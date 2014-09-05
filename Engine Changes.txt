@@ -1,5 +1,5 @@
 Feel free to add to this list anything that comes to mind that would be related to modifying the COP source.
-If you've implemented a given feature already by experimenting on the CS source, put a star next to it.
+If you've implemented a given feature already by experimenting on the CS source, put a * next to it.
 
 1) Convert to 64-bit (to allow more than 4gb RAM to be used)
 2) Multi-thread the engine for up to 4 cores
@@ -17,10 +17,29 @@ If you've implemented a given feature already by experimenting on the CS source,
 14) Better tessellation in DX11/12. Modify current method plus implement artist controlled displacement mapping or something else that allows more control over usage
 15) 3D shell casings (I know this can sorta be done in only LUA, but it would be simpler just to hardcode it)
 16) Replace current shadowing system with one with better antialiasing and less "noise" when a character is in an interior and moving around
-
+17) Actor shadows in R2/R3 - *
+18) Grass draw distance console command - *
+19) Re-enable fov and hud_fov console commands - *
 
 SDK
 1) Less errors and crashes, loads of these.
 2) Visible level-loaded decals and the ability to see decals that aren't just 'wallmarkblend' type.
 3) 'Undo' function that doesn't take minutes to do and actually works properly.
 4) Better performance
+
+Weapon related changes
+1) Add ability to give weapons like the Abakan the ability to specify a fire mode where they fire at a different RPM (Abakan fires 2 shots at 1800rpm. The new AK-12 fires 3 shots at 1,000rpm. I'm not adding an AK-12, just giving an example).
+2) Make pistols more useful somehow. Maybe make a "quick pistol" key or something. 
+3) Different reload sounds for reloading empty vs reloading full - *
+4) Add anm_reload_empty to weapons that don't have one - *
+5) Animation for misfires - *
+6) Weapons can't be reloaded during sprint - *
+7) sprint_start and sprint_stop animations for weapons
+8) Smoother transition/falloff for weapons using grenade launcher attachments
+9) Full-auto pistol class so they display proper empty animations
+10) Bayonet and underslung shotgun attachments
+11) Ability to swap out different scope models and eotech's/kobra's without having to swap models like in Shoker
+12) Ability to change weapon model visual based on upgrades
+13) 3D scopes (different than in Shoker and STCOP; I mean a scope model that takes up the screen with a texture underlay of the crosshair)
+14) Allow new types of weapon upgrades like artifact augmentation
+15) Ironsight zoom in/out sounds - *
