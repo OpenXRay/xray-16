@@ -22,7 +22,8 @@ source, put a * next to it.
 10) Allow more than 2 ammo types per weapon without screwed up/missing UI ammo
     count
 11) Allow environment mapping for weapons not on DX8 (I found the file
-    responsible, just need someone to implement it)
+    responsible, just need someone to implement it) (NOTE: K.D. Says this can't really
+    be done without it happening indoors too :(  )
 12) Allow .seq files to be given a stop frame/point (animated blood puddles
     underneath bodies anyone?)
 13) Allow wallmarks to have bump and bump# usage (for glossy blood and for
@@ -57,7 +58,7 @@ Weapon related changes
 3) Different reload sounds for reloading empty vs reloading full - *
 4) Add anm_reload_empty to weapons that don't have one - *
 5) Animation for misfires - *
-6) Weapons can't be reloaded during sprint - *
+6) Weapons can't be reloaded during sprint
 7) sprint_start and sprint_stop animations for weapons
 8) Smoother transition/falloff for weapons using grenade launcher attachments
 9) Full-auto pistol class so they display proper empty animations
