@@ -38,6 +38,9 @@ source, put a * next to it.
 17) Actor shadows in R2/R3 - *
 18) Grass draw distance console command - *
 19) Re-enable fov and hud_fov console commands - *
+20) Re-enable grass shadows
+21) Add Instanced Tessellation for DX9&10: 
+    http://developer.download.nvidia.com/SDK/10.5/Samples/InstancedTessellation.zip
 
 SDK
 1) Get SDK compiled with Visual Studio (=> get rid of Borland trash)
@@ -61,7 +64,7 @@ Weapon related changes
 6) Weapons can't be reloaded during sprint
 7) sprint_start and sprint_stop animations for weapons
 8) Smoother transition/falloff for weapons using grenade launcher attachments
-9) Full-auto pistol class so they display proper empty animations
+9) Full-auto pistol class so they display proper empty animations - *
 10) Bayonet and underslung shotgun attachments
 11) Ability to swap out different scope models and eotech's/kobra's without
     having to swap models like in Shoker
