@@ -38,7 +38,7 @@ source, put a * next to it.
 17) Actor shadows in R2/R3 - *
 18) Grass draw distance console command - *
 19) Re-enable fov and hud_fov console commands - *
-20) Re-enable grass shadows
+20) Re-enable grass shadows - *
 21) Add Instanced Tessellation for DX9&10: 
     http://developer.download.nvidia.com/SDK/10.5/Samples/InstancedTessellation.zip
 
