@@ -1,0 +1,156 @@
+Changelog for: GameSpy HTTP SDK
+--------------------------------------------------------
+
+DATE        VERSION  BY   TYPE     DESCRIPTION
+----------  -------  ---  -------  ---------------------------------------------------------
+12-12-2007  1.11.00  RMV  RELEASE  Released to Developer Site
+12-12-2007  1.10.05  RMV  FIX      Updated ghttpStreamEx call in ghttpc.c to use a URL requiring Nintendo certification, since it 
+                                   uses REVOEXSSL
+11-27-2007  1.10.04  SAH  FIX      Fixed bug where hostname lookup thread wasn't cancelled if request was
+                     SAH  CLEANUP  Moved extern "c" block below includes to prevent linker errors
+11-12-2007  1.10.03  SAH  FIX      Incorporated Nintendo suggestions for Built-in RevoEX SSL Certification
+10-08-2007  1.10.02  BED  RELEASE  Limited Release
+10-03-2007  1.10.02  BED  FIX      Switched use of GS_ASSERT(0) with GS_FAIL()
+10-01-2007  1.10.01  BED  FEATURE  Added RevoEX SSL support
+08-06-2007  1.10.00  RMV  RELEASE  Released to Developer Site
+07-18-2007  1.09.03  SAH  FIX      Rolled back version of ghttpProcess to use stack allocation - DS changes were causing socket errors.
+07-16-2007  1.09.02  RMV  FIX      Fixed URL for getting header in ghttpc
+07-11-2007  1.09.02  RMV  FIX      Fixed ghttpc/ghttpmfc Project files to get rid of Unicode warnings and fixed other compiler warnings
+04-19-2007  1.09.01  SAH  FIX      Fixed ghiDoReceivingHeaders/File to support DS limited stack size - uses heap allocation now.
+03-05-2007  1.09.00  SAH  RELEASE  Released to Developer Site
+03-02-2007  1.08.06  SN   FIX      Fixed some compiler warnings for code warrior
+02-22-2007  1.08.05  SN   FIX      Changed parts of code that used strdup to use goastrdup  
+01-22-2007  1.08.04  SAH  FIX      Fixed unicode-specific bug for PostAddFileFromMemory
+01-16-2007  1.08.03  DES  FEATURE  Added X360 support
+01-04-2007  1.08.02  BED  FIX      Fixed PS3 Byte order bug in encryption algorithm
+12-19-2006  1.08.01  BED  FEATURE  Added support for Unicode file names when saving to disk.
+12-15-2006  1.08.00  MJW  RELEASE  Released to Developer Site
+11-28-2006  1.07.49  SAH  FIX      Fixed previous change, postWaitContinue set to true for soap messages only
+11-13-2006  1.07.48  SAH  FIX      Rolled back the 1.07.37 change, set postWaitContinue to FALSE.
+11-10-2006  1.07.47  JR   RELEASE  Limited release
+10-23-2006  1.07.47  DES  RELEASE  Limited release
+10-05-2006  1.07.47  SAH  FIX      Updated MacOSX Makefile
+09-28-2006  1.07.46  SAH  FIX      Fixed PS3 project to work with PS3 095.00x SDK; changed included libaries in linker input.
+08-24-2006  1.07.45  SAH  FIX      Fixed VC7 project file
+08-04-2006  1.07.44  SN   FIX      Fixed asynchronous DNS lookup code: removed unnecessary memory allocation
+08-02-2006  1.07.43  SAH  RELEASE  Releasing to developer site 
+07-31-2006  1.07.43  SAH  FIX      Fixed PS3 project file - added post-build step to create *.SELF for execution
+07-25-2006  1.07.42  SAH  FIX      Fixed NITRO project, include for crt0.o now above others so it add correct file
+07-07-2006  1.07.41  SAH  FIX      Fixed HTTP DNS cleanup - needed to explicitly free handle pointer memory
+07-06-2006  1.07.40  SAH  FIX      Fixed PSP project file to not explicitly include the PSP linker file
+07-05-2006  1.07.39  SAH  FIX      Fixed postWaitContinue functionality to remain false when waiting
+	             SAH  FIX      Fixed log call define
+06-30-2006  1.07.38  SAH  FIX      Fixed Linux makefile
+06-30-2006  1.07.37  SAH  FIX      Uncommented postWaitContinue if statement (caused extra newline sent in posts)
+		     SAH  FIX      Fixed Nitro project file & linker command file to work with CW 2.0/NitroSDK 3.1
+06-20-2006  1.07.36  SAH  FEATURE  Added asynchronous DNS lookup for LINUX (pthreads)
+                     SAH  OTHER    Added some more debugging statements for failed host lookups
+                     SAH  FIX      Fixed Linux makefile - added "-lpthread" compiler option for asynch DNS
+06-09-2006  1.07.35  SAH  FEATURE  Added asynchronous DNS lookup support for WIN32 (multi-threaded)
+05-31-2006  1.07.34  SAH  RELEASE  Releasing to developer site
+05-25-2006  1.07.33  SAH  FIX      Added GSI_UNUSED calls to get rid of PSP warnings
+		     SAH  FIX      Changed PSP project warning levels
+		     SAH  FIX      Fixed PS3 project to compile with 084_001 SDK
+05-24-2006  1.07.32  SAH  FIX      Uncommented secure page test in gptestc.c
+05-19-2006  1.07.31  SAH  FIX      Added gsTestMain.c to nitro CodeWarrior Project
+05-18-2006  1.07.30  BED  FIX      Fixed bug with byte alignment for SSL on DS/PS3
+                     BED  FIX      Fixed bug where a line was mistakenly removed from previous version.
+05-18-2006  1.07.29  DES  RELEASE  Limited developer release
+05-18-2006  1.07.29  SAH  FIX      Added a check in ghiDoSend to ensure buffer != NULL and len != 0
+05-15-2006  1.07.28  SAH  FIX      Added "PS3 Release" configuration to project
+05-08-2006  1.07.27  SAH  FIX      Fixed PS2 Project file (was missing gsXML)
+05-02-2006  1.07.26  BED  FIX      Removed "expect continue" functionality that (may have) caused issues with some UK web proxies.
+04-25-2006  1.07.25  SAH  RELEASE  Releasing to developer site
+04-24-2006  1.07.25  SAH  FIX      added typecasts, fixed #includes to get rid of warnings in CW
+04-20-2006  1.07.24  SAH  FIX      got rid of unused variables, switched GSI_USUNUSED above the returns
+04-19-2006  1.07.23  SAH  FIX      Bill switched some byte ordering for PS3 compatibility
+04-18-2006  1.07.22  SAH  FIX      Added || defined(_PS3) for PS3 support
+04-13-2006  1.07.21  SAH  FIX      Replaced all (rcode == SOCKET_ERROR) w/ (gsiSocketIsError(rcode))
+02-21-2006  1.07.20  BED  OTHER    Adjusted debug output level for http continue.
+01-26-2006  1.07.19  SN   FIX      Added psp to the test_main definition
+                     SN   OTHER    Added and updated psp prodg project and solution      
+01-26-2006  1.07.18  BED  FIX      Added error checking between REQUEST and POST.
+                     BED  OTHER    HTTPS requests now default to GameSpy SSL encryptor.
+                     BED  FIX      Fixed an efficiency bug with plain text posts.
+01-20-2006  1.07.17  BED  FEATURE  Added support for DIME attachments.
+01-13-2006  1.07.16  BED  FEATURE  Added ghttpPostAddXml to support http soap requests.
+12-16-2005  1.07.15  SN   OTHER    Cleaned up project files and added missing common code if any
+11-17-2005  1.07.15  DES  FIX      Updated Nitro makefile.
+11-14-2005  1.07.14  DES  FIX      Updated the makefiles and project files.
+                     DES  FIX      Fixed a few minor HTTPS bugs.
+                     DES  FEATURE  Updated MFC sample to work with HTTPS.
+09-23-2005  1.07.13  DES  FEATURE  Updated DS support
+07-28-2005  1.07.12  SN   RELEASE  Releasing to developer site.
+07-28-2005  1.07.12  SN   FEATURE  Added HTTP SSL common code to projects
+06-03-2005  1.07.11  SN   RELEASE  Releasing to developer site.
+06-01-2004  1.07.11  SN   FIX      Fixed the function ghiParseStatus to find the status string after it checks for correct header information.
+05-09-2005  1.07.10  BED  FEATURE  Added ghttpCloseRequest to handle graceful shutdowns
+05-08-2005  1.07.09  DES  FIX      CompletedCallback now gets the file length for Save and Stream requests.
+05-05-2005  1.07.08  BED  FIX      Updated project files to use new common folder
+04-29-2005  1.07.07  SN   OTHER    Created Visual Studio .NET projects
+04-28-2005  1.07.07  SN   RELEASE  Releasing to developer site.
+04-27-2005  1.07.07  DES  RELEASE  Limited release to Nintendo DS developers.
+04-25-2005  1.07.07  DES  FEATURE  Added debug logging.
+                     DES  CLEANUP  Removed old commented-out code.
+                     DES  CLEANUP  General cleanup of ghttpc.
+04-12-2005  1.07.06  BED  FIX      Fixed bug where User-Agent header could appear twice.
+04-04-2005  1.07.05  SN   RELEASE  Releasing to developer site.
+03-29-2005  1.07.05  DES  FIX      Fixed warnings for internal functions
+03-14-2005  1.07.04  DES  FEATURE  Nintendo DS support
+01-12-2004  1.07.03  BED  FIX      Was missing a #ifdef around matrixssl.h
+12-20-2004  1.07.02  BED  FIX      Fixed ghttpGetHeaders with SSL support.
+12-06-2004  1.07.01  BED  FEATURE  Added initial support for SSL connections.
+11-19-2004  1.07.00  DDW  FEATURE  Added internal support for persistent server connections
+09-16-2004  1.06.25  SN   RELEASE  Releasing to developer site.
+08-27-2004  1.06.25  DES  CLEANUP  Removed MacOS style includes
+                     DES  CLEANUP  General Unicode cleanup
+                     DES  CLEANUP  Updated Win32 project configurations
+                     DES  CLEANUP  Fixed warnings under OSX
+                     DES  CLEANUP  Updated OSX Makefile
+08-13-2004  1.06.24  SN   FIX      Changed asserts in ghiParseProxyServer to reflect the correct checks on parameters
+08-04-2004  1.06.23  SN   RELEASE  Releasing to developer site.
+07-19-2004  1.06.23  SN   FIX	   Updated code with explicit casts to remove implicit cast error 
+                                   when compiling at highest level and warnings treated as errors.
+06-18-2004  1.06.22  BED  RELEASE  Releasing to developer site.
+06-17-2004  1.06.22  BED  FIX      ghttpc sample no longer builds UNICODE mode by default
+                     BED  FEATURE  Added PS2 Insock support
+01-26-2004  1.06.21  BED  FEATURE  Added the ability to set a "proxy override" on each request.
+11-10-2003  1.06.20  DES  RELEASE  Releasing to developer site.
+11-07-2003  1.06.20  DES  FIX      Updated the linux makefile.
+10-21-2003  1.06.19  BED  RELEASE  Releasing to developer site.  (UNIQUE NICK AND UNICODE SUPPORT)
+10-20-2003  1.06.19  BED  FEATURE  Added ghttpSetMaxRecvTime() to prevent async downloads from blocking in special cases
+01-05-2003  1.06.18  JED  FEATURE  Added download size checking and GHTTPFileToBig error code
+09-30-2003  1.06.17  BED  FEATURE  Modified sample app to check (result < 0) instead of (result == -1) to handle additional error codes.
+09-16-2003  1.06.16  JED  FIX      Added stringutil.c/h incudes to ghttp.dsp
+09-08-2003  1.06.15  BED  FEATURE  Added wrapper for UNICODE support.  (Two byte UNICODE converted to single byte ASCII)
+                     BED  FEATURE  Added new return status "GHTTPFileIncomplete" to notify of a partial or interrupted download
+                     BED  FEATURE  Added extra error return codes per JED request.  To enable these define GHTTP_EXTENDEDERROR
+07-24-2003  1.06.14  DES  RELEASE  Releasing to developer site.
+07-18-2003  1.06.14  BED  FEATURE  Added CodeWarrior (PS2) sample project file.
+                     BED  CLEANUP  General cleanup to remove CodeWarrior warnings.
+07-17-2003  1.06.13  DES  CLEANUP  Cleaned up the PS2 Makefile, it now uses Makefile.commmon.
+07-16-2003  1.06.12  DES  FIX      Changed a __mips64 checks to a _PS2 check.
+                     BED  FEATURE  Added ProDG sample project files.
+07-15-2003  1.06.11  DES  RELEASE  Releasing to developer site.
+07-10-2003  1.06.11  BED  FIX      Added newline to end of file to prevent compiler warning.
+05-09-2003  1.06.10  DES  CLEANUP  Removed Dreamcast support.
+                          FIX      Metrowerks for Win32 is no longer falsely identified as MacOS.
+04-15-2003  1.06.09  JED  CLEANUP  More cleanup to remove a few DevStudio Level4 warnings
+03-03-2003  1.06.08  DES  CLEANUP  General cleanup to remove warnings.
+01-28-2003  1.06.07  DES  FIX      Fixed a bug which could cause a request to fail if a 1xx (Continue)
+                                   status response was received (common when posting).
+                          CLEANUP  Changed posting code to send no more than 32K in a single send() call.
+                                   Win98 was having trouble dealing with large blocks of data.
+01-23-2003  1.06.06  DES  FIX      Replaced a malloc with gsimalloc.
+01-15-2003  1.06.05  DES  FIX      Fixed a crashing bug involving parsing received data that started
+                                   with the last byte of a chunk header.
+12-19-2002  1.06.04  DES  RELEASE  Releasing to developer site.
+12-19-2002  1.06.04  DES  CLEANUP  Removed assert.h include.
+12-16-2002  1.06.03  DES  CLEANUP  Removed call to GOAClearSocketError.
+12-13-2002  1.06.02  DES  FEATURE  Added PS2 eenet stack support.
+                          CLEANUP  Cleaned up code to remove PS2 compiler warnings.
+11-14-2002  1.06.01  DES  FIX      Send "Connection: close" in request header to be 1.1 compliant
+                          FIX      Fixed bug with reading end of chunked header
+                          OTHER    Removed "#if 1" block from around chunked transfer code
+                          OTHER    Each connection gets a unique ID (for debugging, not exposed in API)
+09-25-2002  1.06.00  DDW  OTHER    Changelog started

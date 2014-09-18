@@ -1,0 +1,47 @@
+Changelog for: PS2 Common Code
+--------------------------------------------------------
+
+DATE        VERSION  BY   TYPE     DESCRIPTION
+----------  -------  ---  -------  ---------------------------------------------------------
+06-03-2005  1.05.19  SN   RELEASE  Releasing to developer site.
+04-28-2005  1.05.19  SN   RELEASE  Releasing to developer site.
+04-04-2005  1.05.19  SN   RELEASE  Releasing to developer site.
+09-16-2004  1.05.19  SN   RELEASE  Releasing to developer site.
+08-05-2004  1.05.19  SN   RELEASE  Releasing to developer site.
+07-23-2004  1.05.19  SN	  FIX      Updated code with explicit casts to remove implicit cast error 
+                                   when compiling at highest level and warnings treated as errors.(ps2pad.c)
+07-19-2004  1.05.18  SN	  FIX      Updated code with explicit casts to remove implicit cast error 
+                                   when compiling at highest level and warnings treated as errors.(ps2common.c)
+07-14-2004  1.05.17  DES  CLEANUP  Updated and unified IRX module loading code.
+                          FEATURE  Added loading of IRX modules needed by GV SPU2 code.
+06-22-2004  1.05.16  BED  FEATURE  Added PS2 Insock support
+06-22-2004  1.05.15  DES  FEATURE  Add loading of Logitech video library for EyeToy support in GV.
+06-08-2003  1.05.14  DES  RELEASE  Limited developer release (for GV)
+04-22-2004  1.05.14  DES  FEATURE  Added ps2pad.c/h for getting input events from the controller.
+10-21-2003  1.05.13  BED  RELEASE  Releasing to developer site.  (UNIQUE NICK AND UNICODE SUPPORT)
+                     BED  FIX      Removed misc compiler warnings on strict setting.
+10-09-2003  1.05.13  BED  FIX      DHCP override settings defined but not used.  Now passed into init call.
+07-24-2003  1.05.12  DES  RELEASE  Releasing to developer site.
+07-24-2003  1.05.12  DES  FEATURE  Added a Makefile for building all projects with gcc.
+                          FEATURE  Added a ProDG workspace that includes all the sample app projects.
+                          FEATURE  Added a CodeWarrior workspace that includes all the sample app projects.
+07-23-2003  1.05.11  DES  FIX      Removed unneeded headers from ps2common.c which were causing warnings.
+                          CLEANUP  Removed EENet 2.6.0 compatibility.
+                          CLEANUP  Changed most printf()s in ps2common.c to scePrintf().
+07-21-2003  1.05.10  DES  FIX      Updated the gcc Makefile.common to automatically build the
+                                   ent_cnf.irx when making for EENet.
+07-17-2003  1.05.09  DES  FEATURE  Put PS2 test app common Makefile code into Makefile.common.
+                                   It is then included from all the SDK-specific Makefiles.
+07-16-2003  1.05.08  DES  FIX      EENet will no longer lockup if it can't load an irx module.
+                          CLEANUP  Removed Cisco NFT support.
+02-25-2003  1.05.07  DES  CLEANUP  Changed sceEENetInit() for 2.6.1 EENet compatibility.
+                                   EENET_260 can be defined for 2.6.0 compatibility.
+01-02-2003  1.05.06  DES  FIX      Added needed defines for modem support.
+                          CLEANUP  Removed references to ent_cnf.h and ent_cnf.irx.
+12-18-2002  1.05.05  DES  CLEANUP  Updated SN Systems stack support.
+12-13-2002  1.05.04  DES  FEATURE  Added PS2 eenet stack support.
+12-05-2002  1.05.03  DES  CLEANUP  General cleanup
+                          FEATURE  Initial PS2 eenet stack support
+11-20-2002  1.05.02  DES  FEATURE  Updated to use new Unique ID code.
+11-14-2002  1.05.01  DES  OTHER    Updated the IOPIMAGE define to IOPRP255.IMG from IOPRP250.IMG
+09-25-2002  1.05.00  DDW  OTHER    Changelog started

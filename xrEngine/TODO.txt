@@ -1,0 +1,176 @@
+***[OLES]*** Done:
+-------------------------
+		*	PS for everything even for R1			(?)
+		*	OPT:		one pass detail textures
+		*	NF:			d-lighting
+				hemisphere
+					- xrLC tesselation
+					- EQ-ps: 			base * (diffuse.rgb + lmap*diffuse.a)
+					- EQ-vs-light: 		diffuse.rgb = (lights(pos,norm) + fonarik(s) + hemi_color*diffuse.a), diffuse.a = lmap_scale
+					- EQ-vs-fog:		???
+					- VS for everything
+					- PS for everything
+					- 32bit normals for everything
+					- 16bit lmap-TC for level	
+					- LMAP geom: 	3*4(pos) + 4(norm.hemi) + 2*4(tc0) + 2*2(tc1)  					= 28bytes = ~ideal
+					- VLIGHT geom:	3*4(pos) + 4(norm)      + 2*4(tc0) + 4(diffuse.rgb + hemi)		= 28bytes = ~ideal
+		*	xrLC - hemisphere (R1)
+		*	точное освещение level.details
+		*	более точное освещение моделей
+		*	MEM:		wallmarks shouldn't use connectivity		( - 16 bytes per CFORM triangle)
+		*	MEM:		уменьшить/палеттизировать level.details
+		*	MEM:		string-docking / sharing
+		*	OPT+MEM:	C++ LUA + xr_malloc, etc.
+		*	OPT:		xrRenderR1/R2 - statistical flow analysis LOG (datch levels - yarigra, etc.)
+		*	OPT:		move 90% of per-object info/calc into per-slot (vis-detection, etc)
+
+	bugs/features:
+		*	BUG:		models/model_trans 			- черный
+		*	BUG:		vert_aref					- черный
+		*	BUG:		5-color-lods
+
+***[OLES]*** Done:
+-------------------------
+		*	BUG:		освещение монстров вдали (загасить проекцию)
+		*	OPT:		ref-str for constant lookups
+		*	OPT+MEM:	Animation sharing
+		* 	NEW:		фонарик
+		*	NEW:		sub-rendering
+		*	NEW:		projective texturing in ps1_1
+		*	BUG:		projector - 
+		*	NEW:		sound cache
+		*	NEW:		R1/R2 shared scene-graph
+		*	NEW:		scripted shaders
+		*	NEW:		4tap shadow filter
+		*	OPT:		fast pixel correct projection 
+		*	NEW:		4tap projection filter
+		*	NEW:		2tap duality filter
+		*	BUG:		sun source shadowing
+		*	BUG:		засветка кончиков моделей 
+		*	NEW:shader: типа по альфе в моделях - рефлекшн, какая-то кубемапа
+		
+
+***[OLES]*** In progress:
+-------------------------
+		2.		типа стекло, типа преломляет, типа статика
+		3.		вода???
+		
+		---Р    Нужны шейдеры самосвечения для уровня (разрывы лавы к примеру) и моделей (светящиеся глаза)
+		---		не работает шейдер кубе мапа в движке ( в редакторе работает)
+		---		Нужны шейдеры для моделей "прозрачность+отражение скайдома" "чистое отражение скайдома" и 
+					ОЧЕНЬ ЖЕЛАТЕЛЬНО связать отражение с текстурой скайдома ("динамический" шейдер)
+		---Р    Нужны шейдеры для уровня "прозрачность+отражение скайдома" "чистое отражение скайдома" 
+					(для отражения воды в болотах через маску ряски и проч. и ОЧЕНЬ ЖЕЛАТЕЛЬНО связать 
+					отражение с текстурой скайдома ("динамический" шейдер)
+		---Р    Нужны шейдеры для моделей персонажей "прозрачность+отражение скайдома" 
+		---Р    Нужны шейдеры для моделей оружия "прозрачность+отражение скайдома" для имитации легкого 
+					поблескивания оружия
+		---P    Шэйдер с детальной текстурой для моделей оружия. Это возможно позволит уменьшить основные 
+					текстуры без потери качества
+					
+		------------- не нравится и вааще впадло ---------------------
+		---P	Осветить (хотя бы приблизительно) партиклы. взрывы ночью смотрятся плохо.
+		--------------------------------------------------------------
+	
+		*	conditional shading 					(#define :)
+		*	detail textures on characters
+		*	per-character ambient
+		*	dynamic-glow
+
+		bugs/features:
+		*	проверить transluency на деревьях (test_light) 
+		*	BUG: full path inside FS - should be relative!
+
+		to think:
+		*	солнце (lmaps) / дождь / туман (возможно scattering) / небо (тучи) / ветер+порывы (трава, деревья) / flare+sun effs
+		*	обьемный туман
+		
+***[AlexMX]*** In progress:
+---------------------------
+		+	одна текстура на все детальные обьекты
+		+	Self-reference in _vector2<T>, _vector3<T>, _vector4<T>, _matrix<T>, etc.
+		*	.OGG vorbis + params
+			подумать насчет декомпрессии (кеш?непрерывная?при загрузке?)
+		*	#include in "system.ltx"
+
+***[???]*** TODO:
+---------------------------
+		new:
+		*	save material-translate table in xrLC and use in xr3DA (level_load.cpp) - u16(trans)-u32(global)-u16(index)
+		*	O(1) AI node search
+		* 	SW - VIPM (прогр. меши)
+		
+		*	smooth lerping of tree-lods
+		
+		*	wallmark на персонажах
+		*	кровь, следы от машин
+
+		*	xrLC - optimize cform 				( )
+		*	hierrarchical profiler
+		*	R2 - shaders			(ATI rm/ nvCG FX)
+		*	R2 - light materials	(3D tex)
+
+		*	пригибание травы + ветер
+		*	дальность для травы
+
+		*	'fast' strings
+
+		*	progressive+hierrarchical volume shrink for ISpatial
+
+		*	учесть материалы при рей-пике (12 бит + флаги для Кости и всех остальных ? :)
+
+
+		bugs/features:
+		* 	трава и лоды в Zoom-е
+		*	dynamic_cast<ISpatial>(this) в конструкторе
+
+		to think:
+		*	разрушаемые обьекты
+		*	освещение партиклов
+		*	PVS ???
+		*	вариации оккл. кулинга ???
+		*	коллижен для партиклов ???
+
+		очень большой кусок:
+		*	сеть
+
+
+
+
+
+
+
+
+
+Sanya : 250-03-70; 488-81-66
+Oles:   oles@astral.ntu-kpi.kiev.ua, ICQ#: 36842658, 417-49-05
+Zaya:	-250-62-66, +562-05-28
+AlexMX:	418-72-13(дом), 463-69-36(work2) alexmx22@hotmail.com
+Viktor	514-82-64(random)
+AlexRR:	553-51-86
+
+-----------------------
+// 32554 (05356) Женя - брат Олеся
+// litvin@newmail.ru
+-----------------------
+// Andy - друг Олеся :)
+// 2473180 - работа
+// 2712100 - офис
+
+// 2663511 - Vadya
+-----------------------
+// Yura(2)
+// 413-0995
+-----------------------
+
+Позвонить Andy - спросить тел. Вадима Зиновьева.
+Ваде сказать, что от меня и что бы разобрался со своей работой.
+vadya@astral.ntu-kpi.kiev.ua
+
+WhitePages - 
+
+Вариант 2:
+Позвонить Andy - спросить тел. Ивана Веретянникова
+У Ивана спросить как можно добраться до Вади.
+Дальше пункт 1 :)
+

@@ -1,0 +1,389 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>LuaJIT Performance</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="Author" content="Mike Pall">
+<meta name="Copyright" content="Copyright (C) 2005-2008, Mike Pall">
+<meta name="Language" content="en">
+<link rel="stylesheet" type="text/css" href="bluequad.css" media="screen">
+<link rel="stylesheet" type="text/css" href="bluequad-print.css" media="print">
+<style type="text/css">
+table.bench {
+  line-height: 1.2;
+}
+tr.benchhead td {
+  font-weight: bold;
+}
+td img, li img {
+  vertical-align: middle;
+}
+td.barhead, td.bar {
+  font-size: 8pt;
+  font-family: Courier New, Courier, monospace;
+  width: 360px;
+  padding: 0;
+}
+td.bar {
+  background: url('img/backbar.png');
+}
+td.speedup {
+  text-align: center;
+}
+</style>
+</head>
+<body>
+<div id="site">
+<a href="http://luajit.org/"><span>Lua<span id="logo">JIT</span></span></a>
+</div>
+<div id="head">
+<h1>LuaJIT Performance</h1>
+</div>
+<div id="nav">
+<ul><li>
+<a href="index.html">Index</a>
+</li><li>
+<a href="luajit.html">LuaJIT</a>
+<ul><li>
+<a href="luajit_features.html">Features</a>
+</li><li>
+<a href="luajit_install.html">Installation</a>
+</li><li>
+<a href="luajit_run.html">Running</a>
+</li><li>
+<a href="luajit_api.html">API Extensions</a>
+</li><li>
+<a href="luajit_intro.html">Introduction</a>
+</li><li>
+<a class="current" href="luajit_performance.html">Performance</a>
+</li><li>
+<a href="luajit_debug.html">Debugging</a>
+</li><li>
+<a href="luajit_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="coco.html">Coco</a>
+<ul><li>
+<a href="coco_portability.html">Portability</a>
+</li><li>
+<a href="coco_api.html">API Extensions</a>
+</li><li>
+<a href="coco_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="dynasm.html">DynASM</a>
+<ul><li>
+<a href="dynasm_features.html">Features</a>
+</li><li>
+<a href="dynasm_examples.html">Examples</a>
+</li></ul>
+</li><li>
+<a href="http://luajit.org/download.html">Download <span class="ext">&raquo;</span></a>
+</li></ul>
+</div>
+<div id="main">
+<p>
+Here are some performance measurements, based on a few benchmarks.
+</p>
+
+<h2 id="interpretation">Interpreting the Results</h2>
+<p>
+As is always the case with benchmarks, care must be taken to
+interpret the results:
+</p>
+<p>
+First, the standard Lua interpreter is already <em>very</em> fast.
+It's commonly the fastest of it's class (interpreters) in the
+<a href="http://shootout.alioth.debian.org/"><span class="ext">&raquo;</span>&nbsp;Great Computer Language Shootout</a>.
+Only true machine code compilers get a better overall score.
+</p>
+<p>
+Any performance improvements due to LuaJIT can only be incremental.
+You can't expect a speedup of 50x if the fastest compiled language
+is only 5x faster than interpreted Lua in a particular benchmark.
+LuaJIT can't do miracles.
+</p>
+<p>
+Also please note that most of the benchmarks below are <em>not</em>
+trivial micro-benchmarks, which are often cited with marvelous numbers.
+Micro-benchmarks do not realistically model the performance gains you
+can expect in your own programs.
+</p>
+<p>
+It's easy to make up a few one-liners like:<br>
+<tt>&nbsp;&nbsp;local function f(...) end; for i=1,1e7 do f() end</tt><br>
+This is more than 30x faster with LuaJIT. But you won't find
+this in a real-world program.
+</p>
+
+<h2 id="methods">Measurement Methods</h2>
+<p>
+All measurements have been taken on a Pentium&nbsp;III 1.139&nbsp;GHz
+running Linux&nbsp;2.6. Both Lua and LuaJIT have been compiled with
+GCC&nbsp;3.3.6 with <tt>-O3 -fomit-frame-pointer</tt>.
+You'll definitely get different results on different machines or
+with different C&nbsp;compiler options. <sup>*</sup>
+</p>
+<p>
+The base for the comparison are the user CPU times as reported by
+<tt>/usr/bin/time</tt>. The runtime of each benchmark is parametrized
+and has been adjusted to minimize the variation between several runs.
+The ratio between the times for LuaJIT and Lua gives the speedup.
+Only this number is shown because it's less dependent on a specific system.
+</p>
+<p>
+E.g. a speedup of 6.74 means the same benchmark runs almost 7 times
+faster with <tt>luajit&nbsp;-O</tt> than with standard Lua (or with
+<tt>-j off</tt>). Your mileage may vary.
+</p>
+<p style="font-size: 80%;">
+<sup>*</sup> Yes, LuaJIT relies on quite a bit of the Lua core infrastructure
+like table and string handling. All of this is written in C and
+should be compiled with full optimization turned on, or performance
+will suffer.
+</p>
+
+<h2 id="lua_luajit" class="pagebreak">Comparing Lua to LuaJIT</h2>
+<p>
+Here is a comparison using the current benchmark collection of the
+<a href="http://shootout.alioth.debian.org/"><span class="ext">&raquo;</span>&nbsp;Great Computer Language Shootout</a> (as of 3/2006):
+</p>
+
+<div class="tablewrap">
+<table class="bench">
+<tr class="benchhead">
+<td>Benchmark</td>
+<td class="speedup">Speedup</td>
+<td class="barhead">
+<img src="img/spacer.png" width="360" height="12" alt="-----1x----2x----3x----4x----5x----6x----7x----8x">
+</td>
+</tr>
+<tr class="odd">
+<td>mandelbrot</td>
+<td class="speedup">6.74</td>
+<td class="bar"><img src="img/bluebar.png" width="303" height="12" alt="========================================"></td>
+</tr>
+<tr class="even">
+<td>recursive</td>
+<td class="speedup">6.64</td>
+<td class="bar"><img src="img/bluebar.png" width="299" height="12" alt="========================================"></td>
+</tr>
+<tr class="odd">
+<td>fannkuch</td>
+<td class="speedup">5.37</td>
+<td class="bar"><img src="img/bluebar.png" width="242" height="12" alt="================================"></td>
+</tr>
+<tr class="even">
+<td>chameneos</td>
+<td class="speedup">5.08</td>
+<td class="bar"><img src="img/bluebar.png" width="229" height="12" alt="=============================="></td>
+</tr>
+<tr class="odd">
+<td>nsievebits</td>
+<td class="speedup">5.05</td>
+<td class="bar"><img src="img/bluebar.png" width="227" height="12" alt="=============================="></td>
+</tr>
+<tr class="even">
+<td>pidigits</td>
+<td class="speedup">4.94</td>
+<td class="bar"><img src="img/bluebar.png" width="222" height="12" alt="=============================="></td>
+</tr>
+<tr class="odd">
+<td>nbody</td>
+<td class="speedup">4.63</td>
+<td class="bar"><img src="img/bluebar.png" width="208" height="12" alt="============================"></td>
+</tr>
+<tr class="even">
+<td>spectralnorm</td>
+<td class="speedup">4.59</td>
+<td class="bar"><img src="img/bluebar.png" width="207" height="12" alt="============================"></td>
+</tr>
+<tr class="odd">
+<td>cheapconcr</td>
+<td class="speedup">4.46</td>
+<td class="bar"><img src="img/bluebar.png" width="201" height="12" alt="==========================="></td>
+</tr>
+<tr class="even">
+<td>partialsums</td>
+<td class="speedup">3.73</td>
+<td class="bar"><img src="img/bluebar.png" width="168" height="12" alt="======================"></td>
+</tr>
+<tr class="odd">
+<td>fasta</td>
+<td class="speedup">2.68</td>
+<td class="bar"><img src="img/bluebar.png" width="121" height="12" alt="================"></td>
+</tr>
+<tr class="even">
+<td>cheapconcw</td>
+<td class="speedup">2.52</td>
+<td class="bar"><img src="img/bluebar.png" width="113" height="12" alt="==============="></td>
+</tr>
+<tr class="odd">
+<td>nsieve</td>
+<td class="speedup">1.95</td>
+<td class="bar"><img src="img/bluebar.png" width="88" height="12" alt="============"></td>
+</tr>
+<tr class="even">
+<td>revcomp</td>
+<td class="speedup">1.92</td>
+<td class="bar"><img src="img/bluebar.png" width="86" height="12" alt="============"></td>
+</tr>
+<tr class="odd">
+<td>knucleotide</td>
+<td class="speedup">1.59</td>
+<td class="bar"><img src="img/bluebar.png" width="72" height="12" alt="=========="></td>
+</tr>
+<tr class="even">
+<td>binarytrees</td>
+<td class="speedup">1.52</td>
+<td class="bar"><img src="img/bluebar.png" width="68" height="12" alt="========="></td>
+</tr>
+<tr class="odd">
+<td>sumfile</td>
+<td class="speedup">1.27</td>
+<td class="bar"><img src="img/bluebar.png" width="57" height="12" alt="========"></td>
+</tr>
+<tr class="even">
+<td>regexdna</td>
+<td class="speedup">1.01</td>
+<td class="bar"><img src="img/bluebar.png" width="45" height="12" alt="======"></td>
+</tr>
+</table>
+</div>
+<p>
+Note that many of these benchmarks have changed over time (both spec
+and code). Benchmark results shown in previous versions of LuaJIT
+are not directly comparable. The next section compares different
+versions with the current set of benchmarks.
+</p>
+
+<h2 id="luajit_versions" class="pagebreak">Comparing LuaJIT Versions</h2>
+<p>
+This shows the improvements between the following versions:
+</p>
+<ul>
+<li>LuaJIT&nbsp;1.0.x <img src="img/bluebar.png" width="30" height="12" alt="(===)"></li>
+<li>LuaJIT&nbsp;1.1.x <img src="img/bluebar.png" width="30" height="12" alt="(===##)"><img src="img/magentabar.png" width="20" height="12" alt=""></li>
+</ul>
+
+<div class="tablewrap">
+<table class="bench">
+<tr class="benchhead">
+<td>Benchmark</td>
+<td class="speedup">Speedup</td>
+<td class="barhead">
+<img src="img/spacer.png" width="360" height="12" alt="-----1x----2x----3x----4x----5x----6x----7x----8x">
+</td>
+</tr>
+<tr class="odd">
+<td>fannkuch</td>
+<td class="speedup">3.96&nbsp;&rarr;&nbsp;5.37</td>
+<td class="bar"><img src="img/bluebar.png" width="178" height="12" alt="========================"><img src="img/magentabar.png" width="64" height="12" alt="########"></td>
+</tr>
+<tr class="even">
+<td>chameneos</td>
+<td class="speedup">2.25&nbsp;&rarr;&nbsp;5.08</td>
+<td class="bar"><img src="img/bluebar.png" width="101" height="12" alt="=============="><img src="img/magentabar.png" width="128" height="12" alt="################"></td>
+</tr>
+<tr class="odd">
+<td>nsievebits</td>
+<td class="speedup">2.90&nbsp;&rarr;&nbsp;5.05</td>
+<td class="bar"><img src="img/bluebar.png" width="131" height="12" alt="================="><img src="img/magentabar.png" width="96" height="12" alt="#############"></td>
+</tr>
+<tr class="even">
+<td>pidigits</td>
+<td class="speedup">3.58&nbsp;&rarr;&nbsp;4.94</td>
+<td class="bar"><img src="img/bluebar.png" width="161" height="12" alt="====================="><img src="img/magentabar.png" width="61" height="12" alt="#########"></td>
+</tr>
+<tr class="odd">
+<td>nbody</td>
+<td class="speedup">4.16&nbsp;&rarr;&nbsp;4.63</td>
+<td class="bar"><img src="img/bluebar.png" width="187" height="12" alt="========================="><img src="img/magentabar.png" width="21" height="12" alt="###"></td>
+</tr>
+<tr class="even">
+<td>cheapconcr</td>
+<td class="speedup">1.46&nbsp;&rarr;&nbsp;4.46</td>
+<td class="bar"><img src="img/bluebar.png" width="66" height="12" alt="========="><img src="img/magentabar.png" width="135" height="12" alt="##################"></td>
+</tr>
+<tr class="odd">
+<td>partialsums</td>
+<td class="speedup">1.71&nbsp;&rarr;&nbsp;3.73</td>
+<td class="bar"><img src="img/bluebar.png" width="77" height="12" alt="=========="><img src="img/magentabar.png" width="91" height="12" alt="############"></td>
+</tr>
+<tr class="even">
+<td>fasta</td>
+<td class="speedup">2.37&nbsp;&rarr;&nbsp;2.68</td>
+<td class="bar"><img src="img/bluebar.png" width="107" height="12" alt="=============="><img src="img/magentabar.png" width="14" height="12" alt="##"></td>
+</tr>
+<tr class="odd">
+<td>cheapconcw</td>
+<td class="speedup">1.27&nbsp;&rarr;&nbsp;2.52</td>
+<td class="bar"><img src="img/bluebar.png" width="57" height="12" alt="========"><img src="img/magentabar.png" width="56" height="12" alt="#######"></td>
+</tr>
+<tr class="even">
+<td>revcomp</td>
+<td class="speedup">1.45&nbsp;&rarr;&nbsp;1.92</td>
+<td class="bar"><img src="img/bluebar.png" width="65" height="12" alt="========="><img src="img/magentabar.png" width="21" height="12" alt="###"></td>
+</tr>
+<tr class="odd">
+<td>knucleotide</td>
+<td class="speedup">1.32&nbsp;&rarr;&nbsp;1.59</td>
+<td class="bar"><img src="img/bluebar.png" width="59" height="12" alt="========"><img src="img/magentabar.png" width="13" height="12" alt="##"></td>
+</tr>
+</table>
+</div>
+<p>
+All other benchmarks show only minor performance differences.
+</p>
+
+<h2 id="summary">Summary</h2>
+<p>
+These results should give you an idea about what speedup
+you can expect depending on the nature of your Lua code:
+</p>
+<ul>
+<li>
+LuaJIT is really good at (floating-point) math and loops
+(mandelbrot, pidigits, spectralnorm, partialsums).
+</li>
+<li>
+Function calls (recursive), vararg calls, table lookups (nbody),
+table iteration and coroutine switching (chameneos, cheapconc)
+are a lot faster than with plain Lua.
+</li>
+<li>
+It's still pretty good for indexed table access (fannkuch, nsieve)
+and string processing (fasta, revcomp, knucleotide).
+But there is room for improvement in a future version.
+</li>
+<li>
+If your application spends most of the time in C&nbsp;code
+you won't see much of a difference (regexdna, sumfile).
+Ok, so write more code in pure Lua. :-)
+</li>
+<li>
+The real speedup may be shadowed by other dominant factors in a benchmark:
+<ul>
+<li>Common parts of the Lua core: e.g. memory allocation
+and GC (binarytrees).</li>
+<li>Language characteristics: e.g. lack of bit operations (nsievebits).</li>
+<li>System characteristics: e.g. CPU cache size and memory speed (nsieve).</li>
+</ul>
+</li>
+</ul>
+<p>
+The best idea is of course to benchmark your <em>own</em> applications.
+Please report any interesting results you may find. Thank you!
+</p>
+<br class="flush">
+</div>
+<div id="foot">
+<hr class="hide">
+Copyright &copy; 2005-2008 Mike Pall
+<span class="noprint">
+&middot;
+<a href="contact.html">Contact</a>
+</span>
+</div>
+</body>
+</html>

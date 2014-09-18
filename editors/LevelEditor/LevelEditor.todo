@@ -1,0 +1,30 @@
+{TODO 1 -oAlexMX -cTODO : LOD прогенерить при билде в одну текстуру}
+{TODO 1 -oAlexMX -cTODO : DO set det texture}
+{TODO 1 -oAlexMX -cTODO : Перенести настройки из BottomBar в Props}
+{TODO 1 -oAlexMX -cTODO : Flags принимает enum}
+{DONE 1 -oAlexMX -cERROR : Sun не сохраняет положение}
+{TODO -oAlexMX -cTODO : Доделать Scene.Validate}
+{TODO -oAlexMX -cTODO : Группировать и сделать плагинами все тулзы}
+{TODO -oAlexMX -cTODO : Scene.Validate переделать под tools'ы}
+{DONE 1 -oAlexMX -cTODO : ObjectList в ESceneTools}
+{TODO 1 -oAlexMX -cTODO : Добавить GetBox в ESceneTools}
+{DONE 1 -oAlexMX -cTODO : Порядок рендера для ESceneTools}
+{TODO 1 -oAlexMX -cTODO : В CustomObject -> IsGroupAlowed}
+{TODO -oAlexMX -cTODO : Переместить части GameData (файлы)}
+{DONE 1 -oAlexMX -cTODO : ESceneLightTools}
+{DONE 1 -oAlexMX -cTODO : Copy,Paste,(Load/Save Selection), Clear+Save+Load+Reload Levels,  Level Name (Caption)}
+{TODO 2 -oAlexMX -cTODO : View for Target}
+{DONE 2 -oAlexMX -cTODO : AI Map: пикать ноды по квадратам}
+{DONE -oAlexMX -cERROR : AI Map: не связываются ноды}
+{DONE -oAlexMX -cTODO : растягивать LeftBar то что нужно}
+{DONE -oAlexMX -cTODO : ItemList добавить OnDrawThumbnail + Thumbnail}
+{TODO 2 -oAlexMX -cTODO : Проект состоящий из частей уровня}
+{DONE -oAlexMX -cTODO : AI Map Export Import}
+{DONE -oAlexMX -cTODO : Export Snap List}
+{DONE -oAlexMX -cERROR : Refs '+'}
+{DONE -oAlexMX -cTODO : брать имена для ServerEnt из секции}
+{TODO 2 -oAlexMX -cTODO : при Validate Scene - развернуть группу}
+
+
+
+

@@ -1,0 +1,466 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.06.00"/>
+    <PROJECT value="$(OUTPUT_BINARIES_DIR)\LevelEditor.exe"/>
+    <OBJFILES value="x:\intermediate_ed\le\LevelEditor.obj x:\intermediate_ed\le\BottomBar.obj 
+      x:\intermediate_ed\le\main.obj x:\intermediate_ed\le\TopBar.obj 
+      x:\intermediate_ed\le\stdafx.obj x:\intermediate_ed\le\DOOneColor.obj 
+      x:\intermediate_ed\le\DOShuffle.obj x:\intermediate_ed\le\EditLibrary.obj 
+      x:\intermediate_ed\le\EditLightAnim.obj 
+      x:\intermediate_ed\le\FrameAIMap.obj x:\intermediate_ed\le\FrameDetObj.obj 
+      x:\intermediate_ed\le\FrameGroup.obj x:\intermediate_ed\le\FrameLight.obj 
+      x:\intermediate_ed\le\FrameObject.obj 
+      x:\intermediate_ed\le\FramePortal.obj x:\intermediate_ed\le\FramePS.obj 
+      x:\intermediate_ed\le\FrameSector.obj x:\intermediate_ed\le\FrameShape.obj 
+      x:\intermediate_ed\le\FrameSpawn.obj 
+      x:\intermediate_ed\le\FrameWayPoint.obj x:\intermediate_ed\le\LeftBar.obj 
+      x:\intermediate_ed\le\ObjectList.obj 
+      x:\intermediate_ed\le\previewimage.obj x:\intermediate_ed\le\PropertiesEObject.obj 
+      x:\intermediate_ed\le\Splash.obj x:\intermediate_ed\le\UI_LevelTools.obj 
+      x:\intermediate_ed\le\UI_LevelMain.obj x:\intermediate_ed\le\WayPoint.obj 
+      x:\intermediate_ed\le\ESceneAIMapTools_Export.obj 
+      x:\intermediate_ed\le\Builder.obj x:\intermediate_ed\le\BuilderCF.obj 
+      x:\intermediate_ed\le\BuilderCore.obj 
+      x:\intermediate_ed\le\BuilderGame.obj x:\intermediate_ed\le\BuilderLTX.obj 
+      x:\intermediate_ed\le\BuilderOGF.obj 
+      x:\intermediate_ed\le\BuilderRemote.obj x:\intermediate_ed\le\Cursor3D.obj 
+      x:\intermediate_ed\le\Custom2DProjector.obj 
+      x:\intermediate_ed\le\ESceneDOTools.obj 
+      x:\intermediate_ed\le\EditObjectExportLWO.obj 
+      x:\intermediate_ed\le\ELight.obj 
+      x:\intermediate_ed\le\EParticlesObject.obj x:\intermediate_ed\le\ESceneAIMapTools.obj 
+      x:\intermediate_ed\le\ESceneAIMapTools_Controls.obj 
+      x:\intermediate_ed\le\ESceneAIMapTools_Generate.obj 
+      x:\intermediate_ed\le\ESceneAIMapTools_MotionSimulator.obj 
+      x:\intermediate_ed\le\ESceneAIMapTools_Pick.obj 
+      x:\intermediate_ed\le\ESceneAIMapTools_Render.obj 
+      x:\intermediate_ed\le\ESceneCustomMTools.obj 
+      x:\intermediate_ed\le\ESceneCustomMToolsControls.obj 
+      x:\intermediate_ed\le\ESceneCustomOTools.obj 
+      x:\intermediate_ed\le\ESceneCustomOToolsIO.obj 
+      x:\intermediate_ed\le\ESceneDummyTools.obj 
+      x:\intermediate_ed\le\ESceneGlowTools.obj 
+      x:\intermediate_ed\le\ESceneGroupTools.obj 
+      x:\intermediate_ed\le\ESceneLightTools.obj 
+      x:\intermediate_ed\le\ESceneLightToolsIO.obj 
+      x:\intermediate_ed\le\ESceneObjectTools.obj 
+      x:\intermediate_ed\le\EScenePortalTools.obj 
+      x:\intermediate_ed\le\EScenePSTools.obj 
+      x:\intermediate_ed\le\ESceneSectorTools.obj 
+      x:\intermediate_ed\le\ESceneShapeTools.obj 
+      x:\intermediate_ed\le\ESceneSoundEnvTools.obj 
+      x:\intermediate_ed\le\ESceneSoundSrcTools.obj 
+      x:\intermediate_ed\le\ESceneSpawnTools.obj 
+      x:\intermediate_ed\le\ESceneWayTools.obj x:\intermediate_ed\le\EShape.obj 
+      x:\intermediate_ed\le\ESound_Environment.obj 
+      x:\intermediate_ed\le\ESound_Source.obj x:\intermediate_ed\le\FS2.obj 
+      x:\intermediate_ed\le\glow.obj x:\intermediate_ed\le\GroupObject.obj 
+      x:\intermediate_ed\le\portal.obj x:\intermediate_ed\le\portalutils.obj 
+      x:\intermediate_ed\le\scene.obj x:\intermediate_ed\le\Scene_Tools.obj 
+      x:\intermediate_ed\le\SceneIO.obj x:\intermediate_ed\le\SceneObject.obj 
+      x:\intermediate_ed\le\SceneObjectIO.obj 
+      x:\intermediate_ed\le\ScenePick.obj x:\intermediate_ed\le\SceneRender.obj 
+      x:\intermediate_ed\le\SceneSelection.obj 
+      x:\intermediate_ed\le\SceneSnap.obj 
+      x:\intermediate_ed\le\SceneSummaryInfo.obj 
+      x:\intermediate_ed\le\SceneUndo.obj x:\intermediate_ed\le\SceneUtil.obj 
+      x:\intermediate_ed\le\sector.obj x:\intermediate_ed\le\SoundManager_LE.obj 
+      x:\intermediate_ed\le\SpawnPoint.obj 
+      x:\intermediate_ed\le\ESceneAIMapControls.obj 
+      x:\intermediate_ed\le\ESceneControlsCustom.obj 
+      x:\intermediate_ed\le\ESceneObjectControls.obj 
+      x:\intermediate_ed\le\EScenePortalControls.obj 
+      x:\intermediate_ed\le\EScenePSControls.obj 
+      x:\intermediate_ed\le\ESceneSectorControls.obj 
+      x:\intermediate_ed\le\ESceneShapeControls.obj 
+      x:\intermediate_ed\le\ESceneSpawnControls.obj 
+      x:\intermediate_ed\le\ESceneWayControls.obj 
+      x:\intermediate_ed\le\ESceneGlowToolsIO.obj 
+      x:\intermediate_ed\le\EScenePortalToolsIO.obj 
+      x:\intermediate_ed\le\ESceneSectorToolsIO.obj 
+      x:\intermediate_ed\le\ESceneSpawnToolsIO.obj 
+      x:\intermediate_ed\le\ESceneObjectToolsIO.obj 
+      x:\intermediate_ed\le\EScenePSToolsIO.obj 
+      x:\intermediate_ed\le\ESceneShapeToolsIO.obj 
+      x:\intermediate_ed\le\ESceneSoundEnvToolsIO.obj 
+      x:\intermediate_ed\le\ESceneSoundSrcToolsIO.obj 
+      x:\intermediate_ed\le\ESceneWayToolsIO.obj 
+      x:\intermediate_ed\le\ESceneGroupToolsIO.obj 
+      x:\intermediate_ed\le\ESceneDOTools_Pick.obj 
+      x:\intermediate_ed\le\ESceneDOTools_Controls.obj 
+      x:\intermediate_ed\le\ESceneDOTools_Generate.obj 
+      x:\intermediate_ed\le\ObjectAnimator.obj 
+      x:\intermediate_ed\le\ELight_props.obj x:\intermediate_ed\le\ELight_IO.obj 
+      x:\intermediate_ed\le\ESceneObjectToolsExportBreakable.obj 
+      x:\intermediate_ed\le\LevelGameDef.obj 
+      x:\intermediate_ed\le\ESceneWallmarkTools.obj 
+      x:\intermediate_ed\le\ESceneWallmarkControls.obj 
+      x:\intermediate_ed\le\GeometryPartExtractor.obj 
+      x:\intermediate_ed\le\BuilderLODs.obj 
+      x:\intermediate_ed\le\ESceneGroupControls.obj 
+      x:\intermediate_ed\le\CustomObjectLE.obj 
+      x:\intermediate_ed\le\CustomObject.obj 
+      x:\intermediate_ed\le\CustomObjectAnimation.obj 
+      x:\intermediate_ed\le\LevelPreferences.obj 
+      x:\intermediate_ed\le\FrmDBXpacker.obj 
+      x:\intermediate_ed\le\DetailManager.obj 
+      x:\intermediate_ed\le\DetailManager_Decompress.obj 
+      x:\intermediate_ed\le\iniStreamImpl.obj 
+      x:\intermediate_ed\le\DetailManager_soft.obj 
+      x:\intermediate_ed\le\DetailManager_CACHE.obj 
+      x:\intermediate_ed\le\DetailManager_VS.obj 
+      x:\intermediate_ed\le\ESceneFogVolumeTools.obj 
+      x:\intermediate_ed\le\RightForm.obj x:\intermediate_ed\le\FrameFogVol.obj 
+      x:\intermediate_ed\le\gametype_chooser.obj 
+      x:\intermediate_ed\le\GroupObjectUtils.obj 
+      x:\intermediate_ed\le\AppendObjectInfoForm.obj 
+      x:\intermediate_ed\le\LEClipEditor.obj x:\intermediate_ed\le\LEPhysics.obj 
+      x:\intermediate_ed\le\MgcConvexHull2D.obj 
+      x:\intermediate_ed\le\MgcAppr3DPlaneFit.obj 
+      x:\intermediate_ed\le\MgcEigen.obj x:\intermediate_ed\le\MgcVector2.obj 
+      x:\intermediate_ed\le\MgcVector3.obj x:\intermediate_ed\le\stats_manager.obj"/>
+    <RESFILES value="LevelEditor.res resource.res"/>
+    <IDLFILES value=""/>
+    <IDLGENFILES value=""/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES) BottomBar.dfm main.dfm TopBar.dfm DOOneColor.dfm DOShuffle.dfm 
+      EditLibrary.dfm EditLightAnim.dfm FrameAIMap.dfm FrameDetObj.dfm 
+      FrameGroup.dfm FrameLight.dfm FrameObject.dfm FramePortal.dfm FramePS.dfm 
+      FrameSector.dfm FrameShape.dfm FrameSpawn.dfm FrameWayPoint.dfm 
+      LeftBar.dfm ObjectList.dfm previewimage.dfm PropertiesEObject.dfm 
+      Splash.dfm FrmDBXpacker.dfm RightForm.dfm FrameFogVol.dfm 
+      Edit\AppendObjectInfoForm.dfm LEClipEditor.dfm"/>
+    <LIBFILES value=""/>
+    <LIBRARIES value="editor.lib"/>
+    <SPARELIBS value="rtl.lib vcl.lib bcbsmp.lib vclx.lib editor.lib elpackB6.lib"/>
+    <PACKAGES value="rtl.bpi vcl.bpi vclx.bpi bcbsmp.bpi elpackB6.bpi elpproB6.bpi"/>
+    <PATHCPP value=".;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;..\..\xrEngine;Edit;Edit;Edit;..\..\xrServerEntities;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;Edit;..\..\xrServerEntities;Edit;Edit;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Approximation3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Numerics;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\Layers\xrRender"/>
+    <PATHPAS value=".;"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
+    <RELEASELIBPATH value="$(BCB)\lib\release"/>
+    <LINKER value="ilink32"/>
+    <USERDEFINES value="_EDITOR;_LEVEL_EDITOR;_DEBUG"/>
+    <SYSDEFINES value="NO_STRICT;_RTLDLL;USEPACKAGES"/>
+    <MAINSOURCE value="LevelEditor.cpp"/>
+    <INCLUDEPATH value="..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Numerics;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Approximation3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment2D;..\..;..\..\xrServerEntities;..\..\Layers\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;$(MAGIC_SW_DIR);$(ETOOLS_DIR)"/>
+    <LIBPATH value="..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Numerics;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Approximation3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment2D;..\..;..\..\Layers\xrRender;..\..\xrServerEntities;..\..\xrEngine;Edit;..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;$(OUT_LIB_DIR)"/>
+    <WARNINGS value="-w8092 -w8090 -w8089 -w8087 -wprc -wucp -wstv -wstu -wsig -wpin -w-par 
+      -wnod -wnak -w-8027 -w-8026 -wdef -wcln -wbbf -wasm -wamp -wamb"/>
+    <OTHERFILES value=""/>
+  </MACROS>
+  <OPTIONS>
+    <IDLCFLAGS value="-src_suffix cpp -D_EDITOR -D_LEVEL_EDITOR -D_DEBUG 
+      -I..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D 
+      -I..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D 
+      -I..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Numerics 
+      -I..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Approximation3D 
+      -I..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment2D 
+      -I..\.. -I..\..\xrServerEntities -I..\..\Layers\xrRender 
+      -I$(DXSDK_DIR)\Include -IEdit -IEngine -I$(BCB)\Projects 
+      -I$(BCB)\include\vcl -I$(BCB)\include -I$(COMPONENTS)\alexmx 
+      -I$(COMPONENTS)\ElPack\Code -I$(COMPONENTS)\ElPack\Code\Source 
+      -I$(CORE_DIR) -I../../xrEngine -I$(MAGIC_SW_DIR) -I$(ETOOLS_DIR)"/>
+    <CFLAG1 value="-Od -H=pch.csm -Hc -Q -Vms -Vx -Ve -xf -xp -VF -ff -X- -r- -ps -a4 -6 -b- 
+      -k -y -v -vi- -He -c -tW -tWM"/>
+    <PFLAGS value="-N2x:\intermediate_ed\le -N0x:\intermediate_ed\le -$Y+ -$W -$R -$Q -$O- 
+      -$A8 -v -JPHNE -M"/>
+    <RFLAGS value=""/>
+    <AFLAGS value="/mx /w2 /zi"/>
+    <LFLAGS value="-lx:\stalker_addon\libraries -Ix:\intermediate_ed\le -D&quot;&quot; -aa -Tpe -GD -x 
+      -Gn -v"/>
+    <OTHERFILES value=""/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="c0w32.obj $(PACKAGES) Memmgr.Lib sysinit.obj $(OBJFILES)"/>
+    <ALLRES value="$(RESFILES)"/>
+    <ALLLIB value="$(LIBFILES) $(LIBRARIES) import32.lib cp32mti.lib"/>
+    <OTHERFILES value=""/>
+  </LINKER>
+  <FILELIST>
+      <FILE FILENAME="LevelEditor.cpp" FORMNAME="" UNITNAME="LevelEditor" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="LevelEditor.todo" FORMNAME="" UNITNAME="LevelEditor.todo" CONTAINERID="ToDo" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="LevelEditor.res" FORMNAME="" UNITNAME="LevelEditor.res" CONTAINERID="ResTool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="resource.res" FORMNAME="" UNITNAME="resource.res" CONTAINERID="ResTool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="BottomBar.cpp" FORMNAME="fraBottomBar" UNITNAME="BottomBar" CONTAINERID="CCompiler" DESIGNCLASS="TFrame" LOCALCOMMAND=""/>
+      <FILE FILENAME="main.cpp" FORMNAME="frmMain" UNITNAME="main" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="TopBar.cpp" FORMNAME="fraTopBar" UNITNAME="TopBar" CONTAINERID="CCompiler" DESIGNCLASS="TFrame" LOCALCOMMAND=""/>
+      <FILE FILENAME="stdafx.cpp" FORMNAME="" UNITNAME="stdafx" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="DOOneColor.cpp" FORMNAME="frmOneColor" UNITNAME="DOOneColor" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="DOShuffle.cpp" FORMNAME="frmDOShuffle" UNITNAME="DOShuffle" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="EditLibrary.cpp" FORMNAME="frmEditLibrary" UNITNAME="EditLibrary" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="EditLightAnim.cpp" FORMNAME="frmEditLightAnim" UNITNAME="EditLightAnim" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FrameAIMap.cpp" FORMNAME="fraAIMap" UNITNAME="FrameAIMap" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FrameDetObj.cpp" FORMNAME="fraDetailObject" UNITNAME="FrameDetObj" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FrameGroup.cpp" FORMNAME="fraGroup" UNITNAME="FrameGroup" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FrameLight.cpp" FORMNAME="fraLight" UNITNAME="FrameLight" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FrameObject.cpp" FORMNAME="fraObject" UNITNAME="FrameObject" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FramePortal.cpp" FORMNAME="fraPortal" UNITNAME="FramePortal" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FramePS.cpp" FORMNAME="fraPS" UNITNAME="FramePS" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FrameSector.cpp" FORMNAME="fraSector" UNITNAME="FrameSector" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FrameShape.cpp" FORMNAME="fraShape" UNITNAME="FrameShape" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FrameSpawn.cpp" FORMNAME="fraSpawn" UNITNAME="FrameSpawn" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FrameWayPoint.cpp" FORMNAME="fraWayPoint" UNITNAME="FrameWayPoint" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="LeftBar.cpp" FORMNAME="fraLeftBar" UNITNAME="LeftBar" CONTAINERID="CCompiler" DESIGNCLASS="TFrame" LOCALCOMMAND=""/>
+      <FILE FILENAME="ObjectList.cpp" FORMNAME="frmObjectList" UNITNAME="ObjectList" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="previewimage.cpp" FORMNAME="frmPreviewImage" UNITNAME="previewimage" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="PropertiesEObject.cpp" FORMNAME="frmPropertiesEObject" UNITNAME="PropertiesEObject" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Splash.cpp" FORMNAME="frmSplash" UNITNAME="Splash" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\UI_LevelTools.cpp" FORMNAME="" UNITNAME="UI_LevelTools" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\UI_LevelMain.cpp" FORMNAME="" UNITNAME="UI_LevelMain" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\WayPoint.cpp" FORMNAME="" UNITNAME="WayPoint.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneAIMapTools_Export.cpp" FORMNAME="" UNITNAME="ESceneAIMapTools_Export" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\Builder.cpp" FORMNAME="" UNITNAME="Builder.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\BuilderCF.cpp" FORMNAME="" UNITNAME="BuilderCF.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\BuilderCore.cpp" FORMNAME="" UNITNAME="BuilderCore.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\BuilderGame.cpp" FORMNAME="" UNITNAME="BuilderGame.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\BuilderLTX.cpp" FORMNAME="" UNITNAME="BuilderLTX.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\BuilderOGF.cpp" FORMNAME="" UNITNAME="BuilderOGF.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\BuilderRemote.cpp" FORMNAME="" UNITNAME="BuilderRemote.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\Cursor3D.cpp" FORMNAME="" UNITNAME="Cursor3D.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\Custom2DProjector.cpp" FORMNAME="" UNITNAME="Custom2DProjector.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneDOTools.cpp" FORMNAME="" UNITNAME="ESceneDOTools" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\EditObjectExportLWO.cpp" FORMNAME="" UNITNAME="EditObjectExportLWO.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ELight.cpp" FORMNAME="" UNITNAME="ELight.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\EParticlesObject.cpp" FORMNAME="" UNITNAME="EParticlesObject.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneAIMapTools.cpp" FORMNAME="" UNITNAME="ESceneAIMapTools.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneAIMapTools_Controls.cpp" FORMNAME="" UNITNAME="ESceneAIMapTools_Controls.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneAIMapTools_Generate.cpp" FORMNAME="" UNITNAME="ESceneAIMapTools_Generate.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneAIMapTools_MotionSimulator.cpp" FORMNAME="" UNITNAME="ESceneAIMapTools_MotionSimulator.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneAIMapTools_Pick.cpp" FORMNAME="" UNITNAME="ESceneAIMapTools_Pick.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneAIMapTools_Render.cpp" FORMNAME="" UNITNAME="ESceneAIMapTools_Render.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneCustomMTools.cpp" FORMNAME="" UNITNAME="ESceneCustomMTools.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneCustomMToolsControls.cpp" FORMNAME="" UNITNAME="ESceneCustomMToolsControls.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneCustomOTools.cpp" FORMNAME="" UNITNAME="ESceneCustomOTools.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneCustomOToolsIO.cpp" FORMNAME="" UNITNAME="ESceneCustomOToolsIO.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneDummyTools.cpp" FORMNAME="" UNITNAME="ESceneDummyTools.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneGlowTools.cpp" FORMNAME="" UNITNAME="ESceneGlowTools.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneGroupTools.cpp" FORMNAME="" UNITNAME="ESceneGroupTools.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneLightTools.cpp" FORMNAME="" UNITNAME="ESceneLightTools.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneLightToolsIO.cpp" FORMNAME="" UNITNAME="ESceneLightToolsIO.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneObjectTools.cpp" FORMNAME="" UNITNAME="ESceneObjectTools.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\EScenePortalTools.cpp" FORMNAME="" UNITNAME="EScenePortalTools.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\EScenePSTools.cpp" FORMNAME="" UNITNAME="EScenePSTools.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneSectorTools.cpp" FORMNAME="" UNITNAME="ESceneSectorTools.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneShapeTools.cpp" FORMNAME="" UNITNAME="ESceneShapeTools.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneSoundEnvTools.cpp" FORMNAME="" UNITNAME="ESceneSoundEnvTools.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneSoundSrcTools.cpp" FORMNAME="" UNITNAME="ESceneSoundSrcTools.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneSpawnTools.cpp" FORMNAME="" UNITNAME="ESceneSpawnTools.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneWayTools.cpp" FORMNAME="" UNITNAME="ESceneWayTools.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\EShape.cpp" FORMNAME="" UNITNAME="EShape.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESound_Environment.cpp" FORMNAME="" UNITNAME="ESound_Environment.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESound_Source.cpp" FORMNAME="" UNITNAME="ESound_Source.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\FS2.cpp" FORMNAME="" UNITNAME="FS2.CPP" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\glow.cpp" FORMNAME="" UNITNAME="Glow.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\GroupObject.cpp" FORMNAME="" UNITNAME="GroupObject.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\portal.cpp" FORMNAME="" UNITNAME="portal.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\portalutils.cpp" FORMNAME="" UNITNAME="portalutils.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\scene.cpp" FORMNAME="" UNITNAME="Scene.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\Scene_Tools.cpp" FORMNAME="" UNITNAME="Scene_Tools.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\SceneIO.cpp" FORMNAME="" UNITNAME="SceneIO.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\SceneObject.cpp" FORMNAME="" UNITNAME="SceneObject.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\SceneObjectIO.cpp" FORMNAME="" UNITNAME="SceneObjectIO.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ScenePick.cpp" FORMNAME="" UNITNAME="ScenePick.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\SceneRender.cpp" FORMNAME="" UNITNAME="SceneRender.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\SceneSelection.cpp" FORMNAME="" UNITNAME="SceneSelection.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\SceneSnap.cpp" FORMNAME="" UNITNAME="SceneSnap.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\SceneSummaryInfo.cpp" FORMNAME="" UNITNAME="SceneSummaryInfo.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\SceneUndo.cpp" FORMNAME="" UNITNAME="SceneUndo.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\SceneUtil.cpp" FORMNAME="" UNITNAME="SceneUtil.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\sector.cpp" FORMNAME="" UNITNAME="sector.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\SoundManager_LE.cpp" FORMNAME="" UNITNAME="SoundManager_LE.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\SpawnPoint.cpp" FORMNAME="" UNITNAME="SpawnPoint.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneAIMapControls.cpp" FORMNAME="" UNITNAME="ESceneAIMapControls" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneControlsCustom.cpp" FORMNAME="" UNITNAME="ESceneControlsCustom" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneObjectControls.cpp" FORMNAME="" UNITNAME="ESceneObjectControls" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\EScenePortalControls.cpp" FORMNAME="" UNITNAME="EScenePortalControls" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\EScenePSControls.cpp" FORMNAME="" UNITNAME="EScenePSControls" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneSectorControls.cpp" FORMNAME="" UNITNAME="ESceneSectorControls" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneShapeControls.cpp" FORMNAME="" UNITNAME="ESceneShapeControls" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneSpawnControls.cpp" FORMNAME="" UNITNAME="ESceneSpawnControls" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneWayControls.cpp" FORMNAME="" UNITNAME="ESceneWayControls" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneGlowToolsIO.cpp" FORMNAME="" UNITNAME="ESceneGlowToolsIO" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\EScenePortalToolsIO.cpp" FORMNAME="" UNITNAME="EScenePortalToolsIO" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneSectorToolsIO.cpp" FORMNAME="" UNITNAME="ESceneSectorToolsIO" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneSpawnToolsIO.cpp" FORMNAME="" UNITNAME="ESceneSpawnToolsIO" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneObjectToolsIO.cpp" FORMNAME="" UNITNAME="ESceneObjectToolsIO" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\EScenePSToolsIO.cpp" FORMNAME="" UNITNAME="EScenePSToolsIO" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneShapeToolsIO.cpp" FORMNAME="" UNITNAME="ESceneShapeToolsIO" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneSoundEnvToolsIO.cpp" FORMNAME="" UNITNAME="ESceneSoundEnvToolsIO" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneSoundSrcToolsIO.cpp" FORMNAME="" UNITNAME="ESceneSoundSrcToolsIO" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneWayToolsIO.cpp" FORMNAME="" UNITNAME="ESceneWayToolsIO" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneGroupToolsIO.cpp" FORMNAME="" UNITNAME="ESceneGroupToolsIO" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneDOTools_Pick.cpp" FORMNAME="" UNITNAME="ESceneDOTools_Pick.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneDOTools_Controls.cpp" FORMNAME="" UNITNAME="ESceneDOTools_Controls.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneDOTools_Generate.cpp" FORMNAME="" UNITNAME="ESceneDOTools_Generate.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\xrEngine\ObjectAnimator.cpp" FORMNAME="" UNITNAME="ObjectAnimator" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ELight_props.cpp" FORMNAME="" UNITNAME="ELight_props" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ELight_IO.cpp" FORMNAME="" UNITNAME="ELight_IO" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ELight_def.h" FORMNAME="" UNITNAME="ELight_def.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneObjectToolsExportBreakable.cpp" FORMNAME="" UNITNAME="ESceneObjectToolsExportBreakable" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\xrServerEntities\LevelGameDef.cpp" FORMNAME="" UNITNAME="LevelGameDef" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneWallmarkTools.cpp" FORMNAME="" UNITNAME="ESceneWallmarkTools" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneWallmarkControls.cpp" FORMNAME="" UNITNAME="ESceneWallmarkControls" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Engine\ShapeData.h" FORMNAME="" UNITNAME="ShapeData.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\GeometryPartExtractor.cpp" FORMNAME="" UNITNAME="GeometryPartExtractor" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\BuilderLODs.cpp" FORMNAME="" UNITNAME="BuilderLODs" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneGroupControls.cpp" FORMNAME="" UNITNAME="ESceneGroupControls" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\CustomObjectLE.cpp" FORMNAME="" UNITNAME="CustomObjectLE" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\CustomObject.cpp" FORMNAME="" UNITNAME="CustomObject.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\CustomObject.h" FORMNAME="" UNITNAME="CustomObject.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\CustomObjectAnimation.cpp" FORMNAME="" UNITNAME="CustomObjectAnimation.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\LevelPreferences.cpp" FORMNAME="" UNITNAME="LevelPreferences" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FrmDBXpacker.cpp" FORMNAME="DB_packer" UNITNAME="FrmDBXpacker" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\Layers\xrRender\DetailManager.cpp" FORMNAME="" UNITNAME="DetailManager" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\Layers\xrRender\DetailManager_Decompress.cpp" FORMNAME="" UNITNAME="DetailManager_Decompress.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="iniStreamImpl.cpp" FORMNAME="" UNITNAME="iniStreamImpl" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\Layers\xrRender\DetailManager_soft.cpp" FORMNAME="" UNITNAME="DetailManager_soft.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\Layers\xrRender\DetailManager_CACHE.cpp" FORMNAME="" UNITNAME="DetailManager_CACHE.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneFogVolumeTools.h" FORMNAME="" UNITNAME="ESceneFogVolumeTools.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\Layers\xrRender\DetailManager_VS.cpp" FORMNAME="" UNITNAME="DetailManager_VS" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\ESceneFogVolumeTools.cpp" FORMNAME="" UNITNAME="ESceneFogVolumeTools.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="RightForm.cpp" FORMNAME="frmRight" UNITNAME="RightForm" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FrameFogVol.cpp" FORMNAME="fraFogVol" UNITNAME="FrameFogVol" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\xrServerEntities\gametype_chooser.cpp" FORMNAME="" UNITNAME="gametype_chooser" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\GroupObjectUtils.cpp" FORMNAME="" UNITNAME="GroupObjectUtils" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Edit\AppendObjectInfoForm.cpp" FORMNAME="frmAppendObjectInfo" UNITNAME="AppendObjectInfoForm" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="LEClipEditor.ddp" FORMNAME="" UNITNAME="LEClipEditor.ddp" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="LEClipEditor.cpp" FORMNAME="ClipMaker" UNITNAME="LEClipEditor" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="LEClipEditor.dfm" FORMNAME="" UNITNAME="LEClipEditor.dfm" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="LEClipEditor.h" FORMNAME="" UNITNAME="LEClipEditor.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="LEPhysics.cpp" FORMNAME="" UNITNAME="LEPhysics" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment2D\MgcConvexHull2D.cpp" FORMNAME="" UNITNAME="MgcConvexHull2D" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Approximation3D\MgcAppr3DPlaneFit.cpp" FORMNAME="" UNITNAME="MgcAppr3DPlaneFit" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Numerics\MgcEigen.cpp" FORMNAME="" UNITNAME="MgcEigen" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D\MgcVector2.cpp" FORMNAME="" UNITNAME="MgcVector2" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D\MgcVector3.cpp" FORMNAME="" UNITNAME="MgcVector3" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\Layers\xrRender\stats_manager.cpp" FORMNAME="" UNITNAME="stats_manager" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+  </FILELIST>
+  <BUILDTOOLS>
+  </BUILDTOOLS>
+
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=1
+AutoIncBuild=1
+MajorVer=1
+MinorVer=0
+Release=2
+Build=156
+Debug=1
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1033
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=
+FileDescription=
+FileVersion=1.0.2.156
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=
+ProductName=
+ProductVersion=1.0.0.0
+Comments=
+
+[HistoryLists\hlIncludePath]
+Count=12
+Item0=..\..;..\..\xrServerEntities;..\..\Layers\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;$(MAGIC_SW_DIR);$(ETOOLS_DIR)
+Item1=$(VC_INCLUDE);..\..;..\..\xrServerEntities;..\..\Layers\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;$(MAGIC_SW_DIR);$(ETOOLS_DIR)
+Item2=..\..;..\..\xrServerEntities;..\..\Layers\xrRender;..\..\xrEngine\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrRender;$(MAGIC_SW_DIR);$(ETOOLS_DIR)
+Item3=..\..\xrServerEntities;..\..\Layers\xrRender;..\..\xrEngine\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrRender;$(MAGIC_SW_DIR);$(ETOOLS_DIR)
+Item4=..\..\xrEngine\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrRender;$(MAGIC_SW_DIR);$(ETOOLS_DIR)
+Item5=..\..\xrEngine\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrRender;$(MAGIC_SW_DIR)
+Item6=$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrRender;$(MAGIC_SW_DIR)
+Item7=$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrEngine/xrRender;$(MAGIC_SW_DIR)
+Item8=$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrEngine/xrRender
+Item9=Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(DXSDK_DIR)\Include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrEngine/xrRender
+Item10=Edit;H:\RAD\Borland\CBuilder6\Projects;&quot;R:\SDK\Microsoft DirectX 9.0 SDK (April 2005)\Include&quot;Edit;Engine;r:\borland\components6\alexmx;$(BCB)\include;$(BCB)\include\vcl;R:\SDK\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\ElPack\Code;R:\Borland\Components6\ElPack\Code\Source;P:\xrCore;..\ECore;..\ECore\Editor;..\ECore\Engine;..\ECore\Engine\blenders;..\ECore\Engine\visuals;..\xrEProps;P:\xrSound
+Item11=H:\RAD\Borland\CBuilder6\Projects;R:\SDK\Microsoft DirectX 9.0 SDK (April 2005)\Include;Engine\Game;Edit;Engine;r:\borland\components6\alexmx;$(BCB)\include;$(BCB)\include\vcl;R:\SDK\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\ElPack\Code;R:\Borland\Components6\ElPack\Code\Source;P:\xrCore;..\ECore;..\ECore\Editor;..\ECore\Engine;..\ECore\Engine\blenders;..\ECore\Engine\visuals;..\xrEProps;P:\xrSound
+
+[HistoryLists\hlLibraryPath]
+Count=14
+Item0=..\..;..\..\Layers\xrRender;..\..\xrServerEntities;..\..\xrEngine;Edit;..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;$(OUT_LIB_DIR)
+Item1=..\..;..\..\Layers\xrRender;..\..\xrServerEntities;..\..\xrEngine;Edit;..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source
+Item2=..\..;..\..\Layers\xrRender;..\..\xrServerEntities;..\..\xrEngine;Edit;..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries;X:\libraries
+Item3=..\..\Layers\xrRender;..\..\xrServerEntities;..\..\xrEngine;Edit;..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries;X:\libraries
+Item4=..\..\Layers\xrRender;..\..\xrServerEntities;..\..\xrEngine;Edit;..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries
+Item5=..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries
+Item6=..\..\xrServerEntities;..\..\Layers\xrRender;..\..\..\SDK\components\ElPack\Code;..\..\xrEngine\xrRender;..\..\xrRender;..\..\xrEngine;Edit;Engine;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries
+Item7=..\..\xrEngine\xrRender;..\..\xrRender;..\..\xrEngine;Edit;Engine;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries
+Item8=..\..\xrRender;..\..\xrEngine;Edit;Engine;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries
+Item9=..\..\xrEngine\xrRender;..\..\xrEngine;Edit;Engine;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;x:\libraries
+Item10=Edit;Engine;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;x:\libraries
+Item11=$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;x:\libraries
+Item12=H:\RAD\Borland\CBuilder6\Projects;Edit;Engine;C:\Rad\Borland\CBuilder6\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;r:\borland\components6\alexmx;R:\Borland\Components6\ElPack\Code;R:\Borland\Components6\ElPack\Code\Source;..\lib\dx;..\lib;x:\;..\ECore;..\ECore\Editor
+Item13=H:\RAD\Borland\CBuilder6\Projects;Engine\Game;Edit;Engine;C:\Rad\Borland\CBuilder6\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;r:\borland\components6\alexmx;R:\Borland\Components6\ElPack\Code;R:\Borland\Components6\ElPack\Code\Source;..\lib\dx;..\lib;x:\;..\ECore;..\ECore\Editor
+
+[HistoryLists\hlDebugSourcePath]
+Count=2
+Item0=X:\stalker_addon\sources\engine\editors\ECore\Editor\
+Item1=c:\rad\borland\cbuilder5\source\vcl;R:\Borland\Components6\AlexMX\
+
+[HistoryLists\hlConditionals]
+Count=2
+Item0=_EDITOR;_LEVEL_EDITOR;_DEBUG
+Item1=_EDITOR;_LEVEL_EDITOR
+
+[HistoryLists\hlIntOutputDir]
+Count=3
+Item0=x:\intermediate_ed\le
+Item1=$(OUTPUT_INTERMEDIATE_DIR)\le
+Item2=intermediate
+
+[HistoryLists\hlFinalOutputDir]
+Count=5
+Item0=$(OUTPUT_BINARIES_DIR)\
+Item1=x:\stalker_addon\binaries\
+Item2=x:\binaries\
+Item3=x:\binaries
+Item4=x:\
+
+[HistoryLists\hIBPIOutputDir]
+Count=4
+Item0=x:\stalker_addon\libraries
+Item1=$(OUTPUT_LIBRARIES_DIR)
+Item2=$(OUTPUT_LIBRARIES_DIR)\
+Item3=x:\libraries
+
+[Debugging]
+DebugSourceDirs=X:\stalker_addon\sources\engine\editors\ECore\Editor\
+
+[Parameters]
+RunParams=-wf x:\stalker_addon\resources -editor
+Launcher=
+UseLauncher=0
+DebugCWD=
+HostApplication=x:\STALKER_ADDON\binaries\LevelEditor.exe
+RemoteHost=
+RemotePath=
+RemoteLauncher=
+RemoteCWD=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=0
+LinkCGLIB=0
+
+[CORBA]
+AddServerUnit=1
+AddClientUnit=1
+PrecompiledHeaders=1
+
+[Language]
+ActiveLang=
+ProjectLang=
+RootDir=
+  </IDEOPTIONS>
+</PROJECT>

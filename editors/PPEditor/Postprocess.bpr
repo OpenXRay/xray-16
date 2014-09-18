@@ -1,0 +1,205 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.06.00"/>
+    <PROJECT value="x:\stalker_addon\binaries\Postprocess.exe"/>
+    <OBJFILES value="x:\intermediate_ed\ppe\Postprocess.obj x:\intermediate_ed\ppe\main.obj 
+      x:\intermediate_ed\ppe\interp.obj x:\intermediate_ed\ppe\float_param.obj 
+      x:\intermediate_ed\ppe\float_constructor.obj 
+      x:\intermediate_ed\ppe\color.obj x:\intermediate_ed\ppe\single_param.obj 
+      x:\intermediate_ed\ppe\Envelope.obj 
+      x:\intermediate_ed\ppe\PostprocessAnimator.obj"/>
+    <RESFILES value="Postprocess.res"/>
+    <IDLFILES value=""/>
+    <IDLGENFILES value=""/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES) main.dfm float_param.dfm float_constructor.dfm color.dfm 
+      single_param.dfm"/>
+    <LIBFILES value=""/>
+    <LIBRARIES value="editorB.lib"/>
+    <SPARELIBS value="vcl.lib rtl.lib bcbsmp.lib vclx.lib editor.lib editorB.lib"/>
+    <PACKAGES value="editor.bpi vcl.bpi rtl.bpi dbrtl.bpi adortl.bpi vcldb.bpi vclx.bpi 
+      bdertl.bpi vcldbx.bpi ibxpress.bpi cds.bpi dsnap.bpi bdecds.bpi qrpt.bpi 
+      teeui.bpi teedb.bpi tee.bpi dss.bpi teeqr.bpi visualclx.bpi 
+      visualdbclx.bpi dsnapcrba.bpi dsnapcon.bpi bcbsmp.bpi"/>
+    <PATHCPP value=".;..\..\xrEngine;..\..\xrGame"/>
+    <PATHPAS value=".;"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
+    <RELEASELIBPATH value="$(BCB)\lib\release"/>
+    <LINKER value="ilink32"/>
+    <USERDEFINES value="_EDITOR;_PP_EDITOR_;ENGINE_API;IC;ICF;__forceinline"/>
+    <SYSDEFINES value="NO_STRICT;USEPACKAGES"/>
+    <MAINSOURCE value="Postprocess.cpp"/>
+    <INCLUDEPATH value="..\..\xrGame;..\..\xrEngine;$(BCB)\include;$(BCB)\include\vcl;$(CORE_DIR);$(COMPONENTS)\AlexMX"/>
+    <LIBPATH value="..\..\..\SDK\components\AlexMX;..\..\xrGame;..\..\xrEngine;$(BCB)\Projects\Lib;$(BCB)\lib\obj;$(BCB)\lib;x:\stalker_addon\libraries"/>
+    <WARNINGS value="-w-pck -w-par"/>
+    <OTHERFILES value=""/>
+  </MACROS>
+  <OPTIONS>
+    <IDLCFLAGS value="-I..\..\xrGame -I..\..\xrEngine -I$(BCB)\include -I$(BCB)\include\vcl 
+      -I$(CORE_DIR) -I$(COMPONENTS)\AlexMX -src_suffix cpp -D_EDITOR 
+      -D_PP_EDITOR_ -DENGINE_API -DIC -DICF -D__forceinline -boa"/>
+    <CFLAG1 value="-O2 -H=x:\intermediate_ed\ppe\pch.csm -Hc -Q -Vmm -Vx -Ve -xf -xp -VF -X- 
+      -ps -a4 -6 -b- -k- -vi -c -tW -tWM"/>
+    <PFLAGS value="-N2x:\intermediate_ed\ppe -N0x:\intermediate_ed\ppe -$Y- -$L- -$D- -$A8 -v 
+      -JPHNE -M"/>
+    <RFLAGS value=""/>
+    <AFLAGS value="/mx /w2 /zn"/>
+    <LFLAGS value="-Ix:\intermediate_ed\ppe -D&quot;&quot; -aa -Tpe -x -Gn"/>
+    <OTHERFILES value=""/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="c0w32.obj $(PACKAGES) sysinit.obj $(OBJFILES)"/>
+    <ALLRES value="$(RESFILES)"/>
+    <ALLLIB value="$(LIBFILES) $(LIBRARIES) import32.lib cp32mt.lib"/>
+    <OTHERFILES value=""/>
+  </LINKER>
+  <FILELIST>
+      <FILE FILENAME="Postprocess.res" FORMNAME="" UNITNAME="Postprocess.res" CONTAINERID="ResTool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Postprocess.cpp" FORMNAME="" UNITNAME="Postprocess" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="main.cpp" FORMNAME="MainForm" UNITNAME="main" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="interp.cpp" FORMNAME="" UNITNAME="interp.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="float_param.cpp" FORMNAME="frmTimeConstructor" UNITNAME="float_param" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="float_constructor.cpp" FORMNAME="frmConstructor" UNITNAME="float_constructor" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="color.cpp" FORMNAME="AddColorForm" UNITNAME="Color" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="single_param.cpp" FORMNAME="AddFloatForm" UNITNAME="single_param" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\xrEngine\Envelope.cpp" FORMNAME="" UNITNAME="Envelope" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\xrGame\PostprocessAnimator.cpp" FORMNAME="" UNITNAME="PostprocessAnimator" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="base.h" FORMNAME="" UNITNAME="base.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+  </FILELIST>
+  <BUILDTOOLS>
+  </BUILDTOOLS>
+
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=0
+AutoIncBuild=0
+MajorVer=1
+MinorVer=0
+Release=0
+Build=0
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1058
+CodePage=1251
+
+[Version Info Keys]
+CompanyName=
+FileDescription=
+FileVersion=1.0.0.0
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=
+ProductName=
+ProductVersion=1.0.0.0
+Comments=
+
+[Excluded Packages]
+e:\program files\borland\cbuilder6\Bin\bcb2kaxserver60.bpl=Borland C++Builder COM Server Components Sample Package
+
+[HistoryLists\hlIncludePath]
+Count=13
+Item0=..\..\xrGame;..\..\xrEngine;$(BCB)\include;$(BCB)\include\vcl;$(CORE_DIR);$(COMPONENTS)\AlexMX
+Item1=..\..\xrGame;..\..\xrEngine;$(BCB)\include;$(BCB)\include\vcl;$(CORE_DIR);$(COMPONENTS)\AlexMX;$(3DA_DIR)
+Item2=$(BCB)\include;$(BCB)\include\vcl;$(CORE_DIR);$(COMPONENTS)\AlexMX;$(3DA_DIR)
+Item3=$(BCB)\include;$(BCB)\include\vcl;$(CORE_DIR);$(COMPONENTS)\AlexMX
+Item4=$(BCB)\include;$(BCB)\include\vcl;$(CORE_DIR);X:\stalker_addon\sources\sdk\components\AlexMX
+Item5=$(BCB)\include;$(BCB)\include\vcl;$(CORE_DIR)
+Item6=..;$(BCB)\include;$(BCB)\include\vcl
+Item7=..\..\components\AlexMX;..;Postprocess;$(BCB)\include;$(BCB)\include\vcl;e:\projects\xrcore
+Item8=..\RX\Units;..;Postprocess;$(BCB)\include;$(BCB)\include\vcl;e:\projects\xrcore
+Item9=..\RX\Units;..;Postprocess;$(BCB)\include;$(BCB)\include\vcl;Y:\postprocess\core_hdr;Y:\postprocess
+Item10=..\RX\Units;..;Postprocess;$(BCB)\include;$(BCB)\include\vcl;Y:\postprocess\core_hdr
+Item11=Y:\postprocess\core_hdr;..\RX\Units;..;Postprocess;$(BCB)\include;$(BCB)\include\vcl
+Item12=..\RX\Units;..;Postprocess;$(BCB)\include;$(BCB)\include\vcl
+
+[HistoryLists\hlLibraryPath]
+Count=10
+Item0=..\..\..\SDK\components\AlexMX;..\..\xrGame;..\..\xrEngine;$(BCB)\Projects\Lib;$(BCB)\lib\obj;$(BCB)\lib;x:\stalker_addon\libraries
+Item1=..\..\..\SDK\components\AlexMX;..\..\xrGame;..\..\xrEngine;$(COMPONENTS)\AlexMX;$(BCB)\Projects\Lib;$(BCB)\lib\obj;$(BCB)\lib;x:\stalker_addon\libraries
+Item2=$(COMPONENTS)\AlexMX;$(BCB)\Projects\Lib;$(BCB)\lib\obj;$(BCB)\lib;x:\stalker_addon\libraries
+Item3=..\..\..\SDK\components\AlexMX;..\..\xrGame;..\..\xrEngine;$(COMPONENTS)\AlexMX;$(BCB)\Projects\Lib;$(BCB)\lib\obj;$(BCB)\lib
+Item4=$(COMPONENTS)\AlexMX;$(BCB)\Projects\Lib;$(BCB)\lib\obj;$(BCB)\lib
+Item5=..\..\..\sdk\components\AlexMX;$(BCB)\Projects\Lib;$(BCB)\lib\obj;$(BCB)\lib
+Item6=$(BCB)\Projects\Lib;$(BCB)\lib\obj;$(BCB)\lib
+Item7=..\..\components\AlexMX;Y:\postprocess;..;Postprocess;$(BCB)\Projects\Lib;$(BCB)\lib\obj;$(BCB)\lib
+Item8=Y:\postprocess;..\RX\Units;..;Postprocess;$(BCB)\Projects\Lib;$(BCB)\lib\obj;$(BCB)\lib
+Item9=..\RX\Units;..;Postprocess;$(BCB)\Projects\Lib;$(BCB)\lib\obj;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlConditionals]
+Count=21
+Item0=_EDITOR;_PP_EDITOR_;ENGINE_API;IC;ICF;__forceinline
+Item1=_DEBUG;_EDITOR;_PP_EDITOR_;ENGINE_API;IC;ICF;__forceinline
+Item2=_DEBUG;_EDITOR;_PP_EDITOR_;ENGINE_API;IC;XRCORE_API;ICF;__forceinline
+Item3=_DEBUG;_EDITOR;_PP_EDITOR_;ENGINE_API;IC;XRCORE_API;ICF
+Item4=_DEBUG;_EDITOR;_PP_EDITOR_;ENGINE_API;IC;XRCORE_API;ICF;__BORLANDC__
+Item5=_DEBUG;_EDITOR;_PP_EDITOR_;ENGINE_API;IC;XRCORE_API
+Item6=_DEBUG;_EDITOR;_PP_EDITOR_;ENGINE_API;IC
+Item7=_DEBUG;_EDITOR;_PP_EDITOR_;ENGINE_API
+Item8=_DEBUG;_EDITOR;_PP_EDITOR_
+Item9=_DEBUG;_EDITOR
+Item10=_DEBUG;_EDITOR;_CPPUNWIND
+Item11=_DEBUG;_CPPUNWIND;_EDITOR
+Item12=_DEBUG
+Item13=_DEBUG;_CPPUNWIND
+Item14=_DEBUG,_CPPUNWIND
+Item15=_DEBUG,_EDITOR
+Item16=DEBUG,_EDITOR
+Item17=_DEBUG,_EDITOR,FORCE_NO_EXCEPTIONS
+Item18=_DEBUG,_EDITOR,_CPPUNWIND,FORCE_NO_EXCEPTIONS
+Item19=_DEBUG,_EDITOR,_CPPUNWIND
+Item20=_DEBUG,__BORLANDC__
+
+[HistoryLists\hlIntOutputDir]
+Count=1
+Item0=x:\intermediate_ed\ppe
+
+[HistoryLists\hlFinalOutputDir]
+Count=4
+Item0=x:\stalker_addon\binaries\
+Item1=x:\binaries\
+Item2=x:\binaries
+Item3=x:\
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=-wf x:\stalker_addon\resources
+Launcher=
+UseLauncher=0
+DebugCWD=
+HostApplication=x:\binaries\Postprocess.exe
+RemoteHost=
+RemotePath=
+RemoteLauncher=
+RemoteCWD=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=0
+LinkCGLIB=0
+
+[CORBA]
+AddServerUnit=1
+AddClientUnit=1
+PrecompiledHeaders=1
+
+[Language]
+ActiveLang=
+ProjectLang=
+RootDir=
+  </IDEOPTIONS>
+</PROJECT>

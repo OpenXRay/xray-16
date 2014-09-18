@@ -1,0 +1,14 @@
+INSTALLING
+
+To install luabind follow these easy steps:
+
+1. make sure boost 1.31 is installed at the path specified by the environment variable
+   BOOST_ROOT
+2. make sure lua 5 is installed (and built) at the path specified by the environment
+   variable LUA_PATH
+3. run bjam (or make) in the luabind directory
+4. copy the luabind folder (the one with hpp-files in it) into a system include path. And
+   the luabind library into a library include path
+
+For more detailed information about building and trouble shooting, consult the manual.
+

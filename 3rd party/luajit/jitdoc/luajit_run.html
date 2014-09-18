@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Running LuaJIT</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="Author" content="Mike Pall">
+<meta name="Copyright" content="Copyright (C) 2005-2008, Mike Pall">
+<meta name="Language" content="en">
+<link rel="stylesheet" type="text/css" href="bluequad.css" media="screen">
+<link rel="stylesheet" type="text/css" href="bluequad-print.css" media="print">
+</head>
+<body>
+<div id="site">
+<a href="http://luajit.org/"><span>Lua<span id="logo">JIT</span></span></a>
+</div>
+<div id="head">
+<h1>Running LuaJIT</h1>
+</div>
+<div id="nav">
+<ul><li>
+<a href="index.html">Index</a>
+</li><li>
+<a href="luajit.html">LuaJIT</a>
+<ul><li>
+<a href="luajit_features.html">Features</a>
+</li><li>
+<a href="luajit_install.html">Installation</a>
+</li><li>
+<a class="current" href="luajit_run.html">Running</a>
+</li><li>
+<a href="luajit_api.html">API Extensions</a>
+</li><li>
+<a href="luajit_intro.html">Introduction</a>
+</li><li>
+<a href="luajit_performance.html">Performance</a>
+</li><li>
+<a href="luajit_debug.html">Debugging</a>
+</li><li>
+<a href="luajit_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="coco.html">Coco</a>
+<ul><li>
+<a href="coco_portability.html">Portability</a>
+</li><li>
+<a href="coco_api.html">API Extensions</a>
+</li><li>
+<a href="coco_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="dynasm.html">DynASM</a>
+<ul><li>
+<a href="dynasm_features.html">Features</a>
+</li><li>
+<a href="dynasm_examples.html">Examples</a>
+</li></ul>
+</li><li>
+<a href="http://luajit.org/download.html">Download <span class="ext">&raquo;</span></a>
+</li></ul>
+</div>
+<div id="main">
+<p>
+LuaJIT has only a single stand-alone executable, called <tt>luajit</tt>.
+It can be used to run simple Lua statements or whole Lua applications
+from the command line. It has an interactive mode, too.
+</p>
+<p>
+<em>Note: The optimizer is not activated by default because it resides
+in an external module
+(see <a href="luajit_install.html">Installing LuaJIT</a>).
+It's recommended to always use the optimizer, i.e.:</em> <tt>luajit -O</tt>
+</p>
+
+<h2 id="options">Command Line Options</h2>
+<p>
+The <tt>luajit</tt> stand-alone executable is just a slightly modified
+version of the regular <tt>lua</tt> stand-alone executable.
+It supports the same basic options, too. Please have a look at the
+<a href="../doc/lua.html">Manual Page</a>
+for the regular <tt>lua</tt> stand-alone executable.
+</p>
+<p>
+Two additional options control LuaJIT behaviour:
+</p>
+
+<h3 id="opt_j"><tt>-j cmd[=value]</tt></h3>
+<p>
+This option performs a LuaJIT control command. LuaJIT has a small
+but extensible set of control commands. It's easy to add your own.
+</p>
+<p>
+The command is first searched for in the <tt>jit.*</tt> library.
+If no matching function is found, a module named <tt>jit.&lt;cmd&gt;</tt>
+is loaded. The module table must provide a <tt>start()</tt> function.
+</p>
+<p>
+For the <tt>-j cmd</tt> form the function is called without an argument.
+Otherwise the <tt>value</tt> is passed as the first argument (a string).
+</p>
+<p>
+Here are the built-in LuaJIT control commands:
+</p>
+<ul>
+<li id="j_on"><tt>-j on</tt> &mdash; Turns the JIT engine on (default).</li>
+<li id="j_off"><tt>-j off</tt> &mdash; Turns the JIT engine off.</li>
+<li id="j_debug"><tt>-j debug[=level]</tt> &mdash; Set debug level. See
+<a href="luajit_api.html#jit_debug">jit.debug()</a>.</li>
+</ul>
+<p>
+The following control commands are loaded from add-on modules:
+</p>
+<ul>
+<li id="j_trace"><tt>-j trace[=file]</tt> &mdash; Trace the progress of the JIT compiler.</li>
+<li id="j_dumphints"><tt>-j dumphints[=file]</tt> &mdash; Dump bytecode + hints before compilation.</li>
+<li id="j_dump"><tt>-j dump[=file]</tt> &mdash; Dump machine code after compilation.</li>
+</ul>
+
+<!--
+<h3 id="opt_O"><tt>-O[level|ext]</tt></h3>
+-->
+<h3 id="opt_O"><tt>-O[level]</tt></h3>
+<p>
+This option loads and runs the optimizer module <tt>jit.opt</tt>.
+The optimizer generates hints for the compiler backend to improve
+the performance of the compiled code. The optimizer slows down
+compilation slightly, but the end result should make up for it
+in almost every case.
+</p>
+<p>
+The <tt>-O</tt> form sets the default optimizer level, which is
+currently <tt>2</tt> (this may change in future versions
+of LuaJIT).
+</p>
+<p>
+The <tt>-Olevel</tt> form explicitly sets the optimizer level:
+</p>
+<ul>
+<li><tt>-O0</tt> &mdash; disable the optimizer but leave it attached.</li>
+<li><tt>-O1</tt> &mdash; perform standard optimizations (like hints for table lookups).</li>
+<li><tt>-O2</tt> &mdash; like <tt>-O1</tt> but also loads <tt>jit.opt_inline</tt> to enable result hints and inlining for standard library functions.</li>
+</ul>
+<!--
+<p>
+The <tt>-Oext</tt> form loads optimizer extension modules
+from <tt>jit.opt_&lt;ext&gt;</tt>.
+</p>
+-->
+<br class="flush">
+</div>
+<div id="foot">
+<hr class="hide">
+Copyright &copy; 2005-2008 Mike Pall
+<span class="noprint">
+&middot;
+<a href="contact.html">Contact</a>
+</span>
+</div>
+</body>
+</html>

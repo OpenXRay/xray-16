@@ -1,0 +1,57 @@
+* Variable, dynamic geometry detail of scene
+	- highly optimized for T&L hardware
+	- doesn't modify vertex data - only rearrange indices 
+* Colored, animated dynamic, per vertex lighting
+	- Intelligent light sources selection & clipping
+	- Makes possible more than 100 dynamic lights per frame at reasonable FPS-es
+* Very impressive simulation of atmosphere effects like sky/clouds/suns
+	- Of course it depends on art-designers skills but the bumped sky looks great :)
+* Fast, full-accelerated by hardware "Hard Shadow" generating algorithm
+	- Disadvantage: requires presents of 8 (or more) bits stencil buffer
+	- Advantages: the most current hardware has already had it :)
+* Table W-Fog & Z-Fog support
+	- automatic rollback to emulation via vertex fogging if hardware doesn't support it.
+* Intelligent use of triple buffering scheme
+	- results in FPS-es increase on video boards which have enough memory to hold all buffers
+* Motion compensation scheme
+	- Hides many visual artifacts produced by FPS-es instability
+* Light maps (shadow maps) and dynamic lightmaps
+* Flare system
+* Particle system
+* Coronas and Lensflares
+* Detail patch subsystem
+* Shader script support
+* Support for texture compression
+* Support for hardware transformation and lighting 
+* Hierarchical objects
+* Support for Lightwave objects
+* Bump mapping
+* Environment mapping
+	- Cubic environment mapping
+	- Spherical environment mapping
+* Reflections
+	- Pre-rendered textured reflection simulation can be applied on any object or part of it 
+		without any performance penalty
+* Single-mesh skeleton animation
+	- High-speed blended animation system capable of up to infinity number of bones interpolation & modulation
+	- The first 256 bones blending will be accelerated by GPU (if it capable of doing such thing :)
+* Portal-style, non-linear subdivision based visibility detection system
+	- Optimized for T&L hardware in the way of grouping primitives to large-size batches
+	- Greatly reduces overdraw - which is the main slowdown on even high-level video boards
+* Antiportals
+* Intelligent hardware state caching technology
+* Dynamically generated textures
+* OBB-style collision-detection system
+	- Capable of ideal determining collisions between high-poly models in high-detailed world
+* Powerful scripting
+	- Full realization of C-language 
+	- Only 6-8 times slower than real (x86) code
+	- Enables fast AI development and almost infinite number of texturing effects
+* The most important part of the mathematics is optimized for PIII SSE & K6/K7 3DNow instructions
+
+* High quality HRTF-3D sound, accelerated by hardware if possible
+* Low-penalty & "low-delay" reaction technology (about 1-3ms to start HRTF 3D Sound Source to play)
+* Sound clipping and sound reflection
+* High speed streaming sound decoding
+	- Means playing MP3/MP2/WMA/ADPCM tracks with almost no penalty to performance
+* Context relative multiple-mixed music streams 

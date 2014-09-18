@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Coco</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="Author" content="Mike Pall">
+<meta name="Copyright" content="Copyright (C) 2005-2008, Mike Pall">
+<meta name="Language" content="en">
+<link rel="stylesheet" type="text/css" href="bluequad.css" media="screen">
+<link rel="stylesheet" type="text/css" href="bluequad-print.css" media="print">
+</head>
+<body>
+<div id="site">
+<a href="http://luajit.org/"><span>Lua<span id="logo">JIT</span></span></a>
+</div>
+<div id="head">
+<h1>Coco</h1>
+</div>
+<div id="nav">
+<ul><li>
+<a href="index.html">Index</a>
+</li><li>
+<a href="luajit.html">LuaJIT</a>
+<ul><li>
+<a href="luajit_features.html">Features</a>
+</li><li>
+<a href="luajit_install.html">Installation</a>
+</li><li>
+<a href="luajit_run.html">Running</a>
+</li><li>
+<a href="luajit_api.html">API Extensions</a>
+</li><li>
+<a href="luajit_intro.html">Introduction</a>
+</li><li>
+<a href="luajit_performance.html">Performance</a>
+</li><li>
+<a href="luajit_debug.html">Debugging</a>
+</li><li>
+<a href="luajit_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a class="current" href="coco.html">Coco</a>
+<ul><li>
+<a href="coco_portability.html">Portability</a>
+</li><li>
+<a href="coco_api.html">API Extensions</a>
+</li><li>
+<a href="coco_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="dynasm.html">DynASM</a>
+<ul><li>
+<a href="dynasm_features.html">Features</a>
+</li><li>
+<a href="dynasm_examples.html">Examples</a>
+</li></ul>
+</li><li>
+<a href="http://luajit.org/download.html">Download <span class="ext">&raquo;</span></a>
+</li></ul>
+</div>
+<div id="main">
+<p>
+Coco is a small extension to get <strong>True C&nbsp;Coroutine</strong>
+semantics for Lua 5.1.
+</p>
+<p>
+Coco is both available as a stand-alone release and integrated
+into <a href="luajit.html">LuaJIT</a>.
+</p>
+<p>
+The stand-alone release is a patchset against the
+<a href="http://www.lua.org/ftp/"><span class="ext">&raquo;</span>&nbsp;standard Lua 5.1.3</a>
+distribution. There are no dependencies on LuaJIT. However LuaJIT
+depends on Coco to allow yielding for JIT compiled functions.
+</p>
+<p>
+Coco is Copyright &copy; 2004-2008 Mike Pall.
+Coco is free software, released under the
+<a href="http://www.opensource.org/licenses/mit-license.php"><span class="ext">&raquo;</span>&nbsp;MIT/X license</a>
+(same license as the Lua core).
+</p>
+<h2>Features</h2>
+<p>
+True C&nbsp;coroutine semantics mean you can yield from a coroutine
+across a C&nbsp;call boundary and resume back to it.
+</p>
+<p>
+Coco allows you to use a dedicated C&nbsp;stack for each coroutine.
+Resuming a coroutine and yielding from a coroutine automatically switches
+C&nbsp;stacks, too.
+</p>
+<p>
+In particular you can now:
+</p>
+<ul>
+<li>Yield across all metamethods (not advised for <tt>__gc</tt>).</li>
+<li>Yield across iterator functions (<tt>for x in func do</tt>).</li>
+<li>Yield across callbacks (<tt>table.foreach()</tt>, <tt>dofile()</tt>, ...).</li>
+<li>Yield across protected callbacks (<tt>pcall()</tt>, <tt>xpcall()</tt>, ...).</li>
+<li>Yield from C&nbsp;functions and resume back to them.</li>
+</ul>
+<p>
+Best of all, you don't need to change your Lua or C&nbsp;sources
+and still get the benefits. It's fully integrated into the
+Lua core, but tries to minimize the required changes.
+</p>
+
+<h2>More ...</h2>
+<p>
+Please visit the <a href="http://luajit.org/download.html"><span class="ext">&raquo;</span>&nbsp;Download</a> page
+to fetch the current version of the stand-alone package.
+</p>
+<p>
+Coco needs some machine-specific features &mdash; please have a look
+at the <a href="coco_portability.html">Portability Requirements</a>.
+</p>
+<p>
+Coco also provides some upwards-compatible
+<a href="coco_api.html">API Extensions</a> for Lua.
+</p>
+<br class="flush">
+</div>
+<div id="foot">
+<hr class="hide">
+Copyright &copy; 2005-2008 Mike Pall
+<span class="noprint">
+&middot;
+<a href="contact.html">Contact</a>
+</span>
+</div>
+</body>
+</html>

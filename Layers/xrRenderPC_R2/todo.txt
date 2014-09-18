@@ -1,0 +1,205 @@
+----------------------------
+done, ~7% perf-gain		:	intelligent	RT-switches sheduling + give some time to complete RT-rendering
+done, ~5.5% perf-gain	:	cull point-light frustums against real frustum
+done, works OK			:	fixed coordinate system for point lights - should minimize flickering
+						:	clip every-light frustums against real frustum - difficult
+						:	scissoring ???
+done, works OK			:	3*32	bit RTs		- position/normal compression
+done, works OK			:	bilinear/q-linear filter for cubemaps
+done, works OK			:	2*DXT5	bumpmaps + heightmaps	- lower quality, 8 bit, faster(?)
+----------------------------
+						:	A8L8	encoding of encodeRG
+						:	L8		encoding of encodeB + mov instead add
+						:	A8L8	encoding of material
+----------------------------
+smap_res:	fixed(36.0), adaptive(36.9), minus one RT-switch(37.5)
+433/1.08Ghz:optimized spot-shadow-shaders + aref( 31.3  )
+433/1.08Ghz:agressive scissoring				( 33.8  )
+same,60.50 :all + optimized sphere				( 42.83 )
+same,			+ optimized order				( 57.20	)
+----------------------------
+433/1.2/60.50:		23.92/23.22
+433/1.2/60.60:		~23.8
+same,occq-delay:	~25.9
+----------------------------
++BUG:	mt_physics
++BUG:	particles
++BUG:	self-illum
++BUG:	optimized sphere around cone-shape
+BUG:	scissor	- reprojection
+BUG:	light - spanning multiple sectors -> connect to portals
+
+OPT:	clipping light volume by visibility frustum (or primary)
+		should minimize geometry/fill req
+OPT:	if scissor is inside light volume we can construct more precise/smaller volume
+OPT:	occlusion culling of light volumes
+		1. if camera inside - assume visible
+		2. employ temporal coherence
+OPT:	precompute invisible list (visuals) for static lights at load time
+
+FEAT:	shadows from transparent particles - 2x for light boost + colorful shadows?
+
++FEATURE:	incremental object level culling
++FEATURE:	stats:
++FEATURE:	materials:
++FEATURE:	anisotropic
++FEATURE:	range-fog
++FEATURE:	particles/transparency
++		:	light-sleeping logic
++		:	faster bloom blur
++		:	fading of bloom
++BUG	:	jumping transform for projected texture
++BUG	:	biasing for spot-lighting
++BUG	:	fucking light-flickering!!!
++BUG	:	DX-WARN: RT used while bound
++FEATURE:	self-ilum
++BUG	:	fucking light near viewpoint!!!
+
+hw-pointlight
+volume-fog
+z-fade particles
+
+Engine/Game:
+	* refactor/rebuild collision detection infrastructure (along with Slipch)	
+		- should speed up physics considerably						~1 week for me, ??? for Slipch
+
+Sound:
+	* I3DL2_reverb				(?)									-	3 days / Sanya (???)
+	
+LevelCompiler/GeometryProcessing:
+	* R2: xrLC geometry selection for point/spot lights	(???)		-	? R2 only ?
+	* CDB - qSlim						(???) / discrete attrs		-	~1week
+	* better hemisphere / qSlim			(???)						-	~2weeks?
+	* SlidingWindow VIPM				(???)						-	~1week
+
+R1:
+	* per-pixel displacement + secondary channel					-	~1week / ps2.0 / ps1.3 (1 day + 1 day) 
+	* wallmarks on dynamic objects		(?)							-	~1week
+	* SlidingWindow VIPM / screen-error	(???)						-	3 day (max)
+	* ShadowCast cache					(:BUG:)
+
+R2:
+	* work out point-light-hw-shadowmaps()							-	1 day
+done* work out tonemapping				(?)							-	?
+done* work out blooming					(again)						-\  3 days	
+done* work out skybox					(again)						-/
+	* work out hemisphere				(again)						-	1 day (?)
+done* work out ordinary rendering + transparency					-	1 day (?)
+done* work out HUD													-	1 day (?)
+	* sRGB convert diffuse				(???)						-	?
+	* transluency						(again + experiment)		-	1day - 1week
+	* reverse culling for spot/point with initial clears - should avoid most biasing (?)	- 1day - but can just not work :)
+	* 4*32bit	RT(s) / emissive									-	1day + emissive shaders (as need them)
+	* perspective shadow maps and all that stuff Gary talks about	-	1month...	1year :)))
+	* wallmarks :)	(?)												-	?
+	* generated bumpmaps leaks
+	* surface material:
+		- emmisive map
+	done- detail-bump map
+		- anisotropic materials										-	1 day
+		- material	definition										-	(blin-bump-low-spec, 1=blin-bump-high-spec, 2=anisotroptic-low, 3=anisotroptic-high) / ()
+	* SlidingWindow VIPM / screen-error	(???)						-	3 day (max) / R1
+	* IRender_Light	-> save/load ->		R2 / shadow-no-shadow		-	1 day me	/ 1 day sanya
+----------------------------
+	surface:
+		diffuse texture			/ diffuse detail (???)
+		height map [rgb](5cm)	/ detail heightmap
+		gloss map  [a]	(0..1)	/ 
+		emisssive				/ 1 scalar / 1 koeff				-	none
+		material-id				/ 1 scalar
+		transluency				/ ???
+----------------------------
+blin-bump-low-spec  , blin-bump-high-spec
+blin-bump-high-spec	, anisotroptic-low, 
+anisotroptic-low	, anisotroptic-high
+----------------------------
+	bump:
+		format					: Bump
+	  + virtual_height			: float (5cm default)
+		mipmaps					: none
+		details					: inaplicable
+		flags					: inaplicable
+		fade					: inaplicable
+		border					: inaplicable
+			-> 2 textures (DXT5)
+
+	texture:
+		format					: 2D/Cube
+	  +	material_id				: float 
+	  +	bump_mode				: flat, autogen, use
+			bump_autogen		: height (5 cm, default)
+			bump_use			: bump-texture
+		detail_mode				:
+			bump_or_diffuse/diffuse/none
+		
+----------------------------
+I think I understand it. Maybe I can help myself (and others) understand it better if I try to explain it.
+I assume you know how the normal mapping works. The question is: how is the offset computed?
+
+1) for each vertex, transform the eye vector into tangent space so that 'z' represents the normal component
+now for each fragment:
+2) normalize the tangent-space eye vector. call it ~v
+3) fetch the height of the texture, which represents the displacement of the surface. Scale and bias is used to map the fetched values of 0-1 to some range, such as -.02 to .02. You wouldn't need to do this with float textures, but you probably don't need the precision. Call the final height h.
+4) to compute the offset, you have to find the intersection of a ray with direction ~v and height h to a a plane at height 0.(representing the texture surface). Because the x and y components of ~v represent the tangent plane coordinates, and 2D texture fetches ignore the z component, all you need to do is scale ~v by h.
+
+I think that's it? Any corrections/clarifications?
+---
+Nice demo, Humus. The shadows do a nice job of hiding some of the ugly artifacts from the offset mapping 
+I noticed a couple posts complaining about things looking wrong at a distance, which is a good observation. 
+Keep in mind that the offset I calculate in the fragment program is a small-angle approximation. This code
+
+# calculate offset
+TEX height, fragment.texcoord[0], texture[2], 2D;
+MAD height, height, 0.04, -0.02;	# scale and bias
+MAD newtexcoord, height, eyevects, fragment.texcoord[0];
+
+should really look like this:
+
+# calculate offset
+TEX height, fragment.texcoord[0], texture[2], 2D;
+MAD height, height, 0.04, -0.02;	# scale and bias
+RCP temp, eyevects.z;
+MUL height, height, temp;
+MAD newtexcoord, height, eyevects, fragment.texcoord[0];
+
+All I did there was add a couple instructions to divide the offset by the eye vector's z component. This is more mathematically correct in one sense because it increases the steep angle offsets to their proper lengths.
+
+However, all these offsets assume that the texcoord their pointing to is the same height as the texcoord they're 
+starting at, which is almost never true. So making the offsets the correct length causes extra swimming in the 
+textures and actually makes things look worse in my opinion. In a nutshell, I'm using a small angle approximation 
+to tone down artifacts that result from another completely different approximation.
+
+Anyway, I hope that explanation makes some sense. It's really hard to describe this stuff without drawing pictures :P
+			/-------------------------------\				/-------------------------------\
+			| RT_0		=	depth			|				| RT_P	= pos.1/len(pos), 4xFP16|				/---------------------------\
+deffer -----| RT_1		=	norm.mid		|--decompress---| RT_N	= norm.mid,	4xFP16		|--accumulate---| RT_ACCUM = total_light	|--combine
+			| RT_COLOR	=	rgb.gloss		|				\-------------------------------/				\---------------------------/
+			| RT_ACCUM	=	hemi+emissive	|				
+-----------------------------------------------------------------------------------------------
+light	- logic:
+	color-animator + brightness
+	motion		= pos + rotation
+	name		(access)
+	
+light	- physic:
+	type		= spot/point/...
+	flags		= shadow cast/active/...
+	xform		= pos/dir/right/...
+	range		= 
+	cone-angle	= (spot)
+	virtual-size= point/spot
+	color		= 
+	texture		= 
+-----------------------------------------------------------------------------------------------
+struct	def : public def
+{
+	typedef _previous	AAA;
+	typedef _current	BBB;
+}
+struct	def : public def
+{
+	typedef _previous	def::_current;
+	typedef	_current	CCC;
+}
+
+accum	(a,b)

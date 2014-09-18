@@ -1,0 +1,372 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>LuaJIT API Extensions</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="Author" content="Mike Pall">
+<meta name="Copyright" content="Copyright (C) 2005-2008, Mike Pall">
+<meta name="Language" content="en">
+<link rel="stylesheet" type="text/css" href="bluequad.css" media="screen">
+<link rel="stylesheet" type="text/css" href="bluequad-print.css" media="print">
+<style type="text/css">
+td.stname { width: 10em; }
+tr.sthead td { font-weight: bold; }
+</style>
+</head>
+<body>
+<div id="site">
+<a href="http://luajit.org/"><span>Lua<span id="logo">JIT</span></span></a>
+</div>
+<div id="head">
+<h1>LuaJIT API Extensions</h1>
+</div>
+<div id="nav">
+<ul><li>
+<a href="index.html">Index</a>
+</li><li>
+<a href="luajit.html">LuaJIT</a>
+<ul><li>
+<a href="luajit_features.html">Features</a>
+</li><li>
+<a href="luajit_install.html">Installation</a>
+</li><li>
+<a href="luajit_run.html">Running</a>
+</li><li>
+<a class="current" href="luajit_api.html">API Extensions</a>
+</li><li>
+<a href="luajit_intro.html">Introduction</a>
+</li><li>
+<a href="luajit_performance.html">Performance</a>
+</li><li>
+<a href="luajit_debug.html">Debugging</a>
+</li><li>
+<a href="luajit_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="coco.html">Coco</a>
+<ul><li>
+<a href="coco_portability.html">Portability</a>
+</li><li>
+<a href="coco_api.html">API Extensions</a>
+</li><li>
+<a href="coco_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="dynasm.html">DynASM</a>
+<ul><li>
+<a href="dynasm_features.html">Features</a>
+</li><li>
+<a href="dynasm_examples.html">Examples</a>
+</li></ul>
+</li><li>
+<a href="http://luajit.org/download.html">Download <span class="ext">&raquo;</span></a>
+</li></ul>
+</div>
+<div id="main">
+<p>
+LuaJIT provides several new API functions organized into two
+libraries.
+</p>
+<p>
+LuaJIT includes Coco &mdash; so have a look at the
+<a href="coco_api.html">Coco API Extensions</a>, too.
+</p>
+
+<h2>Standard Library Functions</h2>
+<p>
+All standard library functions have the same behaviour as
+in the Lua distribution LuaJIT is based on.
+</p>
+<p>
+The Lua loader used by the standard <tt>require()</tt> library
+function has been modified to turn off compilation of the main
+chunk of a module. The main chunk is only run once when the module
+is loaded for the first time. There is no point in compiling it.
+</p>
+<p>
+You might want to adapt this behaviour if you use your own utility
+functions (and not <tt>require()</tt>) to load modules.
+</p>
+<p>
+Note that the subfunctions defined in a loaded module <em>are</em>
+of course compiled. See below if you want to override this.
+</p>
+
+<h2>The jit.* Library</h2>
+<p>
+This library holds several functions to control the behaviour
+of the JIT engine.
+</p>
+
+<h3 id="jit_onoff"><tt>jit.on()<br>
+jit.off()</tt></h3>
+<p>
+Turns the JIT engine on (default) or off.
+</p>
+<p>
+These functions are typically used with the command line options
+<tt>-j on</tt> or <tt>-j off</tt>.
+</p>
+
+<h3 id="jit_onoff_func"><tt>jit.on(func|true [,true|false])<br>
+jit.off(func|true [,true|false])</tt></h3>
+<p>
+Enable (with <tt>jit.on</tt>, default) or disable (with <tt>jit.off</tt>)
+JIT compilation for a Lua function. The current function (the Lua function
+calling this library function) can be specified with <tt>true</tt>.
+</p>
+<p>
+If the second argument is <tt>true</tt>, JIT compilation is also
+enabled/disabled recursively for all subfunctions of a function.
+With <tt>false</tt> only the subfunctions are affected.
+</p>
+<p>
+Both library functions only set a flag which is checked when
+the function is executed for the first/next time. They do not
+trigger immediate compilation.
+</p>
+<p>
+Typical usage is <tt>jit.off(true, true)</tt> in the main chunk
+of a module to turn off JIT compilation for the whole module.
+Note that <tt>require()</tt> already turns off compilation for
+the main chunk itself.
+</p>
+
+<h3 id="jit_compile"><tt>status = jit.compile(func [,args...])</tt></h3>
+<p>
+Compiles a Lua function and returns the compilation status.
+Successful compilation is indicated with a <tt>nil</tt> status.
+Failure is indicated with a numeric status (see <tt>jit.util.status</tt>).
+</p>
+<p>
+The optimizer pass of the compiler tries to derive hints from the
+passed arguments. Not passing any arguments or passing untypical
+arguments (esp. the wrong types) reduces the efficiency of the
+optimizer. The compiled function will still run, but probably not
+with maximum speed.
+</p>
+<p>
+This library function is typically used for Ahead-Of-Time (AOT)
+compilation of time-critical functions or for testing/debugging.
+</p>
+
+<h3 id="jit_compilesub"><tt>status = jit.compilesub(func|true [,true])</tt></h3>
+<p>
+Recursively compile all subfunctions of a Lua function.
+The current function (the Lua function calling this library function)
+can be specified with <tt>true</tt>. Note that the function
+<em>itself</em> is not compiled (use <tt>jit.compile()</tt>).
+</p>
+<p>
+If the second argument is <tt>true</tt>, compilation will stop
+when the first error is encountered. Otherwise compilation will
+continue with the next subfunction.
+</p>
+<p>
+The returned status is <tt>nil</tt>, if all subfunctions have been
+compiled successfully. A numeric status (see <tt>jit.util.status</tt>)
+indicates that at least one compilation failed and gives the status
+of the last failure (this is only helpful when stop on error
+is <tt>true</tt>).
+</p>
+
+<h3 id="jit_debug"><tt>jit.debug([level])</tt></h3>
+<p>
+Set the debug level for JIT compilation. If no <tt>level</tt> is given,
+the maximum debug level is set.
+</p>
+<ul>
+<li>Level 0 disables debugging: no checks for hooks are compiled
+into the code. This is the default when LuaJIT is started and
+provides the maximum performance.</li>
+<li>Level 1 enables function call debugging: call hooks and
+return hooks are checked in the function prologue and epilogue.
+This slows down function calls somewhat (by up to 10%).</li>
+<li>Level 2 enables full debugging: all hooks are checked.
+This slows down execution quite a bit, even when the hooks
+are not active.</li>
+</ul>
+<p>
+Note that some compiler optimizations are turned off when
+debugging is enabled.
+</p>
+<p>
+This function is typically used with the command line options
+<tt>-j debug</tt> or <tt>-j debug=level</tt>.
+</p>
+
+<h3 id="jit_attach"><tt>jit.attach(handler [, priority])</tt></h3>
+<p>
+Attach a handler to the compiler pipeline with the given priority.
+The handler is detached if no priority is given.
+</p>
+<p>
+The inner workings of the compiler pipeline and the API for handlers
+are still in flux. Please see the source code for more details.
+</p>
+
+<h3 id="jit_version"><tt>jit.version</tt></h3>
+<p>
+Contains the LuaJIT version string.
+</p>
+
+<h3 id="jit_version_num"><tt>jit.version_num</tt></h3>
+<p>
+Contains the version number of the LuaJIT core. Version xx.yy.zz
+is represented by the decimal number xxyyzz.
+</p>
+
+<h3 id="jit_arch"><tt>jit.arch</tt></h3>
+<p>
+Contains the target architecture name (CPU and optional ABI).
+</p>
+
+
+<h2 id="jit_util">The jit.util.* Library</h2>
+<p>
+This library holds many utility functions used by the provided
+extension modules for LuaJIT (e.g. the optimizer). The API may
+change in future versions.
+</p>
+
+<h3 id="jit_util_stats"><tt>stats = jit.util.stats(func)</tt></h3>
+<p>
+Retrieves information about a function. Returns <tt>nil</tt>
+for C functions. Returns a table with the following fields for
+Lua functions:
+</p>
+<ul>
+<li><tt>status</tt>: numeric compilation status (see <tt>jit.util.status</tt>).</li>
+<li><tt>stackslots</tt>: number of stack slots.</li>
+<li><tt>params</tt>: number of fixed parameters (arguments).</li>
+<li><tt>consts</tt>: number of constants.</li>
+<li><tt>upvalues</tt>: number of upvalues.</li>
+<li><tt>subs</tt>: number of subfunctions (sub prototypes).</li>
+<li><tt>bytecodes</tt>: number of bytecode instructions.</li>
+<li><tt>isvararg</tt>: fixarg (false) or vararg (true) function.</li>
+<li><tt>env</tt>: function environment table.</li>
+<li><tt>mcodesize</tt>: size of the compiled machine code.</li>
+<li><tt>mcodeaddr</tt>: start address of the compiled machine code.</li>
+</ul>
+<p>
+<tt>mcodesize</tt> and <tt>mcodeaddr</tt> are not set if the
+function has not been compiled (yet).
+</p>
+
+<h3 id="jit_util_bytecode"><tt>op, a, b, c, test = jit.util.bytecode(func, pc)</tt></h3>
+<p>
+Returns the fields of the bytecode instruction at the given <tt>pc</tt>
+for a Lua function. The first instruction is at <tt>pc</tt> = 1.
+Nothing is returned if <tt>pc</tt> is out of range.
+</p>
+<p>
+The opcode name is returned as an uppercase string in <tt>op</tt>.
+The opcode arguments are returned as <tt>a</tt>, <tt>b</tt> and
+optionally <tt>c</tt>. Arguments that indicate an index into the
+array of constants are translated to negative numbers (the first
+constant is referred to with -1). Branch targets are signed numbers
+relative to the next instruction.
+</p>
+<p>
+<tt>test</tt> is true if the instruction is a test (i.e. followed
+by a JMP).
+</p>
+
+<h3 id="jit_util_const"><tt>const, ok = jit.util.const(func, idx)</tt></h3>
+<p>
+Returns a constant from the array of constants for a Lua function.
+<tt>ok</tt> is true if <tt>idx</tt> is in range. Otherwise nothing
+is returned.
+</p>
+<p>
+Constants are numbered starting with 1. A negative <tt>idx</tt>
+is mapped to a positive index.
+</p>
+
+<h3 id="jit_util_upvalue"><tt>upvalue, ok = jit.util.upvalue(func, idx)</tt></h3>
+<p>
+Returns an upvalue from the array of upvalues for a Lua function.
+<tt>ok</tt> is true if <tt>idx</tt> is in range. Otherwise nothing
+is returned. Upvalues are numbered starting with 0.
+</p>
+
+<h3 id="jit_util_closurenup"><tt>nup = jit.util.closurenup(func, idx)</tt></h3>
+<p>
+Returns the number of upvalues for the subfunction prototype with
+the given index <tt>idx</tt> for a Lua function. Nothing is returned
+if <tt>idx</tt> is out of range. Subfunctions are numbered starting
+with 0.
+</p>
+
+<h3 id="jit_util_mcode"><tt>addr, mcode, mfmiter = jit.util.mcode(func, block])</tt></h3>
+<p>
+Returns the numeric start address, the compiled machine code
+(converted to a string) and an iterator for the machine code fragment map
+for the specified machine code block associated with a Lua function.
+</p>
+<p>
+Returns <tt>nil</tt> and a numeric status code (see <tt>jit.util.status</tt>)
+if the function has not been compiled yet or compilation has failed
+or compilation is disabled. Returns nothing if the selected
+machine code block does not exist.
+</p>
+<p>
+The machine code fragment map is used for debugging and error handling.
+The format may change between versions and is an internal implementation
+detail of LuaJIT.
+</p>
+
+<h3 id="jit_util_jsubmcode"><tt>addr [, mcode] = jit.util.jsubmcode([idx])</tt></h3>
+<p>
+If <tt>idx</tt> is omitted or nil:
+Returns the numeric start address and the compiled machine code
+(converted to a string) for internal subroutines used by the
+compiled machine code.
+</p>
+<p>
+If <tt>idx</tt> is given:
+Returns the numeric start address of the machine code for a specific
+internal subroutine (0&nbsp;based). Nothing is returned if <tt>idx</tt> is
+out of range.
+</p>
+
+<h3 id="jit_util_status"><tt>jit.util.status</tt></h3>
+<p>
+This is a table that bidirectionally maps status numbers and
+status names (strings):
+</p>
+<div class="tablewrap">
+<table>
+<tr class="sthead"><td class="stname">Status Name</td><td>Description</td></tr>
+<tr class="odd"><td class="stname">OK</td><td>Ok, code has been compiled.</td></tr>
+<tr class="even"><td class="stname">NONE</td><td>Nothing analyzed or compiled, yet (default).</td></tr>
+<tr class="odd"><td class="stname">OFF</td><td>Compilation disabled for this function.</td></tr>
+<tr class="even"><td class="stname">ENGINE_OFF</td><td>JIT engine is turned off.</td></tr>
+<tr class="odd"><td class="stname">DELAYED</td><td>Compilation delayed (recursive invocation).</td></tr>
+<tr class="even"><td class="stname">TOOLARGE</td><td>Bytecode or machine code is too large.</td></tr>
+<tr class="odd"><td class="stname">COMPILER_ERROR</td><td>Error from compiler frontend.</td></tr>
+<tr class="even"><td class="stname">DASM_ERROR</td><td>Error from DynASM engine.</td></tr>
+</table>
+</div>
+
+<h3 id="jit_util_hints"><tt>jit.util.hints<br>
+jit.util.fhints</tt></h3>
+<p>
+These two tables map compiler hint names to internal hint numbers.
+</p>
+<p>
+The hint system is an internal implementation detail of LuaJIT.
+Please see the source code for more info.
+</p>
+<br class="flush">
+</div>
+<div id="foot">
+<hr class="hide">
+Copyright &copy; 2005-2008 Mike Pall
+<span class="noprint">
+&middot;
+<a href="contact.html">Contact</a>
+</span>
+</div>
+</body>
+</html>

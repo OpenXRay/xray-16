@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Coco API Extensions</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="Author" content="Mike Pall">
+<meta name="Copyright" content="Copyright (C) 2005-2008, Mike Pall">
+<meta name="Language" content="en">
+<link rel="stylesheet" type="text/css" href="bluequad.css" media="screen">
+<link rel="stylesheet" type="text/css" href="bluequad-print.css" media="print">
+</head>
+<body>
+<div id="site">
+<a href="http://luajit.org/"><span>Lua<span id="logo">JIT</span></span></a>
+</div>
+<div id="head">
+<h1>Coco API Extensions</h1>
+</div>
+<div id="nav">
+<ul><li>
+<a href="index.html">Index</a>
+</li><li>
+<a href="luajit.html">LuaJIT</a>
+<ul><li>
+<a href="luajit_features.html">Features</a>
+</li><li>
+<a href="luajit_install.html">Installation</a>
+</li><li>
+<a href="luajit_run.html">Running</a>
+</li><li>
+<a href="luajit_api.html">API Extensions</a>
+</li><li>
+<a href="luajit_intro.html">Introduction</a>
+</li><li>
+<a href="luajit_performance.html">Performance</a>
+</li><li>
+<a href="luajit_debug.html">Debugging</a>
+</li><li>
+<a href="luajit_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="coco.html">Coco</a>
+<ul><li>
+<a href="coco_portability.html">Portability</a>
+</li><li>
+<a class="current" href="coco_api.html">API Extensions</a>
+</li><li>
+<a href="coco_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="dynasm.html">DynASM</a>
+<ul><li>
+<a href="dynasm_features.html">Features</a>
+</li><li>
+<a href="dynasm_examples.html">Examples</a>
+</li></ul>
+</li><li>
+<a href="http://luajit.org/download.html">Download <span class="ext">&raquo;</span></a>
+</li></ul>
+</div>
+<div id="main">
+<p>
+Coco changes the semantics of several standard API functions and
+provides a few API extensions for Lua.
+</p>
+<p>
+By default all your coroutines get an associated C&nbsp;stack.
+If you want to be more selective, see below.
+</p>
+
+<h2>Lua API extensions</h2>
+<p>
+All <tt>coroutine.*</tt> functions should be fully upwards compatible.
+</p>
+
+<h3><tt>coroutine.coco</tt></h3>
+<p>
+This field is <tt>true</tt> when Coco is present (nil otherwise).
+</p>
+
+<h3><tt>coro = coroutine.create(f [, cstacksize])<br>
+func = coroutine.wrap(f [, cstacksize])</tt></h3>
+<p>
+The optional argument <tt>cstacksize</tt> specifies the size of the
+C&nbsp;stack to allocate for the coroutine:
+</p>
+<ul>
+<li>A default stack size is used if <tt>cstacksize</tt> is not given
+or is nil or zero.</li>
+<li>No C&nbsp;stack is allocated if <tt>cstacksize</tt> is -1.</li>
+<li>Any other value is rounded up to the minimum size
+(i.e. use 1 to get the minimum size).</li>
+</ul>
+<p>
+Important notice for LuaJIT: JIT compiled functions cannot
+yield if a coroutine does not have a dedicated C&nbsp;stack.
+</p>
+
+<h3><tt>olddefault = coroutine.cstacksize([newdefault])</tt></h3>
+<p>
+Returns the current default C&nbsp;stack size (may be 0 if the
+underlying context switch method has its own default).
+Sets a new default C&nbsp;stack size if <tt>newdefault</tt> is present.
+Use 0 to reset it to the default C&nbsp;stack size. Any other
+value is rounded up to the minimum size.
+</p>
+
+<h2>C&nbsp;API extensions</h2>
+<p>
+All C&nbsp;API functions are either unchanged or upwards compatible.
+</p>
+
+<h3><tt>int lua_yield(lua_State *L, int nresults)</tt></h3>
+<p>
+The semantics for <tt>lua_yield()</tt> have changed slightly.
+Existing programs should work fine as long as they follow
+the usage conventions from the Lua manual:
+</p>
+<pre>
+return lua_yield(L, nresults);
+</pre>
+<p>
+Previously <tt>lua_yield()</tt> returned a 'magic' value (<tt>-1</tt>) that
+indicated a yield. Your C&nbsp;function had to pass this value
+on to the Lua core and was <em>not</em> called again.
+</p>
+<p>
+Now, if the current coroutine has an associated C&nbsp;stack,
+<tt>lua_yield()</tt> returns the number of arguments passed back from
+the resume. This just happens to be the right convention for
+returning them as a result from a C&nbsp;function. I.e. if you
+used the above convention, you'll never notice the change.
+</p>
+<p>
+But the results <em>are</em> on the Lua stack when <tt>lua_yield()</tt>
+returns. So the C&nbsp;function can just continue and process them
+or retry an I/O operation etc. And your whole C&nbsp;stack frame
+(local variables etc.) is still there, too. You can yield from
+anywhere in your C&nbsp;program, even several call levels deeper.
+</p>
+<p>
+Of course all of this only works with Lua+Coco and not with standard Lua.
+</p>
+
+<h3><tt>lua_State *lua_newcthread(lua_State *L, int cstacksize)</tt></h3>
+<p>
+This is an (optional) new function that allows you to create
+a coroutine with an associated C&nbsp;stack directly from the C&nbsp;API.
+Other than that it works the same as <tt>lua_newthread(L)</tt>.
+</p>
+<p>
+You have to declare this function as <tt>extern</tt>
+yourself, since it's not part of the official Lua API.
+This means that a C&nbsp;module that uses this call cannot
+be loaded with standard Lua. This may be intentional.
+</p>
+<p>
+If you want your C&nbsp;module to work with both standard Lua
+and Lua+Coco you can check whether Coco is available with:
+</p>
+<pre>
+  lua_getfield(L, LUA_GLOBALSINDEX, "coroutine");
+  lua_getfield(L, -1, "coco");
+  coco_available = lua_toboolean(L, -1);
+  lua_pop(L, 2);
+</pre>
+<p>
+You can create coroutines with a C&nbsp;stack by calling
+the Lua function <tt>coroutine.create()</tt> from C, too.
+</p>
+<br class="flush">
+</div>
+<div id="foot">
+<hr class="hide">
+Copyright &copy; 2005-2008 Mike Pall
+<span class="noprint">
+&middot;
+<a href="contact.html">Contact</a>
+</span>
+</div>
+</body>
+</html>

@@ -1,0 +1,55 @@
+global proc int xrayObjectExportOptions ( string $parent,
+								   string $action,
+								   string $initialSettings,
+								   string $resultCallback )
+{
+	int		$bResult;
+	string	$currentOptions;
+	string	$optionList[];
+	string	$optionBreakDown[];
+	int		$index;
+
+	if ($action == "post") {
+		setParent $parent;
+
+		setUITemplate -pushTemplate DefaultTemplate;
+
+		formLayout -e -vis false optionsBoxForm;
+
+		frameLayout
+			-cll true
+			-cl false
+			-bv true
+			-bs "etchedIn"
+			-l "About"
+			xrayAboutFrame;
+
+			columnLayout -adj true;
+
+			text -al "left" -l "Maya -> X-Ray Object Exporter ver. 1.0";
+                				
+		// Now set to current settings.
+		$currentOptions = $initialSettings;
+		if (size($currentOptions) > 0) {
+			tokenize($currentOptions, ";", $optionList);
+			for ($index = 0; $index < size($optionList); $index++) {
+				tokenize($optionList[$index], "=", $optionBreakDown);
+
+			}
+		}
+		$result = 1;
+
+		formLayout -e -vis true optionsBoxForm;
+
+		setUITemplate -popTemplate;
+	
+	} else if ($action == "query") {
+
+		eval($resultCallback+" \""+$currentOptions+"\"");
+		$result = 1;
+	} else {
+		$bResult = 0;
+	}
+	
+	return $bResult;
+}

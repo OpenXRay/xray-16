@@ -1,0 +1,231 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>LuaJIT Features</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="Author" content="Mike Pall">
+<meta name="Copyright" content="Copyright (C) 2005-2008, Mike Pall">
+<meta name="Language" content="en">
+<link rel="stylesheet" type="text/css" href="bluequad.css" media="screen">
+<link rel="stylesheet" type="text/css" href="bluequad-print.css" media="print">
+</head>
+<body>
+<div id="site">
+<a href="http://luajit.org/"><span>Lua<span id="logo">JIT</span></span></a>
+</div>
+<div id="head">
+<h1>LuaJIT Features</h1>
+</div>
+<div id="nav">
+<ul><li>
+<a href="index.html">Index</a>
+</li><li>
+<a href="luajit.html">LuaJIT</a>
+<ul><li>
+<a class="current" href="luajit_features.html">Features</a>
+</li><li>
+<a href="luajit_install.html">Installation</a>
+</li><li>
+<a href="luajit_run.html">Running</a>
+</li><li>
+<a href="luajit_api.html">API Extensions</a>
+</li><li>
+<a href="luajit_intro.html">Introduction</a>
+</li><li>
+<a href="luajit_performance.html">Performance</a>
+</li><li>
+<a href="luajit_debug.html">Debugging</a>
+</li><li>
+<a href="luajit_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="coco.html">Coco</a>
+<ul><li>
+<a href="coco_portability.html">Portability</a>
+</li><li>
+<a href="coco_api.html">API Extensions</a>
+</li><li>
+<a href="coco_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="dynasm.html">DynASM</a>
+<ul><li>
+<a href="dynasm_features.html">Features</a>
+</li><li>
+<a href="dynasm_examples.html">Examples</a>
+</li></ul>
+</li><li>
+<a href="http://luajit.org/download.html">Download <span class="ext">&raquo;</span></a>
+</li></ul>
+</div>
+<div id="main">
+<p>
+LuaJIT tries to keep the spirit of Lua &mdash; it's <em>light-weight</em>,
+<em>efficient</em> and <em>extensible</em>.
+</p>
+
+<h2>Features</h2>
+<p>
+All functions are by default compiled Just-In-Time (JIT) to
+machine code:
+</p>
+<ul>
+<li>Functions that are unused are not compiled at all.</li>
+<li>Compilation can be enabled/disabled selectively for individual
+functions and subfunctions or even whole modules.</li>
+<li>Interpreted and compiled functions can be freely mixed.</li>
+</ul>
+<p>
+Ahead-Of-Time (AOT) compilation (at runtime) is supported, too:
+</p>
+<ul>
+<li>A number of API functions and command line options allows
+full user control over the compilation process.</li>
+</ul>
+<p>
+The JIT compiler is extensible:
+</p>
+<ul>
+<li>The optimizer is an extra module that attaches to the compiler
+pipeline.</li>
+<li>Various modules provide trace and debug information about
+the compilation process.</li>
+<li>All of these features can be activated with command line options.</li>
+</ul>
+
+<h2>Performance</h2>
+<p>
+The compiled machine code is <em>very efficient</em>:
+</p>
+<ul>
+<li>Have a look at some
+<a href="luajit_performance.html">Performance Measurements</a>.</li>
+<li>Aggressive optimizations (specialization, inlining) are enabled
+wherever possible. Inlined contracts catch wrong optimizer predictions
+at runtime (undetected polymorphism).</li>
+<li>Adaptive deoptimization is used to recompile individual bytecode
+instructions with broken contracts. This avoids generating code for the
+generic fallback cases most of the time (faster compilation, reduced
+I-cache contention).</li>
+<li>Special CPU features (such as conditional moves or SSE2)
+are automatically used when detected.</li>
+</ul>
+<p>
+The JIT compiler is <em>very fast</em>:
+</p>
+<ul>
+<li>Compilation times vary a great deal (depending on the nature of
+the function to be compiled) but are generally in the
+<em>microsecond</em> range.</li>
+<li>Even compiling large functions (hundreds of lines) with the
+maximum optimization level takes only a few milliseconds in the
+worst case.</li>
+</ul>
+<p>
+LuaJIT is <em>very small</em>:
+</p>
+<ul>
+<li>The whole JIT compiler engine adds only around <strong>32K</strong>
+of code to the Lua core (if compiled with <tt>-Os</tt>).</li>
+<li>The optimizer is split into several optional modules that
+can be loaded at runtime if requested.</li>
+<li>LuaJIT adds around 6.000 lines of C and assembler code and
+2.000 lines of Lua code to the Lua 5.1 core (17.000 lines of C).</li>
+<li>Required build tools (<a href="dynasm.html">DynASM</a>)
+take another 2.500 lines of Lua code.</li>
+</ul>
+
+<h2>Compatibility</h2>
+<p>
+LuaJIT is designed to be <em>fully compatible</em> with Lua 5.1.
+It accepts the same source code and/or precompiled bytecode.
+It supports all standard language semantics. In particular:
+</p>
+<ul>
+<li>All standard types, operators and metamethods are supported.</li>
+<li>Implicit type coercions (number/string) work as expected.</li>
+<li>Full IEEE-754 semantics for floating point arithmetics
+(NaN, +-Inf, +-0, ...).</li>
+<li>Full support for lexical closures.
+Proper tail calls do not consume a call frame.</li>
+<li>Exceptions are precise. Backtraces work fine.</li>
+<li>Coroutines are supported with the help of <a href="coco.html">Coco</a>.</li>
+<li>No changes to the Lua 5.1 incremental garbage collector.</li>
+<li>No changes to the standard Lua/C API.</li>
+<li>Dynamically loaded C modules are link compatible with Lua 5.1
+(same ABI).</li>
+<li>LuaJIT can be <a href="luajit_install.html#embedding">embedded</a>
+into an application just like Lua.</li>
+</ul>
+<p>
+Some minor differences are related to debugging:
+</p>
+<ul>
+<li>Debug hooks are only called if debug code generation is enabled.</li>
+<li>There is no support for tailcall counting in JIT compiled code.
+HOOKTAILRET is not called, too. Note: this won't affect you unless
+you are writing a Lua debugger. <sup>*</sup></li>
+</ul>
+<p style="font-size: 80%;">
+<sup>*</sup> There is not much I can do to improve this situation without undue
+complications. A suggestion to modify the behaviour of standard Lua
+has been made on the mailing list (it would be beneficial there, too).
+</p>
+
+<h2>Restrictions</h2>
+<ul>
+<li>Only x86 (i386+) CPUs are supported right now (but see below).</li>
+<li>Only the default type for <tt>lua_Number</tt> is supported
+(<tt>double</tt>).</li>
+<li>The interrupt signal (Ctrl-C) is ignored unless you enable
+debug hooks (with <tt>-j debug</tt>). But this will seriously
+slow down your application. I'm looking for better ways to handle
+this. In the meantime you have to press Ctrl-C twice to interrupt
+a currently running JIT compiled function (just like C functions).</li>
+<li>GDB, Valgrind and other debugging tools can't report symbols
+or stack frames for JIT compiled code. This is rather difficult to solve.
+Have a look at <a href="luajit_debug.html">Debugging LuaJIT</a>, too.</li>
+</ul>
+
+<h2>Caveats</h2>
+<ul>
+<li>LuaJIT allocates executable memory for the generated machine code
+if your OS has support for it: either <tt>HeapCreate()</tt> for Windows or
+<tt>mmap()</tt> on POSIX systems.<br>
+The fallback is the standard Lua allocator (i.e. malloc()).
+But this usually means the allocated memory is not marked executable.
+Running compiled code will trap on CPUs/OS with the NX (No eXecute)
+extension <em>if you can only use the fallback</em>.</li>
+<li><a href="dynasm.html">DynASM</a> is needed to regenerate the
+<tt>ljit_x86.h</tt> file. But only in case you want to <em>modify</em>
+the <tt>*.dasc</tt>/<tt>*.dash</tt> files. A pre-processed <tt>*.h</tt>
+file is supplied with LuaJIT.<br>
+DynASM is written in Lua and needs a plain copy of Lua 5.1
+(installed as <tt>lua</tt>). Or you can run it with LuaJIT built from
+the <tt>*.h</tt> file supplied with the distribution (modify
+<tt>DASM=</tt> in <tt>src/Makefile</tt>). It's a good idea to install
+a known good copy of LuaJIT under a different name for this.</li>
+<li>LuaJIT ships with <tt>LUA_COMPAT_VARARG</tt> turned off.
+I.e. the implicit <tt>arg</tt> parameter is not created anymore.
+Please have a look at the comments in <tt>luaconf.h</tt> for
+this configuration option. You can turn it on, if you really need it.
+Or better yet, convert your code to the new Lua 5.1 vararg syntax.</li>
+</ul>
+
+<h2>TODOs</h2>
+<ul>
+<li>Work on LuaJIT 2.x is in progress. For more details please check
+the <a href="http://lua-users.org/lists/lua-l/2008-02/msg00051.html"><span class="ext">&raquo;</span>&nbsp;LuaJIT roadmap 2008</a>.</li>
+</ul>
+<br class="flush">
+</div>
+<div id="foot">
+<hr class="hide">
+Copyright &copy; 2005-2008 Mike Pall
+<span class="noprint">
+&middot;
+<a href="contact.html">Contact</a>
+</span>
+</div>
+</body>
+</html>

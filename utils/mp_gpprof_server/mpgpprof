@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# Startup script for program
+#
+# chkconfig: 345 85 15     - start or stop process definition within the boot process
+# description: STALKER FastCGI server that shows player profiles
+# processname: mp_gpprof_server
+# pidfile: /var/run/mp_gpprof_server.pid
+
+# Source function library.      This creates the operating environment for the process to be started
+. /lib/lsb/init-functions
+. /etc/default/rcS
+
+
+prog="mp_gpprof_server"
+exe="/usr/share/mp_gpprof_server/mp_gpprof_server"
+pidfile="/var/run/mp_gpprof_server.pid"
+
+
+case "$1" in
+  start)
+        echo -n "Starting  $prog:"
+        daemon -F $pidfile -r -A 5 -L 30 $exe 127.0.0.1:9000 /gprof
+        ;;
+  stop)
+        echo -n "Shutting down $prog:"
+	kill `cat $pidfile`
+        echo
+	rm -f $pidfile
+        ;;
+  restart)
+        $0 stop
+        $0 start
+        ;;
+  status)
+	status_of_proc -p $pidfile "$DAEMON" $exe
+	;;
+  *)
+        echo "Usage: $0 {start|stop|restart|status}"
+        exit 1
+esac
+
+exit 0

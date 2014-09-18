@@ -1,0 +1,14 @@
+Changelog for: Win32 Common Code
+--------------------------------------------------------
+
+DATE        VERSION  BY   TYPE     DESCRIPTION
+----------  -------  ---  -------  ---------------------------------------------------------
+09-15-2006  1.00.02  DES  FIX      Always call CreateSemaphoreA
+09-21-2005  1.00.01  DES  FEATURE  Updated workspace
+06-03-2005  1.00.00  SN   RELEASE  Releasing to developer site.
+04-28-2005  1.00.00  SN   RELEASE  Releasing to developer site.
+04-04-2005  1.00.00  SN   RELEASE  Releasing to developer site.
+09-16-2004  1.00.00  SN   RELEASE  Releasing to developer site.
+08-26-2004  1.00.00  DES  OTHER    Changelog started
+                          FEATURE  Added a workspace for building all the C test apps.
+

@@ -1,0 +1,28 @@
+# luajit.pc -- pkg-config data for LuaJIT
+
+# vars from install Makefile
+
+# grep '^J*V=' ../Makefile
+V= 5.1
+JV= 1.1.4
+
+# grep '^INSTALL_.*=' ../Makefile | sed 's/INSTALL_TOP/prefix/'
+prefix= /usr/local
+INSTALL_BIN= ${prefix}/bin
+INSTALL_INC= ${prefix}/include
+INSTALL_LIB= ${prefix}/lib
+INSTALL_MAN= ${prefix}/man/man1
+INSTALL_LMOD= ${prefix}/share/lua/${V}
+INSTALL_CMOD= ${prefix}/lib/lua/${V}
+
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: LuaJIT
+Description: An Extensible Extension Language (JIT compiled for speed)
+Version: ${JV}
+Requires: 
+Libs: -L${libdir} -llua -lm
+Cflags: -I${includedir}
+

@@ -1,0 +1,59 @@
+Server
+	- версии критических файлов
+	- хранит информацию об уровне
+		- имя уровня (папка)
+
+Клиент
+	- Процесс коннекта
+		1. Сетевой коннект
+		2. SEND: 'M_CONNECT' ClientName, Version, FileVersion, etc
+			RECEIVE: 'accept(+инфо)' or 'decline'
+				'accept'	: goto p.3.
+				'decline'	: сообщение об ошибке
+		3. В пакете 'accept' информация об уровне - загрузка уровня
+			* имя уровня
+		4. SEND: 'M_LOADED'
+			RECEIVE: 'M_START'	
+				* Spawn entities
+				* 1st update
+				* Syncronise time
+
+
+typedef DWORD CRC32;
+
+MSYS_CONFIG			// server 2 client - first packet ever, uncompressed
+{
+	u16				probability_table[256];
+}
+ 
+M_CONNECT			// client 2 server
+{
+	char	ClientName	[32];
+	DWORD	Version;
+	CRC32	vEXE;
+	CRC32	vSystemLTX;	
+}
+
+M_ACCEPT			// server 2 client
+{
+	char	Level		[32];
+}
+
+M_LOADED			// client 2 server
+{
+	
+}
+
+//------------------------------------------------------------------------------------------------
+Unreal applies the following rules in determining the relevant set of actors for a player. 
+
+The actor belongs to the ZoneInfo class, then it is relevant. 
+If the actor has static=true or bNoDelete=true, then it is relevant. 
+If the actor is owned by the player (Owner==Player), then it is relevant. 
+If the actor is a Weapon and is owned by a visible actor, then it is relevant. 
+If the actor is hidden (bHidden=true) and it doesn't collide (bBlockPlayers=false) and it doesn't have an ambient ref_sound (AmbientSound==None) then the actor is not relevant. 
+If the actor is visible according to a line-of-sight check between the actor's Location and the player's Location, then it is relevant. 
+If the actor was visible less than 2 to 10 seconds ago (the exact number varies because of some performance optimizations), then it is relevant. 
+//------------------------------------------------------------------------------------------------
+Actor Prioritization
+//------------------------------------------------------------------------------------------------

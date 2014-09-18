@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ecore", "all_editors_vs.vcproj", "{226C6807-BB48-4A07-BF13-806C38FD8FBE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "le", "le\le.vcproj", "{136857E3-D61B-4A03-A4E9-7F73ED946C41}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ae", "ae\ae.vcproj", "{027C2413-9620-4C61-B7A0-84160D081826}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{226C6807-BB48-4A07-BF13-806C38FD8FBE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{226C6807-BB48-4A07-BF13-806C38FD8FBE}.Debug|Win32.Build.0 = Debug|Win32
+		{226C6807-BB48-4A07-BF13-806C38FD8FBE}.Release|Win32.ActiveCfg = Release|Win32
+		{226C6807-BB48-4A07-BF13-806C38FD8FBE}.Release|Win32.Build.0 = Release|Win32
+		{136857E3-D61B-4A03-A4E9-7F73ED946C41}.Debug|Win32.ActiveCfg = Debug|Win32
+		{136857E3-D61B-4A03-A4E9-7F73ED946C41}.Debug|Win32.Build.0 = Debug|Win32
+		{136857E3-D61B-4A03-A4E9-7F73ED946C41}.Release|Win32.ActiveCfg = Release|Win32
+		{136857E3-D61B-4A03-A4E9-7F73ED946C41}.Release|Win32.Build.0 = Release|Win32
+		{027C2413-9620-4C61-B7A0-84160D081826}.Debug|Win32.ActiveCfg = Debug|Win32
+		{027C2413-9620-4C61-B7A0-84160D081826}.Debug|Win32.Build.0 = Debug|Win32
+		{027C2413-9620-4C61-B7A0-84160D081826}.Release|Win32.ActiveCfg = Release|Win32
+		{027C2413-9620-4C61-B7A0-84160D081826}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

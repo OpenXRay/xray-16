@@ -1,0 +1,55 @@
+import modules ;
+import path ;
+import errors ;
+
+BOOST_ROOT = [ modules.peek : BOOST_ROOT ] ;
+LUA_PATH = [ modules.peek : LUA_PATH ] ;
+
+if ! $(LUA_PATH)
+{
+    errors.user-error
+        "LUA_PATH needs to be set to point to your Lua5.x directory." ;
+}
+
+if ! [ GLOB $(LUA_PATH)/include : lua.h ]
+{
+    errors.user-error
+        "LUA_PATH seems to point to a broken Lua5.x installation." :
+        "Currently set to $(LUA_PATH)" ;
+}
+
+if ! $(BOOST_ROOT)
+{
+    errors.user-error
+        "BOOST_ROOT must be set to your boost installation path." ;
+}
+
+lib lua
+    :
+    : <name>lua <search>$(LUA_PATH)/lib
+    ;
+
+lib lualib
+    :
+    : <name>lualib <search>$(LUA_PATH)/lualib
+    ;
+
+project luabind
+    : requirements
+        <include>./ <include>$(BOOST_ROOT) <include>$(LUA_PATH)/include/
+        <library>/luabind//lua <library>/luabind//lualib
+        <toolset>msvc,<link>shared:<define>LUABIND_IMPORT=__declspec(dllimport)
+        <toolset>msvc,<link>shared:<define>LUABIND_EXPORT=__declspec(dllexport)
+    : usage-requirements
+        <include>./ <include>$(BOOST_ROOT) <include>$(LUA_PATH)/include/
+        <toolset>msvc,<link>shared:<define>LUABIND_IMPORT=__declspec(dllimport)
+        <toolset>msvc,<link>shared:<define>LUABIND_EXPORT=__declspec(dllexport)
+    ;
+
+alias luabind : /luabind/luabind//luabind ;
+
+#use-project /luabind/luabind : src ;
+
+build-project src ;
+build-project test ;
+

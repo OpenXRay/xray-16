@@ -1,0 +1,273 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Debugging LuaJIT</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="Author" content="Mike Pall">
+<meta name="Copyright" content="Copyright (C) 2005-2008, Mike Pall">
+<meta name="Language" content="en">
+<link rel="stylesheet" type="text/css" href="bluequad.css" media="screen">
+<link rel="stylesheet" type="text/css" href="bluequad-print.css" media="print">
+</head>
+<body>
+<div id="site">
+<a href="http://luajit.org/"><span>Lua<span id="logo">JIT</span></span></a>
+</div>
+<div id="head">
+<h1>Debugging LuaJIT</h1>
+</div>
+<div id="nav">
+<ul><li>
+<a href="index.html">Index</a>
+</li><li>
+<a href="luajit.html">LuaJIT</a>
+<ul><li>
+<a href="luajit_features.html">Features</a>
+</li><li>
+<a href="luajit_install.html">Installation</a>
+</li><li>
+<a href="luajit_run.html">Running</a>
+</li><li>
+<a href="luajit_api.html">API Extensions</a>
+</li><li>
+<a href="luajit_intro.html">Introduction</a>
+</li><li>
+<a href="luajit_performance.html">Performance</a>
+</li><li>
+<a class="current" href="luajit_debug.html">Debugging</a>
+</li><li>
+<a href="luajit_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="coco.html">Coco</a>
+<ul><li>
+<a href="coco_portability.html">Portability</a>
+</li><li>
+<a href="coco_api.html">API Extensions</a>
+</li><li>
+<a href="coco_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="dynasm.html">DynASM</a>
+<ul><li>
+<a href="dynasm_features.html">Features</a>
+</li><li>
+<a href="dynasm_examples.html">Examples</a>
+</li></ul>
+</li><li>
+<a href="http://luajit.org/download.html">Download <span class="ext">&raquo;</span></a>
+</li></ul>
+</div>
+<div id="main">
+<p>
+LuaJIT is a rather complex application. There will undoubtedly
+be bugs lurking in there. You have been warned. :-)
+</p>
+<p>
+If you came here looking for information on how to debug
+<em>your application</em> (and not LuaJIT itself) then please
+check out <a href="luajit_api.html#jit_debug"><tt>jit.debug()</tt></a>
+and the <a href="luajit_run.html#j_debug"><tt>-j debug</tt></a>
+command line option.
+</p>
+<p>
+But if you suspect a problem with LuaJIT itself, then try
+any of the following suggestions (in order).
+</p>
+
+<h2>Is LuaJIT the Problem?</h2>
+<p>
+Try to run your application in several different ways:
+</p>
+<ul>
+<li><tt>luajit app.lua</tt></li>
+<li><tt>luajit -O1 app.lua</tt></li>
+<li><tt>luajit -O app.lua</tt></li>
+<li><tt>luajit -j off app.lua</tt></li>
+<li><tt>lua app.lua</tt> (i.e. with standard Lua)</li>
+</ul>
+<p>
+If the behaviour is the <em>same</em> as with standard Lua then ...
+well ... that's what LuaJIT is about: doing the same things,
+just faster. Even bugs fly faster. :-)
+</p>
+<p>
+So this is most likely a bug in your application then. It may be easier
+to debug this with plain Lua &mdash; the remainder of this page
+is probably not helpful for you.
+</p>
+<p>
+But if the behaviour is <em>different</em>, there is some likelihood
+that you caught a bug in LuaJIT. Oh dear ...
+</p>
+<p>
+Ok, so don't just give up. Please read on and help the community
+by finding the bug. Thank you!
+</p>
+
+<h2>Get the Latest Version</h2>
+<p>
+Number one on your list of things to check is the
+<a href="http://luajit.org/luajit_changes.html"><span class="ext">&raquo;</span>&nbsp;Online Change History</a>.
+</p>
+<p>
+Please check if a newer version is available. Maybe the bug
+you have encountered has been fixed already. Always download the
+latest version and try it with your application before continuing.
+</p>
+
+<h2>Reproduce the Bug</h2>
+<p>
+First try to make the bug reproducible. Try to isolate the module
+and the function the bug occurs in:
+</p>
+<p>
+Either selectively turn off compilation for some modules with<br>
+<tt>&nbsp;&nbsp;jit.off(true, true)</tt><br>
+until the bug disappears ...
+</p>
+<p>
+And/or turn the whole JIT engine off and selectively compile
+functions with<br>
+<tt>&nbsp;&nbsp;jit.compile(func)</tt><br>
+until it reappears.
+</p>
+<p>
+If you have isolated the point where it happens, it's most helpful
+to reduce the affected Lua code to a short code snippet that
+still shows the problem. You may need to <tt>print()</tt> some
+variables until you can pinpoint the exact spot where it happens.
+</p>
+<p>
+If you've got a <em>reproducible</em> and <em>short</em> test
+you can either send it directly to me or the mailing list
+(see the <a href="contact.html">Contact Information</a>)
+or you can try to debug this a bit further.
+</p>
+<p>
+Well &mdash; if you are brave enough. :-)
+</p>
+
+<h2>Look at the Generated Code</h2>
+<p>
+You may want to have a look at the output of <tt>-j dumphints</tt>
+first. Try to change things around until you can see which hint
+or which instruction is the cause of the bug. If you suspect
+an optimizer bug then have a look at the backend (<tt>*.das[ch]</tt>)
+and check how the hint is encoded.
+</p>
+<p>
+Otherwise have a look at <tt>-j dump</tt> and see whether
+you can spot the problem around the affected instruction.
+It's helpful to have a good knowledge of assembler, though
+(sorry).
+</p>
+
+<h2>Locate a Crash</h2>
+<p>
+If you get a crash, you should compile LuaJIT with debugging
+turned on:
+</p>
+<p>
+Add <tt>-g</tt> to <tt>CFLAGS</tt> and <tt>MYLDFLAGS</tt>
+or whatever is needed to turn on debugging. For Windows you
+need both an executable and a DLL built with debugging.
+</p>
+<p>
+Then start LuaJIT with your debugger. Run it with
+<tt>-j dump=test.dump</tt>.
+</p>
+<p>
+Have a look at the backtrace and compare it with the generated
+dump file to find out exactly where it crashes. I'm sorry, but
+symbols or instructions for JIT compiled functions are not
+displayed in your debugger (this is really hard to solve).
+</p>
+
+<h2>Turn on Assertions</h2>
+<p>
+Another way to debug LuaJIT is to turn on assertions.
+They can be turned on only for the JIT engine by adding
+<tt>-DLUAJIT_ASSERT</tt> to <tt>JITCFLAGS</tt> in <tt>src/Makefile</tt>.
+Then recompile with <tt>make&nbsp;clean</tt> and <tt>make</tt>.
+</p>
+<p>
+Add these two lines to <tt>src/luaconf.h</tt> to turn on all assertions in the Lua core:<br>
+<tt>&nbsp;&nbsp;#include &lt;assert.h&gt;</tt><br>
+<tt>&nbsp;&nbsp;#define lua_assert(x) assert(x)</tt><br>
+This turns on the JIT engine assertions, too.
+Recompile and see whether any assertions trigger.
+Don't forget to turn off the (slow) assertions when you're done!
+</p>
+
+<h2>Use Valgrind</h2>
+<p>
+A tremendously useful (and free) tool for runtime code analysis
+is <a href="http://valgrind.org/"><span class="ext">&raquo;</span>&nbsp;Valgrind</a>. Regularly
+run your applications with <tt>valgrind --memcheck</tt> and
+your life will be better.
+</p>
+<p>
+To run LuaJIT under Valgrind you <em>must</em> add
+<tt>-DUSE_VALGRIND</tt> to <tt>MYCFLAGS</tt>
+and recompile LuaJIT. You will get random errors if you don't!
+Valgrind 3.x or later is required. Earlier versions
+do not work well with newly allocated C stacks.
+</p>
+<p>
+An executable built with this option runs fine without Valgrind
+and without a performance loss. But it needs the Valgrind header
+files for compilation (which is why it's not enabled by default).
+</p>
+<p>
+It's helpful to compile LuaJIT with debugging turned on, too
+(see above).
+</p>
+<p>
+If Valgrind spots many invalid memory accesses that involve
+memory allocation/free functions you've probably found a bug
+related to garbage collection. Some object reference must have
+gone astray.
+</p>
+<p>
+Try to find out which object is disappearing. You can force
+eager garbage collection with repeated calls to
+<tt>collectgarbage()</tt> or by setting a very low threshold
+with <tt>collectgarbage("setpause", 1)</tt>.
+</p>
+
+<h2>Don't Despair</h2>
+<p>
+If all of this doesn't help to find the bug, please send
+a summary of your findings to the mailing list. Describe as much
+of the circumstances you think are relevant.
+</p>
+<p>
+Please <em>don't</em> send your whole application to me
+(without asking first) and especially not to the mailing list.
+Code snippets should preferrably be less than 50 lines and
+up to the point.
+</p>
+<p>
+All bug reports are helpful, even if no immediate solution
+is available. Often enough someone else finds the same bug
+in a different setting and together with your bug report
+this may help to track it down.
+</p>
+<p>
+Finally I have to say a <strong>BIG THANK YOU</strong>
+to everyone who has helped to make LuaJIT better by finding
+and fixing bugs!
+</p>
+<br class="flush">
+</div>
+<div id="foot">
+<hr class="hide">
+Copyright &copy; 2005-2008 Mike Pall
+<span class="noprint">
+&middot;
+<a href="contact.html">Contact</a>
+</span>
+</div>
+</body>
+</html>

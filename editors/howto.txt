@@ -1,0 +1,4 @@
+"$(BCB)\Include\Vcl\dstring.h"
+
+protected:
+  void < __cdecl > ThrowIfOutOfRange(int idx) const;

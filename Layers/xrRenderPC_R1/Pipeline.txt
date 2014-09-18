@@ -1,0 +1,65 @@
+hw-cull:
+	1. divide into two parts:
+			untested(occluder), tested(occludee)
+			
+	render occluder geometry		-> create pending list
+	get results for previous frame	-> mark invisible nodes as "invisible"
+	render pending list				-> 
+	
+state:
+	visible			: 
+	verify/probe	: test real object
+	invisible		: test box
+
+
+new object entered	:
+
+
+
+
+
+
+
+
+
+
+lmapped									
+-------------------------------------------------------------------------------
+input:
+	constants:
+		hemi_color	-	vector
+		sun_color	-	vector
+		sun_dir		-	vector
+		lmap_color	-	vector	(other lights)
+	vertex:
+		tc0			-	base	()
+		tc1			-	lmap	()
+		diffuse.rgb	-	???
+		diffuse.a	-	hemi-occlusion	- COLOR_0
+		normal		-	for lighting	- COLOR_1
+	vertex-math:
+		diffuse		=	hemi_color * vertex.diffuse.a
+		specular	=	light_direct(sun_color,sun_dir,vertex.normal)
+	pixel:
+		t_diff		=	tex(diffuse)
+		t_lmap		=	tex(lmap)
+		light		=	t_lmap.rgb * lmap_color + diffuse.rgb(hemi + фонарик) + specular.rgb(sun)*t_lmap.a
+		out			:=	(t_diff * light)x2;
+
+-------------------------------------------------------------------------------
+vertex
+-------------------------------------------------------------------------------
+	constants:
+		hemi_color	-	vector
+		sun_color	-	vector
+		sun_dir		-	vector
+		lmap_color	-	vector	(other lights)
+	vertex:
+		diffuse.rgb	-	other-lights		- COLOR_0
+		diffuse.a	-	hemi-occlusion
+		normal		-	for lighting
+		normal.a	-	dir-occlusion		- COLOR_1	(???)
+-------------------------------------------------------------------------------
+rgb		- all static lights	| lmap :	lmap.rgb	| vert: diffuse.rgb	|	mu: diffuse.rgb*Argb+Brgb	| models:	prj+dlights
+hemi	- hemisphere		|			diffuse.a	|		diffuse.a	|		diffuse.a*Ah+Bh			|			prj
+sun		- sun				|			lmap.a		|		normal.a	|		diffuse.a*As+Bs			|			prj+dlights

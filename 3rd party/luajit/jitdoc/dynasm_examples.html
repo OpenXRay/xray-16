@@ -1,0 +1,188 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>DynASM Examples</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="Author" content="Mike Pall">
+<meta name="Copyright" content="Copyright (C) 2005-2008, Mike Pall">
+<meta name="Language" content="en">
+<link rel="stylesheet" type="text/css" href="bluequad.css" media="screen">
+<link rel="stylesheet" type="text/css" href="bluequad-print.css" media="print">
+</head>
+<body>
+<div id="site">
+<a href="http://luajit.org/"><span>Lua<span id="logo">JIT</span></span></a>
+</div>
+<div id="head">
+<h1>DynASM Examples</h1>
+</div>
+<div id="nav">
+<ul><li>
+<a href="index.html">Index</a>
+</li><li>
+<a href="luajit.html">LuaJIT</a>
+<ul><li>
+<a href="luajit_features.html">Features</a>
+</li><li>
+<a href="luajit_install.html">Installation</a>
+</li><li>
+<a href="luajit_run.html">Running</a>
+</li><li>
+<a href="luajit_api.html">API Extensions</a>
+</li><li>
+<a href="luajit_intro.html">Introduction</a>
+</li><li>
+<a href="luajit_performance.html">Performance</a>
+</li><li>
+<a href="luajit_debug.html">Debugging</a>
+</li><li>
+<a href="luajit_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="coco.html">Coco</a>
+<ul><li>
+<a href="coco_portability.html">Portability</a>
+</li><li>
+<a href="coco_api.html">API Extensions</a>
+</li><li>
+<a href="coco_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="dynasm.html">DynASM</a>
+<ul><li>
+<a href="dynasm_features.html">Features</a>
+</li><li>
+<a class="current" href="dynasm_examples.html">Examples</a>
+</li></ul>
+</li><li>
+<a href="http://luajit.org/download.html">Download <span class="ext">&raquo;</span></a>
+</li></ul>
+</div>
+<div id="main">
+<h2>A Simple Example</h2>
+<p>
+To get you started, here is a simple code snippet to be pre-processed.
+The lines starting with '|' (the pipe symbol) are for DynASM:
+</p>
+<pre>
+  if (ptr != NULL) {
+    |  mov eax, foo+17
+    |  mov edx, [eax+esi*2+0x20]
+    |  add ebx, [ecx+bar(ptr, 9)]
+  }
+</pre>
+<p>
+After pre-processing you get:
+</p>
+<pre>
+  if (ptr != NULL) {
+    dasm_put(Dst, 123, foo+17, bar(ptr, 9));
+  }
+</pre>
+<p style="font-size: 80%;">
+Note: yes, you usually get the assembler code as comments and proper
+CPP directives to match them up with the source. I've omitted
+them here for clarity. Oh and BTW: the pipe symbols probably
+line up much more nicely in your editor than in a browser.
+</p>
+<p>
+Here 123 is an offset into the action list buffer that
+holds the partially specified machine code. Without going
+into too much detail, the embedded C&nbsp;library implements a
+tiny bytecode engine that takes the action list as input and
+outputs machine code. It basically copies machine code snippets
+from the action list and merges them with the arguments
+passed in by <tt>dasm_put()</tt>.
+</p>
+<p>
+The arguments can be any kind of C&nbsp;expressions. In practical
+use most of them evaluate to constants (e.g. structure offsets).
+Your C&nbsp;compiler should generate very compact code out of it.
+</p>
+<p>
+The embedded C&nbsp;library knows only what's absolutely needed to
+generate proper machine code for the target CPU (e.g. variable
+displacement sizes, variable branch offset sizes and so on).
+It doesn't have a clue about other atrocities like x86 opcode
+encodings &mdash; and it doesn't need to. This dramatically
+reduces the minimum required code size to around 2K [sic!].
+</p>
+<p>
+The action list buffer itself has a pretty compact encoding, too.
+E.g. the whole action list buffer for an early version of LuaJIT
+needs only around 3K.
+</p>
+
+<h2>Advanced Features</h2>
+<p>
+Here's a real-life example taken from LuaJIT that shows some
+advanced features like type maps, macros and how to access
+C&nbsp;structures:
+</p>
+<pre>
+|.type L,      lua_State,  esi  // L.
+|.type BASE,   TValue,     ebx  // L->base.
+|.type TOP,    TValue,     edi  // L->top.
+|.type CI,     CallInfo,   ecx  // L->ci.
+|.type LCL,    LClosure,   eax  // L->ci->func->value.
+|.type UPVAL,  UpVal
+
+|.macro copyslot, D, S, R1, R2, R3
+|  mov R1, S.value;  mov R2, S.value.na[1];  mov R3, S.tt
+|  mov D.value, R1;  mov D.value.na[1], R2;  mov D.tt, R3
+|.endmacro
+
+|.macro copyslot, D, S;  copyslot D, S, ecx, edx, eax; .endmacro
+
+|.macro getLCL, reg
+||if (!J->pt->is_vararg) {
+|  mov LCL:reg, BASE[-1].value
+||} else {
+|  mov CI, L->ci
+|  mov TOP, CI->func
+|  mov LCL:reg, TOP->value
+||}
+|.endmacro
+
+|.macro getLCL;  getLCL eax; .endmacro
+
+[...]
+
+static void jit_op_getupval(jit_State *J, int dest, int uvidx)
+{
+  |  getLCL
+  |  mov UPVAL:ecx, LCL->upvals[uvidx]
+  |  mov TOP, UPVAL:ecx->v
+  |  copyslot BASE[dest], TOP[0]
+}
+</pre>
+<p>
+And here is the pre-processed output (stripped a bit for clarity):
+</p>
+<pre>
+#define Dt1(_V) (int)&amp;(((lua_State *)0)_V)
+[...]
+static void jit_op_getupval(jit_State *J, int dest, int uvidx)
+{
+  if (!J->pt->is_vararg) {
+    dasm_put(Dst, 1164, Dt2([-1].value));
+  } else {
+    dasm_put(Dst, 1168, Dt1(->ci), Dt4(->func), Dt3(->value));
+  }
+  dasm_put(Dst, 1178, Dt5(->upvals[uvidx]), DtF(->v), Dt3([0].value),
+           Dt3([0].value.na[1]), Dt3([0].tt), Dt2([dest].value),
+           Dt2([dest].value.na[1]), Dt2([dest].tt));
+}
+</pre>
+<br class="flush">
+</div>
+<div id="foot">
+<hr class="hide">
+Copyright &copy; 2005-2008 Mike Pall
+<span class="noprint">
+&middot;
+<a href="contact.html">Contact</a>
+</span>
+</div>
+</body>
+</html>

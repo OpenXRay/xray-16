@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>DynASM Features</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="Author" content="Mike Pall">
+<meta name="Copyright" content="Copyright (C) 2005-2008, Mike Pall">
+<meta name="Language" content="en">
+<link rel="stylesheet" type="text/css" href="bluequad.css" media="screen">
+<link rel="stylesheet" type="text/css" href="bluequad-print.css" media="print">
+</head>
+<body>
+<div id="site">
+<a href="http://luajit.org/"><span>Lua<span id="logo">JIT</span></span></a>
+</div>
+<div id="head">
+<h1>DynASM Features</h1>
+</div>
+<div id="nav">
+<ul><li>
+<a href="index.html">Index</a>
+</li><li>
+<a href="luajit.html">LuaJIT</a>
+<ul><li>
+<a href="luajit_features.html">Features</a>
+</li><li>
+<a href="luajit_install.html">Installation</a>
+</li><li>
+<a href="luajit_run.html">Running</a>
+</li><li>
+<a href="luajit_api.html">API Extensions</a>
+</li><li>
+<a href="luajit_intro.html">Introduction</a>
+</li><li>
+<a href="luajit_performance.html">Performance</a>
+</li><li>
+<a href="luajit_debug.html">Debugging</a>
+</li><li>
+<a href="luajit_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="coco.html">Coco</a>
+<ul><li>
+<a href="coco_portability.html">Portability</a>
+</li><li>
+<a href="coco_api.html">API Extensions</a>
+</li><li>
+<a href="coco_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="dynasm.html">DynASM</a>
+<ul><li>
+<a class="current" href="dynasm_features.html">Features</a>
+</li><li>
+<a href="dynasm_examples.html">Examples</a>
+</li></ul>
+</li><li>
+<a href="http://luajit.org/download.html">Download <span class="ext">&raquo;</span></a>
+</li></ul>
+</div>
+<div id="main">
+<h2>DynASM Toolchain Features</h2>
+<ul>
+<li>DynASM is a pre-processing assembler.</li>
+<li>DynASM converts mixed C/Assembler source to plain C&nbsp;code.</li>
+<li>The primary knowledge about instruction names, operand modes,
+registers, opcodes and how to encode them is <em>only</em>
+needed in the pre-processor.</li>
+<li>The generated C&nbsp;code is extremely small and fast.</li>
+<li>A tiny embeddable C&nbsp;library helps with the process of dynamically
+assembling, relocating and linking machine code.</li>
+<li>There are no outside dependencies on other tools (such as
+stand-alone assemblers or linkers).</li>
+<li>Internal consistency checks catch runtime errors
+(e.g. undefined labels).</li>
+<li>The toolchain is split into a portable subset and
+CPU-specific modules.</li>
+<li>DynASM itself (the pre-processor) is written in Lua.</li>
+<li>There is no machine-dependency for the pre-processor itself.
+It should work everywhere you can get Lua 5.1 up and running
+(i.e. Linux, *BSD, Solaris, Windows, ... you name it).</li>
+</ul>
+
+<h2>DynASM Assembler Features</h2>
+<ul>
+<li>C&nbsp;code and assembler code can be freely mixed.
+<em>Readable</em>, too.</li>
+<li>All the usual syntax for instructions and operand modes
+you come to expect from a standard assembler.</li>
+<li>Access to C&nbsp;variables and CPP defines in assembler statements.</li>
+<li>Access to C&nbsp;structures and unions via type mapping.</li>
+<li>Convenient shortcuts for accessing C&nbsp;structures.</li>
+<li>Local and global labels.</li>
+<li>Numbered labels (e.g. for mapping bytecode instruction numbers).</li>
+<li>Multiple code sections (e.g. for tailcode).</li>
+<li>Defines/substitutions (inline and from command line).</li>
+<li>Conditionals (translation time) with proper nesting.</li>
+<li>Macros with parameters.</li>
+<li>Macros can mix assembler statements and C&nbsp;code.</li>
+<li>Captures (output diversion for code reordering).</li>
+<li>Simple and extensible template system for instruction definitions.</li>
+</ul>
+
+<h2>Restrictions</h2>
+<p>
+Currently only a subset of x86 (i386+) instructions is supported.
+Unsupported instructions are either not usable in user-mode or
+are slow on modern CPUs (i.e. not suited for a code generator).
+SSE, SSE2, SSE3 and SSSE3 are fully supported. MMX is not supported.
+</p>
+<p>
+The whole toolchain has been designed to support multiple CPU
+architectures. As LuaJIT gets support for more architectures,
+DynASM will be extended with new CPU-specific modules.
+</p>
+<p>
+The assembler itself will be extended with more features on an
+as-needed basis. E.g. I'm thinking about vararg macros.
+</p>
+<p>
+Note that runtime conditionals are not really needed, since you can
+just use plain C&nbsp;code for that (and LuaJIT does this <em>a lot</em>).
+It's not going to be more (time-) efficient if conditionals are done
+by the embedded C&nbsp;library (maybe a bit more space-efficient).
+</p>
+
+
+<br class="flush">
+</div>
+<div id="foot">
+<hr class="hide">
+Copyright &copy; 2005-2008 Mike Pall
+<span class="noprint">
+&middot;
+<a href="contact.html">Contact</a>
+</span>
+</div>
+</body>
+</html>

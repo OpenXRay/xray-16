@@ -1,0 +1,340 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Installing LuaJIT</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="Author" content="Mike Pall">
+<meta name="Copyright" content="Copyright (C) 2005-2008, Mike Pall">
+<meta name="Language" content="en">
+<link rel="stylesheet" type="text/css" href="bluequad.css" media="screen">
+<link rel="stylesheet" type="text/css" href="bluequad-print.css" media="print">
+<style type="text/css">
+table.build {
+  line-height: 1.2;
+}
+td.buildsys {
+  width: 11em;
+}
+td.buildcmd {
+  width: 10em;
+  font-family: Courier New, Courier, monospace;
+}
+tr.buildhead td {
+  /* font-family: inherit; ... not supported in IE *sigh* */
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-weight: bold;
+}
+</style>
+</head>
+<body>
+<div id="site">
+<a href="http://luajit.org/"><span>Lua<span id="logo">JIT</span></span></a>
+</div>
+<div id="head">
+<h1>Installing LuaJIT</h1>
+</div>
+<div id="nav">
+<ul><li>
+<a href="index.html">Index</a>
+</li><li>
+<a href="luajit.html">LuaJIT</a>
+<ul><li>
+<a href="luajit_features.html">Features</a>
+</li><li>
+<a class="current" href="luajit_install.html">Installation</a>
+</li><li>
+<a href="luajit_run.html">Running</a>
+</li><li>
+<a href="luajit_api.html">API Extensions</a>
+</li><li>
+<a href="luajit_intro.html">Introduction</a>
+</li><li>
+<a href="luajit_performance.html">Performance</a>
+</li><li>
+<a href="luajit_debug.html">Debugging</a>
+</li><li>
+<a href="luajit_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="coco.html">Coco</a>
+<ul><li>
+<a href="coco_portability.html">Portability</a>
+</li><li>
+<a href="coco_api.html">API Extensions</a>
+</li><li>
+<a href="coco_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="dynasm.html">DynASM</a>
+<ul><li>
+<a href="dynasm_features.html">Features</a>
+</li><li>
+<a href="dynasm_examples.html">Examples</a>
+</li></ul>
+</li><li>
+<a href="http://luajit.org/download.html">Download <span class="ext">&raquo;</span></a>
+</li></ul>
+</div>
+<div id="main">
+<p>
+LuaJIT is not much more difficult to install than Lua itself.
+Just unpack the distribution file, change into the newly created
+directory and follow the instructions below.
+</p>
+<p class="indent">
+For the impatient: <b><tt>make&nbsp;linux&nbsp;&amp;&amp;&nbsp;sudo&nbsp;make&nbsp;install</tt></b><br>
+Replace <tt>linux</tt> with e.g. <tt>bsd</tt> or <tt>macosx</tt> depending on your OS.
+</p>
+<p>
+In case you've missed this in <a href="luajit_features.html">Features</a>:
+LuaJIT only works on x86 (i386+) systems right now. Support for
+other architectures may be added in future versions.
+</p>
+
+<h2>Configuring LuaJIT</h2>
+<p>
+LuaJIT is (deliberately) <em>not</em> autoconfigured &mdash; the
+defaults should work fine on most systems. But please check the
+system-specific instructions below.
+</p>
+<p>
+The following three files hold all configuration information:
+</p>
+<ul>
+<li><tt>Makefile</tt> holds settings for installing LuaJIT.</li>
+<li><tt>src/Makefile</tt> holds settings for compiling LuaJIT.</li>
+<li><tt>src/luaconf.h</tt> sets a multitude of configuration
+variables.</li>
+</ul>
+<p>
+If this is your first build then it's better not to give into
+the temptation to tweak every little setting. The standard
+configuration provides sensible defaults (IMHO).
+</p>
+<p>
+One particular setting you might want to change is the installation
+path. Note that you need to modify both the top-level <tt>Makefile</tt>
+and <tt>src/luaconf.h</tt> (right at the start) to take
+effect.
+</p>
+<p>
+If you have trouble getting Coco to work, you can disable it by
+uncommenting the <tt>COCOFLAGS= -DCOCO_DISABLE</tt> line in
+<tt>src/Makefile</tt>. But note that this effectively disables
+yielding from coroutines for JIT compiled functions.
+</p>
+<p>
+A few more settings need to be changed if you want to
+<a href="luajit_debug.html">Debug LuaJIT</a> <em>itself</em>.
+Application debugging can be turned on/off at runtime.
+</p>
+
+<h3>Upgrading From Previous Versions</h3>
+<p>
+It's important to keep the LuaJIT core and the add-on modules in sync.
+Be sure to delete any old versions of LuaJIT modules from the
+Lua module search path (check the current directory, too!).
+</p>
+<p>
+Lua files compiled to bytecode may be incompatible if the underlying
+Lua core has changed (like from Lua&nbsp;5.1 alpha to Lua&nbsp;5.1
+final between LuaJIT&nbsp;1.0.3 and LuaJIT&nbsp;1.1.0). The same
+applies to any
+<a href="http://lua-users.org/wiki/BuildingModules"><span class="ext">&raquo;</span>&nbsp;loadable C modules</a>
+(shared libraries, DLLs) which need to be recompiled with the new
+Lua header files.
+</p>
+<p>
+Compiled bytecode and loadable C modules are fully compatible and
+can be freely exchanged between LuaJIT and the <em>same</em>
+version of Lua it is based on. Please verify that <tt>LUA_RELEASE</tt>
+in <tt>src/lua.h</tt> is the same in both distributions.
+</p>
+
+<h2>Building LuaJIT</h2>
+
+<h3>Makefile Targets</h3>
+<p>
+The Makefiles have a number of targets for various operating systems:
+</p>
+
+<div class="tablewrap">
+<table class="build">
+<tr class="buildhead"><td class="buildsys">System</td><td class="buildcmd">Build Command</td><td>Notes</td></tr>
+<tr class="odd"><td class="buildsys">Linux i386</td><td class="buildcmd">make linux</td><td></td></tr>
+<tr class="even"><td class="buildsys">BSD i386</td><td class="buildcmd">make bsd</td><td>FreeBSD, NetBSD or OpenBSD</td></tr>
+<tr class="odd"><td class="buildsys">Mac OS X on Intel</td><td class="buildcmd">make macosx</td><td>Check <tt>src/Makefile</tt> for OS X &lt; 10.4</td></tr>
+<tr class="even"><td class="buildsys">Solaris x86</td><td class="buildcmd">make solaris</td><td>GCC only, SunCC miscompiles LuaJIT</td></tr>
+<tr class="odd"><td class="buildsys">MinGW (Win32)</td><td class="buildcmd">make mingw</td><td>cross-MinGW: must be 1st in PATH</td></tr>
+<tr class="even"><td class="buildsys">Cygwin</td><td class="buildcmd">make cygwin</td><td></td></tr>
+<tr class="odd"><td class="buildsys">POSIX on x86</td><td class="buildcmd">make posix</td><td>Check <a href="coco_portability.html">Portability Req. for Coco</a>, too</td></tr>
+<tr class="even"><td class="buildsys">Generic x86</td><td class="buildcmd">make generic</td><td>Check <a href="coco_portability.html">Portability Req. for Coco</a>, too</td></tr>
+</table>
+</div>
+
+<p>
+You may want to enable interactive line editing for the stand-alone
+executable. There are extra targets for Linux, BSD and Mac OS X:
+<tt>make&nbsp;linux_rl</tt>, <tt>make&nbsp;bsd_rl</tt>
+and <tt>make&nbsp;macosx_rl</tt>.
+</p>
+
+<h3>MSVC (Win32)</h3>
+<p>
+First check out <tt>etc\luavs.bat</tt> if it suits your needs. Then try
+running it from the MSVC command prompt (start it from the toplevel directory).
+</p>
+<p>
+Another option is to set up your own MSVC project:
+</p>
+<p>
+Change to the <tt>src</tt> directory
+and create a new DLL project for <tt>lua51.dll</tt>.
+Add all C files to it except for <tt>lua.c</tt>, <tt>luac.c</tt>
+and <tt>print.c</tt>. Add the <tt>..\dynasm</tt> directory
+to the include path and build the DLL.
+</p>
+<p>
+Next create a new EXE project for <tt>luajit.exe</tt>.
+Add <tt>lua.c</tt> to it and link with the import library
+<tt>lua51.lib</tt> created for <tt>lua51.dll</tt>. Build
+the executable.
+</p>
+
+<h2>Installation</h2>
+
+<h3>POSIX systems</h3>
+<p>
+Run <tt>make&nbsp;install</tt> from the top-level directory.
+You probably need to be the root user before doing so, i.e. use
+<tt>sudo&nbsp;make&nbsp;install</tt> or <tt>su&nbsp;-&nbsp;root</tt>
+before the <tt>make&nbsp;install</tt>.
+</p>
+<p>
+By default this installs only:<br>
+<tt>&nbsp;&nbsp;/usr/local/bin/<strong>luajit</strong></tt> &mdash; The stand-alone executable.<br>
+<tt>&nbsp;&nbsp;/usr/local/lib/lua/5.1</tt> &mdash; C module directory.<br>
+<tt>&nbsp;&nbsp;/usr/local/share/lua/5.1</tt> &mdash; Lua module directory.<br>
+<tt>&nbsp;&nbsp;/usr/local/share/lua/5.1/<strong>jit/*.lua</strong></tt> &mdash;
+<tt>jit.*</tt> modules.<br>
+</p>
+<p>
+The Lua docs and includes are not installed to avoid overwriting
+an existing Lua installation. In any case these are identical
+to the version of Lua that LuaJIT is based on. If you want
+to install them, edit the top-level makefile (look for <tt>###</tt>).
+</p>
+<p>
+The stand-alone Lua bytecode compiler <tt>luac</tt> is neither
+built nor installed, for the same reason. If you really need it,
+you may be better off with <tt>luac</tt> built from the original Lua
+distribution (use the <em>same</em> version your copy of LuaJIT
+is based on). This avoids dragging in most of LuaJIT which is not
+needed for the pure bytecode compiler. You can also use the bare-bones
+Lua to bytecode translator <tt>luac.lua</tt> (look in the <tt>test</tt>
+directory of the original Lua distribution).
+</p>
+
+<h3>Windows</h3>
+<p>
+Copy <tt>luajit.exe</tt> and <tt>lua51.dll</tt>
+to a newly created directory (any location is ok). Add <tt>lua</tt>
+and <tt>lua\jit</tt> directories below it and copy all Lua files
+from the <tt>jit</tt> directory of the distribution to the latter directory.
+</p>
+<p>
+There are no hardcoded
+absolute path names &mdash; all modules are loaded relative to the
+directory where <tt>luajit.exe</tt> is installed
+(see <tt>src/luaconf.h</tt>).
+</p>
+
+<h2 id="embedding">Embedding LuaJIT</h2>
+<p>
+It's strongly recommended that you build the stand-alone executable
+with your toolchain and verify that it works <em>before</em> starting
+to embed LuaJIT into an application. The stand-alone executable is
+also useful later on, when you want to experiment with code snippets
+or try out some Lua files.
+</p>
+<p>
+Please consult the Lua docs for general information about how to
+embed Lua into your application. The following list only shows
+the additional steps needed for embedding LuaJIT:
+</p>
+<ul>
+<li>You need to add the LuaJIT library functions by running
+<tt>luaopen_jit()</tt> after all the other standard library functions.
+The modified <tt>src/linit.c</tt> used by the stand-alone executable
+already does this for you.</li>
+<li><em>Caveat:</em> LuaJIT is based on Lua 5.1 which
+means the <tt>luaopen_*()</tt> functions <em>must not</em>
+be called directly. See <tt>src/linit.c</tt> for the proper way to
+run them. You'll get an error initializing the <tt>io</tt> library
+if you don't follow these instructions.</li>
+<li>To use the optimizer (strongly recommended) you need to:
+<ul>
+<li>Install the optimizer modules <tt>jit.opt</tt> and
+<tt>jit.opt_inline</tt> relative to the Lua module path
+(you've probably modified it &mdash; see <tt>src/luaconf.h</tt>):<br>
+<tt>jit/opt.lua</tt><br>
+<tt>jit/opt_inline.lua</tt></li>
+<li>If you want to ship a single executable then you may want to
+embed the optimizer modules into your application (but don't loose
+time with this during the early development phase). This involves:
+<ul>
+<li>Compile the two modules to bytecode
+(using <tt>luac&nbsp;-s</tt> from a plain Lua installation).</li>
+<li>Convert them to C include files (search for "Lua&nbsp;bin2c").</li>
+<li>On Windows you can also put the compiled bytecode into a resource
+(search for "Lua&nbsp;bin2res").</li>
+<li>Load the bytecode with <tt>luaL_loadbuffer</tt> (but don't run it).</li>
+<li>Put the resulting functions into <tt>package.preload["jit.opt"]</tt>
+and <tt>package.preload["jit.opt_inline"]</tt>.</li>
+</ul></li>
+<li>Activate the LuaJIT optimizer from Lua code to be run at startup:
+<tt>&nbsp;&nbsp;require("jit.opt").start()</tt><br>
+Or use equivalent C code. See <tt>dojitopt()</tt> in <tt>src/lua.c</tt>.</li>
+</ul></li>
+<li>All other LuaJIT specific modules (<tt>jit.*</tt>) are for debugging only.
+They do not need to be shipped with an application. But they may be quite
+useful, anyway (especially <tt>jit.trace</tt>).</li>
+<li>DynASM is only needed while <em>building</em> LuaJIT. It's not
+needed while running LuaJIT and there is no point in shipping or
+installing it together with an application.</li>
+<li>In case you want to strip some of the standard libraries from
+your application: The optimizer modules need several functions from
+the base library and the string library (and of course the LuaJIT
+core libraries). The io library is only used to print a fatal error
+message (you may want to replace it). The optional modules
+for debugging depend on a few more library functions &mdash;
+please check the source.</li>
+</ul>
+<p>
+Although the very liberal LuaJIT
+<a href="http://www.opensource.org/licenses/mit-license.php"><span class="ext">&raquo;</span>&nbsp;license</a>
+does not require any acknowledgment whatsoever, it would be appreciated
+if you give some credit in the docs (or the "About" box) of your application.
+A simple line like:<br>
+<tt>&nbsp;&nbsp;This product includes LuaJIT, http://luajit.org/</tt><br>
+would be nice. Please do not include any E-Mail addresses. Thank you!
+</p>
+<p>
+I'm always interested where LuaJIT can be put to good use in applications.
+Please <a href="contact.html">tell me</a>
+or better yet write a few lines about your project to the
+<a href="http://www.lua.org/lua-l.html"><span class="ext">&raquo;</span>&nbsp;Lua mailing list</a>.
+Thank you!
+</p>
+<br class="flush">
+</div>
+<div id="foot">
+<hr class="hide">
+Copyright &copy; 2005-2008 Mike Pall
+<span class="noprint">
+&middot;
+<a href="contact.html">Contact</a>
+</span>
+</div>
+</body>
+</html>

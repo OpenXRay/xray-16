@@ -1,0 +1,221 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Russian resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+#ifdef _WIN32
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+#pragma code_page(1251)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_VERIFY DIALOGEX 0, 0, 265, 106
+STYLE DS_ABSALIGN | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | 
+    DS_NOFAILCREATE | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "XRay Engine Internal Error"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "Stop",IDSTOP,204,72,60,14,BS_FLAT
+    GROUPBOX        "Description",IDC_STATIC,0,0,265,45,BS_FLAT
+    GROUPBOX        "Source File",IDC_STATIC,0,48,200,20,BS_FLAT
+    GROUPBOX        "Line",IDC_STATIC,204,48,60,20,BS_FLAT
+    LTEXT           "",IDC_FILE,4,56,191,8
+    LTEXT           "",IDC_LINE,209,56,51,8
+    LTEXT           "",IDC_DESC,5,7,255,35
+    PUSHBUTTON      "Debug",IDDEBUG,204,90,60,14,BS_FLAT
+END
+
+IDD_LOG DIALOGEX 0, 0, 400, 323
+STYLE DS_ABSALIGN | DS_SETFONT | DS_MODALFRAME | DS_NOFAILCREATE | DS_CENTER | 
+    WS_MINIMIZEBOX | WS_CAPTION | WS_SYSMENU
+CAPTION "XRay Engine Components Compiler"
+FONT 10, "Fixedsys", 0, 0, 0x0
+BEGIN
+    LISTBOX         IDC_LOG,0,0,400,155,NOT LBS_NOTIFY | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL
+    CTEXT           "Starting...",IDC_STAGE,0,155,400,17,SS_CENTERIMAGE | 
+                    SS_SUNKEN
+    CONTROL         "Progress1",IDC_PROGRESS,"msctls_progress32",0x1,0,225,
+                    370,14
+    GROUPBOX        "Stage information",IDC_STATIC,0,175,275,50
+    LTEXT           "",IDC_INFO,5,185,265,35
+    GROUPBOX        "Phase Timing",IDC_STATIC,275,175,125,50
+    LTEXT           "",IDC_TIMING,280,185,115,35
+    CTEXT           "",IDC_P_TEXT,370,225,30,14,SS_CENTERIMAGE | SS_SUNKEN
+    LISTBOX         IDC_PHASE_TIME,0,240,400,83,NOT LBS_NOTIFY | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL
+END
+
+IDD_STEP DIALOGEX 0, 0, 100, 15
+STYLE DS_ABSALIGN | DS_SYSMODAL | DS_SETFONT | DS_SETFOREGROUND | 
+    DS_NOFAILCREATE | DS_CENTER | WS_POPUP | WS_VISIBLE
+EXSTYLE WS_EX_NOPARENTNOTIFY
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Next",IDOK,0,0,50,14,BS_VCENTER | BS_FLAT
+    PUSHBUTTON      "Debug",IDCANCEL,50,0,50,14,BS_FLAT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_VERIFY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 258
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 99
+    END
+
+    IDD_LOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 393
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 316
+    END
+
+    IDD_STEP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 93
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 8
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // Russian resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Ukrainian resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_UKR)
+#ifdef _WIN32
+LANGUAGE LANG_UKRAINIAN, SUBLANG_DEFAULT
+#pragma code_page(1251)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // Ukrainian resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_NVIEW DIALOG  0, 0, 780, 535
+STYLE DS_ABSALIGN | DS_SETFONT | DS_SETFOREGROUND | DS_NOFAILCREATE | 
+    DS_CENTER | WS_VISIBLE | WS_BORDER
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Close",IDOK,690,5,85,14,BS_FLAT
+    PUSHBUTTON      "View depth",ID_VIEW_NDEPTH,690,30,85,14,BS_FLAT
+    PUSHBUTTON      "View height",ID_VIEW_NHEIGHT,690,45,85,14,BS_FLAT
+    PUSHBUTTON      "View sectors",ID_VIEW_NSECTOR,690,75,85,14,BS_FLAT
+    PUSHBUTTON      "View normals",ID_VIEW_NNORMALS,690,60,85,14,BS_FLAT
+    PUSHBUTTON      "View lighting",ID_VIEW_NLIGHT,690,90,85,14,BS_FLAT
+    PUSHBUTTON      "View subdivisions",ID_VIEW_NSUBDIV,690,105,85,14,
+                    BS_FLAT
+    PUSHBUTTON      "View cover left",ID_VIEW_COVER1,690,135,85,14,BS_FLAT
+    PUSHBUTTON      "View cover forward",ID_VIEW_COVER2,690,150,85,14,
+                    BS_FLAT
+    PUSHBUTTON      "View cover right",ID_VIEW_COVER3,690,165,85,14,BS_FLAT
+    PUSHBUTTON      "View cover back",ID_VIEW_COVER4,690,180,85,14,BS_FLAT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_NVIEW, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 773
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 528
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

@@ -1,0 +1,426 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.06.00"/>
+    <PROJECT value="$(OUTPUT_BINARIES_DIR)\xrCoreB.dll"/>
+    <OBJFILES value="x:\intermediate_ed\core\xrMemory_pso_Fill32.obj 
+      x:\intermediate_ed\core\_math.obj x:\intermediate_ed\core\_sphere.obj 
+      x:\intermediate_ed\core\cpuid.obj x:\intermediate_ed\core\stdafx.obj 
+      x:\intermediate_ed\core\xrCore.obj x:\intermediate_ed\core\xrMemory.obj 
+      x:\intermediate_ed\core\xrMemory_pso_Copy.obj 
+      x:\intermediate_ed\core\xrMemory_pso_Fill.obj 
+      x:\intermediate_ed\core\_compressed_normal.obj 
+      x:\intermediate_ed\core\xrMemory_align.obj 
+      x:\intermediate_ed\core\LzHuf.obj x:\intermediate_ed\core\log.obj 
+      x:\intermediate_ed\core\FS.obj x:\intermediate_ed\core\xr_trims.obj 
+      x:\intermediate_ed\core\Xr_ini.obj x:\intermediate_ed\core\clsid.obj 
+      x:\intermediate_ed\core\FileSystem_borland.obj 
+      x:\intermediate_ed\core\FileSystem.obj 
+      x:\intermediate_ed\core\xrMemory_subst_msvc.obj 
+      x:\intermediate_ed\core\xrMemory_POOL.obj 
+      x:\intermediate_ed\core\xrMemory_subst_borland.obj 
+      x:\intermediate_ed\core\rt_lzo.obj 
+      x:\intermediate_ed\core\rt_compressor.obj 
+      x:\intermediate_ed\core\FTimer.obj x:\intermediate_ed\core\xrstring.obj 
+      x:\intermediate_ed\core\xrsharedmem.obj 
+      x:\intermediate_ed\core\_std_extensions.obj 
+      x:\intermediate_ed\core\crc32.obj x:\intermediate_ed\core\xrSyncronize.obj 
+      x:\intermediate_ed\core\ELocatorAPI.obj 
+      x:\intermediate_ed\core\LocatorAPI_defs.obj 
+      x:\intermediate_ed\core\xrDebug.obj x:\intermediate_ed\core\xrDebugNew.obj 
+      x:\intermediate_ed\core\TLHELPProcessInfo.obj 
+      x:\intermediate_ed\core\BlackBoxUI.obj 
+      x:\intermediate_ed\core\BSUFunctions.obj 
+      x:\intermediate_ed\core\CrashHandler.obj 
+      x:\intermediate_ed\core\DiagAssert.obj 
+      x:\intermediate_ed\core\GetLoadedModules.obj 
+      x:\intermediate_ed\core\IsNT.obj 
+      x:\intermediate_ed\core\NT4ProcessInfo.obj x:\intermediate_ed\core\stdafx_.obj 
+      x:\intermediate_ed\core\rt_compressor9.obj 
+      x:\intermediate_ed\core\rt_lzo1x_1.obj 
+      x:\intermediate_ed\core\rt_lzo1x_9x.obj 
+      x:\intermediate_ed\core\rt_lzo1x_d1.obj 
+      x:\intermediate_ed\core\rt_lzo1x_d2.obj 
+      x:\intermediate_ed\core\rt_lzo1x_d3.obj 
+      x:\intermediate_ed\core\rt_lzo_init.obj 
+      x:\intermediate_ed\core\os_clipboard.obj"/>
+    <RESFILES value="x:\intermediate_ed\core\xrCore.res"/>
+    <IDLFILES value=""/>
+    <IDLGENFILES value=""/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES)"/>
+    <LIBFILES value=""/>
+    <LIBRARIES value="editor.lib elpackB6.lib vclx.lib bcbsmp.lib vcl.lib"/>
+    <SPARELIBS value="rtl.lib vcl.lib bcbsmp.lib vclx.lib elpackB6.lib editor.lib"/>
+    <PACKAGES value="rtl.bpi"/>
+    <PATHCPP value=".;blackbox;blackbox;blackbox;blackbox;blackbox;blackbox;blackbox;blackbox;blackbox"/>
+    <PATHPAS value=".;"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
+    <RELEASELIBPATH value="$(BCB)\lib\release"/>
+    <LINKER value="ilink32"/>
+    <USERDEFINES value="_EDITOR;_XRCOREB;XRCORE_EXPORTS;_DEBUG"/>
+    <SYSDEFINES value="NO_STRICT;_RTLDLL;USEPACKAGES"/>
+    <MAINSOURCE value="xrCoreB.bpf"/>
+    <INCLUDEPATH value="..\editors\ECore;&quot;E:\Program Files (x86)\Borland\CBuilder6\Projects&quot;;blackbox;$(ETOOLS_DIR);$(DXSDK_DIR)\Include;$(BCB)\include;$(BCB)\include\vcl;$(BCB)\Include\Mfc"/>
+    <LIBPATH value="..\editors\ECore;&quot;E:\Program Files (x86)\Borland\CBuilder6\Projects&quot;;blackbox;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\lib\psdk;$(OUT_LIB_DIR);$(COMPONENTS)\Elpack\Code;$(COMPONENTS)\AlexMX"/>
+    <WARNINGS value="-w8092 -w8091 -w8090 -w8089 -w8087 -wprc -wucp -wstv -wstu -wsig -wpin 
+      -w-par -wnod -wnak -w-8027 -w-8026 -wdef -wcln -wbbf -wasm -wamp -wamb"/>
+    <OTHERFILES value=""/>
+  </MACROS>
+  <OPTIONS>
+    <IDLCFLAGS value="-src_suffix cpp -D_EDITOR -D_XRCOREB -DXRCORE_EXPORTS -D_DEBUG 
+      -I..\editors\ECore -I&quot;E:\Program Files (x86)\Borland\CBuilder6\Projects&quot; 
+      -Iblackbox -I$(ETOOLS_DIR) -I$(DXSDK_DIR)\Include -I$(BCB)\include 
+      -I$(BCB)\include\vcl -I$(BCB)\Include\Mfc -boa"/>
+    <CFLAG1 value="-WD -Od -H=pch.csm -Q -Vx -Ve -xf -xp -VF -ff -X- -r- -ps -a4 -6 -b- -k -y 
+      -v -vi- -tWD -tWM -c"/>
+    <PFLAGS value="-N2x:\intermediate_ed\core -N0x:\intermediate_ed\core -$Y+ -$W -$O- -$A8 
+      -v -JPHNE -M"/>
+    <RFLAGS value=""/>
+    <AFLAGS value="/mu /w2 /zi"/>
+    <LFLAGS value="-lx:\stalker_addon\libraries -Ix:\intermediate_ed\core -D&quot;&quot; -aa -Tpd -x 
+      -Gi -v"/>
+    <OTHERFILES value=""/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="c0d32.obj $(PACKAGES) Memmgr.Lib sysinit.obj $(OBJFILES)"/>
+    <ALLRES value="$(RESFILES)"/>
+    <ALLLIB value="$(LIBFILES) $(LIBRARIES) import32.lib cp32mti.lib"/>
+    <OTHERFILES value=""/>
+  </LINKER>
+  <FILELIST>
+      <FILE FILENAME="xrCoreB.bpf" FORMNAME="" UNITNAME="xrCoreB" CONTAINERID="BPF" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrMemory_pso_Fill32.cpp" FORMNAME="" UNITNAME="xrMemory_pso_Fill32.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_math.cpp" FORMNAME="" UNITNAME="_math.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_sphere.cpp" FORMNAME="" UNITNAME="_sphere.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="cpuid.cpp" FORMNAME="" UNITNAME="cpuid.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="stdafx.cpp" FORMNAME="" UNITNAME="stdafx.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrCore.cpp" FORMNAME="" UNITNAME="xrCore.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrMemory.cpp" FORMNAME="" UNITNAME="xrMemory.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrMemory_pso_Copy.cpp" FORMNAME="" UNITNAME="xrMemory_pso_Copy.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrMemory_pso_Fill.cpp" FORMNAME="" UNITNAME="xrMemory_pso_Fill.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_compressed_normal.cpp" FORMNAME="" UNITNAME="_compressed_normal.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrMemory_align.cpp" FORMNAME="" UNITNAME="xrMemory_align" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrCore.rc" FORMNAME="" UNITNAME="xrCore.rc" CONTAINERID="RCCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="LzHuf.cpp" FORMNAME="" UNITNAME="LzHuf.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="log.cpp" FORMNAME="" UNITNAME="log.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FS.cpp" FORMNAME="" UNITNAME="FS.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xr_trims.cpp" FORMNAME="" UNITNAME="xr_trims.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Xr_ini.cpp" FORMNAME="" UNITNAME="Xr_ini.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="clsid.cpp" FORMNAME="" UNITNAME="clsid" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FileSystem_borland.cpp" FORMNAME="" UNITNAME="FileSystem_borland.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FileSystem.cpp" FORMNAME="" UNITNAME="FileSystem.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrMemory_subst_msvc.cpp" FORMNAME="" UNITNAME="xrMemory_subst_msvc.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrMemory_POOL.cpp" FORMNAME="" UNITNAME="xrMemory_POOL.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrMemory_subst_borland.cpp" FORMNAME="" UNITNAME="xrMemory_subst_borland.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="rt_lzo.cpp" FORMNAME="" UNITNAME="rt_lzo.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="rt_compressor.cpp" FORMNAME="" UNITNAME="rt_compressor.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FTimer.cpp" FORMNAME="" UNITNAME="FTimer" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrstring.cpp" FORMNAME="" UNITNAME="xrstring" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrsharedmem.cpp" FORMNAME="" UNITNAME="xrsharedmem" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrSyncronize.h" FORMNAME="" UNITNAME="xrSyncronize.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_bitwise.h" FORMNAME="" UNITNAME="_bitwise.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_color.h" FORMNAME="" UNITNAME="_color.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_compressed_normal.h" FORMNAME="" UNITNAME="_compressed_normal.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_cylinder.h" FORMNAME="" UNITNAME="_cylinder.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_fbox2.h" FORMNAME="" UNITNAME="_fbox2.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_fbox.h" FORMNAME="" UNITNAME="_fbox.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_flags.h" FORMNAME="" UNITNAME="_flags.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_math.h" FORMNAME="" UNITNAME="_math.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_matrix33.h" FORMNAME="" UNITNAME="_matrix33.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_matrix.h" FORMNAME="" UNITNAME="_matrix.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_obb.h" FORMNAME="" UNITNAME="_obb.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_plane.h" FORMNAME="" UNITNAME="_plane.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_quaternion.h" FORMNAME="" UNITNAME="_quaternion.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_random.h" FORMNAME="" UNITNAME="_random.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_rect.h" FORMNAME="" UNITNAME="_rect.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_sphere.h" FORMNAME="" UNITNAME="_sphere.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_std_extensions.h" FORMNAME="" UNITNAME="_std_extensions.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_stl_extensions.h" FORMNAME="" UNITNAME="_stl_extensions.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_type_traits.h" FORMNAME="" UNITNAME="_type_traits.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_types.h" FORMNAME="" UNITNAME="_types.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_vector2.h" FORMNAME="" UNITNAME="_vector2.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_vector3d.h" FORMNAME="" UNITNAME="_vector3d.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_vector4.h" FORMNAME="" UNITNAME="_vector4.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="clsid.h" FORMNAME="" UNITNAME="clsid.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="cpuid.h" FORMNAME="" UNITNAME="cpuid.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FileSystem.h" FORMNAME="" UNITNAME="FileSystem.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FixedMap.h" FORMNAME="" UNITNAME="FixedMap.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FixedSet.h" FORMNAME="" UNITNAME="FixedSet.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FixedVector.h" FORMNAME="" UNITNAME="FixedVector.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FS.h" FORMNAME="" UNITNAME="FS.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FS_internal.h" FORMNAME="" UNITNAME="FS_internal.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="FTimer.h" FORMNAME="" UNITNAME="FTimer.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="log.h" FORMNAME="" UNITNAME="log.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="lzhuf.h" FORMNAME="" UNITNAME="lzhuf.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="resource.h" FORMNAME="" UNITNAME="resource.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="rt_compressor.h" FORMNAME="" UNITNAME="rt_compressor.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="rt_lzo.h" FORMNAME="" UNITNAME="rt_lzo.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="rt_lzo_config.h" FORMNAME="" UNITNAME="rt_lzo_config.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="stdafx.h" FORMNAME="" UNITNAME="stdafx.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="vector.h" FORMNAME="" UNITNAME="vector.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Xr_ini.h" FORMNAME="" UNITNAME="Xr_ini.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xr_trims.h" FORMNAME="" UNITNAME="xr_trims.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrCore.h" FORMNAME="" UNITNAME="xrCore.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrCPU_Pipe.h" FORMNAME="" UNITNAME="xrCPU_Pipe.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrDebug_macros.h" FORMNAME="" UNITNAME="xrDebug_macros.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrMemory.h" FORMNAME="" UNITNAME="xrMemory.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrMemory_align.h" FORMNAME="" UNITNAME="xrMemory_align.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrMemory_POOL.h" FORMNAME="" UNITNAME="xrMemory_POOL.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrMemory_pso.h" FORMNAME="" UNITNAME="xrMemory_pso.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrMemory_subst_borland.h" FORMNAME="" UNITNAME="xrMemory_subst_borland.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrMemory_subst_msvc.h" FORMNAME="" UNITNAME="xrMemory_subst_msvc.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrPool.h" FORMNAME="" UNITNAME="xrPool.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrsharedmem.h" FORMNAME="" UNITNAME="xrsharedmem.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrstring.h" FORMNAME="" UNITNAME="xrstring.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="_std_extensions.cpp" FORMNAME="" UNITNAME="_std_extensions" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="crc32.cpp" FORMNAME="" UNITNAME="crc32" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="fastdelegate.h" FORMNAME="" UNITNAME="fastdelegate.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrSyncronize.cpp" FORMNAME="" UNITNAME="xrSyncronize" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="D3DX_Wrapper.h" FORMNAME="" UNITNAME="D3DX_Wrapper.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="ELocatorAPI.cpp" FORMNAME="" UNITNAME="ELocatorAPI" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="LocatorAPI_defs.h" FORMNAME="" UNITNAME="LocatorAPI_defs.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="LocatorAPI_defs.cpp" FORMNAME="" UNITNAME="LocatorAPI_defs" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrDebug.cpp" FORMNAME="" UNITNAME="xrDebug" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xrDebugNew.cpp" FORMNAME="" UNITNAME="xrDebugNew" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="blackbox\TLHELPProcessInfo.cpp" FORMNAME="" UNITNAME="TLHELPProcessInfo.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="blackbox\BlackBoxUI.cpp" FORMNAME="" UNITNAME="BlackBoxUI.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="blackbox\BSUFunctions.cpp" FORMNAME="" UNITNAME="BSUFunctions.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="blackbox\CrashHandler.cpp" FORMNAME="" UNITNAME="CrashHandler.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="blackbox\DiagAssert.cpp" FORMNAME="" UNITNAME="DiagAssert.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="blackbox\GetLoadedModules.cpp" FORMNAME="" UNITNAME="GetLoadedModules.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="blackbox\IsNT.cpp" FORMNAME="" UNITNAME="IsNT.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="blackbox\NT4ProcessInfo.cpp" FORMNAME="" UNITNAME="NT4ProcessInfo.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="blackbox\stdafx_.cpp" FORMNAME="" UNITNAME="stdafx_.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="rt_compressor9.cpp" FORMNAME="" UNITNAME="rt_compressor9.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="rt_lzo1x_1.cpp" FORMNAME="" UNITNAME="rt_lzo1x_1.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="rt_lzo1x_9x.cpp" FORMNAME="" UNITNAME="rt_lzo1x_9x.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="rt_lzo1x_d1.cpp" FORMNAME="" UNITNAME="rt_lzo1x_d1.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="rt_lzo1x_d2.cpp" FORMNAME="" UNITNAME="rt_lzo1x_d2.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="rt_lzo1x_d3.cpp" FORMNAME="" UNITNAME="rt_lzo1x_d3.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="rt_lzo_init.cpp" FORMNAME="" UNITNAME="rt_lzo_init.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="os_clipboard.cpp" FORMNAME="" UNITNAME="os_clipboard" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+  </FILELIST>
+  <BUILDTOOLS>
+  </BUILDTOOLS>
+
+  <FILES>
+    <FILE type="override" value="blackbox\BlackBoxUI.cpp" translator="Auto">
+      <CFLAG1 value=" -H- -Hc-"/>
+    </FILE>
+    <FILE type="override" value="blackbox\IsNT.cpp" translator="Auto">
+      <CFLAG1 value=" -H- -Hc-"/>
+    </FILE>
+    <FILE type="override" value="blackbox\stdafx_.cpp" translator="Auto">
+      <CFLAG1 value=" -H- -Hc-"/>
+    </FILE>
+    <FILE type="override" value="blackbox\TLHELPProcessInfo.cpp" translator="Auto">
+      <CFLAG1 value=" -H- -Hc-"/>
+    </FILE>
+    <FILE type="override" value="blackbox\DiagAssert.cpp" translator="Auto">
+      <CFLAG1 value=" -H- -Hc-"/>
+    </FILE>
+    <FILE type="override" value="blackbox\CrashHandler.cpp" translator="Auto">
+      <CFLAG1 value=" -H- -Hc-"/>
+    </FILE>
+    <FILE type="override" value="blackbox\NT4ProcessInfo.cpp" translator="Auto">
+      <CFLAG1 value=" -H- -Hc-"/>
+    </FILE>
+    <FILE type="override" value="blackbox\BSUFunctions.cpp" translator="Auto">
+      <CFLAG1 value=" -H- -Hc-"/>
+    </FILE>
+    <FILE type="override" value="blackbox\GetLoadedModules.cpp" translator="Auto">
+      <CFLAG1 value=" -H- -Hc-"/>
+    </FILE>
+  </FILES>
+
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=0
+AutoIncBuild=0
+MajorVer=1
+MinorVer=0
+Release=0
+Build=34
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1058
+CodePage=1251
+
+[Version Info Keys]
+CompanyName=
+FileDescription=
+FileVersion=1.0.0.34
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=
+ProductName=
+ProductVersion=1.0.0.0
+Comments=
+
+[HistoryLists\hlIncludePath]
+Count=30
+Item0=blackbox;$(ETOOLS_DIR);$(DXSDK_DIR)\Include;$(BCB)\include;$(BCB)\include\vcl;$(BCB)\Include\Mfc
+Item1=$(VC_INCLUDE);blackbox;$(ETOOLS_DIR);$(DXSDK_DIR)\Include;$(BCB)\include;$(BCB)\include\vcl;$(BCB)\Include\Mfc
+Item2=blackbox;$(ETOOLS_DIR);$(DXSDK_DIR)\Include;$(BCB)\_include_;$(BCB)\include\vcl;$(BCB)\Include\Mfc
+Item3=$(ETOOLS_DIR);$(DXSDK_DIR)\Include;$(BCB)\include;$(BCB)\include\vcl;$(BCB)\Include\Mfc
+Item4=$(DXSDK_DIR)\Include;$(BCB)\include;$(BCB)\include\vcl;$(BCB)\Include\Mfc
+Item5=$(DXSDK)\Include;$(BCB)\include;$(BCB)\include\vcl;$(BCB)\Include\Mfc
+Item6=I:\Program Files\Microsoft DirectX SDK (October 2006)\Include;$(BCB)\include;$(BCB)\include\vcl;R:\SDK\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source;$(BCB)\Include\Mfc
+Item7=R:\SDK\Microsoft DirectX 9.0 SDK (April 2005)\Include;$(BCB)\include;$(BCB)\include\vcl;R:\SDK\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source;$(BCB)\Include\Mfc
+Item8=R:\SDK\Microsoft DirectX 9.0 SDK (April 2005)\Include;$(BCB)\include;$(BCB)\include\vcl;R:\SDK\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source;R:\Borland\CBuilder6\Include\Mfc
+Item9=R:\SDK\Microsoft DirectX 9.0 SDK (February 2005)\Include;$(BCB)\include;$(BCB)\include\vcl;R:\SDK\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source;R:\Borland\CBuilder6\Include\Mfc;..\Tools\Etools
+Item10=R:\SDK\Microsoft DirectX 9.0 SDK (October 2004)\Include;$(BCB)\include;$(BCB)\include\vcl;R:\SDK\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source;R:\Borland\CBuilder6\Include\Mfc;..\Tools\Etools
+Item11=R:\SDK\DirectX9.0_sum_2004\Include;$(BCB)\include;$(BCB)\include\vcl;P:\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source;R:\Borland\CBuilder6\Include\Mfc;..\Tools\Etools
+Item12=R:\SDK\DirectX9.0_sum_2004\Include;$(BCB)\include;$(BCB)\include\vcl;P:\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source;R:\Borland\CBuilder6\Include\Mfc
+Item13=$(BCB)\include;$(BCB)\include\vcl;P:\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source;R:\Borland\CBuilder6\Include\Mfc
+Item14=R:\SDK\DirectX9.0\include;$(BCB)\include;$(BCB)\include\vcl;P:\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source;R:\Borland\CBuilder6\Include\Mfc
+Item15=R:\SDK\DirectX9.0\include;$(BCB)\include;$(BCB)\include\vcl;P:\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source;R:\VS7.NET\Vc7\atlmfc\include;R:\Borland\CBuilder6\Include\Mfc
+Item16=R:\SDK\DirectX9.0\include;$(BCB)\include;$(BCB)\include\vcl;P:\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source;R:\VS7.NET\Vc7\atlmfc\include
+Item17=R:\SDK\DirectX8.1\include;$(BCB)\include;$(BCB)\include\vcl;P:\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source;R:\VS7.NET\Vc7\atlmfc\include
+Item18=R:\SDK\DirectX8.0\include;$(BCB)\include;$(BCB)\include\vcl;P:\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source;R:\VS7.NET\Vc7\atlmfc\include
+Item19=R:\SDK\DirectX9.0\include;$(BCB)\include;$(BCB)\include\vcl;P:\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source;R:\VS7.NET\Vc7\atlmfc\include;$(BCB)\include\mfc
+Item20=R:\SDK\DirectX9.0\include;$(BCB)\include;$(BCB)\include\vcl;P:\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source;$(BCB)\include\mfc
+Item21=R:\SDK\DirectX9.0\include;$(BCB)\include;$(BCB)\include\vcl;P:\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source
+Item22=R:\DirectX9.0\include;$(BCB)\include;$(BCB)\include\vcl;P:\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source
+Item23=R:\DirectX9\include;$(BCB)\include;$(BCB)\include\vcl;P:\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source
+Item24=R:\DirectX8.1\include;$(BCB)\include;$(BCB)\include\vcl;P:\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source
+Item25=..\LevelOptions\Engine;..\LevelOptions\Editor;..\LevelOptions;Editor;R:\DirectX8.1\include;$(BCB)\include;$(BCB)\include\vcl;engine;P:\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source
+Item26=Editor;R:\DirectX8.1\include\;$(BCB)\include;$(BCB)\include\vcl;engine;P:\MagicFM_Borland\Sdk\Include\;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code\Source
+Item27=Editor;Engine\Blenders;R:\Borland\Components\Eldos\Code\Source\;r:\borland\components\alexmx\;lib\DX;R:\DirectX8.1\include\;c:\rad\Borland\CBuilder5\Bin\;c:\rad\borland\CBuilder5\Projects\;$(BCB)\include;$(BCB)\include\vcl;engine;edit;Import\LWO;Collide;P:\MagicFM_Borland\Sdk\Include\;c:\rad\borland\components\extbtn\;c:\rad\borland\components\multi\;c:\rad\borland\components\renderwindow\;C:\RAD\borland\Components\RX\Units\;C:\RAD\borland\Components\ElTree\Code\Source\
+Item28=Engine\Blenders;R:\Borland\Components\Eldos\Code\Source\;r:\borland\components\alexmx\;lib\DX;R:\DirectX8.1\include\;c:\rad\Borland\CBuilder5\Bin\;c:\rad\borland\CBuilder5\Projects\;$(BCB)\include;$(BCB)\include\vcl;engine;edit;Import\LWO;Collide;P:\MagicFM_Borland\Sdk\Include\;c:\rad\borland\components\extbtn\;c:\rad\borland\components\multi\;c:\rad\borland\components\renderwindow\;C:\RAD\borland\Components\RX\Units\;C:\RAD\borland\Components\ElTree\Code\Source\
+Item29=$(BCB)\include;shared;$(BCB)\include\vcl;edit;edit\Shader;Import\LWO;Collide;P:\MagicFM_Borland\Sdk\Include\;c:\rad\borland\components\extbtn\;c:\rad\borland\components\multi\;c:\rad\borland\components\renderwindow\;C:\RAD\borland\Components\RX\Units\;C:\RAD\borland\Components\ElTree\Code\Source\
+
+[HistoryLists\hlLibraryPath]
+Count=30
+Item0=blackbox;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\lib\psdk;$(OUT_LIB_DIR);$(COMPONENTS)\Elpack\Code;$(COMPONENTS)\AlexMX
+Item1=blackbox;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\lib\psdk;$(COMPONENTS)\ElPack\Code;$(OUT_LIB_DIR)
+Item2=blackbox;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\lib\psdk;$(COMPONENTS)\ElPack\Code;$(OUTPUT_LIBRARIES_DIR)
+Item3=blackbox;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\lib\psdk;$(COMPONENTS)\ElPack\Code;$(OUTPUT_LINRARIES_DIR)
+Item4=blackbox;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\lib\psdk;$(COMPONENTS)\ElPack\Code
+Item5=blackbox;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\lib\psdk;$(COMPONENTS_DIR)\ElPack\Code
+Item6=blackbox;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;x:\stalker_addon\libraries;$(BCB)\lib\psdk;X:\stalker_addon\sources\sdk\components\ElPack\Code;x:\libraries;X:\sources\sdk\components\ElPack\Code
+Item7=blackbox;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;x:\stalker_addon\libraries;$(BCB)\lib\psdk;X:\stalker_addon\sources\sdk\components\ElPack\Code;x:\libraries
+Item8=blackbox;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;x:\stalker_addon\libraries;$(BCB)\lib\psdk;X:\stalker_addon\sources\sdk\components\ElPack\Code;x:\libraries\
+Item9=blackbox;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;x:\stalker_addon\libraries;$(BCB)\lib\psdk;X:\stalker_addon\sources\sdk\components\ElPack\Code
+Item10=blackbox;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;x:\stalker_addon\libraries;$(BCB)\lib\psdk
+Item11=blackbox;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;x:\libraries;$(BCB)\lib\psdk
+Item12=blackbox;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;x:\libraries
+Item13=$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;x:\libraries
+Item14=i:\Projects\editors\components\Alexmx;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;x:\libraries
+Item15=$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;x:\libraries
+Item16=$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;R:\Borland\Components6\ElPack\Code;R:\Borland\CBuilder6\Lib\Psdk;..\Editors\lib\dx;..\Editors\lib;x:\
+Item17=c:\rad\borland\CBuilder5\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code;R:\Borland\CBuilder6\Lib\Psdk;..\Editors\lib\dx;..\Editors\lib;x:\
+Item18=c:\rad\borland\CBuilder5\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code;R:\Borland\CBuilder6\Lib\Psdk;..\Editors\lib\dx;..\Editors\lib
+Item19=c:\rad\borland\CBuilder5\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code;R:\Borland\CBuilder6\Lib\Psdk;..\lib\dx;..\lib
+Item20=c:\rad\borland\CBuilder5\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code;R:\Borland\CBuilder6\Lib\Psdk;lib;lib\dx
+Item21=c:\rad\borland\CBuilder5\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code;R:\Borland\CBuilder6\Lib\Psdk;lib
+Item22=c:\rad\borland\CBuilder5\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code;R:\Borland\CBuilder6\Lib\Psdk
+Item23=c:\rad\borland\CBuilder5\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code;R:\Borland\CBuilder6\Lib\Psdk\
+Item24=c:\rad\borland\CBuilder5\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code
+Item25=..\LevelOptions\Engine;..\LevelOptions\Editor;..\LevelOptions;c:\rad\borland\CBuilder5\Projects;engine;editor;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code
+Item26=c:\rad\borland\CBuilder5\Projects\;engine;editor;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;R:\Borland\Components6\AlexMX;R:\Borland\Components6\ElPack\Code
+Item27=c:\rad\borland\CBuilder5\Projects\;engine;editor;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;r:\borland\components\alexmx\;R:\Borland\Components\Eldos\Code\Source\;R:\Borland\Components\Eldos\Code\
+Item28=Editor;shared;edit;edit\Shader;Collide;Import\LWO;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;c:\rad\borland\components\renderwindow\;c:\rad\borland\components\extbtn\;c:\rad\borland\components\multi\;C:\RAD\borland\Components\RX\Units\;C:\RAD\borland\Components\ElTree\Code\Source\
+Item29=shared;edit;edit\Shader;Collide;Import\LWO;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;c:\rad\borland\components\renderwindow\;c:\rad\borland\components\extbtn\;c:\rad\borland\components\multi\;C:\RAD\borland\Components\RX\Units\;C:\RAD\borland\Components\ElTree\Code\Source\
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlConditionals]
+Count=8
+Item0=_EDITOR;_XRCOREB;XRCORE_EXPORTS;_DEBUG
+Item1=_EDITOR;_XRCOREB;XRCORE_EXPORTS
+Item2=_XRCOREB;XRCORE_EXPORTS
+Item3=_XRCOREB;XRCORE_EXPORTS;_DEBUG
+Item4=_XRCOREB
+Item5=_LEVEL_OPTIONS
+Item6=_OPTIONS
+Item7=_DEBUG
+
+[HistoryLists\hlIntOutputDir]
+Count=8
+Item0=x:\intermediate_ed\core
+Item1=$(OUTPUT_INTERMEDIATE_DIR)\core
+Item2=$(OUTPUT_INTERMEDIATE_DIR)
+Item3=$(OUTPUT_INTERMEDIATE_DIR)\
+Item4=x:\intermediate_ed
+Item5=Intermediate
+Item6=XRLC_Intermediate
+Item7=xrLC_Options
+
+[HistoryLists\hlFinalOutputDir]
+Count=18
+Item0=$(OUTPUT_BINARIES_DIR)\
+Item1=x:\stalker_addon\binaries\
+Item2=x:\binaries\
+Item3=x:\binaries
+Item4=C:\Program Files\THQ\S.T.A.L.K.E.R. - Shadow of Chernobyl\
+Item5=x:\
+Item6=x:\build\
+Item7=x:\build
+Item8=u:\preliminary\
+Item9=u:\preliminary
+Item10=s:\bin\
+Item11=z:\
+Item12=S:\build_zmey\
+Item13=S:\build_zmey
+Item14=x:\xrCoreB.dll\
+Item15=x:\xrCoreB.dll
+Item16=!run\
+Item17=!run
+
+[HistoryLists\hIBPIOutputDir]
+Count=7
+Item0=x:\stalker_addon\libraries
+Item1=$(OUT_LIB_DIR)
+Item2=$(OUT_LIB_DIR)\
+Item3=$(OUTPUT_LIBRARIES_DIR)
+Item4=$(OUTPUT_LIBRARIES_DIR)\
+Item5=x:\libraries
+Item6=x:\libraries\
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=-wf x:\stalker_addon\resources
+Launcher=
+UseLauncher=0
+DebugCWD=
+HostApplication=x:\stalker_addon\binaries\LevelEditor.exe
+RemoteHost=
+RemotePath=
+RemoteLauncher=
+RemoteCWD=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=0
+LinkCGLIB=0
+
+[CORBA]
+AddServerUnit=1
+AddClientUnit=1
+PrecompiledHeaders=1
+
+[Language]
+ActiveLang=
+ProjectLang=
+RootDir=
+
+[Linker]
+LibPrefix=
+LibSuffix=
+LibVersion=
+  </IDEOPTIONS>
+</PROJECT>

@@ -1,0 +1,93 @@
+Summary of engine features:
+	Sometimes the engine outstrips its time and in generally is designed for modern and (even future) hardware.
+	The main goal was to utilize all resources of video boards especially the T&L
+	'Cause not all of us have it (even the developers :) the most of engine features (almost the vertex-related) 
+	are emulated (and very fast emulated) in software.
+
+	Distinguishing feature of XRay engine is high parallelism, which results in low number of situations when CPU 
+	is waiting for GPU or GPU resources to be available.
+
+In Detail (not sorted by any kind of priority):
+* Variable, dynamic geometry detail of scene
+	- highly optimized for T&L hardware
+	- doesn't modify vertex data - only rearrange indices 
+		- which results in ZERO overhead
+		- disadvantage: can kill GPU vertex cache :(
+* Colored dynamic, per vertex lighting
+	- Intelligent light sources selection & clipping
+		- Makes possible more than 100 dynamic lights per frame at reasonable FPS-es
+* Very impressive simulation of atmosphere effects like sky/clouds/suns
+	- Of course it depends on art-designers skills but the bumped sky looks great :)
+* Fast, full-accelerated by hardware "Hard Shadow" generating algorithm
+	- Disadvantage: requires presents of 8 (or more) bits stencil buffer
+	- Advantages: the most current hardware has already had it :)
+* Full scene anti-aliasing
+	- Supports Accumulation Buffer & super sampling technologies as 3dfx's T-Buffer (R)
+	- Engine designed in mind to use Multisampling than it will be available on hardware
+		- Enables to use "motion blur", "depth of field blur" and "soft shadows"
+* Table W-Fog & Z-Fog support
+	- automatic rollback to emulation via vertex fogging if hardware doesn't support it.
+* Intelligent use of triple buffering scheme
+	- results in FPS-es increase on video boards which have enough memory to hold all buffers
+* Motion compensation scheme
+	- Hides many visual artifacts produced by FPS-es instability
+* Light maps and dynamic lightmaps
+	- Up to 3(three) texture stages that blends using almost infinite combinations of pixel-shaders
+	- Disadvantage: some pixel shaders requires DirectX8 and appropriate hardware support
+* Flare system
+* Particle system
+	- Can be highly accelerated by upcoming hardware, which will be available at fall'00
+* Bump mapping
+	- Even "DotProduct3" emboss bump mapping supported
+* Environment mapping
+	* Cubic environment mapping
+		- Realization fully depends on hardware capabilities
+	* Spherical environment mapping
+		- Real alternative to CubicEnvMap on all current hardware
+		- Doesn't highly depends on geometry complexity
+* Reflections
+	- Pre-rendered textured reflection simulation can be applied on any object or part of it 
+		without any performance penalty
+* Curved surfaces
+	- 'Cause even modern hardware can't do the tessellation in real-time - it is done on load-time
+	- Tessellation is based not on the real splined surface definition but on the control surface NURBS-tessellation
+* N-Patch support
+	- Real-time support is only guaranteed for DirectX8 with appropriate hardware installed
+* Single-mesh skeleton animation
+	- High-speed blended animation system capable of up to infinity number of bones interpolation & modulation
+	- The first 256 bones blending will be accelerated by GPU (if it capable of doing such thing :)
+	- Combined with N-Patch technology can give photo-realistic models visualization in real-time
+* Portal-style, non-linear subdivision based visibility detection system
+	- Optimized for T&L hardware in the way of grouping primitives to large-size batches
+	- Can handle up to 20,000 polys in one frame on software transformation(PII 450) and up to 80,000 in T&L(GeForce2)
+	- Greatly reduces overdraw - which is the main slowdown on even high-level video boards
+	- Enables to use more texturing effects compared with today“s engines (Even Q3 & Unreal)
+* Intelligent hardware state caching technology
+	- Results in speed increasing on bed-written rendering code (not all of the programmers code good, isn't so? :)
+* Dynamically generated textures
+	- High-speed fractal & particles based generating
+	- 20% of Unreal(TM) engine based on this technology - it is approved.
+* OBB-style collision-detection system
+	- Capable of ideal determining collisions between high-poly models in high-detailed world
+	- Disadvantage: Ray-picking is not highly optimized now
+* Independence of engine from world and objects it holds
+	- All objects lies in independent DLLs and the Engine itself doesn't know of them until level load time
+	- Results in increased speed of development (and especially team development)
+* Powerful scripting
+	- Full realization of C-language 
+	- Only 6-8 times slower than real (x86) code   (isn't great? :)
+	- Enables fast AI development and almost infinite number of texturing effects
+* The most important part of the mathematics is optimized for PIII SSE & K6/K7 3DNow instructions
+
+
+* High quality HRTF-3D sound, accelerated by hardware if possible
+* Low-penalty & "low-delay" reaction technology (about 1-3ms to start HRTF 3D Sound Source to play)
+* No "glitches" when starting a sound even in full HRTF model
+* Incredible support for sound environments 
+	- Requires EAX-capable sound card
+	- A3D now used only to speed up some calculations (handled by DirectSound subsystem)
+* Sound clipping and sound reflection
+	- If Diamond Corp. continues support for its A3D standard - will be realized on hardware
+* High speed streaming sound decoding
+	- Means playing MP3/MP2/WMA/ADPCM tracks with almost no penalty to performance
+* Context relative multiple-mixed music streams 

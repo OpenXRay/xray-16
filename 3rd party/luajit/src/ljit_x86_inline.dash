@@ -1,0 +1,627 @@
+/*
+** Function inlining support for x86 CPUs.
+** Copyright (C) 2005-2008 Mike Pall. See Copyright Notice in luajit.h
+*/
+
+/* ------------------------------------------------------------------------ */
+
+/* Private structure holding function inlining info. */
+typedef struct jit_InlineInfo {
+  int func;			/* Function slot. 1st arg slot = func+1. */
+  int res;			/* 1st result slot. Overlaps func/ci->func. */
+  int nargs;			/* Number of args. */
+  int nresults;			/* Number of results. */
+  int xnargs;			/* Expected number of args. */
+  int xnresults;		/* Returned number of results. */
+  int hidx;			/* Library/function index numbers. */
+} jit_InlineInfo;
+
+/* ------------------------------------------------------------------------ */
+
+enum { TFOR_FUNC, TFOR_TAB, TFOR_CTL, TFOR_KEY, TFOR_VAL };
+
+static void jit_inline_base(jit_State *J, jit_InlineInfo *ii)
+{
+  int func = ii->func;
+  switch (JIT_IH_IDX(ii->hidx)) {
+  case JIT_IH_BASE_PAIRS:
+  case JIT_IH_BASE_IPAIRS:
+    |// Easy for regular calls: res == func. Not inlined for tailcalls.
+    |// Guaranteed to be inlined only if used in conjunction with TFORLOOP.
+    |// So we omit setting the iterator function and fake the control var.
+    |  istable func+TFOR_TAB; jne L_DEOPTIMIZE	// Caveat: deopt TFORLOOP, too!
+    |  xor eax, eax				// Assumes: LUA_TNIL == 0.
+    |  mov BASE[func+TFOR_CTL].tt, eax		// Fake nil type.
+    |  mov BASE[func+TFOR_CTL].value, eax	// Hidden control var = 0.
+    |//  mov BASE[func+TFOR_FUNC].tt, eax	// Kill function (not needed).
+    |.mfmap
+    |  .word JIT_MFM_DEOPT_PAIRS, J->nextpc-1	// Deoptimize TFORLOOP, too.
+    |.code
+    break;
+  default:
+    jit_assert(0);
+    break;
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+
+#ifndef COCO_DISABLE
+
+/* Helper function for inlined coroutine.resume(). */
+static StkId jit_coroutine_resume(lua_State *L, StkId base, int nresults)
+{
+  lua_State *co = thvalue(base-1);
+  /* Check for proper usage. Merge of lua_resume() and auxresume() checks. */
+  if (co->status != LUA_YIELD) {
+    if (co->status > LUA_YIELD) {
+errdead:
+      setsvalue(L, base-1, luaS_newliteral(L, "cannot resume dead coroutine"));
+      goto err;
+    } else if (co->ci != co->base_ci) {
+      setsvalue(L, base-1,
+	luaS_newliteral(L, "cannot resume non-suspended coroutine"));
+      goto err;
+    } else if (co->base == co->top) {
+      goto errdead;
+    }
+  }
+  {
+    unsigned int ndelta = (char *)L->top - (char *)base;
+    int nargs = ndelta/sizeof(TValue);  /* Compute nargs. */
+    int status;
+    if ((char *)co->stack_last-(char *)co->top <= ndelta) {
+      co->ci->top = (StkId)(((char *)co->top) + ndelta);  /* Ok before grow. */
+      luaD_growstack(co, nargs);  /* Grow thread stack. */
+    }
+    /* Copy args. */
+    co->top = (StkId)(((char *)co->top) + ndelta);
+    { StkId t = co->top, f = L->top; while (f > base) setobj2s(co, --t, --f); }
+    L->top = base;
+    status = luaCOCO_resume(co, nargs);  /* Resume Coco thread. */
+    if (status == 0 || status == LUA_YIELD) {  /* Ok. */
+      StkId f;
+      if (nresults == 0) return NULL;
+      if (nresults == -1) {
+	luaD_checkstack(L, co->top - co->base);  /* Grow own stack. */
+      }
+      base = L->top - 2;
+      setbvalue(base++, 1);  /* true */
+      /* Copy results. Fill unused result slots with nil. */
+      f = co->base;
+      while (--nresults != 0 && f < co->top) setobj2s(L, base++, f++);
+      while (nresults-- > 0) setnilvalue(base++);
+      co->top = co->base;
+      return base;
+    } else {  /* Error. */
+      base = L->top;
+      setobj2s(L, base-1, co->top-1);  /* Copy error object. */
+err:
+      setbvalue(base-2, 0);  /* false */
+      nresults -= 2;
+      while (--nresults >= 0) setnilvalue(base+nresults);  /* Fill results. */
+      return base;
+    }
+  }
+}
+
+static void jit_inline_coroutine(jit_State *J, jit_InlineInfo *ii)
+{
+  int arg = ii->func+1;
+  int res = ii->res;
+  int i;
+  switch (JIT_IH_IDX(ii->hidx)) {
+  case JIT_IH_COROUTINE_YIELD:
+    |  cmp aword [L+((int)&LHASCOCO((lua_State *)0))], 0  // Got a C stack?
+    |  je L_DEOPTIMIZE
+    |  mov L->savedpc, &J->nextins		// Debugger-friendly.
+    |  add BASE, arg*#TVALUE
+    if (ii->nargs >= 0) {  /* Previous op was not open and did not set TOP. */
+      |  lea TOP, BASE[ii->nargs]
+    }
+    |  mov L->base, BASE
+    |  mov L->top, TOP
+    |  call &luaCOCO_yield, L
+    |  mov BASE, L->base
+    |  mov TOP, L->top
+    jit_assert(ii->nresults >= 0 && ii->nresults <= EXTRA_STACK);
+    for (i = 0; i < ii->nresults; i++) {
+      |  setnilvalue TOP[i]			// Clear undefined result.
+      |  copyslot BASE[res+i], BASE[arg+i]	// Move result down.
+    }
+    ii->nargs = -1;  /* Force restore of L->top. */
+    break;
+  case JIT_IH_COROUTINE_RESUME:
+    jit_assert(ii->nargs != 0 && ii->res == ii->func);
+    |  add BASE, (arg+1)*#TVALUE
+    if (ii->nargs >= 0) {  /* Previous op was not open and did not set TOP. */
+      |  lea TOP, BASE[ii->nargs-1]
+    } else {
+      |  cmp TOP, BASE; jb L_DEOPTIMIZE		// No thread arg? Deoptimize.
+    }
+    |  istt -1, LUA_TTHREAD; jne L_DEOPTIMIZE	// Wrong type? Deoptimize.
+    |  mov L:eax, BASE[-1].value
+    |  cmp aword [L:eax+((int)&LHASCOCO((lua_State *)0))], 0
+    |  je L_DEOPTIMIZE				// No C stack? Deoptimize.
+    |  mov L->savedpc, &J->nextins		// Debugger-friendly.
+    |  mov L->top, TOP
+    |  call &jit_coroutine_resume, L, BASE, ii->nresults
+    |  mov BASE, L->base
+    if (ii->nresults == -1) {
+      |  mov TOP, eax
+    }
+    ii->nargs = -1;  /* Force restore of L->top. */
+    break;
+  default:
+    jit_assert(0);
+    break;
+  }
+}
+
+#endif /* COCO_DISABLE */
+
+/* ------------------------------------------------------------------------ */
+
+static void jit_inline_string(jit_State *J, jit_InlineInfo *ii)
+{
+  int arg = ii->func+1;
+  int res = ii->res;
+  switch (JIT_IH_IDX(ii->hidx)) {
+  case JIT_IH_STRING_LEN:
+    |  isstring arg; jne L_DEOPTIMIZE
+    |  mov TSTRING:ecx, BASE[arg].value
+    |  fild aword TSTRING:ecx->tsv.len	// size_t
+    |  settt BASE[res], LUA_TNUMBER
+    |  fstp qword BASE[res].value
+    break;
+  case JIT_IH_STRING_SUB:
+    /* TODO: inline numeric constants with help from the optimizer. */
+    /*       But this would save only another 15-20% in a trivial loop. */
+    jit_assert(ii->nargs >= 2);  /* Open op caveat is ok, too. */
+    if (ii->nargs > 2) {
+      |  lea TOP, BASE[arg]
+      |  call ->STRING_SUB3
+      |  setsvalue BASE[res], eax
+    } else {
+      |  lea TOP, BASE[arg]
+      |  call ->STRING_SUB2
+      |  setsvalue BASE[res], eax
+    }
+    break;
+  case JIT_IH_STRING_CHAR:
+    |  isnumber arg; jne L_DEOPTIMIZE
+    |  lea eax, L->env			// Abuse L->env to hold temp string.
+    |  fld qword BASE[arg].value
+    |  fistp dword [eax]		// LSB is at start (little-endian).
+    |  cmp dword [eax], 255; ja L_DEOPTIMIZE
+    |  call &luaS_newlstr, L, eax, 1
+    |  setsvalue BASE[res], eax
+    break;
+  default:
+    jit_assert(0);
+    break;
+  }
+
+  |//-----------------------------------------------------------------------
+  |.jsub STRING_SUB3			// string.sub(str, start, end)
+  |  mov eax, TOP[0].tt; shl eax, 4; or eax, TOP[1].tt; shl eax, 4
+  |  or eax, TOP[2].tt; sub eax, LUA_TSTR_NUM_NUM
+  |  jne ->DEOPTIMIZE_CALLER		// Wrong types? Deoptimize.
+  |  // eax must be zero here!
+  |   fld qword TOP[1].value
+  |  fld qword TOP[2].value
+  |  fistp aword TMP3			// size_t
+  |   fistp aword TMP2			// size_t
+  |   mov TSTRING:ecx, TOP[0].value
+  |   mov TOP, aword TSTRING:ecx->tsv.len  // size_t
+  |  mov edx, TMP3
+  |   cmp TOP, edx
+  |  jb >4
+  |1:
+  |  or eax, TMP2			// eax is known to be zero.
+  |  jle >6				// start <= 0?
+  |2:
+  |  sub edx, eax			// newlen = end-start
+  |  jl >7				// start > end?
+  |  lea ecx, [TSTRING:ecx+eax+#TSTRING-1]  // svalue()-1+start
+  |  inc edx
+  |3:
+  |  mov ARG2, L			// First arg for tailcall is ARG2.
+  |  mov ARG3, ecx			// Pointer to start.
+  |  mov ARG4, edx			// Length.
+  |   mov GL:edi, L->l_G
+  |   mov eax, GL:edi->totalbytes	// size_t
+  |   cmp eax, GL:edi->GCthreshold	// size_t
+  |   jae >8				// G->totalbytes >= G->GCthreshold?
+  |  jmp &luaS_newlstr			// Tailcall to C function.
+  |
+  |4:  // Negative end or overflow.
+  |  jl >5
+  |  lea edx, [edx+TOP+1]		// end = end+(len+1)
+  |  jmp <1
+  |5:  // Overflow
+  |  mov edx, TOP			// end = len
+  |  jmp <1
+  |
+  |6:  // Negative start or underflow.
+  |  je >5
+  |  add eax, TOP			// start = start+(len+1)
+  |  inc eax
+  |  jg <2				// start > 0?
+  |5:  // Underflow.
+  |  mov eax, 1				// start = 1
+  |  jmp <2
+  |
+  |7:  // Range underflow.
+  |  xor edx, edx			// Zero length.
+  |  jmp <3				// Any pointer in ecx is ok.
+  |.endjsub
+  |
+  |//-----------------------------------------------------------------------
+  |.jsub STRING_SUB2			// string.sub(str, start)
+  |  mov eax, TOP[0].tt; shl eax, 4; or eax, TOP[1].tt; sub eax, LUA_TSTR_NUM
+  |  jne ->DEOPTIMIZE_CALLER		// Wrong types? Deoptimize.
+  |  // eax must be zero here!
+  |  fld qword TOP[1].value
+  |  fistp aword TMP2			// size_t
+  |  mov TSTRING:ecx, TOP[0].value
+  |  mov TOP, aword TSTRING:ecx->tsv.len // size_t
+  |  mov edx, TOP
+  |  jmp <1				// See STRING_SUB3.
+  |
+  |8:  // GC threshold reached.
+  |  sub esp, FRAME_OFFSET
+  |  call &luaC_step, L
+  |  add esp, FRAME_OFFSET
+  |  mov BASE, L->base
+  |  jmp &luaS_newlstr			// Tailcall to C function.
+  |.endjsub
+}
+
+/* ------------------------------------------------------------------------ */
+
+/* Helper functions for inlined calls to table.*. */
+static void jit_table_insert(lua_State *L, TValue *arg)
+{
+  setobj2t(L, luaH_setnum(L, hvalue(arg), luaH_getn(hvalue(arg))+1), arg+1);
+  luaC_barriert(L, hvalue(arg), arg+1);
+}
+
+static TValue *jit_table_remove(lua_State *L, TValue *arg, TValue *res)
+{
+  int n = luaH_getn(hvalue(arg));
+  if (n == 0) {
+    setnilvalue(res);  /* For the nresults == 1 case. Harmless otherwise. */
+    return res;  /* For the nresults == -1 case. */
+  } else {
+    TValue *val = luaH_setnum(L, hvalue(arg), n);
+    setobj2s(L, res, val);
+    setnilvalue(val);
+    return res+1;  /* For the nresults == -1 case. */
+  }
+}
+
+static void jit_inline_table(jit_State *J, jit_InlineInfo *ii)
+{
+  int arg = ii->func+1;
+  int res = ii->res;
+  |  istable arg; jne L_DEOPTIMIZE
+  switch (JIT_IH_IDX(ii->hidx)) {
+  case JIT_IH_TABLE_INSERT:
+    jit_assert(ii->nargs == 2);
+    |  lea TVALUE:eax, BASE[arg]
+    |  call &jit_table_insert, L, TVALUE:eax
+    break;
+  case JIT_IH_TABLE_REMOVE:
+    jit_assert(ii->nargs == 1);
+    |  lea TVALUE:eax, BASE[arg]
+    |  lea TVALUE:ecx, BASE[res]
+    |  call &jit_table_remove, L, TVALUE:eax, TVALUE:ecx
+    if (ii->nresults == -1) {
+      ii->xnresults = -1;
+      |  mov TOP, TVALUE:eax
+    }
+    break;
+  case JIT_IH_TABLE_GETN:
+    |  mov TABLE:eax, BASE[arg].value
+    |  call &luaH_getn, TABLE:eax
+    |  mov TMP1, eax
+    |  fild dword TMP1
+    |  fstp qword BASE[res].value
+    |  settt BASE[res], LUA_TNUMBER
+    break;
+  default:
+    jit_assert(0);
+    break;
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+
+/* This typedef must match the libm function signature. */
+/* Serves as a check against wrong lua_Number or wrong calling conventions. */
+typedef lua_Number (*mathfunc_11)(lua_Number);
+
+/* Partially inlined math functions. */
+/* CHECK: must match with jit_hints.h and jit.opt_lib. */
+static const mathfunc_11 jit_mathfuncs_11[JIT_IH_MATH_SIN] = {
+  log, log10, exp,	sinh, cosh, tanh,	asin, acos, atan
+};
+
+/* FPU control words for ceil and floor (exceptions masked, full precision). */
+static const unsigned short jit_fpucw[2] = { 0x0b7f, 0x077f };
+
+static void jit_inline_math(jit_State *J, jit_InlineInfo *ii)
+{
+  int arg = ii->func+1;
+  int res = ii->res;
+  int idx = JIT_IH_IDX(ii->hidx);
+
+  if (idx < JIT_IH_MATH__21) {
+    |  isnumber arg; jne L_DEOPTIMIZE
+    |  fld qword BASE[arg].value
+  } else {
+    jit_assert(idx < JIT_IH_MATH__LAST);
+    |  isnumber2 arg, arg+1; jne L_DEOPTIMIZE
+  }
+  switch (idx) {
+  /* We ignore sin/cos/tan range overflows (2^63 rad) just like -ffast-math. */
+  case JIT_IH_MATH_SIN:
+    |  fsin
+    break;
+  case JIT_IH_MATH_COS:
+    |  fcos
+    break;
+  case JIT_IH_MATH_TAN:
+    |  fptan; fpop
+    break;
+  case JIT_IH_MATH_CEIL:
+  case JIT_IH_MATH_FLOOR:
+    |  fnstcw word TMP1
+    |  fldcw word [(ptrdiff_t)&jit_fpucw[idx-JIT_IH_MATH_CEIL]]
+    |  frndint
+    |  fldcw word TMP1
+    break;
+  case JIT_IH_MATH_ABS:
+    |  fabs
+    break;
+  case JIT_IH_MATH_SQRT:
+    |  fsqrt
+    break;
+  case JIT_IH_MATH_FMOD:
+    |  fld qword BASE[arg+1].value
+    |  fld qword BASE[arg].value
+    |1: ; fprem; fnstsw ax; sahf; jp <1
+    |  fstp st1
+    break;
+  case JIT_IH_MATH_ATAN2:
+    |// Inlining is easier than calling atan2().
+    |  fld qword BASE[arg].value
+    |  fld qword BASE[arg+1].value
+    |  fpatan
+    break;
+  default:
+    |// Partially inlined. Just call the libm function (__cdecl!).
+    |  fstp FPARG1
+    |  call &jit_mathfuncs_11[idx]
+    break;
+  }
+  |  settt BASE[res], LUA_TNUMBER
+  |  fstp qword BASE[res].value
+}
+
+/* ------------------------------------------------------------------------ */
+
+/* Try to inline a CALL or TAILCALL instruction. */
+static int jit_inline_call(jit_State *J, int func, int nargs, int nresults)
+{
+  const TValue *callable = hint_get(J, TYPE);  /* TYPE hint = callable. */
+  int cltype = ttype(callable);
+  const TValue *oidx;
+  jit_InlineInfo ii;
+  int idx;
+
+  if (cltype != LUA_TFUNCTION) goto fail;
+  if (J->flags & JIT_F_DEBUG) goto fail;  /* DWIM. */
+
+  oidx = hint_get(J, INLINE);  /* INLINE hint = library/function index. */
+  if (!ttisnumber(oidx)) goto fail;
+
+  ii.hidx = (int)nvalue(oidx);
+  idx = JIT_IH_IDX(ii.hidx);
+
+  if (nresults == -2) {  /* Tailcall. */
+    /* Tailcalls from vararg functions don't work with BASE[-1]. */
+    if (J->pt->is_vararg) goto fail;  /* So forget about this rare case. */
+    ii.res = -1;  /* Careful: 2nd result overlaps 1st stack slot. */
+    ii.nresults = -1;
+  } else {
+    ii.res = func;
+    ii.nresults = nresults;
+  }
+  ii.func = func;
+  ii.nargs = nargs;
+  ii.xnargs = ii.xnresults = 1;  /* Default: 1 arg, 1 result. */
+
+  /* Check for the currently supported cases. */
+  switch (JIT_IH_LIB(ii.hidx)) {
+  case JIT_IHLIB_BASE:
+    switch (idx) {
+    case JIT_IH_BASE_PAIRS:
+    case JIT_IH_BASE_IPAIRS:
+      if (nresults == -2) goto fail;  /* Not useful for tailcalls. */
+      ii.xnresults = 3;
+      goto check;
+    }
+    break;
+#ifndef COCO_DISABLE
+  case JIT_IHLIB_COROUTINE:
+    switch (idx) {
+    case JIT_IH_COROUTINE_YIELD:
+      /* Only support common cases: no tailcalls, low number of results. */
+      if (nresults < 0 || nresults > EXTRA_STACK) goto fail;
+      ii.xnargs = ii.xnresults = -1;
+      goto ok;  /* Anything else is ok. */
+    case JIT_IH_COROUTINE_RESUME:
+      /* Only support common cases: no tailcalls, not with 0 args (error). */
+      if (nresults == -2 || nargs == 0) goto fail;
+      ii.xnargs = ii.xnresults = -1;
+      goto ok;  /* Anything else is ok. */
+    }
+    break;
+#endif
+  case JIT_IHLIB_STRING:
+    switch (idx) {
+    case JIT_IH_STRING_LEN:
+      goto check;
+    case JIT_IH_STRING_SUB:
+      if (nargs < 2) goto fail;  /* No support for open calls, too. */
+      goto ok;  /* 2 or more args are ok. */
+    case JIT_IH_STRING_CHAR:
+      goto check;  /* Only single arg supported. */
+    }
+    break;
+  case JIT_IHLIB_TABLE:
+    switch (idx) {
+    case JIT_IH_TABLE_INSERT:
+      ii.xnargs = 2;
+      goto check;  /* Only push (append) supported. */
+    case JIT_IH_TABLE_REMOVE:
+      goto check;  /* Only pop supported. */
+    case JIT_IH_TABLE_GETN:
+      goto check;
+    }
+    break;
+  case JIT_IHLIB_MATH:
+    if (idx >= JIT_IH_MATH__LAST) goto fail;
+    if (idx >= JIT_IH_MATH__21) ii.xnargs = 2;
+    goto check;
+  }
+fail:
+  return cltype;  /* Call could not be inlined. Return type of callable. */
+
+check:
+  if (nargs != ii.xnargs && nargs != -1) goto fail;
+  /* The optimizer already checks the number of results (avoid setnil). */
+
+ok:  /* Whew, all checks done. Go for it! */
+
+  /* Start with the common leadin for inlined calls. */
+  jit_deopt_target(J, nargs);
+  |// Caveat: Must save TOP for open ops if jsub uses DEOPTIMIZE_CALLER.
+  |  isfunction func
+  |  jne L_DEOPTIMIZE			// Not a function? Deoptimize.
+  |  cmp aword BASE[func].value, &clvalue(callable)
+  |  jne L_DEOPTIMIZE			// Wrong closure? Deoptimize.
+  if (nargs == -1 && ii.xnargs >= 0) {
+    |  lea eax, BASE[func+1+ii.xnargs]
+    |  cmp TOP, eax
+    |  jne L_DEOPTIMIZE			// Wrong #args? Deoptimize.
+  }
+
+  /* Now inline the function itself. */
+  switch (JIT_IH_LIB(ii.hidx)) {
+  case JIT_IHLIB_BASE: jit_inline_base(J, &ii); break;
+#ifndef COCO_DISABLE
+  case JIT_IHLIB_COROUTINE: jit_inline_coroutine(J, &ii); break;
+#endif
+  case JIT_IHLIB_STRING: jit_inline_string(J, &ii); break;
+  case JIT_IHLIB_TABLE:  jit_inline_table(J, &ii); break;
+  case JIT_IHLIB_MATH:   jit_inline_math(J, &ii); break;
+  default: jit_assert(0); break;
+  }
+
+  /* And add the common leadout for inlined calls. */
+  if (ii.nresults == -1) {
+    if (ii.xnresults >= 0) {
+      |  lea TOP, BASE[ii.res+ii.xnresults]
+    }
+  } else if (ii.nargs == -1) {  /* Restore L->top only if needed. */
+    |  lea TOP, BASE[J->pt->maxstacksize]
+    |  mov L->top, TOP
+  }
+
+  if (nresults == -2) {  /* Results are in place. Add return for tailcalls. */
+    |  add esp, FRAME_OFFSET
+    |  sub BASE, #BASE
+    |  sub aword L->ci, #CI
+    |  ret
+  }
+
+  return -1;  /* Success, call has been inlined. */
+}
+
+/* ------------------------------------------------------------------------ */
+
+/* Helper function for inlined iterator code. Paraphrased from luaH_next. */
+/* TODO: GCC has trouble optimizing this. */
+static int jit_table_next(lua_State *L, TValue *ra)
+{
+  Table *t = hvalue(&ra[TFOR_TAB]);
+  int i = ra[TFOR_CTL].value.b;  /* Hidden control variable. */
+  for (; i < t->sizearray; i++) {  /* First the array part. */
+    if (!ttisnil(&t->array[i])) {
+      setnvalue(&ra[TFOR_KEY], cast_num(i+1));
+      setobj2s(L, &ra[TFOR_VAL], &t->array[i]);
+      ra[TFOR_CTL].value.b = i+1;
+      return 1;
+    }
+  }
+  for (i -= t->sizearray; i < sizenode(t); i++) {  /* Then the hash part. */
+    if (!ttisnil(gval(gnode(t, i)))) {
+      setobj2s(L, &ra[TFOR_KEY], key2tval(gnode(t, i)));
+      setobj2s(L, &ra[TFOR_VAL], gval(gnode(t, i)));
+      ra[TFOR_CTL].value.b = i+1+t->sizearray;
+      return 1;
+    }
+  }
+  return 0;  /* End of iteration. */
+}
+
+/* Try to inline a TFORLOOP instruction. */
+static int jit_inline_tforloop(jit_State *J, int ra, int nresults, int target)
+{
+  const TValue *oidx = hint_get(J, INLINE);  /* INLINE hint = lib/func idx. */
+  int idx;
+
+  if (!ttisnumber(oidx)) return 0;  /* No hint: don't inline anything. */
+  idx = (int)nvalue(oidx);
+  if (J->flags & JIT_F_DEBUG) return 0;  /* DWIM. */
+
+  switch (idx) {
+  case JIT_IH_MKIDX(JIT_IHLIB_BASE, JIT_IH_BASE_PAIRS):
+    |// The type checks can be omitted -- see the iterator constructor.
+    |  lea TOP, BASE[ra]
+    |  call &jit_table_next, L, TOP
+    |  test eax, eax
+    |  jnz =>target
+    return 1;  /* Success, iterator has been inlined. */
+  case JIT_IH_MKIDX(JIT_IHLIB_BASE, JIT_IH_BASE_IPAIRS):
+    |// The type checks can be omitted -- see the iterator constructor.
+    |  mov eax, BASE[ra+TFOR_CTL].value		// Hidden control variable.
+    |  inc eax
+    |   mov TABLE:edx, BASE[ra+TFOR_TAB].value	// Table object.
+    |  mov BASE[ra+TFOR_CTL].value, eax
+    |  call &luaH_getnum, TABLE:edx, eax
+    |  // This is really copyslot BASE[ra+TFOR_VAL], TVALUE:eax[0] plus compare.
+    |  mov ecx, TVALUE:eax->tt
+    |  test ecx, ecx				// Assumes: LUA_TNIL == 0.
+    |  jz >9					// nil value stops iteration.
+    |   fild dword BASE[ra+TFOR_CTL].value	// Set numeric key.
+    |   settt BASE[ra+TFOR_KEY], LUA_TNUMBER
+    |   fstp qword BASE[ra+TFOR_KEY].value
+    |  mov edx, TVALUE:eax->value
+    |  mov eax, TVALUE:eax->value.na[1]	// Overwrites eax.
+    |  mov BASE[ra+TFOR_VAL].tt, ecx		// Copy value from table slot.
+    |  mov BASE[ra+TFOR_VAL].value, edx
+    |  mov BASE[ra+TFOR_VAL].value.na[1], eax
+    |  jmp =>target
+    |9:
+    return 1;  /* Success, iterator has been inlined. */
+  }
+
+  return 0;  /* No support for inlining any other iterators. */
+}
+
+/* ------------------------------------------------------------------------ */
+

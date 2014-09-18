@@ -1,0 +1,389 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Introducing LuaJIT</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="Author" content="Mike Pall">
+<meta name="Copyright" content="Copyright (C) 2005-2008, Mike Pall">
+<meta name="Language" content="en">
+<link rel="stylesheet" type="text/css" href="bluequad.css" media="screen">
+<link rel="stylesheet" type="text/css" href="bluequad-print.css" media="print">
+</head>
+<body>
+<div id="site">
+<a href="http://luajit.org/"><span>Lua<span id="logo">JIT</span></span></a>
+</div>
+<div id="head">
+<h1>Introducing LuaJIT</h1>
+</div>
+<div id="nav">
+<ul><li>
+<a href="index.html">Index</a>
+</li><li>
+<a href="luajit.html">LuaJIT</a>
+<ul><li>
+<a href="luajit_features.html">Features</a>
+</li><li>
+<a href="luajit_install.html">Installation</a>
+</li><li>
+<a href="luajit_run.html">Running</a>
+</li><li>
+<a href="luajit_api.html">API Extensions</a>
+</li><li>
+<a class="current" href="luajit_intro.html">Introduction</a>
+</li><li>
+<a href="luajit_performance.html">Performance</a>
+</li><li>
+<a href="luajit_debug.html">Debugging</a>
+</li><li>
+<a href="luajit_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="coco.html">Coco</a>
+<ul><li>
+<a href="coco_portability.html">Portability</a>
+</li><li>
+<a href="coco_api.html">API Extensions</a>
+</li><li>
+<a href="coco_changes.html">Changes</a>
+</li></ul>
+</li><li>
+<a href="dynasm.html">DynASM</a>
+<ul><li>
+<a href="dynasm_features.html">Features</a>
+</li><li>
+<a href="dynasm_examples.html">Examples</a>
+</li></ul>
+</li><li>
+<a href="http://luajit.org/download.html">Download <span class="ext">&raquo;</span></a>
+</li></ul>
+</div>
+<div id="main">
+<p>
+This is a little essay that tries to answer the question:
+<em>'So, how does LuaJIT really work?'</em>.
+</p>
+<p>
+I tried to avoid going into all the gory details, but at the
+same time provide a deep enough explanation, to let you find
+your way around LuaJIT's inner workings.
+</p>
+<p>
+The learning curve is maybe a little bit steep for newbies and
+compiler gurus will certainly fall asleep after two paragraphs.
+It's difficult to strike a balance here.
+</p>
+
+<h2>Acronym Soup</h2>
+<p>
+As the name says LuaJIT is a <em>Just-In-Time</em> (JIT) compiler.
+This means that functions are compiled on demand, i.e. when they
+are run first. This ensures both a quick application startup
+and helps to avoid useless work, too. E.g. unused functions
+are not compiled at all.
+</p>
+<p>
+The other alternative is known as <em>Ahead-Of-Time</em> (AOT)
+compilation. Here everything is compiled before running any function.
+This is the classic way for many languages, such as C or C++.
+</p>
+<p>
+In fact plain Lua allows you to pre-compile Lua source code into
+Lua bytecode and store it in a binary file that can be run
+later on. This is used only in specific settings (e.g. memory limited
+embedded systems), because the Lua bytecode compiler is really fast.
+The ability to run source files right away is part of what makes
+a dynamic language (aka scripting language) so powerful.
+</p>
+<p>
+JIT compilation has a few other advantages for dynamic languages
+that AOT compilation can only provide with a massive amount
+of code analysis. More can be found in the literature.
+One particular advantage is explained later.
+</p>
+
+<h2>Quick, JIT &mdash; Run!</h2>
+<p>
+JIT compilation happens mostly invisible. You'll probably never
+notice that a compilation is going on. Part of the secret is
+that everything happens in little pieces intermixed with running
+the application itself inbetween. The other part of the secret
+is that JIT compilation can be made pretty fast.
+</p>
+<p>
+Most applications quickly converge to a stable state where
+everything that really needs to be compiled is compiled
+right away. Only occasional isolated compiles happen later on.
+</p>
+<p>
+Even though the name doesn't suggest it, LuaJIT <em>can</em> operate
+in AOT mode, too. But this is completely under user control
+(see <a href="luajit_api.html#jit_compile"><tt>jit.compile()</tt></a>)
+and doesn't happen automatically.
+</p>
+<p>
+Unless you have good reason to suspect that AOT compilation
+might help for a specific application, I wouldn't bother though.
+Compilation speed is usually a non-argument, because LuaJIT
+is extremely fast. Compilation times are typically in the
+<em>microsecond range</em> for individual Lua functions.
+</p>
+
+<h2>Starting Up</h2>
+<p>
+The next few paragraphs may not be exactly breaking news to you,
+if you are familiar with JIT compilers. Still, please read on,
+because some terms are introduced that are used later on.
+</p>
+<p>
+When you start LuaJIT everything proceeds like in standard Lua:
+the Lua core is initialized, the standard libraries are loaded and
+the command line is analyzed. Then usually the first Lua source
+code file is loaded and is translated to Lua bytecode. And finally
+the function for the initial main chunk is run ...
+</p>
+
+<h2>Kicking the Compiler</h2>
+<p>
+This is where LuaJIT kicks in:
+</p>
+<p>
+All Lua functions carry an additional <em>status code</em> for LuaJIT.
+Initially this is set to 'NONE', i.e. the function has not been
+looked at (yet). If a function is run with this setting,
+the LuaJIT <em>compiler pipeline</em> is started up.
+</p>
+<p>
+If you haven't loaded any special LuaJIT modules and optimization
+is not turned on, the compiler pipeline only consists of the
+<em>compiler backend</em>.
+</p>
+<p>
+The compiler backend is the low-level encoding engine that translates
+bytecode instructions to machine code instructions. Without any
+further hints from other modules, the backend more or less does a
+1:1 translation. I.e. a single variant of a bytecode instruction
+corresponds to a single piece of machine code.
+</p>
+<p>
+If all goes well, these little code pieces are put together,
+a function prologue is slapped on and voila: your Lua function
+has been translated to machine code. Of course things are not
+that simple when you look closer, but hey &mdash; this is
+the theory.
+</p>
+<p>
+Anyway, the status code for the function is set to 'OK' and the
+machine code is run. If this function runs another Lua function
+which has not been compiled, that one is compiled, too. And so on.
+</p>
+
+<h2>Call Gates</h2>
+<p>
+Ok, so what happens when a function is called repeatedly? After all
+this is the most common case.
+</p>
+<p>
+Simple: The status code is checked again. This time it's set to 'OK',
+so the machine code can be run directly. Well &mdash; that's not the
+whole truth: for calls that originate in a JIT compiled function
+a better mechanism, tentatively named <em>call gates</em> is used.
+</p>
+<p>
+Every function has a call gate field (a function pointer). By default
+it's set to a function that does the above checks and runs the
+compiler. But as soon as a function is compiled, the call gate
+is modified to point to the just compiled machine code.
+</p>
+<p>
+Calling a function is then as easy as calling the code that the
+call gate points to. But due to special (faster) calling conventions
+this function pointer cannot be used directly from C. So calls from
+a non-compiled function or from a C&nbsp;function use an extra entry
+call gate which in turn calls the real call gate. But this is
+really a non-issue since most calls in typical applications
+are intra-JIT calls.
+</p>
+
+<h2>The Compiler Pipeline</h2>
+<p>
+The compiler pipeline has already been mentioned. This sounds
+more complicated than it is. Basically this is a coroutine that
+runs a <em>frontend</em> function which in turn calls all functions
+from the <em>pipeline table</em>.
+</p>
+<p>
+The pipeline table is sorted by <em>priorities</em>. The standard
+backend has priority 0. Positive priorities are run before the
+backend and negative priorities are run after the backend. Modules
+can dynamically attach or detach themselves to the pipeline with
+the library function <tt>jit.attach()</tt>.
+</p>
+<p>
+So a typical optimizer pass better have a positive priority,
+because it needs to be run before the backend is run. E.g. the
+LuaJIT optimizer module registers itself with priority 50.
+</p>
+<p>
+On the other hand a typical helper module for debugging &mdash;
+a machine code disassembler &mdash; needs to be run after the
+backend and is attached with a negative priority.
+</p>
+<p>
+One special case occurs when compilation fails. This can be due to
+an internal error (ouch) or on purpose. E.g. the optimizer module
+checks some characteristics of the function to be compiled and
+may decide that it's just not worth it. In this case a status
+other than OK is passed back to the pipeline frontend.
+</p>
+<p>
+The easiest thing would be to abort pipeline processing and just
+give up. But this would remove the ability to trace the progress
+of the compiler (which better include failed compilations, too).
+So there is a special rule that odd priorities are still run,
+but even priorities are not. That's why e.g. <tt>-j trace</tt>
+registers itself with priority -99.
+</p>
+
+<h2>The Optimizer</h2>
+<p>
+Maybe it hasn't become clear from the above description,
+but a module can attach any Lua or C&nbsp;function to the compiler
+pipeline. In fact all of the loadable modules are Lua modules.
+Only the backend itself is written in C.
+</p>
+<p>
+So, yes &mdash; the LuaJIT optimizer is written in pure Lua!
+</p>
+<p>
+And no, don't worry, it's quite fast. One reason for this is
+that a very simple <em>abstract interpretation</em> algorithm
+is used. It mostly ignores control flow and/or basic block
+boundaries.
+</p>
+<p>
+Thus the results of the analysis are really only <em>hints</em>.
+The backend <em>must</em> check the preconditions (the contracts)
+for these hints (e.g. the object type). Still, the generated
+hints are pretty accurate and quite useful to speed up the
+compiled code (see below).
+</p>
+<p>
+Explaining how abstract interpretation works is not within the
+scope for this short essay. You may want to have  a look at the
+optimizer source code and/or read some articles or books on
+this topic. The canonical reference is
+<a href="http://www2.imm.dtu.dk/~riis/PPA/ppa.html"><span class="ext">&raquo;</span>&nbsp;Principles of Program Analysis</a>.
+Ok, so this one is a bit more on the theoretical side (a gross
+understatement). Try a search engine with the keywords "abstract
+interpretation", too.
+</p>
+<p>
+Suffice to say the optimizer generates hints and passes these
+on to the backend. The backend then decides to encode different
+forms for the same bytecode instruction, to combine several
+instructions or to inline code for C&nbsp;functions. If the hints
+from the optimizer are good, the resulting code will perform
+better because shorter code paths are used for the typical cases.
+</p>
+
+<h2>The JIT Advantage</h2>
+<p>
+One important feature of the optimizer is that it takes 'live'
+function arguments into account. Since the JIT compiler is
+called just before the function is run, the arguments for this
+first invocation are already present. This can be used to great
+advantage in a <em>dynamically typed language</em>, such as Lua.
+</p>
+<p>
+Here's a trivial example:
+</p>
+<pre>
+function foo(t, k)
+  return t[k]
+end
+</pre>
+<p>
+Without knowing the most likely arguments for the function
+there's not much to optimize.
+</p>
+<p>
+Ok, so 't' is most likely a table. But it could be userdata, too.
+In fact it could be any type since the introduction of generic
+metatables for types.
+</p>
+<p>
+And more importantly 'k' can be a number, a string
+or any other type. Oh and let's not forget about metamethods ...
+</p>
+<p>
+If you know a bit about Lua internals, it should be clear by now
+that the code for this function could potentially branch to half
+of the Lua core. And it's of course impossible to inline all
+these cases.
+</p>
+<p>
+On the other hand if it's <em>known</em> (or there's a good hint)
+that 't' is a table and that 'k' is a positive integer, then there
+is a high likeliness that the key 'k' is in the array part
+of the table. This lookup can be done with just a few machine code
+instructions.
+</p>
+<p>
+Of course the preconditions for this fast path have to be checked
+(unless there are definitive hints). But if the hints are right,
+the code runs a lot faster (about a factor of 3 in this case
+for the pure table lookup).
+</p>
+
+<h2>Optimizing the Optimizer</h2>
+<p>
+A question that surely popped up in your mind while reading
+the above section: does the optimizer optimize itself? I.e.
+is the optimizer module compiled?
+</p>
+<p>
+The current answer is no. Mainly because the compiler pipeline
+is single-threaded only. It's locked during compilation and
+any parallel attempt to JIT compile a function results in
+a 'DELAYED' status code. In fact all modules that attach to
+the compiler pipeline disable compilation for the entire
+module (because LuaJIT would do that anyway). The main chunk
+of modules loaded with <tt>require()</tt> is never compiled,
+so there is no chicken-and-egg problem here.
+</p>
+<p>
+Of course you could do an AOT compilation in the main chunk of
+the optimizer module. But then only with the plain backend.
+Recompiling it later on with the optimizer attached doesn't work,
+because a function cannot be compiled twice (I plan to lift
+this restriction).
+</p>
+<p>
+The other question is whether it pays off to compile the optimizer
+at all? Honestly, I haven't tried, because the current optimizer
+is really simple. It runs very quickly, even under the bytecode
+interpreter.
+</p>
+
+<h2>That's All Folks</h2>
+<p>
+Ok, that's all for now. I'll extend this text later on with
+new topics that come up in questions. Keep on asking these
+on the mailing list if you are interested.
+</p>
+<p>
+Thank you for your attention!
+</p>
+<br class="flush">
+</div>
+<div id="foot">
+<hr class="hide">
+Copyright &copy; 2005-2008 Mike Pall
+<span class="noprint">
+&middot;
+<a href="contact.html">Contact</a>
+</span>
+</div>
+</body>
+</html>
