@@ -1,3 +1,0 @@
-Commit:
-1) Uploaded source
-2) Changed to VS2008 version from RedPython's repo
