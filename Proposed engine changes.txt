@@ -51,6 +51,8 @@ SDK
 4) 'Undo' function that doesn't take minutes to do and actually works
    properly.
 5) Better performance
+6) "Render" / "ingame" like editor. Not WYSIWYG, but for example, having proper
+   lighting settings which are configurable from a weather editor in-editor.
 
 Weapon related changes
 1) Add ability to give weapons like the Abakan the ability to specify a fire
@@ -74,3 +76,5 @@ Weapon related changes
     takes up the screen with a texture underlay of the crosshair)
 14) Allow new types of weapon upgrades like artifact augmentation
 15) Ironsight zoom in/out sounds - *
+16) Add a quick-grenade slot (can also be done currently, but imho also wiser to hardcode)
+17) Animations for attaching weapon attachements (opinions on this may differ, but it's nice to have?)
