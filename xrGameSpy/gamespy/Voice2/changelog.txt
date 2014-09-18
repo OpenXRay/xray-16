@@ -1,0 +1,105 @@
+Changelog for: GameSpy Voice SDK 2
+--------------------------------------------------------
+
+DATE        VERSION  BY   TYPE     DESCRIPTION
+----------  -------  ---  -------  ---------------------------------------------------------
+12-12-2007  2.08.00  RMV  RELEASE  Released to Developer Site
+12-12-2007  2.07.04  SAH  FIX      Fixed OSX to use mute bool in playing packets
+12-11-2007  2.07.03  SN   FIX      Fixed floating point precision for sample app
+                     SN   FIX      Cleaned up some compiler errors for PS2 support
+12-07-2007  2.07.02  SAH  OTHER    Fixed all VC6 projects to use Speex 1.0.5
+12-04-2007  2.07.01  SN   FIX      Removed some test code from PS3 headset listing function
+                     SN   FIX      Commented out SPURS define from Voice2Test for PS3 PPU testing
+11-27-2007  2.07.01  SAH  CLEANUP  Moved extern "c" block below includes to prevent linker errors
+11-08-2007  2.07.00  SN   FEATURE  Added initial SPU speex support for the PS3
+08-22-2007  2.06.01  SN   FIX      Fixed support for 16Khz audio on the PS3
+                     SN   FIX      Cleaned up some code for VS2005
+08-20-2007  2.06.00  SN   FEATURE  Added support for 16Khz audio on the PC
+08-06-2007  2.05.00  RMV  RELEASE  Released to Developer Site
+06-20-2007  2.04.00  SN   FEATURE  Added support for PS3 USB Headsets.  
+                     SN   FEATURE  Used speex as a codec for PS3 USB Headsets for now
+                     SN   FEATURE  Using speex 1.2 beta1
+                     SN   FEATURE  Usung GSM 1.0.12 for platforms using GSM codec
+06-20-2007  2.03.01  DES  FEATURE  Speex is now more compatible with other sample rates
+12-15-2006  2.03.00  MJW  RELEASE  Released to Developer Site
+12-13-2006  2.02.14  MJW  FIX      Fixed VC7 projects
+10-05-2006  2.02.13  SAH  FIX      Updated MacOSX Makefile
+08-02-2006  2.02.12  SAH  RELEASE  Releasing to developer site
+07-24-2006  2.02.12  SAH  FIX      Added new NatNeg files to Voice2 MFC app to fix compilation error
+07-06-2006  2.02.11  SAH  FIX      Fixed PSP project file to not explicitly include the PSP linker file
+                     SAH  FIX      Added PSP solution along with project file
+05-31-2006  2.02.10  SAH  RELEASE  Releasing to developer site
+05-20-2006  2.02.09  SAH  FIX      Added GSI_UNUSED calls to Voice2Test, fixed PSP warning levels
+05-15-2006  2.02.08  SAH  FIX      Added "PS3 Release" configuration to project
+04-25-2006  2.02.07  SAH  RELEASE  Releasing to developer site
+04-24-2006  2.02.07  SAH  FIX      Got rid of unnecessary source files in Voice2Test project
+04-20-2006  2.02.06  SAH  FIX      Added a missing ')' in ps2Headset
+04-18-2006  2.02.05  SAH  FIX      Added || defined(_PS3) in voice2Test.c for PS3 support
+04-13-2006  2.02.04  DES  FEATURE  PSP and GSM support
+                     DES  RELEASE  Limited developer release
+03-21-2006  2.01.03  DES  FIX      Unicode support
+                     DES  RELEASE  Limited developer release
+03-16-2006  2.01.02  DES  FIX      Fixed OSX when using a device with more than one channel.
+                     DES  FEATURE  Added channel API.
+                     DES  RELEASE  Limited developer release
+03-15-2006  2.01.01  DES  FEATURE  OSX volume is now controlled in software by default.
+                     DES  FIX      No longer hangs when trying to stop a closed iSight
+                     DES  FIX      Detects when an OSX USB device is unplugged
+03-14-2006  2.01.00  DES  RELEASE  Limited developer release
+03-14-2006  2.01.00  DES  FIX      Moved OSX encoding and decoding out of the IOProc functions.
+                     DES  FEATURE  Added raw codec for getting unencoded audio
+                     DES  OTHER    Changed decodeCallback to decodeAddCallback and decodeSetCallback.
+01-27-2006  2.00.25  SN   RELEASE  Releasing to developer site
+12-22-2005  2.00.25  SN   OTHER    Cleaned up projects and added missing common code if needed
+11-14-2005  2.00.24  DES  FIX      Updated OSX support.
+11-11-2005  2.00.23  DES  CLEANUP  Updated dsp projects to use Speex 1.0.5
+09-21-2005  2.00.22  DES  FEATURE  Changed DirectSound include from mmreg.h to mmsystem.h
+                     DES  FEATURE  Voice2Test is now setup to work with Speex 1.0.5
+07-28-2005  2.00.21  SN   RELEASE  Releasing to developer site.
+07-18-2005  2.00.21  DES  FIX      gvGetCustomPlaybackAudio no longer always returns true.
+                     DES  FIX      Custom playback devices were trying to write too much audio data.
+06-03-2005  2.00.20  SN   RELEASE  Releasing to developer site.
+06-03-2005  2.00.20  SN   FIX      Fix support for old and new eyetoy library.
+05-04-2005  2.00.19  SN   OTHER    Created Visual Studio .NET project
+04-28-2005  2.00.19  SN   RELEASE  Releasing to developer site.
+04-25-2005  2.00.18  DES  CLEANUP  Disable Win32 linker warning.
+                     DES  FEATURE  Updated to use Speex 1.0.4.
+04-04-2005  2.00.17  SN   RELEASE  Releasing to developer site.
+03-18-2005  2.00.17  DES  FIX      Added coded to ensure that DirectSound always pairs calls
+                                   to init and cleanup COM.
+01-27-2005  2.00.16  DES  FIX      Removed GV_CUSTOM_SOURCE_TYPE define from Voice2Test.c
+01-19-2005  2.00.15  DES  FIX      Fixed bug when checking GVI_DYNAMICALLY_ALLOCATE_FRAMES.
+10-04-2004  2.00.14  DES  FEATURE  Completed OSX hardware support.
+                     DES  FIX      Packet capturing code no longer assumes voice pointer is valid.
+                     DES  FIX      Fixed voice2test endian issues.
+                     DES  FIX      Voice2test no longer assume a capture device was found.
+09-16-2004  2.00.13  SN   RELEASE  Releasing to developer site.
+09-02-2004  2.00.13  DES  FEATURE  Added initial OSX hardware support (not complete yet)
+                     DES  CLEANUP  Moved code for managing device lists into gvDevice.c/h
+08-27-2004  2.00.12  DES  CLEANUP  Fixed warnings under OSX (no harware support yet)
+                     DES  FIX      voice2bench will now use Speex on all non-ps2 systems
+                     DES  CLEANUP  Updated Win32 project configurations
+                     DES  FEATURE  Added OSX Makefiles
+                     DES  FIX      Typo in the CORE_INPUT_L  CORE0_INPUT_L define.
+08-10-2004  2.00.11  DES  FIX      An lgAud device can now only be used once at a time.
+08-05-2004  2.00.10  SN   RELEASE  Releasing to developer site.
+08-05-2004  2.00.10  SN   FIX      Fixed missing prototype warning for codwarrior
+08-04-2004  2.00.09  DES  FIX      gvGetDeviceVolume was using the wrong formula for getting
+                                   the volume from DirectSound devices.
+08-03-2004  2.00.08  DES  FEATURE  Now differentiates between lgAud device types.
+                                   Possible types are headset, microphone, and speakers.
+07-23-2004  2.00.07  SN   FIX      Updated code with explicit casts to remove implicit cast error 
+                                   when compiling at highest level and warnings treated as errors.
+07-22-2004  2.00.06  DES  FIX      Fixed eyetoy device bit
+                          FEATURE  Voice2Test now shows what types are being
+                                   used for created devices.
+07-14-2004  2.00.05  DES  FEATURE  Added GVHardwareType for checking a device's hardware type
+                          FEATURE  SPU2 playback support for PS2.
+                          CLEANUP  Split PS2 devices into seperate files.
+06-29-2004  2.00.04  SN   FIX      Changed the ouput path for the object files
+06-29-2004  2.00.03  BED  RELEASE  Releasing to developer site (Beta)
+06-28-2004  2.00.03  DES  FEATURE  Setup lgVid to use the GSI memory functions.
+06-23-2004  2.00.02  BED  FIX      Removed gvSpeex files from PS2 builds
+06-22-2004  2.00.01  DES  FEATURE  Added support for the PS2 EyeToy as an audio capture device.
+06-08-2004  2.00.00  DES  RELEASE  Limited developer release
+06-04-2004  2.00.00  DES  OTHER    Changelog started

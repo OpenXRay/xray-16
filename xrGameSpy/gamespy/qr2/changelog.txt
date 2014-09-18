@@ -1,0 +1,155 @@
+Changelog for: GameSpy Query & Reporting 2 SDK
+--------------------------------------------------------
+
+DATE        VERSION  BY   TYPE     DESCRIPTION
+----------  -------  ---  -------  ---------------------------------------------------------
+12-12-2007  3.04.00  RMV  RELEASE  Released to Developer Site
+12-12-2007  3.03.07  DES  FIX      No longer overwrites the availability check if not needed.
+12-10-2007  3.03.06  SAH  OTHER    Updated Nitro project, fixed up compilation errors in sample
+12-07-2007  3.03.05  SN   FIX      Modified sample to use AppDebug
+12-07-2007  3.03.05  SAH  OTHER    Added NatNeg to VC6 project to remove compiler error
+11-19-2007  3.03.04  SAH  FIX      Changed qr2_shutdown, it now frees the negotiate list for ACE
+11-05-2007  3.03.03  DES  FEATURE  Added clientconnected callback (ACE functionality)
+08-28-2007  3.03.02  SAH  FIX      Removed qr2_parse_queryW, it was incorrectly trying to convert to UTF8
+08-22-2007  3.03.01  RMV  OTHER    Added Unicode configurations to qr2csample projects
+                                   Modified qr2csample.c to make it more thorough and developer friendly (and added ReadMe)
+08-06-2007  3.03.00  RMV  RELEASE  Released to Developer Site
+07-10-2007  3.02.03  RMV  OTHER    Raised qr2csample Project warning levels (to 4) and fixed compiler warnings
+01-25-2007  3.02.02  SAH  FIX      Added COUNTRY_KEY and REGION_KEY to reserved keys list
+            3.02.02  SAH  FIX      Added internal function for SB to check if a key is a Query-Master-Only key
+01-16-2007  3.02.01  DES  FEATURE  Added X360 support
+12-15-2006  3.02.00  MJW  RELEASE  Released to Developer Site
+11-10-2006  3.01.34  JR   RELEASE  Limited release
+10-23-2006  3.01.34  DES  RELEASE  Limited release
+10-10-2006  3.01.34  DES  FEATURE  Added ability to call qr2_register_keyA/W directly
+10-05-2006  3.01.33  SAH  FIX      Updated MacOSX Makefile
+10-05-2006  3.01.32  DES  FIX      Changed method of incrementing progress->mCurKeyType to work with VS2K5
+09-28-2006  3.01.31  SAH  FIX      Fixed PS3 project to work with PS3 095.00x SDK; changed included libaries in linker input.
+08-22-2006  3.01.30  SAH  FIX      Removed static caching of local ips - fixes bug where DCHP allocates a new ip between games
+08-02-2006  3.01.29  SAH  RELEASE  Releasing to developer site
+07-31-2006  3.01.29  SAH  FIX      Fixed PS3 project file - added post-build step to create *.SELF for execution
+07-25-2006  3.01.28  SAH  FIX      Fixed NITRO project, include for crt0.o now above others so it add correct file
+07-24-2006  3.01.27  SAH  FIX      Removed #ifdef _PS3 for socket calls (changed platformSocket.h to typecast calls)
+07-06-2006  3.01.26  SAH  FIX      Fixed PSP project file to not explicitly include the PSP linker file
+07-06-2006  3.01.25  SAH  FIX      Fixed Linux makefile to work with pthreads (http asynch DNS lookups)
+                     SAH  FIX      Fixed NITRO project & linker command file (to work with CW 2.0/NitroSDK 3.1)
+06-09-2006  3.01.24  MJ   FEATURE  Added NN_GROUP_ID_KEY for new nat negotiation SDK
+06-06-2006  3.01.23  SAH  FIX      moved the (len<4) check for ip-verify queries into the IF block
+05-31-2006  3.01.22  SAH  RELEASE  Releasing to developer site
+		     SAH  FIX	   Fixed Linux makefile
+05-30-2006  3.01.20  SAH  FIX      Fixed PS3 projects to work with PS3(084_001 SDK)
+05-25-2006  3.01.19  SAH  FIX      Moved GSI_UNUSED in qr2csample
+		     SAH  FIX      Changed PSP project warning levels
+05-24-2006  3.01.18  SAH  FIX      redid previous change, added necessary #ifdefs
+05-23-2006  3.01.17  SAH  FIX      Added gsSetDebug for PS3, and GSI_UNUSED statements to qr2csample.c
+05-19-2006  3.01.16  SAH  FIX      Added gsTestMain.c to nitro CodeWarrior project
+05-15-2006  3.01.15  SAH  FIX      Added "PS3 Release" configuration to project
+04-25-2006  3.01.14  SAH  RELEASE  Releasing to developer site
+04-24-2006  3.01.14  SAH  FIX      Fixed Nitro project files to work on build machine
+04-20-2006  3.01.13  SAH  FIX      Commented out unnecessary variables
+04-20-2006  3.01.12  SAH  FIX      Added _PS3 wrapper typecast for recvfrom calls
+04-18-2006  3.01.11  SAH  FIX      Added || defined(_PS3) to qr2csample.c for PS3 support
+01-27-2006  3.01.10  SN   RELEASE  Releasing to developer site
+12-28-2005  3.01.10  SN   FIX      Modified test application to use new memory manager code
+12-22-2005  3.01.09  SN   OTHER    Cleaned up project file and added missing common code files
+11-15-2005  3.01.08  DES  FIX      Updated DS support.
+11-14-2005  3.01.07  DES  FIX      Updated OSX support.
+                     DES  FEATURE  Added GSI_DOMAIN_NAME support.
+10-24-2005  3.01.06  SN   FIX      Fixed timer on keep alives causing them to be sent after every heartbeat
+10-12-2005  3.01.06  BED  RELEASE  Releasing to developer site.
+10-11-2005  3.01.05  BED  FEATURE  Added query challege/response to prevent ip spoofing.
+09-21-2005  3.01.04  DES  FEATURE  Updated DS support
+08-18-2005  3.01.03  BED  CLEANUP  Updated LINUX makefile for new common code and Fedora-Redhat
+07-28-2005  3.01.02  SN   RELEASE  Releasing to developer site.
+07-28-2005  3.01.02  SN   FIX      fixed code causing warning in qr2csample
+06-03-2005  3.01.01  SN   RELEASE  Releasing to developer site.
+05-05-2005  3.01.01  BED  FIX      Updated file pathes to use new common folder
+05-04-2005  3.01.00  SN   OTHER    Created Visual Studio .NET project
+04-29-2005  3.01.00  BED  FEATURE  Added support for multi-packet qr2 responses. (Full keys direct only)
+                     BED  FIX      Individual response packets are limited to 1400 bytes (reasonable udp size)
+                     BED  FIX      Heartbeats now truncated to server keys only when larger than 1400 bytes.
+04-28-2005  3.00.45  SN   RELEASE  Releasing to developer site.
+04-27-2005  3.00.45  DES  RELEASE  Limited release to Nintendo DS developers.
+04-25-2005  3.00.45  DES  CLEANUP  Minor debug logging cleanup.
+04-04-2005  3.00.44  SN   RELEASE  Releasing to developer site.
+03-14-2005  3.00.44  DES  FEATURE  Nintendo DS support
+01-27-2005  3.00.43  DES  FIX      Fixed custom SN sendto and moved it to nonport
+09-28-2004  3.00.42  DES  FIX      Cleaned up an unused var warning when GSI_MEM_MANAGED was off.
+09-23-2004  3.00.41  DES  FIX      Fixed source control issues with qr2.dsw and qr2csample.dsp.
+09-16-2004  3.00.40  SN   RELEASE  Releasing to developer site.
+09-03-2003  3.00.40  BED  FEATURE  Added support for GSI_COMMON_DEBUG and GSI_MEM_MANAGED modes.
+08-27-2004  3.00.39  DES  CLEANUP  Removed MacOS style includes
+                     DES  CLEANUP  Fixed warnings under OSX
+                     DES  CLEANUP  Updated Win32 project configurations
+                     DES  CLEANUP  General Unicode cleanup
+                     DES  FEATURE  Added OSX Makefile
+08-25-2004  3.00.38  DES  FEATURE  Added OSX makefile
+08-05-2004  3.00.37  SN   RELEASE  Releasing to developer site.
+07-19-2004  3.00.37  SN   FIX      Updated code with explicit casts to remove implicit cast error 
+                                   when compiling at highest level and warnings treated as errors.							
+07-15-2004  3.00.36  BED  FIX      Now must manually call qr2_internal_key_list_free when using GSI_UNICODE
+06-18-2004  3.00.35  BED  FIX      Removed confusing key name from sample.
+                     BED  FIX      Added some comments to sample, cleaned up Unicode support in sample.
+06-18-2004  3.00.34  BED  RELEASE  Releasing to developer site.
+                     BED  FIX      Fixed bug with handling of "No Challenge" error
+                     BED  FEATURE  Added #defines to simulate hard and soft firewalls
+11-10-2003  3.00.33  DES  RELEASE  Releasing to developer site.
+11-07-2003  3.00.33  DES  FIX      Updated the linux makefile.
+10-27-2003  3.00.32  BED  FEATURE  Added CodeWarrior Unicode switch for PS2.
+10-24-2003  3.00.31  BED  FEATURE  SendStateChanged() will now be queued instead of dropped when sent too soon.
+10-24-2003  3.00.30  BED  FIX      Sample file updated, missing from last release due to directory mismatch
+                     BED  FIX      Removed misc warnings
+10-22-2003  3.00.29  BED  RELEASE  Releasing to developer site.  (UNIQUE NICK AND UNICODE SUPPORT)
+10-22-2003  3.00.28  BED  FIX      Removed some compiler warnings on strict setting.
+09-09-2003  3.00.27  BED  FEATURE  Added UTF-8 wrapper -- define GSI_UNICODE
+                          OTHER    Added stringutil.c and stringutil.h to sample project files
+08-25-2003  3.00.26  DES  FIX      Updated to be compatible with new public IP and port encoding.
+08-18-2003  3.00.25  DES  FEATURE  Added a callback for getting your public reporting address.
+07-24-2003  3.00.24  DES  RELEASE  Releasing to developer site.
+07-21-2003  3.00.24  BED  FIX      Moved VisualStudio workspace into appropriate directory.
+07-18-2003  3.00.23  BED  FEATURE  Added CodeWarrior (PS2) sample project file.
+                     BED  CLEANUP  General cleanup to remove CodeWarrior warnings.
+07-17-2003  3.00.22  DES  CLEANUP  Cleaned up the PS2 Makefile, it now uses Makefile.commmon.
+07-16-2003  3.00.21  DES  FIX      Changed a __mips64 check to a _PS2 check.
+                     BED  FEATURE  Added ProDG sample project files.
+06-11-2003  3.00.20  DES  RELEASE  Releasing to developer site.
+05-09-2003  3.00.20  DES  CLEANUP  Removed Dreamcast support.
+                          FIX      Metrowerks for Win32 is no longer falsely identified as MacOS.
+05-07-2003  3.00.19  DES  RELEASE  Releasing to developer site.
+05-06-2003  3.00.19  DES  FIX      Old style replies were not correctly handling callbacks that didn't add a value.
+04-07-2003  3.00.18  DES  FIX      Fixed the PID__KEY define (changed to 27 from 26).
+03-11-2003  3.00.17  DES  OTHER    Split socket creation into a seperate internal function, needed for Peer.
+02-28-2003  3.00.16  DES  RELEASE  Releasing to developer site.
+02-27-2003  3.00.16  DES  FIX      If not using NULL as the qr2_t parameter, qr2_shutdown() would access
+                                   the structure after it was freed.
+02-05-2003  3.00.15  DES  RELEASE  Releasing to developer site.
+02-05-2003  3.00.15  DES  CLEANUP  Switched to use CanReceiveOnSocket instead of select.
+02-04-2003  3.00.14  DES  RELEASE  Relasing to developer site.
+02-04-2003  3.00.14  DDW  FIX      Added an extra \ to the "final" key in the GOA-style reply to fix illegal format
+01-31-2003  3.00.13  DES  FEATURE  Added a check which adds an empty string to the buffer if nothing was added in
+                                   a call to the server_key_callback, player_key_callback, or team_key_callback.
+                                   Apps no longer need to handle the case of an unrecognized key.
+01-20-2003  3.00.12  DES  OTHER    Changed to use new <gamename>.master.gamespy.com master server naming convention.
+01-16-2003  3.00.11  JED  OTHER    renamed a static var in qr2.c that was causing linker name conflicts in GS Arcade
+01-06-2003  3.00.10  DES  OTHER    Moved a few things from qr2.c to qr2.h for CDKey SDK integration.
+12-19-2002  3.00.09  DES  RELEASE  Releasing to developer site.
+12-19-2002  3.00.09  DES  CLEANUP  Removed assert.h include.
+12-16-2002  3.00.08  DES  FEATURE  Added a check to prevent statechanges from being sent too frequently.
+                                   This is to help alleviate the problem of servers that flood our master server.
+12-13-2002  3.00.07  DES  FEATURE  Added PS2 eenet stack support.
+12-11-2002  3.00.06  DES  CLEANUP  Changed from using gethostname to getlocalhost for getting local IPs.
+12-06-2002  3.00.05  DES  RELEASE  Releasing to developer site.
+12-06-2002  3.00.05  DDW  FIX      Added new heartbeat type so that if restarting a crashed server
+                                   the nochallenge error will not be triggered.
+12-03-2002  3.00.04  DES  RELEASE  Releasing to developer site.
+12-03-2002  3.00.04  DES  FEATURE  Added a Linux Makefile.
+11-22-2002  3.00.03  DES  RELEASE  Releasing to developer site.
+11-20-2002  3.00.03  DES  FIX      Only call SocketShutDown if we called SocketStartup.
+11-20-2002  3.00.02  DES  FEATURE  Added support for compiling on the PS2.
+09-26-2002  3.00.01  DES  RELEASE  Limited release on developer site
+09-25-2002  3.00.01  DDW  OTHER    Changelog started
+09-23-2002  3.00.01  DDW  RELEASE  Release to EAPAC for Generals (Peer)
+09-18-2002  3.00.01  DDW  RELEASE  Release to EAPAC for Generals
+09-18-2002  3.00.01  DDW  FEATURE  Added 20-sec keep-alive packets
+09-06-2002  3.00.00  DDW  RELEASE  Release to EAPAC for Generals
+

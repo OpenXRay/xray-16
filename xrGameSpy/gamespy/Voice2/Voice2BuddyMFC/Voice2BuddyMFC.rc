@@ -1,0 +1,300 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\Voice2BuddyMFC.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\Voice2BuddyMFC.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 235, 55
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About Voice2BuddyMFC"
+FONT 8, "MS Sans Serif"
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "Voice2BuddyMFC Version 1.0",IDC_STATIC,40,10,119,8,
+                    SS_NOPREFIX
+    LTEXT           "Copyright (C) 2004",IDC_STATIC,40,25,119,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,14,WS_GROUP
+END
+
+IDD_VOICE2BUDDYMFC_DIALOG DIALOGEX 0, 0, 150, 126
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Voice2 Buddy MFC"
+FONT 8, "MS Sans Serif"
+BEGIN
+    PUSHBUTTON      "Exit",IDCANCEL,7,105,50,14
+    PUSHBUTTON      "Setup",ID_SETUP,7,78,50,14,WS_DISABLED
+    PUSHBUTTON      "Voice Chat",ID_VOICECHAT,7,59,50,14,WS_DISABLED
+    LISTBOX         IDC_BUDDYLIST,64,7,79,112,LBS_SORT | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | 
+                    WS_TABSTOP
+    LTEXT           "Select a buddy to chat with --->",IDC_STATIC,7,7,50,46
+END
+
+IDD_LOGIN DIALOG DISCARDABLE  0, 0, 143, 95
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Login"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,75,74,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,18,74,50,14
+    EDITTEXT        IDC_EMAIL,48,7,88,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_NICKNAME,48,28,88,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASSWORD,48,49,88,14,ES_PASSWORD | ES_AUTOHSCROLL
+    RTEXT           "Email:",IDC_STATIC,7,7,36,14,SS_CENTERIMAGE
+    RTEXT           "Nickname:",IDC_STATIC,7,28,36,14,SS_CENTERIMAGE
+    RTEXT           "Password:",IDC_STATIC,7,49,36,14,SS_CENTERIMAGE
+END
+
+IDD_SESSION DIALOG DISCARDABLE  0, 0, 121, 79
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Session"
+FONT 8, "MS Sans Serif"
+BEGIN
+    PUSHBUTTON      "Exit",IDCANCEL,35,58,50,14
+    CTEXT           "",IDC_DISPLAYTEXT,7,7,107,23
+    CONTROL         146,IDC_SPEAKING1,"Static",SS_BITMAP | SS_SUNKEN | NOT 
+                    WS_VISIBLE,25,36,28,14
+    CONTROL         134,IDC_SPEAKING2,"Static",SS_BITMAP | SS_SUNKEN | NOT 
+                    WS_VISIBLE,68,36,28,14
+END
+
+IDD_SETUPDIALOG DIALOG DISCARDABLE  0, 0, 197, 207
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Voice Setup"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,73,186,50,14
+    COMBOBOX        IDC_PLAYBACKCOMBO,43,82,136,105,CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_CAPTURECOMBO,43,116,136,96,CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Capture Device:",IDC_STATIC,43,103,98,12
+    LTEXT           "Playback Device:",IDC_STATIC,43,68,117,12
+    CONTROL         136,IDC_SPEAKERBITMAP,"Static",SS_BITMAP,13,74,21,20
+    CONTROL         135,IDC_MICROPHONEBITMAP,"Static",SS_BITMAP,13,106,21,20
+    GROUPBOX        "",IDC_STATIC,7,58,183,82,BS_CENTER
+    CONTROL         "Slider1",IDC_ACTIVATELEVEL,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,48,146,105,12
+    CONTROL         "Progress1",IDC_VOICELEVEL,"msctls_progress32",WS_BORDER,
+                    51,160,97,11
+    GROUPBOX        "",IDC_STATIC,7,138,183,40
+    LTEXT           "Activate",IDC_STATIC,155,147,27,10
+    LTEXT           "Volume",IDC_STATIC,155,161,27,10
+    CONTROL         146,IDC_ISSPEAKING,"Static",SS_BITMAP,16,153,27,12
+    CONTROL         142,IDC_STATIC,"Static",SS_BITMAP | SS_SUNKEN,7,7,185,52
+END
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "\0"
+            VALUE "FileDescription", "Voice2BuddyMFC MFC Application\0"
+            VALUE "FileVersion", "1, 0, 0, 1\0"
+            VALUE "InternalName", "Voice2BuddyMFC\0"
+            VALUE "LegalCopyright", "Copyright (C) 2004\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "Voice2BuddyMFC.EXE\0"
+            VALUE "ProductName", "Voice2BuddyMFC Application\0"
+            VALUE "ProductVersion", "1, 0, 0, 1\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_VOICE2BUDDYMFC_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 143
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 119
+    END
+
+    IDD_LOGIN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 136
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 88
+    END
+
+    IDD_SESSION, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 114
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 72
+    END
+
+    IDD_SETUPDIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 190
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 200
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_SPEAKER             BITMAP  DISCARDABLE     "res\\microsoft-speaker.bmp"
+IDB_MICROPHONE          BITMAP  DISCARDABLE     "res\\microsoft-microphone.bmp"
+IDB_GAMESPYLOGO         BITMAP  DISCARDABLE     "res\\logo270x83.bmp"
+IDB_SPEAKING            BITMAP  DISCARDABLE     "res\\speaking.bmp"
+IDB_GAMESPYLOGO1        BITMAP  DISCARDABLE     "res\\gamespyl.bmp"
+IDB_SPEAKING2           BITMAP  DISCARDABLE     "res\\speaking2.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_ABOUTBOX            "&About Voice2BuddyMFC..."
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\Voice2BuddyMFC.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

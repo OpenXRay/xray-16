@@ -1,0 +1,85 @@
+Microsoft Developer Studio Workspace File, Format Version 6.00
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
+
+###############################################################################
+
+Project: "CdkeyGen"=.\CdkeyGen\CdkeyGen.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    $/Gamespy/GOA/gcdkey/CdkeyGen
+    .\cdkeygen
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "ClientTest"=.\ClientTest\ClientTest.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    $/Gamespy/GOA/gcdkey/ClientTest
+    .\ClientTest
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "ServerTest"=.\ServerTest\ServerTest.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    $/Gamespy/GOA/gcdkey/ServerTest
+    .\ServerTest
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "ServerTestQR2"=.\ServerTestQR2\ServerTestQR2.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    $/Gamespy/GOA/gcdkey/ServerTestQR2
+    .\ServerTestQR2
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gcdkey", JIGAAAAA
+    .
+    end source code control
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+

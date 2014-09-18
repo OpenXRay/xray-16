@@ -1,0 +1,33 @@
+# OSX Common Makefile
+# Copyright 2006 GameSpy Industries
+
+CC=cc
+BASE_CFLAGS=$(DEFINES) $(INCLUDES) -I../ -I../..
+
+unicode: UNICODE_CFLAGS = -DGSI_UNICODE -fshort-wchar
+
+CFLAGS=$(BASE_CFLAGS) $(UNICODE_CFLAGS) -D_MACOSX -DGSI_COMMON_DEBUG -D_NO_NOPORT_H_ -g -O0 -Wall -Werror
+
+#optimization flags
+#CFLAGS=$(BASE_CFLAGS) $(UNICODE_CFLAGS) -O6 -ffast-math -funroll-loops \
+	-fomit-frame-pointer -fexpensive-optimizations -lpthreads
+
+#############################################################################
+# SETUP AND BUILD
+#############################################################################
+
+$(PROJECT): $(PROG_OBJS)
+	$(CC) $(CFLAGS) -o $@ $(PROG_OBJS) $(LIBS)
+
+#############################################################################
+# MISC
+#############################################################################
+
+unicode: $(PROJECT)
+
+clean:	
+	rm -f $(PROG_OBJS)
+
+depend:
+	$(CC) -MM $(PROG_OBJS:.o=.c)
+

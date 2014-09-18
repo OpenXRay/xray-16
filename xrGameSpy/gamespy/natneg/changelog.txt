@@ -1,0 +1,111 @@
+Changelog for: GameSpy NAT Negotiation SDK
+--------------------------------------------------------
+
+DATE        VERSION  BY   TYPE     DESCRIPTION
+----------  -------  ---  -------  ---------------------------------------------------------
+12-12-2007  2.03.01  DES  FEATURE  Support for match queuing
+12-12-2007  2.03.00  RMV  RELEASE  Released to Developer Site
+08-06-2007  2.02.00  RMV  RELEASE  Released to Developer Site
+07-10-2007  2.01.03  RMV  OTHER    Raised test Project warning levels (to 4) and fixed compiler warnings
+06-13-2007  2.01.02  SAH  FIX      Fixed a bug where a fast report return could cancel NN prior to completion
+05-16-2007  2.01.01  DES  FIX      Replaced two while(1) statements
+12-15-2006  2.01.00  MJW  RELEASE  Released to Developer Site
+12-13-2006  2.00.09  SN   FIX      Named a union to get rid of a warning
+11-13-2006  2.00.08  SAH  FIX      Fixed a bug where negotiateSock was never closed, even when using a gamesocket
+10-05-2006  2.00.07  SAH  FIX      Updated MacOSX Makefile
+09-28-2006  2.00.06  SAH  FIX      Fixed PS3 project to work with PS3 095.00x SDK; changed included libaries in linker input.
+08-24-2006  2.00.05  SAH  FIX      Fixed VC7 Project file; removed ';' after PRE_ALIGN call in simpletest to get rid of compiler warning
+08-18-2006  2.00.04  SN   FIX      Renamed a parameter of the OutputMapping function due to standard c++ lib conflict
+08-02-2006  2.00.03  SAH  RELEASE  Releasing to developer site
+07-31-2006  2.00.03  SAH  FIX      Fixed PS3 project file - added post-build step to create *.SELF for execution
+                     SAH  FIX      Fixed Linux makefile
+07-25-2006  2.00.02  SAH  FIX      Fixed NITRO project, include for crt0.o now above others so it add correct file
+                     SAH  FIX      Fixed some implicit typecasts and unused variables
+                     SAH  FIX      Changed all instances of BOOL to gsi_bool, FALSE to gsi_false, TRUE to gsi_true
+                     SAH  FIX      Made some functions static, or included prototypes to get rid of compiler warnings
+                     SAH  FIX      Fixed PS3, PSP, PS2 projects to include Natify.c,h
+07-24-2006  2.00.01  SAH  FIX      Removed #ifdef _PS3 for socket calls (changed platformSocket.h to typecast calls)
+07-21-2006  2.00.00  BMS  FEATURE  New version 3 of the NN protocol - SDK is now version 2
+07-06-2006  1.00.45  SAH  FIX      Fixed PSP project file to not explicitly include the PSP linker file
+06-30-2006  1.00.44  SAH  FIX      Fixed NITRO project & linker command file (to work with CW 2.0/NitroSDK 3.1)
+                     SAH  FIX      Fixed Linux makefile
+05-31-2006  1.00.43  SAH  RELEASE  Releasing to developer site
+		     SAH  FIX	   Fixed Linux makefile
+05-30-2006  1.00.42  SAH  FIX      Fixed PS3 projects to work with PS3(084_001 SDK)
+				   Added PRE_ALIGN, POST_ALIGN for mem_managed to simpletest
+05-25-2006  1.00.41  SAH  FIX      Changed PSP project warning levels
+05-22-2006  1.00.40  SAH  FIX      Changed ESTRING to unsigned int to remove warnings
+05-19-2006  1.00.39  SAH  FIX      Added gsTestMain.c to nitro CodeWarrior project
+05-15-2006  1.00.38  SAH  FIX      Added "PS3 Release" configuration to project
+05-09-2006  1.00.37  SN   FIX      Changed the output statements in simple to be more descriptive
+04-25-2006  1.00.36  SAH  RELEASE  Releasing to developer site
+04-24-2006  1.00.36  SAH  FIX      Fixed Nitro Project files to work on build machine
+04-20-2006  1.00.35  SAH  FIX      Moved GSI_UNUSED call above return statement
+04-20-2006  1.00.34  SAH  FIX      Added _PS3 wrapper typecast for socket calls
+02-13-2006  1.00.33  DDW  FIX      Fixed crash when NN DNS address fails to resolve
+01-27-2006  1.00.32  SN   RELEASE  Releasing to developer site
+01-27-2006  1.00.32  SN   OTHER    Added psp prodg project and solution to sgv
+12-22-2005  1.00.32  SN   OTHER    Cleaned up project and added any missing code common code 
+11-17-2005  1.00.31  DES  FIX      Added error check to simpletest.
+                     DES  FIX      Updated Nitro Makefile.
+11-14-2005  1.00.30  DES  FIX      Updated the OSX Makefile.
+                     DES  FEATURE  Added GSI_DOMAIN_NAME support.
+11-09-2005  1.00.29  BED  FEATURE  Added PS3 makefile for simpletest.
+10-07-2005  1.00.28  DES  FEATURE  Reduced number of retries, so failures timeout sooner.
+                     DES  FEATURE  Added packet types for address check feature.
+09-25-2005  1.00.27  DES  FEATURE  Updated DS support
+                     DES  FIX      Don't send additional ping packets if not needed
+                     DES  FEATURE  Added game-specific DNS
+07-28-2005  1.00.26  SN   RELEASE  Releasing to developer site.
+07-15-2005  1.00.26  SN   FIX      Fixed included file for availability check
+06-03-2005  1.00.25  SN   RELEASE  Releasing to developer site.
+05-04-2005  1.00.25  SN   OTHER    Created Visual Studio .NET project
+04-28-2005  1.00.25  SN   RELEASE  Releasing to developer site.
+04-27-2005  1.00.25  DES  RELEASE  Limited release to Nintendo DS developers.
+04-25-2005  1.00.25  DES  CLEANUP  Replaced old DP() code with debug logging.
+04-04-2005  1.00.24  SN   RELEASE  Releasing to developer site.
+03-14-2005  1.00.24  DES  FEATURE  Nintendo DS support
+01-27-2003  1.00.23  DES  FIX      Fixed custom SN sendto and moved it to nonport
+09-16-2004  1.00.22  SN   RELEASE  Releasing to developer site.
+08-27-2004  1.00.22  DES  CLEANUP  Fixed warnings under OSX
+                     DES  CLEANUP  Removed #pragma comment for linking with winsock (in nonport now)
+                     DES  CLEANUP  Updated Win32 project configurations
+08-25-2004  1.00.21  DES  FEATURE  Added OSX makefile
+08-05-2004  1.00.20  SN   FIX      Releasing to developer site.
+07-19-2004  1.00.20  SN	  FIX      Updated code with explicit casts to remove implicit cast error 
+                                   when compiling at highest level and warnings treated as errors.
+06-18-2004  1.00.19  BED  RELEASE  Releasing to developer site.
+06-17-2004  1.00.19  BED  FEATURE  Added PS2 Insock (LibNet) support
+11-10-2003  1.00.18  DES  RELEASE  Releasing to developer site.
+11-07-2003  1.00.18  DES  FIX      Updated the linux and PS2 makefiles.
+11-04-2003  1.00.17  DES  FEATURE  Added availability check code.
+10-30-2003  1.00.16  DES  FEATURE  Pass the gamename to the backend when connecting or searching.
+07-24-2003  1.00.15  DES  RELEASE  Releasing to developer site.
+07-18-2003  1.00.15  BED  FEATURE  Added CodeWarrior (PS2) sample project file.
+                     BED  CLEANUP  General cleanup to remove CodeWarrior warnings.
+07-17-2003  1.00.14  DES  CLEANUP  Cleaned up the PS2 Makefile, it now uses Makefile.commmon.
+07-16-2003  1.00.13  BED  FIX      Added #ifndef to avoid #pragma that PS2 doesn't understand
+                     DES  FIX      Changed a few __mips64 checks to _PS2 checks.
+                     BED  FEATURE  Added ProDG sample project files.
+05-09-2003  1.00.12  DES  CLEANUP  Removed Dreamcast support.
+04-21-2003  1.00.11  DES  FIX      Changed WSAGetLastError call in a DP macro to GOAGetLastError.
+04-07-2003  1.00.10  DES  FIX      Fixed byte alignment issues with InitPacket.
+                          RELEASE  Releasing to developer site.
+03-26-2003  1.00.09  DES  RELEASE  Releasing to developer site.
+03-24-2003  1.00.09  DES  OTHER    Changed interal IP code to use the common code's IsPrivateIP.
+03-21-2003  1.00.08  DDW  FEATURE  Added support for reporting "internal" address to allow for
+                                   negotiation of two users behind the same NAT.
+                                   Added NNFreeNegotiateList function to free all memory once done.
+03-17-2003  1.00.07  DES  FIX      Added extern "C" to natneg.h for when compiling with C++.
+02-05-2003  1.00.06  DES  RELEASE  Releasing to developer site.
+02-05-2003  1.00.06  DES  CLEANUP  Switched to use the common code CanReceiveOnSocket and CanSendOnSocket.
+12-19-2002  1.00.05  DES  RELEASE  Releasing to developer site.
+12-16-2002  1.00.05  DES  CLEANUP  Removed calls to GOAClearSocketError.
+12-13-2002  1.00.04  DES  FEATURE  Added PS2 eenet stack support.
+12-03-2002  1.00.03  DES  RELEASE  Releasing to developer site.
+12-03-2002  1.00.03  DES  FEATURE  Added a Linux Makefile.
+11-22-2002  1.00.02  DES  RELEASE  Releasing to developer site.
+11-21-2002  1.00.02  DES  FIX      Hardcoded packet struct sizes to get around PS2/compiler packing bug.
+11-20-2002  1.00.01  DES  FEATURE  Added support for compiling on the PS2.
+09-26-2002  1.00.00  DES  RELEASE  Limited release on developer site
+09-25-2002  1.00.00  DDW  OTHER    Changelog started

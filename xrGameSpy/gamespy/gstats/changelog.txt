@@ -1,0 +1,102 @@
+Changelog for: GameSpy Stats & Tracking / Persistent Storage SDK
+--------------------------------------------------------
+
+DATE        VERSION  BY   TYPE     DESCRIPTION
+----------  -------  ---  -------  ---------------------------------------------------------
+12-12-2007  1.19.00  RMV  RELEASE  Released to Developer Site
+12-10-2007  1.18.02  RMV  OTHER    Created VS2005 projects for persisttest and gstats
+12-07-2007  1.18.01  SAH  OTHER    Fixed projects that were missing dependencies
+08-06-2007  1.18.00  RMV  RELEASE  Released to Developer Site
+12-15-2006  1.17.00  MJW  RELEASE  Released to Developer Site
+10-05-2006  1.16.43  SAH  FIX      Updated MacOSX Makefile
+09-28-2006  1.16.42  SAH  FIX      Fixed PS3 project to work with PS3 095.00x SDK; changed included libaries in linker input.
+08-24-2006  1.16.41  SAH  FIX      Fixed VC7 project file
+08-23-2006  1.16.40  SAH  FIX      Added a fix for len == -1 in RecvSessionKey function.
+08-02-2006  1.16.39  SAH  RELEASE  Releasing to developer site
+07-31-2006  1.16.38  SAH  FIX      Fixed PS3 project file - added post-build step to create *.SELF for execution
+07-25-2006  1.16.37  SAH  FIX      Fixed NITRO project, include for crt0.o now above others so it add correct file
+07-06-2006  1.16.36  SAH  FIX      Fixed PSP project file to not explicitly include the PSP linker file
+06-30-2006  1.16.35  SAH  FIX      Fixed NITRO projects & linker command files (to work with CW 2.0/NitroSDK 3.1)
+                     SAH  FIX      Fixed Linux makefiles
+05-31-2006  1.16.34  SAH  RELEASE  Releasing to developer site
+05-30-2006  1.16.33  SAH  FIX      Fixed PS3 projects to work with PS3(084_001 SDK)
+05-25-2006  1.16.32  SAH  FIX      Changed PSP project warning levels
+05-19-2006  1.16.31  SAH  FIX      Added gsTestMain.c to nitro CodeWarrior project
+05-15-2006  1.16.30  SAH  FIX      Added "PS3 Release" configuration(s) to project
+05-11-2006  1.16.29  SN   FIX      Modified the update game message to include the connid so that games aren't discarded when a disconnect occurs
+04-25-2006  1.16.28  SAH  RELEASE  Releasing to developer site
+04-24-2006  1.16.28  SAH  FIX      Fixed Nitro project files to work on build machine
+04-20-2006  1.16.27  SAH  FIX      Removed unused variables, moved GSI_UNUSED above return calls
+01-27-2006  1.16.26  SN   RELEASE  Releasing to developer site
+01-27-2006  1.16.26  SN   FIX      Added PSP to test_main define in statstest
+                     SN   OTHER    Added psp prodg project and solution to sgv for statstest
+01-27-2006  1.16.25  SN   FIX      Added PSP to test_main define in persisttest
+                     SN   OTHER    Added psp prodg project and solution to sgv for persisttest
+12-19-2005  1.16.24  SN   OTHER    Cleaned up projects, adding any missing common code.  
+                                   Replaced gstats project with statstest in its subdirectory
+11-17-2005  1.16.23  DES  FIX      Updated Nitro Makefile.
+11-14-2005  1.16.22  DES  FIX      Updated the OSX Makefiles.
+                     DES  FEATURE  Added GSI_DOMAIN_NAME support.
+09-23-2005  1.16.21  DES  FEATURE  Updated DS support
+07-28-2005  1.16.20  SN   RELEASE  Releasing to developer site.
+07-28-2005  1.16.20  SN   FIX      fixed PS2 projects to use new common code
+06-03-2005  1.16.19  SN   RELEASE  Releasing to developer site.
+05-05-2005  1.16.19  BED  FIX      Updated project files to use new common folder.
+05-03-2005  1.16.18  SN   FIX      Removed deprecated MFC code for Visual Studio .NET projects
+                     SN   OTHER    Created Visual Studio .NET projects
+04-28-2005  1.16.17  SN   RELEASE  Releasing to developer site.
+04-27-2005  1.16.17  DES  RELEASE  Limited release to Nintendo DS developers.
+04-27-2005  1.16.17  DES  FIX      Changed the default connect timeout to 20 seconds for the DS.
+                     DES  FIX      Added extra printfs to statstest.
+04-25-2005  1.16.16  DES  FIX      Check for socket error when receiving the challenge.
+                     DES  CLEANUP  Removed printf()s from gstats.c
+04-04-2005  1.16.15  SN   RELEASE  Releasing to developer site.
+04-03-2005  1.16.15  SN   FIX      Added a StatsThink function due to socket api buffer clogging
+03-25-2005  1.16.14  SN   FIX      Fixed bug to clean g_statsgame when FreeGame was called with local statsgame_t and both were the same object.
+03-16-2005  1.16.13  SN   FIX      Fixed PS2 bug not being able to print hex chars correctly.
+03-14-2005  1.16.13  DES  FEATURE  Nintendo DS support
+12-28-2004  1.16.12  SN   FIX      Added const qualifiers to unmodified formal function parameters
+09-16-2004  1.16.11  SN   RELEASE  Releasing to developer site.
+09-16-2004  1.16.11  SN   FIX      Renamed a global variable to avoid MacOS X naming confliction
+09-09-2004  1.16.10  BED  FEATURE  Added InitStatsAsync and InitStatsThink.
+08-27-2004  1.16.09  DES  CLEANUP  Removed MacOS style includes
+                     DES  CLEANUP  Updated Win32 project configurations
+                     DES  CLEANUP  General Unicode cleanup
+                     DES  CLEANUP  Fixed warnings under OSX
+                     DES  CLEANUP  Updated OSX Makefile
+08-05-2004  1.16.08  BED  RELEASE  Releasing to developer site.
+08-05-2004  1.16.08  BED  FIX      Updated samples to use GT2 instead of legacy GT1 SDK
+07-20-2004  1.16.07  SN   FIX      Updated code with explicit casts to remove implicit cast error 
+                                   when compiling at highest level and warnings treated as errors.
+07-20-2004  1.16.06  BED  FEATURE  Added Remote Auth hooks
+06-18-2004  1.16.05  BED  RELEASE  Releasing to developer site.
+                          FEATURE  Added PS2 Insock support
+11-10-2003  1.16.04  DES  RELEASE  Releasing to developer site.
+11-07-2003  1.16.04  BED  FIX      Removed CodeWarrior strictest warnings.
+11-07-2003  1.16.03  DES  FIX      Updated the linux and PS2 makefiles.
+11-04-2003  1.16.02  DES  FEATURE  Added availability check code.
+10-30-2003  1.16.01  DES  FIX      Updated gp_stats to work with the latest versions of GP and stats.
+10-21-2003  1.16.00  BED  RELEASE  Releasing to developer site.  (UNIQUE NICK AND UNICODE SUPPORT)
+10-01-2003  1.16.00  DDW  FEATURE  Added modified time checking/reporting to persistent storage
+                                   NOTE: Persistent Storage callbacks modified w/ additional parameter
+                                   Prepend hostname with gamename for unique DNS names							
+09-08-2003  1.15.11  BED  FEATURE  Added UTF-8 wrapper for UNICODE support.
+07-24-2003  1.15.10  DES  RELEASE  Releasing to developer site.
+07-18-2003  1.15.10  BED  FEATURE  Added CodeWarrior (PS2) sample project file.
+                     BED  CLEANUP  General cleanup to remove CodeWarrior warnings.
+07-17-2003  1.15.09  DES  CLEANUP  Cleaned up the PS2 Makefiles, they now use Makefile.commmon.
+07-14-2003  1.15.08  DES  FIX      ALLOW_DISK is now undef'd whenever NOFILE is defined.
+                          FIX      Changed __mips64 check to _PS2 check.
+                          CLEANUP  No need to make remove() an empty define on systems with NOFILE defined.
+                     BED  FEATURE  Added ProDG sample project files to gstats and persistest
+07-03-2003  1.15.07  BED  FIX      Added gtUtility.c to the ladderTrack sample.
+05-09-2003  1.15.06  DES  CLEANUP  Removed Dreamcast support.
+                          FIX      Metrowerks for Win32 is no longer falsely identified as MacOS.
+03-03-2003  1.15.05  DES  CLEANUP  General cleanup to remove warnings.
+12-19-2002  1.15.04  DES  RELEASE  Releasing to developer site.
+12-19-2002  1.15.04  DES  CLEANUP  Removed assert.h include.
+12-13-2002  1.15.03  DES  FEATURE  Added PS2 eenet stack support.
+11-22-2002  1.15.02  DES  RELEASE  Releasing to developer site.
+11-20-2002  1.15.02  DES  CLEANUP  Cleaned up to remove PS2 compiler warnings.
+11-15-2002  1.15.01  DES  CLEANUP  Updated persisttest PS2 Makefile
+09-25-2002  1.15.00  DDW  OTHER    Changelog started

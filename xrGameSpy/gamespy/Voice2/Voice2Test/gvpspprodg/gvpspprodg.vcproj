@@ -1,0 +1,780 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="gvpspprodg"
+	ProjectGUID="{B42F2BB1-779C-461A-84C7-3CFDFF181113}"
+	RootNamespace="gvpspprodg"
+	SccProjectName="SAK"
+	SccAuxPath="SAK"
+	SccLocalPath="SAK"
+	SccProvider="SAK"
+	>
+	<Platforms>
+		<Platform
+			Name="Win32"
+		/>
+	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
+	<Configurations>
+		<Configuration
+			Name="PSP Debug|Win32"
+			OutputDirectory="PSP_Debug"
+			IntermediateDirectory="PSP_Debug"
+			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			DeleteExtensionsOnClean="*.obj;*.d;*.map;*.lst;*.pch;*.prx;$(TargetPath)"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="-g -O0"
+				AdditionalIncludeDirectories="&quot;..\..\gsm-1.0-pl12\inc&quot;;&quot;$(SCE_PSP_HW_ROOT)include&quot;"
+				PreprocessorDefinitions="SN_TARGET_PSP_PRX;_DEBUG;_PSP;UNIQUEID;GSI_COMMON_DEBUG;GV_CUSTOM_SOURCE_TYPE=SOCKADDR_IN;LTP_CUT"
+				PrecompiledHeaderFile=""
+				ProgramDataBaseFileName=""
+				WarningLevel="4"
+				WarnAsError="false"
+				CompileAs="0"
+				ForcedIncludeFiles=""
+				ForcedUsingFiles=""
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="-g"
+				AdditionalDependencies="crt0_prx.o pspnet_stub_weak.a pspnet_inet_stub_weak.a pspnet_apctl_stub_weak.a; pspnet_ap_dialog_dummy_stub_weak.a rtc_stub.a utility_stub.a wlan_stub.a pspnet_resolver_stub_weak.a libwave.a audio_stub_02.a"
+				OutputFile="$(OutDir)/tempprx.obj"
+				AdditionalLibraryDirectories=""
+				IgnoreAllDefaultLibraries="false"
+				ProgramDatabaseFile=""
+				ImportLibrary=""
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				Description="Generating Debug PRX &quot;$(TargetDir)$(ProjectName).prx&quot;"
+				CommandLine="pspprxgen &quot;$(TargetPath)&quot; -r &quot;$(TargetDir)$(ProjectName).prx&quot;"
+			/>
+		</Configuration>
+		<Configuration
+			Name="PSP Release|Win32"
+			OutputDirectory="PSP_Release"
+			IntermediateDirectory="PSP_Release"
+			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			DeleteExtensionsOnClean="*.obj;*.d;*.map;*.lst;*.pch;*.prx;$(TargetPath)"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="-O3"
+				AdditionalIncludeDirectories="&quot;C:\gamespy\GOA\Voice2\gsm-1.0-pl11\inc&quot;;&quot;$(SCE_PSP_HW_ROOT)include&quot;"
+				PreprocessorDefinitions="SN_TARGET_PSP_PRX;_DEBUG;_PSP;UNIQUEID;GSI_COMMON_DEBUG;GV_CUSTOM_SOURCE_TYPE=SOCKADDR_IN;LTP_CUT"
+				ProgramDataBaseFileName=""
+				WarningLevel="4"
+				WarnAsError="true"
+				CompileAs="0"
+				ForcedIncludeFiles=""
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="-Wl,-S -Wl,-Map,&quot;$(OutDir)/$(ProjectName).map&quot; -Wl,-sn-full-map"
+				AdditionalDependencies="crt0_prx.o pspnet_stub_weak.a pspnet_inet_stub_weak.a pspnet_apctl_stub_weak.a; pspnet_ap_dialog_dummy_stub_weak.a rtc_stub.a utility_stub.a wlan_stub.a pspnet_resolver_stub_weak.a libwave.a audio_stub_02.a"
+				OutputFile="$(OutDir)/tempprx.obj"
+				AdditionalLibraryDirectories=""
+				IgnoreAllDefaultLibraries="false"
+				ProgramDatabaseFile=""
+				MapFileName=""
+				ImportLibrary=""
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				Description="Generating Release PRX &quot;$(TargetDir)$(ProjectName).prx&quot;"
+				CommandLine="pspprxgen &quot;$(TargetPath)&quot; -o &quot;$(TargetDir)$(ProjectName).prx&quot;"
+			/>
+		</Configuration>
+		<Configuration
+			Name="PSP Debug Opt|Win32"
+			OutputDirectory="PSP_DebugOpt"
+			IntermediateDirectory="PSP_DebugOpt"
+			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			DeleteExtensionsOnClean="*.obj;*.d;*.map;*.lst;*.pch;*.prx;$(TargetPath)"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="-g -O3 -G0"
+				AdditionalIncludeDirectories="&quot;..\..\gsm-1.0-pl12\inc&quot;;&quot;$(SCE_PSP_HW_ROOT)include&quot;"
+				PreprocessorDefinitions="SN_TARGET_PSP_PRX;_DEBUG;_PSP;UNIQUEID;GSI_COMMON_DEBUG;GV_CUSTOM_SOURCE_TYPE=SOCKADDR_IN;LTP_CUT"
+				ProgramDataBaseFileName=""
+				WarningLevel="4"
+				CompileAs="0"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="-G0 -g"
+				AdditionalDependencies="crt0_prx.o pspnet_stub_weak.a pspnet_inet_stub_weak.a pspnet_apctl_stub_weak.a; pspnet_ap_dialog_dummy_stub_weak.a rtc_stub.a utility_stub.a wlan_stub.a pspnet_resolver_stub_weak.a libwave.a audio_stub_02.a"
+				OutputFile="$(OutDir)/tempprx.obj"
+				AdditionalLibraryDirectories=""
+				ProgramDatabaseFile=""
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				Description="Generating Debug PRX &quot;$(TargetDir)$(ProjectName).prx&quot;"
+				CommandLine="pspprxgen &quot;$(TargetPath)&quot; -r &quot;$(TargetDir)$(ProjectName).prx&quot;"
+			/>
+		</Configuration>
+	</Configurations>
+	<References>
+	</References>
+	<Files>
+		<Filter
+			Name="Source Files"
+			Filter="cpp;c;cxx;cc;s;asm"
+			>
+			<File
+				RelativePath="..\Voice2Test.c"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp"
+			>
+		</Filter>
+		<Filter
+			Name="Voice2SDK"
+			>
+			<File
+				RelativePath="..\..\gv.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gvCodec.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gvCodec.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gvCustomDevice.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gvCustomDevice.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gvDevice.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gvDevice.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gvFrame.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gvFrame.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gvGSM.c"
+				>
+				<FileConfiguration
+					Name="PSP Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gvGSM.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gvMain.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gvMain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gvPSPAudio.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gvPSPAudio.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gvSource.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gvSource.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gvUtil.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gvUtil.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="GsCommon"
+			>
+			<File
+				RelativePath="..\..\..\darray.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\darray.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\gsAssert.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\gsAssert.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\gsCommon.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\gsDebug.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\gsDebug.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\gsMemory.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\gsMemory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\gsPlatform.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\gsPlatform.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\gsPlatformSocket.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\gsPlatformSocket.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\gsPlatformUtil.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\gsPlatformUtil.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\gsStringUtil.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\gsStringUtil.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\common\psp\pspcommon.c"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="GSM"
+			>
+			<File
+				RelativePath="..\..\gsm-1.0-pl12\src\add.c"
+				>
+				<FileConfiguration
+					Name="PSP Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O0 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PSP Debug Opt|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O3 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gsm-1.0-pl12\src\code.c"
+				>
+				<FileConfiguration
+					Name="PSP Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O0 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PSP Debug Opt|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O3 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gsm-1.0-pl12\src\debug.c"
+				>
+				<FileConfiguration
+					Name="PSP Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O0 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PSP Debug Opt|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O3 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gsm-1.0-pl12\src\decode.c"
+				>
+				<FileConfiguration
+					Name="PSP Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O0 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PSP Debug Opt|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O3 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gsm-1.0-pl12\src\gsm_create.c"
+				>
+				<FileConfiguration
+					Name="PSP Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O0 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PSP Debug Opt|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O3 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gsm-1.0-pl12\src\gsm_decode.c"
+				>
+				<FileConfiguration
+					Name="PSP Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O0 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PSP Debug Opt|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O3 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gsm-1.0-pl12\src\gsm_destroy.c"
+				>
+				<FileConfiguration
+					Name="PSP Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O0 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PSP Debug Opt|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O3 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gsm-1.0-pl12\src\gsm_encode.c"
+				>
+				<FileConfiguration
+					Name="PSP Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O0 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PSP Debug Opt|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O3 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gsm-1.0-pl12\src\gsm_option.c"
+				>
+				<FileConfiguration
+					Name="PSP Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O0 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PSP Debug Opt|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O3 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gsm-1.0-pl12\src\long_term.c"
+				>
+				<FileConfiguration
+					Name="PSP Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O0 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PSP Debug Opt|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O3 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gsm-1.0-pl12\src\lpc.c"
+				>
+				<FileConfiguration
+					Name="PSP Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O0 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PSP Debug Opt|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O3 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gsm-1.0-pl12\src\preprocess.c"
+				>
+				<FileConfiguration
+					Name="PSP Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O0 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PSP Debug Opt|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O3 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gsm-1.0-pl12\src\rpe.c"
+				>
+				<FileConfiguration
+					Name="PSP Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O0 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PSP Debug Opt|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O3 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gsm-1.0-pl12\src\short_term.c"
+				>
+				<FileConfiguration
+					Name="PSP Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O0 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PSP Debug Opt|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O3 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\gsm-1.0-pl12\src\table.c"
+				>
+				<FileConfiguration
+					Name="PSP Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O0 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PSP Debug Opt|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="-g -O3 -Xdiag=0"
+						PrecompiledHeaderFile=""
+					/>
+				</FileConfiguration>
+			</File>
+		</Filter>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>
