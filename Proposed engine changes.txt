@@ -2,6 +2,7 @@ Feel free to add to this list anything that comes to mind that would be
 related to modifying the COP source.
 If you've implemented a given feature already by experimenting on the CS
 source, put a * next to it.
+Note: Source for COP released! Will update this with source asap.
 
 1) Convert to 64-bit (to allow more than 4gb RAM to be used)
 2) Multi-thread the engine for up to 4 cores
