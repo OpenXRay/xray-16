@@ -1,0 +1,43 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sakeps2prodg", "sakeps2prodg.vcproj", "{190F63A1-557A-4CAF-B92F-0C98884B422B}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 2
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://tfsapp1:8080/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = sakeps2prodg.vcproj
+		SccLocalPath1 = .
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		PS2 EE Debug|Win32 = PS2 EE Debug|Win32
+		PS2 EE Release|Win32 = PS2 EE Release|Win32
+		PS2_INET_Debug|Win32 = PS2_INET_Debug|Win32
+		PS2_INET_Release|Win32 = PS2_INET_Release|Win32
+		PS2_SNSystems_Debug|Win32 = PS2_SNSystems_Debug|Win32
+		PS2_SNSystems_Release|Win32 = PS2_SNSystems_Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{190F63A1-557A-4CAF-B92F-0C98884B422B}.PS2 EE Debug|Win32.ActiveCfg = PS2 EE Debug|Win32
+		{190F63A1-557A-4CAF-B92F-0C98884B422B}.PS2 EE Debug|Win32.Build.0 = PS2 EE Debug|Win32
+		{190F63A1-557A-4CAF-B92F-0C98884B422B}.PS2 EE Release|Win32.ActiveCfg = PS2 EE Release|Win32
+		{190F63A1-557A-4CAF-B92F-0C98884B422B}.PS2 EE Release|Win32.Build.0 = PS2 EE Release|Win32
+		{190F63A1-557A-4CAF-B92F-0C98884B422B}.PS2_INET_Debug|Win32.ActiveCfg = PS2_INET_Debug|Win32
+		{190F63A1-557A-4CAF-B92F-0C98884B422B}.PS2_INET_Debug|Win32.Build.0 = PS2_INET_Debug|Win32
+		{190F63A1-557A-4CAF-B92F-0C98884B422B}.PS2_INET_Release|Win32.ActiveCfg = PS2_INET_Release|Win32
+		{190F63A1-557A-4CAF-B92F-0C98884B422B}.PS2_INET_Release|Win32.Build.0 = PS2_INET_Release|Win32
+		{190F63A1-557A-4CAF-B92F-0C98884B422B}.PS2_SNSystems_Debug|Win32.ActiveCfg = PS2_SNSystems_Debug|Win32
+		{190F63A1-557A-4CAF-B92F-0C98884B422B}.PS2_SNSystems_Debug|Win32.Build.0 = PS2_SNSystems_Debug|Win32
+		{190F63A1-557A-4CAF-B92F-0C98884B422B}.PS2_SNSystems_Release|Win32.ActiveCfg = PS2_SNSystems_Release|Win32
+		{190F63A1-557A-4CAF-B92F-0C98884B422B}.PS2_SNSystems_Release|Win32.Build.0 = PS2_SNSystems_Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sbx360", "sbx360.vcproj", "{5916E6A7-E04A-4AF1-8203-6A1E199E02FA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Xbox 360 = Debug|Xbox 360
+		Profile_FastCap|Xbox 360 = Profile_FastCap|Xbox 360
+		Profile|Xbox 360 = Profile|Xbox 360
+		Release_LTCG|Xbox 360 = Release_LTCG|Xbox 360
+		Release|Xbox 360 = Release|Xbox 360
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5916E6A7-E04A-4AF1-8203-6A1E199E02FA}.Debug|Xbox 360.ActiveCfg = Debug|Xbox 360
+		{5916E6A7-E04A-4AF1-8203-6A1E199E02FA}.Debug|Xbox 360.Build.0 = Debug|Xbox 360
+		{5916E6A7-E04A-4AF1-8203-6A1E199E02FA}.Profile_FastCap|Xbox 360.ActiveCfg = Profile_FastCap|Xbox 360
+		{5916E6A7-E04A-4AF1-8203-6A1E199E02FA}.Profile_FastCap|Xbox 360.Build.0 = Profile_FastCap|Xbox 360
+		{5916E6A7-E04A-4AF1-8203-6A1E199E02FA}.Profile|Xbox 360.ActiveCfg = Profile|Xbox 360
+		{5916E6A7-E04A-4AF1-8203-6A1E199E02FA}.Profile|Xbox 360.Build.0 = Profile|Xbox 360
+		{5916E6A7-E04A-4AF1-8203-6A1E199E02FA}.Release_LTCG|Xbox 360.ActiveCfg = Release_LTCG|Xbox 360
+		{5916E6A7-E04A-4AF1-8203-6A1E199E02FA}.Release_LTCG|Xbox 360.Build.0 = Release_LTCG|Xbox 360
+		{5916E6A7-E04A-4AF1-8203-6A1E199E02FA}.Release|Xbox 360.ActiveCfg = Release|Xbox 360
+		{5916E6A7-E04A-4AF1-8203-6A1E199E02FA}.Release|Xbox 360.Build.0 = Release|Xbox 360
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

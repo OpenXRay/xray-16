@@ -1,0 +1,43 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "peerps2prodg", "peerps2prodg.vcproj", "{3FA7F00E-E8CC-4A64-9E29-40BCD5AFCAF5}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 2
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://tfsapp1:8080/
+		SccProjectUniqueName0 = peerps2prodg.vcproj
+		SccLocalPath0 = .
+		SccLocalPath1 = .
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		PS2 EENET Debug|Win32 = PS2 EENET Debug|Win32
+		PS2 EENET Release|Win32 = PS2 EENET Release|Win32
+		PS2 INET Debug|Win32 = PS2 INET Debug|Win32
+		PS2 INET Release|Win32 = PS2 INET Release|Win32
+		PS2 SN Systems Debug|Win32 = PS2 SN Systems Debug|Win32
+		PS2 SN Systems Release|Win32 = PS2 SN Systems Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3FA7F00E-E8CC-4A64-9E29-40BCD5AFCAF5}.PS2 EENET Debug|Win32.ActiveCfg = PS2 EENET Debug|Win32
+		{3FA7F00E-E8CC-4A64-9E29-40BCD5AFCAF5}.PS2 EENET Debug|Win32.Build.0 = PS2 EENET Debug|Win32
+		{3FA7F00E-E8CC-4A64-9E29-40BCD5AFCAF5}.PS2 EENET Release|Win32.ActiveCfg = PS2 EENET Release|Win32
+		{3FA7F00E-E8CC-4A64-9E29-40BCD5AFCAF5}.PS2 EENET Release|Win32.Build.0 = PS2 EENET Release|Win32
+		{3FA7F00E-E8CC-4A64-9E29-40BCD5AFCAF5}.PS2 INET Debug|Win32.ActiveCfg = PS2 INET Debug|Win32
+		{3FA7F00E-E8CC-4A64-9E29-40BCD5AFCAF5}.PS2 INET Debug|Win32.Build.0 = PS2 INET Debug|Win32
+		{3FA7F00E-E8CC-4A64-9E29-40BCD5AFCAF5}.PS2 INET Release|Win32.ActiveCfg = PS2 INET Debug|Win32
+		{3FA7F00E-E8CC-4A64-9E29-40BCD5AFCAF5}.PS2 INET Release|Win32.Build.0 = PS2 INET Debug|Win32
+		{3FA7F00E-E8CC-4A64-9E29-40BCD5AFCAF5}.PS2 SN Systems Debug|Win32.ActiveCfg = PS2 SN Systems Debug|Win32
+		{3FA7F00E-E8CC-4A64-9E29-40BCD5AFCAF5}.PS2 SN Systems Debug|Win32.Build.0 = PS2 SN Systems Debug|Win32
+		{3FA7F00E-E8CC-4A64-9E29-40BCD5AFCAF5}.PS2 SN Systems Release|Win32.ActiveCfg = PS2 SN Systems Release|Win32
+		{3FA7F00E-E8CC-4A64-9E29-40BCD5AFCAF5}.PS2 SN Systems Release|Win32.Build.0 = PS2 SN Systems Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,151 @@
+Changelog for: GameSpy Common Code
+--------------------------------------------------------
+
+DATE        VERSION  BY   TYPE     DESCRIPTION
+----------  -------  ---  -------  ---------------------------------------------------------
+12-12-2007  2.06.00  RMV  RELEASE  Released to Developer Site
+11-27-2007  2.05.01  SAH  CLEANUP  Removed extern "c" block in nonport.h to prevent linker errors
+08-06-2007  2.05.00  RMV  RELEASE  Released to Developer Site *Note - fixed version number to match other common changelog
+06-22-2007  2.01.02  SAH  FIX      Fixed MD5Print to null terminate the output string.
+05-16-2007  2.01.01  DES  CLEANUP  Changed MD5Print to non use sprintf, to avoid security warnings
+12-15-2006  2.01.00  MJW  RELEASE  Releasing to developer site.
+05-26-2005  2.00.00  BED  RELEASE  Releasing to developer site.
+05-16-2005  2.00.00  BED  OTHER    Moved common code into /common directory.
+                     BED  OTHER    Stubbed nonport.h and nonport.c to include new common files.
+04-28-2005  1.11.02  SN   RELEASE  Releasing to developer site.
+04-27-2005  1.11.02  DES  RELEASE  Limited release to Nintendo DS developers.
+04-25-2005  1.11.02  DES  FIX      Nitro updates
+                     DES  FEATURE  Addition categories and types added to gsiDebug
+04-08-2005  1.11.01  SN   FIX      Fixed SN Systems bug where a socket was shown to be readable even when an error was recorded for it.
+04-08-2005  1.11.00  DES  FEATURE  Changes for XBox support.
+04-04-2005  1.10.72  SN   RELEASE  Releasing to developer site.
+04-04-2005  1.10.72  DES  CLEANUP  Removed unused GS_BIG_ENDIAN define.
+                     DES  FEATURE  Added gsi_is_false() and gsi_is_true() defines.
+                     DES  CLEANUP  Removed unused PATHCHAR define.
+                     DES  CLEANUP  Removed old _NITRO code from SetSockBlocking.
+03-31-2005  1.10.71  BED  FIX      Removed some CodeWarrior strict compile warnings.
+03-31-2005  1.10.70  SN   FIX      Fixed build problem by moving defines that had dependancies
+03-14-2005  1.10.69  DES  FEATURE  Nintendo DS support
+02-18-2005  1.10.68  BED  FIX      Added timeout for gsoap recv so it could recover from a hosed server
+                     BED  FIX      Explicit __cdecl for hashtable and darray are used on Win32 only
+                     BED  FIX      Switched gsimemory to track peak memory usage rather than total num allocs.
+01-27-2005  1.10.67  DES  FIX      Added GSI_NO_THREADS for platforms without thread support
+                     DES  FIX      Fixed custom SN sendto and moved it to nonport
+01-04-2005  1.10.66  DDW  FIX      Added malloc cast in XXTEA encryption code
+12-21-2004  1.10.65  SN   FIX      Added code to register the hostname resolution thread with SN_SYSTEMS
+12-07-2004  1.10.64  BED  FIX      Added explicit __cdecl in darray.c and gsidebug.c
+11-18-2004  1.10.63  SN   RELEASE  Releasing to developer site.
+11-18-2004  1.10.63  SN   FIX      Fixed conversion warnings for XXTEA algorithm
+11-17-2004  1.10.62  SN   FIX      Modified the XXTEA headers and renamed global key size
+11-16-2004  1.10.62  BED  FEATURE  Added Thread/Semaphore common functions
+                     BED  FEATURE  Added AD sdk to common debugger code.
+                     BED  FEATURE  Common debug functions and memory manager are now thread safe
+                     BED  FEATURE  Added core task processor (see core.h)
+                     BED  FEATURE  Added common gsoap task (see soap.h)
+11-16-2004  1.10.61  SN   FEATURE  Added URL-safe Base64 encoding and XXTEA encrypt and decrypt
+09-21-2004  1.10.60  SN   FIX      Added the directories for MacOS X and Win32 common to goacommon.bat
+09-16-2004  1.10.59  SN   RELEASE  Releasing to developer site.
+09-16-2004  1.10.59  SN   FIX      Modified header define of NOFILE to avoid conflict with MacOS X
+09-03-2004  1.10.58  BED  CLEANUP  Removed misc compiler warnings.
+08-27-2004  1.10.57  BED  FEATURE  Added memory diagnostic functions to memory manager.
+08-27-2004  1.10.56  DES  CLEANUP  Changed UNDER_UNIX to _UNIX, and define it if _LINUX or _MACOSX are defined.
+                     DES  OTHER    Generate an error if _WIN32, _PS2, or _UNIX are not defined.
+                     DES  CLEANUP  General Unicode cleanup
+                     DES  CLEANUP  Fixed minor warnings under OSX
+                     BED  FIX      Fixed typo in SN Systems version of GOAGetLastError.
+08-25-2004  1.10.55  BED  FEATURE  Added common debug utilities to nonport. (See gsiDebug.h)
+                     BED  FEATURE  Added memory pool manager to nonport. (See top of nonport.h)
+08-24-2004  1.10.54  DES  CLEANUP  Removed references to MacOS.
+08-20-2004  1.10.53  SN   FIX      Changed the way errors are obtained from the SN Systems network stack.
+08-05-2004  1.10.52  SN   RELEASE  Releasing to developer site.
+08-04-2004  1.10.51  SN   FIX      Fixed a function prototype causing compiler warnings for codewarrior
+08-02-2004  1.10.50  SN   FEATURE  Added support for developers to use winsock 2
+07-13-2004  1.10.49  DES  FEATURE  Added GSIStartResolvingHostname() for doing async hostname lookups.
+07-12-2004  1.10.48  SN   FIX      Cleared warnings when warnings are treated as errors for gamspy common code.
+07-09-2004  1.10.47  SN   FIX      Updated portions of code to eliminate warnings for PS2
+07-08-2004  1.10.46  SN   FIX      Commented an include line <if_types.h>
+07-01-2004  1.10.46  SN   FIX      Includeded <malloc.h> for ps2 
+06-29-2004  1.10.45  BED  RELEASE  Releasing to developer site.
+06-28-2004  1.10.45  DES  FEATURE  Added gsimemalign to the list of memory functions.
+06-24-2004  1.10.44  BED  FEATURE  Util_Rand functions no longer static.
+                     BED  FEATURE  Added B64 encode and decode from matrix source.
+06-22-2004  1.10.43  BED  RELEASE  Releasing with updated PS2Common code
+06-18-2004  1.10.42  BED  RELEASE  Releasing to developer site.
+06-01-2004  1.10.42  BED  FEATURE  Phase 1 of PS2 Insock integration.  (needs further testing)
+                     BED  FIX      Found case where unsigned long was used on Ps2 instead of gsi_time.
+04-27-2004  1.10.41  DES  FEATURE  Added current_time_hires(), returns time in microseconds.
+03-10-2004  1.10.40  BED  FEATURE  Added some more types to nonport.h
+                          FIX      Undefine socket types to workaround SNSys bug.  (They plan to patch in march 04)
+12-03-2003  1.10.39  BED  FEATURE  Added "GameSpy Help.chm" to goapackage.bat
+11-10-2003  1.10.38  DES  RELEASE  Releasing to developer site.
+11-10-2003  1.10.38  BED  FIX      Remove misc compiler warnings.
+11-07-2003  1.10.37  DES  FIX      Added linux support for the common integers datatypes.
+                          FIX      Added a newline to the bottom of available.h.
+                          FEATURE  The available check now uses <gamename>.available.gamespy.com.
+10-29-2003  1.10.36  DES  FEATURE  Added available.h,.c for doing backend services availability checks.
+10-09-2003  1.10.35  BED  FEATURE  Added gsi_time type for PS2 compatibility
+10-08-2003  1.10.34  JED  FEATURE  Added common integer datatypes
+08-25-2003  1.10.33  JED  CLEANUP  Added some sanity checks in hashtable.c
+07-24-2003  1.10.32  DES  RELEASE  Releasing to developer site.
+07-23-2003  1.10.32  DES  FIX      Moved EENet includes in nonport.h to fix CW PS2 warnings.
+                     DES  FEATURE  Added memory tracking.  Use GSI_MEM_TRACK to enable.
+07-22-2203  1.10.31  BED  CLEANUP  General cleanup to remove CodeWarrior compiler warnings.
+07-16-2003  1.10.30  DES  CLEANUP  Removed support for Cisco NFT for the PS2.
+                          FIX      Changed some __mips64 checks to _PS2 checks in nonport.c
+                     BED  FIX      Changed nonport.c to not use #pragma comment when _PS2 if defined
+07-10-2003  1.10.29  BED  CLEANUP  Added GSI_UNUSED to nonport.h to silence unused variable warnings.
+05-09-2003  1.10.28  DES  CLEANUP  Removed Dreamcast support.
+                          CLEANUP  Changed nonport.h to use EENet if no network stack is defined for the PS2.
+                          FIX      Metrowerks for Win32 is no longer falsely identified as MacOS.
+05-07-2003  1.10.27  DES  RELEASE  Releasing to developer site.
+                          FIX      Rewrote EENet GetMAC to be 2.7.x compatibile.
+04-28-2003  1.10.26  DES  RELEASE  Releasing to developer site.
+                          FIX      Changed malloc/free in new EENet getlocalhost to gsimalloc/gsifree.
+04-28-2003  1.10.25  DES  RELEASE  Releasing to developer site.
+04-17-2003  1.10.25  DES  FIX      Rewrote EENet getlocalhost again, to be compatible with the 2.7.0.1 release.
+04-15-2003  1.10.24  DES  FIX      Rewrote the EENet implementation of getlocalhost to build its own HOSTENT.
+04-15-2003  1.10.23  JED  CLEANUP  Corrected DevStudio Level4 warnings for use of FD_SET
+04-08-2003  1.10.22  JED  FIX      converted md5 function parameter type declarations from K&R C to ANSI C
+03-27-2003  1.10.21  DES  FIX      IsPrivateIP no longer flips the source IP's byte order.
+03-26-2003  1.10.20  DES  RELEASE  Releasing to developer site.
+03-25-2003  1.10.20  DES  FIX      The EENet version of getlocalhost() wasn't checking all possible local IPs.
+03-24-2003  1.10.19  DES  FEATURE  Added IsPrivateIP() for checking if an IP is a private network IP.
+                     DES  FIX      GetTicks() no longer causes a compiler warning.
+03-10-2003  1.10.18  DES  RELEASE  Releasing to developer site.
+02-25-2003  1.10.18  DES  CLEANUP  Added headers to nonport.h for 2.6.1 EENet compatibility.
+                                   EENET_260 can be defined for 2.6.0 compatibility.
+02-05-2003  1.10.17  DES  RELEASE  Releasing to developer site.
+02-05-2003  1.10.17  DES  FEATURE  Added CanReceiveOnSocket and CanSendOnSocket as wrappers for select.
+                                   Needed because the SN stack for the PS2 has non-standard behavior.
+01-23-2003  1.10.16  DES  FEATURE  Added the ability to just get the gsi*() memory function defines
+                                   by defining GSI_MEM_ONLY before including nonport.h.
+01-07-2003  1.10.15  DES  RELEASE  Releasing to developer site.
+01-07-2003  1.10.15  DES  CLEANUP  Removed a comment and a printf that were no longer needed.
+01-02-2003  1.10.14  DES  CLEANUP  Removed the typedef for PSOCKADDR
+                                   It doesn't appear to be used anywhere, and was causing compile problems.
+12-20-2002  1.10.13  DES  FEATURE  Implemented new code from SN Systems to get the MAC for the unique ID.
+12-19-2002  1.10.12  DES  RELEASE  Releasing to developer site.
+12-19-2002  1.10.12  DES  CLEANUP  Removed assert.h include from darray.h and hashtable.h.
+12-18-2002  1.10.11  DES  CLEANUP  Put in a stub function fr getting the unique ID when using the SN stack.
+12-16-2002  1.10.10  DES  FEATURE  Defined NOFILE when _PS2 is defined to exclude all file writing code.
+                          FEATURE  Defined SOMAXCONN to 5 when not defined.  This is used as the backlog
+                                   parameter in calls to listen().  5 is the max for SN Systems.
+                          FEATURE  gethostbyaddr() is not supported by SN Systems, defined it to NULL.
+                          CLEANUP  Changed GOAGetLastError() to clear the error for SN Systems.
+                                   Also removed GOAClearSocketError(), which was only needed for SN Systems.
+12-13-2002  1.10.09  DES  FEATURE  Added EENet specific code for getting the MAC address for the Unique ID.
+12-11-2002  1.10.08  DES  FEATURE  Additional eenet support.
+                          FEATURE  Added getlocalhost() for getting the local machine's hostent struct.
+                          FEATURE  Added SetSendBufferSize(), GetSendBufferSize(), and GetReceiveBufferSize().
+12-05-2002  1.10.07  DES  CLEANUP  General cleanup
+                          FEATURE  Initial PS2 eenet stack support
+11-22-2002  1.10.06  DES  RELEASE  Releasing to developer site.
+11-22-2002  1.10.06  DES  FIX      Fixed bug with checking the current time on the PS2.
+11-20-2002  1.10.05  DES  FEATURE  Switched to using the MAC address for the Unique ID on the PS2.
+                          CLEANUP  Cleaned up to compile without warnings on the PS2.
+11-18-2002  1.10.04  JED  FIX      nonport.c now using ansi registry funcs for WIN32/unicode
+11-14-2002  1.10.03  DES  FEATURE  Added assert.h include to nonport.h.
+11-13-2002  1.10.02  DDW  FEATURE  Changed GOAGetUniqueID to use redefinable function pointer. 
+                                   Made Cisco the default stack for PS2.
+11-13-2002  1.10.01  DES  FIX      Removed Reference to unsupported non-blocking CISCO stack
+09-25-2002  1.10.00  DDW  OTHER    Changelog started

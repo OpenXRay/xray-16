@@ -1,0 +1,50 @@
+Changelog for: GameSpy Competition SDK
+--------------------------------------------------------
+
+DATE        VERSION  BY   TYPE     DESCRIPTION
+----------  -------  ---  -------  ---------------------------------------------------------
+12-12-2007  1.04.00  RMV  RELEASE  Released to Developer Site
+12-07-2007  1.03.01  SAH  OTHER    Fixed projects missing dependencies
+12-03-2007  1.03.00  SN   FEATURE  Added Int64 support for reports
+08-06-2007  1.02.00  RMV  RELEASE  Released to Developer Site
+07-18-2007  1.01.01  RMV  OTHER    Created sctestmatchless projects for multiple platforms
+07-17-2007  1.01.01  RMV  FIX      Fixed compiler warnings for PSP test project
+06-15-2007  1.01.00  BMS  FEATURE  Updated for "matchless" ATLAS.
+04-17-2007  1.00.02  SAH  FEATURE  Added scReportAddFloatValue
+            1.00.02  SAH  OTHER    Changed sctest for easier testing of AuthService    
+03-16-2007  1.00.01  SAH  FIX      Fixed an issue where team indexes were not properly retrieved based on the team ID.
+03-06-2007  1.00.00  SAH  RELEASE  Released to Developer Site
+03-06-2007  0.09.08  SAH  FIX      Added SCResult_NO_AVAILABILITY_CHECK for unperformed checks made prior to init
+            0.09.08  SAH  FIX      Modified sctest to include availability check.
+            0.09.08  SAH  FIX      Fixed scServiceURL to construct the proper URL based on the __GSIACGamename                     
+03-02-2007  0.09.07  SAH  FIX      Added Linux, MACOSX makefiles and Nintendo DS project
+03-02-2007  0.09.06  SN   FIX      Fixed some compiler warnings for code warrior
+                     SN   FIX      Added checks for consoles in sctest.c after testing terminates
+03-02-2007  0.09.06  SN   FIX      Fixed an alignment issue for sctest.c on the ps2
+03-02-2007  0.09.05  SN   FIX      Fixed compiler warnings for sctest.c
+02-28-2007  0.09.04  SAH  FIX      Fixed an assert, added ghttpPost.h for extern function call
+            0.09.04  SAH  FIX      Added ScRaceSample to VS2005 project, updated sample to use AdminSite header
+02-27-2007  0.09.03  SAH  FEATURE  Created ScRaceSample application and added it to the project
+02-22-2007  0.09.02  SN   FEATURE  Added code to calculate an MD5 hash on the binary report before sending it
+            0.09.02  SN   FIX      Fixed the report version number
+            0.09.02  SN   FIX      Modified sctest to have each player submit its own snapsnot
+02-21-2007  0.09.01  SAH  FEATURE  Added SCGameStatus enum, gamestatus is now set when calling scReportEnd
+            0.09.01  SAH  FIX      Removed all references to isFinal, no longer used
+01-31-2007  0.09.00  SAH  FEATURE  Added scReportAddShortValue / scReportAddByteValue
+            0.09.00  SAH  FIX      Fixed protocol header length define for rosterSection
+01-31-2007  0.08.00  SAH  FEATURE  TeamIndex now takes in an arena teamID (or a local index for games that don't plan to use arena)
+            0.08.00  SAH  FEATURE  Fixed a bug where the result enum was improperly casted, causing win/loss mismatch
+01-22-2007  0.07.00  SAH  FIX      Increasing version number to remove confusion
+            0.07.00  SAH  FIX      Fixed Unicode issues as well as the addString function
+            0.07.00  SAH  FIX      Added Unicode configuration in Project
+            0.07.00  SAH  FIX      Added String tests in scTest.c
+01-16-2007  0.04.03  DES  FEATURE  Added X360 support
+01-04-2007  0.04.02  SN   FIX      Changed URLs to release backend
+12-18-2006  0.04.01  SN   FIX      Added PS2, PS3, PSP projects
+12-18-2006  0.04.01  SN   FEATURE  Added scDestroyReport for freeing reports
+                     SN   FIX      Fixed sdk shutdown code, and any warnings and errors that came up when compiling as C++ code
+                     SN   FIX      Updated sctest to use latest sdk interface and fixed some issues with building the report
+12-15-2006  0.04.00  MJW  RELEASE  Released to Developer Site
+12-05-2006  0.03.01  SN   FIX      Fixed errors and warnings on all platforms slated for release
+10-20-2006  0.03.00  BED  RELEASE  Aplha update
+                          FEATURE  Added User data for callbacks

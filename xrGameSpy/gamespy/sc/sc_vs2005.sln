@@ -1,0 +1,81 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sctest_vs2005", "sctest\sctest_vs2005.vcproj", "{86C8BA16-7AD5-4366-ABFE-0F319E299A04}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScRaceSample_vs2005", "scRaceSample\scRaceSample_vs2005.vcproj", "{CE7A165A-399F-4B16-A590-16FC58166A2D}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sctestmatchless_vs2005", "sctestmatchless\sctestmatchless_vs2005.vcproj", "{2039A6BF-58A8-4142-BEC1-D37D44CF3173}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4BB71178-8B8D-4B5F-962C-62C6DD0C9081}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		changelog.txt = changelog.txt
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://tfs.ign.com:8080/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = sctest\\sctest_vs2005.vcproj
+		SccProjectName1 = sctest
+		SccLocalPath1 = sctest
+		SccProjectUniqueName2 = scRaceSample\\scRaceSample_vs2005.vcproj
+		SccProjectName2 = scRaceSample
+		SccLocalPath2 = scRaceSample
+		SccProjectUniqueName3 = sctestmatchless\\sctestmatchless_vs2005.vcproj
+		SccProjectName3 = sctestmatchless
+		SccLocalPath3 = sctestmatchless
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+		Unicode Debug|Win32 = Unicode Debug|Win32
+		Unicode Release|Win32 = Unicode Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{86C8BA16-7AD5-4366-ABFE-0F319E299A04}.Debug|Win32.ActiveCfg = Debug|Win32
+		{86C8BA16-7AD5-4366-ABFE-0F319E299A04}.Debug|Win32.Build.0 = Debug|Win32
+		{86C8BA16-7AD5-4366-ABFE-0F319E299A04}.Release|Win32.ActiveCfg = Release|Win32
+		{86C8BA16-7AD5-4366-ABFE-0F319E299A04}.Release|Win32.Build.0 = Release|Win32
+		{86C8BA16-7AD5-4366-ABFE-0F319E299A04}.Unicode Debug|Win32.ActiveCfg = Unicode Debug|Win32
+		{86C8BA16-7AD5-4366-ABFE-0F319E299A04}.Unicode Debug|Win32.Build.0 = Unicode Debug|Win32
+		{86C8BA16-7AD5-4366-ABFE-0F319E299A04}.Unicode Release|Win32.ActiveCfg = Unicode Release|Win32
+		{86C8BA16-7AD5-4366-ABFE-0F319E299A04}.Unicode Release|Win32.Build.0 = Unicode Release|Win32
+		{CE7A165A-399F-4B16-A590-16FC58166A2D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CE7A165A-399F-4B16-A590-16FC58166A2D}.Debug|Win32.Build.0 = Debug|Win32
+		{CE7A165A-399F-4B16-A590-16FC58166A2D}.Release|Win32.ActiveCfg = Release|Win32
+		{CE7A165A-399F-4B16-A590-16FC58166A2D}.Release|Win32.Build.0 = Release|Win32
+		{CE7A165A-399F-4B16-A590-16FC58166A2D}.Unicode Debug|Win32.ActiveCfg = Debug|Win32
+		{CE7A165A-399F-4B16-A590-16FC58166A2D}.Unicode Debug|Win32.Build.0 = Debug|Win32
+		{CE7A165A-399F-4B16-A590-16FC58166A2D}.Unicode Release|Win32.ActiveCfg = Release|Win32
+		{CE7A165A-399F-4B16-A590-16FC58166A2D}.Unicode Release|Win32.Build.0 = Release|Win32
+		{2039A6BF-58A8-4142-BEC1-D37D44CF3173}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2039A6BF-58A8-4142-BEC1-D37D44CF3173}.Debug|Win32.Build.0 = Debug|Win32
+		{2039A6BF-58A8-4142-BEC1-D37D44CF3173}.Release|Win32.ActiveCfg = Release|Win32
+		{2039A6BF-58A8-4142-BEC1-D37D44CF3173}.Release|Win32.Build.0 = Release|Win32
+		{2039A6BF-58A8-4142-BEC1-D37D44CF3173}.Unicode Debug|Win32.ActiveCfg = Unicode Debug|Win32
+		{2039A6BF-58A8-4142-BEC1-D37D44CF3173}.Unicode Debug|Win32.Build.0 = Unicode Debug|Win32
+		{2039A6BF-58A8-4142-BEC1-D37D44CF3173}.Unicode Release|Win32.ActiveCfg = Unicode Release|Win32
+		{2039A6BF-58A8-4142-BEC1-D37D44CF3173}.Unicode Release|Win32.Build.0 = Unicode Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

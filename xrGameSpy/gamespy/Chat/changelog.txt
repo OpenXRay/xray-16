@@ -1,0 +1,131 @@
+Changelog for: GameSpy Chat SDK
+--------------------------------------------------------
+
+DATE        VERSION  BY   TYPE     DESCRIPTION
+----------  -------  ---  -------  ---------------------------------------------------------
+12-12-2007  1.15.00  RMV  RELEASE  Released to Developer Site
+08-06-2007  1.14.00  RMV  RELEASE  Released to Developer Site
+07-10-2007  1.13.01  RMV  FIX      Fixed chatc Project files to get rid of Unicode warnings and fixed other compiler warnings
+06-28-2007  1.13.00  DDW  FEATURE  Added UDP relay support
+12-15-2006  1.12.00  MJW  RELEASE  Released to Developer Site
+12-11-2006  1.11.40  SN   OTHER    Added visual studio 2005 projects for samples
+                     SN   OTHER    Fixed warnings with visual studio 2005 projects
+10-05-2006  1.11.39  SAH  FIX      Updated MacOSX Makefile
+09-28-2006  1.11.38  SAH  FIX      Fixed PS3 project to work with PS3 095.00x SDK; changed included libaries in linker input.
+09-05-2006  1.11.37  SN   FIX      Updated Revolution support
+                                   Fixed bug in the case where null strings were being ignored.
+08-02-2006  1.11.36  SAH  RELEASE  Releasing to developer site
+07-31-2006  1.11.36  SAH  FIX      Fixed PS3 project file - added post-build step to create *.SELF for execution
+07-24-2006  1.11.35  SAH  FIX      Fixed NITRO project, include for crt0.o now above others so it add correct file
+07-06-2006  1.11.34  SAH  FIX      Fixed PSP project file - the linker file was explicitly included in a project
+06-30-2006  1.11.33  SAH  FIX      Fixed NITRO project & linker command file (for Codewarrior 2.0/NitroSDK 3.1)
+                     SAH  FIX      Fixed Linux makefile
+06-02-2006  1.11.32  SAH  FIX      Added GS_STATIC_CALLBACK on comparator functions for __fastcall support
+05-31-2006  1.11.31  SAH  RELEASE  Releasing to developer site
+		     SAH  FIX	   Fixed Linux makefiles
+05-25-2006  1.11.31  SAH  FIX	   Added some GSI_UNUSED calls to get rid of PSP warnings
+		     SAH  FIX	   Changed PS3 project settings to compile with 084_001 SDK
+05-19-2006  1.11.30  SAH  FIX	   Added gsTestMain.c to nitro CodeWarrior project
+04-25-2006  1.11.29  SAH  RELEASE  Releasing to developer site
+04-24-2006  1.11.29  SAH  FIX      Fixed the nitro project to work on test machine, removed unncessary source files
+04-20-2006  1.11.28  SAH  FIX      commented out unused variables to get rid of warnings
+01-27-2006  1.11.27  SN   RELEASE  Releasing to developer site
+01-26-2006  1.11.27  SN   OTHER    Added psp prodg solution and project to sgv
+01-09-2006  1.11.27  SN   FIX      Updated code to use default server address and port
+12-13-2005  1.11.26  SN   OTHER    Updated Visual Studio .NET Projects to use new common dir
+                                   Created Visual Studio .NET Solution 
+                                   Removed old Static Library chat.vcproj
+12-02-2005  1.11.26  SN   FIX      Added a check before freeing variable
+11-17-2005  1.11.25  DES  FIX      Removed unneeded assert.
+                     DES  FIX      Compatibility fix.
+                     DES  FIX      Updated Nitro Makefile.
+11-14-2005  1.11.24  DES  FIX      Updated the OSX Makefile.
+                     DES  FEATURE  Adding GSI_DOMAIN_NAME support.
+09-21-2005  1.11.23  DES  FEATURE  Updated DS support
+07-28-2005  1.11.22  SN   RELEASE  Releasing to developer site.
+06-03-2005  1.11.22  SN   RELEASE  Releasing to developer site.
+04-29-2005  1.11.22  SN   OTHER    Created Visual Studio .NET projects for existing projects.
+04-28-2005  1.11.22  SN   RELEASE  Releasing to developer site.
+04-27-2005  1.11.22  DES  RELEASE  Limited release to Nintendo DS developers.
+04-04-2005  1.11.22  SN   RELEASE  Releasing to developer site.
+03-31-2005  1.11.22  SN   FIX      Added some preprocessor code to stop compiler warnings.
+03-14-2005  1.11.21  DES  FEATURE  Nintendo DS support
+11-25-2004  1.11.20  SN   FIX      Added const qualifiers to function parameters not modified 
+10-15-2004  1.11.19  SN   FEATURE  Added SDK side nickname checking
+09-20-2004  1.11.18  BED  FIX      ciUserTableCompareFn now treats NULL parameter as "less than"  (Arcade helper)
+09-16-2004  1.11.17  SN   RELEASE  Releasing to developer site.
+09-15-2004  1.11.17  DDW  FEATURE  Added global version var to pass on crypt for Arcade blacklisting
+09-13-2004  1.11.16  BED  FEATURE  Added support for channel mode "e".  (Ops obey channel limit)
+08-27-2004  1.11.15  DES  CLEANUP  Removed MacOS style includes
+                     DES  CLEANUP  General Unicode cleanup
+                     DES  CLEANUP  Updated Win32 project configurations
+                     DES  CLEANUP  Fixed warnings under OSX
+                     DES  CLEANUP  Updated OSX Makefile
+08-10-2004  1.11.14  BED  FIX      ciSocketRecv will now process remaining messages after a disconnect.
+08-05-2004  1.11.13  SN   RELEASE  Releasing to developer site.
+07-19-2004  1.11.13  SN   FIX	   Updated code with explicit casts to remove implicit cast error when compiling 
+                                   at highest level and warnings treated as errors.
+06-18-2004  1.11.12  BED  RELEASE  Releasing to developer site.
+06-16-2004  1.11.12  BED  FEATURE  Added PS2 Insock (LibNet) support
+04-19-2004  1.11.11  DDW  FIX      Fixed USRIP handler - handles message correctly after login
+12-08-2003  1.11.10  BED  FIX      Updated PS2 sample for Sony 3.0.  UNICODE no longer defined.
+11-10-2003  1.11.09  DES  RELEASE  Releasing to developer site.
+11-07-2003  1.11.09  DES  FIX      Updated the linux makefile to include the MD5 code.
+11-06-2003  1.11.08  BED  FIX      Removed some unnecessary asserts in Unicode layer.
+                     BED  FIX      Slight correction in sample callback.
+                     BED  FIX      Sample no longer includes <crtdbg.h>  Leftover from memory leak testing.
+10-23-2003  1.11.07  BED  FIX      Changed StringUtil to accept char* instead of unsigned char*
+                     BED  FIX      Removed additional warnings for various compilers.
+10-22-2003  1.11.06  BED  RELEASE  Releasing to developer site.  (UNIQUE NICK AND UNICODE SUPPORT)
+10-21-2003  1.11.06  BED  FIX      Added ChatASCII.h to silence all the CodeWarrior prototype warnings
+                     BED  FIX      Cleaned up other misc warnings.
+10-17-2003  1.11.05  DES  FIX      It now always picks the correct name to use for the socket log.
+10-16-2003  1.11.04  BED  FIX      Switched from UTF8 to Ascii when dealing with nicknames.
+                     DES  FIX      Always pass the appropriate nick to the chatNickErrorCallback.
+                          FIX      Correctly handle chatConnectLogin with a 0 namespaceID.
+10-09-2003  1.11.03  BED  FIX      Switched to gsi_time type instead of unsinged long for PS2 compatibility
+10-06-2003  1.11.02  DES  FIX      chatGet[User|Profile]ID now return values during the connection attempt.
+10-01-2003  1.11.01  DES  FEATURE  Added a reason code for failed connect attempts.
+                          FEATURE  Added suggested nicks for a CHAT_INVALID_UNIQUENICK nick errors.
+09-30-2003  1.11.00  DES  FEATURE  Uniquenick support.
+09-30-2003  1.10.27  BED  FEATURE  Update Chat sample to support GSI_UNICODE mode.
+09-15-2003  1.10.26  JED  FIX      Minor change to CONNECTED macro to be more robust.
+09-08-2003  1.10.25  BED  FEATURE  Added UTF-8 Wrapper for UNICODE support.
+                          FIX      Fixed crash when chatRetryWithNick was called with NULL.  (As directed in the documentation)
+07-24-2003  1.10.24  DES  RELEASE  Releasing to developer site.
+07-24-2003  1.10.24  DES  FIX      Added GSI_UNUSED around an unused param.
+07-18-2003  1.10.23  BED  FEATURE  Added CodeWarrior (PS2) sample project file.
+                          CLEANUP  General cleanup to remove CodeWarrior (PS2) warnings.
+07-17-2003  1.10.22  DES  CLEANUP  Cleaned up the PS2 Makefile, it now uses Makefile.commmon.
+07-16-2003  1.10.21  BED  FIX      Added a newline at end of chatmain.c
+                     DES  FIX      Changed two __mips64 checks to _PS2 checks.
+                     BED  FEATURE  Added ProDG sample project files.
+07-14-2003  1.10.20  BED  FIX      Now using ciNickIsValid to validate nicknames on client side.
+07-14-2003  1.10.19  DES  FIX      Correctly handle being disconnected during the connection attempt.
+07-11-2003  1.10.18  BED  FIX      Updated sample to join nonrestricted channel.
+06-26-2003  1.10.17  DES  CLEANUP  Reduced the initial sizes of the channel and user hash tables.
+06-11-2003  1.10.16  DES  RELEASE  Releasing to developer site.
+05-09-2003  1.10.16  DES  CLEANUP  Removed Dreamcast support.
+                          FIX      Metrowerks for Win32 is no longer falsely identified as MacOS.
+05-07-2003  1.10.15  DES  RELEASE  Releasing to developer site.
+04-23-2003  1.10.15  BGW  FIX      Now handling the case of localtime() returning NULL.
+04-17-2003  1.10.14  DES  FIX      Fix for simultaneous WHO requests on a single user.
+04-16-2003  1.10.13  DDW  FEATURE  Added chatInChannel function exposing ciInChannel functionality
+03-19-2003  1.10.12  DES  FEATURE  IRC logging (IRC_LOG) now uses the nick as part of the filename.
+03-12-2003  1.10.11  DES  FIX      If requesting 0 keys for a channel, correctly request all keys.
+03-11-2003  1.10.10  DES  FIX      chatGetChannelKeys no longer asserts if keys is NULL.
+                                   If keys is NULL and num is 0, all keys are returned.
+03-03-2003  1.10.09  DES  CLEANUP  General cleanup to remove warnings.
+                          FEATURE  Added chatSetChannelLimit for directly setting a channel limit.
+01-09-2003  1.10.08  DES  CLEANUP  Removed an unneeded assert.
+12-19-2002  1.10.07  DES  RELEASE  Releasing to developer site.
+12-19-2002  1.10.07  DES  CLEANUP  Removed assert.h includes.
+12-13-2002  1.10.06  DES  FEATURE  Added PS2 eenet stack support.
+12-05-2002  1.10.05  DES  CLEANUP  Added some explicit type casting to eliminate warnings.
+11-22-2002  1.10.04  DES  RELEASE  Releasing to developer site.
+11-20-2002  1.10.04  DES  CLEANUP  Cleaned up to remove compiler warings on the PS2.
+11-15-2002  1.10.03  DES  OTHER    Changed chatc to use chatConnectSecure.
+11-07-2002  1.10.02  DES  FIX      Fixed negative hash due to high-ascii characters in hashed string.
+10-17-2002  1.10.01  DES  RELEASE  Limited release on developer site
+10-17-2002  1.10.01  DES  FIX      Fixed bug where incoming data was not processed when disconnected.
+09-25-2002  1.10.00  DDW  OTHER    Changelog started

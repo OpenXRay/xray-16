@@ -1,0 +1,117 @@
+Microsoft Developer Studio Workspace File, Format Version 6.00
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
+
+###############################################################################
+
+Project: "gp_stats"=.\gp_stats\gp_stats.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gstats/gp_stats", RUFBAAAA
+    .\gp_stats
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "ladderTrack"=.\ladderTrack\ladderTrack.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gstats/ladderTrack", YNHCAAAA
+    .\laddertrack
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "multiTrack"=.\multiTrack\multiTrack.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gstats/multiTrack", VYZBAAAA
+    .\multitrack
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "persisttest"=.\persisttest\persisttest.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gstats/persisttest", BBVAAAAA
+    .\persisttest
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "statstest"=.\statstest\statstest.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    $/Gamespy/GOA/gstats/statstest
+    .\statstest
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "track"=.\track\track.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gstats/track", OAACAAAA
+    .\track
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gstats", BSGAAAAA
+    .
+    end source code control
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+

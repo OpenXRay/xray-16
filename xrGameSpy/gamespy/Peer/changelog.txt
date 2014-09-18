@@ -1,0 +1,255 @@
+Changelog for: GameSpy Peer SDK
+--------------------------------------------------------
+
+DATE        VERSION  BY   TYPE     DESCRIPTION
+----------  -------  ---  -------  ---------------------------------------------------------
+12-12-2007  2.07.00  RMV  RELEASE  Released to Developer Site
+12-11-2007  2.06.03  SAH  OTHER    Added NatNeg to projects to remove compiler errors
+11-27-2007  2.06.01  SAH  CLEANUP  Moved extern "c" block below includes to prevent linker errors
+08-06-2007  2.06.00  RMV  RELEASE  Released to Developer Site
+07-10-2007  2.05.02  RMV  FIX      Fixed peerc Project files to get rid of Unicode warnings and fixed other compiler warnings
+02-16-2006  2.05.01  SAH  FIX      Fixed bug where room name for UNICODE version was not being set
+12-15-2006  2.05.00  MJW  RELEASE  Released to Developer Site
+12-07-2006  2.04.66  SAH  FIX      Fixed bug where pending IMCP queries were not removed from gameEngine in piSBGamesListCallback
+10-10-2006  2.04.65  SN   FIX      Stop automatch now automatically has the player leave the room.
+10-05-2006  2.04.65  SAH  FIX      Updated MacOSX Makefile
+09-28-2006  2.04.64  SAH  FIX      Fixed PS3 project to work with PS3 095.00x SDK; changed included libaries in linker input.
+08-02-2006  2.04.63  SAH  RELEASE  Releasing to developer site
+07-31-2006  2.04.63  SAH  FIX      Fixed PS3 project file - added post-build step to create *.SELF for execution
+07-25-2006  2.04.62  SAH  FIX      Fixed NITRO project, include for crt0.o now above others so it add correct file
+07-06-2006  2.04.61  SAH  FIX      Fixed PSP project file to not explicitly include the PSP linker file
+07-06-2006  2.04.60  SAH  FIX      Fixed Linux makefile to work with pthreads (for http asynch DNS lookup)
+                     SAH  FIX      Fixed NITRO project & linker command file (to work with CW 2.0/NitroSDK 3.1)
+06-05-2006  2.04.59  SN   FIX      Modified the start listing groups to use correct function for stopping the listing of groups
+06-02-2006  2.04.58  SAH  FIX      Added GS_STATIC_CALLBACK on comparator functions for __fastcall support
+05-31-2006  2.04.57  SAH  RELEASE  Releasing to developer site
+05-30-2006  2.04.56  SAH  FIX      Fixed PS3 projects to work with PS3(084_001 SDK)
+05-25-2006  2.04.55  SAH  FIX	   Added GSI_UNUSED calls to get rid of PSP warnings
+		     SAH  FIX	   Changed PSP project warning levels
+05-23-2006  2.04.54  SAH  FIX	   added GSI_UNUSED calls to get rid of PS3 warnings
+05-19-2006  2.04.53  SAH  FIX	   Added gsTestMain.c to nitro CodeWarrior project
+05-15-2006  2.04.52  SAH  FIX	   Added "PS3 Release" configuration to project
+04-25-2006  2.04.51  SAH  RELEASE  Releasing to developer site
+04-24-2006  2.04.51  SAH  FIX      Fixed some compile errors with UNICODE build, mainly typecasts
+04-24-2006  2.04.50  SAH  FIX      Fixed Nitro project files to work on build machine
+04-20-2006  2.04.49  SAH  FIX      Commented out unused variables, Moved GSI_UNUSED above return calls
+                     SAH  FIX      Removed uncessary check (if unsigned int > 0)
+                     SAH  FIX      Removed uncessary break; statements
+04-18-2006  2.04.48  SAH  FIX      Added || defined(_PS3) to peerc.c for PS3 support
+04-14-2006  2.04.47  SAH  FIX      Got rid of GsCore in the project files, added compile errors
+04-10-2006  2.04.46  SAH  FEATURE  Multiple sorts will retain previous sorting arrangement when values are equal
+02-10-2006  2.02.45  SN   FIX      peerParseQueryW was redundant since qr2_parse_query simply needs an char stream
+                                   As encountered by a developer.  
+02-07-2006  2.02.44  SN   FIX      peerSetStagingRoomMaxPlayers sets the channel limit in addition to the state change
+01-27-2006  2.02.43  SN   RELEASE  Releasing to developer site
+01-26-2006  2.02.43  SN   OTHER    Added psp prodg project and solution to sgv
+12-22-2005  2.02.42  SN   OTHER    Cleaned up vc6 projects and added latest common code if missing
+12-16-2005  2.02.41  SN   OTHER    Added a solution for the SDK to vault and fixed bindings on vcproj files
+12-13-2005  2.02.40  SN   FIX      Cleaned up .vcproj files to have latest common code
+                                   Fixed a compiler issue that would not get caught on VC6
+11-17-2005  2.02.39  DES  FEATURE  Added ability to send client messages to servers.
+                     DES  FIX      Updated Nitro Makefile.
+                     DES  FIX      Made peerc printf Unicode compatible.
+11-14-2005  2.02.38  DES  FIX      Updated the OSX Makefile.
+                     DES  FEATURE  Added GSI_DOMAIN_NAME support.
+10-13-2005  2.02.37  BED  FEATURE  peerSB now supports QR2 query challenge.
+                     BED  FIX      Function pointers now cast to int to prevent strict ANSI warnings
+09-21-2005  2.02.36  DES  FEATURE  Updated DS support
+08-16-2005  2.02.35  SN   FIX      Added support for NatNeg in automatch.
+07-28-2005  2.02.34  SN   RELEASE  Releasing to developer site.
+07-28-2005  2.02.34  SN   FIX      Fixed code causing warning in peerc test app
+06-03-2004  2.02.33  SN   RELEASE  Releasing to developer site.
+06-03-2005  2.02.33  SN   FIX      Fixed issue where people behind same firewall as host could join full staging rooms.
+05-13-2005  2.02.32  SN   FIX      Fixed issue where group room internal data was being incompletely cleared, causing crashes.
+05-05-2005  2.02.31  BED  FIX      Update header files for new common code.
+05-05-2005  2.02.30  SN   OTHER    Created Visual Studio .NET project 
+04-28-2005  2.02.30  SN   RELEASE  Releasing to developer site.
+04-27-2005  2.02.30  DES  RELEASE  Limited release to Nintendo DS developers.
+04-27-2005  2.02.30  DES  FEATURE  Updates to make peerc more friendly.
+                     DES  FIX      On Nitro only, Ping the chat server ever 20 seconds to stay connected.
+04-27-2005  2.02.29  SN   FEATURE  Made changes to allow developers to override default chat ping time.
+04-25-2005  2.02.28  DES  CLEANUP  Disable Win32 linker warning.
+04-04-2005  2.02.27  SN   RELEASE  Releasing to developer site.
+04-01-2005  2.02.27  SN   FIX      Fixed and handled case where getting automatch channel modes failed
+03-14-2005  2.02.26  DES  FEATURE  Nintendo DS support
+01-27-2005  2.02.25  DES  FIX      Fixed custom SN sendto and moved it to nonport
+11-06-2004  2.02.24  SN   FIX      Fixed hashing algorithm to minimize collisions
+11-04-2004  2.02.23  SN   FIX      Fixed calls to SB Interal calls 
+10-15-2004  2.02.22  SN   FEATURE  Added SDK side nickname checking
+09-27-2004  2.02.21  SN   RELEASE  Releasing with Qr2 fix to developer site
+09-17-2004  2.02.21  JED  FIX      Added robustness to piConnectFillInUserCallback & PEER_CONNECTION_OP, Arcade reported some null pointer crashes
+09-16-2004  2.02.20  SN   RELEASE  Releasing to developer site.
+08-27-2004  2.02.20  DES  CLEANUP  Fixed warnings under OSX
+                     DES  CLEANUP  Removed peerc.dsp's dependency on peer.dsp
+                     DES  CLEANUP  General Unicode cleanup
+                     DES  CLEANUP  Removed MacOS style includes
+                     DES  CLEANUP  Updated Win32 project configurations
+                     DES  CLEANUP  Removed headers already included in nonport.h
+                     DES  CLEANUP  Updated OSX Makefile
+08-26-2004  2.02.19  SN   FEATURE  Added peerUpdateServerByMaster function to update a server through the master server
+08-26-2004  2.02.18  DES  CLEANUP  Removed MacOS stlye includes
+08-16-2004  2.02.18  BED  FIX      Fixed case where players would become stuck in automatch searching phase
+08-05-2004  2.02.17  SN   RELEASE  Releasing to developer site.
+08-05-2004  2.02.17  SN   FIX      Added a parameter missing in a prototype (BAD, compiler could not catch it!!!).
+07-19-2004  2.02.17  SN	  FIX      Updated code with explicit casts to remove implicit cast error 
+                                   when compiling at highest level and warnings treated as errors.
+06-21-2004  2.02.16  BED  FIX      Fixed bug with peerc sample's handling of NickErrorCallback
+06-18-2004  2.02.15  BED  RELEASE  Releasing to developer site.
+06-17-2004  2.02.15  BED  FIX      Fixed bug where piListingGamesCall was prematurely showing 100% progress.
+                     BED  FEATURE  Added PS2 Insock support
+05-21-2004  2.02.14  DDW  FEATURE  Minor change to accomodate Peer/VEngine compatibility
+03-04-2004  2.02.13  BED  FIX      Fixed bug in Unicode wrapper when retrieving keys for user "*"
+12-03-2003  2.02.12  BED  FIX      Fixed bug where duplicate key change callbacks were called for broadcast keys in staging rooms
+12-02-2003  2.02.11  BED  FIX      Fixed parameter mismatch when using cached player info.
+11-10-2003  2.02.10  DES  RELEASE  Releasing to developer site.
+11-07-2003  2.02.10  BED  FIX      Updated CodeWarrior project files.
+11-07-2003  2.02.09  DES  FIX      Updated linux and PS2 makefiles.
+                          FIX      Fixed a case mismatch for a chat include.
+                          FIX      Took some debug code out of peerc.c.
+                          FIX      Wrapped some internal unicode functions in GSI_UNICODE ifdefs.
+                          FIX      Commented out functions in peerc.c that were no longer being used.
+11-04-2003  2.02.08  DES  FEATURE  Added availability check code.
+10-29-2003  2.02.07  DES  FEATURE  Added code to PeerTest for doing the available check.
+                     DES  FIX      Removed SN compiler options from PeerTest's project.
+10-21-2003  2.02.06  BED  RELEASE  Releasing to developer site.  (UNIQUE NICK AND UNICODE SUPPORT)
+                     BED  FIX      Removed misc compiler warnings on strict settings.
+10-21-2003  2.02.05  DES  FEATURE  Updated PeerTest to handle new connect methods.
+10-16-2003  2.02.04  BED  FIX      Changed from UCS2ToUTF8String to UCS2ToAsciiString when dealing with nicknames.
+                          FEATURE  Added peerSetStagingRoomMaxPlayers.  Developer request to allow host to update this.
+                     DES  FIX      peerPingPlayer no longer returns PEERFalse if there is an outstanding ping for the player.
+                          FIX      Correctly handle peerConnectLogin with a 0 namespaceID.
+10-09-2003  2.02.03  BED  FIX      Switched to gsi_time type instead of unsinged long for PS2 compatibility
+10-08-2003  2.02.02  DES  FEATURE  Added peerPingPlayer for doing one-time pings in non-ping rooms.
+10-01-2003  2.02.01  DES  FEATURE  Added a reason code for failed connect attempts.
+                          FEATURE  Added suggested nicks for a CHAT_INVALID_UNIQUENICK nick errors.
+09-30-2003  2.02.00  DES  FEATURE  Uniquenick support.
+09-08-2003  2.01.27  BED  FEATURE  Added UTF-8 wrapper for UNICODE support.
+08-29-2003  2.01.26  DES  RELEASE  Released to Stainless Steel for Empires: DotMW.
+                          FIX      Compatible AM's that start at the same time will now get matched.
+                          FIX      No longer queries an AM server if a query is already pending.
+08-18-2003  2.01.25  DES  FEATURE  Added a callback for getting your public reporting address.
+07-24-2003  2.01.24  DES  RELEASE  Releasing to developer site.
+07-24-2003  2.01.24  DES  CLEANUP  Removed unused roomType parameter from piPingPlayerLeftRoom.
+07-23-2003  2.01.23  BED  FEATURE  Added Linux sample Makefile.
+07-18-2003  2.01.22  BED  FEATURE  Added CodeWarrior (PS2) sample project file.
+                          CLEANUP  General cleanup to remove CodeWarrior warnings.
+07-17-2003  2.01.21  DES  CLEANUP  Cleaned up the PS2 Makefile, it now uses Makefile.commmon.
+07-16-2003  2.01.20  DES  FIX      Changed a __mips64 check to a _PS2 check.
+                     BED  FEATURE  Added ProDG sample project files.
+07-10-2003  2.01.19  DES  FIX      Fixed unused value warning in pinger.
+06-26-2003  2.01.18  DES  FEATURE  Added peerGetRoomHost to get the SBServer for the staging room host.
+06-26-2003  2.01.17  DES  RELEASE  Releasing to developer site.
+                          FEATURE  peerJoinStagingRoomByChannel added for joining a staging room based on channel name.
+                          FIX      Fixed peerShutdown to disconnect before clearing the title.
+                          FIX      PeerTest now uses PEER_FLAG_HOST instead of PEER_FLAG_OP to determine the room host.
+                          FIX      Fixed PeerTest to refresh a room's players when a player's host flag changes.
+06-24-2003  2.01.16  DES  FIX      Fixed peerStopAutoMatch comment to say it will not leave a staging room.
+06-11-2003  2.01.15  DES  RELEASE  Releasing to developer site.
+06-04-2003  2.01.15  DDW  FIX      Fixed binding to private IP when both private and public are present
+05-11-2003  2.01.14  DDW  CLEANUP  Compatibility with SB internal API changes
+05-09-2003  2.01.13  DES  CLEANUP  Removed Dreamcast support.
+                          FIX      Metrowerks for Win32 is no longer falsely identified as MacOS.
+05-07-2003  2.01.12  DES  RELEASE  Releasing to developer site.
+                          FIX      Updated PS2 Makefile for AutoMatch.
+05-07-2003  2.01.12  JED  CLEANUP  Replaced refrences in comments to the dyslexic peerGameStart() with the proper peerStartGame()
+05-03-2003  2.01.11  DES  FIX      Was unable to join an AutoMatch room if the host was behind a firewall.
+04-25-2003  2.01.10  DES  FIX      Flipped peerGetPlayerInfo IP and profileID paramters to match the NoWait version.
+                          FIX      peerParseQuery wasn't handling queries correctly during an AutoMatch attempt.
+                          CLEANUP  peerStartAutoMatch[WithSocket] now returns void.  If it fails to start the
+                                   attempt, it calls the statusCallback with PEERFailed.
+                          FIX      peerStartAutoMatch[WithSocket] wasn't doing blocking correctly.
+04-24-2003  2.01.09  DES  FEATURE  Added peerGetPlayerInfo to replace peerGetPlayerProfileID and peerGetPlayerIP.
+                                   Both old functions are now deprecated and will be removed in a future version.
+04-23-2003  2.01.08  DES  FEATURE  peerGameStartedCallback is now passed the host's SBServer instead of IP.
+                          FEATURE  peerGetLocalIP has been replaced by peerGetPublicIP and peerGetPrivateIP.
+                          FIX      AutoMatch now correctly checks if a listed match is the local player or not.
+04-03-2003  2.01.07  DES  FIX      If maxPlayers was set to 0 in peerCreateStagingRoom[WithSocket],
+                                   the qrServerKey callback was not being called for MAXPLAYERS_KEY.
+03-27-2003  2.01.06  DES  FIX      piGetPrivateIP now returns the IP instead of true/false.
+03-26-2003  2.01.05  DES  FEATURE  Added peerSetGroupID and peerGetGroupID, which allows for getting a list
+                                   of games in a group room and reporting a game as being in a group,
+                                   without having to actually be in that group room.
+                          CLEANUP  Removed piListingGamesGroupID method of setting group ID.
+                          OTHER    Updated to pass the new extra parameter to SBServerListConnectAndQuery().
+03-24-2003  2.01.04  DES  FIX      piStartHosting and piStartReportingWithSocket will now correctly return
+                                   PEERFalse if piStartReporting fails.
+                          FIX      Updated the PS2 Makefile to compile files recently added to Peer.
+                          OTHER    Changed interal IP code to use the common code's IsPrivateIP.
+03-21-2003  2.01.03  DES  FEATURE  Added the ability to join a passworded title room.
+                          FEATURE  Added a global (piListingGamesGroupID) to control what group ID to use
+                                   when listing games.  Use -1 for games that aren't in a group.
+                          OTHER    Doesn't initialize pinger if there are no ping rooms.
+                          OTHER    During initial server listing, don't query server that already have keys.
+03-19-2003  2.01.02  DES  FEATURE  Added a player flag PEER_FLAG_HOST to identify a staging room host.
+                          FIX      Switched to a new set of crypt characters for encoding IPs, the old set
+                                   had both 'F' and 'f', which could cause conflicting staging room names.
+                          FIX      No longer need to pass a list of fields to peerStartAutoMatch[WithSocket]().
+                          FIX      General AutoMatch fixes.
+03-13-2003  2.01.01  DES  OTHER    Shortened the length of the new staging room names.
+                          OTHER    If peerIsPlayerHost() is called for the local player, return Peer's hosting flag.
+                          CLEANUP  Changed code that used internal members of in_addr (not always fully supported).
+03-12-2003  2.01.00  DES  FEATURE  Full AutoMatch support.
+                          FEATURE  Added peerAlwaysGetPlayerInfo(), which is used to tell Peer to always
+                                   get players' IPs and Profile IDs whether rooms are ping rooms or not.
+                          FEATURE  Added the ability to host multiple staging rooms behind the same public IP.
+                                   The staging room name is now based on public IP, private IP, and private queryport.
+                          FEATURE  Peer now sets limits on staging rooms to allow no more than the maxPlayers.
+                                   This behavior can be turned off by defining PI_NO_STAGING_ROOM_LIMIT.
+                                   If maxPlayers is 0, no limit is set, and maxPlayers is not reported.
+                          FEATURE  If 0 keys are requested on a room or a player, all of the keys will be returned.
+                          FEATURE  Added piSBQueryVersion global flag to set the type of server queries to send.
+                          FIX      If a server is removed, clear any pending add/update calls for the same server.
+                          CLEANUP  Changed _strdup() calls to goastrdup().
+                          CLEANUP  Added some explicit casts to remove compiler warnings.
+                          CLEANUP  Removed peerJoinStagingRoomByIP().
+                          CLEANUP  Peer no longer stores passwords, it only stores whether or not one has been set.
+                          CLEANUP  Improved the process of cancelling a join that is already in progress.
+02-10-2003  2.00.19  DES  CLEANUP  Better seperation between hosting (hosting a staging room)
+                                   and reporting (reporting a staging room or running game).
+                          FEATURE  First steps for AutoMatch support.
+02-28-2003  2.00.18  DES  RELEASE  Releasing to developer site with updated QR2.
+02-05-2003  2.00.18  DES  RELEASE  Releasing to developer site.
+02-05-2003  2.00.18  DES  CLEANUP  Switched to use CanReceiveOnSocket instead of select.
+02-04-2003  2.00.17  DES  RELEASE  Releasing to developer site.
+01-23-2003  2.00.17  DES  FIX      Replaced several calls to free with gsifree.
+01-08-2003  2.00.16  DES  FIX      Fixed passing the incorrect param value to the peerListGroupRooms callback.
+12-19-2002  2.00.15  DES  RELEASE  Releasing to developer site.
+12-19-2002  2.00.15  DES  CLEANUP  Removed assert.h includes.
+12-16-2002  2.00.14  DES  CLEANUP  Removed call to GOAClearSocketError in pinger.
+12-13-2002  2.00.13  DES  FEATURE  Added PS2 eenet stack support.
+12-06-2002  2.00.12  DES  RELEASE  Releasing to developer site with updated QR2.
+12-05-2002  2.00.12  DES  CLEANUP  Removed an extraneous assert.
+                          CLEANUP  Changes to remove warnings.
+12-03-2002  2.00.11  DES  RELEASE  Releasing to developer site.
+12-03-2002  2.00.11  DES  FIX      Fixed PeerTest to correctly show server state flags.
+                          FEATURE  Added Update button to PeerTest, uses peerUpdateGame to get a server's full keys.
+11-25-2002  2.00.10  DES  FIX      Fixed PeerTest to handle e_qrnochallengeerror.
+11-22-2002  2.00.09  DES  RELEASE  Releasing to developer site.
+11-20-2002  2.00.09  DES  CLEANUP  Cleaned up to remove compiler warings on the PS2.
+11-20-2002  2.00.08  DES  FIX      Fixed bug which caused blocking functions to lockup if disconnected while blocking.
+11-14-2002  2.00.07  DES  FEATURE  Added peerKickPlayer function to SDK and to PeerTest
+11-07-2002  2.00.06  DES  RELEASE  Limited release on developer site and to EAPAC for Generals
+                                   Incorporates serverbrowsing change to fix invalid SBServer in listing games callback.
+11-07-2002  2.00.06  DES  FIX      Fixed negative hash due to high-ascii characters in hashed string.
+10-28-2002  2.00.05  DES  RELEASE  Limited release on developer site and to EAPAC for Generals
+10-28-2002  2.00.05  DES  FIX      Correctly passing request fields to SB when starting listing.
+                                   Changed peerStartListingGames API to pass in keys by id instead of name.
+                                   Changed tests/samples to use new API.
+                                   SB callbacks debugging code now also shows the server address or group id.
+10-22-2002  2.00.04  DES  RELEASE  Limited release on developer site and to EAPAC for Generals
+10-22-2002  2.00.04  DES  FIX      Updated SB querying to use QR2 style instead of old GOA style
+                                   Update PeerTest to always check for no currently selected server
+10-22-2002  2.00.03  DDW  FIX      Clears query engine when stopping listing of games
+                                   Correctly removes servers from query engine when deleted message arrives
+10-17-2002  2.00.02  DES  RELEASE  Limited release on developer site and to EAPAC for Generals
+                                   Incorporates fix to Chat SDK
+10-10-2002  2.00.02  DES  RELEASE  Limited release on developer site and to EAPAC for Generals
+10-10-2002  2.00.02  DES  FIX      SBQueryEngineSetPublicIP is now called when the serverlist
+                                   determines the public IP (slc_publicipdetermined).
+09-26-2002  2.00.01  DES  RELEASE  Limited release on developer site
+09-25-2002  2.00.01  DDW  OTHER    Changelog started
+09-23-2002  2.00.01  DES  RELEASE  Release to EAPAC for Generals
+09-23-2002  2.00.01  DES  FEATURE  Added peerUpdateGame function
+09-06-2002  2.00.00  DDW  RELEASE  Release to EAPAC for Generals
+09-06-2002  2.00.00  DES  FEATURE  Replaces CEngine/QR with ServerBrowsing/QR2
+06-25-2002  1.20.00  DES  RELEASE  Release on deveoper site

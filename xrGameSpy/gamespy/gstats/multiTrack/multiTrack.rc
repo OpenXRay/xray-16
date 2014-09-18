@@ -1,0 +1,253 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\multiTrack.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\multiTrack.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_MULTITRACK_DIALOG DIALOGEX 0, 0, 252, 135
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "multiTrack"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Exit",IDOK,195,5,50,14
+    PUSHBUTTON      "Logout",IDC_LOGOUT,195,21,50,14
+    PUSHBUTTON      "Start 50m",IDC_START_50,10,15,50,14
+    LTEXT           "Info",IDC_INFO,10,35,80,8
+    CONTROL         "Progress1",IDC_LOCAL_PROGRESS,"msctls_progress32",
+                    PBS_SMOOTH | WS_BORDER,10,70,80,14
+    CONTROL         "Progress1",IDC_REMOTE_PROGRESS,"msctls_progress32",
+                    PBS_SMOOTH | WS_BORDER,10,105,80,14
+    PUSHBUTTON      "Start 100m",IDC_START_100,70,15,50,14
+    PUSHBUTTON      "Start 200m",IDC_START_200,130,15,50,14
+    CTEXT           "8888888888",IDC_LOCAL_INFO_OVERALL,145,70,41,8
+    CTEXT           "8888888888",IDC_REMOTE_INFO_OVERALL,195,70,41,8
+    GROUPBOX        "Rating",IDC_STATIC,105,45,140,85
+    LTEXT           "Opponent",IDC_STATIC,201,55,32,8
+    LTEXT           "Overall",IDC_STATIC,111,70,23,8
+    LTEXT           "50m",IDC_STATIC,111,85,14,8
+    LTEXT           "100m",IDC_STATIC,111,100,18,8
+    LTEXT           "200m",IDC_STATIC,111,115,18,8
+    LTEXT           "You",IDC_STATIC,161,55,14,8
+    CTEXT           "8888888888",IDC_LOCAL_INFO_50,145,85,41,8
+    CTEXT           "8888888888",IDC_LOCAL_INFO_100,145,100,41,8
+    CTEXT           "8888888888",IDC_LOCAL_INFO_200,145,115,41,8
+    CTEXT           "8888888888",IDC_REMOTE_INFO_100,195,100,41,8
+    CTEXT           "8888888888",IDC_REMOTE_INFO_50,195,85,41,8
+    CTEXT           "8888888888",IDC_REMOTE_INFO_200,195,115,41,8
+    LTEXT           "You:",IDC_STATIC,10,60,16,8
+    LTEXT           "Opponent:",IDC_STATIC,10,95,34,8
+    LTEXT           "Use Z && X to race",IDC_STATIC,10,45,57,8
+END
+
+IDD_LOGIN DIALOG DISCARDABLE  0, 0, 147, 76
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "GameSpy Login"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_EMAIL,51,8,84,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_NICK,51,23,84,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASSWORD,51,38,84,12,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Login",IDOK,15,55,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,80,55,50,14
+    LTEXT           "email:",IDC_STATIC,10,10,19,8
+    LTEXT           "nick:",IDC_STATIC,10,25,16,8
+    LTEXT           "password:",IDC_STATIC,10,40,33,8
+END
+
+IDD_HOST_OR_JOIN DIALOG DISCARDABLE  0, 0, 165, 50
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Host or Join?"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Host",IDC_HOST,"Button",BS_AUTORADIOBUTTON | WS_GROUP,7,
+                    7,31,10
+    CONTROL         "Join",IDC_JOIN,"Button",BS_AUTORADIOBUTTON,7,31,29,10
+    EDITTEXT        IDC_JOIN_ADDRESS,52,28,106,14,ES_AUTOHSCROLL | WS_GROUP
+    DEFPUSHBUTTON   "OK",IDOK,52,7,50,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,108,7,50,14
+END
+
+IDD_WAITING DIALOG DISCARDABLE  0, 0, 64, 45
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "multiTrack"
+FONT 8, "MS Sans Serif"
+BEGIN
+    PUSHBUTTON      "Cancel",IDCANCEL,7,24,50,14
+    LTEXT           "Please Wait...",IDC_STATIC,9,7,45,8
+END
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "\0"
+            VALUE "FileDescription", "multiTrack MFC Application\0"
+            VALUE "FileVersion", "1, 0, 0, 1\0"
+            VALUE "InternalName", "multiTrack\0"
+            VALUE "LegalCopyright", "Copyright (C) 2001\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "multiTrack.EXE\0"
+            VALUE "ProductName", "multiTrack Application\0"
+            VALUE "ProductVersion", "1, 0, 0, 1\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_MULTITRACK_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 245
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 128
+    END
+
+    IDD_HOST_OR_JOIN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 158
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 43
+    END
+
+    IDD_WAITING, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 57
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 38
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\multiTrack.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
