@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="Maya_Export_45"
 	ProjectGUID="{B0ED3CE1-1417-46EF-AE39-59BCFF67268B}"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -84,6 +85,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/xrayMaya_export.pdb"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="..\..\..\..\intermediate_plugs\$(ConfigurationName)\$(ProjectName)\project.lib"
 			/>
 			<Tool
@@ -103,9 +106,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -182,6 +182,8 @@
 				AdditionalLibraryDirectories="../../../sdk/3d_sdk/maya/ver-4.5/lib; ..\..\..\..\libraries"
 				ProgramDatabaseFile=""
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="..\..\..\..\intermediate_plugs\$(ConfigurationName)\$(ProjectName).lib"
 			/>
 			<Tool
@@ -201,9 +203,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"

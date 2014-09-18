@@ -162,12 +162,6 @@ namespace CPU
 			abort				();
 		}
 
-		// Number of processors
-		SYSTEM_INFO siSysInfo;
-		GetSystemInfo( &siSysInfo ); 
-		ID.n_threads = siSysInfo.dwNumberOfProcessors;
-
-
 		// Timers & frequency
 		u64			start,end;
 		u32			dwStart,dwTest;
@@ -249,13 +243,13 @@ void _initialize_cpu	(void)
     if (CPU::ID.feature&_CPU_FEATURE_SSE)	xr_strcat(features,", SSE");
     if (CPU::ID.feature&_CPU_FEATURE_SSE2)	xr_strcat(features,", SSE2");
     if (CPU::ID.feature&_CPU_FEATURE_SSE3)	xr_strcat(features,", SSE3");
-    if (CPU::ID.feature&_CPU_FEATURE_MWAIT)	xr_strcat(features,", MONITOR/MWAIT");
     if (CPU::ID.feature&_CPU_FEATURE_SSSE3)	xr_strcat(features,", SSSE3");
     if (CPU::ID.feature&_CPU_FEATURE_SSE4_1)xr_strcat(features,", SSE4.1");
     if (CPU::ID.feature&_CPU_FEATURE_SSE4_2)xr_strcat(features,", SSE4.2");
-	Msg("* CPU features: %s" , features );
+    if (CPU::ID.feature&_CPU_FEATURE_HTT)	xr_strcat(features,", HTT");
 
-	Msg("* CPU threads: %d\n" , CPU::ID.n_threads );
+	Msg("* CPU features: %s" , features );
+	Msg("* CPU cores/threads: %d/%d\n" , CPU::ID.n_cores , CPU::ID.n_threads );
 
 	Fidentity.identity		();	// Identity matrix
 	Didentity.identity		();	// Identity matrix

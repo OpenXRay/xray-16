@@ -26,16 +26,35 @@ int _cpuid ( _processor_info *pinfo )
 }
 #else
 
+#undef _CPUID_DEBUG
+
 int _cpuid ( _processor_info *pinfo )
-{__asm {
+{	
+	unsigned int lpid_width , mlpp;
+	#ifdef _CPUID_DEBUG
+		unsigned int mlpc , mcc;
+	#endif // _CPUID_DEBUG
+__asm {
 
 	// set pointers
 	mov			edi , DWORD PTR [pinfo]
 
-	// zero result
+	// zero structure
+	xor			eax, eax
+	mov			ecx, TYPE _processor_info
+	mov			esi, edi
+	add			esi, ecx
+	neg			ecx
+NZ:
+	mov			BYTE PTR [esi][ecx], al
+	inc			ecx
+	jnz			NZ
+
+	// zero result mask
 	xor			esi , esi
-	mov			BYTE PTR  [edi][_processor_info::model_name][0] , 0
-	mov			BYTE PTR  [edi][_processor_info::v_name][0] , 0
+
+	// zero bit width
+	mov			DWORD PTR [lpid_width] , esi
 
 	// test for CPUID presence
 	pushfd
@@ -62,6 +81,76 @@ int _cpuid ( _processor_info *pinfo )
 	test		eax , eax
 	jz			CHECK_EXT
 
+	// Check for Intel signature
+	cmp			ecx , 0x6C65746E				; "ntel"
+	jnz			NO_HTT
+
+	// Check for HTT bit
+	mov			eax , 01h
+	cpuid
+	test		edx , 010000000h
+	jz			NO_HTT
+
+	// Max logical processors addressed in this package
+	shr			ebx , 16
+	and			ebx , 0FFh
+	mov			DWORD PTR [mlpp] , ebx
+
+	// How many cores we have?
+
+	// Check for 04h leaf
+	xor			eax , eax
+	cpuid
+	cmp			eax , 04h
+	jb			ONE_CORE						; undocumented old P4 ?
+
+	// Max addressable cores we have
+	xor			ecx , ecx
+	mov			eax , 04h
+	cpuid
+
+	shr			eax , 26
+	and			eax , 03Fh
+	jmp short	CALC_WIDTH
+
+ONE_CORE:
+	xor			eax , eax
+
+CALC_WIDTH:
+	inc			eax
+
+#ifdef _CPUID_DEBUG
+	mov			DWORD PTR [mcc] , eax
+#endif // _CPUID_DEBUG
+
+	// Addressable logical processors per core
+	mov			ebx , eax
+	xor			edx , edx
+	mov			eax , DWORD PTR [mlpp]
+	div			ebx
+
+#ifdef _CPUID_DEBUG
+	mov			DWORD PTR [mlpc] , eax
+#endif // _CPUID_DEBUG
+
+	cmp			eax , 01h
+	jbe			NO_HTT
+
+	// Calculate required bit width to address logical procesors
+	xor			ecx , ecx
+	mov			edx , ecx
+	dec			eax
+	bsr			cx , ax
+	jz			BW_READY
+	inc			cx
+	mov			edx , ecx
+BW_READY:
+	mov			DWORD PTR [lpid_width] , edx
+
+	// We have some sort of HT
+	or			esi , _CPU_FEATURE_HTT
+
+NO_HTT:
 	// function 01h - feature sets
 	mov			eax , 01h
 	cpuid
@@ -83,8 +172,7 @@ int _cpuid ( _processor_info *pinfo )
 	and			ebx , 0fh
 	mov			BYTE PTR [edi][_processor_info::family] , bl
 
-	// Raw features
-	// TODO: check against vendor
+	// Standard features
 
 	// Against SSE3
 	xor			ebx , ebx
@@ -259,6 +347,90 @@ NO_CPUID:
 	
 	mov		DWORD PTR [edi][_processor_info::feature] , esi
 }
+#ifdef _CPUID_DEBUG
+	printf("mlpp = %u\n" , mlpp );
+	printf("mcc = %u\n" , mcc );
+	printf("mlpc = %u\n" , mlpc );
+	printf("\nlogical_id bit width = %u\n\n" , lpid_width );
+#endif // _CPUID_DEBUG
+
+	// Calculate available processors
+	DWORD pa_mask_save, sa_mask_stub, pa_mask_test, proc_count = 0;
+
+	GetProcessAffinityMask( GetCurrentProcess() , &pa_mask_save , &sa_mask_stub );
+
+	pa_mask_test = pa_mask_save;
+	while ( pa_mask_test ) {
+		if ( pa_mask_test & 0x01 )
+			++proc_count;
+		pa_mask_test >>= 1;
+	}
+
+	// All logical processors
+	pinfo->n_threads = proc_count;
+
+	// easy case, HT is not possible at all
+	if ( lpid_width == 0 ) {
+		pinfo->affinity_mask = pa_mask_save;
+		pinfo->n_cores = proc_count;
+		return pinfo->feature;
+	}
+	
+	// create APIC ID list
+	DWORD dwAPIC_IDS[256], dwNums[256], n_cpu = 0 , n_avail = 0 , dwAPIC_ID , ta_mask;
+
+	pa_mask_test = pa_mask_save;
+	while ( pa_mask_test ) {
+		if ( pa_mask_test & 0x01 ) {
+			// Switch thread to specific CPU
+			ta_mask = ( 1 << n_cpu );
+			SetThreadAffinityMask( GetCurrentThread() , ta_mask );
+			Sleep( 100 );
+			// get APIC ID
+			__asm {
+				mov		eax , 01h
+				cpuid
+				shr		ebx , 24
+				and		ebx , 0FFh
+				mov		DWORD PTR [dwAPIC_ID] , ebx
+			}
+
+			#ifdef _CPUID_DEBUG
+				char mask[255];
+				_itoa_s( dwAPIC_ID , mask , 2 );
+				printf("APID_ID #%2.2u = 0x%2.2X (%08.8sb)\n" , n_cpu , dwAPIC_ID , mask );
+			#endif // _CPUID_DEBUG
+
+			// search for the APIC_ID with the same base
+			BOOL bFound = FALSE;
+			for ( DWORD i = 0 ; i < n_avail ; ++i )
+				if ( ( dwAPIC_ID >> lpid_width ) == ( dwAPIC_IDS[i] >> lpid_width ) ) {
+					bFound = TRUE;
+					break;
+				}
+			if ( ! bFound ) {
+				// add unique core
+				dwNums[n_avail] = n_cpu;
+				dwAPIC_IDS[n_avail] = dwAPIC_ID;
+				++n_avail;
+			}
+		}
+		// pick the next logical processor
+		++n_cpu;
+		pa_mask_test >>= 1;
+	}
+
+	// restore original saved affinity mask
+	SetThreadAffinityMask( GetCurrentThread() , pa_mask_save );
+	Sleep( 100 );
+
+	// Create recommended mask
+	DWORD ta_rec_mask = 0;
+	for ( DWORD i = 0 ; i < n_avail ; ++i )
+		ta_rec_mask |= ( 1 << dwNums[i] );
+
+	pinfo->affinity_mask = ta_rec_mask;
+	pinfo->n_cores = n_avail;
 
 	return pinfo->feature;
 }

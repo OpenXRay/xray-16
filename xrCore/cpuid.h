@@ -12,6 +12,7 @@
 #define _CPU_FEATURE_SSE4_2	0x0080
 
 #define _CPU_FEATURE_MWAIT	0x0100
+#define _CPU_FEATURE_HTT	0x0200
 
 struct _processor_info {
     char		v_name[13];							// vendor name
@@ -22,7 +23,14 @@ struct _processor_info {
     unsigned char stepping;							// Processor revision number
     
 	unsigned int feature;							// processor Feature ( same as return value).
-	unsigned int n_threads;							// number of available threads, both physical and logical
+
+	unsigned int n_cores;							// number of available physical cores
+	unsigned int n_threads;							// number of available logical threads
+
+	unsigned int affinity_mask;						// recommended affinity mask
+													// all processors available to process
+													// except 2nd (and upper) logical threads
+													// of the same physical core
 };
 
 int _cpuid ( _processor_info * );

@@ -8,7 +8,11 @@
 #include "../../xrEngine/xr_object.h"
 #include "../xrRender/fbasicvisual.h"
 #include "../../xrEngine/CustomHUD.h"
- 
+
+#ifndef _EDITOR
+#include "../../xrCPU_Pipe/ttapi.h"
+#endif
+
 const	float		S_distance		= 48;
 const	float		S_distance2		= S_distance*S_distance;
 const	float		S_ideal_size	= 4.f;		// ideal size for the object
@@ -135,6 +139,10 @@ void CLightShadows::add_element	(NODE& N)
 //
 void CLightShadows::calculate	()
 {
+	#ifdef _GPA_ENABLED	
+		TAL_SCOPED_TASK_NAMED( "CLightShadows::calculate()" );
+	#endif // _GPA_ENABLED
+
 	if (casters.empty())		return;
 
 	BOOL bRTS					= FALSE;

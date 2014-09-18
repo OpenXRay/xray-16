@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="Max_Export_60"
 	ProjectGUID="{93AD3B7E-71DE-4FA2-90E7-A79782ED4960}"
 	RootNamespace="Max_Export_60"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -92,6 +93,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/xray_export.pdb"
 				BaseAddress="0x08970000"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="..\..\..\..\intermediate_plugs\$(ConfigurationName)\$(ProjectName).lib"
 			/>
 			<Tool
@@ -111,9 +114,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -199,6 +199,8 @@
 				ProgramDatabaseFile=" "
 				SetChecksum="true"
 				BaseAddress="0x08970000"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="..\..\..\..\intermediate_plugs\$(ConfigurationName)\$(ProjectName).lib"
 			/>
 			<Tool
@@ -218,9 +220,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -304,6 +303,8 @@
 				MapExports="false"
 				SetChecksum="true"
 				BaseAddress="0x08970000"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="..\..\..\..\intermediate_plugs\$(ConfigurationName)\$(ProjectName).lib"
 			/>
 			<Tool
@@ -323,9 +324,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"

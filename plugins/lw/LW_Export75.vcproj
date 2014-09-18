@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="LW_Export_75"
 	ProjectGUID="{F573DE85-0866-4775-955F-6C3241D2AE75}"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -86,6 +87,8 @@
 				AdditionalLibraryDirectories="Server/$(ConfigurationName)/; ../../../../Libraries"
 				ModuleDefinitionFile="Server\serv.def"
 				ProgramDatabaseFile=""
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="..\..\..\..\intermediate_plugs\$(ConfigurationName)\$(ProjectName).lib"
 			/>
 			<Tool
@@ -105,9 +108,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -190,6 +190,8 @@
 				ModuleDefinitionFile="Server\serv.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/xray_export.pdb"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="..\..\..\..\intermediate_plugs\$(ConfigurationName)\$(ProjectName).lib"
 			/>
 			<Tool
@@ -209,9 +211,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"

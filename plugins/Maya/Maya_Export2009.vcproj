@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="Maya_Export_2009"
 	ProjectGUID="{E5F40F9E-C01B-4B97-9BD5-FC24308D8022}"
 	RootNamespace="Maya_Export_2009"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -87,6 +88,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/xrayMaya_export.pdb"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="..\..\..\..\intermediate_plugs\$(ConfigurationName)\$(ProjectName).lib"
 			/>
 			<Tool
@@ -106,9 +109,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -186,6 +186,8 @@
 				AdditionalLibraryDirectories="../../../sdk/3d_sdk/maya/ver-2009/lib;../../../../libraries;../../../sdk/libraries"
 				ProgramDatabaseFile=""
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="..\..\..\..\intermediate_plugs\$(ConfigurationName)\$(ProjectName).lib"
 			/>
 			<Tool
@@ -205,9 +207,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -396,13 +395,6 @@
 				<File
 					RelativePath="..\..\editors\ECore\Editor\ExportSkeletonCalculateTB.cpp"
 					>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-						/>
-					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\editors\ECore\Editor\itterate_adjacents_dynamic.h"

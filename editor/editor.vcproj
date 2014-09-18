@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="editor"
 	ProjectGUID="{492D3DFE-9068-4E7E-A008-7C2420A651C0}"
 	RootNamespace="editor"
 	Keyword="ManagedCProj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -69,6 +70,8 @@
 				AdditionalLibraryDirectories="..\..\sdk\libraries;"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="..\..\..\libraries\$(ProjectName).lib"
 				TargetMachine="1"
 			/>
@@ -89,9 +92,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -150,6 +150,8 @@
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="..\..\..\libraries\$(ProjectName).lib"
 				TargetMachine="1"
 			/>
@@ -172,9 +174,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -183,50 +182,60 @@
 		<AssemblyReference
 			RelativePath="System.dll"
 			AssemblyName="System, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL"
+			MinFrameworkVersion="131072"
 		/>
 		<AssemblyReference
 			RelativePath="System.Data.dll"
 			AssemblyName="System.Data, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=x86"
+			MinFrameworkVersion="131072"
 		/>
 		<AssemblyReference
 			RelativePath="System.Drawing.dll"
 			AssemblyName="System.Drawing, Version=2.0.0.0, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL"
+			MinFrameworkVersion="131072"
 		/>
 		<AssemblyReference
 			RelativePath="System.Windows.Forms.dll"
 			AssemblyName="System.Windows.Forms, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL"
+			MinFrameworkVersion="131072"
 		/>
 		<AssemblyReference
 			RelativePath="System.XML.dll"
 			AssemblyName="System.Xml, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL"
+			MinFrameworkVersion="131072"
 		/>
 		<AssemblyReference
-			RelativePath="..\..\sdk\binaries\DockPanelSkin.dll"
+			RelativePath="..\..\SDK\binaries\DockPanelSkin.dll"
 			AssemblyName="DockPanelSkin, Version=1.0.0.0, processorArchitecture=MSIL"
+			MinFrameworkVersion="131072"
 		/>
 		<AssemblyReference
 			RelativePath="..\..\..\binaries\editor_controls.dll"
 			AssemblyName="editor_controls, Version=1.0.3506.20635, processorArchitecture=x86"
+			MinFrameworkVersion="0"
 		/>
 		<AssemblyReference
-			RelativePath="..\..\sdk\binaries\WeifenLuo.WinFormsUI.Docking.dll"
+			RelativePath="..\..\SDK\binaries\WeifenLuo.WinFormsUI.Docking.dll"
 			AssemblyName="WeifenLuo.WinFormsUI.Docking, Version=1.0.0.0, processorArchitecture=MSIL"
+			MinFrameworkVersion="131072"
 		/>
 		<AssemblyReference
 			RelativePath="System.Design.dll"
 			AssemblyName="System.Design, Version=2.0.0.0, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL"
+			MinFrameworkVersion="131072"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{B45374AA-C7ED-42CF-BBD3-DEAA2B7ACB48}"
-			RelativePathToProject=".\editor_controls\editor_controls.vcproj"
 		/>
 		<AssemblyReference
 			RelativePath="Microsoft.VisualC.Dll"
 			AssemblyName="Microsoft.VisualC, Version=8.0.0.0, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL"
+			MinFrameworkVersion="131072"
 		/>
 		<AssemblyReference
-			RelativePath="..\..\sdk\binaries\Flobbster.Windows.Forms.PropertyGrid.dll"
+			RelativePath="..\..\SDK\binaries\Flobbster.Windows.Forms.PropertyGrid.dll"
 			AssemblyName="Flobbster.Windows.Forms.PropertyGrid, Version=0.0.0.0, processorArchitecture=MSIL"
+			MinFrameworkVersion="131072"
 		/>
 	</References>
 	<Files>

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="openal32"
 	ProjectGUID="{566551F4-4EF1-4CB4-A131-F982E7606907}"
 	RootNamespace="openal32"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -88,6 +89,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/OpenAL32.pdb"
 				LargeAddressAware="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="..\..\..\..\..\..\libraries\OpenAL32.lib"
 				TargetMachine="1"
 			/>
@@ -108,9 +111,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -195,6 +195,8 @@
 				ProgramDatabaseFile="$(OutDir)/OpenAL32.pdb"
 				LargeAddressAware="2"
 				LinkTimeCodeGeneration="1"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="..\..\..\..\..\..\libraries\OpenAL32.lib"
 				TargetMachine="1"
 			/>
@@ -215,9 +217,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"

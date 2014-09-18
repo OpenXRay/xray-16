@@ -36,6 +36,45 @@ IDI_ICON1               ICON                    "stalker_cs.ico"
 //
 
 IDB_BITMAP1             BITMAP                  "splash_xrcs_en.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,6,0,2
+ PRODUCTVERSION 1,6,0,2
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "CompanyName", "GSC Game World"
+            VALUE "FileDescription", "X-Ray 1.6 Engine"
+            VALUE "FileVersion", "1.6.02"
+            VALUE "InternalName", "xrEngine"
+            VALUE "LegalCopyright", "Copyright © 2009 GSC Game World"
+            VALUE "OriginalFilename", "xrEngine.exe"
+            VALUE "ProductName", "S.T.A.L.K.E.R.: Call Of Pripyat"
+            VALUE "ProductVersion", "1.6.02"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END
+
 #endif    // Russian resources
 /////////////////////////////////////////////////////////////////////////////
 

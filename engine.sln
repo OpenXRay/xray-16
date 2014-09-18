@@ -1,5 +1,5 @@
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "bugtrap", "bugtrap", "{6BE93BFF-E2B4-43F2-ADBB-F8971E43CD5A}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
@@ -25,6 +25,36 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rd party", "3rd party", "{
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugins", "plugins", "{A074ECE0-24F4-497F-99BD-AD45D5C51382}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "max", "max", "{901F5C6A-BA06-4727-B9BC-762891749A46}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "maya", "maya", "{68CB7CEC-F907-47AD-B624-B8432F53AAE3}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lw", "lw", "{AB0D87B3-0937-4B2D-AB01-7A613B3EEF0D}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "editor", "editor", "{2DDE8FE4-6490-4AC5-B020-7E6A203F6318}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cximage", "cximage", "{8D7A67B7-7CBA-4E8F-835F-76BD34446767}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
@@ -342,24 +372,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrXMLParser", "xrXMLParser\
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "max", "max", "{901F5C6A-BA06-4727-B9BC-762891749A46}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "maya", "maya", "{68CB7CEC-F907-47AD-B624-B8432F53AAE3}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lw", "lw", "{AB0D87B3-0937-4B2D-AB01-7A613B3EEF0D}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LW_Export_70", "plugins\lw\LW_Export70.vcproj", "{F573DE85-0866-4775-955F-6C3241D2AE70}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6BA3121A-ACBC-4685-9246-4549CA1EFFFD} = {6BA3121A-ACBC-4685-9246-4549CA1EFFFD}
@@ -547,12 +559,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R3", "Layers\xrRen
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "editor", "editor", "{2DDE8FE4-6490-4AC5-B020-7E6A203F6318}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "editor", "editor\editor.vcproj", "{492D3DFE-9068-4E7E-A008-7C2420A651C0}"
 	ProjectSection(ProjectDependencies) = postProject
 		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E} = {A0F7D1FB-59A7-4717-A7E4-96F37E91998E}
@@ -635,12 +641,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrPhysics", "xrPhysics\xrPh
 		{CCCA7859-EB86-493E-9B53-C4235F45B3C5} = {CCCA7859-EB86-493E-9B53-C4235F45B3C5}
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8} = {1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}
 	EndProjectSection
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cximage", "cximage", "{8D7A67B7-7CBA-4E8F-835F-76BD34446767}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
@@ -1990,11 +1990,11 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6BE93BFF-E2B4-43F2-ADBB-F8971E43CD5A} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
+		{8D7A67B7-7CBA-4E8F-835F-76BD34446767} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 		{1BF75FEB-87DD-486C-880B-227987D191C2} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 		{566551F4-4EF1-4CB4-A131-F982E7606907} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 		{F6C4F74A-152C-4612-9E3B-D02346234855} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
-		{8D7A67B7-7CBA-4E8F-835F-76BD34446767} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 		{FA169092-EA3E-40C1-8E5A-A2B575700FE8} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 		{C961EA19-716C-4A6D-BB13-689F8FB78B01} = {89F6A7EE-3BBE-45D3-A8A8-5D9366CD987B}
 		{2FAAC8BA-369F-465E-B465-2235963FD377} = {89F6A7EE-3BBE-45D3-A8A8-5D9366CD987B}
@@ -2015,10 +2015,10 @@ Global
 		{E8CF1ADA-264A-4127-86C2-FD7057D3792C} = {6BE93BFF-E2B4-43F2-ADBB-F8971E43CD5A}
 		{CA2604CA-A2AC-49A1-A468-8AB5A2E6CBC9} = {6BE93BFF-E2B4-43F2-ADBB-F8971E43CD5A}
 		{893279CB-0805-405F-B484-9BB728A18261} = {6BE93BFF-E2B4-43F2-ADBB-F8971E43CD5A}
-		{F1066EAC-EE25-4C7A-9023-5957A6F7BA27} = {A074ECE0-24F4-497F-99BD-AD45D5C51382}
 		{901F5C6A-BA06-4727-B9BC-762891749A46} = {A074ECE0-24F4-497F-99BD-AD45D5C51382}
 		{68CB7CEC-F907-47AD-B624-B8432F53AAE3} = {A074ECE0-24F4-497F-99BD-AD45D5C51382}
 		{AB0D87B3-0937-4B2D-AB01-7A613B3EEF0D} = {A074ECE0-24F4-497F-99BD-AD45D5C51382}
+		{F1066EAC-EE25-4C7A-9023-5957A6F7BA27} = {A074ECE0-24F4-497F-99BD-AD45D5C51382}
 		{93AD3B7E-71DE-4FA2-90E7-A79782ED4960} = {901F5C6A-BA06-4727-B9BC-762891749A46}
 		{56AD8F54-F89E-4B5A-93F8-8A617BFD1160} = {901F5C6A-BA06-4727-B9BC-762891749A46}
 		{B0ED3CE1-1417-46EF-AE39-59BCFF67268B} = {68CB7CEC-F907-47AD-B624-B8432F53AAE3}

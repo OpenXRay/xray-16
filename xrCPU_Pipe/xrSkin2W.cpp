@@ -187,12 +187,12 @@ void __stdcall xrSkin4W_x86(vertRender*		D,
 	// NON-Unrolled loop
 	for (; S!=E; )
 	{
-		Fmatrix& M0		= Bones[ S->m[0] ].mRenderTransform;
+	Fmatrix& M0		= Bones[ S->m[0] ].mRenderTransform;
         Fmatrix& M1		= Bones[ S->m[1] ].mRenderTransform;
         Fmatrix& M2		= Bones[ S->m[2] ].mRenderTransform;
         Fmatrix& M3		= Bones[ S->m[3] ].mRenderTransform;
 
-		M0.transform_tiny(P0,S->P); P0.mul(S->w[0]);
+	M0.transform_tiny(P0,S->P); P0.mul(S->w[0]);
         M0.transform_dir (N0,S->N); N0.mul(S->w[0]);
 
         M1.transform_tiny(P1,S->P); P1.mul(S->w[1]);
@@ -201,7 +201,7 @@ void __stdcall xrSkin4W_x86(vertRender*		D,
         M2.transform_tiny(P2,S->P); P2.mul(S->w[2]);
         M2.transform_dir (N2,S->N); N2.mul(S->w[2]);
 
-		M3.transform_tiny(P3,S->P); P3.mul(1.0f-S->w[0]-S->w[1]-S->w[2]);
+	M3.transform_tiny(P3,S->P); P3.mul(1.0f-S->w[0]-S->w[1]-S->w[2]);
         M3.transform_dir (N3,S->N); N3.mul(1.0f-S->w[0]-S->w[1]-S->w[2]);
 
 		P0.add(P1);
