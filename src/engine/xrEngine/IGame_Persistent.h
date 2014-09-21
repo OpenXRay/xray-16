@@ -65,6 +65,7 @@ public:
 	IGame_ObjectPool				ObjectPool;
 	CEnvironment*					pEnvironment;
 	CEnvironment&					Environment()	{return *pEnvironment;};
+	void							Prefetch			( );
 #endif
 	IMainMenu*						m_pMainMenu;	
 

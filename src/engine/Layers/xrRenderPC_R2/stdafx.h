@@ -35,7 +35,7 @@
 #include "../../xrEngine/igame_level.h"
 #include "../xrRender/blenders\blender.h"
 #include "../xrRender/blenders\blender_clsid.h"
-#include "../../xrEngine/psystem.h"
+#include "../../xrParticles/psystem.h"
 #include "../xrRender/xrRender_console.h"
 #include "r2.h"
 

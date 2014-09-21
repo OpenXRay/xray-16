@@ -206,8 +206,10 @@ void CStats::Show()
 		//F.OutNext	("DIP/DP:      %d",			RCache.stat.calls);
 #ifdef DEBUG
 		F.OutSkip	();
+#ifdef FS_DEBUG
 		F.OutNext	("mapped:      %d",			g_file_mapped_memory);
 		F.OutSkip	();
+#endif
 		m_pRender->OutData2(F);
 		//F.OutNext	("SH/T/M/C:    %d/%d/%d/%d",RCache.stat.states,RCache.stat.textures,RCache.stat.matrices,RCache.stat.constants);
 		//F.OutNext	("RT/PS/VS:    %d/%d/%d",	RCache.stat.target_rt,RCache.stat.ps,RCache.stat.vs);

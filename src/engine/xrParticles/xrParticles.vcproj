@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="xrParticles"
 	ProjectGUID="{94A1C366-3D19-48E6-8170-4ADC2E70DF97}"
+	RootNamespace="xrParticles"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -95,7 +96,6 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="tal_sr.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\sdk\libraries;..\..\..\libraries"

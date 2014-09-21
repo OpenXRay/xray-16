@@ -134,8 +134,14 @@ void IGame_Persistent::OnGameStart()
 #ifndef _EDITOR
 //	LoadTitle("st_prefetching_objects");
 	LoadTitle();
-	if (strstr(Core.Params,"-noprefetch"))	return;
+	if(!strstr(Core.Params,"-noprefetch"))
+		Prefetch();
+#endif
+}
 
+#ifndef _EDITOR
+void IGame_Persistent::Prefetch()
+{
 	// prefetch game objects & models
 	float	p_time		=			1000.f*Device.GetTimerGlobal()->GetElapsed_sec();
 	u32	mem_0			=			Memory.mem_usage()	;
@@ -152,8 +158,9 @@ void IGame_Persistent::OnGameStart()
 
 	Msg					("* [prefetch] time:    %d ms",	iFloor(p_time));
 	Msg					("* [prefetch] memory:  %dKb",	p_mem/1024);
-#endif
 }
+#endif
+
 
 void IGame_Persistent::OnGameEnd	()
 {

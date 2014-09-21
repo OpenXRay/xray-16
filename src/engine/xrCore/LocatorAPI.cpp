@@ -601,16 +601,11 @@ bool CLocatorAPI::Recurse		(const char* path)
 
 	_findclose		( hFile );
 
-	u32				count = rec_files.size();
-	_finddata_t		*buffer = (_finddata_t*)_alloca(count*sizeof(_finddata_t));
-	std::copy		(&*rec_files.begin(), &*rec_files.begin() + count, buffer);
-
-//.	std::copy		(&*rec_files.begin(),&*rec_files.end(),buffer);
-
+	FFVec buffer(rec_files);
 	rec_files.clear_not_free();
-	std::sort		(buffer, buffer + count, pred_str_ff);
-	for (_finddata_t *I = buffer, *E = buffer + count; I != E; ++I)
-		ProcessOne	(path,I);
+	std::sort		(buffer.begin(), buffer.end(), pred_str_ff);
+	for (FFIt I = buffer.begin(), E = buffer.end(); I != E; ++I)
+		ProcessOne	(path, &*I);
 
 	// insert self
     if (path&&path[0])\
@@ -1141,7 +1136,7 @@ void CLocatorAPI::file_from_archive	(IReader *&R, LPCSTR fname, const file &desc
 	string512					temp;
 	xr_sprintf					(temp, sizeof(temp),"%s:%s",*A.path,fname);
 
-#ifdef DEBUG
+#ifdef FS_DEBUG
 	register_file_mapping		(ptr,sz,temp);
 #endif // DEBUG
 
@@ -1157,7 +1152,7 @@ void CLocatorAPI::file_from_archive	(IReader *&R, LPCSTR fname, const file &desc
 	R							= xr_new<CTempReader>(dest,desc.size_real,0);
 	UnmapViewOfFile				(ptr);
 
-#ifdef DEBUG
+#ifdef FS_DEBUG
 	unregister_file_mapping		(ptr,sz);
 #endif // DEBUG
 }

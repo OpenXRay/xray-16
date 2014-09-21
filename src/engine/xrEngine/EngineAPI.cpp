@@ -187,6 +187,17 @@ extern "C" {
 
 void CEngineAPI::CreateRendererList()
 {
+#ifdef DEDICATED_SERVER
+
+	vid_quality_token						= xr_alloc<xr_token>(2);
+
+	vid_quality_token[0].id			= 0;
+	vid_quality_token[0].name		= xr_strdup("renderer_r1");
+
+	vid_quality_token[1].id			= -1;
+	vid_quality_token[1].name		= NULL;
+
+#else
 	//	TODO: ask renderers if they are supported!
 	if(vid_quality_token != NULL)		return;
 	bool bSupports_r2 = false;
@@ -371,4 +382,5 @@ void CEngineAPI::CreateRendererList()
 #endif // DEBUG
 	}
 	*/
+#endif //#ifndef DEDICATED_SERVER
 }

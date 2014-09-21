@@ -398,7 +398,7 @@ NO_CPUID:
 			#ifdef _CPUID_DEBUG
 				char mask[255];
 				_itoa_s( dwAPIC_ID , mask , 2 );
-				printf("APID_ID #%2.2u = 0x%2.2X (%08.8sb)\n" , n_cpu , dwAPIC_ID , mask );
+				printf("APID_ID #%2.2u = 0x%2.2X (%08.8sb)\n" , n_avail , dwAPIC_ID , mask );
 			#endif // _CPUID_DEBUG
 
 			// search for the APIC_ID with the same base

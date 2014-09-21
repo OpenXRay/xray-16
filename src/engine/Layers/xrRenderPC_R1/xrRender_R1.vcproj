@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="xrRender_R1"
 	ProjectGUID="{57A498C9-A741-4DDF-8EFC-BFB9EB6B00E2}"
 	RootNamespace="xrRender_R1"
@@ -180,7 +180,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="nvapi.lib atimgpud_s_x86.lib tal_sr.lib"
+				AdditionalDependencies="nvapi.lib atimgpud_s_x86.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\sdk\libraries;..\..\..\..\libraries"
 				GenerateDebugInformation="true"

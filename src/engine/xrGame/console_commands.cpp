@@ -182,7 +182,7 @@ static void full_memory_stats	( )
 
 	Msg		("* [x-ray]: economy: strings[%d K], smem[%d K]",_eco_strings/1024,_eco_smem);
 
-#ifdef DEBUG
+#ifdef FS_DEBUG
 	Msg		("* [x-ray]: file mapping: memory[%d K], count[%d]",g_file_mapped_memory/1024,g_file_mapped_count);
 	dump_file_mappings	();
 #endif // DEBUG

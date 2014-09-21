@@ -388,7 +388,7 @@
 				Name="VCX360LinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="/NODEFAULTLIB:LIBCMTD"
-				AdditionalDependencies="vorbisfile_static_d.lib ogg_static_d.lib OpenAL32.lib"
+				AdditionalDependencies="libvorbisfile_static_d.lib libogg_static_d.lib OpenAL32.lib"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\sdk\libraries;..\..\..\libraries"
@@ -481,7 +481,7 @@
 			/>
 			<Tool
 				Name="VCX360LinkerTool"
-				AdditionalDependencies="vorbisfile_static.lib ogg_static.lib OpenAL32.lib"
+				AdditionalDependencies="libvorbisfile_static.lib libogg_static.lib OpenAL32.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\sdk\libraries;..\..\..\libraries"
 				GenerateDebugInformation="true"
@@ -573,7 +573,7 @@
 			/>
 			<Tool
 				Name="VCX360LinkerTool"
-				AdditionalDependencies="vorbisfile_static.lib ogg_static.lib OpenAL32.lib"
+				AdditionalDependencies="libvorbisfile_static.lib libogg_static.lib OpenAL32.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\sdk\libraries;..\..\..\libraries"
 				GenerateDebugInformation="true"

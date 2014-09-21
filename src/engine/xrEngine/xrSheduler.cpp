@@ -35,7 +35,7 @@ void CSheduler::Destroy			()
 
 		Msg				("! Sheduler work-list is not empty");
 		for (u32 it=0; it<Items.size(); it++)
-			Msg("%s",*Items[it].Object->shedule_Name().c_str());
+			Msg("%s", Items[it].Object->shedule_Name().c_str());
 	}
 #endif // DEBUG
 	ItemsRT.clear		();

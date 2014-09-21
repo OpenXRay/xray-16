@@ -91,7 +91,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="ogg_static.lib vorbis_static.lib vorbisenc_static.lib vorbisfile_static.lib"
+				AdditionalDependencies="libogg_static.lib libvorbis_static.lib libvorbisenc_static.lib libvorbisfile_static.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="false"
 				AdditionalLibraryDirectories="..\..\..\sdk\libraries;..\..\..\..\libraries"
@@ -201,7 +201,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="/MACHINE:I386 /NODEFAULTLIB:LIBCMTD"
-				AdditionalDependencies="ogg_static_d.lib vorbis_static_d.lib vorbisenc_static.lib vorbisfile_static_d.lib"
+				AdditionalDependencies="libogg_static_d.lib libvorbis_static_d.lib libvorbisenc_static.lib libvorbisfile_static_d.lib"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\sdk\libraries;..\..\..\..\libraries"
@@ -309,7 +309,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386 /NODEFAULTLIB:user32"
-				AdditionalDependencies="ogg_static.lib vorbis_static.lib vorbisenc_static.lib vorbisfile_static.lib"
+				AdditionalDependencies="libogg_static.lib libvorbis_static.lib libvorbisenc_static.lib libvorbisfile_static.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\sdk\libraries;..\..\..\..\libraries"

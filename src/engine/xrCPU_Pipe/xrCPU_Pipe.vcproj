@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="xrCPU_Pipe"
 	ProjectGUID="{CA0649DD-D089-423A-981C-46B57A884EB9}"
+	RootNamespace="xrCPU_Pipe"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -95,7 +96,6 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386 "
-				AdditionalDependencies="tal_sr.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\sdk\libraries;..\..\..\libraries"

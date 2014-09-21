@@ -442,9 +442,9 @@ void ParticleRenderStream( LPVOID lpvParams )
 				lt.set			(0.f,0.f);
 				rb.set			(1.f,1.f);
 
-				// _mm_prefetch( (char*) &particles[i + 1] , _MM_HINT_NTA );
+				 _mm_prefetch( (char*) &particles[i + 1] , _MM_HINT_NTA );
 
-				//if ( angle != *((DWORD*)&m.rot.x) ) {
+				if ( angle != *((DWORD*)&m.rot.x) ) {
 					angle = *((DWORD*)&m.rot.x);
 					__asm {
 						fld			DWORD PTR [angle]
@@ -452,9 +452,9 @@ void ParticleRenderStream( LPVOID lpvParams )
 						fstp		DWORD PTR [cosa]
 						fstp		DWORD PTR [sina]
 					}
-				//}
+				}
 
-				// _mm_prefetch( 64 + (char*) &particles[i + 1] , _MM_HINT_NTA );
+				 _mm_prefetch( 64 + (char*) &particles[i + 1] , _MM_HINT_NTA );
 
 				if (pPE.m_Def->m_Flags.is(CPEDef::dfFramed))
 					pPE.m_Def->m_Frame.CalculateTC(iFloor(float(m.frame)/255.f),lt,rb);
