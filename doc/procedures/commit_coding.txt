@@ -1,0 +1,24 @@
+TITLE: Commit message conventions
+
+The format of commit message should be a short description of what you did.
+After the description, the bug ID, review ID or anything else.
+
+The commit log should not contain the obvious. If you change file Foo.cpp:
+
+ BAD:
+    "Fix bug in Foo.cpp"
+ BAD:
+    "Fix #45"
+ BAD:
+    "Commit Foo.cpp"
+ GOOD:
+    "Fix buffer overflow (close #45)."
+
+The above does not mean that when you do a complex change do not write a
+description of what you did, on the contrary. When a long description is
+needed do add as much as needed to explain the change, just do not add
+meaningless information (committing Foo.cpp etc.)
+
+It is advisable to split complex commits to several smaller commits if
+possible. If you see that your commit massage contain more then one topic, you
+probably can and should split the commit into a few unrelated commits.
