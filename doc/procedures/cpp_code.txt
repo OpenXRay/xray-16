@@ -114,9 +114,9 @@ if the case is one line, then one space after ':':
  BAD
     switch (vendor)
     {
-        case Vendor::Intel:
+        case Vendor::Intel :
             ...
-        case Vendor::AMD:
+        case Vendor::AMD :
             ...
     }
  GOOD
@@ -348,6 +348,18 @@ not before.
     i--;
     j++;
 
+Put one space before and after comparison operators:
+ BAD
+    if (i==0)
+       return;
+    if (j>0)
+       i = 1;
+ GOOD
+    if (i == 0)
+       return;
+    if (j > 0)
+       i = 1;
+
 Don't increment, set or change value of variable inside a function call:
  BAD
     CalcXY(i++, 2);
@@ -451,12 +463,12 @@ comparing, if they return true or false.
     if (cl)
         Disconnect(cl);
 
-When allocating a structure on stack, use = {0} unstead of memset:
+When allocating a structure on stack, use zero initializer unstead of memset:
  BAD
     ShaderParams params;
     memset(&params, sizeof(params), 0);
  GOOD
-    ShaderParams params = {0};
+    ShaderParams params = {};
 
 When possible, prefer inline functions to macros:
  BAD
@@ -465,7 +477,7 @@ When possible, prefer inline functions to macros:
     template <typename T>
     T RadiansToDegrees(T angle)
     {
-        return angle * 180 / PI;
+        return angle*180/PI;
     }
 
 Macro names should normally be all upper case, with normal spacing as rest of
@@ -787,11 +799,11 @@ Trivial + - * / expressions should not have spaces around them:
  GOOD
     Foo((a+b)/(1000*1000));
  BAD
-    Foo((Min(aMin, bMin)+Max(aMax, bMax))*(width*Pow(a, p))/(1000*1000));
+    Foo((Min(aMin, bMin)+Max(aMax, bMax))*(width+Pow(a, p))/(1000*1000));
  GOOD
-    Foo((Min(aMin, bMin)+Max(aMax, bMax)) * (width*Pow(a, p)) / (1000*1000));
+    Foo((Min(aMin, bMin)+Max(aMax, bMax)) * (width+Pow(a, p)) / (1000*1000));
 
-Dont put empty lines between code inside functions. If you want to separate
+Don't put empty lines between code inside functions. If you want to separate
 code fragments, put a comment line.
  BAD
     for (auto& item : items)
