@@ -8,7 +8,7 @@ Note: Source for COP released! Will update this with source asap.
 2) Multi-thread the engine for up to 4 cores
 3) Solve stuttering problem (likely due to LuaJit. Solution would be to
    upgrade it to newest version and then rewrite all the lua files to conform
-   with it)
+   with it).
 4) Solve problem with COP sometimes not loading correctly upon launch on some
    systems as well as not always exiting properly and still running as a
    background task.
@@ -40,7 +40,7 @@ Note: Source for COP released! Will update this with source asap.
 18) Grass draw distance console command - *
 19) Re-enable fov and hud_fov console commands - *
 20) Re-enable grass shadows - *
-21) Add Instanced Tessellation for DX9&10: 
+21) Add Instanced Tessellation for DX9&10:
     http://developer.download.nvidia.com/SDK/10.5/Samples/InstancedTessellation.zip
 
 SDK
@@ -60,7 +60,7 @@ Weapon related changes
    The new AK-12 fires 3 shots at 1,000rpm. I'm not adding an AK-12,
    just giving an example).
 2) Make pistols more useful somehow. Maybe make a "quick pistol" key or
-   something. 
+   something.
 3) Different reload sounds for reloading empty vs reloading full - *
 4) Add anm_reload_empty to weapons that don't have one - *
 5) Animation for misfires - *
