@@ -9,6 +9,6 @@ and work on the source code.
 
 If you find a bug or have an enhancement request, file an [Issue](https://github.com/openxray/xray-16/issues).
 
-Pull requests appreciated! Just check out [the version plan](https://github.com/openxray/xray-16/blob/master/doc/design/version_plan.txt) 
+Pull requests appreciated! Just check out [the task list](https://github.com/openxray/xray-16/blob/master/doc/design/tasks.txt) 
 and follow [coding](https://github.com/openxray/xray-16/blob/master/doc/procedures/cpp_code.txt) 
 and [committing](https://github.com/openxray/xray-16/blob/master/doc/procedures/commit_coding.txt) conventions.

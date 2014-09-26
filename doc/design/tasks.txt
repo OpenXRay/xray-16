@@ -1,4 +1,4 @@
-TITLE: X-Ray Engine 1.6 version plan
+TITLE: X-Ray Engine 1.6 task list
 
 Legend
 ------
