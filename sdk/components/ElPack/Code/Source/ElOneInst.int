@@ -1,0 +1,95 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+{$ifdef CLX_USED}
+error ElOneInstance doesn''t currently work with CLX
+{$endif}
+
+unit ElOneInst;
+
+{ Application single instance monitor }
+
+interface
+
+uses
+  Windows,
+  SysUtils,
+  Messages,
+  Classes,
+  Forms,
+  ElTools,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElBaseComp;
+
+type
+  TInstanceRunEvent = procedure(Sender : TObject; Parameters : TStrings) of object;
+
+type
+  PElMemMapArr = ^TElMemMapArr;
+  TElMemMapArr = record
+    hPrevInst, hPrevAppWin,
+      hPrevMainWin, hMonWin : THandle;
+  end;
+
+  TExistsEvent = procedure(Sender : TObject;
+    hPrevInst : THandle; hPrevAppWin, hPrevMainWin : HWND; var Switch : boolean) of object;
+
+  TElOneInstance = class(TElBaseComponent)
+  private
+    FMapHandle : THandle;
+    FPrevInst,
+    FPrevAppWin,
+    FPrevMainWin : THandle;
+
+    FView      : PElMemMapArr;
+    FMapName   : string;
+    FNoAutoTerminate : boolean;
+
+    FOnExists : TExistsEvent;
+    FOnInstanceRun : TInstanceRunEvent;
+
+    procedure WMCopyData(var Msg : TMessage); message WM_COPYDATA;
+  protected
+    { Protected declarations }
+    procedure TriggerExistsEvent(hPrevInst, hPrevAppWin, hPrevMainWin : THandle; var Switch : boolean); virtual;
+    procedure TriggerInstanceRunEvent(Parameters : TStrings); virtual;
+    procedure SetEnabled(AEnabled : boolean); override;
+    procedure DoSetEnabled(AEnabled : boolean); override;
+    procedure CreateMapping;
+  public
+    { Public declarations }
+    destructor Destroy; override;
+    property PrevInstance : THandle read FPrevInst;
+    property FPrevMainWindow : THandle read FPrevMainWin;
+    property FPrevAppWindow : THandle read FPrevAppWin;
+  published
+    property MapName : string read FMapName write FMapName;
+    property NoAutoTerminate : boolean read FNoAutoTerminate write FNoAutoTerminate;
+    property OnExists : TExistsEvent read FOnExists write FOnExists;
+    property OnInstanceRun : TInstanceRunEvent read FOnInstanceRun write FOnInstanceRun;
+    property Enabled;
+  end; { TElOneInstance }
+
+var
+
+  rs_OneInstAlreadyExists : string;
+
+implementation
+end.

@@ -1,0 +1,515 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+
+(*
+
+Version History
+
+03/27/2002
+
+  Mouse wheel didn't cause OnChange event. Fixed.
+
+01/26/2002
+
+  Changed BtnFlat behavior
+
+01/22/2002
+
+  ReadOnly flag was ignored when pressing arrow buttons. Fixed.
+
+01/06/2002
+
+  Fixed Alignment property, spoiled in 3.02 release
+
+01/01/2002
+
+  Fixed some problems with painting borders when focus is moved
+
+07/17/2001
+
+  Fixed the problem with cursor position when typing the values over MaxLength
+
+03/29/2001
+
+  Fixed the problem with input of negative numbers
+
+
+02/28/2001
+
+  ButtonDirection and ButtonType properties added
+  ButtonWidth property added
+
+12/16/2000
+
+  Setting a value for the first time programmatically in run-time didn't work.
+  Fixed.
+
+*)
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+unit ElSpin;
+
+interface
+
+uses
+  SysUtils,
+  Classes,
+{$ifdef MSWINDOWS}
+  Controls,
+  Messages,
+  Windows,
+  Graphics,
+  Forms,
+  StdCtrls,
+  Menus,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+{$else}
+  QForms,
+  QStdCtrls,
+  QControls,
+  QGraphics,
+  Qt,
+  Types,
+  QMenus,
+{$endif}
+  ElACtrls,
+  ElVCLUtils,
+  ElTools,
+  ElEdits,
+  ElSpinBtn;
+
+type
+
+  TElSpinEditError = class(Exception)
+  end;
+
+  TElSpinEdit = class(TCustomElEdit)
+  protected
+    FModified : Boolean;
+    FBtnWidth : Integer;
+    FMouseOver : boolean;
+    FLargeIncrement : Integer;
+    FIncrement : Integer;
+    FSaveValue : integer;
+    FSavePos : integer;
+    FSaveLen : integer;
+    FChanging : boolean;
+    FValue : Integer;
+    FMaxValue : Integer;
+    FMinValue : Integer;
+    FAllowEdit : Boolean;
+    FButton : TElSpinButton;
+    FOnUpClick,
+    FOnDownClick : TNotifyEvent;
+    FButtonWidth: Integer;
+    FUseButtonWidth: Boolean;
+    FValueUndefined: Boolean;
+    FReadOnly: Boolean;
+    FButtonThinFrame: Boolean;
+    FButtonFlat: Boolean;
+    procedure SetValue(newValue : Integer);
+    procedure SetMaxValue(newValue : Integer);
+    procedure SetMinValue(newValue : Integer);
+    procedure SetAllowEdit(newValue : Boolean);
+    procedure SetIncrement(newValue : integer);
+    procedure SetEditRect;
+
+    {$ifdef MSWINDOWS}
+    procedure WMKeyDown(var Msg : TWMKeyDown); message WM_KEYDOWN;
+    procedure CMEnter(var Msg : TCMEnter); message CM_ENTER;
+    procedure CMExit(var Msg : TCMExit); message CM_EXIT;
+    procedure WMCreate(var Msg : TWMCreate); message WM_CREATE;
+    procedure CMMouseEnter(var Msg : TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg : TMessage); message CM_MOUSELEAVE;
+    procedure WMSetFocus(var Msg : TWMSetFocus); message WM_SETFOCUS;
+    procedure WMKillFocus(var Msg : TWMKillFocus); message WM_KILLFOCUS;
+    procedure WMMouseWheel(var Msg: TWMMouseWheel); message WM_MOUSEWHEEL;
+    procedure WMSize(var Msg : TWMSize); message WM_SIZE;
+    procedure CMEnabledChanged(var Msg : TMessage); message CM_ENABLEDCHANGED;
+    procedure WMCut(var Msg : TMessage); message WM_CUT;
+    procedure WMPaste(var Msg : TMessage); message WM_PASTE;
+    procedure WMMButtonDown(var Msg : TWMMButtonDown); message WM_MBUTTONDOWN;
+    procedure CMFontChanged(var Msg : TMessage); message CM_FONTCHANGED;
+    procedure WMContextMenu(var Msg : TMessage); message WM_CONTEXTMENU;
+    {$endif}
+
+    procedure SpinUpClick(Sender : TObject; Increment : Double); virtual;
+    procedure SpinDownClick(Sender : TObject; Increment : Double); virtual;
+    procedure SpinDrag(Sender : TObject; NewValue : Double); virtual;
+    procedure SpinStart(Sender : TObject; var StartValue : Double);
+    procedure SetReadOnly(Value: Boolean);
+    
+    procedure SetFlat(const Value : Boolean); override;
+
+    {$ifdef MSWINDOWS}
+    procedure CreateParams(var Params : TCreateParams); override;
+    {$endif}
+    procedure KeyPress(var Key : char); override;
+    procedure KeyDown(var Key : Word; Shift : TShiftState); override;
+    procedure Click; override;
+    function GetPopupMenu: TPopupMenu; override;
+
+    procedure SetModified(newValue : Boolean); virtual;
+    procedure SetButtonWidth(const Value: Integer);
+    procedure SetUseButtonWidth(Value: Boolean);
+    function GetButtonType: TElSpinBtnType;
+    procedure SetButtonType(Value: TElSpinBtnType);
+    function GetButtonDirection: TElSpinBtnDir;
+    procedure SetButtonDirection(Value: TElSpinBtnDir);
+    procedure SetValueUndefined(Value: Boolean);
+    function GetUseXPThemes: Boolean;
+    procedure SetUseXPThemes(const Value: Boolean); override;
+    procedure SetButtonThinFrame(Value: Boolean);
+    procedure SetLineBorderActiveColor(Value: TColor); override;
+    procedure SetLineBorderInactiveColor(Value: TColor); override;
+    procedure SetButtonFlat(Value: Boolean);
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    {$ifdef MSWINDOWS}
+    procedure CreateWnd; override;
+    {$endif}
+    procedure Change; override;
+
+    procedure Loaded; override;
+
+    property MouseOver : boolean read FMouseOver;
+
+    property Modified : Boolean read FModified write SetModified;  { Published }
+  published
+    property Value : Integer read FValue write SetValue default 0;
+    property MaxValue : Integer read FMaxValue write SetMaxValue default 100;
+    property MinValue : Integer read FMinValue write SetMinValue default 0;
+    property AllowEdit : Boolean read FAllowEdit write SetAllowEdit default True;
+    property Increment : Integer read FIncrement write SetIncrement;
+    property LargeIncrement : Integer read FLargeIncrement write FLargeIncrement;
+    property ButtonWidth: Integer read FButtonWidth write SetButtonWidth stored
+        FUseButtonWidth nodefault;
+    property UseButtonWidth: Boolean read FUseButtonWidth write SetUseButtonWidth
+        default false;
+    property ButtonType: TElSpinBtnType read GetButtonType write SetButtonType
+        default sbtUpDown;
+    property ButtonDirection: TElSpinBtnDir read GetButtonDirection write
+        SetButtonDirection default sbdUpDown;
+    property ValueUndefined: Boolean read FValueUndefined write SetValueUndefined
+        default false;
+    property ReadOnly: Boolean read FReadOnly write SetReadOnly default false;
+    property UseXPThemes: Boolean read GetUseXPThemes write SetUseXPThemes default true;
+    property ButtonThinFrame: Boolean read FButtonThinFrame write SetButtonThinFrame default true;
+
+    property OnUpClick   : TNotifyEvent read FOnUpClick write FOnUpClick;
+    property OnDownClick : TNotifyEvent read FOnDownClick write FOnDownClick;
+
+    property Alignment;
+    property TopMargin;
+    property LeftMargin;
+    property RightMargin;
+    property BorderSides;
+    property MaxLength;
+    property Transparent;
+    property HandleDialogKeys;
+    property HideSelection;
+    {$ifdef ELPACK_COMPLETE}
+    property ImageForm;
+    {$endif}
+
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnResize;
+    property OnChange;
+    property OnSelectionChange;
+
+    {$IFDEF VCL_4_USED}
+    property Anchors;
+    {$ENDIF}
+    {$IFDEF VCL_4_USED}
+    property Constraints;
+    {$ENDIF}
+    {$IFDEF VCL_4_USED}
+    {$ifdef MSWINDOWS}
+    property DragKind;
+    {$endif}
+    {$ENDIF}
+    {$IFDEF VCL_4_USED}
+    {$ifdef MSWINDOWS}
+    property BiDiMode;
+    {$endif}
+    {$ENDIF}
+    property ActiveBorderType;
+    property Align;
+    property AutoSelect;
+    property AutoSize;
+    property Background;
+    property BorderStyle;
+    property Color;
+    {$ifdef MSWINDOWS}
+    property Ctl3D;
+    property DragCursor;
+    {$endif}
+    property DragMode;
+    property Enabled;
+    property Font;
+    property Flat;
+    property InactiveBorderType;
+    property LineBorderActiveColor;
+    property LineBorderInactiveColor;
+
+    property ParentColor;
+    {$ifdef MSWINDOWS}
+    property ParentCtl3D;
+    {$endif}
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property TabStop default True;
+    property TabOrder;
+    property ShowHint;
+    property UseBackground;
+    property Visible;
+
+    {$ifdef MSWINDOWS}
+    {$IFDEF VCL_4_USED}
+    property OnStartDock;
+    property OnEndDock;
+    {$ENDIF}
+    {$IFDEF VCL_5_USED}
+    property OnContextPopup;
+    {$ENDIF}
+    {$endif}
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+
+    property OnStartDrag;
+    property ButtonFlat: Boolean read FButtonFlat write SetButtonFlat default false;
+  end;
+
+  TElFloatSpinEdit = class(TCustomElEdit)
+  protected
+    FAllowEdit: Boolean;
+    FBtnWidth: Integer;
+    FButton: TElSpinButton;
+    FButtonWidth: Integer;
+    FChanging: Boolean;
+    FIncrement: Double;
+    FLargeIncrement: Double;
+    FMaxValue: Double;
+    FMinValue: Double;
+    FModified: Boolean;
+    FMouseOver: Boolean;
+    FOnUpClick, FOnDownClick: TNotifyEvent;
+    FReadOnly: Boolean;
+    FSaveLen: Integer;
+    FSavePos: Integer;
+    FSaveValue: Double;
+    FUseButtonWidth: Boolean;
+    FValue: Double;
+    FValueUndefined: Boolean;
+    FButtonThinFrame: Boolean;
+    procedure SetAllowEdit(newValue : Boolean);
+    procedure SetEditRect;
+    procedure SetIncrement(newValue: Double);
+    procedure SetMaxValue(newValue: Double);
+    procedure SetMinValue(newValue: Double);
+    procedure SetReadOnly(Value: Boolean);
+    procedure SetValue(newValue: Double);
+    procedure SpinDownClick(Sender : TObject; Increment : Double); virtual;
+    procedure SpinDrag(Sender : TObject; NewValue : Double); virtual;
+    procedure SpinStart(Sender : TObject; var StartValue : Double);
+    procedure SpinUpClick(Sender : TObject; Increment : Double); virtual;
+
+    {$ifdef MSWINDOWS}
+    procedure WMKeyDown(var Msg : TWMKeyDown); message WM_KEYDOWN;
+    procedure CMEnter(var Msg : TCMEnter); message CM_ENTER;
+    procedure CMExit(var Msg : TCMExit); message CM_EXIT;
+    procedure WMCreate(var Msg : TWMCreate); message WM_CREATE;
+    procedure CMMouseEnter(var Msg : TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg : TMessage); message CM_MOUSELEAVE;
+    procedure WMSetFocus(var Msg : TWMSetFocus); message WM_SETFOCUS;
+    procedure WMKillFocus(var Msg : TWMKillFocus); message WM_KILLFOCUS;
+    procedure WMMouseWheel(var Msg: TWMMouseWheel); message WM_MOUSEWHEEL;
+    procedure WMSize(var Msg : TWMSize); message WM_SIZE;
+    procedure CMEnabledChanged(var Msg : TMessage); message CM_ENABLEDCHANGED;
+    procedure WMCut(var Msg : TMessage); message WM_CUT;
+    procedure WMPaste(var Msg : TMessage); message WM_PASTE;
+    procedure WMMButtonDown(var Msg : TWMMButtonDown); message WM_MBUTTONDOWN;
+    procedure CMFontChanged(var Msg : TMessage); message CM_FONTCHANGED;
+    procedure WMContextMenu(var Msg : TMessage); message WM_CONTEXTMENU;
+    {$endif}
+
+    procedure Click; override;
+    {$ifdef MSWINDOWS}
+    procedure CreateParams(var Params : TCreateParams); override;
+    {$endif}
+    function GetButtonDirection: TElSpinBtnDir;
+    function GetButtonType: TElSpinBtnType;
+    function GetPopupMenu: TPopupMenu; override;
+    procedure KeyDown(var Key : Word; Shift : TShiftState); override;
+    procedure KeyPress(var Key : char); override;
+    procedure SetButtonDirection(Value: TElSpinBtnDir);
+    procedure SetButtonType(Value: TElSpinBtnType);
+    procedure SetButtonWidth(const Value: Integer);
+    procedure SetFlat(const Value : Boolean); override;
+    procedure SetModified(newValue : Boolean); virtual;
+    procedure SetUseButtonWidth(Value: Boolean);
+    procedure SetValueUndefined(Value: Boolean);
+    function GetUseXPThemes: Boolean;
+    procedure SetUseXPThemes(const Value: Boolean); override;
+    procedure SetButtonThinFrame(Value: Boolean);
+    procedure SetLineBorderActiveColor(Value: TColor); override;
+    procedure SetLineBorderInactiveColor(Value: TColor); override;
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Change; override;
+    {$ifdef MSWINDOWS}
+    procedure CreateWnd; override;
+    {$endif}
+    procedure Loaded; override;
+    property Modified: Boolean read FModified write SetModified;
+    property MouseOver: Boolean read FMouseOver;
+  published
+    property AllowEdit: Boolean read FAllowEdit write SetAllowEdit default True;
+    property ButtonDirection: TElSpinBtnDir read GetButtonDirection write
+        SetButtonDirection default sbdUpDown;
+    property ButtonType: TElSpinBtnType read GetButtonType write SetButtonType
+        default sbtUpDown;
+    property ButtonWidth: Integer read FButtonWidth write SetButtonWidth stored
+        FUseButtonWidth nodefault;
+    property Increment: Double read FIncrement write SetIncrement;
+    property LargeIncrement: Double read FLargeIncrement write FLargeIncrement;
+    property MaxValue: Double read FMaxValue write SetMaxValue;
+    property MinValue: Double read FMinValue write SetMinValue;
+    property OnDownClick: TNotifyEvent read FOnDownClick write FOnDownClick;
+    property OnUpClick: TNotifyEvent read FOnUpClick write FOnUpClick;
+    property ReadOnly: Boolean read FReadOnly write SetReadOnly default false;
+    property UseButtonWidth: Boolean read FUseButtonWidth write SetUseButtonWidth
+        default false;
+    property Value: Double read FValue write SetValue;
+    property ValueUndefined: Boolean read FValueUndefined write SetValueUndefined
+        default false;
+
+    property Alignment;
+    property TopMargin;
+    property LeftMargin;
+    property RightMargin;
+    property BorderSides;
+    property MaxLength;
+    property Transparent;
+    property HandleDialogKeys;
+    property HideSelection;
+    {$ifdef ELPACK_COMPLETE}
+    property ImageForm;
+    {$endif}
+
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnResize;
+    property OnChange;
+    property OnSelectionChange;
+
+    {$IFDEF VCL_4_USED}
+    property Anchors;
+    {$ENDIF}
+    {$IFDEF VCL_4_USED}
+    property Constraints;
+    {$ENDIF}
+    {$IFDEF VCL_4_USED}
+    {$ifdef MSWINDOWS}
+    property DragKind;
+    {$endif}
+    {$ENDIF}
+    {$IFDEF VCL_4_USED}
+    {$ifdef MSWINDOWS}
+    property BiDiMode;
+    {$endif}
+    {$ENDIF}
+    property ActiveBorderType;
+    property Align;
+    property AutoSelect;
+    property AutoSize;
+    property Background;
+    property BorderStyle;
+    property Color;
+    {$ifdef MSWINDOWS}
+    property Ctl3D;
+    property DragCursor;
+    {$endif}
+    property DragMode;
+    property Enabled;
+    property Font;
+    property Flat;
+    property InactiveBorderType;
+    property LineBorderActiveColor;
+    property LineBorderInactiveColor;
+
+    property ParentColor;
+    {$ifdef MSWINDOWS}
+    property ParentCtl3D;
+    {$endif}
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property TabStop default True;
+    property TabOrder;
+    property ShowHint;
+    property UseBackground;
+    property Visible;
+
+    {$ifdef MSWINDOWS}
+    {$IFDEF VCL_4_USED}
+    property OnStartDock;
+    property OnEndDock;
+    {$ENDIF}
+    {$IFDEF VCL_5_USED}
+    property OnContextPopup;
+    {$ENDIF}
+    {$endif}
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+
+    property OnStartDrag;
+    property UseXPThemes: Boolean read GetUseXPThemes write SetUseXPThemes default 
+        true;
+    property ButtonThinFrame: Boolean read FButtonThinFrame write 
+        SetButtonThinFrame default true;
+  end;
+
+implementation
+end.

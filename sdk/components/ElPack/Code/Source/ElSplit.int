@@ -1,0 +1,231 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+
+(*
+
+Version History
+
+03/22/2002
+
+  Fixed positioning of the splitter in AutoSnap operations
+
+03/05/2002
+
+  IsSnappedLEft, IsSnappedRight properties added
+
+12/07/2001
+
+  Second snap button added
+
+09/21/2001
+
+  Windows XP support added
+
+06/01/2001
+
+  preview line (the one that appears when you drag the splitter) was too long 
+
+05/28/2001 (c) Akzhan Abdulin
+
+  Splitter dragging rewritten to be more accurate
+
+  WM_CANCELMODE message now stops dragging.
+  Test: try to press Windows key while splitter dragged.
+
+  Controls was accepted by splitter. Now it is not.
+
+  New Snap button can be used when one of SnapTopLeft
+  or SnapBottomRight properties set to true but not both
+  Inspired by Netscape Navigator 6.0.
+
+  ESC Key isn't handled now
+
+12/16/2000
+
+  Focus was grabbed by splitter. Now it is not.
+
+*)
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElSplit;  { TElSplitter component. }
+
+interface
+
+uses
+  ElHook,
+  ExtCtrls,  
+  Windows,
+  SysUtils,
+  Messages,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  ElUxTheme,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElPanel;
+
+type
+
+  TElSplitterEvent = procedure(Sender : TObject; var NewPos : integer; var Accept : boolean) of object;
+
+  TElSplitter = class(TCustomElPanel)
+  private
+    FSnapTopLeft,
+    FSnapBottomRight: boolean;
+    FAutoHide : Boolean;
+    FOldFocused : HWND;
+    FDragging   : boolean;
+    FOffset     : integer;
+    FControlTopLeft : TControl;
+    FControlBottomRight : TControl;
+    FMinSizeTopLeft : Integer;
+    FMinSizeBottomRight : Integer;
+    FAutoSnap : Boolean;
+    FLineVisible : boolean;
+    FLineDC : HDC;
+    FCurPos : integer;
+    FSizeBeforeSnap: Integer;
+    FLeftSnapButtonPushed: Boolean;
+    FLeftSnapButtonPushing: Boolean;
+
+    FRightSnapButtonPushed: Boolean;
+    FRightSnapButtonPushing: Boolean;
+
+    FShowSnapButton: Boolean;
+    FSnapButtonCursor: TCursor;
+    FSnapButtonColor: TColor;
+    FSnapButtonDotColor: TColor;
+    FSnapButtonArrowColor: TColor;
+    FLeftHook,
+    FRightHook : TElHook;
+    FOnPositionChanged : TNotifyEvent;  { Defined in Classes unit. }
+    FOnPositionChanging : TElSplitterEvent;
+    FArrowTheme: HTheme;
+    procedure AfterMessage(Sender: TObject; var Msg: TMessage; var Handled: boolean);
+    procedure SetMinSizeTopLeft(newValue : Integer);
+    procedure SetControlTopLeft(newValue : TControl);
+    procedure SetControlBottomRight(newValue : TControl);
+    procedure DrawLine;
+    procedure AllocateLineDC;
+    procedure ReleaseLineDC;
+    procedure SetAutoHide(newValue : Boolean);
+    procedure UpdateAutoVis;
+    function GetLeftSnapButtonRect: TRect;
+    procedure RecalcCurPos(X, Y: Integer);
+    procedure StopMode;
+    procedure UpdateShowSnapButton;
+    procedure SetSnapBottomRight(const Value: boolean);
+    procedure SetSnapTopLeft(const Value: boolean);
+    procedure SetShowSnapButton(const Value: Boolean);
+    procedure DoSizing(L: Integer);
+    procedure SetSnapButtonArrowColor(const Value: TColor);
+    procedure SetSnapButtonColor(const Value: TColor);
+    procedure SetSnapButtonDotColor(const Value: TColor);
+    function GetRightSnapButtonRect: TRect;
+  protected
+    FSnappedLeft: Boolean;
+    FSnappedRight: Boolean;
+    FInvertSnapButtons: Boolean;
+    procedure TriggerPositionChangedEvent; virtual;
+    procedure TriggerPositionChangingEvent(var NewPos : integer; var Accept : boolean); virtual;
+    procedure WMCancelMode(var Msg: TMessage); message WM_CANCELMODE;
+    procedure WMSetCursor(var Msg: TWMSetCursor); message WM_SETCURSOR;
+    procedure Notification(AComponent : TComponent; operation : TOperation); override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+//    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    procedure StopSizing(X, Y : integer; Accept : boolean); virtual;
+    procedure Loaded; override;
+    function GetThemedClassName: WideString; override;
+    {$ifdef VCL_4_USED}
+    procedure RequestAlign; override;
+    {$endif}
+    procedure SetUseXPThemes(const Value: Boolean); override;
+    procedure CreateArrowThemeHandle; virtual;
+    procedure FreeArrowThemeHandle; virtual;
+    procedure SetInvertSnapButtons(Value: Boolean);
+  public
+    { Public declarations }
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Paint; override;
+    procedure Snap(SnapLeft : boolean);
+    property ArrowTheme: HTheme read FArrowTheme;
+
+    property SnappedLeft: Boolean read FSnappedLeft;
+    property SnappedRight: Boolean read FSnappedRight;
+  published
+    { Published properties and events }
+    property MinSizeTopLeft : Integer read FMinSizeTopLeft write SetMinSizeTopLeft default 20;  { Published }
+    property MinSizeBottomRight : Integer read FMinSizeBottomRight write FMinSizeBottomRight default 20;  { Published }
+    property AutoSnap : Boolean read FAutoSnap write FAutoSnap default False;  { Published }
+    property SnapTopLeft : boolean read FSnapTopLeft write SetSnapTopLeft;
+    property SnapBottomRight : boolean read FSnapBottomRight write SetSnapBottomRight;
+    property ControlTopLeft : TControl read FControlTopLeft write SetControlTopLeft;
+    property ControlBottomRight : TControl read FControlBottomRight write SetControlBottomRight;
+
+    property AutoHide : Boolean read FAutoHide write SetAutoHide;  { Published }
+
+    property ShowSnapButton: Boolean read FShowSnapButton write SetShowSnapButton default false;
+    property SnapButtonCursor: TCursor read FSnapButtonCursor write FSnapButtonCursor default crDefault;
+    property SnapButtonColor: TColor read FSnapButtonColor write SetSnapButtonColor default clBtnHighlight;
+    property SnapButtonDotColor: TColor read FSnapButtonDotColor write SetSnapButtonDotColor default clBtnShadow;
+    property SnapButtonArrowColor: TColor read FSnapButtonArrowColor write SetSnapButtonArrowColor default clBtnShadow;
+
+    property Align;
+    property BevelInner;
+    property BevelOuter;
+    property BevelWidth;
+    property BorderStyle;
+    property BorderWidth;
+    property Color;
+    property Enabled;
+    property ParentColor;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property Visible;
+    {$ifndef CLX_USED}
+    property UseXPThemes;
+    {$endif}
+
+    property OnPositionChanged : TNotifyEvent read FOnPositionChanged write FOnPositionChanged;
+    property OnPositionChanging : TElSplitterEvent read FOnPositionChanging write FOnPositionChanging;
+    { Inherited events: }
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property InvertSnapButtons: Boolean read FInvertSnapButtons write 
+        SetInvertSnapButtons default false;
+  end;  { TElSplitter }
+
+implementation
+end.

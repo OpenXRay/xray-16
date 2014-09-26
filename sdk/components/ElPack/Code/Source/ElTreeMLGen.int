@@ -1,0 +1,267 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+
+{$I ..\ElPack.inc}
+
+{$R ..\Design\ElTreeMLGen.dcr}
+
+(*
+
+Template description:
+
+Loop:
+
+ITEMS
+    - this loop defines the part of template, which is processed for every
+      item
+SECTIONS
+    - this loop defines the part of template, which is processed for every
+      section in the header
+CELLS
+    - this loop defines the part of template, which is processed for every cell
+      of the item
+      This loop must only be used when generating multicolumn tree.
+
+Tags:
+
+<HEADER></HEADER>
+    - defines the part of text that belongs to the header. Header-related
+      macros and tags can be used only within this tag.
+<SECTION></SECTION>
+    - defines the part of the text that belongs to the header section.
+
+<ITEM></ITEM>
+    - defines the part of text that belongs to the tree item. Item-related macros
+      and tags can be used only within this tag.
+<CELL></CELL>
+    - defines the part of text that belongs to the cell of the tree item.
+      Cell-related macros can be used only within this tag.
+
+Macros:
+
+Section-related macros:
+
+SECTIONINDEX
+    - replaced by section index (it's "ID", as section's position can be changed
+      in runtime, but index remains unchanged). 
+SECTIONDATA
+    - replaced by section contents, be it a text or owner-drawn picture.
+SECTIONWIDTH [adjustment="+/-N"]
+    - current width of the section as it is drawn on the screen
+      Adjustment is added to the value before replacement
+OPTSECTIONWIDTH [adjustment="+/-N"]
+    - optimal width of the section as it is drawn on the screen
+      Adjustment is added to the value before replacement
+
+Item-related macros:
+ABSOLUTEINDEX [adjustment="+/-N"]
+    - replaced by the absolute index of the item in the tree. This index is the
+      number of current item in the list of all items including visible, invisible,
+      hidden and any other item. Adjustment is added to the value before replacement
+RELATIVEINDEX [adjustment="+/-N"]
+    - replaced by the index of the item in the list of the printable items. Can
+      be treated as the number of the item in the export sequence.
+      Adjustment is added to the value before replacement
+CHILDINDEX  [adjustment="+/-N"]
+    - replaced by the number of the item in the list of children of the item's
+      parent. Adjustment is added to the value before replacement
+ITEMLEVEL  [adjustment="+/-N"]
+    - replaced by the level of the item. Adjustment is added to the value
+      before replacement
+INDENT indentchars="..."
+    - replaced by indentchars sequence repeated Indent times. For exanple, when
+      indentchars is "-", INDENT macro for the item with level 3 will be replaced
+      with "---"
+
+cell-related macros:
+
+CELLDATA
+    - replaced by cell contents, be it a text or owner-drawn picture.
+CELLHEIGHT [adjustment="+/-N"]
+    - current height of the cell as it is drawn on the screen
+      Adjustment is added to the value before replacement
+CELLWIDTH [adjustment="+/-N"]
+    - current width of the cell as it is drawn on the screen
+      Adjustment is added to the value before replacement
+OPTCELLHEIGHT [adjustment="+/-N"]
+    - optimal height of the cell as it is drawn on the screen
+      Adjustment is added to the value before replacement
+OPTCELLWIDTH [adjustment="+/-N"]
+    - optimal width of the cell as it is drawn on the screen
+      Adjustment is added to the value before replacement
+
+FONTSIZE [adjustment="+/-N"]
+    - replaced by font size with adjustment specified by "adjustment" parameter.
+      For example, if font size is 8, macro FONTSIZE adjustment="+2" wil be replaced with
+      10.
+FONTNAME
+    - replaced by font name
+
+CELLBKCOLOR (format="dec/hex")
+    - replaced by (hexa)decimal value of the cell background color. The value is
+      NOT prefixed by any symbol. "Format" parameter specifies the format of the
+      color value.
+TEXTBKCOLOR (format="dec/hex")
+    - replaced by (hexa)decimal value of the text background color. The value is
+      NOT prefixed by any symbol. "Format" parameter specifies the format of the
+      color value.
+TEXTCOLOR (format="dec/hex")
+    - replaced by (hexa)decimal value of the text color. The value is NOT
+      prefixed by any symbol. "Format" parameter specifies the format of the
+      color value.
+
+Predefined conditions:
+
+SectionIndexIs {eq="number"|lt="number"|gt="number"}
+    - evaluates to true if current section index is equal, lower than or
+      greater than specified number
+
+ItemAbsIndexIs {eq="number"|lt="number"|gt="number"}
+    - evaluates to true if current item absolute index is equal, lower than or
+      greater than specified number
+
+ItemChildIndexIs {eq="number"|lt="number"|gt="number"}
+    - evaluates to true if current item child index is equal, lower than or
+      greater than specified number
+
+ItemLevelIs {eq="number"|lt="number"|gt="number"}
+    - evaluates to true if current item level is equal, lower than or
+      greater than specified number
+
+*)
+
+unit ElTreeMLGen;
+
+interface
+
+uses Classes,
+     SysUtils,
+
+     Graphics,
+     Windows,
+     {$ifndef VCL_4_USED}
+     ComCtrls,
+     {$endif}
+     Controls,
+
+     ElTools,
+     ElTree,
+     ElHeader,
+     ElStrUtils,
+
+     ElMLGen;
+
+type
+
+  TMLTreeGenOwnerDrawEvent = procedure (Sender : TObject; Item : TElTreeItem; 
+          SectionIndex : integer; MaxRect : TRect; var ReplacementString : 
+          string) of object;
+  TMLTreeGenImageEvent = procedure (Sender : TObject; ImageList : TImageList; 
+          ImageIndex : integer; var ReplacementString : string) of object;
+  TMlTreeGenItemGenerateEvent = procedure (Sender : TObject; Item : TElTreeItem;
+          var Generate : boolean) of object;
+  TMlTreeGenItemGeneratedEvent = procedure (Sender : TObject; Item : 
+          TElTreeItem) of object;
+  TElTreeMLGenerator = class (TCustomElMLGen)
+  private
+    FOnImage: TMLTreeGenImageEvent;
+  protected
+    FBusy: Boolean;
+    FCurItem: TElTreeItem;
+    FCurItemIdx: Integer;
+    FCurSection: TElHeaderSection;
+    FCurSectionIdx: Integer;
+    FGenerateColumns: Boolean;
+    FGenerateHeader: Boolean;
+    FGenerateHiddenItems: Boolean;
+    FGenerateImages: Boolean;
+    FGenerateInvisibleItems: Boolean;
+    FHeaderOnEveryPage: Boolean;
+    FItemsPerPage: Integer;
+    FLastItemIdx: Integer;
+    FLastSectionIdx: Integer;
+    FOnItemGenerate: TMlTreeGenItemGenerateEvent;
+    FOnItemGenerated: TMlTreeGenItemGeneratedEvent;
+    FOnOwnerDraw: TMLTreeGenOwnerDrawEvent;
+    FRelItemIdx: Integer;
+    FRelSectionIdx: Integer;
+    FTree: TCustomElTree;
+    VirtStyle: TElCellStyle;
+    procedure AfterExecute; override;
+    procedure BeforeExecute; override;
+    function BuildTree(Item : TElTreeItem): string;
+    function DrawCell(Item : TElTreeItem; SectionIndex : integer): string;
+    function DrawHeaderSection(SectionIndex : integer): string;
+    procedure IfFound(IfName : string; TagParameters : TStringParameters; var 
+            ResultValue : boolean); override;
+    procedure IsTag(TagName : string; var IsTag : boolean); override;
+    procedure LoopIteration(LoopNumb: integer; LoopName: string; TagParameters 
+            : TStringParameters; var LoopDone : boolean); override;
+    procedure MacroFound(MacroName : string; TagParameters : TStringParameters; 
+            var MacroResult : string; var UseTranslationTable : boolean); 
+            override;
+    procedure SetGenerateColumns(Value: Boolean);
+    procedure SetGenerateHeader(Value: Boolean);
+    procedure SetGenerateHiddenItems(Value: Boolean);
+    procedure SetGenerateInvisibleItems(Value: Boolean);
+    procedure SetHeaderOnEveryPage(Value: Boolean);
+    procedure SetItemsPerPage(Value: Integer);
+    procedure SetTree(Value: TCustomElTree);
+    procedure TagFound(Tag : string; const TagClosed : boolean; TagParameters : 
+            TStringParameters); override;
+    procedure TriggerImageEvent(ImageList : TImageList; ImageIndex : integer; 
+            var ReplacementString : string); virtual;
+    procedure TriggerItemGeneratedEvent(Item : TElTreeItem); virtual;
+    procedure TriggerItemGenerateEvent(Item : TElTreeItem; var Generate : 
+            boolean); virtual;
+    procedure TriggerOwnerDrawEvent(Item : TElTreeItem; SectionIndex : integer; 
+            MaxRect : TRect; var ReplacementString : string); virtual;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    property CurrentItem: TElTreeItem read FCurItem;
+    property CurrentSection: TElHeaderSection read FCurSection;
+  published
+    property GenerateColumns: Boolean read FGenerateColumns write 
+            SetGenerateColumns;
+    property GenerateHeader: Boolean read FGenerateHeader write 
+            SetGenerateHeader default true;
+    property GenerateHiddenItems: Boolean read FGenerateHiddenItems write 
+            SetGenerateHiddenItems;
+    property GenerateInvisibleItems: Boolean read FGenerateInvisibleItems write 
+            SetGenerateInvisibleItems;
+    property HeaderOnEveryPage: Boolean read FHeaderOnEveryPage write 
+            SetHeaderOnEveryPage;
+    property ItemsPerPage: Integer read FItemsPerPage write SetItemsPerPage 
+            default 0;
+    property OnAfterExecute;
+    property OnBeforeExecute;
+    property OnIfFound;
+    property OnImage: TMLTreeGenImageEvent read FOnImage write FOnImage;
+    property OnItemGenerate: TMlTreeGenItemGenerateEvent read FOnItemGenerate 
+            write FOnItemGenerate;
+    property OnItemGenerated: TMlTreeGenItemGeneratedEvent read 
+            FOnItemGenerated write FOnItemGenerated;
+    property OnLoopIteration;
+    property OnMacroFound;
+    property OnOwnerDraw: TMLTreeGenOwnerDrawEvent read FOnOwnerDraw write 
+            FOnOwnerDraw;
+    property OnPageBegin;
+    property OnPageEnd;
+    property OnTagFound;
+    property OnWriteString;
+    property TagPrefix;
+    property Template;
+    property Tree: TCustomElTree read FTree write SetTree;
+  end;
+  
+procedure Register;
+  
+implementation
+end.

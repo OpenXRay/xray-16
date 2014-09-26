@@ -1,0 +1,298 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}     
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+03/16/2001
+
+
+
+08/31/2001
+
+  Reading of multistring values in binary mode fixed
+  Now the file buffers are flushed after writing file.
+
+12/29/2000
+
+  IntLoadKey method remade to be quicker.
+
+09/28/2000
+
+  Object properties of type TStrings were not saved and loaded by
+  WriteObject/ReadObject. Fixed.
+
+  TCollections were not possible to save using WriteObject. Now they are.
+
+09/20/2000
+
+  WriteRect and ReadRect methods added
+
+09/12/2000
+
+  WriteColor and ReadColor methods added
+
+07/09/2000
+
+  Setting Path in registry mode to empty string caused AV. Fixed.
+  Support for binary files added.
+*)
+
+unit ElIni;
+
+interface
+
+uses
+{$ifndef CLX_USED}
+  Windows,
+  Registry,
+  ElRegUtils,
+{$IFDEF ELINI_USE_GRAPHICS}
+  Graphics,
+{$ENDIF}
+{$else}
+  Types,
+{$IFDEF ELINI_USE_GRAPHICS}
+  QGraphics,
+{$ENDIF}
+{$endif}
+  SysUtils,
+  Classes,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElList;
+
+type
+
+{$IFNDEF ELINI_USE_GRAPHICS}
+  TColor = -$7FFFFFFF-1..$7FFFFFFF;
+{$ifdef BUILDER_USED}
+  {$NODEFINE TColor}
+  (*$HPPEMIT 'namespace Graphics'*)
+  (*$HPPEMIT '{'*)
+  (*$HPPEMIT '  enum TColor {clMin=-0x7fffffff-1, clMax=0x7fffffff};'*)
+  (*$HPPEMIT '}'*)
+{$endif}
+{$ENDIF}
+
+  TElValueType = (evtUnknown, evtBoolean, evtInt, evtString, evtMultiString,
+      evtBinary, evtDouble);
+
+  TElValueData = record
+    case ValueType : TElValueType of
+      evtUnknown : ();
+      evtBoolean : (BoolValue : boolean);
+      evtInt : (IntValue : integer);
+      evtString : (StrValue : pchar);
+      evtMultiString : (MStrValue : TStringList);
+      evtBinary : (DataValue : pointer; DataLength : integer);
+      evtDouble : (DoubleValue : double);
+  end;
+
+  PELValueData = ^TElValueData;
+
+  {:
+  }
+  EElIniError = class (Exception)
+  end;
+
+  {:
+  }
+  TElIniEntry = class (TObject)
+  private
+    FChildren: TElList;
+    FIsKey: Boolean;
+    FParent: TElIniEntry;
+    FValueData: TElValueData;
+    FValueName: String;
+    function GetSubCount: Integer;
+    procedure OnValueDelete(Sender : TObject; Data : pointer);
+    procedure SetParent(Value: TElIniEntry);
+  protected
+    constructor Create;
+    function GetValue(Name : string): TElIniEntry;
+    property Parent: TElIniEntry read FParent write SetParent;
+  public
+    destructor Destroy; override;
+    procedure Invalidate;
+    property IsKey: Boolean read FIsKey;
+    property SubCount: Integer read GetSubCount;
+  end;
+
+  {$ifdef CLX_USED}
+  TRegRootType = (rrtUnknown, rrtHKEY_CLASSES_ROOT, rrtHKEY_CURRENT_USER,
+                  rrtHKEY_LOCAL_MACHINE, rrtHKEY_USERS, rrtHKEY_CURRENT_CONFIG);
+  {$endif}
+
+  TElIniFile = class (TComponent)
+  private
+    FOnBeforeLoad : TNotifyEvent;
+    FOnAfterSave  : TNotifyEvent;
+    FOnBeforeSave : TNotifyEvent;
+    FOnAfterLoad  : TNotifyEvent;
+    FBinaryMode: Boolean;
+    FComment: String;
+    FCurEntry: TElIniEntry;
+    FCurrentKey: String;
+    FDelimiter: Char;
+    FDivChar: Char;
+    FLazyWrite: Boolean;
+    FModified: Boolean;
+    FPath: String;
+    {$ifndef CLX_USED}
+    FRegistry: TRegistry;
+    FRegRoot : DWORD;
+    {$else}
+    FRegRoot : TRegRootType;
+    {$endif}
+    FUseRegistry: Boolean;
+    FRoot: TElIniEntry;
+    {$ifndef D_2}
+    FSimple: Boolean;
+    {$endif}
+    FWarningMessage: String;
+    {$ifndef CLX_USED}
+    function GetRegRoot: TRegRootType;
+    {$endif}
+    procedure SetCurrentKey(const newValue: String);
+    procedure SetDelimiter(newValue: Char);
+    procedure SetLazyWrite(newValue: Boolean);
+    procedure SetPath(newValue: String);
+    {$ifndef D_2}
+    procedure SetSimple(newValue: Boolean);
+    {$endif}
+    {$ifndef CLX_USED}
+    procedure SetRegRoot(newValue: TRegRootType);
+    procedure SetUseRegistry(newValue: Boolean);
+    {$endif}
+    procedure IntLoadKey(SL : TStringList; CurLine : integer);
+    procedure IntLoadBinKey(F : TStream);
+    procedure IntSaveKey(F : TStream; KeyName : string; KeyEntry : TElIniEntry);
+    procedure IntSaveBinKey(F : TStream; KeyName : string; KeyEntry : TElIniEntry);
+  protected
+    function GetValueEntry(Key : string; ValueName : string): TElIniEntry;
+        virtual;
+    procedure ParseLine(S : string; var Name, Value : string; var HasName :
+        boolean); virtual;
+    procedure TriggerBeforeSaveEvent; virtual;
+    procedure TriggerAfterLoadEvent; virtual;
+    procedure TriggerBeforeLoadEvent; virtual;
+    procedure TriggerAfterSaveEvent; virtual;
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    function Clear: Boolean;
+    function ClearKey(Key : string): Boolean; virtual;
+    function CreateValue(Key, ValueName : string): TElIniEntry;
+    function Delete(Key, ValueName : string): Boolean;
+    function EnumSubKeys(Key : string; Strings : TStrings): Boolean;
+    function EnumValues(Key : string; Strings : TStrings): Boolean;
+    function FullKey(Key : string): String;
+    function GetValueType(Key, ValueName : string): TElValueType;
+    function KeyExists(Key : string): Boolean;
+    procedure LoadFromStream(Stream : TStream);
+    procedure SaveToStream(Stream : TStream);
+    function Load: Boolean;
+    procedure Loaded; override;
+    function MoveEntry(Key, ValueName, NewKey : string): Boolean;
+    function OpenKey(Key : string; CanCreate : boolean): Boolean;
+    function OwnKey(Key : string): String;
+    function ParentKey(Key : string): String;
+    function ReadBinary(Key : string; ValueName : string; var Buffer; var
+        BufferLen : integer): Boolean;
+    function ReadBool(Key : string; ValueName : string; DefValue : boolean; var
+        Value : boolean): Boolean;
+    function ReadDouble(Key : string; ValueName : string; DefValue : Double; var
+        Value : Double): Boolean;
+    function ReadInteger(Key : string; ValueName : string; DefValue : integer;
+        var Value : integer): Boolean;
+    function ReadMultiString(Key : string; ValueName : string; Strings :
+        TStrings): Boolean;
+    function ReadObject(Key : string; AnObject : TPersistent): Boolean;
+    function ReadString(Key : string; ValueName : string; DefValue : string;
+        var Value : string): Boolean;
+    {$ifdef ELINI_USE_GRAPHICS}
+    function ReadColor(Key : string; ValueName : string; DefValue : TColor;
+        var Value : TColor): Boolean;
+    function ReadRect(Key : string; ValueName : string; DefValue : TRect;
+        var Value : TRect): Boolean;
+    {$endif}
+    function RenameKey(Key, NewName : string): Boolean; virtual;
+    function RenameValue(Key, ValueName, NewName : string): Boolean; virtual;
+    function Save: Boolean;
+    procedure SetValueType(Key, ValueName : string; NewType : TElValueType);
+        virtual;
+    function SubKeysCount(Key : string): Integer;
+    function ValueExists(Key : string; ValueName : string): Boolean;
+    function ValuesCount(Key : string): Integer;
+    function WriteBinary(Key : string; ValueName : string; var Buffer;
+        BufferLen : integer): Boolean;
+    function WriteBool(Key : string; ValueName : string; Value : boolean):
+        Boolean;
+    function WriteDouble(Key : string; ValueName : string; Value : Double):
+        Boolean;
+    function WriteInteger(Key : string; ValueName : string; Value : integer):
+        Boolean;
+    function WriteMultiString(Key : string; ValueName : string; Strings :
+        TStrings): Boolean;
+    function WriteObject(Key : string; AnObject : TPersistent): Boolean;
+    function WriteString(Key : string; ValueName : string; Value : string):
+        Boolean;
+    {$ifdef ELINI_USE_GRAPHICS}
+    function WriteColor(Key : string; ValueName : string; Value : TColor):
+        Boolean;
+    function WriteRect(Key : string; ValueName : string; Value : TRect):
+        Boolean;
+    {$endif}
+    property CurrentKey: String read FCurrentKey write SetCurrentKey;
+    property Modified: Boolean read FModified;
+  published
+    property BinaryMode : Boolean read FBinaryMode write FBinaryMode;
+    property Comment: String read FComment write FComment;
+    property Delimiter: Char read FDelimiter write SetDelimiter;
+    property DivChar: Char read FDivChar write FDivChar default '=';
+    property LazyWrite: Boolean read FLazyWrite write SetLazyWrite default True;
+    property Path: String read FPath write SetPath;
+    {$ifndef D_2}
+    property Simple: Boolean read FSimple write SetSimple default False;
+    {$endif}
+    property RegRoot: TRegRootType
+    {$ifndef CLX_USED}
+    read GetRegRoot write SetRegRoot;
+    {$else}
+    read FRegRoot write FRegRoot;
+    {$endif}
+    property UseRegistry: Boolean read FUseRegistry write
+    {$ifndef CLX_USED}
+        SetUseRegistry
+    {$else}
+        FUseRegistry
+    {$endif}
+        default False;
+    property WarningMessage: String read FWarningMessage write FWarningMessage;
+    property OnBeforeSave : TNotifyEvent read FOnBeforeSave write FOnBeforeSave;
+    property OnAfterLoad  : TNotifyEvent read FOnAfterLoad write FOnAfterLoad;
+    property OnBeforeLoad : TNotifyEvent read FOnBeforeLoad write FOnBeforeLoad;
+    property OnAfterSave : TNotifyEvent read FOnAfterSave write FOnAfterSave;
+  end;
+
+implementation
+end.

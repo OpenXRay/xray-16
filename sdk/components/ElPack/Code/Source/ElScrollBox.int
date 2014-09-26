@@ -1,0 +1,162 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+03/10/2002
+
+  Removed terrible flicker that happened on repainting
+
+*)
+
+unit ElScrollBox;
+
+interface
+
+uses ElVCLUtils,
+     ElUxTheme,
+     ElTmSchema,
+     ElImgFrm,
+
+     Classes,
+     StdCtrls,
+
+     Windows,
+     Controls,
+     Messages,
+     Graphics,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+     Forms;
+
+type
+
+    TElScrollBox = class(TScrollBox)
+    private
+      FActiveBorderType: TElFlatBorderType;
+      FBackground: TBitmap;
+      FBorderSides: TElBorderSides;
+      FFlat: Boolean;
+      FFlatFocusedScrollBars: Boolean;
+      FInactiveBorderType: TElFlatBorderType;
+      FTheme: HTheme;
+      FUseBackground: Boolean;
+      FImgForm: TElImageForm;
+      FImgFormChLink: TImgFormChangeLink;
+      FMouseOver: Boolean;
+      FOnMouseEnter: TNotifyEvent;
+      FOnMouseLeave: TNotifyEvent;
+      FPainting: Boolean;
+      FPaintingTo: Boolean;
+      FTransparent: Boolean;
+      procedure SetActiveBorderType(const Value: TElFlatBorderType);
+      procedure SetBackground(const Value: TBitmap);
+      procedure SetBorderSides(Value: TElBorderSides);
+      procedure SetFlat(const Value: boolean);
+      procedure SetFlatFocusedScrollBars(const Value: boolean);
+      procedure SetImageForm(newValue : TElImageForm);
+      procedure SetInactiveBorderType(const Value: TElFlatBorderType);
+      procedure SetUseBackground(const Value: boolean);
+      procedure BackgroundChanged(Sender: TObject);
+      procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+      procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+      procedure DrawBackground(DC: HDC; R: TRect);
+      procedure DrawFlatBorder(DC: HDC);
+      procedure DrawParentControl(DC: HDC);
+      procedure WMEraseBkgnd(var Msg: TWMEraseBkgnd); message WM_ERASEBKGND;
+      procedure WMKillFocus(var Msg: TMessage); message WM_KILLFOCUS;
+      procedure WMNCCalcSize(var Message : TWMNCCalcSize); message WM_NCCALCSIZE;
+      procedure WMPaint(var Msg: TWMPaint); message WM_PAINT;
+      procedure WMSetFocus(var Msg: TMessage); message WM_SETFOCUS;
+      procedure ImageFormChange(Sender : TObject);
+      procedure WMWindowPosChanged(var Message: TWMWindowPosChanged); message
+          WM_WINDOWPOSCHANGED;
+    protected
+      FLineBorderActiveColor: TColor;
+      FLineBorderInactiveColor: TColor;
+      FUseXPThemes: Boolean;
+      {$ifdef ELPACK_UNICODE}
+      FHint: WideString;
+      {$endif}
+
+      procedure SetLineBorderActiveColor(Value: TColor);
+      procedure SetLineBorderInactiveColor(Value: TColor);
+      procedure SetUseXPThemes(Value: Boolean);
+      procedure CreateThemeHandle; virtual;
+      procedure CreateWnd; override;
+      procedure DestroyWnd; override;
+      procedure FreeThemeHandle; virtual;
+      function GetThemedClassName: WideString; virtual;
+      function IsThemeApplied: Boolean;
+      procedure WMNCPaint(var Msg : TMessage); message WM_NCPAINT;
+      procedure WMThemeChanged(var Message: TMessage); message WM_THEMECHANGED;
+      procedure DoMouseEnter; dynamic;
+      procedure DoMouseLeave; dynamic;
+      procedure DoPaint(DC : HDC); dynamic;
+      procedure IFMRepaintChildren(var Message: TMessage); message
+          IFM_REPAINTCHILDREN;
+      procedure CreateParams(var Params: TCreateParams); override;
+
+      {$ifdef ELPACK_UNICODE}
+      {$ifndef CLX_USED}
+      procedure CMHintShow(var Message: TMessage); message CM_HINTSHOW;
+      {$else}
+      function HintShow(var HintInfo : THintInfo): Boolean; override;
+      {$endif}
+      {$endif}
+      procedure DrawThemedBackground(DC : HDC); virtual;
+      {$ifdef ELPACK_UNICODE}
+      procedure SetHint(Value: WideString);
+      {$endif}
+
+    public
+      constructor Create(AOwner: TComponent); override;
+      destructor Destroy; override;
+      property Theme: HTheme read FTheme;
+    published
+      property ActiveBorderType: TElFlatBorderType read FActiveBorderType write 
+          SetActiveBorderType default fbtSunken;
+      property Background: TBitmap read FBackground write SetBackground;
+      property BorderSides: TElBorderSides read FBorderSides write SetBorderSides;
+      property Flat: Boolean read FFlat write SetFlat default False;
+      property FlatFocusedScrollBars: Boolean read FFlatFocusedScrollBars write 
+          SetFlatFocusedScrollBars default False;
+      property ImageForm: TElImageForm read FImgForm write SetImageForm;
+      property InactiveBorderType: TElFlatBorderType read FInactiveBorderType write 
+          SetInactiveBorderType default fbtSunkenOuter;
+      property LineBorderActiveColor: TColor read FLineBorderActiveColor write 
+          SetLineBorderActiveColor;
+      property LineBorderInactiveColor: TColor read FLineBorderInactiveColor write 
+          SetLineBorderInactiveColor;
+      property UseBackground: Boolean read FUseBackground write SetUseBackground 
+          default False;
+      property UseXPThemes: Boolean read FUseXPThemes write SetUseXPThemes default 
+          true;
+      property OnMouseEnter: TNotifyEvent read FOnMouseEnter write FOnMouseEnter;
+      property OnMouseLeave: TNotifyEvent read FOnMouseLeave write FOnMouseLeave;
+      {$ifdef ELPACK_UNICODE}
+      property Hint: WideString read FHint write SetHint;
+      {$endif}
+    end;
+
+implementation
+end.

@@ -1,0 +1,338 @@
+
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2002, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+02/26/2002
+
+  When setting window caption (only setting it), Visible property of the text item was ignored
+
+01/27/2002
+
+  Form caption works almost correctly (font style is not obeyed) with XP styles
+  enabled
+
+10/12/2001
+
+  Form caption is drawn corectly when there are no caption texts specified
+  FWndActive flag is set when Active property is changed in run-time. 
+
+09/10/2001
+
+  Now form's complex caption is shown in Alt-Tab list
+
+07/18/2001
+
+  Added Unicode support
+
+07/12/2001
+
+  When no Text items are defined, form default caption is drawn
+
+04/18/2001
+
+  Assignment method implemented (now one can use ElFormCaption in inherited forms).
+
+02/05/2001
+
+  Right-click on the caption, when popup menu was assigned, could cause an AV.
+  Fixed.
+
+01/27/2001
+
+  Added Glyph, Layout and Align to TElCaptionText
+
+09/05/2000
+
+  Background styles fixed for Win95/Win98.
+
+*)
+
+unit ElCaption;
+
+{Custom form caption}
+
+interface
+
+uses
+  Windows,
+  SysUtils,
+  Messages,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Menus,
+  Buttons,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElTools,
+  ElPopBtn,
+  ElVCLUtils,
+  ElStrUtils,
+  ElUxTheme,
+  ElTmSchema,
+  ElHook;
+
+type
+
+  TElFormCaption = class;
+  TElCaptionButtons = class;
+  TElCaptionTexts = class;
+
+(*  TElMeasureCaptionPartEvent = procedure(Sender : TObject; Canvas : TCanvas;
+                               var Height : integer; var Width : integer) of object;
+*)
+  TElCaptionText = class(TCollectionItem)
+  private
+    FActiveColor: TColor;
+    FInactiveColor: TColor;
+    FFont: TFont;
+    FVisible: Boolean;
+    FCaption: TElFString;
+    FOwnerStyle: boolean;
+    FLayout: TButtonLayout;
+    FGlyph: TElButtonGlyph;
+    FAlign: TAlignment;
+    procedure SetOwnerStyle(newValue: boolean);
+    procedure SetActiveColor(newValue: TColor);
+    procedure SetInactiveColor(newValue: TColor);
+    procedure SetFont(newValue: TFont);
+    procedure SetVisible(newValue: Boolean);
+    procedure SetCaption(newValue: TElFString);
+    procedure FontChange(Sender: TObject);
+    function GetGlyph: TBitmap;
+    procedure SetGlyph(newValue: TBitmap);
+    procedure SetLayout(newValue: TButtonLayout);
+    procedure GlyphChanged(Sender: TObject);
+    procedure SetAlign(newValue: TAlignment);
+  protected
+    procedure Paint(Canvas: TCanvas; R: TRect); virtual;
+    function GetWidth(Canvas: TCanvas; Height : integer): Integer;
+  public
+    constructor Create(Collection: TCollection); override;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+  published
+    property ActiveColor: TColor read FActiveColor write SetActiveColor default clCaptionText;
+    property InactiveColor: TColor read FInactiveColor write SetInactiveColor default clInactiveCaptionText;
+    property Font: TFont read FFont write SetFont;
+    property Visible: Boolean read FVisible write SetVisible default True;
+    property Caption: TElFString read FCaption write SetCaption;
+    property OwnerStyle: boolean read FOwnerStyle write SetOwnerStyle default true;
+    property Glyph: TBitmap read GetGlyph write SetGlyph;
+    property Layout: TButtonLayout read FLayout write SetLayout;
+    property Align: TAlignment read FAlign write SetAlign;
+  end;
+
+  TElCaptionTexts = class(TCollection)
+  private
+    FCaption: TElFormCaption;
+  protected
+    function GetItems(Index: integer): TElCaptionText;
+    procedure SetItems(Index: integer; newValue: TElCaptionText);
+    function GetOwner: TPersistent; override;
+    procedure Update(Item: TCollectionItem); override;
+  public
+    function Add: TElCaptionText;
+    property Items[index: integer]: TElCaptionText read GetItems write SetItems; default;
+  end;
+
+  TElPaintBkgndType = (pbtActive, pbtInactive, pbtAlways);
+
+  TElCaptionButton = class(TCollectionItem)
+  private
+    FAlign: TAlignment;
+    FCaption: TElFString;
+    FGlyph: TElButtonGlyph;
+    FButtons: TElCaptionButtons;
+    FEnabled: Boolean;
+    FFixClick: Boolean;
+    FDown: Boolean;
+    FVisible: Boolean;
+    FOwnerStyle: Boolean;
+    FActiveColor: TColor;
+    FInactiveColor: TColor;
+    FFont: TFont;
+    FLayout: TButtonLayout;
+    FBtnRect: TRect;
+    FOnClick: TNotifyEvent;
+    FOnDblClick: TNotifyEvent;
+    procedure SetLayout(newValue: TButtonLayout);
+    procedure SetFont(newValue: TFont);
+    procedure SetOwnerStyle(newValue: Boolean);
+    procedure SetActiveColor(newValue: TColor);
+    procedure SetInactiveColor(newValue: TColor);
+    procedure SetVisible(newValue: Boolean);
+    procedure SetEnabled(newValue: Boolean);
+    procedure SetDown(newValue: Boolean);
+    procedure SetAlign(newValue: TAlignment);
+    procedure SetCaption(newValue: TElFString);
+    function GetGlyph: TBitmap;
+    procedure SetGlyph(newValue: TBitmap);
+    procedure GlyphChanged(Sender: TObject);
+    procedure FontChange(Sender: TObject);
+  protected
+    procedure Paint(Canvas: TCanvas; R: TRect); virtual;
+    function GetWidth(Canvas: TCanvas; Height : integer): Integer;
+  public
+    procedure Assign(Source: TPersistent); override;
+    constructor Create(Collection: TCollection); override;
+    destructor Destroy; override;
+  published
+    property Glyph: TBitmap read GetGlyph write SetGlyph;
+    property Layout: TButtonLayout read FLayout write SetLayout;
+    property Align: TAlignment read FAlign write SetAlign;
+    property Caption: TElFString read FCaption write SetCaption;
+    property Enabled: Boolean read FEnabled write SetEnabled default True;
+    property FixClick: Boolean read FFixClick write FFixClick;
+    property Down: Boolean read FDown write SetDown default False;
+    property Visible: Boolean read FVisible write SetVisible default True;
+    property OwnerStyle: Boolean read FOwnerStyle write SetOwnerStyle default True;
+    property ActiveColor: TColor read FActiveColor write SetActiveColor;
+    property InactiveColor: TColor read FInactiveColor write SetInactiveColor;
+    property Font: TFont read FFont write SetFont;
+
+    property OnClick: TNotifyEvent read FOnClick write FOnClick;
+    property OnDblClick: TNotifyEvent read FOnDblClick write FOnDblClick;
+  end;
+
+  TElCaptionButtons = class(TCollection)
+  private
+    FCaption: TElFormCaption;
+  protected
+    function GetItems(Index: integer): TElCaptionButton;
+    procedure SetItems(Index: integer; newValue: TElCaptionButton);
+    function GetOwner: TPersistent; override;
+    procedure Update(Item: TCollectionItem); override;
+  public
+    function Add: TElCaptionButton;
+    property Items[index: integer]: TElCaptionButton read GetItems write SetItems; default;
+  end;
+
+  TElCaptionDrawEvent = procedure(Sender: TObject; Canvas: TCanvas; var Rect: TRect) of object;
+  TCaptionButtonEvent = procedure(Sender: TObject; Button: TElCaptionButton) of object;
+
+  TElFormCaption = class(TComponent)
+  private
+    FTexts: TElCaptionTexts;
+    FInactiveBitmap: TBitmap;
+    FButtons: TElCaptionButtons;
+    FPaintBkgnd: TElPaintBkgndType;
+    FPopupMenu: TPopupMenu;
+    FBitmap: TBitmap;
+    FHook: TElHook;
+    FActive: Boolean;
+    FActiveLeftColor: TColor;
+    FActiveRightColor: TColor;
+    FInactiveLeftColor: TColor;
+    FInactiveRightColor: TColor;
+    FBackgroundType: TElBkGndType;
+    FNumColors: Integer;
+    FAlignment: TAlignment;
+    FForm: TForm;
+    FSystemFont: Boolean;
+    FFont,
+      Font2: TFont;
+    FWndActive: boolean;
+    FRegion,
+      FSaveRegion: HRGN;
+    FClicked: boolean;
+    FInBtn: boolean;
+    FBtnPressed: TElCaptionButton;
+    FBtnsRect: TRect;
+    FOnDrawCaption: TElCaptionDrawEvent;
+    FOnButtonClick: TCaptionButtonEvent;
+    FOnButtonDblClick: TCaptionButtonEvent;
+    FPreventUpdate: Boolean;
+    FTheme: HTheme;
+    (*FOnMeasureCaptionPart: TElMeasureCaptionPartEvent;*)
+
+    procedure SetActive(newValue: Boolean);
+    procedure SetActiveLeftColor(newValue: TColor);
+    procedure SetActiveRightColor(newValue: TColor);
+    procedure SetInactiveLeftColor(newValue: TColor);
+    procedure SetBackgroundType(newValue: TElBkGndType);
+    procedure SetPopupMenu(newValue: TPopupMenu);
+    procedure SetNumColors(newValue: Integer);
+    procedure SetAlignment(newValue: TAlignment);
+    procedure SetBitmap(newValue: TBitmap);
+    procedure BitmapChange(Sender: TObject);
+    procedure OnBeforeHook(Sender: TObject; var Msg: TMessage; var Handled: boolean);
+    procedure OnAfterHook(Sender: TObject; var Msg: TMessage; var Handled: boolean);
+    procedure SetPaintBkgnd(newValue: TElPaintBkgndType);
+    procedure SetInactiveRightColor(newValue: TColor);
+    procedure SetButtons(newValue: TElCaptionButtons);
+    procedure SetInactiveBitmap(newValue: TBitmap);
+    procedure SetSystemFont(newValue: Boolean);
+    procedure SetFont(newValue: TFont);
+    procedure FontChange(Sender: TObject);
+    procedure GetSystemFont;
+    procedure SetTexts(newValue: TElCaptionTexts);
+  protected
+    FUseXPThemes: Boolean;
+    procedure Loaded; override;
+    procedure Notification(AComponent: TComponent; operation: TOperation); override;
+    procedure Update;
+    procedure PaintCaption(var Msg: TMessage; Step: integer); virtual;
+    procedure TriggerDrawCaptionEvent(Canvas: TCanvas; var Rect: TRect); virtual;
+    procedure TriggerButtonClickEvent(Button: TElCaptionButton); virtual;
+    procedure TriggerButtonDblClickEvent(Button: TElCaptionButton); virtual;
+    procedure SetUseXPThemes(Value: Boolean);
+    procedure CreateThemeHandle; virtual;
+    procedure FreeThemeHandle; virtual;
+    procedure AllocThemes;
+    (*procedure TriggerMeasureCaptionPart(Sender : TObject; Canvas : TCanvas; var
+        Height : integer; var Width : integer);*)
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    function ButtonAtPos(X, Y: integer): TElCaptionButton;
+    procedure Assign(Source : TPersistent); override;
+    function IsThemeApplied: Boolean;
+  published
+    property Active: Boolean read FActive write SetActive;
+    property ActiveLeftColor: TColor read FActiveLeftColor write SetActiveLeftColor default clBlack;
+    property ActiveRightColor: TColor read FActiveRightColor write SetActiveRightColor default clActiveCaption;
+    property InactiveLeftColor: TColor read FInactiveLeftColor write SetInactiveLeftColor default clBlack;
+    property InactiveRightColor: TColor read FInactiveRightColor write SetInactiveRightColor default clInactiveCaption;
+    property BackgroundType: TElBkGndType read FBackgroundType write SetBackgroundType default bgtColorFill;
+    property PopupMenu: TPopupMenu read FPopupMenu write SetPopupMenu;
+    property NumColors: Integer read FNumColors write SetNumColors default 64;
+    property Alignment: TAlignment read FAlignment write SetAlignment;
+    property ActiveBitmap: TBitmap read FBitmap write SetBitmap;
+    property PaintBkgnd: TElPaintBkgndType read FPaintBkgnd write SetPaintBkgnd;
+    property Buttons: TElCaptionButtons read FButtons write SetButtons;
+    property InactiveBitmap: TBitmap read FInactiveBitmap write SetInactiveBitmap;
+    property OnDrawCaption: TElCaptionDrawEvent read FOnDrawCaption write FOnDrawCaption;
+    property OnButtonClick: TCaptionButtonEvent read FOnButtonClick write FOnButtonClick;
+    property OnButtonDblClick: TCaptionButtonEvent read FOnButtonDblClick write FOnButtonDblClick;
+    (*property OnMeasureCaptionPart: TElMeasureCaptionPartEvent read
+        FOnMeasureCaptionPart write FOnMeasureCaptionPart;*)
+    property SystemFont: Boolean read FSystemFont write SetSystemFont;
+    property Font: TFont read FFont write SetFont;
+    property Texts: TElCaptionTexts read FTexts write SetTexts;
+    property UseXPThemes: Boolean read FUseXPThemes write SetUseXPThemes default true;
+  end;
+
+implementation
+end.

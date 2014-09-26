@@ -1,0 +1,652 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+
+(*
+
+Version History
+
+03/10/2002
+
+  Removed flicker introduced during CLX porting
+  Fixed AutoScroll that was broken during CLX porting
+  Improved drawing of border in with XP styles enabled 
+
+03/06/2002
+
+  Added unicode hint
+
+01/06/2002
+
+  Fixed painting of text in CLX version with XP styles enabled 
+
+10/25/2001
+
+  Fixed painting of the borders with XP styles enabled
+  
+07/26/2001
+
+  Added Unicode support
+
+07/15/2001 (c) Akzhan Abdulin
+
+  Adapted to allow image index property editor
+
+  Potential bug fixed (FBar field was duplicated in descendant)
+
+07/12/2001
+
+  BorderSides property added.
+
+06/29/2001
+
+  Now items with #13#10 are drawn multiline when WordWrap is off.
+
+03/10/2001
+
+  Fixed possible AVs that could happen when image list is removed.
+
+  Minor optimizations and readness improvements.
+
+01/26/2001
+
+    When AutoSelectItem is false, the OnItemChange event is not fired now (!)
+
+01/22/2001
+
+    ChangeDelay property added.
+
+11/08/2000
+
+  ContainsControls made obsolete
+
+10/11/2000
+
+  OnItemChange event was not fired when the item was changed by a keypress. Fixed.
+
+
+07/03/2000
+
+  TElSidebarSection.Inactive property added. Inactive section can't be clicked
+and can't be highlighted on tracking.
+
+07/01/2000
+
+  CMControlChange changed to fix the bug with ContainsControls when attempt to
+create a panel causes an exception.
+
+
+*)
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElSideBar;
+
+interface
+
+uses
+  {$ifndef CLX_USED}
+  Windows,
+  Messages,
+  Graphics,
+  Controls,
+  StdCtrls,
+  Forms,
+  ExtCtrls,
+  Menus,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  {$else}
+  {$ifdef MSWINDOWS}
+  Windows,
+  {$endif}
+  Qt,
+  Types,
+  QTypes,
+  QGraphics,
+  QControls,
+  QForms,
+  QStdCtrls,
+  QMenus,
+  QExtCtrls,
+  ElCLXUtils,
+  {$endif}
+  SysUtils,
+  Classes,
+  ElPanel,
+  ElVCLUtils,
+  ElStrUtils,
+  ElTools,
+  ElSndMap,
+  ElUxtheme,
+  ElTmSchema,
+{$IFDEF VCL_4_USED}
+{$ifndef CLX_USED}
+  ImgList,
+{$endif}
+{$ENDIF}
+{$ifdef CLX_USED}
+  QImgList,
+{$endif}
+  ElExtBkgnd,
+  ElIni;
+
+type
+
+  TElSideBarSection = class;
+  TElSideBarSections = class;
+  TElSideBar = class;
+  TElSideBarItems = class;
+  TElSideBarItem  = class;
+
+  TElSideBarPart = (sbpSection, sbpItemImage, sbpItemText, sbpUpScroll, sbpDownScroll, sbpInside);
+  TElSideBarIconLocation = (ilLeft, ilTop);
+
+  TElSideBarContainerPanel = class(TElPanel)
+  protected
+{$ifndef CLX_USED}
+    procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHitTest;
+    procedure CreateParams(var Params : TCreateParams); override;
+{$endif}
+  public
+    constructor Create(AOwner : TComponent); override;
+  end;
+
+  TElSideBarCItem = class(TCollectionItem)
+  private
+    FBar : TElSideBar;
+    FVisible : Boolean;
+    FEnabled : Boolean;
+    FImageIndex : Integer;
+    FCaption: TElFString;
+    FTag : Integer;
+    FHint: TElFString;
+    FTextRect  : TRect;
+    FBoundRect : TRect;
+    FPartial   : boolean;
+    procedure SetVisible(newValue : Boolean);
+    procedure SetEnabled(newValue : Boolean);
+    procedure SetImageIndex(newValue : Integer);
+    procedure SetCaption(newValue: TElFString);
+  protected
+    function GetBar: TElSideBar;
+    function GetOwner : TPersistent; override;
+    function GetDisplayName: string; override;
+  public
+    Active,
+    Hidden,
+    Disabled  : boolean; // Don't matter. Used only by design-time editor
+
+    Data      : Pointer; // User-defined data.
+
+    constructor Create(Collection : TCollection); override;
+    procedure Assign(Source : TPersistent); override;
+  published
+    property Index;
+    property Tag : Integer read FTag write FTag;  { Published }
+    property Hint: TElFString read FHint write FHint;
+    property Visible : Boolean read FVisible write SetVisible;  { Published }
+    property Enabled : Boolean read FEnabled write SetEnabled;  { Published }
+    property ImageIndex : Integer read FImageIndex write SetImageIndex;  { Published }
+    property Caption: TElFString read FCaption write SetCaption;
+  end;
+
+  TElSideBarItem = class(TElSideBarCItem)
+  public
+    constructor Create(Collection : TCollection); override;
+    destructor Destroy; override;
+  end;
+
+{$warnings off}
+  TElSideBarItems = class(TCollection)
+  private
+    FSection : TElSideBarSection;
+    function GetItems(index : integer) : TElSideBarItem;
+    procedure SetItems(index: integer; newValue : TElSideBarItem);
+  protected
+    function GetOwner : TPersistent; override;
+    procedure Update(Item : TCollectionItem); override;
+  public
+    function Add : TElSideBarItem;
+    constructor Create(Section : TElSideBarSection);
+    property Items[index : integer] : TElSideBarItem read GetItems write SetItems; default; { Public }
+  end;
+{$warnings on}
+
+  TElSideBarSection = class(TElSideBarCItem)
+  private
+    FContainsControls : Boolean;
+    FItems    : TElSideBarItems;
+    FSections : TElSideBarSections;
+//    FBar      : TElSideBar;
+    FPanel    : TElSideBarContainerPanel;
+    FInactive : boolean;
+    procedure SetItems(newValue : TElSideBarItems);
+    procedure SetContainsControls(newValue : Boolean);
+    procedure AllocatePanel;
+  public
+    constructor Create(Collection : TCollection); override;
+    destructor Destroy; override;
+    procedure Assign(Source : TPersistent); override;
+
+    property Panel : TElSideBarContainerPanel read FPanel;
+  published
+    property Inactive : boolean read FInactive write FInactive;
+    property Items : TElSideBarItems read FItems write SetItems;  { Published }
+    property ContainsControls : Boolean read FContainsControls write SetContainsControls;  { Published }
+  end;
+
+{$warnings off}
+  TElSideBarSections = class(TCollection)
+  private
+    FBar : TElSideBar;
+    function GetItems(index : integer) : TElSideBarSection;
+    procedure SetItems(index : integer; newValue : TElSideBarSection);
+  protected
+    function GetOwner : TPersistent; override;
+  public
+    constructor Create(Bar : TElSideBar);
+    function Add : TElSideBarSection;
+    procedure Update(Item : TCollectionItem); override;
+    property Items[index : integer] : TElSideBarSection read GetItems write SetItems; default; { Published }
+  end;
+{$warnings on}
+
+  TElSideBar = class (TCustomElPanel)
+  private
+    FVisibleSections : Boolean;
+    FItemsFont: TFont;
+    FFlatSections: Boolean;
+    FFlatItems: Boolean;
+    FFlatActiveItem: boolean;
+    FFlat : Boolean;
+    FUpdateCount : Integer;
+{$IFDEF USE_SOUND_MAP}
+    FSoundMap : TElSoundMap;
+{$ENDIF}
+    FSectionImages : TImageList;
+    FSectionHotImages : TImageList;
+    FSectionDisabledImages : TImageList;
+    FItemDisabledImages : TImageList;
+    FItemImages: TImageList;
+    FItemHotImages : TImageList;
+
+    FSectionTracking : Boolean;
+    FItemTracking : Boolean;
+    FUnderlineTracked : Boolean;
+    FMouseOver : Boolean;
+    FSections  : TElSideBarSections;
+
+    FVisUpBtn,
+    FVisDownBtn: boolean;
+    FUpBtnPressed,
+    FDownBtnPressed: boolean;
+    FSaveUpBtnPressed,
+    FSaveDownBtnPressed: boolean;
+
+    FActiveSectionStyle: TFontStyles;
+    FActiveItemStyle: TFontStyles;
+
+    FTrackSectionFontColor,
+    FTrackSectionBkColor,
+    FTrackItemFontColor,
+    FTrackItemBkColor : TColor;
+
+    {$ifndef CLX_USED}
+    FSaveCapture   : HWND;
+    {$else}
+    FSaveCapture   : TControl;
+    {$endif}
+    FPressed       : boolean;
+    //Scrolling
+    FAutoScroll    : boolean;
+{    FScrollPos,
+    FScrollFrom,
+    FScrollTo : integer;
+}
+    Registered    : boolean;
+    //current selections
+    FTopItem      : TElSideBarItem;
+    FSection      : TElSideBarSection;
+    FItem         : TElSideBarItem;
+    FTrackSection : TElSideBarSection;
+    FTrackItem    : TElSideBarItem;
+    FDownSection  : TElSideBarSection;
+    FDownItem     : TElSideBarItem;
+    FSaveDownSection : TElSideBarSection;
+    FSaveDownItem    : TElSideBarItem;
+
+    FSImagesLink  : TChangeLink;
+    FIImagesLink  : TChangeLink;
+    FSDImagesLink : TChangeLink;
+    FIDImagesLink : TChangeLink;
+    FSHImagesLink : TChangeLink;
+    FIHImagesLink : TChangeLink;
+
+    FItemsPopup,
+    FSectionsPopup: TPopupMenu;
+
+    FSectionHeight : Integer;
+    FSectionsColor: TColor;
+    FWordWrap     : Boolean;
+    FSpacing      : Integer;
+    FTopSpacing   : Integer;
+    FScrollDelay  : Integer;
+    //FScrolling    : boolean;
+    FScrollTimer  : TTimer;
+    FItemChangeSound : TElSoundName;
+    FSectionChangeSound : TElSoundName;
+    FItemSize : Integer;
+    FRightAlignedBar : Boolean;
+
+    FOnItemChange : TNotifyEvent;
+    FOnSectionChange : TNotifyEvent;
+
+    FActiveBorderType : TElFlatBorderType;
+    FInactiveBorderType : TElFlatBorderType;
+
+    FAutoSelectItem : Boolean;
+    FDelayItem      : TElSideBarItem;
+    FHintItem       : TElSideBarCItem;
+
+    FChangeDelay    : Integer;
+    FDelayTimer     : TTimer;
+    FKeepSelection: Boolean;
+    {$ifndef CLX_USED}
+    FBorderSides: TElBorderSides;
+    {$endif}
+    FIconLocation: TElSideBarIconLocation;
+
+    procedure SetActiveBorderType(newValue : TElFlatBorderType);
+    procedure SetInactiveBorderType(newValue : TElFlatBorderType);
+    procedure SetSectionHeight(newValue : Integer);
+    procedure SetSections(newValue : TElSideBarSections);
+    function GetSectionIndex : integer;
+    procedure SetSectionIndex(newValue : Integer);
+    function GetItemIndex : integer;
+    procedure SetItemIndex(newValue : Integer);
+    procedure SetSectionsColor(newValue : TColor);
+    procedure SetWordWrap(newValue : Boolean);
+    procedure SetSpacing(newValue : Integer);
+    procedure SetTopSpacing(newValue : Integer);
+    procedure SetScrollDelay(newValue : Integer);
+    procedure SetSectionTracking(newValue : Boolean);
+    procedure SetItemTracking(newValue : Boolean);
+    procedure SetUnderlineTracked(newValue : Boolean);
+{$IFDEF USE_SOUND_MAP}
+    procedure SetSoundMap(newValue : TElSoundMap);
+{$ENDIF}
+    procedure SetSectionImages(newValue : TImageList);
+    procedure SetSectionHotImages(newValue : TImageList);
+    procedure SetSectionDisabledImages(newValue : TImageList);
+    procedure SetItemDisabledImages(newValue : TImageList);
+    procedure SetItemImages(newValue : TImageList);
+    procedure SetItemHotImages(newValue : TImageList);
+    {$ifndef CLX_USED}
+    procedure CMControlChange(var Msg : TCMControlChange); message CM_CONTROLCHANGE;
+    procedure WMPaint(var Msg : TWMPaint); message WM_PAINT;
+    procedure WMNCPaint(var Msg : TMessage); message WM_NCPAINT;
+    procedure CMMouseEnter(var Msg : TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg : TMessage); message CM_MOUSELEAVE;
+    procedure CMEnter(var Msg : TCMEnter); message CM_ENTER;
+    procedure CMExit(var Msg : TCMExit); message CM_EXIT;
+    procedure WMMouseMove(var Msg : TWMMouseMove); message WM_MOUSEMOVE;
+    procedure WMLButtonUp(var Msg : TWMLButtonUp); message WM_LBUTTONUP;
+    procedure WMLButtonDown(var Msg : TWMLButtonDown); message WM_LBUTTONDOWN;
+    procedure WMMouseWheel(var Msg: TWMMouseWheel); message WM_MOUSEWHEEL;
+    procedure WMSize(var Msg : TWMSize); message WM_SIZE;
+    procedure WMGetMinMaxInfo(var Msg : TMessage); message WM_GETMINMAXINFO;
+    procedure CMHintShow(var Msg: TMessage); message CM_HINTSHOW;
+    procedure CMDialogChar(var Msg: TCMDialogChar); message CM_DIALOGCHAR;
+    procedure WMGetDlgCode(var Msg: TWMGetDlgCode); message WM_GETDLGCODE;
+    procedure WMNCCalcSize(var Message : TWMNCCalcSize); message WM_NCCALCSIZE;
+    {$endif}
+    procedure SetFlat(newValue : Boolean);
+    {$ifndef CLX_USED}
+    procedure DrawFlatBorder;
+    {$endif}
+    procedure ItemRemoved(Sender : TObject; Item : TCollectionItem);
+    procedure ItemAdded(Sender : TObject; Item : TCollectionItem);
+    procedure SectionRemoved(Sender : TObject; Item : TCollectionItem);
+    procedure SectionAdded(Sender : TObject; Item : TCollectionItem);
+    procedure SetFlatSections(newValue: Boolean);
+    procedure SetFlatItems(newValue: Boolean);
+    procedure SetItemsFont(newValue: TFont);
+    function GetSectionsFont: TFont;
+    procedure SetSectionsFont(newValue: TFont);
+    procedure SectionsFontChanged(Sender: TObject);
+    procedure ItemsFontChanged(Sender: TObject);
+    procedure SetVisibleSections(newValue : Boolean);
+    procedure ImagesChanged(Sender : TObject);
+    procedure SetItemSize(newValue : Integer);
+    procedure SetRightAlignedBar(newValue : Boolean);
+    procedure OnScrollTimer(Sender : TObject);
+    procedure SetSectionsPopupMenu(newValue : TPopupMenu);
+    procedure SetItemsPopupMenu(newValue : TPopupMenu);
+    function GetTopIndex : Integer;
+    procedure SetTopIndex(newValue : Integer);
+    procedure UpdateTracks;
+    procedure SetActiveSectionStyle(newValue: TFontStyles);
+    procedure SetActiveItemStyle(newValue: TFontStyles);
+    procedure SetTrackSectionFontColor(Value : TColor);
+    procedure SetTrackSectionBkColor(Value : TColor);
+    procedure SetTrackItemFontColor(Value : TColor);
+    procedure SetTrackItemBkColor(Value : TColor);
+    procedure SetFlatActiveItem(Value : boolean);
+    procedure SetKeepSelection(Value: Boolean);
+    {$ifndef CLX_USED}
+    procedure SetBorderSides(Value: TElBorderSides);
+    {$endif}
+    procedure SetIconLocation(Value: TElSideBarIconLocation);
+  protected
+    {$ifndef CLX_USED}
+    FLineBorderActiveColor: TColor;
+    FLineBorderInactiveColor: TColor;
+    {$endif}
+    procedure IntKeyDown  (var Key : Word; ShiftState : TShiftState);
+    procedure IntMouseDown(Button : TMouseButton; XPos, YPos : SmallInt);
+    procedure IntMouseUp  (Button : TMouseButton; XPos, YPos : SmallInt);
+    procedure IntMouseMove(XPos, YPos : SmallInt);
+    procedure IntMouseWheel(WheelDelta: Integer; MousePos: TPoint);
+    function  IntHintShow(var HintInfo : THintInfo): Boolean;
+{$ifdef VCL_4_USED}
+    procedure ConstrainedResize(var MinWidth, MinHeight, MaxWidth, MaxHeight: Integer); override;
+{$else}
+{$ifdef CLX_USED}
+    procedure ConstrainedResize(var MinWidth, MinHeight, MaxWidth, MaxHeight: Integer); override;
+{$endif}
+{$endif}
+    {$ifdef CLX_USED}
+    procedure MouseEnter(AControl: TControl); override;
+    procedure MouseLeave(AControl: TControl); override;
+    function WidgetFlags: Integer; override;
+    function EventFilter(Sender: QObjectH; Event: QEventH): Boolean; override;
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    function DoMouseWheel(Shift: TShiftState; WheelDelta: Integer;
+      const MousePos: TPoint): Boolean; override;
+    {$endif}
+    procedure UpdateSectionPanels;
+    procedure TriggerItemChangeEvent; virtual;
+    procedure TriggerSectionChangeEvent; virtual;
+    function GetPopupMenu : TPopupMenu; override;
+    procedure Notification(AComponent : TComponent; Operation : TOperation); override;
+    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    {$ifndef CLX_USED}
+    procedure CreateParams(var Params : TCreateParams); override;
+    {$endif}
+    function  GetSectionHeight : integer;
+    function  GetItemHeight : integer;
+    function  GetSectionRect(Section : TElSideBarSection) : TRect;
+    function  GetItemsRect : TRect;
+    function  GetTopSectionsRect : TRect;
+    function  GetBottomSectionsRect : TRect;
+    procedure UpdateSection(Section : TElSideBarSection);
+    procedure UpdateTopSections;
+    procedure UpdateBottomSections;
+    procedure UpdateItems;
+    procedure UpdateAllSections;
+    procedure UpdateBar;
+    {$ifndef CLX_USED}
+    procedure UpdateFrame; // Updates flat frame
+    {$endif}
+    function GetMinHeight : integer; virtual;
+    {$ifndef CLX_USED}
+    procedure CreateWnd; override;
+    {$else}
+    procedure CreateWidget; override;
+    {$endif}
+    procedure GetChildren(Proc: TGetChildProc; Root: TComponent); override;
+    function GetChildOwner: TComponent; override;
+    procedure ShowControl(AControl: TControl); override;
+    procedure AlignControls(AControl: TControl; var Rect: TRect); override;
+    procedure OnDelayTimer(Sender : TObject);
+    procedure StartDelayTimer(Item : TElSideBarItem);
+    procedure StopDelayTimer;
+    {$ifndef CLX_USED}
+    procedure DestroyWnd; override;
+    procedure WMEraseBkgnd(var Message: TMessage); message WM_ERASEBKGND;
+    {$endif}
+    function GetThemedClassName: WideString; override;
+    function GetBackgroundClientRect: TRect; override;
+    {$ifndef CLX_USED}
+    procedure SetLineBorderActiveColor(Value: TColor);
+    procedure SetLineBorderInactiveColor(Value: TColor);
+    {$endif}
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure UpdateChildControl;
+    
+    procedure ScrollUp;
+    procedure ScrollDown;
+    procedure Paint; override;
+    procedure BeginUpdate;
+    procedure EndUpdate;
+    procedure Loaded; override;
+
+    procedure GetHitTest(X, Y : integer; var BarPart : TElSideBarPart; var Section : TElSideBarSection; var Item : TElSideBarItem);
+  published
+    property AutoSelectItem : Boolean read FAutoSelectItem write FAutoSelectItem;  { Published }
+    property Sections : TElSideBarSections read FSections write SetSections;  { Published }
+    property SectionIndex : Integer read GetSectionIndex write SetSectionIndex;  { Published }
+    property ItemIndex : Integer read GetItemIndex write SetItemIndex;  { Published }
+    property SectionsColor : TColor read FSectionsColor write SetSectionsColor;  { Published }
+    property WordWrap : Boolean read FWordWrap write SetWordWrap;  { Published }
+    property Spacing : Integer read FSpacing write SetSpacing;  { Published }
+    property TopSpacing : Integer read FTopSpacing write SetTopSpacing;  { Published }
+    property ScrollDelay : Integer read FScrollDelay write SetScrollDelay;  { Published }
+    property ItemChangeSound : TElSoundName read FItemChangeSound write FItemChangeSound;  { Published }
+    property SectionChangeSound : TElSoundName read FSectionChangeSound write FSectionChangeSound;  { Published }
+    property SectionTracking : Boolean read FSectionTracking write SetSectionTracking;  { Published }
+    property ItemTracking : Boolean read FItemTracking write SetItemTracking;  { Published }
+    property UnderlineTracked : Boolean read FUnderlineTracked write SetUnderlineTracked;  { Published }
+{$IFDEF USE_SOUND_MAP}
+    property SoundMap : TElSoundMap read FSoundMap write SetSoundMap;
+{$ENDIF}
+    property ChangeDelay: Integer read FChangeDelay write FChangeDelay default 500;
+    property SectionImages : TImageList read FSectionImages write SetSectionImages;
+    property SectionHotImages : TImageList read FSectionHotImages write SetSectionHotImages;
+    property SectionDisabledImages : TImageList read FSectionDisabledImages write SetSectionDisabledImages;
+    property ItemDisabledImages : TImageList read FItemDisabledImages write SetItemDisabledImages;
+    property ItemImages : TImageList read FItemImages write SetItemImages;
+    property ItemHotImages : TImageList read FItemHotImages write SetItemHotImages;
+    property FlatSections: Boolean read FFlatSections write SetFlatSections;
+    property FlatItems: Boolean read FFlatItems write SetFlatItems;
+    property FlatActiveItem : boolean read FFlatActiveItem write SetFlatActiveItem;
+    property ItemSize : Integer read FItemSize write SetItemSize;  { Published }
+    property RightAlignedBar : Boolean read FRightAlignedBar write SetRightAlignedBar;  { Published }
+    property SectionHeight : Integer read FSectionHeight write SetSectionHeight;  { Published }
+    property ItemsPopupMenu : TPopupMenu read FItemsPopup write SetItemsPopupMenu;
+    property SectionsPopupMenu : TPopupMenu read FSectionsPopup write SetSectionsPopupMenu;
+    property TopIndex : Integer read GetTopIndex write SetTopIndex;  { Published }
+    property ActiveSectionStyle: TFontStyles read FActiveSectionStyle write SetActiveSectionStyle;
+    property ActiveItemStyle: TFontStyles read FActiveItemStyle write SetActiveItemStyle;
+    property ActiveBorderType : TElFlatBorderType read FActiveBorderType write SetActiveBorderType;  { Published }
+    property InactiveBorderType : TElFlatBorderType read FInactiveBorderType write SetInactiveBorderType;  { Published }
+
+    property Flat : Boolean read FFlat write SetFlat;  { Published }
+    property ItemsFont: TFont read FItemsFont write SetItemsFont;
+    property SectionsFont: TFont read GetSectionsFont write SetSectionsFont;
+    property VisibleSections : Boolean read FVisibleSections write SetVisibleSections;  { Published }
+
+    property TrackSectionFontColor : TColor read FTrackSectionFontColor write SetTrackSectionFontColor;
+    property TrackSectionBkColor   : TColor read FTrackSectionBkColor write SetTrackSectionBkColor;
+    property TrackItemFontColor    : TColor read FTrackItemFontColor write SetTrackItemFontColor;
+    property TrackItemBkColor      : TColor read FTrackItemBkColor write SetTrackItemBkColor;
+    property KeepSelection: Boolean read FKeepSelection write SetKeepSelection default true;
+    property IconLocation: TElSideBarIconLocation read FIconLocation write SetIconLocation default ilTop;
+    {$ifndef CLX_USED}
+    property BorderSides: TElBorderSides read FBorderSides write SetBorderSides;
+    property LineBorderActiveColor: TColor read FLineBorderActiveColor write 
+        SetLineBorderActiveColor;
+    property LineBorderInactiveColor: TColor read FLineBorderInactiveColor write 
+        SetLineBorderInactiveColor;
+    {$endif}
+
+    property OnItemChange : TNotifyEvent read FOnItemChange write FOnItemChange;
+    property OnSectionChange : TNotifyEvent read FOnSectionChange write FOnSectionChange;
+
+    property Background;
+    property BackgroundType;
+    property GradientStartColor;
+    property GradientEndColor;
+    property GradientSteps;
+
+    property Align nodefault;
+    property BorderStyle nodefault;
+    property Color;
+{$ifndef CLX_USED}
+    property DragCursor;
+{$endif}
+    property DragMode;
+    property Enabled;
+    property ParentColor;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    //property Transparent;
+    property Visible;
+    property UseXPThemes;
+
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnResize;
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Constraints;
+{$ifndef CLX_USED}
+    property DockOrientation;
+    property Floating;
+    property DragKind;
+{$endif}
+{$ENDIF}
+  end;
+
+implementation
+end.

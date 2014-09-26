@@ -1,0 +1,40 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElProcessUtils;
+
+interface
+
+uses ElList, ElTools, Windows, SysUtils, Messages;
+
+type TProcessInfo = class
+       ModuleName : string;
+       PID        : integer;
+       ThreadCount: integer;
+       PriorityCls: integer;
+
+       function DiffersFrom(Source : TProcessInfo) : boolean;
+     end;
+
+procedure FillProcessList(L : TElList);
+
+function ProcessExists(ModuleName : string) : boolean;
+procedure CloseProcess(ModuleName : string);
+
+implementation
+end.

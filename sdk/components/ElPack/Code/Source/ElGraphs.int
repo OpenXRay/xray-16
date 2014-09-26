@@ -1,0 +1,259 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+10/10/2001
+
+  CLX adaptation complete
+
+05/27/2001 (c) Akzhan Abdulin
+
+  Fixed Color property design-time storing issue (clWindow not stored)
+
+*)
+
+unit ElGraphs;
+
+{ Data graphs displaying }
+
+interface
+
+uses
+  Classes,
+  SysUtils,
+
+  {$ifndef CLX_USED}
+  Windows,
+  Messages,
+  Graphics,
+  Controls,
+  Forms,
+  extctrls,
+  Printers,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  {$else}
+  QGraphics,
+  QControls,
+  QForms,
+  QExtCtrls,
+  Qt,
+  Types,
+  QTypes,
+  {$endif}
+  ElVCLUtils,
+  ElTools,
+  ElQueue,
+  ElImgFrm,
+  ElCGControl;
+
+type
+
+  TElGraph = class;
+
+  TDataEntry = class
+  private
+    FValues : TElQueue;
+    FColor : TColor;
+    FName : string; // for legend
+    FMinGrid,
+      FMaxGrid : integer; // for legend and fraph
+    FOwner : TElGraph;
+    FVisible : boolean;
+    FAutoGrid : boolean;
+    FFaults : integer;
+
+    function GetLimit : integer;
+    procedure SetLimit(newValue : Integer);
+    procedure SetColor(value : TColor);
+    procedure SetName(value : string);
+    procedure SetMinGrid(newValue : Integer);
+    procedure SetMaxGrid(newValue : Integer);
+    procedure SetVisible(value : boolean);
+    function GetValueCount : integer;
+     { Removes the oldest values, that are beyond the limit }
+
+  public
+     { Calculates Min, Max and Average values for the data array }
+    procedure CalcMinMax(var Min, Max, Avg : integer);
+    constructor Create;
+    destructor Destroy; override;
+    procedure AddValue(value : integer);
+    function GetValue(index : integer) : integer;
+
+    procedure Reset;
+
+    property Name : string read FName write SetName; { Public }
+    property Owner : TElGraph read FOwner;
+    property Values : TElQueue read FValues;
+    property Value[index : integer] : integer read GetValue; default;
+    property ValueCount : integer read GetValueCount;
+    property Color : TColor read FColor write SetColor;
+    property MinGrid : Integer read FMinGrid write SetMinGrid; { Public }
+    property MaxGrid : Integer read FMaxGrid write SetMaxGrid; { Public }
+    property Visible : boolean read FVisible write SetVisible;
+    property Limit : Integer read GetLimit write SetLimit default 1000; { Public }
+    property AutoGrid : boolean read FAutoGrid write FAutoGrid;
+    property Faults : integer read FFaults;
+  end;
+
+//  TGraphType = (gtMoveCurrent, gtMoveAll);
+
+  TElGraph = class(TElCustomGraphicControl)
+  private
+    FShowTimeouts : Boolean;
+    FStatus : string;
+    FColumnEntry : TDataEntry;
+    FHGridLines : Integer;
+    FVGridLines : Integer;
+    FOnResize : TNotifyEvent;
+    FLegendBkColor : TColor;
+    FLegendWidth : Integer;
+    FLegendAtRight : Boolean;
+
+    FEntryList : TList;
+    FShowLegend : Boolean;
+    FShowMinMax : Boolean;
+    FShowGrid : Boolean;
+    FMinMaxEntry : TDataEntry;
+    {$ifndef CLX_USED}
+    FImgForm : TElImageForm;
+    procedure SetImageForm(newValue : TElImageForm);
+    {$endif}
+    function GetDataList(index : integer) : TDataEntry;
+    procedure SetShowLegend(newValue : Boolean);
+    procedure SetShowMinMax(newValue : Boolean);
+    function GetEntriesCount : Integer;
+    procedure SetShowGrid(newValue : Boolean);
+//    procedure SetGraphType( newValue : TGraphType ) ;
+    procedure SetLegendAtRight(newValue : Boolean);
+    procedure SetLegendWidth(newValue : Integer);
+    procedure SetLegendBkColor(newValue : TColor);
+    procedure SetMinMaxEntry(newValue : TDataEntry);
+    procedure SetHGridLines(newValue : Integer);
+    procedure SetVGridLines(newValue : Integer);
+    function GetColumnEntry : TDataEntry;
+    procedure SetColumnEntry(newValue : TDataEntry);
+    {$ifndef CLX_USED}
+    procedure WMEraseBkgnd(var Msg : TWMEraseBkgnd); message WM_ERASEBKGND;
+    {$endif}
+    procedure SetShowTimeouts(newValue : Boolean);
+    function GetTransparent : Boolean;
+    procedure SetTransparent(newValue : Boolean);
+  protected
+    { Protected declarations }
+    function CreateEntry : TDataEntry; virtual;
+    { Performs actual drawing }
+    procedure DoDrawGraph(Surface : TCanvas); virtual;
+    procedure Paint; override;
+
+    { Returns the rectangle for legend }
+    function GetLegendRect : TRect; virtual;
+    { Returns rectangle for MinMaxInfo }
+    function GetMinMaxRect : TRect; virtual;
+    { Returns the rectangle for the graph }
+    function GetMainRect : TRect; virtual;
+    procedure TriggerResizeEvent; virtual;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    {$ifndef CLX_USED}
+    procedure IFMRepaintChildren(var Message: TMessage); message
+        IFM_REPAINTCHILDREN;
+    {$endif}
+  public
+    { Public declarations }
+    procedure SetBounds(ALeft, ATop, AWidth, AHeight : Integer); override;
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    { Prints the graph }
+    {$ifndef CLX_USED}
+    procedure Print;
+    {$endif}
+    { Adds the entry to the list }
+    function AddEntry : TDataEntry;
+    function InsertEntry(index : integer) : TDataEntry;
+    procedure DeleteEntry(index : integer);
+    { Refreshes the graph }
+    procedure Refresh;
+    { Arrays of integer values for graph entry }
+    property DataList[index : integer] : TDataEntry read GetDataList; { Public }
+    { Ammount of entries }
+    property EntriesCount : Integer read GetEntriesCount; { Public }
+    property MinMaxEntry : TDataEntry read FMinMaxEntry write SetMinMaxEntry; { Public }
+    { Entry, that has attribute "Column" }
+    property ColumnEntry : TDataEntry read GetColumnEntry write SetColumnEntry; { Public }
+  published
+    { Does the graph show the legend? }
+    property ShowLegend : Boolean read FShowLegend write SetShowLegend; { Published }
+    { Show min, max and average values of the selected entry? }
+    property ShowMinMax : Boolean read FShowMinMax write SetShowMinMax; { Published }
+    { Show grid lines? }
+    property ShowGrid : Boolean read FShowGrid write SetShowGrid; { Published }
+//    property GraphType : TGraphType read FGraphType write SetGraphType ;  { Published }
+    { Inherited properties: }
+    property Align;
+    property Canvas;
+    property Color;
+    property Enabled;
+    property Font;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property ShowHint;
+    property Visible;
+    { Inherited events: }
+    property OnClick;
+    property OnDblClick;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    { Legend is positioned at the right side of the graph }
+    property LegendAtRight : Boolean read FLegendAtRight write SetLegendAtRight default true; { Published }
+    { Legend panel width }
+    property LegendWidth : Integer read FLegendWidth write SetLegendWidth default 100; { Published }
+    { Background color for legend and MinMax Info }
+    property LegendBkColor : TColor read FLegendBkColor write SetLegendBkColor; { Published }
+    { Occurs when the graph is resized }
+    property OnResize : TNotifyEvent read FOnResize write FOnResize;
+    { Ammount of horizontal lines of the grid }
+    property HGridLines : Integer read FHGridLines write SetHGridLines default 5; { Published }
+    { Ammount of vertical lines of the grid }
+    property VGridLines : Integer read FVGridLines write SetVGridLines default 0; { Public }
+    property Status : string read FStatus write FStatus; { Published }
+    property ShowTimeouts : Boolean read FShowTimeouts write SetShowTimeouts default True; { Published }
+    property Transparent : Boolean read GetTransparent write SetTransparent;  { Published }
+    {$ifndef CLX_USED}
+    property ImageForm   : TElImageForm read FImgForm write SetImageForm;
+    {$endif}
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Action;
+    property Constraints;
+    {$ifndef CLX_USED}
+    property DockOrientation;
+    property Floating;
+    property DragKind;
+    {$endif}
+{$ENDIF}
+  end; { TElGraph }
+
+implementation
+end.

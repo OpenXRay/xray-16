@@ -1,0 +1,204 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998 Alex Shovkoplyas              }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElHstgrm;
+
+interface
+
+uses
+  {$ifndef CLX_USED}
+  Windows,
+  Messages,
+  Graphics,
+  Controls,
+  Forms,
+  extctrls,
+  ElImgFrm,
+  {$else}
+  QGraphics,
+  QControls,
+  QForms,
+  QExtCtrls,
+  Qt,
+  Types,
+  QTypes,
+  {$endif}
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElTools,
+  SysUtils,
+  Classes;
+
+const
+  HISTOBUFFERSIZE = 16384;
+
+type
+  THistoBuf = array[0..HISTOBUFFERSIZE - 1] of Integer;
+  PHistoBuf = ^THistoBuf;
+
+  THistoDoubleMode = (hdmCumulative, hdmHSplitOppositeIn, hdmHSplitOppositeOut, hdmHSplitSingle,
+                      hdmVSplitOpposite, hdmVSplitSingle);
+
+type
+  TElHistogram = class;
+
+  {:
+  }
+  THistoBuffer = class (TObject)
+  private
+    FBuf: PHistoBuf;
+    FBufSize : Integer;
+    FElements: Integer;
+    FOwner: TElHistogram;
+    procedure SetBufSize(newValue: Integer);
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure Add(aValue : Integer);
+    function Average(aSamples : integer): Integer;
+    procedure Clear;
+    procedure Push(aValue : Integer);
+    property BufSize: Integer read FBufSize write SetBufSize;
+  end;
+
+  {:
+  }
+  TElHistogram = class (TGraphicControl)
+  private
+    FBorderStyle : TBorderStyle;
+    Bitmap: TBitmap;
+    FBgColor: TColor;
+    FBuffer: THistoBuffer;
+    FBuffer2: THistoBuffer;
+    FColor2: TColor;
+    FDoubleMode: THistoDoubleMode;
+    FExtBuffer: THistoBuffer;
+    FExtBuffer2: THistoBuffer;
+    FGrColor: TColor;
+    FHGrid: Boolean;
+    FScale: Integer;
+    FShowZeroValues: Boolean;
+    FSmooth: Boolean;
+    FUseBuffer2: Boolean;
+    FVGrid     : Boolean;
+    {$ifndef CLX_USED}
+    FImgForm   : TElImageForm;
+    FImgFormChLink  : TImgFormChangeLink;
+
+    procedure ImageFormChange(Sender: TObject);
+    procedure SetImageForm(newValue : TElImageForm);
+    {$endif}
+    function GetBufferSize: Integer;
+    function GetTransparent: Boolean;
+    procedure SetBgColor(aValue: TColor);
+    procedure SetBufferSize(newValue: Integer);
+    procedure SetColor2(Value: TColor);
+    procedure SetDoubleMode(Value: THistoDoubleMode);
+    procedure SetGrColor(aValue: TColor);
+    procedure SetHGrid(aValue: Boolean);
+    procedure SetScale(aValue: Integer);
+    procedure SetShowZeroValues(newValue: Boolean);
+    procedure SetSmooth(aValue: Boolean);
+    procedure SetTransparent(newValue: Boolean);
+    procedure SetUseBuffer2(Value: Boolean);
+    procedure SetVGrid(aValue: Boolean);
+  protected
+    procedure Paint; override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure SetBorderStyle(newValue : TBorderStyle); virtual;
+    {$ifndef CLX_USED}
+    procedure IFMRepaintChildren(var Message: TMessage); message
+        IFM_REPAINTCHILDREN;
+    {$endif}
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    property Buffer: THistoBuffer read FBuffer;
+    property Buffer2: THistoBuffer read FBuffer2;
+    property ExternalBuffer: THistoBuffer read FExtBuffer write FExtBuffer;
+    property ExternalBuffer2: THistoBuffer read FExtBuffer2 write FExtBuffer2;
+  published
+{$IFDEF VCL_4_USED}
+    property Action;
+{$ENDIF}
+    property Align;
+{$IFDEF VCL_4_USED}
+    property Anchors;
+{$ENDIF}
+    property BgColor: TColor read FBgColor write SetBgColor default clBlack;
+    property BufferSize: Integer read GetBufferSize write SetBufferSize default 
+        HISTOBUFFERSIZE;
+    property Color default clAqua;
+    property Color2: TColor read FColor2 write SetColor2;
+{$IFDEF VCL_4_USED}
+    property Constraints;
+{$ifndef CLX_USED}
+    property DockOrientation;
+{$endif}
+{$ENDIF}
+    property DoubleMode: THistoDoubleMode read FDoubleMode write SetDoubleMode;
+{$ifndef CLX_USED}
+    property DragCursor;
+{$endif}
+{$IFDEF VCL_4_USED}
+{$ifndef CLX_USED}
+    property DragKind;
+{$endif}
+{$ENDIF}
+    property DragMode;
+    property Enabled;
+{$IFDEF VCL_4_USED}
+{$ifndef CLX_USED}
+    property Floating;
+{$endif}
+{$ENDIF}
+    property GridColor: TColor read FGrColor write SetGrColor default clSilver;
+    property Height default 30;
+    property HGrid: Boolean read FHGrid write SetHGrid default false;
+    {$ifndef CLX_USED}
+    property ImageForm   : TElImageForm read FImgForm write SetImageForm;
+    {$endif}
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+    property ParentColor default false;
+    property ParentShowHint;
+    property PopupMenu;
+    property Scale: Integer read FScale write SetScale default 4096;
+    property ShowHint;
+    property ShowZeroValues: Boolean read FShowZeroValues write
+        SetShowZeroValues;
+    property Smooth: Boolean read FSmooth write SetSmooth default false;
+    property Transparent: Boolean read GetTransparent write SetTransparent;
+    property UseBuffer2: Boolean read FUseBuffer2 write SetUseBuffer2;
+    property VGrid: Boolean read FVGrid write SetVGrid default false;
+    property Visible;
+    property Width default 100;
+    property BorderStyle : TBorderStyle read FBorderStyle write SetBorderStyle;  { Published }
+  end;
+
+implementation
+end.

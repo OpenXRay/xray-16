@@ -1,0 +1,271 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6E9637D8-B32D-4ABD-A5CC-6E4677039B47}</ProjectGuid>
+    <RootNamespace>mp_gpprof_server</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(xrBinDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(xrBinDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>libraries\fcgi-2.4.0\;libraries\fcgi-2.4.0\include;libraries\gamespy;libraries\pthreads-w32-2-8-0-release;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;XRAY_DISABLE_GAMESPY_WARNINGS;GSI_COMMON_DEBUG;PTW32_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>libraries\fcgi-2.4.0\;libraries\fcgi-2.4.0\include;libraries\gamespy;libraries\pthreads-w32-2-8-0-release;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;XRAY_DISABLE_GAMESPY_WARNINGS;PTW32_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="atlas_stalkercoppc_v1.h" />
+    <ClInclude Include="gamespy_sake.h" />
+    <ClInclude Include="libraries\fcgi-2.4.0\fcgi_config.h" />
+    <ClInclude Include="libraries\fcgi-2.4.0\include\fcgiapp.h" />
+    <ClInclude Include="libraries\fcgi-2.4.0\include\fcgio.h" />
+    <ClInclude Include="libraries\gamespy\common\gsAssert.h" />
+    <ClInclude Include="libraries\gamespy\common\gsAvailable.h" />
+    <ClInclude Include="libraries\gamespy\common\gsCommon.h" />
+    <ClInclude Include="libraries\gamespy\common\gsCore.h" />
+    <ClInclude Include="libraries\gamespy\common\gsCrypt.h" />
+    <ClInclude Include="libraries\gamespy\common\gsDebug.h" />
+    <ClInclude Include="libraries\gamespy\common\gsLargeInt.h" />
+    <ClInclude Include="libraries\gamespy\common\gsMemory.h" />
+    <ClInclude Include="libraries\gamespy\common\gsPlatform.h" />
+    <ClInclude Include="libraries\gamespy\common\gsPlatformSocket.h" />
+    <ClInclude Include="libraries\gamespy\common\gsPlatformThread.h" />
+    <ClInclude Include="libraries\gamespy\common\gsPlatformUtil.h" />
+    <ClInclude Include="libraries\gamespy\common\gsRC4.h" />
+    <ClInclude Include="libraries\gamespy\common\gsSHA1.h" />
+    <ClInclude Include="libraries\gamespy\common\gsSoap.h" />
+    <ClInclude Include="libraries\gamespy\common\gsSSL.h" />
+    <ClInclude Include="libraries\gamespy\common\gsStringUtil.h" />
+    <ClInclude Include="libraries\gamespy\common\gsUdpEngine.h" />
+    <ClInclude Include="libraries\gamespy\common\gsXML.h" />
+    <ClInclude Include="libraries\gamespy\darray.h" />
+    <ClInclude Include="libraries\gamespy\ghttp\ghttp.h" />
+    <ClInclude Include="libraries\gamespy\ghttp\ghttpASCII.h" />
+    <ClInclude Include="libraries\gamespy\ghttp\ghttpBuffer.h" />
+    <ClInclude Include="libraries\gamespy\ghttp\ghttpCallbacks.h" />
+    <ClInclude Include="libraries\gamespy\ghttp\ghttpCommon.h" />
+    <ClInclude Include="libraries\gamespy\ghttp\ghttpConnection.h" />
+    <ClInclude Include="libraries\gamespy\ghttp\ghttpEncryption.h" />
+    <ClInclude Include="libraries\gamespy\ghttp\ghttpMain.h" />
+    <ClInclude Include="libraries\gamespy\ghttp\ghttpPost.h" />
+    <ClInclude Include="libraries\gamespy\ghttp\ghttpProcess.h" />
+    <ClInclude Include="libraries\gamespy\GP\gp.h" />
+    <ClInclude Include="libraries\gamespy\GP\gpi.h" />
+    <ClInclude Include="libraries\gamespy\GP\gpiBuddy.h" />
+    <ClInclude Include="libraries\gamespy\GP\gpiBuffer.h" />
+    <ClInclude Include="libraries\gamespy\GP\gpiCallback.h" />
+    <ClInclude Include="libraries\gamespy\GP\gpiConnect.h" />
+    <ClInclude Include="libraries\gamespy\GP\gpiInfo.h" />
+    <ClInclude Include="libraries\gamespy\GP\gpiKeys.h" />
+    <ClInclude Include="libraries\gamespy\GP\gpiOperation.h" />
+    <ClInclude Include="libraries\gamespy\GP\gpiPeer.h" />
+    <ClInclude Include="libraries\gamespy\GP\gpiProfile.h" />
+    <ClInclude Include="libraries\gamespy\GP\gpiPS3.h" />
+    <ClInclude Include="libraries\gamespy\GP\gpiSearch.h" />
+    <ClInclude Include="libraries\gamespy\GP\gpiTransfer.h" />
+    <ClInclude Include="libraries\gamespy\GP\gpiUnique.h" />
+    <ClInclude Include="libraries\gamespy\GP\gpiUtility.h" />
+    <ClInclude Include="libraries\gamespy\gt2\gt2.h" />
+    <ClInclude Include="libraries\gamespy\gt2\gt2Auth.h" />
+    <ClInclude Include="libraries\gamespy\gt2\gt2Buffer.h" />
+    <ClInclude Include="libraries\gamespy\gt2\gt2Callback.h" />
+    <ClInclude Include="libraries\gamespy\gt2\gt2Connection.h" />
+    <ClInclude Include="libraries\gamespy\gt2\gt2Encode.h" />
+    <ClInclude Include="libraries\gamespy\gt2\gt2Filter.h" />
+    <ClInclude Include="libraries\gamespy\gt2\gt2Main.h" />
+    <ClInclude Include="libraries\gamespy\gt2\gt2Message.h" />
+    <ClInclude Include="libraries\gamespy\gt2\gt2Socket.h" />
+    <ClInclude Include="libraries\gamespy\gt2\gt2Utility.h" />
+    <ClInclude Include="libraries\gamespy\hashtable.h" />
+    <ClInclude Include="libraries\gamespy\md5.h" />
+    <ClInclude Include="libraries\gamespy\nonport.h" />
+    <ClInclude Include="libraries\gamespy\sake\sake.h" />
+    <ClInclude Include="libraries\gamespy\sake\sakeMain.h" />
+    <ClInclude Include="libraries\gamespy\sake\sakeRequest.h" />
+    <ClInclude Include="libraries\gamespy\sake\sakeRequestInternal.h" />
+    <ClInclude Include="profiles_cache.h" />
+    <ClInclude Include="profile_data_types.h" />
+    <ClInclude Include="profile_printer.h" />
+    <ClInclude Include="profile_request.h" />
+    <ClInclude Include="requests_processor.h" />
+    <ClInclude Include="sake_worker.h" />
+    <ClInclude Include="threads.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="atlas_stalkercoppc_v1.c" />
+    <ClCompile Include="entry_point.cpp" />
+    <ClCompile Include="gamespy_sake.cpp" />
+    <ClCompile Include="libraries\fcgi-2.4.0\libfcgi\fcgiapp.c" />
+    <ClCompile Include="libraries\fcgi-2.4.0\libfcgi\fcgio.cpp" />
+    <ClCompile Include="libraries\fcgi-2.4.0\libfcgi\fcgi_stdio.c" />
+    <ClCompile Include="libraries\fcgi-2.4.0\libfcgi\os_win32.c" />
+    <ClCompile Include="libraries\gamespy\common\gsAssert.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsAvailable.c" />
+    <ClCompile Include="libraries\gamespy\common\gsCore.c" />
+    <ClCompile Include="libraries\gamespy\common\gsCrypt.c" />
+    <ClCompile Include="libraries\gamespy\common\gsDebug.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsLargeInt.c" />
+    <ClCompile Include="libraries\gamespy\common\gsMemory.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsPlatform.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsPlatformSocket.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsPlatformThread.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsPlatformUtil.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsRC4.c" />
+    <ClCompile Include="libraries\gamespy\common\gsSHA1.c" />
+    <ClCompile Include="libraries\gamespy\common\gsSoap.c" />
+    <ClCompile Include="libraries\gamespy\common\gsSSL.c" />
+    <ClCompile Include="libraries\gamespy\common\gsStringUtil.c" />
+    <ClCompile Include="libraries\gamespy\common\gsUdpEngine.c" />
+    <ClCompile Include="libraries\gamespy\common\gsXML.c" />
+    <ClCompile Include="libraries\gamespy\darray.c" />
+    <ClCompile Include="libraries\gamespy\ghttp\ghttpBuffer.c" />
+    <ClCompile Include="libraries\gamespy\ghttp\ghttpCallbacks.c" />
+    <ClCompile Include="libraries\gamespy\ghttp\ghttpCommon.c" />
+    <ClCompile Include="libraries\gamespy\ghttp\ghttpConnection.c" />
+    <ClCompile Include="libraries\gamespy\ghttp\ghttpEncryption.c" />
+    <ClCompile Include="libraries\gamespy\ghttp\ghttpMain.c" />
+    <ClCompile Include="libraries\gamespy\ghttp\ghttpPost.c" />
+    <ClCompile Include="libraries\gamespy\ghttp\ghttpProcess.c" />
+    <ClCompile Include="libraries\gamespy\GP\gp.c" />
+    <ClCompile Include="libraries\gamespy\GP\gpi.c" />
+    <ClCompile Include="libraries\gamespy\GP\gpiBuddy.c" />
+    <ClCompile Include="libraries\gamespy\GP\gpiBuffer.c" />
+    <ClCompile Include="libraries\gamespy\GP\gpiCallback.c" />
+    <ClCompile Include="libraries\gamespy\GP\gpiConnect.c" />
+    <ClCompile Include="libraries\gamespy\GP\gpiInfo.c" />
+    <ClCompile Include="libraries\gamespy\GP\gpiKeys.c" />
+    <ClCompile Include="libraries\gamespy\GP\gpiOperation.c" />
+    <ClCompile Include="libraries\gamespy\GP\gpiPeer.c" />
+    <ClCompile Include="libraries\gamespy\GP\gpiProfile.c" />
+    <ClCompile Include="libraries\gamespy\GP\gpiPS3.c" />
+    <ClCompile Include="libraries\gamespy\GP\gpiSearch.c" />
+    <ClCompile Include="libraries\gamespy\GP\gpiTransfer.c" />
+    <ClCompile Include="libraries\gamespy\GP\gpiUnique.c" />
+    <ClCompile Include="libraries\gamespy\GP\gpiUtility.c" />
+    <ClCompile Include="libraries\gamespy\gt2\gt2Auth.c" />
+    <ClCompile Include="libraries\gamespy\gt2\gt2Buffer.c" />
+    <ClCompile Include="libraries\gamespy\gt2\gt2Callback.c" />
+    <ClCompile Include="libraries\gamespy\gt2\gt2Connection.c" />
+    <ClCompile Include="libraries\gamespy\gt2\gt2Encode.c" />
+    <ClCompile Include="libraries\gamespy\gt2\gt2Filter.c" />
+    <ClCompile Include="libraries\gamespy\gt2\gt2Main.c" />
+    <ClCompile Include="libraries\gamespy\gt2\gt2Message.c" />
+    <ClCompile Include="libraries\gamespy\gt2\gt2Socket.c" />
+    <ClCompile Include="libraries\gamespy\gt2\gt2Utility.c" />
+    <ClCompile Include="libraries\gamespy\hashtable.c" />
+    <ClCompile Include="libraries\gamespy\md5c.c" />
+    <ClCompile Include="libraries\gamespy\nonport.c" />
+    <ClCompile Include="libraries\gamespy\sake\sakeMain.c" />
+    <ClCompile Include="libraries\gamespy\sake\sakeRequest.c" />
+    <ClCompile Include="libraries\gamespy\sake\sakeRequestMisc.c" />
+    <ClCompile Include="libraries\gamespy\sake\sakeRequestModify.c" />
+    <ClCompile Include="libraries\gamespy\sake\sakeRequestRead.c" />
+    <ClCompile Include="libraries\pthreads-w32-2-8-0-release\pthread.c" />
+    <ClCompile Include="profiles_cache.cpp" />
+    <ClCompile Include="profile_data_types.cpp" />
+    <ClCompile Include="profile_request.cpp" />
+    <ClCompile Include="requests_processor.cpp" />
+    <ClCompile Include="sake_worker.cpp" />
+    <ClCompile Include="threads.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

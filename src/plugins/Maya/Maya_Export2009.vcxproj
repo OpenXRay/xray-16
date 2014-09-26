@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>Maya_Export_2009</ProjectName>
+    <ProjectGuid>{E5F40F9E-C01B-4B97-9BD5-FC24308D8022}</ProjectGuid>
+    <RootNamespace>Maya_Export_2009</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(xrBinPlugDir)$(ProjectName)\</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(xrBinPlugDir)$(ProjectName)\</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>$(OutDir)$(TargetName).tlb</TypeLibraryName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(XRAY_16X_LIBS)maya/ver-2009/include;../Shared;$(SolutionDir)xrEngine;$(SolutionDir)utils/xrQSlim/src/;$(XRAY_16X_LIBS)MagicSoftware\FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG;WIN32;_WINDOWS;NT_PLUGIN;_MAYA_EXPORT;_MAYA_PLUGIN;XRCORE_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <ForceConformanceInForLoopScope>false</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CallingConvention>Cdecl</CallingConvention>
+      <CompileAs>Default</CompileAs>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/MACHINE:I386 /export:initializePlugin /export:uninitializePlugin
+ %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;Foundation.lib;OpenMaya.lib;OpenMayaAnim.lib;xrcorestatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)xrayMaya_export.mll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(XRAY_16X_LIBS)maya/ver-2009/lib;$(xrLibDir);$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)xrayMaya_export.pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>$(OutDir)$(TargetName).tlb</TypeLibraryName>
+    </Midl>
+    <ClCompile>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>$(XRAY_16X_LIBS)maya/ver-2009/include;../Shared;$(SolutionDir)xrEngine;$(SolutionDir)utils/xrQSlim/src/;$(XRAY_16X_LIBS)MagicSoftware\FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;NT_PLUGIN;_MAYA_EXPORT;_MAYA_PLUGIN;XRCORE_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling />
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <ForceConformanceInForLoopScope>false</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/MACHINE:I386 /export:initializePlugin /export:uninitializePlugin %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;Foundation.lib;OpenMaya.lib;OpenMayaAnim.lib;xrcorestatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)xrayMaya_export.mll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(XRAY_16X_LIBS)maya/ver-2009/lib;$(xrLibDir);$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ProgramDatabaseFile>$(OutDir)xrayMaya_export.pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\common\NvMender2003\NVMeshMender.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\editors\ECore\Editor\bone.cpp" />
+    <ClCompile Include="..\..\editors\ECore\Editor\EditMesh.cpp" />
+    <ClCompile Include="..\..\editors\ECore\Editor\EditMeshIO.cpp" />
+    <ClCompile Include="..\..\editors\ECore\Editor\EditMeshModify.cpp" />
+    <ClCompile Include="..\..\editors\ECore\Editor\EditObject.cpp" />
+    <ClCompile Include="..\..\editors\ECore\Editor\EditObjectIO.cpp" />
+    <ClCompile Include="..\..\editors\ECore\Editor\EditObjectMotions.cpp" />
+    <ClCompile Include="..\..\editors\ECore\Editor\ExportObjectOGF.cpp" />
+    <ClCompile Include="..\..\editors\ECore\Editor\ExportObjectOGFCalculateTB.cpp" />
+    <ClCompile Include="..\..\editors\ECore\Editor\ExportSkeleton.cpp" />
+    <ClCompile Include="..\..\editors\ECore\Editor\ExportSkeletonCalculateTB.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\RAPIDMinBox.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlApprGaussPointsFit3.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlBox3.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlContBox3.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlContMinBox3.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlEigen.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlMath.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlMatrix2.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlMatrix3.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlMatrix4.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlMinimize1.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlMinimizeN.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlQuaternion.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlSystem.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlVector2.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlVector3.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlVector4.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlWinSystem.cpp" />
+    <ClCompile Include="..\..\utils\ETools\object.cpp" />
+    <ClCompile Include="..\..\utils\ETools\object_sliding.cpp" />
+    <ClCompile Include="..\..\utils\ETools\PropSlimTools.cpp" />
+    <ClCompile Include="..\..\xrEngine\fmesh.cpp" />
+    <ClCompile Include="..\Shared\ELog.cpp" />
+    <ClCompile Include="..\Shared\Envelope.cpp" />
+    <ClCompile Include="..\Shared\interp.cpp" />
+    <ClCompile Include="..\Shared\motion.cpp" />
+    <ClCompile Include="Export\camera_exporter.cpp" />
+    <ClCompile Include="Export\ExportDefines.cpp" />
+    <ClCompile Include="Export\maTranslator.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Export\MayaExport.cpp" />
+    <ClCompile Include="Export\SmdBone.cpp" />
+    <ClCompile Include="Export\SmdMaya.cpp" />
+    <ClCompile Include="Export\SmdTriangle.cpp" />
+    <ClCompile Include="Export\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Export\XRayExport.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\common\NvMender2003\convert.h" />
+    <ClInclude Include="..\..\common\NvMender2003\mender_input_output.h" />
+    <ClInclude Include="..\..\common\NvMender2003\NVMeshMender.h" />
+    <ClInclude Include="..\..\common\NvMender2003\remove_isolated_verts.h" />
+    <ClInclude Include="..\..\editors\ECore\Editor\EditMesh.h" />
+    <ClInclude Include="..\..\editors\ECore\Editor\EditObject.h" />
+    <ClInclude Include="..\..\editors\ECore\Editor\ExportObjectOGF.h" />
+    <ClInclude Include="..\..\editors\ECore\Editor\ExportSkeleton.h" />
+    <ClInclude Include="..\..\editors\ECore\Editor\itterate_adjacents_dynamic.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlApprGaussPointsFit3.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlBox3.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlContBox3.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlContMinBox3.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlEigen.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlGMatrix.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlGVector.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlMath.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlMatrix.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlMatrix2.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlMatrix3.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlMatrix4.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlMinimize1.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlMinimizeN.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlQuaternion.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlSystem.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlVector.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlVector2.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlVector3.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlVector4.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlWinSystem.h" />
+    <ClInclude Include="..\..\xrEngine\bone.h" />
+    <ClInclude Include="..\Shared\ELog.h" />
+    <ClInclude Include="..\Shared\envelope.h" />
+    <ClInclude Include="..\Shared\motion.h" />
+    <ClInclude Include="Export\camera_exporter.h" />
+    <ClInclude Include="Export\ExportDefines.h" />
+    <CustomBuild Include="Export\maTranslator.h" />
+    <CustomBuild Include="Export\SmdBone.h" />
+    <CustomBuild Include="Export\SmdMaya.h" />
+    <CustomBuild Include="Export\SmdTriangle.h" />
+    <ClInclude Include="Export\smoth_flags.h" />
+    <ClInclude Include="Export\Stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\editors\ECore\WildMagic\WmlGMatrix.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlGVector.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlMath.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlMatrix.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlMatrix2.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlMatrix3.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlMatrix4.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlQuaternion.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlSystem.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlVector.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlVector2.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlVector3.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlVector4.inl" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

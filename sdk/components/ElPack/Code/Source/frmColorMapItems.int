@@ -1,0 +1,86 @@
+
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit frmColorMapItems;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  StdCtrls, ExtCtrls, ElColorMap, ElBtnCtl, ElPopBtn, ElACtrls,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElCheckCtl, ElClrCmb, ElXPThemedControl;
+
+type
+  TColorMapItemsForm = class(TForm)
+    Label1 : TLabel;
+    Label2 : TLabel;
+    FgColor : TElColorCombo;
+    BkColor : TElColorCombo;
+    Label3 : TLabel;
+    Label4 : TLabel;
+    Label5 : TLabel;
+    IDLbl : TLabel;
+    OkBtn: TElPopupButton;
+    CancelBtn: TElPopupButton;
+    AddBtn: TElPopupButton;
+    DelBtn: TElPopupButton;
+    AddGroupBtn: TElPopupButton;
+    DelGroupBtn: TElPopupButton;
+    EntryLB: TElAdvancedListBox;
+    GroupLB: TElAdvancedListBox;
+    UseBkCB: TElCheckBox;
+    UseFgCB: TElCheckBox;
+    procedure UseFgCBClick(Sender : TObject);
+    procedure CustomFgCBClick(Sender : TObject);
+    procedure AddGroupBtnClick(Sender : TObject);
+    procedure GroupLBClick(Sender : TObject);
+    procedure FormCreate(Sender : TObject);
+    procedure FormDestroy(Sender : TObject);
+    procedure FormShow(Sender : TObject);
+    procedure UseBkCBClick(Sender : TObject);
+    procedure DelGroupBtnClick(Sender : TObject);
+    procedure AddBtnClick(Sender : TObject);
+    procedure DelBtnClick(Sender : TObject);
+    procedure EntryLBClick(Sender : TObject);
+    procedure FgColorChange(Sender : TObject);
+    procedure BkColorChange(Sender : TObject);
+  private
+    { Private declarations }
+  protected
+    GrSel,
+      MapSel,
+      EntSel : integer;
+
+    SaveVal : string;
+    procedure RefreshEntriesList;
+  public
+    { Public declarations }
+    Runtime : boolean;
+    Map : TElColorMap;
+    procedure RefreshColors;
+  end;
+
+var
+  ColorMapItemsForm : TColorMapItemsForm;
+
+implementation
+end.

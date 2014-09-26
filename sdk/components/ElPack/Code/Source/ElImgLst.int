@@ -1,0 +1,95 @@
+
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{   RLE compression (c) Copyright 1999,              }
+{   Dipl. Ing. Mike Lischke                          }
+{   public@lischke-online.de                         }
+{   Used with permission from Mike Lischke           }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+{.$DEFINE USE_JPEG}
+
+unit ElImgLst;
+
+{ ImageList with WriteData and ReadData fix }
+
+interface
+
+uses
+  Classes,
+  SysUtils,
+  {$ifdef CLX_USED}
+  QComCtrls,
+  QImgList,
+  QGraphics,
+  QControls,
+  {$else}
+  Controls,
+  Forms,
+  Windows,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  Consts, 
+  CommCtrl,
+{$IFDEF VCL_4_USED}
+  ImgList,
+{$ENDIF}
+  Graphics,
+  {$endif}
+  ElTools
+{$IFDEF USE_JPEG}
+  , JPEG
+{$ENDIF}
+  ;
+
+type
+  TElImageList = class(TImageList)
+  private
+    (*
+    procedure CreateHandle;
+    *)
+  public
+    { Private declarations }
+    procedure ReadImg(Stream : TStream);
+    procedure WriteImg(Stream : TStream);
+    function Equal(IL : TElImageList) : Boolean;
+    constructor Create(AOwner : TComponent); override;
+  protected
+    procedure GetFullImages(Image, Mask: TBitmap);
+    { Protected declarations }
+    procedure ReadLeft(Reader : TReader);
+    procedure ReadTop(Reader : TReader);
+    procedure WriteLeft(Writer : TWriter);
+    procedure WriteTop(Writer : TWriter);
+    procedure DefineProperties(Filer : TFiler); override;
+{$IFDEF USE_JPEG}
+  private
+    FUseCompression : Boolean;
+    FCompressionQuality : TJPEGQualityRange;
+  published
+    property UseCompression : Boolean read FUseCompression write FUseCompression; { Published }
+    property CompressionQuality : TJPEGQualityRange read FCompressionQuality write FCompressionQuality; { Published }
+{$ENDIF}
+  end; { TElImageList }
+
+function EncodeRLE(const Source, Target: PByte; Count, BPP: Integer): Integer;
+function DecodeRLE(const Source, Target: Pointer; Count, ColorDepth: Cardinal): Integer;
+
+implementation
+end.

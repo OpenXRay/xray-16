@@ -1,0 +1,284 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version history
+
+  Fixed GetTempDir function in windows
+
+*)
+
+unit ElTools;
+
+interface
+
+uses
+{$ifndef KYLIX_USED}
+Messages, Windows, ShellAPI,
+ActiveX,
+mmSystem,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+{$else}
+Types, Libc,
+{$endif}
+classes, SysUtils, ElStrUtils;
+
+function Sign(a : integer) : integer;
+function Max(a, b : integer) : integer;
+function Min(a, b : integer) : integer;
+function InRange(L, R, x : integer) : boolean;
+function InRangeF(L, R, x : double) : boolean;
+
+function SwapDouble(d : double) : double;
+function swapInt32(i : integer) : integer;
+function swapInt16(w : word) : Word;
+
+function RangesIntersect(L1, R1, L2, R2 : integer) : boolean;
+{$IFNDEF VER90}
+{$ifdef MSWINDOWS}
+function SubtractTimes(Time1, Time2 : TDateTime) : TDateTime;
+{$endif}
+{$ENDIF}
+
+function GetTime(DateTime : TDateTime) : TDateTime;
+
+// the following two functions write and read the string in the following format:
+// <string length><text>
+function WriteStringToStream(S : TStream; Str : string) : boolean;
+function ReadStringFromStream(S : TStream; var Str : string) : boolean;
+{$ifndef BROKEN_UNICODE}
+function WriteWideStringToStream(S : TStream; Str : WideString) : boolean;
+function ReadWideStringFromStream(S : TStream; var Str : WideString) : boolean;
+{$endif}
+function WriteFStringToStream(S : TStream; Str : TElFString) : boolean;
+function ReadFStringFromStream(S : TStream; var Str : TElFString) : boolean;
+
+// the following two functions write and read the string in the following format:
+// <text>#13#10
+procedure WriteTextToStream(S : TStream; Data : string);
+function ReadTextFromStream(S : TStream; var Data : string) : boolean;
+
+{$IFDEF VCL_4_USED}
+function GetFileSize(const FileName: string): Int64;
+{$ELSE}
+function GetFileSize(const FileName: string): Integer;
+{$ENDIF}
+function FileDateTime(const FileName: string): TDateTime;
+function FileNameValid(FileName : string) : boolean;
+function CreateFile(FileName : String) : boolean;
+procedure EnsureDirExists(RootName, DirName : string);
+function DirExists(DirName : string) : boolean;
+{$ifndef CLX_USED}
+function PurgeDir(DirName : string) : boolean;
+{$endif}
+function GetModulePath : string;
+
+{$ifdef MSWINDOWS}
+function GetComputerName : string;
+{$endif}
+
+function IsBIn(index : integer; storage : byte) : boolean;
+
+function encode_line(const buf; size : integer) : string;
+
+{$IFDEF VER90}
+function CompareMem(Var1, Var2 : pointer; size : integer) : boolean; assembler;
+{$ENDIF}
+
+procedure ValFloat(Value : string; Result : Double; var Error : integer);
+function StrFloat(Value : double) : String;
+
+
+type
+  TDirectMemoryStream = class(TMemoryStream)
+  public
+    procedure SetPointer(Ptr : Pointer; Size : Longint);
+  end;
+  TElMemoryStream = TDirectMemoryStream;
+
+  TNamedFileStream = class(TFileStream)
+  private
+    FFileName : string;
+  public
+    constructor Create(const FileName : string; Mode : Word);
+    property FileName : string read FFileName;
+  end;
+
+const
+  MAXPATHLEN = 1024;
+
+// Returns a path name after adding
+// a backslash character to the end if it is not already there.
+function IncludeTrailingBackslash2(const Path: String): String;
+
+{$ifdef MSWINDOWS}
+function GetSystemDir : string;
+function GetWindowsDir: string;
+function GetTempDir   : string;
+function GetShortPath(Path : String) : string;
+{$endif}
+
+function AppendSlash(const PathName : String) : string;
+{$ifndef D_2}
+function GetTempFile : String;
+{$endif}
+
+{$ifdef MSWINDOWS}
+function GetSpecialFolder(const CSIDL : integer) : string;
+{$endif}
+function GetUserLocalAppDataFolder : string;
+function GetUserAppDataFolder   : string;
+{$ifdef MSWINDOWS}
+function GetCommonAppDataFolder : string;
+{$endif}
+
+type
+  TReducedDateTime = record
+    Year,
+      Month,
+      DOW,
+      Day,
+      Hour,
+      Min : word;
+  end;
+
+function DateTimeToReduced(T : TDateTime) : TReducedDateTime;
+function ReducedToDateTime(T : TReducedDateTime) : TDateTime;
+function CompareReducedDT(T1, T2 : TReducedDateTime) : boolean;
+// < -1
+// = 0
+// > +1
+function MakeReducedDT(Year, Month, Day, DOW, Hour, Min : word) : TReducedDateTime;
+
+function RunProgram(StartName, Params, StartDir : string) : THandle;
+
+procedure CenterRects(WS, WT, HS, HT : integer; var R : TRect);
+function RectToString(Rect : TRect) : string;
+function StringToRect(AString : string) : TRect;
+
+function IncDate(ADate : TDateTime; Days, Months, Years : Integer) : TDateTime;
+function IncTime(ATime : TDateTime; Hours, Minutes, Seconds, MSecs : Integer) : TDateTime;
+function ExtractTime(ATime : TDateTime) : TDateTime;
+function ExtractDate(ATime : TDateTime) : TDateTime;
+
+function  DaysPerMonth(AYear, AMonth : Integer) : Integer;
+function  ElDayOfWeek(ADay, AMonth, AYear : Integer) : Integer;
+function  DateToJulianDays(ADay, AMonth, AYear : Integer) : integer;
+procedure JulianDaysToDate(var ADay, AMonth, AYear :Integer; JulianDate : integer);
+function  ElDateTimeToSeconds(ADay, AMonth, AYear, AHours, AMinute, ASecond : integer) : Cardinal;
+procedure ElSecondsToDateTime(Seconds : Cardinal; var ADay, AMonth, AYear, AHours, AMinute, ASecond : integer);
+
+function  GetSysStartDayOfWeek : integer;
+
+{$ifdef MSWINDOWS}
+procedure ElSystemTimeToTzSpecificLocalTime(lpTimeZoneInformation : PTimeZoneInformation;
+  var lpUniversalTime : TSystemTime;
+  var lpLocalTime : TSystemTime);
+
+{procedure ElTZSpecificLocalTimeToSystemTime(lpTimeZoneInformation : PTimeZoneInformation;
+  var lpUniversalTime : TSystemTime;
+  var lpLocalTime : TSystemTime);
+}
+
+procedure UTCToZoneLocal(lpTimeZoneInformation : PTimeZoneInformation;
+  lpUniversalTime : TSystemTime; var lpLocalTime : TSystemTime);
+procedure ZoneLocalToUTC(lpTimeZoneInformation : PTimeZoneInformation;
+  var lpUniversalTime : TSystemTime; lpLocalTime : TSystemTime);
+{$endif}
+
+{$ifdef MSWINDOWS}
+function NowToUTC : TDateTime;
+function ZoneIDtoBias (ZoneID : string) : integer;
+{$endif}
+
+{$ifndef D_2}
+{$ifdef MSWINDOWS}
+function GetFormattedTimeString(ADate : TDateTime; Format : string) : string;
+{$endif}
+{$endif}
+function DayNumber(AYear, AMonth, ADay : integer) : integer;
+function WeekNumber(AYear, AMonth, ADay : integer) : integer;
+
+function TimeInMask(CronMask : string; T : TReducedDateTime) : boolean;
+
+
+{$ifdef MSWINDOWS}
+
+function GetShiftState : TShiftState;
+function GetKeysState : integer;
+
+{$ifndef D_2}
+function SetPrivilege(sPrivilegeName : string; bEnabled : boolean) : boolean;
+{$endif}
+
+type TMsgPumpRoutineEvent = procedure of object;
+     TElWndMethod = procedure(var Message: TMessage) of object;
+
+var
+
+  OnMessagePump : TMsgPumpRoutineEvent;
+
+function XAllocateHWND(Obj : TObject; WndMethod : TElWndMethod) : HWND;
+procedure XDeallocateHWND(Wnd : HWND);
+
+function WindowExists(ClassName, Caption : string; ExactMatch : boolean) : HWND;
+function TopWindowExists(ClassName, Caption : string; ExactMatch : boolean) : HWND;
+{$endif}
+
+//function ProcessExists(Name : string) : THandle;
+
+procedure PlaySound(Name : Pchar; Flags1, Flags2 : DWORD);
+
+{$ifdef KYlIX_USED}
+var
+{$else}
+const
+{$endif}
+  IsLinux : boolean = false;
+  IsWin95 : boolean = false;
+  IsWinNT : boolean = false;
+  IsWin2000 : boolean = false;
+  IsWinNTUp : boolean = false;
+  IsWin2000Up : boolean = false;
+  IsWinXP : boolean = false;
+  IsWinXPUp : boolean = false;
+  IsWin95OSR2 : boolean = false;
+  IsWin98 : boolean = false;
+  IsWinME : boolean = false;
+  IsWin98Up : boolean = false;
+
+
+{$ifdef MSWINDOWS}
+var LastWin : HWND; // the result of last WindowExists or TopWindowExists call
+    LastProcessID: DWORD; // the result of last ProcessExists call
+{$endif}
+
+const
+  ElementFormatList : array[1..38] of string
+    = ('D', 'DD', 'w', '', 'ww', 'W', 'd', 'dd',
+    'm', 'mm', 'mmm', 'mmmm', 'y', 'yy',
+    'n', 'nn', 'Y', 'YY', 'x', 'xx', 'h',
+    'hh', 'H', 'HH', 'M', 'MM', 'S', 'SS',
+    '', '', '', 'tt', '|', '''', '~', '.', ':', 'TT');
+
+implementation
+end.

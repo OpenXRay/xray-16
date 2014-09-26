@@ -1,0 +1,213 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>ecore</ProjectName>
+    <ProjectGuid>{226C6807-BB48-4A07-BF13-806C38FD8FBE}</ProjectGuid>
+    <RootNamespace>all_editors_vs</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(xrBinDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(xrBinDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\editors\ECore\Editor\ArbitraryList.h" />
+    <ClInclude Include="..\editors\ECore\Editor\ColorPicker.h" />
+    <ClInclude Include="..\editors\ECore\Editor\D3DUtils.h" />
+    <ClInclude Include="..\editors\ECore\Editor\D3DX_Wrapper.h" />
+    <ClInclude Include="..\editors\ECore\Editor\device.h" />
+    <ClInclude Include="..\editors\ECore\Editor\DrawUtils.h" />
+    <ClInclude Include="..\editors\ECore\Editor\du_box.h" />
+    <ClInclude Include="..\editors\ECore\Editor\du_cone.h" />
+    <ClInclude Include="..\editors\ECore\Editor\du_cylinder.h" />
+    <ClInclude Include="..\editors\ECore\Editor\du_sphere.h" />
+    <ClInclude Include="..\editors\ECore\Editor\du_sphere_part.h" />
+    <ClInclude Include="..\editors\ECore\Editor\EDetailModel.h" />
+    <ClInclude Include="..\editors\ECore\Editor\EditMesh.h" />
+    <ClInclude Include="..\editors\ECore\Editor\EditObject.h" />
+    <ClInclude Include="..\editors\ECore\Editor\EditorPreferences.h" />
+    <ClInclude Include="..\editors\ECore\Editor\ELog.h" />
+    <ClInclude Include="..\editors\ECore\Editor\engine.h" />
+    <ClInclude Include="..\editors\ECore\Editor\EStats.h" />
+    <ClInclude Include="..\editors\ECore\Editor\ETextureParams.h" />
+    <ClInclude Include="..\editors\ECore\Editor\EThumbnail.h" />
+    <ClInclude Include="..\editors\ECore\Editor\ExportObjectOGF.h" />
+    <ClInclude Include="..\editors\ECore\Editor\ExportSkeleton.h" />
+    <ClInclude Include="..\editors\ECore\Editor\GeometryCollector.h" />
+    <ClInclude Include="..\editors\ECore\Editor\ImageEditor.h" />
+    <ClInclude Include="..\editors\ECore\Editor\ImageManager.h" />
+    <ClInclude Include="..\editors\ECore\Editor\Library.h" />
+    <ClInclude Include="..\editors\ECore\Editor\LogForm.h" />
+    <ClInclude Include="..\editors\ECore\Editor\lwo2.h" />
+    <ClInclude Include="..\editors\ECore\Editor\LW_ShaderDef.h" />
+    <ClInclude Include="..\editors\ECore\Editor\MinimapEditor.h" />
+    <ClInclude Include="..\editors\ECore\Editor\ParticleEffectActions.h" />
+    <ClInclude Include="..\editors\ECore\Editor\pick_definition.h" />
+    <ClInclude Include="..\editors\ECore\Editor\pick_defs.h" />
+    <ClInclude Include="..\editors\ECore\Editor\PropSlimTools.h" />
+    <ClInclude Include="..\editors\ECore\Editor\render.h" />
+    <ClInclude Include="..\editors\ECore\Editor\SkeletonFace.h" />
+    <ClInclude Include="..\editors\ECore\Editor\SkeletonVert.h" />
+    <ClInclude Include="..\editors\ECore\Editor\SoundEditor.h" />
+    <ClInclude Include="..\editors\ECore\Editor\SoundManager.h" />
+    <ClInclude Include="..\editors\ECore\Editor\TLSPRITE.h" />
+    <ClInclude Include="..\editors\ECore\Editor\UI_Camera.h" />
+    <ClInclude Include="..\editors\ECore\Editor\ui_main.h" />
+    <ClInclude Include="..\editors\ECore\Editor\UI_MainCommand.h" />
+    <ClInclude Include="..\editors\ECore\Editor\UI_ToolsCustom.h" />
+    <ClInclude Include="..\editors\ECore\Engine\ai_sounds.h" />
+    <ClInclude Include="..\editors\ECore\Engine\cl_collector.h" />
+    <ClInclude Include="..\editors\ECore\Engine\cl_intersect.h" />
+    <ClInclude Include="..\editors\ECore\Engine\GameMtlLib.h" />
+    <ClInclude Include="..\editors\ECore\Engine\guid_generator.h" />
+    <ClInclude Include="..\editors\ECore\Engine\Image.h" />
+    <ClInclude Include="..\editors\ECore\Engine\NVMeshMender.h" />
+    <ClInclude Include="..\editors\ECore\Engine\nv_algebra.h" />
+    <ClInclude Include="..\editors\ECore\Engine\nv_math.h" />
+    <ClInclude Include="..\editors\ECore\Engine\nv_mathdecl.h" />
+    <ClInclude Include="..\editors\ECore\Engine\Texture.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\editors\ECore\Editor\bone.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\BoneEditor.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\ColorPicker.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\c_dinput.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\D3DUtils.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\device.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\DeviceScreenshot.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\du_box.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\du_cone.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\du_cylinder.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\du_sphere.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\du_sphere_part.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EDetailModel.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EditMesh.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EditMeshIO.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EditMeshModify.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EditMeshPick.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EditMeshRender.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EditObject.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EditObjectEditor.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EditObjectImport.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EditObjectIO.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EditObjectMotions.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EditObjectProps.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EditObjectSkin.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EditorPreferences.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\ELog.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\Engine.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EStats.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\ETextureParams.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EThumbnail.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EThumbnailGroup.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EThumbnailObject.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EThumbnailSound.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\EThumbnailTexture.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\ExportObjectOGF.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\ExportSkeleton.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\GeometryCollector.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\ImageEditor.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\ImageManager.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\ImageManagerDO.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\ImageManagerLOD.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\Library.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\LogForm.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\MinimapEditor.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\ParticleEffectActions.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\pDomain.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\render.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\SoundEditor.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\SoundManager.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\TLSPRITE.CPP" />
+    <ClCompile Include="..\editors\ECore\Editor\UI_Camera.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\ui_main.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\UI_MainCommand.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\UI_MainMail.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\UI_ToolsCustom.cpp" />
+    <ClCompile Include="..\editors\ECore\Editor\xrLoadSurface.cpp" />
+    <ClCompile Include="..\editors\ECore\Engine\ai_sounds.cpp" />
+    <ClCompile Include="..\editors\ECore\Engine\bone.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Engine\cl_collector.cpp" />
+    <ClCompile Include="..\editors\ECore\Engine\GameMtlLib.cpp" />
+    <ClCompile Include="..\editors\ECore\Engine\GameMtlLib_Engine.cpp" />
+    <ClCompile Include="..\editors\ECore\Engine\guid_generator.cpp" />
+    <ClCompile Include="..\editors\ECore\Engine\Image.cpp" />
+    <ClCompile Include="..\editors\ECore\Engine\NVMeshMender.cpp" />
+    <ClCompile Include="..\editors\ECore\Engine\nv_algebra.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

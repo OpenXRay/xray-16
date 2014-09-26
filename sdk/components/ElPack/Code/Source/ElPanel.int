@@ -1,0 +1,442 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+03/03/2002
+
+  Added BevelSpaceColor. This color is used to draw bevel which is of type bvSpace.
+
+02/03/2002
+
+  Added size grip for resizable panels
+
+01/27/2002
+
+  Vertical text aligment worked slightly incorrectly. Fixed.
+
+11/20/2001
+
+  Fixed painting of inner border with XP styles enabled
+
+11/17/2001
+
+  Fixed painting of edges with XP styles enabled
+
+11/16/2001
+
+  Panel with XP styles enabled is now OPTIONALLY drawn with DrawThemeParentBackground
+  This is controlled by TransparentXPThemes property
+
+10/24/2001
+
+  ! Panel with XP styles enabled is now drawn with DrawThemeParentBackground,
+  thus behaving as transparent. 
+
+10/16/2001
+
+  CLX adaptation complete
+
+04/23/2001
+
+  OnMouseEnter and OnMouseLeave events added
+
+*)
+
+unit ElPanel;
+
+interface
+
+uses
+  {$ifndef CLX_USED}
+  Windows,
+  Messages,
+  Graphics,
+  Controls,
+  StdCtrls,
+  Forms,
+  ExtCtrls,
+  Menus,
+  {$else}
+{$ifdef MSWINDOWS}
+  Windows,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+{$endif}
+  Qt,
+  Types,
+  QTypes,
+  QGraphics,
+  QControls,
+  QForms,
+  QExtCtrls,
+  QStdCtrls,
+  ElCLXUtils,
+  {$endif}
+  SysUtils,
+  Classes,
+
+  ElXPThemedControl,
+  ElUxTheme,
+  ElTmSchema,
+  ElVCLUtils,
+  ElStrUtils,
+  ElExtBkgnd,
+  ElTools,
+  ElImgFrm;
+
+type
+  TElPanelGrabHandleKind = (ghkNone, ghkMove, ghkResize, ghkMoveParent);
+type
+
+  TCustomElPanel = class;
+
+  TElPanelGrabHandle = class(TPersistent)
+  private
+    FEnabled : Boolean;
+    FSize : Integer;
+    FKind : TElPanelGrabHandleKind;
+    FBevelKind : TPanelBevel;
+    FOwner      : TCustomElPanel;
+    FVisible : Boolean;
+    procedure SetVisible(newValue : Boolean);
+    procedure SetEnabled(newValue : Boolean);
+    procedure SetSize   (newValue : Integer);
+    procedure SetBevelKind(newValue : TPanelBevel);
+  public
+    procedure Assign(Source : TPersistent); override;
+  published
+    property Enabled    : Boolean read FEnabled write SetEnabled default false;  { Published }
+    property Size       : Integer read FSize write SetSize default 0;  { Published }
+    property Kind       : TElPanelGrabHandleKind read FKind write FKind default ghkNone;  { Published }
+    property BevelKind  : TPanelBevel read FBevelKind write SetBevelKind default bvNone;  { Published }
+    property Visible : Boolean read FVisible write SetVisible default false;  { Published }
+  end;
+
+  TCustomElPanel = class(TCustomPanel)
+  private
+    FBevelInner: TPanelBevel;
+    FBevelOuter: TPanelBevel;
+    FBevelWidth: TBevelWidth;
+    procedure SetBevelInner(Value: TPanelBevel);
+    procedure SetBevelOuter(Value: TPanelBevel);
+    procedure SetBevelWidth(Value: TBevelWidth);
+  protected
+    FOwnerDraw : Boolean;
+    FAlwaysPaintBackground: boolean;
+    FLayout : TTextLayout;
+    FOnPaint : TNotifyEvent;
+    FGradientSteps : Integer;
+    FGradientStartColor : TColor;
+    FGradientEndColor : TColor;
+    FTmpBmp : TBitmap;
+    FTransparent : Boolean;
+    FBackground : TBitmap;
+    FBackgroundType : TElBkGndType;
+{$ifndef CLX_USED}
+    FImgFormChLink  : TImgFormChangeLink;
+    FImgForm        : TElImageForm;
+{$endif}
+    {$ifndef CLX_USED}
+    FSaveCapture : HWND;
+    {$else}
+    //FSaveCapture : TControl;
+    {$endif}
+    FOnMove : TNotifyEvent;
+    FResizable : Boolean;
+    FMovable : Boolean;
+    {$ifndef CLX_USED}
+    FSizeMoveRect : TRect;
+    {$endif}
+    FGrabHandles    : array[1..4] of TElPanelGrabHandle;
+    FOnMouseEnter: TNotifyEvent;
+    FOnMouseLeave: TNotifyEvent;
+    FMouseInControl: Boolean;
+    FTheme: HTheme;
+    FUseXPThemes: Boolean;
+    FPressed : boolean;
+    FIntPaint: boolean;
+    FCaption: TElFString;
+    FAlphaLevel: Byte;
+    FTransparentXPThemes: Boolean;
+    FSizeGrip: Boolean;
+    SizeGripRect : TRect;
+    FBevelSpaceColor: TColor;
+    FShowFocus: Boolean;
+    {$ifdef ELPACK_UNICODE}
+    FHint: WideString;
+    {$endif}
+    procedure SetBackground(newValue : TBitmap);
+    procedure ImageChange(Sender : TObject);
+    {$ifndef CLX_USED}
+    procedure ImageFormChange(Sender : TObject);
+    {$endif}
+    procedure SetResizable(newValue : Boolean);
+    {$ifndef CLX_USED}
+    procedure WMEnterSizeMove(var Msg : TMessage); message WM_ENTERSIZEMOVE;
+    procedure WMExitSizeMove(var Msg : TMessage); message WM_EXITSIZEMOVE;
+    procedure WMNCHitTest(var Msg : TMessage); message WM_NCHITTEST;
+    procedure WMEraseBkGnd(var Msg : TWMEraseBkGnd); message WM_EraseBkgnd;
+    procedure WMMouseMove(var Msg : TWMMouseMove); message WM_MOUSEMOVE;
+    procedure WMLButtonDown(var Msg : TMessage); message WM_LBUTTONDOWN;
+    procedure WMLButtonUp(var Msg : TWMLButtonUp); message WM_LBUTTONUP;
+    procedure WMMove(var Msg : TWMMove); message WM_MOVE;
+    procedure WMSize(var Msg : TWMSize); message WM_SIZE;
+    procedure WMPaint(var Msg : TWMPaint); message WM_PAINT;
+    procedure WMWindowPosChanged(var Message: TWMWindowPosChanged); message
+        WM_WINDOWPOSCHANGED;
+    procedure CMMouseEnter(var Message: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Message: TMessage); message CM_MOUSELEAVE;
+    procedure IFMRepaintChildren(var Message: TMessage); message 
+        IFM_REPAINTCHILDREN;
+    {$endif}
+    procedure RedoTmpBmp;
+    procedure SetGradientStartColor(newValue : TColor);
+    procedure SetGradientEndColor(newValue : TColor);
+    procedure SetGradientSteps(newValue : Integer);
+    procedure SetLayout(newValue : TTextLayout);
+    procedure SetOwnerDraw(newValue : Boolean);
+    function GetTopGrabHandle : TElPanelGrabHandle;
+    procedure SetTopGrabHandle(newValue : TElPanelGrabHandle);
+    function GetRightGrabHandle : TElPanelGrabHandle;
+    procedure SetRightGrabHandle(newValue : TElPanelGrabHandle);
+    function GetLeftGrabHandle : TElPanelGrabHandle;
+    procedure SetLeftGrabHandle(newValue : TElPanelGrabHandle);
+    function GetBottomGrabHandle : TElPanelGrabHandle;
+    procedure SetBottomGrabHandle(newValue : TElPanelGrabHandle);
+    procedure SetAlwaysPaintBackground(Value : boolean);
+    //procedure DrawBackground(DC: HDC);
+
+    {$ifdef CLX_USED}
+    function WidgetFlags: Integer; override;
+    {$endif}
+
+    procedure Loaded; override;
+    {$ifndef CLX_USED}
+    procedure SetImageForm(newValue : TElImageForm); virtual;
+    {$endif}
+    procedure SetBackgroundType(newValue : TElBkGndType); virtual;
+    procedure SetTransparent(newValue : Boolean); virtual;
+    procedure SetMovable(newValue : Boolean); virtual;
+    procedure AlignControls(AControl: TControl; var Rect: TRect); override;
+    procedure Paint; override;
+    procedure TriggerMoveEvent; virtual;
+    procedure TriggerPaintEvent; virtual;
+    procedure SetCaption(newValue: TElFString); virtual;
+    {$ifndef CLX_USED}
+    procedure CreateParams(var Params : TCreateParams); override;
+    procedure WndProc(var Message : TMessage); override;
+    procedure WMSetFocus(var Message: TMessage); message WM_SETFOCUS;
+    procedure WMKillFocus(var Message: TMessage); message WM_KILLFOCUS;
+    {$else}
+    procedure DoEnter; override;
+    procedure DoExit; override;
+    {$endif}
+    procedure AdjustClientRect(var Rect: TRect);{$IFDEF VCL_4_USED}override{$else}virtual{$ENDIF};
+    function  InGrabHandle(X, Y : integer; Rect : TRect) : TElPanelGrabHandle;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure DoMouseEnter; virtual;
+    procedure DoMouseLeave; virtual;
+    function GetCaption: TElFString; virtual;
+    procedure SetAlphaLevel(Value: Byte);
+    
+    function GetThemedClassName: WideString; virtual;
+    procedure SetUseXPThemes(const Value: Boolean); virtual;
+    procedure CreateThemeHandle; virtual;
+    procedure FreeThemeHandle; virtual;
+
+    {$ifndef CLX_USED}
+    procedure CreateWnd; override;
+    procedure DestroyWnd; override;
+
+    procedure WMThemeChanged(var Message: TMessage); message WM_THEMECHANGED;
+    {$else}
+    procedure CreateWidget; override;
+    procedure DestroyWidget; override;
+    {$endif}
+    procedure DrawThemedBackground; virtual;
+    function GetBackgroundClientRect: TRect; virtual;
+    procedure SetTransparentXPThemes(Value: Boolean); virtual;
+    procedure SetSizeGrip(Value: Boolean);
+    procedure UpdateInterior; virtual;
+    procedure SetBevelSpaceColor(Value: TColor);
+    procedure SetShowFocus(Value: Boolean);
+    {$ifdef ELPACK_UNICODE}
+    procedure SetHint(Value: WideString);
+
+    {$ifndef CLX_USED}
+    procedure CMHintShow(var Message: TMessage); message CM_HINTSHOW;
+    {$else}
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    {$endif}
+    {$endif}
+    property AlwaysPaintBackground : boolean read FAlwaysPaintBackground write SetAlwaysPaintBackground default false;
+    property Layout : TTextLayout read FLayout write SetLayout default tlCenter;  { Published }
+    property OwnerDraw : Boolean read FOwnerDraw write SetOwnerDraw default false;  { Published }
+    property Background : TBitmap read FBackground write SetBackground;
+    property BackgroundType : TElBkGndType read FBackgroundType write SetBackgroundType default bgtColorFill;
+    property Resizable : Boolean read FResizable write SetResizable default false;
+    property Movable : Boolean read FMovable write SetMovable default false;
+    property Transparent : Boolean read FTransparent write SetTransparent default false; { Protected }
+    property Caption: TElFString read GetCaption write SetCaption;
+    property GradientStartColor : TColor read FGradientStartColor write SetGradientStartColor default clBlack;  { Protected }
+    property GradientEndColor : TColor read FGradientEndColor write SetGradientEndColor default clBlack;  { Protected }
+    property GradientSteps : Integer read FGradientSteps write SetGradientSteps default 16;  { Protected }
+    {$ifndef CLX_USED}
+    property ImageForm     : TElImageForm read FImgForm write SetImageForm;
+    {$endif}
+    property TopGrabHandle : TElPanelGrabHandle read GetTopGrabHandle write SetTopGrabHandle;  { Published }
+    property RightGrabHandle : TElPanelGrabHandle read GetRightGrabHandle write SetRightGrabHandle;  { Published }
+    property LeftGrabHandle : TElPanelGrabHandle read GetLeftGrabHandle write SetLeftGrabHandle;  { Published }
+    property BottomGrabHandle : TElPanelGrabHandle read GetBottomGrabHandle write SetBottomGrabHandle;  { Published }
+
+    property OnMove : TNotifyEvent read FOnMove write FOnMove;
+    property OnPaint : TNotifyEvent read FOnPaint write FOnPaint;
+    property OnMouseEnter: TNotifyEvent read FOnMouseEnter write FOnMouseEnter;
+    property OnMouseLeave: TNotifyEvent read FOnMouseLeave write FOnMouseLeave;
+    property AlphaLevel: Byte read FAlphaLevel write SetAlphaLevel default 0;
+    property UseXPThemes: Boolean read FUseXPThemes write SetUseXPThemes default
+        True;
+    property TransparentXPThemes: Boolean read FTransparentXPThemes write
+        SetTransparentXPThemes default true;
+    property TabStop default true;
+    property SizeGrip: Boolean read FSizeGrip write SetSizeGrip default false;
+    property BevelInner: TPanelBevel read FBevelInner write SetBevelInner default 
+        bvNone;
+    property BevelOuter: TPanelBevel read FBevelOuter write SetBevelOuter default 
+        bvRaised;
+    property BevelWidth: TBevelWidth read FBevelWidth write SetBevelWidth default 1;
+    property BevelSpaceColor: TColor read FBevelSpaceColor write SetBevelSpaceColor 
+        default clBtnFace;
+    property ShowFocus: Boolean read FShowFocus write SetShowFocus default false;
+  public
+{$ifndef CLX_USED}
+    procedure Update; override;
+{$endif}
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+
+    function IsThemeApplied: Boolean;
+
+    property MouseInControl: Boolean read FMouseInControl;
+    property Canvas;
+    property Theme: HTheme read FTheme;
+  published
+    {$ifdef ELPACK_UNICODE}
+    property Hint: WideString read FHint write SetHint;
+    {$endif}
+  end;
+
+  TElPanel = class(TCustomElPanel)
+    property AlphaLevel;
+    property AlwaysPaintBackground;
+    property Background;
+    property BackgroundType;
+    property GradientEndColor;
+    property GradientStartColor;
+    property GradientSteps;
+    property Alignment;
+    property Layout;
+    property OwnerDraw;
+    {$ifndef CLX_USED}
+    property ImageForm;
+    {$endif}
+    property TopGrabHandle;
+    property RightGrabHandle;
+    property LeftGrabHandle;
+    property BottomGrabHandle;
+
+    property Resizable;
+    property Movable;
+    property OnMove;
+    property OnPaint;
+
+    property SizeGrip;
+    property Align nodefault;
+    property BevelInner;
+    property BevelOuter;
+    property BevelSpaceColor;
+    property BevelWidth;
+    property BorderStyle;
+    property BorderWidth;
+    property TransparentXPThemes;
+    property UseXPThemes;
+
+    property Color;
+{$ifndef CLX_USED}
+    property DragCursor;
+{$endif}
+    property DragMode;
+    property Enabled;
+    property Font;
+{$ifndef CLX_USED}
+    property Locked;
+    property MouseCapture;
+{$endif}
+    property ParentColor;
+{$ifndef CLX_USED}
+    property ParentCtl3D;
+{$endif}
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property Transparent;
+    property Visible;
+    property Caption;
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnResize;
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Action;
+    property Constraints;
+{$ifndef CLX_USED}
+    property DockOrientation;
+    property Floating;
+    property BevelKind;
+    property DoubleBuffered;
+    property DragKind;
+{$endif}
+{$ENDIF}
+{$IFDEF VCL_5_USED}
+    property OnContextPopup;
+{$ENDIF}
+  end;
+
+implementation
+end.

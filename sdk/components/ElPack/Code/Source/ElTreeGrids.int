@@ -1,0 +1,482 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+04/01/2002
+
+  Inplace editing was triggered by any button (instead of left button only). fixed.
+
+03/12/2002
+
+  Built-in editor always has the same font as a grid itself
+  AV appeared whn trying to read Rows array. Fixed.
+
+02/15/2002
+
+  Fixed Tab key handling
+
+02/01/2002
+
+  Changed Cols, Rows types to conditionally unicode
+
+11/05/2001
+
+  goRowSelect was not working properly. Fixed. 
+
+*)
+
+unit ElTreeGrids;
+
+interface
+
+uses
+
+    Windows,
+    Messages,
+    Controls,
+    Forms,
+    StdCtrls,
+
+    Classes,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+
+    ElStrArray,
+    ElTree,
+    ElHeader,
+    ElStrUtils,
+    {$ifdef ELPACK_UNICODE}
+    ElUnicodeStrings,
+    {$endif}
+    {$ifdef ELPACK_COMPLETE}
+    ElTreeBtnEdit;
+    {$else}
+    ElTreeStdEditors;
+    {$endif}
+
+type
+
+{$ifdef ELPACK_UNICODE}
+  TElFStringArray = TElWideStringArray;
+{$else}
+  TElFStringArray = TElStringArray;
+{$endif}
+
+     TCustomElTreeGrid = class(TCustomElTree)
+     private
+       FgoAlwaysShowEditor: Boolean;
+       FgoRowSelect: Boolean;
+       FgoColMoving: Boolean;
+       FgoTabs: Boolean;
+
+       procedure SetgoRowSelect(Value: Boolean);
+       procedure SetgoColMoving(Value: Boolean);
+       function GetCol: Integer;
+       procedure SetCol(Value: Integer);
+       function GetRow: Integer;
+       procedure SetRow(Value: Integer);
+       function GetLeftCol: Integer;
+       procedure SetLeftCol(Value: Integer);
+       function GetColCount: Integer;
+       procedure SetColCount(Value: Integer);
+       function GetColWidths(Index: Integer): Integer;
+       procedure SetColWidths(Index: Integer; Value: Integer);
+       function GetDefaultColWidth: Integer;
+       procedure SetDefaultColWidth(Value: Integer);
+       function GetDefaultRowHeight: Integer;
+       procedure SetDefaultRowHeight(Value: Integer);
+       function GetEditorMode: Boolean;
+       procedure SetEditorMode(Value: Boolean);
+       function GetRowCount: Integer;
+       procedure SetRowCount(Value: Integer);
+       function GetTopRow: Integer;
+       procedure SetTopRow(Value: Integer);
+       function GetgoEditing: Boolean;
+       procedure SetgoEditing(Value: Boolean);
+     protected
+       FgoTabSkipNonEditable: Boolean;
+       procedure KeyDownTransfer(Sender : TObject; var Key : Word; Shift :
+           TShiftState); override;
+       procedure WMChar(var Message: TMessage); message WM_CHAR;
+       function CreateView: TElTreeView; override;
+       function GetAsCell(ACol, ARow : Integer): TElTreeItem;
+       procedure WMGetDlgCode(var Message: TWMGetDlgCode); message WM_GETDLGCODE;
+
+       procedure MouseDownTransfer(Sender : TObject; Button : TMouseButton; Shift :
+           TShiftState; X : Integer; Y : Integer); override;
+       procedure EnsureColumnVisible(SectionNumber : integer);
+
+       property goAlwaysShowEditor: Boolean read FgoAlwaysShowEditor write
+           FgoAlwaysShowEditor;
+       property goRowSelect: Boolean read FgoRowSelect write SetgoRowSelect;
+       property goColMoving: Boolean read FgoColMoving write SetgoColMoving;
+       property goTabs: Boolean read FgoTabs write FgoTabs;
+       property ColCount: Integer read GetColCount write SetColCount;
+       property DefaultColWidth: Integer read GetDefaultColWidth write
+           SetDefaultColWidth;
+       property DefaultRowHeight: Integer read GetDefaultRowHeight write
+           SetDefaultRowHeight;
+       property EditorMode: Boolean read GetEditorMode write SetEditorMode;
+       property RowCount: Integer read GetRowCount write SetRowCount;
+       property goEditing: Boolean read GetgoEditing write SetgoEditing;
+       property goTabSkipNonEditable: Boolean read FgoTabSkipNonEditable write
+           FgoTabSkipNonEditable;
+     public
+       function CellRect(ACol, ARow: Longint): TRect;
+       procedure MouseToCell(X, Y: Integer; var ACol, ARow: Longint);
+       constructor Create(Owner : TComponent); override;
+       function GetNextEditableSection(Section : TElHeaderSection; GoForward : 
+           boolean): TElHeaderSection;
+       property Col: Integer read GetCol write SetCol;
+       property ColWidths[Index: Integer]: Integer read GetColWidths write
+           SetColWidths;
+       property LeftCol: Integer read GetLeftCol write SetLeftCol;
+       property Row: Integer read GetRow write SetRow;
+       property TopRow: Integer read GetTopRow write SetTopRow;
+     published
+       property VerticalLines default true;
+       property HorizontalLines default true;
+     end;
+
+     {$ifdef ELPACK_COMPLETE}
+     TElTreeTrickyInplaceEdit = class(TElTreeInplaceButtonEdit)
+     {$else}
+     TElTreeTrickyInplaceEdit = class(TElTreeInplaceEdit)
+     {$endif}
+     private
+       FDummyStr : string;
+     published
+       property Name : string read FDummyStr;
+       property Tree : string read FDummyStr;
+     end;
+
+     TElTreeStringGrid = class(TCustomElTreeGrid)
+     private
+       FCols : TElFStringArray;
+       FRows: TElFStringArray;
+       {$ifdef ELPACK_COMPLETE}
+       FEditor : TElTreeInplaceButtonEdit;
+       {$else}
+       FEditor : TElTreeInplaceEdit;
+       {$endif}
+       function GetCols(Index: Integer): TElFStrings;
+       procedure SetCols(Index: Integer; Value: TElFStrings);
+       function GetRows(Index: Integer): TElFStrings;
+       procedure SetRows(Index: Integer; Value: TElFStrings);
+       function GetCells(ACol, ARow: Integer): TElFString;
+       procedure SetCells(ACol, ARow: Integer; Value: TElFString);
+       function GetObjects(ACol, ARow: Integer): TObject;
+       procedure SetObjects(ACol, ARow: Integer; Value: TObject);
+       {$ifdef ELPACK_COMPLETE}
+       procedure SetEditor(Value : TElTreeInplaceButtonEdit);
+       {$else}
+       procedure SetEditor(Value : TElTreeInplaceEdit);
+       {$endif}
+     protected
+       FUseDefaultEditor: Boolean;
+       procedure TriggerInplaceEditorNeeded(Item : TElTreeItem; SectionIndex : Integer;
+        SupposedFieldType : TElFieldType; var Editor : TElTreeInplaceEditor); override;
+       procedure OnFontChange(Sender: TObject); override;
+
+       procedure KeyDownTransfer(Sender : TObject; var Key : Word; Shift :
+           TShiftState); override;
+       procedure EditorKeyDown(Sender  : TObject; var Key : Word; Shift : TShiftState);
+     public
+       constructor Create(Owner : TComponent); override;
+       destructor Destroy; override;
+       property Cols[Index: Integer]: TElFStrings read GetCols write SetCols;
+       property Rows[Index: Integer]: TElFStrings read GetRows write SetRows;
+       property Cells[ACol, ARow: Integer]: TElFString read GetCells write SetCells;
+           default;
+       property Objects[ACol, ARow: Integer]: TObject read GetObjects write SetObjects;
+
+       {$ifdef ELPACK_COMPLETE}
+       property Editor : TElTreeInplaceButtonEdit read FEditor
+                                                  write SetEditor;
+       {$else}
+       property Editor : TElTreeInplaceEdit read FEditor
+                                            write SetEditor;
+       {$endif}
+     published
+       property UseDefaultEditor: Boolean read FUseDefaultEditor write 
+           FUseDefaultEditor default false;
+
+       property ColCount default 5;
+       property RowCount default 5;
+       property goAlwaysShowEditor  default false;
+       property goRowSelect default false;
+       property goColMoving default true;
+       property goEditing default true;
+       property goTabs default false;
+       property goTabSkipNonEditable default false;
+       property DefaultColWidth default 64;
+       property DefaultRowHeight default 24;
+
+       property ActiveBorderType;
+       property Align;
+       property AutoLookup;
+       property AutoResizeColumns;
+   {$IFDEF VCL_4_USED}
+       property Anchors;
+       property Action;
+       property Constraints;
+       property DockOrientation;
+       property Floating;
+       property BevelKind;
+       property DoubleBuffered;
+       property DragKind;
+   {$ENDIF}
+   {$IFNDEF LITE}
+       property AdjustMultilineHeight;
+       property Background;
+       property BackgroundType;
+   {$ENDIF}
+       property BorderStyle;
+       property ChangeDelay;
+       property ChangeStateImage;
+       property CheckBoxGlyph;
+       property Ctl3D;
+       property Color;
+       property Cursor;
+       property CustomCheckboxes;
+       property CustomPlusMinus;
+       property VertDivLinesColor;
+       property HorzDivLinesColor;
+       property DragCursor;
+       property DragAllowed;
+       property DragTrgDrawMode;
+       property DragType;
+       property DragExpandDelay;
+       property DragImageMode;
+       property DrawFocusRect;
+       property DragRectAcceptColor;
+       property DragRectDenyColor;
+
+       property Enabled;
+       property ExpandOnDragOver;
+       property ExplorerEditMode;
+       property FilteredVisibility;
+       property Flat;
+       property FlatFocusedScrollbars;
+       property FocusedSelectColor;
+       property FocusedSelectTextColor;
+       property ForcedScrollBars;
+       property Font stored true;
+   {$IFNDEF LITE}
+       property GradientStartColor;
+       property GradientEndColor;
+       property GradientSteps;
+   {$ENDIF LITE}
+       property HeaderActiveFilterColor;
+       property HeaderColor;
+       property HeaderHeight default 0;
+       property HeaderHotTrack;
+       property HeaderInvertSortArrows;
+       property HeaderSections;
+       property HeaderFilterColor;
+       property HeaderFlat;
+       property HeaderImages;
+   {$IFNDEF LITE}
+       property HeaderWrapCaptions;
+   {$ENDIF}
+       property HideFocusRect;
+       property HideHintOnTimer;
+       property HideHintOnMove;
+       property HideSelectColor;
+       property HideSelectTextColor;
+       property HideSelection;
+       property HorizontalLines default true;
+       property HideHorzScrollBar;
+       property HideVertScrollBar;
+       property Hint;
+       property HorzScrollBarStyles;
+   {$IFDEF ELPACK_COMPLETE}
+       property HeaderImageForm;
+       property ImageForm;
+   {$ENDIF}
+       property Images;
+       property Images2;
+       property InactiveBorderType;
+       property InplaceEditorDelay;
+       property ItemIndent;
+       property Items;
+       property LineBorderActiveColor;
+       property LineBorderInactiveColor;
+       property LinesColor;
+       property LinesStyle;
+       property LineHintColor;
+       property LineHintMode default shmLong;
+       property LineHintTimeout;
+       property LockHeaderHeight default true;
+       property MainTreeColumn;
+       property MinusPicture;
+       property MoveFocusOnCollapse;
+       property ParentCtl3D;
+       property ParentFont;
+       property ParentShowHint;
+       property PlusMinusTransparent;
+       property PlusPicture;
+       property PopupMenu;
+       property RadioButtonGlyph;
+       property RightAlignedText;
+       property RightAlignedTree;
+       property RightClickSelect;
+       property ScrollbarOpposite;
+       property ScrollTracking;
+       property ShowButtons default false;
+       property ShowCheckboxes;
+       property ShowEmptyImages;
+       property ShowEmptyImages2;
+       property ShowHint;
+       property ShowImages default false;
+       property ShowLines default false;
+       property ShowRoot default false;
+       property ShowRootButtons;
+       property SortDir;
+       property SortMode;
+       property SortSection;
+       property SortType;
+   {$IFDEF ELPACK_COMPLETE}
+       property Storage;
+       property StoragePath;
+   {$ENDIF}
+       property StickyHeaderSections;
+       property TabOrder;
+       property TabStop;
+       property UseCustomScrollBars;
+
+       property VerticalLines default true;
+       property VerticalLinesLong default false;
+       property VertScrollBarStyles;
+       property Visible;
+       property UseSystemHintColors;
+       property TextColor;
+       property BkColor;
+
+       property OnScroll;
+       property OnHeaderColumnClick;
+       property OnHeaderColumnDraw;
+       property OnHeaderColumnResize;
+       property OnHeaderColumnMove;
+       property OnHeaderLookup;
+       property OnHeaderLookupDone;
+       property OnHeaderResize;
+       property OnHeaderSectionExpand;
+       property OnHeaderSectionCollapse;
+       property OnHeaderSectionFilterCall;
+       property OnHeaderSectionAutoSize;
+       property OnHeaderSectionMeasure;
+       property OnHorzScrollDrawPart;
+       property OnHorzScrollHintNeeded;
+
+       property OnAfterSelectionChange;
+       property OnChanging;
+       property OnDragTargetChange;
+       property OnItemChange;
+       property OnItemPreDraw;
+       property OnItemDraw;
+       property OnResize;
+{$ifndef VER3_EDITORS}
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+       property OnTryEdit;
+       property OnEditRequest;
+       property OnComboEditShow;
+       property OnValidateCombo;
+       property OnValidateInplaceEdit;
+       property OnTuneUpInplaceEdit;
+       property OnEditKeyDown;
+{$endif}
+{$else}
+       property OnInplaceEditorNeeded;
+{$endif}
+       property OnItemChecked;
+       property OnItemExpand;
+       property OnItemCollapse;
+       property OnItemExpanding;
+       property OnItemCollapsing;
+       property OnItemDeletion;
+       property OnItemFocused;
+       property OnShowLineHint;
+       property OnCompareItems;
+       property OnItemPicDraw;
+       property OnItemPicDraw2;
+       property OnItemPostDraw;
+       property OnHotTrack;
+       property OnSortBegin;
+       property OnSortEnd;
+       property OnItemSave;
+       property OnItemLoad;
+       property OnItemSelectedChange;
+       property OnCellStyleSave;
+       property OnCellStyleLoad;
+       property OnVertScrollDrawPart;
+       property OnVertScrollHintNeeded;
+   {$IFDEF HAS_HTML_RENDER}
+       property OnHTMLImageNeeded;
+   {$ENDIF}
+
+       property OnHeaderMouseDown;
+       property OnClick;
+       property OnEnter;
+       property OnExit;
+       property OnDragDrop;
+       property OnDragOver;
+       property OnStartDrag;
+       property OnEndDrag;
+       property OnMouseDown;
+       property OnMouseMove;
+       property OnMouseUp;
+       property OnDblClick;
+       property OnKeyDown;
+       property OnKeyPress;
+       property OnKeyUp;
+   {$IFDEF VCL_4_USED}
+       property OnStartDock;
+
+       property OnEndDock;
+   {$ENDIF}
+   {$IFDEF VCL_5_USED}
+       property OnContextPopup;
+   {$ENDIF}
+   {$ifdef ELTREE_USE_OLE_DRAGDROP}
+   {$IFNDEF VER90}
+   {$IFNDEF LITE}
+       property OnOleTargetDrag;
+       property OnOleTargetDrop;
+       property OnOleDragStart;
+       property OnOleDragFinish;
+   {$ENDIF}
+   {$ENDIF}
+   {$endif}
+   end;
+
+     TElTreeGridView = class(TElTreeView)
+     protected
+       procedure WMLButtonDown(var Message: TWMLButtonDown); message WM_LBUTTONDOWN;
+       procedure WMLButtonDblClick(var Message: TMessage); message WM_LBUTTONDBLCLK;
+       procedure WMGetDlgCode(var Message: TWMGetDlgCode); message WM_GETDLGCODE;
+     end;
+
+     EElTreeGridError = class(EElTreeError);
+
+implementation
+end.

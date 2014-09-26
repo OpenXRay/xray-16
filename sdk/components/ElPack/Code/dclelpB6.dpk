@@ -1,0 +1,54 @@
+package dclelpB6;
+
+{$R *.RES}
+{$ALIGN ON}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST ON}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'EldoS Visual Components (Design-time)'}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+{$DEFINE BUIlDER_USED}
+
+requires
+  vcl,
+  dclstd,
+  elpackB6;
+
+contains
+  ElReg in 'ElReg.pas',
+  frmFormPers in 'Design\frmFormPers.pas' {PersPropsForm},
+  MlCapProp in 'Design\MlCapProp.pas' {MlCapEditDialog},
+  ElTBDsgn in 'Design\ElTBDsgn.pas',
+  frmSoundMap in 'Design\frmSoundMap.pas' {SoundMapForm},
+  ColorMapProp in 'Design\ColorMapProp.pas',
+  frmItemsProp in 'Design\frmItemsProp.pas' {ItemsPropDlg},
+  frmItemCol in 'Design\frmItemCol.pas' {ItemColDlg},
+  frmSectEdit in 'Design\frmSectEdit.pas' {SectEdit},
+  frmSectProp in 'Design\frmSectProp.pas' {ElSectionsPropDlg},
+  frmStrPoolEdit in 'Design\frmStrPoolEdit.pas',
+  ElImageIndexProp in 'Design\ElImageIndexProp.pas',
+  ColnProp in 'Design\ColnProp.pas',
+  PgCtlProp in 'Design\PgCtlProp.pas',
+  ElMenuDsgn in 'Design\ElMenuDsgn.pas',
+  ElEBDsgn in 'Design\ElEBDsgn.pas',
+  TreeDsgn in 'Design\TreeDsgn.pas';
+
+end.

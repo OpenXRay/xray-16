@@ -1,0 +1,214 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+
+(*
+
+Version History
+
+04/10/2002
+
+  Fixed the problem with property saving when the window was created
+  but was not shown during the session
+
+03/14/2002
+
+  Fixed interseption of secondary windows hiding
+
+01/20/2002
+
+  Fixed WM_DESTROY handling for owner form
+
+11/15/2001
+
+  Changed the way FormPersist gets notified about form show/hide events. 
+
+11/05/2001
+
+  Now it's possible to store collection elements too
+
+03/14/2001
+
+  Fixed incorrect TopMost behavior of application forms, when other forms (invisible)
+  have topmost status.
+
+12/16/2000
+
+   Improved handling of ActiveForms. However ElFormPersist control placed to
+   ActiveForm in design-time won't function. In case of ActiveForms you will need
+   to create the object manually and specify an owner for it.  
+
+11/08/2000
+
+   Maximized state of main form was saved incorrectly sometimes (not always).
+   Fixed.
+
+*)
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElFrmPers;
+
+interface
+
+uses
+  Classes,
+  SysUtils,
+  {$ifndef CLX_USED}
+  Windows,
+  Messages,
+  Graphics,
+  Controls,
+  Forms,
+  Menus,
+  StdCtrls,
+  ExtCtrls,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  {$else}
+  Types,
+  Qt,
+  QTypes,
+  QControls,
+  QGraphics,
+  QForms,
+  QMenus,
+  {$endif}
+  ElHook,
+  ElVCLUtils,
+  ElMTree,
+  TypInfo,
+  ElTools,
+  ElIni;
+
+type
+  TElFormPersist = class;
+
+  TElPersistOption = (epoState, epoPosition, epoProperties, epoActiveControl, epoSize);
+  TElPersistOptions = set of TElPersistOption;
+
+  {$ifndef CLX_USED}
+  TElMinMaxInfo = class(TPersistent)
+  private
+    FInfo : TMinMaxInfo;
+    FOwner : TElFormPersist;
+    procedure SetInfo(index : integer; Value : integer);
+    function GetInfo(index : integer) : integer;
+  published
+    property MaxPosX : Integer index 0 read GetInfo write SetInfo default 0;
+    property MaxPosY : Integer index 1 read GetInfo write SetInfo default 0;
+    property MaxSizeX : Integer index 2 read GetInfo write SetInfo default 0;
+    property MaxSizeY : Integer index 3 read GetInfo write SetInfo default 0;
+    property MaxTrackX : Integer index 4 read GetInfo write SetInfo default 0;
+    property MaxTrackY : Integer index 5 read GetInfo write SetInfo default 0;
+    property MinTrackX : Integer index 6 read GetInfo write SetInfo default 0;
+    property MinTrackY : Integer index 7 read GetInfo write SetInfo default 0;
+  end;
+  {$endif}
+
+  // Fake class. Do not remove!
+  TElStoredProps = class
+  end;
+
+  TElFormPersist = class(TComponent)
+  private
+    FTopMost : Boolean;
+    FPersistOptions : TElPersistOptions;
+    FActive : Boolean;
+    {$ifndef CLX_USED}
+    FMinMaxInfo : TElMinMaxInfo;
+    {$endif}
+    FProps : TElMTree;
+    FStorage : TElIniFile;
+    FStoragePath : string;
+    FOnSave : TNotifyEvent;
+    FOnRestore : TNotifyEvent;
+    FHook : TElHook;
+    //FOnShow : TNotifyEvent;
+    //FOnDestroy : TNotifyEvent;
+    //FOnHide : TNotifyEvent;
+    // Fake field.
+    FStoredProps : TElStoredProps;
+    FSaveSize : TRect;
+    RealDims: TRect;
+    //FPosChanging : boolean;
+    procedure SetStorage(newValue : TElIniFile);
+    {$ifndef CLX_USED}
+    procedure SetMinMaxInfo(newValue : TElMinMaxInfo);
+    {$endif}
+    procedure SetActive(newValue : Boolean);
+    procedure OnHook(Sender : TObject; var Msg : TMessage; var Handled : boolean);
+    procedure OnAfterHook(Sender : TObject; var Msg : TMessage; var Handled : boolean);
+    //procedure FormShow(Sender : TObject);
+    //procedure FormHide(Sender : TObject);
+    //procedure FormDestroy(Sender : TObject);
+    procedure ReadPropsList(Stream : TStream);
+    procedure WritePropsList(Stream : TStream);
+    procedure OnSavePropData(Sender : TObject; Item : TElMTreeItem; Stream : TStream);
+    procedure OnLoadPropData(Sender : TObject; Item : TElMTreeItem; Stream : TStream);
+    procedure OnDelPropData(Sender : TObject; Item : TElMTreeItem; Data : pointer);
+    function GetPropsToStore : TElMTree;
+    procedure SetTopMost(newValue : Boolean);
+    procedure UpdateTopmost;
+  protected
+    FFlipped: Boolean;
+    procedure TriggerSaveEvent; virtual;
+    procedure TriggerRestoreEvent; virtual;
+    procedure InfoChanged;
+    procedure Notification(AComponent : TComponent; Operation : TOperation); override;
+    procedure UpdatePosition;
+    procedure DefineProperties(Filer : TFiler); override;
+    procedure Loaded; override;
+    procedure SetFlipped(Value: Boolean);
+    procedure DoFlip(Flip : boolean);
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Save;
+    procedure Restore;
+    procedure SavePosition;
+    procedure RestorePosition;
+    procedure SaveProps;
+    procedure RestoreProps;
+    property PropsToStore : TElMTree read GetPropsToStore;
+  published
+    property Storage : TElIniFile read FStorage write SetStorage;
+    property StoragePath : string read FStoragePath write FStoragePath;
+    property OnSave : TNotifyEvent read FOnSave write FOnSave;
+    property OnRestore : TNotifyEvent read FOnRestore write FOnRestore;
+    {$ifndef CLX_USED}
+    property MinMaxInfo : TElMinMaxInfo read FMinMaxInfo write SetMinMaxInfo;
+    {$endif}
+    property Active : Boolean read FActive write SetActive default True;
+    property PersistOptions : TElPersistOptions read FPersistOptions write FPersistOptions;
+    property StoredProps : TElStoredProps read FStoredProps;
+    property TopMost : Boolean read FTopMost write SetTopMost;
+    property Flipped: Boolean read FFlipped write SetFlipped;
+  end;
+
+type
+  TElStoreType = (estComp, estProp, estCollection);
+
+type
+  TElPropData = record
+    PropType : TElStoreType;
+    Store : boolean;
+    Name : string;
+  end;
+  PElPropData = ^TElPropData;
+
+implementation
+end.

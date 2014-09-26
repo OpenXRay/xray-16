@@ -1,0 +1,101 @@
+{
+
+Known problems:
+
+1. Tick marks are of wrong color in ElTrackbar
+3. Header sort marks are not drawn correctly
+
+}
+
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{   Copyright (c) 2001, Akzhan Abdulin               }
+{                                                    }
+{====================================================}
+
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+09/21/2001 (c) Akzhan Abdulin
+
+  Now nonclient area size will be recalculated after theme changes
+
+09/17/2001 (c) Akzhan Abdulin
+
+  Initiated.
+  Themed control fully supports one theme per control paradigm.
+  Bevel is drawn using Theme API.
+
+  Developer note: You must override in descendants only one method named
+  GetThemedClassName.
+
+*)
+
+unit ElXPThemedControl;
+
+interface
+
+uses
+  ElUxTheme,
+  ElTmSchema,
+  Classes,
+{$ifndef CLX_USED}
+  Controls,
+{$ifdef VCL_6_USED}
+  Types,
+{$endif}
+  Messages
+{$else}
+  QControls,
+  Qt
+{$ENDIF}
+  ;
+
+type
+  TElXPThemedControl = class(TCustomControl)
+  private
+    FUseXPThemes: Boolean;
+    FTheme: HTheme;
+  protected
+    procedure SetUseXPThemes(const Value: Boolean); virtual;
+    function GetThemedClassName: WideString; virtual; abstract;
+{$ifdef MSWINDOWS}
+{$ifdef CLX_USED}
+    procedure CreateWidget; override;
+    procedure DestroyWidget; override;
+{$else}
+    procedure CreateWnd; override;
+    procedure DestroyWnd; override;
+{$endif}
+{$ifndef CLX_USED}
+    procedure WMThemeChanged(var Message: TMessage); message WM_THEMECHANGED;
+    procedure WMNCPaint(var Message: TMessage); message WM_NCPAINT;
+{$endif}
+{$endif}
+    procedure FreeThemeHandle; virtual;
+    procedure CreateThemeHandle; virtual;
+
+    property UseXPThemes: Boolean read FUseXPThemes write SetUseXPThemes default True;
+  public
+    constructor Create(AOwner : TComponent); override;
+    function IsThemeApplied: Boolean;
+    property Theme: HTheme read FTheme;
+  end;
+
+implementation
+end.

@@ -1,0 +1,282 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{9f21a79f-38cf-41a6-8537-7bb4557e71f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="test">
+      <UniqueIdentifier>{e30fb378-9707-47c3-9bc5-ad336097ff90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples">
+      <UniqueIdentifier>{89c9d149-3e28-41fd-869a-135f1b0e59fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\any_converter">
+      <UniqueIdentifier>{53f0eca4-4778-4a0e-9694-dcc027c7046a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\cln">
+      <UniqueIdentifier>{bdf34564-fcb7-4cd2-b903-c50742d03b23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\filesystem">
+      <UniqueIdentifier>{80180e30-0ddb-4ec6-ada2-f74dc20ad33e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\glut">
+      <UniqueIdentifier>{e6cc1c43-fb31-46fc-87c8-4f11650b7b3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\intrusive_ptr">
+      <UniqueIdentifier>{6dc04e6d-d5a4-4854-b0f6-362876a9d276}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="examples\regexp">
+      <UniqueIdentifier>{62254950-738c-4fca-94fd-d48352d283cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="doc">
+      <UniqueIdentifier>{c8030fe7-98a8-4801-ad86-6ee69c55a2c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{84591f60-900e-43fb-98ac-e0683cac4433}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\detail">
+      <UniqueIdentifier>{30565c46-0574-47e0-9ddb-b5d7a39564a3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="luabind\src\class.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\src\class_info.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\src\class_registry.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\src\class_rep.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\src\create_class.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\src\error.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\src\find_best_match.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\src\function.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\src\implicit_cast.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\src\link_compatibility.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\src\object.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\src\object_rep.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\src\open.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\src\pcall.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\src\ref.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\src\scope.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\src\stack_content_by_name.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\src\weak_ref.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\src\wrapper_base.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\benchmark.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\main.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_abstract_base.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_attributes.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_const.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_construction.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_exceptions.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_free_functions.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_held_type.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_implicit_cast.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_iterator.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_lua_classes.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_null_pointer.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_object.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_operators.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_policies.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_scope.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_separate_registration.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_separation.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_typetraits.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\test\test_yield.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\examples\any_converter\any_converter.cpp">
+      <Filter>examples\any_converter</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\examples\cln\cln_test.cpp">
+      <Filter>examples\cln</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\examples\filesystem\filesystem.cpp">
+      <Filter>examples\filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\examples\glut\glut_bind.cpp">
+      <Filter>examples\glut</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\examples\intrusive_ptr\intrusive_ptr.cpp">
+      <Filter>examples\intrusive_ptr</Filter>
+    </ClCompile>
+    <ClCompile Include="luabind\examples\regexp\regex_wrap.cpp">
+      <Filter>examples\regexp</Filter>
+    </ClCompile>
+    <ClCompile Include="library_linkage.cpp" />
+    <ClCompile Include="luabind_memory.cpp" />
+    <ClCompile Include="pch.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="luabind\examples\filesystem\directory_iterator.hpp">
+      <Filter>examples\filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="$(SolutionDir)include\luabind\adopt_policy.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\back_reference.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\back_reference_fwd.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\class.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\class_info.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\com_policy.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\config.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\container_policy.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\copy_policy.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\dependency_policy.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\calc_arity.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\call.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\call_function.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\call_member.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\call_operator_iterate.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\class_cache.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\class_registry.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\class_rep.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\class_rep_scope.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\constructor.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\construct_rep.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\convert_to_lua.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\debug.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\decorate_type.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\enum_maker.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\find_best_match.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\garbage_collector.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\get_overload_signature.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\get_signature.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\implicit_cast.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\is_indirect_const.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\link_compatibility.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\method_rep.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\object_funs.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\object_rep.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\open.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\operators.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\operator_id.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\other.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\overload_rep.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\overload_rep_base.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\overload_rep_impl.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\pcall.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\pointee_sizeof.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\pointee_typeid.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\policy.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\primitives.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\property.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\ref.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\signature_match.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\stack_utils.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\typetraits.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\detail\yes_no.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\discard_result_policy.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\error.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\function.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\functor.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\iterator_policy.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\library_linkage.h" />
+    <ClInclude Include="$(SolutionDir)include\luabind\luabind.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\luabind_auto_ptr.h" />
+    <ClInclude Include="$(SolutionDir)include\luabind\luabind_delete.h" />
+    <ClInclude Include="$(SolutionDir)include\luabind\luabind_memory.h" />
+    <ClInclude Include="$(SolutionDir)include\luabind\luabind_memory_allocator.h" />
+    <ClInclude Include="$(SolutionDir)include\luabind\luabind_memory_allocator_inline.h" />
+    <ClInclude Include="$(SolutionDir)include\luabind\luabind_memory_manager_generator.h" />
+    <ClInclude Include="$(SolutionDir)include\luabind\luabind_types.h" />
+    <ClInclude Include="$(SolutionDir)include\luabind\lua_include.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\object.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\open.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\operator.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\out_value_policy.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\prefix.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\raw_policy.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\return_reference_to_policy.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\scope.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\weak_ref.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\wrapper_base.hpp" />
+    <ClInclude Include="$(SolutionDir)include\luabind\yield_policy.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="luabind\doc\docs.html">
+      <Filter>doc</Filter>
+    </None>
+    <None Include="luabind\doc\index.html">
+      <Filter>doc</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="luabind\test\test.hpp">
+      <Filter>test</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

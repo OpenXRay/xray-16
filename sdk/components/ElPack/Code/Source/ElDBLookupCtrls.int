@@ -1,0 +1,168 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2002, EldoS                   }
+{                                                    }
+{====================================================}
+unit ElDBLookupCtrls;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  StdCtrls, ElACtrls, db, dbctrls;
+
+type
+  TElDBLookupListControl = class;
+  TElDBLookupListBox = class;
+  TElDBLookupComboBox = class;
+
+  TElDBLookupListControl = class(TDBLookupControl)
+  private
+    { Private declarations }
+    FElDBLookupListBox: TElDBLookupListBox;
+  protected
+    { Protected declarations }
+    procedure KeyValueChanged; override;
+    procedure UpdateListFields; override;
+    procedure SelectCurrent;
+    procedure Select(Value: Integer);
+  public
+    { Public declarations }
+    function ExecuteAction(Action: TBasicAction): Boolean; override;
+    function UpdateAction(Action: TBasicAction): Boolean; override;
+  published
+    { Published declarations }
+  end;
+
+  TElDBLookUpComboControl = class(TDBLookupControl)
+  private
+    { Private declarations }
+    FElDBLookupComboBox: TElDBLookupComboBox;
+  protected
+    { Protected declarations }
+    procedure KeyValueChanged; override;
+    procedure UpdateListFields; override;
+    procedure SelectCurrent;
+    procedure Select(Value: Integer);
+//    procedure ListLinkDataChanged;
+  public
+    { Public declarations }
+    function ExecuteAction(Action: TBasicAction): Boolean; override;
+    function UpdateAction(Action: TBasicAction): Boolean; override;
+  published
+    { Published declarations }
+  end;
+
+  TElDBLookupListBox = class(TElAdvancedListBox)
+  private
+    { Private declarations }
+    FElDBLookupControl: TElDBLookupListControl;
+    FOnChange : TNotifyEvent;
+    procedure SetDataSource(Value: TDataSource);
+    procedure SetListSource(Value: TDataSource);
+    procedure SetDataFieldName(const Value: string);
+    procedure SetListFieldName(const Value: string);
+    procedure SetKeyFieldName(const Value: string);
+    procedure SetKeyValue(const Value: Variant);
+    procedure SetListFieldIndex(Value: integer);
+    function GetField: TField;
+    function GetListFieldIndex: integer;
+    function GetDataSource: TDataSource;
+    function GetListSource: TDataSource;
+    function GetListFieldName: string;
+    function GetDataFieldName: string;
+    function GetKeyFieldName: string;
+    function GetKeyValue: Variant;
+    function GetSelectedString: string;
+//    procedure WMMouseMove(var Message: TWMMouseMove); message WM_MOUSEMOVE;
+    procedure WMLButtonDown(var Message: TWMLButtonDown); message WM_LBUTTONDOWN;
+    procedure WMChar(var Message: TWMChar); message WM_CHAR;
+  protected
+    { Protected declarations }
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState;
+      X, Y: Integer); override;
+  public
+    { Public declarations }
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    function ExecuteAction(Action: TBasicAction): Boolean; override;
+    function UpdateAction(Action: TBasicAction): Boolean; override;
+    property KeyValue: Variant read GetKeyValue write SetKeyValue;
+    property SelectedItem: string read GetSelectedString;
+    property ListFieldIndex: integer read GetListFieldIndex write SetListFieldIndex;
+    property Field: TField read GetField;
+  published
+    { Published declarations }
+    property DataSource: TDataSource read GetDataSource write SetDataSource;
+    property ListSource: TDataSource read GetListSource write SetListSource;
+    property DataField: string read GetDataFieldName write SetDataFieldName;
+    property ListField: string read GetListFieldName write SetListFieldName;
+    property KeyField: string read GetKeyFieldName write SetKeyFieldName;
+    property OnChange : TNotifyEvent read FOnChange write FOnChange;
+  end;
+
+  TElDBLookupComboBox = class(TElAdvancedComboBox)
+  private
+    { Private declarations }
+    FElDBLookupControl: TElDBLookupComboControl;
+    FSelected: array of Boolean;
+    FMaxItems: integer;
+    procedure SetDataSource(Value: TDataSource);
+    procedure SetListSource(Value: TDataSource);
+    procedure SetDataFieldName(const Value: string);
+    procedure SetListFieldName(const Value: string);
+    procedure SetKeyFieldName(const Value: string);
+    procedure SetKeyValue(const Value: Variant);
+    procedure SetListFieldIndex(Value: integer);
+    procedure SetSelected(index: integer; Value: Boolean);
+    procedure AddItem(const Value: string);
+    function GetSelected(index: integer): boolean;
+    function GetField: TField;
+    function GetListFieldIndex: integer;
+    function GetDataSource: TDataSource;
+    function GetListSource: TDataSource;
+    function GetListFieldName: string;
+    function GetDataFieldName: string;
+    function GetKeyFieldName: string;
+    function GetKeyValue: Variant;
+    function GetSelectedString: string;
+    procedure WMChar(var Message: TWMChar); message WM_CHAR;
+//    procedure WMKeyUp(var Message: TWMKeyUp); message WM_KEYUP;
+//    procedure WMKeyDown(var Message: TWMKeyDown); message WM_KEYDOWN;
+//    procedure WMMouseMove(var Message: TWMMouseMove); message WM_MOUSEMOVE;
+//    procedure WMLButtonDown(var Message: TWMLButtonDown); message WM_LBUTTONDOWN;
+  protected
+    { Protected declarations }
+    procedure EditWndProc(var Message : TMessage); override;
+    procedure ListWndProc(var Message : TMessage); override;
+    procedure DrawItem(Index: Integer; Rect: TRect; State: TOwnerDrawState); override;
+
+//    procedure MouseDown(Button: TMouseButton; Shift: TShiftState;
+//      X, Y: Integer); override;
+  public
+    { Public declarations }
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    function ExecuteAction(Action: TBasicAction): Boolean; override;
+    function UpdateAction(Action: TBasicAction): Boolean; override;
+    property KeyValue: Variant read GetKeyValue write SetKeyValue;
+    property SelectedItem: string read GetSelectedString;
+    property ListFieldIndex: integer read GetListFieldIndex write SetListFieldIndex;
+    property Field: TField read GetField;
+    property Selected[Index: Integer]: Boolean read GetSelected write SetSelected;
+  published
+    { Published declarations }
+    property DataSource: TDataSource read GetDataSource write SetDataSource;
+    property ListSource: TDataSource read GetListSource write SetListSource;
+    property DataField: string read GetDataFieldName write SetDataFieldName;
+    property ListField: string read GetListFieldName write SetListFieldName;
+    property KeyField: string read GetKeyFieldName write SetKeyFieldName;
+  end;
+
+implementation
+end.

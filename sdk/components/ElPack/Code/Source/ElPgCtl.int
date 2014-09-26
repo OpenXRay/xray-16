@@ -1,0 +1,860 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{   XP Themes (c) Akzhan Abdulin                     }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+03/21/2002
+
+  Controls on tab sheets didn't get accelerator chars. Fixed.
+
+03/19/2002
+
+  Fixed hint showing - now one can track the hint given 
+
+03/10/2002
+
+  PopupComponent is set to tabsheet or pagecontrol when PopupMenu is shown.  
+
+03/06/2002
+
+  Added unicode hint
+
+02/28/2002
+
+  VerticalSideCaptions property added.
+
+02/24/2002
+
+  Improved enabling of ScrollRight button in case when the last tab fits
+  into view, but is covered with the button
+
+02/22/2002
+
+  Added TabBkColorNetStyle property to control background color of the tabs in NetTabs style.
+  Accessible only in run-time
+
+02/03/2002
+
+  Added AngledTabs type
+
+01/14/2002
+
+  Added Shortcuts support for Top/Bottom tab orientations.
+
+01/04/2002
+
+  Slightly improved size calculation and painting of tabs with XP styles enabled
+  and images assigned to tabs
+
+12/24/2001
+
+  ShowImages is now True by default.
+  ShowImages is now taken into account when calculating the size of the tabs
+
+12/21/2001
+
+  Fixed size calculation and painting of tabs with XP styles enabled
+
+11/28/2001
+
+  Added FlatTabs style
+
+11/21/2001
+
+  Fixed the problem with tab space transparent background with XP styles enabled 
+
+10/24/2001
+
+  Now it's possible to set ShowBorder to false with XP styles enabled.
+
+10/21/2001
+
+  Improved painting of tab line when XP styles are enabled.
+
+10/16/2001
+
+  Fixed painting of tab backgrounds when XP styles are enabled.
+
+10/15/2001
+
+  Fixed painting of shadows in TabSheets when XP styles are enabled.
+  ActivePage is forcefully made visible when the page control is loaded from
+  resource
+
+10/10/2001
+
+  Tab hints are  shown now (optionally). 
+  TabEnabled behavior improved. Now disabled tab functions in design-time and
+  is completely disabled in run-time.
+
+10/09/2001 (c) Akzhan Abdulin
+
+  Windows XP Themes Support Added.
+
+10/03/2001
+
+  Fixed drawing of the line when tab style is in [tabs, net tabs], ShowBorder = false
+  and tab position is in [right, bottom]
+
+09/16/2001
+
+  Fixed repainting bug that happened when size of the control is less than some limit
+
+08/30/2001
+
+  Problems with docking fixed
+  Problem with ActivePage initial setting fixed 
+  Now the tab is activated on MouseDown in [Tabs, NetTabs] styles
+
+*)
+
+unit ElPgCtl;
+
+interface
+
+uses
+  Windows,
+  Messages,
+  SysUtils,
+  Classes,
+  Consts,
+  Graphics,
+  Controls,
+  Forms,
+  ExtCtrls,
+  Menus,
+  ComObj,
+  {$ifdef VCL_4_USED}
+  ImgList,
+  {$endif}
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+
+  ElHintWnd,
+  ElTimers,
+  ElSndMap,
+  ElImgFrm,
+  ElList,
+  ElVCLUtils,
+  ElUxTheme,
+  ElTmSchema,
+  ElXPThemedControl,
+  ElStrUtils;
+
+const PM_REFRESHACTIVEPAGE = WM_USER + 7434;
+
+type
+
+  TElTabStyle = (etsTabs, etsButtons, etsFlatButtons, etsNetTabs, etsFlatTabs, etsAngledTabs);
+  TElTabPosition = (etpTop, etpBottom, etpRight, etpLeft);
+
+  TElPageControl = class;
+  TElTabSheet = class;
+  TElTabs = class;
+  TElTab = class;
+
+  TElMeasureTabEvent = procedure(Sender: TObject; Page : TElTabSheet;
+    var Size : TSize) of object;
+
+  TElTabGetImageEvent = procedure(Sender: TObject; PageIndex: integer;
+    var ImageIndex: integer) of object;
+  TElTabChangingEvent = procedure(Sender: TObject; NewPage : TElTabSheet;
+    var AllowChange: Boolean) of object;
+
+  TElTabSheet = class(TCustomControl)
+  private
+    FTabShowing: Boolean;
+    ARect      : TRect;
+    AComplete  : boolean;
+    ALine      : integer;
+    AShown     : boolean;
+    
+    procedure CMShowingChanged(var Message: TMessage); message CM_SHOWINGCHANGED;
+    procedure WMPaint(var Msg : TWMPaint); message WM_PAINT;
+    procedure SetTabShowing(Value: Boolean);
+    procedure UpdateTabShowing;
+    function GetPageIndex: Integer;
+    procedure SetPageIndex(Value: Integer);
+    procedure CMEnabledChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
+    function GetBtnTheme: HTheme;
+    function GetScrollTheme: HTheme;
+    function GetTabTheme: HTheme;
+    function GetUseXPThemes: Boolean;
+    procedure CMDialogChar(var Message: TCMDialogChar); message CM_DIALOGCHAR;
+  protected
+    FOnShow: TNotifyEvent;
+    FOnHide: TNotifyEvent;
+    FTabColor: TColor;             
+    FPageControl: TElPageControl;
+    FImageIndex: integer;
+    FTabVisible: Boolean;
+    FCaption: TElFString;
+    FTabEnabled: Boolean;
+    FTabMenu: TPopupMenu;
+    {$ifdef ELPACK_UNICODE}
+    FHint: WideString;
+    {$endif}
+
+    procedure TriggerShowEvent; virtual;
+    procedure TriggerHideEvent; virtual;
+    procedure SetTabColor(Value: TColor);
+    procedure SetPageControl(Value: TElPageControl);
+    procedure SetImageIndex(Value: integer);
+    procedure SetTabVisible(Value: Boolean);
+    procedure SetCaption(Value: TElFString);
+    procedure Paint; override;
+    function GetTabIndex: Integer;
+
+    procedure WMEraseBkGnd(var Msg : TWMEraseBkGnd); message WM_ERASEBKGND;
+    procedure WMNCCalcSize(var Message: TWMNCCalcSize); message WM_NCCALCSIZE;
+    procedure WMNCPaint(var Message: TMessage); message WM_NCPAINT;
+    procedure WMThemeChanged(var Message: TMessage); message WM_THEMECHANGED;
+    procedure SetTabEnabled(Value: Boolean);
+    procedure SetTabMenu(Value: TPopupMenu);
+    procedure CreateWnd; override;
+    procedure ReadState(Reader: TReader); override;
+
+    {$ifdef ELPACK_UNICODE}
+    procedure SetHint(Value: WideString);
+
+    {$ifndef CLX_USED}
+    procedure CMHintShow(var Message: TMessage); message CM_HINTSHOW;
+    {$else}
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    {$endif}
+    {$endif}
+
+    property TabShowing: Boolean read FTabShowing;
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    function IsThemeApplied: Boolean;
+
+    property TabIndex: Integer read GetTabIndex;
+    property TabTheme: HTheme read GetTabTheme;
+    property BtnTheme: HTheme read GetBtnTheme;
+    property ScrollTheme: HTheme read GetScrollTheme;
+    property UseXPThemes: Boolean read GetUseXPThemes;
+  published
+    property TabColor: TColor read FTabColor write SetTabColor default clBtnFace;
+
+    property OnShow: TNotifyEvent read FOnShow write FOnShow;
+    property OnHide: TNotifyEvent read FOnHide write FOnHide;
+
+    property PageControl: TElPageControl read FPageControl write SetPageControl;
+    property ImageIndex: integer read FImageIndex write SetImageIndex;
+    property TabVisible: Boolean read FTabVisible write SetTabVisible;
+    property Caption: TElFString read FCaption write SetCaption;
+    property PageIndex: Integer read GetPageIndex write SetPageIndex stored False;
+    property TabEnabled: Boolean read FTabEnabled write SetTabEnabled default true;
+    property TabMenu: TPopupMenu read FTabMenu write SetTabMenu;
+
+    {$ifdef ELPACK_UNICODE}
+    property Hint: WideString read FHint write SetHint;
+    {$endif}
+
+    // inherited properties
+    property Color default clBtnFace;
+    property ParentColor default false;
+    property Visible;
+    {$ifdef VCL_4_USED}
+    property BorderWidth;
+    property Constraints;
+    {$endif}
+    property DragMode;
+    property Enabled;
+    property Font;
+    property ParentFont;
+    property Height stored False;
+    property Left stored False;
+    {$ifdef VCL_5_USED}
+    property OnContextPopup;
+    {$endif}
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    {$ifdef VCL_4_USED}
+    property OnResize;
+    {$endif}
+    property OnStartDrag;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property Top stored False;
+    property Width stored False;
+  end;
+
+  TElPageScrollBtnState = (pbsNone, pbsLeftBtnOver, pbsLeftBtnDown, pbsLeftBtnHeld, pbsRightBtnOver, pbsRightBtnDown, pbsRightBtnHeld);
+
+  TElPageControl = class(TElXPThemedControl)
+  private
+    ALines: Integer;
+    FTabs: TElTabs;
+    ScrollLeftRect,
+    ScrollRightRect: TRect;
+    TabsPos: TPoint;
+    TabsSize: TSize;
+    MemDC   : HDC;
+    FScrollBtnState: TElPageScrollBtnState;
+    FSaveCapture: HWND;
+    FScrollTimer: TTimer;
+    FTabIndex : integer;
+    FBtnTheme: HTheme;
+    FScrollTheme: HTheme;
+    FHintCoords: TPoint;
+    FHintTimer: TElTimer;
+    FHintWnd  : THintWindow;
+    FNoDTAlert: Boolean;
+  protected
+    FActivateSound: TElSoundName;
+    FActivePage: TElTabSheet;
+    FActiveTabColor: TColor;
+    FBackground: TBitmap;                 
+    FBackgroundType: TElBkGndType;
+    FBorderWidth: Integer;
+    FDownTab: TElTabSheet;
+    FDrawFocus: Boolean;
+    FDummyCaption: string;
+    FFirstTab: TElTabSheet;
+    FFlat: Boolean;
+    FGradientEndColor: TColor;
+    FGradientStartColor: TColor;
+    FGradientSteps: Integer;
+    FHotTrack: Boolean;
+    FImageChangeLink: TChangeLink;
+    FImages: TImageList;
+    FImgForm: TElImageForm;
+    FImgFormChLink: TImgFormChangeLink;
+    FInactiveTabColor: TColor;
+    FMinTabHeight: Integer;
+    FMinTabWidth: Integer;
+    FMultiLine: Boolean;
+    FNewDockSheet: TElTabSheet;
+    FOnChange: TNotifyEvent;
+    FOnGetImageIndex: TElTabGetImageEvent;
+    FOnMeasureTab: TElMeasureTabEvent;
+    FOnChanging: TElTabChangingEvent;
+    FPages: TElList;
+    FRaggedRight: Boolean;
+    FScrollOpposite: Boolean;
+    FShowBorder: Boolean;
+    FShowImages: Boolean;
+    FShowTabs: Boolean;
+    FSoundMap: TElSoundMap;
+    FStyle: TElTabStyle;
+    FTabHeight: DWORD;
+    FTabPosition: TElTabPosition;
+    FTabWidth: DWORD;
+    FTmpBmp: TBitmap;
+    FTrackTab: TElTabSheet;
+    FUndockingPage: TElTabSheet;
+    FTabBkColor: TColor;
+{$IFNDEF VCL_4_USED}
+    FOnResize : TNotifyEvent;
+{$ENDIF}
+    FHotTrackFont: TFont;
+    FShowTabHints: Boolean;
+    FSavvyMode: Boolean;
+    FFlatTabBorderColor: TColor;
+    FTabBkColorNetStyle: TColor;
+    FVerticalSideCaptions: Boolean;
+    {$ifdef ELPACK_UNICODE}
+    FHint: WideString;
+    {$endif}
+
+{$IFDEF VCL_4_USED}
+    procedure Resize; override;
+{$ELSE}
+    procedure Resize; dynamic;
+{$ENDIF}
+    function GetThemedClassName: WideString; override;
+    procedure FreeThemeHandle; override;
+    procedure CreateThemeHandle; override;
+    function CanChange(NewPage : TElTabSheet): Boolean; virtual;
+    function CanScrollLeft: Boolean;
+    procedure Change; virtual;
+    procedure ChangeActivePage(Page: TElTabSheet);
+
+    procedure WMWindowPosChanged(var Message: TWMWindowPosChanged); message 
+        WM_WINDOWPOSCHANGED;
+    procedure WMEraseBkGnd(var Msg : TWMEraseBkGnd); message WM_ERASEBKGND;
+    procedure WMNCCalcSize(var Message: TWMNCCalcSize); message WM_NCCALCSIZE;
+    procedure WMNCPaint(var Message: TWMNCPaint); message WM_NCPAINT;
+    procedure WMSize(var Msg : TWMSize); message WM_SIZE;
+
+    procedure WMPaint(var Msg : TWMPaint); message WM_PAINT;
+    {$ifdef VCL_4_USED}
+    procedure WMLButtonDblClk(var Message: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
+    {$endif}
+    procedure WMKeyDown(var Message: TWMKeyDown); message WM_KEYDOWN;
+    procedure WMLButtonDown(var Message: TWMLButtonDown); message WM_LBUTTONDOWN;
+    procedure WMLButtonUp(var Message: TWMLButtonUp); message WM_LBUTTONUP;
+    procedure WMNCLButtonDown(var Message: TWMNCLBUTTONDOWN); message
+        WM_NCLBUTTONDOWN;
+    procedure WMNCLButtonUp(var Message: TWMNCLBUTTONUP); message WM_NCLBUTTONUP;
+    procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
+    procedure CMMouseLeave(var Message: TMessage); message CM_MOUSELEAVE;
+    procedure WMGetDlgCode(var Message: TWMGetDlgCode); message WM_GETDLGCODE;
+    procedure CMShowingChanged(var Message: TMessage); message CM_SHOWINGCHANGED;
+    procedure CMControlListChange(var Message: TMessage); message
+        CM_CONTROLLISTCHANGE;
+    procedure CMDesignHitTest(var Message: TCMDesignHitTest); message
+        CM_DESIGNHITTEST;
+    procedure CMDialogKey(var Message: TCMDialogKey); message CM_DIALOGKEY;
+    {$ifdef VCL_4_USED}
+    procedure CMDockClient(var Message: TCMDockClient); message CM_DOCKCLIENT;
+    procedure CMDockNotification(var Message: TCMDockNotification); message
+        CM_DOCKNOTIFICATION;
+    {$endif}
+    procedure CMFocusChanged(var Message: TMessage); message CM_FOCUSCHANGED;
+    procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
+    procedure CMSysColorChange(var Message: TMessage); message CM_SYSCOLORCHANGE;
+    procedure CMColorChanged(var Message: TMessage); message CM_COLORCHANGED;
+    {$ifdef VCL_4_USED}
+    procedure CMUnDockClient(var Message: TCMUnDockClient); message CM_UNDOCKCLIENT;
+    {$endif}
+    procedure CreateHandle; override;
+    procedure CreateParams(var Params: TCreateParams); override;
+    {$ifdef VCL_4_USED}
+    procedure DockOver(Source: TDragDockObject; X, Y: Integer; State: TDragState;
+        var Accept: Boolean); override;
+    procedure DoAddDockClient(Client: TControl; const ARect: TRect); override;
+    procedure DoRemoveDockClient(Client: TControl); override;
+    {$endif}
+    function GetActivePageIndex: Integer;
+    procedure GetChildren(Proc: TGetChildProc; Root: TComponent); override;
+    {$ifdef VCL_4_USED}
+    function GetDockClientFromMousePos(MousePos: TPoint): TControl;
+    {$endif}
+    function GetPageCount: Integer;
+    {$ifdef VCL_4_USED}
+    function GetPageFromDockClient(Client: TControl): TElTabSheet;
+    {$endif}
+    function GetPages(index : integer): TelTabSheet;
+    {$ifdef VCL_4_USED}
+    procedure GetSiteInfo(Client: TControl; var InfluenceRect: TRect; MousePos:
+        TPoint; var CanDock: Boolean); override;
+    {$endif}
+    function GetTabIndex: Integer;
+    procedure ImageChange(Sender : TObject);
+    procedure ImageFormChange(Sender : TObject);
+    procedure ImageListChange(Sender: TObject);
+    procedure InsertPage(TabSheet : TElTabSheet); virtual;
+    procedure MakeTabVisible(ATabSheet : TElTabSheet);
+    procedure RebuildTabs(ResetFirstItem : boolean);
+    procedure RedoTmpBmp;
+    procedure RemovePage(TabSheet : TElTabSheet); virtual;
+    procedure SetActivePage(Value: TElTabSheet);
+    procedure SetActivePageIndex(const Value: Integer);
+    procedure SetActiveTabColor(Value: TColor);
+    procedure SetBackground(newValue: TBitmap);
+    procedure SetBackgroundType(newValue: TElBkGndType);
+    procedure SetBorderWidth(Value: Integer);
+    procedure SetChildOrder(Child: TComponent; Order: Integer); override;
+    procedure SetDrawFocus(Value: Boolean);
+    procedure SetFirstTab(Value: TElTabSheet);
+    procedure SetFlat(newValue : Boolean);
+    procedure SetGradientEndColor(newValue : TColor);
+    procedure SetGradientStartColor(newValue : TColor);
+    procedure SetGradientSteps(newValue : integer);
+    procedure SetHotTrack(newValue : Boolean);
+    procedure SetImageForm(newValue: TElImageForm);
+    procedure SetImages(newValue : TImageList);
+    procedure SetInactiveTabColor(Value: TColor);
+    procedure SetMinTabHeight(Value: Integer);
+    procedure SetMinTabWidth(Value: Integer);
+    procedure SetMultiLine(newValue : Boolean);
+    procedure SetRaggedRight(const Value: Boolean);
+    procedure SetScrollOpposite(const Value: Boolean);
+    procedure SetShowBorder(Value: Boolean);
+    procedure SetShowImages(newValue : Boolean);
+    procedure SetShowTabs(Value: Boolean);
+    procedure SetStyle(newValue: TElTabStyle);
+    procedure SetTabHeight(newValue : DWORD);
+    procedure SetTabIndex(const Value: integer);
+    procedure SetTabPosition(newValue : TElTabPosition);
+    procedure SetTabWidth(newValue : DWORD);
+    procedure ShowControl(AControl: TControl); override;
+    procedure UpdateActivePage; virtual;
+    procedure UpdateTab(TabSheet : TElTabSheet);
+    function CanScrollRight: Boolean;
+    procedure SetHotTrackFont(Value: TFont);
+    procedure HotTrackFontChange(Sender : TObject);
+    procedure Paint; override;
+    procedure SetScrollBtnState(Value: TElPageScrollBtnState);
+    procedure SetTrackTab(Value: TElTabSheet);
+    procedure OnScrollTimer(Sender : TObject);
+    procedure SetTabBkColor(Value: TColor);
+    function HasVisibleTabs: Boolean;
+    function DoHitTest(X, Y : integer; var Res : integer) : boolean;
+    procedure UpdateMultilineOrder;
+    procedure TriggerGetImageEvent(PageIndex: integer; var ImageIndex: integer); 
+        virtual;
+    procedure TriggerMeasureTabEvent(Page : TElTabSheet; var Size : TSize); virtual;
+    procedure IFMRepaintChildren(var Message: TMessage); message 
+        IFM_REPAINTCHILDREN;
+    procedure IFMEffectiveSize(var Message: TMessage); message IFM_EFFECTIVESIZE;
+    procedure IFMCanPaintBkgnd(var Message: TMessage); message IFM_CANPAINTBKGND;
+    procedure PMRefreshActivePage(var Message: TMessage); message 
+        PM_REFRESHACTIVEPAGE;
+    procedure WMNCRButtonUp(var Message: TWMNCRBUTTONUP); message WM_NCRBUTTONUP;
+    procedure WMNCCreate(var Message: TMessage); message WM_NCCREATE;
+    procedure WMNCDestroy(var Message: TMessage); message WM_NCDESTROY;
+    procedure WMNCMouseMove(var Message: TMessage); message WM_NCMOUSEMOVE;
+    procedure OnHintTimer(Sender : TObject); virtual;
+    procedure WMMouseMove(var Message: TMessage); message WM_MOUSEMOVE;
+    procedure WMThemeChanged(var Message: TMessage); message WM_THEMECHANGED;
+    procedure SetSavvyMode(Value: Boolean);
+    procedure SetFlatTabBorderColor(Value: TColor);
+    procedure SetTabBkColorNetStyle(Value: TColor);
+    procedure SetVerticalSideCaptions(Value: Boolean);
+
+    {$ifdef ELPACK_UNICODE}
+    procedure SetHint(Value: WideString);
+
+    {$ifndef CLX_USED}
+    procedure CMHintShow(var Message: TMessage); message CM_HINTSHOW;
+    {$else}
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    {$endif}
+    {$endif}
+
+    property ScrollBtnState: TElPageScrollBtnState read FScrollBtnState write
+        SetScrollBtnState;
+    property Background: TBitmap read FBackground write SetBackground;
+    property BackgroundType: TElBkGndType read FBackgroundType write
+        SetBackgroundType;
+    property GradientEndColor: TColor read FGradientEndColor write
+        SetGradientEndColor;
+    property GradientStartColor: TColor read FGradientStartColor write
+        SetGradientStartColor;
+    property GradientSteps: Integer read FGradientSteps write SetGradientSteps;
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    function FindNextPage(CurPage: TElTabSheet; GoForward, CheckTabVisible, 
+        CheckTabEnabled : Boolean): TElTabSheet;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure SelectNextPage(GoForward: Boolean);
+    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer); override;
+    function TabFromPoint(Point : TPoint): TElTabSheet;
+    procedure UpdateTabs(Immediate : boolean);
+    function NewPage: TElTabSheet;
+    procedure Loaded; override;
+    property ActivePageIndex: Integer read GetActivePageIndex write
+        SetActivePageIndex;
+    property FirstTab: TElTabSheet read FFirstTab write SetFirstTab;
+    property PageCount: Integer read GetPageCount;
+    property Pages[index : integer]: TElTabSheet read GetPages;
+    property TrackTab: TElTabSheet read FTrackTab write SetTrackTab;
+    property BtnTheme: HTheme read FBtnTheme;
+    property ScrollTheme: HTheme read FScrollTheme;
+    property TabBkColorNetStyle: TColor read FTabBkColorNetStyle write
+        SetTabBkColorNetStyle nodefault;
+  published
+    property ActivateSound: TElSoundName read FActivateSound write FActivateSound;
+    property ActiveTabColor: TColor read FActiveTabColor write SetActiveTabColor
+        default clBtnFace;
+    property BorderWidth: Integer read FBorderWidth write SetBorderWidth;
+    property Caption: string read FDummyCaption;
+    property Color default clBtnFace;
+    property DrawFocus: Boolean read FDrawFocus write SetDrawFocus;
+    property Flat: Boolean read FFlat write SetFlat;
+    property HotTrack: Boolean read FHotTrack write SetHotTrack;
+    property ImageForm: TElImageForm read FImgForm write SetImageForm;
+    property Images: TImageList read FImages write SetImages;
+    property InactiveTabColor: TColor read FInactiveTabColor write 
+        SetInactiveTabColor default clBtnFace;
+    property MinTabHeight: Integer read FMinTabHeight write SetMinTabHeight default 
+        40;
+    property MinTabWidth: Integer read FMinTabWidth write SetMinTabWidth default 40;
+    property Multiline: Boolean read FMultiLine write SetMultiLine;
+    property OnChanging: TElTabChangingEvent read FOnChanging write FOnChanging;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property OnGetImageIndex: TElTabGetImageEvent read FOnGetImageIndex write
+        FOnGetImageIndex;
+    property OnMeasureTab: TElMeasureTabEvent read FOnMeasureTab write 
+        FOnMeasureTab;
+    property RaggedRight: Boolean read FRaggedRight write SetRaggedRight;
+    property ScrollOpposite: Boolean read FScrollOpposite write SetScrollOpposite;
+    property ShowBorder: Boolean read FShowBorder write SetShowBorder default true;
+    property ShowImages: Boolean read FShowImages write SetShowImages default true;
+    property ShowTabs: Boolean read FShowTabs write SetShowTabs default true;
+    property SoundMap: TElSoundMap read FSoundMap write FSoundMap;
+    property Style: TElTabStyle read FStyle write SetStyle;
+    property TabHeight: DWORD read FTabHeight write SetTabHeight default 0;
+    property TabIndex: Integer read GetTabIndex write SetTabIndex default -1;
+    property TabPosition: TElTabPosition read FTabPosition write SetTabPosition;
+    property TabWidth: DWORD read FTabWidth write SetTabWidth default 0;
+    property HotTrackFont: TFont read FHotTrackFont write SetHotTrackFont;
+    property TabBkColor: TColor read FTabBkColor write SetTabBkColor default
+        clBtnFace;
+    property ActivePage: TElTabSheet read FActivePage write SetActivePage;
+    property ShowTabHints: Boolean read FShowTabHints write FShowTabHints default
+        true;
+    property SavvyMode: Boolean read FSavvyMode write SetSavvyMode default false;
+    property FlatTabBorderColor: TColor read FFlatTabBorderColor write SetFlatTabBorderColor;
+    property VerticalSideCaptions: Boolean read FVerticalSideCaptions write 
+        SetVerticalSideCaptions default true;
+
+    {$ifdef ELPACK_UNICODE}
+    property Hint: WideString read FHint write SetHint;
+    {$endif}
+
+    property Align;
+    property DragCursor;
+    property DragMode;
+    property Enabled;
+    property Font;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property TabOrder;
+    property TabStop;
+    property ShowHint;
+    property Visible;
+    property UseXPThemes;
+
+    property OnDblClick;
+    property OnStartDrag;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnEnter;
+    property OnExit;
+{$IFNDEF VCL_4_USED}
+    property OnResize : TNotifyEvent read FOnResize write FOnResize;
+{$ELSE}
+    property OnStartDock;
+    property OnUnDock;
+    property OnDockDrop;
+    property OnDockOver;
+    property OnEndDock;
+    property OnResize;
+{$ENDIF}
+{$IFDEF VCL_5_USED}
+    property OnContextPopup;
+{$ENDIF}
+
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Constraints;
+    property DockSite;
+    property Floating;
+    property DragKind;
+{$ENDIF}
+  end;
+
+  TElTabClass = class of TElTab;
+
+  TElTabs = class
+  private
+    FPageControl : TElPageControl;
+    FTab: TElTab;
+    function MeasureSheet(ACanvas : TCanvas; Sheet : TElTabSheet): TSize;
+    procedure DoDrawTabs(ACanvas : TCanvas; Rect : TRect; DoDraw : boolean; var 
+        Size : TSize);
+    function GetBtnTheme: HTheme;
+    function GetScrollTheme: HTheme;
+    function GetTabTheme: HTheme;
+  protected
+    FTabClass: TElTabClass;
+    function CalcTabAreaSize: TSize; virtual;
+    procedure DrawTabs(ACanvas : TCanvas; R : TRect; DoDraw : boolean; var Size : TSize);
+    procedure SetTabClass(Value: TElTabClass);
+    function GetRotatedFont(Canvas : TCanvas; RotationAngle : integer): HFont;
+    procedure ReorderPages(MaxRows : integer);
+    function IsThemeApplied: Boolean;
+    property TabTheme: HTheme read GetTabTheme;
+    property BtnTheme: HTheme read GetBtnTheme;
+    property ScrollTheme: HTheme read GetScrollTheme;
+  public
+    constructor Create(PageControl : TElPageControl);
+    destructor Destroy; override;
+    property TabClass: TElTabClass read FTabClass write SetTabClass;
+  end;
+
+  TElTab = class(TObject)
+  private
+    FOwner : TElTabs;
+    procedure Draw(ACanvas : TCanvas; R : TRect; TabSheet : TElTabSheet);
+    function GetBtnTheme: HTheme;
+    function GetScrollTheme: HTheme;
+    function GetTabTheme: HTheme;
+    function GetTabPosition: TElTabPosition;
+  protected
+    function GetOuterMargin: Integer; virtual;
+    function GetInnerMargin: Integer; virtual;
+    procedure DrawTabContents(Canvas : TCanvas; R : TRect; TabSheet : TElTabSheet); 
+        virtual;
+    procedure DrawSpace(Canvas : TCanvas; var cx, cy : integer; mx, my : integer);
+        virtual;
+    function CanDrawTab(ActiveDraw : boolean): Boolean; virtual;
+    function GetAscend: Integer; virtual;
+    procedure AdjustDrawingSize(Active : boolean; var R : TRect); virtual;
+    procedure AdjustTabSize(var Size : TSize); virtual;
+    procedure AdjustFillSize(After : boolean; var R : TRect; TabSheet :
+        TElTabSheet); virtual;
+    procedure DrawTabLine(Canvas : TCanvas; R : TRect); virtual;
+    procedure FillSpace(Canvas : TCanvas; Rect : TRect); virtual;
+    procedure FillTab(Canvas : TCanvas; Rect : TRect; TabSheet : TElTabSheet); 
+        virtual;
+    procedure DrawButtons(Canvas : TCanvas; LeftRect, RightRect : TRect; CSL, CSR : 
+        boolean); virtual;
+    function GetRowMargin: Integer; virtual;
+
+    function IsThemeApplied: Boolean;
+    procedure DrawTabEdges(Canvas : TCanvas; var R : TRect; TabSheet : TElTabSheet);
+        virtual; abstract;
+    function GetContentMargin: Integer; virtual;
+    procedure FixupTab(Canvas : TCanvas; R : TRect; TabSheet : TElTabSheet); 
+        virtual;
+    property TabTheme: HTheme read GetTabTheme;
+    property BtnTheme: HTheme read GetBtnTheme;
+    property ScrollTheme: HTheme read GetScrollTheme;
+    property TabPosition: TElTabPosition read GetTabPosition;
+  public
+    constructor Create(Owner : TElTabs);
+  end;
+
+  TElStdTab = class(TElTab)
+  private
+  protected
+    function GetOuterMargin: Integer; override;
+    function CanDrawTab(ActiveDraw : boolean): Boolean; override;
+    function GetAscend: Integer; override;
+    procedure AdjustDrawingSize(Active : boolean; var R : TRect); override;
+    procedure AdjustTabSize(var Size : TSize); override;
+    procedure DrawTabLine(Canvas : TCanvas; R : TRect); override;
+    procedure AdjustFillSize(After : boolean; var R : TRect; TabSheet : 
+        TElTabSheet); override;
+    procedure FillTab(Canvas : TCanvas; Rect : TRect; TabSheet : TElTabSheet); 
+        override;
+    procedure DrawTabEdges(Canvas : TCanvas; var R : TRect; TabSheet : TElTabSheet);
+        override;
+  public
+  end;
+
+  TElBtnTab = class(TElTab)
+  private
+  protected
+    function GetInnerMargin: Integer; override;
+    procedure DrawSpace(Canvas : TCanvas; var cx, cy : integer; mx, my : integer); 
+        override;
+    procedure AdjustTabSize(var Size : TSize); override;
+    function GetRowMargin: Integer; override;
+    procedure FillTab(Canvas : TCanvas; Rect : TRect; TabSheet : TElTabSheet); override;
+    procedure DrawTabEdges(Canvas : TCanvas; var R : TRect; TabSheet : TElTabSheet);
+        override;
+  end;
+
+  TElFlatBtnTab = class(TElTab)
+  private
+  protected
+    function GetInnerMargin: Integer; override;
+    procedure DrawSpace(Canvas : TCanvas; var cx, cy : integer; mx, my : integer);
+        override;
+    procedure AdjustTabSize(var Size : TSize); override;
+    procedure AdjustFillSize(After : boolean; var R : TRect; TabSheet :
+        TElTabSheet); override;
+    function GetRowMargin: Integer; override;
+    procedure FillTab(Canvas : TCanvas; Rect : TRect; TabSheet : TElTabSheet); override;
+    procedure DrawTabEdges(Canvas : TCanvas; var R : TRect; TabSheet : TElTabSheet);
+        override;
+  end;
+
+  TElNetTab = class(TElTab)
+  private
+  protected
+    procedure AdjustTabSize(var Size : TSize); override;
+    function GetInnerMargin: Integer; override;
+    procedure DrawSpace(Canvas : TCanvas; var cx, cy : integer; mx, my : integer); 
+        override;
+    function CanDrawTab(ActiveDraw : boolean): Boolean; override;
+    procedure AdjustDrawingSize(Active : boolean; var R : TRect); override;
+    function GetOuterMargin: Integer; override;
+    procedure DrawTabLine(Canvas : TCanvas; R : TRect); override;
+    function GetAscend: Integer; override;
+    procedure FillSpace(Canvas : TCanvas; Rect : TRect); override;
+    procedure AdjustFillSize(After : boolean; var R : TRect; TabSheet : 
+        TElTabSheet); override;
+    procedure FillTab(Canvas : TCanvas; Rect : TRect; TabSheet : TElTabSheet); 
+        override;
+    procedure DrawButtons(Canvas : TCanvas; LeftRect, RightRect : TRect; CSL, CSR : 
+        boolean); override;
+    procedure DrawTabEdges(Canvas : TCanvas; var R : TRect; TabSheet : TElTabSheet);
+        override;
+  end;
+
+  TEl2DFlatTab = class(TElTab)
+  private
+  protected
+    procedure AdjustDrawingSize(Active : boolean; var R : TRect); override;
+    procedure AdjustFillSize(After : boolean; var R : TRect; TabSheet : 
+        TElTabSheet); override;
+    procedure AdjustTabSize(var Size : TSize); override;
+    function CanDrawTab(ActiveDraw : boolean): Boolean; override;
+    procedure DrawTabLine(Canvas : TCanvas; R : TRect); override;
+    function GetAscend: Integer; override;
+    function GetInnerMargin: Integer; override;
+    function GetOuterMargin: Integer; override;
+    procedure FillTab(Canvas : TCanvas; Rect : TRect; TabSheet : TElTabSheet); 
+        override;
+    procedure DrawTabEdges(Canvas : TCanvas; var R : TRect; TabSheet : TElTabSheet);
+        override;
+  end;
+
+  TElAngledTab = class(TElTab)
+  private
+    SaveDCState: Integer;
+  protected
+    function CanDrawTab(ActiveDraw : boolean): Boolean; override;
+    procedure DrawTabEdges(Canvas : TCanvas; var R : TRect; TabSheet : TElTabSheet);
+        override;
+    procedure DrawTabLine(Canvas : TCanvas; R : TRect); override;
+    procedure AdjustFillSize(After : boolean; var R : TRect; TabSheet : 
+        TElTabSheet); override;
+    procedure AdjustDrawingSize(Active : boolean; var R : TRect); override;
+    procedure AdjustTabSize(var Size : TSize); override;
+    procedure FillTab(Canvas : TCanvas; Rect : TRect; TabSheet : TElTabSheet); 
+        override;
+    function GetAscend: Integer; override;
+    function GetInnerMargin: Integer; override;
+    function GetOuterMargin: Integer; override;
+    function GetContentMargin: Integer; override;
+    procedure CreateTabPoints(R : TRect; Points : PPoint);
+    procedure FixupTab(Canvas : TCanvas; R : TRect; TabSheet : TElTabSheet); 
+        override;
+  end;
+
+implementation
+end.

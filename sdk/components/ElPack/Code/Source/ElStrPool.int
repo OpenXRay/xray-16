@@ -1,0 +1,51 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElStrPool;
+
+interface
+
+uses Classes,
+     {$ifdef ELPACK_UNICODE}
+     ElUnicodeStrings;
+     {$else}
+     ElStrArray;
+     {$endif}
+
+type
+
+{$ifdef ELPACK_UNICODE}
+     TElFStringArray = TElWideStringArray;
+{$else}
+     TElFStringArray = TElStringArray;
+{$endif}
+
+     TElStringPool = class(TComponent)
+     private
+       FItems : TElFStringArray;
+       procedure SetItems(newValue : TElFStringArray);
+     public
+       constructor Create(AOwner : TComponent); override;
+       destructor Destroy; override;
+       procedure Assign(Source : TPersistent); override;
+     published
+       property Items : TElFStringArray read FItems write SetItems;
+     end;
+
+implementation
+end.

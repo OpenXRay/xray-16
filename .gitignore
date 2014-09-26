@@ -1,3 +1,10 @@
 # exclude all dot files except .gitignore
 .*
 !.gitignore
+
+# exclude binaries and temporary files
+bin/
+bin_plugs/
+intermediate/
+intermediate_plugs/
+lib/

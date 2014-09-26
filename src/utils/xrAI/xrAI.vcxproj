@@ -1,0 +1,501 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mixed|Win32">
+      <Configuration>Mixed</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{EA5932F3-02FE-4AD3-89E8-7072DC465D25}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(xrBinDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(xrBinDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
+    <OutDir>$(xrBinDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>$(OutDir)$(TargetName).tlb</TypeLibraryName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.;$(DXSDK_DIR)Include;$(SolutionDir)xrServerEntities;$(xrSdkDir)include;$(XRAY_16X_LIBS)MagicSoftware\Sdk\Include;$(XRAY_16X_LIBS)FreeImage\Dist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;DEBUG;AI_COMPILER;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <ForceConformanceInForLoopScope>false</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <BrowseInformation />
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ShowIncludes>false</ShowIncludes>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrLibDir);$(xrSdkDir)libraries;$(XRAY_16X_LIBS)FreeImage\Dist;$(XRAY_16X_LIBS)MagicSoftware\Sdk\Library\DebugDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <MapExports>false</MapExports>
+      <SubSystem>Windows</SubSystem>
+      <StackReserveSize>0</StackReserveSize>
+      <StackCommitSize>0</StackCommitSize>
+      <LargeAddressAware>true</LargeAddressAware>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>NotSet</TargetMachine>
+      <AdditionalDependencies>FreeImaged.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>$(OutDir)$(TargetName).tlb</TypeLibraryName>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>.;$(DXSDK_DIR)Include;$(SolutionDir)xrServerEntities;$(xrSdkDir)include;$(XRAY_16X_LIBS)MagicSoftware\Sdk\Include;$(XRAY_16X_LIBS)FreeImage\Dist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;AI_COMPILER;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling />
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <ForceConformanceInForLoopScope>false</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <BrowseInformation />
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrLibDir);$(xrSdkDir)libraries;$(XRAY_16X_LIBS)FreeImage\Dist;$(XRAY_16X_LIBS)MagicSoftware\Sdk\Library\ReleaseDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <StackReserveSize>0</StackReserveSize>
+      <StackCommitSize>0</StackCommitSize>
+      <LargeAddressAware>true</LargeAddressAware>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>NotSet</TargetMachine>
+      <AdditionalDependencies>FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>$(OutDir)$(TargetName).tlb</TypeLibraryName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>.;$(DXSDK_DIR)Include;$(SolutionDir)xrServerEntities;$(xrSdkDir)include;$(XRAY_16X_LIBS)MagicSoftware\Sdk\Include;$(XRAY_16X_LIBS)FreeImage\Dist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;DEBUG;_WINDOWS;AI_COMPILER;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <ForceConformanceInForLoopScope>false</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <BrowseInformation />
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrLibDir);$(xrSdkDir)libraries;$(XRAY_16X_LIBS)FreeImage\Dist;$(XRAY_16X_LIBS)MagicSoftware\Sdk\Library\ReleaseDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <StackReserveSize>0</StackReserveSize>
+      <StackCommitSize>0</StackCommitSize>
+      <LargeAddressAware>true</LargeAddressAware>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>NotSet</TargetMachine>
+      <AdditionalDependencies>FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\xrEngine\xrLoadSurface.cpp" />
+    <ClCompile Include="..\..\xrServerEntities\alife_human_brain.cpp" />
+    <ClCompile Include="..\..\xrServerEntities\alife_monster_brain.cpp" />
+    <ClCompile Include="..\..\xrServerEntities\alife_space.cpp" />
+    <ClCompile Include="..\..\xrServerEntities\PHNetState.cpp" />
+    <ClCompile Include="..\..\xrServerEntities\PHSynchronize.cpp" />
+    <ClCompile Include="..\..\xrServerEntities\smart_cast.cpp" />
+    <ClCompile Include="..\..\xrServerEntities\smart_cast_stats.cpp" />
+    <ClCompile Include="..\..\xrServerEntities\xrServer_Objects.cpp" />
+    <ClCompile Include="..\..\xrServerEntities\xrServer_Objects_Abstract.cpp" />
+    <ClCompile Include="..\..\xrServerEntities\xrServer_Objects_ALife.cpp" />
+    <ClCompile Include="..\..\xrServerEntities\xrServer_Objects_ALife_Items.cpp" />
+    <ClCompile Include="..\..\xrServerEntities\xrServer_Objects_ALife_Monsters.cpp" />
+    <ClCompile Include="..\..\xrServerEntities\xrServer_Object_Base.cpp" />
+    <ClCompile Include="alife_artefact_order.cpp" />
+    <ClCompile Include="buffer_vector.cpp" />
+    <ClCompile Include="cl_collector.cpp" />
+    <ClCompile Include="cl_log.cpp" />
+    <ClCompile Include="compiler.cpp">
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">AssemblyAndSourceCode</AssemblerOutput>
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AssemblyAndSourceCode</AssemblerOutput>
+    </ClCompile>
+    <ClCompile Include="compiler_build.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="compiler_cover.cpp" />
+    <ClCompile Include="compiler_display.cpp" />
+    <ClCompile Include="compiler_light.cpp" />
+    <ClCompile Include="compiler_link.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="compiler_load.cpp" />
+    <ClCompile Include="compiler_merge.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="compiler_palettize_covers.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="compiler_save.cpp">
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">AssemblyAndSourceCode</AssemblerOutput>
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AssemblyAndSourceCode</AssemblerOutput>
+    </ClCompile>
+    <ClCompile Include="compiler_smooth.cpp" />
+    <ClCompile Include="game_graph_builder.cpp" />
+    <ClCompile Include="game_spawn_constructor.cpp" />
+    <ClCompile Include="guid_generator.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="level_graph.cpp" />
+    <ClCompile Include="level_graph_vertex.cpp" />
+    <ClCompile Include="level_spawn_constructor.cpp" />
+    <ClCompile Include="motion_simulator.cpp" />
+    <ClCompile Include="patrol_path.cpp" />
+    <ClCompile Include="patrol_path_storage.cpp" />
+    <ClCompile Include="patrol_point.cpp" />
+    <ClCompile Include="random32.cpp" />
+    <ClCompile Include="server_entity_wrapper.cpp" />
+    <ClCompile Include="space_restrictor_wrapper.cpp" />
+    <ClCompile Include="spawn_patcher.cpp" />
+    <ClCompile Include="StdAfx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="tga.cpp" />
+    <ClCompile Include="verify_level_graph.cpp" />
+    <ClCompile Include="xrAI.cpp" />
+    <ClCompile Include="xrCrossTable.cpp" />
+    <ClCompile Include="xrThread.cpp" />
+    <ClCompile Include="xr_graph_merge.cpp" />
+    <ClCompile Include="_buildnodes_view.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\xrServerEntities\alife_human_brain.h" />
+    <ClInclude Include="..\..\xrServerEntities\alife_human_brain_inline.h" />
+    <ClInclude Include="..\..\xrServerEntities\alife_monster_brain.h" />
+    <ClInclude Include="..\..\xrServerEntities\alife_monster_brain_inline.h" />
+    <ClInclude Include="..\..\xrServerEntities\alife_space.h" />
+    <ClInclude Include="..\..\xrServerEntities\associative_vector.h" />
+    <ClInclude Include="..\..\xrServerEntities\associative_vector_compare_predicate.h" />
+    <ClInclude Include="..\..\xrServerEntities\associative_vector_compare_predicate_inline.h" />
+    <ClInclude Include="..\..\xrServerEntities\associative_vector_inline.h" />
+    <ClInclude Include="..\..\xrServerEntities\character_info_defs.h" />
+    <ClInclude Include="..\..\xrServerEntities\clsid_game.h" />
+    <ClInclude Include="..\..\xrServerEntities\DrawUtils.h" />
+    <ClInclude Include="..\..\xrServerEntities\FastDelegate.h" />
+    <ClInclude Include="..\..\xrServerEntities\game_base_space.h" />
+    <ClInclude Include="..\..\xrServerEntities\game_graph_space.h" />
+    <ClInclude Include="..\..\xrServerEntities\InfoPortionDefs.h" />
+    <ClInclude Include="..\..\xrServerEntities\inventory_space.h" />
+    <ClInclude Include="..\..\xrServerEntities\ItemListTypes.h" />
+    <ClInclude Include="..\..\xrServerEntities\object_broker.h" />
+    <ClInclude Include="..\..\xrServerEntities\object_cloner.h" />
+    <ClInclude Include="..\..\xrServerEntities\object_comparer.h" />
+    <ClInclude Include="..\..\xrServerEntities\object_destroyer.h" />
+    <ClInclude Include="..\..\xrServerEntities\object_interfaces.h" />
+    <ClInclude Include="..\..\xrServerEntities\object_loader.h" />
+    <ClInclude Include="..\..\xrServerEntities\object_saver.h" />
+    <ClInclude Include="..\..\xrServerEntities\object_type_traits.h" />
+    <ClInclude Include="..\..\xrServerEntities\PHNetState.h" />
+    <ClInclude Include="..\..\xrServerEntities\PHSynchronize.h" />
+    <ClInclude Include="..\..\xrServerEntities\PropertiesListTypes.h" />
+    <ClInclude Include="..\..\xrServerEntities\restriction_space.h" />
+    <ClInclude Include="..\..\xrServerEntities\script_export_space.h" />
+    <ClInclude Include="..\..\xrServerEntities\script_value_container.h" />
+    <ClInclude Include="..\..\xrServerEntities\script_value_container_impl.h" />
+    <ClInclude Include="..\..\xrServerEntities\ShapeData.h" />
+    <ClInclude Include="..\..\xrServerEntities\smart_cast.h" />
+    <ClInclude Include="..\..\xrServerEntities\smart_cast_impl0.h" />
+    <ClInclude Include="..\..\xrServerEntities\smart_cast_impl1.h" />
+    <ClInclude Include="..\..\xrServerEntities\smart_cast_impl2.h" />
+    <ClInclude Include="..\..\xrServerEntities\WaveForm.h" />
+    <ClInclude Include="..\..\xrServerEntities\xrEProps.h" />
+    <ClInclude Include="..\..\xrServerEntities\xrMessages.h" />
+    <ClInclude Include="..\..\xrServerEntities\xrServer_Objects.h" />
+    <ClInclude Include="..\..\xrServerEntities\xrServer_Objects_Abstract.h" />
+    <ClInclude Include="..\..\xrServerEntities\xrServer_Objects_ALife.h" />
+    <ClInclude Include="..\..\xrServerEntities\xrServer_Objects_ALife_All.h" />
+    <ClInclude Include="..\..\xrServerEntities\xrServer_Objects_ALife_Items.h" />
+    <ClInclude Include="..\..\xrServerEntities\xrServer_Objects_ALife_Monsters.h" />
+    <ClInclude Include="..\..\xrServerEntities\xrServer_Object_Base.h" />
+    <ClInclude Include="..\..\xrServerEntities\xrServer_Space.h" />
+    <ClInclude Include="..\..\xr_3da\xrLevel.h" />
+    <ClInclude Include="AIMapExport.h" />
+    <ClInclude Include="alife_artefact_order.h" />
+    <ClInclude Include="a_star.h" />
+    <ClInclude Include="a_star_inline.h" />
+    <ClInclude Include="bone.h" />
+    <ClInclude Include="builder_allocator_constructor.h" />
+    <ClInclude Include="builder_allocator_constructor_inline.h" />
+    <ClInclude Include="ChooseTypes.h" />
+    <ClInclude Include="client_id.h" />
+    <ClInclude Include="cl_collector.h" />
+    <ClInclude Include="cl_intersect.h" />
+    <ClInclude Include="cl_log.h" />
+    <ClInclude Include="communicate.h" />
+    <ClInclude Include="compiler.h" />
+    <ClInclude Include="cover_point.h" />
+    <ClInclude Include="cover_point_inline.h" />
+    <ClInclude Include="data_storage_binary_heap.h" />
+    <ClInclude Include="data_storage_binary_heap_inline.h" />
+    <ClInclude Include="data_storage_bucket_list.h" />
+    <ClInclude Include="data_storage_bucket_list_inline.h" />
+    <ClInclude Include="data_storage_constructor.h" />
+    <ClInclude Include="data_storage_double_linked_list.h" />
+    <ClInclude Include="data_storage_double_linked_list_inline.h" />
+    <ClInclude Include="data_storage_single_linked_list.h" />
+    <ClInclude Include="data_storage_single_linked_list_inline.h" />
+    <ClInclude Include="defines.h" />
+    <ClInclude Include="dijkstra.h" />
+    <ClInclude Include="dijkstra_inline.h" />
+    <ClInclude Include="edge_path.h" />
+    <ClInclude Include="edge_path_inline.h" />
+    <ClInclude Include="ETextureParams.h" />
+    <ClInclude Include="factory_api.h" />
+    <ClInclude Include="FTimer.h" />
+    <ClInclude Include="game_graph.h" />
+    <ClInclude Include="game_graph_builder.h" />
+    <ClInclude Include="game_graph_builder_inline.h" />
+    <ClInclude Include="game_graph_inline.h" />
+    <ClInclude Include="game_level_cross_table.h" />
+    <ClInclude Include="game_level_cross_table_inline.h" />
+    <ClInclude Include="game_spawn_constructor.h" />
+    <ClInclude Include="game_spawn_constructor_inline.h" />
+    <ClInclude Include="graph_abstract.h" />
+    <ClInclude Include="graph_abstract_inline.h" />
+    <ClInclude Include="graph_edge.h" />
+    <ClInclude Include="graph_edge_inline.h" />
+    <ClInclude Include="graph_engine.h" />
+    <ClInclude Include="graph_engine_inline.h" />
+    <ClInclude Include="graph_engine_space.h" />
+    <ClInclude Include="graph_vertex.h" />
+    <ClInclude Include="graph_vertex_inline.h" />
+    <ClInclude Include="guid_generator.h" />
+    <ClInclude Include="intrusive_ptr.h" />
+    <ClInclude Include="intrusive_ptr_inline.h" />
+    <ClInclude Include="LevelGameDef.h" />
+    <ClInclude Include="level_graph.h" />
+    <ClInclude Include="level_graph_inline.h" />
+    <ClInclude Include="level_graph_space.h" />
+    <ClInclude Include="level_graph_vertex_inline.h" />
+    <ClInclude Include="level_spawn_constructor.h" />
+    <ClInclude Include="level_spawn_constructor_inline.h" />
+    <ClInclude Include="light.h" />
+    <ClInclude Include="manager_builder_allocator_constructor.h" />
+    <ClInclude Include="manager_builder_allocator_constructor_inline.h" />
+    <ClInclude Include="motion_simulator.h" />
+    <ClInclude Include="NET_Compressor.h" />
+    <ClInclude Include="NET_utils.h" />
+    <ClInclude Include="path_manager.h" />
+    <ClInclude Include="path_manager_game.h" />
+    <ClInclude Include="path_manager_game_inline.h" />
+    <ClInclude Include="path_manager_game_level.h" />
+    <ClInclude Include="path_manager_game_level_inline.h" />
+    <ClInclude Include="path_manager_game_vertex_type.h" />
+    <ClInclude Include="path_manager_game_vertex_type_inline.h" />
+    <ClInclude Include="path_manager_generic.h" />
+    <ClInclude Include="path_manager_generic_inline.h" />
+    <ClInclude Include="path_manager_level.h" />
+    <ClInclude Include="path_manager_level_evaluator.h" />
+    <ClInclude Include="path_manager_level_evaluator_inline.h" />
+    <ClInclude Include="path_manager_level_flooder.h" />
+    <ClInclude Include="path_manager_level_flooder_inline.h" />
+    <ClInclude Include="path_manager_level_inline.h" />
+    <ClInclude Include="path_manager_level_straight_line.h" />
+    <ClInclude Include="path_manager_level_straight_line_inline.h" />
+    <ClInclude Include="path_manager_params.h" />
+    <ClInclude Include="path_manager_params_flooder.h" />
+    <ClInclude Include="path_manager_params_game_level.h" />
+    <ClInclude Include="path_manager_params_straight_line.h" />
+    <ClInclude Include="patrol_path.h" />
+    <ClInclude Include="patrol_path_inline.h" />
+    <ClInclude Include="patrol_path_storage.h" />
+    <ClInclude Include="patrol_path_storage_inline.h" />
+    <ClInclude Include="patrol_point.h" />
+    <ClInclude Include="patrol_point_inline.h" />
+    <ClInclude Include="profiler.h" />
+    <ClInclude Include="PropertiesListHelper.h" />
+    <ClInclude Include="quadtree.h" />
+    <ClInclude Include="quadtree_inline.h" />
+    <ClInclude Include="random32.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="server_entity_wrapper.h" />
+    <ClInclude Include="server_entity_wrapper_inline.h" />
+    <ClInclude Include="Shader_xrLC.h" />
+    <ClInclude Include="Sound.h" />
+    <ClInclude Include="space_restrictor_wrapper.h" />
+    <ClInclude Include="space_restrictor_wrapper_inline.h" />
+    <ClInclude Include="spawn_constructor_space.h" />
+    <ClInclude Include="spawn_patcher.h" />
+    <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="std_classes.h" />
+    <ClInclude Include="tga.h" />
+    <ClInclude Include="vertex_allocator_fixed.h" />
+    <ClInclude Include="vertex_allocator_fixed_inline.h" />
+    <ClInclude Include="vertex_manager_fixed.h" />
+    <ClInclude Include="vertex_manager_fixed_inline.h" />
+    <ClInclude Include="vertex_manager_hash_fixed.h" />
+    <ClInclude Include="vertex_manager_hash_fixed_inline.h" />
+    <ClInclude Include="vertex_path.h" />
+    <ClInclude Include="vertex_path_inline.h" />
+    <ClInclude Include="xrAI.h" />
+    <ClInclude Include="xrCrossTable.h" />
+    <ClInclude Include="xrShaderTypes.h" />
+    <ClInclude Include="xrThread.h" />
+    <ClInclude Include="xr_graph_merge.h" />
+    <ClInclude Include="_d3d_extensions.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties DevPartner_IsInstrumented="1" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

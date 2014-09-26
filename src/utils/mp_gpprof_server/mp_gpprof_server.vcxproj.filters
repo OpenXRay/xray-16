@@ -1,0 +1,495 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="3rd party">
+      <UniqueIdentifier>{dd00ad18-4cc8-463e-8a59-03b277337fc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rd party\libfastcgi">
+      <UniqueIdentifier>{fec0e399-7cd6-4f7a-a62b-404ae4b257a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rd party\libfastcgi\include">
+      <UniqueIdentifier>{bf3aa093-c3a8-4688-a4d6-8dd7fc64620f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rd party\gamespy">
+      <UniqueIdentifier>{cf7b79b8-2309-4286-b18a-057b889901fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rd party\gamespy\common">
+      <UniqueIdentifier>{be07d9d0-a695-4ee4-a919-bfb4e00b6897}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rd party\gamespy\ghttp">
+      <UniqueIdentifier>{48f8dd3d-ed6d-448b-9a1a-f0d9c884d50a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rd party\gamespy\gp">
+      <UniqueIdentifier>{c45538a2-17e3-40fe-ab01-3e7ad633b8be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rd party\gamespy\sake">
+      <UniqueIdentifier>{cb7957cd-005b-4419-95f6-8297b312ef0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rd party\gamespy\gt2">
+      <UniqueIdentifier>{54b33adb-f7e9-420b-8d78-fbe45e115891}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rd party\pthread">
+      <UniqueIdentifier>{7875fa9d-8769-498e-8df3-c1b30f5549d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{b21d5656-c6c6-4f71-b1bb-447627fef7d5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="libraries\fcgi-2.4.0\fcgi_config.h">
+      <Filter>3rd party\libfastcgi</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\fcgi-2.4.0\include\fcgiapp.h">
+      <Filter>3rd party\libfastcgi\include</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\fcgi-2.4.0\include\fcgio.h">
+      <Filter>3rd party\libfastcgi\include</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\darray.h">
+      <Filter>3rd party\gamespy</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\hashtable.h">
+      <Filter>3rd party\gamespy</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\md5.h">
+      <Filter>3rd party\gamespy</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\nonport.h">
+      <Filter>3rd party\gamespy</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsAssert.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsAvailable.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsCommon.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsCore.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsCrypt.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsDebug.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsLargeInt.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsMemory.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsPlatform.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsPlatformSocket.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsPlatformThread.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsPlatformUtil.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsRC4.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsSHA1.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsSoap.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsSSL.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsStringUtil.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsUdpEngine.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\common\gsXML.h">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\ghttp\ghttp.h">
+      <Filter>3rd party\gamespy\ghttp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\ghttp\ghttpASCII.h">
+      <Filter>3rd party\gamespy\ghttp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\ghttp\ghttpBuffer.h">
+      <Filter>3rd party\gamespy\ghttp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\ghttp\ghttpCallbacks.h">
+      <Filter>3rd party\gamespy\ghttp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\ghttp\ghttpCommon.h">
+      <Filter>3rd party\gamespy\ghttp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\ghttp\ghttpConnection.h">
+      <Filter>3rd party\gamespy\ghttp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\ghttp\ghttpEncryption.h">
+      <Filter>3rd party\gamespy\ghttp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\ghttp\ghttpMain.h">
+      <Filter>3rd party\gamespy\ghttp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\ghttp\ghttpPost.h">
+      <Filter>3rd party\gamespy\ghttp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\ghttp\ghttpProcess.h">
+      <Filter>3rd party\gamespy\ghttp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\GP\gp.h">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\GP\gpi.h">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\GP\gpiBuddy.h">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\GP\gpiBuffer.h">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\GP\gpiCallback.h">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\GP\gpiConnect.h">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\GP\gpiInfo.h">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\GP\gpiKeys.h">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\GP\gpiOperation.h">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\GP\gpiPeer.h">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\GP\gpiProfile.h">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\GP\gpiPS3.h">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\GP\gpiSearch.h">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\GP\gpiTransfer.h">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\GP\gpiUnique.h">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\GP\gpiUtility.h">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\sake\sake.h">
+      <Filter>3rd party\gamespy\sake</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\sake\sakeMain.h">
+      <Filter>3rd party\gamespy\sake</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\sake\sakeRequest.h">
+      <Filter>3rd party\gamespy\sake</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\sake\sakeRequestInternal.h">
+      <Filter>3rd party\gamespy\sake</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\gt2\gt2.h">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\gt2\gt2Auth.h">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\gt2\gt2Buffer.h">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\gt2\gt2Callback.h">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\gt2\gt2Connection.h">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\gt2\gt2Encode.h">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\gt2\gt2Filter.h">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\gt2\gt2Main.h">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\gt2\gt2Message.h">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\gt2\gt2Socket.h">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\gamespy\gt2\gt2Utility.h">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClInclude>
+    <ClInclude Include="atlas_stalkercoppc_v1.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="gamespy_sake.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="profile_data_types.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="profile_printer.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="profile_request.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="profiles_cache.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="requests_processor.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="sake_worker.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="threads.h">
+      <Filter>src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="libraries\fcgi-2.4.0\libfcgi\fcgi_stdio.c">
+      <Filter>3rd party\libfastcgi</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\fcgi-2.4.0\libfcgi\fcgiapp.c">
+      <Filter>3rd party\libfastcgi</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\fcgi-2.4.0\libfcgi\fcgio.cpp">
+      <Filter>3rd party\libfastcgi</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\fcgi-2.4.0\libfcgi\os_win32.c">
+      <Filter>3rd party\libfastcgi</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\darray.c">
+      <Filter>3rd party\gamespy</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\hashtable.c">
+      <Filter>3rd party\gamespy</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\md5c.c">
+      <Filter>3rd party\gamespy</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\nonport.c">
+      <Filter>3rd party\gamespy</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsAssert.c">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsAvailable.c">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsCore.c">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsCrypt.c">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsDebug.c">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsLargeInt.c">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsMemory.c">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsPlatform.c">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsPlatformSocket.c">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsPlatformThread.c">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsPlatformUtil.c">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsRC4.c">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsSHA1.c">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsSoap.c">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsSSL.c">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsStringUtil.c">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsUdpEngine.c">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\common\gsXML.c">
+      <Filter>3rd party\gamespy\common</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\ghttp\ghttpBuffer.c">
+      <Filter>3rd party\gamespy\ghttp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\ghttp\ghttpCallbacks.c">
+      <Filter>3rd party\gamespy\ghttp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\ghttp\ghttpCommon.c">
+      <Filter>3rd party\gamespy\ghttp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\ghttp\ghttpConnection.c">
+      <Filter>3rd party\gamespy\ghttp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\ghttp\ghttpEncryption.c">
+      <Filter>3rd party\gamespy\ghttp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\ghttp\ghttpMain.c">
+      <Filter>3rd party\gamespy\ghttp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\ghttp\ghttpPost.c">
+      <Filter>3rd party\gamespy\ghttp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\ghttp\ghttpProcess.c">
+      <Filter>3rd party\gamespy\ghttp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\GP\gp.c">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\GP\gpi.c">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\GP\gpiBuddy.c">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\GP\gpiBuffer.c">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\GP\gpiCallback.c">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\GP\gpiConnect.c">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\GP\gpiInfo.c">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\GP\gpiKeys.c">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\GP\gpiOperation.c">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\GP\gpiPeer.c">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\GP\gpiProfile.c">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\GP\gpiPS3.c">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\GP\gpiSearch.c">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\GP\gpiTransfer.c">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\GP\gpiUnique.c">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\GP\gpiUtility.c">
+      <Filter>3rd party\gamespy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\sake\sakeMain.c">
+      <Filter>3rd party\gamespy\sake</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\sake\sakeRequest.c">
+      <Filter>3rd party\gamespy\sake</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\sake\sakeRequestMisc.c">
+      <Filter>3rd party\gamespy\sake</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\sake\sakeRequestModify.c">
+      <Filter>3rd party\gamespy\sake</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\sake\sakeRequestRead.c">
+      <Filter>3rd party\gamespy\sake</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\gt2\gt2Auth.c">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\gt2\gt2Buffer.c">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\gt2\gt2Callback.c">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\gt2\gt2Connection.c">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\gt2\gt2Encode.c">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\gt2\gt2Filter.c">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\gt2\gt2Main.c">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\gt2\gt2Message.c">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\gt2\gt2Socket.c">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\gamespy\gt2\gt2Utility.c">
+      <Filter>3rd party\gamespy\gt2</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\pthreads-w32-2-8-0-release\pthread.c">
+      <Filter>3rd party\pthread</Filter>
+    </ClCompile>
+    <ClCompile Include="atlas_stalkercoppc_v1.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="entry_point.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="gamespy_sake.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="profile_data_types.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="profile_request.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="profiles_cache.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="requests_processor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="sake_worker.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="threads.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

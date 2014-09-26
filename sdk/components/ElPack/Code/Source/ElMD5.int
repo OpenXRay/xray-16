@@ -1,0 +1,248 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1996 Greg Carter,                  }
+{                      gregc@cryptocard.com          }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElMD5;
+{*****************************************************************************
+ UNIT: MD5Unit
+ Description:  This unit contains an Object Pascal Object which can be used to
+               perform an MD5 Hashing of byte array, file, or Pascal String.  An
+               MD5 Hashing or Message Digest is a 'finger print' of the
+               input. This is 100% PASCAL!!!
+
+               "It is conjectured that it is computationally infeasible
+               to produce two messages having the same message digest"....
+               "The MD5 algorithm is intended for digital signature
+               applications, where a large file must be "compressed" in a
+               secure manner before being encrypted with a private (secret) key
+               under a public-key cryptosystem such as RSA." R. Rivest
+               RfC: 1321, RSA Data Security, Inc. April 1992
+
+ The MD5 Algorithm was produced by RSA Data Security Inc.(See LEGAL)
+ -----------------------------------------------------------------------------
+ Code Author:  Greg Carter, gregc@cryptocard.com
+ Organization: CRYPTOCard Corporation, info@cryptocard.com
+               R&D Division, Carleton Place, ON, CANADA, K7C 3T2
+               1-613-253-3152 Voice, 1-613-253-4685 Fax.
+ Date of V.1:  Jan. 3 1996.
+
+ Compatibility & Testing with BP7.0: Anne Marcel Roorda, garfield@xs4all.nl
+ -----------------------------------------------------------------------------}
+ {Useage:  Below is typical usage(for File)of the MD5 Object, Follow these steps:
+        Step 1: Declare and Create a New TCrMD5 object.  This can be done by
+                'Drag N Drop' a TCrMD5 off the Delphi Tool Pallet,
+                or explicitly in code.
+        Step 2: Set the InputType.
+        Step 3: Point to the input(InputString, InputFilePath, pInputArray).
+        Step 4: Point to the output Array(pOutputArray).
+        Step 5: Call the MD5_Hash procedure.
+                Your Done!
+
+Example
+procedure Tcryptfrm.Button1Click(Sender: TObject);
+var
+ md5hash: TCrMD5;                  (* Step 1a *)
+ outarray: array[0..15] of char;
+ InputFile: File;
+ startTime: LongInt;
+begin
+ md5hash := TCrMD5.Create(Self);   (* Step 1b *)
+ try
+  If OpenDialog1.Execute then
+  begin
+    md5hash.InputType := SourceFile;  (* Step 2 *)
+    md5hash.InputFilePath := OpenDialog1.FileName; (* Step 3 *)
+    md5hash.pOutputArray := @outarray;             (* Step 4 *)
+    startTime := timeGetTime;
+    md5hash.MD5_Hash;                              (* Step 5 *)
+    LEDLabel1.Caption := IntToStr(timeGetTime - startTime);
+    Label2.Caption := StrPas(outarray);     (* Do something with output *)
+  end;(* if *)
+ finally
+  md5hash.free;
+ end;
+end;
+{-----------------------------------------------------------------------------}
+{LEGAL:        The algorithm was placed into the public domain, hence requires
+               no license or runtime fees.  However this code is copyright by
+               CRYPTOCard.  CRYPTOCard grants anyone who may wish to use, modify
+               or redistribute this code privileges to do so, provided the user
+               agrees to the following three(3) rules:
+
+               1)Any Applications, (ie exes which make use of this
+               Object...), for-profit or non-profit,
+               must acknowledge the author of this Object(ie.
+               MD5 Implementation provided by Greg Carter, CRYPTOCard
+               Corporation) somewhere in the accompanying Application
+               documentation(ie AboutBox, HelpFile, readme...).  NO runtime
+               or licensing fees are required!
+
+               2)Any Developer Component(ie Delphi Component, Visual Basic VBX,
+               DLL) derived from this software must acknowledge that it is
+               derived from "MD5 Object Pascal Implementation Originated by
+               Greg Carter, CRYPTOCard Corporation 1996". Also all efforts should
+               be made to point out any changes from the original.
+               !!!!!Further, any Developer Components based on this code
+               *MAY NOT* be sold for profit.  This Object was placed into the
+               public domain, and therefore any derived components should
+               also.!!!!!
+
+               3)CRYPTOCard Corporation makes no representations concerning this
+               software or the suitability of this software for any particular
+               purpose. It is provided "as is" without express or implied
+               warranty of any kind. CRYPTOCard accepts no liability from any
+               loss or damage as a result of using this software.
+
+CRYPTOCard Corporation is in no way affiliated with RSA Data Security Inc.
+The MD5 Algorithm was produced by RSA Data Security Inc.
+-----------------------------------------------------------------------------
+Why Use this instead of a freely available C DLL?
+
+The goal was to provide a number of Encryption/Hash implementations in Object
+Pascal, so that the Pascal Developer has considerably more freedom.  These
+Implementations are geared toward the PC(Intel) Microsoft Windows developer,
+who will be using Borland's New 32bit developement environment(Delphi32).  The
+code generated by this new compiler is considerablely faster then 16bit versions.
+And should provide the Developer with faster implementations then those using
+C DLLs.
+-----------------------------------------------------------------------------
+NOTES: Version 1 does not contain any cross-platform considerations.  If trying
+       to use this code on a Big Endian style processor you will need to write
+       additional code to reorder the bytes.
+------------------------------------------------------------------------------
+Revised:  00/00/00 BY: ******* Reason: ******
+------------------------------------------------------------------------------
+}
+{Declare the compiler defines}
+{------Changeable compiler switches-----------------------------------}
+{$A+   Word align variables }
+{$F+   Force Far calls }
+{$K+   Use smart callbacks
+{$N+   Allow coprocessor instructions }
+{$P+   Open parameters enabled }
+{$S+   Stack checking }
+{$T-   @ operator is NOT typed }
+{$U-   Non Pentium safe FDIV }
+{$Z-   No automatic word-sized enumerations}
+{$H+   Huge Strings}
+
+{$RANGECHECKS OFF}
+{$Q-}
+
+{---------------------------------------------------------------------}
+
+{$DEFINE MD5ONLY}
+
+interface
+uses SysUtils,
+{$ifndef KYLIX_USED}
+     Windows,
+{$else}
+     Libc,
+     Types,
+{$endif}
+     Classes;
+
+{An enumerated typt which tells the object what type the input to the cipher is}
+type
+  TSourceType = (SourceFile, SourceByteArray, SourceString);
+
+type
+  ULONG32 = record
+    LoWord16 : WORD;
+    HiWord16 : WORD;
+  end;
+
+  PULONG32 = ^ULONG32;
+  PLong = ^LongInt;
+
+  hashDigest = record
+    A : DWORD;
+    B : DWORD;
+    C : DWORD;
+    D : DWORD;
+  end; {hashArray}
+
+  PTR_Hash = ^hashDigest;
+
+  TCrMD5 = class
+  private
+ { Private declarations }
+
+    FType : TSourceType; {Source type, whether its a file or ByteArray, or
+                                            a Pascal String}
+    FInputFilePath : string; {Full Path to Input File}
+    FInputArray : PByte; {Point to input array}
+    FInputString : string; {Input String}
+    FOutputDigest : PTR_Hash; {output MD5 Digest}
+    FSourceLength : LongInt; {input length in BYTES}
+    FActiveBlock : array[0..15] of DWORD; {the 64Byte block being transformed}
+    FA, FB, FC, FD, FAA, FBB, FCC, FDD : DWORD;
+  {FA..FDD are used during Step 4, the transform.  I made them part of the
+   Object to cut down on time used to pass variables.}
+  {FF, GG, HH, II are used in Step 4, the transform}
+    procedure FF(var a, b, c, d, x : DWORD; s : BYTE; ac : DWORD);
+    procedure GG(var a, b, c, d, x : DWORD; s : BYTE; ac : DWORD);
+    procedure HH(var a, b, c, d, x : DWORD; s : BYTE; ac : DWORD);
+    procedure II(var a, b, c, d, x : DWORD; s : BYTE; ac : DWORD);
+
+  protected
+    { Protected declarations }
+  public
+    { Public declarations }
+  {Initialize is used in Step 3, this fills FA..FD with init. values
+   and points FpA..FpD to FA..FD}
+    procedure MD5_Initialize;
+  {this is where all the magic happens}
+    procedure MD5_Transform;
+    procedure MD5_Finish;
+    procedure MD5_Hash_Bytes;
+{  Procedure MD5_Hash_String;(Pascal Style strings???)}
+    procedure MD5_Hash_File;
+  {This procedure sends the data 64Bytes at a time to MD5_Transform}
+    procedure MD5_Hash;
+    property pInputArray : PByte read FInputArray write FInputArray;
+    property pOutputArray : PTR_Hash read FOutputDigest write FOutputDigest; {!!See FOutputArray}
+  published
+    property InputType : TSourceType read FType write FType;
+    property InputFilePath : string read FInputFilePath write FInputFilePath;
+    property InputString : string read FInputString write FInputString;
+    property InputLength : LongInt read FSourceLength write FSourceLength;
+  end; {TCrMD5}
+
+const
+{Constants for MD5Transform routine.}
+  S11 = 7;
+  S12 = 12;
+  S13 = 17;
+  S14 = 22;
+  S21 = 5;
+  S22 = 9;
+  S23 = 14;
+  S24 = 20;
+  S31 = 4;
+  S32 = 11;
+  S33 = 16;
+  S34 = 23;
+  S41 = 6;
+  S42 = 10;
+  S43 = 15;
+  S44 = 21;
+
+implementation
+end.

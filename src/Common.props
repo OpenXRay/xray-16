@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <xrBinRootDir>$(SolutionDir)..\bin\</xrBinRootDir>
+    <xrBinPlugRootDir>$(SolutionDir)..\bin_plugs\</xrBinPlugRootDir>
+    <xrLibRootDir>$(SolutionDir)..\lib\</xrLibRootDir>
+    <xrBinDir>$(SolutionDir)..\bin\$(Configuration)\</xrBinDir>
+    <xrBinPlugDir>$(SolutionDir)..\bin_plugs\$(Configuration)\</xrBinPlugDir>
+    <xrLibDir>$(SolutionDir)..\lib\$(Configuration)\</xrLibDir>
+    <xrIntDir>$(SolutionDir)..\intermediate\$(Configuration)\</xrIntDir>
+    <xrSdkDir>$(SolutionDir)..\sdk\</xrSdkDir>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+      <BuildMacro Include="xrBinRootDir">
+      <Value>$(xrBinRootDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="xrBinPlugRootDir">
+      <Value>$(xrBinPlugRootDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="xrLibRootDir">
+      <Value>$(xrLibRootDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="xrBinDir">
+      <Value>$(xrBinDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="xrBinPlugDir">
+      <Value>$(xrBinPlugDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="xrLibDir">
+      <Value>$(xrLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="xrIntDir">
+      <Value>$(xrIntDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="xrSdkDir">
+      <Value>$(xrSdkDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

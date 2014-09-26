@@ -1,0 +1,208 @@
+
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+03/13/2002
+
+  Added Tag property to TElMRUSection
+  Added Section property to TElMRUEntry 
+
+10/16/2001
+
+  CLX adaptation complete
+
+*)
+
+unit ElMRU;
+
+{Most Recently Used items manager}
+
+interface
+
+uses
+  Classes,
+  SysUtils,
+  {$ifndef CLX_USED}
+  Messages,
+  Graphics,
+  Controls,
+  Menus,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  {$else}
+  Qt,
+  QGraphics,
+  QControls,
+  QMenus,
+  {$endif}
+  ElList,
+  ElTools,
+  ElStrUtils,
+  ElIni;
+
+type
+
+  TElMRUEntry = class;
+  TElMRUSection = class;
+
+  TElMRU = class;
+  TElMRUSections = class;
+
+  TMRUChangeEvent = procedure(Sender : TObject; Section : TElMRUSection) of object;
+  TMRUClickEvent = procedure(Sender : TObject; Entry : TElMRUEntry) of object;
+  TMRUStreamEvent = procedure(Sender : TObject; Stream : TStream; Entry : TElMRUEntry) of object;
+
+  TMRUAddMode = (mamAdd, mamInsert);
+
+  TElMRUEntry = class
+  private
+    FName : string;
+    FData : Integer;
+    FOwner : TElMRUSection;
+    procedure SetName(value : string);
+    procedure SetData(Value : integer);
+  public
+    property Name : string read FName write SetName;
+    property Data : Integer read FData write SetData;
+    property Section : TElMRUSection read FOwner;
+  end;
+
+  TElMRUSection = class(TCollectionItem)
+  protected
+    FTag: Integer;
+    FAutoHide : Boolean;
+    FCaption : string;
+    FValues : TElList;
+    FCapacity : Integer;
+    FName : string;
+    FShowName : Boolean;
+    FVisible : Boolean;
+    FOwner : TElMRU;
+    procedure SetName(newValue : string);
+    procedure SetShowName(newValue : Boolean);
+    procedure SetVisible(newValue : Boolean);
+    function GetValue(index : integer) : TElMRUEntry;
+    procedure SetCapacity(newValue : Integer);
+    function GetCount : Integer;
+    procedure OnEntryDelete(Sender : TObject; Item : pointer);
+    procedure SetCaption(newValue : string);
+    procedure SetAutoHide(newValue : Boolean);
+  public
+    constructor Create(Collection : TCollection); override;
+    destructor Destroy; override;
+    procedure Assign(Source : TPersistent); override;
+    procedure Clear;
+
+    property Count : Integer read GetCount;
+    function Add(Name : string; Data : integer) : TElMRUEntry; virtual;
+    procedure Remove(Entry : TElMRUEntry); virtual;
+    function EntryByName(Name : string) : TElMRUEntry;
+
+    property Entries[index : integer] : TElMRUEntry read GetValue;
+  published
+    property Name : string read FName write SetName;
+    property ShowCaption : Boolean read FShowName write SetShowName default false;
+    property Visible : Boolean read FVisible write SetVisible default true;
+    property Capacity : Integer read FCapacity write SetCapacity default 10;
+    property Caption : string read FCaption write SetCaption;
+    property AutoHide : Boolean read FAutoHide write SetAutoHide;
+    property Tag: Integer read FTag write FTag;
+  end;
+
+  TElMRUSections = class(TCollection)
+  private
+    FMRU : TElMRU;
+    function GetItem(index : integer) : TElMRUSection;
+    procedure SetItem(index : integer; newValue : TElMRUSection);
+  protected
+    function GetOwner : TPersistent; override;
+    procedure Update(Item : TCollectionItem); override;
+  public
+    constructor Create(MRU : TElMRU);
+    function Add : TElMRUSection;
+    property Items[index : integer] : TElMRUSection read GetItem write SetItem; default;
+  end;
+
+  TElMRU = class(TComponent)
+  private
+    FStorage : TElIniFile;
+    FShowAccel : Boolean;
+    FAutoUpdate : Boolean;
+    FAutoEnable : Boolean;
+    FSections : TElMRUSections;
+    FRecentMenu : TMenuItem;
+    FAddMode : TMRUAddMode;
+    FRemoveOnClick : Boolean;
+    FAccelDelimiter : Char;
+    FOnChange : TMRUChangeEvent;
+    FOnClick : TMRUClickEvent;
+    FOnSaveEntry : TMRUStreamEvent;
+    FOnLoadEntry : TMRUStreamEvent;
+    FPopupMenu : TPopupMenu;
+    FStoragePath : string;
+    FIgnoreDuplicates : Boolean;
+    procedure SetStorage(newValue : TElIniFile);
+    procedure SetIgnoreDuplicates(newValue : Boolean);
+    procedure SetPopupMenu(newValue : TPopupMenu);
+    procedure SetSections(newValue : TElMRUSections);
+    procedure SetShowAccel(newValue : Boolean);
+    procedure SetAutoUpdate(newValue : Boolean);
+    procedure SetAutoEnable(newValue : Boolean);
+    procedure SetRecentMenu(newValue : TMenuItem);
+    procedure OnItemClick(Sender : TObject);
+    procedure SetAccelDelimiter(newValue : Char);
+  protected
+    procedure TriggerChangeEvent(Section : TElMRUSection); virtual;
+    procedure TriggerClickEvent(Entry : TElMRUEntry); virtual;
+    procedure TriggerSaveEntryEvent(Stream : TStream; Entry : TElMRUEntry); virtual;
+    procedure TriggerLoadEntryEvent(Stream : TStream; Entry : TElMRUEntry); virtual;
+    procedure Notification(AComponent : TComponent; Operation : TOperation); override;
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure RebuildMenu; virtual;
+    procedure Restore;
+    procedure Save;
+    function SectionByName(Name : string) : TElMRUSection;
+  published
+    property AccelDelimiter : Char read FAccelDelimiter write SetAccelDelimiter default ' ';
+    property AddMode : TMRUAddMode read FAddMode write FAddMode;
+    property Sections : TElMRUSections read FSections write SetSections;
+    property Storage : TElIniFile read FStorage write SetStorage;
+    property StoragePath : string read FStoragePath write FStoragePath;
+    property ShowAccel : Boolean read FShowAccel write SetShowAccel default true;
+    property AutoUpdate : Boolean read FAutoUpdate write SetAutoUpdate default true;
+    property AutoEnable : Boolean read FAutoEnable write SetAutoEnable default true;
+    property RecentMenu : TMenuItem read FRecentMenu write SetRecentMenu;
+    property PopupMenu : TPopupMenu read FPopupMenu write SetPopupMenu;
+    property RemoveOnClick : Boolean read FRemoveOnClick write FRemoveOnClick default true;
+    property IgnoreDuplicates : Boolean read FIgnoreDuplicates write SetIgnoreDuplicates default True;
+
+    property OnChange : TMRUChangeEvent read FOnChange write FOnChange;
+    property OnClick : TMRUClickEvent read FOnClick write FOnClick;
+    property OnSaveEntry : TMRUStreamEvent read FOnSaveEntry write FOnSaveEntry;
+    property OnLoadEntry : TMRUStreamEvent read FOnLoadEntry write FOnLoadEntry;
+  end;
+
+implementation
+end.

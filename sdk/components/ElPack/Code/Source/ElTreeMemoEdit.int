@@ -1,0 +1,65 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElTreeMemoEdit;
+
+interface
+
+uses
+
+  Windows,
+  Messages,
+  Controls,
+  Forms,
+
+  SysUtils,
+  Classes,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+
+
+  ElTree,
+  ElHeader,
+  ElACtrls
+  ;
+
+type
+
+    TElTreeInplaceMemoEdit = class(TElTreeInplaceEditor)
+    
+    private
+      SaveWndProc: TWndMethod;
+      procedure EditorWndProc(var Message : TMessage);
+    protected
+      FEditor: TElAdvancedMemo;
+      procedure DoStartOperation; override;
+      procedure DoStopOperation(Accepted : boolean); override;
+      function GetVisible: Boolean; override;
+      procedure TriggerAfterOperation(var Accepted : boolean; var DefaultConversion : 
+          boolean); override;
+      procedure TriggerBeforeOperation(var DefaultConversion : boolean); override;
+      procedure SetEditorParent; override;
+    public
+      constructor Create(AOwner : TComponent); override;
+      destructor Destroy; override;
+      property Editor: TElAdvancedMemo read FEditor;
+    end;
+
+implementation
+end.

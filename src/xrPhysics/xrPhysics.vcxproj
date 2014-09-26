@@ -1,0 +1,373 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mixed|Win32">
+      <Configuration>Mixed</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{98D24A3D-7666-4C11-9D6E-B10393CE8CBA}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(xrBinDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(xrBinDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
+    <OutDir>$(xrBinDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>$(xrSdkDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;DEBUG;_WINDOWS;dSINGLE;_USRDLL;XRPHYSICS_EXPORTS;MSVC;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>false</StringPooling>
+      <MinimalRebuild>true</MinimalRebuild>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <SmallerTypeCheck>true</SmallerTypeCheck>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <ForceConformanceInForLoopScope>false</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <BrowseInformation />
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/NODEFAULTLIB:LIBCMTD %(AdditionalOptions)</AdditionalOptions>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <MapExports>false</MapExports>
+      <SubSystem>Windows</SubSystem>
+      <LargeAddressAware>true</LargeAddressAware>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>NotSet</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>$(xrSdkDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;dSINGLE;_USRDLL;XRPHYSICS_EXPORTS;MSVC;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling />
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <ForceConformanceInForLoopScope>false</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <BrowseInformation />
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>NotSet</SubSystem>
+      <LargeAddressAware>true</LargeAddressAware>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>$(xrSdkDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MIXED;WIN32;DEBUG;_WINDOWS;dSINGLE;_USRDLL;XRPHYSICS_EXPORTS;MSVC;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <ForceConformanceInForLoopScope>false</ForceConformanceInForLoopScope>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <BrowseInformation />
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libvorbisfile_static.lib;libogg_static.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <LargeAddressAware>true</LargeAddressAware>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>NotSet</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\xrServerEntities\PHNetState.cpp" />
+    <ClCompile Include="ActorCameraCollision.cpp" />
+    <ClCompile Include="collisiondamagereceiver.cpp" />
+    <ClCompile Include="console_vars.cpp" />
+    <ClCompile Include="dcylinder\dCylinder.cpp" />
+    <ClCompile Include="debug_output.cpp" />
+    <ClCompile Include="DisablingParams.cpp" />
+    <ClCompile Include="dRayMotions.cpp" />
+    <ClCompile Include="ElevatorState.cpp" />
+    <ClCompile Include="ExtendedGeom.cpp" />
+    <ClCompile Include="Geometry.cpp" />
+    <ClCompile Include="GeometryBits.cpp" />
+    <ClCompile Include="IActivationShape.cpp" />
+    <ClCompile Include="MathUtils.cpp" />
+    <ClCompile Include="MovementBoxDynamicActivate.cpp" />
+    <ClCompile Include="params.cpp" />
+    <ClCompile Include="PHActivationShape.cpp" />
+    <ClCompile Include="PHActorCharacter.cpp" />
+    <ClCompile Include="PHAICharacter.cpp" />
+    <ClCompile Include="PHCapture.cpp" />
+    <ClCompile Include="PHCaptureInit.cpp" />
+    <ClCompile Include="PHCharacter.cpp" />
+    <ClCompile Include="PHCollideValidator.cpp" />
+    <ClCompile Include="PHContactBodyEffector.cpp" />
+    <ClCompile Include="PHDisabling.cpp" />
+    <ClCompile Include="PHDynamicData.cpp" />
+    <ClCompile Include="PHElement.cpp" />
+    <ClCompile Include="PHElementNetState.cpp" />
+    <ClCompile Include="PHFracture.cpp" />
+    <ClCompile Include="PHGeometryOwner.cpp" />
+    <ClCompile Include="PHInterpolation.cpp" />
+    <ClCompile Include="PHIsland.cpp" />
+    <ClCompile Include="PHJoint.cpp" />
+    <ClCompile Include="PHJointDestroyInfo.cpp" />
+    <ClCompile Include="PHMoveStorage.cpp" />
+    <ClCompile Include="PHObject.cpp" />
+    <ClCompile Include="PHShell.cpp" />
+    <ClCompile Include="PHShellActivate.cpp" />
+    <ClCompile Include="PHShellNetState.cpp" />
+    <ClCompile Include="PHShellSplitter.cpp" />
+    <ClCompile Include="PHSimpleCharacter.cpp" />
+    <ClCompile Include="PHSplitedShell.cpp" />
+    <ClCompile Include="PHStaticGeomShell.cpp" />
+    <ClCompile Include="phvalide.cpp" />
+    <ClCompile Include="PHWorld.cpp" />
+    <ClCompile Include="Physics.cpp" />
+    <ClCompile Include="PhysicsExternalCommon.cpp" />
+    <ClCompile Include="PhysicsShell.cpp" />
+    <ClCompile Include="PhysicsShellAnimator.cpp" />
+    <ClCompile Include="physics_scripted.cpp" />
+    <ClCompile Include="ShellHit.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="tri-colliderknoopc\dcTriListCollider.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="tri-colliderknoopc\dSortTriPrimitive.cpp" />
+    <ClCompile Include="tri-colliderknoopc\dTriBox.cpp" />
+    <ClCompile Include="tri-colliderknoopc\dTriCallideK.cpp" />
+    <ClCompile Include="tri-colliderknoopc\dTriCylinder.cpp" />
+    <ClCompile Include="tri-colliderknoopc\dTriList.cpp" />
+    <ClCompile Include="tri-colliderknoopc\dTriSphere.cpp" />
+    <ClCompile Include="xrPhysics.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\xrServerEntities\PHNetState.h" />
+    <ClInclude Include="ActorCameraCollision.h" />
+    <ClInclude Include="BlockAllocator.h" />
+    <ClInclude Include="CalculateTriangle.h" />
+    <ClInclude Include="console_vars.h" />
+    <ClInclude Include="CycleConstStorage.h" />
+    <ClInclude Include="DamageSource.h" />
+    <ClInclude Include="dcylinder\dCylinder.h" />
+    <ClInclude Include="debug_output.h" />
+    <ClInclude Include="DisablingParams.h" />
+    <ClInclude Include="dRayMotions.h" />
+    <ClInclude Include="ElevatorState.h" />
+    <ClInclude Include="ExtendedGeom.h" />
+    <ClInclude Include="Geometry.h" />
+    <ClInclude Include="GeometryBits.h" />
+    <ClInclude Include="IActivationShape.h" />
+    <ClInclude Include="iclimableobject.h" />
+    <ClInclude Include="IColisiondamageInfo.h" />
+    <ClInclude Include="ICollideValidator.h" />
+    <ClInclude Include="icollisiondamagereceiver.h" />
+    <ClInclude Include="IElevatorState.h" />
+    <ClInclude Include="IPHCapture.h" />
+    <ClInclude Include="IPHStaticGeomShell.h" />
+    <ClInclude Include="IPHWorld.h" />
+    <ClInclude Include="IPhysicsShellHolder.h" />
+    <ClInclude Include="iphysics_scripted.h" />
+    <ClInclude Include="MathUtils.h" />
+    <ClInclude Include="MathUtilsOde.h" />
+    <ClInclude Include="matrix_utils.h" />
+    <ClInclude Include="MovementBoxDynamicActivate.h" />
+    <ClInclude Include="ode_include.h" />
+    <ClInclude Include="ode_redefine.h" />
+    <ClInclude Include="params.h" />
+    <ClInclude Include="PHActivationShape.h" />
+    <ClInclude Include="PHActorCharacter.h" />
+    <ClInclude Include="PHActorCharacterInline.h" />
+    <ClInclude Include="PHAICharacter.h" />
+    <ClInclude Include="PHBaseBodyEffector.h" />
+    <ClInclude Include="PHCapture.h" />
+    <ClInclude Include="PHCharacter.h" />
+    <ClInclude Include="PHCollideValidator.h" />
+    <ClInclude Include="PHContactBodyEffector.h" />
+    <ClInclude Include="PHDefs.h" />
+    <ClInclude Include="PHDisabling.h" />
+    <ClInclude Include="PHDynamicData.h" />
+    <ClInclude Include="PHElement.h" />
+    <ClInclude Include="PHElementInline.h" />
+    <ClInclude Include="PHFracture.h" />
+    <ClInclude Include="PHGeometryOwner.h" />
+    <ClInclude Include="PHImpact.h" />
+    <ClInclude Include="PHInterpolation.h" />
+    <ClInclude Include="PHIsland.h" />
+    <ClInclude Include="PHItemList.h" />
+    <ClInclude Include="PHJoint.h" />
+    <ClInclude Include="PHJointDestroyInfo.h" />
+    <ClInclude Include="PHMoveStorage.h" />
+    <ClInclude Include="PHObject.h" />
+    <ClInclude Include="PHShell.h" />
+    <ClInclude Include="PHShellBuildJoint.h" />
+    <ClInclude Include="PHShellSplitter.h" />
+    <ClInclude Include="PHSimpleCharacter.h" />
+    <ClInclude Include="PHSimpleCharacterInline.h" />
+    <ClInclude Include="PHSplitedShell.h" />
+    <ClInclude Include="PHStaticGeomShell.h" />
+    <ClInclude Include="PHUpdateObject.h" />
+    <ClInclude Include="phvalide.h" />
+    <ClInclude Include="PHValideValues.h" />
+    <ClInclude Include="PHWorld.h" />
+    <ClInclude Include="Physics.h" />
+    <ClInclude Include="PhysicsCommon.h" />
+    <ClInclude Include="PhysicsExternalCommon.h" />
+    <ClInclude Include="PhysicsShell.h" />
+    <ClInclude Include="PhysicsShellAnimator.h" />
+    <ClInclude Include="PhysicsShellAnimatorBoneData.h" />
+    <ClInclude Include="physics_scripted.h" />
+    <ClInclude Include="ph_valid_ode.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="tri-colliderknoopc\dcTriangle.h" />
+    <ClInclude Include="tri-colliderknoopc\dcTriListCollider.h" />
+    <ClInclude Include="tri-colliderknoopc\dSortTriPrimitive.h" />
+    <ClInclude Include="tri-colliderknoopc\dTriBox.h" />
+    <ClInclude Include="tri-colliderknoopc\dTriCollideK.h" />
+    <ClInclude Include="tri-colliderknoopc\dTriColliderCommon.h" />
+    <ClInclude Include="tri-colliderknoopc\dTriColliderMath.h" />
+    <ClInclude Include="tri-colliderknoopc\dTriCylinder.h" />
+    <ClInclude Include="tri-colliderknoopc\dTriList.h" />
+    <ClInclude Include="tri-colliderknoopc\dTriSphere.h" />
+    <ClInclude Include="tri-colliderknoopc\dxTriList.h" />
+    <ClInclude Include="tri-colliderknoopc\TriPrimitiveCollideClassDef.h" />
+    <ClInclude Include="tri-colliderknoopc\__aabb_tri.h" />
+    <ClInclude Include="xrPhysics.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)3rd party\ode\contrib\msvc7\ode_default\default.vcxproj">
+      <Project>{1bf75feb-87dd-486c-880b-227987d191c2}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)Layers\xrAPI\xrAPI.vcxproj">
+      <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrCDB\xrCDB.vcxproj">
+      <Project>{a19b1df2-82ec-4364-8bdf-85d13a1c89b5}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrSound\xrSound.vcxproj">
+      <Project>{ccca7859-eb86-493e-9b53-c4235f45b3c5}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties DevPartner_IsInstrumented="1" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

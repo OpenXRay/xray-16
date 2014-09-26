@@ -1,0 +1,119 @@
+
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElDBSpin;
+
+interface
+
+uses
+     DB,
+     DBCtrls,
+
+     ElSpin,
+
+     Forms,
+     Windows,
+     Controls,
+     StdCtrls,
+     Messages,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+
+     Classes,
+     SysUtils;
+
+type
+
+  TElDBSpinEdit = class(TElSpinEdit)
+  private
+    FDataLink: TFieldDataLink;
+    function GetDataField: string;
+    function GetDataSource: TDataSource;
+    function GetField: TField;
+    procedure SetDataField(const Value: string);
+    procedure SetDataSource(Value: TDataSource);
+    procedure DataChange(Sender: TObject);
+    procedure CMGetDataLink(var Message: TMessage); message CM_GETDATALINK;
+    procedure CMExit(var Message: TCMExit); message CM_EXIT;
+    function  GetReadOnly: Boolean;
+    procedure SetReadOnly(Value: Boolean);
+    procedure UpdateData(Sender: TObject);
+    procedure EditingChange(Sender: TObject);
+  protected
+    procedure KeyPress(var Key: Char); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure SpinDownClick(Sender : TObject; Increment : Double); override;
+    procedure SpinDrag(Sender : TObject; NewValue : Double); override;
+    procedure SpinUpClick(Sender : TObject; Increment : Double); override;
+    procedure KeyDown(var Key : Word; Shift : TShiftState); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    {$ifdef VCL_4_USED}
+    function ExecuteAction(Action: TBasicAction): Boolean; override;
+    function UpdateAction(Action: TBasicAction): Boolean; override;
+    function UseRightToLeftAlignment: Boolean; override;
+    {$endif}
+    property Field: TField read GetField;
+  published
+    property DataField: string read GetDataField write SetDataField;
+    property DataSource: TDataSource read GetDataSource write SetDataSource;
+    property ReadOnly: Boolean read GetReadOnly write SetReadOnly default False;
+  end;
+
+  TElDBFloatSpinEdit = class(TElFloatSpinEdit)
+  private
+    FDataLink: TFieldDataLink;
+    procedure CMExit(var Message: TCMExit); message CM_EXIT;
+    procedure CMGetDataLink(var Message: TMessage); message CM_GETDATALINK;
+    procedure DataChange(Sender: TObject);
+    function GetDataField: string;
+    function GetDataSource: TDataSource;
+    function GetField: TField;
+    function GetReadOnly: Boolean;
+    procedure SetDataField(const Value: string);
+    procedure SetDataSource(Value: TDataSource);
+    procedure SetReadOnly(Value: Boolean);
+    procedure UpdateData(Sender: TObject);
+    procedure EditingChange(Sender: TObject);
+  protected
+    procedure KeyPress(var Key: Char); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure SpinDownClick(Sender : TObject; Increment : Double); override;
+    procedure SpinDrag(Sender : TObject; NewValue : Double); override;
+    procedure SpinUpClick(Sender : TObject; Increment : Double); override;
+    procedure KeyDown(var Key : Word; Shift : TShiftState); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    {$ifdef VCL_4_USED}
+    function ExecuteAction(Action: TBasicAction): Boolean; override;
+    function UpdateAction(Action: TBasicAction): Boolean; override;
+    function UseRightToLeftAlignment: Boolean; override;
+    {$endif}
+    property Field: TField read GetField;
+  published
+    property DataField: string read GetDataField write SetDataField;
+    property DataSource: TDataSource read GetDataSource write SetDataSource;
+    property ReadOnly: Boolean read GetReadOnly write SetReadOnly default False;
+  end;
+
+implementation
+end.

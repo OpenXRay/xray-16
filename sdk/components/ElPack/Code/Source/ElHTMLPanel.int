@@ -1,0 +1,196 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+09/26/2001
+
+  Added LinkStyle, LinkColor and LinkPopupMenu properties
+  Fixed link clicking
+  Fixed image painting
+
+*)
+
+unit ElHTMLPanel;
+
+interface
+
+uses
+
+  SysUtils,
+  Classes,
+
+  ElPanel,
+  ElVCLUtils,
+  HTMLRender,
+  ElTools,
+
+  {$ifdef VCL_4_USED}
+  ImgList,
+  {$endif}
+  Menus,
+  Windows,
+  Graphics,
+  Controls,
+  StdCtrls,
+  Forms,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElStrUtils,
+  ExtCtrls,
+  Messages;
+
+type
+
+  TCustomElHTMLPanel = class(TCustomElPanel)
+  private
+    FOnImageNeeded: TElHTMLImageNeededEvent;
+    FOnLinkClick: TElHTMLLinkClickEvent;
+    FCursor: TCursor;
+    FLinkColor: TColor;
+    FLinkPopupMenu: TPopupMenu;
+    FLinkStyle: TFontStyles;
+    FTextRect: TRect;
+    procedure CMMouseLeave(var Msg : TMessage); message CM_MOUSELEAVE;
+  protected
+    FRender : TElHTMLRender;
+    procedure TriggerPaintEvent; override;
+    procedure TriggerImageNeededEvent(Sender : TObject; Src : TElFString; var Image
+        : TBitmap);
+    procedure TriggerLinkClickEvent(HRef : TElFString); virtual;
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+    procedure Click; override;
+    procedure SetCursor(newValue : TCursor); virtual;
+    procedure SetLinkPopupMenu(newValue : TPopupMenu); virtual;
+    procedure SetLinkColor(newValue : TColor); virtual;
+    procedure SetLinkStyle(newValue : TFontStyles); virtual;
+    procedure SetCaption(newValue: TElFString); override;
+    {$ifdef VCL_5_USED}
+    procedure WMContextMenu(var Message: TWMContextMenu); message WM_CONTEXTMENU;
+    {$endif}
+    procedure WMRButtonUp(var Message: TWMRButtonUp); message WM_RBUTTONUP;
+    procedure DoLinkPopup(MousePos : TPoint);
+
+    property OnImageNeeded: TElHTMLImageNeededEvent read FOnImageNeeded write
+        FOnImageNeeded;
+    property OnLinkClick: TElHTMLLinkClickEvent read FOnLinkClick write
+        FOnLinkClick;
+    property Cursor: TCursor read FCursor write SetCursor;
+    property LinkColor: TColor read FLinkColor write SetLinkColor;
+    property LinkPopupMenu: TPopupMenu read FLinkPopupMenu write SetLinkPopupMenu;
+    property LinkStyle: TFontStyles read FLinkStyle write SetLinkStyle;
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+  end;
+
+  TElHTMLPanel = class(TCustomElHTMLPanel)
+  published
+    property OnImageNeeded;
+    property OnLinkClick;
+    property Cursor;
+    property LinkColor;
+    property LinkPopupMenu;
+    property LinkStyle;
+
+    property Background;
+    property BackgroundType;
+    property GradientEndColor;
+    property GradientStartColor;
+    property GradientSteps;
+    property Alignment;
+    property Layout;
+    property ImageForm;
+    property TopGrabHandle;
+    property RightGrabHandle;
+    property LeftGrabHandle;
+    property BottomGrabHandle;
+
+    property Resizable;
+    property Movable;
+    property OnMove;
+
+    property Align nodefault;
+    property BevelInner;
+    property BevelOuter;
+    property BevelWidth;
+    property BorderStyle;
+    property BorderWidth;
+    property Canvas;
+    property Color;
+{$ifdef MSWINDOWS}
+    property DragCursor;
+{$endif}
+    property DragMode;
+    property Enabled;
+    property Font;
+{$ifdef MSWINDOWS}
+    property Locked;
+    property MouseCapture;
+{$endif}
+    property ParentColor;
+{$ifdef MSWINDOWS}
+    property ParentCtl3D;
+{$endif}
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property TabStop;
+    property Transparent;
+    property TransparentXPThemes;
+    property UseXPThemes;
+    property Visible;
+    property SizeGrip;
+
+    property Caption;
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnResize;
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Action;
+    property Constraints;
+{$ifdef MSWINDOWS}
+    property DockOrientation;
+    property Floating;
+    property BevelKind;
+    property DoubleBuffered;
+    property DragKind;
+{$endif}
+{$ENDIF}
+  end;
+
+implementation
+end.

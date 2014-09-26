@@ -1,0 +1,498 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2002, EldoS                   }
+{                                                    }
+{====================================================}
+
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+03/22/2002
+
+  The images were not updated when items list is changed. Fixed.
+
+03/11/2002
+
+  Lots of properties made published
+
+03/06/2002
+
+  Added unicode hint
+
+*)
+
+unit ElListBox;
+
+interface
+
+uses
+  StdCtrls,
+  Windows,
+  SysUtils,
+  Messages,
+  Classes,
+  Controls,
+  Graphics,
+  Consts,
+  Forms,
+{$IFDEF WIN32}
+  ElUxTheme,
+{$ENDIF}
+  {$ifdef VCL_4_USED}
+  ImgList,
+  {$endif}
+  {$ifdef VCL_6_USED}
+  RTLConsts,
+  {$endif}
+  ElImgFrm,
+  Menus,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElTools,
+  ExtCtrls,
+  ElTmSchema,
+  ElHintWnd,
+  ElXPThemedControl,
+  {$ifdef ELPACK_UNICODE}
+  ElUnicodeStrings,
+  {$endif}
+  ElStrUtils,
+  ElVCLUtils;
+
+type
+{$ifdef MSWINDOWS}
+{$ifdef ELPACK_UNICODE}
+  TElFStrings = TElWideStrings;
+  TElFStringList = TElWideStringList;
+{$else}
+  TElFStrings = TStrings;
+  TElFStringList = TStringList;
+{$endif}
+{$else}
+  TElFStrings = TStrings;
+  TElFStringList = TStringList;
+{$endif}
+
+    TIntArray = array[0..MaxInt div sizeof(integer) -1] of integer;
+    PIntArray = ^TIntArray;
+
+    TCustomElListBox = class;
+
+    {$ifdef ELPACK_UNICODE}
+    TElListBoxStrings = class(TElWideStringList)
+    {$else}
+    TElListBoxStrings = class(TStringList)
+    {$endif}
+    private
+      ListBox : TCustomElListBox;
+    protected
+      {$ifdef ELPACK_UNICODE}
+      function Get(Index: Integer): WideString; override;
+      {$else}
+      function Get(Index: Integer): string; override;
+      {$endif}
+      function GetCount: Integer; override;
+      function GetObject(Index: Integer): TObject; override;
+      {$ifdef ELPACK_UNICODE}
+      procedure Put(Index: Integer; const S: WideString); override;
+      {$else}
+      procedure Put(Index: Integer; const S: String); override;
+      {$endif}
+      procedure PutObject(Index: Integer; AObject: TObject); override;
+      procedure SetUpdateState(Updating: Boolean); override;
+      procedure ResetBox;
+    public
+      {$ifdef ELPACK_UNICODE}
+      function Add(const S: WideString): Integer; override;
+      {$else}
+      function Add(const S: String): Integer; override;
+      {$endif}
+      procedure Clear; override;
+      procedure Delete(Index: Integer); override;
+      procedure Exchange(Index1, Index2: Integer); override;
+      {$ifdef ELPACK_UNICODE}
+      function IndexOf(const S: WideString): Integer; override;
+      procedure Insert(Index: Integer; const S: WideString); override;
+      {$else}
+      function IndexOf(const S: String): Integer; override;
+      procedure Insert(Index: Integer; const S: String); override;
+      {$endif}
+      procedure Move(CurIndex, NewIndex: Integer); override;
+    end;
+
+    TCustomElListBox = class(TWinControl)
+    protected
+      FImageIndex : PIntArray;
+      FImagesSize : integer;
+      FStates : PChar;
+      FStatesSize : integer;
+      FBorderStyle: TBorderStyle;
+      FCanvas     : TCanvas;
+      FColumns: Integer;
+      FExtendedSelect: Boolean;
+      FIntegralHeight: Boolean;
+      FItemHeight: Integer;
+      FMultiSelect: Boolean;
+      FSorted: Boolean;
+      FTabWidth: Integer;
+      FCurHintItem : Integer;
+      FLastTopIndex : integer;
+      FImgFormChLink : TImgFormChangeLink;
+      FListBoxStrings : TElFStrings;
+      FActiveBorderType: TElFlatBorderType;
+      FBackground: TBitmap;
+      FBorderSides: TElBorderSides;
+      FFlat: Boolean;
+      FFlatFocusedScrollBars: Boolean;
+      FHorizontalScroll: Boolean;
+      FInactiveBorderType: TElFlatBorderType;
+      FInvertSelection: Boolean;
+      FSelectedColor: TColor;
+      FSelectedFont: TFont;
+      FShowLineHint: Boolean;
+      FTheme: HTheme;
+      FTransparent: Boolean;
+      FTransparentSelection: Boolean;
+      FUseBackground: Boolean;
+      FImgForm : TElImageForm;
+      FMouseOver: boolean;
+      FHintTimer: TTimer;
+      FHintWnd     : TElHintWindow;
+      FHintWndProc : TWndMethod;
+      FMaxWidth    : integer;
+      FInVScroll,
+      FInHScroll     : boolean;
+      FLineBorderActiveColor: TColor;
+      FLineBorderInactiveColor: TColor;
+      FUseXPThemes: Boolean;
+      FMoving : boolean;
+      FShowCheckBox: Boolean;
+      FAllowGrayed: Boolean;
+      FImages: TImageList;
+      FImageChangeLink : TChangeLink;
+      {$ifndef ELPACK_UNICODE}
+      FSaveItems: TStringList;
+      {$endif}
+      FSaveTopIndex: Integer;
+      FSaveItemIndex: Integer;
+      {$ifdef ELPACK_UNICODE}
+      FHint: WideString;
+      {$endif}
+
+      procedure SetActiveBorderType(const Value: TElFlatBorderType);
+      procedure SetBackground(const Value: TBitmap);
+      procedure SetBorderSides(Value: TElBorderSides);
+      procedure SetFlat(const Value: boolean);
+      procedure SetFlatFocusedScrollBars(const Value: boolean);
+      procedure SetHorizontalScroll(Value: Boolean);
+      procedure SetImageForm(newValue : TElImageForm);
+      procedure SetInactiveBorderType(const Value: TElFlatBorderType);
+      procedure SetInvertSelection(const Value: boolean);
+      procedure SetSelectedColor(const Value: TColor);
+      procedure SetSelectedFont(const Value: TFont);
+      procedure SetTransparent(const Value: boolean);
+      procedure SetTransparentSelection(Value: Boolean);
+      procedure SetUseBackground(const Value: boolean);
+      procedure BackgroundChanged(Sender: TObject);
+      procedure CancelLineHint;
+      procedure CMFontChanged(var Msg: TMessage); message CM_FONTCHANGED;
+      procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+      procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+      procedure CMParentColorChanged(var Msg: TMessage); message
+          CM_PARENTCOLORCHANGED;
+      procedure CMParentFontChanged(var Msg: TMessage); message CM_PARENTFONTCHANGED;
+      procedure DrawBackground(DC: HDC; R: TRect);
+      procedure DrawBackgroundEx(DC: HDC; R, SubR: TRect);
+      procedure DrawFlatBorder(DC: HDC; HDragging, VDragging : boolean);
+      procedure DrawParentControl(DC: HDC);
+      procedure DrawParentControlEx(DC: HDC; R: TRect);
+      procedure HintWndProc(var Message: TMessage);
+      procedure ImageFormChange(Sender : TObject);
+      procedure IntMouseMove(XPos, YPos : SmallInt);
+      procedure LBGetTopIndex(var Msg: TMessage); message LB_GETTOPINDEX;
+      procedure OnLineHintTimer(Sender : TObject);
+      procedure ResetHorizontalExtent;
+      procedure SelectedFontChanged(Sender: TObject);
+      procedure WMEraseBkgnd(var Msg: TWMEraseBkgnd); message WM_ERASEBKGND;
+      procedure WMHScroll(var Message: TMessage); message WM_HSCROLL;
+      procedure WMKillFocus(var Msg: TMessage); message WM_KILLFOCUS;
+      procedure WMMouseMove(var Message: TWMMouseMove); message WM_MOUSEMOVE;
+      procedure WMNCCalcSize(var Message : TWMNCCalcSize); message WM_NCCALCSIZE;
+      procedure WMNCMouseMove(var Message: TMessage); message WM_NCMOUSEMOVE;
+      procedure WMPaint(var Msg: TWMPaint); message WM_PAINT;
+      procedure WMSetFocus(var Msg: TMessage); message WM_SETFOCUS;
+      procedure WMVScroll(var Message: TMessage); message WM_VSCROLL;
+      procedure WMWindowPosChanged(var Message: TWMWindowPosChanged); message
+          WM_WINDOWPOSCHANGED;
+      procedure ResetHorizontalExtent1;
+      procedure SetHorizontalExtent;
+      procedure SetColumnWidth;
+      procedure CMCtl3DChanged(var Message: TMessage); message CM_CTL3DCHANGED;
+      procedure CNCommand(var Message: TWMCommand); message CN_COMMAND;
+      procedure CNDrawItem(var Message: TWMDrawItem); message CN_DRAWITEM;
+      procedure WMLButtonDown(var Message: TWMLButtonDown); message WM_LBUTTONDOWN;
+      procedure WMSize(var Message: TWMSize); message WM_SIZE;
+      function GetItemHeight: Integer;
+      function GetItemIndex: Integer;
+      function GetSelCount: Integer;
+      function GetSelected(Index: Integer): Boolean;
+      function GetTopIndex: Integer;
+      procedure SetBorderStyle(Value: TBorderStyle);
+      procedure SetColumns(Value: Integer);
+      procedure SetExtendedSelect(Value: Boolean);
+      procedure SetIntegralHeight(Value: Boolean);
+      procedure SetItemHeight(Value: Integer);
+      procedure SetItemIndex(Value: Integer);
+      procedure SetItems(Value: TElFStrings);
+      procedure SetMultiSelect(Value: Boolean);
+      procedure SetSelected(Index: Integer; Value: Boolean);
+      procedure SetSorted(Value: Boolean);
+      procedure SetTabWidth(Value: Integer);
+      procedure SetTopIndex(Value: Integer);
+
+      function GetBackground: TBitmap; virtual;
+      procedure SetLineBorderActiveColor(Value: TColor);
+      procedure SetLineBorderInactiveColor(Value: TColor);
+      procedure SetUseXPThemes(Value: Boolean);
+      function CreateHintWindow: TElHintWindow; virtual;
+      procedure CreateParams(var Params: TCreateParams); override;
+      procedure CreateThemeHandle; virtual;
+      procedure CreateWnd; override;
+      procedure DestroyWnd; override;
+      {$ifndef VCL_5_USED}
+      procedure DrawItem(Index: Integer; R: TRect; State: TOwnerDrawState);
+      {$else}
+      procedure DrawItem(Index: Integer; R: TRect; State: Windows.TOwnerDrawState);
+      {$endif}
+      procedure FreeThemeHandle; virtual;
+      function GetItemWidth(Index: Integer): Integer; virtual;
+      function GetParentCtlHeight: Integer; virtual;
+      function GetParentCtlWidth: Integer; virtual;
+      function GetThemedClassName: WideString;
+      procedure IFMRepaintChildren(var Message: TMessage); message 
+          IFM_REPAINTCHILDREN;
+      function IsThemeApplied: Boolean;
+      procedure Loaded; override;
+      procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+      function RealScreenToClient(APoint : TPoint): TPoint; virtual;
+      procedure WMNCPaint(var Msg : TMessage); message WM_NCPAINT;
+      procedure WMThemeChanged(var Message: TMessage); message WM_THEMECHANGED;
+      procedure WndProc(var Message: TMessage); override;
+      function InternalGetItemData(Index: Integer): LongInt; dynamic;
+      procedure InternalSetItemData(Index: Integer; AData: Longint); dynamic;
+      function GetItemData(Index: Integer): LongInt; dynamic;
+      procedure SetItemData(Index: Integer; AData: LongInt); dynamic;
+      procedure ResetContent; dynamic;
+      procedure DeleteString(Index: Integer); dynamic;
+      procedure SetShowCheckBox(Value: Boolean);
+      function GetState(Index: Integer): TCheckBoxState;
+      procedure SetState(Index: Integer; Value: TCheckBoxState);
+      function GetCheckBoxSize: TSize;
+      procedure SetAllowGrayed(Value: Boolean);
+      procedure DrawFlatFrame(Canvas : TCanvas; R : TRect);
+      procedure OnImageListChange(Sender : TObject);
+      procedure SetImages(newValue : TImageList);
+      procedure AdjustItemHeight; virtual;
+      function GetImageIndex(Index: Integer): Integer;
+      procedure SetImageIndex(Index: Integer; Value: Integer);
+      procedure SetStatesSize(aSize : integer);
+      procedure SetImagesSize(aSize : integer);
+
+      {$ifndef CLX_USED}
+      procedure CMHintShow(var Message: TMessage); message CM_HINTSHOW;
+      {$else}
+      function HintShow(var HintInfo : THintInfo): Boolean; override;
+      {$endif}
+      {$ifdef ELPACK_UNICODE}
+      procedure SetHint(Value: WideString);
+      {$endif}
+      procedure ItemsChange(Sender : TObject);
+
+      property BorderStyle: TBorderStyle read FBorderStyle write SetBorderStyle
+          default bsSingle;
+      property Columns: Integer read FColumns write SetColumns default 0;
+      property ExtendedSelect: Boolean read FExtendedSelect write SetExtendedSelect
+          default True;
+      property IntegralHeight: Boolean read FIntegralHeight write SetIntegralHeight
+          default False;
+      property ItemHeight: Integer read GetItemHeight write SetItemHeight;
+      property MultiSelect: Boolean read FMultiSelect write SetMultiSelect default
+          False;
+      property ParentColor default False;
+      property Sorted: Boolean read FSorted write SetSorted default False;
+      property TabWidth: Integer read FTabWidth write SetTabWidth default 0;
+      property ItemIndex: Integer read GetItemIndex write SetItemIndex;
+      {$ifdef ELPACK_UNICODE}
+      property Items: TElWideStrings read FListBoxStrings write SetItems;
+      {$else}
+      property Items: TStrings read FListBoxStrings write SetItems;
+      {$endif}
+      property SelCount: Integer read GetSelCount;
+      property TopIndex: Integer read GetTopIndex write SetTopIndex;
+
+      property ActiveBorderType: TElFlatBorderType read FActiveBorderType write
+          SetActiveBorderType default fbtSunken;
+      property Background: TBitmap read GetBackground write SetBackground;
+      property BorderSides: TElBorderSides read FBorderSides write SetBorderSides;
+      property Flat: Boolean read FFlat write SetFlat default False;
+      property FlatFocusedScrollBars: Boolean read FFlatFocusedScrollBars write 
+          SetFlatFocusedScrollBars default False;
+      property HorizontalScroll: Boolean read FHorizontalScroll write 
+          SetHorizontalScroll;
+      property ImageForm: TElImageForm read FImgForm write SetImageForm;
+      property InactiveBorderType: TElFlatBorderType read FInactiveBorderType write 
+          SetInactiveBorderType default fbtSunkenOuter;
+      property InvertSelection: Boolean read FInvertSelection write 
+          SetInvertSelection default False;
+      property LineBorderActiveColor: TColor read FLineBorderActiveColor write 
+          SetLineBorderActiveColor;
+      property LineBorderInactiveColor: TColor read FLineBorderInactiveColor write 
+          SetLineBorderInactiveColor;
+      property SelectedColor: TColor read FSelectedColor write SetSelectedColor
+          default clHighlight;
+      property SelectedFont: TFont read FSelectedFont write SetSelectedFont;
+      property ShowLineHint: Boolean read FShowLineHint write FShowLineHint default
+          false;
+      property Transparent: Boolean read FTransparent write SetTransparent default
+          False;
+      property TransparentSelection: Boolean read FTransparentSelection write
+          SetTransparentSelection default false;
+      property UseBackground: Boolean read FUseBackground write SetUseBackground
+          default False;
+      property UseXPThemes: Boolean read FUseXPThemes write SetUseXPThemes default
+          true;
+      property TabStop default True;
+      property ShowCheckBox: Boolean read FShowCheckBox write SetShowCheckBox default 
+          false;
+      property AllowGrayed: Boolean read FAllowGrayed write SetAllowGrayed default 
+          true;
+      property Images: TImageList read FImages write SetImages;
+    public
+      constructor Create(AOwner : TComponent); override;
+      destructor Destroy; override;
+      function ItemAtPos(Pos: TPoint; Existing: Boolean): Integer;
+      function ItemRect(Index: Integer): TRect;
+      property Theme: HTheme read FTheme;
+      property Canvas: TCanvas read FCanvas;
+      property Selected[Index: Integer]: Boolean read GetSelected write SetSelected;
+      property State[Index: Integer]: TCheckBoxState read GetState write SetState;
+      property ImageIndex[Index: Integer]: Integer read GetImageIndex write
+          SetImageIndex;
+    published
+      {$ifdef ELPACK_UNICODE}
+      property Hint: WideString read FHint write SetHint;
+      {$endif}
+    end;
+
+    TElListBox = class(TCustomElListBox)
+
+      property AllowGrayed;
+      property BorderStyle;
+      property Columns;
+      property ExtendedSelect;
+      property IntegralHeight;
+      property ItemHeight;
+      property MultiSelect;
+      property ParentColor;
+      property Sorted;
+      property TabWidth;
+      property ItemIndex;
+      property Items;
+      property SelCount;
+      property TopIndex;
+      property ShowCheckBox;
+
+      property ActiveBorderType;
+      property Background;
+      property BorderSides;
+      property Flat;
+      property Ctl3D;
+      property ParentCtl3D;
+      property Font;
+      property FlatFocusedScrollBars;
+      property HorizontalScroll;
+      property Images;
+      property ImageForm;
+      property InactiveBorderType;
+      property InvertSelection;
+      property LineBorderActiveColor;
+      property LineBorderInactiveColor;
+      property SelectedColor;
+      property SelectedFont;
+      property ShowLineHint;
+      property Transparent;
+      property TransparentSelection;
+      property UseBackground;
+      property UseXPThemes;
+      property TabStop;
+      property ParentFont;
+
+      property OnClick;
+      {$ifdef VCL_5_USED}
+      property OnContextPopup;
+      {$endif}
+      property OnDblClick;
+      property OnDragDrop;
+      property OnDragOver;
+      {$ifdef VCL_4_USED}
+      property OnEndDock;
+      {$endif}
+      property OnEndDrag;
+      property OnEnter;
+      property OnExit;
+      property OnKeyDown;
+      property OnKeyPress;
+      property OnKeyUp;
+      property OnMouseDown;
+      property OnMouseMove;
+      property OnMouseUp;
+      {$ifdef VCL_4_USED}
+      property OnStartDock;
+      {$endif}
+      property OnStartDrag;
+
+
+      property Align;
+      {$ifdef VCL_4_USED}
+      property Anchors;
+      property BiDiMode;
+      {$endif}
+      property Color;
+      {$ifdef VCL_4_USED}
+      property Constraints;
+      {$endif}
+      property DragCursor;
+      {$ifdef VCL_4_USED}
+      property DragKind;
+      {$endif}
+      property DragMode;
+      property Enabled;
+      {$ifdef VCL_4_USED}
+      property ImeMode;
+      property ImeName;
+      property ParentBiDiMode;
+      {$endif}
+      property ParentShowHint;
+      property PopupMenu;
+      property ShowHint;
+      property TabOrder;
+      property Visible;
+    end;
+
+implementation
+end.

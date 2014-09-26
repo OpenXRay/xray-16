@@ -1,0 +1,124 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+{$r ElFontCombo.res}
+
+(*
+
+Version History
+
+04/02/2002
+
+  Added fsmNoSample sample mode to prevent the control from drawing text using the selected font
+  Increased speed of component loading
+
+09/26/2001
+
+  Made SampleText property Unicode (optionally)
+  Improved size calculation
+  Added XP styles when drawing text
+
+*)
+
+unit ElFontCombo;
+
+interface
+
+uses Windows,
+     Graphics,
+     Printers,
+     StdCtrls,
+
+     SysUtils,
+     Classes,
+
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+     ElTools,
+     ElStrUtils,
+     ElVCLUtils,
+     ElTmSchema,
+     ElUxTheme,
+     ElACtrls;
+
+type
+
+    TElFontSampleMode = (fsmFontName, fsmFontSample, fsmBoth, fsmNoSample);
+
+    TElFontDevice = (efdScreen, efdPrinter, efdBoth);
+
+    TElFontComboOption = (foAnsiOnly, foTrueTypeOnly, foIncludeOEMFonts,
+                          foIncludeSymbolFonts, foOEMFontsOnly,
+                          foScalableOnly);
+
+    TElFontComboOptions = set of TElFontComboOption;
+
+    TElFontComboBox = class(TElAdvancedComboBox)
+    protected
+      FOptions: TElFontComboOptions;
+      FSampleText: TElFString;
+      FFontPitch : TFontPitch;
+      FSampleMode: TElFontSampleMode;
+      FFontDevice: TElFontDevice;
+      FFontName  : string;
+      FFakeInt   : Integer;
+      
+      procedure SetFontName(Value: TFontName);
+      procedure SetOptions(Value: TElFontComboOptions);
+      procedure SetSampleText(Value: TElFString);
+      procedure SetFontPitch(Value: TFontPitch);
+      procedure SetSampleMode(Value: TElFontSampleMode);
+      procedure CreateWnd; override;
+      function GetItemText(index : integer): TElFString;
+      function GetItemWidth(Index: Integer): Integer; override;
+
+      {$ifndef CLX_USED}
+      procedure MeasureItem(Index: Integer; var Height: Integer); override;
+      procedure DrawItem(Index: Integer; Rect: TRect; State: TOwnerDrawState); override;
+      {$else}
+      procedure MeasureItem(Control: TWinControl; Index: Integer;
+        var Height, Width: Integer); override;
+      function DrawItem(Index: Integer; Rect: TRect;
+        State: TOwnerDrawState): Boolean; override;
+      {$endif}
+      procedure SetFontDevice(Value: TElFontDevice);
+
+      procedure AddFont(Font : TFontName; FontType : integer);
+      function GetFontName: TFontName;
+      procedure Loaded; override;
+    public
+      procedure RebuildFontList;
+      constructor Create(AOwner : TComponent); override;
+      destructor Destroy; override;
+
+    published
+      property Items : integer read FFakeInt;
+      property Style : integer read FFakeInt;
+      property Text : integer read FFakeInt;
+
+      property FontName: TFontName read GetFontName write SetFontName;
+      property Options: TElFontComboOptions read FOptions write SetOptions;
+      property SampleText: TElFString read FSampleText write SetSampleText;
+      property FontPitch: TFontPitch read FFontPitch write SetFontPitch;
+      property SampleMode: TElFontSampleMode read FSampleMode write SetSampleMode;
+      property FontDevice: TElFontDevice read FFontDevice write SetFontDevice;
+    end;
+
+implementation
+end.

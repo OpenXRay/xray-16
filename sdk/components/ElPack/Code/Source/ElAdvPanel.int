@@ -1,0 +1,369 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+{$r ElAdvPanel.res}
+
+(*
+
+Version History
+
+12/27/2001
+
+  Now one can correctly set glyphs for Minimize button -- 2 images in one bitmap
+  in format suitable for imagelist
+  
+11/22/2001
+
+  Link* properties now change settings for caption too
+
+10/29/2001
+
+  Fixed the problem with incorrect OnRestore event invokation when the panel is resized.
+
+10/27/2001
+
+  InvertMinButtonArrows property now does really work correctly when the for is just loade :)
+
+10/25/2001
+
+  When panel is saved as minimized, there was no way to restore it in run-time. 
+  Fixed.
+
+10/21/2001
+
+  Clicks on caption links were not processed. Fixed.
+
+10/19/2001
+
+  InvertMinButtonArrows property now works correctly when the for is just loaded.
+
+10/06/2001
+
+  InvertMinButtonArrows property added. 
+  Caption rectangle is inflated by BevelWidth size now
+
+09/26/2001
+
+  Fixed caption sizing when bevel size is > 0.
+
+09/17/2001
+
+  Default caption alignment taCenter was not set properly. Fixed.
+  OnClose event was mapped to OnRestore event handler. Fixed.
+
+*)
+
+unit ElAdvPanel;
+
+interface
+
+uses
+
+  SysUtils,
+  Classes,
+
+  ElPanel,
+  ElPopBtn,
+  ElVCLUtils,
+  ElHTMLPanel,
+  ElTools,
+  ElImgFrm,
+  ElStrUtils,
+  ElUxTheme,
+  ElTmSchema,
+
+  {$ifdef VCL_4_USED}
+  ImgList,
+  {$endif}
+  Windows,
+  Graphics,
+  Controls,
+  StdCtrls,
+  Forms,
+  Menus,
+  ExtCtrls,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  Messages;
+
+type
+
+  TCustomElAdvancedPanel = class;
+  TElAdvCaptionButton = class;
+  TElAdvCaptionPanel = class;
+  
+  TElPanelCaptionSettings = class(TPersistent)
+  private
+    FVisible: Boolean;
+    FHeight: Integer;
+    FShowCloseButton: Boolean;
+    FOwner: TCustomElAdvancedPanel;
+    FShowMinButton: Boolean;
+    FFlatButtons: Boolean;
+    FButtonWidth: Integer;
+    FAlignment: TAlignment;
+    FLayout: TTextLayout;
+    FButtonColor: TColor;
+    procedure SetText(Value: TElFString);
+    procedure SetVisible(Value: Boolean);
+    procedure SetHeight(Value: Integer);
+    procedure SetShowCloseButton(Value: Boolean);
+    procedure SetShowMinButton(Value: Boolean);
+    procedure SetFlatButtons(Value: Boolean);
+    function GetText: TElFString;
+    procedure SetButtonWidth(Value: Integer);
+    procedure SetAlignment(Value: TAlignment);
+    procedure SetLayout(newValue: TTextLayout);
+    function GetFont: TFont;
+    procedure SetFont(Value: TFont);
+    function GetParentFont: Boolean;
+    procedure SetParentFont(Value: Boolean);
+    function GetColor: TColor;
+    procedure SetColor(Value: TColor);
+    procedure SetButtonColor(Value: TColor);
+    function GetImageForm: TElImageForm;
+    procedure SetImageForm(Value: TElImageForm);
+  protected
+    FInvertMinButtonArrows: Boolean;
+    FAutoSize: Boolean;
+    function GetMinButtonGlyph: TBitmap;
+    procedure SetMinButtonGlyph(Value: TBitmap);
+    function GetCloseButtonGlyph: TBitmap;
+    procedure SetCloseButtonGlyph(Value: TBitmap);
+    procedure SetInvertMinButtonArrows(Value: Boolean);
+    procedure SetAutoSize(Value: Boolean);
+    procedure FontChanged;
+    procedure AdjustHeight;
+  public
+    constructor Create(Owner : TCustomElAdvancedPanel);
+  published
+    property Text: TElFString read GetText write SetText;
+    property Visible: Boolean read FVisible write SetVisible default true;
+    property Height: Integer read FHeight write SetHeight default 19;
+    property ShowCloseButton: Boolean read FShowCloseButton write
+        SetShowCloseButton nodefault;
+    property ShowMinButton: Boolean read FShowMinButton write SetShowMinButton default true;
+    property FlatButtons: Boolean read FFlatButtons write SetFlatButtons default true;
+    property ButtonWidth: Integer read FButtonWidth write SetButtonWidth default 15;
+    property Alignment: TAlignment read FAlignment write SetAlignment default
+        taCenter;
+    property Layout: TTextLayout read FLayout write SetLayout default tlCenter;
+    property Font: TFont read GetFont write SetFont;
+    property ParentFont: Boolean read GetParentFont write SetParentFont;
+    property Color: TColor read GetColor write SetColor;
+    property ButtonColor: TColor read FButtonColor write SetButtonColor default
+        clBtnFace;
+    property ImageForm: TElImageForm read GetImageForm write SetImageForm;
+    property MinButtonGlyph: TBitmap read GetMinButtonGlyph write SetMinButtonGlyph;
+    property CloseButtonGlyph: TBitmap read GetCloseButtonGlyph write
+        SetCloseButtonGlyph;
+    property InvertMinButtonArrows: Boolean read FInvertMinButtonArrows write
+        SetInvertMinButtonArrows default false;
+    property AutoSize: Boolean read FAutoSize write SetAutoSize;
+  end;
+
+  TCustomElAdvancedPanel = class(TCustomElHTMLPanel)
+  private
+    procedure SetCaptionSettings(Value: TElPanelCaptionSettings);
+    procedure WMNCHitTest(var Msg : TMessage); message WM_NCHITTEST;
+  protected
+    FMinButtonGlyph: TBitmap;
+    FImages     : TImageList;
+    FSaveHeight : Integer;
+    FMinimized: Boolean;
+    FCaptionPanel: TElHTMLPanel;
+    FCaptionSettings: TElPanelCaptionSettings;
+    FMinButton: TElGraphicButton;
+    FCloseButton: TElGraphicButton;
+    FOnMinimize: TNotifyEvent;
+    FOnRestore: TNotifyEvent;
+    FOnClose: TNotifyEvent;
+
+    procedure SetLinkPopupMenu(newValue : TPopupMenu); override;
+    procedure SetLinkColor(newValue : TColor); override;
+    procedure SetLinkStyle(newValue : TFontStyles); override;
+
+    procedure WMSize(var Message: TMessage); message WM_SIZE;
+    procedure TriggerMinimizeEvent; virtual;
+    procedure TriggerRestoreEvent; virtual;
+    procedure AdjustButtonSize;
+    procedure OnCaptionSize(Sender : TObject);
+    procedure OnMinButtonClick(Sender : TObject);
+    procedure OnCloseButtonClick(Sender : TObject);
+    procedure TriggerCloseEvent; virtual;
+    procedure AdjustClientRect(var Rect: TRect); override;
+    procedure CreateWnd; override;
+    procedure LinkClickEventTransfer(Sender : TObject; HRef : TElFString);
+    procedure SetImageForm(newValue : TElImageForm); override;
+    procedure SetUseXPThemes(const Value: Boolean); override;
+    procedure AdjustInnerSize(var R : TRect); virtual;
+    function GetBevelAdjustment: Integer;
+    procedure UpdateMinButtonImages;
+    procedure Loaded; override;
+    procedure DefineProperties(Filer: TFiler); override;
+    procedure ReadExpHeight(Reader : TReader);
+    procedure WriteExpHeight(Writer : TWriter);
+    procedure SetTransparentXPThemes(Value: Boolean); override;
+    function CreateButton: TElAdvCaptionButton; virtual;
+    procedure SetMinimized(Value: Boolean); virtual;
+    function CreatePanel: TElAdvCaptionPanel; virtual;
+    function GetThemePartID: Integer; virtual;
+    procedure UpdateInterior; override;
+    procedure WMSetFocus(var Message: TMessage); message WM_SETFOCUS;
+
+    property Minimized: Boolean read FMinimized write SetMinimized default false;
+    property CaptionSettings: TElPanelCaptionSettings read FCaptionSettings write SetCaptionSettings;
+    property OnMinimize: TNotifyEvent read FOnMinimize write FOnMinimize;
+    property OnRestore: TNotifyEvent read FOnRestore write FOnRestore;
+    property OnClose: TNotifyEvent read FOnClose write FOnClose;
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    function GetCaptionHeight: Integer; virtual;
+    function GetButtonWidth: Integer; virtual;
+  end;
+
+  TElAdvancedPanel = class(TCustomElAdvancedPanel)
+  published
+    property OnImageNeeded;
+    property OnLinkClick;
+    property Cursor;
+    property LinkColor;
+    property LinkPopupMenu;
+    property LinkStyle;
+
+    property Background;
+    property BackgroundType;
+    property GradientEndColor;
+    property GradientStartColor;
+    property GradientSteps;
+    property Alignment;
+    property Layout;
+    property ImageForm;
+    property TopGrabHandle;
+    property RightGrabHandle;
+    property LeftGrabHandle;
+    property BottomGrabHandle;
+
+    property Resizable;
+    property Movable;
+    property OnMove;
+
+    property Align nodefault;
+    property BevelInner nodefault;
+    property BevelOuter nodefault;
+    property BevelSpaceColor nodefault;
+    property BevelWidth;
+    property BorderStyle;
+    property BorderWidth;
+    property Canvas;
+    property Color;
+{$ifdef MSWINDOWS}
+    property DragCursor;
+{$endif}
+    property DragMode;
+    property Enabled;
+    property Font;
+{$ifdef MSWINDOWS}
+    property Locked;
+    property MouseCapture;
+{$endif}
+    property ParentColor;
+{$ifdef MSWINDOWS}
+    property ParentCtl3D;
+{$endif}
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property TabStop;
+    property Transparent;
+    property TransparentXPThemes;
+    property UseXPThemes;
+    property Visible;
+    property SizeGrip;
+
+    property Caption;
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnResize;
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Action;
+    property Constraints;
+{$ifdef MSWINDOWS}
+    property DockOrientation;
+    property Floating;
+    property BevelKind;
+    property DoubleBuffered;
+    property DragKind;
+{$endif}
+{$ENDIF}
+
+    property Minimized;
+    property CaptionSettings;
+    property OnMinimize;
+    property OnRestore;
+    property OnClose;
+  end;
+
+  TElAdvCaptionPanel = class(TElHTMLPanel)
+  private
+    FDummyInt : integer;
+    FDummyBool: boolean;
+    procedure WMNCHitTest(var Msg : TMessage); message WM_NCHITTEST;
+  protected
+    procedure CreateWnd; override;
+    procedure AdjustClientRect(var Rect: TRect); override;
+    procedure SetImageForm(newValue : TElImageForm); override;
+    procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
+    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    procedure WMKillFocus(var Message: TMessage); message WM_KILLFOCUS;
+    procedure WMSetFocus(var Message: TMessage); message WM_SETFOCUS;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); 
+        override;
+  public
+    constructor Create(AOwner : TComponent); override;
+  published
+    property TabStop : boolean write FDummyBool;
+    property TabOrder: integer write FDummyInt;
+  end;
+
+  TElAdvCaptionButton = class(TElGraphicButton)
+  protected
+    procedure DrawThemedBackground(Canvas : TCanvas); override;
+  public
+    constructor Create(AOwner : TComponent); override;
+  end;
+
+implementation
+end.

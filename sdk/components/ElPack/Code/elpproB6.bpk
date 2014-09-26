@@ -1,0 +1,137 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.06.00"/>
+    <PROJECT value="elpproB6.bpl"/>
+    <OBJFILES value="Source\ElShellCtl.obj Source\ElPrinter.obj Source\ElTreePrinter.obj \
+           Source\ElPrinterPreview.obj elpproB6.obj"/>
+    <RESFILES value="elpproB6.res"/>
+    <IDLFILES value=""/>
+    <IDLGENFILES value=""/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES) Source\ElPrinterPreview.dfm"/>
+    <LIBFILES value=""/>
+    <LIBRARIES value=""/>
+    <SPARELIBS value="Vcl.lib rtl.lib"/>
+    <PACKAGES value="rtl.bpi vclx.bpi VCL.bpi ElPackB6.bpi"/>
+    <PATHCPP value=".;"/>
+    <PATHPAS value=".;Source"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
+    <RELEASELIBPATH value="$(BCB)\lib\release"/>
+    <LINKER value="ilink32"/>
+    <USERDEFINES value=""/>
+    <SYSDEFINES value="NO_STRICT;_RTLDLL;_VIS_NOLIB;USEPACKAGES"/>
+    <MAINSOURCE value="elpproB6.cpp"/>
+    <INCLUDEPATH value="source;$(BCB)\include;$(BCB)\include\vcl"/>
+    <LIBPATH value="source;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\lib\release"/>
+    <WARNINGS value="-w-par -w-8027 -w-8026"/>
+    <WARNOPTSTR value=""/>
+  </MACROS>
+  <OPTIONS>
+    <IDLCFLAGS value="-Isource -I$(BCB)\include -I$(BCB)\include\vcl -src_suffix cpp -boa"/>
+    <CFLAG1 value="-O2 -H=$(BCB)\lib\vcl.csm -Hc -Vx -Ve -Tkh30000 -X- -a8 -4 -b- -k- -vi 
+      -c -tWM"/>
+    <PFLAGS value="-N2source -N0source -$Y- -$L- -$I- -$D- -$C- -v -M -JPHNE"/>
+    <RFLAGS value=""/>
+    <AFLAGS value="/mx /w2 /zn"/>
+    <LFLAGS value="-Isource -D&quot;EldoS Professional Components&quot; -aa -Tpp -Gpr -x -Gn -Gl -Gi"/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="c0pkg32.obj $(PACKAGES) Memmgr.Lib sysinit.obj $(OBJFILES)"/>
+    <ALLRES value="$(RESFILES)"/>
+    <ALLLIB value="$(LIBFILES) $(LIBRARIES) import32.lib cp32mti.lib"/>
+  </LINKER>
+  <FILELIST>
+      <FILE FILENAME="elpproB6.cpp" FORMNAME="" UNITNAME="elpproB6" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="elpproB6.res" FORMNAME="" UNITNAME="elpproB6" CONTAINERID="ResTool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="vclx.bpi" FORMNAME="" UNITNAME="vclx" CONTAINERID="BPITool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="VCL.bpi" FORMNAME="" UNITNAME="VCL" CONTAINERID="BPITool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="rtl.bpi" FORMNAME="" UNITNAME="rtl" CONTAINERID="BPITool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="ElPackB6.bpi" FORMNAME="" UNITNAME="ElPackB6" CONTAINERID="BPITool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElShellCtl.pas" FORMNAME="" UNITNAME="ElShellCtl" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElPrinter.pas" FORMNAME="" UNITNAME="ElPrinter" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTreePrinter.pas" FORMNAME="" UNITNAME="ElTreePrinter" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElPrinterPreview.pas" FORMNAME="ElPrinterPreviewDlg" UNITNAME="ElPrinterPreview" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+  </FILELIST>
+  <BUILDTOOLS>
+  </BUILDTOOLS>
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=1
+AutoIncBuild=0
+MajorVer=3
+MinorVer=0
+Release=0
+Build=0
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=1
+Locale=1033
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=EldoS
+FileDescription=
+FileVersion=3.0.0.0
+InternalName=elppro
+LegalCopyright=(c) 1998-2001, EldoS
+LegalTrademarks=
+OriginalFilename=
+ProductName=elppro
+ProductVersion=3.0.0.0
+Comments=
+
+[HistoryLists\hlIncludePath]
+Count=3
+
+[HistoryLists\hlLibraryPath]
+Count=6
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlConditionals]
+Count=1
+Item0=_RTLDLL;USEPACKAGES
+
+[HistoryLists\hlIntOutputDir]
+Count=3
+
+[HistoryLists\hlFinalOutputDir]
+Count=4
+
+[HistoryLists\hIBPIOutputDir]
+Count=3
+
+[Debugging]
+DebugSourceDirs=
+
+[Parameters]
+RunParams=
+HostApplication=
+RemoteHost=
+RemotePath=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=0
+LinkCGLIB=0
+
+[CORBA]
+AddServerUnit=1
+AddClientUnit=1
+PrecompiledHeaders=1
+
+[Language]
+ActiveLang=
+ProjectLang=
+RootDir=
+  </IDEOPTIONS>
+</PROJECT>

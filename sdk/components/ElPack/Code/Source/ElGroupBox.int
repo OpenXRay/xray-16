@@ -1,0 +1,346 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+03/11/2002
+
+  In HTML mode font name is set correctly now
+  Flicker reduced with XP themes enabled
+
+11/28/2001
+
+  Added MoneyFlat and accompanying properties
+
+11/09/2001
+
+  Transparency fixed
+
+11/01/2001
+
+  AutoDisableChildren property added. If it is true, children get disabled
+  automatically if checkbox is unchecked, and enabled if checkbox is checked.  
+
+10/28/2001
+
+  Changing Enabled state didn't repaint the group box. Fixed.
+
+10/22/2001
+
+  Fixed painting of background with XP styles enabled 
+
+09/17/2001
+
+  Added Windows XP Themes Support 
+
+09/08/2001
+
+  Added missing Unicode support
+
+*)
+
+unit ElGroupBox;
+
+interface
+
+uses
+  SysUtils,
+  Classes,
+  {$ifndef CLX_USED}
+  Stdctrls,
+  Messages,
+  Controls,
+  Windows,
+  Graphics,
+  ElImgFrm,
+  ExtCtrls,
+  Forms,
+  {$ifdef VCL_4_USED}
+  ImgList,
+  {$endif}
+  {$else}
+  {$ifdef MSWINDOWS}
+  Windows,
+  {$endif}
+  QForms,
+  QStdCtrls,
+  QControls,
+  QGraphics,
+  QTypes,
+  Qt,
+  Types,
+  QImgList,
+  ElCLXUtils,
+  {$endif}
+  ElList,
+  ElPanel,
+  ElVCLUtils,
+  HTMLRender,
+  ElTools,
+  ElTmSchema,
+  ElUxTheme,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  {$ifdef USE_SOUND_MAP}
+  ElSndMap,
+  {$endif}
+  ElCheckCtl;
+
+type
+
+  TCustomElGroupBox = class(TCustomElPanel)
+  protected
+    FReading  : Boolean;
+  {$ifdef HAS_HTML_RENDER}
+    FRender   : TElHTMLRender;
+    FIsHTML: Boolean;
+  {$endif}
+    FBorderSides: TElBorderSides;
+    FCheckRect  : TRect;
+    {$ifdef USE_SOUND_MAP}
+    FCheckSound: TElSoundName;
+    {$endif}
+    FGlyph: TBitmap;
+    FImages: TImageList;
+    {$ifdef USE_SOUND_MAP}
+    FSoundMap: TElSoundMap;
+    {$endif}
+    FUseCustomGlyphs: Boolean;
+    FUseImageList: Boolean;
+    FChLink: TChangeLink;
+    FShowCheckBox: Boolean;
+    FCheckBoxChecked: Boolean;
+    FShowFocus: Boolean;
+    FCaptionColor: TColor;
+    FMouseInCheckBox : boolean;
+    FFlat: Boolean;
+    FFlatAlways: Boolean;
+    FAutoDisableChildren: Boolean;
+    {$ifndef CLX_USED}
+    FMoneyFlat: Boolean;
+    FMoneyFlatInactiveColor: TColor;
+    FMoneyFlatActiveColor: TColor;
+    FMoneyFlatDownColor: TColor;
+    {$endif}
+    procedure SetBorderSides(Value: TElBorderSides);
+    procedure ImagesChanged(Sender: TObject);
+    {$ifdef HAS_HTML_RENDER}
+    procedure SetIsHTML(Value: Boolean); virtual;
+    {$endif}
+    procedure ReadState(Reader: TReader); override;
+    function  CanModify: Boolean; virtual;
+    procedure Paint; override;
+    {$ifdef MSWINDOWS}
+    function GetThemedClassName: WideString; override;
+    {$endif}
+    procedure SetShowCheckBox(Value: Boolean);
+    procedure SetCheckBoxChecked(Value: Boolean); virtual;
+    procedure SetShowFocus(Value: Boolean);
+    procedure SetCaptionColor(Value: TColor);
+    {$ifdef USE_SOUND_MAP}
+    procedure SetCheckSound(Value: TElSoundName); virtual;
+    {$endif}
+    procedure SetGlyph(Value: TBitmap); virtual;
+    {$ifdef USE_SOUND_MAP}
+    procedure SetSoundMap(Value: TElSoundMap); virtual;
+    {$endif}
+    procedure SetUseCustomGlyphs(Value: Boolean); virtual;
+    procedure SetImages(Value: TImageList); virtual;
+    procedure SetUseImageList(Value: Boolean); virtual;
+    procedure Notification(AComponent : TComponent; operation : TOperation); 
+        override;
+    procedure GlyphChange(Sender : TObject); virtual;
+    function GetCheckBoxSize: TSize;
+    procedure DrawGlyph(Canvas : TCanvas; DestRect: TRect; SrcRect: TRect); virtual;
+    procedure SetFlat(newValue : boolean); virtual;
+    {$ifndef CLX_USED}
+    procedure DrawFlatFrame(Canvas : TCanvas; R : TRect);
+    {$endif}
+    procedure MouseDown(Button : TMouseButton; Shift : TShiftState; X, Y : Integer);
+        override;
+    procedure MouseUp(Button : TMouseButton; Shift : TShiftState; X, Y : Integer); 
+        override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+    procedure KeyDown(var Key : Word; Shift : TShiftState); override;
+    procedure AdjustClientRect(var Rect: TRect); override;
+    function GetTopOffset: Integer;
+    {$ifdef CLX_USED}
+    function WidgetFlags: Integer; override;
+    procedure DoEnter; override;
+    procedure DoExit; override;
+    {$endif}
+    {$ifndef CLX_USED}
+    procedure WMEraseBkGnd(var Msg : TWMEraseBkGnd); message WM_ERASEBKGND;
+    procedure CMMouseLeave(var Msg : TMessage); message CM_MOUSELEAVE;
+    procedure CMEnter(var Msg : TCMEnter); message CM_ENTER;
+    procedure CMExit(var Msg : TCMExit); message CM_EXIT;
+    {$endif}
+    procedure SetFlatAlways(Value: Boolean);
+    function GetCaptionRect: TRect;
+    function GetCheckRect: TRect;
+    function GetLineTopOffset: Integer;
+    {$ifndef CLX_USED}
+    procedure CMEnabledChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
+    {$else}
+    procedure EnabledChanged; override;
+    {$endif}
+    procedure SetAutoDisableChildren(Value: Boolean);
+    {$ifndef CLX_USED}
+    procedure SetMoneyFlat(Value: Boolean);
+    procedure SetMoneyFlatInactiveColor(Value: TColor); virtual;
+    procedure SetMoneyFlatActiveColor(Value: TColor); virtual;
+    procedure SetMoneyFlatDownColor(Value: TColor); virtual;
+    function GetMoneyFlat: Boolean;
+    {$endif}
+
+    {$ifdef HAS_HTML_RENDER}
+    property IsHTML: Boolean read FIsHTML write SetIsHTML default false;
+    {$endif}
+    property BorderSides: TElBorderSides read FBorderSides write SetBorderSides;
+    property ShowCheckBox: Boolean read FShowCheckBox write SetShowCheckBox
+        default false;
+    property CheckBoxChecked: Boolean read FCheckBoxChecked write
+        SetCheckBoxChecked default true;
+    property ShowFocus: Boolean read FShowFocus write SetShowFocus;
+    property CaptionColor: TColor read FCaptionColor write SetCaptionColor default
+        clNone;
+    {$ifdef USE_SOUND_MAP}
+    property CheckSound: TElSoundName read FCheckSound write SetCheckSound;
+    {$endif}
+    property Glyph: TBitmap read FGlyph write SetGlyph;
+    property Images: TImageList read FImages write SetImages;
+    {$ifdef USE_SOUND_MAP}
+    property SoundMap: TElSoundMap read FSoundMap write SetSoundMap;
+    {$endif}
+    property UseCustomGlyphs: Boolean read FUseCustomGlyphs write
+        SetUseCustomGlyphs default false;
+    property UseImageList: Boolean read FUseImageList write SetUseImageList default
+        false;
+    property Flat: Boolean read FFlat write SetFlat;
+    property FlatAlways: Boolean read FFlatAlways write SetFlatAlways;
+    property AutoDisableChildren: Boolean read FAutoDisableChildren write SetAutoDisableChildren;
+    {$ifndef CLX_USED}
+    property MoneyFlat: Boolean read GetMoneyFlat write SetMoneyFlat default false;
+    property MoneyFlatInactiveColor: TColor read FMoneyFlatInactiveColor write SetMoneyFlatInactiveColor stored GetMoneyFlat;
+    property MoneyFlatActiveColor: TColor read FMoneyFlatActiveColor write
+        SetMoneyFlatActiveColor stored GetMoneyFlat;
+    property MoneyFlatDownColor: TColor read FMoneyFlatDownColor write
+        SetMoneyFlatDownColor stored GetMoneyFlat;
+    {$endif}
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
+{$IFDEF VCL_4_USED}
+    procedure FlipChildren(AllLevels: Boolean); override;
+{$ENDIF}
+
+  published
+  end;
+
+  TElGroupBox = class(TCustomElGroupBox)
+    property Align;
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    {$ifndef CLX_USED}
+    property AutoDisableChildren;
+    property BiDiMode;
+    property Constraints;
+    property DragKind;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+    {$endif}
+{$ENDIF}
+    {$ifndef CLX_USED}
+    property BorderSides;
+    {$endif}
+    property Caption;
+    property CaptionColor;
+    property CheckBoxChecked;
+    {$ifdef USE_SOUND_MAP}
+    property CheckSound;
+    {$endif}
+    property Color;
+    {$ifndef CLX_USED}
+    property Ctl3D;
+    property DragCursor;
+    {$endif}
+    property DragMode;
+    property Enabled;
+    property Flat;
+    property FlatAlways;
+    property Font;
+    property Glyph;
+    {$ifndef CLX_USED}
+    property ImageForm;
+    {$endif}
+    property Images;
+    {$ifndef CLX_USED}
+    property MoneyFlat;
+    property MoneyFlatInactiveColor;
+    property MoneyFlatActiveColor;
+    property MoneyFlatDownColor;
+    {$endif}
+  {$ifdef HAS_HTML_RENDER}
+    property IsHTML;
+  {$endif}
+    {$ifndef CLX_USED}
+    property ParentCtl3D;
+    {$endif}
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowCheckBox;
+    property ShowFocus;
+    property ShowHint;
+    {$ifdef USE_SOUND_MAP}
+    property SoundMap;
+    {$endif}
+    property TabOrder;
+    property TabStop;
+    property Transparent;
+    property UseCustomGlyphs;
+    property UseImageList;
+    {$ifdef MSWINDOWS}
+    property UseXPThemes;
+    {$endif}
+    property Visible;
+
+    property OnClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnStartDrag;
+{$IFDEF VCL_5_USED}
+    property OnContextPopup;
+{$ENDIF}
+  end;
+
+implementation
+end.

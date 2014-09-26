@@ -1,0 +1,37 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElUnicodeStrings;
+
+interface
+
+uses Classes,
+     SysUtils,
+     {$ifndef CLX_USED}
+     Consts,
+     {$endif}
+     ElArray,
+     ElTools,
+     {$ifdef VCL_6_USED}
+     RTLConsts,
+     {$endif}
+     ElStrUtils;
+
+{$ifdef BROKEN_UNICODE}
+implementation
+end.

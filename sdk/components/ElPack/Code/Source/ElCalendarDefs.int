@@ -1,0 +1,89 @@
+
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElCalendarDefs;
+
+interface
+
+uses ElTools, Classes, SysUtils,
+     {$ifndef CLX_USED}
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+     Controls
+     {$else}
+     Qt,
+     QControls
+     {$endif}
+     ;
+
+type
+
+  TDayOfWeek = 0..6;
+
+  TElWeekEndDay = (Sun, Mon, Tue, Wed, Thu, Fri, Sat);
+
+  TElWeekEndDays = set of TElWeekEndDay;
+
+  TElHoliday = class(TCollectionItem)
+  private
+    FDescription : string;
+    FFixedDate : Boolean;
+    FDay : Word;
+    FDayOfWeek : Word;
+    FMonth : Word;
+    FIsRest : Boolean;
+    procedure SetFixedDate(newValue : Boolean);
+    procedure SetDay(newValue : Word);
+    procedure SetDayOfWeek(newValue : Word);
+    procedure SetMonth(newValue : Word);
+    procedure SetIsRest(newValue : Boolean);
+  public
+    constructor Create(Collection : TCollection); override;
+    destructor Destroy; override;
+    procedure Assign(Source : TPersistent); override;
+    procedure SaveToStream(Stream : TStream);
+    procedure LoadFromStream(Stream : TStream);
+  published
+    property FixedDate : Boolean read FFixedDate write SetFixedDate default True;
+    property Day : Word read FDay write SetDay;
+    property DayOfWeek : Word read FDayOfWeek write SetDayOfWeek;
+    property Month : Word read FMonth write SetMonth;
+    property IsRest : Boolean read FIsRest write SetIsRest;
+    property Description : string read FDescription write FDescription;
+  end;
+
+  TElHolidays = class(TCollection)
+  private
+    FOwner : TPersistent;
+    function GetItems(Index : integer) : TElHoliday;
+    procedure SetItems(Index : integer; newValue : TElHoliday);
+  protected
+    function GetOwner : TPersistent; override;
+    procedure Update(Item : TCollectionItem); override;
+  public
+    constructor Create(AOwner : TComponent);
+    function Add : TElHoliday;
+    procedure SaveToStream(Stream : TStream);
+    procedure LoadFromStream(Stream : TStream);
+    property Items[Index : integer] : TElHoliday read GetItems write SetItems; default;
+  end;
+
+implementation
+end.

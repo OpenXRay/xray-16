@@ -1,0 +1,181 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+  
+03/06/2002
+
+  Added unicode hint
+
+02/16/2002
+
+  Optimized resource usage on Win9x
+
+08/20/2001
+
+  Improved AutoSize behaviour
+
+07/26/2001
+
+  Added Unicode support
+
+05/27/2001 (c) Akzhan Abdulin
+
+    Fixed Color property design-time storing issue (clWindow not stored)
+
+*)
+
+unit ElLabel;
+
+interface
+
+uses
+  Windows,
+  Classes,
+  Graphics,
+  StdCtrls,
+  Messages,
+  Controls,
+  Forms,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElCLabel,
+  ElVCLUtils,
+  ElStrUtils;
+
+type
+  TElLabelTextStyle = (ltsNormal, ltsEmbossed, ltsRecessed, ltsOutlined);
+  TElLabelEffectStyle = (lesNone, lesShadow, lesExtrude);
+  TElLabelExtrudePosition = (lepLeft, lepLeftTop, lepTop, lepRightTop, lepRight,
+    lepRightBottom, lepBottom, lepLeftBottom);
+
+  TElLabel = class(TElCustomLabel)
+  private
+    FAngle: integer;
+    FBuffer: TBitmap;
+    FDarkColor: TColor;
+    FDepth: integer;
+    FDisabledDarkColor: TColor;
+    FDisabledLightColor: TColor;
+    FEffect: TElLabelEffectStyle;
+    FFarColor: TColor;
+    FLightColor: TColor;
+    FNearColor: TColor;
+    FOutlineColor: TColor;
+    FPosition: TElLabelExtrudePosition;
+    FShadowColor: TColor;
+    FStriated: boolean;
+    FStyle: TElLabelTextStyle;
+    FXOffset: integer;
+    FYOffset: integer;
+    procedure SetAngle(Value: integer);
+    procedure SetDarkColor(const Value: TColor);
+    procedure SetDepth(const Value: integer);
+    procedure SetDisabledDarkColor(const Value: TColor);
+    procedure SetDisabledLightColor(const Value: TColor);
+    procedure SetEffect(const Value: TElLabelEffectStyle);
+    procedure SetExtrudePosition(const Value: TElLabelExtrudePosition);
+    procedure SetFarColor(const Value: TColor);
+    procedure SetLightColor(const Value: TColor);
+    procedure SetNearColor(const Value: TColor);
+    procedure SetOutlineColor(const Value: TColor);
+    procedure SetShadowColor(const Value: TColor);
+    procedure SetStriated(const Value: boolean);
+    procedure SetStyle(const Value: TElLabelTextStyle);
+    procedure SetXOffset(const Value: integer);
+    procedure SetYOffset(const Value: integer);
+  protected
+    FCaption: TElFString;
+    {$ifdef ELPACK_UNICODE}
+    FHint: WideString;
+    {$endif}
+
+{$IFDEF VER100}
+    procedure AdjustBounds;
+{$else}
+    procedure AdjustBounds; override;
+{$ENDIF}
+    procedure DoDrawText(var Rect: TRect; {$IFDEF B_3}Flags : word{$ELSE}Flags: longint{$ENDIF});
+{$IFDEF VCL_4_USED}
+    override;
+{$ELSE}
+{$IFDEF BUILDER_USED}
+   override;
+{$ENDIF}
+{$ENDIF}
+    procedure DrawDisabledText(Canvas: TCanvas; var Rect: TRect; Text: TElFSTring; 
+        Flags: longint); virtual;
+    procedure DrawEffect(Canvas: TCanvas; var Rect: TRect; Flags: longint); dynamic;
+    procedure DrawExtrusion(Canvas: TCanvas; var Rect: TRect; Text: TElFSTring; 
+        Flags: longint; NearColor, FarColor: TColor);
+    procedure DrawNormalText(Canvas: TCanvas; var Rect: TRect; Text: TElFSTring; 
+        Flags: longint);
+    procedure DrawOutlinedText(Canvas: TCanvas; var Rect: TRect; Text: TElFSTring; 
+        Flags: longint; OutlineColor: TColor);
+    procedure DrawRaisedText(Canvas: TCanvas; var Rect: TRect; Text: TElFSTring; 
+        Flags: longint; LeftTop, RightBottom: TColor);
+    procedure DrawShadow(Canvas: TCanvas; var Rect: TRect; Text: TElFSTring; Flags:
+        longint; X, Y: integer; ShadowColor: TColor);
+    procedure DrawText(Canvas: TCanvas; var Rect: TRect; Flags: longint); dynamic;
+    procedure Paint; override;
+    procedure SetCaption(newValue: TElFString); virtual;
+    procedure SetAutoSize(newValue : Boolean); override;
+
+    {$ifdef ELPACK_UNICODE}
+    procedure SetHint(Value: WideString);
+
+    {$ifndef CLX_USED}
+    procedure CMHintShow(var Message: TMessage); message CM_HINTSHOW;
+    {$else}
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    {$endif}
+    {$endif}
+    procedure SetName(const Value: TComponentName); override;
+
+    property Angle: integer read FAngle write SetAngle default 0;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  published
+    property Caption: TElFString read FCaption write SetCaption;
+    property DarkColor: TColor read FDarkColor write SetDarkColor default clBtnShadow;
+    property Depth: integer read FDepth write SetDepth default 10;
+    property DisabledDarkColor: TColor read FDisabledDarkColor write SetDisabledDarkColor default clBtnShadow;
+    property DisabledLightColor: TColor read FDisabledLightColor write SetDisabledLightColor default clBtnHighlight;
+    property Effect: TElLabelEffectStyle read FEffect write SetEffect default lesNone;
+    property ExtrudePosition: TElLabelExtrudePosition read FPosition write SetExtrudePosition default lepRightBottom;
+    property FarColor: TColor read FFarColor write SetFarColor default clBlack;
+    property LightColor: TColor read FLightColor write SetLightColor default clBtnHighlight;
+    property NearColor: TColor read FNearColor write SetNearColor default clBlack;
+    property OutlineColor: TColor read FOutlineColor write SetOutlineColor default clWhite;
+    property ShadowColor: TColor read FShadowColor write SetShadowColor default clBtnShadow;
+    property Striated: boolean read FStriated write SetStriated default False;
+    property Style: TElLabelTextStyle read FStyle write SetStyle default ltsNormal;
+    property XOffset: integer read FXOffset write SetXOffset default 2;
+    property YOffset: integer read FYOffset write SetYOffset default 2;
+    {$ifdef ELPACK_UNICODE}
+    property Hint: WideString read FHint write SetHint;
+    {$endif}
+    property Transparent default true;
+  end;
+
+implementation
+end.

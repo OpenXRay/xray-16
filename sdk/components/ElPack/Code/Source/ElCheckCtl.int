@@ -1,0 +1,547 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2002, EldoS                   }
+{                                                    }
+{====================================================}
+
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+02/08/2002
+
+  imagelist removal was not tracked. Fixed. 
+
+01/31/2002
+
+  Fixed the bug with right-clicks when IsHTML is false
+
+12/25/2001
+
+  Added LinkPopupMenu, LinkStyle and LinkColor properties
+
+11/28/2001
+
+  Added MoneyFlat and accompanying properties
+
+11/20/2001
+
+  Fixed an exception that happens when CheckBox is dropped to the form
+  (introduced recently)
+
+11/17/2001
+
+  Removed flicker with XP styles enabled
+
+11/10/2001
+
+  in RadioButton now Checked state follows focus (this behaviour was spoiled
+  during CLX adaptation)
+
+11/05/2001
+
+  Disabled controls are flat now too
+
+10/26/2001
+
+  Fixed painting of background with XP styles enabled
+
+10/21/2001
+
+  Text was not drawn when Unicode is off (spoiled during CLX adaptation). Fixed.
+
+10/16/2001
+
+  CLX adaptation complete
+
+09/17/2001
+
+  Added Windows XP Themes Support
+
+07/26/2001
+
+  Added Unicode support
+
+05/26/2001
+
+  HTML support added
+
+10/06/2000
+
+  Margin between text and glyph increased
+
+10/05/2000
+
+  Click reaction improved
+
+09/14/2000
+
+  Multiline property added
+
+*)
+
+unit ElCheckCtl;
+
+interface
+
+uses
+{$ifndef CLX_USED}
+  Controls,
+  Messages,
+  Windows,
+  Graphics,
+  Forms,
+  StdCtrls,
+  Menus,
+{$ifdef VCL_4_USED}
+  ImgList,
+{$endif}
+{$else}
+{$ifdef MSWINDOWS}
+  Messages,
+  Windows,
+{$endif}
+  QForms,
+  QStdCtrls,
+  QControls,
+  QGraphics,
+  Qt,
+  Types,
+  QImgList,
+  QMenus,
+{$endif}
+  SysUtils,
+  Classes,
+{$IFDEF HAS_HTML_RENDER}
+  HTMLRender,
+{$ENDIF}
+{$ifdef MSWINDOWS}
+  ElTmSchema,
+  ElUxTheme,
+{$endif}
+{$ifndef CLX_USED}
+  ElImgFrm,
+{$endif}
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElSndMap,
+  ElVCLUtils,
+  ElBtnCtl,
+  ElHandPt,
+  ElStrUtils,
+  ElTools;
+
+type
+  TElCheckItem = class(TElButtonControl)
+  private
+    FFlat : Boolean;
+{$IFDEF USE_SOUND_MAP}
+    FSoundMap : TElSoundMap;
+{$ENDIF}
+    FCheckSound : TElSoundName;
+    FUseCustomGlyphs : Boolean;
+    FGlyph : TBitmap;
+    FAlignment : TLeftRight;
+    FMouseInControl : boolean;
+    FPressed : boolean;
+    {$ifndef CLX_USED}
+    FOldCapture : HWND;
+    {$endif}
+    FChLink  : TChangeLink;
+    // FDoFocus : boolean;
+    {$ifndef CLX_USED}
+    FImgForm : TElImageForm;
+    FImgFormChLink  : TImgFormChangeLink;
+    {$endif}
+    FAutoSize       : boolean;
+{$ifdef HAS_HTML_RENDER}
+    FIsHTML  : Boolean;
+    FRender  : TElHTMLRender;
+{$endif}
+    // FMultiLine: boolean;
+    FModified : boolean;
+    FImages  : TImageList;
+    FUseImageList: Boolean;
+    FCursor: TCursor;
+    FTextPos: TPoint;
+    FLinkColor: TColor;
+    FLinkPopupMenu: TPopupMenu;
+    FLinkStyle: TFontStyles;
+    {$IFDEF HAS_HTML_RENDER}
+    FOnImageNeeded: TElHTMLImageNeededEvent;
+    FOnLinkClick: TElHTMLLinkClickEvent;
+    {$endif}
+    // procedure SetMultiLine(value : boolean);
+    procedure AdjustAutoSize;
+    {$ifndef CLX_USED}
+    procedure ImageFormChange(Sender: TObject);
+    {$endif}
+    procedure ImagesChanged(Sender: TObject);
+    {$ifndef CLX_USED}
+    procedure setImageForm(newValue : TElImageForm);
+    {$endif}
+    procedure setUseCustomGlyphs(newValue : Boolean);
+    procedure setGlyph(newValue : TBitmap);
+    procedure setAlignment(newValue : TLeftRight);
+{$IFDEF USE_SOUND_MAP}
+    procedure setSoundMap(newValue : TElSoundMap);
+{$ENDIF}
+{$ifdef HAS_HTML_RENDER}
+    procedure SetIsHTML(Value: Boolean);
+{$endif}
+    {$ifndef CLX_USED}
+    procedure CMEnabledChanged(var Msg : TMessage); message CM_ENABLEDCHANGED;
+    procedure CMMouseLeave(var Msg : TMessage); message CM_MOUSELEAVE;
+    procedure CMMouseEnter(var Msg : TMessage); message CM_MOUSEENTER;
+//    procedure CMExit(var Msg : TCMExit); message CM_EXIT;
+//    procedure CMEnter(var Msg : TCMEnter); message CM_ENTER;
+    procedure CMTextChanged(var Msg : TMessage); message CM_TEXTCHANGED;
+    procedure CMFocusChanged(var Msg : TCMFocusChanged); message CM_FOCUSCHANGED;
+    {$endif}
+    procedure SetFlat(newValue : Boolean);
+    procedure SetImages(Value: TImageList);
+    procedure SetUseImageList(Value: Boolean);
+    procedure SetLinkPopupMenu(newValue : TPopupMenu);
+  protected
+    { Protected declarations }
+    FFlatAlways: Boolean;
+    FHandleDialogKeys: Boolean;
+    {$ifndef CLX_USED}
+    function GetPartId: Integer;
+    {$endif}
+    function GetCheckBoxSize: TSize;
+    procedure setAutoSize(newValue : boolean);
+{$ifdef VCL_6_USED}
+{$ifndef CLX_USED}
+    override;
+{$endif}    
+{$endif}
+    {$ifdef CLX_USED}
+    procedure EnabledChanged; override;
+    procedure MouseEnter(AControl: TControl); override;
+    procedure MouseLeave(AControl: TControl); override;
+    procedure TextChanged; override;
+    function WidgetFlags: Integer; override;
+    {$endif}
+
+    procedure DoEnter; override;
+    procedure DoExit; override;
+
+    {$ifndef CLX_USED}
+    procedure WMEraseBkgnd(var Msg : TWMEraseBkGnd); message WM_ERASEBKGND;
+    {$endif}
+    procedure Notification(AComponent : TComponent; operation : TOperation); 
+        override;
+    procedure GlyphChange(Sender : TObject); virtual;
+    {$ifndef CLX_USED}
+    procedure DrawFlatFrame(Canvas : TCanvas; R : TRect); virtual; abstract;
+    {$endif}
+    procedure DrawGlyph(Canvas : TCanvas; DestRect: TRect; SrcRect: TRect); virtual;
+    procedure MouseDown(Button : TMouseButton; Shift : TShiftState; X, Y : Integer); override;
+    procedure MouseUp(Button : TMouseButton; Shift : TShiftState; X, Y : Integer); override;
+    procedure KeyDown(var Key : Word; Shift : TShiftState); override;
+    procedure Paint; override;
+    procedure SetFlatAlways(Value: Boolean);
+    {$ifndef CLX_USED}
+    procedure IFMRepaintChildren(var Message: TMessage); message
+        IFM_REPAINTCHILDREN;
+    procedure WMWindowPosChanged(var Message: TWMWindowPosChanged); message
+        WM_WINDOWPOSCHANGED;
+    procedure WMGetDlgCode(var Msg : TWMGetDlgCode); message WM_GETDLGCODE;
+    {$ifdef VCL_5_USED}
+    procedure WMContextMenu(var Message: TWMContextMenu); message WM_CONTEXTMENU;
+    {$endif}
+    procedure WMRButtonUp(var Message: TWMRButtonUp); message WM_RBUTTONUP;
+
+    procedure CreateWnd; override;
+    {$endif}
+    {$ifdef CLX_USED}
+    procedure CreateWidget; override;
+    procedure DoContextPopup(const MousePos: TPoint; var Handled: Boolean); override;
+    {$endif}
+    function CalcAutoHeight(Multiline : boolean) : Integer; virtual;
+    procedure SetCursor(newValue : TCursor); virtual;
+    {$IFDEF HAS_HTML_RENDER}
+    function CalcTextRect: TRect;
+    {$endif}
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+    procedure SetLinkColor(newValue : TColor); virtual;
+    procedure SetLinkStyle(newValue : TFontStyles); virtual;
+    {$IFDEF HAS_HTML_RENDER}
+    procedure DoLinkPopup(MousePos : TPoint);
+    procedure TriggerImageNeededEvent(Sender : TObject; Src : TElFString; var Image
+        : TBitmap);
+    procedure TriggerLinkClickEvent(HRef : TElFString); virtual;
+    {$endif}
+
+    property CheckSound : TElSoundName read FCheckSound write FCheckSound; { Protected }
+{$IFDEF USE_SOUND_MAP}
+    property SoundMap   : TElSoundMap read FSoundMap write SetSoundMap;
+{$ENDIF}
+    property Alignment : TLeftRight read FAlignment write SetAlignment default taRightJustify; { Protected }
+    property UseCustomGlyphs : Boolean read FUseCustomGlyphs write SetUseCustomGlyphs default false; { Protected }
+    property Glyph : TBitmap read FGlyph write SetGlyph; { Published }
+    property Flat : Boolean read FFlat write SetFlat default false; { Published }
+    {$ifndef CLX_USED}
+    property ImageForm : TElImageForm read FImgForm write SetImageForm;
+    {$endif}
+    property AutoSize : boolean read FAutoSize write SetAutoSize default true;
+{$ifdef HAS_HTML_RENDER}
+    property IsHTML : Boolean read FIsHTML write SetIsHTML default false;
+{$endif}
+    // property Multiline: boolean read FMultiline write SetMultiline default false;
+    property FlatAlways: Boolean read FFlatAlways write SetFlatAlways default false;
+    property Images: TImageList read FImages write SetImages;
+    property UseImageList: Boolean read FUseImageList write SetUseImageList default
+        false;
+  public
+    { Public declarations }
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Loaded; override;
+    procedure Click; override;
+    
+    property Modified : boolean read FModified write FModified;
+
+    property Cursor: TCursor read FCursor write SetCursor;
+    property LinkColor: TColor read FLinkColor write SetLinkColor;
+    property LinkPopupMenu: TPopupMenu read FLinkPopupMenu write SetLinkPopupMenu;
+    property LinkStyle: TFontStyles read FLinkStyle write SetLinkStyle;
+    {$IFDEF HAS_HTML_RENDER}
+    property OnImageNeeded: TElHTMLImageNeededEvent read FOnImageNeeded write
+        FOnImageNeeded;
+    property OnLinkClick: TElHTMLLinkClickEvent read FOnLinkClick write
+        FOnLinkClick;
+    {$endif}
+  published
+    property HandleDialogKeys: Boolean read FHandleDialogKeys write
+        FHandleDialogKeys default false;
+  end; { TElCheckItem }
+
+  TElCheckBox = class(TElCheckItem)
+  private
+    { Private declarations }
+    FState : TCheckBoxState;
+    FAllowGrayed : Boolean;
+    procedure SetState(newValue : TCheckBoxState);
+    procedure SetAllowGrayed(newValue : Boolean);
+  protected
+    function GetChecked : Boolean; override;
+    procedure SetChecked(newValue : Boolean); override;
+    {$ifndef CLX_USED}
+    procedure DrawFlatFrame(Canvas : TCanvas; R : TRect); override;
+    {$endif}
+    procedure Toggle; virtual;
+  published
+    property Alignment;
+    property AllowGrayed : Boolean read FAllowGrayed write SetAllowGrayed default false; { Published }
+    property AutoSize;
+    property UseCustomGlyphs;
+    property Checked;
+    property CheckSound;
+{$IFDEF USE_SOUND_MAP}
+    property SoundMap;
+{$ENDIF}
+    property Glyph;
+    {$ifndef CLX_USED}
+    property ImageForm;
+    {$endif}
+    // property Multiline;
+    property TextDrawType;
+    property Transparent;
+    property Flat;
+    property FlatAlways;
+{$ifdef HAS_HTML_RENDER}
+    property IsHTML;
+{$endif}
+    property Images;
+    property State : TCheckBoxState read FState write SetState default cbUnchecked; { Published }
+
+    property Cursor;
+    property LinkColor;
+    property LinkPopupMenu;
+    property LinkStyle;
+    {$IFDEF HAS_HTML_RENDER}
+    property OnImageNeeded;
+    property OnLinkClick;
+    {$endif}
+
+    {$ifndef CLX_USED}
+    property MoneyFlat;
+    property MoneyFlatActiveColor;
+    property MoneyFlatInactiveColor;
+    property MoneyFlatDownColor;
+    {$endif}
+    property UseImageList;
+
+    // VCL properties
+    property Caption;
+    property Enabled;
+    property TabStop default True;
+    property TabOrder;
+    property PopupMenu;
+    property Color;
+    property ParentColor;
+    property Align;
+    property Font;
+    property ParentFont;
+    property ParentShowHint;
+    property ShowHint;
+    {$ifdef MSWINDOWS}
+    property UseXPThemes;
+    {$endif}
+    property Visible;
+
+    property OnClick;
+    property OnDblClick;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnStartDrag;
+
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Action;
+    property Constraints;
+{$ifndef CLX_USED}
+    property DockOrientation;
+    property Floating;
+    property DoubleBuffered;
+    property DragKind;
+    property OnStartDock;
+    property OnEndDock;
+{$endif}    
+{$ENDIF}
+{$IFDEF VCL_5_USED}
+    property OnContextPopup;
+{$ENDIF}
+  end; { TElCheckBox }
+
+  TElRadioButton = class(TElCheckItem)
+  private
+    FChecked : boolean;
+  protected
+    {$ifndef CLX_USED}
+    procedure DrawFlatFrame(Canvas : TCanvas; R : TRect); override;
+    {$endif}
+    function GetChecked : Boolean; override;
+    procedure SetChecked(newValue : Boolean); override;
+  published
+    property AutoSize;
+    property Checked;
+
+    property Cursor;
+    property LinkColor;
+    property LinkPopupMenu;
+    property LinkStyle;
+    {$IFDEF HAS_HTML_RENDER}
+    property OnImageNeeded;
+    property OnLinkClick;
+    {$endif}
+
+    property UseCustomGlyphs;
+{$IFDEF USE_SOUND_MAP}
+    property CheckSound;
+    property SoundMap;
+{$ENDIF}
+    property Alignment;
+    property Glyph;
+    {$ifndef CLX_USED}
+    property ImageForm;
+    {$endif}
+    {$ifndef CLX_USED}
+    property MoneyFlat;
+    property MoneyFlatActiveColor;
+    property MoneyFlatInactiveColor;
+    property MoneyFlatDownColor;
+    {$endif}
+    // property Multiline;
+    property Transparent;
+    property TextDrawType;
+    property Flat;
+    property FlatAlways;
+{$ifdef HAS_HTML_RENDER}
+    property IsHTML;
+{$endif}
+    property Images;
+    property UseImageList;
+    {$ifdef MSWINDOWS}
+    property UseXPThemes;
+    {$endif}
+
+    // VCL properties
+    property Caption;
+    property Enabled;
+    property TabStop default True;
+    property TabOrder;
+    property PopupMenu;
+    property Color;
+    property ParentColor;
+    property Align;
+    property Font;
+    property ParentFont;
+    property ParentShowHint;
+    property ShowHint;
+    property Visible;
+    property OnClick;
+    property OnDblClick;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnStartDrag;
+
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+
+
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Action;
+    property Constraints;
+{$ifndef CLX_USED}
+    property DockOrientation;
+    property Floating;
+    property DoubleBuffered;
+    property DragKind;
+
+    property OnStartDock;
+    property OnEndDock;
+{$endif}    
+
+{$ENDIF}
+{$IFDEF VCL_5_USED}
+    property OnContextPopup;
+{$ENDIF}
+  end; { TElRadioButton }
+
+implementation
+end.

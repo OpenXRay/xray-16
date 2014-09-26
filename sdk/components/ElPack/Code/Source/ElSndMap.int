@@ -1,0 +1,103 @@
+
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElSndMap;
+
+interface
+
+uses
+{$ifdef MSWINDOWS}
+  Windows,
+  Messages,
+  ElRegUtils,
+  mmSystem,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+{$endif}
+  SysUtils,
+  Classes,
+  ElIni,
+  ElTools,
+  TypInfo;
+
+type
+
+{$ifndef VCL_6_USED}
+  TElSoundName = string[255];
+{$else}
+  TElSoundName = string;
+{$endif}
+
+  TElSoundMap = class(TComponent)
+  private
+    FSchemes : TStringList;
+    FStorage : TElIniFile;
+    FStoragePath : string;
+    FScheme : string;
+    FApplicationKey : string;
+    FApplicationName : string;
+    FRegIni,
+      ARegIni : TElIniFile;
+    FEventKeys : TStringList;
+    FMute : Boolean;
+    function GetEventLabels(EventKey : string) : string;
+    procedure SetEventLabels(EventKey : string; newValue : string);
+
+    function GetEnabled(EventKey : string) : boolean;
+    procedure SetEnabled(EventKey : string; newValue : boolean);
+
+    function GetSchemes : TStringList;
+    function GetEventKeys : TStringList;
+    function GetEventValues(EventKey : string) : string;
+    procedure SetEventValues(EventKey : string; newValue : string);
+    procedure SetApplicationName(newValue : string);
+    procedure SetApplicationKey(newValue : string);
+    procedure SetScheme(newValue : string);
+    procedure SetStorage(newValue : TElIniFile);
+    procedure SetStoragePath(newValue : string);
+  protected
+    { Protected declarations }
+    procedure Notification(AComponent : TComponent; operation : TOperation); override;
+  public
+    { Public declarations }
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Play(EventKey : string);
+    procedure Add(EventKey, EventLabel, EventValue : string; Enabled : boolean);
+    procedure Delete(EventKey : string);
+    procedure Loaded; override;
+
+    property EventKeys : TStringList read GetEventKeys; { Published }
+    property EventLabel[EventKey : string] : string read GetEventLabels write SetEventLabels; { Published }
+    property EventValue[EventKey : string] : string read GetEventValues write SetEventValues; { Published }
+    property EventEnabled[EventKey : string] : boolean read GetEnabled write SetEnabled; { Published }
+    property Schemes : TStringList read GetSchemes;
+  published
+    property Mute : Boolean read FMute write FMute; { Published }
+    property ApplicationName : string read FApplicationName write SetApplicationName; { Published }
+    property ApplicationKey : string read FApplicationKey write SetApplicationKey; { Published }
+    property Scheme : string read FScheme write SetScheme;
+    property StoragePath : string read FStoragePath write SetStoragePath; { Published }
+    property Storage : TElIniFile read FStorage write SetStorage;
+  end; { TElSoundMap }
+
+implementation
+end.

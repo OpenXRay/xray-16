@@ -1,0 +1,157 @@
+
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998 Alex Shovkoplyas              }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElBiProgr;
+
+interface
+
+uses
+  {$ifndef CLX_USED}
+  Windows,
+  Messages,
+  Graphics,
+  Controls,
+  Forms,
+  extctrls,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  {$else}
+  QGraphics,
+  QControls,
+  QForms,
+  QExtCtrls,
+  Qt,
+  Types,
+  QTypes,
+  {$endif}
+  Classes,
+  SysUtils;
+
+type
+  TProgrShowMode = (psmAllFull, psmLightHalf, psmDarkHalf, psmAllHalf);
+  TElBevelStyle = (ebsNone, ebsLowered, ebsRaised);
+
+type
+  TElBiProgressBar = class(TGraphicControl)
+  private
+    FLightTextFullLine: Boolean;
+    FDarkTextFullLine: Boolean;
+    FLightButtonStyle : Boolean;
+    FDarkButtonStyle : Boolean;
+    FMinValue : Integer;
+    FBorderStyle : TElBevelStyle;
+    FDarkText  : string;
+    FLightText : string;
+    FDarkTextColor : TColor;
+    FLightTextColor : TColor;
+    FLightColor : TColor;
+    FDarkColor : TColor;
+    FScale : integer;
+    FLightValue : integer;
+    FDarkValue : integer;
+    Bitmap : TBitmap;
+    FAdditive : boolean;
+    FProgrShowMode : TProgrShowMode;
+    FCaption       : string;
+
+    procedure SetLightColor(aValue : TColor);
+    procedure SetDarkColor(aValue : TColor);
+    procedure SetScale(aValue : integer);
+    procedure SetLightValue(aValue : integer);
+    procedure SetDarkValue(aValue : integer);
+    procedure SetAdditive(aValue : boolean);
+    procedure SetProgrShowMode(aValue : TProgrShowMode);
+    procedure SetDarkText(newValue : string);
+    procedure SetLightText(newValue : string);
+    procedure SetCaption(newValue : string);
+    procedure SetDarkTextColor(newValue : TColor);
+    procedure SetLightTextColor(newValue : TColor);
+    procedure SetBorderStyle(newValue : TElBevelStyle);
+    procedure SetMinValue(newValue : Integer);
+    procedure SetLightButtonStyle(newValue : Boolean);
+    procedure SetDarkButtonStyle(newValue : Boolean);
+    procedure SetTransparent(newValue : Boolean);
+    procedure SetLightTextFullLine(newValue : boolean);
+    procedure SetDarkTextFullLine(newValue : boolean);
+    function GetTransparent : boolean;
+  protected
+    procedure Paint; override;
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure SetValues(ALightValue, ADarkValue, AScale : integer; AAdditive : boolean);
+  published
+    property LightColor : TColor read FLightColor write SetLightColor default clRed;
+    property DarkColor : TColor read FDarkColor write SetDarkColor default clMaroon;
+    property Scale : integer read FScale write SetScale default 100;
+    property LightValue : integer read FLightValue write SetLightValue;
+    property DarkValue : integer read FDarkValue write SetDarkValue;
+    property Additive : boolean read FAdditive write SetAdditive;
+    property Caption : string read FCaption write SetCaption;
+    property ProgressShowMode : TProgrShowMode read FProgrShowMode write SetProgrShowMode;
+    property LightTextFullLine: Boolean read FLightTextFullLine write SetLightTextFullLine;
+    property DarkTextFullLine: Boolean read FDarkTextFullLine write SetDarkTextFullLine;
+    property DarkText : string read FDarkText write SetDarkText; { Published }
+    property LightText : string read FLightText write SetLightText; { Published }
+    property DarkTextColor : TColor read FDarkTextColor write SetDarkTextColor; { Published }
+    property LightTextColor : TColor read FLightTextColor write SetLightTextColor; { Published }
+    property BorderStyle : TElBevelStyle read FBorderStyle write SetBorderStyle; { Published }
+    property MinValue : Integer read FMinValue write SetMinValue default 0;
+    property LightButtonStyle : Boolean read FLightButtonStyle write SetLightButtonStyle;
+    property DarkButtonStyle : Boolean read FDarkButtonStyle write SetDarkButtonStyle;
+    property Transparent : Boolean read GetTransparent write SetTransparent;  { Published }
+    property Align;
+    property Color default clWindow;
+    {$ifndef CLX_USED}
+    property DragCursor;
+    {$endif}
+    property DragMode;
+    property Enabled;
+    property Font;
+    property ParentColor default false;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property Visible;
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Action;
+    property Constraints;
+    {$ifndef CLX_USED}
+    property DockOrientation;
+    property Floating;
+    property DragKind;
+    {$endif}
+{$ENDIF}
+  end;
+
+implementation
+end.

@@ -1,0 +1,126 @@
+
+ELDOS GROUP
+SOFTWARE LICENSE AGREEMENT
+
+You  should  carefully read the following terms and conditions before installing
+the software.
+
+By  installing  the  software  you  indicate  your acceptance of these terms and
+conditions.
+
+EldoS  Group  or its suppliers own the enclosed software programs (Software) and
+the  documentation,  all of which are protected under applicable copyright laws.
+Your  right  to  use this software and documentation is limited to the terms and
+conditions  of this License.  You assume responsibility for the selection of the
+Software  to  achieve  your  intended  results and for the installation, use and
+results obtained from the Software.
+
+RIGHTS.   EldoS  Group grants you the right to use one copy of the Software on a
+single  computer.  The Software is in "use" on a computer when it is loaded into
+temporary  memory (i.e. RAM) or installed into permanent memory (e.g. Hard Disk,
+CD-ROM,  or  other  storage device of that computer.  However, installation on a
+network  server  for  the  sole  purpose  of  distribution  to one or more other
+computer(s) shall not constitute "use" for which a separate license is required.
+
+ADDING  USERS.   You may add users by paying for a separate software package for
+each user you wish to add.  You may also add users by purchasing a site license.
+
+TRANSFERRING  THE  SOFTWARE.   You  may  transfer  all of your rights to use the
+Software to another person, provided that you transfer to that person all of the
+software,  diskettes (if applicable), and documentation provided in this package
+(including  this  license  agreement), and transfer or destroy all copies in any
+form.  Remember, once you transfer the software, you no longer have any right to
+use  it,  and the person to whom it is transferred may use it only in accordance
+with the copyright law, international treaty, and this license.
+
+UPGRADING  THE  SOFTWARE.   If  you  have  purchased  an  upgrade version of the
+Software,  the  original  product  together with the upgrade constitute a single
+license.   The  original  Software  and  the  upgrade   Software  cannot both be
+available  for  use  by  two  different  people  at the same time, and cannot be
+transferred separately without written permission from EldoS Group.
+
+ADDITIONAL SITE LICENSE RIGHTS.  Customers who have purchased a Site License may
+install  and  use multiple copies of the software for all users at a single site
+or within a single development team.
+
+RESTRICTIONS.   You  may  not  rent,  lease,  lend,  copy,  modify, sub-licence,
+time-share,  electronically transmit or receive the Software, except as provided
+in  this license, or as directed by EldoS Group.  You may not translate, reverse
+engineer,  decompile  or  disassemble  or  otherwise  alter  the Software or its
+documentation.
+
+SOURCE  CODE  RESTRICTIONS.   Portions  of  this product that may be supplied as
+source  code were developed using the Delphi Visual Component Library, Copyright
+©  1995,  1999  Inprise  Corporation.  All rights reserved.  In order to use the
+source  code  of  these  components  you  will  need  to comply with all Inprise
+Corporation licensing terms and conditions and will need to have first purchased
+the VCL Source Code.
+
+REDISTRIBUTABLE COMPONENTS.  EldoS Group grants you a non-exclusive royalty-free
+right  to  compile,  reproduce  and distribute any new software programs created
+using  the Software (the Redistributables) provided that you: (a) distribute the
+Redistributables  only  as compiled executable programs; (b) do not use any part
+of  the  source  code  of  the Software to build any other Delphi components for
+public distribution or commercial sale; (c) do not use EldoS Group name, logo or
+trademarks to market your Delphi application without the express written consent
+of   EldoS   Group  and  (d) agree to indemnify, hold harmless, and defend EldoS
+Group  from  and against any claims or lawsuits, including attorney's fees, that
+arise  or  result  from  the use or distribution of your software product or the
+Redistributables within it.
+
+
+THE  REDISTRIBUTABLES  ARE  PROVIDED  AS IS WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESS  OR  IMPLIED,  INCLUDING,  WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY  OR  FITNESS  FOR  A PARTICULAR PURPOSE AND THE WARRANTY AGAINST
+INFRINGEMENT.
+
+LIMITED   WARRANTY.   EldoS  Group  warrants  that  the  Software  will  perform
+substantially in accordance with the accompanying written materials for a period
+of  sixty  (60) days from the date of original purchase.  Any implied warranties
+on  the  Software  are limited to sixty (60) days.  Some states/countries do not
+allow  limitations  on the duration of an implied warranty, so the above may not
+apply to you.
+
+CUSTOMER  REMEDIES.   EldoS  Group  and its suppliers' entire liability and your
+exclusive remedy shall be, at EldoS Group option, either (a) return of the price
+paid,  or  (b)  repair  or replacement of the Software or hardware that does not
+meet  EldoS  Group  Limited Warranty and which is returned to EldoS Group with a
+copy  of your receipt.  This Limited Warranty is void if failure of the Software
+or   hardware   has  resulted  from  accident,  abuse  or  misapplication.   Any
+replacement  Software  or  hardware  will  be warranted for the remainder of the
+original warranty period.
+
+NO  OTHER  WARRANTIES.   ELDOS  GROUP  AND  ITS  SUPPLIERS  DISCLAIM  ALL  OTHER
+WARRANTIES,  EITHER  EXPRESS  OR  IMPLIED, INCLUDING, BUT NOT LIMITED TO IMPLIED
+WARRANTIES  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, WITH REGARD
+TO  THE  SOFTWARE,  THE  ACCOMPANYING  WRITTEN  MATERIALS,  AND ANY ACCOMPANYING
+HARDWARE.   THIS  WARRANTY GIVES YOU SPECIFIC LEGAL RIGHTS.  YOU MAY HAVE OTHERS
+WHICH VARY FROM STATE/COUNTRY TO STATE/COUNTRY.
+
+NO  LIABILITY  FOR  CONSEQUENTIAL DAMAGES.  IN NO EVENT SHALL ELDOS GROUP OR ITS
+SUPPLIERS  BE  LIABLE  FOR ANY DAMAGES WHATSOEVER (INCLUDING WITHOUT LIMITATION,
+DAMAGES  FOR  LOSS  OF BUSINESS PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS
+INFORMATION, OR ANY OTHER PECUNIARY LOSS) ARISING OUT OF THE USE OR INABILITY TO
+USE  THIS  PRODUCT,  EVEN  IF ELDOS GROUP HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH  DAMAGES.   BECAUSE  SOME  STATES/COUNTRIES  DO  NOT ALLOW THE EXCLUSION OR
+LIMITATION  OF  LIABILITY  FOR  CONSEQUENTIAL  OR  INCIDENTAL DAMAGES, THE ABOVE
+LIMITATION MAY NOT APPLY TO YOU.
+
+GENERAL.   You  may  not  sublicense,  assign  or  transfer  the  license of the
+Software.   Any  attempt  to  sublicense,  assign or transfer any of the rights,
+duties  or obligations hereunder is void.
+This  Agreement will be governed by the laws  of  Ukraine.   Should you have any
+questions  regarding  this Agreement, you may  contact EldoS Group by writing to
+EldoS Group, 10 Chokolovski blvd., apt.57, Kiev 03186, Ukraine
+
+YOU ACKNOWLEDGE THAT YOU HAVE READ THIS AGREEMENT, UNDERSTAND IT AND AGREE TO BE
+BOUND  BY  ITS  TERMS AND CONDITIONS.  YOU FURTHER AGREE THAT IT IS THE COMPLETE
+AND  EXCLUSIVE  STATEMENT  OF  THE  AGREEMENT  BETWEEN  US  WHICH SUPERSEDES ANY
+PROPOSAL  OR  PRIOR  AGREEMENT,  ORAL  OR  WRITTEN, AND ANY OTHER COMMUNICATIONS
+BETWEEN US RELATING TO THE SUBJECT MATTER OF THIS AGREEMENT.
+
+All materials Copyright © 2001 EldoS Group
+All rights reserved.
+Delphi is a trademark of Borland Software Corporation.
+Microsoft  is  a  registered  trademark, and Windows is a trademark of Microsoft
+Corporation.

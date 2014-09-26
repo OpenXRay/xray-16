@@ -1,0 +1,225 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C961EA19-716C-4A6D-BB13-689F8FB78B01}</ProjectGuid>
+    <RootNamespace>CompressionTest</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(xrBinDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(xrBinDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling />
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\xrCore\Coder.hpp" />
+    <ClInclude Include="..\..\xrCore\compression_ppmd_stream.h" />
+    <ClInclude Include="..\..\xrCore\compression_ppmd_stream_inline.h" />
+    <ClInclude Include="..\..\xrCore\PPMd.h" />
+    <ClInclude Include="..\..\xrCore\PPMdType.h" />
+    <ClInclude Include="..\..\xrCore\SubAlloc.hpp" />
+    <ClInclude Include="..\xrCompress\lzo\compr1b.h" />
+    <ClInclude Include="..\xrCompress\lzo\compr1c.h" />
+    <ClInclude Include="..\xrCompress\lzo\config1.h" />
+    <ClInclude Include="..\xrCompress\lzo\config1a.h" />
+    <ClInclude Include="..\xrCompress\lzo\config1b.h" />
+    <ClInclude Include="..\xrCompress\lzo\config1c.h" />
+    <ClInclude Include="..\xrCompress\lzo\config1f.h" />
+    <ClInclude Include="..\xrCompress\lzo\config1x.h" />
+    <ClInclude Include="..\xrCompress\lzo\config1y.h" />
+    <ClInclude Include="..\xrCompress\lzo\config1z.h" />
+    <ClInclude Include="..\xrCompress\lzo\config2a.h" />
+    <ClInclude Include="..\xrCompress\lzo\fake16.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzo1.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzo16bit.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzo1a.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzo1a_de.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzo1b.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzo1b_cc.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzo1b_de.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzo1c.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzo1c_cc.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzo1f.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzo1x.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzo1y.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzo1z.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzo2a.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzoconf.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzoutil.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzo_conf.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzo_dict.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzo_ptr.h" />
+    <ClInclude Include="..\xrCompress\lzo\lzo_util.h" />
+    <ClInclude Include="..\xrCompress\lzo\stats1a.h" />
+    <ClInclude Include="..\xrCompress\lzo\stats1b.h" />
+    <ClInclude Include="..\xrCompress\lzo\stats1c.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\xrCore\Model.cpp">
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Level1</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Level1</WarningLevel>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\alloc.c" />
+    <ClCompile Include="..\xrCompress\lzo\io.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1a.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1a_99.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_1.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_2.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_3.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_4.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_5.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_6.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_7.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_8.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_9.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_99.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_9x.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_cc.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_d1.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_d2.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_rr.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_xx.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_1.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_2.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_3.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_4.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_5.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_6.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_7.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_8.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_9.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_99.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_9x.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_cc.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_d1.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_d2.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_rr.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_xx.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1f_1.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1f_9x.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1f_d1.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1f_d2.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1x_1.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1x_1k.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1x_1l.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1x_1o.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1x_9x.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1x_d1.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1x_d2.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1x_d3.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1x_o.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1y_1.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1y_9x.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1y_d1.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1y_d2.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1y_d3.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1y_o.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1z_9x.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1z_d1.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1z_d2.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1z_d3.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo1_99.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo2a_9x.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo2a_d1.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo2a_d2.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo_crc.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo_dll.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo_init.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo_ptr.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo_str.c" />
+    <ClCompile Include="..\xrCompress\lzo\lzo_util.c" />
+    <ClCompile Include="CompressionTest.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

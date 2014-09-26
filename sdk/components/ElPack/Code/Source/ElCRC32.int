@@ -1,0 +1,47 @@
+
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElCRC32;
+
+interface
+
+uses
+  {$ifndef CLX_USED}
+    Windows,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+    Consts;
+  {$else}
+  {$ifdef KYLIX}
+    Libc,
+  {$endif}
+  {$ifdef MSWINDOWS}
+  Windows,
+  {$endif}
+  Types;
+  {$endif}
+
+function CRC32(crc : longint; const c : byte) : longint;
+
+function CRCBuffer(InitialCRC : longint; Buffer : Pointer; BufLen : integer) : Longint;
+function CRCStr(Str : string) : longint;
+
+implementation
+end.

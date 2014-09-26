@@ -1,0 +1,252 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\nvconfig.h" />
+    <ClInclude Include="include\nvtt\nvtt.h" />
+    <ClInclude Include="include\nvtt\nvtt_wrapper.h" />
+    <ClInclude Include="src\nvcore\BitArray.h" />
+    <ClInclude Include="src\nvcore\Containers.h" />
+    <ClInclude Include="src\nvcore\Debug.h" />
+    <ClInclude Include="src\nvcore\DefsGnucDarwin.h" />
+    <ClInclude Include="src\nvcore\DefsGnucLinux.h" />
+    <ClInclude Include="src\nvcore\DefsGnucWin32.h" />
+    <ClInclude Include="src\nvcore\DefsVcWin32.h" />
+    <ClInclude Include="src\nvcore\Library.h" />
+    <ClInclude Include="src\nvcore\Memory.h" />
+    <ClInclude Include="src\nvcore\nvcore.h" />
+    <ClInclude Include="src\nvcore\poshlib\posh.h" />
+    <ClInclude Include="src\nvcore\Prefetch.h" />
+    <ClInclude Include="src\nvcore\Ptr.h" />
+    <ClInclude Include="src\nvcore\Radix.h" />
+    <ClInclude Include="src\nvcore\StdStream.h" />
+    <ClInclude Include="src\nvcore\Stream.h" />
+    <ClInclude Include="src\nvcore\StrLib.h" />
+    <ClInclude Include="src\nvcore\TextReader.h" />
+    <ClInclude Include="src\nvcore\TextWriter.h" />
+    <ClInclude Include="src\nvcore\Tokenizer.h" />
+    <ClInclude Include="src\nvimage\BlockDXT.h" />
+    <ClInclude Include="src\nvimage\ColorBlock.h" />
+    <ClInclude Include="src\nvimage\ConeMap.h" />
+    <ClInclude Include="src\nvimage\DirectDrawSurface.h" />
+    <ClInclude Include="src\nvimage\Filter.h" />
+    <ClInclude Include="src\nvimage\FloatImage.h" />
+    <ClInclude Include="src\nvimage\HoleFilling.h" />
+    <ClInclude Include="src\nvimage\Image.h" />
+    <ClInclude Include="src\nvimage\ImageIO.h" />
+    <ClInclude Include="src\nvimage\NormalMap.h" />
+    <ClInclude Include="src\nvimage\NormalMipmap.h" />
+    <ClInclude Include="src\nvimage\nvimage.h" />
+    <ClInclude Include="src\nvimage\PixelFormat.h" />
+    <ClInclude Include="src\nvimage\PsdFile.h" />
+    <ClInclude Include="src\nvimage\Quantize.h" />
+    <ClInclude Include="src\nvimage\TgaFile.h" />
+    <ClInclude Include="src\nvmath\Basis.h" />
+    <ClInclude Include="src\nvmath\Box.h" />
+    <ClInclude Include="src\nvmath\Color.h" />
+    <ClInclude Include="src\nvmath\Matrix.h" />
+    <ClInclude Include="src\nvmath\Montecarlo.h" />
+    <ClInclude Include="src\nvmath\nvmath.h" />
+    <ClInclude Include="src\nvmath\Plane.h" />
+    <ClInclude Include="src\nvmath\Quaternion.h" />
+    <ClInclude Include="src\nvmath\Random.h" />
+    <ClInclude Include="src\nvmath\SphericalHarmonic.h" />
+    <ClInclude Include="src\nvmath\Triangle.h" />
+    <ClInclude Include="src\nvmath\Vector.h" />
+    <ClInclude Include="src\nvtt\CompressDXT.h" />
+    <ClInclude Include="src\nvtt\CompressionOptions.h" />
+    <ClInclude Include="src\nvtt\Compressor.h" />
+    <ClInclude Include="src\nvtt\CompressRGB.h" />
+    <ClInclude Include="src\nvtt\cuda\Bitmaps.h" />
+    <ClInclude Include="src\nvtt\cuda\CudaCompressDXT.h" />
+    <ClInclude Include="src\nvtt\cuda\CudaMath.h" />
+    <ClInclude Include="src\nvtt\cuda\CudaUtils.h" />
+    <ClInclude Include="src\nvtt\InputOptions.h" />
+    <ClInclude Include="src\nvtt\nvtt.h" />
+    <ClInclude Include="src\nvtt\nvtt_wrapper.h" />
+    <ClInclude Include="src\nvtt\OptimalCompressDXT.h" />
+    <ClInclude Include="src\nvtt\OutputOptions.h" />
+    <ClInclude Include="src\nvtt\QuickCompressDXT.h" />
+    <ClInclude Include="src\nvtt\SingleColorLookup.h" />
+    <ClInclude Include="src\nvtt\squish\alpha.h" />
+    <ClInclude Include="src\nvtt\squish\clusterfit.h" />
+    <ClInclude Include="src\nvtt\squish\colourblock.h" />
+    <ClInclude Include="src\nvtt\squish\colourfit.h" />
+    <ClInclude Include="src\nvtt\squish\colourset.h" />
+    <ClInclude Include="src\nvtt\squish\config.h" />
+    <ClInclude Include="src\nvtt\squish\fastclusterfit.h" />
+    <ClInclude Include="src\nvtt\squish\maths.h" />
+    <ClInclude Include="src\nvtt\squish\rangefit.h" />
+    <ClInclude Include="src\nvtt\squish\simd.h" />
+    <ClInclude Include="src\nvtt\squish\simd_3dnow.h" />
+    <ClInclude Include="src\nvtt\squish\simd_sse.h" />
+    <ClInclude Include="src\nvtt\squish\simd_ve.h" />
+    <ClInclude Include="src\nvtt\squish\singlechannelfit.h" />
+    <ClInclude Include="src\nvtt\squish\singlecolourfit.h" />
+    <ClInclude Include="src\nvtt\squish\squish.h" />
+    <ClInclude Include="src\nvtt\squish\weightedclusterfit.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\nvcore\Debug.cpp" />
+    <ClCompile Include="src\nvcore\Library.cpp" />
+    <ClCompile Include="src\nvcore\Memory.cpp" />
+    <ClCompile Include="src\nvcore\poshlib\posh.c" />
+    <ClCompile Include="src\nvcore\Radix.cpp" />
+    <ClCompile Include="src\nvcore\StrLib.cpp" />
+    <ClCompile Include="src\nvcore\TextReader.cpp" />
+    <ClCompile Include="src\nvcore\TextWriter.cpp" />
+    <ClCompile Include="src\nvcore\Tokenizer.cpp" />
+    <ClCompile Include="src\nvimage\BlockDXT.cpp" />
+    <ClCompile Include="src\nvimage\ColorBlock.cpp" />
+    <ClCompile Include="src\nvimage\ConeMap.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\nvimage\DirectDrawSurface.cpp" />
+    <ClCompile Include="src\nvimage\Filter.cpp" />
+    <ClCompile Include="src\nvimage\FloatImage.cpp" />
+    <ClCompile Include="src\nvimage\HoleFilling.cpp" />
+    <ClCompile Include="src\nvimage\Image.cpp" />
+    <ClCompile Include="src\nvimage\ImageIO.cpp" />
+    <ClCompile Include="src\nvimage\NormalMap.cpp" />
+    <ClCompile Include="src\nvimage\NormalMipmap.cpp" />
+    <ClCompile Include="src\nvimage\Quantize.cpp" />
+    <ClCompile Include="src\nvmath\Basis.cpp" />
+    <ClCompile Include="src\nvmath\Montecarlo.cpp" />
+    <ClCompile Include="src\nvmath\Plane.cpp" />
+    <ClCompile Include="src\nvmath\Random.cpp" />
+    <ClCompile Include="src\nvmath\SphericalHarmonic.cpp" />
+    <ClCompile Include="src\nvmath\Triangle.cpp" />
+    <ClCompile Include="src\nvmath\TriBox.cpp" />
+    <ClCompile Include="src\nvtt\CompressDXT.cpp" />
+    <ClCompile Include="src\nvtt\CompressionOptions.cpp" />
+    <ClCompile Include="src\nvtt\Compressor.cpp" />
+    <ClCompile Include="src\nvtt\CompressRGB.cpp" />
+    <ClCompile Include="src\nvtt\cuda\CudaCompressDXT.cpp" />
+    <ClCompile Include="src\nvtt\cuda\CudaUtils.cpp" />
+    <ClCompile Include="src\nvtt\InputOptions.cpp" />
+    <ClCompile Include="src\nvtt\nvtt.cpp" />
+    <ClCompile Include="src\nvtt\nvtt_wrapper.cpp" />
+    <ClCompile Include="src\nvtt\OptimalCompressDXT.cpp" />
+    <ClCompile Include="src\nvtt\OutputOptions.cpp" />
+    <ClCompile Include="src\nvtt\QuickCompressDXT.cpp" />
+    <ClCompile Include="src\nvtt\squish\alpha.cpp" />
+    <ClCompile Include="src\nvtt\squish\clusterfit.cpp" />
+    <ClCompile Include="src\nvtt\squish\colourblock.cpp" />
+    <ClCompile Include="src\nvtt\squish\colourfit.cpp" />
+    <ClCompile Include="src\nvtt\squish\colourset.cpp" />
+    <ClCompile Include="src\nvtt\squish\fastclusterfit.cpp" />
+    <ClCompile Include="src\nvtt\squish\maths.cpp" />
+    <ClCompile Include="src\nvtt\squish\rangefit.cpp" />
+    <ClCompile Include="src\nvtt\squish\singlechannelfit.cpp" />
+    <ClCompile Include="src\nvtt\squish\singlecolourfit.cpp" />
+    <ClCompile Include="src\nvtt\squish\squish.cpp" />
+    <ClCompile Include="src\nvtt\squish\weightedclusterfit.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\nvtt\squish\singlecolourlookup.inl" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{0EB257DC-5CFC-44B0-82C9-CE6B158BE473}</ProjectGuid>
+    <RootNamespace>nvtt</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(xrLibDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(xrLibDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;$(ProjectDir)src\nvcore;$(ProjectDir)src\nvtt\squish;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;DEBUG;NVTT_EXPORTS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;$(ProjectDir)src\nvcore;$(ProjectDir)src\nvtt\squish;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;NVTT_EXPORTS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,384 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+04/09/2002
+
+  Clearing items caused error when ItemIndex <> -1 in ElRadioGroup. Fixed. 
+
+03/10/2002
+
+  Hints property is Unicode now
+  Incorrect typecast for FItems in destructor fixed 
+
+01/27/2002
+
+  ItemIndex was not changed after keyboard operations
+
+12/18/2001
+
+  FlatAlways property made published
+  Fixed reading of ElRadioGroup.ItemIndex property
+
+10/13/2001
+
+  UseXPThemes made published
+
+*)
+
+unit ElCheckItemGrp;
+
+interface
+
+uses
+  SysUtils,
+  Classes,
+  {$ifndef CLX_USED}
+  Stdctrls,
+  Messages,
+  Controls,
+  Windows,
+  Graphics,
+  ElImgFrm,
+  ExtCtrls,
+  Forms,
+  {$ifdef VCL_4_USED}
+  ImgList,
+  {$endif}
+  {$else}
+  {$ifdef MSWINDOWS}
+  // Windows,
+  {$endif}
+  QForms,
+  QStdCtrls,
+  QControls,
+  QGraphics,
+  QTypes,
+  Qt,
+  Types,
+  QImgList,
+  ElCLXUtils,
+  {$endif}
+  ElList,
+  HTMLRender,
+  ElTools,
+  ElTmSchema,
+  ElUxTheme,
+  ElCheckCtl,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElGroupBox
+  {$ifdef USE_SOUND_MAP}
+  , ElSndMap
+  {$endif}
+  ;
+
+type
+
+  TElCheckItemClass = class of TElCheckItem;
+
+  TElCheckItemGroup = class(TCustomElGroupBox)
+  protected
+    FAlignment: TLeftRight;
+    FButtons: TElList;
+    FColumns: Integer;
+    FHints: TElFStrings;
+    FItems: TElFStrings;
+    FReading: Boolean;
+    FUpdating: boolean;
+    procedure ArrangeButtons;
+    {$ifndef CLX_USED}
+    procedure CMEnabledChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
+    procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
+    {$else}
+    procedure EnabledChanged; override;
+    procedure FontChanged; override;
+    {$endif}
+    procedure HintsChange(Sender: TObject);
+    procedure ItemsChange(Sender: TObject); virtual;
+    procedure SetAlignment(newValue: TLeftRight);
+    procedure SetButtonCount(Value: Integer);
+    procedure SetColumns(Value: Integer);
+    procedure SetFlat(newValue : boolean); override;
+    procedure SetHints(Value: TElFStrings);
+    procedure SetItems(Value: TElFStrings);
+    procedure UpdateButtons; virtual;
+    {$ifndef CLX_USED}
+    procedure WMSize(var Message: TWMSize); message WM_SIZE;
+    {$else}
+    procedure Resize; override;
+    {$endif}
+    procedure GetChildren(Proc: TGetChildProc; Root: TComponent); override;
+    procedure ReadState(Reader: TReader); override;
+    {$ifndef CLX_USED}
+    procedure SetImageForm(Value : TElImageForm); override;
+    {$endif}
+    {$ifdef HAS_HTML_RENDER}
+    procedure SetIsHTML(Value: Boolean); override;
+    {$endif}
+    procedure SetTransparent(newValue : boolean); override;
+    procedure SetUseXPThemes(const Value: Boolean); override;
+    procedure IntCreateItem; virtual; abstract;
+    procedure ButtonClick(Sender: TObject); virtual;
+    {$ifdef USE_SOUND_MAP}
+    procedure SetCheckSound(Value: TElSoundName); override;
+    {$endif}
+    procedure SetGlyph(Value: TBitmap); override;
+    procedure SetImages(Value: TImageList); override;
+    {$ifdef USE_SOUND_MAP}
+    procedure SetSoundMap(Value: TElSoundMap); override;
+    {$endif}
+    procedure SetUseCustomGlyphs(Value: Boolean); override;
+    procedure SetUseImageList(Value: Boolean); override;
+    procedure SetCheckboxChecked(Value: Boolean); override;
+    procedure SetFlatAlways(Value: Boolean);
+    {$ifndef CLX_USED}
+    procedure SetMoneyFlatInactiveColor(Value: TColor); override;
+    procedure SetMoneyFlatActiveColor(Value: TColor); override;
+    procedure SetMoneyFlatDownColor(Value: TColor); override;
+    {$endif}
+    function GetItemEnabled(Index: Integer): Boolean;
+
+    procedure SetItemEnabled(Index: Integer; Value: Boolean);
+    property Alignment: TLeftRight read FAlignment write SetAlignment default
+        taRightJustify;
+    property Columns: Integer read FColumns write SetColumns default 1;
+    property Hints: TElFStrings read FHints write SetHints;
+    property Items: TElFStrings read FItems write SetItems;
+    property ItemEnabled[Index: Integer]: Boolean read GetItemEnabled write
+        SetItemEnabled;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    {$ifdef VCL_4_USED}
+    procedure FlipChildren(AllLevels: Boolean); override;
+    {$endif}
+  end;
+
+type
+  TCustomElRadioGroup = class (TElCheckItemGroup)
+  private
+    FItemIndex: Integer;
+
+    procedure SetItemIndex(Value: Integer);
+  protected
+    procedure IntCreateItem; override;
+    procedure UpdateButtons; override;
+    procedure ButtonClick(Sender: TObject); override;
+    procedure ItemsChange(Sender: TObject); override;
+
+    property ItemIndex: Integer read FItemIndex write SetItemIndex default -1;
+  public
+    constructor Create(AOwner: TComponent); override;
+  end;
+
+
+  TElRadioGroup = class(TCustomElRadioGroup)
+  public
+    property ItemEnabled;
+  published
+    property Align;
+    property Alignment;
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    {$ifndef CLX_USED}
+    property BiDiMode;
+    property Constraints;
+    property DragKind;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+    {$endif}
+{$ENDIF}
+    property BorderSides;
+    property Caption;
+    property CaptionColor;
+    property CheckBoxChecked;
+    property Color;
+    property Columns;
+    {$ifndef CLX_USED}
+    property Ctl3D;
+    property DragCursor;
+    {$endif}
+    property DragMode;
+    property Enabled;
+    property Flat;
+    property FlatAlways;
+    property Font;
+    property Hints;
+    {$ifndef CLX_USED}
+    property ImageForm;
+    {$endif}
+  {$ifdef HAS_HTML_RENDER}
+    property IsHTML;
+  {$endif}
+    property ItemIndex;
+    property Items;
+    {$ifndef CLX_USED}
+    property MoneyFlat;
+    property MoneyFlatInactiveColor;
+    property MoneyFlatActiveColor;
+    property MoneyFlatDownColor;
+    {$endif}
+    property ParentColor;
+    {$ifndef CLX_USED}
+    property ParentCtl3D;
+    {$endif}
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowCheckBox;
+    property ShowFocus;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property Transparent;
+    property Visible;
+    property UseXPThemes;
+
+    {$ifdef USE_SOUND_MAP}
+    property CheckSound;
+    property SoundMap;
+    {$endif}
+    property Glyph;
+    property Images;
+    property UseCustomGlyphs;
+    property UseImageList;
+
+    property OnClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnStartDrag;
+{$IFDEF VCL_5_USED}
+    property OnContextPopup;
+{$ENDIF}
+  end;
+
+type
+
+  TCustomElCheckGroup = class(TElCheckItemGroup)
+  private
+    function GetChecked(Index: Integer): Boolean;
+    procedure SetChecked(Index: Integer; Value: Boolean);
+    function GetState(Index: Integer): TCheckBoxState;
+    procedure SetState(Index: Integer; Value: TCheckBoxState);
+  protected
+    FAllowGrayed: Boolean;
+    procedure SetAllowGrayed(Value: Boolean);
+    procedure IntCreateItem; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    property Checked[Index: Integer]: Boolean read GetChecked write SetChecked;
+    property State[Index: Integer]: TCheckBoxState read GetState write SetState;
+  published
+    property AllowGrayed: Boolean read FAllowGrayed write SetAllowGrayed default true;
+  end;
+
+  TElCheckGroup = class(TCustomElCheckGroup)
+  public
+    property ItemEnabled; 
+  published
+    property Align;
+    property Alignment;
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    {$ifndef CLX_USED}
+    property BiDiMode;
+    property Constraints;
+    property DragKind;
+    property ParentBiDiMode;
+    property OnEndDock;
+    property OnStartDock;
+    {$endif}
+{$ENDIF}
+    property BorderSides;
+    property Caption;
+    property CaptionColor;
+    property CheckBoxChecked; 
+    property Color;
+    property Columns;
+    {$ifndef CLX_USED}
+    property Ctl3D;
+    property DragCursor;
+    {$endif}
+    property DragMode;
+    property Enabled;
+    property Flat;
+    property FlatAlways;
+    property Font;
+    property Hints;
+    {$ifndef CLX_USED}
+    property ImageForm;
+    {$endif}
+  {$ifdef HAS_HTML_RENDER}
+    property IsHTML;
+  {$endif}
+    property Items;
+    {$ifndef CLX_USED}
+    property MoneyFlat;
+    property MoneyFlatInactiveColor;
+    property MoneyFlatActiveColor;
+    property MoneyFlatDownColor;
+    {$endif}
+    property ParentColor;
+    {$ifndef CLX_USED}
+    property ParentCtl3D;
+    {$endif}
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowCheckBox;
+    property ShowFocus;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property Transparent;
+    property Visible;
+    property UseXPThemes;
+
+    {$ifdef USE_SOUND_MAP}
+    property CheckSound;
+    property SoundMap;
+    {$endif}
+    property Glyph;
+    property Images;
+    property UseCustomGlyphs;
+    property UseImageList;
+
+
+    property OnClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnStartDrag;
+{$IFDEF VCL_5_USED}
+    property OnContextPopup;
+{$ENDIF}
+  end;
+
+implementation
+end.

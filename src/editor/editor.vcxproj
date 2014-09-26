@@ -1,0 +1,355 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{492D3DFE-9068-4E7E-A008-7C2420A651C0}</ProjectGuid>
+    <RootNamespace>editor</RootNamespace>
+    <Keyword>ManagedCProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <CLRSupport>true</CLRSupport>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <CLRSupport>true</CLRSupport>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(xrBinDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(xrBinDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(xrSdkDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;DEBUG;EDITOR_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4945;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/ignore:4248 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies />
+      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AssemblyDebug>true</AssemblyDebug>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(xrSdkDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;EDITOR_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies />
+      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Reference Include="DockPanelSkin">
+      <HintPath>..\..\sdk\binaries\DockPanelSkin.dll</HintPath>
+    </Reference>
+    <Reference Include="Flobbster.Windows.Forms.PropertyGrid">
+      <HintPath>..\..\sdk\binaries\Flobbster.Windows.Forms.PropertyGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualC">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Data">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Design">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Xml">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="WeifenLuo.WinFormsUI.Docking">
+      <HintPath>..\..\sdk\binaries\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="entry_point.cpp" />
+    <ClCompile Include="ide_impl.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="property_boolean.cpp" />
+    <ClCompile Include="property_boolean_reference.cpp" />
+    <ClCompile Include="property_boolean_values_value.cpp" />
+    <ClCompile Include="property_boolean_values_value_reference.cpp" />
+    <ClCompile Include="property_collection.cpp" />
+    <ClCompile Include="property_collection_base.cpp" />
+    <ClCompile Include="property_collection_converter.cpp" />
+    <ClCompile Include="property_collection_editor.cpp" />
+    <ClCompile Include="property_collection_enumerator.cpp" />
+    <ClCompile Include="property_collection_getter.cpp" />
+    <ClCompile Include="property_color.cpp" />
+    <ClCompile Include="property_color_base.cpp" />
+    <ClCompile Include="property_color_reference.cpp" />
+    <ClCompile Include="property_container.cpp" />
+    <ClCompile Include="property_container_converter.cpp" />
+    <ClCompile Include="property_converter_boolean_values.cpp" />
+    <ClCompile Include="property_converter_color.cpp" />
+    <ClCompile Include="property_converter_float.cpp" />
+    <ClCompile Include="property_converter_float_enum.cpp" />
+    <ClCompile Include="property_converter_integer_enum.cpp" />
+    <ClCompile Include="property_converter_integer_values.cpp" />
+    <ClCompile Include="property_converter_string_values.cpp" />
+    <ClCompile Include="property_converter_tree_values.cpp" />
+    <ClCompile Include="property_converter_vec3f.cpp" />
+    <ClCompile Include="property_editor_color.cpp" />
+    <ClCompile Include="property_editor_file_name.cpp" />
+    <ClCompile Include="property_editor_tree_values.cpp" />
+    <ClCompile Include="property_file_name_value.cpp" />
+    <ClCompile Include="property_file_name_value_shared_str.cpp" />
+    <ClCompile Include="property_float.cpp" />
+    <ClCompile Include="property_float_enum_value.cpp" />
+    <ClCompile Include="property_float_enum_value_reference.cpp" />
+    <ClCompile Include="property_float_limited.cpp" />
+    <ClCompile Include="property_float_limited_reference.cpp" />
+    <ClCompile Include="property_float_reference.cpp" />
+    <ClCompile Include="property_holder.cpp" />
+    <ClCompile Include="property_holder_boolean.cpp" />
+    <ClCompile Include="property_holder_collection.cpp" />
+    <ClCompile Include="property_holder_color.cpp" />
+    <ClCompile Include="property_holder_container.cpp" />
+    <ClCompile Include="property_holder_float.cpp" />
+    <ClCompile Include="property_holder_integer.cpp" />
+    <ClCompile Include="property_holder_string.cpp" />
+    <ClCompile Include="property_holder_vec3f.cpp" />
+    <ClCompile Include="property_integer.cpp" />
+    <ClCompile Include="property_integer_enum_value.cpp" />
+    <ClCompile Include="property_integer_enum_value_reference.cpp" />
+    <ClCompile Include="property_integer_limited.cpp" />
+    <ClCompile Include="property_integer_limited_reference.cpp" />
+    <ClCompile Include="property_integer_reference.cpp" />
+    <ClCompile Include="property_integer_values_value.cpp" />
+    <ClCompile Include="property_integer_values_value_getter.cpp" />
+    <ClCompile Include="property_integer_values_value_reference.cpp" />
+    <ClCompile Include="property_integer_values_value_reference_getter.cpp" />
+    <ClCompile Include="property_property_container.cpp" />
+    <ClCompile Include="property_string.cpp" />
+    <ClCompile Include="property_string_shared_str.cpp" />
+    <ClCompile Include="property_string_values_value.cpp" />
+    <ClCompile Include="property_string_values_value_getter.cpp" />
+    <ClCompile Include="property_string_values_value_shared_str.cpp" />
+    <ClCompile Include="property_string_values_value_shared_str_getter.cpp" />
+    <ClCompile Include="property_vec3f.cpp" />
+    <ClCompile Include="property_vec3f_base.cpp" />
+    <ClCompile Include="property_vec3f_reference.cpp" />
+    <ClCompile Include="window_ide.cpp" />
+    <ClCompile Include="window_ide_serialize.cpp" />
+    <ClCompile Include="window_levels.cpp" />
+    <ClCompile Include="window_tree_values.cpp" />
+    <ClCompile Include="window_view.cpp" />
+    <ClCompile Include="window_weather.cpp" />
+    <ClCompile Include="window_weather_editor.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Include\editor\engine.hpp" />
+    <ClInclude Include="..\Include\editor\ide.hpp" />
+    <ClInclude Include="..\Include\editor\interfaces.hpp" />
+    <ClInclude Include="..\Include\editor\property_holder.hpp" />
+    <ClInclude Include="engine_include.hpp" />
+    <ClInclude Include="ide_impl.hpp" />
+    <ClInclude Include="pch.hpp" />
+    <ClInclude Include="property_boolean.hpp" />
+    <ClInclude Include="property_boolean_reference.hpp" />
+    <ClInclude Include="property_boolean_values_value.hpp" />
+    <ClInclude Include="property_boolean_values_value_reference.hpp" />
+    <ClInclude Include="property_collection.hpp" />
+    <ClInclude Include="property_collection_base.hpp" />
+    <ClInclude Include="property_collection_converter.hpp" />
+    <ClInclude Include="property_collection_editor.hpp" />
+    <ClInclude Include="property_collection_enumerator.hpp" />
+    <ClInclude Include="property_collection_getter.hpp" />
+    <ClInclude Include="property_color.hpp" />
+    <ClInclude Include="property_color_base.hpp" />
+    <ClInclude Include="property_color_reference.hpp" />
+    <ClInclude Include="property_container.hpp" />
+    <ClInclude Include="property_container_converter.hpp" />
+    <ClInclude Include="property_container_holder.hpp" />
+    <ClInclude Include="property_converter_boolean_values.hpp" />
+    <ClInclude Include="property_converter_color.hpp" />
+    <ClInclude Include="property_converter_float.hpp" />
+    <ClInclude Include="property_converter_float_enum.hpp" />
+    <ClInclude Include="property_converter_integer_enum.hpp" />
+    <ClInclude Include="property_converter_integer_values.hpp" />
+    <ClInclude Include="property_converter_string_values.hpp" />
+    <ClInclude Include="property_converter_tree_values.hpp" />
+    <ClInclude Include="property_converter_vec3f.hpp" />
+    <ClInclude Include="property_editor_color.hpp" />
+    <ClInclude Include="property_editor_file_name.hpp" />
+    <ClInclude Include="property_editor_tree_values.hpp" />
+    <ClInclude Include="property_file_name_value.hpp" />
+    <ClInclude Include="property_file_name_value_base.hpp" />
+    <ClInclude Include="property_file_name_value_shared_str.hpp" />
+    <ClInclude Include="property_float.hpp" />
+    <ClInclude Include="property_float_enum_value.hpp" />
+    <ClInclude Include="property_float_enum_value_reference.hpp" />
+    <ClInclude Include="property_float_limited.hpp" />
+    <ClInclude Include="property_float_limited_reference.hpp" />
+    <ClInclude Include="property_float_reference.hpp" />
+    <ClInclude Include="property_holder.hpp" />
+    <ClInclude Include="property_holder_include.hpp" />
+    <ClInclude Include="property_integer.hpp" />
+    <ClInclude Include="property_integer_enum_value.hpp" />
+    <ClInclude Include="property_integer_enum_value_reference.hpp" />
+    <ClInclude Include="property_integer_limited.hpp" />
+    <ClInclude Include="property_integer_limited_reference.hpp" />
+    <ClInclude Include="property_integer_reference.hpp" />
+    <ClInclude Include="property_integer_values_value.hpp" />
+    <ClInclude Include="property_integer_values_value_base.hpp" />
+    <ClInclude Include="property_integer_values_value_getter.hpp" />
+    <ClInclude Include="property_integer_values_value_reference.hpp" />
+    <ClInclude Include="property_integer_values_value_reference_getter.hpp" />
+    <ClInclude Include="property_property_container.hpp" />
+    <ClInclude Include="property_string.hpp" />
+    <ClInclude Include="property_string_shared_str.hpp" />
+    <ClInclude Include="property_string_values_value.hpp" />
+    <ClInclude Include="property_string_values_value_base.hpp" />
+    <ClInclude Include="property_string_values_value_getter.hpp" />
+    <ClInclude Include="property_string_values_value_shared_str.hpp" />
+    <ClInclude Include="property_string_values_value_shared_str_getter.hpp" />
+    <ClInclude Include="property_vec3f.hpp" />
+    <ClInclude Include="property_vec3f_base.hpp" />
+    <ClInclude Include="property_vec3f_reference.hpp" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="window_ide.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="window_levels.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="window_tree_values.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="window_view.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="window_weather.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="window_weather_editor.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\color_picker.cur" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="editor.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="window_ide.resx">
+      <DependentUpon>window_ide.h</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="window_levels.resx">
+      <DependentUpon>window_levels.h</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="window_tree_values.resx">
+      <DependentUpon>window_tree_values.h</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="window_view.resx">
+      <DependentUpon>window_view.h</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="window_weather.resx">
+      <DependentUpon>window_weather.h</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="window_weather_editor.resx">
+      <DependentUpon>window_weather_editor.h</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
+      <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)editor_controls\editor_controls.vcxproj">
+      <Project>{b45374aa-c7ed-42cf-bbd3-deaa2b7acb48}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

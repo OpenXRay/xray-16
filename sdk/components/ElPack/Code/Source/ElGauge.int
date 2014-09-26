@@ -1,0 +1,144 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElGauge;
+
+interface
+
+uses
+  SysUtils,
+  Classes,
+  {$ifndef CLX_USED}
+  Messages,
+  Windows,
+  Graphics,
+  Controls,
+  Forms,
+  ElImgFrm,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  {$else}
+  Types,
+  Qt,
+  QTypes,
+  QGraphics,
+  QControls,
+  {$endif}
+  ElCGControl;
+
+type
+  TElGaugeKind = (egkNeedle, egkPie);
+
+type
+  TElGauge = class(TElCustomGraphicControl)
+  private
+    FTransparent : Boolean;
+    FGaugeKind : TElGaugeKind;
+    FText : string;
+    FValue : Integer;
+    FMinValue : Integer;
+    FMaxValue : Integer;
+    FShowPoints : Boolean;
+    FPoints : Integer;
+    FBackColor : TColor;
+    FForeColor : TColor;
+    FCriticalValue : Integer;
+    FCriticalColor : TColor;
+    Bitmap : TBitmap;
+    {$ifndef CLX_USED}
+    FImgForm : TElImageForm;
+    FImgFormChLink  : TImgFormChangeLink;
+    procedure ImageFormChange(Sender : TObject);
+    procedure SetImageForm(newValue : TElImageForm);
+    {$endif}
+    procedure SetValue(newValue : Integer);
+    procedure SetMinValue(newValue : Integer);
+    procedure SetMaxValue(newValue : Integer);
+    procedure SetShowPoints(newValue : Boolean);
+    procedure SetPoints(newValue : Integer);
+    procedure SetBackColor(newValue : TColor);
+    procedure SetForeColor(newValue : TColor);
+    procedure SetCriticalValue(newValue : Integer);
+    procedure SetCriticalColor(newValue : TColor);
+    procedure SetGaugeKind(newValue : TElGaugeKind);
+    procedure SetTransparent(newValue : Boolean);
+  protected
+    {$ifndef CLX_USED}
+    procedure SetText(Value: string);
+    {$endif}
+    procedure Paint; override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    {$ifndef CLX_USED}
+    procedure IFMRepaintChildren(var Message: TMessage); message
+        IFM_REPAINTCHILDREN;
+    {$endif}
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+  published
+    property Value : Integer read FValue write SetValue;
+    property MinValue : Integer read FMinValue write SetMinValue;
+    property MaxValue : Integer read FMaxValue write SetMaxValue;
+    property ShowPoints : Boolean read FShowPoints write SetShowPoints;
+    property Points : Integer read FPoints write SetPoints default 11;
+    property BackColor : TColor read FBackColor write SetBackColor;
+    property ForeColor : TColor read FForeColor write SetForeColor;
+    property CriticalValue : Integer read FCriticalValue write SetCriticalValue;
+    property CriticalColor : TColor read FCriticalColor write SetCriticalColor;
+    property Transparent : Boolean read FTransparent write SetTransparent default False;  { Published }
+    {$ifndef CLX_USED}
+    property ImageForm   : TElImageForm read FImgForm write SetImageForm;
+    {$endif}
+    property Align;
+    property Color;
+    property Enabled;
+    property Font;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property Visible;
+    {$ifndef CLX_USED}
+    property Text : string read FText write SetText;
+    {$endif}
+    property GaugeKind : TElGaugeKind read FGaugeKind write SetGaugeKind;
+
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Action;
+    property Constraints;
+    {$ifndef CLX_USED}
+    property DockOrientation;
+    property Floating;
+    property DragKind;
+    {$endif}
+{$ENDIF}
+  end;
+
+implementation
+end.

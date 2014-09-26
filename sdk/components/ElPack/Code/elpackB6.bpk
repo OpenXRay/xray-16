@@ -1,0 +1,303 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.06.00"/>
+    <PROJECT value="elpackB6.bpl"/>
+    <OBJFILES value="source\frmHdrStp.obj source\ElACtrls.obj source\ElAppBar.obj 
+      source\ElArray.obj source\ElBaseComp.obj source\ElBiProgr.obj 
+      source\ElBtnCtl.obj source\ElBtnEdit.obj source\ElCalendar.obj 
+      source\ElCalendDlg.obj source\ElCaption.obj source\ElCBFmts.obj 
+      source\ElCheckCtl.obj source\ElClock.obj source\ElClrCmb.obj 
+      source\ElColorMap.obj source\ElContBase.obj source\ElCRC32.obj 
+      source\ElDailyTip.obj source\ElDragDrop.obj source\ElExtBkgnd.obj 
+      source\ElFlatCtl.obj source\ElFrmPers.obj source\ElGraphs.obj 
+      source\ElHashList.obj source\ElHeader.obj source\ElHint.obj 
+      source\ElHintWnd.obj source\ElHook.obj source\ElHstgrm.obj 
+      source\ElImgLst.obj source\ElIni.obj source\ElList.obj source\ElMD5.obj 
+      source\ElMemoCombo.obj source\ElMRU.obj source\ElMTree.obj 
+      source\ElObjList.obj source\ElOneInst.obj source\ElOpts.obj 
+      source\ElPanel.obj source\ElPopBtn.obj source\ElPropTools.obj 
+      source\ElQueue.obj source\ElRegUtils.obj 
+      source\ElScrollBar.obj source\ElSideBar.obj source\ElSndMap.obj 
+      source\ElSpin.obj source\ElSplit.obj source\ElStack.obj 
+      source\ElStatBar.obj source\ElStrArray.obj source\ElStrToken.obj 
+      source\ElStrUtils.obj source\ElTimers.obj source\ElToolBar.obj 
+      source\ElTools.obj source\ElTray.obj source\ElTree.obj 
+      source\ElTreeCombo.obj source\ElURLLabel.obj source\ElVCLUtils.obj 
+      source\ElImgFrm.obj source\ElLabel.obj source\ElCombos.obj 
+      source\ElCLabel.obj source\ElCGControl.obj source\ElHandPt.obj 
+      source\ElTreeGrids.obj source\ElMaskEdit.obj source\ElVerInfo.obj 
+      source\ElCheckItemGrp.obj source\ElAdvPanel.obj source\ElHTMLPanel.obj 
+      source\ElTreeBtnEdit.obj source\ElShellUtils.obj Source\ElPgCtl.obj
+      source\ElGauge.obj Source\ElShutdownWatcher.obj Source\ElIPEdit.obj 
+      source\ElUnicodeStrings.obj source\ElDriveCombo.obj source\ElFontCombo.obj 
+      source\ElTrackBar.obj source\ElImgCombo.obj source\ElTreeTreeComboEdit.obj 
+      source\ElTreeSpinEdit.obj source\ElTreeMemoEdit.obj Source\ElHTMLView.obj 
+      source\ElTreeMaskEdit.obj Source\ElTmSchema.obj Source\ElUxTheme.obj
+      source\ElXPThemedControl.obj Source\ElListBox.obj Source\ElColor.obj
+      Source\ElMouseHint.obj Source\ElEdits.obj Source\ElTreeAdvEdit.obj 
+      Source\frmTbrStp.obj Source\ElScrollBox.obj Source\ElMenus.obj
+      source\ElTreeDTPickEdit.obj source\ElTreeCurrEdit.obj Source\HTMLLbx.obj
+      source\ElTreeComboBox.obj source\ElTreeCheckBoxEdit.obj Source\ElExpBar.obj 
+      source\ElFileUtils.obj Source\ElGroupBox.obj Source\ElClipMon.obj 
+      source\ElCalendarDefs.obj Source\ElCurrEdit.Obj Source\ElDTPick.obj 
+      source\ElTreeAdvEdit.obj source\ElPromptDlg.obj Source\ElInputDlg.obj 
+      source\frmColorMapItems.obj source\ElNameEdits.obj source\ElTreeStdEditors.obj 
+      source\ElTreeModalEdit.obj Source\ElTrayInfo.obj Source\ElSpinBtn.obj
+      Source\ElHTMLHint.obj Source\HTMLRender.obj Source\ElFolderDlg.obj
+      Source\ElStrPool.obj Source\ElHotKey.pas Source\ElHTMLLbl.obj elpackB6.obj"/>
+    <RESFILES value="elpackB6.res"/>
+    <IDLFILES value=""/>
+    <IDLGENFILES value=""/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES) Source\frmHdrStp.dfm Source\ElCalendDlg.dfm 
+      Source\ElClrCmb.dfm Source\ElDailyTip.dfm Source\ElPromptDlg.dfm 
+      Source\frmColorMapItems.dfm"/>
+    <LIBFILES value=""/>
+    <LIBRARIES value=""/>
+    <SPARELIBS value="Vcl.lib rtl.lib"/>
+    <PACKAGES value="rtl.bpi vclx.bpi VCL.bpi"/>
+    <PATHCPP value=".;"/>
+    <PATHPAS value=".;Source"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
+    <RELEASELIBPATH value="$(BCB)\lib\release"/>
+    <LINKER value="ilink32"/>
+    <USERDEFINES value=""/>
+    <SYSDEFINES value="NO_STRICT;_RTLDLL;_VIS_NOLIB;USEPACKAGES"/>
+    <MAINSOURCE value="elpackB6.cpp"/>
+    <INCLUDEPATH value="source;$(BCB)\include;$(BCB)\include\vcl"/>
+    <LIBPATH value="source;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\lib\release"/>
+    <WARNINGS value="-w-par -w-8027 -w-8026"/>
+    <WARNOPTSTR value=""/>
+  </MACROS>
+  <OPTIONS>
+    <IDLCFLAGS value="-Isource -I$(BCB)\include -I$(BCB)\include\vcl -src_suffix cpp -boa"/>
+    <CFLAG1 value="-O2 -H=$(BCB)\lib\vcl.csm -Hc -Vx -Ve -Tkh30000 -X- -a8 -4 -b- -k- -vi 
+      -c -tWM"/>
+    <PFLAGS value="-N2source -N0source -$Y- -$L- -$I- -$D- -$C- -v -M -JPHNE"/>
+    <RFLAGS value=""/>
+    <AFLAGS value="/mx /w2 /zn"/>
+    <LFLAGS value="-Isource -D&quot;EldoS Visual Components&quot; -aa -Tpp -Gpr -x -Gn -Gl -Gi"/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="c0pkg32.obj $(PACKAGES) Memmgr.Lib sysinit.obj $(OBJFILES)"/>
+    <ALLRES value="$(RESFILES)"/>
+    <ALLLIB value="$(LIBFILES) $(LIBRARIES) import32.lib cp32mti.lib"/>
+  </LINKER>
+  <FILELIST>
+      <FILE FILENAME="elpackB6.cpp" FORMNAME="" UNITNAME="elpackB6" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="elpackB6.res" FORMNAME="" UNITNAME="elpackB6" CONTAINERID="ResTool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="rtl.bpi" FORMNAME="" UNITNAME="rtl" CONTAINERID="BPITool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="vclx.bpi" FORMNAME="" UNITNAME="vclx" CONTAINERID="BPITool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="VCL.bpi" FORMNAME="" UNITNAME="VCL" CONTAINERID="BPITool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\frmHdrStp.pas" FORMNAME="frmHeaderSetup" UNITNAME="TfrmHeaderSetup" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElACtrls.pas" FORMNAME="" UNITNAME="ElACtrls" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElAppBar.pas" FORMNAME="" UNITNAME="ElAppBar" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElArray.pas" FORMNAME="" UNITNAME="ElArray" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElBaseComp.pas" FORMNAME="" UNITNAME="ElBaseComp" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElBiProgr.pas" FORMNAME="" UNITNAME="ElBiProgr" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElBtnCtl.pas" FORMNAME="" UNITNAME="ElBtnCtl" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElBtnEdit.pas" FORMNAME="" UNITNAME="ElBtnEdit" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElCalendar.pas" FORMNAME="" UNITNAME="ElCalendar" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElCalendDlg.pas" FORMNAME="ElCalendarForm" UNITNAME="Elcalenddlg" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElCaption.pas" FORMNAME="" UNITNAME="ElCaption" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElCBFmts.pas" FORMNAME="" UNITNAME="ElCBFmts" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElCheckCtl.pas" FORMNAME="" UNITNAME="ElCheckCtl" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElClipMon.pas" FORMNAME="" UNITNAME="ElClipMon" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElClock.pas" FORMNAME="" UNITNAME="ElClock" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElClrCmb.pas" FORMNAME="ColorListDlg" UNITNAME="Elclrcmb" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElColorMap.pas" FORMNAME="" UNITNAME="ElColorMap" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElContBase.pas" FORMNAME="" UNITNAME="ElContBase" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElCRC32.pas" FORMNAME="" UNITNAME="ElCRC32" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElDailyTip.pas" FORMNAME="ElDailyTipForm" UNITNAME="Eldailytip" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElDragDrop.pas" FORMNAME="" UNITNAME="ElDragDrop" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElExtBkgnd.pas" FORMNAME="" UNITNAME="ElExtBkgnd" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElFlatCtl.pas" FORMNAME="" UNITNAME="ElFlatCtl" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElFrmPers.pas" FORMNAME="" UNITNAME="ElFrmPers" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElGauge.pas" FORMNAME="" UNITNAME="ElGauge" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElGraphs.pas" FORMNAME="" UNITNAME="ElGraphs" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElHashList.pas" FORMNAME="" UNITNAME="ElHashList" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElHeader.pas" FORMNAME="" UNITNAME="ElHeader" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElHint.pas" FORMNAME="" UNITNAME="ElHint" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElHintWnd.pas" FORMNAME="" UNITNAME="ElHintWnd" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElHook.pas" FORMNAME="" UNITNAME="ElHook" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElHstgrm.pas" FORMNAME="" UNITNAME="ElHstgrm" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElImgLst.pas" FORMNAME="" UNITNAME="ElImgLst" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElIni.pas" FORMNAME="" UNITNAME="ElIni" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElFolderDlg.pas" FORMNAME="" UNITNAME="ElFolderDlg" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElInputDlg.pas" FORMNAME="" UNITNAME="ElInputDlg" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElList.pas" FORMNAME="" UNITNAME="ElList" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElMD5.pas" FORMNAME="" UNITNAME="ElMD5" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElMemoCombo.pas" FORMNAME="" UNITNAME="ElMemoCombo" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElMRU.pas" FORMNAME="" UNITNAME="ElMRU" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElMTree.pas" FORMNAME="" UNITNAME="ElMTree" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElObjList.pas" FORMNAME="" UNITNAME="ElObjList" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElOneInst.pas" FORMNAME="" UNITNAME="ElOneInst" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElOpts.pas" FORMNAME="" UNITNAME="ElOpts" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElPanel.pas" FORMNAME="" UNITNAME="ElPanel" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElPopBtn.pas" FORMNAME="" UNITNAME="ElPopBtn" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElPropTools.pas" FORMNAME="" UNITNAME="ElPropTools" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElQueue.pas" FORMNAME="" UNITNAME="ElQueue" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElRegUtils.pas" FORMNAME="" UNITNAME="ElRegUtils" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElScrollBar.pas" FORMNAME="" UNITNAME="ElScrollBar" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElSideBar.pas" FORMNAME="" UNITNAME="ElSideBar" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElSndMap.pas" FORMNAME="" UNITNAME="ElSndMap" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElSpin.pas" FORMNAME="" UNITNAME="ElSpin" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElSplit.pas" FORMNAME="" UNITNAME="ElSplit" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElStack.pas" FORMNAME="" UNITNAME="ElStack" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElStatBar.pas" FORMNAME="" UNITNAME="ElStatBar" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElStrArray.pas" FORMNAME="" UNITNAME="ElStrArray" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElStrToken.pas" FORMNAME="" UNITNAME="ElStrToken" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElStrUtils.pas" FORMNAME="" UNITNAME="ElStrUtils" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTimers.pas" FORMNAME="" UNITNAME="ElTimers" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElToolBar.pas" FORMNAME="" UNITNAME="ElToolBar" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTools.pas" FORMNAME="" UNITNAME="ElTools" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTray.pas" FORMNAME="" UNITNAME="ElTray" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTree.pas" FORMNAME="" UNITNAME="ElTree" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTreeCombo.pas" FORMNAME="" UNITNAME="ElTreeCombo" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElURLLabel.pas" FORMNAME="" UNITNAME="ElURLLabel" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElVCLUtils.pas" FORMNAME="" UNITNAME="ElVCLUtils" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElImgFrm.pas" FORMNAME="" UNITNAME="ElImgFrm" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElLabel.pas" FORMNAME="" UNITNAME="ElLabel" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElCombos.pas" FORMNAME="" UNITNAME="ElCombos" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElCLabel.pas" FORMNAME="" UNITNAME="ElCLabel" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElCGControl.pas" FORMNAME="" UNITNAME="ElCGControl" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElPgCtl.pas" FORMNAME="" UNITNAME="ElPgCtl" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElShutdownWatcher.pas" FORMNAME="" UNITNAME="ElShutdownWatcher" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElIPEdit.pas" FORMNAME="" UNITNAME="ElIPEdit" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElHTMLView.pas" FORMNAME="" UNITNAME="ElHTMLView" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\HTMLLbx.pas" FORMNAME="" UNITNAME="HTMLLbx" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\HTMLRender.pas" FORMNAME="" UNITNAME="HTMLRender" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElHTMLHint.pas" FORMNAME="" UNITNAME="ElHTMLHint" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTrayInfo.pas" FORMNAME="" UNITNAME="ElTrayInfo" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElSpinBtn.pas" FORMNAME="" UNITNAME="ElSpinBtn" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElCalendarDefs.pas" FORMNAME="" UNITNAME="ElCalendarDefs" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElCurrEdit.pas" FORMNAME="" UNITNAME="ElCurrEdit" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElDTPick.pas" FORMNAME="" UNITNAME="ElDTPick" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElStrPool.pas" FORMNAME="" UNITNAME="ElStrPool" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElHTMLLbl.pas" FORMNAME="" UNITNAME="ElHTMLLbl" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElGroupBox.pas" FORMNAME="" UNITNAME="ElGroupBox" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElFileUtils.pas" FORMNAME="" UNITNAME="ElFileUtils" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElScrollBox.pas" FORMNAME="" UNITNAME="ElScrollBox" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElListBox.pas" FORMNAME="" UNITNAME="ElListBox" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElMenus.pas" FORMNAME="" UNITNAME="ElMenus" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElColor.pas" FORMNAME="" UNITNAME="ElColor" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElExpBar.pas" FORMNAME="" UNITNAME="ElExpBar" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElHandPt.pas" FORMNAME="" UNITNAME="ElHandPt" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTreeGrids.pas" FORMNAME="" UNITNAME="ElTreeGrids" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElMaskEdit.pas" FORMNAME="" UNITNAME="ElMaskEdit" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElVerInfo.pas" FORMNAME="" UNITNAME="ElVerInfo" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElCheckItemGrp.pas" FORMNAME="" UNITNAME="ElCheckItemGrp" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElAdvPanel.pas" FORMNAME="" UNITNAME="ElAdvPanel" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElHTMLPanel.pas" FORMNAME="" UNITNAME="ElHTMLPanel" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTreeBtnEdit.pas" FORMNAME="" UNITNAME="ElTreeBtnEdit" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElShellUtils.pas" FORMNAME="" UNITNAME="ElShellUtils" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElUnicodeStrings.pas" FORMNAME="" UNITNAME="ElUnicodeStrings" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElDriveCombo.pas" FORMNAME="" UNITNAME="ElDriveCombo" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElFontCombo.pas" FORMNAME="" UNITNAME="ElFontCombo" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTrackBar.pas" FORMNAME="" UNITNAME="ElTrackBar" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElImgCombo.pas" FORMNAME="" UNITNAME="ElImgCombo" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTreeTreeComboEdit.pas" FORMNAME="" UNITNAME="ElTreeTreeComboEdit" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTreeSpinEdit.pas" FORMNAME="" UNITNAME="ElTreeSpinEdit" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTreeMemoEdit.pas" FORMNAME="" UNITNAME="ElTreeMemoEdit" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTreeMaskEdit.pas" FORMNAME="" UNITNAME="ElTreeMaskEdit" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTreeDTPickEdit.pas" FORMNAME="" UNITNAME="ElTreeDTPickEdit" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTreeCurrEdit.pas" FORMNAME="" UNITNAME="ElTreeCurrEdit" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTreeComboBox.pas" FORMNAME="" UNITNAME="ElTreeComboBox" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTreeCheckBoxEdit.pas" FORMNAME="" UNITNAME="ElTreeCheckBoxEdit" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTreeAdvEdit.pas" FORMNAME="" UNITNAME="ElTreeAdvEdit" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTreeStdEditors.pas" FORMNAME="" UNITNAME="ElTreeStdEditors" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTreeModalEdit.pas" FORMNAME="" UNITNAME="ElTreeModalEdit" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElNameEdits.pas" FORMNAME="" UNITNAME="ElNameEdits" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElTmSchema.pas" FORMNAME="" UNITNAME="ElTmSchema" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElUxTheme.pas" FORMNAME="" UNITNAME="ElUxTheme" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElXpThemedControl.pas" FORMNAME="" UNITNAME="ElXpThemedControl" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\frmTbrStp.pas" FORMNAME="" UNITNAME="frmTbrStp" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElMouseHint.pas" FORMNAME="" UNITNAME="ElMouseHint" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElEdits.pas" FORMNAME="" UNITNAME="ElEdits" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\ElPromptDlg.pas" FORMNAME="ElPromptForm" UNITNAME="ElPromptDlg" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="Source\frmColorMapItems.pas" FORMNAME="ColorMapItemsForm" UNITNAME="Frmcolormapitems" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+  </FILELIST>
+  <BUILDTOOLS>
+  </BUILDTOOLS>
+
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=1
+AutoIncBuild=0
+MajorVer=3
+MinorVer=0
+Release=0
+Build=0
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=1
+Locale=1033
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=EldoS
+FileDescription=
+FileVersion=3.0.0.0
+InternalName=ElPack
+LegalCopyright=(c) 1998-2001, EldoS
+LegalTrademarks=
+OriginalFilename=
+ProductName=ElPack
+ProductVersion=3.0.0.0
+Comments=
+
+[HistoryLists\hlIncludePath]
+Count=3
+
+[HistoryLists\hlLibraryPath]
+Count=6
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlConditionals]
+Count=1
+Item0=_RTLDLL;USEPACKAGES
+
+[HistoryLists\hlIntOutputDir]
+Count=3
+
+[HistoryLists\hlFinalOutputDir]
+Count=4
+
+[HistoryLists\hIBPIOutputDir]
+Count=3
+
+[Debugging]
+DebugSourceDirs=
+
+[Parameters]
+RunParams=
+HostApplication=
+RemoteHost=
+RemotePath=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=0
+LinkCGLIB=0
+
+[CORBA]
+AddServerUnit=1
+AddClientUnit=1
+PrecompiledHeaders=1
+
+[Language]
+ActiveLang=
+ProjectLang=
+RootDir=
+  </IDEOPTIONS>
+</PROJECT>

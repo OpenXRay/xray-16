@@ -1,0 +1,58 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElTreeModalEdit;
+
+interface
+
+uses
+    Classes,
+    Messages,
+    Windows,
+    Forms,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+    ElHeader,
+    ElTree;
+
+type
+
+    TModalEditExecuteEvent = procedure(Sender : TObject; var Accepted : boolean) of object;
+
+    TElTreeInplaceModalEdit = class(TElTreeInplaceEditor)
+    private
+      procedure WndProc(var Message : TMessage);
+    protected
+      RegMsg: DWORD;
+      FWnd  : HWND;
+      FInProgress : boolean;
+      FOnExecute: TModalEditExecuteEvent;
+      function GetVisible: Boolean; override;
+      procedure StartOperation; override;
+      procedure DoStartOperation; override;
+      procedure Execute(var Accepted : boolean); virtual;
+    public
+      constructor Create(AOwner : TComponent); override;
+      destructor Destroy; override;
+    published
+      property OnExecute: TModalEditExecuteEvent read FOnExecute write FOnExecute;
+    end;
+
+implementation
+end.

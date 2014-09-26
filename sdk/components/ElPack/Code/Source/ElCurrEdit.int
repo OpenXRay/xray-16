@@ -1,0 +1,482 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2002, EldoS                   }
+{   Portions Copyright (c) 2001, Akzhan Abdulin      }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+03/09/2002
+
+  ButtonCaption and CurrencySymbol made Unicode
+
+03/06/2002
+
+  Added unicode hint
+
+02/21/2002
+
+  Improved positioning of the text
+  Changed editor ancestor to TElEdit
+
+02/05/2002 (c) Akzhan Abdulin
+
+  Calculation of width of fractional part editor fixed
+
+01/23/2002
+
+  Fixed vertical alignment of the parts
+
+01/01/2002
+
+  Fixed some problems with painting borders when focus is moved
+
+12/24/2001
+
+  Fixed sizing of editor parts when font is changed
+
+12/21/2001
+
+  When font is changed, the position of editor parts is recalculated now
+
+10/25/2001
+
+  Fixed painting of the borders with XP styles enabled
+
+10/24/2001
+
+  Editors' size is now adjusted correctly when the control is resized
+
+08/21/2001 (c) Akzhan Abdulin
+
+  Minor update for inplace editing support and cosmetic changes
+  ReadOnly property added
+
+07/15/2001 (c) Akzhan Abdulin
+
+  AutoSelect property added.
+
+  Sign, EnableSign and AbsoluteValue properties added.
+  TElCurrencyEdit now supports negative values.
+
+  NegativeSignColor and NegativeValueTextColor properties added.
+
+  UpdatePartsWidth, AdjustEditorPositions and Paint methods were
+  rewritten to be more precise.
+
+  System currency symbol leading/trailing blanks now retrieved too. 
+
+07/12/2001
+
+  BorderSides property added.
+
+05/20/2001 (c) Akzhan Abdulin
+
+  Optional right-aligned button and its properties/events added
+
+  TElCurrPartEdit class moved to implementation part,
+  that so IElCurrPartEdit interface expanded and THackEdit class added
+
+  TElCurrPartEdit ancestor replaced with TCustomElFlatEdit
+
+  Changing of CurrencySymbolPosition now set UseSystemCurrencySymbol to false
+
+04/12/2001 (c) Akzhan Abdulin
+
+  Fractional part editor behaviour changed to use DecimalDigits correctly
+
+  UpdatePartsWidth method updated and fixed to use AdjustEditorPositions method
+
+  OnChange event now called when Modified set to True
+
+  CurrencySymbol, CurrencySymbolPosition and UseSystemCurrencySymbol
+  properties added
+
+  Windows locale changing is handled
+
+04/05/2001 (c) Akzhan Abdulin
+
+  Integer part editor behaviour changed to override zero value
+  Interfaces used to made this behavior class independent (like IntEditClass)
+
+  Currency Editor now excludes floating point types and functions
+  (floating point calculations are unsafe by precision)
+
+  DecimalPlaces and UseSystemDecimalPlaces properties added
+
+*)
+
+unit ElCurrEdit;
+
+interface
+
+uses
+  Windows,
+  Messages,
+  SysUtils,
+  Classes,
+  Graphics,
+  Controls,
+  StdCtrls,
+  Forms,
+  Math,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  Menus,
+{$ifdef VCL_4_USED}
+  ImgList,
+{$endif}
+  ElSndMap,
+  ElTools,
+  ElACtrls,
+  ElPopBtn,
+  ElEdits,
+  ElUxTheme,
+  ElTmSchema,
+  ElXPThemedControl,
+  ElStrUtils,
+  ElVCLUtils;
+
+const
+  CURRBTNCOUNT = 1;
+  CURRBTNMIN = 0;
+  CURRBTNMAX = CURRBTNCOUNT - 1;
+type
+
+
+ TElCurrPartEdit = class(TElEdit)
+  private
+    FIsIntegerPart : boolean;
+    OnPoint : TNotifyEvent;
+    OnLeftPoint: TNotifyEvent;
+  protected
+    procedure WMChar(var Message: TMessage); message WM_CHAR;
+    procedure WMGetDlgCode(var Message: TMessage); message WM_GETDLGCODE;
+    procedure WMKeyDown(var Message: TWMKeyDown); message WM_KEYDOWN;
+    procedure CreateWindowHandle(const Params: TCreateParams); override;
+    procedure WMKillFocus(var Msg: TMessage); message WM_KILLFOCUS;
+    procedure WMSetFocus(var Msg: TMessage); message WM_SETFOCUS;
+  end;
+  IntEditClass  = TElCurrPartEdit;
+
+  TElCurrencySymbolPosition = (ecsPosLeft, ecsPosRight);
+
+  TElCurrencyEdit = class (TElXPThemedControl)
+  protected
+    FAbsValue : Currency;
+    FDecimalPlaces: Byte;
+    FUseSystemDecimalPlaces: Boolean;
+    FCurrencySymbol: TElFString;
+    FCurrencySymbolPosition: TElCurrencySymbolPosition;
+    FUseSystemCurrencySymbol: Boolean;
+    FBorderStyle: TBorderStyle;
+    FFlat : boolean;
+    FActiveBorderType: TElFlatBorderType;
+    FInactiveBorderType: TElFlatBorderType;
+    FMouseOver : boolean;
+    FModified  : boolean;
+    FDWidth    : integer;
+    FSWidth    : integer;
+    FBWidth    : integer;
+    FSignWidth : integer;
+    FDSWidth   : integer;
+
+    FOnChange: TNotifyEvent;
+    FOnMouseEnter: TNotifyEvent;
+    FOnMouseLeave: TNotifyEvent;
+    FBorderSides: TElBorderSides;
+
+    FPartEditors: array[1..2] of IntEditClass;
+    FButtons: array[CURRBTNMIN..CURRBTNMAX] of TElGraphicButton;
+    FButtonClicks: array[CURRBTNMIN..CURRBTNMAX] of TNotifyEvent;
+    FEnableSign: Boolean;
+    FSign: Boolean;
+    FNegativeValueTextColor: TColor;
+    FNegativeSignColor: TColor;
+    FHandleDialogKeys: Boolean;
+    FLineBorderActiveColor: TColor;
+    FLineBorderInactiveColor: TColor;
+    {$ifdef ELPACK_UNICODE}
+    FHint: WideString;
+    {$endif}
+
+    function FracValue(AValue : Currency) : string;
+    procedure SetDecimalPlaces(const Value: Byte);
+    procedure SetUseSystemDecimalPlaces(const Value: Boolean);
+    function FindPart(Editor : IntEditClass) : integer;
+    procedure SetFlat(const Value: boolean);
+    procedure SetActiveBorderType(const Value: TElFlatBorderType);
+    procedure SetInactiveBorderType(const Value: TElFlatBorderType);
+    procedure SetBorderStyle(Value : TBorderStyle);
+    procedure UpdateFrame;
+    procedure SetModified(Value : boolean);
+    procedure UpdateParts;
+    procedure UpdatePartsWidth;
+    procedure SetCurrencySymbol(const Value: TElFString);
+    procedure SetUseSystemCurrencySymbol(const Value: Boolean);
+    procedure SetCurrencySymbolPosition(
+      const Value: TElCurrencySymbolPosition);
+    function GetButtonCaption(Index: Integer): TElFString;
+    function GetButtonColor(Index: Integer): TColor;
+    function GetButtonDown(Index: Integer): Boolean;
+    function GetButtonEnabled(Index: Integer): Boolean;
+    function GetButtonFlat(Index: Integer): Boolean;
+    function GetButtonVisible(Index: Integer): Boolean;
+    function GetButtonWidth(Index: Integer): Integer;
+    function GetButtonUseIcon(Index: Integer): Boolean;
+    function GetButtonGlyph(Index: Integer): TBitmap;
+    function GetButtonHint(Index: Integer): string;
+    function GetButtonIcon(Index: Integer): TIcon;
+    function GetButtonNumGlyphs(Index: Integer): integer;
+    function GetButtonPopupPlace(Index: Integer): TPopupPlace;
+    function GetButtonPullDownMenu(Index: Integer): TPopupMenu;
+    function GetButtonUseImageList(Index: Integer): Boolean;
+    function GetOnButtonClick(Index: Integer): TNotifyEvent;
+    procedure SetButtonCaption(Index: Integer; Value: TElFString);
+    procedure SetButtonColor(const Index: Integer; const Value: TColor);
+    procedure SetButtonDown(const Index: Integer; const Value: Boolean);
+    procedure SetButtonEnabled(const Index: Integer; const Value: Boolean);
+    procedure SetButtonFlat(const Index: Integer; const Value: Boolean);
+    procedure SetButtonVisible(const Index: Integer; const Value: Boolean);
+    procedure SetButtonWidth(const Index, Value: Integer);
+    procedure SetButtonUseIcon(const Index: Integer; const Value: Boolean);
+    procedure SetButtonGlyph(const Index: Integer; const Value: TBitmap);
+    procedure SetButtonHint(const Index: Integer; const Value: string);
+    procedure SetButtonIcon(const Index: Integer; const Value: TIcon);
+    procedure SetButtonNumGlyphs(const Index, Value: integer);
+    procedure SetButtonPopupPlace(const Index: Integer;
+      const Value: TPopupPlace);
+    procedure SetButtonPullDownMenu(const Index: Integer;
+      const Value: TPopupMenu);
+    procedure SetButtonUseImageList(const Index: Integer;
+      const Value: Boolean);
+    procedure SetOnButtonClick(const Index: Integer; const Value: TNotifyEvent); { TNotifyEvent }
+    function GetButtonDisabledImages(Index: Integer): TImageList;
+    function GetButtonDownImages(Index: Integer): TImageList;
+    function GetButtonHotImages(Index: Integer): TImageList;
+    function GetButtonImageList(Index: Integer): TImageList;
+    function GetButtonImageIndex(Index: Integer): TImageIndex;
+    procedure SetButtonDisabledImages(const Index: Integer;
+      const Value: TImageList);
+    procedure SetButtonDownImages(const Index: Integer;
+      const Value: TImageList);
+    procedure SetButtonHotImages(const Index: Integer;
+      const Value: TImageList);
+    procedure SetButtonImageList(const Index: Integer;
+      const Value: TImageList);
+    procedure SetButtonImageIndex(const Index: Integer;
+      const Value: TImageIndex);
+    procedure ButtonClickTransfer(Sender : TObject);
+    procedure SetBorderSides(Value: TElBorderSides);
+    procedure WMNCCalcSize(var Message : TWMNCCalcSize); message WM_NCCALCSIZE;
+    procedure SetEnableSign(const Value: Boolean);
+    function GetSignValue: Currency;
+    procedure SetSign(const Value: Boolean);
+    procedure SetSignValue(const Value: Currency);
+    procedure SetAutoSelect(const Value: Boolean);
+    function GetAutoSelect: Boolean;
+    procedure SetNegativeSignColor(const Value: TColor);
+    procedure SetNegativeValueTextColor(const Value: TColor);
+    procedure SetupPartsFont;
+    function GetReadOnly: Boolean;
+    procedure SetReadOnly(const Value: Boolean);
+    procedure OnEditorClick(Sender: TObject);
+    procedure OnEditorDblClick(Sender: TObject);
+    procedure OnEditorEndDrag(Sender: TObject; Target: TObject; X: Integer; Y: 
+        Integer);
+    procedure OnEditorKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure OnEditorMouseDown(Sender: TObject; Button: TMouseButton; Shift:
+        TShiftState; X: Integer; Y: Integer);
+    procedure OnEditorMouseMove(Sender: TObject; Shift: TShiftState; X: Integer; Y:
+        Integer);
+    procedure OnEditorMouseUp(Sender: TObject; Button: TMouseButton; Shift:
+        TShiftState; X: Integer; Y: Integer);
+    procedure OnEditorStartDrag(Sender: TObject; var DragObject: TDragObject);
+    procedure OnEditorKeyPress(Sender: TObject; var Key: Char);
+    procedure OnEditorDragDrop(Sender: TObject; Source: TObject; X: Integer; Y:
+        Integer);
+    procedure OnEditorDragOver(Sender: TObject; Source: TObject; X: Integer; Y:
+        Integer; State: TDragState; var Accept: Boolean);
+
+    function StoreCurrencySymbol: Boolean;
+    function StoreDecimalPlaces: Boolean;
+
+    procedure SetAbsValue(const Value: Currency);
+    procedure DrawFlatBorder(DC: HDC);
+
+    procedure AdjustEditorPositions; virtual;
+
+    procedure CMCtl3DChanged(var Msg : TMessage); message CM_CTL3DCHANGED;
+    procedure CMColorChanged(var Message: TMessage); message CM_COLORCHANGED;
+    procedure CMEnabledChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
+    procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
+    procedure CMSysColorChange(var Message: TMessage); message CM_SYSCOLORCHANGE;
+    procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+    procedure WMSetFocus(var Msg: TMessage); message WM_SETFOCUS;
+    procedure WMKillFocus(var Msg: TMessage); message WM_KILLFOCUS;
+    procedure WMEraseBkgnd(var Msg : TWMEraseBkgnd); message WM_ERASEBKGND;
+    procedure WMNCPaint(var Msg : TMessage); message WM_NCPAINT;
+    procedure WMSize(var Message: TMessage); message WM_SIZE;
+    procedure CMWinIniChange(var Msg : TMessage); message CM_WININICHANGE;
+
+    procedure DoOnChange; dynamic;
+    procedure DoMouseEnter; dynamic;
+    procedure DoMouseLeave; dynamic;
+
+    procedure CreateWindowHandle(const Params: TCreateParams); override;
+    procedure OnEditorChange(Sender : TObject);
+    procedure OnEditorEnter(Sender :TObject);
+    procedure OnEditorExit(Sender :TObject);
+    procedure OnEditorPoint(Sender : TObject);
+    procedure CreateParams(var Params: TCreateParams); override;
+    procedure OnEditorLeftPoint(Sender : TObject);
+    procedure OnEditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    function GetThemedClassName: WideString; override;
+    procedure SetLineBorderActiveColor(Value: TColor);
+    procedure SetLineBorderInactiveColor(Value: TColor);
+
+    {$ifdef ELPACK_UNICODE}
+    procedure SetHint(Value: WideString);
+
+    {$ifndef CLX_USED}
+    procedure CMHintShow(var Message: TMessage); message CM_HINTSHOW;
+    {$else}
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    {$endif}
+    {$endif}
+
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Paint; override;
+    procedure Loaded; override;
+
+    property MouseOver : boolean read FMouseOver;
+    property Modified  : boolean read FModified write SetModified;
+    property AbsoluteValue: Currency read FAbsValue write SetAbsValue;
+  published
+    {$ifdef ELPACK_UNICODE}
+    property Hint: WideString read FHint write SetHint;
+    {$endif}
+    property ReadOnly: Boolean read GetReadOnly write SetReadOnly default False;
+    property AutoSelect: Boolean read GetAutoSelect write SetAutoSelect default True;
+    property Value: Currency read GetSignValue write SetSignValue;
+    property Sign: Boolean read FSign write SetSign stored false;
+    property EnableSign: Boolean read FEnableSign write SetEnableSign default False;
+
+    property NegativeSignColor: TColor read FNegativeSignColor write SetNegativeSignColor default clNone;
+    property NegativeValueTextColor: TColor read FNegativeValueTextColor write SetNegativeValueTextColor default clNone;
+
+    property DecimalPlaces: Byte read FDecimalPlaces write SetDecimalPlaces stored StoreDecimalPlaces;
+    property UseSystemDecimalPlaces: Boolean read FUseSystemDecimalPlaces write SetUseSystemDecimalPlaces default True;
+
+    property CurrencySymbol: TElFString read FCurrencySymbol write
+        SetCurrencySymbol stored StoreCurrencySymbol;
+    property CurrencySymbolPosition: TElCurrencySymbolPosition read FCurrencySymbolPosition write SetCurrencySymbolPosition stored StoreCurrencySymbol;
+    property UseSystemCurrencySymbol: Boolean read FUseSystemCurrencySymbol write SetUseSystemCurrencySymbol default False;
+
+    property ButtonCaption: TElFString index 0 read GetButtonCaption write
+        SetButtonCaption;
+    property ButtonColor: TColor index 0 read GetButtonColor write SetButtonColor default clBtnFace;
+    property ButtonDown: Boolean index 0 read GetButtonDown write SetButtonDown default false;
+    property ButtonEnabled: Boolean index 0 read GetButtonEnabled write SetButtonEnabled default true;
+    property ButtonFlat: Boolean index 0 read GetButtonFlat write SetButtonFlat default false;
+    property ButtonUseIcon: Boolean index 0 read GetButtonUseIcon write SetButtonUseIcon default false;
+    property ButtonVisible: Boolean index 0 read GetButtonVisible write SetButtonVisible default false;
+    property ButtonWidth: Integer index 0 read GetButtonWidth write SetButtonWidth default 15;
+    property ButtonGlyph : TBitmap index 0 read GetButtonGlyph write SetButtonGlyph;
+    property ButtonHint : string index 0 read GetButtonHint write SetButtonHint;
+    property ButtonIcon : TIcon index 0 read GetButtonIcon write SetButtonIcon;
+    property ButtonNumGlyphs : integer index 0 read GetButtonNumGlyphs write SetButtonNumGlyphs default 1;
+    property ButtonPopupPlace : TPopupPlace index 0 read GetButtonPopupPlace write SetButtonPopupPlace;
+    property ButtonPullDownMenu : TPopupMenu index 0 read GetButtonPullDownMenu write SetButtonPullDownMenu;
+    property ButtonUseImageList : Boolean index 0 read GetButtonUseImageList write SetButtonUseImageList default false;
+    property ButtonImages : TImageList index 0 read GetButtonImageList write SetButtonImageList;
+    property ButtonDownImages : TImageList index 0 read GetButtonDownImages write SetButtonDownImages;
+    property ButtonHotImages : TImageList index 0 read GetButtonHotImages write SetButtonHotImages;
+    property ButtonDisabledImages : TImageList index 0 read GetButtonDisabledImages write SetButtonDisabledImages;
+    property ButtonImageIndex: TImageIndex index 0 read GetButtonImageIndex write SetButtonImageIndex;
+    property OnButtonClick : TNotifyEvent index 0 read GetOnButtonClick write SetOnButtonClick;
+    property BorderStyle : TBorderStyle read FBorderStyle write SetBorderStyle default bsSingle;
+    property Flat : boolean read FFlat write SetFlat default false;
+    property ActiveBorderType: TElFlatBorderType read FActiveBorderType write SetActiveBorderType default fbtSunken;
+    property InactiveBorderType: TElFlatBorderType read FInactiveBorderType write SetInactiveBorderType default fbtFlat;
+    property BorderSides: TElBorderSides read FBorderSides write SetBorderSides;
+    property HandleDialogKeys: Boolean read FHandleDialogKeys write FHandleDialogKeys;
+    property LineBorderActiveColor: TColor read FLineBorderActiveColor write 
+        SetLineBorderActiveColor;
+    property LineBorderInactiveColor: TColor read FLineBorderInactiveColor write 
+        SetLineBorderInactiveColor;
+
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+
+    {$IFDEF VCL_4_USED}
+    property Anchors;
+    {$ENDIF}
+    property Color;
+    {$IFDEF VCL_4_USED}
+    property Constraints;
+    {$ENDIF}
+    property Ctl3D;
+    property DragCursor;
+    {$IFDEF VCL_4_USED}
+    property DragKind;
+    {$ENDIF}
+    property DragMode;
+    property Enabled;
+    property Font;
+    property ParentColor;
+    property ParentCtl3D;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property Visible;
+    property UseXPThemes;
+    
+    property OnClick;
+    {$IFDEF VCL_5_USED}
+    property OnContextPopup;
+    {$ENDIF}
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    {$IFDEF VCL_4_USED}
+    property OnEndDock;
+    property OnEndDrag;
+    {$ENDIF}
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    {$IFDEF VCL_4_USED}
+    property OnStartDock;
+    property OnStartDrag;
+    {$ENDIF}
+  end;
+
+implementation
+end.

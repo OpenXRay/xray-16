@@ -1,0 +1,29 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{   Portion copyright (c) 2001, Alexander Hramov     }
+{                                                    }
+{====================================================}
+
+unit ElColor; { EldoS Color Managment }
+
+interface
+
+uses 
+  Windows,
+  Graphics,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElTools;
+
+function ColorToRGB(const Color: TColor): longint;
+function BrightColor(const Color: TColor; const Percent: byte):TColor;
+function DarkColor(const Color: TColor; const Percent: byte): TColor;
+function ColorToGray(const Color: TColor): TColor;
+function ConvertColorToHTML(Color : TColor) : integer;
+
+implementation
+end.

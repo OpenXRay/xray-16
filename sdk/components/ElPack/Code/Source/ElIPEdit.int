@@ -1,0 +1,291 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+  
+03/06/2002
+
+  Added unicode hint
+
+02/21/2002
+
+  Improved positioning of the text
+  Changed editor ancestor to TElEdit
+  
+01/27/2002
+
+  Text was not with some fonts set. Fixed
+
+01/01/2002
+
+  Fixed some problems with painting borders when focus is moved
+
+12/21/2001
+
+  Points are now drawn correctly for all fonts
+
+10/25/2001
+
+  Fixed painting of the borders with XP styles enabled
+  
+07/23/2001
+
+  OnChange event was not fired. Fixed.
+
+07/12/2001
+
+  BorderSides property added.
+
+1/8/2001
+
+ Original version created.
+
+*)
+
+unit ElIPEdit;
+
+interface
+
+uses
+  Windows,
+  Messages,
+  SysUtils,
+  Classes,
+  Graphics,
+  Controls,
+  StdCtrls,
+  Forms,
+  WinSock,
+  Menus,
+  ElUxTheme,
+  ElXPThemedControl,
+  ElTools,
+  ElEdits,
+  ElVCLUtils,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElImgFrm;
+
+type
+
+  TElIPPartEdit = class(TElEdit)
+  private
+    OnPoint : TNotifyEvent;
+    OnLeftPoint: TNotifyEvent;
+    procedure WMChar(var Message: TMessage); message WM_CHAR;
+    procedure WMGetDlgCode(var Message: TMessage); message WM_GETDLGCODE;
+    procedure WMKeyDown(var Message: TWMKeyDown); message WM_KEYDOWN;
+  protected
+    procedure WMKillFocus(var Msg: TMessage); message WM_KILLFOCUS;
+    procedure WMSetFocus(var Msg: TMessage); message WM_SETFOCUS;
+  end;
+
+  IntEditClass  = TElIPPartEdit;
+
+  TElIPEdit = class (TElXPThemedControl)
+  private
+    FBorderStyle: TBorderStyle;
+    FFlat : boolean;
+    FActiveBorderType: TElFlatBorderType;
+    FInactiveBorderType: TElFlatBorderType;
+    FMouseOver : boolean;
+    FModified  : boolean;
+
+    FOnChange: TNotifyEvent;
+    FOnMouseEnter: TNotifyEvent;
+    FOnMouseLeave: TNotifyEvent;
+
+    FPartCanEdit: array [1..4] of boolean;
+    FPartEditors: array[1..4] of IntEditClass;
+    FParts: array[1..4] of byte;
+    FBorderSides: TElBorderSides;
+    {$ifdef ELPACK_UNICODE}
+    FHint: WideString;
+    {$endif}
+
+    function FindPart(Editor : IntEditClass) : integer;
+    function GetPart(Index: Integer): Byte;
+    function GetPartCanEdit(Index: Integer): Boolean;
+    procedure SetPart(Index: Integer; Value: Byte);
+    procedure SetPartCanEdit(Index: Integer; Value: Boolean);
+    function GetIPAddress : DWORD;
+    procedure SetIPAddress(Value: DWORD);
+    procedure SetFlat(const Value: boolean);
+    procedure SetActiveBorderType(const Value: TElFlatBorderType);
+    procedure SetInactiveBorderType(const Value: TElFlatBorderType);
+    procedure SetBorderStyle(Value : TBorderStyle);
+    procedure UpdateFrame;
+    procedure SetModified(Value : boolean);
+
+    procedure SetIPString(value : string);
+    function  GetIPString : string;
+    procedure SetBorderSides(Value: TElBorderSides);
+    procedure WMNCCalcSize(var Message : TWMNCCalcSize); message WM_NCCALCSIZE;
+
+    procedure ClickHandler(Sender: TObject);
+    {$ifdef VCL_5_USED}
+    procedure ContextPopupHandler(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
+    {$endif}
+    procedure DblClickHandler(Sender: TObject);
+    procedure DragDropHandler(Sender: TObject; Source: TObject; X: Integer; Y: Integer);
+    procedure DragOverHandler(Sender: TObject; Source: TObject; X: Integer; Y: Integer; State: TDragState; var Accept: Boolean);
+    procedure EndDragHandler(Sender: TObject; Target: TObject; X: Integer; Y: Integer);
+    procedure KeyDownHandler(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure KeyPressHandler(Sender: TObject; var Key: Char);
+    procedure KeyUpHandler(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure MouseDownHandler(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X: Integer; Y: Integer);
+    procedure MouseEnterHandler(Sender: TObject);
+    procedure MouseLeaveHandler(Sender: TObject);
+    procedure MouseMoveHandler(Sender: TObject; Shift: TShiftState; X: Integer; Y: Integer);
+    procedure MouseUpHandler(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X: Integer; Y: Integer);
+    procedure StartDragHandler(Sender: TObject; var DragObject: TDragObject);
+  protected
+    FLineBorderActiveColor: TColor;
+    FLineBorderInactiveColor: TColor;
+    procedure DrawFlatBorder(DC: HDC);
+
+    procedure AdjustEditorPositions; virtual;
+    procedure CMColorChanged(var Message: TMessage); message CM_COLORCHANGED;
+    procedure CMEnabledChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
+    procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
+    procedure CMSysColorChange(var Message: TMessage); message CM_SYSCOLORCHANGE;
+    procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+    procedure WMSetFocus(var Msg: TMessage); message WM_SETFOCUS;
+    procedure WMKillFocus(var Msg: TMessage); message WM_KILLFOCUS;
+    procedure WMEraseBkgnd(var Msg : TWMEraseBkgnd); message WM_ERASEBKGND;
+    procedure WMNCPaint(var Msg : TMessage); message WM_NCPAINT;
+
+    procedure DoMouseEnter; dynamic;
+    procedure DoMouseLeave; dynamic;
+
+    procedure CreateWindowHandle(const Params: TCreateParams); override;
+    procedure OnEditorChange(Sender : TObject);
+    procedure OnEditorEnter(Sender :TObject);
+    procedure OnEditorExit(Sender :TObject);
+    procedure OnEditorPoint(Sender : TObject);
+    procedure WMSize(var Message: TMessage); message WM_SIZE;
+    procedure CreateParams(var Params: TCreateParams); override;
+    procedure OnEditorLeftPoint(Sender : TObject);
+    procedure TriggerChangeEvent; virtual;
+    function GetThemedClassName: WideString; override;
+    procedure Loaded; override;
+    procedure SetLineBorderActiveColor(Value: TColor);
+    procedure SetLineBorderInactiveColor(Value: TColor);
+
+    {$ifdef ELPACK_UNICODE}
+    procedure SetHint(Value: WideString);
+
+    {$ifndef CLX_USED}
+    procedure CMHintShow(var Message: TMessage); message CM_HINTSHOW;
+    {$else}
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    {$endif}
+    {$endif}
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Paint; override;
+
+    property IPAddress : DWORD read GetIPAddress write SetIPAddress;
+    property MouseOver : boolean read FMouseOver;
+    property Modified  : boolean read FModified write SetModified;
+  published
+    {$ifdef ELPACK_UNICODE}
+    property Hint: WideString read FHint write SetHint;
+    {$endif}
+    property BorderStyle : TBorderStyle read FBorderStyle write SetBorderStyle default bsSingle;
+    property Flat : boolean read FFlat write SetFlat default false;
+    property ActiveBorderType: TElFlatBorderType read FActiveBorderType write SetActiveBorderType default fbtSunken;
+    property InactiveBorderType: TElFlatBorderType read FInactiveBorderType write SetInactiveBorderType default fbtFlat;
+
+    property Part1: Byte index 1 read GetPart write SetPart default 0;
+    property Part2: Byte index 2 read GetPart write SetPart default 0;
+    property Part3: Byte index 3 read GetPart write SetPart default 0;
+    property Part4: Byte index 4 read GetPart write SetPart default 0;
+
+    property Part1CanEdit: Boolean index 1 read GetPartCanEdit write SetPartCanEdit default true;
+    property Part2CanEdit: Boolean index 2 read GetPartCanEdit write SetPartCanEdit default true;
+    property Part3CanEdit: Boolean index 3 read GetPartCanEdit write SetPartCanEdit default true;
+    property Part4CanEdit: Boolean index 4 read GetPartCanEdit write SetPartCanEdit default true;
+
+    property IPString  : string read GetIPString write SetIPString;
+    property BorderSides: TElBorderSides read FBorderSides write SetBorderSides;
+    property LineBorderActiveColor: TColor read FLineBorderActiveColor write
+        SetLineBorderActiveColor;
+    property LineBorderInactiveColor: TColor read FLineBorderInactiveColor write
+        SetLineBorderInactiveColor;
+
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+
+    {$IFDEF VCL_4_USED}
+    property Anchors;
+    {$ENDIF}
+    property Color;
+    {$IFDEF VCL_4_USED}
+    property Constraints;
+    {$ENDIF}
+    property Ctl3D;
+    property DragCursor;
+    {$IFDEF VCL_4_USED}
+    property DragKind;
+    {$ENDIF}
+    property DragMode;
+    property Enabled;
+    property Font;
+    property ParentColor;
+    property ParentCtl3D;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property Visible;
+    property UseXPThemes;
+
+    property OnClick;
+    {$IFDEF VCL_5_USED}
+    property OnContextPopup;
+    {$ENDIF}
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    {$IFDEF VCL_4_USED}
+    property OnEndDock;
+    property OnEndDrag;
+    {$ENDIF}
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    {$IFDEF VCL_4_USED}
+    property OnStartDock;
+    property OnStartDrag;
+    {$ENDIF}
+  end;
+
+implementation
+end.

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioProject
+	ProjectType="Intel C++ Project"
+	Version="11.1"
+	Name="lua.JIT.1.1.4"
+	ProjectGUID="{980AC55C-5259-4505-82E2-95DC164A6596}"
+	VCNestedProjectGUID="{F6C4F74A-152C-4612-9E3B-D02346234855}"
+	VCNestedProjectFileName="lua.JIT.1.1.4.vcxproj">
+	<Configurations>
+		<Configuration
+			Name="Release|Win32">
+			<Tool
+				Name="CppCmplrTool"
+				EnableEnhancedInstructionSet="1001"
+				FlushDenormalResultsToZero="true"
+				Parallelization="true"/>
+		</Configuration>
+	</Configurations>
+	<Files/>
+</VisualStudioProject>

@@ -1,0 +1,230 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+06/25/2001
+
+  Fixed the bug with extended hint window and popup menu, that happened in
+  second tray icon (i.e. when extended hint and popup menu are shown by the
+  second tray icon)
+
+  Fixed extended hint window position for taskbar layouts on the left and
+  on the right sides 
+
+03/13/2001
+
+  Fixed popup menu appearance when extended hint is visible
+
+02/13/2001
+
+  Click tracking improved
+
+12/16/2000
+
+  Now ElTrayIcon uses ElTimerPool component to reduce handles usage.
+
+  Now if a double-click event handler is assigned, double-click on the icon 
+  causes ONLY OnDblClick event. No OnClick event happens in this case. 
+
+11/19/2000
+
+  Fixed the problem, when extended hint can cause AV when invoked from or after
+  CloseQuery of the main window.
+
+09/30/2000
+
+  ExtendedHint and related properties added.
+
+*)
+
+unit ElTray;
+
+{cool tray icon}
+
+interface
+
+uses
+  Windows,
+  SysUtils,
+  Messages,
+  Graphics,
+  Classes,
+  Controls,
+  Menus,
+  Forms,
+  ElBaseComp,
+  ExtCtrls,
+{$IFDEF VCL_4_USED}
+  ImgList,
+{$ENDIF}
+  ElVCLUtils,
+  ElHook,
+  ElTools,
+  ElTimers,
+  StdCtrls,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ShellApi;
+
+type
+  TElTrayExtHintShowEvent = procedure(Sender : TObject; var DoShow : boolean) of object;
+  TElTrayExtHintCreateEvent = procedure(Sender : TObject; FormClass : String; var Form : TForm) of object;
+  TQueryEndSessionEvent   = procedure(Sender : TObject; Action : Integer; var CanClose : boolean) of object;
+
+  TClickInfo = record
+    Button : TMouseButton;
+    Shift  : TShiftState;
+    X, Y : Integer;
+  end;
+
+  TElTrayIcon = class(TElBaseComponent)
+  private
+    FExtHintWndStyle : Cardinal;
+    FExtHintWndExStyle : Cardinal;
+    FOnBeforeExtendedHintShow : TElTrayExtHintShowEvent;
+    FOnExtHintFormCreate : TElTrayExtHintCreateEvent;
+    FHideTaskBarIcon : Boolean;
+    FExtendedHintDelay : Cardinal;
+    FOnQueryEndSession : TQueryEndSessionEvent;
+    FPopupWhenModal : Boolean;
+    FHint : string;
+    FStaticIcon : TIcon;
+    FAnimated : Boolean;
+    FIcon : TIcon;
+    FIcons : TImageList;
+    FInterval : Integer;
+    FPopupMenu : TPopupMenu;
+    FClickInfo : TClickInfo;
+    FClickTimer,
+    FHintTimer,
+    FTimer : TElTimerPoolItem;
+    FTimerPool: TElTimerPool;
+    FImgIdx : integer;
+    FOnClick : TMouseEvent;
+    FOnDblClick : TNotifyEvent;
+    FOnMouseDown : TMouseEvent;
+    FOnMouseUp : TMouseEvent;
+    FOnMouseMove : TMouseMoveEvent;
+    MyChangeLink : TChangeLink;
+    FSet : Boolean;
+    FIconData : TNotifyIconData;
+    FLClick   : boolean;
+    FMClick   : boolean;
+    FRClick   : boolean;
+    FExtForm  : TForm;
+    FExtFormName: string;
+    FExtFormPt  : TPoint;
+    FHideForm   : boolean;
+    FExtFormInt : boolean;
+    FNoShow     : boolean;
+    FOnDblClickEx: TMouseEvent;    
+    {$IFDEF VCL_5_USED}
+    NewMenuProc,
+    OldMenuProc : Pointer;
+//    FOnDblClickEx: TMouseEvent;
+    {$ENDIF}
+
+    procedure SetExtForm(newValue : String);
+    procedure SetAnimated(newValue : Boolean);
+    procedure SetDesignActive(newValue : Boolean);
+    procedure SetIcons(newValue : TImageList);
+    procedure SetInterval(newValue : Integer);
+    procedure SetPopupMenu(newValue : TPopupMenu);
+    procedure SetStaticIcon(newValue : TIcon);
+    procedure OnClickTimer(Sender : TObject);
+    procedure OnTimer(Sender : TObject);
+    procedure OnHintTimer(Sender : TObject);
+    procedure OnImagesChange(Sender : TObject);
+    procedure SetHint(newValue : string);
+    function  DoPopupMenu(X, Y : integer) : boolean;
+    function  DoDblClick(Perform : boolean) : boolean;
+  protected
+    FAnimateOnce: Boolean;
+    procedure TriggerClickEvent(Button : TMouseButton; Shift : TShiftState; X, Y : Integer); virtual;
+    procedure TriggerDblClickEvent; virtual;
+    procedure TriggerMouseDownEvent(Button : TMouseButton; Shift : TShiftState; X, Y : Integer); virtual;
+    procedure TriggerMouseUpEvent(Button : TMouseButton; Shift : TShiftState; X, Y : Integer); virtual;
+    procedure TriggerMouseMoveEvent(Shift : TShiftState; X, Y : Integer); virtual;
+    procedure Notification(AComponent : TComponent; Operation : TOperation); override;
+    {$IFDEF VCL_5_USED}
+    procedure PopupMenuProc(var Message : TMessage);
+    {$ENDIF}
+    function HookWndProc(var Message : TMessage): Boolean;
+    procedure WndProc(var Message : TMessage); override;
+    procedure DoSetEnabled(AEnabled : boolean); override;
+    procedure UpdateIconData(remove : boolean); virtual;
+    procedure Loaded; override;
+    procedure TriggerQueryEndSessionEvent(Action : Integer; var CanClose : boolean); virtual;
+    procedure SetExtendedHintDelay(newValue : Cardinal); virtual;
+    procedure SetHideTaskBarIcon(newValue : Boolean); virtual;
+    procedure DoHideTaskBarIcon;
+    procedure DoShowTaskBarIcon;
+    procedure TriggerBeforeExtendedHintShowEvent(var DoShow : boolean); virtual;
+    function  FindExtForm(Name : string) : TComponentClass;
+    procedure TriggerDblClickExEvent(Button : TMouseButton; Shift : TShiftState; X, 
+        Y : Integer); virtual;
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure ShowExtForm(X, Y : Integer);
+
+    property Handle;
+    property ExtendedHintForm : TForm read FExtForm;
+    property ExtHintWndStyle  : Cardinal read FExtHintWndStyle write FExtHintWndStyle;  { Public }
+    property ExtHintWndExStyle: Cardinal read FExtHintWndExStyle write FExtHintWndExStyle;  { Public }
+  published
+    property Icons : TImageList read FIcons write SetIcons;
+    property Animated : Boolean read FAnimated write SetAnimated default false;
+    property DesignActive : Boolean read FDesignActive write SetDesignActive default false;
+    property Interval : Integer read FInterval write SetInterval default 200;
+    property PopupMenu : TPopupMenu read FPopupMenu write SetPopupMenu;
+    property OnClick : TMouseEvent read FOnClick write FOnClick;
+    property OnDblClick : TNotifyEvent read FOnDblClick write FOnDblClick;
+    property OnMouseDown : TMouseEvent read FOnMouseDown write FOnMouseDown;
+    property OnMouseUp : TMouseEvent read FOnMouseUp write FOnMouseUp;
+    property OnMouseMove : TMouseMoveEvent read FOnMouseMove write FOnMouseMove;
+    property StaticIcon : TIcon read FStaticIcon write SetStaticIcon;
+    property Hint : string read FHint write SetHint;
+    property Enabled;
+    property ExtendedHint : String read FExtFormName write SetExtForm;
+    property ExtendedHintInteractive : boolean read FExtFormInt write FExtFormInt default false;
+    property PopupWhenModal : Boolean read FPopupWhenModal write FPopupWhenModal
+      default False;
+    property OnQueryEndSession : TQueryEndSessionEvent read FOnQueryEndSession write FOnQueryEndSession;
+    property ExtendedHintDelay : Cardinal read FExtendedHintDelay write SetExtendedHintDelay;
+    property HideTaskBarIcon : Boolean read FHideTaskBarIcon write SetHideTaskBarIcon default False;
+    property OnBeforeExtendedHintShow : TElTrayExtHintShowEvent read FOnBeforeExtendedHintShow write FOnBeforeExtendedHintShow;
+    property OnExtHintFormCreate : TElTrayExtHintCreateEvent read FOnExtHintFormCreate write FOnExtHintFormCreate;
+    property OnDblClickEx: TMouseEvent read FOnDblClickEx write FOnDblClickEx;
+    property AnimateOnce: Boolean read FAnimateOnce write FAnimateOnce default 
+        false;
+  end;
+
+const
+  TrackInterval : integer = 100;
+  HideInterval  : integer = 400;
+
+  FInMenu       : boolean = false;
+
+
+implementation
+end.

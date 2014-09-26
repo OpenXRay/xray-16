@@ -1,0 +1,70 @@
+
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit frmHdrStp;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  ElHeader, ExtCtrls, StdCtrls, ElACtrls, ElBtnCtl, ElPopBtn,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElXPThemedControl;
+
+type
+  TfrmHeaderSetup = class(TForm)
+    pnlSections: TPanel;
+    lbxAvailable: TElAdvancedListBox;
+    lbxVisible: TElAdvancedListBox;
+    lblAvailable: TLabel;
+    lblVisible: TLabel;
+    btnAdd: TElPopupButton;
+    btnDelete: TElPopupButton;
+    btnUp: TElPopupButton;
+    btnDown: TElPopupButton;
+    btnOk: TElPopupButton;
+    btnCancel: TElPopupButton;
+    procedure FormShow(Sender: TObject);
+    procedure lbxVisibleEnter(Sender: TObject);
+    procedure lbxAvailableEnter(Sender: TObject);
+    procedure btnAddClick(Sender: TObject);
+    procedure btnDeleteClick(Sender: TObject);
+    procedure btnUpClick(Sender: TObject);
+    procedure btnDownClick(Sender: TObject);
+    procedure lbxVisibleMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure lbxVisibleDragOver(Sender, Source: TObject; X, Y: Integer;
+      State: TDragState; var Accept: Boolean);
+    procedure lbxVisibleDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure lbxAvailableDragOver(Sender, Source: TObject; X, Y: Integer;
+      State: TDragState; var Accept: Boolean);
+    procedure lbxAvailableMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure lbxAvailableDragDrop(Sender, Source: TObject; X, Y: Integer);
+  private
+    procedure UpdateButtons;
+  public
+    procedure LoadHeaderSections(ASections: TElHeaderSections);
+    procedure SaveHeaderSections(ASections: TElHeaderSections);
+  end;
+
+implementation
+end.

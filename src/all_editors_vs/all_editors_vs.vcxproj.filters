@@ -1,0 +1,379 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="editor">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="engine">
+      <UniqueIdentifier>{bd4da29f-ba45-4510-b9d6-597208ddcbb3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\editors\ECore\Editor\ArbitraryList.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\ColorPicker.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\D3DUtils.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\D3DX_Wrapper.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\device.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\DrawUtils.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\du_box.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\du_cone.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\du_cylinder.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\du_sphere.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\du_sphere_part.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\EDetailModel.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\EditMesh.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\EditObject.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\EditorPreferences.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\ELog.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\engine.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\EStats.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\ETextureParams.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\EThumbnail.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\ExportObjectOGF.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\ExportSkeleton.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\GeometryCollector.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\ImageEditor.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\ImageManager.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\Library.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\LogForm.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\LW_ShaderDef.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\lwo2.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\MinimapEditor.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\ParticleEffectActions.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\pick_definition.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\pick_defs.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\PropSlimTools.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\render.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\SkeletonFace.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\SkeletonVert.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\SoundEditor.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\SoundManager.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\TLSPRITE.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\UI_Camera.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\ui_main.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\UI_MainCommand.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Editor\UI_ToolsCustom.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Engine\ai_sounds.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Engine\cl_collector.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Engine\cl_intersect.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Engine\GameMtlLib.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Engine\guid_generator.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Engine\Image.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Engine\nv_algebra.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Engine\nv_math.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Engine\nv_mathdecl.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Engine\NVMeshMender.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\editors\ECore\Engine\Texture.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\editors\ECore\Editor\bone.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\BoneEditor.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\c_dinput.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\ColorPicker.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\D3DUtils.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\device.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\DeviceScreenshot.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\du_box.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\du_cone.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\du_cylinder.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\du_sphere.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\du_sphere_part.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EDetailModel.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EditMesh.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EditMeshIO.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EditMeshModify.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EditMeshPick.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EditMeshRender.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EditObject.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EditObjectEditor.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EditObjectImport.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EditObjectIO.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EditObjectMotions.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EditObjectProps.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EditObjectSkin.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EditorPreferences.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\ELog.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\Engine.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EStats.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\ETextureParams.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EThumbnail.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EThumbnailGroup.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EThumbnailObject.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EThumbnailSound.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\EThumbnailTexture.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\ExportObjectOGF.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\ExportSkeleton.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\GeometryCollector.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\ImageEditor.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\ImageManager.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\ImageManagerDO.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\ImageManagerLOD.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\Library.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\LogForm.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\MinimapEditor.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\ParticleEffectActions.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\pDomain.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\render.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\SoundEditor.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\SoundManager.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\TLSPRITE.CPP">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\UI_Camera.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\ui_main.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\UI_MainCommand.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\UI_MainMail.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\UI_ToolsCustom.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Editor\xrLoadSurface.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Engine\ai_sounds.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Engine\bone.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Engine\cl_collector.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Engine\GameMtlLib.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Engine\GameMtlLib_Engine.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Engine\guid_generator.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Engine\Image.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Engine\nv_algebra.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\editors\ECore\Engine\NVMeshMender.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,67 @@
+
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElQueue;
+
+interface
+
+uses classes,
+{$ifndef KYLIX_USED}
+     Windows,
+{$else}
+     Libc,
+{$endif}
+     SysUtils;
+
+type
+  EElQueueError = class(Exception)
+  end;
+
+  OnDiscardEvent = procedure(Sender : TObject; Item : pointer) of object;
+
+type
+  TElQueue = class(TObject)
+  private
+    FList : PPointerList;
+    FCount : Integer;
+    FCapacity : Integer;
+    FOnDiscard : OnDiscardEvent;
+  protected
+    function Get(Index : Integer) : Pointer;
+    procedure SetCapacity(NewCapacity : Integer);
+    procedure SetCount(NewCount : Integer);
+  public
+    destructor Destroy; override;
+    function Add(Item : Pointer) : Integer;
+    procedure Delete(Index : Integer);
+    procedure Clear;
+    class procedure Error(const Msg : string; Data : Integer); virtual;
+    procedure Exchange(Index1, Index2 : Integer);
+    function First : Pointer;
+    function IndexOf(Item : Pointer) : Integer;
+    function Last : Pointer;
+    property Capacity : Integer read FCapacity write SetCapacity;
+    property Count : Integer read FCount write SetCount;
+    property Items[Index : Integer] : Pointer read Get; default;
+    property List : PPointerList read FList;
+    property OnDiscard : OnDiscardEvent read FOnDiscard write FOnDiscard;
+  end;
+
+implementation
+end.

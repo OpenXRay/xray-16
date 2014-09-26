@@ -1,0 +1,744 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2002, EldoS                   }
+{   Portions copyright (c) 2002, Alexander Hramov    }
+{                                                    }
+{====================================================}
+
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+04/04/2002
+
+  The text is centered now when Multiline is false and AlignBottom = true
+
+03/26/2002
+
+  Lowercase and Uppercase worked wrong (were mixed). Fixed.
+  Clipboard Cut now shares Clipboard Copy technique.
+
+  Clipboard Copy now correctly sets CF_TEXT data
+  (there was PChar(SelText) instead of PChar(S)).
+
+  Clipboard Copy now sets CF_TEXT data only under
+  non-Windows NT/2000/XP platform because of
+  Windows Clipboard autoconvertion feature.
+
+  Clipboard Copy sets CF_UNICODETEXT data under both Unicode
+  and non-Unicode modes because of localized text Clipboard
+  Paste issues.
+
+  Fixed Clipboard Paste under non-Unicode mode to use
+  CF_UNICODETEXT-formatted data when possible
+  because of localized text Clipboard Paste issues.
+
+  Clipboard Paste now uses one Clipboard object
+  and do not uses wrong Open/Close semantics.
+
+  Clipboard Copy now uses one Clipboard object,
+  uses exception-safe Open/Close semantics,
+  and written in Paranoid style.
+
+  TElCustomEdit now fills background with Color
+  under XP Theming mode too.
+
+03/22/2002
+
+  In multiline mode, when BorderStyle = bsNone, junk was drawn around the control. Fixed. 
+
+03/21/2002
+
+  Fixed autosize issues when borders are turned off
+  Fixed issues with entering numbers from numeric part of keyboard
+
+03/20/2002
+
+  Transparency issues fixed
+
+03/18/2002
+
+  Ctrl+BkSp and Ctrl+Delete delete words now 
+
+03/15/2002
+
+  Pressing Home when cursor is on position 0 removes selection 
+  Now it's possible to set key in KeyPress to #0.
+
+03/12/2002
+
+  Autosize is now correctly set to true by default
+  Combination of Ctrl and Alt does not prevent key from being processed.
+  
+03/06/2002
+
+  Added unicode hint
+
+02/26/2002
+
+  Fixed scrollbars 
+
+02/23/2002
+
+  Added CharCase property
+
+02/18/2002
+
+  Property UseCustomScrollBars added. Now you can use standard Windows or custom
+  scrollbars.
+  Support for mouse wheel added.
+
+02/13/2002
+
+  Fixed imageform handling
+
+02/09/2002
+
+  Fixed cursor size/position calculation for non-default fonts
+
+02/01/2002
+
+  Fixed some multiline problems
+
+01/31/2002
+
+  Fixed problems with Lines.Add, Lines.Insert, Lines.Clear
+  Siginificantly improved speed of line addition. 
+
+  Now the control can handle even 20000 lines
+  (although scrolling speed is terrible near the end of the text)
+
+01/18/2002
+
+  Fixed problems with scrollbar updating
+  Fixed problems with IME Editors
+
+01/12/2002
+
+  Add AlignBottom public property. Used for vertical align text in single-line
+  mode
+
+01/06/2002
+
+  Now the text is updated when Alignment, LeftMargin, RightMargin or TopMargin
+  are changed 
+
+01/02/2002
+
+  Under Windows XP, now all input converted to Unicode   
+
+01/01/2002
+
+  Fixed some problems with painting borders when focus is moved
+
+11/28/2001
+
+  LineBorderActiveColor and LineBorderInactiveColor properties added.
+  Fixed the problem with mouse selection of the text
+  
+11/16/2001
+
+  Fix small bug in StringToPassword
+
+11/12/2001
+
+  Add SelectAll method come fixes in WMSetFocusMethod. Added code for context
+  menu support
+
+11/08/2001
+  
+  Solved problem with sending wm_settext in design time
+
+11/04/2001 
+  
+  Some fixes in PosFromChar, CharFromPos, WMCopy. Moved code which sets
+  FLeftChar from MoveCaret to SetSelStart for normal horizontal scrolling
+
+10/31/2001
+
+  Select text with Shift + Left, Shift + Home and Ctrl + Shift + Left, 
+  bug fixed, set ScrollBars position and range moved to SetScrollBarsInfo. 
+  Emulate GetTextExtentExPointW for Win9x
+
+10/30/2001
+
+  PasswordChar assignment fixed
+
+10/22/2001
+
+  Some fix in unicode version
+
+10/18/2001
+
+  Add IME support and Unicode version of editor. Some optimization
+  works.
+
+10/15/2001
+
+  Multiline editor completed.
+
+10/09/2001
+
+  Add ScrollBars, WordWrap properties to TElEdit class. Declare new class
+  TElEditStrings for MultiLine and WordWrap features.
+
+*)
+
+unit ElEdits; { TCustomElEdit component. }
+
+{ EldoS Editor }
+
+interface
+
+uses
+  Windows,
+  SysUtils,
+  Messages,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  Menus,
+  StdCtrls,
+  Clipbrd,
+  ElTools,
+  {$ifdef ELPACK_COMPLETE}
+  ElImgFrm,
+  {$endif}
+  ElTmSchema,
+  ElUxTheme,
+  ElVCLUtils,
+  ElXPThemedControl,
+  ExtCtrls,
+  ElScrollBar,
+  {$ifdef ELPACK_UNICODE}
+  ElUnicodeStrings,
+  Imm,
+  {$endif}
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElStrUtils;
+
+type
+  TCustomElEdit = class;
+
+{$ifdef MSWINDOWS}
+{$ifdef ELPACK_UNICODE}
+  TElFStrings = TElWideStrings;
+  TElFStringList = TElWideStringList;
+{$else}
+  TElFStrings = TStrings;
+  TElFStringList = TStringList;
+{$endif}
+{$else}
+  TElFStrings = TStrings;
+  TElFStringList = TStringList;
+{$endif}
+
+  {$ifdef ELPACK_UNICODE}
+  TElEditStrings = class(TElWideStringList)
+  {$else}
+  TElEditStrings = class(TStringList)
+  {$endif}
+  private
+    FElEdit : TCustomElEdit;
+    RealStrings : TStringList;
+    FInReformat : boolean;
+    FToText : boolean;
+    procedure ListChange(Sender: TObject);
+  protected
+    FMaxLen : Integer;
+    FIdxMaxLen : Integer;
+    FSaveStr : TElFString;
+    procedure Reformat;
+    {$ifdef ELPACK_UNICODE}
+    function Get(Index: integer): WideString; override;
+    {$else}
+    function Get(Index: integer): String; override;
+    {$endif}
+    function GetCR(Index: integer): TElFString;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    {$ifdef ELPACK_UNICODE}
+    procedure SetTextStr(const Value: WideString); override;
+    {$else}
+    procedure SetTextStr(const Value: String); override;
+    {$endif}
+    function GetReText: TElFString;
+    function CutString(var S: TElFString; Len: integer; var RealStr: boolean): TElFString;
+    {$ifdef ELPACK_UNICODE}
+    function Add(const S: WideString): Integer; override;
+    procedure Insert(Index: Integer; const S: WideString); override;
+    {$else}
+    function Add(const S : String): Integer; override;
+    procedure Insert(Index: Integer; const S : String); override;
+    {$endif}
+  end;
+
+  TElEditCharCase = (eecNormal, eecUpperCase, eecLowerCase);
+
+  TCustomElEdit = class(TElXPThemedControl)
+  private
+    FModified : Boolean;
+    FEditRect : TRect;
+    FLeftMargin : Integer;
+    FTopMargin : integer;
+    FRightMargin : Integer;
+    FMouseClick : boolean;
+    FBorderStyle : TBorderStyle;
+    FAutoSelect : Boolean;
+    FHideSelection : Boolean;
+    FAlignment : TAlignment;
+    FReadOnly : Boolean;
+    FWantTabs : Boolean;
+    FText : TElFString;
+    FPasswordChar : TElFChar;
+    FMaxLength : Integer;
+    FSelStart : Integer;
+    FSelLength : Integer;
+    FTransparent : Boolean;       
+    FTabString : TElFString;
+    FTabSpaces : integer;
+    FHasCaret : boolean;
+    FCaretPos : TPoint;
+    FUndoSel : TPoint;
+    FUndoText : TElFString;
+    FModifyCount : integer;
+    FLineHeight : integer;
+    FLeftChar : integer;
+    FCharsInView : integer;
+    FSelecting : boolean;
+    FOnChange : TNotifyEvent;
+    FOnSelectionChange : TNotifyEvent;
+    FOnResize : TNotifyEvent;
+    ForceLeftAlignment : boolean;
+    FBackground: TBitmap;
+    FUseBackground: Boolean;
+    {$ifdef ELPACK_COMPLETE}
+    FImgForm: TElImageForm;
+    FImgFormChLink: TImgFormChangeLink;
+    {$endif}
+    FBorderSides: TElBorderSides;
+    FActiveBorderType: TElFlatBorderType;
+    FFlat: Boolean;
+    FInactiveBorderType: TElFlatBorderType;
+    FHandleDialogKeys: Boolean;
+    FMouseOver: Boolean;
+    FOnMouseEnter: TNotifyEvent;
+    FOnMouseLeave: TNotifyEvent;
+
+    // Список строк для Multiline
+    FElEditList: TElEditStrings;
+    // Верхняя видимая строка
+    FTopLine: integer;
+    FWordWrap: boolean;
+    FScrollBars: TScrollStyle;
+    FLinesInRect: integer;
+    FCharset: Integer;
+    FKeybLayout: HKL;
+
+    scbVert, scbHorz: TElScrollBar;
+    FFlatFocusedScrollBars: Boolean;
+    FUseCustomScrollBars : Boolean;
+    FVertScrollBarStyles : TElScrollBarStyles;
+    FHorzScrollBarStyles : TElScrollBarStyles;
+
+    FAlienFocus : boolean;
+    FAlignBottom : boolean;
+    {$ifdef ELPACK_UNICODE}
+    FKeys : WideString;
+    FKeyDown : boolean;
+    FHint: WideString;
+    {$endif}
+
+    procedure WMCaptureChanged(var Msg: TMessage); message WM_CAPTURECHANGED;
+    procedure WMKeyDown(var Msg : TWMKeyDown); message WM_KEYDOWN;
+    procedure WMCut(var Msg : TMessage); message WM_CUT;
+    procedure WMCopy(var Msg : TMessage); message WM_COPY;
+    procedure WMPaste(var Msg : TMessage); message WM_PASTE;
+    procedure WMClear(var Msg : TMessage); message WM_CLEAR;
+    procedure WMSetText(var Msg : TMessage); message WM_SETTEXT;
+    procedure WMNCPaint(var Msg : TMessage); message WM_NCPAINT;
+    procedure WMEraseBkgnd(var Msg : TWMEraseBkgnd); message WM_ERASEBKGND;
+    procedure WMSetFocus(var Msg : TWMSetFocus); message WM_SETFOCUS;
+    procedure WMKillFocus(var Msg : TWMKillFocus); message WM_KILLFOCUS;
+    procedure WMEnable(var Msg : TMessage); message WM_ENABLE;
+    procedure WMSize(var Msg : TWMSize); message WM_SIZE;
+    procedure WMGetDlgCode(var Msg : TWMGetDlgCode); message WM_GETDLGCODE;
+    procedure WMVScroll(var Msg : TWMScroll); message WM_VSCROLL;
+    procedure WMHScroll(var Msg : TWMScroll); message WM_HSCROLL;
+    procedure WMInputLangChange(var Msg: TMessage); message WM_INPUTLANGCHANGE;
+    procedure WMCommand(var Msg: TWMCommand); message WM_COMMAND;
+    procedure WMMouseWheel(var Msg: TWMMouseWheel); message WM_MOUSEWHEEL;
+
+    {$ifdef ELPACK_UNICODE}
+    procedure WMImeStartComposition(var Message : TMessage); message WM_IME_STARTCOMPOSITION;
+    procedure WMImeComposition(var Message: TMessage); message WM_IME_COMPOSITION;
+    {$endif}
+
+    procedure OnHScroll(Sender: TObject; ScrollCode: TElScrollCode;
+                        var ScrollPos: Integer; var DoChange : boolean);
+    procedure OnVScroll(Sender: TObject; ScrollCode: TElScrollCode;
+                        var ScrollPos: Integer; var DoChange : boolean);
+    procedure SBChanged(Sender: TObject);
+
+    procedure SetReadOnly(newValue : Boolean);
+    procedure SetAlignment(newValue : TAlignment);
+    procedure SetLeftMargin(newValue : Integer);
+    procedure SetRightMargin(newValue : Integer);
+    procedure SetBorderStyle(newValue : TBorderStyle);
+    procedure SetHideSelection(newValue : Boolean);
+    function  GetPasswordChar : TElFString;
+    procedure SetPasswordChar(newValue : TElFString);
+    procedure SetTransparent(newValue : Boolean);
+    procedure SetEditRect(newValue : TRect);
+    procedure SetTabSpaces(newValue : integer);
+    procedure SetModified(newValue : Boolean);
+    procedure SetText(newValue : TElFString);
+    function GetSelectedText : TElFString;
+    procedure SetBackground(const Value: TBitmap);
+    procedure SetUseBackground(const Value: boolean);
+    procedure WMNCCalcSize(var Message : TWMNCCalcSize); message WM_NCCALCSIZE;
+    procedure SetBorderSides(Value: TElBorderSides);
+    {$ifdef ELPACK_COMPLETE}
+    procedure ImageFormChange(Sender : TObject);
+    {$endif}
+    procedure DrawBackground(DC: HDC; R: TRect);
+    procedure DrawFlatBorder;
+    procedure DrawParentControl(DC: HDC);
+    procedure SetScrollBars(const Value: TScrollStyle);
+    procedure SetTopLine(const Value: Integer);
+    procedure AdjustHeight;
+    procedure UpdateHeight;
+    {$ifndef CLX_USED}
+    procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
+    {$ifdef ELPACK_COMPLETE}
+    procedure WMWindowPosChanged(var Message: TWMWindowPosChanged); message
+        WM_WINDOWPOSCHANGED;
+    {$endif}
+    procedure BackgroundChanged(Sender: TObject);
+    procedure SetFlatFocusedScrollBars(const Value: boolean);
+    {$endif}
+  protected
+    { Protected declarations }
+    FMultiLine: Boolean;
+    FRTLContent: Boolean;
+    FAutoSize: Boolean;
+    FLines: TElFStrings;
+    FLineBorderActiveColor: TColor;
+    FLineBorderInactiveColor: TColor;
+    NotifyUserChangeOnly : boolean;
+    FCharCase: TElEditCharCase;
+    {$ifdef CLX_USED}
+    procedure FontChanged; override;
+    {$endif}
+    procedure SetVertScrollBarStyles(newValue : TElScrollBarStyles);
+    procedure SetHorzScrollBarStyles(newValue : TElScrollBarStyles);
+    procedure SetUseCustomScrollBars(newValue : Boolean); 
+
+    procedure SetMaxLength(newValue : Integer); virtual;
+    procedure SetSelStart(newValue : Integer); virtual;
+    procedure SetSelLength(newValue : Integer); virtual;
+    procedure SetSelText(const newValue : TElFString); virtual;
+    function  StringToPassword(AString : TElFString) : TElFString;
+    function  ExpandTabbedString(Text : TElFString) : TElFString;
+    function  TextSize(ALine : TElFString) : TSize;
+    procedure SetScrollBarsInfo;
+    procedure MoveCaret(CharNum : integer);
+    procedure MakeCaret;
+    procedure RepaintText(Rect : TRect);
+    procedure DrawTabbedText(DC : HDC; X, Y : integer; AText : TElFString; var Size : TSize);
+    function  ConvertBreaksFormat(Text : TElFString) : TElFString;
+    function  CharsFitRight(AWidth : integer; FText : TElFString;
+                            StartPos : integer) : integer;
+    function  CharsFitLeft(AWidth : integer; FText: TElFString; StartPos : integer) : integer;
+
+    procedure Change; virtual;
+    procedure TriggerSelectionChangeEvent; virtual;
+    procedure TriggerResizeEvent; virtual;
+    procedure KeyPress(var Key : Char); override;
+    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    procedure Paint; override;
+    // procedure DrawFrame;
+    procedure PaintText(AText : TElFString; Canvas : TCanvas);
+    procedure CreateParams(var Params : TCreateParams); override;
+    procedure MouseDown(Button : TMouseButton; Shift : TShiftState; X, Y : Integer); override;
+    procedure MouseUp(Button : TMouseButton; Shift : TShiftState; X, Y : Integer); override;
+    procedure MouseMove(Shift : TShiftState; X, Y : Integer); override;
+    {$ifdef ELPACK_COMPLETE}
+    procedure SetImageForm(newValue : TElImageForm); virtual;
+    {$endif}
+    procedure SetFlat(const Value: boolean); virtual;
+    {$ifdef ELPACK_COMPLETE}
+    procedure IFMRepaintChildren(var Message: TMessage); message
+        IFM_REPAINTCHILDREN;
+    {$endif}
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    function GetThemedClassName: WideString; override;
+    function GetLinesCount: Integer;
+    procedure SetWordWrap(Value: boolean);
+    procedure SetLeftChar(Value: integer);
+    procedure SetAutoSize(Value: Boolean);{$ifdef VCL_6_USED}override;{$endif}
+    procedure CreateWnd; override;
+    procedure WMGetText(var Message: TMessage); message WM_GETTEXT;
+    procedure SetLines(Value: TElFStrings);
+    function GetLines: TElFStrings;
+    procedure SetTopMargin(Value: Integer);
+    procedure SetAlignBottom(Value: boolean);
+    // procedure UpdateFrame;
+    procedure CMMouseEnter(var Msg : TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg : TMessage); message CM_MOUSELEAVE;
+    procedure DoMouseEnter; virtual;
+    procedure DoMouseLeave; virtual;
+    procedure Loaded; override;
+    procedure SetLineBorderActiveColor(Value: TColor); virtual;
+    procedure SetLineBorderInactiveColor(Value: TColor); virtual;
+    procedure EMSetRect(var Message: TMessage); message EM_SETRECT;
+    procedure EMSetRectNP(var Message: TMessage); message EM_SETRECTNP;
+    procedure SetMultiLine(Value: Boolean);
+    procedure SetActiveBorderType(const Value: TElFlatBorderType); virtual;
+    procedure SetInactiveBorderType(const Value: TElFlatBorderType); virtual;
+    procedure CMEnabledChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
+    procedure SetUseXPThemes(const Value: Boolean); override;
+    procedure SetCharCase(Value: TElEditCharCase);
+    procedure WMSetCursor(var Message: TWMSetCursor); message WM_SETCURSOR;
+
+    {$ifdef ELPACK_UNICODE}
+    procedure SetHint(Value: WideString);
+
+    {$ifndef CLX_USED}
+    procedure CMHintShow(var Message: TMessage); message CM_HINTSHOW;
+    {$else}
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    {$endif}
+    {$endif}
+    procedure SetBottomAlign;
+
+    property RTLContent: Boolean read FRTLContent write FRTLContent;
+    property Background: TBitmap read FBackground write SetBackground;
+    property UseBackground: Boolean read FUseBackground write SetUseBackground
+        default False;
+    property PasswordChar : TElFString read GetPasswordChar write SetPasswordChar; { Published }
+    property MaxLength : Integer read FMaxLength write SetMaxLength default 0; { Published }
+    property Transparent : Boolean read FTransparent write SetTransparent; { Published }
+
+    property OnChange : TNotifyEvent read FOnChange write FOnChange;
+    property OnSelectionChange : TNotifyEvent read FOnSelectionChange write FOnSelectionChange;
+
+    property ReadOnly : Boolean read FReadOnly write SetReadOnly default false; { Published }
+    property WantTabs : Boolean read FWantTabs write FWantTabs default false; { Published }
+    property Alignment : TAlignment read FAlignment write SetAlignment; { Published }
+    property LeftMargin : Integer read FLeftMargin write SetLeftMargin default 1; { Published }
+    property RightMargin : Integer read FRightMargin write SetRightMargin default 2; { Published }
+    property BorderStyle : TBorderStyle read FBorderStyle write SetBorderStyle; { Published }
+    property AutoSelect : Boolean read FAutoSelect write FAutoSelect default false; { Published }
+    property HideSelection : Boolean read FHideSelection write SetHideSelection default true; { Published }
+    property OnResize : TNotifyEvent read FOnResize write FOnResize;
+    property EditRect : TRect read FEditRect write SetEditRect; { Published }
+    property TabSpaces : Integer read FTabSpaces write SetTabSpaces default 4;
+    property Multiline: Boolean read FMultiLine write SetMultiLine default false;
+    {$ifdef ELPACK_COMPLETE}
+    property ImageForm: TElImageForm read FImgForm write SetImageForm;
+    {$endif}
+    property ActiveBorderType: TElFlatBorderType read FActiveBorderType write
+        SetActiveBorderType default fbtSunken;
+    property Flat: Boolean read FFlat write SetFlat default False;
+    property InactiveBorderType: TElFlatBorderType read FInactiveBorderType write
+        SetInactiveBorderType default fbtSunkenOuter;
+
+    property WordWrap: boolean read FWordWrap write SetWordWrap default true;
+    property ScrollBars: TScrollStyle read FScrollBars write SetScrollBars default ssNone;
+    property TopLine: Integer read FTopLine write SetTopLine default 0;
+    property LeftChar: integer read FLeftChar write SetLeftChar default 0;
+
+    property OnMouseEnter: TNotifyEvent read FOnMouseEnter write FOnMouseEnter;
+    property OnMouseLeave: TNotifyEvent read FOnMouseLeave write FOnMouseLeave;
+    property AutoSize: Boolean read FAutoSize write SetAutoSize default true;
+    property BorderSides: TElBorderSides read FBorderSides write SetBorderSides;
+    property Lines: TElFStrings read GetLines write SetLines;
+    property LineBorderActiveColor: TColor read FLineBorderActiveColor write 
+        SetLineBorderActiveColor;
+    property LineBorderInactiveColor: TColor read FLineBorderInactiveColor write 
+        SetLineBorderInactiveColor;
+    property FlatFocusedScrollBars: Boolean read FFlatFocusedScrollBars write
+        SetFlatFocusedScrollBars default False;
+    property CharCase: TElEditCharCase read FCharCase write SetCharCase default
+        eecNormal;
+    property TabStop default true;
+  public
+    { Public declarations }
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    function GetNextWord(FText : TElFString; CharNum : integer) : integer;
+    function GetPrevWord(FText : TElFString; CharNum : integer) : integer;
+    function PosFromChar(FText : TElFString; CharNum : integer) : TPoint;
+    function CharFromPos(FText : TElFString; APos : TPoint) : integer;
+    procedure LineFromChar(FText : TElFString; CharNum : integer; var LineNum : integer; var ColNum : integer);
+    function CharFromLine(LineNum, ColNum : integer) : integer;
+    procedure SelectAll;
+    procedure CutToClipboard;
+    procedure CopyToClipboard;
+    procedure PasteFromClipboard;
+    procedure Undo;
+
+    property SelStart : Integer read FSelStart write SetSelStart; { Published }
+    property SelLength : Integer read FSelLength write SetSelLength; { Published }
+    property SelText : TElFString read GetSelectedText write SetSelText; { Published }
+    property Modified : Boolean read FModified write SetModified default False; { Public }
+    property SelectedText : TElFString read GetSelectedText;
+    property MouseOver: Boolean read FMouseOver;
+    property LinesCount: Integer read GetLinesCount;
+
+    property HandleDialogKeys: Boolean read FHandleDialogKeys write FHandleDialogKeys default false;
+    property Text : TElFString read FText write SetText; { Published }
+    property TopMargin: Integer read FTopMargin write SetTopMargin default 1;
+    property AlignBottom : boolean read FAlignBottom write SetAlignBottom default true;
+
+  published
+    property VertScrollBarStyles : TElScrollBarStyles read FVertScrollBarStyles write SetVertScrollBarStyles;
+    property HorzScrollBarStyles : TElScrollBarStyles read FHorzScrollBarStyles write SetHorzScrollBarStyles;
+    property UseCustomScrollBars : Boolean read FUseCustomScrollBars write SetUseCustomScrollBars;  { Published }
+
+    {$ifdef ELPACK_UNICODE}
+    property Hint: WideString read FHint write SetHint;
+    {$endif}
+    property UseXPThemes;
+  end; { TCustomElEdit }
+
+  TElEdit = class (TCustomElEdit)
+  published
+    property AutoSize;
+    property Alignment;
+    property Background;
+    property BorderSides;
+    property CharCase;
+    property UseBackground;
+    property RTLContent;
+    property PasswordChar;
+    property MaxLength;
+    property Transparent;
+    property FlatFocusedScrollBars;
+    property ReadOnly;
+    property WantTabs;
+    property LeftMargin;
+    property RightMargin;
+    property TopMargin; 
+    property BorderStyle;
+    property AutoSelect;
+    property HandleDialogKeys;
+    property HideSelection;
+    property TabSpaces;
+    property Lines stored false;
+
+    property Text;
+    property Multiline;
+
+    {$ifdef ELPACK_COMPLETE}
+    property ImageForm;
+    {$endif}
+    property ActiveBorderType;
+    property Flat;
+    property InactiveBorderType;
+    property LineBorderActiveColor;
+    property LineBorderInactiveColor;
+
+    property WordWrap;
+    property ScrollBars;
+
+    property VertScrollBarStyles;
+    property HorzScrollBarStyles;
+    property UseCustomScrollBars;
+
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnResize;
+    property OnChange;
+    property OnSelectionChange;
+
+    property Align;
+
+    {$IFDEF VCL_4_USED}
+    property Anchors;
+    {$ENDIF}
+    property Color;
+    {$IFDEF VCL_4_USED}
+    property Constraints;
+    {$ENDIF}
+    property Ctl3D;
+    property DragCursor;
+    {$IFDEF VCL_4_USED}
+    property DragKind;
+    {$ENDIF}
+    property DragMode;
+    property Enabled;
+    property Font;
+    property ParentColor;
+    property ParentCtl3D;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property Visible;
+
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+
+  {$IFDEF VCL_4_USED}
+  {$ifndef CLX_USED}
+      property OnStartDock;
+      property OnEndDock;
+  {$endif}
+  {$ENDIF}
+  {$IFDEF VCL_5_USED}
+      property OnContextPopup;
+  {$ENDIF}
+ end;
+
+var
+  RepaintAll : boolean = true;
+
+const
+  ElFSpace = {$ifdef ELPACK_UNICODE}WideChar(#32){$else}#32{$endif};
+  ElFTab = {$ifdef ELPACK_UNICODE}WideChar(#9){$else}#9{$endif};
+  ElFCR = {$ifdef ELPACK_UNICODE}WideChar(#13){$else}#13{$endif};
+  ElFLF = {$ifdef ELPACK_UNICODE}WideChar(#10){$else}#10{$endif};
+
+  ID_UNDO = 772;
+  ID_CUT = 768;
+  ID_COPY = 769;
+  ID_PASTE = 770;
+  ID_DELETE = 771;
+
+procedure Register;
+
+implementation
+end.

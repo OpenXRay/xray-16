@@ -1,0 +1,98 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+01/10/2002
+
+  Changed ReadOnly property to support Unassigned 
+
+*)
+
+unit ElDBDTPick;
+
+interface
+
+uses
+     DB,
+     DBCtrls,
+
+     {$ifdef VCL_6_USED}
+     Variants,
+     {$endif}
+     ElDTPick,
+
+     Forms,
+     Windows,
+     Controls,
+     StdCtrls,
+     Messages,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+
+     Classes,
+     SysUtils;
+
+type
+
+  TElDBDateTimePicker = class(TElDateTimePicker)
+  private
+    FDataLink: TFieldDataLink;
+    FNowForNULLValues: Boolean;
+    procedure CMExit(var Message: TCMExit); message CM_EXIT;
+    procedure CMGetDataLink(var Message: TMessage); message CM_GETDATALINK;
+    procedure DataChange(Sender: TObject);
+    function GetDataField: string;
+    function GetDataSource: TDataSource;
+    function GetField: TField;
+    procedure SetDataField(const Value: string);
+    procedure SetDataSource(Value: TDataSource);
+    procedure UpdateData(Sender: TObject);
+  protected
+    function GetReadOnly: Boolean; override;
+    procedure SetReadOnly(Value: Boolean); override;
+    procedure KeyPress(var Key: Char); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure SetModified(newValue : Boolean); override;
+    procedure TriggerChangeEvent; override;
+    procedure KeyDown(var Key : Word; Shift : TShiftState); override;
+    procedure CMEnter(var Message: TMessage); message CM_ENTER;
+    procedure CloseUp(AcceptValue: boolean); override;
+    procedure DropDown; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    {$ifdef VCL_4_USED}
+    function ExecuteAction(Action: TBasicAction): Boolean; override;
+    function UpdateAction(Action: TBasicAction): Boolean; override;
+    function UseRightToLeftAlignment: Boolean; override;
+    {$endif}
+    property Field: TField read GetField;
+  published
+    property DataField: string read GetDataField write SetDataField;
+    property DataSource: TDataSource read GetDataSource write SetDataSource;
+    // property ReadOnly: Boolean read GetReadOnly write SetReadOnly default False;
+    property NowForNULLValues: Boolean read FNowForNULLValues write 
+        FNowForNULLValues;
+  end;
+
+implementation
+end.

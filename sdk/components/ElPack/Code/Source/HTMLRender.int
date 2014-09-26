@@ -1,0 +1,287 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{   Parts:                                           }
+{   copyright (c) 2001 Akzhan Abdulin                }
+{                                                    }
+{====================================================}
+
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+01/20/2002
+
+  Changed font size handling to work with font.height, not font.size.
+  This is internal change, font sizes specified in HTML text remain unchanged
+
+01/18/2002
+
+  Added possibility to adjust font color based on some supposedly background color
+
+11/28/2001
+
+  Improved speed of rendering when wordwrap is on
+
+11/01/2001
+
+  Fixed WordWrapping in case of width = 0. 
+
+10/08/2001
+
+  Fixed assignment of break item properties in WordWrap mode -- before the fix
+  not last break item's properties where taken, but first item's.
+
+09/10/2001
+
+  Fixed rendering of LI items with WordWrap on.
+
+07/27/2001
+
+  SUB and SUP tags added for subscript and superscript text 
+
+04/21/2001
+
+  Fixed incorrect wrapping of HTML links and other elements that start a text block
+  (i.e. elements whose attribute is different from previous text)
+
+============================== Version 2.78 ====================================
+
+03/27/2001
+
+  Fixed detection of the element at given position with right and center alignment
+
+03/15/2001
+
+  Now <font color="value"> understands simple color definitions like red, white).
+
+
+03/14/2001
+
+  Added <strikeout> tag that applied to text font style.
+
+  Fixed '&amp;' and '&apos;' handling.
+
+  Minor code optimizations and readness improvements.
+  Unnecessary variables, 'if' statements excluded, some 'while' statements
+  replaced with 'for' statements. or'ed comparisons somewhere replaced with
+  inside const set test etc.
+
+============================== Version 2.75 ====================================
+
+11/07/2000
+
+  Added unordered (bullet) lists
+
+  Added indent parameter for paragraphs. Can be positive or negative
+
+*)
+
+unit HTMLRender;
+
+interface
+
+uses Classes,
+     SysUtils,
+{$ifndef CLX_USED}
+     Forms,
+     Windows,
+     Graphics,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+{$else}
+{$ifdef MSWINDOWS}
+     Windows,
+{$endif}
+     QTypes,
+     Types,
+     Qt,
+     QForms,
+     QGraphics,
+{$endif}
+     ElList,
+     ElStack,
+     ElTools,
+     ElVCLUtils,
+{$ifdef ELPACK_UNICODE}
+     ElUnicodeStrings,
+{$endif}
+     ElStrUtils;
+
+type
+{$ifdef MSWINDOWS}
+{$ifdef ELPACK_UNICODE}
+  TElFStrings = TElWideStrings;
+  TElFStringList = TElWideStringList;
+{$else}
+  TElFStrings = TStrings;
+  TElFStringList = TStringList;
+{$endif}
+{$else}
+  TElFStrings = TStrings;
+  TElFStringList = TStringList;
+{$endif}
+
+const
+
+     flIsLink = 1;
+     flSub    = 2;
+     flSuper  = 4;
+
+type
+  { event handlers support }
+   TElFString = ElStrUtils.TElFString;
+
+type
+  TElHTMLImageNeededEvent = procedure(Sender : TObject; Src : TElFString; var Image : TBitmap) of object;
+  TElHTMLLinkClickEvent = procedure(Sender : TObject; HRef : TElFString) of object;
+
+  THTMLItemType = (hitChar, hitSoftBreak, hitBreak, hitPara, hitBitmap, hitHR, hitLI, hitUL);
+
+  THTMLItemTypes = set of THTMLItemType;
+
+  TElHTMLRender = class;
+  TElHTMLData = class;
+
+  TElHTMLItem = class
+  private
+    FOwner    : TElHTMLData;
+    ItemType  : THTMLItemType;
+    FText     : TElFString;
+    FontStyle : TFontStyles;
+    FontHeight: integer;
+    FontBgColor,
+    FontColor : TColor;
+    FLinkRef  : TElFString;
+    FFontRef  : TElFString;
+    FFntCnt   : integer;
+    TWidth,
+    Width,
+    Height    : Word;
+    Indent    : integer;
+    FBoolState: integer;
+    
+    function GetWidth  : integer; virtual;
+    function GetHeight(var BaseLine : integer) : integer; virtual;
+    function GetIsLink: Boolean;
+    procedure SetIsLink(Value: Boolean);
+    function GetIsSub: Boolean;
+    procedure SetIsSub(Value: Boolean);
+    function GetIsSuper: Boolean;
+    procedure SetIsSuper(Value: Boolean);
+
+  public
+    procedure Assign(Source : TElHTMLItem);
+    constructor Create(Owner : TElHTMLData);
+    destructor Destroy; override;
+    
+    property Text: TElFString read FText write FText;
+    property LinkRef: TElFString read FLinkRef write FLinkRef;
+    property IsLink: Boolean read GetIsLink write SetIsLink;
+    property IsSub: Boolean read GetIsSub write SetIsSub;
+    property IsSuper: Boolean read GetIsSuper write SetIsSuper;
+  end;
+
+  TElHTMLBreakItem = class(TElHTMLItem)
+  private
+    FParams   : integer;
+    ListLevel : integer;
+    ListItemN : integer;
+
+    function GetWidth : integer; override;
+    function GetHeight(var BaseLine : integer) : integer; override;
+  public
+    procedure Assign(Source : TElHTMLItem);
+    procedure AssignBreakProps(Source : TElHTMLBreakItem);
+  end;
+
+  TElHTMLData = class
+    private
+      FRender       : TElHTMLRender;
+      FLinkColor    : TColor;
+      FDefaultColor : TColor;
+      FLinkStyle    : TFontStyles;
+      FDefaultStyle : TFontStyles;
+      FDefaultHeight: Integer;
+      FCharset      : TFontCharset;
+      FDefaultFont  : String;
+      FArray        : TElList;
+      FDefaultBgColor  : TColor;
+      FHighlightBgColor: TColor;
+      FHighlightColor  : TColor;
+      FSelectedItem: TElHTMLItem;
+
+      FTextSize    : TSize;
+    public
+      constructor Create;
+      destructor Destroy; override;
+      procedure ClearArray;
+      function  LineCount : integer;
+
+      property TextSize     : TSize read FTextSize;
+      property LinkColor    : TColor read FLinkColor write FLinkColor;
+      property DefaultBgColor : TColor read FDefaultBgColor write FDefaultBgColor;
+      property DefaultColor : TColor read FDefaultColor write FDefaultColor;
+      property LinkStyle    : TFontStyles read FLinkStyle write FLinkStyle;
+      property DefaultStyle : TFontStyles read FDefaultStyle write FDefaultStyle;
+      property DefaultHeight: Integer read FDefaultHeight write FDefaultHeight;
+      property DefaultFont  : String read FDefaultFont write FDefaultFont;
+      property Charset      : TFontCharset read FCharset write FCharset;
+      property HighlightBgColor : TColor read FHighlightBgColor write FHighlightBgColor;
+      property HighlightColor : TColor read FHighlightColor write FHighlightColor;
+      property SelectedItem: TElHTMLItem read FSelectedItem write FSelectedItem;
+  end;
+
+  TElHTMLRender = class
+  private
+    FOnImageNeeded : TElHTMLImageNeededEvent;
+    FIntData,
+    FData        : TElHTMLData;
+    Canvas       : TCanvas;
+    Bitmap       : TBitmap;
+    {$ifndef CLX_USED}
+    FSaveObj     : HGDIOBJ;
+    {$endif}
+  protected
+    procedure TriggerImageNeededEvent(Src : TElFString; var Image : TBitmap); virtual;
+    procedure CalcTokenSizes(FCurData : TElHTMLData);
+    function GetTextSize : TSize;
+    function FindItemAt(Point : TPoint; SrcPoint : TPoint; R : TRect) : TElHTMLItem;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    procedure DestroyData(Data : TElHTMLData);
+    procedure SetData(NewData : TElHTMLData);
+    function  CreateData : TElHTMLData;
+    procedure DrawText(Canvas : TCanvas; SrcPoint : TPoint; R : TRect; AdjustFromColor : TColor);
+    procedure DrawTextEx(Canvas : TCanvas; SrcPoint : TPoint; R : TRect; UseOverColors : boolean; Color, BkColor, SelColor, SelBkColor : TColor; AdjustFromColor : TColor);
+    function  IsCursorOverLink(Point : TPoint; SrcPoint : TPoint; R : TRect; var href : TElFString) : Boolean;
+    procedure SelectLinkAt(Point : TPoint; SrcPoint : TPoint; R : TRect);
+    procedure SelectPrevLink;
+    procedure SelectNextLink;
+
+    procedure PrepareToData(Text : TElFString; MaxWidth :
+        integer; AutoWrap : boolean; CurData : TElHTMLData);
+    procedure PrepareText(Text : TElFString; MaxWidth : integer; AutoWrap : boolean);
+
+    property Data : TElHTMLData read FData;
+    property OnImageNeeded: TElHTMLImageNeededEvent read FOnImageNeeded write FOnImageNeeded;
+  end;
+
+implementation
+end.

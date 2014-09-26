@@ -1,0 +1,908 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+  
+03/06/2002
+
+  Added unicode hint
+
+02/08/2002
+
+  Changed drag'n'drop behaviour - now when the mouse is not over the header,
+  the section is dropped to position that it would be drooped to if the mouse
+  was over the header with the same horizontal position. 
+
+11/20/2001
+
+  Fixed drawing of the section being dragged in Windows 95/98 
+  Fixed an AV introduced 11/17
+
+11/17/2001
+
+  Fixed some artefacts when drawing with XP styles enabled
+
+09/19/2001
+
+  Added Windows XP Themes Support 
+
+08/22/2001
+
+  Fixed transparency issues with images
+
+07/26/2001
+
+  Added Unicode support
+
+07/17/2001
+
+  Header sections can now contain HTML text. 
+
+07/14/2001
+
+  Improved dragging painting
+  Changed OnItemDraw event to include canvas
+
+06/28/2001
+
+  Default FieldType for HeaderSection is sftText now
+  Improved drawing of the section being dragged
+  Added DefaultWidth property. This defines width of new sections. 
+
+06/26/2001
+
+  Added support for WM_CANCELMODE message
+
+03/10/2001
+
+  Fixed possible AVs that could happen when image list is removed.
+
+  Minor optimizations and readness improvements.
+
+01/11/2001
+
+   Fixed the bug in UpdateSection, which incorrectly invalidated sections when
+   parent tree was horizontally scrolled
+
+12/02/2000
+
+   WrapCaptions property added. Now header captions can be multiline and wrapped
+   automatically, if they don't fit into width 
+
+   ImageForm support added
+
+10/06/2000
+
+   Deletion of the section could cause AV. Fixed. 
+
+09/22/2000
+
+   Fixed Section hints showing to be changed when cursor moves to another section
+
+09/20/2000
+
+   ElHeaderSection.AutoSize property added.
+   
+08/09/2000
+
+   Lookup focus returning caused an exception ("can't focus hidden window"). Fixed. 
+
+07/25/2000
+
+  Lookup improved. Now focus is returned to the previously focused control.
+
+07/09/2000
+
+  Fixed lookup, expandable and filter sections to react on sign clicks when the
+  heaader is scrolled.
+  Changed section drawing to make offset of caption for non-resizable sections.  
+
+*)
+
+unit ElHeader;
+
+interface
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+{$R ElHeader.res}
+
+{$B-}
+{$ALIGN ON}
+uses
+  {$ifndef CLX_USED}
+  Windows,
+  Messages,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  Menus,
+  ExtCtrls,
+  StdCtrls,
+{$IFDEF VCL_4_USED}
+  ImgList,
+{$ENDIF}
+  {$else}
+  {$ifdef LINUX}
+  Xlib,
+  {$else}
+  Windows,
+  {$endif}
+  Qt,
+  QTypes,
+  Types,
+  QGraphics,
+  QControls,
+  QForms,
+  QMenus,
+  QExtCtrls,
+  QStdCtrls,
+{$IFDEF VCL_4_USED}
+  QImgList,
+{$ENDIF}
+  {$endif}
+{$IFDEF ELPACK_COMPLETE}
+{$ifdef SUPPORT_STORAGE}
+  ElIni,
+{$endif}
+  ElImgFrm,
+{$ifndef CLX_USED}
+  ElACtrls,
+{$endif}
+{$ENDIF}
+  ElStrUtils,
+  SysUtils,
+  Classes,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElTools,
+  ElList,
+  ElXPThemedControl,
+  ElUxTheme,
+  ElTmSchema,
+{$ifdef HAS_HTML_RENDER}
+  HTMLRender,
+{$endif}  
+  ElVCLUtils;
+
+type
+  TElSectionStyle = (ElhsText, ElhsOwnerDraw, ElhsPictureOnly);
+
+  TElSSortMode = (hsmNone, hsmAscend, hsmDescend);
+
+  TElSAlignment = (hsaLeft, hsaCenter, hsaRight);
+
+  TElHResizingStates = (trsBegin, trsMove, trsEnd);
+
+  TSectionChangeMode = (scmCaption, scmFieldName, scmFieldType,
+    scmAlign, scmStyle, scmEditable, scmPassword);
+
+  TElSectionPart = (espResizeArea, espText, espExpandSign, espLookupSign, espFilterSign);
+
+  TAdjustCondition = (acAll,acAutoSizedOnly);
+
+  TElFieldType = (
+    sftCustom, // custom field
+    sftText, // text field
+    sftNumber, // Integer numbers
+    sftFloating, // Floating numbers
+    sftDateTime, // DateTime
+    sftDate, // Date
+    sftTime, // Time
+    sftPicture, // Picture
+    sftEnum,  // enumeration
+    sftBLOB,  // BLOB data
+    sftUndef, // undefined field
+    sftBool,   // boolean field
+    sftCurrency, // currency
+    sftMemo   // Memo, multiline text
+    );
+
+  TElFieldTypes = set of TElFieldType;
+
+  EElHeaderError = class(Exception);
+
+type
+  TCustomElHeader = class;
+  TElHeaderSection = class;
+
+{$ifndef SUPPORT_STORAGE}
+  TElIniFile = class end;
+{$endif}
+
+  TElHeaderSectionEvent = procedure(Sender : TCustomElHeader; Section : TElHeaderSection) of object;
+
+  TElHeaderLookupEvent = procedure(Sender : TObject; Section : TElHeaderSection; var Text : string) of object;
+  TElHeaderLookupDoneEvent = procedure(Sender : TObject;
+    Section : TElHeaderSection;
+    Text : string;
+    Accepted : boolean) of object;
+
+  TElHeaderSection = class(TPersistent)
+  protected
+    FFilterIsActive : Boolean;
+    FFilterEnabled : Boolean;
+    FHint: TElFString;
+
+    FTextLayout : TTextLayout;
+    FUseMainStyle : Boolean;
+    FFontColor : TColor;
+    FColor : TColor;
+    FParentColor : Boolean;
+    FLookupEnabled : boolean;
+    FExpandable : Boolean;
+    FExpanded : Boolean;
+    FParentSection : TElHeaderSection;
+    FParentIdx : integer;
+    FPopupMenu : TPopupMenu;
+    FPopupName : string;
+    FResizable : Boolean;
+    FClickSelect : Boolean;
+    FProtected : Boolean;
+    FFieldName : string;
+    FFieldType : TElFieldType;
+    FEditable : Boolean;
+    FImageIndex : Integer;
+    FPicAlign : TElSAlignment;
+    FIntTag,
+    FIndex    : integer;
+    FTag: Integer;
+    FVisible : boolean;
+    FStyle : TElSectionStyle;
+    FWidth : integer;
+    FMinWidth,
+      FMaxWidth : integer;
+    FSortMode : TElSSortMode;
+    FAllowClick : boolean;
+    FAlignment : TElSAlignment;
+    FText: TElFString;
+    FData : pointer;
+    FOwner : TCustomElHeader;
+    FLookupHist : TStringList;
+    FAutoSize   : boolean;
+
+    FStickySize : single;
+    ASaveSize : integer;
+    FOnResize: TNotifyEvent;
+    FShowSortMark: Boolean;
+
+    procedure SetWidth(value : integer);
+    function GetWidth : integer;
+    function GetLeft  : integer;
+    function GetRight : integer;
+    procedure SetMaxWidth(value : integer);
+    procedure SetMinWidth(value : integer);
+    procedure SetText(value: TElFString);
+    procedure SetStyle(value : TElSectionStyle);
+    procedure SetSortMode(value : TElSSortMode);
+    procedure SetAlignment(value : TElSAlignment);
+    procedure SetVisible(value : boolean);
+
+    function GetIndex : integer;
+    function GetPosition : Integer;
+    procedure SetImageIndex(newValue : Integer);
+    procedure SetProtected(newValue : Boolean);
+    procedure SetExpandable(newValue : Boolean);
+    procedure SetExpanded(newValue : Boolean);
+    procedure SetParentSection(newValue : TElHeaderSection);
+    procedure SetPopupMenu(newValue : TPopupMenu);
+    function GetVisible : boolean;
+    procedure SetLookupEnabled(newValue : boolean);
+    procedure SetParentColor(newValue : Boolean);
+    procedure SetColor(newValue : TColor);
+    procedure SetFontColor(newValue : TColor);
+    procedure SetUseMainStyle(newValue : Boolean);
+    procedure SetTextLayout(newValue : TTextLayout);
+    procedure SetFilterEnabled(newValue : Boolean);
+    procedure SetFilterIsActive(newValue : Boolean);
+    procedure SetLookupList(newValue : TStringList);
+    procedure SetAutoSize(newValue : boolean);
+{$IFNDEF LITE}
+    function GetLocked : boolean;
+{$ENDIF}
+    procedure SetShowSortMark(Value: Boolean);
+  protected
+    procedure SetFieldName(newValue : string); virtual;
+    procedure SetFieldType(newValue : TElFieldType); virtual;
+    procedure SetEditable(newValue : boolean); virtual;
+    procedure SetResizable(newValue : boolean); virtual;
+    procedure SetSaveSize(newValue : integer);
+    property FSaveSize : integer read ASaveSize write SetSaveSize;
+    function GetOwner : TPersistent; override;
+    property OnResize : TNotifyEvent read FOnResize write FOnResize;
+  public
+    constructor Create(AOwner : TCustomElHeader);
+    destructor Destroy; override;
+    procedure UpdateSection;
+    procedure Assign(source : TPersistent); override;
+    property Index : integer read GetIndex;
+    property Left : integer read GetLeft;
+    property Right : integer read GetRight;
+    property Position : Integer read GetPosition; { Public }
+    property Data : pointer read FData write FData;
+{$IFNDEF LITE}
+    property Locked : boolean read GetLocked;
+{$ENDIF}
+    property Owner: TCustomElHeader read FOwner;
+  published
+    property Text: TElFString read FText write SetText;
+    property Style : TElSectionStyle read FStyle write SetStyle;
+    property Width : integer read GetWidth write SetWidth;
+    property MaxWidth : integer read FMaxWidth write SetMaxWidth;
+    property MinWidth : integer read FMinWidth write SetMinWidth;
+    property SortMode : TElSSortMode read FSortMode write SetSortMode;
+    property AllowClick : boolean read FAllowClick write FAllowClick;
+    property Alignment : TElSAlignment read FAlignment write SetAlignment;
+    property PictureAlign : TElSAlignment read FPicAlign write FPicAlign;
+    property Visible : boolean read GetVisible write SetVisible;
+    property ImageIndex : Integer read FImageIndex write SetImageIndex; { Published }
+    property FieldName : string read FFieldName write SetFieldName; { Public }
+    property FieldType : TElFieldType read FFieldType write SetFieldType; { Public }
+    property Editable : Boolean read FEditable write SetEditable; { Public }
+    property Password : Boolean read FProtected write SetProtected default False; { Public }
+    property Resizable : Boolean read FResizable write SetResizable; { Public }
+    property ClickSelect : Boolean read FClickSelect write FClickSelect; { Public }
+    property Expandable : Boolean read FExpandable write SetExpandable;
+    property Expanded : Boolean read FExpanded write SetExpanded;
+    property ParentSection : TElHeaderSection read FParentSection write SetParentSection;
+    property PopupMenu : TPopupMenu read FPopupMenu write SetPopupMenu;
+    property LookupEnabled : boolean read FLookupEnabled write SetLookupEnabled;
+    property LookupHistory : TStringList read FLookupHist write SetLookupList;
+    property ParentColor : Boolean read FParentColor write SetParentColor;
+    property Color : TColor read FColor write SetColor;
+    property FontColor : TColor read FFontColor write SetFontColor;
+    property UseMainStyle : Boolean read FUseMainStyle write SetUseMainStyle;
+    property TextLayout : TTextLayout read FTextLayout write SetTextLayout;
+    property FilterEnabled : Boolean read FFilterEnabled write SetFilterEnabled; { Public }
+    property FilterIsActive : Boolean read FFilterIsActive write SetFilterIsActive; { Published }
+    property Hint: TElFString read FHint write FHint;
+    property AutoSize : boolean read FAutoSize write SetAutoSize;
+    property ShowSortMark: Boolean read FShowSortMark write SetShowSortMark;
+    property Tag: Integer read FTag write FTag;
+  end;
+
+  TElHeaderSections = class(TPersistent)
+  private
+    FList : TElList;
+    function GetCount : integer;
+    function GetSectionsOrder : string;
+    procedure SetSectionsOrder(newValue : string);
+  protected
+    FOwner : TCustomElHeader;
+    function GetSectionByIntTag(IntTag : integer) : TElHeaderSection; virtual;
+    function GetSection(index : integer) : TElHeaderSection; virtual;
+    procedure SetSection(index : integer; Section : TElHeaderSection); virtual;
+    function GetSectionByPos(index : integer) : TElHeaderSection; virtual;
+    function CreateSection : TElHeaderSection; virtual;
+    procedure WriteData(Stream : TStream); virtual;
+    procedure IntReadData(Stream : TStream; ClearCurrent : boolean); virtual;
+    procedure ReadData(Stream : TStream); virtual;
+    procedure FrameReadData(Stream : TStream); virtual;
+    procedure DefineProperties(Filer : TFiler); override;
+    function LastVisibleSection : TElHeaderSection;
+    function GetPrevVisibleSection(Section : TElHeaderSection) : TElHeaderSection;
+    function FindSection(tag : integer) : TElHeaderSection; virtual;
+    function GetOwner : TPersistent; override;
+  public
+    constructor Create(AOwner : TCustomElHeader);
+    destructor Destroy; override;
+    procedure Clear;
+
+    procedure Assign(source : TPersistent); override;
+    function AddSection : TElHeaderSection;
+    function InsertSection(index : integer) : TElHeaderSection;
+    procedure DeleteSection(Section : TElHeaderSection);
+    procedure MoveSection(Section : TElHeaderSection; NewPos : integer);
+    procedure LoadFromStream(Stream : TStream);
+    procedure SaveToStream(Stream : TStream);
+    procedure SaveToFile(FileName : string);
+    procedure LoadFromFile(FileName : string);
+
+    property Owner : TCustomElHeader read FOwner;
+    property Count : integer read GetCount;
+    property ItemByPos[Index : integer] : TElHeaderSection read GetSectionByPos;
+    property Item[Index : integer] : TElHeaderSection read GetSection write SetSection; default;
+  published
+    property SectionsOrder : string read GetSectionsOrder write SetSectionsOrder stored false; { Protected }
+  end;
+
+  TMeasureSectionEvent = procedure(Sender: TObject; Section : TElHeaderSection; var Size: TPoint) of object;
+
+  TElSectionRedrawEvent = procedure(Sender : TCustomElHeader;
+    Canvas : TCanvas; Section : TElHeaderSection; R : TRect; Pressed : boolean) of object;
+  TElSectionResizingEvent = procedure(Sender : TCustomElHeader;
+    Section : TElHeaderSection; State : TElHResizingStates; Width : integer) of object;
+  TElSectionMoveEvent = procedure(Sender : TCustomElHeader;
+    Section : TElHeaderSection; OldPos, NewPos : integer) of object;
+  TPictureNeededEvent = procedure(Sender : TCustomElHeader; Section : TElHeaderSection; var ImageIndex : integer) of object;
+  TSectionChangeEvent = procedure(Sender : TCustomElHeader; Section : TElHeaderSection; Change : TSectionChangeMode) of object;
+
+  TCustomElHeader = class(TElXPThemedControl)
+  private
+    FMouseInControl: Boolean;
+  protected
+{$IFNDEF LITE}
+    FWrapCaptions : Boolean;
+    FLockedSection : TElHeaderSection;
+{$ENDIF}
+    FHPos : Integer;
+    FInvertSortArrows : Boolean;
+    FFlat : Boolean;
+{$IFDEF ELPACK_COMPLETE}
+{$ifndef CLX_USED}
+    FImgFormChLink : TImgFormChangeLink;
+    FImgForm: TElImageForm;
+{$endif}
+{$ENDIF}
+    FActiveFilterColor : TColor;
+    FOnFilterCall : TElHeaderSectionEvent;
+    FOnSectionAutoSize : TElHeaderSectionEvent;
+    FFilterColor : TColor;
+    FLockHeight : Boolean;
+    FRightAlignedText : Boolean;
+    FRightAlignedOrder : Boolean;
+    FStickySections : Boolean;
+    FMoveOnDrag : Boolean;
+{$ifdef ELPACK_COMPLETE}
+    FStorage : TElIniFile;
+    FStoragePath: string;
+{$ENDIF}
+    FImages : TImageList;
+
+    FImageChangeLink : TChangeLink;
+    FSections : TElHeaderSections;
+    FTracking : boolean;
+    FAllowDrag : boolean;
+    FPainting : boolean;
+    DragBmp,
+    SaveBmp,
+    DragBmpMask : TBitmap;
+    DragRect : TRect;
+    FDragCoord : TPoint;
+    FLookup : TComboBox;
+    FPressCoord : TPoint;
+    FPressed : boolean;
+    FPressedItem : TElHeaderSection;
+    FHintSection,
+    FLookupSection,
+      FTrackSection : TElHeaderSection;
+    FResizing : boolean;
+    FResizeSection : TElHeaderSection;
+    FDropSrc,
+      FDropTrg : TElHeaderSection;
+    FHeaderLine : integer;
+    FLineTab : integer;
+    FResizeOnDrag : boolean;
+    FHeaderLineVis : boolean;
+    FIgnoreLookupChange : boolean;
+    FDoingLookup : boolean;
+    {$ifndef CLX_USED}
+    FLineDC : HDC;
+    FFocusedCtl : THandle;
+    {$else}
+    FLineDC : TBitmap;
+    {$ifdef LINUX}
+    FFocusedCtl : TWindow;
+    {$else}
+    FFocusedCtl : HWND;
+    {$endif}
+    {$endif}
+    LoadingCount : integer;
+    DeletionHappened,
+    AdditionHappened : boolean;
+
+    FInStick : boolean;
+    FOldWidth : integer;
+    FUpdateCount: integer;
+{$ifdef HAS_HTML_RENDER}
+    FRender : TElHTMLRender;
+{$endif}
+    FOnSectionClick : TElHeaderSectionEvent;
+    FOnSectionResize : TElHeaderSectionEvent;
+    FOnSectionDraw : TElSectionRedrawEvent;
+{$IFNDEF VCL_4_USED}
+    FOnResize : TNotifyEvent;
+{$ENDIF}
+    FOnSectionResizing : TElSectionResizingEvent;
+    FOnSectionDelete : TElHeaderSectionEvent;
+    FOnSectionMove : TElSectionMoveEvent;
+    FOnVisibleChange : TElHeaderSectionEvent;
+    FOnPictureNeeded : TPictureNeededEvent;
+    FOnSectionChange : TSectionChangeEvent;
+    FOnSectionCreate : TElHeaderSectionEvent;
+    FOnHeaderLookup : TElHeaderLookupEvent;
+    FOnHeaderLookupDone : TElHeaderLookupDoneEvent;
+    FOnSectionExpand : TElHeaderSectionEvent;
+    FOnSectionCollapse : TElHeaderSectionEvent;
+    FOnMeasureSection  : TMeasureSectionEvent;
+    FDefaultWidth: Integer;
+{$ifdef HAS_HTML_RENDER}
+    FOnImageNeeded: TElHTMLImageNeededEvent;
+{$endif}
+    {$ifdef ELPACK_UNICODE}
+    FHint: WideString;
+    {$endif}
+    FMultiSort: Boolean;
+
+    procedure DrawLine(Restore : boolean);
+
+    procedure AllocateLineDC;
+    procedure ReleaseLineDC;
+
+    function GetColumnsWidth : integer;
+    procedure InvalidateRight(value : integer);
+    procedure SetTracking(newValue : boolean);
+
+    procedure IntMouseEnter;
+    procedure IntMouseLeave;
+    procedure IntSize;
+    procedure IntExit;
+
+    procedure IntLButtonDown(XPos, YPos : SmallInt);
+    procedure IntLButtonUp(XPos, YPos : SmallInt);
+    function  IntRButtonDown(XPos, YPos : SmallInt) : boolean;
+    function  IntRButtonUp(XPos, YPos : SmallInt) : boolean;
+    procedure IntMouseMove(XPos, YPos : SmallInt);
+    procedure IntLButtonDblClick(XPos, YPos : SmallInt);
+    function  IntHintShow(var HintInfo : THintInfo): Boolean;
+    {$ifndef CLX_USED}
+    procedure CMDrag(var Message : TCMDrag); message CM_DRAG;
+    procedure WMEraseBkgnd(var Msg : TWMEraseBkgnd); message WM_ERASEBKGND;
+    procedure WMRButtonDown(var Msg : TWMRButtonDown); message WM_RBUTTONDOWN;
+    procedure WMSize(var Msg : TWMSize); message WM_SIZE;
+    procedure WMRButtonUp(var Msg : TWMRButtonUp); message WM_RBUTTONUP;
+    procedure WMLButtonDblClk(var Msg : TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
+    procedure CMHintShow(var Msg : TMessage); message CM_HINTSHOW;
+    procedure CMSysColorChange(var Msg: TMessage); message CM_SYSCOLORCHANGE;
+    procedure WMPaint(var Msg : TWMPaint); message WM_PAINT;
+    procedure WMCancelMode(var Msg: TMessage); message WM_CANCELMODE;
+    procedure WMLButtonDown(var Message : TWMLButtonDown); message WM_LBUTTONDOWN;
+    procedure WMLButtonUp(var Message : TWMLButtonUp); message WM_LBUTTONUP;
+    procedure WMMouseMove(var Message : TWMMouseMove); message WM_MOUSEMOVE;
+    procedure CMMouseEnter(var Message : TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Message : TMessage); message CM_MOUSELEAVE;
+    procedure CMExit(var Msg : TCMExit); message CM_EXIT;
+    {$endif}
+    procedure SetSections(value : TElHeaderSections);
+    procedure SetImages(newValue : TImageList);
+    procedure OnImageListChange(Sender : TObject);
+    procedure GetDragImage(XPos : Integer);
+
+{$ifdef SUPPORT_STORAGE}
+    procedure SetStorage(newValue : TElIniFile);
+{$ENDIF}
+    procedure EditExit(Sender : TObject);
+    procedure EditKeyDown(Sender : TObject; var Key : Word; Shift : TShiftState);
+    procedure EditKeyUp(Sender : TObject; var Key : Word; Shift : TShiftState);
+    procedure EditChange(Sender : TObject);
+    procedure SetStickySections(newValue : Boolean);
+    procedure AdjustHeaderHeight;
+    procedure AdjustStickySize(Caller : TElHeaderSection);
+    function IsLoading : Boolean;
+    procedure SetRightAlignedText(newValue : Boolean);
+    procedure SetRightAlignedOrder(newValue : Boolean);
+    procedure SetLockHeight(newValue : Boolean);
+    procedure SetFilterColor(newValue : TColor);
+    procedure SetActiveFilterColor(newValue : TColor);
+    procedure SetFlat(newValue : Boolean);
+    function GetIsDesigning : Boolean;
+    procedure SetIsDesigning(newValue : Boolean);
+    procedure SetInvertSortArrows(newValue : Boolean);
+    procedure SetLeftPos(newValue : Integer);
+{$IFDEF ELPACK_COMPLETE}
+    {$ifndef CLX_USED}
+    procedure ImageFormChange(Sender : TObject);
+    procedure SetImageForm(newValue : TElImageForm);
+    {$endif}
+{$ENDIF}
+{$IFNDEF LITE}
+    procedure SetLockedSection(newValue : TElHeaderSection);
+    procedure SetWrapCaptions(newValue : Boolean); virtual;
+{$ENDIF}
+
+    procedure RedrawSection(Canvas : TCanvas; Section : TElHeaderSection; R : TRect; Dithered : Boolean);
+    procedure RedrawSections;
+    procedure Notification(AComponent : TComponent; Operation : TOperation); override;
+    function  CreateSections : TElHeaderSections; virtual;
+    function  InResizeArea(X : integer; var HitSection : TElHeaderSection) : boolean; virtual;
+
+    {$ifdef CLX_USED}
+    procedure MouseEnter(AControl: TControl); override;
+    procedure MouseLeave(AControl: TControl); override;
+    procedure DoExit; override;
+    function WidgetFlags: Integer; override;
+    function EventFilter(Sender: QObjectH; Event: QEventH): Boolean; override;
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    {$endif}
+
+    procedure Paint; override;
+{$IFDEF VCL_4_USED}
+    procedure Resize; override;
+{$ELSE}
+    procedure Resize; dynamic;
+{$ENDIF}
+    function DoGetPicture(Section : TElHeaderSection) : integer; virtual;
+    procedure DoVisChanged(Section : TElHeaderSection); virtual;
+    procedure DoSectionDelete(Section : TElHeaderSection); virtual;
+    procedure DoSectionMove(Section : TElHeaderSection; OldPos, NewPos : integer); virtual;
+    procedure DoSectionResizing(Section : TElHeaderSection; State : TElHResizingStates; NewWidth : integer); virtual;
+    procedure DoSectionResize(Section : TElHeaderSection); virtual;
+    procedure DoSectionClick(Section : TElHeaderSection); virtual;
+    procedure DoSectionDraw(Canvas : TCanvas; Section : TElHeaderSection; R : TRect; Pressed : boolean); virtual;
+    procedure DoNotifySectionChange(Section : TElHeaderSection; Change : TSectionChangeMode); virtual;
+    procedure DoSectionExpandEvent(Section : TElHeaderSection); virtual;
+    procedure DoSectionCollapseEvent(Section : TElHeaderSection); virtual;
+    procedure DoSectionCreate(Section : TElHeaderSection); virtual;
+    procedure DoSectionLookupEvent(Section : TElHeaderSection; var Text : string); virtual;
+    procedure DoSectionLookupDoneEvent(Section : TElHeaderSection; Text : string; Accepted : boolean); virtual;
+    procedure TriggerSectionAutoSizeEvent(Section : TElHeaderSection); virtual;
+    procedure TriggerFilterCallEvent(Section : TElHeaderSection); virtual;
+    procedure TriggerMeasureSectionEvent(Section : TElHeaderSection; var Size: TPoint); virtual;
+
+    procedure OnFontChange(Sender : TObject);
+    function GetResizableWidth : integer;
+    {$ifndef CLX_USED}
+    procedure CreateParams(var Params : TCreateParams); override;
+    procedure WMKeyDown(var Message: TWMKeyDown); message WM_KEYDOWN;
+    {$endif}
+{$ifdef HAS_HTML_RENDER}
+    procedure TriggerImageNeededEvent(Sender : TObject; Src : TElFString; var Image :
+        TBitmap); virtual;
+{$endif}
+    {$ifndef CLX_USED}
+    procedure CreateHandle; override;
+    {$else}
+    procedure CreateWidget; override;
+    {$endif}
+    {$ifndef CLX_USED}
+    {$ifdef ELPACK_COMPLETE}
+    procedure IFMRepaintChildren(var Message: TMessage); message
+        IFM_REPAINTCHILDREN;
+    {$endif}
+    {$endif}
+    {$ifdef MSWINDOWS}
+    function GetThemedClassName: WideString; override;
+    {$endif}
+
+    {$ifdef ELPACK_UNICODE}
+    procedure SetHint(Value: WideString);
+    {$endif}
+
+    property SectionsWidth : integer read GetColumnsWidth;
+    property Sections : TElHeaderSections read FSections write SetSections;
+    property ResizeOnDrag : boolean read FResizeOnDrag write FResizeOnDrag;
+    property Tracking : boolean read FTracking write SetTracking;
+    property AllowDrag : boolean read FAllowDrag write FAllowDrag;
+
+    property Images : TImageList read FImages write SetImages; { Published }
+
+    property MoveOnDrag : Boolean read FMoveOnDrag write FMoveOnDrag; { Published }
+{$ifdef SUPPORT_STORAGE}
+    property StoragePath : string read FStoragePath write FStoragePath;
+    property Storage : TElIniFile read FStorage write SetStorage;
+{$ELSE}
+{$IFDEF ELPACK_COMPLETE}
+    property StoragePath: string read FStoragePath write FStoragePath;
+    property Storage : TElIniFile read FStorage write FStorage;
+{$ENDIF}
+{$ENDIF}
+    property StickySections : Boolean read FStickySections write SetStickySections;
+    property RightAlignedText : Boolean read FRightAlignedText write SetRightAlignedText;
+    property RightAlignedOrder : Boolean read FRightAlignedOrder write SetRightAlignedOrder;
+    property LockHeight : Boolean read FLockHeight write SetLockHeight; { Protected }
+    property FilterColor : TColor read FFilterColor write SetFilterColor; { Protected }
+    property ActiveFilterColor : TColor read FActiveFilterColor write SetActiveFilterColor; { Published }
+{$IFDEF ELPACK_COMPLETE}
+{$ifndef CLX_USED}
+    property ImageForm   : TElImageForm read FImgForm write SetImageForm;
+{$endif}
+{$ENDIF}
+    property OnSectionChange : TSectionChangeEvent read FOnSectionChange
+      write FOnSectionChange;
+{$IFNDEF VCL_4_USED}
+    property OnResize : TNotifyEvent read FOnResize write FOnResize;
+{$ENDIF}
+    property OnSectionShowHide : TElHeaderSectionEvent read FOnVisibleChange
+      write FOnVisibleChange;
+    property OnSectionClick : TElHeaderSectionEvent read FOnSectionClick
+      write FOnSectionClick;
+    property OnSectionResize : TElHeaderSectionEvent read FOnSectionResize
+      write FOnSectionResize;
+    property OnSectionDraw : TElSectionRedrawEvent read FOnSectionDraw
+      write FOnSectionDraw;
+    property OnSectionDelete : TElHeaderSectionEvent read FOnSectionDelete
+      write FOnSectionDelete;
+    property OnSectionResizing : TElSectionResizingEvent read FOnSectionResizing
+      write FOnSectionResizing;
+    property OnSectionMove : TElSectionMoveEvent read FOnSectionMove
+      write FOnSectionMove;
+    property OnPictureNeeded : TPictureNeededEvent read FOnPictureNeeded
+      write FOnPictureNeeded;
+    property OnSectionCreate : TElHeaderSectionEvent read FOnSectionCreate
+      write FOnSectionCreate;
+    property OnSectionExpand : TElHeaderSectionEvent read FOnSectionExpand
+      write FOnSectionExpand;
+    property OnSectionCollapse : TElHeaderSectionEvent read FOnSectionCollapse
+      write FOnSectionCollapse;
+    property OnHeaderLookup : TElHeaderLookupEvent read FOnHeaderLookup
+      write FOnHeaderLookup;
+    property OnHeaderLookupDone : TElHeaderLookupDoneEvent read FOnHeaderLookupDone
+      write FOnHeaderLookupDone;
+    property OnMeasureSection  : TMeasureSectionEvent read FOnMeasureSection write FOnMeasureSection;
+    
+    property OnSectionAutoSize : TElHeaderSectionEvent read FOnSectionAutoSize write FOnSectionAutoSize;
+    property OnFilterCall : TElHeaderSectionEvent read FOnFilterCall write FOnFilterCall;
+    property Flat : Boolean read FFlat write SetFlat; { Protected }
+    property IsDesigning : Boolean read GetIsDesigning write SetIsDesigning;  { Protected }
+    property InvertSortArrows : Boolean read FInvertSortArrows write SetInvertSortArrows default False;  { Protected }
+{$IFNDEF LITE}
+    property WrapCaptions : Boolean read FWrapCaptions write SetWrapCaptions;  { Published }
+    property DefaultWidth: Integer read FDefaultWidth write FDefaultWidth default 
+        120;
+{$ifdef HAS_HTML_RENDER}
+    property OnHTMLImageNeeded: TElHTMLImageNeededEvent read FOnImageNeeded write
+        FOnImageNeeded;
+{$endif}
+{$ENDIF}
+  public
+      { Public declarations }
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    function GetSectionAt(X, Y : integer) : TElHeaderSection;
+    function GetSectionAtEx(X, Y : integer; var SectionPart : TElSectionPart) : TElHeaderSection;
+    function GetSectionRect(SectionNum : integer) : TRect;
+    function MeasureSectionWidth(Section : TElHeaderSection; TextWidth : PInteger; SectionHeight : PInteger) : integer;
+    function CalcHeaderHeight : integer;
+
+    property Canvas;
+    procedure Loaded; override;
+{$IFDEF ELPACK_COMPLETE}
+{$ifndef CLX_USED}
+    function Setup: boolean;
+{$endif}
+{$ENDIF}
+{$ifdef SUPPORT_STORAGE}
+    procedure Save;
+    procedure Restore;
+{$ENDIF}
+    procedure Update; override;
+
+    procedure BeginUpdate;
+    procedure EndUpdate;
+    procedure MarkStickySections;
+    property LeftPos : Integer read FHPos write SetLeftPos;  { Public }
+{$IFNDEF LITE}
+    property LockedSection : TElHeaderSection read FLockedSection write SetLockedSection;  { Public }
+    property MultiSort: Boolean read FMultiSort write FMultiSort;
+{$ENDIF}
+  published
+    {$ifdef ELPACK_UNICODE}
+    property Hint: WideString read FHint write SetHint;
+    {$endif}
+  end;
+
+  TElHeader = class(TCustomElHeader)
+  published
+    property ActiveFilterColor;
+    property AllowDrag;
+    property Align;
+    property Color;
+    property DefaultWidth;
+    property Enabled;
+    property Flat;
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Action;
+    property Constraints;
+    {$ifndef CLX_USED}
+    property DockOrientation;
+    property Floating;
+    property BevelKind;
+    property DoubleBuffered;
+    property DragKind;
+    {$endif}
+{$ENDIF}
+//        property FixClick; // Left for future
+    property MoveOnDrag;
+    property Font;
+    property FilterColor;
+    property Images;
+{$IFDEF ELPACK_COMPLETE}
+{$ifndef CLX_USED}
+    property ImageForm;
+{$endif}
+{$ENDIF}
+    property InvertSortArrows;
+
+    property LockHeight;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ResizeOnDrag;
+    property RightAlignedText;
+    property RightAlignedOrder;
+    property SectionsWidth;
+    property Sections;
+    property ShowHint;
+    property StickySections;
+    property Tracking;
+{$IFDEF ELPACK_COMPLETE}
+    property Storage;
+    property StoragePath;
+{$ENDIF}
+    property Visible;
+    property UseXPThemes;
+    property WrapCaptions;
+
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnResize;
+    property OnSectionClick;
+    property OnSectionResize;
+    property OnSectionDraw;
+    property OnSectionResizing;
+    property OnSectionDelete;
+    property OnSectionMove;
+    property OnSectionShowHide;
+    property OnPictureNeeded;
+    property OnSectionChange;
+    property OnSectionCreate;
+    property OnSectionExpand;
+    property OnSectionCollapse;
+    property OnHeaderLookup;
+    property OnHeaderLookupDone;
+{$ifdef HAS_HTML_RENDER}
+    property OnHTMLImageNeeded;
+{$endif}
+    property OnSectionAutoSize;
+    property OnFilterCall;
+{$IFDEF VCL_4_USED}
+    {$ifndef CLX_USED}
+    property OnStartDock;
+    property OnEndDock;
+    {$endif}
+{$ENDIF}
+{$IFDEF VCL_5_USED}
+    property OnContextPopup;
+{$ENDIF}
+  end;
+
+const
+  ResizeWidth = 5;
+
+var ElHeaderAscBmp,
+    ElHeaderDescBmp,
+    ElHeaderLeftBmp,
+    ElHeaderRightBmp,
+    ElHeaderPointBmp : TBitmap;
+
+implementation
+end.

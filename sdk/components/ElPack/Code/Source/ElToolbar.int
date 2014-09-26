@@ -1,0 +1,636 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+03/26/2002
+
+  Fixed the bug introduced 03/12/2002 that leads to inability to focus any
+  control on toolbar.
+
+03/22/2002
+
+  ButtonCount was made public to prevent crashes in early versions of
+  Delphi/Builder IDE
+
+03/12/2002
+
+  Fixed focus passing when TElToolbar gains focus 
+
+03/10/2002
+
+  Fixed assignment of properties for buttons that have OwnerSettings = false
+
+01/24/2002
+
+  Improved transparency handling with XP themes enabled 
+
+01/17/2002
+
+  Toolbar buttons now correctly handle change of Visible property when linked 
+  to actions
+
+12/24/2001
+
+  When the toolbar is focused, focus is automatically passed to the first control
+  that is able to be focused (i.e. is WinControl) 
+
+12/12/2001
+
+  Improved behaviour of "transparent" toolbar with XP styles enabled
+
+11/24/2001
+
+  Added ShowCaption and LargeSize to properties handled with Save/Restore
+
+11/19/2001
+
+  Added AdjustButtonHeight property
+  Fixed deletion of buttons from toolbar
+
+11/16/2001
+
+  Button size can be now adjusted automatically depending on button contents
+  with AdjustButtonWidth property
+
+11/11/2001
+
+  Storage and StoragePath properties were not accessible in Delphi 3. Fixed.
+
+11/05/2001
+
+  Save and Restore methods added. They save order and visibility of controls
+  Setup method added. It shows a dialog window that the user can use to customize
+  the toolbar.
+
+10/10/2001
+
+  ThinButtons property added
+
+09/17/2001
+
+  Added Windows XP Themes Support 
+  MoreMenu button disabled
+
+12/16/2000
+
+  MoreMenu button behaviour improved.
+
+*)
+
+unit ElToolbar;
+
+interface
+
+uses
+  SysUtils,
+  Classes,
+  {$ifndef CLX_USED}
+  Windows,
+  Messages,
+  Controls,
+  Graphics,
+  Forms,
+  Buttons,
+  ExtCtrls,
+  Menus,
+  ElImgFrm,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  {$IFDEF VCL_4_USED}
+  ImgList,
+  ActnList,
+  {$ENDIF}
+  {$else}
+  QTypes,
+  Types,
+  QT,
+  QControls,
+  QGraphics,
+  QForms,
+  QButtons,
+  QExtCtrls,
+  QMenus,
+  QImgList,
+  QActnList,
+  {$endif}
+  ElIni,
+  ElStrToken,
+  ElTmSchema,
+  ElXPThemedControl,
+  ElUxTheme,
+  ElPanel,
+  ElList,
+  ElTools,
+  ElPopBtn,
+  ElVCLUtils,
+  ElSndMap
+  ;
+
+{$R ElToolBar.res}
+
+type
+  TElBarOrientation = (eboHorz, eboVert);
+
+  TElToolButtonType = (ebtButton, ebtSeparator, ebtDivider);
+
+  TCustomElToolButton = class(TCustomElGraphicButton)
+  private
+    FLargeGlyph : pointer;
+    FGlyph : pointer;
+    FButtonType : TElToolButtonType;
+    FWrap : Boolean;
+    {$ifdef VCL_4_USED}
+    ActionVisibleInverted,
+    {$endif}
+    FSettingVisible,
+    FRealVisible   : boolean;
+    FFakeBoolProp  : boolean;
+    FFakeIntProp   : integer;
+    FFakeNotifyEvent : TNotifyEvent;
+    {$ifndef CLX_USED}
+    {$IFDEF VCL_4_USED}
+    FFakeBevelKind : TBevelKind;
+    {$ENDIF}
+    {$endif}
+    FButtonID: Integer;
+    FOwnerSettings: Boolean;
+    procedure SetWrap(newValue : Boolean);
+    procedure SetButtonType(newValue : TElToolButtonType);
+    procedure SetLargeGlyph(newValue : TBitmap);
+    procedure SetNumLargeGlyphs(newValue : Integer);
+    procedure SetGlyph(newValue : TBitmap);
+    procedure SetNumGlyphs(newValue : Integer);
+    function GetNumGlyphs : integer;
+    function GetNumLargeGlyphs : integer;
+    function GetGlyph : TBitmap;
+    function GetLargeGlyph : TBitmap;
+    procedure GlyphChanged(Sender : TObject);
+    procedure LargeGlyphChanged(Sender : TObject);
+    {$ifndef CLX_USED}
+    procedure CMEnabledChanged(var Msg : TMessage); message CM_ENABLEDCHANGED;
+    {$endif}
+  protected
+    {$ifdef CLX_USED}
+    procedure EnabledChanged; override;
+    {$endif}
+    procedure SetUseArrow(newValue : boolean); override;
+    procedure SwitchGlyphs(ToLarge : boolean);
+    procedure SetFlat(Value : Boolean); override;
+    {$ifndef CLX_USED}
+    procedure SetParent(AParent : TWinControl); override;
+    {$else}
+    procedure SetParent(const AParent : TWidgetControl); override;
+    {$endif}
+    procedure Paint; override;
+    procedure MouseDown(Button : TMouseButton; Shift : TShiftState; X, Y : Integer);
+        override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+    {$ifdef MSWINDOWS}
+
+    function GetThemePartID: Integer; override;
+    function GetThemeStateID: Integer; override;
+    function GetThemedClassName: WideString; override;
+    function GetArrowThemePartID: Integer; override;
+    function GetArrowThemeStateID: Integer; override;
+    function GetArrowThemedClassName: WideString; override;
+    procedure DrawThemedBackground(Canvas : TCanvas); override;
+    {$endif}
+    procedure DefineProperties(Filer: TFiler); override;
+    procedure ReadButtonID(Reader : TReader);
+    procedure WriteButtonID(Writer : TWriter);
+    {$ifndef CLX_USED}
+    procedure CMTextChanged(var Message : TMessage); message CM_TEXTCHANGED;
+    procedure CMVisibleChanged(var Message: TMessage); message CM_VISIBLECHANGED;
+    {$else}
+    procedure VisibleChanged; override;
+    procedure TextChanged; override;
+    {$endif}
+    procedure ImagesChanged(Sender : TObject); override;
+    procedure SetLayout(Value : TButtonLayout); override;
+    procedure SetMargin(Value : Integer); override;
+    procedure SetShowGlyph(newValue : Boolean); override;
+    procedure SetShowText(newValue : Boolean); override;
+    procedure SetSpacing(Value : Integer); override;
+    {$ifdef VCL_4_USED}
+    function GetActionLinkClass: TControlActionLinkClass; override;
+    {$endif}
+    procedure Loaded; override;
+    procedure SetOwnerSettings(Value: Boolean);
+    property Transparent;
+
+    property Wrap : Boolean read FWrap write SetWrap;
+    property ButtonType : TElToolButtonType read FButtonType write SetButtonType;
+    property LargeGlyph : TBitmap read GetLargeGlyph write SetLargeGlyph; { Published }
+    property NumLargeGlyphs : Integer read GetNumLargeGlyphs write SetNumLargeGlyphs; { Protected }
+    property Glyph : TBitmap read GetGlyph write SetGlyph; { Published }
+    property NumGlyphs : Integer read GetNumGlyphs write SetNumGlyphs; { Published }
+    property OwnerSettings: Boolean read FOwnerSettings write SetOwnerSettings
+        default true;
+
+    property Default : boolean read FFakeBoolProp write FFakeBoolProp  stored false;
+    property ShowFocus: boolean read FFakeBoolProp write FFakeBoolProp  stored false;
+    property TabStop : boolean read FFakeBoolProp write FFakeBoolProp stored false;
+    property TabOrder: integer read FFakeIntProp write FFakeIntProp stored false;
+    property OnEnter : TNotifyEvent read FFakeNotifyEvent write FFakeNotifyEvent stored false;
+    property OnExit : TNotifyEvent read FFakeNotifyEvent write FFakeNotifyEvent stored false;
+
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+
+    property RealVisible : boolean read FRealVisible;
+  published
+
+    {$IFDEF VCL_4_USED}
+    {$ifndef CLX_USED}
+    property BevelKind : TBevelKind read FFakeBevelKind write FFakeBevelKind stored false;
+    property DoubleBuffered : boolean read FFakeBoolProp write FFakeBoolProp stored false;
+    {$endif}
+    {$ENDIF}
+  end;
+
+  TElToolButton = class(TCustomElToolButton)
+  published
+
+    property Wrap;
+    property ButtonType;
+    property LargeGlyph;
+    property NumLargeGlyphs;
+    property Glyph;
+    property NumGlyphs;
+    property OwnerSettings;
+
+    // ElGraphicButton properties
+	property AdjustSpaceForGlyph;
+    property PullDownMenu;
+    property PopupPlace;
+    property DisableAutoPopup;
+    property Cancel;
+    property ModalResult;
+    property AllowAllUp;
+    property GroupIndex;
+    property Down;
+    property Flat;
+    property Layout;
+    property Margin;
+    property Spacing;
+    property UseArrow;
+    property ShadowFollowsColor;
+    property ShowGlyph;
+    property ShowText;
+    property OnArrowClick;
+    property Icon;
+    property ImageIsAlphaBlended;
+    property IsSwitch;
+    property TextDrawType;
+    property ThinFrame;
+    property DownSound;
+    property UpSound;
+    property ClickSound;
+    property ArrowClickSound;
+{$IFDEF USE_SOUND_MAP}
+    property SoundMap;
+{$ENDIF}
+    property UseIcon;
+    property ImageIndex;
+    property UseImageList;
+    property OldStyled;
+    property Background;
+    property DownBackground;
+    property BackgroundDrawBorder;
+    property Transparent;
+    {$ifdef MSWINDOWS}
+    property UseXPThemes;
+    {$endif}
+
+    // VCL properties
+    property Caption;
+    property Enabled;
+    property PopupMenu;
+    property Color;
+    property ParentColor;
+    property Align;
+    property Font;
+    property ParentFont;
+    property ParentShowHint;
+    property ShowHint;
+    property Visible;
+
+    property OnClick;
+    property OnDblClick;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnStartDrag;
+
+{$IFDEF VCL_4_USED}
+    property Action;
+    property Constraints;
+{$ENDIF}
+{$IFDEF VCL_5_USED}
+    property OnContextPopup;
+{$ENDIF}
+  end;
+
+  TElToolButtonClass = class of TCustomElToolButton;
+
+type
+  TElToolBar = class(TElPanel)
+  private
+    FNoReAlign      : boolean;
+    (*
+    FMoreMenu       : TPopupMenu;
+    FMoreMenuItems  : TElList;
+    FMoreMenuVisible,
+    FMoreMenuActive : boolean;
+    FIgnoreMoreClick: boolean;
+    *)
+    FShowMoreMenu   : Boolean;
+
+    FTransparentButtons : Boolean;
+    FUseImageList : Boolean;
+    FImages : TImageList;
+    FHotImages : TImageList;
+    FDisabledImages : TImageList;
+    FUpdateCount : integer;
+    FUpdatingButtons: integer;
+    FUseLargeGlyphs : Boolean;
+    FHidden : Boolean;
+    FHideable : Boolean;
+    FOrientation : TElBarOrientation;
+    FButtonColor : TColor;
+    FMinSize : integer;
+    FAutoSize : Boolean;
+    FFlat : Boolean;
+    FLargeBtnWidth : Integer;
+    FLargeBtnHeight : Integer;
+    FGlyphLayout : TButtonLayout;
+    FSpacing : Integer;
+    FMargin : Integer;
+    FShowGlyph : Boolean;
+    FShowCaption : Boolean;
+    FLargeSize : Boolean;
+    FBtnWidth : Integer;
+    FBtnHeight : Integer;
+    FBtnOffsHorz : Integer;
+    FBtnOffsVert : Integer;
+    FAutoWrap : Boolean;
+    FCreating : boolean;
+    FSaveAlign : TAlign;
+    //    FSaveSize: integer;
+    FDummy : string;
+    {$ifndef CLX_USED}
+    FButtonImageForm : TElImageForm;
+    FMouseInControl: Boolean;
+    {$endif}
+    {$ifndef CLX_USED}
+    procedure WMNCCalcSize(var Msg : TWMNcCalcSize); message WM_NCCALCSIZE;
+    procedure WMNCPaint(var Msg : TMessage); message WM_NCPAINT;
+    procedure WMNCHitTest(var Msg : TMessage); message WM_NCHITTEST;
+    procedure WMNCLButtonDown(var Msg : TWMNCLButtonDown); message WM_NCLBUTTONDOWN;
+    procedure WMWindowPosChanged(var Msg : TWMWindowPosChanged); message WM_WINDOWPOSCHANGED;
+    procedure WMEraseBkGnd(var Msg : TWMEraseBkGnd); message WM_EraseBkgnd;
+    procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
+    {$endif}
+  protected
+    FThinButtons: Boolean;
+    FStorage: TElIniFile;
+    FStoragePath: string;
+    FAdjustButtonWidth: Boolean;
+    FAdjustButtonHeight: Boolean;
+    FButtons: TElList;
+    FFocusedButton: TElToolButton;
+    FTransparent : boolean;
+    FImageIsAlphaBlended: Boolean;
+    {$ifndef CLX_USED}
+    procedure CMEnabledChanged(var Msg : TMessage); message CM_ENABLEDCHANGED;
+    {$else}
+    procedure EnabledChanged; override;
+    {$endif}
+    {$ifndef CLX_USED}
+    procedure StartMoreMenu;
+    procedure PutMoreItemsToBar;
+    procedure OnMoreItemClick(Sender : TObject);
+    {$endif}
+    {$ifndef CLX_USED}
+    procedure SetButtonImageForm(newValue : TElImageForm); virtual;
+    {$endif}
+    procedure SetBtnWidth(newValue : Integer); virtual;
+    procedure SetBtnHeight(newValue : Integer); virtual;
+    procedure SetFlat(newValue : Boolean); virtual;
+    procedure SetLargeSize(newValue : Boolean); virtual;
+    procedure SetLargeBtnWidth(newValue : Integer); virtual;
+    procedure SetLargeBtnHeight(newValue : Integer); virtual;
+    procedure SetButtonColor(newValue : TColor); virtual;
+    procedure SetAutoSize(newValue : Boolean);
+{$ifdef VCL_6_USED}
+    {$ifndef CLX_USED}
+    override;
+    {$else}
+    virtual;
+    {$endif}
+{$else}
+    virtual;
+{$endif}
+    procedure SetTransparentButtons(newValue : Boolean); virtual;
+    procedure SetBtnOffsHorz(newValue : Integer); virtual;
+    procedure SetBtnOffsVert(newValue : Integer); virtual;
+    procedure SetAutoWrap(newValue : Boolean);
+    procedure SetShowGlyph(newValue : Boolean);
+    procedure SetShowCaption(newValue : Boolean);
+    procedure SetGlyphLayout(newValue : TButtonLayout); virtual;
+    procedure SetSpacing(newValue : Integer); virtual;
+    procedure SetMargin(newValue : Integer); virtual;
+    function GetToolButton(index : integer) : TElToolButton;
+    procedure SetToolButton(index : integer; newValue : TElToolButton);
+    function GetButtonCount : Integer;
+    {$ifdef CLX_USED}
+    procedure ControlsListChanged(Control: TControl; Inserting: Boolean); override;
+    procedure ControlsListChanging(Control: TControl; Inserting: Boolean); override;
+    procedure Resize; override;
+    {$endif}
+    {$ifndef CLX_USED}
+    procedure CMControlListChange(var Msg : TMessage); message CM_CONTROLLISTCHANGE;
+    procedure CMControlChange(var Msg : TCMControlChange); message CM_CONTROLCHANGE;
+    procedure WMSize(var Msg : TWMSize); message WM_SIZE;
+    {$endif}
+    procedure SetMinSize(newValue : integer);
+    procedure SetOrientation(newValue : TElBarOrientation);
+    //procedure SetHideable(newValue : Boolean);
+    //procedure SetHidden(newValue : Boolean);
+    procedure SetUseLargeGlyphs(newValue : Boolean);
+    procedure SetImages(newValue : TImageList);
+    procedure SetHotImages(newValue : TImageList);
+    procedure SetDisabledImages(newValue : TImageList);
+    procedure SetUseImageList(newValue : Boolean);
+
+    {$ifndef CLX_USED}
+    procedure SetShowMoreMenu(newValue : Boolean); virtual;
+    procedure SetMoreMenuActive(newValue : Boolean); virtual;
+    {$endif}
+    procedure AlignControls(AControl : TControl; var Rect : TRect); override;
+    procedure Notification(AComponent : TComponent; Operation : TOperation); override;
+    procedure Loaded; override;
+    procedure Paint; override;
+    {$ifndef CLX_USED}
+    {$endif}
+    {$ifndef CLX_USED}
+    procedure RedrawMoreBtn;
+    {$endif}
+    function GetRealClientWidth : integer;
+    function GetRealClientHeight : integer;
+    {$ifndef CLX_USED}
+    function GetMoreBtnRect : TRect;
+    {$endif}
+    procedure SetThinButtons(Value: Boolean);
+
+    procedure DrawThemedBackground; override;
+    function GetThemedClassName: WideString; override;
+    function GetFreeButtonID: Integer;
+    function GetButtonByID(ID : Integer): TElToolButton;
+    procedure SetAdjustButtonWidth(Value: Boolean);
+    function GetEffectiveButtonWidth(Button : TCustomElToolButton; IncludeArrow : 
+        boolean): Integer;
+    procedure SetAdjustButtonHeight(Value: Boolean);
+    function GetEffectiveButtonHeight(Button : TCustomElToolButton): Integer;
+    {$ifndef CLX_USED}
+    procedure CMMouseEnter(var Message: TMessage); message CM_MOUSEENTER;
+    procedure WMMouseLeave(var Message: TMessage); message WM_MOUSELEAVE;
+    procedure WMMouseMove(var Message: TMessage); message WM_MOUSEMOVE;
+    procedure CMMouseLeave(var Message: TMessage); message CM_MOUSELEAVE;
+    procedure StartLeaveTracking;
+    {$endif}
+    function GetButtonClass: TElToolButtonClass; virtual;
+    procedure SetFocusedButton(Value: TElToolButton);
+    procedure SetTransparent(newValue : Boolean); override;
+    procedure SetUseXPThemes(const Value: Boolean); override;
+    procedure DoEnter; override;
+    {$ifndef CLX_USED}
+    procedure SetParent(AParent: TWinControl); override;
+    {$endif}
+    {$ifdef CLX_USED}
+    procedure FontChanged; override;
+    {$endif}
+    procedure SetImageIsAlphaBlended(Value: Boolean);
+
+    property FocusedButton: TElToolButton read FFocusedButton write
+        SetFocusedButton;
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    function AddButton(ButtonType : TELToolButtonType) : TElToolButton; virtual;
+    procedure OrderedControls(L : TElList);
+
+    procedure AlignButtons; virtual;
+    procedure UpdateButtons; virtual;
+    procedure BeginUpdate;
+    procedure EndUpdate;
+    procedure Save;
+    procedure Restore;
+    {$ifndef CLX_USED}
+    function Setup(ShowTextOptions, ShowIconOptions : boolean): Boolean;
+    {$endif}
+    function GetNextButton(CurrentButton : TCustomElToolButton; Forward :
+             boolean; IncludeDisabled : boolean) : TCustomElToolButton;
+
+    property ToolButton[index : integer] : TElToolButton read GetToolButton write SetToolButton;
+    property Caption : string read FDummy write FDummy;
+    property ButtonCount : Integer read GetButtonCount;
+  published
+    property BtnWidth : Integer read FBtnWidth write SetBtnWidth default 24;
+    property BtnHeight : Integer read FBtnHeight write SetBtnHeight default 24;
+    property BtnOffsHorz : Integer read FBtnOffsHorz write SetBtnOffsHorz default 3;
+    property BtnOffsVert : Integer read FBtnOffsVert write SetBtnOffsVert default 3;
+    property AutoWrap : Boolean read FAutoWrap write SetAutoWrap;
+    property ShowGlyph : Boolean read FShowGlyph write SetShowGlyph default True;
+    property ShowCaption : Boolean read FShowCaption write SetShowCaption default False;
+    property LargeSize : Boolean read FLargeSize write SetLargeSize default False;
+    property LargeBtnWidth : Integer read FLargeBtnWidth write SetLargeBtnWidth default 48;
+    property LargeBtnHeight : Integer read FLargeBtnHeight write SetLargeBtnHeight default 48;
+    property GlyphLayout : TButtonLayout read FGlyphLayout write SetGlyphLayout;
+    property Spacing : Integer read FSpacing write SetSpacing default 4;
+    property Margin : Integer read FMargin write SetMargin default -1;
+    property Flat : Boolean read FFlat write SetFlat default True;
+    property AutoSize : Boolean read FAutoSize write SetAutoSize default True;
+    property MinSize : integer read FMinSize write SetMinSize default 8;
+    property ButtonColor : TColor read FButtonColor write SetButtonColor default clBtnFace;
+    {$ifndef CLX_USED}
+    property ButtonImageForm : TElImageForm read FButtonImageForm write SetButtonImageForm;
+    {$endif}
+    property Orientation : TElBarOrientation read FOrientation write SetOrientation default eboHorz;
+
+    property UseLargeGlyphs : Boolean read FUseLargeGlyphs write SetUseLargeGlyphs; { Published }
+    property Images : TImageList read FImages write SetImages;
+    property HotImages : TImageList read FHotImages write SetHotImages;
+    property DisabledImages : TImageList read FDisabledImages write SetDisabledImages;
+    property UseImageList : Boolean read FUseImageList write SetUseImageList; { Published }
+    property TransparentButtons : Boolean read FTransparentButtons write SetTransparentButtons; { Published }
+    property ThinButtons: Boolean read FThinButtons write SetThinButtons;
+    property Storage: TElIniFile read FStorage write FStorage;
+    property StoragePath: string read FStoragePath write FStoragePath;
+    property AdjustButtonWidth: Boolean read FAdjustButtonWidth write
+        SetAdjustButtonWidth default true;
+    property AdjustButtonHeight: Boolean read FAdjustButtonHeight write
+        SetAdjustButtonHeight default true;
+    property ImageIsAlphaBlended: Boolean read FImageIsAlphaBlended write 
+        SetImageIsAlphaBlended default false;
+    {$ifndef CLX_USED}
+    property ShowMoreMenu : boolean read FShowMoreMenu write SetShowMoreMenu;
+    {$endif}
+    {$ifndef CLX_USED}
+    property UseXPThemes;
+    {$endif}
+    
+// Not made yet
+//    property Hideable : Boolean read FHideable write SetHideable;
+//    property Hidden : Boolean read FHidden write SetHidden default False;
+
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Action;
+    property Constraints;
+    {$ifndef CLX_USED}
+    property DockOrientation;
+    property Floating;
+    property BevelKind;
+    property DoubleBuffered;
+    property DragKind;
+    {$endif}
+{$ENDIF}
+  end;
+
+  {$ifdef VCL_4_USED}
+  TElToolButtonActionLink = class(TElGraphicButtonActionLink)
+  protected
+    function IsVisibleLinked: Boolean; override;
+    procedure SetVisible(Value: Boolean); override;
+  end;
+  {$endif}
+
+const
+  DEF_SepSize : integer = 4;
+
+implementation
+end.

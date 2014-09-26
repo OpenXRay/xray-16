@@ -1,0 +1,110 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElHashList; { TElHashList component. }
+
+{$Q-}
+{$RANGECHECKS OFF}
+{$ALIGN ON}
+
+interface
+
+uses
+  SysUtils, ElCRC32(*, ElMD5*);
+
+type
+  EElHashListError = class(Exception)
+  end;
+
+const
+  MaxHashListSize = Maxint div 16;
+
+type
+  PHash = ^THash;
+{$IFDEF Ver120}
+  THash = array[1..4] of LongWord;
+{$ELSE}
+  THash = array[1..4] of integer;
+{$ENDIF}
+
+  PHashRecord = ^THashRecord;
+  THashRecord = record
+    Hash : PHash;
+    ItemData : pointer;
+  end;
+
+  PHashList = ^THashList;
+  THashList = array[0..MaxHashListSize - 1] of PHashRecord;
+
+  TElHashList = class;
+
+  TElHashType = (ehtMD5, ehtQuick, ehtCRC32);
+
+  OnHashDeleteEvent = procedure(Sender : TElHashList; Data : pointer) of object;
+
+  THashInsertDupesMode = (himInsert, himRaise, himReplace, himIgnore, himMove);
+
+  TElHashList = class(TObject)
+  private
+    FAutoClearObjects : Boolean;
+    FNoCase : boolean;
+    FHashType : TElHashType;
+    FList : PHashList;
+    FCount : Integer;
+    FCapacity : Integer;
+    FOnDelete : OnHashDeleteEvent;
+    FQuickHash : Boolean;
+    FInsertDupesMode : THashInsertDupesMode;
+    FRaiseOnAbsence : Boolean;
+
+    procedure Grow;
+    procedure SetCapacity(NewCapacity : Integer);
+    function GetItem(Hash : string) : pointer;
+    procedure SetQuickHash(newValue : Boolean);
+    procedure SetHashType(newValue : TElHashType);
+    procedure SetAutoClearObjects(newValue : Boolean);
+  protected
+    { Protected declarations }
+
+    function CalcQuickHash(Hash : string) : Integer; virtual;
+  public
+    { Public declarations }
+    destructor Destroy; override;
+    procedure AddItem(Hash : string; Value : Pointer);
+    procedure DeleteItem(Hash : string);
+    procedure InsertItem(Index : integer; Hash : string; Value : pointer);
+    function GetIndex(Hash : string) : integer;
+    procedure Clear;
+
+    property Count : Integer read FCount; { Public }
+    property Capacity : Integer read FCapacity; { Public }
+    function GetByIndex(Index : integer) : Pointer;
+    constructor Create;
+
+    property Item[Hash : string] : pointer read GetItem; { Public }
+    property OnDelete : OnHashDeleteEvent read FOnDelete write FOnDelete;
+    property QuickHash : Boolean read FQuickHash write SetQuickHash; { Public }
+    property RaiseOnAbsence : Boolean read FRaiseOnAbsence write FRaiseOnAbsence default False; { Public }
+    property InsertDupesMode : THashInsertDupesMode read FInsertDupesMode write FInsertDupesMode; { Public }
+    property HashType : TElHashType read FHashType write SetHashType; { Public }
+    property NoCase : boolean read FNoCase write FNoCase;
+    property AutoClearObjects : Boolean read FAutoClearObjects write SetAutoClearObjects; { Published }
+  end; { TElHashList }
+
+implementation
+end.

@@ -1,0 +1,79 @@
+unit ElAttrList;
+
+(*
+  Version History:
+
+  15/Mar/2001
+
+  + Added optional strict XML atribute name check.
+    XML attibute cannot be quoted and meets XmlIdent rules.
+
+  * SetText and GetText now encodes/decodes values as XML strings.
+
+  * Uses XmlQuotes and XmlWhitespaces constants.
+
+  ! Moved to ElAttrList unit;
+
+*)
+
+interface
+
+uses
+  Classes,
+  SysUtils,
+  ElInterfaceClasses;
+
+type
+  TElAttributeListException = class(Exception);
+
+  IElAttributeList = interface
+  ['{47F41D19-EE3C-4E0A-9F06-3CEF29F64000}']
+    function GetStrictXML: Boolean;
+    procedure SetStrictXML(const Value: Boolean);
+    function GetText: String;
+    procedure SetText(const Text: String);
+    function GetName(const Index: Integer): String;
+    function GetValue(const Index: Integer): String;
+    procedure SetValue(const Index: Integer; const AValue: String);
+    function GetCount: Integer;
+    function GetAttribute(const AName: String): String;
+    procedure SetAttribute(const AName: String; const AValue: String; Additive: Boolean);
+    procedure _SetAttribute(const AName: String; const AValue: String);
+    procedure RemoveAttribute(const AName: String);
+    procedure Clear;
+
+    property StrictXML: Boolean read GetStrictXML write SetStrictXML;
+    property Text: String read GetText write SetText;
+    property Names[const Index: Integer]: String read GetName;
+    property Values[const Index: Integer]: String read GetValue write SetValue;
+    property Count: Integer read GetCount;
+    property Attributes[const Name: String]: String read GetAttribute write _SetAttribute;
+  end;
+
+  TElAttributeList = class(TInterfacedObject, IElAttributeList)
+  private
+    FStrictXML: Boolean;
+    FNames: TStrings;
+    FValues: TStrings;
+  protected
+    { IElAttributeList }
+    function GetStrictXML: Boolean;
+    procedure SetStrictXML(const Value: Boolean);
+    function GetText: String;
+    procedure SetText(const Text: String);
+    function GetName(const Index: Integer): String;
+    function GetValue(const Index: Integer): String;
+    procedure SetValue(const Index: Integer; const AValue: String);
+    function GetCount: Integer;
+    function GetAttribute(const AName: String): String;
+    procedure SetAttribute(const AName: String; const AValue: String; Additive: Boolean);
+    procedure _SetAttribute(const AName: String; const AValue: String);
+    procedure RemoveAttribute(const AName: String);
+    procedure Clear;
+  public
+    procedure AfterConstruction; override;
+    destructor Destroy; override;
+  end;
+
+implementation
+end.

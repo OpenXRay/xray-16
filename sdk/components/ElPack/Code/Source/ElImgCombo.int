@@ -1,0 +1,167 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 2001, EldoS, Akzhan Abdulin        }
+{                                                    }
+{====================================================}
+
+(*
+
+Version History
+
+03/26/2002
+
+  Now it is possible to specify the name for empty value
+  and to draw the name instead of the index 
+
+03/06/2002
+
+  Added unicode hint
+
+01/11/2002
+
+  Fixed painting of the image in the combo box
+
+12/24/2001
+
+  Fixed ShowEmptyValue behaviour when ItemIndex is changed programmatically
+
+12/16/2001
+
+  Now the image is drawn to the left from the edit box
+  Added ShowEmptyValue property
+
+10/02/2001
+
+  Added ManualEdit property
+
+07/15/2001 (c) Akzhan Abdulin
+
+  Initiated (tested under Delphi 5 only)
+
+*)
+
+unit ElImgCombo;
+
+{$I '..\ElPack.inc'}
+
+interface
+
+uses
+  Windows,
+  Messages,
+  Classes,
+  {$ifdef VCL_4_USED}
+  ImgList,
+  {$endif}
+  Controls,
+  StdCtrls,
+
+  CommCtrl,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElTools,
+  ElACtrls;
+
+type
+
+  TElImageNameEvent = procedure(Sender : TObject; Index : integer; var Text : string) of object;
+
+  TElImageComboBox = class(TElAdvancedComboBox)
+  private
+    FChLink   : TChangeLink;
+    FImages   : TImageList;
+    FModified : Boolean;
+    FDummyInt : integer;
+    IOffs: Integer;
+    OwnMoveFlag: Boolean;
+
+    procedure ImagesChanged(Sender : TObject);
+    procedure SetImages(const Value: TImageList);
+    procedure Remake;
+    function GetImageIndex: Integer;
+    procedure SetImageIndex(const Value: Integer);
+    procedure SetModified(const Value: Boolean);
+    procedure WMPaint(var Msg : TWMPaint); message WM_PAINT;
+    procedure CNCommand(var Message: TWMCommand); message CN_COMMAND;
+  protected
+    FOnImageName: TElImageNameEvent;
+    FManualEdit: Boolean;
+    FEmptyValueText: string;
+    procedure Notification(AComponent : TComponent; Operation : TOperation); override;
+    procedure CreateParams(var Params: TCreateParams); override;
+    procedure CreateWnd; override;
+    procedure DropDown; override;
+    procedure DblClick; override;
+    procedure Change; override;
+    procedure DrawItem(Index: Integer; Rect: TRect;
+      State: TOwnerDrawState); override;
+    procedure ComboWndProc(var Message: TMessage; ComboWnd: HWnd;
+      ComboProc: Pointer); override;
+    procedure TriggerImageNameEvent(Index : Integer; var Text : string); virtual;
+    procedure SetManualEdit(Value: Boolean);
+    function GetShowEmptyValue: Boolean;
+    procedure SetShowEmptyValue(Value: Boolean);
+    procedure WMNCCalcSize(var Message: TMessage); message WM_NCCALCSIZE;
+    procedure EditWndProc(var Message : TMessage); override;
+    procedure WndProc(var Message : TMessage); override;
+    procedure UpdateEditSize;
+    procedure Loaded; override;
+    procedure SetEmptyValueText(const Value: string);
+
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  published
+    property Items : integer read FDummyInt;
+    property Style: Integer read FDummyInt;
+
+    property Images: TImageList read FImages write SetImages;
+    property ImageIndex: Integer read GetImageIndex write SetImageIndex default -1;
+    property Modified: Boolean read FModified write SetModified;
+    property ManualEdit: Boolean read FManualEdit write SetManualEdit default true;
+    property ShowEmptyValue: Boolean read GetShowEmptyValue write SetShowEmptyValue 
+        default true;
+    property EmptyValueText: string read FEmptyValueText write SetEmptyValueText;
+
+    property OnImageName: TElImageNameEvent read FOnImageName write FOnImageName;
+
+    {$ifdef VCL_4_USED}
+    property Anchors;
+    property BiDiMode;
+    property Constraints;
+    property ParentBiDiMode;
+    {$endif}
+    property Color;
+    property Ctl3D;
+    property DropDownCount;
+    property Enabled;
+    property Font;
+    property ImeMode;
+    property ImeName;
+    property ParentColor;
+    property ParentCtl3D;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property Visible;
+    property OnChange;
+    property OnClick;
+    property OnDblClick;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    {$ifdef VCL_5_USED}
+    property OnContextPopup;
+    {$endif}
+  end;
+
+implementation
+end.

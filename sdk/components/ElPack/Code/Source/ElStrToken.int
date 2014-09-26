@@ -1,0 +1,58 @@
+
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElStrToken;
+
+interface
+
+uses Classes, SysUtils;
+
+type
+
+  EElStrTokenizerError = class(Exception) end;
+
+  TElStringTokenizer = class
+  private
+    FPos : Integer;
+    FSourceString : String;
+    FReturnTokens : Boolean;
+    FDelimiters   : string;
+    FLastWasToken : boolean;
+    procedure SetSourceString(newValue : String);
+    function IntHasMoreTokens : Boolean;
+    function IntNextToken(var AResult : string) : boolean;
+  public
+    constructor Create;
+    constructor CreateStr(str : String);
+    constructor CreateStrDelim(str : String; Delim : string);
+    constructor CreateStrDelimEx(str : String; Delim : string; ReturnTokens : boolean);
+
+    function  HasMoreTokens : Boolean;
+    function  NextToken : String;
+    function  CountTokens : Integer;
+    function  NextTokenDelim(Delims : string) : String;
+    procedure FindAll(AStrings : TStrings);
+  published
+    property SourceString : String read FSourceString write SetSourceString;  { Published }
+    property ReturnTokens : Boolean read FReturnTokens write FReturnTokens;  { Published }
+    property Delimiters   : string read FDelimiters write FDelimiters;  { Published }
+  end;
+
+implementation
+end.

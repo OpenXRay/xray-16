@@ -1,0 +1,82 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElTreeSpinEdit;
+
+interface
+
+uses
+
+  Windows,
+  Messages,
+  Controls,
+  Forms,
+
+  SysUtils,
+  Classes,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+
+  ElTree,
+  ElHeader,
+  ElSpin
+  ;
+
+type
+
+    TElTreeInplaceSpinEdit = class(TElTreeInplaceEditor)
+    private
+      SaveWndProc: TWndMethod;
+      procedure EditorWndProc(var Message : TMessage);
+    protected
+      FEditor: TElSpinEdit;
+      procedure DoStartOperation; override;
+      procedure DoStopOperation(Accepted : boolean); override;
+      function GetVisible: Boolean; override;
+      procedure TriggerAfterOperation(var Accepted : boolean; var DefaultConversion : 
+          boolean); override;
+      procedure TriggerBeforeOperation(var DefaultConversion : boolean); override;
+    public
+      constructor Create(AOwner : TComponent); override;
+      destructor Destroy; override;
+
+      property Editor: TElSpinEdit read FEditor;
+    end;
+
+    TElTreeInplaceFloatSpinEdit = class(TElTreeInplaceEditor)
+    private
+      SaveWndProc: TWndMethod;
+      procedure EditorWndProc(var Message : TMessage);
+    protected
+      FEditor: TElFloatSpinEdit;
+      procedure DoStartOperation; override;
+      procedure DoStopOperation(Accepted : boolean); override;
+      function GetVisible: Boolean; override;
+      procedure TriggerAfterOperation(var Accepted : boolean; var DefaultConversion : 
+          boolean); override;
+      procedure TriggerBeforeOperation(var DefaultConversion : boolean); override;
+    public
+      constructor Create(AOwner : TComponent); override;
+      destructor Destroy; override;
+
+      property Editor: TElFloatSpinEdit read FEditor;
+    end;
+
+implementation
+end.

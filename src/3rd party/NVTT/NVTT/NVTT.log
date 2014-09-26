@@ -1,0 +1,25 @@
+﻿Build started 9/24/2014 2:10:23 PM.
+     1>Project "E:\git\xray-16\src\3rd party\NVTT\NVTT.vcxproj" on node 2 (Build target(s)).
+     1>Building with tools version "12.0".
+       Project file contains ToolsVersion="4.0". This toolset may be unknown or missing, in which case you may be able to resolve this by installing the appropriate version of MSBuild, or the build may have been forced to a particular ToolsVersion for policy reasons. Treating the project as if it had ToolsVersion="12.0". For more information, please see http://go.microsoft.com/fwlink/?LinkId=293424.
+     1>Target "_CheckForInvalidConfigurationAndPlatform" in file "C:\Program Files (x86)\MSBuild\12.0\bin\Microsoft.Common.CurrentVersion.targets" from project "E:\git\xray-16\src\3rd party\NVTT\NVTT.vcxproj" (entry point):
+       Using "Error" task from assembly "Microsoft.Build.Tasks.v12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a".
+       Task "Error"
+     1>C:\Program Files (x86)\MSBuild\12.0\bin\Microsoft.Common.CurrentVersion.targets(617,5): error : The OutputPath property is not set for project 'NVTT.vcxproj'.  Please check to make sure that you have specified a valid combination of Configuration and Platform for this project.  Configuration='Debug'  Platform='Win32'.  This error may also appear if some other project is trying to follow a project-to-project reference to this project, this project has been unloaded or is not included in the solution, and the referencing project does not build using the same or an equivalent Configuration or Platform.
+       Done executing task "Error" -- FAILED.
+     1>Done building target "_CheckForInvalidConfigurationAndPlatform" in project "NVTT.vcxproj" -- FAILED.
+     1>Done Building Project "E:\git\xray-16\src\3rd party\NVTT\NVTT.vcxproj" (Build target(s)) -- FAILED.
+
+Project Performance Summary:
+       23 ms  E:\git\xray-16\src\3rd party\NVTT\NVTT.vcxproj   1 calls
+                 23 ms  Build                                      1 calls
+
+Target Performance Summary:
+       23 ms  _CheckForInvalidConfigurationAndPlatform   1 calls
+
+Task Performance Summary:
+       20 ms  Error                                      1 calls
+
+Build FAILED.
+
+Time Elapsed 00:00:00.01

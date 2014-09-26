@@ -1,0 +1,387 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+04/09/2002
+
+  Added ConvertHintTextW function. It can be used to set statusbar text from application hint
+
+03/28/2002
+
+  Improved drawing of status bar bevels when SimplePanel is false
+
+03/06/2002
+
+  Added unicode hint
+
+12/02/2001
+
+  Fixed vertical alignment of panel text
+
+10/09/2001
+
+  CLX adaptation complete
+
+09/17/2001 (c) Akzhan Abdulin
+
+  Added Windows XP Themes Support. UseXPThemes property added.
+  Note that themed statusbar will ignore some its look'n'feel properties.
+
+  Developer note: Size Grip drawn using handmade calculations
+  because GetThemePartSize doesn't work for gripper (under research).
+
+08/31/2001 (c) Akzhan Abdulin
+
+  Size grip now drawn correctly after window state changing
+
+07/26/2001
+
+  Added Unicode support
+
+05/27/2001 (c) Akzhan Abdulin
+
+    Fixed Color property design-time storing issue (clWindow not stored)
+
+05/26/2001
+
+   Added HTML support
+
+09/22/2000
+
+   Fixed panel hints showing to be changed when cursor moves to another panel
+
+*)
+
+unit ElStatBar;
+
+interface
+
+uses
+  SysUtils,
+  Classes,
+{$ifndef CLX_USED}
+  Windows,
+  Messages,
+  Graphics,
+  Forms,
+  Controls,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+{$else}
+{$ifdef MSWINDOWS}
+  Windows,
+{$endif}
+  Qt,
+  Types,
+  QTypes,
+  QControls,
+  QForms,
+  QGraphics,
+{$endif}
+  ElXPThemedControl,
+  ElUxTheme,
+  ElTmSchema,
+{$ifdef HAS_HTML_RENDER}
+  HTMLRender,
+{$endif}
+  ElTools,
+  ElStrUtils,
+  ElList,
+  ElIni,
+  ElVCLUtils;
+
+type
+  TElStatusPanelBevel = (epbLowered, epbNone, epbRaised);
+  TElStatusPanelStyle = (epsText, epsControl, epsOwnerDraw);
+
+  TElStatusBar = class;
+
+  TElStatusPanel = class(TCollectionItem)
+  private
+    FHint: TElFString;
+    FAlignment   : TAlignment;
+    FBevel       : TElStatusPanelBevel;
+    FStyle       : TElStatusPanelStyle;
+    FText        : TElFString;
+    FWidth       : Integer;
+    FControl     : TControl;
+    FOldParent   : TWinControl;
+    FOldBounds   : TRect;
+    FCtlVisible,
+    FOldVisible,
+    FVisible     : Boolean;
+    FOwner       : TElStatusBar;
+    FSavedWidth  : Integer;
+    FResizable   : Boolean;
+    FAutoSize    : Boolean;
+{$ifdef HAS_HTML_RENDER}
+    FIsHTML      : Boolean;
+{$endif}
+    procedure SetAutoSize(newValue : Boolean);
+    procedure SetVisible(newValue : Boolean);
+    procedure SetAlignment(newValue : TAlignment);
+    procedure SetBevel(newValue : TElStatusPanelBevel);
+    procedure SetStyle(newValue : TElStatusPanelStyle);
+    procedure SetText(newValue: TElFString);
+    procedure SetWidth(newValue : Integer);
+    procedure SetControl(newValue : TControl);
+    function GetLeft : Integer;
+    function GetRight : Integer;
+    function GetPanelRect : TRect;
+{$ifdef HAS_HTML_RENDER}
+    procedure SetIsHTML(Value: Boolean);
+{$endif}
+  protected
+    procedure SaveWidth;
+    procedure RestoreWidth;
+    procedure UpdateControl; virtual;
+    function  CurWidth : integer;
+    function  CalcAutoSize : integer;
+  public
+    constructor Create(Collection : TCollection); override;
+    destructor Destroy; override;
+    procedure Assign(Source : TPersistent); override;
+    function GetRealWidth: Integer;
+
+    property AutoSize : Boolean read FAutoSize write SetAutoSize;  { Published }
+    property Left : Integer read GetLeft;
+    property Right : Integer read GetRight;
+    property PanelRect : TRect read GetPanelRect;
+  published
+    property Resizable : Boolean read FResizable write FResizable default true;
+    property Alignment : TAlignment read FAlignment write SetAlignment;
+    property Bevel     : TElStatusPanelBevel read FBevel write SetBevel default epbLowered;
+    property Style     : TElStatusPanelStyle read FStyle write SetStyle default epsText;
+    property Text      : TElFString read FText write SetText;
+    property Width     : Integer read FWidth write SetWidth default 100;
+    property Control   : TControl read FControl write SetControl;
+    property Visible   : Boolean read FVisible write SetVisible default true;
+    property Hint      : TElFString read FHint write FHint;
+{$ifdef HAS_HTML_RENDER}
+    property IsHTML    : Boolean read FIsHTML write SetIsHTML;
+{$endif}
+  end;
+
+  TElPanelEvent = procedure(Sender : TObject; Panel : TElStatusPanel) of object;
+
+  TElStatusPanels = class(TCollection)
+  private
+    FStatusBar : TElStatusBar;
+    function GetItems(Index : integer) : TElStatusPanel;
+    procedure SetItems(Index : integer; newValue : TElStatusPanel);
+  protected
+    function GetOwner : TPersistent; override;
+    procedure Update(Item : TCollectionItem); override;
+  public
+    constructor Create(StatusBar : TElStatusBar);
+    function Add : TElStatusPanel;
+    property Items[Index : integer] : TElStatusPanel read GetItems write SetItems; default;
+  end;
+
+  TElStatusBar = class(TElXPThemedControl)
+  private
+    FBevel : TElStatusPanelBevel;
+    FStorage : TElIniFile;
+    FStoragePath : string;
+    FResizablePanels : Boolean;
+    FPressed : Boolean;
+    FHintPanel,
+    FPressedPanel,
+    FResizePanel : TElStatusPanel;
+    FSimpleText : TElFString;
+    FSimplePanel : Boolean;
+    FSizeGrip : Boolean;
+    FOnPanelResize : TElPanelEvent;
+    FOnPanelDraw : TElPanelEvent;
+    FOnPanelClick : TElPanelEvent;
+    FOnPanelDblClick : TElPanelEvent;
+{$IFNDEF VCL_4_USED}
+    FOnResize : TNotifyEvent;
+{$ENDIF}
+    {$ifdef CLX_USED}
+    FLineDC : TBitmap;
+    {$endif}
+    FPanels : TElStatusPanels;
+    FOldCursor : TCursor;
+    FDelta : integer;
+    FLine : integer;
+    FLineVis : boolean;
+    FIgnoreSize : boolean;
+    {$ifdef CLX_USED}
+    FSizeGripHandle : QSizegripH;
+    {$endif}
+{$ifdef HAS_HTML_RENDER}
+    FSimpleTextIsHTML: Boolean;
+    FRender: TElHTMLRender;
+    FOnImageNeeded: TElHTMLImageNeededEvent;
+{$endif}
+    {$ifdef ELPACK_UNICODE}
+    FHint: WideString;
+    {$endif}
+    procedure SetPanels(Value : TElStatusPanels);
+    procedure SetSimpleText(newValue : TElFString);
+    procedure SetSimplePanel(newValue : Boolean);
+    procedure SetSizeGrip(newValue : Boolean);
+    {$ifndef CLX_USED}
+    procedure WMERASEBKGND(var Msg : TWMEraseBkgnd); message WM_ERASEBKGND;
+    procedure WMLButtonDown(var Msg : TWMLButtonDown); message WM_LBUTTONDOWN;
+    procedure WMLButtonUp(var Msg : TWMLButtonUp); message WM_LBUTTONUP;
+    procedure WMSize(var Msg : TWMSize); message WM_SIZE;
+    procedure WMMouseMove(var Msg : TWMMouseMove); message WM_MOUSEMOVE;
+    procedure WMLButtonDblClk(var Msg : TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
+    procedure WMNCHitTest(var Message : TWMNCHITTEST); message WM_NCHITTEST;
+    procedure CMMouseLeave(var Msg : TMessage); message CM_MOUSELEAVE;
+    procedure CMHintShow(var Msg : TMessage); message CM_HINTSHOW;
+    {$endif}
+
+    procedure IntHintShow(var HintInfo : THintInfo);
+    procedure DrawDragLine(Restore : boolean);
+    procedure SetBevel(newValue : TElStatusPanelBevel);
+{$ifdef HAS_HTML_RENDER}
+    procedure SetSimpleTextIsHTML(Value: Boolean);
+{$endif}
+  protected
+    {$ifdef CLX_USED}
+    function EventFilter(Sender: QObjectH; Event: QEventH): Boolean; override;
+    function WidgetFlags: Integer; override;
+    procedure MouseLeave(AControl: TControl); override;
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    {$endif}
+    function GetThemedClassName: WideString; override;
+
+{$IFNDEF VCL_4_USED}
+    procedure TriggerResizeEvent; virtual;
+{$ENDIF}
+    procedure TriggerPanelResizeEvent(Panel : TElStatusPanel); virtual;
+    procedure TriggerPanelDrawEvent(Panel : TElStatusPanel); virtual;
+    procedure TriggerPanelDblClickEvent(Panel : TElStatusPanel); virtual;
+    procedure TriggerPanelClickEvent(Panel : TElStatusPanel); virtual;
+    procedure Paint; override;
+    procedure DrawPanel(Panel : TElStatusPanel); virtual;
+    procedure UpdatePanels; virtual;
+    procedure Notification(AComponent : TComponent; Operation : TOperation); override;
+    {$ifdef HAS_HTML_RENDER}
+    procedure TriggerImageNeededEvent(Sender : TObject; Src : TElFString; var Image
+        : TBitmap); virtual;
+    {$endif}
+    procedure IntLButtonDown(X, Y : integer);
+    procedure IntLButtonUp(X, Y : integer);
+    procedure IntMouseMove(X, Y : integer);
+    procedure InitDragLine;
+    procedure DeinitDragLine;
+    procedure Resize;
+    {$ifdef VCL_4_USED}
+    override;
+    {$endif}
+    {$ifdef CLX_USED}
+    procedure InitWidget; override;
+    procedure PositionSizeGrip;
+    {$endif}
+    {$ifdef ELPACK_UNICODE}
+    procedure SetHint(Value: WideString);
+    {$endif}
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor  Destroy; override;
+    function PanelAtPoint(Pos : TPoint) : TElStatusPanel; virtual;
+    property Canvas;
+    procedure Save;
+    procedure Restore;
+  published
+    property Panels : TElStatusPanels read FPanels write SetPanels;
+    property SimpleText : TElFString read FSimpleText write SetSimpleText;
+    property SimplePanel : Boolean read FSimplePanel write SetSimplePanel default true;
+{$ifdef HAS_HTML_RENDER}
+    property SimpleTextIsHTML: Boolean read FSimpleTextIsHTML write SetSimpleTextIsHTML;
+{$endif}
+    property SizeGrip : Boolean read FSizeGrip write SetSizeGrip default true;
+    property ResizablePanels : Boolean read FResizablePanels write FResizablePanels;
+    property Storage : TElIniFile read FStorage write FStorage;
+    property StoragePath : string read FStoragePath write FStoragePath;
+    property Bevel : TElStatusPanelBevel read FBevel write SetBevel;  { Published }
+
+    {$ifdef ELPACK_UNICODE}
+    property Hint: WideString read FHint write SetHint;
+    {$endif}
+
+    property UseXPThemes;
+
+    property Align;
+    property Color nodefault;
+    {$ifndef CLX_USED}
+    property DragCursor;
+    {$endif}
+    property DragMode;
+    property Enabled;
+    property Font;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property Visible;
+    property OnPanelResize : TElPanelEvent read FOnPanelResize write FOnPanelResize;
+    property OnPanelDraw : TElPanelEvent read FOnPanelDraw write FOnPanelDraw;
+    property OnPanelClick : TElPanelEvent read FOnPanelClick write FOnPanelClick;
+    property OnPanelDblClick : TElPanelEvent read FOnPanelDblClick write FOnPanelDblClick;
+{$ifdef HAS_HTML_RENDER}
+    property OnHTMLImageNeeded: TElHTMLImageNeededEvent read FOnImageNeeded write FOnImageNeeded;
+{$endif}
+{$IFNDEF VCL_4_USED}
+    property OnResize : TNotifyEvent read FOnResize write FOnResize;
+{$ELSE}
+
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnResize;
+{$ENDIF}
+{$IFDEF VCL_5_USED}
+    property OnContextPopup;
+{$ENDIF}
+
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Action;
+    property Constraints;
+    {$ifndef CLX_USED}
+    property DockOrientation;
+    property Floating;
+    property BevelKind;
+    property DoubleBuffered;
+    property DragKind;
+    {$endif}
+{$ENDIF}
+  end;
+
+{$ifdef ELPACK_UNICODE}
+function ConvertHintTextW(Hint : string): WideString;
+{$endif}
+
+implementation
+end.

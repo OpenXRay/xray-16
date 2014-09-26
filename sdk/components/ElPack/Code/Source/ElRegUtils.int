@@ -1,0 +1,83 @@
+
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElRegUtils;
+
+interface
+
+uses Windows, Classes;
+
+type
+  TRegRootType = (rrtUnknown, rrtHKEY_CLASSES_ROOT, rrtHKEY_CURRENT_USER,
+                  rrtHKEY_LOCAL_MACHINE, rrtHKEY_USERS, rrtHKEY_CURRENT_CONFIG);
+  TRegRoots = set of TRegRootType;
+
+function OpenRegKey (const ComputerName : string; RT : TRegRootType;
+  const KeyName : string; var KeyRes: HKey): Boolean;
+function IsValidKeyName(Name : string) : boolean;
+
+function RootTypeToHandle(RT : TRegRootType) : HKey;
+function RootTypeName(RT : TRegRootType) : string;
+function RootTypeShortName(RT : TRegRootType) : string;
+function ValueTypeToString(VT : Integer) : string;
+
+function NameToRootType(const Name : string) : TRegRootType;
+
+function KeyHasSubKeys0(Key: HKey; const KeyName : string) : boolean;
+function KeyHasSubKeys(const ComputerName : string; RT : TRegRootType;
+  const KeyName : string) : boolean;
+function KeyHasValue(const ComputerName : string; RT : TRegRootType;
+  const KeyName : string; const ValueName : string;
+  var Exists : boolean) : boolean;
+function KeyGetClassName(const ComputerName : string; RT : TRegRootType;
+  const KeyName : string; var ClassName : string) : boolean;
+
+function KeyDelete(const ComputerName : string; RT : TRegRootType;
+  const KeyName : string) : boolean;
+function KeyClear(const ComputerName : string; RT : TRegRootType;
+  const KeyName : string) : boolean;
+function KeyCreateSubKey(const ComputerName : string; RT : TRegRootType;
+  const KeyName, SubKeyName, NewClassName : string) : boolean;
+function KeySetValue(const ComputerName : string; RT : TRegRootType;
+  const KeyName, ValueName : string; ValueType : integer; Value : Pointer;
+  ValueSize : integer) : boolean;
+function KeyDeleteValue(const ComputerName : string; RT : TRegRootType;
+  const KeyName, ValueName : string) : boolean;
+function KeyRenameValue(const ComputerName : string; RT : TRegRootType;
+  const KeyName, ValueName, NewName : string) : boolean;
+
+function KeyEnumSubKeys0(Key: HKey; const KeyName : string;
+												 SL : TStringList) : boolean;
+function KeyEnumSubKeys(const ComputerName : string; RT : TRegRootType;
+  const KeyName : string; SL : TStringList) : boolean;
+
+function KeyEnumValues(const ComputerName : string; RT : TRegRootType;
+  const KeyName : string; SL : TStringList) : boolean;
+function KeyGetValueInfo(const ComputerName : string; RT : TRegRootType;
+  const KeyName : string; const ValueName : string;
+  var ValueType : integer; var ValueString : string;
+  var ValueSize : integer) : boolean;
+
+function CopyKey(const OldComputerName, NewComputerName : string;
+  OldRT, NewRT : TRegRootType;	const OldKeyName, NewKeyName : string) : boolean;
+
+function GetLastRegError : string;
+
+implementation
+end.

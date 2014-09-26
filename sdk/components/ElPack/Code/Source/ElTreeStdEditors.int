@@ -1,0 +1,199 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElTreeStdEditors;
+
+interface
+
+uses
+
+  {$ifndef CLX_USED}
+  Windows,
+  Messages,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  Menus,
+  ExtCtrls,
+  StdCtrls,
+  ComCtrls,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+
+{$IFDEF VCL_4_USED}
+  ImgList,
+{$ENDIF}
+  {$else}
+  {$ifdef LINUX}
+  Xlib,
+  {$else}
+  Windows,
+  {$endif}
+  Qt,
+  QTypes,
+  Types,
+  QComCtrls,
+  QGraphics,
+  QControls,
+  QForms,
+  QMenus,
+  QExtCtrls,
+  QStdCtrls,
+  ElCLXUtils,
+{$IFDEF VCL_4_USED}
+  QImgList,
+{$ENDIF}
+  {$endif}
+
+  SysUtils,
+  Classes,
+  {$ifndef CLX_USED}
+  ElEdits,
+  {$endif}
+  ElTree,
+  ElHeader
+  ;
+
+type
+
+    TElTreeInplaceEdit = class(TElTreeInplaceEditor)
+    private
+      {$ifndef CLX_USED}
+      SaveWndProc : TWndMethod;
+      procedure EditorWndProc(var Message : TMessage);
+      {$endif}
+    protected
+      {$ifdef CLX_USED}
+      FEditor: TEdit;
+      {$else}
+      FEditor: TElEdit;
+      {$endif}
+      procedure DoStartOperation; override;
+      procedure DoStopOperation(Accepted : boolean); override;
+      function GetVisible: Boolean; override;
+      procedure TriggerAfterOperation(var Accepted : boolean; var DefaultConversion :
+          boolean); override;
+      procedure TriggerBeforeOperation(var DefaultConversion : boolean); override;
+      procedure SetEditorParent; override;
+    public
+      constructor Create(AOwner : TComponent); override;
+      destructor Destroy; override;
+      {$ifdef CLX_USED}
+      property Editor: TEdit read FEditor;
+      {$else}
+      property Editor: TElEdit read FEditor;
+      {$endif}
+    end;
+
+    TElTreeInplaceMemo = class(TElTreeInplaceEditor)
+    private
+      {$ifndef CLX_USED}
+      SaveWndProc: TWndMethod;
+      procedure EditorWndProc(var Message : TMessage);
+      {$endif}
+    protected
+      FEditor: TMemo;
+      function GetVisible: Boolean; override;
+      procedure TriggerAfterOperation(var Accepted : boolean; var DefaultConversion :
+          boolean); override;
+      procedure TriggerBeforeOperation(var DefaultConversion : boolean); override;
+      procedure DoStartOperation; override;
+      procedure DoStopOperation(Accepted : boolean); override;
+      procedure SetEditorParent; override;
+    public
+      constructor Create(AOwner : TComponent); override;
+      destructor Destroy; override;
+      property Editor: TMemo read FEditor;
+    end;
+
+    {$ifndef CLX_USED}
+    TElTreeInplaceDateTimePicker = class(TElTreeInplaceEditor)
+    private
+      SaveWndProc: TWndMethod;
+      procedure EditorWndProc(var Message : TMessage);
+    protected
+      FEditor: TDateTimePicker;
+      function GetVisible: Boolean; override;
+      procedure TriggerAfterOperation(var Accepted : boolean; var DefaultConversion :
+          boolean); override;
+      procedure TriggerBeforeOperation(var DefaultConversion : boolean); override;
+      procedure DoStartOperation; override;
+      procedure DoStopOperation(Accepted : boolean); override;
+      procedure SetEditorParent; override;
+    public
+      constructor Create(AOwner : TComponent); override;
+      destructor Destroy; override;
+      property Editor: TDateTimePicker read FEditor;
+    end;
+    {$endif}
+
+    TElTreeInplaceCheckBox = class(TElTreeInplaceEditor)
+    private
+      {$ifndef CLX_USED}
+      SaveWndProc: TWndMethod;
+      procedure EditorWndProc(var Message : TMessage);
+      {$endif}
+    protected
+      FEditor: TCheckBox;
+      procedure DoStartOperation; override;
+      procedure DoStopOperation(Accepted : boolean); override;
+      function GetVisible: Boolean; override;
+      procedure TriggerAfterOperation(var Accepted : boolean; var DefaultConversion : 
+          boolean); override;
+      procedure TriggerBeforeOperation(var DefaultConversion : boolean); override;
+      procedure SetEditorParent; override;
+    public
+      constructor Create(AOwner : TComponent); override;
+      destructor Destroy; override;
+      property Editor: TCheckBox read FEditor;
+    end;
+
+    {$ifndef CLX_USED}
+    THackInplaceComboBox = class(TComboBox)
+      procedure ComboWndProc(var Message: TMessage; ComboWnd: HWnd; ComboProc: Pointer); override;
+    protected
+      procedure KeyPress(var Key: Char); override;
+      procedure WMGetDlgCode(var Message: TWMGetDlgCode); message WM_GETDLGCODE;
+    end;
+
+    TElTreeInplaceComboBox = class(TElTreeInplaceEditor)
+    private
+      SaveWndProc: TWndMethod;
+      procedure EditorWndProc(var Message : TMessage);
+    protected
+      FInitiallyDropped : boolean;
+      FEditor: TComboBox;
+      procedure DoStartOperation; override;
+      procedure DoStopOperation(Accepted : boolean); override;
+      function GetVisible: Boolean; override;
+      procedure TriggerAfterOperation(var Accepted : boolean; var DefaultConversion :
+          boolean); override;
+      procedure TriggerBeforeOperation(var DefaultConversion : boolean); override;
+      procedure SetEditorParent; override;
+    public
+      constructor Create(AOwner : TComponent); override;
+      destructor Destroy; override;
+      property Editor: TComboBox read FEditor;
+    published
+      property InitiallyDropped : boolean read FInitiallyDropped write FInitiallyDropped; 
+    end;
+    {$endif}
+implementation
+end.

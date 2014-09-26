@@ -1,0 +1,352 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="PPMd">
+      <UniqueIdentifier>{e3decf37-2cf3-446d-97b9-495ebf775639}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LZO">
+      <UniqueIdentifier>{a4d6a431-1f53-495a-9d25-5b62366f5035}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\xrCore\Coder.hpp">
+      <Filter>PPMd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xrCore\compression_ppmd_stream.h">
+      <Filter>PPMd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xrCore\compression_ppmd_stream_inline.h">
+      <Filter>PPMd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xrCore\PPMd.h">
+      <Filter>PPMd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xrCore\PPMdType.h">
+      <Filter>PPMd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xrCore\SubAlloc.hpp">
+      <Filter>PPMd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\compr1b.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\compr1c.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\config1.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\config1a.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\config1b.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\config1c.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\config1f.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\config1x.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\config1y.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\config1z.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\config2a.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\fake16.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzo1.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzo16bit.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzo1a.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzo1a_de.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzo1b.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzo1b_cc.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzo1b_de.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzo1c.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzo1c_cc.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzo1f.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzo1x.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzo1y.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzo1z.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzo2a.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzo_conf.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzo_dict.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzo_ptr.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzo_util.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzoconf.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\lzoutil.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\stats1a.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\stats1b.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCompress\lzo\stats1c.h">
+      <Filter>LZO</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\xrCore\Model.cpp">
+      <Filter>PPMd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\alloc.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\io.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1_99.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1a.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1a_99.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_1.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_2.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_3.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_4.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_5.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_6.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_7.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_8.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_9.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_99.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_9x.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_cc.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_d1.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_d2.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_rr.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1b_xx.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_1.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_2.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_3.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_4.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_5.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_6.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_7.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_8.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_9.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_99.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_9x.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_cc.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_d1.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_d2.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_rr.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1c_xx.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1f_1.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1f_9x.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1f_d1.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1f_d2.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1x_1.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1x_1k.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1x_1l.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1x_1o.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1x_9x.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1x_d1.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1x_d2.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1x_d3.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1x_o.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1y_1.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1y_9x.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1y_d1.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1y_d2.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1y_d3.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1y_o.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1z_9x.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1z_d1.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1z_d2.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo1z_d3.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo2a_9x.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo2a_d1.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo2a_d2.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo_crc.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo_dll.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo_init.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo_ptr.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo_str.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrCompress\lzo\lzo_util.c">
+      <Filter>LZO</Filter>
+    </ClCompile>
+    <ClCompile Include="CompressionTest.cpp" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="core">
+      <UniqueIdentifier>{8baeba25-10f7-4a0a-ac1f-647cb6a2789b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="entry_point.cpp" />
+    <ClCompile Include="screenshots_common.cpp" />
+    <ClCompile Include="screenshots_reader.cpp" />
+    <ClCompile Include="screenshots_writer.cpp" />
+    <ClCompile Include="xr_dsa_signer.cpp" />
+    <ClCompile Include="xr_dsa_verifyer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="screenshots_common.h" />
+    <ClInclude Include="screenshots_reader.h" />
+    <ClInclude Include="xr_dsa_verifyer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="screenshots_writer.h" />
+    <CustomBuild Include="xr_dsa_signer.h" />
+  </ItemGroup>
+</Project>

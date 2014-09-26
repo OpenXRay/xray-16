@@ -1,0 +1,110 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{   Parts:                                           }
+{   copyright (c) 2001 Akzhan Abdulin                }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElPrinterPreview;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  ExtCtrls, ElPanel, ElToolBar, ElStatBar, ElPopBtn, StdCtrls, ElACtrls,
+  ElTools, Printers, ElPrinter, ElSpin, ElList, ElHook, ElCombos,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElXPThemedControl, ElEdits;
+
+type
+  TElPrinterPreviewDlg = class(TForm)
+    Toolbar: TElToolBar;
+    ScrollBox: TScrollBox;
+    StatusBar: TElStatusBar;
+    PrintBtn: TElToolButton;
+    ElToolButton2: TElToolButton;
+    OnePageBtn: TElToolButton;
+    MultipageBtn: TElToolButton;
+    ElToolButton1: TElToolButton;
+    SaveBtn: TElToolButton;
+    ElToolButton3: TElToolButton;
+    PrintDialog: TPrintDialog;
+    PrintSetupBtn: TElToolButton;
+    PrevPageBtn: TElToolButton;
+    ElToolButton5: TElToolButton;
+    NextPageBtn: TElToolButton;
+    PageSpin: TElSpinEdit;
+    PrinterSetupDialog: TPrinterSetupDialog;
+    SaveDialog: TSaveDialog;
+    CloseBtn: TElGraphicButton;
+    PagesPanel: TElPanel;
+    MainPagePanel: TElPanel;
+    ElHook1: TElHook;
+    ScaleCombo: TElComboBox;
+    procedure PrintBtnClick(Sender: TObject);
+    procedure ScrollBoxResize(Sender: TObject);
+    procedure MainPagePanelPaint(Sender: TObject);
+    procedure PageSpinChange(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure ScaleComboExit(Sender: TObject);
+    procedure NextPageBtnClick(Sender: TObject);
+    procedure PrintSetupBtnClick(Sender: TObject);
+    procedure CloseBtnClick(Sender: TObject);
+    procedure SaveBtnClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure PrevPageBtnClick(Sender: TObject);
+    procedure ScComboKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure ElHook1AfterProcess(Sender: TObject; var Msg: TMessage;
+      var Handled: Boolean);
+    procedure FormResize(Sender: TObject);
+    procedure ScaleComboChange(Sender: TObject);
+    procedure MultipageBtnClick(Sender: TObject);
+    procedure OnePageBtnClick(Sender: TObject);
+  private
+    FScale   : Integer;
+    FCurrentPage: Integer;
+    FTotalPages: Integer;
+    Panels   : TElList;
+    PagePanels: integer;
+    HorzPages,
+    VertPages : integer;
+    FPrinter  : TElPrinter;
+    FScaleIdx : integer;
+    FRealIdx  : integer;
+    procedure SetCurrentPage(Value: Integer);
+    procedure SetTotalPages(Value: Integer);
+    procedure SetScale(Value: Integer);
+  protected
+    procedure UpdatePageNumbers;
+    procedure UpdatePanels;
+    procedure UpdateMultiPage;
+  public
+    procedure SetData(Printer : TElPrinter);
+    property CurrentPage: Integer read FCurrentPage write SetCurrentPage;
+    property TotalPages: Integer read FTotalPages write SetTotalPages;
+    property Scale: Integer read FScale write SetScale;
+
+  end;
+
+var
+  ElPrinterPreviewDlg: TElPrinterPreviewDlg;
+
+implementation
+end.

@@ -1,0 +1,3988 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+04/10/2002
+
+  Fixed inplace editing in DblClickMode = dcmEdit
+
+04/09/2002
+
+  Fixed MoveToItem to insert the item above the target when the item belonged to 
+
+04/08/2002
+
+  Fixed painting of the control when IsUpdating = true
+
+04/07/2002
+
+  Improved vertical scrolling of items with own height (once more)
+
+04/05/2002
+
+  Improved vertical scrolling of items with own height
+
+04/04/2002
+
+  Now the item that is a drop target is expanded even if it doesn't have visible
+  children. This helps to expand items which are built on-the-fly  
+
+03/28/2002
+
+  Overlay images support added 
+
+03/26/2002
+
+  Items can be assigned to and from TStringList/TElWideStringList.
+
+  Scrolling to the end of items when there are items of different height
+  doesn't move the last item to the very top now and leaves at least screen
+  of items visible.
+
+03/10/2002
+
+  Optimized painting of the tree when the parent form is resized
+  Optimized font change handling
+
+03/06/2002
+
+  Scrollbar colors are correctly updated now
+
+03/03/2002
+
+  Fixed selection of item colors
+  Improved selection of items with mouse in multi-select mode
+  Added space style with customizable color for item border.
+
+02/23/2002
+
+  Fixed the problem with custom checkboxes/radiobuttons that was introduced in 3.02u9.
+
+02/21/2002
+
+  Double-click handler is not called now when double-click happens on checkbox
+
+  Fixed handling of vertical scrollbar when there are > 32767 items and custom scrollbars are not used
+
+02/16/2002
+
+  Optimized resource use on Win9x (reduced the number of bitmaps being created
+    per component)
+
+02/14/2002
+
+  Fixed possible AV when using inplace editors and C++Builder codeguard. 
+
+02/04/2002
+
+  improved vertical scrollbar handling in case of items of different height
+
+02/03/2002
+
+  DoubleBuffered property added.
+  Currently, when the form is resized, tree doesn't use double-buffering. This
+  significantly speeds up repainting during resizing.
+
+02/02/2002
+
+  Case-insensitive sorting in Unicode significantly optimized
+
+02/01/2002
+
+  AddExistingItem, InsertExistingItem, RemoveItem methods removed.
+
+01/29/2002
+
+  Fixed style saving when OnStyleSave/OnStyleLoad event handler is assigned.
+
+  Added DblClickMode property, ExpandOnDblClick made obsolete.
+
+01/23/2002
+
+  Fixed the terrific bug when Unicode value from inplace editor was converted
+  to string after editing.
+
+01/22/2002
+
+  Images were not displayed in HTML hint for items. Fixed.
+  After using Save method the path was not restored. Fixed.
+
+01/18/2002
+
+  When the item is HTML-enabled, text color is adjusted when the item is selected.
+
+12/24/2001
+
+  OnItemFocused events were not fired when focus was moved due to calls to item deletion events. Fixed
+
+12/21/2001
+
+  Changed colors in default tree buttons to be the same as standard ones 
+
+12/12/2001
+
+  Fixed background painting in Kylix
+  Fixed CalcPageUpPos/CalcPageDownPos methods to return proper value 
+
+12/06/2001
+
+  Changed time of OnItemExpand/OnItemCollapse
+
+11/28/2001
+
+  LineBorderActiveColor and LineBorderInactiveColor properties added.
+
+11/21/2001
+
+  Changed selected items drawing when the form is activated/deactivated.
+
+11/17/2001
+
+  Added HintIsHTML flag to TElTreeItem. 
+
+11/16/2001
+
+  Mouse movement was processed during vertical scrolling. Fixed. 
+
+11/09/2001
+
+  Added SortUseCase property. 
+
+  Now inplace editing is invoked only when the cursor is over main text or column
+  (i.e. not on checkbox or image)
+
+11/08/2001
+
+  Item was not aligned correctly when Item.SuppressButtons was true and
+  Tree.ShowRootButtons was false
+
+11/03/2001
+
+  Page setting for vertical scrollbar in mode with items of variable height is
+  now always 1 to prevent confusion
+  Drag code didn't always correctly process Accept parameter when setting colors 
+
+10/30/2001
+
+  Helloween release.
+  Added some compatibility properties and methods for easier migration between
+  TTreeView and TElTree 
+
+10/29/2001
+
+  Added TextLeft and TextRight properties to TElTreeItem
+
+10/27/2001
+
+  FullRowSelect is not needed anymore - RowSelect does the same
+
+10/22/2001
+
+  Now it's possible to set AutoExpand and MoveFocusOnCollapse to true at the same time
+  Removed spacing before checkbox
+  Added spacing before image if checkbox is drawn
+  Fixed vertical position of item checkboxes
+
+10/16/2001
+
+  When the tree is disabled, scrollbars (only when UseCustomScrollbars is true)
+  are shown as disabled in Windows XP with styles enabled.
+  Borders were drawn in XP style even when BorderStyle = bsNone. Fixed.
+  UseCustomCheckBoxes property was not taken in effect when XP styles were used. Fixed
+  CheckBoxSize behaved incorrectly when application was designed under Windows XP and
+  then run on previous Windows versions. Fixed
+
+10/09/2001
+
+  AutoCollapse property added. When AutoCollapse is false and AutoExpand is true,
+  focused item is expanded but other branches are not collapsed
+
+10/07/2001
+
+  KeepSelectionWithinLevel property added. When it is true and multiselect is on,
+  several items can be selected only when all items are on the same level as the
+  main item is
+
+  ElCellProgressBar and ElCellCheckBox now draw their captions using
+  *SelectTextColor when the item is selected.
+
+  HeaderFont property was not taken into account when loading the form from
+  resource in run-time
+
+10/06/2001
+
+  Clicking on the right side of the item now deselects items  
+  If the tree has Align = alClient, it's parts were not updated after form
+  loading. Fixed.
+
+10/05/2001
+
+  Fixed default for ShowRootButtons
+  Fixed key clicks processing for inplace editors - some inplace editors didn't
+  catch Enter/Esc keys
+
+10/03/2001
+
+  Changed positioning of inplace editor for main tree column in multi-column mode.
+  Now editor rectangle is calculated not for the whole cell, but for the rectangle
+  between left side of the text bounding rect and cell's right side. 
+  
+10/02/2001
+
+  Clicks on CellProgressBar select an item now
+
+09/29/2001
+
+  Added TElCellProgressBar.Caption property  
+
+09/28/2001
+
+  HTML items set in design time were not painted correctly. Fixed.
+  HTML cells whose column alignment is taRightJustify were not painted. Fixed. 
+
+09/26/2001
+
+  Visible flag for cell controls was not taken into account. Fixed.
+  TElCellControl.BorderWidth added. This property adds some margin between
+  cell bounds and control.  
+
+09/22/2001
+
+  Tracking is now shown even when control has no focus
+  HTML text is correctly aligned vertically
+  Own height is set correctly in design-time
+  IsHTML flag is restored correctly after saving the form in design-time  
+  Improved alignment of scrollbars when no columns are shown
+
+09/16/2001
+
+  Fixed the problem with mouse clicks and movements to the right of the last column
+
+09/09/2001
+
+  Fixed the AV that happened when QuickEditMode is set and click is done
+  outside of the tree  
+
+09/07/2001
+
+  Fixed minor problems with scrolling the view after the item was manually expanded
+
+09/06/2001
+
+  Fixed drawing of the strike line in no_columns mode
+
+08/30/2001
+
+  UpdateDiffItems method fixed so that it doesn't go to the infinite loop now
+
+  ExplorerEditMode property added. In this mode when inplace editor looses focus,
+  changes are accepted. When ExplorerEditMode is off, the only way to accept
+  changes is to press Enter
+
+08/22/2001
+
+  Fixed some problems with max.width not updated when ShowColumns = false and
+  the widest item's width is changed due to property change (extremely rare, but
+  happens). 
+
+08/19/2001
+
+  Changed Iterate* methods to include CheckCollapsed parameter
+
+08/18/2001
+
+  Added MultiSelectLevel property.
+  Added DragScrollInterval property.
+  Added more informative drag cursors
+
+08/09/2001
+
+  Reduced size of item instance by 36 bytes (it was 164 + 20, now it's 128 + 20).
+  +20 is the size of static data, which can be absent in case of virtual mode.
+
+  Added Item.IndentAdjust property. This value is ADDED to item's position when drawing
+  or calculating item part. this way you can move the item to the left or to the right
+  of it's original location. 
+
+08/08/2001
+
+  DivLinesColor property replaced by HorzDivLinesColor and VertDivLinesColor.
+  Published OnHitTest events of custom scrollbars 
+
+08/07/2001
+
+  Fixed the problem with default values for MainStyle object
+
+08/03/2001
+
+  MouseFrameSelect property added. Now you can select a range of items by
+  pressing left button and moving the mouse cursor
+
+07/26/2001
+
+  Added Unicode support
+
+07/25/2001
+
+  HintType property made published
+  OnMeasureItemPart event made published
+
+07/20/2001
+
+  Inplace editing remade.
+
+07/18/2001
+
+  StripedEvenColor, StripedOddColor, StripedItems properties added.
+
+07/15/2001
+
+  Virtuality Level 1 added. 
+
+  MultiSort added:
+  1) AddSortSection and RemoveSortSection -- add and remove additional sections
+     to the list of sorting sections
+  2) Ctrl+Click on header column changes sort mode of the header section and thus
+     adds the section to the list of sorting sections or removes it from there
+
+  Added LinHintType property to control, what exactly is displayed in line hint
+
+07/14/2001
+
+  Changed OnHeaderItemDraw event to include canvas
+
+  Fixed Item.MoveTo(Item.Parent) (this statement caused corruption of internal
+  tree structure before).
+
+07/12/2001
+
+  BorderSides property added.
+
+07/06/2001
+
+  Significantly improved speed of Clear operations.
+
+07/03/2001
+
+  Fixed the problem with cell background when the item is selected and
+  SelectColumn <> -1.
+
+06/29/2001
+
+  A bug with multiline items fixed.
+
+06/28/2001
+
+  ipOutside part type added. Now ipInside is set only when the click happened in
+  main column in multicolumn mode.
+  DefaultSectionWidth property added.
+
+  Fixed format for Date and Time inplace editors.
+
+============================== Version 2.80 ====================================
+
+06/21/2001
+
+  Added ElCellStyle.UseBkColor. This property defines whether CellBkColor and
+  TextBkColor properties of ElCellStyle object are used.
+
+06/06/2001
+
+  Now empty space between image and text belongs to text and GetItemAt
+  returns ipText. As result, one can select the item by clicking this empty space
+
+06/05/2001
+
+  HideSelection property was reset (and so lost) under certain conditions. Fixed.
+
+06/03/2001
+
+  Horizontal scroll thumb size changed
+
+06/02/2001
+
+  Default for LineHintTimeout was not set correctly. It is 3000 ms now and is
+  set fine.
+
+05/29/2001
+
+  Fixed the problem that appears in treecombo, when MouseDown is called and tree
+  is already not visible (tree combo has been closed).  
+
+05/21/2001
+
+  OnAfterSelectionChange was triggered when no selection change happened during
+  keyboard operation.
+  Such behaviour has been improved (although this event doesn't guarantee, that
+  actual selection has been changed during keyboard operation).
+
+  FullExpand and FullCollapse methods could corrupt update counter if no children
+  were available for some items. Fixed.
+
+05/12/2001
+
+  LineHintTimeout property added. 
+
+04/26/2001
+
+  DrawLine function fixed -- worked incorrectly on Riva TNT 2 video cards (and
+  maybe some others)
+
+04/18/2001
+
+  Vertical scrollbar behaviour changed to reflect the total/on-screen ratio
+  (before the change scrollbar reflected total/1 ratio) 
+
+  Fixed the problem with select when clicking on expand button
+
+  Fixed the problem of redrawing items when some window is slowly dragged over
+  the tree 
+
+04/13/2001
+
+  Added ScrollBarOpposite to allow left-aligned scrollbar. Works with custom
+    scrollbars only.
+
+  Fixed the bug with incorrect drag image when multiple items were dragged while
+    DragImageKind was set to dimOne or dimNever.
+  BevelKind property is ignored now (this is better than drawing garbage) 
+  Sorting improved
+
+04/10/2001
+
+  Fixed AV that happened when cancelling the inplace editor
+
+04/04/2001
+
+  Fixed the incorrect default for RightClickSelect property
+
+============================== Version 2.78 ====================================
+
+03/30/2001
+
+  Added ipPicture2 to hit states
+
+03/26/2001 (c) Akzhan Abdulin
+
+  Currency inplace editor setup fixed.
+
+  Inplace editors placement fixed.
+
+  Sorting preparation step modified, currency sorting fixed.
+
+03/15/2001
+
+  Shift+down pressed twice in the end of the list in mutliselect mode
+  selected all items. Fixed.
+
+03/14/2001 (c) Akzhan Abdulin
+
+  Incremental search now works correctly with international
+  and shifted characters.
+
+  Item comparison and insertion methods now correctly compares
+  international strings using Windows locale.
+
+  Types used by event handlers defined inside unit.
+
+  Minor code optimizations and readness improvements.
+  Unnecessary variables, 'if' statements excluded, some 'while' statements
+  replaced with 'for' statements. DrawLine dot line drawing rewritten.
+
+03/10/2001
+
+  Fixed possible AVs that could happen when image list is removed.
+
+  Minor optimizations and readness improvements.
+
+  Added automatic scrolling of the item, which is expanded and it's children
+  don't fint into view.
+
+03/01/2001
+
+  RootItem  property  added  to  ElTreeItems.  Lets application randomly access
+  0-level items
+
+  Fixed the bug with incorrect section width when ImageIndex2 is set in code
+  before the tree is shown for the first time
+
+  Added indentation to the cell contents
+
+02/23/2001
+
+  Added ELTREE_USE_INPLACE_EDITORS directive
+  Added ELTREE_USE_STYLES directive
+  Added ELTREE_USE_OLE_DRAGDROP directive
+  Added ELTREE_USE_EXT_EDITORS directive
+
+  Added new drag target drawing styles
+
+  VisibleRowCount property added.
+
+  DragExpandDelay property added.
+
+  Incremental Search added.
+
+  Currency inplace editor and currency field type added.
+
+02/15/2001
+
+  OnAfterSelectionChange event added. It is fired after user changes selection
+  using mouse or keyboard. This event is especially useful when you need to
+  enable/disable some controls to reflect possibility to perform some action with
+  selected items (Delete button/menu item is a perfect sample).
+
+  DragRectAcceptColor and DragRectDenyColor properties added.
+
+02/08/2001                                         
+
+  Fixed the problem with Header Height in case of change of tree's
+  (and header's) font
+
+01/31/2001
+
+  Shift-Tab navigation fixed.
+  Default for ExpandOnDoubleClick set to true.
+
+============================== Version 2.77 ====================================
+
+01/20/2001
+
+  ChangeDelay property added. It sets delay time between focus
+is moved with keyboard and OnItemFocused event is fired.
+
+01/16/2001
+
+  MoveFocusOnCollapse property didn't work. Fixed.
+
+12/30/2000
+
+  OnItemChecked event added
+  Fixed possible AVs that could happen when drag'n'drop is started
+
+12/25/2000
+
+  Christmas gift -- sorting and other operations improved. Sorting is about 100
+  times faster now.
+
+12/21/2000
+
+  Item hints added. Now every item can have its own hint and you don't need to implement
+  OnItemHintNeeded event handler to provide a hint for the item
+
+12/16/2000
+
+  Centering of item cell text was incorrect under some circumstances. Fixed.
+
+  Opening a dialog form in responce to MouseDown caused further problems with
+  selecting items. Fixed.
+
+12/14/2000
+
+  IterateBranch method added.
+
+  Fixed focus movement in AutoExpand mode.
+
+============================== Version 2.76 ====================================
+
+12/06/2000
+
+  Items text, that contains "&" was drawing with end-ellipse at the end. Fixed.
+  Disabled items now don't react on clicks and can't be selected with keyboard.
+
+============================== Version 2.75 ====================================
+
+11/04/2000
+
+  Improved vertical alignment of text when drawing multiline and HTML items
+
+10/27/2000
+
+  Fixed the bug, when the height for multiline items with no multiline main text
+  (i.e. the item where only column text is multiline) was defined incorrectly.
+
+10/26/2000
+
+  Fixed the bug, that slows down scrolling after 2.74.
+
+10/25/2000
+
+  Added edition of multiline items
+
+============================== Version 2.74 ====================================
+
+10/21/2000
+
+  Property UseCustomScrollBars added. Now you can use standard Windows or custom
+  scrollbars.
+  Support for mouse wheel in Windows 95 added (Delphi 4/5 and C++Builder 4/5 only).
+  Support for Genius and Microsoft mouse drivers (autoscroll feature) added.
+
+10/17/2000
+
+  Added Item.DataInterface property to keep interface reference in it
+
+10/12/2000
+
+  Selecting multiple items with keyboard or mouse worked not always properly.
+  Fixed.
+
+10/10/2000
+
+  Divider lines were not painted after 10/06/2000 (v2.73). Fixed.
+  Items with multiline main text are supported now. WARNING: enabling multiline
+    significantly slows down the tree
+
+10/06/2000
+
+  Fixed drawing of cell text when styles are defined
+
+10/04/2000
+
+  HeaderColor property added
+  Vertical alignment of the item main text is the same as of the cell text
+  Tree font style is not spoiled when the item that is dragged has
+  ParentStyle = false
+  RowBkColor is not used if UseBkColor is false
+
+10/01/2000
+
+  Backspace key moves focus to the parent item now.
+
+09/30/2000
+
+  UseSystemHintColors property added. Allows to show item hints using system
+  colors instead of tree colors
+  Speed optimized by changing IndexOf to IndexOfFrom in some important iteration
+  methods.
+
+09/25/2000
+
+  Added ElTreeItem.RowBkColor property. Allows to define a color for the whole
+  item row
+
+09/20/2000
+
+  Automatical resizing of columns worked incorrectly for columns after the main
+  one. Fixed
+
+09/05/2000
+
+  DoubleBuffered made obsolete.
+
+09/01/2000
+
+  OnEndDrag event didn't work. Fixed.
+
+08/15/2000.
+
+  Added ElTreeItems.AddLastItem method.
+  Made ElCellStyle.Assign method public.
+  ItemExt constant now is the tree's property
+
+07/31/2000.
+
+  Fixed the LockedHeaderHeight property loading.
+  Fixed the cell button text color.
+
+07/29/2000.
+
+  Checkbox clicks moved from MouseDown to MouseUp to correctly process
+  double-clicks.
+
+  Selecting items with mouse in simple SelectionMode fixed.
+
+07/19/2000.
+
+  AlwaysKeepFocus property added. This property prevents the tree from setting
+  ItemFocused to nil when the user clicks empty space.
+
+  LineHintColor property added. This property defines the color of the line hint. 
+
+  ElTreeItem.UseBkColor property added. If item uses own colors, background of
+  the text is filled with BkColor. To prevent this (for example, when background
+  image is used in the tree), set UseBkColor property to false.
+
+07/09/2000.
+
+  Added TElTreeItem.AnObject property. This property can be used as a simple
+  placeholder for the object references, as Data is used to hold pointers.
+
+07/02/2000.
+  Different routines changed to improve speed of scrolling in keyboard operations.
+  FillVisFwd fixed to ensure correct scrolling when FilteredVisibility enabled.
+
+*)
+
+unit ElTree;
+
+{$B-}
+
+{$ALIGN ON}
+
+{$define PaintBackground}
+
+interface
+
+uses
+  SysUtils,
+  Classes,
+{$ifndef CLX_USED}
+  Controls,
+  Messages,
+  Windows,
+  Graphics,
+  Forms,
+  StdCtrls,
+  ExtCtrls,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+{$ifdef VCL_4_USED}
+  ImgList,
+{$endif}
+{$ifdef ELPACK_COMPLETE}
+  Buttons,
+{$endif}
+  Menus,
+{$else}
+{$ifdef MSWINDOWS}
+  Windows,
+{$endif}
+  QForms,
+  QStdCtrls,
+  QControls,
+  QGraphics,
+  Qt,
+  Types,
+  QImgList,
+  QExtCtrls,
+  QButtons,
+  QMenus,
+  QDialogs,
+  ElExtBkgnd,
+{$endif}
+
+  ElTools,
+  ElHook,
+  ElXPThemedControl,
+  ElUxTheme,
+  ElTmSchema,
+  ElHeader,
+  ElList,
+  ElScrollBar,
+  ElStrUtils,
+  ElHintWnd,
+{$ifdef VCL_6_USED}
+  Variants,
+{$endif}
+{$ifdef ELPACK_UNICODE}
+  ElUnicodeStrings,
+{$endif}
+{$IFDEF ELPACK_COMPLETE}
+{$ifdef SUPPORT_STORAGE}
+  ElIni,
+{$endif}
+{$ifdef ELTREE_USE_STYLES}
+  ElPopBtn,
+{$endif}
+
+{$ifndef VER3_EDITORS}
+{$IFDEF ELTREE_USE_INPLACE_EDITORS}
+{$ifdef ELTREE_USE_EXT_EDITORS}
+  ElBtnEdit,
+  ElACtrls,
+  ElDTPick,
+  ElCurrEdit,
+  ElCheckCtl,
+{$endif}
+{$endif}
+{$ENDIF}
+
+  ElImgFrm,
+{$ENDIF}
+{$IFDEF HAS_HTML_RENDER}
+  ElArray,
+  HTMLRender,
+{$ENDIF}
+
+{$ifndef CLX_USED}
+{$IFNDEF LITE}
+{$ifdef ELTREE_USE_OLE_DRAGDROP}
+  ElDragDrop,
+{$endif}
+{$endif}
+  ElExtBkgnd,
+{$ENDIF}
+  ElVCLUtils
+  {$ifdef CLX_USED}
+  , ElCLXUtils
+  {$endif}
+{$ifndef CLX_USED}
+{$IFNDEF VER90}
+  , ActiveX
+{$ENDIF}
+{$endif}
+  ;
+
+{$R ElTree.res}
+
+{$ifndef BUILDER_USED}
+type
+
+  TElHeaderSection = ElHeader.TElHeaderSection;
+  TCustomElHeader = ElHeader.TCustomElHeader;
+  TElFieldType = ElHeader.TElFieldType;
+  TElFieldTypes = ElHeader.TElFieldTypes;
+  TElScrollBarPart = ElScrollBar.TElScrollBarPart;
+{$endif}
+
+{$ifdef ELTREE_USE_OLE_DRAGDROP}
+{$IFNDEF VER90}
+{$IFNDEF LITE}
+{$IFNDEF BUILDER_USED}
+  TDragType = ElDragDrop.TDragType;
+  IDataObject = ActiveX.IDataObject;
+  IDropSource = ActiveX.IDropSource;
+  TDragTypes = ElDragDrop.TDragTypes;
+  TOleDragObject = ElDragDrop.TOleDragObject;
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$endif}
+
+const
+  stsFocused = 1; // TElTreeItem states
+  stsSelected = 2;
+  stsCut = 3;
+  stsUnderlined = 4;
+  stsBold = 5;
+  stsItalic = 6;
+  stsExpanded = 7;
+  stsStrikeOut = 8;
+  stiMaxState = 8;
+
+  tisFocused    = 1;
+  tisSelected   = 2;
+  tisCut        = 4;
+  tisExpanded   = 8;
+  tisBold       = 16;
+  tisItalic     = 32;
+  tisUnderlined = 64;
+  tisStrikeout  = 128;
+
+  ibfParentColors   = $000001;
+  ibfParentStyle    = $000002;
+  ibfSuppressLines  = $000004;
+  ibfImageDrawn     = $000008;
+  ibfImageDrawn2    = $000010;
+  ibfForceButtons   = $000020;
+  ibfStrikedOutLine = $000040;
+  ibfDrawHLine      = $000080;
+  ibfAllowSelection = $000100;
+  ibfAllowEdit      = $000200;
+  ibfUseBkColor     = $000400;
+  ibfDeleting       = $000800;
+  ibfUseStyles      = $001000;
+  ibfMultiline      = $002000;
+  ibfHidden         = $004000;
+  ibfEnabled        = $008000;
+  ibfSuppressButtons= $010000;
+  ibfCheckBoxEnabled= $020000;
+  ibfShowCheckBox   = $040000;
+  ibfIsHTML         = $080000;
+  ibfOwnerHeight    = $100000;
+  ibfRec            = $200000;
+  ibfHintIsHTML     = $400000;
+  
+  {$ifndef CLX_USED}
+  CM_MOUSEWHEEL     = CM_BASE + WM_MOUSEWHEEL;
+  WM_UPDATESBFRAME  = WM_USER + 1298;
+  {$endif}
+  
+type
+  TSTIStates = set of 1..stiMaxState;
+
+type
+  EElTreeError = class(Exception)
+  end;
+
+resourcestring
+  STExOutOfBounds = 'ElTree item index out of bounds.';
+  STexInvItem = 'ElTree item not specified';
+  STexRecursiveMove = 'Can''t move Item to one of its subitems.';
+
+type
+  TItemChangeMode = (icmText, icmState, icmCheckState);
+
+type
+  TSTItemPart  = (ipButton, ipMainText, ipColumn, ipInside, ipPicture, ipPicture2, ipCheckBox, ipOutside);
+  TSTSelModes  = (smSimple, smUsual);
+  TSortDirs    = (sdAscend, sdDescend);
+  TSortModes   = (smNone, smAdd, smClick, smAddClick);
+  TSortTypes   = (stCustom, stText, stNumber, stFloating, stDateTime, stDate, stTime, stBoolean, stCurrency);
+  THintModes   = (shmNone, shmLong, shmAll);
+  TLineHintType= (lhtMainTextOnly, lhtCellTextOnly, lhtSmart);
+  TElHintType  = (shtMainText, shtHintOnly, shtHintOrText);
+  TDragImgMode = (dimNever, dimOne, dimAll);
+  TNodeAttachMode = (naAdd, naAddFirst, naAddChild, naAddChildFirst, naInsert);
+  TElCheckBoxType = (ectCheckBox, ect3SCheckBox, ectRadioButton);
+  TVirtualityLevel= (vlNone, vlTextAndStyles);
+  TElItemBorderStyle  = (ibsNone, ibsRaised, ibsFlat, ibsSunken, ibsSpace);
+  TElDragType = (dtOLE, dtDelphi, dtBoth);
+  TElDblClickMode = (dcmNone, dcmExpand, dcmEdit);
+
+  TDragTargetDraw = (ColorFrame,
+                     ColorRect,
+                     SelColorRect,
+                     dtdNone,
+                     dtdUpColorLine,
+                     dtdDownColorLine,
+                     dtdUpSelColorLine,
+                     dtdDownSelColorLine);
+     // ColorFrame - usual background, color frame
+     // ColorRect  - green rect (drop allowed) or red rect (drop not allowed)
+     // SelColorRect - usual selected color rect
+
+// *****************************************************************************
+
+type
+{$ifdef MSWINDOWS}
+{$ifdef ELPACK_UNICODE}
+  TElFStrings = TElWideStrings;
+  TElFStringList = TElWideStringList;
+{$else}
+  TElFStrings = TStrings;
+  TElFStringList = TStringList;
+{$endif}
+{$else}
+  TElFStrings = TStrings;
+  TElFStringList = TStringList;
+{$endif}
+
+{$ifndef CLX_USED}
+const TM_CLOSEINPLACEEDITOR = WM_USER + 2835;
+{$endif}
+
+type
+  TCustomElTree = class;
+  TElTreeItem = class;
+  TElTreeItems = class;
+{$ifdef ELTREE_USE_STYLES}
+  TElCellStyle = class;
+{$else}
+  TElCEllStyle = class end;
+{$endif}
+  TElTreeView = class;
+
+{$ifdef VER3_EDITORS}
+
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+  TElTreeInplaceEditor = class;
+  TInplaceEditorNeededEvent   = procedure (Sender : TObject; Item : TElTreeItem; SectionIndex : Integer; SupposedFieldType : TElFieldType; var Editor : TElTreeInplaceEditor) of object;
+  TInplaceOperationEvent      = procedure (Sender : TObject; var DefaultConversion : boolean) of object;
+  TInplaceAfterOperationEvent = procedure (Sender : TObject; var Accepted   : boolean; var DefaultConversion : boolean) of object;
+  TInplaceValidationEvent     = procedure (Sender : TObject; var InputValid : boolean) of object;
+{$endif}
+{$endif}
+
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+{$ifdef VER3_EDITORS}
+  TElTreeInplaceEditor = class(TComponent)
+  protected
+    FDefaultValueAsText: TElFString;
+    FEditing : boolean;
+    FTree    : TCustomElTree;
+    FTypes   : TElFieldTypes;
+    FItem    : TElTreeItem;
+    FValueAsText: TElFString;
+    FSectionIndex: Integer;
+    FDataType: TElFieldType;
+    FCellRect: TRect;
+    FOnBeforeOperation : TInplaceOperationEvent;
+    FOnAfterOperation  : TInplaceAfterOperationEvent;
+    FOnValidateResult  : TInplaceValidationEvent;
+    procedure SetTree(Value: TCustomElTree);
+  protected
+    function GetVisible: Boolean; virtual; abstract;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure SetEditorParent; virtual;
+    procedure StartOperation; virtual;
+    procedure CompleteOperation(Accepted : boolean); virtual;
+
+    procedure TriggerBeforeOperation(var DefaultConversion : boolean); virtual;
+    procedure TriggerAfterOperation(var Accepted : boolean; var DefaultConversion : boolean); virtual;
+    procedure TriggerValidateResult(var InputValid : boolean); virtual;
+    procedure DoStartOperation; virtual; abstract;
+    procedure DoStopOperation(Accepted : boolean); virtual;
+  public
+    property Item: TElTreeItem read FItem;
+    property ValueAsText: TElFString read FValueAsText write FValueAsText;
+    property SectionIndex: Integer read FSectionIndex;
+    property DataType: TElFieldType read FDataType;
+    property CellRect: TRect read FCellRect;
+    property Visible: Boolean read GetVisible;
+  published
+    property Tree: TCustomElTree read FTree write SetTree;
+    property Types: TElFieldTypes read FTypes write FTypes default [];
+    property DefaultValueAsText: TElFString read FDefaultValueAsText write
+        FDefaultValueAsText;
+
+    property OnBeforeOperation : TInplaceOperationEvent read FOnBeforeOperation
+                                                        write FOnBeforeOperation;
+    property OnAfterOperation : TInplaceAfterOperationEvent read FOnAfterOperation
+                                                            write FOnAfterOperation;
+    property OnValidateResult : TInplaceValidationEvent read FOnValidateResult
+                                                        write FOnValidateResult;
+  end;
+
+  TElTreeInplaceManager = class(TComponent)
+  private
+    FEditorsList: TElList;
+  protected
+    procedure RegisterEditor(Editor : TElTreeInplaceEditor);
+    procedure UnregisterEditor(Editor : TElTreeInplaceEditor);
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    function GetSuitableEditor(SupposedFieldType : TElFieldType): 
+        TElTreeInplaceEditor;
+  published
+  end;
+{$endif}
+{$endif}
+
+{$ifdef ELTREE_USE_STYLES}
+{$warnings off}
+  TElCellControl = class(TComponent)
+  private
+    FPopupMenu: TPopupMenu;
+    FOwner: TElCellStyle;
+    FCaption: TElFString;
+       //FBoundsRect : TRect;
+    FVisible: Boolean;
+    FEnabled: boolean;
+
+    FOnClick: TNotifyEvent;
+    FOnMouseDown: TMouseEvent;
+    FOnMouseUp: TMouseEvent;
+    FOnDblClick: TNotifyEvent;
+    FOnMouseMove: TMouseMoveEvent;
+    FFont: TFont;
+
+    procedure SetPopupMenu(newValue: TPopupMenu);
+    procedure FontChanged(Sender: TObject);
+    procedure SetFont(newValue: TFont);
+  protected
+       //procedure SetBoundsRect(newValue : TRect); virtual;
+    FBorderWidth: Integer;
+    procedure SetCaption(newValue: TElFString); virtual;
+    procedure SetVisible(newValue: Boolean); virtual;
+    procedure SetEnabled(newValue: Boolean); virtual;
+
+    procedure TriggerClickEvent; virtual;
+    procedure TriggerMouseDownEvent(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); virtual;
+    procedure TriggerMouseUpEvent(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); virtual;
+    procedure TriggerDblClickEvent; virtual;
+    procedure TriggerMouseMoveEvent(Shift: TShiftState; X, Y: Integer); virtual;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure SetBorderWidth(Value: Integer);
+    function PassClicks: Boolean; virtual;
+  public
+    procedure Update; virtual;
+    procedure Assign(Source: TElCellControl); virtual; abstract;
+    procedure Paint(Canvas: TCanvas; Rect: TRect); virtual; abstract;
+    constructor Create; virtual;
+    destructor Destroy; override;
+    property BorderWidth: Integer read FBorderWidth write SetBorderWidth;
+    property Font: TFont read FFont write SetFont;
+  published
+    property Caption: TElFString read FCaption write SetCaption;
+    property Owner : TElCellStyle read FOwner;
+    property Enabled: Boolean read FEnabled write SetEnabled default True;
+    property Visible: Boolean read FVisible write SetVisible default True;
+    property OnClick: TNotifyEvent read FOnClick write FOnClick;
+    property OnMouseDown: TMouseEvent read FOnMouseDown write FOnMouseDown;
+    property OnMouseUp: TMouseEvent read FOnMouseUp write FOnMouseUp;
+    property OnDblClick: TNotifyEvent read FOnDblClick write FOnDblClick;
+    property OnMouseMove: TMouseMoveEvent read FOnMouseMove write FOnMouseMove;
+    property PopupMenu: TPopupMenu read FPopupMenu write SetPopupMenu;
+  end;
+{$warnings on}
+
+{$IFDEF ELPACK_COMPLETE}
+  TElCellCheckBox = class (TElCellControl)
+  private
+    FAlignment : TAlignment;
+    FState     : TCheckBoxState;
+    FAllowGrayed : boolean;
+    procedure SetState(newValue : TCheckBoxState);
+    procedure SetAllowGrayed(newValue : Boolean);
+    function GetChecked : Boolean;
+    procedure SetChecked(newValue : Boolean);
+    procedure SetAlignment(newValue : TAlignment);
+  protected
+    procedure TriggerClickEvent; override;
+    procedure TriggerMouseDownEvent(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure TriggerMouseUpEvent(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+  public
+    procedure Assign(Source: TElCellControl); override;
+    constructor Create; override;
+    destructor Destroy; override;
+    procedure Paint(Canvas: TCanvas; R: TRect); override;
+
+    property State : TCheckBoxState read FState write SetState;
+    property Checked : boolean read GetChecked write SetChecked;
+    property AllowGrayed : Boolean read FAllowGrayed write SetAllowGrayed; { Published }
+    property Alignment : TAlignment read FAlignment write SetAlignment; { Protected }
+  end;
+
+  TElCellButtonGlyph = class(TElButtonGlyph)
+    property ImageList;
+    property ImageIndex;
+    property UseImageList;
+  end;
+
+  TElCellButton = class(TElCellControl)
+  private
+    FGlyph: TElCellButtonGlyph;
+    FLayout: TButtonLayout;
+    FFixClick: Boolean;
+    FDown: Boolean;
+    function GetGlyph: TBitmap;
+    procedure SetGlyph(newValue: TBitmap);
+    procedure GlyphChanged(Sender: TObject);
+    procedure SetDown(newValue: Boolean);
+    procedure SetLayout(newValue: TButtonLayout);
+    function GetUseImageList : Boolean;
+    procedure SetUseImageList(newValue : Boolean);
+    function GetImageList : TImageList;
+    procedure SetImageList(newValue : TImageList);
+    function GetImageIndex : Integer;
+    procedure SetImageIndex(newValue : Integer);
+  protected
+    procedure TriggerMouseDownEvent(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure TriggerMouseUpEvent(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+  public
+    procedure Assign(Source: TElCellControl); override;
+    constructor Create; override;
+    destructor Destroy; override;
+    procedure Paint(Canvas: TCanvas; R: TRect); override;
+
+    property UseImageList : Boolean read GetUseImageList write SetUseImageList;  { Public }
+    property ImageList : TImageList read GetImageList write SetImageList;  { Public }
+    property ImageIndex : Integer read GetImageIndex write SetImageIndex;  { Public }
+
+    property Glyph: TBitmap read GetGlyph write SetGlyph;
+    property FixClick: Boolean read FFixClick write FFixClick;
+    property Down: Boolean read FDown write SetDown default False;
+    property Layout: TButtonLayout read FLayout write SetLayout;
+  end;
+
+{$ENDIF}
+
+  TElCellProgressBar = class(TElCellControl)
+  private
+  protected
+    FMinValue: Integer;
+    FMaxValue: Integer;
+    FValue: Integer;
+    FBarColor: TColor;
+    FShowProgressText: Boolean;
+    FTextAlignment: TAlignment;
+    FFrameColor: TColor;
+    FColor: TColor;
+    procedure SetMinValue(Value: Integer);
+    procedure SetMaxValue(Value: Integer);
+    procedure SetValue(Value: Integer);
+    procedure SetBarColor(Value: TColor);
+    procedure SetShowProgressText(Value: Boolean);
+    procedure SetTextAlignment(Value: TAlignment);
+    procedure SetFrameColor(Value: TColor);
+    procedure SetColor(Value: TColor);
+    function PassClicks: Boolean; override;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    procedure Assign(Source: TElCellControl); override;
+    procedure Paint(Canvas: TCanvas; R: TRect); override;
+
+    property MinValue: Integer read FMinValue write SetMinValue;
+    property MaxValue: Integer read FMaxValue write SetMaxValue;
+    property Value: Integer read FValue write SetValue;
+    property BarColor: TColor read FBarColor write SetBarColor;
+    property TextAlignment: TAlignment read FTextAlignment write SetTextAlignment;
+    property ShowProgressText: Boolean read FShowProgressText write SetShowProgressText;
+    property FrameColor: TColor read FFrameColor write SetFrameColor;
+    property Color: TColor read FColor write SetColor;
+  end;
+
+  TElCellStyle = class(TOBject)
+  private
+    FTag: Integer;
+    FOwner: TElTreeItem;
+    FCellBkColor: TColor;
+    FTextBkColor: TColor;
+    FTextColor: TColor;
+    FTextFlags: DWORD;
+    FPicture: TBitmap;
+    FCellType: TElFieldType;
+    FStyle: TElSectionStyle;
+    FOwnerProps: Boolean;
+    FFontSize: integer;
+    FFontStyles: TFontStyles;
+    FFontName: TFontName;
+    FControl: TElCellControl;
+    FUseBkColor: Boolean;
+    procedure SetControl(newValue: TElCellControl);
+    procedure SetFontSize(newValue: integer);
+    procedure SetFontStyles(newValue: TFontStyles);
+    procedure SetFontName(newValue: TFontName);
+    procedure SetOwnerColors(newValue: Boolean);
+    procedure SetStyle(newValue: TElSectionStyle);
+    procedure SetCellBkColor(newValue: TColor);
+    procedure SetTextBkColor(newValue: TColor);
+    procedure SetTextColor(newValue: TColor);
+    procedure SetTextFlags(newValue: DWORD);
+    procedure SetPicture(newValue: TBitmap);
+    procedure SetCellType(newValue: TElFieldType);
+    procedure SetUseBkColor(Value: Boolean);
+  public
+    constructor Create(Owner: TElTreeItem);
+    destructor Destroy; override;
+    procedure Assign(Source: TElCellStyle);
+    procedure Update;
+
+    property Tag: Integer read FTag write FTag;
+    property Control: TElCellControl read FControl write SetControl; { Published }
+    property CellBkColor: TColor read FCellBkColor write SetCellBkColor;
+    property TextBkColor: TColor read FTextBkColor write SetTextBkColor;
+    property TextColor: TColor read FTextColor write SetTextColor;
+    property TextFlags: DWORD read FTextFlags write SetTextFlags;
+    property Picture: TBitmap read FPicture write SetPicture;
+    property CellType: TElFieldType read FCellType write SetCellType;
+    property Style: TElSectionStyle read FStyle write SetStyle;
+    property OwnerProps: Boolean read FOwnerProps write SetOwnerColors;
+    property FontSize: integer read FFontSize write SetFontSize;
+    property FontStyles: TFontStyles read FFontStyles write SetFontStyles;
+    property FontName: TFontName read FFontName write SetFontName;
+    property Owner   : TElTreeItem read FOwner;
+    property UseBkColor: Boolean read FUseBkColor write SetUseBkColor;
+  end;
+{$endif}
+
+  TElTreeItemStaticData = record
+    FText    : TElFString;
+    FColText : TElFStringList;
+    FHint    : TElFString;
+{$ifdef ELTREE_USE_STYLES}
+    FMainStyle: TElCellStyle;
+    FStyles  : TElList;
+{$endif}
+  end;
+  PElTreeItemStaticData = ^TElTreeItemStaticData;
+
+  TElTreeItem = class(TPersistent)
+  protected
+{$IFDEF HAS_HTML_RENDER}
+    FHTMLData      : TElHTMLData;
+    FHTMLDataArray : TElArray;
+{$ENDIF}
+    FTag           : Integer;
+    FObject        : TObject;
+    FDataInterface : IUnknown;
+{$IFDEF USE_VARIANT}
+    FSortData      : Variant;
+{$ELSE}
+    FSortData      : Pointer;
+    FSortType      : integer;
+{$ENDIF}
+    FSortRef       : integer;
+
+    FStaticData    : PElTreeItemStaticData;
+    FBorderStyle   : TElItemBorderStyle;
+
+{$IFNDEF LITE}
+    FComplexHeight : Cardinal;
+    (* record
+         FHeight : Word;
+         FRealHeight: Word;
+       end;  
+    *)
+{$ENDIF LITE}
+
+    FCheckBoxState: TCheckBoxState;
+    FCheckBoxType: TElCheckBoxType;
+
+    FState: TSTIStates;
+    FIState: integer;
+
+    FChildren: TElList;
+    FOwner: TCustomElTree;
+    FList : TElTreeItems;
+    FData : pointer; // generic data
+
+    FRowBkColor : TColor;
+    FColor,
+      FBkColor: TColor;
+    FStrikedLineColor: TColor;
+
+    FBoolData1   : integer;
+
+    FTextLeft,
+      FTextRight: integer;
+    FImageIndex,
+      FStImageIndex: integer;
+    FImageIndex2,
+      FStImageIndex2: integer;
+
+    FParent: TElTreeItem;
+    FRoot  : TElTreeItem;
+    FIndentAdjust: Integer;
+    FBorderSpaceColor: TColor;
+    FOverlayIndex: ShortInt;
+    FOverlayIndex2: ShortInt;
+
+    function GetText: TElFString;
+    function GetHint: TElFString; virtual;
+    procedure SetHint(Value: TElFString);
+    procedure SetBorderStyle(Value: TElItemBorderStyle);
+    function GetParent: TElTreeItem;
+    function GetLevel: integer;
+    procedure SetColor(index: integer; value: TColor);
+    procedure SetUseBkColor(newValue: Boolean);
+    function GetHasChildren: boolean;
+    function GetHasVisibleChildren: Boolean;
+    procedure SetExpanded(value: boolean);
+    procedure SetParentColors(value: Boolean);
+    procedure SetParentStyle(value: Boolean);
+    function GetIndex: integer;
+    function GetAbsIndex: integer;
+    function GetVisIndex: integer;
+    function GetChildIndex(Child: TElTreeItem): integer;
+    function IsExpanded: boolean;
+    function GetFullExpand: boolean;
+    procedure MakeFullyExpanded(value: boolean);
+    procedure OnColTextChange(Sender: TObject);
+    procedure SetImageIndex(value: integer);
+    procedure SetStImageIndex(value: integer);
+    procedure SetImageIndex2(value: integer);
+    procedure SetStImageIndex2(value: integer);
+    procedure SetForceButtons(newValue: Boolean);
+    function GetChildrenCount: Integer;
+    function GetCount: Integer;
+    function GetItems(Index: integer): TElTreeItem;
+{$ifdef ELTREE_USE_STYLES}
+    procedure SetUseStyles(newValue: Boolean);
+{$endif}
+    procedure OnStyleDelete(Sender: TObject; Item: pointer);
+{$ifdef ELTREE_USE_STYLES}
+    function GetStyles(index: integer): TElCellStyle;
+    procedure SetStyles(index: integer; newValue: TElCellStyle);
+    function GetStylesCount: Integer;
+{$endif}
+    procedure SetCheckBoxState(newValue: TCheckBoxState);
+    procedure SetChecked(newValue: Boolean);
+    function GetChecked: boolean;
+    procedure SetShowCheckBox(newValue: Boolean);
+    procedure SetCheckBoxType(newValue: TElCheckBoxType);
+    procedure SetCheckBoxEnabled(newValue: Boolean);
+    procedure SetSuppressButtons(newValue: Boolean);
+    procedure SetEnabled(newValue: Boolean);
+    procedure SetHidden(newValue: Boolean);
+    function GetFullyVisible: Boolean;
+    procedure SetFullyVisible(newValue: Boolean);
+    function GetSelected : boolean;
+    procedure SetSelected(newValue : boolean);
+{$ifdef ELTREE_USE_STYLES}    
+    procedure CreateStyles;
+{$endif}
+{$IFNDEF LITE}
+    procedure SetOwnerHeight(newValue : Boolean);
+    procedure SetHeight(newValue : Integer);
+{$ENDIF LITE}
+    function  GetHeight : Integer;
+    procedure SetSuppressLines(newValue: Boolean);
+    procedure UpdateItem;
+    procedure SetText(Value: TElFString); virtual;
+    function GetState(index: integer): boolean;
+    procedure SetState(index: integer; value: boolean);
+    procedure RemoveChild(Child: TElTreeItem);
+    procedure DeleteChild(Child: TElTreeItem);
+    function  AddChild(Child: TElTreeItem): integer;
+    function  AddLastChild(Child: TElTreeItem): integer;
+    function InsertChild(index: integer; Child: TElTreeItem): integer;
+    procedure ReadData(Stream: TStream); virtual;
+    procedure WriteData(Stream: TStream); virtual;
+    procedure ExchangeItems(I, J: integer);
+
+    // Sorting-related methods
+    procedure QuickSort(recursive: boolean;
+                        L, R: Integer;
+                        SM : TElSSortMode;
+                        SortType: TSortTypes;
+                        FSortSection : integer);
+    procedure AddSortData(SortType: TSortTypes;
+                          FSortSection : integer);
+    procedure ReleaseSortData;
+    procedure NormalizeSorts(StartIdx : integer);
+                        
+    procedure SetRowBkColor(newValue : TColor); virtual;
+    {$IFNDEF LITE}
+    function  GetOwnerHeight : boolean;
+    procedure SetMultiline(newValue: Boolean); virtual;
+    {$ENDIF}
+{$IFDEF HAS_HTML_RENDER}
+    procedure SetIsHTML(newValue: Boolean);
+    procedure OnHTMLDataDestroy(Sender :TObject; Item : Pointer);
+    procedure ReRenderMainText;
+    procedure ReRenderAllTexts;
+{$ENDIF}
+    function GetAncestor: TElTreeItem;
+
+    procedure SetStrikedOutLine(const Value: boolean);
+    procedure SetStrikedLineColor(const Value: TColor);
+    function GetStrikedOutLine: boolean;
+    procedure SetDrawHLine(const Value: Boolean);
+
+    procedure SetAllowEdit(const Value: Boolean);
+    function CalcSubItemsHeight: Integer;
+    procedure NewStaticData;
+    procedure DisposeStaticData;
+    procedure FillStaticData;
+    function GetColText: TElFStrings;
+    function GetParentStyle: Boolean;
+
+    {$ifdef ELTREE_USE_STYLES}
+    function GetMainStyle: TElCellStyle;
+    function GetUseStyles: Boolean;
+    {$endif}
+    function GetUseBkColor: Boolean;
+    function GetParentColors: Boolean;
+    function GetDrawHLine: Boolean;
+    (*
+    function GetAllowSelection: Boolean;
+    procedure SetAllowSelection(Value: Boolean);
+    *)
+    function GetAllowEdit: Boolean;
+    function GetForceButtons: Boolean;
+    function GetSuppressButtons: Boolean;
+    function GetSuppressLines: Boolean;
+    function GetIsHTML: Boolean;
+    function GetMultiline: Boolean;
+    function GetShowCheckBox: Boolean;
+    function GetCheckBoxEnabled: Boolean;
+    function GetEnabled: Boolean;
+    function GetHidden: Boolean;
+    procedure SetIndentAdjust(Value: Integer);
+    function GetDropTarget: Boolean;
+    function GetHintIsHTML: Boolean;
+    procedure SetHintIsHTML(Value: Boolean);
+    procedure SetBorderSpaceColor(Value: TColor);
+    procedure SetOverlayIndex(value: ShortInt);
+    procedure SetOverlayIndex2(value: ShortInt);
+  public
+    constructor Create(AOwner: TCustomElTree); virtual;
+    destructor Destroy; override;
+    function GetWidth: Integer; virtual;
+
+    function IsUnder(Item: TElTreeItem): boolean;
+    function GetFullName(separator: TElFString): TElFString;
+    function GetFullNameEx(separator: TElFString; AddRoot: boolean): TElFString;
+    procedure Expand(recursive: boolean);
+    procedure Collapse(recursive: boolean);
+    procedure Sort(recursive: boolean);
+    procedure MoveTo(NewParent: TElTreeItem);
+       // Moves the item to the new parent, adding it to the NewParent's
+       // children list.
+    procedure MoveToIns(NewParent: TElTreeItem; AnIndex: integer);
+       // Moves the item to the new parent, inserting it to the NewParent's
+       // children list at Index position
+
+    procedure Clear;
+    function GetFirstVisibleChild: TElTreeItem;
+    function GetFirstChild: TElTreeItem;
+    function GetLastChild: TElTreeItem;
+    function GetNextChild(Child: TElTreeItem): TElTreeItem;
+    function GetPrevChild(Child: TElTreeItem): TElTreeItem;
+    function GetFirstSibling: TElTreeItem;
+    function GetLastSibling: TElTreeItem;
+    function GetNextSibling: TElTreeItem;
+    function GetPrevSibling: TElTreeItem;
+    function GetLastSubItem : TElTreeItem;
+      // Get the last item, that has current item as one of its "parents"
+    function GetChildByIndex(index: integer): TElTreeItem;
+       // Get child item, which is on "index" position in the children list
+{$IFDEF ELTREE_USE_INPLACE_EDITORS}
+    procedure EditText;
+{$ENDIF}
+    procedure Assign(Source: TPersistent); override;
+
+    procedure Delete; virtual;
+    property TreeView: TCustomElTree read FOwner;
+
+    function IsVisible: Boolean;
+    function GetNextVisible: TElTreeItem;
+    function GetPrevVisible: TElTreeItem;
+    function GetPrev: TElTreeItem; virtual;
+    function GetNext: TElTreeItem; virtual;
+    procedure MoveToItem(Item: TElTreeItem; Mode: TNodeAttachMode); virtual;
+{$ifdef ELTREE_USE_STYLES}
+    function AddStyle: TElCellStyle; virtual;
+    procedure RemoveStyle(Style: TElCellStyle); virtual;
+{$endif}                    
+    procedure RedrawItem(DoCheck: boolean);
+    procedure RedrawItemPart(DoCheck: boolean; Left, Right: integer);
+    function DisplayRect(TextOnly : boolean): TRect;
+    {$ifdef ELTREE_USE_INPLACE_EDITORS}
+    procedure EndEdit(ByCancel : boolean);
+    {$endif}
+    function HasAsParent(Item : TElTreeItem): Boolean;
+    function IndexOf(Item : TElTreeItem): Integer;
+    procedure MakeVisible;
+
+    property TextLeft  : integer read FTextLeft;
+    property TextRight : integer read FTextRight;
+
+    property Data: pointer read FData write FData;
+       // User defined data. The ElTree doesn't free this memory when
+       // the item is deleted
+
+    property AnObject: TObject read FObject write FObject;
+       // User defined data. The ElTree doesn't free this memory when
+       // the item is deleted
+
+    property DataInterface: IUnknown read FDataInterface write FDataInterface;
+    // User defined interface. Will be set to NIL before destruction to
+    // decrease the reference counter.
+
+    property Owner: TCustomElTree read FOwner;
+       // Points to the item's owner ElTree component
+
+    property Parent: TElTreeItem read GetParent write MoveTo;
+       // Points to the item's parent item
+
+    property HasVisibleChildren: boolean read GetHasVisibleChildren;
+       // Shows, if the item has child items, that are not hidden
+
+    property HasChildren: boolean read GetHasChildren;
+       // Shows, if the item has child items
+    property Index: integer read GetIndex;
+       // This is the index of the item in the parent's children list
+
+    property AbsoluteIndex: integer read GetAbsIndex;
+       // This is the index of the item among all items in the tree
+
+    property VisIndex: integer read GetVisIndex;
+       // This is the index of the item among all expanded items in the tree
+
+    property Count: Integer read GetCount;
+    // This is the number of elements in Children array. Direct children only!!!
+
+    property ChildrenCount: integer read GetChildrenCount;
+    // This is the number of children on all levels below this item.
+
+    property Children[Index: integer]: TElTreeItem read GetItems; { Public }
+    // The array of children elements. Direct children only!!!
+    // To find out all subitems, use Iterate* methods
+
+    property Item[Index: integer]: TElTreeItem read GetItems; { Public }
+    // the same but for TTreeView compatibility
+    
+    property Level: integer read GetLevel;
+       // Tells, on which level the item is
+       // Root items have Level 0 (zero)
+
+    property Tag : Integer read FTag write FTag;
+
+{$ifdef ELTREE_USE_STYLES}
+    property Styles[index: integer]: TElCellStyle read GetStyles write SetStyles;
+{$endif}
+
+    property Ancestor: TElTreeItem read GetAncestor;
+
+    property StrikedOutLine: boolean read GetStrikedOutLine write SetStrikedOutLine;
+
+    property StrikedLineColor: TColor read FStrikedLineColor write SetStrikedLineColor;
+
+    property DrawHLine: Boolean read GetDrawHLine write SetDrawHLine;
+
+    // property AllowSelection: Boolean read GetAllowSelection write SetAllowSelection;
+
+    property AllowEdit: Boolean read GetAllowEdit write SetAllowEdit;
+
+    property Focused: boolean index 1 read GetState write SetState;
+       // The item currently has focus
+    property Selected: boolean read GetSelected write SetSelected;
+       // The item is marked as selected
+    property Cut: boolean index 3 read GetState write SetState;
+       // The item is marked as cut
+    property Underlined: boolean index 4 read GetState write SetState;
+       // This property sets the item's main text font style
+       // This doesn't affect columns text style
+    property Bold: boolean index 5 read GetState write SetState;
+       // This property sets the item's main text font style
+       // This doesn't affect columns text style
+    property Italic: boolean index 6 read GetState write SetState;
+       // This property sets the item's main text font style
+       // This doesn't affect columns text style
+    property StrikeOut: boolean index 8 read GetState write SetState;
+       // This property sets the item's main text font style
+       // This doesn't affect columns text style
+    property ParentStyle: Boolean read GetParentStyle write SetParentStyle;
+       // if ParentStyle=true, then item's font styles are ignored, and tree's
+       // are used
+    property Text: TElFString read GetText write SetText;
+       // Main tree text
+    property ColumnText: TElFStrings read GetColText;
+
+    // the alias for ColumnText
+    property SubItems  : TElFStrings read GetColText;
+       // Text for additional columns
+    property Expanded: boolean read IsExpanded write SetExpanded;
+       // The item is expanded
+
+    property FullyExpanded: boolean read GetFullExpand write MakeFullyExpanded;
+       // The item and all its parent are expanded
+
+    property Color: TColor index 1 read FColor write SetColor;
+       // Color of item's text
+
+    property BkColor: TColor index 2 read FBkColor write SetColor;
+       // Color of item's text background
+
+    property UseBkColor: Boolean read GetUseBkColor write SetUseBkColor;
+
+    property ParentColors: Boolean read GetParentColors write SetParentColors;
+       // if ParentColors=True, then Color and BkColor properties are ignored
+
+    property ImageIndex: integer read FImageIndex write SetImageIndex;
+    property StateImageIndex: integer read FStImageIndex write SetStImageIndex;
+
+    property ImageIndex2: integer read FImageIndex2 write SetImageIndex2;
+    property StateImageIndex2: integer read FStImageIndex2 write SetStImageIndex2;
+
+    property ForceButtons: Boolean read GetForceButtons write SetForceButtons
+        default False;
+    property SuppressButtons: Boolean read GetSuppressButtons write
+        SetSuppressButtons default False;
+    property SuppressLines: Boolean read GetSuppressLines write SetSuppressLines;
+
+    property Hint: TElFString read GetHint write SetHint;
+
+{$ifdef ELTREE_USE_STYLES}
+    property UseStyles: Boolean read GetUseStyles write SetUseStyles;
+    property MainStyle  : TElCellStyle read GetMainStyle;
+    property StylesCount: Integer read GetStylesCount;
+{$endif}
+    property CheckBoxState: TCheckBoxState read FCheckBoxState write SetCheckBoxState;
+    property Checked: Boolean read GetChecked write SetChecked default False;
+    property ShowCheckBox: Boolean read GetShowCheckBox write SetShowCheckBox
+        default True;
+    property CheckBoxType: TElCheckBoxType read FCheckBoxType write SetCheckBoxType;
+    property CheckBoxEnabled: Boolean read GetCheckBoxEnabled write
+        SetCheckBoxEnabled;
+    property Enabled: Boolean read GetEnabled write SetEnabled default True;
+    property Hidden: Boolean read GetHidden write SetHidden;
+    property FullyVisible: Boolean read GetFullyVisible write SetFullyVisible;
+    property Height      : Integer read GetHeight {$ifndef LITE}write SetHeight{$endif};  { Public }
+
+{$IFNDEF LITE}
+    property OwnerHeight : Boolean read GetOwnerHeight write SetOwnerHeight;  { Public }
+    property Multiline: Boolean read GetMultiline write SetMultiline;
+{$ENDIF LITE}
+    property RowBkColor : TColor read FRowBkColor write SetRowBkColor;  { Public }
+    // The color of the item background (complete, not under text
+{$IFDEF HAS_HTML_RENDER}
+    property IsHTML: Boolean read GetIsHTML write SetIsHTML;
+{$ENDIF}
+    property BorderStyle: TElItemBorderStyle read FBorderStyle write SetBorderStyle;
+    property IndentAdjust: Integer read FIndentAdjust write SetIndentAdjust;
+    property DropTarget: Boolean read GetDropTarget;
+    property HintIsHTML: Boolean read GetHintIsHTML write SetHintIsHTML;
+    property BorderSpaceColor: TColor read FBorderSpaceColor write 
+        SetBorderSpaceColor;
+    property OverlayIndex: ShortInt read FOverlayIndex write SetOverlayIndex;
+    property OverlayIndex2: ShortInt read FOverlayIndex2 write SetOverlayIndex2;
+  end;
+
+// *****************************************************************************
+
+  TElTreeItemClass = class of TElTreeItem;
+
+  TElLookupCompareProc = function(Item: TElTreeItem; SearchDetails: Pointer): boolean;
+
+  TIterateProc = procedure(Item: TElTreeItem; Index: integer; var ContinueIterate: boolean;
+    IterateData: pointer; Tree: TCustomElTree);
+
+  TElTreeItems = class(TPersistent)
+  private
+    FOwner: TCustomElTree;
+    //FCount: integer;
+
+    function GetItem(index: integer): TElTreeItem;
+    function GetVisItem(index: integer): TElTreeItem;
+  protected
+    FRoot: TElTreeItem;
+    FItemClass : TElTreeItemClass;
+    function GetVisCount: integer;
+    procedure ReadData(Stream: TStream); virtual;
+    procedure WriteData(Stream: TStream); virtual;
+    procedure DefineProperties(Filer: TFiler); override;
+    function CreateItem(FOwner: TCustomElTree): TElTreeItem; virtual;
+    function GetCount: Integer;
+    function GetRootCount: Integer;
+    function GetRootItem(Index: Integer): TElTreeItem;
+  public
+    procedure Assign(Source: TPersistent); override;
+    constructor Create(AOwner: TCustomElTree); virtual;
+    constructor CreateClass(AOwner: TCustomElTree; ItemClass : TElTreeItemClass);
+    destructor Destroy; override;
+    (*
+    procedure AddExistingItem(Item, Parent: TElTreeItem);
+    procedure InsertExistingItem(Item, Parent: TElTreeItem; Index: integer);
+    procedure RemoveItem(Child: TElTreeItem);
+    *)
+    procedure LoadFromStream(Stream: TStream);
+    procedure SaveToStream(Stream: TStream);
+    procedure SaveToFile(FileName: string);
+    procedure LoadFromFile(FileName: string);
+
+    procedure SaveToStringList(AStrings : TStrings);
+    procedure LoadFromStringList(Strings : TStrings);
+    {$ifdef ELPACK_UNICODE}
+    procedure LoadFromWideStringList(Strings : TElWideStrings);
+    procedure SaveToWideStringList(AStrings : TElWideStrings);
+    {$endif}
+
+    procedure DeleteItem(Child: TElTreeItem);
+    function GetAbsIndex(Child: TElTreeItem) : integer;
+    function GetVisIndex(Child: TElTreeItem) : integer;
+    function AddItem(Parent: TElTreeItem)    : TElTreeItem;
+    function AddLastItem(Parent: TElTreeItem): TElTreeItem;
+    procedure SetItem(Index: Integer; Value: TElTreeItem);
+    function InsertItem(Index: integer; Parent: TElTreeItem): TElTreeItem;
+
+    // AllocateStorage increases the size of the list, thus speeding up items adding
+    procedure AllocateStorage(MaxItems : integer);
+    function Add(Item: TElTreeItem; Text: TElFString): TElTreeItem; virtual;
+    function AddChild(Item: TElTreeItem; Text: TElFString): TElTreeItem; virtual;
+    function AddChildFirst(Item: TElTreeItem; Text: TElFString): TElTreeItem; virtual;
+    function AddChildObject(Item: TElTreeItem; Text: TElFString; Ptr: pointer): TElTreeItem; virtual;
+    function AddChildObjectFirst(Item: TElTreeItem; Text: TElFString; Ptr: pointer): TElTreeItem; virtual;
+    function AddFirst(Item: TElTreeItem; Text: TElFString): TElTreeItem; virtual;
+    function AddObject(Item: TElTreeItem; Text: TElFString; Ptr: pointer): TElTreeItem; virtual;
+    function AddObjectFirst(Item: TElTreeItem; Text: TElFString; Ptr: pointer): TElTreeItem; virtual;
+    function Insert(Item: TElTreeItem; Text: TElFString): TElTreeItem; virtual;
+    function InsertObject(Item: TElTreeItem; Text: TElFString; Ptr: pointer): TElTreeItem; virtual;
+    function InsertAfter(Item: TElTreeItem; Text: TElFString): TElTreeItem; virtual;
+    function InsertAfterObject(Item: TElTreeItem; Text: TElFString; Ptr: Pointer): TElTreeItem; virtual;
+    procedure InsertItemFromString(Index : integer; AString : TElFString);
+
+    procedure Delete(Item: TElTreeItem); virtual;
+    function GetFirstNode: TElTreeItem;
+
+    procedure Clear;
+    procedure IterateBranch(VisibleOnly: boolean; IterateProc: TIterateProc; IterateData: pointer; BranchParent: TElTreeItem);
+
+    procedure IterateFrom(VisibleOnly, CheckCollapsed: boolean; IterateProc: TIterateProc; IterateData: pointer; StartFrom: TElTreeItem); (*<+>*)
+    procedure IterateBackFrom(VisibleOnly, CheckCollapsed: boolean; IterateProc: TIterateProc; IterateData: pointer; StartFrom: TElTreeItem); (*<+>*)
+    procedure Iterate(VisibleOnly, CheckCollapsed: boolean; IterateProc: TIterateProc; IterateData: pointer); (*<+>*)
+    procedure IterateBack(VisibleOnly, CheckCollapsed: boolean; IterateProc: TIterateProc; IterateData: pointer); (*<+>*)
+
+    procedure BeginUpdate; virtual;
+    procedure EndUpdate; virtual;
+
+    function LookForItem(StartItem: TElTreeItem;
+      TextToFind: TElFString;
+      DataToFind: pointer;
+      ColumnNum : integer;
+      LookForData,
+      CheckStartItem,
+      SubItemsOnly,
+      VisibleOnly,
+      NoCase: boolean): TElTreeItem;
+        (*<+>*)
+    function LookForItem2(StartItem: TElTreeItem;
+      TextToFind: TElFString;
+      WholeTextOnly: boolean;
+      DataToFind: pointer;
+      ColumnNum : integer;
+      LookForData,
+      CheckStartItem,
+      SubItemsOnly,
+      VisibleOnly,
+      CheckCollapsed,
+      NoCase: boolean): TElTreeItem;
+
+    function LookForItemEx(StartItem: TElTreeItem; ColumnNum: integer;
+      CheckStartItem, SubItemsOnly, VisibleOnly: boolean;
+      SearchDetails: pointer;
+      CompareProc: TElLookupCompareProc): TElTreeItem;
+
+    function LookBackForItemEx2(StartItem: TElTreeItem; ColumnNum: integer;
+      CheckStartItem, SubItemsOnly, VisibleOnly, CheckCollapsed: boolean;
+      SearchDetails: pointer;
+      CompareProc: TElLookupCompareProc): TElTreeItem;
+
+    (*<+>*)
+    function LookForItemEx2(StartItem: TElTreeItem; ColumnNum: integer;
+      CheckStartItem, SubItemsOnly, VisibleOnly, CheckCollapsed: boolean;
+      SearchDetails: pointer;
+      CompareProc: TElLookupCompareProc): TElTreeItem;
+
+    property ItemClass : TElTreeItemClass read FItemClass write FItemClass;
+    property Owner: TCustomElTree read FOwner;
+    property Item[Index: integer]: TElTreeItem read GetItem; default;
+    property ItemAsVis[Index: integer]: TElTreeItem read GetVisItem;
+    property Count: Integer read GetCount;
+    property VisCount: integer read GetVisCount;
+    property RootCount: Integer read GetRootCount;
+    property RootItem[Index: Integer]: TElTreeItem read GetRootItem;
+  end;
+
+// *****************************************************************************
+
+{$ifdef ELTREE_USE_OLE_DRAGDROP}
+{$IFNDEF VER90}
+{$IFNDEF LITE}
+  TOleDragStartEvent = procedure(Sender: TObject; var dataObj: IDataObject;
+    var dropSource: IDropSource; var dwOKEffects: TDragTypes) of object;
+  TOleDragFinishEvent = procedure(Sender: TObject; dwEffect: TDragType; Result: HResult) of object;
+{$ENDIF}
+{$ENDIF}
+{$endif}
+
+  TMeasureItemPartEvent = procedure(Sender: TObject; Item: TElTreeItem; PartIndex: integer; var Size: TPoint) of object;
+  THeaderSectionEvent = procedure(Sender: TObject; Section: TElHeaderSection) of object;
+  TColumnNotifyEvent = procedure(Sender: TObject; SectionIndex: integer) of object;
+  TOnItemDrawEvent = procedure(Sender: TObject; Item: TElTreeItem; Surface: TCanvas;
+    R: TRect; SectionIndex: integer) of object;
+  TOnShowHintEvent = procedure(Sender: TObject;
+    Item: TElTreeItem;
+    Section : TElHeaderSection;
+    var Text: TElFString;
+    HintWindow: THintWindow;
+    MousePos: TPoint;
+    var DoShowHint: boolean) of object;
+  TApplyVisFilterEvent = procedure(Sender: TObject; Item: TElTreeItem; var Hidden: boolean) of object;
+
+  TTuneUpInplaceEditEvent = procedure(Sender : TObject; Item : TElTreeItem; SectionIndex : integer; Editor : TCustomEdit) of object;
+  TOnItemExpandEvent = procedure(Sender: TObject; Item: TElTreeItem) of object;
+  TOnItemCheckedEvent = Procedure (Sender: TObject; Item: TelTreeItem) of Object;
+  TItemSelChangeEvent = procedure(Sender: TObject; Item: TElTreeItem) of object;
+  TOnItemChangeEvent = procedure(Sender: TObject; Item: TElTreeItem;
+    ItemChangeMode: TItemChangeMode) of object;
+
+  TOnCompareItems = procedure(Sender: TObject; Item1, Item2: TElTreeItem;
+    var res: integer) of object;
+
+  TOnItemExpanding = procedure(Sender: TObject; Item: TElTreeItem;
+    var CanProcess: boolean) of object;
+
+  TOnPicDrawEvent = procedure(Sender: TObject; Item: TElTreeItem;
+    var ImageIndex: integer) of object;
+
+  THotTrackEvent = procedure(Sender: TObject; OldItem, NewItem: TElTreeItem) of object;
+
+  TOnValidateEvent = procedure(Sender: TObject; Item: TElTreeItem;
+    Section: TElHeaderSection;
+    var Text: string; var Accept: boolean) of object;
+
+  {$ifndef VER3_EDITORS}
+  TTryEditEvent = procedure(Sender: TObject; Item: TElTreeItem;
+    Section: TElHeaderSection; var CellType: TElFieldType; var CanEdit: boolean) of object;
+  {$else}
+  TTryEditEvent = procedure(Sender: TObject; Item: TElTreeItem;
+    SectionIndex: integer; var CellType: TElFieldType; var CanEdit: boolean) of object;
+  {$endif}
+  TEditRequestEvent = procedure(Sender: TObject; Item: TElTreeItem;
+    Section: TElHeaderSection) of object;
+
+  TComboEditShowEvent = procedure(Sender: TObject; Item: TElTreeItem;
+    Section: TElHeaderSection;
+    Combobox: TCombobox) of object;
+
+  TValidateComboEvent = procedure(Sender: TObject; Item: TElTreeItem;
+    Section: TElHeaderSection;
+    Combo: TComboBox;
+    var Accept: boolean) of object;
+
+  TElScrollEvent = procedure(Sender: TObject;
+    ScrollBarKind: TScrollBarKind;
+    ScrollCode: integer) of object;
+
+  TElColumnMoveEvent = procedure(Sender: TCustomElTree;
+    Section: TElHeaderSection;
+    OldPos, NewPos: integer) of object;
+
+  TItemSaveEvent = procedure(Sender: TObject; Stream: TStream;
+    Item: TElTreeItem) of object;
+
+  TCellStyleSaveEvent = procedure(Sender: TObject; Stream: TStream;
+    Style: TElCellStyle) of object;
+
+  TElTreeChangingEvent = procedure (Sender : TObject; Item : TElTreeItem;
+    var AllowChange: Boolean) of object;
+
+  TElTreeItemPostDrawEvent = procedure(Sender : TObject; Canvas : TCanvas; Item : TElTreeItem;
+    ItemRect : TRect; var DrawFocusRect : boolean) of object;
+
+  TElTreeItemDragTargetEvent = procedure (Sender : TObject; Item : TElTreeItem;
+    ItemRect : TRect; X, Y : integer) of object;
+
+  TVirtualTextNeededEvent = procedure (Sender : TObject; Item : TElTreeItem; SectionIndex : Integer; var Text : TElFString) of object;
+  TVirtualHintNeededEvent = procedure (Sender : TObject; Item : TElTreeItem; var Hint : TElFString) of object;
+  TVirtualValueNeededEvent= procedure (Sender : TObject; Item : TElTreeItem; SectionIndex : Integer; VarType : integer; var Value : Variant) of object;
+{$ifdef ELTREE_USE_STYLES}
+  TVirtualStyleNeededEvent= procedure (Sender : TObject; Item : TElTreeItem; SectionIndex : Integer; Style : TElCellStyle) of object;
+{$endif}
+
+  TElTreeView = class(TCustomControl)
+  protected
+    FHeader   : TElHeader;
+    FOwner    : TCustomElTree;
+    FItems    : TElTreeItems;
+    {$ifdef ELTREE_USE_STYLES}
+    VirtStyle : TElCellStyle;
+    {$endif}
+    // Hint fields
+    FHintTimer: TTimer;
+    FHintWnd  : TElHintWindow;
+    FHintCoord: TPoint;
+    FHintItem,
+    FHintItemEx : TElTreeItem;
+
+    // Update fields
+    FPainting, // already in Paint
+    FClearVis, // do update visibles list
+    FClearAll, // clear the whole ClientRect
+    FVisUpdated, // visibles list updated
+    FRangeUpdate // all items should be updated
+               : boolean;
+
+    // Positioning fields
+    FHRange    : integer;
+
+    // Mouse action fields
+    FPressCoord: TPoint;
+    FPressed   : boolean;
+    FMouseSel  : boolean;
+    FClickCoord: TPoint;
+    FClicked   : boolean;
+{$ifdef ELTREE_USE_STYLES}
+    FClickControl: TElCellControl;
+{$endif}
+    FIgnoreClick,
+    FIgnoreClick2: boolean;
+    FClickPassed : boolean;
+    FPassedItem  : TElTreeItem;
+    FPassedShift : TShiftState;
+
+    FClickSection: integer;
+    // Current items
+    FClickItem,
+    FTrackItem,
+{$IFDEF ELTREE_USE_INPLACE_EDITORS}
+    FEditingItem,
+{$endif}
+    FFocused,
+    FSelected,
+    FDropTrg  : TElTreeItem;
+
+    // mouse frame selection
+    FMFSStartItem  : TElTreeItem;
+    FMFSStartCoord : TPoint;
+    FMFSEndItem    : TElTreeItem;
+    FMFSendCoord   : TPoint;
+    FMFSList       : TElList;
+
+    // Painting helper fields
+    FVisible  : TElList;
+    FOverColors,
+    FRowOvColors: boolean;
+
+    // Drag'n'drop fields
+    FDragScrollTimer,
+    FDragExpandTimer : TTimer;
+    FDropAcc   : boolean;
+    FInDragging: boolean;
+    FDDY       : integer;
+{$ifndef CLX_USED}
+{$IFDEF VCL_4_USED}
+    FDragImages: TImageList;
+{$ELSE}
+    FDragImages: TImageList;
+{$ENDIF}
+{$endif}
+    // Edit fields
+{$ifndef VER3_EDITORS}
+{$IFDEF ELTREE_USE_INPLACE_EDITORS}
+    FInpEdit   : TWinControl;
+    FEditing   : boolean;
+    FEditType  : TElFieldType;
+    FEditSect  : integer;
+    FEditTimer : TTimer;
+    FItemToEdit: TElTreeItem;
+{$ENDIF}
+{$else}
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+    FInpEdit   : TElTreeInplaceEditor;
+    FEditing   : boolean;
+    FEditType  : TElFieldType;
+    FEditSect  : integer;
+    FEditTimer : TTimer;
+    FItemToEdit: TElTreeItem;
+{$endif}
+{$endif}
+    FOldHide   : boolean;
+    FFakePopup : TPopupMenu;
+{$IFDEF HAS_HTML_RENDER}
+    FRender    : TElHTMLRender;
+{$ENDIF}
+{$IFNDEF LITE}
+    FTmpBmp   : TBitmap;
+{$ENDIF}
+    SearchText: string;
+    SearchTextTimeoutThread : TThread;
+
+    FScrollFirstClick: boolean;
+
+    FHasFocus : boolean;
+
+    procedure StartClearSearchTimeoutThread ;
+    procedure StopClearSearchTimeoutThread ;
+    procedure SearchTextTimeout (Sender : TObject) ;
+
+    function ProcessSearch(Key : Char): Boolean;
+    {$ifndef CLX_USED}
+    procedure WMSize(var Msg : TWMSize); message WM_SIZE;
+    {$else}
+    procedure Resize; override;
+    {$endif}
+
+{$IFNDEF LITE}
+    // Custom background routines
+    procedure RedoTmpBmp;
+{$ENDIF}
+
+    // Painting routines
+    procedure RedrawTree(ACanvas : TCanvas; RealLeftPos : integer; ItemsList : TElList);
+    procedure DrawImages(ACanvas : TCanvas; Item : TElTreeItem; HelperBitmap : TBitmap; var R : TRect; var ItemRect : TRect);
+    procedure DrawButtons(ACanvas : TCanvas; Item : TElTreeItem; IsNode : boolean; HelperBitmap : TBitmap; var R : TRect; var ItemRect : TRect);
+    procedure DrawCheckBoxes(ACanvas : TCanvas; Item : TElTreeItem; HelperBitmap : TBitmap; var R : TRect; var ItemRect : TRect);
+    procedure DrawItemLines(ACanvas : TCanvas; Item : TElTreeItem; var R : TRect; var ItemRect : TRect);
+    procedure DoRedrawItem(ACanvas : TCanvas; Item: TElTreeItem; ItemRect, SurfRect: TRect);
+    procedure DoRedrawItemTree(ACanvas : TCanvas; Item: TElTreeItem; ItemRect, SurfRect: TRect);
+    procedure Paint; override;
+    {$ifndef CLX_USED}
+    procedure WMPaint(var Msg : TWMPaint); message WM_PAINT;
+    {$endif}
+    procedure DoPaintBkgnd(DC : HDC; ClipRect : TRect);
+    procedure UpdateView;
+
+    // Hint routines
+    procedure TryStartHint(XPos, YPos : Integer);
+    procedure OnHintTimer(Sender: TObject);
+    procedure DoHideLineHint;
+    procedure DoShowLineHint(Item: TElTreeItem; Section : TElHeaderSection);
+    function  GetHintText(Item: TElTreeItem; var Section : TElHeaderSection) : TElFString;
+
+    // Dynamic height helper routines
+    function CalcPageUpPos(CurIdx : integer) : integer;
+    function CalcPageDownPos(CurIdx : integer) : integer;
+
+    // Windows Message handling
+    {$ifndef CLX_USED}
+    procedure WndProc(var Message: TMessage); override;
+    procedure WMGetDlgCode(var Message: TWMGetDlgCode); message WM_GETDLGCODE;
+    procedure WMEraseBkgnd(var Message: TWMEraseBkgnd); message WM_ERASEBKGND;
+    procedure WMMouseWheel(var Msg: TMessage); message WM_MOUSEWHEEL;
+    procedure WMMouseMove(var Message: TWMMouseMove); message WM_MOUSEMOVE;
+    procedure WMLButtonDown(var Message: TWMLButtonDown); message WM_LBUTTONDOWN;
+    procedure WMLButtonUp(var Message: TWMLButtonUp); message WM_LBUTTONUP;
+    procedure WMLButtonDblClk(var Message: TWMLButtonDblClk); message WM_LButtonDblClk;
+    procedure WMRButtonDblClk(var Msg: TWMRButtonDblClk); message WM_RBUTTONDBLCLK;
+    procedure WMRButtonDown(var Message: TWMRButtonDown); message WM_RBUTTONDOWN;
+    procedure WMRButtonUp(var Msg: TWMRButtonUp); message WM_RBUTTONUP;
+    procedure WMSetFocus(var Msg : TWMSetFocus); message WM_SETFOCUS;
+    procedure WMKillFocus(var Msg : TWMKillFocus); message WM_KILLFOCUS;
+    procedure WMWindowPosChanged(var Message: TWMWindowPosChanged); message WM_WINDOWPOSCHANGED;
+    {$else}
+    function WidgetFlags: Integer; override;
+    function EventFilter(Sender: QObjectH; Event: QEventH): Boolean; override;
+    {$endif}
+    procedure IntLButtonDown(X, Y : integer; Shift : TShiftState);
+    function IntLButtonUp(X, Y : integer; Shift : TShiftState): Boolean;
+    procedure IntRButtonDown(X, Y : integer; Shift : TShiftState);
+    function IntRButtonUp(X, Y : integer; Shift : TShiftState): Boolean;
+    function IntLButtonDblClick(X, Y : integer; Shift : TShiftState): Boolean;
+    function IntRButtonDblClick(X, Y : integer; Shift : TShiftState): Boolean;
+    procedure IntMouseMove(X, Y : integer; Shift : TShiftState);
+
+    // VCL notification handlers
+    {$ifndef CLX_USED}
+    procedure CMMouseWheel(var Msg : TMessage); message CM_MOUSEWHEEL;
+    procedure CMSysColorChange(var Msg: TMessage); message CM_SYSCOLORCHANGE;
+    procedure CMHintShow(var Msg : TMessage); message CM_HINTSHOW;
+    {$else}
+    function DoMouseWheel(Shift: TShiftState; WheelDelta: Integer;
+      const MousePos: TPoint): Boolean; override;
+    procedure PaletteChanged(Sender: TObject); override;
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    {$endif}
+
+    // Scrolling routines
+    procedure SetHPosition(value: integer);
+    procedure SetVPosition(value: integer);
+    procedure DoSetTopIndex(Value: integer);
+
+    procedure OnHScroll(Sender: TObject; ScrollCode: TElScrollCode; var ScrollPos: Integer; var DoChange : boolean);
+    procedure OnVScroll(Sender: TObject; ScrollCode: TElScrollCode; var ScrollPos: Integer; var DoChange : boolean);
+
+    // Painting helper routines
+    procedure FillVisFwd(StartIndex: integer);
+    procedure DefineHRange;
+    function GetVisCount: integer; virtual;
+    function GetVisiblesHeight : integer;
+
+    // editing routines
+
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+{$ifndef VER3_EDITORS}
+    function  DoEndEdit(ByCancel: boolean) : boolean; virtual;
+    procedure OnEditExit(Sender: TObject);
+    procedure DoEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    function  SetupEditControl(Item : TElTreeItem; Section : TElHeaderSection; FT : TElFieldType) : boolean; virtual;
+    function  SetupNumericEditControl(Item : TElTreeItem; Section : TElHeaderSection; Text : string; EditRect : TRect) : boolean; virtual;
+    function  SetupFloatEditControl(Item : TElTreeItem; Section : TElHeaderSection; Text : string; EditRect : TRect) : boolean; virtual;
+    function  SetupEnumEditControl(Item : TElTreeItem; Section : TElHeaderSection; Text : string; EditRect : TRect) : boolean; virtual;
+    function  SetupTextEditControl(Item : TElTreeItem; Section : TElHeaderSection; Text : string; EditRect : TRect) : boolean; virtual;
+    function  SetupDateTimeEditControl(Item : TElTreeItem; Section : TElHeaderSection; Text : string; EditRect : TRect) : boolean; virtual;
+    function  SetupDateEditControl(Item : TElTreeItem; Section : TElHeaderSection; Text : string; EditRect : TRect) : boolean; virtual;
+    function  SetupTimeEditControl(Item : TElTreeItem; Section : TElHeaderSection; Text : string; EditRect : TRect) : boolean; virtual;
+    function  SetupCustomEditControl(Item : TElTreeItem; Section : TElHeaderSection; Text : string; EditRect : TRect) : boolean; virtual;
+    function  SetupBoolEditControl(Item : TElTreeItem; Section : TElHeaderSection; Text : string; EditRect : TRect) : boolean; virtual;
+    function  SetupBlobEditControl(Item : TElTreeItem; Section : TElHeaderSection; Text : string; EditRect : TRect) : boolean; virtual;
+    function  SetupPictureEditControl(Item : TElTreeItem; Section : TElHeaderSection; Text : string; EditRect : TRect) : boolean; virtual;
+    function SetupCurrencyEditControl(Item : TElTreeItem; Section : TElHeaderSection; Text : string; EditRect : TRect): Boolean; virtual;
+
+    procedure ProcessEditResults(ByCancel : boolean); virtual;
+    procedure ProcessFloatEditResults(ByCancel : boolean); virtual;
+    procedure ProcessNumericEditResults(ByCancel : boolean); virtual;
+    procedure ProcessDateTimeEditResults(ByCancel : boolean); virtual;
+    procedure ProcessDateEditResults(ByCancel : boolean); virtual;
+    procedure ProcessTimeEditResults(ByCancel : boolean); virtual;
+    procedure ProcessEnumEditResults(ByCancel : boolean); virtual;
+    procedure ProcessBoolEditResults(ByCancel : boolean); virtual;
+    procedure ProcessTextEditResults(ByCancel : boolean); virtual;
+    procedure ProcessBlobEditResults(ByCancel : boolean); virtual;
+    procedure ProcessPictureEditResults(ByCancel : boolean); virtual;
+    procedure ProcessCustomEditResults(ByCancel : boolean); virtual;
+    procedure ProcessCurrencyEditResults(ByCancel : boolean); virtual;
+
+    procedure DoEditItem(Item: TElTreeItem; SectionNum: integer); virtual;
+    procedure OnEditTimer(Sender : TObject);
+{$else}
+    procedure OnEditTimer(Sender : TObject);
+    procedure DoEditItem(Item: TElTreeItem; SectionNum: integer); virtual;
+    procedure DoEndEdit(ByCancel: boolean); virtual;
+    procedure EditOperationCancelled; virtual;
+    procedure EditOperationAccepted; virtual;
+{$endif}
+{$endif}
+    // drag'n'drop routines
+    {$ifndef CLX_USED}
+    procedure FillDragImage;
+    {$endif}
+    procedure DoStartDrag(var DragObject: TDragObject); override;
+    procedure DoDragOver(Source: TDragObject; X, Y: Integer; CanDrop: Boolean); virtual;
+    procedure DoEndDrag(Target: TObject; X, Y: Integer); override;
+    {$ifndef CLX_USED}
+    procedure CMDrag(var Message: TCMDrag); message CM_DRAG;
+    {$else}
+    procedure DragOver(Source: TObject; X, Y: Integer; State: TDragState;
+      var Accept: Boolean); override;
+    {$endif}
+    function DragScroll(Source: TDragObject; X, Y: integer): boolean; virtual;
+    procedure OnScrollTimer(Sender : TObject);
+    procedure OnDragExpandTimer(Sender : TObject);
+
+{$ifndef CLX_USED}
+{$IFDEF VCL_4_USED}
+    function GetDragImages: TDragImageList; override;
+{$ELSE}
+    function GetDragImages: TCustomImageList; override;
+{$ENDIF}
+{$endif}
+{$ifdef ELTREE_USE_OLE_DRAGDROP}
+{$IFNDEF VER90}
+{$IFNDEF LITE}
+    procedure OnDropTargetDrag(Sender: TObject; State: TDragState; Source: TOleDragObject; Shift: TShiftState; X: Integer; Y: Integer; var DragType: TDragType);
+    procedure OnDropTargetDrop(Sender: TObject; Source: TOleDragObject; Shift: TShiftState; X: Integer; Y: Integer; var DragType: TDragType);
+{$ENDIF}
+{$ENDIF}
+{$endif}
+    // coords routines
+    function GetItemRect(ItemIndex: integer): TRect; virtual;
+    function GetItemAtY(Y: integer): TElTreeItem; virtual;
+    function GetItemAt(X, Y: Integer; var ItemPart: TSTItemPart; var HitColumn: integer): TElTreeItem; virtual;
+
+    // user input routines
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+    {$ifndef CLX_USED}
+    procedure CMMouseLeave(var Message: TMessage); message CM_MouseLeave;
+    {$else}
+    procedure MouseLeave(Control : TControl); override;
+    {$endif}
+    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    procedure KeyPress(var Key: Char); override;
+
+    procedure ProcessPassedClick;
+    procedure FitMostChildren(Item : TElTreeItem);
+
+    procedure DoEnter; override;
+    procedure DoExit; override;
+
+    // selection routines
+    procedure DoSetSelected(value: TElTreeItem);
+    function GetVisCount2: Integer; virtual;
+    function FindNewFocused(Key : word; PVal1 : PInteger; var Sel : boolean): TElTreeItem; virtual;
+    procedure DrawMouseSelectFrame;
+    procedure AllocateMouseSelectFrame;
+    procedure DeallocateMouseSelectFrame;
+    procedure SelectMouseSelectItems;
+    {$ifndef CLX_USED}
+    procedure WMCancelMode(var Message: TMessage); message WM_CANCELMODE;
+    {$endif}
+    procedure CancelMouseSel;
+    {$ifndef CLX_USED}
+    {$ifdef ELPACK_COMPLETE}
+    procedure IFMRepaintChildren(var Message: TMessage); message
+        IFM_REPAINTCHILDREN;
+    {$endif}
+    procedure CMDeactivate(var Message: TMessage); message CM_DEACTIVATE;
+    {$endif}
+    procedure InitiateEditOp(Item : TElTreeItem; HCol : integer; Immediate : 
+        boolean); virtual;
+  public
+    constructor Create(Owner : TComponent); override;
+    destructor Destroy; override;
+    procedure SetFocus; override;
+
+    property Owner : TCustomElTree read FOwner;
+  end;
+
+  TCustomElTree = class(TElXPThemedControl)
+  protected
+    {$ifdef ELTREE_USE_INPLACE_EDITORS}
+    {$ifdef VER3_EDITORS}
+    FEditorManager: TElTreeInplaceManager;
+    {$endif}
+    {$endif}
+    FStripedOddColor: TColor;
+    FStripedEvenColor: TColor;
+    FStripedItems: Boolean;
+    {$ifdef ELTREE_USE_STYLES}
+    FOnVirtualStyleNeeded: TVirtualStyleNeededEvent;
+    {$endif}
+    FSortSections        : TElList;
+    FOnVirtualTextNeeded : TVirtualTextNeededEvent;
+    FVirtualityLevel     : TVirtualityLevel;
+    FOnVirtualHintNeeded : TVirtualHintNeededEvent;
+    FOnVirtualValueNeeded: TVirtualValueNeededEvent;
+    FLineHintType        : TLineHintType;
+    FLineHintTimeout     : Integer;
+    FFireFocusEvents     : integer;
+    FTransButtons        : boolean;
+    FTransCheckBoxes     : boolean;
+    FTrackColor          : TColor;
+    FExpandOnDragOver    : Boolean;
+    FForcedScrollBars    : TScrollStyle;
+    FMoveFocusOnCollapse : Boolean;
+    FHeaderHeight        : integer;
+    FOnVertScrollHintNeeded : TElScrollHintNeededEvent;
+    FOnHorzScrollDrawPart   : TElScrollDrawPartEvent;
+    FOnHorzScrollHintNeeded : TElScrollHintNeededEvent;
+    FOnVertScrollDrawPart   : TElScrollDrawPartEvent;
+    FOnVertScrollHitTest    : TElScrollHitTestEvent;
+    FOnChanging             : TElTreeChangingEvent;
+
+{$IFDEF VCL_4_USED}
+{$ifndef CLX_USED}
+    FBevelKindDummy : TBevelKind;
+{$endif}
+{$ENDIF}
+    FHintType : TElHintType;
+    FOnClick : TNotifyEvent;
+    FOnDblClick : TNotifyEvent;
+    //FOnEndDrag : TDragDropEvent;
+    FOnDrop : TDragDropEvent;
+    FOnOver : TDragOverEvent;
+    FOnDrag : TEndDragEvent;
+    FOnEnter : TNotifyEvent;
+    FOnExit : TNotifyEvent;
+    FOnKeyDown : TKeyEvent;
+    FOnKeyPress : TKeyPressEvent;
+    FOnKeyUp : TKeyEvent;
+    FOnMouseDown : TMouseEvent;
+    FOnMouseMove : TMouseMoveEvent;
+    FOnMouseUp : TMouseEvent;
+    FOnStartDrag : TStartDragEvent;
+    FOnItemPreDraw: TOnItemExpandEvent;
+    FOnDragTargetChange: TElTreeItemDragTargetEvent;
+
+{$IFNDEF LITE}
+    FGradientStartColor : TColor;
+    FGradientEndColor : TColor;
+    FGradientSteps : Integer;
+{$ENDIF LITE}
+    FActiveBorderType : TElFlatBorderType;
+    FInactiveBorderType : TElFlatBorderType;
+    FRowHotTrack : Boolean;
+    FFocusedSelectColor: TColor;
+    FHideSelectColor: TColor;
+    FFocusedSelectTextColor: TColor;
+    FHideSelectTextColor: TColor;
+{$IFNDEF LITE}
+    FNoBlendSelected : Boolean;
+    FScrollBackground : Boolean;
+    FBackground : TBitmap;
+    FBackgroundType : TElBkGndType;
+    FAdjustMultilineHeight : Boolean;
+{$ENDIF}
+    FFlatFocusedScrollbars : Boolean;
+    FAutoResizeColumns : Boolean;
+    FHideFocusRect: Boolean;
+    FShowEmptyImages : Boolean;
+    FShowEmptyImages2: Boolean;
+    FShowRootButtons : Boolean;
+    FUnderlineTracked: Boolean;
+    FCustomCheckboxes: Boolean;
+    FCheckBoxGlyph: TBitmap;
+    FRadioButtonGlyph: TBitmap;
+
+    FFilteredVisibility: Boolean;
+    FOnApplyVisFilter: TApplyVisFilterEvent;
+    FRightAlignedText: Boolean;
+    FFlat: Boolean;
+    FRightAlignedTree: Boolean;
+    FPathSeparator: Char;
+    FLinesStyle: TPenStyle;
+    FLinesColor: TColor;
+    FDeselectChildrenOnCollapse: Boolean;
+    FDrawFocusRect: Boolean;
+    FBarStyle: Boolean;
+    FAlwaysKeepFocus : boolean;
+    FAlwaysKeepSelection: Boolean;
+    FFullRowSelect: Boolean;
+    FDragType  : TElDragType;
+    FMouseOver : boolean;
+{$ifdef ELTREE_USE_OLE_DRAGDROP}
+{$IFNDEF VER90}
+{$IFNDEF LITE}
+    FDropTarget: TElDropTarget;
+{$ENDIF}
+{$ENDIF}
+{$endif}
+
+    FDragObject : TDragObject;
+    FAutoLookup: Boolean;
+    FSelectColumn: Integer;
+    FAutoExpand: Boolean;
+    FLeafPicture,
+    FPlusPicture,
+    FMinusPicture: TBitmap;
+    FCustomPlusMinus: Boolean;
+    FShowHeader,
+    FShowCheckboxes: Boolean;
+
+{$IFDEF ELPACK_COMPLETE}
+    FImgForm : TElImageForm;
+    FImgFormChLink : TImgFormChangeLink;
+    FStorage: TElIniFile;
+    FStoragePath: string;
+{$ENDIF}
+    FDragImageMode: TDragImgMode;
+    FHideHorzScrollBar: Boolean;
+    FHideVertScrollBar: Boolean;
+    FExpandOnDblClick: Boolean;
+    FHideHintOnMove: Boolean;
+    FSortSection: Integer;
+    FSortMode: TSortModes;
+    FSortType: TSortTypes;
+    FDragAllowed: Boolean;
+    FBkColor  : TColor;
+    FTextColor: TColor;
+    FShowButtons: boolean;
+    FShowLines: boolean;
+    FShowImages: boolean;
+    FShowRoot: boolean;
+    FLineHintColor: TColor;
+    FShowHintMode: THintModes;
+    // BMP: TBitmap;
+    FBorderStyle: TBorderStyle;
+
+    FCanEdit: boolean;
+
+    FIgnoreSBChange : boolean;
+    FScrollbarsInitialized : boolean;
+
+    FSortRequired,
+    FProcUpdate, // already in SetIsUpdating
+    FUpdated : boolean;
+    FInSorting : integer;
+    FBSVLines,
+    FHLines,
+      FVLines: boolean;
+
+    FAllList,
+      FSelectedList : TElList;
+
+    FScrollTracking,
+      FTracking: boolean;
+    FHeaderHotTrack: boolean;
+    FODFollowCol: boolean;
+    FODMask: TElFString;
+
+    FImages: TImageList;
+    FImages2: TImageList;
+
+    FImageChangeLink: TChangeLink;
+
+    FTopIndex,
+      FBottomIndex: integer; // visible items
+    FChStateImage: boolean;
+    FRealHint, 
+    FHint       : TElFString;
+    FMainTreeCol: integer;
+    FMultiSelect: boolean;
+    FMultiSelectLevel: Integer; // CNS: -1 any, 0,1,2... limit multiseletion to this level
+    FRowSelect  : boolean;
+    FHideSelect : boolean;
+    FLineHeight : integer;
+    FAutoLineHeight: boolean;
+    ItemExt        : integer;  
+    FUseCustomBars : boolean;
+
+    FTreeIsFocused : boolean;
+
+    FHPos: integer;
+    FVScrollVisible,
+    FHScrollVisible: boolean;
+    FSelMode: TSTSelModes;
+    FSortDir: TSortDirs;
+
+    FSelChange: boolean;
+    FColSizeUpdate,
+    FUpdating : // UpdateCount > 0
+                 boolean;
+    FUpdateCount: integer;
+
+    FHintHide: boolean;
+    FUseSystemHintColors : boolean;
+    IgnoreResize: boolean;
+    FCurBkColor: TColor;
+    FCurTextColor: TColor;
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+    FDelOnEdit: boolean;
+{$endif}
+    FAutoSizingColumns: boolean;
+    FItems: TElTreeItems;
+
+    FOnColumnResize: TColumnNotifyEvent;
+    FOnColumnClick: TColumnNotifyEvent;
+    FOnColumnDraw: TElSectionRedrawEvent;
+{$IFNDEF VCL_4_USED}
+    FOnResize: TNotifyEvent;
+{$ENDIF}
+    FOnItemChange: TOnItemChangeEvent;
+    FOnItemDraw: TOnItemDrawEvent;
+    FOnItemChecked : TOnItemCheckedEvent;
+    FOnItemExpand: TOnItemExpandEvent;
+    FOnItemCollapse: TOnItemExpandEvent;
+    FOnItemExpanding: TOnItemExpanding;
+    FOnItemCollapsing: TOnItemExpanding;
+    FOnItemDelete: TOnItemExpandEvent;
+    FOnItemFocused: TNotifyEvent;
+    FOnItemPostDraw : TElTreeItemPostDrawEvent;
+    FOnShowHint: TOnShowHintEvent;
+    FOnCompareItems: TOnCompareItems;
+    FOnItemPicDraw: TOnPicDrawEvent;
+    FOnItemPicDraw2: TOnPicDrawEvent;
+    FOnHotTrack: THotTrackEvent;
+
+{$ifndef VER3_EDITORS}
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+    FOnComboEditShow: TComboEditShowEvent;
+    FOnTuneUpInplaceEdit : TTuneUpInplaceEditEvent;
+    FOnEditRequest: TEditRequestEvent;
+    FOnValidateCombo: TValidateComboEvent;
+    FOnValidate: TOnValidateEvent;
+{$endif}
+{$endif}
+
+    FOnScroll: TElScrollEvent;
+    FOnItemSave: TItemSaveEvent;
+    FOnItemLoad: TItemSaveEvent;
+    FOnTryEdit: TTryEditEvent;
+    FOnHeaderColumnMove: TElColumnMoveEvent;
+    FOnSave: TCellStyleSaveEvent;
+    FOnLoad: TCellStyleSaveEvent;
+    FOnItemSelectedChange: TItemSelChangeEvent;
+    FOnHeaderLookup: TElHeaderLookupEvent;
+    FOnHeaderLookupDone: TElHeaderLookupDoneEvent;
+    FOnHeaderResize: TNotifyEvent;
+    FOnHeaderSectionExpand: THeaderSectionEvent;
+    FOnHeaderSectionCollapse: THeaderSectionEvent;
+    FOnHeaderSectionMeasure : TMeasureSectionEvent;
+    FOnSectionAutoSize : TColumnNotifyEvent;
+    FOnSectionFilterCall : TColumnNotifyEvent;
+    FOnMeasureItemPart   : TMeasureItemPartEvent;
+    FOnSortBegin,
+    FOnSortEnd           : TNotifyEvent;
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+    FOnEditKeyDown       : TKeyEvent;
+{$endif}
+
+{$ifdef ELTREE_USE_OLE_DRAGDROP}
+{$IFNDEF VER90}
+{$IFNDEF LITE}
+    FOnOleDragFinish: TOleDragFinishEvent;
+    FOnOleDragStart: TOleDragStartEvent;
+    FOnOleTargetDrag: TTargetDragEvent;
+    FOnOleTargetDrop: TTargetDropEvent;
+{$ENDIF}
+{$ENDIF}
+{$endif}
+
+    TotalHiddenCount,
+    TotalVisCount: integer;
+    TotalVarHeightCount : integer;
+
+    FView  : TElTreeView;
+    FHeader: TElHeader;
+    FHScrollBar : TElScrollBar;
+    FVScrollBar : TElScrollBar;
+    FHorzScrollBarStyle,
+    FVertScrollBarStyle : TElScrollBarStyles;
+    FFakeBool : boolean;
+    SavedHH   : integer;
+    FDelayTimer: TTimer;
+
+    FDelayedItem: TElTreeItem;
+    FDragExpandDelay,
+    FChangeDelay: Integer;
+    FDragTrgDrawMode: TDragTargetDraw;
+
+    FOnHeaderMouseDown: TMouseEvent;
+    FOnAfterSelectionChange: TNotifyEvent;
+    FDragRectAcceptColor: TColor;
+    FDragRectDenyColor: TColor;
+    FIncrementalSearch: Boolean;
+    FRightClickSelect: Boolean;
+    FScrollbarOpposite: Boolean;
+    FVerticalLinesLong: Boolean;
+    FBorderSides: TElBorderSides;
+    {$ifdef ELTREE_USE_INPLACE_EDITORS}
+    {$ifdef VER3_EDITORS}
+    FOnInplaceEditorNeeded: TInplaceEditorNeededEvent;
+    {$endif}
+    {$endif}
+
+{$IFDEF HAS_HTML_RENDER}
+    FOnImageNeeded : TElHTMLImageNeededEvent;
+{$ENDIF}
+
+    FQuickEditMode: Boolean;
+    FMainTextType: TElFieldType;
+    FOnHorzScrollHitTest: TElScrollHitTestEvent;
+    FMouseFrameSelect : Boolean;
+    FVertDivLinesColor: TColor;
+    FHorzDivLinesColor: TColor;
+    FDragScrollInterval: Integer;
+    FShowLeafButton: Boolean;
+    FExplorerEditMode: Boolean;
+    FCheckBoxSize: Integer;
+    FIgnoreEnabled: Boolean;
+    FInplaceEditorDelay: Integer;
+    FHeaderFont: TFont;
+    FHeaderUseTreeFont: Boolean;
+    FKeepSelectionWithinLevel: Boolean;
+    FAutoCollapse: Boolean;
+    FIgnoreResizes: Boolean;
+    FSortUseCase: Boolean;
+    FLineBorderActiveColor: TColor;
+    FLineBorderInactiveColor: TColor;
+    FDblClickMode: TElDblClickMode;
+    FDoubleBuffered: Boolean;
+    {$ifndef CLX_USED}
+    InSizeMove : boolean;
+    FHook : TElHook;
+    {$endif}
+    procedure SetStripedOddColor(Value: TColor);
+    procedure SetStripedEvenColor(Value: TColor);
+    procedure SetStripedItems(Value: Boolean);
+{$IFDEF HAS_HTML_RENDER}
+    procedure TriggerImageNeededEvent(Sender : TObject; Src : TElFString; var Image : TBitmap); virtual;
+{$ENDIF}
+    {$ifndef CLX_USED}
+    procedure OnBeforeHook(Sender : TObject; var Message : TMessage; var Handled : boolean);
+    procedure SetParent(AParent: TWinControl); override;
+    {$endif}
+    procedure SetVirtualityLevel(Value: TVirtualityLevel);
+    procedure SetBorderSides(Value: TElBorderSides);
+    function GetDefaultSectionWidth: Integer;
+    procedure SetDefaultSectionWidth(Value: Integer);
+    procedure OnHeaderSectionResize(Header: TCustomElHeader; Section: TElHeaderSection);
+    procedure OnHeaderSectionClick(Header: TCustomElHeader; Section: TElHeaderSection);
+    procedure OnHeaderSectionDelete(Header: TCustomElHeader; Section: TElHeaderSection);
+    procedure DoHeaderMouseDown(Sender: TObject; Button: TMouseButton; Shift:
+        TShiftState; X, Y: Integer);
+    procedure OnHeaderSectionLookup(Sender: TObject; Section: TElHeaderSection; var Text: string);
+    procedure OnHeaderSectionLookupDone(Sender: TObject; Section: TElHeaderSection; Text: string; Accepted: boolean);
+    procedure OnHeaderExpand(Sender: TCustomElHeader; Section: TElHeaderSection);
+    procedure OnHeaderCollapse(Sender: TCustomElHeader; Section: TElHeaderSection);
+    procedure OnHeaderSectionVisChange(Sender: TCustomElHeader; Section: TElHeaderSection);
+    procedure HeaderSectionAutoSizeHandler(Sender : TCustomElHeader; Section : TElHeaderSection);  { TElHeaderSectionEvent }
+    procedure SectionAutoSizeTransfer(Sender : TCustomElHeader; Section : TElHeaderSection);  { TElHeaderSectionEvent }
+    procedure SectionFilterCallTransfer(Sender : TCustomElHeader; Section : TElHeaderSection);  { TElHeaderSectionEvent }
+
+    procedure DoHeaderResize(Sender: TObject);
+    procedure OnFontChange(Sender: TObject); virtual;
+    procedure OnSignChange(Sender: TObject);
+    procedure ImageListChange(Sender: TObject);
+
+    function GetDropTarget: TElTreeItem;
+
+    procedure SetTextColor(value: TColor);
+    procedure SetBkColor(value: TColor);
+{$IFNDEF LITE}
+    function  GetHeaderWrapCaptions : boolean;
+    procedure SetHeaderWrapCaptions(Value : boolean);
+{$ENDIF}
+    procedure SetHeaderHotTrack(value: boolean);
+    procedure SetHeaderHeight(value: integer);
+    procedure SetShowEmptyImages(newValue : boolean);
+    procedure SetShowEmptyImages2(newValue : boolean);
+    procedure SetImages(Value: TImageList);
+    procedure SetImages2(newValue: TImageList);
+    procedure SetLineHintTimeout(Value: Integer);
+
+    procedure SetLineStyle(Value: Boolean);
+    procedure SetRootStyle(Value: Boolean);
+    procedure SetImagesStyle(Value: Boolean);
+    {$ifndef CLX_USED}
+    procedure SetBorderStyle(Value: TBorderStyle);
+    {$endif}
+    procedure SetButtonStyle(Value: Boolean);
+    procedure SetUpdating(value: boolean);
+    function  GetUpdating : boolean;
+    procedure SetHLines(value: boolean);
+    procedure SetVLines(value: boolean);
+    procedure SetBSVLines(value: boolean);
+    procedure SetRowSelect(value: boolean);
+    procedure SetMultiSelectLevel(Value : integer);
+    procedure SetMultiSelect(value: boolean);
+    procedure SetFocused(value: TElTreeItem);
+    procedure SetHideSelect(value: boolean);
+    procedure SetAutoExpand(value: boolean);
+    procedure SetMoveFocusOnCollapse(value: boolean);
+    function GetHeaderSections: TElHeaderSections;
+    procedure SetHeaderSections(value: TElHeaderSections);
+    procedure SetChStateImage(value: boolean);
+    procedure SetUseStdBars(value : boolean);
+
+    procedure SetItemIndent(value: integer);
+    procedure SetLineHeight(value: integer);
+    procedure SetAutoLineHeight(value: boolean);
+    function GetHeaderHeight: integer;
+    procedure SetMainTreeCol(value: integer);
+    procedure SetItems(value: TElTreeItems);
+    function GetTotalVisCount: integer;
+    function GetDraggableSections: Boolean;
+    procedure SetDraggableSections(newValue: Boolean);
+    procedure SetSortMode(newValue: TSortModes);
+    procedure SetSortSection(newValue: Integer);
+
+    function GetMoveColumnOnDrag: Boolean;
+    procedure SetMoveColumnOnDrag(newValue: Boolean);
+    procedure SetHideHorzScrollBar(newValue: Boolean);
+    procedure SetHideVertScrollBar(newValue: Boolean);
+    function GetHeaderImages: TImageList;
+    procedure SetHeaderImages(newValue: TImageList);
+
+    function GetFireFocusEvents: boolean;
+    procedure SetFireFocusEvents(Value: boolean);
+
+    procedure SetScrollbarOpposite(Value: Boolean);
+    procedure SetVerticalLinesLong(Value: Boolean);
+
+    function GetSelCount: integer;
+    function GetSelected: TElTreeItem;
+    function GetFocused : TElTreeItem;
+    procedure SetSelected(newValue: TElTreeItem);
+{$ifdef SUPPORT_STORAGE}
+    procedure SetStorage(newValue: TElIniFile);
+{$endif}
+{$ifndef CLX_USED}
+{$IFDEF ELPACK_COMPLETE}
+    procedure SetImageForm(newValue : TElImageForm);
+    procedure ImageFormChange(Sender: TObject);
+    procedure SetHeaderImageForm(newValue : TElImageForm);
+    function GetHeaderImageForm : TElImageForm;
+{$ENDIF}
+{$endif}
+    procedure SetShowCheckboxes(newValue: Boolean);
+    procedure SetPlusPicture(newValue: TBitmap);
+    procedure SetMinusPicture(newValue: TBitmap);
+    procedure SetCustomPlusMinus(newValue: Boolean);
+    procedure SetSelectColumn(newValue: Integer);
+    procedure SetDragType(newValue: TElDragType);
+
+    procedure HeaderResizeTransfer(Sender: TObject);
+    procedure HeaderResizeHandler(Sender: TObject);
+
+    function GetStickyHeaderSections: Boolean;
+    procedure SetStickyHeaderSections(newValue: Boolean);
+    procedure SetBarStyle(newValue: Boolean);
+    procedure SetDrawFocusRect(newValue: Boolean);
+    procedure SetLinesColor(newValue: TColor);
+    procedure SetHorzDivLinesColor(newValue: TColor);
+    procedure SetLinesStyle(newValue: TPenStyle);
+    procedure SetRightAlignedTree(newValue: Boolean);
+    procedure SetFlat(newValue: Boolean);
+    procedure SetRightAlignedText(newValue: Boolean);
+    procedure SetFilteredVisibility(newValue: Boolean);
+    procedure SetUnderlineTracked(newValue: Boolean);
+    procedure SetCustomCheckboxes(newValue: Boolean);
+    procedure SetCheckBoxGlyph(newValue: TBitmap);
+    procedure SetRadioButtonGlyph(newValue: TBitmap);
+    procedure SetShowRootButtons(newValue: Boolean);
+    procedure SetHideFocusRect(newValue: Boolean);
+    function GetLockHeaderHeight: Boolean;
+    procedure SetLockHeaderHeight(newValue: Boolean);
+    procedure SetTransButtons(newValue : boolean);
+
+    {$ifndef CLX_USED}
+    procedure UpdateFrame;
+    {$endif}
+{$ifndef VER3_EDITORS}
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+    function GetInEditing : boolean;
+{$endif}
+{$endif}
+    procedure SetHeaderActiveFilterColor(newValue : TColor);
+    function GetHeaderActiveFilterColor : TColor;
+    procedure SetHeaderFilterColor(newValue : TColor);
+    function GetHeaderFilterColor : TColor;
+    procedure SetHeaderFlat(newValue : Boolean);
+    function GetHeaderFlat : Boolean;
+
+    {$ifdef MSWINDOWS}
+    procedure DrawFlatBorder(HorzTracking, VertTracking : boolean);
+    procedure DrawFlatBorderEx(DC : Windows.HDC; HorzTracking, VertTracking : boolean);
+    {$endif}
+
+{$ifdef HAS_HTML_RENDER}
+    procedure ReRenderAllHTMLItems;
+{$endif}
+    procedure SetFlatFocusedScrollbars(newValue : Boolean);
+{$IFNDEF LITE}
+    procedure SetBackground(newValue : TBitmap);
+    procedure SetBackgroundType(newValue : TElBkGndType);
+    procedure BackgroundChange(Sender : TObject);
+{$ENDIF}
+    {$ifndef CLX_USED}
+    procedure WMNCHITTEST(var Msg : TMessage); message WM_NCHITTEST;
+    procedure WMVScroll(var Msg : TWMVScroll); message WM_VSCROLL;
+    procedure WMHScroll(var Msg : TWMHScroll); message WM_HSCROLL;
+    procedure WMEnable(var Msg : TMessage); message WM_ENABLE;
+    procedure WMEraseBkgnd(var Message: TWMEraseBkgnd); message WM_ERASEBKGND;
+    procedure WMSetFocus(var Msg : TWMSetFocus); message WM_SETFOCUS;
+    procedure WMKillFocus(var Msg : TWMKillFocus); message WM_KILLFOCUS;
+    procedure WMNCPaint(var Msg: TMessage); message WM_NCPAINT;
+    procedure WMSize(var Message: TWMSize); message WM_SIZE;
+    procedure WMNCCalcSize(var Message : TWMNCCalcSize); message WM_NCCALCSIZE;
+    procedure CMMouseEnter( var Msg: TMessage ); message CM_MouseEnter;
+    procedure CMMouseLeave(var Message: TMessage); message CM_MouseLeave;
+    procedure WMMouseMove(var Message: TWMMouseMove); message WM_MOUSEMOVE;
+    procedure CMEnabledChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
+    procedure WMSysColorChange(var Msg: TMessage); message WM_SYSCOLORCHANGE;
+
+    {$ifdef ELPACK_COMPLETE}
+    procedure IFMRepaintChildren(var Message: TMessage); message
+        IFM_REPAINTCHILDREN;
+    {$endif}
+    procedure WMWindowPosChanged(var Message: TWMWindowPosChanged); message
+        WM_WINDOWPOSCHANGED;
+    {$ifdef ELPACK_COMPLETE}
+    procedure IFMCanPaintBkgnd(var Message: TMessage); message IFM_CANPAINTBKGND;
+    {$endif}
+    {$else}
+    procedure EnabledChanged; override;
+    {$endif}
+
+    procedure SetHideSelectColor(newValue: TColor);
+    procedure SetFocusedSelectColor(newValue: TColor);
+
+    procedure SetHideSelectTextColor(newValue: TColor);
+    procedure SetFocusedSelectTextColor(newValue: TColor);
+
+    procedure SetRowHotTrack(newValue : Boolean);
+    procedure SetActiveBorderType(newValue : TElFlatBorderType);
+    procedure SetInactiveBorderType(newValue : TElFlatBorderType);
+{$IFNDEF LITE}
+    procedure SetGradientStartColor(newValue : TColor);
+    procedure SetGradientEndColor(newValue : TColor);
+    procedure SetGradientSteps(newValue : Integer);
+{$ENDIF LITE}
+    procedure SetHPosition(value: integer);
+    procedure SetVPosition(value: integer);
+
+    procedure ClickTransfer(Sender : TObject);  virtual;
+    procedure DblClickTransfer(Sender : TObject); virtual;
+    procedure DropTransfer(Sender : TObject; Source : TObject; X : Integer; Y : Integer);  virtual;
+    //procedure EndDragTransfer(Sender : TObject; Source : TObject; X : Integer; Y : Integer);
+    procedure OverTransfer(Sender : TObject; Source : TObject; X : Integer; Y : Integer; State : TDragState; var Accept : Boolean); virtual;
+    procedure DragTransfer(Sender : TObject; Target : TObject; X : Integer; Y : Integer); virtual;
+    procedure EnterTransfer(Sender : TObject); virtual;
+    procedure ExitTransfer(Sender : TObject); virtual;
+    procedure KeyDownTransfer(Sender : TObject; var Key : Word; Shift : TShiftState); virtual;
+    procedure KeyPressTransfer(Sender : TObject; var Key : Char); virtual;
+    procedure KeyUpTransfer(Sender : TObject; var Key : Word; Shift : TShiftState); virtual;
+    procedure MouseDownTransfer(Sender : TObject; Button : TMouseButton; Shift : TShiftState; X : Integer; Y : Integer); virtual;
+    procedure MouseMoveTransfer(Sender : TObject; Shift : TShiftState; X : Integer; Y : Integer); virtual;
+    procedure MouseUpTransfer(Sender : TObject; Button : TMouseButton; Shift : TShiftState; X : Integer; Y : Integer); virtual;
+    procedure StartDragTransfer(Sender : TObject; var DragObject : TDragObject); virtual;
+    procedure MeasureSectionTransfer(Sender : TObject; Section : TElHeaderSection; var Size: TPoint); virtual;
+    procedure SetCursor(newValue : TCursor);
+    function  GetCursor : TCursor;
+    {$ifndef CLX_USED}
+    function  SetScrollInfo(hWnd: HWND; BarFlag: Integer; const ScrollInfo: TScrollInfo; Redraw: BOOL): Integer;
+    function  GetScrollInfo(hWnd: HWND; BarFlag: Integer; var ScrollInfo: TScrollInfo): BOOL;
+    {$else}
+    function  SetScrollInfo(Wnd: TCustomElScrollBar; BarFlag: Integer; const ScrollInfo: TScrollInfo; Redraw: boolean): Integer;
+    function  GetScrollInfo(Wnd: TCustomElScrollBar; BarFlag: Integer; var ScrollInfo: TScrollInfo): boolean;
+    {$endif}
+    procedure SetHorzScrollBarStyle(newValue : TElScrollBarStyles);
+    procedure SetVertScrollBarStyle(newValue : TElScrollBarStyles);
+    procedure HorzScrollDrawPartTransfer(Sender : TObject; Canvas : TCanvas; R : TRect; Part : TElScrollBarPart; Enabled : Boolean; Focused : Boolean; Pressed : Boolean; var DefaultDraw : Boolean);  { TElScrollDrawPartEvent }
+    procedure HorzScrollHintNeededTransfer(Sender : TObject; TrackPosition : Integer; var Hint : TElFString);  { TElScrollHintNeededEvent }
+    procedure VertScrollDrawPartTransfer(Sender : TObject; Canvas : TCanvas; R : TRect; Part : TElScrollBarPart; Enabled : Boolean; Focused : Boolean; Pressed : Boolean; var DefaultDraw : Boolean);  { TElScrollDrawPartEvent }
+    procedure VertScrollHintNeededHandler(Sender : TObject; TrackPosition : Integer; var Hint  : TElFString);  { TElScrollHintNeededEvent }
+    procedure VertScrollHintNeededTransfer(Sender : TObject; TrackPosition : Integer; var Hint : TElFString);  { TElScrollHintNeededEvent }
+    function GetHeaderInvertSortArrows : Boolean;
+    procedure SetHeaderInvertSortArrows(newValue : Boolean);
+    // procedure OnFontChanged(Sender: TObject); virtual;
+    procedure SBChanged(Sender: TObject);
+    procedure ScrollBarMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure SetForcedScrollBars(newValue : TScrollStyle);
+    {$ifndef CLX_USED}
+    function GetDragCursor : TCursor;
+    procedure SetDragCursor(Value : TCursor);
+    {$endif}
+    procedure SetTrackColor(value : TColor);
+{$IFNDEF LITE}
+    procedure SetNoBlendSelected(newValue : Boolean);
+    function GetLockedHeaderSection : TElHeaderSection;
+    procedure SetLockedHeaderSection(newValue : TElHeaderSection);
+    procedure SetAdjustMultilineHeight(newValue : Boolean); virtual;
+{$ENDIF LITE}
+{$IFDEF VCL_4_USED}
+    procedure ActionChange(Sender : TObject; CheckDefaults : Boolean); override;
+{$ENDIF}
+    procedure AlignControls(AControl: TControl; var Rect: TRect); override;
+    procedure AlignPieces;
+    function GetRoot: TElTreeItem; virtual;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    function  CompareItems(Item1, Item2: TElTreeItem; SM : TElSSortMode; ST : TSortTypes; FSortSection : integer): integer; virtual;
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+    procedure SetCanEdit(value: boolean); virtual;
+{$endif}
+    procedure SetShowHeader(value: boolean); virtual;
+    {$ifndef CLX_USED}
+    procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
+    procedure CMColorChanged(var Message: TMessage); message CM_COLORCHANGED;
+    procedure CMCtl3DChanged(var Message: TMessage); message CM_CTL3DCHANGED;
+    {$else}
+    procedure FontChanged; override;
+    procedure ColorChanged; override;
+    {$endif}
+{$IFDEF VCL_4_USED}
+    procedure Resize; override;
+{$ELSE}
+    procedure Resize; dynamic;
+{$ENDIF}
+    function  DoGetPicture(Item: TElTreeItem): integer; virtual;
+    function  DoGetPicture2(Item: TElTreeItem): integer; virtual;
+    function  DefineLineHeight: integer; virtual;
+    procedure UpdateScrollBars; virtual;
+    {$ifndef CLX_USED}
+    procedure CreateParams(var Params: TCreateParams); override;
+    {$endif}
+    function  CreateItems: TElTreeItems; virtual;
+    function  CreateItemsExt(ItemClass : TElTreeItemClass) : TElTreeItems; virtual;
+    function  CreateHeader: TElHeader; virtual;
+    function DoSetFocused(value: TElTreeItem; Forced : boolean): Boolean;
+    function DoSetFocusedEx(value: TElTreeItem; Forced, Delayed : boolean): Boolean;
+    procedure SetHeaderColor(newValue : TColor); virtual;
+    function  GetHeaderColor : TColor; virtual;
+    function GetHint: TElFString;
+    procedure SetHint(newValue: TElFString);
+
+    procedure DoChanging(Item : TElTreeItem; var AllowChange: Boolean); virtual;
+    procedure DoOnColumnResize(SectionIndex: integer); virtual;
+    procedure DoColumnClick(SectionIndex: integer); virtual;
+    procedure DoItemFocused; virtual;
+    procedure DoItemDraw(Item: TElTreeItem; Surface: TCanvas; R: TRect; SectionIndex: integer); virtual;
+{$ifndef VER3_EDITORS}
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+    procedure DoValidate(Item: TElTreeItem; Section: TElHeaderSection; var Text: string; var Accept: boolean); virtual;
+    procedure NotifyOnEditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState); virtual;
+{$endif}
+{$endif}
+
+    procedure DoItemChange(Item: TElTreeItem; ItemChangeMode: TItemChangeMode); virtual;
+    procedure DoItemExpanding(Item: TElTreeItem; var CanProcess: boolean); virtual;
+    procedure DoItemCollapsing(Item: TElTreeItem; var CanProcess: boolean); virtual;
+    procedure DoItemChecked(Item : TElTreeItem); virtual;
+    procedure DoItemExpand(Item: TElTreeItem); virtual;
+    procedure DoItemCollapse(Item: TElTreeItem); virtual;
+    procedure DoItemDelete(Item: TElTreeItem); virtual;
+    procedure DoCompareItems(Item1, Item2: TElTreeItem; var res: integer); virtual;
+    procedure DoHeaderDraw(Header: TCustomElHeader; Canvas : TCanvas; Section: TElHeaderSection;
+      Rect: TRect; Pressed: Boolean); virtual;
+    procedure OnHeaderSectionChange(Sender: TCustomElHeader; Section: TElHeaderSection; Change: TSectionChangeMode); virtual;
+    procedure OnHeaderSectionMove(Sender: TCustomElHeader; Section: TElHeaderSection; OldPos, NewPos: integer); virtual;
+    procedure TriggerHotTrackEvent(OldItem, NewItem: TElTreeItem); virtual;
+{$ifndef VER3_EDITORS}
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+    procedure DoValidateCombo(Item: TElTreeItem; Section: TElHeaderSection; Combo: TComboBox; var Accept: boolean); virtual;
+    procedure TriggerEditRequestEvent(Item: TElTreeItem; Section: TElHeaderSection); virtual;
+    procedure TriggerComboEditShowEvent(Item: TElTreeItem; Section: TElHeaderSection; Combobox: TCombobox); virtual;
+    procedure TriggerTryEditEvent(Item: TElTreeItem; Section: TElHeaderSection;
+      var CellType: TElFieldType; var CanEdit: boolean); virtual;
+    procedure TriggerTuneUpInplaceEditEvent(Item : TElTreeItem; SectionIndex : integer; Editor : TCustomEdit); virtual;
+{$endif}
+{$endif}
+    procedure TriggerScrollEvent(ScrollBarKind: TScrollBarKind; ScrollCode: integer); virtual;
+    procedure TriggerHeaderColumnMoveEvent(Section: TElHeaderSection; OldPos, NewPos: integer); virtual;
+    procedure TriggerItemSaveEvent(Stream: TStream; Item: TElTreeItem); virtual;
+    procedure TriggerItemLoadEvent(Stream: TStream; Item: TElTreeItem); virtual;
+    procedure TriggerItemSelectedChangeEvent(Item: TElTreeItem); virtual;
+    procedure DoShowHint(Item: TElTreeItem; Section : TElHeaderSection; var Text: TElFString; HintWindow: THintWindow; MousePos: TPoint; var DoShowHint: boolean); virtual;
+
+    procedure Paint; override;
+    procedure OnHeaderSectionCreate(Header: TCustomElHeader; Section: TElHeaderSection); virtual;
+
+    procedure TriggerHeaderLookupEvent(Section: TElHeaderSection; var Text: string); virtual;
+    procedure TriggerHeaderLookupDoneEvent(Section: TElHeaderSection; Text: string; Accepted: boolean); virtual;
+    procedure TriggerHeaderSectionExpandEvent(Section: TElHeaderSection); virtual;
+    procedure TriggerHeaderSectionCollapseEvent(Section: TElHeaderSection); virtual;
+    procedure TriggerMeasureItemPartEvent(Item: TElTreeItem; PartIndex: integer; var Size: TPoint); virtual;
+    procedure TriggerApplyVisFilterEvent(Item: TElTreeItem; var Hidden: boolean); virtual;
+    procedure TriggerItemPostDrawEvent(Canvas : TCanvas; Item : TElTreeItem; ItemRect : TRect; var DrawFocusRect : boolean); virtual;
+{$ifdef ELTREE_USE_OLE_DRAGDROP}
+{$IFNDEF VER90}
+{$IFNDEF LITE}
+    procedure TriggerOleTargetDragEvent(State: TDragState; Source: TOleDragObject;
+      Shift: TShiftState; X, Y: integer; var DragType: TDragType); virtual;
+    procedure TriggerOleTargetDropEvent(Source: TOleDragObject; Shift: TShiftState;
+      X, Y: integer; var DragType: TDragType); virtual;
+    procedure TriggerOleDragStartEvent(var dataObj: IDataObject; var dropSource: IDropSource;
+      var dwOKEffects: TDragTypes); virtual;
+    procedure TriggerOleDragFinishEvent(dwEffect: TDragType; Result: HResult); virtual;
+{$ENDIF}
+{$ENDIF}
+{$endif}
+
+{$ifndef CLX_USED}
+{$IFDEF VCL_4_USED}
+    function GetDragImages: TDragImageList; override;
+{$ELSE}
+    function GetDragImages: TCustomImageList; override;
+{$ENDIF}
+{$endif}
+    procedure AutoSizeAllColumns;
+    procedure AutoSizeColumn(SectionIndex : integer);
+    function GetTopItem: TElTreeItem; virtual;
+    procedure SetTopItem(Item: TElTreeItem); virtual;
+    procedure Loaded; override;
+    function SectionTypeToSortType(SectionType: TElFieldType): TSortTypes;
+    procedure TriggerSortBegin; virtual;
+    procedure TriggerSortEnd; virtual;
+    function CreateView : TElTreeView; virtual;
+    {$ifndef CLX_USED}
+    procedure CreateWnd; override;
+    {$else}
+    procedure CreateWidget; override;
+    {$endif}
+    procedure StartDelayedFocus(FocusItemToReport : TElTreeItem);
+    procedure StopDelayedFocus;
+    procedure OnDelayTimer(Sender : TObject);
+    procedure DoAfterSelectionChange; virtual;
+    procedure SetDragRectAcceptColor(const Value: TColor);
+    procedure SetDragRectDenyColor(Value: TColor);
+    procedure SetDragTrgDrawMode(Value: TDragTargetDraw);
+    function GetVisibleRowCount: Integer;
+    procedure DoSetDragTrgDrawMode(Value: TDragTargetDraw; RedrawItem : boolean);
+    procedure DoEndDrag(Target: TObject; X, Y: Integer); override;
+    procedure UpdateDiffItems;
+    procedure SlowCompareItems(Item1, Item2: TElTreeItem; Section : 
+        TElHeaderSection; var Result : integer);
+    procedure TriggerVirtualTextNeeded(Item : TElTreeItem; SectionIndex : Integer;
+        var Text : TElFString); virtual;
+    procedure TriggerVirtualHintNeeded(Item : TElTreeItem; var Hint : TElFString); 
+        virtual;
+    procedure TriggerVirtualValueNeeded(Item : TElTreeItem; SectionIndex : Integer; 
+        VarType : integer; var Value : Variant); virtual;
+    {$ifdef ELTREE_USE_STYLES}
+    procedure TriggerVirtualStyleNeeded(Item : TElTreeItem; SectionIndex : Integer; 
+        Style : TElCellStyle); virtual;
+    {$endif}
+
+    {$ifdef VER3_EDITORS}
+    {$ifdef ELTREE_USE_INPLACE_EDITORS}
+    procedure TriggerTryEditEvent(Item: TElTreeItem; SectionIndex : integer;
+      var CellType: TElFieldType; var CanEdit: boolean); virtual;
+    procedure TriggerInplaceEditorNeeded(Item : TElTreeItem; SectionIndex : Integer;
+        SupposedFieldType : TElFieldType; var Editor : TElTreeInplaceEditor);
+        virtual;
+    {$endif}
+    {$endif}
+    procedure VertScrollHitTestTransfer(Sender : TObject; X, Y : integer; var Part
+        : TElScrollBarPart; var DefaultTest : boolean); virtual;
+    procedure HorzScrollHitTestTransfer(Sender : TObject; X, Y : integer; var Part
+        : TElScrollBarPart; var DefaultTest : boolean); virtual;
+    procedure SetVertDivLinesColor(Value: TColor);
+    procedure SetCheckBoxSize(Value: Integer);
+    function GetTrackItem: TElTreeItem;
+    function GetDragging: Boolean;
+    procedure SetShowLeafButton(Value: Boolean);
+    procedure SetLeafPicture(Value: TBitmap);
+    {$ifdef VCL_4_USED}
+    procedure MouseWheelTransfer(Sender : TObject; Shift: TShiftState; WheelDelta:
+        Integer; MousePos: TPoint; var Handled: Boolean);
+    procedure MouseWheelDownTransfer(Sender : TObject; Shift: TShiftState;
+        MousePos: TPoint; var Handled: Boolean);
+    procedure MouseWheelUpTransfer(Sender : TObject; Shift: TShiftState; MousePos:
+        TPoint; var Handled: Boolean);
+    {$endif}
+    procedure FitMostChildren(Item : TElTreeItem);
+    function GetThemedClassName: WideString; override;
+    procedure SetUseXPThemes(const Value: Boolean); override;
+    function GetCheckBoxSize: Integer;
+    function GetHeaderPopupMenu: TPopupMenu;
+    procedure SetHeaderPopupMenu(Value: TPopupMenu);
+    procedure SetHeaderFont(Value: TFont);
+    procedure SetHeaderUseTreeFont(Value: Boolean);
+    procedure HeaderFontChanged(Sender: TObject);
+    function IsStripedColorStored: Boolean;
+    {$ifndef CLX_USED}
+    procedure WMThemeChanged(var Message: TMessage); message WM_THEMECHANGED;
+    {$endif}
+    procedure DoEnter; override;
+    procedure DoExit; override;
+    procedure SetSortUseCase(Value: Boolean);
+    procedure SetLineBorderActiveColor(Value: TColor);
+    procedure SetLineBorderInactiveColor(Value: TColor);
+    procedure SetDblClickMode(Value: TElDblClickMode);
+    procedure SetExpandOnDblClick(Value: Boolean);
+    function GetPlusPicture: TBitmap;
+    function GetLeafPicture: TBitmap;
+    function GetMinusPicture: TBitmap;
+    function GetCheckBoxGlyph: TBitmap;
+    function GetRadioButtonGlyph: TBitmap;
+    procedure OnCheckSignChange(Sender: TObject);
+    {$ifndef CLX_USED}
+    procedure WMUpdateSBFrame(var Message: TMessage); message WM_UPDATESBFRAME;
+    {$endif}
+    procedure SetDoubleBuffered(Value: Boolean);
+
+    property TextColor: TColor read FTextColor write SetTextColor default clWindowText;
+    property BkColor: TColor read FBkColor write SetBkColor default clWindow;
+    property ShowButtons: Boolean read FShowButtons write SetButtonStyle default true;
+    {$ifndef CLX_USED}
+    property BorderStyle: TBorderStyle read FBorderStyle write SetBorderStyle default bsSingle;
+    {$endif}
+    property ShowLines: Boolean read FShowLines write SetLineStyle default true;
+    property ShowImages: Boolean read FShowImages write SetImagesStyle default true;
+    property ShowRoot: boolean read FShowRoot write SetRootStyle default false;
+    property LineHintMode: THintModes read FShowHintMode write FShowHintMode default shmLong;
+    property LineHintColor: TColor read FLineHintColor write FLineHintColor default clWindow;
+    property HideSelection: Boolean read FHideSelect write SetHideSelect default false;
+    property HideHintOnTimer: boolean read FHintHide write FHintHide default false;
+    property Images: TImageList read FImages write SetImages;
+    property Images2: TImageList read FImages2 write SetImages2;
+
+    property ChangeStateImage: boolean read FChStateImage write SetChStateImage default false;
+    property ShowColumns: Boolean read FShowHeader write SetShowHeader default false;
+    property DragTrgDrawMode: TDragTargetDraw read FDragTrgDrawMode write
+        SetDragTrgDrawMode default SelColorRect;
+    property DraggableSections: Boolean read GetDraggableSections write SetDraggableSections default false; { Published }
+    property SelectionMode: TSTSelModes read FSelMode write FSelMode default smUsual;
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+    property DoInplaceEdit: boolean read FCanEdit write SetCanEdit default true;
+{$else}
+    property DoInplaceEdit: boolean read FCanEdit write FCanEdit default true;
+{$endif}
+    property VerticalLines: boolean read FVLines write SetVLines default false;
+    property BarStyleVerticalLines : boolean read FBSVLines write SetBSVLines default false;
+    property HorizontalLines: boolean read FHLines write SetHLines default false;
+    property ScrollTracking: boolean read FScrollTracking write FScrollTracking default false;
+    property HotTrack: Boolean read FTracking write FTracking default true;
+    property Tracking: boolean read FTracking write FTracking default true;
+    property RowSelect: boolean read FRowSelect write SetRowSelect default true;
+    property MultiSelect: boolean read FMultiSelect write SetMultiSelect default true;
+    property MultiSelectLevel: Integer read FMultiSelectLevel write SetMultiSelectLevel default -1; // CNS
+    property LineHeight: integer read FLineHeight write SetLineHeight nodefault;
+    property AutoLineHeight: boolean read FAutoLineHeight write SetAutoLineHeight default true;
+    property HeaderHotTrack: boolean read FHeaderHotTrack write SetHeaderHotTrack default true;
+    property HeaderSections: TElHeaderSections read GetHeaderSections write SetHeaderSections;
+    property HeaderHeight: integer read GetHeaderHeight write SetHeaderHeight nodefault;
+    property MainTreeColumn: integer read FMainTreeCol write SetMainTreeCol default 0;
+    property OwnerDrawByColumn: boolean read FODFollowCol write FODFollowCol default true;
+    property OwnerDrawMask: TElFString read FODMask write FODMask;
+    property DragAllowed: Boolean read FDragAllowed write FDragAllowed default false;
+    property SortDir: TSortDirs read FSortDir write FSortDir default sdAscend;
+    property SortMode: TSortModes read FSortMode write SetSortMode default smNone; { Published }
+    property SortSection: Integer read FSortSection write SetSortSection default 0; { Published }
+    property SortType: TSortTypes read FSortType write FSortType default stText;
+    property HideHintOnMove: Boolean read FHideHintOnMove write FHideHintOnMove default true; { Protected }
+    property ExpandOnDblClick: Boolean read FExpandOnDblClick write
+        SetExpandOnDblClick default true;
+    property MoveColumnOnDrag: Boolean read GetMoveColumnOnDrag write SetMoveColumnOnDrag default false; { Published }
+    property HideHorzScrollBar: Boolean read FHideHorzScrollBar write SetHideHorzScrollBar default false; { Published }
+    property HideVertScrollBar: Boolean read FHideVertScrollBar write SetHideVertScrollBar default false; { Published }
+    property HorzScrollBarStyles : TElScrollBarStyles read FHorzScrollBarStyle write SetHorzScrollBarStyle stored true;
+    property VertScrollBarStyles : TElScrollBarStyles read FVertScrollBarStyle write SetVertScrollBarStyle stored true;
+
+    {$IFNDEF LITE}
+    property NoBlendSelected : Boolean read FNoBlendSelected write SetNoBlendSelected default false;  { Protected }
+    property Background : TBitmap read FBackground write SetBackground;  { Protected }
+    property BackgroundType : TElBkGndType read FBackgroundType write SetBackgroundType default bgtColorFill;  { Protected }
+    property ScrollBackground : Boolean read FScrollBackground write FScrollBackground default false;  { Protected }
+    {$ENDIF}
+
+    property HeaderImages: TImageList read GetHeaderImages write SetHeaderImages; { Protected }
+    property DragImageMode: TDragImgMode read FDragImageMode write FDragImageMode default dimNever; { Protected }
+{$IFDEF ELPACK_COMPLETE}
+    property StoragePath     : string read FStoragePath write FStoragePath;
+{$IFDEF SUPPORT_STORAGE}
+    property Storage         : TElIniFile read FStorage write SetStorage;
+{$ELSE}
+    property Storage         : TElIniFile read FStorage write FStorage;
+{$ENDIF}
+{$ENDIF}
+
+{$ifndef CLX_USED}
+{$IFDEF ELPACK_COMPLETE}
+    property ImageForm       : TElImageForm read FImgForm write SetImageForm;
+    property HeaderImageForm : TElImageForm read GetHeaderImageForm write SetHeaderImageForm;
+{$ENDIF}
+{$endif}
+    property ShowCheckboxes: Boolean read FShowCheckboxes write SetShowCheckboxes default false;
+    property PlusPicture: TBitmap read GetPlusPicture write SetPlusPicture;
+    property MinusPicture: TBitmap read GetMinusPicture write SetMinusPicture;
+    property CustomPlusMinus: Boolean read FCustomPlusMinus write SetCustomPlusMinus default false;
+    property SelectColumn: Integer read FSelectColumn write SetSelectColumn default -1;
+    property AutoExpand: Boolean read FAutoExpand write SetAutoExpand default false;
+    property AutoLookup: Boolean read FAutoLookup write FAutoLookup default false;
+    property DragType: TElDragType read FDragType write SetDragType default dtDelphi;
+    property FullRowSelect: Boolean read FFullRowSelect write FFullRowSelect default true;
+    property AlwaysKeepSelection: Boolean read FAlwaysKeepSelection write FAlwaysKeepSelection default true;
+    property AlwaysKeepFocus: Boolean read FAlwaysKeepFocus write FAlwaysKeepFocus default false;
+    property StickyHeaderSections: Boolean read GetStickyHeaderSections write SetStickyHeaderSections default false;
+    property BarStyle: Boolean read FBarStyle write SetBarStyle default false;
+    property DrawFocusRect: Boolean read FDrawFocusRect write SetDrawFocusRect default true;
+    property DeselectChildrenOnCollapse: Boolean read FDeselectChildrenOnCollapse write FDeselectChildrenOnCollapse default false;
+    property HorzDivLinesColor: TColor read FHorzDivLinesColor write
+        SetHorzDivLinesColor default clBtnFace;
+    property LinesColor: TColor read FLinesColor write SetLinesColor default clBtnFace;
+    property LinesStyle: TPenStyle read FLinesStyle write SetLinesStyle default psDot;
+    property PathSeparator: Char read FPathSeparator write FPathSeparator default '\'; { Protected }
+    property RightAlignedTree: Boolean read FRightAlignedTree write SetRightAlignedTree default false;
+    property Flat: Boolean read FFlat write SetFlat default false; { Protected }
+    property RightAlignedText: Boolean read FRightAlignedText write SetRightAlignedText default false;
+    property FilteredVisibility: Boolean read FFilteredVisibility write SetFilteredVisibility default false;
+    property UnderlineTracked: Boolean read FUnderlineTracked write SetUnderlineTracked default true; { Published }
+    property CustomCheckboxes: Boolean read FCustomCheckboxes write SetCustomCheckboxes default false; { Published }
+    property CheckBoxGlyph: TBitmap read GetCheckBoxGlyph write SetCheckBoxGlyph;
+    property RadioButtonGlyph: TBitmap read GetRadioButtonGlyph write
+        SetRadioButtonGlyph;
+    property ScrollbarOpposite: Boolean read FScrollbarOpposite write SetScrollbarOpposite;
+    property ShowRootButtons: Boolean read FShowRootButtons write SetShowRootButtons default true;
+    property ShowEmptyImages : Boolean read FShowEmptyImages write SetShowEmptyImages default false;
+    property ShowEmptyImages2: Boolean read FShowEmptyImages2 write SetShowEmptyImages2 default false;
+
+    property HideFocusRect: Boolean read FHideFocusRect write SetHideFocusRect default false;
+    property LockHeaderHeight: Boolean read GetLockHeaderHeight write SetLockHeaderHeight default false; { Protected }
+    property AutoResizeColumns : Boolean read FAutoResizeColumns write FAutoResizeColumns default True;  { Protected }
+    property HeaderActiveFilterColor : TColor read GetHeaderActiveFilterColor write SetHeaderActiveFilterColor default clBlack;
+    property HeaderFilterColor : TColor read GetHeaderFilterColor write SetHeaderFilterColor default clBtnText;
+    property HeaderFlat : Boolean read GetHeaderFlat write SetHeaderFlat default false;
+{$IFNDEF LITE}
+    property HeaderWrapCaptions : Boolean read GetHeaderWrapCaptions write SetHeaderWrapCaptions default false;
+{$ENDIF}
+    property FlatFocusedScrollbars : Boolean read FFlatFocusedScrollbars write SetFlatFocusedScrollbars default true;  { Protected }
+    property HideSelectColor: TColor read FHideSelectColor write SetHideSelectColor default clBtnFace;
+    property FocusedSelectColor: TColor read FFocusedSelectColor write SetFocusedSelectColor default clHighlight;
+    property HideSelectTextColor: TColor read FHideSelectTextColor write SetHideSelectTextColor default clBtnShadow;
+    property FocusedSelectTextColor: TColor read FFocusedSelectTextColor write SetFocusedSelectTextColor default clHighlightText;
+    
+    property UseCustomScrollBars : boolean read FUseCustomBars write SetUseStdBars default true;
+
+    property RowHotTrack : Boolean read FRowHotTrack write SetRowHotTrack default false;  { Protected }
+    property ActiveBorderType : TElFlatBorderType read FActiveBorderType write SetActiveBorderType default fbtSunken;  { Protected }
+    property InactiveBorderType : TElFlatBorderType read FInactiveBorderType write SetInactiveBorderType default fbtSunkenOuter;  { Protected }
+    property ItemIndent : integer read ItemExt write SetItemIndent default 17;
+{$IFNDEF LITE}
+    property GradientStartColor : TColor read FGradientStartColor write SetGradientStartColor default clBlack;  { Protected }
+    property GradientEndColor : TColor read FGradientEndColor write SetGradientEndColor  default clBlack;  { Protected }
+    property GradientSteps : Integer read FGradientSteps write SetGradientSteps default 16;  { Protected }
+{$ENDIF LITE}
+    property Cursor : TCursor read GetCursor write SetCursor default crArrow;
+    property HeaderInvertSortArrows : Boolean read GetHeaderInvertSortArrows write SetHeaderInvertSortArrows default false;  { Protected }
+    property MoveFocusOnCollapse : Boolean read FMoveFocusOnCollapse write SetMoveFocusOnCollapse default false;  { Protected }
+    property ForcedScrollBars : TScrollStyle read FForcedScrollBars write SetForcedScrollBars default ssNone;  { Protected }
+    property PlusMinusTransparent : boolean read FTransButtons write SetTransButtons default false;
+    property Hint: TElFString read GetHint write SetHint;
+    property DragRectAcceptColor: TColor read FDragRectAcceptColor write
+        SetDragRectAcceptColor default clGreen;
+    property DragRectDenyColor: TColor read FDragRectDenyColor write
+        SetDragRectDenyColor default clRed;
+    property DragExpandDelay: Integer read FDragExpandDelay write FDragExpandDelay
+        default 500;
+    property IncrementalSearch: Boolean read FIncrementalSearch write
+        FIncrementalSearch;
+    {$IFNDEF LITE}
+    property AdjustMultilineHeight : Boolean read FAdjustMultilineHeight write SetAdjustMultilineHeight default true;  { Protected }
+    {$ENDIF}
+    property ExpandOnDragOver : Boolean read FExpandOnDragOver write FExpandOnDragOver default false;  { Protected }
+    {$ifndef CLX_USED}
+    property DragCursor : TCursor read GetDragCursor write SetDragCursor;
+    {$endif}
+    property TrackColor : TColor read FTrackColor write SetTrackColor default clHighlight;
+    property UseSystemHintColors : Boolean read FUseSystemHintColors write FUseSystemHintColors default false;  { Protected }
+    property HeaderColor : TColor read GetHeaderColor write SetHeaderColor default clBtnFace;
+    property ChangeDelay: Integer read FChangeDelay write FChangeDelay default 500;
+    property RightClickSelect: Boolean read FRightClickSelect write
+        FRightClickSelect default true;
+    property StripedOddColor: TColor read FStripedOddColor write SetStripedOddColor stored IsStripedColorStored;
+    property StripedEvenColor: TColor read FStripedEvenColor write SetStripedEvenColor stored IsStripedColorStored;
+    property StripedItems: Boolean read FStripedItems write SetStripedItems default false;
+    {$ifdef ELTREE_USE_INPLACE_EDITORS}
+    {$ifdef VER3_EDITORS}
+    property OnInplaceEditorNeeded: TInplaceEditorNeededEvent read
+        FOnInplaceEditorNeeded write FOnInplaceEditorNeeded;
+    {$endif}
+    {$endif}
+    property QuickEditMode: Boolean read FQuickEditMode write FQuickEditMode
+        default false;
+    property MainTextType: TElFieldType read FMainTextType write FMainTextType
+        default sftText;
+    property HintType: TElHintType read FHintType write FHintType
+        default shtHintOrText;
+    property OnVertScrollHitTest: TElScrollHitTestEvent read FOnVertScrollHitTest
+        write FOnVertScrollHitTest;
+    property OnHorzScrollHitTest: TElScrollHitTestEvent read FOnHorzScrollHitTest
+        write FOnHorzScrollHitTest;
+    property MouseFrameSelect: Boolean read FMouseFrameSelect write
+        FMouseFrameSelect;
+    property VertDivLinesColor: TColor read FVertDivLinesColor write
+        SetVertDivLinesColor default clBtnFace;
+
+{$IFNDEF VCL_4_USED}
+    property OnResize: TNotifyEvent read FOnResize write FOnResize;
+{$ENDIF}
+    property OnItemChange: TOnItemChangeEvent read FOnItemChange write FOnItemChange;
+    property OnItemDraw: TOnItemDrawEvent read FOnItemDraw write FOnItemDraw;
+    property OnItemChecked  : TOnItemCheckedEvent read FOnItemChecked write FOnItemChecked;
+    property OnItemExpand: TOnItemExpandEvent read FOnItemExpand write FOnItemExpand;
+    property OnItemCollapse: TOnItemExpandEvent read FOnItemCollapse write FOnItemCollapse;
+    property OnItemExpanding: TOnItemExpanding read FOnItemExpanding write FOnItemExpanding;
+    property OnItemCollapsing: TOnItemExpanding read FOnItemCollapsing write FOnItemCollapsing;
+    property OnScroll: TElScrollEvent read FOnScroll write FOnScroll;
+    property OnItemDeletion: TOnItemExpandEvent read FOnItemDelete write FOnItemDelete;
+    property OnChanging: TElTreeChangingEvent read FOnChanging write FOnChanging;
+    property OnItemFocused: TNotifyEvent read FOnItemFocused write FOnItemFocused;
+    property OnShowLineHint: TOnShowHintEvent read FOnShowHint write FOnShowHint;
+    property OnCompareItems: TOnCompareItems read FOnCompareItems write FOnCompareItems;
+    property OnItemPicDraw: TOnPicDrawEvent read FOnItemPicDraw write FOnItemPicDraw;
+    property OnItemPicDraw2: TOnPicDrawEvent read FOnItemPicDraw2 write FOnItemPicDraw2;
+    property OnHotTrack: THotTrackEvent read FOnHotTrack write FOnHotTrack;
+
+{$ifndef VER3_EDITORS}
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+    property OnTuneUpInplaceEdit : TTuneUpInplaceEditEvent read FOnTuneUpInplaceEdit write FOnTuneUpInplaceEdit;
+    property OnComboEditShow: TComboEditShowEvent read FOnComboEditShow write FOnComboEditShow;
+    property OnValidateCombo: TValidateComboEvent read FOnValidateCombo write FOnValidateCombo;
+    property OnValidateInplaceEdit: TOnValidateEvent read FOnValidate write FOnValidate;
+    property OnEditKeyDown: TKeyEvent read FOnEditKeyDown write FOnEditKeyDown;
+    property OnEditRequest: TEditRequestEvent read FOnEditRequest write FOnEditRequest;
+    property OnTryEdit: TTryEditEvent read FOnTryEdit write FOnTryEdit;
+{$endif}
+{$else}
+    property OnTryEdit: TTryEditEvent read FOnTryEdit write FOnTryEdit;
+{$endif}
+    property OnItemSave: TItemSaveEvent read FOnItemSave write FOnItemSave;
+    property OnItemLoad: TItemSaveEvent read FOnItemLoad write FOnItemLoad;
+    property OnItemSelectedChange: TItemSelChangeEvent read FOnItemSelectedChange write FOnItemSelectedChange;
+    property OnCellStyleSave: TCellStyleSaveEvent read FOnSave write FOnSave;
+    property OnCellStyleLoad: TCellStyleSaveEvent read FOnLoad write FOnLoad;
+    property OnSortBegin : TNotifyEvent read FOnSortBegin write FOnSortBegin;
+    property OnSortEnd : TNotifyEvent read FOnSortEnd write FOnSortEnd;
+    
+    property OnHeaderResize: TNotifyEvent read FOnHeaderResize write FOnHeaderResize;
+    property OnHeaderLookup: TElHeaderLookupEvent read FOnHeaderLookup write FOnHeaderLookup;
+    property OnHeaderLookupDone: TElHeaderLookupDoneEvent read FOnHeaderLookupDone write FOnHeaderLookupDone;
+    property OnHeaderSectionExpand: THeaderSectionEvent read FOnHeaderSectionExpand write FOnHeaderSectionExpand;
+    property OnHeaderSectionCollapse : THeaderSectionEvent read FOnHeaderSectionCollapse write FOnHeaderSectionCollapse;
+    property OnHeaderSectionAutoSize : TColumnNotifyEvent read FOnSectionAutoSize write FOnSectionAutoSize;
+    property OnHeaderColumnResize: TColumnNotifyEvent read FOnColumnResize write FOnColumnResize;
+    property OnHeaderColumnClick: TColumnNotifyEvent read FOnColumnClick write FOnColumnClick;
+    property OnHeaderColumnMove: TElColumnMoveEvent read FOnHeaderColumnMove write FOnHeaderColumnMove;
+    property OnHeaderColumnDraw: TElSectionRedrawEvent read FOnColumnDraw write FOnColumnDraw;
+    property OnHeaderSectionFilterCall : TColumnNotifyEvent read FOnSectionFilterCall write FOnSectionFilterCall;
+    property OnHeaderSectionMeasure : TMeasureSectionEvent read FOnHeaderSectionMeasure write FOnHeaderSectionMeasure;
+    property OnApplyVisFilter: TApplyVisFilterEvent read FOnApplyVisFilter write FOnApplyVisFilter;
+    property OnItemPostDraw : TElTreeItemPostDrawEvent read FOnItemPostDraw write FOnItemPostDraw;
+    property OnMeasureItemPart: TMeasureItemPartEvent read FOnMeasureItemPart write FOnMeasureItemPart;
+{$IFDEF HAS_HTML_RENDER}
+    property OnHTMLImageNeeded : TElHTMLImageNeededEvent read FOnImageNeeded write FOnImageNeeded;
+{$ENDIF}
+
+    property OnClick : TNotifyEvent read FOnClick write FOnClick;
+    property OnDblClick : TNotifyEvent read FOnDblClick write FOnDblClick;
+    property OnDragDrop : TDragDropEvent read FOnDrop write FOnDrop;
+    property OnDragOver : TDragOverEvent read FOnOver write FOnOver;
+    //property OnEndDrag : TEndDragEvent read FOnDrag write FOnDrag;
+    property OnEnter : TNotifyEvent read FOnEnter write FOnEnter;
+    property OnExit : TNotifyEvent read FOnExit write FOnExit;
+    property OnKeyDown : TKeyEvent read FOnKeyDown write FOnKeyDown;
+    property OnKeyPress : Tkeypressevent read FOnKeyPress write FOnKeyPress;
+    property OnKeyUp : TKeyEvent read FOnKeyUp write FOnKeyUp;
+    property OnMouseDown : TMouseEvent read FOnMouseDown write FOnMouseDown;
+    property OnMouseMove : TMouseMoveEvent read FOnMouseMove write FOnMouseMove;
+    property OnMouseUp : TMouseEvent read FOnMouseUp write FOnMouseUp;
+    property OnStartDrag : TStartDragEvent read FOnStartDrag write FOnStartDrag;
+{$ifdef ELTREE_USE_OLE_DRAGDROP}
+{$IFNDEF VER90}
+{$IFNDEF LITE}
+    property OnOleTargetDrag: TTargetDragEvent read FOnOleTargetDrag write FOnOleTargetDrag;
+    property OnOleTargetDrop: TTargetDropEvent read FOnOleTargetDrop write FOnOleTargetDrop;
+    property OnOleDragStart: TOleDragStartEvent read FOnOleDragStart write FOnOleDragStart;
+    property OnOleDragFinish: TOleDragFinishEvent read FOnOleDragFinish write FOnOleDragFinish;
+{$ENDIF}
+{$ENDIF}
+{$endif}
+    property OnHorzScrollDrawPart : TElScrollDrawPartEvent read FOnHorzScrollDrawPart write FOnHorzScrollDrawPart;
+    property OnHorzScrollHintNeeded : TElScrollHintNeededEvent read FOnHorzScrollHintNeeded write FOnHorzScrollHintNeeded;
+    property OnVertScrollDrawPart : TElScrollDrawPartEvent read FOnVertScrollDrawPart write FOnVertScrollDrawPart;
+    property OnVertScrollHintNeeded : TElScrollHintNeededEvent read FOnVertScrollHintNeeded write FOnVertScrollHintNeeded;
+
+    property OnHeaderMouseDown: TMouseEvent read FOnHeaderMouseDown write
+        FOnHeaderMouseDown;
+    property OnAfterSelectionChange: TNotifyEvent read FOnAfterSelectionChange
+        write FOnAfterSelectionChange;
+    property OnItemPreDraw: TOnItemExpandEvent read FOnItemPreDraw write
+        FOnItemPreDraw;
+    property OnDragTargetChange: TElTreeItemDragTargetEvent read
+        FOnDragTargetChange write FOnDragTargetChange;
+    property LineHintTimeout: Integer read FLineHintTimeout write
+        SetLineHintTimeout default 3000;
+    property VerticalLinesLong: Boolean read FVerticalLinesLong write
+        SetVerticalLinesLong default true;
+    property DefaultSectionWidth: Integer read GetDefaultSectionWidth write 
+        SetDefaultSectionWidth;
+    property BorderSides: TElBorderSides read FBorderSides write SetBorderSides;
+    property LineHintType: TLineHintType read FLineHintType write FLineHintType
+        default lhtSmart;
+    property OnVirtualTextNeeded: TVirtualTextNeededEvent read FOnVirtualTextNeeded 
+        write FOnVirtualTextNeeded;
+    property VirtualityLevel: TVirtualityLevel read FVirtualityLevel write 
+        SetVirtualityLevel;
+    property OnVirtualHintNeeded: TVirtualHintNeededEvent read FOnVirtualHintNeeded
+        write FOnVirtualHintNeeded;
+    property OnVirtualValueNeeded: TVirtualValueNeededEvent read
+        FOnVirtualValueNeeded write FOnVirtualValueNeeded;
+    {$ifdef ELTREE_USE_STYLES}
+    property OnVirtualStyleNeeded: TVirtualStyleNeededEvent read
+        FOnVirtualStyleNeeded write FOnVirtualStyleNeeded;
+    {$endif}
+    property CheckBoxSize: Integer read GetCheckBoxSize write SetCheckBoxSize
+        default 15;
+    property DragScrollInterval: Integer read FDragScrollInterval write
+        FDragScrollInterval default 100;
+    property ShowLeafButton: Boolean read FShowLeafButton write SetShowLeafButton;
+    property LeafPicture: TBitmap read GetLeafPicture write SetLeafPicture;
+    property ExplorerEditMode: Boolean read FExplorerEditMode write
+        FExplorerEditMode;
+    property IgnoreEnabled: Boolean read FIgnoreEnabled write FIgnoreEnabled;
+
+    property InplaceEditorDelay: Integer read FInplaceEditorDelay write 
+        FInplaceEditorDelay default 500;
+    property HeaderFont: TFont read FHeaderFont write SetHeaderFont;
+    property HeaderUseTreeFont: Boolean read FHeaderUseTreeFont write 
+        SetHeaderUseTreeFont default true;
+    property KeepSelectionWithinLevel: Boolean read FKeepSelectionWithinLevel write
+        FKeepSelectionWithinLevel;
+    property AutoCollapse: Boolean read FAutoCollapse write FAutoCollapse default
+        true;
+    property SortUseCase: Boolean read FSortUseCase write SetSortUseCase default 
+        true;
+    property LineBorderActiveColor: TColor read FLineBorderActiveColor write 
+        SetLineBorderActiveColor;
+    property LineBorderInactiveColor: TColor read FLineBorderInactiveColor write 
+        SetLineBorderInactiveColor;
+    property DblClickMode: TElDblClickMode read FDblClickMode write SetDblClickMode
+        default dcmExpand;
+
+  public
+    { Public declarations }
+    constructor Create(AOwner: TComponent); override;
+    constructor CreateClass(AOwner: TComponent; ItemClass : TElTreeItemClass);
+    destructor Destroy; override;
+    procedure Update; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure FullCollapse; virtual;
+    procedure FullExpand; virtual;
+{$warnings off}
+    function CanFocus : boolean; {$ifndef VCL_5_USED}virtual;{$else}override;{$endif}
+{$warnings on}
+
+    function Focused: Boolean; {$IFDEF VCL_4_USED} override; {$ENDIF VCL_4_USED}
+    function GetItemRect(ItemIndex: integer): TRect; virtual;
+    function GetItemAtY(Y: integer): TElTreeItem; virtual;
+    function GetItemAt(X, Y: Integer; var ItemPart: TSTItemPart;
+      var HitColumn: integer): TElTreeItem; virtual;
+    procedure MeasureCell(Item : TElTreeItem; ColumnNum : integer; var Size : TPoint); virtual;
+    function GetNextSelected(Prev: TElTreeItem): TElTreeItem; virtual;
+    procedure AllSelected(SelectedItems: TElList); virtual;
+    procedure SelectAll; virtual;
+    procedure InvertSelection; virtual;
+    procedure SelectAllEx(IncludeHidden: boolean); virtual;
+    procedure InvertSelectionEx(IncludeHidden: boolean); virtual;
+    procedure DeselectAll; virtual;
+    procedure DeselectAllEx(IncludeHidden: boolean); virtual;
+    procedure SelectRange(FromItem, ToItem: TElTreeItem); virtual;
+    procedure SelectRange2(FromItem, ToItem: TElTreeItem; SelectDisabled : boolean); virtual;
+    procedure SelectRangeEx(FromItem, ToItem: TElTreeItem; IncludeHidden : boolean); virtual;
+    procedure SelectRangeEx2(FromItem, ToItem: TElTreeItem; IncludeHidden, SelectDisabled : boolean); virtual;
+    procedure Sort(recursive: boolean); virtual;
+{$IFDEF SUPPORT_STORAGE}
+    procedure Save; virtual;
+    procedure Restore; virtual;
+{$ENDIF}
+    procedure EnsureVisible(Item: TElTreeItem);
+    procedure EnsureVisibleBottom(Item: TElTreeItem);
+{$ifndef VER3_EDITORS}
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+    procedure EditItem(Item: TElTreeItem; SectionNum: integer); virtual;
+    procedure EndEdit(ByCancel: boolean);
+    function IsEditing: boolean;
+{$endif}
+{$else}
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+    function IsEditing: boolean;
+    procedure EditItem(Item: TElTreeItem; SectionNum: integer); virtual;
+    procedure EndEdit(ByCancel: boolean);
+{$endif}
+{$endif}
+
+    procedure SaveStringsToStream(Stream: TStream); virtual;
+    function GetNodeAt(X, Y: integer): TElTreeItem;
+    {$ifndef CLX_USED}
+    procedure CreateWindowHandle(const Params: TCreateParams); override;
+    {$endif}
+    function IsInView(Item: TElTreeItem): Boolean; virtual;
+    function MeasureColumnWidth(ColumnNum: integer; VisibleOnly : boolean): integer;
+    function IndexInView(Item : TElTreeItem): Integer;
+    procedure AllSelectedEx(SelectedItems : TElList; Order : boolean);
+    procedure AddSortSection(Index : Integer; ReSort : boolean);
+    procedure RemoveSortSection(Index : Integer; ReSort : boolean);
+    procedure ClearSortList(ReSort : boolean);
+{$ifndef VER3_EDITORS}
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+    property InEditState: Boolean read GetInEditing;
+{$endif}
+{$endif}
+    property TopIndex: integer read FTopIndex write SetVPosition;
+
+    property BottomIndex: integer read FBottomIndex;
+    property IsUpdating: boolean read GetUpdating write SetUpdating;
+    property Items: TElTreeItems read FItems write SetItems;
+    property ItemFocused: TElTreeItem read GetFocused write SetFocused;
+    property SelectedCount: integer read GetSelCount;
+    property FireFocusEvents: boolean read GetFireFocusEvents write SetFireFocusEvents default true;
+
+    property Selected: TElTreeItem read GetSelected write SetSelected;
+    property TopItem: TElTreeitem read GetTopItem write SetTopItem;
+    property DragObject : TDragObject read FDragObject;
+    property View : TElTreeView read FView;
+    property HorzScrollBarVisible : boolean read FHScrollVisible;
+    property VertScrollBarVisible : boolean read FVScrollVisible;
+{$IFNDEF LITE}
+    property LockedHeaderSection : TElHeaderSection read GetLockedHeaderSection write SetLockedHeaderSection;  { Public }
+    property VisibleRowCount: Integer read GetVisibleRowCount;
+{$ENDIF}
+    property DropTarget: TElTreeItem read GetDropTarget;
+    property HScrollBar: TElScrollBar read FHScrollBar;  (*<+>*)
+    property VScrollBar : TElScrollBar read FVScrollBar;  (*<+>*)
+    property TrackItem: TElTreeItem read GetTrackItem;
+  published
+    property LeftPosition: integer read FHPos write SetHPosition;
+    {$ifndef CLX_USED}
+{$IFDEF VCL_4_USED}
+    property BevelKind : TBevelKind read FBevelKindDummy write FBevelKindDummy stored false default bkNone;
+{$ENDIF}
+    {$endif}
+    property HeaderPopupMenu: TPopupMenu read GetHeaderPopupMenu write
+        SetHeaderPopupMenu;
+    property DoubleBuffered: Boolean read FDoubleBuffered write SetDoubleBuffered
+        default true;
+  end;
+
+  TElTree = class(TCustomElTree)
+  published
+    property ActiveBorderType;
+    {$ifndef CLX_USED}
+    property DragCursor;
+    {$endif}
+  
+    property Align;
+    property AlwaysKeepFocus;
+    property AlwaysKeepSelection;
+    property AutoCollapse;
+    property AutoExpand;
+    property AutoLineHeight;
+    property AutoLookup;
+    property AutoResizeColumns;
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    {$ifndef CLX_USED}
+    property Action;
+    {$endif}
+    property Constraints;
+    {$ifndef CLX_USED}
+    property DockOrientation;
+    property Floating;
+    property BevelKind;
+    property DoubleBuffered;
+    property DragKind;
+    {$endif}
+{$ENDIF}
+    property DefaultSectionWidth;
+{$IFNDEF LITE}
+    property AdjustMultilineHeight;
+    property Background;
+    property BackgroundType;
+{$ENDIF}
+    property BarStyle;
+    property BarStyleVerticalLines;
+    {$ifndef CLX_USED}
+    property BorderStyle;
+    {$endif}
+    property BorderSides;
+    property ChangeDelay;
+    property ChangeStateImage;
+    property CheckBoxGlyph;
+    property CheckBoxSize;
+    {$ifndef CLX_USED}
+    property Ctl3D;
+    {$endif}
+// here is fine
+    property Color;
+    property Cursor;
+    property CustomCheckboxes;
+    property CustomPlusMinus;
+    property DeselectChildrenOnCollapse;
+	property DblClickMode;
+    property DoInplaceEdit;
+    property DragAllowed;
+
+    property DragExpandDelay;
+    property DraggableSections;
+    property DrawFocusRect;
+    property DragImageMode;
+    property DragRectAcceptColor;
+    property DragRectDenyColor;
+    property DragScrollInterval;
+    property DragTrgDrawMode;
+    property DragType;
+
+    property Enabled;
+    property ExpandOnDblClick;
+    property ExpandOnDragOver;
+    property ExplorerEditMode;
+    property FilteredVisibility;
+    property Flat;
+    property FlatFocusedScrollbars;
+    property FocusedSelectColor;
+    property FocusedSelectTextColor;
+    property ForcedScrollBars;
+    property Font stored true;
+    property FullRowSelect;
+
+{$IFNDEF LITE}
+    property GradientStartColor;
+    property GradientEndColor;
+    property GradientSteps;
+{$ENDIF LITE}
+    property HeaderActiveFilterColor;
+    property HeaderColor;
+    property HeaderHeight;
+    property HeaderHotTrack;
+    property HeaderInvertSortArrows;
+    property HeaderSections;
+    property HeaderFilterColor;
+    property HeaderFlat;
+    property HeaderFont;
+    property HeaderUseTreeFont;
+    property HeaderImages;
+{$IFNDEF LITE}
+    property HeaderWrapCaptions;
+{$ENDIF}
+
+    property HideFocusRect;
+    property HideHintOnTimer;
+    property HideHintOnMove;
+    property HideSelectColor;
+    property HideSelectTextColor;
+    property HideSelection;
+    property HorizontalLines;
+    property HideHorzScrollBar;
+    property HideVertScrollBar;
+    property Hint;
+    property HintType;
+    property HorzDivLinesColor;
+    property HorzScrollBarStyles;
+    property IgnoreEnabled;
+{$ifndef CLX_USED}
+{$IFDEF ELPACK_COMPLETE}
+    property HeaderImageForm;
+    property ImageForm;
+{$ENDIF}
+{$endif}
+    property Images;
+    property Images2;
+    property InactiveBorderType;
+    property IncrementalSearch;
+    property InplaceEditorDelay;
+    property ItemIndent;
+    property Items;
+    property KeepSelectionWithinLevel;
+    property LeafPicture;
+    property LineBorderActiveColor;
+    property LineBorderInactiveColor;
+
+    property LineHeight;
+    property LinesColor;
+    property LinesStyle;
+    property LineHintColor;
+    property LineHintMode default shmLong;
+    property LineHintTimeout;
+    property LineHintType;
+    property LockHeaderHeight;
+    property MainTextType;
+    property MainTreeColumn;
+    property MinusPicture;
+    property MoveColumnOnDrag;
+    property MoveFocusOnCollapse;
+    property MouseFrameSelect;
+    property MultiSelect;
+    property MultiSelectLevel;
+    property OwnerDrawByColumn default true;
+    property OwnerDrawMask;
+    {$ifndef CLX_USED}
+    property ParentCtl3D;
+    {$endif}
+    property ParentFont;
+    property ParentShowHint;
+    {$ifndef CLX_USED}
+    property PathSeparator;
+    {$endif}
+    property PlusMinusTransparent;
+    property PlusPicture;
+    property PopupMenu;
+    property QuickEditMode;
+
+    property RadioButtonGlyph;
+    property RightAlignedText;
+    property RightAlignedTree;
+    property RightClickSelect;
+    property RowHotTrack;
+    property RowSelect;
+{$IFNDEF LITE}
+    property NoBlendSelected;
+    property ScrollBackground;
+{$ENDIF}
+    property ScrollbarOpposite;
+    property ScrollTracking;
+    property SelectColumn;
+    property ShowButtons;
+    property ShowColumns;
+    property ShowCheckboxes;
+    property ShowEmptyImages;
+    property ShowEmptyImages2;
+    property ShowHint;
+    property ShowImages;
+    property ShowLeafButton;
+    property ShowLines;
+    property ShowRoot;
+    property ShowRootButtons;
+    property SelectionMode;
+    property SortDir;
+    property SortMode;
+    property SortSection;
+    property SortType;
+{$IFDEF ELPACK_COMPLETE}
+    property Storage;
+    property StoragePath;
+{$ENDIF}
+    property SortUseCase;
+    property StickyHeaderSections;
+    property StripedOddColor;
+    property StripedEvenColor;
+    property StripedItems;
+
+    property TabOrder;
+    property TabStop;
+    property Tracking;
+    property TrackColor;
+    property UnderlineTracked;
+    property UseCustomScrollBars;
+
+    property VertDivLinesColor;
+    property VerticalLines;
+    property VerticalLinesLong;
+    property VertScrollBarStyles;
+    property VirtualityLevel;
+    property Visible;
+    property UseSystemHintColors;
+    property UseXPThemes;
+    property TextColor;
+    property BkColor;
+
+    property OnScroll;
+    property OnHeaderColumnClick;
+    property OnHeaderColumnDraw;
+    property OnHeaderColumnResize;
+    property OnHeaderColumnMove;
+    property OnHeaderLookup;
+    property OnHeaderLookupDone;
+    property OnHeaderResize;
+    property OnHeaderSectionExpand;
+    property OnHeaderSectionCollapse;
+    property OnHeaderSectionFilterCall;
+    property OnHeaderSectionAutoSize;
+    property OnHeaderSectionMeasure;
+    property OnHorzScrollDrawPart;
+    property OnHorzScrollHintNeeded;
+
+    property OnAfterSelectionChange;
+    property OnChanging;
+    property OnDragTargetChange;
+    property OnItemChange;
+    property OnItemPreDraw;
+    property OnItemDraw;
+    property OnResize;
+{$ifndef VER3_EDITORS}
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+    property OnTryEdit;
+    property OnEditRequest;
+    property OnComboEditShow;
+    property OnValidateCombo;
+    property OnValidateInplaceEdit;
+    property OnTuneUpInplaceEdit;
+    property OnEditKeyDown;
+{$endif}
+{$else}
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+    property OnTryEdit;
+    property OnInplaceEditorNeeded;
+{$endif}
+{$endif}
+    property OnItemChecked;
+    property OnItemExpand;
+    property OnItemCollapse;
+    property OnItemExpanding;
+    property OnItemCollapsing;
+    property OnItemDeletion;
+    property OnItemFocused;
+    property OnShowLineHint;
+    property OnCompareItems;
+    property OnItemPicDraw;
+    property OnItemPicDraw2;
+    property OnItemPostDraw;
+    property OnHotTrack;
+    property OnMeasureItemPart;
+    property OnSortBegin;
+    property OnSortEnd;
+    property OnItemSave;
+    property OnItemLoad;
+    property OnItemSelectedChange;
+    property OnCellStyleSave;
+    property OnCellStyleLoad;
+    property OnVertScrollDrawPart;
+    property OnVertScrollHintNeeded;
+{$IFDEF HAS_HTML_RENDER}
+    property OnHTMLImageNeeded;
+{$ENDIF}
+    property OnVirtualTextNeeded;
+    property OnVirtualHintNeeded;
+    property OnVirtualValueNeeded;
+    {$ifdef ELTREE_USE_STYLES}
+    property OnVirtualStyleNeeded;
+    {$endif}
+
+    property OnHeaderMouseDown;
+    property OnClick;
+    property OnEnter;
+    property OnExit;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnStartDrag;
+    property OnEndDrag;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnDblClick;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+{$IFDEF VCL_4_USED}
+    property OnMouseWheel;
+    property OnMouseWheelDown;
+    property OnMouseWheelUp;
+
+    {$ifndef CLX_USED}
+    property OnStartDock;
+    property OnEndDock;
+    {$endif}
+{$ENDIF}
+{$IFDEF VCL_5_USED}
+    property OnContextPopup;
+{$ENDIF}
+{$ifdef ELTREE_USE_OLE_DRAGDROP}
+{$IFNDEF VER90}
+{$IFNDEF LITE}
+    property OnOleTargetDrag;
+    property OnOleTargetDrop;
+    property OnOleDragStart;
+    property OnOleDragFinish;
+{$ENDIF}
+{$ENDIF}
+{$endif}
+  end;
+
+type
+
+  TElTreeDragObject = class(TDragControlObject)
+    procedure Finished(Target: TObject; X, Y: Integer; Accepted: Boolean); override;
+    {$ifndef CLX_USED}
+    function GetDragCursor(Accepted: Boolean; X, Y: Integer): TCursor; override;
+    {$endif}
+    destructor Destroy; override;
+  end;
+
+const
+  FDivLineWidth = 1;
+  CheckMargin   = 2;
+  CheckBoxSize  = 15;
+
+  // CNS
+  crDragSingleNo    = 20001;
+  crDragSingleMove  = 20002;
+  crDragSingleCopy  = 20003;
+  {
+  crDragMultiNo     = 20004;
+  crDragMultiMove   = 20005;
+  crDragMultiCopy   = 20006;
+  }
+
+{$ifndef VER3_EDITORS}
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+type
+
+{$IFDEF ELPACK_COMPLETE}
+{$ifdef ELTREE_USE_EXT_EDITORS}
+     TElHackAdvancedComboBox = class(TElAdvancedComboBox)
+     protected                  
+       procedure WMGetDlgCode(var Message : TMessage); message WM_GETDLGCODE;
+     end;
+{$endif}
+{$endif}
+
+{$IFDEF ELPACK_COMPLETE}
+{$ifdef ELTREE_USE_EXT_EDITORS}
+     EditBoxClass  = TElButtonEdit;
+     ComboBoxClass = TElHackAdvancedComboBox;
+     CheckBoxClass = TElCheckBox;
+{$ELSE}
+     EditBoxClass  = TEdit;
+     ComboBoxClass = TComboBox;
+     CheckBoxClass = TCheckBox;
+{$endif}
+{$ELSE}
+     EditBoxClass  = TEdit;
+     ComboBoxClass = TComboBox;
+     CheckBoxClass = TCheckBox;
+{$ENDIF}
+{$endif}
+{$endif}
+
+{$ifndef CLX_USED}
+const MultiLineFlags : array[boolean] of integer = (DT_SINGLELINE, 0);
+      MultiLineEllipseFlags : array[boolean] of integer = (DT_END_ELLIPSIS, 0);
+{$else}
+const MultiLineFlags : array[boolean] of integer = (Integer(AlignmentFlags_SingleLine), 0);
+      MultiLineEllipseFlags : array[boolean] of integer = (0, 0);
+
+      VK_RETURN  = KEY_RETURN;
+      VK_ESCAPE  = KEY_ESCAPE;
+      VK_BACK    = KEY_BACKSPACE;
+      VK_ADD     = KEY_PLUS;
+      VK_SUBTRACT= KEY_MINUS;
+      VK_MULTIPLY= Key_Asterisk;
+      VK_SPACE   = KEY_SPACE;
+      VK_DIVIDE  = KEY_SLASH;
+      VK_HOME    = KEY_HOME;
+      VK_END     = KEY_END;
+      VK_PRIOR   = KEY_PRIOR;
+      VK_NEXT    = KEY_NEXT;
+      VK_LEFT    = KEY_LEFT;
+      VK_RIGHT   = KEY_RIGHT;
+      VK_UP      = KEY_UP;
+      VK_DOWN    = KEY_DOWN;
+{$endif}
+
+
+var LeafBmp,
+    PlusBmp,
+    MinusBmp : TBitmap;
+
+implementation
+end.

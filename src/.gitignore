@@ -1,9 +1,4 @@
 # exclude binaries and temporary files
-binaries/
-binaries_plugs/
-intermediate/
-intermediate_plugs/
-libraries/
 ipch/
 
 # User-specific files

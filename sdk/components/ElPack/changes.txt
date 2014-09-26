@@ -1,0 +1,2878 @@
+================================ Version 3.11 ==================================
+
+All controls now correctly set inherited (non-Unicode) Hint property in the 
+tricky way that Application.Hint contains both Unicode and non-Unicode hint.
+
+TElDBLookupListBox and TElDBLookupComboBox components and their Unicode clones added
+TElWideDBEdit and TElWideDBMemo components added
+
+TElHotKey component added
+
+Lite Package (Delphi) ----------------- 
+
+TElEdit:
+
+* In multiline mode, when BorderStyle = bsNone, junk was drawn around the control. Fixed. 
+* Fixed autosize issues when borders are turned off
+* Fixed issues with entering numbers from numeric part of keyboard
+* Transparency issues fixed
+! Ctrl+BkSp and Ctrl+Delete delete words now 
+! The text is centered now when Multiline is false and AlignBottom = true
+* Pressing Home when cursor is on position 0 removes selection 
+* Now it's possible to set key in KeyPress to #0.
+* Autosize is now correctly set to true by default
+* Combination of Ctrl and Alt does not prevent key from being processed.
+
+TElTree:
+
+! Now the item that is a drop target is expanded even if it doesn't have visible
+  children. This helps to expand items which are built on-the-fly  
++ Overlay images support added 
++ Items can be assigned to and from TStringList/TElWideStringList.
+* Optimized painting of the tree when the parent form is resized
+* Optimized font change handling
+* Scrolling to the end of items when there are items of different height
+  doesn't move the last item to the very top now and leaves at least screen
+  of items visible.
+* Improved vertical scrolling of items with own height
+
+Standard Package (Delphi) ----------------- 
+
+TElCheckItemGroup:
+
+* Hints property is Unicode now
+* Incorrect typecast for FItems in destructor fixed 
+
+TElCurrencyEdit:
+
+* ButtonCaption and CurrencySymbol made Unicode
+
+TElExplorerBar:
+
+* Fixed positioning of invisible groups in design-time
+* Fixed theme painting when caption is not visible
+
+TElFlatController:
+
+* Fixed loading of design-time UseXPThemes value in FlatController
+* Fixed drawing of scrollbars with XP themes enabled
+
+TElGroupBox:
+
+* In HTML mode font name is set correctly now
+* Flicker reduced with XP themes enabled
+
+TElListBox:
+
+* Lots of properties made published
+* The images were not updated when items list is changed. Fixed.
+
+ElMenus:
+
+* Fixed resource leak 
+* Increased calculation of space in main menu
+* Improved painting of the selected items
+* ElPopupMenu.Popup function worked incorrectly. Fixed.
++ Added support for HTML text
+
+TElPageControl:
+
+* PopupComponent is set to tabsheet or pagecontrol when PopupMenu is shown.  
+* Controls on tab sheets didn't get accelerator chars. Fixed.
+! Fixed hint showing - now one can track the hint given 
+
+TElPopupButton:
+
+* Fixed drawing of disabled images when manifest is included 
+* Fixed popup menu handling for ElPopupMenu
+* Fixed the AV that happened when ImageIsAlphaBlended was turned off for bitmaps
+
+TElScrollBox:
+
+* Removed terrible flicker that appeared on repainting
+
+TElSideBar:
+
+* Removed flicker introduced during CLX porting
+* Fixed AutoScroll that was broken during CLX porting
+* Improved drawing of border in with XP styles enabled 
+
+TElToolbar:
+
+* Fixed focus passing when TElToolbar gains focus 
+* Fixed assignment of properties for buttons that have OwnerSettings = false
+* ButtonCount was made public to prevent crashes in early versions of Delphi/Builder IDE
+
+TElTreeGrid:
+
+* Inplace editing was triggered by any button (instead of left button only). fixed.
+* Built-in editor always has the same font as a grid itself
+* AV appeared whn trying to read Rows array. Fixed.
+
+TElDateTimePicker:
+
+* Default for AutoSize is now correctly set to true
+
+TElFormPersist:
+
+* Fixed interseption of secondary windows hiding
+
+TElMRU:
+
+* Added Tag property to TElMRUSection
+* Added Section property to TElMRUEntry 
+
+TElSpinButton:
+
+* Fixed style painting for disabled button with XP themes enabled
+
+TElSplitter:
+
+* Fixed positioning of the splitter in AutoSnap operations
+
+TElFileNameEdit:
+
+* OnChange is called now after the dialog is executed and the user presses ok in the dialog
++ Added an option to show open OR save dialog in FileNameEdit
+
+TElFolderNameEdit:
+
+* OnChange is called now after the dialog is executed and the user presses ok in the dialog
+
+TElImageCombo:
+
+* Now it is possible to specify the name for empty value and to draw the name instead of the index 
+
+TElFontCombo:
+
++ Added fsmNoSample sample mode to prevent the control from drawing text using the selected font
+* Increased speed of component loading
+
+TElTreecombo:
+
+* Fixed the problem when drop-down tree didn't appear in response to the first click
+
+TElStatusBar:
+
+* Improved drawing of status bar bevels when SimplePanel is false
+
+TElSpinEdit:
+
+* Mouse wheel didn't cause OnChange event. Fixed.
+
+TElTimerPool:
+
+* Setting Enabled for timer pool items with Precise set to true doesn't cause 
+an AV on application termination
+
+Professional Package (Delphi) ----------------- 
+
+TElShellList,
+TElShellTree:
+
+* Improved speed of list building
+* Fixed the problem with images
+
+TElDBButtonEdit:
+
++ now supports unicode fields
+
+TElDBRadioGroup:
+
++ now supports unicode fields
+
+TElDBLabel:
+
++ now supports unicode fields
+
+=============================== Version 3.10 ==================================
+
+Unicode hints added to most of controls
+TElListBox unicode component added
+TElPopupMenu and TElMainMenu components added
+TElExplorerBar component added
+TElScrollBox component added
+
+HTMLRender:
+
++ Added possibility to adjust font color based on some supposedly background color
++ Changed font size handling to work with font.height, not font.size.
+  This is internal change, font sizes specified in HTML text remain unchanged
+
+TElHeader:
+
+* Changed drag'n'drop behaviour - now when the mouse is not over the header,
+  the section is dropped to position that it would be drooped to if the mouse
+  was over the header with the same horizontal position. 
+
+TElTree:
+
+* Fixed selection of item colors
+* Improved selection of items with mouse in multi-select mode
++ Added space style with customizable color for item border.
+! Changed colors in default tree buttons to be the same as standard ones 
+* Fixed setting bgt*Bitmap values for BackgroundType property without background 
+  bitmap assigned
+* OnItemFocused events were not fired when focus was moved due to calls to 
+  item deletion events. Fixed
+* When the item is HTML-enabled, text color is adjusted when the item is selected.
+- AddExistingItem, InsertExistingItem, RemoveItem methods removed.
+* Fixed style saving when OnStyleSave/OnStyleLoad event handler is assigned.
++! Added DblClickMode property, ExpandOnDblClick made obsolete.
+* Fixed the terrific bug when Unicode value from inplace editor was converted
+  to string after editing.
+* Images were not displayed in HTML hint for items. Fixed.
+* After using Save method the path was not restored. Fixed.
+* improved vertical scrollbar handling in case of items of different height
++ DoubleBuffered property added.
+  Currently, when the form is resized, tree doesn't use double-buffering. This
+  significantly speeds up repainting during resizing.
+* Case-insensitive sorting in Unicode significantly optimized
+* Optimized resource use on Win9x (reduced the number of bitmaps being created
+    per component)
+* Fixed possible AV when using inplace editors and C++Builder codeguard. 
+* Fixed the problem with custom checkboxes/radiobuttons that was introduced in 3.02u9.
+! Double-click handler is not called now when double-click happens on checkbox
+* Fixed handling of vertical scrollbar when there are > 32767 items and custom scrollbars are not used
+
+
+TElTreeStringGrid:
+
+* completely Unicode now
+* Fixed Tab key handling
+
+
+TElEdit:
+
+* Fixed most problems with Lines property (Delphi 6 *incorrectly* works 
+  with WideString published properties)
+* Various minor fixes
+* in WinXP all characters are converted to Unicode to avoid problems
+* Fixed a memory leak
+* Fixed problems with scrollbar updating
+* Fixed problems with IME Editors
+* Fixed some multiline problems
+* Fixed problems with Lines.Add, Lines.Insert, Lines.Clear
++ Siginificantly improved speed of line addition. 
+  Now the control can handle even 20000 lines
+  (although scrolling speed is terrible near the end of the text)
+* Fixed cursor size/position calculation for non-default fonts
+* Fixed imageform handling
+* Fixed scrollbars
++ Added CharCase property
++ Property UseCustomScrollBars added. Now you can use standard Windows or custom
+  scrollbars.
++ Support for mouse wheel added.
+
+
+TElAdvancedComboBox: 
+
++ Made ListWndProc and EidtWndProc methods of ComboBox virtual
+
+TElButtonEdit:
+
++ Published some inherited properties
+* Fixed the problem with disappearing AltButton (caused by incorrect calculation
+  of button size)
+
+
+TElCheckGroup:
+
++ FlatAlways property made published
+
+
+TElRadioGroup:
+
++ FlatAlways property made published
++ Fixed reading of ElRadioGroup.ItemIndex property
+* ItemIndex was not changed after keyboard operations
+
+TElComboBox:
+
+! Now OnDropDown is fired before the list is dropped. This lets you fill the list
+  in OnDropDown event handler. 
+! Fixed ElCombo to NOT call OnChange event when the text is changed programmatically
+* Fixed vertical text alignment problems with BorderStyle = bsNone
++ Added ButtonShortCut and AltButtonShortcut properties
+* Dropdown form now correctly positions itself on the top of the combo's parent form
+* Fixed width of the visible text
+* Unicode support added
+* Text specified in designtime was lost in runtime. Fixed.
+
+
+TElCurrencyEdit:
+
++ When font is changed, the position of editor parts is recalculated now
+* Fixed sizing of editor parts when font is changed
+* Fixed vertical alignment of the parts
+* Calculation of width of fractional part editor fixed
+* Improved positioning of the text
++ Changed editor ancestor to TElEdit
+
+TElIPEdit:
+
+* Improved positioning of the text
++ Changed editor ancestor to TElEdit
+* Points are now drawn correctly for all fonts
+
+TElDateTimePicker:
+
++ UnassignedAllowed, Unassigned, UnassignedColor and ReadOnly properties added 
++ ButtonVisible property added
+* Fixed pm reset in 12-hour mode when entering text manually
+* Added AutoSize property
+
+
+TElImageCombo:
+
++ Now the image is drawn to the left from the edit box
++ Added ShowEmptyValue property
+* Fixed ShowEmptyValue behaviour when ItemIndex is changed programmatically
+* Fixed painting of the image in the combo box
+
+TElFileNameEdit:
+
++ It's possible to set custom glyphs to buttons now.
++ ButtonWidth and ButtonNumGlyphs properties made visible
+
+TElFolderNameEdit:
+
++ It's possible to set custom glyphs to buttons now.
++ When TElFolderNameEdit was placed to the form other than main, main form
+  was activated after showing folder dialog. Fixed.
++ ButtonWidth and ButtonNumGlyphs properties made visible
+* DirExists failed on empty DirName parameter. Fixed.
+
+TElPageControl:
+
+* Fixed size calculation and painting of tabs with XP styles enabled
++ ShowImages is now True by default.
++ ShowImages is now taken into account when calculating the size of the tabs
++ Added AngledTabs style
+* Slightly improved size calculation and painting of tabs with XP styles enabled
+  and images assigned to tabs
++ Added Shortcuts support for Top/Bottom tab orientations.
+* Improved enabling of ScrollRight button in case when the last tab fits into view, but is covered with the button
++ Added TabBkColorNetStyle property to control background color of the tabs in NetTabs style.
+  Accessible only in run-time
+
+
+TElPopupButton, TElGraphicButton:
+
++ DownBackground can now be used without Background
+! Now GraphicButton is drawn without accelerator
+* Improved positioning of text and glyphs in buttons
++ Added support for 32-bit images with alpha blending (used in XP).
+  Such images are supported on all OS, not just WinXP
+* Fixed alignment of the text with XP styles enabled
+
+
+TElTreeCombo:
+
+* Fixed problems with positioning the owner form when TreeCombo is dropped on NT 4.
+* Fixed WM_CHAR handling to correctly pass incremental search  
+* The combobox failed to drop down for some reason. Fixed.
+
+
+TElURLLabel:
+
++ Now the shortcuts can be used not only to focus the linked controls, but also 
+  to fire OnClick event
+
+TElPrinter:
+
+* Changed positioning of Print Privew dialog (the window was maximized).
+
+
+TElFlatController, TElFlatMultiController:
+
+* Fixed assignment of color line border colors
+* Fixed automatic addition of controls to the list
++ Added BorderSides property to MultiController
++ Now it's possible to override values in design-time too
+* Fixed the problem with "running away controls" when MultiController is on the form
+
+TElAdvancedPanel:
+
+* Now one can correctly set glyphs for Minimize button -- 2 images in one bitmap
+  in format suitable for imagelist
+
+TElCheckBox, TElRadioButton:
+
+* Improved work with HTML formatting -- added LinkPopupMenu, LinkStyle and 
+  LinkColor properties, added OnImageNeeded and OnLinkClick events
+* Fixed the bug with right-clicks when IsHTML is false
+* imagelist removal was not tracked. Fixed. 
+
+
+TElColorCombo:
+
+* It was possible to select clNone color only on second attempt. Fixed.
+
+TElToolbar:
+
+! When the toolbar is focused, focus is automatically passed to the first control
+  that is able to be focused (i.e. is WinControl) 
++ Toolbar buttons now correctly handle change of Visible property when linked 
+  to actions
+* Improved transparency handling in with XP themes enabled 
+* Tool button draws and handles keyboard shortcuts
+
+
+TElShellTree, TElShellList:
+
++ Added ElShellList.BuildRootPIDL to access current root pidl
++ Made ElShellListItem.BuildFullPIDL and ElShellTreeItem.BuildFullPIDL methods public
+* Fixed calls to SetRootPIDL with Empty PIDL (with size of 2) as parameter
+
+TElDBEdit:
+
+* Change not commited bug fixed
+
+TElDBComboBox:
+
+* Change not commited bug fixed
+* Value not updated from DB bug fixed
+
+TElDBDateTimePicker:
+
+* Changed ReadOnly property to support Unassigned 
+* Added handling of NULL values 
+
+TElFormCaption:
+
++ Form caption works almost correctly (font style is not obeyed) with XP styles
+  enabled
+* When setting window caption (only setting it), Visible property of the text item was ignored
+
+TElPanel:
+
++ Added size grip for resizable panels
+* Vertical text aligment worked slightly incorrectly. Fixed. 
++ Added BevelSpaceColor. This color is used to draw bevel which is of type bvSpace.
+
+
+TElSpinEdit, TElFloatSpinEdit:
+
+! Changed BtnFlat behavior
+
+TElPromptDialog:
+
+! Now it is completely unicode. 
+
+TElLabel:
+
+* Optimized resource usage on Win9x
+
+TElCalendar:
+
++ Added handling of enter key
+
+TElTrackBar:
+
+* Fixed trackbar auto-scrolling behaviour when the thumb goes under the cursor while scrolling
+
+TElHTMLView:
+
++ Added margins between control sides and text rectangle
++ Improved vertical scrolling
+
+TElSplitter:
+
++ IsSnappedLeft, IsSnappedRight properties added
++ Second snap button added
+
+TElDragDrop:
+
++ Now ElDataObject can render data in IStream format (not only GLOBAL)
+* Improved handling of parameters passed to ElDataObject.GetData* and 
+ElDataObject.QueryGetData
+
+
+
+
+
+=============================== Version 3.02 ==================================
+
+New border style introduced: fbtColorLineBorder
+
+
+TElEdit and TElMouseHint components added.
+
+TElScrollbar:
+
+! if RegisterClass gives an exception, it is caught now.
+* Optimized resource use on Win9x 
+* Fixed background painting for horizontal scorllbar in cases, when thumb is not visible
+
+
+TElTree:
+
+! Now inplace editing is invoked only when the cursor is over main text or column
+  (i.e. not on checkbox or image)
+! Page setting for vertical scrollbar in mode with items of variable height is
+  now always 1 to prevent confusion
+! Changed selected items drawing when the form is activated/deactivated.
++ Added SortUseCase property.
++ Added HintIsHTML flag to TElTreeItem.  Now it's possible to make non-HTML item
+  have HTML-enabled hints.
++ LineBorderActiveColor and LineBorderInactiveColor properties added.
+* Item was not aligned correctly when Item.SuppressButtons was true and
+  Tree.ShowRootButtons was false
+* Drag code didn't always correctly process Accept parameter when setting colors 
+* Mouse movement was processed during vertical scrolling. Fixed. 
+
+TElHeader:
+
+! Configuration dialog has been changed.
+
+* Hot-tracked section was not redrawn correctly with XP styles enabled. Fixed.
+* Fixed drawing of the section being dragged in Windows 95/98 
+* Fixed some artefacts when drawing with XP styles enabled
+
+ElVCLUtils.DrawTextExW:
+
++ 8K limitation in DrawTextW removed.
+
+
+TElPageControl:
+
++ Added FlatTabs style
+* Fixed the problem with tab space transparent background with XP styles enabled 
+
+TElHTMLRender:
+
++ Fixed WordWrapping in case of width = 0.
+* Improved speed of rendering when wordwrap is on
+
+TElGroupBox:
+
+* Transparency fixed
++ Added MoneyFlat and accompanying properties
+
+TElPopupButton, TElGraphicButton:
+
++ Added MoneyFlat and accompanying properties
+* Transparency fixed
+* Removed flicker in TElPopupButton with XP styles enabled
+* Fixed the problem with raised frame that stays after pull-down menu is hidden
+
+TElTrackBar:
+
++ Added Flat property
+* Transparency fixed
+* Fixed some artefacts with XP styles enabled
+* Removed flicker with XP styles enabled
+ 
+TElToolbar:
+
+! Now toolbar can be customized by the user. Outlook-like dialog is provided.
+  Save configuration using Save and Restore methods of Toolbar. 
++ AdjustButtonWidth property added. It's used to automatically size the buttons 
+  when captions are shown
++ Added AdjustButtonHeight property
++ Added ShowCaption and LargeSize to properties handled with Save/Restore
+* Fixed deletion of buttons from toolbar
+
+TElCheckBox, TElRadioButton:
+
+! When AutoSize is true, the control is actually resized even when there is no
+  handle
++ Disabled controls are flat now too 
++ Added MoneyFlat and accompanying properties
+* in RadioButton now Checked state follows focus (this behaviour was spoiled
+  during CLX adaptation)
+* Reduced flicker with XP styles enabled
+* FocusRect is now drawn with XP styles enabled
+
+TElColorComboBox:
+
+* Improved alignment of the text
+
+TElDriveComboBox:
+
+* fixed handing of Drive property and OnChange event
+
+TElFormPersist:
+
+! Changed the way FormPersist gets notified about form show/hide events. 
++ Now it's possible to store collection elements too
+
+TElTreeInplaceComboBox:
+
+* Access violation rarely happened when closing the form using system menu.
+Fixed.
+
+TElTreeStringGrid:
+
+* goRowSelect was not working properly. Fixed. 
+
+TElDBEdit, TElDBMemo:
+
++ Some DB controls gave an AV when dropping them to the form. Fixed.
+
+TElTreeMLGenerator:
+
+* Added Notification method to prevent AVs on tree deletion
+
+TElTreePrinter:
+
+* Added Notification method to prevent AVs on tree deletion
+
+TElPanel, TElHTMLPanel:
+
+* Fixed painting of inner border with XP styles enabled
++ Panel with XP styles enabled is now OPTIONALLY drawn with
+  DrawThemeParentBackground. This is controlled by TransparentXPThemes property
+
+TElAdvancedPanel:
+
++ Panel with XP styles enabled is now OPTIONALLY drawn with
+  DrawThemeParentBackground. This is controlled by TransparentXPThemes property
++ Link* properties now change settings for caption too
+
+TElShellTree, TElShellList:
+
++ ExpandRoot property added. It defines whether the root item is expanded. 
+* OnTryEdit property made published
+* Fixed system menus that worked incorrectly
+* SystemMenu is shown when you press VK_APPS (AKA Context Menu) key.
+* Fixed the problem with 32-bit icons in Windows XP. 
+* Fixed GetFocusedDisplayName methods
+
+TElHintWindow:
+
+* Fixed CalcHintRect method
+
+TElPromptDialog:
+
+* Form size (amount of space the form takes in EXE) reduced
+
+TElImageForm:
+
+* Fixed possible AV appearing in PictureChanged when no form image is assigned
+
+TElAdvancedEdit, TElAdvancedMemo, TElAdvancedListBox, TElAdvancedComboBox: 
+
++ LineBorderActiveColor and LineBorderInactiveColor properties added.
+
+TElIPEdit, TElMaskEdit, TElCurrencyEdit, TElDateTimePicker:
+
++ LineBorderActiveColor and LineBorderInactiveColor properties added.
+
+TElHTMLView:
+
++ LineBorderActiveColor and LineBorderInactiveColor properties added.
+
+TElSpinButton:
+
++ Added MoneyFlat and accompanying properties
+
+=============================== Version 3.01 ==================================
+
+ElTree:
+
+! When the tree is disabled, scrollbars (only when UseCustomScrollbars is true)
+  are shown as disabled in Windows XP with styles enabled.
+! Clicking on the right side of the item now deselects items  
+! ElCellProgressBar and ElCellCheckBox now draw their captions using
+  *SelectTextColor when the item is selected.
+
++ Added some compatibility properties and methods for easier migration between
+  TTreeView and TElTree 
++ Added TextLeft and TextRight properties to TElTreeItem.
++ Font property has been added to ElCellCheckBox and ElCellButton
++ AutoCollapse property added. When AutoCollapse is false and AutoExpand is true,
+  focused item is expanded but other branches are not collapsed
++ KeepSelectionWithinLevel property added. When it is true and multiselect is on,
+  several items can be selected only when all items are on the same level as the
+  main item is
+
+* HeaderFont property was not taken into account when loading the form from
+  resource in run-time
+* If the tree has Align = alClient, it's parts were not updated after form
+  loading. Fixed.
+* Borders were drawn in XP style even when BorderStyle = bsNone. Fixed.
+* UseCustomCheckBoxes property was not taken in effect when XP styles were used.
+  Fixed
+* CheckBoxSize behaved incorrectly when application was designed under
+  Windows XP and then run on previous Windows versions. Fixed
+
+ElTree design-time editor:
+
++ window now is resizeable.
+
+ElScrollbar:
+
+* Disabled scrollbars had incorrect background in Windows XP with styles enabled.
+  Fixed.
+
+ElTools:
+
+* Fixed GetTempDir function in windows
+
+ElButtonEdit:
+
++ ButtonThinFrame and AltButtonThinFrame added.  
+
+ElDateTimePicker:
+
++ Added ButtonDir, ButtonType and ButtonWidth properties.
+* Fixed XP support
+
+ElHTMLView:
+
+* When the tree is disabled, scrollbars (only when UseCustomScrollbars is true)
+  are shown as disabled in Windows XP with styles enabled.
+* Borders were drawn in XP style even when BorderStyle = bsNone. Fixed.
+
+
+ElTrackBar:
+
+* When Min value is > 0, trackbar worked incorrectly. Fixed.
+
+TEMTree:
+
++ Added MoveToIns method
+
+ElHeader:
+
+* When assigning header sections, their order was not preserved. This caused
+problem in design-time. Fixed.
+
+ElHTMLRender:
+
+* Fixed assignment of break item properties in WordWrap mode -- before the fix
+  not last break item's properties where taken, but first item's. 
+
+ElStrPool editor:
+
+* Item text was not refreshed after copying. Fixed.
+* Property editor for ElStrPool.Items was not registered in Unicode mode. Fixed.
+
+ElAdvancedComboBox:
+
++ Scrollbar is flat in dropdown listbox of ElAdvancedComboBox now.
+
+ElAdvancedEdit, ElAdvancedMemo, ElAdvancedListBox:
+
++ Added XP support for all controls. XP support works always no matter if
+  manifest file is present, so if you need to turn it off, you can do this only
+  globally. 
+
+ElAdvancedPanel:
+
++ InvertMinButtonArrows property added. 
++ Caption rectangle is inflated by BevelWidth size now
+* When panel is saved as minimized, there was no way to restore it in run-time. 
+  Fixed.
+* Fixed the problem with incorrect OnRestore event invokation when the panel is
+  resized.
+
+
+ElButtonEdit:
+
++ ButtonThinFrame and AltButtonThinFrame added.  
+
+ElFormCaption:
+
+* XP compatibility added. Note that when XP styles are enabled, no additional
+  texts or buttons are available. Olny popup-menus work. 
+* Form caption is drawn corectly when there are no caption texts specified
+  FWndActive flag is set when Active property is changed in run-time. 
+
+ElColorCombo:
+
+* Options were not taken into account when combo was loaded. Fixed 
+
+ElFormPersist property editor:
+
+* now doesn't go to loops and doesn't hang. 
+
+ElGroupBox:
+
+* Changing Enabled state didn't repaint the group box. Fixed.
+* Fixed XP support 
+
+ElHTMLView:
+
+* Fixed XP support 
+
+ElIPEdit:
+
+* Fixed XP support 
+
+ElCurrencyEdit:
+
+* Fixed XP support 
+
+ElSideBar:
+
+* Fixed XP support 
+
+ElFilenameEdit:
+
+* Now ElFilenameEdit correctly processes strings with parameters
+
+ElPageControl:
+
++ Tab hints are shown now (optionally). 
++ TabEnabled behavior improved. Noww disabled tab functions in design-time and
+  is completely disabled in run-time.
++ Windows XP Themes Support Added.
+
+
+TElToolBar:
+
++ ThinButtons property added
+
+
+================================ Version 3.0 ==================================
+
+ElTree:
+
+! Changed positioning of inplace editor for main tree column in multi-column
+  mode. Now editor rectangle is calculated not for the whole cell, but for the
+  rectangle between left side of the text bounding rect and cell's right side. 
+! Clicks on CellProgressBar select an item now
+* Fixed default for ShowRootButtons
+* Fixed key clicks processing for inplace editors - some inplace editors didn't
+  catch Enter/Esc keys
+
+ElPageControl:
+
+* Fixed drawing of the line when tab style is in [tabs, net tabs],
+  ShowBorder = false and tab position is in [right, bottom]
+
+ElVCLUtils:
+
+* Fixed measurement of single-line DT_WORDWRAP'ed text in DrawTextW 
+
+
+================================ Version 3.0 PR ===============================
+
+
+TElTree:
+
++ Added TElCellProgressBar.Caption property.  
++ TElCellControl.BorderWidth added. This property adds some margin between
+  cell bounds and control.
+* HTML items set in design time were not painted correctly. Fixed.
+* HTML cells whose column alignment is taRightJustify were not painted. Fixed. 
+* Visible flag for cell controls was not taken into account. Fixed.
+
+
+ElStrUtils:
+
+Added WideUppercase and WideLowercase functions that correctly convert Unicode
+symbols
+
+ElHTMLPanel:
+
++ Added LinkStyle, LinkColor and LinkPopupMenu properties
+* Fixed link clicking
+* Fixed image painting
+
+ElHTMLView:
+
+* Fixed LinkPopupMenu that didn't work
+* Fixed calculation of non-client area for control_size < size_of_scrollbar
+  with no real scrollbar cases (for exmaple, when control height is 15 and no
+  scrollbars are visible, non-client area was calculated as if there was a
+  scrollbar)
+
+ElHTMLLabel:
+
++ Added LinkStyle, LinkColor and LinkPopupMenu properties
+
+ElFontComboBox:
+
++ Made SampleText property Unicode (optionally)
+* Improved size calculation
++ Added XP styles when drawing text
+
+ElAdvancedPanel:
+
+* Fixed caption sizing when bevel size is > 0.
+
+ElDailyTipDialog:
+
++ Added HTML support
+
+ElImageForm:
+
+* Fixed right and middle mouse button messages when MoveForm = true and
+  CaptionControl = nil
+
+ElPopupButton, ElGraphicButton:
+
+* Improved border drawing
+
+
+
+================================ Version 3.0b8 =================================
+
+Components added:
+
+ElGroupBox
+
+All components:
+
++ Added XP styles support
+* Fixed FrawTextExW function
+
+ElTree: 
+
++ ExplorerEditMode property added. In this mode when inplace editor looses focus,
+  changes are accepted. When ExplorerEditMode is off, the only way to accept
+  changes is to press Enter
+
+* Tracking is now shown even when control has no focus
+* HTML text is correctly aligned vertically
+* Own height is set correctly in design-time
+* IsHTML flag is restored correctly after saving the form in design-time  
+* Improved alignment of scrollbars when no columns are shown
+* Fixed the problem with mouse clicks and movements to the right of the last column
+* Fixed the AV that happened when QuickEditMode is set and click is done
+  outside of the tree  
+* Fixed minor problems with scrolling the view after the item was manually expanded
+* Fixed drawing of the strike line in no_columns mode
+* UpdateDiffItems method fixed so that it doesn't go to the infinite loop now
+
+
+ElToolBar:
+
+! MoreMenu button disabled
+
+
+ElDateTimePicker:
+
++ Added MaxDate and MinDate properties 
+
+
+ElScrollBar:
+
+* In non-flat mode arrow colors where drawn with HotTrackColor. Fixed.
++ Windows XP Themes Support remade using TElXPThemedControl.
++ Mouse hot tracking now works for themed control not only in flat mode.
+* Bug fixed when user uses secondary buttons in Page mode and tries
+  to look at end of scrollbar and reverse to begin (PageUp button was disabled).
+
++ Added Windows XP Themes Support. UseXPThemes property added.
+  Note that themed scrollbar will ignore some its look'n'feel properties.
+  Note that themed arrow buttons will not fire OnDrawPart event.
++ Added WM_MOUSEWHEEL processing
++ Added OnHitTest event, that simplifies implementation of owner-drawn scrollbars.
+
+
+ElHTMLRender:
+
+* Fixed rendering of LI items with WordWrap on.
+
+
+ElHTMLView:
+
+* Fixed updating after control is resized and WordWrap is set to TRUE.
+
+
+ElAdvancedPanel:
+
+* Default caption alignment taCenter was not set properly. Fixed.
+  OnClose event was mapped to OnRestore event handler. Fixed.
+
+
+ElCurrencyEdit, ElIPEdit:
+
+* Different events exposed.
+
+
+ElAdvancedComboBox:
+
++ Added Windows XP Themes Support for ElAdvancedComboBox.
+  Note that themed combobox will ignore some of its look'n'feel properties.
+* A nasty bug in ElAdvancedCombobox that prevented insertion of other controls
+  into the combobox was fixed.
+* Horizontal scrollbar fixed to behave as it is supposed to
+
+
+ElPageControl:
+
+* Fixed repainting bug that happened when size of the control is less than some limit
+
+
+ElformCaption:
+
+* Now form's complex caption is shown in Alt-Tab list
+
+ElFolderDialog:
+
+* Some problems with virtual and "dual" folders fixed
+
+
+ElImageForm:
+
++ Added TransparentColor. This value is used as a transparent color when creating
+  image-shaped forms.  
++ Added possibility to draw background on any control, not just on the form
+* Fixed the problem when MoveForm is True and no CaptionControl assigned - it
+  was impossible to click on min/max/close/menu buttons. 
+
+
+ElHTMLLabel:
+
+* Fixed updating after control is resized and WordWrap is set to TRUE.
+* in HTML mode Layout and Alignment properties are taken into account now.  
+
+
+
+================================ Version 3.0b5 =================================
+
+Components added:
+
+ElPageControl
+
+
+All components:
+
+* Fixed Unicode support on Win9x.
+* Fixed DrawTextExW function
+
+
+ElTree:
+
+* Fixed some old problems with updating max.width in certain situations
+
+
+ElHTMLView:
+
+* Fixed the problem with painting when WordWrap is true
+
+
+ElImageForm:
+
+! It is possible now to draw custom background not only on the form, but also
+on the frame and some controls (all ElPack controls that support ImageForm can
+also support new feature)
++ Scrollable controls now have correct scrollable background
++ New background style - bgtTopLeftBitmap
+
+
+ElFolderDialog:
+
++ Custom root folders are now supported
++ Initial Selection can now be set using PIDL and not displayable name
+
+
+ElUnicodeStrings:
+
++ Lots of fixes in Unicode procedures
+
+ElColorComboBox:
+
+* Item height calculation fixed for large fonts
+
+================================ Version 3.0b1 =================================
+
+Components added:
+
+ElCheckGroup, ElFilenameEdit, ElFoldernameEdit, ElFloatSpinEdit, ElVersionInfo,
+ElDriveComboBox, ElFontComboBox, ElMaskEdit, ElTreeStringGrid, ElImageComboBox,
+ElHTMLPanel, ElAdvancedPanel, ElTrackBar, ElInputDialog
+
+Components removed:
+
+ElGraph, ElDice, ElDicePanel
+
+Components renamed:
+
+ElFlatEdit -> ElAdvancedEdit
+ElFlatMemo -> ElAdvancedMemo
+ElFlatListBox -> ElAdvancedListBox
+ElFlatComboBox -> ElAdvancedComboBox
+
+Components modified:
+
+ElColorCombo:
+
+! Completely rewritten
+
+ElHTMLListBox,
+ElHTMLComboBox:
+
++ IsHTML property added. 
+
+
+ElTree:
+
+! Inplace editing completely remade. You can turn off new editors using
+  compiler directives in elpack.inc.
+! Reduced size of item instance by 36 bytes (it was 164 + 20, now it's 128 + 20).
+  +20 is the size of static data, which can be absent in case of virtual mode.
+! DivLinesColor property replaced by HorzDivLinesColor and VertDivLinesColor.
+
++ Added IndentAdjust property. This value is ADDED to item's position when drawing
+  or calculating item part. this way you can move the item to the left or to the right
+  of it's original location.
++ MouseFrameSelect property added. Now you can select a range of items by
+  pressing left button and moving the mouse cursor
++ Published OnHitTest events of custom scrollbars 
++ Added Unicode support
++ Virtuality Level 1 added.
++ StripedEvenColor, StripedOddColor, StripedItems properties added.
++ MultiSort added:
+  1) AddSortSection and RemoveSortSection -- add and remove additional sections
+     to the list of sorting sections
+  2) Ctrl+Click on header column changes sort mode of the header section and thus
+     adds the section to the list of sorting sections or removes it from there
++ Added LinHintType property to control, what exactly is displayed in line hint
++ BorderSides property added.
++  ipOutside part type added. Now ipInside is set only when the click happened in
+  main column in multicolumn mode.
++ DefaultSectionWidth property added.
+
+* Fixed the problem with default values for MainStyle object
+* HintType property made published
+* OnMeasureItemPart event made published
+* Changed OnHeaderItemDraw event to include canvas
+* Fixed Item.MoveTo(Item.Parent) (this statement caused corruption of internal
+  tree structure before).
+* Significantly improved speed of Clear operations.
+* Fixed the problem with cell background when the item is selected and
+  SelectColumn <> -1.
+* A bug with multiline items fixed.
+* Fixed format for Date and Time inplace editors.
+
+
+ElSideBar:
+
+! Adapted to allow image index property editor
+! Now items with #13#10 are drawn multiline when WordWrap is off.
++ Added Unicode support
++ BorderSides property added.
+* Potential bug fixed (FBar field was duplicated in descendant)
+
+
+ElRadioGroup:
+
+! Default alignment changed
++ BorderSides property added
++ Hints property added.
++ IsHTML property added.
+
+
+ElIPEdit:
+
++ BorderSides property added.
+* OnChange event was not fired. Fixed.
+
+
+ElHTMLView:
+
++ BorderSides property added
++ Unicode support added
+
+
+ElDateTimePicker:
+
++ BorderSides property added
++ Unicode support added
+
+
+ElCurrencyEdit:
+
++ BorderSides property added
++ AutoSelect property added.
++ Sign, EnableSign and AbsoluteValue properties added.
++ TElCurrencyEdit now supports negative values.
++ NegativeSignColor and NegativeValueTextColor properties added.
+
+* UpdatePartsWidth, AdjustEditorPositions and Paint methods was
+  rewritten to be more precise.
+* System currency symbol leading/trailing blanks now retrieved too. 
+
+
+ElCalendar:
+
++ SelectionBorder, DayCellBorder, CurrentDayBorder properties added
++ BorderSides property added
+
+
+ElPopupButton, ElGraphicButton:
+
++ Added Unicode support
++ Added AdjustSpaceForGlyph property to use new rectangle calculation 
+* Changed the drawing rectangle calculation to look the same as TSpeedButton and
+  TBitBtn 
+
+ElTreeCombo:
+
+! The component now mimics standard combobox behaviour.
+
+
+ElSpinEdit:
+
+*  Fixed the problem with cursor position when typing the values over MaxLength
+
+
+ElStatusBar:
+
++ Added Unicode support
+
+
+ElHTMLLabel:
+
++ Added Unicode support
+* Fixed GetITemRect method
+
+
+ElFolderDlg:
+
++ It is possible to set initial folder in string or PIDL form now.
+
+
+ElScrollBar:
+
++ Added OnHitTest event, that simplifies implementation of owner-drawn scrollbars.
++ Added Unicode support
+
+
+ElHeader:
+
+! Changed OnItemDraw event to include canvas
+! Default FieldType for HeaderSection is sftText now
+! Improved drawing of the section being dragged
++ Added Unicode support
++ Header sections can now contain HTML text. 
++ Added DefaultWidth property. This defines width of new sections. 
+
+
+ElSpinButton:
+
+* Fixed the problem with spin buttons, that continue to spin when mouse cursor
+  is moved over drag are and mouse button is pressed  
+
+
+ElOneInstance:
+
+* Previous instance window is brought to top only when there is no OnExists
+  event handler set.
+
+
+ElCheckBox, ElRadioButton:
+
++ Added Unicode support
+
+
+ElComboBox:
+
++ AltBtnShowFrame and BtnShowFrame properties added.
+
+
+ElCaption:
+
++ Added Unicode support
+! When no Text items are defined, form default caption is drawn
+
+
+ElLabel:
+
++ Added Unicode support
+
+
+================================ Version 2.80 ==================================
+
+Compatibility with Delphi 6 release
+
+ElTree:
+
+* Fixed format for Date and Time inplace editors.
++ Added ElCellStyle.UseBkColor. This property defines whether CellBkColor and
+  TextBkColor properties of ElCellStyle object are used.
+
+ElTray:
+
+* Fixed the bug with extended hint window and popup menu, that happened in
+  second tray icon (i.e. when extended hint and popup menu are shown by the
+  second tray icon)
+* Fixed extended hint window position for taskbar layouts on the left and
+  on the right sides 
+  
+================================ Version 2.79 ==================================
+
+ElPopupButton:
+
+* Removed small memory leak that appeared when UseArrow was set to true
+* Fixed Color property design-time storing issue (clWindow not stored)
+
+ElRadioGroup:
+
++ IsHTML property added
+
+ElTree:
+
+! Horizontal scrollbar behaviour changed to reflect the total/on-screen ratio
+  (before the change scrollbar reflected total/1 ratio)
+! Vertical scrollbar behaviour changed to reflect the total/on-screen ratio
+  (before the change scrollbar reflected total/1 ratio)
+! BevelKind property is ignored now (this is better than drawing garbage)
++ LineHintTimeout property added.
++ Added ScrollBarOpposite to allow left-aligned scrollbar. Works with custom
+    scrollbars only.
+* Now empty space between image and text belongs to text and GetItemAt returns
+  ipText. As result, one can select the item by clicking this empty space 
+* Default for LineHintTimeout was not set correctly. It is 3000 ms now and is
+  set fine.
+* Fixed the problem that appears in treecombo, when MouseDown is called and tree
+  is already not visible (tree combo has been closed).  
+* OnAfterSelectionChange was triggered when no selection change happened during
+  keyboard operation.
+  Such behaviour has been improved (although this event doesn't guarantee, that
+  actual selection has been changed during keyboard operation).
+* FullExpand and FullCollapse methods could corrupt update counter if no children
+  were available for some items. Fixed.
+* DrawLine function fixed -- worked incorrectly on Riva TNT 2 video cards (and
+  maybe some others)
+* Fixed the problem with select when clicking on expand button
+  Fixed the problem of redrawing items when some window is slowly dragged over
+  the tree 
+* Fixed the bug with incorrect drag image when multiple items were dragged while
+    DragImageKind was set to dimOne or dimNever.
+* Sorting improved
+* Fixed AV that happened when cancelling the inplace editor
+* Fixed the incorrect default for RightClickSelect property
+
+ElCheckBox, ElRadioButton:
+
++  HTML support added
+
+ElSplitter:
+
+! preview line (the one that appears when you drag the splitter) was too long 
+* Splitter dragging rewritten to be more accurate
+* WM_CANCELMODE message now stops dragging.
+* Controls were accepted by splitter. Now they are not.
++ New Snap button can be used when one of SnapTopLeft or SnapBottomRight
+  properties set to true but not both. Inspired by Netscape Navigator 6.0.
+* ESC Key isn't handled now
+
+ElCurrencyEdit:
+
++ Optional right-aligned button and its properties/events added
+* Changing of CurrencySymbolPosition now sets UseSystemCurrencySymbol to false
+! Fractional part editor behaviour changed to use DecimalDigits correctly
+* UpdatePartsWidth method updated and fixed to use AdjustEditorPositions method
+! OnChange event now called when Modified set to True
++ CurrencySymbol, CurrencySymbolPosition and UseSystemCurrencySymbol properties
+  added
+! Windows locale changing is handled
+* Integer part editor behaviour changed to override zero value
+! Currency Editor now excludes floating point types and functions
+  (floating point calculations are unsafe by precision)
++ DecimalPlaces and UseSystemDecimalPlaces properties added
+
+ElCalendarDialog:
+
+* Fixed window size for CALENDAR_USE_WINDOWS_CALENDAR option
+
+ElDateTimePicker:
+
++ OnCheckBoxChange event added
+* Fixed OnChange event triggering
+* Fixed time reset while assigning the date from popup calendar to picker
+* Fixed alignment of the text when checkbox is displayed
+* Fixed the problem with Picker loosing current selection when focus is moved
+  out of control.
+
+ElHTMLRender:
+
+* Fixed incorrect wrapping of HTML links and other elements that start a text
+  block (i.e. elements whose attribute is different from previous text)
+
+
+ElScrollBar:
+
++ DrawArrowFrames, DrawBars, BarOffset and BarColor properties added
+  (inspired by Windows XP)
+* Fixed Color property design-time storing issue (clWindow didn't stored)
+* Fixed SystemBkColor property setter (always didn't changed)
+* Painting was slightly restructured using subroutines
+* Fixed design-time settings being loaded for UseSystemMetrics-related properties
+
+ElStatusBar:
+
+* Fixed Color property design-time storing issue (clWindow not stored)
++ Added HTML support
+
+ElDice:
+
+* TElDice ParentColor property now published
+
+ElBtnCtl:
+
+* Fixed Color property design-time storing issue (clWindow not stored)
+
+ElGraph:
+
+* Fixed Color property design-time storing issue (clWindow not stored)
+
+ElLabel, ElURLLabel:
+
+* Fixed Color property design-time storing issue (clWindow not stored)
+
+ElHTMLHint:
+
+* Fixed the bug when OnShow was not called properly
+* Fixed the AV that happens when the application is closed.
+
+ElCaption:
+
++ Assignment method implemented (now one can use ElFormCaption in inherited
+  forms).
+
+ElPanel:
+
++ OnMouseEnter and OnMouseLeave events added
+  
+
+================================ Version 2.78 ==================================
+
+ElCurrencyEdit  control  added.  This  component  provides  an  easy way to edit
+currency values.
+
+ElTree:
+
++ Added ipPicture2 to hit states
++ Added automatic scrolling of the item, which is expanded and it's children
+  don't fint into view.
++ Added indentation (ItemExt div 5) to the cell contents 
+! Added ELTREE_USE_INPLACE_EDITORS directive
+  Added ELTREE_USE_STYLES directive
+  Added ELTREE_USE_OLE_DRAGDROP directive
+  Added ELTREE_USE_EXT_EDITORS directive
+  These  directives  let  you  reduce  code  size if you don't use some ElTree's
+  features.
++ Added new drag target drawing styles
++ VisibleRowCount property added.
++ DragExpandDelay property added.
++ Incremental Search added.
++ Currency inplace editor and currency field type added.
++ OnAfterSelectionChange event added. It is fired after user changes selection
+  using mouse or keyboard. This event is especially useful when you need to
+  enable/disable some controls to reflect possibility to perform some action with
+  selected items (Delete button/menu item is a perfect sample).
++ DragRectAcceptColor and DragRectDenyColor properties added.
++  RootItem  property  added  to  ElTreeItems.  Lets application randomly access
+
+* Fixed possible AVs that could happen when image list is removed.
+* Minor optimizations and readness improvements.
+* Fixed the bug with incorrect section width when ImageIndex2 is set in code
+  before the tree is shown for the first time
+* Fixed the problem with Header Height in case of change of tree's
+  (and header's) font
+* Shift-Tab navigation fixed.
+* Default for ExpandOnDoubleClick set to true.
+* Shift+down pressed twice in the end of the list in mutliselect mode selected
+  all items. Fixed.
+* Incremental search now works correctly with international and shifted
+  characters.
+* Item comparison and insertion methods now correctly compares international
+  strings using Windows locale.
+* Types used by event handlers defined inside unit.
+* Minor code optimizations and readness improvements.
+* Unnecessary variables, 'if' statements excluded, some 'while' statements
+  replaced with 'for' statements. DrawLine dot line drawing rewritten.
+* Currency inplace editor setup fixed.
+* Inplace editors placement fixed.
+* Sorting preparation step modified, currency sorting fixed.
+
+ElDateTimePicker:
+
+* Fixed the problem with center- and right-aligned text when checkbox is visible 
+* Fixed the problem with HH specifier (it worked as H).
+* Fixed the problem with construct '*:h:*' (one 'h' is used).
+* Modified property was not updated when the user changed the value with keyboard.
+  Fixed.
+
+ElComboBox:
+
++ Fixed the problem with auto-size combo boxes, that spoiled form fonts.
+
+ElHTMLView:
+
++ Now <font color="value"> understands simple color definitions like red, white).
++ Added <strikeout> tag that applied to text font style.
+* Fixed '&amp;' and '&apos;' handling.
+* Minor code optimizations and readness improvements.
+* Unnecessary variables, 'if' statements excluded, some 'while' statements
+  replaced with 'for' statements. or'ed comparisons somewhere replaced with
+  inside const set test etc.
+
+ElScrollBar:
+
++ Added HintColor and HintTextColor properties
+! Now  background  color  is  drawn  in  the  same  way as for system scrollbar
+  (optionally)
+! Now scrollbar behaves more like standard scrollbar 
+
+ElTrayInfo:
+
+* Fixed horizontal positioning of the window when taskbar is attached
+  to left or right sides
+
+ElSpinEdit:
+
++ ButtonDirection and ButtonType properties added
++ ButtonWidth property added
+* Fixed the problem with keyboard input of negative numbers
+
+ElPopupButton,
+ElGraphicButton:
+
+* Fixed possible AVs that could happen when image list is removed.
+* Minor optimizations and readness improvements.
+
+ElSideBar:
+
+! When AutoSelectItem is false, the OnItemChange event is not fired now (!)
+* Fixed possible AVs that could happen when image list is removed.
+* Minor optimizations and readness improvements.
+
+ElFormCaption:
+
+* Right-click on the caption, when popup menu was assigned, could cause an AV.
+  Fixed.
++ Added Glyph, Layout and Align to TElCaptionText
+
+================================ Version 2.77 ==================================
+
+HTMLView.pas renamed to ElHTMLView.pas.
+
+ElIPEdit component added. This component allows to enter IP addresses or parts 
+of them.
+
+ElTree: 
+
++ ChangeDelay property added. It sets delay time between focus
+  is moved with keyboard and OnItemFocused event is fired.
+* MoveFocusOnCollapse property didn't work. Fixed. 
++ OnItemChecked event added
+* Fixed possible AVs that could happen when drag'n'drop is started
+* Christmas gift -- sorting and other operations improved. Sorting is about 100
+  times faster now.
++ Item hints added. Now every item can have its own hint and you don't need to 
+  implement OnItemHintNeeded event handler to provide a hint for the item
+* Centering of item cell text was incorrect under some circumstances. Fixed.
+* Opening a dialog form in responce to MouseDown caused further problems with
+  selecting items. Fixed.
++ IterateBranch method added.
+* Fixed focus movement in AutoExpand mode.
+
+ElHeader:
+
+* Fixed the bug in UpdateSection, which incorrectly invalidated sections when
+  parent tree was horizontally scrolled
+
+ElIni:
+
+* IntLoadKey method remade to be quicker.
+
+ElHTMLHint:
+
++ OnShow and OnHide events added. They let you catch the moment, when 
+  application hints are shown or hidden.
+* Font properties for HTML text fixed.
+
+ElStringTokenizer:
+
+* Changed to avoid internal exceptions. Works quicker now and debugging is easier.
+
+ElList:
+
+* FastGet method added. This method doesn't validate index parameter.
+
+ElTimers:
+
++ Precise property added to ElTimerPool. Now when Precise is false, regular 
+  timer is used to track timer ticks. 
+
+ElComboBox:
+
++ CanDrop property added. For read-only comboboxes it acts similar to Enabled,
+  but the font color is not changed. 
+* Small resource leak fixed in ElCombos.SetAutoSize (By the way, this leak 
+  exists in VCL).
+
+ElSpinEdit:
+
+* Setting a value for the first time programmatically in run-time didn't work.
+  Fixed.
+
+ElSplitter:
+
+! Focus was grabbed by splitter. Now it is not. 
+
+ElAppBar:
+
+* Improved auto-hiding of the auto-hide bars. 
+
+ElTrayIcon:
+
+! Now ElTrayIcon uses ElTimerPool component to reduce handles usage.
+
+! Now if a double-click event handler is assigned, double-click on the icon 
+  causes ONLY OnDblClick event. No OnClick event happens in this case. 
+
+ElSideBar:
+
++ ChangeDelay property added
+
+ElPopupButton, ElGraphicButton:
+
+* NumGlyphs property is now set correctly 
+
+ElButtonEdit:
+
++ Now AltButton can be located on the left side of the control
+
+ElComboBox:
+
++ You can define second button now, with custom glyph and custom OnClick event
+  handling. This button canbe located on the left or on the right side of the 
+  edit field.
+
+
+
+================================ Version 2.76 ==================================
+
+ElDateTimePicker  component  added. This component is an advanced replacement of
+TDateTimePicker  component,  that  lets you specify the format of the data being
+shown and modified, thus letting to edit date AND time in one control.
+
+ElShutdownWatcher  unit  added.  It's a rarely known fact, that when OS is being
+shut  down,  your  application is likely to not perform properly. If you perform
+any  actions  AFTER  OnCloseQuery  of  the form is being called (for example, in
+OnDestroy or OnClose of the form), you have all chances to lose your data. Why -
+because  most  of  API  functions  will fail with error code "system is shutting
+down".  To  solve  this  problem (in 99% of cases. The solution doesn't work for
+actions  taken  in  Finalization  of  the  units) just include this unit to your
+project.
+
+ElTree:
+
+!  Items, that have Enabled set to False, are now really disabled. I.e. the user
+can't  select  them  with  mouse  or keyboard and they are not selected in group
+selection operations.
+
+* Items text, that contains "&" was drawing with end-ellipse at the end. Fixed.
+
+ElSpinEdit:
+
+* Modified property was not set due to some unknown reason. Fixed.
+
+ElSideBar:
+
+!  Property  editor  removed.  Now  properties  are  to be modified via Sections
+property and standard collection property editor.
+
+!!!!!  ElSideBarSection.ContainsControls    property   behaviour   changed.  Now
+it   is  more   correct,  than before, but (!) it's not compatible with existing
+forms.  If you have controls, that are put to the side bar sections, you need to
+migrate to new version as follows:
+
+1) For every section that contains controls, select all controls on the section,
+copy them to Clipboard and then paste to some text file.
+2) Delete all controls from the section panels. 
+3) Set ContainsControls property for these sections to false.
+4) Save the forms.
+5) Install new version of ElPack
+6) Set ContainsControls property for necessary sections to true.
+7)  Copy the controls from the text files (to which you have copied them before)
+and paste them to section panels.
+
+ElCheckBox,
+ElRadioButton:
+
+* Improved drawing of the focus rectangle
+
+ElStringTokenizer:
+
+*  When  the  string  assigned  was already set (and no change occured on second
+assign), position counter was not reset, causing an exception. Fixed.
+
+ElHistogram:
+
++ BorderStyle property added. 
+
+ElFolderDialog:
+
+* Dialog title and initial folder are correctly set under Win2000
+
+ElTrayIcon:
+
+* Fixed  the problem, when extended hint can cause AV when invoked from or after
+  CloseQuery of the main window.
+
+ElHTMLView:
+
+* Fixed the problem with horizontal scrollbar, when WordWrap is on. 
+* Transparent property was not working. Fixed.
+
+ElHeader:
+
++  WrapCaptions property added. Now header captions can be multiline and wrapped
+automatically, if they don't fit into width
++ ImageForm support added
+ 
+
+ElPopupButton,
+ElGraphicButton:
+
++  When  the  glyph  of  disabled  button is drawn from the imagelist, specified
+by Images property, this glyph is grayed before drawing now.
+
+!  The  glyph is not being offset when the image for Down state differs from the
+image for normal state
+
+ElTray:
+
+! Now ElTrayIcon uses ElTimerPool component to reduce handles usage.
+
+! Now if a double-click event handler is assigned, double-click on the icon 
+  causes ONLY OnDblClick event. No OnClick event happens in this case. 
+
+ElImageForm:
+
+* Clearing the form shape image when the window was not visible didn't work. Fixed.
+
+ElToolBar:
+
+ MoreMenu button behaviour improved.
+
+ElPopupButton, ElGraphicButton:
+
+* Border colors calculation fixed for custom border. 
+
+================================ Version 2.75 ==================================
+
+  ElHTMLView component added. This is an advanced component, that allows to view 
+  HTML-formatted text.
+
+  ElShutdownWatcher unit added. Just include this unit into your application and
+  you  will  be  sure, that your application completely executes all OnClose and
+  OnDestroy  methods  of  all  forms  and  datamodules  (there  appear different
+  problems without such solution).
+
+  TrayDays sample application added. 
+
+ElTree:
+
+* Improved vertical alignment of text when drawing multiline and HTML items
+* Improved speed of rendering HTML items. 
+* Fixed the bug, when the height for multiline items with no multiline main text
+  (i.e. the item where only column text is multiline) was defined incorrectly.
+
+* Fixed the bug, that slows down scrolling after 2.74.
+* Added edition of multiline items
+
+ElHeader: 
+
+* Assign  procedures  fixed  to  support  recently  added  properties of header
+  sections
+
+ElAppBar:
+
+* Topmost property now completely controls topmost position of the AppBar window
+
+ElSideBar:
+
+* design time behaviour of ContainsControls' sections improved. 
+
+ElCombos:
+
+* Popup list is really topmost now (it will appear on top of topmost forms). 
+
+ElToolBar:
+
++ ShowMoreMenu property added. Now when buttons don't fit to toolbar client
+  area, popup button appears, and the rest of buttons is available in popup menu
+
+ElIni:
+
+* WriteObject/ReadObject methods improved to correctly save and restore
+  properties
+
+ElTrayIcon:
+
+*  When  ExtendedFormInteractive  property  is set to true, extended hint window
+doesn't disappear if it has focus.
+  
+ElOneInstance:
+
+* Under Win2000, if the application was run under different user accounts,
+  ElOneInstance object failed to initialize. Fixed.
+
+ElFormPersist:
+
+* Now Topmost property completely controls topmost position of the form. 
+  Got rid of application hooks.
+
+ElPopupButton:
+
+* When the color is changed, the button is repainted now. 
+
+HTMLRender:
+
++ Support for unordered lists added.
++ Indent parameter for paragraphs added.
+
+ElHTMLComboBox:
+
+* Fixed item height when adding a combo box to the form in design-time
+
+ElDragDrop:
+
+* The problem with using DragDrop and ElTree units under C++Builder solved.
+
+ElImageForm:
+
+* Background painting speed significantly improved
+
+
+================================ Version 2.74 ==================================
+
+  ElHTMLLabel  component added. It supports HTML formatting (controled by IsHTML
+  property).
+
+  ElHTMLListBox,  ElHTMLComboBox  components  added. They assume that the items'
+  text is always HTML-formatted.
+
+  ElHint  component  added.  It  replaces  application hints with the ones, that
+  support rich formatting. Note, that rich-formatted text must start with <html>
+  (case sensitive).
+
+ElTree:
+
++ ElTreeItem.Multiline property added. Signals, that the item contains multiline
+  text in one of its sells.
++ AdjustHeightForMultilne  property  added.  When  the property is NOT set, the
+  height of multiline remains the same as of regular items. Application can
+  adjust the height "manually" if needed.
++ ElTreeItem.IsHTML property added. Signals, that the item will contain rich
+  text in one of the cells. Note, that rich text must start with <html> (case
+  sensitive).
++ UseCustomScrollBars (default true) property added. When this property is false,
+  standard scrollbars are used. 
++ Support for Genius and Microsoft mouse drivers added. Now it's possible to use 
+  "panning" (auto-scroll) feature, offered by the drivers, with ElTree.
++ Wheel support for Windows 95 added.
++ TElTreeItem.DataInterface property added. One can store interface references
+  there.
+! Divider lines were not painted after 10/06/2000 (v2.73). Fixed.
+
+ElPromptDialog:
+  
++ TopMost property added. When TopMost is set, dialogs appear on top of all other
+  windows. 
++ Support for HTML added
++ Message sounds are played when the dialog is shown.
+
+ElFormPersist:
+
+* Control over TopMost forms improved. 
+
+ElTrayInfo:
+
+* Support for HTML added.
+
+ElButtonEdit:
+
+* The ancestor changed to ElFlatEdit. Support for ImageForms added.
+
+================================ Version 2.73 ==================================
+
+ElScrollBar:
+
++ ImageForm  - pseudo-transparency support
++ ArrowColor -  defines the color of the arrow
++ ArrowHotTrackColor - defines the color of the arrow when cursor is over
+  the button
++ DrawFrames - enables or disables buttons and thumb frames (border)
++ ThinFrames - enables or disables thin buttons and thumb frames (border)
+
+ElCheckBox and ElRadioButton:
+
+* Margin between text and glyph increased
+* Click reaction improved
+
+ElTree:
+
+* Fixed drawing of cell text when styles are defined
++ HeaderColor property added
+* Vertical alignment of the item main text is the same as of the cell text 
+* Tree font style is not spoiled when the item that is dragged has
+  ParentStyle = false
+! RowBkColor is not used if UseBkColor is false
+
+ElHeader:
+
+* Deletion of the section could cause AV. Fixed. 
+
+ElPromptDialog:
+
++ Button captions made published to simplify translation of the dialog
+
+ElFolderDialog:
+
+* Selection path was not set sometimes. Fixed.
+
+================================ Version 2.72 ==================================
+
+ElFolderDialog component added for selecting a folder.
+
+ElTrayInfo component added. Shows a hint-like window, that can be hidden
+automatically, near the system tray.
+
+ElTree:
+
+* Automatical resizing of columns worked incorrectly for columns after the main
+  one. Fixed
++ Added ElTreeItem.RowBkColor property. Allows to define a color for the whole
+  item row
++ UseSystemHintColors property added. Allows to show item hints using system
+  colors instead of tree colors
+* Speed optimized by changing IndexOf to IndexOfFrom in some important iteration
+  methods.   
++ Backspace key moves focus to the parent item now.
+
+ElFlatMemo:
+
+* ElFlatMemo ignored WantReturns property value. Fixed. 
+
+ElTrayIcon:
+
++ ExtendedHint and related properties added.
+
+ElHeader:
+
+* Fixed Section hints showing to be changed when cursor moves to another section
++ ElHeaderSection.AutoSize property added.
+ 
+ElStatusBar:
+
+* Fixed panel hints showing to be changed when cursor moves to another panel.
+  Delphi 5/C++Builder 5 only
+
+ElIniFile:
+
+* Object properties of type TStrings were not saved and loaded by
+  WriteObject/ReadObject. Fixed.
+* TCollections were not possible to save using WriteObject. Now they are.  
++ WriteRect and ReadRect methods added
++ WriteColor and ReadColor methods added 
+
+ElPromoptDialog:
+
++ ElMessageDlg and ElMessageDlgEx functions added to quickly show a dialog.
+
+ElSideBar:
+
++ Multiline property added
+
+ElPopupButton and ElGraphicButton:
+
+* When ElPopupButton.ImageList is assigned, UseImageList wasn't taken into account. Fixed.
++ Added DownImages property for ElPopupButton and ElGraphicButton 
++ ShowBorder property added to ElPopupButton and ElGraphicButton
+
+
+================================ Version 2.71 ==================================
+
+ElSideBar:
+
+* ElSideBar correctly processes alNone align.
+
+ElFlatEdit:
+ElFlatMemo:
+
+* ElFlatEdit and ElFlatMemo now don't grab dialog keys (Enter and Esc)
+
+ElCalendar:
+
+* PeriodInterval = 0 now doesn't freeze the system
+  
+ElComboBox:
+
++ AutoSize property published
+
+ElDailyTipDlg:
+
++ Now tips can be taken from the string pool
+
+ElTree:
+
+* OnEndDrag event didn't work. Fixed. 
+* DoubleBuffered made obsolete. 
+
+ElFormCaption:
+
+* Background styles fixed for Win95/Win98.
+
+ElOneInstance: 
+
+* Now works correctly, when created before any form is shown.
+
+================================ Version 2.70 ==================================
+
+ElImageForm  component added. This component allows creation of shaped forms and
+supports custom form background.
+
+ElLabel component added. It supports different text effects.
+
+ElStringPool  component added. This component can be a placeholder for different
+text strings. Each string can consist of multiple lines.
+
+ElPromptDlg  component  added.  This  component can be used as a replacement for
+MessageDlg function. It supports translatable buttons and texts.
+ 
+Some  components got ImageForm property. When linked to ImageForm these controls
+copy their background from form's background.
+
+ElTree:
+
++ Added ElTreeItems.AddLastItem method.
++ Made ElCellStyle.Assign method public. 
++ ItemExt constant now is the tree's property
+* Fixed the LockedHeaderHeight property loading.
+* Fixed the cell button text color.
+*  Checkbox  clicks  moved  from  MouseDown  to  MouseUp  to  correctly  process
+  double-clicks.
+* Selecting items with mouse in simple SelectionMode fixed.
++  AlwaysKeepFocus  property added. This property prevents the tree from setting
+  ItemFocused to nil when the user clicks empty space.
++ LineHintColor  property  added.  This  property defines the color of the line
+  hint.
++  ElTreeItem.UseBkColor  property added. If item uses own colors, background of
+the  text  is filled with BkColor. To prevent this (for example, when background
+image is used in the tree), set UseBkColor property to false.
+
+
+ElSplitter:
+
+* AutoHide property fixed.
+
+ElHeader:
+
+* Lookup improved. Now focus is returned to the previously focused control.
+* Fixed lookup, expandable and filter sections to react on sign clicks when the
+  heaader is scrolled.
+* Changed section drawing to make offset of caption for non-resizable sections.  
+
+
+ElIni:
+
+* Setting Path in registry mode to empty string caused AV. Fixed.
++ Support for binary files added.
+
+
+ElScrollBar:
+
+* OnMouse* events published.
+
+
+ElSideBar:
+
++ TElSidebarSection.Inactive property added. Inactive section can't be clicked
+and can't be highlighted on tracking. 
+
+* CMControlChange changed to fix the bug with ContainsControls when attempt to
+create a panel causes an exception.
+
+================================ Version 2.68 ==================================
+
+ElTree:
+
++  Added  TElTreeItem.AnObject  property.  This property can be used as a simple
+placeholder for the object references, as Data is used to hold pointers.
+
+*   Different  routines  changed  to  improve  speed  of  scrolling  in keyboard
+operations.     FillVisFwd    fixed    to    ensure   correct   scrolling   when
+FilteredVisibility enabled.
+
+! In drag'n'drop operations TElTree is the source of the operation now.  
+
++ DivLinesColor property added. Defines the color of the divider lines.
+
+ElScrollBar:
+
++ OnMouse* events published.
+
+ElIniFile:
+
+*  Setting Path in registry mode to empty string caused AV. Fixed.
+
+ElHeader:
+
+*  Fixed lookup, expandable and filter sections to react on sign clicks when the
+header is scrolled.
+*  Changed section drawing to make offset of caption for non-resizable sections.
+  
+ElSideBar:
+
++  TElSidebarSection.Inactive property added. Inactive section can't be clicked
+and can't be highlighted on tracking. 
+
+*  CMControlChange changed to fix the bug with ContainsControls when attempt to
+create a panel causes an exception.
+
+
+
+================================ Version 2.60 ==================================
+
+VERSION NOTES:
+
+ElTreeCombo now has changed the names of most of its properties, related to the 
+tree. When you open your project, you will need 
+
+ElDataTree is not included any more. Users of versions of ElPack prior to 2.60
+need to keep the files from the old version, and install current version over
+the old files.
+
+TBaseComponent renamed to TElBaseComponent to avoid name conflicts.
+
+ElSplitter component added. Simple splitter.
+
+ElTimers  added. ElTimers is a set of classes, that implement a simple timer and
+a  timer  pool.  Timer  Pool  allows  to define and use the indefinite number of
+timers, without any problems with system limits.
+
+ElHintWindow  class  added. It allows you to control the color and styles of the
+text.
+
+ElObjectList   container  class  added.  This  class  can  be  used  instead  of
+TCollection. 
+
+ElImageList:
+
++  Now  all  images  are  saved with RLE compression. This makes the size of the
+image when it is saved to the stream 3 to 4 times smaller.
+
+ElPanel:
+
++  Grab  Handles  added. They offer the customer a new way to move or resize the
+panel  in  run-time.  Grab Handle can also be used to move Panel's Parent!!! The
+latter  feature is especially useful when you put the panel to the ElAppBar with
+Align=alClient, and need to move the AppBar, which has no caption or borders.
+
+ElIniFile: 
+
++   SaveObject   method  added.  Works with any TPersistent descendants, and has
+special  support  for  saving collections and ObjectLists to the ElIniFile. Also
+works with TStrings' descendants.
+
+ElToolBar:
+
+*  separators  in  toolbars  with  vertical  orientation but horizontal (alLeft,
+alRight) align are now drawn correctly.
+
+ElBiProgressBar:
+
++ Transparent property added. 
+
+ElHistogram:
+
++ Transparent property added. 
+
+ElGraph:
+
++ Transparent property added. 
+
+ElPopupButton:
+
+*  When  the  assigned  PullDownMenu is removed from the form in design-time, AV
+happened. Fixed.
+
++  Now the arrow button remains pressed, if pulldown menu is being shown.
+
+ElAppBar:
+
+*  ElAppBar  was not working under C++Builder due to differences between C++ and
+Pascal. Fixed.
+
+ElTree:
+
+* Incorrect painting of the focused and selected items fixed.
+! LineHint colors now follow the colors of the tree text and background color. 
++ psDot lines are at last drawn correctly
++ ExpandOnDragOver property added. 
+*  Automatic Drag scroll is fixed. It doesn't require the mouse to be moved near
+the edge all the time.
++  Now you can lock one column. When the column is locked, it takes the leftmost
+position and is not scrolled when the tree is scrolled horizontally.
++  Item.OwnerHeight  and  Item.Height  properties added. Now you can control the
+height of individual items!!!
+* Several painting bugs fixed
+* When the associated imagelist was freed, AV happened. Fixed.
++ Painting speed improved.
+
+ElSideBar:
+
++  AutoSelectItem  property  added. It controls whether the new item is selected
+when the new section is selected.
++  It is now possible to deselect all items. 
++  You can drop controls on ElSideBar sections. Sections are containers, even in
+design-time. Just set section's ContainsControls property to true.
+!   In Delphi 4/5 and C++Builder 4/5 disabled item's image is drawn as disabled,
+if no DisabledImages imagelist was defined.
+
+ElScrollBar:
+
++  Width  and  Height parameters added to ElScrollStyles. They control the width
+and height of the scrollbar.
++   NoSunkenThumb  property  added.  Allows  to keep the thumb raised when it is
+being dragged.
+
+ElHeader:
+
+*  OnHeaderResize property works now. 
++   LockedSection   proeprty  added.  Allows  to   lock   one   section  on  the
+leftmost  position.   Such   section  can't  be  moved,  and  it is not scrolled
+horizontally.
++  The header can be scrolled horizontally now. Just set LeftPosition property.
+
+
+ElFlatComboBox:
+
++ BorderStyle property added.
+
+ElStatusBar:
+
++ Border property Added. 
++ Color and ParentColor properties exposed.
++  Panel.AutoSize  property  added.  when  it is set, the panel is automatically
+resized, when the text is set.
+
+
+================================ Version 2.50 ==================================
+
+ElSideBar component added. ElSideBar implements the component similar to the one 
+in Microsoft Outlook, commonly known as "OutlookBar".
+
+ElScrollBar  component  added.  ElScrollBar  is  a  complete VCL replacement for
+Windows  scrollbar,  that  offers  additional  buttons, owner-draw support, flat
+buttons and thumb, scroll-hint and more ...
+
+All components, that support flat borders, got new option: now it is possible to
+customize  the  style  of  the  border  both  in active and inactive states. For
+example,  you  can  make  inactive  TElFlatEdit raised, and active - with bumped
+edge.
+
+Unit names changed:
+
+BaseComp.pas  -> ElBaseComp.pas
+DailyTip.pas  -> ElDailyTip.pas
+DragDrop.pas  -> ElDragDrop.pas
+FormPers.pas  -> ElFrmPers.pas
+Histogram.pas -> Elhstgrm.pas
+MRU.pas	      -> ElMRU.pas
+SoundMap.pas  -> ElSndMap.pas
+CRC_32.pas    -> ElCRC32.pas
+CryptMD5.pas  -> ElMD5.pas
+ColorCombo.pas-> ElClrCmb.pas
+CbFmts.pas    -> ElCbFmts.pas 
+BiProgr.pas   -> ElBiProgr.pas
+
+Packages  changed.  Now  ELPack  is  split  into  two pairs of packages. Runtime
+packages   are   ElPackXY.dpk   and   ElpkdbXY.dpk.   Design-time  packages  are
+dceldbXY.dpk    and    dclelpXX.dpk.    X    stands    for    Borland    product
+(D[elphi]/B[uilder]), and Y stands for product major version.
+
+CheckCtl.res file added. It contains sevral cool bitmaps for checkbxes and radio
+buttons.
+
+ElPanel:
+
++ New background styles (vertical and horizontal gradient) added.
++ BorderWidth property made published. 
++ Custom paint support added. New OnPaint event and OwnerDraw property.
+
+ElPopupButton:
+
++  New  mode,  ppTop,  added for a pulldown menu. In this mode the pulldown menu
+appears up to the button.
+*  The  button  correctly  handles  the  change  of DisabledImages and HotImages
+properties.
+!  The  button  now draws the focus rectangle around the whole button internals,
+including both text and glyphs.
+* The text and glyph location is calculated correctly when using arrow. 
+
+
+ElFormPersist:
+
+* The change in VCL 4+ (Delphi4, Delphi 5, C++Builder 4) caused the problem with
+storing the components' properties. Fixed.
+
+
+ElTree:
+
++  Now you get much more flexibility in customizing ElTree in Design-time. I.e.
+   ElTree   header   behaves  exactly  like in run-time. You can visually resize
+   header sections, scroll the tree etc.
++  NoBlendSelected  property  added.  This  property  removes  blended selection
+   rectangle in the tree, when the background is drawn with custom bitmap.
+*  Doubled repainting of the tree when the view is resized removed.
++  RowHotTrack property added. Defines whether to underline and change colors of
+   the complete hottracked item (not just main column).
++  Speed optimized. 
++  New background styles (vertical and horizontal gradient) added.
++  Scrollbars replaced with ElScrollBar.
+
+
+ElHeader:
+
+* Flicker that happened when the HotTrack section was changed, is removed.
+*  When  StickySections mode is turned on, there was a possibility to resize the
+right  border  of  some  section  behind  the  header itself, thus assiging some
+sections negative width. Now this is fixed.
+
+
+ElGauge: 
+
+* CriticalValue and CriticalColor are now taken into account
+
+ElFlatController, ElHook:
+
+*  The unexpected AVs that appeared when there were many components on the form,
+fixed.
+
+
+================================ Version 2.40  =================================
+
+New components:
+
++ ElFlatController - allows to turn almost any control into flat control.
++  ElFlatMultiController  -  when  dropped  on the form, turns all controls into
+  flat.  Then  you  can  define, which controls will remain flat, and which ones
+  should have an old-style border.
++ ElFlatComboBox,  ElFlatListBox, ElFlatEdit, ElFlatMemo - just the enhancements
+  of standard VCL controls, that implement "Flat" look.
++  ElButtonEdit  -  the generic control which is useful when you need to let the
+  user   enter   some  text or press one of two buttons (for example, one button
+  will  invoke   a  file  selection dialog, while the second one will invoke the
+  previous selections list).
++  ElCheckBox   and  ElRadioButton  - These VCL replacements of Windows controls
+  allow   you   to   have  transparent  and  colored checkboxes and radiobuttons
+  with SoundMap and flat style support.
+
+ElOneInstance: 
+
++  NoAutoTerminate  property  added.  If  there  is  no OnExist handler and this
+property  is  set,  the second instance doesn't switch to the first instance and
+just  allows  your application to obtain the handles of the application, window,
+main window and the process handle of the previous instance.
+
+
+ElTree:
+
++ AutoResizeColumns  property  added.  When this property is set to true, ElTree
+  will   respond  to  double-click  on header section resize area, adjusting the
+  width of  the  column.  When  the  property  is false, OnHeaderSectionAutoSize
+  event is fired.
++ OnHeaderSectionAutoSize event added. See AutoResizeColumns.
++   OnHeaderCellFilterCall   event  added.  See  ElHeader's  OnFilterCell  event
+  description.
++ Flat property added. Controls the flat look of the tree window.
++  FlatFocusedScrollbars  property  added.  This  one  controls  the look of the
+  scrollbars when the window is focused.
++  Background  and  BackgoundType  properties  added.  They are used for drawing
+  custom background of the tree.
++ HeaderFlat property added. Controls the flat look of the header sections.
++  ScrollBackground  property  added.  It  works  only  when  BackgroundMode  is
+  bgtTileBitmap   and   defines,   whether the bitmap is being scrolled together
+  with tree contents.
++  HideFocusRect  property  published.  This property controls whether the focus
+  rectangle is drawn when the tree is not focused.
+! HideSelection behavior changed. When HideSelection is set, and the tree is not
+  focused, selected items are drawn with clBtnFace brush color.
++ OnTuneUpInplaceEdit event added. It is fired after all tune-up was made so
+  you can set the edit's size and position in case you need to adjust them (for
+  example, for owner-drawn items).
++ OnMeasureItemPart event added.
+! Fixed the bug with unconditional redrawing in EnsureVisible method.  
+
+
+ElHeader:
+
++ Flat property added. Controls the flat look of the header sections.
++  ElHeaderSection.FilterEnabled  and  ElHeaderSection.FilterIsActive properties
+  added.  These  properties  allow  you  to  draw  an  arrow  similar to Excel's
+  autofilter  button.   OnFilterCell   event   is   fired,   when   the arrow is
+  clicked. Filter and Lookup are mutually exclusive.
++  FilterColor  and  ActiveFilterColor properties added. These properies control
+  the color of the filter arrow.
++  OnFilterCall event added. It is fired when the user presses the filter arrow.
++  OnSectionAutoSize  event  added.  It is fired when the user double-clicks the
+  resize area. See ElTree's comments on AutoResizeColumns property.
++  ElHeaderSection.Hint  property  added.  Every section now can have a separate
+  hint text, that is displayed when the mouse is over this section.
+* Sort signs displaying fixed. 
+
+
+ElPanel:
+
++ Transparent property added. Controls whether the panel is transparent.
+
+
+ElPopupButton:
+
++ Transparent property added.
+*  OldStyled property added. If Flat is set to false, OldStyled defines, whether
+  the button will look like TButton.
+! Arrow sign (triangle) inflated by one point.
++ HotImages and DisabledImages properties added.
+
+ElToolbar: 
+
++ TransparentButtons property added. Controls the transparency of ElToolButtons.
+
+
+ElClock:
+
+!  Now  ElClock  supports  transparency  and  background images (properties were
+  published, but did nothing before. Now they do what they are required to).
+
+
+ElBiProgressBar:
+
+*  DarkText  was drawn on the place of LightText. Fixed. Now all texts are drawn
+  on their correct places
+
+
+ElGauge: 
+
+* The bug with incorrect drawing when the Value = MaxValue fixed.
+
+================================ Version 2.37 ================================
+
+ElPropTools:
+
+* Memory leaks in LoadObject and StoreObject fixed.
+
+ElIniEdit:
+
+! Now spaces before and after key/value names (not values!) are not trimmed.
+
+ElToolBar:
+
+* Now the focus is returned to the previous control (see 2.35 remarks) before
+  OnClick event is fired. 
+
+ElFormPersist:
+
+* The bug with form size persistence that appeared in 2.35 fixed.
+
+ElColorCombo:
+
+! ColorCombo component became a descendant of the TCustomControl and got a 
+  window handle. This is made to enable changing the color with only keyboard,
+  without a mouse. 
+
+ElBiProgressBar:
+
+* The nasty bug with a colored line that appears when DarkColor is 0 fixed.
+
+ElPopupButton: 
+
+! The button with Flat property not set is drawn as a raised flat button. 
++ Multimedia support added. Now the button plays a sound when it is pressed and
+  released, or clicked.
++ ImageLists support added. 
+* The drawing of the icons improved.
+* Now the UseIcon property controls whether to draw an icon or a bitmap glyph. 
++ Actions support added (Delphi 4 and Delphi 5).
+
+ElToolBar:
+
++ ImageLists support added.
++ Actions support added (Delphi 4 and Delphi 5).
+
+ElTree: 
+
++ ImageLists support added for ElCellButton.
+* ShowRootButtons bug fixed.
+* CellButtons got ImageList support  
+* The bug with flickering when Flat is false is fixed. 
+* The lines connecting root items are now drawn more precisely. Moved a little.
+  Looks more beautiful.
+* Maximum size for custom expand/collapse signes changed - was 15x15, now it is 
+  17x17.
+
+
+ElTreeCombo:
+
+* The OnDrop event is now fired *before* the drop-down window actually changes
+  its visibility.
+   
+
+ElHeader: 
+
++ ElHeaderSection.TextLayout property added. It defines, how the text is
+  aligned vertically. 
+  
+
+================================= Version 2.35 ===============================
+
+ElSoundMap component added. This component allows you to access Windows sounds
+configuration in registry, add your application's sounds there, read the
+configuration from registry and play the proper sound. 
+
+ElTree: 
+
++ Limited support for WM_MOUSEWHEEL added. Now ElTree scrolls the view up and
+  down but doesn't fire any event. Also there is no way to change ElTree's 
+  reaction on fractional wheel distances (fractional are those, whose
+  mod 120 <> 0).
++ HideFocusRect property added. When the property is set, the focus rectangle
+  is drawn only when the control has input focus.
++ HeaderHeight propery made published. Defines the height of the header. 0
+  hides the header, although the columns remain visible. 
++ LockHeaderHeight property added. See ElHeader's "what's new". This property
+  should be set to true if you need to change header's height.
++ Flat property added.
+! Now root items are connected with vertical line.
+
+ElHeader:
+
++ LockHeight property added. When it is set, the height of the header is not
+  changed automatically when the images or font change.
+
+ElPopupButton:
+
++ TextDrawStyle property added. Now the text can be drawn like shadowed or
+  raised.
+
+ElCalendarDlg: 
+
+* Holidays can be edited in design-time.
+
+ElTreeCombo:
+
+* When ReadOnly is set, clicking on the edit switches Dropped state.
++ AutoProcessSelection property added. This property control whether the 
+  text of the combo will be changed by TreeCombo, whe multiselect is off and
+  the user changes the focused item. 
+* ElTree's DoInplaceEdit property exposed.
+* Drop-down window's height settings were not taken into account. Fixed. 
+
+ElIniFile:
+
+! Default (unnamed) values for the keys vere written to Registry in the way,
+  that allows to save binary data on Windows 95, but is not compatible with
+  standard default registry behaviour. This behaviour is changed to standard
+  (losing the possibility to save the binary data to default values on
+  Windows 95). 
+
+ElToolBar:
+
+* When the button is pressed and then released the previously focused control
+  now gains focus again.
+
+
+
+================================= Version 2.30 ===============================
+
+ElTree:
+
+* Keyboard selection with Shift key fixed.
++ Hidden items now supported.
++ Custom glyphs for CheckBoxes and RadioButtons are supported.
++ Underlining of the tracking item is optional now.
+* Automatic lookup in main tree column didn't work. Fixed.
+
+ElClock:
+
++ Countdown timer feature added.
+
+ElFormPers:
+
+* The form, that goes non_topmost, now doesn't hide itself.
+* Window position saving fixed. 
+
+
+
+================================= Version 2.26 ===============================
+
+Delphi 5 compatibility.
+
+
+
+================================= Version 2.25 ===============================
+
+ElTreeCombo component added. Some minor fixes to different components.
+
+ElClock:
+
+* Timer is counted correctly. 
+
+ElFormPersist:
+
+* now the property or the component checked for saving can be unchecked
+  correctly.
+* The size of the window is stored correctly (the real size, not the
+  maximized or minimized size).
+
+ElTree:
+
++ RightAlignedText (for Hebrew and Arabic languages) property added. 
++ RightAlignedTree (for right-aligned tree) property added. 
++ Images2 property added. Now the second image is taken from the 2nd Imagelist,
+  Images2, if it exists, or from Images, if Images2 is nil.
++ Optional second images to items added.
+* SelectedCount property works correctly.
+
+
+================================= Version 2.22 ===============================
+
+ElSpin, ElCalendar and ElCalendarDlg components added.
+
+ElTree:
+
++ DeselectChildrenOnCollapse property added.
++ LineColor and LineStyle properties added.
+* Items.Clear raised an exception under certain conditions. Fixed.
+* Second image support added.
+* OnItemSelectedChange event is fired only for items, whose Selected
+  state is really being changed.
+* DoubleClick on the item's expand or collapse sign doesn't cause OnDoubleClick
+  now. 
+* Tree lines drawing fixed
+
+ElToolBar:
+
++ ebtDivider ToolButton style added. 
+* Orientation follows align now.
+* Alignment improved. Now ebtSeparator and ebtDivider buttons get the right
+  size, depending on the toolbar align and orientation.
+
+ElCaption: 
+
+* TSplitter didn't work on a form, that had ElCaption component active. Fixed.
+
+ElHeader:
+
+* Header height is recalculated, when Images property is set to nil.
+
+Version 2.23:
+
+All visual components:
+
++ Published Delphi 4 new properties:
+
+      property Anchors;
+      property Action;
+      property Constraints;
+      property DockOrientation;
+      property Floating;
+      property DragKind;
+      property BevelKind;
+      property DoubleBuffered;
+
+ElTree:
+
++ BarStyle property added.
++ DrawFocusRect property added. This property defines, whether the focus 
+  rectangle is drawn, and is especially useful in BarStyle mode with no
+  multi-select.
+* EndEdit correctly redraws the item being edited.
+* EnsureVisible now correctly processes nil parameter. 
+! ElTreeItem.MoveTo invokes sorting routine when the SortMode is smAdd
+  or smAddClick.
++ ElTreeItem.RedrawItem and RedrawItemPart made public.
++ InvertSelection method added.
+
+ElBiProgressBar:
+
++ DarkButtonStyle and LightButtonStyle properties added. If the property is 
+  set, the button-like rectangle, not the color-filled rectangle, will be
+  drawn to show the progress.
+
+ElToolBar:
+
+* Cutting the toolbar in designer caused Access Violation in ContLibX.dpl.
+  Fixed.
+
+! The toolbar now changes its size when both AutoSize and AutoWrap are turned
+  on, and the toolbar's Align property is not alNone. 
+
+ElHeader: 
+
+* StickySections are now resized more correctly when the parent control is
+  resized.
+* When the section dragging was started near the right or left side of the
+  header, the section image was obtained and displayed incorrectly. Fixed. 
+
+Header Sections design-time editor:
+
+* Selection is set on the item being moved up or down, after the item has
+  been moved.
+
+Version 2.22:
+
+1. ElTree
+
+ * FullRowSelect works with double-clicks too now.
+ * ColumnText is aligned according to header section alignment.
+ + AlwaysKeepSelection property added. When true, it prohibits deselection
+   of the item in MultiSelect mode.
+ * ElTree persistence support fixed
+ * Focus and DropTarget highlight frames srawing fixed 
+ * Changing DropType property from dtBoth to dtOLE and vice versa fixed.
+ * ElHeader's FieldType now is used for proper sorting
+ 
+2. ElToolBar
+
+ * Correctly processes visiblility state change of child controls
+
+3. ElHeader
+ 
+ + UseMainStyle property added. It controls the style usage in ElTree. When 
+   this property is set, and ElTreeItem's UseStyles is set, main style (and
+   not the style defined for the particular section) is used to draw the
+   section.
+ + StickySections property added. This property controls the size of the
+   sections: sticky sections can't get the total width more than the header's
+   client width. So the user will never need to scrol the window horizontally
+   to see the rest of the sections. This behaviour is implemented in Netscape
+   Communicator's lists and trees.
+   
+Version 2.20:
+
+Public release
+
+1. ElHeader
+
+ * OnResize event is now working
+
+2. ElTree
+
+ * OLE drag'n'drop support a bit improved
+
+3. ElToolBar
+
+ * Controls alignment improved
+
+Version 2.10b:
+
+ElToolBar component and ElAppBar object added
+
+1. ElMRU
+
+ * Fixed the bug with refreshing the menu 
+
+2. ElTree
+
+ * Fixed the bug with redrawing the item when styles are not used and
+   ParentColors = false 
+ + OLE drag'n'drop support added
+
+3. ElFormCaption
+
+ * Fixed the bug with arrows, that appears when resizing a form
+
+4. ElHint
+
+ * Improved behavior, when the hint is shown near the edge of the screen
+
+Version 2.05b:
+
+ + ElDailyTip and ElGauge components added
+
+1. ElIniFile
+
+ * Fixed the bug with custom DivChar.
+ * Error handling improved
+ * Registry support added
+
+2. ElFormPersist
+
+ * Various minor bugs fixed 
+
+3. ElPopupButton
+  
+ * Behaviour improved
+
+4. ElTrayIcon
+
+ + Possibility to react on modal form showing (no popup menus, when modal
+   form is active) added
+ 
+5. ElURLLabel
+
+ + Internal popup menu added
+ + Possibility to change colors for visited links added
+
+6. ElBiProgressBar
+
+ * Multiline text output improved
+
+7. ElClock
+
+ * Better support for time zone time calculation (almost correct, based on
+   Windows Time Zones data)
+ + Timer fature added
+
+Version 2.05a:
+
+ + ElFormCaption, ElTrayIcon, ElFormPersist components and ElHint object
+   added.
+
+1. ElPopupButton
+
+ * Drawing fixed. Now disabled text is drawn correctly.
+
+2. ElDataTree
+
+ * HandleInsert and HandleDelete features fixed.
+ * Key and parent fields now can have nearly every type (note, that if you
+   want ElDataTree to handle insertions, and the key field type is not
+   ftAutoInc, you will have to define a handler for OnUniqueKeyNeeded event).
+ * small bugs fixed.
+
+Version 2.02:
+
+1. ElHeader
+
+ + Sections have own popup menus
+ + Sections can have "subsections" that can be shown or hidden
+ + Sections provide a lookup capability (edit box appears instead of the
+   section, and the program is notified when the edit box contents are
+   changed).
+ + Lookup history is available.
+ * Format of the data stored in ElIniFile changed. 
+
+2. ElTree
+
+ * Item text's bottom was cut, when HorizontalLines is set to false. Fixed.
+ * When RowSelect is false, Focus rectangle follows the selection rectangle.
+ + AutoLookup property added. It allows the user to search for items with
+   the text typed in the lookup box in the header.
+
+Version 2.01:
+
+1. ElTree
+
+ + Item CheckBoxes and RadioButtons support
+ + it is possible to draw only one cell as selected (when the item is selected).
+   SelectColumn property. 
+ + AutoExpand property added (when the focus changed, the focused item is
+   expanded, and the old focused is collapsed).
+ + custom Expand and Collapse signs supported
+   // note: the size of the image should not exceed 15x15 pixels
+ * drawing functions improved (flicker reduced, redraw speed increased)
+ * right-click select improved (better user interface)
+
+
+Version 2.0:
+
+ElTree:
+
++ Cell styles added.

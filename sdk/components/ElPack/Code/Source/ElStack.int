@@ -1,0 +1,56 @@
+
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElStack;
+
+interface
+
+uses Classes, SysUtils;
+
+type
+  EElStackError = class(exception)
+  end;
+
+type
+  TElStack = class(TObject)
+  private
+    FList : PPointerList;
+    FCount : Integer;
+    FCapacity : Integer;
+    function Get(index : integer) : pointer;
+    procedure Put(index : integer; value : pointer);
+    procedure Grow;
+    procedure SetCapacity(NewCapacity : Integer);
+  protected
+    function GetLast: Pointer;
+  public
+    destructor Destroy; override;
+    procedure Clear;
+    procedure Push(value : pointer);
+    function Pop : pointer;
+    function Empty : boolean;
+    property Capacity : integer read FCapacity write SetCapacity;
+    property Items[Index : Integer] : Pointer read Get write Put; default;
+    property Count : integer read FCount;
+    property Last: Pointer read GetLast;
+  end;
+
+implementation
+end.

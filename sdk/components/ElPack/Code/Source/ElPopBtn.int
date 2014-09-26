@@ -1,0 +1,1313 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+03/17/2002
+
+  Fixed the AV that happened when ImageIsAlphaBlended was turned off for bitmaps
+
+03/09/2002
+
+  Fixed drawing of disabled images when manifest is included 
+  Fixed popup menu handling for ElPopupMenu
+
+03/06/2002
+
+  Added unicode hint
+  Fixed disabled image creation for images that use imagelist
+
+02/23/2002
+
+  Added support for 32-bit images with alpha blending (used in XP).
+  Such images are supported on all OS, not just WinXP
+
+02/17/2002
+
+  Fixed alignment of the text with XP styles enabled
+
+01/29/2002
+
+  Improved positioning of text and glyphs in buttons
+
+01/16/2002
+
+  Now GraphicButton is drawn without accelerator
+
+12/25/2001
+
+  Fixed measurement of size in CLX version
+
+12/21/2001
+
+  DownBackground can now be used without Background
+
+12/09/2001
+
+  Fixed sizing of the buttons with MeasureButton with XP styles enabled
+
+11/28/2001
+
+  Added MoneyFlat and accompanying properties
+  Fixed the problem with raised frame that stays after pull-down menu is hidden
+
+11/24/2001
+
+  Improved drawing of hot images when mouse enters and leaves the button
+
+11/21/2001
+
+  Removed flicker in TElPopupButton with XP styles enabled 
+
+11/09/2001
+
+  Transparency fixed
+  
+10/26/2001
+
+  Fixed painting of background with XP styles enabled
+
+09/24/2001
+
+  Improved flat borders behaviour
+
+09/17/2001
+
+  Added Windows XP Themes Support 
+
+09/13/2001
+
+  Fixed position of menu that pulls up
+
+07/26/2001
+
+  Added Unicode support
+
+07/25/2001
+
+  Added AdjustSpaceForGlyph property to use new rectangle calculation 
+
+07/22/2001
+
+  Changed the drawing rectangle calculation to look the same as TSpeedButton and
+  TBitBtn 
+
+06/06/2001
+
+  Small memory leak fixed in ElPopupButton and ElGraphicButton with UseArrow
+  set to true
+  
+05/27/2001 (c) Akzhan Abdulin
+
+    Fixed Color property design-time storing issue (clWindow not stored)
+
+03/10/2001
+
+  Fixed possible AVs that could happen when image list is removed.
+
+  Minor optimizations and readness improvements.
+
+1/7/2001
+
+  NumGlyphs property is now set correctly
+
+12/16/2000 
+
+  Border colors calculation fixed for custom border.
+
+============================== Version 2.76 ====================================
+
+12/04/2000
+
+  When the glyph of disabled button is drawn from the imagelist, specified by
+  Images property, this glyph is grayed before drawing now.
+
+  The glyph is not being offset when the image for Down state differs from
+  the image for normal state
+
+============================== Version 2.75 ====================================
+
+10/31/2000
+
+  When the color is changed, the button is repaintàed. 
+
+============================== Version 2.74 ====================================
+
+09/23/2000
+
+  When ElPopupButton.ImageList is assigned, UseImageList wasn't taken into
+  account. Fixed.
+  Added DownImages property for ElPopupButton and ElGraphicButton
+
+09/14/2000
+
+  ShowBorder property added to ElPopupButton and ElGraphicButton
+
+*)
+
+unit ElPopBtn;
+
+interface
+
+{$R 'ElPopBtn.res'}
+
+uses
+  SysUtils,
+  Classes,
+  TypInfo,
+  ElBtnCtl,
+  ElTmSchema,
+  ElUxTheme,
+
+{$ifndef CLX_USED}
+  Windows,
+  Messages,
+  Graphics,
+  Controls,
+  Forms,
+  Buttons,
+  CommCtrl,
+  Menus,
+  ExtCtrls,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+{$ifdef VCL_4_USED}
+  ImgList,
+{$endif}
+{$IFDEF VCL_4_USED}
+  ActnList,
+{$ENDIF}
+{$else}
+{$ifdef MSWINDOWS}
+  Windows,
+{$endif}
+  Types,
+  QTypes,
+  Qt,
+  QGraphics,
+  QControls,
+  QForms,
+  QButtons,
+  QImgList,
+  ElCLXUtils,
+  QMenus,
+  QExtCtrls,
+  QActnList,
+{$endif}
+  ElVCLUtils,
+
+  ElTools,
+  ElList,
+  ElSndMap,
+  ElStrUtils,
+  ElImgFrm;
+
+type
+  TPullDownEvent = procedure(Sender : TObject) of object;
+
+  TElButtonState = (ebsUp, ebsDisabled, ebsDown, ebsExclusive, ebsArrDown);
+
+  TElButtonGlyph = class;
+
+  {$ifndef CLX_USED}
+  TElSpeedButton = class(TGraphicControl)
+  private
+    FTransparentColor : TColor;
+    FAutoSize : Boolean;
+    FNormalImage : TBitmap;
+    FDisabledImage : TBitmap;
+    FMouseInImage : TBitmap;
+    FPressedImage : TBitmap;
+    FFlat : Boolean;
+    FDrawEdge : Boolean;
+    FPressed : boolean;
+    FOver : boolean;
+    FPullTimer : TTimer;
+    FPullDownBtn : TMouseButton;
+    FPullDownInterval : Integer;
+    FPullDownEnabled : Boolean;
+    FPullDownMenu : TPopupMenu;
+    FTransparent : Boolean;
+    FOnPullDown : TPullDownEvent;
+    procedure SetPullDownMenu(newValue : TPopupMenu);
+    procedure SetTransparent(newValue : Boolean);
+    procedure SetDrawEdge(newValue : Boolean);
+
+    procedure WMMouseMove(var Msg : TWMMouseMove); message WM_MOUSEMOVE;
+    procedure CMMouseLeave(var Msg : TMessage); message CM_MOUSELEAVE;
+
+    procedure SetFlat(newValue : Boolean);
+    procedure SetNormalImage(newValue : TBitmap);
+    procedure SetDisabledImage(newValue : TBitmap);
+    procedure SetMouseInImage(newValue : TBitmap);
+    procedure SetPressedImage(newValue : TBitmap);
+    procedure SetTransparentColor(newValue : TColor);
+    procedure WMEraseBkgnd(var Msg : TWMEraseBkgnd); message WM_ERASEBKGND;
+  protected
+    procedure SetAutoSize(newValue : boolean); {$ifdef VCL_6_USED} override; {$endif}
+    procedure TriggerPullDownEvent; virtual;
+    procedure Paint; override;
+    procedure MouseDown(Button : TMouseButton; Shift : TShiftState; X, Y : Integer); override;
+    procedure MouseUp(Button : TMouseButton; Shift : TShiftState; X, Y : Integer); override;
+    procedure OnTimer(Sender : TObject);
+    procedure StartTimer;
+    procedure PullMenu;
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    function InCircle(X, Y : integer) : Boolean; virtual;
+  published
+    property PullDownBtn : TMouseButton read FPullDownBtn write FPullDownBtn; { Published }
+    property PullDownInterval : Integer read FPullDownInterval write FPullDownInterval default 1000; { Published }
+    property PullDownEnabled : Boolean read FPullDownEnabled write FPullDownEnabled default false; { Published }
+    property PullDownMenu : TPopupMenu read FPullDownMenu write SetPullDownMenu; { Published }
+    property Transparent : Boolean read FTransparent write SetTransparent default true; { Published }
+    property OnPullDown : TPullDownEvent read FOnPullDown write FOnPullDown;
+    property DrawEdge : Boolean read FDrawEdge write SetDrawEdge default False; { Published }
+    property Flat : Boolean read FFlat write SetFlat; { Published }
+    property NormalImage : TBitmap read FNormalImage write SetNormalImage; { Published }
+    property DisabledImage : TBitmap read FDisabledImage write SetDisabledImage; { Published }
+    property MouseInImage : TBitmap read FMouseInImage write SetMouseInImage; { Published }
+    property PressedImage : TBitmap read FPressedImage write SetPressedImage; { Published }
+    property AutoSize : Boolean read FAutoSize write SetAutoSize default true; { Published }
+    property TransparentColor : TColor read FTransparentColor write SetTransparentColor; { Published }
+
+    //VCL properties
+    property Align;
+    property Color nodefault;
+    property DragCursor;
+    property DragMode;
+    property ParentColor;
+    property Enabled;
+    property ParentShowHint;
+    property ShowHint;
+    property Visible;
+    property OnClick;
+    property OnDblClick;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDrag;
+    property OnDragOver;
+    property OnDragDrop;
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Action;
+    property Constraints;
+    property DockOrientation;
+    property Floating;
+    property DragKind;
+{$ENDIF}
+  end; { TElSpeedButton }
+  {$endif}
+
+  TPopupPlace = (ppDown, ppRight{$ifndef CLX_USED}, ppTop{$endif});
+
+{$WARNINGS OFF}
+  TCustomElPopupButton = class(TElButtonControl)
+  private
+    FNumGlyphs: Integer;
+  protected
+    FShadowsUseCustom : boolean;
+    FShadowBtnHighlight,
+    FShadowBtnShadow,
+    FShadowBtnDkShadow : TColor;
+    FBackground : TBitmap;
+    FShadowFollowsColor : boolean;
+    FDownBackground : TBitmap;
+    FBackgroundDrawBorder : boolean;
+    FThinFrame : Boolean;
+    FHotImages      : TImageList;
+    FDisabledImages : TImageList;
+    FDownImages     : TImageList;
+    FImageList      : TImageList;
+    FOldStyled : Boolean;
+    FUseImageList : boolean;
+    FUseIcon : Boolean;
+{$IFDEF USE_SOUND_MAP}
+    FSoundMap : TElSoundMap;
+{$ENDIF}
+    FDownSound : TElSoundName;
+    FUpSound : TElSoundName;
+    FClickSound : TElSoundName;
+    FArrowClickSound : TElSoundName;
+    FIsSwitch : Boolean;
+    FShowGlyph : Boolean;
+    FShowText : Boolean;
+    FUseArrow : Boolean;
+    FShowFocus : Boolean;
+    FMultiLine : Boolean;
+    FGroupIndex : Integer;
+    FGlyph : TElButtonGlyph;
+    FDown : Boolean;
+    FArrDown : boolean;
+    FInMenu,
+    FIgnoreClick  : boolean;
+    FDragging : Boolean;
+    FAllowAllUp : Boolean;
+    FLayout : TButtonLayout;
+    FSpacing : Integer;
+    FMargin : Integer;
+    FFlat : Boolean;
+    FMouseInArrow,
+    FMouseInControl : Boolean;
+    FDisableAp : boolean;
+    FPopupPlace : TPopupPlace;
+    FDefault : Boolean;
+    FCancel : Boolean;
+    FActive : Boolean;
+    FModalResult : TModalResult;
+    FClicksDisabled : Boolean;
+    FChLink,
+    FNChLink,
+    FDChLink,
+    FHChLink: TChangeLink;
+    FPullDownMenu : TPopupMenu;
+    FOnArrowClick : TNotifyEvent;
+    {$ifndef CLX_USED}
+    FImgForm : TElImageForm;
+    FImgFormChLink  : TImgFormChangeLink;
+    {$endif}
+    FShowBorder   : boolean;
+    FAdjustSpaceForGlyph: Boolean;
+    FArrTheme: HTheme;
+
+    procedure SetShowBorder(newValue : boolean);
+    {$ifndef CLX_USED}
+    procedure ImageFormChange(Sender : TObject);
+    procedure SetImageForm(newValue : TElImageForm);
+    {$endif}
+    procedure SetPullDownMenu(newValue : TPopupMenu);
+    procedure SetDefault(Value : Boolean);
+    procedure SetPopupPlace(Value : TPopupPlace);
+    procedure SetDisableAp(Value : boolean);
+    procedure GlyphChanged(Sender : TObject);
+    procedure UpdateExclusive;
+    function GetGlyph : TBitmap;
+    procedure SetGlyph(Value : TBitmap);
+    function GetNumGlyphs : TNumGlyphs;
+    procedure SetNumGlyphs(Value : TNumGlyphs);
+    procedure SetDown(Value : Boolean);
+    procedure SetAllowAllUp(Value : Boolean);
+    procedure SetGroupIndex(Value : Integer);
+    procedure SetLayout(Value : TButtonLayout);
+    procedure SetSpacing(Value : Integer);
+    procedure SetMargin(Value : Integer);
+    procedure UpdateTracking;
+    procedure IntMouseEnter;
+    procedure IntMouseLeave;
+    procedure IntEnabledChanged;
+    function IntKeyDown(var Key: Word; Shift: TShiftState) : boolean;
+    procedure IntKeyUp(var Key: Word; Shift: TShiftState);
+    procedure IntTextChanged;
+    {$ifdef CLX_USED}
+    procedure MouseEnter(AControl: TControl); override;
+    procedure MouseLeave(AControl: TControl); override;
+    function EventFilter(Sender: QObjectH; Event: QEventH): Boolean; override;
+    function WidgetFlags: Integer; override;
+    procedure DoEnter; override;
+    procedure DoExit; override;
+    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    procedure KeyUp(var Key: Word; Shift: TShiftState); override;
+    procedure ButtonPressed(Sender: TCustomElPopupButton; GroupIndex: Integer); virtual;
+    procedure TextChanged; override;
+    procedure EnabledChanged; override;
+    {$endif}
+    {$ifndef CLX_USED}
+    procedure CMMouseEnter(var Message : TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Message : TMessage); message CM_MOUSELEAVE;
+    procedure CMEnter(var Msg: TCMEnter); message CM_ENTER;
+    procedure CMExit(var Msg: TCMExit); message CM_EXIT;
+
+    procedure WMKeyDown(var Message : TWMKeyDown); message WM_KEYDOWN;
+    procedure WMKeyUp(var Msg: TWMKeyUp); message WM_KEYUP;
+    procedure WMLButtonDblClk(var Message : TWMLButtonDown); message WM_LBUTTONDBLCLK;
+    procedure CMEnabledChanged(var Message : TMessage); message CM_ENABLEDCHANGED;
+    procedure CMButtonPressed(var Message : TMessage); message CM_BUTTONPRESSED;
+    procedure CMDialogKey(var Message : TCMDialogKey); message CM_DIALOGKEY;
+    procedure CMFontChanged(var Message : TMessage); message CM_FONTCHANGED;
+    procedure CMTextChanged(var Message : TMessage); message CM_TEXTCHANGED;
+    procedure CMColorChanged(var Message : TMessage); message CM_COLORCHANGED;
+    procedure CMSysColorChange(var Message : TMessage); message CM_SYSCOLORCHANGE;
+    procedure IFMRepaintChildren(var Message: TMessage); message
+        IFM_REPAINTCHILDREN;
+    procedure WMGetDlgCode(var Msg : TMessage); message WM_GETDLGCODE;
+    procedure CMFocusChanged(var Message : TCMFocusChanged); message CM_FOCUSCHANGED;
+    procedure CNCommand(var Message : TWMCommand); message CN_COMMAND;
+    {$endif}
+    procedure SetShowFocus(newValue : Boolean);
+    procedure SetShowGlyph(newValue : Boolean);
+    procedure SetShowText(newValue : Boolean);
+    function GetIcon : TIcon;
+    procedure SetIcon(newValue : TIcon);
+    procedure SetIsSwitch(newValue : Boolean);
+{$IFDEF USE_SOUND_MAP}
+    procedure SetSoundMap(newValue : TElSoundMap);
+{$ENdIF}
+    procedure SetImageIndex(newValue : Integer);
+    function GetImageIndex : integer;
+    procedure SetUseIcon(newValue : Boolean);
+    procedure SetImageList(newValue : TImageList);
+    procedure SetUseImageList(newValue : Boolean);
+    function GetUseImageList : boolean;
+    procedure SetOldStyled(newValue : Boolean);
+    procedure SetHotImages(newValue : TImageList);
+    procedure SetDownImages(newValue : TImageList);
+    procedure SetDisabledImages(newValue : TImageList);
+    procedure ImagesChanged(Sender : TObject);
+    procedure SetThinFrame(newValue : Boolean);
+    procedure SetBackground(newValue : TBitmap);
+    procedure SetDownBackground(newValue : TBitmap);
+    procedure SetBackgroundDrawBorder(Value : boolean);
+    procedure SetShadowFollowsColor(Value : Boolean);
+    procedure SetShadowsUseCustom(Value : Boolean);
+    procedure SetShadowBtnHighlight(Value : TColor);
+    procedure SetShadowBtnShadow(Value : TColor);
+    procedure SetShadowBtnDkShadow(Value : TColor);
+    procedure SetAdjustSpaceForGlyph(Value: Boolean);
+  protected
+    FOrigState,
+    FState : TElButtonState;
+    FDrawDefaultFrame: Boolean;
+    FImageIsAlphaBlended: Boolean;
+    procedure SetUseArrow(newValue : boolean); virtual;
+
+    procedure CreateThemeHandle; override;
+    procedure FreeThemeHandle; override;
+
+    {$ifndef CLX_USED}
+    function GetPalette : HPALETTE; override;
+    {$endif}
+    procedure Loaded; override;
+    procedure MouseDown(Button : TMouseButton; Shift : TShiftState;
+      X, Y : Integer); override;
+    procedure MouseMove(Shift : TShiftState; X, Y : Integer); override;
+    procedure MouseUp(Button : TMouseButton; Shift : TShiftState;
+      X, Y : Integer); override;
+    procedure Paint; override;
+    {$ifndef CLX_USED}
+    procedure CreateParams(var Params : TCreateParams); override;
+    {$endif}
+    {$ifndef CLX_USED}
+    procedure CreateWnd; override;
+    {$else}
+    procedure CreateWidget; override;
+    {$endif}
+    {$ifndef CLX_USED}
+    procedure SetButtonStyle(ADefault : Boolean); virtual;
+    procedure WndProc(var Message : TMessage); override;
+    {$endif}
+    procedure SetFlat(Value : Boolean); virtual;
+    function GetChecked : Boolean; override;
+    procedure SetChecked(newValue : Boolean); override;
+{$IFDEF VCL_4_USED}
+    function GetActionLinkClass : TControlActionLinkClass; override;
+    procedure ActionChange(Sender : TObject; CheckDefaults : Boolean); override;
+{$ENDIF}
+
+    property ClicksDisabled : Boolean read FClicksDisabled write FClicksDisabled;
+    procedure Notification(AComponent : TComponent; operation : TOperation); override;
+
+    procedure SetDrawDefaultFrame(Value: Boolean);
+    function GetArrowSize: Integer; virtual;
+    function DoSaveShadows: Boolean;
+    procedure SetImageIsAlphaBlended(Value: Boolean);
+    property PullDownMenu : TPopupMenu read FPullDownMenu write SetPullDownMenu; { Published }
+    property PopupPlace : TPopupPlace read FPopupPlace write SetPopupPlace default ppDown;
+    property DisableAutoPopup : boolean read FDisableAp write SetDisableAp default false;
+    property Cancel : Boolean read FCancel write FCancel default False;
+    property Default : Boolean read FDefault write SetDefault default False;
+    property ModalResult : TModalResult read FModalResult write FModalResult default 0;
+    property AllowAllUp : Boolean read FAllowAllUp write SetAllowAllUp default False;
+    property GroupIndex : Integer read FGroupIndex write SetGroupIndex default 0;
+    property Down : Boolean read FDown write SetDown default False;
+    property Flat : Boolean read FFlat write SetFlat default False;
+    property Glyph : TBitmap read GetGlyph write SetGlyph;
+    property Layout : TButtonLayout read FLayout write SetLayout default blGlyphLeft;
+    property Margin : Integer read FMargin write SetMargin default -1;
+    property NumGlyphs : TNumGlyphs read GetNumGlyphs write SetNumGlyphs;
+    property Spacing : Integer read FSpacing write SetSpacing default 4;
+    property ShowFocus : Boolean read FShowFocus write SetShowFocus default true;
+    property UseArrow : Boolean read FUseArrow write SetUseArrow default False;
+    property ShadowFollowsColor : boolean read FShadowFollowsColor write SetShadowFollowsColor default true;
+    property ShowGlyph : Boolean read FShowGlyph write SetShowGlyph default true;
+    property ShowText : Boolean read FShowText write SetShowText default true;
+    property OnArrowClick : TNotifyEvent read FOnArrowClick write FOnArrowClick;
+    property Icon : TIcon read GetIcon write SetIcon;
+    property UseIcon : Boolean read FUseIcon write SetUseIcon default False;
+    property IsSwitch : Boolean read FIsSwitch write SetIsSwitch default False;
+    property DownSound : TElSoundName read FDownSound write FDownSound;
+    property UpSound : TElSoundName read FUpSound write FUpSound;
+    property ClickSound : TElSoundName read FClickSound write FClickSound; { Published }
+    property ArrowClickSound : TElSoundName read FArrowClickSound write FArrowClickSound; { Published }
+{$IFDEF USE_SOUND_MAP}
+    property SoundMap : TElSoundMap read FSoundMap write SetSoundMap;
+{$ENDIF}
+    property ImageIndex : Integer read GetImageIndex write SetImageIndex default -1;
+    property Images : TImageList read FImageList write SetImageList;
+    property DownImages : TImageList read FDownImages write SetDownImages;
+    property HotImages : TImageList read FHotImages write SetHotImages;
+    property DisabledImages : TImageList read FDisabledImages write SetDisabledImages;
+    {$ifndef CLX_USED}
+    property ImageForm      : TElImageForm read FImgForm write SetImageForm;
+    {$endif}
+    property ShowBorder     : boolean read FShowBorder write SetShowBorder default True;
+
+    property ShadowsUseCustom  : boolean read FShadowsUseCustom write SetShadowsUseCustom default False;
+    property ShadowBtnHighlight: TColor read FShadowBtnHighlight write SetShadowBtnHighlight stored DoSaveShadows;
+    property ShadowBtnShadow   : TColor read FShadowBtnShadow write   SetShadowBtnShadow stored DoSaveShadows;
+    property ShadowBtnDkShadow : TColor read FShadowBtnDkShadow write SetShadowBtnDkShadow stored DoSaveShadows;
+
+    property UseImageList : Boolean read GetUseImageList write SetUseImageList default False;
+    property OldStyled : Boolean read FOldStyled write SetOldStyled default False;
+    property ThinFrame : Boolean read FThinFrame write SetThinFrame default False;
+    property Background : TBitmap read FBackground write SetBackground;
+    property DownBackground : TBitmap read FDownBackground write SetDownBackground;  { Protected }
+    property BackgroundDrawBorder : boolean read FBackgroundDrawBorder write SetBackgroundDrawBorder default False;
+    property AdjustSpaceForGlyph: Boolean read FAdjustSpaceForGlyph write 
+        SetAdjustSpaceForGlyph default true;
+    property DrawDefaultFrame: Boolean read FDrawDefaultFrame write 
+        SetDrawDefaultFrame;
+    property ImageIsAlphaBlended: Boolean read FImageIsAlphaBlended write
+        SetImageIsAlphaBlended default false;
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure AClick(Arrow : boolean); virtual;
+    procedure Click; override;
+    property MouseInControl : Boolean read FMouseInControl;
+  end;
+{$WARNINGS ON}
+
+  TElPopupButton = class(TCustomElPopupButton)
+  protected
+    procedure MouseDown(Button : TMouseButton; Shift : TShiftState; X, Y : Integer); override;
+  published
+    property Background;
+    property BackgroundDrawBorder;
+    property DownBackground;
+    property ImageIndex;
+    property UseImageList;
+    property ImageIsAlphaBlended;
+    property Images;
+    property HotImages;
+    property DisabledImages;
+    property DrawDefaultFrame;
+    property PullDownMenu;
+    property PopupPlace;
+    property DisableAutoPopup;
+    property Cancel;
+    property Default;
+    property ModalResult;
+    {$ifndef CLX_USED}
+    property MoneyFlat;
+    property MoneyFlatActiveColor;
+    property MoneyFlatInactiveColor;
+    property MoneyFlatDownColor;
+    {$endif}
+    property AdjustSpaceForGlyph;
+    property AllowAllUp;
+    property GroupIndex;
+    property Down;
+    property Flat;
+    property Glyph;
+    {$ifndef CLX_USED}
+    property ImageForm;
+    {$endif}
+    property Layout;
+    property Margin;
+    property NumGlyphs;
+    property ShadowFollowsColor;
+    property ShadowsUseCustom;
+    property ShadowBtnHighlight;
+    property ShadowBtnShadow;
+    property ShadowBtnDkShadow;
+
+    property ShowFocus;
+    property ShowGlyph;
+    property ShowText;
+    property Spacing;
+    property UseArrow;
+    property IsSwitch;
+    property OnArrowClick;
+    property Icon;
+    property UseIcon;
+    property ThinFrame;
+    property TextDrawType;
+    property Transparent;
+    property DownSound;
+    property UpSound;
+    property ClickSound;
+    property ArrowClickSound;
+{$IFDEF USE_SOUND_MAP}
+    property SoundMap;
+{$ENDIF}
+    property DownImages;
+    property ShowBorder;
+    property OldStyled;
+    property UseXPThemes;
+
+    // VCL properties
+    property Caption;
+    property Enabled;
+    property TabStop default True;
+    property TabOrder;
+    property PopupMenu;
+    property Color;
+    property ParentColor;
+    property Align;
+    property Font;
+    property HelpContext;
+    property ParentFont;
+    property ParentShowHint;
+    property ShowHint;
+    property Visible;
+
+    property OnClick;
+    property OnDblClick;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnKeyDown;
+    property OnKeyUp;
+    property OnKeyPress;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnStartDrag;
+
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Action;
+    property Constraints;
+    {$ifndef CLX_USED}
+    property DockOrientation;
+    property Floating;
+    property BevelKind;
+    property DoubleBuffered;
+    property DragKind;
+
+    property OnStartDock;
+    property OnEndDock;
+{$ENDIF}
+{$IFDEF VCL_5_USED}
+    property OnContextPopup;
+{$ENDIF}
+    {$endif}
+  end;
+
+{$IFDEF VCL_4_USED}
+  TElPopupButtonActionLink = class(TElButtonActionlink)
+  protected
+    procedure SetImageIndex(Value: Integer); override;
+    procedure SetChecked(Value : boolean); override;
+  end;
+{$ENDIF}
+
+  TElGlyphList = class(TImageList)
+  private
+    Used : TBits;
+    FCount : Integer;
+    function AllocateIndex : Integer;
+  public
+    constructor CreateSize(AWidth, AHeight : Integer);
+    destructor Destroy; override;
+    function AddMasked(Image : TBitmap; MaskColor : TColor) : Integer;
+    procedure Delete(Index : Integer);
+    property Count : Integer read FCount;
+  end;
+
+  TElGlyphCache = class
+  private
+    GlyphLists : TElList;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    function GetList(AWidth, AHeight : Integer) : TElGlyphList;
+    procedure ReturnList(List : TElGlyphList);
+    function Empty : Boolean;
+  end;
+
+  TElButtonGlyph = class
+  private
+    FImageList : TImageList;
+    FImageIndex : Integer;
+    FUseImageList : Boolean;
+    FIcon : TIcon;
+    FUseIcon : Boolean;
+    FOriginal : TBitmap;
+    FGlyphList : TElGlyphList;
+    FIndexs : array[TElButtonState] of Integer;
+    FTransparentColor : TColor;
+    FNumGlyphs : TNumGlyphs;
+    FOnChange : TNotifyEvent;
+    FStretched : boolean;
+    FStrW,
+      FStrH : integer;
+    //procedure ImageListChanged(Sender : TObject);
+    procedure SetImageList(NewValue  : TImageList);
+    procedure SetImageIndex(NewValue : Integer);
+    procedure GlyphChanged(Sender : TObject);
+    procedure IconChanged(Sender : TObject);
+    procedure SetGlyph(Value : TBitmap);
+    procedure SetNumGlyphs(Value : TNumGlyphs);
+    procedure Repaint;
+    function CreateButtonGlyph(State : TElButtonState) : Integer;
+    procedure DrawButtonGlyph(Canvas : TCanvas; const GlyphPos : TPoint; State : 
+        TElButtonState; Transparent : Boolean; Color : TColor; AlphaBlended : 
+        boolean);
+    procedure DrawButtonText(Canvas : TCanvas; const Caption : TElFString;
+        TextBounds : TRect; State : TElButtonState; Multiline, Active, Transparent
+        : boolean; TextDrawType : TElTextDrawType; UseThemesForText : boolean;
+        Theme : HTheme; ThemePart, ThemeState : integer; ShowAccelChar : boolean);
+    procedure CalcButtonLayout(Canvas : TCanvas; const Client : TRect; const Offset 
+        : TPoint; const Caption : TElFString; Layout : TButtonLayout; Margin, 
+        Spacing : Integer; var GlyphPos : TPoint; var TextBounds : TRect; ShowGlyph,
+        ShowText, MultiLine : boolean; ArrowWidth : integer; UseThemesForText : 
+        boolean; Theme : HTheme; ThemePart, ThemeState : integer);
+    function GetGlyphSize : TRect;
+    procedure SetUseIcon(NewValue : boolean);
+  protected
+    property ImageList : TImageList read FImageList write SetImageList;
+    property ImageIndex : Integer read FImageIndex write SetImageIndex;
+    property UseImageList : Boolean read FUseImageList write FUseImageList;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    { return the text rectangle }
+    procedure ResetNumGlyphs;
+
+    function Draw(Canvas : TCanvas; const Client : TRect; const Offset : TPoint;
+        const Caption : TElFString; Layout : TButtonLayout; Margin, Spacing :
+        Integer; State, GlyphState : TElButtonState; Transparent : Boolean;
+        Multiline : boolean; Active, ShowGlyph, ShowText : boolean; ArrowWidth :
+        integer; TextDrawType : TElTextDrawType; Color : TColor;
+        UseThemesForText : boolean; Theme : HTheme; ThemePart, ThemeState : integer;
+        ShowAccelChar : boolean; ImageIsAlphaBlended : boolean): TRect;
+    procedure GetPaintGlyphSize(R : TRect; var Size : TPoint);
+    function CalcButtonWidth(Canvas : TCanvas; var MaxHeight : integer; const 
+        Offset : TPoint; const Caption : TElFString; Layout : TButtonLayout; Margin,
+        Spacing : Integer; ShowGlyph, ShowText, MultiLine : boolean; ArrowWidth : 
+        integer; UseThemesForText : boolean; Theme : HTheme; ThemePart, ThemeState 
+        : integer): Integer;
+    property UseIcon : boolean read FUseIcon write SetUseIcon;
+    property Icon : TIcon read FIcon;
+    property Glyph : TBitmap read FOriginal write SetGlyph;
+    property NumGlyphs : TNumGlyphs read FNumGlyphs write SetNumGlyphs;
+    property GlyphSize : TRect read GetGlyphSize;
+    property OnChange : TNotifyEvent read FOnChange write FOnChange;
+  end;
+
+{$WARNINGS OFF}
+  TCustomElGraphicButton = class(TGraphicControl)
+  private
+    FNumGlyphs: Integer;
+    {$ifndef CLX_USED}
+    FMenuWindowProc: TWndMethod;
+    {$endif}
+  protected
+    FShadowsUseCustom : boolean;
+    FShadowBtnHighlight,
+    FShadowBtnShadow,
+    FShadowBtnDkShadow : TColor;
+    FBackground : TBitmap;
+    FShadowFollowsColor : boolean;
+    FDownBackground : TBitmap;
+    FBackgroundDrawBorder : boolean;
+    FThinFrame : Boolean;
+    FHotImages,
+    FDownImages,
+    FDisabledImages,
+    FImageList : TImageList;
+    FOldStyled : Boolean;
+    FUseImageList : boolean;
+    FUseIcon : Boolean;
+{$IFDEF USE_SOUND_MAP}
+    FSoundMap : TElSoundMap;
+{$ENDIF}
+    FDownSound : TElSoundName;
+    FUpSound : TElSoundName;
+    FClickSound : TElSoundName;
+    FArrowClickSound : TElSoundName;
+    FIsSwitch : Boolean;
+    FShowGlyph : Boolean;
+    FShowText : Boolean;
+    FUseArrow : Boolean;
+    FMultiLine : Boolean;
+    FGroupIndex : Integer;
+    FGlyph : TElButtonGlyph;
+    FDown : Boolean;
+    FArrDown : boolean;
+    FInMenu,
+    FIgnoreClick  : boolean;
+    FDragging : Boolean;
+    FAllowAllUp : Boolean;
+    FLayout : TButtonLayout;
+    FSpacing : Integer;
+    FMargin : Integer;
+    FFlat : Boolean;
+    FMouseInArrow,
+    FMouseInControl : Boolean;
+    FDisableAp : boolean;
+    FPopupPlace : TPopupPlace;
+    FDefault : Boolean;
+    FCancel : Boolean;
+    FModalResult : TModalResult;
+    FClicksDisabled : Boolean;
+    FChLink,
+    FNChLink,
+    FDChLink,
+    FHChLink: TChangeLink;
+    FPullDownMenu : TPopupMenu;
+    FOnArrowClick : TNotifyEvent;
+    FTransparent  : boolean;
+    FTextDrawType : TElTextDrawType;
+    {$ifndef CLX_USED}
+    FImgForm      : TElImageForm;
+    FImgFormChLink  : TImgFormChangeLink;
+    {$endif}
+    FShowBorder   : boolean;
+    FAdjustSpaceForGlyph: Boolean;
+
+    FUseXPThemes: Boolean;
+    FTheme: HTheme;
+    FArrTheme: HTheme;
+    {$ifndef CLX_USED}
+    FWnd: HWND;
+    {$endif}
+    function  IsColorStored : boolean;
+    procedure SetShowBorder(newValue : boolean);
+    {$ifndef CLX_USED}
+    procedure ImageFormChange(Sender : TObject);
+    procedure SetImageForm(newValue : TElImageForm);
+    {$endif}
+    procedure SetTransparent(newValue : Boolean); virtual;
+    procedure SetTextDrawType(newValue : TElTextDrawType);
+    procedure SetPullDownMenu(newValue : TPopupMenu);
+
+    procedure SetPopupPlace(Value : TPopupPlace);
+    procedure SetDisableAp(Value : boolean);
+    procedure GlyphChanged(Sender : TObject);
+    procedure UpdateExclusive;
+    function GetGlyph : TBitmap;
+    procedure SetGlyph(Value : TBitmap);
+    function GetNumGlyphs : TNumGlyphs;
+    procedure SetNumGlyphs(Value : TNumGlyphs);
+    procedure SetDown(Value : Boolean);
+    procedure SetAllowAllUp(Value : Boolean);
+    procedure SetGroupIndex(Value : Integer);
+    procedure SetLayout(Value : TButtonLayout); virtual;
+    procedure SetSpacing(Value : Integer); virtual;
+    procedure SetMargin(Value : Integer); virtual;
+    procedure UpdateTracking;
+
+    procedure IntMouseEnter;
+    procedure IntMouseLeave;
+    procedure IntEnabledChanged;
+    procedure IntTextChanged;
+
+    {$ifdef CLX_USED}
+    procedure MouseEnter(AControl: TControl); override;
+    procedure MouseLeave(AControl: TControl); override;
+    procedure ButtonPressed(Sender: TCustomElGraphicButton; GroupIndex: Integer); virtual;
+    procedure TextChanged; override;
+    procedure EnabledChanged; override;
+    procedure FontChanged; override;
+    {$endif}
+
+    {$ifndef CLX_USED}
+    procedure CMEnabledChanged(var Message : TMessage); message CM_ENABLEDCHANGED;
+    procedure CMButtonPressed(var Message : TMessage); message CM_BUTTONPRESSED;
+    procedure CMDialogKey(var Message : TCMDialogKey); message CM_DIALOGKEY;
+    procedure CMDialogChar(var Message : TCMDialogChar); message CM_DIALOGCHAR;
+    procedure CMFontChanged(var Message : TMessage); message CM_FONTCHANGED;
+    procedure CMTextChanged(var Message : TMessage); message CM_TEXTCHANGED;
+    procedure CMColorChanged(var Message : TMessage); message CM_COLORCHANGED;
+    procedure CMSysColorChange(var Message : TMessage); message CM_SYSCOLORCHANGE;
+    procedure CMMouseEnter(var Message : TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Message : TMessage); message CM_MOUSELEAVE;
+    procedure WMThemeChanged(var Message: TMessage); message WM_THEMECHANGED;
+    {$endif}
+
+    procedure SetShowGlyph(newValue : Boolean); virtual;
+    procedure SetShowText(newValue : Boolean); virtual;
+    function GetIcon : TIcon;
+    procedure SetIcon(newValue : TIcon);
+    procedure SetIsSwitch(newValue : Boolean);
+{$IFDEF USE_SOUND_MAP}
+    procedure SetSoundMap(newValue : TElSoundMap);
+{$ENDIF}
+    procedure SetImageIndex(newValue : Integer); virtual;
+    function GetImageIndex : integer;
+    procedure SetUseIcon(newValue : Boolean); virtual;
+    procedure SetImageList(newValue : TImageList); virtual;
+    procedure SetUseImageList(newValue : Boolean); virtual;
+    function GetUseImageList : boolean;
+    procedure SetOldStyled(newValue : Boolean);
+    procedure SetDownImages(newValue : TImageList);
+    procedure SetHotImages(newValue : TImageList);
+    procedure SetDisabledImages(newValue : TImageList);
+    procedure ImagesChanged(Sender : TObject); virtual;
+    procedure SetThinFrame(newValue : Boolean);
+    procedure SetBackground(newValue : TBitmap);
+    procedure SetDownBackground(newValue : TBitmap);
+    procedure SetBackgroundDrawBorder(Value : boolean);
+    procedure SetShadowFollowsColor(Value : Boolean);
+    procedure SetShadowsUseCustom(Value : Boolean);
+    procedure SetShadowBtnHighlight(Value : TColor);
+    procedure SetShadowBtnShadow(Value : TColor);
+    procedure SetShadowBtnDkShadow(Value : TColor);
+    procedure SetAdjustSpaceForGlyph(Value: Boolean);
+    procedure SetUseXPThemes(const Value: Boolean);
+
+    procedure CreateThemeHandle;
+    procedure FreeThemeHandle;
+
+  protected
+    FOrigState,
+    FState : TElButtonState;
+    FCaption: TElFString;
+
+    {$ifdef ELPACK_UNICODE}
+    FHint: WideString;
+    {$endif}
+
+    FMoneyFlat: Boolean;
+    FMoneyFlatDownColor: TColor;
+    FMoneyFlatActiveColor: TColor;
+    FMoneyFlatInactiveColor: TColor;
+    FShortcutsEnabled: Boolean;
+    FImageIsAlphaBlended: Boolean;
+
+    procedure SetUseArrow(newValue : boolean); virtual;
+    {$ifndef CLX_USED}
+    function GetPalette : HPALETTE; override;
+    {$endif}
+    procedure Loaded; override;
+    procedure MouseDown(Button : TMouseButton; Shift : TShiftState;
+      X, Y : Integer); override;
+    procedure MouseMove(Shift : TShiftState; X, Y : Integer); override;
+    procedure MouseUp(Button : TMouseButton; Shift : TShiftState;
+      X, Y : Integer); override;
+    procedure Paint; override;
+    {$ifndef CLX_USED}
+    procedure WndProc(var Message : TMessage); override;
+    {$endif}
+    procedure SetFlat(Value : Boolean); virtual;
+    function GetChecked : Boolean; virtual;
+    procedure SetChecked(newValue : Boolean); virtual;
+{$IFDEF VCL_4_USED}
+    function GetActionLinkClass : TControlActionLinkClass; override;
+    procedure ActionChange(Sender : TObject; CheckDefaults : Boolean); override;
+{$ENDIF}
+    function DoSaveShadows : boolean;
+
+    {$ifdef ELPACK_UNICODE}
+    {$ifndef CLX_USED}
+    procedure CMHintShow(var Message: TMessage); message CM_HINTSHOW;
+    {$else}
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    {$endif}
+    {$endif}
+
+    procedure Notification(AComponent : TComponent; operation : TOperation); override;
+
+    procedure SetCaption(Value: TElFString);
+    {$ifndef CLX_USED}
+    procedure IFMRepaintChildren(var Message: TMessage); message
+        IFM_REPAINTCHILDREN;
+    {$endif}
+    function GetThemePartID: Integer; virtual;
+    function GetThemeStateID: Integer; virtual;
+    function GetThemedClassName: WideString; virtual;
+    function GetArrowThemePartID: Integer; virtual;
+    function GetArrowThemeStateID: Integer; virtual;
+    function GetArrowThemedClassName: WideString; virtual;
+
+    function GetArrowSize: Integer; virtual;
+    {$ifdef MSWINDOWS}
+    procedure DrawThemedBackground(Canvas : TCanvas); virtual;
+    {$endif}
+    {$ifndef CLX_USED}
+    procedure WMWindowPosChanged(var Message: TMessage); message WM_WINDOWPOSCHANGED;
+    {$endif}
+    function MeasureButton(LockHeight : boolean): TPoint;
+
+    procedure SetMoneyFlat(Value: Boolean);
+    procedure SetMoneyFlatDownColor(Value: TColor);
+    procedure SetMoneyFlatActiveColor(Value: TColor);
+    procedure SetMoneyFlatInactiveColor(Value: TColor);
+    function GetMoneyFlat: Boolean;
+
+    {$ifndef CLX_USED}
+    procedure IntWndProc(var Message : TMessage);
+    {$endif}
+    procedure DoPullMenu; virtual;
+    procedure SetShortcutsEnabled(Value: Boolean);
+    function Focused: Boolean; virtual;
+    procedure SetImageIsAlphaBlended(Value: Boolean);
+    {$ifdef ELPACK_UNICODE}
+    procedure SetHint(Value: WideString);
+    {$endif}
+    property ClicksDisabled : Boolean read FClicksDisabled write FClicksDisabled;
+
+    property PullDownMenu : TPopupMenu read FPullDownMenu write SetPullDownMenu; { Published }
+    property PopupPlace : TPopupPlace read FPopupPlace write SetPopupPlace default ppDown;
+    property DisableAutoPopup : boolean read FDisableAp write SetDisableAp default false;
+    property Cancel : Boolean read FCancel write FCancel default False;
+    property ModalResult : TModalResult read FModalResult write FModalResult default 0;
+    property AllowAllUp : Boolean read FAllowAllUp write SetAllowAllUp default False;
+    property GroupIndex : Integer read FGroupIndex write SetGroupIndex default 0;
+    property Down : Boolean read FDown write SetDown default False;
+    property Flat : Boolean read FFlat write SetFlat default false;
+    property Glyph : TBitmap read GetGlyph write SetGlyph;
+    property Layout : TButtonLayout read FLayout write SetLayout default blGlyphLeft;
+    property Margin : Integer read FMargin write SetMargin default -1;
+    property NumGlyphs : TNumGlyphs read GetNumGlyphs write SetNumGlyphs;
+    property Spacing : Integer read FSpacing write SetSpacing default 4;
+
+    property UseArrow : Boolean read FUseArrow write SetUseArrow default False;
+    property ShadowFollowsColor : boolean read FShadowFollowsColor write SetShadowFollowsColor;
+    property ShowGlyph : Boolean read FShowGlyph write SetShowGlyph default true;
+    property ShowText : Boolean read FShowText write SetShowText default true;
+    property OnArrowClick : TNotifyEvent read FOnArrowClick write FOnArrowClick;
+    property Icon : TIcon read GetIcon write SetIcon;
+    property UseIcon : Boolean read FUseIcon write SetUseIcon default false; { Protected }
+    property IsSwitch : Boolean read FIsSwitch write SetIsSwitch default false;
+    property DownSound : TElSoundName read FDownSound write FDownSound; { Published }
+    property UpSound : TElSoundName read FUpSound write FUpSound; { Published }
+    property ClickSound : TElSoundName read FClickSound write FClickSound; { Published }
+    property ArrowClickSound : TElSoundName read FArrowClickSound write FArrowClickSound; { Published }
+{$IFDEF USE_SOUND_MAP}
+    property SoundMap : TElSoundMap read FSoundMap write SetSoundMap;
+{$ENDIF}
+    property ImageIndex : Integer read GetImageIndex write SetImageIndex default -1;
+    property Images : TImageList read FImageList write SetImageList;
+    property HotImages : TImageList read FHotImages write SetHotImages;
+    property DisabledImages : TImageList read FDisabledImages write SetDisabledImages;
+    property DownImages     : TImageList read FDownImages write SetDownImages;
+    {$ifndef CLX_USED}
+    property ImageForm      : TElImageForm read FImgForm write SetImageForm;
+    {$endif}
+    property ShowBorder     : boolean read FShowBorder write SetShowBorder default true;
+
+    property ShadowsUseCustom  : boolean read FShadowsUseCustom write SetShadowsUseCustom default false;
+    property ShadowBtnHighlight: TColor read FShadowBtnHighlight write SetShadowBtnHighlight stored DoSaveShadows default $00F7F7F5;
+    property ShadowBtnShadow   : TColor read FShadowBtnShadow write   SetShadowBtnShadow stored DoSaveShadows default $00767A60;
+    property ShadowBtnDkShadow : TColor read FShadowBtnDkShadow write SetShadowBtnDkShadow stored DoSaveShadows default $00595C48;
+
+    property UseImageList : Boolean read GetUseImageList write SetUseImageList default false; { Protected }
+    property OldStyled : Boolean read FOldStyled write SetOldStyled default false; { Protected }
+    property ThinFrame : Boolean read FThinFrame write SetThinFrame default false;  { Protected }
+    property Background : TBitmap read FBackground write SetBackground;  { Protected }
+    property DownBackground : TBitmap read FDownBackground write SetDownBackground;  { Protected }
+    property BackgroundDrawBorder : boolean read FBackgroundDrawBorder write SetBackgroundDrawBorder default false;
+    property Transparent : boolean read FTransparent write SetTransparent default false;
+    property TextDrawType : TElTextDrawType read FTextDrawType write SetTextDrawType default tdtNormal; { Published }
+    property Checked : Boolean read GetChecked write SetChecked default false; { Protected }
+    property Color stored IsColorStored nodefault;
+    property AdjustSpaceForGlyph: Boolean read FAdjustSpaceForGlyph write
+        SetAdjustSpaceForGlyph default true;
+    property Caption: TElFString read FCaption write SetCaption;
+
+    property UseXPThemes: Boolean read FUseXPThemes write SetUseXPThemes default
+        True;
+
+    property MoneyFlat: Boolean read GetMoneyFlat write SetMoneyFlat default false;
+    property MoneyFlatDownColor: TColor read FMoneyFlatDownColor write
+        SetMoneyFlatDownColor stored GetMoneyFlat;
+    property MoneyFlatActiveColor: TColor read FMoneyFlatActiveColor write
+        SetMoneyFlatActiveColor  stored GetMoneyFlat;
+    property MoneyFlatInactiveColor: TColor read FMoneyFlatInactiveColor write
+        SetMoneyFlatInactiveColor  stored GetMoneyFlat;
+    property ImageIsAlphaBlended: Boolean read FImageIsAlphaBlended write 
+        SetImageIsAlphaBlended default false;
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure AClick(Arrow : boolean); virtual;
+
+    function IsThemeApplied: Boolean;
+    procedure Click; override;
+
+    property MouseInControl : Boolean read FMouseInControl;
+    property Theme: HTheme read FTheme;
+    {$ifndef CLX_USED}
+    property MenuWindowProc: TWndMethod read FMenuWindowProc write FMenuWindowProc;
+    {$endif}
+    property ShortcutsEnabled: Boolean read FShortcutsEnabled write 
+        SetShortcutsEnabled default false;
+  published
+    {$ifdef ELPACK_UNICODE}
+    property Hint: WideString read FHint write SetHint;
+    {$endif}
+  end;
+{$WARNINGS ON}
+
+  TCustomElGraphicButtonClass = class of TCustomElGraphicButton;
+
+  TElGraphicButton = class(TCustomElGraphicButton)
+  published
+    property Background;
+    property BackgroundDrawBorder;
+    property DownBackground;
+    property ImageIsAlphaBlended;
+    property ImageIndex;
+    property UseImageList;
+    property Images;
+    property HotImages;
+    property DisabledImages;
+    property PullDownMenu;
+    property PopupPlace;
+    property DisableAutoPopup;
+    property Cancel;
+    property ModalResult;
+
+    property MoneyFlat;
+    property MoneyFlatInactiveColor;
+    property MoneyFlatActiveColor;
+    property MoneyFlatDownColor;
+
+    property AdjustSpaceForGlyph;
+    property AllowAllUp;
+    property GroupIndex;
+    property Down;
+    property Flat;
+    property Glyph;
+    {$ifndef CLX_USED}
+    property ImageForm;
+    {$endif}
+    property Layout;
+
+    property Margin;
+    property NumGlyphs;
+    property ShadowFollowsColor;
+    property ShadowsUseCustom;
+    property ShadowBtnHighlight;
+    property ShadowBtnShadow;
+    property ShadowBtnDkShadow;
+
+    property ShowGlyph;
+    property ShowText;
+    property Spacing;
+    property UseArrow;
+    property IsSwitch;
+    property OnArrowClick;
+    property Icon;
+    property UseIcon;
+    property ThinFrame;
+    property TextDrawType;
+    property Transparent;
+    property DownSound;
+    property UpSound;
+    property ClickSound;
+    property ArrowClickSound;
+{$IFDEF USE_SOUND_MAP}
+    property SoundMap;
+{$ENDIF}
+    property DownImages;
+    property ShowBorder;
+    property ShortcutsEnabled;
+    property OldStyled;
+    property UseXPThemes;
+
+    // VCL properties
+    property Caption;
+    property Enabled;
+
+    property PopupMenu;
+    property Color;
+    property ParentColor;
+    property Align;
+    property Font;
+    property ParentFont;
+    property ParentShowHint;
+    property ShowHint;
+    property Visible;
+
+    property OnClick;
+    property OnDblClick;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnStartDrag;
+
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Action;
+    property Constraints;
+    {$ifndef CLX_USED}
+    property DockOrientation;
+    property Floating;
+    property DragKind;
+
+    property OnStartDock;
+    property OnEndDock;
+{$ENDIF}
+{$IFDEF VCL_5_USED}
+    property OnContextPopup;
+{$ENDIF}
+    {$endif}
+  end;
+
+{$IFDEF VCL_4_USED}
+  TElGraphicButtonActionLink = class(TControlActionLink)
+  protected
+    FClient : TCustomElGraphicButton;
+    procedure AssignClient(AClient : TObject); override;
+    function IsCheckedLinked : Boolean; override;
+    function IsImageIndexLinked : Boolean; override;
+
+    procedure SetImageIndex(Value: Integer); override;
+    procedure SetChecked(Value : Boolean); override;
+    {$ifndef CLX_USED}
+    procedure SetCaption(const Value: string); override;
+    procedure SetHint(const Value: string); override;
+    {$else}
+    procedure SetCaption(const Value: TCaption); override;
+    procedure SetHint(const Value: WideString); override;
+    {$endif}
+  end;
+{$ENDIF}
+
+var
+  GlyphCache : TElGlyphCache = nil;
+  Pattern : TBitmap = nil;
+  ButtonCount : Integer = 0;
+
+procedure CreateBrushPattern;
+
+var MenuCancelMsg : integer;
+
+{$ifdef CLX_USED}
+type HMenu = QObjectH;
+{$endif}
+
+function GetMenuHandle(AMenu : TMenu) : HMENU;
+
+implementation
+end.

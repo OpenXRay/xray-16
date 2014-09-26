@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Convert">
+      <UniqueIdentifier>{4fe1da01-7a52-4559-bb15-a14fb52a8c9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared">
+      <UniqueIdentifier>{ebd62474-7505-4523-9c9d-ca09233d3704}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NormalMap">
+      <UniqueIdentifier>{6e4bc661-d7f1-4351-8d46-392b19298175}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ETextureParams.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Image_DXTC.h">
+      <Filter>NormalMap</Filter>
+    </ClInclude>
+    <ClInclude Include="NV_Common.h">
+      <Filter>NormalMap</Filter>
+    </ClInclude>
+    <ClInclude Include="NVI_Convolution.h">
+      <Filter>NormalMap</Filter>
+    </ClInclude>
+    <ClInclude Include="NVI_Image.h">
+      <Filter>NormalMap</Filter>
+    </ClInclude>
+    <ClInclude Include="tga.h">
+      <Filter>NormalMap</Filter>
+    </ClInclude>
+    <ClInclude Include="dds.h" />
+    <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="dds\ConvertColor.h" />
+    <ClInclude Include="dds\ddsTypes.h" />
+    <ClInclude Include="dds\nvErrorCodes.h" />
+    <ClInclude Include="dds\tPixel.h" />
+    <ClInclude Include="dds\tVector.h" />
+    <ClInclude Include="dxtlib.h">
+      <Filter>Convert</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DXT.cpp">
+      <Filter>Convert</Filter>
+    </ClCompile>
+    <ClCompile Include="ETextureParams.cpp">
+      <Filter>Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="Image_DXTC.cpp">
+      <Filter>NormalMap</Filter>
+    </ClCompile>
+    <ClCompile Include="NormalMapGen.cpp">
+      <Filter>NormalMap</Filter>
+    </ClCompile>
+    <ClCompile Include="NVI_Convolution.cpp">
+      <Filter>NormalMap</Filter>
+    </ClCompile>
+    <ClCompile Include="NVI_Image.cpp">
+      <Filter>NormalMap</Filter>
+    </ClCompile>
+    <ClCompile Include="tga.cpp">
+      <Filter>NormalMap</Filter>
+    </ClCompile>
+    <ClCompile Include="StdAfx.cpp" />
+  </ItemGroup>
+</Project>

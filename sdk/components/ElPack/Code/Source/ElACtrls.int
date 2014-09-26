@@ -1,0 +1,922 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+  
+03/06/2002
+
+  Added unicode hint
+
+01/18/2002
+
+  Fixed some problems with painting flat scrollbars
+
+01/01/2002
+
+  Fixed some problems with painting borders when focus is moved
+
+12/28/2001
+
+  Borders are redrawn correctly in ColorLineType mode when mouse cursor enters
+  or leaves the control
+
+12/21/2001
+
+  Made ListWndProc and EidtWndProc methods of ComboBox virtual
+
+11/28/2001
+
+  LineBorderActiveColor and LineBorderInactiveColor properties added.
+
+10/15/2001
+
+  Improved Windows XP styles use 
+
+10/12/2001
+
+  Scrollbar is flat in dropdown listbox of ElAdvancedComboBox now.
+
+10/09/2001
+
+  Added XP support for all controls. XP support works always no matter if
+  manifest file is present, so if you need to turn it off, you can do this only
+  globally.
+
+09/17/2001 (c) Akzhan Abdulin
+
+  Added Windows XP Themes Support for ElAdvancedComboBox.
+  Note that themed combobox will ignore some of its look'n'feel properties.
+
+09/04/2001
+
+  A nasty bug in ElAdvancedCombobox that prevented insertion of other controls
+  into the combobox was fixed.
+
+09/03/2001
+
+  Horizontal scrollbar fixed to behave as it is supposed to
+
+07/24/2001
+
+  Added BtnFlat and BtnTransparent properties.
+
+  In ElAdvancedComboBox component BorderStyle property is obsolete.
+
+07/12/2001
+
+  BorderSides property added.
+
+11/24/2000
+
+  Transparency handling improved
+
+09/26/2000
+
+  ElFlatMemo ignored WantReturns property value. Fixed.
+
+09/05/2000
+
+  ElFlatEdit and ElFlatMemo now don't grab dialog keys (Enter and Esc)
+
+*)
+
+unit ElACtrls;
+
+interface
+
+uses
+  {$ifndef CLX_USED}
+  Windows,
+  StdCtrls,
+  Messages,
+  Controls,
+  ExtCtrls,
+  Forms,
+  Graphics,
+  ElImgFrm,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  {$else}
+  {$ifdef MSWINDOWS}
+  Windows,
+  {$endif}
+  Qt,
+  QForms,
+  Types,
+  QGraphics,
+  QControls,
+  QStdCtrls,
+  QExtCtrls,
+  {$endif}
+  SysUtils,
+  Classes,
+  ElTmSchema,
+  ElUxTheme,
+  ElTools,
+{$ifdef ELPACK_NO_ADV_EDITS}
+  ElEdits,
+{$endif}
+  ElVCLUtils;
+
+type
+
+{$ifdef ELPACK_NO_ADV_EDITS}
+  TElAdvancedMemo = class(TElEdit)
+  public
+    constructor Create(AOwner : TComponent); override;
+
+  end;
+{$else}
+  TElAdvancedMemo = class(TMemo)
+  private
+    FActiveBorderType: TElFlatBorderType;
+    FBackground: TBitmap;
+    FFlat: boolean;
+    FFlatFocusedScrollBars: boolean;
+    FInactiveBorderType: TElFlatBorderType;
+    FMouseOver: boolean;
+    FPainting: boolean;
+    FPaintingTo: boolean;
+    FTransparent: boolean;
+    FUseBackground: boolean;
+    FOnMouseEnter: TNotifyEvent;
+    FOnMouseLeave: TNotifyEvent;
+    {$ifndef CLX_USED}
+    FImgForm   : TElImageForm;
+    FImgFormChLink : TImgFormChangeLink;
+    {$endif}
+    {$ifndef CLX_USED}
+    FBorderSides: TElBorderSides;
+    {$endif}
+    FHandleDialogKeys: Boolean;
+    FTheme: HTheme;
+    {$ifdef ELPACK_UNICODE}
+    FHint: WideString;
+    {$endif}
+
+    {$ifndef CLX_USED}
+    procedure ImageFormChange(Sender : TObject);
+    procedure SetImageForm(newValue : TElImageForm);
+    {$endif}
+    procedure BackgroundChanged(Sender: TObject);
+    {$ifndef CLX_USED}
+    procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+    procedure CMParentColorChanged(var Msg: TMessage); message CM_PARENTCOLORCHANGED;
+    procedure CNCtlColorEdit(var Msg: TWMCtlColorEdit); message CN_CTLCOLOREDIT;
+    procedure CNCtlColorStatic(var Msg: TWMCtlColorStatic); message CN_CTLCOLORSTATIC;
+    procedure WMGetDlgCode(var Msg : TMessage); message WM_GETDLGCODE;
+    procedure WMEraseBkgnd(var Msg: TWMEraseBkgnd); message WM_ERASEBKGND;
+    procedure WMKillFocus(var Msg: TMessage); message WM_KILLFOCUS;
+    procedure WMMove(var Msg: TMessage); message WM_MOVE;
+    procedure WMPaint(var Msg: TWMPaint); message WM_PAINT;
+    procedure WMSetFocus(var Msg: TMessage); message WM_SETFOCUS;
+    procedure WMNCCalcSize(var Message : TWMNCCalcSize); message WM_NCCALCSIZE;
+    procedure WMKeyDown(var Message: TWMKey); message WM_KEYDOWN;
+
+    procedure DrawBackground(DC: HDC; R: TRect);
+    procedure DrawFlatBorder(DC: HDC);
+    procedure DrawParentControl(DC: HDC);
+    {$endif}
+    procedure SetActiveBorderType(const Value: TElFlatBorderType);
+    procedure SetBackground(const Value: TBitmap);
+    procedure SetFlat(const Value: boolean);
+    procedure SetFlatFocusedScrollBars(const Value: boolean);
+    procedure SetInactiveBorderType(const Value: TElFlatBorderType);
+    procedure SetTransparent(const Value: boolean);
+    procedure SetUseBackground(const Value: boolean);
+    {$ifndef CLX_USED}
+    procedure SetBorderSides(Value: TElBorderSides);
+    procedure WMWindowPosChanged(var Message: TWMWindowPosChanged); message
+        WM_WINDOWPOSCHANGED;
+    {$endif}
+  protected
+    FUseXPThemes: Boolean;
+    {$ifndef CLX_USED}
+    FLineBorderActiveColor: TColor;
+    FLineBorderInactiveColor: TColor;
+    {$endif}
+    procedure Change; override;
+    procedure DoMouseEnter; dynamic;
+    procedure DoMouseLeave; dynamic;
+    {$ifndef CLX_USED}
+    procedure DoPaint; dynamic;
+    {$endif}
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    {$ifndef CLX_USED}
+    procedure IFMRepaintChildren(var Message: TMessage); message
+        IFM_REPAINTCHILDREN;
+    procedure WMNCPaint(var Msg : TMessage); message WM_NCPAINT;
+    {$endif}
+    procedure SetUseXPThemes(Value: Boolean);
+    function IsThemeApplied: Boolean;
+
+    procedure FreeThemeHandle; virtual;
+    procedure CreateThemeHandle; virtual;
+    {$ifndef CLX_USED}
+    procedure CreateWnd; override;
+    procedure DestroyWnd; override;
+    procedure WMThemeChanged(var Message: TMessage); message WM_THEMECHANGED;
+    {$else}
+    procedure CreateWidget; override;
+    procedure DestroyWidget; override;
+    {$endif}
+    function GetThemedClassName: WideString;
+    {$ifndef CLX_USED}
+    procedure SetLineBorderActiveColor(Value: TColor);
+    procedure SetLineBorderInactiveColor(Value: TColor);
+    procedure CreateParams(var Params: TCreateParams); override;
+    procedure CMEnabledChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
+    {$endif}
+    {$ifdef ELPACK_UNICODE}
+    procedure SetHint(Value: WideString);
+    {$ifndef CLX_USED}
+    procedure CMHintShow(var Message: TMessage); message CM_HINTSHOW;
+    {$else}
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    {$endif}
+    {$endif}
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    property Theme: HTheme read FTheme;
+  published
+    property ActiveBorderType: TElFlatBorderType read FActiveBorderType write SetActiveBorderType default fbtSunken;
+    property Align;
+    property Background: TBitmap read FBackground write SetBackground;
+    property Flat: boolean read FFlat write SetFlat default False;
+    property FlatFocusedScrollBars: boolean read FFlatFocusedScrollBars write SetFlatFocusedScrollBars default False;
+    property InactiveBorderType: TElFlatBorderType read FInactiveBorderType write SetInactiveBorderType default fbtSunkenOuter;
+    property Transparent: boolean read FTransparent write SetTransparent default False;
+    property UseBackground: boolean read FUseBackground write SetUseBackground default False;
+    {$ifndef CLX_USED}
+    property ImageForm   : TElImageForm read FImgForm write SetImageForm;
+    {$endif}
+    property OnMouseEnter: TNotifyEvent read FOnMouseEnter write FOnMouseEnter;
+    property OnMouseLeave: TNotifyEvent read FOnMouseLeave write FOnMouseLeave;
+    {$ifndef CLX_USED}
+    property BorderSides: TElBorderSides read FBorderSides write SetBorderSides;
+    {$endif}
+    property HandleDialogKeys: Boolean read FHandleDialogKeys write
+        FHandleDialogKeys default false;
+    property UseXPThemes: Boolean read FUseXPThemes write SetUseXPThemes default
+        true;
+    {$ifndef CLX_USED}
+    property LineBorderActiveColor: TColor read FLineBorderActiveColor write
+        SetLineBorderActiveColor;
+    property LineBorderInactiveColor: TColor read FLineBorderInactiveColor write
+        SetLineBorderInactiveColor;
+    {$endif}
+    {$ifdef ELPACK_UNICODE}
+    property Hint: WideString read FHint write SetHint;
+    {$endif}
+  end;
+{$endif}
+
+  //TElFlatMemo = TElAdvancedMemo;
+
+{$ifdef ELPACK_NO_ADV_EDITS}
+  TCustomElAdvancedEdit = TCustomElEdit;
+{$else}
+  TCustomElAdvancedEdit = class(TCustomEdit)
+  private
+    FActiveBorderType: TElFlatBorderType;
+    FAlignment: TAlignment;
+    FBackground: TBitmap;
+    FFlat: boolean;
+    FInactiveBorderType: TElFlatBorderType;
+    FMouseOver: boolean;
+    FPainting: boolean;
+    FPaintingTo: boolean;
+    FReturnPressed: boolean;
+    FTransparent: boolean;
+    FUseBackground: boolean;
+    FOnMouseEnter: TNotifyEvent;
+    FOnMouseLeave: TNotifyEvent;
+    {$ifndef CLX_USED}
+    FImgForm   : TElImageForm;
+    FImgFormChLink : TImgFormChangeLink;
+    {$endif}
+    FHandleDialogKeys : boolean;
+    {$ifndef CLX_USED}
+    FBorderSides: TElBorderSides;
+    {$endif}
+    FTheme: HTheme;
+    {$ifdef ELPACK_UNICODE}
+    FHint: WideString;
+    {$endif}
+
+    {$ifndef CLX_USED}
+    procedure ImageFormChange(Sender : TObject);
+    {$endif}
+    procedure BackgroundChanged(Sender: TObject);
+    {$ifndef CLX_USED}
+    procedure WMGetDlgCode(var Msg : TMessage); message WM_GETDLGCODE;
+    procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+    procedure CMParentColorChanged(var Msg: TMessage); message CM_PARENTCOLORCHANGED;
+    procedure CNCtlColorEdit(var Msg: TWMCtlColorEdit); message CN_CTLCOLOREDIT;
+    procedure CNCtlColorStatic(var Msg: TWMCtlColorStatic); message CN_CTLCOLORSTATIC;
+    procedure WMEraseBkgnd(var Msg: TWMEraseBkgnd); message WM_ERASEBKGND;
+    procedure WMKillFocus(var Msg: TMessage); message WM_KILLFOCUS;
+    procedure WMMove(var Msg: TMessage); message WM_MOVE;
+    procedure WMPaint(var Msg: TWMPaint); message WM_PAINT;
+    procedure WMSetFocus(var Msg: TMessage); message WM_SETFOCUS;
+    procedure WMNCCalcSize(var Message : TWMNCCalcSize); message WM_NCCALCSIZE;
+    procedure DrawBackground(DC: HDC; R: TRect);
+    procedure DrawFlatBorder(DC: HDC);
+    procedure DrawParentControl(DC: HDC);
+    {$endif}
+    procedure SetActiveBorderType(const Value: TElFlatBorderType);
+    procedure SetAlignment(const Value: TAlignment);
+    procedure SetBackground(const Value: TBitmap);
+    procedure SetInactiveBorderType(const Value: TElFlatBorderType);
+    procedure SetTransparent(const Value: boolean);
+    procedure SetUseBackground(const Value: boolean);
+    {$ifndef CLX_USED}
+    procedure SetBorderSides(Value: TElBorderSides);
+    procedure WMWindowPosChanged(var Message: TWMWindowPosChanged); message
+        WM_WINDOWPOSCHANGED;
+    {$endif}
+  protected
+    FNoHandleEnter : boolean;
+    FPasswordChar: Char;
+    FUseXPThemes: Boolean;
+    {$ifndef CLX_USED}
+    FLineBorderActiveColor: TColor;
+    FLineBorderInactiveColor: TColor;
+    {$endif}
+
+    {$ifndef MSWINDOWS}
+    function NeedKey(Key: Integer; Shift: TShiftState; const KeyText: WideString): Boolean; override;
+    {$endif}
+    {$ifndef CLX_USED}
+    procedure SetImageForm(newValue : TElImageForm); virtual;
+    procedure SetLineBorderActiveColor(Value: TColor);
+    procedure SetLineBorderInactiveColor(Value: TColor);
+    {$endif}
+    procedure SetFlat(const Value: boolean); virtual;
+
+    {$ifndef CLX_USED}
+    procedure Change; override;
+    procedure CreateParams(var Params: TCreateParams); override;
+    {$endif}
+    procedure DoMouseEnter; dynamic;
+    procedure DoMouseLeave; dynamic;
+    {$ifndef CLX_USED}
+    procedure DoPaint; dynamic;
+    {$endif}
+    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    procedure KeyPress(var Key: Char); override;
+    property ActiveBorderType: TElFlatBorderType read FActiveBorderType write SetActiveBorderType default fbtSunken;
+    property Alignment: TAlignment read FAlignment write SetAlignment default taLeftJustify;
+    property Background: TBitmap read FBackground write SetBackground;
+    property Flat: boolean read FFlat write SetFlat default False;
+    property InactiveBorderType: TElFlatBorderType read FInactiveBorderType write SetInactiveBorderType default fbtSunkenOuter;
+    property Transparent: boolean read FTransparent write SetTransparent default False;
+    property UseBackground: boolean read FUseBackground write SetUseBackground default False;
+    property OnMouseEnter: TNotifyEvent read FOnMouseEnter write FOnMouseEnter;
+    property OnMouseLeave: TNotifyEvent read FOnMouseLeave write FOnMouseLeave;
+    {$ifndef CLX_USED}
+    property LineBorderActiveColor: TColor read FLineBorderActiveColor write
+        SetLineBorderActiveColor;
+    property LineBorderInactiveColor: TColor read FLineBorderInactiveColor write
+        SetLineBorderInactiveColor;
+    {$endif}
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    {$ifndef CLX_USED}
+    procedure SetPasswordChar(Value: Char);
+    procedure IFMRepaintChildren(var Message: TMessage); message
+        IFM_REPAINTCHILDREN;
+    procedure WMNCPaint(var Msg : TMessage); message WM_NCPAINT;
+    {$endif}
+    procedure SetUseXPThemes(Value: Boolean); virtual;
+    function IsThemeApplied: Boolean;
+
+    {$ifndef CLX_USED}
+    procedure CreateWnd; override;
+    procedure DestroyWnd; override;
+    {$else}
+    procedure CreateWidget; override;
+    procedure DestroyWidget; override;
+    {$endif}
+    procedure FreeThemeHandle; virtual;
+    procedure CreateThemeHandle; virtual;
+    function GetThemedClassName: WideString;
+    {$ifndef CLX_USED}
+    procedure WMThemeChanged(var Message: TMessage); message WM_THEMECHANGED;
+    procedure CMEnabledChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
+    procedure WMPaste(var Message: TMessage); message WM_PASTE;
+    {$endif}
+    {$ifdef ELPACK_UNICODE}
+    procedure SetHint(Value: WideString);
+
+    {$ifndef CLX_USED}
+    procedure CMHintShow(var Message: TMessage); message CM_HINTSHOW;
+    {$else}
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    {$endif}
+    {$endif}
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
+    property MouseOver : boolean read FMouseOver;
+    property Theme: HTheme read FTheme;
+  published
+    {$ifndef CLX_USED}
+    property ImageForm   : TElImageForm read FImgForm write SetImageForm;
+    {$endif}
+    property HandleDialogKeys : boolean read FHandleDialogKeys write FHandleDialogKeys default false;
+    {$ifndef CLX_USED}
+    property BorderSides: TElBorderSides read FBorderSides write SetBorderSides;
+    {$endif}
+    {$ifndef CLX_USED}
+    property PasswordChar: Char read FPasswordChar write SetPasswordChar stored
+        False default #0;
+    {$endif}
+    property UseXPThemes: Boolean read FUseXPThemes write SetUseXPThemes default
+        true;
+    {$ifdef ELPACK_UNICODE}
+    property Hint: WideString read FHint write SetHint;
+    {$endif}
+  end;
+{$endif}
+  
+  TElAdvancedEdit = class(TCustomElAdvancedEdit)
+  published
+    property ActiveBorderType;
+    property Align;
+    property Alignment;
+    {$IFDEF VCL_4_USED}
+    property Anchors;
+    {$ENDIF}
+    property AutoSelect;
+    property AutoSize;
+    property Background;
+    {$IFDEF VCL_4_USED}
+    {$ifndef CLX_USED}
+    property BiDiMode;
+    {$endif}
+    {$ENDIF}
+    property BorderStyle;
+    {$ifndef ELPACK_NO_ADV_EDITS}
+    property CharCase;
+    {$endif}
+    property Color;
+    {$IFDEF VCL_4_USED}
+    property Constraints;
+    {$ENDIF}
+    property Cursor;
+    {$ifndef CLX_USED}
+    property DragCursor;
+    {$endif}
+    {$IFDEF VCL_4_USED}
+    {$ifndef CLX_USED}
+    property DragKind;
+    {$endif}
+    {$ENDIF}
+    property DragMode;
+    property Enabled;
+    property Flat;
+    property Font;
+    property HideSelection;
+    {$ifndef CLX_USED}
+    property ImeMode;
+    property ImeName;
+    {$endif}
+    property InactiveBorderType;
+    {$ifndef CLX_USED}
+    property LineBorderActiveColor;
+    property LineBorderInactiveColor;
+    {$endif}
+
+    property MaxLength;
+    {$ifndef CLX_USED}
+    {$ifndef ELPACK_NO_ADV_EDITS}
+    property OEMConvert;
+    {$endif}
+    {$endif}
+    {$IFDEF VCL_4_USED}
+    {$ifndef CLX_USED}
+    property ParentBiDiMode;
+    {$endif}
+    {$ENDIF}
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    {$ifndef CLX_USED}
+    property PasswordChar;
+    {$endif}
+    property PopupMenu;
+    property ReadOnly;
+    property ShowHint;
+    property TabOrder;
+    property Text;
+    property Transparent;
+    property UseBackground;
+    property Visible;
+    property OnChange;
+    property OnClick;
+    {$IFDEF VCL_5_USED}
+    property OnContextPopup;
+    {$ENDIF}
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    {$IFDEF VCL_4_USED}
+    {$ifndef CLX_USED}
+    property OnEndDock;
+    {$endif}
+    {$ENDIF}
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseEnter;
+    property OnMouseMove;
+    property OnMouseLeave;
+    property OnMouseUp;
+    {$IFDEF VCL_4_USED}
+    {$ifndef CLX_USED}
+    property OnStartDock;
+    {$endif}
+    {$ENDIF}
+    property OnStartDrag;
+  end;
+
+  TElAdvancedListBox = class(TListBox)
+  private
+    FActiveBorderType: TElFlatBorderType;
+    FBackground: TBitmap;
+    FFlat: boolean;
+    FFlatFocusedScrollBars: boolean;
+    FInactiveBorderType: TElFlatBorderType;
+    FInvertSelection: boolean;
+    FLastTopIndex: integer;
+    FMouseOver: boolean;
+    FSelectedColor: TColor;
+    FSelectedFont: TFont;
+    FTransparent: boolean;
+    FUseBackground: boolean;
+    {$ifndef CLX_USED}
+    FImgForm   : TElImageForm;
+    FImgFormChLink : TImgFormChangeLink;
+    {$endif}
+    FInVScroll,
+    FInHScroll     : boolean;
+    FTransparentSelection: Boolean;
+    FBorderSides : TElBorderSides;
+    FShowLineHint: Boolean;
+    FCurHintItem : Integer;
+    FStyle       : TListBoxStyle;
+    FMaxWidth    : integer;
+    FHorizontalScroll: Boolean;
+    FHintTimer   : TTimer;
+    FHintWnd     : THintWindow;
+    FHintWndProc : TWndMethod;
+    FTheme: HTheme;
+    {$ifdef ELPACK_UNICODE}
+    FHint: WideString;
+    {$endif}
+
+    {$ifndef CLX_USED}
+    procedure ImageFormChange(Sender : TObject);
+    procedure SetImageForm(newValue : TElImageForm);
+    {$endif}
+    procedure BackgroundChanged(Sender: TObject);
+    {$ifndef CLX_USED}
+    procedure CMFontChanged(var Msg: TMessage); message CM_FONTCHANGED;
+    procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+    procedure CMParentColorChanged(var Msg: TMessage); message CM_PARENTCOLORCHANGED;
+    procedure CMParentFontChanged(var Msg: TMessage); message CM_PARENTFONTCHANGED;
+    procedure LBGetTopIndex(var Msg: TMessage); message LB_GETTOPINDEX;
+    procedure WMEraseBkgnd(var Msg: TWMEraseBkgnd); message WM_ERASEBKGND;
+    procedure WMKillFocus(var Msg: TMessage); message WM_KILLFOCUS;
+    procedure WMPaint(var Msg: TWMPaint); message WM_PAINT;
+    procedure WMSetFocus(var Msg: TMessage); message WM_SETFOCUS;
+    procedure WMVScroll(var Message: TMessage); message WM_VSCROLL;
+    procedure WMHScroll(var Message: TMessage); message WM_HSCROLL;
+    procedure WMNCMouseMove(var Message: TMessage); message WM_NCMOUSEMOVE;
+    procedure WMMouseMove(var Message: TWMMouseMove); message WM_MOUSEMOVE;
+    procedure WMNCCalcSize(var Message : TWMNCCalcSize); message WM_NCCALCSIZE;
+
+    procedure DrawBackground(DC: HDC; R: TRect);
+    procedure DrawBackgroundEx(DC: HDC; R, SubR: TRect);
+    procedure DrawFlatBorder(DC: HDC; HDragging, VDragging : boolean);
+    procedure DrawParentControl(DC: HDC);
+    procedure DrawParentControlEx(DC: HDC; R: TRect);
+    {$endif}
+    procedure IntMouseMove(XPos, YPos : SmallInt);
+    procedure SelectedFontChanged(Sender: TObject);
+    procedure SetActiveBorderType(const Value: TElFlatBorderType);
+    procedure SetBackground(const Value: TBitmap);
+    procedure SetFlat(const Value: boolean);
+    procedure SetFlatFocusedScrollBars(const Value: boolean);
+    procedure SetInactiveBorderType(const Value: TElFlatBorderType);
+    procedure SetInvertSelection(const Value: boolean);
+    procedure SetSelectedColor(const Value: TColor);
+    procedure SetSelectedFont(const Value: TFont);
+    procedure SetTransparent(const Value: boolean);
+    procedure SetUseBackground(const Value: boolean);
+    procedure SetTransparentSelection(Value: Boolean);
+    procedure SetBorderSides(Value: TElBorderSides);
+    procedure SetStyle(Value: TListBoxStyle);
+    procedure SetHorizontalScroll(Value: Boolean);
+    {$ifndef CLX_USED}
+    procedure ResetHorizontalExtent;
+    procedure SetHorizontalExtent;
+    {$endif}
+    procedure CancelLineHint;
+    procedure OnLineHintTimer(Sender : TObject);
+    {$ifndef CLX_USED}
+    procedure HintWndProc(var Message: TMessage);
+    procedure WMWindowPosChanged(var Message: TWMWindowPosChanged); message
+        WM_WINDOWPOSCHANGED;
+    {$endif}
+  protected
+    FUseXPThemes: Boolean;
+    {$ifndef CLX_USED}
+    FLineBorderActiveColor: TColor;
+    FLineBorderInactiveColor: TColor;
+    {$endif}
+    function  GetItemWidth(Index: Integer): Integer; virtual;
+    function GetParentCtlWidth: Integer; virtual;
+    function GetParentCtlHeight: Integer; virtual;
+    function  RealScreenToClient(APoint : TPoint) : TPoint; virtual;
+    {$ifndef CLX_USED}
+    procedure CreateParams(var Params: TCreateParams); override;
+    procedure CreateWnd; override;
+    procedure DestroyWnd; override;
+    {$else}
+    procedure CreateWidget; override;
+    procedure DestroyWidget; override;
+    {$endif}
+    {$ifndef CLX_USED}
+    procedure DrawItem(Index: Integer; R: TRect; State: TOwnerDrawState); override;
+    {$else}
+    function DrawItem(Index: Integer; R: TRect; State: TOwnerDrawState): Boolean; override;
+    {$endif}
+    function  GetBackground: TBitmap; virtual;
+    procedure Loaded; override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    function CreateHintWindow: THintWindow; virtual;
+    {$ifndef CLX_USED}
+    procedure WndProc(var Message: TMessage); override;
+    procedure IFMRepaintChildren(var Message: TMessage); message
+        IFM_REPAINTCHILDREN;
+    procedure WMNCPaint(var Msg : TMessage); message WM_NCPAINT;
+    {$endif}
+    procedure SetUseXPThemes(Value: Boolean);
+    function IsThemeApplied: Boolean;
+
+    procedure FreeThemeHandle; virtual;
+    procedure CreateThemeHandle; virtual;
+    function GetThemedClassName: WideString;
+    {$ifndef CLX_USED}
+    procedure WMThemeChanged(var Message: TMessage); message WM_THEMECHANGED;
+    procedure SetLineBorderActiveColor(Value: TColor);
+    procedure SetLineBorderInactiveColor(Value: TColor);
+    {$endif}
+    {$ifdef ELPACK_UNICODE}
+    procedure SetHint(Value: WideString);
+
+    {$ifndef CLX_USED}
+    procedure CMHintShow(var Message: TMessage); message CM_HINTSHOW;
+    {$else}
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    {$endif}
+    {$else}
+    procedure CMHintShow(var Message: TMessage); message CM_HINTSHOW;
+    {$endif}
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    property Theme: HTheme read FTheme;
+  published
+    property ActiveBorderType: TElFlatBorderType read FActiveBorderType write SetActiveBorderType default fbtSunken;
+    property Background: TBitmap read GetBackground write SetBackground;
+    property Flat: boolean read FFlat write SetFlat default False;
+    property FlatFocusedScrollBars: boolean read FFlatFocusedScrollBars write SetFlatFocusedScrollBars default False;
+    property InactiveBorderType: TElFlatBorderType read FInactiveBorderType write SetInactiveBorderType default fbtSunkenOuter;
+    property InvertSelection: boolean read FInvertSelection write SetInvertSelection default False;
+    property SelectedColor: TColor read FSelectedColor write SetSelectedColor default clHighlight;
+    property SelectedFont: TFont read FSelectedFont write SetSelectedFont;
+    property Transparent: boolean read FTransparent write SetTransparent default False;
+    property UseBackground: boolean read FUseBackground write SetUseBackground default False;
+    {$ifndef CLX_USED}
+    property ImageForm   : TElImageForm read FImgForm write SetImageForm;
+    {$endif}
+    property TransparentSelection: Boolean read FTransparentSelection write
+        SetTransparentSelection default false;
+    property BorderSides: TElBorderSides read FBorderSides write SetBorderSides;
+    property ShowLineHint: Boolean read FShowLineHint write FShowLineHint default
+        false;
+    property Style: TListBoxStyle read FStyle write SetStyle default lbStandard;
+    property HorizontalScroll: Boolean read FHorizontalScroll write
+        SetHorizontalScroll;
+    property UseXPThemes: Boolean read FUseXPThemes write SetUseXPThemes default
+        true;
+    {$ifndef CLX_USED}
+    property LineBorderActiveColor: TColor read FLineBorderActiveColor write
+        SetLineBorderActiveColor;
+    property LineBorderInactiveColor: TColor read FLineBorderInactiveColor write
+        SetLineBorderInactiveColor;
+    {$endif}
+    {$ifdef ELPACK_UNICODE}
+    property Hint: WideString read FHint write SetHint;
+    {$endif}
+  end;
+
+  TElAdvancedComboBox = class(TComboBox)
+  private
+    FActiveBorderType : TElFlatBorderType;
+    FInactiveBorderType : TElFlatBorderType;
+    FFlat : boolean;
+    BtnCanvas : TCanvas;
+    {$ifndef CLX_USED}
+    FImgForm   : TElImageForm;
+    FImgFormChLink : TImgFormChangeLink;
+    {$endif}
+    FAutoCompletion: Boolean;
+    FListInstance : pointer;
+    FEditInstance : pointer;
+    FSaveEditWndProc : Integer;
+    FSaveListWndProc : Integer;
+    FListWindowProc: TWndMethod;
+    FEditWindowProc: TWndMethod;
+    FHorizontalScroll: Boolean;
+    //FFakeListBox     : TElAdvancedListBox;
+    {$ifndef CLX_USED}
+    FInHScroll,
+    FInVScroll       : boolean;
+    {$endif}
+    FTheme: HTheme;
+    {$ifdef ELPACK_UNICODE}
+    FHint: WideString;
+    {$endif}
+
+    {$ifndef CLX_USED}
+    procedure ImageFormChange(Sender : TObject);
+    {$endif}
+    //procedure SetImageForm(newValue : TElImageForm);
+    procedure SetFlat(newValue : Boolean);
+    {$ifndef CLX_USED}
+    procedure CMMouseEnter(var Msg : TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg : TMessage); message CM_MOUSELEAVE;
+    procedure WMNCPaint(var Msg : TMessage); message WM_NCPAINT;
+    procedure WMSetFocus(var Msg : TWMSetFocus); message WM_SETFOCUS;
+    procedure WMKillFocus(var Msg : TWMKillFocus); message WM_KILLFOCUS;
+    procedure WMPaint(var Msg : TWMPaint); message WM_PAINT;
+    procedure WMSize(var Msg : TWMSize); message WM_SIZE;
+    procedure CMEnter(var Msg : TCMEnter); message CM_ENTER;
+    procedure CMExit(var Msg : TCMExit); message CM_EXIT;
+    procedure CNCommand(var Message: TWMCommand); message CN_COMMAND;
+    procedure WMEraseBkgnd(var Message: TMessage); message WM_ERASEBKGND;
+    function IsFocused : boolean;
+    {$endif}
+    procedure SetActiveBorderType(newValue : TElFlatBorderType);
+    procedure SetInactiveBorderType(newValue : TElFlatBorderType);
+    procedure SetHorizontalScroll(Value: Boolean);
+    {$ifndef CLX_USED}
+    procedure SetHorizontalExtent;
+    procedure ResetHorizontalExtent;
+    {$endif}
+    {$ifndef CLX_USED}
+    procedure WMWindowPosChanged(var Message: TWMWindowPosChanged); message
+        WM_WINDOWPOSCHANGED;
+    {$endif}
+  protected
+    {$ifndef CLX_USED}
+    FListHandle,
+    FEditHandle : HWND;
+    {$endif}
+    FMouseOver : boolean;
+
+    FHorzPos    : integer;
+    FMaxWidth: integer;
+    FBtnFlat: Boolean;
+    FBtnTransparent: Boolean;
+    FUseXPThemes: Boolean;
+    FBtnThinFrame: Boolean;
+    {$ifndef CLX_USED}
+    FLineBorderActiveColor: TColor;
+    FLineBorderInactiveColor: TColor;
+
+    
+    procedure DrawFlatBorder(DrawButton : boolean);
+    procedure UpdateFrame;
+    procedure CreateParams(var Params: TCreateParams); override;
+    procedure WndProc(var Message : TMessage); override;
+    procedure ListWndProc(var Message : TMessage); virtual;
+    procedure EditWndProc(var Message : TMessage); virtual;
+    procedure WMThemeChanged(var Message: TMessage); message WM_THEMECHANGED;
+    {$endif}
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure SetBtnFlat(Value: Boolean);
+    procedure SetBtnTransparent(Value: Boolean);
+    function GetItemWidth(Index: Integer): Integer; virtual;
+    {$ifndef CLX_USED}
+    procedure IFMRepaintChildren(var Message: TMessage); message
+        IFM_REPAINTCHILDREN;
+    {$endif}
+    procedure SetUseXPThemes(Value: Boolean);
+    function IsThemeApplied: Boolean;
+
+    {$ifndef CLX_USED}
+    procedure CreateWnd; override;
+    procedure DestroyWnd; override;
+    {$else}
+    procedure CreateWidget; override;
+    procedure DestroyWidget; override;
+    {$endif}
+    procedure FreeThemeHandle; virtual;
+    procedure CreateThemeHandle; virtual;
+    function GetThemedClassName: WideString;
+
+    procedure SetBtnThinFrame(Value: Boolean);
+    {$ifndef CLX_USED}
+    procedure SetLineBorderActiveColor(Value: TColor);
+    procedure SetLineBorderInactiveColor(Value: TColor);
+    {$endif}
+    {$ifdef ELPACK_UNICODE}
+    procedure SetHint(Value: WideString);
+
+    {$ifndef CLX_USED}
+    procedure CMHintShow(var Message: TMessage); message CM_HINTSHOW;
+    {$else}
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    {$endif}
+    {$endif}
+    procedure CMEnabledChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
+
+    property AutoCompletion: Boolean read FAutoCompletion write FAutoCompletion;
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+
+    {$ifndef CLX_USED}
+    property ListHandle : HWND read FListHandle;
+    property EditHandle : HWND read FEditHandle;
+    property ListWindowProc: TWndMethod read FListWindowProc write FListWindowProc;
+    property EditWindowProc: TWndMethod read FEditWindowProc write FEditWindowProc;
+    {$endif}
+    property Theme: HTheme read FTheme;
+  published
+    property Align;
+    property Flat : Boolean read FFlat write SetFlat; { Published }
+
+    property ActiveBorderType : TElFlatBorderType read FActiveBorderType write SetActiveBorderType default fbtSunken;  { Published }
+    property InactiveBorderType : TElFlatBorderType read FInactiveBorderType write SetInactiveBorderType default fbtSunkenOuter;  { Published }
+    property BtnFlat: Boolean read FBtnFlat write SetBtnFlat default false;
+    property BtnTransparent: Boolean read FBtnTransparent write SetBtnTransparent
+        default false;
+    property HorizontalScroll: Boolean read FHorizontalScroll write SetHorizontalScroll;
+    property ItemIndex;
+    property ItemHeight;
+    property UseXPThemes: Boolean read FUseXPThemes write SetUseXPThemes default
+        true;
+    property BtnThinFrame: Boolean read FBtnThinFrame write SetBtnThinFrame default
+        true;
+    {$ifndef CLX_USED}
+    property LineBorderActiveColor: TColor read FLineBorderActiveColor write
+        SetLineBorderActiveColor;
+    property LineBorderInactiveColor: TColor read FLineBorderInactiveColor write
+        SetLineBorderInactiveColor;
+    {$endif}
+    {$ifdef ELPACK_UNICODE}
+    property Hint: WideString read FHint write SetHint;
+    {$endif}
+  end;
+
+  TCustomElFlatEdit = TCustomElAdvancedEdit;
+  TElFlatEdit = TElAdvancedEdit;
+  TElFlatMemo = TElAdvancedMemo;
+  TElFlatListBox = TElAdvancedListBox;
+  TElFlatComboBox= TElAdvancedComboBox;
+
+implementation
+end.

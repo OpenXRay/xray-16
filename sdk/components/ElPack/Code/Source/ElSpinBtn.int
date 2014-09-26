@@ -1,0 +1,272 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+03/22/2002
+
+  Fixed style painting for disabled button with XP themes enabled
+
+03/06/2002
+
+  Added unicode hint
+
+01/06/2002
+
+  Added Qt styles in CLX version 
+
+11/30/2001
+
+  Added moneyFlat and accompanying properties
+
+09/17/2001
+
+  Added Windows XP Themes Support 
+
+08/03/2001
+
+  Fixed the problem with spin buttons, that continue to spin when mouse cursor
+  is moved over drag are and mouse button is pressed  
+
+03/29/2001
+
+  Fixed the problem with spin buttons, that continued to spin when context menu
+  is invoked
+
+*)
+
+unit ElSpinBtn;
+
+interface
+
+uses
+  {$ifndef CLX_USED}
+  Windows,
+  Messages,
+  Graphics,
+  Controls,
+  Forms,
+  Menus,
+  StdCtrls,
+  ExtCtrls,
+  ElACtrls,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  {$else}
+  Qt,
+  QTypes,
+  Types,
+  QMenus,
+  QGraphics,
+  QControls,
+  QForms,
+  QStdCtrls,
+  QExtCtrls,
+  ElCLXUtils,
+  {$endif}
+  SysUtils,
+  Classes,
+  ElVCLUtils,
+  ElXPThemedControl,
+  ElUxTheme,
+  ElTmSchema,
+  ElTools;
+
+type
+
+  TElSpinEvent = procedure(Sender : TObject; Distance : Double) of object;
+  TElSpinStartEvent = procedure(Sender : TObject; var InitialDistance : Double) of object;
+
+  TElSpinBtnDir  = (sbdUpDown, sbdLeftRight);
+  TElSpinBtnType = (sbtUpDown, sbtLeftRight);
+
+  TElSpinButton = class(TElXPThemedControl)
+  private
+    FFlat : Boolean;
+    FUseDrag : Boolean;
+    FOnUpClick,
+    FOnDownClick,
+    FOnSpinDrag : TElSpinEvent;
+    FOnSpinStart: TElSpinStartEvent;
+    FMouseInUpPart: Boolean;
+    FMouseInDownPart: Boolean;
+
+    {$ifndef CLX_USED}
+    procedure WMMouseMove(var Msg : TWMMouseMove); message WM_MOUSEMOVE;
+    procedure CMEnabledChanged(var Msg : TMessage); message CM_ENABLEDCHANGED;
+    procedure WMContextMenu(var Msg : TMessage); message WM_CONTEXTMENU;
+    procedure CMMouseLeave(var Msg : TMessage); message CM_MOUSELEAVE;
+    {$endif}
+  protected
+    FTopBtnDown,
+      FBottomBtnDown : boolean;
+    FTimer : TTimer;
+    SaveCursor  : TCursor;
+    FCaptured,
+      FDragging : boolean;
+    FStartValue,
+    FValue      : Double;
+    FIncrement: Double;
+    FButtonDirection: TElSpinBtnDir;
+    FButtonType: TElSpinBtnType;
+    FUpArrowEnabled: Boolean;
+    FDownArrowEnabled: Boolean;
+
+    FMoneyFlat: Boolean;
+    FMoneyFlatActiveColor: TColor;
+    FMoneyFlatDownColor: TColor;
+    FMoneyFlatInactiveColor: TColor;
+    FOldStyled: Boolean;
+    {$ifdef ELPACK_UNICODE}
+    FHint: WideString;
+    {$endif}
+
+    procedure IntMouseMove(XPos, YPos : SmallInt);
+    {$ifdef CLX_USED}
+    function EventFilter(Sender: QObjectH; Event: QEventH): Boolean; override;
+    procedure EnabledChanged; override;
+    {$endif}
+    procedure Paint; override;
+    procedure OnTimer(Sender : TObject);
+
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseUp(Button : TMouseButton; Shift : TShiftState; X, Y : Integer); override;
+
+    {$ifndef CLX_USED}
+    procedure CMExit(var Msg : TCMExit); message CM_EXIT;
+    {$else}
+    procedure DoExit; override;
+    {$endif}
+    procedure MouseMove(Shift : TShiftState; X, Y : Integer); override;
+    {$ifndef CLX_USED}
+    procedure WMMouseWheel(var Msg: TWMMouseWheel); message WM_MOUSEWHEEL;
+    {$endif}
+
+    function GetPopupMenu: TPopupMenu; override;
+    procedure SetUseDrag(newValue : Boolean); virtual;
+    procedure SetFlat(newValue : Boolean); virtual;
+    procedure SetButtonDirection(Value: TElSpinBtnDir);
+    procedure SetButtonType(Value: TElSpinBtnType);
+    function GetThemedClassName: WideString; override;
+    procedure SetUpArrowEnabled(Value: Boolean);
+    procedure SetDownArrowEnabled(Value: Boolean);
+    procedure SetMoneyFlat(Value: Boolean);
+    procedure SetMoneyFlatActiveColor(Value: TColor);
+    procedure SetMoneyFlatDownColor(Value: TColor);
+    procedure SetMoneyFlatInactiveColor(Value: TColor);
+    function GetMoneyFlat: Boolean;
+    procedure SetOldStyled(Value: Boolean);
+
+    {$ifdef ELPACK_UNICODE}
+    procedure SetHint(Value: WideString);
+
+    {$ifndef CLX_USED}
+    procedure CMHintShow(var Message: TMessage); message CM_HINTSHOW;
+    {$else}
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    {$endif}
+    {$endif}
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+
+    procedure StopDragging;
+    property SpinDragging : boolean read FDragging;
+
+  published
+    property Increment: Double read FIncrement write FIncrement;
+    property UseDrag : Boolean read FUseDrag write SetUseDrag;  { Published }
+    property Flat : Boolean read FFlat write SetFlat;  { Published }
+    property ButtonDirection: TElSpinBtnDir read FButtonDirection write
+        SetButtonDirection default sbdUpDown;
+    property ButtonType: TElSpinBtnType read FButtonType write SetButtonType;
+    property UpArrowEnabled: Boolean read FUpArrowEnabled write SetUpArrowEnabled default true;
+    property DownArrowEnabled: Boolean read FDownArrowEnabled write SetDownArrowEnabled default true;
+    property MoneyFlat: Boolean read GetMoneyFlat write SetMoneyFlat default false;
+    property MoneyFlatActiveColor: TColor read FMoneyFlatActiveColor write
+        SetMoneyFlatActiveColor stored GetMoneyFlat;
+    property MoneyFlatDownColor: TColor read FMoneyFlatDownColor write
+        SetMoneyFlatDownColor stored GetMoneyFlat;
+    property MoneyFlatInactiveColor: TColor read FMoneyFlatInactiveColor write
+        SetMoneyFlatInactiveColor stored GetMoneyFlat;
+    property OldStyled: Boolean read FOldStyled write SetOldStyled default false;
+
+    {$ifdef ELPACK_UNICODE}
+    property Hint: WideString read FHint write SetHint;
+    {$endif}
+
+    property OnUpClick  : TElSpinEvent read FOnUpClick write FOnUpClick;
+    property OnDownClick: TElSpinEvent read FOnDownClick write FOnDownClick;
+    property OnSpinDrag : TElSpinEvent read FOnSpinDrag write FOnSpinDrag;
+    property OnSpinStart: TElSpinStartEvent read FOnSpinStart write FOnSpinStart;
+
+    property Caption;
+    property Enabled;
+    property TabStop default True;
+    property TabOrder;
+    property PopupMenu;
+    property Color;
+    property ParentColor;
+    property Align;
+    property Font;
+    property ParentFont;
+    property ParentShowHint;
+    property ShowHint;
+    property Visible;
+    property UseXPThemes;
+
+    property OnClick;
+    property OnDblClick;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnKeyDown;
+    property OnKeyUp;
+    property OnKeyPress;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnStartDrag;
+
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Action;
+    property Constraints;
+    {$ifndef CLX_USED}
+    property DockOrientation;
+    property Floating;
+    property BevelKind;
+    property DoubleBuffered;
+    property DragKind;
+
+    property OnStartDock;
+    property OnEndDock;
+    {$endif}
+{$ENDIF}
+{$IFDEF VCL_5_USED}
+    property OnContextPopup;
+{$ENDIF}
+  end;
+
+implementation
+end.

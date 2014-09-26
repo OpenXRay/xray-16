@@ -1,0 +1,598 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+03/18/2002
+
+  Default for AutoSize is now correctly set to true
+
+03/06/2002
+
+  Added unicode hint
+
+02/09/2002
+
+  Fixed manual hour setup in 24-hour mode (spoiled 01/24)
+
+01/24/2002
+
+  Fixed pm reset in 12-hour mode when entering text manually
+
+01/10/2002
+
+  UnassignedAllowed, Unassigned, UnassignedColor and ReadOnly properties added 
+
+01/01/2002
+
+  Fixed some problems with painting borders when focus is moved
+
+12/21/2001
+
+  ButtonVisible property added
+
+11/28/2001
+
+  LineBorderActiveColor and LineBorderInactiveColor properties added.
+
+10/25/2001
+
+  Fixed painting of the borders with XP styles enabled
+  
+10/19/2001
+
+  Added ButtonDir, ButtonType and ButtonWidth properties.
+
+08/31/2001
+
+  Added MaxDate and MinDate properties 
+
+07/26/2001
+
+  Added Unicode support
+
+07/12/2001
+
+  BorderSides property added.
+
+06/05/2001
+
+  Fixed the problems with window size and sleection that appeared when using
+  CALENDAR_USE_WINDOWS_CALENDAR option for popup calendar.
+
+  OnChange event was not fired when changes were made via popup calendar. Fixed.
+
+05/01/2001
+
+  fixed alignment of the text when checkbox is displayed
+
+04/10/2001
+
+  Fixed the problem with Picker loosing current selection when focus is moved out of control.
+
+03/06/2001
+
+  Fixed the problem with center- and right-aligned text when checkbox is visible
+
+02/02/2001
+
+  Fixed the problem with HH specifier (it worked as H).
+  Fixed the problem with construct '*:h:*' (one 'h' is used).
+
+  Modified property was not updated when the user changed the value with keyboard.
+  Fixed.
+
+12/14/2000
+
+  Fixed the problem with ddddd/dddddd and t/tt formats.
+
+*)
+
+unit ElDTPick;  { TElDateTimePicker component. }
+
+interface
+
+uses
+  SysUtils,
+  Classes,
+
+{$ifndef CLX_USED}
+  Windows,
+  Messages,
+  Graphics,
+  Controls,
+  StdCtrls,
+  Forms,
+  Buttons,
+  Menus,
+  ExtCtrls,
+{$ifdef VCL_4_USED}
+  ImgList,
+{$endif}
+{$else}
+  Types,
+  QTypes,
+  Qt,
+  QGraphics,
+  QControls,
+  QForms,
+  QButtons,
+  QImgList,
+  QMenus,
+  QExtCtrls,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ElCLXUtils,
+{$endif}
+  {$ifndef CLX_USED}
+  ElACtrls,
+  ElImgFrm,
+  {$endif}
+  ElSpinBtn,
+  ElTools,
+  ElList,
+  ElExtBkgnd,
+  ElPopBtn,
+  ElCalendarDefs,
+{$ifdef DATETIMEPICKER_SUPPORT_CALENDAR}
+  ElCalendDlg,
+{$endif}
+  ElVCLUtils,
+  ElStrUtils,
+  ElTmSchema,
+  ElUxTheme,
+  ElXPThemedControl;
+
+type
+
+  {
+  Possible values for DPart :
+  -1: plain text
+  0 : year long (4 digits)
+  1 : year short (2 digits)
+  2 : month
+  3 : day
+  4 : hour long (24 hours)
+  5 : hour short (12 hours)
+  6 : minute
+  7 : second
+  8 : am/pm sign
+  9 : separator
+  10: day name
+  }
+
+  TDTFPart = record
+    Text   : string;
+    DPart  : integer;
+    TSPos,
+    TEPos,
+    SPos,
+    EPos   : integer;
+  end;
+  PDTFPart = ^TDTFPart;
+
+  TElDatePickerFormat = (edfShortDateLongTime,
+                         edfLongDate,
+                         edfShortDate,
+                         edfLongTime,
+                         edfShortTime,
+                         edfCustom);
+
+  TElDateTimePicker = class(TElXPThemedControl)
+  protected
+    FHandleDialogKeys: Boolean;
+    FModified : Boolean;
+    FShowCheckBox : Boolean;
+    FChecked : Boolean;
+    FAltChangeMethod : Boolean;
+    FShowPopupCalendar : Boolean;
+    FNavigationInPopup : boolean;
+    FBorderStyle : TBorderStyle;
+    FOnChange : TNotifyEvent;
+    Use12Hours : boolean;
+    FCalButton : TElGraphicButton;
+    FButton    : TElSpinButton;
+    FBtnWidth  : Integer;
+    DTFParts   : TElList;
+    FFormatStr : string;
+    FFormat    : TElDatePickerFormat;
+    FDate      : TDateTime;
+    FFocused   : boolean;
+    FCurPart   : integer;
+    FAlignment : TAlignment;
+    FMouseOver : boolean;
+{$ifdef DATETIMEPICKER_SUPPORT_CALENDAR}
+    FForm      : TElCalendarForm;
+{$endif}
+    TmpDC      : HDC;
+    FOnDropDown: TNotifyEvent;
+    FGradientSteps : Integer;
+    FGradientStartColor : TColor;
+    FGradientEndColor : TColor;
+    FTmpBmp : TBitmap;
+    FTransparent : Boolean;
+    FBackground : TBitmap;
+    FBackgroundType : TElBkGndType;
+    {$ifndef CLX_USED}
+    FImgFormChLink  : TImgFormChangeLink;
+    FImgForm : TElImageForm;
+    {$endif}
+    FActiveBorderType : TElFlatBorderType;
+    FInactiveBorderType : TElFlatBorderType;
+    FFlat : boolean;
+    FMinDate: TDateTime;
+    FMaxDate: TDateTime;
+
+    FDI   : string;
+    FText : TElFString;
+{$ifdef DATETIMEPICKER_SUPPORT_CALENDAR}
+    FDroppedDown : boolean;
+{$endif}
+    InDblClick   : boolean;
+    FOnCheckBoxChange: TNotifyEvent;
+    {$ifndef CLX_USED}
+    FBorderSides: TElBorderSides;
+    {$endif}
+    //FButtonWidth: Integer;
+    FLineBorderActiveColor: TColor;
+    FLineBorderInactiveColor: TColor;
+    FButtonVisible: Boolean;
+    FUnassigned: Boolean;
+    FUnassignedColor: TColor;
+    FUnassignedAllowed: Boolean;
+    FReadOnly: Boolean;
+    FButtonShowOnFocus: Boolean;
+    FUseCurrentDate: Boolean;
+    FButtonThinFrame: Boolean;
+    FAutoSize: Boolean;
+    {$ifdef ELPACK_UNICODE}
+    FHint: WideString;
+    {$endif}
+
+    {$ifndef CLX_USED}
+    procedure WMSize(var Msg : TWMSize); message WM_SIZE;
+    procedure WMSysKeyDown(var Msg: TWMKeyDown); message WM_SYSKEYDOWN;
+    procedure CMCancelMode(var Msg: TCMCancelMode); message CM_CANCELMODE;
+    procedure CMCtl3DChanged(var Msg : TMessage); message CM_CTL3DCHANGED;
+    procedure CMFontChanged(var Msg : TMessage); message CM_FONTCHANGED;
+    procedure CMSysColorChange(var Msg : TMessage); message CM_SYSCOLORCHANGE;
+    procedure CMMouseEnter(var Msg : TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg : TMessage); message CM_MOUSELEAVE;
+    procedure WMNCPaint(var Msg : TMessage); message WM_NCPAINT;
+    procedure WMSetFocus(var Msg : TWMSetFocus); message WM_SETFOCUS;
+    procedure WMKillFocus(var Msg : TWMKillFocus); message WM_KILLFOCUS;
+    procedure WMPaint(var Msg : TWMPaint); message WM_PAINT;
+    procedure WMEraseBkgnd(var Msg : TWMEraseBkgnd); message WM_ERASEBKGND;
+    procedure CMEnabledChanged(var Msg : TMessage); message CM_ENABLEDCHANGED;
+    procedure WMGetDlgCode(var Msg : TWMGetDlgCode); message WM_GETDLGCODE;
+    procedure WMNCCalcSize(var Message : TWMNCCalcSize); message WM_NCCALCSIZE;
+    procedure WMWindowPosChanged(var Message: TWMWindowPosChanged); message
+        WM_WINDOWPOSCHANGED;
+    procedure IFMRepaintChildren(var Message: TMessage); message
+        IFM_REPAINTCHILDREN;
+    {$else}
+    procedure FontChanged; override;
+    procedure Resize; override;
+    procedure EnabledChanged; override;
+    procedure DoEnter; override;
+    procedure DoExit; override;
+    procedure MouseEnter(AControl: TControl); override;
+    procedure MouseLeave(AControl: TControl); override;
+    procedure PaletteChanged(Sender: TObject); override;
+    {$endif}
+    procedure KeyDown(var Key : Word; Shift : TShiftState); override;
+
+    procedure SetBorderStyle(Value: TBorderStyle);
+    {$ifndef CLX_USED}
+    procedure SetImageForm(newValue : TElImageForm);
+    {$endif}
+    procedure SetTransparent(newValue : boolean);
+    procedure SetBackground(newValue : TBitmap);
+    procedure SetBackgroundType(newValue : TElBkGndType);
+    procedure ImageChange(Sender : TObject);
+    {$ifndef CLX_USED}
+    procedure ImageFormChange(Sender : TObject);
+    {$endif}
+    procedure SetGradientStartColor(newValue : TColor);
+    procedure SetGradientEndColor(newValue : TColor);
+    procedure SetGradientSteps(newValue : Integer);
+    procedure RedoTmpBmp;
+    {$ifndef CLX_USED}
+    procedure DrawFlatBorder;
+    {$endif}
+    procedure InvalidateEdit;
+    procedure CloseUp(AcceptValue: boolean); virtual;
+    {$ifdef DATETIMEPICKER_SUPPORT_CALENDAR}
+    procedure CalendarDeactivate(Sender : TObject);
+    {$endif}
+    
+    procedure SpinUpClick(Sender : TObject; Increment : Double);
+    procedure SpinDownClick(Sender : TObject; Increment : Double);
+    procedure CalBtnClick(Sender : TObject);
+
+    procedure IncValue(Increment : integer);
+    procedure ParseFormat(AFormat : string);
+    procedure UpdatePart;
+    {$ifndef CLX_USED}
+    procedure UpdateFrame;
+    {$endif}
+    procedure UpdateText;
+    procedure OnDTFPartDelete(Sender : TObject; Item : Pointer);
+
+    function GetStdFormat(Fmt : TElDatePickerFormat) : string;
+    procedure TuneupCalendarControls;
+
+    function GetCalendarUseLineColors: Boolean;
+    procedure SetCalendarUseLineColors(Value: Boolean);
+
+    function StoreStartOfWeek: Boolean;
+    function GetCalendarWeekendColor: TColor;
+    procedure SetCalendarWeekendColor(Value: TColor);
+    {$ifndef CLX_USED}
+    procedure DrawFlatFrame(Canvas : TCanvas; R : TRect);
+    procedure SetBorderSides(Value: TElBorderSides);
+    {$endif}
+    procedure SetFormat(newValue : TElDatePickerFormat); virtual;
+    procedure SetFormatStr(newValue : String); virtual;
+    procedure SetDateTime(newValue: TDateTime); virtual;
+    procedure SetAlignment(Value: TAlignment); virtual;
+    function  GetBtnWidth   : integer; virtual;
+    function  GetCheckDims  : integer; virtual;
+    function  GetCheckWidth : integer; virtual;
+    procedure SetEditRect;
+    procedure DropDown; virtual;
+    procedure Paint; override;
+    procedure DoDropDown; virtual;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure TriggerChangeEvent; virtual;
+    procedure SetActiveBorderType(newValue : TElFlatBorderType); virtual;
+    procedure SetInactiveBorderType(newValue : TElFlatBorderType); virtual;
+    procedure SetFlat(newValue : Boolean); virtual;
+    procedure SetNavigationInPopup(newValue : boolean); virtual;
+    procedure SetDate(newValue : TDateTime); virtual;
+    function GetDate : TDateTime; virtual;
+
+    procedure SetTime(newValue : TDateTime); virtual;
+    function GetTime : TDateTime; virtual;
+    {$ifdef DATETIMEPICKER_SUPPORT_CALENDAR}
+    function GetDroppedDown : boolean;
+    procedure SetDroppedDown(newValue : boolean); virtual;
+    {$endif}
+    function GetStartOfWeek: TDayOfWeek;
+    procedure SetStartOfWeek(Value: TDayOfWeek);
+    function GetWeekEndDays: TElWeekEndDays;
+    procedure SetWeekEndDays(Value: TElWeekEndDays);
+    procedure SetCalendarLineColorLight(Value: TColor);
+    function GetCalendarLineColorDark: TColor;
+    procedure SetCalendarLineColorDark(Value: TColor);
+    function GetCalendarLineColorLight: TColor;
+    function GetCalendarBackColor: TColor;
+    procedure SetCalendarBackColor(Value: TColor);
+    function GetUseSystemStartOfWeek: Boolean;
+    procedure SetUseSystemStartOfWeek(Value: Boolean);
+
+    procedure Notification(AComponent : TComponent; operation : TOperation); override;
+    {$ifndef CLX_USED}
+    procedure CreateParams(var Params : TCreateParams); override;
+    {$endif}
+    procedure Loaded; override;
+    {$ifndef CLX_USED}
+    procedure CreateWindowHandle(const Params: TCreateParams); override;
+    {$else}
+    procedure CreateWidget; override;
+    {$endif}
+    {$ifndef CLX_USED}
+    procedure AdjustHeight;
+    procedure UpdateHeight;
+    procedure CreateWnd; override;
+    {$endif}
+    procedure SetShowPopupCalendar(newValue : Boolean); virtual;
+    procedure CalendarKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure CalendarChange(Sender: TObject);
+    procedure DblClick; override;
+
+    property BtnWidth : integer read GetBtnWidth;
+
+    procedure SetShowCheckBox(newValue : Boolean); virtual;
+    procedure SetChecked(newValue : Boolean); virtual;
+    procedure SetModified(newValue : Boolean); virtual;
+    procedure TriggerCheckboxChangeEvent;
+    function GetCalendarCurrentDayBorder: TElFlatBorderType;
+    procedure SetCalendarCurrentDayBorder(Value: TElFlatBorderType);
+    function GetCalendarDayCellBorder: TElFlatBorderType;
+    procedure SetCalendarDayCellBorder(Value: TElFlatBorderType);
+    function GetCalendarSelectionBorder: TElFlatBorderType;
+    procedure SetCalendarSelectionBorder(Value: TElFlatBorderType);
+    procedure SetMinDate(Value: TDateTime);
+    procedure SetMaxDate(Value: TDateTime);
+    procedure DoSetDateTime(ADate : TDateTime);
+    function GetThemedClassName: WideString; override;
+    procedure SetUseXPThemes(const Value: Boolean); override;
+    function GetButtonDir: TElSpinBtnDir;
+    procedure SetButtonDir(Value: TElSpinBtnDir);
+    function GetButtonType: TElSpinBtnType;
+    procedure SetButtonType(Value: TElSpinBtnType);
+    procedure SetButtonWidth(Value: Integer);
+    procedure SetLineBorderActiveColor(Value: TColor);
+    procedure SetLineBorderInactiveColor(Value: TColor);
+    procedure UpdateButtonStyles;
+    procedure SetButtonVisible(Value: Boolean);
+    procedure SetUnassigned(Value: Boolean);
+    procedure SetUnassignedColor(Value: TColor);
+    procedure SetUnassignedAllowed(Value: Boolean);
+    function GetReadOnly: Boolean; virtual;
+    procedure SetReadOnly(Value: Boolean); virtual;
+    procedure SetButtonShowOnFocus(Value: Boolean);
+    function IsDateTimeStored: Boolean;
+    procedure SetButtonThinFrame(Value: Boolean);
+    procedure SetAutoSize(Value: Boolean); {$ifdef VCL_6_USED}reintroduce;{$endif}
+
+    {$ifdef ELPACK_UNICODE}
+    procedure SetHint(Value: WideString);
+
+    {$ifndef CLX_USED}
+    procedure CMHintShow(var Message: TMessage); message CM_HINTSHOW;
+    {$else}
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    {$endif}
+    {$endif}
+
+  public
+    { Public declarations }
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+
+    property MouseOver   : boolean read FMouseOver;
+
+    {$ifdef DATETIMEPICKER_SUPPORT_CALENDAR}
+    property DroppedDown : boolean read GetDroppedDown write SetDroppedDown;
+    {$endif}
+
+    property Date : TDateTime read GetDate write SetDate;
+    property Time : TDateTime read GetTime write SetTime;
+  published
+    property Format : TElDatePickerFormat read FFormat write SetFormat default edfShortDateLongTime;
+    property FormatString : String read FFormatStr write SetFormatStr;  { Published }
+    property DateTime: TDateTime read FDate write SetDateTime stored IsDateTimeStored;
+    property Alignment: TAlignment read FAlignment write SetAlignment default taLeftJustify;
+    {$ifndef CLX_USED}
+    property ImageForm : TElImageForm read FImgForm write SetImageForm;
+    {$endif}
+    property AutoSize: Boolean read FAutoSize write SetAutoSize default true;
+    property GradientStartColor : TColor read FGradientStartColor write SetGradientStartColor default clBlack;  { Protected }
+    property GradientEndColor : TColor read FGradientEndColor write SetGradientEndColor default clBlack;  { Protected }
+    property GradientSteps : Integer read FGradientSteps write SetGradientSteps default 16;  { Protected }
+    property Background : TBitmap read FBackground write SetBackground;
+    property BackgroundType : TElBkGndType read FBackgroundType write SetBackgroundType;
+    property BorderStyle: TBorderStyle read FBorderStyle write SetBorderStyle default bsSingle;
+    property Transparent : Boolean read FTransparent write SetTransparent default false; { Protected }
+    property ActiveBorderType : TElFlatBorderType read FActiveBorderType write SetActiveBorderType;
+    property InactiveBorderType : TElFlatBorderType read FInactiveBorderType write SetInactiveBorderType;
+    property Flat : Boolean read FFlat write SetFlat default false;
+    property ShowPopupCalendar : Boolean read FShowPopupCalendar write SetShowPopupCalendar default false;  { Published }
+    property NavigationInPopup : boolean read FNavigationInPopup write SetNavigationInPopup default true;
+    property AltChangeMethod : Boolean read FAltChangeMethod write FAltChangeMethod;  { Published }
+    property ShowCheckBox : Boolean read FShowCheckBox write SetShowCheckBox;  { Published }
+    property Checked  : Boolean read FChecked write SetChecked default True;  { Published }
+    property Modified : Boolean read FModified write SetModified;  { Published }
+
+    property CalendarLineColorDark: TColor read GetCalendarLineColorDark write
+        SetCalendarLineColorDark default clBtnShadow;
+    property CalendarLineColorLight: TColor read GetCalendarLineColorLight write
+        SetCalendarLineColorLight default clWindow;
+    property CalendarBackColor: TColor read GetCalendarBackColor write
+        SetCalendarBackColor default clWindow;
+    property StartOfWeek: TDayOfWeek read GetStartOfWeek write SetStartOfWeek
+        stored StoreStartOfWeek;
+    property UseSystemStartOfWeek: Boolean read GetUseSystemStartOfWeek write
+        SetUseSystemStartOfWeek;
+    property WeekEndDays: TElWeekEndDays read GetWeekEndDays write SetWeekEndDays;
+    property CalendarUseLineColors: Boolean read GetCalendarUseLineColors write
+        SetCalendarUseLineColors default true;
+    property CalendarWeekendColor: TColor read GetCalendarWeekendColor write
+        SetCalendarWeekendColor;
+    {$ifndef CLX_USED}
+    property BorderSides: TElBorderSides read FBorderSides write SetBorderSides;
+    {$endif}
+    property CalendarCurrentDayBorder: TElFlatBorderType read
+        GetCalendarCurrentDayBorder write SetCalendarCurrentDayBorder;
+    property CalendarDayCellBorder: TElFlatBorderType read GetCalendarDayCellBorder
+        write SetCalendarDayCellBorder;
+    property CalendarSelectionBorder: TElFlatBorderType read
+        GetCalendarSelectionBorder write SetCalendarSelectionBorder;
+    property MinDate: TDateTime read FMinDate write SetMinDate;
+    property MaxDate: TDateTime read FMaxDate write SetMaxDate;
+    property HandleDialogKeys: Boolean read FHandleDialogKeys write
+        FHandleDialogKeys default false;
+    property ButtonDir: TElSpinBtnDir read GetButtonDir write SetButtonDir;
+    property ButtonType: TElSpinBtnType read GetButtonType write SetButtonType;
+    property ButtonWidth: Integer read FBtnWidth write SetButtonWidth;
+
+    property OnChange : TNotifyEvent read FOnChange write FOnChange;
+    property OnDropDown: TNotifyEvent read FOnDropDown write FOnDropDown;
+
+    property OnCheckBoxChange: TNotifyEvent read FOnCheckBoxChange write
+        FOnCheckBoxChange;
+
+    {$IFDEF VCL_4_USED}
+    property Anchors;
+    {$ENDIF}
+    property Align;
+    property Color;
+    {$ifndef CLX_USED}
+    property Ctl3D;
+    property DragCursor;
+    {$endif}
+    property DragMode;
+    property Enabled;
+    property Font;
+    property ParentColor;
+    {$ifndef CLX_USED}
+    property ParentCtl3D;
+    {$endif}
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property Visible;
+
+    { Inherited events: }
+    property OnClick;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property LineBorderActiveColor: TColor read FLineBorderActiveColor write 
+        SetLineBorderActiveColor;
+    property LineBorderInactiveColor: TColor read FLineBorderInactiveColor write 
+        SetLineBorderInactiveColor;
+    property ButtonVisible: Boolean read FButtonVisible write SetButtonVisible 
+        default true;
+    property Unassigned: Boolean read FUnassigned write SetUnassigned default false;
+    property UnassignedColor: TColor read FUnassignedColor write SetUnassignedColor 
+        default clRed;
+    property UnassignedAllowed: Boolean read FUnassignedAllowed write 
+        SetUnassignedAllowed default false;
+    property ReadOnly: Boolean read GetReadOnly write SetReadOnly default false;
+    property ButtonShowOnFocus: Boolean read FButtonShowOnFocus write 
+        SetButtonShowOnFocus default false;
+    property UseCurrentDate: Boolean read FUseCurrentDate write FUseCurrentDate 
+        default true;
+    property ButtonThinFrame: Boolean read FButtonThinFrame write 
+        SetButtonThinFrame default true;
+
+    {$ifdef ELPACK_UNICODE}
+    property Hint: WideString read FHint write SetHint;
+    {$endif}
+  end;  { TElDateTimePicker }
+
+implementation
+end.

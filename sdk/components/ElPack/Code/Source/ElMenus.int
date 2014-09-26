@@ -1,0 +1,539 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{   Portion copyright (c) 2001, Alexander Hramov     }
+{   Portion copyright (c) 1997, Borland Int.         }
+{                                                    }
+{====================================================}
+
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+04/04/2002
+
+  Added IsHTML property and possibility to draw HTML
+
+03/13/2002
+
+  Fixed various painting issues
+
+03/12/2002
+
+  Fixed resource leak
+
+03/09/2002
+
+  Increased calculation of space in main menu
+  Improved painting of the selected items
+  ElPopupMenu.Popup function worked incorrectly. Fixed.
+
+03/06/2002
+
+  Fixed different painting issues
+
+02/26/2002
+
+  Fixed painting, font handling, image list handling issues
+
+02/12/2002
+
+  Add TElMenuItem.Find method
+
+
+*)
+
+unit ElMenus; { TElMainMenu & TElPopupMenu component. }
+
+{ EldoS Menu }
+
+interface
+
+uses
+  Windows,
+  SysUtils,
+  Messages,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  Menus,
+  StdCtrls,
+  Clipbrd,
+  {$ifdef VCL_4_USED}
+  ActnList,
+  ImgList,
+  {$endif}
+  CommCtrl,
+  ElTools,
+  ElImgFrm,
+  ElTmSchema,
+  ElUxTheme,
+  ElVCLUtils,
+  ElXPThemedControl,
+  ExtCtrls,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+
+  ElStrUtils,
+  ElColor,
+  ElHook
+  {$ifdef ELPACK_UNICODE}
+  , ElUnicodeStrings
+  {$endif}
+  {$ifdef HAS_HTML_RENDER}
+  , HTMLRender
+  {$endif}
+  ;
+
+{$warnings off}
+
+{$ifndef VCL_4_USED}
+{$define ELMENU_USE_IMAGES}
+{$else}
+{$undef ELMENU_USE_IMAGES}
+{$endif}
+
+type
+  TElMenuItem = class;
+
+  EMenuError = class(Exception);
+  TMenuBreak = (mbNone, mbBreak, mbBarBreak);
+  TMenuChangeEvent = procedure (Sender: TObject; Source: TElMenuItem; Rebuild: Boolean) of object;
+  TMenuDrawItemEvent = procedure (Sender: TObject; ACanvas: TCanvas;
+    ARect: TRect; Selected: Boolean) of object;
+  TMenuMeasureItemEvent = procedure (Sender: TObject; ACanvas: TCanvas;
+    var Width, Height: Integer) of object;
+
+  {$ifndef VCL_4_USED}
+  TMenuItemAutoFlag = (maAutomatic, maManual, maParent);
+  TMenuAutoFlag = maAutomatic..maManual;
+  // Types for TElPopupMenu
+  TTrackButton = (tbRightButton, tbLeftButton);
+  {$endif}
+  {$ifndef VCL_5_USED}
+  TMenuAnimations = (maLeftToRight, maRightToLeft, maTopToBottom, maBottomToTop, maNone);
+  TMenuAnimation = set of TMenuAnimations;
+  {$endif}
+
+
+  THackClass = class(TComponent)
+  private
+    {$ifdef VCL_4_USED}
+    FBiDiMode: TBiDiMode;
+    {$endif}
+    FItems: TMenuItem;
+  end;
+
+  {$ifdef VCL_4_USED}
+
+  { TMenuActionLink }
+
+  TMenuActionLink = class(TActionLink)
+  protected
+    FClient: TElMenuItem;
+    procedure AssignClient(AClient: TObject); override;
+    function IsCaptionLinked: Boolean; override;
+    function IsCheckedLinked: Boolean; override;
+    function IsEnabledLinked: Boolean; override;
+    function IsHelpContextLinked: Boolean; override;
+    function IsHintLinked: Boolean; override;
+    function IsImageIndexLinked: Boolean; override;
+    function IsShortCutLinked: Boolean; override;
+    function IsVisibleLinked: Boolean; override;
+    function IsOnExecuteLinked: Boolean; override;
+    procedure SetCaption(const Value: TElFString);
+    procedure SetChecked(Value: Boolean); override;
+    procedure SetEnabled(Value: Boolean); override;
+    procedure SetHelpContext(Value: THelpContext); override;
+    procedure SetHint(const Value: TElFString);
+    procedure SetImageIndex(Value: Integer); override;
+    procedure SetShortCut(Value: TShortCut); override;
+    procedure SetVisible(Value: Boolean); override;
+    procedure SetOnExecute(Value: TNotifyEvent); override;
+  end;
+
+  TMenuActionLinkClass = class of TMenuActionLink;
+  {$endif}
+
+  { !!! This class only for internal use.  !!! }
+  TElMenu = class(TMenu)
+  end;
+
+  TDrawStyle = (tdsNormal, tdsOfficeXP, tdsWindowsXP);
+
+  { TElMenuItem }
+
+  TElMenuItem = class(TMenuItem)
+  private
+    FImageChangeLink: TChangeLink;
+    FSubMenuImages: TCustomImageList;
+    FCaption: TElFString;
+    FHandle: HMENU;
+    FChecked: Boolean;
+    FEnabled: Boolean;
+    FDefault: Boolean;
+    FRadioItem: Boolean;
+    FVisible: Boolean;
+    FGroupIndex: Byte;
+    FImageIndex: Integer;
+    {$ifdef VCL_4_USED}
+    FActionLink: TMenuActionLink;
+    {$endif}
+    FBreak: TMenuBreak;
+    FBitmap: TBitmap;
+    FDisBitmap: TBitmap;
+    FCommand: Word;
+    FHelpContext: THelpContext;
+    FHint: TElFString;
+    FItems: TList;
+    FShortCut: TShortCut;
+    FParent: TElMenuItem;
+    FMerged: TElMenuItem;
+    FMergedWith: TElMenuItem;
+    FMenu: TElMenu;
+    FStreamedRebuild: Boolean;
+    FOnChange: TMenuChangeEvent;
+    FOnClick: TNotifyEvent;
+    FOnDrawItem: TMenuDrawItemEvent;
+    FOnMeasureItem: TMenuMeasureItemEvent;
+    procedure AppendTo(Menu: HMENU; ARightToLeft: Boolean);
+    {$ifdef VCL_4_USED}
+    procedure DoActionChange(Sender: TObject);
+    {$endif}
+    procedure ReadShortCutText(Reader: TReader);
+    procedure MergeWith(Menu: TElMenuItem);
+    procedure RebuildHandle;
+    procedure PopulateMenu;
+    procedure SubItemChanged(Sender: TObject; Source: TElMenuItem; Rebuild: Boolean);
+    procedure TurnSiblingsOff;
+    procedure WriteShortCutText(Writer: TWriter);
+    procedure VerifyGroupIndex(Position: Integer; Value: Byte);
+    {$ifdef VCL_4_USED}
+    function GetAction: TBasicAction;
+    procedure SetAction(Value: TBasicAction);
+    {$endif}
+    procedure SetSubMenuImages(Value: TCustomImageList);
+
+    function GetBitmap: TBitmap;
+    procedure SetBitmap(Value: TBitmap);
+
+    {$ifdef VCL_4_USED}
+    procedure InitiateActions;
+    function IsCaptionStored: Boolean;
+    function IsCheckedStored: Boolean;
+    function IsEnabledStored: Boolean;
+    function IsHintStored: Boolean;
+    function IsHelpContextStored: Boolean;
+    function IsImageIndexStored: Boolean;
+    function IsOnClickStored: Boolean;
+    function IsShortCutStored: Boolean;
+    function IsVisibleStored: Boolean;
+    {$endif}
+  protected
+    procedure DefineProperties(Filer: TFiler); override;
+
+    {$ifdef VCL_4_USED}
+    procedure ActionChange(Sender: TObject; CheckDefaults: Boolean); override;
+    {$endif}
+    procedure ImageListChange(Sender: TObject);
+
+    procedure AssignTo(Dest: TPersistent); override;
+    procedure DoDrawText(ACanvas: TCanvas; const ACaption: TElFString;
+      var Rect: TRect; Selected: Boolean; Flags: Longint);
+    procedure DrawItem(ACanvas: TCanvas; ARect: TRect; Selected: Boolean);
+    {$ifdef VCL_4_USED}
+    override;
+    function GetActionLinkClass: TMenuActionLinkClass;
+    {$endif}
+    function GetHandle: HMENU;
+    function GetCount: Integer;
+    procedure GetChildren(Proc: TGetChildProc; Root: TComponent); override;
+    function GetItem(Index: Integer): TElMenuItem;
+    function GetMenuIndex: Integer;
+    procedure MeasureItem(ACanvas: TCanvas; var Width, Height: Integer);
+    {$ifdef D_6_UP}
+    override;
+    {$endif}
+    procedure MenuChanged(Rebuild: Boolean); override;
+    procedure Loaded; override;
+    procedure Notification(AComponent: TComponent;
+      Operation: TOperation); override;
+    procedure SetBreak(Value: TMenuBreak);
+    procedure SetCaption(const Value: TElFString);
+    procedure SetChecked(Value: Boolean);
+    procedure SetChildOrder(Child: TComponent; Order: Integer); override;
+    procedure SetDefault(Value: Boolean);
+    procedure SetEnabled(Value: Boolean);
+    procedure SetGroupIndex(Value: Byte);
+    procedure SetImageIndex(Value: Integer);
+    procedure SetMenuIndex(Value: Integer);
+    procedure SetParentComponent(Value: TComponent); override;
+    procedure SetRadioItem(Value: Boolean);
+    procedure SetShortCut(Value: TShortCut);
+    procedure SetVisible(Value: Boolean);
+    {$ifdef VCL_4_USED}
+    property ActionLink: TMenuActionLink read FActionLink write FActionLink;
+    {$endif}
+    procedure UpdateItems;
+    function GetImageWidth: Integer;
+    procedure SetHint(Value: TElFString);
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    {$ifdef VCL_4_USED}
+    procedure InitiateAction; override;
+    {$endif}
+    procedure DesignRebuild;
+    procedure Insert(Index: Integer; Item: TElMenuItem);
+    procedure Delete(Index: Integer);
+    procedure Click; override;
+    function Find(ACaption: TElFString): TElMenuItem;
+    function IndexOf(Item: TElMenuItem): Integer;
+    function GetParentComponent: TComponent; override;
+    function GetParentMenu: TElMenu;
+    function HasParent: Boolean; override;
+    procedure Add(Item: TElMenuItem);
+    procedure Remove(Item: TElMenuItem);
+    //property Command: Word read FCommand;
+
+    property Handle: HMENU read GetHandle;
+    property Count: Integer read GetCount;
+    property Items[Index: Integer]: TElMenuItem read GetItem; default;
+    property MenuIndex: Integer read GetMenuIndex write SetMenuIndex;
+    property Parent: TElMenuItem read FParent;
+  published
+    {$ifdef VCL_4_USED}
+    property Action: TBasicAction read GetAction write SetAction;
+    {$endif}
+    property SubMenuImages: TCustomImageList read FSubMenuImages write SetSubMenuImages;
+    property Bitmap: TBitmap read GetBitmap write SetBitmap;
+    property Break: TMenuBreak read FBreak write SetBreak default mbNone;
+    property Caption: TElFString read FCaption write SetCaption {$ifdef VCL_4_USED}stored IsCaptionStored{$endif};
+    property Checked: Boolean read FChecked write SetChecked {$ifdef VCL_4_USED}stored IsCheckedStored{$endif} default False;
+    property Default: Boolean read FDefault write SetDefault default False;
+    property Enabled: Boolean read FEnabled write SetEnabled {$ifdef VCL_4_USED}stored IsEnabledStored{$endif} default True;
+    property GroupIndex: Byte read FGroupIndex write SetGroupIndex default 0;
+    property HelpContext: THelpContext read FHelpContext write FHelpContext {$ifdef VCL_4_USED}stored IsHelpContextStored{$endif} default 0;
+    property Hint: TElFString read FHint write SetHint {$ifdef VCL_4_USED}stored IsHintStored{$endif};
+    property ImageIndex: Integer read FImageIndex write SetImageIndex {$ifdef VCL_4_USED}stored IsImageIndexStored{$endif} default -1;
+    property RadioItem: Boolean read FRadioItem write SetRadioItem default False;
+    property ShortCut: TShortCut read FShortCut write SetShortCut {$ifdef VCL_4_USED}stored IsShortCutStored{$endif} default 0;
+    property Visible: Boolean read FVisible write SetVisible {$ifdef VCL_4_USED}stored IsVisibleStored{$endif} default True;
+    property OnClick: TNotifyEvent read FOnClick write FOnClick {$ifdef VCL_4_USED}stored IsOnClickStored{$endif};
+    property OnDrawItem: TMenuDrawItemEvent read FOnDrawItem write FOnDrawItem;
+    property OnMeasureItem: TMenuMeasureItemEvent read FOnMeasureItem write FOnMeasureItem;
+    property OnChange: TMenuChangeEvent read FOnChange write FOnChange;
+  end;
+
+  TElMainMenu = class(TMainMenu)
+  private
+    FOle2Menu: HMENU;
+    FMenuImage: WideString;
+    FUnicodeItems: TElMenuItem;
+    FHook: TElHook;
+    FDrawStyle: TDrawStyle;
+    FFont: TFont;
+    FForm: TForm;
+    FImageChangeLink: TChangeLink;
+    FImages: TImageList;
+    FOwnerDraw: boolean;
+
+    {$ifdef HAS_HTML_RENDER}
+    FIsHTML  : Boolean;
+    FOnImageNeeded: TElHTMLImageNeededEvent;
+    FRender  : TElHTMLRender;
+    procedure SetIsHTML(Value: Boolean);
+    {$endif}
+
+    procedure SetOwnerDraw(Value: Boolean);
+    procedure ImageListChange(Sender: TObject);
+    procedure SetImages(Value: TImageList);
+
+    procedure ItemChanged;
+    procedure OnBeforeHook(Sender : TObject; var Message : TMessage; var Handled :
+        boolean);
+    procedure SetDrawStyle(Value: TDrawStyle);
+    procedure SetFont(const Value: TFont);
+    function UpdateImage: Boolean;
+  protected
+    FSystemFont: Boolean;
+    function IsOwnerDraw: Boolean;
+    procedure ProcessMenuChar(var Message: TWMMenuChar);
+    procedure Notification(AComponent: TComponent;
+                           Operation: TOperation); override;
+    {$ifdef ELPACK_UNICODE}
+    function DoGetMenuString(Menu: HMENU; ItemID: UINT; Str: PWideChar;
+                             MaxCount: Integer; Flag: UINT): Integer;
+    {$else}
+    function DoGetMenuString(Menu: HMENU; ItemID: UINT; Str: PChar;
+                             MaxCount: Integer; Flag: UINT): Integer;
+    {$endif}
+    procedure MenuChanged(Sender: TObject; Source: TMenuItem; Rebuild: Boolean);
+    {$ifdef VCL_4_USED}
+    override;
+    {$endif}
+    function GetHandle: HMENU; override;
+    function DispatchCommand(ACommand: Word): Boolean;
+    procedure Loaded; override;
+    procedure SetSystemFont(Value: Boolean);
+    procedure GetFont;
+    procedure FontChange(Sender : TObject);
+
+    {$ifdef HAS_HTML_RENDER}
+    procedure TriggerImageNeededEvent(Sender : TObject; Src : TElFString;
+      var Image: TBitmap);
+    {$endif}
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    function FindItem(Value: Integer; Kind: TFindItemKind): TElMenuItem;
+    function IsShortCut(var Message: TWMKey): Boolean;
+    {$ifdef VCL_4_USED}
+    override;
+    {$endif}
+    procedure UpdateItems;
+  published
+    property Items: TElMenuItem read FUniCodeItems;
+    property Font: TFont read FFont write SetFont;
+    property DrawStyle: TDrawStyle read FDrawStyle write SetDrawStyle default tdsNormal;
+    property Images: TImageList read FImages write SetImages;
+    property OwnerDraw: Boolean read FOwnerDraw write SetOwnerDraw default False;
+    property SystemFont: Boolean read FSystemFont write SetSystemFont default true;
+    {$ifdef HAS_HTML_RENDER}
+    property IsHTML : Boolean read FIsHTML write SetIsHTML default false;
+    property OnImageNeeded: TElHTMLImageNeededEvent read FOnImageNeeded write
+        FOnImageNeeded;
+    {$endif}
+  end;
+
+  TElPopupMenu = class(TPopupMenu)
+  private
+    {$ifdef HAS_HTML_RENDER}
+    FIsHTML  : Boolean;
+    FRender  : TElHTMLRender;
+    FOnImageNeeded: TElHTMLImageNeededEvent;
+    {$endif}
+    FHook: TElHook;
+    FDrawStyle: TDrawStyle;
+    FUnicodeItems: TElMenuItem;
+    FPopupPoint: TPoint;
+    FForm: TForm;
+    FFont: TFont;
+    {$ifndef VCL_5_USED}
+    FMenuAnimation: TMenuAnimation;
+    {$endif}
+    {$ifndef VCL_4_USED}
+    FTrackButton: TTrackButton;
+    FImageChangeLink: TChangeLink;
+    FImages: TImageList;
+    FOwnerDraw: boolean;
+
+    procedure Notification(AComponent: TComponent;
+                           Operation: TOperation); override;
+    procedure ImageListChange(Sender: TObject);
+    procedure SetImages(Value: TImageList);
+    procedure SetOwnerDraw(Value: Boolean);
+    {$endif}
+    procedure SetDrawStyle(Value: TDrawStyle);
+    procedure OnBeforeHook(Sender : TObject; var Message : TMessage; var Handled : boolean);
+    procedure SetFont(const Value: TFont);
+    {$ifdef HAS_HTML_RENDER}
+    procedure SetIsHTML(Value: Boolean);
+    {$endif}
+  protected
+    FSystemFont: Boolean;
+    procedure DoPopup(Sender: TObject);
+    {$ifdef VCL_5_USED}
+    override;
+    {$endif}
+    function IsOwnerDraw: Boolean;
+    function DispatchCommand(ACommand: Word): Boolean;
+    function GetHandle: HMENU; virtual;
+    procedure GetFont;
+    procedure SetSystemFont(Value: Boolean);
+    procedure FontChange(Sender : TObject);
+    procedure Loaded; override;
+    {$ifdef HAS_HTML_RENDER}
+    procedure TriggerImageNeededEvent(Sender : TObject; Src : TElFString;
+      var Image: TBitmap);
+    {$endif}
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Popup(X, Y: Integer); override;
+    function FindItem(Value: Integer; Kind: TFindItemKind): TElMenuItem;
+    function IsShortCut(var Message: TWMKey): Boolean;
+    {$ifdef VCL_4_USED}
+    override;
+    {$endif}
+    procedure ProcessMenuChar(var Message: TWMMenuChar);
+    procedure UpdateItems;
+    property PopupPoint: TPoint read FPopupPoint;
+    property Handle read GetHandle;
+  published
+    property Items: TElMenuItem read FUniCodeItems;
+    property Font: TFont read FFont write SetFont;
+    property DrawStyle: TDrawStyle read FDrawStyle write SetDrawStyle default tdsNormal;
+    {$ifndef VCL_5_USED}
+    property MenuAnimation: TMenuAnimation read FMenuAnimation write FMenuAnimation default [];
+    {$endif}
+    {$ifndef VCL_4_USED}
+    property OwnerDraw: Boolean read FOwnerDraw write SetOwnerDraw default False;
+    property Images: TImageList read FImages write SetImages;
+    property TrackButton: TTrackButton read FTrackButton write FTrackButton default tbRightButton;
+    {$endif}
+    property SystemFont: Boolean read FSystemFont write SetSystemFont default true;
+    {$ifdef HAS_HTML_RENDER}
+    property IsHTML : Boolean read FIsHTML write SetIsHTML default false;
+    property OnImageNeeded: TElHTMLImageNeededEvent read FOnImageNeeded write
+        FOnImageNeeded;
+    {$endif}
+  end;
+{$warnings on}
+
+
+procedure InsertItems(var AMenu: TMenu; MainItem: TElMenuItem; Index: Integer; Items: array of TElMenuItem);
+procedure InsertMenuItems(var AMenu: TMenu; Index: Integer; Items: array of TElMenuItem);
+
+function ElNewMenu(Owner: TComponent; const AName: TElFString;
+                 Items: array of TElMenuItem): TElMainMenu;
+
+function ElNewSubMenu(const ACaption: TElFString; hCtx: Word;
+                    const AName: TElFString; Items: array of TElMenuItem;
+                    AEnabled: Boolean): TElMenuItem;
+
+function ElNewItem(const ACaption: TElFString; AShortCut: TShortCut;
+                 AChecked, AEnabled: Boolean; AOnClick: TNotifyEvent;
+                 hCtx: Word; const AName: TElFString): TElMenuItem;
+
+function ElNewLine: TElMenuItem;
+
+function ElStripHotKey(const Text: TElFString): TElFString;
+function ElGetHotkey(const Text: TElFString): TElFString;
+procedure ElInitMenuItems(AMenu: TMenu; Items: array of TElMenuItem);
+
+procedure CopyMenuItems(Dest : TElMenuItem; Source : TElMenuItem);
+
+function GetMenuFont: HFont;
+
+var
+  FTheme: HTheme;
+
+implementation
+end.

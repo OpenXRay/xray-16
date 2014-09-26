@@ -1,0 +1,184 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+05/01/2002
+
+  Fixed design-time setting of Style property
+
+07/14/2001
+
+  IsHTML property added.
+  Now these controls act as ancestors for ElDBListBox and ElDBComboBox
+
+============================== Version 2.78 ====================================
+
+03/23/2001
+
+  Images were not drawn. Fixed. 
+
+============================== Version 2.75 ====================================
+
+10/26/2000
+
+  Fixed item height when adding a combo box to the form in design-time
+
+*)
+
+unit HTMLLbx;  { TElHTMLListBox component. }
+
+{ HTML-enabled listbox }
+
+interface
+
+uses
+  {$ifdef MSWINDOWS}
+  Windows,
+  Graphics,
+  Controls,
+  Forms,
+  Messages,
+  Dialogs,
+  Menus,
+  StdCtrls,
+  ExtCtrls,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  {$else}
+  Types,
+  QControls,
+  QGraphics,
+  QStdCtrls,
+  Qt,
+  QForms,
+  {$endif}
+  ElACtrls,
+
+  SysUtils,
+  Classes,
+  HTMLRender,
+  ElHintWnd,
+  ElStrUtils,
+  ElImgFrm;
+
+type
+
+  TCustomElHTMLListBox = class(TElAdvancedListBox)
+  private
+    { Private declarations }
+    FDummyEvent : TNotifyEvent;  { Dummy field for hiding events. }
+
+    FRender : TElHTMLRender;
+    FOnLinkClick : TElHTMLLinkClickEvent;
+    FOnImageNeeded : TElHTMLImageNeededEvent;
+    FIsHTML: Boolean;
+    FCursor: TCursor;
+    procedure CMMouseLeave(var Msg : TMessage); message CM_MOUSELEAVE;
+    // function GetItemHeight(Index: Integer): Integer; virtual;
+  protected
+    FStyle: TListBoxStyle;
+    function GetItemWidth(Index: Integer): Integer; override;
+    {$ifndef CLX_USED}
+    procedure MeasureItem(Index: Integer; var Height: Integer); override;
+    procedure DrawItem(Index: Integer; Rect: TRect; State: TOwnerDrawState); override;
+    {$else}
+    procedure MeasureItem(Control: TWinControl; Index: Integer;
+      var Height, Width: Integer); override;
+    function DrawItem(Index: Integer; Rect: TRect;
+      State: TOwnerDrawState): Boolean; override;
+    {$endif}        
+    procedure TriggerLinkClickEvent(Sender : TObject; HRef : TElFString); virtual;
+    procedure TriggerImageNeededEvent(Sender : TObject; Src : TElFString; var Image :
+        TBitmap); virtual;
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure SetCursor(newValue : TCursor); virtual;
+    function CreateHintWindow: THintWindow; override;
+    procedure SetStyle(Value: TListBoxStyle);
+    procedure SetIsHTML(Value: Boolean); virtual;
+  public
+    { Public declarations }
+    constructor Create(AOwner : TComponent); override;
+    procedure Loaded; override;
+    destructor Destroy; override;
+  published
+    { Published properties and events }
+    property OnLinkClick : TElHTMLLinkClickEvent read FOnLinkClick write FOnLinkClick;
+    property OnImageNeeded : TElHTMLImageNeededEvent read FOnImageNeeded write FOnImageNeeded;
+    property OnDrawItem : TNotifyEvent read FDummyEvent;  { Hidden Event }
+    property OnMeasureItem : TNotifyEvent read FDummyEvent;  { Hidden Event }
+    property IsHTML: Boolean read FIsHTML write SetIsHTML;
+    property Cursor: TCursor read FCursor write SetCursor;
+    property Style: TListBoxStyle read FStyle write SetStyle default 
+        lbOwnerDrawVariable;
+  end;  { TElHTMLListBox }
+
+  TCustomElHTMLComboBox = class(TElAdvancedComboBox)
+  private
+    { Private declarations }
+    FDummyEvent : TNotifyEvent;  { Dummy field for hiding events. }
+
+    FRender : TElHTMLRender;
+    FOnLinkClick : TElHTMLLinkClickEvent;
+    FOnImageNeeded : TElHTMLImageNeededEvent;
+    FIsHTML: Boolean;
+  protected
+    {$ifndef CLX_USED}
+    FStyle: TComboBoxStyle;
+    procedure MeasureItem(Index: Integer; var Height: Integer); override;
+    procedure DrawItem(Index: Integer; Rect: TRect; State: TOwnerDrawState); override;
+    {$else}
+    procedure MeasureItem(Control: TWinControl; Index: Integer;
+      var Height, Width: Integer); override;
+    function DrawItem(Index: Integer; Rect: TRect;
+      State: TOwnerDrawState): Boolean; override;
+    {$endif}
+
+    procedure TriggerLinkClickEvent(Sender : TObject; HRef : TElFString); virtual;
+    procedure TriggerImageNeededEvent(Sender : TObject; Src : TElFString; var Image : TBitmap); virtual;
+    procedure SetStyle(Value: TComboBoxStyle); {$ifdef VCL_4_USEd}reintroduce;{$endif}
+    procedure SetIsHTML(Value: Boolean); virtual;
+  public
+    { Public declarations }
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Loaded; override;
+  published
+    { Published properties and events }
+    property OnLinkClick : TElHTMLLinkClickEvent read FOnLinkClick write FOnLinkClick;
+    property OnImageNeeded : TElHTMLImageNeededEvent read FOnImageNeeded write FOnImageNeeded;
+    property OnDrawItem : TNotifyEvent read FDummyEvent;  { Hidden Event }
+    property OnMeasureItem : TNotifyEvent read FDummyEvent;  { Hidden Event }
+    property IsHTML: Boolean read FIsHTML write SetIsHTML;
+    property Style: TComboBoxStyle read FStyle write SetStyle default 
+        csOwnerDrawVariable;
+  end;
+
+  TElHTMLListBox = class(TCustomElHTMLListBox)
+  end;
+
+  TElHTMLComboBox = class(TCustomElHTMLComboBox)
+  end;
+
+implementation
+end.

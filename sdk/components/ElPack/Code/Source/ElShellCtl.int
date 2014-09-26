@@ -1,0 +1,1155 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+04/04/2002
+
+  Improved speed of list building
+  Fixed the problem with images
+
+02/14/2002
+
+  Solved the problem with AV happening when the combo box is recreated
+  (RecreateWnd is used). 
+
+12/24/2001
+
+  Added ElShellList.BuildRootPIDL to access current root pidl
+  Made ElShellListItem.BuildFullPIDL and ElShellTreeItem.BuildFullPIDL methods public
+  Fixed calls to SetRootPIDL with Empty PIDL (with size of 2) as parameter
+
+11/21/2001
+
+  SystemMenu is shown when you press VK_APPS (AKA Context Menu) key.
+  Fixed the problem with 32-bit icons in Windows XP. 
+
+11/20/2001
+
+  Fixed GetFocusedDisplayName methods
+
+11/15/2001
+
+  Fixed system menus that worked incorrectly
+  ExpandRoot property added. It defines whether the root item is expanded. 
+
+11/14/2001
+
+  OnTryEdit property made published
+
+*)
+
+unit ElShellCtl;
+
+
+interface
+
+uses
+
+  Controls,
+  Menus,
+  Classes,
+  SysUtils,
+  Messages,
+  CommCtrl,
+  Windows,
+  ShellAPI,
+  ShlObj,
+  ComObj,
+  ActiveX,
+  Forms,
+  Graphics,
+  {$ifdef VCL_4_USED}
+  ImgList,
+  {$endif}
+  {$ifdef VCL_6_USED}
+  Variants,
+  {$endif}
+  StdCtrls,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+
+  ElACtrls,
+  ElTreeStdEditors,
+  ElShellUtils,
+  ElStrUtils,
+  ElTools,
+  ElList,
+  ElHeader,
+{$ifdef ELPACK_NO_ADV_EDITS}
+  ElEdits,
+{$endif}
+  ElTree;
+
+type
+
+  TElShellSortType = (sstCustom, sstName, sstExt, sstSize, sstCreationDate, sstModifyDate, sstAccessDate);
+
+  TElShellSortModifier = (ssmFoldersFirst, ssmExecutablesFirst);
+  TElShellSortModifiers = set of TElShellSortModifier;
+
+  TElShellSizeFormat = (ssfAsIs, ssfKb, ssfAuto);
+
+  EElShellError = class(Exception);
+
+  TElShellTreeItem = class(TElTreeItem)
+  private
+    FIsValidFile: Boolean;
+  protected
+    FValid : boolean;
+    FAttrAsString: string;
+    FComment: string;
+    FSizeAsString: string;
+    FDisplayName: string;
+    FTypeName : string;
+    FFileName : string;
+    FAttr: Cardinal;
+    FPIDL: PItemIDList;
+    Win32FindData: PWin32FindData;
+    procedure GetAttributes(iParentFolder : IShellFolder);
+    function GetDisplayName: string;
+    function GetFullName: string;
+    function GetHasSubFolders: Boolean;
+    function GetIsFolder: Boolean;
+    function GetIsRemovable: Boolean;
+    function GetParentFolder: IShellFolder;
+    function GetPIDL: PItemIDList;
+    function GetSize: Cardinal;
+    procedure SetDisplayName(const Value: string);
+    function GetCreationTime: TDateTime;
+    function GetModificationTime: TDateTime;
+    function GetLastAccessTime: TDateTime;
+    procedure GetWin32Data(ParentFolder : IShellFolder);
+    procedure CheckWin32FindData;
+    function GetFileName: string;
+    function GetSizeAsString: string;
+    function GetTypeName: string;
+    function GetIsFileObject: Boolean;
+    function GetAttrAsString: string;
+    function GetComment: string;
+    procedure Invalidate;
+    function FindItemByPIDL(APIDL : PItemIDList): TElShellTreeItem;
+    function GetCanRename: Boolean;
+    {$ifdef VCL_4_USED}
+    function GetHintText(ParentFolder: IShellFolder): TElFString;
+    {$endif}
+    function GetPicture(ParentFolder : IShellFolder): Integer;
+  public
+    constructor Create(AOwner : TCustomElTree); override;
+    destructor Destroy; override;
+    function BuildFullPIDL: PItemIDList;
+
+    property Attr: Cardinal read FAttr;
+    property DisplayName: string read GetDisplayName write SetDisplayName;
+    property FullName: string read GetFullName;
+    property HasSubFolders: Boolean read GetHasSubFolders;
+    property IsFolder: Boolean read GetIsFolder;
+    property IsRemovable: Boolean read GetIsRemovable;
+    property ParentFolder: IShellFolder read GetParentFolder;
+    property PIDL: PItemIDList read GetPIDL;
+    property ModificationTime: TDateTime read GetModificationTime;
+    property CreationTime: TDateTime read GetCreationTime;
+    property LastAccessTime: TDateTime read GetLastAccessTime;
+    property FileName: string read GetFileName;
+    property SizeAsString: string read GetSizeAsString;
+    property IsFileObject: Boolean read GetIsFileObject;
+    property Comment: string read GetComment;
+    property CanRename: Boolean read GetCanRename;
+  published
+    property Size: Cardinal read GetSize;
+    property TypeName: string read GetTypeName;
+    property AttrAsString: string read GetAttrAsString;
+  end;
+
+  TShellTreeItemAddingEvent = procedure(Sender : TObject; ItemName : String;
+                              ShellFolder : IShellFolder; RelPIDL : PItemIDList;
+                              var Allowed : boolean) of object;
+  TShellTreeItemAddedEvent  = procedure(Sender : TObject; ItemName : String;
+                              ShellFolder : IShellFolder; RelPIDL : PItemIDList;
+                              Item : TElShellTreeItem) of object;
+
+  TElShellTree = class(TCustomElTree)
+  protected
+    FEditor: TElTreeInplaceEdit;
+    FRootFolder : TShellFolders;
+    FRootPIDL   : PItemIDList;
+    FFocusedPIDL: PItemIDList;
+    FIFolder    : IShellFolder;
+    FCustomRootFolder: string;
+    FUseSystemMenus: Boolean;
+    FClearOnCollapse: Boolean;
+    FCheckForChildren: Boolean;
+    FShowHidden: Boolean;
+    FShowFiles: Boolean;
+    FHighlightCompressed: Boolean;
+    FFileFilters: TStringList;
+    FOnFilterItem: TShellTreeItemAddingEvent;
+    FOnItemAdded: TShellTreeItemAddedEvent;
+    FFileSystemOnly: Boolean;
+    FSortType: TElShellSortType;
+    FSortModifiers: TElShellSortModifiers;
+    FSizeFormat: TElShellSizeFormat;
+    FDefaultColumns: Boolean;
+    FDefaultEditor: Boolean;
+    FMaxColumns   : integer;
+    FExpandRoot: Boolean;
+    function GetFocusedPIDL: PItemIDList;
+    function GetFocusedDisplayName: string;
+    procedure BuildTree;
+    procedure ReleaseFocusedPIDL;
+    procedure DoItemFocused; override;
+    procedure SetCustomRootFolder(const Value: string);
+    function CreateView: TElTreeView; override;
+    function CreateItems: TElTreeItems; override;
+    function CheckChildren(Item : TElTreeItem; AFolder : IShellFolder): Boolean;
+    procedure FillItemWithData(Item : TElShellTreeItem; AFolder : IShellFolder;
+        recursive : integer);
+    procedure SetShowHidden(Value: Boolean);
+    procedure SetShowFiles(Value: Boolean);
+    procedure SetHighlightCompressed(Value: Boolean);
+    function GetFileFilters: TStrings;
+    procedure SetFileFilters(const Value: TStrings);
+    function NameFiltered(S : String; ShellFolder : IShellFolder; RelPIDL : PItemIDList): Boolean; virtual;
+    procedure CreateHandle; override;
+    procedure DoItemCollapse(Item: TElTreeItem); override;
+    procedure DoItemExpand(Item: TElTreeItem); override;
+    procedure DoItemExpanding(Item: TElTreeItem; var CanProcess: boolean); override;
+    function GetRootFolder: TShellFolders;
+    procedure SetRootFolder(Value: TShellFolders);
+    procedure DoItemAdded(S : String; ShellFolder : IShellFolder; RelPIDL :
+        PItemIDList; Item : TElShellTreeItem); virtual;
+    procedure SetFileSystemOnly(Value: Boolean);
+    function GetItemFocused: TElShellTreeItem;
+    procedure SetItemFocused(Value: TElShellTreeItem);
+    procedure DoCompareItems(Item1, Item2: TElTreeItem; var res: integer); override;
+    procedure SetSortType(Value: TElShellSortType);
+    procedure SetSortModifiers(Value: TElShellSortModifiers);
+    procedure SetSizeFormat(Value: TElShellSizeFormat);
+    procedure SetDefaultColumns(Value: Boolean);
+    procedure AddDefaultColumns;
+    function DeleteDefaultColumns: Integer;
+    procedure TriggerVirtualTextNeeded(Item : TElTreeItem; SectionIndex : Integer;
+        var Text : TElFString); override;
+    procedure TriggerVirtualValueNeeded(Item : TElTreeItem; SectionIndex : Integer;
+        VarType : integer; var Value : Variant); override;
+    procedure TriggerSortBegin; override;
+    procedure TriggerTryEditEvent(Item: TElTreeItem; SectionIndex : integer;
+      var CellType: TElFieldType; var CanEdit: boolean); override;
+    procedure TriggerInplaceEditorNeeded(Item : TElTreeItem; SectionIndex : Integer;
+        SupposedFieldType : TElFieldType; var Editor : TElTreeInplaceEditor); override;
+    procedure FileFiltersChange(Sender : TObject);
+    procedure OnValidateEdit(Sender : TOBject; var InputValid : boolean);
+    procedure SetExpandRoot(Value: Boolean);
+    {$ifdef VCL_4_USED}
+    procedure TriggerVirtualHintNeeded(Item : TElTreeItem; var Hint :
+      TElFString); override;
+    {$endif}
+    function DoGetPicture(Item: TElTreeItem): integer; override;
+  public
+    procedure SetRootPIDL(PIDL : PItemIDList);
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Loaded; override;
+    procedure RefreshTree(Item : TElTreeItem; recursive : Integer);
+    procedure SetSelectionPIDL(PIDL : PItemIDList);
+    function BuildRootPIDL: PItemIDList;
+
+    property FocusedPIDL: PItemIDList read GetFocusedPIDL;
+    property FocusedDisplayName: string read GetFocusedDisplayName;
+    property ItemFocused: TElShellTreeItem read GetItemFocused write SetItemFocused;
+
+    property Images;
+    property Images2;
+  published
+    property RootFolder: TShellFolders read GetRootFolder write SetRootFolder;
+    property CustomRootFolder: string read FCustomRootFolder write
+        SetCustomRootFolder;
+    property UseSystemMenus: Boolean read FUseSystemMenus write FUseSystemMenus;
+    property ClearOnCollapse: Boolean read FClearOnCollapse write FClearOnCollapse;
+    property CheckForChildren: Boolean read FCheckForChildren write
+        FCheckForChildren;
+    property ShowHidden: Boolean read FShowHidden write SetShowHidden default true;
+    property ShowFiles: Boolean read FShowFiles write SetShowFiles default false;
+    property HighlightCompressed: Boolean read FHighlightCompressed write
+        SetHighlightCompressed;
+    property FileFilters: TStrings read GetFileFilters write SetFileFilters;
+    property OnItemAdding: TShellTreeItemAddingEvent read FOnFilterItem write
+        FOnFilterItem;
+    property OnItemAdded: TShellTreeItemAddedEvent read FOnItemAdded write
+        FOnItemAdded;
+    property FileSystemOnly: Boolean read FFileSystemOnly write SetFileSystemOnly;
+    property SortType: TElShellSortType read FSortType write SetSortType default
+        sstName;
+    property SortModifiers: TElShellSortModifiers read FSortModifiers write
+        SetSortModifiers;
+    property SizeFormat: TElShellSizeFormat read FSizeFormat write SetSizeFormat;
+    property DefaultColumns: Boolean read FDefaultColumns write SetDefaultColumns;
+    property DefaultEditor: Boolean read FDefaultEditor write FDefaultEditor
+        default True;
+    property ExpandRoot: Boolean read FExpandRoot write SetExpandRoot default false;
+
+    // inherited properties
+    property ActiveBorderType;
+    property Align;
+    property AlwaysKeepFocus;
+    property AlwaysKeepSelection;
+    property AutoExpand;
+    property AutoLineHeight;
+    property AutoLookup;
+    property AutoResizeColumns;
+
+    property DefaultSectionWidth;
+    property AdjustMultilineHeight;
+    property Background;
+    property BackgroundType;
+
+    property BarStyle;
+    property BarStyleVerticalLines;
+    property BorderSides;
+    property ChangeDelay;
+    property ChangeStateImage;
+    property CheckBoxGlyph;
+    property CheckBoxSize;
+    property CustomCheckboxes;
+    property CustomPlusMinus;
+    property DeselectChildrenOnCollapse;
+
+    property DblClickMode;
+    property DoInplaceEdit;
+    property DragAllowed;
+    property DragCursor;
+    property DragExpandDelay;
+    property DraggableSections;
+    property DrawFocusRect;
+    property DragImageMode;
+    property DragRectAcceptColor;
+    property DragRectDenyColor;
+    property DragScrollInterval;
+    property DragTrgDrawMode;
+    property DragType;
+
+    property ExpandOnDblClick;
+    property ExpandOnDragOver;
+    property ExplorerEditMode default true;
+    property FilteredVisibility;
+    property Flat;
+    property FlatFocusedScrollbars;
+    property FocusedSelectColor;
+    property FocusedSelectTextColor;
+    property ForcedScrollBars;
+    property Font stored true;
+    property FullRowSelect;
+    property GradientStartColor;
+    property GradientEndColor;
+    property GradientSteps;
+
+    property HeaderActiveFilterColor;
+    property HeaderColor;
+    property HeaderHeight;
+    property HeaderHotTrack;
+    property HeaderInvertSortArrows;
+    property HeaderSections;
+    property HeaderFilterColor;
+    property HeaderFlat;
+    property HeaderFont;
+    property HeaderUseTreeFont;
+    property HeaderImages;
+    property HeaderWrapCaptions;
+    property HideFocusRect;
+    property HideHintOnTimer;
+    property HideHintOnMove;
+    property HideSelectColor;
+    property HideSelectTextColor;
+    property HideSelection;
+    property HorizontalLines;
+    property HideHorzScrollBar;
+    property HideVertScrollBar;
+    property HintType;
+    property HorzDivLinesColor;
+    property HorzScrollBarStyles;
+    {$ifdef ELPACK_COMPLETE}
+    property HeaderImageForm;
+    property ImageForm;
+    {$endif}
+    property InactiveBorderType;
+    property IncrementalSearch;
+    property InplaceEditorDelay;
+    property ItemIndent;
+    property LeafPicture;
+    property LineBorderActiveColor;
+    property LineBorderInactiveColor;
+
+    property LineHeight;
+    property LinesColor;
+    property LinesStyle;
+    property LineHintColor;
+    property LineHintMode default shmLong;
+    property LineHintTimeout;
+    property LineHintType;
+    property LockHeaderHeight;
+    property MainTreeColumn;
+    property MinusPicture;
+    property MoveColumnOnDrag;
+    property MoveFocusOnCollapse;
+    property MouseFrameSelect;
+    property MultiSelect;
+    property MultiSelectLevel;
+    property OwnerDrawByColumn default true;
+    property OwnerDrawMask;
+    property PathSeparator;
+    property PlusMinusTransparent;
+    property PlusPicture;
+    property QuickEditMode;
+
+    property RadioButtonGlyph;
+    property RightAlignedText;
+    property RightAlignedTree;
+    property RightClickSelect;
+    property RowHotTrack;
+    property RowSelect;
+
+    property ScrollbarOpposite;
+    property ScrollTracking;
+    property SelectColumn;
+    property ShowButtons;
+    property ShowColumns;
+    property ShowCheckboxes;
+    property ShowEmptyImages;
+    property ShowEmptyImages2;
+    property ShowHint;
+    property ShowImages;
+    property ShowLeafButton;
+    property ShowLines;
+    property ShowRoot;
+    property ShowRootButtons;
+    property SelectionMode;
+    property SortDir;
+    property SortMode;
+    property SortUseCase;
+    property Storage;
+    property StoragePath;
+    property StickyHeaderSections;
+    property StripedOddColor;
+    property StripedEvenColor;
+    property StripedItems;
+
+    property Tracking;
+    property TrackColor;
+    property UnderlineTracked;
+    property UseCustomScrollBars;
+
+    property VertDivLinesColor;
+    property VerticalLines;
+    property VerticalLinesLong;
+    property VertScrollBarStyles;
+    property UseSystemHintColors;
+    property TextColor;
+    property BkColor;
+
+    property OnScroll;
+    property OnHeaderColumnClick;
+    property OnHeaderColumnDraw;
+    property OnHeaderColumnResize;
+    property OnHeaderColumnMove;
+    property OnHeaderLookup;
+    property OnHeaderLookupDone;
+    property OnHeaderResize;
+    property OnHeaderSectionExpand;
+    property OnHeaderSectionCollapse;
+    property OnHeaderSectionFilterCall;
+    property OnHeaderSectionAutoSize;
+    property OnHeaderSectionMeasure;
+    property OnHorzScrollDrawPart;
+    property OnHorzScrollHintNeeded;
+
+    property OnAfterSelectionChange;
+    property OnChanging;
+    property OnDragTargetChange;
+    property OnItemChange;
+    property OnItemPreDraw;
+    property OnItemDraw;
+{$ifndef VER3_EDITORS}
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+    property OnTryEdit;
+    property OnEditRequest;
+    property OnComboEditShow;
+    property OnValidateCombo;
+    property OnValidateInplaceEdit;
+    property OnTuneUpInplaceEdit;
+    property OnEditKeyDown;
+{$endif}
+{$else}
+    property OnTryEdit;
+    property OnInplaceEditorNeeded;
+{$endif}
+    property OnItemChecked;
+    property OnItemExpand;
+    property OnItemCollapse;
+    property OnItemExpanding;
+    property OnItemCollapsing;
+    property OnItemDeletion;
+    property OnItemFocused;
+    property OnShowLineHint;
+    property OnCompareItems;
+    property OnItemPicDraw;
+    property OnItemPicDraw2;
+    property OnItemPostDraw;
+    property OnHotTrack;
+    property OnMeasureItemPart;
+    property OnSortBegin;
+    property OnSortEnd;
+    property OnItemSave;
+    property OnItemLoad;
+    property OnItemSelectedChange;
+    property OnCellStyleSave;
+    property OnCellStyleLoad;
+    property OnVertScrollDrawPart;
+    property OnVertScrollHintNeeded;
+{$IFDEF HAS_HTML_RENDER}
+    property OnHTMLImageNeeded;
+{$ENDIF}
+    property OnVirtualTextNeeded;
+    property OnVirtualHintNeeded;
+    property OnVirtualValueNeeded;
+{$ifdef ELTREE_USE_STYLES}
+    property OnVirtualStyleNeeded;
+{$endif}
+    property OnHeaderMouseDown;
+
+{$ifdef ELTREE_USE_OLE_DRAGDROP}
+{$IFNDEF VER90}
+    property OnOleTargetDrag;
+    property OnOleTargetDrop;
+    property OnOleDragStart;
+    property OnOleDragFinish;
+{$ENDIF}
+{$endif}
+
+    // VCL properties
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Constraints;
+    property DockOrientation;
+    property Floating;
+    property DoubleBuffered;
+    property DragKind;
+{$ENDIF}
+    property BorderStyle;
+
+    property Ctl3D;
+    property Cursor;
+    property Enabled;
+    property Hint;
+
+    property ParentCtl3D;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+
+    property Visible;
+    property TabOrder;
+    property TabStop;
+
+    property OnClick;
+    property OnEnter;
+    property OnExit;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnStartDrag;
+    property OnEndDrag;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnDblClick;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnResize;
+{$IFDEF VCL_4_USED}
+    property OnStartDock;
+    property OnEndDock;
+{$ENDIF}
+{$IFDEF VCL_5_USED}
+    property OnContextPopup;
+{$ENDIF}
+  end;
+
+  TElShellComboBox = class(TElAdvancedComboBox)
+  protected
+    FNoRebuild     : boolean;
+    FSelectionPIDL : PItemIDList;
+    FExplorerStyle : Boolean;
+    FShowHidden    : Boolean;
+    FFileSystemOnly: Boolean;
+    FDummyInt      : integer;
+    {$ifdef ELPACK_NO_ADV_EDITS}
+    FEditor        : TCustomElEdit;
+    {$else}
+    FEditor        : TCustomEdit;
+    {$endif}
+    FCursor: TCursor;
+    FStyle: TComboBoxStyle;
+
+    procedure SetExplorerStyle(Value: Boolean);
+    procedure FillCombo(BaseFolder : IShellFolder; BasePIDL : PItemIDList; Level :
+        integer);
+    procedure CreateWnd; override;
+    procedure SetShowHidden(Value: Boolean);
+    procedure CreateParams(var Params: TCreateParams); override;
+    function GetItemWidth(Index: Integer): Integer; override;
+    procedure SetFileSystemOnly(Value: Boolean);
+    procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
+    procedure CNCommand(var Msg: TWMCommand); message CN_COMMAND;
+    procedure CNDrawItem(var Msg: TWMDrawItem); message CN_DRAWITEM;
+    procedure DrawItem(Index: Integer; Rect: TRect; State: TOwnerDrawState); 
+        override;
+    function GetSelection: PItemIDList;
+    procedure ShowEdit;
+    procedure KeyPress(var Key: Char); override;
+    procedure DropDown; override;
+    procedure WMDeleteItem(var Message: TMessage); message WM_DELETEITEM;
+    procedure AcceptEdit;
+    procedure CancelEdit;
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+    procedure WMLButtonDown(var Message: TWMMouse); message WM_LBUTTONDOWN;
+    procedure SetCursor(Value: TCursor);
+    procedure FillItems;
+    procedure SetStyle(Value: TComboBoxStyle); {$ifdef VCL_5_USED}reintroduce;{$endif}
+    procedure DestroyWnd; override;
+  public
+    destructor Destroy; override;
+    constructor Create(AOwner : TComponent); override;
+    procedure SetSelection(PIDL : PItemIDList);
+    property Selection: PItemIDList read GetSelection write SetSelection;
+  published
+    property Items : integer read FDummyInt;
+    property ItemHeight : integer read FDummyInt;
+
+    property ExplorerStyle: Boolean read FExplorerStyle write SetExplorerStyle default true;
+    property ShowHidden: Boolean read FShowHidden write SetShowHidden default true;
+    property FileSystemOnly: Boolean read FFileSystemOnly write SetFileSystemOnly;
+    property Cursor: TCursor read FCursor write SetCursor;
+    property Style: TComboBoxStyle read FStyle write SetStyle stored false default csOwnerDrawVariable;
+  end;
+
+  TElShellListItem = class(TElTreeItem)
+  private
+    FIsValidFile: Boolean;
+    FValid: Boolean;
+  protected
+    {$ifndef VCL_4_USED}
+    FAttr        : integer;
+    {$else}
+    FAttr        : Cardinal;
+    {$endif}
+    FAttrAsString: string;
+    FComment: string;
+    FDisplayName: string;
+    FFileName: string;
+    FPIDL: PItemIDList;
+    FSizeAsString: string;
+    FTypeName: string;
+    Win32FindData: PWin32FindData;
+    function GetAttrAsString: string;
+    function GetCanRename: Boolean;
+    function GetComment: string;
+    function GetCreationTime: TDateTime;
+    function GetDisplayName: string;
+    function GetFileName: string;
+    function GetFullName: string;
+    function GetIsFileObject: Boolean;
+    function GetIsFolder: Boolean;
+    function GetIsRemovable: Boolean;
+    function GetLastAccessTime: TDateTime;
+    function GetModificationTime: TDateTime;
+    function GetPIDL: PItemIDList;
+    function GetSize: Cardinal;
+    function GetSizeAsString: string;
+    function GetTypeName: string;
+    procedure SetDisplayName(const Value: string);
+    procedure CheckWin32FindData;
+    procedure GetWin32Data(ParentFolder : IShellFolder);
+    procedure Invalidate;
+    procedure GetAttributes(iParentFolder : IShellFolder);
+    {$ifdef VCL_4_USED}
+    function GetHintText(ParentFolder: IShellFolder): TElFString;
+    {$endif}
+    function GetPicture(ParentFolder: IShellFolder): Integer;
+  public
+    constructor Create(AOwner : TCustomElTree); override;
+    destructor Destroy; override;
+    function BuildFullPIDL: PItemIDList;
+
+    {$ifndef VCL_4_USED}
+    property Attr: Integer read FAttr;
+    {$else}
+    property Attr: Cardinal read FAttr;
+    {$endif}
+    property CanRename: Boolean read GetCanRename;
+    property Comment: string read GetComment;
+    property CreationTime: TDateTime read GetCreationTime;
+    property DisplayName: string read GetDisplayName write SetDisplayName;
+    property FileName: string read GetFileName;
+    property FullName: string read GetFullName;
+    property IsFileObject: Boolean read GetIsFileObject;
+    property IsFolder: Boolean read GetIsFolder;
+    property IsRemovable: Boolean read GetIsRemovable;
+    property LastAccessTime: TDateTime read GetLastAccessTime;
+    property ModificationTime: TDateTime read GetModificationTime;
+    property PIDL: PItemIDList read GetPIDL;
+    property SizeAsString: string read GetSizeAsString;
+  published
+    property AttrAsString: string read GetAttrAsString;
+    property Size: Cardinal read GetSize;
+    property TypeName: string read GetTypeName;
+  end;
+
+  TShellListItemAddingEvent = procedure(Sender : TObject; ItemName : String;
+                              ShellFolder : IShellFolder; RelPIDL : PItemIDList;
+                              var Allowed : boolean) of object;
+  TShellListItemAddedEvent  = procedure(Sender : TObject; ItemName : String;
+                              ShellFolder : IShellFolder; RelPIDL : PItemIDList;
+                              Item : TElShellListItem) of object;
+
+  TElShellList = class(TCustomElTree)
+  private
+    {$ifndef VCL_4_USED}
+    FAttr: integer;
+    {$else}
+    FAttr: Cardinal;
+    {$endif}
+  protected
+    FEditor: TElTreeInplaceEdit;
+    FCustomFolder: string;
+    FDefaultColumns: Boolean;
+    FFocusedPIDL: PItemIDList;
+    FHighlightCompressed: Boolean;
+    FFolder: TShellFolders;
+    FShowHidden: Boolean;
+    FSizeFormat: TElShellSizeFormat;
+    FSortModifiers: TElShellSortModifiers;
+    FSortType: TElShellSortType;
+    FUseSystemMenus: Boolean;
+    FIFolder: IShellFolder;
+    FMaxColumns: integer;
+    FFileSystemOnly: Boolean;
+    FFileFilters: TStringList;
+    FOnFilterItem: TShellListItemAddingEvent;
+    FOnItemAdded: TShellListItemAddedEvent;
+    FDefaultEditor: Boolean;
+    FRootPIDL: PItemIDList;
+    procedure SetCustomFolder(const Value: string);
+    procedure SetDefaultColumns(Value: Boolean);
+    function GetFocusedDisplayName: string;
+    function GetFocusedPIDL: PItemIDList;
+    function GetItemFocused: TElShellListItem;
+    procedure SetHighlightCompressed(Value: Boolean);
+    procedure SetItemFocused(Value: TElShellListItem);
+    procedure SetFolder(Value: TShellFolders);
+    procedure SetShowHidden(Value: Boolean);
+    procedure SetSizeFormat(Value: TElShellSizeFormat);
+    procedure SetSortModifiers(Value: TElShellSortModifiers);
+    procedure SetSortType(Value: TElShellSortType);
+    procedure SetPIDL(PIDL : PItemIDList);
+    procedure AddDefaultColumns;
+    function DeleteDefaultColumns: Integer;
+    procedure TriggerSortBegin; override;
+    procedure TriggerTryEditEvent(Item: TElTreeItem; SectionIndex : integer; var
+        CellType: TElFieldType; var CanEdit: boolean); override;
+    procedure TriggerVirtualTextNeeded(Item : TElTreeItem; SectionIndex : Integer;
+        var Text : TElFString); override;
+    procedure TriggerVirtualValueNeeded(Item : TElTreeItem; SectionIndex : Integer;
+        VarType : integer; var Value : Variant); override;
+    procedure SetFileSystemOnly(Value: Boolean);
+    function FindItemByPIDL(APIDL : PItemIDList): TElShellListItem;
+    function NameFiltered(S : String; ShellFolder : IShellFolder; RelPIDL :
+        PItemIDList): Boolean; virtual;
+    function GetFileFilters: TStrings;
+    procedure SetFileFilters(const Value: TStrings);
+    procedure FileFiltersChange(Sender : TObject);
+    procedure CreateHandle; override;
+    function CreateItems: TElTreeItems; override;
+    function CreateView: TElTreeView; override;
+    procedure DoCompareItems(Item1, Item2: TElTreeItem; var res: integer); override;
+    {$ifdef VCL_4_USED}
+    procedure TriggerVirtualHintNeeded(Item : TElTreeItem; var Hint :
+      TElFString); override;
+    {$endif}
+    function DoGetPicture(Item: TElTreeItem): integer; override;
+  public
+    procedure RefreshList;
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure SetRootPIDL(PIDL : PItemIDList);
+    procedure SetSelectionPIDL(PIDL : PItemIDList);
+    function BuildRootPIDL: PItemIDList;
+    property FocusedDisplayName: string read GetFocusedDisplayName;
+    property FocusedPIDL: PItemIDList read GetFocusedPIDL;
+    property ItemFocused: TElShellListItem read GetItemFocused write SetItemFocused;
+  published
+    property CustomFolder: string read FCustomFolder write SetCustomFolder;
+    property DefaultColumns: Boolean read FDefaultColumns write SetDefaultColumns;
+    property HighlightCompressed: Boolean read FHighlightCompressed write
+        SetHighlightCompressed;
+    property Folder: TShellFolders read FFolder write SetFolder;
+    property ShowHidden: Boolean read FShowHidden write SetShowHidden default true;
+    property SizeFormat: TElShellSizeFormat read FSizeFormat write SetSizeFormat;
+    property SortModifiers: TElShellSortModifiers read FSortModifiers write
+        SetSortModifiers;
+    property SortType: TElShellSortType read FSortType write SetSortType default
+        sstName;
+    property UseSystemMenus: Boolean read FUseSystemMenus write FUseSystemMenus;
+    property FileSystemOnly: Boolean read FFileSystemOnly write SetFileSystemOnly;
+    property FileFilters: TStrings read GetFileFilters write SetFileFilters;
+    property OnItemAdded: TShellListItemAddedEvent read FOnItemAdded write
+        FOnItemAdded;
+    property OnItemAdding: TShellListItemAddingEvent read FOnFilterItem write
+        FOnFilterItem;
+    property DefaultEditor: Boolean read FDefaultEditor write FDefaultEditor
+        default True;
+
+    // inherited properties
+    property ActiveBorderType;
+    property Align;
+    property AlwaysKeepFocus;
+    property AlwaysKeepSelection;
+    property AutoExpand;
+    property AutoLineHeight;
+    property AutoLookup;
+    property AutoResizeColumns;
+
+    property DefaultSectionWidth;
+    property AdjustMultilineHeight;
+    property Background;
+    property BackgroundType;
+
+    property BarStyle;
+    property BarStyleVerticalLines;
+    property BorderSides;
+    property ChangeDelay;
+    property ChangeStateImage;
+    property CheckBoxGlyph;
+    property CheckBoxSize;
+    property CustomCheckboxes;
+    property CustomPlusMinus;
+    property DeselectChildrenOnCollapse;
+	property DblClickMode;
+    property DoInplaceEdit;
+    property DragAllowed;
+    property DragCursor;
+    property DragExpandDelay;
+    property DraggableSections;
+    property DrawFocusRect;
+    property DragImageMode;
+    property DragRectAcceptColor;
+    property DragRectDenyColor;
+    property DragScrollInterval;
+    property DragTrgDrawMode;
+    property DragType;
+
+    property ExpandOnDblClick;
+    property ExpandOnDragOver;
+    property ExplorerEditMode default true;
+    property FilteredVisibility;
+    property Flat;
+    property FlatFocusedScrollbars;
+    property FocusedSelectColor;
+    property FocusedSelectTextColor;
+    property ForcedScrollBars;
+    property Font stored true;
+    property FullRowSelect;
+    property GradientStartColor;
+    property GradientEndColor;
+    property GradientSteps;
+
+    property HeaderActiveFilterColor;
+    property HeaderColor;
+    property HeaderHeight;
+    property HeaderHotTrack;
+    property HeaderInvertSortArrows;
+    property HeaderSections;
+    property HeaderFilterColor;
+    property HeaderFlat;
+    property HeaderFont;
+    property HeaderUseTreeFont;
+    property HeaderImages;
+    property HeaderWrapCaptions;
+    property HideFocusRect;
+    property HideHintOnTimer;
+    property HideHintOnMove;
+    property HideSelectColor;
+    property HideSelectTextColor;
+    property HideSelection;
+    property HorizontalLines;
+    property HideHorzScrollBar;
+    property HideVertScrollBar;
+    property HintType;
+    property HorzDivLinesColor;
+    property HorzScrollBarStyles;
+    property HeaderImageForm;
+    property ImageForm;
+
+    property InactiveBorderType;
+    property IncrementalSearch;
+    property InplaceEditorDelay;
+    property ItemIndent;
+    property LeafPicture;
+    property LineBorderActiveColor;
+    property LineBorderInactiveColor;
+    property LineHeight;
+    property LinesColor;
+    property LinesStyle;
+    property LineHintColor;
+    property LineHintMode default shmLong;
+    property LineHintTimeout;
+    property LineHintType;
+    property LockHeaderHeight;
+    property MainTreeColumn;
+    property MinusPicture;
+    property MoveColumnOnDrag;
+    property MoveFocusOnCollapse;
+    property MouseFrameSelect;
+    property MultiSelect;
+    property MultiSelectLevel;
+    property OwnerDrawByColumn default true;
+    property OwnerDrawMask;
+    property PathSeparator;
+    property PlusMinusTransparent;
+    property PlusPicture;
+    property QuickEditMode;
+
+    property RadioButtonGlyph;
+    property RightAlignedText;
+    property RightAlignedTree;
+    property RightClickSelect;
+    property RowHotTrack;
+    property RowSelect;
+
+    property ScrollbarOpposite;
+    property ScrollTracking;
+    property SelectColumn;
+    property ShowButtons default false;
+    property ShowColumns;
+    property ShowCheckboxes;
+    property ShowEmptyImages default true;
+    property ShowEmptyImages2;
+    property ShowHint;
+    property ShowImages;
+    property ShowLeafButton;
+    property ShowLines default false;
+    property ShowRoot default false;
+    property ShowRootButtons default false;
+    property SelectionMode;
+    property SortDir;
+    property SortMode;
+    property Storage;
+    property StoragePath;
+    property StickyHeaderSections;
+    property StripedOddColor;
+    property StripedEvenColor;
+    property StripedItems;
+
+    property Tracking;
+    property TrackColor;
+    property UnderlineTracked;
+    property UseCustomScrollBars;
+
+    property VertDivLinesColor;
+    property VerticalLines;
+    property VerticalLinesLong;
+    property VertScrollBarStyles;
+    property UseSystemHintColors;
+    property TextColor;
+    property BkColor;
+
+    property OnScroll;
+    property OnHeaderColumnClick;
+    property OnHeaderColumnDraw;
+    property OnHeaderColumnResize;
+    property OnHeaderColumnMove;
+    property OnHeaderLookup;
+    property OnHeaderLookupDone;
+    property OnHeaderResize;
+    property OnHeaderSectionExpand;
+    property OnHeaderSectionCollapse;
+    property OnHeaderSectionFilterCall;
+    property OnHeaderSectionAutoSize;
+    property OnHeaderSectionMeasure;
+    property OnHorzScrollDrawPart;
+    property OnHorzScrollHintNeeded;
+
+    property OnAfterSelectionChange;
+    property OnChanging;
+    property OnDragTargetChange;
+    property OnItemChange;
+    property OnItemPreDraw;
+    property OnItemDraw;
+{$ifndef VER3_EDITORS}
+{$ifdef ELTREE_USE_INPLACE_EDITORS}
+    property OnTryEdit;
+    property OnEditRequest;
+    property OnComboEditShow;
+    property OnValidateCombo;
+    property OnValidateInplaceEdit;
+    property OnTuneUpInplaceEdit;
+    property OnEditKeyDown;
+{$endif}
+{$else}
+    property OnInplaceEditorNeeded;
+{$endif}
+    property OnItemChecked;
+    property OnItemExpand;
+    property OnItemCollapse;
+    property OnItemExpanding;
+    property OnItemCollapsing;
+    property OnItemDeletion;
+    property OnItemFocused;
+    property OnShowLineHint;
+    property OnCompareItems;
+    property OnItemPicDraw;
+    property OnItemPicDraw2;
+    property OnItemPostDraw;
+    property OnHotTrack;
+    property OnMeasureItemPart;
+    property OnSortBegin;
+    property OnSortEnd;
+    property OnItemSave;
+    property OnItemLoad;
+    property OnItemSelectedChange;
+    property OnCellStyleSave;
+    property OnCellStyleLoad;
+    property OnVertScrollDrawPart;
+    property OnVertScrollHintNeeded;
+{$IFDEF HAS_HTML_RENDER}
+    property OnHTMLImageNeeded;
+{$ENDIF}
+    property OnVirtualTextNeeded;
+    property OnVirtualHintNeeded;
+    property OnVirtualValueNeeded;
+{$ifdef ELTREE_USE_STYLES}
+    property OnVirtualStyleNeeded;
+{$endif}
+
+    property OnHeaderMouseDown;
+
+{$ifdef ELTREE_USE_OLE_DRAGDROP}
+{$IFNDEF VER90}
+    property OnOleTargetDrag;
+    property OnOleTargetDrop;
+    property OnOleDragStart;
+    property OnOleDragFinish;
+{$ENDIF}
+{$endif}
+
+    // VCL properties
+{$IFDEF VCL_4_USED}
+    property Anchors;
+    property Constraints;
+    property DockOrientation;
+    property Floating;
+    property DoubleBuffered;
+    property DragKind;
+{$ENDIF}
+    property BorderStyle;
+
+    property Ctl3D;
+    property Cursor;
+    property Enabled;
+    property Hint;
+
+    property ParentCtl3D;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+
+    property Visible;
+    property TabOrder;
+    property TabStop;
+
+    property OnClick;
+    property OnEnter;
+    property OnExit;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnStartDrag;
+    property OnEndDrag;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnDblClick;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnResize;
+{$IFDEF VCL_4_USED}
+    property OnStartDock;
+    property OnEndDock;
+{$ENDIF}
+{$IFDEF VCL_5_USED}
+    property OnContextPopup;
+{$ENDIF}
+  end;
+
+const
+     siBase     = 1458;
+     siMin      = 0;
+     siName     = 0;
+     siSize     = 1;
+     siType     = 2;
+     siModified = 3;
+     siAttr     = 4;
+     siComment  = 5;
+     siCreated  = 6;
+     siAccessed = 7;
+     siMax      = 7;
+
+const DefaultColumnNames : array[siMin..siMax] of string
+                         = ('Name',
+                            'Size',
+                            'Type',
+                            'Modified',
+                            'Attributes',
+                            'Comment',
+                            'Created',
+                            'Accessed');
+DefaultColumnAlignments  : array[siMin..siMax] of integer
+                         = (LVCFMT_LEFT,
+                            LVCFMT_RIGHT,
+                            LVCFMT_LEFT,
+                            LVCFMT_LEFT,
+                            LVCFMT_LEFT,
+                            LVCFMT_LEFT,
+                            LVCFMT_LEFT,
+                            LVCFMT_LEFT);
+
+ColumnSortTypes          : array[siMin..siMax] of TElShellSortType
+                         = (sstName,
+                            sstSize,
+                            sstCustom,
+                            sstModifyDate,
+                            sstCustom,
+                            sstCustom,
+                            sstCreationDate,
+                            sstAccessDate);
+
+
+implementation
+end.

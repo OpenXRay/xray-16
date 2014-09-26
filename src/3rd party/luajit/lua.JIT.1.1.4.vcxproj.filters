@@ -1,0 +1,320 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="doc">
+      <UniqueIdentifier>{b83ce5bc-2d73-4f3a-84dc-2abd982445f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="etc">
+      <UniqueIdentifier>{78342819-7c81-4532-8709-bcbed455edf9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="jit">
+      <UniqueIdentifier>{89e57896-9ebe-4128-bc1c-fd8c55f571f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{1c015a83-f4f3-426d-90ff-771e83666901}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="jitdoc">
+      <UniqueIdentifier>{b1380553-cbd1-4193-9935-ac8c451029c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dynasm">
+      <UniqueIdentifier>{0dbf10bd-d8de-4488-a406-eeb71f304f0d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="doc\contents.html">
+      <Filter>doc</Filter>
+    </None>
+    <None Include="doc\lua.html">
+      <Filter>doc</Filter>
+    </None>
+    <None Include="doc\luac.html">
+      <Filter>doc</Filter>
+    </None>
+    <None Include="doc\manual.html">
+      <Filter>doc</Filter>
+    </None>
+    <None Include="doc\readme.html">
+      <Filter>doc</Filter>
+    </None>
+    <None Include="jit\dis_x86.lua">
+      <Filter>jit</Filter>
+    </None>
+    <None Include="jit\dump.lua">
+      <Filter>jit</Filter>
+    </None>
+    <None Include="jit\dumphints.lua">
+      <Filter>jit</Filter>
+    </None>
+    <None Include="jit\opt.lua">
+      <Filter>jit</Filter>
+    </None>
+    <None Include="jit\opt_inline.lua">
+      <Filter>jit</Filter>
+    </None>
+    <None Include="jit\trace.lua">
+      <Filter>jit</Filter>
+    </None>
+    <None Include="jitdoc\coco.html">
+      <Filter>jitdoc</Filter>
+    </None>
+    <None Include="jitdoc\coco_api.html">
+      <Filter>jitdoc</Filter>
+    </None>
+    <None Include="jitdoc\coco_changes.html">
+      <Filter>jitdoc</Filter>
+    </None>
+    <None Include="jitdoc\coco_portability.html">
+      <Filter>jitdoc</Filter>
+    </None>
+    <None Include="jitdoc\contact.html">
+      <Filter>jitdoc</Filter>
+    </None>
+    <None Include="jitdoc\dynasm.html">
+      <Filter>jitdoc</Filter>
+    </None>
+    <None Include="jitdoc\dynasm_examples.html">
+      <Filter>jitdoc</Filter>
+    </None>
+    <None Include="jitdoc\dynasm_features.html">
+      <Filter>jitdoc</Filter>
+    </None>
+    <None Include="jitdoc\index.html">
+      <Filter>jitdoc</Filter>
+    </None>
+    <None Include="jitdoc\luajit.html">
+      <Filter>jitdoc</Filter>
+    </None>
+    <None Include="jitdoc\luajit_api.html">
+      <Filter>jitdoc</Filter>
+    </None>
+    <None Include="jitdoc\luajit_changes.html">
+      <Filter>jitdoc</Filter>
+    </None>
+    <None Include="jitdoc\luajit_debug.html">
+      <Filter>jitdoc</Filter>
+    </None>
+    <None Include="jitdoc\luajit_features.html">
+      <Filter>jitdoc</Filter>
+    </None>
+    <None Include="jitdoc\luajit_install.html">
+      <Filter>jitdoc</Filter>
+    </None>
+    <None Include="jitdoc\luajit_intro.html">
+      <Filter>jitdoc</Filter>
+    </None>
+    <None Include="jitdoc\luajit_performance.html">
+      <Filter>jitdoc</Filter>
+    </None>
+    <None Include="jitdoc\luajit_run.html">
+      <Filter>jitdoc</Filter>
+    </None>
+    <None Include="dynasm\dasm_x86.lua">
+      <Filter>dynasm</Filter>
+    </None>
+    <None Include="dynasm\dynasm.lua">
+      <Filter>dynasm</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="etc\lua.hpp">
+      <Filter>etc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lapi.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lcoco.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lcode.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ldebug.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ldo.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lfunc.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lgc.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ljit.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ljit_dasm.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ljit_hints.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ljit_x86.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\llex.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\llimits.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lmem.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lobject.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lopcodes.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lparser.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lstate.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lstring.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ltable.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ltm.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\luajit.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lundump.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lvm.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lzio.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="dynasm\dasm_proto.h">
+      <Filter>dynasm</Filter>
+    </ClInclude>
+    <ClInclude Include="dynasm\dasm_x86.h">
+      <Filter>dynasm</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\lapi.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lauxlib.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lbaselib.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lcoco.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lcode.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ldblib.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ldebug.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ldo.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ldump.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lfunc.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lgc.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\linit.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\liolib.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ljit_backend.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ljit_core.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ljit_dasm.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ljit_mem.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ljitlib.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\llex.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lmathlib.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lmem.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\loadlib.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lobject.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lopcodes.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\loslib.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lparser.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lstate.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lstring.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lstrlib.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ltable.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ltablib.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ltm.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\luac.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lundump.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lvm.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lzio.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\print.c">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

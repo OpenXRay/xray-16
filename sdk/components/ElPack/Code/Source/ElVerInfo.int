@@ -1,0 +1,76 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS, Alex Ionov       }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElVerInfo;
+
+interface
+
+uses
+  Windows, Classes, ShellAPI;
+
+type
+  TVersionAttribute = (vaDebug, vaPatched, vaPreRelease, vaPrivateBuild,
+    vaSpecialBuild);
+  TVersionAttributes = set of TVersionAttribute;
+
+  TElVersionInfo = class(TComponent)
+  private
+    FBuffer: string;
+    FFileName: string;
+    FFixedFileInfo: PVSFixedFileInfo;
+    FLanguage: string;
+    function GetAttributes: TVersionAttributes;
+    function GetBuild: integer;
+    function GetLanguage: string;
+    function GetMajorVersion: integer;
+    function GetMinorVersion: integer;
+    function GetPredefined(Index: integer): string;
+    function GetRelease: integer;
+    function GetValue(AName: string): string;
+    procedure SetAttributes(const Value: TVersionAttributes);
+    procedure SetDummy(const Value: string);
+    procedure SetDummyEx(Index: integer; Value: string);
+    procedure SetFileName(const Value: string);
+    procedure SetDummyInt(const Value: integer);
+    function StoreFileName: boolean;
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure Refresh;
+    property Values[Name: string]: string read GetValue; default;
+  published
+    property Attributes: TVersionAttributes read GetAttributes write SetAttributes stored False;
+    property Build: integer read GetBuild write SetDummyInt stored False;
+    property Comments: string index 9 read GetPredefined write SetDummyEx stored False;
+    property CompanyName: string index 0 read GetPredefined write SetDummyEx stored False;
+    property FileDescription: string index 1 read GetPredefined write SetDummyEx stored False;
+    property FileName: string read FFileName write SetFileName stored StoreFileName;
+    property FileVersion: string index 2 read GetPredefined write SetDummyEx stored False;
+    property InternalName: string index 3 read GetPredefined write SetDummyEx stored False;
+    property Language: string read GetLanguage write SetDummy stored False;
+    property LegalCopyright: string index 4 read GetPredefined write SetDummyEx stored False;
+    property LegalTrademarks: string index 5 read GetPredefined write SetDummyEx stored False;
+    property MajorVersion: integer read GetMajorVersion write SetDummyInt stored False;
+    property MinorVersion: integer read GetMinorVersion write SetDummyInt stored False;
+    property OriginalFilename: string index 6 read GetPredefined write SetDummyEx stored False;
+    property ProductName: string index 7 read GetPredefined write SetDummyEx stored False;
+    property ProductVersion: string index 8 read GetPredefined write SetDummyEx stored False;
+    property Release: integer read GetRelease write SetDummyInt stored False;
+  end;
+
+implementation
+end.

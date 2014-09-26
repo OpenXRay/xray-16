@@ -1,0 +1,70 @@
+
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElOpts;
+
+{ Component template to store and load properties }
+
+interface
+
+uses
+  //Windows,
+  SysUtils,
+  //Messages,
+  Classes,
+  {$ifdef MSWINDOWS}
+  Registry,
+  {$endif}
+  IniFiles,
+  ElIni,
+  ElTools,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  TypInfo;
+
+type
+
+  TElStorageType = (eosRegistry, eosIni, eosElIni);
+
+  TElOptions = class (TComponent)
+  protected
+    FAutoSave: Boolean;
+    FIniName: string;
+    FIniSection: string;
+    FLoading: Boolean;
+    FStorage: TElIniFile;
+    FStorageType: TElStorageType;
+    procedure SetAutoSave(Value: Boolean); virtual;
+  public
+    constructor Create(AOwner : TComponent); override;
+    destructor Destroy; override;
+    procedure Load; virtual;
+    procedure Save; virtual;
+    property Loading: Boolean read FLoading;
+  published
+    property AutoSave: Boolean read FAutoSave write SetAutoSave;
+    property IniName: string read FIniName write FIniName;
+    property IniSection: string read FIniSection write FIniSection;
+    property Storage: TElIniFile read FStorage write FStorage;
+    property StorageType: TElStorageType read FStorageType write FStorageType;
+  end;
+
+implementation
+end.

@@ -1,0 +1,713 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1998-2001, EldoS                   }
+{   Portions Copyright (c) 2001, Akzhan Abdulin      }
+{                                                    }
+{====================================================}
+
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+(*
+
+Version History
+
+03/06/2002
+
+  Added unicode hint
+  Added Step property
+
+02/26/2202
+
+  Fixed background painting for horizontal scorllbar in cases, when thumb is not visible
+
+02/16/2002
+
+  Optimized resource usage on Win9x
+
+02/03/2002
+
+  Fixed scroll hint text displaying in Unicode mode (was broken in update 7)
+
+10/16/2001
+
+  Disabled scrollbars had incorrect background in Windows XP with styles enabled. Fixed.
+
+10/15/2001
+
+  Improved scrollbar system size detection in Windows XP with styles enabled
+
+09/22/2001
+
+  In non-flat mode arrow colors where drawn with HotTrackColor. Fixed.
+
+09/17/2001 (c) Akzhan Abdulin
+
+  Windows XP Themes Support remade using TElXPThemedControl.
+
+  Mouse hot tracking now works for themed control not only in flat mode.
+  
+09/14/2001 (c) Akzhan Abdulin
+
+  Bug fixed when user uses secondary buttons in Page mode and tries
+  to look at end of scrollbar and reverse to begin (PageUp button was disabled).
+
+  Added Windows XP Themes Support. UseXPThemes property added.
+  Note that themed scrollbar will ignore some its look'n'feel properties.
+  Note that themed arrow buttons will not fire OnDrawPart event.
+
+  Developer note: Gripper on thumb button drawn always when ShowBars is true
+  because GetThemePartSize doesn't work for gripper (under research).
+
+09/10/2001
+
+  Added WM_MOUSEWHEEL processing
+
+08/01/2001
+
+  Added OnHitTest event, that simplifies implementation of owner-drawn scrollbars.
+
+07/26/2001
+
+  Added Unicode support
+
+05/27/2001 (c) Akzhan Abdulin
+
+    Fixed Color property design-time storing issue (clWindow didn't stored)
+
+    Fixed SystemBkColor property setter (always didn't changed)
+
+    DrawArrowFrames, DrawBars, BarOffset and BarColor properties added (inspired by Windows XP)
+    Note: try to setup all by default except: Color to clWindow, MinThumbSize to 23 and DrawArrowFrames to false
+
+    Painting was slightly restructured using subroutines
+
+04/28/2001 
+
+    Fixed design-time settings being loaded for UseSystemMetrics-related properties
+
+03/01/2001
+
+    Now background color is drawn in the same way as for system scrollbar
+
+    Now scrollbar behaves more like standard scrollbar 
+
+02/10/2001
+
+    Added HintColor and HintTextColor properties
+
+10/10/2000
+
+    Colors adjusted to be the same as standard scrollbars
+
+10/05/2000
+
+    Added following properties:
+
+    ImageForm  - pseudo-transparency support
+    ArrowColor -  defines the color of the arrow
+    ArrowHotTrackColor - defines the color of the arrow when cursor is over
+                         the button
+    DrawFrames - enables or disables buttons and thumb frames (border)
+    ThinFrames - enables or disables thin buttons and thumb frames (border)
+
+07/09/2000
+
+    OnMouse* events published.
+
+*)
+
+unit ElScrollBar; { TElScrollBar component. }
+
+{ ScrollBar replacement component }
+
+interface
+
+uses
+  SysUtils,
+{$ifndef CLX_USED}
+  Windows,
+  Messages,
+  Graphics,
+  Controls,
+  Forms,
+  ExtCtrls,
+  StdCtrls,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+{$else}
+{$ifdef MSWINDOWS}
+  Windows,
+{$endif}
+  Qt,
+  QTypes,
+  Types,
+  QGraphics,
+  QControls,
+  QForms,
+  QMenus,
+  QExtCtrls,
+  QStdCtrls,
+  ElClxUtils,
+{$endif}
+  ElTmSchema,
+  ElUxTheme,
+  ElXPThemedControl,
+  Classes,
+  ElTools,
+  ElVCLUtils,
+  ElStrUtils,
+{$ifdef ELPACK_UNICODE}
+  ElUnicodeStrings,
+{$endif}
+{$IFDEF ELPACK_COMPLETE}
+  ElImgFrm,
+{$ENDIF}
+{$IFDEF HAS_HTML_RENDER}
+  HTMLRender,
+{$ENDIF}
+  ElHintWnd
+  ;
+
+
+type
+  TElScrollHintNeededEvent = procedure(Sender : TObject; TrackPosition : integer; var Hint : TElFString) of object;
+
+  TElScrollBarPart = (sbpNowhere,
+    sbpLeftArrow, sbpRightSndArrow {actually pointing to the left},
+    sbpRightArrow, sbpLeftSndArrow {actually pointing to the right},
+    sbpThumb, sbpLeftTop, sbpRightBottom);
+
+  TElScrollHitTestEvent = procedure(Sender : TObject; X, Y : integer; var Part : TElScrollBarPart; var DefaultTest : boolean) of object;
+  TElScrollDrawPartEvent = procedure(Sender : TObject; Canvas : TCanvas; R : TRect; Part : TElScrollBarPart; Enabled, Focused, Pressed : boolean; var DefaultDraw : boolean) of object;
+
+  TElScrollCode = (escLineUp, escLineDown, escPageUp, escPageDown, escPosition, escTrack, escTop, escBottom, escEndScroll, escSndLineUp, escSndLineDown);
+
+  TElScrollEvent = procedure(Sender : TObject; ScrollCode : TElScrollCode; var ScrollPos : integer; var DoChange : boolean) of object;
+
+  TElSecButtonsKind = (sbkOpposite, sbkPage, sbkCustom);
+  TElScrollThumbMode = (etmFixed, etmAuto);
+
+  TCustomElScrollBar = class(TElXPThemedControl)
+  private
+    FThinFrames: Boolean;
+    FDrawFrames: Boolean;
+    FDrawArrowFrames: Boolean;
+    FDrawBars: Boolean;
+    FBarOffset: Cardinal;
+    FBarColor: TColor;
+    FArrowColor: TColor;
+    FArrowHotTrackColor: TColor;
+{$IFDEF ELPACK_COMPLETE}
+{$ifndef CLX_USED}
+    FImgFormChLink: TImgFormChangeLink;
+    FImgForm: TElImageForm;
+{$endif}
+{$ENDIF}
+    FUseSystemMetrics: boolean;
+    FNoSunkenThumb: Boolean;
+    FShowLeftArrows: Boolean;
+    FShowRightArrows: Boolean;
+    FChangeColorsOnScroll: Boolean;
+    FBitmapOwner : boolean;
+    FBlendBackground: boolean;
+    FShowTrackHint: Boolean;
+    FNoDisableButtons: Boolean;
+    FOwnerDraw: Boolean;
+
+    FSecondaryButtons: Boolean;
+    FSecondBtnKind: TElSecButtonsKind;
+    FPage: Integer;
+    FMinThumbSize: Integer;
+    FThumbMode: TElScrollThumbMode;
+    FThumbSize: Integer;
+    FButtonSize: Integer;
+    FKind: TScrollBarKind;
+    FPosition: Integer;
+    FMax: Integer;
+    FMin: Integer;
+    FFlat: Boolean;
+    FActiveFlat: Boolean;
+    FMouseInControl: boolean;
+{$IFDEF HAS_HTML_RENDER}
+    FIsHTML: boolean;
+{$ENDIF}
+    FOnChange: TNotifyEvent;
+    FOnScroll: TElScrollEvent;
+    FOnDrawPart: TElScrollDrawPartEvent;
+    FOnScrollHintNeeded: TElScrollHintNeededEvent;
+{$IFNDEF VCL_4_USED}
+    FOnResize: TNotifyEvent;
+{$ENDIF}
+
+    FScrollTimer: TTimer;
+    FThumbOffset,
+      FOrigPos,
+      FOrigCoord: integer;
+    {$ifndef CLX_USED}
+    FSaveCapture: HWND;
+    {$else}
+    FSaveCapture: TControl;
+    {$endif}
+    FTrackPos,
+    FThumbPos   : integer;
+
+    FPressedIn,
+      FOrigPressedIn,
+      FMouseOver: TElScrollBarPart;
+    FHintWnd: TElHintWindow;
+    FPressedPos: TPoint;
+    FPressed: boolean;
+    FTracking : boolean;
+    FNoScrollMessages: boolean;
+    FAltDisablingArrows: Boolean;
+    FOnHitTest: TElScrollHitTestEvent;
+    procedure SetKind(newValue: TScrollBarKind);
+
+    procedure SetPosition(newValue: Integer);
+    procedure SetMax(newValue: Integer);
+    procedure SetMin(newValue: Integer);
+    procedure SetPage(newValue: Integer);
+
+    procedure IntMouseButton(Pressed : Boolean; Btn : TMouseButton; XPos, YPos : SmallInt);
+    procedure IntMouseMove(XPos, YPos : SmallInt);
+    procedure IntMouseEnter;
+    procedure IntMouseLeave;
+    procedure IntDoEnter;
+    procedure IntDoExit;
+    procedure IntColorChanged;
+
+    procedure DoSetPosition(newValue : Integer; Redraw : boolean);
+    procedure DoSetMax(newValue : Integer; Redraw : boolean);
+    procedure DoSetMin(newValue : Integer; Redraw : boolean);
+    procedure DoSetPage(newValue : Integer; Redraw : boolean);
+    function  ShadowColor: TColor;
+    function  LighterColor: TColor;
+    procedure SetFlat(newValue: Boolean);
+    procedure SetActiveFlat(newValue: Boolean);
+    {$ifndef CLX_USED}
+    procedure CMEnabledChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
+    {$endif}
+    {$ifndef CLX_USED}
+    procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+    procedure CMEnter(var Msg: TCMEnter); message CM_ENTER;
+    procedure CMExit(var Msg: TCMExit); message CM_EXIT;
+    procedure WMEraseBkgnd(var Msg: TWMEraseBkgnd); message WM_ERASEBKGND;
+    procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
+    procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+    procedure WMGetDlgCode(var Msg: TWMGetDlgCode); message WM_GETDLGCODE;
+    procedure WMSize(var Msg: TWMSize); message WM_SIZE;
+    procedure SBMSetScrollInfo(var Msg: TMessage); message SBM_SETSCROLLINFO;
+    procedure SBMGetScrollInfo(var Msg: TMessage); message SBM_GETSCROLLINFO;
+    procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
+    procedure WMSysColorChange(var Msg: TWMSysColorChange); message WM_SYSCOLORCHANGE;
+    procedure CMColorChanged(var Msg: TMessage); message CM_COLORCHANGED;
+    procedure WMPaint(var Msg : TWMPaint); message WM_PAINT;
+    procedure WMWindowPosChanged(var Message: TWMWindowPosChanged); message
+        WM_WINDOWPOSCHANGED;
+    procedure WMMouseWheel(var Msg: TMessage); message WM_MOUSEWHEEL;
+    {$endif}
+    procedure OnScrollTimer(Sender: TObject);
+    procedure SetButtonSize(newValue: Integer);
+    procedure SetThumbMode(newValue: TElScrollThumbMode);
+    procedure SetThumbSize(newValue: Integer);
+    function  GetAutoThumbSize : integer;
+    function  GetThumbPos : integer;
+    function  GetTopBtns : integer;
+    function  GetBottomBtns : integer;
+    function  AdjustThumbPos : integer;
+    function  UpdateThumbPos : integer;
+    procedure SetMinThumbSize(newValue: Integer);
+    procedure SetSecondaryButtons(newValue: Boolean);
+    procedure SetOwnerDraw(newValue: Boolean);
+    procedure SetSecondBtnKind(newValue: TElSecButtonsKind);
+
+    procedure SetNoDisableButtons(newValue: Boolean);
+    procedure UpdateScrollingRegion;
+    procedure ShowHintAt(APosition, X, Y: integer);
+    function  GetButtonSize : integer;
+    procedure SetIsDesigning(newValue : Boolean);
+    function  GetIsDesigning : Boolean;
+    procedure SetBlendBackground(newValue: boolean);
+    procedure SetShowLeftArrows(newValue: Boolean);
+    procedure SetShowRightArrows(newValue: Boolean);
+    procedure SetNoSunkenThumb(newValue: Boolean);
+    procedure SetUseSystemMetrics(value: boolean);
+    procedure SetArrowColor(newValue: TColor);
+    procedure SetArrowHotTrackColor(newValue: TColor);
+    procedure SetDrawFrames(newValue: Boolean);
+    procedure SetDrawBars(const Value: Boolean);
+    procedure SetDrawArrowFrames(const Value: Boolean);
+    procedure SetThinFrames(newValue: Boolean);
+    procedure SetBarColor(const Value: TColor);
+    procedure SetBarOffset(const Value: Cardinal);
+{$IFDEF ELPACK_COMPLETE}
+{$ifndef CLX_USED}
+    procedure ImageFormChange(Sender: TObject);
+    procedure SetImageForm(newValue: TElImageForm); virtual;
+{$endif}    
+{$ENDIF}
+    function RightBtnsEnabled: Boolean;
+    function LeftBtnsEnabled: Boolean;
+    procedure RebuildBackground;
+    procedure SetAltDisablingArrows(const Value: Boolean);
+    function GetThumbSize: Integer;
+  protected
+    FHintColor: TColor;
+    FHintTextColor: TColor;
+    {$ifdef ELPACK_UNICODE}
+    FHint: WideString;
+    {$endif}
+    FSysBkColor: boolean;
+    FStep: Integer;
+{$ifdef CLX_USED}
+    function EventFilter(Sender: QObjectH; Event: QEventH): Boolean; override;
+    function WidgetFlags: Integer; override;
+    procedure MouseEnter(AControl: TControl); override;
+    procedure MouseLeave(AControl: TControl); override;
+    procedure DoEnter; override;
+    procedure DoExit; override;
+    procedure ColorChanged; override;
+    procedure EnabledChanged; override;
+{$else}
+{$endif}
+    function GetThemedClassName: WideString; override;
+
+    procedure TriggerChangeEvent; virtual;
+    procedure TriggerScrollEvent(ScrollCode: TElScrollCode; var ScrollPos: Integer; var DoChange: boolean); virtual;
+    procedure TriggerScrollHintNeededEvent(TrackPosition: integer; var Hint: TElFString); virtual;
+{$IFNDEF VCL_4_USED}
+    procedure TriggerResizeEvent; virtual;
+{$ENDIF}
+    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    {$ifndef CLX_USED}
+    procedure CreateWnd; override;
+    {$else}
+    procedure CreateWidget; override;
+    {$endif}
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure SetSysBkColor(Value: boolean);
+    procedure TriggerHitTestEvent(X, Y : integer; var Part : TElScrollBarPart;
+              var DefaultTest : boolean); virtual;
+    {$ifdef ELPACK_COMPLETE}
+{$ifndef CLX_USED}
+    procedure IFMRepaintChildren(var Message: TMessage); message
+        IFM_REPAINTCHILDREN;
+{$endif}
+    {$endif}
+    {$ifdef ELPACK_UNICODE}
+    procedure SetHint(Value: WideString);
+
+    {$ifndef CLX_USED}
+    procedure CMHintShow(var Message: TMessage); message CM_HINTSHOW;
+    {$else}
+    function HintShow(var HintInfo : THintInfo): Boolean; override;
+    {$endif}
+    {$endif}
+
+    property Color nodefault;
+    property ParentColor default False;
+
+    property Kind: TScrollBarKind read FKind write SetKind default sbHorizontal; { Published }
+    property Position: Integer read FPosition write SetPosition default 0; { Published }
+    property Max: Integer read FMax write SetMax default 100; { Published }
+    property Min: Integer read FMin write SetMin default 0; { Published }
+    property Step: Integer read FStep write FStep default 1;
+    property Flat: Boolean read FFlat write SetFlat default true; { Published }
+    property ActiveFlat: Boolean read FActiveFlat write SetActiveFlat default true; { Published }
+    property ButtonSize: Integer read GetButtonSize write SetButtonSize; { Published }
+    property ThumbMode: TElScrollThumbMode read FThumbMode write SetThumbMode default etmAuto; { Published }
+    property ThumbSize: Integer read GetThumbSize write SetThumbSize default 0;
+    property MinThumbSize: Integer read FMinThumbSize write SetMinThumbSize default 4; { Published }
+    property Page: Integer read FPage write SetPage default 1; { Published }
+    property SecondaryButtons: Boolean read FSecondaryButtons write SetSecondaryButtons default false; { Published }
+    property SecondBtnKind: TElSecButtonsKind read FSecondBtnKind write SetSecondBtnKind default sbkOpposite;
+    property NoDisableButtons: Boolean read FNoDisableButtons write SetNoDisableButtons default false; { Published }
+    property ShowTrackHint: Boolean read FShowTrackHint write FShowTrackHint default false; { Published }
+    property IsDesigning: Boolean read GetIsDesigning write SetIsDesigning default false; { Protected }
+    property BlendBackground: boolean read FBlendBackground write SetBlendBackground default true; { Protected }
+    property ShowLeftArrows: Boolean read FShowLeftArrows write SetShowLeftArrows default True; { Protected }
+    property ShowRightArrows: Boolean read FShowRightArrows write SetShowRightArrows default true; { Protected }
+    property ChangeColorsOnScroll: Boolean read FChangeColorsOnScroll write FChangeColorsOnScroll default True; { Protected }
+    property NoScrollMessages: boolean read FNoScrollMessages write FNoScrollMessages default false;
+    property NoSunkenThumb: Boolean read FNoSunkenThumb write SetNoSunkenThumb default false; { Protected }
+    property UseSystemMetrics: boolean read FUseSystemMetrics write SetUseSystemMetrics default true;
+    property DrawFrames: Boolean read FDrawFrames write SetDrawFrames default true; { Protected }
+    property DrawArrowFrames: Boolean read FDrawArrowFrames write SetDrawArrowFrames default true; { Protected }
+    property DrawBars: Boolean read FDrawBars write SetDrawBars default True;
+    property BarOffset: Cardinal read FBarOffset write SetBarOffset default 2;
+    property BarColor: TColor read FBarColor write SetBarColor default clBtnShadow;
+{$IFDEF HAS_HTML_RENDER}
+    property IsHTML: boolean read FIsHTML write FIsHTML default false;
+{$ENDIF}
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property OnHitTest: TElScrollHitTestEvent read FOnHitTest write FOnHitTest;
+    property OnScroll: TElScrollEvent read FOnScroll write FOnScroll;
+    property OnScrollHintNeeded: TElScrollHintNeededEvent read FOnScrollHintNeeded write FOnScrollHintNeeded;
+    property OwnerDraw: Boolean read FOwnerDraw write SetOwnerDraw;
+    property OnDrawPart: TElScrollDrawPartEvent read FOnDrawPart write FOnDrawPart;
+    property ArrowColor: TColor read FArrowColor write SetArrowColor default clBtnText; { Protected }
+    property ArrowHotTrackColor: TColor read FArrowHotTrackColor write SetArrowHotTrackColor default clHighlight; { Protected }
+    property ThinFrames: Boolean read FThinFrames write SetThinFrames default false; { Protected }
+    property HintColor: TColor read FHintColor write FHintColor default clInfoBk;
+    property HintTextColor: TColor read FHintTextColor write FHintTextColor default
+      clInfoText;
+    property SystemBkColor : boolean read FSysBkColor write SetSysBkColor default true;
+    property AltDisablingArrows: Boolean read FAltDisablingArrows write
+        SetAltDisablingArrows default false;
+
+{$IFDEF ELPACK_COMPLETE}
+{$ifndef CLX_USED}
+    property ImageForm: TElImageForm read FImgForm write SetImageForm; { Protected }
+{$endif}
+{$ENDIF}
+{$IFNDEF VCL_4_USED}
+    property OnResize: TNotifyEvent read FOnResize write FOnResize;
+{$ENDIF}
+  public
+    { Public declarations }
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Loaded; override;
+    function GetHitTest(X, Y : integer) : TElScrollBarPart;
+    procedure Paint; override;
+{$IFNDEF VCL_4_USED}
+    procedure Resize; virtual;
+{$ELSE}
+    procedure Resize; override;
+{$ENDIF}
+    procedure EndScroll;
+    function SetScrollInfo(ScrollInfo: TScrollInfo; Redraw: BOOL): Integer;
+    function GetScrollInfo(var ScrollInfo: TScrollInfo): BOOL;
+  published
+    {$ifdef ELPACK_UNICODE}
+    property Hint: WideString read FHint write SetHint;
+    {$endif}
+  end; { TCustomElScrollBar }
+
+  TElScrollBarStyles = class(TPersistent)
+  private
+    FElScrollBar: TCustomElScrollBar;
+    FOnChange: TNotifyEvent;
+    function GetButtonSize: integer;
+    procedure SetButtonSize(newValue: Integer);
+    function GetNoDisableButtons: Boolean;
+    procedure SetNoDisableButtons(newValue: Boolean);
+    function GetNoSunkenThumb: Boolean;
+    procedure SetNoSunkenThumb(newValue: Boolean);
+    procedure SetActiveFlat(newValue: Boolean);
+    function GetActiveFlat: Boolean;
+    procedure SetColor(newValue: TColor);
+    function GetColor: TColor;
+    procedure SetFlat(newValue: Boolean);
+    function GetFlat: Boolean;
+    procedure SetMinThumbSize(newValue: Integer);
+    function GetMinThumbSize: Integer;
+    procedure SetOwnerDraw(newValue: Boolean);
+    function GetOwnerDraw: Boolean;
+    procedure SetSecondaryButtons(newValue: Boolean);
+    function GetSecondaryButtons: Boolean;
+    procedure SetSecondBtnKind(newValue: TElSecButtonsKind);
+    function GetSecondBtnKind: TElSecButtonsKind;
+    procedure SetShowTrackHint(newValue: Boolean);
+    function GetShowTrackHint: Boolean;
+    procedure SetThumbMode(newValue: TElScrollThumbMode);
+    function GetThumbMode: TElScrollThumbMode;
+    procedure SetThumbSize(newValue: Integer);
+    function GetThumbSize: Integer;
+    function GetBlendBackground: Boolean;
+    procedure SetBlendBackground(newValue: Boolean);
+    function GetWidth : Integer;
+    procedure SetWidth(newValue : Integer);
+    function GetShowLeftArrows: Boolean;
+    procedure SetShowLeftArrows(newValue: Boolean);
+    function GetShowRightArrows: Boolean;
+    procedure SetShowRightArrows(newValue: Boolean);
+    function GetUseSystemMetrics: boolean;
+    procedure SetUseSystemMetrics(Value: boolean);
+    function GetArrowColor: TColor;
+    procedure SetArrowColor(newValue: TColor);
+    function GetArrowHotTrackColor: TColor;
+    procedure SetArrowHotTrackColor(newValue: TColor);
+    function GetDrawFrames: Boolean;
+    procedure SetDrawFrames(newValue: Boolean);
+    function GetThinFrames: Boolean;
+    procedure SetThinFrames(newValue: Boolean);
+    function GetHintColor: TColor;
+    procedure SetHintColor(Value: TColor);
+    function GetHintTextColor: TColor;
+    procedure SetHintTextColor(Value: TColor);
+    function GetDrawBars: Boolean;
+    procedure SetDrawBars(const Value: Boolean);
+    function GetBarColor: TColor;
+    procedure SetBarColor(const Value: TColor);
+    function GetBarOffset: Cardinal;
+    procedure SetBarOffset(const Value: Cardinal);
+{$IFDEF ELPACK_COMPLETE}
+{$ifndef CLX_USED}
+    function GetImageForm: TElImageForm;
+    procedure SetImageForm(newValue: TElImageForm);
+{$endif}
+{$ENDIF}
+    function GetDrawArrowFrames: Boolean;
+    procedure SetDrawArrowFrames(const Value: Boolean);
+
+    function GetUseXPThemes: Boolean;
+    procedure SetUseXPThemes(const Value: Boolean);
+
+  protected
+    function GetSysBkColor: boolean;
+    procedure SetSysBkColor(Value: boolean);
+  public
+    constructor Create(AControl: TCustomElScrollBar);
+    procedure Assign(Source: TPersistent); override;
+  published
+    property ActiveFlat: Boolean read GetActiveFlat write SetActiveFlat default false;
+    property BlendBackground: Boolean read GetBlendBackground write SetBlendBackground default true; { Published }
+    property Color: TColor read GetColor write SetColor default clBtnFace;
+    property Flat: Boolean read GetFlat write SetFlat default true;
+    property MinThumbSize: Integer read GetMinThumbSize write SetMinThumbSize default 4;
+    property NoDisableButtons: Boolean read GetNoDisableButtons write SetNoDisableButtons default false; { Published }
+    property NoSunkenThumb: Boolean read GetNoSunkenThumb write SetNoSunkenThumb default false; { Published }
+    property OwnerDraw: Boolean read GetOwnerDraw write SetOwnerDraw default false;
+    property SecondaryButtons: Boolean read GetSecondaryButtons write SetSecondaryButtons default false;
+    property SecondBtnKind: TElSecButtonsKind read GetSecondBtnKind write SetSecondBtnKind default sbkOpposite;
+    property ShowLeftArrows: Boolean read GetShowLeftArrows write SetShowLeftArrows default true; { Published }
+    property ShowRightArrows: Boolean read GetShowRightArrows write SetShowRightArrows default true; { Published }
+    property ShowTrackHint: Boolean read GetShowTrackHint write SetShowTrackHint;
+    property ThumbMode: TElScrollThumbMode read GetThumbMode write SetThumbMode default etmAuto;
+    property ThumbSize: Integer read GetThumbSize write SetThumbSize default 0;
+    property Width     : Integer read GetWidth write SetWidth;  { Published }
+    property ButtonSize: integer read GetButtonSize write SetButtonSize;
+    property UseSystemMetrics: boolean read GetUseSystemMetrics write SetUseSystemMetrics default true;
+    property ArrowColor: TColor read GetArrowColor write SetArrowColor default clBtnText; { Published }
+    property ArrowHotTrackColor: TColor read GetArrowHotTrackColor write SetArrowHotTrackColor default clHighlight; { Published }
+
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property DrawFrames: Boolean read GetDrawFrames write SetDrawFrames default true; { Published }
+    property DrawArrowFrames: Boolean read GetDrawArrowFrames write SetDrawArrowFrames default true; { Published }
+    property DrawBars: Boolean read GetDrawBars write SetDrawBars default True;
+    property BarOffset: Cardinal read GetBarOffset write SetBarOffset default 2;
+    property BarColor: TColor read GetBarColor write SetBarColor default clBtnShadow;
+    property ThinFrames: Boolean read GetThinFrames write SetThinFrames default false; { Published }
+    property HintColor: TColor read GetHintColor write SetHintColor default clInfoBk;
+    property HintTextColor: TColor read GetHintTextColor write SetHintTextColor default clInfoText;
+    property SystemBkColor: boolean read GetSysBkColor write SetSysBkColor default true;
+{$IFDEF ELPACK_COMPLETE}
+{$ifndef CLX_USED}
+    property ImageForm: TElImageForm read GetImageForm write SetImageForm; { Published }
+{$endif}
+{$ENDIF}
+    property UseXPThemes: Boolean read GetUseXPThemes write SetUseXPThemes default True;
+  end;
+
+  TElScrollBar = class(TCustomElScrollBar)
+  published
+    property AltDisablingArrows;
+    property ArrowColor;
+    property ArrowHotTrackColor;
+    property Kind;
+    property Position;
+    property Max;
+    property Min;
+    property Flat;
+    property ActiveFlat;
+    property BlendBackground;
+    property SystemBkColor;
+    property ButtonSize;
+    property ChangeColorsOnScroll;
+    property DrawFrames;
+    property DrawArrowFrames;
+    property DrawBars;
+    property BarOffset;
+    property BarColor;
+{$IFDEF ELPACK_COMPLETE}
+{$ifndef CLX_USED}
+    property ImageForm;
+{$endif}
+{$ENDIF}
+{$IFDEF HAS_HTML_RENDER}
+    property IsHTML;
+{$ENDIF}
+    property MinThumbSize;
+    property NoDisableButtons;
+    property NoSunkenThumb;
+    property Page;
+    property SecondaryButtons;
+    property SecondBtnKind;
+    property ShowLeftArrows;
+    property ShowRightArrows;
+    property ShowTrackHint;
+	property Step;
+    property ThinFrames;
+    property ThumbMode;
+    property ThumbSize;
+    property UseSystemMetrics;
+
+    property UseXPThemes;
+
+    { Inherited properties: }
+
+    property Align;
+    property Color;
+{$ifndef CLX_USED}
+    property Ctl3D;
+{$endif}
+    property Enabled;
+    property ParentColor;
+    property ParentShowHint;
+    property ShowHint;
+
+    property TabOrder;
+    property TabStop;
+    property Visible;
+
+    property OnHitTest;
+    property OnChange;
+    property OnScroll;
+    property OnScrollHintNeeded;
+    property OwnerDraw;
+    property OnDrawPart;
+
+{$IFNDEF VCL_4_USED}
+    property OnResize;
+{$ENDIF}
+
+    { Inherited events: }
+{$IFDEF VCL_4_USED}
+{$ifndef CLX_USED}
+    property OnStartDock;
+    property OnEndDock;
+{$endif}
+{$ENDIF}
+{$IFDEF VCL_5_USED}
+    property OnContextPopup;
+{$ENDIF}
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnStartDrag;
+  end;
+
+implementation
+end.

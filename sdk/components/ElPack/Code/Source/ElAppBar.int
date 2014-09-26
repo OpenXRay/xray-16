@@ -1,0 +1,439 @@
+{====================================================}
+{                                                    }
+{   EldoS Visual Components                          }
+{                                                    }
+{   Copyright (c) 1997 Paolo Giacomuzzi              }
+{   Copyright (c) 1998-2001, EldoS                   }
+{                                                    }
+{====================================================}
+
+(*
+
+Version History
+
+12/16/2000
+
+  Improved auto-hiding of the auto-hide bars. 
+
+*)
+{$include elpack2.inc}
+{$ifdef ELPACK_SINGLECOMP}
+{$I ElPack.inc}
+{$else}
+{$ifdef LINUX}
+{$I ../ElPack.inc}
+{$else}
+{$I ..\ElPack.inc}
+{$endif}
+{$endif}
+
+unit ElAppBar;
+
+interface
+
+{$ifdef CLX_USED}
+error ElAppBar is not compatible with CLX
+{$endif}
+
+uses
+  Windows, Messages, SysUtils, Classes, Forms, Dialogs, Controls, ExtCtrls,
+{$ifdef VCL_6_USED}
+Types,
+{$endif}
+  ShellApi, Menus;
+
+const
+  // AppBar's user notification message
+  WM_APPBARNOTIFY = WM_USER + 100;
+
+  // Timer interval
+  SLIDE_DEF_TIMER_INTERVAL = 400; // milliseconds
+
+  // Defaults
+  AB_DEF_SIZE_INC = 1;
+  AB_DEF_DOCK_DIM = 32;
+
+type
+  // You can send to the Windows shell one of the following messages:
+  // Message             Description
+  // --------------      --------------------------------------------------
+  // ABM_NEW             Register a new AppBar to the system
+  // ABM_REMOVE          Remove a previously created AppBar from the system
+  // ABM_QUERYPOS        Query the AppBar position
+  // ABM_SETPOS          Set the AppBar position
+  // ABM_GETSTATE        Get the edge the Appbar is docked to
+  // ABM_GETTASKBARPOS   Get the Explorer Taskbar position
+  // ABM_ACTIVATE        Activate the AppBar
+  // ABM_GETAUTOHIDEBAR  Query if AppBar has Auto-hide behavior
+  // ABM_SETAUTOHIDEBAR  Set the AppBar's Auto-hide behavior
+
+  // The ABM_message constants are defined in SHELLAPI.PAS as follows:
+  // ABM_NEW              = $00000000;
+  // ABM_REMOVE           = $00000001;
+  // ABM_QUERYPOS         = $00000002;
+  // ABM_SETPOS           = $00000003;
+  // ABM_GETSTATE         = $00000004;
+  // ABM_GETTASKBARPOS    = $00000005;
+  // ABM_ACTIVATE         = $00000006;
+  // ABM_GETAUTOHIDEBAR   = $00000007;
+  // ABM_SETAUTOHIDEBAR   = $00000008;
+  // ABM_WINDOWPOSCHANGED = $00000009;
+
+  // The following enumerated type defines the constants in the table
+  TAppBarMessage = (abmNew, abmRemove, abmQueryPos, abmSetPos, abmGetState,
+    abmGetTaskBarPos, abmActivate, abmGetAutoHideBar,
+    abmSetAutoHideBar, abmWindowPosChanged);
+
+  // An AppBar can be in one of 6 states shown in the table below:
+  // State          Description
+  // -----------    -----------------------------------------------------
+  // ABE_UNKNOWN    The Appbar is in an unknown state
+  //                (usually during construction/destruction)
+  // ABE_FLOAT      The AppBar is floating on the screen
+  // ABE_LEFT       The Appbar is docked on the left   edge of the screen
+  // ABE_TOP        The Appbar is docked on the top    edge of the screen
+  // ABE_RIGHT      The Appbar is docked on the right  edge of the screen
+  // ABE_BOTTOM     The Appbar is docked on the bottom edge of the screen
+
+  // The ABE_edge state constants are defined in SHELLAPI.PAS as follows:
+  // ABE_LEFT    = 0;
+  // ABE_TOP     = 1;
+  // ABE_RIGHT   = 2;
+  // ABE_BOTTOM  = 3;
+
+  // The ABE_UNKNOWN and ABE_FLOAT constants are defined here as follows:
+  // ABE_UNKNOWN = 4;
+  // ABE_FLOAT   = 5;
+
+  // The following enumerated type defines the constants in the table
+  // (Values are mutually exclusive)
+  TAppBarEdge = (abeLeft, abeTop, abeRight, abeBottom, abeUnknown, abeFloat);
+
+  // An AppBar can have several behavior flags as shown below:
+  // Flag                        Description
+  // --------------------------- -----------------------------------
+  // ABF_ALLOWLEFT               Allow dock on left   of screen
+  // ABF_ALLOWRIGHT              Allow dock on right  of screen
+  // ABF_ALLOWTOP                Allow dock on top    of screen
+  // ABF_ALLOWBOTTOM             Allow dock on bottom of screen
+  // ABF_ALLOWFLOAT              Allow float in the middle of screen
+
+  // The following enumerated type defines the constants in the table
+  TAppBarFlag = (abfAllowLeft, abfAllowTop, abfAllowRight, abfAllowBottom,
+    abfAllowFloat);
+  TAppBarFlags = set of TAppBarFlag;
+
+  // The following enumerated type defines the AppBar behavior in the Taskbar
+  TAppBarTaskEntry = (abtShow, abtHide, abtFloatDependent);
+
+  // The record below contains all of the AppBar settings that
+  // can be saved/loaded in/from the Registry
+  TAppBarSettings = record
+    abEdge : TAppBarEdge; // ABE_UNKNOWN, ABE_FLOAT, or ABE_edge
+    bAutohide : Boolean; // Should AppBar be auto-hidden when docked?
+    bAlwaysOnTop : Boolean; // Should AppBar always be on top?
+    bSlideEffect : Boolean; // Should AppBar slide?
+    nTimerInterval : Integer; // Slide Timer Interval (determines speed)
+    rcDockDims : TRect; // Width/height for docked bar on 4 edges
+    rcFloat : TRect; // Floating rectangle (in screen coordinates)
+    nMinWidth : LongInt; // Min allowed width
+    nMinHeight : LongInt; // Min allowed height
+    nMaxWidth : LongInt; // Max allowed width
+    nMaxHeight : LongInt; // Max allowed height
+    abTaskEntry : TAppBarTaskEntry; // AppBar behavior in the Windows Taskbar
+  end;
+
+  // TAppBar class ////////////////////////////////////////////////////////////
+  TElAppBar = class(TForm)
+  private
+    FInPosChanged  : boolean;
+
+  protected
+    FForceReHide : boolean;
+    FPreventOffScreen : Boolean;
+    FKeepSize : Boolean;
+    FDraggingOffset : TPoint; // offset from TopLeft corner to mouse cursor
+                              // when the window is about to be moved
+    { Internal implementation state variables }
+
+    // This AppBar's settings info
+    FABS : TAppBarSettings;
+
+    // ABF_* flags
+    FabFlags : TAppBarFlags;
+
+    // Discrete width/height size increments
+    FszSizeInc : TSize;
+
+    // We need a member variable which tracks the proposed edge of the
+    // AppBar while the user is moving it, deciding where to position it.
+    // While not moving, this member must contain ABE_UNKNOWN so that
+    // GetEdge returns the current edge contained in FABS.abEdge.
+    // While moving the AppBar, FabEdgeProposedPrev contains the
+    // proposed edge based on the position of the AppBar.  The proposed
+    // edge becomes the new edge when the user stops moving the AppBar.
+    FabEdgeProposedPrev : TAppBarEdge;
+
+    // We need a member variable which tracks whether a full screen
+    // application window is open
+    FbFullScreenAppOpen : Boolean;
+
+    // We need a member variable which tracks whether our autohide window
+    // is visible or not
+    FbAutoHideIsVisible : Boolean;
+
+    // We need a timer to to determine when the AppBar should be re-hidden
+    FTimer : TTimer;
+
+    FOnEdgeChanged : TNotifyEvent;
+
+    // These functions encapsulate the shell's SHAppBarMessage function
+    function AppBarMessage(abMessage : TAppBarMessage;
+      abEdge : TAppBarEdge;
+      lParam : LPARAM;
+      bRect : Boolean;
+      var rc : TRect) : UINT;
+
+    function AppBarMessage1(abMessage : TAppBarMessage) : UINT;
+
+    function AppBarMessage2(abMessage : TAppBarMessage;
+      abEdge : TAppBarEdge) : UINT;
+
+    function AppBarMessage3(abMessage : TAppBarMessage;
+      abEdge : TAppBarEdge;
+      lParam : LPARAM) : UINT;
+
+    function AppBarMessage4(abMessage : TAppBarMessage;
+      abEdge : TAppBarEdge;
+      lParam : LPARAM;
+      var rc : TRect) : UINT;
+
+    // Gets a edge (ABE_FLOAT or ABE_edge) from a point (screen coordinates)
+    function CalcProposedState(var pt : TSmallPoint) : TAppBarEdge;
+
+    // Adjusts the AppBar's location to account for autohide
+    // Returns TRUE if rectangle was adjusted
+    function AdjustLocationForAutohide(bShow : Boolean;
+      var rc : TRect) : Boolean;
+
+    // When Autohide AppBar is shown/hidden, slides in/out of view
+    procedure SlideWindow(var rcEnd : TRect);
+
+    // Returns which edge we're autohidden on or ABE_UNKNOWN
+    function GetAutohideEdge : TAppBarEdge;
+
+    // Returns a TSmallPoint that gives the cursor position in screen coords
+    function GetMessagePosition : TSmallPoint;
+
+    procedure SetKeepSize(newValue : Boolean);
+    procedure SetPreventOffScreen(newValue : Boolean);
+    procedure SetHorzInc(newValue : integer);
+    procedure SetVertInc(newValue : integer);
+    function  GetVertInc : integer;
+    function  GetHorzInc : integer;
+
+  protected
+
+    procedure DoEdgeChanged;
+
+    // Gets a retangle position (screen coordinates) from a proposed state
+    procedure GetRect(abEdgeProposed : TAppBarEdge; var rcProposed : TRect); virtual;
+
+  { Property selector functions }
+
+    // Retrieves the AppBar's edge.  If the AppBar is being positioned, its
+    // proposed state is returned instead
+    function GetEdge : TAppBarEdge;
+
+    // Changes the AppBar's edge to ABE_UNKNOWN, ABE_FLOAT or an ABE_edge
+    procedure SetEdge(abEdge : TAppBarEdge);
+
+    procedure SetSlideTime(nInterval : Integer);
+
+    // Returns TRUE if Auto-hide is on, FALSE if Auto-hide is off
+    function IsAutoHide : Boolean;
+
+    // Sets the Auto-hide behavior
+    procedure SetAutoHide(bAutoHide : Boolean);
+
+    // Returns TRUE if AppBar is always on topAuto-hide, FALSE otherwise
+    function IsAlwaysOnTop : Boolean;
+
+    // Sets the AlwaysOnTop behavior
+    procedure SetAlwaysOnTop(bAlwaysOnTop : Boolean);
+
+    procedure SetFlags(newValue : TAppBarFlags);
+
+  { Overridable functions }
+
+    // Called if user attempts to dock an Autohide AppBar on
+    // an edge that already contains an Autohide AppBar
+    procedure OnAppBarForcedToDocked; virtual;
+
+    // Called when AppBar gets an ABN_FULLSCREENAPP notification
+    procedure OnABNFullScreenApp(bOpen : Boolean); virtual;
+
+    // Called when AppBar gets an ABN_POSCHANGED notification
+    procedure OnABNPosChanged; virtual;
+
+    // Called when AppBar gets an ABN_WINDOWARRANGE notification
+    procedure OnABNWindowArrange(bBeginning : Boolean); virtual;
+
+  { Message handlers }
+
+    // Called when the AppBar receives a WM_APPBARNOTIFY window message
+    procedure OnAppBarCallbackMsg(var Msg : TMessage); message WM_APPBARNOTIFY;
+
+    // Called when the AppBar form is first created
+    procedure WmCreate(var Msg : TWMCreate); message WM_CREATE;
+
+    // Called when the AppBar form is about to be destroyed
+    procedure WmDestroy(var Msg : TWMDestroy); message WM_DESTROY;
+
+    // Called when the AppBar receives a WM_WINDOWPOSCHANGED message
+    procedure OnWindowPosChanged(var Msg : TWMWindowPosChanged);
+      message WM_WINDOWPOSCHANGED;
+
+    // Called when the AppBar receives a WM_ACTIVATE message
+    procedure OnActivate(var Msg : TWMActivate); message WM_ACTIVATE;
+
+    // Called every timer tick
+    procedure OnAppBarTimer(Sender : TObject);
+
+    // Called when the AppBar receives a WM_NCMOUSEMOVE message
+    procedure OnNcMouseMove(var Msg : TWMNCMouseMove); message WM_NCMOUSEMOVE;
+
+    procedure OnMouseMove(var Msg : TWMMouseMove);  message WM_MOUSEMOVE;
+
+    // Called when the AppBar receives a WM_NCHITTEST message
+    procedure OnNcHitTest(var Msg : TWMNCHitTest); message WM_NCHITTEST;
+
+    // Called when the AppBar receives a WM_ENTERSIZEMOVE message
+    procedure OnEnterSizeMove(var Msg : TMessage); message WM_ENTERSIZEMOVE;
+
+    // Called when the AppBar receives a WM_EXITSIZEMOVE message
+    procedure OnExitSizeMove(var Msg : TMessage); message WM_EXITSIZEMOVE;
+
+    // Called when the AppBar receives a WM_MOVING message
+    procedure OnMoving(var Msg : TMessage); message WM_MOVING;
+
+    // Called when the AppBar receives a WM_SIZING message
+    procedure OnSizing(var Msg : TMessage); message WM_SIZING;
+
+    // Called when the AppBar receives a WM_GETMINMAXINFO message
+    procedure OnGetMinMaxInfo(var Msg : TWMGetMinMaxInfo);
+      message WM_GETMINMAXINFO;
+
+  { AppBar-specific helper functions }
+
+    // Returns TRUE if abEdge is ABE_LEFT or ABE_RIGHT, else FALSE is returned
+    function IsEdgeLeftOrRight(abEdge : TAppBarEdge) : Boolean;
+
+    // Returns TRUE if abEdge is ABE_TOP or ABE_BOTTOM, else FALSE is returned
+    function IsEdgeTopOrBottom(abEdge : TAppBarEdge) : Boolean;
+
+    // Returns TRUE if abEdge is ABE_FLOAT, else FALSE is returned
+    function IsFloating(abEdge : TAppBarEdge) : Boolean;
+
+    // Returns TRUE if abFlags contain an at least allowed edge to dock on
+    function IsDockable(abFlags : TAppBarFlags) : Boolean;
+
+    // Returns TRUE if abFlags contain abfAllowLeft and abfAllowRight
+    function IsDockableVertically(abFlags : TAppBarFlags) : Boolean;
+
+    // Returns TRUE if abFlags contain abfAllowTop and abfAllowBottom
+    function IsDockableHorizontally(abFlags : TAppBarFlags) : Boolean;
+
+    // Forces the shell to update its AppBar list and the workspace area
+    procedure ResetSystemKnowledge;
+
+    // Returns a proposed edge or ABE_FLOAT based on ABF_* flags and a
+    // point specified in screen coordinates
+    function GetEdgeFromPoint(abFlags : TAppBarFlags;
+      pt : TSmallPoint) : TAppBarEdge;
+
+      procedure CreateParams (var Params: TCreateParams); override;
+
+  public
+    // Gets the AppBar's docked dimensions
+{$IFDEF BUILDER_USED}
+    procedure GetDockDims(var rc : TRect);
+{$ELSE}
+    function GetDockDims : TRect;
+{$ENDIF}
+    // Sets the AppBar's docked dimensions
+    procedure SetDockDims(rc : TRect);
+
+    // Gets the AppBar's floating rectangle
+{$IFDEF BUILDER_USED}
+    procedure GetFloatRect(var rc : TRect);
+{$ELSE}
+    function GetFloatRect : TRect;
+{$ENDIF}
+
+    // Sets the AppBar's floating rectangle
+    procedure SetFloatRect(rc : TRect);
+
+    // Constructs an AppBar
+    constructor Create(Owner : TComponent); override;
+
+    // Destroys a previously created AppBar
+    destructor Destroy; override;
+
+    // Forces the AppBar's visual appearance to match its internal state
+    procedure UpdateBar;
+
+    // If AppBar is Autohide and docked, shows/hides the AppBar
+    procedure ShowHiddenAppBar(bShow : Boolean); virtual;
+
+    property AutoHideIsVisible : boolean read FbAutoHideIsVisible;
+
+{$IFNDEF BUILDER_USED}
+    // Dimensions when docked on left, top, right and bottom
+    property DockDims : TRect read GetDockDims write SetDockDims;
+
+    // AppBar rectangle when floating
+    property FloatRect : TRect read GetFloatRect write SetFloatRect;
+   
+{$ENDIF}
+
+  published
+
+  { Properties }
+
+    // Allowed dockable edges
+    property Flags : TAppBarFlags read FabFlags write SetFlags;
+
+    // Horizontal size increment
+    property HorzSizeInc : LongInt read GetHorzInc write SetHorzInc;
+
+    // Vertical size increment
+    property VertSizeInc : LongInt read GetVertInc write SetVertInc;
+
+    // Edge to dock on
+    property Edge : TAppBarEdge read GetEdge write SetEdge;
+
+    // Auto-hide On/Off
+    property AutoHide : Boolean read IsAutoHide write SetAutoHide;
+
+    // Always On Top On/Off
+    property AlwaysOnTop : Boolean read IsAlwaysOnTop write SetAlwaysOnTop;
+
+    // AppBar MinMax dimensions when floating
+    property MinWidth : LongInt read FABS.nMinWidth write FABS.nMinWidth;
+    property MinHeight : LongInt read FABS.nMinHeight write FABS.nMinHeight;
+    property MaxWidth : LongInt read FABS.nMaxWidth write FABS.nMaxWidth;
+    property MaxHeight : LongInt read FABS.nMaxHeight write FABS.nMaxHeight;
+
+    // AppBar behavior in the Window Taskbar
+    property TaskEntry : TAppBarTaskEntry read FABS.abTaskEntry write FABS.abTaskEntry;
+    // If set, the window won't be stretched when docked, and will keep it's size
+    property KeepSize : Boolean read FKeepSize write SetKeepSize;
+    // if set, the window will always be kept inside of viewable area (of cause, except when hidden or auto-hide bar)
+    property PreventOffScreen : Boolean read FPreventOffScreen write SetPreventOffScreen default false;
+
+    property OnEdgeChanged : TNotifyEvent read FOnEdgeChanged write FOnEdgeChanged;
+  end;
+
+implementation
+end.
