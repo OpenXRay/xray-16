@@ -484,7 +484,8 @@ void ValidateState(D3D_DEPTH_STENCIL_DESC &desc)
 
 	if (!desc.DepthEnable)
 	{
-		desc.DepthFunc = D3D_COMPARISON_NEVER;
+        desc.DepthWriteMask = D3D_DEPTH_WRITE_MASK_ALL;
+		desc.DepthFunc = D3D_COMPARISON_LESS;
 	}
 
 	if (!desc.StencilEnable)
