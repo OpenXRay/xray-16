@@ -61,6 +61,7 @@ nitrocaster: Pavel Kovalenko
     - get rid of DirectPlay
     - log suspicious packets and kick/ban its senders after X attempts
     - dedicated server
+      * fix lights_hanging_lamp class name in system.ltx (used 'SO_HLAMP', should be 'O_HLAMP')
       - remove unnecessary modules initialization (render/sound/etc...)
       - use standard windows unput instead of DirectInput (causes problems on dedicated servers)
       - console (remove GUI and use separate administrative tool?)
