@@ -11,4 +11,66 @@ c Canceled
 
 --------------------------------
 
-  
+nitrocaster: Pavel Kovalenko
++ get rid of STLPort
+- Mgc::Math::PI (MgcMath.h) conflicts with PI macro
+- try to remove OpenAL from repository
+- remove lzo and other compression libs from repository
+- get the entire solution compiled with ForceConformanceInForLoopScope=false
+- get rid of atimgpu, use amd ags instead (will also eliminate LNK4098)
+- Modules
+  - subdivide xrGame into multiple modules (so changed code could be compiled faster)
+  - merge xrCPU_Pipe into xrCore
+  - merge xrAPI into xrCore
+  - merge xrXMLParser into xrCore
+- 3rd party libraries
+  - detach/update ODE
+    - dig through current ODE and analyze changes that were made by GSC
+    - get the latest ODE and make sure it can be used with xray
+    - detach/update LuaJIT
+    - detach/update LuaBind
+- known bugs
+  - generic
+    - stackoverflow when starting with too long command line
+    - stackoverflow when game directory contains too many files (_alloca)
+      - can me improved (get rid of recursive directory traversal)
+      - exclude $app_data_root$/logs and $app_data_root$/screenshots from index
+    - GetColorFromText bug
+    - (bytes_need<=mSize) && vl_Count
+  - core
+    + xrMemory::mem_usage -> mem_usage_impl falls into infinite loop or finds bad nodes
+    - buffer overflow when copying command line to Core.Params
+    - misplaced arguments in calls to xrDebug::backend
+  - multiplayer
+    - xrGameSpy: fix master server name (gamespy is down)
+    - dedicated server
+      - known multiple vulnerabilities (verify)
+        - dirtysky
+        - stalkazz
+        - stalkerbof
+        - stalkerboom
+  - render
+    - dx10StateUtils::ValidateState(D3D_DEPTH_STENCIL_DESC&) doesn't initialize passed D3D_DEPTH_STENCIL_DESC with
+      proper default values when DepthEnable flag is false. Because of this incorrect initialization previously created
+      state cannot be found, so renderer creates it over and over.
+      Link ref: http://msdn.microsoft.com/en-us/library/windows/desktop/bb205036(v=vs.85).aspx
+- improvements
+  - multiplayer
+    - use GSC server instead of GameSpy one
+  	- ipv6 support
+    - get rid of DirectPlay
+    - log suspicious packets and kick/ban its senders after X attempts
+    - dedicated server
+      - remove unnecessary modules initialization (render/sound/etc...)
+      - use standard windows unput instead of DirectInput (causes problems on dedicated servers)
+      - console (remove GUI and use separate administrative tool?)
+      - remove topmost startup logo window
+      - Linux support
+  - xrCore
+    - get rid of old blackbox code
+    - refactor xrDebug
+    - logger
+      - don't keep log in std::vector, write to log file immediately
+      - tweak CConsole to use new logger
+- log messages
+  - fix log messages format (normally, the 'color' character should be followed by a space)
