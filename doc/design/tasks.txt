@@ -28,8 +28,6 @@ nitrocaster: Pavel Kovalenko
   - detach/update ODE
     - dig through current ODE and analyze changes that were made by GSC
     - get the latest ODE and make sure it can be used with xray
-    * detach/update LuaJIT
-    * detach/update LuaBind
 - known bugs
   - generic
     - stackoverflow when starting with too long command line
@@ -55,6 +53,7 @@ nitrocaster: Pavel Kovalenko
       proper default values when DepthEnable flag is false. Because of this incorrect initialization previously created
       state cannot be found, so renderer creates it over and over.
       Link ref: http://msdn.microsoft.com/en-us/library/windows/desktop/bb205036(v=vs.85).aspx
+    * D3D11Shader.h from DirectX SDK conflicts with one from Windows SDK
 - improvements
   - multiplayer
     - use GSC server instead of GameSpy one
@@ -76,7 +75,7 @@ nitrocaster: Pavel Kovalenko
       - tweak CConsole to use new logger
 - log messages
   - fix log messages format (normally, the 'color' character should be followed by a space)
-  
+
 STALKER_2010: Andrew Boyarshin
-	* detach/update LuaJIT
-	* detach/update LuaBind
+* detach/update LuaJIT
+* detach/update LuaBind
