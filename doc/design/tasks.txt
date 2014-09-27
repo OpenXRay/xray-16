@@ -18,6 +18,7 @@ nitrocaster: Pavel Kovalenko
 - remove lzo and other compression libs from repository
 - get the entire solution compiled with ForceConformanceInForLoopScope=false
 - get rid of atimgpu, use amd ags instead (will also eliminate LNK4098)
+- scan solution by PVS-Studio and fix found bugs
 - Modules
   - subdivide xrGame into multiple modules (so changed code could be compiled faster)
   - merge xrCPU_Pipe into xrCore
@@ -27,8 +28,8 @@ nitrocaster: Pavel Kovalenko
   - detach/update ODE
     - dig through current ODE and analyze changes that were made by GSC
     - get the latest ODE and make sure it can be used with xray
-    - detach/update LuaJIT
-    - detach/update LuaBind
+    * detach/update LuaJIT
+    * detach/update LuaBind
 - known bugs
   - generic
     - stackoverflow when starting with too long command line
@@ -75,3 +76,7 @@ nitrocaster: Pavel Kovalenko
       - tweak CConsole to use new logger
 - log messages
   - fix log messages format (normally, the 'color' character should be followed by a space)
+  
+STALKER_2010: Andrew Boyarshin
+	* detach/update LuaJIT
+	* detach/update LuaBind
