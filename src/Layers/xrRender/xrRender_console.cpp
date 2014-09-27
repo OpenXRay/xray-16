@@ -701,9 +701,7 @@ void		xrRender_initconsole	()
 #endif // DEBUG
 
 	CMD2(CCC_tf_Aniso,	"r__tf_aniso",			&ps_r__tf_Anisotropic		); //	{1..16}
-  
-  CMD3(CCC_Mask,  "r__actor_shadow", &ps_common_flags, RFLAG_ACTOR_SHADOW );  //Swartz27
-  
+
 	// R1
 	CMD4(CCC_Float,		"r1_ssa_lod_a",			&ps_r1_ssaLOD_A,			16,		96		);
 	CMD4(CCC_Float,		"r1_ssa_lod_b",			&ps_r1_ssaLOD_B,			16,		64		);
