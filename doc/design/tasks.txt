@@ -84,8 +84,13 @@ awdavies: Andrew Davies
 - project general
 	* Get rid of deprecation compiler warnings.
 - engine
-	- multithreading
-		- Designate which tasks should be assigned to which cores.
+	- multithreading (order listed is order of completion).
+		- research
+			- Determine where multithreading could benefit potential performance bottlenecks.
+			- Examine bottlenecks with profiler.  Document results.
+			- Designate which tasks should be assigned to which cores.
+		- implementation
+			- Include library capable of creating light-weight kernel-visible threads.
 			- Abstract specific tasks to certain cores.
-		- Add thread pool/scheduler for tasks.
-		- Include library capable of creating light-weight kernel-visible threads.
+			- Add thread pool/scheduler for tasks.
+			- Run profiler again (might need to find one capable of tracking multiple threads).
