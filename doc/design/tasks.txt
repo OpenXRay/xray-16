@@ -18,7 +18,7 @@ nitrocaster: Pavel Kovalenko
 - remove lzo and other compression libs from repository
 - get the entire solution compiled with ForceConformanceInForLoopScope=false
 - get rid of atimgpu, use amd ags instead (will also eliminate LNK4098)
-- scan solution by PVS-Studio and fix found bugs
+- scan solution with PVS-Studio and fix found bugs
 - Modules
   - subdivide xrGame into multiple modules (so changed code could be compiled faster)
   - merge xrCPU_Pipe into xrCore
@@ -36,6 +36,7 @@ nitrocaster: Pavel Kovalenko
       - exclude $app_data_root$/logs and $app_data_root$/screenshots from index
     - GetColorFromText bug
     - (bytes_need<=mSize) && vl_Count
+    - "! tab named [1] doesnt exist"
   - core
     + xrMemory::mem_usage -> mem_usage_impl falls into infinite loop or finds bad nodes
     - buffer overflow when copying command line to Core.Params
@@ -54,6 +55,11 @@ nitrocaster: Pavel Kovalenko
       state cannot be found, so renderer creates it over and over.
       Link ref: http://msdn.microsoft.com/en-us/library/windows/desktop/bb205036(v=vs.85).aspx
     * D3D11Shader.h from DirectX SDK conflicts with one from Windows SDK
+  - physics
+    - falling actor can continue being in falling state under specific conditions
+  - plugins
+    + fix LW and Max exporters (seem to be broken by GSC)
+    - update plugins for new Max/Maya versions
 - improvements
   - multiplayer
     - use GSC server instead of GameSpy one
@@ -73,6 +79,11 @@ nitrocaster: Pavel Kovalenko
     - logger
       - don't keep log in std::vector, write to log file immediately
       - tweak CConsole to use new logger
+  - render
+    - FXAA
+    - glow material doesn't cast shadows (causes artefacts on actor shadow)
+- disable accel when falling (more realistic)
+- multiplayer weather: misplaced rainy/cloudy
 - log messages
   - fix log messages format (normally, the 'color' character should be followed by a space)
 
