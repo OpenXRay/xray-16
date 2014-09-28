@@ -17,16 +17,17 @@ BOOL APIENTRY DllMain( HANDLE hModule,
     return TRUE;
 }
 
-extern "C"{ 
-	__declspec(dllexport) lwObject* LWO_ImportObject(char* filename, lwObject* new_obj){
-		unsigned int failID;
-		int failpos;
-		new_obj = lwGetObject( filename, &failID, &failpos );
-		return new_obj; 
-	}
+extern "C"
+{
+    __declspec(dllexport) lwObject* LWOImportObject(char* filename)
+    {
+        unsigned int failID;
+        int failpos;
+        return lwGetObject(filename, &failID, &failpos);
+    }
 
-	__declspec(dllexport) void LWO_CloseFile(lwObject *new_obj){
-		lwFreeObject( new_obj );
-	}
+    __declspec(dllexport) void LWOCloseFile(lwObject* object)
+    {
+        lwFreeObject(object);
+    }
 }
-

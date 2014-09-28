@@ -121,11 +121,11 @@ extern "C" {
 							if (!FS.path_exist(path)) FS.append_path(path,path,0,FALSE);
 						}
 						if (FS.exist(lwo_nm)){
-							if (!obj->Import_LWO(lwo_nm,false)) bErr = true;
+							if (!obj->ImportLWO(lwo_nm,false)) bErr = true;
 							else{ 
 								obj->m_Flags.set(CEditableObject::eoDynamic,TRUE);
 								obj->Optimize	();
-								obj->SaveObject	(buf);
+                                obj->Save(buf);
 							}
 						}else
 							bErr = true;

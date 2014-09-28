@@ -54,16 +54,3 @@ void ENGINE_API	CBoneData::CalculateM2B(const Fmatrix& parent)
 
 	m2b_transform.invert	();            
 }
-
-u16	CBoneData::GetNumChildren	( )const
-{
-	return (u16)children.size();
-}
-IBoneData&	CBoneData::GetChild		( u16 id )
-{
-	return *children[id];
-}
-const IBoneData&	CBoneData::GetChild		( u16 id )const
-{
-	return *children[id];
-}

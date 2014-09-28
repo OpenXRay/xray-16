@@ -7,7 +7,7 @@
  * names and activation entry point for a single server.  Multiple
  * server modules will define their own 'ServerDesc' arrays.
  */
-#include <lwserver.h>
+#include <lwsdk/lwserver.h>
 
 
 extern char             ServerClass[];

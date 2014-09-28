@@ -17,6 +17,18 @@
 #define BONE_CHUNK_IK_JOINT_BREAK		0x0009
 #define BONE_CHUNK_IK_JOINT_FRICTION	0x0010
 
+u16	CBone::get_game_mtl_idx() const
+{
+    return -1;
+}
+
+static const Fobb dummy = Fobb().identity();
+
+const Fobb& CBone::get_obb() const
+{
+    return dummy;
+}
+
 CBone::CBone()
 {
 	flags.zero		();

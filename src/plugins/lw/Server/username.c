@@ -5,7 +5,7 @@
  * The default 'UserNames' array is empty, so the user name will be
  * the same as the server name for a minimal server.
  */
-#include <lwserver.h>
+#include <lwsdk/lwserver.h>
 
 
     ServerUserName

@@ -136,7 +136,6 @@ class ECORE_API CExportObjectOGF
             for (COGFCPIt it=m_Parts.begin(); it!=m_Parts.end(); it++)
                 (*it)->CalculateTB		();
         }
-        
 		void 			MakeProgressive	();
         				SSplit			(CSurface* surf, const Fbox& bb);
         				~SSplit			();

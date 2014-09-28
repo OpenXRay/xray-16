@@ -28,19 +28,6 @@ const	Fobb&		CBone::	get_obb				( )			const
 {
 	return dummy;
 }
-const IBoneData&	CBoneData::GetChild		( u16 id )const
-{
-	return *children[id];
-}
-IBoneData&	CBoneData::GetChild		( u16 id )
-{
-	return *children[id];
-}
-
-u16	CBoneData::GetNumChildren	( )const
-{
-	return (u16)children.size();
-}
 
 CBone::CBone()
 {

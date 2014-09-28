@@ -20,7 +20,7 @@ BOOL CEditableObject::ExtractTexName(Texmap *src, LPSTR dest)
 		return FALSE;
 	BitmapTex *bmap = (BitmapTex*)src;
 	_splitpath( bmap->GetMapName(), 0, 0, dest, 0 );
-	EFS.AppendFolderToName(dest,1,TRUE);
+    EFS.AppendFolderToName(dest, 1024, 1, TRUE);
 	return TRUE;
 }
 

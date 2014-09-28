@@ -63,7 +63,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(XRAY_16X_LIBS)maya/ver-2008/include;../Shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(DXSDK_DIR)Include;$(XRAY_16X_LIBS)maya/ver-2008/include;../Shared;$(SolutionDir)xrEngine;$(SolutionDir)utils/xrQSlim/src;$(XRAY_16X_LIBS)MagicSoftware\FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>DEBUG;WIN32;_WINDOWS;NT_PLUGIN;_MAYA_EXPORT;_MAYA_PLUGIN;XRCORE_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -84,10 +84,10 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 /export:initializePlugin /export:uninitializePlugin %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;Foundation.lib;OpenMaya.lib;OpenMayaAnim.lib;OpenMayaUI.lib;xrcorestatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;Foundation.lib;OpenMaya.lib;OpenMayaAnim.lib;xrcorestatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)xrayMaya_export.mll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(XRAY_16X_LIBS)maya/ver-2008/lib;$(xrLibDir);$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(XRAY_16X_LIBS)maya/ver-2008/lib;$(XRAY_16X_LIBS)BugTrap\Bin;$(xrLibDir);$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)xrayMaya_export.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -104,7 +104,7 @@
     </Midl>
     <ClCompile>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(XRAY_16X_LIBS)maya/ver-2008/include;../Shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(DXSDK_DIR)Include;$(XRAY_16X_LIBS)maya/ver-2008/include;../Shared;$(SolutionDir)xrEngine;$(SolutionDir)utils/xrQSlim/src;$(XRAY_16X_LIBS)MagicSoftware\FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;NT_PLUGIN;_MAYA_EXPORT;_MAYA_PLUGIN;XRCORE_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>
@@ -129,7 +129,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;Foundation.lib;OpenMaya.lib;OpenMayaAnim.lib;xrcorestatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)xrayMaya_export.mll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(XRAY_16X_LIBS)maya/ver-2008/lib;$(xrLibDir);$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(XRAY_16X_LIBS)maya/ver-2008/lib;$(XRAY_16X_LIBS)BugTrap\Bin;$(xrLibDir);$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(OutDir)xrayMaya_export.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -139,24 +139,67 @@
     <ClCompile Include="..\..\common\NvMender2003\NVMeshMender.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
     </ClCompile>
+    <ClCompile Include="..\..\editors\ECore\Editor\bone.cpp" />
     <ClCompile Include="..\..\editors\ECore\Editor\EditMesh.cpp" />
     <ClCompile Include="..\..\editors\ECore\Editor\EditMeshIO.cpp" />
     <ClCompile Include="..\..\editors\ECore\Editor\EditMeshModify.cpp" />
     <ClCompile Include="..\..\editors\ECore\Editor\EditObject.cpp" />
     <ClCompile Include="..\..\editors\ECore\Editor\EditObjectIO.cpp" />
     <ClCompile Include="..\..\editors\ECore\Editor\EditObjectMotions.cpp" />
-    <ClCompile Include="..\..\editors\ECore\Editor\ExportSkeletonCalculateTB.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    <ClCompile Include="..\..\editors\ECore\Editor\ExportObjectOGF.cpp" />
+    <ClCompile Include="..\..\editors\ECore\Editor\ExportObjectOGFCalculateTB.cpp" />
+    <ClCompile Include="..\..\editors\ECore\Editor\ExportSkeleton.cpp" />
+    <ClCompile Include="..\..\editors\ECore\Editor\ExportSkeletonCalculateTB.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\RAPIDMinBox.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlApprGaussPointsFit3.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlBox3.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlContBox3.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlContMinBox3.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlEigen.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlMath.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlMatrix2.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\Shared\bone.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlMatrix3.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlMatrix4.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlMinimize1.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlMinimizeN.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlQuaternion.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlSystem.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlVector2.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlVector3.cpp" />
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlVector4.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\editors\ECore\WildMagic\WmlWinSystem.cpp" />
+    <ClCompile Include="..\..\utils\ETools\object.cpp" />
+    <ClCompile Include="..\..\utils\ETools\object_sliding.cpp" />
+    <ClCompile Include="..\..\utils\ETools\PropSlimTools.cpp" />
+    <ClCompile Include="..\..\xrEngine\fmesh.cpp" />
     <ClCompile Include="..\Shared\ELog.cpp" />
     <ClCompile Include="..\Shared\Envelope.cpp" />
     <ClCompile Include="..\Shared\interp.cpp" />
     <ClCompile Include="..\Shared\motion.cpp" />
+    <ClCompile Include="Export\camera_exporter.cpp" />
     <ClCompile Include="Export\ExportDefines.cpp" />
     <ClCompile Include="Export\maTranslator.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -178,16 +221,38 @@
     <ClInclude Include="..\..\common\NvMender2003\remove_isolated_verts.h" />
     <ClInclude Include="..\..\editors\ECore\Editor\EditMesh.h" />
     <ClInclude Include="..\..\editors\ECore\Editor\EditObject.h" />
+    <ClInclude Include="..\..\editors\ECore\Editor\ExportObjectOGF.h" />
     <ClInclude Include="..\..\editors\ECore\Editor\ExportSkeleton.h" />
     <ClInclude Include="..\..\editors\ECore\Editor\itterate_adjacents_dynamic.h" />
-    <ClInclude Include="..\Shared\bone.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlApprGaussPointsFit3.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlBox3.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlContBox3.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlContMinBox3.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlEigen.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlGMatrix.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlGVector.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlMath.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlMatrix.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlMatrix2.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlMatrix3.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlMatrix4.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlMinimize1.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlMinimizeN.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlQuaternion.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlSystem.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlVector.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlVector2.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlVector3.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlVector4.h" />
+    <ClInclude Include="..\..\editors\ECore\WildMagic\WmlWinSystem.h" />
+    <ClInclude Include="..\..\xrEngine\bone.h" />
     <ClInclude Include="..\Shared\ELog.h" />
     <ClInclude Include="..\Shared\envelope.h" />
     <ClInclude Include="..\Shared\motion.h" />
+    <ClInclude Include="Export\camera_exporter.h" />
     <ClInclude Include="Export\ExportDefines.h" />
     <ClInclude Include="Export\Fmesh.h" />
     <CustomBuild Include="Export\maTranslator.h" />
-    <ClInclude Include="Export\motion.h" />
     <CustomBuild Include="Export\SmdBone.h" />
     <CustomBuild Include="Export\SmdMaya.h" />
     <CustomBuild Include="Export\SmdTriangle.h" />
@@ -195,6 +260,19 @@
     <ClInclude Include="Export\Stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\editors\ECore\WildMagic\WmlGMatrix.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlGVector.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlMath.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlMatrix.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlMatrix2.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlMatrix3.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlMatrix4.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlQuaternion.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlSystem.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlVector.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlVector2.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlVector3.inl" />
+    <None Include="..\..\editors\ECore\WildMagic\WmlVector4.inl" />
     <None Include="Export\xrayObjectExportOptions.mel" />
     <None Include="Export\xraySkinExportOptions.mel" />
     <None Include="Export\xraySkinMotionExportOptions.mel" />

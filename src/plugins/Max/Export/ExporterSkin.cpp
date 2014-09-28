@@ -23,7 +23,7 @@ BOOL CExporter::ExportSkin(INode* pNode, LPCSTR fname)
 		return FALSE;
 	}
 	OBJECT->Optimize	();
-	OBJECT->SaveObject	(fname);
+    OBJECT->Save(fname);
 	xr_delete			(OBJECT);
 	return TRUE;
 };

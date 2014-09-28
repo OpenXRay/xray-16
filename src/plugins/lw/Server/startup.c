@@ -4,7 +4,7 @@
  *
  * Default 'Startup' function returns any non-zero value for success.
  */
-#include <lwserver.h>
+#include <lwsdk/lwserver.h>
 
 
     void *

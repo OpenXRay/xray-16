@@ -199,7 +199,7 @@ void CEditableObject::Save(IWriter& F)
 	bOnModified			= false;
 }
 
-#if 1 //#ifdef _EDITOR
+#if defined(_EDITOR) || defined(_MAYA_EXPORT)
 
 bool CEditableObject::Load(IReader& F)
 {

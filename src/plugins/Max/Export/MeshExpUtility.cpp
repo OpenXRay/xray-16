@@ -214,7 +214,7 @@ BOOL MeshExpUtility::SaveAsObject(const char* m_ExportName)
 			if (strext(t)) *strext(t)=0;
 		}
 		exp_obj->Optimize		();
-		exp_obj->SaveObject		(m_ExportName);
+        exp_obj->Save(m_ExportName);
 	}
 
 	xr_delete(exp_obj);

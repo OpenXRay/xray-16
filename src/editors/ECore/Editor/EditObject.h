@@ -60,7 +60,10 @@ public:
     shared_str			m_GameMtlName;
     Flags32			m_Flags;
     u32				m_dwFVF;
-
+#ifdef _MAX_EXPORT
+	u32				mid;
+	Mtl*			mtl;
+#endif
 	Flags32			m_RTFlags;
 	u32				tag;
     SSimpleImage*	m_ImageData;
@@ -73,6 +76,10 @@ public:
         m_RTFlags.zero	();
 		m_Flags.zero	();
 		m_dwFVF		= 0;
+#ifdef _MAX_EXPORT
+		mtl			= 0;
+		mid			= 0;
+#endif
 		tag			= 0;
 	}
     IC bool			Validate		()
@@ -367,9 +374,13 @@ public:
 
     // load/save methods
 	bool 			Reload					();
-	bool 			Load					(LPCSTR fname);
-	bool 			Save					(LPCSTR fname);
-  	bool 			Load					(IReader&);
+#ifdef _EDITOR
+    bool 			Load					(LPCSTR fname);
+#endif
+#if defined(_EDITOR) || defined(_MAYA_EXPORT)
+    bool 			Load					(IReader&);
+#endif
+	bool 			Save					(LPCSTR fname);  	
 	void 			Save					(IWriter&);
 #ifdef _EDITOR
 	void 			FillMotionList			(LPCSTR pref, ListItemsVec& items, int modeID);
@@ -380,7 +391,7 @@ public:
 	void 			FillSummaryProps		(LPCSTR pref, PropItemVec& items);
 	bool			CheckShaderCompatible	();
 #endif
-
+	
     // contains methods
     CEditableMesh* 	FindMeshByName			(LPCSTR name, CEditableMesh* Ignore=0);
     void			VerifyMeshNames			();
@@ -408,6 +419,7 @@ public:
     bool			PrepareSkeletonOGF		(IWriter& F, u8 infl);
     // rigid
     bool			PrepareRigidOGF			(IWriter& F, bool gen_tb, CEditableMesh* mesh);
+#if defined(_EDITOR) || defined(_MAYA_EXPORT)
 	// ogf
     bool			PrepareOGF				(IWriter& F, u8 infl, bool gen_tb, CEditableMesh* mesh);
 	bool			ExportOGF				(LPCSTR fname, u8 skl_infl);
@@ -416,8 +428,21 @@ public:
 	bool			ExportOMF				(LPCSTR fname);
     // obj
     bool			ExportOBJ				(LPCSTR name);
-
+#endif
 	LPCSTR			GenerateSurfaceName		(LPCSTR base_name);
+#ifdef _MAX_EXPORT
+	BOOL			ExtractTexName			(Texmap *src, LPSTR dest);
+	BOOL			ParseStdMaterial		(StdMat* src, CSurface* dest);
+	BOOL			ParseMultiMaterial		(MultiMtl* src, u32 mid, CSurface* dest);
+	BOOL			ParseXRayMaterial		(XRayMtl* src, u32 mid, CSurface* dest);
+	CSurface*		CreateSurface			(Mtl* M, u32 mat_id);
+	bool			ImportMAXSkeleton		(CExporter* exporter);
+#endif
+#ifdef _LW_EXPORT
+    bool ImportLWO(const char* fname, bool optimize);
+	bool			ImportLWO				(st_ObjectDB *I);
+	Flags32         m_Flags;
+#endif
 #ifdef _MAYA_EXPORT
 	BOOL			ParseMAMaterial			(CSurface* dest, SXRShaderData& d);
 	CSurface*		CreateSurface			(LPCSTR m_name, SXRShaderData& d);

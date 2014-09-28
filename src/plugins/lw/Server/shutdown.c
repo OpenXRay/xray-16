@@ -4,7 +4,7 @@
  *
  * Default 'Shutdown' implementaion does nothing.
  */
-#include <lwserver.h>
+#include <lwsdk/lwserver.h>
 
 
     void

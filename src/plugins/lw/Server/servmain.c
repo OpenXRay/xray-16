@@ -2,7 +2,7 @@
  * LWSDK Startup File
  * Copyright 1995,1997  NewTek, Inc.
  */
-#include <lwmodule.h>
+#include <lwsdk/lwmodule.h>
 
 
 extern void *        Startup (void);

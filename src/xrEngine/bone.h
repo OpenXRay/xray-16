@@ -2,6 +2,10 @@
 #ifndef BoneH
 #define BoneH
 
+#ifdef _LW_EXPORT
+#include <lwsdk/lwrender.h>
+#endif
+
 // refs
 class CBone;
 
@@ -381,7 +385,9 @@ public:
 	void			    Save			(IWriter& F);
 	void			    Load_0			(IReader& F);
 	void			    Load_1			(IReader& F);
-
+#ifdef _LW_EXPORT
+    void			    ParseBone(LWItemID bone);
+#endif
 IC	float	_BCL		engine_lo_limit ( u8 k ) const	{ return -IK_data.limits[k].limit.y; }
 IC	float	_BCL		engine_hi_limit ( u8 k ) const	{ return -IK_data.limits[k].limit.x; }
 
@@ -491,9 +497,9 @@ public:
 	// Calculation
 	void				CalculateM2B	(const Fmatrix& Parent);
 private:
-				IBoneData&		_BCL	GetChild			( u16 id )			;
-		const	IBoneData&		_BCL	GetChild			( u16 id )	const	;
-				u16				_BCL	GetNumChildren		( )			const	;
+				IBoneData&		_BCL	GetChild			( u16 id ) { return *children[id]; }
+		const	IBoneData&		_BCL	GetChild			( u16 id )	const { return *children[id]; }
+				u16				_BCL	GetNumChildren		( )			const { return (u16)children.size(); }
 		const	SJointIKData&	_BCL	get_IK_data			( )			const	{return	IK_data;}
 		const	Fmatrix&		_BCL	get_bind_transform	( )			const	{return	bind_transform;}
 		const	SBoneShape&		_BCL	get_shape			( )			const	{return shape;}
