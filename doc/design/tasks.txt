@@ -94,6 +94,7 @@ STALKER_2010: Andrew Boyarshin
 awdavies: Andrew Davies
 - project general
 	* Get rid of deprecation compiler warnings.
+	* Remove macro redefinitions.
 - engine
 	- multithreading (order listed is order of completion).
 		- research
