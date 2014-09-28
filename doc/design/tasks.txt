@@ -49,6 +49,7 @@ nitrocaster: Pavel Kovalenko
         - stalkazz
         - stalkerbof
         - stalkerboom
+    - voting for weather: rainy/cloudy buttons are mixed up
   - render
     + dx10StateUtils::ValidateState(D3D_DEPTH_STENCIL_DESC&) doesn't initialize passed D3D_DEPTH_STENCIL_DESC with
       proper default values when DepthEnable flag is false. Because of this incorrect initialization previously created
