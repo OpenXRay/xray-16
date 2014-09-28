@@ -89,7 +89,7 @@ awdavies: Andrew Davies
 			- Determine where multithreading could benefit potential performance bottlenecks.
 			- Examine bottlenecks with profiler.  Document results.
 			- Designate which tasks should be assigned to which cores.
-		- implementation
+		- implementation (edit as research gets closer to completion for more accurate plan).
 			- Include library capable of creating light-weight kernel-visible threads.
 			- Abstract specific tasks to certain cores.
 			- Add thread pool/scheduler for tasks.
