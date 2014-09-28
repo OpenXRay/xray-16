@@ -80,7 +80,7 @@ nitrocaster: Pavel Kovalenko
       - don't keep log in std::vector, write to log file immediately
       - tweak CConsole to use new logger
   - render
-    - FSAA
+    - FXAA
     - glow material doesn't cast shadows (causes artefacts on actor shadow)
 - disable accel when falling (more realistic)
 - multiplayer weather: misplaced rainy/cloudy
