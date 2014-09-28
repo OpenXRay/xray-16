@@ -79,3 +79,13 @@ nitrocaster: Pavel Kovalenko
 STALKER_2010: Andrew Boyarshin
 * detach/update LuaJIT
 * detach/update LuaBind
+
+awdavies: Andrew Davies
+- project general
+	* Get rid of deprecation compiler warnings.
+- engine
+	- multithreading
+		- Designate which tasks should be assigned to which cores.
+			- Abstract specific tasks to certain cores.
+		- Add thread pool/scheduler for tasks.
+		- Include library capable of creating light-weight kernel-visible threads.
