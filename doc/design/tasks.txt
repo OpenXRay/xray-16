@@ -107,3 +107,11 @@ awdavies: Andrew Davies
       - Abstract specific tasks to certain cores.
       - Add thread pool/scheduler for tasks.
       - Run profiler again (might need to find one capable of tracking multiple threads).
+
+Highflex: Alex M
+- plugins/content creation
+  * Update Primary DCC Tools ( Maya )
+  - Optimize pipeline for asset converting ( direct export to game? )
+  - Python scripts for stalker skeleton control rig creation
+- game code
+  - Improve Weapon System ( Additional Animations, Options )
