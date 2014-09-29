@@ -93,7 +93,7 @@ STALKER_2010: Andrew Boyarshin
 * detach/update LuaBind
 
 awdavies: Andrew Davies
-- project general
+- cleanup
   * Get rid of deprecation compiler warnings.
   * Remove macro redefinitions.
 - engine
