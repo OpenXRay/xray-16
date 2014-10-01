@@ -58,11 +58,13 @@ nitrocaster: Pavel Kovalenko
       state cannot be found, so renderer creates it over and over.
       Link ref: http://msdn.microsoft.com/en-us/library/windows/desktop/bb205036(v=vs.85).aspx
     + D3D11Shader.h from DirectX SDK conflicts with one from Windows SDK
+    - when d3d compiler fails to compile some shader, it displays message
+      "Your video card doesn't meet game requirements ..." even if GPU actually meets game requirements (feature level)
   - physics
     - falling actor can continue being in falling state under specific conditions
   - plugins
     + fix LW and Max exporters (seem to be broken by GSC)
-    - update plugins for new Max/Maya versions
+    - update plugins for new 3DS Max versions
 - improvements
   - multiplayer
     - use GSC server instead of GameSpy one
@@ -85,8 +87,7 @@ nitrocaster: Pavel Kovalenko
   - render
     - FXAA
     - glow material doesn't cast shadows (causes artefacts on actor shadow)
-- disable accel when falling (more realistic)
-- multiplayer weather: misplaced rainy/cloudy
+- consider disabling accel when falling (more realistic)
 - log messages
   - fix log messages format (normally, the 'color' character should be followed by a space)
 
