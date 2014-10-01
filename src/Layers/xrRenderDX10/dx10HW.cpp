@@ -744,10 +744,10 @@ void CHW::updateWindowProps(HWND m_hWnd)
 	// Set window properties depending on what mode were in.
 	if (bWindowed)		{
 		if (m_move_window) {
-			if (strstr(Core.Params,"-no_dialog_header"))
-				SetWindowLong	( m_hWnd, GWL_STYLE, dwWindowStyle=(WS_BORDER|WS_VISIBLE) );
-			else
-				SetWindowLong	( m_hWnd, GWL_STYLE, dwWindowStyle=(WS_BORDER|WS_DLGFRAME|WS_VISIBLE|WS_SYSMENU|WS_MINIMIZEBOX ) );
+            dwWindowStyle = WS_BORDER | WS_VISIBLE;
+            if (!strstr(Core.Params, "-no_dialog_header"))
+                dwWindowStyle |= WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX;
+            SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle);
 			// When moving from fullscreen to windowed mode, it is important to
 			// adjust the window size after recreating the device rather than
 			// beforehand to ensure that you get the window size you want.  For
@@ -758,33 +758,22 @@ void CHW::updateWindowProps(HWND m_hWnd)
 			// desktop.
 
 			RECT			m_rcWindowBounds;
-			BOOL			bCenter = FALSE;
-			if (strstr(Core.Params, "-center_screen"))	bCenter = TRUE;
+			RECT				DesktopRect;
 
-			if (bCenter) {
-				RECT				DesktopRect;
+			GetClientRect		(GetDesktopWindow(), &DesktopRect);
 
-				GetClientRect		(GetDesktopWindow(), &DesktopRect);
-
-				SetRect(			&m_rcWindowBounds, 
-					(DesktopRect.right-m_ChainDesc.BufferDesc.Width)/2, 
-					(DesktopRect.bottom-m_ChainDesc.BufferDesc.Height)/2, 
-					(DesktopRect.right+m_ChainDesc.BufferDesc.Width)/2, 
-					(DesktopRect.bottom+m_ChainDesc.BufferDesc.Height)/2);
-			}else{
-				SetRect(			&m_rcWindowBounds,
-					0, 
-					0, 
-					m_ChainDesc.BufferDesc.Width, 
-					m_ChainDesc.BufferDesc.Height);
-			};
+			SetRect(			&m_rcWindowBounds, 
+				(DesktopRect.right-m_ChainDesc.BufferDesc.Width)/2, 
+				(DesktopRect.bottom-m_ChainDesc.BufferDesc.Height)/2, 
+				(DesktopRect.right+m_ChainDesc.BufferDesc.Width)/2, 
+				(DesktopRect.bottom+m_ChainDesc.BufferDesc.Height)/2);
 
 			AdjustWindowRect		(	&m_rcWindowBounds, dwWindowStyle, FALSE );
 
 			SetWindowPos			(	m_hWnd, 
 				HWND_NOTOPMOST,	
-				m_rcWindowBounds.left, 
-				m_rcWindowBounds.top,
+                m_rcWindowBounds.left,
+                m_rcWindowBounds.top,
 				( m_rcWindowBounds.right - m_rcWindowBounds.left ),
 				( m_rcWindowBounds.bottom - m_rcWindowBounds.top ),
 				SWP_SHOWWINDOW|SWP_NOCOPYBITS|SWP_DRAWFRAME );
