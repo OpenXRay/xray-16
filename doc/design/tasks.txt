@@ -24,10 +24,12 @@ nitrocaster: Pavel Kovalenko
   - merge xrCPU_Pipe into xrCore
   - merge xrAPI into xrCore
   - merge xrXMLParser into xrCore
+  - merge crypto into xrCore
 - 3rd party libraries
   - detach/update ODE
     - dig through current ODE and analyze changes that were made by GSC
     - get the latest ODE and make sure it can be used with xray
+  - remove openssl code from crypto, use it as external library
 - known bugs
   - generic
     - stackoverflow when starting with too long command line
@@ -55,7 +57,7 @@ nitrocaster: Pavel Kovalenko
       proper default values when DepthEnable flag is false. Because of this incorrect initialization previously created
       state cannot be found, so renderer creates it over and over.
       Link ref: http://msdn.microsoft.com/en-us/library/windows/desktop/bb205036(v=vs.85).aspx
-    * D3D11Shader.h from DirectX SDK conflicts with one from Windows SDK
+    + D3D11Shader.h from DirectX SDK conflicts with one from Windows SDK
   - physics
     - falling actor can continue being in falling state under specific conditions
   - plugins
