@@ -1,0 +1,21 @@
+TITLE: C++ Comments Coding Conventions
+
+Good comments
+=============
+Generally, it's best to let the code itself explain what it does, whereas
+the comments are there to describe why it's like that. Do not write comments
+that don't add to the reader's understanding of what's going on.
+
+XXX comments
+============
+Oftentimes, when you're in the middle of implementing something and you don't
+want to distract on the details that should be implemented or improved in
+future, add an XXX comment:
+
+    strcpy_s(params, sizeof(params), GetCommandLine());
+    // XXX: allocate dynamically to handle long command lines
+
+For one thing, this tells anyone reading your code that it's still unstable,
+and also points out where the known problems are. For another, if you don't
+mark the problems now, they'll be a lot harder to find a week or a year from
+now, when you're ready to revisit your old code.
