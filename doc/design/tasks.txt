@@ -66,6 +66,8 @@ nitrocaster: Pavel Kovalenko
     + fix LW and Max exporters (seem to be broken by GSC)
     - update plugins for new 3DS Max versions
 - improvements
+  - common/unsorted
+    + windows cursor position should match with ingame cursor position
   - multiplayer
     - use GSC server instead of GameSpy one
   	- ipv6 support
