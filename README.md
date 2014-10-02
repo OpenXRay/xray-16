@@ -12,6 +12,6 @@ Build instructions can be found [here](https://github.com/openxray/xray-16/blob/
 If you find a bug or have an enhancement request, file an [Issue](https://github.com/openxray/xray-16/issues).
 
 Pull requests appreciated! Just check out 
-[the task list](https://github.com/openxray/xray-16/blob/master/doc/design/tasks.txt) 
+[the task list](https://github.com/openxray/xray-16/blob/master/doc/design/task_list.txt) 
 and follow [coding](https://github.com/openxray/xray-16/blob/master/doc/procedure/cpp_code.txt) 
 and [committing](https://github.com/openxray/xray-16/blob/master/doc/procedure/commit_coding.txt) conventions.
