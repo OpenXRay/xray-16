@@ -13,5 +13,4 @@ If you find a bug or have an enhancement request, file an [Issue](https://github
 
 Pull requests appreciated! Just check out 
 [the task list](https://github.com/openxray/xray-16/blob/master/doc/design/task_list.txt) 
-and follow [coding](https://github.com/openxray/xray-16/blob/master/doc/procedure/cpp_code.txt) 
-and [committing](https://github.com/openxray/xray-16/blob/master/doc/procedure/commit_coding.txt) conventions.
+and follow our [procedures](https://github.com/OpenXRay/xray-16/tree/master/doc/procedure).
