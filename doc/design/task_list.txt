@@ -12,7 +12,6 @@ c Canceled
 --------------------------------
 
 nitrocaster: Pavel Kovalenko
-+ get rid of STLPort
 - Mgc::Math::PI (MgcMath.h) conflicts with PI macro
 - try to remove OpenAL from repository
 - remove lzo and other compression libs from repository
@@ -40,7 +39,6 @@ nitrocaster: Pavel Kovalenko
     - (bytes_need<=mSize) && vl_Count
     - "! tab named [1] doesnt exist"
   - core
-    + xrMemory::mem_usage -> mem_usage_impl falls into infinite loop or finds bad nodes
     - buffer overflow when copying command line to Core.Params
     - misplaced arguments in calls to xrDebug::backend
   - multiplayer
@@ -53,28 +51,20 @@ nitrocaster: Pavel Kovalenko
         - stalkerboom
     - voting for weather: rainy/cloudy buttons are mixed up
   - render
-    + dx10StateUtils::ValidateState(D3D_DEPTH_STENCIL_DESC&) doesn't initialize passed D3D_DEPTH_STENCIL_DESC with
-      proper default values when DepthEnable flag is false. Because of this incorrect initialization previously created
-      state cannot be found, so renderer creates it over and over.
-      Link ref: http://msdn.microsoft.com/en-us/library/windows/desktop/bb205036(v=vs.85).aspx
-    + D3D11Shader.h from DirectX SDK conflicts with one from Windows SDK
     - when d3d compiler fails to compile some shader, it displays message
       "Your video card doesn't meet game requirements ..." even if GPU actually meets game requirements (feature level)
   - physics
     - falling actor can continue being in falling state under specific conditions
   - plugins
-    + fix LW and Max exporters (seem to be broken by GSC)
     - update plugins for new 3DS Max versions
 - improvements
   - common/unsorted
-    + windows cursor position should match with ingame cursor position
   - multiplayer
     - use GSC server instead of GameSpy one
   	- ipv6 support
     - get rid of DirectPlay
     - log suspicious packets and kick/ban its senders after X attempts
     - dedicated server
-      + fix lights_hanging_lamp class name in system.ltx (used 'SO_HLAMP', should be 'O_HLAMP')
       - remove unnecessary modules initialization (render/sound/etc...)
       - use standard windows unput instead of DirectInput (causes problems on dedicated servers)
       - console (remove GUI and use separate administrative tool?)

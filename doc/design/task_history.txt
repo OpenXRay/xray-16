@@ -2,3 +2,19 @@ TITLE: X-Ray Engine 1.6 task history
 
 --------------------------------
 
+nitrocaster: Pavel Kovalenko
++ get rid of STLPort
+- known bugs
+  + fix lights_hanging_lamp class name in system.ltx (used 'SO_HLAMP', should be 'O_HLAMP')
+  - core
+    + xrMemory::mem_usage -> mem_usage_impl falls into infinite loop or finds bad nodes
+  - render
+    + dx10StateUtils::ValidateState(D3D_DEPTH_STENCIL_DESC&) doesn't initialize passed D3D_DEPTH_STENCIL_DESC with
+      proper default values when DepthEnable flag is false. Because of this incorrect initialization previously created
+      state cannot be found, so renderer creates it over and over.
+      Link ref: http://msdn.microsoft.com/en-us/library/windows/desktop/bb205036(v=vs.85).aspx
+    + D3D11Shader.h from DirectX SDK conflicts with one from Windows SDK
+  - plugins
+    + fix LW and Max exporters (seem to be broken by GSC)
+- improvements
+  + windows cursor position should match with ingame cursor position
