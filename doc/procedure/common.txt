@@ -1,0 +1,22 @@
+TITLE: Common conventions
+
+File and directory names:
+- Unless otherwise specified, use lower_case.
+- Source code files and VS projects: use PascalCase.
+- When you need to define the same entity with several files, you can use lowercase suffixes:
+ BAD (both files implement the same Matrix44 class, but differ in implementation details)
+    Matrix44xm.hpp
+    Matrix44noxm.hpp
+ GOOD
+    Matrix44_xm.hpp
+    Matrix44_noxm.hpp
+
+- Keep it simple.
+- VS projects that represent engine modules should have 'xr' prefix in their names.
+- VS projects and their root directories should have the same names.
+
+Formatting (for text files in /doc/ directory):
+- Shift width (indentation) is 2 spaces.
+- Never use tabs.
+- Line size is 120 columns.
+- File should begin with 'TITLE: ' followed by document title.
