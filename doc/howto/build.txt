@@ -1,25 +1,27 @@
+TITLE: X-Ray 1.6 build instructions
+
 By default, all libraries mentioned below (except Windows/DirectX SDK) are assumed to be in the directory
 defined by XRAY_16X_LIBS environment variable (set this by going to System, then going to Advanced system
 settings and then clicking on Environmental Variables).
 
 To build X-Ray Engine you'll need following libraries:
-  * OpenAutomate: https://developer.nvidia.com/openautomate
-  * NVAPI: https://developer.nvidia.com/nvapi
-  * libjpeg: http://sourceforge.net/projects/libjpeg
-    - Use "jpeg" as project root directory name for compatibility with CxImage
-  * zlib: http://zlib.net
-  * BugTrap: https://github.com/nitrocaster/BugTrap
-  * FreeImage: http://freeimage.sourceforge.net
-  * FreeMagic
-  * libogg-1.1.4: http://xiph.org/downloads
-  * libtheora-1.1.1: http://xiph.org/downloads
-  * libvorbis-1.2.3: http://xiph.org/downloads
-  * Autodesk Maya 2008/2009 SDK
-  * Autodesk 3DS Max 6.0 SDK
-  * Windows SDK: http://www.microsoft.com/en-us/download/details.aspx?id=8279
-  * DirectX SDK June 2010: http://www.microsoft.com/en-us/download/details.aspx?id=6812
-    - replace dxguid.lib with the one from Windows SDK
-      (for DirectPlay GUIDs)
+* OpenAutomate: https://developer.nvidia.com/openautomate
+* NVAPI: https://developer.nvidia.com/nvapi
+* libjpeg: http://sourceforge.net/projects/libjpeg
+  - Use "jpeg" as project root directory name for compatibility with CxImage
+* zlib: http://zlib.net
+* BugTrap: https://github.com/nitrocaster/BugTrap
+* FreeImage: http://freeimage.sourceforge.net
+* FreeMagic
+* libogg-1.1.4: http://xiph.org/downloads
+* libtheora-1.1.1: http://xiph.org/downloads
+* libvorbis-1.2.3: http://xiph.org/downloads
+* Autodesk Maya 2008/2009 SDK
+* Autodesk 3DS Max 6.0 SDK
+* Windows SDK: http://www.microsoft.com/en-us/download/details.aspx?id=8279
+* DirectX SDK June 2010: http://www.microsoft.com/en-us/download/details.aspx?id=6812
+  - replace dxguid.lib with the one from Windows SDK
+    (for DirectPlay GUIDs)
 
 You can download all these libraries (except Windows/DirectX SDK) with compiled binaries here:
 https://dl.dropboxusercontent.com/u/63973281/dev/xray/xray-16-libraries.7z
