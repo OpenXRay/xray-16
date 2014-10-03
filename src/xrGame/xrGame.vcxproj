@@ -1681,7 +1681,7 @@
     <ClInclude Include="ui\UICellItem.h" />
     <ClInclude Include="ui\UICellItemFactory.h" />
     <ClInclude Include="ui\UIChangeMap.h" />
-    <ClInclude Include="ui\UIChangeWeather.h" />
+    <ClInclude Include="ui\ChangeWeatherDialog.hpp" />
     <ClInclude Include="ui\UICharacterInfo.h" />
     <ClInclude Include="ui\UIChatWnd.h" />
     <ClInclude Include="ui\UICheckButton.h" />
@@ -3737,7 +3737,7 @@
     <ClCompile Include="ui\UICellItem.cpp" />
     <ClCompile Include="ui\UICellItemFactory.cpp" />
     <ClCompile Include="ui\UIChangeMap.cpp" />
-    <ClCompile Include="ui\UIChangeWeather.cpp" />
+    <ClCompile Include="ui\ChangeWeatherDialog.cpp" />
     <ClCompile Include="ui\UICharacterInfo.cpp" />
     <ClCompile Include="ui\UIChatWnd.cpp" />
     <ClCompile Include="ui\UICheckButton.cpp" />

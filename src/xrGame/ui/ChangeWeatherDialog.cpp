@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "UIChangeWeather.h"
+#include "ChangeWeatherDialog.hpp"
 #include "UIXmlInit.h"
 #include "UI3tButton.h"
 #include "../game_cl_teamdeathmatch.h"
@@ -86,7 +86,7 @@ void ButtonListDialog::SendMessage(CUIWindow* wnd, s16 msg, void* data /*= nullp
     }
 }
 
-void CUIChangeWeather::InitChangeWeather(CUIXml& xmlDoc)
+void ChangeWeatherDialog::InitChangeWeather(CUIXml& xmlDoc)
 {
     CUIXmlInit::InitWindow(xmlDoc, "change_weather", 0, this);
     CUIXmlInit::InitTextWnd(xmlDoc, "change_weather:header", 0, Header);
@@ -107,7 +107,7 @@ void CUIChangeWeather::InitChangeWeather(CUIXml& xmlDoc)
     }
 }
 
-void CUIChangeWeather::OnButtonClick(int i)
+void ChangeWeatherDialog::OnButtonClick(int i)
 {
     string1024 command;
     xr_sprintf(command, "cl_votestart changeweather %s %s", *weatherItems[i].Name, *weatherItems[i].Time);
@@ -115,7 +115,7 @@ void CUIChangeWeather::OnButtonClick(int i)
     HideDialog();
 }
 
-void CUIChangeGameType::InitChangeGameType(CUIXml& xmlDoc)
+void ChangeGameTypeDialog::InitChangeGameType(CUIXml& xmlDoc)
 {
     CUIXmlInit::InitWindow(xmlDoc, "change_gametype", 0, this);
     CUIXmlInit::InitTextWnd(xmlDoc, "change_gametype:header", 0, Header);
@@ -136,7 +136,7 @@ void CUIChangeGameType::InitChangeGameType(CUIXml& xmlDoc)
     }
 }
 
-void CUIChangeGameType::OnButtonClick(int i)
+void ChangeGameTypeDialog::OnButtonClick(int i)
 {
     string1024 command;
     xr_sprintf(command, "cl_votestart changegametype %s", gameTypeItems[i].c_str());

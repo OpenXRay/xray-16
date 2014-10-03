@@ -40,7 +40,7 @@ protected:
     virtual void OnCancel();
 };
 
-class CUIChangeWeather : public ButtonListDialog
+class ChangeWeatherDialog : public ButtonListDialog
 {
 private:
     struct WeatherDesc
@@ -61,7 +61,7 @@ private:
     void ParseWeather();
 };
 // XXX nitrocaster: move to separate file
-class CUIChangeGameType : public ButtonListDialog
+class ChangeGameTypeDialog : public ButtonListDialog
 {
 private:
     xr_vector<shared_str> gameTypeItems;

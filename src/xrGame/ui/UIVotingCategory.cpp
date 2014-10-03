@@ -4,7 +4,7 @@
 #include "UI3tButton.h"
 #include "UIKickPlayer.h"
 #include "UIChangeMap.h"
-#include "UIChangeWeather.h"
+#include "ChangeWeatherDialog.hpp"
 #include "UIGameCustom.h"
 
 #include "../game_cl_teamdeathmatch.h"
@@ -148,14 +148,14 @@ void CUIVotingCategory::OnBtn(int i)
 		case 5:
 			HideDialog();
 			if (!change_weather)
-				change_weather			= xr_new<CUIChangeWeather>();
+				change_weather			= xr_new<ChangeWeatherDialog>();
 			change_weather->InitChangeWeather(*xml_doc);
 			change_weather->ShowDialog	(true);
 			break;
 		case 6:
 			HideDialog();
 			if (!change_gametype)
-				change_gametype			= xr_new<CUIChangeGameType>();
+				change_gametype			= xr_new<ChangeGameTypeDialog>();
 			change_gametype->InitChangeGameType(*xml_doc);
 			change_gametype->ShowDialog	(true);
 			break;

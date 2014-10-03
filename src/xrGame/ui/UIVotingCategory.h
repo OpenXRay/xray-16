@@ -6,8 +6,8 @@ class CUIStatic;
 class CUI3tButton;
 class CUIKickPlayer;
 class CUIChangeMap;
-class CUIChangeWeather;
-class CUIChangeGameType;
+class ChangeWeatherDialog;
+class ChangeGameTypeDialog;
 class CUIXml;
 class CUITextVote;
 
@@ -38,7 +38,7 @@ protected:
 
 	CUIKickPlayer*		kick;
 	CUIChangeMap*		change_map;
-	CUIChangeWeather*	change_weather;
-	CUIChangeGameType*	change_gametype;
+	ChangeWeatherDialog*	change_weather;
+	ChangeGameTypeDialog*	change_gametype;
 	CUIXml*				xml_doc;
 };

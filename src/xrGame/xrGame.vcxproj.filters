@@ -7167,9 +7167,6 @@
     <ClInclude Include="ui\UIChangeMap.h">
       <Filter>UI\Multiplayer\Voting</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UIChangeWeather.h">
-      <Filter>UI\Multiplayer\Voting</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UIKickPlayer.h">
       <Filter>UI\Multiplayer\Voting</Filter>
     </ClInclude>
@@ -7376,6 +7373,9 @@
     </ClInclude>
     <ClInclude Include="physics_world_scripted.h">
       <Filter>Physics\scripts</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\ChangeWeatherDialog.hpp">
+      <Filter>UI\Multiplayer\Voting</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -10820,9 +10820,6 @@
     <ClCompile Include="ui\UIChangeMap.cpp">
       <Filter>UI\Multiplayer\Voting</Filter>
     </ClCompile>
-    <ClCompile Include="ui\UIChangeWeather.cpp">
-      <Filter>UI\Multiplayer\Voting</Filter>
-    </ClCompile>
     <ClCompile Include="ui\UIKickPlayer.cpp">
       <Filter>UI\Multiplayer\Voting</Filter>
     </ClCompile>
@@ -11023,6 +11020,9 @@
     </ClCompile>
     <ClCompile Include="physics_world_scripted.cpp">
       <Filter>Physics\scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\ChangeWeatherDialog.cpp">
+      <Filter>UI\Multiplayer\Voting</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
