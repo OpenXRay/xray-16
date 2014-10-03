@@ -94,23 +94,23 @@ void ChangeWeatherDialog::InitChangeWeather(CUIXml& xmlDoc)
     CUIXmlInit::Init3tButton(xmlDoc, "change_weather:btn_cancel", 0, CancelButton);
     auto& gameWeathers = gMapListHelper.GetGameWeathers();
     Initialize(gameWeathers.size());
-    weatherItems.resize(gameWeathers.size());
+    weathers.resize(gameWeathers.size());
 	string256 path;
-    for (u32 i = 0; i < weatherItems.size(); i++)
+    for (u32 i = 0; i < weathers.size(); i++)
     {
         xr_sprintf(path, "change_weather:btn_%s", gameWeathers[i].m_weather_name.c_str());
         CUIXmlInit::Init3tButton(xmlDoc, path, 0, GetButton(i).Button);
         xr_sprintf(path, "change_weather:txt_%s", gameWeathers[i].m_weather_name.c_str());
         CUIXmlInit::InitTextWnd(xmlDoc, path, 0, GetButton(i).Text);
-        weatherItems[i].Name = gameWeathers[i].m_weather_name;
-        weatherItems[i].Time = gameWeathers[i].m_start_time;
+        weathers[i].Name = gameWeathers[i].m_weather_name;
+        weathers[i].Time = gameWeathers[i].m_start_time;
     }
 }
 
 void ChangeWeatherDialog::OnButtonClick(int i)
 {
     string1024 command;
-    xr_sprintf(command, "cl_votestart changeweather %s %s", *weatherItems[i].Name, *weatherItems[i].Time);
+    xr_sprintf(command, "cl_votestart changeweather %s %s", *weathers[i].Name, *weathers[i].Time);
     Console->Execute(command);
     HideDialog();
 }
@@ -124,22 +124,22 @@ void ChangeGameTypeDialog::InitChangeGameType(CUIXml& xmlDoc)
     // XXX nitrocaster: get it from somewhere
     const int gameTypeCount = 4;
     Initialize(gameTypeCount);
-    gameTypeItems.resize(gameTypeCount);
+    gameTypes.resize(gameTypeCount);
     string256 path;
-    for (u32 i = 0; i < gameTypeItems.size(); i++)
+    for (u32 i = 0; i < gameTypes.size(); i++)
     {
         xr_sprintf(path, "change_gametype:btn_%d", i+1);
         CUIXmlInit::Init3tButton(xmlDoc, path, 0, GetButton(i).Button);
         xr_sprintf(path, "change_gametype:txt_%d", i+1);
         CUIXmlInit::InitTextWnd(xmlDoc, path, 0, GetButton(i).Text);
-        gameTypeItems[i] = xmlDoc.ReadAttrib(path, 0, "id");
+        gameTypes[i] = xmlDoc.ReadAttrib(path, 0, "id");
     }
 }
 
 void ChangeGameTypeDialog::OnButtonClick(int i)
 {
     string1024 command;
-    xr_sprintf(command, "cl_votestart changegametype %s", gameTypeItems[i].c_str());
+    xr_sprintf(command, "cl_votestart changegametype %s", gameTypes[i].c_str());
     Console->Execute(command);
     HideDialog();
 }

@@ -49,7 +49,7 @@ private:
         shared_str Time;
     };
 
-    xr_vector<WeatherDesc> weatherItems;
+    xr_vector<WeatherDesc> weathers;
 
 public:
     void InitChangeWeather(CUIXml& xmlDoc);
@@ -64,7 +64,7 @@ private:
 class ChangeGameTypeDialog : public ButtonListDialog
 {
 private:
-    xr_vector<shared_str> gameTypeItems;
+    xr_vector<shared_str> gameTypes;
 
 public:
     void InitChangeGameType(CUIXml& xmlDoc);
