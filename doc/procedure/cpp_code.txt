@@ -424,9 +424,10 @@ Naming conventions:
 Casing styles:
 - class/struct/enum: PascalCase
   - Math primitives can be in lowercase: vector2f, angle3f, matrix44f
-- Public members: PascalCase
+- Functions: PascalCase
+- Public and protected fields: PascalCase
   - Math primitives can use lowercase: vector2f.x, angle3f.yaw, matrix44f.m03
-- Private members: camelCase
+- Private fields: camelCase
 - Local variables: camelCase
 - Global variables: PascalCase
 - Namespaces: PascalCase
