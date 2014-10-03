@@ -98,9 +98,9 @@ void ChangeWeatherDialog::InitChangeWeather(CUIXml& xmlDoc)
 	string256 path;
     for (u32 i = 0; i < weatherItems.size(); i++)
     {
-        xr_sprintf(path, "change_weather:btn_%d", i+1);
+        xr_sprintf(path, "change_weather:btn_%s", gameWeathers[i].m_weather_name.c_str());
         CUIXmlInit::Init3tButton(xmlDoc, path, 0, GetButton(i).Button);
-        xr_sprintf(path, "change_weather:txt_%d", i+1);
+        xr_sprintf(path, "change_weather:txt_%s", gameWeathers[i].m_weather_name.c_str());
         CUIXmlInit::InitTextWnd(xmlDoc, path, 0, GetButton(i).Text);
         weatherItems[i].Name = gameWeathers[i].m_weather_name;
         weatherItems[i].Time = gameWeathers[i].m_start_time;
