@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="kb_active_jobs">
+		<text>PDA</text>
+	</string>
+	<string id="kb_alife_command">
+		<text>Rozkaz k ъtoku</text>
+	</string>
+	<string id="kb_always_run">
+		<text>Chщze</text>
+	</string>
+	<string id="kb_artefact">
+		<text>Artefakt</text>
+	</string>
+	<string id="kb_backward">
+		<text>Zpмt</text>
+	</string>
+	<string id="kb_binoculars">
+		<text>Dalekohled</text>
+	</string>
+	<string id="kb_buy_menu">
+		<text>Nabнdka nбkupu</text>
+	</string>
+	<string id="kb_chat">
+		<text>Chat</text>
+	</string>
+	<string id="kb_chat_team">
+		<text>Tэmovэ chat</text>
+	</string>
+	<string id="kb_console">
+		<text>Konzole</text>
+	</string>
+	<string id="kb_contacts">
+		<text>Kontakty v PDA</text>
+	</string>
+	<string id="kb_crouch">
+		<text>Pшikrиenн</text>
+	</string>
+	<string id="kb_crouch_toggle">
+		<text>Pшepnout pшikrиenн</text>
+	</string>
+	<string id="kb_detector">
+		<text>Detektor</text>
+	</string>
+	<string id="kb_down">
+		<text>Dolщ</text>
+	</string>
+	<string id="kb_drop">
+		<text>Zahodit</text>
+	</string>
+	<string id="kb_fire">
+		<text>Stшelba</text>
+	</string>
+	<string id="kb_firemode_next">
+		<text>Dalљн reћim stшelby</text>
+	</string>
+	<string id="kb_firemode_prev">
+		<text>Pшedchozн reћim stшelby</text>
+	</string>
+	<string id="kb_forward">
+		<text>Dopшedu</text>
+	</string>
+	<string id="kb_func">
+		<text>Podvмљenэ granбtomet</text>
+	</string>
+	<string id="kb_grp_common">
+		<text>Obecnй</text>
+	</string>
+	<string id="kb_grp_direction">
+		<text>Smмr</text>
+	</string>
+	<string id="kb_grp_inventory">
+		<text>Batoh</text>
+	</string>
+	<string id="kb_grp_movement">
+		<text>Pohyb</text>
+	</string>
+	<string id="kb_grp_multiplayer">
+		<text>Hra vнce hrбищ</text>
+	</string>
+	<string id="kb_grp_weapons">
+		<text>Zbraт</text>
+	</string>
+	<string id="kb_inventory">
+		<text>Batoh</text>
+	</string>
+	<string id="kb_jump">
+		<text>Skok</text>
+	</string>
+	<string id="kb_left">
+		<text>Doleva</text>
+	</string>
+	<string id="kb_left_lookout">
+		<text>Naklonit doleva</text>
+	</string>
+	<string id="kb_left_strafe">
+		<text>Ъkrok doleva</text>
+	</string>
+	<string id="kb_map">
+		<text>Mapa v PDA</text>
+	</string>
+	<string id="kb_next_slot">
+		<text>Zbraт na dalљн pozici</text>
+	</string>
+	<string id="kb_night_vision">
+		<text>Noиnн vidмnн</text>
+	</string>
+	<string id="kb_pause">
+		<text>Pauza</text>
+	</string>
+	<string id="kb_pda">
+		<text>PDA</text>
+	</string>
+	<string id="kb_prev_slot">
+		<text>Zbraт na pшedchozн pozici</text>
+	</string>
+	<string id="kb_quit">
+		<text>Zpмt</text>
+	</string>
+	<string id="kb_reload">
+		<text>Nabнt</text>
+	</string>
+	<string id="kb_repair">
+		<text>Opravit</text>
+	</string>
+	<string id="kb_right">
+		<text>Doprava</text>
+	</string>
+	<string id="kb_right_lookout">
+		<text>Naklonit doprava</text>
+	</string>
+	<string id="kb_right_strafe">
+		<text>Naklonit doprava</text>
+	</string>
+	<string id="kb_scores">
+		<text>Body</text>
+	</string>
+	<string id="kb_screenshot">
+		<text>Screenshot</text>
+	</string>
+	<string id="kb_skin_menu">
+		<text>Nabнdka  modelщ</text>
+	</string>
+	<string id="kb_sprint">
+		<text>Bмh</text>
+	</string>
+	<string id="kb_team_menu">
+		<text>Nabнdka  tэmщ</text>
+	</string>
+	<string id="kb_torch">
+		<text>Baterka</text>
+	</string>
+	<string id="kb_turn_engine">
+		<text>Aktivovat</text>
+	</string>
+	<string id="kb_up">
+		<text>Nahoru</text>
+	</string>
+	<string id="kb_use">
+		<text>Pouћнt</text>
+	</string>
+	<string id="kb_use_bandage">
+		<text>Rychlэ obvaz</text>
+	</string>
+	<string id="kb_use_medkit">
+		<text>Rychlб lйkбrniиka</text>
+	</string>
+	<string id="kb_vote_begin">
+		<text>Zahбjit hlasovбnн</text>
+	</string>
+	<string id="kb_vote_menu">
+		<text>Hlasovat</text>
+	</string>
+	<string id="kb_vote_no">
+		<text>Hlasovat „Ano“</text>
+	</string>
+	<string id="kb_vote_yes">
+		<text>Hlasovat „Ne“</text>
+	</string>
+	<string id="kb_weapon1">
+		<text>Zbraт 1</text>
+	</string>
+	<string id="kb_weapon2">
+		<text>Zbraт 2</text>
+	</string>
+	<string id="kb_weapon3">
+		<text>Zbraт 3</text>
+	</string>
+	<string id="kb_weapon4">
+		<text>Zbraт 4</text>
+	</string>
+	<string id="kb_weapon5">
+		<text>Zbraт 5</text>
+	</string>
+	<string id="kb_weapon6">
+		<text>Zbraт 6</text>
+	</string>
+	<string id="kb_wpn_next">
+		<text>Zmмnit typ munice</text>
+	</string>
+	<string id="kb_wpn_prev">
+		<text>Pшedchozн zbraт tohoto typu</text>
+	</string>
+	<string id="kb_zoom">
+		<text>Pшiblнћenн</text>
+	</string>
+	<string id="speech_menu_group">
+		<text>Hlasovй zprбvy (1)</text>
+	</string>
+	<string id="speech_menu_personal">
+		<text>Hlasovй zprбvy (2)</text>
+	</string>
+	<string id="kb_quick_use_1">
+		<text>Rychlб pozice 1</text>
+	</string>
+	<string id="kb_quick_use_2">
+		<text>Rychlб pozice 2</text>
+	</string>
+	<string id="kb_quick_use_3">
+		<text>Rychlб pozice 3</text>
+	</string>
+	<string id="kb_quick_use_4">
+		<text>Rychlб pozice 4</text>
+	</string>
+</string_table>

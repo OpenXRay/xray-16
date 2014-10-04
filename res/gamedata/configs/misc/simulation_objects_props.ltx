@@ -1,0 +1,1464 @@
+[default]
+base 		= 0
+resource 	= 0 ; артефакты
+surge		= 0 ; укрытие
+lair		= 0 ; логово монстров
+territory	= 0
+actor		= 0
+squad 		= 0
+
+[default_resource]:default
+resource 	= 2
+territory	= 1
+
+[default_base]:default
+base 		= 2
+territory	= 0
+
+[default_lair]:default
+lair		= 2
+territory	= 1
+
+[default_squad]:default
+squad 		= 2
+
+[default_territory]:default
+territory 	= 1
+
+[actor]:default
+actor		= 2
+sim_avail = {-pri_a28_actor_in_zone_stay =actor_on_level(pripyat)} false, true
+
+;test
+[sim_smart_1]:default_resource
+sim_avail = true
+
+[sim_smart_2]:default_resource
+sim_avail = true
+
+[sim_smart_3]:default_resource
+sim_avail = true
+
+[sim_smart_4]:default_resource
+sim_avail = true
+
+[sim_smart_5]:default_lair
+sim_avail = true
+
+[sim_smart_6]:default_lair
+sim_avail = true
+
+[sim_smart_7]:default_lair
+sim_avail = true
+
+[sim_smart_8]:default_resource
+sim_avail = true
+
+[sim_smart_9]:default_base
+sim_avail = true
+
+[sim_smart_base]:default_base
+sim_avail = true
+
+;Zaton
+;base
+[zat_stalker_base_smart]:default_base
+surge = 1
+sim_avail = true
+
+;no sim
+[zat_medic_home_smart]:default
+sim_avail = false
+
+[zat_b7_stalker_raider]:default
+sim_avail = false
+
+;technical, but with sim available, surge too
+[zat_b33]:default_lair
+sim_avail =  false
+
+[zat_a23_smart_terrain]:default
+sim_avail = false
+
+;surge
+[zat_b7]:default
+surge = 1
+sim_avail = {+zat_b7_task_end} true, false
+
+[zat_b40_smart_terrain]:default
+surge = 1
+sim_avail = {+zat_b40_actor_has_notebook} true, false 
+
+[zat_b28]:default_lair
+surge = 1
+sim_avail = false
+
+;!!!
+[zat_b42_smart_terrain]:default
+surge = 1
+territory 	= 1
+sim_avail = {+zat_b42_controller_dead} true, false 
+
+[zat_b18]:default
+surge = 1
+sim_avail = {+zat_b18_noah_dead} true, false
+
+[zat_b101]:default_resource
+surge = 1
+territory 	= 1
+sim_avail = true
+
+[zat_b38u]:default
+sim_avail = false
+
+[zat_b38]:default
+surge = 1
+sim_avail = {+zat_b57_bloodsucker_lair_clear} true, false
+
+;regular smarts
+[zat_b5_smart_terrain]:default
+surge = 1
+sim_avail = {+zat_b5_task_start +zat_b5_task_end} true, {-zat_b5_task_start -zat_b5_task_end} true, false 
+
+[zat_b106_smart_terrain]:default_lair
+sim_avail = {+zat_b106_chimera_dead} true, {-zat_b106_gonta_accept_actor} true, false
+
+[zat_b52]:default
+territory 	= 1
+sim_avail = {+zat_b52_actor_go_offline} true, {-zat_b52_port_bandits_spawn} true, false
+
+[zat_b103_merc_smart]:default
+surge		= 1
+sim_avail = {+zat_b103_lost_merc_leader_bunker_guards_work} true, {+zat_b103_merc_fight} true, {+zat_b103_merc_gone} true, false
+
+[zat_b104_zombied]:default_lair
+sim_avail = {+zat_b104_task_end} true, false
+
+[zat_b14_smart_terrain]:default_resource
+sim_avail = {+zat_b14_smart_terrain_open} true, false
+
+[zat_b20_smart_terrain]:default_resource
+territory 	= 1
+sim_avail = {+zat_b20_plateau_way_done} true, {-zat_b20_plateau_way_started} true, false
+
+[zat_b53]:default_resource
+territory 	= 1
+sim_avail = {+zat_b53_thanks_dialog} true, false 
+
+[zat_b12]:default_lair
+sim_avail = true
+
+[zat_b54]:default_resource
+territory 	= 1
+sim_avail = true
+
+[zat_b55]:default_resource
+territory 	= 1
+sim_avail = true
+
+[zat_b100]:default_resource
+surge		= 1
+sim_avail = {+zat_b100_heli_2_searched} true, false
+
+[zat_b39]:default_resource
+territory 	= 1
+lair		= 1
+sim_avail = {+zat_b39_tech_buddies_joker_found} true, false
+
+[zat_b56]:default_resource
+sim_avail = true
+
+[zat_a1]:default
+territory 	= 1
+sim_avail = {+zat_a1_simulation_start} true, false
+
+;---------	SIMULATION	--------
+
+[zat_sim_1]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_2]:default
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_3]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_4]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_5]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_6]:default
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_7]:default_lair
+territory 	= 1
+sim_avail =  {+zat_b38_disappearance_stalkers_find_to_be_missing_hunter_give -zat_b38_cop_passed_away} false, true
+
+[zat_sim_8]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_9]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_10]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_11]:default
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_12]:default
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_13]:default
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_14]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_15]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_16]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_17]:default_lair
+territory 	= 1
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_18]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_19]:default
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_20]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_21]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_22]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_23]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_24]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_25]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_26]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_27]:default
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_28]:default
+sim_avail =  true
+
+[zat_sim_29]:default
+sim_avail =  true
+
+[zat_sim_30]:default
+sim_avail =  true
+
+;---------	ZATON UNIQUE SQUADS	--------
+[zat_b38_bloodsucker_simulation]:default_squad
+sim_avail = false
+
+[zat_b38_bloodsucker_1_lair]:default_squad
+sim_avail = false
+
+[zat_b38_bloodsucker_2_lair]:default_squad
+sim_avail = false
+
+[zat_b38_bloodsuckers_sleepers]:default_squad
+sim_avail = false
+
+[zat_b38_default_bloodsucker]:default_squad
+sim_avail = false
+
+[zat_b38_stalker_cop_squad]:default_squad
+sim_avail = false
+
+[zat_b14_stalkers]:default_squad
+sim_avail = false
+
+[zat_b57_bloodsuckers]:default_squad
+sim_avail = false
+
+[zat_b52_port_bandits]:default_squad
+sim_avail = {+zat_b52_actor_go_offline} true, false
+
+[zat_a2_stalker_nimble_squad]:default_squad
+sim_avail = false
+
+[zat_b30_owl_stalker_trader_squad]:default_squad
+sim_avail = false
+
+[zat_b7_bandit_boss_sultan_squad]:default_squad
+sim_avail = false
+
+[zat_a2_stalker_mechanic_squad]:default_squad
+sim_avail = false
+
+[zat_b22_barmen]:default_squad
+sim_avail = false
+
+[zat_b22_medic]:default_squad
+sim_avail = false
+
+[zat_b103_lost_merc_squad1]:default_squad
+sim_avail = false
+
+[zat_b7_stalkers_raiders]:default_squad
+sim_avail = false
+
+[zat_b7_stalkers_victims_1]:default_squad
+sim_avail = false
+
+[zat_b104_zombied_1]:default_squad
+sim_avail = {+zat_b104_task_end} true, false
+
+[zat_b104_zombied_2]:default_squad
+sim_avail = {+zat_b104_task_end} true, false
+
+[zat_b104_zombied_3]:default_squad
+sim_avail = {+zat_b104_task_end} true, false
+
+[zat_b5_stalkers_squad]:default_squad
+sim_avail =  false ;{+zat_b5_task_end} true,
+
+
+[zat_b7_stalkers_base_squad]:default_squad
+sim_avail = false
+
+;[zat_b5_dolg_squad]:default_squad
+;sim_avail = {+zat_b5_task_end} true, false
+
+
+[zat_b5_bandit_squad]:default_squad
+sim_avail = false ; {+zat_b5_task_end} true,
+
+[zat_b56_polter_squad]:default_squad
+sim_avail = false
+
+[zat_b33_snork_first_wave]:default_squad
+sim_avail = {+zat_b33_snork_jump_05} true, false
+
+[zat_b33_snork_second_wave]:default_squad
+sim_avail = {+zat_b33_snork_jump_05} true, false
+
+[zat_b33_stalker_snag_squad]:default_squad
+sim_avail = false
+
+[zat_b29_stalker_rival_1_squad]:default_squad
+sim_avail = {+zat_b30_task_end} true, false
+
+[zat_b29_stalker_rival_2_squad]:default_squad
+sim_avail = {+zat_b30_task_end} true, false
+
+[zat_b29_stalker_rival_default_1_squad]:default_squad
+sim_avail = {+zat_b30_task_end} true, false
+
+[zat_b29_stalker_rival_default_2_squad]:default_squad
+sim_avail = {+zat_b30_task_end} true, false
+
+[zat_b18_noah_squad]:default_squad
+sim_avail = false
+
+[zat_b18_dog_noah_squad]:default_squad
+sim_avail = false
+
+[zat_b215_stalker_guide_zaton_squad]:default_squad
+sim_avail = false
+
+[zat_b28_snork_squad]:default_squad
+sim_avail = {+zat_b28_heli_3_searched} true, false
+
+[zat_b42_controller_squad]:default_squad
+sim_avail = false
+
+[zat_b40_merc_squad]:default_squad
+sim_avail = {+zat_b40_actor_has_notebook} true, false
+
+[zat_b20_noah_teleport_squad]:default_squad
+sim_avail = false
+
+[zat_b20_actor_squad]:default_squad
+sim_avail = false
+
+[zat_b39_dogs_squad]:default_squad
+sim_avail = false
+
+[zat_b53_artefact_hunter_1_squad]:default_squad
+sim_avail = {+zat_b53_go_nil} true, false
+
+[zat_a23_zombie_squad]:default_squad
+sim_avail = false
+
+[zat_a23_giant_squad]:default_squad
+sim_avail = false
+
+[zat_b106_stalker_gonta_squad]:default_squad
+sim_avail = false
+
+[zat_b106_stalker_crab_squad]:default_squad
+sim_avail = false
+
+;[zat_b106_stalker_garmata_squad]:default_squad
+;sim_avail = false
+
+[zat_b106_chimera_squad]:default_squad
+sim_avail = false
+
+[zat_b100_poltergeist_squad_01]:default_squad
+sim_avail = {+zat_b100_heli_2_searched} true, false
+
+[zat_simulation_test]:default_squad
+sim_avail = false
+
+;---------	JUPITER UNIQUE SQUADS	--------
+[jup_b208_burers_squad]:default_squad
+sim_avail = false 
+
+[jup_b212_jupiter_chimera_lair]:default_squad
+sim_avail = false
+
+[jup_a10_bandit_squad]:default_squad
+sim_avail = {+jup_a10_vano_give_task_end} true, {+jup_a10_fals} true, false
+
+[jup_a10_bandit_squad_1]:default_squad
+sim_avail = {+jup_a10_vano_give_task_end} true, {+jup_a10_fals} true, false
+
+[jup_a10_bandit_squad_2]:default_squad
+sim_avail = {+jup_a10_vano_give_task_end} true, {+jup_a10_fals} true, false
+
+[jup_a10_bandit_squad_3]:default_squad
+sim_avail = {+jup_a10_vano_give_task_end} true, {+jup_a10_fals} true, false
+
+[jup_b200_tushkano_squad]:default_squad
+sim_avail = false
+
+[jup_b25_alex_squad]:default_squad
+sim_avail = false
+
+[jup_b200_stalker_squad]:default_squad
+sim_avail = {+jup_b200_tech_materials_brought_some} true, {+jup_b200_tech_materials_brought_all} true, false
+
+[jup_b4_squad]:default_squad
+sim_avail = {+jup_b4_monolith_squad_out} true, false
+
+[jup_b4_squad_duty]:default_squad
+sim_avail = false
+
+[jup_b4_squad_duty_leader]:default_squad
+sim_avail = false
+
+[jup_b4_squad_freedom]:default_squad
+sim_avail = false
+
+[jup_b4_squad_freedom_leader]:default_squad
+sim_avail = false
+
+
+[jup_b4_duty_squad]:default_squad
+sim_avail = false
+
+[jup_b4_freedom_squad]:default_squad
+sim_avail = false
+
+[jup_b8_psy_dog_squad]:default_squad
+sim_avail = false
+
+[jup_b209_squad_snork]:default_squad
+sim_avail = false
+
+[jup_b209_squad_snork_1]:default_squad
+sim_avail = false
+
+[jup_b209_squad_snork_2]:default_squad
+sim_avail = false
+
+[jup_a12_bandit_chief_squad]:default_squad
+sim_avail = {+jup_a12_task_done} true, false
+
+[jup_a12_bandit_cashier_squad]:default_squad
+sim_avail = {+jup_a12_task_done} true, false
+
+[jup_a12_bandit_guard_squad]:default_squad
+sim_avail = {+jup_a12_task_done} true, false
+
+[jup_a12_bandit_sim_squad]:default_squad
+sim_avail = {+jup_a12_task_done} true, false
+
+[jup_a12_prisoner]:default_squad
+sim_avail = false
+
+[jup_a12_stalker_squad]:default_squad
+sim_avail = false
+
+[jup_a12_merc_stalker_squad]:default_squad
+sim_avail = {-jup_a12_task_done} true, false
+
+[jup_b25_freedom_flint_squad]:default_squad
+sim_avail = false
+
+[jup_b25_stalker_senya_squad]:default_squad
+sim_avail = false
+
+[jup_b1_stalker_squad]:default_squad
+sim_avail = false
+
+[jup_b1_zombie]:default_squad
+sim_avail = {+jup_b1_complete_end} true, false
+
+[jup_b1_tushkano_squad]:default_squad
+sim_avail = {+jup_b1_complete_end} true, false
+
+[jup_b1_controller_squad]:default_squad
+sim_avail = {+jup_b1_complete_end} true, false
+
+[jup_b1_simulation_controller]:default_squad
+sim_avail = {+jup_b1_complete_end} true, false
+
+[jup_b6_scientist_group]:default_squad
+sim_avail = false
+
+[jup_b6_flesh_horde]:default_squad
+sim_avail = {+jup_b6_complete_end} true, false
+
+[jup_b6_boar_horde]:default_squad
+sim_avail = {+jup_b6_complete_end} true, false
+
+[jup_b6_flesh_horde_2]:default_squad
+sim_avail =  {+jup_b6_complete_end} true, false
+
+[jup_b6_boar_horde_2]:default_squad
+sim_avail = {+jup_b6_complete_end} true, false
+
+[jup_b6_swamp_hunters]:default_squad
+sim_avail = false
+
+[jup_b6_zombie_squad_1]:default_squad
+sim_avail = {+jup_b19_complete} true, {+jup_b19_yar_enemy_or_dead} true, false
+
+[jup_b6_zombie_squad_2]:default_squad
+sim_avail = {+jup_b19_complete} true, {+jup_b19_yar_enemy_or_dead} true, false
+
+[jup_b6_zombie_squad_3]:default_squad
+sim_avail = {+jup_b19_complete} true, {+jup_b19_yar_enemy_or_dead} true, false
+
+[jup_b6_zombie_squad_4]:default_squad
+sim_avail = {+jup_b19_complete} true, {+jup_b19_yar_enemy_or_dead} true, false
+
+[jup_b6_zombie_squad_5]:default_squad
+sim_avail = {+jup_b19_complete} true, {+jup_b19_yar_enemy_or_dead} true, false
+ 
+[jup_b43_stalker_assistant_squad_sq]:default_squad
+sim_avail = false 
+
+[jup_b202_stalker_snag_squad]:default_squad
+sim_avail = false
+
+[jup_a6_stalker_medik_squad]:default_squad
+sim_avail = false
+
+[jup_b15_zulus_squad]:default_squad
+sim_avail = false
+
+[jup_a6_stalker_barmen_squad]:default_squad
+sim_avail = false
+
+;[jup_b202_snag_wounded]:default_squad
+;sim_avail = false 
+
+[jup_b202_bandit_squad]:default_squad
+sim_avail = {+jup_b202_bandit_go_away} true, false
+
+
+[jup_b19_freedom_yar_squad]:default_squad
+sim_avail = false 
+
+[jup_b19_kopatci_zombied_squad]:default_squad
+sim_avail = {+jup_b19_complete} true, {+jup_b19_yar_enemy_or_dead} true, false
+
+[jup_b19_merc_squad]:default_squad
+sim_avail = {+jup_b19_complete} true, {+jup_b19_yar_enemy_or_dead} true, false
+
+[zat_b215_stalker_guide_jupiter_squad]:default_squad
+sim_avail = false
+
+[jup_a6_freedom_leader_squad]:default_squad
+sim_avail = false
+
+[jup_a6_duty_leader_squad]:default_squad
+sim_avail = false
+
+[jup_b207_zat_b7_duty_illicit_dealer]:default_squad
+sim_avail = false
+
+[jup_b207_zat_b7_duty_illicit_dealer_depot]:default_squad
+sim_avail = false
+
+[jup_b207_depot_mercs]:default_squad
+sim_avail = false
+
+[jup_b207_merc_1]:default_squad
+sim_avail = true
+
+[jup_b207_merc_2]:default_squad
+sim_avail = true
+
+[jup_b207_duty_base]:default_squad
+sim_avail = false
+
+[jup_b207_freedom_base]:default_squad
+sim_avail = false
+
+[jup_b207_freedom_depot]:default_squad
+sim_avail = false
+
+[jup_b218_sokolov]:default_squad
+sim_avail = false
+
+[jup_b218_sokolov_sci]:default_squad
+sim_avail = false
+
+[jup_b203_zombied_squad]:default_squad
+sim_avail = false
+
+[jup_b203_tushkano]:default_squad
+sim_avail = false
+
+[jup_b204_squad]:default_squad
+sim_avail = false
+
+[jup_b10_stalker_drunk_squad]:default_squad
+sim_avail = false
+
+[jup_b205_zombie_01_squad]:default_squad
+sim_avail = false
+
+[jup_b205_zombie_02_squad]:default_squad
+sim_avail = false
+
+[jup_b205_monster_01_squad]:default_squad
+sim_avail = false
+
+[jup_b205_monster_02_squad]:default_squad
+sim_avail = false
+
+[jup_b205_monster_03_squad]:default_squad
+sim_avail = false
+
+[jup_b205_monster_04_squad]:default_squad
+sim_avail = false
+
+[jup_b47_merc_guard_squad]:default_squad
+sim_avail = false
+
+[jup_b47_bunker_guard_freedom]:default_squad
+sim_avail = false
+
+[jup_b47_bunker_guard_duty]:default_squad
+sim_avail = false
+
+[jup_b47_bunker_guard_lost_merc]:default_squad
+sim_avail = false
+
+[jup_b47_bunker_guard_stalker_leader]:default_squad
+sim_avail = false
+
+[jup_b219_squad]:default_squad
+sim_avail = false
+
+[jup_b219_stalker_tech_squad]:default_squad
+sim_avail = false
+
+[jup_b221_duty_squad]:default_squad
+sim_avail = false 
+
+[jup_b221_freedom_squad]:default_squad
+sim_avail = false
+
+[jup_a9_dogs_normal]:default_squad
+sim_avail = false
+
+;---------	PRIPYAT UNIQUE SQUADS	----------------------------------------------
+;---------------------------------------------------------------------------------
+[pri_b301_snorks_squad]:default_squad
+sim_avail = false
+
+[pri_b301_zulus_squad]:default_squad
+sim_avail = false
+
+[pri_a17_military_colonel_kovalski_squad]:default_squad
+sim_avail = false
+
+[pri_a20_missing_military_recon_leader]:default_squad
+sim_avail = false
+
+[pri_a20_missing_military_recon_1]:default_squad
+sim_avail = false
+
+[pri_a20_missing_military_recon_2]:default_squad
+sim_avail = false
+
+[pri_a20_missing_military_recon_3]:default_squad
+sim_avail = false
+
+[pri_a17_recon_squad]:default_squad
+sim_avail = false
+
+[pri_a17_mon_patrol]:default_squad
+sim_avail = false
+
+[pri_a17_mon_preacher]:default_squad
+sim_avail = false
+
+[pri_a17_mon_ambush_1]:default_squad
+sim_avail = false
+
+[pri_a17_mon_ambush_2]:default_squad
+sim_avail = false
+
+[pri_a17_mon_ambush_3]:default_squad
+sim_avail = false
+
+[pri_a17_mon_ambush_4]:default_squad
+sim_avail = false
+
+[pri_a17_mon_ambush_5]:default_squad
+sim_avail = false
+;-------------------------------------
+
+[pri_a18_monolith_idol_squad]:default_squad
+sim_avail = false
+
+[pri_a18_monolith_post_guard_squad]:default_squad
+sim_avail = false
+
+[pri_a18_monolith_corridor_squad]:default_squad
+sim_avail = false
+
+[pri_a18_monolith_2nd_floor_squad]:default_squad
+sim_avail = false
+
+[pri_a18_vano_sokolov]:default_squad
+sim_avail = false
+
+[pri_a18_vano_skorlupko]:default_squad
+sim_avail = false
+
+[pri_a18_sokolov_vano_reserve]:default_squad
+sim_avail = false
+
+[pri_a18_vano_reserve_skorlupko]:default_squad
+sim_avail = false
+
+[pri_a21_chasovoi]:default_squad
+sim_avail = false
+
+[pri_a25_base_army_medic]:default_squad
+sim_avail = false
+
+[pri_a22_military_yarmoshuk_squad]:default_squad
+sim_avail = false
+
+[pri_a22_military_skelja_squad]:default_squad
+sim_avail = false
+
+[pri_a22_military_merkulov_squad]:default_squad
+sim_avail = false
+
+[pri_a25_poltergeist_1_squad]:default_squad
+sim_avail = false
+
+[pri_a25_poltergeist_2_squad]:default_squad
+sim_avail = false
+
+[pri_b304_dogs]:default_squad
+sim_avail = false
+
+[pri_b304_tushkano_1]:default_squad
+sim_avail = false
+
+[pri_b304_tushkano_2]:default_squad
+sim_avail = false
+
+[pri_b304_tushkano_3]:default_squad
+sim_avail = false
+
+[pri_b304_tushkano_4]:default_squad
+sim_avail = false
+
+[pri_b304_tushkano_5]:default_squad
+sim_avail = false
+
+[pri_b304_tushkano_6]:default_squad
+sim_avail = false
+
+[pri_b304_tushkano_7]:default_squad
+sim_avail = false
+
+[pri_b304_tushkano_8]:default_squad
+sim_avail = false
+
+[pri_b306_4_floor_monolith]:default_squad
+sim_avail = false
+
+[pri_b306_4_floor_monolith_2]:default_squad
+sim_avail = false
+
+[pri_b306_3_floor_monolith]:default_squad
+sim_avail = false
+
+[pri_b306_3_floor_zombied]:default_squad
+sim_avail = false
+
+[pri_b306_2_floor_monolith]:default_squad
+sim_avail = false
+
+[pri_b306_2_floor_zombied]:default_squad
+sim_avail = false
+
+[pri_b306_1_floor_zombied]:default_squad
+sim_avail = false
+
+[pri_b306_1_floor_zombied_2]:default_squad
+sim_avail = false
+
+[pri_a15_squad]:default_squad
+sim_avail = false
+
+[pri_a15_military_squad]:default_squad
+sim_avail = false
+
+[pri_b35_jup_b43_stalker_assistant_squad]:default_squad
+sim_avail = false
+
+[pri_b35_military_squad]:default_squad
+sim_avail = false
+
+[pri_b35_mercs_squad]:default_squad
+sim_avail = false
+
+[pri_b35_envoy_squad]:default_squad
+sim_avail = false
+
+[pri_b36_monolith_sniper_squad]:default_squad
+sim_avail = false
+
+[pri_b36_monolith_master_hiding_place_squad]:default_squad
+sim_avail = false
+
+[pri_b36_zombied_squad]:default_squad
+sim_avail = false
+
+[pri_b36_monolith_guard_squad]:default_squad
+sim_avail = false
+
+[pri_b36_monolith_marine_squad]:default_squad
+sim_avail = false
+
+[pri_b305_dogs_squad]:default_squad
+sim_avail = false
+
+[pri_a16_military_squad]:default_squad
+sim_avail = false
+
+[pri_a16_military_squad_strong]:default_squad
+sim_avail = false
+
+[pri_a28_base_zombied]:default_squad
+sim_avail = true
+
+[pri_a28_base_zombied_2]:default_squad
+sim_avail = true
+
+[pri_a28_shop_zombied]:default_squad
+sim_avail = true
+
+[pri_a28_shop_zombied_2]:default_squad
+sim_avail = true
+
+[pri_a28_shop_zombied_3]:default_squad
+sim_avail = true
+
+[pri_a28_arch_zombied]:default_squad
+sim_avail = true
+
+[pri_a28_medic]:default_squad
+sim_avail = false
+
+[pri_a28_technician_signaller]:default_squad
+sim_avail = false
+
+[pri_a28_military_sokolov]:default_squad
+sim_avail = false
+
+[pri_a28_strelok]:default_squad
+sim_avail = false
+
+[pri_a28_school_snorks_1]:default_squad
+sim_avail = true
+
+[pri_a28_school_snorks_2]:default_squad
+sim_avail = true
+
+[pri_a28_evac_squad]:default_squad
+sim_avail = false
+
+[pri_a28_heli_mono_default]:default_squad
+sim_avail = false
+
+[pri_a28_heli_mono_snipers]:default_squad
+sim_avail = false
+
+[pri_a28_heli_mono_add_1]:default_squad
+sim_avail = false
+
+[pri_a28_heli_mono_add_2]:default_squad
+sim_avail = false
+
+[pri_a28_heli_mono_add_2_final]:default_squad
+sim_avail = false
+
+[pri_a28_heli_mono_add_3]:default_squad
+sim_avail = false
+
+[pri_b303_burer_squad]:default_squad
+sim_avail = {+pri_b303_door_is_open} true, false
+
+[pri_b306_mercs_squad_light]:default_squad
+sim_avail = false
+
+[pri_b306_mercs_squad_strong]:default_squad
+sim_avail = false
+
+;---------------------------------------------------------------------------------
+;------------------------------- Simulation SQUADS -------------------------------
+[simulation_stalker]:default_squad
+sim_avail = true
+
+[simulation_stalker_1]:default_squad
+sim_avail = true
+
+[simulation_stalker_2]:default_squad
+sim_avail = true
+
+[simulation_stalker_3]:default_squad
+sim_avail = true
+
+[simulation_bandit]:default_squad
+sim_avail = true
+
+[simulation_bloodsucker]:default_squad
+sim_avail = true
+
+[simulation_boar]:default_squad
+sim_avail = true
+
+[simulation_boar_test]:default_squad
+sim_avail = true
+
+[simulation_burer]:default_squad
+sim_avail = true
+
+[simulation_dog]:default_squad
+sim_avail = true
+
+[simulation_pseudodog]:default_squad
+sim_avail = true
+
+[simulation_flesh]:default_squad
+sim_avail = true
+
+[simulation_snork]:default_squad
+sim_avail = true
+
+[simulation_dog_for_a1]:default_squad
+sim_avail = true
+
+[simulation_mix_dogs]:default_squad
+sim_avail = true
+
+[simulation_mix_boar_flesh]:default_squad
+sim_avail = true
+
+[simulation_monolith_squad]:default_squad
+sim_avail = true
+
+[simulation_poltergeist_tele]:default_squad
+sim_avail = true
+
+[simulation_killer]:default_squad
+sim_avail = true
+
+[simulation_duty]:default_squad
+sim_avail = true
+
+[simulation_freedom]:default_squad
+sim_avail = true
+
+[simulation_chimera]:default_squad
+sim_avail = true
+
+[simulation_psy_dog]:default_squad
+sim_avail = true
+
+
+[stalker_sim_squad_novice]:default_squad
+sim_avail = true
+
+[stalker_sim_squad_advanced]:default_squad
+sim_avail = true
+
+[stalker_sim_squad_veteran]:default_squad
+sim_avail = true
+
+[bandit_sim_squad_novice]:default_squad
+sim_avail = true
+
+[bandit_sim_squad_advanced]:default_squad
+sim_avail = true
+
+[bandit_sim_squad_veteran]:default_squad
+sim_avail = true
+
+[merc_sim_squad_novice]:default_squad
+sim_avail = true
+
+[merc_sim_squad_advanced]:default_squad
+sim_avail = true
+
+[merc_sim_squad_veteran]:default_squad
+sim_avail = true
+
+[duty_sim_squad_novice]:default_squad
+sim_avail = true
+
+[duty_sim_squad_advanced]:default_squad
+sim_avail = true
+
+[duty_sim_squad_veteran]:default_squad
+sim_avail = true
+
+[freedom_sim_squad_novice]:default_squad
+sim_avail = true
+
+[freedom_sim_squad_advanced]:default_squad
+sim_avail = true
+
+[freedom_sim_squad_veteran]:default_squad
+sim_avail = true
+
+[monolith_sim_squad_novice]:default_squad
+sim_avail = true
+
+[monolith_sim_squad_advanced]:default_squad
+sim_avail = true
+
+[monolith_sim_squad_veteran]:default_squad
+sim_avail = true
+
+[zombied_sim_squad_novice]:default_squad
+sim_avail = true
+
+[zombied_sim_squad_advanced]:default_squad
+sim_avail = true
+
+[zombied_sim_squad_veteran]:default_squad
+sim_avail = true
+
+;--------------------------------------------------------------------------------
+
+;Jupiter
+[jup_a10_smart_terrain]:default_base
+sim_avail = {+jup_a10_vano_give_task_end} true, {+jup_a10_fals} true, false
+surge		= 1
+
+[jup_a12]:default
+sim_avail = {+jup_a12_task_done} true, false
+surge		= 1
+
+[jup_a6]:default_base
+sim_avail = true
+surge 		= 1
+
+[jup_b1]:default
+sim_avail = {+jup_b1_complete_end} true, false
+surge		= 1
+
+[jup_b19]:default
+sim_avail = {-jup_b19_agreed_to_go} true, {+jup_b19_complete} true, {+jup_b19_yar_enemy_or_dead} true, false
+
+[jup_b200]:default_base
+;sim_avail = {+jup_b200_tech_materials_brought_some} true, {+jup_b200_tech_materials_brought_all} true, false
+sim_avail = true
+surge		= 1
+territory 	= 1
+
+[jup_b202]:default
+sim_avail =	{-jup_b52_actor_items_can_be_stolen} true, {+jup_b202_actor_items_returned} true, false
+
+[jup_b203]:default
+sim_avail = {+jup_b16_oasis_artifact_spawn} true, false
+surge		= 1
+
+[jup_b204]:default
+sim_avail = {+jup_b204_wachman_dead} true, false
+
+[jup_b205_smart_terrain]:default_lair
+sim_avail = {+jup_b205_evacuation_visited} true, false
+surge		= 1
+
+[jup_b206]:default_resource
+sim_avail = {+jup_b206_anomalous_grove_done} true, false
+
+[jup_b207]:default
+sim_avail = {-jup_b207_morgan_gived_depot -jup_b207_freedom_knows_about_depot -jup_b207_duty_knows_about_depot} false, true
+;surge		= 1
+
+[jup_b208]:default
+sim_avail = {+jup_b208_burers_hunt_done} true,  false
+surge		= 1
+
+[jup_b209]:default_resource
+sim_avail = {+jup_b209_hypotheses_end} true, false
+
+[jup_b211]:default_resource
+sim_avail = {+jup_b211_scene_done} true,  false
+
+[jup_b212]:default
+sim_avail = {+jup_b212_jupiter_chimera_hunt_done} true,  false
+
+[jup_b25]:default_resource
+sim_avail = {+jup_b25_senya_dead} true, false
+
+[jup_b32]:default_resource
+;всегда в симул€ции
+sim_avail = true
+
+[jup_b4]:default
+sim_avail = {+jup_b4_task_end} true, false
+
+[jup_b41]:default_base
+sim_avail = false
+surge		= 1
+
+[jup_b46]:default
+sim_avail = true
+
+[jup_b47]:default
+sim_avail = {+jup_b47_products_info_complite} true, {+jup_b47_all_merc_dead} true, false
+
+[jup_b6_anom_2]:default_resource
+sim_avail = {-jup_b6_give_task} true, {+jup_b6_task_fail} true, {+jup_b6_anom_2_count_end} true, false
+
+;technical
+
+[jup_b200_tushkan_smart_terrain]:default_lair
+sim_avail = true
+
+[jup_b207_depot_attack]:default
+sim_avail = false
+
+[jup_b219]:default
+sim_avail = false
+
+[jup_b8_smart_terrain]:default
+sim_avail = false
+
+[jup_b205_smart_terrain_tushkano]:default
+sim_avail = false
+
+[jup_a12_merc]:default
+sim_avail = false
+
+[jup_a9]:default_lair
+sim_avail =  false
+
+;---------	SIMULATION	--------
+
+[jup_sim_1]:default_lair
+sim_avail =  true
+
+[jup_sim_2]:default_lair
+sim_avail =  true
+
+[jup_sim_3]:default_lair
+sim_avail =  true
+
+[jup_sim_4]:default_lair
+sim_avail =  true
+
+[jup_sim_5]:default_lair
+sim_avail =  true
+
+[jup_sim_6]:default
+sim_avail =  true
+
+[jup_sim_7]:default_lair
+sim_avail =  true
+
+[jup_sim_8]:default_lair
+sim_avail =  true
+
+[jup_sim_9]:default_lair
+sim_avail =  true
+
+[jup_sim_10]:default_lair
+sim_avail =  true
+
+[jup_sim_11]:default_lair
+sim_avail =  true
+
+[jup_sim_12]:default_lair
+sim_avail =  {+jup_b9_heli_1_searched}true, false
+
+[jup_sim_13]:default_lair
+sim_avail =  true
+
+[jup_sim_14]:default_lair
+sim_avail =  true
+
+[jup_sim_15]:default_lair
+sim_avail =  true
+
+[jup_sim_16]:default_lair
+sim_avail =  true
+
+[jup_sim_17]:default_lair
+sim_avail =  true
+resource 	= 2
+
+[jup_sim_18]:default_lair
+sim_avail =  true
+
+[jup_sim_19]:default_lair
+sim_avail =  false
+
+[jup_sim_20]:default_lair
+sim_avail =  true
+
+[jup_sim_21]:default_lair
+sim_avail =  true
+; ---------------------------  Pripyat  ------------------------------------
+; --------------------------------------------------------------------------
+
+[pri_a15]:default
+sim_avail = {+pri_a15_cutscene_end} true, false
+
+[pri_a16]:default_base
+sim_avail = {+pri_a28_actor_in_zone_stay} true, false
+
+[pri_a17]:default
+sim_avail = {+pri_a17_actor_has_gauss_rifle} true, false
+
+[pri_a18_smart_terrain]:default
+sim_avail = {+pri_a18_reinf_go_base} true, false
+surge = 1
+
+[pri_a21_smart_terrain]:default
+sim_avail = {-pri_a21_sentry_task_done +zat_a23_actor_has_gauss_rifle_documentation +pri_a20_talk_with_colonel_complete} false, true
+surge = 1
+
+[pri_a22_smart_terrain]:default
+sim_avail = {+pri_a22_scene_done} true, {-pri_a22_scene_done +pri_a18_found_antenna +pri_a21_sentry_task_done +pri_a19_lab_x8_investigated} false, true
+
+[pri_a25_smart_terrain]:default
+sim_avail = {+pri_a25_rfi_source_eliminated} true, false
+
+[pri_b301]:default_resource
+sim_avail = {+pri_b301_zulus_dead} true, {+pri_b301_save_zulus_complete} true, false
+surge = 1
+
+[pri_b302]:default_resource
+sim_avail = true
+
+[pri_b303]:default_resource
+sim_avail = {+pri_b303_door_is_open} true, false
+surge = 1
+
+[pri_b304]:default
+sim_avail = {+pri_b304_actor_take_toolkit} true, false
+surge = 1
+
+[pri_b306]:default_resource
+sim_avail = {+pri_b306_task_end} true, false
+surge = 1
+
+[pri_b307]:default_resource
+sim_avail = true
+
+[pri_b35_mercs]:default
+sim_avail = {-pri_b35_task_end +pri_b35_task_running} false, true
+surge = 1
+
+[pri_b36_smart_terrain]:default
+sim_avail = {+pri_b36_master_dead} true, false
+surge = 1
+
+[pri_sim_1]:default_lair
+sim_avail = true
+surge = 1
+
+[pri_sim_2]:default_lair
+sim_avail = true
+
+[pri_sim_3]:default_lair
+sim_avail = true
+
+[pri_sim_4]:default_lair
+sim_avail = true
+
+[pri_sim_5]:default_lair
+sim_avail = true
+
+[pri_sim_6]:default_lair
+sim_avail = true
+
+[pri_sim_7]:default_lair
+sim_avail = true
+
+[pri_sim_8]:default_lair
+sim_avail = true
+
+[pri_sim_9]:default_lair
+sim_avail = true
+
+[pri_sim_10]:default_lair
+sim_avail = true
+
+[pri_sim_11]:default_lair
+sim_avail = true
+
+[pri_sim_12]:default_lair
+sim_avail = true
+
+[pri_b35_military]:default
+sim_avail = {-pri_b35_task_end +pri_b35_task_running} false, true
+surge = 1
+
+[pri_b305_dogs]:default
+sim_avail = false
+
+[pri_b304_monsters_smart_terrain]:default
+sim_avail = {+zat_b103_toolkit_2_second} true, false
+
+[pri_a20]:default
+sim_avail = false
+
+[pri_a28_heli]:default
+sim_avail = false
+
+[pri_a28_base]:default
+sim_avail = false
+
+[pri_a28_shop]:default
+sim_avail = false
+
+[pri_a28_arch]:default
+sim_avail = false
+
+[pri_a28_school]:default
+sim_avail = false
+
+[pri_a28_evac]:default
+sim_avail = false
+
+;underpass
+[lx8_smart_terrain]:default
+sim_avail = false
+
+[pas_b400_elevator]:default
+sim_avail = false
+
+[pas_b400_track]:default
+sim_avail = false
+
+[pas_b400_downstairs]:default
+sim_avail = false
+
+[pas_b400_tunnel]:default
+sim_avail = false
+
+[pas_b400_hall]:default
+sim_avail = false
+
+[pas_b400_way]:default
+sim_avail = false
+
+[pas_b400_canalisation]:default
+sim_avail = false
+
+[pas_b400_fake]:default
+sim_avail = false
+
+[pas_b400_stalkers_squad]:default_squad
+sim_avail = false
+
+[pas_b400_stalkers_squad_strong]:default_squad
+sim_avail = false
+
+[pas_b400_hall_monolith_squad]:default_squad
+sim_avail = false
+
+[pas_b400_hall_monolith_2_squad]:default_squad
+sim_avail = false
+
+[pas_b400_hall_monolith_sniper_1]:default_squad
+sim_avail = false
+
+[pas_b400_hall_monolith_sniper_2]:default_squad
+sim_avail = false
+
+[pas_b400_hall_monolith_sniper_3]:default_squad
+sim_avail = false
+
+[pas_b400_hall_monolith_sniper_4]:default_squad
+sim_avail = false
+
+[pas_b400_hall_monolith_after_fwd_squad]:default_squad
+sim_avail = false
+
+[pas_b400_hall_monolith_after_bwd_squad]:default_squad
+sim_avail = false
+
+[pas_b400_canalisation_3_zombied]:default_squad
+sim_avail = false
+
+[pas_b400_canalisation_5_zombied]:default_squad
+sim_avail = false

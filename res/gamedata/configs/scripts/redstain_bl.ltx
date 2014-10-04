@@ -1,0 +1,13 @@
+[logic]
+active = mob_walker
+
+[mob_walker]
+path_walk = way1
+path_look = way2
+combat_ignore_cond = true
+on_sound = actor|MST_step|10000|0| mob_home %+step_heared%
+[mob_home]
+path_home = way1
+aggressive = true
+home_min_radius = 3
+home_max_radius = 80

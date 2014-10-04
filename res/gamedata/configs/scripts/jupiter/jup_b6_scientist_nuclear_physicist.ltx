@@ -1,0 +1,37 @@
+[logic@jup_b6_scientist_nuclear_physicist]
+suitable = {=check_npc_name(jup_b6_scientist_nuclear_physicist)} true
+trade = misc\trade\trade_jup_b6_scientist_nuclear_physicist.ltx
+prior = 200
+active = walker@meet
+level_spot = trader
+
+[walker@meet]
+path_walk = nuc_walk
+path_look  = nuc_look
+def_state_standing = wait_trade
+def_state_moving = walk_noweap
+on_info = {+jup_b1_complete_end -jup_b6_ask !talking} %+jup_b6_ask%
+on_info2 = {!npc_in_zone(jup_b41_sr_light)} %=teleport_npc(jup_b41_nuc_walk)%
+meet = meet@default
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = jup_b41_sr_light
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@default]
+close_snd_hello = jup_b6_scientist_nuclear_physicist_greeting
+close_snd_bye = jup_b6_scientist_nuclear_physicist_farewell
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {!actor_enemy +jup_b1_complete_end +jup_b6_ask -jup_b6_intro_end =dist_to_actor_ge(3)} self, {=actor_enemy} false, true
+allow_break = false
+trade_enable = {=counter_greater(jup_b1_sci_task_controller_count:0)} true, false
+meet_dialog	= {+jup_b1_complete_end +jup_b6_ask -jup_b6_intro_end} jup_b6_scientist_nuclear_physicist_b32_investigation_anomaly

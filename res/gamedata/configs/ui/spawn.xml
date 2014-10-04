@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<window>
+	<team_selector x="144" y="115" width="749" height="543">
+		<background x="0" y="0" width="724" height="526">
+			<texture>ui_inGame2_Mp_screen_main_window</texture>
+		</background>
+		<caption x="200" y="4" width="330" height="32">
+			<text font="letterica18" r="200" g="200" b="200" align="c" vert_align="c">mp_team_selection</text>
+		</caption>
+
+		<image_frames_tl x="33" y="42" width="324" height="234">
+			<texture>ui_inGame2_Mp_screen_map_window</texture>
+		</image_frames_tl>
+		<image_frames_tr x="365" y="42" width="324" height="234">
+			<texture>ui_inGame2_Mp_screen_map_window</texture>
+		</image_frames_tr>
+<!--
+		<image_frames_bottom x="53" y="113" width="664" height="208">
+			<texture>ui_TV_team_bottom</texture>
+		</image_frames_bottom>
+-->
+		<image_0 x="33" y="42" width="324" height="234" stretch="1">
+			<texture>freedom_big</texture>
+			<!--text font="graffiti32" align="r" vert_align="t">1</text-->
+		</image_0>
+		<image_1 x="365" y="42" width="324" height="234" stretch="1">
+			<texture>merc_big</texture>
+			<!--text font="graffiti32" align="r" vert_align="t">2</text-->
+		</image_1>
+
+		<text_desc x="44" y="303" width="657" height="144" complex_mode="1">
+			<text font="letterica18" r="192" g="168" b="144">team_1_name</text>
+			<text font="letterica18" >\n </text>
+			<text font="letterica18" r="106" g="95" b="91">team_1_desc</text>
+			<text font="letterica18">\n </text>
+			<text font="letterica18" r="192" g="168" b="144">team_2_name</text>
+			<text font="letterica18" r="106" g="95" b="91">team_2_desc</text>
+		</text_desc>
+
+		<btn_back x="155" y="482" width="137" height="28" stretch="1">
+			<texture>ui_inGame2_Mp_bigbuttone</texture>
+			<text font="graffiti19" align="c" a="170">mp_back</text>
+			<text_color>
+				<e r="227" g="199" b="178"/>
+				<t r="180" g="153" b="155"/>
+				<d r="106" g="95" b="91"/>
+				<h r="0" g="0" b="0"/>
+			</text_color>
+		</btn_back>
+		<btn_autoselect x="294" y="482" width="137" height="28" stretch="1">
+			<texture>ui_inGame2_Mp_bigbuttone</texture>
+			<text font="graffiti19" align="c" a="170">mp_auto_select</text>
+			<text_color>
+				<e r="227" g="199" b="178"/>
+				<t r="180" g="153" b="155"/>
+				<d r="106" g="95" b="91"/>
+				<h r="0" g="0" b="0"/>
+			</text_color>
+		</btn_autoselect>
+		<btn_spectator x="433" y="482" width="137" height="28" stretch="1">
+			<texture>ui_inGame2_Mp_bigbuttone</texture>
+			<text font="graffiti19" align="c" a="170">mp_spectator</text>
+			<text_color>
+				<e r="227" g="199" b="178"/>
+				<t r="180" g="153" b="155"/>
+				<d r="106" g="95" b="91"/>
+				<h r="0" g="0" b="0"/>
+			</text_color>
+		</btn_spectator>
+	</team_selector>
+</window>

@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="ls_header">
+		<text>100 WSKAZУWEK, JAK PRZETRWAЖ W ZONIE</text>
+	</string>
+	<string id="ls_mp_tip_16">
+		<text>Strzaі w oko przeciwnika skutkuje jego natychmiastow№ њmierci№, niezaleїnie od poziomu jego pancerza.</text>
+	</string>
+	<string id="ls_mp_tip_19">
+		<text>AC-96/2 posiada unikatowy, dwustrzaіowy tryb seryjny. W tym trybie oba pociski z serii trafiaj№ dokіadnie w to samo miejsce.</text>
+	</string>
+	<string id="ls_mp_tip_21">
+		<text>Dwulufowe strzelby mog№ wystrzeliж z obu luf niemal jednoczeњnie.</text>
+	</string>
+	<string id="ls_mp_tip_25">
+		<text>Nie lekcewaї pistoletуw. Moj№ przyzwoit№ siік raїenia i mog№ byж bardzo skuteczne przeciwko sіabo opancerzonym celom.</text>
+	</string>
+	<string id="ls_mp_tip_32">
+		<text>Karabiny snajperskie, z uwagi na pіaskoњж toru pocisku i celnoњж, s№ idealne do zabijania wrogуw z duїej odlegіoњci. Nie s№ jednak zbyt skuteczne na krуtkim dystansie.</text>
+	</string>
+	<string id="ls_mp_tip_33">
+		<text>Strzelanie w ruchu charakteryzuje siк znacznie mniejsz№ celnoњci№ w porуwnaniu do strzelania ze stabilnej pozycji stoj№cej lub podczas kucania.</text>
+	</string>
+	<string id="ls_mp_tip_34">
+		<text>W trudnych warunkach Zony zarуwno broс, jak i kombinezony ochronne szybko siк zuїywaj№. Zuїyte bronie s№ mniej celne i mog№ siк zacinaж, a kombinezony daj№ sіabsz№ ochronк.</text>
+	</string>
+	<string id="ls_mp_tip_54">
+		<text>Aby zrobiж zrzut ekranu, wciњnij „$$ACTION_SCREENSHOT$$".</text>
+	</string>
+	<string id="ls_mp_tip_9">
+		<text>Artefakt lub nios№cy go gracz pokazany jest na minimapie. Jeїeli artefakt jest daleko, strzaіka na minimapie wskaїe odpowiedni kierunek.</text>
+	</string>
+	<string id="ls_tip_37">
+		<text>AC-96/2 posiada unikatowy, dwustrzaіowy tryb seryjny. W tym trybie oba pociski z serii trafiaj№ dokіadnie w to samo miejsce.</text>
+	</string>
+	<string id="ls_tip_39">
+		<text>Dwulufowe strzelby mog№ wystrzeliж z obu luf niemal jednoczeњnie.</text>
+	</string>
+	<string id="ls_tip_43">
+		<text>Nie lekcewaї pistoletуw. Moj№ przyzwoit№ siік raїenia i mog№ byж bardzo skuteczne przeciwko sіabo opancerzonym celom.</text>
+	</string>
+	<string id="ls_tip_50">
+		<text>Karabiny snajperskie, z uwagi na pіaskoњж toru pocisku i celnoњж, s№ idealne do zabijania wrogуw z duїej odlegіoњci. Nie s№ jednak zbyt skuteczne na krуtkie dystanse.</text>
+	</string>
+	<string id="ls_tip_52">
+		<text>W trudnych warunkach Zony zarуwno broс, jak i kombinezony ochronne szybko siк zuїywaj№. Zuїyte bronie s№ mniej celne i mog№ siк zacinaж, a kombinezony daj№ sіabsz№ ochronк.</text>
+	</string>
+	<string id="ls_tip_56">
+		<text>Niektуre њrodki medyczne maj№ wyj№tkowe wіaњciwoњci. Na przykіad tabletki „Herkules" pozwalaj№ ci przez jakiњ czas unieњж wiкkszy ciкїar, podczas gdy blokery psioniczne wzmacniaj№ odpornoњж na emisje psioniczne.</text>
+	</string>
+	<string id="ls_tip_83">
+		<text>Aby zrobiж zrzut ekranu, wciњnij „$$ACTION_SCREENSHOT$$".</text>
+	</string>
+	<string id="ls_tip_number">
+		<text>Wskazуwka #</text>
+	</string>
+	<string id="ls_tip_1">
+		<text>Wуdka jest tani№ alternatyw№ dla lekуw przeciwpromiennych. To najprostszy sposуb, by zredukowaж wpіyw promieniowania na organizm.</text>
+	</string>
+	<string id="ls_tip_10">
+		<text>Aby zobaczyж szczegуіy na temat aktualnej misji, przytrzymaj „$$ACTION_SCORES$$".</text>
+	</string>
+	<string id="ls_tip_13">
+		<text>Aby mуc szukaж artefaktуw, potrzebujesz detektora. Najlepsze detektory czyni№ szukanie іatwiejszym i s№ w stanie wykryж wiкcej wartoњciowych artefaktуw.</text>
+	</string>
+	<string id="ls_tip_14">
+		<text>Stalkerzy nie wpuszczaj№ do swoich obozуw ludzi z broni№ w rкku. Aby schowaж broс, wciњnij odpowiedni klawisz („$$ACTION_WPN_1$$", „$$ACTION_WPN_2$$", „$$ACTION_WPN_3$$", „$$ACTION_WPN_4$$").</text>
+	</string>
+	<string id="ls_tip_15">
+		<text>Moїesz zlokalizowaж granice anomalii, rzucaj№c њrubami. Aby wyj№ж њrubк, wciњnij „$$ACTION_WPN_6$$".</text>
+	</string>
+	<string id="ls_tip_17">
+		<text>Jedzenie nie tylko zaspokaja gіуd, ale rуwnieї nieznacznie poprawia zdrowie.</text>
+	</string>
+	<string id="ls_tip_18">
+		<text>Napoje energetyzuj№ce tymczasowo przyњpieszaj№ odzyskiwanie wytrzymaіoњci, co zwiкksza twoj№ zdolnoњж poruszania siк.</text>
+	</string>
+	<string id="ls_tip_20">
+		<text>Niska wytrzymaіoњж moїe ciк unieruchomiж i wystawiж na atak wrogуw w kluczowych momentach.</text>
+	</string>
+	<string id="ls_tip_21">
+		<text>Moїesz monitorowaж stan swojej widocznoњci dziкki wskaџnikom haіasu i wykrycia umieszczonym w lewym gуrnym rogu ekranu.</text>
+	</string>
+	<string id="ls_tip_22">
+		<text>Trzymanie detektora w jednej rкce nie uniemoїliwia uїycia noїa, pistoletu lub њruby za pomoc№ drugiej rкki.</text>
+	</string>
+	<string id="ls_tip_23">
+		<text>Niektуre њrodki medyczne zwiкkszaj№ odpornoњж organizmu na szkodliwe dziaіania. Uїywanie tych њrodkуw moїe ocaliж ci їycie podczas misji w okolicach, w ktуrych wystкpuj№ anomalie.</text>
+	</string>
+	<string id="ls_tip_27">
+		<text>Moїesz wywoіaж podrкczne menu dla przedmiotуw w plecaku, umieszczaj№c kursor myszy nad danym przedmiotem i klikaj№c prawym przyciskiem myszy.</text>
+	</string>
+	<string id="ls_tip_28">
+		<text>Pomimo swoich uїytecznych wіaњciwoњci, wiкkszoњж artefaktуw jest radioaktywna. Efekt ten moїna zniwelowaж, uїywaj№c artefaktуw pochіaniaj№cych promieniowanie.</text>
+	</string>
+	<string id="ls_tip_29">
+		<text>Nуї jest nieskuteczny przeciwko wrogom wyposaїonym w broс paln№. Uїywaj go w zwarciu lub w celu dyskretnego wyeliminowania przeciwnika.</text>
+	</string>
+	<string id="ls_tip_3">
+		<text>Ciкїar, ktуry nosisz, obniїa twoj№ wytrzymaіoњж. Zbyt duїy ciкїar ograniczy twoj№ mobilnoњж, a kompletne przeci№їenie unieruchomi ciк zupeіnie.</text>
+	</string>
+	<string id="ls_tip_30">
+		<text>Uїycie detektora to jedyny pewny sposуb na wykrycie obecnoњci artefaktуw na obszarach anomalii.</text>
+	</string>
+	<string id="ls_tip_31">
+		<text>Wiкkszoњж artefaktуw jest niewidoczna podczas swoich wкdrуwek po obszarach anomalii, dopуki nie wykryjesz ich za pomoc№ detektora.</text>
+	</string>
+	<string id="ls_tip_32">
+		<text>Mutanty s№ bardziej aktywne w nocy, co wyjaњnia, dlaczego stalkerzy wol№ poczekaж do њwitu z wyruszeniem do Zony.</text>
+	</string>
+	<string id="ls_tip_33">
+		<text>W przypadku silnego napromieniowania organizmu uїyj lekуw przeciwpromiennych. Jeњli nie masz їadnych przy sobie, uїyj apteczki, aby uporaж siк z pierwszymi objawami, zanim dotrzesz do medyka.</text>
+	</string>
+	<string id="ls_tip_34">
+		<text>Wiкkszoњж stalkerуw moїe oprowadziж ciк po okolicy, ale tylko doњwiadczeni przewodnicy s№ w stanie bezpiecznie i szybko zaprowadziж ciк w bardziej odlegіe miejsca. Jedni i drudzy kaї№ sobie sіono pіaciж za usіugк.</text>
+	</string>
+	<string id="ls_tip_35">
+		<text>Sprzedawanie artefaktуw to nie jedyny sposуb na zarobienie gotуwki. Pozbywanie siк niepotrzebnego sprzкtu teї moїe przynieњж zyski. Pamiкtaj, їe handlarze z reguіy nie s№ zainteresowani powaїnie uszkodzonymi przedmiotami.</text>
+	</string>
+	<string id="ls_tip_38">
+		<text>Aby zdemontowaж tіumik, celownik lub podwieszany granatnik ze swojej broni, kliknij prawym przyciskiem myszy dan№ broс w swoim plecaku i wybierz odpowiednie polecenie z menu podrкcznego.</text>
+	</string>
+	<string id="ls_tip_40">
+		<text>Jeњli chcesz siк poruszaж najciszej, jak to tylko moїliwe, wciњnij „$$ACTION_ACCEL$$" aby chodziж lub „$$ACTION_CROUCH$$" aby kucn№ж.</text>
+	</string>
+	<string id="ls_tip_41">
+		<text>Strzelba to broс na krуtkie dystanse. Im dalej od ciebie znajduje siк przeciwnik, tym mniej jest skuteczna.</text>
+	</string>
+	<string id="ls_tip_42">
+		<text>Szukaj№c schronienia przed ostrzaіem z mniejszych broni, upewnij siк, їe chowasz siк za czymњ wytrzymaіym. Deski i blacha, w przeciwieсstwie do betonowej њciany, nie zapewni№ ci zbyt bezpiecznej kryjуwki.</text>
+	</string>
+	<string id="ls_tip_44">
+		<text>Strzaіy w gіowк zadaj№ krytyczne obraїenia i dla wiкkszoњci wrogуw s№ њmiertelne.</text>
+	</string>
+	<string id="ls_tip_45">
+		<text>Kaїdy rodzaj mutanta w Zonie ma wіasny styl walki. Weџ to pod uwagк, a bкdziesz mieж duїo wiкksz№ szansк na przeїycie.</text>
+	</string>
+	<string id="ls_tip_46">
+		<text>Moїesz ustawiж odlegіoњж, na jak№ rzucisz granat, przytrzymuj№c „$$ACTION_WPN_ZOOM$$".</text>
+	</string>
+	<string id="ls_tip_47">
+		<text>Przeciwnicy mog№ i bкd№ uїywaж granatуw. Gdy zobaczysz symbol granatu, opuњж natychmiast strefк wybuchu. </text>
+	</string>
+	<string id="ls_tip_48">
+		<text>Rozbieg przed skokiem pozwala na pokonanie duїych dziur i szczelin.</text>
+	</string>
+	<string id="ls_tip_49">
+		<text>Kluczowe wskaџniki pokazuj№ce zdrowie i wytrzymaіoњж znajduj№ siк w prawym dolnym rogu ekranu.</text>
+	</string>
+	<string id="ls_tip_53">
+		<text>Zona їyje swoim wіasnym їyciem, co oznacza, їe zawsze istnieje ryzyko wpadniкcia na mutanty lub wrogich stalkerуw w miejscach, ktуre zostaіy juї wyczyszczone. </text>
+	</string>
+	<string id="ls_tip_54">
+		<text>W Zonie zachowaj czujnoњж i nie polegaj na nieaktualnych informacjach. Gdy powrуcisz na zbadany wczeњniej obszar anomalii, moїe siк okazaж, їe poprzednio sprawdzona њcieїka nie jest juї dostкpna.</text>
+	</string>
+	<string id="ls_tip_58">
+		<text>Rozmowy ze zwykіymi stalkerami mog№ dostarczyж ci przydatnych informacji na temat nowych terenуw i ostatnich wydarzeс.</text>
+	</string>
+	<string id="ls_tip_60">
+		<text>W obu przeznaczonych do tego miejscach moїesz umieњciж ktуr№kolwiek z broni. Pozwala to na stworzenie dogodnej kombinacji, na przykіad karabinu szturmowego ze strzelb№ lub pistoletu z karabinem snajperskim.</text>
+	</string>
+	<string id="ls_tip_61">
+		<text>Kaїdy handlarz, na jakiego natrafisz w rуїnych obozach stalkerуw, oferuje swуj wіasny, unikalny towar. Na przykіad medycy na pewno bкd№ mieli najlepszy wybуr њrodkуw medycznych.</text>
+	</string>
+	<string id="ls_tip_62">
+		<text>Jeњli dotrzesz do obozu stalkerуw z ran№ lub zatruciem spowodowanym promieniowaniem, moїesz skorzystaж z darmowej pomocy miejscowego medyka.</text>
+	</string>
+	<string id="ls_tip_63">
+		<text>Moїesz zostawiж swoje rzeczy w prywatnym schowku w obozie, aby unikn№ж noszenia ze sob№ niepotrzebnego sprzкtu.</text>
+	</string>
+	<string id="ls_tip_64">
+		<text>Jeњli musisz poczekaж na konkretn№ godzinк, moїesz zdrzemn№ж siк w obozie, by zabiж czas. Їeby to zrobiж, znajdџ miejsce do spania, wciњnij „$$ACTION_USE$$" i wybierz, jak dіugo chcesz spaж.</text>
+	</string>
+	<string id="ls_tip_65">
+		<text>Noktowizor w twoim heіmie moїe zostaж ulepszony do wersji nowej generacji. Zwiкkszy to znacz№co zasiкg jego dziaіania.</text>
+	</string>
+	<string id="ls_tip_67">
+		<text>Gdy jesteњ w Zonie, zawsze miej przy sobie kilka zapasowych magazynkуw - na pewno siк przydadz№.</text>
+	</string>
+	<string id="ls_tip_68">
+		<text>Pamiкtaj, їeby regularnie zapisywaж stan gry - zapobiegnie to koniecznoњci przechodzenia w kуіko tych samych fragmentуw.</text>
+	</string>
+	<string id="ls_tip_69">
+		<text>Aby prawidіowo stosowaж leki, warto znaж ich dziaіanie. Zapoznaj siк z opisami lekуw, aby dowiedzieж siк, jakie efekty powoduj№. </text>
+	</string>
+	<string id="ls_tip_70">
+		<text>Uїyj granatуw, aby zaatakowaж przeciwnikуw bкd№cych w ukryciu. Weџ pod uwagк promieс raїenia granatu, aby nie zraniж sojusznikуw.</text>
+	</string>
+	<string id="ls_tip_71">
+		<text>Aby wyrzuciж przedmiot z plecaka, kliknij go prawym przyciskiem myszy i wybierz odpowiedni№ czynnoњж z menu podrкcznego.</text>
+	</string>
+	<string id="ls_tip_72">
+		<text>Moїesz uїyж specjalnego ustawienia w menu opcji, aby gra zapisywaіa siк automatycznie w kluczowych miejscach.</text>
+	</string>
+	<string id="ls_tip_73">
+		<text>Gdy wrуcisz do obozu, napraw swуj sprzкt, sprzedaj niepotrzebne іupy i uzupeіnij zapasy amunicji i њrodkуw medycznych.</text>
+	</string>
+	<string id="ls_tip_75">
+		<text>Aby zmniejszyж szkodliwe dziaіanie anomalii podczas wypraw do Zony, uїywaj kombinezonu ochronnego i artefaktуw lub zaїyj odpowiednie leki.</text>
+	</string>
+	<string id="ls_tip_77">
+		<text>Oprуcz broni i amunicji, przy ciaіach wrogуw moїesz znaleџж wartoњciowe przedmioty, takie jak PDA z danymi.</text>
+	</string>
+	<string id="ls_tip_78">
+		<text>Artefakty to nie tylko wartoњciowy іup. Poza tym, їe s№ lekkie i drogie, czкsto maj№ teї bardzo uїyteczne wіaњciwoњci.</text>
+	</string>
+	<string id="ls_tip_79">
+		<text>Z uwagi na њrodowisko panuj№ce w Zonie, wiele mutantуw jest radioaktywnych. Zbliїanie siк do nich bez odpowiedniej ochrony przed promieniowaniem jest bardzo niebezpieczne.</text>
+	</string>
+	<string id="ls_tip_8">
+		<text>Aby zatamowaж krwotok, moїesz uїyж bandaїa, wojskowej apteczki lub barwinkуw. Jeњli szybko sobie z nim nie poradzisz, krwawienie moїe powaїnie uszkodziж twoje zdrowie.</text>
+	</string>
+	<string id="ls_tip_80">
+		<text>Niektуre bronie pozwalaj№ na zainstalowanie celownika o dalekim zasiкgu. Moїesz go regulowaж za pomoc№ kуіka myszy.</text>
+	</string>
+	<string id="ls_tip_82">
+		<text>Przez niektуre miejsca nie moїna przejњж nawet kucaj№c. Aby przykucn№ж najniїej, jak tylko siк da, wciњnij i przytrzymaj jednoczeњnie „$$ACTION_CROUCH$$" i „$$ACTION_ACCEL$$".</text>
+	</string>
+	<string id="ls_tip_84">
+		<text>Aby zmniejszyж prawdopodobieсstwo trafienia przez przeciwnika, prowadџ wymianк ognia wychylaj№c siк zza rogu. W tym celu przytrzymaj „$$ACTION_LLOOKOUT$$" lub „$$ACTION_RLOOKOUT$$".</text>
+	</string>
+	<string id="ls_tip_85">
+		<text>Dziкki wbudowanemu mechanizmowi namierzania celu, twoja lornetka pozwala ci nie tylko lepiej siк przyjrzeж daleko poіoїonym obiektom, ale rуwnieї zlokalizowaж wrogуw. Aby wyj№ж lornetkк, wciњnij „$$ACTION_WPN_5$$".</text>
+	</string>
+	<string id="ls_tip_86">
+		<text>Aby wі№czyж lub wyі№czyж latarkк, wciњnij „$$ACTION_TORCH$$".</text>
+	</string>
+	<string id="ls_tip_87">
+		<text>Aby wyj№ж њrubк, wciњnij „$$ACTION_WPN_6$$".</text>
+	</string>
+	<string id="ls_tip_88">
+		<text>Jeїeli masz noktowizor przy swoim heіmie, moїesz go wі№czaж i wyі№czaж wciskaj№c „$$ACTION_NIGHT_VISION$$”.</text>
+	</string>
+	<string id="ls_tip_89">
+		<text>Wciњnij „$$ACTION_QUICK_USE_1$$", „$$ACTION_QUICK_USE_2$$", „$$ACTION_QUICK_USE_3$$", „$$ACTION_QUICK_USE_4$$", aby uїyж odpowiedniego przedmiotu ze swojego panelu szybkiego dostкpu.</text>
+	</string>
+	<string id="ls_tip_9">
+		<text>Leki nie zaczynaj№ dziaіaж natychmiastowo, a efekt dziaіania niektуrych z nich utrzymuje siк doњж dіugo.</text>
+	</string>
+	<string id="ls_tip_90">
+		<text>W twoim PDA przechowywana jest mapa, informacje na temat bieї№cych misji, prywatne statystyki oraz rejestr wiadomoњci. Aby otworzyж PDA, wciњnij „$$ACTION_ACTIVE_JOBS$$".</text>
+	</string>
+	<string id="ls_tip_91">
+		<text>Їeby mуc szukaж artefaktуw, musisz wyj№ж detektor. Aby to zrobiж, wciњnij „$$ACTION_SHOW_DETECTOR$$".</text>
+	</string>
+	<string id="ls_tip_92">
+		<text>Aby wі№czyж pauzк, wciњnij „$$ACTION_PAUSE$$".</text>
+	</string>
+	<string id="ls_tip_93">
+		<text>Aby skorzystaж z szybkiego zapisu, wciњnij „$$ACTION_QUICK_SAVE$$". Wciњnij „$$ACTION_QUICK_LOAD$$", aby szybko wczytaж ostatni szybki zapis.</text>
+	</string>
+	<string id="ls_tip_94">
+		<text>Sprint to najszybszy sposуb poruszania siк, ale rуwnieї najbardziej mкcz№cy. Wciњnij „$$ACTION_SPRINT_TOGGLE$$”, aby pobiec sprintem.</text>
+	</string>
+	<string id="ls_tip_95">
+		<text>Strzelanie z celownikiem jest duїo dokіadniejsze niї strzelanie z biodra. Aby wі№czyж celownik, wciњnij „$$ACTION_WPN_ZOOM$$".</text>
+	</string>
+	<string id="ls_tip_96">
+		<text>Jeњli masz granatnik podwieszany, moїesz siк przeі№czaж pomiкdzy nim i standardowym trybem strzaіu wciskaj№c „$$ACTION_WPN_FUNC$$".</text>
+	</string>
+	<string id="ls_tip_97">
+		<text>Jeњli masz kilka rodzajуw amunicji do uїywanej obecnie broni, moїesz przeі№czaж siк pomiкdzy nimi wciskaj№c „$$ACTION_WPN_NEXT$$".</text>
+	</string>
+	<string id="ls_tip_98">
+		<text>Aby przeіadowaж broс, zanim magazynek bкdzie pusty, wciњnij „$$ACTION_WPN_RELOAD$$".</text>
+	</string>
+	<string id="ls_tip_99">
+		<text>Aby wyrzuciж uїywan№ obecnie broс, wciњnij „$$ACTION_DROP$$".</text>
+	</string>
+	<string id="ls_tip_6">
+		<text>Aby przeczekaж emisjк, schroс siк w solidnym budynku lub pod ziemi№. Gdy emisja bкdzie siк zbliїaж, najbliїsze schronienie bкdzie zaznaczone na twoim PDA.</text>
+	</string>
+	<string id="ls_tip_12">
+		<text>Aby uїyж przedmiotu przy pomocy okienka szybkiego dostкpu, przeci№gnij go ze swojego plecaka do jednego z okienek nad pojemnikami na artefakty.</text>
+	</string>
+	<string id="ls_tip_24">
+		<text>Znak kropli krwi w prawym dolnym rogu ekranu informuje ciк o krwotoku i koniecznoњci jego zatamowania. Kolor znaku pokazuje, jak powaїny jest krwotok.</text>
+	</string>
+	<string id="ls_tip_25">
+		<text>Symbol zagroїenia promieniowaniem w prawym dolnym rogu ekranu ostrzega o napromieniowaniu organizmu. Gdy go zobaczysz, musisz zaїyж leki przeciwpromienne. Kolor symbolu pokazuje, jak wysoki jest poziom napromieniowania.</text>
+	</string>
+	<string id="ls_tip_4">
+		<text>Przy pomocy filtrуw moїesz ukrywaж i wyњwietlaж rуїne rodzaje oznaczeс na swoim PDA. Przyciski filtrуw znajduj№ siк ponad map№, pod nazw№ bieї№cej misji.</text>
+	</string>
+	<string id="ls_tip_55">
+		<text>Artefakty zazwyczaj nie s№ statyczne: maj№ tendencjк do poruszania siк w obrкbie anomalii. Szalone prуby pogoni za artefaktami w mgnieniu oka wpakuj№ ciк na anomaliк.</text>
+	</string>
+	<string id="ls_tip_57">
+		<text>Niektуrzy stalkerzy mog№ mieж ci do zaoferowania informacje czy wyj№tkowe towary. Mog№ teї na przykіad zleciж ci dostarczenie im konkretnych artefaktуw.</text>
+	</string>
+	<string id="ls_tip_59">
+		<text>Po emisji, na przeszukanych juї wczeњniej obszarach anomalii mog№ siк pojawiж nowe artefakty.</text>
+	</string>
+	<string id="ls_tip_74">
+		<text>W kaїdej chwili moїesz zmieniж poziom trudnoњci gry w menu opcji.</text>
+	</string>
+	<string id="ls_tip_2">
+		<text>Technicy w obozach stalkerуw mog№ ulepszyж twoje bronie, kombinezony i heіmy.</text>
+	</string>
+	<string id="ls_tip_66">
+		<text>Jeњli chcesz przetrwaж, zawsze zwracaj uwagк na trzeszcz№ce dџwiкki wydawane przez twуj licznik Geigera, ktуre ostrzegaj№ ciк przed promieniowaniem, oraz na sygnaіy o zagroїeniu ze strony anomalii, informuj№ce, їe jesteњ blisko jednej z nich.</text>
+	</string>
+	<string id="ls_tip_26">
+		<text>Twoje stosunki z ludџmi bezpoњrednio wpіywaj№ na cenк oferowanych przez nich towarуw i usіug. Jeњli twoje stosunki s№ zіe, nie licz na zniїkк. Jeњli dogadujesz siк nieџle, handlarz moїe nawet zaoferowaж ci coњ specjalnego.</text>
+	</string>
+	<string id="ls_tip_11">
+		<text>Moїesz rozіadowaж znalezion№ broс w celu uzupeіnienia amunicji. Aby to zrobiж, kliknij prawym przyciskiem myszy dan№ broс w swoim plecaku i wybierz odpowiedni№ czynnoњж z menu podrкcznego.</text>
+	</string>
+	<string id="ls_mp_tip_1">
+		<text>Zabijanie wrogуw i zbieranie artefaktуw przynosi ci punkty potrzebne, by awansowaж na wyїsz№ rangк. Wraz ze wzrostem rangi, dostaniesz dostкp do nowych broni, pancerzy i wyposaїenia.</text>
+	</string>
+	<string id="ls_mp_tip_11">
+		<text>Granatуw dymnych uїywa siк, by ukraњж artefakt lub ukryж siк przed wrogiem.</text>
+	</string>
+	<string id="ls_mp_tip_13">
+		<text>Lewa czкњж menu handlu zawiera piкж zakіadek. Od gуry do doіu: pistolety, broс podstawowa, amunicja, pancerze oraz њrodki medyczne wraz z dodatkowym wyposaїeniem. Po wybraniu ї№danej zakіadki zobaczysz przedmioty dostкpne przy twojej randze.</text>
+	</string>
+	<string id="ls_mp_tip_14">
+		<text>Prawa czкњж menu handlu zawiera cztery okienka szybkiego kupowania. Wciњniкcie ikonki dyskietki zapisuje aktualny zestaw. Moїna go wczytaж, wciskaj№c odpowiedni numer. W czwartym okienku automatycznie zapisywany jest ostatnio zakupiony zestaw.</text>
+	</string>
+	<string id="ls_mp_tip_15">
+		<text>Jeњli masz wiкcej niї jedn№ broс, moїesz przeі№czaж siк miкdzy nimi, wciskaj№c na przemian „$$ACTION_WPN_2$$" albo „$$ACTION_WPN_3$$".</text>
+	</string>
+	<string id="ls_mp_tip_17">
+		<text>Aby aktywowaж artefakt w celu utworzenia anomalii, wyci№gnij go, wciskaj№c „$$ACTION_ARTEFACT$$" i przytrzymuj№c „$$ACTION_WPN_FIRE$$". Powstaіa anomalia jest niebezpieczna zarуwno dla przeciwnikуw, jak i dla gracza, ktуry j№ stworzyі.</text>
+	</string>
+	<string id="ls_mp_tip_18">
+		<text>Kombinezon naukowca pomoїe ci przetrwaж w anomaliach i obszarach radioaktywnych.</text>
+	</string>
+	<string id="ls_mp_tip_2">
+		<text>POLOWANIE NA ARTEFAKTY: Aby wygraж, musisz przynieњж do swojej bazy okreњlon№ liczbк artefaktуw.</text>
+	</string>
+	<string id="ls_mp_tip_20">
+		<text>Aby zdemontowaж tіumik, celownik lub podwieszany granatnik ze swojej broni, kliknij prawym przyciskiem myszy dan№ broс w swoim plecaku i wybierz odpowiednie polecenie z menu podrкcznego.</text>
+	</string>
+	<string id="ls_mp_tip_22">
+		<text>Jeњli chcesz siк poruszaж najciszej, jak to tylko moїliwe, wciњnij „$$ACTION_ACCEL$$" aby chodziж lub „$$ACTION_CROUCH$$" aby kucn№ж.</text>
+	</string>
+	<string id="ls_mp_tip_23">
+		<text>Strzelba to broс na krуtkie dystanse. Im dalej od ciebie znajduje siк przeciwnik, tym mniej jest skuteczna.</text>
+	</string>
+	<string id="ls_mp_tip_24">
+		<text>Szukaj№c schronienia przed ostrzaіem, upewnij siк, їe chowasz siк za czymњ wytrzymaіym. Deski i blacha, w przeciwieсstwie do betonowej њciany, nie zapewni№ ci zbyt bezpiecznej kryjуwki.</text>
+	</string>
+	<string id="ls_mp_tip_26">
+		<text>Strzaіy w gіowк zadaj№ krytyczne obraїenia i dla wiкkszoњci wrogуw s№ њmiertelne.</text>
+	</string>
+	<string id="ls_mp_tip_27">
+		<text>Szybkie poruszanie, skakanie i rany znacz№co obniїaj№ twoj№ wytrzymaіoњж.</text>
+	</string>
+	<string id="ls_mp_tip_28">
+		<text>Moїesz ustawiж odlegіoњж, na jak№ rzucisz granat, przytrzymuj№c „$$ACTION_WPN_ZOOM$$".</text>
+	</string>
+	<string id="ls_mp_tip_29">
+		<text>Przeciwnicy mog№ i bкd№ uїywaж granatуw. Gdy zobaczysz symbol granatu, opuњж natychmiast potencjaln№ strefк wybuchu.</text>
+	</string>
+	<string id="ls_mp_tip_3">
+		<text>WSZYSCY PRZECIWKO WSZYSTKIM: Aby wygraж, musisz zdobyж najwiкksz№ liczbк punktуw za zabicia.</text>
+	</string>
+	<string id="ls_mp_tip_30">
+		<text>Rozbieg przed skokiem pozwala na pokonanie duїych dziur i szczelin.</text>
+	</string>
+	<string id="ls_mp_tip_31">
+		<text>Kluczowe wskaџniki pokazuj№ce zdrowie i wytrzymaіoњж znajduj№ siк w prawym dolnym rogu ekranu.</text>
+	</string>
+	<string id="ls_mp_tip_35">
+		<text>Minimapa pokazuje, z ktуrej strony znajduje siк artefakt. Jeїeli strzaіka wskazuje w gуrк, artefakt znajduje siк nad twoja obecn№ pozycj№. Jeїeli strzaіka wskazuje w dуі, znajduje siк on poniїej twojej obecnej pozycji.</text>
+	</string>
+	<string id="ls_mp_tip_36">
+		<text>Moїesz zabieraж plecaki swoich przeciwnikуw, aby zdobyж dodatkow№ gotуwkк. Nadwyїkк sprzкtu moїesz sprzedaж w bazie.</text>
+	</string>
+	<string id="ls_mp_tip_37">
+		<text>Musisz za wszelk№ cenк ochraniaж czіonka swojej druїyny, ktуry niesie artefakt.</text>
+	</string>
+	<string id="ls_mp_tip_38">
+		<text>Uїyj granatуw, aby zaatakowaж przeciwnikуw bкd№cych w ukryciu. Weџ pod uwagк promieс raїenia granatu, aby nie zraniж swoich sojusznikуw.</text>
+	</string>
+	<string id="ls_mp_tip_39">
+		<text>Moїesz komunikowaж siк z druїyn№ przy pomocy wiadomoњci gіosowych. Aby wejњж do menu wiadomoњci gіosowych, wciњnij „$$ACTION_SPEECH_MENU_0$$" lub „$$ACTION_SPEECH_MENU_1$$".</text>
+	</string>
+	<string id="ls_mp_tip_4">
+		<text>GRA DRUЇYNOWA: Aby wygraж, twoja druїyna musi zdobyж wiкcej punktуw za zabicia niї druїyna przeciwna.</text>
+	</string>
+	<string id="ls_mp_tip_40">
+		<text>Gіosowanie moїna rozpocz№ж wciskaj№c „$$ACTION_VOTE_BEGIN$$".</text>
+	</string>
+	<string id="ls_mp_tip_41">
+		<text>Aby zobaczyж wyniki gry, wciњnij „$$ACTION_SCORES$$".</text>
+	</string>
+	<string id="ls_mp_tip_42">
+		<text>Aby odrodziж siк po њmierci, wciњnij „$$ACTION_JUMP$$", gdy skoсczy siк czas oczekiwania.</text>
+	</string>
+	<string id="ls_mp_tip_43">
+		<text>Aby otworzyж menu handlu, wciњnij „$$ACTION_BUY_MENU$$" w czasie pobytu w bazie.</text>
+	</string>
+	<string id="ls_mp_tip_44">
+		<text>Rozmowк ze wszystkimi moїna rozpocz№ж wciskaj№c „$$ACTION_CHAT$$". Aby prowadziж rozmowк tekstow№ tylko ze swoj№ druїyn№, wciњnij „$$ACTION_CHAT_TEAM$$".</text>
+	</string>
+	<string id="ls_mp_tip_45">
+		<text>Sprint to najszybszy sposуb poruszania siк, ale rуwnieї najbardziej mкcz№cy. Wciњnij „$$ACTION_SPRINT_TOGGLE$$”, aby pobiec sprintem.</text>
+	</string>
+	<string id="ls_mp_tip_46">
+		<text>Strzelanie z celownikiem jest duїo dokіadniejsze niї strzelanie z biodra. Aby wі№czyж celownik, wciњnij „$$ACTION_WPN_ZOOM$$".</text>
+	</string>
+	<string id="ls_mp_tip_47">
+		<text>Jeњli masz granatnik podwieszany, moїesz przeі№czaж siк pomiкdzy nim i standardowym trybem strzaіu, wciskaj№c „$$ACTION_WPN_FUNC$$".</text>
+	</string>
+	<string id="ls_mp_tip_48">
+		<text>Jeњli masz kilka rodzajуw amunicji do uїywanej obecnie broni, moїesz siк przeі№czaж pomiкdzy nimi, wciskaj№c „$$ACTION_WPN_NEXT$$".</text>
+	</string>
+	<string id="ls_mp_tip_49">
+		<text>Aby przeіadowaж broс, zanim magazynek bкdzie pusty, wciњnij „$$ACTION_WPN_RELOAD$$".</text>
+	</string>
+	<string id="ls_mp_tip_5">
+		<text>ZDOBYCIE ARTEFAKTU: Aby wygraж, musisz przynieњж do swojej bazy okreњlon№ liczbк artefaktуw naleї№cych do wroga.</text>
+	</string>
+	<string id="ls_mp_tip_50">
+		<text>Aby wyrzuciж uїywan№ obecnie broс, wciњnij „$$ACTION_DROP$$".</text>
+	</string>
+	<string id="ls_mp_tip_51">
+		<text>Aby zajrzeж do plecaka, wciњnij „$$ACTION_INVENTORY$$".</text>
+	</string>
+	<string id="ls_mp_tip_52">
+		<text>Wiкkszoњж broni ma kilka trybуw strzaіu. Aby przeі№czaж siк miкdzy trybami strzaіu, wciњnij „$$ACTION_WPN_FIREMODE_NEXT$$" lub „$$ACTION_WPN_FIREMODE_PREV$$".</text>
+	</string>
+	<string id="ls_mp_tip_53">
+		<text>Przez niektуre miejsca nie da siк przecisn№ж nawet w pozycji kucniкtej. Aby przykucn№ж najniїej, jak tylko siк da, wciњnij i przytrzymaj jednoczeњnie „$$ACTION_CROUCH$$" i „$$ACTION_ACCEL$$".</text>
+	</string>
+	<string id="ls_mp_tip_55">
+		<text>Aby wyjrzeж zza rogu, wciњnij „$$ACTION_LLOOKOUT$$" lub „$$ACTION_RLOOKOUT$$". Podczas wygl№dania zza rogu nie moїesz strzelaж.</text>
+	</string>
+	<string id="ls_mp_tip_6">
+		<text>ZDOBYCIE ARTEFAKTU: Aby zwrуciж skradziony artefakt do bazy, musisz zabiж nios№cego go przeciwnika, a nastкpnie podnieњж przedmiot, wciskaj№c „$$ACTION_USE$$".</text>
+	</string>
+	<string id="ls_mp_tip_7">
+		<text>POLOWANIE NA ARTEFAKTY: Moїesz zniszczyж artefakt aktywuj№c go. Aby to zrobiж, wyci№gnij artefakt wciskaj№c „$$ACTION_ARTEFACT$$" i przytrzymaj „$$ACTION_WPN_FIRE$$".</text>
+	</string>
+	<string id="ls_mp_tip_8">
+		<text>Gdy niesiesz artefakt, nie moїesz biec.</text>
+	</string>
+	<string id="ls_tip_100">
+		<text>Aby zajrzeж do plecaka, wciњnij „$$ACTION_INVENTORY$$".</text>
+	</string>
+	<string id="ls_tip_36">
+		<text>Aby naprawiж przedmiot, musisz znaleџж technika i klikn№ж przycisk naprawy po wybraniu przedmiotu na ekranie modyfikacji. Moїesz teї klikn№ж dany przedmiot prawym przyciskiem myszy w tym samym oknie i wybraж odpowiednie polecenie z menu podrкcznego.</text>
+	</string>
+	<string id="ls_tip_81">
+		<text>Wiкkszoњж broni ma kilka domyњlnych trybуw strzaіu. Moїesz kupowaж modyfikacje, aby dodawaж nastкpne. Aby przeі№czyж siк miкdzy trybami strzaіu, wciњnij „$$ACTION_WPN_FIREMODE_NEXT$$" lub „$$ACTION_WPN_FIREMODE_PREV$$".</text>
+	</string>
+	<string id="ls_tip_7">
+		<text>Pіaskoњж toru pocisku wpіywa na trajektoriк, a obsіuga warunkuje czas, potrzebny aby broс powrуciіa do pierwotnej pozycji po oddaniu strzaіu.</text>
+	</string>
+	<string id="ls_tip_5">
+		<text>Niektуre kombinezony maj№ wbudowane heіmy. Uїywaj№c takiego kombinezonu nie moїna korzystaж z innych heіmуw.</text>
+	</string>
+	<string id="ls_tip_76">
+		<text>Kaїda broс ma niepowtarzalne wіaњciwoњci - celnoњж, obsіugк, obraїenia i szybkostrzelnoњж, co umoїliwia ci wybуr najbardziej odpowiedniego modelu.</text>
+	</string>
+	<string id="ls_tip_51">
+		<text>Celnoњж strzaіu podczas ruchu wyraџnie spada. Staс lub przykucnij, aby j№ zwiкkszyж.</text>
+	</string>
+	<string id="ls_mp_tip_10">
+		<text>Napуj energetyzuj№cy tymczasowo przyњpiesza regeneracjк wytrzymaіoњci, co pozwala ci dіuїej biec.</text>
+	</string>
+	<string id="ls_mp_tip_12">
+		<text>W trybie „Wszyscy przeciwko wszystkim” masz nieograniczon№ iloњж amunicji.</text>
+	</string>
+	<string id="ls_tip_16">
+		<text>Jednym z najczкstszych zagroїeс w Zonie jest promieniowanie. Silne napromieniowanie doprowadzi do pogorszenia zdrowia i, jeњli nie bкdzie odpowiednio leczone, moїe byж њmiertelne.</text>
+	</string>
+	<string id="ls_tip_19">
+		<text>Wyruszaj№c na dіugie wyprawy weџ ze sob№ coњ do jedzenia. Jeњli mocno zgіodniejesz, wpіynie to bardzo negatywnie na odzyskiwanie wytrzymaіoњci.</text>
+	</string>
+</string_table>

@@ -1,0 +1,12 @@
+[zone_base]
+idle_light_volumetric 	= false
+idle_light_shadow		= true
+effective_radius		= 1 ;0.75 ;размер радиуса в процентах от оригинального, где действует зона
+pick_dof_effector		= false
+idle_light_r1			= true
+script_binding          = bind_anomaly_field.bind
+;bolt_entrance_particles	= anomaly2\anomaly_entrance
+
+[zone_base_noshadow]:zone_base
+idle_light_shadow		= false
+idle_light_r1			= true

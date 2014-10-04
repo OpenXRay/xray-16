@@ -1,0 +1,383 @@
+----------------------------------------------------------------------------------------------------
+-- Physic door control
+----------------------------------------------------------------------------------------------------
+-- Исходный скрипт: Evgeniy Negrobov (Jon) jon@gsc-game.kiev.ua
+-- Перевод на xr_logic: Andrey Fidrya (Zmey) af@svitonline.com
+-- Доработка: Oleg Kreptul (Haron) haronk@ukr.net
+----------------------------------------------------------------------------------------------------
+
+
+class "action_door"
+function action_door:__init(obj, storage)
+	--printf	("action_door::action_door() called")
+	self.object = obj
+	self.st = storage
+	self.snd_obj = nil
+	
+	storage.door_action = self
+end
+function action_door:reset_scheme(loading)
+	--printf("_bp: action_door:reset_scheme: self.object:name()='%s'", self.object:name())
+	
+	self.st.signals = {}
+	
+	self.initialized = false
+	
+	local ph_shell = self.object:get_physics_shell()
+	if not ph_shell then
+		return
+	end
+	self.joint = ph_shell:get_joint_by_bone_name("door")
+
+	self.low_limits, self.hi_limits = 0, 0
+	self.low_limits, self.hi_limits	= self.joint:get_limits(self.low_limits, self.hi_limits, 0)
+
+	self.block = false
+	self.soundless_block = false
+
+	self.show_tips = self.st.show_tips
+
+	local disable_snd
+	-- Звук нужно отключить, только если скрипт двери для этого объекта используется
+	-- впервые (т.е. после загрузки уровня или после загрузки сохраненной игры),
+	-- иначе игрок услышит хлопок...
+	if not self.st.script_used_more_than_once then
+		disable_snd = true
+		self.st.script_used_more_than_once = true
+	end
+	
+	if self.st.closed then
+		--' Если дверь уже закрыта - то нужно закрыть без звука
+		if self:is_closed() then
+			disable_snd = true
+		end
+		self:close_door(disable_snd)
+	else
+		self:open_door(disable_snd)
+	end
+
+	self.object:set_nonscript_usable(false)
+
+	self.initialized = true
+end
+
+function action_door:update(delta)
+	--printf("_bp: action_door:update()", delta)
+	if not self.initialized then
+		abort("object '%s': door failed to initialize", self.object:name())
+	end
+
+	if xr_logic.try_switch_to_another_section(self.object, self.st, db.actor) then
+		return
+	end
+end
+
+function action_door:fastcall()
+	if not self.initialized then
+		return false
+	end
+
+	if self.block and self:is_closed() then
+		self:close_action()
+		self.object:on_door_is_closed()
+		return true
+	end
+	return false
+end
+
+function action_door:open_fastcall()
+	if not self.initialized then
+		return false
+	end
+
+	if self:is_open() then
+		local ph_obj = self.object:get_physics_object()
+		ph_obj:unset_door_ignore_dynamics() --'Игнорирование динамики на момент открытия/закрытия	
+		self.object:on_door_is_open()
+		return true
+	end
+	return false
+end
+
+
+function action_door:close_action()
+	--printf("_bp: close_action(): %d", time_global())
+
+	-- Закрыли до предела, будем блокировать
+	if self.st.no_force == true then
+		self.joint:set_max_force_and_velocity(0, 0, 0)
+	else
+		self.joint:set_max_force_and_velocity(10000, 1, 0)
+		
+		--!!! Фиксируем кость.
+		local ph_shell = self.object:get_physics_shell()
+		if ph_shell then
+			local ph_element = ph_shell:get_element_by_bone_name("door")
+			if not ph_element:is_fixed() then
+				--printf("FIX")
+				ph_element:fix()
+			end	
+		end		
+	end
+	
+	local ph_obj = self.object:get_physics_object()
+	ph_obj:unset_door_ignore_dynamics() --'Игнорирование динамики на момент открытия/закрытия
+	self.block = false
+	-- Отыграть звук когда дверь захлопнулась:
+	if not self.soundless_block and self.st.snd_close_stop then
+        xr_sound.set_sound_play(self.object:id(), self.st.snd_close_stop)
+	end
+end
+
+function action_door:open_door(disable_snd)
+	--printf("_bp: [%s] action_door:open_door()", self.object:name())
+	if not disable_snd then
+		if self.st.snd_open_start then
+            xr_sound.set_sound_play(self.object:id(), self.st.snd_open_start)
+		end
+	end
+
+	self.object:set_fastcall(self.open_fastcall,self)
+
+	--!!! Тут надо снять фиксацию кости
+	local ph_shell = self.object:get_physics_shell()
+	if ph_shell then
+		local ph_element = ph_shell:get_element_by_bone_name("door")
+		if ph_element:is_fixed() then
+			--printf("RELEASE")
+			ph_element:release_fixed()
+			
+			local ph_obj = self.object:get_physics_object()
+			ph_obj:set_door_ignore_dynamics() --'Игнорирование динамики на момент открытия/закрытия
+		end	
+	end
+	 
+	
+	if self.st.no_force == true then
+		self.joint:set_max_force_and_velocity(0, 0, 0)
+	else
+		self.joint:set_max_force_and_velocity(2100, -3, 0)
+	end
+	self.block = false
+
+	if self.show_tips and self.st.tip_close then
+		self.object:set_tip_text(self.st.tip_close)
+	end
+end
+
+function action_door:is_closed()
+	local angle
+	if self.st.slider then
+		angle = -self.joint:get_axis_angle(0)
+	else
+		angle = self.joint:get_axis_angle(90)
+	end
+	--printf("_bp[%s]: action_door:update(): angle %f limits %f, %f",
+	--	self.object:name(), angle, self.low_limits, self.hi_limits)
+		
+	if angle <= self.low_limits + 0.02 then
+		--printf("_bp: close_check(): true")
+		return true
+	end
+	return false
+end
+
+function action_door:is_open()
+	local angle
+	if self.st.slider then
+		angle = -self.joint:get_axis_angle(0)
+	else
+		angle = self.joint:get_axis_angle(90)
+	end
+	
+	--printf("_bp[%s]: action_door:update(): angle %f limits %f, %f",
+	--	self.object:name(), angle, self.low_limits, self.hi_limits)
+		
+	if angle >= self.hi_limits - 0.02 then
+		--printf("_bp: open_check(): true")
+		return true
+	end
+	return false
+end
+
+function action_door:close_door(disable_snd)
+	--printf("_bp: [%s] action_door:close_door()", self.object:name())
+--	local disable_snd = self:is_closed()
+	if not disable_snd then
+		if self.st.snd_close_start then
+            xr_sound.set_sound_play(self.object:id(), self.st.snd_close_start)
+		end
+	end
+
+	-- Ставим коллбек для отлова окончания закрытия двери (чтобы заблокировать ее и проиграть звук, если нужно):
+	self.object:set_fastcall(self.fastcall,self)
+
+	--printf("_bp: action_door:close_door()")
+	if self.st.no_force == true then
+		self.joint:set_max_force_and_velocity(0, 0, 0)
+	else
+		self.joint:set_max_force_and_velocity(200, 3, 0)
+	end
+	self.block = true -- Закрываем и блокируем	
+	self.soundless_block = disable_snd
+	
+	local ph_obj = self.object:get_physics_object()
+	ph_obj:set_door_ignore_dynamics() --'Игнорирование динамики на момент открытия/закрытия
+
+	if self.show_tips then
+		if self.st.locked == true and self.st.tip_unlock then
+			self.object:set_tip_text(self.st.tip_unlock)
+			return
+		end
+
+		if self.st.tip_open then
+			self.object:set_tip_text(self.st.tip_open)
+		end
+	end
+end
+
+function action_door:try_switch()
+	--printf("_bp: action_door: object '%s': try_switch", self.object:name())
+	if self.st.on_use then		
+		if xr_logic.switch_to_section(self.object, self.st.ini,
+		   xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.on_use.condlist)) then
+			return true
+		end
+	end
+	return false
+end
+
+function action_door:use_callback(door, actor)
+	if self.st.locked then
+		if self.st.snd_open_start then
+            xr_sound.set_sound_play(self.object:id(), self.st.snd_open_start)
+		end
+	end
+
+	if self:try_switch() then
+		return
+	end
+
+--	local angle = self.joint:get_axis_angle(90)
+
+--	if angle - self.low_limits > self.hi_limits - angle then
+--		self:open_door(false)
+--	else
+--		self:close_door(false)
+--	end
+end
+function action_door:hit_callback(obj, amount, local_direction, who, bone_index)
+	local who_name
+	if who then
+		who_name = who:name()
+	else
+		who_name = "nil"
+	end
+
+	--printf("DOOR: hit_callback: obj='%s', amount=%d, who='%s', bone='%s'", obj:name(), amount, who_name, bone_index)
+	print_table(self.st.hit_on_bone)
+	if self.st.hit_on_bone[bone_index] ~= nil then
+		local section = xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.hit_on_bone[bone_index].state)
+		xr_logic.switch_to_section(obj, self.st.ini, section)
+		return
+	end
+end
+function action_door:deactivate()
+	self.object:set_tip_text("")
+end
+
+---------------------------------------------------------------------------------------------------------------------
+function add_to_binder(npc, ini, scheme, section, storage)
+	--printf("DEBUG: add_to_binder: scheme='%s', section='%s'", scheme, section)
+
+	npc:register_door_for_npc	( )
+
+	local new_action = action_door(npc, storage)
+
+	-- Зарегистрировать все actions, в которых должен быть вызван метод reset_scheme при изменении настроек схемы:
+	xr_logic.subscribe_action_for_events(npc, storage, new_action)
+end
+
+function set_scheme(npc, ini, scheme, section, gulag_name)
+	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
+
+	st.logic     = xr_logic.cfg_get_switch_conditions(ini, section, npc)
+
+	st.closed    = utils.cfg_get_bool(ini, section, "closed", npc, false, true)
+	st.locked    = utils.cfg_get_bool(ini, section, "locked", npc, false)
+	st.no_force  = utils.cfg_get_bool(ini, section, "no_force", npc, false, false)
+	
+	st.not_for_npc  = utils.cfg_get_bool(ini, section, "not_for_npc", npc, false, false)
+
+	st.show_tips = utils.cfg_get_bool(ini, section, "show_tips", npc, false, true)
+
+	st.tip_open  = utils.cfg_get_string(ini, section, "tip_open", npc, false, "", "tip_door_open")		
+	st.tip_unlock  = utils.cfg_get_string(ini, section, "tip_open", npc, false, "", "tip_door_locked")
+	st.tip_close = utils.cfg_get_string(ini, section, "tip_close", npc, false, "", "tip_door_close")
+	
+	st.slider = utils.cfg_get_bool(ini, section, "slider", npc, false, false)
+	
+	
+--	st.snd_init        = utils.cfg_get_string(ini, section, "snd_init", npc, false, "")
+	st.snd_open_start  = utils.cfg_get_string(ini, section, "snd_open_start", npc, false, "", "trader_door_open_start")
+	st.snd_close_start = utils.cfg_get_string(ini, section, "snd_close_start", npc, false, "", "trader_door_close_start")
+	st.snd_close_stop  = utils.cfg_get_string(ini, section, "snd_close_stop", npc, false, "", "trader_door_close_stop")
+	
+	st.on_use    = xr_logic.cfg_get_condlist(ini, section, "on_use", npc)
+
+	if st.locked == true or st.not_for_npc == true then
+		if not npc:is_door_locked_for_npc() then	
+			npc:lock_door_for_npc()
+		end
+	else
+		if npc:is_door_locked_for_npc() then
+	 		npc:unlock_door_for_npc()
+	 	end
+	end
+		
+		
+		
+	st.hit_on_bone = utils.parse_data_1v(npc, utils.cfg_get_string(ini, section, "hit_on_bone", npc, false, ""))
+end
+
+
+-- Вызывается на апдейте НПС
+-- пробегается по всем дверям и пытается открыть те, которые находятся рядом с НПС
+-- возвращает список дверей, которую открыл данный НПС
+function try_to_open_door(npc)
+	if true then return {} end
+	local opened_doors = {}
+	local npc_position = npc:position()
+	for id,position in pairs(db.level_doors) do
+		if npc_position:distance_to_sqr(position) <= 9 then
+			if db.storage[id].ph_door ~= nil then
+				local action = db.storage[id].ph_door.door_action					
+				if action.st.not_for_npc == false and action.st.closed == true then
+					--printf("OPEN DOOR")
+					action:use_callback()
+					opened_doors[id] = true
+				end
+			end			
+		end
+	end
+	return opened_doors	
+end
+
+function try_to_close_door(npc, doors)
+	if true then return {} end
+	local npc_position = npc:position()
+	local closed_doors = {}
+	for id, v in pairs(doors) do
+		if npc_position:distance_to_sqr(db.level_doors[id]) > 9 then
+			if db.storage[id].ph_door ~= nil then
+				local action = db.storage[id].ph_door.door_action					
+				if action.st.not_for_npc == false and action.st.closed ~= true then
+					--printf("CLOSE DOOR")
+					action:use_callback()
+					closed_doors[id] = true
+				end
+			end			
+		end
+	end
+	return closed_doors
+end

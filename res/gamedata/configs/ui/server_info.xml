@@ -1,0 +1,45 @@
+<window>
+	<server_info x="144" y="115" width="749" height="543">
+		<background x="0" y="0" width="724" height="526">
+			<texture>ui_inGame2_Mp_screen_main_window</texture>
+		</background>
+		
+    <caption x="300" y="5" width="220" height="32">
+			<text font="letterica18" r="192" g="168" b="144" vert_align="c">mp_server_info</text>
+		</caption>
+
+    <image x="30" y="40" width="658" height="215" stretch="1">
+      <texture width="256" height="175">ui\ui_noise</texture>
+	    <auto_static x="0" y="0" width="658" height="234">
+	      <texture>ui_inGame2_Mp_screen_sponsor_window</texture>
+	    </auto_static>
+    </image>
+
+		<text_desc x="41" y="300" width="660" height="150" always_show_scroll="0" complex_mode="1" />
+    <text_body x="0" y="0" width="14" height="13">
+      <text font="letterica16">mp_default_rules</text>
+    </text_body>
+
+    <btn_next x="240" y="480" width="127" height="28">
+			<texture>ui_inGame2_Mp_bigbuttone</texture>
+			<text font="letterica18" align="c">mp_next</text>
+			<text_color>
+				<e r="227" g="199" b="178"/>
+				<t r="180" g="153" b="155"/>
+				<d r="106" g="95" b="91"/>
+				<h r="0" g="0" b="0"/>
+			</text_color>
+		</btn_next>
+
+    <btn_spectator x="380" y="480" width="127" height="28">
+			<texture>ui_inGame2_Mp_bigbuttone</texture>
+			<text font="letterica18" align="c">mp_spectator</text>
+			<text_color>
+				<e r="227" g="199" b="178"/>
+				<t r="180" g="153" b="155"/>
+				<d r="106" g="95" b="91"/>
+				<h r="0" g="0" b="0"/>
+			</text_color>
+		</btn_spectator>
+	</server_info>
+</window>

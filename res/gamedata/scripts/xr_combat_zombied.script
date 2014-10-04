@@ -1,0 +1,281 @@
+--[[----------------------------------------------------------------------------------------------------------
+Боевая схема зомбированных сталкеров
+Чугай Александр
+
+Сделать:
+	- анимация поворота
+------------------------------------------------------------------------------------------------------------]]
+
+local act_shoot  = 1
+local act_danger = 2
+
+class "evaluator_combat_zombied" ( property_evaluator )
+
+function evaluator_combat_zombied:__init( name, glob_storage ) super ( nil, name )
+	self.gst = glob_storage
+end
+
+function evaluator_combat_zombied:evaluate()
+	return character_community(self.object) == "zombied"
+end
+
+--------------------------------------------------------------------------------------------------------------
+
+class "action_zombie_shoot" ( action_base )
+
+function action_zombie_shoot:__init( name, storage )  super ( nil, name )
+	self.st = storage
+	self.t  = {}
+	self.was_hit = false
+	self.hit_reaction_end_time = 0
+end
+
+function action_zombie_shoot:initialize()
+	action_base.initialize( self )
+
+--	self.object:set_node_evaluator      ()
+--	self.object:set_path_evaluator      ()
+	self.object:set_desired_direction   ()
+	self.object:set_detail_path_type    ( move.line )
+	self.last_state = nil
+	local be  = self.object:best_enemy()
+	self.enemy_last_seen_pos = be:position()
+	self.enemy_last_seen_vid = be:level_vertex_id()
+	self.last_vid   = nil
+	self.valid_path = false
+	self.turn_time  = 0
+	self.st.cur_act = act_shoot
+
+--	xr_sound.set_sound_play(self.object:id(), "fight_enemy")
+end
+
+function action_zombie_shoot:set_state( state, be, pos )
+	self.t.look_object = be
+
+	if be then
+		self.t.look_position = self.enemy_last_seen_pos
+	else
+		self.t.look_position = pos
+	end
+
+	state_mgr.set_state( self.object, state, nil, nil, self.t )
+
+	self.last_state = state
+end
+
+function action_zombie_shoot:execute()
+	action_base.execute( self )
+
+	local be  = self.object:best_enemy()
+	local see = self.object:see( be )
+
+	--' Если видим врага - то запоминаем его позицию и ноду
+	if see then
+		self.enemy_last_seen_pos = be:position()
+		self.enemy_last_seen_vid = be:level_vertex_id()
+	end
+
+	if self.last_vid ~= self.enemy_last_seen_vid then
+		self.last_vid = self.enemy_last_seen_vid
+		self.valid_path = false
+		--' Запоминаем позицию, куда нам надо будет идти
+		if not self.object:accessible(self.enemy_last_seen_vid) then
+			self.enemy_last_accessible_vid, self.enemy_last_accessible_position  = self.object:accessible_nearest(level.vertex_position(self.enemy_last_seen_vid), vector())
+		else
+			self.enemy_last_accessible_vid, self.enemy_last_accessible_position  = self.enemy_last_seen_vid, self.enemy_last_seen_pos
+		end
+
+	end
+
+	self.object:set_path_type( game_object.level_path )
+
+	--' Если мы дальше чем в 3 метрах от позиции, идем в нее.
+	if self.object:position():distance_to_sqr( self.enemy_last_accessible_position ) > 9 then
+		if self.valid_path == false then
+			self.valid_path = true
+			self.object:set_dest_level_vertex_id(self.enemy_last_accessible_vid)
+		end
+		if see then
+			self:set_state( "raid_fire", be )
+
+		elseif self.was_hit then
+			self.was_hit = false
+			self.hit_reaction_end_time = time_global() + 5000
+
+			self:set_state( "raid_fire", nil, self.enemy_last_seen_pos )
+
+		elseif self.hit_reaction_end_time > time_global() then
+			--' продолжать идти и стрелять в точку, из которой был нанесён хит
+		else
+			self:set_state( "raid",      nil, self.enemy_last_seen_pos )
+		end
+		self.turn_time = 0
+	else
+		--' Стоим в позиции.
+		if see then
+			self:set_state( "threat_fire",  be )
+			self.turn_time = 0
+		else
+			--' Время от времени поворачиваем в случайном направлении, типа осматриваемся.
+			if self.was_hit then
+				self.was_hit = false
+				self.turn_time = time_global() + math.random( 5000, 7000 )
+				self:set_state( "threat_na", nil, self.enemy_last_seen_pos )
+			elseif self.turn_time < time_global() then
+				--'printf("[zombied_combat %s] turning", self.object:name())
+				self.turn_time = time_global() + math.random( 3000, 5000 )
+				self:set_state( "threat_na", nil, self:calc_random_direction() )
+			end
+		end
+	end
+end
+
+function action_zombie_shoot:calc_random_direction()
+	local ang      = math.pi * 2 * math.random()
+	local look_pos = vector():set( self.object:position() )
+
+	look_pos.x = look_pos.x + math.cos( ang )
+	look_pos.z = look_pos.z + math.sin( ang )
+
+	return look_pos
+end
+
+function action_zombie_shoot:finalize()
+	action_base.finalize( self )
+	self.st.cur_act = nil
+end
+
+-- вызывается как для action_zombie_shoot, так и для action_zombie_go_to_danger
+function action_zombie_shoot:hit_callback( obj, amount, local_direction, who, bone_index )
+	if who == nil then
+		return
+	end
+	if self.st.cur_act == act_shoot then
+		local be = self.object and self.object:best_enemy()
+		-- если получили хит от текущего врага, то мы знаем, где он
+		if be and who:id() == be:id() then
+			self.enemy_last_seen_pos   = be:position()
+			self.enemy_last_seen_vid   = be:level_vertex_id()
+			self.was_hit               = true
+		end
+	end
+end
+
+--------------------------------------------------------------------------------------------------------------
+
+class "action_zombie_go_to_danger" ( action_base )
+
+function action_zombie_go_to_danger:__init( name, storage )  super ( nil, name )
+	self.st = storage
+	self.t  = {}
+	self.was_hit               = false
+	self.hit_reaction_end_time = 0
+end
+
+function action_zombie_go_to_danger:initialize()
+	action_base.initialize( self )
+--	self.object:set_node_evaluator      ()
+--	self.object:set_path_evaluator      ()
+	self.object:set_desired_direction   ()
+	self.object:set_detail_path_type    ( move.line )
+	self.object:set_path_type           ( game_object.level_path )
+	self.last_state  = nil
+	self.bdo_id      = nil
+	self.bdo_vert_id = nil
+	self.last_sent_vert_id = nil
+	self.st.cur_act = act_danger
+end
+
+function action_zombie_go_to_danger:set_state( state, be, pos )
+	if state ~= self.last_state then
+		self.t.look_object   = be
+		self.t.look_position = pos
+		state_mgr.set_state( self.object, state, nil, nil, self.t )
+		self.last_state = state
+--		printf( "set state !!!!!!!!!!!" )
+	end
+end
+
+function action_zombie_go_to_danger:execute()
+	action_base.execute( self )
+	if self.was_hit then
+		self.was_hit = false
+		self.hit_reaction_end_time = time_global() + 5000
+		self:set_state( "raid_fire", nil, self.enemy_last_seen_pos )
+	elseif self.hit_reaction_end_time > time_global() then
+		-- продолжать идти и стрелять в точку, из которой был нанесён хит
+	else
+		local bd  = self.object:best_danger()
+		local bdo = bd:object()
+		if bdo and bd:type() ~= danger_object.grenade then
+			if not self.bdo_id or self.bdo_id ~= bdo:id() then
+				self.bdo_id      = bdo:id()
+				self.bdo_vert_id = bdo:level_vertex_id()
+			end
+			if self.bdo_vert_id ~= self.last_sent_vert_id then
+				self.last_sent_vert_id = self.bdo_vert_id
+				utils.send_to_nearest_accessible_vertex( self.object, self.bdo_vert_id )
+			end
+			self:set_state( "raid", nil, bd:position() )
+		else
+			self:set_state( "threat_na",  nil, bd:position() )
+		end
+	end
+end
+
+function action_zombie_go_to_danger:finalize()
+	action_base.finalize( self )
+	self.st.cur_act = nil
+end
+
+-- вызывается как для action_zombie_shoot, так и для action_zombie_go_to_danger
+function action_zombie_go_to_danger:hit_callback( obj, amount, local_direction, who, bone_index )
+	if who == nil then
+		return
+	end
+
+	if self.st.cur_act == act_danger then
+		local bd  = self.object:best_danger()
+		if bd then
+			local bdo = bd:object()
+			if bdo ~= nil and
+				 (bd:type() == danger_object.attacked or amount > 0)
+			then
+				self.enemy_last_seen_pos   = bdo:position()
+				self.enemy_last_seen_vid   = bdo:level_vertex_id()
+				self.was_hit               = true
+			end
+		end
+	end
+end
+
+--------------------------------------------------------------------------------------------------------------
+
+function add_to_binder( npc, ini, st, planner )
+	local properties  = {}
+
+	properties["state_mgr_logic_active"] 	= xr_evaluators_id.state_mgr + 4
+
+	planner:add_evaluator( xr_evaluators_id.combat_zombied_base, evaluator_combat_zombied( "combat_zombied", db.storage[npc:id()] ) )
+
+	local action = action_zombie_shoot( "action_zombie_shoot", st )
+	action:add_precondition( world_property( stalker_ids.property_alive,           true  ) )
+	action:add_precondition( world_property( xr_evaluators_id.combat_zombied_base, true  ) )
+	action:add_precondition( world_property( xr_evaluators_id.script_combat,       true  ) )
+	action:add_effect      ( world_property( stalker_ids.property_enemy,           false ) )
+	action:add_effect (world_property(properties["state_mgr_logic_active"], false))
+	planner:add_action( xr_actions_id.combat_zombied_base, action )
+
+	xr_logic.subscribe_action_for_events( npc, st, action )
+
+	action = action_zombie_go_to_danger( "action_zombie_go_to_danger", st )
+	action:add_precondition( world_property( stalker_ids.property_alive,           true  ) )
+	action:add_precondition( world_property( xr_evaluators_id.combat_zombied_base, true  ) )
+	action:add_precondition( world_property( stalker_ids.property_enemy,           false ) )
+	action:add_precondition( world_property( stalker_ids.property_danger,          true  ) )
+	action:add_effect      ( world_property( stalker_ids.property_danger,          false ) )
+	action:add_effect (world_property(properties["state_mgr_logic_active"], false))
+	planner:add_action( xr_actions_id.combat_zombied_base + 1, action )
+
+	xr_logic.subscribe_action_for_events( npc, st, action )
+end

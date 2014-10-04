@@ -1,0 +1,45 @@
+#include "common.h"
+
+uniform half3x4                        m_v2w                ;
+uniform	float4		screen_res;
+
+struct	_input
+{
+	float4	hpos : POSITION;
+#ifdef        USE_VTF
+	float4	tc0  : TEXCOORD0;		// tc.xy, tc.w = tonemap scale
+#else
+	float2	tc0  : TEXCOORD0;		// tc.xy
+#endif
+	float2	tcJ	 : TEXCOORD1;		// jitter coords
+};
+
+struct	v2p
+{
+	float2	tc0 : TEXCOORD0;
+	float2	tc1 : TEXCOORD1;
+};
+
+float4	main(_input I) : COLOR0
+{
+        //float4 	P	= tex2D         (s_position,      I.tc0);                // position.(mtl or sun)
+
+	// FIXME: Should add a half-texel offset to I.tc0 here
+	// This would fix horizontal line issue
+	float4 	P0	= tex2D         (s_position,      I.tc0 + 0.5f * screen_res.zw );                // position.(mtl or sun)
+	float4 	P1	= tex2D         (s_position,      I.tc0 - 0.5f * screen_res.zw );                // position.(mtl or sun)
+	float4 	P2	= tex2D         (s_position,      I.tc0 + 0.5f * float2(screen_res.z, -screen_res.w) );                // position.(mtl or sun)
+	float4 	P3	= tex2D         (s_position,      I.tc0 + 0.5f * float2(-screen_res.z, screen_res.w) );                // position.(mtl or sun)
+
+	float4 P = P0;
+	if (P1.z < P.z) P = P1;	
+	if (P2.z < P.z) P = P2;	
+	if (P3.z < P.z) P = P3;
+
+#if SSAO_OPT_DATA == 2	
+	return  float4(P.zzzz);
+#else	//	USE_HBAO == 2	
+	P 		= tex2D         (s_position,      I.tc0 - 0.5f * screen_res.zw);
+	return  float4(P.zzzz);
+#endif	//	USE_HBAO == 2
+}

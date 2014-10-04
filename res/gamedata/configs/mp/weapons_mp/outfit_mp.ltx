@@ -1,0 +1,225 @@
+[mp_scientific_outfit]:scientific_outfit
+$spawn              = "network\outfits\mp_scientific_outfit"
+class				= EQU_SCIE
+
+inv_name			= mp_scientific_outfit_name
+inv_name_short		= mp_scientific_outfit_name
+description			= mp_scientific_outfit_description
+
+
+burn_protection = 10			;коэффициенты защиты костюма персонажем
+strike_protection = 0 ;0.05
+shock_protection = 10
+wound_protection = 0.5
+radiation_protection = 1
+telepatic_protection = 0.99
+chemical_burn_protection = 4
+explosion_protection = 0.2
+hit_fraction_actor		= 0.25
+
+bones_koeff_protection = mp_scien_outfit_bones
+immunities_sect			= mp_sect_scientific_outfit_immunities
+
+[mp_scien_outfit_bones]
+hit_fraction		= 0.21
+
+bip01_pelvis 		 = 1.88, 0.35 ;1.8, 0.3
+bip01_spine 		 = 1.88, 0.35 ;1.8, 0.3
+bip01_spine1 		 = 1.88, 0.35 ;1.8, 0.3
+bip01_spine2		 = 1.88, 0.35 ;1.8, 0.3
+bip01_neck 		 = 2.8, 0.30 ;2.0, 0.20
+bip01_head 		 = 2.8, 0.30 ;2.0, 0.20
+eyelid_1 		 = 2.8, 0.30 ;2.0, 0.20
+eye_left 		 = 2.8, 0.02 ;2.0, 0.01 
+eye_right 		 = 2.8, 0.02 ;2.0, 0.01
+jaw_1 		 	 = 2.8, 0.30 ;2.0, 0.20
+
+
+bip01_l_clavicle	 = 1.88, 0.35, 1.5 ;1.8, 0.3
+bip01_l_upperarm	 = 1.88, 0.35, 1.5 ;1.8, 0.3, 1
+bip01_l_forearm	 	 = 1.88, 0.35, 1.5 ;1.8, 0.3, 1
+bip01_l_hand	 	 = 1.88, 0.35, 1.5 ;1.8, 0.3, 1
+
+bip01_r_clavicle	 = 1.88, 0.35 ;1.8, 0.3
+bip01_r_upperarm	 = 1.88, 0.35, 1.5 ;1.8, 0.3, 1
+bip01_r_forearm	 	 = 1.88, 0.35, 1.5 ;1.8, 0.3, 1
+bip01_r_hand	 	 = 1.88, 0.35, 1.5 ;1.8, 0.3, 1
+bip01_l_finger0	 	 = 1.88, 0.35, 1.5 ;1.8, 0.3, 1
+bip01_l_finger1	 	 = 1.88, 0.35, 1.5 ;1.8, 0.3, 1
+bip01_l_finger2	 	 = 1.88, 0.35, 1.5 ;1.8, 0.3, 1
+
+bip01_l_thigh	 	 = 1.88, 0.35 ;1.8, 0.3
+bip01_l_calf	 	 = 1.88, 0.35 ;1.8, 0.3
+bip01_l_foot	 	 = 1.88, 0.35 ;1.8, 0.3
+
+bip01_r_thigh	 	 = 1.88, 0.35 ;1.8, 0.3
+bip01_r_calf	 	 = 1.88, 0.35 ;1.8, 0.3
+bip01_r_foot	 	 = 1.88, 0.35 ;1.8, 0.3
+bip01_r_finger0	 	 = 1.88, 0.35, 1.5 ;1.8, 0.3, 1
+bip01_r_finger1	 	 = 1.88, 0.35, 1.5 ;1.8, 0.3, 1
+bip01_r_finger2	 	 = 1.88, 0.35, 1.5 ;1.8, 0.3, 1
+
+
+[mp_sect_scientific_outfit_immunities]
+burn_immunity				= 0.05				;коэффициенты иммунитета самого костюма
+strike_immunity				= 0.5 ;0.00
+shock_immunity				= 0.00
+wound_immunity				= 1.00
+radiation_immunity			= 0.00
+telepatic_immunity			= 0.00
+chemical_burn_immunity		= 0.05
+explosion_immunity			= 0.5 ;0.00
+fire_wound_immunity			= 0.08
+
+[mp_military_stalker_outfit]:military_outfit
+$spawn              	= "network\outfits\mp_military_stalker_outfit"
+class				= EQU_MLTR
+inv_name			= mp_military_outfit_name
+inv_name_short		= mp_military_outfit_name
+description			= mp_military_outfit_description
+
+burn_protection = 0.5 ;0.6			;коэффициенты защиты костюма персонажем
+strike_protection = 0 ;0.2
+shock_protection = 0.6
+wound_protection = 0.6
+radiation_protection = 0.00005 ;0.5
+telepatic_protection = 0.6
+chemical_burn_protection = 0.5 ;0.6
+explosion_protection = 0.3 ;0.6
+hit_fraction_actor	   = 0.12
+
+immunities_sect			= mp_military_stalker_outfit_immunities
+
+bones_koeff_protection = mp_military_outfit_bones
+
+power_loss = 0.55 ;0.67
+
+[mp_military_stalker_outfit_immunities]
+burn_immunity				= 0.4				;коэффициенты иммунитета самого костюма
+strike_immunity				= 0.4
+shock_immunity				= 0.1
+wound_immunity				= 0.3 ;0.50
+radiation_immunity			= 0.00
+telepatic_immunity			= 0.00
+chemical_burn_immunity		= 0.05 ;1.00
+explosion_immunity			= 0.3 ;0.50
+fire_wound_immunity			= 0.04
+
+
+[mp_military_outfit_bones]
+hit_fraction		= 0.11
+
+bip01_pelvis 		 = 1.38, 0.35 ;1.3, 0.3
+bip01_spine 		 = 1.38, 0.35 ;1.3, 0.3
+bip01_spine1 		 = 1.38, 0.35 ;1.3, 0.3
+bip01_spine2		 = 1.38, 0.35 ;1.3, 0.3
+bip01_neck 		 = 1.58, 0.35 ;1.5, 0.3
+bip01_head 		 = 1.58, 0.35 ;1.5, 0.3
+eyelid_1 		 = 1.58, 0.35 ;1.5, 0.3
+eye_left 		 = 2.5, 0.02 ;2.0, 0.01
+eye_right 		 = 2.5, 0.02 ;2.0, 0.01
+jaw_1 		 	 = 1.58, 0.35 ;1.5, 0.3
+
+bip01_l_clavicle	 = 1.38, 0.35 ;1.3, 0.3
+bip01_l_upperarm	 = 1.38, 0.35 ;1.3, 0.3
+bip01_l_forearm	 	 = 1.38, 0.35 ;1.3, 0.3
+bip01_l_hand	 	 = 1.38, 0.35 ;1.3, 0.3
+bip01_l_finger0	 	 = 1.38, 0.35 ;1.3, 0.3
+bip01_l_finger1	 	 = 1.38, 0.35 ;1.3, 0.3
+bip01_l_finger2	 	 = 1.38, 0.35 ;1.3, 0.3
+
+bip01_r_clavicle	 = 1.38, 0.35 ;1.3, 0.3
+bip01_r_upperarm	 = 1.38, 0.35 ;1.3, 0.3
+bip01_r_forearm	 	 = 1.38, 0.35 ;1.3, 0.3
+bip01_r_hand	 	 = 1.38, 0.35 ;1.3, 0.3
+bip01_r_finger0	 	 = 1.38, 0.35 ;1.3, 0.3
+bip01_r_finger1	 	 = 1.38, 0.35 ;1.3, 0.3
+bip01_r_finger2	 	 = 1.38, 0.35 ;1.3, 0.3
+
+bip01_l_thigh	 	 = 1.38, 0.35 ;1.3, 0.3
+bip01_l_calf	 	 = 1.38, 0.35 ;1.3, 0.3
+bip01_l_foot	 	 = 1.38, 0.35 ;1.3, 0.3
+
+bip01_r_thigh	 	 = 1.38, 0.35 ;1.3, 0.3
+bip01_r_calf	 	 = 1.38, 0.35 ;1.3, 0.3
+bip01_r_foot	 	 = 1.38, 0.35 ;1.3, 0.3
+
+
+
+[mp_exo_outfit]:exo_outfit
+$spawn              	= "network\outfits\mp_exo_outfit"
+class				= EQU_EXO
+inv_name			= mp_exo_outfit_name
+inv_name_short		= mp_exo_outfit_name
+description			= mp_exo_outfit_description
+
+
+burn_protection = 0.9 ;0.5		;коэффициенты защиты костюма персонажем
+strike_protection = 0.7 ;0.4
+shock_protection = 0.9
+wound_protection = 0.6
+radiation_protection = 0.0001
+telepatic_protection = 0.6
+chemical_burn_protection = 0.9 ;0,5 
+explosion_protection = 0.5 ;0.3
+hit_fraction_actor = 0.2
+
+immunities_sect			= mp_exo_outfit_immunities
+bones_koeff_protection = mp_exo_outfit_bones
+
+;запрещение режима Sprint для Актера
+sprint_allowed			= false
+
+control_inertion_factor = 0.1
+
+
+[mp_exo_outfit_immunities]:sect_exo_outfit_immunities
+burn_immunity				= 0.1 ;0.2				;коэффициенты иммунитета самого костюма
+strike_immunity				= 0.6 ;0.7 
+shock_immunity				= 0.1 ;1.00
+wound_immunity				= 0.10
+radiation_immunity			= 0.00
+telepatic_immunity			= 0.00
+chemical_burn_immunity		= 0.05 ;1.00
+explosion_immunity			= 0.3
+fire_wound_immunity			= 0.02
+
+[mp_exo_outfit_bones]
+hit_fraction		= 0.2
+
+bip01_pelvis 		 = 1.2, 0.5 ;1.1, 0.4
+bip01_spine 		 = 1.2, 0.5 ;1.1, 0.4
+bip01_spine1 		 = 1.2, 0.5 ;1.1, 0.4
+bip01_spine2 		 = 1.2, 0.5 ;1.1, 0.4
+bip01_neck 		 = 0.8, 0.45 ;0.7, 0.35
+bip01_head 		 = 0.8, 0.45 ;0.7, 0.35
+eyelid_1 		 = 0.8, 0.45 ;0.7, 0.35
+eye_left 		 = 2.1, 0.02 ;2.0, 0.01
+eye_right 		 = 2.1, 0.02 ;2.0, 0.01
+jaw_1 		 	 = 0.8, 0.5 ;0.7, 0.4
+
+bip01_l_clavicle	 = 1.2, 0.5 ;1.1, 0.4
+bip01_l_upperarm	 = 1.2, 0.5 ;1.1, 0.4
+bip01_l_forearm	 	 = 1.2, 0.5 ;1.1, 0.4
+bip01_l_hand	 	 = 1.2, 0.5 ;1.1, 0.4
+bip01_l_finger0	 	 = 1.2, 0.5 ;1.1, 0.4
+bip01_l_finger1	 	 = 1.2, 0.5 ;1.1, 0.4
+bip01_l_finger2	 	 = 1.2, 0.5 ;1.1, 0.4
+
+
+bip01_r_clavicle	 = 1.2, 0.5 ;1.1, 0.4
+bip01_r_upperarm	 = 1.2, 0.5 ;1.1, 0.4
+bip01_r_forearm	 	 = 1.2, 0.5 ;1.1, 0.4
+bip01_r_hand	 	 = 1.2, 0.5 ;1.1, 0.4
+bip01_r_finger0	 	 = 1.2, 0.5 ;1.1, 0.4
+bip01_r_finger1	 	 = 1.2, 0.5 ;1.1, 0.4
+bip01_r_finger2	 	 = 1.2, 0.5 ;1.1, 0.4
+
+bip01_l_thigh	 	 = 1.2, 0.5 ;1.1, 0.4
+bip01_l_calf	 	 = 1.2, 0.5 ;1.1, 0.4
+bip01_l_foot	 	 = 1.2, 0.5 ;1.1, 0.4
+
+bip01_r_thigh	 	 = 1.2, 0.5 ;1.1, 0.4
+bip01_r_calf	 	 = 1.2, 0.5 ;1.1, 0.4
+bip01_r_foot	 	 = 1.2, 0.5 ;1.1, 0.4
+

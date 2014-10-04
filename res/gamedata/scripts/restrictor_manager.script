@@ -1,0 +1,145 @@
+
+class "Crestrictor_manager"
+
+function Crestrictor_manager:__init(obj)
+  	self.object = obj
+  	self.base_out_restrictions = {}
+  	self.base_in_restrictions = {}	
+	self.out_restrictions = utils.parse_names(self.object:out_restrictions())
+	for k,v in pairs(self.out_restrictions) do
+		self.base_out_restrictions[v] = true
+	end
+	self.in_restrictions = utils.parse_names(self.object:in_restrictions())
+	for k,v in pairs(self.in_restrictions) do
+		self.base_in_restrictions[v] = true
+	end
+end
+
+
+----------------------------------------------------------------------------------------------------------------------
+-- STALKER restrictions
+----------------------------------------------------------------------------------------------------------------------
+--' Данная функция вычитывает из логики набор рестрикторов, которые нужно проставить персонажу.
+function Crestrictor_manager:reset_restrictions(st, section)
+	--printf("reset restrictions obj=%s section=%s", self.object:name(), tostring(section))
+
+	local actual_ini = st.ini
+	
+	local out_restr_string = get_param_string(utils.cfg_get_string(actual_ini, section, "out_restr", nil, false, "", ""), self.object)
+	
+	--' Вычитываем новые аут рестрикторы
+	local new_out_restr = utils.parse_names(out_restr_string)
+	
+	--' Узнаем про существующие аут рестрикторы
+	local old_out_restr = utils.parse_names(self.object:out_restrictions())
+
+	--[[
+	printf("old out_restrs table:")
+	print_table(old_out_restr)	
+	printf("new out_restrs table:")
+	print_table(new_out_restr)
+	]]--	
+
+	--' Проверяем появились ли новые рестрикторы.
+	local ins_restr = {}  --' Тут поместим рестрикторы, которые нужно добавить
+	local del_restr = {}  --' Тут поместим рестрикторы, которые нужно удалить
+	for k,v in pairs(old_out_restr) do
+		local exist_rest = false
+		for kk,vv in pairs(new_out_restr) do
+			if v == vv then
+				exist_rest = true
+				break
+			end
+		end
+		if exist_rest == false and self.base_out_restrictions[v] ~= true then
+			table.insert(del_restr, v)
+		end
+	end
+	for k,v in pairs(new_out_restr) do
+		local exist_rest = false
+		for kk,vv in pairs(old_out_restr) do
+			if v == vv then
+				exist_rest = true
+				break
+			end
+		end
+		if exist_rest == false and v ~= "nil" then
+			table.insert(ins_restr, v)
+		end
+	end
+
+	--'Удаляем старые аут рестрикторы. апплаим новые.
+	for k,v in pairs(del_restr) do
+		--printf("old out_restr [%s] deleted", v)
+		self.object:remove_restrictions(v, "")
+	end
+	for k,v in pairs(ins_restr) do
+		--printf("new out_restr [%s] added", v)
+		self.object:add_restrictions(v, "")
+	end
+
+	
+	
+	--' Вычитываем новые ИН рестрикторы
+	local in_restr_string = get_param_string(utils.cfg_get_string(actual_ini, section, "in_restr", nil, false, "", ""), self.object)
+	
+	--' Вычитываем новые аут рестрикторы
+	local new_in_restr = utils.parse_names(in_restr_string)
+
+	--' Узнаем про существующие ИН рестрикторы
+	local old_in_restr = utils.parse_names(self.object:in_restrictions())
+
+	--[[
+	printf("old in_restrs table:")
+	print_table(old_in_restr)	
+	printf("new in_restrs table:")
+	print_table(new_in_restr)
+	]]--	
+
+	--' Проверяем появились ли новые рестрикторы.
+	ins_restr = {}  --' Тут поместим рестрикторы, которые нужно добавить
+	del_restr = {}  --' Тут поместим рестрикторы, которые нужно удалить
+	for k,v in pairs(old_in_restr) do
+		local exist_rest = false
+		for kk,vv in pairs(new_in_restr) do
+			if v == vv then
+				exist_rest = true
+				break
+			end
+		end
+		if exist_rest == false and self.base_in_restrictions[v] ~= true then
+			table.insert(del_restr, v)
+		end
+	end
+	for k,v in pairs(new_in_restr) do
+		local exist_rest = false
+		for kk,vv in pairs(old_in_restr) do
+			if v == vv then
+				exist_rest = true
+				break
+			end
+		end
+		if exist_rest == false and v ~= "nil" then
+			table.insert(ins_restr, v)
+		end
+	end
+
+	--'Удаляем старые аут рестрикторы. апплаим новые.
+	for k,v in pairs(del_restr) do
+		--printf("old in_restr [%s] deleted", v)
+		self.object:remove_restrictions("", v)
+	end
+	for k,v in pairs(ins_restr) do
+		--printf("new in_restr [%s] added", v)
+		self.object:add_restrictions("", v)
+	end
+	 
+end
+
+
+function get_restrictor_manager(npc)
+	if db.storage[npc:id()].restrictor_manager == nil then
+		db.storage[npc:id()].restrictor_manager = Crestrictor_manager(npc)
+	end
+	return db.storage[npc:id()].restrictor_manager
+end

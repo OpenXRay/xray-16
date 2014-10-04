@@ -1,0 +1,150 @@
+[campfire_base]:zone_base
+hit_impulse_scale     = 0.0
+effective_radius      = 1.3
+
+ef_anomaly_type       = 1
+ef_weapon_type        = 13
+
+postprocess         = postprocess_flame
+
+;----------- Anomaly settings -----------------------
+max_start_power   = 0.40
+attenuation     = 1
+
+idle_particles        = explosions\campfire
+blowout_particles     = explosions\campfire_disabled
+
+hit_small_particles     = damage_fx\burn_creatures00
+hit_big_particles     = damage_fx\burn_creatures00
+idle_small_particles    = damage_fx\burn_creatures00
+idle_big_particles      = damage_fx\burn_creatures00
+
+idle_particles_dont_stop  = true
+
+idle_sound          = ambient\fire2
+blowout_sound       = ambient\fire2
+hit_sound         = ambient\fire2
+entrance_sound        = ambient\fire2
+
+hit_type          = light_burn
+
+disable_time        = 10000 ;время игнорирования неживого объекта в зоне (-1 если не нужно)
+disable_time_small      = -1  ;время игнорирования маленького неживого объекта в зоне (-1 если не нужно)
+disable_idle_time     = 50000 ;время отключения idle партиклов
+
+ignore_nonalive       = false
+ignore_small        = true
+ignore_artefacts      = true
+
+blowout_light       = on
+light_color           = 1.8,1.7,1.4
+light_animation             = koster
+light_range           = 8
+light_time            = 0.35
+light_height        = 0.75      ;подъем источника света на высоту
+
+idle_light_r1			= false
+idle_light          = on
+idle_light_range      = 8.0
+idle_light_range_delta    = 0.25
+idle_light_anim       = koster_00
+idle_light_height     = 0.70      ;подъем источника света на высоту
+
+awaking_time        = 0
+blowout_time        = 1000
+accamulate_time       = 0
+
+blowout_wind        = off
+
+blowout_wind_time_start	= 0
+blowout_wind_time_peak	= 600
+blowout_wind_time_end	= 899
+blowout_wind_power		= 0.5     ;сила поднимаего ветра (от 0 до 1), в момент blowout_wind_time_peak
+
+shape_transp_color		= 255, 0, 0, 60
+shape_edge_color		= 32, 32, 32, 255
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+[campfire_base_noshadow]:zone_base_noshadow
+hit_impulse_scale     = 0.0
+effective_radius      = 1.3
+
+ef_anomaly_type       = 1
+ef_weapon_type        = 13
+
+postprocess         = postprocess_flame
+
+;----------- Anomaly settings -----------------------
+max_start_power   = 0.40
+attenuation     = 1
+
+idle_particles        = explosions\campfire
+blowout_particles     = explosions\campfire_disabled
+
+hit_small_particles     = damage_fx\burn_creatures00
+hit_big_particles     = damage_fx\burn_creatures00
+idle_small_particles    = damage_fx\burn_creatures00
+idle_big_particles      = damage_fx\burn_creatures00
+
+idle_particles_dont_stop  = true
+
+idle_sound          = ambient\fire2
+blowout_sound       = ambient\fire2
+hit_sound         = ambient\fire2
+entrance_sound        = ambient\fire2
+
+hit_type          = light_burn
+
+disable_time        = 10000 ;время игнорирования неживого объекта в зоне (-1 если не нужно)
+disable_time_small      = -1  ;время игнорирования маленького неживого объекта в зоне (-1 если не нужно)
+disable_idle_time     = 50000 ;время отключения idle партиклов
+
+ignore_nonalive      = true
+ignore_small        	= true
+ignore_artefacts     = true
+
+blowout_light       = off
+light_color           = 1.8,1.7,1.4
+light_animation             = koster
+light_range           = 8
+light_time            = 0.35
+light_height        = 0.75      ;подъем источника света на высоту
+
+idle_light_r1			= false
+idle_light          = off
+idle_light_range      = 8.0
+idle_light_range_delta    = 0.25
+idle_light_anim       = koster_00
+idle_light_height     = 0.70      ;подъем источника света на высоту
+
+awaking_time        = 0
+blowout_time        = 1000
+accamulate_time       = 0
+
+blowout_wind        = off
+
+blowout_wind_time_start	= 0
+blowout_wind_time_peak	= 600
+blowout_wind_time_end	= 899
+blowout_wind_power		= 0.5     ;сила поднимаего ветра (от 0 до 1), в момент blowout_wind_time_peak
+
+shape_transp_color		= 255, 0, 0, 60
+shape_edge_color		= 32, 32, 32, 255
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+[campfire]:campfire_base
+$spawn            		= "campfire\campfire_dynamics"
+class           			= Z_CFIRE
+script_binding        	= bind_campfire.bind
+
+disabled_particles		= explosions\campfire_disabled
+enabling_particles		= explosions\campfire_enabled
+disabled_sound				= ambient\fire2
+
+shape_transp_color		= 255, 0, 0, 60
+shape_edge_color		= 32, 32, 32, 255
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------

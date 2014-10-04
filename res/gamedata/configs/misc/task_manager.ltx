@@ -1,0 +1,247 @@
+; Выдача заданий: =give_task(тип_задания:ид_задания:группировка)
+
+#include "tm_zaton.ltx"
+#include "tm_jupiter.ltx"
+#include "tm_pripyat.ltx"
+
+[test_storyline_task]
+icon = ui_mt_image_attack_tower
+prior = 5
+title = {-a} test_storyline_task_name, nil
+;title_functor = condlist
+descr = {+a} test_storyline_task_text, nil
+;descr_functor = condlist
+target = {-a} test
+;target_functor = target_condlist
+reward_money = 10000
+condlist_0 = {+test_info_1} complete
+storyline = true
+
+[test_storyline_task2]
+icon = ui_mt_image_attack_tower
+prior = 2
+title = {-a} test_storyline_task_name2, nil
+;title_functor = condlist
+descr = {+a} test_storyline_task_text2, nil
+;descr_functor = condlist
+;target = {-a} test2
+;target_functor = target_condlist
+reward_money = 10000
+condlist_0 = {+test_info_1} complete
+storyline = false
+
+[tbt_task_1]
+icon = ui_mt_image_attack_tower
+prior = 4
+title = tbt_task_1_name
+descr = tbt_task_1_text
+target = tbt_snork
+reward_money = 10000
+condlist_0 = {+tbt_task_1_complete} complete
+
+[tbt_task_2]
+icon = ui_mt_image_attack_tower
+prior = 3
+title = tbt_task_2_name
+descr = tbt_task_2_text
+target = tbt_move_1
+reward_money = 10000
+condlist_0 = {+tbt_task_2_complete} complete
+
+[tbt_task_3]
+icon = ui_mt_image_attack_tower
+prior = 2
+title = tbt_task_3_name
+descr = tbt_task_3_text
+target = tbt_move_2
+reward_money = 10000
+condlist_0 = {+tbt_task_3_complete} complete
+
+[tbt_task_4]
+icon = ui_mt_image_attack_tower
+prior = 1
+title = tbt_task_4_name
+descr = tbt_task_4_text
+target = tbt_move_3
+reward_money = 10000
+condlist_0 = {+tbt_task_4_complete} complete
+
+[hide_from_surge]
+icon = ui_inGame2_Vibros
+prior = 200
+title_functor = surge_task_title
+descr_functor = surge_task_descr
+target_functor = surge_task_target
+;dont_send_update_news = true
+condlist_0 = {=surge_complete()} complete
+condlist_1 = {!actor_alive()} fail
+
+
+[test_storyline_task3]
+icon = ui_mt_image_attack_tower
+prior = 2
+title = {-a} test_storyline_task_name2, nil
+;title_functor = condlist
+descr = {+a} test_storyline_task_text2, nil
+;descr_functor = condlist
+;target = {-a} test2
+;target_functor = target_condlist
+reward_money = 10000
+condlist_0 = {+test_info_1} complete
+storyline = false
+
+[test_storyline_task4]
+icon = ui_mt_image_attack_tower
+prior = 2
+title = {-a} test_storyline_task_name2, nil
+;title_functor = condlist
+descr = {+a} test_storyline_task_text2, nil
+;descr_functor = condlist
+;target = {-a} test2
+;target_functor = target_condlist
+reward_money = 10000
+condlist_0 = {+test_info_1} complete
+storyline = false
+
+[test_storyline_task5]
+icon = ui_mt_image_attack_tower
+prior = 2
+title = {-a} test_storyline_task_name2, nil
+;title_functor = condlist
+descr = {+a} test_storyline_task_text2, nil
+;descr_functor = condlist
+;target = {-a} test2
+;target_functor = target_condlist
+reward_money = 10000
+condlist_0 = {+test_info_1} complete
+storyline = false
+
+[test_storyline_task6]
+icon = ui_mt_image_attack_tower
+prior = 2
+title = {-a} test_storyline_task_name2, nil
+;title_functor = condlist
+descr = {+a} test_storyline_task_text2, nil
+;descr_functor = condlist
+;target = {-a} test2
+;target_functor = target_condlist
+reward_money = 10000
+condlist_0 = {+test_info_1} complete
+storyline = false
+
+[test_storyline_task7]
+icon = ui_mt_image_attack_tower
+prior = 2
+title = {-a} test_storyline_task_name2, nil
+;title_functor = condlist
+descr = {+a} test_storyline_task_text2, nil
+;descr_functor = condlist
+;target = {-a} test2
+;target_functor = target_condlist
+reward_money = 10000
+condlist_0 = {+test_info_1} complete
+storyline = false
+
+[test_storyline_task8]
+icon = ui_mt_image_attack_tower
+prior = 2
+title = {-a} test_storyline_task_name2, nil
+;title_functor = condlist
+descr = {+a} test_storyline_task_text2, nil
+;descr_functor = condlist
+;target = {-a} test2
+;target_functor = target_condlist
+reward_money = 10000
+condlist_0 = {+test_info_1} complete
+storyline = false
+
+[test_storyline_task9]
+icon = ui_mt_image_attack_tower
+prior = 2
+title = {-a} test_storyline_task_name2, nil
+;title_functor = condlist
+descr = {+a} test_storyline_task_text2, nil
+;descr_functor = condlist
+;target = {-a} test2
+;target_functor = target_condlist
+reward_money = 10000
+condlist_0 = {+test_info_1} complete
+storyline = false
+
+[test_storyline_task10]
+icon = ui_mt_image_attack_tower
+prior = 2
+title = {-a} test_storyline_task_name2, nil
+;title_functor = condlist
+descr = {+a} test_storyline_task_text2, nil
+;descr_functor = condlist
+;target = {-a} test2
+;target_functor = target_condlist
+reward_money = 10000
+condlist_0 = {+test_info_1} complete
+storyline = false
+
+[test_storyline_task11]
+icon = ui_mt_image_attack_tower
+prior = 2
+title = {-a} test_storyline_task_name2, nil
+;title_functor = condlist
+descr = {+a} test_storyline_task_text2, nil
+;descr_functor = condlist
+;target = {-a} test2
+;target_functor = target_condlist
+reward_money = 10000
+condlist_0 = {+test_info_1} complete
+storyline = false
+
+[test_storyline_task12]
+icon = ui_mt_image_attack_tower
+prior = 2
+title = {-a} test_storyline_task_name2, nil
+;title_functor = condlist
+descr = {+a} test_storyline_task_text2, nil
+;descr_functor = condlist
+;target = {-a} test2
+;target_functor = target_condlist
+reward_money = 10000
+condlist_0 = {+test_info_1} complete
+storyline = false
+
+[test_storyline_task13]
+icon = ui_mt_image_attack_tower
+prior = 2
+title = {-a} test_storyline_task_name2, nil
+;title_functor = condlist
+descr = {+a} test_storyline_task_text2, nil
+;descr_functor = condlist
+;target = {-a} test2
+;target_functor = target_condlist
+reward_money = 10000
+condlist_0 = {+test_info_1} complete
+storyline = false
+
+[test_storyline_task14]
+icon = ui_mt_image_attack_tower
+prior = 2
+title = {-a} test_storyline_task_name2, nil
+;title_functor = condlist
+descr = {+a} test_storyline_task_text2, nil
+;descr_functor = condlist
+;target = {-a} test2
+;target_functor = target_condlist
+reward_money = 10000
+condlist_0 = {+test_info_1} complete
+storyline = false
+
+[test_storyline_task15]
+icon = ui_mt_image_attack_tower
+prior = 2
+title = {-a} test_storyline_task_name2, nil
+;title_functor = condlist
+descr = {+a} test_storyline_task_text2, nil
+;descr_functor = condlist
+;target = {-a} test2
+;target_functor = target_condlist
+reward_money = 10000
+condlist_0 = {+test_info_1} complete
+storyline = false

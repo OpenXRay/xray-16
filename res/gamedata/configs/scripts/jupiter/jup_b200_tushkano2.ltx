@@ -1,0 +1,28 @@
+[logic@tushkano2]
+suitable = {=check_npc_name(tushkano)}
+active = mob_home@1
+monster_job = true
+
+[mob_home@1]
+path_home = home_1
+home_min_radius = 5
+home_max_radius = 10
+aggressive = true
+on_timer = 20000 |  mob_home@2
+combat_ignore_cond = {=check_enemy_name(sim_default)} true 
+
+[mob_home@2]
+path_home = home_2
+home_min_radius = 5
+home_max_radius = 10
+aggressive = true
+on_timer = 15000 |  mob_home@3
+combat_ignore_cond = {=check_enemy_name(sim_default)} true 
+
+[mob_home@3]
+path_home = home_3
+home_min_radius = 5
+home_max_radius = 10
+aggressive = true
+on_timer = 15000 |  mob_home@1
+combat_ignore_cond = {=check_enemy_name(sim_default)} true 

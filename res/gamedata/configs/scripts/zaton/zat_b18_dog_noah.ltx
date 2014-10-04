@@ -1,0 +1,81 @@
+[logic@dog_noah]
+active = mob_walker@stay
+suitable = {=check_npc_name(zat_b18_dog_noah) -zat_b18_dog_noah_free} true
+prior = 75
+monster_job = true
+on_hit = hit
+
+[mob_walker@stay]
+path_walk = dog_1_walk 
+path_look = dog_1_look
+out_restr = zat_b18_out_restrictor_noah
+actor_friendly = true
+on_info = {+zat_b18_actor_enemy} mob_home@attack %=set_visual_memory_enabled(1)%
+on_info2 = {+zat_b18_noah_go_away} mob_walker@waiting_sleep
+on_info3 = {+zat_b18_noah_remembers} mob_walker@waiting_sleep
+on_info4 = {-zat_b18_dog_indi} %+zat_b18_dog_indi =set_visual_memory_enabled(0)%
+combat_ignore_cond = {=check_enemy_name(zat_b18_noah)} true, {=check_enemy_name(actor)} true
+aggressive = false
+
+[mob_walker@go_away]
+path_walk = dog_1_walk 
+path_look = dog_attack_look
+on_timer = 3000 | mob_walker@waiting_sleep
+aggressive = false
+out_restr = zat_b18_out_restrictor_noah
+combat_ignore_cond = {=check_enemy_name(zat_b18_noah)} true, {=check_enemy_name(actor)} true
+actor_friendly = true
+on_info = {+zat_b18_actor_enemy} mob_home@attack %=set_visual_memory_enabled(1)%
+on_info2 = {+zat_b18_reset_memory} mob_walker@stay %-zat_b18_actor_enemy%
+
+[mob_walker@waiting_sleep]
+path_walk = dog_1_walk 
+path_look = dog_1_look
+out_restr = zat_b18_out_restrictor_noah
+actor_friendly = true
+on_timer = 3500 | {~50} mob_walker@sleep, mob_walker@sit
+on_info = {+zat_b18_actor_enemy} mob_home@attack %=set_visual_memory_enabled(1)%
+combat_ignore_cond = {=check_enemy_name(zat_b18_noah)} true, {=check_enemy_name(actor)} true
+aggressive = false
+
+[mob_walker@sit]
+path_walk = dog_1_walk 
+path_look = dog_sit_look
+on_timer = 30000 | mob_walker@waiting_sleep
+aggressive = false
+on_actor_dist_le_nvis = 2 | mob_walker@waiting_sleep
+out_restr = zat_b18_out_restrictor_noah
+combat_ignore_cond = {=check_enemy_name(zat_b18_noah)} true, {=check_enemy_name(actor)} true
+actor_friendly = true
+on_info = {+zat_b18_actor_enemy} mob_home@attack %=set_visual_memory_enabled(1)%
+;on_info2 = {+zat_b18_reset_memory} mob_walker@stay 
+
+[mob_walker@sleep]
+path_walk = dog_1_walk
+path_look = dog_sleep_look
+on_timer = 30000 | mob_walker@waiting_sleep
+aggressive = false
+on_actor_dist_le_nvis = 2 | mob_walker@waiting_sleep
+out_restr = zat_b18_out_restrictor_noah
+combat_ignore_cond = {=check_enemy_name(zat_b18_noah)} true, {=check_enemy_name(actor)} true
+actor_friendly = true
+on_info = {+zat_b18_actor_enemy} mob_home@attack %=set_visual_memory_enabled(1)%
+;on_info2 = {+zat_b18_reset_memory} mob_walker@stay 
+
+[mob_home@attack]
+path_home = dog_1_walk
+home_min_radius = 30
+home_max_radius = 40
+aggressive = true
+actor_friendly = false
+out_restr = zat_b18_out_restrictor_noah
+on_info = {+zat_b18_reset_memory} mob_walker@stay %-zat_b18_actor_enemy =set_visual_memory_enabled(0)%
+on_info2 = {+zat_b18_noah_dead !dist_to_actor_le(130) -zat_b18_dog_noah_free} %+zat_b18_dog_noah_free%
+combat_ignore_cond = {=check_enemy_name(zat_b18_noah)} true
+
+
+[hit]
+on_info = {=hit_by_actor -zat_b18_actor_enemy} %+zat_b18_actor_enemy%
+
+;[physics]
+;controller_can_be_moved_by_player = false

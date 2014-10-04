@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="csky_heavy_outfit_name">
+		<text>CS-3a Kцrperpanzerung</text>
+	</string>
+	<string id="dolg_heavy_outfit_name">
+		<text>PSZ-9d Wдchterpanzerung</text>
+	</string>
+	<string id="dolg_outfit_name">
+		<text>PS5-M Universalschutzanzug</text>
+	</string>
+	<string id="exo_outfit_name">
+		<text>Exoskelett</text>
+	</string>
+	<string id="military_outfit_name">
+		<text>Bulat-Kampfanzug</text>
+	</string>
+	<string id="mp_exo_outfit_description">
+		<text>Dieses Exoskelett bietet hervorragenden Schutz vor Schaden durch Projektile und Splitter, schrдnkt jedoch im Gegenzug die Bewegungsfreiheit des Trдgers ein. Es ist anfдllig gegen panzerbrechende Munition.</text>
+	</string>
+	<string id="mp_exo_outfit_name">
+		<text>Exoskelett</text>
+	</string>
+	<string id="mp_military_outfit_description">
+		<text>Dieser Armeekampfanzug ist fьr Angriffsoperationen gedacht. Er bietet ausgezeichneten Schutz vor Schaden durch Vollmantelgeschosse und Splitter, ohne die Mobilitдt des Trдgers einzuschrдnken. Der Anzug ist anfдllig gegen panzerbrechende Munition.</text>
+	</string>
+	<string id="mp_military_outfit_name">
+		<text>Armeekampfanzug</text>
+	</string>
+	<string id="novice_outfit_description">
+		<text>Ein gewцhnlicher schwarzer Ledermantel. Hat keinen weiteren Nutzen, als den Trдger nachts warm zu halten oder ihn vor dem Biss eines blinden, alten Hundes zu schьtzen. Obwohl der Mantel nicht besonders bequem ist, wird er von Stalkern in der Zone hдufig getragen - entweder weil sie sich gut damit im Dunkeln verstecken kцnnen oder wegen seines "coolen" Aussehens.</text>
+	</string>
+	<string id="novice_outfit_name">
+		<text>Ledermantel</text>
+	</string>
+	<string id="scientific_outfit_name">
+		<text>SEVA-Schutzanzug</text>
+	</string>
+	<string id="specops_outfit_name">
+		<text>Berill-5M Kampfanzug</text>
+	</string>
+	<string id="st_helm_battle">
+		<text>Sphere-M12 Helm</text>
+	</string>
+	<string id="st_helm_battle_descr">
+		<text>Ein Aluminium-/Titan-Helm mit Stoffьberzug, der Platz fьr weitere Stahlplatten zur Panzerung bietet, sowie mit einer gepanzerten Gesichtsmaske. Der Sphere-M12 wird normalerweise in Kombination mit der Spetsnaz-Kцrperpanzerung der PSZ-Reihe eingesetzt. Aufgrund der Atemmaske und des integrierten Nachtsichtgerдts der ersten Generation sowie des maximalen Schutzes fьr den Kopfbereich ist der Helm in der Zone recht beliebt. Verfьgt ьber Elektronikfelder.</text>
+	</string>
+	<string id="st_helm_hardhat">
+		<text>Stahlhelm</text>
+	</string>
+	<string id="st_helm_hardhat_descr">
+		<text>Ein total veralteter Armeestahlhelm ohne jegliche Zusдtze. Er schьtzt weder vor Anomalien noch vor Strahlung, kann aber Projektile abwehren. Dieser Helm war nie besonders beliebt in der Zone, auЯer wдhrend einer kurzen, bewaffneten Auseinandersetzung zwischen den Fraktionen.</text>
+	</string>
+	<string id="st_helm_protective">
+		<text>Schutzhelm</text>
+	</string>
+	<string id="st_helm_protective_descr">
+		<text>Ein leichter Helm mit einem luftdichten Visier, der vor Anomalien schьtzen soll. Nach dem Design zu urteilen, stammt dieser Helm aus der gleichen Forschungsschmiede wie der SEVA-Schutzanzug. Der Einsatzzweck des Schutzhelms kцnnte durchaus in der Kombination mit Armeekampfanzьgen bei Operationen in extremen Anomaliegebieten liegen.</text>
+	</string>
+	<string id="st_helm_respirator">
+		<text>Gasmaske</text>
+	</string>
+	<string id="st_helm_respirator_descr">
+		<text>Eine gewцhnliche Gasmaske aus Kunststoff und Gummi, die radioaktive Partikel und giftige Substanzen aus der Luft filtert. Dank ihrer universellen Einsetzbarkeit wird sie von vielen Anfдngern wie auch Veteranen geschдtzt. Die Gasmaske bietet keinen physischen Schutz.</text>
+	</string>
+	<string id="st_helm_tactic">
+		<text>Taktischer Helm</text>
+	</string>
+	<string id="st_helm_tactic_descr">
+		<text>Ein westliches Modell eines taktischen Helms ohne Tarnbemalung. Bisher ist ungeklдrt, wie dieser Helm in die Zone gelangt ist. Er ist dafьr gedacht, mit zahlreichen Scannern und Gerдten fьr die Satellitenkommunikation einem Truppanfьhrer die strategische Ьberlegenheit ьber den Gegner zu gewдhrleisten. Diese Funktionen sind in diesem speziellen Helm jedoch nicht integriert. Er ist mit einer mehrschichtigen Kevlarummantelung und gepanzerten Elementen zum Schutz der elektronischen Bauteile ausgestattet. Darьber hinaus bietet er einen Atemschutz und ein Nachtsichtgerдt der ersten Generation.</text>
+	</string>
+	<string id="stalker_outfit_name">
+		<text>Sunrise-Schutzanzug</text>
+	</string>
+	<string id="svoboda_heavy_outfit_name">
+		<text>Freiheit-Wachanzug</text>
+	</string>
+	<string id="svoboda_light_outfit_description">
+		<text>Dieser leichte Stalkerschutzanzug wird von Handwerkern der Freiheit hergestellt. Das Material wird mit "Horizont" behandelt, einer speziellen Lцsung, die die Fraktion durch systematisches Ausprobieren entwickelt hat, um den Schutz vor Anomalien zu verbessern. Wie auch der Freiheit-Wachanzug weist der Sturmanzug eine integrierte Kцrperpanzerung und Artefaktbehдlter auf.</text>
+	</string>
+	<string id="svoboda_light_outfit_name">
+		<text>Freiheit-Sturmanzug</text>
+	</string>
+	<string id="dolg_outfit_description">
+		<text>Diese moderne Version des Wдchterschutzanzugs ist fьr Stalkerrekruten geeignet, die an leichte Anzьge gewцhnt sind. Sie bietet im Gegensatz zur PSZ-Serie guten Schutz gegen Anomalien und kann zugleich den Schuss einer Pistole aufhalten. Es kann kein Artefaktbehдlter an dem Anzug angebracht werden, aber er kann stattdessen mit einem Kampfhilfssystem ausgestattet werden.</text>
+	</string>
+	<string id="military_outfit_description">
+		<text>Dieser moderne Armeekampfanzug ist fьr Einsдtze in Anomaliegebieten gedacht. Er besteht aus einem schweren PSZ-12p Armeekampfanzug, einem integrierten Kompensationsanzug und einem Schutzanzug gegen Anomalien. Die Panzerung schьtzt hervorragend vor Projektilen und Splittern, ohne die Beweglichkeit des Trдgers stark zu beeintrдchtigen. Weist keinen Artefaktbehдlter auf.</text>
+	</string>
+	<string id="mp_scientific_outfit_description">
+		<text>Dieser Schutzanzug fьr Forschungseinsдtze in der Zone bietet einen geschlossenen Atemkreislauf und eine дuЯere Isolationsbeschichtung. Damit schьtzt er hervorragend vor Anomalien. Wegen der recht groЯen Anfдlligkeit gegenьber physikalischem Schaden ist er nicht besonders wirkungsvoll gegen Projektile und Splitter. Weist einen integrierten Artefaktbehдlter auf.</text>
+	</string>
+	<string id="scientific_outfit_description">
+		<text>Dieser Anzug aus einem der Kiewer Forschungsinstitute ist eine groЯartige Alternative zu den selbstgemachten Stalkeranzьgen. Die integrierte Kцrperpanzerung kann zwar nur eine Pistolenkugel aufhalten, aber der Schutz gegen Anomalien und Strahlung ist unьbertroffen. Dieser komplett aufrьstbare Anzug mit zwei Artefaktbehдltern ist die erste Wahl fьr viele erfahrene Stalker.</text>
+	</string>
+	<string id="specops_outfit_description">
+		<text>Dieser Kampfanzug besteht aus einer berylliumbeschichteten Armeepanzerung der PS5-Serie, die fьr den Einsatz in der Zone modifiziert wurde. Sie wurde fьr Angriffsoperationen in hochradioaktiven Gebieten konzipiert und ist in Gebieten mit hoher anomaler Aktivitдt ineffektiv. Stalker bekommen sie im Tausch von Beute mit Armeebediensteten. Weist keinen Artefaktbehдlter auf.</text>
+	</string>
+	<string id="stalker_outfit_description">
+		<text>Dieser Stalkeranzug der Marke Eigenbau besteht aus einem Schutzanzug aus doppelt geschichtetem, gummiertem Stoff mit Plexiglasfutter und einer integrierten Kцrperpanzerung. Obwohl er nicht einmal den Schuss einer Pistole aufhalten kann, ist er wegen seines geringen Preises und des hohen Modifikationspotenzials sehr beliebt. Weist einen integrierten Artefaktbehдlter auf.</text>
+	</string>
+	<string id="svoboda_heavy_outfit_description">
+		<text>Dieser Stalkerschutzanzug der Freiheit mit verstдrkter Kцrperpanzerung ist ein guter Kompromiss zwischen Kampf- und Anomalieschutz. Die integrierte Panzerung besteht aus einer Schutzplatte und 10 Kevlarschichten, die eine Pistolenkugel aufhalten kцnnen. Der Anzug wird mit dem recht teuren Schutzmittel "Souverдn" gegen Anomalien behandelt. Weist einen Artefaktbehдlter auf.</text>
+	</string>
+	<string id="dolg_heavy_outfit_description">
+		<text>Diese Frьhversion des Wдchterschutzanzugs ist eine fьr die Zone modifizierte Spetsnaz PSZ-9 Kцrperpanzerung. Sie kann einem Gewehrschuss widerstehen, aber diese Effektivitдt wird mit hohem Gewicht, ausladender GrцЯe und kaum vorhandenem Anomalieschutz erkauft. Der Anzug kann zwar nicht mit einem Artefaktbehдlter ausgestattet werden, aber dafьr mit einem Kampfhilfssystem.</text>
+	</string>
+	<string id="csky_heavy_outfit_description">
+		<text>Einst wurde diese Kцrperpanzerung von Clear Sky getragen, aber seit der Auslцschung der Fraktion dient der Anzug nur mehr der Erinnerung daran, dass in der Zone selbst ein perfekter Schutzanzug keine Sicherheit garantiert. Dieser Anzug kann einen Pistolenschuss aufhalten, zudem ist der Trдger gut geschьtzt vor Anomalien. Weist einen integrierten Artefaktbehдlter auf.</text>
+	</string>
+	<string id="exo_outfit_description">
+		<text>Experimenteller Prototyp eines militдrischen Exoskeletts, der wegen der hohen Kosten und einiger Konstruktionsmдngel nie in Serienproduktion ging. Da aber damit das maximal tragbare Gewicht enorm steigt und daher Nachfrage dafьr herrscht, werden geringe Stьckzahlen in unterirdischen Fabriken auЯerhalb der Ukraine hergestellt. Weist einen integrierten Artefaktbehдlter auf.</text>
+	</string>
+	<string id="mp_scientific_outfit_name">
+		<text>SEVA-Schutzanzug</text>
+	</string>
+</string_table>

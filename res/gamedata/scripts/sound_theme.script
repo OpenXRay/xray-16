@@ -1,0 +1,810 @@
+--'-------------------------------------------------------------------------------------------------------------------
+--' Схема озвучки
+--' автор:  Диденко Руслан  (Stohe)
+--'--------------------------------------------------------------------------------------------------------------------
+nstl = 64
+theme = {}
+local sounds_base = stalker_ids.sound_script + 10000
+
+function id()
+	sounds_base = sounds_base + 1
+	return sounds_base - 1
+end
+--function printf()
+--end
+--'--------------------------------------------------------------------------------------------------------------------
+--' Класс "звуковая коллекция сталкера"
+--'--------------------------------------------------------------------------------------------------------------------
+class "npc_sound"
+function npc_sound:__init(snd_ini, section)
+	self.class_id = "npc_sound"
+		--' Параметры вычитывания звука
+	self.prefix = utils.cfg_get_bool(snd_ini, section, "npc_prefix", nil, false, false)
+	self.path = utils.cfg_get_string(snd_ini, section, "path", nil, true, "")
+	self.shuffle = utils.cfg_get_string(snd_ini, section, "shuffle", nil, false, "", "rnd")
+	self.group_snd = utils.cfg_get_bool(snd_ini, section, "group_snd", nil, false, false)
+	self.play_always = utils.cfg_get_bool(snd_ini, section, "play_always", nil, false, false)
+	self.is_combat_sound = utils.cfg_get_bool(snd_ini, section, "is_combat_sound", nil, false, false)
+	self.section = section
+	--' Хранит параметры звука для каждого NPC
+	self.npc = {}
+	self.played_id = nil
+	-- Время задержки начала отыгрывания звука
+	self.delay_sound = utils.cfg_get_number(snd_ini, section, "delay_sound", self.npc, false, 0)
+	--' Интервал проигрывания звука
+	local interval = parse_names(utils.cfg_get_string(snd_ini, section, "idle", nil, false, "", "3,5,100"))	
+	self.min_idle = tonumber(interval[1])
+	self.max_idle = tonumber(interval[2])
+	self.rnd = tonumber(interval[3])
+	self.can_play_group_sound = true
+	self.can_play_sound = {}
+	self.sound_path = {}
+	self.faction = utils.cfg_get_string(snd_ini, section, "faction", nil, false, "", "")
+	self.point = utils.cfg_get_string(snd_ini, section, "point", nil, false, "", "")
+	self.msg = utils.cfg_get_string(snd_ini, section, "message", nil, false, "", "")
+
+
+	local avail_communities = parse_names(utils.cfg_get_string(snd_ini, section, "avail_communities", nil, false, "", "stalker, ecolog, bandit, dolg, freedom, army, zombied, monolith, killer"))
+	self.avail_communities = {}
+	for k,v in pairs(avail_communities) do
+ 		self.avail_communities[v] = true
+ 	end
+
+
+end
+function npc_sound:reset(npc_id)
+	local npc = db.storage[npc_id] and db.storage[npc_id].object
+	self.played_time = nil
+	self.played_id = nil
+	self.can_play_group_sound = true
+	self.can_play_sound[npc_id] = true
+	if npc ~= nil then
+		npc:set_sound_mask(-1)
+		npc:set_sound_mask(0)
+	end
+	if self.pda_snd_obj ~= nil then
+		self.pda_snd_obj:stop()
+		self.pda_snd_obj = nil
+	end
+end
+function npc_sound:is_playing(npc_id)
+--  Проверка играется ли сейчас звук у нпс
+	local obj = db.storage[npc_id] and db.storage[npc_id].object
+	if obj == nil then
+		return false
+	end
+	return obj:active_sound_count() ~= 0 or (self.pda_snd_obj and self.pda_snd_obj:playing())
+end
+function npc_sound:init_npc(npc)
+	--printf("Init %s snd NPC %s", self.section, npc:name())
+	local npc_id = npc:id()
+
+	self.npc[npc_id] = {}
+	self.sound_path[npc_id] = {}
+
+	local character_prefix
+	if self.prefix == false then
+		character_prefix = npc:sound_prefix()
+		npc:sound_prefix("characters_voice\\")
+	end
+
+
+	self.npc[npc_id].id = id()
+	if self.is_combat_sound then
+		self.npc[npc_id].max = npc:add_combat_sound(self.path, nstl, snd_type.talk, 2, 1, self.npc[npc_id].id,"bip01_head") - 1
+	else
+		self.npc[npc_id].max = npc:add_sound(self.path, nstl, snd_type.talk, 2, 1, self.npc[npc_id].id) - 1
+	end
+	local f = getFS()
+	if f:exist("$game_sounds$",npc:sound_prefix()..self.path..".ogg") ~= nil then
+		self.sound_path[npc_id][1] = npc:sound_prefix()..self.path
+--		printf("adding sound ["..npc:sound_prefix()..self.path.."]")
+	else
+		local num = 1
+		while f:exist("$game_sounds$",npc:sound_prefix()..self.path..num..".ogg") do
+--			printf("adding sound ["..npc:sound_prefix()..self.path..num.."] to table id = "..num)
+			self.sound_path[npc_id][num] = npc:sound_prefix()..self.path..num
+			num = num + 1
+		end
+	end
+	if self.npc[npc_id].max < 0 then
+		abort("Couldnt find sounds %s with prefix %s", tostring(self.path), npc:sound_prefix())
+	end
+
+
+	if self.prefix == false then
+		npc:sound_prefix(character_prefix)
+	end
+	if self.group_snd then
+		self.can_play_group_sound = true
+	else
+		if self.can_play_sound[npc_id] ~= false then
+			self.can_play_sound[npc_id] = true
+		end
+	end
+end
+function npc_sound:callback(npc_id)
+	self.played_time = time_global()
+	self.idle_time = math.random(self.min_idle, self.max_idle) * 1000
+
+	if self.group_snd then
+		self.can_play_group_sound = true
+	else
+		self.can_play_sound[npc_id] = true
+	end
+
+--	printf("npc_sound:callback!!!!!!!!")
+
+	get_hud():RemoveCustomStatic("cs_subtitles_npc")
+
+	local st   = db.storage[npc_id]
+	if st.active_scheme == nil then
+		return
+	end
+
+	if st[st.active_scheme].signals == nil then
+		return
+	end
+
+	-- Затычка против возможного вылета, когда приходит колбек от звука, который данный НПС не играет.
+	if self.npc[npc_id] == nil then
+		return
+	end
+
+	if self.played_id == self.npc[npc_id].max and self.shuffle ~= "rnd" then
+--		printf("npc [%s] signalled [theme_end] for snd [%s]", npc_id, self.section)
+		st[st.active_scheme].signals["theme_end"] = true
+		st[st.active_scheme].signals["sound_end"] = true
+	else
+--		printf("npc [%s] signalled [sound_end] for snd [%s]", npc_id, self.section)
+		st[st.active_scheme].signals["sound_end"] = true
+	end
+end
+function npc_sound:play(npc_id, faction, point, msg)
+	local npc = db.storage[npc_id] and db.storage[npc_id].object
+
+	if npc == nil then
+		--printf("coudnt find npc!!!")
+		return false
+	end
+
+--	if not self.play_always then
+		if self.group_snd then
+			if not self.can_play_group_sound then
+				--printf("coudnt play snd1!!!")
+				return false
+			end
+		else
+			if not self.can_play_sound[npc_id] then
+				--printf("coudnt play snd1!!!")
+				return false
+			end
+		end
+--	end
+
+	if self.played_time ~= nil and time_global() - self.played_time < self.idle_time
+	then
+		--printf("coudnt play snd2!!!")
+		return false
+	end
+
+	self.played_time = nil
+
+	local npc_data = self.npc[npc_id]
+		if(npc_data==nil) then
+			--printf("coudnt play nodata!!!")
+		return false
+	end
+	--' Выбор звука, который играть.
+	self.played_id = self:select_next_sound(npc_id)
+
+	if self.played_id == -1 then
+		--printf("coudnt play snd3!!!")
+		--' Пропускаем.
+		return false
+	end
+	--printf("playing sound "..self.played_id)
+	if npc ~= nil then
+		-- play_sound (u32 internal_type, u32 max_start_time, u32 min_start_time, u32 max_stop_time, u32 min_stop_time, u32 id)
+		npc:play_sound(npc_data.id, self.delay_sound+0.06, self.delay_sound+0.05, 1, 0, self.played_id)
+	end
+	local table_id = self.played_id + 1
+	local snd = self.sound_path[npc_id][table_id]
+	-- проверка на существование звука дублирующего основной по ПДА. Если он есть то играть его.
+	local f = getFS()
+	if snd and f:exist("$game_sounds$", snd.."_pda.ogg") ~= nil and npc:position():distance_to_sqr(db.actor:position()) >= 100 then
+		if self.pda_snd_obj ~= nil and self.pda_snd_obj:playing() then
+			self.pda_snd_obj:stop()
+		end
+		self.pda_snd_obj = sound_object(snd.."_pda")
+		--play_at_pos(CScriptGameObject *object, const Fvector &position, float delay, int flags)
+		self.pda_snd_obj:play_at_pos(db.actor, vector():set(0,0,0), self.delay_sound, sound_object.s2d)
+		self.pda_snd_obj.volume = 0.8
+	end
+	--printf("snd_path is "..tostring(self.sound_path[npc_id][table_id]))
+	local snd_st, num_copy = string.gsub(snd, "\\", "_")
+
+	if self.group_snd then
+		self.can_play_group_sound = false
+	else
+		self.can_play_sound[npc_id] = false
+	end
+	if game.translate_string(snd_st) ~= snd_st then
+		if not faction then
+			faction = character_community(npc)
+		end
+		if not point then
+						point = npc:profile_name().."_name"
+			if game.translate_string(point) == point then
+							point = nil
+			end
+		end
+		news_manager.send_sound(npc, faction, point, snd, snd_st, self.delay_sound)
+	else
+		news_manager.send_sound(npc, faction, point, snd, nil , self.delay_sound)
+	end
+	return true
+end
+function npc_sound:select_next_sound(npc_id)
+	local npc_data = self.npc[npc_id]
+	if self.shuffle == "rnd" then
+		if npc_data.max == 0 then
+			return 0
+		end
+
+		if self.played_id ~= nil then
+			local played_id = math.random(0,npc_data.max - 1)
+			if played_id >= self.played_id then
+				return played_id + 1
+			end
+			return played_id
+		end
+		return math.random(0,npc_data.max)
+	end
+
+	if self.shuffle == "seq" then
+		if self.played_id == -1 then
+			return -1
+		end
+		if self.played_id == nil then
+			return 0
+		end
+		if self.played_id < npc_data.max then
+			return self.played_id + 1
+		end
+		return -1
+	end
+
+	if self.shuffle == "loop" then
+		if self.played_id == nil then
+			return 0
+		end
+		if self.played_id < npc_data.max then
+			return self.played_id + 1
+		end
+		return 0
+	end
+end
+function npc_sound:stop(obj_id)
+	local npc = db.storage[obj_id] and db.storage[obj_id].object
+	if npc ~= nil and npc:alive() then
+		npc:set_sound_mask(-1)
+		npc:set_sound_mask(0)
+	end
+	if self.pda_snd_obj ~= nil and self.pda_snd_obj:playing() then
+		self.pda_snd_obj:stop()
+		self.pda_snd_obj = nil
+	end
+end
+function npc_sound:save(thread)
+--	set_save_marker(thread, "save", false, "npc_sound")
+		thread:w_stringZ(tostring(self.played_id))
+
+	if self.group_snd then
+		thread:w_bool(self.can_play_group_sound)
+	end
+--	set_save_marker(thread, "save", true, "npc_sound")
+end
+function npc_sound:load(thread)
+--	set_save_marker(thread, "load", false, "npc_sound")
+	local id = thread:r_stringZ()
+	if(id~="nil") then
+		self.played_id = tonumber(id)
+	else
+		self.played_id = nil
+	end
+
+	if self.group_snd then
+		self.can_play_group_sound = thread:r_bool()
+	end
+--	set_save_marker(thread, "load", true, "npc_sound")
+end
+function npc_sound:save_npc(thread, npc_id)
+--	set_save_marker(thread, "save", false, "npc_sound_save_npc")
+	if not self.group_snd then
+		thread:w_bool(self.can_play_sound[npc_id] == true)
+	end
+--	set_save_marker(thread, "save", true, "npc_sound_save_npc")
+end
+function npc_sound:load_npc(thread, npc_id)
+--	set_save_marker(thread, "load", false, "npc_sound_save_npc")
+	if not self.group_snd then
+		self.can_play_sound[npc_id] = thread:r_bool()
+	end
+--	set_save_marker(thread, "load", true, "npc_sound_save_npc")
+end
+--'--------------------------------------------------------------------------------------------------------------------
+--' Класс "звуковая коллекция игрока"
+--'--------------------------------------------------------------------------------------------------------------------
+class "actor_sound"
+function actor_sound:__init(snd_ini, section)
+	self.class_id = "actor_sound"
+		--' Параметры вычитывания звука
+	self.stereo = utils.cfg_get_bool(snd_ini, section, "actor_stereo", nil, false, false)
+	self.prefix = utils.cfg_get_bool(snd_ini, section, "npc_prefix", nil, false, false)
+	self.path = utils.cfg_get_string(snd_ini, section, "path", nil, true, "")
+	self.shuffle = utils.cfg_get_string(snd_ini, section, "shuffle", nil, false, "", "rnd")
+	self.play_always = utils.cfg_get_bool(snd_ini, section, "play_always", nil, false, false)
+	self.section = section
+	self.played_id = nil
+	if self.prefix then
+		self.path = "characters_voice\\"..self.path
+	end
+
+	--' Интервал проигрывания звука
+	local interval = parse_names(utils.cfg_get_string(snd_ini, section, "idle", nil, false, "", "3,5,100"))
+	self.min_idle = tonumber(interval[1])
+	self.max_idle = tonumber(interval[2])
+	self.rnd = tonumber(interval[3])
+	self.sound = {}
+	self.snd_obj = nil
+	self.can_play_sound = true
+	self.faction = utils.cfg_get_string(snd_ini, section, "faction", nil, false, "", "")
+	self.point = utils.cfg_get_string(snd_ini, section, "point", nil, false, "", "")
+	self.msg = utils.cfg_get_string(snd_ini, section, "message", nil, false, "", "")
+
+	local f = getFS()
+
+	if f:exist("$game_sounds$",self.path..".ogg") ~= nil then
+		self.sound[1] = self.path
+	else
+		local num = 1
+		while f:exist("$game_sounds$",self.path..num..".ogg") do
+			self.sound[num] = self.path..num
+			num = num + 1
+		end
+	end
+	if #self.sound == 0 then
+		abort("There are no sound collection with path: %s", self.path)
+	end
+end
+function actor_sound:callback(npc_id)
+	self.played_time = time_global()
+	self.idle_time = math.random(self.min_idle, self.max_idle) * 1000
+	self.snd_obj = nil
+	self.can_play_sound = true
+
+	get_hud():RemoveCustomStatic("cs_subtitles_actor")
+
+--	printf("actor_sound:callback from [%s]", npc_id)
+	local st   = db.storage[npc_id]
+	if st.active_scheme == nil then
+		return
+	end
+	if st[st.active_scheme].signals == nil then
+--		printf("SOUND_THEME: There is no signals in this scheme [%s]", st.active_scheme)
+		return
+	end
+
+	if self.played_id == #self.sound and self.shuffle ~= "rnd" then
+		printf("actor_sound:object [%s] signalled 'theme_end' in section [%s]", npc_id, st.active_section)
+		st[st.active_scheme].signals["theme_end"] = true
+		st[st.active_scheme].signals["sound_end"] = true
+	else
+		printf("actor_sound:object [%s] signalled 'sound_end' in section [%s]", npc_id, st.active_section)
+		st[st.active_scheme].signals["sound_end"] = true
+	end
+end
+function actor_sound:is_playing ()
+	if(self.snd_obj~=nil) then
+		return self.snd_obj:playing()
+	else
+		return false
+	end
+end
+function actor_sound:play(npc, faction, point, msg)
+	--printf("PLAY ACTOR SOUND")
+	if not self.can_play_sound then
+		printf("self.can_play_sound == false")
+		return false
+	end
+
+	if self.played_time ~= nil and time_global() - self.played_time < self.idle_time
+	then
+	--printf("self.idle_time not reached!!")
+		return false
+	end
+
+	self.played_time = nil
+	--' Выбор звука, который играть.
+	self.played_id = self:select_next_sound()
+	if self.played_id == -1 then
+		--' Пропускаем.
+		return false
+	end
+	local snd = self.sound[self.played_id]
+	self.snd_obj = sound_object(snd)
+	self.snd_obj.volume = 0.8
+	self.snd_obj:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d)
+	self.snd_obj.volume = 0.8
+	local snd_st, num_copy = string.gsub(snd, "\\", "_")
+--[[
+	if game.translate_string(snd_st) ~= snd_st then
+		local hud_demo = get_hud()
+		--printf("uraaaa!!!")
+		self.custom_static_demo = hud_demo:GetCustomStatic("cs_subtitles_actor")
+		if self.custom_static_demo == nil then
+			hud_demo:AddCustomStatic("cs_subtitles_actor", true)
+			self.custom_static_demo = hud_demo:GetCustomStatic("cs_subtitles_actor")
+		end
+		self.custom_static_demo:wnd():SetTextST(snd_st)
+	end
+]]
+	self.can_play_sound = false
+
+	news_manager.send_sound(nil, faction, point, snd)
+
+	return true
+end
+function actor_sound:reset(npc_id)
+	self.played_time = nil
+	self.played_id = nil
+end
+function actor_sound:select_next_sound()
+	local sound_table_size = #self.sound
+	if self.shuffle == "rnd" then
+		if sound_table_size == 1 then
+			return 1
+		end
+		if self.played_id ~= nil then
+			local played_id = math.random(1,sound_table_size - 1)
+			if played_id >= self.played_id then
+				return played_id + 1
+			end
+			return played_id
+		end
+		return math.random(1,sound_table_size)
+	end
+	if self.shuffle == "seq" then
+		if self.played_id == -1 then
+			return -1
+		end
+		if self.played_id == nil then
+			return 1
+		end
+		if self.played_id < sound_table_size then
+			return self.played_id + 1
+		end
+		return -1
+	end
+	if self.shuffle == "loop" then
+		if self.played_id == nil then
+			return 1
+		end
+		if self.played_id < sound_table_size then
+			return self.played_id + 1
+		end
+		return 1
+	end
+end
+function actor_sound:stop()
+	if self.snd_obj ~= nil then
+		self.snd_obj:stop()
+	end
+end
+function actor_sound:save(thread)
+--	set_save_marker(thread, "save", false, "actor_sound")
+		thread:w_stringZ(tostring(self.played_id))
+--	set_save_marker(thread, "save", true, "actor_sound")
+end
+function actor_sound:load(thread)
+--	set_save_marker(thread, "load", false, "actor_sound")
+	local id = thread:r_stringZ()
+	if(id~="nil") then
+		self.played_id = tonumber(id)
+	else
+		self.played_id = nil
+	end
+--	set_save_marker(thread, "load", true, "actor_sound")
+end
+function actor_sound:save_npc(thread)
+end
+function actor_sound:load_npc(thread)
+end
+
+
+--'--------------------------------------------------------------------------------------------------------------------
+--' Класс "звуковая коллекция объекта"
+--'--------------------------------------------------------------------------------------------------------------------
+class "object_sound"
+function object_sound:__init(snd_ini, section)
+	self.class_id = "object_sound"
+	--' Параметры вычитывания звука
+	self.path = utils.cfg_get_string(snd_ini, section, "path", nil, true, "")
+	self.shuffle = utils.cfg_get_string(snd_ini, section, "shuffle", nil, false, "", "rnd")
+
+	--' Интервал проигрывания звука
+	local interval = parse_names(utils.cfg_get_string(snd_ini, section, "idle", nil, false, "", "3,5,100"))
+	self.min_idle = tonumber(interval[1])
+	self.max_idle = tonumber(interval[2])
+	self.rnd = tonumber(interval[3])
+	self.sound = {}
+	self.snd_obj = nil
+	self.can_play_sound = true
+	self.section = section
+	self.played_id = nil
+	self.faction = utils.cfg_get_string(snd_ini, section, "faction", nil, false, "", "")
+	self.point = utils.cfg_get_string(snd_ini, section, "point", nil, false, "", "")
+	self.msg = utils.cfg_get_string(snd_ini, section, "message", nil, false, "", "")
+
+	local f = getFS()
+	if f:exist("$game_sounds$",self.path..".ogg") ~= nil then
+		self.sound[1] = self.path
+	else
+		local num = 1
+		while f:exist("$game_sounds$",self.path..num..".ogg") do
+			self.sound[num] = self.path..num
+			num = num + 1
+		end
+	end
+	if #self.sound == 0 then
+		abort("There are no sound collection with path: %s", self.path)
+	end
+end
+function object_sound:callback(npc_id)
+	self.played_time = time_global()
+	self.idle_time = math.random(self.min_idle, self.max_idle) * 1000
+	self.snd_obj = nil
+	self.can_play_sound = true
+
+--	printf("object_sound:callback for object !!!!!!!!")
+	get_hud():RemoveCustomStatic("cs_subtitles_object")
+
+	local st   = db.storage[npc_id]
+	if st.active_scheme == nil then
+		return
+	end
+	if st[st.active_scheme].signals == nil then
+		return
+	end
+	if self.played_id == #self.sound and self.shuffle ~= "rnd" then
+		st[st.active_scheme].signals["theme_end"] = true
+		st[st.active_scheme].signals["sound_end"] = true
+	else
+		st[st.active_scheme].signals["sound_end"] = true
+	end
+end
+function object_sound:is_playing ()
+	if(self.snd_obj~=nil) then
+		return self.snd_obj:playing()
+	else
+		return false
+	end
+end
+function object_sound:play(obj_id, faction, point, msg)
+	local obj = db.storage[obj_id] and db.storage[obj_id].object
+
+	if obj == nil then
+		return false
+	end
+
+	if not self.can_play_sound then return false end
+
+	if self.played_time ~= nil and time_global() - self.played_time < self.idle_time
+	then
+		return false
+	end
+	self.played_time = nil
+		--' Выбор звука, который играть.
+	self.played_id = self:select_next_sound()
+	if self.played_id == -1 then
+		--' Пропускаем.
+		return false
+	end
+--	printf("object played_id = %s", self.played_id)
+	local snd = self.sound[self.played_id]
+	local f = getFS()
+	if snd and f:exist("$game_sounds$", snd.."_pda.ogg") ~= nil and obj:position():distance_to_sqr(db.actor:position()) >= 5 then
+		self.pda_snd_obj = sound_object(snd.."_pda")
+		self.pda_snd_obj:play_at_pos(db.actor, vector():set(0,0,0), 0, sound_object.s2d)
+		self.pda_snd_obj.volume = 0.8
+	end
+	self.snd_obj = sound_object(snd)
+	self.snd_obj:play_at_pos(obj, obj:position(), 0, sound_object.s3d)
+	local snd_st, num_copy = string.gsub(snd, "\\", "_")
+--[[
+	if game.translate_string(snd_st) ~= snd_st then
+		local hud_demo = get_hud()
+--		printf("uraaaa!!!")
+		self.custom_static_demo = hud_demo:GetCustomStatic("cs_subtitles_object")
+		if self.custom_static_demo == nil then
+			hud_demo:AddCustomStatic("cs_subtitles_object", true)
+			self.custom_static_demo = hud_demo:GetCustomStatic("cs_subtitles_object")
+		end
+		self.custom_static_demo:wnd():SetTextST(snd_st)
+	end
+]]
+	self.can_play_sound = false
+
+	news_manager.send_sound(nil, faction, point, snd)
+
+	return true
+end
+function object_sound:select_next_sound()
+	local sound_table_size = #self.sound
+	if self.shuffle == "rnd" then
+		if sound_table_size == 1 then
+			return 1
+		end
+		if self.played_id ~= nil then
+			local played_id = math.random(1,sound_table_size - 1)
+			if played_id >= self.played_id then
+				return played_id + 1
+			end
+			return played_id
+		end
+		return math.random(1,sound_table_size)
+	end
+	if self.shuffle == "seq" then
+		if self.played_id == -1 then
+			return -1
+		end
+		if self.played_id == nil then
+			return 1
+		end
+		if self.played_id < sound_table_size then
+			return self.played_id + 1
+		end
+		return -1
+	end
+	if self.shuffle == "loop" then
+		if self.played_id == nil then
+			return 1
+		end
+		if self.played_id < sound_table_size then
+			return self.played_id + 1
+		end
+		return 1
+	end
+end
+function object_sound:stop()
+	if self.snd_obj ~= nil then
+		self.snd_obj:stop()
+	end
+	if self.pda_snd_obj ~= nil and self.pda_snd_obj:playing() then
+		self.pda_snd_obj:stop()
+		self.pda_snd_obj = nil
+	end
+end
+function object_sound:save(thread)
+--	set_save_marker(thread, "save", false, "object_sound")
+		thread:w_stringZ(tostring(self.played_id))
+--    set_save_marker(thread, "save", true, "object_sound")
+end
+function object_sound:load(thread)
+--	set_save_marker(thread, "load", false, "object_sound")
+	local id = thread:r_stringZ()
+	if(id~="nil") then
+		self.played_id = tonumber(id)
+	else
+		self.played_id = nil
+	end
+--	set_save_marker(thread, "load", true, "object_sound")
+end
+function object_sound:save_npc(thread)
+end
+function object_sound:load_npc(thread)
+end
+--'--------------------------------------------------------------------------------------------------------------------
+--' Класс "зацикленный звук"
+--'--------------------------------------------------------------------------------------------------------------------
+class "looped_sound"
+function looped_sound:__init(snd_ini, section)
+	self.class_id = "looped_sound"
+	--' Параметры вычитывания звука
+	self.path = utils.cfg_get_string(snd_ini, section, "path", nil, true, "")
+	self.sound = nil
+	self.snd_obj = nil
+	self.section = section
+
+	local f = getFS()
+
+	if f:exist("$game_sounds$",self.path..".ogg") ~= nil then
+		self.sound = self.path
+	end
+	if self.sound == nil then
+		abort("There are no looped sound with path: %s", self.path)
+	end
+end
+function looped_sound:is_playing ()
+	if(self.snd_obj~=nil) then
+		return self.snd_obj:playing()
+	else
+		return false
+	end
+end
+function looped_sound:stop ()
+	if self.snd_obj ~= nil then
+		self.snd_obj:stop()
+	end
+end
+function looped_sound:set_volume (level)
+	self.snd_obj.volume = level
+end
+function looped_sound:play(obj_id)
+	local obj = db.storage[obj_id].object
+	if obj == nil then
+		return
+	end
+
+	self.snd_obj = sound_object(self.sound)
+	self.snd_obj:play_at_pos(obj, obj:position(), 0, sound_object.s3d + sound_object.looped)
+	return true
+end
+function looped_sound:save(thread)
+--	set_save_marker(thread, "save", false, "looped_sound")
+--	set_save_marker(thread, "save", true, "looped_sound")
+end
+function looped_sound:load(thread)
+--	set_save_marker(thread, "load", false, "looped_sound")
+--	set_save_marker(thread, "load", true, "looped_sound")
+end
+function looped_sound:save_npc(thread)
+end
+function looped_sound:load_npc(thread)
+end
+--'--------------------------------------------------------------------------------------------------------------------
+--' Загрузка звуков
+--'--------------------------------------------------------------------------------------------------------------------
+function load_sound()
+	local snd_ini = ini_file("misc\\script_sound.ltx")
+
+	--' Итерируемся по списку тем.
+	if not snd_ini:section_exist("list") then
+		abort("There is no section [list] in script_sound.ltx")
+	end
+	local n = snd_ini:line_count("list")
+	local id, value = "",""
+	local category = ""
+
+	--' начальная установка
+	theme = {}
+
+	for i=0,n-1 do
+		result, section, value  = snd_ini:r_line("list",i,"","")
+
+		local type = utils.cfg_get_string(snd_ini, section, "type", db.actor, true, "")
+
+		--' Определяем тип звука.
+		if type == "npc" then
+			theme[section] = npc_sound(snd_ini, section)
+		elseif type == "actor" then
+			theme[section] = actor_sound(snd_ini, section)
+		elseif type == "3d" then
+			theme[section] = object_sound(snd_ini, section)
+		elseif type == "looped" then
+			theme[section] = looped_sound(snd_ini, section)
+		end
+	end
+end
+--' Загрузка звуков НПС
+function init_npc_sound(npc)
+	for k,v in pairs(theme) do
+		if v.init_npc then
+			--printf("checking %s for %s (%s)", v.section, npc:name(), character_community(npc))
+			if v.avail_communities[character_community(npc)] ~= nil then
+				v:init_npc(npc)
+			end
+		end
+	end
+end

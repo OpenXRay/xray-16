@@ -1,0 +1,258 @@
+﻿<w>
+    <file name="ui\ui_ingame2_common">
+
+<!-- final - 99% ;) -->
+
+<!--    <texture id="ui_inGame2_inventory_back" x="299" y="0" width="725" height="768" />
+    <texture id="ui_inGame2_left_side" x="693" y="0" width="331" height="768" /> -->
+    <texture id="ui_inGame2_character_border" x="0" y="0" width="123" height="87" />
+    <texture id="ui_inGame2_left_top" x="693" y="0" width="331" height="142" />
+
+<!--  temp -->
+
+    <texture id="ui_inGame2_delimiter_01a" x="688" y="768" width="5" height="39" />
+    <texture id="ui_inGame2_delimiter_01b" x="693" y="768" width="331" height="39" />
+    <texture id="ui_inGame2_delimiter_02" x="688" y="768" width="336" height="47" />
+
+    <texture id="ui_inGame2_bt_mech_e" x="0" y="303" width="71" height="39" />
+    <texture id="ui_inGame2_bt_mech_h" x="0" y="342" width="71" height="39" />
+    <texture id="ui_inGame2_bt_mech_d" x="0" y="381" width="71" height="39" />
+    <texture id="ui_inGame2_bt_mech_s" x="0" y="420" width="71" height="39" />
+    <texture id="ui_inGame2_bt_mech_u" x="0" y="459" width="71" height="39" />
+    <texture id="ui_inGame2_bt_mech_t" x="0" y="498" width="71" height="39" />
+
+    <!--texture id="ui_temp_item_01" x="0" y="537" width="71" height="39" />
+    <texture id="ui_temp_item_02" x="0" y="576" width="71" height="39" />
+    <texture id="ui_temp_item_03" x="0" y="615" width="71" height="39" /-->
+
+<!-- mechanic -->
+
+    <texture id="ui_bt_repair_e"	x="70" y="325" width="56" height="57" />
+    <texture id="ui_bt_repair_h"	x="126" y="325" width="56" height="57" />
+    <texture id="ui_bt_repair_t"	x="182" y="325" width="56" height="57" />
+    <texture id="ui_bt_repair_d"	x="238" y="325" width="56" height="57" />
+
+<!-- layouts - horizontal: 41, 49, 90, 180, vertical: 98 -->
+
+    <texture id="ui_bt_upgrade_border"	x="0" y="229" width="105" height="56" />
+    <texture id="ui_bt_upgrade_chain"	x="105" y="229" width="105" height="56" />
+
+<!-- RGBA - unknown: 22,30,35,231 , dissabled: 28,14,14,231 , not_allowed: 72,0,0,128 , taken: 10,63,41,128 -->
+
+    <texture id="ui_bt_upgrade_base"	x="0" y="325" width="70" height="40" />
+    <texture id="ui_bt_upgrade_unknown"	x="0" y="285" width="70" height="40" />
+    <texture id="ui_bt_upgrade_dissabled"	x="140" y="285" width="70" height="40" />
+    <texture id="ui_bt_upgrade_not_allowed"	x="70" y="285" width="70" height="40" />
+    <texture id="ui_bt_upgrade_taken"	x="210" y="285" width="70" height="40" />
+
+    <texture id="ui_bt_noice_01"  x="0" y="654" width="71" height="39" />
+    <texture id="ui_inGame2_bt_mech_h2" x="0" y="579" width="71" height="39" />
+
+
+    <texture id="ui_temp_chars_info_progress" x="0" y="149" width="247" height="2" />
+
+    <texture id="ui_temp_mech_tips_icon_01" x="0" y="749" width="19" height="19" />
+    <texture id="ui_temp_mech_tips_icon_02" x="19" y="749" width="19" height="19" />
+    <texture id="ui_temp_mech_tips_icon_03" x="38" y="749" width="19" height="19" />
+
+    <texture id="ui_temp_frame_lt"   x="904" y="812" width="50" height="50" />
+    <texture id="ui_temp_frame_l"    x="904" y="847" width="50" height="50" />
+    <texture id="ui_temp_frame_lb"   x="904" y="882" width="50" height="50" />
+
+    <texture id="ui_temp_frame_t"    x="939" y="812" width="50" height="50" />
+    <texture id="ui_temp_frame_b"    x="939" y="882" width="50" height="50" />
+    <texture id="ui_temp_frame_rb"   x="974" y="882" width="50" height="50" />
+
+    <texture id="ui_temp_frame_r"    x="974" y="847" width="50" height="50" />
+    <texture id="ui_temp_frame_rt"   x="974" y="812" width="50" height="50" />
+    <texture id="ui_temp_frame_back" x="939" y="847" width="50" height="50" />
+
+    <texture id="ui_char_arrow_shadow"	x="877" y="840" width="9" height="39" />
+    <texture id="ui_char_arrow"		x="887" y="840" width="9" height="39" />
+
+    <texture id="ui_char_resist_fire"	x="759" y="903" width="31" height="27" />
+    <texture id="ui_char_resist_acid"	x="794" y="903" width="31" height="27" />
+    <texture id="ui_char_resist_psi"	x="829" y="903" width="31" height="27" />
+    <texture id="ui_char_resist_rad"	x="864" y="903" width="31" height="27" />
+
+    <texture id="ui_char_stamina"	x="815" y="934" width="209" height="9" />
+    <texture id="ui_char_health"	x="815" y="946" width="209" height="9" />
+    <texture id="ui_char_armor"		x="815" y="958" width="209" height="9" />
+
+    <texture id="ui_char_bleeding"	x="852" y="873" width="22" height="22" />
+<!-- x-y 3x718 -->
+    <texture id="ui_watch_back"		x="736" y="850" width="108" height="47" />
+
+    <texture id="ui_inv_flogo_over"	x="916" y="971" width="108" height="48" />
+
+<!-- items -->
+    <texture id="ui_item_count_back" x="865" y="821" width="29" height="16" />
+
+    <texture id="ui_grid_blank"		x="822" y="975" width="41" height="41" />
+    <texture id="ui_grid_selected"	x="866" y="975" width="41" height="41" />
+
+    <texture id="ui_closed_af_slot"	x="745" y="947" width="58" height="58" />
+
+<!-- anomaly detector -->
+    <texture id="ui_temp_ad1_back" x="0" y="227" width="193" height="38" />
+    <texture id="ui_temp_ad2_back" x="0" y="265" width="193" height="38" />
+    <texture id="ui_temp_ad12_freq_line" x="166" y="45" width="23" height="20" />
+    <texture id="ui_temp_ad3_back" x="0" y="151" width="193" height="75" />
+    <texture id="ui_temp_ad3_artefact" x="194" y="152" width="5" height="5" />
+    <texture id="ui_temp_ad3_radar_glow" x="165" y="0" width="89" height="44" />
+
+    <texture id="ui_temp_ad4_mine_thermal" x="210" y="156" width="19" height="19" />
+    <texture id="ui_temp_ad4_mine_acidic" x="210" y="177" width="19" height="19" />
+    <texture id="ui_temp_ad4_mine_electric" x="210" y="198" width="19" height="19" />
+    <texture id="ui_temp_ad4_mine_gravitational" x="210" y="219" width="19" height="19" />
+
+    <texture id="ui_inv_delimiter_b" 	x="0" 	y="110" width="19" height="19" />
+    <texture id="ui_inv_delimiter_back" x="19" 	y="110" width="30" height="19" />
+    <texture id="ui_inv_delimiter_e" 	x="160" y="129" width="19" height="19" />
+
+    <texture id="ui_det_wave_b" 	x="166" y="45" width="23" height="20" />
+    <texture id="ui_det_wave_back"  x="166" y="45" width="23" height="20" />
+    <texture id="ui_det_wave_e" 	x="166" y="45" width="23" height="20" />
+
+<!-- weapon - upgrades -->
+    <texture id="ui_wp_upgrade_01" 	x="0" y="784" width="70" height="40" />
+    <texture id="ui_wp_upgrade_02" 	x="0" y="824" width="70" height="40" />
+    <texture id="ui_wp_upgrade_03" 	x="0" y="864" width="70" height="40" />
+    <texture id="ui_wp_upgrade_04" 	x="0" y="904" width="70" height="40" />
+    <texture id="ui_wp_upgrade_05" 	x="0" y="944" width="70" height="40" />
+    <texture id="ui_wp_upgrade_06" 	x="0" y="984" width="70" height="40" />
+
+    <texture id="ui_wp_upgrade_07" 	x="70" y="784" width="70" height="40" />
+    <texture id="ui_wp_upgrade_08" 	x="70" y="824" width="70" height="40" />
+    <texture id="ui_wp_upgrade_09" 	x="70" y="864" width="70" height="40" />
+    <texture id="ui_wp_upgrade_10" 	x="70" y="904" width="70" height="40" />
+    <texture id="ui_wp_upgrade_11" 	x="70" y="944" width="70" height="40" />
+    <texture id="ui_wp_upgrade_12" 	x="70" y="984" width="70" height="40" />
+
+    <texture id="ui_wp_upgrade_13" 	x="140" y="784" width="70" height="40" />
+    <texture id="ui_wp_upgrade_14" 	x="140" y="824" width="70" height="40" />
+    <texture id="ui_wp_upgrade_15" 	x="140" y="864" width="70" height="40" />
+    <texture id="ui_wp_upgrade_16" 	x="140" y="904" width="70" height="40" />
+    <texture id="ui_wp_upgrade_17" 	x="140" y="944" width="70" height="40" />
+    <texture id="ui_wp_upgrade_18" 	x="140" y="984" width="70" height="40" />
+
+    <texture id="ui_wp_upgrade_19" 	x="210" y="784" width="70" height="40" />
+    <texture id="ui_wp_upgrade_20" 	x="210" y="824" width="70" height="40" />
+    <texture id="ui_wp_upgrade_21" 	x="210" y="864" width="70" height="40" />
+    <texture id="ui_wp_upgrade_22" 	x="210" y="904" width="70" height="40" />
+    <texture id="ui_wp_upgrade_23" 	x="210" y="944" width="70" height="40" />
+    <texture id="ui_wp_upgrade_24" 	x="210" y="984" width="70" height="40" />
+
+    <texture id="ui_wp_upgrade_25" 	x="280" y="784" width="70" height="40" />
+    <texture id="ui_wp_upgrade_26" 	x="280" y="824" width="70" height="40" />
+    <texture id="ui_wp_upgrade_27" 	x="280" y="864" width="70" height="40" />
+    <texture id="ui_wp_upgrade_28" 	x="280" y="904" width="70" height="40" />
+    <texture id="ui_wp_upgrade_29" 	x="280" y="944" width="70" height="40" />
+    <texture id="ui_wp_upgrade_30" 	x="280" y="984" width="70" height="40" />
+
+    <texture id="ui_wp_upgrade_31" 	x="350" y="784" width="70" height="40" />
+    <texture id="ui_wp_upgrade_32" 	x="350" y="824" width="70" height="40" />
+    <texture id="ui_wp_upgrade_33" 	x="350" y="864" width="70" height="40" />
+    <texture id="ui_wp_upgrade_34" 	x="350" y="904" width="70" height="40" />
+    <texture id="ui_wp_upgrade_35" 	x="350" y="944" width="70" height="40" />
+    <texture id="ui_wp_upgrade_36" 	x="350" y="984" width="70" height="40" />
+
+    <texture id="ui_wp_upgrade_37" 	x="420" y="784" width="70" height="40" />
+    <texture id="ui_wp_upgrade_38" 	x="420" y="824" width="70" height="40" />
+    <texture id="ui_wp_upgrade_39" 	x="420" y="864" width="70" height="40" />
+    <texture id="ui_wp_upgrade_40" 	x="420" y="904" width="70" height="40" />
+    <texture id="ui_wp_upgrade_41" 	x="420" y="944" width="70" height="40" />
+    <texture id="ui_wp_upgrade_42" 	x="420" y="984" width="70" height="40" />
+
+    <texture id="ui_wp_upgrade_43" 	x="490" y="784" width="70" height="40" />
+    <texture id="ui_wp_upgrade_44" 	x="490" y="824" width="70" height="40" />
+    <texture id="ui_wp_upgrade_45" 	x="490" y="864" width="70" height="40" />
+    <texture id="ui_wp_upgrade_46" 	x="490" y="904" width="70" height="40" />
+    <texture id="ui_wp_upgrade_47" 	x="490" y="944" width="70" height="40" />
+    <texture id="ui_wp_upgrade_48" 	x="490" y="984" width="70" height="40" />
+
+    <texture id="ui_wp_upgrade_49" 	x="560" y="784" width="70" height="40" />
+    <texture id="ui_wp_upgrade_50" 	x="560" y="824" width="70" height="40" />
+    <texture id="ui_wp_upgrade_51" 	x="560" y="864" width="70" height="40" />
+    <texture id="ui_wp_upgrade_52" 	x="560" y="904" width="70" height="40" />
+    <texture id="ui_wp_upgrade_53" 	x="560" y="944" width="70" height="40" />
+    <texture id="ui_wp_upgrade_54" 	x="560" y="984" width="70" height="40" />
+
+    <texture id="ui_wp_upgrade_55" 	x="0" y="624" width="70" height="40" />
+    <texture id="ui_wp_upgrade_56" 	x="0" y="664" width="70" height="40" />
+    <texture id="ui_wp_upgrade_57" 	x="0" y="704" width="70" height="40" />
+    <texture id="ui_wp_upgrade_58" 	x="0" y="744" width="70" height="40" />
+    <texture id="ui_wp_upgrade_59" 	x="70" y="704" width="70" height="40" />
+    <texture id="ui_wp_upgrade_60" 	x="70" y="744" width="70" height="40" />
+    <texture id="ui_wp_upgrade_61" 	x="70" y="744" width="70" height="40" />
+    <texture id="ui_wp_upgrade_62" 	x="70" y="744" width="70" height="40" />
+
+<!-- armor - upgrades -->
+    <texture id="ui_am_upgrade_01" 	x="630" y="904" width="70" height="40" />
+    <texture id="ui_am_upgrade_02" 	x="630" y="864" width="70" height="40" />
+    <texture id="ui_am_upgrade_03" 	x="630" y="824" width="70" height="40" />
+    <texture id="ui_am_upgrade_04" 	x="210" y="744" width="70" height="40" />
+    <texture id="ui_am_upgrade_05" 	x="210" y="704" width="70" height="40" />
+    <texture id="ui_am_upgrade_06" 	x="210" y="664" width="70" height="40" />
+    <texture id="ui_am_upgrade_07" 	x="210" y="624" width="70" height="40" />
+    <texture id="ui_am_upgrade_08" 	x="210" y="584" width="70" height="40" />
+    <texture id="ui_am_upgrade_09" 	x="210" y="544" width="70" height="40" />
+    <texture id="ui_am_upgrade_10" 	x="210" y="504" width="70" height="40" />
+    <texture id="ui_am_upgrade_11" 	x="210" y="464" width="70" height="40" />
+    <texture id="ui_am_upgrade_12" 	x="210" y="424" width="70" height="40" />
+    <texture id="ui_am_upgrade_13" 	x="210" y="384" width="70" height="40" />
+    <texture id="ui_am_upgrade_14" 	x="140" y="744" width="70" height="40" />
+    <texture id="ui_am_upgrade_15" 	x="140" y="704" width="70" height="40" />
+    <texture id="ui_am_upgrade_16" 	x="140" y="664" width="70" height="40" />
+    <texture id="ui_am_upgrade_17" 	x="140" y="624" width="70" height="40" />
+    <texture id="ui_am_upgrade_18" 	x="140" y="464" width="70" height="40" />
+    <texture id="ui_am_upgrade_19" 	x="140" y="424" width="70" height="40" />
+    <texture id="ui_am_upgrade_20" 	x="140" y="384" width="70" height="40" />
+    <texture id="ui_am_upgrade_21" 	x="70" y="664" width="70" height="40" />
+    <texture id="ui_am_upgrade_22" 	x="70" y="624" width="70" height="40" />
+    <texture id="ui_am_upgrade_23" 	x="70" y="464" width="70" height="40" />
+    <texture id="ui_am_upgrade_24" 	x="70" y="424" width="70" height="40" />
+    <texture id="ui_am_upgrade_25" 	x="70" y="384" width="70" height="40" />
+    <texture id="ui_am_upgrade_26" 	x="0" y="584" width="70" height="40" />
+    <texture id="ui_am_upgrade_27" 	x="0" y="544" width="70" height="40" />
+    <texture id="ui_am_upgrade_28" 	x="0" y="504" width="70" height="40" />
+    <texture id="ui_am_upgrade_29" 	x="0" y="464" width="70" height="40" />
+    <texture id="ui_am_upgrade_30" 	x="0" y="424" width="70" height="40" />
+    <texture id="ui_am_upgrade_31" 	x="0" y="384" width="70" height="40" />
+
+<!-- weapon - properties -->
+    <texture id="ui_wp_propery_01" 	x="78" y="524" width="19" height="19" />
+    <texture id="ui_wp_propery_02" 	x="78" y="543" width="19" height="19" />
+    <texture id="ui_wp_propery_03" 	x="78" y="562" width="19" height="19" />
+    <texture id="ui_wp_propery_04" 	x="78" y="581" width="19" height="19" />
+    <texture id="ui_wp_propery_05" 	x="78" y="600" width="19" height="19" />
+
+    <texture id="ui_wp_propery_06" 	x="97" y="524" width="19" height="19" />
+    <texture id="ui_wp_propery_07" 	x="97" y="543" width="19" height="19" />
+    <texture id="ui_wp_propery_08" 	x="97" y="562" width="19" height="19" />
+    <texture id="ui_wp_propery_09" 	x="97" y="581" width="19" height="19" />
+    <texture id="ui_wp_propery_10" 	x="97" y="600" width="19" height="19" />
+
+    <texture id="ui_wp_propery_11" 	x="116" y="524" width="19" height="19" />
+    <texture id="ui_wp_propery_12" 	x="116" y="543" width="19" height="19" />
+    <texture id="ui_wp_propery_13" 	x="116" y="562" width="19" height="19" />
+    <texture id="ui_wp_propery_14" 	x="116" y="581" width="19" height="19" />
+
+<!-- armor - properties -->
+    <texture id="ui_am_propery_01" 	x="135" y="524" width="19" height="19" />
+    <texture id="ui_am_propery_02" 	x="135" y="543" width="19" height="19" />
+    <texture id="ui_am_propery_03" 	x="135" y="562" width="19" height="19" />
+    <texture id="ui_am_propery_04" 	x="135" y="581" width="19" height="19" />
+    <texture id="ui_am_propery_05" 	x="135" y="600" width="19" height="19" />
+
+    <texture id="ui_am_propery_06" 	x="154" y="524" width="19" height="19" />
+    <texture id="ui_am_propery_07" 	x="154" y="543" width="19" height="19" />
+    <texture id="ui_am_propery_08" 	x="154" y="562" width="19" height="19" />
+    <texture id="ui_am_propery_09" 	x="154" y="581" width="19" height="19" />
+    <texture id="ui_am_propery_10" 	x="154" y="600" width="19" height="19" />
+
+    <texture id="ui_am_propery_11" 	x="173" y="524" width="19" height="19" />
+
+   </file>
+</w>
+

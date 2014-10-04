@@ -1,0 +1,15 @@
+[torch_definition]
+range           = 15									; range                 <in meters>
+range_r2        = 15			 						; range                 <in meters>
+color           = 1.0,1.0,1.0,0.2						; four color components <r,g,b,a> 0.f<X<3.f
+color_r2        = 0.6,0.55,0.55,0.8						; four color components <r,g,b,a> 0.f<X<3.f
+omni_range      = 1.5									; range                 <in meters>
+omni_range_r2   = 0.75									; range                 <in meters>
+omni_color      = 1.0,1.0,1.0,0.1						; four color components <r,g,b,a> 0.f<X<3.f
+omni_color_r2   = 1.0,1.0,1.0,0.1						; four color components <r,g,b,a> 0.f<X<3.f
+color_animator  = empty									; color animator name   (empty - not using animator) //light_torch_01
+spot_texture    = internal\internal_light_torch_r2		; spot texture name     (using only in Second Render)
+spot_angle      = 75									; spot angle            <in gradus>
+glow_texture    = glow\glow_torch_r2					; glow texture name     (required)
+glow_radius     = 0.3									; glow radius           <in meters>
+guide_bone      = lights_bone							; guid bone name        (required)

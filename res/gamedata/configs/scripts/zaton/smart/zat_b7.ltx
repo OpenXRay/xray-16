@@ -1,0 +1,36 @@
+[smart_terrain]
+squad_id = 29
+max_population = 2
+respawn_params = respawn@zat_b7   
+
+[respawn@zat_b7]
+spawn_bandit@novice
+spawn_bandit@advanced
+spawn_bandit@master
+
+[spawn_bandit@novice]
+spawn_squads = bandit_sim_squad_novice
+spawn_num = {-zat_b28_heli_3_searched -zat_b100_heli_2_searched -zat_b101_heli_5_searched +zat_b7_task_end +zat_b7_actor_help_bandits} 2, 0
+
+[spawn_bandit@advanced]
+spawn_squads = bandit_sim_squad_novice, bandit_sim_squad_advanced
+spawn_num = {+jup_b218_pripyat_group_gathering} 0, {+zat_b28_heli_3_searched +zat_b7_task_end +zat_b7_actor_help_bandits} 2, {+zat_b100_heli_2_searched +zat_b7_task_end +zat_b7_actor_help_bandits} 2, {+zat_b101_heli_5_searched +zat_b7_task_end +zat_b7_actor_help_bandits} 2, 0
+
+[spawn_bandit@master]
+spawn_squads = bandit_sim_squad_veteran, bandit_sim_squad_advanced
+spawn_num = {+jup_b218_pripyat_group_gathering +zat_b7_task_end +zat_b7_actor_help_bandits} 2, 0
+
+[exclusive]
+zat_b7_stalker_victim_1 = zaton\zat_b7_stalker_victim.ltx
+zat_b7_stalker_victim_2 = zaton\zat_b7_stalker_victim.ltx
+zat_b7_stalker_victim_3 = zaton\zat_b7_stalker_victim.ltx
+zat_b7_stalker_victim_4 = zaton\zat_b7_stalker_victim.ltx
+zat_b7_stalker_victim_5 = zaton\zat_b7_stalker_victim.ltx
+zat_b7_stalker_victim_6 = zaton\zat_b7_stalker_victim.ltx
+zat_b7_stalker_victim_7 = zaton\zat_b7_stalker_victim.ltx
+zat_b7_stalker_raider_leader_after = zaton\zat_b7_stalker_raider.ltx
+;sim
+;in addition there are 1 guard and 3 walkers
+zat_b7_guard_walker = zaton\zat_b7_stalker_victim.ltx
+zat_b7_stalker_victim_sleeper_1 = zaton\zat_b7_stalker_victim.ltx
+zat_b7_stalker_victim_sleeper_2 = zaton\zat_b7_stalker_victim.ltx

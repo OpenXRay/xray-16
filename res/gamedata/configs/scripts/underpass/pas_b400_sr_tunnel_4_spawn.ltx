@@ -1,0 +1,14 @@
+[logic]
+active = sr_idle@wait
+
+[sr_idle@wait]
+on_info = {=squad_exist(pas_b400_snork_tunnel_3) !squad_npc_count_ge(pas_b400_snork_tunnel_3:1)} sr_idle@spawn_2 %+pas_b400_snork_tunnel_4_spawn =create_squad(pas_b400_snork_tunnel_4:pas_b400_tunnel) =heal_squad(pas_b400_stalkers_squad)%
+on_info2 = {!squad_exist(pas_b400_snork_tunnel_3)} sr_idle@spawn_2 %+pas_b400_snork_tunnel_4_spawn =create_squad(pas_b400_snork_tunnel_4:pas_b400_tunnel) =heal_squad(pas_b400_stalkers_squad)%
+
+[sr_idle@spawn_2]
+on_game_timer = 25 | sr_idle@spawn_3 %=create_squad_member(snork_indoor_normal:pas_b400_snork_tunnel_4:pas_b400_tunnel_snork_tunnel_4_spawn)%
+
+[sr_idle@spawn_3]
+on_game_timer = 25 | sr_idle@nil %=create_squad_member(snork_indoor_normal:pas_b400_snork_tunnel_4:pas_b400_tunnel_snork_tunnel_4_spawn)%
+
+[sr_idle@nil]

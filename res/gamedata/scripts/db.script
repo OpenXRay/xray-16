@@ -1,0 +1,104 @@
+--[[------------------------------------------------------------------------------------------------
+База данных живых онлайновых объектов, зон и рестрикторов, актёра
+Чугай Александр
+--------------------------------------------------------------------------------------------------]]
+
+zone_by_name        = {}
+script_ids			= {}
+storage             = {}
+actor               = nil
+actor_proxy         = actor_proxy.actor_proxy()
+heli                = {}
+camp_storage        = {}
+story_by_id	        = {}
+smart_terrain_by_id = {}
+info_restr          = {}
+strn_by_respawn     = {}
+heli_enemies        = {}
+heli_enemy_count    = 0
+anim_obj_by_name	= {}
+goodwill 			= {sympathy = {}, relations = {}}
+story_object		= {}
+signal_light		= {}
+offline_objects		= {}
+anomaly_by_name     = {}
+level_doors 		= {}  -- Содержит список всех дверей на уровне (чтобы нпс могли по нему пробегаться и открывать двери, рядом с которыми они стоят.
+no_weap_zones 		= {}
+spawned_vertex_by_id= {}
+
+
+
+function add_enemy( obj )
+	heli_enemies[heli_enemy_count] = obj
+	heli_enemy_count = heli_enemy_count + 1
+end
+
+function delete_enemy( e_index )
+	heli_enemies[e_index] = nil
+end
+
+function add_obj( obj )
+	printf("adding object %s",obj:name())
+	storage[obj:id()].object = obj
+end
+
+function del_obj( obj )
+	storage   [obj:id()] = nil
+end
+
+
+function add_zone( zone )
+	zone_by_name[zone:name()] = zone
+end
+
+function del_zone( zone )
+	zone_by_name[zone:name()] = nil
+end
+
+function add_anomaly( anomaly )
+	anomaly_by_name[anomaly.object:name()] = anomaly
+end
+
+function del_anomaly( anomaly )
+	anomaly_by_name[anomaly.object:name()] = nil
+end
+
+function add_actor( obj )
+	actor = obj
+	actor_proxy:net_spawn( obj )
+	add_obj( obj )
+end
+
+function del_actor()
+	del_obj( actor )
+	actor_proxy:net_destroy()
+	actor = nil
+end
+
+
+function add_heli(obj)
+	heli[obj:id()] = obj
+end
+function del_heli(obj)
+	heli[obj:id()] = nil
+end
+
+
+function add_smart_terrain( obj )
+	smart_terrain_by_id[obj.id] = obj
+end
+
+function del_smart_terrain( obj )
+	smart_terrain_by_id[obj.id] = nil
+end
+
+
+function add_anim_obj(anim_obj, binder)
+	anim_obj_by_name[anim_obj:name()] = binder
+	add_obj(anim_obj)
+end
+
+function del_anim_obj(anim_obj)
+	anim_obj_by_name[anim_obj:name()] = nil
+	del_obj(anim_obj)
+end

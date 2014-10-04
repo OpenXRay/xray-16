@@ -1,0 +1,32 @@
+[logic@jup_a10_bandit_leader]
+suitable = {=check_npc_name(jup_a10_bandit_leader)}
+prior = 100
+active = animpoint@valet
+on_death = death
+
+[animpoint@valet]
+cover_name = jup_a10_bandit_leader_sit_animpoint
+avail_animations =  animpoint_sit_normal
+use_camp = false
+on_info = {+jup_a10_krutoy_stvol_attack -jup_a10_hit_bandit_leader}  %=hit_npc_from_actor +jup_a10_hit_bandit_leader%
+;on_actor_dist_le = 10 | {=actor_has_weapon} remark
+on_info2 = {=is_squad_enemy_to_actor(jup_a10_bandit_squad_3) +jup_a10_vano_give_task} %+jup_a10_kill_all_bandit%
+meet = meet
+
+[death]
+on_info = %+jup_a10_death_0% 
+
+[meet]
+snd_on_use 		= {-jup_a10_vano_give_task} meet_use_no_default,  {+jup_a10_back_vano} meet_use_no_default
+close_snd_hello = jup_a10_bandit_leader_hello
+close_distance  = 10
+close_victim    = actor
+close_anim = nil
+use = {=actor_enemy} false, {=actor_has_weapon} false, true
+trade_enable	= false
+
+[animpoint@remark]
+target = story | actor
+snd = meet_hide_weapon
+on_signal = sound_end | animpoint@valet
+meet = no_meet

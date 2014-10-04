@@ -1,0 +1,15 @@
+[logic]
+active = ph_idle@1
+
+[ph_idle@1]
+on_info = {+jup_b205_pass_code_valide} ph_idle@2
+tips = jup_b205_tip_door_closed
+
+[ph_idle@2]
+on_use = %+jup_b205_open_the_door% ph_idle@end
+tips = jup_b205_tip_door_decode
+
+[ph_idle@end]
+
+
+

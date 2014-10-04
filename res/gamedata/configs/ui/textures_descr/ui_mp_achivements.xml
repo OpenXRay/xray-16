@@ -1,0 +1,38 @@
+<w>
+    <file name="ui\ui_mp_awards">
+    <texture id="mp_award_massacre"       			x="121" y="484" width="121" height="121" />
+    <texture id="mp_award_paranoia"    				x="121" y="363" width="121" height="121" />
+    <texture id="mp_award_overwhelming_superiority"	x="242" y="726" width="121" height="121" />
+    <texture id="mp_award_blitzkrieg"     			x="0" 	y="242" width="121" height="121" />
+    <texture id="mp_award_dry_victory"       		x="121" y="847" width="121" height="121" />
+    <texture id="mp_award_multichampion"			x="242" y="0"	width="121" height="121" />
+ 	<texture id="mp_award_mad"       				x="363" y="363" width="121" height="121" />
+    <texture id="mp_award_achilles_heel"    		x="242" y="363" width="121" height="121" />
+    <texture id="mp_award_fater_than_bullets"		x="242" y="242" width="121" height="121" />
+    <texture id="mp_award_harvest_time"     		x="242" y="484" width="121" height="121" />
+    <texture id="mp_award_skewer"       			x="363" y="484" width="121" height="121" />
+    <texture id="mp_award_double_shot_double_kill"	x="0"  	y="847" width="121" height="121" />
+    <texture id="mp_award_climber"       			x="0" 	y="605" width="121" height="121" />
+    <texture id="mp_award_opener"    				x="0" 	y="484" width="121" height="121" />
+    <texture id="mp_award_toughy"					x="242" y="847" width="121" height="121" />
+    <texture id="mp_award_invincible_fury"     		x="363" y="121" width="121" height="121" />
+	<texture id="mp_award_oculist"       			x="121" y="726" width="121" height="121" />
+    <texture id="mp_award_lightning_reflexes"		x="242" y="605" width="121" height="121" />
+ 	<texture id="mp_award_sprinter_stopper"       	x="121" y="0" 	width="121" height="121" />
+    <texture id="mp_award_marksman"    				x="363" y="0" 	width="121" height="121" />
+    <texture id="mp_award_peace_ambassador"			x="242" y="121" width="121" height="121" />
+    <texture id="mp_award_deadly_accuracy"     		x="0" 	y="726" width="121" height="121" />
+    <texture id="mp_award_remembrance"       		x="121" y="121" width="121" height="121" />
+    <texture id="mp_award_avenger"					x="0" 	y="121"	width="121" height="121" />
+    <texture id="mp_award_cherub"    				x="121" y="605" width="121" height="121" />
+    <texture id="mp_award_dignity"					x="0" 	y="363" width="121" height="121" />
+    <texture id="mp_award_stalker_flair"     		x="121" y="242" width="121" height="121" />
+    <texture id="mp_award_lucky"       				x="363" y="242" width="121" height="121" />
+    <texture id="mp_award_black_list"				x="363" y="605" width="121" height="121" />
+    <texture id="mp_award_silent_death"				x="0"  	y="0" 	width="121" height="121" />
+    <texture id="mp_award_unknown"					x="363"	y="726"	width="121"	height="121" />
+   </file>
+   <!--<file name="award\award_1">
+   <texture id="mp_award_massacre"       			x="0" y="0" width="128" height="128" />
+   </file>-->
+</w>

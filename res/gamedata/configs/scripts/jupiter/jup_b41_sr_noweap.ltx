@@ -1,0 +1,10 @@
+[logic]
+active = sr_idle@wait
+
+[sr_idle@wait]
+;on_actor_inside = {=check_smart_alarm_status(jup_b41:normal) !actor_has_weapon} sr_no_weapon@wait
+on_info = {=actor_in_zone(jup_b41_sr_light)} sr_no_weapon@wait
+
+[sr_no_weapon@wait]
+on_actor_outside = sr_idle@wait
+on_info = {!actor_in_zone(jup_b41_sr_light)} sr_idle@wait

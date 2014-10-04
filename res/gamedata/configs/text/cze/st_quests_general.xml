@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="hide_from_surge_message">
+		<text>Pozor! Emise nastane za:</text>
+	</string>
+	<string id="hide_from_surge_descr_1_a">
+		<text>Okamћitм musнљ bмћet k nejbliћљнmu ъkrytu a skrэt se pшed emisн.</text>
+	</string>
+	<string id="hide_from_surge_descr_2_a">
+		<text>Bмhem emise nesmнљ opouљtмt svщj ъkryt.</text>
+	</string>
+	<string id="hide_from_surge_name_1">
+		<text>Emise: ukryj se</text>
+	</string>
+	<string id="hide_from_surge_name_2">
+		<text>Emise: poиkej v krytu</text>
+	</string>
+</string_table>

@@ -1,0 +1,13 @@
+[logic]
+active = sr_idle@wait
+
+[sr_idle@wait]
+on_info = {=actor_in_zone(pas_b400_sr_switcher) -pas_b400_switcher_use} sr_idle@use %=run_tutorial(pas_b400_switcher)%
+on_info2 = {+pas_b400_switcher_use} sr_idle@nil
+
+[sr_idle@use]
+on_info = {+pas_b400_switcher_use} sr_idle@nil
+on_info2 = {!actor_in_zone(pas_b400_sr_switcher)} sr_idle@wait %=stop_tutorial%
+on_info3 = {!has_active_tutorial} sr_idle@wait
+
+[sr_idle@nil]

@@ -1,0 +1,16 @@
+[logic]
+active = sr_idle@jup_b46_ruptured
+
+[sr_idle@jup_b46_ruptured]
+on_info = {=actor_in_zone(jup_b46_spatial_bubble_zone) =actor_active_detector(detector_scientific) -jup_b46_spatial_bubble_ruptured} sr_particle@jup_b46_rupture_particle
+on_info2 = {+jup_b46_spatial_bubble_ruptured} sr_idle@jup_b46_end
+
+[sr_particle@jup_b46_rupture_particle]
+name = anomaly2\anomaly_spatial_bubble_rupture
+path = jup_b46_particle_point
+mode = 2
+looped = false 
+on_info = {-jup_b46_spatial_bubble_ruptured} %+jup_b46_spatial_bubble_ruptured =play_sound(jup_b46_spatial_bubble_rupture)%
+on_signal = particle_end | {+jup_b46_spatial_bubble_ruptured} sr_idle@jup_b46_end
+
+[sr_idle@jup_b46_end]

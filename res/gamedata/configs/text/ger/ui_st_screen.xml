@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="actor_inventory_box_use">
+		<text>Persцnliche Kiste цffnen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="cant_walk">
+		<text>Sie sind zu erschцpft, um weiterzugehen</text>
+	</string>
+	<string id="cant_walk_weight">
+		<text>Sie sind zu ьberladen, um weiterzugehen</text>
+	</string>
+	<string id="car_character_use">
+		<text>Tьr цffnen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="character_use">
+		<text>Reden ($$ACTION_USE$$)</text>
+	</string>
+	<string id="dead_character_use">
+		<text>Leiche durchsuchen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="dead_character_use_or_drag">
+		<text>Leiche durchsuchen ($$ACTION_USE$$)\nLeiche aufheben (Umschalt + $$ACTION_USE$$)</text>
+	</string>
+	<string id="general_complete_task">
+		<text>Mission abgeschlossen:</text>
+	</string>
+	<string id="general_fail_task">
+		<text>Mission fehlgeschlagen:</text>
+	</string>
+	<string id="general_in_item">
+		<text>Gegenstand erhalten:</text>
+	</string>
+	<string id="general_in_money">
+		<text>Geld erhalten:</text>
+	</string>
+	<string id="general_new_task">
+		<text>Neue Mission:</text>
+	</string>
+	<string id="general_out_item">
+		<text>Gegenstand verloren:</text>
+	</string>
+	<string id="general_out_money">
+		<text>Geld abgegeben:</text>
+	</string>
+	<string id="general_reverse_task">
+		<text>Mission abgebrochen:</text>
+	</string>
+	<string id="general_update_task">
+		<text>Mission aktualisiert:</text>
+	</string>
+	<string id="gun_jammed">
+		<text>Ihre Waffe klemmt. Bitte nachladen.</text>
+	</string>
+	<string id="inventory_box_use">
+		<text>Behдlter durchsuchen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="inventory_item_use">
+		<text>Gegenstand aufheben ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b10_ufo_searching_tips">
+		<text>Flugobjekt durchsuchen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b1_bar_door">
+		<text>Tьr klemmt</text>
+	</string>
+	<string id="jup_b1_door_is_closed">
+		<text>Die Tьr ist von innen verschlossen</text>
+	</string>
+	<string id="jup_b202_treasures_closed">
+		<text>Tresor verschlossen</text>
+	</string>
+	<string id="jup_b205_tip_door_closed">
+		<text>Code notwendig</text>
+	</string>
+	<string id="jup_b205_tip_door_decode">
+		<text>Code eingeben ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b206_use_plant">
+		<text>Pflanze nehmen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b209_scanner_place_tips">
+		<text>Scanner aufstellen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b209_scanner_remove_tips">
+		<text>Scanner nehmen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="lx8_raduga">
+		<text>Regenbogen Aggressionsunterdrьcker\nModell des externen Emissionskomplexes\nMaЯstab 1:20</text>
+	</string>
+	<string id="pas_b400_tip_switcher">
+		<text>Schalter aktivieren ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_a18_use_idol">
+		<text>Gerдt untersuchen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_a25_blow_up_enter_door">
+		<text>Sprengstoff anbringen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_a28_talk_with_stupid_medic">
+		<text>Erholen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_b306_elevator_door_locked_used">
+		<text>Aufzug hat keinen Strom</text>
+	</string>
+	<string id="pri_b306_generator_use">
+		<text>Generator aktivieren ($$ACTION_USE$$)</text>
+	</string>
+	<string id="sleep_ok_button">
+		<text>Schlafen</text>
+	</string>
+	<string id="sleep_warning_all_pleasures">
+		<text>Sie kцnnen nicht schlafen! Sie bluten bedrohlich stark und waren radioaktiver Strahlung ausgesetzt. Nehmen Sie Medikamente ein oder konsultieren Sie einen Arzt.</text>
+	</string>
+	<string id="sleep_warning_bleeding">
+		<text>Sie kцnnen nicht schlafen! Sie bluten bedrohlich stark. Nehmen Sie Medikamente ein oder konsultieren Sie einen Arzt.</text>
+	</string>
+	<string id="sleep_warning_radiation">
+		<text>Sie kцnnen nicht schlafen! Sie waren radioaktiver Strahlung ausgesetzt. Nehmen Sie Medikamente ein oder konsultieren Sie einen Arzt.</text>
+	</string>
+	<string id="sleep_zone_tip">
+		<text>Schlafen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_ach_balance_advocate">
+		<text>Sie haben folgenden Erfolg errungen: Mann des Gleichgewichts.</text>
+	</string>
+	<string id="st_ach_battle_systems_master">
+		<text>Sie haben folgenden Erfolg errungen: Experte fьr Waffensysteme.</text>
+	</string>
+	<string id="st_ach_detective">
+		<text>Sie haben folgenden Erfolg errungen: Detektiv.</text>
+	</string>
+	<string id="st_ach_diplomat">
+		<text>Sie haben folgenden Erfolg errungen: Diplomat.</text>
+	</string>
+	<string id="st_ach_friend_of_duty">
+		<text>Sie haben folgenden Erfolg errungen: Freund der Wдchter.</text>
+	</string>
+	<string id="st_ach_friend_of_freedom">
+		<text>Sie haben folgenden Erfolg errungen: Freund der Freiheit.</text>
+	</string>
+	<string id="st_ach_friend_of_stalkers">
+		<text>Sie haben folgenden Erfolg errungen: Freund der Stalker.</text>
+	</string>
+	<string id="st_ach_herald_of_justice">
+		<text>Sie haben folgenden Erfolg errungen: Verfechter der Gerechtigkeit.</text>
+	</string>
+	<string id="st_ach_high_tech_master">
+		<text>Sie haben folgenden Erfolg errungen: High-Tech-Experte.</text>
+	</string>
+	<string id="st_ach_information_dealer">
+		<text>Sie haben folgenden Erfolg errungen: Informationsmakler.</text>
+	</string>
+	<string id="st_ach_keeper_of_secrets">
+		<text>Sie haben folgenden Erfolg errungen: Bewahrer von Geheimnissen.</text>
+	</string>
+	<string id="st_ach_kingpin">
+		<text>Sie haben folgenden Erfolg errungen: Boss.</text>
+	</string>
+	<string id="st_ach_leader">
+		<text>Sie haben folgenden Erfolg errungen: Anfьhrer.</text>
+	</string>
+	<string id="st_ach_mutant_hunter">
+		<text>Sie haben folgenden Erfolg errungen: Mutantenjдger.</text>
+	</string>
+	<string id="st_ach_one_of_the_lads">
+		<text>Sie haben folgenden Erfolg errungen: Einer von uns.</text>
+	</string>
+	<string id="st_ach_pioneer">
+		<text>Sie haben folgenden Erfolg errungen: Pionier.</text>
+	</string>
+	<string id="st_ach_research_man">
+		<text>Sie haben folgenden Erfolg errungen: Wissenschaftlicher Mitarbeiter.</text>
+	</string>
+	<string id="st_ach_seeker">
+		<text>Sie haben folgenden Erfolg errungen: Artefaktjдger.</text>
+	</string>
+	<string id="st_ach_skilled_stalker">
+		<text>Sie haben folgenden Erfolg errungen: Erfahrener Stalker.</text>
+	</string>
+	<string id="st_ach_wealthy">
+		<text>Sie haben folgenden Erfolg errungen: Reicher Kunde.</text>
+	</string>
+	<string id="st_autosave">
+		<text>Automatische Speicherung...</text>
+	</string>
+	<string id="st_can_use_weapon_now">
+		<text>Sie kцnnen Ihre Waffe jetzt wieder herausnehmen.</text>
+	</string>
+	<string id="st_codelock">
+		<text>Code lock ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_detective_news">
+		<text>Als Belohnung dafьr, dass Sie das Geheimnis der verschwundenen Stalker lьften konnten, wurden medizinische Vorrдte in Ihrer persцnlichen Kiste auf der Skadowsk hinterlegt.</text>
+	</string>
+	<string id="st_duty_first_reward_news">
+		<text>Als Belohnung fьr die Hilfe, die Sie den Wдchtern geleistet haben, wurde ein PS5-M Universalschutzanzug in Ihrer persцnlichen Kiste in der Janow-Station hinterlegt.</text>
+	</string>
+	<string id="st_duty_second_reward_news">
+		<text>Als Belohnung fьr die Hilfe, die Sie den Wдchtern geleistet haben, wurde eine PSZ-9d Wдchterpanzerung in Ihrer persцnlichen Kiste in der Janow-Station hinterlegt.</text>
+	</string>
+	<string id="st_freedom_first_reward_news">
+		<text>Als Belohnung fьr die Hilfe, die Sie der Freiheit geleistet haben, wurde ein Freiheit-Sturmanzug in Ihrer persцnlichen Kiste in der Janow-Station hinterlegt.</text>
+	</string>
+	<string id="st_freedom_second_reward_news">
+		<text>Als Belohnung fьr die Hilfe, die Sie der Freiheit geleistet haben, wurde ein Freiheit-Wachanzug in Ihrer persцnlichen Kiste in der Janow-Station hinterlegt.</text>
+	</string>
+	<string id="st_freeplay_text_ok">
+		<text>Sie haben es nicht bis zum Hubschrauber geschafft und das Evakuierungsteam hat die Zone ohne Sie verlassen.</text>
+	</string>
+	<string id="st_freeplay_text_yes_no">
+		<text>Sind Sie bereit, die Zone zu verlassen? Es gibt keinen Weg zurьck.</text>
+	</string>
+	<string id="st_game_over">
+		<text>Game Over</text>
+	</string>
+	<string id="st_game_over_press_jump">
+		<text>Drьcken Sie ($$ACTION_JUMP$$), um ins Hauptmenь zurьckzukehren.</text>
+	</string>
+	<string id="st_game_paused">
+		<text>Pause</text>
+	</string>
+	<string id="st_game_saved">
+		<text>Spiel gespeichert</text>
+	</string>
+	<string id="st_herald_of_justice_news">
+		<text>Als Belohnung fьr Ihre Hilfe dabei, Magpie zu ьberfьhren, wurde ein Artefakt in Ihrer persцnlichen Kiste auf der Skadowsk hinterlegt.</text>
+	</string>
+	<string id="st_jup_b41_door_locked">
+		<text>Sie mьssen warten, bis das Dock luftdicht verschlossen ist</text>
+	</string>
+	<string id="st_lx8_button_press_true">
+		<text>Zugang gewдhrt</text>
+	</string>
+	<string id="st_lx8_lift_button">
+		<text>Aufzug nach oben ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_pri_b306_go_down">
+		<text>Aufzug nach unten ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_psy_danger">
+		<text>Kritisches Psi-Emissionsniveau. Begeben Sie sich sofort aus der Gefahrenzone.</text>
+	</string>
+	<string id="st_radiation_danger">
+		<text>Kritisches Strahlungsniveau. Um weiterzugehen, wird Schutz benцtigt.</text>
+	</string>
+	<string id="st_search_helicopter">
+		<text>Hubschrauber untersuchen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_search_treasure">
+		<text>Versteck durchsuchen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_sleep_hours">
+		<text>h</text>
+	</string>
+	<string id="st_tip">
+		<text>Nachricht</text>
+	</string>
+	<string id="tip_door_blocked">
+		<text>Tьr blockiert</text>
+	</string>
+	<string id="tip_door_close">
+		<text>Tьr schlieЯen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="tip_door_closed_base_alarm">
+		<text>Tьr verschlossen - das Lager befindet sich im Alarmzustand</text>
+	</string>
+	<string id="tip_door_closed_hide_weapon">
+		<text>Tьr verschlossen - Sie mьssen Ihre Waffe einstecken</text>
+	</string>
+	<string id="tip_door_locked">
+		<text>Tьr verschlossen</text>
+	</string>
+	<string id="tip_door_no_electricity">
+		<text>Stromzufuhr der Tьr ist unterbrochen</text>
+	</string>
+	<string id="tip_door_open">
+		<text>Tьr цffnen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="tip_gate_locked">
+		<text>Tor blockiert</text>
+	</string>
+	<string id="tip_need_access_card">
+		<text>Zugangskarte benutzen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="tip_no_access_card">
+		<text>Zugangskarte erforderlich</text>
+	</string>
+	<string id="tip_open_another_site">
+		<text>Die Tьr kann nicht von dieser Seite aus geцffnet werden</text>
+	</string>
+	<string id="ui_st_mp_experience_grow">
+		<text>-</text>
+	</string>
+	<string id="zat_b12_conteiner_full_locked">
+		<text>Die Kiste ist verschlossen. Es werden zwei Schlьssel benцtigt.</text>
+	</string>
+	<string id="zat_b12_conteiner_has_one_key">
+		<text>Schlьssel benutzen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b12_conteiner_has_two_key">
+		<text>Schlьssel benutzen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b12_conteiner_locked">
+		<text>Die Kiste ist verschlossen. Sie benцtigen den zweiten Schlьssel, um sie zu цffnen.</text>
+	</string>
+	<string id="zat_b12_conteiner_open">
+		<text>Kiste цffnen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b14_door_locked_hint">
+		<text>Der Tьrmechanismus wurde von innen blockiert</text>
+	</string>
+	<string id="zat_b57_balon_use_hint">
+		<text>Gastank verbinden ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b57_gas_warning">
+		<text>Achtung! Chemische Gefahr!</text>
+	</string>
+	<string id="zat_b57_vintil_press">
+		<text>Ventil drehen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b33_car_searching_tip">
+		<text>Fahrzeug durchsuchen ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_resupply_ready">
+		<text>Sie kцnnen bei Leutnant Rogowez und Leutnant Kirilloff Ihre Vorrдte an Medikamenten und Munition auffrischen.</text>
+	</string>
+	<string id="st_surge_while_asleep">
+		<text>Vor kurzem fand eine Emission in der Zone statt.</text>
+	</string>
+	<string id="st_ach_marked_by_zone">
+		<text>Sie haben folgenden Erfolg errungen: Gezeichnet von der Zone.</text>
+	</string>
+	<string id="st_mutant_hunter_news">
+		<text>Als Dank dafьr, dass Sie gefдhrliche Mutanten getцtet haben, wurde Munition in Ihrer persцnlichen Kiste in der Janow-Station hinterlegt.</text>
+	</string>
+	<string id="st_found_old_treasure">
+		<text>Koordinaten eines Verstecks erhalten, das schon bekannt ist.</text>
+	</string>
+	<string id="st_got_treasure">
+		<text>Versteck gefunden</text>
+	</string>
+	<string id="st_found_new_treasure">
+		<text>Versteckkoordinaten erhalten</text>
+	</string>
+	<string id="st_press_any_key">
+		<text>Zum Spielen beliebige Taste drьcken</text>
+	</string>
+</string_table>

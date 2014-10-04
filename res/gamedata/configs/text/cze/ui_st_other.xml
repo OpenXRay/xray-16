@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="Btn_Cancel">
+		<text>Zruљit</text>
+	</string>
+	<string id="Btn_No">
+		<text>Ne </text>
+	</string>
+	<string id="Btn_OK">
+		<text>OK</text>
+	</string>
+	<string id="Btn_Yes">
+		<text>Ano</text>
+	</string>
+	<string id="bad">
+		<text>Љpatnэ</text>
+	</string>
+	<string id="enemy">
+		<text>Nepшнtel</text>
+	</string>
+	<string id="excellent">
+		<text>Vэbornэ</text>
+	</string>
+	<string id="experienced">
+		<text>Zkuљenэ</text>
+	</string>
+	<string id="friendly">
+		<text>Spojenec</text>
+	</string>
+	<string id="global_map">
+		<text>Mapa Zуny</text>
+	</string>
+	<string id="good">
+		<text>Dobrэ</text>
+	</string>
+	<string id="indifferent">
+		<text>Nevyhranмnэ</text>
+	</string>
+	<string id="master">
+		<text>Mistr</text>
+	</string>
+	<string id="mm_mp_pda_hunt">
+		<text>Bonus za PDA</text>
+	</string>
+	<string id="mp_only_one_voting">
+		<text>V jednu chvнli mщћe bэt aktivnн jen jedno hlasovбnн.</text>
+	</string>
+	<string id="neutral">
+		<text>Neutrбlnн</text>
+	</string>
+	<string id="novice">
+		<text>Zelenби</text>
+	</string>
+	<string id="st_game">
+		<text>Hra</text>
+	</string>
+	<string id="st_item_used">
+		<text>Pouћil jsi</text>
+	</string>
+	<string id="st_level">
+		<text>Ъroveт</text>
+	</string>
+	<string id="st_loading_ai_objects">
+		<text>Naинtбm objekty AI</text>
+	</string>
+	<string id="st_loading_alife_simulator">
+		<text>Server: naинtбm simulбtor A-life</text>
+	</string>
+	<string id="st_loading_cform">
+		<text>Naинtбm CFORM</text>
+	</string>
+	<string id="st_loading_details">
+		<text>Naинtбm detaily</text>
+	</string>
+	<string id="st_loading_geometry">
+		<text>Naинtбm geometrii</text>
+	</string>
+	<string id="st_loading_saved_game">
+		<text>Naинtбm uloћenou hru</text>
+	</string>
+	<string id="st_loading_sectors_portals">
+		<text>Naинtбm sektory a portбly</text>
+	</string>
+	<string id="st_loading_shaders">
+		<text>Naинtбm shadery</text>
+	</string>
+	<string id="st_loading_spatial_db">
+		<text>Naинtбm prostorovou databбzi</text>
+	</string>
+	<string id="st_loading_textures">
+		<text>Naинtбm textury</text>
+	</string>
+	<string id="st_mp_direct_ip">
+		<text>Pшнmй IP</text>
+	</string>
+	<string id="st_no_active_task">
+		<text>Ћбdnй aktivnн ъkoly</text>
+	</string>
+	<string id="st_not_enough_money">
+		<text>Nemбљ dost penмz</text>
+	</string>
+	<string id="st_not_enough_money_npc">
+		<text>Tato postava nemб dost penмz</text>
+	</string>
+	<string id="st_opening_stream">
+		<text>Otevнrбm stream</text>
+	</string>
+	<string id="st_prefetching_objects">
+		<text>Uklбdбm objekty do vyrovnбvacн pamмti</text>
+	</string>
+	<string id="st_rubles">
+		<text>rublщ</text>
+	</string>
+	<string id="st_server_connecting">
+		<text>SERVER: Pшipojuji se</text>
+	</string>
+	<string id="st_server_starting">
+		<text>SERVER: Spouљtнm</text>
+	</string>
+	<string id="st_validating_cdkey">
+		<text>Ovмшuji CD klни</text>
+	</string>
+	<string id="st_video">
+		<text>Obraz</text>
+	</string>
+	<string id="terrible">
+		<text>Hroznэ</text>
+	</string>
+	<string id="ui_inv_repair">
+		<text>Opravit</text>
+	</string>
+	<string id="ui_st_cant_run_r2">
+		<text>Na svйm PC nemщћeљ spustit render 2</text>
+	</string>
+	<string id="ui_st_community">
+		<text>Frakce</text>
+	</string>
+	<string id="ui_st_conn_cdkey_disabled">
+		<text>Chyba pшipojenн: tvщj CD klни nenн povolen. Obraќ se na zбkaznickou sluћbu.</text>
+	</string>
+	<string id="ui_st_conn_cdkey_in_use">
+		<text>Chyba pшipojenн: tvщj CD klни jiћ pouћнvб jinэ hrби</text>
+	</string>
+	<string id="ui_st_conn_cdkey_invalid">
+		<text>Chyba pшipojenн: neplatnэ CD klни</text>
+	</string>
+	<string id="ui_st_conn_invalid_host">
+		<text>Chyba pшipojenн: љpatnэ hostitel</text>
+	</string>
+	<string id="ui_st_conn_invalid_pass">
+		<text>Chyba pшipojenн: љpatnй heslo</text>
+	</string>
+	<string id="ui_st_conn_new_patch">
+		<text>Ke staћenн je novэ patch.\n Verze: %s\n Umнstмnн: %s\nPшejeљ si ho teп stбhnout?</text>
+	</string>
+	<string id="ui_st_conn_no_new_patch">
+		<text>Ћбdnй novй patche nejsou k dispozici.</text>
+	</string>
+	<string id="ui_st_conn_rejected_server">
+		<text>Chyba pшipojenн: server zamнtl pшipojenн</text>
+	</string>
+	<string id="ui_st_conn_sess_full">
+		<text>Chyba pшipojenн: server je plnэ</text>
+	</string>
+	<string id="ui_st_conn_version_differs">
+		<text>Chyba pшipojenн: rozdнlnй verze</text>
+	</string>
+	<string id="ui_st_connecting_to_masterserver">
+		<text>Pшipojuji se k hlavnнmu serveru</text>
+	</string>
+	<string id="ui_st_days">
+		<text>Dnн</text>
+	</string>
+	<string id="ui_st_error">
+		<text>Chyba</text>
+	</string>
+	<string id="ui_st_error_loading">
+		<text>Chyba pшi naинtбnн</text>
+	</string>
+	<string id="ui_st_file_exist_owerwrite_q">
+		<text>Soubor s tнmto nбzvem jiћ existuje. Pшejeљ si jej pшepsat?</text>
+	</string>
+	<string id="ui_st_file_name_is_empty">
+		<text>Soubor nemб jmйno</text>
+	</string>
+	<string id="ui_st_hours">
+		<text>Hodiny</text>
+	</string>
+	<string id="ui_st_kicked_by_battleye">
+		<text>Odpojeno ochrannэm systйmem BattleEye. Dщvod:</text>
+	</string>
+	<string id="ui_st_kicked_by_server">
+		<text>Odpojeno. Dщvod:</text>
+	</string>
+	<string id="ui_st_leave">
+		<text>Odejнt</text>
+	</string>
+	<string id="ui_st_load_game_confirm">
+		<text>Naиtenнm tйto hry pшijdeљ o neuloћenб data. Pokraиovat?</text>
+	</string>
+	<string id="ui_st_mins">
+		<text>min</text>
+	</string>
+	<string id="ui_st_months">
+		<text>Mмsнce</text>
+	</string>
+	<string id="ui_st_opponent_items">
+		<text>Batoh</text>
+	</string>
+	<string id="ui_st_params">
+		<text>Parametry</text>
+	</string>
+	<string id="ui_st_patch_download_error">
+		<text>Patch se nepodaшilo stбhnout.</text>
+	</string>
+	<string id="ui_st_patch_download_success">
+		<text>Stahovбnн patche dokonиeno. Pшejeљ si jej nainstalovat?</text>
+	</string>
+	<string id="ui_st_price">
+		<text>Cena</text>
+	</string>
+	<string id="ui_st_rank">
+		<text>Hodnost</text>
+	</string>
+	<string id="ui_st_relation">
+		<text>Postoj</text>
+	</string>
+	<string id="ui_st_reputation">
+		<text>Reputace</text>
+	</string>
+	<string id="ui_st_secs">
+		<text>s.</text>
+	</string>
+	<string id="ui_st_select_one_map">
+		<text>Zvol alespoт jednu mapu</text>
+	</string>
+	<string id="ui_st_take_all">
+		<text>Sebrat vљe</text>
+	</string>
+	<string id="ui_st_time_remains">
+		<text>Zbэvб</text>
+	</string>
+	<string id="ui_st_voting_disabled">
+		<text>Hlasovбnн neproљlo</text>
+	</string>
+	<string id="ui_st_want_to_leave_game_q">
+		<text>Opravdu si pшejeљ odejнt ze hry?</text>
+	</string>
+	<string id="ui_total_price">
+		<text>Celkem</text>
+	</string>
+	<string id="very_bad">
+		<text>velmi љpatnй</text>
+	</string>
+	<string id="very_good">
+		<text>velmi dobrй</text>
+	</string>
+	<string id="veteran">
+		<text>Veterбn</text>
+	</string>
+	<string id="ui_st_inv_repair">
+		<text>Opravit</text>
+	</string>
+	<string id="ui_repair_button_hint">
+		<text>Opravit zvolenэ pшedmмt</text>
+	</string>
+	<string id="st_key_notbinded">
+		<text>...</text>
+	</string>
+	<string id="st_save_uni_travel_generic">
+		<text>pшesun v rбmci oblasti</text>
+	</string>
+	<string id="st_save_uni_travel_zat_to_jup">
+		<text>pшesun ze Zatonu do Janova</text>
+	</string>
+	<string id="st_save_uni_travel_zat_to_pri">
+		<text>pшesun ze Zatonu do Pripjati</text>
+	</string>
+	<string id="st_save_uni_travel_jup_to_zat">
+		<text>pшesun z Janova do Zatonu</text>
+	</string>
+	<string id="st_save_uni_travel_jup_to_pri">
+		<text>pшesun z Janova do Pripjati</text>
+	</string>
+	<string id="st_save_uni_travel_pri_to_zat">
+		<text>pшesun z Pripjati do Zatonu</text>
+	</string>
+	<string id="st_save_uni_travel_pri_to_jup">
+		<text>pшesun z Pripjati do Janova</text>
+	</string>
+	<string id="st_save_uni_pri_to_labx8">
+		<text>pшesun z Pripjati do X8</text>
+	</string>
+	<string id="st_save_uni_labx8_to_pri">
+		<text>pшesun z X8 do Pripjati</text>
+	</string>
+	<string id="st_save_uni_surge_start">
+		<text>emise</text>
+	</string>
+	<string id="st_save_zat_a1_game_start">
+		<text>zaибtek hry</text>
+	</string>
+	<string id="st_save_zat_a2_reached_skadovsk">
+		<text>pшнchod na Skadovsk</text>
+	</string>
+	<string id="st_save_jup_b9_searched_heli_1">
+		<text>Prщzkum Rejnoka 1</text>
+	</string>
+	<string id="st_save_zat_b100_searched_heli_2">
+		<text>Prщzkum Rejnoka 2</text>
+	</string>
+	<string id="st_save_zat_b28_searched_heli_3">
+		<text>Prщzkum Rejnoka 3</text>
+	</string>
+	<string id="st_save_jup_b8_searched_heli_4">
+		<text>Prщzkum Rejnoka 4</text>
+	</string>
+	<string id="st_save_zat_b101_searched_heli_5">
+		<text>Prщzkum Rejnoka 5</text>
+	</string>
+	<string id="st_save_zat_b18_noah_showed_teleport">
+		<text>cesta na nбhornн ploљinu</text>
+	</string>
+	<string id="st_save_jup_b217_arrived_to_jup">
+		<text>pшнchod do Janova</text>
+	</string>
+	<string id="st_save_jup_a9_got_underpass_docs">
+		<text>nalezena cesta do Pripjati</text>
+	</string>
+	<string id="st_save_jup_b15_drunk_with_zulu">
+		<text>pшidбvб se Zulu</text>
+	</string>
+	<string id="st_save_jup_a10_gonna_return_debt">
+		<text>Vбтo splбcн dluh</text>
+	</string>
+	<string id="st_save_jup_b218_vano_in_squad">
+		<text>pшidбvб se Vбтo</text>
+	</string>
+	<string id="st_save_jup_b206_got_anomalous_plant">
+		<text>nalezena anomбlnн rostlina</text>
+	</string>
+	<string id="st_save_jup_b218_sokolov_in_squad">
+		<text>pшidбvб se Sokolov</text>
+	</string>
+	<string id="st_save_jup_b218_strider_in_squad">
+		<text>Tulбk odchбzн</text>
+	</string>
+	<string id="st_save_jup_b218_travel_jup_to_pas">
+		<text>utvoшeno druћstvo</text>
+	</string>
+	<string id="st_save_pas_b400_underpass_start">
+		<text>pшнchod k nadchodu</text>
+	</string>
+	<string id="st_save_uni_travel_pas_to_pri">
+		<text>pшнchod do Pripjati</text>
+	</string>
+	<string id="st_save_pri_a16_arrived_to_pri">
+		<text>nalezena armбda</text>
+	</string>
+	<string id="st_save_pri_a17_hospital_start">
+		<text>zнskбna neidentifikovanб zbraт</text>
+	</string>
+	<string id="st_save_pri_a20_found_dead_recon">
+		<text>nalezeni prщzkumnнci</text>
+	</string>
+	<string id="st_save_pri_a18_met_reinforcement">
+		<text>dorazily posily</text>
+	</string>
+	<string id="st_save_pri_a18_searched_antenna">
+		<text>„antйna“ prozkoumбna</text>
+	</string>
+	<string id="st_save_pri_a21_approached_mad_sentry">
+		<text>nalezen chybмjнcн zбznam</text>
+	</string>
+	<string id="st_save_pri_a21_killed_controller">
+		<text>zabit kontrolor poblнћ hlнdky</text>
+	</string>
+	<string id="st_save_zat_a23_entered_test_center">
+		<text>vstup do testovacн dнlny</text>
+	</string>
+	<string id="st_save_zat_a23_got_gauss_docs">
+		<text>nalezena dokumentace ke Gaussovм puљce</text>
+	</string>
+	<string id="st_save_pri_a22_found_dead_squad">
+		<text>nalezen mrtvэ bojovnнk</text>
+	</string>
+	<string id="st_save_pri_a25_gonna_place_explosive">
+		<text>vstup do љkolky</text>
+	</string>
+	<string id="st_save_pri_a25_freed_medic">
+		<text>zachrбnмn zdravotnнk</text>
+	</string>
+	<string id="st_save_pri_a28_talked_with_ssu">
+		<text>obnoven kontakt s velitelstvнm</text>
+	</string>
+	<string id="st_save_pri_a28_evacutaion_start">
+		<text>zahбjena evakuace Pripjati</text>
+	</string>
+	<string id="st_save_pri_a28_evacuation_end">
+		<text>pшнchod k evakuaиnнm vrtulnнkщm</text>
+	</string>
+	<string id="st_save_uni_zone_to_reality">
+		<text>evakuace dokonиena</text>
+	</string>
+	<string id="st_save_jup_b209_placed_mutant_scanner">
+		<text>detektor mutantщ</text>
+	</string>
+	<string id="st_save_jup_a12_gave_artefact_for_hostage">
+		<text>vэkupnй zaplaceno</text>
+	</string>
+	<string id="st_save_jup_a12_met_with_liberators">
+		<text>rukojmн osvobozen</text>
+	</string>
+	<string id="st_save_jup_b6_arrived_to_ash_heap">
+		<text>mмшenн anomбlie Spбleniљtм</text>
+	</string>
+	<string id="st_save_jup_b6_arrived_to_fen">
+		<text>mмшenн anomбlie Rбkosн</text>
+	</string>
+	<string id="st_save_zat_b38_met_with_grouse">
+		<text>pelech upнrщ</text>
+	</string>
+	<string id="st_save_jup_b19_arrived_to_kopachy">
+		<text>poslбn do Kopaиi</text>
+	</string>
+	<string id="st_save_zat_b40_warned_by_mercs">
+		<text>pшнchod k иistiиce odpadщ</text>
+	</string>
+	<string id="st_save_zat_b7_met_with_robbers">
+		<text>nбjezd na stalkery</text>
+	</string>
+	<string id="st_save_zat_b33_got_container">
+		<text>ve skrэљi nalezen kontejner</text>
+	</string>
+	<string id="st_save_zat_b106_arrived_to_chimera_lair">
+		<text>hon na chimйru</text>
+	</string>
+	<string id="st_save_jup_b16_passed_labyrinth">
+		<text>nalezena Oбza</text>
+	</string>
+	<string id="st_save_pri_b35_ready_to_snipe">
+		<text>zahбjena Operace jeden vэstшel</text>
+	</string>
+	<string id="st_save_jup_b1_entered_railroad_tunnel">
+		<text>hledбnн zdroje psionickйho zбшenн</text>
+	</string>
+	<string id="st_save_jup_b47_got_admin_docs">
+		<text>administrativnн dokumenty</text>
+	</string>
+	<string id="st_save_zat_b103_warned_by_mercs">
+		<text>pшнstup k nбdraћnн dнlnм</text>
+	</string>
+	<string id="st_save_zat_b5_met_with_others">
+		<text>kљeft u loveckй stanice</text>
+	</string>
+	<string id="st_save_jup_b207_arrived_to_duty_depot">
+		<text>skladiљtм Povinnosti</text>
+	</string>
+	<string id="st_save_zat_b14_got_altered_wheel">
+		<text>nalezen zdroj podivnйho zбшenн</text>
+	</string>
+	<string id="st_save_pri_b301_arrived_to_help_zulu">
+		<text>Zulus nalezen</text>
+	</string>
+	<string id="st_save_zat_b42_arrived_to_controler_lair">
+		<text>nebezpeиnб jeskynм</text>
+	</string>
+	<string id="ui_st_upgrade">
+		<text>Opravy a modifikace</text>
+	</string>
+	<string id="ui_st_buy">
+		<text>Koupit</text>
+	</string>
+	<string id="ui_st_sell">
+		<text>Prodat</text>
+	</string>
+	<string id="ui_st_trade">
+		<text>Obchod</text>
+	</string>
+	<string id="ui_st_exit_hint">
+		<text>Zavшнt okno ($$ACTION_USE$$)</text>
+	</string>
+	<string id="ui_st_trade_hint">
+		<text>Otevшнt okno obchodu ($$ACTION_SPRINT_TOGGLE$$)</text>
+	</string>
+	<string id="ui_st_upgrade_hint">
+		<text>Otevшнt okno oprav a modifikacн ($$ACTION_SPRINT_TOGGLE$$)</text>
+	</string>
+	<string id="ui_st_take_all_hint">
+		<text>Pшesunout vљechny pшedmмty do batohu ($$ACTION_SPRINT_TOGGLE$$)</text>
+	</string>
+	<string id="ui_st_buy_hint">
+		<text>Koupit zvolenй pшedmмty</text>
+	</string>
+	<string id="ui_st_sell_hint">
+		<text>Prodat zvolenй pшedmмty</text>
+	</string>
+	<string id="st_save_pri_a28_evacuation_heli">
+		<text>start evakuaиnн helikoptйry</text>
+	</string>
+</string_table>

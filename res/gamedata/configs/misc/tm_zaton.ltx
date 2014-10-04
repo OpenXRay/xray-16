@@ -1,0 +1,378 @@
+;сюжетные задания
+
+[zat_b107_evacuation_zaton]
+icon = ui_inGame2_Mesta_evakuatsii
+prior = 106
+storyline = true
+title = zat_b107_evacuation_zaton_name
+descr = zat_b107_evacuation_zaton_text
+target = zat_a2_stalker_barmen
+condlist_0 =  {+zat_a2_stalker_barmen_evacuation_asked} complete
+condlist_1 =  {+jup_b9_blackbox_decrypted} reversed
+
+[zat_b107_evacuation_jupiter]
+icon = ui_inGame2_Mesta_evakuatsii
+prior = 107
+storyline = true
+title = zat_b107_evacuation_jupiter_name
+descr = zat_b107_evacuation_jupiter_text
+target = jup_b205_zombie_zone_01
+condlist_0 = {+jup_b205_evacuation_visited} complete
+condlist_1 = {+jup_b9_blackbox_decrypted} reversed 
+
+[zat_b107_evacuation_pripyat]
+icon = ui_inGame2_Mesta_evakuatsii
+prior = 108
+storyline = true
+title  = {+zat_b28_heli_3_searched +jup_b9_blackbox_decrypted} zat_b107_evacuation_pripyat_3_name ,{+zat_b28_heli_3_searched -jup_b9_blackbox_decrypted} zat_b107_evacuation_pripyat_1_name, {-zat_b28_heli_3_searched +jup_b9_blackbox_decrypted} zat_b107_evacuation_pripyat_2_name
+descr  = {+zat_b28_heli_3_searched +jup_b9_blackbox_decrypted} zat_b107_evacuation_pripyat_3_text ,{+zat_b28_heli_3_searched -jup_b9_blackbox_decrypted} zat_b107_evacuation_pripyat_1_text, {-zat_b28_heli_3_searched +jup_b9_blackbox_decrypted} zat_b107_evacuation_pripyat_2_text
+target = {+zat_b28_heli_3_searched +jup_b9_blackbox_decrypted} pri_a28_evacuation_point ,{+zat_b28_heli_3_searched -jup_b9_blackbox_decrypted} pri_a28_evacuation_point, {-zat_b28_heli_3_searched +jup_b9_blackbox_decrypted}
+condlist_0 = {+pri_a17_military_base_commander_task_dialog_end} complete
+
+[zat_b100_heli_2_crash]
+icon = ui_inGame2_Skat_2
+prior = 104
+storyline = true
+title = zat_b100_heli_2_crash_name
+descr = zat_b100_heli_2_crash_text
+target = zat_b100_heli_2
+condlist_0 = {+zat_b100_heli_2_searched} complete, {+pri_b305_actor_wondered_done} complete
+
+[zat_b101_heli_5_crash]
+icon = ui_inGame2_Skat_5
+prior = 101
+storyline = true
+title = {+zat_b101_both_heli_info} zat_b101_heli_5_crash_name_03, {+zat_b101_one_heli_info -jup_b8_heli_4_searching} zat_b101_heli_5_crash_name_02, zat_b101_heli_5_crash_name
+descr = {+zat_b101_both_heli_info} zat_b101_heli_5_crash_text_03, {+zat_b101_one_heli_info -jup_b8_heli_4_searching} zat_b101_heli_5_crash_text_02, zat_b101_heli_5_crash_text
+target = {+zat_b101_both_heli_info} nil, {+zat_b101_one_heli_info -jup_b8_heli_4_searching} nil, zat_b101_heli_5
+condlist_0 = {+pri_b305_actor_wondered_done} complete
+
+[zat_b28_heli_3_crash]
+icon = ui_inGame2_Skat_3
+prior = 103
+storyline = true
+title = zat_b28_heli_3_crash_name
+descr = zat_b28_heli_3_crash_text
+target = zat_b28_heli_3
+condlist_0 = {+zat_b28_heli_3_searched} complete
+
+;второстепенные задания
+
+[zat_b14_learn_about_strange_occurrence] ;Найти артефакт - послал бармен
+icon = ui_inGame2_Strannoe_yavlenie
+prior = 1
+storyline = false
+title = {+zat_b14_give_item_stalker +zat_b14_stalker_killed_by_actor +zat_b14_return_item} zat_b14_bring_strange_object_name, {+zat_b14_give_item_stalker +zat_b14_stalker_killed_by_actor} zat_b14_take_artefact_name, {+zat_b14_give_item_stalker +zat_b14_stalker_killed_by_actor +zat_b14_take_item} zat_b14_bring_strange_object_name, {+zat_b14_give_item_stalker  +zat_b14_take_item} zat_b14_tell_svyaznoy_about_all_name, {+zat_b14_take_item} zat_b14_bring_strange_object_name, {+zat_b14_actor_in_up_point_zone} zat_b14_take_artefact_name, zat_b14_learn_about_strange_occurrence_name
+descr = {+zat_b14_give_item_stalker +zat_b14_stalker_killed_by_actor +zat_b14_return_item} zat_b14_bring_strange_object_text, {+zat_b14_give_item_stalker +zat_b14_stalker_killed_by_actor} zat_b14_take_artefact_text, {+zat_b14_give_item_stalker +zat_b14_stalker_killed_by_actor +zat_b14_take_item} zat_b14_bring_strange_object_text, {+zat_b14_give_item_stalker  +zat_b14_take_item} zat_b14_tell_svyaznoy_about_all_text, {+zat_b14_take_item} zat_b14_bring_strange_object_text, {+zat_b14_actor_in_up_point_zone} zat_b14_take_artefact_text, zat_b14_learn_about_strange_occurrence_text
+target = {+zat_b14_take_item} zat_a2_stalker_barmen, zat_b14_artefact_id
+on_init = %+zat_b14_learn_about_strange_occurrence_give_task%
+condlist_0 = {+zat_b14_give_item_linker} complete
+condlist_1 = {+zat_a2_linker_b14_quest_wrong_done} reversed, {+jup_b6_half_artefact_from_b14_given_to_sci} reversed %+zat_b14_smart_terrain_open%
+on_complete = %+zat_b14_smart_terrain_open%
+on_reversed = %+zat_b14_smart_terrain_open% 
+reward_money = 3000
+
+[zat_b14_learn_about_strange_occurrence_by_stalkers] ;Игрок сам нашел артефакт
+icon = ui_inGame2_Strannoe_yavlenie
+prior = 1
+storyline = false
+title = {+zat_b14_take_item +zat_b14_actor_know_about_svyaznoy} zat_b14_tell_svyaznoy_about_all_name, zat_b14_learn_about_strange_occurrence_by_stalkers_name
+descr = {+zat_b14_take_item +zat_b14_actor_know_about_svyaznoy} zat_b14_bring_strange_object_text, zat_b14_learn_about_strange_occurrence_by_stalkers_text
+target = {+zat_b14_take_item +zat_b14_actor_know_about_svyaznoy} zat_a2_stalker_barmen, nil
+on_init = %+zat_b14_learn_about_strange_occurrence_by_stalkers_give_task%
+condlist_0 = {+zat_b14_give_item_linker} complete
+condlist_1 = {+zat_a2_linker_b14_quest_wrong_done} reversed %+zat_b14_smart_terrain_open%, {+jup_b6_half_artefact_from_b14_given_to_sci} reversed %+zat_b14_smart_terrain_open%, {+zat_b14_give_item_stalker -zat_b14_reversed_first_time} reversed
+on_complete = %+zat_b14_smart_terrain_open +zat_b14_give_item_linker%
+on_reversed = %+zat_b14_smart_terrain_open%
+reward_money = 3000
+
+[zat_b38_disappearance_stalkers] ;Исчезновение сталкеров
+icon = ui_inGame2_Ischeznovenie_stalkerov
+prior = 2
+storyline = false
+title  = {+zat_b22_actor_has_proof} zat_b22_bring_proof_name, {+zat_b22_find_proof} zat_b22_find_proof_name, {+zat_b38_disappearance_stalkers_tell_barmen_about_medic_give} zat_b38_disappearance_stalkers_tell_barmen_about_medic_name, {+zat_b38_disappearance_stalkers_deal_with_medic_give} zat_b38_disappearance_stalkers_deal_with_medic_name, {+zat_b38_disappearance_stalkers_find_cop_near_port_krans_give} zat_b38_disappearance_stalkers_find_cop_near_port_krans_name, {+zat_b38_disappearance_stalkers_find_out_where_is_cop_give} zat_b38_disappearance_stalkers_find_out_where_is_cop_name, {+zat_b38_disappearance_stalkers_meet_cop_24h_past_give} zat_b38_disappearance_stalkers_meet_cop_24h_past_name, {+zat_b38_disappearance_stalkers_meet_cop_later_give} zat_b38_disappearance_stalkers_meet_cop_later_name, {+zat_b38_disappearance_stalkers_get_out_from_den_of_the_bloodsucker_give} zat_b38_disappearance_stalkers_get_out_from_den_of_the_bloodsucker_name, {+zat_b38_disappearance_stalkers_clean_den_of_the_bloodsucker_give} zat_b38_disappearance_stalkers_clean_den_of_the_bloodsucker_name, {+zat_b38_disappearance_stalkers_meet_ment_give} zat_b38_disappearance_stalkers_meet_ment_name, zat_b38_disappearance_stalkers_find_to_be_missing_hunter_name
+descr  = {+zat_b22_actor_has_proof} zat_b22_bring_proof_text, {+zat_b22_find_proof} zat_b22_find_proof_text, {+zat_b38_disappearance_stalkers_tell_barmen_about_medic_give} zat_b38_disappearance_stalkers_tell_barmen_about_medic_text, {+zat_b38_disappearance_stalkers_deal_with_medic_give} zat_b38_disappearance_stalkers_deal_with_medic_text, {+zat_b38_disappearance_stalkers_find_cop_near_port_krans_give} zat_b38_disappearance_stalkers_find_cop_near_port_krans_text, {+zat_b38_disappearance_stalkers_find_out_where_is_cop_give} zat_b38_disappearance_stalkers_find_out_where_is_cop_text, {+zat_b38_disappearance_stalkers_meet_cop_24h_past_give} zat_b38_disappearance_stalkers_meet_cop_24h_past_text, {+zat_b38_disappearance_stalkers_meet_cop_later_give} zat_b38_disappearance_stalkers_meet_cop_later_text, {+zat_b38_disappearance_stalkers_get_out_from_den_of_the_bloodsucker_give} zat_b38_disappearance_stalkers_get_out_from_den_of_the_bloodsucker_text, {+zat_b38_disappearance_stalkers_clean_den_of_the_bloodsucker_give} zat_b38_disappearance_stalkers_clean_den_of_the_bloodsucker_text, {+zat_b38_disappearance_stalkers_meet_ment_give} zat_b38_disappearance_stalkers_meet_ment_text, zat_b38_disappearance_stalkers_find_to_be_missing_hunter_text
+target = {+zat_b22_actor_has_proof} zat_a2_stalker_barmen, {+zat_b22_find_proof} zat_b22_stalker_medic, {+zat_b38_disappearance_stalkers_tell_barmen_about_medic_give} zat_a2_stalker_barmen, {+zat_b38_disappearance_stalkers_deal_with_medic_give} zat_b22_stalker_medic, {+zat_b38_disappearance_stalkers_find_cop_near_port_krans_give} zat_b22_port_krans, {+zat_b38_disappearance_stalkers_find_out_where_is_cop_give} zat_a2_stalker_barmen, {+zat_b38_disappearance_stalkers_meet_cop_24h_past_give} zat_stalker_base_smart, {+zat_b38_disappearance_stalkers_meet_cop_later_give} nil, {+zat_b38_disappearance_stalkers_get_out_from_den_of_the_bloodsucker_give} zat_cop_id, {+zat_b38_disappearance_stalkers_clean_den_of_the_bloodsucker_give} zat_cop_id, {+zat_b38_disappearance_stalkers_meet_ment_give} zat_cop_id, zat_b38_hunter_point_zone
+condlist_0 = {+zat_b22_barmen_gave_reward} complete
+condlist_1 =  {+zat_b38_stalker_cop_death -zat_b38_disappearance_stalkers_meet_cop_24h_past_give} fail %+zat_b38_failed%, {+zat_b38_failed_getaway} fail %+zat_b38_failed%, {+zat_b38_quest_failed} fail %+zat_b38_failed%
+reward_money = 10000
+on_complete = %=inc_faction_goodwill_to_actor(stalker:200) =give_treasure(zat_hiding_place_31:zat_hiding_place_49)%
+
+[zat_b38_den_of_the_bloodsucker_inform_stalkers] ;Рассказать сталкерам о логове
+icon = ui_inGame2_Logovo_krovososov
+prior = 2
+storyline = false
+title =  {+zat_b57_den_of_the_bloodsucker_tell_stalkers_about_destroy_lair_give} zat_b57_den_of_the_bloodsucker_tell_stalkers_about_destroy_lair_name, {+zat_b57_den_of_the_bloodsucker_wait_destroy_give} zat_b57_den_of_the_bloodsucker_wait_destroy_name, {+zat_b57_den_of_the_bloodsucker_twist_vintil_give} zat_b57_den_of_the_bloodsucker_twist_vintil_name, {+zat_b57_den_of_the_bloodsucker_place_gas_give} zat_b57_den_of_the_bloodsucker_place_gas_name, {+zat_b57_actor_has_gas +zat_b57_den_of_the_bloodsucker_search_gas_give} zat_b57_den_of_the_bloodsucker_destroy_lair_name, {+zat_b12_actor_have_keys +zat_b57_den_of_the_bloodsucker_search_gas_give} zat_b57_den_of_the_bloodsucker_open_container_name, {+zat_b12_find_keys_and_open +zat_b57_den_of_the_bloodsucker_search_gas_give} zat_b57_den_of_the_bloodsucker_get_gas_name, {+zat_b12_find_the_way_to_open +zat_b57_den_of_the_bloodsucker_search_gas_give} zat_b57_den_of_the_bloodsucker_open_gas_box_name, {+zat_b57_nimble_talk_about_gas +zat_b57_den_of_the_bloodsucker_search_gas_give} zat_b57_den_of_the_bloodsucker_find_gas_name, {+zat_b57_den_of_the_bloodsucker_search_gas_give} zat_b57_den_of_the_bloodsucker_find_gas_name, zat_b38_den_of_the_bloodsucker_tell_barman_about_all_name
+descr =  {+zat_b57_den_of_the_bloodsucker_tell_stalkers_about_destroy_lair_give} zat_b57_den_of_the_bloodsucker_tell_stalkers_about_destroy_lair_text, {+zat_b57_den_of_the_bloodsucker_wait_destroy_give} zat_b57_den_of_the_bloodsucker_wait_destroy_text, {+zat_b57_den_of_the_bloodsucker_twist_vintil_give} zat_b57_den_of_the_bloodsucker_twist_vintil_text, {+zat_b57_den_of_the_bloodsucker_place_gas_give} zat_b57_den_of_the_bloodsucker_place_gas_text, {+zat_b57_actor_has_gas +zat_b57_den_of_the_bloodsucker_search_gas_give} zat_b57_den_of_the_bloodsucker_destroy_lair_text, {+zat_b12_actor_have_keys +zat_b57_den_of_the_bloodsucker_search_gas_give} zat_b57_den_of_the_bloodsucker_open_container_text, {+zat_b12_find_keys_and_open +zat_b57_den_of_the_bloodsucker_search_gas_give} zat_b57_den_of_the_bloodsucker_get_gas_text, {+zat_b12_find_the_way_to_open +zat_b57_den_of_the_bloodsucker_search_gas_give} zat_b57_den_of_the_bloodsucker_open_gas_box_text, {+zat_b57_nimble_talk_about_gas +zat_b57_den_of_the_bloodsucker_search_gas_give} zat_b57_den_of_the_bloodsucker_find_gas_text_2, {+zat_b57_den_of_the_bloodsucker_search_gas_give} zat_b57_den_of_the_bloodsucker_find_gas_text, zat_b38_den_of_the_bloodsucker_tell_barman_about_all_text
+target = {+zat_b57_den_of_the_bloodsucker_tell_stalkers_about_destroy_lair_give} zat_a2_stalker_barmen, {+zat_b57_den_of_the_bloodsucker_wait_destroy_give} nil, {+zat_b57_den_of_the_bloodsucker_twist_vintil_give} zat_b57_vintil_id, {+zat_b57_den_of_the_bloodsucker_place_gas_give +zat_b57_den_of_the_bloodsucker_search_gas_give} zat_b57_place_gas_id, {+zat_b57_actor_has_gas +zat_b57_den_of_the_bloodsucker_search_gas_give} zat_b57_place_gas_id,  {+zat_b12_find_keys_and_open +zat_b57_den_of_the_bloodsucker_search_gas_give} nil,  {+zat_b12_actor_have_keys +zat_b57_den_of_the_bloodsucker_search_gas_give} zat_b57_gas_box, {+zat_b12_find_the_way_to_open +zat_b57_den_of_the_bloodsucker_search_gas_give} nil, {+zat_b57_nimble_talk_about_gas} zat_b57_gas_box, {+zat_b57_den_of_the_bloodsucker_search_gas_give} zat_b30_owl_stalker_trader_id, zat_a2_stalker_barmen
+condlist_0 = {+zat_b38_den_of_the_bloodsucker_complete} complete
+on_complete = %+zat_b57_bloodsucker_lair_clear =inc_faction_goodwill_to_actor(stalker:200)%
+reward_money = 5000
+
+[zat_b52_reputation] ;Репутация
+icon = ui_inGame2_Reputatsiya
+prior = 2
+storyline = false
+title = {+zat_b52_snag_port_cranes} zat_b52_reputation_find_snag_name, {+zat_b52_snag_no_place} zat_b52_reputation_know_there_snog_name, zat_b52_reputation_tell_snag_name
+descr = {+zat_b52_actor_has_port_bandits_pda} zat_b52_reputation_find_snag_text_5, {+zat_b52_snag_jupiter} zat_b52_reputation_find_snag_text_4, {+zat_b52_snag_port_bandits} zat_b52_reputation_find_snag_text_3, {+zat_b52_snag_no_port_cranes} zat_b52_reputation_find_snag_text_2, {+zat_b52_snag_port_cranes} zat_b52_reputation_find_snag_text, {+zat_b52_barman_know_there_snag} zat_b52_reputation_know_there_snog_text_3, {+zat_b52_sultan_know_there_snag} zat_b52_reputation_know_there_snog_text_2, {+zat_b52_snag_no_place} zat_b52_reputation_know_there_snog_text, zat_b52_reputation_tell_snag_text
+target = {+zat_b52_actor_has_port_bandits_pda} nil, {+zat_b52_snag_jupiter} nil, {+zat_b52_snag_port_bandits} port_bandit_1_leader_id, {+zat_b52_snag_no_port_cranes} port_bandit_1_leader_id, {+zat_b52_bandit_leader_is_dead} port_bandit_1_leader_id, {+zat_b52_snag_port_cranes} zat_b52_port_cranes_id, {+zat_b52_barman_know_there_snag} zat_a2_stalker_barmen, {+zat_b52_sultan_know_there_snag} zat_b7_bandit_boss_sultan, {+zat_b52_snag_no_place} nil, zat_b52_snag_place_id
+condlist_0 = {+jup_b202_snag_on_jup_founded} complete, {+zat_b52_snag_is_dead} complete
+
+[zat_b51_nimble_items] ;Предметы на заказ
+icon = ui_inGame2_Osobiy_zakaz
+prior = 2
+storyline = false
+title = {-zat_b51_order_ready_task} zat_b51_nimble_items_wait_order_name, zat_b51_nimble_items_get_order_name 
+descr = {-zat_b51_order_ready_task} zat_b51_nimble_items_wait_order_text, zat_b51_nimble_items_get_order_text
+target = {-zat_b51_order_ready_task} nil, zat_a2_stalker_nimble_id
+condlist_0 = {-zat_b51_order_in_process -zat_b51_order_refused} complete
+condlist_1 = {-zat_b51_order_in_process +zat_b51_order_refused} reversed
+
+[zat_b5_come_to_bandits]
+icon = ui_inGame2_Sdelka
+prior = 2
+storyline = false
+title = {-zat_b5_come_to_bandits_complete -zat_b5_meat -zat_b5_witness_dead -zat_b5_sultan_speak_for_stalkers} zat_b5_come_to_bandits_name, {-zat_b5_meat -zat_b5_witness_dead -zat_b5_sultan_speak_for_stalkers} zat_b5_secure_bandits_name, {-zat_b5_witness_dead} zat_b5_kill_stalkers_name, zat_b5_talk_to_sultan_name
+descr = {-zat_b5_come_to_bandits_complete -zat_b5_meat -zat_b5_witness_dead -zat_b5_sultan_speak_for_stalkers} zat_b5_come_to_bandits_text, {-zat_b5_meat -zat_b5_witness_dead -zat_b5_sultan_speak_for_stalkers} zat_b5_secure_bandits_text, {-zat_b5_witness_dead} zat_b5_kill_stalkers_text, zat_b5_talk_to_sultan_name
+target = {+zat_b7_stalker_raider_leader_alive -zat_b5_come_to_bandits_complete -zat_b5_meat -zat_b5_witness_dead -zat_b5_sultan_speak_for_stalkers} zat_b5_talk_to_sultan_id, {-zat_b7_stalker_raider_leader_alive -zat_b5_come_to_bandits_complete -zat_b5_meat -zat_b5_witness_dead -zat_b5_sultan_speak_for_stalkers} zat_b7_bandit_boss_dead, {-zat_b5_witness_dead} zat_b5_kill_stalkers_id, {+zat_b7_stalker_raider_leader_alive} zat_b7_bandit_boss_dead, {-zat_b7_stalker_raider_leader_alive} zat_b7_bandit_boss_dead
+condlist_0 = {=is_squad_enemy_to_actor(zat_b5_bandit_squad)} fail %+zat_b5_meat +zat_b5_task_end%
+condlist_1 = {+zat_b5_actor_help_bandits} complete %+zat_b5_task_end =dec_faction_goodwill_to_actor(stalker:250) =inc_faction_goodwill_to_actor(bandit:500) =set_squad_goodwill(zat_b5_bandit_squad:friend)%
+condlist_2 = {+zat_b5_sultan_dead} fail %+zat_b5_task_end%
+condlist_3 = {+zat_b5_meat -zat_b5_bandit_speak_1_done} fail %+zat_b5_task_end%
+condlist_4 = {+zat_b5_leave_for_bandit_quest} fail %+zat_b5_task_end%
+;reward_money = 5000
+
+[zat_b5_come_to_dealer]
+icon = ui_inGame2_Sdelka
+prior = 2
+storyline = false
+title = {-zat_b5_actor_together_dealer -zat_b5_meat -zat_b5_protect_dealer_done -zat_b5_speak_dealer_done} zat_b5_come_to_dealer_name, {-zat_b5_meat -zat_b5_protect_dealer_done -zat_b5_speak_dealer_done} zat_b5_cover_dealer_name, {-zat_b5_protect_dealer_done -zat_b5_speak_dealer_done} zat_b5_protect_dealer_name, {-zat_b5_speak_dealer_done} zat_b5_speak_dealer_name
+descr = {-zat_b5_actor_together_dealer -zat_b5_meat -zat_b5_protect_dealer_done -zat_b5_speak_dealer_done} zat_b5_come_to_dealer_text, {-zat_b5_meat -zat_b5_protect_dealer_done -zat_b5_speak_dealer_done} zat_b5_cover_dealer_text, {-zat_b5_protect_dealer_done -zat_b5_speak_dealer_done} zat_b5_protect_dealer_text, {-zat_b5_speak_dealer_done} zat_b5_speak_dealer_name
+target =  zat_b7_duty_illicit_dealer
+condlist_0 = {+zat_b5_trader_death} fail %+zat_b5_task_end%
+condlist_1 = {=is_squad_enemy_to_actor(zat_b5_dolg_squad) +zat_b5_dealer_speak_1_done} fail %+zat_b5_dolg_enemy +zat_b5_task_end%
+condlist_2 = {+zat_b5_actor_help_dealer} complete %+zat_b5_task_end_another +zat_b5_task_end =set_squad_goodwill(zat_b5_dolg_squad:friend)%
+condlist_3 = {+zat_b5_meat -zat_b5_bandit_speak_1_done} fail %+zat_b5_dolg_enemy +zat_b5_task_end%
+condlist_4 = {+zat_b5_leave_for_trader_quest} fail %+zat_b5_task_end%
+;reward_money = {+zat_b5_dealer_full_revard} 6000, {+zat_b5_dealer_easy_revard} 3000
+
+
+[zat_b5_come_to_stalkers]
+icon = ui_inGame2_Sdelka
+prior = 2
+storyline = false
+title = {-zat_b5_actor_stalker_go_to_trader -zat_b5_stalker_attack_dealer -zat_b5_destroy_enemy -zat_b7_actor_now_duty_illicit_dealer -zat_b5_actor_help_stalkers_pric -zat_b5_meat} zat_b5_come_to_stalkers_name, {-zat_b5_stalker_attack_dealer -zat_b5_destroy_enemy -zat_b7_actor_now_duty_illicit_dealer -zat_b5_actor_help_stalkers_pric -zat_b5_meat} zat_b5_intercept_talking_name, {-zat_b5_destroy_enemy -zat_b7_actor_now_duty_illicit_dealer -zat_b5_actor_help_stalkers_pric} zat_b5_kill_dealer_name, {-zat_b7_actor_now_duty_illicit_dealer -zat_b5_actor_help_stalkers_pric} zat_b5_search_body_name, zat_b5_talk_stalkers_name
+descr = {-zat_b5_actor_stalker_go_to_trader -zat_b5_stalker_attack_dealer -zat_b5_destroy_enemy -zat_b7_actor_now_duty_illicit_dealer -zat_b5_actor_help_stalkers_pric -zat_b5_meat} zat_b5_come_to_stalkers_text, {-zat_b5_stalker_attack_dealer -zat_b5_destroy_enemy -zat_b7_actor_now_duty_illicit_dealer -zat_b5_actor_help_stalkers_pric -zat_b5_meat} zat_b5_intercept_talking_text, {-zat_b5_destroy_enemy -zat_b7_actor_now_duty_illicit_dealer -zat_b5_actor_help_stalkers_pric} zat_b5_kill_dealer_text, {-zat_b7_actor_now_duty_illicit_dealer -zat_b5_actor_help_stalkers_pric} zat_b5_search_body_text, zat_b5_talk_stalkers_text
+;target = {-zat_b5_actor_stalker_go_to_trader -zat_b5_stalker_attack_dealer -zat_b5_destroy_enemy -zat_b7_actor_now_duty_illicit_dealer -zat_b5_actor_help_stalkers_pric -zat_b5_meat} zat_b5_stalkers_squad, {-zat_b5_stalker_attack_dealer -zat_b5_destroy_enemy -zat_b7_actor_now_duty_illicit_dealer -zat_b5_actor_help_stalkers_pric -zat_b5_meat} zat_b5_intercept_talking_id, {-zat_b5_destroy_enemy -zat_b7_actor_now_duty_illicit_dealer -zat_b5_actor_help_stalkers_pric} zat_b7_duty_illicit_dealer, {-zat_b7_actor_now_duty_illicit_dealer -zat_b5_actor_help_stalkers_pric} zat_b7_duty_illicit_dealer, {=is_alive(zat_b5_stalker_commander_id) +zat_b5_actor_help_stalkers} zat_b5_stalker_commander_id, {=is_alive(zat_b5_stalker_commander_b7_id) +zat_b5_actor_help_stalkers} zat_b5_stalker_commander_b7_id, {!is_alive(zat_b5_stalker_commander_id) !is_alive(zat_b5_stalker_commander_b7_id) +zat_b5_actor_help_stalkers} zat_b5_stalkers_squad
+target = {=is_alive(zat_b5_stalker_commander_id) -zat_b5_actor_stalker_go_to_trader -zat_b5_stalker_attack_dealer -zat_b5_destroy_enemy -zat_b7_actor_now_duty_illicit_dealer -zat_b5_actor_help_stalkers_pric -zat_b5_meat} zat_b5_stalker_commander_id, {=is_alive(zat_b5_stalker_commander_b7_id) -zat_b5_actor_stalker_go_to_trader -zat_b5_stalker_attack_dealer -zat_b5_destroy_enemy -zat_b7_actor_now_duty_illicit_dealer -zat_b5_actor_help_stalkers_pric -zat_b5_meat} zat_b5_stalker_commander_b7_id, {-zat_b5_stalker_attack_dealer -zat_b5_destroy_enemy -zat_b7_actor_now_duty_illicit_dealer -zat_b5_actor_help_stalkers_pric -zat_b5_meat} zat_b5_intercept_talking_id, {-zat_b5_destroy_enemy -zat_b7_actor_now_duty_illicit_dealer -zat_b5_actor_help_stalkers_pric} zat_b7_duty_illicit_dealer, {-zat_b7_actor_now_duty_illicit_dealer -zat_b5_actor_help_stalkers_pric} zat_b7_duty_illicit_dealer, {=is_alive(zat_b5_stalker_commander_id) +zat_b5_actor_help_stalkers} zat_b5_stalker_commander_id, {=is_alive(zat_b5_stalker_commander_b7_id) +zat_b5_actor_help_stalkers} zat_b5_stalker_commander_b7_id, {!is_alive(zat_b5_stalker_commander_id) !is_alive(zat_b5_stalker_commander_b7_id) +zat_b5_actor_help_stalkers} zat_b5_stalkers_squad
+;reward_money = 2500
+condlist_0 = {+zat_b5_actor_help_stalkers_pric} complete %+zat_b5_task_end =inc_faction_goodwill_to_actor(stalker:200) =dec_faction_goodwill_to_actor(bandit:100) =set_squad_goodwill(zat_b5_stalkers_squad:friend)%
+condlist_1 = {=is_squad_enemy_to_actor(zat_b5_stalkers_squad)} fail %+zat_b5_task_end%
+condlist_2 = {+zat_b5_stalker_death -zat_b5_actor_help_stalkers_pric} fail %+zat_b5_task_end%
+condlist_3 = {+zat_b5_time_is_out} fail %+zat_b5_task_end_another% ;%+zat_b5_task_end%
+
+
+[zat_b5_barmen_reward]
+icon = ui_inGame2_Sdelka
+prior = 2
+storyline = false
+title = zat_b5_talk_barmen_name
+descr = zat_b5_talk_barmen_text
+target = zat_a2_stalker_barmen
+reward_money = 3500
+condlist_0 = {+zat_b5_barmen_give_revard} complete %+zat_b5_task_end%
+condlist_1 = {=is_squad_enemy_to_actor(zat_b22_barmen)} fail %+zat_b5_quest_for_barmen_fail +zat_b5_task_end%
+
+
+[zat_b100_guide_maps];zat_b100_heli_2_searched
+icon = ui_inGame2_Karti_mestnosti
+prior = 1
+storyline = false
+title = {-zat_b100_guide_need_maps} zat_b100_guide_maps_01_name, {+zat_b100_guide_need_maps} zat_b100_guide_maps_02_name
+descr = {-zat_b100_guide_need_maps} zat_b100_guide_maps_01_text, {+zat_b100_guide_need_maps} zat_b100_guide_maps_02_text
+target = {+zat_b100_guide_need_maps =actor_on_level(zaton)} zat_b215_stalker_guide_zaton, {+zat_b100_guide_need_maps =actor_on_level(jupiter)} zat_b215_stalker_guide_zaton, nil
+condlist_0 = {+zat_b215_gave_maps} complete
+
+[zat_b3_tech_instruments]
+icon = ui_inGame2_Instrumenti
+prior = 1
+storyline = false
+title = {+zat_b3_tech_instrument_1_brought +zat_b3_tech_instrument_2_brought} zat_b3_get_tools_3_name, {+zat_b3_tech_instrument_1_brought +zat_b3_tech_instrument_3_brought} zat_b3_get_tools_2_name, {+zat_b3_tech_instrument_2_brought +zat_b3_tech_instrument_3_brought} zat_b3_get_tools_1_name, {+zat_b3_tech_instrument_3_brought} zat_b3_get_tools_1_2_name, {+zat_b3_tech_instrument_2_brought} zat_b3_get_tools_1_3_name, {+zat_b3_tech_instrument_1_brought} zat_b3_get_tools_2_3_name, zat_b3_mechanic_toolkit_search_name
+descr = {+zat_b3_tech_instrument_1_brought +zat_b3_tech_instrument_2_brought} zat_b3_get_tools_3_text, {+zat_b3_tech_instrument_1_brought +zat_b3_tech_instrument_3_brought} zat_b3_get_tools_2_text, {+zat_b3_tech_instrument_2_brought +zat_b3_tech_instrument_3_brought} zat_b3_get_tools_1_text, {+zat_b3_tech_instrument_3_brought} zat_b3_get_tools_1_2_text, {+zat_b3_tech_instrument_2_brought} zat_b3_get_tools_1_3_text, {+zat_b3_tech_instrument_1_brought} zat_b3_get_tools_2_3_text, zat_b3_mechanic_toolkit_search_text
+condlist_0 = {+zat_b3_all_instruments_brought} complete
+on_complete = %+zat_b3_task_end%
+
+[zat_b103_merc_bring_supplies]
+icon = ui_inGame2_Pripasi
+prior = 1
+storyline = false
+title = {=zat_b103_actor_has_needed_food} zat_b103_merc_supplies_got_name, zat_b103_merc_bring_supplies_name 
+descr = {=zat_b103_actor_has_needed_food} zat_b103_merc_supplies_got_text, zat_b103_merc_bring_supplies_text
+target = {=zat_b103_actor_has_needed_food} zat_b103_lost_merc_leader
+condlist_0 = {+zat_b103_merc_task_done} complete
+condlist_1 = {+zat_b103_merc_fight} fail
+;condlist_2 = {+zat_b103_merc_gone} reversed
+
+[zat_b7_stalkers_raiders]
+icon = ui_inGame2_Naezd
+prior = 2
+storyline = false
+title = {+zat_b7_actor_help_bandits -zat_b7_actor_killed_victims_self} zat_b7_stalkers_raiders_raiders_reward_name, {+zat_b7_actor_with_bandits +zat_b7_stalkers_raiders_attack_started +zat_b7_stalkers_raiders_meet} zat_b7_stalkers_raiders_raiders_name, {+zat_b7_actor_with_bandits +zat_b7_stalkers_raiders_attack} zat_b7_stalkers_raiders_meet_name, {+zat_b7_actor_with_bandits} zat_b7_stalkers_raiders_wait_name, zat_b7_stalkers_raiders_name
+descr = {+zat_b7_actor_help_bandits -zat_b7_actor_killed_victims_self} zat_b7_stalkers_raiders_raiders_reward_text, {+zat_b7_actor_with_bandits +zat_b7_stalkers_raiders_attack_started +zat_b7_stalkers_raiders_meet} zat_b7_stalkers_raiders_raiders_text, {+zat_b7_actor_with_bandits +zat_b7_stalkers_raiders_attack} zat_b7_stalkers_raiders_meet_text, {+zat_b7_actor_with_bandits} zat_b7_stalkers_raiders_wait_text, zat_b7_stalkers_raiders_text
+target = {+zat_b7_victims_disappeared +zat_b7_stalkers_raiders_attack_started} nil, {+zat_b7_actor_help_bandits} zat_b7_stalkers_raiders, {+zat_b7_actor_with_bandits +zat_b7_stalkers_raiders_attack_started +zat_b7_stalkers_raiders_meet} zat_b7_stalkers_victims_1, {+zat_b7_actor_with_bandits} zat_b7_sr_stalkers_raiders_attack, zat_b7_stalker_raider_leader
+condlist_0 = {-zat_b7_actor_killed_victims_self +zat_b7_actor_help_bandits +zat_b7_stalkers_raiders_reward_given +zat_b7_actor_really_helped_bandits} complete, {-zat_b7_actor_killed_victims_self +zat_b7_actor_help_bandits +zat_b7_stalkers_raiders_reward_given -zat_b7_actor_really_helped_bandits} complete
+condlist_1 = {-zat_b7_timeout +zat_b7_task_end} fail, {!squad_exist(zat_b7_stalkers_raiders)} reversed %+zat_b7_stalkers_raiders_attack_started%, {=is_squad_enemy_to_actor(zat_b7_stalkers_raiders)} reversed, {+zat_b7_actor_robbed} reversed
+condlist_2 = {+zat_b7_actor_killed_victims_self} reversed %+zat_b7_task_end%, {+zat_b7_timeout} reversed %+zat_b7_task_end%
+on_complete = {-zat_b7_victims_disappeared} %+zat_b7_task_end%, {+zat_b7_actor_robbed} %+zat_b7_task_end%
+
+[zat_b7_stalkers_victims]
+icon = ui_inGame2_Naezd
+prior = 2
+storyline = false
+title = {+zat_b7_actor_help_stalkers -zat_b7_victims_disappeared} zat_b7_stalkers_raiders_stalkers_reward_name, {+zat_b7_stalkers_raiders_attack_started +zat_b7_stalkers_raiders_meet} zat_b7_stalkers_raiders_backstab_name, {+zat_b7_actor_with_bandits +zat_b7_actor_with_stalkers} zat_b7_stalkers_raiders_time_name, zat_b7_stalkers_raiders_stalkers_name
+descr = {+zat_b7_actor_help_stalkers -zat_b7_victims_disappeared} zat_b7_stalkers_raiders_stalkers_reward_text, {+zat_b7_stalkers_raiders_attack_started +zat_b7_stalkers_raiders_meet} zat_b7_stalkers_raiders_backstab_text, {+zat_b7_actor_with_bandits +zat_b7_actor_with_stalkers} zat_b7_stalkers_raiders_time_text, zat_b7_stalkers_raiders_stalkers_text
+target = {+zat_b7_stalkers_victims_reward_1_given} zat_b7_stalkers_victims_1, {+zat_b7_actor_help_stalkers -zat_b7_stalkers_victims_reward_2_given -zat_b7_victims_disappeared} zat_b7_stalkers_victims_1, {+zat_b7_stalkers_raiders_meet} zat_b7_stalkers_raiders, {-zat_b7_actor_help_bandits +zat_b7_actor_with_bandits} nil  
+condlist_0 = {+zat_b7_victims_disappeared +zat_b7_actor_help_stalkers} complete, {+zat_b7_actor_help_stalkers +zat_b7_stalkers_victims_reward_1_given -zat_b7_actor_really_helped_stalkers -zat_b7_victims_disappeared} complete, {+zat_b7_actor_help_stalkers +zat_b7_stalkers_victims_reward_2_given +zat_b7_actor_really_helped_stalkers} complete
+condlist_1 = {-zat_b7_timeout +zat_b7_task_end -zat_b7_stalkers_victims_reward_1_given} fail, {!squad_exist(zat_b7_stalkers_victims_1)} reversed, {=is_squad_enemy_to_actor(zat_b7_stalkers_victims_1)} reversed
+condlist_2 = {+zat_b7_timeout} reversed %+zat_b7_task_end%
+on_complete = {-zat_b7_victims_disappeared} %+zat_b7_task_end%
+
+[zat_b33_zaporojec];+zat_b33_safe_container
+icon = ui_inGame2_Nedostupniy_taynik
+prior = 1
+storyline = false
+title = zat_b33_zaporojec_name 
+descr = {-zat_b33_find_package !actor_has_item(zat_b33_safe_container)} zat_b33_zaporojec_text_01, {+zat_b33_find_package =actor_has_item(zat_b33_safe_container)} zat_b33_zaporojec_text_02, {+zat_b33_find_package !actor_has_item(zat_b33_safe_container)} zat_b33_zaporojec_text_03 
+target = {-zat_b33_find_package !actor_has_item(zat_b33_safe_container)} zat_b33_treasure, {+zat_b33_find_package =actor_has_item(zat_b33_safe_container)} zat_b33_stalker_snag, {+zat_b33_find_package !actor_has_item(zat_b33_safe_container)} zat_b33_safe_container
+condlist_0 = {+zat_b33_refuse_task} reversed
+condlist_1 = {+zat_b33_package_returned} complete
+on_complete = %+zat_b52_reputation_task_open%
+on_reversed = %+zat_b52_reputation_task_open%
+
+[zat_b29_adv_task]
+icon = ui_inGame2_Artefakti_na_zakaz
+prior = 1
+storyline = false
+title_functor = zat_b29_adv_title
+descr_functor = zat_b29_adv_descr
+target_functor = zat_b29_adv_target
+condlist_0 = {-zat_b29_adv_task_given} complete
+condlist_1 = {+zat_b29_adv_task_timeout} reversed
+on_complete = %-zat_b29_linker_take_af_from_rival%
+on_reversed = %-zat_b29_adv_task_timeout -zat_b29_adv_task_given -zat_b29_linker_take_af_from_rival%
+
+[zat_b30_task]
+icon = ui_inGame2_Zamanchiviy_biznes
+prior = 1
+storyline = false
+title = {+zat_b29_exclusive_conditions} zat_b30_task_5_name, {+zat_b30_owl_in_trouble_dialog_done} zat_b30_task_4_name, {+zat_b30_owl_in_trouble} zat_b30_task_3_name, {+zat_b30_actor_gave_detector} zat_b30_task_2_name, zat_b30_task_1_name
+descr = {+zat_b29_exclusive_conditions} zat_b30_task_5_text, {+zat_b30_owl_in_trouble_dialog_done} zat_b30_task_4_text, {+zat_b30_owl_in_trouble} zat_b30_task_3_text, {+zat_b30_actor_gave_detector} zat_b30_task_2_text, zat_b30_task_1_text
+target = {+zat_b29_exclusive_conditions} zat_b30_owl_stalker_trader_id, {+zat_b30_owl_in_trouble_dialog_done} zat_a2_stalker_barmen, {+zat_b30_actor_gave_detector} zat_b30_owl_stalker_trader_id, jup_b6_scientist_tech
+condlist_0 = {+zat_b30_owl_quest_done} complete
+
+[zat_b30_compass_to_barmen_task]
+icon = ui_inGame2_kompas
+prior = 1
+storyline = false
+title = {+zat_b30_actor_with_af} zat_b30_compass_to_barmen_task_give_name, zat_b30_compass_to_barmen_task_find_name
+descr = {+zat_b30_actor_with_af} zat_b30_compass_to_barmen_task_give_text, zat_b30_compass_to_barmen_task_find_text
+target = {+zat_b30_actor_with_af} zat_a2_stalker_barmen, zat_b18_noah
+condlist_0 = {+zat_b30_barmen_got_af} complete
+condlist_1 = {+zat_b30_compass_to_barmen_reversed} reversed
+on_complete = %+zat_b30_sultan_loose =inc_faction_goodwill_to_actor(stalker:200) =dec_faction_goodwill_to_actor(bandit:250)%
+
+[zat_b30_sultan_task]
+icon = ui_inGame2_Temniy_biznes
+prior = 1
+storyline = false
+title = {+zat_b30_barmen_going_under_sultan} zat_b30_sultan_task_4_name, {+zat_b30_second_detector} zat_b30_sultan_task_3_name, {+zat_b30_first_detector} zat_b30_sultan_task_7_name, {+zat_b30_sultan_know_about_detectors +zat_b29_adv_task_given} zat_b30_sultan_task_2_name, {+zat_b30_sultan_know_about_detectors} zat_b30_sultan_task_8_name, {+zat_b30_sultan_got_af} zat_b30_sultan_task_8_name, {+zat_b30_actor_with_af +zat_b30_actor_with_sultan} zat_b30_compass_to_sultan_task_give_name, {+zat_b30_compass_to_sultan} zat_b30_compass_to_sultan_task_find_name, {+zat_b30_actor_with_sultan} zat_b30_sultan_task_6_name, {+zat_b30_actor_against_barmen} zat_b30_sultan_task_1_name
+descr = {+zat_b30_barmen_going_under_sultan} zat_b30_sultan_task_4_text, {+zat_b30_second_detector} zat_b30_sultan_task_3_text, {+zat_b30_first_detector} zat_b30_sultan_task_7_text, {+zat_b30_sultan_know_about_detectors +zat_b29_adv_task_given} zat_b30_sultan_task_2_text, {+zat_b30_sultan_know_about_detectors} zat_b30_sultan_task_8_name, {+zat_b30_sultan_got_af} zat_b30_sultan_task_8_name, {+zat_b30_actor_with_af +zat_b30_actor_with_sultan} zat_b30_compass_to_sultan_task_give_text, {+zat_b30_compass_to_sultan} zat_b30_compass_to_sultan_task_find_text, {+zat_b30_actor_with_sultan} zat_b30_sultan_task_6_text, {+zat_b30_actor_against_barmen} zat_b30_sultan_task_1_text
+target = {+zat_b30_barmen_going_under_sultan} zat_a2_stalker_barmen, {+zat_b30_second_detector} zat_b7_bandit_boss_sultan, {+zat_b30_sultan_know_about_detectors =squad_exist(zat_b29_stalker_rival_1_squad) -zat_b30_rival_1_wo_detector} zat_b29_stalker_rival_1_squad, {+zat_b30_sultan_know_about_detectors =squad_exist(zat_b29_stalker_rival_2_squad) -zat_b30_rival_2_wo_detector} zat_b29_stalker_rival_2_squad, {+zat_b30_sultan_got_af} zat_a2_stalker_barmen, {+zat_b30_actor_with_af} zat_b7_bandit_boss_sultan, {+zat_b30_compass_to_sultan} zat_b18_noah, {+zat_b30_actor_with_sultan} zat_b7_bandit_boss_sultan, {+zat_b30_actor_against_barmen} zat_b7_bandit_boss_sultan
+condlist_0 = {+zat_b30_barmen_under_sultan} complete
+condlist_1 = {+zat_b30_sultan_loose +zat_b30_sultan_refuses_af} fail, {+zat_b30_compass_to_sultan_reversed} reversed
+on_complete = %+zat_b30_task_end =inc_faction_goodwill_to_actor(bandit:500) =dec_faction_goodwill_to_actor(stalker:100)%
+
+[zat_b30_percent_task]
+icon = ui_inGame2_Temniy_biznes
+prior = 1
+storyline = false
+title = zat_b30_percent_task_name
+descr = zat_b30_percent_task_text
+target = zat_a2_stalker_barmen
+condlist_0 = {!counter_greater(zat_b30_days_cnt:0)} complete
+condlist_1 = {=is_squad_enemy_to_actor(zat_b22_barmen)} fail
+on_complete = %-zat_b30_task_percents_running%
+
+[zat_b40_reconnoitre_merc_camp]
+icon = ui_inGame2_Lager_naemnikov
+prior = 1
+storyline = false
+;title = {=counter_equal(zat_b40_item_counter:0)} zat_b40_reconnoitre_merc_camp_01_name, {=counter_equal(zat_b40_item_counter:1)} zat_b40_reconnoitre_merc_camp_02_name, {=counter_equal(zat_b40_item_counter:2)} zat_b40_reconnoitre_merc_camp_03_name, {=counter_equal(zat_b40_item_counter:3)} zat_b40_reconnoitre_merc_camp_04_name
+;descr = {=counter_equal(zat_b40_item_counter:0)} zat_b40_reconnoitre_merc_camp_01_text, {=counter_equal(zat_b40_item_counter:1)} zat_b40_reconnoitre_merc_camp_02_text, {=counter_equal(zat_b40_item_counter:2)} zat_b40_reconnoitre_merc_camp_03_text, {=counter_equal(zat_b40_item_counter:3)} zat_b40_reconnoitre_merc_camp_04_text
+;target = {=counter_equal(zat_b40_item_counter:3)} zat_b30_owl_stalker_trader_id, zat_b40_smart_terrain 
+title = {+zat_b40_actor_has_notebook} zat_b40_reconnoitre_merc_camp_02_name, zat_b40_reconnoitre_merc_camp_01_name
+descr = {+zat_b40_actor_has_notebook} zat_b40_reconnoitre_merc_camp_02_text, zat_b40_reconnoitre_merc_camp_01_text
+target = {+zat_b40_actor_has_notebook} zat_b30_owl_stalker_trader_id, zat_b40_notebook 
+condlist_0 = {+zat_b40_find_information_comlpete} complete
+;condlist_1 = {+zat_b40_find_information_canceled} reversed
+;on_complete = %-zat_b30_task_percents_running%
+
+[zat_b20_plateau_way]
+icon = ui_inGame2_Put_na_plato
+prior = 1
+storyline = false
+title = {-zat_b20_plateau_way_started -zat_b20_plateau_way_mentioned -zat_b20_plateau_way_known} zat_b20_ask_a_stalkers_name, {-zat_b20_plateau_way_mentioned -zat_b20_plateau_way_known} zat_b20_plato_talk_to_noah_name, {+zat_b20_plateau_way_mentioned -zat_b20_plateau_way_known} zat_b20_find_the_teleport_name, {+zat_b20_plateau_way_known} zat_b20_cross_the_teleport_name 
+descr = {-zat_b20_plateau_way_started -zat_b20_plateau_way_mentioned -zat_b20_plateau_way_known} zat_b20_ask_a_stalkers_text, {-zat_b20_plateau_way_mentioned -zat_b20_plateau_way_known} zat_b20_plato_talk_to_noah_text, {+zat_b20_plateau_way_mentioned -zat_b20_plateau_way_known} zat_b20_find_the_teleport_text, {+zat_b20_plateau_way_known} zat_b20_cross_the_teleport_text 
+target = {-zat_b20_plateau_way_started -zat_b20_plateau_way_mentioned -zat_b20_plateau_way_known} nil, {-zat_b20_plateau_way_mentioned -zat_b20_plateau_way_known} zat_b18_noah, {+zat_b20_plateau_way_mentioned -zat_b20_plateau_way_known} zat_b20_teleport_mapspot, {+zat_b20_plateau_way_known} zat_b20_teleport_mapspot
+condlist_0 = {+zat_b20_plateau_way_done} complete
+
+[zat_b44_tech_buddies]
+icon = ui_inGame2_Tri_tovarisha
+prior = 1
+storyline = false
+title = {+zat_b44_tech_buddies_barge_told +zat_b44_tech_buddies_joker_told} zat_b44_tech_buddies_joker_name, {+zat_b44_tech_buddies_both_told} zat_b44_tech_buddies_joker_name, {+zat_b44_tech_buddies_barge_told -zat_b44_tech_buddies_both_told -zat_b44_tech_buddies_joker_told} zat_b44_tech_buddies_joker_name, {-zat_b44_tech_buddies_barge_told -zat_b44_tech_buddies_both_told +zat_b44_tech_buddies_joker_told} zat_b44_tech_buddies_barge_name, {-zat_b44_tech_buddies_barge_told -zat_b44_tech_buddies_both_told -zat_b44_tech_buddies_joker_told} zat_b44_tech_buddies_both_name 
+descr = {+zat_b44_tech_buddies_barge_told +zat_b44_tech_buddies_joker_told} zat_b44_tech_buddies_joker_text, {+zat_b44_tech_buddies_both_told} zat_b44_tech_buddies_joker_text, {+zat_b44_tech_buddies_barge_told -zat_b44_tech_buddies_both_told -zat_b44_tech_buddies_joker_told} zat_b44_tech_buddies_joker_text, {-zat_b44_tech_buddies_barge_told -zat_b44_tech_buddies_both_told +zat_b44_tech_buddies_joker_told} zat_b44_tech_buddies_barge_text, {-zat_b44_tech_buddies_barge_told -zat_b44_tech_buddies_both_told -zat_b44_tech_buddies_joker_told} zat_b44_tech_buddies_both_text 
+condlist_0 = {+zat_b44_tech_buddies_both_told} complete
+
+[zat_b106_hunt_himera]
+icon = ui_inGame2_Ohota_na_Himeru
+prior = 2
+storyline = false
+title = {-zat_b106_forwarding -zat_b106_ahtung -zat_b106_chimera_dead_reward} zat_b106_meet_with_gonta_at_night_name, {+zat_b106_forwarding -zat_b106_ahtung -zat_b106_chimera_dead_reward} zat_b106_find_chimera_name, {+zat_b106_ahtung -zat_b106_chimera_dead_reward} zat_b106_kill_chimera_name, {+zat_b106_chimera_dead_reward} zat_b106_receipt_reward_name
+descr = {-zat_b106_forwarding -zat_b106_ahtung -zat_b106_chimera_dead_reward} zat_b106_meet_with_gonta_at_night_text, {+zat_b106_forwarding -zat_b106_ahtung -zat_b106_chimera_dead_reward} zat_b106_find_chimera_text, {+zat_b106_ahtung -zat_b106_chimera_dead_reward} zat_b106_kill_chimera_text, {+zat_b106_chimera_dead_reward} zat_b106_receipt_reward_text
+target = {-zat_b106_forwarding -zat_b106_ahtung -zat_b106_chimera_dead_reward} zat_b106_stalker_gonta, {+zat_b106_forwarding -zat_b106_ahtung -zat_b106_chimera_dead_reward} zat_b106_chimera, {+zat_b106_ahtung -zat_b106_chimera_dead_reward} zat_b106_chimera, {+zat_b106_chimera_dead}  jup_b220_trapper
+;reward_money = {-zat_b106_one_hit} 2000, 3000
+condlist_0 = {+zat_b106_garmata_dead +zat_b106_gonta_dead -zat_b106_chimera_dead_reward} fail %+zat_b106_fail%
+condlist_1 = {+zat_b106_dont_receipt_reward} fail %+zat_b106_fail%
+condlist_2 = {+zat_b106_start_hunt =is_squad_enemy_to_actor(zat_b106_stalker_gonta_squad)} fail %+zat_b106_fail%
+condlist_3 = {+jup_b220_trapper_zaton_chimera_hunted_told} complete
+
+[zat_b106_search_soroka]
+icon = ui_inGame2_V_poiskah_Soroki
+prior = 2
+storyline = false
+title = {+zat_b106_search_soroka -zat_b106_found_soroka} zat_b106_search_soroka_name, {+zat_b106_found_soroka} zat_b106_found_soroka_name
+descr = {+zat_b106_search_soroka -zat_b106_found_soroka} zat_b106_search_soroka_text, {+zat_b106_found_soroka} zat_b106_found_soroka_text
+target = {+zat_b106_found_soroka} zat_b106_stalker_gonta
+;reward_money = 3000
+condlist_0 = {+zat_b106_found_soroka_done} complete
+;condlist_1 = {+jup_b220_trapper_zaton_chimera_hunted_told} complete
+
+[zat_a2_reach_base]
+icon = ui_inGame2_Bezopasnoe_mesto
+prior = 1
+storyline = false
+title = zat_a2_reach_base_name
+descr = zat_a2_reach_base_text
+target = zat_a2_sr_noweap
+condlist_0 = {=actor_in_zone(zat_a2_sr_noweap)} complete
+
+[zat_b20_cross_teleport]
+icon = ui_inGame2_Put_na_plato
+prior = 1
+storyline = false
+title =  zat_b20_cross_the_teleport_name 
+descr =  zat_b20_cross_the_teleport_text 
+target = zat_b20_teleport_mapspot
+condlist_0 = {+zat_b20_cross_teleport} complete
+ 

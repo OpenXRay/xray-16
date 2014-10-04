@@ -1,0 +1,66 @@
+[logic]
+active = ph_door@closed
+
+[ph_door@closed]
+closed = true
+locked = false
+on_use = ph_door@open %+pri_a16_base_second_door_open%
+on_info = {!check_smart_alarm_status(pri_a16:normal) -pri_a16_wait_for_stalkers} ph_door@locked
+on_info2 = {+pri_b305_fifth_cam_end -pri_a28_update_task_cover_strelok} ph_door@locked_pri_a28
+on_info3 = {+pri_a16_base_second_door_open !is_door_blocked_by_npc} ph_door@open 
+on_info4 = {+pri_b305_third_cam_go -pri_b305_fifth_cam_end} ph_door@locked_b305
+
+[ph_door@open]
+closed = false
+locked = false
+on_use = ph_door@closed %-pri_a16_base_second_door_open%
+on_info = {!check_smart_alarm_status(pri_a16:normal) -pri_a16_wait_for_stalkers} ph_door@locked %-pri_a16_base_second_door_open%
+on_info2 = {+pri_b305_fifth_cam_end -pri_a28_update_task_cover_strelok} ph_door@locked_pri_a28 %-pri_a16_base_second_door_open%
+on_info3 = {-pri_a16_base_second_door_open !is_door_blocked_by_npc} ph_door@closed
+on_info4 = {+pri_b305_third_cam_go -pri_b305_quest_completed} ph_door@closed_b305 %-pri_a16_base_second_door_open%
+on_game_timer = 50 | {!is_door_blocked_by_npc} ph_door@closed %-pri_a16_base_second_door_open%
+
+[ph_door@locked]
+closed = true
+locked = true
+on_info = {=check_smart_alarm_status(pri_a16:normal)} ph_door@closed
+on_info2 = {=check_smart_alarm_status(pri_a16:alarm)} ph_door@locked_alarm
+on_info3 = {+pri_b305_third_cam_go -pri_b305_quest_completed} ph_door@closed_b305
+snd_open_start = trader_door_locked
+tip_open = tip_door_closed_hide_weapon
+
+[ph_door@locked_alarm]
+closed = true
+locked = true
+on_info = {=check_smart_alarm_status(pri_a16:normal)} ph_door@closed
+on_info2 = {=check_smart_alarm_status(pri_a16:danger)} ph_door@locked
+snd_open_start = trader_door_locked
+tip_open = tip_door_closed_base_alarm
+
+[ph_door@locked_pri_a28]
+closed = true
+locked = true
+on_info = {+pri_a28_update_task_cover_strelok} ph_door@closed_regular
+snd_open_start = trader_door_locked
+not_for_npc = true
+
+[ph_door@locked_b305]
+closed = true
+locked = true
+on_info = {+pri_b305_fifth_cam_end} ph_door@locked_pri_a28
+not_for_npc = true
+
+[ph_door@closed_regular]
+closed = true
+locked = false
+on_use = ph_door@open_regular %+pri_a16_base_second_door_open%
+on_info = {-pri_a16_wait_for_stalkers} ph_door@locked
+on_info2 = {+pri_a16_base_second_door_open !is_door_blocked_by_npc} ph_door@open_regular 
+
+[ph_door@open_regular]
+closed = false
+locked = false
+on_use = ph_door@closed_regular %-pri_a16_base_second_door_open%
+on_info = {-pri_a16_wait_for_stalkers} ph_door@locked %-pri_a16_base_second_door_open%
+on_info2 = {-pri_a16_base_second_door_open !is_door_blocked_by_npc} ph_door@closed_regular
+on_game_timer = 50 | {!is_door_blocked_by_npc} ph_door@closed_regular %-pri_a16_base_main_door_open%

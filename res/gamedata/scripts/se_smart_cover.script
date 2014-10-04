@@ -1,0 +1,151 @@
+--'******************************************************
+--'*  серверный класс объекта смарт кавер .
+--'******************************************************
+registered_smartcovers = {}
+registered_smartcovers_by_lv_id = {}
+
+class "se_smart_cover"	(cse_smart_cover)
+function se_smart_cover:__init (section) super (section)
+--	printf("se_smart_cover:__init( ) called")
+	self.loopholes				= {}
+	self.last_description			= ""
+	if self.set_available_loopholes ~= nil then
+		self:set_available_loopholes	( self.loopholes )
+	end
+end
+function se_smart_cover:STATE_Write (packet)
+	cse_smart_cover.STATE_Write (self, packet)
+	packet:w_stringZ(self.last_description)
+	local n = 0
+	for k,v in pairs (self.loopholes) do
+		n = n + 1
+	end
+	packet:w_u8(n)
+	for k,v in pairs (self.loopholes) do
+		packet:w_stringZ(k)
+		packet:w_bool(v)
+	end
+--	printf("write")
+--	print_table(self.loopholes)
+end
+function se_smart_cover:STATE_Read (packet, size)
+	cse_smart_cover.STATE_Read (self, packet, size)
+	if self.script_version >= 9 then
+		self.last_description = packet:r_stringZ()
+		local smart_cover_description
+		if self.last_description ~= "" then
+			smart_cover_description = self.last_description
+		else
+			smart_cover_description = self:description()
+		end
+		local existing_loopholes = {}
+		if smart_cover_description ~= nil then
+			printf("name %s descr %s", self:name(), tostring(smart_cover_description))
+			if smart_covers == nil then
+				abort("smartcovers is nil")
+			end
+			if smart_covers.descriptions[smart_cover_description] == nil then
+				abort("smartcover [%s] has wrong description [%s]!!!", self:name(), tostring(smart_cover_description))
+			end
+			local loopholes = smart_covers.descriptions[smart_cover_description].loopholes
+			for k,v in pairs (loopholes) do
+				existing_loopholes[v.id] = true
+			end
+		end
+
+		local n = packet:r_u8()
+		for i = 1, n do
+			local loophole_id = packet:r_stringZ()
+			local loophole_exist = packet:r_bool()
+			if existing_loopholes[loophole_id] then
+				self.loopholes[loophole_id] = loophole_exist
+			end
+		end
+	else
+		local smart_cover_description = self:description()
+		if smart_cover_description ~= nil then
+			local loopholes = smart_covers.descriptions[smart_cover_description].loopholes
+			for k,v in pairs (loopholes) do
+				self.loopholes[v.id] = true
+			end
+			self.last_description = smart_cover_description
+		end
+	end
+end
+function se_smart_cover:on_before_register()
+	cse_smart_cover.on_before_register( self )
+	registered_smartcovers[self:name()] = self
+end
+function se_smart_cover:on_register()
+	cse_smart_cover.on_register( self )
+	story_objects.check_spawn_ini_for_story_id(self)
+	local level_id = game_graph():vertex(self.m_game_vertex_id):level_id()
+	if registered_smartcovers_by_lv_id[level_id] == nil then
+		registered_smartcovers_by_lv_id[level_id] = {}
+	end
+	registered_smartcovers_by_lv_id[level_id][self.m_level_vertex_id] = self
+--	printf("smart_cover [%s] is registered lvlid [%s] lvid[%s]", self:name(), tostring(level_id), tostring(self.m_level_vertex_id))
+end
+function se_smart_cover:on_unregister()
+	unregister_story_object_by_id(self.id)
+	registered_smartcovers[self:name()] = nil
+	local level_id = game_graph():vertex(self.m_game_vertex_id):level_id()
+	registered_smartcovers_by_lv_id[level_id][self.m_level_vertex_id] = nil
+--	printf("smart_cover [%s] is unregistered", self:name())
+	cse_smart_cover.on_unregister(self)
+end
+function se_smart_cover:update()
+	cse_smart_cover.update(self)
+end
+
+function se_smart_cover:FillProps	(pref,items)
+--	log							("CSE_NewAttachableItem::FillProps called!")
+--	log							(tostring(self:description()))
+	cse_smart_cover.FillProps	(self,pref,items)
+	local						prefix = pref .. "\\" .. self:section_name().."\\"
+	local smart_cover_description = self:description()
+	if smart_cover_description ~= self.last_description then
+		for k,v in pairs (self.loopholes) do
+			self.loopholes[k] = nil
+		end
+		self.last_description = tostring(smart_cover_description)
+	end
+	if smart_cover_description ~= nil then
+		local loopholes = smart_covers.descriptions[smart_cover_description].loopholes
+		for k,v in pairs (loopholes) do
+			if self.loopholes[v.id] == nil then
+				self.loopholes[v.id] = true
+			end
+			local h = properties_helper():create_bool	(items, prefix .. "loopholes\\"..v.id,self,self.loopholes,v.id)
+			self:set_loopholes_table_checker(h)
+		end
+	end
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

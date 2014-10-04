@@ -1,0 +1,906 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="jup_b15_zulus_b301_after_fight_0">
+		<text>Ha! No to im siк dostaіo! Dziкki za pomoc. Gdyby nie ty, te gnojki juї dawno by mnie poїarіy. Jednak dobry z ciebie stalker... Przepraszam, їe siк wtedy wkurzyіem, ale mogіeњ mi wczeњniej powiedzieж, їe jesteњ z SBU.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_after_fight_1">
+		<text>Drobiazg. Wracajmy lepiej do obozu wojskowego - tam jest bezpieczniej.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_after_fight_11">
+		<text>Tak, na pewno wyjdк na tym lepiej, niї samotnie paікtaj№c siк po Prypeci.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_after_fight_111">
+		<text>No to chodџmy.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_after_fight_112">
+		<text>Muszк tu coњ skoсczyж, ale ty idџ. Obуz mieњci siк w budynku pralni.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_after_fight_2">
+		<text>Muszк juї iњж.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_reward_dialog_0">
+		<text>Czekaj... Weџ to... To najporz№dniejszy karabin maszynowy w Zonie.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_reward_dialog_1">
+		<text>A ty go juї nie potrzebujesz?</text>
+	</string>
+	<string id="jup_b15_zulus_b301_reward_dialog_11">
+		<text>Zawsze znajdк coњ do odpкdzenia paru mutantуw. Poza tym postanowiіem wrуciж - Garri zabierze mnie do Jupitera. Wiкc tobie bardziej siк przyda. Weџ go i niech ci dobrze sіuїy.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_reward_dialog_111">
+		<text>Powodzenia.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_reward_dialog_2">
+		<text>Dziкki, to њwietna broс.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_reward_dialog_21">
+		<text>Ha! Nie њwietna, tylko najlepsza w Zonie. Jest zmodyfikowana, wiкc trochк przyciкїka, ale w koсcu z takim dziaіkiem nie bкdziesz musiaі biegaж - to wrуg bкdzie zmykaі!</text>
+	</string>
+	<string id="jup_b15_zulus_b301_reward_dialog_211">
+		<text>Czeњж.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_reward_dialog_3">
+		<text>Super!</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b301_about_zulus_0">
+		<text>Dok№d poszedі Zulus?</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b301_about_zulus_1">
+		<text>Odszedі... Poprosiі, їebym zabraі go do Jupitera, i rozdzieliliњmy siк niedaleko niego. Nie powiedziaі mi, dok№d idzie.</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_0">
+		<text>Czekaj... Spotkaіo mnie coњ nieprzyjemnego i chcк ci o tym opowiedzieж... Paru najemnikуw poprosiіo, їebym poprowadziі ich do Prypeci. Najpierw skusili mnie grub№ kas№, ale szybko siк zorientowaіem, їe wdepn№іem w miкkkie i br№zowe... Nawet na chwilк nie spuszczali mnie z oka i grozili mi broni№. W pobliїu Prypeci udaіo mi siк uciec, ale teraz musz№ juї byж w mieњcie, wiкc uwaїaj.</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_1">
+		<text>Sіyszaіeњ moїe, o czym ci najemnicy rozmawiali?</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_11">
+		<text>Trochк sіyszaіem. Na pewno nie zamierzali puњciж mnie їywcem, wiкc nie ukrywali swoich planуw. Rozmawiali gіуwnie o spotkaniu z ludџmi klienta, ktуrzy mieli przedstawiж im przedmiot i cel ich misji.</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_111">
+		<text>Gdzie ma siк odbyж spotkanie?</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_1111">
+		<text>Niedaleko st№d, na dziedziсcu osiedla.</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_2">
+		<text>Dziкki za informacjк.</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_actor_0">
+		<text>Wspomniaіeњ o najemnikach - sіyszaіeњ, o czym rozmawiali?</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_actor_1">
+		<text>Trochк sіyszaіem. Na pewno nie zamierzali puњciж mnie їywcem, wiкc nie ukrywali swoich planуw. Rozmawiali gіуwnie o spotkaniu z ludџmi klienta, ktуrzy mieli przedstawiж im przedmiot i cel ich misji.</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_actor_11">
+		<text>Gdzie ma siк odbyж spotkanie?</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_actor_111">
+		<text>Niedaleko st№d, na dziedziсcu osiedla.</text>
+	</string>
+	<string id="pri_a15_sokolov_arranged_outfit_0">
+		<text>Rozmawiaіem z naukowcami o kombinezonie - poszukaj Hermana, powie ci, co i jak.</text>
+	</string>
+	<string id="pri_a15_sokolov_arranged_outfit_1">
+		<text>Dobra... Gdzie ma dojњж do spotkania?</text>
+	</string>
+	<string id="pri_a15_sokolov_arranged_outfit_11">
+		<text>Niedaleko stacji Janуw, u Zulusa.</text>
+	</string>
+	<string id="pri_a15_sokolov_arranged_outfit_111">
+		<text>Tam roi siк od stalkerуw! Odprowadџ mnie, bo jeњli pуjdк sam, mogк mieж kіopoty. Jeњli ze mn№ pуjdziesz, nie zastrzel№ mnie, bo ciк znaj№.</text>
+	</string>
+	<string id="pri_a15_sokolov_evacuation_point_0">
+		<text>Do ktуrego punktu ewakuacyjnego poszedіeњ?</text>
+	</string>
+	<string id="pri_a15_sokolov_evacuation_point_1">
+		<text>Niestety nie mogк o tym rozmawiaж - to њciњle tajne.</text>
+	</string>
+	<string id="pri_a15_sokolov_goto_zulus_0">
+		<text>Chodџmy do Zulusa.</text>
+	</string>
+	<string id="pri_a15_sokolov_goto_zulus_1">
+		<text>Dobra. Ale najpierw musimy iњж do Hermana po ten naukowy kombinezon.</text>
+	</string>
+	<string id="pri_a15_sokolov_goto_zulus_11">
+		<text>Chodџmy.</text>
+	</string>
+	<string id="pri_a15_sokolov_goto_zulus_2">
+		<text>Poszedіbym... Ale tam jest emisja. Moїe trochк poczekamy?</text>
+	</string>
+	<string id="pri_a15_sokolov_jupiter_0">
+		<text>Jak tu trafiіeњ?</text>
+	</string>
+	<string id="pri_a15_sokolov_jupiter_1">
+		<text>Mуj helikopter rozbiі siк o warsztat fabryki Jupiter i run№і do њrodka przez dach. Tylko ja przeїyіem - udaіo mi siк wydostaж z Jupitera i dotrzeж do najbliїszego punktu ewakuacyjnego, ale nikogo tam nie byіo. A potem spotkaіem Garriego, ktуry zaprowadziі mnie do bunkra.</text>
+	</string>
+	<string id="pri_a15_sokolov_need_outfit_0">
+		<text>Їeby dotrzeж do Prypeci, bкdziesz potrzebowaі kombinezonu z aparatem tlenowym z zamkniкtym obiegiem powietrza..</text>
+	</string>
+	<string id="pri_a15_sokolov_occupation_0">
+		<text>Co tu robisz?</text>
+	</string>
+	<string id="pri_a15_sokolov_occupation_1">
+		<text>Mam rozkaz udaж siк do punktu ewakuacyjnego, ale w Zonie jest zbyt niebezpiecznie. Jestem pilotem, nie szturmowcem! Dlatego tu czekam - mam nadziejк, їe zabior№ mnie st№d, kiedy operacja zostanie wykonana.</text>
+	</string>
+	<string id="pri_a15_sokolov_pripyat_group_0">
+		<text>Zbieram oddziaі, z ktуrym wybiorк siк do Prypeci. Przyі№czysz siк?</text>
+	</string>
+	<string id="pri_a15_sokolov_pripyat_group_1">
+		<text>Do Prypeci? A wiesz, їe chyba tak... Moїe ktoњ z naszych przeїyі i zdoіaі tam dotrzeж... W Prypeci jest punkt ewakuacyjny, wiкc wіaњciwie to tam powinienem iњж. Samemu mi siк nie uda, ale z twoim oddziaіem mogк sprуbowaж.</text>
+	</string>
+	<string id="pri_a15_sokolov_pripyat_ready_0">
+		<text>Jesteњ gotowy?</text>
+	</string>
+	<string id="pri_a15_sokolov_pripyat_ready_1">
+		<text>Moїna tak powiedzieж.</text>
+	</string>
+	<string id="pri_a15_sokolov_start_dialog_11">
+		<text>Witaj, stalkerze.</text>
+	</string>
+	<string id="pri_a15_sokolov_start_dialog_12">
+		<text>Czeњж.</text>
+	</string>
+	<string id="pri_a15_sokolov_start_dialog_13">
+		<text>Witaj.</text>
+	</string>
+	<string id="pri_a15_sokolov_start_dialog_14">
+		<text>Witaj, stalkerze.</text>
+	</string>
+	<string id="pri_a15_sokolov_where_from_0">
+		<text>Sk№d masz mundur wojskowy?</text>
+	</string>
+	<string id="pri_a15_sokolov_where_from_1">
+		<text>Ha... Juї chyba wszyscy wiedz№ o katastrofie helikopterуw wojskowych... Jestem porucznik Sokoіow, pilot jednego z nich.</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_dialog_0">
+		<text>Jeњli chodzi o tego wartownika...</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_dialog_1">
+		<text>Jego sygnaі dochodzi ze starego sklepu spoїywczego, ale on nie odpowiada... Moїe straciі nadajnik... Trudno to stwierdziж na pewno. Musimy go znaleџж...</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_dialog_11">
+		<text>Dziкkujк, puіkowniku! Chyba dam radк.</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_pass_task_dialog_0">
+		<text>Co do tego wartownika...</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_pass_task_dialog_1">
+		<text>To wszystko przez tego kontrolera... Pewnie to samo przydarzyіo siк oddziaіowi zwiadowczemu. Powystrzelali siк nawzajem... To jedne z najgorszych stworzeс w Zonie, a w dodatku nigdy nas nie szkolono do walki z nimi. Kontroler zupeіnie nas zaskoczyі i znowu straciliњmy ludzi...</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_pass_task_dialog_11">
+		<text>Przynajmniej ten kontroler jest juї zaіatwiony.</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_pass_task_dialog_111">
+		<text>Mam nadziejк, їe teraz wszystko siк trochк uspokoi... Dziкkujк wam za pomoc, majorze. Ta misja musiaіa was kosztowaж mnуstwo amunicji... Znajdџcie porucznika Kiryіowa, niech was zaopatrzy w potrzebny sprzкt.</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_pass_task_dialog_1111">
+		<text>Dziкkujк, puіkowniku!</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_pass_task_dialog_12">
+		<text>Nie trzeba siк niepokoiж, puіkowniku... Rozprawiк siк z tym mutantem.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_dialog_1_0">
+		<text>Czy mogк poznaж wiкcej szczegуіуw misji?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_dialog_1_11">
+		<text>Kim on jest?</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_a25_base_reminding_1_0">
+		<text>Jeњli szybko nie znajdziemy џrуdіa zakіуceс, pozostanie nam juї tylko czekaж na њmierж. Pierwszy zmasowany atak Monolitu rozniesie wojsko na strzкpy... A operacja skoсczy siк totaln№ klкsk№.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_a25_base_reminding_1_1">
+		<text>Postaram siк jak najszybciej znaleџж џrуdіo.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_a25_base_reminding_2_0">
+		<text>No i co, majorze? Znaleџliњcie џrуdіo zakіуceс radiowych?</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_a25_base_reminding_2_1">
+		<text>Nie, wci№ї nad tym pracujк...</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_about_merc_start_0">
+		<text>Garri opowiedziaі mi o incydencie z najemnikami...</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_about_merc_start_1">
+		<text>Tak, mi teї o nim opowiedziaі... Jak tylko uciekі, schroniі siк tutaj ze strachu przed poњcigiem. Na szczкњcie - dla niego i dla nas - najemnicy go nie znaleџli. Obserwujemy miejsce, w ktуrym maj№ siк spotkaж z ludџmi klienta, ale na razie spokуj... Chciaіbym wiedzieж, po co ci najemnicy tu przyszli.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_0">
+		<text>Mam informacjк, їe szukaj№ tajnego laboratorium w Prypeci.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_1">
+		<text>Tajnego laboratorium, tutaj, w Prypeci? Ale sk№d siк tego dowiedziaіeњ?</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_11">
+		<text>Z notesu najemnika na Zatonie. Potwierdziіa to teї opowieњж, ktуr№ usіyszaіem od stalkera zwanego Wujkiem Jarem.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_111">
+		<text>Hm... Wiesz o czymњ jeszcze?</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_1111">
+		<text>Szukaj№ laboratorium centralnego. W toku њledztwa udaіo mi siк poznaж jego wspуіrzкdne...</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_11111">
+		<text>Jeњli to prawda, to znaczy, їe oprуcz zombi i fanatykуw mamy jeszcze jednego wroga... Musimy zdecydowaж, co dalej.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_111111">
+		<text>Trzeba obserwowaж spotkanie i jeњli siк da, wyeliminowaж przedstawicieli klienta - dziкki temu nikt przez jakiњ czas nie wejdzie do laboratorium X8.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_1111111">
+		<text>To dobre rozwi№zanie, bo chociaї nie dowiemy siк, kto jeszcze wie o laboratorium, przynajmniej zadbamy o to, їe nie znajd№ go najemnicy. Jednak ci ostatni szybko zareaguj№ i bкd№ dla nas zagroїeniem. Jeњli siк uda, zlikwiduj obydwa cele. Wyњlк z tob№ porucznika Kiryіowa.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_11111111">
+		<text>Dobrze.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_11111112">
+		<text>Zaraz, moїe powinniњmy siк zdecydowaж na drugi cel.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_111111121">
+		<text>Trzeba zdecydowaж, ktуry cel jest waїniejszy.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_111112">
+		<text>Musimy zlikwidowaж przywуdcк najemnikуw - jeњli tego dokonasz, pozbawiony szefa oddziaі nie bкdzie juї stanowiі duїego problemu.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_1111121">
+		<text>To niezіe rozwi№zanie, ale posіaniec prawdopodobnie ucieknie i przekaїe informacjк o laboratoriach gdzieњ indziej, wiкc najemnicy i tak w koсcu tam dotr№. Jeњli siк uda, zlikwiduj obydwa cele. Wyњlк z tob№ porucznika Kiryіowa.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_111113">
+		<text>Nie mam na to czasu.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_12">
+		<text>Z notesu najemnika na Zatonie.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_13">
+		<text>Z historii, ktуr№ opowiedziaі mi Wujek Jar, stalker ze stacji Janуw.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_reward_0">
+		<text>Co do najemnikуw...</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_reward_1">
+		<text>Њwietna robota - obydwa cele zabite. Teraz najemnicy nie bкd№ wchodziж nam w drogк i przestan№ interesowaж siк laboratorium. Moїesz zatrzymaж karabin. A tu masz do niego trochк amunicji.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_reward_2">
+		<text>Dobrze, teraz, gdy ich szef nie їyje, najemnicy nie bкd№ juї dla nas problemem. Ale skoro ludzie klienta uciekli, mog№ zjawiж siк w laboratorium. Nie traж czujnoњci... Moїesz zatrzymaж karabin. A tu masz do niego trochк amunicji.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_reward_3">
+		<text>Dobrze - teraz, gdy nie їyje osoba, ktуra znaіa poіoїenie laboratorium, najemnicy go nie znajd№. Ale w№tpiк, їeby opuњcili Prypeж, co oznacza, їe bкd№ dla nas zagroїeniem. Nie traж czujnoњci... Moїesz zatrzymaж karabin. A tu masz do niego trochк amunicji.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_reward_4">
+		<text>A wiкc w ostatniej chwili zmieniіeњ cel? Cуї, decyzja byіa sіuszna. Teraz, gdy ich szef nie їyje, najemnicy nie bкd№ juї dla nas problemem. Ale skoro ludzie klienta uciekli, mog№ zjawiж siк w laboratorium. Nie traж czujnoњci... Moїesz zatrzymaж karabin. A tu masz do niego trochк amunicji.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_reward_5">
+		<text>A wiкc w ostatniej chwili zmieniіeњ cel? Cуї, decyzja byіa sіuszna. Teraz, gdy nie їyje osoba, ktуra znaіa poіoїenie laboratorium, najemnicy go nie znajd№. Ale w№tpiк, їeby opuњcili Prypeж, co oznacza, їe bкd№ dla nas zagroїeniem. Nie traж czujnoњci... Moїesz zatrzymaж karabin. A tu masz do niego trochк amunicji.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_reward_6">
+		<text>To nie poszіo najlepiej. Przywуdca najemnikуw їyje, czіowiek klienta teї. Teraz najemnicy o nas wiedz№ i bкd№ dla nas takim samym zagroїeniem, jak siіy Monolitu. A w dodatku znaj№ poіoїenie laboratorium, wiкc ich pojawienie siк w nim jest tylko kwesti№ czasu. Nie traж czujnoњci... Moїesz zatrzymaж karabin. A tu masz do niego trochк amunicji.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_evacuation_ready_0">
+		<text>Przygotujcie їoіnierzy, puіkowniku. Jestem gotowy.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_evacuation_ready_1">
+		<text>Dobrze. Osіaniajcie Strieіoka, majorze. My sami o siebie zadbamy.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_evacuation_start_11">
+		<text>A wiкc... Z nas wszystkich to wy i Strieіok macie najwiкksze doњwiadczenie w Zonie. Rуїnica polega na tym, їe o doњwiadczeniu Strieіoka kr№ї№ tylko pogіoski, a w was od razu moїna poznaж zawodowca. Chcк powiedzieж, їe na was liczк, majorze. Miejcie Strieіoka na oku - niewielu nas juї zostaіo.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_evacuation_start_12">
+		<text>Oddziaі gotуw do wyruszenia. Czekamy juї tylko na was, majorze.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_after_scene_dialog_0">
+		<text>Zdaje siк, їe wszystkie њwiry juї nie їyj№. Јap karabin i wynoњmy siк st№d, dopуki jeszcze moїemy.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_after_scene_dialog_1">
+		<text>Brzmi rozs№dnie.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_actor_ready_0">
+		<text>Jestem gotуw, ruszajmy.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_actor_ready_1">
+		<text>Dobrze. Oddziaі jest gotowy.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_actor_ready_11">
+		<text>Ruszamy.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_actor_ready_2">
+		<text>Musimy poczekaж. Nie chcк straciж ludzi przez emisjк.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_dialog_0">
+		<text>Nazywam siк kapitan Tarasow. Moїe i jesteњcie majorem, ale to ja tu dowodzк i moje rozkazy nie podlegaj№ dyskusji. Zaleїy od tego їycie caіego oddziaіu. Plan jest nastкpuj№cy: zajmujemy pozycjк w zachodniej czкњci szpitala i czekamy na pojawienie siк siі Monolitu. Musimy dziaіaж szybko, їeby nie zwracaж na siebie niepotrzebnej uwagi.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_dialog_1">
+		<text>Przyj№іem, chodџmy.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_dialog_11">
+		<text>Dobrze. Oddziaі jest gotowy.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_dialog_111">
+		<text>Ruszamy.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_dialog_12">
+		<text>Musimy poczekaж. Nie chcк straciж ludzi przez emisjк.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_dialog_2">
+		<text>Czekajcie, kapitanie, nie jestem jeszcze gotowy.</text>
+	</string>
+	<string id="pri_a22_army_signaller_about_rfi_source_0">
+		<text>Coњ nowego na froncie zakіуceс?</text>
+	</string>
+	<string id="pri_a22_army_signaller_about_rfi_source_1">
+		<text>Namierzyіem wiele џrуdeі, jedno z nich jest gdzieњ w pobliїu. Jeњli zostanie zniszczone, moїe nam siк udaж porozumieж z dowуdztwem.</text>
+	</string>
+	<string id="pri_a22_army_signaller_about_rfi_source_2">
+		<text>Obliczyіem wspуіrzкdne џrуdіa zakіуceс. To musi byж jakiњ wyspecjalizowany przekaџnik wysokich czкstotliwoњci, moїe nawet mikrofal.</text>
+	</string>
+	<string id="pri_a22_army_signaller_about_rfi_source_3">
+		<text>Zniszczone przez ciebie urz№dzenie byіo џrуdіem zakіуceс - jest ich pewnie mnуstwo, ale udaіo nam siк juї odzyskaж kontakt z dowуdztwem.</text>
+	</string>
+	<string id="pri_a22_army_signaller_about_signal_0">
+		<text>Powiedz mi o sygnale.</text>
+	</string>
+	<string id="pri_a22_army_signaller_about_signal_1">
+		<text>Sygnaі pojawia siк i znika, ale za kaїdym razem pojawia siк coraz bliїej bazy.</text>
+	</string>
+	<string id="pri_a22_army_signaller_about_signal_11">
+		<text>To wszystko?</text>
+	</string>
+	<string id="pri_a22_army_signaller_about_signal_111">
+		<text>Niezupeіnie - chodzi o to, їe sygnaі jest przekazywany na czкstotliwoњciach rzadko uїywanych do komunikacji radiowej.</text>
+	</string>
+	<string id="pri_a22_army_signaller_about_signal_12">
+		<text>Rozumiem.</text>
+	</string>
+	<string id="pri_a22_army_signaller_b35_about_merc_0">
+		<text>Weџ tк broс i naboje... Na razie moїesz siк wyluzowaж - bкdк obserwowaж pozycjк z drugiej strony i dam ci znaж, jak tylko siк pojawi№.</text>
+	</string>
+	<string id="pri_a22_army_signaller_b35_about_merc_1">
+		<text>Dobrze.</text>
+	</string>
+	<string id="pri_a22_army_signaller_start_dialog_11">
+		<text>Witam. Jestem porucznik Kiryіow. Odpowiadam za konserwacjк broni i skіad amunicji.</text>
+	</string>
+	<string id="pri_a22_army_signaller_start_dialog_111">
+		<text>Macie jakieњ naboje?</text>
+	</string>
+	<string id="pri_a22_army_signaller_start_dialog_1111">
+		<text>Tak, kilka dni temu wіamaliњmy siк do magazynu Monolitu, ktуry byі wyіadowany amunicj№ do kaїdego typu broni, jaki moїna znaleџж w Zonie... Ciekawe, sk№d maj№ tyle broni... S№dzк, їe musi im j№ sprzedawaж ktуryњ ze straїnikуw...</text>
+	</string>
+	<string id="pri_a22_army_signaller_start_dialog_112">
+		<text>Moїecie teї naprawiж moj№ broс?</text>
+	</string>
+	<string id="pri_a22_army_signaller_start_dialog_1121">
+		<text>Oczywiњcie. Jesteњmy szkoleni w naprawianiu wszelkiego rodzaju broni.</text>
+	</string>
+	<string id="pri_a22_army_signaller_start_dialog_113">
+		<text>Rozumiem.</text>
+	</string>
+	<string id="pri_a22_army_signaller_start_dialog_12">
+		<text>Witam.</text>
+	</string>
+	<string id="pri_a22_army_signaller_start_dialog_13">
+		<text>Sk№d siк wzi№і ten bуl gіowy...</text>
+	</string>
+	<string id="pri_a22_army_signaller_start_dialog_14">
+		<text>Oto chwila prawdy - ciekawe, czy wyjdziemy z tego caіo...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_0">
+		<text>Potrzebujк amunicji.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_1">
+		<text>Nie ma sprawy... Co wam dokіadnie potrzebne?</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_11">
+		<text>Naboje do pistoletu 9x18...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_111">
+		<text>Proszк... Coњ jeszcze?</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_112">
+		<text>Proszк...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_12">
+		<text>Naboje do pistoletu 9x19...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_13">
+		<text>Naboje do pistoletu 11.43x23...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_14">
+		<text>Naboje do strzelby.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_15">
+		<text>Naboje do karabinu szturmowego 5.45x39...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_16">
+		<text>Naboje do karabinu szturmowego 5.56x45...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_17">
+		<text>Naboje do karabinu szturmowego 9x39...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_18">
+		<text>Naboje do karabinu snajperskiego...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_19">
+		<text>Naboje do karabinu maszynowego...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_2">
+		<text>Nie mogк daж wam juї nic wiкcej, majorze... Puіkownik wydaі rozkaz, їeby oszczкdzaж naboje.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_20">
+		<text>Dobrze, niewaїne.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_grenade_0">
+		<text>Potrzebujк granatуw.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_grenade_1">
+		<text>Nie ma sprawy... Jakie granaty s№ wam potrzebne?</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_grenade_11">
+		<text>Granaty rкczne.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_grenade_111">
+		<text>Proszк...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_grenade_12">
+		<text>Amunicja do wyrzutni VOG-25.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_grenade_13">
+		<text>Amunicja do wyrzutni M209.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_grenade_14">
+		<text>Wіaњciwie niewaїne</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_grenade_2">
+		<text>Nie mogк daж wam juї nic wiкcej, majorze... Puіkownik wydaі rozkaz, їeby oszczкdzaж naboje.</text>
+	</string>
+	<string id="pri_a25_army_medic_need_health_care_0">
+		<text>Potrzebujк pomocy medycznej.</text>
+	</string>
+	<string id="pri_a25_army_medic_need_health_care_1">
+		<text>Chкtnie pomogк. Zobaczmy...</text>
+	</string>
+	<string id="pri_a25_army_medic_need_health_care_111">
+		<text>Proszк bardzo, jesteњcie juї zdrowi i gotowi do akcji.</text>
+	</string>
+	<string id="pri_a25_army_medic_rescued_0">
+		<text>Jak siк czujecie po tym, co siк staіo?</text>
+	</string>
+	<string id="pri_a25_army_medic_rescued_1">
+		<text>Teraz juї dobrze... Po tym, co zaszіo w przedszkolu, byіem w szoku, ale jak tylko zaczкіa siк emisja, szybko odzyskaіem њwiadomoњж.</text>
+	</string>
+	<string id="pri_a25_army_medic_start_dialog_12">
+		<text>Witam.</text>
+	</string>
+	<string id="pri_a25_army_medic_start_dialog_13">
+		<text>Najwaїniejsze, їeby dotrzeж do helikopterуw.</text>
+	</string>
+	<string id="pri_a25_army_medic_supply_medicine_0">
+		<text>Potrzebujк њrodkуw medycznych.</text>
+	</string>
+	<string id="pri_a25_army_medic_supply_medicine_1">
+		<text>Zobaczmy, co tu mamy. Proszк...</text>
+	</string>
+	<string id="pri_a25_army_medic_supply_medicine_2">
+		<text>Przykro mi, niewiele juї mi zostaіo, wiкc nie mogк daж nic wiкcej.</text>
+	</string>
+	<string id="pri_b305_strelok_about_base_0">
+		<text>Monitorowaliњmy twуj sygnaі radiowy.</text>
+	</string>
+	<string id="pri_b305_strelok_about_base_1">
+		<text>Tak. Skontaktowaіem siк ze stalkerem imieniem Przewodnik. Powiedziaі mi, jak dotrzeж do tego miejsca podziemnymi tunelami.</text>
+	</string>
+	<string id="pri_b305_strelok_about_base_11">
+		<text>Kim jest Przewodnik?</text>
+	</string>
+	<string id="pri_b305_strelok_about_base_111">
+		<text>To legendarny stalker - podobno jest w stanie zaprowadziж do kaїdego miejsca w Zonie. Chіopaki z wojska maj№ szczкњcie, їe go spotkali - bez niego dіugo by nie przeїyli.</text>
+	</string>
+	<string id="pri_b305_strelok_about_base_12">
+		<text>Sk№d wiedziaіeњ, їe wojsko tu jest?</text>
+	</string>
+	<string id="pri_b305_strelok_about_base_121">
+		<text>Przewodnik mi powiedziaі - to on przyprowadziі tu Kowalskiego i jego oddziaі.</text>
+	</string>
+	<string id="pri_b305_strelok_about_base_13">
+		<text>Rozumiem.</text>
+	</string>
+	<string id="pri_b305_strelok_about_information_0">
+		<text>Jakie informacje chcesz przekazaж rz№dowi? </text>
+	</string>
+	<string id="pri_b305_strelok_about_information_1">
+		<text>Duїo ich jest... Jestem pewien, їe posiadane przeze mnie informacje mogіyby posіuїyж do zniszczenia Zony. Myњlaіem, їe dam radк zrobiж to sam... Ale okazaіo siк, їe to znacznie bardziej skomplikowane. Ludzie, ktуrzy to zaczкli, stracili wіadzк... wszystko wyjaњniк, kiedy st№d wyjdziemy.</text>
+	</string>
+	<string id="pri_b305_strelok_about_station_0">
+		<text>Co widziaіeњ w sarkofagu?</text>
+	</string>
+	<string id="pri_b305_strelok_about_station_1">
+		<text>To oszustwo... Monolit, Speіniacz Їyczeс, to wszystko kіamstwo, urz№dzenie, ktуre zwodzi umysі. A stoj№cy za tym ludzie ukrywaj№ siк gdzieњ indziej...</text>
+	</string>
+	<string id="pri_b305_strelok_about_station_11">
+		<text>Wiesz, kto za tym stoi?</text>
+	</string>
+	<string id="pri_b305_strelok_about_station_111">
+		<text>Moїe tak, moїe nie... Juї nie wiem, w co wierzyж... Mimo to odkryіem wiкcej, niї chcieli.</text>
+	</string>
+	<string id="pri_b305_strelok_about_station_12">
+		<text>Dobrze, doњж juї o tym.</text>
+	</string>
+	<string id="pri_b305_strelok_dialog_11">
+		<text>Podzielк siк wszystkim, co wiem. O ile te informacje dotr№ do odpowiednich ludzi.</text>
+	</string>
+	<string id="pri_b305_strelok_note_0">
+		<text>W drodze tutaj znalazіem schowki twojej grupy...</text>
+	</string>
+	<string id="pri_b305_strelok_note_1">
+		<text>Ciekawe, jak zdoіaіeњ je znaleџж... W њrodku powinny byж rуїne zapiski, znalazіeњ coњ takiego?</text>
+	</string>
+	<string id="pri_b305_strelok_note_11">
+		<text>Tak, znalazіem trzy notatki.</text>
+	</string>
+	<string id="pri_b305_strelok_note_111">
+		<text>Dziкkujк... Duch i Kieі byli moimi przyjaciуіmi... Razem zdoіaliњmy przejњж koіo Zwкglacza i dotrzeж do Czarnobylskiej Elektrowni J№drowej. Niestety obydwaj zginкli. Po powrocie rozdzieliliњmy siк - ja byіem ranny i zostaіem z Doktorem na bagnach. Wiкcej ich nie zobaczyіem... Niedіugo pуџniej dowiedziaіem siк, їe Kіa zabili najemnicy, a Duch zgin№і, bo zaufaі naukowcom... Ale niewaїne, to juї przeszіoњж... Teraz muszк zadbaж o to, їeby ich њmierж nie poszіa na marne.</text>
+	</string>
+	<string id="pri_b305_strelok_note_12">
+		<text>Tak, oto twoja wiadomoњж do Ducha.</text>
+	</string>
+	<string id="pri_b305_strelok_note_121">
+		<text>Dziкkujк... Duch byі moim przyjacielem... Razem z nim i Kіem zdoіaliњmy przejњж koіo Zwкglacza i dotrzeж do Czarnobylskiej Elektrowni J№drowej... Po powrocie z centrum rozdzieliliњmy siк - ja byіem ranny i zostaіem z Doktorem na bagnach. Wiкcej ich nie zobaczyіem... Niedіugo pуџniej dowiedziaіem siк, їe Kіa zabili najemnicy, a Duch zgin№і, bo zaufaі naukowcom...</text>
+	</string>
+	<string id="pri_b305_strelok_note_13">
+		<text>Tak, oto wiadomoњж Kіa do ciebie.</text>
+	</string>
+	<string id="pri_b305_strelok_note_131">
+		<text>Dziкkujк... Kieі byі moim przyjacielem... Razem z nim i Duchem zdoіaliњmy przejњж koіo Zwкglacza i dotrzeж do Czarnobylskiej Elektrowni J№drowej... Po powrocie z centrum rozdzieliliњmy siк - ja byіem ranny i zostaіem z Doktorem na bagnach. Wiкcej ich nie zobaczyіem... Niedіugo pуџniej dowiedziaіem siк, їe Kіa zabili najemnicy, a Duch zgin№і, bo zaufaі naukowcom...</text>
+	</string>
+	<string id="pri_b305_strelok_note_14">
+		<text>Tak, oto twoja wiadomoњж do Kіa.</text>
+	</string>
+	<string id="pri_b305_strelok_note_141">
+		<text>Dziкkujк... Kieі byі moim przyjacielem... Razem z nim i Duchem zdoіaliњmy przejњж koіo Zwкglacza i dotrzeж do Czarnobylskiej Elektrowni J№drowej... Po powrocie z centrum rozdzieliliњmy siк - ja byіem ranny i zostaіem z Doktorem na bagnach. Wiкcej ich nie zobaczyіem... Niedіugo pуџniej dowiedziaіem siк, їe Kіa zabili najemnicy, a Duch zgin№і, bo zaufaі naukowcom...</text>
+	</string>
+	<string id="pri_b305_strelok_note_15">
+		<text>Tak, oto twoja wiadomoњж do Ducha i wiadomoњж Kіa do ciebie.</text>
+	</string>
+	<string id="pri_b305_strelok_note_151">
+		<text>Dziкkujк... Duch i Kieі byli moimi przyjaciуіmi... Razem zdoіaliњmy przejњж koіo Zwкglacza i dotrzeж do Czarnobylskiej Elektrowni J№drowej. Niestety obydwaj zginкli. Po powrocie rozdzieliliњmy siк - ja byіem ranny i zostaіem z Doktorem na bagnach. Wiкcej ich nie zobaczyіem... Niedіugo pуџniej dowiedziaіem siк, їe Kіa zabili najemnicy, a Duch zgin№і, bo zaufaі naukowcom...</text>
+	</string>
+	<string id="pri_b305_strelok_note_16">
+		<text>Tak, oto twoje wiadomoњci do Ducha i do Kіa.</text>
+	</string>
+	<string id="pri_b305_strelok_note_161">
+		<text>Dziкkujк... Duch i Kieі byli moimi przyjaciуіmi... Razem zdoіaliњmy przejњж koіo Zwкglacza i dotrzeж do Czarnobylskiej Elektrowni J№drowej. Niestety obydwaj zginкli. Po powrocie rozdzieliliњmy siк - ja byіem ranny i zostaіem z Doktorem na bagnach. Wiкcej ich nie zobaczyіem... Niedіugo pуџniej dowiedziaіem siк, їe Kіa zabili najemnicy, a Duch zgin№і, bo zaufaі naukowcom...</text>
+	</string>
+	<string id="pri_b305_strelok_note_17">
+		<text>Tak, oto twoja wiadomoњж do Kіa i wiadomoњж Kіa do ciebie.</text>
+	</string>
+	<string id="pri_b305_strelok_note_171">
+		<text>Dziкkujк... Kieі byі moim przyjacielem... Razem z nim i Duchem zdoіaliњmy przejњж koіo Zwкglacza i dotrzeж do Czarnobylskiej Elektrowni J№drowej... Po powrocie z centrum rozdzieliliњmy siк - ja byіem ranny i zostaіem z Doktorem na bagnach. Wiкcej ich nie zobaczyіem... Niedіugo pуџniej dowiedziaіem siк, їe Kіa zabili najemnicy, a Duch zgin№і, bo zaufaі naukowcom...</text>
+	</string>
+	<string id="pri_b305_strelok_note_18">
+		<text>Tak. Niestety nie mam ich przy sobie.</text>
+	</string>
+	<string id="pri_a25_army_medic_need_health_care_2">
+		<text>Zobaczmy... Macie problem, majorze... Znaczy - pewnie zaliczylibyњcie badanie lekarskie do programu kosmicznego, ale poza tym jesteњcie w okropnym stanie! Ha!</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_dialog_21">
+		<text>Chodџcie, majorze. Ludzie z Monolitu nie bкd№ czekaж.</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_start_0">
+		<text>Majorze, zagin№і nam wartownik - opuњciі swуj posterunek. Jego sygnaі dochodzi ze sklepu spoїywczego, ale on sam nie odpowiada. Bуg jeden wie, co tam siк staіo. Moїe dzieciak spanikowaі - katastrofa helikoptera porz№dnie nim wstrz№snкіa. Sprawdzicie dla mnie ten sygnaі?</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_start_1">
+		<text>Tak.</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_start_2">
+		<text>Niczego nie obiecujк.</text>
+	</string>
+	<string id="pri_a16_military_colonel_a20_find_recon_squd_dialog_0">
+		<text>Majorze, musimy znaleџж oddziaі zwiadowczy.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_dialog_1_1">
+		<text>Razem z oddziaіem szturmowym musicie siк udaж do obiektu A17 - kapitan Tarasow wszystko wam pokaїe. Celem s№ dwa poі№czone przejњciem skrzydіa szpitala. Bojownicy Monolitu s№ obecnie w zachodnim skrzydle. Wy macie urz№dziж zasadzkк w tym drugim. Powinni mieж ze sob№ karabin, pewnie znajdziecie go u najwiкkszego њwira.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_dialog_1_111">
+		<text>Zapewne dowуdc№ oddziaіu. Chіopcy widzieli, jak wygіasza swoim ludziom kazanie. Dosіownie! B№dџcie ostroїni, nie wiadomo, czego moїna siк po nim spodziewaж.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_dialog_1_12">
+		<text>Przyj№іem, puіkowniku.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_task_dialog_0">
+		<text>Witam. Puіkownik Kowalski, dowуdca tego oddziaіu.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_task_dialog_1">
+		<text>Major Diegtiariow, SBU. Jestem upowaїniony do przeprowadzenia њledztwa w sprawie klкski operacji Tor Wodny.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_task_dialog_11">
+		<text>Rozumiem. No to posіuchajcie, majorze. Operacja Tor Wodny poszіa w diabіy razem z naszymi њmigіowcami. Poіowa moich chіopakуw nie їyje i nie mamy і№cznoњci z dowуdztwem. Ja teї chcк siк dowiedzieж, dlaczego operacja siк nie powiodіa.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_task_dialog_111">
+		<text>Jakieњ pomysіy?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_task_dialog_1111">
+		<text>Jedynie taki, їe helikoptery zostaіy zestrzelone. Zestrzelone za pomoc№ niezwykle potкїnej broni, o ktуrej niewiele wiemy. Bojownicy Monolitu uїyli jej przeciwko nam podczas pierwszego szturmu na CEJ... Zamierzam zdobyж tak№ broс i dokіadnie j№ zbadaж. Jeњli chcecie siк wі№czyж do akcji, to grupa szturmowa czeka wіaњnie na mуj sygnaі do wyruszenia za wyњledzonym przez nas oddziaіem Monolitu, ktуry ma jedno z tych dziaі. Co wy na to?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_task_dialog_11111">
+		<text>Zgadzam siк, pod warunkiem, їe podzielicie siк ze mn№ wszystkimi informacjami i zapewnicie zupeіn№ swobodк dziaіania.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_a23_about_gauss_labx8_0">
+		<text>Mam informacjк na temat niezidentyfikowanej broni, to karabin Gaussa.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_a23_about_gauss_labx8_1">
+		<text>Њwietnie! Jak on dziaіa? Moїna z niego zestrzeliж helikopter?</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_a23_about_gauss_labx8_11">
+		<text>Technicznie rzecz bior№c, tak, ale przyspieszona kula zostawiіaby w helikopterach dziury, a niczego takiego nie znaleџliњmy.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_a23_about_gauss_labx8_111">
+		<text>Cholera... A wiкc to њlepy zauіek. Nie mam juї innych pomysіуw. Teraz moїemy juї tylko siedzieж na tyіkach w samym њrodku tej powalonej Zony i liczyж na to, їe po nas przyjd№... Dobra, koniec narzekania. Skupmy siк na tym, na co moїemy mieж wpіyw tu i teraz. Dziкki wam, majorze, wiemy juї, їe ukrywanie siк nie uchroni nas przed tymi przyspieszonymi kulami, a to juї coњ. Wiкc naleї№ siк wam podziкkowania. Skontaktujк siк z wami, jak dowiemy siк czegoњ nowego.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_a23_about_gauss_labx8_12">
+		<text>Technicznie rzecz bior№c, tak, ale Ogoсcza 4 i 5 rozbiіy siк z powodu awarii elektroniki. Przyspieszone kule nie mogіyby tego spowodowaж.</text>
+	</string>
+	<string id="pri_a17_got_gauss_0">
+		<text>Jak idzie operacja?</text>
+	</string>
+	<string id="pri_a17_got_gauss_1">
+		<text>Sierїant Morozow zgin№і. Bojownicy Monolitu wci№gnкli nas w zasadzkк poњwiкcaj№c їycie wіasnych ludzi.</text>
+	</string>
+	<string id="pri_a17_got_gauss_11">
+		<text>Dranie! Nie mogli wiedzieж, co planujemy... Wiкc straciliњmy snajpera. A co z celem operacji?</text>
+	</string>
+	<string id="pri_a17_got_gauss_2">
+		<text>Ponieњliњmy pewne straty... Bojownicy Monolitu wci№gnкli nas w zasadzkк poњwiкcaj№c їycie wіasnych ludzi.</text>
+	</string>
+	<string id="pri_a17_got_gauss_21">
+		<text>Dranie! Nie mogli wiedzieж, co planujemy... Wiкc straciliњmy paru ludzi. A co z celem operacji?</text>
+	</string>
+	<string id="pri_a17_got_gauss_3">
+		<text>Oddziaі wybity do nogi... Bojownicy Monolitu wci№gnкli nas w zasadzkк poњwiкcaj№c їycie wіasnych ludzi.</text>
+	</string>
+	<string id="pri_a17_got_gauss_31">
+		<text>Dranie! Nie mogli wiedzieж, co planujemy... Wiкc straciliњmy Tarasowa i jego ludzi. A co z celem operacji?</text>
+	</string>
+	<string id="pri_a17_got_gauss_4">
+		<text>Mam broс. Zostaіa uszkodzona w trakcie walki.</text>
+	</string>
+	<string id="pri_a17_got_gauss_41">
+		<text>A wiкc nie moїemy ustaliж, czy zostaіa uїyta do zestrzelenia helikopterуw. Sіuchajcie, majorze: wy macie znajomoњci w krкgach stalkerуw. Moїliwe, ze oni juї kiedyњ natknкli siк na tк broс. Powinni byж wњrуd nich technicy. Porozmawiacie z nimi?</text>
+	</string>
+	<string id="pri_a17_got_gauss_411">
+		<text>Dobrze.</text>
+	</string>
+	<string id="pri_a17_got_gauss_4111">
+		<text>Њwietnie... A, skoro o tym mowa. Jeszcze jeden stalker uszedі їywcem z Jupitera. Jeњli chcesz, pogadaj z nim na ten temat.</text>
+	</string>
+	<string id="pri_a17_got_gauss_5">
+		<text>Wci№ї nad tym pracujк.</text>
+	</string>
+	<string id="pri_a17_got_gauss_51">
+		<text>Rozumiem. Majorze, ta bron jest nam potrzebna. Na pewno rozumiecie, jakie to waїne.</text>
+	</string>
+	<string id="pri_a17_got_gauss_511">
+		<text>A-ha.</text>
+	</string>
+	<string id="pri_a15_sokolov_evacuation_note_0">
+		<text>Znalazіem twoje zapiski w kompleksie Woіkow AA. Weџ je.</text>
+	</string>
+	<string id="pri_a15_sokolov_evacuation_note_1">
+		<text>Sіuchaj... A, niewaїne. I tak pewnie nikt z naszych nie pojawi siк w tym miejscu. Jeњli zauwaїysz tu jakichњ їoіnierzy, daj mi znaж, dobra? Z gуry wielkie dziкki...</text>
+	</string>
+	<string id="pri_a25_army_medic_freezer_0">
+		<text>Majorze... Bogu niech bкd№ dziкki! Jestem uratowany!</text>
+	</string>
+	<string id="pri_a25_army_medic_freezer_1">
+		<text>Jak tu wyl№dowaіeњ?</text>
+	</string>
+	<string id="pri_a25_army_medic_freezer_11">
+		<text>Eee... Niewiele pamiкtam... Byіem tak przeraїony, їe ledwo mogіem myњleж, a nawet nie wiem, co mnie przestraszyіo. Czuіem, їe muszк siк schowaж, wiкc pobiegіem... Pamiкtam ulice, jakieњ zakrкty... Dotarіem do tej dziury. Drzwi byіy zamkniкte od zewn№trz... Myњlaіem, їe tu umrк. Jak mnie znalazіeњ? A tak w ogуle to wynoњmy siк st№d i chodџmy do bazy. To miejsce dziaіa mi na nerwy...</text>
+	</string>
+	<string id="pri_a25_army_medic_freezer_111">
+		<text>Chodџmy.</text>
+	</string>
+	<string id="pri_a25_army_medic_start_dialog_11">
+		<text>Witam. Potrzebujesz pomocy medycznej? Nie jestem lekarzem, ale potrafiк usuwaж kule i zszywaж rany.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_0">
+		<text>Potrzebujк informacji.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1">
+		<text>Pytaj.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_11">
+		<text>Co do operacji Tor Wodny...</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_111">
+		<text>Tak?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1111">
+		<text>Czy kiedy helikoptery znajdowaіy siк w powietrzu, wydarzyіo siк coњ dziwnego?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_11111">
+		<text>Dopiero wtedy, gdy zaczкіy spadaж. Trzymaliњmy siк planu operacji: wystartowaliњmy 90 sekund przed emisj№, wі№czyliњmy system ochronny i przeі№czyliњmy maszyny na autopilota. Lecieliњmy najkrуtsz№ bezpieczn№ tras№, opracowan№ przy pomocy mapy anomalii. Widocznoњж byіa zerowa, ale to nie powinno byіo zakіуciж przebiegu misji, bo korytarz byі wystarczaj№co szeroki. Wedіug planu mieliњmy dotrzeж do elektrowni w dwanaњcie i pуі minuty. Po dziewiкciu minutach straciliњmy і№cznoњж z Ogoсcz№ 4, a pozostali zaczкli padaж jak muchy.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_111111">
+		<text>Mam jeszcze parк pytaс na temat operacji.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1112">
+		<text>Co wiesz o tym, co staіo siк z helikopterami?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_11121">
+		<text>Prawie nic. Ogoсcze 2 i 4 to dla mnie zupeіna tajemnica. Nie wiem, gdzie siк rozbiіy ani co siк staіo z ludџmi, ktуrzy nimi lecieli. Informacje o pozostaіych њmigіowcach pochodz№ od ludzi, ktуrzy przeїyli, a tych nie ma zbyt wielu, wiкc nie moїna liczyж na dokіadny opis wydarzeс. Poza tym, mieliњmy inne zmartwienia.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_111211">
+		<text>Opowiedz mi o Ogoсczy 1.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_11121111">
+		<text>Jak siк tu dostaіeњ?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_111211111">
+		<text>Niedaleko pola minowego spotkaliњmy stalkera. Chyba usіyszaі eksplozjк miny. Dziwny facet... Mуwiі o sobie „Przewodnik". Nie zadawaі їadnych pytaс, po prostu zaproponowaі, їe doprowadzi nas do Prypeci. To nam odpowiadaіo, wiкc siк zgodziіem. Na wszelki wypadek mieliњmy go na oku, ale wszystko poszіo gіadko... Aї do samego miasta nie odezwaі siк ani sіowem, a kiedy doszliњmy na miejsce, nagle znikn№і. Powiedziaіem ludziom, їeby go nie szukali.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_111212">
+		<text>Opowiedz mi o Ogoсczy 3.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1112121">
+		<text>Kapitan Tarasow mуwi, їe obydwa silniki miaіy awariк. Musieli l№dowaж na wzgуrzu w pobliїu pozycji B2. Mieli szczкњcie, bo l№dowanie byіo miкkkie, ale technik nie miaі czasu okreњliж przyczyny awarii, bo zostali zaatakowani przez snorki i stracili trzech ludzi. Pozostali zdecydowali, їe nie bкd№ tam siedzieж - skontaktowali siк z Ogoсcz№ 5 i poszli siк z nimi spotkaж. Po drodze wdali siк w walkк z dobrze uzbrojonym oddziaіem wroga, ale zdoіali z tego wyjњж bez strat w ludziach.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_11121211">
+		<text>Jak siк dostali do Prypeci?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_111212111">
+		<text>Zaіogi Ogoсczy 3 i 5 zdoіaіy spotkaж siк niedaleko miejsc katastrofy, przy jakiejњ barce. Doniesiono mi, їe czіowiek, ktуry tam mieszka, to kompletny wariat: kiedy moi ludzie prуbowali go schwytaж, on wykrzykiwaі, їe ich aresztuje! Niech mnie, biedny dureс byі sam, a ich jedenastu. W kaїdym razie, okazaіo siк, їe to spotkanie byіo szczкњliwym trafem, bo w koсcu udaіo im siк dogadaж i facet zgodziі siк poprowadziж caіy oddziaі do Prypeci. Jedyn№ ofiar№ byі porucznik Steczenko, ktуry po drodze straciі kilka palcуw u nуg w anomalii grawitacyjnej.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_111213">
+		<text>Opowiedz mi o Ogoсczy 5.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1112131">
+		<text>Zawiodіa elektronika i Ogoсcza 5 runкіa prosto w bagno. Katastrofк przeїyіo piкciu ludzi. Kiedy wyci№gali sprzкt ze њmigіowca, skontaktowaіa siк z nimi zaіoga Ogoсczy 3. Dowуdca oddziaіu, major Nieborski, zgin№і w drodze do miejsca spotkania. Biedak, tuї przy stacji odczytуw zabiіa go pijawka... Pozostaіym nic siк nie staіo. Ale kiedy doszli do Prypeci, wdali siк w walkк z siіami Monolitu i stracili jednego ze snajperуw, starszego sierїanta Batiaja.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_11121311">
+		<text>Jak siк dostali do Prypeci?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_111213111">
+		<text>Zaіogi Ogoсczy 3 i 5 zdoіaіy spotkaж siк niedaleko miejsc katastrofy, przy jakiejњ barce. Doniesiono mi, їe czіowiek, ktуry tam mieszka, to kompletny wariat: kiedy moi ludzie prуbowali go schwytaж, on wykrzykiwaі, їe ich aresztuje! Niech mnie, biedny dureс byі sam, a ich jedenastu. W kaїdym razie, okazaіo siк, їe to spotkanie byіo szczкњliwym trafem, bo w koсcu udaіo im siк dogadaж i facet zgodziі siк poprowadziж caіy oddziaі do Prypeci. Jedyn№ ofiar№ byі porucznik Steczenko, ktуry po drodze straciі kilka palcуw u nуg w anomalii grawitacyjnej.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_11122">
+		<text>Prawie nic. Ogoсcza 2 to dla mnie zupeіna tajemnica. Nie wiem, gdzie siк rozbiіa ani co siк staіo z ludџmi, ktуrzy ni№ lecieli. O Ogoсczy 4 powinieneњ wiedzieж wiкcej niї ja. Porucznik Sokoіow, ten, ktуry tu z tob№ przyszedі, jako jedyny ocalaі z jej katastrofy. Informacje o pozostaіych њmigіowcach pochodz№ od ludzi, ktуrzy przeїyli, a tych nie ma zbyt wielu, wiкc nie moїna liczyж na dokіadny opis wydarzeс. Poza tym, mieliњmy inne zmartwienia.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_11123">
+		<text>Prawie nic. Ogoсcza 2 to dla mnie zupeіna tajemnica. Nie wiem, gdzie siк rozbiіa ani co siк staіo z ludџmi, ktуrzy ni№ lecieli. O Ogoсczк 4 moїesz sam zapytaж porucznika Sokoіowa. On jeden z caіej zaіogi tej maszyny dotarі do Prypeci. Informacje o pozostaіych њmigіowcach pochodz№ od ludzi, ktуrzy przeїyli, a tych nie ma zbyt wielu, wiкc nie moїna liczyж na dokіadny opis wydarzeс. Poza tym, mieliњmy inne zmartwienia.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1113">
+		<text>Potrzebujк innych informacji.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1114">
+		<text>Nie mam wiкcej pytaс.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_12">
+		<text>Jaka jest sytuacja w Prypeci?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_121">
+		<text>Gorzej juї byж nie moїe. Prypeж jest peіna fanatykуw Monolitu i zombiakуw. Emisje pojawiaj№ siк jedna za drug№, a oprуcz tego trzeba ci№gle uwaїaж na mutanty i anomalie... Witajcie w piekle.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1211">
+		<text>Jak sobie radzicie ze sprzкtem i zaopatrzeniem?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_13">
+		<text>Opowiedz mi o Monolicie.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_131">
+		<text>To fanatycy, koniec, kropka. Nie wiem, co ich tak nakrкca, ale bez przerwy szukaj№ zwady. Nie uciekaj№ nawet w obliczu przewagi liczebnej i ogniowej... A w tym miejscu to rzadkoњж. Zdaje siк, їe ci№gle napіywaj№ do nich posiіki z CEJ. Pieprzyж ich, straciliњmy przez nich juї wielu dobrych ludzi...</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1311">
+		<text>Przesіuchiwaliњcie ktуregoњ z nich?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_13111">
+		<text>To nic nie daje. Przede wszystkim walcz№ na њmierж i їycie. W koсcu nasi chіopcy zdoіali wzi№ж jednego їywcem - ogіuszyі go granat - ale niewiele z tego wynikіo. Na sekundк spuњciliњmy go z oczu, a on tak mocno r№bn№і gіow№ w њcianк, їe jego czaszka pкkіa jak skorupka jajka.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_14">
+		<text>Co teraz zrobicie?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_141">
+		<text>Nie s№dzк, їeby daіo siк kontynuowaж Operacjк Tor Wodny. Wasza obecnoњж tutaj to potwierdza. Chcк utrzymaж bazк, dopуki nie zjawi№ siк њmigіowce. Mam kilka moїliwych dat ewakuacji.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1411">
+		<text>Nikt tu nie przyleci, dopуki siк nie dowiemy, co spowodowaіo katastrofк Ogoсczy.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_14111">
+		<text>A wiкc tak to wygl№da... Ale przecieї pieszo siк st№d nie wydostaniemy! Bуg jeden wie, ile kilometrуw ma to gуwno, a poza tym Zona peіna jest stalkerуw, z ktуrymi nie jesteњmy w najlepszych stosunkach. To znaczy, їe naszym jedynym wyjњciem jest przeprowadziж wіasne dochodzenie i nie daж siк przy tym zabiж. Mamy wspуlny cel, majorze.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_15">
+		<text>Nie teraz.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_start_0">
+		<text>Sіucham, majorze.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_12111">
+		<text>Ze sprzкtu mamy tylko to, co mieliњmy ze sob№. Udaіo nam siк rуwnieї przechwyciж trochк rzeczy Monolitu, gіуwnie amunicjк. Braki zmuszaj№ nas do oszczкdnego wydzielania zapasуw. Tak samo jest z jedzeniem - mamy tylko їelazne racje i trochк їarcia z magazynu Monolitu.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_12112">
+		<text>Ze sprzкtu mamy tylko to, co mieliњmy ze sob№. Udaіo nam siк rуwnieї przechwyciж trochк rzeczy Monolitu, gіуwnie amunicjк. Braki zmuszaj№ nas do oszczкdnego wydzielania zapasуw. Jeњli chodzi o jedzenie, to jest bardzo podobnie, z tym, їe zawarіem umowк z Garrim. On przynosi nam konserwy, a my pozwalamy mu zostaж w bazie i patrzymy w inn№ stronк, gdy szuka artefaktуw... I tak nie mamy innego wyboru.</text>
+	</string>
+	<string id="pri_a18_altar_destroyed_soldiers_start_11">
+		<text>Pomњciliњmy naszych chіopcуw... Rуb, co musisz, i wracajmy. Nie mam ochoty dіuїej tu siedzieж.</text>
+	</string>
+	<string id="pri_a18_altar_destroyed_soldiers_start_12">
+		<text>Nie traжmy tu czasu, dobra? Chcк jak najszybciej wrуciж do bazy...</text>
+	</string>
+	<string id="pri_a18_altar_destroyed_soldiers_start_111">
+		<text>Dobrze.</text>
+	</string>
+	<string id="pri_a18_altar_destroyed_vano_start_11">
+		<text>Tam jest ta dziwna rzecz! Jak myњlisz, do czego im ona potrzebna? A, niewaїne. Chodџ, stary - rуb, co musisz, i wracajmy do bazy.</text>
+	</string>
+	<string id="pri_a18_altar_destroyed_vano_start_12">
+		<text>Skoсczyіeњ juї? Chкtnie wrуcк do bazy i coњ przek№szк...</text>
+	</string>
+	<string id="pri_a18_altar_destroyed_vano_start_111">
+		<text>Dobrze.</text>
+	</string>
+	<string id="pri_a15_sokolov_pripyat_how_are_you_0">
+		<text>Jak samopoczucie?</text>
+	</string>
+	<string id="pri_a15_sokolov_pripyat_how_are_you_1">
+		<text>Do dupy. Dobrze byж ze swoimi, ale przebywanie z innymi ludџmi w jednym bagnie nie napawa mnie optymizmem.</text>
+	</string>
+	<string id="pri_a15_sokolov_acquaintance_after_jorney_0">
+		<text>Nie widziaіem ciк tu wczeњniej. Zjawiіeњ siк niedawno?</text>
+	</string>
+	<string id="pri_a15_sokolov_acquaintance_after_jorney_1">
+		<text>Tak. Jestem porucznik Sokoіow, jeden z pilotуw Ogoсczy 4.</text>
+	</string>
+	<string id="pri_a15_sokolov_about_journey_0">
+		<text>Jak siк tu znalazіeњ?</text>
+	</string>
+	<string id="pri_a15_sokolov_about_journey_1">
+		<text>Przyszedіem ze stalkerem imieniem Garri. Poprosiіem go, їeby mnie ze sob№ zabraі, kiedy szukaі drogi do Prypeci. To dopiero byіa przeprawa! Dobrze, їe tuї po dojњciu do Prypeci wpadliњmy na nasz oddziaі zwiadowczy.</text>
+	</string>
+	<string id="pri_a15_sokolov_helicopter_0">
+		<text>Co siк staіo z Ogoсcz№ 4?</text>
+	</string>
+	<string id="pri_a15_sokolov_helicopter_1">
+		<text>A kto to moїe wiedzieж? Od pocz№tku miaіem zіe przeczucia... Lecieliњmy na autopilocie, sprzкt dziaіaі bez zarzutu, a w nastкpnej chwili siedzieliњmy w kupie zіomu z rozwalon№ elektronik№. Ja i pilot prуbowaliњmy dotrzeж do pіaskiego terenu, ale siк nie udaіo. Spadliњmy prosto na gіуwny warsztat elektrowni Jupiter, runкliњmy przez dach... Tylko ja przeїyіem.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_outfit_0">
+		<text>Potrzebujк kamizelki kuloodpornej.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_outfit_1">
+		<text>Dobrze. Na pocz№tek heіm... Teraz kamizelka - mam nadziejк, їe bкdzie pasowaіa, bo i tak nie mamy innego rozmiaru. Poіataіem j№, powinna wytrzymaж.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_task_dialog_111111">
+		<text>Oczywiњcie, majorze... W tych okolicznoњciach nie mam wielkiego wyboru... Przy okazji, poszukajcie porucznika Kiryіowa. Wyda wam trochк sprzкtu.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_9">
+		<text>Co do helikopterуw...</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_91">
+		<text>Sіucham.</text>
+	</string>
+	<string id="pri_a25_army_medic_start_dialog_14">
+		<text>Rany, to wariactwo... Juї widzк, jak Kiryіow bкdzie mnie pуџniej bіagaі o aspirynк.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_evacuation_start_21">
+		<text>Najgorsze jest czekanie. Nic innego tak nie wyprowadza z rуwnowagi...</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_evacuation_start_1111">
+		<text>Dobrze, majorze, chіopcy mog№ ruszaж. Jeњli musicie siк w coњ zaopatrzyж, poszukajcie Kiryіowa i Rogowca. Dajcie znaж, jak bкdziecie gotowi.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_evacuation_start_11111">
+		<text>Dobrze.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_evacuation_ready_11">
+		<text>Ruszajcie.</text>
+	</string>
+	<string id="pri_a15_sokolov_need_outfit_1">
+		<text>Cуї, w takim razie musi byж twardy jak skaіa, taki, jakie maj№ naukowcy. Ale nie bкdzie іatwo namуwiж Hermana, їeby daі mi kombinezon. Mam przeczucie, їe wolaіby, їebym poszedі z goіym tyіkiem do kraсca Zony, a nie zajmowaі cenne miejsce w ich bunkrze... Moїesz spytaж Oziorskiego. Jest trochк milszy i byж moїe zgodzi siк wydaж mi kombinezon.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_dialog_second_0">
+		<text>No i co, majorze?</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_evacuation_start_111">
+		<text>[Dalej....]</text>
+	</string>
+	<string id="pri_a25_army_medic_need_health_care_11">
+		<text>[Dalej....]</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1112111">
+		<text>Byіem tam. Jak tylko straciliњmy і№cznoњж z Ogoсcz№ 4, powiedziaіem pozostaіym o wyznaczonym punkcie ewakuacyjnym w Prypeci - pomyњlaіem, їe moїemy iњж do elektrowni. Niemal w tym samym momencie helikopter oberwaі i rozszedі siк zapach spalenizny - zapaliі siк silnik. Piloci zdoіali dolecieж do l№dowisk w pobliїu Jupitera, ale przy uderzeniu obydwaj zginкli. Potem straciliњmy sierїanta Szlaczina - okazaіo siк, їe teren wokуі l№dowisk byі zaminowany... W Prypeci zgin№і kolejny z nas, starszy porucznik, kiedy walczyliњmy z Monolitem o ten budynek.</text>
+	</string>
+</string_table>

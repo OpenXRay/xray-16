@@ -1,0 +1,169 @@
+#include "snd_channels.ltx"
+
+[ambient_env_0]
+sound_period		= 5, 10 ;						; <from,to>				(sec)
+sound_dist			= 300, 600
+sounds				= ambient\rnd_outdoor\rnd_boar	; <snd0,snd1..sndN>		sounds name
+effect_period		= 30, 60					; <from,to>				(sec)
+effects				= ae0_effect_0,ae0_effect_1,ae0_effect_2,ae0_effect_3,ae0_effect_8	; <eff0,eff1..effN>		effects sect name
+
+[ambient_env_stancia1]
+sound_period		= 5, 10 ;						; <from,to>				(sec)
+sound_dist			= 300, 600
+sounds				= ambient\rnd_outdoor\rnd_boar2	; <snd0,snd1..sndN>		sounds name
+effect_period		= 10, 20					; <from,to>				(sec)
+effects				= ae0_effect_1,ae0_effect_2, ae0_effect_3,ae0_effect_4,ae0_effect_5,ae0_effect_6,ae0_effect_7,ae0_effect_8,ae0_effect_9	; <eff0,eff1..effN>
+
+[ambient_env_day]
+;sound_period		= 5, 10 ;						; <from,to>				(sec)
+;sound_dist			= 30, 60
+; sounds				= 
+effect_period		= 40, 90					; <from,to>				(sec)
+effects				= ae0_effect_1,ae0_effect_2, ae0_effect_3,ae0_effect_5,ae0_effect_6,ae0_effect_7,ae0_effect_8	; <eff0,eff1..effN>		effects sect name
+snd_channels            = snd_bkwind_1,snd_bkwind_2,snd_swampwind_1,snd_dogs_1,snd_gunshots_1,snd_crows_1,snd_moans_1
+
+[ambient_env_rain]
+;sound_period		= 5, 10 ;						; <from,to>				(sec)
+;sound_dist			= 30, 60
+;sounds				= 
+effect_period		= 20, 40					; <from,to>				(sec)
+effects				= ae0_effect_1,ae0_effect_2, ae0_effect_3,ae0_effect_4,ae0_effect_5,ae0_effect_6,ae0_effect_7,ae0_effect_8	; <eff0,eff1..effN>		effects sect name
+snd_channels            = snd_bkwind_1,snd_bkwind_2,snd_swampwind_1,snd_dogs_1,snd_gunshots_1,snd_crows_1,snd_moans_1
+
+[ambient_env_evening]
+;sound_period		= 5, 10					; <from,to>				(sec)
+;sound_dist			= 30, 60
+;sounds				= 
+effect_period		= 90, 120					; <from,to>				(sec)
+;effects				= 	; <eff0,eff1..effN>		effects sect name
+snd_channels            = snd_bkwind_1,snd_bkwind_2,snd_swampwind_1,snd_dogs_1,snd_gunshots_1,snd_crickets_1,snd_moans_1
+
+[ambient_env_night]
+;sound_period		= 5, 10					; <from,to>				(sec)
+;sound_dist			= 30, 60
+;sounds				= 
+effect_period		= 130, 160					; <from,to>				(sec)
+effects				= ae0_effect_1,ae0_effect_2, ae0_effect_3,ae0_effect_8	; <eff0,eff1..effN>		effects sect name
+snd_channels            = snd_bkwind_1,snd_bkwind_2,snd_swampwind_1,snd_crickets_1,snd_crickets_2,snd_owls_1,snd_moans_1,snd_howling_1
+
+[ambient_env_morning]
+;sound_period		= 5, 10 ;						; <from,to>				(sec)
+;sound_dist			= 30, 60
+;sounds				= ; <snd0,snd1..sndN>		sounds name
+effect_period		= 30, 60					; <from,to>				(sec)
+effects				= ae0_effect_4 ; <eff0,eff1..effN>		effects sect name
+snd_channels            = snd_bkwind_1,snd_bkwind_2,snd_swampwind_1,snd_dogs_1,snd_gunshots_1,snd_crows_1,snd_moans_1
+
+[ambient_env_hospital]
+sound_period		= 3, 7 ;						; <from,to>				(sec)
+sound_dist			= 10, 30
+sounds				= ambient\rnd_outdoor\rnd_boar1,ambient\rnd_outdoor\rnd_boar,ambient\rnd_outdoor\rnd_boar2,ambient\rnd_outdoor\rnd_boar3,ambient\rnd_outdoor\rnd_darkwind4,ambient\rnd_outdoor\rnd_darkwind5,ambient\rnd_outdoor\rnd_darkwind4,ambient\rnd_outdoor\rnd_darkwind5,ambient\rnd_outdoor\rnd_darkwind4,ambient\rnd_outdoor\rnd_darkwind5,ambient\rnd_outdoor\rnd_darkwind4,ambient\rnd_outdoor\rnd_darkwind5,ambient\rnd_outdoor\rnd_dog,ambient\rnd_outdoor\rnd_dog1,ambient\rnd_outdoor\rnd_dog2,ambient\rnd_outdoor\rnd_dog3,ambient\rnd_outdoor\rnd_krik6,ambient\rnd_outdoor\rnd_krik8,ambient\rnd_outdoor\rnd_krik9,ambient\rnd_outdoor\rnd_moan,ambient\rnd_outdoor\rnd_moan1,ambient\rnd_outdoor\rnd_moan2,ambient\rnd_outdoor\rnd_moan1,ambient\rnd_outdoor\rnd_moan2,ambient\rnd_outdoor\rnd_shooting_4,ambient\rnd_outdoor\rnd_shooting_4,ambient\rnd_outdoor\rnd_shooting_7,ambient\rnd_outdoor\rnd_shooting_1,ambient\rnd_outdoor\rnd_krik3,ambient\rnd_outdoor\rnd_shooting_9,ambient\rnd_outdoor\rnd_shooting_3,ambient\rnd_outdoor\rnd_swamp,ambient\rnd_outdoor\rnd_wind_tree,ambient\rnd_outdoor\rnd_wind_tree		; <snd0,snd1..sndN>		sounds name
+effect_period		= 30, 60					; <from,to>				(sec)
+effects				= ae0_effect_4 ; <eff0,eff1..effN>		effects sect name
+
+[ambient_env_indoor]
+;sound_period		= 10, 30 ;						; <from,to>				(sec)
+;sound_dist			= 10, 30
+;sounds				= ambient\underground\breath_1,ambient\underground\breath_2,ambient\underground\breath_3,ambient\underground\breath_4,ambient\underground\hit_2,ambient\underground\hit_1,ambient\underground\strange_noise_1,ambient\underground\strange_noise_2,ambient\underground\strange_noise_3,ambient\underground\rnd_metal1,ambient\underground\rnd_metal2,ambient\underground\rnd_metal3,ambient\underground\rnd_rat_panic_1,ambient\underground\rnd_rat_panic_2,ambient\underground\rnd_rat_panic_3,	; <snd0,snd1..sndN>		sounds name
+effect_period		= 130, 160					; <from,to>				(sec)
+;effects				= 	; <eff0,eff1..effN>		effects sect name
+snd_channels            = snd_ug_breath_1, snd_ug_hits_1, snd_ug_strange_1, snd_ug_metal_1, snd_x18_hits_1, snd_x18_moves_1
+
+[ambient_env_x18]
+sound_period		= 30, 60					; <from,to>				(sec)
+sound_dist			= 10, 30
+sounds				= ambient\x18\x18_noise_1,ambient\x18\x18_noise_2,ambient\x18\x18_hit_1,ambient\x18\x18_hit_2,ambient\x18\x18_hit_3,ambient\x18\x18_hit_4,ambient\x18\x18_hit_5,ambient\x18\x18_hit_6
+;ambient\underground\rnd_giant_1,ambient\underground\rnd_giant,ambient\underground\rnd_giant_1,ambient\underground\rnd_giant,ambient\underground\rnd_giant_1,ambient\underground\rnd_giant,ambient\underground\rnd_polter,ambient\underground\rnd_polter_1,ambient\underground\rnd_polter_2,ambient\underground\breath_1,ambient\underground\breath_2,ambient\underground\hit_2,ambient\underground\hit_1,ambient\underground\strange_noise_1,ambient\underground\strange_noise_2,ambient\underground\strange_noise_3,ambient\underground\rnd_drop_1,ambient\underground\rnd_drop_2,ambient\underground\rnd_drop_3,ambient\underground\rnd_drop_4,ambient\underground\rnd_drop_5,ambient\underground\rnd_drop_6,ambient\underground\rnd_metal1,ambient\underground\rnd_metal2,ambient\underground\rnd_metal3,ambient\underground\rnd_rat_panic_1,ambient\underground\rnd_rat_panic_2,ambient\underground\rnd_rat_panic_3,	; <snd0,snd1..sndN>		sounds name
+effect_period		= 130, 160					; <from,to>				(sec)
+;effects				= 	; <eff0,eff1..effN>		effects sect name
+
+[ambient_env_tuman]
+;sound_period		= 5, 10					; <from,to>				(sec)
+;sound_dist			= 30, 60
+;sounds				= 
+effect_period		= 5, 10					; <from,to>				(sec)
+effects				= ae0_effect_4,ae0_effect_6	; <eff0,eff1..effN>		effects sect name
+snd_channels            = snd_bkwind_1,snd_bkwind_2,snd_darkwind_1,snd_dogs_1,snd_gunshots_1,snd_crows_1,snd_moans_1
+
+[ambient_env_stancia2]
+sound_period		= 5, 10					; <from,to>				(sec)
+sound_dist			= 30, 60
+sounds				= ambient\rnd_outdoor\rnd_darkwind1,ambient\rnd_outdoor\rnd_darkwind2,ambient\rnd_outdoor\rnd_darkwind3,ambient\rnd_outdoor\rnd_darkwind4,ambient\rnd_outdoor\rnd_darkwind5,ambient\rnd_outdoor\rnd_dark,ambient\rnd_outdoor\rnd_dark1,ambient\rnd_outdoor\rnd_dark2,ambient\rnd_outdoor\rnd_dark3,ambient\rnd_outdoor\rnd_dark4,ambient\rnd_outdoor\rnd_dark5,ambient\rnd_outdoor\rnd_rock1,ambient\rnd_outdoor\rnd_rock2,ambient\rnd_outdoor\rnd_rock3,ambient\rnd_outdoor\rnd_rock4,ambient\rnd_outdoor\rnd_drone2,ambient\rnd_outdoor\rnd_drone1,ambient\rnd_outdoor\rnd_drone2
+effect_period		= 10, 20					; <from,to>				(sec)
+effects				= ae0_effect_1,ae0_effect_2, ae0_effect_3,ae0_effect_4,ae0_effect_5,ae0_effect_6,ae0_effect_7,ae0_effect_8,ae0_effect_9	; <eff0,eff1..effN>		effects sect name
+
+[ae0_effect_0]
+life_time			= 10													; life time (sec)
+particles			= nature\fog_stormy								; particle name
+sound					= ambient\rnd_outdoor\rnd_wind_3				; sound name
+offset				= 0,0,0												; offset from actor camera
+wind_gust_factor	= 0.015
+
+[ae0_effect_1]
+life_time			= 7
+particles			= nature\fog_stormy_02
+sound					= ambient\rnd_outdoor\rnd_wind_2
+offset				= 0,0,0
+wind_gust_factor	= 0.0155
+
+[ae0_effect_2]
+life_time			= 10
+particles			= nature\fog_tornado_01
+sound					= ambient\rnd_outdoor\rnd_wind_3
+offset				= 0,0,10
+wind_gust_factor	= 0.0155
+
+[ae0_effect_3]
+life_time			= 10
+particles			= nature\fog_tornado_00
+sound					= ambient\rnd_outdoor\rnd_wind_3
+offset				= 0,0,0
+wind_gust_factor	= 0.015
+
+[ae0_effect_4]
+life_time			= 15
+particles			= nature\fog_foggy_00
+sound					= ambient\rnd_outdoor\rnd_wind_2
+offset				= 0,0,0
+wind_gust_factor	= 0.015
+
+[ae0_effect_5]
+life_time			= 7
+particles			= nature\vortex_01
+sound		 			= ambient\rnd_outdoor\rnd_wind_2
+offset				= 0,0,25
+wind_gust_factor	= 0.03
+
+[ae0_effect_6]
+life_time			= 7
+particles			= nature\fog_stormy_01
+sound					= ambient\rnd_outdoor\rnd_wind_1
+offset				= 0,0,0
+wind_gust_factor	= 0.02
+
+[ae0_effect_7]
+life_time			= 8
+particles			= nature\fog_stormy_02
+sound					= ambient\rnd_outdoor\rnd_wind_1
+offset				= 0,0,15
+wind_gust_factor	= 0.025
+
+[ae0_effect_8]
+life_time			= 7
+particles			= nature\fog_stormy_00
+sound			 		= ambient\rnd_outdoor\rnd_wind_2
+offset				= 0,0,0
+wind_gust_factor	= 0.01
+
+[ae0_effect_9]
+life_time			= 10
+particles			= nature\fog_stormy_01
+sound			 		= ambient\rnd_outdoor\rnd_wind_3
+offset				= 0,0,0
+wind_gust_factor	= 0.03
+
+
+
+
+
+

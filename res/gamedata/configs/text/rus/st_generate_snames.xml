@@ -1,0 +1,4836 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="lname_bandit_0">
+		<text>Сивый</text>
+	</string>
+	<string id="lname_bandit_1">
+		<text>Бешеный</text>
+	</string>
+	<string id="lname_bandit_10">
+		<text>Гнилой</text>
+	</string>
+	<string id="lname_bandit_100">
+		<text>Чебурек</text>
+	</string>
+	<string id="lname_bandit_101">
+		<text>Шпион</text>
+	</string>
+	<string id="lname_bandit_102">
+		<text>Бизон</text>
+	</string>
+	<string id="lname_bandit_103">
+		<text>Бобёр</text>
+	</string>
+	<string id="lname_bandit_104">
+		<text>Бульдог</text>
+	</string>
+	<string id="lname_bandit_105">
+		<text>Бык</text>
+	</string>
+	<string id="lname_bandit_106">
+		<text>Воробей</text>
+	</string>
+	<string id="lname_bandit_107">
+		<text>Дятел</text>
+	</string>
+	<string id="lname_bandit_108">
+		<text>Зверь</text>
+	</string>
+	<string id="lname_bandit_109">
+		<text>Колдун</text>
+	</string>
+	<string id="lname_bandit_11">
+		<text>Горбун</text>
+	</string>
+	<string id="lname_bandit_110">
+		<text>Кабан</text>
+	</string>
+	<string id="lname_bandit_111">
+		<text>Карась</text>
+	</string>
+	<string id="lname_bandit_112">
+		<text>Кенарь</text>
+	</string>
+	<string id="lname_bandit_113">
+		<text>Клоп</text>
+	</string>
+	<string id="lname_bandit_114">
+		<text>Легавый</text>
+	</string>
+	<string id="lname_bandit_115">
+		<text>Лось</text>
+	</string>
+	<string id="lname_bandit_116">
+		<text>Пацюк</text>
+	</string>
+	<string id="lname_bandit_117">
+		<text>Удав</text>
+	</string>
+	<string id="lname_bandit_118">
+		<text>Батон</text>
+	</string>
+	<string id="lname_bandit_119">
+		<text>Битый</text>
+	</string>
+	<string id="lname_bandit_12">
+		<text>Длинный</text>
+	</string>
+	<string id="lname_bandit_120">
+		<text>Беспредел</text>
+	</string>
+	<string id="lname_bandit_121">
+		<text>Болт</text>
+	</string>
+	<string id="lname_bandit_122">
+		<text>Бритва</text>
+	</string>
+	<string id="lname_bandit_123">
+		<text>Бубен</text>
+	</string>
+	<string id="lname_bandit_124">
+		<text>Хлам</text>
+	</string>
+	<string id="lname_bandit_125">
+		<text>Винт</text>
+	</string>
+	<string id="lname_bandit_126">
+		<text>Динамит</text>
+	</string>
+	<string id="lname_bandit_127">
+		<text>Козырь</text>
+	</string>
+	<string id="lname_bandit_128">
+		<text>Лопата</text>
+	</string>
+	<string id="lname_bandit_129">
+		<text>Косяк</text>
+	</string>
+	<string id="lname_bandit_13">
+		<text>Дохлый</text>
+	</string>
+	<string id="lname_bandit_130">
+		<text>Крест</text>
+	</string>
+	<string id="lname_bandit_131">
+		<text>Рубероид</text>
+	</string>
+	<string id="lname_bandit_132">
+		<text>Лапоть</text>
+	</string>
+	<string id="lname_bandit_133">
+		<text>Лом</text>
+	</string>
+	<string id="lname_bandit_134">
+		<text>Панадол</text>
+	</string>
+	<string id="lname_bandit_135">
+		<text>Перо</text>
+	</string>
+	<string id="lname_bandit_136">
+		<text>Пистон</text>
+	</string>
+	<string id="lname_bandit_137">
+		<text>Пятак</text>
+	</string>
+	<string id="lname_bandit_138">
+		<text>Решка</text>
+	</string>
+	<string id="lname_bandit_139">
+		<text>Смерть</text>
+	</string>
+	<string id="lname_bandit_14">
+		<text>Доходяга</text>
+	</string>
+	<string id="lname_bandit_140">
+		<text>Точило</text>
+	</string>
+	<string id="lname_bandit_141">
+		<text>Туз</text>
+	</string>
+	<string id="lname_bandit_142">
+		<text>Чекан</text>
+	</string>
+	<string id="lname_bandit_143">
+		<text>Чучело</text>
+	</string>
+	<string id="lname_bandit_144">
+		<text>Шкет</text>
+	</string>
+	<string id="lname_bandit_145">
+		<text>Шпала</text>
+	</string>
+	<string id="lname_bandit_146">
+		<text>Штырь</text>
+	</string>
+	<string id="lname_bandit_147">
+		<text>Шухер</text>
+	</string>
+	<string id="lname_bandit_148">
+		<text>Кулак</text>
+	</string>
+	<string id="lname_bandit_149">
+		<text>Синяк</text>
+	</string>
+	<string id="lname_bandit_15">
+		<text>Дохляк</text>
+	</string>
+	<string id="lname_bandit_150">
+		<text>Бармалей</text>
+	</string>
+	<string id="lname_bandit_151">
+		<text>Батый</text>
+	</string>
+	<string id="lname_bandit_152">
+		<text>Кащей</text>
+	</string>
+	<string id="lname_bandit_153">
+		<text>Рэмбо</text>
+	</string>
+	<string id="lname_bandit_154">
+		<text>Сусанин</text>
+	</string>
+	<string id="lname_bandit_155">
+		<text>Терминатор</text>
+	</string>
+	<string id="lname_bandit_156">
+		<text>Чапай</text>
+	</string>
+	<string id="lname_bandit_157">
+		<text>Чингиз</text>
+	</string>
+	<string id="lname_bandit_158">
+		<text>Банан</text>
+	</string>
+	<string id="lname_bandit_159">
+		<text>Батон</text>
+	</string>
+	<string id="lname_bandit_16">
+		<text>Дырявый</text>
+	</string>
+	<string id="lname_bandit_160">
+		<text>Батя</text>
+	</string>
+	<string id="lname_bandit_161">
+		<text>Баян</text>
+	</string>
+	<string id="lname_bandit_162">
+		<text>Братан</text>
+	</string>
+	<string id="lname_bandit_163">
+		<text>Гангрена</text>
+	</string>
+	<string id="lname_bandit_164">
+		<text>Глюк</text>
+	</string>
+	<string id="lname_bandit_165">
+		<text>Градус</text>
+	</string>
+	<string id="lname_bandit_166">
+		<text>Сайгак</text>
+	</string>
+	<string id="lname_bandit_167">
+		<text>Звиздец</text>
+	</string>
+	<string id="lname_bandit_168">
+		<text>Изгой</text>
+	</string>
+	<string id="lname_bandit_169">
+		<text>Холодец</text>
+	</string>
+	<string id="lname_bandit_17">
+		<text>Жжёный</text>
+	</string>
+	<string id="lname_bandit_170">
+		<text>Козырь</text>
+	</string>
+	<string id="lname_bandit_171">
+		<text>Косяк</text>
+	</string>
+	<string id="lname_bandit_172">
+		<text>Лапоть</text>
+	</string>
+	<string id="lname_bandit_173">
+		<text>Леший</text>
+	</string>
+	<string id="lname_bandit_174">
+		<text>Мавр</text>
+	</string>
+	<string id="lname_bandit_175">
+		<text>Ништяк</text>
+	</string>
+	<string id="lname_bandit_176">
+		<text>Облом</text>
+	</string>
+	<string id="lname_bandit_177">
+		<text>Пельмень</text>
+	</string>
+	<string id="lname_bandit_178">
+		<text>Перец</text>
+	</string>
+	<string id="lname_bandit_179">
+		<text>Рашпиль</text>
+	</string>
+	<string id="lname_bandit_18">
+		<text>Жирдяй</text>
+	</string>
+	<string id="lname_bandit_180">
+		<text>Сухарь</text>
+	</string>
+	<string id="lname_bandit_181">
+		<text>Упырь</text>
+	</string>
+	<string id="lname_bandit_19">
+		<text>Жлоб</text>
+	</string>
+	<string id="lname_bandit_2">
+		<text>Битый</text>
+	</string>
+	<string id="lname_bandit_20">
+		<text>Жмот</text>
+	</string>
+	<string id="lname_bandit_21">
+		<text>Жмур</text>
+	</string>
+	<string id="lname_bandit_22">
+		<text>Изверг</text>
+	</string>
+	<string id="lname_bandit_23">
+		<text>Калека</text>
+	</string>
+	<string id="lname_bandit_24">
+		<text>Колотун</text>
+	</string>
+	<string id="lname_bandit_25">
+		<text>Косой</text>
+	</string>
+	<string id="lname_bandit_26">
+		<text>Кривой</text>
+	</string>
+	<string id="lname_bandit_27">
+		<text>Ловкач</text>
+	</string>
+	<string id="lname_bandit_28">
+		<text>Лысый</text>
+	</string>
+	<string id="lname_bandit_29">
+		<text>Лютый</text>
+	</string>
+	<string id="lname_bandit_3">
+		<text>Блатной</text>
+	</string>
+	<string id="lname_bandit_30">
+		<text>Местный</text>
+	</string>
+	<string id="lname_bandit_31">
+		<text>Мутный</text>
+	</string>
+	<string id="lname_bandit_32">
+		<text>Мятый</text>
+	</string>
+	<string id="lname_bandit_33">
+		<text>Одноглазый</text>
+	</string>
+	<string id="lname_bandit_34">
+		<text>Падла</text>
+	</string>
+	<string id="lname_bandit_35">
+		<text>Паразит</text>
+	</string>
+	<string id="lname_bandit_36">
+		<text>Пижон</text>
+	</string>
+	<string id="lname_bandit_37">
+		<text>Подлец</text>
+	</string>
+	<string id="lname_bandit_38">
+		<text>Покойник</text>
+	</string>
+	<string id="lname_bandit_39">
+		<text>Псих</text>
+	</string>
+	<string id="lname_bandit_4">
+		<text>Болтун</text>
+	</string>
+	<string id="lname_bandit_40">
+		<text>Рваный</text>
+	</string>
+	<string id="lname_bandit_41">
+		<text>Рвач</text>
+	</string>
+	<string id="lname_bandit_42">
+		<text>Слепой</text>
+	</string>
+	<string id="lname_bandit_43">
+		<text>Сопля</text>
+	</string>
+	<string id="lname_bandit_44">
+		<text>Стиляга</text>
+	</string>
+	<string id="lname_bandit_45">
+		<text>Столичный</text>
+	</string>
+	<string id="lname_bandit_46">
+		<text>Трупак</text>
+	</string>
+	<string id="lname_bandit_47">
+		<text>Ухарь</text>
+	</string>
+	<string id="lname_bandit_48">
+		<text>Ушастый</text>
+	</string>
+	<string id="lname_bandit_49">
+		<text>Хохмач</text>
+	</string>
+	<string id="lname_bandit_5">
+		<text>Борзой</text>
+	</string>
+	<string id="lname_bandit_50">
+		<text>Хромой</text>
+	</string>
+	<string id="lname_bandit_51">
+		<text>Хроник</text>
+	</string>
+	<string id="lname_bandit_52">
+		<text>Шалый</text>
+	</string>
+	<string id="lname_bandit_53">
+		<text>Эстет</text>
+	</string>
+	<string id="lname_bandit_54">
+		<text>Ядрёный</text>
+	</string>
+	<string id="lname_bandit_55">
+		<text>Адвокат</text>
+	</string>
+	<string id="lname_bandit_56">
+		<text>Айболит</text>
+	</string>
+	<string id="lname_bandit_57">
+		<text>Артист</text>
+	</string>
+	<string id="lname_bandit_58">
+		<text>Аферист</text>
+	</string>
+	<string id="lname_bandit_59">
+		<text>Банкир</text>
+	</string>
+	<string id="lname_bandit_6">
+		<text>Босяк</text>
+	</string>
+	<string id="lname_bandit_60">
+		<text>Барон</text>
+	</string>
+	<string id="lname_bandit_61">
+		<text>Барыга</text>
+	</string>
+	<string id="lname_bandit_62">
+		<text>Басурман</text>
+	</string>
+	<string id="lname_bandit_63">
+		<text>Бомж</text>
+	</string>
+	<string id="lname_bandit_64">
+		<text>Боцман</text>
+	</string>
+	<string id="lname_bandit_65">
+		<text>Пигмей</text>
+	</string>
+	<string id="lname_bandit_66">
+		<text>Бурбон</text>
+	</string>
+	<string id="lname_bandit_67">
+		<text>Буржуй</text>
+	</string>
+	<string id="lname_bandit_68">
+		<text>Водила</text>
+	</string>
+	<string id="lname_bandit_69">
+		<text>Вор</text>
+	</string>
+	<string id="lname_bandit_7">
+		<text>Бритый</text>
+	</string>
+	<string id="lname_bandit_70">
+		<text>Гангстер</text>
+	</string>
+	<string id="lname_bandit_71">
+		<text>Гонец</text>
+	</string>
+	<string id="lname_bandit_72">
+		<text>Граф</text>
+	</string>
+	<string id="lname_bandit_73">
+		<text>Деспот</text>
+	</string>
+	<string id="lname_bandit_74">
+		<text>Дикарь</text>
+	</string>
+	<string id="lname_bandit_75">
+		<text>Душитель</text>
+	</string>
+	<string id="lname_bandit_76">
+		<text>Законник</text>
+	</string>
+	<string id="lname_bandit_77">
+		<text>Игрок</text>
+	</string>
+	<string id="lname_bandit_78">
+		<text>Кидала</text>
+	</string>
+	<string id="lname_bandit_79">
+		<text>Крёстный отец</text>
+	</string>
+	<string id="lname_bandit_8">
+		<text>Бывалый</text>
+	</string>
+	<string id="lname_bandit_80">
+		<text>Кучер</text>
+	</string>
+	<string id="lname_bandit_81">
+		<text>Мажор</text>
+	</string>
+	<string id="lname_bandit_82">
+		<text>Маньяк</text>
+	</string>
+	<string id="lname_bandit_83">
+		<text>Могильщик</text>
+	</string>
+	<string id="lname_bandit_84">
+		<text>Мясник</text>
+	</string>
+	<string id="lname_bandit_85">
+		<text>Ниндзя</text>
+	</string>
+	<string id="lname_bandit_86">
+		<text>Палач</text>
+	</string>
+	<string id="lname_bandit_87">
+		<text>Панк</text>
+	</string>
+	<string id="lname_bandit_88">
+		<text>Партизан</text>
+	</string>
+	<string id="lname_bandit_89">
+		<text>Пацифист</text>
+	</string>
+	<string id="lname_bandit_9">
+		<text>Глыба</text>
+	</string>
+	<string id="lname_bandit_90">
+		<text>Пират</text>
+	</string>
+	<string id="lname_bandit_91">
+		<text>Поджигатель</text>
+	</string>
+	<string id="lname_bandit_92">
+		<text>Принц</text>
+	</string>
+	<string id="lname_bandit_93">
+		<text>Разбойник</text>
+	</string>
+	<string id="lname_bandit_94">
+		<text>Смертник</text>
+	</string>
+	<string id="lname_bandit_95">
+		<text>Сутенёр</text>
+	</string>
+	<string id="lname_bandit_96">
+		<text>Тиран</text>
+	</string>
+	<string id="lname_bandit_97">
+		<text>Убийца</text>
+	</string>
+	<string id="lname_bandit_98">
+		<text>Фагот</text>
+	</string>
+	<string id="lname_bandit_99">
+		<text>Химик</text>
+	</string>
+	<string id="lname_captain_0">
+		<text>Абдурхманов</text>
+	</string>
+	<string id="lname_captain_1">
+		<text>Алтынник</text>
+	</string>
+	<string id="lname_captain_10">
+		<text>Барсак</text>
+	</string>
+	<string id="lname_captain_100">
+		<text>Киреев</text>
+	</string>
+	<string id="lname_captain_101">
+		<text>Щербин</text>
+	</string>
+	<string id="lname_captain_102">
+		<text>Ковальчук</text>
+	</string>
+	<string id="lname_captain_103">
+		<text>Коев</text>
+	</string>
+	<string id="lname_captain_104">
+		<text>Козлов</text>
+	</string>
+	<string id="lname_captain_105">
+		<text>Колонтарёв</text>
+	</string>
+	<string id="lname_captain_106">
+		<text>Колонтарь</text>
+	</string>
+	<string id="lname_captain_107">
+		<text>Кондратенко</text>
+	</string>
+	<string id="lname_captain_108">
+		<text>Коркин</text>
+	</string>
+	<string id="lname_captain_109">
+		<text>Корнеев</text>
+	</string>
+	<string id="lname_captain_11">
+		<text>Баул</text>
+	</string>
+	<string id="lname_captain_110">
+		<text>Кравченко</text>
+	</string>
+	<string id="lname_captain_111">
+		<text>Кривда</text>
+	</string>
+	<string id="lname_captain_112">
+		<text>Кривохатский</text>
+	</string>
+	<string id="lname_captain_113">
+		<text>Кузнецов</text>
+	</string>
+	<string id="lname_captain_114">
+		<text>Кузьмич</text>
+	</string>
+	<string id="lname_captain_115">
+		<text>Кузякин</text>
+	</string>
+	<string id="lname_captain_116">
+		<text>Кульчитский</text>
+	</string>
+	<string id="lname_captain_117">
+		<text>Кунцев</text>
+	</string>
+	<string id="lname_captain_118">
+		<text>Курвиц</text>
+	</string>
+	<string id="lname_captain_119">
+		<text>Кучерук</text>
+	</string>
+	<string id="lname_captain_12">
+		<text>Башаков</text>
+	</string>
+	<string id="lname_captain_120">
+		<text>Кушнарёв</text>
+	</string>
+	<string id="lname_captain_121">
+		<text>Кхаладзе</text>
+	</string>
+	<string id="lname_captain_122">
+		<text>Лаврик</text>
+	</string>
+	<string id="lname_captain_123">
+		<text>Лавров</text>
+	</string>
+	<string id="lname_captain_124">
+		<text>Лившиц</text>
+	</string>
+	<string id="lname_captain_125">
+		<text>Лисичанский</text>
+	</string>
+	<string id="lname_captain_126">
+		<text>Литвин</text>
+	</string>
+	<string id="lname_captain_127">
+		<text>Лымаренко</text>
+	</string>
+	<string id="lname_captain_128">
+		<text>Мазепа</text>
+	</string>
+	<string id="lname_captain_129">
+		<text>Макаренко</text>
+	</string>
+	<string id="lname_captain_13">
+		<text>Башмаков</text>
+	</string>
+	<string id="lname_captain_130">
+		<text>Мальцев</text>
+	</string>
+	<string id="lname_captain_131">
+		<text>Мамаев</text>
+	</string>
+	<string id="lname_captain_132">
+		<text>Мерзляев</text>
+	</string>
+	<string id="lname_captain_133">
+		<text>Мильченко</text>
+	</string>
+	<string id="lname_captain_134">
+		<text>Миронюк</text>
+	</string>
+	<string id="lname_captain_135">
+		<text>Морер</text>
+	</string>
+	<string id="lname_captain_136">
+		<text>Крыга</text>
+	</string>
+	<string id="lname_captain_137">
+		<text>Мостовой</text>
+	</string>
+	<string id="lname_captain_138">
+		<text>Мунтян</text>
+	</string>
+	<string id="lname_captain_139">
+		<text>Мухамедов</text>
+	</string>
+	<string id="lname_captain_14">
+		<text>Бешевлий</text>
+	</string>
+	<string id="lname_captain_140">
+		<text>Мыськов</text>
+	</string>
+	<string id="lname_captain_141">
+		<text>Навроцкий</text>
+	</string>
+	<string id="lname_captain_142">
+		<text>Неприцкий</text>
+	</string>
+	<string id="lname_captain_143">
+		<text>Никаноров</text>
+	</string>
+	<string id="lname_captain_144">
+		<text>Никешин</text>
+	</string>
+	<string id="lname_captain_145">
+		<text>Никулин</text>
+	</string>
+	<string id="lname_captain_146">
+		<text>Фуцин</text>
+	</string>
+	<string id="lname_captain_147">
+		<text>Нордиев</text>
+	</string>
+	<string id="lname_captain_148">
+		<text>Носань</text>
+	</string>
+	<string id="lname_captain_149">
+		<text>Ополев</text>
+	</string>
+	<string id="lname_captain_15">
+		<text>Биноев</text>
+	</string>
+	<string id="lname_captain_150">
+		<text>Орлевич</text>
+	</string>
+	<string id="lname_captain_151">
+		<text>Орлов</text>
+	</string>
+	<string id="lname_captain_152">
+		<text>Петкевич</text>
+	</string>
+	<string id="lname_captain_153">
+		<text>Петренко</text>
+	</string>
+	<string id="lname_captain_154">
+		<text>Петров</text>
+	</string>
+	<string id="lname_captain_155">
+		<text>Плохенко</text>
+	</string>
+	<string id="lname_captain_156">
+		<text>Подячев</text>
+	</string>
+	<string id="lname_captain_157">
+		<text>Полянин</text>
+	</string>
+	<string id="lname_captain_158">
+		<text>Поплавский</text>
+	</string>
+	<string id="lname_captain_159">
+		<text>Попов</text>
+	</string>
+	<string id="lname_captain_16">
+		<text>Блинов</text>
+	</string>
+	<string id="lname_captain_160">
+		<text>Портных</text>
+	</string>
+	<string id="lname_captain_161">
+		<text>Прасолов</text>
+	</string>
+	<string id="lname_captain_162">
+		<text>Прокопенко</text>
+	</string>
+	<string id="lname_captain_163">
+		<text>Проскурин</text>
+	</string>
+	<string id="lname_captain_164">
+		<text>Проценко</text>
+	</string>
+	<string id="lname_captain_165">
+		<text>Прудов</text>
+	</string>
+	<string id="lname_captain_166">
+		<text>Пустовар</text>
+	</string>
+	<string id="lname_captain_167">
+		<text>Пучек</text>
+	</string>
+	<string id="lname_captain_168">
+		<text>Рабинович</text>
+	</string>
+	<string id="lname_captain_169">
+		<text>Радкевич</text>
+	</string>
+	<string id="lname_captain_17">
+		<text>Бобров</text>
+	</string>
+	<string id="lname_captain_170">
+		<text>Резун</text>
+	</string>
+	<string id="lname_captain_171">
+		<text>Рогоза</text>
+	</string>
+	<string id="lname_captain_172">
+		<text>Роднянский</text>
+	</string>
+	<string id="lname_captain_173">
+		<text>Ротань</text>
+	</string>
+	<string id="lname_captain_174">
+		<text>Рублев</text>
+	</string>
+	<string id="lname_captain_175">
+		<text>Рудик</text>
+	</string>
+	<string id="lname_captain_176">
+		<text>Русанов</text>
+	</string>
+	<string id="lname_captain_177">
+		<text>Рычагирский</text>
+	</string>
+	<string id="lname_captain_178">
+		<text>Савченко</text>
+	</string>
+	<string id="lname_captain_179">
+		<text>Савчук</text>
+	</string>
+	<string id="lname_captain_18">
+		<text>Богданов</text>
+	</string>
+	<string id="lname_captain_180">
+		<text>Сагитов</text>
+	</string>
+	<string id="lname_captain_181">
+		<text>Свиридов</text>
+	</string>
+	<string id="lname_captain_182">
+		<text>Седых</text>
+	</string>
+	<string id="lname_captain_183">
+		<text>Середа</text>
+	</string>
+	<string id="lname_captain_184">
+		<text>Сидоренко</text>
+	</string>
+	<string id="lname_captain_185">
+		<text>Сидоров</text>
+	</string>
+	<string id="lname_captain_186">
+		<text>Синий</text>
+	</string>
+	<string id="lname_captain_187">
+		<text>Синицын</text>
+	</string>
+	<string id="lname_captain_188">
+		<text>Скамейка</text>
+	</string>
+	<string id="lname_captain_189">
+		<text>Слуцкий</text>
+	</string>
+	<string id="lname_captain_19">
+		<text>Бойко</text>
+	</string>
+	<string id="lname_captain_190">
+		<text>Смелов</text>
+	</string>
+	<string id="lname_captain_191">
+		<text>Смолий</text>
+	</string>
+	<string id="lname_captain_192">
+		<text>Сорокин</text>
+	</string>
+	<string id="lname_captain_193">
+		<text>Стацюра</text>
+	</string>
+	<string id="lname_captain_194">
+		<text>Степчин</text>
+	</string>
+	<string id="lname_captain_195">
+		<text>Стычинский</text>
+	</string>
+	<string id="lname_captain_196">
+		<text>Сыкула</text>
+	</string>
+	<string id="lname_captain_197">
+		<text>Тарнавский</text>
+	</string>
+	<string id="lname_captain_198">
+		<text>Татарчук</text>
+	</string>
+	<string id="lname_captain_199">
+		<text>Тимчук</text>
+	</string>
+	<string id="lname_captain_2">
+		<text>Андрейчук</text>
+	</string>
+	<string id="lname_captain_20">
+		<text>Бойченко</text>
+	</string>
+	<string id="lname_captain_21">
+		<text>Болдескул</text>
+	</string>
+	<string id="lname_captain_22">
+		<text>Бондарев</text>
+	</string>
+	<string id="lname_captain_23">
+		<text>Борисов</text>
+	</string>
+	<string id="lname_captain_24">
+		<text>Брич</text>
+	</string>
+	<string id="lname_captain_25">
+		<text>Бронштейн</text>
+	</string>
+	<string id="lname_captain_26">
+		<text>Буряк</text>
+	</string>
+	<string id="lname_captain_27">
+		<text>Бутурин</text>
+	</string>
+	<string id="lname_captain_28">
+		<text>Бяло</text>
+	</string>
+	<string id="lname_captain_29">
+		<text>Валентинов</text>
+	</string>
+	<string id="lname_captain_3">
+		<text>Андрущенко</text>
+	</string>
+	<string id="lname_captain_30">
+		<text>Васильев</text>
+	</string>
+	<string id="lname_captain_31">
+		<text>Веселов</text>
+	</string>
+	<string id="lname_captain_32">
+		<text>Виноградов</text>
+	</string>
+	<string id="lname_captain_33">
+		<text>Вовненко</text>
+	</string>
+	<string id="lname_captain_34">
+		<text>Воланчук</text>
+	</string>
+	<string id="lname_captain_35">
+		<text>Володарь</text>
+	</string>
+	<string id="lname_captain_36">
+		<text>Волошин</text>
+	</string>
+	<string id="lname_captain_37">
+		<text>Воронцов</text>
+	</string>
+	<string id="lname_captain_38">
+		<text>Ворохаев</text>
+	</string>
+	<string id="lname_captain_39">
+		<text>Вьюшинский</text>
+	</string>
+	<string id="lname_captain_4">
+		<text>Анисьев</text>
+	</string>
+	<string id="lname_captain_40">
+		<text>Галкин</text>
+	</string>
+	<string id="lname_captain_41">
+		<text>Ганзюк</text>
+	</string>
+	<string id="lname_captain_42">
+		<text>Гарковенко</text>
+	</string>
+	<string id="lname_captain_43">
+		<text>Гаркуша</text>
+	</string>
+	<string id="lname_captain_44">
+		<text>Георгов</text>
+	</string>
+	<string id="lname_captain_45">
+		<text>Глебовский</text>
+	</string>
+	<string id="lname_captain_46">
+		<text>Гнатюк</text>
+	</string>
+	<string id="lname_captain_47">
+		<text>Гончаренко</text>
+	</string>
+	<string id="lname_captain_48">
+		<text>Гордиенко</text>
+	</string>
+	<string id="lname_captain_49">
+		<text>Горлевой</text>
+	</string>
+	<string id="lname_captain_5">
+		<text>Ардашев</text>
+	</string>
+	<string id="lname_captain_50">
+		<text>Горохин</text>
+	</string>
+	<string id="lname_captain_51">
+		<text>Горюнов</text>
+	</string>
+	<string id="lname_captain_52">
+		<text>Гребенюк</text>
+	</string>
+	<string id="lname_captain_53">
+		<text>Грицаенко</text>
+	</string>
+	<string id="lname_captain_54">
+		<text>Грицай</text>
+	</string>
+	<string id="lname_captain_55">
+		<text>Гриценков</text>
+	</string>
+	<string id="lname_captain_56">
+		<text>Гришачев</text>
+	</string>
+	<string id="lname_captain_57">
+		<text>Грищук</text>
+	</string>
+	<string id="lname_captain_58">
+		<text>Губар</text>
+	</string>
+	<string id="lname_captain_59">
+		<text>Гунько</text>
+	</string>
+	<string id="lname_captain_6">
+		<text>Бабич</text>
+	</string>
+	<string id="lname_captain_60">
+		<text>Гуревич</text>
+	</string>
+	<string id="lname_captain_61">
+		<text>Денисенко</text>
+	</string>
+	<string id="lname_captain_62">
+		<text>Довгалюк</text>
+	</string>
+	<string id="lname_captain_63">
+		<text>Домбрик</text>
+	</string>
+	<string id="lname_captain_64">
+		<text>Доценко</text>
+	</string>
+	<string id="lname_captain_65">
+		<text>Дроздуш</text>
+	</string>
+	<string id="lname_captain_66">
+		<text>Дубенчук</text>
+	</string>
+	<string id="lname_captain_67">
+		<text>Дудоров</text>
+	</string>
+	<string id="lname_captain_68">
+		<text>Дука</text>
+	</string>
+	<string id="lname_captain_69">
+		<text>Думко</text>
+	</string>
+	<string id="lname_captain_7">
+		<text>Балан</text>
+	</string>
+	<string id="lname_captain_70">
+		<text>Дунаев</text>
+	</string>
+	<string id="lname_captain_71">
+		<text>Дыклов</text>
+	</string>
+	<string id="lname_captain_72">
+		<text>Ерофеев</text>
+	</string>
+	<string id="lname_captain_73">
+		<text>Ефремов</text>
+	</string>
+	<string id="lname_captain_74">
+		<text>Жабенко</text>
+	</string>
+	<string id="lname_captain_75">
+		<text>Жмыев</text>
+	</string>
+	<string id="lname_captain_76">
+		<text>Жураковский</text>
+	</string>
+	<string id="lname_captain_77">
+		<text>Забыйягода</text>
+	</string>
+	<string id="lname_captain_78">
+		<text>Загороднюк</text>
+	</string>
+	<string id="lname_captain_79">
+		<text>Замосенчук</text>
+	</string>
+	<string id="lname_captain_8">
+		<text>Баранов</text>
+	</string>
+	<string id="lname_captain_80">
+		<text>Зарубин</text>
+	</string>
+	<string id="lname_captain_81">
+		<text>Захарин</text>
+	</string>
+	<string id="lname_captain_82">
+		<text>Звонницкий</text>
+	</string>
+	<string id="lname_captain_83">
+		<text>Зиновьев</text>
+	</string>
+	<string id="lname_captain_84">
+		<text>Зозо</text>
+	</string>
+	<string id="lname_captain_85">
+		<text>Золотарь</text>
+	</string>
+	<string id="lname_captain_86">
+		<text>Зубарев</text>
+	</string>
+	<string id="lname_captain_87">
+		<text>Зубков</text>
+	</string>
+	<string id="lname_captain_88">
+		<text>Иванов</text>
+	</string>
+	<string id="lname_captain_89">
+		<text>Игнатенко</text>
+	</string>
+	<string id="lname_captain_9">
+		<text>Барановский</text>
+	</string>
+	<string id="lname_captain_90">
+		<text>Иженко</text>
+	</string>
+	<string id="lname_captain_91">
+		<text>Ищук</text>
+	</string>
+	<string id="lname_captain_92">
+		<text>Казаков</text>
+	</string>
+	<string id="lname_captain_93">
+		<text>Казанцев</text>
+	</string>
+	<string id="lname_captain_94">
+		<text>Кандыбабко</text>
+	</string>
+	<string id="lname_captain_95">
+		<text>Капука</text>
+	</string>
+	<string id="lname_captain_96">
+		<text>Капустянко</text>
+	</string>
+	<string id="lname_captain_97">
+		<text>Кац</text>
+	</string>
+	<string id="lname_captain_98">
+		<text>Кикабидзе</text>
+	</string>
+	<string id="lname_captain_99">
+		<text>Гацула</text>
+	</string>
+	<string id="lname_lieutenant_0">
+		<text>Абдурхманов</text>
+	</string>
+	<string id="lname_lieutenant_1">
+		<text>Алтынник</text>
+	</string>
+	<string id="lname_lieutenant_10">
+		<text>Барсак</text>
+	</string>
+	<string id="lname_lieutenant_100">
+		<text>Киреев</text>
+	</string>
+	<string id="lname_lieutenant_101">
+		<text>Щербин</text>
+	</string>
+	<string id="lname_lieutenant_102">
+		<text>Ковальчук</text>
+	</string>
+	<string id="lname_lieutenant_103">
+		<text>Коев</text>
+	</string>
+	<string id="lname_lieutenant_104">
+		<text>Козлов</text>
+	</string>
+	<string id="lname_lieutenant_105">
+		<text>Колонтарёв</text>
+	</string>
+	<string id="lname_lieutenant_106">
+		<text>Колонтарь</text>
+	</string>
+	<string id="lname_lieutenant_107">
+		<text>Кондратенко</text>
+	</string>
+	<string id="lname_lieutenant_108">
+		<text>Коркин</text>
+	</string>
+	<string id="lname_lieutenant_109">
+		<text>Корнеев</text>
+	</string>
+	<string id="lname_lieutenant_11">
+		<text>Баул</text>
+	</string>
+	<string id="lname_lieutenant_110">
+		<text>Кравченко</text>
+	</string>
+	<string id="lname_lieutenant_111">
+		<text>Кривда</text>
+	</string>
+	<string id="lname_lieutenant_112">
+		<text>Кривохатский</text>
+	</string>
+	<string id="lname_lieutenant_113">
+		<text>Кузнецов</text>
+	</string>
+	<string id="lname_lieutenant_114">
+		<text>Кузьмич</text>
+	</string>
+	<string id="lname_lieutenant_115">
+		<text>Кузякин</text>
+	</string>
+	<string id="lname_lieutenant_116">
+		<text>Кульчитский</text>
+	</string>
+	<string id="lname_lieutenant_117">
+		<text>Кунцев</text>
+	</string>
+	<string id="lname_lieutenant_118">
+		<text>Курвиц</text>
+	</string>
+	<string id="lname_lieutenant_119">
+		<text>Кучерук</text>
+	</string>
+	<string id="lname_lieutenant_12">
+		<text>Башаков</text>
+	</string>
+	<string id="lname_lieutenant_120">
+		<text>Кушнарёв</text>
+	</string>
+	<string id="lname_lieutenant_121">
+		<text>Кхаладзе</text>
+	</string>
+	<string id="lname_lieutenant_122">
+		<text>Лаврик</text>
+	</string>
+	<string id="lname_lieutenant_123">
+		<text>Лавров</text>
+	</string>
+	<string id="lname_lieutenant_124">
+		<text>Лившиц</text>
+	</string>
+	<string id="lname_lieutenant_125">
+		<text>Лисичанский</text>
+	</string>
+	<string id="lname_lieutenant_126">
+		<text>Литвин</text>
+	</string>
+	<string id="lname_lieutenant_127">
+		<text>Лымаренко</text>
+	</string>
+	<string id="lname_lieutenant_128">
+		<text>Мазепа</text>
+	</string>
+	<string id="lname_lieutenant_129">
+		<text>Макаренко</text>
+	</string>
+	<string id="lname_lieutenant_13">
+		<text>Башмаков</text>
+	</string>
+	<string id="lname_lieutenant_130">
+		<text>Мальцев</text>
+	</string>
+	<string id="lname_lieutenant_131">
+		<text>Мамаев</text>
+	</string>
+	<string id="lname_lieutenant_132">
+		<text>Мерзляев</text>
+	</string>
+	<string id="lname_lieutenant_133">
+		<text>Мильченко</text>
+	</string>
+	<string id="lname_lieutenant_134">
+		<text>Миронюк</text>
+	</string>
+	<string id="lname_lieutenant_135">
+		<text>Морер</text>
+	</string>
+	<string id="lname_lieutenant_136">
+		<text>Крыга</text>
+	</string>
+	<string id="lname_lieutenant_137">
+		<text>Мостовой</text>
+	</string>
+	<string id="lname_lieutenant_138">
+		<text>Мунтян</text>
+	</string>
+	<string id="lname_lieutenant_139">
+		<text>Мухамедов</text>
+	</string>
+	<string id="lname_lieutenant_14">
+		<text>Бешевлий</text>
+	</string>
+	<string id="lname_lieutenant_140">
+		<text>Мыськов</text>
+	</string>
+	<string id="lname_lieutenant_141">
+		<text>Навроцкий</text>
+	</string>
+	<string id="lname_lieutenant_142">
+		<text>Неприцкий</text>
+	</string>
+	<string id="lname_lieutenant_143">
+		<text>Никаноров</text>
+	</string>
+	<string id="lname_lieutenant_144">
+		<text>Никешин</text>
+	</string>
+	<string id="lname_lieutenant_145">
+		<text>Никулин</text>
+	</string>
+	<string id="lname_lieutenant_146">
+		<text>Фуцин</text>
+	</string>
+	<string id="lname_lieutenant_147">
+		<text>Нордиев</text>
+	</string>
+	<string id="lname_lieutenant_148">
+		<text>Носань</text>
+	</string>
+	<string id="lname_lieutenant_149">
+		<text>Ополев</text>
+	</string>
+	<string id="lname_lieutenant_15">
+		<text>Биноев</text>
+	</string>
+	<string id="lname_lieutenant_150">
+		<text>Орлевич</text>
+	</string>
+	<string id="lname_lieutenant_151">
+		<text>Орлов</text>
+	</string>
+	<string id="lname_lieutenant_152">
+		<text>Петкевич</text>
+	</string>
+	<string id="lname_lieutenant_153">
+		<text>Петренко</text>
+	</string>
+	<string id="lname_lieutenant_154">
+		<text>Петров</text>
+	</string>
+	<string id="lname_lieutenant_155">
+		<text>Плохенко</text>
+	</string>
+	<string id="lname_lieutenant_156">
+		<text>Подячев</text>
+	</string>
+	<string id="lname_lieutenant_157">
+		<text>Полянин</text>
+	</string>
+	<string id="lname_lieutenant_158">
+		<text>Поплавский</text>
+	</string>
+	<string id="lname_lieutenant_159">
+		<text>Попов</text>
+	</string>
+	<string id="lname_lieutenant_16">
+		<text>Блинов</text>
+	</string>
+	<string id="lname_lieutenant_160">
+		<text>Портных</text>
+	</string>
+	<string id="lname_lieutenant_161">
+		<text>Прасолов</text>
+	</string>
+	<string id="lname_lieutenant_162">
+		<text>Прокопенко</text>
+	</string>
+	<string id="lname_lieutenant_163">
+		<text>Проскурин</text>
+	</string>
+	<string id="lname_lieutenant_164">
+		<text>Проценко</text>
+	</string>
+	<string id="lname_lieutenant_165">
+		<text>Прудов</text>
+	</string>
+	<string id="lname_lieutenant_166">
+		<text>Пустовар</text>
+	</string>
+	<string id="lname_lieutenant_167">
+		<text>Пучек</text>
+	</string>
+	<string id="lname_lieutenant_168">
+		<text>Рабинович</text>
+	</string>
+	<string id="lname_lieutenant_169">
+		<text>Радкевич</text>
+	</string>
+	<string id="lname_lieutenant_17">
+		<text>Бобров</text>
+	</string>
+	<string id="lname_lieutenant_170">
+		<text>Резун</text>
+	</string>
+	<string id="lname_lieutenant_171">
+		<text>Рогоза</text>
+	</string>
+	<string id="lname_lieutenant_172">
+		<text>Роднянский</text>
+	</string>
+	<string id="lname_lieutenant_173">
+		<text>Ротань</text>
+	</string>
+	<string id="lname_lieutenant_174">
+		<text>Рублев</text>
+	</string>
+	<string id="lname_lieutenant_175">
+		<text>Рудик</text>
+	</string>
+	<string id="lname_lieutenant_176">
+		<text>Русанов</text>
+	</string>
+	<string id="lname_lieutenant_177">
+		<text>Рычагирский</text>
+	</string>
+	<string id="lname_lieutenant_178">
+		<text>Савченко</text>
+	</string>
+	<string id="lname_lieutenant_179">
+		<text>Савчук</text>
+	</string>
+	<string id="lname_lieutenant_18">
+		<text>Богданов</text>
+	</string>
+	<string id="lname_lieutenant_180">
+		<text>Сагитов</text>
+	</string>
+	<string id="lname_lieutenant_181">
+		<text>Свиридов</text>
+	</string>
+	<string id="lname_lieutenant_182">
+		<text>Седых</text>
+	</string>
+	<string id="lname_lieutenant_183">
+		<text>Середа</text>
+	</string>
+	<string id="lname_lieutenant_184">
+		<text>Сидоренко</text>
+	</string>
+	<string id="lname_lieutenant_185">
+		<text>Сидоров</text>
+	</string>
+	<string id="lname_lieutenant_186">
+		<text>Синий</text>
+	</string>
+	<string id="lname_lieutenant_187">
+		<text>Синицын</text>
+	</string>
+	<string id="lname_lieutenant_188">
+		<text>Скамейка</text>
+	</string>
+	<string id="lname_lieutenant_189">
+		<text>Слуцкий</text>
+	</string>
+	<string id="lname_lieutenant_19">
+		<text>Бойко</text>
+	</string>
+	<string id="lname_lieutenant_190">
+		<text>Смелов</text>
+	</string>
+	<string id="lname_lieutenant_191">
+		<text>Смолий</text>
+	</string>
+	<string id="lname_lieutenant_192">
+		<text>Сорокин</text>
+	</string>
+	<string id="lname_lieutenant_193">
+		<text>Стацюра</text>
+	</string>
+	<string id="lname_lieutenant_194">
+		<text>Степчин</text>
+	</string>
+	<string id="lname_lieutenant_195">
+		<text>Стычинский</text>
+	</string>
+	<string id="lname_lieutenant_196">
+		<text>Сыкула</text>
+	</string>
+	<string id="lname_lieutenant_197">
+		<text>Тарнавский</text>
+	</string>
+	<string id="lname_lieutenant_198">
+		<text>Татарчук</text>
+	</string>
+	<string id="lname_lieutenant_199">
+		<text>Тимчук</text>
+	</string>
+	<string id="lname_lieutenant_2">
+		<text>Андрейчук</text>
+	</string>
+	<string id="lname_lieutenant_20">
+		<text>Бойченко</text>
+	</string>
+	<string id="lname_lieutenant_21">
+		<text>Болдескул</text>
+	</string>
+	<string id="lname_lieutenant_22">
+		<text>Бондарев</text>
+	</string>
+	<string id="lname_lieutenant_23">
+		<text>Борисов</text>
+	</string>
+	<string id="lname_lieutenant_24">
+		<text>Брич</text>
+	</string>
+	<string id="lname_lieutenant_25">
+		<text>Бронштейн</text>
+	</string>
+	<string id="lname_lieutenant_26">
+		<text>Буряк</text>
+	</string>
+	<string id="lname_lieutenant_27">
+		<text>Бутурин</text>
+	</string>
+	<string id="lname_lieutenant_28">
+		<text>Бяло</text>
+	</string>
+	<string id="lname_lieutenant_29">
+		<text>Валентинов</text>
+	</string>
+	<string id="lname_lieutenant_3">
+		<text>Андрущенко</text>
+	</string>
+	<string id="lname_lieutenant_30">
+		<text>Васильев</text>
+	</string>
+	<string id="lname_lieutenant_31">
+		<text>Веселов</text>
+	</string>
+	<string id="lname_lieutenant_32">
+		<text>Виноградов</text>
+	</string>
+	<string id="lname_lieutenant_33">
+		<text>Вовненко</text>
+	</string>
+	<string id="lname_lieutenant_34">
+		<text>Воланчук</text>
+	</string>
+	<string id="lname_lieutenant_35">
+		<text>Володарь</text>
+	</string>
+	<string id="lname_lieutenant_36">
+		<text>Волошин</text>
+	</string>
+	<string id="lname_lieutenant_37">
+		<text>Воронцов</text>
+	</string>
+	<string id="lname_lieutenant_38">
+		<text>Ворохаев</text>
+	</string>
+	<string id="lname_lieutenant_39">
+		<text>Вьюшинский</text>
+	</string>
+	<string id="lname_lieutenant_4">
+		<text>Анисьев</text>
+	</string>
+	<string id="lname_lieutenant_40">
+		<text>Галкин</text>
+	</string>
+	<string id="lname_lieutenant_41">
+		<text>Ганзюк</text>
+	</string>
+	<string id="lname_lieutenant_42">
+		<text>Гарковенко</text>
+	</string>
+	<string id="lname_lieutenant_43">
+		<text>Гаркуша</text>
+	</string>
+	<string id="lname_lieutenant_44">
+		<text>Георгов</text>
+	</string>
+	<string id="lname_lieutenant_45">
+		<text>Глебовский</text>
+	</string>
+	<string id="lname_lieutenant_46">
+		<text>Гнатюк</text>
+	</string>
+	<string id="lname_lieutenant_47">
+		<text>Гончаренко</text>
+	</string>
+	<string id="lname_lieutenant_48">
+		<text>Гордиенко</text>
+	</string>
+	<string id="lname_lieutenant_49">
+		<text>Горлевой</text>
+	</string>
+	<string id="lname_lieutenant_5">
+		<text>Ардашев</text>
+	</string>
+	<string id="lname_lieutenant_50">
+		<text>Горохин</text>
+	</string>
+	<string id="lname_lieutenant_51">
+		<text>Горюнов</text>
+	</string>
+	<string id="lname_lieutenant_52">
+		<text>Гребенюк</text>
+	</string>
+	<string id="lname_lieutenant_53">
+		<text>Грицаенко</text>
+	</string>
+	<string id="lname_lieutenant_54">
+		<text>Грицай</text>
+	</string>
+	<string id="lname_lieutenant_55">
+		<text>Гриценков</text>
+	</string>
+	<string id="lname_lieutenant_56">
+		<text>Гришачев</text>
+	</string>
+	<string id="lname_lieutenant_57">
+		<text>Грищук</text>
+	</string>
+	<string id="lname_lieutenant_58">
+		<text>Губар</text>
+	</string>
+	<string id="lname_lieutenant_59">
+		<text>Гунько</text>
+	</string>
+	<string id="lname_lieutenant_6">
+		<text>Бабич</text>
+	</string>
+	<string id="lname_lieutenant_60">
+		<text>Гуревич</text>
+	</string>
+	<string id="lname_lieutenant_61">
+		<text>Денисенко</text>
+	</string>
+	<string id="lname_lieutenant_62">
+		<text>Довгалюк</text>
+	</string>
+	<string id="lname_lieutenant_63">
+		<text>Домбрик</text>
+	</string>
+	<string id="lname_lieutenant_64">
+		<text>Доценко</text>
+	</string>
+	<string id="lname_lieutenant_65">
+		<text>Дроздуш</text>
+	</string>
+	<string id="lname_lieutenant_66">
+		<text>Дубенчук</text>
+	</string>
+	<string id="lname_lieutenant_67">
+		<text>Дудоров</text>
+	</string>
+	<string id="lname_lieutenant_68">
+		<text>Дука</text>
+	</string>
+	<string id="lname_lieutenant_69">
+		<text>Думко</text>
+	</string>
+	<string id="lname_lieutenant_7">
+		<text>Балан</text>
+	</string>
+	<string id="lname_lieutenant_70">
+		<text>Дунаев</text>
+	</string>
+	<string id="lname_lieutenant_71">
+		<text>Дыклов</text>
+	</string>
+	<string id="lname_lieutenant_72">
+		<text>Ерофеев</text>
+	</string>
+	<string id="lname_lieutenant_73">
+		<text>Ефремов</text>
+	</string>
+	<string id="lname_lieutenant_74">
+		<text>Жабенко</text>
+	</string>
+	<string id="lname_lieutenant_75">
+		<text>Жмыев</text>
+	</string>
+	<string id="lname_lieutenant_76">
+		<text>Жураковский</text>
+	</string>
+	<string id="lname_lieutenant_77">
+		<text>Забыйягода</text>
+	</string>
+	<string id="lname_lieutenant_78">
+		<text>Загороднюк</text>
+	</string>
+	<string id="lname_lieutenant_79">
+		<text>Замосенчук</text>
+	</string>
+	<string id="lname_lieutenant_8">
+		<text>Баранов</text>
+	</string>
+	<string id="lname_lieutenant_80">
+		<text>Зарубин</text>
+	</string>
+	<string id="lname_lieutenant_81">
+		<text>Захарин</text>
+	</string>
+	<string id="lname_lieutenant_82">
+		<text>Звонницкий</text>
+	</string>
+	<string id="lname_lieutenant_83">
+		<text>Зиновьев</text>
+	</string>
+	<string id="lname_lieutenant_84">
+		<text>Зозо</text>
+	</string>
+	<string id="lname_lieutenant_85">
+		<text>Золотарь</text>
+	</string>
+	<string id="lname_lieutenant_86">
+		<text>Зубарев</text>
+	</string>
+	<string id="lname_lieutenant_87">
+		<text>Зубков</text>
+	</string>
+	<string id="lname_lieutenant_88">
+		<text>Иванов</text>
+	</string>
+	<string id="lname_lieutenant_89">
+		<text>Игнатенко</text>
+	</string>
+	<string id="lname_lieutenant_9">
+		<text>Барановский</text>
+	</string>
+	<string id="lname_lieutenant_90">
+		<text>Иженко</text>
+	</string>
+	<string id="lname_lieutenant_91">
+		<text>Ищук</text>
+	</string>
+	<string id="lname_lieutenant_92">
+		<text>Казаков</text>
+	</string>
+	<string id="lname_lieutenant_93">
+		<text>Казанцев</text>
+	</string>
+	<string id="lname_lieutenant_94">
+		<text>Кандыбабко</text>
+	</string>
+	<string id="lname_lieutenant_95">
+		<text>Капука</text>
+	</string>
+	<string id="lname_lieutenant_96">
+		<text>Капустянко</text>
+	</string>
+	<string id="lname_lieutenant_97">
+		<text>Кац</text>
+	</string>
+	<string id="lname_lieutenant_98">
+		<text>Кикабидзе</text>
+	</string>
+	<string id="lname_lieutenant_99">
+		<text>Гацула</text>
+	</string>
+	<string id="lname_private_0">
+		<text>Абдурхманов</text>
+	</string>
+	<string id="lname_private_1">
+		<text>Алтынник</text>
+	</string>
+	<string id="lname_private_10">
+		<text>Барсак</text>
+	</string>
+	<string id="lname_private_100">
+		<text>Киреев</text>
+	</string>
+	<string id="lname_private_101">
+		<text>Щербин</text>
+	</string>
+	<string id="lname_private_102">
+		<text>Ковальчук</text>
+	</string>
+	<string id="lname_private_103">
+		<text>Коев</text>
+	</string>
+	<string id="lname_private_104">
+		<text>Козлов</text>
+	</string>
+	<string id="lname_private_105">
+		<text>Колонтарёв</text>
+	</string>
+	<string id="lname_private_106">
+		<text>Колонтарь</text>
+	</string>
+	<string id="lname_private_107">
+		<text>Кондратенко</text>
+	</string>
+	<string id="lname_private_108">
+		<text>Коркин</text>
+	</string>
+	<string id="lname_private_109">
+		<text>Корнеев</text>
+	</string>
+	<string id="lname_private_11">
+		<text>Баул</text>
+	</string>
+	<string id="lname_private_110">
+		<text>Кравченко</text>
+	</string>
+	<string id="lname_private_111">
+		<text>Кривда</text>
+	</string>
+	<string id="lname_private_112">
+		<text>Кривохатский</text>
+	</string>
+	<string id="lname_private_113">
+		<text>Кузнецов</text>
+	</string>
+	<string id="lname_private_114">
+		<text>Кузьмич</text>
+	</string>
+	<string id="lname_private_115">
+		<text>Кузякин</text>
+	</string>
+	<string id="lname_private_116">
+		<text>Кульчитский</text>
+	</string>
+	<string id="lname_private_117">
+		<text>Кунцев</text>
+	</string>
+	<string id="lname_private_118">
+		<text>Курвиц</text>
+	</string>
+	<string id="lname_private_119">
+		<text>Кучерук</text>
+	</string>
+	<string id="lname_private_12">
+		<text>Башаков</text>
+	</string>
+	<string id="lname_private_120">
+		<text>Кушнарёв</text>
+	</string>
+	<string id="lname_private_121">
+		<text>Кхаладзе</text>
+	</string>
+	<string id="lname_private_122">
+		<text>Лаврик</text>
+	</string>
+	<string id="lname_private_123">
+		<text>Лавров</text>
+	</string>
+	<string id="lname_private_124">
+		<text>Лившиц</text>
+	</string>
+	<string id="lname_private_125">
+		<text>Лисичанский</text>
+	</string>
+	<string id="lname_private_126">
+		<text>Литвин</text>
+	</string>
+	<string id="lname_private_127">
+		<text>Лымаренко</text>
+	</string>
+	<string id="lname_private_128">
+		<text>Мазепа</text>
+	</string>
+	<string id="lname_private_129">
+		<text>Макаренко</text>
+	</string>
+	<string id="lname_private_13">
+		<text>Башмаков</text>
+	</string>
+	<string id="lname_private_130">
+		<text>Мальцев</text>
+	</string>
+	<string id="lname_private_131">
+		<text>Мамаев</text>
+	</string>
+	<string id="lname_private_132">
+		<text>Мерзляев</text>
+	</string>
+	<string id="lname_private_133">
+		<text>Мильченко</text>
+	</string>
+	<string id="lname_private_134">
+		<text>Миронюк</text>
+	</string>
+	<string id="lname_private_135">
+		<text>Морер</text>
+	</string>
+	<string id="lname_private_136">
+		<text>Крыга</text>
+	</string>
+	<string id="lname_private_137">
+		<text>Мостовой</text>
+	</string>
+	<string id="lname_private_138">
+		<text>Мунтян</text>
+	</string>
+	<string id="lname_private_139">
+		<text>Мухамедов</text>
+	</string>
+	<string id="lname_private_14">
+		<text>Бешевлий</text>
+	</string>
+	<string id="lname_private_140">
+		<text>Мыськов</text>
+	</string>
+	<string id="lname_private_141">
+		<text>Навроцкий</text>
+	</string>
+	<string id="lname_private_142">
+		<text>Неприцкий</text>
+	</string>
+	<string id="lname_private_143">
+		<text>Никаноров</text>
+	</string>
+	<string id="lname_private_144">
+		<text>Никешин</text>
+	</string>
+	<string id="lname_private_145">
+		<text>Никулин</text>
+	</string>
+	<string id="lname_private_146">
+		<text>Фуцин</text>
+	</string>
+	<string id="lname_private_147">
+		<text>Нордиев</text>
+	</string>
+	<string id="lname_private_148">
+		<text>Носань</text>
+	</string>
+	<string id="lname_private_149">
+		<text>Ополев</text>
+	</string>
+	<string id="lname_private_15">
+		<text>Биноев</text>
+	</string>
+	<string id="lname_private_150">
+		<text>Орлевич</text>
+	</string>
+	<string id="lname_private_151">
+		<text>Орлов</text>
+	</string>
+	<string id="lname_private_152">
+		<text>Петкевич</text>
+	</string>
+	<string id="lname_private_153">
+		<text>Петренко</text>
+	</string>
+	<string id="lname_private_154">
+		<text>Петров</text>
+	</string>
+	<string id="lname_private_155">
+		<text>Плохенко</text>
+	</string>
+	<string id="lname_private_156">
+		<text>Подячев</text>
+	</string>
+	<string id="lname_private_157">
+		<text>Полянин</text>
+	</string>
+	<string id="lname_private_158">
+		<text>Поплавский</text>
+	</string>
+	<string id="lname_private_159">
+		<text>Попов</text>
+	</string>
+	<string id="lname_private_16">
+		<text>Блинов</text>
+	</string>
+	<string id="lname_private_160">
+		<text>Портных</text>
+	</string>
+	<string id="lname_private_161">
+		<text>Прасолов</text>
+	</string>
+	<string id="lname_private_162">
+		<text>Прокопенко</text>
+	</string>
+	<string id="lname_private_163">
+		<text>Проскурин</text>
+	</string>
+	<string id="lname_private_164">
+		<text>Проценко</text>
+	</string>
+	<string id="lname_private_165">
+		<text>Прудов</text>
+	</string>
+	<string id="lname_private_166">
+		<text>Пустовар</text>
+	</string>
+	<string id="lname_private_167">
+		<text>Пучек</text>
+	</string>
+	<string id="lname_private_168">
+		<text>Рабинович</text>
+	</string>
+	<string id="lname_private_169">
+		<text>Радкевич</text>
+	</string>
+	<string id="lname_private_17">
+		<text>Бобров</text>
+	</string>
+	<string id="lname_private_170">
+		<text>Резун</text>
+	</string>
+	<string id="lname_private_171">
+		<text>Рогоза</text>
+	</string>
+	<string id="lname_private_172">
+		<text>Роднянский</text>
+	</string>
+	<string id="lname_private_173">
+		<text>Ротань</text>
+	</string>
+	<string id="lname_private_174">
+		<text>Рублев</text>
+	</string>
+	<string id="lname_private_175">
+		<text>Рудик</text>
+	</string>
+	<string id="lname_private_176">
+		<text>Русанов</text>
+	</string>
+	<string id="lname_private_177">
+		<text>Рычагирский</text>
+	</string>
+	<string id="lname_private_178">
+		<text>Савченко</text>
+	</string>
+	<string id="lname_private_179">
+		<text>Савчук</text>
+	</string>
+	<string id="lname_private_18">
+		<text>Богданов</text>
+	</string>
+	<string id="lname_private_180">
+		<text>Сагитов</text>
+	</string>
+	<string id="lname_private_181">
+		<text>Свиридов</text>
+	</string>
+	<string id="lname_private_182">
+		<text>Седых</text>
+	</string>
+	<string id="lname_private_183">
+		<text>Середа</text>
+	</string>
+	<string id="lname_private_184">
+		<text>Сидоренко</text>
+	</string>
+	<string id="lname_private_185">
+		<text>Сидоров</text>
+	</string>
+	<string id="lname_private_186">
+		<text>Синий</text>
+	</string>
+	<string id="lname_private_187">
+		<text>Синицын</text>
+	</string>
+	<string id="lname_private_188">
+		<text>Скамейка</text>
+	</string>
+	<string id="lname_private_189">
+		<text>Слуцкий</text>
+	</string>
+	<string id="lname_private_19">
+		<text>Бойко</text>
+	</string>
+	<string id="lname_private_190">
+		<text>Смелов</text>
+	</string>
+	<string id="lname_private_191">
+		<text>Смолий</text>
+	</string>
+	<string id="lname_private_192">
+		<text>Сорокин</text>
+	</string>
+	<string id="lname_private_193">
+		<text>Стацюра</text>
+	</string>
+	<string id="lname_private_194">
+		<text>Степчин</text>
+	</string>
+	<string id="lname_private_195">
+		<text>Стычинский</text>
+	</string>
+	<string id="lname_private_196">
+		<text>Сыкула</text>
+	</string>
+	<string id="lname_private_197">
+		<text>Тарнавский</text>
+	</string>
+	<string id="lname_private_198">
+		<text>Татарчук</text>
+	</string>
+	<string id="lname_private_199">
+		<text>Тимчук</text>
+	</string>
+	<string id="lname_private_2">
+		<text>Андрейчук</text>
+	</string>
+	<string id="lname_private_20">
+		<text>Бойченко</text>
+	</string>
+	<string id="lname_private_21">
+		<text>Болдескул</text>
+	</string>
+	<string id="lname_private_22">
+		<text>Бондарев</text>
+	</string>
+	<string id="lname_private_23">
+		<text>Борисов</text>
+	</string>
+	<string id="lname_private_24">
+		<text>Брич</text>
+	</string>
+	<string id="lname_private_25">
+		<text>Бронштейн</text>
+	</string>
+	<string id="lname_private_26">
+		<text>Буряк</text>
+	</string>
+	<string id="lname_private_27">
+		<text>Бутурин</text>
+	</string>
+	<string id="lname_private_28">
+		<text>Бяло</text>
+	</string>
+	<string id="lname_private_29">
+		<text>Валентинов</text>
+	</string>
+	<string id="lname_private_3">
+		<text>Андрущенко</text>
+	</string>
+	<string id="lname_private_30">
+		<text>Васильев</text>
+	</string>
+	<string id="lname_private_31">
+		<text>Веселов</text>
+	</string>
+	<string id="lname_private_32">
+		<text>Виноградов</text>
+	</string>
+	<string id="lname_private_33">
+		<text>Вовненко</text>
+	</string>
+	<string id="lname_private_34">
+		<text>Воланчук</text>
+	</string>
+	<string id="lname_private_35">
+		<text>Володарь</text>
+	</string>
+	<string id="lname_private_36">
+		<text>Волошин</text>
+	</string>
+	<string id="lname_private_37">
+		<text>Воронцов</text>
+	</string>
+	<string id="lname_private_38">
+		<text>Ворохаев</text>
+	</string>
+	<string id="lname_private_39">
+		<text>Вьюшинский</text>
+	</string>
+	<string id="lname_private_4">
+		<text>Анисьев</text>
+	</string>
+	<string id="lname_private_40">
+		<text>Галкин</text>
+	</string>
+	<string id="lname_private_41">
+		<text>Ганзюк</text>
+	</string>
+	<string id="lname_private_42">
+		<text>Гарковенко</text>
+	</string>
+	<string id="lname_private_43">
+		<text>Гаркуша</text>
+	</string>
+	<string id="lname_private_44">
+		<text>Георгов</text>
+	</string>
+	<string id="lname_private_45">
+		<text>Глебовский</text>
+	</string>
+	<string id="lname_private_46">
+		<text>Гнатюк</text>
+	</string>
+	<string id="lname_private_47">
+		<text>Гончаренко</text>
+	</string>
+	<string id="lname_private_48">
+		<text>Гордиенко</text>
+	</string>
+	<string id="lname_private_49">
+		<text>Горлевой</text>
+	</string>
+	<string id="lname_private_5">
+		<text>Ардашев</text>
+	</string>
+	<string id="lname_private_50">
+		<text>Горохин</text>
+	</string>
+	<string id="lname_private_51">
+		<text>Горюнов</text>
+	</string>
+	<string id="lname_private_52">
+		<text>Гребенюк</text>
+	</string>
+	<string id="lname_private_53">
+		<text>Грицаенко</text>
+	</string>
+	<string id="lname_private_54">
+		<text>Грицай</text>
+	</string>
+	<string id="lname_private_55">
+		<text>Гриценков</text>
+	</string>
+	<string id="lname_private_56">
+		<text>Гришачев</text>
+	</string>
+	<string id="lname_private_57">
+		<text>Грищук</text>
+	</string>
+	<string id="lname_private_58">
+		<text>Губар</text>
+	</string>
+	<string id="lname_private_59">
+		<text>Гунько</text>
+	</string>
+	<string id="lname_private_6">
+		<text>Бабич</text>
+	</string>
+	<string id="lname_private_60">
+		<text>Гуревич</text>
+	</string>
+	<string id="lname_private_61">
+		<text>Денисенко</text>
+	</string>
+	<string id="lname_private_62">
+		<text>Довгалюк</text>
+	</string>
+	<string id="lname_private_63">
+		<text>Домбрик</text>
+	</string>
+	<string id="lname_private_64">
+		<text>Доценко</text>
+	</string>
+	<string id="lname_private_65">
+		<text>Дроздуш</text>
+	</string>
+	<string id="lname_private_66">
+		<text>Дубенчук</text>
+	</string>
+	<string id="lname_private_67">
+		<text>Дудоров</text>
+	</string>
+	<string id="lname_private_68">
+		<text>Дука</text>
+	</string>
+	<string id="lname_private_69">
+		<text>Думко</text>
+	</string>
+	<string id="lname_private_7">
+		<text>Балан</text>
+	</string>
+	<string id="lname_private_70">
+		<text>Дунаев</text>
+	</string>
+	<string id="lname_private_71">
+		<text>Дыклов</text>
+	</string>
+	<string id="lname_private_72">
+		<text>Ерофеев</text>
+	</string>
+	<string id="lname_private_73">
+		<text>Ефремов</text>
+	</string>
+	<string id="lname_private_74">
+		<text>Жабенко</text>
+	</string>
+	<string id="lname_private_75">
+		<text>Жмыев</text>
+	</string>
+	<string id="lname_private_76">
+		<text>Жураковский</text>
+	</string>
+	<string id="lname_private_77">
+		<text>Забыйягода</text>
+	</string>
+	<string id="lname_private_78">
+		<text>Загороднюк</text>
+	</string>
+	<string id="lname_private_79">
+		<text>Замосенчук</text>
+	</string>
+	<string id="lname_private_8">
+		<text>Баранов</text>
+	</string>
+	<string id="lname_private_80">
+		<text>Зарубин</text>
+	</string>
+	<string id="lname_private_81">
+		<text>Захарин</text>
+	</string>
+	<string id="lname_private_82">
+		<text>Звонницкий</text>
+	</string>
+	<string id="lname_private_83">
+		<text>Зиновьев</text>
+	</string>
+	<string id="lname_private_84">
+		<text>Зозо</text>
+	</string>
+	<string id="lname_private_85">
+		<text>Золотарь</text>
+	</string>
+	<string id="lname_private_86">
+		<text>Зубарев</text>
+	</string>
+	<string id="lname_private_87">
+		<text>Зубков</text>
+	</string>
+	<string id="lname_private_88">
+		<text>Иванов</text>
+	</string>
+	<string id="lname_private_89">
+		<text>Игнатенко</text>
+	</string>
+	<string id="lname_private_9">
+		<text>Барановский</text>
+	</string>
+	<string id="lname_private_90">
+		<text>Иженко</text>
+	</string>
+	<string id="lname_private_91">
+		<text>Ищук</text>
+	</string>
+	<string id="lname_private_92">
+		<text>Казаков</text>
+	</string>
+	<string id="lname_private_93">
+		<text>Казанцев</text>
+	</string>
+	<string id="lname_private_94">
+		<text>Кандыбабко</text>
+	</string>
+	<string id="lname_private_95">
+		<text>Капука</text>
+	</string>
+	<string id="lname_private_96">
+		<text>Капустянко</text>
+	</string>
+	<string id="lname_private_97">
+		<text>Кац</text>
+	</string>
+	<string id="lname_private_98">
+		<text>Кикабидзе</text>
+	</string>
+	<string id="lname_private_99">
+		<text>Гацула</text>
+	</string>
+	<string id="lname_science_0">
+		<text>Синаев</text>
+	</string>
+	<string id="lname_science_1">
+		<text>Фейгельман</text>
+	</string>
+	<string id="lname_science_10">
+		<text>Леденцов</text>
+	</string>
+	<string id="lname_science_11">
+		<text>Алферов</text>
+	</string>
+	<string id="lname_science_12">
+		<text>Антипин</text>
+	</string>
+	<string id="lname_science_13">
+		<text>Блинов</text>
+	</string>
+	<string id="lname_science_14">
+		<text>Богомолов</text>
+	</string>
+	<string id="lname_science_15">
+		<text>Василевич</text>
+	</string>
+	<string id="lname_science_16">
+		<text>Гешкенбейн</text>
+	</string>
+	<string id="lname_science_17">
+		<text>Дьяконов</text>
+	</string>
+	<string id="lname_science_18">
+		<text>Ерохин</text>
+	</string>
+	<string id="lname_science_19">
+		<text>Заикин</text>
+	</string>
+	<string id="lname_science_2">
+		<text>Захаров</text>
+	</string>
+	<string id="lname_science_20">
+		<text>Ивченко</text>
+	</string>
+	<string id="lname_science_21">
+		<text>Кабанов</text>
+	</string>
+	<string id="lname_science_22">
+		<text>Ларин</text>
+	</string>
+	<string id="lname_science_23">
+		<text>Манько</text>
+	</string>
+	<string id="lname_science_24">
+		<text>Миронов</text>
+	</string>
+	<string id="lname_science_25">
+		<text>Степаненко</text>
+	</string>
+	<string id="lname_science_26">
+		<text>Оганесян</text>
+	</string>
+	<string id="lname_science_27">
+		<text>Чернодуб</text>
+	</string>
+	<string id="lname_science_28">
+		<text>Шилов</text>
+	</string>
+	<string id="lname_science_3">
+		<text>Чириков</text>
+	</string>
+	<string id="lname_science_4">
+		<text>Белявин</text>
+	</string>
+	<string id="lname_science_5">
+		<text>Фадеев</text>
+	</string>
+	<string id="lname_science_6">
+		<text>Стеклов</text>
+	</string>
+	<string id="lname_science_7">
+		<text>Андреев</text>
+	</string>
+	<string id="lname_science_8">
+		<text>Спирин</text>
+	</string>
+	<string id="lname_science_9">
+		<text>Балитский</text>
+	</string>
+	<string id="lname_sergeant_0">
+		<text>Абдурхманов</text>
+	</string>
+	<string id="lname_sergeant_1">
+		<text>Алтынник</text>
+	</string>
+	<string id="lname_sergeant_10">
+		<text>Барсак</text>
+	</string>
+	<string id="lname_sergeant_100">
+		<text>Киреев</text>
+	</string>
+	<string id="lname_sergeant_101">
+		<text>Щербин</text>
+	</string>
+	<string id="lname_sergeant_102">
+		<text>Ковальчук</text>
+	</string>
+	<string id="lname_sergeant_103">
+		<text>Коев</text>
+	</string>
+	<string id="lname_sergeant_104">
+		<text>Козлов</text>
+	</string>
+	<string id="lname_sergeant_105">
+		<text>Колонтарёв</text>
+	</string>
+	<string id="lname_sergeant_106">
+		<text>Колонтарь</text>
+	</string>
+	<string id="lname_sergeant_107">
+		<text>Кондратенко</text>
+	</string>
+	<string id="lname_sergeant_108">
+		<text>Коркин</text>
+	</string>
+	<string id="lname_sergeant_109">
+		<text>Корнеев</text>
+	</string>
+	<string id="lname_sergeant_11">
+		<text>Баул</text>
+	</string>
+	<string id="lname_sergeant_110">
+		<text>Кравченко</text>
+	</string>
+	<string id="lname_sergeant_111">
+		<text>Кривда</text>
+	</string>
+	<string id="lname_sergeant_112">
+		<text>Кривохатский</text>
+	</string>
+	<string id="lname_sergeant_113">
+		<text>Кузнецов</text>
+	</string>
+	<string id="lname_sergeant_114">
+		<text>Кузьмич</text>
+	</string>
+	<string id="lname_sergeant_115">
+		<text>Кузякин</text>
+	</string>
+	<string id="lname_sergeant_116">
+		<text>Кульчитский</text>
+	</string>
+	<string id="lname_sergeant_117">
+		<text>Кунцев</text>
+	</string>
+	<string id="lname_sergeant_118">
+		<text>Курвиц</text>
+	</string>
+	<string id="lname_sergeant_119">
+		<text>Кучерук</text>
+	</string>
+	<string id="lname_sergeant_12">
+		<text>Башаков</text>
+	</string>
+	<string id="lname_sergeant_120">
+		<text>Кушнарёв</text>
+	</string>
+	<string id="lname_sergeant_121">
+		<text>Кхаладзе</text>
+	</string>
+	<string id="lname_sergeant_122">
+		<text>Лаврик</text>
+	</string>
+	<string id="lname_sergeant_123">
+		<text>Лавров</text>
+	</string>
+	<string id="lname_sergeant_124">
+		<text>Лившиц</text>
+	</string>
+	<string id="lname_sergeant_125">
+		<text>Лисичанский</text>
+	</string>
+	<string id="lname_sergeant_126">
+		<text>Литвин</text>
+	</string>
+	<string id="lname_sergeant_127">
+		<text>Лымаренко</text>
+	</string>
+	<string id="lname_sergeant_128">
+		<text>Мазепа</text>
+	</string>
+	<string id="lname_sergeant_129">
+		<text>Макаренко</text>
+	</string>
+	<string id="lname_sergeant_13">
+		<text>Башмаков</text>
+	</string>
+	<string id="lname_sergeant_130">
+		<text>Мальцев</text>
+	</string>
+	<string id="lname_sergeant_131">
+		<text>Мамаев</text>
+	</string>
+	<string id="lname_sergeant_132">
+		<text>Мерзляев</text>
+	</string>
+	<string id="lname_sergeant_133">
+		<text>Мильченко</text>
+	</string>
+	<string id="lname_sergeant_134">
+		<text>Миронюк</text>
+	</string>
+	<string id="lname_sergeant_135">
+		<text>Морер</text>
+	</string>
+	<string id="lname_sergeant_136">
+		<text>Крыга</text>
+	</string>
+	<string id="lname_sergeant_137">
+		<text>Мостовой</text>
+	</string>
+	<string id="lname_sergeant_138">
+		<text>Мунтян</text>
+	</string>
+	<string id="lname_sergeant_139">
+		<text>Мухамедов</text>
+	</string>
+	<string id="lname_sergeant_14">
+		<text>Бешевлий</text>
+	</string>
+	<string id="lname_sergeant_140">
+		<text>Мыськов</text>
+	</string>
+	<string id="lname_sergeant_141">
+		<text>Навроцкий</text>
+	</string>
+	<string id="lname_sergeant_142">
+		<text>Неприцкий</text>
+	</string>
+	<string id="lname_sergeant_143">
+		<text>Никаноров</text>
+	</string>
+	<string id="lname_sergeant_144">
+		<text>Никешин</text>
+	</string>
+	<string id="lname_sergeant_145">
+		<text>Никулин</text>
+	</string>
+	<string id="lname_sergeant_146">
+		<text>Фуцин</text>
+	</string>
+	<string id="lname_sergeant_147">
+		<text>Нордиев</text>
+	</string>
+	<string id="lname_sergeant_148">
+		<text>Носань</text>
+	</string>
+	<string id="lname_sergeant_149">
+		<text>Ополев</text>
+	</string>
+	<string id="lname_sergeant_15">
+		<text>Биноев</text>
+	</string>
+	<string id="lname_sergeant_150">
+		<text>Орлевич</text>
+	</string>
+	<string id="lname_sergeant_151">
+		<text>Орлов</text>
+	</string>
+	<string id="lname_sergeant_152">
+		<text>Петкевич</text>
+	</string>
+	<string id="lname_sergeant_153">
+		<text>Петренко</text>
+	</string>
+	<string id="lname_sergeant_154">
+		<text>Петров</text>
+	</string>
+	<string id="lname_sergeant_155">
+		<text>Плохенко</text>
+	</string>
+	<string id="lname_sergeant_156">
+		<text>Подячев</text>
+	</string>
+	<string id="lname_sergeant_157">
+		<text>Полянин</text>
+	</string>
+	<string id="lname_sergeant_158">
+		<text>Поплавский</text>
+	</string>
+	<string id="lname_sergeant_159">
+		<text>Попов</text>
+	</string>
+	<string id="lname_sergeant_16">
+		<text>Блинов</text>
+	</string>
+	<string id="lname_sergeant_160">
+		<text>Портных</text>
+	</string>
+	<string id="lname_sergeant_161">
+		<text>Прасолов</text>
+	</string>
+	<string id="lname_sergeant_162">
+		<text>Прокопенко</text>
+	</string>
+	<string id="lname_sergeant_163">
+		<text>Проскурин</text>
+	</string>
+	<string id="lname_sergeant_164">
+		<text>Проценко</text>
+	</string>
+	<string id="lname_sergeant_165">
+		<text>Прудов</text>
+	</string>
+	<string id="lname_sergeant_166">
+		<text>Пустовар</text>
+	</string>
+	<string id="lname_sergeant_167">
+		<text>Пучек</text>
+	</string>
+	<string id="lname_sergeant_168">
+		<text>Рабинович</text>
+	</string>
+	<string id="lname_sergeant_169">
+		<text>Радкевич</text>
+	</string>
+	<string id="lname_sergeant_17">
+		<text>Бобров</text>
+	</string>
+	<string id="lname_sergeant_170">
+		<text>Резун</text>
+	</string>
+	<string id="lname_sergeant_171">
+		<text>Рогоза</text>
+	</string>
+	<string id="lname_sergeant_172">
+		<text>Роднянский</text>
+	</string>
+	<string id="lname_sergeant_173">
+		<text>Ротань</text>
+	</string>
+	<string id="lname_sergeant_174">
+		<text>Рублев</text>
+	</string>
+	<string id="lname_sergeant_175">
+		<text>Рудик</text>
+	</string>
+	<string id="lname_sergeant_176">
+		<text>Русанов</text>
+	</string>
+	<string id="lname_sergeant_177">
+		<text>Рычагирский</text>
+	</string>
+	<string id="lname_sergeant_178">
+		<text>Савченко</text>
+	</string>
+	<string id="lname_sergeant_179">
+		<text>Савчук</text>
+	</string>
+	<string id="lname_sergeant_18">
+		<text>Богданов</text>
+	</string>
+	<string id="lname_sergeant_180">
+		<text>Сагитов</text>
+	</string>
+	<string id="lname_sergeant_181">
+		<text>Свиридов</text>
+	</string>
+	<string id="lname_sergeant_182">
+		<text>Седых</text>
+	</string>
+	<string id="lname_sergeant_183">
+		<text>Середа</text>
+	</string>
+	<string id="lname_sergeant_184">
+		<text>Сидоренко</text>
+	</string>
+	<string id="lname_sergeant_185">
+		<text>Сидоров</text>
+	</string>
+	<string id="lname_sergeant_186">
+		<text>Синий</text>
+	</string>
+	<string id="lname_sergeant_187">
+		<text>Синицын</text>
+	</string>
+	<string id="lname_sergeant_188">
+		<text>Скамейка</text>
+	</string>
+	<string id="lname_sergeant_189">
+		<text>Слуцкий</text>
+	</string>
+	<string id="lname_sergeant_19">
+		<text>Бойко</text>
+	</string>
+	<string id="lname_sergeant_190">
+		<text>Смелов</text>
+	</string>
+	<string id="lname_sergeant_191">
+		<text>Смолий</text>
+	</string>
+	<string id="lname_sergeant_192">
+		<text>Сорокин</text>
+	</string>
+	<string id="lname_sergeant_193">
+		<text>Стацюра</text>
+	</string>
+	<string id="lname_sergeant_194">
+		<text>Степчин</text>
+	</string>
+	<string id="lname_sergeant_195">
+		<text>Стычинский</text>
+	</string>
+	<string id="lname_sergeant_196">
+		<text>Сыкула</text>
+	</string>
+	<string id="lname_sergeant_197">
+		<text>Тарнавский</text>
+	</string>
+	<string id="lname_sergeant_198">
+		<text>Татарчук</text>
+	</string>
+	<string id="lname_sergeant_199">
+		<text>Тимчук</text>
+	</string>
+	<string id="lname_sergeant_2">
+		<text>Андрейчук</text>
+	</string>
+	<string id="lname_sergeant_20">
+		<text>Бойченко</text>
+	</string>
+	<string id="lname_sergeant_21">
+		<text>Болдескул</text>
+	</string>
+	<string id="lname_sergeant_22">
+		<text>Бондарев</text>
+	</string>
+	<string id="lname_sergeant_23">
+		<text>Борисов</text>
+	</string>
+	<string id="lname_sergeant_24">
+		<text>Брич</text>
+	</string>
+	<string id="lname_sergeant_25">
+		<text>Бронштейн</text>
+	</string>
+	<string id="lname_sergeant_26">
+		<text>Буряк</text>
+	</string>
+	<string id="lname_sergeant_27">
+		<text>Бутурин</text>
+	</string>
+	<string id="lname_sergeant_28">
+		<text>Бяло</text>
+	</string>
+	<string id="lname_sergeant_29">
+		<text>Валентинов</text>
+	</string>
+	<string id="lname_sergeant_3">
+		<text>Андрущенко</text>
+	</string>
+	<string id="lname_sergeant_30">
+		<text>Васильев</text>
+	</string>
+	<string id="lname_sergeant_31">
+		<text>Веселов</text>
+	</string>
+	<string id="lname_sergeant_32">
+		<text>Виноградов</text>
+	</string>
+	<string id="lname_sergeant_33">
+		<text>Вовненко</text>
+	</string>
+	<string id="lname_sergeant_34">
+		<text>Воланчук</text>
+	</string>
+	<string id="lname_sergeant_35">
+		<text>Володарь</text>
+	</string>
+	<string id="lname_sergeant_36">
+		<text>Волошин</text>
+	</string>
+	<string id="lname_sergeant_37">
+		<text>Воронцов</text>
+	</string>
+	<string id="lname_sergeant_38">
+		<text>Ворохаев</text>
+	</string>
+	<string id="lname_sergeant_39">
+		<text>Вьюшинский</text>
+	</string>
+	<string id="lname_sergeant_4">
+		<text>Анисьев</text>
+	</string>
+	<string id="lname_sergeant_40">
+		<text>Галкин</text>
+	</string>
+	<string id="lname_sergeant_41">
+		<text>Ганзюк</text>
+	</string>
+	<string id="lname_sergeant_42">
+		<text>Гарковенко</text>
+	</string>
+	<string id="lname_sergeant_43">
+		<text>Гаркуша</text>
+	</string>
+	<string id="lname_sergeant_44">
+		<text>Георгов</text>
+	</string>
+	<string id="lname_sergeant_45">
+		<text>Глебовский</text>
+	</string>
+	<string id="lname_sergeant_46">
+		<text>Гнатюк</text>
+	</string>
+	<string id="lname_sergeant_47">
+		<text>Гончаренко</text>
+	</string>
+	<string id="lname_sergeant_48">
+		<text>Гордиенко</text>
+	</string>
+	<string id="lname_sergeant_49">
+		<text>Горлевой</text>
+	</string>
+	<string id="lname_sergeant_5">
+		<text>Ардашев</text>
+	</string>
+	<string id="lname_sergeant_50">
+		<text>Горохин</text>
+	</string>
+	<string id="lname_sergeant_51">
+		<text>Горюнов</text>
+	</string>
+	<string id="lname_sergeant_52">
+		<text>Гребенюк</text>
+	</string>
+	<string id="lname_sergeant_53">
+		<text>Грицаенко</text>
+	</string>
+	<string id="lname_sergeant_54">
+		<text>Грицай</text>
+	</string>
+	<string id="lname_sergeant_55">
+		<text>Гриценков</text>
+	</string>
+	<string id="lname_sergeant_56">
+		<text>Гришачев</text>
+	</string>
+	<string id="lname_sergeant_57">
+		<text>Грищук</text>
+	</string>
+	<string id="lname_sergeant_58">
+		<text>Губар</text>
+	</string>
+	<string id="lname_sergeant_59">
+		<text>Гунько</text>
+	</string>
+	<string id="lname_sergeant_6">
+		<text>Бабич</text>
+	</string>
+	<string id="lname_sergeant_60">
+		<text>Гуревич</text>
+	</string>
+	<string id="lname_sergeant_61">
+		<text>Денисенко</text>
+	</string>
+	<string id="lname_sergeant_62">
+		<text>Довгалюк</text>
+	</string>
+	<string id="lname_sergeant_63">
+		<text>Домбрик</text>
+	</string>
+	<string id="lname_sergeant_64">
+		<text>Доценко</text>
+	</string>
+	<string id="lname_sergeant_65">
+		<text>Дроздуш</text>
+	</string>
+	<string id="lname_sergeant_66">
+		<text>Дубенчук</text>
+	</string>
+	<string id="lname_sergeant_67">
+		<text>Дудоров</text>
+	</string>
+	<string id="lname_sergeant_68">
+		<text>Дука</text>
+	</string>
+	<string id="lname_sergeant_69">
+		<text>Думко</text>
+	</string>
+	<string id="lname_sergeant_7">
+		<text>Балан</text>
+	</string>
+	<string id="lname_sergeant_70">
+		<text>Дунаев</text>
+	</string>
+	<string id="lname_sergeant_71">
+		<text>Дыклов</text>
+	</string>
+	<string id="lname_sergeant_72">
+		<text>Ерофеев</text>
+	</string>
+	<string id="lname_sergeant_73">
+		<text>Ефремов</text>
+	</string>
+	<string id="lname_sergeant_74">
+		<text>Жабенко</text>
+	</string>
+	<string id="lname_sergeant_75">
+		<text>Жмыев</text>
+	</string>
+	<string id="lname_sergeant_76">
+		<text>Жураковский</text>
+	</string>
+	<string id="lname_sergeant_77">
+		<text>Забыйягода</text>
+	</string>
+	<string id="lname_sergeant_78">
+		<text>Загороднюк</text>
+	</string>
+	<string id="lname_sergeant_79">
+		<text>Замосенчук</text>
+	</string>
+	<string id="lname_sergeant_8">
+		<text>Баранов</text>
+	</string>
+	<string id="lname_sergeant_80">
+		<text>Зарубин</text>
+	</string>
+	<string id="lname_sergeant_81">
+		<text>Захарин</text>
+	</string>
+	<string id="lname_sergeant_82">
+		<text>Звонницкий</text>
+	</string>
+	<string id="lname_sergeant_83">
+		<text>Зиновьев</text>
+	</string>
+	<string id="lname_sergeant_84">
+		<text>Зозо</text>
+	</string>
+	<string id="lname_sergeant_85">
+		<text>Золотарь</text>
+	</string>
+	<string id="lname_sergeant_86">
+		<text>Зубарев</text>
+	</string>
+	<string id="lname_sergeant_87">
+		<text>Зубков</text>
+	</string>
+	<string id="lname_sergeant_88">
+		<text>Иванов</text>
+	</string>
+	<string id="lname_sergeant_89">
+		<text>Игнатенко</text>
+	</string>
+	<string id="lname_sergeant_9">
+		<text>Барановский</text>
+	</string>
+	<string id="lname_sergeant_90">
+		<text>Иженко</text>
+	</string>
+	<string id="lname_sergeant_91">
+		<text>Ищук</text>
+	</string>
+	<string id="lname_sergeant_92">
+		<text>Казаков</text>
+	</string>
+	<string id="lname_sergeant_93">
+		<text>Казанцев</text>
+	</string>
+	<string id="lname_sergeant_94">
+		<text>Кандыбабко</text>
+	</string>
+	<string id="lname_sergeant_95">
+		<text>Капука</text>
+	</string>
+	<string id="lname_sergeant_96">
+		<text>Капустянко</text>
+	</string>
+	<string id="lname_sergeant_97">
+		<text>Кац</text>
+	</string>
+	<string id="lname_sergeant_98">
+		<text>Кикабидзе</text>
+	</string>
+	<string id="lname_sergeant_99">
+		<text>Гацула</text>
+	</string>
+	<string id="lname_stalker_0">
+		<text>Белый</text>
+	</string>
+	<string id="lname_stalker_1">
+		<text>Зелёный</text>
+	</string>
+	<string id="lname_stalker_10">
+		<text>Бессмертный</text>
+	</string>
+	<string id="lname_stalker_100">
+		<text>Ржавый</text>
+	</string>
+	<string id="lname_stalker_101">
+		<text>Романтик</text>
+	</string>
+	<string id="lname_stalker_102">
+		<text>Свирепый</text>
+	</string>
+	<string id="lname_stalker_103">
+		<text>Силач</text>
+	</string>
+	<string id="lname_stalker_104">
+		<text>Сказочник</text>
+	</string>
+	<string id="lname_stalker_105">
+		<text>Слепой</text>
+	</string>
+	<string id="lname_stalker_106">
+		<text>Смелый</text>
+	</string>
+	<string id="lname_stalker_107">
+		<text>Сопля</text>
+	</string>
+	<string id="lname_stalker_108">
+		<text>Спорщик</text>
+	</string>
+	<string id="lname_stalker_109">
+		<text>Старик</text>
+	</string>
+	<string id="lname_stalker_11">
+		<text>Бешеный</text>
+	</string>
+	<string id="lname_stalker_110">
+		<text>Стиляга</text>
+	</string>
+	<string id="lname_stalker_111">
+		<text>Столичный</text>
+	</string>
+	<string id="lname_stalker_112">
+		<text>Суровый</text>
+	</string>
+	<string id="lname_stalker_113">
+		<text>Сутулый</text>
+	</string>
+	<string id="lname_stalker_114">
+		<text>Сухой</text>
+	</string>
+	<string id="lname_stalker_115">
+		<text>Счастливчик</text>
+	</string>
+	<string id="lname_stalker_116">
+		<text>Чалый</text>
+	</string>
+	<string id="lname_stalker_117">
+		<text>Толстый</text>
+	</string>
+	<string id="lname_stalker_118">
+		<text>Толстяк</text>
+	</string>
+	<string id="lname_stalker_119">
+		<text>Трупак</text>
+	</string>
+	<string id="lname_stalker_12">
+		<text>Битый</text>
+	</string>
+	<string id="lname_stalker_120">
+		<text>Умник</text>
+	</string>
+	<string id="lname_stalker_121">
+		<text>Ухарь</text>
+	</string>
+	<string id="lname_stalker_122">
+		<text>Ушастый</text>
+	</string>
+	<string id="lname_stalker_123">
+		<text>Фигляр</text>
+	</string>
+	<string id="lname_stalker_124">
+		<text>Хохмач</text>
+	</string>
+	<string id="lname_stalker_125">
+		<text>Хромой</text>
+	</string>
+	<string id="lname_stalker_126">
+		<text>Хроник</text>
+	</string>
+	<string id="lname_stalker_127">
+		<text>Худой</text>
+	</string>
+	<string id="lname_stalker_128">
+		<text>Циник</text>
+	</string>
+	<string id="lname_stalker_129">
+		<text>Чувак</text>
+	</string>
+	<string id="lname_stalker_13">
+		<text>Блаженный</text>
+	</string>
+	<string id="lname_stalker_130">
+		<text>Шалый</text>
+	</string>
+	<string id="lname_stalker_131">
+		<text>Резвый</text>
+	</string>
+	<string id="lname_stalker_132">
+		<text>Эстет</text>
+	</string>
+	<string id="lname_stalker_133">
+		<text>Ядрёный</text>
+	</string>
+	<string id="lname_stalker_134">
+		<text>Абитуриент</text>
+	</string>
+	<string id="lname_stalker_135">
+		<text>Абориген</text>
+	</string>
+	<string id="lname_stalker_136">
+		<text>Авиатор</text>
+	</string>
+	<string id="lname_stalker_137">
+		<text>Агент</text>
+	</string>
+	<string id="lname_stalker_138">
+		<text>Адвокат</text>
+	</string>
+	<string id="lname_stalker_139">
+		<text>Айболит</text>
+	</string>
+	<string id="lname_stalker_14">
+		<text>Блатной</text>
+	</string>
+	<string id="lname_stalker_140">
+		<text>Апостол</text>
+	</string>
+	<string id="lname_stalker_141">
+		<text>Артист</text>
+	</string>
+	<string id="lname_stalker_142">
+		<text>Аскет</text>
+	</string>
+	<string id="lname_stalker_143">
+		<text>Аферист</text>
+	</string>
+	<string id="lname_stalker_144">
+		<text>Банкир</text>
+	</string>
+	<string id="lname_stalker_145">
+		<text>Бард</text>
+	</string>
+	<string id="lname_stalker_146">
+		<text>Барон</text>
+	</string>
+	<string id="lname_stalker_147">
+		<text>Барыга</text>
+	</string>
+	<string id="lname_stalker_148">
+		<text>Басурман</text>
+	</string>
+	<string id="lname_stalker_149">
+		<text>Бегун</text>
+	</string>
+	<string id="lname_stalker_15">
+		<text>Богатырь</text>
+	</string>
+	<string id="lname_stalker_150">
+		<text>Боец</text>
+	</string>
+	<string id="lname_stalker_151">
+		<text>Бомж</text>
+	</string>
+	<string id="lname_stalker_152">
+		<text>Боцман</text>
+	</string>
+	<string id="lname_stalker_153">
+		<text>Пигмей</text>
+	</string>
+	<string id="lname_stalker_154">
+		<text>Бурбон</text>
+	</string>
+	<string id="lname_stalker_155">
+		<text>Буржуй</text>
+	</string>
+	<string id="lname_stalker_156">
+		<text>Бюрократ</text>
+	</string>
+	<string id="lname_stalker_157">
+		<text>Вандал</text>
+	</string>
+	<string id="lname_stalker_158">
+		<text>Варвар</text>
+	</string>
+	<string id="lname_stalker_159">
+		<text>Вахтер</text>
+	</string>
+	<string id="lname_stalker_16">
+		<text>Бодряк</text>
+	</string>
+	<string id="lname_stalker_160">
+		<text>Ведьмак</text>
+	</string>
+	<string id="lname_stalker_161">
+		<text>Визитёр</text>
+	</string>
+	<string id="lname_stalker_162">
+		<text>Викинг</text>
+	</string>
+	<string id="lname_stalker_163">
+		<text>Водила</text>
+	</string>
+	<string id="lname_stalker_164">
+		<text>Водолаз</text>
+	</string>
+	<string id="lname_stalker_165">
+		<text>Вождь</text>
+	</string>
+	<string id="lname_stalker_166">
+		<text>Вор</text>
+	</string>
+	<string id="lname_stalker_167">
+		<text>Вояжёр</text>
+	</string>
+	<string id="lname_stalker_168">
+		<text>Врач</text>
+	</string>
+	<string id="lname_stalker_169">
+		<text>Всадник</text>
+	</string>
+	<string id="lname_stalker_17">
+		<text>Болтун</text>
+	</string>
+	<string id="lname_stalker_170">
+		<text>Гангстер</text>
+	</string>
+	<string id="lname_stalker_171">
+		<text>Геолог</text>
+	</string>
+	<string id="lname_stalker_172">
+		<text>Гладиатор</text>
+	</string>
+	<string id="lname_stalker_173">
+		<text>Гонец</text>
+	</string>
+	<string id="lname_stalker_174">
+		<text>Гость</text>
+	</string>
+	<string id="lname_stalker_175">
+		<text>Граф</text>
+	</string>
+	<string id="lname_stalker_176">
+		<text>Грузчик</text>
+	</string>
+	<string id="lname_stalker_177">
+		<text>Дед</text>
+	</string>
+	<string id="lname_stalker_178">
+		<text>Дезертир</text>
+	</string>
+	<string id="lname_stalker_179">
+		<text>Делец</text>
+	</string>
+	<string id="lname_stalker_18">
+		<text>Борзой</text>
+	</string>
+	<string id="lname_stalker_180">
+		<text>Денди</text>
+	</string>
+	<string id="lname_stalker_181">
+		<text>Депутат</text>
+	</string>
+	<string id="lname_stalker_182">
+		<text>Деспот</text>
+	</string>
+	<string id="lname_stalker_183">
+		<text>Дикарь</text>
+	</string>
+	<string id="lname_stalker_184">
+		<text>Дипломат</text>
+	</string>
+	<string id="lname_stalker_185">
+		<text>Док</text>
+	</string>
+	<string id="lname_stalker_186">
+		<text>Доктор</text>
+	</string>
+	<string id="lname_stalker_187">
+		<text>Доцент</text>
+	</string>
+	<string id="lname_stalker_188">
+		<text>Душитель</text>
+	</string>
+	<string id="lname_stalker_189">
+		<text>Егерь</text>
+	</string>
+	<string id="lname_stalker_19">
+		<text>Босяк</text>
+	</string>
+	<string id="lname_stalker_190">
+		<text>Законник</text>
+	</string>
+	<string id="lname_stalker_191">
+		<text>Зенитчик</text>
+	</string>
+	<string id="lname_stalker_192">
+		<text>Знахарь</text>
+	</string>
+	<string id="lname_stalker_193">
+		<text>Игрок</text>
+	</string>
+	<string id="lname_stalker_194">
+		<text>Индеец</text>
+	</string>
+	<string id="lname_stalker_195">
+		<text>Ирокез</text>
+	</string>
+	<string id="lname_stalker_196">
+		<text>Капитан</text>
+	</string>
+	<string id="lname_stalker_197">
+		<text>Кидала</text>
+	</string>
+	<string id="lname_stalker_198">
+		<text>Клоун</text>
+	</string>
+	<string id="lname_stalker_199">
+		<text>Князь</text>
+	</string>
+	<string id="lname_stalker_2">
+		<text>Красный</text>
+	</string>
+	<string id="lname_stalker_20">
+		<text>Бритый</text>
+	</string>
+	<string id="lname_stalker_200">
+		<text>Казак</text>
+	</string>
+	<string id="lname_stalker_201">
+		<text>Кок</text>
+	</string>
+	<string id="lname_stalker_202">
+		<text>Колдун</text>
+	</string>
+	<string id="lname_stalker_203">
+		<text>Команч</text>
+	</string>
+	<string id="lname_stalker_204">
+		<text>Король</text>
+	</string>
+	<string id="lname_stalker_205">
+		<text>Крёстный отец</text>
+	</string>
+	<string id="lname_stalker_206">
+		<text>Купец</text>
+	</string>
+	<string id="lname_stalker_207">
+		<text>Курильщик</text>
+	</string>
+	<string id="lname_stalker_208">
+		<text>Курьер</text>
+	</string>
+	<string id="lname_stalker_209">
+		<text>Кучер</text>
+	</string>
+	<string id="lname_stalker_21">
+		<text>Бывалый</text>
+	</string>
+	<string id="lname_stalker_210">
+		<text>Легионер</text>
+	</string>
+	<string id="lname_stalker_211">
+		<text>Лекарь</text>
+	</string>
+	<string id="lname_stalker_212">
+		<text>Лесник</text>
+	</string>
+	<string id="lname_stalker_213">
+		<text>Лорд</text>
+	</string>
+	<string id="lname_stalker_214">
+		<text>Магнат</text>
+	</string>
+	<string id="lname_stalker_215">
+		<text>Мажор</text>
+	</string>
+	<string id="lname_stalker_216">
+		<text>Маньяк</text>
+	</string>
+	<string id="lname_stalker_217">
+		<text>Марсианин</text>
+	</string>
+	<string id="lname_stalker_218">
+		<text>Масон</text>
+	</string>
+	<string id="lname_stalker_219">
+		<text>Механик</text>
+	</string>
+	<string id="lname_stalker_22">
+		<text>Важный</text>
+	</string>
+	<string id="lname_stalker_220">
+		<text>Могильщик</text>
+	</string>
+	<string id="lname_stalker_221">
+		<text>Модератор</text>
+	</string>
+	<string id="lname_stalker_222">
+		<text>Молочник</text>
+	</string>
+	<string id="lname_stalker_223">
+		<text>Мясник</text>
+	</string>
+	<string id="lname_stalker_224">
+		<text>Наёмник</text>
+	</string>
+	<string id="lname_stalker_225">
+		<text>Настройщик</text>
+	</string>
+	<string id="lname_stalker_226">
+		<text>Начальник</text>
+	</string>
+	<string id="lname_stalker_227">
+		<text>Ниндзя</text>
+	</string>
+	<string id="lname_stalker_228">
+		<text>Оператор</text>
+	</string>
+	<string id="lname_stalker_229">
+		<text>Оружейник</text>
+	</string>
+	<string id="lname_stalker_23">
+		<text>Везунчик</text>
+	</string>
+	<string id="lname_stalker_230">
+		<text>Падишах</text>
+	</string>
+	<string id="lname_stalker_231">
+		<text>Палач</text>
+	</string>
+	<string id="lname_stalker_232">
+		<text>Полкан</text>
+	</string>
+	<string id="lname_stalker_233">
+		<text>Панк</text>
+	</string>
+	<string id="lname_stalker_234">
+		<text>Папа</text>
+	</string>
+	<string id="lname_stalker_235">
+		<text>Партизан</text>
+	</string>
+	<string id="lname_stalker_236">
+		<text>Пастор</text>
+	</string>
+	<string id="lname_stalker_237">
+		<text>Пастух</text>
+	</string>
+	<string id="lname_stalker_238">
+		<text>Пастырь</text>
+	</string>
+	<string id="lname_stalker_239">
+		<text>Пахарь</text>
+	</string>
+	<string id="lname_stalker_24">
+		<text>Везучий</text>
+	</string>
+	<string id="lname_stalker_240">
+		<text>Пацифист</text>
+	</string>
+	<string id="lname_stalker_241">
+		<text>Перевозчик</text>
+	</string>
+	<string id="lname_stalker_242">
+		<text>Свистун</text>
+	</string>
+	<string id="lname_stalker_243">
+		<text>Пилот</text>
+	</string>
+	<string id="lname_stalker_244">
+		<text>Пионер</text>
+	</string>
+	<string id="lname_stalker_245">
+		<text>Пират</text>
+	</string>
+	<string id="lname_stalker_246">
+		<text>Плотник</text>
+	</string>
+	<string id="lname_stalker_247">
+		<text>Поджигатель</text>
+	</string>
+	<string id="lname_stalker_248">
+		<text>Пожарник</text>
+	</string>
+	<string id="lname_stalker_249">
+		<text>Ползун</text>
+	</string>
+	<string id="lname_stalker_25">
+		<text>Верзила</text>
+	</string>
+	<string id="lname_stalker_250">
+		<text>Полярник</text>
+	</string>
+	<string id="lname_stalker_251">
+		<text>Посол</text>
+	</string>
+	<string id="lname_stalker_252">
+		<text>Почтальон</text>
+	</string>
+	<string id="lname_stalker_253">
+		<text>Поэт</text>
+	</string>
+	<string id="lname_stalker_254">
+		<text>Принц</text>
+	</string>
+	<string id="lname_stalker_255">
+		<text>Пророк</text>
+	</string>
+	<string id="lname_stalker_256">
+		<text>Профессор</text>
+	</string>
+	<string id="lname_stalker_257">
+		<text>Прыгун</text>
+	</string>
+	<string id="lname_stalker_258">
+		<text>Пчеловод</text>
+	</string>
+	<string id="lname_stalker_259">
+		<text>Работяга</text>
+	</string>
+	<string id="lname_stalker_26">
+		<text>Верный</text>
+	</string>
+	<string id="lname_stalker_260">
+		<text>Раввин</text>
+	</string>
+	<string id="lname_stalker_261">
+		<text>Радист</text>
+	</string>
+	<string id="lname_stalker_262">
+		<text>Разбойник</text>
+	</string>
+	<string id="lname_stalker_263">
+		<text>Растаман</text>
+	</string>
+	<string id="lname_stalker_264">
+		<text>Ратник</text>
+	</string>
+	<string id="lname_stalker_265">
+		<text>Рокер</text>
+	</string>
+	<string id="lname_stalker_266">
+		<text>Рудокоп</text>
+	</string>
+	<string id="lname_stalker_267">
+		<text>Самурай</text>
+	</string>
+	<string id="lname_stalker_268">
+		<text>Сапер</text>
+	</string>
+	<string id="lname_stalker_269">
+		<text>Связной</text>
+	</string>
+	<string id="lname_stalker_27">
+		<text>Глазастый</text>
+	</string>
+	<string id="lname_stalker_270">
+		<text>Священник</text>
+	</string>
+	<string id="lname_stalker_271">
+		<text>Секретарь</text>
+	</string>
+	<string id="lname_stalker_272">
+		<text>Сердцеед</text>
+	</string>
+	<string id="lname_stalker_273">
+		<text>Симулянт</text>
+	</string>
+	<string id="lname_stalker_274">
+		<text>Скиф</text>
+	</string>
+	<string id="lname_stalker_275">
+		<text>Следопыт</text>
+	</string>
+	<string id="lname_stalker_276">
+		<text>Слесарь</text>
+	</string>
+	<string id="lname_stalker_277">
+		<text>Смертник</text>
+	</string>
+	<string id="lname_stalker_278">
+		<text>Собачник</text>
+	</string>
+	<string id="lname_stalker_279">
+		<text>Спасатель</text>
+	</string>
+	<string id="lname_stalker_28">
+		<text>Глыба</text>
+	</string>
+	<string id="lname_stalker_280">
+		<text>Спортсмен</text>
+	</string>
+	<string id="lname_stalker_281">
+		<text>Странник</text>
+	</string>
+	<string id="lname_stalker_282">
+		<text>Студент</text>
+	</string>
+	<string id="lname_stalker_283">
+		<text>Судья</text>
+	</string>
+	<string id="lname_stalker_284">
+		<text>Мухомор</text>
+	</string>
+	<string id="lname_stalker_285">
+		<text>Сутенер</text>
+	</string>
+	<string id="lname_stalker_286">
+		<text>Счетовод</text>
+	</string>
+	<string id="lname_stalker_287">
+		<text>Танкист</text>
+	</string>
+	<string id="lname_stalker_288">
+		<text>Танцор</text>
+	</string>
+	<string id="lname_stalker_289">
+		<text>Тиран</text>
+	</string>
+	<string id="lname_stalker_29">
+		<text>Гнилой</text>
+	</string>
+	<string id="lname_stalker_290">
+		<text>Торгаш</text>
+	</string>
+	<string id="lname_stalker_291">
+		<text>Трофейщик</text>
+	</string>
+	<string id="lname_stalker_292">
+		<text>Трубочист</text>
+	</string>
+	<string id="lname_stalker_293">
+		<text>Туземец</text>
+	</string>
+	<string id="lname_stalker_294">
+		<text>Турист</text>
+	</string>
+	<string id="lname_stalker_295">
+		<text>Убийца</text>
+	</string>
+	<string id="lname_stalker_296">
+		<text>Фагот</text>
+	</string>
+	<string id="lname_stalker_297">
+		<text>Футболист</text>
+	</string>
+	<string id="lname_stalker_298">
+		<text>Снайпер</text>
+	</string>
+	<string id="lname_stalker_299">
+		<text>Химик</text>
+	</string>
+	<string id="lname_stalker_3">
+		<text>Ржавый</text>
+	</string>
+	<string id="lname_stalker_30">
+		<text>Говорун</text>
+	</string>
+	<string id="lname_stalker_300">
+		<text>Чебурек</text>
+	</string>
+	<string id="lname_stalker_301">
+		<text>Художник</text>
+	</string>
+	<string id="lname_stalker_302">
+		<text>Чабан</text>
+	</string>
+	<string id="lname_stalker_303">
+		<text>Шаман</text>
+	</string>
+	<string id="lname_stalker_304">
+		<text>Шатун</text>
+	</string>
+	<string id="lname_stalker_305">
+		<text>Шахтер</text>
+	</string>
+	<string id="lname_stalker_306">
+		<text>Шериф</text>
+	</string>
+	<string id="lname_stalker_307">
+		<text>Шеф</text>
+	</string>
+	<string id="lname_stalker_308">
+		<text>Школяр</text>
+	</string>
+	<string id="lname_stalker_309">
+		<text>Шофер</text>
+	</string>
+	<string id="lname_stalker_31">
+		<text>Горбун</text>
+	</string>
+	<string id="lname_stalker_310">
+		<text>Шпион</text>
+	</string>
+	<string id="lname_stalker_311">
+		<text>Электрик</text>
+	</string>
+	<string id="lname_stalker_312">
+		<text>Юнга</text>
+	</string>
+	<string id="lname_stalker_313">
+		<text>Язычник</text>
+	</string>
+	<string id="lname_stalker_314">
+		<text>Аллигатор</text>
+	</string>
+	<string id="lname_stalker_315">
+		<text>Анаконда</text>
+	</string>
+	<string id="lname_stalker_316">
+		<text>Бабуин</text>
+	</string>
+	<string id="lname_stalker_317">
+		<text>Бизон</text>
+	</string>
+	<string id="lname_stalker_318">
+		<text>Бобёр</text>
+	</string>
+	<string id="lname_stalker_319">
+		<text>Богомол</text>
+	</string>
+	<string id="lname_stalker_32">
+		<text>Гордый</text>
+	</string>
+	<string id="lname_stalker_320">
+		<text>Бульдог</text>
+	</string>
+	<string id="lname_stalker_321">
+		<text>Бурундук</text>
+	</string>
+	<string id="lname_stalker_322">
+		<text>Бык</text>
+	</string>
+	<string id="lname_stalker_323">
+		<text>Вепрь</text>
+	</string>
+	<string id="lname_stalker_324">
+		<text>Воробей</text>
+	</string>
+	<string id="lname_stalker_325">
+		<text>Ворон</text>
+	</string>
+	<string id="lname_stalker_326">
+		<text>Выхухоль</text>
+	</string>
+	<string id="lname_stalker_327">
+		<text>Подорожник</text>
+	</string>
+	<string id="lname_stalker_328">
+		<text>Дворник</text>
+	</string>
+	<string id="lname_stalker_329">
+		<text>Грач</text>
+	</string>
+	<string id="lname_stalker_33">
+		<text>Горький</text>
+	</string>
+	<string id="lname_stalker_330">
+		<text>Манул</text>
+	</string>
+	<string id="lname_stalker_331">
+		<text>Гусь</text>
+	</string>
+	<string id="lname_stalker_332">
+		<text>Дельфин</text>
+	</string>
+	<string id="lname_stalker_333">
+		<text>Динозавр</text>
+	</string>
+	<string id="lname_stalker_334">
+		<text>Дрозд</text>
+	</string>
+	<string id="lname_stalker_335">
+		<text>Дятел</text>
+	</string>
+	<string id="lname_stalker_336">
+		<text>Ёж</text>
+	</string>
+	<string id="lname_stalker_337">
+		<text>Жук</text>
+	</string>
+	<string id="lname_stalker_338">
+		<text>Заяц</text>
+	</string>
+	<string id="lname_stalker_339">
+		<text>Зверь</text>
+	</string>
+	<string id="lname_stalker_34">
+		<text>Грозный</text>
+	</string>
+	<string id="lname_stalker_340">
+		<text>Колдун</text>
+	</string>
+	<string id="lname_stalker_341">
+		<text>Зубр</text>
+	</string>
+	<string id="lname_stalker_342">
+		<text>Индюк</text>
+	</string>
+	<string id="lname_stalker_343">
+		<text>Кабан</text>
+	</string>
+	<string id="lname_stalker_344">
+		<text>Карась</text>
+	</string>
+	<string id="lname_stalker_345">
+		<text>Кенарь</text>
+	</string>
+	<string id="lname_stalker_346">
+		<text>Клоп</text>
+	</string>
+	<string id="lname_stalker_347">
+		<text>Кобра</text>
+	</string>
+	<string id="lname_stalker_348">
+		<text>Комар</text>
+	</string>
+	<string id="lname_stalker_349">
+		<text>Конь</text>
+	</string>
+	<string id="lname_stalker_35">
+		<text>Громила</text>
+	</string>
+	<string id="lname_stalker_350">
+		<text>Кот</text>
+	</string>
+	<string id="lname_stalker_351">
+		<text>Крокодил</text>
+	</string>
+	<string id="lname_stalker_352">
+		<text>Кузнечик</text>
+	</string>
+	<string id="lname_stalker_353">
+		<text>Легавый</text>
+	</string>
+	<string id="lname_stalker_354">
+		<text>Лось</text>
+	</string>
+	<string id="lname_stalker_355">
+		<text>Мамонт</text>
+	</string>
+	<string id="lname_stalker_356">
+		<text>Слон</text>
+	</string>
+	<string id="lname_stalker_357">
+		<text>Микроб</text>
+	</string>
+	<string id="lname_stalker_358">
+		<text>Москит</text>
+	</string>
+	<string id="lname_stalker_359">
+		<text>Муравей</text>
+	</string>
+	<string id="lname_stalker_36">
+		<text>Длинный</text>
+	</string>
+	<string id="lname_stalker_360">
+		<text>Овод</text>
+	</string>
+	<string id="lname_stalker_361">
+		<text>Паук</text>
+	</string>
+	<string id="lname_stalker_362">
+		<text>Пацюк</text>
+	</string>
+	<string id="lname_stalker_363">
+		<text>Пилигрим</text>
+	</string>
+	<string id="lname_stalker_364">
+		<text>Пиранья</text>
+	</string>
+	<string id="lname_stalker_365">
+		<text>Питон</text>
+	</string>
+	<string id="lname_stalker_366">
+		<text>Русак</text>
+	</string>
+	<string id="lname_stalker_367">
+		<text>Сова</text>
+	</string>
+	<string id="lname_stalker_368">
+		<text>Сокол</text>
+	</string>
+	<string id="lname_stalker_369">
+		<text>Сурок</text>
+	</string>
+	<string id="lname_stalker_37">
+		<text>Добряк</text>
+	</string>
+	<string id="lname_stalker_370">
+		<text>Суслик</text>
+	</string>
+	<string id="lname_stalker_371">
+		<text>Пескарь</text>
+	</string>
+	<string id="lname_stalker_372">
+		<text>Таракан</text>
+	</string>
+	<string id="lname_stalker_373">
+		<text>Тарантул</text>
+	</string>
+	<string id="lname_stalker_374">
+		<text>Тушканчик</text>
+	</string>
+	<string id="lname_stalker_375">
+		<text>Удав</text>
+	</string>
+	<string id="lname_stalker_376">
+		<text>Филин</text>
+	</string>
+	<string id="lname_stalker_377">
+		<text>Хорёк</text>
+	</string>
+	<string id="lname_stalker_378">
+		<text>Червь</text>
+	</string>
+	<string id="lname_stalker_379">
+		<text>Шатун</text>
+	</string>
+	<string id="lname_stalker_38">
+		<text>Дохлый</text>
+	</string>
+	<string id="lname_stalker_380">
+		<text>Абсолют</text>
+	</string>
+	<string id="lname_stalker_381">
+		<text>Аномалия</text>
+	</string>
+	<string id="lname_stalker_382">
+		<text>Бампер</text>
+	</string>
+	<string id="lname_stalker_383">
+		<text>Батон</text>
+	</string>
+	<string id="lname_stalker_384">
+		<text>Битый</text>
+	</string>
+	<string id="lname_stalker_385">
+		<text>Беспредел</text>
+	</string>
+	<string id="lname_stalker_386">
+		<text>Болид</text>
+	</string>
+	<string id="lname_stalker_387">
+		<text>Болт</text>
+	</string>
+	<string id="lname_stalker_388">
+		<text>Бритва</text>
+	</string>
+	<string id="lname_stalker_389">
+		<text>Бубен</text>
+	</string>
+	<string id="lname_stalker_39">
+		<text>Доходяга</text>
+	</string>
+	<string id="lname_stalker_390">
+		<text>Бублик</text>
+	</string>
+	<string id="lname_stalker_391">
+		<text>Вакуум</text>
+	</string>
+	<string id="lname_stalker_392">
+		<text>Хлам</text>
+	</string>
+	<string id="lname_stalker_393">
+		<text>Валун</text>
+	</string>
+	<string id="lname_stalker_394">
+		<text>Вентилятор</text>
+	</string>
+	<string id="lname_stalker_395">
+		<text>Вертолёт</text>
+	</string>
+	<string id="lname_stalker_396">
+		<text>Ветер</text>
+	</string>
+	<string id="lname_stalker_397">
+		<text>Винт</text>
+	</string>
+	<string id="lname_stalker_398">
+		<text>Ворот</text>
+	</string>
+	<string id="lname_stalker_399">
+		<text>Гвоздь</text>
+	</string>
+	<string id="lname_stalker_4">
+		<text>Рыжий</text>
+	</string>
+	<string id="lname_stalker_40">
+		<text>Дохляк</text>
+	</string>
+	<string id="lname_stalker_400">
+		<text>Гильза</text>
+	</string>
+	<string id="lname_stalker_401">
+		<text>Глобус</text>
+	</string>
+	<string id="lname_stalker_402">
+		<text>Глыба</text>
+	</string>
+	<string id="lname_stalker_403">
+		<text>Граната</text>
+	</string>
+	<string id="lname_stalker_404">
+		<text>Туман</text>
+	</string>
+	<string id="lname_stalker_405">
+		<text>Гроб</text>
+	</string>
+	<string id="lname_stalker_406">
+		<text>Дачник</text>
+	</string>
+	<string id="lname_stalker_407">
+		<text>Движок</text>
+	</string>
+	<string id="lname_stalker_408">
+		<text>Динамит</text>
+	</string>
+	<string id="lname_stalker_409">
+		<text>Дырчик</text>
+	</string>
+	<string id="lname_stalker_41">
+		<text>Дырявый</text>
+	</string>
+	<string id="lname_stalker_410">
+		<text>Закон</text>
+	</string>
+	<string id="lname_stalker_411">
+		<text>Замок</text>
+	</string>
+	<string id="lname_stalker_412">
+		<text>Затвор</text>
+	</string>
+	<string id="lname_stalker_413">
+		<text>Изотоп</text>
+	</string>
+	<string id="lname_stalker_414">
+		<text>Камень</text>
+	</string>
+	<string id="lname_stalker_415">
+		<text>Капкан</text>
+	</string>
+	<string id="lname_stalker_416">
+		<text>Ведун</text>
+	</string>
+	<string id="lname_stalker_417">
+		<text>Карма</text>
+	</string>
+	<string id="lname_stalker_418">
+		<text>Кирпич</text>
+	</string>
+	<string id="lname_stalker_419">
+		<text>Клей</text>
+	</string>
+	<string id="lname_stalker_42">
+		<text>Жадина</text>
+	</string>
+	<string id="lname_stalker_420">
+		<text>Ключ</text>
+	</string>
+	<string id="lname_stalker_421">
+		<text>Кнут</text>
+	</string>
+	<string id="lname_stalker_422">
+		<text>Козырь</text>
+	</string>
+	<string id="lname_stalker_423">
+		<text>Колпак</text>
+	</string>
+	<string id="lname_stalker_424">
+		<text>Колун</text>
+	</string>
+	<string id="lname_stalker_425">
+		<text>Коньяк</text>
+	</string>
+	<string id="lname_stalker_426">
+		<text>Корень</text>
+	</string>
+	<string id="lname_stalker_427">
+		<text>Коса</text>
+	</string>
+	<string id="lname_stalker_428">
+		<text>Космос</text>
+	</string>
+	<string id="lname_stalker_429">
+		<text>Лопата</text>
+	</string>
+	<string id="lname_stalker_43">
+		<text>Жалкий</text>
+	</string>
+	<string id="lname_stalker_430">
+		<text>Косяк</text>
+	</string>
+	<string id="lname_stalker_431">
+		<text>Крест</text>
+	</string>
+	<string id="lname_stalker_432">
+		<text>Рубероид</text>
+	</string>
+	<string id="lname_stalker_433">
+		<text>Курок</text>
+	</string>
+	<string id="lname_stalker_434">
+		<text>Лапоть</text>
+	</string>
+	<string id="lname_stalker_435">
+		<text>Лом</text>
+	</string>
+	<string id="lname_stalker_436">
+		<text>Машина</text>
+	</string>
+	<string id="lname_stalker_437">
+		<text>Мишень</text>
+	</string>
+	<string id="lname_stalker_438">
+		<text>Мотор</text>
+	</string>
+	<string id="lname_stalker_439">
+		<text>Насос</text>
+	</string>
+	<string id="lname_stalker_44">
+		<text>Железный</text>
+	</string>
+	<string id="lname_stalker_440">
+		<text>Ночной</text>
+	</string>
+	<string id="lname_stalker_441">
+		<text>Обрез</text>
+	</string>
+	<string id="lname_stalker_442">
+		<text>Панадол</text>
+	</string>
+	<string id="lname_stalker_443">
+		<text>Парашют</text>
+	</string>
+	<string id="lname_stalker_444">
+		<text>Патрон</text>
+	</string>
+	<string id="lname_stalker_445">
+		<text>Перекур</text>
+	</string>
+	<string id="lname_stalker_446">
+		<text>Перо</text>
+	</string>
+	<string id="lname_stalker_447">
+		<text>Пистон</text>
+	</string>
+	<string id="lname_stalker_448">
+		<text>Пластилин</text>
+	</string>
+	<string id="lname_stalker_449">
+		<text>Порох</text>
+	</string>
+	<string id="lname_stalker_45">
+		<text>Железячник</text>
+	</string>
+	<string id="lname_stalker_450">
+		<text>Пятак</text>
+	</string>
+	<string id="lname_stalker_451">
+		<text>Ракета</text>
+	</string>
+	<string id="lname_stalker_452">
+		<text>Рама</text>
+	</string>
+	<string id="lname_stalker_453">
+		<text>Реактор</text>
+	</string>
+	<string id="lname_stalker_454">
+		<text>Резак</text>
+	</string>
+	<string id="lname_stalker_455">
+		<text>Решето</text>
+	</string>
+	<string id="lname_stalker_456">
+		<text>Решка</text>
+	</string>
+	<string id="lname_stalker_457">
+		<text>Робот</text>
+	</string>
+	<string id="lname_stalker_458">
+		<text>Рогач</text>
+	</string>
+	<string id="lname_stalker_459">
+		<text>Совок</text>
+	</string>
+	<string id="lname_stalker_46">
+		<text>Жжёный</text>
+	</string>
+	<string id="lname_stalker_460">
+		<text>Самогон</text>
+	</string>
+	<string id="lname_stalker_461">
+		<text>Сапог</text>
+	</string>
+	<string id="lname_stalker_462">
+		<text>Сидр</text>
+	</string>
+	<string id="lname_stalker_463">
+		<text>Смерть</text>
+	</string>
+	<string id="lname_stalker_464">
+		<text>Спирт</text>
+	</string>
+	<string id="lname_stalker_465">
+		<text>Стамеска</text>
+	</string>
+	<string id="lname_stalker_466">
+		<text>Ствол</text>
+	</string>
+	<string id="lname_stalker_467">
+		<text>Сундук</text>
+	</string>
+	<string id="lname_stalker_468">
+		<text>Топор</text>
+	</string>
+	<string id="lname_stalker_469">
+		<text>Торец</text>
+	</string>
+	<string id="lname_stalker_47">
+		<text>Живчик</text>
+	</string>
+	<string id="lname_stalker_470">
+		<text>Точило</text>
+	</string>
+	<string id="lname_stalker_471">
+		<text>Туз</text>
+	</string>
+	<string id="lname_stalker_472">
+		<text>Узел</text>
+	</string>
+	<string id="lname_stalker_473">
+		<text>Фактор</text>
+	</string>
+	<string id="lname_stalker_474">
+		<text>Фонарь</text>
+	</string>
+	<string id="lname_stalker_475">
+		<text>Чекан</text>
+	</string>
+	<string id="lname_stalker_476">
+		<text>Червень</text>
+	</string>
+	<string id="lname_stalker_477">
+		<text>Чеснок</text>
+	</string>
+	<string id="lname_stalker_478">
+		<text>Чучело</text>
+	</string>
+	<string id="lname_stalker_479">
+		<text>Шанс</text>
+	</string>
+	<string id="lname_stalker_48">
+		<text>Жирдяй</text>
+	</string>
+	<string id="lname_stalker_480">
+		<text>Шкет</text>
+	</string>
+	<string id="lname_stalker_481">
+		<text>Шип</text>
+	</string>
+	<string id="lname_stalker_482">
+		<text>Шкаф</text>
+	</string>
+	<string id="lname_stalker_483">
+		<text>Шпала</text>
+	</string>
+	<string id="lname_stalker_484">
+		<text>Штакет</text>
+	</string>
+	<string id="lname_stalker_485">
+		<text>Штуцер</text>
+	</string>
+	<string id="lname_stalker_486">
+		<text>Штык</text>
+	</string>
+	<string id="lname_stalker_487">
+		<text>Штырь</text>
+	</string>
+	<string id="lname_stalker_488">
+		<text>Шуруп</text>
+	</string>
+	<string id="lname_stalker_489">
+		<text>Шухер</text>
+	</string>
+	<string id="lname_stalker_49">
+		<text>Жлоб</text>
+	</string>
+	<string id="lname_stalker_490">
+		<text>Голова</text>
+	</string>
+	<string id="lname_stalker_491">
+		<text>Клык</text>
+	</string>
+	<string id="lname_stalker_492">
+		<text>Коготь</text>
+	</string>
+	<string id="lname_stalker_493">
+		<text>Кость</text>
+	</string>
+	<string id="lname_stalker_494">
+		<text>Кулак</text>
+	</string>
+	<string id="lname_stalker_495">
+		<text>Нерв</text>
+	</string>
+	<string id="lname_stalker_496">
+		<text>Скелет</text>
+	</string>
+	<string id="lname_stalker_497">
+		<text>Хвост</text>
+	</string>
+	<string id="lname_stalker_498">
+		<text>Грива</text>
+	</string>
+	<string id="lname_stalker_499">
+		<text>Синяк</text>
+	</string>
+	<string id="lname_stalker_5">
+		<text>Седой</text>
+	</string>
+	<string id="lname_stalker_50">
+		<text>Жмот</text>
+	</string>
+	<string id="lname_stalker_500">
+		<text>Бармалей</text>
+	</string>
+	<string id="lname_stalker_501">
+		<text>Батый</text>
+	</string>
+	<string id="lname_stalker_502">
+		<text>Богатырь</text>
+	</string>
+	<string id="lname_stalker_503">
+		<text>Буратино</text>
+	</string>
+	<string id="lname_stalker_504">
+		<text>Ведьмак</text>
+	</string>
+	<string id="lname_stalker_505">
+		<text>Воланд</text>
+	</string>
+	<string id="lname_stalker_506">
+		<text>Гомер</text>
+	</string>
+	<string id="lname_stalker_507">
+		<text>Горыныч</text>
+	</string>
+	<string id="lname_stalker_508">
+		<text>Грозный</text>
+	</string>
+	<string id="lname_stalker_509">
+		<text>Джоконда</text>
+	</string>
+	<string id="lname_stalker_51">
+		<text>Жмур</text>
+	</string>
+	<string id="lname_stalker_510">
+		<text>Дуремар</text>
+	</string>
+	<string id="lname_stalker_511">
+		<text>Железняк</text>
+	</string>
+	<string id="lname_stalker_512">
+		<text>Икар</text>
+	</string>
+	<string id="lname_stalker_513">
+		<text>Казанова</text>
+	</string>
+	<string id="lname_stalker_514">
+		<text>Кащей</text>
+	</string>
+	<string id="lname_stalker_515">
+		<text>Кесарь</text>
+	</string>
+	<string id="lname_stalker_516">
+		<text>Колобок</text>
+	</string>
+	<string id="lname_stalker_517">
+		<text>Кутузов</text>
+	</string>
+	<string id="lname_stalker_518">
+		<text>Малыш</text>
+	</string>
+	<string id="lname_stalker_519">
+		<text>Наполеон</text>
+	</string>
+	<string id="lname_stalker_52">
+		<text>Задумчивый</text>
+	</string>
+	<string id="lname_stalker_520">
+		<text>Нельсон</text>
+	</string>
+	<string id="lname_stalker_521">
+		<text>Нептун</text>
+	</string>
+	<string id="lname_stalker_522">
+		<text>Оскар</text>
+	</string>
+	<string id="lname_stalker_523">
+		<text>Прометей</text>
+	</string>
+	<string id="lname_stalker_524">
+		<text>Пушкин</text>
+	</string>
+	<string id="lname_stalker_525">
+		<text>Пятница</text>
+	</string>
+	<string id="lname_stalker_526">
+		<text>Рембо</text>
+	</string>
+	<string id="lname_stalker_527">
+		<text>Рокфор</text>
+	</string>
+	<string id="lname_stalker_528">
+		<text>Сусанин</text>
+	</string>
+	<string id="lname_stalker_529">
+		<text>Терминатор</text>
+	</string>
+	<string id="lname_stalker_53">
+		<text>Зануда</text>
+	</string>
+	<string id="lname_stalker_530">
+		<text>Бормотуха</text>
+	</string>
+	<string id="lname_stalker_531">
+		<text>Цезарь</text>
+	</string>
+	<string id="lname_stalker_532">
+		<text>Чапаев</text>
+	</string>
+	<string id="lname_stalker_533">
+		<text>Чапай</text>
+	</string>
+	<string id="lname_stalker_534">
+		<text>Чебур</text>
+	</string>
+	<string id="lname_stalker_535">
+		<text>Чебурашка</text>
+	</string>
+	<string id="lname_stalker_536">
+		<text>Чингачгук</text>
+	</string>
+	<string id="lname_stalker_537">
+		<text>Чингиз</text>
+	</string>
+	<string id="lname_stalker_538">
+		<text>Штирлиц</text>
+	</string>
+	<string id="lname_stalker_539">
+		<text>Банан</text>
+	</string>
+	<string id="lname_stalker_54">
+		<text>Зоркий</text>
+	</string>
+	<string id="lname_stalker_540">
+		<text>Барабашка</text>
+	</string>
+	<string id="lname_stalker_541">
+		<text>Батон</text>
+	</string>
+	<string id="lname_stalker_542">
+		<text>Батя</text>
+	</string>
+	<string id="lname_stalker_543">
+		<text>Баян</text>
+	</string>
+	<string id="lname_stalker_544">
+		<text>Братан</text>
+	</string>
+	<string id="lname_stalker_545">
+		<text>Булкин</text>
+	</string>
+	<string id="lname_stalker_546">
+		<text>Бульдозер</text>
+	</string>
+	<string id="lname_stalker_547">
+		<text>Буфер</text>
+	</string>
+	<string id="lname_stalker_548">
+		<text>Вареник</text>
+	</string>
+	<string id="lname_stalker_549">
+		<text>Вист</text>
+	</string>
+	<string id="lname_stalker_55">
+		<text>Зубастый</text>
+	</string>
+	<string id="lname_stalker_550">
+		<text>Гангрена</text>
+	</string>
+	<string id="lname_stalker_551">
+		<text>Гибрид</text>
+	</string>
+	<string id="lname_stalker_552">
+		<text>Глюк</text>
+	</string>
+	<string id="lname_stalker_553">
+		<text>Ударник</text>
+	</string>
+	<string id="lname_stalker_554">
+		<text>Горец</text>
+	</string>
+	<string id="lname_stalker_555">
+		<text>Градус</text>
+	</string>
+	<string id="lname_stalker_556">
+		<text>Гремлин</text>
+	</string>
+	<string id="lname_stalker_557">
+		<text>Сайгак</text>
+	</string>
+	<string id="lname_stalker_558">
+		<text>Дядька</text>
+	</string>
+	<string id="lname_stalker_559">
+		<text>Звиздец</text>
+	</string>
+	<string id="lname_stalker_56">
+		<text>Зябкий</text>
+	</string>
+	<string id="lname_stalker_560">
+		<text>Изгой</text>
+	</string>
+	<string id="lname_stalker_561">
+		<text>Кагор</text>
+	</string>
+	<string id="lname_stalker_562">
+		<text>Капуста</text>
+	</string>
+	<string id="lname_stalker_563">
+		<text>Карбид</text>
+	</string>
+	<string id="lname_stalker_564">
+		<text>Холодец</text>
+	</string>
+	<string id="lname_stalker_565">
+		<text>Козырь</text>
+	</string>
+	<string id="lname_stalker_566">
+		<text>Командор</text>
+	</string>
+	<string id="lname_stalker_567">
+		<text>Король</text>
+	</string>
+	<string id="lname_stalker_568">
+		<text>Косяк</text>
+	</string>
+	<string id="lname_stalker_569">
+		<text>Лапоть</text>
+	</string>
+	<string id="lname_stalker_57">
+		<text>Изверг</text>
+	</string>
+	<string id="lname_stalker_570">
+		<text>Лед</text>
+	</string>
+	<string id="lname_stalker_571">
+		<text>Леший</text>
+	</string>
+	<string id="lname_stalker_572">
+		<text>Мавр</text>
+	</string>
+	<string id="lname_stalker_573">
+		<text>Мадера</text>
+	</string>
+	<string id="lname_stalker_574">
+		<text>Макарон</text>
+	</string>
+	<string id="lname_stalker_575">
+		<text>Мастер</text>
+	</string>
+	<string id="lname_stalker_576">
+		<text>Мутант</text>
+	</string>
+	<string id="lname_stalker_577">
+		<text>Ништяк</text>
+	</string>
+	<string id="lname_stalker_578">
+		<text>Облом</text>
+	</string>
+	<string id="lname_stalker_579">
+		<text>Омут</text>
+	</string>
+	<string id="lname_stalker_58">
+		<text>Инвалид</text>
+	</string>
+	<string id="lname_stalker_580">
+		<text>Опер</text>
+	</string>
+	<string id="lname_stalker_581">
+		<text>Пельмень</text>
+	</string>
+	<string id="lname_stalker_582">
+		<text>Перец</text>
+	</string>
+	<string id="lname_stalker_583">
+		<text>Погон</text>
+	</string>
+	<string id="lname_stalker_584">
+		<text>Пончик</text>
+	</string>
+	<string id="lname_stalker_585">
+		<text>Пузырь</text>
+	</string>
+	<string id="lname_stalker_586">
+		<text>Рашпиль</text>
+	</string>
+	<string id="lname_stalker_587">
+		<text>Репей</text>
+	</string>
+	<string id="lname_stalker_588">
+		<text>Рязанский</text>
+	</string>
+	<string id="lname_stalker_589">
+		<text>Самогон</text>
+	</string>
+	<string id="lname_stalker_59">
+		<text>Калека</text>
+	</string>
+	<string id="lname_stalker_590">
+		<text>Сморчок</text>
+	</string>
+	<string id="lname_stalker_591">
+		<text>Сухарь</text>
+	</string>
+	<string id="lname_stalker_592">
+		<text>Табак</text>
+	</string>
+	<string id="lname_stalker_593">
+		<text>Табель</text>
+	</string>
+	<string id="lname_stalker_594">
+		<text>Туз</text>
+	</string>
+	<string id="lname_stalker_595">
+		<text>Тыква</text>
+	</string>
+	<string id="lname_stalker_596">
+		<text>Упырь</text>
+	</string>
+	<string id="lname_stalker_597">
+		<text>Фагот</text>
+	</string>
+	<string id="lname_stalker_598">
+		<text>Фантом</text>
+	</string>
+	<string id="lname_stalker_599">
+		<text>Фокус</text>
+	</string>
+	<string id="lname_stalker_6">
+		<text>Сивый</text>
+	</string>
+	<string id="lname_stalker_60">
+		<text>Колотун</text>
+	</string>
+	<string id="lname_stalker_61">
+		<text>Коматозник</text>
+	</string>
+	<string id="lname_stalker_62">
+		<text>Косой</text>
+	</string>
+	<string id="lname_stalker_63">
+		<text>Косолапый</text>
+	</string>
+	<string id="lname_stalker_64">
+		<text>Костлявый</text>
+	</string>
+	<string id="lname_stalker_65">
+		<text>Кривой</text>
+	</string>
+	<string id="lname_stalker_66">
+		<text>Кривоног</text>
+	</string>
+	<string id="lname_stalker_67">
+		<text>Ловкач</text>
+	</string>
+	<string id="lname_stalker_68">
+		<text>Лохматый</text>
+	</string>
+	<string id="lname_stalker_69">
+		<text>Лысый</text>
+	</string>
+	<string id="lname_stalker_7">
+		<text>Синий</text>
+	</string>
+	<string id="lname_stalker_70">
+		<text>Любимчик</text>
+	</string>
+	<string id="lname_stalker_71">
+		<text>Лютый</text>
+	</string>
+	<string id="lname_stalker_72">
+		<text>Малыш</text>
+	</string>
+	<string id="lname_stalker_73">
+		<text>Мертвец</text>
+	</string>
+	<string id="lname_stalker_74">
+		<text>Мертвый</text>
+	</string>
+	<string id="lname_stalker_75">
+		<text>Местный</text>
+	</string>
+	<string id="lname_stalker_76">
+		<text>Мрачный</text>
+	</string>
+	<string id="lname_stalker_77">
+		<text>Мутный</text>
+	</string>
+	<string id="lname_stalker_78">
+		<text>Мятый</text>
+	</string>
+	<string id="lname_stalker_79">
+		<text>Нарцисс</text>
+	</string>
+	<string id="lname_stalker_8">
+		<text>Черный</text>
+	</string>
+	<string id="lname_stalker_80">
+		<text>Небрежный</text>
+	</string>
+	<string id="lname_stalker_81">
+		<text>Неудачник</text>
+	</string>
+	<string id="lname_stalker_82">
+		<text>Неумёха</text>
+	</string>
+	<string id="lname_stalker_83">
+		<text>Нудный</text>
+	</string>
+	<string id="lname_stalker_84">
+		<text>Нытик</text>
+	</string>
+	<string id="lname_stalker_85">
+		<text>Одноглазый</text>
+	</string>
+	<string id="lname_stalker_86">
+		<text>Падла</text>
+	</string>
+	<string id="lname_stalker_87">
+		<text>Паразит</text>
+	</string>
+	<string id="lname_stalker_88">
+		<text>Параноик</text>
+	</string>
+	<string id="lname_stalker_89">
+		<text>Пижон</text>
+	</string>
+	<string id="lname_stalker_9">
+		<text>Неуязвимый</text>
+	</string>
+	<string id="lname_stalker_90">
+		<text>Плут</text>
+	</string>
+	<string id="lname_stalker_91">
+		<text>Подлец</text>
+	</string>
+	<string id="lname_stalker_92">
+		<text>Покойник</text>
+	</string>
+	<string id="lname_stalker_93">
+		<text>Праведный</text>
+	</string>
+	<string id="lname_stalker_94">
+		<text>Простак</text>
+	</string>
+	<string id="lname_stalker_95">
+		<text>Псих</text>
+	</string>
+	<string id="lname_stalker_96">
+		<text>Работяга</text>
+	</string>
+	<string id="lname_stalker_97">
+		<text>Рваный</text>
+	</string>
+	<string id="lname_stalker_98">
+		<text>Рвач</text>
+	</string>
+	<string id="lname_stalker_99">
+		<text>Резкий</text>
+	</string>
+</string_table>

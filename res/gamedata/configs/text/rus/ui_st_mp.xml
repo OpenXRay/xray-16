@@ -1,0 +1,741 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="af_neutral">
+		<text>Артефакт</text>
+	</string>
+	<string id="friend">
+		<text>Союзник</text>
+	</string>
+	<string id="mm_mp_max_ping">
+		<text>макс. пинг</text>
+	</string>
+	<string id="mm_mp_profile">
+		<text>Профиль</text>
+	</string>
+	<string id="modes">
+		<text>Режимы</text>
+	</string>
+	<string id="mp_art_destroyed">
+		<text>Артефакт был уничтожен</text>
+	</string>
+	<string id="mp_art_spowned">
+		<text>Артефакт появился. Принесите его на базу, чтобы заработать очко.</text>
+	</string>
+	<string id="mp_artefact_dropped">
+		<text>Артефакт потерян</text>
+	</string>
+	<string id="mp_artefact_on_base">
+		<text>Артефакт на нашей базе</text>
+	</string>
+	<string id="mp_artefact_on_enemy_base">
+		<text>Артефакт на вражеской базе</text>
+	</string>
+	<string id="mp_artefacts">
+		<text>Артефакты</text>
+	</string>
+	<string id="mp_artefacts_upcase">
+		<text>Артефактов</text>
+	</string>
+	<string id="mp_auto_select">
+		<text>Автовыбор</text>
+	</string>
+	<string id="mp_back">
+		<text>Назад</text>
+	</string>
+	<string id="mp_ban">
+		<text>4. Заблокировать</text>
+	</string>
+	<string id="mp_by_anomaly">
+		<text>Аномалией</text>
+	</string>
+	<string id="mp_cancel">
+		<text>Отмена</text>
+	</string>
+	<string id="mp_captured_artefact">
+		<text>захватил артефакт</text>
+	</string>
+	<string id="mp_change_map">
+		<text>5. Изменить карту</text>
+	</string>
+	<string id="mp_change_weather">
+		<text>6. Изменить погоду</text>
+	</string>
+	<string id="mp_change_weather_header">
+		<text>Изменить погоду на</text>
+	</string>
+	<string id="mp_chat">
+		<text>Чат</text>
+	</string>
+	<string id="mp_connected">
+		<text>Соединился</text>
+	</string>
+	<string id="mp_deaths">
+		<text>Смерти</text>
+	</string>
+	<string id="mp_description">
+		<text>Описание</text>
+	</string>
+	<string id="mp_disconnected">
+		<text>отсоединился</text>
+	</string>
+	<string id="mp_enter_text">
+		<text>Введите текст для голосования</text>
+	</string>
+	<string id="mp_entered_game">
+		<text>вступил в игру</text>
+	</string>
+	<string id="mp_firestation">
+		<text>Пожарная станция</text>
+	</string>
+	<string id="mp_first_eye">
+		<text>(От первого лица)</text>
+	</string>
+	<string id="mp_frags">
+		<text>фраги</text>
+	</string>
+	<string id="mp_frags_upcase">
+		<text>Фрагов</text>
+	</string>
+	<string id="mp_free_fly">
+		<text>(Свободный полёт)</text>
+	</string>
+	<string id="mp_free_look">
+		<text>(От третьего лица)</text>
+	</string>
+	<string id="mp_from">
+		<text>от</text>
+	</string>
+	<string id="mp_gamemode">
+		<text>7. Режим</text>
+	</string>
+	<string id="mp_garbage">
+		<text>Свалка</text>
+	</string>
+	<string id="mp_go">
+		<text>ВПЕРЁД!</text>
+	</string>
+	<string id="mp_has_drop_art">
+		<text>потерял%s Артефакт</text>
+	</string>
+	<string id="mp_has_dropped_artefact">
+		<text>потерял артефакт</text>
+	</string>
+	<string id="mp_has_tak_art">
+		<text>взял%s Артефакт</text>
+	</string>
+	<string id="mp_headhuntrs">
+		<text>Наёмники</text>
+	</string>
+	<string id="mp_is_now">
+		<text>теперь</text>
+	</string>
+	<string id="mp_joined">
+		<text>присоединился к команде</text>
+	</string>
+	<string id="mp_kick">
+		<text>3. Выбросить</text>
+	</string>
+	<string id="mp_limansk">
+		<text>Лиманск</text>
+	</string>
+	<string id="mp_loading_awards">
+		<text>Загрузка наград...</text>
+	</string>
+	<string id="mp_loading_best_scores">
+		<text>Загрузка лучших результатов...</text>
+	</string>
+	<string id="mp_look_at">
+		<text>(Свободно-привязанный)</text>
+	</string>
+	<string id="mp_map_desc">
+		<text>Описание карты</text>
+	</string>
+	<string id="mp_match_started">
+		<text>Бой начался!</text>
+	</string>
+	<string id="mp_military_2">
+		<text>Старая деревня</text>
+	</string>
+	<string id="mp_modes">
+		<text>Режимы</text>
+	</string>
+	<string id="mp_name">
+		<text>Имя</text>
+	</string>
+	<string id="mp_next">
+		<text>Дальше</text>
+	</string>
+	<string id="mp_no_voted">
+		<text>Не проголосовали</text>
+	</string>
+	<string id="mp_ping">
+		<text>Пинг</text>
+	</string>
+	<string id="mp_player_wins">
+		<text>Игрок %s выиграл бой!</text>
+	</string>
+	<string id="mp_players">
+		<text>Игроков</text>
+	</string>
+	<string id="mp_press_fire2spectator">
+		<text>Нажмите «Огонь», чтобы перейти в режим наблюдения</text>
+	</string>
+	<string id="mp_press_jump2pay_spaw">
+		<text>Нажмите «Прыжок», чтобы купить моментальное рождение</text>
+	</string>
+	<string id="mp_press_jump2select_skin">
+		<text>Нажмите «Прыжок», чтобы выбрать униформу</text>
+	</string>
+	<string id="mp_press_jump2select_team">
+		<text>Нажмите «Прыжок», чтобы выбрать команды</text>
+	</string>
+	<string id="mp_press_jump2spawn">
+		<text>Нажмите «Прыжок», чтобы родиться</text>
+	</string>
+	<string id="mp_press_jump2start">
+		<text>Нажмите «Прыжок», чтобы стартовать</text>
+	</string>
+	<string id="mp_press_to_buy">
+		<text>Нажмите «$$ACTION_BUY_MENU$$» для доступа к меню покупки</text>
+	</string>
+	<string id="mp_press_yes2pay">
+		<text>У Вас есть %d$. Вы можете купить рождение за %d$. Нажмите «Да», чтобы заплатить</text>
+	</string>
+	<string id="mp_ready">
+		<text>Внимание...</text>
+	</string>
+	<string id="mp_rembasa">
+		<text>Ремонтная база</text>
+	</string>
+	<string id="mp_restart">
+		<text>1. Рестарт</text>
+	</string>
+	<string id="mp_restart_fast">
+		<text>2. Быстрый рестарт</text>
+	</string>
+	<string id="mp_returned_artefact">
+		<text>возвратил артефакт</text>
+	</string>
+	<string id="mp_scores">
+		<text>зарабатывают очко</text>
+	</string>
+	<string id="mp_select_ban">
+		<text>Выберите игрока, для блокирования которого назначается голосование</text>
+	</string>
+	<string id="mp_select_category">
+		<text>Выберите категорию голосования</text>
+	</string>
+	<string id="mp_select_kick">
+		<text>Выберите игрока, для выбрасывания которого назначается голосование</text>
+	</string>
+	<string id="mp_select_kick_player">
+		<text>Выберите игрока, для выбрасывания которого назначается голосование</text>
+	</string>
+	<string id="mp_select_map">
+		<text>Выберите карту для голосования</text>
+	</string>
+	<string id="mp_si_afbearer_cant_sprint">
+		<text>Не бегать с артефактом</text>
+	</string>
+	<string id="mp_si_afcount">
+		<text>- Количество</text>
+	</string>
+	<string id="mp_si_afrespawntime">
+		<text>- Появление</text>
+	</string>
+	<string id="mp_si_afstaytime">
+		<text>- Время</text>
+	</string>
+	<string id="mp_si_anomalies">
+		<text>Аномалии</text>
+	</string>
+	<string id="mp_si_anomalies_period">
+		<text>Период аномалий</text>
+	</string>
+	<string id="mp_si_any_time">
+		<text>Любое время</text>
+	</string>
+	<string id="mp_si_artefact_captured">
+		<text>Артефакт захвачен</text>
+	</string>
+	<string id="mp_si_artefacts">
+		<text>Артефакты:</text>
+	</string>
+	<string id="mp_si_autoteam_balance">
+		<text>Автобаланс команд</text>
+	</string>
+	<string id="mp_si_autoteam_swap">
+		<text>Автосмена команд</text>
+	</string>
+	<string id="mp_si_battleye">
+		<text>BattlEye</text>
+	</string>
+	<string id="mp_si_disabled">
+		<text>Выкл.</text>
+	</string>
+	<string id="mp_si_enabled">
+		<text>Вкл.</text>
+	</string>
+	<string id="mp_si_first_eye">
+		<text>- От первого лица</text>
+	</string>
+	<string id="mp_si_forcerespawn">
+		<text>Принудит. рождение</text>
+	</string>
+	<string id="mp_si_fraglimit">
+		<text>Лимит фрагов</text>
+	</string>
+	<string id="mp_si_free_fly">
+		<text>- Свободный полёт</text>
+	</string>
+	<string id="mp_si_free_look">
+		<text>- Свободный обзор</text>
+	</string>
+	<string id="mp_si_friendly_fire">
+		<text>Огонь по своим</text>
+	</string>
+	<string id="mp_si_friendly_indicators">
+		<text>Индикаторы союзников</text>
+	</string>
+	<string id="mp_si_friendly_names">
+		<text>Имена союзников</text>
+	</string>
+	<string id="mp_si_infinite">
+		<text>Бесконечный</text>
+	</string>
+	<string id="mp_si_invinsibility">
+		<text>Невидимость:</text>
+	</string>
+	<string id="mp_si_invinsibility_indicators">
+		<text>- Индикаторы</text>
+	</string>
+	<string id="mp_si_invinsibility_time">
+		<text>- Время</text>
+	</string>
+	<string id="mp_si_look_at">
+		<text>- От третьего лица</text>
+	</string>
+	<string id="mp_si_maprotation">
+		<text>Смена карт</text>
+	</string>
+	<string id="mp_si_max_ping">
+		<text>макс. пинг</text>
+	</string>
+	<string id="mp_si_min">
+		<text>мин.</text>
+	</string>
+	<string id="mp_si_no">
+		<text>Нет</text>
+	</string>
+	<string id="mp_si_players_respawn">
+		<text>Рождение игроков</text>
+	</string>
+	<string id="mp_si_return_players">
+		<text>Возврат на базы</text>
+	</string>
+	<string id="mp_si_sec">
+		<text>сек.</text>
+	</string>
+	<string id="mp_si_servername">
+		<text>Имя сервера:</text>
+	</string>
+	<string id="mp_si_shielded_bases">
+		<text>Защищённые базы</text>
+	</string>
+	<string id="mp_si_spectatormodes">
+		<text>Режимы наблюдения:</text>
+	</string>
+	<string id="mp_si_team_only">
+		<text>- Только команда</text>
+	</string>
+	<string id="mp_si_time_limit">
+		<text>Лимит времени</text>
+	</string>
+	<string id="mp_si_version">
+		<text>Версия:</text>
+	</string>
+	<string id="mp_si_voting">
+		<text>Голосование</text>
+	</string>
+	<string id="mp_si_warmuptime">
+		<text>Разминка</text>
+	</string>
+	<string id="mp_si_yes">
+		<text>Да</text>
+	</string>
+	<string id="mp_skin_selection">
+		<text>Выбор униформы</text>
+	</string>
+	<string id="mp_spectator">
+		<text>Наблюдатель</text>
+	</string>
+	<string id="mp_spectators">
+		<text>НАБЛЮДАТЕЛИ</text>
+	</string>
+	<string id="mp_sport_center">
+		<text>Спортивный центр</text>
+	</string>
+	<string id="mp_status">
+		<text>Статус</text>
+	</string>
+	<string id="mp_switched_to">
+		<text>перешёл в команду</text>
+	</string>
+	<string id="mp_team_free_stalkers">
+		<text>«Свобода»</text>
+	</string>
+	<string id="mp_team_selection">
+		<text>Выбор команды</text>
+	</string>
+	<string id="mp_team_wins">
+		<text>Команда %s ВЫИГРЫВАЕТ!</text>
+	</string>
+	<string id="mp_text">
+		<text>Текст</text>
+	</string>
+	<string id="mp_time2respawn">
+		<text>Время до рождения</text>
+	</string>
+	<string id="mp_time2start">
+		<text>Время до старта:</text>
+	</string>
+	<string id="mp_timeleft">
+		<text>Осталось времени: %d:%d; Согласились: %.2f</text>
+	</string>
+	<string id="mp_training_camp">
+		<text>Тренировочный лагерь</text>
+	</string>
+	<string id="mp_vote_hint">
+		<text>Голосовать ЗА-[$$ACTION_VOTE_YES$$]\nГолосовать ПРОТИВ-[$$ACTION_VOTE_NO$$]\nРезультаты-[$$ACTION_VOTE$$]</text>
+	</string>
+	<string id="mp_vote_no">
+		<text>Против</text>
+	</string>
+	<string id="mp_vote_yes">
+		<text>За</text>
+	</string>
+	<string id="mp_voted">
+		<text>Проголосовал</text>
+	</string>
+	<string id="mp_voted_no">
+		<text>«Против»</text>
+	</string>
+	<string id="mp_voted_yes">
+		<text>«За»</text>
+	</string>
+	<string id="mp_voting_broken">
+		<text>Голосование аннулировано сервером!</text>
+	</string>
+	<string id="mp_voting_started">
+		<text>Голосование '%s' было начато %s.</text>
+	</string>
+	<string id="mp_voting_started_msg">
+		<text>Голосование началось!</text>
+	</string>
+	<string id="mp_weather_clear">
+		<text>1. Чистая</text>
+	</string>
+	<string id="mp_weather_cloudy">
+		<text>4. Облачная</text>
+	</string>
+	<string id="mp_weather_night">
+		<text>3. Ночь</text>
+	</string>
+	<string id="mp_weather_rain">
+		<text>2. Дождь</text>
+	</string>
+	<string id="mp_with_backstab">
+		<text>зарезан!</text>
+	</string>
+	<string id="mp_with_headshot">
+		<text>в голову!</text>
+	</string>
+	<string id="mp_you_captured_artefact">
+		<text>Вы захватили вражеский артефакт, принесите его к своему!</text>
+	</string>
+	<string id="mp_you_captured_own_artefact">
+		<text>Вы подняли свой артефакт. Активируйте его, чтобы возратить на базу!</text>
+	</string>
+	<string id="mp_your_rank">
+		<text>Ваш ранг теперь</text>
+	</string>
+	<string id="self">
+		<text>Меченый</text>
+	</string>
+	<string id="st_mp_disabled_voting">
+		<text>Голосование недоступно на этом сервере</text>
+	</string>
+	<string id="st_mp_no_current_voting">
+		<text>Сейчас нет активных голосований</text>
+	</string>
+	<string id="st_mp_only_one_voting">
+		<text>Разрешено только одно активное голосование</text>
+	</string>
+	<string id="st_mp_ready">
+		<text>Готов</text>
+	</string>
+	<string id="st_mp_say_to_all">
+		<text>Всем</text>
+	</string>
+	<string id="st_mp_say_to_team">
+		<text>Команде</text>
+	</string>
+	<string id="st_mp_voting_failed">
+		<text>Голосование провалено!</text>
+	</string>
+	<string id="st_mp_voting_succeed">
+		<text>Голосование прошло успешно!</text>
+	</string>
+	<string id="team_base_1">
+		<text>База «Свободы»</text>
+	</string>
+	<string id="team_base_2">
+		<text>База наёмников</text>
+	</string>
+	<string id="ui_mp_ah">
+		<text>2. Охота за артефактом</text>
+	</string>
+	<string id="ui_mp_cta">
+		<text>4. Захват артефакта</text>
+	</string>
+	<string id="ui_mp_dm">
+		<text>1. Все против всех</text>
+	</string>
+	<string id="ui_mp_gamespy_creating_new_profile">
+		<text>Создание нового профиля...</text>
+	</string>
+	<string id="ui_mp_gamespy_getting_account_profiles">
+		<text>Получение профилей аккаунта...</text>
+	</string>
+	<string id="ui_mp_gamespy_loading_rewards_hello">
+		<text>Здравствуйте,</text>
+	</string>
+	<string id="ui_mp_gamespy_logining_to_profile">
+		<text>Подключение к профилю...</text>
+	</string>
+	<string id="ui_mp_gamespy_profile_created">
+		<text>Профиль успешно создан. Пожалуйста, подключитесь к нему.</text>
+	</string>
+	<string id="ui_mp_gamespy_suggesting_unique_name">
+		<text>Проверка уникального имени...</text>
+	</string>
+	<string id="ui_mp_gamespy_use_existing_profile">
+		<text>Хотите ли вы использовать существующий профиль с именем</text>
+	</string>
+	<string id="ui_mp_gamespy_verify_account_profiles">
+		<text>Аккаунт найден. Получение зарегистрированых профилей...</text>
+	</string>
+	<string id="ui_mp_gamespy_verify_account_profiles_error1">
+		<text>Ваш профиль уже создан. Пожалуйста, подключитесь к нему.</text>
+	</string>
+	<string id="ui_mp_gamespy_verify_email">
+		<text>Проверка существования аккаунта...</text>
+	</string>
+	<string id="ui_mp_gamespy_verify_nickname_error1">
+		<text>Это уникальное имя уже используется. Пожалуйста, выберите одно из предложеных в выпадающем списке ниже, или введите другое.</text>
+	</string>
+	<string id="ui_mp_gamespy_verify_password_error1">
+		<text>Введёные пароли не совпадают!</text>
+	</string>
+	<string id="ui_mp_tdm">
+		<text>3. Команда против команды</text>
+	</string>
+	<string id="ui_st_btn_copy_url">
+		<text>Скопировать ссылку</text>
+	</string>
+	<string id="ui_st_btn_download_map">
+		<text>Загрузить карту</text>
+	</string>
+	<string id="ui_st_description">
+		<text>Описание</text>
+	</string>
+	<string id="ui_st_map_data_corrupted">
+		<text>Карта не верна или испорчена</text>
+	</string>
+	<string id="ui_st_map_not_found">
+		<text>Карта не найдена</text>
+	</string>
+	<string id="ui_st_mp_awards">
+		<text>Награды</text>
+	</string>
+	<string id="ui_st_mp_best_results">
+		<text>Лучшие результаты</text>
+	</string>
+	<string id="ui_st_mp_check_avaliability">
+		<text>Проверить</text>
+	</string>
+	<string id="ui_st_mp_confirm_password">
+		<text>Подтвердите пароль</text>
+	</string>
+	<string id="ui_st_mp_email">
+		<text>E-mail</text>
+	</string>
+	<string id="ui_st_mp_forgot_password">
+		<text>Забыли пароль?</text>
+	</string>
+	<string id="ui_st_mp_gamespy_account_creation">
+		<text>Страница создания GameSpy ID</text>
+	</string>
+	<string id="ui_st_mp_password">
+		<text>Пароль</text>
+	</string>
+	<string id="ui_st_mp_remember_me">
+		<text>Запомнить</text>
+	</string>
+	<string id="ui_st_mp_unique_nickname">
+		<text>Уникальное имя</text>
+	</string>
+	<string id="ui_st_mp_unique_nickname_change">
+		<text>Уникальное имя успешно изменено на</text>
+	</string>
+	<string id="ui_st_team">
+		<text>Команда</text>
+	</string>
+	<string id="ui_st_team1_name">
+		<text>«Свобода»</text>
+	</string>
+	<string id="ui_st_team2_name">
+		<text>Наёмники</text>
+	</string>
+	<string id="ui_st_mp_create_new_account">
+		<text>Новый профиль</text>
+	</string>
+	<string id="ui_st_mp_gamespy_login_page">
+		<text>Авторизация на GameSpy</text>
+	</string>
+	<string id="mpd_play">
+		<text>играть</text>
+	</string>
+	<string id="mpd_rewind">
+		<text>перемотка</text>
+	</string>
+	<string id="mpd_restart">
+		<text>рестарт</text>
+	</string>
+	<string id="mpd_rewind_until_start">
+		<text>до старта</text>
+	</string>
+	<string id="mpd_rewind_until_kill">
+		<text>до убийства</text>
+	</string>
+	<string id="mpd_rewind_until_die">
+		<text>до смерти</text>
+	</string>
+	<string id="mpd_rewind_until_arttake">
+		<text>до захвата артефакта</text>
+	</string>
+	<string id="mpd_rewind_until_artdrop">
+		<text>до потери артефакта</text>
+	</string>
+	<string id="mpd_rewind_until_artdeliver">
+		<text>до приноса артефакта</text>
+	</string>
+	<string id="mpd_any_player">
+		<text>любой</text>
+	</string>
+	<string id="mm_mp_login">
+		<text>Логин</text>
+	</string>
+	<string id="ui_mp_am_screen_all">
+		<text>Скриншоты со всех</text>
+	</string>
+	<string id="ui_mp_am_config_all">
+		<text>Конфиги со всех</text>
+	</string>
+	<string id="ui_mp_am_ping_limit">
+		<text>Ограничение пинга:</text>
+	</string>
+	<string id="ui_mp_am_set_ping_limit">
+		<text>Ограничение пинга</text>
+	</string>
+	<string id="ui_mp_am_screen_selected">
+		<text>Скриншот выбр. игрока</text>
+	</string>
+	<string id="ui_mp_am_config_selected">
+		<text>Конфиг выбр. игрока</text>
+	</string>
+	<string id="ui_mp_am_kick_selected">
+		<text>Выбросить выбр. игрока</text>
+	</string>
+	<string id="ui_mp_am_ban_selected">
+		<text>Забанить выбр. игрока</text>
+	</string>
+	<string id="ui_mp_am_restart">
+		<text>Рестарт</text>
+	</string>
+	<string id="ui_mp_am_fast_restart">
+		<text>Быстрый рестарт</text>
+	</string>
+	<string id="ui_mp_am_change_weather">
+		<text>Сменить погоду</text>
+	</string>
+	<string id="ui_mp_am_set_change_rate">
+		<text>Скорость смены погоды</text>
+	</string>
+	<string id="ui_mp_am_change_game_type">
+		<text>Сменить тип игры</text>
+	</string>
+	<string id="ui_mp_am_change_game_limits">
+		<text>Изменить настройки игры</text>
+	</string>
+	<string id="ui_mp_am_stop_cur_voting">
+		<text>Остановить тек. голосование</text>
+	</string>
+	<string id="ui_mp_am_set_time_limit">
+		<text>Огран. времени (0, 180)</text>
+	</string>
+	<string id="ui_mp_am_set_frag_limit">
+		<text>Огран. фрагов (0, 1000)</text>
+	</string>
+	<string id="ui_mp_am_set_art_limit">
+		<text>Огран. артефактов (0, 100)</text>
+	</string>
+	<string id="ui_mp_am_set_warm_up_time">
+		<text>Время разогрева (0, 3600)</text>
+	</string>
+	<string id="ui_mp_am_set_invincible_time">
+		<text>Время неуязв. (0, 60 CTA)</text>
+	</string>
+	<string id="ui_mp_am_set_damage_block_time">
+		<text>Время неуязв. (0, 600 T/DM)</text>
+	</string>
+	<string id="ui_mp_am_set_reinforcement_time">
+		<text>Время подкреп. (-1, 3600)</text>
+	</string>
+	<string id="mp_gp_unknown_error_4">
+		<text>Неизвестная ошибка профиля (код: 4)</text>
+	</string>
+	<string id="ui_mp_am_10_minutes">
+		<text>10 минут</text>
+	</string>
+	<string id="ui_mp_am_30_minutes">
+		<text>30 минут</text>
+	</string>
+	<string id="ui_mp_am_1_hour">
+		<text>1 час</text>
+	</string>
+	<string id="ui_mp_am_6_hours">
+		<text>6 часов</text>
+	</string>
+	<string id="ui_mp_am_1_day">
+		<text>1 день</text>
+	</string>
+	<string id="ui_mp_am_1_week">
+		<text>1 неделя</text>
+	</string>
+	<string id="ui_mp_am_1_month">
+		<text>1 месяц</text>
+	</string>
+	<string id="ui_mp_am_3_monthes">
+		<text>3 месяца</text>
+	</string>
+	<string id="ui_mp_am_forever">
+		<text>Навсегда</text>
+	</string>
+	<string id="mp_gp_unique_nick_too_short">
+		<text>Слишком короткое уникальное имя</text>
+	</string>
+	<string id="mp_gp_unknown_error_512">
+		<text>Ошибка создания профиля</text>
+	</string>
+</string_table>

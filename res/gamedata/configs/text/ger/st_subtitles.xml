@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="zat_a1_cutscene_phrase_1">
+		<text>Am 26. April 1986 wird um 01:23 Uhr der Reaktor von Block 4 des Atomkraftwerks Tschernobyl durch eine Folge von thermischen Explosionen zerstцrt. Die dadurch entstandene radioaktive Wolke bewegt sich ьber den europдischen Teil der UdSSR, Osteuropas und Skandinaviens und erreicht schlieЯlich den amerikanischen Kontinent.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_2">
+		<text>Die Konsequenzen dieser Katastrophe sind so fatal, dass die Regierung sich gezwungen sieht, eine Evakuierung der nahe liegenden Stдdte und Dцrfer anzuordnen.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_3">
+		<text>Eine Sperrzone mit einem Radius von 30 Kilometern wird errichtet, um die Bewohner daran zu hindern, in das verstrahlte Gebiet zurьckzukehren.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_4">
+		<text>Trotz der Katastrophe bleibt das Atomkraftwerk Tschernobyl in Betrieb. Die Existenz eines Kraftwerks sowie die Tatsache, dass das Gebiet nicht mehr besiedelt ist, veranlassen den Ministerrat der UdSSR dazu, in der Sperrzone ein Netzwerk aus geheimen Labors zu errichten.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_5">
+		<text>11. Juni 2006. Die Sperrzone wird von einem grellen Blitz erhellt, gefolgt von in den Himmel aufsteigendem Rauch. Nach einem Augenblick der totalen Stille bringt ein drцhnender Donner die Erde zum Beben. Die meisten Truppen der Regierung, die dort zur Bewachung des Gebiets stationiert sind, sterben auf der Stelle.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_6">
+		<text>2008. Die Wissenschaftler haben immer noch keine Erklдrung fьr die Vorkommnisse gefunden. Die seltenen Expeditionen in die Sperrzone enden fьr gewцhnlich in einer Tragцdie und die Ьberlebenden berichten von mutierten Tieren mit unglaublichen Fдhigkeiten, die durch das Gelдnde streifen.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_7">
+		<text>Laut verschiedener Schдtzungen beheimatet die Zone im Jahr 2010 zwischen ein- und dreihundert unbekannte Personen. Sie nennen sich Stalker und verdienen sich ihren Lebensunterhalt durch das Einsammeln ungewцhnlicher Gesteinsbildungen, die gemeinhin als Artefakte bekannt sind und zu stattlichen Preisen gehandelt werden.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_8">
+		<text>2011. Trotz der Errichtung militдrischer Sperrgebiete nimmt die Zahl der Stalker immer weiter zu. Diese halten sich jedoch ьberwiegend in den Randgebieten der Zone auf und das Zentrum bleibt nahezu unerforscht. Die wenigen Versuche, tiefer in die Zone vorzudringen, schlagen ausnahmslos fehl.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_9">
+		<text>2012: Ein Stalker namens Strelok lьftet das Geheimnis um den Hirnschmelzer, einen von Menschenhand geschaffenen Sender, der fьr Jahre ein Betreten des Zentrums der Zone unmцglich gemacht hat. Nachdem der Hirnschmelzer deaktiviert wurde, treibt es alle Stalker in das Zentrum der Zone: einige mit der Hoffnung, einen wertvollen Artefaktfund zu machen, andere auf der Suche nach dem Wunschgцnner.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_10">
+		<text>Die Regierung beschlieЯt, eine groЯ angelegte Militдroperation durchzufьhren. Bei diesem Einsatz - Operation "Fairway" - finden Karten mit Anomaliefeldern Verwendung, um Hubschrauber unversehrt zum Atomkraftwerk Tschernobyl manцvrieren zu kцnnen. Trotz sorgfдltiger Vorbereitung missglьckt die Operation und keiner der Hubschrauber kehrt zurьck.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_11">
+		<text>Major Degtarew, Agent des ukrainischen Geheimdienstes, wird in die Zone geschickt, um das Verschwinden der Hubschrauber zu untersuchen.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_12">
+		<text>Verkleidet als Stalker, bewaffnet mit einem gewцhnlichen Sturmgewehr und ausgerьstet mit Verpflegung fьr zwei Wochen sowie mit einem Funkgerдt zur Kommunikation mit dem Hauptquartier macht sich der Major auf den Weg in das Zentrum der Zone.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_13">
+		<text>Gesprдche mit Stalkern fьhren zu keinem Ergebnis. Entweder haben sie keine Informationen, oder sie wollen sie fьr sich behalten...</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_14">
+		<text>Die Zone lдsst keine Gelegenheit aus, den Major daran zu erinnern, dass dieser Einsatz kein Erholungsurlaub ist. Kein Tag vergeht ohne einen Angriff von Mutanten oder schlimmer: Menschen.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_15">
+		<text>Die Kommunikation mit dem Hauptquartier gibt ebenfalls keinen Anlass, optimistisch zu sein: Die Informationen sind spдrlich, abgesehen von den Koordinaten der fьnf abgestьrzten Hubschrauber, die per Satellit ьbertragen wurden.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_16">
+		<text>Als der Major nur noch 5 Kilometer vom Atomkraftwerk Tschernobyl entfernt ist, bricht der Funkkontakt ab.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_1">
+		<text>Degtarew wurde als Belohnung dafьr, dass er seine Ermittlungen erfolgreich abschlieЯen konnte, zum Oberst befцrdert und zum Missionskoordinator ernannt. Er lehnte die Arbeit im Hauptquartier ab und bat darum, fьr den ukrainischen Geheimdienst als stдndiger Beobachter in die Zone geschickt zu werden.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_2">
+		<text>Die Informationen ьber die Entwicklung von PSI-Gerдten, die Degtarew beschafft hatte, waren alarmierend fьr den ukrainischen Geheimdienst. Alle entsprechenden Informationen wurden aus den Militдrunterlagen entfernt und als streng geheim eingestuft. Das gesamte Personal, das in der Zone tдtig war, wurde angewiesen, um jeden Preis zu verhindern, dass Details ьber die Labors an die Цffentlichkeit gelangen.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_3">
+		<text>Auf Basis der technischen Dokumente fьr Forschungsobjekt 62 wurden verschiedene experimentelle Prototypen entwickelt. Nach einer Reihe von Tests wurde auf Grund der hohen Kosten fьr die Munition entschieden, dass die Waffe nicht in die Serienproduktion gehen solle. Dennoch ist es nicht unwahrscheinlich, dass die Entwicklung des GauЯgewehrs fortgesetzt wurde und noch wird.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_4_a">
+		<text>Nachdem es Sultan und seiner Bande nicht gelungen war, die Skadowsk zu ьbernehmen, verlieЯen sie das Schiff, um ihren krummen Geschдften woanders nachzugehen. Das daraufhin eintretende Gefьhl der Sicherheit unter den Stalkern fьhrte zu einer enormen Steigerung der Artefaktverkдufe an Beard. Dessen Geschдft blьhte auf und die ehemals ruhige Bar der Skadowsk wurde so beliebt wie die berьhmte 100 Rads Bar, obwohl sie sich fast mitten in der Zone befindet!</text>
+	</string>
+	<string id="pri_a28_outro_phrase_4_b">
+		<text>Die Skadowsk wurde zur Heimat der Banditen. Obwohl alle Stalker zu Steuerzahlungen gezwungen wurden, gingen die Streitereien an Bord dramatisch zurьck, nachdem an einigen unverbesserlichen Quertreibern ein Exempel statuiert worden war - man hatte sie ьber Bord geworfen, damit sie in den Emissionen ums Leben kommen. Beard jedoch war nicht willens, einen Teil seiner Einnahmen abzugeben. Daher scharte er einen Trupp von Stalkern um sich und machte sich auf, um die unerforschten Gebiete der Zone zu erkunden. Auf der Skadowsk setzte sich Sultans Gesellschaftsordnung endgьltig durch.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_4_c">
+		<text>Die Skadowsk wurde zur Heimat fьr all jene, die das Schiff erreichen konnten. Obwohl die Stalker erbitterten Widerstand leisteten, versuchten die Banditen immer wieder vergeblich, ihre so genannte "Ordnung" auf dem Schiff durchzusetzen. Trotz dieser andauernden Auseinandersetzungen wurde auf der Skadowsk die einzigartige Art zu leben fortgefьhrt, fьr die das Schiff so berьhmt war.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_5_a">
+		<text>Leider war dies nicht von allzu langer Dauer. Blutsauger aus einer Hцhle in der Nдhe der Skadowsk fanden einen Weg zum Schiff. Als sie schlieЯlich dazu ьbergingen, am helllichten Tage anzugreifen, wurde die Entscheidung getroffen, den Unterschlupf der Kreaturen zu stьrmen. Leider schafften es die Jдger nicht, tief genug in die Tunnel vorzustoЯen, und schon kurz darauf lцschten die Blutsauger mit einer einzigen Angriffswelle alles Leben an Bord der Skadowsk aus.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_5_b">
+		<text>Nach der Zerstцrung der Blutsaugerhцhle kann wohl kaum noch etwas den Lauf der Dinge auf der Skadowsk stцren. Das alte Schiff entwickelte sich vorьbergehend zu einem Hort der Stabilitдt in der ansonsten vom ewigen Wandel geprдgten Zone.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_6_a">
+		<text>Den Freiheitlern gelang es, das Vertrauen der Stalker in der Janow-Station zu gewinnen. Die Wдchter starteten einen Angriff, um verlorenen Boden wiedergutzumachen, doch Oberst Shulga wurde bei einem Feuergefecht getцtet. Der Wдchtertrupp konnte den Verlust seines Kommandeurs nicht verkraften und fiel schon bald auseinander.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_6_b">
+		<text>Verstдrkungen und die wachsende Beliebtheit unter den Stalkern sorgten dafьr, dass der Angriffstrupp der Wдchter die Freiheitler von der Janow-Station vertreiben konnte. Bei dieser Schlacht wurden Loki und sein Trupp ein fьr allemal ausgeschaltet.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_6_c">
+		<text>Die Freiheitler und die Wдchter in der Janow-Station gelangten zu einem fragilen Gleichgewicht. Die Kдmpfer der beiden Parteien hatten einfach genug von den endlosen Gefechten. Aus diesem Grund begannen sie, ihre Gruppierungen zu verlassen und sich den freien Stalkern anzuschlieЯen.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_7_a">
+		<text>Die wissenschaftliche Expedition, die die Professoren Hermann und Oserski organisiert hatten, war ein voller Erfolg. Die gesammelten Daten ermцglichten bahnbrechende Entwicklungen auf den Gebieten der Medizin und Technik. Dies fьhrte schlieЯlich dazu, dass das Bildungsministerium zusдtzliche Finanzmittel fьr die Erforschung der Zone bewilligte.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_7_b">
+		<text>Die Professoren Hermann und Oserski mussten ihre wissenschaftliche Forschung in der Zone wegen fehlender Daten vorzeitig beenden. Nach ihrer Rьckkehr in die Welt auЯerhalb der Zone widmeten sie sich Arbeitsfeldern, die nichts mehr mit der Zone zu tun hatten.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_8_a">
+		<text>Garis Geschichten ьber den Kampf der Armee gegen die Gefahren von Pripyat ermutigten Stalker dazu, die Geisterstadt zu erkunden. Trotz der Angriffe durch die Monolither gelang es ihnen, das ehemalige Armeelager zu sichern. Sie nutzten es als Basis fьr ihre weiteren VorstцЯe tief in die Stadt, die zwar langsam vonstattengingen, aber dennoch erfolgreich waren.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_8_b">
+		<text>Garis Geschichten ьber das Schicksal der Armee lieЯen die Stalker vor Pripyat zurьckschrecken. Die wenigen, die sich in die Stadt wagten, stieЯen auf unerklдrliche Phдnomene, was das bereits dьstere Bild, das die Menschen von der toten Stadt hatten, weiter verfestigte.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_9">
+		<text>Die Legende von der Oase war keine mehr. Wer schlieЯlich den Weg zur geheimen Anomalie gefunden hatte, wurde zu einem immer beliebteren Gesprдchsthema unter Stalkern. Dennoch versuchten weiterhin zahlreiche Stalker sie zu finden - was sich die Banditen schon bald zu Nutze machten. Sie boten den Stalkern an, sie zur Oase zu fьhren, ьberfielen sie aber lediglich, wenn sie weit genug von den Stalkerlagern entfernt waren.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_10">
+		<text>Organisierte Sцldnertrupps sind weiterhin in der Zone aktiv. Ihr Interesse an den geheimen Labors zu ignorieren, fдllt den Verantwortlichen des ukrainischen Geheimdienstes immer schwerer. Jeder Versuch herauszufinden, wer die Sцldner angeheuert hat, ist bis jetzt gescheitert.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_11_a">
+		<text>Das Gebiet um die Janow-Station zieht weiterhin viele Stalker an. Das Fehlen von gefдhrlichen Mutanten und zahlreiche Anomalien haben dazu gefьhrt, dass das Gebiet immer цfter als "Fundgrube" bezeichnet wird.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_11_b">
+		<text>Das Gebiet um die Janow-Station gehцrt mittlerweile zu den gefдhrlichsten Gegenden der Zone. Immer weniger Stalker kehren von Abstechern dorthin lebend zurьck, viele von ihnen fallen bereits unweit des Lagers wilden Mutanten zum Opfer. Einer der Vermissten ist Trapper, der sich auf die Spuren einer Chimдre gemacht hatte - das dьrfte seine letzte Jagd gewesen sein.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_12_a">
+		<text>Zulu kehrte zur Hauptbasis der Wдchter bei der Rostok-Anlage zurьck. Niemand weiЯ, was er dort mit dem Anfьhrer der Wдchter, General Woronin, besprach. Aber einige Tage spдter wurde er an der Spitze eines groЯen Trupps gesehen, der ins Zentrum der Zone unterwegs war.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_12_b">
+		<text>Gerьchte ьber Zulus Schicksal erreichten den Anfьhrer der Wдchter, General Woronin. Entgegen den meisten Erwartungen entschied Woronin, Zulu posthum den Silbernen Schild zu verleihen, die hцchste Auszeichnung der Wдchter.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_13_a">
+		<text>Wano begab sich in die von den Freiheitlern kontrollierten Militдrlager, wo er durch seinen freundlichen Charakter und Optimismus schnell an Beliebtheit gewann. Spдter ьbernahm er schlieЯlich die Leitung einer kleinen Gruppe von Wissenschaftlern, die Anomaliegebiete untersuchten.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_13_b">
+		<text>Die Stalker in der Janow-Station haben Wano noch nicht vergessen und erinnern sich gern an seine Leichtherzigkeit und seine Fertigkeiten. Auch wenn man sich ьber viele Aspekte seines Lebens streiten kann, ist eines gewiss: Angesichts seines allgemeinen Pechs war es ein groЯer Fehler, sich auf die Suche nach einem Weg nach Pripyat zu machen.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_14_a">
+		<text>In der Zone ist eine neue Gruppierung aufgetaucht. Sie sind gut ausgebildet, aber ihre Ziele sind unbekannt. Gerьchten zufolge handelt es sich bei ihnen um ehemalige Monolither. Ihr Anfьhrer ist unter dem Namen Strider bekannt.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_14_b">
+		<text>Nur wenige bekamen das Verschwinden von Strider mit. Sein Wunsch, Leuten zu helfen, die in den Bann des Monolithen geraten waren, begleitete ihn bis ins Grab.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_15_a">
+		<text>Oberleutnant Sokolow nahm weiterhin an Flugmissionen ьber der Zone teil. Wдhrend eines solchen Fluges ьber Limansk wurde sein Flugzeug von Sцldnern abgeschossen. Zwei Wochen spдter wurde er von einer Patrouille in der Nдhe des Kordons gefunden. Einen Monat nach seiner Rettung verlieЯ Sokolow die Luftstreitkrдfte und heuerte stattdessen bei einer zivilen Luftfahrtgesellschaft an.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_15_b">
+		<text>Zu den zahlreichen Opfern der Operation "Fairway" kam ein weiteres hinzu: "Oberleutnant O. N. Sokolow, gefallen bei der Ausьbung seiner Pflichten."</text>
+	</string>
+	<string id="pri_a28_outro_phrase_16">
+		<text>Uhu hat Kunden auЯerhalb der Zone gefunden. Er verkauft Informationen und diese landen, falls die Gerьchte stimmen sollten, direkt beim ukrainischen Geheimdienst.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_17">
+		<text>Eine Gruppe von Stalkern musste wegen einer besonders starken Emission Unterschlupf auf Noahs altem Kahn suchen. Als das Schiff von einer Horde Schnorks angegriffen wurde, stellte sich heraus, dass der Kahn die beste Verteidigungsmцglichkeit gegen Mutanten war, die die Stalker je gesehen hatten. Und noch erstaunlicher war die Tatsache, dass Noah eine Reihe von Pseudohundwelpen in die Schlacht gegen die Schnorks schickte.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_18_a">
+		<text>Nachdem Kardan vom Schicksal seiner Freunde gehцrt hatte, gab er seine Trдume von einem Leben als Stalker auf. Er besiegte seinen Alkoholismus und zog in die Janow-Station, wo er zusammen mit Nitro eine Werkstatt erцffnete. Mittlerweile widmen beide Mechaniker ihre gesamte Freizeit dem Bau eines Fahrzeugs, das in der Zone eingesetzt werden kann.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_18_b">
+		<text>Nachdem Kardan seine Alkoholsucht besiegt hatte, verlieЯ er die Skadowsk. Es hieЯ, dass er sich auf die Suche nach seinen vermissten Freunden gemacht hдtte. Mehrere Tage spдter kehrte er - verletzt und verstrahlt - zurьck. Sobald seine Verletzungen auskuriert waren, verlieЯ er die Zone zum zweiten und wohl letzten Mal.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_19_a">
+		<text>Strelok gab die Informationen, die er bei seinem Abstecher zum Atomkraftwerk Tschernobyl gesammelt hatte, an den ukrainischen Geheimdienst weiter. Dies veranlasste die Regierung, ein Forschungsinstitut fьr die Erforschung des Anomaliegebiets Tschernobyl einzurichten. Strelok ьbernahm die Position des leitenden wissenschaftlichen Beraters im Institut.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_19_b">
+		<text>Strelok hat sein Wissen mit ins Grab genommen. Die Informationen, die er beim Atomkraftwerk Tschernobyl gesammelt hatte und die zu einem besseren Verstдndnis der Zone hдtten fьhren kцnnen, gelangten niemals in die AuЯenwelt. Fast scheint es so, als ob die Zone wьsste, wie sie ihre Geheimnisse zu schьtzen hat.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_20_a">
+		<text>Als der Kommandeur der Stingray-Staffel, Oberst Kowalski, aus der Zone zurьckkehrte, musste er die Grьnde fьr die misslungene Operation "Fairway" erlдutern. Nach einer schleppenden Untersuchung und dem vergeblichen Versuch der Fьhrungsriege, den Oberst zum Sьndenbock zu machen, wurde dieser schlieЯlich ehrenvoll aus dem Dienst entlassen.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_20_b">
+		<text>Die letzte Ruhestдtte von Oberst Kowalski, Kommandeur der Stingray-Staffel, befindet sich unweit der seines Trupps. Die Zone nahm die Leichen zu sich und nichts weiter als alte Fotos erinnert mittlerweile noch an sie.</text>
+	</string>
+</string_table>

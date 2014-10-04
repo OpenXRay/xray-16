@@ -1,0 +1,44 @@
+[logic]
+active = sr_idle@clean_jup
+
+[sr_idle@clean_jup]
+on_info = {=squad_exist(jup_b15_zulus_squad)} sr_idle@spawn_vano %=remove_squad(jup_b15_zulus_squad)%, sr_idle@spawn_vano
+
+[sr_idle@spawn_vano]
+on_info = {-pri_a15_vano_out} sr_idle@spawn_sokolov %=create_squad(pri_a16_vano_squad:pri_a16)%
+on_info2 = {+pri_a15_vano_out} sr_idle@spawn_sokolov
+
+[sr_idle@spawn_sokolov]
+on_info = {-pri_a15_sokolov_out} sr_idle@spawn_wanderer %=create_squad(pri_a16_sokolov_squad:pri_a16) +pri_a16_sokolov_on_pripyat%
+on_info2 = {+pri_a15_sokolov_out} sr_idle@spawn_wanderer
+
+[sr_idle@spawn_wanderer]
+on_info = {-pri_a15_wanderer_out +jup_b4_monolith_squad_in_freedom} sr_idle@wait %=create_squad(pri_a16_wanderer_freedom_squad:pri_a16)%
+on_info2 = {-pri_a15_wanderer_out +jup_b4_monolith_squad_in_duty} sr_idle@wait %=create_squad(pri_a16_wanderer_dolg_squad:pri_a16)%
+on_info3 = {+pri_a15_wanderer_out} sr_idle@wait
+on_info4 = {-jup_b4_monolith_squad_in_duty -jup_b4_monolith_squad_in_freedom} %+jup_b4_monolith_squad_in_freedom%
+
+[sr_idle@wait]
+on_info = {+pri_a15_cutscene_go} sr_cutscene@start
+;затычка
+on_info2 = {+pri_a15_cutscene_end} sr_idle@fade
+
+[sr_cutscene@start]
+point = pri_a15_actor_walk
+look = pri_a15_actor_look
+cam_effector = pri_a15_cameffector
+on_signal = cameff_end | sr_idle@fade %=teleport_actor(pri_a15_actor_start_walk:pri_a15_actor_start_look) +pri_a15_cutscene_end =run_postprocess(black:3009:true)%
+enable_ui_on_end = false
+outdoor = true
+
+[sr_idle@fade]
+on_info = sr_idle@after %=remove_squad(pri_a15_squad) =remove_squad(pri_a15_military_squad) =forward_game_time(0:20)% 
+
+[sr_idle@after]
+on_info = {=squad_exist(pri_a16_wanderer_squad)} %=set_squad_goodwill(pri_a16_wanderer_squad:friend)% 
+on_info2 = sr_idle@wait_for_end
+
+[sr_idle@wait_for_end]
+on_game_timer = 30 | sr_idle@nil %=enable_ui(true) =stop_postprocess(3009) +pri_a16_kovalski_start =spawn_corpse(sim_default_monolith_2:pri_a15_monolith_dead_stand:0)%
+
+[sr_idle@nil]

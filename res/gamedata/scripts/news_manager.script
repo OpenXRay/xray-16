@@ -1,0 +1,297 @@
+--news = {}
+--[[
+tips_icons = {
+	default  = { 0, 658},      -- ui_iconsTotal_grouping
+	trader	 = { 332, 893},    -- ui_iconsNpc_trader
+	dolg     = { 0, 658},
+	freedom  = { 0, 658},
+	ecolog   = { 498, 0},      -- ui_iconsNpc_ecolog
+	army     = { 332, 141},    -- ui_iconsNpc_stalker_neytral_balon_6
+	stalker  = { 0, 658},
+	csky  	 = { 0, 658},
+	krot     = { 332, 47},     -- ui_iconsNpc_stalker_neytral_rukzak_4
+	barman   = { 332, 235},    -- ui_iconsNpc_barman
+	wolf	 = { 332, 940},    -- ui_iconsNpc_stalker_neytral_balon_1
+	o_soznanie = { 498, 893},
+	monolith = { 0, 658},
+	saharov  = { 332, 470},    -- ui_iconsNpc_ucheniy_2
+	prizrak  = { 0, 658},
+	killer   = { 0, 658},
+	bandit   = { 0, 658},
+	renegade = { 0, 658}
+}
+]]
+
+-- ToDo - Need Pioneer icon here!
+tips_icons = {
+	pioneer 				= "ui_inGame2_PD_Pervootkrivatel",
+	mutant_hunter			= "ui_inGame2_PD_Ohotnik_na_mutantov",
+	detective   			= "ui_inGame2_PD_Sisshik",
+	one_of_the_lads			= "ui_inGame2_PD_Svoy_paren",
+	kingpin					= "ui_inGame2_PD_Avtoritet",
+	herald_of_justice 		= "ui_inGame2_PD_Gonets_pravosudiya",
+	seeker					= "ui_inGame2_PD_Iskatel",
+	battle_systems_master	= "ui_inGame2_PD_master_boevih_sistem",
+	high_tech_master		= "ui_inGame2_PD_Master_visokih_technologiy",
+	skilled_stalker			= "ui_inGame2_PD_Opitniy_stalker",
+	leader					= "ui_inGame2_PD_Lider",
+	diplomat				= "ui_inGame2_PD_Diplomat",
+	research_man			= "ui_inGame2_PD_Nauchniy_sotrudnik",
+	friend_of_duty			= "ui_inGame2_PD_Drug_Dolga",
+	friend_of_freedom		= "ui_inGame2_PD_Drug_Swobodi",
+	balance_advocate		= "ui_inGame2_PD_storonnik_ravnovesiya",
+	wealthy					= "ui_inGame2_PD_Sostoyatelniy_klient",
+	keeper_of_secrets		= "ui_inGame2_PD_Hranitel_tayn",
+	marked_by_zone			= "ui_inGame2_PD_Otmecheniy_zonoy",
+	information_dealer		= "ui_inGame2_PD_Torgovets_informatsiey",
+	friend_of_stalkers		= "ui_inGame2_PD_Drug_Stalkerov",
+
+	got_artefact			= "ui_inGame2_D_gonets_pravosudiya",
+	got_ammo				= "ui_inGame2_D_Ohotnik_na_mutantov",
+	got_medicine			= "ui_inGame2_D_Sisshik",
+	got_duty_light_armor	= "ui_inGame2_D_Vipolnil_2_zadaniya_dlya_Dolga",
+	got_duty_heavy_armor	= "ui_inGame2_D_Vipolnil_4_zadaniya_dlya_Dolga",
+	got_freedom_light_armor	= "ui_inGame2_D_Vipolnil_2_zadaniya_dlya_Swobodi",
+	got_freedom_heavy_armor	= "ui_inGame2_D_Vipolnil_4_zadaniya_dlya_Swobodi",
+
+	can_resupply			= "ui_inGame2_Pered_zadaniyami_voennih",
+	recent_surge			= "ui_inGame2_V_zone_nedavno_proshel_vibros",
+}
+
+
+function send_tip(actor, news_id, timeout, sender, showtime, sender_id)
+	if news_id == nil then return false end
+
+--	printf("try to send tips for [%s]", tostring(sender_id))
+	if sender_id ~= nil then
+		local sim = alife()
+		if sim ~= nil then
+			local npc = sim:object(get_story_object_id(sender_id))
+			if npc ~= nil then
+				if npc.online then
+					--в онлайне проверяем на раненность
+					if xr_wounded.is_heavy_wounded_by_id(npc.id) then
+						printf("[PDA]Cannot send tips [%s], sender is heavy wounded", tostring(news_id))
+						return false
+					end
+				end
+				-- в других случаях только на смерть
+				if npc:alive() == 1 then
+					printf("[PDA]Cannot send tips [%s], sender is dead", tostring(news_id))
+					return false
+				end
+			end
+		end
+	end
+
+	if timeout == nil then timeout = 0 end
+	if showtime == nil then showtime = 5000 end
+
+	--' Играем дефолтный звук
+	xr_sound.set_sound_play(actor:id(), "pda_tips")
+
+
+	local texture = "ui_iconsTotal_grouping"
+	if sender ~= nil then
+		if type(sender) == "string" then
+			if tips_icons[sender] then
+				texture = tips_icons[sender]
+			end
+ 		elseif is_npc_stalker(sender:clsid()) then
+			texture = sender:character_icon()
+		end
+	end
+	local news_caption = game.translate_string("st_tip")
+	local news_text = game.translate_string(news_id)
+--	actor:give_game_news(news_caption, news_text, texture, timeout*1000, showtime)
+	actor:give_game_news(news_caption, news_text, texture, timeout*1000, showtime, 0)
+
+	return true
+end
+
+
+function send_sound(npc, faction, point, str, str2, delay_sound)
+	--callstack()
+	if faction ~= nil then
+		--printf("---------------------")
+		--printf(tostring(faction))
+		local point_name = ""
+		if point ~= nil then
+			local smart = sim_board.get_sim_board().smarts[point]
+			if smart then
+				point_name = smart_names.get_smart_terrain_name(smart.smrt)
+			else
+				point_name = game.translate_string(point)
+			end
+		end
+		--printf(point_name)
+		local txt = ""
+		if str2 == nil then
+			txt = string.gsub(str, "(characters_voice\\human_..\\)([^\\]*)", "%2")
+			txt = string.gsub(txt, "[\\]([^\\]*)", "_%1")
+		else
+			txt = str2
+		end
+		--printf("--->"..tostring(txt))
+
+		local news_text = game.translate_string(txt)
+		if news_text == txt then
+			return
+		end
+
+
+--		callstack()
+		--' Играем дефолтный звук
+--	    xr_sound.set_sound_play(db.actor:id(), "pda_tips")
+
+		local texture = "ui_iconsTotal_grouping"
+		if npc ~= nil and is_npc_stalker(npc:clsid()) then
+			texture = npc:character_icon()
+		else
+			if tips_icons[faction] then
+				texture = tips_icons[faction]
+			end
+			if tips_icons[point] then
+				texture = tips_icons[point]
+			end
+		end
+--		printf("--->texture="..tostring(texture))
+		local news_caption = game.translate_string("st_tip").." "..game.translate_string(faction)
+		if point_name ~= "" then
+			news_caption = news_caption..". "..point_name..":"
+		else
+			news_caption = news_caption..":"
+		end
+
+
+--		db.actor:give_game_news(news_caption, news_text, texture, 1000, 5000)
+--		give_game_news(LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int show_time)
+		db.actor:give_game_news(news_caption, news_text, texture, delay_sound+1000, 5000, 1)
+
+		return true
+
+	end
+end
+
+function is_npc_stalker(class_id)
+	if class_id==clsid.script_stalker or
+		 class_id==clsid.stalker then
+		return true
+	end
+	return false
+end
+
+local action_descr_by_type = {
+								new = "general_new_task",
+								complete = "general_complete_task",
+								fail = "general_fail_task",
+								reversed = "general_reverse_task",
+								updated = "general_update_task"
+							 }
+
+function send_task(actor, type, task)
+	if db.actor == nil then
+		return false
+	end
+	local time_on_screen = 10000
+	if type == "updated" then
+		time_on_screen = 5000
+	end
+	xr_sound.set_sound_play(db.actor:id(), "pda_task")
+	local news_caption = game.translate_string(action_descr_by_type[type])
+	local news_text = game.translate_string(task:get_title())
+	local icon = task:get_icon_name()
+	if(icon==nil) then
+		icon = "ui_iconsTotal_storyline"
+	end
+
+	if db.actor:is_talking() then
+		db.actor:give_talk_message2(news_caption, news_text..".", icon, "iconed_answer_item")
+	else
+		db.actor:give_game_news(news_caption, news_text..".", icon, 0, time_on_screen)
+	end
+
+end
+
+function send_treasure(param)
+	local news_caption = ""
+	if(param==0) then
+		news_caption = game.translate_string("st_found_new_treasure")
+	elseif(param==1) then
+		news_caption = game.translate_string("st_got_treasure")
+		xr_sound.set_sound_play(db.actor:id(), "pda_tips")
+	elseif(param==2) then
+		news_caption = game.translate_string("st_found_old_treasure")
+	end
+
+	if db.actor:is_talking() then
+		db.actor:give_talk_message2(news_caption, "", "ui_inGame2_Polucheni_koordinaty_taynika", "iconed_answer_item")
+	else
+		db.actor:give_game_news(news_caption, "", "ui_inGame2_Polucheni_koordinaty_taynika", 0, 3000)
+	end
+end
+
+function get_inv_name(section)
+	return system_ini():r_string(section,"inv_name")
+end
+
+function relocate_item(actor, type, item, amount)
+	if db.actor == nil then return false end
+	--' Играем дефолтный звук
+	if not amount then
+		amount = 1
+	end
+	local news_caption = ""
+	local news_text = ""
+	if type == "in" then
+		if amount == 1 then
+			news_caption = game.translate_string("general_in_item")
+			news_text = game.translate_string(get_inv_name(item))
+		else
+			news_caption = game.translate_string("general_in_item")
+			news_text = game.translate_string(get_inv_name(item)).." x"..amount
+		end
+		if db.actor:is_talking() then
+			db.actor:give_talk_message2(news_caption, news_text, "ui_inGame2_Predmet_poluchen", "iconed_answer_item")
+		else
+			db.actor:give_game_news(news_caption, news_text, "ui_inGame2_Predmet_poluchen", 0, 3000)
+		end
+	elseif type == "out" then
+		if amount == 1 then
+			news_caption = game.translate_string("general_out_item")
+			news_text = game.translate_string(get_inv_name(item))
+		else
+			news_caption = game.translate_string("general_out_item")
+			news_text = game.translate_string(get_inv_name(item)).." x"..amount
+		end
+		if db.actor:is_talking() then
+			db.actor:give_talk_message2(news_caption, news_text, "ui_inGame2_Predmet_otdan", "iconed_answer_item")
+		else
+			db.actor:give_game_news(news_caption, news_text, "ui_inGame2_Predmet_otdan", 0, 3000)
+		end
+	end
+end
+
+function relocate_money(actor, type, amount)
+	if db.actor == nil then return false end
+	--' Играем дефолтный звук
+	if type == "in" then
+		local news_caption = game.translate_string("general_in_money")
+		local news_text = game.translate_string(tostring(amount))
+
+		if db.actor:is_talking() then
+			db.actor:give_talk_message2(news_caption, news_text, "ui_inGame2_Dengi_polucheni", "iconed_answer_item")
+		else
+			db.actor:give_game_news(news_caption, news_text, "ui_inGame2_Dengi_polucheni", 0, 3000)
+		end
+	elseif type == "out" then
+		local news_caption = game.translate_string("general_out_money")
+		local news_text = game.translate_string(tostring(amount))
+
+		if db.actor:is_talking() then
+			db.actor:give_talk_message2(news_caption, news_text, "ui_inGame2_Dengi_otdani", "iconed_answer_item")
+		else
+			db.actor:give_game_news(news_caption, news_text, "ui_inGame2_Dengi_otdani", 0, 3000)
+		end
+	end
+end

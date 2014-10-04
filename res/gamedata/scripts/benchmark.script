@@ -1,0 +1,39 @@
+function main()
+	local spawn_table = {	bench_sunshafts = {	weather_name  = "sun_shafts",
+												effector_name = "marsh_benchmark",
+												effector_id   = 106081,
+												enable_light  = false
+											  },
+							bench_rain =	  {	weather_name  = "default_rain",
+												effector_name = "marsh_benchmark",
+												effector_id   = 106082,
+												enable_light  = false
+											  },
+							bench_day =		  {	weather_name  = "default_clear",
+												effector_name = "marsh_benchmark",
+												effector_id   = 106082,
+												enable_light  = false
+											  },
+							bench_night =	  {	weather_name  = "night",
+												effector_name = "marsh_benchmark",
+												effector_id   = 106083,
+												enable_light  = true
+											  }
+						}
+	local pos1 = string.find(command_line(), "%(")
+	local pos2 = string.find(command_line(), "/", pos1)
+	if pos1 and pos2 then
+		local spawn_name = string.sub(command_line(), pos1+1, pos2-1)
+		if spawn_table[spawn_name] then
+			weather = true
+			level.set_weather(spawn_table[spawn_name].weather_name, true)
+			if spawn_table[spawn_name].enable_light then
+				light = true
+			end
+			level.add_cam_effector2( "benchmarks\\"..spawn_table[spawn_name].effector_name..".anm",
+									spawn_table[spawn_name].effector_id,
+									false,
+									"xr_effects.quit")		
+		end
+	end	
+end

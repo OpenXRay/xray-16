@@ -1,0 +1,612 @@
+;ќтдача(1)-10%
+;------------
+[up_sect_firsta_mp5]
+cost		      		= 500
+value					= -10
+
+cam_dispersion              = -0.08		;0.5
+cam_dispersion_inc         	= -0.04		;0.5
+cam_step_angle_horz        	= -0.2		;1.5 [0.73 в остатке]
+
+zoom_cam_dispersion          = -0.1		;0.5 [0.093 в остатке]
+zoom_cam_dispersion_inc      = -0.05		;0.5
+zoom_cam_step_angle_horz     = -0.3 	;1.0 [0.505 в остатке]
+
+;“очность(2)20%
+[up_sect_firstc_mp5]
+cost		      		= 800
+value					= +20
+fire_dispersion_base    = -0.05 ;0.09
+fire_dispersion_condition_factor    = -1 ;15
+
+;—корострельность(2)15%
+;----------------------
+[up_sect_firstd_mp5]
+cost		      		= 800
+value					= +15
+
+rpm                     = +80 ;700
+
+
+;—корострельность(3)25%
+;----------------------
+[up_sect_firste_mp5]
+cost		      		= 1100
+value					= +25
+
+rpm                     = +120 ;700
+
+;—корострельность(1)10%
+;----------------------
+[up_sect_secona_mp5]
+cost		      		= 500
+value					= +10
+rpm                     = +50 ;700
+
+;Ќадежность(2)15%
+;---------------
+[up_sect_seconc_mp5]
+cost		      		= 800
+value					= +15
+
+;увеличение дисперсии в процентах при максимальном износе
+fire_dispersion_condition_factor    = -1 ;15
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.0001 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0001 ;0.0011
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= -0.001
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= -0.016 ;0.03
+
+;“очность(3)30%
+[up_sect_secone_mp5]
+cost		      		= 1100
+value					= +30
+fire_dispersion_base    = -0.08 ;0.09
+fire_dispersion_condition_factor    = -2 ;15
+
+;ќтдача(3)-30%
+;------------
+[up_sect_seconf_mp5]
+cost		      		= 1100
+value					= -30
+
+cam_dispersion              = -0.18		;0.5
+cam_dispersion_inc         	= -0.08		;0.5
+cam_step_angle_horz        	= -0.4		;1.5 [0.73 в остатке]
+
+zoom_cam_dispersion          = -0.2		;0.5 [0.093 в остатке]
+zoom_cam_dispersion_inc      = -0.1		;0.5
+zoom_cam_step_angle_horz     = -0.5 	;1.0 [0.505 в остатке]
+
+;ќтдача(1)-10%
+;------------
+[up_sect_thirda_mp5]
+cost		      		= 500
+value					= -10
+
+cam_dispersion              = -0.08		;0.5
+cam_dispersion_inc         	= -0.04		;0.5
+cam_step_angle_horz        	= -0.2		;1.5 [0.73 в остатке]
+
+zoom_cam_dispersion          = -0.1		;0.5 [0.093 в остатке]
+zoom_cam_dispersion_inc      = -0.05		;0.5
+zoom_cam_step_angle_horz     = -0.3 	;1.0 [0.505 в остатке]
+
+;”добство(2)15%
+;--------------
+[up_sect_thirdc_mp5]
+cost		      		= 800
+value					= +15
+
+crosshair_inertion		   = -0.35
+ 
+PDM_disp_base 				= -0.07 ;0.5
+PDM_disp_vel_factor 		= -0.25 ;1.5
+PDM_disp_accel_factor 		= -0.25 ;1.5
+
+;Ќадежность(2)15%
+;---------------
+[up_sect_thirdd_mp5]
+cost		      		= 800
+value					= +15
+
+;увеличение дисперсии в процентах при максимальном износе
+fire_dispersion_condition_factor    = -1 ;15
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.0001 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0001 ;0.0011
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= -0.001
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= -0.016 ;0.03
+
+;—корострельность(3)25%
+;----------------------
+[up_sect_thirde_mp5]
+cost		      		= 1100
+value					= +25
+
+rpm                     = +120 ;700
+
+;Ќадежность(1)10%
+;---------------
+[up_sect_fourta_mp5]
+cost		      		= 500
+value					= +10
+
+;увеличение дисперсии в процентах при максимальном износе
+fire_dispersion_condition_factor    = -1 ;15
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= -0.0008
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= -0.008 ;0.03
+
+;—корострельность(2)15%
+;----------------------
+[up_sect_fourtc_mp5]
+cost		      		= 800
+value					= +15
+
+rpm                     = +80 ;700
+
+
+;”добство(3)25%
+;--------------
+[up_sect_fourte_mp5]
+cost		      		= 1100
+value					= +25
+
+crosshair_inertion		   = -0.5
+ 
+PDM_disp_base 				= -0.1 ;0.5
+PDM_disp_vel_factor 		= -0.3 ;1.5
+PDM_disp_accel_factor 		= -0.3 ;1.5
+
+;Ќастильность(3)30%
+;------------------
+[up_sect_fourtf_mp5]
+cost		      		= 1100
+value					= +30
+bullet_speed			= +90   ;270 
+fire_dispersion_base    = -0.03 
+
+;ќбъем магазина +10
+;--------------------
+[up_sect_fiftha_mp5]
+cost		      		= 1000
+value					= +10
+ammo_mag_size        	= 10
+
+;—мена калибра 9x18
+;-------------
+[up_sect_fifthc_mp5]
+cost		      		= 2500
+value					= "9x18"
+ammo_class		 		= ammo_9x18_fmj, ammo_9x18_pmm
+
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= 0.0001 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= 0.0001 ;0.0011
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= 0.0005
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= 0.005 ;0.03
+
+;---END----
+
+[up_firsta_mp5]
+scheme_index            = 0, 0
+known                   = 1
+effects                 = up_gr_firstcd_mp5
+section                 = up_sect_firsta_mp5
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_ret_a3_name
+description             = st_up_ret_a3_descr
+icon                    = ui_inGame2_upgrade_Gadyuka_5_1
+
+;;...
+[up_firstc_mp5]
+scheme_index            = 1, 0
+known                   = 1
+effects                 = up_gr_firstef_mp5
+section                 = up_sect_firstc_mp5
+property                = prop_dispersion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_ret_b3_name
+description             = st_up_ret_b3_descr
+icon                    = ui_inGame2_upgrade_Gadyuka_5_2
+
+[up_firstd_mp5]
+scheme_index            = 1, 1
+known                   = 1
+effects                 = up_gr_firstef_mp5
+section                 = up_sect_firstd_mp5
+property                = prop_rpm
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_ret_b2_name
+description             = st_up_ret_b2_descr
+icon                    = ui_inGame2_upgrade_Gadyuka_5_3
+
+[up_firste_mp5]
+scheme_index            = 2, 0
+known                   = 1
+effects                 =
+section                 = up_sect_firste_mp5
+property                = prop_rpm
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_ret_c2_name
+description             = st_up_ret_c2_descr
+icon                    = ui_inGame2_upgrade_Gadyuka_5_4
+
+[up_secona_mp5]
+scheme_index            = 0, 1
+known                   = 1
+effects                 = up_gr_seconcd_mp5
+section                 = up_sect_secona_mp5
+property                = prop_rpm
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_zat_a3_name
+description             = st_up_zat_a3_descr
+icon                    = ui_inGame2_upgrade_Gadyuka_5_5
+
+[up_seconc_mp5]
+scheme_index            = 1, 2
+known                   = 1
+effects                 = up_gr_seconef_mp5
+section                 = up_sect_seconc_mp5
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_zat_b4_name
+description             = st_up_zat_b4_descr
+icon                    = ui_inGame2_upgrade_Gadyuka_5_6
+
+[up_secone_mp5]
+scheme_index            = 2, 1
+known                   = 1
+effects                 =
+section                 = up_sect_secone_mp5
+property                = prop_dispersion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_zat_c5_name
+description             = st_up_zat_c5_descr
+icon                    = ui_inGame2_upgrade_Gadyuka_5_7
+
+[up_seconf_mp5]
+scheme_index            = 2, 2
+known                   = 1
+effects                 =
+section                 = up_sect_seconf_mp5
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_zat_c1_name
+description             = st_up_zat_c1_descr
+icon                    = ui_inGame2_upgrade_Gadyuka_5_8
+
+
+[up_thirda_mp5]
+scheme_index            = 0, 2
+known                   = 1
+effects                 = up_gr_thirdcd_mp5
+section                 = up_sect_thirda_mp5
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_usm_a1_name
+description             = st_up_usm_a1_descr
+icon                    = ui_inGame2_upgrade_Gadyuka_5_9
+
+[up_thirdc_mp5]
+scheme_index            = 1, 3
+known                   = 1
+effects                 = up_gr_thirdef_mp5
+section                 = up_sect_thirdc_mp5
+property                = prop_inertion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_usm_b3_name
+description             = st_up_usm_b3_descr
+icon                    = ui_inGame2_upgrade_Gadyuka_5_10
+
+[up_thirdd_mp5]
+scheme_index            = 1, 4
+known                   = 1
+effects                 = up_gr_thirdef_mp5
+section                 = up_sect_thirdd_mp5
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_usm_b1_name
+description             = st_up_usm_b1_descr
+icon                    = ui_inGame2_upgrade_Gadyuka_5_11
+
+[up_thirde_mp5]
+scheme_index            = 2, 3
+known                   = 1
+effects                 =
+section                 = up_sect_thirde_mp5
+property                = prop_rpm
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_usm_c2_name
+description             = st_up_usm_c2_descr
+icon                    = ui_inGame2_upgrade_Gadyuka_5_12
+
+
+[up_fourta_mp5]
+scheme_index            = 0, 3
+known                   = 1
+effects                 = up_gr_fourtcd_mp5
+section                 = up_sect_fourta_mp5
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stk_a2_name
+description             = st_up_stk_a2_descr
+icon                    = ui_inGame2_upgrade_Gadyuka_5_13
+
+
+[up_fourtc_mp5]
+scheme_index            = 1, 5
+known                   = 1
+effects                 = up_gr_fourtef_mp5
+section                 = up_sect_fourtc_mp5
+property                = prop_rpm
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stk_b1_name
+description             = st_up_stk_b1_descr
+icon                    = ui_inGame2_upgrade_Gadyuka_5_14
+
+[up_fourte_mp5]
+scheme_index            = 2, 4
+known                   = 1
+effects                 =
+section                 = up_sect_fourte_mp5
+property                = prop_inertion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stk_c3_name
+description             = st_up_stk_c3_descr
+icon                    = ui_inGame2_upgrade_Gadyuka_5_15
+
+
+[up_fourtf_mp5]
+scheme_index            = 2, 5
+known                   = 1
+effects                 =
+section                 = up_sect_fourtf_mp5
+property                = prop_bullet_speed
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stk_c2_name
+description             = st_up_stk_c2_descr
+icon                    = ui_inGame2_upgrade_Gadyuka_5_16
+
+
+[up_fiftha_mp5]
+scheme_index            = 0, 4
+known                   = 1
+effects                 = 
+section                 = up_sect_fiftha_mp5
+property                = prop_ammo_size 
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_add_a4_name
+description             = st_up_add_a4_descr
+icon                    = ui_inGame2_upgrade_Gadyuka_5_17
+
+[up_fifthc_mp5]
+scheme_index            = 1, 6
+known                   = 1
+effects                 =
+section                 = up_sect_fifthc_mp5
+property                = prop_calibre
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = true
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_add_b3_name
+description             = st_up_add_b3_descr
+icon                    = ui_inGame2_upgrade_Gadyuka_5_18
+
+[up_gr_firstab_mp5]
+elements                = up_firsta_mp5
+
+[up_gr_firstcd_mp5]
+elements                = up_firstc_mp5, up_firstd_mp5
+
+[up_gr_firstef_mp5]
+elements                = up_firste_mp5
+
+[up_gr_seconab_mp5]
+elements                = up_secona_mp5
+
+[up_gr_seconcd_mp5]
+elements                = up_seconc_mp5
+
+[up_gr_seconef_mp5]
+elements                = up_secone_mp5, up_seconf_mp5
+
+[up_gr_thirdab_mp5]
+elements                = up_thirda_mp5
+
+[up_gr_thirdcd_mp5]
+elements                = up_thirdc_mp5, up_thirdd_mp5
+
+[up_gr_thirdef_mp5]
+elements                = up_thirde_mp5
+
+[up_gr_fourtab_mp5]
+elements                = up_fourta_mp5
+
+[up_gr_fourtcd_mp5]
+elements                = up_fourtc_mp5
+
+[up_gr_fourtef_mp5]
+elements                = up_fourte_mp5, up_fourtf_mp5
+
+[up_gr_fifthab_mp5]
+elements                = up_fiftha_mp5
+
+[up_gr_fifthcd_mp5]
+elements                = up_fifthc_mp5

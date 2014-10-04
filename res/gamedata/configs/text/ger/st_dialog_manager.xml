@@ -1,0 +1,993 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="dm_anomalies_10">
+		<text>Es gibt da ein Gebiet in Zaton, wo unter der Wasseroberflдche Hitzeanomalien entstanden sind. Dieser Ort wird "Boiler" genannt, weil dort Dampf und anderes Zeug aus dem Boden austritt. Falls du denkst "ist ja nur Dampf", дndere deine Meinung lieber. Erfahrene Stalker sagen, dass diese Art von Dampfanomalie mindestens genauso gefдhrlich ist wie eine normale Hitzeanomalie, wenn nicht sogar gefдhrlicher. Die Temperatur mag etwas niedriger sein, aber du bist der Hitze lдnger ausgesetzt. Und was Artefakte betrifft: Man findet dort normale Feuerartefakte.</text>
+	</string>
+	<string id="dm_anomalies_11">
+		<text>Angeblich gibt es im Steinbruch ein nettes Plдtzchen mit vielen Artefakten, aber Anomalien wohl auch nicht zu knapp. Unten sind so viele Blasen von Gasanomalien, dass einem selbst mit einer Gasmaske die Augen wehtun.</text>
+	</string>
+	<string id="dm_anomalies_12">
+		<text>Der Aschehьgel befindet sich am alten Friedhof in der Nдhe von Kopatschi. Dort sind viele Hitzeanomalien und immer wieder Zombies. Die meisten versuchen, diesen Ort zu meiden, aber man findet dort Artefakte.</text>
+	</string>
+	<string id="dm_anomalies_13">
+		<text>Man sagt, dass auf dem Parkplatz Artefakte gefunden wurden. Da sind immer noch Fahrzeuge aus der Zeit der ersten Tschernobyl-Katastrophe - diese Babys bereiten dem Geigerzдhler Magenschmerzen. AuЯerdem sind dort ьberall Elektroanomalien.</text>
+	</string>
+	<string id="dm_anomalies_14">
+		<text>Im Verdorbenen Wдldchen, wo alle Bдume von Sдure verunstaltet wurden. Wer an diesem Ort war, sagt, dass dort ьberall Gasanomalien sind. Da soll so viel Gas in der Luft sein, dass man seine Hand vor Augen nicht sieht. Aber mit genug Erfahrung findet man dort die Artefakte, die man sucht.</text>
+	</string>
+	<string id="dm_anomalies_15">
+		<text>Wenn du auf der Suche nach Artefakten bist, konzentriere dich auf Sдureartefakte. Am ehesten wirst du im Betonbad fьndig. Viel Konkurrenz wirst du dort nicht haben, weil dieser Ort niemandem geheuer ist - die Jupiter-Anlage ist gleich in der Nдhe.</text>
+	</string>
+	<string id="dm_anomalies_16">
+		<text>Nicht weit von der Jupiter-Anlage entfernt ist ein Teil der StraЯe eingebrochen. Dieser Ort wird "Asphalt" genannt, weil dort der StraЯenbelag geschmolzen ist. In dem Spalt sind viele Anomalien - Hitzeanomalien und Gravitationsanomalien gemischt. Und da es sich um zwei Arten von Anomalien handelt, mьssen auch die Artefakte anders sein.</text>
+	</string>
+	<string id="dm_anomalies_17">
+		<text>Jenseits der Zementfabrik ist ein kleiner Hafen namens Fen. Der ganze Hafen hat sich in ein fьrchterlich stinkendes Sumpfgebiet verwandelt und das Wasser ist voller Gasanomalien. Wasser kann man es eigentlich gar nicht mehr nennen, eher Sдure. Man hat dort Artefakte gefunden, aber es wimmelt an diesem Ort auch von Monstern.</text>
+	</string>
+	<string id="dm_anomalies_18">
+		<text>Sieh dich mal in der alten Zementfabrik um. Dort sind zwar viele Anomalien, aber es lohnt sich. Natьrlich gibt es Orte, wo man einfacher an Artefakte rankommt, aber dementsprechend groЯ ist dort der Andrang. In der Zementfabrik musst du dich lediglich mit Hamstern herumschlagen, und das auch nur, wenn du ins Untergeschoss gehst.</text>
+	</string>
+	<string id="dm_anomalies_19">
+		<text>Du solltest dich in der Nдhe der Pinieneiche umsehen. Das ist dieses Ding, das zwischen den Hьgeln ьber den Gasanomalien wдchst. So heiЯt dieser sonderbare Baum, seit irgendjemand herausgefunden hat, dass es sich bei der Rinde sowohl um Pinien- als auch um Eichenrinde handelt. Wenn du dich dort nach Artefakten umsehen willst, brauchst du einen guten chemischen Schutz - und jede Menge Munition, weil diese Hьgel das Revier von vielen Hunderudeln sind.</text>
+	</string>
+	<string id="dm_anomalies_2">
+		<text>Manchmal muss man gar nicht in Anomalien herumsuchen, um ein Artefakt zu finden. Ich habe gehцrt, dass jemand ein Artefakt im offenen Gelдnde herumliegen gesehen hat. Der Detektor dieses Stalkers hat verrьckt gespielt, also hat er beschlossen, die Batterien auszuwechseln. AnschlieЯend hat sich der Detektor zu Wort gemeldet und direkt vor der Nase des Stalkers lag ein Artefakt. Was fьr ein Glьckspilz, oder? Aber so ist die Zone: Manchmal bestraft sie dich und manchmal belohnt sie dich.</text>
+	</string>
+	<string id="dm_anomalies_20">
+		<text>Erfahrene Stalker haben mir gesagt, dass sich Artefakte manchmal aus Anomalien hinausbewegen. Dein Detektor piept, du schaltest ihn aus, aber dann ist da nichts. Wenn das passiert, hast du es mit einem "Nomadenartefakt" zu tun. Aber es hat keinen Zweck, diesem Artefakt hinterher zu jagen, denn allein die Zone entscheidet, wen sie damit belohnen will.</text>
+	</string>
+	<string id="dm_anomalies_21">
+		<text>In Pripyat hat sich bisher niemand nach Artefakten umgesehen. Jeder, den ich kenne, ist hier erst seit kurzer Zeit, und deswegen sind sie alle vorsichtig.</text>
+	</string>
+	<string id="dm_anomalies_22">
+		<text>Ich weiЯ nicht, ob irgendjemand die guten Stellen kennt. Pripyat ist bisher kaum erforscht.</text>
+	</string>
+	<string id="dm_anomalies_23">
+		<text>Ich wьrde mich mal in den unterirdischen Tunneln umsehen. Ich habe gehцrt, unter der Stadt sollen tonnenweise Artefakte zu finden sein.</text>
+	</string>
+	<string id="dm_anomalies_24">
+		<text>Ьber diese Gegend weiЯ man nicht viel, abgesehen von Garis Geschichten. Er sagt, dass dort irgendwo eine riesige Weinrebe aus einer Sдureanomalie wдchst. Sie soll so groЯ sein wie ein zehnstцckiges Gebдude. Vielleicht nimmt er uns nur auf den Arm, aber ich wьrde trotzdem mal nach dieser Weinrebe Ausschau halten und dort nach Artefakten suchen - man weiЯ ja nie.</text>
+	</string>
+	<string id="dm_anomalies_3">
+		<text>Am meisten Glьck dьrftest du im Sдuresumpf haben. Dort sind ьberall Gravitationsanomalien, die jedoch leicht zu erkennen sind. Behalte die Wasseroberflдche im Auge, dann kann nichts schiefgehen. Ein grцЯeres Problem sind allerdings Gasanomalien, weil man dort so gut wie keine Luft kriegt. Ist nicht witzig, wenn man von einer Gasanomalie erwischt wird, das kannst du mir glauben. Das Ding frisst sich schneller durch einen Schutzanzug als Schwefelsдure.</text>
+	</string>
+	<string id="dm_anomalies_5">
+		<text>Im abgebrannten Bauernhof oben auf dem Hьgel sind jede Menge Hitzeanomalien, in denen man Feuerartefakte finden kann. Sieh dich in den Hдusern um: Dort, wo sich nach einer Emission die meisten Anomalien bilden, sind auch die meisten Artefakte.</text>
+	</string>
+	<string id="dm_anomalies_6">
+		<text>In den Hцhlen unter dem abgebrannten Bauernhof sind wahrscheinlich viele. Wenn du mit dem Detektor auf dem Hьgel herumlдufst, hцrt das Ding gar nicht mehr zum Piepen auf. Schwer ist es auch nicht, in die Hцhlen zu gelangen. Du musst einfach oben in den Spalt springen. Da wieder rauszukommen, ist das Problem - bei all den Anomalien dort unten, hauptsдchlich Vortex- und Sдureanomalien. Einige Leute behaupten, in dem Spalt etwas gesehen zu haben, das einem Kometen дhnelt. Dort unten erwarten dich sicher viele Gefahren, aber wahrscheinlich ebenso viele Artefakte.</text>
+	</string>
+	<string id="dm_anomalies_7">
+		<text>Hast du schon mal eine Rundkreis-Anomalie gesehen? Das ist eine riesige Sprungbrett-Anomalie mit zwei rotierenden Kometen - wirklich ein atemberaubender Anblick, den man jedoch aus einer gewissen Entfernung genieЯen sollte. Rundkreise sind verdammt heiЯ und voller Hitzeanomalien. Man findet dort viele Artefakte, aber sie werden von einem fiesen Feuerpoltergeist beschьtzt, der versuchen wird, dich zu rцsten, wenn du dich ihm nдherst.</text>
+	</string>
+	<string id="dm_anomalies_9">
+		<text>Falls du an Gravitationsartefakten interessiert bist, suche danach in der Fanganomalie. Die Stelle ist leicht zu finden - Anomalien haben bei der Verдnderung des Gelдndes ganze Arbeit geleistet und den halben Hьgel abgetragen. Im Hьgel sind einige Hцhlen zum Vorschein gekommen, die sofort von Schnorks unter Beschlag genommen wurden. Glьcklicherweise kommen sie nur selten raus.</text>
+	</string>
+	<string id="dm_anomalies_do_not_know_1">
+		<text>In der Zone, Mann, in der Zone. Immer am Ball bleiben.</text>
+	</string>
+	<string id="dm_anomalies_do_not_know_2">
+		<text>Eine gute Frage. Sag mir bescheid, wenn du die Antwort weiЯt!</text>
+	</string>
+	<string id="dm_anomalies_do_not_know_3">
+		<text>Wo, warum, wieso, weshalb... Merke dir eins: Wenn du eine Goldgrube findest, behalte es fьr dich.</text>
+	</string>
+	<string id="dm_anomalies_general">
+		<text>Wo findet man Artefakte?</text>
+	</string>
+	<string id="dm_anomalies_no_more_1">
+		<text>Das habe ich dir schon gesagt.</text>
+	</string>
+	<string id="dm_anomalies_no_more_2">
+		<text>Nein, ich weiЯ sonst nichts.</text>
+	</string>
+	<string id="dm_anomalies_no_more_3">
+		<text>Das ist alles, was ich weiЯ. Frag jemand anderen.</text>
+	</string>
+	<string id="dm_hello_0">
+		<text>Wie geht's, Bruder?</text>
+	</string>
+	<string id="dm_hello_1">
+		<text>GrьЯ dich.</text>
+	</string>
+	<string id="dm_hello_10">
+		<text>Hallo Stalker.</text>
+	</string>
+	<string id="dm_hello_11">
+		<text>Hallo.</text>
+	</string>
+	<string id="dm_hello_12">
+		<text>Was willst du?</text>
+	</string>
+	<string id="dm_hello_13">
+		<text>Was?</text>
+	</string>
+	<string id="dm_hello_14">
+		<text>Rede.</text>
+	</string>
+	<string id="dm_hello_15">
+		<text>Guten Tag, Major, Sir!</text>
+	</string>
+	<string id="dm_hello_16">
+		<text>Guten Tag!</text>
+	</string>
+	<string id="dm_hello_17">
+		<text>Ich hцre, Major, Sir.</text>
+	</string>
+	<string id="dm_hello_2">
+		<text>Ja, hi.</text>
+	</string>
+	<string id="dm_hello_3">
+		<text>Was?</text>
+	</string>
+	<string id="dm_hello_4">
+		<text>Wen haben wir denn da.</text>
+	</string>
+	<string id="dm_hello_5">
+		<text>Hey, Stalker. Was willst du?</text>
+	</string>
+	<string id="dm_hello_6">
+		<text>Was geht?</text>
+	</string>
+	<string id="dm_hello_7">
+		<text>Was geht, Mann?</text>
+	</string>
+	<string id="dm_hello_8">
+		<text>Oh, hey, Kumpel.</text>
+	</string>
+	<string id="dm_hello_9">
+		<text>Na, alles klar?</text>
+	</string>
+	<string id="dm_hello_general">
+		<text>Hey!</text>
+	</string>
+	<string id="dm_help_0">
+		<text>Hilf mir, Bruder!</text>
+	</string>
+	<string id="dm_help_1">
+		<text>Hilf mir, Bruder, ich sterbe...</text>
+	</string>
+	<string id="dm_help_10">
+		<text>Ich brauche medizinische Hilfe!</text>
+	</string>
+	<string id="dm_help_11">
+		<text>Ein Medkit... schnell!</text>
+	</string>
+	<string id="dm_help_2">
+		<text>Hilf mir, Kumpel... Aaahh, diese Schmerzen!</text>
+	</string>
+	<string id="dm_help_3">
+		<text>Gib mir ein Medkit... ein Medkit, sofort...</text>
+	</string>
+	<string id="dm_help_4">
+		<text>Kumpel... argh... komm schon, hilf mir!</text>
+	</string>
+	<string id="dm_help_5">
+		<text>Hey, ich brauche ein Medkit... schnell...</text>
+	</string>
+	<string id="dm_help_6">
+		<text>Hilf mir, Stalker... ein Medkit, bitte...</text>
+	</string>
+	<string id="dm_help_7">
+		<text>Mich hat's erwischt... Hilfe!</text>
+	</string>
+	<string id="dm_help_8">
+		<text>Ich brauche ein Medkit!</text>
+	</string>
+	<string id="dm_help_9">
+		<text>Medkit!</text>
+	</string>
+	<string id="dm_information_1">
+		<text>Hast du schon von dem Baggerschiff цstlich der Skadowsk gehцrt? Man sagt, dass dort nachts irgendetwas sonderbar leuchtet... Sogar fьr die Zone soll das ziemlich merkwьrdig sein. Ich weiЯ nicht, ob es sich lohnen wьrde, der Sache auf den Grund zu gehen. Vielleicht findet man dort irgendetwas Wertvolles, aber macht es Sinn, dafьr sein Leben zu riskieren? Das ist hier die Frage...</text>
+	</string>
+	<string id="dm_information_10">
+		<text>Hier ist nichts auЯer altes Zeug. Zum Beispiel dieser verrostende Konvoi auf der Preobraschenski-Brьcke - alles kaputt, genauso wie die Brьcke. Viele wьrden sich gerne mal in der Gegend umsehen, wдren da nicht Schnorks und Anomalien...</text>
+	</string>
+	<string id="dm_information_11">
+		<text>Hast du mitbekommen, dass sich Sultan Beards Geschдft unter den Nagel reiЯen wollte? Die Skadowsk war wohl nicht groЯ genug fьr seinen gierigen Hintern, und deswegen wollte er ein noch grцЯeres Stьck vom Kuchen... Aber wir haben gesagt "Kannste knicken, Sultan!". Beard und der Rest unserer Jungs haben ihm ganz schцn den Arsch aufgerissen. Seine Gangsterplдne kann er hier vergessen.</text>
+	</string>
+	<string id="dm_information_12">
+		<text>Wow, hast du das gehцrt? Sultan, dieser Dreckskerl, hat gegen Beard die Fдuste spielen lassen... Ich weiЯ nicht genau, was er gemacht hat, aber wie es scheint, schuldet Beard ihm Geld! Was ist nur aus der Zone geworden? Wenn das so weitergeht, ist die Skadowsk bald ein Banditenlager!</text>
+	</string>
+	<string id="dm_information_13">
+		<text>Hast du schon von der Oase gehцrt, Bruder? Man sagt, es sei verdammt schwer, sie zu finden. Und wenn man wirklich weiЯ, wo sie ist, sei es noch schwerer, dorthin zu gelangen. Angeblich ist dort ein See. Du gehst hinein, all deine Wehwehchen verschwinden und alle Verletzungen heilen sofort! Ist aber alles nur Spekulation. Hast du auch schon gemerkt, wie viele Anfдngerstalker hier ins Zentrum der Zone gekommen sind? Einige suchen nach einer Fundgrube voller Artefakte, andere sind einfach nur neugierig, aber die meisten von ihnen hoffen, dass sie die Oase finden. Es heiЯt, dass sie irgendwo hier sein soll...</text>
+	</string>
+	<string id="dm_information_14">
+		<text>Gerьchte besagen, dass die Zone langsam verschwindet... Jemand hat die Oase gefunden und ihr Artefakt mitgenommen - das Herz der Oase. Jetzt vollzieht die Zone einen Dimensionssprung und kein Stalker wird sie jemals wieder verlassen kцnnen... War nur ein Witz, Mann. Aber jemand hat wirklich ein neues Artefakt gefunden. Die Wissenschaftler spielen gerade damit in ihrem Bunker herum.</text>
+	</string>
+	<string id="dm_information_15">
+		<text>Hast du schon mal von Topol gehцrt? Hat irgendein neues Drecksloch gefunden, das er mit seinen Jungs erkunden wollte, und natьrlich sind sie frohen Mutes reingegangen. Aber das Lachen ist ihnen bald vergangen, als ein Controller aufgetaucht ist und sich an ihren Gehirnzellen zu schaffen gemacht hat. Die wьrden jetzt alle in der Klapsmьhle stecken, wenn sie nicht diesen Stalker dabeigehabt hдtten. Als Topol nach diesem Zombifizierungskram wieder klar im Kopf wurde, war der Stalker gerade dabei, den Controller einen Kopf kьrzer zu machen.</text>
+	</string>
+	<string id="dm_information_16">
+		<text>Sagt dir das Dorf Kopatschi was? Damals nach der Katastrophe im Atomkraftwerk Tschernobyl war diese Gegend so verstrahlt, dass man beschlossen hat, das ganze Dorf mit Erde zuzuschьtten. Anstelle von Hдusern findest du dort nichts mehr auЯer radioaktiv verseuchten Hьgeln. Angeblich war das schon vor dem Unglьck ein ziemlich unheimlicher Ort. Ich krieg 'ne Gдnsehaut, wenn ich nur daran denke, was man dort wohl heutzutage vorfindet. Keiner hat den Mumm, die Gegend unter die Lupe zu nehmen. Aber was, wenn sie alle falsch liegen? Nach allem, was wir wissen, kцnnten dort auch jede Menge Artefakte herumliegen!</text>
+	</string>
+	<string id="dm_information_17">
+		<text>WeiЯt du, es gibt nur zwei Stalker in der Janow-Station, die spьren, wenn eine Emission im Anmarsch ist - Knochenmann, unser Arzt, und Zulu, der frьher bei den Wдchtern war. Na ja, "frьher" stimmt nicht ganz, er hat sich erst vor kurzem von ihnen getrennt. Als die Wдchter zur Janow-Station gekommen sind, waren dort schon Kдmpfer von den Freiheitlern. Wie es nicht anders zu erwarten war, ging es dann ganz schnell zur Sache. Beide Fraktionen mussten hohe Verluste hinnehmen und sogar einige freie Stalker wurden von Querschlдgern erwischt. Dann sagte Zulu plцtzlich, dass eine Emission bevorsteht. Die Wдchter und Freiheitler hatten keine andere Wahl. Sie mussten einen Waffenstillstand vereinbaren und haben sich in der Station verbarrikadiert. Als die Emission vorbei war, ist Zulu aus der Wдchterfraktion ausgetreten und hat sich in dem Turm nahe der Station niedergelassen.</text>
+	</string>
+	<string id="dm_information_18">
+		<text>In der Zone erzдhlt man sich allerlei verrьckte Geschichten, aber du solltest nicht alles glauben, was du hцrst. Es gibt hier zurzeit so viele Labertaschen... Aber eine Sache ist merkwьrdig. Ein paar Stalker aus der Janow-Station haben eine UFO-Sichtung gemeldet. Sie meinten, das Ding hat sie an eine schwarze Untertasse erinnert, mit einem Durchmesser von ungefдhr fьnf Metern. Andere haben gesagt, dass es eher wie ein Flugzeug aus groЯer Entfernung ausgesehen hat, und sie sind sich ziemlich sicher, dass es eins war. Eines bleibt allerdings unumstritten: Einer der Augenzeugen ist ein ehemaliger Pilot und er meinte, er habe in seinem ganzen Leben so etwas noch nicht gesehen.</text>
+	</string>
+	<string id="dm_information_2">
+		<text>Die letzte Zeit gibt es nur schlechte Neuigkeiten. Die guten Mдnner sterben wie die Fliegen, aber wenn wir ihre Leichen finden, ist da kein Tropfen Blut mehr. Das mьssen diese verdammten Blutsauger sein, wer sonst? Oh, wie gerne wьrde ich ihr Lager finden und diesen Biestern eine Ladung Blei in den Schдdel jagen! Wьrde mich nicht wundern, wenn wir bald nur noch zu zweit aufs Klo gehen kцnnen. Aber ich zeige den anderen Stalkern doch nicht meinen Hintern!</text>
+	</string>
+	<string id="dm_information_20">
+		<text>Es gibt Neuigkeiten. Die Freiheitler haben den PDA des legendдren Wдchtergrьnders in die Finger bekommen. Und weiЯt du was? Es hat sich herausgestellt, dass er seine eigenen Leute verarscht hat, indem er ihnen erzдhlt hat, dass die Armeefьhrung sie in der Zone zurьckgelassen hat. Er hat das alles erfunden, damit er seine eigene Fraktion ins Leben rufen kann! Aber so was kommt in der Zone irgendwann raus. Nur kurze Zeit spдter ist unser Held in einer Raumblase gelandet und das war's. So lдuft es nun mal... Wenn man bedenkt, dass ich tatsдchlich mal in Erwдgung gezogen habe, den Wдchtern beizutreten... Nein danke, sollen sie doch ihr selbstgerechtes Ding durchziehen, aber ohne mich.</text>
+	</string>
+	<string id="dm_information_21">
+		<text>Dieser neue Wдchtertrupp, weiЯt du... Wie aus dem Nichts tauchen immer mehr von denen auf. Einige von ihren Kдmpfern verlassen die Janow-Station und wenn sie zurьckkommen, sind sie drei Mal so viele. Klonen die sich oder was? Aber bei den Wдchtern wьrde mich das gar nicht wundern. Die kann man nur an ihrem Dienstgrad unterscheiden!</text>
+	</string>
+	<string id="dm_information_22">
+		<text>Dieser neue Freiheitlertrupp, weiЯt du... Wie aus dem Nichts tauchen immer mehr von denen auf. Einige von ihren Kдmpfern verlassen die Janow-Station und wenn sie zurьckkommen, sind sie drei Mal so viele. Aber ich habe da eine Theorie: Bei dem ganzen Gras, das sie rauchen, wьrde es mich nicht wundern, wenn sie Wurzeln schlagen und sich wie Pflanzen vermehren!</text>
+	</string>
+	<string id="dm_information_23">
+		<text>Kennst du Gonta und seine Jungs? Eine Zeit lang hat sie das Glьck ganz schцn verlassen, als Danila verschwunden ist und Krabbe verwundet wurde. Aber jetzt haben sie wieder eine Glьcksstrдhne. Sie kommen gut mit den Wissenschaftlern klar und nehmen Messungen fьr sie vor. Nett, oder? Ein angenehmer Job und ein groЯer Schritt in Richtung offizielle Genehmigung fьr den Aufenthalt in der Zone.</text>
+	</string>
+	<string id="dm_information_24">
+		<text>Hast du schon von den Stalkern Mitaj, Torba und Grizzly gehцrt? Angeblich haben sie bei den Wissenschaftlern einen Job gekriegt und nehmen fьr sie Messungen vor. Wozu soll das gut sein? Wenn du mich fragst, fьhren diese blцdstudierten Typen nichts Gutes im Schilde. Aber hey, wenigstens kцnnen es die Jungs jetzt ruhig angehen lassen. Vielleicht kriegen sie sogar eines Tages ihre offizielle Genehmigung fьr den Aufenthalt in der Zone.</text>
+	</string>
+	<string id="dm_information_25">
+		<text>Kennst du Spartacus und seine Leute? Nun, auf der Skadowsk bekommt man sie nicht mehr zu Gesicht - sie bewachen jetzt den Bunker der Wissenschaftler. Warum nicht - sie wissen, wie man mit Mutanten fertig wird und wie man sich Banditen vom Leib hдlt. Forschung ist eine gute Sache, aber man braucht dafьr Ruhe.</text>
+	</string>
+	<string id="dm_information_26">
+		<text>Hast du die Sцldner beim Umspannwerk herumhдngen gesehen? Wenn ja, dann muss es aber schon lдnger her sein. Sie sind rьber nach Jupiter gegangen, um den Bunker der Wissenschaftler zu bewachen. Vorher waren da ein paar andere Sцldner, aber ich habe gehцrt, dass ihnen irgendetwas zugestoЯen ist. Kann ruhig so weitergehen, wenn du mich fragst! Einige Sцldner verschwinden, andere nehmen ihren Platz ein und immer so weiter... Wenn das eine Zeit lang so geht, sind wir die Sцldner in Zaton bald los.</text>
+	</string>
+	<string id="dm_information_27">
+		<text>Man erzдhlt sich, dass der Bunker der Wissenschaftler jetzt von tapferen Kriegern der Wдchter beschьtzt wird... Ich frage mich, was fьr sie dabei herausspringt. Denken die wirklich, dass diese Wissenschaftler ihnen als Bezahlung ein brandneues Plasmagewehr geben werden, um damit auf Hamsterjagd zu gehen? Was fьr Trottel, ha ha.</text>
+	</string>
+	<string id="dm_information_28">
+		<text>Ich habe gehцrt, der Bunker der Wissenschaftler wird jetzt von kiffenden Freiheitlern bewacht. Haben die Wissenschaftler denn nicht Angst, dass ihre Proben in Rauch aufgehen? Also das meine ich durchaus wцrtlich. Aber es hat ja auch sein Gutes. Wer versucht, den Bunker anzugreifen, muss erst durch eine dicke Nebelwand durch! Ha ha ha!</text>
+	</string>
+	<string id="dm_information_29">
+		<text>Warst du schon in Jupiter, bei der Funkelektronikanlage? Ist ganz schцn unheimlich dort. Niemand weiЯ genau, was da drinnen eigentlich vor sich geht. Die Anomalien und Mutanten sind so wie ьberall, aber trotzdem ist mir nicht danach, dorthin zu gehen. Mein Bauchgefьhl sagt mir, dass einen dort 'ne Menge Дrger erwartet.</text>
+	</string>
+	<string id="dm_information_3">
+		<text>Sieh an, bist du nicht der Kerl, der den Arzt der Skadowsk entlarvt hat? Das war wirklich gute Arbeit. Ich hдtte sein nдchster Patient sein kцnnen, weiЯt du... Wir alle dachten, dass es die Monster waren, aber scheinbar kцnnen manche Menschen genauso grausam sein. Fressen oder gefressen werden, so lдuft das auf der Welt, habe ich nicht Recht?</text>
+	</string>
+	<string id="dm_information_30">
+		<text>Das sollte ich dich fragen. Nachdem du in diese Tunnel unter der Jupiter-Anlage gegangen bist, sind uns Gerьchte zu Ohren gekommen, dass du bis zum Zentrum der Zone vorgestoЯen bist. Das hat fьr ganz schцn viel Wirbel gesorgt. Dutzenden Leuten hat es in den Fingern gejuckt, in deine FuЯstapfen zu treten. Aber Nitro konnte sie wieder zur Vernunft bringen. Er hat ihnen gesagt, dass die Tore zu den Tunneln verriegelt sind und er nichts tun kann, um sie wieder aufzukriegen. Natьrlich waren da ein paar ьbermьtige Kerle, die das Tor in die Luft sprengen wollten, aber sie versuchen immer noch herauszufinden, wo man dafьr genug Dynamit herbekommen kцnnte. AuЯerdem haben sie keine Ahnung, wie sie da unten ьberhaupt Luft kriegen sollen.</text>
+	</string>
+	<string id="dm_information_31">
+		<text>Oh, weiЯt du schon das Neueste ьber Gari? Der Stalker, der fьr die Wissenschaftler gearbeitet hat. Er ist jetzt kein "Eindringling" mehr, sondern hat eine offizielle Genehmigung fьr die Zone bekommen, ob du's glaubst oder nicht! Du denkst bestimmt, er hat 'nen Haufen Beute gemacht und ist dann raus aus der Zone. Da liegst du falsch. Dieser Verrьckte ist stattdessen nach Pripyat aufgebrochen. Jeder dachte, dass wir den Kerl wie die anderen nie mehr wiedersehen, aber weit gefehlt. Er hat es tatsдchlich dorthin geschafft, aber diese GroЯtat hat den Stalkern nicht viel gebracht. Er ist ein paar Leuten vom Militдr ьber den Weg gelaufen und jetzt versteht er sich gut mit diesen Uniformfritzen. Er hat ja seine Genehmigung, aber das Gebiet ist fьr gewцhnliche Stalker immer noch tabu.</text>
+	</string>
+	<string id="dm_information_32">
+		<text>Nun... Die Wдchter und Freiheitler kдmpfen wieder gegeneinander, dieses Mal geht es um irgendein wichtiges Versteck. Sie sagen, da sei genug Ausrьstung, um drei Infanteriedivisionen damit auszustatten. Ich weiЯ nicht, wer das Versteck ursprьnglich genutzt hat, aber das Gefecht hatte es echt in sich. Die Sache hat auch die Stalker in der Janow-Station aufgestachelt, aber zum Glьck haben sie sich rausgehalten, sonst wьrde jetzt wieder jeder gegen jeden kдmpfen. Ich glaube, die Wдchter sind am schlechtesten weggekommen, weil das Gebiet jetzt von Truppen der Freiheit patrouilliert wird.</text>
+	</string>
+	<string id="dm_information_33">
+		<text>Nun... Die Wдchter und Freiheitler kдmpfen wieder gegeneinander, dieses Mal geht es um irgendein wichtiges Versteck. Sie sagen, da sei genug Ausrьstung, um drei Infanteriedivisionen damit auszustatten. Ich weiЯ nicht, wer das Versteck ursprьnglich genutzt hat, aber das Gefecht hatte es echt in sich. Die Sache hat auch die Stalker in der Janow-Station aufgestachelt, aber zum Glьck haben sie sich rausgehalten, sonst wьrde jetzt wieder jeder gegen jeden kдmpfen. Ich glaube, die Freiheitler sind am schlechtesten weggekommen, weil das Gebiet jetzt von Truppen der Wдchter patrouilliert wird.</text>
+	</string>
+	<string id="dm_information_34">
+		<text>Neulich ist etwas passiert. Eine Gruppe von Stalkern hat die Jupiter-Tunnel erkundet und ist dabei auf etwas gestoЯen - oder besser gesagt auf jemanden. Zuerst wurden ihnen ihre Waffen aus den Hдnden gerissen und dann sind alle mцglichen Sachen direkt auf sie zugeflogen. Sie hatten keine Ahnung, was da vor sich geht, aber zwei Jungs sind dabei draufgegangen.</text>
+	</string>
+	<string id="dm_information_35">
+		<text>Ich habe gehцrt, dass in den Tunneln nцrdlich von Jupiter ekelhafte Mutanten gesehen wurden. Trapper hat einen Stalker losgeschickt, um der Sache auf den Grund zu gehen. Es hat sich dann herausgestellt, dass dort Burer ihren Unterschlupf hatten. Warum "hatten"? Weil eben jener Stalker alle Burer erledigt hat. Und zwar alleine... Du passt sogar auf seine Beschreibung, auЯer dass er ein bisschen grцЯer ist und immer einen Granatwerfer dabei hat.</text>
+	</string>
+	<string id="dm_information_36">
+		<text>Die Stalker sind erledigt... Aus Fen kommen Monster und die Stalker in der Zementfabrik haben gesehen, wie sie einen unserer Jungs erwischt haben. Da waren mindestens ein Dutzend von ihnen, riesige Bestien - so groЯ, dass man seinen Augen nicht traut. Haben wie Blutsauger ausgesehen, aber doppelt so groЯ und viel schneller. Wir beten, dass Trapper herausfindet, wie man mit diesen Monstern fertig wird...</text>
+	</string>
+	<string id="dm_information_37">
+		<text>Hast du schon einmal von Sumpfblutsaugern gehцrt? Die in Fen? Tja, also jetzt sind sie weg. Trapper hat sich darum gekьmmert... Allerdings nicht persцnlich - er hat ein paar Stalker angeheuert. Man sagt, er hat einen Trupp aus ungefдhr zehn Mann zusammengestellt, die diesen Sumpf Meter fьr Meter durchkдmmt haben. Alles, was aus dem Sumpf hervorgekrochen kam, haben sie ins Jenseits befцrdert. Da hьpft kein einziger Frosch mehr herum.</text>
+	</string>
+	<string id="dm_information_38">
+		<text>Es ist noch nicht lange her, da hat das Gerьcht die Runde gemacht, dass jemand eine Chimдre abgeknallt hat. Bisher haben die Mutanten reihenweise Stalker getцtet, aber scheinbar werden wir endlich klьger und drehen den SpieЯ langsam um. AuЯerdem weiЯ ich aus anderen Quellen, dass der Typ ein erfahrener Jдger ist und mehr Monster getцtet hat als wir beide Mьcken in unserem ganzen Leben.</text>
+	</string>
+	<string id="dm_information_39">
+		<text>WeiЯt du, was fьr Leute die Freiheit heutzutage rekrutiert? Da war dieser Kerl namens Flint, der ьberall mit seinen Glanztaten und Trophдen angegeben hat... Tja, wie sich herausgestellt hat, ist er der grцЯte Dreckskerl aller Zeiten. Hat seinen Kumpel in einer Anomalie sterben lassen, sich seine Beute unter den Nagel gerissen und ist dann abgehauen. Spдter ist noch mehr ьber seine Heldenzeit in Zaton herausgekommen, wo er quasi eine Gruppe von Jдgern an eine Chimдre verfьttert hat. Ich hдtte mehr von den Freiheitlern erwartet... Mann, da bin ich lieber in keiner Fraktion, als solche Freunde zu haben.</text>
+	</string>
+	<string id="dm_information_4">
+		<text>In Zaton haben sie diese Chimдre erledigt - Gontas Trupp und ein unbekannter Stalker. Moment, das warst doch du, oder? Kannst du mir das alles nochmal aus erster Hand erzдhlen? Danke ьbrigens - ein menschenfressender Mutant weniger, der uns Sorgen bereitet.</text>
+	</string>
+	<string id="dm_information_40">
+		<text>Ich weiЯ nicht, ob es erwдhnenswert ist, aber wir haben hier diesen Kerl namens Noah. Das ist der verrьckteste Vogel, dem du jemals begegnet bist. Er wohnt in einem hдsslichen Kahn - hat ihn wohl innerhalb von einer Woche von ein paar Schwarzarbeitern zusammenbauen lassen, he he... Aber pass auf - er schieЯt, bevor es ihm ьberhaupt in den Sinn kommt, irgendwelche Fragen zu stellen. Ich sage dir, zur Hцlle mit diesem Arschloch.</text>
+	</string>
+	<string id="dm_information_41">
+		<text>Kennst du Nimble, diesen Fuchs? Ein ausgewieftes Schlitzohr, aber schon ganz in Ordnung. Er verkauft ohne Zweifel die besten Waffen hier in der Gegend. Ich frage mich, wie er es schafft, sie hierher zu schmuggeln. Ich meine, wie schleppt man ein Vintar mit sich herum, ohne dass man es dir ansieht? Wo verstaut man dieses Ding? Das grenzt echt an Zauberei, Mann.</text>
+	</string>
+	<string id="dm_information_42">
+		<text>Es heiЯt, Sultan wьrde ganz schцn tief in der ScheiЯe sitzen. Der Kerl wollte Beard fertigmachen und sich sein Geschдft unter den Nagel reiЯen, aber da hat er sich ein bisschen ьbernommen. Hat stattdessen ganz schцn die Fresse poliert bekommen. Auf ihn kommen schwere Zeiten zu, weil er bei seinen Leuten ganz schцn an Respekt eingebьЯt hat. Ist nicht mehr so gut dabei wie vorher.</text>
+	</string>
+	<string id="dm_information_43">
+		<text>Beard frisst Sultan jetzt aus der Hand. Er quetscht sein Geschдft wie eine Zitrone aus. Ist 'ne gute Sache und Sultan hat sich dadurch ganz schцn viel Respekt verschafft. Aber das Beste ist, dass wir jetzt auf der Skadowsk allen zeigen kцnnen, wo's langgeht. Das wird 'ne schцne Zeit. Du willst dich vor einer Emission in Sicherheit bringen? Kein Problem, du musst nur die Gebьhr zusammenkratzen!</text>
+	</string>
+	<string id="dm_information_44">
+		<text>Hey Mann, hast du schon von der Oase gehцrt? Stell dir das mal vor, ein Ort, der sofort all deine Verletzungen und Krankheiten heilt. Das muss irgendein fauler Zauber sein... Allerdings habe ich da eine Theorie. Der ganze Wirbel um die Oase, aber niemand verliert ein Wort ьber den Wunschgцnner so wie frьher... Vielleicht ist die Oase ja ein erfьllter Wunsch?</text>
+	</string>
+	<string id="dm_information_45">
+		<text>Unter den Wissenschaftlern kursiert das Gerьcht, dass ein Artefakt aus der Oase hierher gebracht wurde. Du wirst sehen: Sobald sie das Ding genau analysiert haben, werden sie ihre Forschungsergebnisse dazu benutzen, um ein Heilmittel gegen Krebs zu finden! Ja genau...</text>
+	</string>
+	<string id="dm_information_46">
+		<text>Jeden Tag der gleiche ScheiЯ... Jeder kramt alte Geschichten ьber das Zentrum der Zone hervor. Wie zum Beispiel die Story ьber die Oase - ein Ort, an dem man wieder zu Krдften kommt und alle Verletzungen geheilt werden. Das ist zwar vollkommener Quatsch, aber man hцrt ihn sich gerne an. Vor allem wenn darьber geredet wird, wo genau sie ist. Oh, ich wьnschte, es gдbe wirklich so ein Fleckchen Erde... Wir kцnnten so vielen von unseren Jungs das Leben retten.</text>
+	</string>
+	<string id="dm_information_47">
+		<text>Mir ist zu Ohren gekommen, dass jemand die Oase gefunden hat. Ich hдtte nie gedacht, dass sie wirklich existiert, aber die Sachlage ist eindeutig. Man hat dort sogar ein Artefakt gefunden und die Wissenschaftler untersuchen es gerade. Vielleicht kцnnen sie damit ein Gerдt erfinden, das in Sekundenschnelle heilt... Unsere Jungs kцnnten so was sicher gut gebrauchen.</text>
+	</string>
+	<string id="dm_information_48">
+		<text>Kopatschi. In der Zone nichts Neues, fьr mich aber schon. Man stelle sich vor, ein ganzes Dorf mit seinen Hдusern bis zu den Dдchern mit Erde zugeschьttet... Damals, im Jahre 1986, ging von den Hдusern so viel Strahlung aus, dass man sie einfach eingegraben hat. Ganz schцn unheimlich...</text>
+	</string>
+	<string id="dm_information_49">
+		<text>WeiЯt du, wie es dazu gekommen ist, dass die Wдchter und wir zusammen in der Janow-Station sind? Zulu ist das zu verdanken. Er war damals noch bei den Wдchtern und konnte wie kein Zweiter feststellen, ob eine Emission im Anmarsch ist... Aber wir waren zuerst in der Janow-Station, zumindest nach den Stalkern. Wir hatten kaum Zeit, uns eine Zigarette anzuzьnden, als diese Pseudosoldaten aufgetaucht sind und vor uns mit ihren Waffen herumgefuchtelt haben. Das letzte Mal habe ich so ein Gemetzel vor mehr als einem Jahr auf der Mьllhalde gesehen. Auf beiden Seiten gab es zahlreiche Opfer - darunter unser Emissionsexperte, mцge er in Frieden ruhen. Aber dann hat Zulu plцtzlich gerufen "Eine Emission steht kurz bevor! Bringt euch in Sicherheit!". Was hдtten wir denn tun sollen? Sie einfach rausschmeiЯen und sterben lassen? Wдchter oder nicht, sie sind immer noch Menschen. Und so leben wir jetzt: Wir zanken uns, wenn es ruhig ist, aber wenn eine Emission ьber uns hinwegfegt, sitzen wir dicht gedrдngt und angespannt zusammen. Zulu hat irgendwann die Wдchter verlassen und lebt jetzt wie ein Einsiedler in der Nдhe der Janow-Station.</text>
+	</string>
+	<string id="dm_information_5">
+		<text>Das ist zwar nichts Neues und auch kein Geheimnis, aber Kardan - der Techniker - ist gerade drauf und dran, sich tot zu saufen. Als er auf die Skadowsk gekommen ist, soll er nur zu bestimmten Anlдssen oder gegen die Strahlung etwas getrunken haben. Erst spдter hat er wirklich angefangen, sich regelrecht volllaufen zu lassen. Er ist nicht ьber den Tod seiner zwei Kameraden hinweggekommen. Sie mьssen ziemlich eng befreundet gewesen sein...</text>
+	</string>
+	<string id="dm_information_50">
+		<text>Hier was Lustiges. Da hat doch einer tatsдchlich behauptet, dass ein UFO ьber die Janow-Station geflogen ist. Manch einem wдchst die Zone echt ьber den Kopf, oder? Poltergeister und Controller reichen ihnen nicht, nein, da mьssen die guten alten UFO-Storys herhalten. Na ja, zum Glьck haben wir hier keine Psychos, die dem Wodka mit Exorzismus bцse Geister austreiben wollen. Das wьrde dann so klingen: "Oh Herr, befreie dieses Getrдnk von den bцsen Geistern, auf dass es rein sei und den Menschen keinen Kater beschert!" Ha ha...</text>
+	</string>
+	<string id="dm_information_51">
+		<text>Sagt dir das Dorf Kopatschi was? Damals nach der Katastrophe im Atomkraftwerk Tschernobyl war diese Gegend so verstrahlt, dass man beschlossen hat, das ganze Dorf mit Erde zuzuschьtten. Anstelle von Hдusern findest du dort nichts mehr auЯer radioaktiv verseuchten Hьgeln. Angeblich war das schon vor dem Unglьck ein ziemlich unheimlicher Ort. Ich krieg 'ne Gдnsehaut, wenn ich nur daran denke, was man dort wohl heutzutage vorfindet. Keiner hat den Mumm, die Gegend unter die Lupe zu nehmen.</text>
+	</string>
+	<string id="dm_information_52">
+		<text>Zwar nichts Neues, aber vielleicht hast du es noch nicht mitbekommen. Wir haben uns hier nicht zu den Freiheitlern gesellt, weil wir sie so gern mцgen. Die Umstдnde haben einfach dazu gefьhrt. Als wir hierher gekommen sind, sind die Freiheitler aus heiterem Himmel ьber uns hergefallen... Auf beiden Seiten hat es hohe Verluste gegeben, obwohl wir langsam aber sicher gegen diese Anarchisten die Oberhand gewonnen haben... Mitten im Kampfgeschehen hat dann Zulu plцtzlich irgendwie gespьrt, dass eine Emission im Anmarsch ist. Er liegt niemals daneben, musst du wissen... Wir hatten keine andere Wahl und mussten die Kampfhandlungen einstellen. Ich verstehe nicht, warum Zulu den Wдchtern nach diesem Vorfall den Rьcken gekehrt hat...</text>
+	</string>
+	<string id="dm_information_53">
+		<text>Unsere Spдher haben neulich gemeldet, dass sie ein unidentifizierbares Flugobjekt ьber der Janow-Station gesehen haben - mit anderen Worten: ein UFO. Bevor du anfдngst, irgendwelche dummen Fragen zu stellen, sei dir gesagt, dass es sich dabei nicht zwingend um eine fliegende Untertasse mit Marsmдnnchen handeln muss. Es kцnnte ein herumfliegender Karton oder ein Wetterballon gewesen sein, solange die Augenzeugen nicht in der Lage sind, dieses Flugobjekt genau einzuordnen. Verstanden?</text>
+	</string>
+	<string id="dm_information_54">
+		<text>Du warst derjenige, der diesen PDA zu Loki gebracht hat, stimmt's? Mann, das ist echt der Knaller. Der legendдre Grьnder der Wдchter, General Taschenkow, hat seine eigenen Leute wie Idioten hinters Licht gefьhrt. Hat das Funkgerдt kaputt gemacht, damit sie nicht von der AuЯenwelt erreicht werden kцnnen, und dann seine eigene Armee aus Schwachkцpfen gebildet. Und wozu? Um dann in klassischer Volldeppenmanier in einer verdammten Raumblase zu landen! Das ist so blцd, dass es einfach stimmen muss, Mann!</text>
+	</string>
+	<string id="dm_information_55">
+		<text>Hast du schon den neuen Trupp gesehen, den diese Pseudosoldaten rekrutiert haben? Das kann keine Verstдrkung aus ihrem Lager sein - im Gegensatz zu den anderen haben die Neuen ihren Menschenverstand noch nicht ganz gegen die Fraktionsideologie eingetauscht. Fьr gewцhnliche Stalker sind sie zu gut ausgebildet. Wer weiЯ, vielleicht kommen sie ja vom Monolith? Ja, das klingt verrьckt!</text>
+	</string>
+	<string id="dm_information_56">
+		<text>Hast du schon unsere neuen Kдmpfer gesehen? Ach, du warst es, der sie hierher gebracht hat, stimmt's? Echt genial, Mann. Die Jungs sind ziemlich cool drauf, aber ein bisschen angespannt... Ist OK - wenn sie erst einmal ein paar Monate bei uns waren, sind sie sicher lockerer drauf. Die gewцhnen sich frьh genug an unsere Lebensweise und werden dann so wie wir.</text>
+	</string>
+	<string id="dm_information_57">
+		<text>Wir haben ein paar coole neue Rekruten: ein Trupp aus ehemaligen Monolithern. Und sind auch keine Anfдnger, sondern gut ausgebildete Kдmpfer. Natьrlich sind sie im Kopf noch nicht ganz normal, nach all der Zeit beim Monolith. Aber das macht nichts, wir haben fьr solche Fдlle einen besonderen ideologischen Einfьhrungskurs und noch ein paar andere Dinge.</text>
+	</string>
+	<string id="dm_information_58">
+		<text>Es heiЯt, die Freiheit hдtte ein paar ehemalige Monolith-Kдmpfer rekrutiert. Schwer zu glauben, aber sie haben tatsдchlich einen neuen Trupp, und der kommt definitiv nicht von auЯerhalb der Zone. Scheinbar sind die Freiheitler ganz schцn verzweifelt... oder sie haben sich mit den ganzen Drogen ihre Gehirnzellen ruiniert. Wen nehmen sie als Nдchstes - eine Zombiebrigade? Ein Bataillon aus Burern?</text>
+	</string>
+	<string id="dm_information_59">
+		<text>In dieser Gegend wird bald wieder Recht und Ordnung herrschen. Die Wдchter haben die Kontrolle ьber цrtliche Schlьsselpositionen ьbernommen. Wir haben in der Janow-Station FuЯ gefasst und bewachen mit einem Trupp den Bunker der Wissenschaftler rund um die Uhr. Es wird hцchste Zeit, dass die Freiheit ihre Sachen zusammenpackt und sich aus dem Staub macht - Anarchisten sind hier nicht erwьnscht.</text>
+	</string>
+	<string id="dm_information_6">
+		<text>Die neueste Attraktion - ein nьchterner Kardan. Kannst du glauben, dass er trocken ist? Die Leute auf der Skadowsk haben ihn gefragt, ob er sich die Nummer von den anonymen Alkoholikern besorgt hat, woraufhin er geantwortet hat: "Die einzige Nummer, die ich gebraucht habe, war die Zweiundsechzig."</text>
+	</string>
+	<string id="dm_information_60">
+		<text>Du warst derjenige, der den Jungs dabei geholfen hat, den Job von den Wissenschaftlern zur Bewachung ihres Bunkers zu kriegen, stimmt's? Danke. Es war bestimmt gut, unsere Mдnner beim Bunker zu sehen, und nicht diese verdammten Sцldner. Feine Sache!</text>
+	</string>
+	<string id="dm_information_61">
+		<text>Mal sehen... die Sache hat sich gelohnt. Jetzt kцnnen wir das Versteck so nutzen, wie es ursprьnglich vorgesehen war - als Gefдngnis fьr den Abschaum der Wдchter, um aus ihnen all ihre Geheimnisse rauszupressen. He he. Ach, und danke, dass du uns den Hinweis mit dem Alarmsystem gegeben hast - ohne Verstдrkung hдtten wir keine Chance gehabt.</text>
+	</string>
+	<string id="dm_information_62">
+		<text>Ein weiterer Sieg fьr die Wдchter! Diese Anarchisten waren einfach zu grцЯenwahnsinnig... Sie haben sich an unser geheimes Warenlager herangeschlichen und dachten wirklich, dass sie damit durchkommen. Nein, so nicht! Wir haben sie ьberrascht und ihnen die Schдdel weggepustet, als wдren sie tollwьtige Hamster.</text>
+	</string>
+	<string id="dm_information_63">
+		<text>Es ist nichts Neues, dass sich bei der Freiheit nur Abschaum tummelt, aber wir sind an brandneue Informationen ьber einen ihrer grцЯten Spinner rangekommen. Dieser Gauner war bei der Freiheit unter dem Namen Flint bekannt, aber vor seinem Beitritt hieЯ er Magpie und war ein Stalker. Zumindest war das sein Name, als er nach Zaton gekommen ist. Er hдtte fast einen ganzen Jдgertrupp einem Mutanten zum FraЯ vorgeworfen. Er hat sie reingelegt und eine Chimдre hдtte sie beinahe in Stьcke gerissen, wдhrend sich dieser Mistkerl ihre Ausrьstung geschnappt hat und hier zur Janow-Station gegangen ist. Nachdem er sich den Freiheitlern angeschlossen hatte, hat er seinen Kameraden in eine Anomalie gelockt und sich dort sein Artefakt gekrallt. Ja, so sind sie, die Freiheitler.</text>
+	</string>
+	<string id="dm_information_7">
+		<text>Es gibt hier ein neues Schiffbauprojekt unter der Leitung von Noah. Ja, das ist die neueste Attraktion in Zaton - ein Stalker namens Noah. Erfahren, motiviert und vцllig durchgeknallt. Sein neuestes verrьcktes Vorhaben ist es, alle Stalker vor der Apokalypse zu retten. Aus diesem Grund baut er einen alten Kahn zu einer "Arche" um - oder besser zu einem Irrenhaus. Falls du vorhaben solltest, bei ihm vorbeizuschauen, pass auf, dass du Noah nicht wьtend machst oder ihn belдstigst. Solange du das nicht tust, ist er ziemlich harmlos.</text>
+	</string>
+	<string id="dm_information_8">
+		<text>Kennst du Nimble? Zurzeit hдngt er auf der Skadowsk rum. Er ist wirklich ein Meister seines Fachs. Egal was du brauchst, er kriegt es. Nun ja, zumindest meistens. In letzter Zeit handelt er hauptsдchlich mit Waffen und Schutzanzьgen, alles Spitzenware! Sonderanfertigungen, experimentelle oder handgemachte Sachen... zwar nicht billig, aber warum auch? Wer was Exklusives will, muss bereit sein, tief in die Tasche zu greifen.</text>
+	</string>
+	<string id="dm_information_9">
+		<text>Wusstest du, dass Pilot eine neue Route zwischen Zaton und Jupiter hat? Vorher war man eine ganze Weile unterwegs - es ging bergauf, man musste Anomalien umgehen usw. Jetzt ist das ein Kinderspiel und keine Reise mehr, sondern fast schon wie ein Spaziergang im Park. Kein Wunder, die Strecke ist ja nur noch halb so lang. Aber Pilot ist bescheiden und ehrlich: Ehre, wem Ehre gebьhrt! Er war nicht derjenige, der die Route entdeckt hat. Ein Stalker hat ihm seine Karten gezeigt. Natьrlich nicht umsonst, aber ein Vermцgen hat er nicht dafьr verlangt.</text>
+	</string>
+	<string id="dm_information_do_not_know_1">
+		<text>Nicht viel, um ehrlich zu sein.</text>
+	</string>
+	<string id="dm_information_do_not_know_2">
+		<text>In der Zone ist immer was los, egal wo.</text>
+	</string>
+	<string id="dm_information_do_not_know_3">
+		<text>Nun, du bist jetzt hier. Ich denke, das ist durchaus eine Neuigkeit.</text>
+	</string>
+	<string id="dm_information_general">
+		<text>Was gibt's Neues in der Zone?</text>
+	</string>
+	<string id="dm_information_no_more_1">
+		<text>Ich weiЯ sonst nichts, was dich interessieren kцnnte.</text>
+	</string>
+	<string id="dm_information_no_more_2">
+		<text>Ich wьrde dir gerne mehr erzдhlen, aber das ist alles, was ich gehцrt habe.</text>
+	</string>
+	<string id="dm_information_no_more_3">
+		<text>Ich habe dir alles erzдhlt, was ich weiЯ.</text>
+	</string>
+	<string id="dm_job_1">
+		<text>Hm... vielleicht solltest du Grouse drьben auf der Skadowsk fragen. Es gibt da eine Sache, bei der er Hilfe benцtigt - einige Stalker sind spurlos verschwunden. Jeder glaubt, dass Blutsauger sie auf dem Gewissen haben, denn die gefundenen Leichen hatten kein Blut mehr in ihrem Kцrper. Aber es sind einfach zu viele... Fast jeden zweiten Tag verschwindet ein Stalker, und dieses Verhalten ist fьr Blutsauger eher ungewцhnlich... Grouse hat sogar einen erfahrenen Jдger angeheuert, um diese Blutsauger zu jagen.</text>
+	</string>
+	<string id="dm_job_10">
+		<text>WeiЯt du, wenn ein Stalker Geld braucht, gibt es zwei Mцglichkeiten: Artefakte finden und sie fьr ein Drittel des Werts an Hдndler verhцkern, oder fьr die Wissenschaftler arbeiten. Die haben immer irgendwas fьr einen Stalker zu tun - mal wollen sie ein seltenes Artefakt, mal einen Mutantenkadaver haben. Aber vor allem kцnnen sie dir eine offizielle Genehmigung fьr den Aufenthalt in der Zone ausstellen, wenn du mit ihnen gut klarkommst. Stell dir vor, wie du mit deinem Rucksack voller Beute an einem Wachposten des Militдrs vorbeigehst und dir die Soldaten salutieren! Da wird mir gleich ganz warm ums Herz! Aber wie auch immer, der Bunker der Wissenschaftler befindet sich westlich der Janow-Station. Ein Stalker arbeitet bereits fьr sie, aber vielleicht kцnnen sie ja noch jemanden wie dich gebrauchen.</text>
+	</string>
+	<string id="dm_job_11">
+		<text>Wie erfolgreich du bist, hдngt davon ab, was du tust. Wenn es dir nichts ausmacht, auf Mutantenjagd zu gehen, wirst du viele Jobangebote kriegen. Schau im Untergeschoss der Janow-Station vorbei und frage nach Trapper - er bezahlt gut fьr das Tцten von Mutanten. Allerdings solltest du nicht Jagd auf den erstbesten Pseudohund machen, der dir ьber den Weg lдuft, um an deine Belohnung zu kommen. Bei Trappers Auftrдgen geht es um ganz bestimmte Monster, die entweder beim Sammeln von Artefakten Дrger machen, oder hдufig an den Orten anzutreffen sind, die Stalkern als Versteck vor Emissionen dienen.</text>
+	</string>
+	<string id="dm_job_14">
+		<text>Typen wie du, die auf die Skadowsk kommen, schauen gerne bei Beard vorbei. Er bezahlt gut fьr Artefakte... Aber ich sag dir was - er hat keinen guten Geschдftssinn. Er will seinen Gewinn nicht mit gewissen mдchtigen Leuten teilen... und das wird ihn eines Tages den Kopf kosten. Verstehst du?</text>
+	</string>
+	<string id="dm_job_15">
+		<text>Falls du Kohle machen willst, geh zu Uhu. Er handelt mit allem, was ein echter Kerl auf der Skadowsk brauchen kann - mit Informationen, Waffen usw. Falls du brisante oder wertvolle Sachen hast, beispielsweise ein Dokument oder den PDA eines Stalkers, bring das Zeug zu Uhu und steck die Kohle ein. Du kannst auch gutes Geld machen, wenn du seine persцnlichen Auftrдge annimmst. Frag ihn einfach, ob du irgendetwas fьr ihn erledigen kannst.</text>
+	</string>
+	<string id="dm_job_2">
+		<text>Du solltest mal mit Gonta reden. Er und seine Leute haben einiges zu erzдhlen. Vor nicht allzu langer Zeit ist eine Chimдre in Zaton aufgetaucht, also hat sich Gonta mit seinem Trupp auf die Jagd gemacht. Sie haben sich in zwei Gruppen aufgeteilt, um die Bestie aufzuspьren, und einen der Jдger hat er auf die Suche nach dem Blutsaugerlager geschickt. Sie waren also nicht viele, als sie der Chimдre endlich auf die Spur gekommen sind. Ein anderer Stalker, Magpie, ist zu ihnen gestoЯen. Ich weiЯ nicht, wie das genau abgelaufen ist, aber alles deutet darauf hin, dass Magpie sich aus dem Staub gemacht hat, als er die Chimдre gesehen hat. Gonta hдtte es fast nicht geschafft und einer seiner Mдnner wurde schwer verwundet. Die Chimдre ist immer noch da drauЯen, weswegen sie nach Leuten suchen, die ihnen bei der Jagd helfen.</text>
+	</string>
+	<string id="dm_job_3">
+		<text>Ganz einfach: Wenn du gutes Geld verdienen willst, ist Sultan dein Mann. Er hat hier das Sagen, und wenn du gut mit ihm klarkommst, hat er vielleicht was fьr dich zu tun.</text>
+	</string>
+	<string id="dm_job_4">
+		<text>Wenn du ein guter Stalker bist - also Artefakte findest - sprich mit Beard. Er genieЯt hier ein hohes Ansehen und ist der einzige auf der Skadowsk, der dir fьr deine Artefakte einen guten Preis macht. Er hat die Kontakte, um die Artefakte aus der Zone rauszukriegen. AuЯerdem ist er ein feiner Kerl, weiЯt du... er hat immer einen guten Ratschlag oder einen geeigneten Job fьr dich parat.</text>
+	</string>
+	<string id="dm_job_5">
+		<text>Auf der Skadowsk ist ein Hдndler, sein Name lautet Uhu. Ist nicht gerade der sympathischste Kerl auf dem Schiff. Er beschwert sich immer darьber, dass jeder Beard Artefakte verkauft und nicht ihm. Aber wenn man Kohle braucht, kann es nie schaden, ihn zu fragen, ob er was zu erledigen hat. Dieses Wiesel handelt mit weit mehr als nur Munition. Er kann dir Infos geben, verkauft Waren und ist auch an deinem Zeug interessiert. Statte ihm mal einen Besuch ab - du findest ihn auf dem zweiten Achterdeck. Ich bin mir sicher, ihr kommt ins Geschдft.</text>
+	</string>
+	<string id="dm_job_6">
+		<text>Du kannst Wano fragen, er hдngt meistens in der Janow-Bar rum. Zurzeit hat er Дrger mit den Banditen - er hat schon drei Mal versucht, seine Schulden bei ihnen zu begleichen, aber die Zinsen werden immer hцher. Er hat viel Erfahrung und entdeckt eine Anomalie mit geschlossenen Augen, aber dennoch gerдt er immer wieder in Schwierigkeiten. Mehrere Leute haben ihm schon geraten, sich aus dem Staub zu machen. Die Zone ist zu groЯ, als dass ihn die Banditen finden kцnnten. Aber er ist zu stolz, um einfach wegzulaufen, und es gibt nicht viele Leute, die ihm bei der Sache mit den Banditen helfen wollen...</text>
+	</string>
+	<string id="dm_job_7">
+		<text>Vergiss das mit den Jobs mal, Mann... Die Banditen machen uns das Leben immer mehr zur Hцlle. Sie haben Mitaj als Geisel genommen und fordern fьr seine Freilassung ein Lцsegeld. Mitaj war einer der ersten Stalker hier in der Janow-Station. Er hat dort alles so hergerichtet, dass die Leute wдhrend einer Emission geschьtzt sind. Jetzt braucht er ein Mal Hilfe und niemanden kьmmert es. Bei den Freiheitlern und Wдchtern ьberrascht mich das nicht - die machen sich schon gegenseitig das Leben schwer genug... aber die anderen - die sollten echt was unternehmen! Ach, warum reg ich mich auf... Mitajs eigener Trupp weiЯ nicht, wie man ihn aus der Hand der Banditen befreien kцnnte. Falls du ihnen helfen willst, rede mit Grizzly. Du findest ihn in der Bar der Station.</text>
+	</string>
+	<string id="dm_job_8">
+		<text>Nitro, der Techniker in der Janow-Station, braucht Materialien, mit denen er arbeiten kann. Er kennt sich mit Waffen ebenso gut aus wie mit Elektronik, falls du es noch nicht gewusst hast. Aber manchmal reichen Fдhigkeiten einfach nicht aus - er braucht die richtigen Materialien und hat schon viel herumgefragt. Das Problem ist, dass die ungefдhrlichen Orte schon leergerдumt wurden, wдhrend den meisten Leuten die anderen Gegenden zu gefдhrlich sind. Nitro hofft, dass er jemanden findet, der dieses Risiko auf sich nimmt. Ich bin mir sicher, er lдsst dafьr 'nen Haufen Geld springen.</text>
+	</string>
+	<string id="dm_job_9">
+		<text>Ich habe gehцrt, dass Onkel Jar in der Janow-Station nach einem Stalker sucht, der ihm bei irgendeiner Sache hilft und nicht allzu viele Fragen stellt. Ich weiЯ nicht, warum er nicht einfach seine Kumpels von der Freiheit fragt... Wie auch immer, er ist ein netter, alter Mann. Vielleicht solltest du mal mit ihm reden und versuchen, mit ihm ins Geschдft zu kommen.</text>
+	</string>
+	<string id="dm_job_do_not_know_1">
+		<text>Hm... ich wьsste niemanden.</text>
+	</string>
+	<string id="dm_job_do_not_know_2">
+		<text>Das wьrde ich selbst gerne wissen.</text>
+	</string>
+	<string id="dm_job_do_not_know_3">
+		<text>Woher zum Teufel soll ich das wissen?</text>
+	</string>
+	<string id="dm_job_general">
+		<text>Wьsstest du jemanden, der einen Job fьr mich hat?</text>
+	</string>
+	<string id="dm_job_no_more_1">
+		<text>Das hast du mich schon gefragt.</text>
+	</string>
+	<string id="dm_job_no_more_2">
+		<text>Ich kann dir nichts Neues erzдhlen.</text>
+	</string>
+	<string id="dm_job_no_more_3">
+		<text>Du hast meine Antwort schon.</text>
+	</string>
+	<string id="dm_universal_actor_exit">
+		<text>Ach, schon gut.</text>
+	</string>
+	<string id="dm_universal_actor_start">
+		<text>Ich habe eine Frage.</text>
+	</string>
+	<string id="dm_universal_npc_start_0">
+		<text>Frag einfach.</text>
+	</string>
+	<string id="dm_universal_npc_start_1">
+		<text>Spuck's aus.</text>
+	</string>
+	<string id="dm_universal_npc_start_2">
+		<text>SchieЯ los.</text>
+	</string>
+	<string id="dm_universal_npc_start_3">
+		<text>Ich hцre.</text>
+	</string>
+	<string id="dm_wounded_general">
+		<text>Hilfe!</text>
+	</string>
+	<string id="dm_wounded_medkit">
+		<text>Nimm dieses Medkit.</text>
+	</string>
+	<string id="dm_wounded_sorry">
+		<text>Tut mir leid, ich habe nichts.</text>
+	</string>
+	<string id="dm_traveler_bye">
+		<text>Ich verstehe.</text>
+	</string>
+	<string id="dm_traveler_what_are_you_doing">
+		<text>Was machst du gerade?</text>
+	</string>
+	<string id="dm_traveler_can_i_go_with_you">
+		<text>Kann ich mitkommen?</text>
+	</string>
+	<string id="dm_traveler_stalker_actor_companion_yes">
+		<text>Natьrlich. Je mehr desto besser.</text>
+	</string>
+	<string id="dm_traveler_stalker_actor_companion_no">
+		<text>Tut mir leid, nein. Ich bin lieber alleine.</text>
+	</string>
+	<string id="dm_traveler_actor_go_with_squad">
+		<text>Na dann, los.</text>
+	</string>
+	<string id="dm_traveler_take_me_to">
+		<text>Ich muss irgendwohin. Kannst du mich gegen eine kleine Gebьhr dorthin bringen?</text>
+	</string>
+	<string id="dm_traveler_stalker_where_do_you_want">
+		<text>Sicher. Wo willst du hin? Wдhle dein Ziel aus.</text>
+	</string>
+	<string id="dm_traveler_actor_agree">
+		<text>Einverstanden. Gehen wir.</text>
+	</string>
+	<string id="dm_traveler_actor_refuse">
+		<text>Ich habe meine Meinung geдndert.</text>
+	</string>
+	<string id="dm_traveler_stalker_i_cant_travel">
+		<text>Nein, ich habe Wichtigeres zu tun.</text>
+	</string>
+	<string id="dm_stalker_doing_nothing_1">
+		<text>Ich lasse es gerade ruhig angehen.</text>
+	</string>
+	<string id="dm_stalker_doing_nothing_2">
+		<text>Nichts, ich genieЯe meine Freizeit.</text>
+	</string>
+	<string id="dm_stalker_doing_nothing_3">
+		<text>Wonach sieht es denn aus? Nicht das Geringste!</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_monster">
+		<text>Ich verfolge Mutanten.</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_bandit">
+		<text>Ich beschatte ein paar Typen. Richtige Vollidioten...</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_killer">
+		<text>Ich verfolge ein paar Sцldner. Das sind richtige Arschlцcher!</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_monolith">
+		<text>Ich verfolge einen Trupp von bescheuerten Fanatikern. Monolithern also...</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_zombied">
+		<text>Ich bin hinter ein paar Zombies her. Von denen gibt es hier viel zu viele...</text>
+	</string>
+	<string id="dm_traveler_travel_cost">
+		<text>OK, das kostet dich</text>
+	</string>
+	<string id="dm_traveler_actor_dont_go_with_squad">
+		<text>Ach, ich habe meine Meinung geдndert.</text>
+	</string>
+	<string id="dm_traveler_actor_has_no_money">
+		<text>So viel habe ich nicht.</text>
+	</string>
+	<string id="dm_freedom_doing_nothing_1">
+		<text>Oh, nichts, wьrde ich sagen.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_monster">
+		<text>Ich verfolge ein paar Mutanten. Jemand muss ihnen ja zeigen, wo's lang geht.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_bandit">
+		<text>Ich bin hinter ein paar Halunken aus der Gegend her.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_killer">
+		<text>Ich bin auf der Jagd nach ein paar Sцldnern. Wir haben da noch eine Rechnung zu begleichen.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_monolith">
+		<text>Ich bin hinter diesen verrьckten Monolithern her.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_duty">
+		<text>Ich versuche, ein paar der Typen zu erwischen, die mir Geld schulden.</text>
+	</string>
+	<string id="dm_duty_doing_nothing_1">
+		<text>Im Moment tue ich nichts.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_monster">
+		<text>Ich jage Mutanten... mцchte die Gegend hier von ihrem Dreck sдubern.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_bandit">
+		<text>Ich bin auf einer Mission und verfolge einen Banditentrupp.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_killer">
+		<text>Mein Ziel sind Sцldner. Ich verfolge die Spuren von einem ihrer Trupps.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_monolith">
+		<text>Ich bin hinter einem Monolithertrupp her.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_freedom">
+		<text>Ich verfolge diese blцden Amateure... von der Freiheit...</text>
+	</string>
+	<string id="dm_stalker_searching_artefacts_1">
+		<text>Ich bin auf der Suche nach Artefakten.</text>
+	</string>
+	<string id="dm_stalker_searching_artefacts_2">
+		<text>Ich sammle keine Pilze... sondern eher Artefakte.</text>
+	</string>
+	<string id="dm_stalker_searching_artefacts_3">
+		<text>Ich suche Artefakte.</text>
+	</string>
+	<string id="st_stalker_zat_sim_1">
+		<text>Ich bin unterwegs zur Boiler-Anomalie, gleich in der Nдhe eines kleinen Wдldchens.</text>
+	</string>
+	<string id="st_stalker_zat_sim_2">
+		<text>Ich bin auf dem Weg zum nцrdlichen See... werde mir ein paar Tage Urlaub auf der Halbinsel gцnnen.</text>
+	</string>
+	<string id="st_stalker_zat_sim_3">
+		<text>Ich bin unterwegs zum Gebiet jenseits des nцrdlichen Sees - dort gibt es einen ganz netten Lagerplatz.</text>
+	</string>
+	<string id="st_stalker_zat_sim_4">
+		<text>Ich bin auf dem Weg in die Wдlder jenseits des nцrdlichen Sees.</text>
+	</string>
+	<string id="st_stalker_zat_sim_5">
+		<text>Ich gehe in den kleinen Wald westlich des Sдgewerks.</text>
+	</string>
+	<string id="st_stalker_zat_sim_6">
+		<text>Ich bin unterwegs zu dem Hьgel westlich des Sumpfes. Dort bin ich sicher vor diesem verpesteten Dreckssumpf.</text>
+	</string>
+	<string id="st_stalker_zat_sim_7">
+		<text>Ich gehe zum Antennenkomplex. Westlich davon gibt es einen netten, kleinen Platz, wo ich entspannen werde.</text>
+	</string>
+	<string id="st_stalker_zat_sim_8">
+		<text>Ich bin unterwegs in den Wald westlich der Pinieneiche... komm doch mit, wenn du willst - ich hдtte nichts gegen etwas Gesellschaft.</text>
+	</string>
+	<string id="st_stalker_zat_sim_9">
+		<text>In ein Wдldchen zwischen dem Eisenwald und den Werkstдtten.</text>
+	</string>
+	<string id="st_stalker_zat_sim_10">
+		<text>In Richtung groЯe Brьcke... цstlich davon soll es einen sicheren, ungestцrten Flecken Erde geben.</text>
+	</string>
+	<string id="st_stalker_zat_sim_11">
+		<text>Zu einem Parkplatz sьdlich des alten Schiffs.</text>
+	</string>
+	<string id="st_stalker_zat_sim_12">
+		<text>Nichts Besonderes, bin nur unterwegs. Цstlich der Skadowsk werde ich auf einem Hьgel mein Lager aufschlagen.</text>
+	</string>
+	<string id="st_stalker_zat_sim_13">
+		<text>In ein Wдldchen zwischen Isumrudnoje und der Tankstelle.</text>
+	</string>
+	<string id="st_stalker_zat_sim_14">
+		<text>Zu einer StraЯengabelung in der Nдhe der Klдranlage.</text>
+	</string>
+	<string id="st_stalker_zat_sim_15">
+		<text>Zur Boiler-Anomalie.</text>
+	</string>
+	<string id="st_stalker_zat_sim_16">
+		<text>Zur Forststation. Dort gibt es einen Gebдudekomplex, vermutlich hast du ihn schon gesehen. Sogar ein Hochofen ist dort... ich frage mich, was sie da unten genau gemacht haben.</text>
+	</string>
+	<string id="st_stalker_zat_sim_17">
+		<text>In ein Wдldchen westlich des abgebrannten Bauernhofs.</text>
+	</string>
+	<string id="st_stalker_zat_sim_18">
+		<text>In ein Wдldchen цstlich der Boiler-Anomalie.</text>
+	</string>
+	<string id="st_stalker_zat_sim_19">
+		<text>Zu einem Hьgel gleich hinter dem nцrdlichen See.</text>
+	</string>
+	<string id="st_stalker_zat_sim_20">
+		<text>In ein kleines Wдldchen sьdlich des abgebrannten Bauernhofs.</text>
+	</string>
+	<string id="st_stalker_zat_sim_21">
+		<text>Ich bin unterwegs ins Gebiet westlich der Skadowsk... wo die Rohre herauskommen.</text>
+	</string>
+	<string id="st_stalker_zat_sim_22">
+		<text>Ich bin auf dem Weg zu einem Plдtzchen mitten zwischen der Skadowsk und dem Baggerschiff.</text>
+	</string>
+	<string id="st_stalker_zat_sim_23">
+		<text>Zu einer Sumpfstelle in der Nдhe des alten Schiffs.</text>
+	</string>
+	<string id="st_stalker_zat_sim_24">
+		<text>Zu einem Bach in der Nдhe der Narbe-Anomalie.</text>
+	</string>
+	<string id="st_stalker_zat_sim_25">
+		<text>Zur Tankstelle.</text>
+	</string>
+	<string id="st_stalker_zat_sim_26">
+		<text>Zu den Pinieneichenschluchten.</text>
+	</string>
+	<string id="st_stalker_zat_b55">
+		<text>Ich mцchte in der Klaue-Anomalie nach Artefakten suchen.</text>
+	</string>
+	<string id="st_stalker_zat_a1">
+		<text>Ich bin unterwegs zu einem Hьgel westlich der Boiler-Anomalie.</text>
+	</string>
+	<string id="st_stalker_zat_a23_smart_terrain">
+		<text>Zur Eisenwald-Anomalie.</text>
+	</string>
+	<string id="st_stalker_zat_b100">
+		<text>Ich gehe in den Eisenwald, um dort nach Artefakten zu suchen.</text>
+	</string>
+	<string id="st_stalker_zat_b101">
+		<text>Ich gehe zum Sumpf. Wegen dem ganzen Gas kriegt man dort zwar kaum Luft, aber die Artefakte sind es wert.</text>
+	</string>
+	<string id="st_stalker_zat_b103_merc_smart">
+		<text>Ich bin unterwegs in die Werkstдtten des Umspannwerks. Es heiЯt, dass man sich dort gut vor Emissionen verstecken kann, deswegen mцchte ich das mal ausprobieren.</text>
+	</string>
+	<string id="st_stalker_zat_b104_zombied">
+		<text>Kennst du das Sдgewerk hier in der Nдhe? Dorthin bin ich unterwegs. Ich mцchte nachsehen, ob es da etwas Wertvolles zu finden gibt.</text>
+	</string>
+	<string id="st_stalker_zat_b106_smart_terrain">
+		<text>Ich will ein bisschen Urlaub im Ferienparadies Isumrudnoje machen. Oh ja, ein Paradies... fьr Fleisch und Wildschweine! Ha ha! Aber egal... ich bin mir sicher, dass ich dort irgendwo mein Lager aufschlagen kann.</text>
+	</string>
+	<string id="st_stalker_zat_b12">
+		<text>Zu einer Brьcke. Ich glaube, auf der Karte ist sie als Preobraschenski eingezeichnet.</text>
+	</string>
+	<string id="st_stalker_zat_b14_smart_terrain">
+		<text>Zum Baggerschiff. Ich wette, dass es dort in der Gegend noch einige wertvolle Dinge zu holen gibt.</text>
+	</string>
+	<string id="st_stalker_zat_b18">
+		<text>Zum alten Schiff.</text>
+	</string>
+	<string id="st_stalker_zat_b20_smart_terrain">
+		<text>Ich habe vor, beim abgebrannten Bauernhof vorbeizuschauen und zu ьberprьfen, ob neue Artefakte aufgetaucht sind.</text>
+	</string>
+	<string id="st_stalker_zat_b28">
+		<text>Zum sьdlichen Plateau.</text>
+	</string>
+	<string id="st_stalker_zat_b33">
+		<text>Zu dem Erdspalt bei der Tankstelle.</text>
+	</string>
+	<string id="st_stalker_zat_b38">
+		<text>Ich bin unterwegs zum Antennenkomplex Krug - ich brauche einen sicheren Ort, um mich vor Emissionen zu schьtzen. Allerdings sollen sich dort leider ziemlich viele Monster herumtreiben.</text>
+	</string>
+	<string id="st_stalker_zat_b38u">
+		<text>Ich bin unterwegs zum Antennenkomplex Krug - ich brauche einen sicheren Ort, um mich vor Emissionen zu schьtzen. Allerdings sollen sich dort leider ziemlich viele Monster herumtreiben.</text>
+	</string>
+	<string id="st_stalker_zat_b39">
+		<text>Ich will in der Nдhe der Pinieneiche nach Artefakten suchen. Hoffentlich lassen mich die Mutanten in Ruhe.</text>
+	</string>
+	<string id="st_stalker_zat_b40_smart_terrain">
+		<text>Zum Abwassertank... du weiЯt schon, in der Klдranlage. Dort hat man wohl genauso viel Schutz vor Emissionen wie anderswo.</text>
+	</string>
+	<string id="st_stalker_zat_b42_smart_terrain">
+		<text>Ich bin unterwegs zum Bootspier am nцrdlichen See. Danach entscheide ich spontan, wie's weitergeht.</text>
+	</string>
+	<string id="st_stalker_zat_b52">
+		<text>Ich gehe zu den Docks, wo die Krдne stehen. Ein ganz netter Ort, um ein Lager aufzuschlagen.</text>
+	</string>
+	<string id="st_stalker_zat_b53">
+		<text>Ich habe vor, in der Boiler-Anomalie nach Artefakten zu suchen. Hoffentlich ьbersteht mein Schutzanzug diesen heiЯen Urlaub.</text>
+	</string>
+	<string id="st_stalker_zat_b54">
+		<text>Zur Narbe-Anomalie.</text>
+	</string>
+	<string id="st_stalker_zat_b56">
+		<text>Ich will testen, wie feuerfest meine Ausrьstung ist... und nach Artefakten suchen. Drьben in der Rundkreis-Anomalie.</text>
+	</string>
+	<string id="st_stalker_zat_b5_smart_terrain">
+		<text>Zur Forststation.</text>
+	</string>
+	<string id="st_stalker_zat_b7">
+		<text>Ich werde mein Lager auf der Schewtschenko aufschlagen. Dort ist man vor Emissionen sicher und wird nur selten von Mutanten angegriffen.</text>
+	</string>
+	<string id="st_stalker_zat_b7_stalker_raider">
+		<text>Ich werde mein Lager auf der Schewtschenko aufschlagen. Dort ist man vor Emissionen sicher und wird nur selten von Mutanten angegriffen.</text>
+	</string>
+	<string id="st_stalker_zat_medic_home_smart">
+		<text>Ich gehe zu den Docks, wo die Krдne stehen. Ein ganz netter Ort, um ein Lager aufzuschlagen.</text>
+	</string>
+	<string id="st_stalker_zat_stalker_base_smart">
+		<text>Ich will meine Beute loswerden und mir ein paar Bier gцnnen. Ich denke, die Skadowsk ist wie geschaffen dafьr.</text>
+	</string>
+	<string id="st_stalker_jup_a10_smart_terrain">
+		<text>Ich gehe zum Armeecheckpoint, bei der Jupiter-Anlage.</text>
+	</string>
+	<string id="st_stalker_jup_a12">
+		<text>Zum Containerlagerhaus.</text>
+	</string>
+	<string id="st_stalker_jup_a12_merc">
+		<text>Ich bin unterwegs in ein total unscheinbares Gebiet zwischen dem Containerlagerhaus und dem sьdlichen Tunnel.</text>
+	</string>
+	<string id="st_stalker_jup_a6">
+		<text>Zur Janow-Station... endlich kann ich mich mal ausruhen.</text>
+	</string>
+	<string id="st_stalker_jup_b1">
+		<text>Zum Tunnel nцrdlich von Kopatschi.</text>
+	</string>
+	<string id="st_stalker_jup_b19">
+		<text>Ich bin unterwegs zu einem wirklich unheimlichen Ort: Kopatschi... oder was von dem Dorf ьbrig ist. Und ja, ich habe eine Extraladung Munition und Strahlenschutzmittel dabei... ich werde das Zeug wohl brauchen.</text>
+	</string>
+	<string id="st_stalker_jup_b200">
+		<text>Zur Zementfabrik. Ein ganz netter Aussichtspunkt und das Tolle dort ist, dass sich niemand an dich heranschleichen kann.</text>
+	</string>
+	<string id="st_stalker_jup_b200_tushkan_smart_terrain">
+		<text>Zur Zementfabrik. Ich muss das Untergeschoss ьberprьfen.</text>
+	</string>
+	<string id="st_stalker_jup_b202">
+		<text>Zum Umspannwerk in der Nдhe der Janow-Station.</text>
+	</string>
+	<string id="st_stalker_jup_b203">
+		<text>Ich bin unterwegs zu einem Ort in der Nдhe des sьdlichen Eisenbahntunnels.</text>
+	</string>
+	<string id="st_stalker_jup_b204">
+		<text>Ich gehe zu einem Kьhlbecken in der Nдhe der Jupiter-Anlage.</text>
+	</string>
+	<string id="st_stalker_jup_b205_smart_terrain">
+		<text>Ich bin auf dem Weg in den Flugabwehrkomplex Wolchow... werde dort ein paar Zombies jagen.</text>
+	</string>
+	<string id="st_stalker_jup_b205_smart_terrain_tushkano">
+		<text>Zum Bunker... du weiЯt schon, der bei dem Flugabwehrkomplex Wolchow.</text>
+	</string>
+	<string id="st_stalker_jup_b206">
+		<text>In das anomale Wдldchen in der Nдhe des Steinbruchs. Vielleicht finde ich dort ein paar Artefakte.</text>
+	</string>
+	<string id="st_stalker_jup_b207">
+		<text>Ich gehe zum Steinbruch, wo die Wagen der Bauarbeiter stehen.</text>
+	</string>
+	<string id="st_stalker_jup_b207_depot_attack">
+		<text>Es gibt da ein nettes Plдtzchen zwischen dem Steinbruch und der Janow-Station... dort werde ich eine Weile bleiben und es ruhiger angehen lassen.</text>
+	</string>
+	<string id="st_stalker_jup_b208">
+		<text>Ich bin unterwegs zum цstlichen Tunnel... der unter der Jupiter-Anlage.</text>
+	</string>
+	<string id="st_stalker_jup_b209">
+		<text>Zur Asphalt-Anomalie... mal sehen, wie feuerfest mein Schutzanzug ist.</text>
+	</string>
+	<string id="st_stalker_jup_b211">
+		<text>Ich gehe zur Plawni-Anomalie, um nach Artefakten zu suchen. Gegengift habe ich genug dabei... ich mache mir eher Sorgen wegen der Monster.</text>
+	</string>
+	<string id="st_stalker_jup_b212">
+		<text>Zum Belьftungskomplex zwischen der Fabrik und dem Containerlagerhaus. Warum? Tja, wenn ich das nur wьsste.</text>
+	</string>
+	<string id="st_stalker_jup_b219">
+		<text>Ich bin unterwegs zu den Jupiter-Werkstдtten. Vielleicht finde ich dort ja heraus, wie man auf so einen blцden Namen kommt.</text>
+	</string>
+	<string id="st_stalker_jup_b25">
+		<text>Ich gehe mitten ins Zentrum des Steinbruchs. Die Stalker behaupten, dass sie dort immer viele Artefakte finden.</text>
+	</string>
+	<string id="st_stalker_jup_b32">
+		<text>Zum Parkplatz, wo die alten Fahrzeuge stehen. Werde mich in Elektroanomalien nach Artefakten umsehen.</text>
+	</string>
+	<string id="st_stalker_jup_b4">
+		<text>Zwischen dem Flugabwehrkomplex Wolchow und dem Containerlagerhaus gibt es ein nettes, kleines Plдtzchen... und genau dorthin bin ich unterwegs.</text>
+	</string>
+	<string id="st_stalker_jup_b41">
+		<text>Zum Bunker der Wissenschaftler.</text>
+	</string>
+	<string id="st_stalker_jup_b46">
+		<text>Zum Kьhlturm nordwestlich der Janow-Station.</text>
+	</string>
+	<string id="st_stalker_jup_b47">
+		<text>In Richtung Jupiter-Anlage, aber ich habe nicht vor, da reinzugehen. Ich werde mich mal bei den Verwaltungsgebдuden umsehen und schauen, was fьr Mцglichkeiten ich habe.</text>
+	</string>
+	<string id="st_stalker_jup_b6_anom_2">
+		<text>Ich gehe zur Aschehьgel-Anomalie hinter Kopatschi.</text>
+	</string>
+	<string id="st_stalker_jup_b8_smart_terrain">
+		<text>Ich bin unterwegs zu den Jupiter-Werkstдtten. Dort soll ein Hubschrauber abgestьrzt sein, also habe ich mir gedacht, dass ich mich dort mal umsehen sollte.</text>
+	</string>
+	<string id="st_stalker_jup_sim_1">
+		<text>Ich gehe zu dem verfallenen Zug zwischen dem Flugabwehrkomplex Wolchow und dem Parkplatz.</text>
+	</string>
+	<string id="st_stalker_jup_sim_2">
+		<text>Ich gehe zum sьdlichen Tunnel, um im Falle einer Emission sicher zu sein.</text>
+	</string>
+	<string id="st_stalker_jup_sim_3">
+		<text>Ich gehe zu diesem Plдtzchen zwischen der Janow-Station und Kopatschi.</text>
+	</string>
+	<string id="st_stalker_jup_sim_4">
+		<text>Ich bin unterwegs zu einem Plдtzchen in der Nдhe des Kanals, sьdlich der Zementfabrik.</text>
+	</string>
+	<string id="st_stalker_jup_sim_5">
+		<text>Ich bin unterwegs zu einem Plдtzchen in der Nдhe des Kanals, nцrdlich der Jupiter-Anlage.</text>
+	</string>
+	<string id="st_stalker_jup_sim_6">
+		<text>Ich werde mich mal beim Steinbruch umsehen.</text>
+	</string>
+	<string id="st_stalker_jup_sim_7">
+		<text>Ich werde mich mal beim Steinbruch umsehen.</text>
+	</string>
+	<string id="st_stalker_jup_sim_8">
+		<text>Ich werde mich mal im Gebiet nцrdlich der Janow-Station umsehen.</text>
+	</string>
+	<string id="st_stalker_jup_sim_9">
+		<text>In Richtung Flugabwehrkomplex Wolchow. Da gibt es einen ganz netten Lagerplatz, zwischen dem Komplex und dem Dorf Kopatschi.</text>
+	</string>
+	<string id="st_stalker_jup_sim_10">
+		<text>Oh, ich bin nur unterwegs... in Richtung Containerlagerhaus.</text>
+	</string>
+	<string id="st_stalker_jup_sim_11">
+		<text>Ich kundschafte die Gegend aus. Im Moment bin ich unterwegs in das Gebiet sьdlich des Armeecheckpoints.</text>
+	</string>
+	<string id="st_stalker_jup_sim_12">
+		<text>Zum Hubschrauberlandeplatz, zwischen der Fabrik und dem Containerlagerhaus.</text>
+	</string>
+	<string id="st_stalker_jup_sim_13">
+		<text>Ich bin unterwegs zu diesem einen Plдtzchen sьdlich der Janow-Station, bei den Eisenbahnschienen.</text>
+	</string>
+	<string id="st_stalker_jup_sim_14">
+		<text>In das Gebiet nцrdlich der Janow-Station.</text>
+	</string>
+	<string id="st_stalker_jup_sim_15">
+		<text>In das anomale Wдldchen.</text>
+	</string>
+	<string id="st_stalker_jup_sim_16">
+		<text>In das Gebiet sьdlich des Flugabwehrkomplex.</text>
+	</string>
+	<string id="st_stalker_jup_sim_17">
+		<text>Zum Kьhlbecken bei der Betonbad-Anomalie.</text>
+	</string>
+	<string id="st_stalker_jup_sim_18">
+		<text>Ich werde mir die Gegend um die Anlage genauer ansehen.</text>
+	</string>
+	<string id="st_stalker_jup_sim_19">
+		<text>Ich werde mir die Gegend um die Anlage genauer ansehen.</text>
+	</string>
+	<string id="st_stalker_pri_a15">
+		<text>Zum Hof hinter dem Waschsalon.</text>
+	</string>
+	<string id="st_stalker_pri_a16">
+		<text>Zum Waschsalon, dem sichersten Ort hier in der Gegend.</text>
+	</string>
+	<string id="st_stalker_pri_a17">
+		<text>Zum Krankenhaus. Hoffentlich laufe ich dabei nicht diesen verrьckten Monolithern ьber den Weg...</text>
+	</string>
+	<string id="st_stalker_pri_a18_smart_terrain">
+		<text>Zum Buchladen... ich habe gehцrt, dass man dort einigermaЯen vor Emissionen geschьtzt sein soll.</text>
+	</string>
+	<string id="st_stalker_pri_a20">
+		<text>Ich bin unterwegs zur цrtlichen Sehenswьrdigkeit - dem Denkmal zur Vцlkerfreundschaft. Es ist ganz in der Nдhe des Buchladens.</text>
+	</string>
+	<string id="st_stalker_pri_a21_smart_terrain">
+		<text>Zum alten Lebensmittelgeschдft. Man findet dort heutzutage zwar kein frisches Brot mehr, aber wenigstens ist man gut genug vor Emissionen geschьtzt.</text>
+	</string>
+	<string id="st_stalker_pri_a22_smart_terrain">
+		<text>Zum Bereska-Laden.</text>
+	</string>
+	<string id="st_stalker_pri_a25_smart_terrain">
+		<text>Zum alten Kindergarten.</text>
+	</string>
+	<string id="st_stalker_pri_a28">
+		<text>Zum Kinoplatz, in der Nдhe des Prometheus-Monuments.</text>
+	</string>
+	<string id="st_stalker_pri_b301">
+		<text>Ich bin unterwegs zur Schule. Dort soll es zwar von Monstern nur so wimmeln, aber man soll zumindest vor Emissionen sicher sein.</text>
+	</string>
+	<string id="st_stalker_pri_b303">
+		<text>Ich bin unterwegs ins alte Servicezentrum. Im ersten Stock soll eine Anomalie sein... und wer weiЯ, vielleicht finden sich dort auch Artefakte.</text>
+	</string>
+	<string id="st_stalker_pri_b304">
+		<text>Ich kundschafte diesen Teil der Stadt aus. Im Moment bin ich unterwegs zum alten Lebensmittelgeschдft.</text>
+	</string>
+	<string id="st_stalker_pri_b304_monsters_smart_terrain">
+		<text>Ich kundschafte diesen Teil der Stadt aus. Im Moment bin ich unterwegs zum alten Lebensmittelgeschдft.</text>
+	</string>
+	<string id="st_stalker_pri_b305_dogs">
+		<text>Ich kundschafte die Gegend aus. Im Moment bin ich unterwegs zu diesem einen Gebдude hinter der Wohnanlage.</text>
+	</string>
+	<string id="st_stalker_pri_b306">
+		<text>Ich will mich im Servicezentrum umsehen... ich glaube, es heiЯt Jubilejni.</text>
+	</string>
+	<string id="st_stalker_pri_b307">
+		<text>Ich suche Artefakte hier in dieser Gegend. Auf dem Hof soll eine Feueranomalie sein, westlich des Kindergartens...</text>
+	</string>
+	<string id="st_stalker_pri_b35_envoy">
+		<text>Oh, ich schaue mich nur in der Stadt um. Gerade bin ich unterwegs zur Wohnanlage.</text>
+	</string>
+	<string id="st_stalker_pri_b35_mercs">
+		<text>Oh, ich schaue mich nur in der Stadt um. Gerade bin ich unterwegs zur Wohnanlage.</text>
+	</string>
+	<string id="st_stalker_pri_b35_military">
+		<text>Oh, ich schaue mich nur in der Stadt um. Gerade bin ich unterwegs zur Wohnanlage.</text>
+	</string>
+	<string id="st_stalker_pri_b36_smart_terrain">
+		<text>Ich wandere nur umher... im Moment bin ich unterwegs zum Flusshafen. Hoffentlich laufe ich dabei keinen verrьckten Monolithern ьber den Weg...</text>
+	</string>
+	<string id="st_stalker_pri_b302">
+		<text>Ich bin auf der Suche nach einem Gebiet in Pripyat mit vielen Artefakten und keinen Monstern oder Monolithern... ha ha! Nein, im Ernst... ich bin unterwegs zu einer Anomalie, von der ich gehцrt habe... gleich sьdlich des Flusshafens.</text>
+	</string>
+	<string id="st_stalker_pri_sim_1">
+		<text>Zum Prometheus-Kino.</text>
+	</string>
+	<string id="st_stalker_pri_sim_2">
+		<text>Zum Kinoplatz, in der Nдhe des Prometheus-Monuments.</text>
+	</string>
+	<string id="st_stalker_pri_sim_3">
+		<text>Ich mцchte es eine Weile ruhig angehen lassen und bisschen runterkommen. Nцrdlich des Kindergartens gibt es auf einem Hof ein hьbsches Plдtzchen, das perfekt dafьr geeignet wдre.</text>
+	</string>
+	<string id="st_stalker_pri_sim_4">
+		<text>In das Gebiet sьdlich der Wohnanlage.</text>
+	</string>
+	<string id="st_stalker_pri_sim_5">
+		<text>Ich bin unterwegs in das Gebiet zwischen dem Kindergarten und der Wohnanlage.</text>
+	</string>
+	<string id="dm_anomalies_8">
+		<text>Es gibt da eine Gegend, die Narbe genannt wird, weil der Boden dort so aussieht, als ob man ihn mit einer Axt zerpflьgt hдtte. Dort wurden Artefakte gefunden, aber wenn man erst einmal dorthin geht, geschehen die merkwьrdigsten Dinge. Dein Hirn spielt so verrьckt, dass du fast schon das Atmen vergisst, ganz zu schweigen davon zu verschwinden.</text>
+	</string>
+	<string id="dm_anomalies_1">
+		<text>WeiЯt du, wo das Baggerschiff ist? Die ganzen Gravitationsanomalien haben dem Ding arg zugesetzt, aber das sollte kein Problem fьr einen erfahrenen Stalker sein. Hauptsache, man hat genьgend Schrauben dabei, die man werfen kann. Aber das Schiff ist teilweise verstrahlt, sowohl innen als auch auЯen... es ist fast so, als ob man sich einem groЯen Haufen angereichertem Uran nдhern wьrde.</text>
+	</string>
+	<string id="dm_anomalies_4">
+		<text>Es gibt da ein altes Umspannwerk, das auch Eisenwald genannt wird. Wenn du dorthin kommst, wirst du verstehen warum. Manche behaupten, dass sie nach einer Emission einen Haufen Artefakte dort gefunden hдtten. Allzu gefдhrlich ist es im Eisenwald nicht, hauptsдchlich Elektroanomalien und leichte Strahlung... da sind auch ein paar Poltergeister, die dir allen mцglichen Krempel entgegenschleudern, wenn du nicht rechtzeitig in Deckung gehst.</text>
+	</string>
+	<string id="dm_job_12">
+		<text>Hmm... ehrlich gesagt habe ich keine Ahnung. Aber wenn du die Mцglichkeit hast, der Freiheit zu helfen, melde dich bei unserem Anfьhrer in der Janow-Station. Loki ist sein Name, du findest ihn im Sьdflьgel. Denke immer daran: Wenn du an den Fortschritt der Menschheit, ein hцheres Bewusstsein und an die Wichtigkeit der Geschenke der Zone glaubst, bist du auf dem richtigen Weg.</text>
+	</string>
+	<string id="dm_job_13">
+		<text>Keine Ahnung. Aber wenn du auf etwas stцЯt, das uns bei unserem Kampf gegen die Zone und die Typen hilft, die die Zone als Segen und nicht als Fluch ansehen, melde dich beim Kommandeur der Expeditionseinheit der Wдchter - Oberstleutnant Shulga. Er hat das Sagen in der Janow-Station, du findest ihn im Nordflьgel. Eines ist ganz sicher: Jeder Zivilist, der seinen Beitrag fьr den Erfolg der Wдchter leistet, wird angemessen belohnt.</text>
+	</string>
+	<string id="dm_information_19">
+		<text>Alle reden davon, dass bei dem alten Kьhlturm merkwьrdige Dinge vor sich gehen. Wenn man auf die allgemeine Frequenz schaltet, empfдngt man Teile von Notrufmitteilungen... die hцren sich so an, als ob ein armer Typ versuchen wьrde, aus einer Anomalie zu entkommen. Und wenn man dann nach den Koordinaten fragt, herrscht Funkstille. Das Merkwьrdigste daran ist aber, wie sich das Ganze anhцrt. So eine Verzerrung kann ich mir nicht wirklich erklдren...</text>
+	</string>
+	<string id="st_stalker_zat_sim_27">
+		<text>Ich bin unterwegs zu einem Plдtzchen zwischen der Skadowsk und der Schewtschenko.</text>
+	</string>
+	<string id="st_stalker_jup_a9">
+		<text>Nach Jupiter... ich werde mich aber wohl nicht zu weit hineinwagen.</text>
+	</string>
+</string_table>

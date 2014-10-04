@@ -1,0 +1,311 @@
+[logic@smart_changer]
+prior = 200
+active = animpoint@rac_sound_1_walk
+;active = patrol@change
+suitable = true
+on_hit = hit
+
+[hit]
+on_info = %+hitted%
+
+[animpoint@a28_radio]
+;combat_ignore_cond = true
+;combat_ignore_keep_when_attacked = true
+;invulnerable = true
+avail_animations = animpoint_sit_high_no_rnd
+use_camp = false
+;out_restr = pri_a16_sr_noweap
+cover_name = test_sc
+reach_movement = walk
+reach_distance = 1
+meet = no_meet
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@rac_sound_1_walk]:animpoint@a28_radio
+;on_info = {=animpoint_reached} animpoint@rac_sound_1
+
+[animpoint@rac_sound_1]:animpoint@a28_radio
+on_game_timer = 50 | animpoint@rac_sound_2 %=play_sound(pri_a28_signaller_after_surge_1)%
+
+[animpoint@rac_sound_2]:animpoint@a28_radio
+on_signal = sound_end | {-pri_a28_signaller_after_surge_1_done} %+pri_a28_signaller_after_surge_1_done%
+avail_animations = pri_a28_kirillov_sit_high_radio
+on_info = {+test} animpoint@rac_sound_3
+
+[animpoint@rac_sound_3]:animpoint@a28_radio
+on_game_timer = 0 | {!is_playing_sound} %=play_sound(pri_a28_signaller_after_surge_2)%
+avail_animations = pri_a28_kirillov_sit_high_radio
+on_signal = sound_end | %+pri_a28_signaller_after_surge_sound_end%
+
+
+[patrol@change]
+path_walk = change
+def_state_moving = rush
+on_signal = path_end | %+test_info%
+commander = true
+formation = back
+meet = no_meet
+corpse_detection_enabled = false
+gather_items_enabled = false 
+
+[animpoint@test]
+cover_name = test_sc
+;combat_ignore_cond = true
+;combat_ignore_keep_when_attacked = true
+avail_animations = animpoint_sit_high_weapon
+on_info = {+test} animpoint@test_2
+use_camp = false
+;on_info2 = %=play_sound(pri_a16_base_alarm)%
+
+[animpoint@test_2]
+cover_name = test_sc
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+avail_animations = animpoint_sit_high_weapon
+on_info = {-test} animpoint@test
+use_camp = false
+
+
+
+[logic@abuser_1]
+active = walker@abuser_1
+suitable = {=is_squad_commander} true
+prior = 100
+
+[walker@abuser_1]
+path_walk = way_1
+;def_state_standing = threat_na
+;meet = meet@check
+
+[meet@check]
+use = {=has_enemy} false, {+info} self, true
+
+
+
+
+
+;---------------------------------------------------------------
+
+
+[logic@wounded_1]
+active = walker@abuser_1
+suitable = true
+prior = 100
+
+[walker@wounded_1]
+path_walk = way_1
+;on_info = {-hit_1} %+hit_1 =hit_npc(self:pri_a16_way_1:bip01_head:1:95)%
+;wounded = wounded@wound2
+
+[wounded@wound2]
+hp_state = 91|wounded_heavy@help_heavy
+hp_state_see = 91|wounded_heavy@help_heavy
+hp_victim = 91|actor
+hp_cover = 91|false
+hp_fight = 91|false
+autoheal = false
+not_for_help = true
+
+
+
+[logic@wounded_2]
+active = walker@wounded_1
+suitable = true
+prior = 100
+
+[logic@wounded_3]
+active = walker@wounded_1
+suitable = true
+prior = 100
+
+
+
+
+
+
+
+
+
+
+
+
+;-----------------------------------------------------------
+
+
+
+
+
+
+
+[logic@abuser_2]
+active = walker@abuser_2
+suitable = {!is_squad_commander} true
+prior = 100
+
+[walker@abuser_2]
+path_walk = way_2
+path_look = way_1
+
+
+[logic@walker_1]
+active = walker@gogo
+suitable = true
+prior = 90
+on_hit = hit@wound
+
+[hit@wound]
+on_info = walker@wounded 
+
+[walker@gogo]
+path_walk = way_walk
+
+[walker@wounded]
+path_walk = way_walk
+wounded = wounded@wound
+
+[wounded@wound]
+hp_state = 101|wounded_heavy@help_heavy
+hp_state_see = 101|wounded_heavy@help_heavy
+hp_victim = 101|actor
+hp_cover = 101|false
+hp_fight = 101|false
+autoheal = false
+not_for_help = true
+
+
+
+[logic@animp_1]
+active = animpoint@zat_a2_animp_1 
+suitable = {=check_npc_name(sim_default) -suitable} true
+prior = 100
+
+[logic@animp_2]
+active = animpoint@zat_a2_animp_2 
+suitable = {=check_npc_name(sim_default) -suitable} true
+prior = 100
+
+[meet@zat_a2_animpoint_meet]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance 	= 0
+far_distance 	= 0
+use = {=actor_enemy} false, true
+
+[animpoint@zat_a2_animp_gen]
+reach_movement = walk
+use_camp = false
+meet = meet@zat_a2_animpoint_meet
+;combat_ignore_cond = true
+;combat_ignore_keep_when_attacked = true
+
+[animpoint@zat_a2_animp_1]:animpoint@zat_a2_animp_gen
+cover_name = smart_1_anim_2
+use_camp = true
+
+[animpoint@zat_a2_animp_2]:animpoint@zat_a2_animp_gen
+cover_name = smart_1_anim_3
+use_camp = true
+
+
+
+
+
+[logic@pri_a16_medic]
+suitable = {-test =check_npc_name(pri_a25_base_medic)} true
+prior = 200
+active = animpoint@base
+
+[animpoint@base]
+cover_name = pri_a16_animp_medic
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+meet = meet
+
+[meet]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+use = {=actor_enemy} false, true
+trade_enable 	= false
+allow_break 	= false
+
+
+
+[logic@pri_a16_medic2]
+suitable = {+test =check_npc_name(pri_a25_base_medic)} true
+prior = 200
+active = walker@sit
+
+[walker@sit]
+path_walk = way_1
+path_look = way_2
+def_state_standing = sit
+meet = no_meet
+
+[animpoint@base2]
+avail_animations = pri_a22_colonel_lean_on_table_in
+use_camp = false
+cover_name = smart_1_anim_2
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+meet = meet@2
+
+[meet@2]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+use = {=actor_enemy} false, true
+trade_enable 	= false
+allow_break 	= false
+
+
+
+
+
+
+
+
+[logic@pri_a25_base_medic]
+suitable = {=check_npc_name(pri_a25_base_medic)} true
+prior = 200
+active = walker@refrigerator
+
+[walker@refrigerator]
+meet = no_meet
+path_walk = medic_walk
+path_look = medic_look
+on_info = {+pri_a25_antenna_destroyed} %=play_sound(pri_a25_freezer_knock)%
+on_info2 = {+pri_a25_freezer_can_talk} remark@a25_timer %=stop_sound%
+on_info3 = {=actor_enemy} %=actor_neutral%
+
+[remark@a25_timer]
+meet = no_meet
+on_info = {=actor_enemy} %=actor_neutral%
+target = story | actor
+on_game_timer = 10 | remark@a25_dialog
+
+[remark@a25_dialog]
+meet = meet@pri_25
+target = story | actor
+on_info = {=actor_enemy} %=actor_neutral%
+on_info2 = {+pri_a25_scene_end_with_kovalski_must} remark@a25_dialog_end
+
+[remark@a25_dialog_end]
+meet = no_meet
+target = story | actor
+on_info = {=actor_enemy} %=actor_neutral%
+on_info2 = {+pri_a25_rfi_source_eliminated !talking} %=teleport_npc(pri_a16_pri_b305_medic_walk)%
+
+[meet@pri_25]
+meet_dialog = pri_a25_army_medic_freezer
+use = self
+allow_break = false
+trade_enable = false

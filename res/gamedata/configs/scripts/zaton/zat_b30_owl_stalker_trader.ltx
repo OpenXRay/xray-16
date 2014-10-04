@@ -1,0 +1,38 @@
+[logic@zat_b30_owl_stalker_trader]
+active = animpoint@base
+suitable = {=check_npc_name(zat_b30_owl_stalker_trader)}
+prior = 200
+trade = misc\trade\trade_zat_b30_stalker_trader.ltx
+can_select_weapon = false
+level_spot = trader
+
+[animpoint@base]
+cover_name = zat_a2_sc_trader
+avail_animations = animpoint_stay_table
+meet = meet@trade
+out_restr = zat_a2_sr_noweap
+on_info = {!npc_in_zone(zat_a2_sr_trader)} %=teleport_npc(zat_stalker_base_smart_zat_b30_owl_stalker_trader_walk)%
+use_camp = false
+reach_distance = 1
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+
+
+[meet@trade]
+close_snd_hello = zat_b30_owl_stalker_trader_greeting
+close_snd_bye = zat_b30_owl_stalker_trader_farewell
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+allow_break = false
+meet_on_talking = false

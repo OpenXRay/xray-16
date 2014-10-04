@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="team_1_desc">
+		<text>Gli anarchici della Zona. Sostengono che la Zona sia un santuario di libertа e credono che qui tutte le leggi, le regole e le convenzioni del mondo esterno non siano valide. Il loro motto и "Fai quel che vuoi e pensa ai fatti tuoi". La Freedom combatte i tentativi del governo di controllare la Zona ed и in guerra con i mercenari. I suoi membri sono equipaggiati principalmente con armi da fuoco russe e sovietiche.</text>
+	</string>
+	<string id="team_1_name">
+		<text>Fazione della Freedom (stalker liberi)</text>
+	</string>
+	<string id="team_2_desc">
+		<text>Questi tagliagole in cerca di avventura provengono da tutto il mondo e accettano persino i lavori piщ sporchi. Il loro motto и, prevedibilmente, "Pecunia non olet". Continueranno a combattere per avere il controllo completo dei campi di manufatti, finchй ce ne sarа richiesta. I mercenari sono equipaggiati principalmente con armi da fuoco occidentali.</text>
+	</string>
+	<string id="team_2_name">
+		<text>Fazione dei mercenari (tagliagole)</text>
+	</string>
+</string_table>

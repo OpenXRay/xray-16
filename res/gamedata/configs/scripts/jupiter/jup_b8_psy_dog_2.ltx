@@ -1,0 +1,25 @@
+[logic@psy_dog_2]
+suitable = {=is_monster_psy_dog}
+active = mob_home@2
+monster_job = true
+prior = 100
+on_hit = hit
+
+[mob_home@2]
+path_home = jup_b8_psy_dog_2_mob_home
+combat_ignore_cond = {-jup_b8_psy_dog_hit} true, false
+home_min_radius = 10
+home_max_radius = 30
+on_info = {+jup_b8_heli_4_searched} mob_home@1
+on_info2 = {+jup_b8_psy_dog_hit} mob_home@1
+on_info3 = {actor_in_zone (jup_surge_hide_b8)} mob_home@1
+out_restr = jup_factory_default_in_restrictor
+
+[mob_home@1]
+path_home = jup_b8_mob_home
+home_min_radius = 20
+home_max_radius = 40
+out_restr = jup_factory_default_in_restrictor
+
+[hit]
+on_info = %+jup_b8_psy_dog_hit%

@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="jup_a9_conservation_info">
+		<text>Dokumenty z notatkami</text>
+	</string>
+	<string id="jup_a9_conservation_info_desc">
+		<text>Dokumenty mуwi№, їe zgodnie z rozkazem Departamentu 1, po zamkniкciu њluzy transportowej tunel Prypeж 1 zostaі wypeіniony dwutlenkiem wкgla zmieszanym z jak№њ substancj№ chemiczn№. Nastкpnie caіemu personelowi nakazano nosiж ochronne kombinezony z zamkniкtym obiegiem powietrza.</text>
+	</string>
+	<string id="jup_a9_delivery_info">
+		<text>List dotycz№cy dostaw obiektu 62</text>
+	</string>
+	<string id="jup_a9_delivery_info_desc">
+		<text>„Ze wzglкdu na wystкpowanie aktywnoњci anomalnej, transport obiektu 62 przez otwarty teren jest niemoїliwy. Naleїy uїyж podziemnego tunelu Prypeж 1. Plan dostawy i maj№cego po niej nast№piж zamkniкcia tunelu zostaі wysіany do Departamentu 1.”</text>
+	</string>
+	<string id="jup_a9_evacuation_info">
+		<text>Teczka z rozkazem</text>
+	</string>
+	<string id="jup_a9_evacuation_info_desc">
+		<text>Dokumenty wspominaj№ o ewakuacji zakіadu produkcyjnego fabryki Jupiter do podziemnych laboratoriуw. Ta kwestia miaіa zostaж omуwiona w czкњci laboratoryjnej.</text>
+	</string>
+	<string id="jup_a9_losses_info">
+		<text>Harmonogram dostaw</text>
+	</string>
+	<string id="jup_a9_losses_info_desc">
+		<text>„Harmonogram dostaw obiektu 62: 14.07 - 20 jednostek (jedna uszkodzona); 21.07 - 32 jednostki (2 uszkodzone); 28.07 - 26 jednostek (jedna uszkodzona). List przewozowy dotycz№cy strat w wyniku transportu zostaі przesіany do administracji zakіadu, wysіano teї kopiк do warsztatуw naprawczych.”</text>
+	</string>
+	<string id="jup_a9_meeting_info">
+		<text>Kartka z notesu</text>
+	</string>
+	<string id="jup_a9_meeting_info_desc">
+		<text>Podczas spotkania podjкto nastкpuj№c№ decyzjк: dziaі dostaw ma siк skupiж na ewakuacji kompleksu produkcyjnego obiektu 62.</text>
+	</string>
+	<string id="jup_a9_power_info">
+		<text>Raport ze zmiany</text>
+	</string>
+	<string id="jup_a9_power_info_desc">
+		<text>„...18:30 - zakoсczono szczelne zamykanie wszystkich sekcji tunelu P 1. 19:00 - zakoсczono szczelne zamykanie drzwi linii kolejowej. Konieczne byіo ich zaspawanie. 19:45 - zamkniкcie drzwi luku transportowego. Obsіuga mechanizmu drzwi wymagaіa uruchomienia zasilania awaryjnego, poniewaї wczeњniej odciкto juї dopіyw pr№du do tunelu. 20:00 - warsztat chemiczny rozpocz№і wypeіnianie tunelu gazem. 22:00 - zakoсczono dziaіania zmierzaj№ce do zamkniкcia tunelu, wszystkie dokumenty przesіano do Departamentu 1.”</text>
+	</string>
+	<string id="jup_a9_way_info">
+		<text>Plan tuneli</text>
+	</string>
+	<string id="jup_a9_way_info_desc">
+		<text>Plan tuneli Prypeж 1, z ktуrego widaж, їe tunel przebiega pod miastem Prypeж. Dokument zawiera kilka notatek: 1. Zamkn№ж drzwi luku transportowego. 2. Uїyж gazu z warsztatu chemicznego do zamkniкcia tunelu.</text>
+	</string>
+	<string id="jup_b1_half_artifact">
+		<text>Przerobiony izolator</text>
+	</string>
+	<string id="jup_b1_half_artifact_descr">
+		<text>To byі izolator. Teraz prawie zmieniі siк w niestabilny artefakt. To zapewne z niego wydobywaj№ siк sporadyczne emisje psioniczne.</text>
+	</string>
+	<string id="jup_b200_tech_materials_acetone">
+		<text>Puszka kalafonii</text>
+	</string>
+	<string id="jup_b200_tech_materials_acetone_descr">
+		<text>Puszka kalafonii uїywanej do lutowania. Spotyka siк j№ w Zonie doњж rzadko, co tіumaczy, dlaczego miejscowi technicy czкsto uїywaj№ do reperacji zepsutego sprzкtu niebieskiej taњmy elektrycznej.</text>
+	</string>
+	<string id="jup_b200_tech_materials_capacitor">
+		<text>Paczka kondensatorуw</text>
+	</string>
+	<string id="jup_b200_tech_materials_capacitor_descr">
+		<text>Paczka kondensatorуw - jednego z najpowszechniejszych komponentуw elektrycznych. Nie s№ w Zonie rzadkoњci№, jako їe uїywa siк ich w ulepszeniach zaawansowanego sprzкtu, ale taka pojemnoњж nie jest zwykle wymagana.</text>
+	</string>
+	<string id="jup_b200_tech_materials_textolite">
+		<text>Baza tekstolitowa</text>
+	</string>
+	<string id="jup_b200_tech_materials_textolite_descr">
+		<text>Tekstolit to jeden z podstawowych elementуw obwodуw drukowanych. Uczucie, jakiego doњwiadcza radiotechnik-amator na widok nietkniкtej bazy tekstolitowej moїna porуwnaж do tego, co odczuwa pisarz wobec czystej kartki papieru.</text>
+	</string>
+	<string id="jup_b200_tech_materials_transistor">
+		<text>Pudeіko tranzystorуw</text>
+	</string>
+	<string id="jup_b200_tech_materials_transistor_descr">
+		<text>Pudeіko tranzystorуw - pуіprzewodnikуw, ktуre generuj№, przeksztaіcaj№ i zwiкkszaj№ natкїenie impulsуw elektrycznych. Tranzystory to marzenie kaїdego radiotechnika w Zonie.</text>
+	</string>
+	<string id="jup_b200_tech_materials_wire">
+		<text>Kікbek miedzianego drutu</text>
+	</string>
+	<string id="jup_b200_tech_materials_wire_descr">
+		<text>Kікbek miedzianego drutu to znakomity przewodnik i rуwnoczeњnie џrуdіo metalu nieszlachetnego. Ze wzglкdu na tк drug№ cechк taki drut spotyka siк w Zonie bardzo rzadko. Wszystkie jego rezerwy zostaіy odnalezione, stopione i dostarczone do oњrodkуw przetwуrczych jeszcze w latach 90.</text>
+	</string>
+	<string id="jup_b209_monster_scanner">
+		<text>Wykrywacz mutantуw</text>
+	</string>
+	<string id="jup_b209_monster_scanner_descr">
+		<text>To urz№dzenie jest oparte na zwykіym wykrywaczu anomalii, ktуry poі№czono z czujnikiem wykrywaj№cym mutanty na ograniczonym obszarze i elementem pozwalaj№cym na przechowywanie danych. Po zebraniu ich okreњlonej iloњci uruchamia siк przeі№cznik automatycznej dezaktywacji urz№dzenia.</text>
+	</string>
+	<string id="jup_b47_jupiter_products_info">
+		<text>Dokumenty administracyjne</text>
+	</string>
+	<string id="jup_b47_jupiter_products_info_descr">
+		<text>Plik dokumentуw zawieraj№cych dane czysto administracyjne. Wspomina siк w nich, їe zgodnie z rozkazem z laboratorium centralnego, dokumentacja techniczna obiektu 62 zostaіa przekazana do warsztatu testuj№cego.</text>
+	</string>
+	<string id="jup_b47_merc_pda">
+		<text>PDA Czarnego</text>
+	</string>
+	<string id="jup_b47_merc_pda_desc">
+		<text>Uwagк zwraca jedna z wiadomoњci. Nadawca nazywa siк Szakal, a tekst brzmi nastкpuj№co: „Mуj czіowiek w instytucie badawczym poleci ciк na dowуdcк ekspedycji. Bкdzie musiaі wynaj№ж twoich chіopakуw do ochrony bunkra. To ci uіatwi dziaіanie. Pamiкtaj, klient nie chce, їeby do naukowcуw dotarіy JAKIEKOLWIEK informacje na temat obsіugi obiektуw X. W przeciwnym wypadku nie bкdziemy mogli opuњciж Zony. Nie zawiedџ mnie, Czarny."</text>
+	</string>
+	<string id="jup_b9_blackbox">
+		<text>Czarna skrzynka</text>
+	</string>
+	<string id="jup_b9_blackbox_descr">
+		<text>Czarna skrzynka z Ogoсczy 1, ocalaіa z katastrofy. Powinna zawieraж informacje na temat ostatnich chwil lotu, bкd№ one jednak zaszyfrowane.</text>
+	</string>
+	<string id="pri_a25_explosive_charge_descr">
+		<text>Plastikowe materiaіy wybuchowe klasy wojskowej z piкciosekundowym zegarem.</text>
+	</string>
+	<string id="pri_a25_explosive_name">
+		<text>Јadunek wybuchowy z zegarem.</text>
+	</string>
+	<string id="st_af_quest_b14_twisted">
+		<text>Przemienione koіo</text>
+	</string>
+	<string id="st_device_flash_snag">
+		<text>PDA Sкka</text>
+	</string>
+	<string id="st_device_flash_snag_descr">
+		<text>W PDA znajduje siк mapa ze znacznikiem przy podstacji - bez w№tpienia jest tam schowek - oraz kilka fotografii erotycznych. Nic specjalnego.</text>
+	</string>
+	<string id="st_device_pda_port_bandit_leader">
+		<text>PDA bandyty</text>
+	</string>
+	<string id="st_device_pda_port_bandit_leader_descr">
+		<text>Ostatnia wiadomoњж na PDA brzmi: „Zіap tego gnoja Sкka i przyprowadџ go do mnie, musimy sobie powaїnie porozmawiaж. Nie obchodzi mnie, gdzie on jest, znajdџ go. Jeњli bкdzie siк stawiaі, daj mu nauczkк. Suіtan."</text>
+	</string>
+	<string id="st_device_pda_zat_b5_dealer_desc">
+		<text>To PDA zawiera informacje na temat klientуw Morgana oraz wspуіrzкdne tajnego magazynu Powinnoњci, z ktуrego wzi№і broс. Nastкpnie sprzedaі j№ najemnikom i nawi№zaі kontakt z kimњ nazywanym „Suіtan”. Aby zatrzeж za sob№ њlady, Morgan postanowiі zdradziж Wolnoњci lokalizacjк magazynu. Informacjк miaі przekazaж jego wspуlnik, Sкp. PDA wspomina teї o czujniku, ktуry moїe wyі№czyж tylko Morgan, a ktуry zaalarmuje Powinnoњж, jeњli schowek zostanie otwarty. Ta informacja na pewno zainteresuje zarуwno Wolnoњж, jak i Powinnoњж.</text>
+	</string>
+	<string id="st_device_pda_zat_b5_dealer_name">
+		<text>PDA Morgana</text>
+	</string>
+	<string id="st_jup_b10_notes_01_desc">
+		<text>Notatka na odwrocie starego dokumentu: „Duch, zabieram swoje rzeczy. Dziкki za karabin szturmowy - przyda mi siк. W zamian za niego zostawiam ci trochк њrodkуw medycznych od Doktora. Najemnik, ktуry mnie њcigaі, wpadі w moj№ puіapkк, wiкc nie bкd№ mi potrzebne... mam nadziejк. Teraz idк siк spotkaж z Kіem. Udaіo mu siк zbudowaж dekoder. Spotkajmy siк tam, gdzie zawsze, jeњli dasz radк. Strieіok.”</text>
+	</string>
+	<string id="st_jup_b10_notes_01_name">
+		<text>Wiadomoњж dla Ducha</text>
+	</string>
+	<string id="st_jup_b10_notes_02_desc">
+		<text>Notatka na papierze w kratkк: „Strieіok, na wszelki wypadek zostawiіem drugi dekoder w naszym schowku w Prypeci. Ja i Duch idziemy do Agropromu, wiкc zostawimy tu nasz№ dodatkow№ amunicjк. Weџ j№, jeњli ci siк przyda. Pomyњlnych іowуw! Kieі.”</text>
+	</string>
+	<string id="st_jup_b10_notes_02_name">
+		<text>Notatka dla Strieіoka</text>
+	</string>
+	<string id="st_jup_b10_notes_03_desc">
+		<text>Notatka na odwrocie starego dokumentu: „Kieі, nie mogк juї dіuїej na ciebie czekaж - siedzi mi na karku caіy oddziaі. Sam idк do sarkofagu. Zostawiк tu moj№ szczкњliw№ spluwк - i tak nie mam juї do niej nabojуw. Jeњli nie wrуcк, daj j№ Duchowi. Niech zadba o broс, to broс zadba o niego. Trzymaj siк. Strieіok.”</text>
+	</string>
+	<string id="st_jup_b10_notes_03_name">
+		<text>Wiadomoњж dla Kіa</text>
+	</string>
+	<string id="st_jup_b10_ufo_memory_2_desc">
+		<text>Moduі pamiкci z samolotu bezzaіogowego. Nowikow odblokowaі go, dziкki czemu masz dostкp do zebranych przez samolot informacji. S№ poњrуd nich wspуіrzкdne trzech punktуw, z ktуrych dobiegaj№ sygnaіy radiowe.</text>
+	</string>
+	<string id="st_jup_b10_ufo_memory_2_name">
+		<text>Moduі pamiкci (odblokowany)</text>
+	</string>
+	<string id="st_jup_b10_ufo_memory_desc">
+		<text>Moduі pamiкci z samolotu bezzaіogowego. Pomimo wypadku moduі dziaіa bez zarzutu, ale niestety jest zablokowany.</text>
+	</string>
+	<string id="st_jup_b10_ufo_memory_name">
+		<text>Moduі pamiкci (zablokowany)</text>
+	</string>
+	<string id="st_jup_b205_sokolov_note_desc">
+		<text>Stara kartka z harmonogramem zmian warty, pod ktуrym widnieje liczba 1421. Na starych zapiskach sporz№dzono flamastrem nastкpuj№c№ notatkк: „Porucznik W. I. Sokoіow. Po katastrofie њmigіowca udaіem siк do punktu ewakuacyjnego B205. Przez dwa dni nie podjкto prуby ewakuacji i dalsze pozostawanie w tym miejscu jest ryzykowne. Postanowiіem wiкc opuњciж B205 i pуjњж do ruchomego laboratorium ekspedycji naukowej. Znajduje siк ono na pуіnocny wschуd od punktu ewakuacyjnego.”</text>
+	</string>
+	<string id="st_jup_b205_sokolov_note_name">
+		<text>Notatka Sokoіowa</text>
+	</string>
+	<string id="st_jup_b206_plant_desc">
+		<text>Roњlina z zagajnika, ktуry zostaі czкњciowo przeksztaіcony w wyniku dziaіania anomalii. Zagajnik agresywnie zareagowaі na wtargniкcie, ale sama roњlina nie wydaje siк byж niebezpieczna.</text>
+	</string>
+	<string id="st_jup_b206_plant_name">
+		<text>Anormalna roњlina</text>
+	</string>
+	<string id="st_jup_b207_merc_pda_with_contract_desc">
+		<text>Ostatnia wiadomoњж otrzymana na to PDA pochodzi od Morgana. Jest to zlecenie zabуjstwa stalkera nazwiskiem Diegtiariow. Do wiadomoњci doі№czono kilka fotografii. Ostatnie polecenie Morgana mуwi o wykasowaniu wiadomoњci po jej przeczytaniu.</text>
+	</string>
+	<string id="st_jup_b207_merc_pda_with_contract_name">
+		<text>PDA najemnika</text>
+	</string>
+	<string id="st_jup_b32_scanner_device_desc">
+		<text>W tej skrzynce znajduje siк wykrywacz artefaktуw, bateria i potкїny przekaџnik. Urz№dzenie bкdzie skanowaж anomalie, aby okreњliж liczbк i rodzaj artefaktуw, ktуre siк pojawi№. Wszystkie te informacje zostan№ automatycznie przekazane do bunkra naukowcуw.</text>
+	</string>
+	<string id="st_jup_b32_scanner_device_name">
+		<text>Skaner anomalii</text>
+	</string>
+	<string id="st_jup_b46_duty_founder_pda_desc">
+		<text>Ostatnia wiadomoњж na PDA to nagranie gіosowe:\n„...Ktуrкdy pуjdziemy, zawsze trafiamy w to samo miejsce. Nie mogк przywykn№ж do tej mgіy... Zadziwiaj№ce, jak Czepurny mуgі znikn№ж bez њladu. Moїe znalazі wyjњcie?... \nDzieс szуsty... Skoсczyіa siк woda... Puіkownikowi odbiіo, zastrzeliі dwуch ludzi, a potem siebie... Zostaіem sam w tej przeklкtej anomalii... Gdyby і№cznoњж z baz№ nie siadіa, to pewnie by nas uratowali i Powinnoњж by nie powstaіa. Jak do tego wszystkiego doszіo... Eh, pieprzyж to. Tamten kapitan Taczenko zgin№і dawno temu... A ten generaі Taczenko z Powinnoњci zaraz do niego doі№czy... Sprawiedliwoњci stanie siк zadoњж..."\nNagranie koсczy siк tuї po tym, jak rozlega siк strzaі.</text>
+	</string>
+	<string id="st_jup_b46_duty_founder_pda_name">
+		<text>PDA generaіa Taczenki</text>
+	</string>
+	<string id="st_lx8_service_instruction_descr">
+		<text>Ta instrukcja opisuje sposуb korzystania z obiektu 62. Jest wyraџnie podkreњlone, їe nie trzeba wprowadzaж їadnych zmian w zakresie trajektorii kuli czy naci№gu, poniewaї na dystansach, na ktуrych broс jest skuteczna, czynniki te nie maj№ znaczenia.\nTe dokumenty nie mog№ wpaњж w cudze rкce, z pewnoњci№ bardzo zainteresuj№ analitykуw SBU.</text>
+	</string>
+	<string id="st_lx8_service_instruction_name">
+		<text>Instrukcja obsіugi obiektu 62</text>
+	</string>
+	<string id="st_pri_a19_american_experiment_info_descr">
+		<text>Notes zawiera dokіadny opis eksperymentu zwi№zanego z ocen№ efektu pola psionicznego na obiekty na drugiej pуіkuli. Grupa naukowcуw na Karaibach odebraіa sygnaі, ale byі on znieksztaіcony. Zmiana sygnaіu byіa niezwykіa, zupeіnie, jakby ktoњ go skorygowaі. Moїliwe jest wyjaњnienie mуwi№ce, їe teoria noosfery jest sіuszna i їe zmiany zostaіy wprowadzone przez sam№ noosferк.\nTe dokumenty nie mog№ wpaњж w cudze rкce, z pewnoњci№ bardzo zainteresuj№ analitykуw SBU.</text>
+	</string>
+	<string id="st_pri_a19_american_experiment_info_name">
+		<text>Notes z opisem eksperymentu</text>
+	</string>
+	<string id="st_pri_a19_lab_x10_info_descr">
+		<text>Dokument opisuje wіaњciwoњci techniczne anten i tego, jak rуїni№ siк od zakіadanych wartoњci. Na odwrocie jest notatka, ktуra wskazuje, їe te dokumenty przygotowano w laboratorium X10.\nTe dokumenty nie mog№ wpaњж w cudze rкce, z pewnoњci№ bardzo zainteresuj№ analitykуw SBU.</text>
+	</string>
+	<string id="st_pri_a19_lab_x10_info_name">
+		<text>Generator tкczy - gіуwne cechy techniczne</text>
+	</string>
+	<string id="st_pri_a19_lab_x16_info_descr">
+		<text>Te dokumenty dotycz№ jednego z odkryж pobocznych, ktуre wykazaіo, ze istoty їywe s№ w stanie generowaж emisje psioniczne. Biologiczny emiter pola, bкd№cy wіaњciwie olbrzymim mуzgiem, zostaі wyhodowany w laboratorium X16 w ramach prowadzonych tam badaс.\nTe dokumenty nie mog№ wpaњж w cudze rкce, z pewnoњci№ bardzo zainteresuj№ analitykуw SBU.</text>
+	</string>
+	<string id="st_pri_a19_lab_x16_info_name">
+		<text>Dokumenty badawcze</text>
+	</string>
+	<string id="st_pri_a19_lab_x18_info_descr">
+		<text>Raport szczegуіowo przedstawia badanie prуbek biologicznych przesіanych z laboratorium X18. Prуbki poddano dziaіaniu pуl transferowych o zmiennym natкїeniu. Raport drobiazgowo opisuje mutacje istot їywych wywoіane oddziaіywaniem emisji.\nTe dokumenty nie mog№ wpaњж w cudze rкce, z pewnoњci№ bardzo zainteresuj№ analitykуw SBU.</text>
+	</string>
+	<string id="st_pri_a19_lab_x18_info_name">
+		<text>Raport z badania prуbek</text>
+	</string>
+	<string id="st_pri_a19_lab_x7_info_descr">
+		<text>Dokument odnosi siк do przeniesienia zespoіu badawczego i wszystkich materiaіуw do innego laboratorium, zwanego X7, w ktуrym bкd№ prowadzone badania dotycz№ce wpіywуw noosfery. W skіad zespoіu badawczego wchodz№: N. A. Lebiediew, E. F. Kaіancza i W. I. Susіow.\nTe dokumenty nie mog№ wpaњж w cudze rкce, z pewnoњci№ bardzo zainteresuj№ analitykуw SBU.</text>
+	</string>
+	<string id="st_pri_a19_lab_x7_info_name">
+		<text>Rozkaz przeniesienia</text>
+	</string>
+	<string id="st_pri_b306_envoy_pda_desc">
+		<text>Ostatnia notatka na PDA brzmi nastкpuj№co: „Znalazіem generator awaryjny na szуstym piкtrze - technicznym. Dwie godziny zabraіo postawienie go na nogi. Bardzo chciaіbym go wі№czyж, ale Serbin zabroniі mi siк wychylaж, dopуki nie sprowadzi jakichњ ludzi."</text>
+	</string>
+	<string id="st_pri_b306_envoy_pda_name">
+		<text>PDA Barczuka</text>
+	</string>
+	<string id="st_pri_b35_lab_x8_key_desc">
+		<text>Czerwona magnetyczna karta wstкpu oznaczona X8.</text>
+	</string>
+	<string id="st_pri_b35_lab_x8_key_name">
+		<text>Czerwona karta wstкpu X8</text>
+	</string>
+	<string id="st_pri_b36_monolith_hiding_place_pda_desc">
+		<text>PDA zawiera mnуstwo nieistotnych zapiskуw, ale jeden jest inny: „Monolit komunikuje siк z odbiorc№ wiadomoњci i nakazuje mu zebraж nadwyїki amunicji, a potem ukryж je w miejscach nieznanych niedowiarkom. Te miejsca maj№ zostaж zaznaczone symbolem Monolitu. Gdy nadejd№ ciкїkie czasy, ci, ktуrzy sіysz№ Monolit, bкd№ czerpaж korzyњci z jego m№droњci... Przekazaіem wolк Monolitu moim braciom i powiedziaіem im, gdzie umieњciж naboje...”</text>
+	</string>
+	<string id="st_pri_b36_monolith_hiding_place_pda_name">
+		<text>PDA bojownika Monolitu</text>
+	</string>
+	<string id="st_toolkit_1_desc">
+		<text>Narzкdzia jak dla dziecka. Raczej nie przydadz№ siк do robуt precyzyjnych, ale bior№c pod uwagк deficyt narzкdzi w Zonie, mog№ byж uїyteczne dla zapobiegliwego technika.</text>
+	</string>
+	<string id="st_toolkit_1_name">
+		<text>Narzкdzia podstawowe</text>
+	</string>
+	<string id="st_toolkit_2_desc">
+		<text>Porz№dny zestaw narzкdzi. Wygl№da tak, jakby doњwiadczony technik pieczoіowicie skompletowaі go na wіasny uїytek. S№ stare, ale w dobrym stanie.</text>
+	</string>
+	<string id="st_toolkit_2_name">
+		<text>Narzкdzia do precyzyjnej pracy</text>
+	</string>
+	<string id="st_toolkit_3_desc">
+		<text>Zestaw profesjonalnych narzкdzi do zaawansowanych robуt ze sprzкtem. Notatka na pojemniku mуwi, їe zestaw pochodzi z Niemiec. Jest w nim wszystko, czego potrzeba do niemal kaїdej pracy kalibracyjnej.</text>
+	</string>
+	<string id="st_toolkit_3_name">
+		<text>Narzкdzia do kalibracji</text>
+	</string>
+	<string id="st_zat_a23_access_card">
+		<text>Stara magnetyczna karta wstкpu</text>
+	</string>
+	<string id="st_zat_a23_access_card_descr">
+		<text>Magnetyczna karta wstкpu Kardana. Za jej pomoc№ uzyskiwano dostкp do warsztatu testuj№cego obiekt 62.</text>
+	</string>
+	<string id="st_zat_a23_gauss_rifle_docs">
+		<text>Dokumenty dotycz№ce obiektu 62</text>
+	</string>
+	<string id="st_zat_a23_gauss_rifle_docs_descr">
+		<text>Dokumenty opisuj№ce mechanizm i gіуwne wіaњciwoњci techniczne urz№dzenia elektromagnetycznego.\nPoњrуd dokumentуw znajduje siк nastкpuj№ca notatka: „Dokumenty musz№ zostaж zwrуcone do X8, do laboratorium centralnego. Ja bкdк zajкty, wiкc dostarcz je sam. Uїyj karty magnetycznej w centrum usіugowym Jubilejny w Prypeci, їeby zjechaж na drugi poziom pod ziemi№. Stamt№d juї sobie poradzisz. Zaі№czam kartк dostкpu.\nN. Lebiediew.\nTe dokumenty nie mog№ wpaњж w cudze rкce, z pewnoњci№ bardzo zainteresuj№ analitykуw SBU.</text>
+	</string>
+	<string id="st_zat_a23_labx8_key_name">
+		<text>Їуіta karta wstкpu X8</text>
+	</string>
+	<string id="st_zat_b12_documents_1">
+		<text>Rozkaz nr 562</text>
+	</string>
+	<string id="st_zat_b12_documents_2">
+		<text>Rozkaz wewnкtrzny nr 423</text>
+	</string>
+	<string id="st_zat_b12_key_1">
+		<text>Klucz A</text>
+	</string>
+	<string id="st_zat_b12_key_1_descr">
+		<text>Zwykіy klucz oznaczony liter№ A.</text>
+	</string>
+	<string id="st_zat_b12_key_2">
+		<text>Klucz B</text>
+	</string>
+	<string id="st_zat_b12_key_2_descr">
+		<text>Zwykіy klucz oznaczony liter№ B.</text>
+	</string>
+	<string id="st_zat_b20_noah_pda_desc">
+		<text>Jedno z nagraс gіosowych brzmi szczegуlnie psychopatycznie: „A wiкc to st№d s№ te cholerne mutanty!... Przebiegіe gnojki wspiкіy siк na pіaskowyї i myњl№, їe Noe ich nie dostanie... Na pewno nie wiedz№, їe mam wіasn№ њcieїkк na gуrк, przy pуіnocnym gospodarstwie... Szykuje siк zabawa, dupki!"</text>
+	</string>
+	<string id="st_zat_b20_noah_pda_name">
+		<text>PDA Noego</text>
+	</string>
+	<string id="st_zat_b40_notebook_desc">
+		<text>Notes zawiera masк spamu i jedn№ wiadomoњж oznaczon№ jako waїna:\n„Zaіуїcie obуz w pobliїu zakіadu utylizacji odpadуw, a kaїdy, kto ma braж udziaі w tej robocie, przyі№czy siк do was. Nie oczekujcie Czarnego, bo on i jego ludzie bкd№ w Jupiterze z inn№ misj№. Wojsko zawiesiіo wszystkie loty do Zony, wiкc z tej strony nie bкdziemy mieli problemуw. Kiedy stalkerzy znajd№ drogк do Prypeci, wyњlemy przewodnika i poczekamy tam na ludzi klienta - pokaї№ nam, gdzie jest laboratorium.\nSzakal.”</text>
+	</string>
+	<string id="st_zat_b40_notebook_name">
+		<text>Notes najemnika</text>
+	</string>
+	<string id="st_zat_b40_pda_1_desc">
+		<text>Ostatnia nadesіana wiadomoњж brzmi:\n"Czekamy przy jakichњ starych warsztatach. Wysіaіem dwуch chіopakуw przodem, їeby zrobili dla ciebie rozpoznanie drogi. Ale bкdziemy tu czekali, dopуki nie pojawi siк kurier klienta - tu jest o wiele њwieїsze powietrze.\nTasak."</text>
+	</string>
+	<string id="st_zat_b40_pda_1_name">
+		<text>PDA najemnika Haka</text>
+	</string>
+	<string id="st_zat_b40_pda_2_name">
+		<text>PDA najemnika Prкgi</text>
+	</string>
+	<string id="st_zat_b57_gas_desc">
+		<text>Kanister niebezpiecznego chemicznego czynnika nerwowego.</text>
+	</string>
+	<string id="st_zat_b57_gas_name">
+		<text>Kanister gazu Perin B3</text>
+	</string>
+	<string id="zat_b33_safe_container_desc">
+		<text>Skrzynka jest zamkniкta za pomoc№ doњж wymyњlnego zamka. Jej waga i dџwiкk, jaki wydaje przy potrz№saniu, kaї№ s№dziж, їe coњ znajduje siк w њrodku.</text>
+	</string>
+	<string id="zat_b33_safe_container_name">
+		<text>Stalowa skrzynka</text>
+	</string>
+	<string id="zat_b39_joker_pda_description">
+		<text>Notatka na PDA: „Jestem pewien, їe artefakt jest na samym drzewie. St№d widaж, їe mуgіbym siк na nie wspi№ж ze wzgуrza. Mam tylko nadziejк, їe na wzgуrzach nie ma mutantуw. Szkoda, їe przyszedіem tu sam po tej awanturze z Kardanem i Stogiem, ale kiedy przyniosк artefakt, zobacz№, їe od pocz№tku miaіem racjк..."</text>
+	</string>
+	<string id="zat_b39_joker_pda_name">
+		<text>PDA Kawalarza</text>
+	</string>
+	<string id="zat_b44_barge_pda_desc">
+		<text>Ostatnia notatka na tym PDA ujawnia, їe osoba, ktуra j№ wprowadziіa, byіa zdenerwowana: „Kardan, ten stary pijak. Nie doњж, їe jak siк napije, to nic mu siк nie chce - „tu jest dobrze, nigdzie siк nie spieszy” - to jeszcze najechaі na mnie i Kawalarza, їe niby jesteњmy mіodzi i na niczym siк nie znamy... Kawalarz to teї niezіy agregat: wkurzyі siк, zіapaі torbк i poszedі. Kiedy ja uspokajaіem Kardana, znikn№і nie wiadomo gdzie. I co ja mam zrobiж? Piж z tym starym kretynem? Dziкkujк, postojк. Ta jego wуdka to niezіy szajs... Chuj. A pomyњleж, їe na pocz№tku tak dobrze siк zapowiadaіo."</text>
+	</string>
+	<string id="zat_b44_barge_pda_name">
+		<text>PDA Stoga</text>
+	</string>
+	<string id="zat_b22_medic_pda_desc">
+		<text>Wstrz№s prowadziі dziennik w swoim PDA, a najciekawsze s№ jego ostatnie zapiski: „Nagranie 12. Niedіugo skoсczк badania... Ludzie w obozie zaczynaj№ coњ podejrzewaж. Gіuszec i Daniіa chc№ zapolowaж na pijawki... Ciekawe, kiedy siк zorientuj№... Muszк przejrzeж sіoiki z krwi№ i oddzieliж te zakaїone, a resztк ukryж... [szybko:] Ktoњ idzie. [sіychaж, jak urz№dzenie zostaje wyі№czone, a potem wі№czone ponownie.] Nagranie 13... Prawdopodobnie ostatnie... Najpierw ten wњcibski myњliwy, a teraz Gіuszec... Nie ujdzie mi to na sucho. Przyjd№ po mnie... Wiem, o tym. Niewaїne - uzaleїnienie od hemoglobiny i tak by mnie wykoсczyіo. Wolк zgin№ж od kuli niї od choroby...”</text>
+	</string>
+	<string id="zat_b22_medic_pda">
+		<text>PDA Wstrz№sa</text>
+	</string>
+	<string id="st_zat_b12_documents_1_descr">
+		<text>Њciњle tajne. Rozkaz nr 562 gіуwnego dowуdcy odpowiedzialnego za bezpieczeсstwo obiektu nr 1, R. J. Dydenki.\nJednostka Zabezpieczenia Chemicznego nr 423: przenieњж z sektora B103 do sektora A19 w celu przeprowadzenia testуw polowych roztworu chemicznego Perin B3 w warunkach zbliїonych do bojowych. Za przeprowadzenie testуw odpowiada puіkownik P. P. Sіawin, dowуdca jednostki. Podpuіkownik K. S. Waіow, zastкpca dowуdcy jednostki, odpowiada za transport i bezpieczeсstwo.</text>
+	</string>
+	<string id="st_zat_b12_documents_2_descr">
+		<text>Њciњle tajne. Rozkaz puіkownika P. P. Sіawina\nZgodnie z tym rozkazem czіonkowie Jednostki Zabezpieczenia Chemicznego nr 423 maj№ siк zapoznaж z nastкpuj№cymi informacjami:\n1. Klucze do pojemnika z roztworem chemicznym Perin B3 znajduj№ siк w posiadaniu puіkownika P. P. Sіawina (klucz A) i podpuіkownika K. S. Waіowa (klucz B).\n2. Porz№dek konwoju zaczynaj№c od przodu: Pojazd zastкpcy dowуdcy jednostki, pojazd eskortuj№cy nr 8, transporter opancerzony nr 1, pojazd transportowy nr 1, transporter opancerzony nr 3, pojazd eskortuj№cy nr 2, pojazd dowуdcy jednostki (P. P. Sіawina).\nKopie rozkazu maj№ zostaж dostarczone podpuіkownikowi K. S. Waіowowi i porucznikowi R. B. Nazarence.</text>
+	</string>
+	<string id="st_zat_a23_labx8_key_descr">
+		<text>Їуіta magnetyczna karta wstкpu oznaczona X8.\nKarta nie moїe wpaњж w cudze rкce, poniewaї dziкki niej moїna siк dostaж do tajnego laboratorium.</text>
+	</string>
+	<string id="st_jup_b202_bandit_pda">
+		<text>PDA posіaсca Suіtana</text>
+	</string>
+	<string id="st_jup_b202_bandit_pda_descr">
+		<text>Ostatnia wiadomoњж wysіana z tego PDA to nagranie gіosowe: „Suіtan, nieџle daіem popaliж temu miкczakowi! Teraz nie bкdzie juї z nami zadzieraі!"</text>
+	</string>
+	<string id="st_af_quest_b14_twisted_descr">
+		<text>To byіo kiedyњ koіo pogікbiarki. Teraz czкњciowo przeksztaіciіo siк w dziwny artefakt. Jego jedyne zauwaїalne wіaњciwoњci to њwiecenie i lekka radioaktywnoњж.</text>
+	</string>
+	<string id="st_zat_b40_pda_2_desc">
+		<text>Przysіano nastкpuj№c№ wiadomoњж:\n„Udaіo mi siк zaіatwiж coњ w sprawie broni, ten chciwy іajdak sprzeda nam zapasy swojej frakcji. Wyjdzie caіkiem tanio, ale musimy siк powlec do Jupitera.\nSкp.”</text>
+	</string>
+</string_table>

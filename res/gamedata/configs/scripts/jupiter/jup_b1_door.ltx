@@ -1,0 +1,28 @@
+[logic]
+active = ph_door@locked
+
+[ph_door@locked]
+locked = true
+closed = true
+snd_open_start = trader_door_locked
+tip_open = jup_b1_door_is_closed
+on_info = {=actor_in_zone(jup_b1_open_door_zone)} ph_door@close
+
+[ph_door@close]
+locked = false
+closed = true
+snd_open_start = trader_door_open_start
+snd_close_start = trader_door_close_start
+snd_close_stop = trader_door_close_stop
+on_use = {+jup_b1_give_task} ph_door@open %+jup_b1_already_visited%, ph_door@open
+tip_open = tip_door_open
+on_info = {!actor_in_zone(jup_b1_open_door_zone)} ph_door@locked
+
+[ph_door@open]
+locked = false
+closed = false
+snd_open_start = trader_door_open_start
+snd_close_start = trader_door_close_start
+snd_close_stop = trader_door_close_stop
+tip_close = jup_b1_bar_door
+on_info = {+jup_b1_give_task -jup_b1_already_visited} ph_door@locked %+jup_b1_already_visited%

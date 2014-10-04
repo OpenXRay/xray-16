@@ -1,0 +1,404 @@
+[logic@zat_b104_zombied_1_1]
+active = walker@roam_1_1
+suitable = {=target_squad_name(zat_b104_zombied_1) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 200
+post_combat_time = 0,0
+
+;[danger@no_danger]
+;ignore_distance = 2
+;danger_inertion_time_grenade = 2000
+;danger_inertion_time_hit = 2000
+;danger_inertion_time_sound = 2000
+;danger_inertion_time_ricochet = 0
+
+[walker@roam_1_1]
+path_walk = 1_roam_1_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_1_1
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_1_1]
+path_walk = 1_attack_walk
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_1_1
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_1_2]
+active = walker@roam_1_2
+suitable = {=target_squad_name(zat_b104_zombied_1) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 200
+post_combat_time = 0,0
+
+[walker@roam_1_2]
+path_walk = 1_roam_2_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_1_2
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_1_2]
+path_walk = 1_attack_walk
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_1_2
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_1_3]
+active = walker@roam_1_3
+suitable = {=target_squad_name(zat_b104_zombied_1) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 190
+post_combat_time = 0,0
+
+[walker@roam_1_3]
+path_walk = 1_roam_3_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_1_3
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_1_3]
+path_walk = 1_attack_roam
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_1_3
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_1_4]
+active = walker@roam_1_4
+suitable = {=target_squad_name(zat_b104_zombied_1) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 190
+post_combat_time = 0,0
+
+[walker@roam_1_4]
+path_walk = 1_roam_4_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_1_4
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_1_4]
+path_walk = 1_attack_roam
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_1_4
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_1_5]
+active = walker@roam_1_5
+suitable = {=target_squad_name(zat_b104_zombied_1) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 190
+post_combat_time = 0,0
+
+[walker@roam_1_5]
+path_walk = 1_roam_5_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_1_5
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_1_5]
+path_walk = 1_attack_roam
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_1_5
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_1_6]
+active = walker@roam_1_6
+suitable = {=target_squad_name(zat_b104_zombied_1) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 190
+post_combat_time = 0,0
+
+[walker@roam_1_6]
+path_walk = 1_roam_6_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_1_6
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_1_6]
+path_walk = 1_attack_roam
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_1_6
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_1_7]
+active = walker@roam_1_7
+suitable = {=target_squad_name(zat_b104_zombied_1) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 190
+post_combat_time = 0,0
+
+[walker@roam_1_7]
+path_walk = 1_roam_7_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_1_7
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_1_7]
+path_walk = 1_attack_roam
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_1_7
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_2_1]
+active = walker@roam_2_1
+suitable = {=target_squad_name(zat_b104_zombied_2) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 200
+post_combat_time = 0,0
+
+[walker@roam_2_1]
+path_walk = 2_roam_1_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_2_1
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_2_1]
+path_walk = 2_attack_walk
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_2_1
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_2_2]
+active = walker@roam_2_2
+suitable = {=target_squad_name(zat_b104_zombied_2) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 200
+post_combat_time = 0,0
+
+[walker@roam_2_2]
+path_walk = 1_roam_2_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_2_2
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_2_2]
+path_walk = 2_attack_walk
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_2_2
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_2_3]
+active = walker@roam_2_3
+suitable = {=target_squad_name(zat_b104_zombied_2) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 190
+post_combat_time = 0,0
+
+[walker@roam_2_3]
+path_walk = 2_roam_3_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_2_3
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_2_3]
+path_walk = 2_attack_roam
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_2_3
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_2_4]
+active = walker@roam_2_4
+suitable = {=target_squad_name(zat_b104_zombied_2) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 190
+post_combat_time = 0,0
+
+[walker@roam_2_4]
+path_walk = 2_roam_4_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_2_4
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_2_4]
+path_walk = 2_attack_roam
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_2_4
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_2_5]
+active = walker@roam_2_5
+suitable = {=target_squad_name(zat_b104_zombied_2) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 190
+post_combat_time = 0,0
+
+[walker@roam_2_5]
+path_walk = 2_roam_5_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_2_5
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_2_5]
+path_walk = 2_attack_roam
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_2_5
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_2_6]
+active = walker@roam_2_6
+suitable = {=target_squad_name(zat_b104_zombied_2) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 190
+post_combat_time = 0,0
+
+[walker@roam_2_6]
+path_walk = 2_roam_6_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_2_6
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_2_6]
+path_walk = 2_attack_roam
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_2_6
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_2_7]
+active = walker@roam_2_7
+suitable = {=target_squad_name(zat_b104_zombied_2) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 190
+post_combat_time = 0,0
+
+[walker@roam_2_7]
+path_walk = 2_roam_7_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_2_7
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_2_7]
+path_walk = 2_attack_roam
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_2_7
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_3_1]
+active = walker@roam_3_1
+suitable = {=target_squad_name(zat_b104_zombied_3) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 200
+post_combat_time = 0,0
+
+[walker@roam_3_1]
+path_walk = 3_roam_1_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_3_1
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_3_1]
+path_walk = 3_attack_walk
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_3_1
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_3_2]
+active = walker@roam_3_2
+suitable = {=target_squad_name(zat_b104_zombied_3) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 200
+post_combat_time = 0,0
+
+[walker@roam_3_2]
+path_walk = 1_roam_3_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_3_2
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_3_2]
+path_walk = 3_attack_walk
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_3_2
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_3_3]
+active = walker@roam_3_3
+suitable = {=target_squad_name(zat_b104_zombied_3) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 190
+post_combat_time = 0,0
+
+[walker@roam_3_3]
+path_walk = 3_roam_3_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_3_3
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_3_3]
+path_walk = 3_attack_roam
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_3_3
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_3_4]
+active = walker@roam_3_4
+suitable = {=target_squad_name(zat_b104_zombied_3) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 190
+post_combat_time = 0,0
+
+[walker@roam_3_4]
+path_walk = 3_roam_4_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_3_4
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_3_4]
+path_walk = 3_attack_roam
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_3_4
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_3_5]
+active = walker@roam_3_5
+suitable = {=target_squad_name(zat_b104_zombied_3) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 190
+post_combat_time = 0,0
+
+[walker@roam_3_5]
+path_walk = 3_roam_5_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_3_5
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_3_5]
+path_walk = 3_attack_roam
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_3_5
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_3_6]
+active = walker@roam_3_6
+suitable = {=target_squad_name(zat_b104_zombied_3) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 190
+post_combat_time = 0,0
+
+[walker@roam_3_6]
+path_walk = 3_roam_6_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_3_6
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_3_6]
+path_walk = 3_attack_roam
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_3_6
+;danger = danger@no_danger
+
+
+[logic@zat_b104_zombied_3_7]
+active = walker@roam_3_7
+suitable = {=target_squad_name(zat_b104_zombied_3) -zat_b104_task_end} true, {+zat_b104_task_end =check_npc_name(zombied)} true
+prior = 190
+post_combat_time = 0,0
+
+[walker@roam_3_7]
+path_walk = 3_roam_7_walk
+on_actor_in_zone = zat_b104_sr_attack | walker@attack_3_7
+combat_ignore_cond = {=dist_to_actor_ge(13)} true
+combat_ignore_keep_when_attacked = false
+;danger = danger@no_danger
+
+[walker@attack_3_7]
+path_walk = 3_attack_roam
+on_info = {=dist_to_story_obj_ge(zat_b104_sr_attack:50)} walker@roam_3_7
+;danger = danger@no_danger

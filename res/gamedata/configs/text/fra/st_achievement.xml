@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_achievement_10_descr">
+		<text>Votre ennemi doit en avoir assez : vous venez de le tuer 10 fois sans qu'il parvienne а vous йliminer ! Ce n'est pas de la cruautй, vous voulez simplement l'aider а s'amйliorer...</text>
+	</string>
+	<string id="st_achievement_10_name">
+		<text>Moisson d'вmes</text>
+	</string>
+	<string id="st_achievement_11_descr">
+		<text>Vous avez fait d'une pierre deux coups... en йliminant deux ennemis avec la mкme balle de votre fusil Gauss.</text>
+	</string>
+	<string id="st_achievement_11_name">
+		<text>Brochette</text>
+	</string>
+	<string id="st_achievement_12_descr">
+		<text>Votre approche calme et mesurйe a portй ses fruits : vous avez touchй deux cibles en deux tirs de votre fusil а canon sciй, en l'espace de quelques secondes.</text>
+	</string>
+	<string id="st_achievement_12_name">
+		<text>Deux balles, deux morts</text>
+	</string>
+	<string id="st_achievement_13_descr">
+		<text>La carriиre de stalker n'a plus aucun secret pour vous ! Vous кtes dйsormais une lйgende !</text>
+	</string>
+	<string id="st_achievement_13_name">
+		<text>Ascension sociale</text>
+	</string>
+	<string id="st_achievement_14_descr">
+		<text>S'attaquer а un exosquelette avec un couteau ? Vous n'avez pas froid aux yeux et relevez les dйfis les plus difficiles sans sourciller !</text>
+	</string>
+	<string id="st_achievement_14_name">
+		<text>Ouvre-boоte</text>
+	</string>
+	<string id="st_achievement_15_descr">
+		<text>Ils pensaient vous avoir eu, mais vous leur avez dйmontrй le contraire en tuant cinq d'entre eux alors que vous йtiez agonisant.</text>
+	</string>
+	<string id="st_achievement_15_name">
+		<text>Dur а cuire</text>
+	</string>
+	<string id="st_achievement_16_descr">
+		<text>Profitant d'une poussйe d'adrйnaline, vous avez dйchaоnй une pluie de plomb sur vos cibles et tuй 5 ennemis en cinq secondes !</text>
+	</string>
+	<string id="st_achievement_16_name">
+		<text>Berserker</text>
+	</string>
+	<string id="st_achievement_17_descr">
+		<text>En plein dans l'њil ! Vous avez йliminй deux ennemis d'une balle dans l'њil sans vous faire tuer.</text>
+	</string>
+	<string id="st_achievement_17_name">
+		<text>Ophtalmologue</text>
+	</string>
+	<string id="st_achievement_18_descr">
+		<text>Qu'ils tendent leurs embuscades, cela ne vous arrкtera pas ! Vous arrivez mкme а toucher une cible en mouvement, sans viser !</text>
+	</string>
+	<string id="st_achievement_18_name">
+		<text>Rйflexes йclair</text>
+	</string>
+	<string id="st_achievement_19_descr">
+		<text>Il peut courir aussi vite qu'il peut... Vos balles le rattraperont quoi qu'il fasse !</text>
+	</string>
+	<string id="st_achievement_19_name">
+		<text>Cours, Forrest, cours !</text>
+	</string>
+	<string id="st_achievement_1_descr">
+		<text>Vous avez massacrй 20 ennemis d'affilйe sans vous faire tuer. Un vrai bain de sang !</text>
+	</string>
+	<string id="st_achievement_1_name">
+		<text>Massacre</text>
+	</string>
+	<string id="st_achievement_20_descr">
+		<text>Ils йtaient trois, chacun armй d'un fusil de prйcision... mais cela ne leur a pas servi а grand-chose...</text>
+	</string>
+	<string id="st_achievement_20_name">
+		<text>Mortelle prйcision</text>
+	</string>
+	<string id="st_achievement_21_descr">
+		<text>Laissant les barbares s'amuser entre eux, vous avez dйmontrй qu'il йtait possible de gagner sans tirer un seul coup de feu.</text>
+	</string>
+	<string id="st_achievement_21_name">
+		<text>Colombe de la paix</text>
+	</string>
+	<string id="st_achievement_22_descr">
+		<text>Peu importe la distance pour un vrai tireur de prйcision. Vous tirez en plein dans le mille а plus de 120 m de distance. </text>
+	</string>
+	<string id="st_achievement_22_name">
+		<text>Њil de lynx</text>
+	</string>
+	<string id="st_achievement_23_descr">
+		<text>L'ennemi vous a abattu, mais vous lui avez laissй une surprise : une grenade prкte а exploser !</text>
+	</string>
+	<string id="st_achievement_23_name">
+		<text>Souvenir</text>
+	</string>
+	<string id="st_achievement_24_descr">
+		<text>Ils ont tuй vos amis et mйritй votre courroux. Trois morts pour trois amis abattus, ce n'est que justice.</text>
+	</string>
+	<string id="st_achievement_24_name">
+		<text>Vengeur masquй</text>
+	</string>
+	<string id="st_achievement_25_descr">
+		<text>Vous кtes l'ange gardien de votre ami. Vous l'avez sauvй deux fois alors qu'il transportait l'artefact.</text>
+	</string>
+	<string id="st_achievement_25_name">
+		<text>Ange gardien</text>
+	</string>
+	<string id="st_achievement_26_descr">
+		<text>Vous avez sauvй votre honneur et celui de votre йquipe en marquant quelques points.</text>
+	</string>
+	<string id="st_achievement_26_name">
+		<text>L'honneur est sauf</text>
+	</string>
+	<string id="st_achievement_27_descr">
+		<text>Avouez que vous saviez oщ l'artefact allait apparaоtre. Non ? Pourtant, vous l'avez rйcupйrй dans la seconde oщ il est apparu.</text>
+	</string>
+	<string id="st_achievement_27_name">
+		<text>6e sens</text>
+	</string>
+	<string id="st_achievement_28_descr">
+		<text>Vous avez eu de la chance : vous avez tuй l'ennemi avec la derniиre balle de votre chargeur ! Tant mieux pour vous !</text>
+	</string>
+	<string id="st_achievement_28_name">
+		<text>Cul bordй de nouilles</text>
+	</string>
+	<string id="st_achievement_29_descr">
+		<text>Vous avez tuй 8 ennemis d'affilйe. Voyons comment votre adversaire va rйagir !</text>
+	</string>
+	<string id="st_achievement_29_name">
+		<text>Liste noire </text>
+	</string>
+	<string id="st_achievement_2_descr">
+		<text>Vous n'кtes pas mort au cours de la partie et avez marquй plus de 15 points. On dirait que la prudence a du bon...</text>
+	</string>
+	<string id="st_achievement_2_name">
+		<text>Paranoпaque</text>
+	</string>
+	<string id="st_achievement_30_descr">
+		<text>Vous travaillez sans attirer l'attention, avec un silencieux. Aprиs tout, l'ennemi n'a pas besoin de savoir d'oщ venait la balle...</text>
+	</string>
+	<string id="st_achievement_30_name">
+		<text>Mort silencieuse</text>
+	</string>
+	<string id="st_achievement_3_descr">
+		<text>Vous avez anйanti l'ennemi en gagnant et en marquant deux fois plus de points que le meilleur joueur adverse.</text>
+	</string>
+	<string id="st_achievement_3_name">
+		<text>Supйrioritй йcrasante</text>
+	</string>
+	<string id="st_achievement_4_descr">
+		<text>La chance sourit aux audacieux ! Vous avez bien fait de rйcupйrer l'artefact immйdiatement et avez marquй des points pour votre йquipe dиs les trois premiиres minutes de la partie.</text>
+	</string>
+	<string id="st_achievement_4_name">
+		<text>Blitzkrieg</text>
+	</string>
+	<string id="st_achievement_5_descr">
+		<text>Vous n'avez pas laissй le temps а l'йquipe adverse de rйcupйrer un seul artefact. Vive le travail en йquipe !</text>
+	</string>
+	<string id="st_achievement_5_name">
+		<text>Ni vu ni connu</text>
+	</string>
+	<string id="st_achievement_6_descr">
+		<text>Vous avez obtenu le meilleur score dans toutes les catйgories en faisant le plus de victimes, en rйcupйrant la plupart des artefacts et en mourant le moins ! Continuez comme зa !</text>
+	</string>
+	<string id="st_achievement_6_name">
+		<text>Premier de la classe</text>
+	</string>
+	<string id="st_achievement_7_descr">
+		<text>Vous avez йviscйrй trois ennemis en moins de 20 secondes, dйmontrant ainsi votre maоtrise du combat au corps-а-corps.</text>
+	</string>
+	<string id="st_achievement_7_name">
+		<text>Machine а dйcouper</text>
+	</string>
+	<string id="st_achievement_8_descr">
+		<text>Chaque ennemi a son talon d'Achille et vous l'avez dйmontrй une fois de plus en plaзant une balle dans l'њil d'un ennemi trиs bien protйgй.</text>
+	</string>
+	<string id="st_achievement_8_name">
+		<text>Talon d'Achille</text>
+	</string>
+	<string id="st_achievement_9_descr">
+		<text>Les balles de l'ennemi ne vous font pas peur ! Elles ne font que vous effleurer sans vous blesser et ne vous empкchent pas d'abattre vos adversaires !</text>
+	</string>
+	<string id="st_achievement_9_name">
+		<text>Plus rapide que les balles</text>
+	</string>
+	<string id="st_sp_achievement_1_descr">
+		<text>Vous кtes prкt а examiner les derniers dйveloppements dans la Zone. Vous nous avez permis d'approfondir notre connaissance de la Zone en dйcouvrant de nouvelles formations anormales encore inconnues de la science.</text>
+	</string>
+	<string id="st_sp_achievement_1_name">
+		<text>Pionnier</text>
+	</string>
+	<string id="st_sp_achievement_2_hint">
+		<text>Les stalkers vous estiment davantage а prйsent.\nPour vous remercier de vos efforts, ils ont dйcidй de dйposer des munitions dans votre cantine de la gare de Yanov.</text>
+	</string>
+	<string id="st_sp_achievement_2_descr">
+		<text>Vous n'йvitez pas les mutants, vous les traquez et avec talent ! Les bons chasseurs sont apprйciйs parmi les stalkers.</text>
+	</string>
+	<string id="st_sp_achievement_2_name">
+		<text>Chasseur de mutant</text>
+	</string>
+	<string id="st_sp_achievement_3_hint">
+		<text>Les stalkers ont une meilleure opinion de vous.\nEn tйmoignage de leur respect, ils ont dйcidй de dйposer des fournitures mйdicales dans votre cantine sur le Skadovsk.</text>
+	</string>
+	<string id="st_sp_achievement_3_descr">
+		<text>Vous avez rйsolu le mystиre des disparitions du Skadovsk. Le coupable n'йtait pas un mutant, mais un ennemi bien plus redoutable : un homme. Votre quкte de la vйritй vous a valu le respect de vos pairs.</text>
+	</string>
+	<string id="st_sp_achievement_3_name">
+		<text>Dйtective</text>
+	</string>
+	<string id="st_sp_achievement_4_hint">
+		<text>Les stalkers ont une meilleure opinion de vous.\nIls ont demandй au Hibou de vous faire une ristourne. \nLe Barbu vous propose dйsormais ses meilleurs prix en йchange de vos artefacts. </text>
+	</string>
+	<string id="st_sp_achievement_4_descr">
+		<text>Vous avez montrй aux bandits et а leur chef, Sultan, qui est le patron et avez gagnй en popularitй auprиs des stalkers. Vous serez toujours le bienvenu sur le Skadovsk.</text>
+	</string>
+	<string id="st_sp_achievement_4_name">
+		<text>L'un des nфtres</text>
+	</string>
+	<string id="st_sp_achievement_5_hint">
+		<text>Vous avez gagnй le respect des bandits.\nCraignant d'кtre votre prochaine victime, le Hibou vous a fait une ristourne.\nComme convenu, le Barbu vous remettra dйsormais une partie de ses bйnйfices.</text>
+	</string>
+	<string id="st_sp_achievement_5_descr">
+		<text>Vous avez aidй Sultan а vaincre les stalkers et а prendre le contrфle des affaires du Barbu. Vous кtes а la fois craint et respectй а Zaton.</text>
+	</string>
+	<string id="st_sp_achievement_5_name">
+		<text>Boss</text>
+	</string>
+	<string id="st_sp_achievement_6_hint">
+		<text>Les stalkers ont dйcidй de remettre le butin de la Pie, obtenu par le mensonge et la tromperie, а quelqu'un de plus mйritant. Ils ont dйposй le tout dans votre cantine de Yanov.</text>
+	</string>
+	<string id="st_sp_achievement_6_descr">
+		<text>Justice a йtй faite. La Pie, cette petite ordure, a trompй plus d'un stalker et il est temps pour lui de payer !</text>
+	</string>
+	<string id="st_sp_achievement_6_name">
+		<text>Messager de la justice</text>
+	</string>
+	<string id="st_sp_achievement_7_hint">
+		<text>Les stalkers ont une meilleure opinion de vous.\nLes bandits tenteront de vous attaquer oщ que vous soyez dans la Zone.</text>
+	</string>
+	<string id="st_sp_achievement_7_descr">
+		<text>Vous avez dйcouvert tous les types d'artefacts connus des chercheurs de la Zone. Cela vous a valu le respect des stalkers et l'attention des bandits.</text>
+	</string>
+	<string id="st_sp_achievement_7_name">
+		<text>Chasseur d'artefacts</text>
+	</string>
+	<string id="st_sp_achievement_8_hint">
+		<text>Cardan peut amйliorer votre exosquelette en y ajoutant des servomoteurs hydrauliques qui vous permettront de vous dйplacer plus rapidement.</text>
+	</string>
+	<string id="st_sp_achievement_8_descr">
+		<text>Cardan a tous les outils dont il a besoin. Cela lui permettra de rйaliser de nouvelles amйliorations plus complexes.</text>
+	</string>
+	<string id="st_sp_achievement_8_name">
+		<text>Expert en armement</text>
+	</string>
+	<string id="st_sp_achievement_9_hint">
+		<text>Azote peut modifier un casque tactique de faзon unique : il y ajoute un dйtecteur infrarouge permettant d'identifier la prйsence d'humains а proximitй.</text>
+	</string>
+	<string id="st_sp_achievement_9_descr">
+		<text>Azote dispose de tous les outils dont un technicien de la Zone pourrait rкver. Il peut а prйsent rйaliser des modifications de pointe.</text>
+	</string>
+	<string id="st_sp_achievement_9_name">
+		<text>Expert en technologie de pointe</text>
+	</string>
+	<string id="st_sp_achievement_10_hint">
+		<text>Votre expйrience vous permet de trouver des artefacts rares plus frйquemment.</text>
+	</string>
+	<string id="st_sp_achievement_10_descr">
+		<text>Les lieux accessibles autour du centre de la Zone n'ont plus aucun secret pour vous. Vous connaissez toutes les anomalies du coin ou presque.</text>
+	</string>
+	<string id="st_sp_achievement_10_name">
+		<text>Stalker aguerri</text>
+	</string>
+	<string id="st_sp_achievement_11_hint">
+		<text>Vos qualitйs de chef augmentent les chances de survie de votre groupe.</text>
+	</string>
+	<string id="st_sp_achievement_11_descr">
+		<text>Obligй de travailler en йquipe, vous avez formй un groupe solide et prouvй que vous aviez l'йtoffe d'un chef.</text>
+	</string>
+	<string id="st_sp_achievement_11_name">
+		<text>Chef</text>
+	</string>
+	<string id="st_sp_achievement_12_hint">
+		<text>La Libertй, le Devoir, les stalkers indйpendants et mкme les bandits ont fini par reconnaоtre vos talents de nйgociateur et ont une profonde estime pour vous.</text>
+	</string>
+	<string id="st_sp_achievement_12_descr">
+		<text>Vous savez rйsoudre les problиmes avec diplomatie. А quoi bon recourir а la force lorsque de simples paroles peuvent suffire а rйgler un diffйrend ? Faites tout de mкme attention а ceux qui tirent avant et discutent aprиs...</text>
+	</string>
+	<string id="st_sp_achievement_12_name">
+		<text>Diplomate</text>
+	</string>
+	<string id="st_sp_achievement_13_descr">
+		<text>Vous travaillez avec les scientifiques depuis si longtemps qu'on pourrait vous prendre pour un laborantin. Tous les scientifiques du bunker vous considиrent comme leur collиgue.</text>
+	</string>
+	<string id="st_sp_achievement_13_name">
+		<text>Laborantin</text>
+	</string>
+	<string id="st_sp_achievement_14_hint">
+		<text>Vos relations avec le Devoir se sont amйliorйes. En cas de problиme, les combattants du Devoir seront lа pour vous aider.\nAzote, le technicien du Devoir, vous a offert une ristourne.\nVos relations avec la Libertй se sont dйtйriorйes.\nL'Hawaпen, le marchand de la Libertй, vous fera payer sa marchandise plus cher.</text>
+	</string>
+	<string id="st_sp_achievement_14_descr">
+		<text>Vous avez йtй d'une grande aide au Devoir, ce qui vous a valu le respect de ses combattants et de leurs alliйs. Mais n'oubliez pas que certains rйsidents de la Zone ne s'entendent pas aussi bien que vous avec cette faction.</text>
+	</string>
+	<string id="st_sp_achievement_14_name">
+		<text>Ami du Devoir</text>
+	</string>
+	<string id="st_sp_achievement_15_hint">
+		<text>Vos relations avec la Libertй se sont amйliorйes. En cas de problиme, les combattants de la Libertй seront lа pour vous aider.\nL'Hawaпen, le marchand de la Libertй, vous a offert une ristourne.\nVos relations avec le Devoir se sont dйtйriorйes.\nAzote, le technicien du Devoir, vous fera payer sa marchandise plus cher.</text>
+	</string>
+	<string id="st_sp_achievement_15_descr">
+		<text>Vous avez йtй d'une grande aide а la Libertй, ce qui vous a valu le respect de ses combattants et de leurs alliйs. Mais n'oubliez pas que certains rйsidents de la Zone ne s'entendent pas aussi bien que vous avec cette faction.</text>
+	</string>
+	<string id="st_sp_achievement_15_name">
+		<text>Ami de la Libertй</text>
+	</string>
+	<string id="st_sp_achievement_16_hint">
+		<text>Les stalkers de Yanov estiment qu'il est important de maintenir l'йquilibre entre le Devoir et la Libertй. En consйquence, leur technicien et leur marchand ont tous deux dйcidй de vous faire profiter de leurs tarifs prйfйrentiels.</text>
+	</string>
+	<string id="st_sp_achievement_16_descr">
+		<text>Vous ne vous кtes rangй du cфtй d'aucune faction et avez toujours agi en stalker indйpendant. Vous n'avez pas d'ennemis, mais vous ne vous кtes pas fait de nouveaux amis non plus.</text>
+	</string>
+	<string id="st_sp_achievement_16_name">
+		<text>Un homme йquilibrй</text>
+	</string>
+	<string id="st_sp_achievement_17_hint">
+		<text>Les marchands vous proposent de la marchandise plus rare et plus chиre.</text>
+	</string>
+	<string id="st_sp_achievement_17_descr">
+		<text>Vous avez connu des pйriodes de vache maigre, mais les affaires ne vont pas trop mal en ce moment. Vous parvenez mкme parfois а mettre beaucoup d'argent de cфtй et les marchands savent reconnaоtre un bon client.</text>
+	</string>
+	<string id="st_sp_achievement_17_name">
+		<text>Bon client</text>
+	</string>
+	<string id="st_sp_achievement_18_hint">
+		<text>Les messages que vous avez remis а Strelok lui ont donnй une nouvelle raison de vivre et d'atteindre son objectif, coыte que coыte.</text>
+	</string>
+	<string id="st_sp_achievement_18_descr">
+		<text>Vous avez йtй bien inspirй : lorsque vous avez trouvй les messages dans les planques du groupe de Strelok, vous avez dйcidй de les conserver pour les remettre а leur propriйtaire.</text>
+	</string>
+	<string id="st_sp_achievement_18_name">
+		<text>Gardien des secrets</text>
+	</string>
+	<string id="st_sp_achievement_19_descr">
+		<text>Vous avez rйussi а survivre а une йmission sans vous mettre а couvert grвce aux anabiotiques. Les effets sur votre psychisme commencent а se faire sentir ; un йtrange silence s'est installй dans votre esprit, vous n'entendez plus le brouhaha de vos pensйes.</text>
+	</string>
+	<string id="st_sp_achievement_19_name">
+		<text>Affectй par la Zone</text>
+	</string>
+	<string id="st_sp_achievement_20_hint">
+		<text>Le Hibou vous a offert une ristourne pour vous remercier d'кtre son meilleur informateur et partenaire.</text>
+	</string>
+	<string id="st_sp_achievement_20_descr">
+		<text>Lorsque vous dйnichez des informations, vous trouvez toujours le bon acheteur. Йvidemment, lorsque vous les vendez, vous faites toujours en sorte que cela soit dans votre intйrкt.</text>
+	</string>
+	<string id="st_sp_achievement_20_name">
+		<text>Trafiquant d'informations</text>
+	</string>
+	<string id="st_sp_achievement_21_hint">
+		<text>Vos relations avec les stalkers se sont amйliorйes. En cas de problиme, ils seront lа pour vous aider.\nLeurs mйdecins ont acceptй de vous vendre des fournitures mйdicales а prix coыtant.</text>
+	</string>
+	<string id="st_sp_achievement_21_descr">
+		<text>Vous avez toujours aidй les stalkers indйpendants dans les coups durs. Leur faction n'est pas la plus unie, mais vous avez dйsormais des alliйs dans la fraternitй officieuse des stalkers qui vous feront de leur mieux pour vous aider.</text>
+	</string>
+	<string id="st_sp_achievement_21_name">
+		<text>Ami des stalkers</text>
+	</string>
+	<string id="st_sp_achievement_1_hint">
+		<text>Diffйrentes informations ont permis aux professeurs Hermann et Ozersky de crйer une nouvelle drogue expйrimentale de type anabiotique dans la Zone.</text>
+	</string>
+	<string id="st_sp_achievement_19_hint">
+		<text>Vous avez une chance de survivre а une йmission mкme sans mйdicament, dans la mesure oщ vous кtes en bonne santй.</text>
+	</string>
+	<string id="st_sp_achievement_13_hint">
+		<text>Content de votre efficacitй, le professeur Hermann accepte а prйsent de vous vendre а prix coыtant des fournitures mйdicales et de l'йquipement destinйs exclusivement au personnel du bunker.\nNovikov vous connaоt bien et ne vous facture plus la main-d'њuvre lorsqu'il vous prйpare des modifications.</text>
+	</string>
+</string_table>

@@ -1,0 +1,26 @@
+[logic]
+active = sr_idle@run_use_idol_tutorial
+
+[sr_idle@run_use_idol_tutorial]
+on_info = {=actor_in_zone(pri_a18_use_idol_restrictor) !squad_exist(pri_a18_monolith_idol_squad) !squad_exist(pri_a18_monolith_post_guard_squad) !squad_exist(pri_a18_monolith_corridor_squad) !squad_exist(pri_a18_monolith_2nd_corridor_squad) -pri_a18_koval_go_on !surge_started} sr_idle@stop_use_idol_tutorial %=run_tutorial(pri_a18_use_idol)%
+on_info2 = {+pri_a18_run_cam} sr_idle@wait_koval_sound
+
+[sr_idle@stop_use_idol_tutorial]
+on_info = {!actor_in_zone(pri_a18_use_idol_restrictor) -pri_a18_koval_go_on} sr_idle@run_use_idol_tutorial %=stop_tutorial(pri_a18_use_idol)%
+on_info2 = {+pri_a18_run_cam} sr_idle@wait_koval_sound
+on_info3 = {!has_active_tutorial} sr_idle@run_use_idol_tutorial
+
+[sr_idle@wait_koval_sound]
+on_info = {+pri_a18_koval_go_on} sr_idle@kovalskis_voise_sound
+
+[sr_idle@kovalskis_voise_sound]
+on_game_timer = 10 | sr_idle@kovalskis_voise_sound_2
+
+[sr_idle@kovalskis_voise_sound_2]
+on_signal = sound_end | sr_idle@timer %+pri_a18_altar_stop_cam%
+on_info = {+pri_a21_task_start -pri_a21_sentry_task_done} %=play_sound(pri_a18_kovalskiy_squad)%, %=play_sound(pri_a18_kovalskiy_guard)%
+
+[sr_idle@timer]
+on_game_timer = 20 | sr_idle@nil %+pri_a18_cam_stop%
+
+[sr_idle@nil]

@@ -1,0 +1,278 @@
+[zone_mine_gravitational_strong]:zone_base
+GroupControlSection			= spawn_group_zone
+$spawn 						= "zones\mine_gravitational_strong"
+$def_sphere = 4
+$prefetch 					= 16
+class						= ZS_MINCE  ;--CMincer
+
+ef_anomaly_type				= 2
+ef_weapon_type				= 14
+
+postprocess					= postprocess_gravi_mine
+
+;----------- Anomaly settings -----------------------
+max_start_power		= 1.6
+attenuation			= 1
+
+tearing_particles			=anomaly2\body_tear_00
+torn_particles				=anomaly2\gravi_anomaly_shield_00
+idle_particles				= zones_mine\zone_gravity_mine_idle_strong
+;accum_particles				= anomaly2\gravi_zaxvat_myasorubka
+;awake_particles				= anomaly2\gravi_zaxvat_myasorubka
+blowout_particles			= zones_mine\zone_gravity_mine_hit_strong
+
+hit_small_particles			= hit_fx\hit_metal_02
+hit_big_particles			= anomaly2\gravity_damage_02_blood2
+idle_small_particles		= anomaly2\gravity_damage_01_smoke
+idle_big_particles			= anomaly2\gravity_damage_02_blood2; anomaly2\gravity_damage_02_smoke
+entrance_small_particles	= anomaly2\gravi_anomaly_shield_00
+entrance_big_particles		= anomaly2\gravi_anomaly_00;
+
+tele_particles_small		= anomaly2\gravity_damage_01_smoke	;anomaly2\gravity_damage_01_smoke
+tele_particles_big			= anomaly2\gravity_damage_02_smoke
+
+idle_sound					= anomaly\gravi_idle01						;постоянный звук
+awake_sound					= anomaly\gravi_idle01
+accum_sound					= anomaly\gravi_idle01
+blowout_sound				= anomaly\anomaly_mincer_blowout; anomaly_gravy_blast01		;во время выброса(удара) в центре аномалии
+hit_sound					= anomaly\anomaly_gravy_hit1								;на персонаже, когда тот получает хит
+entrance_sound				= anomaly\anomaly_gravy_hit1 ;gravi_idle01										;при попадании объекта в аномалию
+body_tearing_sound			= anomaly\anomaly_body_tear_1								;звук разрывания трупа
+
+hit_type					= strike
+hit_impulse_scale			= 0.1							;соотношение физического импульса и силы хита
+effective_radius			= 1.0							;размер радиуса в процентах от оригинального, где действует зона
+
+disable_time				= -1							;время игнорирования неживого объекта в зоне (-1 если не нужно)
+disable_time_small			= -1							;время игнорирования маленького неживого объекта в зоне (-1 если не нужно)
+disable_idle_time			= 100							;время отключения idle партиклов
+
+ignore_nonalive				= false
+ignore_small				= true
+ignore_artefacts			= true
+
+blowout_light				= on
+light_color					= 1.4,1.6,1.3
+light_range					= 20.0
+light_time 					= 0.38 ;0.35
+light_height				= 1.5								;подъем источника света на высоту
+
+idle_light					= off
+
+awaking_time				= 50
+blowout_time				= 10000
+accamulate_time				= 4000
+
+blowout_particles_time		= 50
+blowout_sound_time  		= 100
+blowout_light_time			= 5988
+blowout_explosion_time		= 5999
+
+;параметры телекинеза для зоны
+throw_in_impulse			= 4000	;сила втягивания для единичной массы на расстоянии один метр
+throw_out_impulse				= 1500			;сила выбрасывания взрывом
+throw_in_impulse_alive			= 600	;сила импульса втягивания для живых
+throw_in_atten					= 1.2	;3;коэфф. затягивания (чем меньше, тем плавнее затягивает)
+blowout_radius_percent			= 0.6							;радиус (в процентах от всего радиуса) непосредственно выброса
+actor_blowout_radius_percent	= 0.6
+tele_height						= 10 ;1.5						;высота подъема телекинеза
+time_to_tele					= 7000							;время деражания объекта в воздухе
+tele_pause						= 4000							;пауза перед тем как снова поднять упавший объект
+
+;; ветер
+blowout_wind				= on
+
+blowout_wind_time_start     = 0
+blowout_wind_time_peak      = 5900
+blowout_wind_time_end		= 10000;9999
+blowout_wind_power			= 0.5								;сила поднимаего ветра (от 0 до 1), в момент blowout_wind_time_peak
+
+shape_transp_color		= 255, 0, 0, 60
+shape_edge_color		= 32, 32, 32, 255
+
+
+[zone_mine_gravitational_average]:zone_base
+GroupControlSection	= spawn_group_zone
+$spawn 			= "zones\mine_gravitational_average"
+$def_sphere = 4
+$prefetch 		= 16
+class			= ZS_GALAN ;--CMincer
+
+ef_anomaly_type			= 5
+ef_weapon_type			= 17
+
+postprocess		= postprocess_gravi_mine
+
+
+;----------- Anomaly settings -----------------------
+max_start_power		= 1.00
+attenuation			= 1
+
+
+idle_particles				= zones_mine\zone_gravity_mine_idle_average
+blowout_particles	= zones_mine\zone_gravity_mine_hit_average
+tearing_particles	=anomaly2\body_tear_00
+torn_particles      =anomaly2\body_tear_01
+
+hit_small_particles			= hit_fx\hit_metal_02
+hit_big_particles			= anomaly2\gravity_damage_02_blood2
+idle_small_particles		= anomaly2\gravity_damage_01_smoke
+idle_big_particles			= anomaly2\gravity_damage_02_smoke
+entrance_small_particles	= anomaly2\gravi_anomaly_shield_00
+entrance_big_particles		= anomaly2\gravi_anomaly_00;
+
+tele_particles_small		= anomaly2\gravity_damage_01_smoke	;anomaly2\gravity_damage_01_smoke
+tele_particles_big			= anomaly2\gravity_damage_02_smoke
+
+
+idle_sound			= anomaly\gravi_idle00							;постоянный звук
+blowout_sound		= anomaly\gravi_blowout6; anomaly_gravy_blast01	;во время выброса(удара) в центре аномалии
+hit_sound			= anomaly\anomaly_gravy_hit1						;на персонаже, когда тот получает хит
+body_tearing_sound	= anomaly\anomaly_body_tear_1						;звук разрывания трупа
+entrance_sound		= anomaly\anomaly_gravy_hit1 ;gravi_idle01								;при попадании объекта в аномалию
+
+hit_type			= strike
+hit_impulse_scale	= 0.02;0.5;0.1			;соотношение физического импульса и силы хита
+effective_radius	= 1.0							;размер радиуса в процентах от оригинального, где действует зона
+
+disable_time		= 5000		;время игнорирования неживого объекта в зоне (-1 если не нужно)
+disable_time_small	= 500		;время игнорирования маленького неживого объекта в зоне (-1 если не нужно)
+disable_idle_time	= 100		;-1	;время отключения idle партиклов
+
+ignore_nonalive		= false
+ignore_small		= true
+ignore_artefacts	= true
+
+blowout_light		= on
+light_color		    = 1.4,1.6,1.3
+light_range		    = 30.0
+light_time 		    = 0.8;0.35
+light_height		= 1.5			;подъем источника света на высоту
+
+idle_light			= off
+
+awaking_time		= 300;1000
+blowout_time		= 2500
+accamulate_time		= 1000
+
+
+blowout_light_time		= 2100
+blowout_explosion_time	= 2100
+
+;параметры телекинеза для зоны
+throw_in_impulse			= 		2000;3000;4000		;сила импульса втягивания (для тела 100кг)
+throw_out_impulse			=		4000;		;сила выбрасывания взрывом
+throw_in_impulse_alive		= 		1000;600 800	;сила импульса втягивания для живых
+throw_in_atten				= 		2;8			;коэфф. затягивания (чем меньше, тем плавнее затягивает)
+blowout_radius_percent		= 		0.8		;радиус (в процентах от всего радиуса) непосредственно выброса
+actor_blowout_radius_percent=		0.5
+
+tele_height				= 0.05;	3.5	;высота подъема телекинеза
+time_to_tele			= 5000		;время деражания объекта в воздухе
+tele_pause				= 5000		;пауза перед тем как снова поднять упавший объект
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ветер
+blowout_wind		= on
+
+blowout_wind_time_start     = 0
+blowout_wind_time_peak      = 1500
+blowout_wind_time_end		= 2501; 2499
+blowout_wind_power			= 0.5			;сила поднимаего ветра (от 0 до 1), в момент blowout_wind_time_peak
+
+
+shape_transp_color		= 255, 0, 0, 60
+shape_edge_color		= 32, 32, 32, 255
+
+
+[zone_mine_gravitational_weak]:zone_base
+GroupControlSection	= spawn_group_zone
+$spawn 			= "zones\mine_gravitational_weak"
+$def_sphere = 3
+$prefetch 		= 16
+class			= ZS_MBALD ;---CMosquitoBald
+hit_impulse_scale	= 0.3;0.5 ;0.1
+effective_radius	= 1.0 ;размер радиуса в процентах от оригинального, где действует зона
+actor_blowout_radius_percent	= 0.75
+
+ef_anomaly_type			= 1
+ef_weapon_type			= 13
+
+postprocess		= postprocess_gravi_mine
+
+hit_type			= strike
+
+;----------- Anomaly settings -----------------------
+max_start_power		= 0.85
+attenuation			= 1
+
+idle_particles				= zones_mine\zone_gravity_mine_idle
+blowout_particles	= anomaly2\gravity_blast_01
+
+hit_small_particles			= hit_fx\hit_metal_02
+hit_big_particles			= anomaly2\gravity_damage_02_blood2
+idle_small_particles		= anomaly2\gravity_damage_01_smoke
+idle_big_particles			= anomaly2\gravity_damage_02_smoke
+entrance_small_particles	= anomaly2\gravi_anomaly_shield_00
+entrance_big_particles		= anomaly2\gravity_entrance_big
+
+idle_sound			= anomaly\gravi_rumble1; ambient\fx2		;постоянный звук
+blowout_sound		= anomaly\anomaly_gravy_blast1; anomaly_gravy_blast01	;во время выброса(удара) в центре аномалии
+hit_sound			= anomaly\anomaly_gravy_hit1								;на персонаже, когда тот получает хит
+entrance_sound		= anomaly\anomaly_gravy_hit1								;при попадании объекта в аномалию
+
+
+awaking_time		= 50;100
+blowout_time		= 500
+accamulate_time		= 1000 ;10;200
+
+blowout_light_time		= 200
+blowout_explosion_time	= 200
+blowout_particles_time	= 200
+blowout_sound_time  	= 100
+
+disable_time		= 5000		;время игнорирования неживого объекта в зоне (-1 если не нужно)
+disable_time_small	= 5000		;время игнорирования маленького неживого объекта в зоне (-1 если не нужно)
+disable_idle_time	= 100		;время отключения idle партиклов
+
+ignore_nonalive		= false
+ignore_small		= true
+ignore_artefacts	= true
+
+blowout_light		= on
+light_color		    = 0.5,0.4,0.3
+light_range		    = 30.0
+light_time 		    = 0.9;0.35
+light_height		= 1.5			;подъем источника света на высоту
+
+
+idle_light			= off
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ветер
+blowout_wind		= on
+
+blowout_wind_time_start     = 0
+blowout_wind_time_peak      = 300
+blowout_wind_time_end		= 501; 899
+blowout_wind_power			= 0.5			;сила поднимаего ветра (от 0 до 1), в момент blowout_wind_time_peak
+
+shape_transp_color		= 255, 0, 0, 60
+shape_edge_color		= 32, 32, 32, 255
+
+
+[zone_mine_gravitational_big]:zone_mine_gravitational_strong
+$spawn 			= "zones\scenes\mine_gravitational_big"
+$def_sphere = 8
+
+
+[zone_gravi_zone]:zone_mine_gravitational_average
+$spawn 			= "zones\mp\gravi_zone"
+$def_sphere = 1
+postprocess		= postprocess_gravi
+max_start_power		= 1.00
+idle_particles		= anomaly2\gravity_idle
+blowout_particles	= anomaly2\gravity_blast_final00 ;gravity_blast_03
+effective_radius	= 0.75 ;размер радиуса в процентах от оригинального, где действует зона

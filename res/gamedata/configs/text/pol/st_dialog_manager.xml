@@ -1,0 +1,993 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="dm_anomalies_10">
+		<text>Na Zatonie jest miejsce, w ktуrym pod wod№ pojawiіy siк anomalie termiczne. Nazywaj№ je Kotіem, bo leci tam spod ziemi para i rуїne takie. Jeњli myњlisz, їe para to fraszka, pomyњl dwa razy. Doњwiadczeni stalkerzy mуwi№, їe taki rodzaj parowej anomalii moїe ci przywaliж co najmniej tak mocno, jak standardowa anomalia termiczna, jeњli nie mocniej. Temperatura moїe i jest niїsza, ale przysmaїa ciк dіuїej. Znajdowano tam gіуwnie standardowe artefakty typu ogniowego.</text>
+	</string>
+	<string id="dm_anomalies_11">
+		<text>Mуwi№, їe w kamienioіomach jest niezіe miejsce z mnуstwem artefaktуw, chociaї anomalii teї tam nie brakuje. Na dole jest tyle b№bli z anomalii gazowych, їe aї oczy bol№, nawet w masce przeciwgazowej.</text>
+	</string>
+	<string id="dm_anomalies_12">
+		<text>Na starym cmentarzu w pobliїu Kopaczi jest Popielisko. Jest tam mnуstwo anomalii termicznych, a od czasu do czasu trafi siк teї kilka zombi. Ludzie staraj№ siк omijaж to miejsce, ale jednak znajduj№ tam artefakty.</text>
+	</string>
+	<string id="dm_anomalies_13">
+		<text>Mуwi№, їe znaleziono jakieњ artefakty na parkingu. Ci№gle s№ tam pojazdy z pierwszej katastrofy Czarnobyla - te maleсstwa potrafi№ przyprawiж czujniki promieniowania o zgagк. W dodatku parking jest peіen anomalii elektrycznych.</text>
+	</string>
+	<string id="dm_anomalies_14">
+		<text>W Gnij№cym Zagajniku, gdzie kwas zdeformowaі drzewa. Ludzie, ktуrzy tam byli, twierdz№, їe jest peіen anomalii gazowych. W powietrzu jest tyle gazu, їe nie sposуb zobaczyж nic przed sob№, ale z odpowiednim doњwiadczeniem znajdziesz tam artefakty, ktуrych szukasz.</text>
+	</string>
+	<string id="dm_anomalies_15">
+		<text>Jeњli szukasz artefaktуw, poluj na kwasowe. Najlepsze miejsce, by je znaleџж, to Betonowa Wanna. Konkurencja nie bкdzie duїa: nikt nie lubi tego miejsca, bo leїy blisko budynku fabryki Jupiter.</text>
+	</string>
+	<string id="dm_anomalies_16">
+		<text>Niedaleko fabryki Jupiter obsun№і siк kawaіek drogi. Nazwano to miejsce Bitumin, poniewaї stopiіa siк tam nawierzchnia. W szczelinie jest mnуstwo anomalii - zarуwno termicznych, jak i grawitacyjnych. Poniewaї s№ ich dwa rodzaje, artefakty teї musz№ byж rуїne.</text>
+	</string>
+	<string id="dm_anomalies_17">
+		<text>Za cementowni№ jest maіa zatoczka zwana Mokradіem. Zmieniіa siк w okropne, њmierdz№ce bagno, a woda peіna jest anomalii gazowych. Wіaњciwie to juї nawet nie jest woda, tylko kwas. Ludzie znajdowali tam artefakty, ale to miejsce obfituje teї w potwory.</text>
+	</string>
+	<string id="dm_anomalies_18">
+		<text>Szukaj w starej cementowni. Peіno tam anomalii, ale jednak warto. Oczywiњcie s№ miejsca, w ktуrych іatwiej o artefakty, ale іatwiej tam teї o konkurencjк. Tutaj twoimi jedynymi konkurentami bкd№ chomiki i to tylko wtedy, gdy zejdziesz do piwnic.</text>
+	</string>
+	<string id="dm_anomalies_19">
+		<text>Poszukaj w okolicach Sosnodкbu. To to coњ rosn№ce miкdzy wzgуrzami, ponad anomaliami gazowym. Wszyscy tak to nazywaj№, odk№d jakiњ m№drala zidentyfikowaі korк tego drzewa jako zarуwno sosnow№, jak i dкbow№. Jeњli chcesz tam szukaж artefaktуw, przyda ci siк dobra ochrona przeciwchemiczna. Weџ teї sporo amunicji, bo wњrуd tych wzgуrz їyj№ caіe hordy psуw.</text>
+	</string>
+	<string id="dm_anomalies_2">
+		<text>Czasami nie trzeba wpadaж na anomalie, їeby zdobyж artefakt. Powiedziano mi kiedyњ o artefakcie znalezionym w њrodku pola. Jeden ze stalkerуw miaі detektor, ktуry zacz№і rozrabiaж, wiкc postanowiі zmieniж w nim baterie. Jak tylko to zrobiі, detektor coњ wykryі i proszк, artefakt praktycznie sam wpadі mu w rкce. Miaі gnojek szczкњcie, co? Taka jest Zona: czasami karze, a czasami nagradza.</text>
+	</string>
+	<string id="dm_anomalies_20">
+		<text>Doњwiadczeni stalkerzy mуwi№, їe czasami artefakty oddalaj№ siк od anomalii. Detektor zaczyna robiж „piip", wyci№gasz go, ale nic nie znajdujesz. To znaczy, їe wіaњnie min№і ciк artefakt wкdrowny. Nie ma jednak sensu za nim pкdziж, bo to Zona decyduje, kogo nim nagrodziж.</text>
+	</string>
+	<string id="dm_anomalies_21">
+		<text>Nikt jeszcze nie szukaі artefaktуw w Prypeci. Їaden z ludzi, ktуrych znam, nie byі tam dіuїej niї chwilк, wiкc zachowaj ostroїnoњж.</text>
+	</string>
+	<string id="dm_anomalies_22">
+		<text>Nie wiem, czy ktokolwiek zna dobre miejsca. Prypeж jest jeszcze sіabo zbadana.</text>
+	</string>
+	<string id="dm_anomalies_23">
+		<text>Proponujк poszukaж w podziemnych tunelach. Mуwi№, їe jest ich mnуstwo pod miastem.</text>
+	</string>
+	<string id="dm_anomalies_24">
+		<text>Niewiele wiadomo o tych okolicach. Tyle, co z opowiadaс Garriego. Twierdzi, їe jest pewne miejsce, gdzie z kwasowej anomalii wyrasta olbrzymia winoroњl, wysoka na dziesiкж piкter. Pewnie nas nabiera, ale moїe warto na wszelki wypadek sprawdziж tк winoroњl pod k№tem artefaktуw.</text>
+	</string>
+	<string id="dm_anomalies_3">
+		<text>Najpewniejsze miejsce to kwasowe bagno. Peіno w nim anomalii grawitacyjnych, ale іatwo je zauwaїyж. Wystarczy patrzeж uwaїnie na powierzchniк wody i nie moїna siк pomyliж. Anomalie gazowe to trochк wiкkszy problem, bo praktycznie nie ma tam czym oddychaж. Dostaж tak№ to nie przelewki, moїesz mi wierzyж. Potrafi przeїreж na wylot kamizelkк szybciej niї kwas siarkowy.</text>
+	</string>
+	<string id="dm_anomalies_5">
+		<text>Sporo anomalii termicznych jest w spalonym gospodarstwie na wzgуrzu. Ludzie znajduj№ tam artefakty. Szukaj w domach: w tych, w ktуrych po emisji jest najwiкcej anomalii, bкd№ artefakty.</text>
+	</string>
+	<string id="dm_anomalies_6">
+		<text>Prawdopodobnie jest ich sporo w jaskiniach pod spalonym gospodarstwem. Jeњli pуjdziesz tam z detektorem, nie przestanie pikaж. Dostaж siк do nich to nie problem - po prostu wskocz od gуry. Gorzej jest siк wydostaж z tymi wszystkimi anomaliami na dole. Gіуwnie wirami i kwasem. Niektуrzy twierdz№, їe widzieli w szczelinie coњ przypominaj№cego kometк. Caіa gama niebezpieczeсstw, bez dwуch zdaс, ale to prawdopodobnie oznacza rуwnieї caі№ gamк artefaktуw.</text>
+	</string>
+	<string id="dm_anomalies_7">
+		<text>Wiesz, co to za anomalia, Cyrk? To olbrzymia trampolina z dwiema okr№їaj№cymi j№ kometami - niezіy widok do podziwiania. Podziwiaj jednak z daleka, bo Cyrk, z mnуstwem anomalii termicznych, jest gor№cy jak diabli. Ma teї sporo artefaktуw, ale s№ one chronione przez paskudnego poltergeista, ktуry sprуbuje ciк usmaїyж, jak tylko siк zbliїysz.</text>
+	</string>
+	<string id="dm_anomalies_9">
+		<text>Jeњli interesujesz siк artefaktami grawitacyjnymi, poszukaj ich w anomalii zwanej Kіem. Јatwo to miejsce zauwaїyж - anomalie zrobiіy swoje i oderwaіy poіowк wzgуrza. Otworzyіo siк tam kilka jaskiс, w ktуrych od razu zamieszkaіy snorki. Na szczкњcie rzadko wychodz№ na zewn№trz.</text>
+	</string>
+	<string id="dm_anomalies_do_not_know_1">
+		<text>W Zonie, czіowieku, w Zonie. Wystarczy siк nie poddawaж.</text>
+	</string>
+	<string id="dm_anomalies_do_not_know_2">
+		<text>Њwietne pytanie. Daj znaж, jak poznasz odpowiedџ!</text>
+	</string>
+	<string id="dm_anomalies_do_not_know_3">
+		<text>Gdzie, kiedy, dlaczego... Pamiкtaj: jak znajdziesz їyік zіota, zachowaj j№ dla siebie.</text>
+	</string>
+	<string id="dm_anomalies_general">
+		<text>Gdzie mogк znaleџж artefakty?</text>
+	</string>
+	<string id="dm_anomalies_no_more_1">
+		<text>Nie bкdк dwa razy powtarzaж.</text>
+	</string>
+	<string id="dm_anomalies_no_more_2">
+		<text>Nie, nic wiкcej juї nie wiem.</text>
+	</string>
+	<string id="dm_anomalies_no_more_3">
+		<text>To wszystko, co wiem. Zapytaj kogoњ innego.</text>
+	</string>
+	<string id="dm_hello_0">
+		<text>Co tam, bracie?</text>
+	</string>
+	<string id="dm_hello_1">
+		<text>Witaj.</text>
+	</string>
+	<string id="dm_hello_10">
+		<text>Witaj, stalkerze.</text>
+	</string>
+	<string id="dm_hello_11">
+		<text>Witaj.</text>
+	</string>
+	<string id="dm_hello_12">
+		<text>Czego chcesz?</text>
+	</string>
+	<string id="dm_hello_13">
+		<text>Co?</text>
+	</string>
+	<string id="dm_hello_14">
+		<text>Gadaj.</text>
+	</string>
+	<string id="dm_hello_15">
+		<text>Dzieс dobry, majorze!</text>
+	</string>
+	<string id="dm_hello_16">
+		<text>Dzieс dobry!</text>
+	</string>
+	<string id="dm_hello_17">
+		<text>Sіucham, majorze.</text>
+	</string>
+	<string id="dm_hello_2">
+		<text>No czeњж.</text>
+	</string>
+	<string id="dm_hello_3">
+		<text>Co?</text>
+	</string>
+	<string id="dm_hello_4">
+		<text>We wіasnej osobie.</text>
+	</string>
+	<string id="dm_hello_5">
+		<text>Hej, stalkerze. Gdzie siк spieszysz?</text>
+	</string>
+	<string id="dm_hello_6">
+		<text>Co tam?</text>
+	</string>
+	<string id="dm_hello_7">
+		<text>Co tam, brachu?</text>
+	</string>
+	<string id="dm_hello_8">
+		<text>Och, hej, stary.</text>
+	</string>
+	<string id="dm_hello_9">
+		<text>Siemano.</text>
+	</string>
+	<string id="dm_hello_general">
+		<text>Hej!</text>
+	</string>
+	<string id="dm_help_0">
+		<text>Pomуї mi, bracie!</text>
+	</string>
+	<string id="dm_help_1">
+		<text>Uratuj mnie, bracie, ja umieram...</text>
+	</string>
+	<string id="dm_help_10">
+		<text>Potrzebujк pomocy medycznej!</text>
+	</string>
+	<string id="dm_help_11">
+		<text>Apteczkк!... Szybko!</text>
+	</string>
+	<string id="dm_help_2">
+		<text>Pomуї mi, przyjacielu... Aaa, co za bуl!</text>
+	</string>
+	<string id="dm_help_3">
+		<text>Dajcie mi apteczkк... apteczkк, szybko...</text>
+	</string>
+	<string id="dm_help_4">
+		<text>Stary... argh... dalej, pomуї mi!</text>
+	</string>
+	<string id="dm_help_5">
+		<text>Hej, potrzebujк apteczki... szybko...</text>
+	</string>
+	<string id="dm_help_6">
+		<text>Pomуї mi, stalkerze... apteczka, proszк...</text>
+	</string>
+	<string id="dm_help_7">
+		<text>Jestem ranny... pomocy!</text>
+	</string>
+	<string id="dm_help_8">
+		<text>Potrzebujк apteczki!</text>
+	</string>
+	<string id="dm_help_9">
+		<text>Apteczka!</text>
+	</string>
+	<string id="dm_information_1">
+		<text>Kojarzysz pogікbiarkк na wschуd od Skadowska? Mуwi№, їe w nocy њwieci tam coњ dziwnego... Zbyt dziwnego, nawet jak na Zonк. Naprawdк nie wiem, czy warto to sprawdzaж. Moїe siк okazaж, їe to coњ wartoњciowego, ale czy warto dla tego ryzykowaж wіasnym tyіkiem? Oto jest pytanie...</text>
+	</string>
+	<string id="dm_information_10">
+		<text>Nic tu nie ma poza starymi, zniszczaіymi rupieciami. Weџmy na przykіad ten rozklekotany konwуj na moњcie Przemienienia Paсskiego - jest kompletnie zardzewiaіy. Most teї. Wielu chкtnie by w tym miejscu poszperaіo, gdyby nie snorki i anomalie...</text>
+	</string>
+	<string id="dm_information_11">
+		<text>Wiesz, їe Suіtan planowaі przej№ж interes Brodacza? Skadowsk jest za maіy, їeby pomieњciж jego chciwy tyіek, wiкc postanowiі ugryџж jeszcze wiкkszy kawaіek tortu... Ale powiedzieliњmy mu „nie ma mowy, Josй!" Brodacz i reszta naszych chіopakуw sprawili im niezіe piekіo. Suіtan i jego bandyckie plany nie maj№ tu szans powodzenia.</text>
+	</string>
+	<string id="dm_information_12">
+		<text>Wiesz, їe ta szuja, Suіtan, przycisn№і Brodacza? Nie wiem dokіadnie, co zrobiі, ale wygl№da na to, їe nieџle siк z Brodaczem rozprawiі! Co siк dzieje z t№ Zon№? Jeњli tak dalej pуjdzie, ani siк obejrzymy, jak Skadowsk stanie siк baz№ dla bandytуw!</text>
+	</string>
+	<string id="dm_information_13">
+		<text>Wiesz coњ o Oazie? Mуwi№, їe to miejsce, ktуre bardzo ciкїko znaleџж, a gdy juї wiesz, gdzie jest, jeszcze ciкїej siк do niego dostaж. Podobno jest tam jezioro. Wystarczy do niego wejњж, a natychmiast min№ ci wszystkie dolegliwoњci i zagoj№ siк rany. Ach, prуїno gadaж. Widzisz, ilu niedoњwiadczonych stalkerуw przychodzi tutaj, do centrum Zony? Dla niektуrych celem jest polowanie na artefakty, inni s№ po prostu ciekawi, ale wiкkszoњж ma nadziejк znaleџж Oazк. Plotka mуwi, їe jest ukryta gdzieњ w pobliїu...</text>
+	</string>
+	<string id="dm_information_14">
+		<text>Podobno Zona ma wkrуtce znikn№ж... Ktoњ znalazі Oazк i zabraі z niej artefakt - Serce Oazy. Teraz Zona przeniesie siк w inny wymiar i їaden ze stalkerуw nie bкdzie mуgі siк z niej wydostaж... Spoko, tylko їartujк. Znaleziono jednak jakiњ nowy rodzaj artefaktu. Naukowcy wіaњnie majstruj№ przy nim w swoim bunkrze.</text>
+	</string>
+	<string id="dm_information_15">
+		<text>Kojarzysz Topola? Znalazі dla swoich ludzi jakieњ nowe zadupie do pozwiedzania i oczywiњcie poszli tam z radoњci№. Ich eskapady skoсczyіy siк tym, їe kontroler przesmaїyі im mуzgi. Sikaliby teraz pod siebie w bunkrach szpitalnych, gdyby nie byіo tam z nimi pewnego stalkera. Gdy Topol doszedі do siebie po tej caіej zombifikacji, stalker kucaі koіo kontrolera i obcinaі mu uszy.</text>
+	</string>
+	<string id="dm_information_16">
+		<text>Wiesz coњ o wiosce Kopaczi? Gdy wydarzyіa siк pierwsza katastrofa elektrowni w Czarnobylu, ten obszar ucierpiaі tak bardzo, їe postanowiono zasypaж caі№ wioskк. Nic tam teraz nie ma oprуcz maіych, radioaktywnych haіd w miejscu domуw. Mуwi№, їe byіo tam upiornie nawet przed katastrof№. Strach pomyњleж, co moїna tam teraz znaleџж. Nikt nie jest doњж odwaїny, їeby to sprawdziж. Ale co jeњli siк myl№? Teraz to moїe byж kopalnia artefaktуw!</text>
+	</string>
+	<string id="dm_information_17">
+		<text>Jest tylko dwуch stalkerуw w Janowie, ktуrzy s№ w stanie wyczuж zbliїaj№c№ siк emisjк. Kostopraw, nasz medyk, i Zulus, byіy czіonek Powinnoњci. Sіowo 'byіy' to niedawna zmiana... Gdy Powinnoњж przybyіa do Janowa, bojownicy Wolnoњci juї tu byli. Јatwo zgadn№ж, їe sprawy szybko przybraіy paskudny obrуt. Obie frakcje poniosіy duїe straty. Kilku niezaleїnych stalkerуw dostaіo nawet zabі№kan№ kul№. Wtedy Zulus powiedziaі im, їe nadchodzi emisja. Nie maj№c wyboru, Powinnoњж i Wolnoњж ogіosiіy rozejm i okopaіy siк na stacji. Kiedy byіo po wszystkim, Zulus odszedі z Powinnoњci i zamieszkaі w wieїy niedaleko stacji.</text>
+	</string>
+	<string id="dm_information_18">
+		<text>Peіno jest dziwnych historii... Nie naleїy we wszystkie wierzyж. W dzisiejszych czasach w Zonie roi siк od bajarzy. Dziwne jednak, їe kilku stalkerуw ze stacji Janуw twierdzi, їe widziaіo UFO. Mуwi№, їe wygl№daіo jak czarny spodek o њrednicy okoіo 5 metrуw. Inni twierdz№, їe z daleka wygl№daіo jak samolot, ale nie s№ pewni, co to byіo. Niezaprzeczalny fakt jest taki, їe jeden z naocznych њwiadkуw jest byіym pilotem i mуwi, їe nigdy w їyciu czegoњ takiego nie widziaі.</text>
+	</string>
+	<string id="dm_information_2">
+		<text>Ostatnio nic tylko zіe wieњci. Dobrzy ludzie znikaj№ jeden po drugim, a potem znajdujemy ich ciaіa bez nawet kropli krwi. To na pewno te cholerne pijawki, bo kto inny? Ooch, marzк, їeby znaleџж ich legowisko i napakowaж te szmaty oіowiem! Niedіugo bкdziemy parami chodziж do kibla, zobaczysz. Samotni stalkerzy, cholera jasna.</text>
+	</string>
+	<string id="dm_information_20">
+		<text>Mam dla ciebie coњ nowego. Goњcie z Wolnoњci poіoїyli іapк na PDA legendarnego zaіoїyciela frakcji Powinnoњж. I wiesz co? Okazaіo siк, їe oszukaі swoich ludzi, mуwi№c im, їe dowуdztwo armii zostawiіo ich w Zonie. Wymyњliі to tylko po to, їeby stworzyж wіasn№ frakcjк! Jednak w Zonie taka њciema nie przejdzie. Niedіugo potem, nasz bohater skoсczyі w B№blu przestrzennym. Tak siк losy tocz№... Pomyњleж, їe rozwaїaіem wst№pienie do Powinnoњci! A tam, niech wygіaszaj№ swoje patetyczne bzdury beze mnie.</text>
+	</string>
+	<string id="dm_information_21">
+		<text>Ta nowa zaіoga Powinnoњci... Wіaњciwie pojawili siк znik№d. Tylko pomyњl: grupa bojownikуw Powinnoњci opuszcza Janуw i powraca w trzy razy wiкkszym skіadzie. Klonuj№ siк, czy co? W sumie moїna by siк tego spodziewaж po Powinnoњci. Moїna ich odrуїniж tylko po rangach!</text>
+	</string>
+	<string id="dm_information_22">
+		<text>Ta nowa zaіoga Wolnoњci... Wіaњciwie pojawili siк znik№d. Tylko pomyњl: grupa bojownikуw Wolnoњci opuszcza Janуw i powraca w trzy razy wiкkszym skіadzie. Wiem! Rozmnaїaj№ siк przez p№czkowanie! Moїna by tak pomyњleж, nie? Pal№ tyle trawy, їe niedіugo wypuszcz№ korzonki i zaczn№ siк rozmnaїaж wegetatywnie!</text>
+	</string>
+	<string id="dm_information_23">
+		<text>Znasz Gontк i jego chіopakуw? Trochк ostatnio mieli pecha. Daniіa znikn№і, a Krab zostaі ranny. Teraz juї chyba idzie im lepiej. Dobrze siк dogadali z naukowcami i robi№ dla nich pomiary. Nieџle, co? Ciepіa posadka i duїy krok w stronк oficjalnych przepustek.</text>
+	</string>
+	<string id="dm_information_24">
+		<text>Znasz takich stalkerуw jak Mitaj, Torba i Grizli? Podobno znaleџli robotк u naukowcуw i robi№ dla nich pomiary. O co tu do diabіa chodzi? Moim zdaniem jajogіowi nie planuj№ nic dobrego, ale przynajmniej chіopaki s№ teraz w niezіej sytuacji. Moїe kiedyњ nawet dostan№ oficjalne przepustki.</text>
+	</string>
+	<string id="dm_information_25">
+		<text>Znasz Spartakusa i jego ekipк? Juї ich w Skadowsku nie zobaczysz - ochraniaj№ teraz bunkier naukowcуw. W sumie, czemu nie - potrafi№ poradziж sobie z mutantami i wiedz№, jak odstraszyж bandytуw. Nauka to szlachetne zajкcie, do ktуrego potrzebne s№ cisza i spokуj.</text>
+	</string>
+	<string id="dm_information_26">
+		<text>Kojarzysz najemnikуw, ktуrzy utknкli na stacji? Ostatnio zniknкli. Wyruszyli do Jupitera, by ochraniaж bunkier naukowcуw. Przed nimi inni najemnicy strzegli tego miejsca, ale podobno coњ im siк staіo. Nie za dobra tendencja, moim zdaniem! Najemnicy znikaj№, inni ich zastкpuj№, i tak w kуіko... Jeszcze kilka takich rund i na Zatonie w ogуle nie bкdzie najemnikуw.</text>
+	</string>
+	<string id="dm_information_27">
+		<text>Ludzie mуwi№, їe bunkier naukowcуw jest teraz ochraniany przez mкїnych wojownikуw Powinnoњci... Ciekawe, co bкd№ z tego mieli. Naprawdк wierz№, їe ci 'ologowie' dadz№ im w rewanїu nowiuteсki karabin plazmowy, їeby mogli sobie popolowaж na chomiki? Teї mi ochroniarze.</text>
+	</string>
+	<string id="dm_information_28">
+		<text>Mуwi№, їe bunkier naukowcуw jest teraz ochraniany przez Wolnoњж. Czy ci naukowcy siк nie boj№, їe ich obiekty doњwiadczalne pуjd№ z dymem? I to dosіownie. Ma to teї swoje dobre strony. Jeњli ktoњ sprуbuje zaatakowaж bunkier, bкdzie musiaі siк najpierw przedrzeж przez zasіonк dymn№! Ha ha ha!</text>
+	</string>
+	<string id="dm_information_29">
+		<text>Wiesz, gdzie jest fabryka radioelektroniczna Jupiter? Straszne miejsce. Nikt tak naprawdк nie wie, co tam siк dzieje. Anomalie i mutanty s№ takie same jak wszкdzie... Ale jakoњ nie mam ochoty siк tam wybraж. Czujк, їe to miejsce oznacza kіopoty.</text>
+	</string>
+	<string id="dm_information_3">
+		<text>Hej, czy to tobie zawdziкczam zdemaskowanie skadowskiego medyka? Doceniam to, naprawdк. Nie wiadomo, kto byіby jego nastкpnym pacjentem... Wszyscy myњleliњmy, їe to sprawka potworуw, ale, jak widaж, niektуrzy ludzie mog№ byж rуwnie џli. Czіowiek czіowiekowi wilkiem, prawda?</text>
+	</string>
+	<string id="dm_information_30">
+		<text>Kto tu kogo powinien pytaж? Po twoim wejњciu do tuneli pod Jupiterem sіyszeliњmy plotki, їe udaіo ci siк dotrzeж aї do centrum Zony. Powstaіo niezіe zamieszanie. Z tuzin ludzi chciaіo pуjњж za twoim przykіadem. Azot ich uspokoiі - powiedziaі, їe bramy tunelu siк zatrzasnкіy i nie moїe nic zrobiж, їeby je otworzyж. Oczywiњcie znalazіo siк kilku szaleсcуw, ktуrzy chcieli wysadziж bramк, ale ci№gle kombinuj№, sk№d wzi№ж wystarczaj№c№ iloњж dynamitu i jak wіaњciwie bкd№ oddychaж, kiedy juї tam wejd№.</text>
+	</string>
+	<string id="dm_information_31">
+		<text>Znasz ostatnie wieњci o Garrim? To ten stalker, ktуry pracowaі dla naukowcуw. Juї nie przekracza granicy nielegalnie - dostaі oficjaln№ przepustkк do Zony, uwierzysz? Myњlisz sobie, їe powinien byі zabraж swуj іup i wrуciж do domu? Cуї, zamiast tego ten wariat wybraі siк do Prypeci. Wszyscy myњleli, їe przepadі na dobre, tak jak reszta, ale gdzie tam. Udaіo mu siк, ale jego wyczyn niewiele daі stalkerom. Wpadі na jakichњ wojskowych. Teraz Garri jest w dobrych stosunkach z їoіnierzami, ma przepustkк i w ogуle, ale ten rejon jest ci№gle niedostкpny dla zwykіych stalkerуw.</text>
+	</string>
+	<string id="dm_information_32">
+		<text>No cуї... Wolnoњж i Powinnoњж znowu walcz№, tym razem o jakiњ powaїny schowek. Mуwi№, їe jest tam doњж broni, by wyposaїyж trzy dywizje piechoty. Nie wiadomo, kto to wszystko w ogуle schowaі, ale ich ostateczne stracie to byіo naprawdк coњ. Poruszyіo wszystkich stalkerуw w Janowie, ktуrzy na szczкњcie sobie odpuњcili, bo mielibyњmy kolejn№ zadymк, kaїdy na kaїdego. Wydaje mi siк, їe Powinnoњж oberwaіa najbardziej, bo teraz teren jest chroniony przez oddziaіy Wolnoњci.</text>
+	</string>
+	<string id="dm_information_33">
+		<text>No cуї... Powinnoњж i Wolnoњж znowu walcz№, tym razem o jakiњ powaїny schowek. Mуwi№, їe jest tam doњж broni, by wyposaїyж trzy dywizje piechoty. Nie wiadomo, kto to wszystko w ogуle schowaі, ale ich ostateczne stracie to byіo naprawdк coњ. Poruszyіo wszystkich stalkerуw w Janowie, ktуrzy na szczкњcie sobie odpuњcili, bo mielibyњmy kolejn№ zadymк kaїdy na kaїdego. Wydaje mi siк, їe Wolnoњж oberwaіa najbardziej, bo teraz teren jest chroniony przez oddziaіy Powinnoњci.</text>
+	</string>
+	<string id="dm_information_34">
+		<text>Coњ siк ostatnio wydarzyіo. Grupa stalkerуw przeszukiwaіa tunele pod Jupiterem i wpadіa na coњ - to znaczy na kogoњ. Najpierw spluwy wyleciaіy im z r№k, a pуџniej wszystkie њmieci zaczкіy lecieж w ich kierunku. Nie mieli pojкcia, co siк tak wіaњciwie staіo, ale stracili tam dwуch chіopakуw.</text>
+	</string>
+	<string id="dm_information_35">
+		<text>Podobno znaleџli jakiegoњ zasranego mutanta w tunelach na pуіnoc od Jupitera. Traper wysіaі tam stalkera, їeby to sprawdziі. Okazaіo siк, їe byіo tam kiedyњ legowisko burerуw. Dlaczego „byіo”? Bo ten stalker wymiуtі wszystkich. Sam... Nawet pasujesz do jego opisu, tylko tamten jest wyїszy i zawsze nosi ze sob№ granatnik.</text>
+	</string>
+	<string id="dm_information_36">
+		<text>Juї po stalkerach... Potwory wyіaї№ z Mokradeі. Stalkerzy z cementowni widzieli je, jak wlokіy jednego z naszych. Byіo ich co najmniej tuzin, ogromne sukinsyny, aї trudno uwierzyж. Wygl№daіy jak pijawki, tylko dwa razy wiкksze i duїo szybsze. Modlimy siк, їeby Traper wymyњliі, jak sobie poradziж z tymi bestiami...</text>
+	</string>
+	<string id="dm_information_37">
+		<text>Wiesz coњ o bagiennych pijawkach? Tych z Mokradeі? Juї ich nie ma. Traper siк do nich dobraі... Nie osobiњcie - wynaj№і kilku stalkerуw. Mуwi№, їe zebraі ekipк okoіo dziesiкciu ludzi, ktуrzy przeczesali te bagna wzdіuї i wszerz, a wszystko, co wyskoczyіo, wysіali na tamten њwiat. Nawet їab juї tam nie ma.</text>
+	</string>
+	<string id="dm_information_38">
+		<text>Niedіugo po tym, jak rozeszіa siк wieњж o chimerze, ktoњ j№ rozwaliі. Mutanty zabijaіy stalkerуw tuzinami, ale chyba siк wreszcie wycwaniliњmy i odwracamy tк tendencjк. Wiadomo mi teї z innych џrуdeі, їe goњж byі doњwiadczonym іowc№, ktуry zabiі w їyciu wiкcej potworуw niї my razem komarуw.</text>
+	</string>
+	<string id="dm_information_39">
+		<text>Wiesz, jakich ludzi Wolnoњж teraz rekrutuje? Byі jeden goњж zwany Flintem. Chwaliі siк swoimi wyprawami na prawo i lewo... cуї, okazaіo siк, їe byі niezіym њmieciem. Daі kumplowi umrzeж w anomalii, zabraі іup i odszedі. Pуџniej dowiedziano siк wiкcej o jego wyczynach na Zatonie, gdzie praktycznie nakarmiі chimerк grup№ іowcуw. Kiedyњ moje zdanie o Wolnoњci byіo lepsze. Kurna, juї lepiej nie naleїeж do їadnej frakcji, niї mieж takich przyjaciуі.</text>
+	</string>
+	<string id="dm_information_4">
+		<text>Zabili tк chimerк z Zatonu. Ekipa Gonty razem z nieznanym stalkerem. Czekaj, to chyba ty, prawda? Mogк liczyж na relacjк z pierwszej rкki? Stokrotne dziкki. Przy okazji jest o jednego mutanta mniej!</text>
+	</string>
+	<string id="dm_information_40">
+		<text>Nie wiem, czy warto o tym gadaж, ale mamy tu tego goњcia, Noego, najbardziej zakrкcony њwir, jakiego w zobaczysz w їyciu. Ma paskudn№ barkк, ktуra wygl№da, jakby mu j№ paru ludzi zbudowaіo w tydzieс na lewo. Uwaїaj na niego, bo najpierw strzela, a pуџniej nawet nie zawraca sobie gіowy zadawaniem pytaс. Moim zdaniem - w cholerк z takim dupkiem.</text>
+	</string>
+	<string id="dm_information_41">
+		<text>Kojarzysz Їwawego? Podstкpny goњж. Sprzedaje najlepsze spluwy w okolicy, bez dwуch zdaс. Ciekawe, jak je przemyca. Jak moїna przenieњж Wintara, їeby nie byіo widaж, їe to robisz? Gdzie go sobie wetkniesz? To jakieњ cholerne czary.</text>
+	</string>
+	<string id="dm_information_42">
+		<text>Chodzi plotka, їe Suіtan wdepn№і w jakieњ niezіe gуwno. Chciaі zniszczyж Brodacza i przej№ж jego interes, ugryzі jednak wiкcej, niї jest w stanie przeїuж. Zamiast tego dostaі w pysk. Ma przed sob№ trudne czasy, bo jego ekipa przygl№da mu siк ze wszystkich stron. Juї siк tak nie liczy jak kiedyњ.</text>
+	</string>
+	<string id="dm_information_43">
+		<text>Mуwi№, ze Suіtan trzyma Brodacza w garњci i wykorzystuje jego interes. Њwietna sprawa. Suіtan duїo bardziej siк teraz liczy. A najlepsze w tym wszystkim jest to, їe teraz moїemy rz№dziж Skadowskiem po swojemu. Bкdzie piкknie. Szukasz schronienia przed emisj№? Nie ma sprawy, wystarczy zapіaciж!</text>
+	</string>
+	<string id="dm_information_44">
+		<text>Hej, wiesz coњ o Oazie? Tylko sobie wyobraџ, miejsce, ktуre natychmiast leczy wszystkie bуle i choroby. To na pewno jakaњ magiczna sztuczka... Ja mam jednak jeszcze inny pomysі. Tyle jest zamieszania wokуі tej Oazy, a nikt juї nie mуwi o Speіniaczu Їyczeс. Moїe Oaza to po prostu czyjeњ speіnione їyczenie?</text>
+	</string>
+	<string id="dm_information_45">
+		<text>Jajogіowi gadaj№ o jakimњ artefakcie przywleczonym z Oazy. Ale sіuchaj tego: jak go przestudiuj№, wykorzystaj№ wyniki swoich badaс, їeby wymyњliж lekarstwo na raka! Powaga!</text>
+	</string>
+	<string id="dm_information_46">
+		<text>Codziennie to samo gуwno... Wszyscy wykopuj№ stare historie na temat centrum Zony. Na przykіad tк o Oazie - miejscu, ktуre natychmiastowo przywraca ci energiк i leczy rany. To bujda w czystej postaci, ale przyjemnie siк jej sіucha. Szczegуlnie jak gdybaj№, gdzie znaleџж to miejsce. Och, fajnie by byіo, gdyby istniaіo naprawdк... Uratowalibyњmy tylu chіopakуw.</text>
+	</string>
+	<string id="dm_information_47">
+		<text>Plotka gіosi, їe odnaleziono Oazк. Kto by przypuszczaі, їe naprawdк istnieje. Z faktami jednak nie moїna polemizowaж. Znaleziono tam jakiњ artefakt. Naukowcy badaj№ go w tej chwili. Byж moїe bкd№ mogli go wykorzystaж, aby stworzyж jakieњ superszybkie lekarstwo... Przydaіoby siк naszym chіopakom.</text>
+	</string>
+	<string id="dm_information_48">
+		<text>Kopaczi. W Zonie to nic nowego, ale dla mnie to nowoњж. Wyobraџ sobie tylko - caіa wioska z domami zakopanymi pod ziemi№ aї po dachy... Wszystko z roku 1986... Domy emitowaіy tyle promieniowania, їe musieli je zasypaж. Okropny widok...</text>
+	</string>
+	<string id="dm_information_49">
+		<text>Znasz tк historiк, jak razem z Powinnoњci№ musieliњmy stacjonowaж w Janowie? To wszystko przez Zulusa. Wtedy byі w Powinnoњci. Jak nikt inny potrafiі wyczuж zbliїaj№c№ siк emisjк... Ale my przybyliњmy do Janowa pierwsi, po stalkerach, oczywiњcie. Nie mieliњmy nawet czasu zapaliж fajki, gdy siк zjawili ci niewydarzeni szeregowcy, wymachuj№c spluwami. Ostatni raz taka rzeџ miaіa miejsce ponad rok temu na Wysypisku. Mnуstwo ludzi zginкіo po obu stronach. W tym nasz specjalista od emisji, њwieж Panie nad jego dusz№. I wtedy Zulus zacz№і krzyczeж „Emisja siк zbliїa! Kryж siк!" Co mieliњmy robiж? Wywaliж ich i pozwoliж umrzeж? Powinnoњж czy nie, to ci№gle ludzie. Tak wіaњnie їyjemy: kіуcimy siк, kiedy jest cicho, a gdy przychodzi emisja, siedzimy razem, jedni obok drugich. Zulus ostatecznie opuњciі Powinnoњж. Zostaі pustelnikiem i mieszka niedaleko Janowa.</text>
+	</string>
+	<string id="dm_information_5">
+		<text>Ani to nowoњж, ani їaden sekret, ale Kardan, technik, wkrуtce zapije siк na њmierж. Mуwi№, їe zacz№і spokojnie, gdy przybyі do Skadowska. Piі tylko okazjonalnie i dla ochrony przed promieniowaniem. Dopiero pуџniej zacz№і siк zalewaж w trupa, ogarniкty їalem po њmierci dwojga przyjaciуі. Musieli byж mu bardzo bliscy.</text>
+	</string>
+	<string id="dm_information_50">
+		<text>Њmieszna historia. Byі jeden goњж, ktуry opowiadaі, їe widziaі UFO lataj№ce nad Janowem. Zona potrafi doprowadziж ludzi do wariactwa, nie? Poltergeisty i kontrolerzy to jeszcze dla nich za maіo. Nie mog№ siк obejњж bez starych, dobrych opowieњci o UFO. Cуї, przynajmniej nie mamy їadnych psychicznych dziwakуw, wyganiaj№cych zіe duchy z wуdki. Wyobraџ sobie takiego: „O Panie, przegnaj zіe duchy! Zostaw tylko czysty spirytus sanctus!"... Ha ha.</text>
+	</string>
+	<string id="dm_information_51">
+		<text>Wiesz coњ o wiosce Kopaczi? Gdy wydarzyіa siк pierwsza katastrofa elektrowni w Czarnobylu, ten obszar ucierpiaі tak bardzo, їe postanowiono zasypaж caі№ wioskк. Nic tam teraz nie ma oprуcz maіych, radioaktywnych haіd w miejscu domуw. Mуwi№, їe byіo tam upiornie nawet przed katastrof№. Strach pomyњleж, co moїna tam teraz znaleџж. Nikt nie ma doњж odwagi, їeby to sprawdziж.</text>
+	</string>
+	<string id="dm_information_52">
+		<text>To їadna nowina, ale moїe o tym nie wiesz. Nie wskoczyliњmy do jednego іуїka z Wolnoњci№, bo lubimy siк przytulaж. Wszystkiemu winne s№ okolicznoњci. Kiedy tu przybyliњmy, Wolnoњж napadіa na nas znienacka... Straty byіy ogromne po obu stronach, chociaї powoli zdobywaliњmy przewagк nad anarchistami. Gdy walka trwaіa w najlepsze, Zulus wyczuі zbliїaj№c№ siк emisjк. On siк nigdy nie myli. Nie mieliњmy wyjњcia. Musieliњmy przerwaж walkк. Nie rozumiem jednak, dlaczego Zulus opuњciі Powinnoњж po tym incydencie.</text>
+	</string>
+	<string id="dm_information_53">
+		<text>Nasi zwiadowcy donieњli o niezidentyfikowanym obiekcie lataj№cym nad stacj№ w Janowie. Innymi sіowy, o UFO. Zanim zaczniesz zadawaж gіupie pytania, UFO to nie jakiњ tam lataj№cy spodek z Marsjanami na pokіadzie. To moїe byж cokolwiek, od kawaіka tektury do sondy meteorologicznej, o ile naoczni њwiadkowie nie s№ w stanie tego zidentyfikowaж. Kapujesz?</text>
+	</string>
+	<string id="dm_information_54">
+		<text>Dostarczenie Lokiemu PDA to twoja sprawka, prawda? Czіowieku, po prostu bomba. Legendarny zaіoїyciel Powinnoњci, generaі Taczenko, wrobiі swoich їoіnierzy jak jakichњ frajerуw. Zepsuі radio, їeby nie moїna byіo siк z nimi skontaktowaж, i zaіoїyі wіasn№ bandк sіuchaj№cych go idiotуw... tylko po to, їeby zejњж w prawdziwie kretyсski sposуb w jakimњ pieprzonym B№blu przestrzennym! Samemu by siк takiej historii nie wymyњliіo!</text>
+	</string>
+	<string id="dm_information_55">
+		<text>Widzisz, jakich nowych ludzi ci niewydarzeni їoіnierze znaleџli sobie do ekipy? Na pewno nie s№ to posiіki z bazy - ideologia jeszcze nie do koсca zast№piіa zdrowy rozsadek. S№ jednak zbyt dobrze wyszkoleni jak na zwykіych stalkerуw. Kto to, do diabіa, moїe wiedzieж? Moїe s№ z Monolitu? Wiem, їe to brzmi wariacko!</text>
+	</string>
+	<string id="dm_information_56">
+		<text>Widzisz, jakich mamy nowych wojownikуw? Ach, to twoja sprawka, prawda? Naprawdк rz№dzisz. S№ caіkiem nieџli, chociaї trochк spiкci... Spoko, kilka miesiкcy z nami oczyњci im umysіy. Zaczn№ їyж naszym trybem i wkrуtce stan№ siк tacy jak my.</text>
+	</string>
+	<string id="dm_information_57">
+		<text>Mamy kilku nowych, њwietnych rekrutуw: ekipa byіych bojownikуw Monolitu. To nie s№ jakieњ їуіtodzioby, tylko wyszkoleni wojownicy. Oczywiњcie maj№ trochк poprzestawiane w gіowach po opuszczeniu Monolitu, ale to nie szkodzi, mamy na tк okazjк specjalne, intensywne szkolenia z podstaw Ideologii i nie tylko.</text>
+	</string>
+	<string id="dm_information_58">
+		<text>Mуwi№, їe Wolnoњж zwerbowaіa kilku byіych wojownikуw Monolitu. Ciкїko w to uwierzyж, ale rzeczywiњcie maj№ now№ ekipк, ktуra na pewno nie przyjechaіa z zewn№trz Zony. Chyba s№ nieџle zdesperowani... albo mуzgi juї im kompletnie zanikіy od tych wszystkich narkotykуw. Kogo zrekrutuj№ w nastкpnej kolejnoњci? Brygadк zombiakуw? A moїe batalion burerуw?</text>
+	</string>
+	<string id="dm_information_59">
+		<text>Wkrуtce w tej okolicy znуw zapanuje prawo i porz№dek. Powinnoњж przejкіa kontrolк nad kluczowymi pozycjami w regionie. Zapewniliњmy stabiln№ sytuacjк w Janowie i sprawujemy staі№ ochronк nad bunkrem naukowcуw. Czas juї, by Wolnoњж spakowaіa manatki i wyniosіa siк st№d - anarchiњci nie s№ tu mile widziani.</text>
+	</string>
+	<string id="dm_information_6">
+		<text>Najnowszy cud њwiata - trzeџwy Kardan. Potrafisz sobie wyobraziж, їe w ogуle nie pije? Ludzie ze Skadowska pytali go, czy znalazі numer na telefon zaufania, na co odpowiedziaі, їe jedyny numer, jakiego potrzebuje, to szeњжdziesi№t dwa.</text>
+	</string>
+	<string id="dm_information_60">
+		<text>Wdaje mi siк, їe to dziкki tobie nasi dostali tк robotк przy ochronie naukowcуw, zgadza siк? Dziкki ci za to. Przyjemnie byіo ogl№daж naszych ludzi przy bunkrze, zamiast tych pieprzonych najemnikуw. Њwietna sprawa!</text>
+	</string>
+	<string id="dm_information_61">
+		<text>Zobaczmy... mamy niezі№ jazdк dziкki tajnemu schowkowi Powinnoњci. Teraz uїyjemy tego schowka do tego, do czego jest przeznaczony - jako wiкzienie dla szumowin Powinnoњci, aby zmusiж ich do wydania wszystkich tajemnic. He, he. Aha, dziкki za cynk o alarmie - bez posiіkуw nie mielibyњmy szans.</text>
+	</string>
+	<string id="dm_information_62">
+		<text>Kolejne zwyciкstwo Powinnoњci! Ci anarchiњci zrobili siк naprawdк zarozumiali... Wkradli siк do naszego sekretnego magazynu, przekonani, їe ujdzie im to na sucho. Nie ma mowy! Zaskoczyliњmy ich i rozwaliliњmy, jak siк rozwala wњciekіe chomiki.</text>
+	</string>
+	<string id="dm_information_63">
+		<text>To їadna nowina, їe Wolnoњж to banda zwyrodnialcуw, ale odkryliњmy coњ nowego na temat jednego z ich najwiкkszych szajbusуw. W Wolnoњci goњж byі znany jako Flint, ale zanim do niej wst№piі, byі stalkerem i woіali na niego Sroka. Przynajmniej tak siк nazywaі, gdy przybyі do Zatonu i prawie zaprowadziі ekipк іowcуw prosto w szczкki mutantуw. Wystawiі ich i chimera prawie rozdarіa ich na strzкpy, a ten gnojek zabraі ich sprzкt i przybyі tutaj, do Janowa. Po doі№czeniu do Wolnoњci wepchn№і swojego partnera do anomalii, їeby zabraж mu artefakt. Taka wіaњnie jest Wolnoњж.</text>
+	</string>
+	<string id="dm_information_7">
+		<text>Nowy projekt budowy statku pod kierownictwem Noego. To najnowsza atrakcja na Zatonie - stalker imieniem Noe. Doњwiadczony, zmotywowany i w stu procentach szalony. Ostatnim jego wariackim pomysіem jest uratowanie wszystkich stalkerуw przed Apokalips№. Dlatego wіaњnie przebudowuje star№ barkк na „arkк". Doprawdy, istny szaleniec. Jeњli zdecydujesz siк do niego wpaњж, uwaїaj, їeby go nie rozdraїniж. Dopуki bкdziesz o tym pamiкtaж, jest praktycznie niegroџny.</text>
+	</string>
+	<string id="dm_information_8">
+		<text>Znasz Їwawego? Jest teraz w Skadowsku. To prawdziwy handlowy profesjonaі. Moїe dla ciebie zdobyж wszystko, czego potrzebujesz. No, prawie wszystko. Ostatnio skupiі siк na spluwach i kombinezonach, wszystko z gуrnej pуіki! Wyspecjalizowany towar, eksperymentalne wzory, artykuіy rкcznie robione... Tanio u niego nie jest, ale dlaczego miaіoby byж? Za ekskluzywnoњж trzeba pіaciж!</text>
+	</string>
+	<string id="dm_information_9">
+		<text>Wiesz, їe Pilot uїywa nowej њcieїki miкdzy Zatonem i Jupiterem? Kiedyњ trzeba byіo poњwiкciж sporo czasu - wіaziж pod gуrк, unikaж anomalii i tak dalej. Teraz to buіka z masіem. To juї nie wyprawa, tylko spacer po parku, nie mуwi№c o tym, їe idzie siк o poіowк krуcej. Ale Pilot potrafi oddaж honor, gdy siк komuњ naleїy - to nie on odkryі tк trasк. Pewien stalker pokazaі mu swoje mapy. Za opіat№, oczywiњcie, ale nie zaї№daі jakiejњ astronomicznej kwoty.</text>
+	</string>
+	<string id="dm_information_do_not_know_1">
+		<text>Niewiele, szczerze mуwi№c.</text>
+	</string>
+	<string id="dm_information_do_not_know_2">
+		<text>W Zonie zawsze znajdzie siк coњ nowego, gdziekolwiek by nie szukaж.</text>
+	</string>
+	<string id="dm_information_do_not_know_3">
+		<text>Cуї, jesteњ tutaj. To coњ nowego, jak s№dzк.</text>
+	</string>
+	<string id="dm_information_general">
+		<text>Co nowego w Zonie?</text>
+	</string>
+	<string id="dm_information_no_more_1">
+		<text>Nie wiem juї niczego, co by ciк zainteresowaіo.</text>
+	</string>
+	<string id="dm_information_no_more_2">
+		<text>Lubiк gadaж, ale nic juї wiкcej nie wiem.</text>
+	</string>
+	<string id="dm_information_no_more_3">
+		<text>Nie wiem juї nic wiкcej.</text>
+	</string>
+	<string id="dm_job_1">
+		<text>Hmm... moїe zapytaj Gіuszca w Skadowsku. Szuka kogoњ, kto pomoїe mu wyjaњniж sprawк gin№cych w tajemniczy sposуb stalkerуw. Wszyscy wini№ pijawki, bo znajdowane ciaіa s№ kompletnie pozbawione krwi. Ale to juї zbyt wiele... Ludzie s№ porywani kaїdego dnia, co zupeіnie nie pasuje do pijawek... Gіuszec wynaj№і nawet doњwiadczonego іowcк, їeby namierzyі te pijawki.</text>
+	</string>
+	<string id="dm_job_10">
+		<text>Kiedy stalker potrzebuje pieniкdzy, ma dwie moїliwoњci: poszukaж artefaktуw i oddaж je handlarzom za 30 procent wartoњci lub popracowaж dla naukowcуw. Zawsze wymyњl№ coњ, co stalker moїe dla nich zrobiж, na przykіad dostarczyж rzadki artefakt albo zwіoki mutanta. Najwaїniejsze jednak jest to, їe jeњli przejdziesz na ich stronк, mog№ ci wydaж przepustkк do Zony, wszystko oficjalnie i legalnie. Wyobraџ sobie, їe mijasz posterunek wojskowy, nios№c plecak peіen іupуw, i jeszcze ci salutuj№! Aї siк ciepіo na sercu robi! W kaїdym razie, bunkier naukowcуw usytuowany jest na zachуd od stacji Janуw. Pracuje dla nich jeden stalker, moїe ciebie teї zatrudni№.</text>
+	</string>
+	<string id="dm_job_11">
+		<text>Twoje sukcesy zaleї№ od tego, czym siк zajmujesz. Jeїeli nie masz nic przeciwko polowaniu na mutanty, bкdziesz mieж mnуstwo zleceс. Wpadnij do piwnic w Janowie i zapytaj o Trapera - pіaci niezі№ kasк za pozbywanie siк mutantуw. Tylko nie zwracaj siк do niego po nagrodк za zabicie pierwszego z brzegu nibypsa. Traper daje zlecenia na konkretne potwory, ktуre przeszkadzaj№ w zbieraniu artefaktуw lub nawiedzaj№ miejsca, ktуrych stalkerzy uїywaj№ jako kryjуwek przed emisj№.</text>
+	</string>
+	<string id="dm_job_14">
+		<text>Ludzie tacy jak ty, ktуrzy przyjeїdїaj№ do Skadowska, czкsto odwiedzaj№ Brodacza. Potrafi odpaliж іadn№ dolк za artefakty... ale powiem ci jedno - jego wyczucie interesu jest kompletnie do dupy. Nie chce siк podzieliж zyskami z pewnymi wpіywowymi ludџmi... i dlatego wіaњnie bкdzie miaі przesrane. Kumasz?</text>
+	</string>
+	<string id="dm_job_15">
+		<text>Jeњli potrzebujesz gotуwki, odwiedџ Sowк. Handluje wszystkim, czego czіowiek moїe w Skadowsku potrzebowaж - informacjami, spluwami, wszystkim. Jeњli masz coњ ciekawego i wartoњciowego, jak dokumenty albo PDA stalkera - zabierz to do Sowy i zgarnij kasк. Moїesz teї dostaж іadn№ sumkк za wykonywanie jego osobistych poleceс. Zapytaj po prostu, czy nie potrzebuje, їeby coњ dla niego zrobiж.</text>
+	</string>
+	<string id="dm_job_2">
+		<text>Radzк pogadaж z Gont№. On i jego druїyna maj№ niezі№ historiк do opowiedzenia. Niedawno temu na Zatonie pojawiіa siк chimera, wiкc Gonta i jego ludzie wyruszyli, їeby siк z ni№ rozprawiж. Rozdzielili siк na dwie druїyny, by namierzyж bestiк i wysіali іowcк, їeby odszukaі legowisko pijawek. Mieli trochк maіo ludzi, kiedy wreszcie trafili na њlad chimery, wiкc poszedі z nimi jeszcze jeden stalker, Sroka. Nie wiem jak to siк dokіadnie odbyіo, ale z wiкkszoњci relacji wynika, їe Sroka prysn№і jak tylko zobaczyі chimerк. Gonta ledwo siк stamt№d wydostaі, a jeden z jego ludzi zostaі ciкїko ranny. Jednak chimera wci№ї grasuje, szukaj№ wiкc ludzi, ktуrzy by im pomogli.</text>
+	</string>
+	<string id="dm_job_3">
+		<text>Proste: szukasz powaїnej gotуwki, idџ do Suіtana. On jest szefem w tej okolicy, wiкcej jeњli bкdziesz siк dobrze zachowywaж, znajdzie dla ciebie robotк.</text>
+	</string>
+	<string id="dm_job_4">
+		<text>Jeњli jesteњ dobrym stalkerem - to znaczy umiesz znajdowaж artefakty - pogadaj z Brodaczem. Cieszy siк tu duїym szacunkiem. Jest jedynym czіowiekiem w Skadowsku, ktуry dobrze ci zapіaci za twoje artefakty. Ma kontakty, dziкki ktуrym transportuje je na zewn№trz Zony. Poza tym - jest dobrym czіowiekiem... zawsze bкdzie miaі dla ciebie radк albo odpowiedni№ pracк.</text>
+	</string>
+	<string id="dm_job_5">
+		<text>W Skadowsku jest pewien handlarz, nazywa siк Sowa. Nie jest najsympatyczniejszym czіowiekiem na њwiecie. Ci№gle narzeka, їe wszystkie artefakty id№ do Brodacza, a nie do niego, ale jeњli potrzebujesz pieniкdzy, moїesz zobaczyж, co ma do zaoferowania. Cwaniak handluje nie tylko amunicj№. Moїe udzieliж ci informacji, coњ ci sprzedaж, kupiж coњ od ciebie i zapіaciж za coњ, co wiesz, a co go interesuje. Wpadnij do niego z wizyt№ - moїesz go znaleџж na drugim pokіadzie na rufie. Na pewno jakoњ siк dogadacie.</text>
+	</string>
+	<string id="dm_job_6">
+		<text>Zapytaj Wano, bywa w barze w Janowie. Ma na pieсku z bandytami - juї trzy razy prуbowaі spіaciж swуj dіug. Jest doњwiadczony i w ogуle, potrafi dostrzec anomalie z zamkniкtymi oczami... a i tak ci№gle pakuje siк w kіopoty. Wielu ludzi sugerowaіo mu, їeby po prostu uciekі. Zona jest za duїa, їeby mafia go znalazіa, ale on jest zbyt dumny, їeby uciekaж. Nie ma jednak zbyt wielu chкtnych do pomocy w rozwi№zaniu kwestii z bandytami...</text>
+	</string>
+	<string id="dm_job_7">
+		<text>Zapomnij o robocie, czіowieku... Bandyci naprawdк wymknкli siк spod kontroli - wziкli Mitaja na zakіadnika i ї№daj№ okupu. Mitaj byі jednym z pierwszych stalkerуw w Janowie, zbudowaі to miejsce, їeby ludzie mogli siк schroniж przed emisj№, a teraz, kiedy potrzebuje pomocy, wszyscy siк na niego wypiкli. Na Wolnoњж i Powinnoњж nie ma co liczyж - zbyt s№ zajкte skakaniem sobie nawzajem do gardeі... Ale reszta - oni powinni coњ zrobiж! Ech, nie ma co... Nawet zaіoga Mitaja nie wie, jak go uwolniж. Jeњli chcesz im pomуc, pogadaj z Grizlim. Znajdziesz go w barze na stacji.</text>
+	</string>
+	<string id="dm_job_8">
+		<text>Azot, technik z Janowa, potrzebuje materiaіуw do pracy. Zna siк na broniach i elektronice. Czasem jednak umiejкtnoњci to za maіo - potrzeba mu odpowiednich materiaіуw, wiкc rozpytuje w okolicy. Problem w tym, їe wszystkie bezpieczne miejsca juї s№ wyczyszczone, a pozostaіe s№ dla wiкkszoњci zbyt niebezpieczne. Azot ma nadziejк znaleџж kogoњ, kto byіby chкtny podj№ж to ryzyko. Na pewno nieџle zapіaci za przysіugк.</text>
+	</string>
+	<string id="dm_job_9">
+		<text>Ponoж Wujek Jar ze stacji Janуw szukaі niezbyt ciekawskiego stalkera, ktуry by mu w czymњ pomуgі. Nie wiem, czemu nie zapyta swoich kumpli z Wolnoњci... W kaїdym razie - jest porz№dnym, starszym czіowiekiem, wiкc pogadaj z nim i moїe siк dogadacie.</text>
+	</string>
+	<string id="dm_job_do_not_know_1">
+		<text>Hmm... Nie znam nikogo takiego.</text>
+	</string>
+	<string id="dm_job_do_not_know_2">
+		<text>Ktуї nie chciaіby tego wiedzieж?</text>
+	</string>
+	<string id="dm_job_do_not_know_3">
+		<text>Sk№d do diabіa mam wiedzieж?</text>
+	</string>
+	<string id="dm_job_general">
+		<text>Znasz kogoњ, kto miaіby dla mnie pracк?</text>
+	</string>
+	<string id="dm_job_no_more_1">
+		<text>Pytasz znowu o to samo.</text>
+	</string>
+	<string id="dm_job_no_more_2">
+		<text>Nic nowego nie jestem ci w stanie powiedzieж.</text>
+	</string>
+	<string id="dm_job_no_more_3">
+		<text>Znasz juї moj№ odpowiedџ.</text>
+	</string>
+	<string id="dm_universal_actor_exit">
+		<text>OK, zapomnij o tym.</text>
+	</string>
+	<string id="dm_universal_actor_start">
+		<text>Mam do ciebie pytanie.</text>
+	</string>
+	<string id="dm_universal_npc_start_0">
+		<text>Pytaj њmiaіo.</text>
+	</string>
+	<string id="dm_universal_npc_start_1">
+		<text>Dawaj.</text>
+	</string>
+	<string id="dm_universal_npc_start_2">
+		<text>Strzelaj.</text>
+	</string>
+	<string id="dm_universal_npc_start_3">
+		<text>Sіucham.</text>
+	</string>
+	<string id="dm_wounded_general">
+		<text>Pomocy!</text>
+	</string>
+	<string id="dm_wounded_medkit">
+		<text>Weџ tк apteczkк.</text>
+	</string>
+	<string id="dm_wounded_sorry">
+		<text>Przepraszam, nic nie mam.</text>
+	</string>
+	<string id="dm_traveler_bye">
+		<text>Rozumiem.</text>
+	</string>
+	<string id="dm_traveler_what_are_you_doing">
+		<text>Co robisz?</text>
+	</string>
+	<string id="dm_traveler_can_i_go_with_you">
+		<text>Mogк pуjњж z tob№?</text>
+	</string>
+	<string id="dm_traveler_stalker_actor_companion_yes">
+		<text>Pewnie. W kupie raџniej.</text>
+	</string>
+	<string id="dm_traveler_stalker_actor_companion_no">
+		<text>Przykro mi, ale nie. Idк swoj№ wіasn№ drog№.</text>
+	</string>
+	<string id="dm_traveler_actor_go_with_squad">
+		<text>No to chodџmy.</text>
+	</string>
+	<string id="dm_traveler_take_me_to">
+		<text>Muszк siк dostaж w pewne miejsce. Zaprowadzisz mnie tam za opіat№?</text>
+	</string>
+	<string id="dm_traveler_stalker_where_do_you_want">
+		<text>Nie ma sprawy. Wybieraj, jakie miejsce ciк interesuje?</text>
+	</string>
+	<string id="dm_traveler_actor_agree">
+		<text>Zgoda. Chodџmy.</text>
+	</string>
+	<string id="dm_traveler_actor_refuse">
+		<text>Zmieniіem zdanie.</text>
+	</string>
+	<string id="dm_traveler_stalker_i_cant_travel">
+		<text>Nie, mam inne pilne sprawy do zaіatwienia.</text>
+	</string>
+	<string id="dm_stalker_doing_nothing_1">
+		<text>Odpoczywam sobie.</text>
+	</string>
+	<string id="dm_stalker_doing_nothing_2">
+		<text>Nic wielkiego, zaїywam odrobiny relaksu.</text>
+	</string>
+	<string id="dm_stalker_doing_nothing_3">
+		<text>A na co to wygl№da? Absolutnie nic.</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_monster">
+		<text>Tropiк mutanty.</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_bandit">
+		<text>Њledzк kilku dupkуw. Pieprzone przygіupy...</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_killer">
+		<text>Tropiк kilku najemnikуw. Niezіe z nich sukinsyny.</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_monolith">
+		<text>Њledzк druїynк fanatykуw. To znaczy wojownikуw Monolitu...</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_zombied">
+		<text>Polujк na zombi. Za duїo tych skubaсcуw w okolicy...</text>
+	</string>
+	<string id="dm_traveler_travel_cost">
+		<text>Dobra. To bкdzie kosztowaж</text>
+	</string>
+	<string id="dm_traveler_actor_dont_go_with_squad">
+		<text>Wiesz... zmieniіem zdanie.</text>
+	</string>
+	<string id="dm_traveler_actor_has_no_money">
+		<text>Nie mam tyle.</text>
+	</string>
+	<string id="dm_freedom_doing_nothing_1">
+		<text>Och, nic takiego.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_monster">
+		<text>Polujк na mutanty. Ktoњ musi im pokazaж, gdzie jest ich miejsce.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_bandit">
+		<text>Њcigam miejscowych bandytуw.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_killer">
+		<text>Polujк na najemnikуw. Maj№ dіug, ktуry trzeba odebraж.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_monolith">
+		<text>Њcigam tych popapraсcуw z Monolitu.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_duty">
+		<text>Prуbujк namierzyж kilku moich dіuїnikуw.</text>
+	</string>
+	<string id="dm_duty_doing_nothing_1">
+		<text>Nic w tej chwili nie robiк.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_monster">
+		<text>Polujк na mutanty. Prуbujк oczyњciж okolicк z tego plugastwa.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_bandit">
+		<text>Jestem na misji. Tropiк druїynк bandytуw.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_killer">
+		<text>Moim celem s№ najemnicy. Pod№їam za њladami ich druїyny.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_monolith">
+		<text>Pod№їam za druїyn№ Monolitu.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_freedom">
+		<text>Њcigam tych niedorobionych dupkуw z Wolnoњci...</text>
+	</string>
+	<string id="dm_stalker_searching_artefacts_1">
+		<text>Poszukujк artefaktуw.</text>
+	</string>
+	<string id="dm_stalker_searching_artefacts_2">
+		<text>Grzybуw nie zbieram... raczej artefakty.</text>
+	</string>
+	<string id="dm_stalker_searching_artefacts_3">
+		<text>Szukam artefaktуw.</text>
+	</string>
+	<string id="st_stalker_zat_sim_1">
+		<text>Idк w stronк anomalii zwanej Kotіem, tej niedaleko maіego zagajnika.</text>
+	</string>
+	<string id="st_stalker_zat_sim_2">
+		<text>Wyruszam w stronк pуіnocnego jeziora... odpocznк sobie trochк na pуіwyspie.</text>
+	</string>
+	<string id="st_stalker_zat_sim_3">
+		<text>Idк za pуіnocne jezioro - jest tam przyzwoite miejsce na obуz.</text>
+	</string>
+	<string id="st_stalker_zat_sim_4">
+		<text>Idк do lasu za pуіnocnym jeziorem.</text>
+	</string>
+	<string id="st_stalker_zat_sim_5">
+		<text>Idк do maіego lasku na zachуd od tartaku.</text>
+	</string>
+	<string id="st_stalker_zat_sim_6">
+		<text>Idк w stronк tego wzgуrza na zachуd od bagna. Їadne bagienne trucizny mnie tam nie dostan№.</text>
+	</string>
+	<string id="st_stalker_zat_sim_7">
+		<text>Idк w stronк stacji antenowej. Na zachуd od niej znajduje siк caіkiem przyjemne miejsce.</text>
+	</string>
+	<string id="st_stalker_zat_sim_8">
+		<text>Idк do lasu na zachуd od Sosnodкbu... Chodџ ze mn№, jeњli chcesz - nie mam nic przeciwko towarzystwu.</text>
+	</string>
+	<string id="st_stalker_zat_sim_9">
+		<text>Do zagajnika pomiкdzy Їelaznym Lasem i warsztatami.</text>
+	</string>
+	<string id="st_stalker_zat_sim_10">
+		<text>W stronк wielkiego mostu... Podobno na wschуd od niego znajduje siк bezpieczne, odosobnione miejsce.</text>
+	</string>
+	<string id="st_stalker_zat_sim_11">
+		<text>Na parking na poіudnie od starej barki.</text>
+	</string>
+	<string id="st_stalker_zat_sim_12">
+		<text>Nic wielkiego, trochк podrуїujк. Zamierzam rozbiж obуz na wzgуrzu na wschуd od Skadowska.</text>
+	</string>
+	<string id="st_stalker_zat_sim_13">
+		<text>Do zagajnika pomiкdzy Izumrudnoje i stacj№ benzynow№.</text>
+	</string>
+	<string id="st_stalker_zat_sim_14">
+		<text>Do rozwidlenia niedaleko zakіadu utylizacji odpadуw.</text>
+	</string>
+	<string id="st_stalker_zat_sim_15">
+		<text>Do anomalii zwanej Kotіem.</text>
+	</string>
+	<string id="st_stalker_zat_sim_16">
+		<text>Do straїnicy. Jest tam kompleks budynkуw, pewnie go kojarzysz. W jednym z nich s№ piece - ciekawe, co tam siк kiedyњ dziaіo.</text>
+	</string>
+	<string id="st_stalker_zat_sim_17">
+		<text>Do zagajnika na zachуd od spalonego gospodarstwa.</text>
+	</string>
+	<string id="st_stalker_zat_sim_18">
+		<text>Do zagajnika na wschуd od anomalii zwanej Kotіem.</text>
+	</string>
+	<string id="st_stalker_zat_sim_19">
+		<text>W stronк wzniesienia zaraz za pуіnocnym jeziorem.</text>
+	</string>
+	<string id="st_stalker_zat_sim_20">
+		<text>Do maіego zagajnika na poіudnie od spalonego gospodarstwa.</text>
+	</string>
+	<string id="st_stalker_zat_sim_21">
+		<text>Idк w pewne miejsce na zachуd od Skadowska... tam, gdzie wychodzi ruroci№g.</text>
+	</string>
+	<string id="st_stalker_zat_sim_22">
+		<text>Idк w stronк miejsca, ktуre znajduje siк w pуі drogi pomiкdzy Skadowskiem i pogікbiark№.</text>
+	</string>
+	<string id="st_stalker_zat_sim_23">
+		<text>Do rzeczki niedaleko starej barki.</text>
+	</string>
+	<string id="st_stalker_zat_sim_24">
+		<text>Do kanaіu niedaleko anomalii zwanej Szram№.</text>
+	</string>
+	<string id="st_stalker_zat_sim_25">
+		<text>Do stacji benzynowej.</text>
+	</string>
+	<string id="st_stalker_zat_sim_26">
+		<text>Do jarуw Sosnodкbu.</text>
+	</string>
+	<string id="st_stalker_zat_b55">
+		<text>Chcк poszukaж artefaktуw w anomalii zwanej Pazurem.</text>
+	</string>
+	<string id="st_stalker_zat_a1">
+		<text>Idк w stronк wzgуrza na zachуd od anomalii zwanej Kotіem.</text>
+	</string>
+	<string id="st_stalker_zat_a23_smart_terrain">
+		<text>Do anomalii zwanej Їelaznym Lasem.</text>
+	</string>
+	<string id="st_stalker_zat_b100">
+		<text>Idк do anomalii zwanej Їelaznym Lasem, їeby poszukaж artefaktуw.</text>
+	</string>
+	<string id="st_stalker_zat_b101">
+		<text>Idк na bagna. Pewnie, їe ciкїko tam oddychaж przez ten caіy gaz, ale artefakty s№ niezі№ rekompensat№.</text>
+	</string>
+	<string id="st_stalker_zat_b103_merc_smart">
+		<text>Idк do warsztatуw podstacji. Mуwi№, їe to dobre miejsce, by siк ukryж przed emisj№. Zamierzam je przetestowaж.</text>
+	</string>
+	<string id="st_stalker_zat_b104_zombied">
+		<text>Niedaleko st№d jest tartak. Tam wіaњnie idк. Chcк siк rozejrzeж i sprawdziж, czy nie ma tam czegoњ wartoњciowego.</text>
+	</string>
+	<string id="st_stalker_zat_b106_smart_terrain">
+		<text>Mam ochotк wzi№ж sobie trochк wolnego w Izumrudnoje. Och, oczywiњcie, їe to њwietny oњrodek... dla ciaіa i dzikуw! Cha, cha! Mam jednak nadziejк, їe uda mi siк rozbiж tam obуz.</text>
+	</string>
+	<string id="st_stalker_zat_b12">
+		<text>Na most. Wydaje mi siк, їe na mapie jest oznaczony jako most Przemienienia Paсskiego.</text>
+	</string>
+	<string id="st_stalker_zat_b14_smart_terrain">
+		<text>Do pogікbiarki. Zaіoїк siк, їe ci№gle moїna tam znaleџж coњ wartoњciowego.</text>
+	</string>
+	<string id="st_stalker_zat_b18">
+		<text>Do starej barki.</text>
+	</string>
+	<string id="st_stalker_zat_b20_smart_terrain">
+		<text>Chcк siк pokrкciж po spalonym gospodarstwie, zobaczyж, czy nie pojawiіy siк tam jakieњ nowe artefakty.</text>
+	</string>
+	<string id="st_stalker_zat_b28">
+		<text>Na poіudniowy pіaskowyї.</text>
+	</string>
+	<string id="st_stalker_zat_b33">
+		<text>Do rozpadliny przy stacji benzynowej.</text>
+	</string>
+	<string id="st_stalker_zat_b38">
+		<text>Idк do stacji antenowej Krug - potrzebujк bezpiecznej kryjуwki przed emisjami. Niestety, podobno jest tam mnуstwo potworуw.</text>
+	</string>
+	<string id="st_stalker_zat_b38u">
+		<text>Idк do stacji antenowej Krug - potrzebujк bezpiecznej kryjуwki przed emisjami. Niestety, podobno jest tam mnуstwo potworуw.</text>
+	</string>
+	<string id="st_stalker_zat_b39">
+		<text>Idк poszukaж artefaktуw w okolicach Sosnodкbu. Mam nadziejк, їe kundle bкd№ siк trzymaж z daleka.</text>
+	</string>
+	<string id="st_stalker_zat_b40_smart_terrain">
+		<text>Do szamba... no wiesz, do zakіadu utylizacji odpadуw. To miejsce rуwnie dobre jak kaїde inne, aby siк schowaж przed emisj№.</text>
+	</string>
+	<string id="st_stalker_zat_b42_smart_terrain">
+		<text>Idк w stronк przystani na pуіnocnym jeziorze. Jak juї siк tam dostanк, bкdк improwizowaж.</text>
+	</string>
+	<string id="st_stalker_zat_b52">
+		<text>Idк do portu, tam gdzie s№ dџwigi. To dobre miejsce na obуz.</text>
+	</string>
+	<string id="st_stalker_zat_b53">
+		<text>Planujк poszukaж artefaktуw w anomalii zwanej Kotіem. Mam nadziejк, їe mуj kombinezon przetrwa te wakacje w gor№cych џrуdіach.</text>
+	</string>
+	<string id="st_stalker_zat_b54">
+		<text>Do anomalii zwanej Szram№.</text>
+	</string>
+	<string id="st_stalker_zat_b56">
+		<text>Chcк sprawdziж odpornoњж mojego sprzкtu na ogieс i poszukaж artefaktуw - wszystko to w anomalii zwanej Cyrkiem.</text>
+	</string>
+	<string id="st_stalker_zat_b5_smart_terrain">
+		<text>Do straїnicy.</text>
+	</string>
+	<string id="st_stalker_zat_b7">
+		<text>Zamierzam rozbiж obуz na Szewczence. To dobre schronienie przed emisjami i trudne miejsce do zaatakowania dla mutantуw.</text>
+	</string>
+	<string id="st_stalker_zat_b7_stalker_raider">
+		<text>Zamierzam rozbiж obуz na Szewczence. To dobre schronienie przed emisjami i trudne miejsce do zaatakowania dla mutantуw.</text>
+	</string>
+	<string id="st_stalker_zat_medic_home_smart">
+		<text>Idк do portu, tam gdzie s№ dџwigi. To dobre miejsce na obуz.</text>
+	</string>
+	<string id="st_stalker_zat_stalker_base_smart">
+		<text>Chcк zostawiж іup i wypiж zimne piwko. Skadowsk to idealne miejsce do tego celu.</text>
+	</string>
+	<string id="st_stalker_jup_a10_smart_terrain">
+		<text>Idк w stronк posterunku wojskowego obok fabryki Jupiter.</text>
+	</string>
+	<string id="st_stalker_jup_a12">
+		<text>Do magazynu kontenerуw.</text>
+	</string>
+	<string id="st_stalker_jup_a12_merc">
+		<text>Idк w stronк pewnego niepozornego miejsca pomiкdzy magazynem kontenerуw i poіudniowym tunelem.</text>
+	</string>
+	<string id="st_stalker_jup_a6">
+		<text>Idк na Janуw. Wreszcie jest czas na odpoczynek.</text>
+	</string>
+	<string id="st_stalker_jup_b1">
+		<text>Do tunelu na pуіnoc od Kopaczi.</text>
+	</string>
+	<string id="st_stalker_jup_b19">
+		<text>Idк do naprawdк strasznego miejsca - do wioski Kopaczi... lub tego, co z niej zostaіo. Mam dodatkowy zapas amunicji i lekуw przeciwpromiennych - na pewno bкd№ mi potrzebne!</text>
+	</string>
+	<string id="st_stalker_jup_b200">
+		<text>Do cementowni. To niezіy punkt obserwacyjny, a na dodatek nikt siк tam do ciebie nie podkradnie.</text>
+	</string>
+	<string id="st_stalker_jup_b200_tushkan_smart_terrain">
+		<text>Do cementowni. Zamierzam sprawdziж piwnicк.</text>
+	</string>
+	<string id="st_stalker_jup_b202">
+		<text>Do podstacji niedaleko Janowa.</text>
+	</string>
+	<string id="st_stalker_jup_b203">
+		<text>Idк do miejsca w pobliїu poіudniowego tunelu kolejowego.</text>
+	</string>
+	<string id="st_stalker_jup_b204">
+		<text>Idк do stawu chіodz№cego w pobliїu fabryki Jupiter.</text>
+	</string>
+	<string id="st_stalker_jup_b205_smart_terrain">
+		<text>Idк do kompleksu przeciwlotniczego Woіchow, zapolowaж na zombi.</text>
+	</string>
+	<string id="st_stalker_jup_b205_smart_terrain_tushkano">
+		<text>Do bunkra, no wiesz, tego w kompleksie przeciwlotniczym Woіchow.</text>
+	</string>
+	<string id="st_stalker_jup_b206">
+		<text>Do zagajnika anomalii w pobliїu kamienioіomu. Moїe znajdк tam jakieњ artefakty.</text>
+	</string>
+	<string id="st_stalker_jup_b207">
+		<text>Idк do kamienioіomu, tam gdzie znajduj№ siк baraki robotnikуw.</text>
+	</string>
+	<string id="st_stalker_jup_b207_depot_attack">
+		<text>Jest takie miejsce pomiкdzy kamienioіomem i stacj№ Janуw. Mam zamiar siк tam przyczaiж przez jakiњ czas.</text>
+	</string>
+	<string id="st_stalker_jup_b208">
+		<text>Idк do wschodniego tunelu, tego, ktуry biegnie pod fabryk№ Jupiter.</text>
+	</string>
+	<string id="st_stalker_jup_b209">
+		<text>Do anomalii zwanej Bituminem. Sprawdzк odpornoњж mojego kombinezonu na ogieс.</text>
+	</string>
+	<string id="st_stalker_jup_b211">
+		<text>Idк do anomalii zwanej Mokradіem, їeby poszukaж artefaktуw. Antidotum mam doњж - bardziej martwiк siк potworami.</text>
+	</string>
+	<string id="st_stalker_jup_b212">
+		<text>Do kompleksu wentylacyjnego pomiкdzy fabryk№ i magazynem kontenerуw. Po co? Ech, diabli wiedz№.</text>
+	</string>
+	<string id="st_stalker_jup_b219">
+		<text>Idк do warsztatуw fabryki Jupiter. Moїe uda mi siк odkryж, dlaczego to miejsce ma tak№ paskudn№ reputacjк.</text>
+	</string>
+	<string id="st_stalker_jup_b25">
+		<text>Idк na sam dуі kamienioіomu. Stalkerzy mуwi№, їe znajduj№ tam sporo artefaktуw.</text>
+	</string>
+	<string id="st_stalker_jup_b32">
+		<text>Na parking, gdzie stoj№ te stare pojazdy. Poszukam artefaktуw w anomaliach elektrycznych.</text>
+	</string>
+	<string id="st_stalker_jup_b4">
+		<text>Jest takie maіe, przyjemne miejsce pomiкdzy kompleksem przeciwlotniczym Woіchow i magazynem kontenerуw. Tam wіaњnie idк.</text>
+	</string>
+	<string id="st_stalker_jup_b41">
+		<text>Do bunkra naukowcуw.</text>
+	</string>
+	<string id="st_stalker_jup_b46">
+		<text>Do chіodni kominowej na pуіnocny zachуd od stacji Janуw.</text>
+	</string>
+	<string id="st_stalker_jup_b47">
+		<text>W stronк fabryki Jupiter, ale nie zamierzam wchodziж do њrodka. Pokrкcк siк przy budynkach administracji i zobaczк, co bкdzie moїna dalej zrobiж.</text>
+	</string>
+	<string id="st_stalker_jup_b6_anom_2">
+		<text>Idк do anomalii zwanej Popieliskiem, za Kopaczi.</text>
+	</string>
+	<string id="st_stalker_jup_b8_smart_terrain">
+		<text>Idк do warsztatуw fabryki Jupiter. Mуwi№, їe w tych okolicach spadі њmigіowiec, wiкc myњlк sobie, їe moїe warto by to sprawdziж.</text>
+	</string>
+	<string id="st_stalker_jup_sim_1">
+		<text>Idк do tego zniszczonego poci№gu pomiкdzy kompleksem przeciwlotniczym Woіchow i parkingiem.</text>
+	</string>
+	<string id="st_stalker_jup_sim_2">
+		<text>Idк do poіudniowego tunelu, їeby siк zabezpieczyж na wypadek emisji.</text>
+	</string>
+	<string id="st_stalker_jup_sim_3">
+		<text>Idк w pewne miejsce pomiкdzy Janowem i Kopaczi.</text>
+	</string>
+	<string id="st_stalker_jup_sim_4">
+		<text>Idк w pewne miejsce niedaleko kanaіu, na poіudnie od cementowni.</text>
+	</string>
+	<string id="st_stalker_jup_sim_5">
+		<text>Idк w pewne miejsce niedaleko kanaіu, na pуіnoc od fabryki Jupiter.</text>
+	</string>
+	<string id="st_stalker_jup_sim_6">
+		<text>Idк sprawdziж kamienioіom.</text>
+	</string>
+	<string id="st_stalker_jup_sim_7">
+		<text>Idк sprawdziж kamienioіom.</text>
+	</string>
+	<string id="st_stalker_jup_sim_8">
+		<text>Idк rozejrzeж siк po okolicy na pуіnoc od Janowa.</text>
+	</string>
+	<string id="st_stalker_jup_sim_9">
+		<text>W stronк kompleksu przeciwlotniczego Woіchow. Jest tam niezіe miejsce na obуz, pomiкdzy kompleksem i wiosk№ Kopaczi.</text>
+	</string>
+	<string id="st_stalker_jup_sim_10">
+		<text>Och, podrуїujк tylko... Idк w stronк magazynu kontenerуw.</text>
+	</string>
+	<string id="st_stalker_jup_sim_11">
+		<text>Badam okolicк. Teraz zamierzam sprawdziж, co znajduje siк na poіudnie od posterunku wojskowego.</text>
+	</string>
+	<string id="st_stalker_jup_sim_12">
+		<text>Na l№dowisko dla helikopterуw, to pomiкdzy fabryk№ i magazynem kontenerуw.</text>
+	</string>
+	<string id="st_stalker_jup_sim_13">
+		<text>Idк w to miejsce na poіudnie od stacji Janуw, przy torach kolejowych.</text>
+	</string>
+	<string id="st_stalker_jup_sim_14">
+		<text>W pewne miejsce na pуіnoc od stacji Janуw.</text>
+	</string>
+	<string id="st_stalker_jup_sim_15">
+		<text>Do zagajnika anomalii.</text>
+	</string>
+	<string id="st_stalker_jup_sim_16">
+		<text>W pewne miejsce na poіudnie od kompleksu przeciwlotniczego.</text>
+	</string>
+	<string id="st_stalker_jup_sim_17">
+		<text>Do stawu chіodz№cego, zaraz obok anomalii zwanej Betonow№ Wann№.</text>
+	</string>
+	<string id="st_stalker_jup_sim_18">
+		<text>Idк rozejrzeж siк po okolicy wokуі fabryki.</text>
+	</string>
+	<string id="st_stalker_jup_sim_19">
+		<text>Idк rozejrzeж siк po okolicy wokуі fabryki.</text>
+	</string>
+	<string id="st_stalker_pri_a15">
+		<text>W stronк placu za pralni№ samoobsіugow№.</text>
+	</string>
+	<string id="st_stalker_pri_a16">
+		<text>Do pralni samoobsіugowej. To najbezpieczniejsze miejsce w okolicy.</text>
+	</string>
+	<string id="st_stalker_pri_a17">
+		<text>Do szpitala. Mam nadziejк, їe nie wpadnк po drodze na tych szaleсcуw z Monolitu...</text>
+	</string>
+	<string id="st_stalker_pri_a18_smart_terrain">
+		<text>Do ksiкgarni... Podobno њwietnie siк sprawdza jako kryjуwka przed emisjami.</text>
+	</string>
+	<string id="st_stalker_pri_a20">
+		<text>Idк zobaczyж lokaln№ atrakcjк - pomnik przyjaџni narodуw. To niedaleko ksiкgarni.</text>
+	</string>
+	<string id="st_stalker_pri_a21_smart_terrain">
+		<text>Do dawnego sklepu spoїywczego. Nie dostaniesz tam teraz њwieїego chleba, ale to dobra kryjуwka na wypadek emisji.</text>
+	</string>
+	<string id="st_stalker_pri_a22_smart_terrain">
+		<text>Do sklepu Bieriezka.</text>
+	</string>
+	<string id="st_stalker_pri_a25_smart_terrain">
+		<text>Do dawnego przedszkola.</text>
+	</string>
+	<string id="st_stalker_pri_a28">
+		<text>Na plac przed kinem, w pobliїu pomnika Prometeusza.</text>
+	</string>
+	<string id="st_stalker_pri_b301">
+		<text>Idк w stronк budynku szkoіy. Ponoж roi siк tam od potworуw, ale dobrze siк sprawdzi na wypadek emisji.</text>
+	</string>
+	<string id="st_stalker_pri_b303">
+		<text>Idк w stronк dawnego centrum usіugowego. Podobno na parterze znajduje siк anomalia, a moїe teї jakieњ artefakty.</text>
+	</string>
+	<string id="st_stalker_pri_b304">
+		<text>Badam tк czкњж miasta. Teraz idк w stronк dawnego sklepu spoїywczego.</text>
+	</string>
+	<string id="st_stalker_pri_b304_monsters_smart_terrain">
+		<text>Badam tк czкњж miasta. Teraz idк w stronк dawnego sklepu spoїywczego.</text>
+	</string>
+	<string id="st_stalker_pri_b305_dogs">
+		<text>Badam okolicк. Teraz chcк sprawdziж ten budynek za osiedlem.</text>
+	</string>
+	<string id="st_stalker_pri_b306">
+		<text>Chcк przeszukaж centrum usіugowe, nazywaіo siк chyba Jubilejny.</text>
+	</string>
+	<string id="st_stalker_pri_b307">
+		<text>Szukam anomalii w okolicy. Podobno na placu na zachуd od przedszkola jest anomalia ogniowa.</text>
+	</string>
+	<string id="st_stalker_pri_b35_envoy">
+		<text>Och, tak tylko zwiedzam miasto. Idк teraz w stronк osiedla.</text>
+	</string>
+	<string id="st_stalker_pri_b35_mercs">
+		<text>Och, tak tylko zwiedzam miasto. Idк teraz w stronк osiedla.</text>
+	</string>
+	<string id="st_stalker_pri_b35_military">
+		<text>Och, tak tylko zwiedzam miasto. Idк teraz w stronк osiedla.</text>
+	</string>
+	<string id="st_stalker_pri_b36_smart_terrain">
+		<text>Chodzк sobie tu i tam. Teraz idк w stronк portu rzecznego. Mam nadziejк, їe nie wpadnк na jakichњ szaleсcуw z Monolitu...</text>
+	</string>
+	<string id="st_stalker_pri_b302">
+		<text>Szukam w Prypeci miejsca z mnуstwem artefaktуw, ale bez potworуw i wojownikуw Monolitu... He, he... A na powaїnie, zamierzam sprawdziж pewn№ anomaliк, o ktуrej sіyszaіem, na poіudnie od portu rzecznego.</text>
+	</string>
+	<string id="st_stalker_pri_sim_1">
+		<text>W stronк kina Prometeusz.</text>
+	</string>
+	<string id="st_stalker_pri_sim_2">
+		<text>Na plac przed kinem, w pobliїu pomnika Prometeusza.</text>
+	</string>
+	<string id="st_stalker_pri_sim_3">
+		<text>Chcк siк przyczaiж przez jakiњ czas i zіapaж oddech. Jest do tego idealne miejsce na placu na pуіnoc od przedszkola.</text>
+	</string>
+	<string id="st_stalker_pri_sim_4">
+		<text>Na poіudnie od osiedla.</text>
+	</string>
+	<string id="st_stalker_pri_sim_5">
+		<text>Idк w pewne miejsce pomiкdzy przedszkolem i osiedlem.</text>
+	</string>
+	<string id="dm_anomalies_8">
+		<text>Jest pewne miejsce, zwane Szram№, gdzie ziemia wygl№da, jakby ktoњ j№ przeci№і siekier№. Ludzie znajdowali tam artefakty, ale gdy siк tam wejdzie, zaczynaj№ siк dziaж dziwne rzeczy. To coњ tak dziaіa na mуzg, їe zapominasz, jak siк oddycha, nie mуwi№c juї o tym, їeby siк stamt№d wydostaж.</text>
+	</string>
+	<string id="dm_anomalies_1">
+		<text>Wiesz, gdzie jest pogікbiarka? Zostaіa zniszczona przez anomalie grawitacyjne, ale dla doњwiadczonego stalkera to nic wielkiego. Po prostu rzucaj њrubami, jak zwykle. Peіno tam teї promieniowania, zarуwno wewn№trz, jak i na zewn№trz - jak przy wielkim kawaіku wzbogaconego uranu.</text>
+	</string>
+	<string id="dm_anomalies_4">
+		<text>Jest tu stara podstacja, zwana teї Їelaznym Lasem. Zrozumiesz dlaczego, jak j№ zobaczysz. Niektуrzy twierdz№, їe po emisji znajdowali tam po kilka artefaktуw. Nie jest tam aї tak niebezpiecznie, gіуwnie anomalie elektryczne i trochк promieniowania... Znajdzie siк teї kilka poltergeistуw, ktуre zasypi№ ciк wszystkim, czym tylko siк da, jeїeli siк w porк nie schowasz.</text>
+	</string>
+	<string id="dm_job_12">
+		<text>Pracк? Szczerze mуwi№c, nie wiem. Ale jeњli nadarzy ci siк szansa, їeby pomуc Wolnoњci, idџ do naszego szefa w Janowie. Skieruj siк do poіudniowego skrzydіa i spotkaj siк z Lokim - to on. Pamiкtaj, jeњli wierzysz w postкp rodzaju ludzkiego, wyїsz№ њwiadomoњж i znaczenie darуw Zony, dokonasz sіusznego wyboru.</text>
+	</string>
+	<string id="dm_job_13">
+		<text>Nie mam pojкcia. Ale jeњli znajdziesz coњ, co moїe nam pomуc w walce przeciwko Zonie i przeciwko tym, ktуrzy uwaїaj№ j№ za dar, a nie za przekleсstwo, spotkaj siк z dowуdc№ jednostki ekspedycyjnej Powinnoњci, podpuіkownikiem Szulg№. On zarz№dza stacj№ Janуw. Znajdziesz go w pуіnocnym skrzydle. Jedno jest pewne - kaїdy cywil, ktуry przyczyni siк do zwyciкstwa Powinnoњci, zostanie naleїycie nagrodzony.</text>
+	</string>
+	<string id="dm_information_19">
+		<text>Wszyscy gadaj№ o jakichњ dziwnych wydarzeniach w dawnej chіodni kominowej. Jeњli wі№czysz ogуln№ czкstotliwoњж, zіapiesz fragmenty woіania o pomoc, ktуre brzmi№ jakby jakiњ biedak prуbowaі siк wydostaж z anomalii. Gdy zapytasz o wspуіrzкdne, nikt nie odpowiada. Najdziwniejszy w tym wszystkim jest dџwiкk. Taki rodzaj zakіуceс ciкїko wytіumaczyж...</text>
+	</string>
+	<string id="st_stalker_zat_sim_27">
+		<text>Idк do pewnego miejsca w pуі drogi miкdzy Skadowskiem i Szewczenk№.</text>
+	</string>
+	<string id="st_stalker_jup_a9">
+		<text>Do fabryki Jupiter. Ale raczej nie bкdк wchodziж zbyt daleko do њrodka.</text>
+	</string>
+</string_table>

@@ -1,0 +1,366 @@
+[list_music_and_stories]
+attack_begin
+attack_begin_reply
+
+alife_stalker_counter_check
+alife_bandit_counter_check
+alife_dolg_counter_check
+alife_freedom_counter_check
+alife_army_counter_check
+
+alife_stalker_counter_begin
+alife_stalker_counter_reply
+alife_bandit_counter_begin
+alife_bandit_counter_reply
+alife_dolg_counter_begin
+alife_dolg_counter_reply
+alife_freedom_counter_begin
+alife_freedom_counter_reply
+alife_army_counter_begin
+alife_army_counter_reply
+
+intro_music
+play_guitar
+reac_music
+
+play_harmonica
+
+intro_joke
+joke
+reac_joke
+reac_laugh
+
+;***************************************************************
+;**  Сбор отряда в атаку
+;***************************************************************
+[attack_begin]
+type = npc
+avail_communities = stalker, bandit, dolg, freedom, army
+npc_prefix = true
+path = alife\attack\attack_begin_
+shuffle = rnd
+idle = 0,0,100
+
+[attack_begin_reply]
+type = npc
+avail_communities = stalker, bandit, dolg, freedom, army
+npc_prefix = true
+path = alife\attack\begin_reply_
+shuffle = rnd
+idle = 0,0,100
+;group_snd = true
+
+
+[alife_stalker_counter_check]
+type = actor
+actor_stereo = false
+npc_prefix = false
+path = characters_voice\human_02\stalker\alife\counter_attack\check_
+shuffle = seq
+idle = 0,0,100
+
+[alife_bandit_counter_check]
+type = actor
+actor_stereo = false
+npc_prefix = false
+path = characters_voice\human_02\bandit\alife\counter_attack\check_
+shuffle = seq
+idle = 0,0,100
+
+[alife_dolg_counter_check]
+type = actor
+actor_stereo = false
+npc_prefix = false
+path = characters_voice\human_02\dolg\alife\counter_attack\check_
+shuffle = seq
+idle = 0,0,100
+
+[alife_freedom_counter_check]
+type = actor
+actor_stereo = false
+npc_prefix = false
+path = characters_voice\human_02\freedom\alife\counter_attack\check_
+shuffle = seq
+idle = 0,0,100
+
+[alife_army_counter_check]
+type = actor
+actor_stereo = false
+npc_prefix = false
+path = characters_voice\human_02\military\alife\counter_attack\check_
+shuffle = seq
+idle = 0,0,100
+
+[alife_stalker_counter_begin]
+type = actor
+actor_stereo = false
+npc_prefix = false
+path = characters_voice\human_02\stalker\alife\counter_attack\counter_attack_begin_
+shuffle = rnd
+idle = 0,0,100
+
+[alife_stalker_counter_reply]
+type = actor
+actor_stereo = false
+npc_prefix = false
+path = characters_voice\human_02\stalker\alife\counter_attack\reply_
+shuffle = rnd
+idle = 0,0,100
+
+[alife_bandit_counter_begin]
+type = actor
+actor_stereo = false
+npc_prefix = false
+path = characters_voice\human_02\bandit\alife\counter_attack\counter_attack_begin_
+shuffle = rnd
+idle = 0,0,100
+
+[alife_bandit_counter_reply]
+type = actor
+actor_stereo = false
+npc_prefix = false
+path = characters_voice\human_02\bandit\alife\counter_attack\reply_
+shuffle = rnd
+idle = 0,0,100
+
+[alife_dolg_counter_begin]
+type = actor
+actor_stereo = false
+npc_prefix = false
+path = characters_voice\human_02\dolg\alife\counter_attack\counter_attack_begin_
+shuffle = rnd
+idle = 0,0,100
+
+[alife_dolg_counter_reply]
+type = actor
+actor_stereo = false
+npc_prefix = false
+path = characters_voice\human_02\dolg\alife\counter_attack\reply_
+shuffle = rnd
+idle = 0,0,100
+
+[alife_freedom_counter_begin]
+type = actor
+actor_stereo = false
+npc_prefix = false
+path = characters_voice\human_02\freedom\alife\counter_attack\counter_attack_begin_
+shuffle = rnd
+idle = 0,0,100
+
+[alife_freedom_counter_reply]
+type = actor
+actor_stereo = false
+npc_prefix = false
+path = characters_voice\human_02\freedom\alife\counter_attack\reply_
+shuffle = rnd
+idle = 0,0,100
+
+[alife_army_counter_begin]
+type = actor
+actor_stereo = false
+npc_prefix = false
+path = characters_voice\human_02\military\alife\counter_attack\counter_attack_begin_
+shuffle = rnd
+idle = 0,0,100
+
+[alife_army_counter_reply]
+type = actor
+actor_stereo = false
+npc_prefix = false
+path = characters_voice\human_02\military\alife\counter_attack\reply_
+shuffle = rnd
+idle = 0,0,100
+
+
+;************************************************************
+;** Игра на гитаре
+;************************************************************
+[intro_music]
+type = npc
+avail_communities = stalker, bandit, dolg, freedom
+npc_prefix = true
+path = talk\intros\intro_music_
+shuffle = rnd
+idle = 1,1,100
+
+[play_guitar]
+type = 3d
+avail_communities = stalker, bandit, dolg, freedom
+npc_prefix = true
+path = music\guitar_
+shuffle = rnd
+idle = 1,1,100
+
+[reac_music]
+type = npc
+avail_communities = stalker, bandit, dolg, freedom
+npc_prefix = true
+path = reactions\music\reaction_music_
+shuffle = rnd
+idle = 1,1,100
+group_snd = true
+
+[play_harmonica]
+type = 3d
+avail_communities = stalker, bandit, dolg, freedom
+npc_prefix = true
+path = music\harmonica_
+shuffle = rnd
+idle = 1,1,100
+
+;***************************************************************
+;**  Истории
+;***************************************************************
+[intro_joke]
+type = npc
+avail_communities = stalker, bandit, dolg, freedom, army, monolith
+npc_prefix = true
+path = talk\intros\intro_joke_
+shuffle = rnd
+idle = 0,0,100
+group_snd = true
+
+[joke]
+type = npc
+avail_communities = stalker, bandit, dolg, freedom, army, monolith
+npc_prefix = true
+path = talk\jokes\joke_
+shuffle = rnd
+idle = 0,0,100
+group_snd = true
+
+[reac_joke]
+type = npc
+avail_communities = stalker, bandit, dolg, freedom, army, monolith
+npc_prefix = true
+path = reactions\joke\reaction_joke_
+shuffle = rnd
+idle = 0,0,100
+group_snd = true
+
+[reac_laugh]
+type = npc
+avail_communities = stalker, bandit, dolg, freedom, army, monolith
+npc_prefix = true
+path = reactions\story\laughter_
+shuffle = rnd
+idle = 0,0,100
+group_snd = true
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[story_01_seq]
+stalker	= 1,talk\stories\story001_part_
+
+[story_02_seq]
+stalker	= 1,talk\stories\story002_part_
+
+[story_03_seq]
+stalker	= 1,talk\stories\story003_part_
+
+[story_04_seq]
+stalker	= 1,talk\stories\story004_part_
+
+[story_05_seq]
+stalker	= 1,talk\stories\story005_part_
+
+[story_06_seq]
+stalker	= 1,talk\stories\story006_part_
+
+[legend_01_seq]
+stalker	= 1,talk\stories\legend001_part_
+
+[legend_02_seq]
+stalker	= 1,talk\stories\legend002_part_
+
+[legend_03_seq]
+stalker	= 1,talk\stories\legend003_part_
+
+[legend_04_seq]
+stalker	= 1,talk\stories\legend004_part_
+
+[legend_05_seq]
+stalker	= 1,talk\stories\legend005_part_
+
+
+[story_reac_action_right_rnd]
+stalker	= 1,reactions\story\action_right_
+
+[story_reac_action_wrong_rnd]
+stalker	= 1,reactions\story\action_wrong_
+
+[story_reac_advice_sceptic_rnd]
+stalker	= 1,reactions\story\advice_sceptic_
+
+[story_reac_advice_support_rnd]
+stalker	= 1,reactions\story\advice_support_
+
+[story_reac_belief_story_rnd]
+stalker	= 1,reactions\story\belief_story_
+
+[story_reac_continue_rnd]
+stalker	= 1,reactions\story\continue_
+
+[story_reac_cool_info_rnd]
+stalker	= 1,reactions\story\cool_info_
+
+[story_reac_cool_teller_rnd]
+stalker	= 1,reactions\story\cool_teller_
+
+[story_reac_disbelief_rnd]
+stalker	= 1,reactions\story\disbelief_
+
+[story_reac_disbelief_story_rnd]
+stalker	= 1,reactions\story\disbelief_story_
+
+[story_reac_disbelief_teller_rnd]
+stalker	= 1,reactions\story\disbelief_teller_
+
+[story_reac_doubt_rnd]
+stalker	= 1,reactions\story\doubt_
+
+[story_reac_fear_rnd]
+stalker	= 1,reactions\story\fear_
+
+[story_reac_final_happy_rnd]
+stalker	= 1,reactions\story\final_happy_
+
+[story_reac_final_tragic_rnd]
+stalker	= 1,reactions\story\final_tragic_
+
+[story_reac_laughter_rnd]
+stalker	= 1,reactions\story\laughter_
+
+[story_reac_old_story_rnd]
+stalker	= 1,reactions\story\old_story_
+
+[story_reac_uncertain_rnd]
+stalker	= 1,reactions\story\uncertain_
+
+[story_reac_wonder_rnd]
+stalker	= 1,reactions\story\wonder_
+
+[story_reac_yes_rnd]
+stalker	= 1,reactions\story\yes_

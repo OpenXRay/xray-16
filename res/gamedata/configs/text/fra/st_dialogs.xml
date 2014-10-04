@@ -1,0 +1,978 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="about_quests_dialog_bandit_0">
+		<text>J'aurais une petite question а poser...</text>
+	</string>
+	<string id="about_quests_dialog_bandit_1">
+		<text>Vas-y, accouche !</text>
+	</string>
+	<string id="about_quests_dialog_bandit_10">
+		<text>Qu'est-ce que tu penses d'Allegro ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_101">
+		<text>Allegro ? Je pense qu'un de ces jours, je vais me choper ce petit con au fond d'un bois et lui foutre une bonne dйrouillйe des familles !</text>
+	</string>
+	<string id="about_quests_dialog_bandit_11">
+		<text>Tu as entendu parler de l'Oasis ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_111">
+		<text>Ouais, j'ai entendu une sacrйe blague а propos de cet endroit. En fait, les gars de la Dйcharge ont lancй une rumeur concernant l'emplacement de l'Oasis. Ils se sont cassй le cul pour que зa ait l'air vrai, tu vois le genre ? Ensuite, ils sont partis lа-bas et ils ont attendu. Зa a pas ratй, il y a eu tellement de stalkers naпfs qui sont venus leur refiler leur matos que les gars ont pu se barrer de la Zone les poches pleines. Et pourquoi pas, aprиs tout ? Ils avaient mis assez de cфtй pour leurs vieux jours. Y en a qu'un seul qui soit restй, un certain Yoga...</text>
+	</string>
+	<string id="about_quests_dialog_bandit_112">
+		<text>Ouais, paraоt que si t'y vas, toutes tes maladies seront guйries... Зa doit кtre bien pratique : plus de gueule de bois ou d'hйmorroпdes, le pied ! Si tu le trouves, t'as plus qu'а y ouvrir un petit commerce et regarder la thune s'accumuler sans que tu lиves le petit doigt !</text>
+	</string>
+	<string id="about_quests_dialog_bandit_113">
+		<text>Qu'est-ce que зa peut me foutre ? Tout зa, c'est des conneries pour occuper les bleubites... Les vrais mecs, ils ont pas besoin de зa. C'est toujours la mкme chose : tu viens prendre une binouze au bar et tous les connards arrкtent pas de parler de l'Oasis. Et chacun te jure qu'il sait oщ elle se trouve... mais bizarrement, ils ont tous des infos diffйrentes !</text>
+	</string>
+	<string id="about_quests_dialog_bandit_12">
+		<text>Tu as dйjа rencontrй un stalker qui se fait appeler la Pie ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_121">
+		<text>Ouais. Et il m'a suffi d'un coup d'њil pour voir que c'йtait une belle buse... et puis, j'ai aussi entendu des stalkers dire que son surnom complet, зa serait plutфt la Pie voleuse... Enfin, si tu veux le trouver, faudra que tu te dйbrouilles tout seul.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_122">
+		<text>Nan... Jamais entendu ce nom-lа...</text>
+	</string>
+	<string id="about_quests_dialog_bandit_13">
+		<text>Qui aurait pu voler des affaires dans une cantine personnelle ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_131">
+		<text>Un salaud, je vois que зa. Tu devrais en parler aux boss а Yanov, ils savent s'occuper de ce genre de vermine.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_14">
+		<text>Qui pourrait m'aider а dйcrypter quelque chose par ici ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_141">
+		<text>Ben, il paraоt que Nitro а Yanov se dйbrouille pas trop mal. Apparemment, avant qu'il se mette а bosser pour le Devoir, les gars lui ont demandй de pirater quelques PDA... Ah, c'йtait le bon temps...</text>
+	</string>
+	<string id="about_quests_dialog_bandit_143">
+		<text>Hй, t'as pas besoin d'un polytechnicien pour зa. Il te suffit de trouver mec qui sache pirater ton systиme. J'en ai rencontrй un quand j'йtais au trou, mais зa fait un bail. Зa va pas t'aider, il avait encore cinq ans а tirer quand je suis sorti.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_15">
+		<text>J'ai le PDA du marchand du Devoir. Tu ne connaоtrais pas quelqu'un que зa intйresserait ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_151">
+		<text>Il y bien a un marchand sur le Skadovsk... Hibou, qu'il s'appelle. Il paye toujours rubis sur l'ongle et les gars lui vendent des PDA de temps en temps. Il pose pas trop de questions non plus, ce qui est pas plus mal.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_152">
+		<text>Зa peut intйresser quasiment tout le monde, mon pote... Rйflйchis un peu : sa propre faction lui en ferait voir des vertes et des pas mыres, et les autres feraient des pieds et des mains pour obtenir ces infos. А mon avis, vaut mieux que le Hibou le fasse disparaоtre. Par contre, y aura que lui qui saura oщ la marchandise finira, mais bon, c'est а toi de voir...</text>
+	</string>
+	<string id="about_quests_dialog_bandit_16">
+		<text>Oщ est-ce que je peux trouver des outils par ici ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_165">
+		<text>Si tu cherches des instruments chirurgicaux, va voir dans les hфpitaux et les dispensaires. Si tu veux des outils de construction, va voir dans la carriиre de Jupiter. Sinon, fouille dans les vieux ateliers.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_166">
+		<text>Qu'est-ce que j'en sais, moi ? J'ai pas besoin d'outils pour faire parler les stalkers, tu sais... Allez, relax, je rigole.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_17">
+		<text>Qui pourrait me dйbloquer un module de mйmoire ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_171">
+		<text>Bonne question ! А ton avis, j'ai une tronche а savoir ce genre de connerie ? T'es pas un peu con, des fois ? Va plutфt voir des techniciens ou des scientifiques ! Tu t'attends quand mкme pas а ce que je puisse t'aider avec ce genre de truc, si ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_172">
+		<text>Pour tout te dire, la derniиre fois que j'ai "dйbloquй un module de mйmoire", c'йtait а l'йcole et c'йtait une putain de disquette ! Alors, va donc faire chier des mecs qui s'y connaissent dans ce genre de trucs, ok ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_18">
+		<text>Qui pourrait forcer un conteneur en acier ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_181">
+		<text>Tu connais Cardan, du Skadovsk ? Eh bien, il йtait torchй l'autre jour et il s'est mis а poursuivre un autre abruti avec un pied-de-biche. Je suis sыr que tu dois pouvoir le convaincre de l'utiliser а des fins plus... comment dire... orthodoxes.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_182">
+		<text>Eh ben, avec des bons outils, mкme moi, je pourrais y arriver. Mais bon, personne vient dans la Zone avec des outils... Donc tu ferais mieux de t'adresser а des mйcanos, c'est leur domaine, aprиs tout.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_19">
+		<text>Je cherche un stalker du nom d'Accroc. Tu sais oщ je peux le trouver ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_191">
+		<text>Aucune idйe... Demande plutфt а Sultan sur le Skadovsk. Le boss sait oщ sont tous les caves, en gйnйral.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_193">
+		<text>Ouais, j'ai entendu parler de ce tocard. Il traоne а Zaton la plupart du temps, donc tu ne risques pas de le croiser par ici.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_2">
+		<text>Qu'est-ce que tu peux me dire sur les hйlicoptиres qui se sont йcrasйs ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_20">
+		<text>Qui serait intйressй par des informations concernant le fondateur du Devoir ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_201">
+		<text>Je connais personne qui serait pas intйressй ! Ce sont des infos explosives, mon pote ! А mon avis, t'aurais plutфt intйrкt а aller voir le Hibou, sur le Skadovsk. Tu y perdras peut-кtre un peu au change, mais au moins, tu te feras pas d'ennemis.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_22">
+		<text>Ben, rien ! Rйflйchis un peu : j'ai le Devoir а ma droite, la Libertй а ma gauche et des stalkers plein le cul ! Tu crois vraiment que j'ai que зa а foutre, de zyeuter le ciel ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_23">
+		<text>Les gars m'ont dit qu'ils en avaient vu un pris dans des cвbles йlectriques de la Forкt de fer, mais зa t'avancera pas а grand-chose... а moins que tu tiennes vraiment а marcher dans une anomalie ou а te faire dйfoncer le crвne par un poltergeist.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_24">
+		<text>Ouais, un mec m'a dit qu'il en avait vu un s'йcraser sur un plateau, mais y a aucun moyen d'y accйder. Paraоt que le pilote aurait pйtй un cвble, vu la faзon dont il volait.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_26">
+		<text>Paraоt qu'un hйlico s'est pris pour un sous-marin et a fini dans le marais. Autant dire que зa s'est mal terminй, vu que l'eau par ici, elle est pas vraiment potable...</text>
+	</string>
+	<string id="about_quests_dialog_bandit_3">
+		<text>Il y a des militaires dans le coin ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_30">
+		<text>Qui serait intйressй par des cartes de la rйgion entre Zaton et Jupiter ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_301">
+		<text>Pilote, je pense. C'est le guide principal de la rйgion. Зa pourrait pas lui faire de mal de se rйfйrer а de vraies cartes au lieu des йtoiles...</text>
+	</string>
+	<string id="about_quests_dialog_bandit_31">
+		<text>Les gars m'ont dit qu'une unitй militaire йtait descendue du plateau sud, droit vers le camp des mercenaires. Ils se sont dit que зa allait barder, alors ils se sont tirйs vite fait.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_32">
+		<text>Paraоt que des bidasses ont essayй de sortir leur matos de leur hйlicoptиre avant qu'il s'enfonce dans le marais. T'imagines ? Cinq troufions dans le marais а essayer de pas se mouiller les pieds ? Hй hй, зa devait pas кtre beau а voir.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_33">
+		<text>Un type m'a dit qu'il traquait un stalker pour choper son butin quand il a entendu des coups de feu. Apparemment, les militaires йtaient en train de se battre contre les mercenaires. Il s'est planquй et a attendu que зa se calme, mais du coup, son stalker en a profitй pour se faire la malle. C'est con, hein ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_34">
+		<text>Un de mes potes m'a racontй qu'il avait vu un truc vraiment bizarre : y avait Noah et sa pйniche avec le moulin dessus, tout excitй а sauter dans tous les sens, et dix bidasses qui couraient dans tous les sens pour s'йloigner de son sale clйbard. Autant te dire que mon pote s'est bien marrй avant de s'йloigner de ce cirque.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_35">
+		<text>Nan, c'est pas un coin tranquille, trop de mecs avec des flingues chargйs et la gвchette facile... J'ai autre chose а foutre que faire le tri entre les militaires en vadrouille et les gars du Devoir en mission.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_4">
+		<text>Tu sais comment aller а Pripyat ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_40">
+		<text>Qui est-ce que je pourrais recruter pour protйger les scientifiques ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_403">
+		<text>Ha, moi et les gars, on ferait l'affaire ! On va leur donner une protection comme ils en ont jamais vue ! Les stalkers et les mutants oseront plus s'approcher, crois-moi ! Suffit de cracher le fric toutes les semaines et c'est une affaire qui roule ! Mais faut pas oublier le 13e mois !</text>
+	</string>
+	<string id="about_quests_dialog_bandit_41">
+		<text>Ben, а pied, mon pote ! Va jusqu'а Jupiter et demande aux gars du coin ! Y a pas de route directe entre Zaton et Pripyat !</text>
+	</string>
+	<string id="about_quests_dialog_bandit_43">
+		<text>J'ai une tronche de guide touristique ? C'est pas marquй 'Questions connes bienvenues' sur mon front ! Va demander а Pilote. Lui, il est payй pour rйpondre а ce genre de questions.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_44">
+		<text>Non... Qu'est-ce que j'irais foutre lа-bas de toute faзon ? Y a pas de stalkers а plumer dans ce trou !</text>
+	</string>
+	<string id="about_quests_dialog_bandit_5">
+		<text>Je cherche quelqu'un qui serait prкt а se rendre а Pripyat. </text>
+	</string>
+	<string id="about_quests_dialog_bandit_51">
+		<text>Pripyat vaut pas le coup pour des mecs comme nous. Rйflйchis un peu, зa grouille de mutants et d'anomalies... comme le reste de la Zone, d'ailleurs... mais en plus, y a pas de stalkers а plumer ! Quand les stalkers iront а Pripyat, fais-moi signe et on y ira, histoire de mettre un peu d'ordre, mais pas avant.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_57">
+		<text>J'ai pas d'idйe, mec. Dйsolй.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_6">
+		<text>J'ai trouvй une arme йtrange. Qui pourrait m'aider а savoir de quoi il s'agit exactement ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_62">
+		<text>А ta place, je demanderais aux techniciens. Aprиs tout, c'est leur boulot de savoir ce genre de trucs, non ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_63">
+		<text>Aucune idйe... Les stalkers du Skadovsk pensent que Cardan est un gйnie de la mйcanique. Si tu veux mon avis, c'est qu'un vieux poivrot, mais tu pourrais peut-кtre t'adresser а lui... </text>
+	</string>
+	<string id="about_quests_dialog_bandit_7">
+		<text>Qui pourrais-je recruter pour faire des relevйs pour les scientifiques ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_73">
+		<text>Nos gars peuvent s'en charger sans problиme. Bon, c'est pas comme s'ils avaient fait des йtudes, hein, mais tu leur montres n'importe qui et ils te le retournent dans tous les sens vite fait bien fait. Ils pourront mкme te creuser une tombe sur mesure !</text>
+	</string>
+	<string id="about_quests_dialog_bandit_8">
+		<text>J'ai trouvй un artefact trиs йtrange. Qui serait prкt а me l'acheter ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_81">
+		<text>Un artefact йtrange, tu dis ? Fais voir... File-le-moi, histoire que je puisse bien le voir... Hй, du calme, je plaisante ! Mais а ta place, je montrerais pas ce truc а n'importe qui... Y a des tas de mecs qui sont pas aussi sympas que moi, si tu vois ce que je veux dire...</text>
+	</string>
+	<string id="about_quests_dialog_bandit_83">
+		<text>Mec, t'as des couilles en bйton pour venir montrer зa dans le coin. Respect ! Йcoute, le mec qu'il te faut, c'est le Barbu, sur le Skadovsk. Personne sait comment il arrive а faire sortir les artefacts de la Zone, mais il te dйbarrassera de ce machin pour un bon prix.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_9">
+		<text>J'ai trouvй un nid de sangsues pas loin d'ici. Qu'est-ce qu'on doit faire ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_91">
+		<text>Ben, qu'est-ce que tu veux qu'on fasse ? On fout le camp, et vite, c'est tout !</text>
+	</string>
+	<string id="about_quests_dialog_bandit_98">
+		<text>Ok, oublie зa.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_0">
+		<text>J'aurais une question...</text>
+	</string>
+	<string id="about_quests_dialog_dolg_1">
+		<text>J'йcoute.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_10">
+		<text>Je cherche а me renseigner au sujet d'un certain Allegro.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_101">
+		<text>Allegro ? Jamais entendu parler de lui. Il serait pas dans une autre unitй ?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_11">
+		<text>Je cherche des informations au sujet de l'Oasis.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_111">
+		<text>C'est un conte de fйe des stalkers. C'est ce qu'ils font depuis toujours : ils inventent une histoire pas possible et ensuite, ils partent а la recherche du saint Graal ! Moi, j'йcoute pas ses racontars, зa apporte que des emmerdes. Y en a mкme qui croient а l'existence de l'Exauceur de vњux !</text>
+	</string>
+	<string id="about_quests_dialog_dolg_112">
+		<text>Ah oui, l'endroit oщ les blessures se referment toutes seules et les maladies sont guйries comme par magie ? Ben, tout зa, c'est que du vent ! Les stalkers inventent ce genre de conneries pour se donner l'impression que la Zone n'est pas si dangereuse que зa, mais la triste vйritй, c'est qu'il n'y a aucun endroit sыr dans toute la Zone. Faut savoir garder les pieds sur terre par ici ! Les rкveurs, ils survivent pas longtemps dans le coin.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_113">
+		<text>Ouais, et tous les artefacts qu'on y trouve valent leur poids en or et ils sont prйsentйs sur un plateau d'argent pendant qu'on te masse les orteils... Ben voyons... Je n'y crois pas une seule seconde, mкme si ce serait bien pratique. On pourrait y installer un hфpital sans mйdecins : les blessйs viendraient et ils seraient soignйs sans rien faire. Mais, c'est trop beau pour кtre vrai...</text>
+	</string>
+	<string id="about_quests_dialog_dolg_12">
+		<text>Je cherche un stalker qui se fait appeler la Pie.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_121">
+		<text>J'ai dйjа du mal а me rappeler tous les gars du Devoir, alors un stalker ! Jamais entendu parler ! Les stalkers ont leur base sur le Skadovsk, vaut mieux s'adresser directement а eux !</text>
+	</string>
+	<string id="about_quests_dialog_dolg_122">
+		<text>Non.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_13">
+		<text>Qui aurait pu voler des affaires dans une cantine personnelle ?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_131">
+		<text>Alors, зa, зa n'arriverait jamais dans une base du Devoir. Mais ici, avec tous ces glandeurs de la Libertй, on ne sait jamais... </text>
+	</string>
+	<string id="about_quests_dialog_dolg_14">
+		<text>Qui pourrait m'aider а dйcrypter quelque chose par ici ?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_141">
+		<text>Il y a un technicien du nom de Nitro dans la gare de Yanov. Il se dйbrouille bien en йlectronique : il m'a dйpannй quand j'avais oubliй le mot de passe de mon PDA. Il s'en est occupй en cinq secondes chrono !</text>
+	</string>
+	<string id="about_quests_dialog_dolg_143">
+		<text>Pour зa, il vaut mieux aller а Yanov et parler а Nitro. Il est plutфt douй pour ce genre de trucs.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_15">
+		<text>J'ai le PDA du marchand du Devoir. Qui est-ce que зa pourrait intйresser ?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_151">
+		<text>Un marchand du Devoir ? C'est impossible ! Quoi qu'il en soit, c'est le lieutenant-colonel Shulga qui s'occupe de ce genre de choses. Il saura quoi en faire.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_16">
+		<text>Oщ est-ce que je peux trouver des outils par ici ?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_163">
+		<text>Il y a une usine pas loin d'ici. Bien sыr, il y a des chances qu'elle ait йtй pillйe, mais зa vaut peut-кtre le coup quand mкme.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_165">
+		<text>А mon avis, il doit en rester quelques-uns dans les vieux ateliers, ou alors dans certains des magasins.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_166">
+		<text>Il n'y a que des mutants et des anomalies dans le coin ! Ha ! Et aussi des contrфleurs, mais ils ne sont pas vraiment du genre serviable...</text>
+	</string>
+	<string id="about_quests_dialog_dolg_169">
+		<text>Eh bien, il y a un train sous le pont pas loin d'ici. J'en ai dйjа vu des comme зa avant : ils servent gйnйralement а transporter des techniciens, donc ils doivent sыrement contenir du matйriel.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_17">
+		<text>Qui pourrait dйbloquer un module de mйmoire ?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_171">
+		<text>Nitro. C'est le seul gars de la gare de Yanov qui s'y connaisse.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_172">
+		<text>Il vaut mieux s'adresser а un technicien pour зa. Et le seul technicien compйtent du coin, c'est Nitro. Il traоne dans la gare de Yanov.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_18">
+		<text>Qui pourrait forcer un conteneur en acier ?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_181">
+		<text>Il paraоt qu'il y a un technicien chez les stalkers. C'est un alcoolique, mais il connaоt son mйtier. </text>
+	</string>
+	<string id="about_quests_dialog_dolg_182">
+		<text>Ha, autant demander qui pourrait forcer un coffre-fort ! Je suis sыr que Nitro pourra rien y faire... s'il y avait une serrure йlectronique, зa serait une autre histoire.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_19">
+		<text>Je suis а la recherche d'un stalker du nom d'Accroc.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_191">
+		<text>Il vaudrait mieux en parler aux autres stalkers, c'est l'un d'entre eux, ils doivent savoir oщ il est. Moi, j'ai jamais entendu parler de ce Maquereau...</text>
+	</string>
+	<string id="about_quests_dialog_dolg_2">
+		<text>Je cherche des informations sur les hйlicoptиres qui se sont йcrasйs.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_20">
+		<text>Qui serait intйressй par des informations concernant le fondateur du Devoir ?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_201">
+		<text>Le commandant, йvidemment. C'est Shulga qui s'occupe de ce genre de chose. Le Devoir sait rйcompenser ses amis...</text>
+	</string>
+	<string id="about_quests_dialog_dolg_22">
+		<text>Ouais, nos йclaireurs ont vu un hйlico militaire qui se dirigeait vers les hйliports de rйserves de Jupiter. Ils ont essayй de lui dire de changer de cap, mais les pilotes devaient avoir d'autres chats а fouetter. Je me demande si ces bidasses ont rйussi а traverser le champ de mines...</text>
+	</string>
+	<string id="about_quests_dialog_dolg_23">
+		<text>On n'est pas encore trиs bien implantйs dans le coin... Il vaut mieux en parler а nos gars prиs de Yanov.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_25">
+		<text>Une patrouille a signalй qu'un hйlicoptиre militaire a tentй un atterrissage d'urgence prиs de l'usine de Jupiter. Malheureusement, l'appareil s'est йcrasй sur le toit des ateliers. Il n'y a probablement aucun survivant, vu que nous n'avons reзu aucun signal de dйtresse.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_3">
+		<text>Il y a des militaires dans le coin ?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_30">
+		<text>Qui serait intйressй par des cartes de la rйgion entre Zaton et Jupiter ?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_301">
+		<text>Quelqu'un qui en aurait l'utilitй ? Pilote, par exemple : c'est le guide sur la route entre Zaton et le Skadovsk. De telles cartes lui seraient bien utiles, c'est sыr.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_31">
+		<text>Des militaires ? J'en ai pas vu beaucoup dans le coin, mais c'est vrai qu'on passe pas trop de temps par ici.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_35">
+		<text>Quelqu'un a repйrй le cadavre d'un soldat dans le champ de mines il y a quelque temps. Ces hйlicoptиres peuvent emmener 8 hommes en plus de l'йquipage, alors certains ont dы en rйchapper, mais personne ne sait oщ ils sont passйs.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_36">
+		<text>Un militaire a йtй aperзu dans le bunker des scientifiques trиs rйcemment, mais je ne sais rien de plus.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_37">
+		<text>L'autre jour, un mec en uniforme a йtй aperзu en train d'entrer dans un bвtiment prиs du complexe Volkhov AA. Mais bon, зa aurait trиs bien pu кtre un zombie...</text>
+	</string>
+	<string id="about_quests_dialog_dolg_38">
+		<text>Des stalkers ont vu un groupe de militaires prиs de l'usine de Jupiter. А en croire la description qu'ils en ont fait, je dirais que ces mecs faisaient partie des forces spйciales. Ils йtaient accompagnйs par un stalker et se dirigeaient vers Pripyat. Les descriptions йtaient trиs dйtaillйes, mais l'expйrience m'a appris а me mйfier des rumeurs trop plausibles pour кtre honnкtes.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_4">
+		<text>Comment faire pour aller а Pripyat ?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_40">
+		<text>Qui je pourrais recruter pour protйger les scientifiques ?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_401">
+		<text>Ils ne pourront pas trouver meilleure protection que celle fournie par le Devoir. Le lieutenant-colonel Shulga а Yanov se charge de ce genre de mission. Je suis sыr que vous arriverez а vous mettre d'accord.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_402">
+		<text>Tant qu'ils bosseront avec ces clowns de la Libertй, on s'approchera pas de l'endroit. Plutфt crever que d'йcouter ces abrutis sortir leurs vannes merdiques а longueur de journйe.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_42">
+		<text>Le Devoir n'a aucune raison de chercher un chemin menant а Pripyat pour l'instant, mais cela peut quand mкme nous intйresser. Diffйrents rapports non confirmйs indiquent l'existence d'un tunnel entre l'usine de Jupiter et Pripyat, mais la vйrification de cette information impliquerait de passer toute la rйgion au peigne fin.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_43">
+		<text>Pour obtenir ce genre d'infos, il vaut mieux s'adresser а un guide civil. Nos йclaireurs ont dйjа assez de pain sur la planche comme зa.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_44">
+		<text>Nos йclaireurs parcourent souvent la rйgion а la recherche d'un passage sыr vers Pripyat, mais sans rйsultat pour l'instant.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_5">
+		<text>Je cherche quelqu'un qui serait prкt а tenter d'atteindre Pripyat. </text>
+	</string>
+	<string id="about_quests_dialog_dolg_51">
+		<text>La prйsence du Devoir est limitйe dans cette rйgion. Il vaut mieux en parler а nos gars de Yanov.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_52">
+		<text>Selon la rumeur, les scientifiques hйbergeraient un militaire dans leur bunker. Paraоt qu'il est coincй lа-bas : les scientifiques ne bougeront pas avant 12 а 18 mois et il ne risque pas de tenter d'atteindre la frontiиre de la Zone tout seul et а pied. Alors, je me dis que зa pourrait peut-кtre l'intйresser.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_53">
+		<text>Il doit bien y avoir quelques tкtes brыlйes qui seraient prкtes а tenter le coup. Par exemple, un stalker du nom de Vano а la gare de Yanov : зa le dйrange pas d'aller se fourrer dans les pires emmerdes et il est plutфt dйbrouillard. Ce type arriverait а sortir d'une anomalie les yeux fermйs !</text>
+	</string>
+	<string id="about_quests_dialog_dolg_54">
+		<text>Peut-кtre qu'en lanзant une campagne de recrutement dans un asile... Quoi que... j'ai mкme mieux ! Des combattants du Monolithe ! D'ailleurs, puisqu'on en parle, on en a repйrй un group prиs du complexe AA, ils connaissent sыrement un moyen d'atteindre Pripyat, eux... Je plaisante, bien sыr...</text>
+	</string>
+	<string id="about_quests_dialog_dolg_56">
+		<text>Certains membres du Devoir se porteront sыrement volontaires. Arpenteur, par exemple. Il n'a pas encore de mission, alors peut-кtre que le lieutenant-colonel le laissera y aller.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_57">
+		<text>Tout le monde sait que les meilleurs combattants font partie du Devoir... mais nous avons d'autres objectifs pour l'instant.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_6">
+		<text>J'ai trouvй une arme йtrange. Qui saurait me dire de quoi il s'agit exactement ?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_62">
+		<text>Waouh, sacrйe pйtoire ! J'ai jamais rien vu de pareil... Faudrait demander aux techniciens.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_7">
+		<text>Qui pourrais-je recruter pour faire des relevйs pour les scientifiques ?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_71">
+		<text>Quelle question, le Devoir, bien sыr ! Nous comptons beaucoup d'hommes expйrimentйs et nous avons dйjа travaillй pour les scientifiques. Il veut mieux en parler au lieutenant-colonel Shulga, je suis sыr qu'il mettra une unitй а leur disposition.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_72">
+		<text>Personne ne voudra travailler lа-bas si c'est la Libertй qui se charge de la protection du bunker ! Ces pacifistes а deux balles sont tellement stones la plupart du temps qu'ils ont autant de chances de tirer sur leurs amis que sur les ennemis !</text>
+	</string>
+	<string id="about_quests_dialog_dolg_8">
+		<text>J'ai trouvй un artefact trиs йtrange. Qui serait susceptible de me l'acheter ?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_81">
+		<text>Tous les artefacts sont йtranges et je dйconseille а quiconque de les trimballer comme зa. Il vaut mieux laisser faire les experts.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_83">
+		<text>Зa intйressera sыrement les stalkers, ils s'y connaissent dans ce genre de choses. Encore mieux, le mec qui leur achиte leurs artefacts !</text>
+	</string>
+	<string id="about_quests_dialog_dolg_9">
+		<text>J'ai trouvй un nid de sangsues pas loin d'ici. Qu'est-ce qu'on doit faire ?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_91">
+		<text>Les unitйs du Devoir n'ont pas d'opйrations de nettoyage prйvues pour l'instant, donc ce nid va devoir attendre.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_98">
+		<text>Ok...</text>
+	</string>
+	<string id="about_quests_dialog_freedom_0">
+		<text>J'aurais une question а te poser...</text>
+	</string>
+	<string id="about_quests_dialog_freedom_1">
+		<text>Je t'йcoute !</text>
+	</string>
+	<string id="about_quests_dialog_freedom_10">
+		<text>Qu'est-ce que tu penses d'Allegro ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_101">
+		<text>Je sais pas grand-chose а son sujet... Tu devrais en causer aux stalkers. C'est l'un d'entre eux, non ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_11">
+		<text>Tu as entendu parler de l'Oasis ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_111">
+		<text>Plein de fois... Зa fait envie, je dois bien l'avouer : un palais dans les sables, une оle dans la brume, un chвteau dans le ciel... Shangri-la, le Paradis ou l'Oasis, mкme combat ! Tout le monde a le droit de rкver !</text>
+	</string>
+	<string id="about_quests_dialog_freedom_112">
+		<text>Un stalker m'a racontй une histoire intйressante lа-dessus, je me demande mкme si c'йtait pas la premiиre fois que j'entendais parler de l'Oasis... Il m'a dit que d'aprиs les lйgendes, toutes les blessures s'y referment, qu'on y devient calme et serein, comme si on n'йtait pas du tout dans la Zone. Je l'ai pas revu depuis... Et c'est seulement une fois qu'il est parti que je me suis souvenu qu'il boitait. Sauf qu'en partant, il boitait plus du tout et il avait mкme l'air d'avoir rajeuni...</text>
+	</string>
+	<string id="about_quests_dialog_freedom_113">
+		<text>Ouais, des stalkers m'ont mкme filй les coordonnйes... Dix ensembles de cordonnйes diffйrents, qui vont du Lobotomisateur а la centrale de Tchernobyl, en passant par le bar de Yanov ! Qui sait, si зa se trouve, on est en plein dans l'Oasis en ce moment mкme, alors dйtends-toi et profites-en !</text>
+	</string>
+	<string id="about_quests_dialog_freedom_12">
+		<text>Je cherche un stalker qui se fait appeler la Pie.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_121">
+		<text>Jamais entendu parler... Je connais pas beaucoup de stalkers indйpendants dans le coin.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_122">
+		<text>La Pie ? Nan, mais c'est cool comme nom !</text>
+	</string>
+	<string id="about_quests_dialog_freedom_13">
+		<text>Qui aurait pu voler des affaires dans une cantine personnelle ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_131">
+		<text>Personne d'ici en tout cas ! Y a bien des mecs qui vont te piquer une bouchйe de ton casse-dalle ou une gorgйe de ta gnфle quand tu regardes pas, mais on n'a pas de vrais voleurs ici...</text>
+	</string>
+	<string id="about_quests_dialog_freedom_14">
+		<text>Qui pourrait m'aider а dйcrypter quelque chose par ici ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_141">
+		<text>Il paraоt que Nitro, а Yanov, est un fada d'algorithmes et de combinaisons. Mais bon, je suis pas vraiment sыr de mon coup, je lui ai jamais parlй : il bosse pour le Devoir, alors il a pas trop de temps а nous consacrer.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_143">
+		<text>Je suis pas un expert en experts locaux... Demande а nos gars de la gare de Yanov la prochaine fois que tu y passes, ils pourront sыrement t'aider.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_15">
+		<text>J'ai le PDA du marchand du Devoir. Qui est-ce que зa pourrait intйresser ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_151">
+		<text>Hй, зa a l'air intйressant ! Moi, je le filerais а Loki, notre chef а Yanov. Il s'assurera que les stalkers indйpendants sachent quel genre de malades le Devoir recrute.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_16">
+		<text>Oщ est-ce que je peux trouver des outils par ici ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_163">
+		<text>Dans l'usine, quelle question ! Bon, c'est pas une sinйcure, mais tu trouveras forcйment ton bonheur dans les entrepфts.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_165">
+		<text>Bonne question ! Laisse-moi y rйflйchir deux secondes... Oщ est-ce qu'on trouve des outils en dehors de la Zone ? Dans un magasin, non ? Sinon, y en a forcйment dans des ateliers, pas vrai ? Ben, c'est la mкme chose ici ! Suffit de regarder au bon endroit, c'est qu'une question de bon sens, stalker !</text>
+	</string>
+	<string id="about_quests_dialog_freedom_166">
+		<text>Des outils ? Euh, c'est un code qui veut dire quoi, зa ? Y a pas de flics par ici, tu peux causer normalement, tu sais... Oh, des vrais outils ? T'es sйrieux ? Dйsolй, pour зa, je peux pas t'aider.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_169">
+		<text>J'ai entendu dire qu'un de nos gars cherchait des outils et qu'il йtait allй dans le train sous le pont. Apparemment, y a un Tesla lа-bas... Enfin bref... il a dit que c'йtait pas du gвteau... Pourquoi je te raconte зa ? Ben, il a dit aussi qu'il y avait des outils qui traоnaient par terre, mais il a prйfйrй pas s'en approcher parce que зa avait l'air dangereux.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_17">
+		<text>Qui pourrait dйbloquer un module de mйmoire ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_171">
+		<text>Ben, Novikov, dans le bunker des scientifiques, doit pouvoir s'en charger. Il est rapide, douй et poli. Y a aussi Nitro, le technicien du Devoir dans la gare de Yanov. Il est pas cher et pas trиs douй, mais il devrait pouvoir te dйpanner.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_172">
+		<text>Un bon technicien, j'imagine. Celui du coin est plus branchй mйcanique, alors а moins de vouloir rayer le canon de ton module, vaut mieux que tu demandes du cфtй de Jupiter.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_18">
+		<text>Qui pourrait forcer un conteneur en acier ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_181">
+		<text>On m'a recommandй Cardan, qui bosse sur le Skadovsk, l'autre jour. Paraоt qu'il sait ce qu'il fait, mкme s'il est rond comme une queue de pelle la plupart du temps. Il devrait pouvoir t'aider.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_182">
+		<text>Quelqu'un qui en a fait son mйtier ? Le technicien local, Nitro, pourra pas s'en occuper, il est plutфt du genre а pirater des trucs йlectroniques, lui...</text>
+	</string>
+	<string id="about_quests_dialog_freedom_19">
+		<text>Je suis а la recherche d'un stalker du nom d'Accroc.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_191">
+		<text>Jamais entendu parler... Tu devrais demander aux autres stalkers indйpendants.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_2">
+		<text>Je cherche des informations sur les hйlicoptиres qui se sont йcrasйs.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_20">
+		<text>Qui serait intйressй par des informations concernant le fondateur du Devoir ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_201">
+		<text>Зa intйressera Loki, pas de doute lа-dessus ! C'est lui le boss а Yanov. Mкme s'il sait pas quoi en faire... l'important, c'est que ces infos tombent pas entre les mains du Devoir. T'imagines la propagande ? J'en ai mal au crвne rien que d'y penser !</text>
+	</string>
+	<string id="about_quests_dialog_freedom_22">
+		<text>Ouais, t'as entendu l'histoire de l'hйlico dans le champ de mine ? Ben, les bidasses se sont йcrasйs sur l'hйliport de rйserve que leurs prйdйcesseurs avaient minй il y a 6 ans. Maintenant, certains disent qu'ils l'ont fait parce qu'ils sont cons, mais j'en doute : aprиs tout, personne ira les faire chier lа-bas, alors, une fois qu'ils auront rempli leur mission, ils peuvent retourner а leur taxi, le rafistoler et se tirer. Mais j'aimerais bien savoir pourquoi ils sont venus...</text>
+	</string>
+	<string id="about_quests_dialog_freedom_23">
+		<text>Je suis pas du coin et je sais que dalle. Va donc voir nos gars de Yanov : ils te diront tout ce qu'ils savent et le reste, ils l'inventeront !</text>
+	</string>
+	<string id="about_quests_dialog_freedom_25">
+		<text>Ouais, certains de nos gars ont vu un hйlico en dйtresse l'autre jour. Il a pas choisi le meilleur endroit pour atterrir, d'ailleurs : droit sur le toit de Jupiter ! Paraоt qu'il s'est йcrasй, que le toit a cйdй et que tout le bordel est tombй а l'intйrieur !</text>
+	</string>
+	<string id="about_quests_dialog_freedom_3">
+		<text>Il y a des militaires dans le coin ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_30">
+		<text>Qui serait intйressй par des cartes de la rйgion entre Zaton et Jupiter ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_301">
+		<text>Pilote, pas de doute. C'est le principal guide des environs. Si tu veux vendre des cartes, зa l'intйressera forcйment !</text>
+	</string>
+	<string id="about_quests_dialog_freedom_31">
+		<text>Du calme, mec. Y a pas de flics, pas de bidasses et pas de putain de milice par ici ! Y a pas de coin plus peinard dans toute la Zone !</text>
+	</string>
+	<string id="about_quests_dialog_freedom_35">
+		<text>Non, mais un mec m'a dit qu'il avait vu une unitй de militaires traverser le champ de mines prиs des hйliports. Il a hйsitй а leur filer un coup de main, mais a dйcidй de s'abstenir. Les militaires, vaut mieux les laisser tranquilles, on sait jamais quand ils vont pйter un cвble et te plomber le cul !</text>
+	</string>
+	<string id="about_quests_dialog_freedom_36">
+		<text>Perso, j'ai rien vu, mais paraоt qu'il y a un militaire chez les scientifiques. Ozersky, le biologiste, dit que c'est un survivant de l'hйlico qui s'est crashй sur la centrale... Ici, on raconte en rigolant que les grosses tкtes se sont trouvй un nouvel animal de compagnie.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_37">
+		<text>Pas directement, mais j'ai entendu des stalkers indйpendants en parler. Ils auraient vu un bidasse prиs du complexe Volkhov AA. А mon avis, c'est plutфt un fantфme ou un zombie qui s'est rйveillй... Qu'est-ce que t'en penses, toi ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_38">
+		<text>Non, mais y a un mec qui dit avoir vu 7 soldats suivre un stalker derriиre la station-relais sur la route de Pripyat. Зa fait un bout de temps qu'y a plus d'herbe dans la Zone, alors on va mettre зa sur le compte du manque...</text>
+	</string>
+	<string id="about_quests_dialog_freedom_4">
+		<text>Comment faire pour aller а Pripyat ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_40">
+		<text>Qui je pourrais recruter pour protйger les scientifiques ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_401">
+		<text>La Libertй ! Nous, quoi ! On bosse tout le temps avec les scientifiques, alors зa serait pas compliquй de les protйger. Va en parler а notre chef, Loki, а Yanov. Il sera sыrement d'accord.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_402">
+		<text>Je sais pas trop... Paraоt que les crвnes d'њuf ont embauchй une unitй du Devoir pour les protйger... On adorerait aider les scientifiques, c'est sыr, mais il est hors de question de bosser avec ces faces de rat du Devoir dans les parages !</text>
+	</string>
+	<string id="about_quests_dialog_freedom_42">
+		<text>Paraоt que tu peux y accйder а partir de Jupiter... l'usine, hein, pas la planиte ! Ah ! Allez, elle йtait pas mal, avoue !</text>
+	</string>
+	<string id="about_quests_dialog_freedom_43">
+		<text>J'en aucune idйe ! J'ai carrйment pas le temps de me pencher sur la question... А ta place, je demanderais а Pilote au camp. Aprиs tout, il connaоt la rйgion comme sa poche...</text>
+	</string>
+	<string id="about_quests_dialog_freedom_44">
+		<text>Si je le savais, зa ferait longtemps que j'y serais allй... J'adorerais laisser le Devoir, les bidasses et tous ces combats derriиre moi...</text>
+	</string>
+	<string id="about_quests_dialog_freedom_5">
+		<text>Je cherche quelqu'un qui serait prкt а tenter d'atteindre Pripyat. </text>
+	</string>
+	<string id="about_quests_dialog_freedom_51">
+		<text>Dйsolй, mon pote, je ne connais personne que зa peut intйresser а Zaton... Tu ferais mieux de demander а nos gars de Yanov.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_52">
+		<text>Tu connais le bunker des scientifiques ? Ben, ils ont un sacrй problиme sur les bras lа-bas ! D'abord Garry, le stalker, qui a dйcidй de partir pour Pripyat et maintenant, leur soldat qui s'est mis la mкme idйe en tкte ! Garry, c'est un loup solitaire, un vrai de vrai, mais le bidasse, c'est exactement le genre de gars qu'il te faut.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_53">
+		<text>Vano, que tu trouveras а Yanov. Il est pas plus mauvais qu'un autre. C'est un gars bien qui aurait pu rejoindre la Libertй, mais il a pas trop envie de se friter avec le Devoir... ou avec qui que ce soit, d'ailleurs. C'est son point de vue et on le respecte !</text>
+	</string>
+	<string id="about_quests_dialog_freedom_54">
+		<text>Je sais qui il te faut ! Un de nos gars a repйrй un groupe pas loin du lac assйchй, ces types seraient parfaits. Ils connaissent sыrement Pripyat comme leur poche et ils ont pas l'air de bosser pour qui que ce soit. Et ils sont courageux, зa, y a pas de doute ! Le seul problиme, c'est que ce sont des combattants du Monolithe...</text>
+	</string>
+	<string id="about_quests_dialog_freedom_55">
+		<text>Ouais. Arpenteur, le chef des nouveaux... Il a pas l'air а l'aise parmi nous. Ses gars se sont bien adaptйs, mais lui pas vraiment... Va donc lui parler ! C'est trop con de laisser un mec se morfondre ici s'il a une meilleure chance de faire son trou ailleurs.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_57">
+		<text>Dйsolй, j'ai pas d'idйe.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_6">
+		<text>J'ai trouvй une arme йtrange. Qui saurait me dire de quoi il s'agit exactement ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_62">
+		<text>T'as pas trouvй le manuel qui va avec ? Ben, je peux rien faire pour toi, alors...</text>
+	</string>
+	<string id="about_quests_dialog_freedom_7">
+		<text>Qui pourrais-je recruter pour faire des relevйs pour les scientifiques ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_71">
+		<text>Je pense que nos gars pourraient s'en charger. Aprиs tout, la Libertй engage pas que des idiots et si on a un doute, on demandera au bunker. C'est cool de faire avancer la science ! Va а Yanov et parles-en а Loki ! Je suis sыr qu'il sera d'accord !</text>
+	</string>
+	<string id="about_quests_dialog_freedom_72">
+		<text>On adorerait s'en charger, mais c'est le Devoir qui garde le bunker ces derniers temps. Alors, pour passer voir les scientifiques de temps en temps, on s'en accommode, mais зa serait pas une bonne idйe d'en faire une habitude.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_8">
+		<text>J'ai trouvй un artefact trиs йtrange. Qui serait susceptible de me l'acheter ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_81">
+		<text>C'est un collectionneur qu'il te faut, mon pote ! T'en trouveras pas а Yanov, vu que mкme les stalkers ont les foies de venir ici. Tu ferais mieux d'aller voir а Zaton, c'est un peu plus calme par lа-bas.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_83">
+		<text>Tu connais le Barbu, le barman du camp des stalkers indйpendants ? Il achиte les artefacts et il t'arnaque pas trop en gйnйral. C'est un mec sympa, crois-moi. Dommage qu'il bosse pas pour nous...</text>
+	</string>
+	<string id="about_quests_dialog_freedom_9">
+		<text>J'ai trouvй un nid de sangsues pas loin d'ici. Qu'est-ce qu'on doit faire ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_91">
+		<text>Faut que t'ailles prйvenir les stalkers indйpendants, leur camp est pas trиs loin, aprиs tout. La faune de la Zone doit кtre protйgйe, c'est sыr, mais les gens sont quand mкme plus importants.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_98">
+		<text>Ok, oublie зa.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_0">
+		<text>J'ai une question pour toi...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_1">
+		<text>Je t'йcoute.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_10">
+		<text>Qu'est-ce que tu penses d'Allegro ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_101">
+		<text>Inconnu au bataillon... Tu ferais mieux de demander aux habituйs du Skadovsk.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_11">
+		<text>Tu as dйjа entendu parler de l'Oasis ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_111">
+		<text>J'ai tout entendu а propos de l'Oasis. C'est une lйgende, un mythe... Chaque stalker en attend quelque chose de diffйrent et chacun prйtend savoir oщ elle se trouve. C'est quand mкme dommage que tous ces lieux n'aient en commun que le fait d'кtre impossibles а atteindre !</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_112">
+		<text>Ouais, ils disent que les blessures s'y referment d'elles-mкmes et qu'on s'y repose en un instant... Qu'aucune maladie ne rйsiste et que mкme les radiations n'ont plus aucun effet ! La seule chose dont je sois sыr, c'est l'endroit oщ se trouve ce petit paradis... Tu veux savoir ? C'est en plein centre de la Zone, pardi ! Mais зa reste entre nous, ok ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_113">
+		<text>Il paraоt que les mutants que tu y croises ne s'intйressent pas а toi et qu'il y a mкme un artefact appelй le Cњur de l'Oasis... Personne sait ce qu'il a comme effet, а part qu'il ne faut pas y toucher. Ceux qui le prennent n'ont plus leur place dans la Zone... Oщ c'est ? Tout le monde sait que l'Oasis est а Pripyat, en dessous de la grande roue ! Oщ veux-tu que ce soit d'autre ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_12">
+		<text>Je cherche un stalker qui se fait appeler la Pie.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_121">
+		<text>Ouais, je vois qui c'est... Mais j'ai pas la moindre idйe de l'endroit oщ il peut кtre...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_122">
+		<text>Hum... Jamais entendu parler de lui.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_13">
+		<text>Qui aurait pu voler des affaires dans une cantine personnelle ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_131">
+		<text>Quoi ? Demande plutфt aux huiles de Yanov, ils pourront peut-кtre t'aider.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_14">
+		<text>Qui pourrait m'aider а dйcrypter quelque chose par ici ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_141">
+		<text>Nitro а Yanov, bien sыr ! Il adore tous ces trucs technologiques hyper compliquйs... Bien plus que jouer avec des flingues !</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_143">
+		<text>Personne que je connaisse, en tout cas. Va plutфt te renseigner а Yanov, paraоt qu'ils ont expert dans ce genre de truc...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_15">
+		<text>J'ai le PDA du marchand du Devoir. Qui est-ce que зa pourrait intйresser ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_151">
+		<text>Tu connais le Hibou sur le Skadovsk ? Je suis sыr qu'il serait trиs ravi de mettre la main lа-dessus...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_152">
+		<text>Il y avait un mec appelй le Hibou а bord du Skadovsk, а Zaton. Il achиte et revend toutes sortes d'informations... Ton PDA l'intйressera peut-кtre.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_16">
+		<text>Oщ est-ce que je peux trouver des outils par ici ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_161">
+		<text>Un stalker m'a racontй que son paternel bossait dans un des ateliers avant 86. Paraоt qu'il y avait tout un tas de matos lа-bas, alors il devrait rester quelques outils, j'imagine. Ils sont sыrement rouillйs а mort, mais зa vaut peut-кtre le coup d'y aller.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_162">
+		<text>Tu connais la scierie dans les bois sur la colline ? Il devrait y avoir des outils lа-bas, а moins que quelqu'un les ait dйjа pris, ce dont je doute... Cet endroit, plus tu t'en approches, plus t'as envie de t'en йloigner... Et les radiations, c'est pas le pire, crois-moi...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_163">
+		<text>Ben, l'usine de Jupiter est lа, sous ton nez. Il doit forcйment y avoir des outils а l'intйrieur. Perso, je m'en approcherais pas... Cet endroit me fout trop les jetons. Mais tu pourrais fouiller les entrepфts а cфtй du bвtiment principal.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_164">
+		<text>Paraоt qu'il y a quelques endroits а Pripyat oщ on peut trouver du matйriel technique. Il y aurait mкme un grand magasin soviйtique d'йpoque. C'йtait le seul endroit oщ les gens pouvaient trouver quoi que ce soit d'utile...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_165">
+		<text>Comment tu veux que je sache зa, moi ? Va voir dans les vieux ateliers et les magasins, tu finiras bien par trouver quelque chose !</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_166">
+		<text>Franchement, le dernier endroit oщ j'ai vu des outils а peu prиs utilisables, c'йtait chez cet escroc de Sidorovich, dans son bunker du Cordon. Йvidemment, faut cracher au bassinet, mais au moins, ils sont neufs et pas si chers que зa au final.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_167">
+		<text>Je suis pas venu dans la Zone pour trouver des outils, moi. Rйflйchis 5 minutes : а quoi pourrait bien te servir un marteau radioactif ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_168">
+		<text>Paraоt qu'on peut rйcupйrer toutes sortes de vieilleries dans l'ancien centre de maintenance... Tu devrais pouvoir y trouver des outils. Mais bon, pour зa comme pour le reste, le seul moyen d'obtenir du bon matos, c'est de s'en emparer en premier, alors bonne chance !</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_169">
+		<text>Bonne question... А ta place, j'irais voir dans le train sous le pont. Me demande pas pourquoi... J'ai juste l'impression que tu pourras y trouver ce que tu recherches.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_17">
+		<text>Qui pourrait dйbloquer un module de mйmoire ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_171">
+		<text>Laisse-moi rйflйchir... Ben, y a Nitro, а Yanov, qui devrait pouvoir s'en occuper. Sinon, y a Novikov, le technicien des scientifiques, ce type-lа, c'est un vrai pro. Mais rйflйchis bien avant de te dйcider, parce que Nitro, il est vachement moins cher !</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_172">
+		<text>Pour зa, t'auras besoin d'un technicien et le seul dans le coin, c'est Cardan. Le truc, c'est qu'aprиs avoir passй tant d'annйes au fond d'une bouteille, il est plus trop а la pointe de la technologie... Demande donc aux mecs de Jupiter, ils doivent bien avoir quelques experts lа-bas.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_18">
+		<text>Qui pourrait forcer un conteneur en acier ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_181">
+		<text>Cardan, sur le Skadovsk, je pense. Apparemment, il semble pas avoir trop de problиme avec les cadenas, alors...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_182">
+		<text>Faudrait que tu te trouves un technicien, j'imagine. Nitro y arrivera sыrement pas, c'est un peu trop lo-tec pour lui...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_183">
+		<text>Ha, tu demandes зa а Pripyat ? Suis mon conseil et cherche quelqu'un un peu plus loin du centre de la Zone.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_19">
+		<text>Je suis а la recherche d'un stalker du nom d'Accroc.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_191">
+		<text>Tu ferais mieux de t'adresser au Barbu, le barman du Skadovsk. Il est au courant de tout, en gйnйral.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_193">
+		<text>Accroc ? Alors, lа, aucune idйe ! Demande aux gars de Zaton, il passe tout son temps lа-bas.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_2">
+		<text>Je cherche des informations sur les hйlicoptиres qui se sont йcrasйs.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_20">
+		<text>Qui serait intйressй par des informations concernant le fondateur du Devoir ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_201">
+		<text>А ta place, j'irais discuter avec le Hibou, sur le Skadovsk. Je te parie qu'il serait intйressй par des infos sur une lйgende comme celle-lа.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_21">
+		<text>J'en ai vu un... Je peux pas dire qu'il se soit crashй, mais il s'est pas posй en douceur en tout cas... Il arrкtait pas de se balancer d'un cфtй а l'autre et a fini par se poser sur un plateau au sud de Zaton... Je me demande s'il y a des survivants... Si seulement on connaissait un moyen d'aller lа-haut. D'ailleurs, зa me fait penser que ce tarй de Noah sait peut-кtre par oщ passer...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_22">
+		<text>J'ai entendu parler de quelques hйlicos militaires qui se sont йcrasйs pas loin d'ici... Les gens ont toutes sortes d'explications, mais il n'y en a qu'une qui m'ait marquй : ils auraient atterri sur les hйliports de rйserve qui avaient йtй minйs par d'autres soldats. C'est con, hein ? Comme le disait mon paternel : "Creuse pas un trou pour quelqu'un d'autre, parce que tu risques d'y tomber toi-mкme". Il avait pas tort, hein ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_23">
+		<text>Un de mes potes m'a racontй une histoire... Il allait dans la Forкt de Fer pour trouver des artefacts et, а peine arrivй, il a entendu un grand fracas juste derriиre lui. Il s'est retournй et s'est retrouvй nez а nez avec un putain d'hйlicoptиre qui fonзait droit sur lui en entraоnant des pylфnes, des cвbles et un tas de bordel. Autant te dire qu'il a dйcampй sans se poser de questions ! Je me demande comment il a rйussi а s'en sortir sans foncer droit dans une anomalie. T'auras pas de mal а trouver la Forкt de fer, on peut la voir depuis des kilomиtres. C'est plein de poltergeists, par contre, alors fais gaffe !</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_24">
+		<text>J'en ai entendu un atterrir sur le plateau au sud, mais c'est pas facile d'y accйder. Et il paraоt que quelqu'un a vu Noah sur le bord de ce mкme plateau, ce qui veut dire que ce cinglй sait comment y aller.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_25">
+		<text>J'ai rien vu, mais la rumeur veut que l'un d'entre eux se soit йcrasй sur l'usine... Personne a voulu aller vйrifier, c'est beaucoup trop dangereux.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_26">
+		<text>Un stalker m'a dit qu'il avait vu plusieurs hйlicos militaires en difficultй... Le moteur de l'un d'entre eux s'est enflammй avant que l'appareil pique tout droit dans un marais rempli d'anomalies. On peut y accйder relativement facilement, mais le marais lui-mкme est un enfer. Crois-moi, t'as pas envie d'y aller !</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_3">
+		<text>Il y a des militaires dans le coin ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_30">
+		<text>Qui serait intйressй par des cartes de la rйgion entre Zaton et Jupiter ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_301">
+		<text>Pilote, bien sыr ! C'est un guide, t'es pas au courant ? Toujours а faire l'aller-retour entre le Skadovsk et Yanov... Alors, c'est sыr qu'il aura rien contre des cartes plus dйtaillйes.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_302">
+		<text>Hй, on est pas а Zaton ou Jupiter ici ! Alors tes cartes, elles servent pas а grand-chose. Va tenter ta chance dans ces coins-lа, tu trouveras beaucoup plus d'acheteurs.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_31">
+		<text>J'en ai pas vu moi-mкme, mais j'ai entendu parler de soldats qui descendaient du plateau sud par les йgouts. Apparemment, au dйbut, ils ont essayй de pas trop se dйgueulasser, avec des cordes et des poulies, mais ils ont vite laissй tomber et se sont laissй glisser sur le cul. Hй hй ! Du bobsleigh dans la Zone... La grande classe, non ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_32">
+		<text>J'ai entendu une conversation sur le Skadovsk... Paraоt que 5 ou 6 soldats ont йtй aperзus en train de sortir des tunnels de drainage du marais. Ils йtaient tellement dйgueulasses et couverts de merde des pieds а la tкte qu'ils auraient pu passer pour des sangsues !</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_33">
+		<text>Perso, j'ai rien vu, mais un pote a aperзu une unitй militaire qui attaquait un groupe de mercenaires prиs de la station de traitement. Le temps pour lui de trouver un bon point d'observation, c'йtait dйjа terminй. Les bidasses se sont retirйs en bon ordre, sans perte d'un cфtй ou de l'autre... Typique, non ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_34">
+		<text>Apparemment, des gars ont vu une dizaine de soldats traоner autour de la pйniche de Noah. Et, vu qu'il йtait encore vivant а ce moment-lа, ils ont dы arriver а un accord... Mais comme personne veut lui demander ce qui s'est passй... Faut dire qu'on sait jamais а quoi s'attendre avec ce tarй.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_35">
+		<text>J'ai entendu une explosion l'autre nuit et plus tard, quelqu'un а Yanov a dit avoir vu un militaire mort dans le champ de mines, pas loin d'un hйlico. А croire qu'ils ont pas vu oщ ils atterrissaient dans le noir et qu'il a foncй droit dans le champ de mines. Personne ne sait s'il y a de survivants, mais c'est sыr qu'il n'йtait pas tout seul. </text>
+	</string>
+	<string id="about_quests_dialog_stalkers_36">
+		<text>J'ai pas vu de militaires... mais j'ai entendu dire qu'il y en avait un qui traоnait avec les scientifiques. Il paraоt que Garry le stalker l'a trouvй alors qu'il se dirigeait vers le silo а missiles pour rejoindre ses potes. Et comme le complexe grouille de zombies, on peut dire que Garry lui a sauvй la mise.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_37">
+		<text>Non, mais on m'a dit qu'un militaire avait йtй repйrй prиs du complexe Volkhov AA. Mais bon, j'y crois pas vraiment... C'est un mensonge ou alors ils ne savent plus faire la diffйrence entre un zombie et un soldat.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_38">
+		<text>Des militaires ? Ben, j'ai entendu dire qu'il y avait "toute une escouade de soldats menйe par un stalker" qui est passйe pas loin de l'usine de Jupiter, mais j'ai pas vraiment suivi la conversation.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_4">
+		<text>Comment faire pour aller а Pripyat ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_40">
+		<text>Qui je pourrais recruter pour protйger les scientifiques ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_401">
+		<text>Tu connais Spartacus et son groupe ? Tu sais, les stalkers de Zaton ? Ce sont de bons gars qui sont pas nйs de la derniиre pluie. Je pense que зa leur plairait bien comme taf.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_402">
+		<text>T'es tombй sur Hachette et son groupe dans les ateliers de Zaton ? Comme tous les mercenaires, ils ont leurs propres problиmes, mais, au moins, ils posent des questions avant de tirer. Je me dis que si t'arrives а les convaincre de prendre ce boulot, les scientifiques seront contents et les stalkers pourront se dйtendre un peu.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_403">
+		<text>Hum... Non, je vois pas trop... Dйsolй.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_41">
+		<text>Ben, ce dont je suis sыr, c'est qu'il n'y a pas de chemin direct а partir de Zaton. Tous ceux qui veulent aller а Pripyat se dirigent d'abord vers Jupiter, en gйnйral, alors il doit bien y avoir un truc...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_42">
+		<text>Ben, la rumeur veut qu'il y ait un passage secret qui mиne а Pripyat sous l'usine de Jupiter... Le hic, c'est que cette histoire ne sort jamais avant la deuxiиme tournйe et que Jupiter est un tel enfer que personne ose s'en approcher.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_43">
+		<text>Alors, lа, aucune idйe ! T'aurais pas des questions plus faciles ? Tout ce que je peux te dire, c'est que tu ferais mieux d'aller causer а Pilote, c'est le seul qui pourra t'aider.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_44">
+		<text>Ha, si je connaissais le chemin de Pripyat, je resterais pas ici ! Pourquoi tu crois que je suis venu au centre de la Zone ? Pripyat regorge d'artefacts ! Celui qui y arrivera en premier se fera des couilles en or !</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_5">
+		<text>Je cherche quelqu'un qui serait prкt а tenter d'atteindre Pripyat. </text>
+	</string>
+	<string id="about_quests_dialog_stalkers_51">
+		<text>Je crois pas que tu trouveras qui que ce soit par ici. Tous ceux qui voulaient s'approcher du centre de la Zone sont dйjа partis pour Jupiter. Tu devrais aller lа-bas pour te renseigner.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_52">
+		<text>T'as entendu parler du militaire qui squatte chez les scientifiques ? Je me dis qu'il doit pas avoir grand-chose а perdre а te suivre... Les grosses tкtes vont pas partir de sitфt et il peut pas retourner au Cordon tout seul, alors il est peut-кtre assez dйsespйrй pour vouloir t'accompagner а Pripyat.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_53">
+		<text>Tu connais Vano, de la gare de Yanov ? C'est un mec rйglo et un bon stalker. Il se dйbrouille mieux avec les anomalies qu'avec les gens, si tu vois ce que je veux dire... Tout le monde a tendance а profiter de lui.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_54">
+		<text>Tu sais, j'ai entendu dire qu'un groupe avait йtй repйrй prиs du lac assйchй au sud du complexe AA... C'йtait pas des stalkers normaux, ni la Libertй ou le Devoir, mais des combattants du Monolithe ! Alors, si tu cherches des gars pour aller а Pripyat, t'auras du mal а trouver mieux ! Hй hй, t'as compris que je plaisantais, hein ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_55">
+		<text>Tu connais Arpenteur, le chef de la nouvelle unitй de la Libertй ? Si tu voyais sa tronche, tu te rendrais compte que Yanov, c'est bien trop tranquille pour lui. Tu devrais lui parler, il a besoin d'action, ce gars-lа.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_56">
+		<text>Tu connais Arpenteur, le chef de la nouvelle unitй du Devoir ? Si tu voyais sa tronche, tu te rendrais compte que Yanov, c'est bien trop tranquille pour lui. Tu devrais lui parler, il a besoin d'action, ce gars-lа.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_57">
+		<text>Hum... Non, je vois vraiment pas.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_6">
+		<text>J'ai trouvй une arme йtrange. Qui saurait me dire de quoi il s'agit exactement ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_62">
+		<text>Alors lа, vaut mieux demander aux experts... Tu sais, les techniciens...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_63">
+		<text>Зa peut pas faire de mal de demander а Cardan, sur le Skadovsk. Il vend des armes et il est plutфt douй... Il lui reste peut-кtre mкme quelques neurones malgrй la bibine...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_7">
+		<text>Qui pourrais-je recruter pour faire des relevйs pour les scientifiques ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_71">
+		<text>Tu connais Gonta le chasseur ? Je me dis que ses gars et lui seraient sыrement d'accord pour bosser avec les scientifiques. Je veux dire, s'ils ont des problиmes de mutants, ces gars sont exactement ce qu'il leur faut.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_72">
+		<text>T'as entendu parler de Grizzly, Torba et Mitay, les stalkers de Yanov ? Ils bossent ensemble et ils se dйbrouillent comme des chefs ! Ils seront parfaits pour ce boulot... si Mitay arrive а se tenir а carreau pour une fois.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_73">
+		<text>Aucune idйe... On a dйjа assez de problиmes par ici.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_8">
+		<text>J'ai trouvй un artefact trиs йtrange. Qui serait susceptible de me l'acheter ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_81">
+		<text>Je vois pas. Les gens d'ici cherchent les grands classiques. Va plutфt faire un tour а Zaton, c'est plus prиs de l'extйrieur, on sait jamais.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_83">
+		<text>Moi, je le montrerais au Barbu, le barman du Skadovsk. Paraоt qu'il bosse avec des collectionneurs de l'extйrieur qui sont toujours intйressйs par les trucs nouveaux.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_9">
+		<text>J'ai trouvй un nid de sangsues pas loin d'ici. Qu'est-ce qu'on doit faire ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_91">
+		<text>Putain, faut que t'ailles en parler au Barbu, sur le Skadovsk... Parce que si on s'en occupe pas, elles vont tous nous bouffer !</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_98">
+		<text>Ok, oublie зa.</text>
+	</string>
+	<string id="about_skadovsk_dialog_bandit_0">
+		<text>Oщ est le camp de stalkers le plus proche ?</text>
+	</string>
+	<string id="about_skadovsk_dialog_bandit_1">
+		<text>T'es con ou quoi ? J'y connais rien en camps de stalkers, mais le camp le plus proche d'ici, c'est le Skadovsk. Je vais te refiler les coordonnйes.</text>
+	</string>
+	<string id="about_skadovsk_dialog_stalkers_0">
+		<text>Oщ est le camp de stalkers le plus proche ?</text>
+	</string>
+	<string id="about_skadovsk_dialog_stalkers_1">
+		<text>J'envoie les coordonnйes sur ton PDA... Il n'y a que le Skadovsk dans les parages.</text>
+	</string>
+	<string id="actor_break_dialog_2">
+		<text>А la prochaine !</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_27">
+		<text>J'ai entendu dire qu'il y en avait plusieurs qui s'йtaient йcrasйs... Mais je n'ai pas de dйtails, je ne m'intйresse pas trop aux rumeurs. Dйsolй...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_28">
+		<text>J'ai d'autres chats а fouetter... Je veux dire, je me doute que s'йcraser en hйlicoptиre, зa doit faire un mal de chien, mais, en dehors de зa, je vois pas quoi dire...</text>
+	</string>
+	<string id="about_quests_dialog_bandit_27">
+		<text>De quoi tu causes ? Faudrait fumer de sacrйs trucs pour voir un hйlico dans les parages, vu que les vrais ont pas vraiment grand-chose а y foutre !</text>
+	</string>
+	<string id="about_quests_dialog_freedom_27">
+		<text>Hein ? Nan, je m'intйresse pas trop а ce genre de truc... Зa cadre pas vraiment avec ma mission de dissйmination des connaissances, si tu vois ce que je veux dire...</text>
+	</string>
+	<string id="about_quests_dialog_dolg_27">
+		<text>Notre patrouille les a observйs en train de descendre, mais seul le lieutenant-colonel est au courant de tous les dйtails. Moi, je n'ai pas vraiment besoin d'en savoir plus.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_50">
+		<text>Oщ est-ce que je peux trouver une combinaison йquipйe d'un module respiratoire en circuit fermй ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_501">
+		<text>Je ne sais pas trop, mais l'argent fait parfois des miracles quand on sait oщ l'investir. Il vaut mieux en parler а Allegro... Si vous parvenez а tomber d'accord, il se dйbrouillera pour en rйcupйrer une. J'espиre que зa marchera... Зa me fera des vacances quand il sera parti.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_502">
+		<text>J'ai une tкte а savoir ce genre de truc ? Зa ne fait pas si longtemps que je suis ici aprиs tout... Tu devrais demander а Zaton, nos frиres y ont leur propre rйseau.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_503">
+		<text>Pas la moindre idйe... Pourquoi ? Tu comptes sauter а pieds joints dans une anomalie ? Si tu trouves des artefacts, fais-nous signe, on viendra tout de suite... pour te fйliciter d'avoir fait notre boulot, ah ah ah !</text>
+	</string>
+	<string id="about_quests_dialog_dolg_50">
+		<text>Oщ est-ce que je peux trouver une combinaison йquipйe d'un module respiratoire en circuit fermй ?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_501">
+		<text>Comment je saurais зa, moi ? Quoi que... il y a un mec sur le Skadovsk... Il paraоt qu'il peut dйgoter des trucs pas possibles. Il squatte le pont supйrieur, en gйnйral, et il s'appelle Allegro.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_502">
+		<text>Y a personne qui risque de venir jusqu'ici avec une combinaison de rechange pareille... Il vaudrait mieux aller voir du cфtй de Zaton, c'est plus prиs de la civilisation.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_503">
+		<text>Je n'en ai pas la moindre idйe... Des combinaisons comme зa, mкme les membres du Devoir n'en ont pas tous. Ils ne les donnent qu'aux soldats qui se sont distinguйs au combat ou qui participent а des opйrations dans des zones hautement anormales.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_50">
+		<text>Oщ est-ce que je peux trouver une combinaison йquipйe d'un module respiratoire en circuit fermй ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_501">
+		<text>J'ai entendu des indйpendants parler d'un mec qui a le bras long, un certain Allegro, je crois. Apparemment, il peut trouver n'importe quoi, des armes, du matos, ce genre de truc... Pas de came, par contre. Il traоne sur le Skadovsk.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_502">
+		<text>Bonne question, mon pote... On a pas ce genre de truc dans la Libertй... Tu devrais demander aux stalkers de Zaton, il y aura peut-кtre quelqu'un qui pourra t'en procurer une lа-bas.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_503">
+		<text>Et а quoi te servirait cette merde ? Si зa sert а rien au combat, зa sert а rien... Remarque... peut-кtre que зa peut servir quand mкme. Plus facile de respirer et le soleil te fait plus chier... Hum... Pas con... Hй, tu saurais oщ je pourrais en trouver une ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_50">
+		<text>Oщ est-ce que je peux trouver une combinaison йquipйe d'un module respiratoire en circuit fermй ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_501">
+		<text>А mon avis, Allegro, sur le troisiиme pont du Skadovsk, doit pouvoir en trouver une. Ce mec pourrait trouver de la neige en plein dйsert... Mais tout a un prix avec lui...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_502">
+		<text>Laisse-moi rйflйchir... Il y avait un mec plein de ressources а Zaton, Allegro qu'il s'appelait... Vois s'il est encore lа ! Je me souviens qu'il йtait spйcialisй en matos haut de gamme.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_503">
+		<text>Hй, зa se trouve pas sous le sabot d'un cheval, ce genre de trucs... Les combinaisons comme зa, y en a pas plus d'une poignйe dans la Zone... T'auras de la chance si t'en trouves une d'occasion !</text>
+	</string>
+	<string id="actor_break_dialog_3">
+		<text>Au revoir.</text>
+	</string>
+	<string id="actor_break_dialog_1">
+		<text>Au revoir.</text>
+	</string>
+	<string id="actor_break_dialog_0">
+		<text>А plus tard !</text>
+	</string>
+</string_table>

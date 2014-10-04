@@ -1,0 +1,24 @@
+[smart_terrain]
+arrive_dist = 10000000
+max_population = 1
+squad_id = 27
+respawn_only_smart = true
+respawn_params = respawn@pri_a15
+
+[respawn@pri_a15]
+stalker_sim_squad
+
+[stalker_sim_squad]
+spawn_squads = stalker_sim_squad_advanced, stalker_sim_squad_veteran
+spawn_num =  {+pri_a28_actor_in_zone_stay} 2, 0
+
+[exclusive]
+pri_a15_vano = pripyat\pri_a15_logic.ltx
+pri_a15_sokolov = pripyat\pri_a15_logic.ltx
+pri_a15_zulus = pripyat\pri_a15_logic.ltx
+pri_a15_wanderer = pripyat\pri_a15_logic.ltx
+pri_a15_actor = pripyat\pri_a15_logic.ltx
+pri_a15_military_tarasov = pripyat\pri_a15_logic.ltx
+pri_a15_military_2 = pripyat\pri_a15_logic.ltx
+pri_a15_military_3 = pripyat\pri_a15_logic.ltx
+pri_a15_military_4 = pripyat\pri_a15_logic.ltx

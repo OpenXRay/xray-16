@@ -1,0 +1,19 @@
+[logic]
+active = sr_idle@wait
+
+[sr_idle@wait]
+on_info = {+pas_b400_elevator_gates_opened -pas_b400_field_elevator_off =actor_in_zone(pas_b400_field_elevator)} sr_idle@play %=pas_b400_play_particle%
+on_info2 = {-pas_b400_field_track_off =actor_in_zone(pas_b400_field_track)} sr_idle@play %=pas_b400_play_particle%
+on_info3 = {-pas_b400_field_downstairs_off =actor_in_zone(pas_b400_field_downstairs)} sr_idle@play %=pas_b400_play_particle%
+on_info4 = {-pas_b400_field_tunnel_off =actor_in_zone(pas_b400_field_tunnel)} sr_idle@play %=pas_b400_play_particle%
+on_info5 = {+pas_b400_field_tunnel_off} sr_idle@nil
+
+[sr_idle@play]
+on_info = {!actor_in_zone(pas_b400_field_elevator) !actor_in_zone(pas_b400_field_track) !actor_in_zone(pas_b400_field_downstairs) !actor_in_zone(pas_b400_field_tunnel)} sr_idle@wait %=pas_b400_stop_particle%
+on_info2 = {-pas_b400_elevator_gates_opened =actor_in_zone(pas_b400_field_elevator)} sr_idle@wait %=pas_b400_stop_particle%
+on_info3 = {+pas_b400_field_elevator_off =actor_in_zone(pas_b400_field_elevator)} sr_idle@wait %=pas_b400_stop_particle%
+on_info4 = {+pas_b400_field_track_off =actor_in_zone(pas_b400_field_track)} sr_idle@wait %=pas_b400_stop_particle%
+on_info5 = {+pas_b400_field_downstairs_off =actor_in_zone(pas_b400_field_downstairs)} sr_idle@wait %=pas_b400_stop_particle%
+on_info6 = {+pas_b400_field_tunnel_off =actor_in_zone(pas_b400_field_tunnels)} sr_idle@wait %=pas_b400_stop_particle%
+
+[sr_idle@nil]

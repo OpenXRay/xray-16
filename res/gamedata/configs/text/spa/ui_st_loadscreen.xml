@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="ls_header">
+		<text>100 CONSEJOS PARA SOBREVIVIR EN LA ZONA</text>
+	</string>
+	<string id="ls_mp_tip_16">
+		<text>Si disparas a un enemigo en el ojo lo matarбs en el acto, sea cual sea su nivel de blindaje.</text>
+	</string>
+	<string id="ls_mp_tip_19">
+		<text>El AC-96/2 puede configurarse para disparar rбfagas de dos balas que impactan en el mismo punto del objetivo.</text>
+	</string>
+	<string id="ls_mp_tip_21">
+		<text>Las escopetas de dos caсones pueden disparar con ambos casi simultбneamente.</text>
+	</string>
+	<string id="ls_mp_tip_25">
+		<text>No subestimes las pistolas. Ofrecen un poder de detenciуn considerable y pueden resultar muy eficaces contra objetivos poco protegidos.</text>
+	</string>
+	<string id="ls_mp_tip_32">
+		<text>Los fusiles de francotirador son ideales para eliminar enemigos desde lejos gracias a su trayectoria y precisiуn. Son menos eficaces a corta distancia.</text>
+	</string>
+	<string id="ls_mp_tip_33">
+		<text>Si disparas mientras te mueves, la precisiуn es mucho menor que si lo haces inmуvil o arrodillado.</text>
+	</string>
+	<string id="ls_mp_tip_34">
+		<text>Las armas y los trajes protectores se desgastan rбpidamente en el entorno hostil de la Zona. Las armas desgastadas son menos precisas y suelen fallar, y los trajes desgastados protegen menos.</text>
+	</string>
+	<string id="ls_mp_tip_54">
+		<text>Para hacer una captura de pantalla, pulsa "$$ACTION_SCREENSHOT$$".</text>
+	</string>
+	<string id="ls_mp_tip_9">
+		<text>El artefacto (o el jugador que lo lleva) aparece en el minimapa. Si estб demasiado lejos, verбs una flecha que indica la direcciуn en la que se encuentra.</text>
+	</string>
+	<string id="ls_tip_37">
+		<text>El AC-96/2 puede configurarse para disparar rбfagas de dos balas que impactan en el mismo punto del objetivo.</text>
+	</string>
+	<string id="ls_tip_39">
+		<text>Las escopetas de dos caсones pueden disparar con ambos casi simultбneamente.</text>
+	</string>
+	<string id="ls_tip_43">
+		<text>No subestimes las pistolas. Ofrecen un poder de detenciуn considerable y pueden resultar muy eficaces contra objetivos poco protegidos.</text>
+	</string>
+	<string id="ls_tip_50">
+		<text>Los fusiles de francotirador son ideales para eliminar enemigos desde lejos gracias a su trayectoria y precisiуn. Son menos eficaces a corta distancia.</text>
+	</string>
+	<string id="ls_tip_52">
+		<text>Las armas y los trajes protectores se desgastan rбpidamente en el entorno hostil de la Zona. Las armas desgastadas son menos precisas y suelen fallar, y los trajes desgastados protegen menos.</text>
+	</string>
+	<string id="ls_tip_56">
+		<text>Algunos productos mйdicos tienen propiedades ъnicas. Por ejemplo, las pнldoras Hйrcules te permiten acarrear mбs peso temporalmente, mientras que los inhibidores psнquicos te ayudan a resistir las emisiones psнquicas.</text>
+	</string>
+	<string id="ls_tip_83">
+		<text>Para hacer una captura de pantalla, pulsa "$$ACTION_SCREENSHOT$$".</text>
+	</string>
+	<string id="ls_tip_number">
+		<text>Consejo n.є</text>
+	</string>
+	<string id="ls_tip_1">
+		<text>El vodka, una alternativa sencilla y barata a los medicamentos antirradiaciуn, reduce los efectos de la radiaciуn en el cuerpo.</text>
+	</string>
+	<string id="ls_tip_10">
+		<text>Para acceder a informaciуn detallada sobre la misiуn en curso, mantйn "$$ACTION_SCORES$$".</text>
+	</string>
+	<string id="ls_tip_13">
+		<text>Necesitas un detector para buscar artefactos. Los mejores detectores facilitan las bъsquedas y detectan cosas mбs valiosas.</text>
+	</string>
+	<string id="ls_tip_14">
+		<text>Los stalkers no permiten el paso a sus campamentos gente con armas a la vista. Para esconder tu arma, pulsa la tecla apropiada ("$$ACTION_WPN_1$$", "$$ACTION_WPN_2$$", “$$ACTION_WPN_3$$", "$$ACTION_WPN_4$$").</text>
+	</string>
+	<string id="ls_tip_15">
+		<text>Puedes localizar los lнmites de una anomalнa lanzando tornillos. Para sacar un tornillo, pulsa "$$ACTION_WPN_6$$".</text>
+	</string>
+	<string id="ls_tip_17">
+		<text>Ademбs de saciar el hambre, comer aumenta ligeramente tu nivel de salud.</text>
+	</string>
+	<string id="ls_tip_18">
+		<text>Las bebidas energйticas mejoran momentбneamente la recuperaciуn de resistencia, incrementando tu movilidad potencial.</text>
+	</string>
+	<string id="ls_tip_20">
+		<text>Una baja resistencia puede dejarte inmуvil y vulnerable ante el enemigo en momentos cruciales.</text>
+	</string>
+	<string id="ls_tip_21">
+		<text>Puedes ver lo oculto que estбs con los indicadores de ruido y de detecciуn enemiga situados en la parte superior izquierda de la pantalla.</text>
+	</string>
+	<string id="ls_tip_22">
+		<text>Llevar un detector en una mano no te impide usar un cuchillo, una pistola o un tornillo con la otra.</text>
+	</string>
+	<string id="ls_tip_23">
+		<text>Ciertos productos mйdicos aumentan la resistencia a los efectos nocivos. Usarlos puede salvarte la vida en бreas anуmalas.</text>
+	</string>
+	<string id="ls_tip_27">
+		<text>Para abrir el menъ contextual y acceder a objetos de tu mochila, sitъa el cursor sobre el elemento necesario y pulsa el botуn derecho del ratуn.</text>
+	</string>
+	<string id="ls_tip_28">
+		<text>La mayorнa de los artefactos, ademбs de tener efectos positivos, emiten radiaciones que puedes compensar usando otros que las absorban.</text>
+	</string>
+	<string id="ls_tip_29">
+		<text>El cuchillo no sirve de nada contra enemigos con armas de fuego. Ъsalo en el combate cuerpo a cuerpo o para matar sigilosamente.</text>
+	</string>
+	<string id="ls_tip_3">
+		<text>El peso que lleves encima reduce tu resistencia. Un peso excesivo limitarб tu movilidad, y, si te cargas demasiado, no podrбs ni moverte.</text>
+	</string>
+	<string id="ls_tip_30">
+		<text>Un detector es lo ъnico fiable para comprobar si hay artefactos en бreas anуmalas.</text>
+	</string>
+	<string id="ls_tip_31">
+		<text>La mayorнa de los artefactos permanecen invisibles en las бreas anуmalas hasta que los identificas con el detector.</text>
+	</string>
+	<string id="ls_tip_32">
+		<text>Los mutantes son mбs activos de noche, lo que explica por quй los stalkers prefieren esperar a que sea de dнa para adentrarse en la Zona.</text>
+	</string>
+	<string id="ls_tip_33">
+		<text>Si has estado muy expuesto a radiaciones, usa medicamentos antirradiaciуn. Si no tienes, usa botiquines para tratar los primeros sнntomas hasta que des con un mйdico.</text>
+	</string>
+	<string id="ls_tip_34">
+		<text>Casi cualquier stalker puede llevarte a un sitio cercano, pero solo un guнa experimentado puede conducirte de forma rбpida y segura a lugares lejanos. Eso sн, te cobrarб un ojo de la cara.</text>
+	</string>
+	<string id="ls_tip_35">
+		<text>Vender artefactos no es el ъnico modo de hacer dinero: deshacerte de equipo innecesario tambiйn puede ser muy lucrativo. Ten en cuenta que los comerciantes no suelen estar interesados en artнculos muy daсados.</text>
+	</string>
+	<string id="ls_tip_38">
+		<text>Para desmontar un silenciador, una mira o un lanzagranadas acoplado de un arma, haz clic con el botуn derecho en ella cuando estй en la mochila y selecciona la acciуn pertinente del menъ contextual.</text>
+	</string>
+	<string id="ls_tip_40">
+		<text>Si quieres moverte sin hacer ruido, pulsa "$$ACTION_ACCEL$$" para andar o "$$ACTION_CROUCH$$" para agacharte.</text>
+	</string>
+	<string id="ls_tip_41">
+		<text>Las escopetas son armas de corto alcance. Cuanto mбs lejos tengas a un enemigo, menos efectivas serбn.</text>
+	</string>
+	<string id="ls_tip_42">
+		<text>Para cubrirte de disparos de armas de fuego pequeсas, escуndete tras algo sуlido. A diferencia de los muros de cemento, las tablas de madera y las placas de metal no son seguras.</text>
+	</string>
+	<string id="ls_tip_44">
+		<text>Los disparos a la cabeza son muy daсinos y letales para casi cualquier enemigo.</text>
+	</string>
+	<string id="ls_tip_45">
+		<text>Cada tipo de mutante en la zona tiene sus propias caracterнsticas de combate. Tenlo en cuenta y tendrбs mбs opciones de sobrevivir.</text>
+	</string>
+	<string id="ls_tip_46">
+		<text>Para ajustar lo lejos que lanzas una granada, mantйn "$$ACTION_WPN_ZOOM$$".</text>
+	</string>
+	<string id="ls_tip_47">
+		<text>Los enemigos utilizan granadas. Cuando veas un indicador de granada, abandona el radio letal de inmediato.</text>
+	</string>
+	<string id="ls_tip_48">
+		<text>Acelerar antes de un salto te permite salvar grandes distancias.</text>
+	</string>
+	<string id="ls_tip_49">
+		<text>Los indicadores clave que muestran tu salud y tu resistencia estбn situados en la parte inferior derecha de la pantalla.</text>
+	</string>
+	<string id="ls_tip_53">
+		<text>La Zona tiene vida propia, lo que significa que siempre te puedes encontrar mutantes o stalkers enemigos en lugares que ya hayas despejado. </text>
+	</string>
+	<string id="ls_tip_54">
+		<text>Muy atento en la Zona; no te fнes de datos anteriores. Al volver a un бrea anуmala que ya hayas explorado, puedes descubrir que el sendero que conocнas ya no existe.</text>
+	</string>
+	<string id="ls_tip_58">
+		<text>Hablar con los stalkers puede proporcionarte informaciуn ъtil sobre бreas o eventos nuevos.</text>
+	</string>
+	<string id="ls_tip_60">
+		<text>Puedes usar cualquier arma en ambas ranuras, lo que te permite crear combinaciones flexibles, como fusil de asalto/escopeta, o pistola/fusil de francotirador.</text>
+	</string>
+	<string id="ls_tip_61">
+		<text>Cada comerciante de los campamentos de stalkers ofrece su propia mercancнa ъnica. Por ejemplo, los mйdicos pueden facilitarte los mejores productos mйdicos.</text>
+	</string>
+	<string id="ls_tip_62">
+		<text>Si llegas a un campamento de stalkers estando herido o intoxicado por radiaciones, puedes acudir gratuitamente al mйdico local.</text>
+	</string>
+	<string id="ls_tip_63">
+		<text>Puedes dejar tus cosas en una caja personal en el campamento para no llevar encima trastos innecesarios.</text>
+	</string>
+	<string id="ls_tip_64">
+		<text>Si tienes que esperar a una determinada hora, puedes echarte una siesta en el campamento para pasar el rato. Busca una zona de descanso, pulsa "$$ACTION_USE$$" y elige cuбnto quieres dormir.</text>
+	</string>
+	<string id="ls_tip_65">
+		<text>Puedes mejorar el dispositivo de visiуn nocturna de tu casco. La versiуn avanzada aumentarб considerablemente su alcance.</text>
+	</string>
+	<string id="ls_tip_67">
+		<text>Cuando andes por la Zona, lleva a mano un par de cargadores de sobra. Igual te vienen bien.</text>
+	</string>
+	<string id="ls_tip_68">
+		<text>Recuerda guardar la partida de vez en cuando para no tener que jugar las mismas escenas una y otra vez.</text>
+	</string>
+	<string id="ls_tip_69">
+		<text>Para usar los medicamentos apropiados, es ъtil conocer su efecto. Consulta las descripciones para informarte.</text>
+	</string>
+	<string id="ls_tip_70">
+		<text>Usa granadas para atacar a los enemigos a cubierto. Ten en cuenta su radio de impacto para no herir a tus aliados.</text>
+	</string>
+	<string id="ls_tip_71">
+		<text>Para desechar un objeto de tu mochila, haz clic con el botуn derecho encima del objeto y selecciona la acciуn pertinente del menъ contextual.</text>
+	</string>
+	<string id="ls_tip_72">
+		<text>Puedes usar una funciуn especial del menъ de opciones para guardar tu progreso en determinados puntos claves de la partida.</text>
+	</string>
+	<string id="ls_tip_73">
+		<text>Al volver al campamento, conviene arreglar tu equipo, vender el botнn que no necesites y reabastecerte de municiуn y suministros mйdicos.</text>
+	</string>
+	<string id="ls_tip_75">
+		<text>Para reducir los efectos daсinos de бreas anуmalas durante incursiones a la Zona, usa un traje protector, artefactos o toma el medicamento adecuado.</text>
+	</string>
+	<string id="ls_tip_77">
+		<text>Ademбs de armas y municiуn, en los cadбveres enemigos puedes encontrar cosas valiosas como una PDA con informaciуn.</text>
+	</string>
+	<string id="ls_tip_78">
+		<text>Los artefactos no son solo un valioso botнn; ademбs de ser ligeros y caros, suelen tener efectos muy beneficiosos.</text>
+	</string>
+	<string id="ls_tip_79">
+		<text>Debido al entorno de la Zona, muchos mutantes son radioactivos. Acercarte a ellos sin la protecciуn adecuada es extremadamente peligroso.</text>
+	</string>
+	<string id="ls_tip_8">
+		<text>Puedes usar una venda, un botiquнn militar o medicamentos de Vinca para detener una hemorragia. Si no te das prisa, tu salud pude verse muy perjudicada.</text>
+	</string>
+	<string id="ls_tip_80">
+		<text>Algunas armas te permiten instalar una mira de largo alcance. Para ajustar el alcance, pulsa "$$ACTION_NEXT_SLOT$$" o "$$ACTION_PREV_SLOT$$".</text>
+	</string>
+	<string id="ls_tip_82">
+		<text>Hay lugares por los que no podrбs pasar ni siquiera estando agachado. Para agacharte lo mбximo posible, mantйn "$$ACTION_CROUCH$$" y "$$ACTION_ACCEL$$" simultбneamente.</text>
+	</string>
+	<string id="ls_tip_84">
+		<text>Para reducir las posibilidades de resultar herido, dispara apoyado contra las esquinas. Para ello, mantйn "$$ACTION_LLOOKOUT$$" o "$$ACTION_RLOOKOUT$$".</text>
+	</string>
+	<string id="ls_tip_85">
+		<text>Gracias al mecanismo integrado de ubicaciуn de objetivos, los prismбticos no solo te permitirбn ver perfectamente objetos lejanos, sino tambiйn localizar a enemigos. Para sacarlos, pulsa "$$ACTION_WPN_5$$".</text>
+	</string>
+	<string id="ls_tip_86">
+		<text>Para encender o apagar la linterna, pulsa "$$ACTION_TORCH$$".</text>
+	</string>
+	<string id="ls_tip_87">
+		<text>Para sacar un tornillo, pulsa "$$ACTION_WPN_6$$".</text>
+	</string>
+	<string id="ls_tip_88">
+		<text>Si tienes un dispositivo de visiуn nocturna acoplado al casco, puedes activarlo y desactivarlo pulsando "$$ACTION_NIGHT_VISION$$".</text>
+	</string>
+	<string id="ls_tip_89">
+		<text>Pulsa "$$ACTION_QUICK_USE_1$$", "$$ACTION_QUICK_USE_2$$", "$$ACTION_QUICK_USE_3$$" o "$$ACTION_QUICK_USE_4$$" para usar el objeto correspondiente del panel de acceso rбpido.</text>
+	</string>
+	<string id="ls_tip_9">
+		<text>Los medicamentos no son de efecto inmediato, aunque algunos duran mucho.</text>
+	</string>
+	<string id="ls_tip_90">
+		<text>Tu PDA contiene un mapa, informaciуn sobre las misiones en curso, estadнsticas personales y un registro de mensajes. Para abrirla, pulsa "$$ACTION_ACTIVE_JOBS$$".</text>
+	</string>
+	<string id="ls_tip_91">
+		<text>Tienes que sacar el detector para buscar artefactos. Para ello, pulsa "$$ACTION_SHOW_DETECTOR$$".</text>
+	</string>
+	<string id="ls_tip_92">
+		<text>Para detener el juego, pulsa "$$ACTION_PAUSE$$".</text>
+	</string>
+	<string id="ls_tip_93">
+		<text>Para guardar rбpido, pulsa "$$ACTION_QUICK_SAVE$$". Pulsa "$$ACTION_QUICK_LOAD$$" para cargar el ъltimo archivo guardado.</text>
+	</string>
+	<string id="ls_tip_94">
+		<text>Correr es el modo mбs rбpido de moverse, pero tambiйn el que mбs cansa. Pulsa "$$ACTION_SPRINT_TOGGLE$$" para correr.</text>
+	</string>
+	<string id="ls_tip_95">
+		<text>Si apuntas, serбs mбs preciso que disparando sin mбs. Para apuntar, pulsa "$$ACTION_WPN_ZOOM$$".</text>
+	</string>
+	<string id="ls_tip_96">
+		<text>Si tienes un lanzagranadas acoplado, puedes cambiar el modo de disparo de normal a granadas pulsando "$$ACTION_WPN_FUNC$$".</text>
+	</string>
+	<string id="ls_tip_97">
+		<text>Si tienes varias clases de municiуn para el arma en uso, puedes cambiar de una a otra pulsando "$$ACTION_WPN_NEXT$$".</text>
+	</string>
+	<string id="ls_tip_98">
+		<text>Para recargar el arma antes de agotar el cargador, pulsa "$$ACTION_WPN_RELOAD$$".</text>
+	</string>
+	<string id="ls_tip_99">
+		<text>Para desechar el arma equipada, pulsa "$$ACTION_DROP$$".</text>
+	</string>
+	<string id="ls_tip_6">
+		<text>Para aguardar a que pase una emisiуn, refъgiate en un edificio fiable o subterrбneo, Cuando se aproxime una emisiуn, verбs marcado en tu PDA el punto mбs cercano.</text>
+	</string>
+	<string id="ls_tip_12">
+		<text>Para usar un objeto mediante acceso rбpido, arrбstralo de la mochila a una de las cuatro ranuras sobre los contenedores para artefactos.</text>
+	</string>
+	<string id="ls_tip_24">
+		<text>Si ves una gota de sangre en la esquina inferior derecha de la pantalla, es que sufres una hemorragia y debes detenerla. El color del sнmbolo varнa segъn la gravedad.</text>
+	</string>
+	<string id="ls_tip_25">
+		<text>Un sнmbolo de peligro por radiaciуn te alerta de que estбs expuesto a radiaciones. Cuando eso ocurra, usa medicamentos antirradiaciуn. El color del sнmbolo indica el nivel de exposiciуn sufrido.</text>
+	</string>
+	<string id="ls_tip_4">
+		<text>Puedes ocultar y mostrar diferentes marcadores en el mapa de tu PDA utilizando filtros. Los botones para filtrar se encuentran arriba del mapa, bajo la misiуn actual.</text>
+	</string>
+	<string id="ls_tip_55">
+		<text>Los artefactos no suelen ser estбticos, sino que tienden a moverse en un бrea anуmala. Si persigues como loco un artefacto acabarбs metido en una anomalнa en poco tiempo.</text>
+	</string>
+	<string id="ls_tip_57">
+		<text>Algunos stalkers pueden ofrecer servicios como facilitarte informaciуn y productos exclusivos, o conseguirte artefactos.</text>
+	</string>
+	<string id="ls_tip_59">
+		<text>Tras una emisiуn, pueden aparecer nuevos artefactos en бreas anуmalas que ya hayas explorado.</text>
+	</string>
+	<string id="ls_tip_74">
+		<text>Puedes cambiar la dificultad del juego cuando quieras en el menъ de opciones.</text>
+	</string>
+	<string id="ls_tip_2">
+		<text>Los tйcnicos de los campamentos de stalkers pueden mejorar tus armas, trajes y cascos.</text>
+	</string>
+	<string id="ls_tip_66">
+		<text>Si quieres sobrevivir, permanece atento a los chirridos del contador Geiger, que te avisarбn de las radiaciones, y a la seсal de peligro por anomalнa, que te indica que te aproximas a una anomalнa.</text>
+	</string>
+	<string id="ls_tip_26">
+		<text>Tu relaciуn con la gente tiene repercusiуn directa en el precio de los artнculos y los servicios. Si no te llevas bien con alguien, no esperes ningъn descuento. Sin embargo, si tienes buen trato, puede que hasta te ofrezca algo especial.</text>
+	</string>
+	<string id="ls_tip_11">
+		<text>Puedes descargar las armas que encuentres para conseguir mбs municiуn; haz clic con el botуn derecho en el arma dentro de tu mochila y selecciona la acciуn precisa en el menъ contextual.</text>
+	</string>
+	<string id="ls_mp_tip_1">
+		<text>Matando a enemigos y consiguiendo artefactos reunirбs los puntos necesarios para aumentar de rango. Al subir de rango, puedes acceder a nuevas armas, blindajes y equipo.</text>
+	</string>
+	<string id="ls_mp_tip_11">
+		<text>Las granadas de humo sirven para robar un artefacto u ocultarse.</text>
+	</string>
+	<string id="ls_mp_tip_13">
+		<text>A la izquierda del menъ de compra verбs cinco pestaсas. De arriba abajo: pistolas, armas principales, equipo, municiуn y suministros mйdicos. Al seleccionar una, verбs todos los elementos accesibles a tu rango.</text>
+	</string>
+	<string id="ls_mp_tip_14">
+		<text>El menъ de compra de la pantalla tiene 4 ranuras de compra rбpida. Pulsa el icono del disco para guardar una combinaciуn o el nъmero pertinente para cargar dicha combinaciуn. La cuarta ranura es para guardar la ъltima combinaciуn adquirida.</text>
+	</string>
+	<string id="ls_mp_tip_15">
+		<text>Si tienes mбs de un arma, puedes cambiar de una a otra pulsando repetidamente "$$ACTION_WPN_3$$".</text>
+	</string>
+	<string id="ls_mp_tip_17">
+		<text>Puedes activar un artefacto para crear una anomalнa. Para ello, saca el artefacto pulsando "$$ACTION_ARTEFACT$$" y mantйn "$$ACTION_WPN_FIRE$$". La anomalнa que aparezca serб tan peligrosa para tus enemigos como para ti.</text>
+	</string>
+	<string id="ls_mp_tip_18">
+		<text>Un traje de cientнfico te ayudarб a sobrevivir en anomalнas y бreas radioactivas.</text>
+	</string>
+	<string id="ls_mp_tip_2">
+		<text>CAZA DE ARTEFACTOS: para ganar, debes llevar un determinado nъmero de artefactos a tu base.</text>
+	</string>
+	<string id="ls_mp_tip_20">
+		<text>Para desmontar un silenciador, una mira o un lanzagranadas acoplado de un arma, haz clic con el botуn derecho en ella cuando estй en la mochila y selecciona la acciуn pertinente del menъ contextual.</text>
+	</string>
+	<string id="ls_mp_tip_22">
+		<text>Si quieres moverte sin hacer ruido, pulsa "$$ACTION_ACCEL$$" para andar o "$$ACTION_CROUCH$$" para agacharte.</text>
+	</string>
+	<string id="ls_mp_tip_23">
+		<text>Las escopetas son armas de corto alcance. Cuanto mбs lejos tengas a un enemigo, menos efectivas serбn.</text>
+	</string>
+	<string id="ls_mp_tip_24">
+		<text>Para cubrirte de disparos de armas de fuego pequeсas, escуndete tras algo sуlido. A diferencia de los muros de cemento, las tablas de madera y las placas de metal no son seguras.</text>
+	</string>
+	<string id="ls_mp_tip_26">
+		<text>Los disparos a la cabeza son muy daсinos y letales para casi cualquier enemigo.</text>
+	</string>
+	<string id="ls_mp_tip_27">
+		<text>Los movimientos acelerados, los saltos y las heridas minan mucho tu resistencia.</text>
+	</string>
+	<string id="ls_mp_tip_28">
+		<text>Para ajustar lo lejos que lanzas una granada, mantйn "$$ACTION_WPN_ZOOM$$".</text>
+	</string>
+	<string id="ls_mp_tip_29">
+		<text>Los enemigos utilizan granadas. Cuando veas un indicador de granada, abandona el radio letal de inmediato.</text>
+	</string>
+	<string id="ls_mp_tip_3">
+		<text>COMBATE A MUERTE: consigue mбs puntos letales que nadie para ganar.</text>
+	</string>
+	<string id="ls_mp_tip_30">
+		<text> Acelerar antes de un salto te permite salvar grandes distancias.</text>
+	</string>
+	<string id="ls_mp_tip_31">
+		<text>Los indicadores clave que muestran tu salud y tu resistencia estбn situados en la parte inferior derecha de la pantalla.</text>
+	</string>
+	<string id="ls_mp_tip_35">
+		<text>El minimapa indica la direcciуn del artefacto. Si la flecha seсala arriba, el artefacto estб por encima de tu posiciуn actual. Si seсala abajo, estб por debajo.</text>
+	</string>
+	<string id="ls_mp_tip_36">
+		<text>Puedes recoger mochilas enemigas para reunir dinero extra. El equipo que te sobre, vйndelo en la base.</text>
+	</string>
+	<string id="ls_mp_tip_37">
+		<text>Cubre a toda costa al miembro de tu equipo que cargue con los artefactos.</text>
+	</string>
+	<string id="ls_mp_tip_38">
+		<text>Usa granadas para atacar a los enemigos a cubierto. Ten en cuenta su radio de impacto para no herir a tus aliados.</text>
+	</string>
+	<string id="ls_mp_tip_39">
+		<text>Puedes comunicarte con tu equipo mediante mensajes de voz. Para acceder al menъ de esa opciуn, pulsa "$$ACTION_SPEECH_MENU_0$$" o "$$ACTION_SPEECH_MENU_1$$".</text>
+	</string>
+	<string id="ls_mp_tip_4">
+		<text>COMBATE A MUERTE EN EQUIPO: para ganar, tu equipo deberб conseguir mбs puntos letales que el enemigo.</text>
+	</string>
+	<string id="ls_mp_tip_40">
+		<text>Para iniciar una votaciуn, pulsa "$$ACTION_VOTE_BEGIN$$".</text>
+	</string>
+	<string id="ls_mp_tip_41">
+		<text>Para ver las puntuaciones del juego, pulsa "$$ACTION_SCORES$$".</text>
+	</string>
+	<string id="ls_mp_tip_42">
+		<text>Para reaparecer, pulsa "$$ACTION_JUMP$$" una vez finalizado el periodo de espera.</text>
+	</string>
+	<string id="ls_mp_tip_43">
+		<text>Para abrir el menъ de compra, pulsa "$$ACTION_BUY_MENU$$" en el interior de la base.</text>
+	</string>
+	<string id="ls_mp_tip_44">
+		<text>Puedes abrir el chat general pulsando "$$ACTION_CHAT$$". Para comunicarte ъnicamente con tu equipo, pulsa "$$ACTION_CHAT_TEAM$$".</text>
+	</string>
+	<string id="ls_mp_tip_45">
+		<text>Correr es el modo mбs rбpido de moverse, pero tambiйn el que mбs cansa. Pulsa "$$ACTION_SPRINT_TOGGLE$$" para correr.</text>
+	</string>
+	<string id="ls_mp_tip_46">
+		<text>Si apuntas, serбs mбs preciso que disparando sin mбs. Para apuntar, pulsa "$$ACTION_WPN_ZOOM$$".</text>
+	</string>
+	<string id="ls_mp_tip_47">
+		<text>Si tienes un lanzagranadas acoplado, puedes cambiar el modo de disparo de normal a granadas pulsando "$$ACTION_WPN_FUNC$$".</text>
+	</string>
+	<string id="ls_mp_tip_48">
+		<text>Si tienes varias clases de municiуn para el arma en uso, puedes cambiar de una a otra pulsando "$$ACTION_WPN_NEXT$$".</text>
+	</string>
+	<string id="ls_mp_tip_49">
+		<text>Para recargar el arma antes de agotar el cargador, pulsa "$$ACTION_WPN_RELOAD$$".</text>
+	</string>
+	<string id="ls_mp_tip_5">
+		<text>CAPTURA DEL ARTEFACTO: para ganar, debes llevar un determinado nъmero de artefactos enemigos a la base.</text>
+	</string>
+	<string id="ls_mp_tip_50">
+		<text>Para desechar el arma equipada, pulsa "$$ACTION_DROP$$".</text>
+	</string>
+	<string id="ls_mp_tip_51">
+		<text>Para mirar en tu mochila, pulsa "$$ACTION_INVENTORY$$".</text>
+	</string>
+	<string id="ls_mp_tip_52">
+		<text>Casi todas las armas tienen varios modos de disparo. Para cambiar de uno a otro, pulsa "$$ACTION_WPN_FIREMODE_NEXT$$" o "$$ACTION_WPN_FIREMODE_PREV$$".</text>
+	</string>
+	<string id="ls_mp_tip_53">
+		<text>Hay lugares por los que no podrбs pasar ni siquiera estando agachado. Para agacharte lo mбximo posible, mantйn "$$ACTION_CROUCH$$" y "$$ACTION_ACCEL$$" simultбneamente.</text>
+	</string>
+	<string id="ls_mp_tip_55">
+		<text>Para asomarte por una esquina, pulsa "$$ACTION_LLOOKOUT$$" o "$$ACTION_RLOOKOUT$$". En esta posiciуn, no puedes disparar.</text>
+	</string>
+	<string id="ls_mp_tip_6">
+		<text>CAPTURA DEL ARTEFACTO: para devolver un artefacto robado a tu base, tienes que matar al enemigo que lo lleve y recogerlo pulsando "$$ACTION_USE$$".</text>
+	</string>
+	<string id="ls_mp_tip_7">
+		<text>CAZA DE ARTEFACTOS: puedes destruir el artefacto activбndolo. Para ello, sбcalo pulsando "$$ACTION_ARTEFACT$$" y mantйn "$$ACTION_WPN_FIRE$$".</text>
+	</string>
+	<string id="ls_mp_tip_8">
+		<text>No puedes correr con el artefacto a cuestas.</text>
+	</string>
+	<string id="ls_tip_100">
+		<text>Para mirar en tu mochila, pulsa "$$ACTION_INVENTORY$$".</text>
+	</string>
+	<string id="ls_tip_36">
+		<text>Para reparar un arma, traje o casco, busca un tйcnico, selecciona el objeto en la pantalla de modificaciуn y haz clic en el botуn de reparaciуn.</text>
+	</string>
+	<string id="ls_tip_81">
+		<text>Casi todas las armas tienen varios modos de disparo predeterminados y tambiйn puedes comprar modificaciones para aсadir mбs modos. Para cambiar de uno a otro, pulsa "$$ACTION_WPN_FIREMODE_NEXT$$" o "$$ACTION_WPN_FIREMODE_PREV$$".</text>
+	</string>
+	<string id="ls_tip_7">
+		<text>La trayectoria del arma afecta a la direcciуn de las balas, y el manejo establece el tiempo que tarda la mira en volver a su posiciуn inicial tras el disparo.</text>
+	</string>
+	<string id="ls_tip_5">
+		<text>Algunos trajes llevan cascos integrados y no es posible combinarlos con otros cascos.</text>
+	</string>
+	<string id="ls_tip_76">
+		<text>Cada arma tiene sus propios valores de precisiуn, manejo, daсo y cadencia de disparo. Elige la que mбs que te convenga de una amplia selecciуn.</text>
+	</string>
+	<string id="ls_tip_51">
+		<text>La precisiуn de disparo se ve mermada considerablemente cuando te mueves. Quйdate quieto o agбchate para mejorarla.</text>
+	</string>
+	<string id="ls_mp_tip_10">
+		<text>Esta bebida energйtica acelera la recuperaciуn de energнa temporalmente y te permite esprintar mбs tiempo.</text>
+	</string>
+	<string id="ls_mp_tip_12">
+		<text>En el modo Combate a muerte tendrбs municiуn ilimitada.</text>
+	</string>
+	<string id="ls_tip_16">
+		<text>Uno de los peligros mбs comunes de la Zona es la radiaciуn. Una exposiciуn prolongada minarб tu salud y puede ser mortal si no se trata adecuadamente.</text>
+	</string>
+	<string id="ls_tip_19">
+		<text>Lleva comida en las largas incursiones. Si llegas a pasar mucha hambre, tu recuperaciуn de resistencia se verб afectada.</text>
+	</string>
+</string_table>

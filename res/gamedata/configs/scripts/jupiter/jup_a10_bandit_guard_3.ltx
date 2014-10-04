@@ -1,0 +1,43 @@
+[logic@jup_a10_bandit_guard_3]
+suitable = {=target_squad_name(jup_a10_bandit_squad_3) !check_npc_name(jup_a10_bandit_leader)} true
+prior = 100
+active = walker@jup_a10_bandit_guard_3
+
+[walker@jup_a10_bandit_guard_3]
+path_walk = jup_a10_bandit_guard_3_walk
+path_look  = jup_a10_bandit_guard_3_look
+on_actor_dist_le = 3 | {=actor_has_weapon} remark
+on_info = {+jup_a10_guard_back} walker@1 %-jup_a10_guard_back%
+on_info2 = {=surge_started} walker@surge
+on_actor_in_zone = jup_surge_hide_a10 | walker@1
+meet = meet
+
+[walker@1]
+path_walk = jup_a10_bandit_guard_3_back_walk
+path_look  = jup_a10_bandit_guard_3_back_look
+on_actor_dist_le = 3 | {=actor_has_weapon} remark@2
+on_actor_not_in_zone = jup_a10_guard_spase_restrictor | walker@jup_a10_bandit_guard_3
+
+[remark]
+anim = backoff2
+target = story | actor
+snd = jup_a10_bandits_warn
+on_timer = 5000 | {-jup_a10_hit_bandit_guard_3}  %=hit_npc_from_actor +jup_a10_hit_bandit_guard_3%
+on_info = {!actor_has_weapon} walker@jup_a10_bandit_guard_3
+
+[remark@2]
+anim = backoff2
+target = story | actor
+snd = jup_a10_bandits_warn
+on_timer = 5000 | {-jup_a10_hit_bandit_guard_3}  %=hit_npc_from_actor +jup_a10_hit_bandit_guard_3%
+on_info = {!actor_has_weapon} walker@1
+
+[meet]
+use = {=actor_enemy} false, {=actor_has_weapon} false ,true
+meet_dialog	= jup_a10_guard_dialog
+
+[walker@surge]
+path_walk = bodyguard_2_walk
+path_look  = bodyguard_2_look
+on_info = {=surge_complete} walker@jup_a10_bandit_guard_3
+on_info2 = {=surge_complete +jup_a10_guard_back} walker@1

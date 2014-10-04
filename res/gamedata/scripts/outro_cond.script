@@ -1,0 +1,222 @@
+-- Preconditions for Outro of STALKER: Call Of Pripyat (see game_tutorials->outro_game)
+
+-- 4a
+function skadovsk_bad_cond()
+	return has_alife_info("kingpin_gained")
+end
+-- 4b
+function skadovsk_good_cond()
+	return has_alife_info("one_of_the_lads_gained")
+end
+-- 4c
+function skadovsk_neutral_cond()
+	return ( not has_alife_info("kingpin_gained") ) and ( not has_alife_info("one_of_the_lads_gained") )
+end
+-- 5a
+function bloodsucker_live_cond()
+	return not has_alife_info("zat_b57_bloodsucker_lair_clear")
+end
+-- 5b
+function bloodsucker_dead_cond()
+	return has_alife_info("zat_b57_bloodsucker_lair_clear")
+end
+-- 6a
+function dolg_die_cond()
+	return has_alife_info("sim_freedom_help_harder")
+end
+-- 6b
+function freedom_die_cond()
+	return has_alife_info("sim_duty_help_harder")
+end
+-- 6c
+function dolg_n_freedom_cond()
+	return ( not has_alife_info("sim_freedom_help_harder") ) and ( not has_alife_info("sim_duty_help_harder") )
+end
+-- 7a
+function scientist_good_cond()
+	return has_alife_info("research_man_gained")
+end
+-- 7b
+function scientist_bad_cond()
+	return not has_alife_info("research_man_gained")
+end
+-- 8a
+function garik_good_cond()
+	return has_alife_info("pri_a28_army_leaved_alive")
+end
+-- 8b
+function garik_bad_cond()
+	return not has_alife_info("pri_a28_army_leaved_alive")
+end
+-- 9
+function oasis_cond()
+	return has_alife_info("jup_b16_oasis_artefact_to_scientist")
+end
+-- 10
+function mercenarys_cond()
+	return has_alife_info("pri_b35_task_running")
+end
+-- 11a
+function yanov_good_cond()
+	return has_alife_info("mutant_hunter_achievement_gained")
+end
+-- 11b
+function yanov_bad_cond()
+	return not has_alife_info("mutant_hunter_achievement_gained")
+end
+-- 12a
+function zuluz_good_cond()
+	return has_alife_info("pri_b301_save_zulus_complete")
+end
+-- 12b
+function zuluz_bad_cond()
+	return not has_alife_info("pri_b301_save_zulus_complete")
+end
+-- 13a
+function vano_good_cond()
+	return has_alife_info("jup_a10_vano_agree_go_und") and has_alife_info("pri_a16_vano_was_alive_when_removed")
+end
+-- 13b
+function vano_bad_cond()
+	return has_alife_info("jup_a10_vano_agree_go_und") and ( not has_alife_info("pri_a16_vano_was_alive_when_removed") )
+end
+-- 14a
+function brodyaga_good_cond()
+	return has_alife_info("jup_b218_monolith_hired") and has_alife_info("pri_a16_wanderer_was_alive_when_removed")
+end
+-- 14b
+function brodyaga_bad_cond()
+	return has_alife_info("jup_b218_monolith_hired") and ( not has_alife_info("pri_a16_wanderer_was_alive_when_removed") )
+end
+-- 15a
+function sokolov_good_cond()
+	return has_alife_info("jup_b218_soldier_hired") and has_alife_info("pri_a28_sokolov_left_alive")
+end
+-- 15b
+function sokolov_bad_cond()
+	return has_alife_info("jup_b218_soldier_hired") and ( not has_alife_info("pri_a28_sokolov_left_alive") )
+end
+-- 16
+function sich_cond()
+	return has_alife_info("balance_advocate_gained")
+end
+-- 17
+function noahs_ark_cond()
+	return has_alife_info("zat_b18_noah_met") and ( not has_alife_info("zat_b18_noah_dead") )
+end
+-- 18a
+function kardan_good_cond()
+	return has_alife_info("zat_b44_tech_buddies_both_told")
+end
+-- 18b
+function kardan_bad_cond()
+	return not has_alife_info("zat_b44_tech_buddies_both_told")
+end
+--19a
+function strelok_live_cond()
+	return not has_alife_info("pri_a28_strelok_dead")
+end
+-- 19b
+function strelok_die_cond()
+	return has_alife_info("pri_a28_strelok_dead")
+end
+-- 20a
+function kovalski_live_cond()
+	return not has_alife_info("pri_a28_koval_dead")
+end
+-- 20b
+function kovalski_die_cond()
+	return has_alife_info("pri_a28_koval_dead")
+end
+
+
+class "outro_sound"
+function outro_sound:__init()
+end
+
+function outro_sound:start()
+	self.snd			= sound_object("music\\outro")
+	self.snd:play		(nil, 0.0, sound_object.s2d)
+	self:set_volume		(1.0)
+end
+
+function outro_sound:stop()
+	self.snd:stop		()
+end
+
+function outro_sound:set_volume(vol)
+	self.snd.volume		= vol
+end
+
+function start_bk_sound()
+	g_outro_sound = outro_sound()
+	g_outro_sound:start()
+	local hud		= get_hud()
+	hud:AddCustomStatic("blackscreen", true)
+	xr_effects.disable_ui_only(db.actor, nil)
+end
+
+function stop_bk_sound()
+	if g_outro_sound ~= nil then
+		g_outro_sound:stop()
+	end
+	g_outro_sound	= nil
+	xr_effects.game_disconnect()
+	xr_effects.game_credits()end
+
+
+volume_max	= 1.0
+volume_min	= 0.3
+
+function calc_fade(factor, fade1_pos, fade2_pos, fade1_volume, fade2_volume)
+	local f = ((factor-fade1_pos)*(fade2_volume-fade1_volume))/(fade2_pos-fade1_pos) + fade1_volume
+
+	local min_vol = 0.0
+	local max_vol = 1.0
+
+	if fade1_volume > fade2_volume then
+		max_vol		= fade1_volume
+		min_vol		= fade2_volume
+	else
+		max_vol		= fade2_volume
+		min_vol		= fade1_volume
+	end
+
+	if f>max_vol then
+		f = max_vol
+	elseif f<min_vol then
+		f = min_vol
+	end
+--	printf("%f - %f", factor, f)
+	return f
+end
+
+function update_bk_sound_fade_start(factor)
+	local start_pt	= 0.6
+	local stop_pt	= 1.0
+
+	f	=				calc_fade(factor, start_pt, stop_pt, volume_max, volume_min)
+	g_outro_sound:set_volume(f)
+end
+
+function update_bk_sound_fade_stop(factor)
+	local f = 1.0
+
+	if factor < 0.5 then
+		local start_pt	= 0.0
+		local stop_pt	= 0.12
+
+		f	=				calc_fade(factor, start_pt, stop_pt, volume_min, volume_max)
+	else
+		local start_pt2	= 0.7
+		local stop_pt2	= 0.95
+
+		f	=				calc_fade(factor, start_pt2, stop_pt2, volume_max, 0.0)
+	end
+	printf("%f - %f", factor, f)
+	g_outro_sound:set_volume(f)
+end
+
+function start_outro()
+	game.start_tutorial("outro_game")
+end

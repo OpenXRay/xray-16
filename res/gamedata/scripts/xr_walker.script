@@ -1,0 +1,202 @@
+----------------------------------------------------------------------------------------------------
+-- Walkers
+---------------------------------------------------------------------------------------------------------------------
+class "evaluator_need_walker" (property_evaluator)
+function evaluator_need_walker:__init(storage, name) super(nil, name)
+		self.st = storage
+end
+function evaluator_need_walker:evaluate()
+		return xr_logic.is_active(self.object, self.st)
+end
+
+
+local assoc_tbl = 	{
+						idle = {director = {"wait"}},
+						harmonica = {director = {"play_harmonica"}},
+						guitar = {director = {"play_guitar"}},
+						story = {director = {"wait"}},
+					}
+
+
+----------------------------------------------------------------------------------------------------------------------
+class "action_walker_activity" (action_base)
+function action_walker_activity:__init (npc, action_name, storage) super(nil, action_name)
+	self.st = storage
+	self.move_mgr = db.storage[npc:id()].move_mgr
+
+	self.st.description = "walker_camp"
+	self.avail_actions = xr_animpoint_predicates.associations[self.st.description]
+	self.st.approved_actions = {}
+
+	for k,v in pairs(self.avail_actions) do
+		-- Убираем те действия, которые не подходят по прекондишну
+		if v.predicate(npc:id())==true then
+			table.insert(self.st.approved_actions, v)
+		end
+	end
+end
+function action_walker_activity:initialize()
+	action_base.initialize(self)
+	self.object:set_desired_position()
+	self.object:set_desired_direction()
+	self:reset_scheme(nil, self.object)
+end
+function action_walker_activity:activate_scheme(loading, npc)
+	self.st.signals = {}
+	self:reset_scheme(loading, npc)
+end
+function action_walker_activity:reset_scheme(loading, npc)
+	if self.st.path_walk_info == nil then
+		self.st.path_walk_info = utils.path_parse_waypoints(self.st.path_walk)
+	end
+	if self.st.path_look_info == nil then
+		self.st.path_look_info = utils.path_parse_waypoints(self.st.path_look)
+	end
+
+	self.move_mgr:reset(self.st.path_walk, self.st.path_walk_info, self.st.path_look, self.st.path_look_info, self.st.team, self.st.suggested_state)
+end
+function action_walker_activity:execute()
+	action_base.execute(self)
+
+	self.move_mgr:update()
+
+	-- Определяем, в каком мы кемпе.
+	local camp = sr_camp.get_current_camp(self.object:position())
+	if camp ~= nil and self.st.use_camp == true then
+		self.camp = camp
+		self.camp:register_npc(self.object:id())
+		self.in_camp = true
+	else
+		if self.in_camp == true then
+			self.camp:unregister_npc(self.object:id())
+			self.in_camp = nil
+		end
+	end
+
+
+	if not self.in_camp and self.st.sound_idle ~= nil then
+		xr_sound.set_sound_play(self.object:id(), self.st.sound_idle)
+	end
+end
+
+function action_walker_activity:update()
+	--printf("update")
+	if self.camp == nil then
+		return
+	end
+
+	local camp_action, is_director = self.camp:get_camp_action(self.object:id())
+	--printf("camp_action %s, %s", camp_action, tostring(is_director))
+
+	if not is_director then
+		return
+	end
+
+	local tbl = assoc_tbl[camp_action].director
+	local anim = tbl[math.random(#tbl)]
+	state_mgr.set_state(self.object, anim)
+end
+
+function action_walker_activity:finalize()
+	self.move_mgr:finalize()
+
+	if self.in_camp == true then
+		self.camp:unregister_npc(self.object:id())
+		self.in_camp = nil
+	end
+	action_base.finalize(self)
+end
+--' Возвращает достиг ли персонаж точки начала работы схемы
+function action_walker_activity:position_riched()
+	return self.move_mgr:arrived_to_first_waypoint()
+end
+
+function action_walker_activity:net_destroy(npc)
+	if self.in_camp == true then
+		self.camp:unregister_npc(npc:id())
+		self.in_camp = nil
+	end
+end
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------
+--walker binder
+----------------------------------------------------------------------------------------------------------------------
+function add_to_binder(npc, ini, scheme, section, storage)
+		printf("DEBUG: add_to_binder: scheme='%s', section='%s'", scheme, section)
+		local operators	= {}
+		local properties  = {}
+
+		local manager = npc:motivation_action_manager()
+
+		properties["event"] = xr_evaluators_id.reaction
+	 	properties["need_walker"] = xr_evaluators_id.zmey_walker_base + 1
+
+		properties["state_mgr_logic_active"] 	= xr_evaluators_id.state_mgr + 4
+
+	 	operators["action_walker"] = xr_actions_id.zmey_walker_base + 1
+
+			 -- -- evaluators
+--		callstack()
+		manager:add_evaluator(properties["need_walker"], this.evaluator_need_walker(storage, "walker_need"))
+
+		local new_action = this.action_walker_activity(npc, "action_walker_activity", storage)
+		new_action:add_precondition(world_property(stalker_ids.property_alive, true))
+		new_action:add_precondition(world_property(stalker_ids.property_danger,false))
+		new_action:add_precondition(world_property(stalker_ids.property_enemy, false))
+		new_action:add_precondition(world_property(stalker_ids.property_anomaly,false))
+		new_action:add_precondition(world_property(properties["need_walker"], true))
+		xr_motivator.addCommonPrecondition(new_action)
+
+		new_action:add_effect(world_property(properties["need_walker"], false))
+		new_action:add_effect (world_property(properties["state_mgr_logic_active"], false))
+		manager:add_action(operators["action_walker"], new_action)
+
+		-- Зарегистрировать все actions, в которых должен быть вызван метод reset_scheme при изменении настроек схемы:
+		xr_logic.subscribe_action_for_events(npc, storage, new_action)
+
+		new_action = manager:action(xr_actions_id.alife)
+		new_action:add_precondition(world_property(properties["need_walker"], false))
+end
+
+-- Включение схемы
+--
+-- enabled - включена ли схема
+-- path_walk - основной путь, по которому ходит охранник
+-- path_look [опционально] - путь, куда смотрит охранник
+-- team [опционально] - команда для синхронизации
+--
+function set_scheme(npc, ini, scheme, section, gulag_name)
+	printf("DEBUG: set_scheme: scheme='%s', section='%s', gulag_name='%s'", scheme, section, tostring(gulag_name))
+	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
+	printf("DEBUG: set_scheme: storage assigned")
+
+	st.logic     = xr_logic.cfg_get_switch_conditions(ini, section, npc)
+
+	st.path_walk = utils.cfg_get_string(ini, section, "path_walk", npc, true,  gulag_name)
+
+	if not level.patrol_path_exists(st.path_walk) then
+		abort("there is no patrol path %s", st.path_walk)
+	end
+
+	st.path_look = utils.cfg_get_string(ini, section, "path_look", npc, false, gulag_name)
+
+	if st.path_walk == st.path_look then
+		abort("You are trying to set 'path_look' equal to 'path_walk' in section [%s] for npc [%s]", section, npc:name())
+	end
+
+	st.team      = utils.cfg_get_string(ini, section, "team",      npc, false, gulag_name)
+	st.sound_idle= utils.cfg_get_string(ini, section, "sound_idle",npc, false, "")
+	st.use_camp  = utils.cfg_get_bool(ini, section, "use_camp",npc, false, false)
+
+	st.suggested_state = {}
+	st.suggested_state.standing = utils.cfg_get_string(ini, section, "def_state_standing", npc, false, "")
+
+	st.suggested_state.moving  = utils.cfg_get_string(ini, section, "def_state_moving1", npc, false, "")
+	st.suggested_state.moving  = utils.cfg_get_string(ini, section, "def_state_moving", npc, false, "", st.suggested_state.moving)
+
+	st.path_walk_info = nil -- Будут инициализированы в reset(), сейчас пути могут быть еще
+	st.path_look_info = nil -- не загружены.
+end

@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="kb_active_jobs">
+		<text>КПК</text>
+	</string>
+	<string id="kb_alife_command">
+		<text>Наказ атакувати</text>
+	</string>
+	<string id="kb_always_run">
+		<text>Крок</text>
+	</string>
+	<string id="kb_artefact">
+		<text>Артефакт</text>
+	</string>
+	<string id="kb_backward">
+		<text>Назад</text>
+	</string>
+	<string id="kb_binoculars">
+		<text>Бінокль</text>
+	</string>
+	<string id="kb_buy_menu">
+		<text>Меню купівлі</text>
+	</string>
+	<string id="kb_chat">
+		<text>Чат</text>
+	</string>
+	<string id="kb_chat_team">
+		<text>Командний чат</text>
+	</string>
+	<string id="kb_console">
+		<text>Консоль</text>
+	</string>
+	<string id="kb_contacts">
+		<text>Контакти в КПК</text>
+	</string>
+	<string id="kb_crouch">
+		<text>Присісти</text>
+	</string>
+	<string id="kb_crouch_toggle">
+		<text>Постійно навприсяд</text>
+	</string>
+	<string id="kb_detector">
+		<text>Детектор</text>
+	</string>
+	<string id="kb_down">
+		<text>Вниз</text>
+	</string>
+	<string id="kb_drop">
+		<text>Викласти</text>
+	</string>
+	<string id="kb_fire">
+		<text>Вогонь</text>
+	</string>
+	<string id="kb_firemode_next">
+		<text>Режим стрільби наст.</text>
+	</string>
+	<string id="kb_firemode_prev">
+		<text>Режим стрільби попер.</text>
+	</string>
+	<string id="kb_forward">
+		<text>Вперед</text>
+	</string>
+	<string id="kb_func">
+		<text>Підствольник</text>
+	</string>
+	<string id="kb_grp_common">
+		<text>Загальне</text>
+	</string>
+	<string id="kb_grp_direction">
+		<text>Напрямок</text>
+	</string>
+	<string id="kb_grp_inventory">
+		<text>Рюкзак</text>
+	</string>
+	<string id="kb_grp_movement">
+		<text>Рух</text>
+	</string>
+	<string id="kb_grp_multiplayer">
+		<text>Гра в мережі</text>
+	</string>
+	<string id="kb_grp_weapons">
+		<text>Зброя</text>
+	</string>
+	<string id="kb_inventory">
+		<text>Рюкзак</text>
+	</string>
+	<string id="kb_jump">
+		<text>Стрибок</text>
+	</string>
+	<string id="kb_left">
+		<text>Наліво</text>
+	</string>
+	<string id="kb_left_lookout">
+		<text>Виглянути наліво</text>
+	</string>
+	<string id="kb_left_strafe">
+		<text>Крок ліворуч</text>
+	</string>
+	<string id="kb_map">
+		<text>Карта в КПК</text>
+	</string>
+	<string id="kb_next_slot">
+		<text>Зброя з наступної комірки</text>
+	</string>
+	<string id="kb_night_vision">
+		<text>Прилад нічного бачення</text>
+	</string>
+	<string id="kb_pause">
+		<text>Пауза</text>
+	</string>
+	<string id="kb_pda">
+		<text>КПК</text>
+	</string>
+	<string id="kb_prev_slot">
+		<text>Зброя із попередньої комірки</text>
+	</string>
+	<string id="kb_quit">
+		<text>Вихід</text>
+	</string>
+	<string id="kb_reload">
+		<text>Перезарядити</text>
+	</string>
+	<string id="kb_repair">
+		<text>Полагодити</text>
+	</string>
+	<string id="kb_right">
+		<text>Направо</text>
+	</string>
+	<string id="kb_right_lookout">
+		<text>Виглянути направо</text>
+	</string>
+	<string id="kb_right_strafe">
+		<text>Крок праворуч</text>
+	</string>
+	<string id="kb_scores">
+		<text>Очки</text>
+	</string>
+	<string id="kb_screenshot">
+		<text>Скріншот</text>
+	</string>
+	<string id="kb_skin_menu">
+		<text>Меню вибору моделі</text>
+	</string>
+	<string id="kb_sprint">
+		<text>Біг</text>
+	</string>
+	<string id="kb_team_menu">
+		<text>Меню вибору команди</text>
+	</string>
+	<string id="kb_torch">
+		<text>Ліхтарик</text>
+	</string>
+	<string id="kb_turn_engine">
+		<text>Увімкнути</text>
+	</string>
+	<string id="kb_up">
+		<text>Нагору</text>
+	</string>
+	<string id="kb_use">
+		<text>Використати</text>
+	</string>
+	<string id="kb_use_bandage">
+		<text>Швидк. використання бинта</text>
+	</string>
+	<string id="kb_use_medkit">
+		<text>Швидк. використання аптечки</text>
+	</string>
+	<string id="kb_vote_begin">
+		<text>Розпочати голосування</text>
+	</string>
+	<string id="kb_vote_menu">
+		<text>Проголосувати</text>
+	</string>
+	<string id="kb_vote_no">
+		<text>Проголосувати «Ні»</text>
+	</string>
+	<string id="kb_vote_yes">
+		<text>Проголосувати «Так»</text>
+	</string>
+	<string id="kb_weapon1">
+		<text>Зброя 1</text>
+	</string>
+	<string id="kb_weapon2">
+		<text>Зброя 2</text>
+	</string>
+	<string id="kb_weapon3">
+		<text>Зброя 3</text>
+	</string>
+	<string id="kb_weapon4">
+		<text>Зброя 4</text>
+	</string>
+	<string id="kb_weapon5">
+		<text>Зброя 5</text>
+	</string>
+	<string id="kb_weapon6">
+		<text>Зброя 6</text>
+	</string>
+	<string id="kb_wpn_next">
+		<text>Змінити тип патронів</text>
+	</string>
+	<string id="kb_wpn_prev">
+		<text>Попередня зброя цього типу</text>
+	</string>
+	<string id="kb_zoom">
+		<text>Наблизити</text>
+	</string>
+	<string id="speech_menu_group">
+		<text>Голосові повідомлення (1)</text>
+	</string>
+	<string id="speech_menu_personal">
+		<text>Голосові повідомлення (2)</text>
+	</string>
+	<string id="kb_quick_use_1">
+		<text>Комірка швидкого доступу 1</text>
+	</string>
+	<string id="kb_quick_use_2">
+		<text>Комірка швидкого доступу 2</text>
+	</string>
+	<string id="kb_quick_use_3">
+		<text>Комірка швидкого доступу 3</text>
+	</string>
+	<string id="kb_quick_use_4">
+		<text>Комірка швидкого доступу 4</text>
+	</string>
+</string_table>

@@ -1,0 +1,35 @@
+[logic@jup_a12_bandit_bodyguard_2]
+active = walker@guard
+prior = 150
+suitable = {=check_npc_name(sim_default_bandit_1)} true
+
+[walker@guard]
+path_walk = bandit_bodyguard_2_walk
+path_look = bandit_bodyguard_2_look
+combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true
+meet = meet@guard
+on_actor_in_zone = jup_a12_sr_bandit_bodyguard | {=actor_has_weapon} walker@threat
+out_restr = jup_a12_sr_bandit_bodyguard
+
+[meet@guard]
+close_distance = 20
+close_victim = actor
+close_anim = guard
+use	= false
+
+[walker@threat]
+path_walk = bandit_bodyguard_2_walk
+path_look = bandit_bodyguard_2_look
+combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true
+meet = meet@threat
+on_actor_in_zone = jup_a12_sr_bandit_bodyguard | {!actor_has_weapon} walker@guard
+on_actor_not_in_zone = jup_a12_sr_bandit_bodyguard | walker@guard
+on_game_timer = 50 | %+jup_a12_actor_enemy_to_bandits%
+out_restr = jup_a12_sr_bandit_bodyguard
+
+[meet@threat]
+close_distance = 20
+close_victim = actor
+close_anim = {!actor_has_weapon} guard, {+jup_a12_actor_enemy_to_bandits} threat_fire, threat
+far_snd = {!actor_has_weapon} nil, {+jup_a12_actor_enemy_to_bandits} nil, nil
+use	= false

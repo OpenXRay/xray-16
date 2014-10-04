@@ -1,0 +1,90 @@
+[logic@zat_b106_stalker_crab]
+suitable = {=check_npc_name(zat_b106_stalker_crab)} true
+prior = 200
+active = animpoint@wounded ;walker@base
+
+[animpoint@wounded]
+cover_name = zat_a2_sc_zat_b106_crab_wounded
+avail_animations = zat_b106_wounded_idle
+meet = no_meet
+on_info = {+zat_b106_hunt_finish -zat_b106_gonta_dead} animpoint@base, {+zat_b106_hunt_finish +zat_b106_gonta_dead} animpoint@base_no_meet
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+wounded = wounded
+danger = danger
+reach_distance = 50
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+;[walker@base]
+;path_walk = crab_walk
+;path_look = crab_look
+;combat_ignore_cond = true
+;combat_ignore_keep_when_attacked = true
+;def_state_standing = lay_on_bed
+;danger = danger
+;meet = no_meet
+;on_signal = crab_look | remark 
+;on_info = {+zat_b106_hunt_finish -zat_b106_gonta_dead} animpoint@base, {+zat_b106_hunt_finish +zat_b106_gonta_dead} animpoint@base_no_meet
+
+;[remark]
+;path_walk = crab_walk
+;target = path | zat_stalker_base_smart_crab_look, 0
+;anim = zat_b106_wounded_idle
+;meet = no_meet
+;on_info = {+zat_b106_hunt_finish -zat_b106_gonta_dead} animpoint@base, {+zat_b106_hunt_finish +zat_b106_gonta_dead} animpoint@base_no_meet
+;combat_ignore_cond = true
+;combat_ignore_keep_when_attacked = true
+;wounded = wounded
+;danger = danger
+
+[animpoint@base]
+cover_name = zat_a2_sc_zat_b106_stalker_crab
+meet = meet@base
+use_camp = false
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@base_no_meet]
+cover_name = zat_a2_sc_zat_b106_stalker_crab
+meet = no_meet
+use_camp = false
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+on_info = {!dist_to_actor_le(140) -zat_b106_free_stalker_crab} %+zat_b106_free_stalker_crab%
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@base]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_hello = nil
+close_snd_bye   = nil
+use = false
+snd_on_use = zat_b106_garmata_refuse_talk
+meet_on_talking = false
+
+[danger]
+ignore_distance = 0
+
+[wounded]
+hp_state = 0|wounded_heavy@help_heavy
+hp_state_see = 0|wounded_heavy@help_heavy
+hp_victim = 0|nil
+hp_fight = 0|false
+hp_cover = 0|false

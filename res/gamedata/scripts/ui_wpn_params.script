@@ -1,0 +1,96 @@
+function normalize(val, min, max)
+	local d = 100*(val-min)/(max-min)
+	if d < 0 then
+		return 0
+	end
+	return d
+
+--[[
+	if val > 100 then
+		val = 100
+	elseif val < 1 then
+		val  = 1
+	end
+
+	return val
+	]]
+end
+
+function normalizeMP(val)
+	if val > 100 then
+		val = 100
+	elseif val < 1 then
+		val  = 1
+	end
+
+	return val
+end
+
+function read_if_exist(section, value, default)
+		local ltx = system_ini()
+		if ltx:section_exist(section) and ltx:line_exist(section,value) then
+		return ltx:r_float(section,value)
+	else
+		return default
+	end
+end
+
+function read_float(wpn_section, upgr_sections, param)
+	local ltx = system_ini()
+		local res = ltx:r_float(wpn_section, param)
+
+	if upgr_sections == nil or upgr_sections == "" then
+				return res
+		end
+
+	for k, sect in pairs(parse_names(upgr_sections)) do
+		if param == "hit_power" then
+			if res < read_if_exist(sect, param, 0) then
+				res = read_if_exist(sect, param, 0)
+			end
+		else
+			res = res + read_if_exist(sect, param, 0)
+		end
+		end
+
+		return res
+end
+
+function GetRPM(wpn_section, upgr_sections) --' скорострельность
+	local rpm = read_float(wpn_section, upgr_sections, "rpm")
+	return normalize(rpm, 0, 1150)
+end
+
+function GetDamage(wpn_section, upgr_sections) --' повреждение
+	local hit_power = read_float(wpn_section, upgr_sections, "hit_power")
+	return normalize(hit_power, 0, 0.9)
+end
+
+function GetDamageMP(wpn_section, upgr_sections) -- ??? (повреждениеMP)
+	local hit_power = read_float(wpn_section, upgr_sections, "hit_power")
+	hit_power = hit_power * 100
+	-- if val < 1.05 then
+		-- val = val*100-30
+	-- else
+		-- val = 75 + math.pow(val/4,2)*25
+	-- end
+	return normalizeMP(hit_power)
+end
+
+function GetHandling(wpn_section, upgr_sections) --' удобность
+	local ltx = system_ini()
+	-- local val
+		local crosshair_inertion = 1
+	if ltx:line_exist(wpn_section,"crosshair_inertion") then
+		crosshair_inertion = read_float(wpn_section, upgr_sections, "crosshair_inertion")
+	end
+
+	crosshair_inertion = 11.9 - crosshair_inertion
+	return normalize(crosshair_inertion, 0, 10.5)
+end
+
+function GetAccuracy(wpn_section, upgr_sections) --' точность
+		local fire_dispersion_base	= read_float(wpn_section, upgr_sections, "fire_dispersion_base")
+	fire_dispersion_base = 0.85 - fire_dispersion_base
+	return normalize(fire_dispersion_base, 0.375, 0.8)
+end

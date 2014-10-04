@@ -1,0 +1,906 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="jup_b15_zulus_b301_after_fight_0">
+		<text>Ha! To je nauин! Dнky za pomoc, brбcho. Nebejt tebe, ty hazlovй by si mм po chvilce podali jak malou holиiиku. Tak nakonec jsi pшece jenom dobrej stalker... Sorry, ћe jsem se pшedtнm tak rozpбlil. Mмl jsi mi шнct rovnou, ћe jsi od Sluћby bezpeиnosti.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_after_fight_1">
+		<text>Nic se nestalo. Vrбtнme se do vojenskйho tбbora, tam bude bezpeиnмji.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_after_fight_11">
+		<text>Jo. Poшбd to bude lepљн, neћ se toulat sami kolem Pripjati.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_after_fight_111">
+		<text>Tak jdeme.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_after_fight_112">
+		<text>Musнm si tu jeљtм nмco zaшнdit, takћe bмћ napшed. Tбbor je v budovм prбdelny.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_after_fight_2">
+		<text>Mмl bych uћ jнt.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_reward_dialog_0">
+		<text>Poиkej... vezmi si tohle. Nejspolehlivмjљн kulomet v Zуnм.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_reward_dialog_1">
+		<text>Proи, ty uћ ho nepotшebujeљ?</text>
+	</string>
+	<string id="jup_b15_zulus_b301_reward_dialog_11">
+		<text>Poшбd mбm u sebe nмco, инm se dб odehnat pбr mutantщ. Navнc jsem se rozhodl, ћe se vrбtнm. Garik mм doprovodн do Jupitera. Tobм se prostм bude hodit vнc. Ber a uћнvej moudшe.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_reward_dialog_111">
+		<text>Hodnм љtмstн.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_reward_dialog_2">
+		<text>Dнky, je to skvмlб zbraт.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_reward_dialog_21">
+		<text>Ha! Nenн skvмlб, je nejlepљн v Zуnм! Nechal jsem si ji upravit, takћe je teп troљku tмћkб, ale vezmi si to takhle - s takovэm kanуnem v nбruин nepotшebujeљ pшed nikэm utнkat. Aќ se probмhne nepшнtel!</text>
+	</string>
+	<string id="jup_b15_zulus_b301_reward_dialog_211">
+		<text>Mмj se.</text>
+	</string>
+	<string id="jup_b15_zulus_b301_reward_dialog_3">
+		<text>Supr!</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b301_about_zulus_0">
+		<text>Nevнљ, kam љel Zulu?</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b301_about_zulus_1">
+		<text>Pryи. Chtмl po mnм, abych ho zavedl k Jupiteru. Nedaleko tovбrny jsme se rozdмlili. Neшekl mi, kam mмl namншeno dбl.</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_0">
+		<text>Poиkej... chci se s tebou podмlit o jeden nepшнjemnej zбћitek... Pбr ћoldбkщ mм poprosilo, abych je zavedl do Pripjati. Nejdшнv si mм zнskali tuиnou sumiиkou, ale brzo jsem si uvмdomil, ћe jsem se dostal do sraиek... Ani na vteшinu mм nepustili z oин a dokonce mi hrozili zbranмma. Nakonec se mi povedlo utйct, kdyћ jsme byli tмsnм pшed Pripjatн, ale oni se urиitм jen tak nevypaшili. Nмkde tam budou, dбvej si bacha.</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_1">
+		<text>Neslyљel jsi nбhodou, o иem si ti ћoldбci povнdali?</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_11">
+		<text>Ъtrћky, jo. Urиitм neplбnovali, ћe mм nechajн naћivu, a tak se svэmi plбny vщbec netajili. Bavili se hlavnм o tom, jak se sejdou se zбstupcema svэho klienta, kteшн jim pak mмli ukбzat nмjakou vмc a vysvмtlit, co bude jejich ъkolem.</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_111">
+		<text>Kde se mб ta schщzka konat?</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_1111">
+		<text>Kousek odsud, na dvoшe pшed bytovkama.</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_2">
+		<text>Dнky za informaci.</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_actor_0">
+		<text>Mluvil jsi o ћoldбcнch. Neslyљel jsi, o иem si povнdali?</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_actor_1">
+		<text>Ъtrћky, jo. Urиitм neplбnovali, ћe mм nechajн naћivu, a tak se svэmi plбny vщbec netajili. Bavili se hlavnм o zбstupcнch svэho klienta, kteшн jim pak mмli ukбzat nмjakou vмc a vysvмtlit, co bude jejich ъkolem.</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_actor_11">
+		<text>Kde se mб ta schщzka konat?</text>
+	</string>
+	<string id="jup_b43_stalker_assistant_b35_about_merc_actor_111">
+		<text>Kousek odsud, na dvoшe pшed bytovkama.</text>
+	</string>
+	<string id="pri_a15_sokolov_arranged_outfit_0">
+		<text>Zaшнdil jsem ti u vмdcщ oblek. Zastav se kvщli nмmu za Hermannem.</text>
+	</string>
+	<string id="pri_a15_sokolov_arranged_outfit_1">
+		<text>Dobrб... kde se potom sejdeme?</text>
+	</string>
+	<string id="pri_a15_sokolov_arranged_outfit_11">
+		<text>U Zuluse doma, poblнћ Janova.</text>
+	</string>
+	<string id="pri_a15_sokolov_arranged_outfit_111">
+		<text>Tam je ale plno stalkerщ! Co kdybys mм tam radљi zavedl? Protoћe kdyћ tam pшijdu sбm, mбm zadмlбno na prщser. Kdyћ se mnou pщjdeљ ty, nebudou stшнlet, protoћe tebe znajн.</text>
+	</string>
+	<string id="pri_a15_sokolov_evacuation_point_0">
+		<text>Ke kterйmu evakuaиnнmu bodu jsi љel?</text>
+	</string>
+	<string id="pri_a15_sokolov_evacuation_point_1">
+		<text>Promiт, ale to je tajnб informace, kterou ti nemщћu шнct.</text>
+	</string>
+	<string id="pri_a15_sokolov_goto_zulus_0">
+		<text>Pojпme za tнm Zulusem.</text>
+	</string>
+	<string id="pri_a15_sokolov_goto_zulus_1">
+		<text>Dobшe. Ale nejdшнv se stavнme u Hermanna pro ten vмdeckэ oblek.</text>
+	</string>
+	<string id="pri_a15_sokolov_goto_zulus_11">
+		<text>Jdeme.</text>
+	</string>
+	<string id="pri_a15_sokolov_goto_zulus_2">
+		<text>Љel bych rбd, ale venku zrovna zuшн emise. Nepoиkбme chvнli?</text>
+	</string>
+	<string id="pri_a15_sokolov_jupiter_0">
+		<text>Jak ses sem dostal?</text>
+	</string>
+	<string id="pri_a15_sokolov_jupiter_1">
+		<text>Nбљ vrtulnнk se zшнtil pшнmo na Jupiter a propadl stшechou do montбћnн haly. Pшeћil jsem jenom jб - podaшilo se mi utйct z Jupiteru a odejнt k nejbliћљнmu evakuaиnнmu bodu, jenomћe tam nikdo nebyl. Pak jsem potkal Garika a ten mм zavedl do bunkru.</text>
+	</string>
+	<string id="pri_a15_sokolov_need_outfit_0">
+		<text>Jestli chceљ do Pripjati, budeљ potшebovat oblek s uzavшenэm rozvodem kyslнku.</text>
+	</string>
+	<string id="pri_a15_sokolov_occupation_0">
+		<text>Co tady dмlбљ?</text>
+	</string>
+	<string id="pri_a15_sokolov_occupation_1">
+		<text>Mбm rozkaz pokraиovat v evakuaиnнmu bodu, jenomћe Zуna je pшнliљ nebezpeиnб. Jsem pilot, ne vэsadkбш! Proto иekбm tady v marnэ nadмji, ћe si mм tu po skonиenн operace vyzvednou.</text>
+	</string>
+	<string id="pri_a15_sokolov_pripyat_group_0">
+		<text>Dбvбm dohromady lidi, co se mnou pщjdou do Pripjati. Pшidбљ se k nбm?</text>
+	</string>
+	<string id="pri_a15_sokolov_pripyat_group_1">
+		<text>Do Pripjati? A vнљ ty co, moћnб ћe i jo... Tшeba pбr naљich chlapщ pшeћilo a dostalo se aћ tam. Navнc jeden evakuaиnн bod je i v Pripjati, takћe to mбm vlastnм pшi cestм. Sбm bych se tam nikdy nedostal, ale s tvэm druћstvem jsem ochoten se o to pokusit.</text>
+	</string>
+	<string id="pri_a15_sokolov_pripyat_ready_0">
+		<text>Mщћeme vyrazit?</text>
+	</string>
+	<string id="pri_a15_sokolov_pripyat_ready_1">
+		<text>Dб se to tak шнct.</text>
+	</string>
+	<string id="pri_a15_sokolov_start_dialog_11">
+		<text>Ahoj, stalkere.</text>
+	</string>
+	<string id="pri_a15_sokolov_start_dialog_12">
+		<text>Zdravнm.</text>
+	</string>
+	<string id="pri_a15_sokolov_start_dialog_13">
+		<text>Ahoj.</text>
+	</string>
+	<string id="pri_a15_sokolov_start_dialog_14">
+		<text>Zdravнm, majore.</text>
+	</string>
+	<string id="pri_a15_sokolov_where_from_0">
+		<text>Kde jsi pшiљel k tй vojenskй uniformм?</text>
+	</string>
+	<string id="pri_a15_sokolov_where_from_1">
+		<text>Haha... no, teп uћ asi mщћu prozradit, ћe popadaly vojenskэ vrtulnнky, protoћe to stejnм kaћdej vн. Jsem poruинk Sokolov, kopilot prбvм jednoho z tмch vrtulnнkщ.</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_dialog_0">
+		<text>Ohlednм tй hlнdky...</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_dialog_1">
+		<text>Jeho signбl pшichбzн ze starйho obchodu s potravinami, ale nehlбsн se... Moћnб jen ztratil vysнlaиku... Nikdo si teп nemщћe bэt jistэ. Musнme ho najнt...</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_dialog_11">
+		<text>Dнky, plukovnнku! Myslнm, ћe to zvlбdnu.</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_pass_task_dialog_0">
+		<text>Ohlednм tй hlнdky...</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_pass_task_dialog_1">
+		<text>No... Za vљechno mщћe ten kontrolor... On je hlavnнm dщvodem toho, co se stalo prщzkumnйmu tэmu. Postaral se o to, aby se chlapi navzбjem postшнleli... Tyhle nestvщry patшн v rбmci Zуny k tмm horљнm a navнc jsme nebyli trйnovбni na boj s nimi. Kontrolor nбs naprosto pшekvapil a uћ zase jsme ztratili muћe...</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_pass_task_dialog_11">
+		<text>Alespoт, ћe ten kontrolor uћ to mб za sebou.</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_pass_task_dialog_111">
+		<text>Doufбm, ћe se teп situace trochu uklidnн... Jsem vdмиnэ za vaљi pomoc, majore. Myslнm, ћe bмhem mise jste ztratil spoustu munice... Zajdмte za poruинkem Kirilovem a poћбdejte ho, aby vбm vydal potшebnй vybavenн.</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_pass_task_dialog_1111">
+		<text>Dнky, plukovnнku!</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_pass_task_dialog_12">
+		<text>Bez obav, plukovnнku... S tнm mutantem si poradнm.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_dialog_1_0">
+		<text>Mщћu znбt vнce informacн o tйto misi?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_dialog_1_11">
+		<text>Kdo je to?</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_a25_base_reminding_1_0">
+		<text>Pokud brzy nenajdeme zdroj ruљenн, nezbyde nбm nic jinйho neћ zemшнt. Prvnн vмtљн ъtok Monolitu naљi armбdu rozdrtн... A z operace se stane naprostй fiasko...</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_a25_base_reminding_1_1">
+		<text>Pokusнm se najнt ten zdroj co nejdшнve.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_a25_base_reminding_2_0">
+		<text>Tak co, majore? Naљel jste ten zdroj ruљenн?</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_a25_base_reminding_2_1">
+		<text>Ne, poшбd na tom dмlбm...</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_about_merc_start_0">
+		<text>Garik mi шekl o incidentu se ћoldбky...</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_about_merc_start_1">
+		<text>Jo, taky mi o tom шнkal... Po svйm ъtмku Garik pшiљel sem, protoћe se bбl, ћe za nнm jdou. Naљtмstн pro nмj i pro nбs ho ћoldбci nesledovali... Sledujeme mнsto, na kterйm se ћoldбci a zбkaznнkovi lidi majн setkat, ale nic se nedмje... Zajнmalo by mм, co majн ћoldбci v plбnu...</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_0">
+		<text>Zjistil jsem, ћe ћoldбci pбtrajн po tajnй laborataшi v Pripjati.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_1">
+		<text>Tajnб laboratoш tady v Pripjati? Jak jste na to pшiљel?</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_11">
+		<text>Dнky zбpisnнku jednoho ћoldбka ze Zatonu. Potvrzuje to i pшнbмh, kterэ mi vyprбvмl Strejda Jar.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_111">
+		<text>Hm... Vнte jeљtм nмco?</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_1111">
+		<text>Hledajн hlavnн laboratoш. Bмhem mйho pбtrбnн jsem naљel jejн souшadnice.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_11111">
+		<text>Pokud je to opravdu tak, znamenб to, ћe kromм zombiн a fanatikщ mбme dalљнho protivnнka... Musнme se rozhodnout, co teп budeme dмlat.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_111111">
+		<text>Musнm setkбnн pozorovat, a pokud to bude moћnй, zlikvidovat zбstupce klienta. Tнm se postarбme o to, ћe na chvнli se do laboratoшe X8 nikdo nedostane.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_1111111">
+		<text>Znн to jako sluљnэ plбn, ale takhle se nikdy nedozvнme, kdo vљechno o laboratoшi vн. Alespoт se postarбme o to, ћe se do nн nedostanou ћoldбci. Ћoldбci vљak zareagujou rychle a budou nebezpeиnн. Pokud to pщjde, zkuste vyшнdit obм strany. Шeknu poruинku Kirilovi, aby љel s vбmi.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_11111111">
+		<text>OK.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_11111112">
+		<text>Poиkejte, moћnб bychom si mмli vybrat jinэ cнl.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_111111121">
+		<text>Vyberte si, kterэ z cнlщ bude tнm hlavnнm.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_111112">
+		<text>Musнme zlikvidovat velitele ћoldбkщ. Pokud se nбm to podaшн, jednotka bez velitele uћ pro nбs nebude pшedstavovat takovэ problйm.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_1111121">
+		<text>Vypadб to jako dobrй шeљenн, ale poslниek pravdмpodobnм uteиe a pшedб informace o laboratoшнch nмkomu jinйmu, takћe se do nн ћoldбci nakonec stejnм dostanou. Pokuste se zneљkodnit obм osoby. Шeknu poruинku Kirilovi, aby љel s vбmi.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_111113">
+		<text>Na tohle nemбm иas.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_12">
+		<text>Dнky zбpisnнku jednoho ћoldбka ze Zatonu.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_actor_know_about_merc_13">
+		<text>Dнky pшнbмhu, kterэ mi vyprбvмl Strejda Jar, stalker ze stanice Janov.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_reward_0">
+		<text>Ohlednм ћoldбkщ...</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_reward_1">
+		<text>Skvмlб prбce, oba cнle byly zlikvidovбny. Teп uћ se nбm ћoldбci nebudou plйst do cesty a v laboratoшнch snad budeme mнt klid. Zbraт si mщћete nechat a tady pro ni mбte i nмjakou tu munici.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_reward_2">
+		<text>Teп, kdyћ je velitel mrtvэ, nбm ћoldбci nebudou dмlat potнћe. Ale zбkaznнkovi lidй se z toho dostali a mohli by se objevit v laboratoшнch, takћe buпte na pozoru... Mщћete si nechat zbraт a tady pro ni mбte i nмjakou munici.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_reward_3">
+		<text>Dobшe. Teп, kdyћ jste zabil osobu, kterб vмdмla o umнstмnн laboratoшe, by ji ћoldбci nemмli najнt. Ale pochybuju o tom, ћe teп opustн Pripjaќ, takћe pro nбs budou poшбd pшedstavovat hrozbu. Buпte opatrnэ... Mщћete si nechat zbraт a tady pro ni mбte i nмjakou munici.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_reward_4">
+		<text>Takћe jste si na poslednн chvнli vybral jinэ cнl? No, moћnб to bylo dobrй rozhodnutн. Teп, kdyћ je velitel mrtvэ, nбm ћoldбci nebudou dмlat potнћe. Ale zбkaznнkovi lidй se z toho dostali a mohli by se objevit v laboratoшнch, takћe buпte na pozoru... Mщћete si nechat zbraт a tady pro ni mбte i nмjakou munici.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_reward_5">
+		<text>Takћe jste si na poslednн chvнli vybral jinэ cнl? No, moћnб to bylo dobrй rozhodnutн. Teп, kdyћ jste zabil osobu, kterб vмdмla o umнstмnн laboratoшe, by ji ћoldбci nemмli najнt. Ale pochybuju o tom, ћe teп opustн Pripjaќ, takћe pro nбs budou poшбd pшedstavovat hrozbu. Buпte opatrnэ... Mщћete si nechat zbraт a tady pro ni mбte i nмjakou munici.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_b35_reward_6">
+		<text>Tak tohle moc nevyљlo. Velitel ћoldбkщ je naћivu, stejnм jako zбkaznнkщv иlovмk. Teп o nбs ћoldбci vн a budou nбm hrozit stejnм jako jednotky Monolitu. Navнc uћ znajн polohu laboratoшe, takћe je jen otбzkou иasu, neћ se tam objevн. Buпte opatrnэ... Mщћete si nechat zbraт a tady pro ni mбte i nмjakou munici.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_evacuation_ready_0">
+		<text>Pшipravte svй vojбky, plukovnнku. Jsem pшipraven vyrazit.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_evacuation_ready_1">
+		<text>OK. Kryjte Stшelce, majore. My se o sebe dokбћeme postarat.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_evacuation_start_11">
+		<text>Takћe... Mezi nбmi, vy se Stшelcem mбte nejvмtљн zkuљenosti v Zуnм. Rozdнl je v tom, ћe zatнmco o Stшelcovэch zkuљenostech se jenom povнdб, o tмch vaљich  uћ jsme se dбvno pшesvмdиili. Tнm chci шнct, ћe na vбs spolйhбm, majore. Dбvejte na Stшelce pozor – uћ nбs moc nezbэvб.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_evacuation_start_12">
+		<text>Jednotka je pшipravena vyrazit. Иekбme jen na vбs, majore.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_after_scene_dialog_0">
+		<text>Zdб se, ћe vљichni ti љнlenci jsou mrtvн. Seber tu zbraт, aќ odsud mщћem co nejdшнv zmizet.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_after_scene_dialog_1">
+		<text>To dбvб smysl.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_actor_ready_0">
+		<text>Jsem pшipraven, jdeme.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_actor_ready_1">
+		<text>OK. Tэm je pшipraven.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_actor_ready_11">
+		<text>Jdeme.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_actor_ready_2">
+		<text>Musнme poиkat. Nechci, aby mi emise vzala chlapy.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_dialog_0">
+		<text>Jsem kapitбn Tarasov. Vy jste moћnб major, ale velitelem jsem tady jб, a to znamenб, ћe o mэch rozkazech se nediskutuje. Zбvisн na tom ћivot kaћdйho chlapa v tэmu. Plбn je nбsledujнcн: dostaneme se na pozici v zбpadnн oblasti nemocnice a poиkбme, aћ se objevн jednotky Monolitu. Musнme pracovat rychle, abychom na sebe nepшitбhli zbyteиnou pozornost.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_dialog_1">
+		<text>Rozumнm, jdeme.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_dialog_11">
+		<text>OK. Tэm je pшipraven.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_dialog_111">
+		<text>Jdeme.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_dialog_12">
+		<text>Musнme poиkat. Nechci, aby mi emise vzala chlapy.</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_dialog_2">
+		<text>Poиkejte, kapitбne. Jeљtм nejsem pшipraven.</text>
+	</string>
+	<string id="pri_a22_army_signaller_about_rfi_source_0">
+		<text>Nмco novйho v oblasti ruљenн?</text>
+	</string>
+	<string id="pri_a22_army_signaller_about_rfi_source_1">
+		<text>Identifikoval jsem nмkolik zdrojщ, z nichћ jeden je docela blнzko. Pokud ho zniинme, moћnб se budeme moci spojit s velitelstvнm.</text>
+	</string>
+	<string id="pri_a22_army_signaller_about_rfi_source_2">
+		<text>Vypбtral jsem souшadnice zdroje ruљenн. Musн to bэt nмjakэ druh speciбlnнho vysokofrekvenиnнho nebo dokonce mikrovlnnйho vysнlaиe.</text>
+	</string>
+	<string id="pri_a22_army_signaller_about_rfi_source_3">
+		<text>Zaшнzenн, kterй jsi zniиil, opravdu bylo zdrojem ruљenн. Pravdмpodobnм je jich vнce, ale spojenн s velitelstvнm uћ jsme navбzali.</text>
+	</string>
+	<string id="pri_a22_army_signaller_about_signal_0">
+		<text>Шekni mi o signбlu.</text>
+	</string>
+	<string id="pri_a22_army_signaller_about_signal_1">
+		<text>Signбl se neustбle objevuje a zase mizн, ale pokaћdй je blнћ zбkladnм.</text>
+	</string>
+	<string id="pri_a22_army_signaller_about_signal_11">
+		<text>To je ono?</text>
+	</string>
+	<string id="pri_a22_army_signaller_about_signal_111">
+		<text>Ne tak docela. Zajнmavй je to, ћe signбl je pшenбљen na frekvencнch, kterй se pro rбdiovou komunikaci prakticky nepouћнvajн.</text>
+	</string>
+	<string id="pri_a22_army_signaller_about_signal_12">
+		<text>Aha.</text>
+	</string>
+	<string id="pri_a22_army_signaller_b35_about_merc_0">
+		<text>Vezmi si tuhle zbraт a munici. Teп si mщћeљ odpoиinout. Budu sledovat situaci z druhй strany a jakmile se nмkdo objevн, dбm ti vмdмt.</text>
+	</string>
+	<string id="pri_a22_army_signaller_b35_about_merc_1">
+		<text>OK.</text>
+	</string>
+	<string id="pri_a22_army_signaller_start_dialog_11">
+		<text>Zdravнm. Jsem poruинk Kirillov. Jsem zodpovмdnэ za ъdrћbu zbranн a muniиnн sklad.</text>
+	</string>
+	<string id="pri_a22_army_signaller_start_dialog_111">
+		<text>Mбљ nмjakй nбboje?</text>
+	</string>
+	<string id="pri_a22_army_signaller_start_dialog_1111">
+		<text>Jo, nedбvno jsme se vkradli do skladiљtм Monolitu, kterй bylo plnй munice pro vљechny typy zbranн, kterй mщћeљ sehnat v Zуnм... Zajнmalo by mм, jak tam vљechny ty zbranм dostali... Myslнm, ћe jim je musн prodбvat nмkdo z pohraniиnн strбћe...</text>
+	</string>
+	<string id="pri_a22_army_signaller_start_dialog_112">
+		<text>Takћe mщћeљ taky opravovat mй zbranм?</text>
+	</string>
+	<string id="pri_a22_army_signaller_start_dialog_1121">
+		<text>Jasnм. Jsme vyљkolenн k opravovбnн vљech typщ zbranн.</text>
+	</string>
+	<string id="pri_a22_army_signaller_start_dialog_113">
+		<text>Aha.</text>
+	</string>
+	<string id="pri_a22_army_signaller_start_dialog_12">
+		<text>Zdravнm.</text>
+	</string>
+	<string id="pri_a22_army_signaller_start_dialog_13">
+		<text>Proи mм tak bolн hlava?</text>
+	</string>
+	<string id="pri_a22_army_signaller_start_dialog_14">
+		<text>Tak, je tady okamћik pravdy. Jsem zvмdavэ, jestli se odsud dostaneme nebo ne...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_0">
+		<text>Potшebuju munici.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_1">
+		<text>Ћбdnэ problйm. Co pшesnм potшebujeљ?</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_11">
+		<text>Nбboje pro pistoli 9x18...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_111">
+		<text>Tady mбљ... Jeљtм nмco?</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_112">
+		<text>Tady mбљ...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_12">
+		<text>Nбboje pro pistoli 9x19...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_13">
+		<text>Nбboje pro pistoli .45...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_14">
+		<text>Nбboje do brokovnice...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_15">
+		<text>Nбboje pro ъtoиnou puљku 5.45x39...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_16">
+		<text>Nбboje pro ъtoиnou puљku 5.56x45...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_17">
+		<text>Nбboje pro ъtoиnou puљku 9x39...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_18">
+		<text>Nбboje pro odstшelovacн puљku...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_19">
+		<text>Nбboje do kulometu 7.52x64...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_2">
+		<text>Vнc nemщћu vydat, majore... Plukovnнk vydal rozkaz k љetшenн municн.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_ammo_20">
+		<text>OK, to je dobrэ.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_grenade_0">
+		<text>Potшebuju granбty.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_grenade_1">
+		<text>Ћбdnэ problйm. Jakйho typu?</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_grenade_11">
+		<text>Ruиnн granбty...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_grenade_111">
+		<text>Tady mбљ...</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_grenade_12">
+		<text>Munici do odpalovaиe VOG-25.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_grenade_13">
+		<text>Munici do odpalovaиe M209.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_grenade_14">
+		<text>Vнљ co? Jб uћ pщjdu.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_grenade_2">
+		<text>Vнc nemщћu vydat, majore... Plukovnнk vydal rozkaz k ponechбnн munice.</text>
+	</string>
+	<string id="pri_a25_army_medic_need_health_care_0">
+		<text>Potшebuju lйkaшskou pomoc.</text>
+	</string>
+	<string id="pri_a25_army_medic_need_health_care_1">
+		<text>Vћdy jsem pшipraven pomoci. Podнvбm se na to...</text>
+	</string>
+	<string id="pri_a25_army_medic_need_health_care_111">
+		<text>Jsi zdravэ jako шнpa.</text>
+	</string>
+	<string id="pri_a25_army_medic_rescued_0">
+		<text>Jak se cнtнљ po tom, co se stalo?</text>
+	</string>
+	<string id="pri_a25_army_medic_rescued_1">
+		<text>Uћ jsem v poшбdku... Po udбlostech v mateшskй љkolce jsem byl v љoku, ale jakmile se objevila emise, docela rychle jsem se z nмj probral...</text>
+	</string>
+	<string id="pri_a25_army_medic_start_dialog_12">
+		<text>Zdravнm.</text>
+	</string>
+	<string id="pri_a25_army_medic_start_dialog_13">
+		<text>Nejdщleћitмjљн je dostat se k vrtulnнkщm.</text>
+	</string>
+	<string id="pri_a25_army_medic_supply_medicine_0">
+		<text>Potшebuju lйkaшskй vybavenн.</text>
+	</string>
+	<string id="pri_a25_army_medic_supply_medicine_1">
+		<text>Podнvбme se, co bych tady pro tebe mмl. Tady, vezmi si tohle...</text>
+	</string>
+	<string id="pri_a25_army_medic_supply_medicine_2">
+		<text>Promiт, ale uћ mi toho moc nezbylo, vнc ti dбt nemщћu...</text>
+	</string>
+	<string id="pri_b305_strelok_about_base_0">
+		<text>Sledovali jsme rбdiovэ signбl.</text>
+	</string>
+	<string id="pri_b305_strelok_about_base_1">
+		<text>Jo. Kontaktoval jsem stalkera zvanйho Prщvodce. Шekl, jak se na toto mнsto dostat podzemnнmi tunely.</text>
+	</string>
+	<string id="pri_b305_strelok_about_base_11">
+		<text>Kdo je Prщvodce?</text>
+	</string>
+	<string id="pri_b305_strelok_about_base_111">
+		<text>Je to ћijнcн legenda, o kterй se шнkб, ћe tм v rбmci Zуny mщћe dovйst kamkoliv... Ti chlapi z armбdy mмli љtмstн, ћe ho potkali, protoћe bez nмj by neћili dlouho.</text>
+	</string>
+	<string id="pri_b305_strelok_about_base_12">
+		<text>Jak vнљ, ћe tady byla armбda?</text>
+	</string>
+	<string id="pri_b305_strelok_about_base_121">
+		<text>Prщvodce mi o tom шekl. Je jeden z tмch, kteшн sem pшivedli Kovalskйho a jeho jednotku.</text>
+	</string>
+	<string id="pri_b305_strelok_about_base_13">
+		<text>Aha.</text>
+	</string>
+	<string id="pri_b305_strelok_about_information_0">
+		<text>Jakй informace chceљ vlбdм pшedat?</text>
+	</string>
+	<string id="pri_b305_strelok_about_information_1">
+		<text>Je toho hodnм... Jsem si jistэ, ћe moje informace by mohly bэt zneuћity ke zniиenн Zуny. Myslel jsem, ћe to udмlбm sбm... Ale ukбzalo se, ћe to nenн tak jednoduchй. Lidй, kteшн s tнm zaиali, uћ nejsou u moci... Aћ se odsud dostaneme, vљechno ti vysvмtlнm.</text>
+	</string>
+	<string id="pri_b305_strelok_about_station_0">
+		<text>Co jsi v Sarkofбgu vidмl?</text>
+	</string>
+	<string id="pri_b305_strelok_about_station_1">
+		<text>Vљechno je to podvod... Kбmen splnмnэch pшбnн je pouhэ podvod, zaшнzenн, kterй zastiтuje tvou mysl. A lidi, kteшн za tнm stojн, se skrэvajн nмkde jinde...</text>
+	</string>
+	<string id="pri_b305_strelok_about_station_11">
+		<text>Vнљ, kdo za tнm je?</text>
+	</string>
+	<string id="pri_b305_strelok_about_station_111">
+		<text>Moћnб jo, moћnб ne... Uћ nevнm, иemu mбm vмшit... Navнc jsem zjistil vнc, neћ po mnм vщbec chtмli.</text>
+	</string>
+	<string id="pri_b305_strelok_about_station_12">
+		<text>Dobrб, nechбme toho.</text>
+	</string>
+	<string id="pri_b305_strelok_dialog_11">
+		<text>Шeknu vљechno, co vнm. Ovљem jen v pшнpadм, ћe se moje informace dostanou ke sprбvnэm lidem.</text>
+	</string>
+	<string id="pri_b305_strelok_note_0">
+		<text>Na cestм sem jsem naљel skrэљ tvйho tэmu...</text>
+	</string>
+	<string id="pri_b305_strelok_note_1">
+		<text>Zajнmalo by mм, jak jsi to dokбzal... Uvnitш by mмly bэt nмjakй zбznamy, naљel jsi je?</text>
+	</string>
+	<string id="pri_b305_strelok_note_11">
+		<text>Jo, naљel jsem tшi poznбmky.</text>
+	</string>
+	<string id="pri_b305_strelok_note_111">
+		<text>Dнky... Duch a Tesбk byli mэmi kamarбdy... Spoleиnм jsme se dostali pшes Vypalovaиe a dostali se do CNPP. Oba bohuћel zemшeli. Po naљem nбvratu jsme se rozdмlili – jб jsem byl zranмn a zщstal s Doktorem v baћinбch. Pak uћ jsem je nevidмl... O nмco pozdмji jsem zjistil, ћe Tesбka zabili ћoldбci a Duch zemшel, protoћe dщvмшoval vмdcщm... Ale to je minulost... Teп uћ vнm, co musнm udмlat, aby pшбtelй neumнrali zbyteиnм.</text>
+	</string>
+	<string id="pri_b305_strelok_note_12">
+		<text>Jo, tady je tvб zprбva pro Ducha.</text>
+	</string>
+	<string id="pri_b305_strelok_note_121">
+		<text>Dнky... Duch byl mэm kamarбdem... Spoleиnм s Duchem a Tesбkem jsme se dostali pшes Vypalovaиe a dostali se do CNPP. Oba bohuћel zemшeli. Po naљem nбvratu jsme se rozdмlili – jб jsem byl zranмn a zщstal s Doktorem v baћinбch. Pak uћ jsem je nevidмl... O nмco pozdмji jsem zjistil, ћe Tesбka zabili ћoldбci a Duch zemшel, protoћe dщvмшoval vмdcщm...</text>
+	</string>
+	<string id="pri_b305_strelok_note_13">
+		<text>Jo, tady je zprбva Tesбka urиenб pro tebe.</text>
+	</string>
+	<string id="pri_b305_strelok_note_131">
+		<text>Dнky... Tesбk byl mэm kamarбdem... Spoleиnм s Duchem a Tesбkem jsme se dostali pшes Vypalovaиe a dostali se do CNPP. Oba bohuћel zemшeli. Po naљem nбvratu jsme se rozdмlili – jб jsem byl zranмn a zщstal s Doktorem v baћinбch. Pak uћ jsem je nevidмl... O nмco pozdмji jsem zjistil, ћe Tesбka zabili ћoldбci a Duch zemшel, protoћe dщvмшoval vмdcщm...</text>
+	</string>
+	<string id="pri_b305_strelok_note_14">
+		<text>Jo, tady je tvб zprбva pro Fanga.</text>
+	</string>
+	<string id="pri_b305_strelok_note_141">
+		<text>Dнky... Tesбk byl mэm kamarбdem... Spoleиnм s Duchem a Tesбkem jsme se dostali pшes Vypalovaиe a dostali se do CNPP. Oba bohuћel zemшeli. Po naљem nбvratu jsme se rozdмlili – jб jsem byl zranмn a zщstal s Doktorem v baћinбch. Pak uћ jsem je nevidмl... O nмco pozdмji jsem zjistil, ћe Tesбka zabili ћoldбci a Duch zemшel, protoћe dщvмшoval vмdcщm...</text>
+	</string>
+	<string id="pri_b305_strelok_note_15">
+		<text>Jo, tady je tvб zprбva pro Ducha a Tesбkova zprбva pro tebe.</text>
+	</string>
+	<string id="pri_b305_strelok_note_151">
+		<text>Dнky... Duch a Tesбk byli mэmi kamarбdy... Spoleиnм jsme se dostali pшes Vypalovaиe a dostali se do CNPP. Oba bohuћel zemшeli. Po naљem nбvratu jsme se rozdмlili – jб jsem byl zranмn a zщstal s Doktorem v baћinбch. Pak uћ jsem je nevidмl... O nмco pozdмji jsem zjistil, ћe Tesбka zabili ћoldбci a Duch zemшel, protoћe dщvмшoval vмdcщm...</text>
+	</string>
+	<string id="pri_b305_strelok_note_16">
+		<text>Jo, tady je tvб zprбva pro Ducha a dalљн pro Tesбka.</text>
+	</string>
+	<string id="pri_b305_strelok_note_161">
+		<text>Dнky... Duch a Tesбk byli mэmi kamarбdy... Spoleиnм jsme se dostali pшes Vypalovaиe a dostali se do CNPP. Oba bohuћel zemшeli. Po naљem nбvratu jsme se rozdмlili – jб jsem byl zranмn a zщstal s Doktorem v baћinбch. Pak uћ jsem je nevidмl... O nмco pozdмji jsem zjistil, ћe Tesбka zabili ћoldбci a Duch zemшel, protoћe dщvмшoval vмdcщm...</text>
+	</string>
+	<string id="pri_b305_strelok_note_17">
+		<text>Jo, tady je tvб zprбva pro Tesбka a jeho zprбva pro tebe.</text>
+	</string>
+	<string id="pri_b305_strelok_note_171">
+		<text>Dнky... Tesбk byl mэm kamarбdem... Spoleиnм s Duchem a Tesбkem jsme se dostali pшes Vypalovaиe a dostali se do CNPP. Oba bohuћel zemшeli. Po naљem nбvratu jsme se rozdмlili – jб jsem byl zranмn a zщstal s Doktorem v baћinбch. Pak uћ jsem je nevidмl... O nмco pozdмji jsem zjistil, ћe Tesбka zabili ћoldбci a Duch zemшel, protoћe dщvмшoval vмdcщm...</text>
+	</string>
+	<string id="pri_b305_strelok_note_18">
+		<text>Ano, ale bohuћel je sebou nemбm.</text>
+	</string>
+	<string id="pri_a25_army_medic_need_health_care_2">
+		<text>Podнvбm se na to... To je hrщza, majore... Hele, lйkaшskэmi testy pro vesmнrnэ program bys asi proљel, ale kondici mбљ jinak pшнљernou! Hehe!</text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_dialog_21">
+		<text>Pojпte, majore. Lidi z Monolitu nebudou иekat.</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_start_0">
+		<text>Majore, ztratil se nбm jeden hlнdaи - nenн na svйm mнstм. Podle signбlu se teп nachбzн v obchodu, ale na volбnн neodpovнdб. Kdo vн, co se tam semlelo, tшeba se zhroutil. Poшбd jeљtм tak ъplnм nevydejchal ten pбd vrtulnнku. Mohl byste to tam skoиit provмшit?</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_start_1">
+		<text>S radostн.</text>
+	</string>
+	<string id="pri_a16_colonel_a21_about_sentry_start_2">
+		<text>Nemщћu nic slнbit.</text>
+	</string>
+	<string id="pri_a16_military_colonel_a20_find_recon_squd_dialog_0">
+		<text>Majore, musнme najнt naљe prщzkumnнky.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_dialog_1_1">
+		<text>Vezmete si ъtoиnй druћstvo a vyrazнte k objektu A17 - kapitбn Tarasov vбs tam zavede. Vaљнm cнlem budou dvм nemocniиnн kшнdla propojenб chodbou. Zбpadnн kшнdlo momentбlnм drћн bojovnнci Monolitu. Vy pщjdete do druhйho kшнdla a nastraћнte na nм lйиku. Puљku budou mнt nejspнљ u sebe, urиitм s nн bude bojovat ten nejvмtљн poљuk.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_dialog_1_111">
+		<text>To bude nejspнљ velitel. Chlapi ho vidмli, jak ostatnнm bojovnнkщm dбvб kбzбnн. Doslova! Dбvejte si pozor, nevнme, co od nмj mщћeme oиekбvat.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_dialog_1_12">
+		<text>Rozumнm, plukovnнku.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_task_dialog_0">
+		<text>Dobrэ den. Jб jsem plukovnнk Kovalskij, velitel tйto jednotky.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_task_dialog_1">
+		<text>Major Dмgtarev, SBU. Mбm proљetшit okolnosti, za jakэch doљlo k selhбnн Operace Prщplav.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_task_dialog_11">
+		<text>Aha. V tom pшнpadм poslouchejte, Majore. Operace Prщplav љla do kytek, a stejnм tak i naљe vrtulnнky. Pщlka mэch chlapщ zaшvala a navнc se nemщћeme spojit s velitelstvнm. I jб bych moc rбd vмdмl, proи se operace posrala.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_task_dialog_111">
+		<text>Nбpady?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_task_dialog_1111">
+		<text>Napadб mм jedinм to, ћe nбm nмkdo ty vrtulnнky sestшelil. A to pomocн extrйmnм vэkonnэch zbranн, o kterэch prakticky nic nevнme. Jednu takovou zbraт pouћнval Monolit pшi prvnнm ъtoku na Иernobyl. Rбd bych jeden kousek dostal do rukou, abych se na nмj mohl podнvat. Jestli nбm chcete pomoct, pщjdeme pшepadnout druћstvo Monolitu, kterй jednu takovou zbraт mб. Naљe ъtoиnб skupina uћ jen иekб na povel k zahбjenн operace. Co шнkбte?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_task_dialog_11111">
+		<text>Souhlasнm, ale jen za podmнnky, ћe mi sdмlнte vљechny zjiљtмnй informace. A ћe mi ponechбte naprostou svobodu jednбnн.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_a23_about_gauss_labx8_0">
+		<text>Mбm informace o tй zбhadnй zbrani, tй Gaussovм puљce.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_a23_about_gauss_labx8_1">
+		<text>Jб zнrбm! Jak funguje? Dajн se s nн sestшelovat vrtulnнky?</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_a23_about_gauss_labx8_11">
+		<text>Teoreticky ano, ale po kulkбch by ve vrtulnнku zщstaly prщstшely. Jenomћe ћбdnй tam nebyly.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_a23_about_gauss_labx8_111">
+		<text>Krucinбl... to jsme tedy v koncнch. Nic jinйho mм nenapadб. Teп nбm nezbэvб neћ sedмt na zadku uprostшed tйhle zpropadenй Zуny a иekat, neћ si nбs pшijdou vyzvednout. No... dost uћ bylo naшнkбnн. Soustшeпme se na vмci, kterй teп dokбћeme ovlivnit. Dнky vбm vнme, ћe vyиkбvбnн v ъkrytu nбs pшed urychlenэmi kulkami neuchrбnн, a to se cenн. Musнm vбm podмkovat, majore. Kdyby se objevilo nмco novйho, ozvu se vбm.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_a23_about_gauss_labx8_12">
+		<text>Teoreticky ano, ale Rejnoci 4 a 5 se zшнtili kvщli selhбnн elektroniky. To urychlenй stшely nedokбћou.</text>
+	</string>
+	<string id="pri_a17_got_gauss_0">
+		<text>Jak pokraиuje operace?</text>
+	</string>
+	<string id="pri_a17_got_gauss_1">
+		<text>Zabili rotnйho Morozova. Bojovnнci Monolitu nбs nalбkali do pasti tнm, ћe obмtovali pбr vlastnнch lidн.</text>
+	</string>
+	<string id="pri_a17_got_gauss_11">
+		<text>Hajzlovй! O naљem plбnu ale vмdмt nemohli... Takћe jsme pшiљli o odstшelovaиe. Povedl se aspoт cнl operace?</text>
+	</string>
+	<string id="pri_a17_got_gauss_2">
+		<text>Mбme pбr ztrбt. Bojovnнci Monolitu nбs nalбkali do pasti tнm, ћe obмtovali pбr vlastnнch lidн.</text>
+	</string>
+	<string id="pri_a17_got_gauss_21">
+		<text>Hajzlovй! O naљem plбnu ale vмdмt nemohli... Takћe jsme pшiљli o pбr chlapщ. Povedl se aspoт cнl operace?</text>
+	</string>
+	<string id="pri_a17_got_gauss_3">
+		<text>Celй druћstvo zaшvalo. Bojovnнci Monolitu nбs nalбkali do pasti tнm, ћe obмtovali pбr vlastnнch lidн.</text>
+	</string>
+	<string id="pri_a17_got_gauss_31">
+		<text>Hajzlovй! O naљem plбnu ale vмdмt nemohli... Takћe jsme pшiљli o Tarasova a jeho chlapy. Povedl se aspoт cнl operace?</text>
+	</string>
+	<string id="pri_a17_got_gauss_4">
+		<text>Zbraт mбm u sebe. Bohuћel byla v boji poљkozena.</text>
+	</string>
+	<string id="pri_a17_got_gauss_41">
+		<text>Nemщћeme tedy urиit, zda s jejн pomocн sestшelili ty vrtulnнky, nebo ne. Poslouchejte, Majore: vнm, ћe mбte mezi stalkery dobrй kontakty. Je moћnй, ћe s touto zbranн se uћ nмkdo setkal. Urиitм se mezi nimi najde i nмjakэ technik. Co kdybyste si s nнm promluvil?</text>
+	</string>
+	<string id="pri_a17_got_gauss_411">
+		<text>Fajn.</text>
+	</string>
+	<string id="pri_a17_got_gauss_4111">
+		<text>Dobrб... a mimochodem. Z Jupiteru k nбm pшiљel dalљн stalker. Jestli chcete, stavte se za nнm na slovниko.</text>
+	</string>
+	<string id="pri_a17_got_gauss_5">
+		<text>Pracuje se na tom.</text>
+	</string>
+	<string id="pri_a17_got_gauss_51">
+		<text>Aha. Majore, my tu zbraт potшebujeme. Urиitм chбpete, jak je to dщleћitй.</text>
+	</string>
+	<string id="pri_a17_got_gauss_511">
+		<text>Hmm.</text>
+	</string>
+	<string id="pri_a15_sokolov_evacuation_note_0">
+		<text>Tu tvojн zprбvu jsem naљel na Volchovм. Tu mбљ.</text>
+	</string>
+	<string id="pri_a15_sokolov_evacuation_note_1">
+		<text>Poslouchej... nebo radљi nic. Stejnм by nakonec nikdo z vбs nedorazil. Kdybys tu v okolн nбhodou spatшil nмjakэ vojбky, dej mi vмdмt, jasnэ? Pшedem dнk.</text>
+	</string>
+	<string id="pri_a25_army_medic_freezer_0">
+		<text>Majore... dнky bohu! Jsem zachrбnмn!</text>
+	</string>
+	<string id="pri_a25_army_medic_freezer_1">
+		<text>Jak jste se sem dostal?</text>
+	</string>
+	<string id="pri_a25_army_medic_freezer_11">
+		<text>Ehm... moc si toho nepamatuju. Mмl jsem tak nahnбno, ћe jsem nedokбzal poшбdnм pшemэљlet. Ani nevнm, co mм tak vydмsilo. Prostм jsem cнtil potшebu se schovat, tak jsem vzal nohy na ramena. Pamatuju si ulice, zatбиky... skonиil jsem tady. Dveшe byly zamиenй zvenku, myslel jsem, ћe tu umшu. Jak jste mм naљel? A nebo vнte co... pojпme nejdшнv pryи, vrбtнme se na zбkladnu. Bмhб mi tady mrбz po zбdech.</text>
+	</string>
+	<string id="pri_a25_army_medic_freezer_111">
+		<text>Jdeme.</text>
+	</string>
+	<string id="pri_a25_army_medic_start_dialog_11">
+		<text>Zdravнm. Potшebujete oљetшit? Nejsem sice doktor, ale kdyћ je nejhщш, dokбћu vytahovat kulky i zaћнvat rбny.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_0">
+		<text>Shбnнm informace.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1">
+		<text>Ptejte se.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_11">
+		<text>Jeљtм k Operaci Prщplav...</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_111">
+		<text>Co je s nн?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1111">
+		<text>Nestalo se nмco podivuhodnйho, kdyћ jeљtм vrtulnнky byly ve vzduchu?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_11111">
+		<text>Dokud jeљtм spoшбdanм letмly, tak nic. Drћeli jsme se plбnu mise - odstartovali jsme 90 minut pшed emisн, aktivovali jsme ochrannй systйmy a pustili jsme autopilota. Letмli jsme nejkratљн bezpeиnou trasou, kterou jsme vypoинtali podle mapy anomбliн. Sice jsme nevidмli ani metr pшed sebe, ale to nemмlo niиemu vadit, protoћe jsme vybrali dost љirokэ koridor. Podle plбnu jsme k elektrбrnм mмli doletмt pшesnм za dvanбct a pщl minuty. Po devнti minutбch jsme ale ztratili spojenн s Rejnokem 4, naиeћ zaиaly ostatnн vrtulnнky padat jako hruљky.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_111111">
+		<text>Mмl bych jeљtм pбr otбzek ohlednм tй operace...</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1112">
+		<text>Co vљechno vнte o tмch vrtulnнcнch?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_11121">
+		<text>Nic moc. Rejnok 2 a 4 jsou ъplnou zбhadou. Nemбm ponмtн, kam spadly ani co se stalo s chlapama na palubм. Informace o ostatnнch vrtulnнcнch mбme jen od chlapщ, co to pшeћili, takћe neиekejte, ћe si z nich sestavнte objektivnн pшedstavu. Mмli jsme dщleћitмjљн vмci na prбci.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_111211">
+		<text>Povмzte mi o Rejnoku 1.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_11121111">
+		<text>Jak jste se dostali aћ sem?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_111211111">
+		<text>Kousek od minovйho pole jsme potkali jednoho stalkera. Asi slyљel, jak vybuchujн miny. Divnej typ... шнkal si Prщvodce. Na nic se neptal a rovnou se nabнdl, ћe nбs zavede do Pripjati. To odpovнdalo naљim plбnщm, takћe jsme souhlasili. Pro jistotu jsme si na nмj dбvali bacha, ale vљechno љlo hladce. Aћ do mмsta nepronesl ani slovo a jakmile jsme dorazili na mнsto, prostм bez varovбnн zmizel. Rozkбzal jsem chlapщm, aby ho nehledali.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_111212">
+		<text>Povмzte mi o Rejnoku 3.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1112121">
+		<text>Kapitбn Tarasov tvrdн, ћe selhaly oba rotory. Museli pak pшistбt na kopci nedaleko pozice B2. Mмli љtмstн a pшistбli celkem mмkce, ale technik nemмl иas poшбdnм se podнvat po pшниinм zбvady, protoћe na nм zaъtoиili snorkovй. Zaшvali tam tшi chlapi. Ostatnн si шekli, ћe se tam radљi nebudou zdrћovat, spojili se s Rejnokem 5 a vydali se za jeho posбdkou. Cestou se zapletli do pшestшelky s po zuby ozbrojenэm nepшбtelskэm druћstvem, ale nakonec z nн vyvбzli bez dalљнch ztrбt.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_11121211">
+		<text>Jak se dostali do Pripjati?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_111212111">
+		<text>Posбdky Rejnokщ 3 aћ 5 se setkaly nedaleko mнst dopadu poblнћ jakйsi шниnн bбrky. V hlбљenн mi pak uvedli, ћe tam ћil nмjakэ totбlnн poљuk: kdyћ se ho mн muћi pokusili zadrћet, on se pokusil zadrћet je! Vщbec mu nevadilo, ћe љel sбm proti jedenбcti chlapщm. Kdyћ se to urovnalo, ukбzalo se, ћe jim ho poslala prozшetelnost sama, protoћe se s nнm dohodli a on pak celй druћstvo zavedl tйmмш nezranмnй aћ do Pripjati. Jedinб nehoda se pшihodila poruинku Stecenkovi, kterэ cestou pшiљel v gravitaиnн anomбlii o nмkolik prstщ na noze.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_111213">
+		<text>Povмzte mi o Rejnoku 5.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1112131">
+		<text>Rejnoku 5 vypadla elektronika, a tak se zaboшil rovnou do baћiny. Nбraz pшeћilo jen pбr muћщ. Ti si z vrtulnнku vytahali vlastnн vэstroj a pшi tй pшнleћitost se spojili s Rejnokem 3. Jejich velicн dщstojnнk, major Neborskij, zemшel cestou na mнsto setkбnн. Chudбk, kousek od radarovй stanice ho dostal snork... Ostatnн vyvбzli bez vмtљнch problйmщ. Dalљнho chlapa, rotmistra Batjaje - ten patшil k odstшelovaищm - ztratili, kdyћ dorazili do Pripjati a zapletli se do pшestшelky s vojбky Monolitu.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_11121311">
+		<text>Jak se do tй Pripjati dostali?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_111213111">
+		<text>Posбdky Rejnokщ 3 aћ 5 se setkaly nedaleko mнst dopadu poblнћ jakйsi шниnн bбrky. V hlбљenн mi pak uvedli, ћe tam ћil nмjakэ totбlnн poљuk: kdyћ se ho mн muћi pokusili zadrћet, on se pokusil zadrћet je! Vщbec mu nevadilo, ћe љel sбm proti jedenбcti chlapщm. Kdyћ se to urovnalo, ukбzalo se, ћe jim ho poslala prozшetelnost sama, protoћe se s nнm dohodli a on pak celй druћstvo zavedl tйmмш nezranмnй aћ do Pripjati. Jedinб nehoda se pшihodila poruинku Stecenkovi, kterэ cestou pшiљel v gravitaиnн anomбlii o nмkolik prstщ na noze.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_11122">
+		<text>Nic moc. Rejnok 2 je pro mм ъplnou zбhadou. Nemбm ponмtн, kam spadl ani co se stalo s chlapama na palubм. O Rejnoku 4 byste toho dokonce mмl vмdмt vнc neћ jб. Z toho vrtulnнku pшeћil jenom poruинk Sokolov - sбm jste sem s nнm pшiљel. Informace o ostatnнch vrtulnнcнch mбme jen od chlapщ, co to pшeћili, takћe neиekejte, ћe si z nich sestavнte objektivnн pшedstavu. Mмli jsme dщleћitмjљн vмci na prбci.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_11123">
+		<text>Nic moc. Rejnok 2 je pro mм ъplnou zбhadou. Nemбm ponмtн, kam spadl ani co se stalo s chlapama na palubм. Na Rejnoka 4 se mщћete osobnм poptat u poruинka Sokolova. Je jedinэ z celй posбdky, kdo vyvбzl a dostal se aћ do Pripjati. Informace o ostatnнch vrtulnнcнch mбme jen od chlapщ, co to pшeћili, takћe neиekejte, ћe si z nich sestavнte objektivnн pшedstavu. Mмli jsme dщleћitмjљн vмci na prбci.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1113">
+		<text>Zajнmб mм jeљtм pбr dalљнch informacн.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1114">
+		<text>Nemбm dalљнch otбzek.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_12">
+		<text>Jak vypadб situace v Pripjati?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_121">
+		<text>Na hovno jako vћdycky. Pripjaќ je zamoшenб smмsicн fanatikщ z Monolitu a zombнkщ. Emise pшichбzejн jedna po druhй a иlovмk se musн poшбd mнt na pozoru pшed mutanty a anomбliemi... vнtejte v pekle.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1211">
+		<text>Kde berete vэzbroj a zбsoby?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_13">
+		<text>Povнdejte mi o Monolitu.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_131">
+		<text>Jsou to pravн a nefalљovanн fanatici. Nevнm, co je tak ћere, ale ze vљeho nejradљi by se poшбd s nмkэm stшнleli. Navнc nikdy neustoupн, ani kdyby stбli proti ohromnй pшesile a silnмjљнm zbranнm. Takovб kurбћ se tady иasto nevidн. Mбm dojem, ћe jim z Иernobylu prщbмћnм chodн novй a novй posily. Svinм zasranэ, uћ jsem kvщli nim pшiљel o spoustu dobrэch chlapщ...</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1311">
+		<text>Zkouљeli jste nмkterй vyslэchat?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_13111">
+		<text>Ћбdnэ efekt. Prvnн problйm je, ћe bojujн aћ do smrti. Nakonec se chlapcщm podaшilo jednoho omrбиit granбtem a zajmout ho ћivйho, ale stejnм to nebylo k niиemu. Na chvilku jsme z nмj spustili oиi a on zaиal buљit hlavou do zdi, aћ mu nakonec lebka praskla jako vajниko.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_14">
+		<text>Co budete dмlat teп?</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_141">
+		<text>Шekl bych, ћe Operaci Prщplav budeme muset odvolat. Ћe sem poslali vбs, tнm se to jenom potvrzuje. Mбm v ъmyslu brбnit zбkladnu, dokud pro nбs nepoљlou vrtulnнky. Pшiљel jsem s nмkolika potenciбlnнmi daty evakuace.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1411">
+		<text>Nepoљlou ћбdnй vrtulnнky, dokud nezjistнme, proи se zшнtili vљichni Rejnoci.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_14111">
+		<text>Takћe tak je to... no, pмљky se odsud beztak nedostaneme. Tohle peklo se tбhne od nevidнm do nevidнm a Zуna je navнc plnб stalkerщ, kteшн nбs nemajн zrovna v lбsce. Coћ znamenб, ћe nejlepљнm шeљenнm bude zahбjit vlastnн vyљetшovбnн, a pokud moћno pшi nмm nenatбhnout brka. Majore, mбme spoleиnэ cнl.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_15">
+		<text>Teп ne.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_start_0">
+		<text>Poslouchбm, majore.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_12111">
+		<text>Jedinб naљe vэzbroj je ta, kterou jsme si sami pшinesli. No, vlastnм se nбm i povedlo pobrat trochu vмcн po Monolitu, pшevбћnм munici. Pшesto toho mбme mбlo, a tak radљi vљechno vydбvбm na pшнdмl. To platн i pro jнdlo - mбme jenom vlastnн zбsoby a pбr konzerv ze skladiљtм Monolitu.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_12112">
+		<text>Jedinб naљe vэzbroj je ta, kterou jsme si sami pшinesli. No, vlastnм se nбm i povedlo pobrat trochu vмcн po Monolitu, pшevбћnм munici. Pшesto toho mбme mбlo, a tak radљi vљechno vydбvбm na pшнdмl. Co se potravin tэиe, tam je situace prakticky stejnб, jen s tнm rozdнlem, ћe jsem uzavшel dohodu s Garikem. Od nбm nosн konzervy, jб ho nechбvбm pшespбvat na zбkladnм a pшivнrбm oиi, kdyћ vyrбћн hledat artefakty. Stejnм nemбme moc na vэbмr.</text>
+	</string>
+	<string id="pri_a18_altar_destroyed_soldiers_start_11">
+		<text>Pomstili jsme naљe chlapy... Zaшiп si, co potшebujeљ, a padбme vodsaп. Nechci se tu zdrћovat.</text>
+	</string>
+	<string id="pri_a18_altar_destroyed_soldiers_start_12">
+		<text>Nebudeme tady vysedбvat, ћe ne? Chci se co nejdшнv vrбtit na zбkladnu.</text>
+	</string>
+	<string id="pri_a18_altar_destroyed_soldiers_start_111">
+		<text>Dobшe.</text>
+	</string>
+	<string id="pri_a18_altar_destroyed_vano_start_11">
+		<text>To je ta divnб vмc! K иemu jim je asi dobrб? No nic, kaљlem na to. Zaшiп si, co potшebujeљ, a padбme zpбtky na zбkladnu.</text>
+	</string>
+	<string id="pri_a18_altar_destroyed_vano_start_12">
+		<text>Hotovej? Navrhuju vrбtit se zpбtky na zбkladnu a poшбdnм si nacpat nбcka...</text>
+	</string>
+	<string id="pri_a18_altar_destroyed_vano_start_111">
+		<text>Dobшe.</text>
+	</string>
+	<string id="pri_a15_sokolov_pripyat_how_are_you_0">
+		<text>Jak se vede?</text>
+	</string>
+	<string id="pri_a15_sokolov_pripyat_how_are_you_1">
+		<text>Na hovno. Je sice super bejt zase mezi vlastnнma, ale maиkat se s bandou lidн v jednэ dншe nenн vщbec ћбdnэ ћщћo.</text>
+	</string>
+	<string id="pri_a15_sokolov_acquaintance_after_jorney_0">
+		<text>Vбs jsem tu jeљtм nevidмl. Jste tu novэ?</text>
+	</string>
+	<string id="pri_a15_sokolov_acquaintance_after_jorney_1">
+		<text>Jo. Poruинk Sokolov, druhэ pilot Rejnoka 4.</text>
+	</string>
+	<string id="pri_a15_sokolov_about_journey_0">
+		<text>Jak jste se sem dostal?</text>
+	</string>
+	<string id="pri_a15_sokolov_about_journey_1">
+		<text>Pшivedl mм stalker jmйnem Garik. Hledal cestu do Pripjati, tak jsem se ho zeptal, jestli bych nemohl jнt s nнm. Na mou duљi, byla to poшбdnб љtreka! Љќatnou nбhodou jsme hned za pшedmмstн Pripjati narazili na naљe prщzkumnнky.</text>
+	</string>
+	<string id="pri_a15_sokolov_helicopter_0">
+		<text>Co se stalo s Rejnokem 4?</text>
+	</string>
+	<string id="pri_a15_sokolov_helicopter_1">
+		<text>Co jб vim? Mбm z tэ vмci takovej divnej pocit. To si tak letнme spokojenм na autopilota, vљechny pшнstroje v poшбdku... a najednou se snaћнme pilotovat lйtajнcн kus љrotu, kterэmu odeљla vљechna elektronika. S kolegou pilotem jsme se snaћili pшistбt na rovnэ ploљe, ale nevyљlo to. Sekli jsme sebou pшнmo do hlavnн tovбrnн linky v Jupiteru, hezky stшechou dovnitш... pшeћil jsem jenom jб.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_outfit_0">
+		<text>Potшebuju zbroj.</text>
+	</string>
+	<string id="pri_a22_army_signaller_supply_outfit_1">
+		<text>Dobшe. Nejdшнv si vezmi tuhle helmu... tak a teп vestu. Doufбm, ћe je to tvoje velikost, protoћe ћбdnou jinou momentбlnм nemбm. Je zбplatovanб, ale mмla by vydrћet.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_task_dialog_111111">
+		<text>Zajistй, majore. V tйto situaci stejnм nemбm pшнliљ na vэbмr. A mimochodem, stavte se u poruинka Kirilova. Vydб vбm nмjakou vэzbroj.</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_9">
+		<text>Jeљtм k tмm vrtulnнkщm...</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_91">
+		<text>Poslouchбm</text>
+	</string>
+	<string id="pri_a25_army_medic_start_dialog_14">
+		<text>Ty vole, to je hustэ... Uћ vidнm, jak u mм Kirilov љkemrб o aspirin.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_evacuation_start_21">
+		<text>Иekбnн je vћdycky to nejhorљн. Иlovмka ubнjн vнc neћ cokoliv jinйho.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_evacuation_start_1111">
+		<text>Dobrб, majore, chlapi jsou pшipraveni. Jestli potшebujete doplnit vэzbroj, skoиte za Rogovcem a Kirilovem. Aћ budete pшipraven, dejte vмdмt.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_evacuation_start_11111">
+		<text>Dobшe.</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_evacuation_ready_11">
+		<text>Pohyb.</text>
+	</string>
+	<string id="pri_a15_sokolov_need_outfit_1">
+		<text>No tak v tom pшнpadм budu potшebovat prvotшнdnн ochrannej oblek, nмco jako majн vмdci. Jenomћe pшemluvit Hermanna, aby mi jeden vydal, nebude snadnэ. Cosi mi шнkб, ћe by mм radљi vidмl bмhat nahatэho po okrajнch Zуny, neћ aby mм trpмl ve vlastnнm bunkru... Co kdyby ses ale zeptal Ozerskeho? Ten je pшнjemnмjљн a moћnб by mi jednu kombinйzu pшenechal. </text>
+	</string>
+	<string id="pri_a17_military_recon_squad_ambush_dialog_second_0">
+		<text>Nuћe, majore?</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_evacuation_start_111">
+		<text>[pokraиovat...]</text>
+	</string>
+	<string id="pri_a25_army_medic_need_health_care_11">
+		<text>[pokraиovat...]</text>
+	</string>
+	<string id="pri_a17_military_base_commander_actor_questions_dialog_1112111">
+		<text>Byl jsem na palubм. Jakmile se zшнtil Rejnok 4, rozeslal jsem ostatnнm souшadnice evakuaиnнho bodu v Pripjati - myslel jsem, ћe k elektrбrnм snadno dojdeme pмљky. Hned v zбpмtн nбљ vrtulnнk schytal zбsah a jб ucнtil, jak se nмco pбlн - vznнtil se nбm motor. Pilotщm se nбs podaшilo navйst na pшistбvacн plochu u Jupiteru, ale pшi nбrazu oba zahynuli. Potom rotnэ Sliaиin vylнtl do luftu, a tak jsme zjistili, ћe pшнchodovй cesty k pшistбvacнm plochбm jsou dщkladnм zaminovanй. Dalљнho muћe, byl to nadporuинk, jsme ztratili v Pripjati, kdyћ jsme s Monolitem bojovali o tuhle budovu.</text>
+	</string>
+</string_table>

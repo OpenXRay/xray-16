@@ -1,0 +1,123 @@
+local random_task = nil
+
+class "CRandomTask"
+function CRandomTask:__init()
+	--' На конструкторе вычитываем LTX и создаем заготовки квестов.
+	self.task_ini = ini_file("misc\\task_manager.ltx")
+
+	--' Таблица проинициализированных квестов.
+	self.task_info = {}
+end
+-- Save
+function CRandomTask:save(packet)
+	set_save_marker(packet, "save", false, "CRandomTask")
+	local n = 0
+	for k,v in pairs(self.task_info) do
+		n = n + 1
+	end
+	packet:w_u16(n)
+	for k,v in pairs(self.task_info) do
+		packet:w_stringZ(k)
+		self.task_info[k]:save(packet)
+	end
+
+	set_save_marker(packet, "save", true, "CRandomTask")
+end
+-- Load
+function CRandomTask:load(reader)
+	set_save_marker(reader, "load", false, "CRandomTask")
+
+	local n = reader:r_u16()
+	for i=1,n do
+		local id = reader:r_stringZ()
+		local obj = task_objects.CGeneralTask(self.task_ini, id)
+		obj:load(reader)
+		self.task_info[id] = obj
+	end
+
+	set_save_marker(reader, "load", true, "CRandomTask")
+end
+--------------------------------------------------------------------------------
+
+--' Выдача квеста игроку
+function CRandomTask:give_task(task_id)
+	printf("CRandomTask:give_task() task_id[%s]", tostring(task_id))
+
+	if not self.task_ini:section_exist(task_id) then
+		abort("There is no task [%s] in task ini_file or ini_file is not included!!!", task_id)
+	end
+	self.task_info[task_id] = task_objects.CGeneralTask(self.task_ini, task_id)
+
+	self.task_info[task_id]:give_task()
+end
+--' Проверяем, не выполнен ли таск
+function CRandomTask:task_complete(p1)
+	local task = self.task_info[p1]
+	if task == nil then
+		return false
+	end
+	task:check_task(self)
+	if task.last_check_task == "complete" then
+		task:give_reward()
+		xr_statistic.inc_completed_quests_counter()
+		return true
+	else
+		return false
+	end
+end
+--' Проверяем, не профейлен ли таск
+function CRandomTask:task_fail(p1)
+	local task = self.task_info[p1]
+	if task == nil then
+		return false
+	end
+	task:check_task(self)
+
+	return task.last_check_task == "fail" or task.last_check_task == "reversed"
+end
+--' Коллбек таска
+function CRandomTask:task_callback(task, completed)
+--    printf("CRandomTask:task_callback")
+	--' Если задание выполнилось - надо выдать с него награду!
+	local task_id = task:get_id()
+	local delta
+	--print_table(self.task_info)
+	if self.task_info[task_id] == nil then
+		return
+	end
+
+	printf("CLEAR TASK %s", tostring(task_id))
+	self.task_info[task_id]:deactivate_task(task)
+
+	self.task_info[task_id] = nil
+end
+
+
+function get_task_manager()
+	if random_task == nil then
+		random_task = CRandomTask()
+	end
+	return random_task
+end
+
+
+
+function task_complete(p1)
+	return get_task_manager():task_complete(p1)
+end
+function task_fail(p1)
+	return get_task_manager():task_fail(p1)
+end
+function task_callback(_task, state)
+--	printf("task_callback")
+	--' В случае есть квест выполнен или провален - надо вызвать обнуление.
+	if state == task.fail or state == task.completed then
+--		printf("task_callback1")
+		get_task_manager():task_callback(_task, state == task.completed)
+	end
+end
+
+
+function clear_task_manager()
+--'	random_task	 = nil
+end

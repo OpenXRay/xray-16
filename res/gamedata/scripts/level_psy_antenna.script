@@ -1,0 +1,180 @@
+class "PsyAntennaPP" (effector)
+function PsyAntennaPP:__init() super(1001,10000000)
+	self.params							= effector_params();
+end
+function PsyAntennaPP:process(pp)
+	pp:assign		(self.params);
+    effector.process(self,pp);
+    return          true;
+end
+
+class "PsyAntenna"
+pa_phase={
+	phIdle 								= 0,
+	phStarting 							= 1,
+	phWorking 							= 2,
+	phStopping							= 3
+}
+function PsyAntenna:__init				()
+-- ----------------------------------------------------------------------------------------
+-- settings
+-- ----------------------------------------------------------------------------------------
+-- phantom gen
+-- ----------------------------------------------------------------------------------------
+	self.phantom_max 					= 0 --8 --10	--max phantoms
+	self.phantom_spawn_probability		= 0.1;	-- spawn probability (0..1)
+	self.phantom_spawn_radius			= 30.0;	-- average radius 30.0m +-15m
+	self.phantom_spawn_height			= 2.5 --3	-- average height from actor pos +-1.5m
+	-- antenna
+	self.hit_amplitude					= 1.0;	-- hit_amplitude*hit_factor.a
+	-- pause time [from]=to
+	self.idle_time						= {};
+	self.idle_time[20]					= 21;
+-- ----------------------------------------------------------------------------------------
+-- postprocess
+-- ----------------------------------------------------------------------------------------
+	self.base_amplitude					= color(0.2,0.15,0.0);		-- max base color diff			[0.0-0.5]
+	self.gray_amplitude					= 0.5;						-- gray max intensity			[0.0-1.0]
+	self.add_factor						= 0.1;	--0.3				-- factor * color_animator(RGB)	[0.0-1.0]
+	self.dual_amplitude					= 0.075 --0.05				-- H&V same						[0.0-0.2]
+	self.gray_color						= color(0.33,0.33,0.33);	-- RGB							[0.0-1.0]
+	self.noise_var						= noise(0.9,0.3,30);		-- intensity, grain, fps		[0.0-1.0,0.0-1.0,1-100]
+-- ----------------------------------------------------------------------------------------
+-- class variables initialize
+	self.phase 							= pa_phase.phIdle;
+	self.power_factor					= fcolor();
+	self.eff_time						= 0;
+	self.starting_anim					= color_animator			("levels\\psy_antenna\\starting");
+	self.starting_time					= self.starting_anim:length	();
+	self.working_anim					= color_animator			("levels\\psy_antenna\\working");
+	self.stopping_anim					= color_animator			("levels\\psy_antenna\\stopping");
+	self.stopping_time					= self.stopping_anim:length();
+	self.hit_time						= 0;
+	self.intensity						= 0;
+	self.pp 							= PsyAntennaPP();
+	self.pp:start						();
+end
+function PsyAntenna:__finalize			()
+	self.pp:finish 						();
+end;
+
+g_PsyAntenna	 						= PsyAntenna();
+
+function PsyAntenna:construct			()
+end
+
+function PsyAntenna:load				(packet)
+	set_save_marker(packet, "load", false, "psy_antenna")
+	self.phase 							= packet:r_u32()
+	set_save_marker(packet, "load", true, "psy_antenna")
+end
+function PsyAntenna:save				(packet)
+	set_save_marker(packet, "save", false, "psy_antenna")
+	packet:r_u32								(self.phase)
+	set_save_marker(packet, "save", true, "psy_antenna")
+end
+
+function PsyAntenna:is_idle_time		(tm)
+	if tm>=13 and tm<14 then 			return true;
+	elseif tm>=20 and tm<21 then 		return true; 
+	end;
+	return false;
+end
+function PsyAntenna:update_postprocess	()
+	self.pp.params.color_base			= color(0.5+self.base_amplitude.r*self.intensity,0.5+self.base_amplitude.g*self.intensity,0.5+self.base_amplitude.b*self.intensity);
+	self.pp.params.color_gray			= color(self.gray_color.r,self.gray_color.g,self.gray_color.b);
+	self.pp.params.color_add 			= color(self.power_factor.r*self.add_factor,self.power_factor.g*self.add_factor,self.power_factor.b*self.add_factor);
+	self.pp.params.gray					= self.gray_amplitude*self.intensity;
+	self.pp.params.dual					= duality(self.dual_amplitude*self.power_factor.a,self.dual_amplitude*self.power_factor.a);
+--	self.pp.params.noise				= self.noise_var;
+end
+function PsyAntenna:update_psy_hit		(dt)
+	local d_time						= time_global()-self.hit_time;
+	if d_time>200 and self.power_factor.a>0.01 then
+		self.hit_time					= time_global();
+		local psy_hit 					= hit();
+		psy_hit.power 					= self.power_factor.a*self.hit_amplitude;
+		psy_hit.direction 				= vector():set( 0, 0, 0 );
+		psy_hit.impulse 				= 0;
+		psy_hit.draftsman 				= db.actor; 
+		psy_hit.type 					= hit.telepatic;
+		db.actor:hit					(psy_hit);
+	end;
+end
+function PsyAntenna:generate_phantoms 	()
+	if self.power_factor.a>0.1 then
+		if math.random()<self.phantom_spawn_probability then
+			if phantom_manager:phantom_count()<self.phantom_max then
+				local yaw	 			= math.pi*2.0*math.random();
+				local radius 			= self.phantom_spawn_radius*(math.random()/2.0+0.5);
+				local height 			= self.phantom_spawn_height*math.random();
+				local a_pos 			= db.actor:position();
+				local pos 				= vector():set(math.sin(yaw)*radius+a_pos.x,a_pos.y+height,math.cos(yaw)*radius+a_pos.z);
+				phantom_manager.spawn_phantom(pos);
+			end;
+		end;
+	end;
+end
+
+function PsyAntenna:switch_to_phase		(ph)
+	self.phase							= ph;
+	self.eff_time		 				= 0;
+	self.power_factor:set				(0,0,0,0);
+end
+function PsyAntenna:phase_starting		()
+	self.intensity						= self.eff_time/self.starting_time;
+	if self.eff_time>self.starting_time then
+		self:switch_to_phase			(pa_phase.phWorking);
+	else
+		self.power_factor:set 			(self.starting_anim:calculate(self.eff_time/1000));
+	end;
+end
+function PsyAntenna:phase_working		()
+	self.intensity						= 1.0;
+	local h								= level.get_time_hours();
+	if self:is_idle_time(h) then 				
+		self:switch_to_phase			(pa_phase.phStopping);
+	else
+		self.power_factor:set 			(self.working_anim:calculate(self.eff_time/1000));
+		self:generate_phantoms 			();
+	end;
+end
+function PsyAntenna:phase_stopping		()
+	self.intensity						= 1.0-self.eff_time/self.stopping_time;
+	if self.eff_time>self.stopping_time then
+		self:switch_to_phase			(pa_phase.phIdle);
+	else
+		self.power_factor:set			(self.stopping_anim:calculate(self.eff_time/1000));
+	end;
+end
+function PsyAntenna:phase_idle			()
+	local h								= level.get_time_hours();
+	if false==self:is_idle_time(h) then 				
+		self:switch_to_phase			(pa_phase.phStarting);
+	end;
+end
+function PsyAntenna:update				(dt)
+	self.eff_time						= self.eff_time + dt;
+	if self.phase==pa_phase.phStarting 		then self:phase_starting	();
+	elseif self.phase==pa_phase.phWorking	then self:phase_working		();
+	elseif self.phase==pa_phase.phStopping	then self:phase_stopping	();
+	elseif self.phase==pa_phase.phIdle 		then self:phase_idle		(); end;
+	if (self.intensity<0.0)				then self.intensity=0.0; end;
+	if (self.intensity>1.0)				then self.intensity=1.0; end;
+	self:update_postprocess 			();
+	self:update_psy_hit					(dt);
+end
+
+function main()
+	while db.actor==nil do wait(); end;
+	if false==has_alife_info("psy_antenna_off") then
+		g_PsyAntenna:construct			();
+		local prev_time					= time_global();
+		while 1 do
+			wait						();
+			local dt					= time_global()-prev_time;
+			prev_time					= time_global();
+			g_PsyAntenna:update			(dt);
+		end
+	end
+end

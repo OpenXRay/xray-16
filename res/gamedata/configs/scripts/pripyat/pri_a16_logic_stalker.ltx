@@ -1,0 +1,247 @@
+[walker@def]
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@reach]:walker@def
+combat_ignore_keep_when_attacked = false
+invulnerable = false
+
+[animpoint@def]
+reach_movement = walk_noweap
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+use_camp = true
+meet = meet@animpoint
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@reach]:animpoint@def
+combat_ignore_keep_when_attacked = false
+invulnerable = false
+
+[meet@animpoint]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_snd_hello = nil
+close_snd_bye 	= nil
+close_distance 	= 0
+far_distance 	= 0
+use = {=actor_enemy} false, {=dist_to_actor_le(3)} true, false
+snd_on_use = {!dist_to_actor_le(3)} nil
+meet_on_talking = false
+
+
+
+[logic@pri_a16_stalker_1]
+active = walker@guarder_1_reach
+suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+prior = 190
+
+[walker@guarder_1_reach]:walker@reach
+path_walk = guarder_1_walk
+path_look = guarder_1_look
+on_info = {=npc_in_zone(pri_surge_hide_a16)} walker@guarder_1
+
+[walker@guarder_1]:walker@def
+path_walk = guarder_1_walk
+path_look = guarder_1_look
+on_info = {=surge_started} walker@hide_1
+
+[walker@hide_1]:walker@def
+path_walk = hide_1_walk
+path_look = hide_1_look
+on_info = {=surge_complete} walker@guarder_1
+
+
+
+[logic@pri_a16_stalker_2]
+active = walker@guarder_2_reach 
+suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+prior = 150
+
+[walker@guarder_2_reach]:walker@reach
+path_walk = guarder_2_walk
+path_look = guarder_2_look
+on_info = {=npc_in_zone(pri_surge_hide_a16)} walker@guarder_2
+
+[walker@guarder_2]:walker@def
+path_walk = guarder_2_walk
+path_look = guarder_2_look
+on_info = {=surge_started} walker@hide_2
+
+[walker@hide_2]:walker@def
+path_walk = hide_2_walk
+path_look = hide_1_look
+on_info = {=surge_complete} walker@guarder_2
+
+
+
+[logic@pri_a16_stalker_3]
+active = animpoint@pri_a16_stalker_3 
+suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+prior = 150
+
+[logic@pri_a16_stalker_4]
+active = animpoint@pri_a16_stalker_4
+suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+prior = 150
+
+[logic@pri_a16_stalker_5]
+active = animpoint@pri_a16_stalker_5
+suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+prior = 150
+
+[logic@pri_a16_stalker_6]
+active = animpoint@pri_a16_stalker_6
+suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+prior = 150
+
+[logic@pri_a16_stalker_7]
+active = animpoint@pri_a16_stalker_7
+suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+prior = 150
+
+[logic@pri_a16_stalker_8]
+active = animpoint@pri_a16_stalker_8
+suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+prior = 150
+
+[logic@pri_a16_stalker_9]
+active = animpoint@pri_a16_stalker_9
+suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+prior = 150
+
+[logic@pri_a16_stalker_10]
+active = animpoint@pri_a16_stalker_10
+suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+prior = 150
+
+[logic@pri_a16_stalker_11]
+active = animpoint@pri_a16_stalker_11
+suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+prior = 140
+
+[logic@pri_a16_stalker_12]
+active = animpoint@pri_a16_stalker_12
+suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+prior = 120
+
+[animpoint@pri_a16_stalker_3]:animpoint@reach
+cover_name = pri_a16_animp_1
+on_info = {=npc_in_zone(pri_surge_hide_a16)} animpoint@pri_a16_stalker_3_reached
+
+[animpoint@pri_a16_stalker_4]:animpoint@reach
+cover_name = pri_a16_animp_2
+on_info = {=npc_in_zone(pri_surge_hide_a16)} animpoint@pri_a16_stalker_4_reached
+
+[animpoint@pri_a16_stalker_5]:animpoint@reach
+cover_name = pri_a16_animp_3
+on_info = {=npc_in_zone(pri_surge_hide_a16)} animpoint@pri_a16_stalker_5_reached
+
+[animpoint@pri_a16_stalker_6]:animpoint@reach
+cover_name = pri_a16_animp_vano
+on_info = {=npc_in_zone(pri_surge_hide_a16)} animpoint@pri_a16_stalker_6_reached
+
+[animpoint@pri_a16_stalker_7]:animpoint@reach
+cover_name = pri_a16_animp_5
+on_info = {=npc_in_zone(pri_surge_hide_a16)} animpoint@pri_a16_stalker_7_reached
+
+[animpoint@pri_a16_stalker_8]:animpoint@reach
+cover_name = pri_a16_animp_6
+on_info = {=npc_in_zone(pri_surge_hide_a16)} animpoint@pri_a16_stalker_8_reached
+
+[animpoint@pri_a16_stalker_9]:animpoint@reach
+cover_name = pri_a16_animp_7
+meet = no_meet
+on_info = {=npc_in_zone(pri_surge_hide_a16)} animpoint@pri_a16_stalker_9_reached
+
+[animpoint@pri_a16_stalker_10]:animpoint@reach
+cover_name = pri_a16_animp_8
+meet = no_meet
+on_info = {=npc_in_zone(pri_surge_hide_a16)} animpoint@pri_a16_stalker_10_reached
+
+[animpoint@pri_a16_stalker_11]:animpoint@reach
+cover_name = pri_a16_animp_4
+on_info = {=npc_in_zone(pri_surge_hide_a16)} animpoint@pri_a16_stalker_11_reached
+
+[animpoint@pri_a16_stalker_12]:animpoint@reach
+cover_name = pri_a16_animp_sokolov
+on_info = {=npc_in_zone(pri_surge_hide_a16)} animpoint@pri_a16_stalker_12_reached
+
+
+
+[animpoint@pri_a16_stalker_3_reached]:animpoint@def
+cover_name = pri_a16_animp_1
+
+[animpoint@pri_a16_stalker_4_reached]:animpoint@def
+cover_name = pri_a16_animp_2
+
+[animpoint@pri_a16_stalker_5_reached]:animpoint@def
+cover_name = pri_a16_animp_3
+
+[animpoint@pri_a16_stalker_6_reached]:animpoint@def
+cover_name = pri_a16_animp_vano
+
+[animpoint@pri_a16_stalker_7_reached]:animpoint@def
+cover_name = pri_a16_animp_5
+
+[animpoint@pri_a16_stalker_8_reached]:animpoint@def
+cover_name = pri_a16_animp_6
+
+[animpoint@pri_a16_stalker_9_reached]:animpoint@def
+cover_name = pri_a16_animp_7
+meet = no_meet
+
+[animpoint@pri_a16_stalker_10_reached]:animpoint@def
+cover_name = pri_a16_animp_8
+meet = no_meet
+
+[animpoint@pri_a16_stalker_11_reached]:animpoint@def
+cover_name = pri_a16_animp_4
+
+[animpoint@pri_a16_stalker_12_reached]:animpoint@def
+cover_name = pri_a16_animp_sokolov
+
+;in reserve - pri_a16_animp_wanderer
+;in reserve - pri_a16_animp_zulus
+
+
+
+[logic@pri_a16_yar]
+suitable = {+pri_a28_actor_in_zone_stay =check_npc_name(jup_b19_freedom_yar)} true
+prior = 200
+active = animpoint@base
+
+[animpoint@base]
+cover_name = pri_a16_animp_medic
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+meet = meet
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+
+[meet]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance 	= 0
+far_distance	= 0
+use 			= {=actor_enemy} false, true
+trade_enable 	= true
+allow_break 	= false
+meet_dialog		= jup_b19_freedom_yar_pripyat_start

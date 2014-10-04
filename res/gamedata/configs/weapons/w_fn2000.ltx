@@ -1,0 +1,306 @@
+[wpn_fn2000]:identity_immunities,weapon_probability,default_weapon_params
+GroupControlSection     = spawn_group
+$spawn                  = "weapons\fn-2000"
+$npc                    = on                                ; option for Level Editor
+$prefetch               = 8
+scheduled               = off                                ; option for ALife Simulator
+cform                   = skeleton
+class                   = WP_GROZA
+description          	= st_wpn_fn2000_descr
+
+ef_main_weapon_type     = 2
+ef_weapon_type          = 8
+
+default_to_ruck         = false
+sprint_allowed       	= true
+control_inertion_factor = 1.0
+
+;-------------------------------------------------------------------------------
+cost              		= 14000
+weapon_class          	= assault_rifle
+inv_weight              = 4.6
+
+upgrades                = up_gr_firstab_fn2000, up_gr_seconab_fn2000, up_gr_thirdab_fn2000, up_gr_fourtab_fn2000, up_gr_fourtcd_fn2000, up_gr_fourtef_fn2000
+;, up_gr_fifthab_fn2000
+installed_upgrades      =
+upgrade_scheme          = upgrade_scheme_fn2000
+
+;--TTX----------------------------------------------------------------------------
+hit_power					= 0.32, 0.32, 0.32, 0.32
+hit_impulse					= 100
+hit_type						= fire_wound
+fire_distance           = 200
+bullet_speed         	= 550 ;начальная скорость пули
+rpm                     = 670
+rpm_empty_click         = 200
+
+grenade_vel 			= 32 ;76
+
+use_aim_bullet          = false                ;Поддерживается ли первая суппер пуля
+time_to_aim             = 1.0
+
+hud                      = wpn_fn2000_hud
+
+misfire_probability        = 0.005 ;вероятность осечки при максимальном износе  !!!old - now not working
+;изношенность, при которой появляется шанс осечки
+misfire_start_condition		= 0.6
+;изношеность при которой шанс осечки становится константным
+misfire_end_condition		= 0.1
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= 0.005
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= 0.06
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= 0.001
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= 0.001
+
+ammo_elapsed           	= 30
+ammo_mag_size          	= 30
+hand_dependence         = 1
+single_handed           = 0
+ammo_class              = ammo_5.56x45_ss190, ammo_5.56x45_ap
+grenade_class			= ammo_m209
+fire_modes              = 1, 3, -1
+launch_speed         	= 32
+
+;-дисперсия-----------------------------------------------------------------------------
+;базовая дисперсия
+fire_dispersion_base       = 0.2    ;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor    = 1.2f
+crosshair_inertion			= 6.30
+
+;отдача
+cam_return 				= 0
+cam_relax_speed         = 5    		;скорость возврата в исходное положение
+cam_relax_speed_ai     	= 120.75
+cam_dispersion          = 0.3 		;увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc      = 0.15 		;увеличениe cam_dispersion с каждым выстрелом
+cam_dispersion_frac     = 1.0 		;ствол будет подыматься на cam_dispersion*cam_dispersion_frac +- cam_dispersion*(1-cam_dispersion_frac)
+cam_max_angle           = 50.0		;максимальный угол отдачи
+cam_max_angle_horz      = 50.0      ;(degree) maximum shot horizontal degree
+cam_step_angle_horz     = 1.2 		;(degree) size of step camera moved in horizontal position while shooting
+
+PDM_disp_base 				= 0.5
+PDM_disp_vel_factor 		= 2.0
+PDM_disp_accel_factor 		= 2.0
+PDM_disp_crouch	 			= 1.0
+PDM_disp_crouch_no_acc 		= 1.0
+
+zoom_cam_relax_speed         = 5     ; scope & ironsight
+zoom_cam_relax_speed_ai      = 360
+zoom_cam_dispersion          = 0.3
+zoom_cam_dispersion_inc      = 0.15
+zoom_cam_dispersion_frac     = 1.0
+zoom_cam_max_angle           = 50.0
+zoom_cam_max_angle_horz      = 50.0
+zoom_cam_step_angle_horz     = 1.0
+
+fire_dispersion_condition_factor = 11        ;увеличение дисперсии в процентах при максимальном износе
+
+;---DOF-------------------------------------------------------------------------
+;zoom_dof					= 0.5, 1.0, 180
+reload_dof					= 0.0, 0.5, 5, 2
+;-------------------------------------------------------------------------------
+
+holder_range_modifier   = 1.85            ; во сколько раз увеличивается eye_range
+holder_fov_modifier     = 1.0              ; во сколько раз увеличивается eye_fov
+
+min_radius              = 50
+max_radius              = 150
+
+hit_probability_gd_novice  = 0.80
+hit_probability_gd_stalker = 0.80
+hit_probability_gd_veteran = 0.80
+hit_probability_gd_master  = 0.80
+
+;-------------------------------------------------------------------------------
+slot                    = 2                ; // secondary
+animation_slot        	= 2     ; type of the animation that will be used
+
+inv_name             	= st_wpn_fn2000
+inv_name_short         	= st_wpn_fn2000
+
+
+inv_grid_width          = 4
+inv_grid_height         = 2
+inv_grid_x              = 5
+inv_grid_y              = 9
+
+upgr_icon_x			= 300
+upgr_icon_y			= 395
+upgr_icon_width		= 292
+upgr_icon_height   	= 118
+
+kill_msg_x              = 131
+kill_msg_y              = 123
+kill_msg_width          = 64
+kill_msg_height         = 30
+
+;-------------------------------------------------------------------------------
+position                = -0.026, -0.132, 0.0
+orientation             = 0, 0, 0
+
+fire_point              = 0.000000,0.184,0.35
+fire_point2             = 0.0, 0.123, 0.398
+
+flame_particles         = weapons\generic_weapon05
+smoke_particles         = weapons\generic_shoot_00
+grenade_flame_particles = weapons\generic_weapon01
+
+shell_point       		= -0.020000,0.186000,0.200000
+shell_dir            	= 0.0, 1.0, 0.0
+shell_particles         = weapons\generic_shells
+
+;--STRAP PARAMETERS-----------------------------------------------------------------
+strap_position          = -0.15,-0.35,0.27         ; position (offset) and orientation of the weapon when it is strapped
+strap_orientation       = -10,-3,10             ; (3rd person view in degrees))
+strap_orientation       = -10,-5,10					; (3rd person view in degrees)
+strap_bone0             = bip01_spine2
+strap_bone1             = bip01_spine1
+
+startup_ammo             = 1000
+visual                   = dynamics\weapons\wpn_fn2000\wpn_fn2000.ogf
+
+light_disabled			= false
+light_color             = 0.6,0.5,0.3
+light_range             = 4
+light_var_color         = 0.05
+light_var_range         = 0.1
+light_time              = 0.2
+
+
+ph_mass                 = 4
+
+;addons
+scope_status            = 1
+silencer_status         = 0
+grenade_launcher_status = 1
+
+zoom_enabled            = true                                                ; (on,off)zoom mode (right mouse button)
+zoom_rotate_time			= 0.25
+scope_zoom_factor       = 50                                                ; fov for zoom mode
+scope_texture		= wpn_crosshair_g36
+lens_texture		= wpn\wpn_crosshair_g36_lens
+lens_texture_x		= 183
+lens_texture_y		= 75
+lens_texture_w		= 648
+lens_texture_h		= 648
+
+scope_name              = wpn_addon_scope_susat
+scope_x                 = 63
+scope_y                 = -1
+silencer_name           = wpn_addon_silencer
+silencer_x              = 169
+silencer_y              = 13
+grenade_launcher_name   = wpn_addon_grenade_launcher
+grenade_launcher_x      = 95
+grenade_launcher_y      = 25
+
+;звуки
+snd_draw                = weapons\generic_draw
+snd_holster             = weapons\generic_holster
+snd_shoot         		= weapons\n_fn2000_shot
+
+snd_empty               = weapons\gen_empty, 0.5
+snd_reload        		= weapons\fn2000_reload
+snd_shoot_grenade       = weapons\gen_grenshoot
+snd_reload_grenade      = weapons\fn2000_grenload, 1.0
+snd_switch              = weapons\groza_switch, 1.0, 0.5
+
+;silencer_flame_particles  = weapons\generic_weapon01
+silencer_smoke_particles   = weapons\generic_shoot_00
+
+snd_silncer_shot        = weapons\w_ak74_shot1
+
+silencer_light_color    = 0.6,0.5,0.3
+silencer_light_range    = 0.01
+silencer_light_var_color= 0.05
+silencer_light_var_range= 0.5
+silencer_light_time     = 0.2
+
+
+[wpn_fn2000_hud]:hud_base
+zoom_hide_crosshair	= true
+attach_place_idx	= 0
+item_visual					= dynamics\weapons\wpn_fn2000\wpn_fn2000_hud.ogf
+
+
+hands_position				= -0.081500,-0.204000,0.288000
+hands_orientation			= 0.250001,0.649990,1.849998
+
+hands_position_16x9				= -0.032000,-0.214499,0.299498
+hands_orientation_16x9			= 2.149999,0.250000,1.399999
+
+
+item_position				= 0.005280,0.016463,-0.003394
+item_orientation			= -16.844534,-2.475593,361.820557
+
+
+shell_point					= 0.037,0.063,0.118
+shell_dir               = 0.0, 1.0, 0.0
+shell_bone					= wpn_body
+
+
+fire_point		= 0,0.054,0.358
+fire_bone      	      = wpn_body
+fire_point2					= 0.0,-0.008,0.408
+fire_bone2					= wpn_body
+
+anm_show             	= fn_2000_draw
+anm_hide             	= fn_2000_holster
+anm_idle             	= fn_2000_idle
+anm_idle_sprint         = fn_2000_idle_sprint_gl
+anm_idle_moving 			= fn_2000_idle_moving
+anm_shots               = fn_2000_shoot
+anm_reload              = fn_2000_reload
+anm_idle_aim           	= fn_2000_idle_aim
+
+anm_switch              = fn_2000_switch_off
+anm_switch_g            = fn_2000_switch_on
+anm_bore						= fn_2000_idle_bore
+
+anm_show_w_gl           = fn_2000_draw
+anm_hide_w_gl           = fn_2000_holster
+anm_idle_w_gl           = fn_2000_idle
+anm_shots_w_gl          = fn_2000_shoot
+anm_reload_w_gl         = fn_2000_reload
+anm_idle_w_gl_aim       = fn_2000_idle_aim
+anm_idle_sprint_w_gl		= fn_2000_idle_sprint
+anm_idle_moving_w_gl		= fn_2000_idle_moving
+anm_bore_w_gl				= fn_2000_idle_bore
+
+anm_show_g         		= fn_2000_draw_gl
+anm_hide_g         		= fn_2000_holster_gl
+anm_idle_g          		= fn_2000_idle_gl
+anm_reload_g       		= fn_2000_reload_gl
+anm_idle_g_aim      		= fn_2000_idle_aim_gl
+anm_shots_g         		= fn_2000_shoot_gl
+anm_idle_sprint_g			= fn_2000_idle_sprint_gl
+anm_idle_moving_g			= fn_2000_idle_moving_gl
+anm_bore_g					= fn_2000_idle_bore_gl
+
+
+aim_hud_offset_pos	= -0.112000,0.029500,-0.318000
+aim_hud_offset_rot	= 0.010000,0.002500,-0.010000
+
+gl_hud_offset_pos				= -0.068500,-0.091000,0.000000
+gl_hud_offset_rot				= -0.162500,0.000000,0.000000
+
+lean_hud_offset_pos	= 0,0,0
+lean_hud_offset_rot	= 0,0,0
+
+aim_hud_offset_pos_16x9     = -0.112000,0.019500,-0.3018000
+aim_hud_offset_rot_16x9  	= 0.010000,0.002500,-0.010000
+
+gl_hud_offset_pos_16x9				= -0.124500,-0.084000,0.000000
+gl_hud_offset_rot_16x9				= -0.170000,0.030000,0.000000
+
+;-----------------------------------------------------------------------------
+; Уникальнvе
+;-----------------------------------------------------------------------------
+
+[wpn_fn2000_nimble]:wpn_fn2000
+$spawn               = "weapons\wpn_fn2000_nimble"   ; name and section in level editor
+
+cost              		= 20000

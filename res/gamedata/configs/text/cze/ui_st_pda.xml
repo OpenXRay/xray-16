@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="Time">
+		<text>Иas</text>
+	</string>
+	<string id="actor">
+		<text>Svobodnэ stalker</text>
+	</string>
+	<string id="army">
+		<text>Armбda</text>
+	</string>
+	<string id="bandit">
+		<text>Bandita</text>
+	</string>
+	<string id="dolg">
+		<text>Povinnost</text>
+	</string>
+	<string id="ecolog">
+		<text>Vмdec</text>
+	</string>
+	<string id="filter_secondary_tasks_text">
+		<text>Vedlejљн mise</text>
+	</string>
+	<string id="filter_treasures_text">
+		<text>Skrэљe</text>
+	</string>
+	<string id="freedom">
+		<text>Svoboda</text>
+	</string>
+	<string id="killer">
+		<text>Ћoldбk</text>
+	</string>
+	<string id="missions_list">
+		<text>Zбznam mise</text>
+	</string>
+	<string id="monolith">
+		<text>Monolit</text>
+	</string>
+	<string id="monster">
+		<text>Mutant</text>
+	</string>
+	<string id="month_april">
+		<text>Duben</text>
+	</string>
+	<string id="month_august">
+		<text>Srpen</text>
+	</string>
+	<string id="month_december">
+		<text>Prosinec</text>
+	</string>
+	<string id="month_february">
+		<text>Ъnor</text>
+	</string>
+	<string id="month_january">
+		<text>Leden</text>
+	</string>
+	<string id="month_july">
+		<text>Иerven</text>
+	</string>
+	<string id="month_june">
+		<text>Иervenec</text>
+	</string>
+	<string id="month_march">
+		<text>Bшezen</text>
+	</string>
+	<string id="month_may">
+		<text>Kvмten</text>
+	</string>
+	<string id="month_november">
+		<text>Listopad</text>
+	</string>
+	<string id="month_october">
+		<text>Шнjen</text>
+	</string>
+	<string id="month_september">
+		<text>Zбшн</text>
+	</string>
+	<string id="pda_btn_close">
+		<text>Deaktivovat PDA</text>
+	</string>
+	<string id="pda_btn_logs">
+		<text>Zбznam zprбv</text>
+	</string>
+	<string id="pda_btn_logs_hint">
+		<text>Zobrazit historii zprбv</text>
+	</string>
+	<string id="pda_btn_quests">
+		<text>Mapa oblasti</text>
+	</string>
+	<string id="pda_btn_quests_hint">
+		<text>Zobrazit mapu zуny a zбznam mise</text>
+	</string>
+	<string id="pda_btn_ranking">
+		<text>Statistiky</text>
+	</string>
+	<string id="pda_btn_ranking_hint">
+		<text>Zobrazit osobnн statistiky</text>
+	</string>
+	<string id="pda_cur_time">
+		<text>Aktuбlnн иas:</text>
+	</string>
+	<string id="pda_date_filter">
+		<text>Filtr dat</text>
+	</string>
+	<string id="pda_filter_news">
+		<text>Zobrazit novinky</text>
+	</string>
+	<string id="pda_filter_talk">
+		<text>Zobrazit rozhovory</text>
+	</string>
+	<string id="pda_legend_caption">
+		<text>Legenda</text>
+	</string>
+	<string id="pda_stat_1">
+		<text>Иas v Zуnм:</text>
+	</string>
+	<string id="pda_stat_2">
+		<text>Pшeиkanй emise:</text>
+	</string>
+	<string id="pda_stat_3">
+		<text>Dokonиenй mise:</text>
+	</string>
+	<string id="pda_stat_4">
+		<text>Zabito mutantщ:</text>
+	</string>
+	<string id="pda_stat_5">
+		<text>Zabito stalkerщ:</text>
+	</string>
+	<string id="pda_stat_6">
+		<text>Nalezeno artefaktщ:</text>
+	</string>
+	<string id="pda_stat_7">
+		<text>Nalezeno skrэљн:</text>
+	</string>
+	<string id="pda_stat_favorite_weapon">
+		<text>Oblнbenб zbraт</text>
+	</string>
+	<string id="pda_stat_mutant_killed">
+		<text>Nejsilnмjљн zabitэ mutant</text>
+	</string>
+	<string id="st_location">
+		<text>Mнsto:</text>
+	</string>
+	<string id="st_target">
+		<text>Cнl</text>
+	</string>
+	<string id="st_ui_pda_legend_additional_task">
+		<text>Vedlejљн mise</text>
+	</string>
+	<string id="st_ui_pda_legend_enemies">
+		<text>Nepшбtelй</text>
+	</string>
+	<string id="st_ui_pda_legend_friends">
+		<text>Spojenci</text>
+	</string>
+	<string id="st_ui_pda_legend_leader">
+		<text>Vщdce frakce</text>
+	</string>
+	<string id="st_ui_pda_legend_main_task">
+		<text>Hlavnн mise</text>
+	</string>
+	<string id="st_ui_pda_legend_neutrals">
+		<text>Neutrбlnн</text>
+	</string>
+	<string id="st_ui_pda_legend_scout">
+		<text>Prщvodce</text>
+	</string>
+	<string id="st_ui_pda_legend_secrets">
+		<text>Skrэљe</text>
+	</string>
+	<string id="st_ui_pda_legend_squad">
+		<text>Velitel druћstva</text>
+	</string>
+	<string id="st_ui_pda_legend_trader">
+		<text>Obchodnнk</text>
+	</string>
+	<string id="stalker">
+		<text>Stalker</text>
+	</string>
+	<string id="ui_logs_center_caption">
+		<text>Zбznam zprбv</text>
+	</string>
+	<string id="ui_map_btn_center">
+		<text>Vystшedit na hrбиe</text>
+	</string>
+	<string id="ui_map_btn_down">
+		<text>Dolщ</text>
+	</string>
+	<string id="ui_map_btn_left">
+		<text>Doleva</text>
+	</string>
+	<string id="ui_map_btn_legend">
+		<text>Zobrazit legendu</text>
+	</string>
+	<string id="ui_map_btn_right">
+		<text>Doprava</text>
+	</string>
+	<string id="ui_map_btn_up">
+		<text>Nahoru</text>
+	</string>
+	<string id="ui_map_btn_zmreset">
+		<text>Maximбlnн oddбlenн</text>
+	</string>
+	<string id="ui_map_btn_zoom_in">
+		<text>Pшiblнћit</text>
+	</string>
+	<string id="ui_map_btn_zoom_out">
+		<text>Oddбlit</text>
+	</string>
+	<string id="ui_ranking_center_caption">
+		<text>Ocenмnн</text>
+	</string>
+	<string id="ui_task_btn_focus_center">
+		<text>Vystшedit na misi</text>
+	</string>
+	<string id="ui_task_btn_focus_center2">
+		<text>Vystшedit na misi</text>
+	</string>
+	<string id="zombied">
+		<text>Zombie</text>
+	</string>
+	<string id="zoom_in_btn_hint">
+		<text>mмшнtko +</text>
+	</string>
+	<string id="zoom_out_btn_hint">
+		<text>mмшнtko -</text>
+	</string>
+	<string id="st_ui_pda_legend_mechanic">
+		<text>Technik</text>
+	</string>
+	<string id="st_ui_pda_legend_medic">
+		<text>Zdravotnнk</text>
+	</string>
+	<string id="ui_pda_secondary_task">
+		<text>Aktivnн mise</text>
+	</string>
+	<string id="ui_show_second_task_wnd">
+		<text>Zobrazit/skrэt mise</text>
+	</string>
+	<string id="st_ui_pda_actor_box">
+		<text>Osobnн skшнтka</text>
+	</string>
+	<string id="zaton">
+		<text>Zaton</text>
+	</string>
+	<string id="jupiter">
+		<text>Okolн Jupiteru</text>
+	</string>
+	<string id="pripyat">
+		<text>Pripjaќ</text>
+	</string>
+	<string id="jupiter_underground">
+		<text>Pripjaќ 1 - nadchod</text>
+	</string>
+	<string id="labx8">
+		<text>Laboratoш X8</text>
+	</string>
+	<string id="filter_primary_objects_text">
+		<text>Oblasti</text>
+	</string>
+	<string id="filter_quest_npcs_text">
+		<text>Dщleћitй pшedmмty</text>
+	</string>
+	<string id="st_ui_pda_legend_primary_objects">
+		<text>Oblast</text>
+	</string>
+	<string id="st_jup_b32_has_af">
+		<text>Skenery detekovaly tyto artefakty:</text>
+	</string>
+	<string id="st_jup_b32_no_af">
+		<text>Skenery nedetekovaly ћбdnй artefakty.</text>
+	</string>
+	<string id="st_ui_pda_secret">
+		<text>Skrэљ</text>
+	</string>
+	<string id="st_ui_pda_sleep_place">
+		<text>Prostor na spanн</text>
+	</string>
+</string_table>

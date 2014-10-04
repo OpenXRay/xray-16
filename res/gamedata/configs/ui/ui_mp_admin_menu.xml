@@ -1,0 +1,301 @@
+<w>
+	<admin_menu x="205" y="166" width="624" height="411">
+		<background x="0" y="0" width="624" height="411">
+			<texture>ui_inGame2_screen_4</texture>
+		</background>
+		<tab_control x="27" y="37" width="441" height="27">
+			<button x="0" y="0" width="172" height="27" id="players" frame_mode="0">
+				<text align="c" vert_align="c" x="0" y="0" width="157" height="27" font="letterica18">mm_mp_players</text>
+				<texture>ui_inGame2_pda_button</texture>
+				<text_color>
+					<t r="255" g="255" b="255"/>
+					<d r="255" g="255" b="255"/>
+					<e r="200" g="200" b="200"/>
+					<h r="170" g="170" b="170"/>
+				</text_color>
+			</button>
+			<button x="148" y="0" width="172" height="27" id="server" frame_mode="0">
+				<text align="c" vert_align="c" x="0" y="0" font="letterica18">mm_mp_server</text>
+				<texture>ui_inGame2_pda_button</texture>
+				<text_color>
+					<t r="255" g="255" b="255"/>
+					<d r="255" g="255" b="255"/>
+					<e r="200" g="200" b="200"/>
+					<h r="170" g="170" b="170"/>
+				</text_color>
+			</button>
+			<button x="296" y="0" width="172" height="27" id="change_map" frame_mode="0">
+				<text align="c" vert_align="c" x="0" y="0" font="letterica18">mp_si_maprotation</text>
+				<texture>ui_inGame2_pda_button</texture>
+				<text_color>
+					<t r="255" g="255" b="255"/>
+					<d r="255" g="255" b="255"/>
+					<e r="200" g="200" b="200"/>
+					<h r="170" g="170" b="170"/>
+				</text_color>
+			</button>
+		</tab_control>
+		<close_button x="259" y="381" width="134" height="26" stretch="1">
+			<texture>ui_inGame2_inventory_button</texture>
+			<text font="letterica16" align="c">mm_mp_cancel</text>
+		</close_button>
+	</admin_menu>
+	<players_adm x="14" y="72" width="610" height="340">
+		<players_list x="15" y="10" width="375" height="265" item_height="18" always_show_scroll="1" can_select="1">
+			<font font="letterica16"/>
+		</players_list>
+		<refresh_button x="85" y="275" width="200" height="26" stretch="1">
+			<texture>ui_inGame2_inventory_button</texture>
+			<text font="letterica16" align="c">mm_mp_refresh</text>
+		</refresh_button>
+		<screen_all_button x="395" y="10" width="195" height="26" stretch="1">
+			<texture>ui_inGame2_inventory_button</texture>
+			<text font="letterica16" align="c">ui_mp_am_screen_all</text>
+		</screen_all_button>
+		<config_all_button x="395" y="40" width="195" height="26" stretch="1">
+			<texture>ui_inGame2_inventory_button</texture>
+			<text font="letterica16" align="c">ui_mp_am_config_all</text>
+		</config_all_button>
+		<max_ping_limit_text x="395" y="70" width="195" height="16">
+			<text r="170" g="170" b="170" font="letterica16" align="c" vert_align="c">ui_mp_am_ping_limit</text>
+		</max_ping_limit_text>
+		<max_ping_limit_track x="395" y="90" width="195" height="16" step="1" is_integer="1">
+			<options_item entry="sv_adm_menu_ping_limit" group="mm_mp_server" depend="runtime"/>
+		</max_ping_limit_track>
+		<max_ping_limit_button x="395" y="110" width="195" height="26" stretch="1">
+			<texture>ui_inGame2_inventory_button</texture>
+			<text font="letterica16" align="c">ui_mp_am_set_ping_limit</text>
+		</max_ping_limit_button>
+		<screen_player_button x="395" y="140" width="195" height="26" stretch="1">
+			<texture>ui_inGame2_inventory_button</texture>
+			<text font="letterica16" align="c">ui_mp_am_screen_selected</text>
+		</screen_player_button>
+		<config_player_button x="395" y="170" width="195" height="26" stretch="1">
+			<texture>ui_inGame2_inventory_button</texture>
+			<text font="letterica16" align="c">ui_mp_am_config_selected</text>
+		</config_player_button>
+		<kick_player_button x="395" y="200" width="195" height="26" stretch="1">
+			<texture>ui_inGame2_inventory_button</texture>
+			<text font="letterica16" align="c">ui_mp_am_kick_selected</text>
+		</kick_player_button>
+		<ban_player_combo x="395" y="240" width="195" height="20">
+			<options_item entry="sv_adm_menu_ban_time" group="mm_mp_server" depend="runtime"/>
+		    <text_color>
+	            <e r="255" g="255" b="255"/>
+		    </text_color>
+		</ban_player_combo>
+<!--
+		<ban_time_text x="395" y="230" width="200" height="16">
+			<text r="170" g="170" b="170" font="letterica16" align="c" vert_align="c">Ban time (minutes):</text>
+		</ban_time_text>
+		<ban_time_track x="395" y="250" width="200" height="16" step="1" is_integer="1">
+			<options_item entry="sv_adm_menu_ban_time" group="mm_mp_server" depend="runtime"/>
+		</ban_time_track>
+-->
+		<ban_player_button x="395" y="270" width="195" height="26" stretch="1">
+			<texture>ui_inGame2_inventory_button</texture>
+			<text font="letterica16" align="c">ui_mp_am_ban_selected</text>
+		</ban_player_button>
+	</players_adm>
+	<server_adm x="14" y="72" width="610" height="340">
+		<back_button x="210" y="270" width="200" height="26" stretch="1">
+			<texture>ui_inGame2_inventory_button</texture>
+			<text font="letterica16" align="c">mp_back</text>
+		</back_button>
+		<main_selection_wnd x="0" y="0" width="610" height="340">
+			<restart_button x="200" y="10" width="220" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">ui_mp_am_restart</text>
+			</restart_button>
+			<fast_restart_button x="200" y="40" width="220" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">ui_mp_am_fast_restart</text>
+			</fast_restart_button>
+			<change_weather_button x="200" y="70" width="220" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">ui_mp_am_change_weather</text>
+			</change_weather_button>
+			<change_game_type_button x="200" y="100" width="220" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">ui_mp_am_change_game_type</text>
+			</change_game_type_button>
+			<change_game_limits_button x="200" y="130" width="220" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">ui_mp_am_change_game_limits</text>
+			</change_game_limits_button>
+			<vote_stop_button x="200" y="190" width="220" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">ui_mp_am_stop_cur_voting</text>
+			</vote_stop_button>
+		</main_selection_wnd>
+		<weather_selection_wnd x="0" y="0" width="610" height="340">
+			<clear_weather_button x="200" y="10" width="220" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">Clear</text>
+			</clear_weather_button>
+			<cloudy_weather_button x="200" y="40" width="220" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">Cloudy</text>
+			</cloudy_weather_button>
+			<rain_weather_button x="200" y="70" width="220" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">Rain</text>
+			</rain_weather_button>
+			<night_weather_button x="200" y="100" width="220" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">Night</text>
+			</night_weather_button>
+		    <weather_change_rate_spin x="200" y="133" width="220" height="20">
+			    <options_item entry="mm_net_weather_rateofchange" group="mm_mp_server"/>
+	    	</weather_change_rate_spin>
+			<set_weather_rate_button x="200" y="160" width="220" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">ui_mp_am_set_change_rate</text>
+			</set_weather_rate_button>
+		</weather_selection_wnd>
+		<game_type_selection_wnd x="0" y="0" width="610" height="340">
+			<dm_button x="200" y="10" width="220" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">st_deathmatch</text>
+			</dm_button>
+			<tdm_button x="200" y="40" width="220" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">st_team_deathmatch</text>
+			</tdm_button>
+			<cta_button x="200" y="70" width="220" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">st_capture_the_artefact</text>
+			</cta_button>
+			<ah_button x="200" y="100" width="220" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">st_artefacthunt</text>
+			</ah_button>
+		</game_type_selection_wnd>
+		<game_limits_selection_wnd x="0" y="0" width="610" height="340">
+		    <time_limit_edit x="20" y="10" width="60" height="25" max_symb_count="3" num_only="1">
+		        <text x="3" font="letterica16" vert_align="c"/>
+	    	    <texture>ui_inGame2_edit_box_1</texture>
+		    </time_limit_edit>
+			<time_limit_button x="85" y="10" width="200" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">ui_mp_am_set_time_limit</text>
+			</time_limit_button>
+		    <frag_limit_edit x="20" y="40" width="60" height="25" max_symb_count="4" num_only="1">
+		        <text x="3" font="letterica16" vert_align="c"/>
+	    	    <texture>ui_inGame2_edit_box_1</texture>
+		    </frag_limit_edit>
+			<frag_limit_button x="85" y="40" width="200" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">ui_mp_am_set_frag_limit</text>
+			</frag_limit_button>
+		    <art_limit_edit x="20" y="70" width="60" height="25" max_symb_count="3" num_only="1">
+		        <text x="3" font="letterica16" vert_align="c"/>
+	    	    <texture>ui_inGame2_edit_box_1</texture>
+		    </art_limit_edit>
+			<art_limit_button x="85" y="70" width="200" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">ui_mp_am_set_art_limit</text>
+			</art_limit_button>
+		    <warm_up_edit x="20" y="100" width="60" height="25" max_symb_count="4" num_only="1">
+		        <text x="3" font="letterica16" vert_align="c"/>
+	    	    <texture>ui_inGame2_edit_box_1</texture>
+		    </warm_up_edit>
+			<warm_up_button x="85" y="100" width="200" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">ui_mp_am_set_warm_up_time</text>
+			</warm_up_button>
+			<spectator_fe_check x="20" y="130" width="44" height="29">
+		        <texture>ui_inGame2_checkbox</texture>
+				<options_item entry="sv_spectr_firsteye" group="mm_mp_server"/>
+				<text x="-5" font="letterica16" vert_align="c">mm_mp_spectator_firsteye</text>
+			</spectator_fe_check>
+			<spectator_ff_check x="20" y="160" width="44" height="29">
+		        <texture>ui_inGame2_checkbox</texture>
+				<options_item entry="sv_spectr_freefly" group="mm_mp_server"/>
+				<text x="-5" font="letterica16" vert_align="c">mm_mp_spectator_freefly</text>
+			</spectator_ff_check>
+			<spectator_fl_check x="20" y="190" width="44" height="29">
+		        <texture>ui_inGame2_checkbox</texture>
+				<options_item entry="sv_spectr_freelook" group="mm_mp_server"/>
+				<text x="-5" font="letterica16" vert_align="c">mm_mp_spectator_freelook</text>
+			</spectator_fl_check>
+			<spectator_la_check x="20" y="220" width="44" height="29">
+		        <texture>ui_inGame2_checkbox</texture>
+				<options_item entry="sv_spectr_lookat" group="mm_mp_server"/>
+				<text x="-5" font="letterica16" vert_align="c">mm_mp_spectator_lookat</text>
+			</spectator_la_check>
+			<spectator_tc_check x="20" y="250" width="44" height="29">
+		        <texture>ui_inGame2_checkbox</texture>
+				<options_item entry="sv_spectr_teamcamera" group="mm_mp_server"/>
+				<text x="-5" font="letterica16" vert_align="c">mm_mp_spectator_teamonly</text>
+			</spectator_tc_check>
+		    <invincible_time_edit x="300" y="10" width="60" height="25" max_symb_count="2" num_only="1">
+		        <text x="3" font="letterica16" vert_align="c"/>
+	    	    <texture>ui_inGame2_edit_box_1</texture>
+		    </invincible_time_edit>
+			<invincible_time_button x="365" y="10" width="225" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">ui_mp_am_set_invincible_time</text>
+			</invincible_time_button>
+		    <damage_block_time_edit x="300" y="40" width="60" height="25" max_symb_count="3" num_only="1">
+		        <text x="3" font="letterica16" vert_align="c"/>
+	    	    <texture>ui_inGame2_edit_box_1</texture>
+		    </damage_block_time_edit>
+			<damage_block_time_button x="365" y="40" width="225" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">ui_mp_am_set_damage_block_time</text>
+			</damage_block_time_button>
+		    <reinforcement_time_edit x="300" y="70" width="60" height="25" max_symb_count="4" num_only="1">
+		        <text x="3" font="letterica16" vert_align="c"/>
+	    	    <texture>ui_inGame2_edit_box_1</texture>
+		    </reinforcement_time_edit>
+			<reinforcement_time_button x="365" y="70" width="225" height="26" stretch="1">
+				<texture>ui_inGame2_inventory_button</texture>
+				<text font="letterica16" align="c">ui_mp_am_set_reinforcement_time</text>
+			</reinforcement_time_button>
+			<vote_enabled_check x="300" y="100" width="44" height="29">
+		        <texture>ui_inGame2_checkbox</texture>
+				<options_item entry="sv_vote_enabled" group="mm_mp_server"/>
+				<text x="-5" font="letterica16" vert_align="c">mm_mp_allowvoting</text>
+			</vote_enabled_check>
+			<dam_block_indic_check x="300" y="130" width="44" height="29">
+		        <texture>ui_inGame2_checkbox</texture>
+				<options_item entry="sv_dmgblockindicator" group="mm_mp_server"/>
+				<text x="-5" font="letterica16" vert_align="c">mm_mp_damageblockindicator</text>
+			</dam_block_indic_check>
+			<friendly_names_check x="300" y="160" width="44" height="29">
+		        <texture>ui_inGame2_checkbox</texture>
+				<options_item entry="sv_friendly_names" group="mm_mp_server"/>
+				<text x="-5" font="letterica16" vert_align="c">mm_mp_friendlynames</text>
+			</friendly_names_check>
+			<friendly_indic_check x="300" y="190" width="44" height="29">
+		        <texture>ui_inGame2_checkbox</texture>
+				<options_item entry="sv_friendly_indicators" group="mm_mp_server"/>
+				<text x="-5" font="letterica16" vert_align="c">mm_mp_friendlyindicators</text>
+			</friendly_indic_check>
+			<bearer_cant_sprint_check x="300" y="220" width="44" height="29">
+		        <texture>ui_inGame2_checkbox</texture>
+				<options_item entry="sv_bearercantsprint" group="mm_mp_server"/>
+				<text x="-5" font="letterica16" vert_align="c">mp_si_afbearer_cant_sprint</text>
+			</bearer_cant_sprint_check>
+		</game_limits_selection_wnd>
+	</server_adm>
+	<change_map_adm x="14" y="72" width="610" height="340">
+	    <list x="15" y="10" width="240" height="265" can_select="1">
+	        <font r="170" g="170" b="170" font="letterica16"/>
+    	</list>
+	    <map_pic x="276" y="23" width="300" height="208" stretch="1">
+		    <texture width="256" height="175">ui\ui_noise</texture>
+    	</map_pic>
+	    <map_frame x="264" y="10" width="324" height="234">
+	    	<texture>ui_inGame2_Mp_screen_map_window</texture>
+    	</map_frame>
+	    <map_ver_txt x="264" y="244" width="100" height="25">
+		    <text font="graffiti19" r="170" g="170" b="170" vert_align="c"></text>
+    	</map_ver_txt>
+	    <btn_ok x="35" y="275" width="200" height="26" stretch="1">
+			<text font="letterica16" align="c">mp_si_maprotation</text>
+    	    <texture>ui_inGame2_inventory_button</texture>
+		</btn_ok>
+	</change_map_adm>
+</w>

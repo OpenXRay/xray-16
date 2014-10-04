@@ -1,0 +1,993 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="dm_anomalies_10">
+		<text>There's a spot in Zaton where heat anomalies emerged underwater. They call it 'Boiler' because there's steam and stuff coming out from the ground. If you think steam is nothing, think again. Seasoned stalkers say this kind of vapor anomaly hits you at least as hard as a regular heat anomaly, if not harder. The temperature may be a bit lower, but it grills you longer. As for artifacts, they found regular ones, the fire kind.</text>
+	</string>
+	<string id="dm_anomalies_11">
+		<text>They say there's a nice spot in the quarry, with lots of artifacts, though not scant on anomalies either. Down at the bottom there's so many bubbles from gas anomalies, it hurts the eyes, even with a gas mask on.</text>
+	</string>
+	<string id="dm_anomalies_12">
+		<text>Ash Heap is at the old graveyard near Kopachy. There's lots of heat anomalies and some zombies from time to time. People try to avoid the place, but they do find artifacts there.</text>
+	</string>
+	<string id="dm_anomalies_13">
+		<text>They say artifacts have been found in the parking lot. Still got vehicles from the first Chernobyl disaster - those babies give the rad counter heartburn. In addition, the lot is full of electrical anomalies as well.</text>
+	</string>
+	<string id="dm_anomalies_14">
+		<text>In the Putrid Grove, where trees are all warped from acid. People who've been there say it's full of gas anomalies. There's so much gas in the air that you can't see straight but with enough experience you can find the artifacts you're looking for.</text>
+	</string>
+	<string id="dm_anomalies_15">
+		<text>If you're after artifacts, go for the acid kind. The best place to get those is the Concrete Bath. You won't have a lot of competition: no one likes that place because of its proximity to the Jupiter building.</text>
+	</string>
+	<string id="dm_anomalies_16">
+		<text>Not far from the Jupiter plant a piece of the road fell through. They called this place Bitumen, because that's where the pavement melted. There're many anomalies in the gap - heat anomalies mixed with gravitational ones. And since it's two kinds of anomalies, the artifacts must be different, too.</text>
+	</string>
+	<string id="dm_anomalies_17">
+		<text>There's a small harbor beyond the cement plant called Fen. The whole harbor's turned into a terrible stinking marsh and the water is full of gas anomalies. It's not even really water anymore, more like acid. People have found artifacts there before, but the place is also teeming with monsters.</text>
+	</string>
+	<string id="dm_anomalies_18">
+		<text>Look in the old cement plant. Lots of anomalies, but it's worth it. Sure, there are spots where artifacts are easier to come by, but so's the competition. Here your only competition consists of hamsters, and that's only if you go down in the basement.</text>
+	</string>
+	<string id="dm_anomalies_19">
+		<text>You should look near Oakpine. That's that thing growing between the hills, above the gas anomalies. Everyone's been calling it that since some geek identified the bark from that tree as both pine and oak. If you want to search for artifacts there, you'll need good chemical protection. Take lots of ammo, too, because those hills are home to packs and packs of dogs.</text>
+	</string>
+	<string id="dm_anomalies_2">
+		<text>Sometimes you don't have to jump into anomalies to scare up an artifact. I've been told of an artifact found out in the open field. This one stalker had a detector that started acting up, so he decided to change the batteries. As soon as he did, the detector shows a reading and bam, an artifact basically drops in his hands. Lucky bastard, eh? That's the Zone for you: sometimes it punishes you and sometimes it rewards you.</text>
+	</string>
+	<string id="dm_anomalies_20">
+		<text>I've heard from seasoned stalkers that sometimes artifacts move outside of anomalies. Your detector starts going "peep," you take it out, but there's nothing there. That means a 'nomadic' artifact walked past you but it's no use chasing it, because only the Zone decides who to reward it with.</text>
+	</string>
+	<string id="dm_anomalies_21">
+		<text>No one has looked for artifacts in Pripyat yet. Everyone I know has only been here a short while, so they stay cautious.</text>
+	</string>
+	<string id="dm_anomalies_22">
+		<text>I don't know if anyone knows the good spots. Pripyat is poorly explored so far.</text>
+	</string>
+	<string id="dm_anomalies_23">
+		<text>I would look in the underground tunnels. They say there's tons of them underneath the city.</text>
+	</string>
+	<string id="dm_anomalies_24">
+		<text>Not much is known about these parts. Garry's stories, mostly. He says there's a place here where a huge grapevine grows out of an acid anomaly, as tall as a ten-story building. He might be pulling our leg, but I'd check out that vine for artifacts just in case.</text>
+	</string>
+	<string id="dm_anomalies_3">
+		<text>The surest place is the acid swamp. It's full of gravitational anomalies, but those are easy to spot. Just keep your eye on the water surface and you can't go wrong. Gas anomalies are more of a pain, because there's basically no air to breath. Getting squirted by one is no fun, believe you me. That thing eats through a vest faster than sulfuric acid.</text>
+	</string>
+	<string id="dm_anomalies_5">
+		<text>There are plenty of heat anomalies at the burnt farmstead up on the hill. People find fire artifacts there. Look in the houses: whichever's got the most anomalies in it after an emission, that's where the artifacts will be.</text>
+	</string>
+	<string id="dm_anomalies_6">
+		<text>There's probably lots of them in the caves under the burnt farmstead. If you walk on the hill with a detector, it doesn't stop beeping. Getting to them is easy enough - just jump in through the gap from above. Getting out is the hard part, what with all the anomalies down there. Mostly vortexes and acid. Some also claim to have seen something resembling a comet in that gap. A whole mix of dangers, to be sure, but that means the artifacts are probably mixed as well.</text>
+	</string>
+	<string id="dm_anomalies_7">
+		<text>Have you seen a Circus anomaly? It's a huge springboard anomaly with two comets going round and round - quite a sight to behold. Behold it from a distance, though, because Circus is hot as hell, with lots of heat anomalies. It's got plenty of artifacts, too, but they're guarded by a nasty fire poltergeist that tries to roast you up when you come near.</text>
+	</string>
+	<string id="dm_anomalies_9">
+		<text>If you're interested in gravitational artifacts, look for them in the Fang anomaly. The place is easy to spot - anomalies have done a job on the terrain, took half the hill clean off. A few caves opened up in the hill and were immediately settled by snorks. Thankfully, they rarely go outside.</text>
+	</string>
+	<string id="dm_anomalies_do_not_know_1">
+		<text>In the Zone, man, in the Zone. Just don't give up.</text>
+	</string>
+	<string id="dm_anomalies_do_not_know_2">
+		<text>A great question. Tell me when you know the answer!</text>
+	</string>
+	<string id="dm_anomalies_do_not_know_3">
+		<text>Where, when, why... Remember: once you find a honey hole, keep it to yourself.</text>
+	</string>
+	<string id="dm_anomalies_general">
+		<text>Where can I find artifacts?</text>
+	</string>
+	<string id="dm_anomalies_no_more_1">
+		<text>I've already told you.</text>
+	</string>
+	<string id="dm_anomalies_no_more_2">
+		<text>No, I don't know anything else.</text>
+	</string>
+	<string id="dm_anomalies_no_more_3">
+		<text>That's all I know. Ask somebody else.</text>
+	</string>
+	<string id="dm_hello_0">
+		<text>Wassup, bro?</text>
+	</string>
+	<string id="dm_hello_1">
+		<text>Greetings.</text>
+	</string>
+	<string id="dm_hello_10">
+		<text>Hello, stalker.</text>
+	</string>
+	<string id="dm_hello_11">
+		<text>Hello.</text>
+	</string>
+	<string id="dm_hello_12">
+		<text>What do you want?</text>
+	</string>
+	<string id="dm_hello_13">
+		<text>What?</text>
+	</string>
+	<string id="dm_hello_14">
+		<text>Start talking.</text>
+	</string>
+	<string id="dm_hello_15">
+		<text>Good afternoon, Major, sir!</text>
+	</string>
+	<string id="dm_hello_16">
+		<text>Good afternoon!</text>
+	</string>
+	<string id="dm_hello_17">
+		<text>I'm listening, Major, sir.</text>
+	</string>
+	<string id="dm_hello_2">
+		<text>Yeah, hi.</text>
+	</string>
+	<string id="dm_hello_3">
+		<text>What?</text>
+	</string>
+	<string id="dm_hello_4">
+		<text>The man himself.</text>
+	</string>
+	<string id="dm_hello_5">
+		<text>Hey, stalker. What's your hurry?</text>
+	</string>
+	<string id="dm_hello_6">
+		<text>Sup.</text>
+	</string>
+	<string id="dm_hello_7">
+		<text>Sup, man.</text>
+	</string>
+	<string id="dm_hello_8">
+		<text>Oh hey, dude.</text>
+	</string>
+	<string id="dm_hello_9">
+		<text>Howdy.</text>
+	</string>
+	<string id="dm_hello_general">
+		<text>Hey!</text>
+	</string>
+	<string id="dm_help_0">
+		<text>Help me, bro!</text>
+	</string>
+	<string id="dm_help_1">
+		<text>Save me brother, I'm dying...</text>
+	</string>
+	<string id="dm_help_10">
+		<text>I need medical assistance!</text>
+	</string>
+	<string id="dm_help_11">
+		<text>Medkit!... Quick!</text>
+	</string>
+	<string id="dm_help_2">
+		<text>Help me, buddy... Ahh, the pain!</text>
+	</string>
+	<string id="dm_help_3">
+		<text>Gimme a medkit... medkit, now...</text>
+	</string>
+	<string id="dm_help_4">
+		<text>Dude... argh... c'mon, help me out!</text>
+	</string>
+	<string id="dm_help_5">
+		<text>Yo, I need a medkit... quick...</text>
+	</string>
+	<string id="dm_help_6">
+		<text>Help me, stalker... a medkit, please...</text>
+	</string>
+	<string id="dm_help_7">
+		<text>I'm hurt... help!</text>
+	</string>
+	<string id="dm_help_8">
+		<text>Need a medkit!</text>
+	</string>
+	<string id="dm_help_9">
+		<text>Medkit!</text>
+	</string>
+	<string id="dm_information_1">
+		<text>Have you heard about the dredge station east of Skadovsk? They say something weird glows there at night... Too weird even for the Zone, mind you. I really don't know if it's worth checking out. It might turn out to be something valuable, but is it worth risking my ass over? That's the question...</text>
+	</string>
+	<string id="dm_information_10">
+		<text>Nothing but old decrepit stuff around here. Take that dilapidated motor column on the Preobrazhensky bridge - it's rusted through and through, the bridge included. Many would love to poke around the area, were it not for snorks and anomalies...</text>
+	</string>
+	<string id="dm_information_11">
+		<text>Did you hear Sultan planned to take over Beard's business? Skadovsk ain't big enough for his greedy ass, so he wanted to grab an even larger piece of the pie... But we said, "No way, Josй!" Beard and the rest of our guys gave them hell all right. Sultan's thug operation won't fly here.</text>
+	</string>
+	<string id="dm_information_12">
+		<text>Wow, did you hear about this? That scumbag Sultan clamped down on Beard... I don't know what he did exactly, but it seems he turned on the meter on Beard! What's the Zone coming to? If they keep this up, Skadovsk is going to be a bandit base before you know it!</text>
+	</string>
+	<string id="dm_information_13">
+		<text>Have you heard about the Oasis, brother? They say there's this place that's extremely hard to find and, once you know where it is, even harder to get to. There's supposed to be a lake there. You walk into it and all your maladies fade away, all your wounds heal instantly! Ah, talking's no use. Have you seen how many rookie stalkers have come here, to the center of the Zone? Some are looking for a treasure trove of artifacts, some are just curious, but most are hoping to find the Oasis. Word is, it's hidden somewhere around here...</text>
+	</string>
+	<string id="dm_information_14">
+		<text>They say the Zone is about to croak... Someone found the Oasis and took its artifact - the Heart of the Oasis. Now the Zone will shift into another dimension and no stalkers will ever be able to get out... Just kidding, man. But they really did find some kind of new artifact. Scientists are tinkering with it in their bunker as we speak.</text>
+	</string>
+	<string id="dm_information_15">
+		<text>Did you hear about Topol? He found some new shithole for his guys to wander into, and of course, they happily went for it. Their escapades ended up with a controller ironing their brains out. They would be pissing all over themselves in hospital bunks if it weren't for this one stalker that was with them. When Topol came to his senses from that zombification crap, that stalker was squatting down right next to the controller, cutting its ears off.</text>
+	</string>
+	<string id="dm_information_16">
+		<text>Did you hear about the Kopachy village? When the original disaster hit the Chernobyl NPP, that area got it so bad that they decided to bury the whole village. Nothing but small radioactive mounds there now, in place of houses. They say it was an eerie place even before the disaster; I shudder to think what one might find there nowadays. Everyone's too scared to check it out. But what if they're wrong - it could be an artifact goldmine for all we know!</text>
+	</string>
+	<string id="dm_information_17">
+		<text>You know, there are only two stalkers at Yanov who can feel an emission approaching. Bonesetter, our medic, and Zulu, an ex Duty member. The 'ex' prefix is a recent development... When Duty came to Yanov station, Freedom fighters were already there. As could be expected, things got ugly quickly. Both factions suffered heavy losses, even a few free stalkers were hit by stray bullets. That's when Zulu told them an emission was coming. Left with no choice, Duty and Freedom called a truce and dug in at the station. When it was all over, Zulu quit Duty and settled down at the tower near the station.</text>
+	</string>
+	<string id="dm_information_18">
+		<text>There's all kinds of weird stories... You shouldn't believe all of them. Storytellers are a dime a dozen in the Zone these days. But the strange thing is, a few stalkers from Yanov station have reported seeing UFOs. They say it looked like a black saucer about 16 feet in diameter. Others claim it looked like an airplane from a distance, they were sure that's what it was. The indisputable fact is that one of the eyewitnesses is a former pilot, and he says he'd never seen anything like it in his whole life.</text>
+	</string>
+	<string id="dm_information_2">
+		<text>Nothing but bad news lately. Good men are vanishing one after another, then we find their bodies with not a drop of blood. It's got to be those mother fucking bloodsuckers, who else? Ooh, how I'd love to find their lair and pump them bitches full of lead! Soon we'll be going to the john in pairs, you know? Lone stalkers my ass.</text>
+	</string>
+	<string id="dm_information_20">
+		<text>Got a new one for you. So, the Freedom guys got their hands on the PDA of the legendary founder of Duty. And you know what? It turns out he duped his men, telling them the army leadership abandoned them in the Zone. He made that up just so he could form his own faction! But shit like that don't stick in the Zone. Not long after our hero found himself in a space bubble and that was the end of him. That's how it goes... To think I was actually considering joining Duty! Nah, let 'em spew their self-righteous drivel without me.</text>
+	</string>
+	<string id="dm_information_21">
+		<text>That new Duty squad, you know... They just about crystallized out of thin air. Think about it: a group of Duty fighters leave Yanov and come back three times as many. Are they cloning themselves or what? I guess you should expect that from Duty, though. Only way they tell each other apart is by rank!</text>
+	</string>
+	<string id="dm_information_22">
+		<text>That new Freedom squad, you know... They just about crystallized out of thin air. Think about it: a group of Freedom fighters leave Yanov and come back three times as many. I got an idea - they're multiplying by budding! You'd think so, wouldn't you? All that grass they're smoking, they're about to take roots and start vegetative reproduction!</text>
+	</string>
+	<string id="dm_information_23">
+		<text>Know Gonta and his guys? They were down on their luck for a while, what with Danila disappearing and Crab getting wounded. But they're on a good streak now. They're making out nicely with the scientists, taking measurements for them. Nice, eh? A cushy job and a surefire step toward getting their official permits.</text>
+	</string>
+	<string id="dm_information_24">
+		<text>Heard about stalkers called Mitay, Torba and Grizzly? I hear they got a job with the scientists, taking measurements. What the heck is that about? If you ask me, those eggheads are up to no good. But hey, at least the guys are taking it easy now. They might even get their official permits one day.</text>
+	</string>
+	<string id="dm_information_25">
+		<text>Know Spartacus and his crew? Well, you won't see them at Skadovsk anymore - they're guarding the scientists' bunker now. Why not - they can handle mutants all right and know how to keep the bandits at bay. Science is a worthy cause that could use some peace and quiet.</text>
+	</string>
+	<string id="dm_information_26">
+		<text>Have you seen them mercenaries kicking heels at the substation? Not recently you haven't. They've gone over to Jupiter to guard the scientists' bunker. There had been some other mercs guarding the place before them, but something happened to them, I hear. Ain't a bad trend if you ask me! Some mercs disappear, others take their place and follow suit... A few more rounds like that and we'll be rid of mercs at Zaton altogether.</text>
+	</string>
+	<string id="dm_information_27">
+		<text>Folks say the scientists' bunker is now being guarded by the valiant warriors of Duty... I wonder what's in it for them? Do they really believe those 'ologists' will pay them back with a brand new plasma gun, to go hamster-hunting? Guards my butt, heh...</text>
+	</string>
+	<string id="dm_information_28">
+		<text>They say the scientists' bunker is now being guarded by Freedom. Aren't the scientists afraid that their test specimens can go up in smoke - I mean literally? There's a bright side to it, though. If anyone tries to attack the bunker, they'll have to get through a smoke screen first! Ha-ha-ha!</text>
+	</string>
+	<string id="dm_information_29">
+		<text>Have you seen Jupiter, the radio electronics plant? A creepy place that is. No one really knows what goes on in there. The anomalies and mutants are just like everywhere else... But I still don't feel like going there. My gut's telling me that place is trouble.</text>
+	</string>
+	<string id="dm_information_3">
+		<text>Lookie here, ain't you that dude who exposed the Skadovsk medic? 'Preciate that, I really do. I coulda been his next patient, ya know... We all thought it was the monsters, but I guess some people can be just as bad. We live in a dog eat dog world, ain't that the truth?</text>
+	</string>
+	<string id="dm_information_30">
+		<text>I should be asking you that. After you went into those tunnels beneath Jupiter, we heard rumors you reached as far as the center of the Zone. Caused a real turmoil. Got a dozen people itching to follow in your footsteps. Nitro cooled them off, though - he said the tunnel gates closed shut and he couldn't do nothing to reopen them. Sure, we had a few desperados who wanted to blow up the gate, but they're still trying to work out where to get enough dynamite and how they're going to breathe once they actually get down there.</text>
+	</string>
+	<string id="dm_information_31">
+		<text>Oh, have you heard the latest about Garry? The stalker who used to work for the scientists. He's no longer a 'trespasser' - he's got an official Zone permit, believe it or not! So, you're thinking he should have picked up his loot and gone home, right? Well, instead the crazy bastard up and made for Pripyat. Everyone thought he was gone for good, like the rest, but far from it. He made it, but his feat wasn't much use to stalkers. He ran into some military guys. Now Garry's cool with the jarheads, having a permit and all, but the area is still off limits to regular stalkers.</text>
+	</string>
+	<string id="dm_information_32">
+		<text>Well... Freedom and Duty are fighting again, this time over some major stash. They say there was enough gear in there to equip three infantry divisions. Don't know who made the stash in the first place, but the showdown was really something. Stirred up all the stalkers at Yanov, but luckily, they stepped aside or we'd have yet another free-for-all. I guess Duty got the worst of it, 'cause now the area is guarded by Freedom squads.</text>
+	</string>
+	<string id="dm_information_33">
+		<text>Well... Duty and Freedom are fighting again, this time over some major stash. They say there was enough gear in there to equip three infantry divisions. Don't know who made the stash in the first place, but the showdown was really something. Stirred up all the stalkers at Yanov, but luckily, they stepped aside or we'd have yet another free-for-all. I guess Freedom got the worst of it, 'cause now the area is guarded by Duty squads.</text>
+	</string>
+	<string id="dm_information_34">
+		<text>Something happened recently. A group of stalkers were exploring the Jupiter tunnels and stumbled into something - I mean someone. First their guns came flying out of their hands, and then all kinds of crap went flying straight at them. They got no clue what the hell actually happened, but they lost two boys in there.</text>
+	</string>
+	<string id="dm_information_35">
+		<text>I heard they found some kind of gross mutant shit in the tunnels north of Jupiter. Trapper sent a stalker in there to investigate. Turned out there used to be a burer lair. Why "used to be"? 'Cause that same stalker wiped out all the burers. On his own... You even seem to fit his description, except he's a bit taller and always carries a grenade launcher.</text>
+	</string>
+	<string id="dm_information_36">
+		<text>Stalkers are done for... Monsters are coming from Fen. Stalkers at the cement plant saw them lugging off one of our guys. There was at least a dozen of them, huge-ass bastards like you won't believe. Looked like bloodsuckers, only twice as big and much faster. We are praying Trapper figures out how to deal with those beasts...</text>
+	</string>
+	<string id="dm_information_37">
+		<text>You heard about swamp bloodsuckers? The ones in Fen? Well, they're gone. Trapper came for 'em... Not personally, though - he hired some stalkers. They say he put a crew together, about ten men or so, and combed that swamp through and through, and whatever jumped out they blasted to kingdom come. Ain't a frog living in that place no more.</text>
+	</string>
+	<string id="dm_information_38">
+		<text>It wasn't long after word began to spread about a chimera that someone popped it. Mutants used to kill stalkers by the dozen, but I guess we're finally wising up and reversing the trend. I also heard from other sources that the guy was an experienced hunter who has killed more monsters than you and I killed mosquitoes in our lifetime.</text>
+	</string>
+	<string id="dm_information_39">
+		<text>Have you heard the kind of people Freedom recruits nowadays? There was this fella called Flint, bragged left and right about his escapades and trophies... well, he turned out to be the scum of the earth. Left his buddy to die in an anomaly, grabbed his loot and took off. Later they uncovered more of his exploits over at Zaton, where he basically fed a group of hunters to a chimera. I used to think better of Freedom... Hell, I'd rather be factionless than have friends like that.</text>
+	</string>
+	<string id="dm_information_4">
+		<text>Well, they put down that chimera at Zaton. Gonta's crew with an unknown stalker. Wait, that was you, wasn't it? Maybe you could give me a first-hand account? Thanks a million, by the way - that's one less man-eating mutant to worry about!</text>
+	</string>
+	<string id="dm_information_40">
+		<text>Don't know if it's newsworthy, but we got this Noah fella here, the loopiest headcase you will ever meet. He's got one ugly barge... Looks like he had a bunch of illegals build it in a week, heh. Watch out for him, he shoots first and doesn't even bother to ask questions later. I say, to hell with that asshole.</text>
+	</string>
+	<string id="dm_information_41">
+		<text>You know this cat Nimble? Yeah, he's sneaky all right. Sells the best shooters around, no doubt. I wonder how he smuggles them like that. I mean, how do you carry a Vintar so it don't look like you do? Where do you stick that thing? That's some wizard shit right there, man.</text>
+	</string>
+	<string id="dm_information_42">
+		<text>Word on the street is, Sultan's stepped into some deep shit. The don wanted to bust up Beard and take his business under, but he bit off more than he could chew. Got a mouthful instead. He's got rough times ahead with his crew looking at him all sideways. Ain't got the same weight anymore.</text>
+	</string>
+	<string id="dm_information_43">
+		<text>Word is, Sultan's got Beard in the palm of his hand, juicing his business. That's good shit and Sultan's got a lot of weight now, but the best thing is we can run Skadovsk our own way now. It's gonna be beautiful. Looking for cover from an emission? No problem, just fork up the toll!</text>
+	</string>
+	<string id="dm_information_44">
+		<text>Hey man, you hear about the Oasis? Picture that, a place that instantly heals all your pains and sicknesses. It's gotta be some kinda trick or magic... I got another idea, though. There's all this buzz about the Oasis, but not a word about the Wish Granter like it used to be. Well, maybe the Oasis is actually someone's wish come true?</text>
+	</string>
+	<string id="dm_information_45">
+		<text>There's talk among the eggheads of some artifact dragged here all the way from the Oasis. But get this: once they study it, they're gonna use their research to come up with a cure for cancer! Word up!</text>
+	</string>
+	<string id="dm_information_46">
+		<text>Same shit, different day... Everyone's digging up old stories about the center of the Zone. Like the one about the Oasis - a place that instantly restores all your energy and heals your wounds. It's pure, unadulterated bullshit, but fun to listen to. Especially when they talk of its location. Oh, I wish there was a place like that for real... we'd have saved so many of our boys.</text>
+	</string>
+	<string id="dm_information_47">
+		<text>I heard through the grapevine that they've found the Oasis. I'd have never thought it existed, but facts are a stubborn thing. An artifact was found on location. Scientists are studying it as we speak. Perhaps they can use it to make some ultra-fast healing device... Our boys sure could make use of that.</text>
+	</string>
+	<string id="dm_information_48">
+		<text>Kopachy. Nothing new to the Zone, but new to me. Just imagine - a whole village with houses buried up to their roofs in the ground... Dating all the way back to 1986... the houses emitted so much radiation, they had to bury them. A chilling sight...</text>
+	</string>
+	<string id="dm_information_49">
+		<text>You know the story how Duty and us ended up rooming together at Yanov? That was all Zulu. He was in Duty back then, and he could smell an emission approaching like no one else... But we came to Yanov first; after stalkers, that is. We barely had time to light up a smoke when those half-assed GIs turned up, waving their shooters at us. The last time I saw that kind of carnage was back at the Garbage over a year ago. Tons of guys dead on both sides. Our emission specialist among them, God save his soul. That's when Zulu goes, "Emission coming! Take cover!" What were we supposed to do, kick them out and let them die? Duty or not, they're still humans. That's how we live now: we squabble when it's quiet, but when an emission hits, we sit tight, side by side. Zulu, he ended up leaving Duty. He lives as a hermit near Yanov now.</text>
+	</string>
+	<string id="dm_information_5">
+		<text>It ain't no news and no secret neither, but Cardan the technician is on his way to drinking himself to death. They say he started out easy when he came to Skadovsk, drinking only on occasion or for antirad purposes. It wasn't until later that he really began to belt the grape, grief-stricken by the death of his two friends. They must have been really close...</text>
+	</string>
+	<string id="dm_information_50">
+		<text>OK, here's a funny story. This one fella was talking about a UFO flying over Yanov. The Zone can really drive people crazy, can't it? Poltergeists and controllers ain't enough for them, no, they simply can't do without the good ol' UFO stories. Well, at least we haven't got any psychic loonies exorcizing the evil spirits out of vodka. Imagine one of them going: "Aw Lawd, cast out the evil spirits! Keep the raw spirits!"... Ha-ha.</text>
+	</string>
+	<string id="dm_information_51">
+		<text>Did you hear about the Kopachy village? When the original disaster hit the Chernobyl NPP, that area got it so bad that they decided to bury the whole village. Nothing but small radioactive mounds there now, in place of houses.  They say it was an eerie place even before the disaster; I shudder to think what one might find there nowadays. Everyone's too scared to check it out .</text>
+	</string>
+	<string id="dm_information_52">
+		<text>This isn't news, but maybe you haven't heard it. We didn't jump in bed with Freedom 'cause we like to snuggle. We owe it to circumstance. When we came here, Freedom pounced on us out of nowhere... Losses were great on both sides, though we were slowly but surely gaining an edge over the anarchists... But as the fight was in full swing, Zulu sensed an emission approaching. He's never wrong, you know... We had no choice but to put the fighting on hold. What I don't get is why Zulu left Duty after that incident...</text>
+	</string>
+	<string id="dm_information_53">
+		<text>Our scouts recently reported seeing an unidentified flying object over Yanov station. A UFO, in other words. Before you ask any stupid questions, a UFO isn't just some flying saucer with Martians in them. It could be any flying object, from a piece of cardboard to a meteorological probe, as long as eyewitnesses were unable to identify it. Got that?</text>
+	</string>
+	<string id="dm_information_54">
+		<text>You were the one who brought that PDA to Loki, right? Man, it's the shiznit. The legendary founder of Duty, General Tachenko, conned his own soldiers like some suckers. Broke the radio so they couldn't be reached from the outside, formed his own following of knuckleheads... only to croak in true retard fashion in an effin' space bubble! You couldn't make this shit up, man!</text>
+	</string>
+	<string id="dm_information_55">
+		<text>Seen the new squad those half-assed GIs been fieldin'? Can't be reinforcements from their base - the ideology hasn't yet replaced good sense altogether. But they're too well trained to be plain stalkers. Who the hell knows. Could they be from the Monolith? I know, that sounds crazy!</text>
+	</string>
+	<string id="dm_information_56">
+		<text>Seen our new fighters? Oh, you brought them here, didn't you? You rock. They're pretty cool, kinda tense though... That's OK, a few months of hanging with us will free their minds. They'll start digging our way of life and become like us soon enough.</text>
+	</string>
+	<string id="dm_information_57">
+		<text>We've got some cool new recruits: a squad of former Monolith fighters. And not some rookies either, these are trained fighters. Of course, their heads haven't quite clicked into place after leaving the Monolith. That's all right though, we've got a special Ideology 101 crash course for that, and much more.</text>
+	</string>
+	<string id="dm_information_58">
+		<text>They say Freedom has recruited some former Monolith fighters. Hard to believe, but they do have a new squad and it definitely didn't come from outside the Zone. I guess they're pretty desperate... that or their brains have completely withered from all those drugs. Who are they gonna recruit next, a zombie brigade? A burer battalion?</text>
+	</string>
+	<string id="dm_information_59">
+		<text>This area will soon have law and order again. Duty has taken control of key local positions. We've secured a firm footing at Yanov, and we've got a 24/7 protection detail at the scientists' bunker. It's high time for Freedom to pack their things and hit the trail - anarchists aren't welcome here.</text>
+	</string>
+	<string id="dm_information_6">
+		<text>The newest wonder of the world - a sober Cardan. Can you believe he's on the wagon? Skadovsk people asked him if he got hold of an AA hotline number, to which he replied, "The only number I needed was sixty two."</text>
+	</string>
+	<string id="dm_information_60">
+		<text>I think it was you who helped our guys get that job guarding the scientists, wasn't it? Thanks for that. It sure was nice to see our men at the bunker instead of those friggin' mercs. Good stuff!</text>
+	</string>
+	<string id="dm_information_61">
+		<text>Let's see... we're getting a kick from Duty's secret stash. Now we'll use the stash for its intended purpose - as a prison for Duty scum to press them into divulging all their secrets. He-he. Oh, and thanks for tipping us off about the alarm system - without reinforcements we didn't stand a chance.</text>
+	</string>
+	<string id="dm_information_62">
+		<text>Another victory for Duty! Those anarchists really got too big for their britches... Snuck into our secret warehouse, thinking they could get away with it. Hell no! We surprised them and blew their heads off like rabid hamsters.</text>
+	</string>
+	<string id="dm_information_63">
+		<text>It ain't news that Freedom is a bunch of lowlifes, but we've uncovered something new about one of their biggest wackos. This hood went by the name of Flint in Freedom, but before he joined he was Magpie, a stalker. At least Magpie was his name when he came to Zaton and almost led a crew of hunters right into mutants' jaws. He set them up so that a chimera almost tore them to pieces, while this bastard grabbed their equipment and came here to Yanov. After joining Freedom, he threw his partner into an anomaly to take away his artifact. So, that's Freedom for you.</text>
+	</string>
+	<string id="dm_information_7">
+		<text>A new shipbuilding project, led by Noah. That's the newest attraction at Zaton - a stalker by the name of Noah. Experienced, motivated and 100% nuts. His latest crazy idea is to save all stalkers from the Apocalypse. To that end, he's rebuilding an old barge onto an "ark." A real nut factory. If you do decide to drop by, make sure not to annoy Noah. As long as you do that, he's pretty much harmless.</text>
+	</string>
+	<string id="dm_information_8">
+		<text>Have you met Nimble? He's on Skadovsk right now. He's a real pro of his trade. He can get you anything you need. Well, almost anything. He's focused on shooters and suits lately, but always top of the line! Specialty items, experimental designs, hand-crafted articles... His stuff ain't cheap, but why should it be? Exclusivity costs a pretty penny!</text>
+	</string>
+	<string id="dm_information_9">
+		<text>Did you know Pilot has been using a new route between Zaton and Jupiter? It used to take a long while - walking uphill, dodging anomalies and so on. Now it's a piece of cake. Not a journey but a walk in the park, not to mention it's half as long. But Pilot gives credit where credit is due - he wasn't the one to discover the route. A stalker showed him his maps. For a fee, of course, but he didn't charge an arm and a leg either.</text>
+	</string>
+	<string id="dm_information_do_not_know_1">
+		<text>Nothing much, to be honest.</text>
+	</string>
+	<string id="dm_information_do_not_know_2">
+		<text>There's always something new in the Zone, anywhere you look.</text>
+	</string>
+	<string id="dm_information_do_not_know_3">
+		<text>Well, you're here now. That's news, I guess.</text>
+	</string>
+	<string id="dm_information_general">
+		<text>What's new in the Zone?</text>
+	</string>
+	<string id="dm_information_no_more_1">
+		<text>I don't know anything else that would interest you.</text>
+	</string>
+	<string id="dm_information_no_more_2">
+		<text>I would tell you gladly, but that's all I've heard.</text>
+	</string>
+	<string id="dm_information_no_more_3">
+		<text>I told you everything I know.</text>
+	</string>
+	<string id="dm_job_1">
+		<text>Hrm... Maybe you should ask Grouse over at Skadovsk. He's been looking for help with this one thing - stalkers are disappearing without a trace. Everyone blames bloodsuckers, because when their bodies are found, they're bled completely dry. But this is just too much... They're snatching people almost every other day. Which really isn't bloodsuckers' MO... Grouse even hired an experienced hunter to track down those bloodsuckers.</text>
+	</string>
+	<string id="dm_job_10">
+		<text>You know, when a stalker needs money he's got two ways to go: find artifacts and offload them to traders at 30 kopecks on the ruble, or work for the scientists. They always come up with something or other a stalker can do, be it the delivery of a rare artifact or a mutant carcass. But above all else, if you get on their good side they can issue you a permit to the Zone, all official and legit. Picture yourself passing a military post, lugging a full backpack of loot, and being saluted! Warms my heart! So anyway, the scientists' bunker is situated west of Yanov station. They've got one stalker working for them already, maybe they can hire another one like you.</text>
+	</string>
+	<string id="dm_job_11">
+		<text>How successful you are depends on what you do. If you don't mind hunting mutants, you'll have plenty of offers. Drop in the basement at Yanov and ask for Trapper - he pays good coin for purging mutants, but don't go shooting the first pseudodog you see to claim your reward. Trapper gives out orders on specific monsters that either interfere with artifact collection or frequent the places stalkers use to hide from emissions.</text>
+	</string>
+	<string id="dm_job_14">
+		<text>Fellas like you who come to Skadovsk like to visit Beard. He shells out decent dough for artifacts... But I'll tell you one thing - his business sense is piss poor. He don't wanna share his profits with some powerful people... and that shit's gonna come back to bite him in the ass. Ya dig?</text>
+	</string>
+	<string id="dm_job_15">
+		<text>If you need hard cash, see Owl. He peddles everything a real man needs on Skadovsk - information, shooters, whatever. If you got something hot and valuable, like a document or a stalker's PDA - take it to Owl and get paid. You can also scare up good dough by taking on his personal orders. Just ask him if he needs something done.</text>
+	</string>
+	<string id="dm_job_2">
+		<text>You might want to ask Gonta. He and his crew have got quite a story to tell. A chimera turned up at Zaton not long ago, so Gonta and his men went after it. They split into two teams to track down the beast and sent on one of the hunters in search of the bloodsucker lair. They were a bit short-staffed when they finally smelled out the chimera, so another stalker, Magpie, came along. I don't know exactly how it all went down, but most accounts agree that Magpie legged it as soon as he saw the chimera. Gonta barely made it out of there, with one of his men badly wounded. But the chimera is still at large, so they're looking for people to lend a hand.</text>
+	</string>
+	<string id="dm_job_3">
+		<text>That's easy: if you want serious dough, Sultan's your man. He's the local boss, so if you make out like a goodfella, he'll find a job for you.</text>
+	</string>
+	<string id="dm_job_4">
+		<text>If you're good at stalking - that is, finding artifacts - talk to Beard. He's got a lot of respect here. He's the only man on Skadovsk who'll give you a good price for your artifacts. He's got the connections to transport them outside the Zone. Besides, he's a good man, you know... always there for you with advice or a suitable job.</text>
+	</string>
+	<string id="dm_job_5">
+		<text>There's a trader on Skadovsk, Owl's his name. Not the most pleasant of people. Always complaining how all the artifacts go to Beard and not him, but if you need money, you can see what's he's got to offer. That weasel deals in much more than ammo. He can tell you things, sell you things, buy your things and pay for things you know that interest him. Pay him a visit - he's on the second aft deck. I'm sure you can work something out together.</text>
+	</string>
+	<string id="dm_job_6">
+		<text>You can ask Vano, he hangs around at the Yanov bar. He got on the hook with the bandits - been trying to repay his debt three times already.  He's got experience and everything, can spot an anomaly with his eyes closed... and still he always manages to get in trouble. A bunch of people have suggested that he just take off. The Zone's too big for the mob to find him, but he's too proud to run away, and there aren't many people willing to help him work out his issue with the bandits...</text>
+	</string>
+	<string id="dm_job_7">
+		<text>Forget about jobs, man... The bandits have gotten really out of hand - they took Mitay prisoner and are demanding ransom. Mitay was one of the first stalkers here at Yanov, he built this place up so people could take cover during an emission, and now when he needs help no one gives a crap. No question about Freedom or Duty - they're too busy gnawing at each other's throats... But the rest - they should do something! Ah, what's the use... Mitay's own crew can't figure out how to free him. If you want to help them, talk to Grizzly; you can find him at the station bar.</text>
+	</string>
+	<string id="dm_job_8">
+		<text>Nitro, the Yanov technician, needs working materials. He's good with weapons and electronics alike, if you didn't know. But sometimes skills are not enough - he needs the right materials, so he's been asking around. The problem is that all the safe places have been cleaned out, while the rest are too dangerous for most. Nitro's hoping to find someone willing to take those risks, but I'm sure he'll pay good money for the trouble.</text>
+	</string>
+	<string id="dm_job_9">
+		<text>I heard Uncle Yar over at Yanov station was looking for a less-than-curious stalker to help him with something. Not sure why he don't ask his Freedom buddies... Anyways, he's a decent old man, so maybe you should talk to him and see if you can work something out.</text>
+	</string>
+	<string id="dm_job_do_not_know_1">
+		<text>Hrm... Don't know anyone like that.</text>
+	</string>
+	<string id="dm_job_do_not_know_2">
+		<text>I'd love to know that myself.</text>
+	</string>
+	<string id="dm_job_do_not_know_3">
+		<text>How the hell should I know?</text>
+	</string>
+	<string id="dm_job_general">
+		<text>Know anyone who'd have a job for me?</text>
+	</string>
+	<string id="dm_job_no_more_1">
+		<text>You've asked me that already.</text>
+	</string>
+	<string id="dm_job_no_more_2">
+		<text>Couldn't tell you anything new.</text>
+	</string>
+	<string id="dm_job_no_more_3">
+		<text>You've got my answer already.</text>
+	</string>
+	<string id="dm_universal_actor_exit">
+		<text>OK, forget about it.</text>
+	</string>
+	<string id="dm_universal_actor_start">
+		<text>I would like to ask you something.</text>
+	</string>
+	<string id="dm_universal_npc_start_0">
+		<text>Ask away.</text>
+	</string>
+	<string id="dm_universal_npc_start_1">
+		<text>Spit it out.</text>
+	</string>
+	<string id="dm_universal_npc_start_2">
+		<text>Shoot.</text>
+	</string>
+	<string id="dm_universal_npc_start_3">
+		<text>I'm listening.</text>
+	</string>
+	<string id="dm_wounded_general">
+		<text>Help!</text>
+	</string>
+	<string id="dm_wounded_medkit">
+		<text>Take this medkit.</text>
+	</string>
+	<string id="dm_wounded_sorry">
+		<text>Sorry, I got nothing.</text>
+	</string>
+	<string id="dm_traveler_bye">
+		<text>I see.</text>
+	</string>
+	<string id="dm_traveler_what_are_you_doing">
+		<text>What are you up to?</text>
+	</string>
+	<string id="dm_traveler_can_i_go_with_you">
+		<text>Can I go with you?</text>
+	</string>
+	<string id="dm_traveler_stalker_actor_companion_yes">
+		<text>Of course. The more the merrier.</text>
+	</string>
+	<string id="dm_traveler_stalker_actor_companion_no">
+		<text>No, sorry. I'm going my own way.</text>
+	</string>
+	<string id="dm_traveler_actor_go_with_squad">
+		<text>Let's go then.</text>
+	</string>
+	<string id="dm_traveler_take_me_to">
+		<text>I need to go some place, can you lead me there for a fee?</text>
+	</string>
+	<string id="dm_traveler_stalker_where_do_you_want">
+		<text>No problem. Where do you need to go? Take your pick.</text>
+	</string>
+	<string id="dm_traveler_actor_agree">
+		<text>I agree. Let's go.</text>
+	</string>
+	<string id="dm_traveler_actor_refuse">
+		<text>I've changed my mind.</text>
+	</string>
+	<string id="dm_traveler_stalker_i_cant_travel">
+		<text>No, I've got other urgent business to attend to.</text>
+	</string>
+	<string id="dm_stalker_doing_nothing_1">
+		<text>I'm just taking it easy.</text>
+	</string>
+	<string id="dm_stalker_doing_nothing_2">
+		<text>Nothing much, just getting a bit of R&R.</text>
+	</string>
+	<string id="dm_stalker_doing_nothing_3">
+		<text>What does it look like I'm doing? Not a damn thing.</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_monster">
+		<text>Tracking mutants.</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_bandit">
+		<text>I'm shadowing a couple of assholes. Friggin' retards...</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_killer">
+		<text>Tracking down a few mercenaries. Real bastards, these.</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_monolith">
+		<text>I'm tailing a squad of fanatics. Monolith fighters, that is...</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_zombied">
+		<text>I'm after some zombies. Too many of those poor bastards around...</text>
+	</string>
+	<string id="dm_traveler_travel_cost">
+		<text>OK. That will cost you</text>
+	</string>
+	<string id="dm_traveler_actor_dont_go_with_squad">
+		<text>You know, I've changed my mind.</text>
+	</string>
+	<string id="dm_traveler_actor_has_no_money">
+		<text>I don't have that much.</text>
+	</string>
+	<string id="dm_freedom_doing_nothing_1">
+		<text>Oh, nothing I guess.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_monster">
+		<text>I'm following some mutants. Someone's got to show them their place.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_bandit">
+		<text>I'm chasing some local thugs.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_killer">
+		<text>I'm out to get some mercenary scalps. They've got a debt that needs collecting.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_monolith">
+		<text>I'm after those screwy Monolith folk.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_duty">
+		<text>I'm trying to track down some of my debtors.</text>
+	</string>
+	<string id="dm_duty_doing_nothing_1">
+		<text>I'm not doing anything right now.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_monster">
+		<text>I'm hunting mutants, trying to purge the area of their filth.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_bandit">
+		<text>I'm on a mission, tracking down a bandit squad.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_killer">
+		<text>Mercenaries are my target. I'm following their squad's tracks.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_monolith">
+		<text>I'm after a Monolith squad.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_freedom">
+		<text>I'm chasing down those half baked assholes - Freedom, that's who...</text>
+	</string>
+	<string id="dm_stalker_searching_artefacts_1">
+		<text>I'm hunting for artifacts.</text>
+	</string>
+	<string id="dm_stalker_searching_artefacts_2">
+		<text>I ain't picking mushrooms... artifacts, more like.</text>
+	</string>
+	<string id="dm_stalker_searching_artefacts_3">
+		<text>I'm looking for artifacts.</text>
+	</string>
+	<string id="st_stalker_zat_sim_1">
+		<text>I'm headed toward the Boiler anomaly, the one next to a small grove.</text>
+	</string>
+	<string id="st_stalker_zat_sim_2">
+		<text>I'm moving out to the northern lake... gonna take some time off on the peninsula.</text>
+	</string>
+	<string id="st_stalker_zat_sim_3">
+		<text>I'm going beyond the northern lake - there's a decent camping spot there.</text>
+	</string>
+	<string id="st_stalker_zat_sim_4">
+		<text>I'm going to the woods beyond the northern lake.</text>
+	</string>
+	<string id="st_stalker_zat_sim_5">
+		<text>I'm headed to a small forest west of the sawmill.</text>
+	</string>
+	<string id="st_stalker_zat_sim_6">
+		<text>I'm headed for the hill that's west of the swamp. None of the swamp pollution can reach me there.</text>
+	</string>
+	<string id="st_stalker_zat_sim_7">
+		<text>I'm heading to the antenna complex. There's a nice little spot west of that.</text>
+	</string>
+	<string id="st_stalker_zat_sim_8">
+		<text>I'm headed for the woods west of Oakpine... come along if you like - I don't mind company.</text>
+	</string>
+	<string id="st_stalker_zat_sim_9">
+		<text>To a grove between the Iron Forest and the workshops.</text>
+	</string>
+	<string id="st_stalker_zat_sim_10">
+		<text>Toward the great bridge... there's supposed to be a safe, private little spot east of there.</text>
+	</string>
+	<string id="st_stalker_zat_sim_11">
+		<text>To a parking lot south of the old barge.</text>
+	</string>
+	<string id="st_stalker_zat_sim_12">
+		<text>Nothing special, just travelling. Gonna set up camp on a hill east of Skadovsk.</text>
+	</string>
+	<string id="st_stalker_zat_sim_13">
+		<text>To a grove between Izumrudnoye and the gas station.</text>
+	</string>
+	<string id="st_stalker_zat_sim_14">
+		<text>A fork in the road near the waste processing station.</text>
+	</string>
+	<string id="st_stalker_zat_sim_15">
+		<text>To the Boiler anomaly.</text>
+	</string>
+	<string id="st_stalker_zat_sim_16">
+		<text>To the ranger station. There's a building complex there, you've probably seen it. One of them even got furnaces - I wonder what kind of business they ran down there.</text>
+	</string>
+	<string id="st_stalker_zat_sim_17">
+		<text>To a grove west of the burnt farmstead.</text>
+	</string>
+	<string id="st_stalker_zat_sim_18">
+		<text>To a grove east of the Boiler anomaly.</text>
+	</string>
+	<string id="st_stalker_zat_sim_19">
+		<text>To a hill just past the northern lake.</text>
+	</string>
+	<string id="st_stalker_zat_sim_20">
+		<text>A little grove south of the burnt farmstead.</text>
+	</string>
+	<string id="st_stalker_zat_sim_21">
+		<text>I'm headed west of Skadovsk... where the pipes come out.</text>
+	</string>
+	<string id="st_stalker_zat_sim_22">
+		<text>I'm headed to a spot midway between Skadovsk and the dredge station.</text>
+	</string>
+	<string id="st_stalker_zat_sim_23">
+		<text>To a bayou near the old barge.</text>
+	</string>
+	<string id="st_stalker_zat_sim_24">
+		<text>To a creek near the Scar anomaly.</text>
+	</string>
+	<string id="st_stalker_zat_sim_25">
+		<text>To the gas station.</text>
+	</string>
+	<string id="st_stalker_zat_sim_26">
+		<text>To the Oakpine ravines.</text>
+	</string>
+	<string id="st_stalker_zat_b55">
+		<text>I want to look for artifacts in the Claw anomaly.</text>
+	</string>
+	<string id="st_stalker_zat_a1">
+		<text>I'm going toward a hill west of the Boiler anomaly.</text>
+	</string>
+	<string id="st_stalker_zat_a23_smart_terrain">
+		<text>To the Iron Forest anomaly.</text>
+	</string>
+	<string id="st_stalker_zat_b100">
+		<text>I'm going to the Iron Forest anomaly to look for artifacts.</text>
+	</string>
+	<string id="st_stalker_zat_b101">
+		<text>I'm going to the swamp. Sure, it ain't easy breathing with all that gas, but the artifacts make up for it.</text>
+	</string>
+	<string id="st_stalker_zat_b103_merc_smart">
+		<text>I'm going to the substation workshops. They say it's a nice place to hide from emissions, so I'm going to give it a test run.</text>
+	</string>
+	<string id="st_stalker_zat_b104_zombied">
+		<text>You know there's a sawmill nearby, that's where I'm headed. I want to double check it for anything of value.</text>
+	</string>
+	<string id="st_stalker_zat_b106_smart_terrain">
+		<text>I feel like taking some time off at the Izumrudnoye resort. Oh, sure it is a fine resort... for flesh and boars! Ha-ha! Still, I'm sure I can camp out there a bit.</text>
+	</string>
+	<string id="st_stalker_zat_b12">
+		<text>To a bridge, I think it's marked Preobrazhensky on the map.</text>
+	</string>
+	<string id="st_stalker_zat_b14_smart_terrain">
+		<text>To the dredge station. I bet there are still some valuables to be found in the area.</text>
+	</string>
+	<string id="st_stalker_zat_b18">
+		<text>To the old barge.</text>
+	</string>
+	<string id="st_stalker_zat_b20_smart_terrain">
+		<text>I want to swing by the burnt farmstead, see if any new artifacts have popped up.</text>
+	</string>
+	<string id="st_stalker_zat_b28">
+		<text>To the southern plateau.</text>
+	</string>
+	<string id="st_stalker_zat_b33">
+		<text>To the crack by the gas station.</text>
+	</string>
+	<string id="st_stalker_zat_b38">
+		<text>I'm going to the Krug antenna complex - need a safe place to hide from emissions. There's supposed to be lots of monsters there, unfortunately.</text>
+	</string>
+	<string id="st_stalker_zat_b38u">
+		<text>I'm going to the Krug antenna complex - need a safe place to hide from emissions. There's supposed to be lots of monsters there, unfortunately.</text>
+	</string>
+	<string id="st_stalker_zat_b39">
+		<text>I'm going to look for artifacts near Oakpine. Hopefully the mutts will keep at bay.</text>
+	</string>
+	<string id="st_stalker_zat_b40_smart_terrain">
+		<text>To the cesspool... you know, the waste processing station. It's as good a place as any to hide from emissions.</text>
+	</string>
+	<string id="st_stalker_zat_b42_smart_terrain">
+		<text>I'm headed to the boat pier on the northern lake. Once there I'll play it by ear.</text>
+	</string>
+	<string id="st_stalker_zat_b52">
+		<text>I'm going to the docks, where the cranes are. A decent place to camp out.</text>
+	</string>
+	<string id="st_stalker_zat_b53">
+		<text>I'm planning to look for artifacts in the Boiler anomaly. I just hope my suit will survive this little hot springs vacation.</text>
+	</string>
+	<string id="st_stalker_zat_b54">
+		<text>To the Scar anomaly.</text>
+	</string>
+	<string id="st_stalker_zat_b56">
+		<text>I want to test how fireproof my equipment is, plus look for artifacts - all in the Circus anomaly.</text>
+	</string>
+	<string id="st_stalker_zat_b5_smart_terrain">
+		<text>To the ranger station.</text>
+	</string>
+	<string id="st_stalker_zat_b7">
+		<text>I'm going to camp out on Shevchenko. It's safe from emissions, and a tough spot for mutants to attack.</text>
+	</string>
+	<string id="st_stalker_zat_b7_stalker_raider">
+		<text>I'm going to camp out on Shevchenko. It's safe from emissions, and a tough spot for mutants to attack.</text>
+	</string>
+	<string id="st_stalker_zat_medic_home_smart">
+		<text>I'm going to the docks, where the cranes are. A decent place to camp out.</text>
+	</string>
+	<string id="st_stalker_zat_stalker_base_smart">
+		<text>I want to dump my loot and have a cold one or two. Skadovsk is just the place.</text>
+	</string>
+	<string id="st_stalker_jup_a10_smart_terrain">
+		<text>I'm going to the army checkpoint, next to the Jupiter plant.</text>
+	</string>
+	<string id="st_stalker_jup_a12">
+		<text>To the container warehouse.</text>
+	</string>
+	<string id="st_stalker_jup_a12_merc">
+		<text>I'm headed to a totally inconspicuous area between the container warehouse and the southern tunnel.</text>
+	</string>
+	<string id="st_stalker_jup_a6">
+		<text>To Yanov station. Finally a time to relax.</text>
+	</string>
+	<string id="st_stalker_jup_b1">
+		<text>To the tunnel north of Kopachy.</text>
+	</string>
+	<string id="st_stalker_jup_b19">
+		<text>I'm going to a really creepy place, the Kopachy village... or whatever is left of it. Yes, I've stocked up on extra antirads and ammo - I'm gonna need ‘em!</text>
+	</string>
+	<string id="st_stalker_jup_b200">
+		<text>To the cement factory. A nice observation point, and no one can sneak up on you there.</text>
+	</string>
+	<string id="st_stalker_jup_b200_tushkan_smart_terrain">
+		<text>To the cement factory. Gonna check out that basement.</text>
+	</string>
+	<string id="st_stalker_jup_b202">
+		<text>To the substation near Yanov.</text>
+	</string>
+	<string id="st_stalker_jup_b203">
+		<text>I'm going to a spot near the southern railroad tunnel.</text>
+	</string>
+	<string id="st_stalker_jup_b204">
+		<text>I'm going to a cooling pond near the Jupiter plant.</text>
+	</string>
+	<string id="st_stalker_jup_b205_smart_terrain">
+		<text>I'm going to the Volkhov AA complex, gonna hunt me some zombies.</text>
+	</string>
+	<string id="st_stalker_jup_b205_smart_terrain_tushkano">
+		<text>To the bunker, you know, the one at the Volkhov AA complex.</text>
+	</string>
+	<string id="st_stalker_jup_b206">
+		<text>To the anomalous grove near the quarry. Might find an artifact or two.</text>
+	</string>
+	<string id="st_stalker_jup_b207">
+		<text>I'm going to the quarry, where the construction workers' vans are.</text>
+	</string>
+	<string id="st_stalker_jup_b207_depot_attack">
+		<text>There's this spot between the quarry and Yanov station. I'm gonna lay low there for a while.</text>
+	</string>
+	<string id="st_stalker_jup_b208">
+		<text>I'm going to the eastern tunnel, one that goes under the Jupiter plant.</text>
+	</string>
+	<string id="st_stalker_jup_b209">
+		<text>To the Bitumen anomaly. Gonna see how fireproof my suit is.</text>
+	</string>
+	<string id="st_stalker_jup_b211">
+		<text>I'm going to the Plavni anomaly to look for artifacts. Got enough antidote - it's the monsters I'm worried about.</text>
+	</string>
+	<string id="st_stalker_jup_b212">
+		<text>To the ventilation complex, between the factory and the container warehouse. Why? Eh, hell if I know.</text>
+	</string>
+	<string id="st_stalker_jup_b219">
+		<text>I'm going to the Jupiter workshops. Maybe I'll find out what gives the place such a bad name.</text>
+	</string>
+	<string id="st_stalker_jup_b25">
+		<text>I'm going to the very bottom of the quarry. Stalkers say they find a lot of artifacts down there.</text>
+	</string>
+	<string id="st_stalker_jup_b32">
+		<text>To the parking lot where the old vehicles are. Gonna look for artifacts in electric anomalies.</text>
+	</string>
+	<string id="st_stalker_jup_b4">
+		<text>There's a neat little spot located between the Volkhov AA complex and the container warehouse, and that's where I'm headed.</text>
+	</string>
+	<string id="st_stalker_jup_b41">
+		<text>To the scientists' bunker.</text>
+	</string>
+	<string id="st_stalker_jup_b46">
+		<text>To the cooling tower northwest of Yanov station.</text>
+	</string>
+	<string id="st_stalker_jup_b47">
+		<text>Toward the Jupiter plant, but I have no desire to go inside. I'll hang around the administration buildings and see what my options are.</text>
+	</string>
+	<string id="st_stalker_jup_b6_anom_2">
+		<text>I'm going to the Ash Heap anomaly, beyond Kopachy.</text>
+	</string>
+	<string id="st_stalker_jup_b8_smart_terrain">
+		<text>I'm going to the Jupiter workshops. They say a helicopter went down in that area, so I thought I'd check it out.</text>
+	</string>
+	<string id="st_stalker_jup_sim_1">
+		<text>I'm going to the dilapidated train located between the Volkhov AA complex and the parking lot.</text>
+	</string>
+	<string id="st_stalker_jup_sim_2">
+		<text>I'm going to the southern tunnel, just to be safe in case of an emission.</text>
+	</string>
+	<string id="st_stalker_jup_sim_3">
+		<text>I'm going to this one spot between Yanov and Kopachy.</text>
+	</string>
+	<string id="st_stalker_jup_sim_4">
+		<text>I'm going to a spot not far from the canal, south of the cement factory.</text>
+	</string>
+	<string id="st_stalker_jup_sim_5">
+		<text>I'm going to a spot near the canal, north of the Jupiter plant.</text>
+	</string>
+	<string id="st_stalker_jup_sim_6">
+		<text>I'm going to check out the quarry.</text>
+	</string>
+	<string id="st_stalker_jup_sim_7">
+		<text>I'm going to check out the quarry.</text>
+	</string>
+	<string id="st_stalker_jup_sim_8">
+		<text>I'm going to check out the area north of Yanov.</text>
+	</string>
+	<string id="st_stalker_jup_sim_9">
+		<text>Toward the Volkhov AA complex. There's a nice spot to camp out, between the complex and the Kopachy village.</text>
+	</string>
+	<string id="st_stalker_jup_sim_10">
+		<text>Oh, just travelling... Heading toward the container warehouse.</text>
+	</string>
+	<string id="st_stalker_jup_sim_11">
+		<text>I'm surveying the area. Right now I'm going to check out what's south of the army checkpoint.</text>
+	</string>
+	<string id="st_stalker_jup_sim_12">
+		<text>To the helicopter pad, the one between the factory and the container warehouse.</text>
+	</string>
+	<string id="st_stalker_jup_sim_13">
+		<text>I'm going to this spot south of Yanov station, by the railroad.</text>
+	</string>
+	<string id="st_stalker_jup_sim_14">
+		<text>To a spot north of Yanov station.</text>
+	</string>
+	<string id="st_stalker_jup_sim_15">
+		<text>To the anomalous grove.</text>
+	</string>
+	<string id="st_stalker_jup_sim_16">
+		<text>To a spot south of the AA complex.</text>
+	</string>
+	<string id="st_stalker_jup_sim_17">
+		<text>To the cooling pond that's right by the Concrete Bath anomaly.</text>
+	</string>
+	<string id="st_stalker_jup_sim_18">
+		<text>I'm going to check out the area around the plant.</text>
+	</string>
+	<string id="st_stalker_jup_sim_19">
+		<text>I'm going to check out the area around the plant.</text>
+	</string>
+	<string id="st_stalker_pri_a15">
+		<text>To the yard behind the laundromat.</text>
+	</string>
+	<string id="st_stalker_pri_a16">
+		<text>To the laundromat, the safest place around.</text>
+	</string>
+	<string id="st_stalker_pri_a17">
+		<text>To the hospital. I hope I won't run into those Monolith lunatics along the way...</text>
+	</string>
+	<string id="st_stalker_pri_a18_smart_terrain">
+		<text>To the book store... I heard it provides decent cover from emissions.</text>
+	</string>
+	<string id="st_stalker_pri_a20">
+		<text>I'm going to see the local attraction - the All-People Friendship symbol. It's not far from the book store.</text>
+	</string>
+	<string id="st_stalker_pri_a21_smart_terrain">
+		<text>To the old grocery store. You ain't gonna find any fresh bread in there nowadays, but it's good enough to hide from an emission.</text>
+	</string>
+	<string id="st_stalker_pri_a22_smart_terrain">
+		<text>To the Berezka store.</text>
+	</string>
+	<string id="st_stalker_pri_a25_smart_terrain">
+		<text>To the old kindergarten.</text>
+	</string>
+	<string id="st_stalker_pri_a28">
+		<text>To the movie theater square, near the Prometheus monument.</text>
+	</string>
+	<string id="st_stalker_pri_b301">
+		<text>I'm headed to the school building. They say it's teeming with monsters, but it'll also do in case an emission hits.</text>
+	</string>
+	<string id="st_stalker_pri_b303">
+		<text>I'm headed to the old service center. There's supposed to be an anomaly on the first floor, and maybe some artifacts too.</text>
+	</string>
+	<string id="st_stalker_pri_b304">
+		<text>I'm exploring this part of town. Right now I'm headed to the old grocery store.</text>
+	</string>
+	<string id="st_stalker_pri_b304_monsters_smart_terrain">
+		<text>I'm exploring this part of town. Right now I'm headed to the old grocery store.</text>
+	</string>
+	<string id="st_stalker_pri_b305_dogs">
+		<text>I'm surveying the area. Right now I want to check out this one building behind the apartment complex.</text>
+	</string>
+	<string id="st_stalker_pri_b306">
+		<text>I want to search the public amenities center, I think it was called Yubileiny.</text>
+	</string>
+	<string id="st_stalker_pri_b307">
+		<text>I'm searching this area for anomalies. I heard there's a fire anomaly in a yard, west of the kindergarten...</text>
+	</string>
+	<string id="st_stalker_pri_b35_envoy">
+		<text>Oh, I'm just touring the town. Heading to the apartment complex right now.</text>
+	</string>
+	<string id="st_stalker_pri_b35_mercs">
+		<text>Oh, I'm just touring the town. Heading to the apartment complex right now.</text>
+	</string>
+	<string id="st_stalker_pri_b35_military">
+		<text>Oh, I'm just touring the town. Heading to the apartment complex right now.</text>
+	</string>
+	<string id="st_stalker_pri_b36_smart_terrain">
+		<text>I'm just travelling around, heading to the river port right now. Hopefully I won't run into any Monolith fanatics...</text>
+	</string>
+	<string id="st_stalker_pri_b302">
+		<text>I'm looking for a place in Pripyat with lots of artifacts and no monsters or Monolith fighters... He-he... Seriously, I'm going to check out this anomaly I heard of, just south of the river port.</text>
+	</string>
+	<string id="st_stalker_pri_sim_1">
+		<text>Toward the Prometheus movie theater.</text>
+	</string>
+	<string id="st_stalker_pri_sim_2">
+		<text>To the movie theater square, near the Prometheus monument.</text>
+	</string>
+	<string id="st_stalker_pri_sim_3">
+		<text>I want to lay low for a while and catch my breath. There's a neat little spot in a yard north of the kindergarten that'd be perfect for it.</text>
+	</string>
+	<string id="st_stalker_pri_sim_4">
+		<text>South of the apartment complex.</text>
+	</string>
+	<string id="st_stalker_pri_sim_5">
+		<text>I'm going to this place between the kindergarten and the apartment complex.</text>
+	</string>
+	<string id="dm_anomalies_8">
+		<text>There's this place they call Scar, where the ground looks like it has been hacked with an axe. People have found artifacts there, but once you go in there something weird starts to happen. That thing hits your brains so hard you almost forget how to breathe, let alone try to get your ass out of there.</text>
+	</string>
+	<string id="dm_anomalies_1">
+		<text>You know where the dredge station is? It's been battered up by gravitational anomalies, but not too bad for an experienced stalker. Just keep throwing bolts as usual. There’s also radiation, inside and out - it’s like being next to a massive chunk of enriched uranium.</text>
+	</string>
+	<string id="dm_anomalies_4">
+		<text>There's an old substation here, also called the Iron Forest. You'll understand why when you see it. Some people claim to have found clusters of artifacts in that area after an emission hit. It’s not all that dangerous, mainly electric anomalies and a bit of radiation... There’s also a few poltergeists, that will bury you in all kinds of crap if you don't hide in time.</text>
+	</string>
+	<string id="dm_job_12">
+		<text>Work? I don’t know, to be honest. But if you get a chance to help Freedom out - go see our boss at Yanov. Go to the southern wing and see Loki - that's him. Remember, if you believe in the advancement of humankind, in greater consciousness and significance of the Zone's gifts, you'll be making the right choice.</text>
+	</string>
+	<string id="dm_job_13">
+		<text>No idea. But if you find something that can help us in our fight against the Zone and those who think it's a gift rather than a curse, go see the commander of Duty's expedition unit - Lieutenant Colonel Shulga. He's the man in charge at Yanov station. You'll find him in the northern wing. One thing’s for sure - any civilian who contributes to Duty’s overall success will get a handsome reward.</text>
+	</string>
+	<string id="dm_information_19">
+		<text>Everyone's talking about some weird stuff going on at the old cooling tower. If you turn on the common frequency, you catch bits and pieces of distress calls, sounding like some poor bastard trying to get out of an anomaly. When you ask for coordinates, there's no reply. The weirdest thing though is the sound. That kind of distortion can’t be explained away...</text>
+	</string>
+	<string id="st_stalker_zat_sim_27">
+		<text>I’m headed to a place half way between Skadovsk and Shevchenko.</text>
+	</string>
+	<string id="st_stalker_jup_a9">
+		<text>To Jupiter. I probably won’t venture too far in though.</text>
+	</string>
+</string_table>

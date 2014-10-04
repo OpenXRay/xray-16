@@ -1,0 +1,17 @@
+[smart_terrain]
+squad_id = 7
+max_population = 1
+respawn_params = respawn@pri_sim_4
+arrive_dist = 100
+
+[respawn@pri_sim_4]
+spawn_zombied
+
+[spawn_zombied]
+spawn_squads =  zombied_sim_squad_novice, zombied_sim_squad_advanced, zombied_sim_squad_veteran
+spawn_num = 2
+
+[exclusive]
+pri_b35_envoy_after = pripyat\pri_b35_envoy_logic.ltx
+pri_b35_envoy_squad_1 = pripyat\pri_b35_envoy_logic.ltx
+pri_b35_envoy_squad_2 = pripyat\pri_b35_envoy_logic.ltx

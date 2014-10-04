@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="speech_attack">
+		<text>Vљichni do ъtoku!</text>
+	</string>
+	<string id="speech_covermeartifact">
+		<text>Jdu pro ten artefakt! Kryjte mм!</text>
+	</string>
+	<string id="speech_followme">
+		<text>Za mnou!</text>
+	</string>
+	<string id="speech_guardartifact">
+		<text>Zatнm ten artefakt hlнdejte. Ne abyste ho brali!</text>
+	</string>
+	<string id="speech_holdingpos">
+		<text>Brбnнm pozici!</text>
+	</string>
+	<string id="speech_holdpos">
+		<text>Zщstaтte na mнstech!</text>
+	</string>
+	<string id="speech_icoverartifact">
+		<text>Berte artefakt! Budu vбs krэt!</text>
+	</string>
+	<string id="speech_needhelp">
+		<text>Pomoc!</text>
+	</string>
+	<string id="speech_needmoney">
+		<text>Nemбm prachy, kup mi lepљн vэbavu!</text>
+	</string>
+	<string id="speech_no">
+		<text>Ne.</text>
+	</string>
+	<string id="speech_noenemy">
+		<text>Nikde nikdo!</text>
+	</string>
+	<string id="speech_report">
+		<text>Nahlaste se!</text>
+	</string>
+	<string id="speech_retreat">
+		<text>Ъstup!</text>
+	</string>
+	<string id="speech_returntheartefact">
+		<text>Vezmмte jim ten artefakt!</text>
+	</string>
+	<string id="speech_roger">
+		<text>Rozumнm.</text>
+	</string>
+	<string id="speech_silence">
+		<text>Drћ hubu!</text>
+	</string>
+	<string id="speech_sticktogether">
+		<text>Zщstaтte pohromadм.</text>
+	</string>
+	<string id="speech_takeartifact">
+		<text>Berte artefakt!</text>
+	</string>
+</string_table>

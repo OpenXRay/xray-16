@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="team_1_desc">
+		<text>Los anarquistas de la Zona. Dicen que la Zona es un santuario de libertad y consideran que todas las leyes, normas y convenciones del exterior no son vбlidas aquн. Su lema es "haz lo que quieras y ocъpate de tus asuntos". Libertad hace frente a los intentos del gobierno por controlar la Zona y estб en lucha con los mercenarios. Sus miembros estбn equipados principalmente con armas de fuego soviйticas y rusas.</text>
+	</string>
+	<string id="team_1_name">
+		<text>Facciуn Libertad (stalkers libres)</text>
+	</string>
+	<string id="team_2_desc">
+		<text>Estos matones aventureros vienen de todo el mundo y aceptan los trabajos mбs sucios. Su lema es: "El dinero es lo primero". Luchan por el control total de los artefactos de la Zona, siempre que siga habiendo demanda. Los mercenarios estбn equipados principalmente con armas occidentales.</text>
+	</string>
+	<string id="team_2_name">
+		<text>Facciуn de los mercenarios (los matones)</text>
+	</string>
+</string_table>

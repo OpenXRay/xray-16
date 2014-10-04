@@ -1,0 +1,993 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="dm_anomalies_10">
+		<text>A Zaton c'и un punto in cui le anomalie di calore appaiono sott'acqua. Lo chiamano il "boiler" perchй c'и molto vapore che fuoriesce dal terreno. Se pensi che il vapore non possa fare danni, allora ti sbagli. Gli stalker piщ esperti dicono che questa anomalia di vapore ti colpisce con la stessa potenza di un'anomalia di calore, se non peggio. La temperatura и di poco piщ bassa, ma ti strina ugualmente. E riguardo ai manufatti, hanno trovato i soliti di fuoco.</text>
+	</string>
+	<string id="dm_anomalies_11">
+		<text>Dicono che alla cava ci sia un bel posticino con tanti manufatti, seppur ricco di anomalie. Sul fondo ci sono talmente tante bolle generate dalle anomalie gassose che fanno male agli occhi, anche se si indossa una maschera antigas.</text>
+	</string>
+	<string id="dm_anomalies_12">
+		<text>Cumulo di cenere и il vecchio cimitero nei pressi di Kopachy. Vi si trovano un sacco di anomalie di calore e ogni tanto anche degli zombi. La gente cerca di stare alla larga da quel posto, ma ci vanno quando hanno bisogno di manufatti.</text>
+	</string>
+	<string id="dm_anomalies_13">
+		<text>Dicono che sono stati rinvenuti dei manufatti anche nel parcheggio. Ci sono ancora dei veicoli risalenti al primo disastro di Chernobyl... quei ferri mandano su di giri il contatore di radiazioni. Inoltre, quel posto и anche pieno di anomalie elettriche.</text>
+	</string>
+	<string id="dm_anomalies_14">
+		<text>Nel Boschetto putrido, dove gli alberi sono deformati per via dell'acido. La gente che c'и stata dice che и pieno di anomalie gassose. C'и talmente tanto gas nell'aria che и impossibile vedere bene, ma con l'esperienza giusta и comunque possibile trovare i manufatti che si stavano cercando.</text>
+	</string>
+	<string id="dm_anomalies_15">
+		<text>Se vuoi dei manufatti, cerca quelli di tipo acido. Il posto migliore per procurarseli и il Bagno di cemento. Non avrai molta concorrenza: a nessuno piace quel posto perchй и troppo vicino all'edificio Jupiter.</text>
+	</string>
+	<string id="dm_anomalies_16">
+		<text>Non lontano dallo stabilimento Jupiter c'и un tratto di strada sprofondato. Lo chiamano Bitume perchй lм l'asfalto si и sciolto. In quel punto ci sono parecchie anomalie, per esempio anomalie di calore mescolate ad anomalie gravitazionali. E poichй sono due tipi di anomalie diversi, anche i manufatti lo saranno.</text>
+	</string>
+	<string id="dm_anomalies_17">
+		<text>Dietro lo stabilimento di cemento c'и un piccolo porto chiamato Fen. И diventato una fetida palude e l'acqua и piena di anomalie gassose. Non и nemmeno piщ definibile acqua, quanto piщ acido. Lм sono stati ritrovati dei manufatti, ma quel posto brulica anche di mostri.</text>
+	</string>
+	<string id="dm_anomalies_18">
+		<text>Cerca nel vecchio stabilimento di cemento. Ci sono parecchie anomalie, ma ne vale la pena. Certo, ci sono dei punti dove i manufatti sono piщ facili da raggiungere, ma c'и anche piщ concorrenza. Qui l'unico intralcio sono i criceti, e li incontrerai solo se vai sottoterra.</text>
+	</string>
+	<string id="dm_anomalies_19">
+		<text>Ti conviene cercare vicino alla Pinquercia. И quella cosa che cresce tra le colline, sopra le anomalie gassose. Tutti la chiamano cosм da quando un secchione ha scoperto che la corteccia di quell'albero и sia di pino che di quercia. Se vuoi cercare dei manufatti in quel posto ti servirа una buona protezione dalle sostanze chimiche. Portati anche parecchie munizioni, perchй su quelle colline vivono branchi e branchi di cani.</text>
+	</string>
+	<string id="dm_anomalies_2">
+		<text>A volte non и necessario infilarsi in un'anomalia per trovare un manufatto. Mi и stato detto che qualcuno ne ha trovato uno in mezzo a un campo. Questo stalker aveva un rilevatore che iniziava a fare le bizze, cosм ha cambiato le batterie. Fatto questo il rilevatore ha subito individuato qualcosa e lui si и ritrovato un manufatto per le mani. Una bella fortuna, vero? Ecco come va la Zona: a volte ti punisce e altre ti ricompensa.</text>
+	</string>
+	<string id="dm_anomalies_20">
+		<text>Degli stalker esperti hanno detto che a volte i manufatti si spostano all'esterno delle anomalie. Il tuo rilevatore inizia a emettere dei suoni, tu controlli ma non trovi niente. Significa che un manufatto "nomade" ti и passato accanto, ma non ha senso mettersi a inseguirlo. И la Zona a decidere a chi assegnarlo.</text>
+	</string>
+	<string id="dm_anomalies_21">
+		<text>Per il momento nessuno ha cercato dei manufatti a Pripyat. Tutti quelli che conosco sono arrivati da poco, quindi per il momento sono prudenti.</text>
+	</string>
+	<string id="dm_anomalies_22">
+		<text>Non so se qualcuno conosce i punti giusti in cui cercare. Finora Pripyat и stata esplorata poco.</text>
+	</string>
+	<string id="dm_anomalies_23">
+		<text>Io cercherei nelle gallerie sotterranee. Dicono che sotto la cittа ce ne sono a centinaia.</text>
+	</string>
+	<string id="dm_anomalies_24">
+		<text>Non si sa molto di quei posti, a parte le storie di Garry. Lui dice che c'и un posto dove un'enorme vite sbuca da un'anomalia acida, alta dieci piani. Forse ci sta solo prendendo in giro, ma fossi in te cercherei dei manufatti in quella vite.</text>
+	</string>
+	<string id="dm_anomalies_3">
+		<text>Il posto dove andare a colpo sicuro и la palude acida. И piena di anomalie gravitazionali, ma sono semplici da individuare. Tieni d'occhio la superficie dell'acqua e non ti potrai sbagliare. Le anomalie gassose sono piщ problematiche, perchй non ti tolgono tutta l'aria da respirare. Finirci dentro non и affatto divertente, credimi. Quella roba attraversa le tute piщ rapidamente dell'acido solforico.</text>
+	</string>
+	<string id="dm_anomalies_5">
+		<text>Ci sono numerose anomalie di calore alla fattoria bruciata, in cima alla collina. Lм sono stati ritrovati dei manufatti di fuoco. Cerca nelle case: quella che contiene il maggior numero di anomalie dopo un'emissione sarа anche quella dove troverai i manufatti.</text>
+	</string>
+	<string id="dm_anomalies_6">
+		<text>Probabilmente ce ne sono parecchi nelle caverne sotto la fattoria bruciata. Se sali sulla collina con un rilevatore non smetterа piщ di emettere segnali. Raggiungerle и facile: infilati dall'apertura in alto. La parte difficile и uscire, con tutte le anomalie che ci sono lа sotto. Sono per lo piщ vortici e acidi. Alcuni dicono di aver visto in quel buco qualcosa che ricorda una cometa. Un bell'insieme di pericoli, in effetti, ma probabilmente ci sarа anche una bella varietа di manufatti.</text>
+	</string>
+	<string id="dm_anomalies_7">
+		<text>Hai mai visto un'anomalia Circo? И un enorme trampolino con due comete che gli girano intorno: un vero spettacolo. Perт bisogna guardarlo da lontano, perchй il Circo и incandescente come l'inferno, formato da numerose anomalie di calore. Contiene anche numerosi manufatti, ma sono protetti da un feroce poltergeist di fuoco che cercherа di arrostirti non appena ti avvicinerai.</text>
+	</string>
+	<string id="dm_anomalies_9">
+		<text>Se ti interessano i manufatti gravitazionali, cercali nell'anomalia Zanna. Non и difficile trovarla: le anomalie hanno mutato il terreno, spaccando mezza collina. Si sono create delle caverne riempitesi immediatamente di snork. Fortunatamente escono di rado.</text>
+	</string>
+	<string id="dm_anomalies_do_not_know_1">
+		<text>Nella Zona, amico, nella Zona. Non arrenderti mai.</text>
+	</string>
+	<string id="dm_anomalies_do_not_know_2">
+		<text>Ottima domanda. Fammi sapere quando avrai trovato la risposta!</text>
+	</string>
+	<string id="dm_anomalies_do_not_know_3">
+		<text>Dove, quando, perchй... Ricorda, una volta trovato il tuo posto d'oro, tienitelo per te.</text>
+	</string>
+	<string id="dm_anomalies_general">
+		<text>Dove posso trovarli?</text>
+	</string>
+	<string id="dm_anomalies_no_more_1">
+		<text>Te l'ho giа detto.</text>
+	</string>
+	<string id="dm_anomalies_no_more_2">
+		<text>No, non so nient'altro.</text>
+	</string>
+	<string id="dm_anomalies_no_more_3">
+		<text>И tutto quello che so. Chiedi a qualcun altro.</text>
+	</string>
+	<string id="dm_hello_0">
+		<text>Che si dice, fratello?</text>
+	</string>
+	<string id="dm_hello_1">
+		<text>Salve!</text>
+	</string>
+	<string id="dm_hello_10">
+		<text>Salve, stalker.</text>
+	</string>
+	<string id="dm_hello_11">
+		<text>Salve.</text>
+	</string>
+	<string id="dm_hello_12">
+		<text>Che cosa vuoi?</text>
+	</string>
+	<string id="dm_hello_13">
+		<text>Cosa?</text>
+	</string>
+	<string id="dm_hello_14">
+		<text>Comincia a parlare.</text>
+	</string>
+	<string id="dm_hello_15">
+		<text>Buon pomeriggio, maggiore, signore!</text>
+	</string>
+	<string id="dm_hello_16">
+		<text>Buon pomeriggio!</text>
+	</string>
+	<string id="dm_hello_17">
+		<text>Ti ascolto, maggiore, signore!</text>
+	</string>
+	<string id="dm_hello_2">
+		<text>Sм, ciao.</text>
+	</string>
+	<string id="dm_hello_3">
+		<text>Cosa?</text>
+	</string>
+	<string id="dm_hello_4">
+		<text>Ma guarda chi c'и.</text>
+	</string>
+	<string id="dm_hello_5">
+		<text>Ehi, stalker. Perchй tanta fretta?</text>
+	</string>
+	<string id="dm_hello_6">
+		<text>Come va?</text>
+	</string>
+	<string id="dm_hello_7">
+		<text>Salve, amico.</text>
+	</string>
+	<string id="dm_hello_8">
+		<text>Ehi, ciao, amico.</text>
+	</string>
+	<string id="dm_hello_9">
+		<text>Salve.</text>
+	</string>
+	<string id="dm_hello_general">
+		<text>Ehi!</text>
+	</string>
+	<string id="dm_help_0">
+		<text>Aiutami, amico!</text>
+	</string>
+	<string id="dm_help_1">
+		<text>Salvami, fratello, sto morendo...</text>
+	</string>
+	<string id="dm_help_10">
+		<text>Mi serve assistenza medica!</text>
+	</string>
+	<string id="dm_help_11">
+		<text>Un kit di pronto soccorso... presto!</text>
+	</string>
+	<string id="dm_help_2">
+		<text>Aiutami, amico... Aah, che male!</text>
+	</string>
+	<string id="dm_help_3">
+		<text>Dammi un kit di pronto soccorso... presto...</text>
+	</string>
+	<string id="dm_help_4">
+		<text>Amico... argh... ti prego, aiutami!</text>
+	</string>
+	<string id="dm_help_5">
+		<text>Ehi, mi serve un kit di pronto soccorso... svelto...</text>
+	</string>
+	<string id="dm_help_6">
+		<text>Aiutami, stalker... un kit di pronto soccorso, ti prego...</text>
+	</string>
+	<string id="dm_help_7">
+		<text>Sono ferito... aiutami!</text>
+	</string>
+	<string id="dm_help_8">
+		<text>Mi serve un kit di pronto soccorso!</text>
+	</string>
+	<string id="dm_help_9">
+		<text>Un kit di pronto soccorso!</text>
+	</string>
+	<string id="dm_information_1">
+		<text>Hai sentito della stazione di drenaggio a est della Skadovsk? Dicono che di notte si vede luccicare qualcosa di strano... troppo strano anche per la Zona, pensa. Non so se vale la pena di andare a controllare. Potrei scoprire qualcosa di valore, ma non so se и il caso di rischiare le chiappe... Che dilemma...</text>
+	</string>
+	<string id="dm_information_10">
+		<text>Da queste parti c'и solo vecchia roba arrugginita. Prendi per esempio quell'autocolonna in rovina sul ponte Preobrazhensky... и coperta di ruggine, proprio come il ponte. Molti vorrebbero ispezionare quell'area, se non fosse per gli snork e le anomalie...</text>
+	</string>
+	<string id="dm_information_11">
+		<text>Hai sentito che Sultan ha intenzione di rilevare l'attivitа di Beard? La Skadovsk non и abbastanza grande per soddisfare la sua bramosia di denaro, vuole una fetta ancora piщ grande della torta... Ma noi gli abbiamo detto "Non se ne parla, Josй!". Beard e i nostri ragazzi gliel'hanno fatta vedere. L'operazione criminale di Sultan non attecchirа in questo posto.</text>
+	</string>
+	<string id="dm_information_12">
+		<text>Wow, hai sentito la notizia? Quel verme di Sultan ha stretto la sua morsa intorno a Beard... non so di preciso cosa abbia fatto, ma ha messo Beard alle strette! Cosa sta diventando la Zona? Se andiamo avanti cosм la Skadovsk si trasformerа in men che non si dica in un covo di banditi!</text>
+	</string>
+	<string id="dm_information_13">
+		<text>Hai sentito parlare dell'Oasi, fratello? Dicono che и un posto difficilissimo da trovare e, anche quando sai dov'и, и ancora piщ difficile da raggiungere. Dicono che ci sia un lago. Se ci entri guarirai da ogni male e tutte le ferite scompariranno all'istante! Ah, stare a parlare non serve a niente. Hai visto quanti stalker novellini sono venuti qui, al centro della Zona? Alcuni cercano un tesoro di manufatti, altri sono semplicemente curiosi, ma la maggior parte di loro spera di trovare l'Oasi. Si dice che sia nascosta da qualche parte...</text>
+	</string>
+	<string id="dm_information_14">
+		<text>Dicono che la Zona stia per morire... Qualcuno ha trovato l'Oasi e si и preso il suo manufatto, il Cuore dell'Oasi. Ora la Zona si sposterа in un'altra dimensione e gli stalker non riusciranno mai piщ a uscirvi... Sto scherzando, amico. Ma hanno trovato davvero un nuovo manufatto. Gli scienziati ci stanno lavorando nel loro bunker in questo preciso istante.</text>
+	</string>
+	<string id="dm_information_15">
+		<text>Hai sentito di Topol? Ha trovato un nuovo posto in cui inviare i suoi uomini, i quali sono stati ben felici di ubbidire. La loro scappatella si и conclusa con un controllore che gli ha messo a ferro e fuoco il cervello. Sarebbero tutti in un ospedale se non fosse stato per questo stalker che era con loro. Quando Topol ha ripreso i sensi in seguito al processo di zombificazione, quello stalker era accovacciato accanto al controllore e gli stava tagliando le orecchie.</text>
+	</string>
+	<string id="dm_information_16">
+		<text>Hai sentito del villaggio di Kopachy? Quando il primo disastro colpм la centrale di Chernobyl, quell'area fu colpita al punto che decisero di seppellire tutto il villaggio. Ora non resta altro che piccoli cumuli radioattivi, al posto delle case. Dicono che prima del disastro era un posto da favola. Tremo a pensare cosa ci si potrebbe trovare oggi. Tutti hanno troppa paura per andare a controllare. Ma se si sbagliano... potrebbe essere una miniera d'oro di manufatti!</text>
+	</string>
+	<string id="dm_information_17">
+		<text>Sai, a Yanov ci sono solo due stalker che possono percepire l'avvicinarsi di un'emissione. Conciaossa, il nostro medico, e Zulu, un ex membro della Duty. Il prefisso ex и un'aggiunta recente... Quando la Duty и arrivata alla stazione Yanov, i combattenti della Freedom si trovavano giа lм. Come и prevedibile, la situazione si и scaldata in fretta. Entrambe le fazioni hanno subito gravi perdite, e persino alcuni stalker liberi sono stati colpiti da dei proiettili vaganti. A quel punto Zulu ha annunciato l'avvicinarsi di un'emissione. Senza altra scelta, la Duty e la Freedom hanno dichiarato una tregua e si sono nascoste nella stazione. Terminata l'emissione, Zulu ha lasciato la Duty e si и stabilito nella torre vicino alla stazione.</text>
+	</string>
+	<string id="dm_information_18">
+		<text>Si raccontano ogni genere di strambe storie... non ti conviene credere a tutto quello che senti. La gente che racconta storie и dappertutto nella Zona. Ma la cosa strana и che alcuni stalker della stazione Yanov hanno segnalato di aver visto un UFO. Dicono che и come un piatto nero di circa cinque metri di diametro. Altri sostengono che abbia l'aspetto di un aeroplano visto da lontano, quindi dicono che non sia nulla di cui preoccuparsi. Uno dei testimoni, perт, и un ex pilota e giura di non aver mai visto nulla del genere in tutta la sua vita.</text>
+	</string>
+	<string id="dm_information_2">
+		<text>Ultimamente arrivano solo brutte notizie. Gli uomini piщ in gamba spariscono uno dopo l'altro, poi ritroviamo i loro cadaveri completamente prosciugati dal sangue. Devono essere quei maledetti succhiasangue, e chi se no? Oh, quanto vorrei trovare la loro tana e riempirli di piombo! Presto ci toccherа andare in bagno due alla volta. Tanti saluti alla storia dello stalker solitario.</text>
+	</string>
+	<string id="dm_information_20">
+		<text>Ho una notizia per te. I tizi della Freedom hanno messo le mani sul PDA del leggendario fondatore della Duty. E sai una cosa? Hanno scoperto che lui aveva ingannato i suoi uomini, raccontando loro che il comando dell'esercito li aveva abbandonati nella Zona. Si и inventato tutto in modo da poter fondare la sua fazione! Ma storie del genere non durano nella Zona. Poco dopo il nostro eroe si и trovato in una bolla di spazio ed и uscito di scena. Cosм va la vita... e pensare che io avevo seriamente pensato di unirmi alla Duty! Bah, che sputino le loro stupidaggini ipocrite senza di me!</text>
+	</string>
+	<string id="dm_information_21">
+		<text>Hai presente quella nuova squadra della Duty? Sembra siano apparsi dal nulla. Pensaci: un gruppo di combattenti della Duty parte da Yanov e torna tre volte piщ numeroso. Ma si clonano o cosa? Immagino che una cosa del genere sia tipica della Duty. L'unico modo di distinguerli gli uni dagli altri и il rango!</text>
+	</string>
+	<string id="dm_information_22">
+		<text>Hai presente quella nuova squadra della Freedom? Sembra siano apparsi dal nulla. Pensaci: un gruppo di combattenti della Duty parte da Yanov e torna tre volte piщ numeroso. Io mi sono fatto un'idea: germogliano. Non sei d'accordo? Con tutta l'erba che fumano, tra poco metteranno radici e si riprodurranno come le piante!</text>
+	</string>
+	<string id="dm_information_23">
+		<text>Conosci Gonta e i suoi ragazzi? Per un po' sembrava che la sfortuna li avesse presi di mira, tra la scomparsa di Danila e Crab fuori gioco. Ma ora si sono rimessi in carreggiata. Eseguono delle misurazioni per conto degli scienziati e sembra che si trovino bene. Non male, no? Un lavoro sicuro e un bel passo avanti verso l'ottenimento del permesso.</text>
+	</string>
+	<string id="dm_information_24">
+		<text>Hai saputo degli stalker Mitay, Torba e Grizzly? Io ho sentito dire che si erano messi a eseguire delle misurazioni per gli scienziati. Ma che razza di storia и? Se vuoi il mio parere, quelle teste d'uovo sono dei buoni a nulla. Ma almeno ora quei ragazzi si sono messi in riga. Forse un giorno potrebbero persino ottenere il permesso ufficiale.</text>
+	</string>
+	<string id="dm_information_25">
+		<text>Conosci Spartacus e i suoi uomini? Beh, non li vedrai piщ alla Skadovsk... ora difendono il bunker degli scienziati. Buon per loro, sanno come occuparsi dei mutanti e sanno tenere a bada i banditi. La scienza и una degna causa che necessita di un po' di pace e tranquillitа.</text>
+	</string>
+	<string id="dm_information_26">
+		<text>Hai visto i mercenari rigirarsi i pollici alla sotto-stazione? No, di sicuro non di recente. Sono andati a Jupiter a difendere il bunker degli scienziati. Prima di loro c'erano altri mercenari, ma ho sentito dire che и successo qualcosa a quel gruppo. Se vuoi il mio parere, non и un brutto giro! Alcuni mercenari scompaiono, altri ne prendono il posto e via dicendo... Ancora un po' e a Zaton ci saremo sbarazzati completamente dei mercenari.</text>
+	</string>
+	<string id="dm_information_27">
+		<text>Si dice che ora il bunker degli scienziati sia protetto dai valorosi combattenti della Duty... Mi chiedo cos'abbiano da guadagnarci. Credono davvero che quegli "scienziati" li ricompenseranno con una pistola al plasma nuova di zecca con cui andare a caccia di criceti? Ma che proteggano le mie chiappe, va'...</text>
+	</string>
+	<string id="dm_information_28">
+		<text>Dicono che ora il bunker degli scienziati sia protetto dalla Freedom. Gli scienziati non hanno paura che i loro campioni da studio possano andare in fumo... letteralmente? Perт c'и un aspetto positivo di questa faccenda: se qualcuno vorrа attaccare il bunker, prima dovrа superare una cortina di fumo! Ah ah!</text>
+	</string>
+	<string id="dm_information_29">
+		<text>Sei stato a Jupiter, lo stabilimento di componenti elettronici e radio? Un posto da brividi. Nessuno sa con precisione cosa succeda lм dentro. Ci sono anomalie e mutanti come in tutti gli altri posti... ma non ho il coraggio di andarci. Ho la sensazione che quel posto significhi guai.</text>
+	</string>
+	<string id="dm_information_3">
+		<text>Ehi, tu non sei quello che ha smascherato il medico della Skadovsk? Te ne sono grato, davvero. Avrei potuto essere il suo prossimo paziente, sai... Pensavamo tutti che fosse colpa dei mostri, ma forse certa gente non и molto diversa da loro. И un mondo fatto di cane mangia cane, non trovi?</text>
+	</string>
+	<string id="dm_information_30">
+		<text>Dovrei essere io a chiedertelo. Dopo che tu sei entrato in quelle gallerie sotto Jupiter, sono iniziate a circolare voci sul fatto che tu fossi arrivato fino al centro della Zona. Hai sollevato un gran polverone. Almeno una dozzina di persone non vedevano l'ora di seguire i tuoi passi. Nitro li ha convinti a darsi una calmata, dicendo che i cancelli delle gallerie si erano chiusi e lui non avrebbe potuto fare nulla per riaprirli. Certo, alcune teste calde vorrebbero farli saltare, ma sono ancora lм a chiedersi dove potersi procurare la dinamite e come faranno a respirare una volta lа sotto.</text>
+	</string>
+	<string id="dm_information_31">
+		<text>Ehi, hai saputo le ultime novitа su Garry, lo stalker che lavorava per gli scienziati? Non и piщ un "trasgressore". Che tu ci creda o no, ha ottenuto un permesso ufficiale per restare nella Zona! A questo punto penseresti che ha raccolto il suo bottino e se n'и andato a casa, no? Invece quel pazzo bastardo и partito per Pripyat. Tutti pensavano che fosse spacciato, come gli altri, e invece si sbagliavano! И arrivato a destinazione, ma i suoi servizi non interessavano granchй agli stalker, quindi si и unito a un gruppo di militari. Adesso и felice insieme ai marine, con il suo bel permesso, ma l'accesso a quell'area и ancora proibito agli stalker normali.</text>
+	</string>
+	<string id="dm_information_32">
+		<text>Beh... la Freedom e la Duty si sono rimesse a combattere, stavolta per via di un grosso deposito. Dicono che contenesse abbastanza equipaggiamento da armare tre divisioni di fanteria. Non so di chi fosse originariamente quel deposito, ma lo spettacolo и stato notevole. Gli stalker di Yanov si sono messi in agitazione, ma per fortuna sono riusciti a farsi da parte in tempo, altrimenti sarebbe stata una bella mischia. Credo che la Duty abbia avuto la peggio, perchй ora l'area и protetta da squadre della Freedom.</text>
+	</string>
+	<string id="dm_information_33">
+		<text>Beh... la Freedom e la Duty si sono rimesse a combattere, stavolta per via di un grosso deposito. Dicono che contenesse abbastanza equipaggiamento da armare tre divisioni di fanteria. Non so di chi fosse originariamente quel deposito, ma lo spettacolo и stato notevole. Gli stalker di Yanov si sono messi in agitazione, ma per fortuna sono riusciti a farsi da parte in tempo, altrimenti sarebbe stata una bella mischia. Credo che la Freedom abbia avuto la peggio, perchй ora l'area и protetta da squadre della Duty.</text>
+	</string>
+	<string id="dm_information_34">
+		<text>Ultimamente и successo qualcosa. Un gruppo di stalker stava esplorando le gallerie sotto Jupiter ed и incappato in qualcosa, cioи in qualcuno. Le pistole gli sono schizzate via dalle mani, poi gli и piombato addosso di tutto. Non hanno idea di che cosa sia successo veramente, ma hanno perso due uomini.</text>
+	</string>
+	<string id="dm_information_35">
+		<text>Ho sentito che nelle gallerie a nord di Jupiter hanno trovato disgustose tracce di mutanti. Trapper ha inviato uno stalker per indagare, e hanno scoperto che era una tana di seppellitori. Perchй "era", mi chiedi? Perchй quello stesso stalker ha spazzato via tutti i seppellitori. Da solo... Tu corrisponderesti anche alla sua descrizione, se non fosse che lui и un po' piщ alto e porta sempre un lanciagranate con sй.</text>
+	</string>
+	<string id="dm_information_36">
+		<text>Gli stalker sono finiti... stanno arrivando dei mostri da Fen. Gli stalker allo stabilimento di cemento li hanno visti trascinare via uno dei nostri ragazzi. Erano almeno una dozzina, talmente enormi da non riuscire neanche a immaginarli. Sembravano dei succhiasangue, solo che erano grossi il doppio e molto piщ veloci. Preghiamo che Trapper riesca a capire come eliminare quelle bestie...</text>
+	</string>
+	<string id="dm_information_37">
+		<text>Hai sentito dei succhiasangue della palude? Quelli a Fen? Beh, non ci sono piщ. Ci ha pensato Trapper... non personalmente, perт, ha assunto degli stalker. Dicono che abbia radunato una squadra di circa dieci uomini e abbia passato piщ e piщ volte al pettine la palude: ogni volta che trovavano uno di quei bastardi lo rimandavano al creatore. Non и sopravvissuta nemmeno una rana.</text>
+	</string>
+	<string id="dm_information_38">
+		<text>Poco dopo il diffondersi di voci riguardo una chimera qualcuno l'ha tolta di mezzo. I mutanti uccidevano stalker a dozzine, ma direi che stiamo invertendo la tendenza. Da altre fonti ho saputo che quel tipo era un esperto cacciatore, che nella sua vita ha ammazzato piщ mostri di quanto io e te abbiamo ucciso delle mosche.</text>
+	</string>
+	<string id="dm_information_39">
+		<text>Hai sentito che gente recluta oggigiorno la Freedom? C'era questo Flint che millantava a destra e a manca i suoi successi e i suoi trofei... beh, si и scoperto che и un vero bastardo. Ha lasciato il suo compagno a morire in un'anomalia, ha preso il suo bottino e se l'и data a gambe. In seguito hanno scoperto che a Zaton aveva praticamente dato un gruppo di cacciatori in pasto a una chimera. Avevo una considerazione piщ alta della Freedom... dannazione, preferirei essere senza una fazione che avere amici del genere.</text>
+	</string>
+	<string id="dm_information_4">
+		<text>Il gruppo di Gonta e uno stalker sconosciuto hanno eliminato la Chimera di Zaton. Aspetta, quello stalker eri tu, vero? Non и che potresti fornirmi un racconto dettagliato? A proposito, grazie mille... ora avremo un mutante divoratore di uomini in meno di cui preoccuparci!</text>
+	</string>
+	<string id="dm_information_40">
+		<text>Non so se la cosa ti interessi, ma qui abbiamo un certo Noah, un pazzo ubriacone. Possiede una brutta, vecchia chiatta, sulla quale pare esegua dei traffici illegali. Guardati da lui, и uno che prima spara poi non si prende neanche la briga di chiederti chi sei. Che vada al diavolo.</text>
+	</string>
+	<string id="dm_information_41">
+		<text>Conosci questo Nimble? Sм, и proprio un verme. Di sicuro perт vende le armi migliori in circolazione. Chissа come fa a contrabbandarle. Cioи, come si fa a trasportare un Vintar senza farsi notare? Dove te lo infili? Roba da maghi, credimi.</text>
+	</string>
+	<string id="dm_information_42">
+		<text>Si dice che Sultan sia nei guai fino al collo. Voleva rilevare l'attivitа di Beard e toglierlo di mezzo, ma ha fatto il passo piщ lungo della gamba. Ed и inciampato. Gli aspetta un periodo difficile, ora che tutti i suoi uomini lo guardano di sbieco e che non ha piщ l'influenza di una volta.</text>
+	</string>
+	<string id="dm_information_43">
+		<text>Si dice che Sultan tenga in pugno Beard, spremendolo fino all'ultima goccia. И una buona notizia, e Sultan ha una certa importanza adesso, ma la cosa migliore и che finalmente possiamo gestire la Skadovsk in libertа. Sarа bellissimo. Cerchi riparo da un'emissione? Nessun problema, ma prima sgancia il dazio!</text>
+	</string>
+	<string id="dm_information_44">
+		<text>Ehi, amico, hai sentito parlare dell'Oasi? Immagina, un posto che guarisce all'istante ogni ferita e malattia. Deve esserci un qualche trucco o magia... Perт io mi sono fatto un'idea diversa. Si fa un gran parlare dell'Oasi, ma nessuno и piщ interessato all'Esauditore di desideri come una volta. E se l'Oasi fosse il desiderio di qualcuno diventato realtа?</text>
+	</string>
+	<string id="dm_information_45">
+		<text>Tra le teste d'uovo si parla di un manufatto arrivato fin qui dall'Oasi. Ma senti questa: dopo che lo avranno studiato useranno i risultati delle ricerche per trovare una cura per il cancro! Mica male!</text>
+	</string>
+	<string id="dm_information_46">
+		<text>Stessa storia di tutti i giorni... La gente non fa che tirare fuori vecchie storie sul centro della Zona. Come quella sull'Oasi, un posto che ti guarisce all'istante tutte le ferite e ti ripristina l'energia. Sono pure e semplici stronzate, anche se starle ad ascoltare и divertente. Soprattutto quando parlano della sua posizione. Oh, quanto vorrei che esistesse davvero un posto del genere... avremmo salvato tanti dei nostri ragazzi.</text>
+	</string>
+	<string id="dm_information_47">
+		<text>Voci di corridoio dicono che qualcuno abbia trovato l'Oasi. Non pensavo esistesse davvero, ma davanti ai fatti non si discute. Si dice che abbiano trovato anche un manufatto sul posto. Gli scienziati lo stanno studiando proprio adesso. Forse possono usarlo per costruire un congegno che faccia guarire alla velocitа della luce... Ai nostri ragazzi farebbe sicuramente comodo.</text>
+	</string>
+	<string id="dm_information_48">
+		<text>Kopachy. Niente di nuovo per la Zona, ma nuovo per me. Immagina: un intero villaggio completamente sepolto. La storia risale al 1986: le case emettevano un livello di radiazioni talmente alto che dovettero seppellire le case fino ai tetti. Che spettacolo da brividi...</text>
+	</string>
+	<string id="dm_information_49">
+		<text>Sai come abbiamo fatto noi e quelli della Duty a finire di stanza insieme a Yanov? И stato merito di Zulu. Al tempo lavorava per la Duty, ed era uno specialista nel percepire l'avvicinarsi di un'emissione... Noi perт arrivammo per primi a Yanov, seppur dopo gli stalker. Non abbiamo avuto nemmeno il tempo di accenderci una sigaretta che sono arrivati quei militari, agitando le loro armi contro di noi. L'ultima volta che ho visto un simile massacro и stato alla Discarica piщ di un anno fa. Decine e decine di morti per entrambe le fazioni, tra cui il nostro specialista di emissioni, possa riposare in pace. Poi Zulu dice, "Arriva un'emissione! Tutti al riparo!", e noi cosa avremmo dovuto fare, buttarli fuori e lasciarli a morire? Della Duty o no, sono pur sempre esseri umani. E ora viviamo cosм: quando и tutto tranquillo battibecchiamo, ma quando arriva un'emissione lottiamo fianco a fianco. Zulu ha lasciato la Duty e ora vive come un'eremita nei pressi di Yanov.</text>
+	</string>
+	<string id="dm_information_5">
+		<text>Non и una novitа e nemmeno un segreto, ma Cardan il tecnico finirа per ammazzarsi di alcol. Quando и arrivato alla Skadovsk beveva solo nelle occasioni speciali o per liberarsi dalle radiazioni. Solo in seguito ha iniziato a darci dentro, quando la morte dei suoi due amici lo ha sconvolto. Erano molto uniti, scommetto...</text>
+	</string>
+	<string id="dm_information_50">
+		<text>Ho una storia buffa da raccontarti. C'и un tipo che racconta di aver visto un UFO sopra a Yanov. La Zona puт davvero far impazzire la gente, eh? I poltergeist e i controllori non gli bastano, macchй, proprio non riescono a fare a meno delle vecchie storie di UFO. Almeno non ci sono ancora dei pazzi che fanno degli esorcismi sulla vodka. Immagina sentirli dire: "Oh, Signore! Allontana gli spiriti malvagi! Trattieni gli spiriti alcolici!". Ah ah!</text>
+	</string>
+	<string id="dm_information_51">
+		<text>Hai sentito del villaggio di Kopachy? Quando il primo disastro colpм la centrale di Chernobyl, quell'area fu colpita al punto che decisero di seppellire tutto il villaggio. Ora non resta altro che piccoli cumuli radioattivi, al posto delle case. Dicono che prima del disastro era un posto da favola. Tremo a pensare cosa ci si potrebbe trovare oggi. Tutti hanno troppa paura per andare a controllare.</text>
+	</string>
+	<string id="dm_information_52">
+		<text>Questa storia non и nuova, ma forse tu non l'hai mai sentita. Non abbiamo unito le forze con la Freedom perchй ci piace coccolarci. Lo dobbiamo alle circostanze. Quando siamo arrivati qui la Freedom ci ha attaccati... Ci sono state ingenti perdite per entrambi gli schieramenti, anche se noi stavamo conquistando un piccolo vantaggio su quegli anarchici... Proprio mentre la battaglia era al suo apice, Zulu ha percepito l'approssimarsi di un'emissione. Lui non si sbaglia mai, sai... Fummo quindi costretti a sospendere il combattimento. Non capisco perт perchй, dopo quella volta, Zulu ha lasciato la Duty...</text>
+	</string>
+	<string id="dm_information_53">
+		<text>Ultimamente i nostri esploratori hanno avvistato un oggetto non identificato volare sopra la stazione Yanov. Un UFO, in altre parole. Prima che tu faccia domande stupide, un UFO non и solo un disco volante con dentro dei marziani. Potrebbe essere un oggetto volante qualunque, da un pezzo di cartone al frammento di una meteora, purchй i testimoni non siano riusciti a identificarlo. Capito?</text>
+	</string>
+	<string id="dm_information_54">
+		<text>Sei stato tu a portare quel PDA a Loki, vero? Cacchio, и il massimo. Il leggendario fondatore della Duty, il Generale Tachenko, ha fregato i suoi stessi soldati. Ha rotto la radio in modo che non potessero essere raggiunti dall'esterno e ha formato il suo seguito di idioti... Solo per fare la fine di un vero idiota in una bolla di spazio! Roba del genere и davvero incredibile, amico!</text>
+	</string>
+	<string id="dm_information_55">
+		<text>Hai visto la nuova squadra schierata da quelle mezze seghe di soldati? Non possono essere rinforzi provenienti dalla loro base... l'ideologia non ha ancora sostituito il buonsenso. Sono troppo addestrati per essere semplici stalker. Bah, chi lo sa. Forse sono della Monolith? Lo so, sembra incredibile!</text>
+	</string>
+	<string id="dm_information_56">
+		<text>Hai visto i nostri nuovi combattenti? Oh, sei stato tu a portarli qui, vero? Sei un grande. Sono tipi a posto, anche se un po' nervosi... Ma va bene cosм, qualche mese in nostra compagnia e si rilasseranno. Inizieranno ad adeguarsi al nostro stile di vita e presto diventeranno come noi.</text>
+	</string>
+	<string id="dm_information_57">
+		<text>Abbiamo delle nuove reclute niente male: una squadra di ex combattenti della Monolith. E non sono dei novellini, ma combattenti esperti. Certo, dopo aver lasciato la Monolith non sono del tutto a posto, ma non c'и problema. In mezzo a noi si adatteranno in un batter d'occhio.</text>
+	</string>
+	<string id="dm_information_58">
+		<text>Dicono che la Freedom ha reclutato degli ex combattenti Monolith. Fatico a crederci, ma in effetti hanno una nuova squadra, che di sicuro non proviene dall'esterno della Zona. Immagino siano piuttosto disperati... oppure tutte quelle droghe gli hanno spappolato definitivamente il cervello. Adesso chi recluteranno, un gruppo di zombi? Un battaglione di seppellitori?</text>
+	</string>
+	<string id="dm_information_59">
+		<text>Presto in quest'area torneranno a esserci legge e ordine. La Duty ha assunto il controllo delle posizioni chiave. Ci siamo assicurati un punto fermo a Yanov e l'incarico di proteggere costantemente il bunker degli scienziati. И ora che la Freedom faccia i bagagli e levi le tende... qui gli anarchici non sono piщ i benvenuti.</text>
+	</string>
+	<string id="dm_information_6">
+		<text>Ecco la nuova meraviglia del mondo: un Cardan sobrio. Riesci a credere che sia sul vagone? Quelli alla Skadovsk gli hanno chiesto se ha messo le mani sul numero di un centro per alcolisti anonimi, e lui ha risposto, "L'unico numero che mi serviva era il sessantadue".</text>
+	</string>
+	<string id="dm_information_60">
+		<text>Sei stato tu ad aiutare i nostri ragazzi a procurarsi il lavoro presso gli scienziati, vero? Te ne sono grato. И stato bello vedere i nostri uomini, anzichй quei dannati mercenari, al loro bunker. Bella storia!</text>
+	</string>
+	<string id="dm_information_61">
+		<text>Vediamo... possiamo attingere a un deposito segreto della Duty. Ora useremo quel deposito per il suo scopo originale: vi terremo prigionieri quegli schifosi della Duty e li costringeremo a rivelare tutti i loro segreti. Eh eh. Ah, grazie per il suggerimento sul sistema di allarme... senza rinforzi non avremmo avuto una sola possibilitа.</text>
+	</string>
+	<string id="dm_information_62">
+		<text>Un'altra vittoria per la Duty! Quegli anarchici hanno davvero esagerato... si sono intrufolati nel nostro magazzino segreto convinti di poterla passare liscia. Col cavolo! Li abbiamo colti di sorpresa e gli abbiamo fatto saltare la testa come fossero criceti rabbiosi.</text>
+	</string>
+	<string id="dm_information_63">
+		<text>Non и una novitа il fatto che la Freedom sia composta da pura feccia, ma abbiamo scoperto qualcosa di nuovo riguardo uno dei loro svitati piщ noti. Si faceva chiamare Flint nella Freedom, ma prima di unirsi a loro usava il nome Magpie ed era uno stalker. Almeno, Magpie era il suo nome quando arrivт a Zaton e per poco non portт un gruppo di cacciatori dritto nelle fauci dei mutanti. Li fregт e per poco una chimera non li sbranт, e intanto quel bastardo si prese la loro attrezzatura e venne a Yanov. Dopo essersi unito alla Freedom, gettт il suo compagno in un'anomalia per rubargli il suo manufatto. Ecco che cosa riserva la Freedom.</text>
+	</string>
+	<string id="dm_information_7">
+		<text>Un nuovo progetto di costruzione navale, condotto da Noah. Ecco l'ultima attrazione di Zaton: uno stalker di nome Noah. Con esperienza, motivato e del tutto pazzo. La sua ultima e folle idea era quella di salvare tutti gli stalker dall'Apocalisse. Per riuscirci, sta trasformando una vecchia chiatta in una "arca". Un vero svitato. Se decidi di passare a trovarlo, stai attento a non infastidirlo. Se non lo farai non ti farа alcun male.</text>
+	</string>
+	<string id="dm_information_8">
+		<text>Hai giа incontrato Nimble? Adesso и sulla Skadovsk. И un vero professionista nel suo campo. Puт procurarti tutto quello che ti serve. Beh, quasi tutto. Ultimamente si occupa per lo piщ di armi e tute, ma la sua merce и sempre di ottima qualitа! Oggetti speciali, progetti sperimentali, articoli realizzati a mano... Non ha certo prezzi convenienti, ma perchй dovrebbe averli? L'esclusivitа ha un suo prezzo!</text>
+	</string>
+	<string id="dm_information_9">
+		<text>Sapevi che Pilot sta usando un nuovo percorso per spostarsi tra Zaton e Jupiter? Una volta era una strada molto lunga: bisognava salire le colline, evitare le anomalie e via dicendo. Ora invece и come una passeggiata nel parco, oltre al fatto che и molto piщ corta. Ma Pilot non и uno da prendersi meriti che non gli spettano: non и stato lui a scoprire quella strada. И stato uno stalker a mostrargli le mappe. Si и fatto pagare, certo, ma non un occhio della testa.</text>
+	</string>
+	<string id="dm_information_do_not_know_1">
+		<text>Non molto, a essere sincero.</text>
+	</string>
+	<string id="dm_information_do_not_know_2">
+		<text>Ovunque si guardi, nella Zona c'и sempre qualcosa di nuovo.</text>
+	</string>
+	<string id="dm_information_do_not_know_3">
+		<text>Beh, adesso sei qui. Questa и giа di per sй una novitа, direi.</text>
+	</string>
+	<string id="dm_information_general">
+		<text>Che si dice di nuovo nella Zona?</text>
+	</string>
+	<string id="dm_information_no_more_1">
+		<text>Non so altro che potrebbe interessarti.</text>
+	</string>
+	<string id="dm_information_no_more_2">
+		<text>Te lo direi con piacere, ma non so altro.</text>
+	</string>
+	<string id="dm_information_no_more_3">
+		<text>Ti ho detto tutto quello che so.</text>
+	</string>
+	<string id="dm_job_1">
+		<text>Mmm... forse ti conviene chiedere a Grouse sulla Skadovsk. Cerca qualcuno che lo aiuti a scoprire come mai gli stalker stiano tutti sparendo senza lasciare traccia. Tutti danno la colpa ai succhiasangue, perchй i cadaveri vengono ritrovati completamente prosciugati. Ma qui si esagera... praticamente scompare qualcuno tutti i giorni. E generalmente i succhiasangue non agiscono in questo modo... Grouse ha assunto anche un cacciatore esperto che individui questi succhiasangue.</text>
+	</string>
+	<string id="dm_job_10">
+		<text>Sai, quando a uno stalker servono dei soldi ha due modi per procurarseli: trovare dei manufatti e portarli ai mercanti per 30 copechi per ogni rublo del loro valore o lavorare per gli scienziati. Quelle teste d'uovo si inventano sempre qualcosa da farti fare, che sia la consegna di un manufatto raro o di una carcassa mutante. Ma, soprattutto, se entri nelle loro simpatie, possono emetterti un permesso di soggiorno permanente nella Zona, del tutto ufficiale e legittimo! Immaginati a superare un blocco militare, con lo zaino pieno di tesori, e ricevere in cambio il saluto militare! Che meraviglia! Comunque, il bunker degli scienziati и a ovest della stazione Yanov. C'и giа un altro stalker che lavora per loro, magari assumeranno anche uno come te.</text>
+	</string>
+	<string id="dm_job_11">
+		<text>Il tuo successo dipende da quello che fai. Se non disdegni dare la caccia ai mutanti, riceverai una valanga di offerte. Fai un salto nel seminterrato della stazione Yanov e chiedi di Trapper: lui paga bene chi uccide i mutanti, ma non sparare al primo psicocane che vedi solo per ricevere una ricompensa. Trapper chiede di uccidere mostri specifici che interferiscono con la raccolta dei manufatti o che bazzicano nei posti usati dagli stalker come nascondiglio dalle emissioni.</text>
+	</string>
+	<string id="dm_job_14">
+		<text>La gente come te che arriva alla Skadovsk deve andare da Beard. Lui paga bene i manufatti che gli vengono consegnati, ma ti dirт una cosa: ha un pessimo senso degli affari. Non ha voluto dividere i suoi profitti con gente di una certa importanza... e questo gli si ritorcerа presto contro. Intesi?</text>
+	</string>
+	<string id="dm_job_15">
+		<text>Se ti servono dei contanti, vai da Owl. Lui vende tutto quello che serve a un vero uomo alla Skadovsk: informazioni, armi, di tutto. Se hai roba che scotta o di valore, come dei documenti o il PDA di uno stalker, portalo a Owl e lui ti pagherа. Puoi anche racimolare un po' di grana svolgendo dei lavori per lui. Chiedigli se ha bisogno di qualcosa.</text>
+	</string>
+	<string id="dm_job_2">
+		<text>Ti conviene chiedere a Gonta. Lui e i suoi uomini hanno una bella storia da raccontare. Una chimera arrivт a Zaton non molto tempo fa, cosм Gonta e il suo gruppo andarono a cercarla. Si divisero in due squadre per individuarla e inviarono uno dei cacciatori in cerca della tana di succhiasangue. Quando finalmente trovarono la chimera erano un po' a corto di uomini, cosм presero con loro un altro stalker, Magpie. Non so bene come andт la faccenda, ma si dice che Magpie se la diede a gambe non appena vide la chimera. Gonta si salvт per miracolo, e uno dei suoi uomini fu gravemente ferito. Ma la chimera и ancora in libertа, e loro sono in cerca di persone che gli diano una mano.</text>
+	</string>
+	<string id="dm_job_3">
+		<text>Semplice: se vuoi fare soldi, Sultan и l'uomo che fa per te. И il capo da queste parti, quindi se entrerai nelle sue simpatie ti troverа senz'altro un lavoro.</text>
+	</string>
+	<string id="dm_job_4">
+		<text>Se sei un bravo stalker, cioи se sei bravo a recuperare i manufatti, parla con Beard. Qui и molto rispettato. И l'unico sulla Skadovsk che ti pagherа bene i manufatti che gli porti. Ha anche le conoscenze giuste per trasportarli fuori dalla Zona. E poi и un brav'uomo... sa sempre darti il consiglio giusto o trovarti un lavoro adatto alle tue esigenze.</text>
+	</string>
+	<string id="dm_job_5">
+		<text>Alla Skadovsk c'и un mercante di nome Owl. Non и esattamente una persona gradevole. Si lamenta sempre del fatto che tutti i manufatti finiscono a Beard e mai a lui, ma se ti servono dei soldi puoi chiedergli cos'ha da offrirti. Quel furbastro non traffica solo le munizioni. Lui ti puт dire cose, vendere cose, comprare le tue cose e pagarti bene per quello che gli interessa sapere. Vallo a trovare, и sul secondo ponte di poppa. Sono sicuro che troverete modo di collaborare.</text>
+	</string>
+	<string id="dm_job_6">
+		<text>Puoi chiedere a Vano, bazzica dalle parti del bar di Yanov. Si и inguaiato con i banditi, e sono giа tre volte che cerca di ripagare il suo debito. Ha parecchia esperienza e puт individuare un'anomalia a occhi chiusi... eppure riesce sempre a ficcarsi nei guai. C'и stato chi gli ha suggerito di filare via. La Zona и troppo grande perchй la mala riesca a trovarlo, ma lui и troppo orgoglioso per darsi alla macchia, e non sono in molti disposti ad aiutarlo a risolvere i suoi problemi con i banditi...</text>
+	</string>
+	<string id="dm_job_7">
+		<text>Dimenticati i lavori, amico... I banditi sono ormai fuori controllo: hanno catturato Mitay e chiedono un riscatto. Mitay и uno dei primi stalker a essere arrivati qui a Yanov, e ha costruito questo posto perchй la gente avesse un posto dove rifugiarsi durante le emissioni. Ora che ha bisogno di aiuto, perт, tutti gli voltano le spalle. Chiedere alla Freedom o alla Duty sarebbe inutile, quelli sono troppo impegnati ad azzannarsi tra loro... Ma gli altri dovrebbero fare qualcosa! Ah, che senso ha stare qui a parlare... Nemmeno gli uomini di Mitay riescono a escogitare un modo per liberarlo. Se vuoi renderti utile parla con Grizzly, lo troverai al bar della stazione.</text>
+	</string>
+	<string id="dm_job_8">
+		<text>A Nitro, il tecnico di Yanov, servono dei materiali da lavoro. Nel caso non lo sapessi, ci sa fare sia con le armi che con i congegni elettronici. Ma a volte la sola abilitа non basta: gli occorrono i materiali giusti, quindi ha iniziato a chiedere in giro. Il problema и che tutti i posti sicuri sono giа stati ripuliti, e gli altri sono troppo pericolosi per la maggior parte della gente. Nitro spera che qualcuno sia disposto a correre questi rischi, e sono certo che pagherа bene un simile disturbo.</text>
+	</string>
+	<string id="dm_job_9">
+		<text>Ho sentito che Zio Yar alla stazione Yanov stava cercando uno stalker che gli dia una mano per un lavoro. Non so perchй non chieda aiuto ai suoi amici della Freedom... Comunque, и un bravo vecchio, quindi forse ti conviene parlargli e vedere se riuscite a trovare un accordo.</text>
+	</string>
+	<string id="dm_job_do_not_know_1">
+		<text>Mmm... non conosco nessuno del genere.</text>
+	</string>
+	<string id="dm_job_do_not_know_2">
+		<text>Non sei l'unico che vorrebbe saperlo.</text>
+	</string>
+	<string id="dm_job_do_not_know_3">
+		<text>E perchй dovrei saperlo?</text>
+	</string>
+	<string id="dm_job_general">
+		<text>Sai se qualcuno ha un lavoro per me?</text>
+	</string>
+	<string id="dm_job_no_more_1">
+		<text>Me l'hai giа chiesto.</text>
+	</string>
+	<string id="dm_job_no_more_2">
+		<text>Non ho niente di nuovo da dirti.</text>
+	</string>
+	<string id="dm_job_no_more_3">
+		<text>Ti ho giа risposto.</text>
+	</string>
+	<string id="dm_universal_actor_exit">
+		<text>OK, lascia perdere.</text>
+	</string>
+	<string id="dm_universal_actor_start">
+		<text>Vorrei chiederti una cosa.</text>
+	</string>
+	<string id="dm_universal_npc_start_0">
+		<text>Chiedi pure.</text>
+	</string>
+	<string id="dm_universal_npc_start_1">
+		<text>Sputa il rospo.</text>
+	</string>
+	<string id="dm_universal_npc_start_2">
+		<text>Spara.</text>
+	</string>
+	<string id="dm_universal_npc_start_3">
+		<text>Ti ascolto.</text>
+	</string>
+	<string id="dm_wounded_general">
+		<text>Aiuto!</text>
+	</string>
+	<string id="dm_wounded_medkit">
+		<text>Prendi questo kit di pronto soccorso.</text>
+	</string>
+	<string id="dm_wounded_sorry">
+		<text>Mi dispiace, non ho nulla.</text>
+	</string>
+	<string id="dm_traveler_bye">
+		<text>Capisco.</text>
+	</string>
+	<string id="dm_traveler_what_are_you_doing">
+		<text>Cosa hai in mente?</text>
+	</string>
+	<string id="dm_traveler_can_i_go_with_you">
+		<text>Posso venire con te?</text>
+	</string>
+	<string id="dm_traveler_stalker_actor_companion_yes">
+		<text>Certo. Piщ siamo meglio и.</text>
+	</string>
+	<string id="dm_traveler_stalker_actor_companion_no">
+		<text>No, spiacente. Io viaggio da solo.</text>
+	</string>
+	<string id="dm_traveler_actor_go_with_squad">
+		<text>Allora muoviamoci.</text>
+	</string>
+	<string id="dm_traveler_take_me_to">
+		<text>Devo andare in un posto. Se ti pago saresti disposto a portarmici?</text>
+	</string>
+	<string id="dm_traveler_stalker_where_do_you_want">
+		<text>Nessun problema. Dove devi andare? Scegli.</text>
+	</string>
+	<string id="dm_traveler_actor_agree">
+		<text>D'accordo. Andiamo.</text>
+	</string>
+	<string id="dm_traveler_actor_refuse">
+		<text>Ho cambiato idea.</text>
+	</string>
+	<string id="dm_traveler_stalker_i_cant_travel">
+		<text>No, ho altre cose urgenti di cui occuparmi.</text>
+	</string>
+	<string id="dm_stalker_doing_nothing_1">
+		<text>Me la sto prendendo comoda.</text>
+	</string>
+	<string id="dm_stalker_doing_nothing_2">
+		<text>Niente di particolare, me la sto solo spassando un po'.</text>
+	</string>
+	<string id="dm_stalker_doing_nothing_3">
+		<text>Secondo te cosa sto facendo? Niente di niente.</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_monster">
+		<text>Rintraccio mutanti.</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_bandit">
+		<text>Sto pedinando un paio di stronzi. Dannati ritardati...</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_killer">
+		<text>Sto seguendo alcuni mercenari. Quelli sм che sono veri bastardi.</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_monolith">
+		<text>Sono alle calcagna di un gruppo di fanatici. Combattenti Monolith, ecco chi...</text>
+	</string>
+	<string id="dm_stalker_chasing_squad_zombied">
+		<text>Sono a caccia di zombi. Quei poveri diavoli sono davvero troppi...</text>
+	</string>
+	<string id="dm_traveler_travel_cost">
+		<text>OK. Ti costerа</text>
+	</string>
+	<string id="dm_traveler_actor_dont_go_with_squad">
+		<text>Sai, ho cambiato idea.</text>
+	</string>
+	<string id="dm_traveler_actor_has_no_money">
+		<text>Non ho tutti quei contanti.</text>
+	</string>
+	<string id="dm_freedom_doing_nothing_1">
+		<text>Oh, niente, direi.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_monster">
+		<text>Sto seguendo dei mutanti. Qualcuno deve pur insegnar loro a stare al posto.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_bandit">
+		<text>Sto dando la caccia ad alcuni criminali del posto.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_killer">
+		<text>Sono a caccia di scalpi mercenari. Hanno un debito che deve essere saldato.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_monolith">
+		<text>Do la caccia a quei maledetti Monolith.</text>
+	</string>
+	<string id="dm_freedom_chasing_squad_duty">
+		<text>Sto cercando di rintracciare alcuni dei miei debitori.</text>
+	</string>
+	<string id="dm_duty_doing_nothing_1">
+		<text>Al momento non sto facendo nulla.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_monster">
+		<text>Do la caccia ai mutanti, nel tentativo di ripulire quest'area dal loro sudiciume.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_bandit">
+		<text>Sono in missione, devo individuare una squadra di banditi.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_killer">
+		<text>Il mio bersaglio sono i mercenari. Sto seguendo le tracce della loro squadra.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_monolith">
+		<text>Sto dando la caccia a una squadra di Monolith.</text>
+	</string>
+	<string id="dm_duty_chasing_squad_freedom">
+		<text>Do la caccia a quegli stupidi stronzi. Quelli della Freedom, ecco chi...</text>
+	</string>
+	<string id="dm_stalker_searching_artefacts_1">
+		<text>Sono a caccia di manufatti.</text>
+	</string>
+	<string id="dm_stalker_searching_artefacts_2">
+		<text>Non vado mica a funghi... Diciamo piuttosto a manufatti.</text>
+	</string>
+	<string id="dm_stalker_searching_artefacts_3">
+		<text>Cerco manufatti.</text>
+	</string>
+	<string id="st_stalker_zat_sim_1">
+		<text>Sono diretto verso l'anomalia Boiler, quella accanto a un boschetto.</text>
+	</string>
+	<string id="st_stalker_zat_sim_2">
+		<text>Mi sto per dirigere al lago settentrionale... trascorrerт un po' di tempo sulla penisola.</text>
+	</string>
+	<string id="st_stalker_zat_sim_3">
+		<text>Mi dirigerт oltre il lago settentrionale. Lм c'и un buon punto dove mettere le tende.</text>
+	</string>
+	<string id="st_stalker_zat_sim_4">
+		<text>Mi dirigerт ai boschi oltre il lago settentrionale.</text>
+	</string>
+	<string id="st_stalker_zat_sim_5">
+		<text>Sono diretto a una piccola foresta a ovest della segheria.</text>
+	</string>
+	<string id="st_stalker_zat_sim_6">
+		<text>Sono diretto alla collina a ovest della palude. Lм non potrт essere raggiunto dall'inquinamento della palude.</text>
+	</string>
+	<string id="st_stalker_zat_sim_7">
+		<text>Sono diretto al complesso dell'antenna. A ovest c'и un bel posticino.</text>
+	</string>
+	<string id="st_stalker_zat_sim_8">
+		<text>Sono diretto ai boschi a ovest della Pinquercia... vieni con me, se vuoi. Un po' di compagnia mi farebbe piacere.</text>
+	</string>
+	<string id="st_stalker_zat_sim_9">
+		<text>A un boschetto tra la Foresta d'acciaio e le officine.</text>
+	</string>
+	<string id="st_stalker_zat_sim_10">
+		<text>Verso il grande ponte... Si dice che a est si trovi un punto tranquillo e sicuro.</text>
+	</string>
+	<string id="st_stalker_zat_sim_11">
+		<text>A un parcheggio a sud della vecchia chiatta.</text>
+	</string>
+	<string id="st_stalker_zat_sim_12">
+		<text>Niente di speciale, sono un viaggiatore. Mi accamperт su una collina a est della Skadovsk.</text>
+	</string>
+	<string id="st_stalker_zat_sim_13">
+		<text>A un boschetto tra Izumrudnoye e la stazione di rifornimento.</text>
+	</string>
+	<string id="st_stalker_zat_sim_14">
+		<text>A un incrocio sulla strada nei pressi dell'impianto dei rifiuti.</text>
+	</string>
+	<string id="st_stalker_zat_sim_15">
+		<text>All'anomalia Boiler.</text>
+	</string>
+	<string id="st_stalker_zat_sim_16">
+		<text>Alla stazione dei ranger. C'и un complesso di edifici lм, probabilmente lo avrai anche visto. In uno ci sono persino delle fornaci... chissа cosa combinano laggiщ.</text>
+	</string>
+	<string id="st_stalker_zat_sim_17">
+		<text>A un boschetto a ovest della fattoria bruciata.</text>
+	</string>
+	<string id="st_stalker_zat_sim_18">
+		<text>A un boschetto a est dell'anomalia Boiler.</text>
+	</string>
+	<string id="st_stalker_zat_sim_19">
+		<text>A una collinetta poco dopo il lago settentrionale.</text>
+	</string>
+	<string id="st_stalker_zat_sim_20">
+		<text>A un piccolo boschetto a sud della fattoria bruciata.</text>
+	</string>
+	<string id="st_stalker_zat_sim_21">
+		<text>Sono diretto a ovest della Skadovsk... dove spuntano le tubature.</text>
+	</string>
+	<string id="st_stalker_zat_sim_22">
+		<text>Sono diretto a un punto a metа strada tra la Skadovsk e la stazione di drenaggio.</text>
+	</string>
+	<string id="st_stalker_zat_sim_23">
+		<text>A un lago paludoso nei pressi della vecchia chiatta.</text>
+	</string>
+	<string id="st_stalker_zat_sim_24">
+		<text>A una baia nei pressi dell'anomalia Cicatrice.</text>
+	</string>
+	<string id="st_stalker_zat_sim_25">
+		<text>Alla stazione di rifornimento.</text>
+	</string>
+	<string id="st_stalker_zat_sim_26">
+		<text>Alle gole della Pinquercia.</text>
+	</string>
+	<string id="st_stalker_zat_b55">
+		<text>Voglio cercare dei manufatti nell'anomalia Artiglio.</text>
+	</string>
+	<string id="st_stalker_zat_a1">
+		<text>Sono diretto a una collina a ovest dell'anomalia Boiler.</text>
+	</string>
+	<string id="st_stalker_zat_a23_smart_terrain">
+		<text>All'anomalia Foresta d'acciaio.</text>
+	</string>
+	<string id="st_stalker_zat_b100">
+		<text>Sono diretto all'anomalia Foresta d'acciaio per cercare manufatti.</text>
+	</string>
+	<string id="st_stalker_zat_b101">
+		<text>Sono diretto alla palude. Certo, non sarа facile respirare con tutto quel gas, ma i manufatti sono un buon incentivo.</text>
+	</string>
+	<string id="st_stalker_zat_b103_merc_smart">
+		<text>Sono diretto alle officine della sotto-stazione. Dicono che sia un buon posto dove nascondersi dalle emissioni, quindi andrт a fare un tentativo.</text>
+	</string>
+	<string id="st_stalker_zat_b104_zombied">
+		<text>Hai presente la segheria qui vicino? Ecco, и lм che sono diretto. Voglio controllare se c'и qualcosa di valore.</text>
+	</string>
+	<string id="st_stalker_zat_b106_smart_terrain">
+		<text>Voglio passare un po' di tempo all'albergo Izumrudnoye. Oh, non и niente male... per la carne e i cinghiali! Ah ah! Comunque, sono sicuro che per un po' potrт accamparmici.</text>
+	</string>
+	<string id="st_stalker_zat_b12">
+		<text>A un ponte. Credo che sulla mappa sia indicato come Preobrazhensky.</text>
+	</string>
+	<string id="st_stalker_zat_b14_smart_terrain">
+		<text>Alla stazione di drenaggio. Scommetto che in quell'area c'и ancora qualcosa di valore da trovare.</text>
+	</string>
+	<string id="st_stalker_zat_b18">
+		<text>Alla vecchia chiatta.</text>
+	</string>
+	<string id="st_stalker_zat_b20_smart_terrain">
+		<text>Voglio passare dalla fattoria bruciata, nel caso sia spuntato qualche nuovo manufatto.</text>
+	</string>
+	<string id="st_stalker_zat_b28">
+		<text>All'altopiano meridionale.</text>
+	</string>
+	<string id="st_stalker_zat_b33">
+		<text>Al crepaccio accanto alla stazione di rifornimento.</text>
+	</string>
+	<string id="st_stalker_zat_b38">
+		<text>Sono diretto al complesso dell'antenna Krug. Mi serve un posto sicuro dove nascondermi dalle emissioni. Purtroppo si dice che lм ci siano parecchi mostri.</text>
+	</string>
+	<string id="st_stalker_zat_b38u">
+		<text>Sono diretto al complesso dell'antenna Krug. Mi serve un posto sicuro dove nascondermi dalle emissioni. Purtroppo si dice che lм ci siano parecchi mostri.</text>
+	</string>
+	<string id="st_stalker_zat_b39">
+		<text>Vado a cercare manufatti dalle parti della Pinquercia. Spero che i mutanti se ne staranno buoni.</text>
+	</string>
+	<string id="st_stalker_zat_b40_smart_terrain">
+		<text>Al pozzo nero... Sai, l'impianto dei rifiuti. Per nascondersi dalle emissioni un posto vale l'altro.</text>
+	</string>
+	<string id="st_stalker_zat_b42_smart_terrain">
+		<text>Sono diretto al molo delle navi sul lago settentrionale. Una volta lм improvviserт.</text>
+	</string>
+	<string id="st_stalker_zat_b52">
+		<text>Sono diretto al porto, dove si trovano le gru. Non и un brutto posto per accamparsi.</text>
+	</string>
+	<string id="st_stalker_zat_b53">
+		<text>Voglio cercare manufatti nell'anomalia Boiler. Spero che la mia tuta resista a questo giretto in mezzo alle sorgenti termali.</text>
+	</string>
+	<string id="st_stalker_zat_b54">
+		<text>All'anomalia Cicatrice.</text>
+	</string>
+	<string id="st_stalker_zat_b56">
+		<text>Voglio vedere se la mia attrezzatura и ignifuga e cercare manufatti... tutto questo nell'anomalia Circo.</text>
+	</string>
+	<string id="st_stalker_zat_b5_smart_terrain">
+		<text>Alla stazione dei ranger.</text>
+	</string>
+	<string id="st_stalker_zat_b7">
+		<text>Mi accamperт a Shevchenko. Lм sarт al sicuro dalle emissioni, e per i mutanti non sarа facile attaccarmi.</text>
+	</string>
+	<string id="st_stalker_zat_b7_stalker_raider">
+		<text>Mi accamperт a Shevchenko. Lм sarт al sicuro dalle emissioni, e per i mutanti non sarа facile attaccarmi.</text>
+	</string>
+	<string id="st_stalker_zat_medic_home_smart">
+		<text>Sono diretto al porto, dove si trovano le gru. Non и un brutto posto per accamparsi.</text>
+	</string>
+	<string id="st_stalker_zat_stalker_base_smart">
+		<text>Voglio scaricare il mio bottino e bermi un paio di drink. La Skadovsk и il posto che fa al caso mio.</text>
+	</string>
+	<string id="st_stalker_jup_a10_smart_terrain">
+		<text>Sono diretto al checkpoint dell'esercito, accanto allo stabilimento Jupiter.</text>
+	</string>
+	<string id="st_stalker_jup_a12">
+		<text>Al magazzino dei contenitori.</text>
+	</string>
+	<string id="st_stalker_jup_a12_merc">
+		<text>Sono diretto a un'area niente affatto appariscente tra il magazzino dei contenitori e il tunnel meridionale.</text>
+	</string>
+	<string id="st_stalker_jup_a6">
+		<text>Alla stazione Yanov. Finalmente un po' di tempo per riposarmi.</text>
+	</string>
+	<string id="st_stalker_jup_b1">
+		<text>Al tunnel a nord di Kopachy.</text>
+	</string>
+	<string id="st_stalker_jup_b19">
+		<text>Sono diretto a un posto davvero spaventoso, il villaggio di Kopachy... o quello che ne resta. Sм, ho fatto scorta di munizioni e antiradiazioni... Ne avrт bisogno!</text>
+	</string>
+	<string id="st_stalker_jup_b200">
+		<text>Alla fabbrica di cemento. Un buon punto di osservazione e lassщ nessuno potrа attaccarmi alle spalle.</text>
+	</string>
+	<string id="st_stalker_jup_b200_tushkan_smart_terrain">
+		<text>Alla fabbrica di cemento. Voglio controllare cosa c'и nel seminterrato.</text>
+	</string>
+	<string id="st_stalker_jup_b202">
+		<text>Alla sotto-stazione dalle parti di Yanov.</text>
+	</string>
+	<string id="st_stalker_jup_b203">
+		<text>Sono diretto a un punto nei pressi del tunnel ferroviario a sud.</text>
+	</string>
+	<string id="st_stalker_jup_b204">
+		<text>Sono diretto a uno stagno di raffreddamento nei pressi dello stabilimento Jupiter.</text>
+	</string>
+	<string id="st_stalker_jup_b205_smart_terrain">
+		<text>Sono diretto al complesso Volkhov AA, dove darт la caccia agli zombi.</text>
+	</string>
+	<string id="st_stalker_jup_b205_smart_terrain_tushkano">
+		<text>Al bunker. Sai, quello al complesso Volkhov AA.</text>
+	</string>
+	<string id="st_stalker_jup_b206">
+		<text>Al boschetto anomalo nei pressi della cava. Magari troverт un paio di manufatti.</text>
+	</string>
+	<string id="st_stalker_jup_b207">
+		<text>Sono diretto alla cava, dove ci sono i furgoni degli operai.</text>
+	</string>
+	<string id="st_stalker_jup_b207_depot_attack">
+		<text>C'и un punto tra la cava e la stazione Yanov dove andrт a riposare per un po'.</text>
+	</string>
+	<string id="st_stalker_jup_b208">
+		<text>Sono diretto al tunnel orientale, quello che passa sotto lo stabilimento Jupiter.</text>
+	</string>
+	<string id="st_stalker_jup_b209">
+		<text>All'anomalia Bitume. Voglio vedere se la mia tuta и davvero ignifuga.</text>
+	</string>
+	<string id="st_stalker_jup_b211">
+		<text>Sono diretto all'anomalia Plavni per cercare dei manufatti. Ho antidoti a sufficienza, ma sono i mostri che mi preoccupano.</text>
+	</string>
+	<string id="st_stalker_jup_b212">
+		<text>Al complesso di ventilazione, tra la fabbrica e il magazzino dei contenitori. Perchй? Ah, magari lo sapessi.</text>
+	</string>
+	<string id="st_stalker_jup_b219">
+		<text>Sono diretto alle officine di Jupiter. Forse scoprirт perchй quel posto ha una pessima reputazione.</text>
+	</string>
+	<string id="st_stalker_jup_b25">
+		<text>Sono diretto al fondo della cava. Gli stalker dicono che da quelle parti si trovano un sacco di manufatti.</text>
+	</string>
+	<string id="st_stalker_jup_b32">
+		<text>Al parcheggio, dove si trovano i vecchi veicoli. Andrт a caccia di manufatti nelle anomalie elettriche.</text>
+	</string>
+	<string id="st_stalker_jup_b4">
+		<text>C'и un bel posticino tra il complesso Volkhov AA e il magazzino dei contenitori. И lм che sono diretto.</text>
+	</string>
+	<string id="st_stalker_jup_b41">
+		<text>Al bunker degli scienziati.</text>
+	</string>
+	<string id="st_stalker_jup_b46">
+		<text>Alla torre di raffreddamento a nordovest della stazione Yanov.</text>
+	</string>
+	<string id="st_stalker_jup_b47">
+		<text>Verso lo stabilimento Jupiter, ma non ho nessuna intenzione di entrare. Farт un giro per gli edifici dell'amministrazione e cercherт di capire cosa posso fare.</text>
+	</string>
+	<string id="st_stalker_jup_b6_anom_2">
+		<text>Sono diretto all'anomalia Cumulo di cenere, oltre Kopachy.</text>
+	</string>
+	<string id="st_stalker_jup_b8_smart_terrain">
+		<text>Sono diretto alle officine di Jupiter. Dicono che in quell'area sia precipitato un elicottero, quindi andrт a controllare.</text>
+	</string>
+	<string id="st_stalker_jup_sim_1">
+		<text>Sono diretto al treno in rovina tra il complesso Volkhov AA e il parcheggio.</text>
+	</string>
+	<string id="st_stalker_jup_sim_2">
+		<text>Sono diretto al tunnel meridionale, per non correre rischi in caso di emissione.</text>
+	</string>
+	<string id="st_stalker_jup_sim_3">
+		<text>Sono diretto a un punto tra Yanov e Kopachy.</text>
+	</string>
+	<string id="st_stalker_jup_sim_4">
+		<text>Sono diretto a un punto nei pressi del canale, a sud della fabbrica di cemento.</text>
+	</string>
+	<string id="st_stalker_jup_sim_5">
+		<text>Sono diretto a un punto nei pressi del canale, a nord dello stabilimento Jupiter.</text>
+	</string>
+	<string id="st_stalker_jup_sim_6">
+		<text>Andrт a controllare la cava.</text>
+	</string>
+	<string id="st_stalker_jup_sim_7">
+		<text>Andrт a controllare la cava.</text>
+	</string>
+	<string id="st_stalker_jup_sim_8">
+		<text>Andrт a controllare l'area a nord di Yanov.</text>
+	</string>
+	<string id="st_stalker_jup_sim_9">
+		<text>Verso il complesso Volkhov AA. C'и un buon punto dove accamparsi, tra il complesso e Kopachy.</text>
+	</string>
+	<string id="st_stalker_jup_sim_10">
+		<text>Oh, sono semplicemente in viaggio... Sono diretto al magazzino dei contenitori.</text>
+	</string>
+	<string id="st_stalker_jup_sim_11">
+		<text>Sto controllando l'area. Al momento sto andando a controllare cosa reste del checkpoint dell'esercito.</text>
+	</string>
+	<string id="st_stalker_jup_sim_12">
+		<text>Alla piattaforma di atterraggio degli elicotteri, quella tra la fabbrica e il magazzino dei contenitori.</text>
+	</string>
+	<string id="st_stalker_jup_sim_13">
+		<text>Sono diretto a un punto a sud della stazione Yanov, accanto alla ferrovia.</text>
+	</string>
+	<string id="st_stalker_jup_sim_14">
+		<text>A un punto a nord della stazione Yanov.</text>
+	</string>
+	<string id="st_stalker_jup_sim_15">
+		<text>Al boschetto anomalo.</text>
+	</string>
+	<string id="st_stalker_jup_sim_16">
+		<text>A un punto a sud del complesso AA.</text>
+	</string>
+	<string id="st_stalker_jup_sim_17">
+		<text>Allo stagno di raffreddamento accanto all'anomalia Bagno di cemento.</text>
+	</string>
+	<string id="st_stalker_jup_sim_18">
+		<text>Vado a controllare l'area intorno allo stabilimento.</text>
+	</string>
+	<string id="st_stalker_jup_sim_19">
+		<text>Vado a controllare l'area intorno allo stabilimento.</text>
+	</string>
+	<string id="st_stalker_pri_a15">
+		<text>Al cortile dietro la lavanderia.</text>
+	</string>
+	<string id="st_stalker_pri_a16">
+		<text>Alla lavanderia, il posto piщ sicuro da queste parti.</text>
+	</string>
+	<string id="st_stalker_pri_a17">
+		<text>All'ospedale. Spero di non incappare in quei pazzi Monolith...</text>
+	</string>
+	<string id="st_stalker_pri_a18_smart_terrain">
+		<text>Alla libreria... Ho sentito dire che и un buon riparo dalle emissioni.</text>
+	</string>
+	<string id="st_stalker_pri_a20">
+		<text>Vado a vedere l'attrazione locale... il simbolo dell'Amicizia tra tutte le genti. Non и lontano dalla libreria.</text>
+	</string>
+	<string id="st_stalker_pri_a21_smart_terrain">
+		<text>Alla vecchia macelleria. Non troverai certo del pane fresco di questi tempi, ma almeno и un buon posto per nascondersi dalle emissioni.</text>
+	</string>
+	<string id="st_stalker_pri_a22_smart_terrain">
+		<text>Al negozio di Berezka.</text>
+	</string>
+	<string id="st_stalker_pri_a25_smart_terrain">
+		<text>Al vecchio asilo.</text>
+	</string>
+	<string id="st_stalker_pri_a28">
+		<text>Alla piazza del cinema, nei pressi del monumento di Prometheus.</text>
+	</string>
+	<string id="st_stalker_pri_b301">
+		<text>Sono diretto alla scuola. Dicono che sia piena di mostri, ma potrebbe essere un buon riparo da un'emissione.</text>
+	</string>
+	<string id="st_stalker_pri_b303">
+		<text>Sono diretto al vecchio centro di servizio. Dovrebbe esserci un'anomalia al primo piano, e forse anche qualche manufatto.</text>
+	</string>
+	<string id="st_stalker_pri_b304">
+		<text>Sto esplorando questa parte della cittа. Al momento sono diretto alla vecchia macelleria.</text>
+	</string>
+	<string id="st_stalker_pri_b304_monsters_smart_terrain">
+		<text>Sto esplorando questa parte della cittа. Al momento sono diretto alla vecchia macelleria.</text>
+	</string>
+	<string id="st_stalker_pri_b305_dogs">
+		<text>Sto dando un'occhiata in giro. Voglio controllare quell'edificio dietro il complesso di appartamenti.</text>
+	</string>
+	<string id="st_stalker_pri_b306">
+		<text>Voglio ispezionare il centro d'intrattenimento pubblico. Credo si chiamasse Yubileiny.</text>
+	</string>
+	<string id="st_stalker_pri_b307">
+		<text>Sto ispezionando quest'area alla ricerca di anomalie. Credo ce ne sia una di fuoco in un cortile, a ovest dell'asilo.</text>
+	</string>
+	<string id="st_stalker_pri_b35_envoy">
+		<text>Oh, faccio solo un giro per la cittа. Al momento sono diretto al complesso di appartamenti.</text>
+	</string>
+	<string id="st_stalker_pri_b35_mercs">
+		<text>Oh, faccio solo un giro per la cittа. Al momento sono diretto al complesso di appartamenti.</text>
+	</string>
+	<string id="st_stalker_pri_b35_military">
+		<text>Oh, faccio solo un giro per la cittа. Al momento sono diretto al complesso di appartamenti.</text>
+	</string>
+	<string id="st_stalker_pri_b36_smart_terrain">
+		<text>Faccio solo un giro. Adesso sono diretto al porto del fiume. Spero di non incappare in qualche fanatico Monolith...</text>
+	</string>
+	<string id="st_stalker_pri_b302">
+		<text>Sto cercando un posto a Pripyat con molti manufatti e senza mostri nй combattenti Monolith... Eh eh. Andrт a controllare quest'anomalia di cui ho sentito parlare, a sud del porto del fiume.</text>
+	</string>
+	<string id="st_stalker_pri_sim_1">
+		<text>Verso il cinema Prometheus</text>
+	</string>
+	<string id="st_stalker_pri_sim_2">
+		<text>Alla piazza del cinema, nei pressi del monumento di Prometheus.</text>
+	</string>
+	<string id="st_stalker_pri_sim_3">
+		<text>Voglio riposare un po' e riprendere fiato. C'и un bel posticino in un cortile a nord dell'asilo che farebbe proprio al caso mio.</text>
+	</string>
+	<string id="st_stalker_pri_sim_4">
+		<text>A sud del complesso di appartamenti.</text>
+	</string>
+	<string id="st_stalker_pri_sim_5">
+		<text>Sono diretto in questo posto tra l'asilo e il complesso di appartamenti.</text>
+	</string>
+	<string id="dm_anomalies_8">
+		<text>C'и questo posto chiamato Cicatrice, dove il terreno sembra colpito da una scure. Lм sono stati ritrovati dei manufatti, ma una volta che ci entri comincia a succedere qualcosa di strano. Il tuo cervello subisce una botta tale che quasi ti dimentichi di respirare, quando invece dovresti dartela a gambe.</text>
+	</string>
+	<string id="dm_anomalies_1">
+		<text>Sai dove si trova la stazione di drenaggio? И stata sottoposta a parecchie anomalie gravitazionali, ma niente che uno stalker esperto non possa affrontare. Continua a lanciare bulloni, come al solito. Ci sono anche delle radiazioni, dentro e fuori. И per via dell'acqua... quel posto sembra un piccolo reattore all'uranio.</text>
+	</string>
+	<string id="dm_anomalies_4">
+		<text>Qui c'и una vecchia sotto-stazione, anche nota come Foresta d'acciaio. Capirai il perchй di questo nome quando la vedrai. Certa gente sostiene di aver trovato numerosi manufatti dopo un'emissione. Non и un posto molto pericoloso, piщ che altro ci sono anomalie elettriche mescolate a radiazioni. Ci sono anche dei poltergeist. Se non ti nascondi in tempo ti seppelliranno in men che non si dica.</text>
+	</string>
+	<string id="dm_job_12">
+		<text>Lavorare? A essere onesto non saprei. Ma se hai la possibilitа di aiutare la Freedom, parla con il nostro capo a Yanov. Vai all'ala sud e parla con Loki, и lui la persona giusta. Ricorda, se credi nell'evoluzione della specie umana, in una veritа superiore e nel significato dei doni della Zona, farai la scelta giusta.</text>
+	</string>
+	<string id="dm_job_13">
+		<text>Non ne ho idea, ma se trovi qualcosa che ci aiuti a combattere la Zona e quelli che la considerano un dono anzichй una maledizione, parla con il comandante dell'unitа della Duty, il Tenente Colonnello Shulga. Lui и a capo della stazione Yanov. Lo troverai nell'ala nord. Una cosa и certa: tutti i civili che contribuiranno al successo della Duty riceveranno una generosa ricompensa.</text>
+	</string>
+	<string id="dm_information_19">
+		<text>Tutti dicono che stanno succedendo cose strane alla vecchia torre di raffreddamento. Se ti sintonizzi sulla frequenza comune potrai sentire frammenti di chiamate... sembra che un povero diavolo stia cercando di uscire da un'anomalia. Quando chiedi delle coordinate, perт, nessuno ti sa rispondere. La cosa piщ strana и il suono. Quel tipo di distorsione non puт proprio essere spiegato...</text>
+	</string>
+	<string id="st_stalker_zat_sim_27">
+		<text>Sono diretto a un luogo a metа strada tra la Skadovsk e Shevchenko.</text>
+	</string>
+	<string id="st_stalker_jup_a9">
+		<text>A Jupiter. Anche se probabilmente non mi spingerт troppo avanti.</text>
+	</string>
+</string_table>

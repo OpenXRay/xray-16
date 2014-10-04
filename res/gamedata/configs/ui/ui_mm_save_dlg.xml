@@ -1,0 +1,53 @@
+<w>
+	<background width="1024" height="768">
+		<auto_static x="500" y="130" width="432" height="160" stretch="1">
+			<texture width="432" height="160">ui\video_voroni_crop</texture>
+		</auto_static>
+		<auto_static x="413" y="352" width="576" height="416" stretch="1">
+			<texture width="576" height="416">ui\video_water_crop</texture>
+		</auto_static>
+	    <auto_static width="1024" height="768">
+	      <texture>ui_inGame2_background</texture>
+	    </auto_static>
+		<auto_static x="41" y="278" width="288" height="428">
+			<texture>ui_save_load_back</texture>
+		</auto_static>
+	</background>
+	<file_item>
+	    <main width="490" height="18"/>
+	    <fn width="325" height="18"/>
+	    <fd width="110" height="18"/>
+	</file_item>
+	<form x="50" y="252" width="560" height="460" stretch="1">
+	    <texture>ui_inGame2_main_window_small</texture>
+	    <caption x="0" y="20" width="560" height="30">
+		    <text font="graffiti32" align="c">ui_mm_save_game</text>
+	    </caption>
+	    <edit x="30" y="75" width="256" height="23" file_name_mode="1">
+		    <texture>ui_inGame2_edit_box_1</texture>
+		    <text x="3" font="letterica18" vert_align="c"/>
+	    </edit>
+	    <list_frame x="30" y="110" width="500" height="275">
+		    <texture>ui_inGame2_servers_list_frame</texture>
+	    </list_frame>
+	    <list x="33" y="110" width="497" height="273" item_height="18" can_select="1">
+		    <font font="letterica16"/>
+	    </list>
+	    <btn_save x="65" y="427" width="135" height="26">
+	        <texture>ui_inGame2_Mp_bigbuttone</texture>
+	        <text font="letterica18">ui_mm_save</text>
+	    </btn_save>
+	    <btn_delete x="221" y="427" width="135" height="26">
+	        <texture>ui_inGame2_Mp_bigbuttone</texture>
+	        <text font="letterica18">ui_mm_delete</text>
+	        <text_color>
+	        </text_color>
+	    </btn_delete>
+	    <btn_cancel x="377" y="427" width="135" height="26">
+	        <texture>ui_inGame2_Mp_bigbuttone</texture>
+	        <text font="letterica18">ui_mm_cancel</text>
+	        <text_color>
+	        </text_color>
+	    </btn_cancel>
+	</form>
+</w>

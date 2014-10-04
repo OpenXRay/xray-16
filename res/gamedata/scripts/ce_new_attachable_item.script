@@ -1,0 +1,10 @@
+class "CCE_NewAttachableItem" (attachable_item)
+
+function CCE_NewAttachableItem:__init() super()
+	printf		("CCE_NewAttachableItem::CCE_NewAttachableItem called!")
+end
+
+function CCE_NewAttachableItem:__finalize()
+	printf		("CCE_NewAttachableItem::~CCE_NewAttachableItem called!")
+end
+

@@ -1,0 +1,10 @@
+function main ()
+	db.actor:give_info_portion("pri_a28_actor_in_zone_stay")
+	db.actor:give_info_portion("kingpin_gained")
+	db.actor:give_info_portion("sim_duty_help_harder")
+ 	db.actor:give_info_portion("jup_a10_vano_agree_go_und")
+ 	db.actor:give_info_portion("jup_b218_monolith_hired")
+ 	db.actor:give_info_portion("jup_b218_soldier_hired")
+ 	db.actor:give_info_portion("pri_a28_strelok_dead")
+ 	db.actor:give_info_portion("pri_a28_koval_dead")
+end

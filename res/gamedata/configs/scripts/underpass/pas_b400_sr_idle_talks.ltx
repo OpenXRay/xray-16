@@ -1,0 +1,30 @@
+[logic]
+active = sr_idle@start_talks
+;active = sr_idle@idle_talks
+
+[sr_idle@start_talks]
+on_info = {+pas_b400_task_given} sr_idle@talk_vano
+
+[sr_idle@talk_vano]
+on_game_timer = 50 | sr_idle@talk_zulus %+pas_b400_vano_about_underpass%
+on_info = {+pas_b400_sr_elevator_1_passed} sr_idle@idle_talks
+
+[sr_idle@talk_zulus]
+on_game_timer = 50 | sr_idle@talk_wanderer %+pas_b400_zulus_about_underpass%
+on_info = {+pas_b400_sr_elevator_1_passed} sr_idle@idle_talks
+
+[sr_idle@talk_wanderer]
+on_game_timer = 50 | sr_idle@talk_vano %+pas_b400_wanderer_about_underpass%
+on_info = {+pas_b400_sr_elevator_1_passed} sr_idle@idle_talks
+
+[sr_idle@idle_talks]
+on_game_timer = 160 | sr_idle@choose
+on_info = {=squad_has_enemy(pas_b400_stalkers_squad)} sr_idle@combat
+
+[sr_idle@combat]
+on_info = {!squad_has_enemy(pas_b400_stalkers_squad)} sr_idle@idle_talks
+
+[sr_idle@choose]
+on_info = {~5 =is_alive(pas_b400_zulus)} sr_idle@idle_talks %+pas_b400_zulus_idle_talk%, {~10 =is_alive(pas_b400_vano)} sr_idle@idle_talks %+pas_b400_vano_idle_talk%, {~15= is_alive(pas_b400_sokolov)} sr_idle@idle_talks %+pas_b400_sokolov_idle_talk%, {~20 =is_alive(pas_b400_wanderer)} sr_idle@idle_talks %+pas_b400_wanderer_idle_talk%, sr_idle@idle_talks
+
+[sr_idle@nil]

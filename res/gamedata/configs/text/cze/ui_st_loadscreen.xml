@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="ls_header">
+		<text>100 TIPЩ PRO PШEЋITН V ZУNМ</text>
+	</string>
+	<string id="ls_mp_tip_16">
+		<text>Zбsah nepшнtele do oka znamenб jeho okamћitou smrt, bez ohledu na kvalitu zbroje.</text>
+	</string>
+	<string id="ls_mp_tip_19">
+		<text>AC-96/2 mб jedineиnэ dбvkovэ reћim stшelby, pшi kterйm dvм souиasnм vystшelenй kulky zasбhnou stejnй mнsto.</text>
+	</string>
+	<string id="ls_mp_tip_21">
+		<text>Dvouhlavтovй brokovnice mohou oba nбboje vystшelit tйmмш souиasnм.</text>
+	</string>
+	<string id="ls_mp_tip_25">
+		<text>Nepodceтuj pistole. Poskytujн sluљnou palebnou sнlu a proti љpatnм obrnмnэm cнlщm mohou bэt velice efektivnн.</text>
+	</string>
+	<string id="ls_mp_tip_32">
+		<text>Odstшelovacн puљky jsou vzhledem ke svй plochй trajektorii a pшesnosti ideбlnн pro eliminaci nepшбtel z dбlky. Pшi malэch vzdбlenostech jejich efektivita klesб.</text>
+	</string>
+	<string id="ls_mp_tip_33">
+		<text>Stшelba za pohybu mб v porovnбnн se stшelbou ze stoje nebo z pokleku mnohem menљн pшesnost.</text>
+	</string>
+	<string id="ls_mp_tip_34">
+		<text>Zbranм a ochrannй obleky se v tvrdэch podmнnkбch Zуny rychle opotшebovбvajн. Opotшebovanй zbranм ztrбcejн pшesnost a mohou selhat, obnoљenй obleky neposkytujн tak dobrou ochranu.</text>
+	</string>
+	<string id="ls_mp_tip_54">
+		<text>Pro vytvoшenн snнmku obrazovky stiskni "$$ACTION_SCREENSHOT$$".</text>
+	</string>
+	<string id="ls_mp_tip_9">
+		<text>Artefakt nebo hrби, kterэ jej nese, je zobrazen na minimapм. Pokud je artefakt daleko, jeho polohu naznaиuje љipka na minimapм.</text>
+	</string>
+	<string id="ls_tip_37">
+		<text>AC-96/2 mб jedineиnэ dбvkovэ reћim stшelby, pшi kterйm dvм souиasnм vystшelenй kulky zasбhnou stejnй mнsto.</text>
+	</string>
+	<string id="ls_tip_39">
+		<text>Dvouhlavтovй brokovnice mohou oba nбboje vystшelit tйmмш souиasnм.</text>
+	</string>
+	<string id="ls_tip_43">
+		<text>Nepodceтuj pistole. Poskytujн sluљnou palebnou sнlu a proti љpatnм obrnмnэm cнlщm mohou bэt velice efektivnн.</text>
+	</string>
+	<string id="ls_tip_50">
+		<text>Odstшelovacн puљky jsou vzhledem ke svй plochй trajektorii a pшesnosti ideбlnн pro eliminaci nepшбtel z dбlky. Na malй vzdбlenosti jejich efektivita klesб.</text>
+	</string>
+	<string id="ls_tip_52">
+		<text>Zbranм a ochrannй obleky se v tvrdэch podmнnkбch Zуny rychle opotшebovбvajн. Opotшebovanй zbranм ztrбcejн pшesnost a mohou selhat, obnoљenй obleky neposkytujн tak dobrou ochranu.</text>
+	</string>
+	<string id="ls_tip_56">
+		<text>Nмkterй zdravotnickй produkty majн jedineиnй vlastnosti. Napшнklad Herkulovy pilulky doиasnм zvyљujн tvou nosnost a droga Stop-psн ti pomщћe odolat psн-zбшenн</text>
+	</string>
+	<string id="ls_tip_83">
+		<text>Pro vytvoшenн snнmku obrazovky stiskni "$$ACTION_SCREENSHOT$$".</text>
+	</string>
+	<string id="ls_tip_number">
+		<text>Tip #</text>
+	</string>
+	<string id="ls_tip_1">
+		<text>Vodka, levnб nбhraћka antiradiaиnнch pшнpravkщ, je nejjednoduљљнm zpщsobem snнћenн efektщ ozбшenн.</text>
+	</string>
+	<string id="ls_tip_10">
+		<text>Podrobnй informace o aktuбlnн misi se zobrazн po stisknutн klбvesy "$$ACTION_SCORES$$".</text>
+	</string>
+	<string id="ls_tip_13">
+		<text>Na vyhledбvбnн artefaktщ potшebujeљ detektor. Hledбnн je s pomocн nejlepљнch detektorщ snazљн a dokonce s nimi mщћeљ najнt vнce cennэch artefaktщ.</text>
+	</string>
+	<string id="ls_tip_14">
+		<text>Stalkeшi nedovolн, aby do jejich tбborщ vstoupil kdokoliv se zbranн v ruce. Pro ukrytн svй zbranм stiskni pшнsluљnou klбvesu ("$$ACTION_WPN_1$$", "$$ACTION_WPN_2$$",  "$$ACTION_WPN_3$$", "$$ACTION_WPN_4$$").</text>
+	</string>
+	<string id="ls_tip_15">
+		<text>Okraje anomбliн mщћeљ odhalit pomocн hбzenн љroubщ. Љroub vytбhneљ klбvesou "$$ACTION_WPN_6$$".</text>
+	</string>
+	<string id="ls_tip_17">
+		<text>Kromм zahnбnн hladu dokбћe jнdlo zlepљit zdravotnн stav.</text>
+	</string>
+	<string id="ls_tip_18">
+		<text>Energetickй nбpoje doиasnм zrychlujн obnovovбnн vэdrћe, coћ zvyљuje tvou potenciбlnн pohyblivost.</text>
+	</string>
+	<string id="ls_tip_20">
+		<text>Slabб vэdrћ mщћe ochromit tvщj pohyb a v dщleћitэch okamћicнch tм uиinit zranitelnэm vщиi ъtokщm nepшбtel.</text>
+	</string>
+	<string id="ls_tip_21">
+		<text>Svщj stupeт ukrytн mщћeљ sledovat pomocн indikбtorщ detektoru hluku a nepшбtel, kterй se nachбzejн v levй hornн ибsti obrazovky.</text>
+	</string>
+	<string id="ls_tip_22">
+		<text>Drћenн detektoru v jednй ruce nijak nebrбnн pouћitн noћe, pistole nebo љroubщ ve druhй.</text>
+	</string>
+	<string id="ls_tip_23">
+		<text>Nмkterй lйkaшskй produkty zvyљujн odolnost tмla vщиi љkodlivэm lбtkбm a ћivlщm. Uћitн tмchto produktщ ti bмhem misн v oblastech anomбliн mщћe zachrбnit ћivot.</text>
+	</string>
+	<string id="ls_tip_27">
+		<text>Kontextovou nabнdku k pшedmмtщm ve svйm batohu mщћeљ vyvolat umнstмnнm kurzoru myљi nad pшнsluљnэ pшedmмt a stisknutнm pravйho tlaинtka myљi.</text>
+	</string>
+	<string id="ls_tip_28">
+		<text>Vмtљina artefaktщ mб, kromм svэch uћiteиnэch efektщ, i radioaktivnн ъиinky. Tu mщћeљ kompenzovat pouћitнm artefaktщ, kterй radiaci absorbujн.</text>
+	</string>
+	<string id="ls_tip_29">
+		<text>Nщћ je proti nepшбtelщm se stшelnэmi zbranмmi neefektivnн. Jeho vyuћitн tkvн pшedevљнm v boji zblнzka a v tichйm zabнjenн.</text>
+	</string>
+	<string id="ls_tip_3">
+		<text>Zбtмћ, kterou neseљ, sniћuje tvou vэdrћ. Nadmмrnб zбtмћ omezн tvou pohyblivost, a pokud budeљ ъplnм pшetнћen, vщbec nebudeљ schopen pohybu.</text>
+	</string>
+	<string id="ls_tip_30">
+		<text>Detektor poskytuje jedinэ zpщsob vyhledбvбnн artefaktщ v oblastech anomбliн.</text>
+	</string>
+	<string id="ls_tip_31">
+		<text>Vмtљina artefaktщ zщstбvб bмhem svйho pohybu v oblastech anomбliн neviditelnб, dokud nejsou odhaleny detektorem.</text>
+	</string>
+	<string id="ls_tip_32">
+		<text>Aktivita mutantщ vzrщstб v noci, coћ vysvмtluje, proи stalkeшi pшed vstupem do zуny иasto vyиkбvajн do rozbшesku.</text>
+	</string>
+	<string id="ls_tip_33">
+		<text>Pokud jsi byl vystaven velkй dбvce ozбшenн, pouћij antiradiaиnн drogy. Pokud ћбdnй nemбљ, pouћij lйky pro vypoшбdбnн se s poибteиnнmi symptomy, aby ses mohl dostat k lйkaшi.</text>
+	</string>
+	<string id="ls_tip_34">
+		<text>Vмtљina stalkerщ tм dokбћe provйst po blнzkйm okolн, ale jen zkuљenэ prщvodce tм mщћe bezpeиnм a rychle dovйst do vzdбlenмjљнch mнst. Vљichni prщvodci ti vљak dokбћн poskytnout pomocnou ruku.</text>
+	</string>
+	<string id="ls_tip_35">
+		<text>Prodej artefaktщ nenн jedinэ zpщsob, jak se dostat k penмzщm. Vэhodnй mщћe bэt i zbavovбnн se nepotшebnйho vybavenн. Mмj vљak na pamмti, ћe obchodnнci vмtљinou nemajн zбjem o vбћnм poљkozenй pшedmмty.</text>
+	</string>
+	<string id="ls_tip_38">
+		<text>Pro odpojenн tlumiиe, zamмшovaиe nebo podvмљenйho granбtometu od svй zbranм klikni pravэm tlaинtkem na zbraт v batohu a z kontextovй nabнdky vyber pшнsluљnou moћnost.</text>
+	</string>
+	<string id="ls_tip_40">
+		<text>Pokud se chceљ pohybovat co nejtiљeji, stiskni "$$ACTION_ACCEL$$" pro chщzi nebo "$$ACTION_CROUCH$$" pro pшikrиenн.</text>
+	</string>
+	<string id="ls_tip_41">
+		<text>Brokovnice patшн k zbranнm pro boj zblнzka. Инm je tvщj protivnнk vzdбlenмjљн, tнm mйnм je efektivnн.</text>
+	</string>
+	<string id="ls_tip_42">
+		<text>Pokud se kryjeљ pшed stшelbou z ruиnнch zbranн, vyuћij dostateиnм pevnэch pшekбћek. Plechy a dшevмnй desky neposkytujн dokonalou ochranu, na rozdнl od betonovэch zdн.</text>
+	</string>
+	<string id="ls_tip_44">
+		<text>Stшely do hlavy majн za nбsledek kritickб zranмnн a pro vмtљinu nepшбtel jsou smrtelnй.</text>
+	</string>
+	<string id="ls_tip_45">
+		<text>Kaћdэ druh mutantщ ћijнcнch v Zуnм mб vlastnн zpщsoby boje. Pokud je vezmeљ v ъvahu, pravdмpodobnost pшeћitн se zvэљн.</text>
+	</string>
+	<string id="ls_tip_46">
+		<text>Dйlku hodu granбtu mщћeљ upravit podrћenнm klбvesy "$$ACTION_WPN_ZOOM$$".</text>
+	</string>
+	<string id="ls_tip_47">
+		<text>Nepшбtelй dokбћou pouћнvat granбty a takй je pouћнvajн. Jakmile se objevн indikбtor granбtu, okamћitм opusќ smrtнcн oblast.</text>
+	</string>
+	<string id="ls_tip_48">
+		<text>Pokud pшed skokem zrychlнљ, dokбћeљ zdolat vмtљн propasti a pшekбћky.</text>
+	</string>
+	<string id="ls_tip_49">
+		<text>Hlavnн indikбtory zobrazujнcн tvщj zdravotnн stav a vэdrћ se nachбzejн v pravйm dolnнm rohu obrazovky.</text>
+	</string>
+	<string id="ls_tip_53">
+		<text>Zуna ћije svэm vlastnнm ћivotem, coћ znamenб, ћe i v oblastech, kterэmi uћ jsi proљel, mщћeљ narazit na dalљн mutanty a nepшбtelskй stalkery.</text>
+	</string>
+	<string id="ls_tip_54">
+		<text>Pшi pobytu v Zуnм se mмj stбle na pozoru a nespolйhej na starй informace. Pokud se vrбtнљ do oblastн anomбliн, kterй jsi uћ prozkoumal, mщћeљ se stбt, ћe dшнve ovмшenй cesty uћ nebudeљ moci vyuћнt.</text>
+	</string>
+	<string id="ls_tip_58">
+		<text>Hovory s bмћnэmi stalkery ti mohou poskytnout uћiteиnй informace o novэch oblastech nebo aktuбlnнch udбlostech.</text>
+	</string>
+	<string id="ls_tip_60">
+		<text>Na obou pozicнch pro zbranм mщћeљ pouћнt kteroukoliv ze zbranн. Dнky tomu mщћeљ vytvбшet rщznorodй kombinace zbranн jako ъtoиnб puљka/brokovnice a pistole/odstшelovacн puљka.</text>
+	</string>
+	<string id="ls_tip_61">
+		<text>Kaћdэ obchodnнk, kterйho v rщznэch tбborech stalkerщ potkбљ, mб unikбtnн nabнdku zboћн. Napшнklad zdravotnнci vћdy disponujн kvalitnнm vэbмrem lйkaшskэch produktщ.</text>
+	</string>
+	<string id="ls_tip_62">
+		<text>Pokud do tбbora stalkerщ dorazнљ zranмnэ nebo postiћenэ radiacн, mщћeљ vyuћнt bezplatnй pomoci mнstnнho zdravotnнka.</text>
+	</string>
+	<string id="ls_tip_63">
+		<text>Svй vмci mщћeљ zanechat v osobnн schrбnce v tбboшe, abys sebou nemusel vlбиet nepotшebnй vмci.</text>
+	</string>
+	<string id="ls_tip_64">
+		<text>Pokud musнљ иekat na konkrйtnн hodinu, pro zkrбcenн иasu si mщћeљ zdшнmnout v kempu. Staин najнt mнsto na spanн, stisknout "$$ACTION_USE$$" a nastavit, jak dlouho chceљ spбt.</text>
+	</string>
+	<string id="ls_tip_65">
+		<text>Zaшнzenн pro noиnн vidмnн nachбzejнcн se na tvй helmм mщћe bэt vylepљeno na verzi novй generace. Tнm se vэraznм zlepљн jeho pokrytн.</text>
+	</string>
+	<string id="ls_tip_67">
+		<text>Kdykoliv se vydбљ do Zуny, nezapomeт si pшibalit pбr zбsobnнkщ navнc – nejspнљ se ti budou hodit.</text>
+	</string>
+	<string id="ls_tip_68">
+		<text>Nezapomeт svou hru pravidelnм uklбdat – nebudeљ tak muset hrбt stejnou ибst stбle dokola.</text>
+	</string>
+	<string id="ls_tip_69">
+		<text>Pokud chceљ uћнvat lйky sprбvnэm zpщsobem, mмl bys vмdмt, k иemu jsou. Pro zjiљtмnн efektu kaћdйho lйku si pшeиti jeho popis.</text>
+	</string>
+	<string id="ls_tip_70">
+		<text>K ъtoku na nepшбtele v zбkrytu mщћeљ vyuћнt granбtщ. Nezapomeт vzнt v ъvahu oblast vэbuchu, abys nezranil svй spolubojovnнky.</text>
+	</string>
+	<string id="ls_tip_71">
+		<text>K odstranмnн pшedmмtu ze svйho batohu na nмj klikni pravэm tlaинtkem a z kontextovй nabнdky vyber pшнsluљnou moћnost.</text>
+	</string>
+	<string id="ls_tip_72">
+		<text>V moћnostech hry mщћeљ vyuћнt zvlбљtnнho nastavenн, pomocн kterйho se hra bude v dщleћitэch mнstech automaticky uklбdat.</text>
+	</string>
+	<string id="ls_tip_73">
+		<text>Jakmile se vrбtнљ do tбbora, mмl bys opravit svй vybavenн, prodat nepotшebnou koшist a doplnit si munici a lйkaшskй zбsoby.</text>
+	</string>
+	<string id="ls_tip_75">
+		<text>K snнћenн љkodlivэch ъиinkщ anomбlnнch oblastн bмhem vэprav do Zуny pouћij ochrannй obleky, artefakty nebo pшнsluљnй lйky.</text>
+	</string>
+	<string id="ls_tip_77">
+		<text>Kromм zbranн a munice u sebe mohou tмla nepшбtel ukrэvat cennй pшedmмty jako PDA zaшнzenн se zajнmavэmi informacemi.</text>
+	</string>
+	<string id="ls_tip_78">
+		<text>Artefakty nejsou jen cennou koшistн: kromм toho, ћe jsou lehkй a drahй, mнvajн nмkdy aћ neuvмшitelnм uћiteиnй ъиinky.</text>
+	</string>
+	<string id="ls_tip_79">
+		<text>Vzhledem k prostшedн Zуny je mnoho mutantщ radioaktivnнch. Pшiblнћenн se k nim bez pшimмшenй ochrany proti radiaci je tak velice nebezpeиnй.</text>
+	</string>
+	<string id="ls_tip_8">
+		<text>K zastavenн krvбcenн mщћeљ pouћнt obvaz, vojenskэ balнk se zdravotnнmi potшebami nebo lйk "Vinostrбz". Pokud rychle nezasбhneљ, krvбcenн mщћe vбћnм poљkodit tvй zdravн.</text>
+	</string>
+	<string id="ls_tip_80">
+		<text>K nмkterэm zbranнm mщћeљ namontovat nastavitelnэ zamмшovaи. Pro pшiblнћenн stiskni "$$ACTION_NEXT_SLOT$$" nebo "$$ACTION_PREV_SLOT$$".</text>
+	</string>
+	<string id="ls_tip_82">
+		<text>Do nмkterэch mнst se nelze dostat ani po pшikrиenн. Pokud se chceљ skrиit co nejnнћe, stiskni a podrћ souиasnм klбvesy "$$ACTION_CROUCH$$" a "$$ACTION_ACCEL$$".</text>
+	</string>
+	<string id="ls_tip_84">
+		<text>Pokud chceљ snнћit pravdмpodobnost, ћe tм zasбhne nepшнtelova kulka, opмtuj palbu po naklonмnн zpoza rohu pomocн klбvesy "$$ACTION_LLOOKOUT$$" nebo "$$ACTION_RLOOKOUT$$".</text>
+	</string>
+	<string id="ls_tip_85">
+		<text>Dнky vestavмnйmu mechanismu pro lokalizaci cнlщ ti dalekohled neposkytuje jen dobrэ pohled na vzdбlenй objekty, ale dokбћe takй najнt nepшбtele. Pro vytбhnutн dalekohledu stiskni "$$ACTION_WPN_5$$".</text>
+	</string>
+	<string id="ls_tip_86">
+		<text>Pro zapnutн nebo vypnutн svнtilny stiskni "$$ACTION_TORCH$$".</text>
+	</string>
+	<string id="ls_tip_87">
+		<text>Pro vytбhnutн љroubu stiskni  "$$ACTION_WPN_6$$".</text>
+	</string>
+	<string id="ls_tip_88">
+		<text>Pokud mбљ na helmм pшipevnмno zaшнzenн pro noиnн vidмnн, zapnout nebo vypnout jej mщћeљ pomocн klбvesy "$$ACTION_NIGHT_VISION$$".</text>
+	</string>
+	<string id="ls_tip_89">
+		<text>Pro pouћitн pшнsluљnйho pшedmмtu z panelu pro rychlэ pшнstup stiskni "$$ACTION_QUICK_USE_1$$", "$$ACTION_QUICK_USE_2$$", "$$ACTION_QUICK_USE_3$$" nebo "$$ACTION_QUICK_USE_4$$".</text>
+	</string>
+	<string id="ls_tip_9">
+		<text>Lйky nepщsobн okamћitм po jejich poћitн a nмkterй majн dlouhodobэ ъиinek.</text>
+	</string>
+	<string id="ls_tip_90">
+		<text>Na svйm PDA najdeљ mapu, informace o aktuбlnн misi, osobnн statistiky a zбznamnнk zprбv. PDA otevшeљ stisknutнm "$$ACTION_ACTIVE_JOBS$$".</text>
+	</string>
+	<string id="ls_tip_91">
+		<text>Pшi vyhledбvбnн artefaktщ musнљ vytбhnout svщj detektor, slouћн k tomu klбvesa "$$ACTION_SHOW_DETECTOR$$".</text>
+	</string>
+	<string id="ls_tip_92">
+		<text>Pro pozastavenн hry stiskni "$$ACTION_PAUSE$$".</text>
+	</string>
+	<string id="ls_tip_93">
+		<text>Pro rychlй uloћenн hry stiskni "$$ACTION_QUICK_SAVE$$". Pro rychlй naиtenн poslednн rychle uloћenй hry stiskni "$$ACTION_QUICK_LOAD$$".</text>
+	</string>
+	<string id="ls_tip_94">
+		<text>Bмh je nejrychlejљнm zpщsobem pohybu, je vљak velice vysilujнcн. Pro bмh stiskni "$$ACTION_SPRINT_TOGGLE$$".</text>
+	</string>
+	<string id="ls_tip_95">
+		<text>Stшelba po zamншenн je mnohem pшesnмjљн neћ stшelba od boku. Pro zamншenн stiskni  "$$ACTION_WPN_ZOOM$$".</text>
+	</string>
+	<string id="ls_tip_96">
+		<text>Pokud mбљ k dispozici podvмљenэ granбtomet, pomocн klбvesy "$$ACTION_WPN_FUNC$$" mщћeљ volit mezi nнm a klasickэm reћimem stшelby.</text>
+	</string>
+	<string id="ls_tip_97">
+		<text>Pokud mбљ vнce druhщ nбbojщ do svй souиasnй zbranм, mщћeљ mezi nimi volit pomocн klбvesy "$$ACTION_WPN_NEXT$$".</text>
+	</string>
+	<string id="ls_tip_98">
+		<text>Pro nabitн zbranм jeљtм pшed vyprбzdnмnнm zбsobnнku stiskni  "$$ACTION_WPN_RELOAD$$".</text>
+	</string>
+	<string id="ls_tip_99">
+		<text>Pro odloћenн svй souиasnй zbranм stiskni "$$ACTION_DROP$$".</text>
+	</string>
+	<string id="ls_tip_6">
+		<text>Abys pшeиkal emisi, najdi si ъkryt v bezpeиnй budovм nebo v podzemн. Pokud se emise zaиne pшibliћovat, na tvйm PDA se zobrazн pozice nejbliћљнho ъkrytu.</text>
+	</string>
+	<string id="ls_tip_12">
+		<text>Pro vyuћitн pшedmмtu v rбmci pozice pro rychlэ pшнstup ho pшetбhni ze svйho batohu na jednu ze иtyш pozic nad schrбnkami pro artefakty.</text>
+	</string>
+	<string id="ls_tip_24">
+		<text>Symbol kapky krve v pravй spodnн ибsti obrazovky tм upozorтuje na krvбcenн a nutnost zastavit jej. Barva symbolu naznaиuje, jak je krvбcenн zбvaћnй.</text>
+	</string>
+	<string id="ls_tip_25">
+		<text>Symbol nebezpeиnйho zбшenн v pravй dolnн ибsti obrazovky upozorтuje, ћe jsi byl vystaven radiaci. Pokud k tomu dojde, mмl bys vyuћнt antiradiaиnнch pшнpravkщ. Barva symbolu naznaиuje, jak zбvaћnй ozбшenн je.</text>
+	</string>
+	<string id="ls_tip_4">
+		<text>Pomocн filtrщ mщћeљ v mapм na svйm PDA zobrazit a skrэt rщznй znaиky. Tlaинtka filtrщ se nachбzejн nad mapou, pod шбdkem s aktuбlnн misн.</text>
+	</string>
+	<string id="ls_tip_55">
+		<text>Artefakty obvykle nejsou statickй: иasto se v rбmci anomбlnнch oblastн pohybujн. Nepromyљlenй pokusy o zнskбnн artefaktu tм tak mohou okamћitм dostat do problйmщ. </text>
+	</string>
+	<string id="ls_tip_57">
+		<text>Nмkteшн stalkeшi ti mohou nabнdnout svй sluћby, jakэmi jsou informace, exkluzivnн zboћн nebo poznбmky k urиitэm artefaktщm.</text>
+	</string>
+	<string id="ls_tip_59">
+		<text>Novй artefakty se mohou objevit v anomбlnнch oblastech, kterй jsi jiћ prozkoumal.</text>
+	</string>
+	<string id="ls_tip_74">
+		<text>V nastavenн hry mщћeљ kdykoliv zmмnit jejн obtнћnost.</text>
+	</string>
+	<string id="ls_tip_2">
+		<text>Technici v tбborech stalkerщ dokбћou vylepљovat tvй zbranм, obleky a helmy.</text>
+	</string>
+	<string id="ls_tip_66">
+		<text>Pokud chceљ pшeћнt, neustбle sleduj praskбnн vydбvanй Geigerovэm poинtaиem varujнcн pшed radiacн a signбl nebezpeин anomбliн, kterэ tм upozornн, pokud se pшiblнћнљ k anomбlii.</text>
+	</string>
+	<string id="ls_tip_26">
+		<text>Tvщj vztah k lidem pшнmo ovlivтuje cenu zboћн a sluћeb, kterй chceљ zakoupit. Pokud je tvщj vztah zбpornэ, ћбdnou slevu neиekej. Pokud vљak s lidmi vychбzнљ dobшe, obchodnнk ti mщћe uиinit zvlбљtnн nabнdku.</text>
+	</string>
+	<string id="ls_tip_11">
+		<text>K zнskбnн nбbojщ mщћeљ vyjmout zбsobnнky z nalezenэch zbranн. Staин kliknou pravэm tlaинtkem na zbraт v batohu a z kontextovй nabнdky zvolit pшнsluљnou moћnost.</text>
+	</string>
+	<string id="ls_mp_tip_1">
+		<text>Zabнjenнm nepшбtel a zнskбvбnнm artefaktщ vydмlбvбљ body potшebnй ke zvэљenн svй hodnosti. Pшi zvэљenн hodnosti zнskбљ pшнstup k novэm zbranнm, zbrojнm a vybavenн.</text>
+	</string>
+	<string id="ls_mp_tip_11">
+		<text>Kouшovй granбty mщћeљ vyuћнt k odcizenн artefaktu nebo ke krytн.</text>
+	</string>
+	<string id="ls_mp_tip_13">
+		<text>Levб ибst nбkupnн nabнdky obsahuje pмt zбloћek: pistole, silnмjљн zbranм, vybavenн, munice a zdravotnickэ materiбl. Po zvolenн poћadovanй zбloћky se zobrazн seznam vмcн, kterэch se svou hodnostн mщћeљ vyuћнt.</text>
+	</string>
+	<string id="ls_mp_tip_14">
+		<text>Nбkupnн nabнdka v pravй ибsti obrazovky obsahuje иtyшi pozice pro rychlэ nбkup. Kliknutнm na ikonu disku vybavenн uloћнљ, kliknutнm na pшнsluљnй инslo toto vybavenн naиteљ. Na иtvrtou pozici se automaticky uklбdб poslednм nakoupenй vybavenн.</text>
+	</string>
+	<string id="ls_mp_tip_15">
+		<text>Pokud disponujeљ vнce neћ jednou zbranн, mщћeљ mezi nimi pшepнnat opakovanэm stisknutнm "$$ACTION_WPN_3$$".</text>
+	</string>
+	<string id="ls_mp_tip_17">
+		<text>Artefakt mщћe bэt aktivovбn a vytvoшit tak anomбlii. Staин vytбhnout artefakt stisknutнm "$$ACTION_ARTEFACT$$" a podrћenнm "$$ACTION_WPN_FIRE$$". Anomбlie, kterб tak vznikne, je nebezpeиnб jak pro nepшнtele, tak pro hrбиe, kterэ ji vytvoшil.</text>
+	</string>
+	<string id="ls_mp_tip_18">
+		<text>Vмdeckэ oblek, kterэ ti pomщћe pшeћнt pшi anomбliнch a v radioaktivnнch oblastech.</text>
+	</string>
+	<string id="ls_mp_tip_2">
+		<text>HON ZA ARTEFAKTY: K dosaћenн vнtмzstvн musнљ na svou zбkladnu pшinйst urиitй mnoћstvн artefaktщ.</text>
+	</string>
+	<string id="ls_mp_tip_20">
+		<text>K odpojenн tlumiиe, zamмшovaиe nebo podvмљenйho granбtometu od svй zbranм klikni pravэm tlaинtkem na zbraт v batohu a z kontextovй nabнdky vyber pшнsluљnou moћnost.</text>
+	</string>
+	<string id="ls_mp_tip_22">
+		<text>Pokud se chceљ pohybovat co nejtiљeji, stiskni "$$ACTION_ACCEL$$" pro chщzi nebo "$$ACTION_CROUCH$$" pro pшikrиenн.</text>
+	</string>
+	<string id="ls_mp_tip_23">
+		<text>Brokovnice patшн k zbranнm pro boj zblнzka. Инm je tvщj protivnнk dбle, tнm mйnм je efektivnн.</text>
+	</string>
+	<string id="ls_mp_tip_24">
+		<text>Pokud se kryjeљ pшed stшelbou z ruиnнch zbranн, vyuћij dostateиnм pevnэch pшekбћek. Plechy a dшevмnй desky na rozdнl od betonovэch zdн neposkytujн dokonalou ochranu.</text>
+	</string>
+	<string id="ls_mp_tip_26">
+		<text>Stшely do hlavy majн za nбsledek kritickб zranмnн a pro vмtљinu nepшбtel jsou smrtelnй.</text>
+	</string>
+	<string id="ls_mp_tip_27">
+		<text>Zrychlenэ pohyb, skoky a zranмnн vэraznм sniћujн tvou vэdrћ.</text>
+	</string>
+	<string id="ls_mp_tip_28">
+		<text>Dйlku hodu granбtu mщћeљ upravit podrћenнm klбvesy "$$ACTION_WPN_ZOOM$$".</text>
+	</string>
+	<string id="ls_mp_tip_29">
+		<text>Nepшбtelй dokбћou pouћнvat granбty a takй je pouћнvajн. Jakmile se objevн indikбtor granбtu, okamћitм opusќ smrtнcн oblast.</text>
+	</string>
+	<string id="ls_mp_tip_3">
+		<text>SOUBOJ NA SMRT: K dosaћenн vнtмzstvн zнskej nejvнce bodщ.</text>
+	</string>
+	<string id="ls_mp_tip_30">
+		<text>Pokud pшed skokem zrychlнљ, dokбћeљ zdolat vмtљн propasti a pшekбћky.</text>
+	</string>
+	<string id="ls_mp_tip_31">
+		<text>Hlavnн indikбtory zobrazujнcн tvщj zdravotnн stav a vэdrћ se nachбzejн v pravйm dolnнm rohu obrazovky.</text>
+	</string>
+	<string id="ls_mp_tip_35">
+		<text>Minimapa zobrazuje polohu artefaktu. Pokud љipka smмшuje nahoru, artefakt je nad tvou souиasnou pozicн; pokud љipka smмшuje smмrem dolщ, nachбzн se pod tebou.</text>
+	</string>
+	<string id="ls_mp_tip_36">
+		<text>K zнskбnн vнce penмz mщћeљ sbнrat batohy nepшбtel. Pшebyteиnй vybavenн mщћeљ prodat na zбkladnм.</text>
+	</string>
+	<string id="ls_mp_tip_37">
+		<text>Za kaћdou cenu bys mмl krэt иlena svйho tэmu, kterэ nese artefakt.</text>
+	</string>
+	<string id="ls_mp_tip_38">
+		<text>K ъtoku na nepшбtele v zбkrytu mщћeљ vyuћнt granбtщ. Nezapomeт vzнt v ъvahu oblast vэbuchu, abys nezranil svй spolubojovnнky.</text>
+	</string>
+	<string id="ls_mp_tip_39">
+		<text>Se svэm tэmem mщћeљ komunikovat pomocн hlasovэch zprбv. Pro otevшenн nabнdky hlasovэch zprбv stiskni "$$ACTION_SPEECH_MENU_0$$" nebo "$$ACTION_SPEECH_MENU_1$$".</text>
+	</string>
+	<string id="ls_mp_tip_4">
+		<text>TЭMOVЭ SOUBOJ NA SMRT: K dosaћenн vнtмzstvн musн tvщj tэm zнskat vнce bodщ neћ soupeш.</text>
+	</string>
+	<string id="ls_mp_tip_40">
+		<text>Hlasovбnн mщћeљ zahбjit stisknutнm klбvesy "$$ACTION_VOTE_BEGIN$$".</text>
+	</string>
+	<string id="ls_mp_tip_41">
+		<text>Vэsledky zobrazнљ stisknutнm klбvesy "$$ACTION_SCORES$$".</text>
+	</string>
+	<string id="ls_mp_tip_42">
+		<text>Pro znovunarozenн po uplynutн иekacн doby stiskni "$$ACTION_JUMP$$".</text>
+	</string>
+	<string id="ls_mp_tip_43">
+		<text>Pro otevшenн nabнdky nбkupщ v dobм pobytu na zбkladnм stiskni  "$$ACTION_BUY_MENU$$"</text>
+	</string>
+	<string id="ls_mp_tip_44">
+		<text>Veшejnou komunikaci spustнљ stisknutнm klбvesy  "$$ACTION_CHAT$$". Pro textovou komunikaci jen v rбmci vlastnнho tэmu stiskni "$$ACTION_CHAT_TEAM$$".</text>
+	</string>
+	<string id="ls_mp_tip_45">
+		<text>Bмh je nejrychlejљнm zpщsobem pohybu, je vљak velice vysilujнcн. Pro bмh stiskni "$$ACTION_SPRINT_TOGGLE$$".</text>
+	</string>
+	<string id="ls_mp_tip_46">
+		<text>Stшelba po zamншenн je mnohem pшesnмjљн neћ stшelba od boku. Pro zamншenн stiskni  "$$ACTION_WPN_ZOOM$$".</text>
+	</string>
+	<string id="ls_mp_tip_47">
+		<text>Pokud mбљ k dispozici podvмљenэ granбtomet, pomocн klбvesy "$$ACTION_WPN_FUNC$$" mщћeљ volit mezi nнm a klasickэm reћimem stшelby.</text>
+	</string>
+	<string id="ls_mp_tip_48">
+		<text>Pokud mбљ vнce druhщ nбbojщ do svй souиasnй zbranм, mщћeљ mezi nimi volit pomocн klбvesy "$$ACTION_WPN_NEXT$$".</text>
+	</string>
+	<string id="ls_mp_tip_49">
+		<text>Pro nabitн zbranм jeљtм pшed vyprбzdnмnнm zбsobnнku stiskni  "$$ACTION_WPN_RELOAD$$".</text>
+	</string>
+	<string id="ls_mp_tip_5">
+		<text>ZНSKБNН ARTEFAKTU: K dosaћenн vнtмzstvн je nutnй pшinйst nмkolik nepшбtelskэch artefaktщ na svou zбkladnu.</text>
+	</string>
+	<string id="ls_mp_tip_50">
+		<text>Pro odloћenн svй zbranм stiskni "$$ACTION_DROP$$".</text>
+	</string>
+	<string id="ls_mp_tip_51">
+		<text>Pro nahlйdnutн do svйho batohu stiskni "$$ACTION_INVENTORY$$".</text>
+	</string>
+	<string id="ls_mp_tip_52">
+		<text>Vмtљina zbranн disponuje nмkolika reћimy stшelby. Pro pшepнnбnн mezi nimi stiskni  "$$ACTION_WPN_FIREMODE_NEXT$$" nebo "$$ACTION_WPN_FIREMODE_PREV$$".</text>
+	</string>
+	<string id="ls_mp_tip_53">
+		<text>Do nмkterэch mнst se nelze dostat ani po pшikrиenн. Pokud se chceљ skrиit co nejnнћe, stiskni a podrћ souиasnм klбvesy "$$ACTION_CROUCH$$" a "$$ACTION_ACCEL$$".</text>
+	</string>
+	<string id="ls_mp_tip_55">
+		<text>Pro nahlйdnutн za roh stiskni "$$ACTION_LLOOKOUT$$" nebo "$$ACTION_RLOOKOUT$$". Pшi nahlнћenн za roh nemщћeљ stшнlet.</text>
+	</string>
+	<string id="ls_mp_tip_6">
+		<text>ZНSKБNН ARTEFAKTU: Pro navrбcenн ukradenйho artefaktu na svou zбkladnu musнљ zabнt nepшнtele, kterэ jej nese, a odebrat mu jej stisknutнm klбvesy "$$ACTION_USE$$".</text>
+	</string>
+	<string id="ls_mp_tip_7">
+		<text>HON ZA ARTEFAKTY: Artefakt mщћeљ zniиit jeho aktivacн. Vyndej artefakt pomocн "$$ACTION_ARTEFACT$$" a podrћ "$$ACTION_WPN_FIRE$$".</text>
+	</string>
+	<string id="ls_mp_tip_8">
+		<text>Pшi nesenн artefaktu nemщћeљ bмhat.</text>
+	</string>
+	<string id="ls_tip_100">
+		<text>Pro nahlйdnutн do svйho batohu stiskni "$$ACTION_INVENTORY$$".</text>
+	</string>
+	<string id="ls_tip_36">
+		<text>Chceљ-li opravit nмjakэ pшedmмt, musнљ nejprve najнt technika, oznaиit danэ pшedmмt v obrazovce modifikacн a kliknout na tlaинtko Opravit. Kdyћ v tйћe obrazovce klikneљ na pшedmмt pravэm tlaинtkem, vyskoин ti seznam dalљнch moћnэch akcн.</text>
+	</string>
+	<string id="ls_tip_81">
+		<text>Vмtљina zbranн mб uћ v sйriovйm provedenн nмkolik reћimщ palby. Dalљн reћimy si mщћeљ pшidat modifikacemi. Pro pшepnutн mezi reћimy stшelby stiskni "$$ACTION_WPN_FIREMODE_NEXT$$" nebo "$$ACTION_WPN_FIREMODE_PREV$$".</text>
+	</string>
+	<string id="ls_tip_7">
+		<text>Plochost drбhy urиuje trajektorii kulky. Ovlбdбnн urиuje, jak rychle zamмшovaиi trvб, neћ se po vэstшelu vrбtн do pщvodnн pozice.</text>
+	</string>
+	<string id="ls_tip_5">
+		<text>Nмkterй obleky majн i zabudovanй helmy. Ty nenн moћnй odebrat a pouћнt s jinэmi obleky.</text>
+	</string>
+	<string id="ls_tip_76">
+		<text>Kaћdб zbraт mб jinou pшesnost, ovlбdбnн, poљkozenн i kadenci. Vэbмr je velikэ, staин jen vybrat si tu, kterб ti nejlйpe sedne.</text>
+	</string>
+	<string id="ls_tip_51">
+		<text>Za chщze ti vэraznм klesб pшesnost stшelby. Pro lepљн pшesnost se zastav nebo rovnou pшikrи.</text>
+	</string>
+	<string id="ls_mp_tip_10">
+		<text>Energetickэ drink ti doиasnм urychlн obnovu energie. Dнky tomu vydrћнљ dйle bмћet.</text>
+	</string>
+	<string id="ls_mp_tip_12">
+		<text>V reћimu deathmatch majн hrбиi neomezenй mnoћstvн munice.</text>
+	</string>
+	<string id="ls_tip_16">
+		<text>Jednнm z nejbмћnмjљнch ъskalн zуny je radioaktivnн zбшenн. Vystavнљ-li se jeho silnйmu zdroji, ohrozнљ svй zdravн. Bez vhodnй lйиby mщћeљ dokonce i zemшнt.</text>
+	</string>
+	<string id="ls_tip_19">
+		<text>Neћ vyrazнљ na dlouhou vэpravu, nezapomeт si nabrat spoustu jнdla. Kdyћ mбљ totiћ hlad, znaиnм se ti zpomalн obnova vэdrћe.</text>
+	</string>
+</string_table>

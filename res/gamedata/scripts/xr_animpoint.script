@@ -1,0 +1,476 @@
+local function angle_to_direction(oangle)
+	local yaw = oangle.y
+	local pitch = oangle.x
+	return vector():setHP(yaw,pitch):normalize()
+end
+
+local assoc_tbl = 	{
+						idle = {director = {"", "_eat_bread", "_eat_kolbasa", "_drink_vodka", "_drink_energy", "_weapon"}, listener = {"", "_eat_bread", "_eat_kolbasa", "_drink_vodka", "_drink_energy", "_weapon"}},
+						harmonica = {director = {"_harmonica"}, listener = {"", "_eat_bread", "_eat_kolbasa", "_drink_vodka", "_drink_energy", "_weapon"}},
+						guitar = {director = {"_guitar"}, listener = {"", "_eat_bread", "_eat_kolbasa", "_drink_vodka", "_drink_energy", "_weapon"}},
+						story = {director = {"", "_weapon"}, listener = {"", "_eat_bread", "_eat_kolbasa", "_drink_vodka", "_drink_energy", "_weapon"}},
+					}
+--------------------------------------------------------------------------------
+-- Animated Point
+--------------------------------------------------------------------------------
+class "evaluator_need_animpoint" (property_evaluator)
+function evaluator_need_animpoint:__init(storage, name) super(nil, name)
+	self.st = storage
+end
+function evaluator_need_animpoint:evaluate()
+	return xr_logic.is_active(self.object, self.st)
+end
+
+class "evaluator_reach_animpoint" (property_evaluator)
+function evaluator_reach_animpoint:__init(storage, name) super(nil, name)
+	self.st = storage
+end
+function evaluator_reach_animpoint:evaluate()
+	return self.st.animpoint:position_riched()
+end
+--------------------------------------------------------------------------------
+class "action_reach_animpoint" (action_base)
+function action_reach_animpoint:__init (npc, action_name, storage) super(nil, action_name)
+	self.st = storage
+end
+function action_reach_animpoint:initialize()
+	action_base.initialize(self)
+	self.st.animpoint:calculate_position()
+end
+function action_reach_animpoint:execute()
+	action_base.execute(self)
+
+	self.object:set_dest_level_vertex_id(self.st.animpoint.position_vertex)
+
+	self.object:set_desired_direction(self.st.animpoint.smart_direction)
+	self.object:set_path_type(game_object.level_path)
+
+
+	--printf("%s animpoint position riched %s", npc:name(), npc:position():distance_to_sqr(self.vertex_position))
+	local distance_reached = self.object:position():distance_to_sqr(self.st.animpoint.vertex_position) <= self.st.reach_distance
+
+	if distance_reached then
+		state_mgr.set_state(self.object, self.st.reach_movement, nil, nil, {look_position = self.st.animpoint.look_position}  )
+	else
+		state_mgr.set_state(self.object, self.st.reach_movement)
+	end
+end
+function action_reach_animpoint:finalize()
+	action_base.finalize(self)
+end
+--------------------------------------------------------------------------------
+class "action_animpoint" (action_base)
+function action_animpoint:__init (npc, action_name, storage) super(nil, action_name)
+	self.st = storage
+end
+function action_animpoint:initialize()
+	action_base.initialize(self)
+	self.st.animpoint:start()
+end
+function action_animpoint:execute()
+	action_base.execute(self)
+
+	local pos, dir = self.st.animpoint:get_animation_params()
+	if not(self.st.animpoint.started) then
+		self.st.animpoint:start() -- zatychka
+	end
+
+--	printf("%s animpoint action %s", self.object:name(), tostring(self.st.animpoint:get_action()))
+--	state_mgr.set_state(self.object, self.st.animpoint:get_action(), nil, nil, nil,
+	state_mgr.set_state(self.object, self.st.animpoint:get_action(), nil, nil, {look_position = self.st.animpoint.look_position},
+						{animation_position = pos, animation_direction = dir} )
+
+
+end
+function action_animpoint:net_destroy(npc)
+	self.st.animpoint:stop()
+end
+function action_animpoint:finalize()
+	self.st.animpoint:stop()
+	action_base.finalize(self)
+end
+--------------------------------------------------------------------------------
+-- Класс отыгрывания разных ништяков на точке
+--------------------------------------------------------------------------------
+class "animpoint"
+function animpoint:__init(npc, storage)
+	self.npc_id = npc:id()
+	self.st = storage
+end
+-- Вызывается при активации схемы
+function animpoint:initialize()
+	self.camp = nil
+	self.st.base_action = nil
+	self.current_action = nil
+	self.position = nil
+	self.smart_direction = nil
+	self.look_position = nil
+	self.avail_actions = {}
+	self.st.approved_actions = {}
+	self.st.description = nil
+	self.started = false
+	self.cover_name = nil
+end
+
+function animpoint:activate_scheme(loading, npc, switching_scheme)
+	self.st.signals = {}
+
+	self:calculate_position()
+	if self.started == true then   -- не стопать, если нужно отыграть тот же смарткавер и тот же экшн. (Кешировать в :start())
+		-- Возможно self.current_action - то, что надо
+		if not self.st.use_camp and self.cover_name == self.st.cover_name then
+		
+			self:fill_approved_actions()
+		
+			local target_action = self.st.approved_actions[math.random(#self.st.approved_actions)].name
+			--printf("check animpoint stop %s == %s", tostring(target_action), tostring(self.current_action))
+			
+			
+			local current_st_animstate = state_lib.states[target_action].animstate
+			local target_st_animstate = state_lib.states[self.current_action].animstate
+			--printf("check animpoint stop %s == %s", tostring(current_st_animstate), tostring(target_st_animstate))
+			
+			if current_st_animstate == target_st_animstate	then
+				--printf("NO ANIMPOINT STOP %s", npc:name())
+				-- Если у нас одинаковое состояние тела, но сами дескрипторы анимаций разные, нужно перевыбрать текущее действие
+				if target_action ~= self.current_action then
+					self.current_action = self.st.approved_actions[math.random(#self.st.approved_actions)].name
+				end
+				
+				return
+			end
+		end
+		self:stop()
+	end
+end
+--' Рассчитывает позицию, куда идти
+function animpoint:calculate_position()
+	--printf("CALCULATE POSITION")
+
+	local smartcover = se_smart_cover.registered_smartcovers[self.st.cover_name]
+	if smartcover == nil then
+		print_table(se_smart_cover.registered_smartcovers)
+		abort("There is no smart_cover with name [%s]", self.st.cover_name)
+	end
+
+	self.position = se_smart_cover.registered_smartcovers[self.st.cover_name].position
+	self.position_vertex = level.vertex_id(self.position)
+	self.vertex_position = level.vertex_position(self.position_vertex)
+
+	self.smart_direction = angle_to_direction(smartcover.angle)
+	--printf("%s pos %s", self.st.cover_name, vec_to_str(self.position))
+	--printf("%s dir %s", self.st.cover_name, vec_to_str(self.smart_direction))
+
+	local look_dir = self.smart_direction:normalize()
+	self.look_position = vector():set( 	self.position.x + 10*look_dir.x,
+										self.position.y,
+										self.position.z + 10*look_dir.z)
+
+
+
+	-- Также получаем дескриптор позиции, и формируем список доступных действий.
+	local description_name = smartcover:description()
+	if xr_animpoint_predicates.associations[description_name] == nil then
+		if self.st.avail_animations == nil then
+			abort("Wrong animpoint smart_cover description %s, name %s", tostring(description_name), smartcover:name())
+		end
+	end
+
+	self.st.description = description_name
+	self.avail_actions = xr_animpoint_predicates.associations[description_name]
+	self.st.approved_actions = {}
+
+--[[ Перенес инициализацию в :start(). Так как здесь еще неизвестно мы в кампе или нет, а это очень критично для гитар и гармошек.
+	-- Если задан авеил анимейшнз, то мы игнорим ассоциации с нашим смарткавером.
+	if self.st.avail_animations ~= nil then
+		-- animations are set from custom_data?
+		for k, v in pairs(self.st.avail_animations) do
+			table.insert(self.st.approved_actions, {predicate = function() return true end, name = v})
+		end
+	else
+		if self.avail_actions ~= nil then
+			for k,v in pairs(self.avail_actions) do
+				-- Убираем те действия, которые не подходят по прекондишну
+				--printf("checking approved actions %s", self.npc_id)
+				if v.predicate(self.npc_id)==true then
+					table.insert(self.st.approved_actions, v)
+				end
+			end
+		end
+	end
+
+	if(#self.st.approved_actions==0) then
+		abort("There is no approved actions for stalker[%s] in animpoint[%s]", db.storage[self.npc_id].object:name(), self.object:name())
+	end
+	]] 
+end
+-- Возвращает позицию и направление смарткавера (чтобы отыграть анимацию с привязкой к точке)
+function animpoint:get_animation_params()
+	return self.position, self.smart_direction
+end
+--' Возвращает достиг ли персонаж точки начала работы схемы
+function animpoint:position_riched()
+	-- Если мы уже что то делаем, то значит что стопудова дошли
+	if self.current_action ~= nil then
+		return true
+	end
+
+	if self.position == nil then
+		return false
+	end
+
+	local npc = db.storage[self.npc_id] and db.storage[self.npc_id].object
+
+	if npc == nil then
+		return false
+	end
+
+	--printf("%s animpoint position riched %s", npc:name(), npc:position():distance_to_sqr(self.vertex_position))
+	local distance_reached = npc:position():distance_to_sqr(self.vertex_position) <= self.st.reach_distance
+
+	-- Если дистанция достигнута и игрок уже играет нужную анимацию - считаем что пришли.
+
+--	if distance_reached then
+--		printf("current_state %s", state)
+--	end
+
+	local v1 = -math.deg(math.atan2(self.smart_direction.x, self.smart_direction.z))
+	local v2 = -math.deg(math.atan2(npc:direction().x, npc:direction().z))
+
+	local rot_y = math.min( math.abs(v1-v2), 360-math.abs(v1)-math.abs(v2) )
+
+	--printf("%s animpoint direction riched %s %s %s", npc:name(), v1, v2, rot_y)
+	local direction_reached = rot_y < 50
+
+	return distance_reached and direction_reached
+end
+function animpoint:fill_approved_actions()
+	local is_in_camp = self.camp ~= nil
+
+	-- Если задан авеил анимейшнз, то мы игнорим ассоциации с нашим смарткавером.
+	if self.st.avail_animations ~= nil then
+		-- animations are set from custom_data?
+		for k, v in pairs(self.st.avail_animations) do
+			table.insert(self.st.approved_actions, {predicate = function() return true end, name = v})
+		end
+	else
+		if self.avail_actions ~= nil then
+			for k,v in pairs(self.avail_actions) do
+				-- Убираем те действия, которые не подходят по прекондишну
+				--printf("checking approved actions %s", self.npc_id)
+				if v.predicate(self.npc_id, is_in_camp)==true then
+					table.insert(self.st.approved_actions, v)
+				end
+			end
+		end
+	end
+
+	if(#self.st.approved_actions==0) then
+		abort("There is no approved actions for stalker[%s] in animpoint[%s]", db.storage[self.npc_id].object:name(), self.object:name())
+	end
+end
+-- Чувак дошел до точки и может начинать работать
+function animpoint:start()
+	-- Определяем, находится ли точка в каком то из кампов
+	if self.st.use_camp then
+		self.camp = sr_camp.get_current_camp(self.position)
+	end
+
+	self:fill_approved_actions()
+
+	-- Получаем сигнал, какое действие мы можем отыграть:
+	if self.camp ~= nil then
+		self.camp:register_npc(self.npc_id)
+	else
+		self.current_action = self.st.approved_actions[math.random(#self.st.approved_actions)].name
+	end
+	
+	
+	self.started = true
+	self.cover_name = self.st.cover_name
+end
+-- Чувак ушел с точки
+function animpoint:stop()
+	--printf("STOP")
+	--callstack()
+	if self.camp ~= nil then
+		self.camp:unregister_npc(self.npc_id)
+	end
+	self.started = false
+	self.current_action = nil
+end
+-- Возвращает, что надо делать
+function animpoint:get_action()
+	return self.current_action
+end
+
+function animpoint:update()
+	local tmp_actions = {}
+	local descr = self.st.description
+
+	if not(self.st.use_camp) then
+		if self.st.avail_animations == nil then
+			if self.st.approved_actions == nil then
+				abort("animpoint not in camp and approved_actions is nil. Name [%s]", self.st.cover_name)
+			end
+
+			for k,v in pairs(self.st.approved_actions) do
+				table.insert(tmp_actions, v.name)
+			end
+		else
+			for k,v in pairs(self.st.avail_animations) do
+				table.insert(tmp_actions, v)
+			end
+		end
+
+		self.current_action = tmp_actions[math.random(#tmp_actions)]
+		return
+	end
+
+	if(self.npc_id==nil) then
+		abort("Trying to use destroyed object!")
+	end
+
+	local camp_action, is_director = self.camp:get_camp_action(self.npc_id)
+	local tbl = {}
+	if(is_director) then
+		--printf(" [%s] is director", self.npc_id)
+		tbl = assoc_tbl[camp_action].director
+	else
+		--printf(" [%s] is not director", self.npc_id)
+		tbl = assoc_tbl[camp_action].listener
+	end
+
+	local found = false
+	for k,v in pairs(self.st.approved_actions) do
+		for i = 1, #tbl do
+			if(descr..tbl[i]==v.name) then
+				--printf("    approved %s", tostring(v.name))
+				table.insert(tmp_actions, v.name)
+				found = true
+			end
+		end
+	end
+
+	if not found then
+	--[[
+		printf("***")
+		print_table(self.st.approved_actions)
+		printf("***")
+		print_table(tbl)
+		printf("***")
+		abort("No actions found %s", self.npc_id)
+]]
+
+		table.insert(tmp_actions, descr)
+	end
+
+	local rnd = math.random(#tmp_actions)
+	local action = tmp_actions[rnd]
+	
+	
+	--action - выбранный экшн из доступных
+	if(self.st.base_action) then
+		--printf("		have base_action")
+		if(self.st.base_action==descr.."_weapon") then
+			--printf("		still play_weapon_anim")
+			action = descr.."_weapon"
+		end
+		
+		--printf(" *** [%s]==[%s] and [%s]==[%s]", action, descr.."_weapon", self.st.base_action, descr )
+		if(action==descr.."_weapon") and (self.st.base_action==descr) then
+			--printf("		LFN")
+			table.remove(tmp_actions, rnd)
+			action = tmp_actions[math.random(#tmp_actions)]
+		end
+	else
+		if(action==descr.."_weapon") then
+			self.st.base_action = action
+		else
+			self.st.base_action = descr
+		end
+	end
+
+
+	--printf("update_current_action %s", tostring(action))
+
+	self.current_action = action
+end
+
+--------------------------------------------------------------------------------
+-- Smartcover binder
+--------------------------------------------------------------------------------
+function add_to_binder(npc, ini, scheme, section, storage)
+	printf("DEBUG: add_to_binder: scheme='%s', section='%s'", scheme, section)
+	local operators	= {}
+	local properties  = {}
+
+	local manager = npc:motivation_action_manager()
+
+	properties["need_animpoint"] 			= xr_evaluators_id.animpoint_property + 1
+	properties["reach_animpoint"] 			= xr_evaluators_id.animpoint_property + 2
+
+	properties["state_mgr_logic_active"] 	= xr_evaluators_id.state_mgr + 4
+
+ 	operators["action_animpoint"] 			= xr_actions_id.animpoint_action + 1
+	operators["action_reach_animpoint"] 	= xr_actions_id.animpoint_action + 2
+
+ 	-- -- evaluators
+	manager:add_evaluator(properties["need_animpoint"], this.evaluator_need_animpoint(storage, "animpoint_need"))
+	manager:add_evaluator(properties["reach_animpoint"], this.evaluator_reach_animpoint(storage, "animpoint_reach"))
+
+	storage.animpoint = animpoint(npc, storage)
+
+	-- Зарегистрировать все actions, в которых должен быть вызван метод reset_scheme при изменении настроек схемы:
+	xr_logic.subscribe_action_for_events(npc, storage, storage.animpoint)
+
+
+	local new_action = this.action_reach_animpoint(npc, "action_reach_animpoint", storage)
+	new_action:add_precondition(world_property(stalker_ids.property_alive, true))
+	new_action:add_precondition(world_property(stalker_ids.property_anomaly,false))
+	new_action:add_precondition(world_property(stalker_ids.property_enemy,false))
+	new_action:add_precondition(world_property(properties["need_animpoint"], true))
+	new_action:add_precondition(world_property(properties["reach_animpoint"], false))
+	xr_motivator.addCommonPrecondition(new_action)
+	new_action:add_effect (world_property(properties["need_animpoint"], false))
+	new_action:add_effect (world_property(properties["state_mgr_logic_active"], false))
+	manager:add_action(operators["action_reach_animpoint"], new_action)
+	xr_logic.subscribe_action_for_events(npc, storage, new_action)
+
+	new_action = this.action_animpoint(npc, "action_animpoint", storage)
+	new_action:add_precondition(world_property(stalker_ids.property_alive, true))
+	new_action:add_precondition(world_property(stalker_ids.property_anomaly,false))
+	new_action:add_precondition(world_property(stalker_ids.property_enemy,false))
+	new_action:add_precondition(world_property(properties["need_animpoint"], true))
+	new_action:add_precondition(world_property(properties["reach_animpoint"], true))
+	xr_motivator.addCommonPrecondition(new_action)
+	new_action:add_effect (world_property(properties["need_animpoint"], false))
+	new_action:add_effect (world_property(properties["state_mgr_logic_active"], false))
+	manager:add_action(operators["action_animpoint"], new_action)
+	xr_logic.subscribe_action_for_events(npc, storage, new_action)
+
+	new_action = manager:action(xr_actions_id.alife)
+	new_action:add_precondition(world_property(properties["need_animpoint"], false))
+end
+
+
+function set_scheme(npc, ini, scheme, section, gulag_name)
+	printf("DEBUG: %s set_scheme: scheme='%s', section='%s'", npc:name(), scheme, section)
+	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
+	st.logic	  		= xr_logic.cfg_get_switch_conditions(ini, section, npc)
+	st.cover_name		= utils.cfg_get_string(ini, section, "cover_name", npc, false, "", "$script_id$_cover")
+	st.use_camp 		= utils.cfg_get_bool(ini, section, "use_camp", npc, false, true)
+	st.reach_distance	= utils.cfg_get_number(ini, section, "reach_distance", npc, false, 0.75)
+	st.reach_movement	= utils.cfg_get_string(ini, section, "reach_movement", npc, false, "", "walk")
+
+	st.reach_distance = st.reach_distance*st.reach_distance
+
+	local tmp = utils.cfg_get_string(ini, section, "avail_animations", npc, false, "", nil)
+
+
+	if(tmp~=nil) then
+		st.avail_animations = parse_names(tmp)
+	else
+		st.avail_animations = nil
+	end
+end

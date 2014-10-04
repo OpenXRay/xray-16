@@ -1,0 +1,16 @@
+[logic]
+active = ph_button@wait
+
+[ph_button@wait] 
+anim = idle
+on_press = ph_idle@pass %=anim_obj_forward(pas_b400_door_elevator) =heal_squad(pas_b400_stalkers_squad) +pas_b400_elevator_button_pressed -pas_b400_about_gates%
+tooltip = tip_door_open
+
+[ph_idle@pass]
+on_game_timer = 120 | ph_idle@open %+pas_b400_sr_elevator_5_passed%
+
+[ph_idle@open]
+on_game_timer = 20 | {-pas_b400_track_2_snorks_attack} %+pas_b400_track_2_snorks_attack%
+on_game_timer2 = 50 | ph_idle@nil %+pas_b400_elevator_gates_opened%
+
+[ph_idle@nil]

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="team_1_desc">
+		<text>Mнstnн anarchistй. Zуnu berou jako oбzu svobody a jsou pшesvмdиeni, ћe veљkerй zбkony, pravidla a zvyky vnмjљнho svмta zde neplatн. Jejich motto znн: „Dмlej si, co uznбљ za vhodnэ, a starej se jen o svэ.“ Svoboda se stavн proti vlбdnнm snahбm o ovlбdnutн Zуny a zбroveт vбlин se ћoldбky. Jejн иlenovй pouћнvajн pшedevљнm sovмtskй a ruskй zbranм.</text>
+	</string>
+	<string id="team_1_name">
+		<text>Frakce Svoboda (Svobodnн stalkeшi)</text>
+	</string>
+	<string id="team_2_desc">
+		<text>Tito dobrodruћnн hrdloшezovй pшichбzejн z celйho svмta a s radostн vнtajн i tu nejљpinavмjљн prбci. Jak by se dalo инst, jejich motto znн: „Penнze nesmrdн“. Dokud bude po artefaktech poptбvka, budou bojovat o nadvlбdu nad kaћdэm naleziљtмm. Ћoldбci jsou vyzbrojeni zejmйna zбpadnнmi zbranмmi.  </text>
+	</string>
+	<string id="team_2_name">
+		<text>Frakce ћoldбci (Hrdloшezovй)</text>
+	</string>
+</string_table>

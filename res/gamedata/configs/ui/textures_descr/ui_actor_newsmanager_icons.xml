@@ -1,0 +1,115 @@
+<w>
+    <file name="ui\ui_actor_newsmanager_icons">
+
+	<texture id="ui_inGame2_Vibros" x="0" y="0" width="83" height="47" />
+	<texture id="ui_inGame2_kompas" x="0" y="47" width="83" height="47" />
+	<texture id="ui_inGame2_Pripyat_1" x="0" y="94" width="83" height="47" />
+	<texture id="ui_inGame2_Skat_1" x="0" y="141" width="83" height="47" />
+	<texture id="ui_inGame2_Skat_2" x="0" y="188" width="83" height="47" />
+	<texture id="ui_inGame2_Skat_3" x="0" y="235" width="83" height="47" />
+	<texture id="ui_inGame2_Skat_4" x="0" y="282" width="83" height="47" />
+	<texture id="ui_inGame2_Skat_5" x="0" y="329" width="83" height="47" />
+	<texture id="ui_inGame2_Anomalnaya_aktivnost" x="0" y="376" width="83" height="47" />
+	<texture id="ui_inGame2_Anomalnoe_rastenie" x="0" y="423" width="83" height="47" />
+	<texture id="ui_inGame2_Artefakti_na_zakaz" x="0" y="470" width="83" height="47" />
+	<texture id="ui_inGame2_Bezopasnoe_mesto" x="0" y="517" width="83" height="47" />
+	<texture id="ui_inGame2_Bespilotniy_razvedchik" x="0" y="564" width="83" height="47" />
+	<texture id="ui_inGame2_V_poiskah_Soroki" x="0" y="611" width="83" height="47" />
+	<texture id="ui_inGame2_Vozmezdie" x="0" y="658" width="83" height="47" />
+	<texture id="ui_inGame2_Vizhivshiy_monolit" x="0" y="705" width="83" height="47" />
+	<texture id="ui_inGame2_Gauss_pushka" x="0" y="752" width="83" height="47" />
+	<texture id="ui_inGame2_Gipoteza" x="0" y="799" width="83" height="47" />
+	<texture id="ui_inGame2_Dolgi" x="0" y="846" width="83" height="47" />
+	<texture id="ui_inGame2_Zalozhnik" x="0" y="893" width="83" height="47" />
+	<texture id="ui_inGame2_Zamanchiviy_biznes" x="0" y="940" width="83" height="47" />
+
+	<texture id="ui_inGame2_Izdelie_N62" x="83" y="0" width="83" height="47" />
+	<texture id="ui_inGame2_Instrumenti" x="83" y="47" width="83" height="47" />
+	<texture id="ui_inGame2_Issledovanie_anomaliy" x="83" y="94" width="83" height="47" />
+	<texture id="ui_inGame2_Issledovatelskaya_gruppa" x="83" y="141" width="83" height="47" />
+	<texture id="ui_inGame2_Istoriya_dolga" x="83" y="188" width="83" height="47" />
+	<texture id="ui_inGame2_Ischeznovenie_stalkerov" x="83" y="235" width="83" height="47" />
+	<texture id="ui_inGame2_Karti_mestnosti" x="83" y="282" width="83" height="47" />
+	<texture id="ui_inGame2_Kontrakt_s_uchenimi" x="83" y="329" width="83" height="47" />
+	<texture id="ui_inGame2_Kopachi" x="83" y="376" width="83" height="47" />
+	<texture id="ui_inGame2_Krazha" x="83" y="423" width="83" height="47" />
+	<texture id="ui_inGame2_Laboratoriya_X8" x="83" y="470" width="83" height="47" />
+	<texture id="ui_inGame2_Lager_naemnikov" x="83" y="517" width="83" height="47" />
+	<texture id="ui_inGame2_Logovo_krovososov" x="83" y="564" width="83" height="47" />
+	<texture id="ui_inGame2_Mesta_evakuatsii" x="83" y="611" width="83" height="47" />
+	<texture id="ui_inGame2_Naezd" x="83" y="658" width="83" height="47" />
+	<texture id="ui_inGame2_Nedostupniy_taynik" x="83" y="705" width="83" height="47" />
+	<texture id="ui_inGame2_Neizvestniy" x="83" y="752" width="83" height="47" />
+	<texture id="ui_inGame2_Nochnaya_ohota" x="83" y="799" width="83" height="47" />
+	<texture id="ui_inGame2_Oazis" x="83" y="846" width="83" height="47" />
+	<texture id="ui_inGame2_Odin_vistrel" x="83" y="893" width="83" height="47" />
+	<texture id="ui_inGame2_Otryad_Skat" x="83" y="940" width="83" height="47" />
+	
+	<texture id="ui_inGame2_Ohota_na_Himeru" x="166" y="0" width="83" height="47" />
+	<texture id="ui_inGame2_Ohota_na_Krovososov" x="166" y="47" width="83" height="47" />
+	<texture id="ui_inGame2_Ohota_na_Burerov" x="166" y="94" width="83" height="47" />
+	<texture id="ui_inGame2_Ohrana_uchenih" x="166" y="141" width="83" height="47" />
+	<texture id="ui_inGame2_Peremennoe_psi_izluchenie" x="166" y="188" width="83" height="47" />
+	<texture id="ui_inGame2_Poslednie_razrabotki" x="166" y="235" width="83" height="47" />
+	<texture id="ui_inGame2_Pripasi" x="166" y="282" width="83" height="47" />
+	<texture id="ui_inGame2_Propavshaya_razvedgruppa" x="166" y="329" width="83" height="47" />
+	<texture id="ui_inGame2_Propavshiy_chasovoy" x="166" y="376" width="83" height="47" />
+	<texture id="ui_inGame2_Put_v_pripyat" x="166" y="423" width="83" height="47" />
+	<texture id="ui_inGame2_Put_na_plato" x="166" y="470" width="83" height="47" />
+	<texture id="ui_inGame2_Radiopomehi" x="166" y="517" width="83" height="47" />
+	<texture id="ui_inGame2_Radiotechnika" x="166" y="564" width="83" height="47" />
+	<texture id="ui_inGame2_Razgovor_s_glazu_na_glaz" x="166" y="611" width="83" height="47" />
+	<texture id="ui_inGame2_Reputatsiya" x="166" y="658" width="83" height="47" />
+	<texture id="ui_inGame2_Sdelka" x="166" y="705" width="83" height="47" />
+	<texture id="ui_inGame2_Skoplenie_monolita" x="166" y="752" width="83" height="47" />
+	<texture id="ui_inGame2_Strannoe_yavlenie" x="166" y="799" width="83" height="47" />
+	<texture id="ui_inGame2_Temniy_biznes" x="166" y="846" width="83" height="47" />
+	<texture id="ui_inGame2_Tri_tovarisha" x="166" y="893" width="83" height="47" />
+	<texture id="ui_inGame2_Evakuatsiya" x="166" y="940" width="83" height="47" />
+
+	<texture id="ui_inGame2_PD_storonnik_ravnovesiya" x="249" y="0" width="83" height="47" />
+	<texture id="ui_inGame2_PD_master_boevih_sistem" x="249" y="47" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Sisshik" x="249" y="94" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Diplomat" x="249" y="141" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Drug_Dolga" x="249" y="188" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Drug_Swobodi" x="249" y="235" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Drug_Stalkerov" x="249" y="282" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Gonets_pravosudiya" x="249" y="329" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Master_visokih_technologiy" x="249" y="376" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Torgovets_informatsiey" x="249" y="423" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Hranitel_tayn" x="249" y="470" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Avtoritet" x="249" y="517" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Lider" x="249" y="564" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Ohotnik_na_mutantov" x="249" y="611" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Svoy_paren" x="249" y="658" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Nauchniy_sotrudnik" x="249" y="705" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Iskatel" x="249" y="752" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Opitniy_stalker" x="249" y="799" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Sostoyatelniy_klient" x="249" y="846" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Otmecheniy_zonoy" x="249" y="893" width="83" height="47" />
+	<texture id="ui_inGame2_D_gonets_pravosudiya" x="249" y="940" width="83" height="47" />
+	
+	<texture id="ui_inGame2_D_Ohotnik_na_mutantov" x="332" y="0" width="83" height="47" />
+	<texture id="ui_inGame2_D_Sisshik" x="332" y="47" width="83" height="47" />
+	<texture id="ui_inGame2_D_Vipolnil_2_zadaniya_dlya_Dolga" x="332" y="94" width="83" height="47" />
+	<texture id="ui_inGame2_D_Vipolnil_4_zadaniya_dlya_Dolga" x="332" y="141" width="83" height="47" />
+	<texture id="ui_inGame2_D_Vipolnil_2_zadaniya_dlya_Swobodi" x="332" y="188" width="83" height="47" />
+	<texture id="ui_inGame2_D_Vipolnil_4_zadaniya_dlya_Swobodi" x="332" y="235" width="83" height="47" />
+	<texture id="ui_inGame2_Dengi_otdani" x="332" y="282" width="83" height="47" />
+	<texture id="ui_inGame2_Dengi_polucheni" x="332" y="329" width="83" height="47" />
+	<texture id="ui_inGame2_Predmet_otdan" x="332" y="376" width="83" height="47" />
+	<texture id="ui_inGame2_Predmet_poluchen" x="332" y="423" width="83" height="47" />
+	<texture id="ui_inGame2_Pered_zadaniyami_voennih" x="332" y="470" width="83" height="47" />
+	<texture id="ui_inGame2_V_zone_nedavno_proshel_vibros" x="332" y="517" width="83" height="47" />
+	<texture id="ui_inGame2_Neizvestnoe_oruzhie" x="332" y="564" width="83" height="47" />
+	<texture id="ui_inGame2_Polucheni_koordinaty_taynika" x="332" y="611" width="83" height="47" />
+	<texture id="ui_inGame2_PD_Pervootkrivatel" x="332" y="658" width="83" height="47" />
+	<texture id="ui_inGame2_Sklad_dolga" x="332" y="705" width="83" height="47" />
+	<texture id="ui_inGame2_Chuzhie_zaslugi" x="332" y="752" width="83" height="47" />
+	<texture id="ui_inGame2_Osobiy_zakaz" x="332" y="799" width="83" height="47" />
+
+
+		
+
+   </file>
+</w>

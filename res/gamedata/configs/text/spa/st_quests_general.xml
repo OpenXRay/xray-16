@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="hide_from_surge_message">
+		<text>ЎAtenciуn! La emisiуn comenzarб en:</text>
+	</string>
+	<string id="hide_from_surge_descr_1_a">
+		<text>Busca el lugar mбs cercano para guarecerte inmediatamente de la emisiуn.</text>
+	</string>
+	<string id="hide_from_surge_descr_2_a">
+		<text>No debes salir de tu refugio mientras dure la emisiуn.</text>
+	</string>
+	<string id="hide_from_surge_name_1">
+		<text>Emisiуn: ponte a cubierto</text>
+	</string>
+	<string id="hide_from_surge_name_2">
+		<text>Emisiуn: espera a cubierto</text>
+	</string>
+</string_table>

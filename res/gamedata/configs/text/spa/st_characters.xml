@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="jup_a10_bandit_leader_name">
+		<text>Jack</text>
+	</string>
+	<string id="jup_a10_stalker_vano">
+		<text>Vano</text>
+	</string>
+	<string id="jup_a6_duty_leader">
+		<text>Ten. Cor. Shulga</text>
+	</string>
+	<string id="jup_a6_freedom_leader">
+		<text>Loki</text>
+	</string>
+	<string id="jup_a6_stalker_barmen">
+		<text>El Hawaiano</text>
+	</string>
+	<string id="jup_a6_stalker_medik">
+		<text>Sueldahuesos</text>
+	</string>
+	<string id="jup_b10_stalker_drunk">
+		<text>Senka</text>
+	</string>
+	<string id="jup_b15_zulus">
+		<text>Zulu</text>
+	</string>
+	<string id="jup_b19_freedom_yar_name">
+		<text>Tнo Yar</text>
+	</string>
+	<string id="jup_b1_stalker_1">
+		<text>Topol</text>
+	</string>
+	<string id="jup_b1_stalker_2">
+		<text>Mace</text>
+	</string>
+	<string id="jup_b1_stalker_3">
+		<text>Licor</text>
+	</string>
+	<string id="jup_b1_stalker_4">
+		<text>Serpiente</text>
+	</string>
+	<string id="jup_b207_merc_leader_name">
+		<text>Buitre</text>
+	</string>
+	<string id="jup_b217_stalker_tech">
+		<text>Nitro</text>
+	</string>
+	<string id="jup_b220_trapper">
+		<text>Trapper</text>
+	</string>
+	<string id="jup_b25_freedom_flint">
+		<text>Pedernal</text>
+	</string>
+	<string id="jup_b46_duty_founder_name">
+		<text>General Tachenko</text>
+	</string>
+	<string id="jup_b46_duty_founder_squad_02_name">
+		<text>Ten. Bunchuk</text>
+	</string>
+	<string id="jup_b46_duty_founder_squad_03_name">
+		<text>Cor. Kosmach</text>
+	</string>
+	<string id="jup_b46_duty_founder_squad_04_name">
+		<text>Ten. Zakharchuk</text>
+	</string>
+	<string id="jup_b47_merc_01">
+		<text>Negro</text>
+	</string>
+	<string id="jup_b47_merc_02">
+		<text>Duplet</text>
+	</string>
+	<string id="jup_b47_merc_03">
+		<text>Cirujano</text>
+	</string>
+	<string id="jup_b47_merc_04">
+		<text>Calavera</text>
+	</string>
+	<string id="jup_b47_merc_05">
+		<text>Stake</text>
+	</string>
+	<string id="jup_b47_merc_06">
+		<text>Koshey</text>
+	</string>
+	<string id="jup_b47_merc_07">
+		<text>Cadбver</text>
+	</string>
+	<string id="jup_b4_monolith_squad_leader_name">
+		<text>Strider</text>
+	</string>
+	<string id="jup_b4_monolith_squad_soldier_1_name">
+		<text>Blindaje</text>
+	</string>
+	<string id="jup_b4_monolith_squad_soldier_2_name">
+		<text>Hoz</text>
+	</string>
+	<string id="jup_b4_monolith_squad_soldier_3_name">
+		<text>Morsa</text>
+	</string>
+	<string id="jup_b4_monolith_squad_soldier_4_name">
+		<text>Dуcil</text>
+	</string>
+	<string id="jup_b4_monolith_squad_soldier_5_name">
+		<text>Foma</text>
+	</string>
+	<string id="jup_b6_scientist_biochemist">
+		<text>Profesor Ozersky</text>
+	</string>
+	<string id="jup_b6_scientist_novikov">
+		<text>Novikov</text>
+	</string>
+	<string id="jup_b6_scientist_nuclear_physicist">
+		<text>Profesor Hermann</text>
+	</string>
+	<string id="jup_b9_shliachin_name">
+		<text>Sgto. Shlyachin</text>
+	</string>
+	<string id="pri_a15_military_recon_1_name">
+		<text>Ten. Sergeev</text>
+	</string>
+	<string id="pri_a15_military_recon_2_name">
+		<text>Sgto. Valiushok</text>
+	</string>
+	<string id="pri_a15_military_recon_3_name">
+		<text>Sgto. Ostrovsky</text>
+	</string>
+	<string id="pri_a15_military_recon_leader_name">
+		<text>Capitбn Klimenko</text>
+	</string>
+	<string id="pri_a15_sokolov_name">
+		<text>Ten. Sokolov</text>
+	</string>
+	<string id="pri_a17_military_captain_tarasov">
+		<text>Capitбn Tarasov</text>
+	</string>
+	<string id="pri_a17_military_colonel_kovalski_name">
+		<text>Cor. Kovalsky</text>
+	</string>
+	<string id="pri_a17_military_lieutenant_podorojniy">
+		<text>Ten. Podorozhny</text>
+	</string>
+	<string id="pri_a18_skorlupko_in_suit_name">
+		<text>Ten. Skelya</text>
+	</string>
+	<string id="pri_a18_vano_in_suit_reserve_name">
+		<text>Sgto. Merkulov</text>
+	</string>
+	<string id="pri_a21_sentry_lieutenant_stecenko_name">
+		<text>Ten. Stetsenko</text>
+	</string>
+	<string id="pri_a22_military_yarmoshuk_name">
+		<text>Sgto. Yarmoshuk</text>
+	</string>
+	<string id="pri_a25_army_medic_name">
+		<text>Ten. Rogovets</text>
+	</string>
+	<string id="pri_a28_evac_com_name">
+		<text>Ten. Smirnov</text>
+	</string>
+	<string id="pri_b305_strelok_name">
+		<text>Strelok</text>
+	</string>
+	<string id="pri_b306_envoy_name">
+		<text>Barchuk</text>
+	</string>
+	<string id="st_actor_name">
+		<text>Mayor Degtyarev</text>
+	</string>
+	<string id="st_jup_a12_bandit_cashier">
+		<text>Enano</text>
+	</string>
+	<string id="st_jup_a12_bandit_chief">
+		<text>Shishak</text>
+	</string>
+	<string id="st_jup_a12_stalker_assaulter">
+		<text>Osopardo</text>
+	</string>
+	<string id="st_jup_a12_stalker_diplomat">
+		<text>Torba</text>
+	</string>
+	<string id="st_jup_a12_stalker_prisoner">
+		<text>Mitay</text>
+	</string>
+	<string id="st_jup_b207_duty_security_squad_leader_name">
+		<text>Ten. Gavrilenko</text>
+	</string>
+	<string id="st_jup_b207_freedom_assault_squad_leader_name">
+		<text>Kremen</text>
+	</string>
+	<string id="st_jup_b207_freedom_recon_squad_leader_name">
+		<text>Gaiduk</text>
+	</string>
+	<string id="st_jup_b43_stalker_assistant">
+		<text>Garry</text>
+	</string>
+	<string id="st_pri_a22_army_signaller">
+		<text>Ten. Kirillov</text>
+	</string>
+	<string id="st_pri_b35_envoy">
+		<text>Serbin</text>
+	</string>
+	<string id="st_pri_b35_merc_leader">
+		<text>Chacal</text>
+	</string>
+	<string id="st_zat_a2_stalker_nimble_name">
+		<text>Nimble</text>
+	</string>
+	<string id="st_zat_b106_stalker_crab_name">
+		<text>Cangrejo</text>
+	</string>
+	<string id="st_zat_b106_stalker_garmata_name">
+		<text>Garmata</text>
+	</string>
+	<string id="st_zat_b106_stalker_gonta_name">
+		<text>Gonta</text>
+	</string>
+	<string id="st_zat_b29_stalker_rival_1">
+		<text>Mazo</text>
+	</string>
+	<string id="st_zat_b29_stalker_rival_2">
+		<text>Cresta</text>
+	</string>
+	<string id="st_zat_b30_owl_stalker_trader_name">
+		<text>Bъho</text>
+	</string>
+	<string id="st_zat_b38_stalker_cop_name">
+		<text>Urogallo</text>
+	</string>
+	<string id="st_zat_b38_stalker_hunter_name">
+		<text>Danila</text>
+	</string>
+	<string id="st_zat_b7_bandit_boss_sultan_name">
+		<text>Sultбn</text>
+	</string>
+	<string id="st_zat_b7_duty_illicit_dealer_name">
+		<text>Morgan</text>
+	</string>
+	<string id="st_zat_b7_stalker_raider_leader">
+		<text>Knuckles</text>
+	</string>
+	<string id="st_zat_b7_stalker_squad_leader">
+		<text>Espartaco</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_name">
+		<text>Barbas</text>
+	</string>
+	<string id="zat_a2_stalker_mechanic_name">
+		<text>Cardбn</text>
+	</string>
+	<string id="zat_b103_lost_merc_1_name">
+		<text>Duende</text>
+	</string>
+	<string id="zat_b103_lost_merc_2_name">
+		<text>Roble</text>
+	</string>
+	<string id="zat_b103_lost_merc_3_name">
+		<text>Pianista</text>
+	</string>
+	<string id="zat_b103_lost_merc_4_name">
+		<text>Segador</text>
+	</string>
+	<string id="zat_b103_lost_merc_5_name">
+		<text>Kirzach</text>
+	</string>
+	<string id="zat_b103_lost_merc_6_name">
+		<text>Tanque</text>
+	</string>
+	<string id="zat_b103_lost_merc_7_name">
+		<text>Careto</text>
+	</string>
+	<string id="zat_b103_lost_merc_leader_name">
+		<text>Hachuela</text>
+	</string>
+	<string id="zat_b14_stalker_1_name">
+		<text>Atъn</text>
+	</string>
+	<string id="zat_b18_noah_name">
+		<text>Noй</text>
+	</string>
+	<string id="zat_b215_stalker_guide_name">
+		<text>Piloto</text>
+	</string>
+	<string id="zat_b22_stalker_medic_name">
+		<text>Tremor</text>
+	</string>
+	<string id="zat_b28_draper_name">
+		<text>Ten. Drapei</text>
+	</string>
+	<string id="zat_b28_umerov_name">
+		<text>Sub. Umerov</text>
+	</string>
+	<string id="zat_b33_stalker_snag">
+		<text>Snag</text>
+	</string>
+	<string id="zat_b40_merc_squad_leader_1_name">
+		<text>Hook</text>
+	</string>
+	<string id="zat_b40_merc_squad_leader_2_name">
+		<text>Ridge</text>
+	</string>
+	<string id="zat_b42_mayron_name">
+		<text>Mirone</text>
+	</string>
+	<string id="zat_b44_stalker_barge_name">
+		<text>Barca</text>
+	</string>
+	<string id="zat_b53_artefact_hunter_1_name">
+		<text>Petruha</text>
+	</string>
+	<string id="zat_b53_artefact_hunter_2_name">
+		<text>Punzуn</text>
+	</string>
+	<string id="jup_b46_duty_founder_squad_01_name">
+		<text>Mayor Chepurny</text>
+	</string>
+	<string id="pri_a17_military_prapor_valentyr">
+		<text>Brig. 1є Valentir</text>
+	</string>
+	<string id="pri_a17_military_sergeant_morozov">
+		<text>Sgto. 1є Morozov</text>
+	</string>
+	<string id="zat_b28_smoliak_name">
+		<text>Ten. 1є Smolyak</text>
+	</string>
+	<string id="jup_b25_stalker_senya">
+		<text>El disidente</text>
+	</string>
+	<string id="zat_b100_army_1">
+		<text>Sargento Gazda</text>
+	</string>
+	<string id="zat_b100_army_2">
+		<text>Capitбn Furtez</text>
+	</string>
+	<string id="zat_b100_army_3">
+		<text>Sarg. prim. Shveiko</text>
+	</string>
+</string_table>

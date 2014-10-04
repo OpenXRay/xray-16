@@ -1,0 +1,32 @@
+[logic@zat_b215_stalker_guide_zaton]
+suitable = {=check_npc_name(zat_b215_stalker_guide_zaton)}
+prior = 200
+active = animpoint
+level_spot = guider
+
+[animpoint]
+cover_name = zat_a2_sc_zat_b215_stalker_guide_zaton
+use_camp = false
+meet = meet@base
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@base]
+close_snd_hello = zat_b215_stalker_guide_greeting
+close_snd_bye = zat_b215_stalker_guide_farewell
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+trade_enable = false
+allow_break = false
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+meet_on_talking = false

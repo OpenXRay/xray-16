@@ -1,0 +1,25 @@
+[logic]
+active = ph_idle@cut
+
+[ph_idle@cut]
+on_info = {+pri_a15_cutscene_end} ph_idle@wait
+
+[ph_idle@wait] 
+on_info = {=actor_in_zone(pri_a16_sr_noweap) !actor_in_zone(pri_a16_sr_light) !check_smart_alarm_status(pri_a16:normal)} ph_idle@pleaseplease
+on_info2 = {+pri_b305_third_cam_end} ph_idle@nil, {+pri_b305_fifth_cam_end} ph_idle@nil
+
+[ph_idle@pleaseplease]
+on_info = {=check_smart_alarm_status(pri_a16:danger)} %=play_sound(pri_a16_base_megaphone)%
+on_info2 = {=check_smart_alarm_status(pri_a16:alarm)} ph_idle@swear
+on_info3 = {=check_smart_alarm_status(pri_a16:normal)} ph_idle@wait
+on_info4 = {!actor_in_zone(pri_a16_sr_noweap)} ph_idle@wait
+on_info5 = {=actor_in_zone(pri_a16_sr_light)} ph_idle@wait
+on_info6 = {+pri_b305_third_cam_end} ph_idle@nil, {+pri_b305_fifth_cam_end} ph_idle@nil
+
+[ph_idle@swear]
+on_info = {!check_smart_alarm_status(pri_a16:alarm)} ph_idle@wait
+on_info2 = {!actor_in_zone(pri_a16_sr_noweap)} ph_idle@wait
+on_info3 = {=actor_in_zone(pri_a16_sr_light)} ph_idle@wait
+on_info4 = {+pri_b305_third_cam_end} ph_idle@nil, {+pri_b305_fifth_cam_end} ph_idle@nil
+
+[ph_idle@nil]

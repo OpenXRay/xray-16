@@ -1,0 +1,176 @@
+class "mob_remark"
+
+function mob_remark:__init(obj, storage)
+	self.object = obj
+	self.st = storage
+end
+
+function mob_remark:reset_scheme()
+	printf("_bp: mob_remark:reset_scheme: %s", self.object:name())
+
+	mob_state_mgr.set_state(self.object, db.actor, self.st.state)
+
+	self.object:disable_talk()
+
+	xr_logic.mob_capture(self.object, not self.st.no_reset)
+
+	local anims = parse_names(self.st.anim)
+
+	local snds
+	if self.st.snd then
+		snds = parse_names(self.st.snd)
+	else
+		snds = {}
+	end
+	local sndset
+
+	local times
+	if self.st.time then
+		times = parse_names(self.st.time)
+	else
+		times = {}
+	end
+	local tm
+
+	local cnd
+	for num, an in pairs(anims) do
+		sndset = snds[num]
+		if times[num] then
+			tm = tonumber(times[num])
+		else
+			tm = 0
+		end
+		if sndset and an then
+			local snd = mob_sound.pick_sound_from_set(self.object, sndset, {})
+			if not snd then
+				abort("mobile '%s': section '%s': sound set '%s' does not exist",
+					self.object:name(), self.st.section, sndset)
+			end
+
+			if tm == 0 then
+				cnd = cond(cond.sound_end)
+			else
+				cnd = cond(cond.time_end, tm)
+			end
+			if self.st.anim_head then
+				--printf("__bp: action set: %d", time_global())
+				action(self.object, anim(an), sound(snd, "bip01_head",
+					MonsterSpace[self.st.anim_head]), cnd)
+			else
+				--printf("__bp: action set: %d", time_global())
+				if self.st.anim_movement == true then
+					action(self.object, anim(an, true), sound(snd, "bip01_head"), cnd)
+				else
+					action(self.object, anim(an), sound(snd, "bip01_head"), cnd)
+				end
+			end
+		elseif an then
+			if tm == 0 then
+				cnd = cond(cond.anim_end)
+			else
+				cnd = cond(cond.time_end, tm)
+			end
+			--printf("__bp: action set: %d", time_global())
+			if self.st.anim_movement == true then
+                local pos = self.object:position()
+                local dir = self.object:direction()
+                printf("SNORK position[%s %s %s] orientation[%s %s %s]",
+                    pos.x, pos.y, pos.z,
+                    dir.x, dir.y, dir.z)
+
+				action(self.object, anim(an, true), cnd)
+			else
+				action(self.object, anim(an), cnd)
+			end
+
+
+		--else
+		--	if npc:get_script() then
+		--		npc:script(false, script_name())
+		--	end
+		end
+	end
+
+	self.tip_sent = false
+
+	self.st.signals = {}
+	self.action_end_signalled = false
+	--printf("_bp: mob_remark:reset_scheme end")
+end
+
+function mob_remark:update(delta)
+	--printf("__bp: mob_remark update: %d", time_global())
+	--if not xr_logic.is_active(self.object, self.st) then
+	--	return
+	--end
+
+	local actor = db.actor
+--[[
+	if xr_logic.try_switch_to_another_section(self.object, self.st, actor) then
+		return
+	end
+]]
+	if self.st.dialog_cond and xr_logic.pick_section_from_condlist(actor, self.object,
+	     self.st.dialog_cond.condlist) ~= nil then
+		--printf("_bp: enable talk")
+	     	if not self.object:is_talk_enabled() then
+			self.object:enable_talk()
+		end
+	else
+		--printf("_bp: disable talk")
+		if self.object:is_talk_enabled() then
+			self.object:disable_talk()
+		end
+	end
+
+	if not self.tip_sent then
+		self.tip_sent = true
+		if self.st.tip then
+			news_manager.send_tip(actor, self.st.tip)
+		end
+	end
+
+	--printf("_bp: mob_remark:update [%s]", self.object:name())
+
+	if self.object:get_script() and not self.object:action() then
+		--self.object:script(false, script_name())
+		--printf("__bp: free from script: %d", time_global())
+
+		if not self.action_end_signalled then
+			self.action_end_signalled = true
+			self.st.signals["action_end"] = true
+			printf("mob_remark: signalling action_end")
+		end
+	end
+end
+
+---------------------------------------------------------------------------------------------------------------------
+function add_to_binder(npc, ini, scheme, section, storage)
+	printf("DEBUG: add_to_binder: npc:name()='%s', scheme='%s', section='%s'", npc:name(), scheme, section)
+
+	local new_action = mob_remark(npc, storage)
+
+	-- Зарегистрировать все actions, в которых должен быть вызван метод reset_scheme при изменении настроек схемы:
+	xr_logic.subscribe_action_for_events(npc, storage, new_action)
+end
+
+function set_scheme(npc, ini, scheme, section, gulag_name)
+	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
+
+	st.logic     = xr_logic.cfg_get_switch_conditions(ini, section, npc)
+
+	st.state           = mob_state_mgr.get_state(ini, section, npc)
+
+	st.dialog_cond    = xr_logic.cfg_get_condlist(ini, section, "dialog_cond", npc)
+	-- Не работает, т.к. при переключении схем в данный момент монстр всегда
+	-- уходит из под скрипта, соответственно, сбрасывает свою очередь actions.
+	--st.no_reset       = utils.cfg_get_bool(ini, section, "no_reset", npc, false)
+	st.no_reset = true
+	st.anim           = utils.cfg_get_string(ini, section, "anim", npc, false, "")
+	st.anim_movement   = utils.cfg_get_bool(ini, section, "anim_movement", npc, false, false) --' Анимация с перемещением или нет
+	st.anim_head      = utils.cfg_get_string(ini, section, "anim_head", npc, false, "")
+	st.tip            = utils.cfg_get_string(ini, section, "tip", npc, false, "")
+	st.snd            = utils.cfg_get_string(ini, section, "snd", npc, false, "")
+	st.time           = utils.cfg_get_string(ini, section, "time", npc, false, "")
+
+end

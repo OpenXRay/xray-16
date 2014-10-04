@@ -1,0 +1,12 @@
+#include "pas_b400_field_general.ltx"
+
+[logic]
+active = sr_idle@elevator
+
+[sr_idle@elevator]
+on_info = {+pas_b400_elevator_gates_opened} sr_psy_antenna@elevator
+
+[sr_psy_antenna@elevator]:sr_psy_antenna@def
+on_info = {+pas_b400_field_elevator_off} sr_idle@nil
+
+[sr_idle@nil]

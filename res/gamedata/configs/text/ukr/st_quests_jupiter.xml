@@ -1,0 +1,687 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="jup_a10_actor_agree_back_vano_duties_name">
+		<text>Борги: віднести бандитам гроші</text>
+	</string>
+	<string id="jup_a10_actor_agree_back_vano_duties_text">
+		<text>Вано заборгував бандитам гроші за костюм і не може віддати їх, бо відсотки ростуть надто швидко. Він просить розібратися із цією проблемою.</text>
+	</string>
+	<string id="jup_a10_actor_back_vano_duties_name">
+		<text>Борги: повернутися до Вано</text>
+	</string>
+	<string id="jup_a10_actor_back_vano_duties_text">
+		<text>Необхідно розповісти Вано, як відбувалося повернення боргів бандитам.</text>
+	</string>
+	<string id="jup_a10_kill_all_bandit_name">
+		<text>Борги: розібратися з бандитами</text>
+	</string>
+	<string id="jup_a10_kill_all_bandit_text">
+		<text>Повернення боргів Вано набуває небезпечного перебігу. Необхідно вбити бандитів.</text>
+	</string>
+	<string id="jup_a12_free_prisoner_get_reward_name">
+		<text>Заручник: узяти нагороду в друзів Митяя</text>
+	</string>
+	<string id="jup_a12_free_prisoner_get_reward_text">
+		<text>Митяя звільнено. Необхідно зустрітися у барі з його друзями та отримати винагороду.</text>
+	</string>
+	<string id="jup_a12_free_prisoner_name">
+		<text>Заручник: звільнити Митяя</text>
+	</string>
+	<string id="jup_a12_free_prisoner_not_ready_name">
+		<text>Заручник: поговорити з Ведмедем за готовності</text>
+	</string>
+	<string id="jup_a12_free_prisoner_not_ready_text">
+		<text>Необхідно поговорити з Ведмедем, перш ніж узятися за звільнення заручника.</text>
+	</string>
+	<string id="jup_a12_free_prisoner_power_name">
+		<text>Заручник: звільнити Митяя силою</text>
+	</string>
+	<string id="jup_a12_free_prisoner_power_text">
+		<text>Необхідно знищити бандитів, щоб звільнити сталкера на прізвисько Митяй.</text>
+	</string>
+	<string id="jup_a12_free_prisoner_power_wait_name">
+		<text>Заручник: зустрітися зі сталкерами</text>
+	</string>
+	<string id="jup_a12_free_prisoner_power_wait_text">
+		<text>Сталкери допоможуть звільнити заручника. Необхідно зустрітися із ними вночі, щоб спільнр атакувати бандитів.</text>
+	</string>
+	<string id="jup_a12_free_prisoner_ransom_name">
+		<text>Заручник: домовитися про викуп Митяя</text>
+	</string>
+	<string id="jup_a12_free_prisoner_ransom_text">
+		<text>Домовиться із ватажком бандитів про викуп, щоб звільнити сталкера на прізвисько Митяй.</text>
+	</string>
+	<string id="jup_a12_free_prisoner_text">
+		<text>Звільнити сталкера по кличці Митяй, якого бандити взяли в заручники.</text>
+	</string>
+	<string id="jup_a12_guide_prisoner_name">
+		<text>Заручник: вивести Митяя з табору бандитів</text>
+	</string>
+	<string id="jup_a12_guide_prisoner_text">
+		<text>У таборі бандитів надто небезпечно для розмов. Необхідно провести Митяя за межі табору.</text>
+	</string>
+	<string id="jup_a12_talk_with_prisoner_name">
+		<text>Заручник: поговорити з Митяєм</text>
+	</string>
+	<string id="jup_a12_talk_with_prisoner_text">
+		<text>Митяй у відносній безпеці. Варто домовитися з ним про подальші дії.</text>
+	</string>
+	<string id="jup_a9_way_to_pripyat_tech_name">
+		<text>Шлях у Прип'ять: поговорити з техніком про шляхопровід</text>
+	</string>
+	<string id="jup_a9_way_to_pripyat_tech_text">
+		<text>Зі знайдених документів стає зрозуміло: під заводом «Юпітер» є підземний шляхопровід, що веде до Прип'яті. Шляхопровід знеструмлено та заповнено газом, а вхід до нього перекрито. Необхідно знайти техніка, який зможе запустити генератор і відкрити шлюз.</text>
+	</string>
+	<string id="jup_b10_ufo_memory_at_text">
+		<text>Модуль пам'яті - у руках майстра. Необхідно дочекатися, поки той розблокує доступ до інформації.</text>
+	</string>
+	<string id="jup_b10_ufo_memory_name">
+		<text>Безпілотний розвідник: розблокувати модуль пам'яті</text>
+	</string>
+	<string id="jup_b10_ufo_memory_nitro_name">
+		<text>Безпілотний розвідник: забрати модуль пам'яті в Азота</text>
+	</string>
+	<string id="jup_b10_ufo_memory_novikov_name">
+		<text>Безпілотний розвідник: забрати модуль пам'яті в Новікова</text>
+	</string>
+	<string id="jup_b10_ufo_memory_repaired_by_nitro_text">
+		<text>Азот розблокував модуль пам'яті. Варто забрати модуль, щоб вивчити записану на ньому інформацію.</text>
+	</string>
+	<string id="jup_b10_ufo_memory_repaired_by_novikov_text">
+		<text>Новіков розблокував модуль пам'яті. Потрібно забрати модуль, щоб вивчити записану на ньому інформацію.</text>
+	</string>
+	<string id="jup_b10_ufo_memory_started_text">
+		<text>З безпілотного розвідника вдалося видобути модуль пам'яті. Щоб отримати доступ до інформації, слід розблокувати модуль.</text>
+	</string>
+	<string id="jup_b10_ufo_memory_wait_name">
+		<text>Безпілотний розвідник: дочекатися розблокування модуля пам'яті</text>
+	</string>
+	<string id="jup_b16_oasis_art_name">
+		<text>Оаза: знайти докази</text>
+	</string>
+	<string id="jup_b16_oasis_art_text">
+		<text>Оазу знайдено: це місце справді має цілющі властивості. Необхідно знайти якісь докази, котрі можна було б пред'явити вченим.</text>
+	</string>
+	<string id="jup_b16_oasis_artifact_back_name">
+		<text>Оаза: принести докази вченим</text>
+	</string>
+	<string id="jup_b16_oasis_artifact_back_text">
+		<text>Оазу знайдено: це місце справді має цілющі властивості. Необхідно принести знайдений тут артефакт ученим - як доказ.</text>
+	</string>
+	<string id="jup_b16_oasis_name">
+		<text>Оаза: перевірити правдивість легенди</text>
+	</string>
+	<string id="jup_b16_oasis_text">
+		<text>Озьорський, учений з бункера, прохав спробувати відшукати легендарну Оазу. Якщо вірити чуткам, там має знаходитися водойма із цілющою водою. Втім, ніхто не зна точно, чи існує це місце насправді.</text>
+	</string>
+	<string id="jup_b19_agreed_to_go_name">
+		<text>Копачі: піти у вилазку із дядьком Яром</text>
+	</string>
+	<string id="jup_b19_agreed_to_go_text">
+		<text>Дядькові Яру потрібна якась допомога. Необхідно відправиться із ним до села Копачів.</text>
+	</string>
+	<string id="jup_b19_destroy_mercs_name">
+		<text>Копачі: знищити найманців</text>
+	</string>
+	<string id="jup_b19_destroy_mercs_text">
+		<text>Схоже, дядько Яр припускав появу найманців. Необхідно їх знищити.</text>
+	</string>
+	<string id="jup_b19_following_yar_name">
+		<text>Копачі: триматися біля дядька Яра</text>
+	</string>
+	<string id="jup_b19_following_yar_text">
+		<text>Дядько Яр попрохав триматися поблизу нього і не здіймати шуму.</text>
+	</string>
+	<string id="jup_b19_talk_to_yar_name">
+		<text>Копачі: поговорити із дядьком Яром</text>
+	</string>
+	<string id="jup_b19_talk_to_yar_text">
+		<text>Найманці мертві. Варто поговорити із дядьком Яром, аби отримати пояснення тому, що сталося.</text>
+	</string>
+	<string id="jup_b1_bring_art_back_name">
+		<text>Перемінне псі-випромінювання: доставити вченим аномальне утворення</text>
+	</string>
+	<string id="jup_b1_bring_art_back_text">
+		<text>Принести знайдений зразок Германові, як то було домовлено. Зважаючи на все, цей наполовину змінений аномальним впливом предмет і є джерелом перемінного псі-випромінювання.</text>
+	</string>
+	<string id="jup_b1_get_art_name">
+		<text>Перемінне псі-випромінювання: дослідити джерело</text>
+	</string>
+	<string id="jup_b1_get_art_text">
+		<text>Обстежити тунель у пошуках такого собі аномального утворення. Учені вважають, що в перемінного псі-поля є джерело та прогнозують, що це, можливо, унікальний артефакт.</text>
+	</string>
+	<string id="jup_b1_join_squad_name">
+		<text>Перемінне псі-випромінювання: зустрітися із загоном Тополі</text>
+	</string>
+	<string id="jup_b1_join_squad_text">
+		<text>Загін Тополі пішов до тунелю із перемінним псі-випромінюванням. Потрібно зустрітися з ними там.</text>
+	</string>
+	<string id="jup_b1_meet_squad_name">
+		<text>Перемінне псі-випромінювання: поговорити з Тополею</text>
+	</string>
+	<string id="jup_b1_meet_squad_text">
+		<text>Приєднатися до загону Тополі, щоб відправитися до тунелю із перемінним псі-випромінюванням. Як було домовлено, у процесі пошуків потрібного вченим зразка сталкери охоронятимуть тунель.</text>
+	</string>
+	<string id="jup_b200_tech_materials_brought_all_text">
+		<text>Віднести Азотові всі знайдені радіотехнічні матеріали</text>
+	</string>
+	<string id="jup_b200_tech_materials_brought_some_text">
+		<text>Азотові потрібні радіотехнічні матеріали. Можна віднести йому вже знайдені деталі або спробувати пошукати ще.</text>
+	</string>
+	<string id="jup_b200_tech_materials_name">
+		<text>Радіотехніка: знайти матеріали для Азота</text>
+	</string>
+	<string id="jup_b200_tech_materials_text">
+		<text>Азотові потрібні матеріали для радіотехніки. За його словами, є сенс пошукати їх на цементному заводі.</text>
+	</string>
+	<string id="jup_b202_actor_items_stolen_01_name">
+		<text>Крадіжка: дізнатися, хто міг вкрасти речі</text>
+	</string>
+	<string id="jup_b202_actor_items_stolen_01_text">
+		<text>Розпитати сталкерів на «Янові» - чи не помітив хтось із них підозрілих людей, здатних вкрасти речі з особистого ящика.</text>
+	</string>
+	<string id="jup_b202_actor_items_stolen_02_name">
+		<text>Крадіжка: перевірити полустанок</text>
+	</string>
+	<string id="jup_b202_actor_items_stolen_02_text">
+		<text>Треба перевірити полустанок: зважаючи на все, підозрілий сталкер, який міг вчинити крадіжку, попрямував саме туди.</text>
+	</string>
+	<string id="jup_b202_actor_items_stolen_03_name">
+		<text>Крадіжка: забрати свої речі</text>
+	</string>
+	<string id="jup_b202_actor_items_stolen_03_text">
+		<text>Всі викрадені Корчем речі мають бути у схованці - в люку каналізації за полустанком.</text>
+	</string>
+	<string id="jup_b206_anomalous_grove_get_plant_name">
+		<text>Аномальна рослина: добути зразок рослинності</text>
+	</string>
+	<string id="jup_b206_anomalous_grove_get_plant_text">
+		<text>Біля краю кар'єру нещодавно виникла ділянка аномальної рослинності. Озьорський просить добути екземпляр для вивчення.</text>
+	</string>
+	<string id="jup_b206_anomalous_grove_have_plant_name">
+		<text>Аномальна рослина: віддати екземпляр Озьорському</text>
+	</string>
+	<string id="jup_b206_anomalous_grove_have_plant_text">
+		<text>Необхідно віднести екземпляр рослинності Озьорському. В обмін на нього вчений переконає Германа пожертвувати науковий костюм.</text>
+	</string>
+	<string id="jup_b208_burers_hunt_kill_burers_name">
+		<text>Полювання: знищити невідомих мутантів</text>
+	</string>
+	<string id="jup_b208_burers_hunt_kill_burers_text">
+		<text>Група сталкерів знайшла дивних мутантів у тоннелях на півночі від заводу «Юпітер». Необхідно перевірити це місце і знищити мутантів.</text>
+	</string>
+	<string id="jup_b208_burers_hunt_take_reward_name">
+		<text>Полювання: забрати в Зверобоя нагороду за мутантів з тоннеля</text>
+	</string>
+	<string id="jup_b208_burers_hunt_take_reward_text">
+		<text>Мутанти в тоннелях на північ від заводу «Юпітер» знищені. Необхідно повідомити про це Звіробоєві та забрати нагороду.</text>
+	</string>
+	<string id="jup_b209_hypotheses_1_name">
+		<text>Гіпотеза: встановити сканер у центрі обвалу</text>
+	</string>
+	<string id="jup_b209_hypotheses_1_text">
+		<text>Щоб перевірити гіпотезу Озьорського, необхідно істановити сканер приблизно у центрі обвалу.</text>
+	</string>
+	<string id="jup_b209_hypotheses_2_name">
+		<text>Гіпотеза: дочекатися закінчення експерименту</text>
+	</string>
+	<string id="jup_b209_hypotheses_2_text">
+		<text>Сканер перейшов у активний режим і почав реєструвати інформацію. Необхідно почекати, поки буде зібрано достатньо даних для підтвердження або спростування гіпотези.</text>
+	</string>
+	<string id="jup_b209_hypotheses_3_name">
+		<text>Гіпотеза: забрати сканер</text>
+	</string>
+	<string id="jup_b209_hypotheses_3_text">
+		<text>Зібрано цілком достатньо даних для підтвердження гіпотези Озьорського. Необхідно забрати сканер.</text>
+	</string>
+	<string id="jup_b209_hypotheses_4_name">
+		<text>Гіпотеза: віддати сканер Озьорському</text>
+	</string>
+	<string id="jup_b209_hypotheses_4_text">
+		<text>Необхідно віддати сканер Озьорському. Зібраних даних має вистачити для однозначного підтвердження його гіпотези.</text>
+	</string>
+	<string id="jup_b211_kill_bloodsuckers_name">
+		<text>Полювання: знищити зграю болотяних кровососів</text>
+	</string>
+	<string id="jup_b211_kill_bloodsuckers_text">
+		<text>У Плавнях, за цементним заводом, бачили зграю болотяних кровососів. Місцеві сталкери просять її знищити.</text>
+	</string>
+	<string id="jup_b211_take_reward_name">
+		<text>Полювання: забрати в Звіробоя нагороду за болотяних кровососів</text>
+	</string>
+	<string id="jup_b211_take_reward_text">
+		<text>Зграю болотяних кровососів знищено. Варто забрати нагороду від місцевих сталкерів у Звіробоя.</text>
+	</string>
+	<string id="jup_b212_jupiter_kill_chimera_name">
+		<text>Нічне полювання: знищити химеру</text>
+	</string>
+	<string id="jup_b212_jupiter_kill_chimera_text">
+		<text>Химера є нічним хижаком; де знаходиться її денне лігвище - невідомо. Необхідно вбити її вночі, коли вона виходить на полювання до вентиляційного комплексу.</text>
+	</string>
+	<string id="jup_b212_jupiter_tell_animalboy_about_chimera_name">
+		<text>Нічне полювання: розповісти Звіробієві про смерть химери</text>
+	</string>
+	<string id="jup_b212_jupiter_tell_animalboy_about_chimera_text">
+		<text>Химера-вбивця мертва, за мисливця Лиса відплачено. Необхідно розповісти про це Звіробієві.</text>
+	</string>
+	<string id="jup_b217_get_tools_1_2_name">
+		<text>Інструменти: принести інструменти Азотові</text>
+	</string>
+	<string id="jup_b217_get_tools_1_2_text">
+		<text>Азот просив знайти два набори інструментів: один для точної, інший для грубої роботи. Він не лише заплатить за інструмент, але й зможе забезпечити серйознішу модернізацію зброї чи бронежилета.</text>
+	</string>
+	<string id="jup_b217_get_tools_1_3_name">
+		<text>Інструменти: принести інструменти Азотові</text>
+	</string>
+	<string id="jup_b217_get_tools_1_3_text">
+		<text>Азот просив знайти два набори інструментів: один для грубої роботи, інший для калібрування. Він не лише заплатить за інструмент, але й зможе забезпечити серйознішу модернізацію зброї чи бронежилета.</text>
+	</string>
+	<string id="jup_b217_get_tools_1_name">
+		<text>Інструменти: принести інструменти Азотові</text>
+	</string>
+	<string id="jup_b217_get_tools_1_text">
+		<text>Азот просив знайти набір інструментів для грубої роботи. Він не лише заплатить за інструмент, але й зможе забезпечити серйознішу модернізацію зброї чи бронежилета.</text>
+	</string>
+	<string id="jup_b217_get_tools_2_3_name">
+		<text>Інструменти: принести інструменти Азотові</text>
+	</string>
+	<string id="jup_b217_get_tools_2_3_text">
+		<text>Азот просив знайти два набори інструментів: один для тонкої роботи, інший для калібрування. Він не лише заплатить за інструмент, але й зможе забезпечити серйознішу модернізацію зброї чи бронежилета.</text>
+	</string>
+	<string id="jup_b217_get_tools_2_name">
+		<text>Інструменти: принести інструменти Азотові</text>
+	</string>
+	<string id="jup_b217_get_tools_2_text">
+		<text>Азот просив знайти набір інструментів для точної роботи. Він не лише заплатить за інструмент, але й зможе забезпечити серйознішу модернізацію зброї чи бронежилета.</text>
+	</string>
+	<string id="jup_b217_get_tools_3_name">
+		<text>Інструменти: принести інструменти Азотові</text>
+	</string>
+	<string id="jup_b217_get_tools_3_text">
+		<text>Азот просив знайти набір інструментів для калібрування. Він не лише заплатить за інструмент, але й зможе забезпечити серйознішу модернізацію зброї чи бронежилета.</text>
+	</string>
+	<string id="jup_b217_mechanic_toolkit_search_name">
+		<text>Інструменти: принести інструменти Азотові</text>
+	</string>
+	<string id="jup_b217_mechanic_toolkit_search_text">
+		<text>Азот просив знайти три набори інструментів: для грубої роботи, для точної роботи плюс набір для калібрування. Він не лише заплатить за інструмент, але й зможе забезпечити серйознішу модернізацію зброї чи бронежилета.</text>
+	</string>
+	<string id="jup_b218_actor_outfit_name">
+		<text>«Прип'ять-1»: знайти костюм із замкнутою системою дихання</text>
+	</string>
+	<string id="jup_b218_actor_outfit_text">
+		<text>Для подолання шляхопроводу «Прип'ять-1» знадобиться костюм із замкнутою системою дихання, оскільки підземні приміщення було заповнено вуглекислим газом із невідомою домішкою.</text>
+	</string>
+	<string id="jup_b218_monolith_guide_to_zulus_name">
+		<text>«Прип'ять-1»: відвести Бродягу до Зулуса</text>
+	</string>
+	<string id="jup_b218_monolith_guide_to_zulus_text">
+		<text>Необхідно відвести Бродягу до Зулуса і представити як нового бійця загону. Зулус може не зрадіти візиту одинака в костюмі «Моноліту».</text>
+	</string>
+	<string id="jup_b218_monolith_name">
+		<text>«Прип'ять-1»: поговорити із Бродягою про захисний костюм</text>
+	</string>
+	<string id="jup_b218_monolith_text">
+		<text>Шляхопровід «Прип'ять-1» було заповнено вуглекислим газом із невідомою домішкою. Необхідно повідомити Бродягу, що для подолання шляхопроводу знадобиться костюм із замкнутою системою дихання.</text>
+	</string>
+	<string id="jup_b218_pripyat_group_gathering_name">
+		<text>«Прип'ять-1»: зібрати загін для походу до Прип'яті</text>
+	</string>
+	<string id="jup_b218_pripyat_group_gathering_text">
+		<text>Азот міг би відкрити шлюз шляхопроводу «Прип'ять-1», але він відмовляється йти на територію заводу «Юпітер» без охорони і рекомендує взяти із собою до шляхопровіду пару бійців. До загону вже приєднався Зулус, котрий пропонує надсилати нових бійців до нього.</text>
+	</string>
+	<string id="jup_b218_pripyat_group_zulus_talk_name">
+		<text>«Прип'ять-1»: перемовитись із Зулусом про похід до Прип'яті</text>
+	</string>
+	<string id="jup_b218_pripyat_group_zulus_talk_text">
+		<text>Азот міг би відкрити шлюз шляхопроводу «Прип'ять-1», але він відмовляється йти на територію заводу «Юпітер» без охорони і рекомендує взяти із собою до шляхопроводу пару бійців. Він пропонує поговорити із Зулусом, який може допомогти зібрати загін.</text>
+	</string>
+	<string id="jup_b218_soldier_guide_to_zulus_name">
+		<text>«Прип'ять-1»: відвести Соколова до Зулуса</text>
+	</string>
+	<string id="jup_b218_soldier_guide_to_zulus_text">
+		<text>Соколов згоден іти до Прип'яті й може, ідучи з бункера, прихопити із собою захисний костюм. Необхідно відвести його до Зулуса та представити як нового бійця загону.</text>
+	</string>
+	<string id="jup_b218_soldier_name">
+		<text>«Прип'ять-1»: поговорити із Соколовим про захисний костюм</text>
+	</string>
+	<string id="jup_b218_soldier_talk_to_scientist_name">
+		<text>«Прип'ять-1»: поговорити з Озьорським щодо костюма для Соколова</text>
+	</string>
+	<string id="jup_b218_soldier_talk_to_scientist_text">
+		<text>Соколов згоден на науковий захисний костюм, але Герман навряд чи дозволить забрати з бункера хоч один. Варто поговорити з Озьорським - то людина м'яка та добра.</text>
+	</string>
+	<string id="jup_b218_soldier_tell_outfit_name">
+		<text>«Прип'ять-1»: розповісти Соколову про науковий костюм</text>
+	</string>
+	<string id="jup_b218_soldier_tell_outfit_text">
+		<text>Озьорський, дуже вдоволений екземпляром рослини, просив передати Соколову, що захисний костюм чекатиме в Германа.</text>
+	</string>
+	<string id="jup_b218_soldier_text">
+		<text>Шляхопровід «Прип'ять-1» був заповнений вуглекислим газом з невідомої приместью. Необхідно повідомити Соколову, що для подолання шляхопроводу знадобиться костюм із замкнутою системою дихання.</text>
+	</string>
+	<string id="jup_b218_stalker_bring_money_name">
+		<text>«Прип'ять-1»: принести Вано гроші на костюм</text>
+	</string>
+	<string id="jup_b218_stalker_bring_money_text">
+		<text>Костюм, через якого сталкер Вано заборгував бандитам, споряджено замкнутою системою дихання. Вано довелося закласти його, щоб розплатитися з боргами; тепер йому потрібні 3000, щоб викупити костюм.</text>
+	</string>
+	<string id="jup_b218_stalker_guide_to_zulus_name">
+		<text>«Прип'ять-1»: відвести Вано до Зулуса</text>
+	</string>
+	<string id="jup_b218_stalker_guide_to_zulus_text">
+		<text>Вано згоден іти до Прип'яті. Необхідно відвести його до Зулуса і представити як нового бійця загону. Окрім того, дорогою Вано зможе викупити свій захисний костюм.</text>
+	</string>
+	<string id="jup_b218_stalker_name">
+		<text>«Прип'ять-1»: поговорити з Вано про захисний костюм</text>
+	</string>
+	<string id="jup_b218_stalker_text">
+		<text>Шляхопровід «Прип'ять-1» було заповнено вуглекислим газом із невідомої домішкою. Необхідно повідомити Вано, що для подолання шляхопроводу знадобиться костюм із замкнутою системою дихання.</text>
+	</string>
+	<string id="jup_b25_accuse_flint_end_text">
+		<text>Флінт, він же Сорока, виявився великим пройдисвітом. Потрібно розповісти про це сталкерам на Затоні або угрупованням - то буде для нього гарна наука.</text>
+	</string>
+	<string id="jup_b25_accuse_flint_first_text">
+		<text>Флінт явно перехвалює себе, розповідаючи про те, чого навіть не міг бачити. Непогано було б вивести його на слизьке.</text>
+	</string>
+	<string id="jup_b25_accuse_flint_name">
+		<text>Чужі заслуги: розібратися із Флінтом</text>
+	</string>
+	<string id="jup_b25_accuse_flint_second_text">
+		<text>Флінт явно полюбляє привласнювати собі результати чужої праці. Непогано було б примусити його припнути свого язика.</text>
+	</string>
+	<string id="jup_b25_accuse_flint_third_text">
+		<text>Хвастощі Флінта переходять усі межі. Потрібно перемовитися з ним, причому так усе пояснити, щоб до нього направду дійшло.</text>
+	</string>
+	<string id="jup_b25_senya_accuse_flint_text">
+		<text>Виявляється, Флінт, він же Сорока, - відомий пройдисвіт. Потрібно розповісти про це сталкерам на Затоні або представникам угруповань: у подібних обставинах це, мабуть, найкращий вибір.</text>
+	</string>
+	<string id="jup_b32_get_scanners_task_name">
+		<text>Дослідження аномалій: одержати в техніка сканери</text>
+	</string>
+	<string id="jup_b32_get_scanners_task_text">
+		<text>Одержати в Новікова сканери, котрі потрібно розмістити в аномаліях. Герман хоче зібрати статистику появи артефактів, тому розміщувати сканери доведеться прямо в центрі деяких аномалій.</text>
+	</string>
+	<string id="jup_b32_task_name">
+		<text>Дослідження аномалій: розмістити сканер в аномалії</text>
+	</string>
+	<string id="jup_b32_task_reward_name">
+		<text>Дослідження аномалій: отримати нагороду</text>
+	</string>
+	<string id="jup_b32_task_reward_text">
+		<text>Отримати обіцяну нагороду за розміщення сканерів в аномалії. Тепер, коли сканери розміщено, Герман може розпочати збір статистики появи артефактів.</text>
+	</string>
+	<string id="jup_b32_task_text">
+		<text>Встановити сканер у центрі аномалії. Герман хоче зібрати статистику появи артефактів, тому сканери треба розмістити у центрах кількох аномалій.</text>
+	</string>
+	<string id="jup_b43_bring_fuzz_kolobok_name">
+		<text>Контракт з ученими: принести Гарикові артефакт «Колобок»</text>
+	</string>
+	<string id="jup_b43_bring_fuzz_kolobok_text">
+		<text>Гарик хотів би завершити контракт із ученими, але для цього йому потрібен артефакт «Колобок». Необхідно принести йому цей артефакт.</text>
+	</string>
+	<string id="jup_b43_bring_mincer_meat_name">
+		<text>Контракт з ученими: принести Гарикові артефакт «Скиба м'яса»</text>
+	</string>
+	<string id="jup_b43_bring_mincer_meat_text">
+		<text>Гарик хотів би завершити контракт із ученими, але для цього йому потрібен артефакт «Скиба м'яса». Необхідно принести йому цей артефакт.</text>
+	</string>
+	<string id="jup_b43_contract_started_name">
+		<text>Контракт з ученими: принести Гарикові артефакти «Скиба м'яса» та «Колобок»</text>
+	</string>
+	<string id="jup_b43_contract_started_text">
+		<text>Гарик хотів би завершити контракт з ученими, але для цього йому потрібні артефакти «Скиба м'яса» та «Колобок». Необхідно принести йому ці артефакти.</text>
+	</string>
+	<string id="jup_b43_thanks_for_2_artifacts_name">
+		<text>Контракт з ученими: артефакти доставлені</text>
+	</string>
+	<string id="jup_b43_thanks_for_2_artifacts_text">
+		<text>Гарик одержав обидва артефакти. Його контракт завершено.</text>
+	</string>
+	<string id="jup_b46_duty_founder_pda_name">
+		<text>Історія «Долгу»: передати КПК засновника «Долгу» зацікавленим особам</text>
+	</string>
+	<string id="jup_b46_duty_founder_pda_text">
+		<text>На тілі засновника «Долгу», який загинув в аномалії, було знайдено особистий КПК. Необхідно передати цей пристрій тим, кого цікавлять останні хвилини життя легендарного засновника угруповання.</text>
+	</string>
+	<string id="jup_b46_spatial_bubble_name">
+		<text>Аномальна активність: просканирувати місцевість поліпшеним детектором</text>
+	</string>
+	<string id="jup_b46_spatial_bubble_text">
+		<text>Сканери вчених зареєстрували аномальну активність на північ від бункера. Необхідно дослідити місцевість за допомогою довершеного детектора.</text>
+	</string>
+	<string id="jup_b47_bunker_guards_01_name">
+		<text>Охорона вчених: знайти надійних людей</text>
+	</string>
+	<string id="jup_b47_bunker_guards_01_text">
+		<text>Бункер учених залишився без охорони. Необхідно підібрати їм для охорони групу надійних людей.</text>
+	</string>
+	<string id="jup_b47_bunker_guards_02_name">
+		<text>Охорона вчених: повернутися до Германа по винагороду</text>
+	</string>
+	<string id="jup_b47_bunker_guards_02_text">
+		<text>Охорону для бункера вчених знайдено. Необхідно повернутися до Германа по належну винагороду.</text>
+	</string>
+	<string id="jup_b47_jupiter_products_01_name">
+		<text>Останні розробки: знайти документи на заводі «Юпітер»</text>
+	</string>
+	<string id="jup_b47_jupiter_products_01_text">
+		<text>Германа цікавлять останні розробки заводу «Юпітер». Необхідно знайти документацію в адміністративному корпусі заводу.</text>
+	</string>
+	<string id="jup_b47_jupiter_products_02_name">
+		<text>Останні розробки: віднести Германові документи</text>
+	</string>
+	<string id="jup_b47_jupiter_products_02_text">
+		<text>У знайдених документах сказано, що всю технічну документацію було вивезено за межі заводу. Варто передати Германові хоча б цю інформацію.</text>
+	</string>
+	<string id="jup_b47_jupiter_products_03_name">
+		<text>Останні розробки: віднести Германові документи та КПК Чорного</text>
+	</string>
+	<string id="jup_b47_jupiter_products_03_text">
+		<text>Під час пошуку документації стався напад найманців. Судячи з КПК їхнього лідера Чорного, вони мали припинити пошук документації вченими. При цьому в знайдених документах зазначено, що всю технічну документацію було вивезено за межі заводу. Бажано передати Германові цю інформацію вкупі з КПК Чорного.</text>
+	</string>
+	<string id="jup_b4_monolith_squad_help_name">
+		<text>Вцілілий «Моноліт»: поговорити із мешканцями «Янова» щодо укриття</text>
+	</string>
+	<string id="jup_b4_monolith_squad_help_text">
+		<text>Загін «монолітівців», колись - фанатичних бійців, вийшов з-під нав'язливого навіювання. Тепер ці люди шукають укриття від викидів та монстрів. Потрібно домовитися з мешканцями станції «Янів», щоб «монолітівці» могли там укритися.</text>
+	</string>
+	<string id="jup_b4_stalkers_come_duty_text">
+		<text>Відвести вербувальників «Долгу» до загону колишніх «монолітівців». Якщо «монолітівці» вступлять до «Долгу», вони зможуть безперешкодно укритися від викиду та монстрів на станції «Янів».</text>
+	</string>
+	<string id="jup_b4_stalkers_come_freedom_text">
+		<text>Відвести вербувальників «Волі» до загону колишніх «монолітівців». Якщо «монолітівці» приєднаються до «Волі», вони зможуть безперешкодно укритися від викиду та монстрів на станції «Янів».</text>
+	</string>
+	<string id="jup_b4_stalkers_come_name">
+		<text>Вцілілий «Моноліт»: відвести вербувальників до загону колишніх «монолітівців»</text>
+	</string>
+	<string id="jup_b6_anom_1_guard_name">
+		<text>Дослідження аномалій: прикривати сталкерів</text>
+	</string>
+	<string id="jup_b6_anom_1_guard_text">
+		<text>Схоже, проведення вимірів в аномалії привернуло увагу монстрів. Треба прикривати сталкерів доти, доки вимірювання не буде завершено.</text>
+	</string>
+	<string id="jup_b6_anom_2_guard_name">
+		<text>Дослідження аномалій: прикривати сталкерів</text>
+	</string>
+	<string id="jup_b6_anom_2_guard_text">
+		<text>Схоже, проведення вимірів у аномалії привернуло увагу зомбі з Копачів. Треба прикривати сталкерів доти, доки вимірювання не буде завершено.</text>
+	</string>
+	<string id="jup_b6_get_reward_name">
+		<text>Дослідження аномалій: поговорити з Германом</text>
+	</string>
+	<string id="jup_b6_get_reward_text">
+		<text>Вимірювання аномалій проведено. Потрібно сповістити про це вчених і забрати обіцяну винагороду.</text>
+	</string>
+	<string id="jup_b6_get_to_anomal_place_name">
+		<text>Дослідження аномалій: поговорити зі сталкерами</text>
+	</string>
+	<string id="jup_b6_get_to_anomal_place_text">
+		<text>Поговорити з групою сталкерів, що будуть проводити виміри. Потрібно вибрати, до якої аномалії прямувати.</text>
+	</string>
+	<string id="jup_b6_travel_home_name">
+		<text>Дослідження аномалій: поговорити зі сталкерами</text>
+	</string>
+	<string id="jup_b6_travel_home_text">
+		<text>Усі потрібні вимірювання проведено. Можна відправлятися із групою до бункера вчених.</text>
+	</string>
+	<string id="jup_b6_travel_name">
+		<text>Дослідження аномалій: поговорити зі сталкерами</text>
+	</string>
+	<string id="jup_b6_travel_text">
+		<text>Усі вимірювання в аномалії проведено. Потрібно поспілкуватися із групою та вирішити, куди йти далі.</text>
+	</string>
+	<string id="jup_b6_watch_topol_squad_six_name">
+		<text>Дослідження аномалій: прикривати сталкерів</text>
+	</string>
+	<string id="jup_b6_watch_topol_squad_six_text">
+		<text>Герман запропонував роботу: потрібно прикривати сталкерів, доки ті проводитимуть вимірювання в аномаліях.</text>
+	</string>
+	<string id="jup_b8_heli_4_crash_name">
+		<text>«Скат-4»: дослідити місце падіння</text>
+	</string>
+	<string id="jup_b8_heli_4_crash_name_2">
+		<text>«Скат-4»: знайти причину згоряння електроніки</text>
+	</string>
+	<string id="jup_b8_heli_4_crash_text">
+		<text>Дослідити місце падіння гелікоптера «Скат-4».</text>
+	</string>
+	<string id="jup_b8_heli_4_crash_text_2">
+		<text>Потрібно з'ясувати джерело потужного електричного розряду, що вразив «Скат-4».</text>
+	</string>
+	<string id="jup_b9_blackbox_decrypting_name">
+		<text>«Скат-1»: віддати «чорний ящик» технікові на дешифрування</text>
+	</string>
+	<string id="jup_b9_blackbox_decrypting_text">
+		<text>«Чорний ящик» гелікоптера «Скат-1» вцілів. Необхідно передати його технікові на дешифрування, щоб отримати доступ до інформації, що там міститься.</text>
+	</string>
+	<string id="jup_b9_blackbox_descrypted_after_3_name">
+		<text>«Скат-1»: дочекатися дешифрування «чорного ящика»</text>
+	</string>
+	<string id="jup_b9_blackbox_descrypted_after_3_text">
+		<text>Азот узявся за дешифрування «чорного ящика» - за його словами, для цього знадобиться близько трьох годин. Необхідно дочекатися закінчення дешифрування.</text>
+	</string>
+	<string id="jup_b9_go_for_blackbox_descryption_name">
+		<text>«Скат-1»: повернутися до Азота по інформацію із «чорного ящика»</text>
+	</string>
+	<string id="jup_b9_go_for_blackbox_descryption_text">
+		<text>Азот уже мав закінчити дешифрування. Необхідно повернутися до нього по інформацію із «чорного ящика».</text>
+	</string>
+	<string id="jup_b9_heli_1_crash_name">
+		<text>«Скат-1»: дослідити місце падіння</text>
+	</string>
+	<string id="jup_b9_heli_1_crash_text">
+		<text>Дослідити місце падіння гелікоптера «Скат-1».</text>
+	</string>
+	<string id="pas_b400_pripyat_name">
+		<text>«Прип'ять-1»: дістатися Прип'яті</text>
+	</string>
+	<string id="pas_b400_pripyat_text">
+		<text>Необхідно подолати шляхопровід «Прип'ять-1» та дістатися до точки евакуації військових у Прип'яті.</text>
+	</string>
+	<string id="zat_a9_way_gases_check_chemistry_workshop_name">
+		<text>Шлях до Прип'яті: перевірити цех хімічних сполук заводу «Юпітер»</text>
+	</string>
+	<string id="zat_a9_way_gases_check_chemistry_workshop_text">
+		<text>У цеху хімічних сполук має бути інформація про консервацію підземного шляхопроводу «Прип'ять-1» за допомогою якогось газу.</text>
+	</string>
+	<string id="zat_a9_way_gates_check_corps_name">
+		<text>Шлях до Прип'яті: перевірити адміністративний корпус заводу «Юпітер»</text>
+	</string>
+	<string id="zat_a9_way_gates_check_corps_text">
+		<text>Проводир не знає маршруту, яким можна безпечно дістатися Прип'яті. Але він підказав, де можна знайти інформацію про підземні тунелі, котрі ведуть від заводу «Юпітер» до міста: найкраще розпочати з адміністративного корпусу.</text>
+	</string>
+	<string id="zat_a9_way_gates_check_electrical_workshop_name">
+		<text>Шлях до Прип'яті: перевірити лабораторний корпус заводу «Юпітер»</text>
+	</string>
+	<string id="zat_a9_way_gates_check_electrical_workshop_text">
+		<text>У знайдених в адміністративному цеху документах говориться про евакуацію виробничого комплексу з території заводу. Інформацію про це треба шукати в лабораторному корпусі.</text>
+	</string>
+	<string id="zat_a9_way_gates_check_transport_workshop_name">
+		<text>Шлях до Прип'яті: перевірити транспортний шлюз шляхопроводу «Прип'ять-1»</text>
+	</string>
+	<string id="zat_a9_way_gates_check_transport_workshop_text">
+		<text>Вхід до підземного шляхопроводу знаходиться за транспортним шлюзом. Потрібно перевірити це місце і пошукати там будь-яку інформацію про шляхопровід.</text>
+	</string>
+	<string id="zat_a9_way_to_pripyat_check_archives_name">
+		<text>Шлях до Прип'яті: перевірити перший відділ заводу «Юпітер»</text>
+	</string>
+	<string id="zat_a9_way_to_pripyat_check_archives_text">
+		<text>У першому відділі має міститися інформація про підземний шляхопровід «Прип'ять-1», котра може виявитися дуже корисною.</text>
+	</string>
+	<string id="zat_a9_way_to_pripyat_check_delivery_department_name">
+		<text>Шлях до Прип'яті: перевірити відділ доставки заводу «Юпітер»</text>
+	</string>
+	<string id="zat_a9_way_to_pripyat_check_delivery_department_text">
+		<text>Судячи із запису з лабораторного цеху, евакуацію мав проводити відділ доставки. Потрібно перевірити це місце.</text>
+	</string>
+	<string id="zat_a9_way_to_pripyat_check_repair_workshop_name">
+		<text>Шлях до Прип'яті: перевірити ремонтний цех заводу «Юпітер»</text>
+	</string>
+	<string id="zat_a9_way_to_pripyat_check_repair_workshop_text">
+		<text>У відділі доставки знайшлася інформація про втрату певної кількості екземплярів «Виробу №62». Судячи із запису, цим займалися у ремонтному цеху. Треба перевірити зазначене приміщення.</text>
+	</string>
+	<string id="zat_a9_way_to_pripyat_tell_stalker_guide_name">
+		<text>Шлях до Прип'яті: розпитати проводиря</text>
+	</string>
+	<string id="zat_a9_way_to_pripyat_tell_stalker_guide_text">
+		<text>Судячи із записів з «чорного ящика» одного з гелікоптерів, військові мали зібратися у точці евакуації Б28. Вона знаходиться у Прип'яті: так, в усякому разі, свідчать знайдені в іншому гелікоптері мапи. Доведеться шукати можливість потрапити туди - треба поговорити про це із проводирем.</text>
+	</string>
+	<string id="zat_b207_depot_reward_task_name">
+		<text>Склад «Долгу»: взяти належне</text>
+	</string>
+	<string id="zat_b207_morgan_depot_task_name">
+		<text>Склад «Долгу»: зустрітися із Морганом</text>
+	</string>
+	<string id="zat_b207_morgan_depot_task_text">
+		<text>Як плату за мовчання про його комбінації барига Морган запропонував доступ до складу «Долгу». Треба із ним зустрітися в обговореному місці - біля кар'єру.</text>
+	</string>
+	<string id="pas_b400_pripyat_gate_text">
+		<text>Для подальшого просування необхідно відкрити ворота.</text>
+	</string>
+	<string id="pas_b400_pripyat_door_text">
+		<text>Для подальшого просування необхідно відкрити двері.</text>
+	</string>
+	<string id="pas_b400_pripyat_hall_door_text">
+		<text>Для подальшого просування необхідно включити живлення воріт.</text>
+	</string>
+	<string id="pas_b400_pripyat_control_text">
+		<text>Для подальшого просування необхідно розблокувати ворота. Ймовірно, це можна зробити з диспетчерської.</text>
+	</string>
+	<string id="jup_b6_employ_stalkers_name">
+		<text>Дослідницька група: підібрати людей</text>
+	</string>
+	<string id="jup_b6_employ_stalkers_text">
+		<text>Дослідницька група, що працювала на вчених, загинула. Необхідно підібрати нову групу для продовження наукової праці.</text>
+	</string>
+	<string id="jup_b6_employ_stalkers_reward_name">
+		<text>Дослідницька група: повернутися до Германа по винагороду</text>
+	</string>
+	<string id="jup_b6_employ_stalkers_reward_text">
+		<text>Людей для нової дослідницької групи підібрано. Необхідно повернутися до Германа по винагороду.</text>
+	</string>
+	<string id="jup_b218_soldier_do_scientist_quest_name">
+		<text>«Прип'ять-1»: виконати завдання Озьорського</text>
+	</string>
+	<string id="jup_b218_soldier_do_scientist_quest_text">
+		<text>Щоб одержати захисний костюм для Соколова, необхідно виконати завдання Озьорського і принести аномальну рослину.</text>
+	</string>
+	<string id="jup_b200_tech_materials_inside_text">
+		<text>Азотові потрібні матеріали для радіотехніки. Необхідно відшукати їх у будівлі цементного заводу.</text>
+	</string>
+	<string id="jup_b25_flint_and_senya_text">
+		<text>Тріску кинув помирати в аномалії саме Флінт. Потрібно поговорити із ним та взнати, чому він так повівся.</text>
+	</string>
+	<string id="jup_b25_revenge_senya_name">
+		<text>Відплата: помститися за Тріску</text>
+	</string>
+	<string id="jup_b25_revenge_senya_text">
+		<text>Відшукати того, хто кинув Тріску помирати в аномалії, а сам забрав артефакт і пішов. На жаль, Тріска не встиг сказати, як звали того сталкера - відомо лише, що він зі «свободівців».</text>
+	</string>
+	<string id="zat_b207_depot_reward_task_duty_text">
+		<text>Підполковник Шульга дозволив узяти будь-яке спорядження зі складу «Долгу», якщо вдасться відбити його в загону «Волі».</text>
+	</string>
+	<string id="zat_b207_depot_reward_task_freedom_text">
+		<text>Локі дозволив брати будь-яке спорядження зі складу «Долгу», доки його утримують бійці «Волі».</text>
+	</string>
+</string_table>

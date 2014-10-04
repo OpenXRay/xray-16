@@ -1,0 +1,9 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_info = {+pri_a15_lights_off} sr_light
+
+[sr_light]
+on_info = {-pri_a15_lights_off} sr_idle
+light_on = false

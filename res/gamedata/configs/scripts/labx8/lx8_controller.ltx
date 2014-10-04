@@ -1,0 +1,18 @@
+[logic@controller]
+active = mob_home
+suitable = {=check_npc_name(lx8_controller)} true
+prior = 100
+monster_job = true
+on_death = death
+
+[mob_home]
+path_home = controller_home
+actor_friendly = false
+home_min_radius = 30
+home_max_radius = 40
+aggressive = true
+out_restr = lx8_sr_controller_out_restr
+combat_ignore_cond = {=check_enemy_name(lx8_snork_1_jump:lx8_snork_2_jump:lx8_snork)} true
+
+[death]
+on_info = %+lx8_controller_dead%

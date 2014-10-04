@@ -1,0 +1,27 @@
+[logic]
+active = sr_idle@hall_talks
+
+[sr_idle@hall_talks]
+on_info = {+pas_b400_hall_done} sr_idle@nil
+on_info2 = {-pas_b400_sokolov_about_dome_1_can +pas_b400_vano_about_dome_1} sr_idle@sokolov_talks_hall_1
+on_info3 = {-pas_b400_vano_about_railway_1_can +pas_b400_about_railway} sr_idle@vano_talks_hall_12
+on_info4 = {-pas_b400_wanderer_about_monolith_1_can +pas_b400_zulus_about_monolith_2} sr_idle@wanderer_talks_hall_11
+on_info5 = {-pas_b400_wanderer_about_sniper_first_1_can +pas_b400_about_sniper} sr_idle@wanderer_talks_hall_6
+on_info6 = {-pas_b400_sokolov_about_door_1_can +pas_b400_about_door} sr_idle@sokolov_talks_hall_12
+
+[sr_idle@sokolov_talks_hall_1]
+on_game_timer = 20 | sr_idle@hall_talks %+pas_b400_sokolov_about_dome_1_can%
+
+[sr_idle@vano_talks_hall_12]
+on_game_timer = 30 | sr_idle@hall_talks %+pas_b400_vano_about_railway_1_can%
+
+[sr_idle@wanderer_talks_hall_11]
+on_game_timer = 20 | sr_idle@hall_talks %+pas_b400_wanderer_about_monolith_1_can%
+
+[sr_idle@wanderer_talks_hall_6]
+on_game_timer = 30 | sr_idle@hall_talks %+pas_b400_wanderer_about_sniper_first_1_can%
+
+[sr_idle@sokolov_talks_hall_12]
+on_game_timer = 30 | sr_idle@hall_talks %+pas_b400_sokolov_about_door_1_can%
+
+[sr_idle@nil]

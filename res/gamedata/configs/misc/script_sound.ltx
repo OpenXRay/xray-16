@@ -1,0 +1,557 @@
+#include "script_sound_music_and_stories.ltx"
+#include "script_sound_zaton.ltx"
+#include "script_sound_jupiter.ltx"
+#include "script_sound_pripyat.ltx"
+#include "script_sound_underpass.ltx"
+[list]: list_music_and_stories, list_script_sound_zaton, list_script_sound_jupiter, list_script_sound_pripyat, list_script_sound_underpass
+bloodsucker_growl
+bloodsucker_hit
+bloodsucker_swarm
+boar_swarm
+boar_swamp_runaway
+state
+wait
+
+trader_door_open_start
+trader_door_close_start
+trader_door_close_stop
+trader_door_locked
+trader_door_unlock
+wood_small_open
+wood_small_close_start
+wood_small_close_stop
+wood_large_open
+wood_large_close_start
+wood_large_close_stop
+metal_small_open
+metal_small_close_start
+metal_small_close_stop
+power_switch
+
+pda_alarm
+pda_news
+pda_tips
+pda_task
+
+heli_damaged
+heli_down
+heli_hit
+
+patrol_sneak
+patrol_run
+patrol_walk
+fight_attack
+post_combat_wait
+post_combat_wait_long
+post_combat_relax
+alarm
+
+meet_hello
+meet_hide_weapon
+meet_use_no_default
+meet_use_no_fight
+meet_use_no_weapon
+meet_use_no_talk_leader
+
+corpse_loot_begin
+corpse_loot_good
+corpse_loot_bad
+
+help_thanks
+help_heavy
+
+surge_earthquake_sound_looped
+surge_earthquake_sound
+blowout_begin
+blowout_rumble
+blowout_hit_1
+blowout_hit_2
+blowout_hit_3
+blowout_wave_1
+blowout_wave_2
+blowout_wave_3
+
+shooting_target_up
+shooting_target_down
+shooting_target_hit
+
+steam_blowout
+
+wounded_medkit
+
+radio_call
+
+
+[surge_earthquake_sound_looped]
+type = looped
+path = ambient\earthquake
+
+[surge_earthquake_sound]
+type = 3d
+path = ambient\earthquake
+
+[blowout_begin]
+type = 3d
+path = ambient\blowout_begin
+
+[blowout_rumble]
+type = looped
+path = ambient\blowout_rumble
+
+[blowout_hit_1]
+type = 3d
+path = ambient\blowout_hit_1
+
+[blowout_hit_2]
+type = 3d
+path = ambient\blowout_hit_2
+
+[blowout_hit_3]
+type = 3d
+path = ambient\blowout_hit_3
+
+[blowout_wave_1]
+type = 3d
+path = ambient\blowout_wave_1
+
+[blowout_wave_2]
+type = 3d
+path = ambient\blowout_wave_2
+
+[blowout_wave_3]
+type = 3d
+path = ambient\blowout_wave_3
+
+[state]
+type = npc
+npc_prefix = true
+path = states\idle\idle_
+shuffle = rnd
+idle = 7,13,100
+group_snd = true
+
+[state_1]
+type = npc|actor|3d
+actor_stereo = true|false
+npc_prefix = true|false
+path = states\idle\idle_
+shuffle = rnd|seq|loop
+idle = 3,5,100 ;min,max,rnd
+
+;************************************************************
+;Универсальная озвучка встречи
+;************************************************************
+[wait]
+type = npc
+avail_communities = stalker, bandit, dolg, freedom, army, monolith
+npc_prefix = true
+path = states\idle\idle_
+shuffle = rnd
+idle = 7,10,100
+
+;************************************************************
+;Болотная тварь и кустарниковый кабан
+;************************************************************
+
+[bloodsucker_swarm]
+type = 3d
+path = monsters\bloodsucker\swamp_run_
+shuffle = rnd
+idle = 1,1,100
+
+[boar_swarm]
+type = 3d
+path = monsters\boar\boar_swamp_run_
+shuffle = rnd
+idle = 0,0,100
+
+[boar_swamp_runaway]
+type = 3d
+path = monsters\boar\boar_swamp_runaway_
+shuffle = rnd
+idle = 0,0,100
+
+[bloodsucker_growl]
+type = 3d
+path = monsters\bloodsucker\attack_hit_
+shuffle = rnd
+idle = 0,0,100
+
+[bloodsucker_hit]
+type = 3d
+path = monsters\bloodsucker\heavy_hit_
+shuffle = rnd
+idle = 0,0,100
+
+
+
+;************************************************************
+; Alife
+;************************************************************
+
+[patrol_sneak]
+type = npc
+actor_stereo = false
+npc_prefix = false
+path = human_01\stalker\alife\patrol\sneak_
+shuffle = rnd
+idle = 1,1,100
+
+[patrol_run]
+type = npc
+actor_stereo = false
+npc_prefix = false
+path = human_01\stalker\alife\patrol\run_
+shuffle = rnd
+idle = 1,1,100
+
+[patrol_walk]
+type = npc
+actor_stereo = false
+npc_prefix = false
+path = human_01\stalker\alife\patrol\walk_
+shuffle = rnd
+idle = 1,1,100
+
+[fight_attack]
+type = npc
+actor_stereo = false
+npc_prefix = true
+path = fight\attack\script_attack_
+shuffle = rnd
+idle = 1,1,100
+is_combat_sound = true
+
+
+
+[post_combat_wait]
+type = npc
+actor_stereo = false
+npc_prefix = true
+group_snd = true
+path = fight\post_combat_wait\wait_
+avail_communities = stalker, bandit, dolg, freedom, army
+shuffle = rnd
+idle = 3,5,100
+
+[post_combat_wait_long]
+type = npc
+actor_stereo = false
+npc_prefix = true
+group_snd = true
+path = fight\post_combat_wait\wait_
+avail_communities = stalker, bandit, dolg, freedom, army
+shuffle = rnd
+idle = 7,10,100
+
+[post_combat_relax]
+type = npc
+actor_stereo = false
+npc_prefix = true
+group_snd = true
+path = fight\post_combat_wait\relax_
+avail_communities = stalker, bandit, dolg, freedom, army
+shuffle = rnd
+idle = 1,1,100
+
+
+;***************************************************************
+; Звуки дверей
+;***************************************************************
+[pl_test]
+type = npc
+npc_prefix = true
+path = fight\attack\attack_
+shuffle = rnd
+idle = 1,1,100
+
+[trader_door_open_start]
+type = 3d
+path = device\door_start
+shuffle = rnd
+idle = 1,1,100
+
+[trader_door_close_start]
+type = 3d
+path = device\door_closing
+shuffle = rnd
+idle = 1,1,100
+
+[trader_door_close_stop]
+type = 3d
+path = device\door_stop
+shuffle = rnd
+idle = 1,1,100
+
+[trader_door_locked]
+type = 3d
+path = device\door_locked
+shuffle = rnd
+idle = 1,1,100
+
+[trader_door_unlock]
+type = 3d
+path = device\door_servomotor
+shuffle = rnd
+idle = 1,1,100
+
+[wood_small_open]
+type = 3d
+path = device\wood_small_open
+shuffle = rnd
+idle = 1,1,100
+
+[wood_small_close_start]
+type = 3d
+path = device\wood_small_close_start
+shuffle = rnd
+idle = 1,1,100
+
+[wood_small_close_stop]
+type = 3d
+path = device\wood_small_close_stop
+shuffle = rnd
+idle = 1,1,100
+
+[wood_large_open]
+type = 3d
+path = device\wood_large_open
+shuffle = rnd
+idle = 1,1,100
+
+[wood_large_close_start]
+type = 3d
+path = device\wood_large_close_start
+shuffle = rnd
+idle = 1,1,100
+
+[wood_large_close_stop]
+type = 3d
+path = device\wood_large_close_stop
+shuffle = rnd
+idle = 1,1,100
+
+[metal_small_open]
+type = 3d
+path = device\metal_small_open
+shuffle = rnd
+idle = 1,1,100
+
+[metal_small_close_start]
+type = 3d
+path = device\metal_small_close_start
+shuffle = rnd
+idle = 1,1,100
+
+[metal_small_close_stop]
+type = 3d
+path = device\metal_small_close_stop
+shuffle = rnd
+idle = 1,1,100
+
+[power_switch]
+type = 3d
+path = device\power_switch
+shuffle = rnd
+idle = 1,1,100
+
+;***************************************************************
+; звуки настольной рации
+;***************************************************************
+[radio_call]
+type = 3d
+path = device\radio_call
+shuffle = rnd
+idle = 0,0,100
+
+
+;***************************************************************
+; Озвучка ПДА
+;***************************************************************
+[pda_alarm]
+type = actor
+npc_prefix = false
+path = device\pda\pda_alarm
+shuffle = rnd
+idle = 0,0,100
+
+[pda_news]
+type = actor
+npc_prefix = false
+path = device\pda\pda_news
+shuffle = rnd
+idle = 1,1,100
+
+[pda_tips]
+type = actor
+npc_prefix = false
+path = device\pda\pda_tip
+shuffle = rnd
+idle = 1,1,100
+
+[pda_task]
+type = actor
+npc_prefix = false
+path = device\pda\pda_objective
+shuffle = rnd
+idle = 1,1,100
+
+;***************************************************************
+; Озвучка Вертиберда
+;***************************************************************
+[heli_damaged]
+type = actor
+npc_prefix = false
+path = vehicles\helicopter\damage_
+shuffle = rnd
+idle = 1,1,100
+
+[heli_down]
+type = actor
+npc_prefix = false
+path = vehicles\helicopter\death_
+shuffle = rnd
+idle = 1,1,100
+
+[heli_hit]
+type = actor
+npc_prefix = false
+path = vehicles\helicopter\hit_
+shuffle = rnd
+idle = 3,4,40
+
+
+
+;***************************************************************
+; ОСНОВНЫЕ ТЕМЫ
+;***************************************************************
+[alarm]
+type = 3d
+path = ambient\siren1
+shuffle = loop
+idle = 0,0,100
+
+
+[meet_hello]
+type = npc
+avail_communities = army, stalker, bandit, dolg, freedom
+npc_prefix = true
+path = states\meet\meet_hello_
+shuffle = rnd
+idle = 2,2,100
+
+[meet_hide_weapon]
+type = npc
+avail_communities = army, stalker, bandit, dolg, freedom
+npc_prefix = true
+path = states\meet\meet_hide_weapon_
+shuffle = rnd
+idle = 5,7,100
+
+[meet_use_no_default]
+type = npc
+avail_communities = army, stalker, bandit, dolg, freedom
+npc_prefix = true
+path = states\meet\meet_use_no_default_
+shuffle = rnd
+idle = 1,1,100
+
+[meet_use_no_fight]
+type = npc
+avail_communities = army, stalker, bandit, dolg, freedom
+npc_prefix = true
+path = states\meet\meet_use_no_fight_
+shuffle = rnd
+idle = 2,2,100
+
+[meet_use_no_weapon]
+type = npc
+avail_communities = army, stalker, bandit, dolg, freedom
+npc_prefix = true
+path = states\meet\meet_use_no_weapon_
+shuffle = rnd
+idle = 5,7,100
+
+[meet_use_no_talk_leader]
+type = npc
+avail_communities = army, stalker, bandit, dolg, freedom
+npc_prefix = true
+path = states\meet\meet_use_no_talk_leader_
+shuffle = rnd
+idle = 5,7,100
+
+
+[corpse_loot_begin]
+type = npc
+avail_communities = army, stalker, bandit, dolg, freedom
+npc_prefix = true
+path = states\loot\loot_begin_
+shuffle = rnd
+idle = 10,11,100
+
+[corpse_loot_good]
+type = npc
+avail_communities = army, stalker, bandit, dolg, freedom
+npc_prefix = true
+path = states\loot\loot_good_
+shuffle = rnd
+idle = 10,11,100
+
+[corpse_loot_bad]
+type = npc
+avail_communities = army, stalker, bandit, dolg, freedom
+npc_prefix = true
+path = states\loot\loot_bad_
+shuffle = rnd
+idle = 10,11,100
+
+[help_heavy]
+type = npc
+avail_communities = army, stalker, bandit, dolg, freedom
+npc_prefix = true
+path = help\wounded_heavy\help_
+shuffle = rnd
+idle = 4,8,100
+
+[help_thanks]
+type = npc
+avail_communities = army, stalker, bandit, dolg, freedom, killer
+npc_prefix = true
+path = help\wounded_thanx\thanx_
+shuffle = rnd
+idle = 1,1,100
+
+[wounded_medkit]
+type = npc
+avail_communities = army, stalker, bandit, dolg, freedom, killer, monolith
+npc_prefix = true
+path = help\wounded\medkit_
+shuffle = rnd
+idle = 1,1,100
+
+;***************************************************************
+; ТЕМЫ ДЛЯ ТИРА
+;***************************************************************
+[shooting_target_up]
+type = 3d
+path = ambient\special\target_up
+shuffle = rnd
+idle = 0,0,100
+
+[shooting_target_down]
+type = 3d
+path = ambient\special\target_down
+shuffle = rnd
+idle = 0,0,100
+
+[shooting_target_hit]
+type = 3d
+path = ambient\special\target_hit_
+shuffle = rnd
+idle = 0,0,100
+
+[steam_blowout]
+type = 3d
+path = anomaly\steam_blowout
+shuffle = rnd
+idle = 0,0,100

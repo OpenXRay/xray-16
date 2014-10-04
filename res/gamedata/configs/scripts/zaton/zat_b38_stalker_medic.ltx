@@ -1,0 +1,33 @@
+[logic@zat_b38_stalker_medic]
+suitable = {=check_npc_name(zat_b22_stalker_medic)}
+trade = misc\trade\trade_zat_b22_stalker_medic.ltx
+prior = 200
+active = animpoint@base
+can_select_weapon = false
+level_spot = medic
+
+[animpoint@base]
+cover_name = zat_a2_sc_medic
+use_camp = false
+meet = meet
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet]
+close_snd_hello = zat_b22_stalker_medic_greeting
+close_snd_bye = zat_b22_stalker_medic_farewell
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+allow_break 	= false
+meet_on_talking = false

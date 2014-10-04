@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="Time">
+		<text>Heure</text>
+	</string>
+	<string id="actor">
+		<text>Stalker indйpendant</text>
+	</string>
+	<string id="army">
+		<text>Militaire</text>
+	</string>
+	<string id="bandit">
+		<text>Bandit</text>
+	</string>
+	<string id="dolg">
+		<text>Devoir</text>
+	</string>
+	<string id="ecolog">
+		<text>Scientifiques</text>
+	</string>
+	<string id="filter_secondary_tasks_text">
+		<text>Missions annexes</text>
+	</string>
+	<string id="filter_treasures_text">
+		<text>Planques</text>
+	</string>
+	<string id="freedom">
+		<text>Libertй</text>
+	</string>
+	<string id="killer">
+		<text>Mercenaire</text>
+	</string>
+	<string id="missions_list">
+		<text>Journal de mission</text>
+	</string>
+	<string id="monolith">
+		<text>Monolithe</text>
+	</string>
+	<string id="monster">
+		<text>Mutant</text>
+	</string>
+	<string id="month_april">
+		<text>Avril</text>
+	</string>
+	<string id="month_august">
+		<text>Aoыt</text>
+	</string>
+	<string id="month_december">
+		<text>Dйcembre</text>
+	</string>
+	<string id="month_february">
+		<text>Fйvrier</text>
+	</string>
+	<string id="month_january">
+		<text>Janvier</text>
+	</string>
+	<string id="month_july">
+		<text>Juillet</text>
+	</string>
+	<string id="month_june">
+		<text>Juin</text>
+	</string>
+	<string id="month_march">
+		<text>Mars</text>
+	</string>
+	<string id="month_may">
+		<text>Mai</text>
+	</string>
+	<string id="month_november">
+		<text>Novembre</text>
+	</string>
+	<string id="month_october">
+		<text>Octobre</text>
+	</string>
+	<string id="month_september">
+		<text>Septembre</text>
+	</string>
+	<string id="pda_btn_close">
+		<text>Dйsactiver PDA</text>
+	</string>
+	<string id="pda_btn_logs">
+		<text>Journal</text>
+	</string>
+	<string id="pda_btn_logs_hint">
+		<text>Historique des messages</text>
+	</string>
+	<string id="pda_btn_quests">
+		<text>Carte de la rйgion</text>
+	</string>
+	<string id="pda_btn_quests_hint">
+		<text>Afficher carte de la Zone et journal</text>
+	</string>
+	<string id="pda_btn_ranking">
+		<text>Stats</text>
+	</string>
+	<string id="pda_btn_ranking_hint">
+		<text>Afficher stats personnelles</text>
+	</string>
+	<string id="pda_cur_time">
+		<text>Heure actuelle :</text>
+	</string>
+	<string id="pda_date_filter">
+		<text>Filtre dates</text>
+	</string>
+	<string id="pda_filter_news">
+		<text>Voir nouvelles</text>
+	</string>
+	<string id="pda_filter_talk">
+		<text>Afficher dialogues</text>
+	</string>
+	<string id="pda_legend_caption">
+		<text>Lйgende</text>
+	</string>
+	<string id="pda_stat_1">
+		<text>Fuseau horaire :</text>
+	</string>
+	<string id="pda_stat_2">
+		<text>Йmissions survйcues :</text>
+	</string>
+	<string id="pda_stat_3">
+		<text>Missions accomplies :</text>
+	</string>
+	<string id="pda_stat_4">
+		<text>Mutants tuйs :</text>
+	</string>
+	<string id="pda_stat_5">
+		<text>Stalkers tuйs :</text>
+	</string>
+	<string id="pda_stat_6">
+		<text>Artefacts trouvйs :</text>
+	</string>
+	<string id="pda_stat_7">
+		<text>Planques trouvйes :</text>
+	</string>
+	<string id="pda_stat_favorite_weapon">
+		<text>Arme prйfйrйe</text>
+	</string>
+	<string id="pda_stat_mutant_killed">
+		<text>Mutant le plus puissant tuй</text>
+	</string>
+	<string id="st_location">
+		<text>Lieu :</text>
+	</string>
+	<string id="st_target">
+		<text>Objectif</text>
+	</string>
+	<string id="st_ui_pda_legend_additional_task">
+		<text>Mission annexe</text>
+	</string>
+	<string id="st_ui_pda_legend_enemies">
+		<text>Ennemis</text>
+	</string>
+	<string id="st_ui_pda_legend_friends">
+		<text>Alliйs</text>
+	</string>
+	<string id="st_ui_pda_legend_leader">
+		<text>Chef de faction</text>
+	</string>
+	<string id="st_ui_pda_legend_main_task">
+		<text>Mission principale</text>
+	</string>
+	<string id="st_ui_pda_legend_neutrals">
+		<text>Neutres</text>
+	</string>
+	<string id="st_ui_pda_legend_scout">
+		<text>Guide</text>
+	</string>
+	<string id="st_ui_pda_legend_secrets">
+		<text>Planques</text>
+	</string>
+	<string id="st_ui_pda_legend_squad">
+		<text>Commandant d'unitй</text>
+	</string>
+	<string id="st_ui_pda_legend_trader">
+		<text>Marchand</text>
+	</string>
+	<string id="stalker">
+		<text>Stalker indйpendant</text>
+	</string>
+	<string id="ui_logs_center_caption">
+		<text>Journal</text>
+	</string>
+	<string id="ui_map_btn_center">
+		<text>Centrer sur le joueur</text>
+	</string>
+	<string id="ui_map_btn_down">
+		<text>Vers le bas</text>
+	</string>
+	<string id="ui_map_btn_left">
+		<text>Vers la gauche</text>
+	</string>
+	<string id="ui_map_btn_legend">
+		<text>Lйgende</text>
+	</string>
+	<string id="ui_map_btn_right">
+		<text>Vers la droite</text>
+	</string>
+	<string id="ui_map_btn_up">
+		<text>Vers le haut</text>
+	</string>
+	<string id="ui_map_btn_zmreset">
+		<text>Zoom arriиre maximal</text>
+	</string>
+	<string id="ui_map_btn_zoom_in">
+		<text>Zoomer</text>
+	</string>
+	<string id="ui_map_btn_zoom_out">
+		<text>Zoom arriиre</text>
+	</string>
+	<string id="ui_ranking_center_caption">
+		<text>Succиs</text>
+	</string>
+	<string id="ui_task_btn_focus_center">
+		<text>Centrer carte sur mission</text>
+	</string>
+	<string id="ui_task_btn_focus_center2">
+		<text>Centrer carte sur mission</text>
+	</string>
+	<string id="zombied">
+		<text>Zombie</text>
+	</string>
+	<string id="zoom_in_btn_hint">
+		<text>йchelle +</text>
+	</string>
+	<string id="zoom_out_btn_hint">
+		<text>йchelle -</text>
+	</string>
+	<string id="st_ui_pda_legend_mechanic">
+		<text>Technicien</text>
+	</string>
+	<string id="st_ui_pda_legend_medic">
+		<text>Mйdecin</text>
+	</string>
+	<string id="ui_pda_secondary_task">
+		<text>Missions en cours</text>
+	</string>
+	<string id="ui_show_second_task_wnd">
+		<text>Afficher/masquer missions</text>
+	</string>
+	<string id="st_ui_pda_actor_box">
+		<text>Cantine personnelle</text>
+	</string>
+	<string id="zaton">
+		<text>Zaton</text>
+	</string>
+	<string id="jupiter">
+		<text>Alentours de Jupiter</text>
+	</string>
+	<string id="pripyat">
+		<text>Pripyat</text>
+	</string>
+	<string id="jupiter_underground">
+		<text>Tunnel Pripyat 1</text>
+	</string>
+	<string id="labx8">
+		<text>Laboratoire X8</text>
+	</string>
+	<string id="filter_primary_objects_text">
+		<text>Lieux</text>
+	</string>
+	<string id="filter_quest_npcs_text">
+		<text>Objets importants</text>
+	</string>
+	<string id="st_ui_pda_legend_primary_objects">
+		<text>Lieu</text>
+	</string>
+	<string id="st_jup_b32_has_af">
+		<text>Les scanners ont dйtectй des artefacts :</text>
+	</string>
+	<string id="st_jup_b32_no_af">
+		<text>Les scanners n'ont dйtectй aucun artefact.</text>
+	</string>
+	<string id="st_ui_pda_secret">
+		<text>Planque</text>
+	</string>
+	<string id="st_ui_pda_sleep_place">
+		<text>Dortoir</text>
+	</string>
+</string_table>

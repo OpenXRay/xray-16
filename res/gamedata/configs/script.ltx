@@ -1,0 +1,21 @@
+[common]
+    script 						= _G
+    levels 						=
+	class_registrators 			= class_registrator.register, game_registrator.register ;, test_global_registrator
+	game_type_clsid_factory		= game_registrator.get_game_clsid
+	ui_type_clsid_factory		= ui_registrator.get_ui_clsid
+
+[single]
+    script = ;level_weathers  Теперь погода перенесена на биндер актера и апдейтится оттуда. Потоковый скрипт убран.
+
+[deathmatch]
+    script =
+
+[teamdeathmatch]
+    script =
+
+[artefacthunt]
+    script =
+
+[lastingame]
+    script =

@@ -1,0 +1,29 @@
+[logic]
+active = ph_idle@wait_for_start
+
+[ph_idle@wait_for_start]
+on_info = {+pri_b306_lift_generator_started} ph_idle@closed 
+nonscript_usable = false
+
+[ph_idle@closed]
+on_info = {=actor_has_item(zat_a23_labx8_key)} ph_idle@open 
+tips = tip_no_access_card
+nonscript_usable = true
+
+[ph_idle@open]
+on_info = {!actor_has_item(zat_a23_labx8_key)} ph_idle@closed 
+tips = st_pri_b306_go_down
+nonscript_usable = true
+on_use = ph_idle@teleport %=scenario_autosave(st_save_uni_pri_to_labx8) +pri_b306_actor_to_lab =disable_ui =run_postprocess(fade_in)%
+
+[ph_idle@teleport]
+on_game_timer = 20 | ph_idle@in %=run_postprocess(black:3009:true) =teleport_actor(pri_b306_actor_lc_walk)%
+
+[ph_idle@in]
+on_info = {!actor_in_zone(pri_b306_sr_control)} ph_idle@wait %=run_postprocess(black:3009:true) =disable_ui%
+
+[ph_idle@wait]
+on_game_timer = 10 | ph_idle@out %=stop_postprocess(3009)%
+
+[ph_idle@out]
+on_game_timer = 10 | ph_idle@closed %=enable_ui%

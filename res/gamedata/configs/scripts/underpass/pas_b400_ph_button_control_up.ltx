@@ -1,0 +1,16 @@
+[logic]
+active = ph_button@wait
+
+[ph_button@wait] 
+anim = idle
+on_press = ph_idle@spawn %=anim_obj_forward(pas_b400_door_control_up) =create_squad(pas_b400_hall_monolith_sniper_1:pas_b400_hall) =create_squad(pas_b400_hall_monolith_sniper_2:pas_b400_hall) =create_squad(pas_b400_hall_monolith_sniper_3:pas_b400_hall) +pas_b400_control_up_door_opened =heal_squad(pas_b400_stalkers_squad)%
+tooltip = tip_door_open
+
+[ph_idle@spawn]
+on_game_timer = 120 | ph_idle@add
+on_info = {=actor_in_zone(pas_b400_sr_way_1)} ph_idle@nil %=create_squad(pas_b400_hall_monolith_after_bwd_squad:pas_b400_hall)%
+
+[ph_idle@add]
+on_info = {!actor_in_zone(pas_b400_sr_hall_2)} ph_idle@nil %=create_squad(pas_b400_hall_monolith_after_bwd_squad:pas_b400_hall)%
+
+[ph_idle@nil]

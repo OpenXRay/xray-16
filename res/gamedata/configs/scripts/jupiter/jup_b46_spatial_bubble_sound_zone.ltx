@@ -1,0 +1,18 @@
+[logic]
+active = sr_idle@jup_b46_idle_sound
+
+[sr_idle@jup_b46_idle_sound]
+on_info = {=distance_to_obj_le(jup_b46_spatial_bubble_zone:50) =actor_active_detector(detector_scientific)} sr_particle@jup_b46_idle_particle 
+on_info3 = {+jup_b46_spatial_bubble_ruptured} sr_idle@jup_b46_end
+
+[sr_particle@jup_b46_idle_particle]
+name = anomaly2\anomaly_spatial_bubble_idle
+path = jup_b46_particle_point
+mode = 2
+looped = true 
+on_info  = {=distance_to_obj_le(jup_b46_spatial_bubble_zone:50) -jup_b46_spatial_bubble_ruptured} %=play_sound(jup_b46_spatial_bubble_idle)%
+on_info2 = {!actor_active_detector(detector_scientific)} sr_idle@jup_b46_idle_sound %=stop_sound%
+on_info3 = {=distance_to_obj_ge(jup_b46_spatial_bubble_zone:50)} sr_idle@jup_b46_idle_sound %=stop_sound%
+on_info4 = {+jup_b46_duty_founder_squad_spawned} sr_idle@jup_b46_end; %=stop_sound%
+
+[sr_idle@jup_b46_end]

@@ -1,0 +1,20 @@
+[logic]
+active = ph_door@closed_out
+
+[ph_door@closed_out]
+locked = false
+closed = true
+tip_open = tip_open_another_site
+on_info = {=actor_in_zone(pri_b303_one_side_door_rest)} ph_door@closed_in %+pri_b303_door_is_open%
+
+[ph_door@open]
+locked = false
+closed = false
+tip_close = tip_door_close
+on_use = ph_door@closed_in
+
+[ph_door@closed_in]
+locked = false
+closed = true
+tip_close = tip_door_open
+on_use = ph_door@open 

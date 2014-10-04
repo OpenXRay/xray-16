@@ -1,0 +1,17 @@
+[logic]
+active = ph_button@wait
+
+[ph_button@wait] 
+anim = idle
+on_press = ph_idle@wreck %=anim_obj_forward(pas_b400_door_tunnel) =heal_squad(pas_b400_stalkers_squad) +pas_b400_tunnel_button_pressed%
+tooltip = tip_door_open
+
+[ph_idle@wreck]
+;on_game_timer = 110 | ph_idle@field_off %=anim_obj_stop(pas_b400_door_tunnel) +pas_b400_tunnel_gates_opened% 
+;on_game_timer = 150 | ph_idle@field_off %=anim_obj_stop(pas_b400_door_tunnel) +pas_b400_tunnel_gates_opened%
+on_game_timer2 =  60 | ph_idle@field_off %+pas_b400_tunnel_gates_started_to_open% 
+
+[ph_idle@field_off]
+on_game_timer = 190 | ph_idle@nil %+pas_b400_field_tunnel_off%
+
+[ph_idle@nil]

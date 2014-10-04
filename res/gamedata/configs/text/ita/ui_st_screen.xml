@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="actor_inventory_box_use">
+		<text>Apri ripostiglio personale ($$ACTION_USE$$)</text>
+	</string>
+	<string id="cant_walk">
+		<text>Sei troppo esausto per muoverti</text>
+	</string>
+	<string id="cant_walk_weight">
+		<text>Sei troppo sovraccarico per muoverti</text>
+	</string>
+	<string id="car_character_use">
+		<text>Apri porta ($$ACTION_USE$$)</text>
+	</string>
+	<string id="character_use">
+		<text>Parla ($$ACTION_USE$$)</text>
+	</string>
+	<string id="dead_character_use">
+		<text>Ispeziona corpo ($$ACTION_USE$$)</text>
+	</string>
+	<string id="dead_character_use_or_drag">
+		<text>Ispeziona corpo ($$ACTION_USE$$)\nTrascina corpo (SHIFT+$$ACTION_USE$$)</text>
+	</string>
+	<string id="general_complete_task">
+		<text>Missione completa:</text>
+	</string>
+	<string id="general_fail_task">
+		<text>Missione fallita:</text>
+	</string>
+	<string id="general_in_item">
+		<text>Oggetto ricevuto:</text>
+	</string>
+	<string id="general_in_money">
+		<text>Denaro ricevuto:</text>
+	</string>
+	<string id="general_new_task">
+		<text>Nuova missione:</text>
+	</string>
+	<string id="general_out_item">
+		<text>Oggetto perduto:</text>
+	</string>
+	<string id="general_out_money">
+		<text>Denaro perduto:</text>
+	</string>
+	<string id="general_reverse_task">
+		<text>Missione annullata:</text>
+	</string>
+	<string id="general_update_task">
+		<text>Missione aggiornata:</text>
+	</string>
+	<string id="gun_jammed">
+		<text>La tua arma si и inceppata. Ricaricala.</text>
+	</string>
+	<string id="inventory_box_use">
+		<text>Ispeziona ripostiglio ($$ACTION_USE$$)</text>
+	</string>
+	<string id="inventory_item_use">
+		<text>Raccogli oggetto ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b10_ufo_searching_tips">
+		<text>Ispeziona velivolo ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b1_bar_door">
+		<text>Porta bloccata</text>
+	</string>
+	<string id="jup_b1_door_is_closed">
+		<text>La porta и chiusa dall'interno</text>
+	</string>
+	<string id="jup_b202_treasures_closed">
+		<text>Cassaforte chiusa</text>
+	</string>
+	<string id="jup_b205_tip_door_closed">
+		<text>Codice richiesto</text>
+	</string>
+	<string id="jup_b205_tip_door_decode">
+		<text>Inserisci codice ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b206_use_plant">
+		<text>Prendi pianta ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b209_scanner_place_tips">
+		<text>Imposta scanner ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b209_scanner_remove_tips">
+		<text>Prendi scanner ($$ACTION_USE$$)</text>
+	</string>
+	<string id="lx8_raduga">
+		<text>Riduttore di aggressivitа Arcobaleno\nmodello del complesso di emissioni esterne\nscala 01:20</text>
+	</string>
+	<string id="pas_b400_tip_switcher">
+		<text>Attiva interruttore ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_a18_use_idol">
+		<text>Esamina congegno ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_a25_blow_up_enter_door">
+		<text>Piazza esplosivi ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_a28_talk_with_stupid_medic">
+		<text>Recupera ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_b306_elevator_door_locked_used">
+		<text>L'ascensore non ha corrente</text>
+	</string>
+	<string id="pri_b306_generator_use">
+		<text>Attiva generatore ($$ACTION_USE$$)</text>
+	</string>
+	<string id="sleep_ok_button">
+		<text>Dormi</text>
+	</string>
+	<string id="sleep_warning_all_pleasures">
+		<text>Non puoi dormire!?Perdi molto sangue e sei stato esposto alle radiazioni! Usa le droghe o contatta un medico.</text>
+	</string>
+	<string id="sleep_warning_bleeding">
+		<text>Non puoi dormire!?Perdi molto sangue. Usa le droghe o contatta un medico.</text>
+	</string>
+	<string id="sleep_warning_radiation">
+		<text>Non puoi dormire! Sei stato esposto alle radiazioni! Usa le droghe o contatta un medico.</text>
+	</string>
+	<string id="sleep_zone_tip">
+		<text>Dormi ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_ach_balance_advocate">
+		<text>Hai ottenuto l'obiettivo Uomo equilibrato.</text>
+	</string>
+	<string id="st_ach_battle_systems_master">
+		<text>Hai ottenuto l'obiettivo Maestro dei sistemi delle armi.</text>
+	</string>
+	<string id="st_ach_detective">
+		<text>Hai ottenuto l'obiettivo Detective.</text>
+	</string>
+	<string id="st_ach_diplomat">
+		<text>Hai ottenuto l'obiettivo Diplomatico.</text>
+	</string>
+	<string id="st_ach_friend_of_duty">
+		<text>Hai ottenuto l'obiettivo Amico della Duty.</text>
+	</string>
+	<string id="st_ach_friend_of_freedom">
+		<text>Hai ottenuto l'obiettivo Amico della Freedom.</text>
+	</string>
+	<string id="st_ach_friend_of_stalkers">
+		<text>Hai ottenuto l'obiettivo Amico degli stalker.</text>
+	</string>
+	<string id="st_ach_herald_of_justice">
+		<text>Hai ottenuto l'obiettivo Corriere della giustizia.</text>
+	</string>
+	<string id="st_ach_high_tech_master">
+		<text>Hai ottenuto l'obiettivo Esperto di tecnologia.</text>
+	</string>
+	<string id="st_ach_information_dealer">
+		<text>Hai ottenuto l'obiettivo Trafficante d'informazioni.</text>
+	</string>
+	<string id="st_ach_keeper_of_secrets">
+		<text>Hai ottenuto l'obiettivo Custode di segreti.</text>
+	</string>
+	<string id="st_ach_kingpin">
+		<text>Hai ottenuto l'obiettivo Boss.</text>
+	</string>
+	<string id="st_ach_leader">
+		<text>Hai ottenuto l'obiettivo Leader.</text>
+	</string>
+	<string id="st_ach_mutant_hunter">
+		<text>Hai ottenuto l'obiettivo Cacciatore di mutanti.</text>
+	</string>
+	<string id="st_ach_one_of_the_lads">
+		<text>Hai ottenuto l'obiettivo Uno dei nostri.</text>
+	</string>
+	<string id="st_ach_pioneer">
+		<text>Hai ottenuto l'obiettivo Pioniere.</text>
+	</string>
+	<string id="st_ach_research_man">
+		<text>Hai ottenuto l'obiettivo Assistente ricercatore.</text>
+	</string>
+	<string id="st_ach_seeker">
+		<text>Hai ottenuto l'obiettivo Cacciatore di manufatti.</text>
+	</string>
+	<string id="st_ach_skilled_stalker">
+		<text>Hai ottenuto l'obiettivo Stalker esperto.</text>
+	</string>
+	<string id="st_ach_wealthy">
+		<text>Hai ottenuto l'obiettivo Un ricco cliente.</text>
+	</string>
+	<string id="st_autosave">
+		<text>Salvataggio automatico in corso...</text>
+	</string>
+	<string id="st_can_use_weapon_now">
+		<text>Ora puoi estrarre l'arma.</text>
+	</string>
+	<string id="st_codelock">
+		<text>Codice di blocco ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_detective_news">
+		<text>I medicinali sono stati collocati nel ripostiglio personale sulla Skadovsk per aver risolto il mistero degli stalker scomparsi.</text>
+	</string>
+	<string id="st_duty_first_reward_news">
+		<text>Una tuta di protezione universale PS5-M и stata collocata nel tuo ripostiglio personale a Yanov per aver aiutato la Duty.</text>
+	</string>
+	<string id="st_duty_second_reward_news">
+		<text>Una tuta corazzata PSZ-9d della Duty и stata collocata nel tuo ripostiglio personale a Yanov per aver aiutato la Duty.</text>
+	</string>
+	<string id="st_freedom_first_reward_news">
+		<text>Una tuta "Vento della Freedom" и stata collocata nel tuo ripostiglio personale a Yanov per aver aiutato la Freedom.</text>
+	</string>
+	<string id="st_freedom_second_reward_news">
+		<text>Una tuta "Guardiano della Freedom" и stata collocata nel tuo ripostiglio personale a Yanov per aver aiutato la Freedom.</text>
+	</string>
+	<string id="st_freeplay_text_ok">
+		<text>Non sei riuscito a raggiungere gli elicotteri e la squadra di evacuazione ha lasciato la Zona senza di te.</text>
+	</string>
+	<string id="st_freeplay_text_yes_no">
+		<text>Sei pronto per lasciare la Zona??Non potrai piщ tornare indietro.</text>
+	</string>
+	<string id="st_game_over">
+		<text>Fine della partita.</text>
+	</string>
+	<string id="st_game_over_press_jump">
+		<text>Premi ($$ACTION_JUMP$$) per tornare al menu principale.</text>
+	</string>
+	<string id="st_game_paused">
+		<text>Pausa</text>
+	</string>
+	<string id="st_game_saved">
+		<text>Partita salvata</text>
+	</string>
+	<string id="st_herald_of_justice_news">
+		<text>И stato collocato un manufatto nel tuo ripostiglio personale sulla Skadovsk per aver smascherato Magpie.</text>
+	</string>
+	<string id="st_jup_b41_door_locked">
+		<text>Devi aspettare che il porto sia sigillato</text>
+	</string>
+	<string id="st_lx8_button_press_true">
+		<text>Accesso consentito</text>
+	</string>
+	<string id="st_lx8_lift_button">
+		<text>Prendi l'ascensore che sale ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_pri_b306_go_down">
+		<text>Prendi l'ascensore che scende ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_psy_danger">
+		<text>Livello di psico-emissione critico. Abbandonare immediatamente l'area a rischio.</text>
+	</string>
+	<string id="st_radiation_danger">
+		<text>Livelli di radiazione pericolosi. И necessaria una protezione per avanzare.</text>
+	</string>
+	<string id="st_search_helicopter">
+		<text>Esamina elicottero ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_search_treasure">
+		<text>Ispeziona il ripostiglio ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_sleep_hours">
+		<text>h</text>
+	</string>
+	<string id="st_tip">
+		<text>Messaggio</text>
+	</string>
+	<string id="tip_door_blocked">
+		<text>Porta bloccata</text>
+	</string>
+	<string id="tip_door_close">
+		<text>Chiudi porta ($$ACTION_USE$$)</text>
+	</string>
+	<string id="tip_door_closed_base_alarm">
+		<text>Porta chiusa - l'accampamento и in all'erta</text>
+	</string>
+	<string id="tip_door_closed_hide_weapon">
+		<text>Porta chiusa - devi rinfoderare l'arma</text>
+	</string>
+	<string id="tip_door_locked">
+		<text>Porta chiusa</text>
+	</string>
+	<string id="tip_door_no_electricity">
+		<text>La porta non и alimentata</text>
+	</string>
+	<string id="tip_door_open">
+		<text>Apri porta ($$ACTION_USE$$)</text>
+	</string>
+	<string id="tip_gate_locked">
+		<text>Cancello bloccato</text>
+	</string>
+	<string id="tip_need_access_card">
+		<text>Usa la tessera d'accesso ($$ACTION_USE$$)</text>
+	</string>
+	<string id="tip_no_access_card">
+		<text>Tessera d'accesso richiesta</text>
+	</string>
+	<string id="tip_open_another_site">
+		<text>Impossibile aprire la porta da questa parte</text>
+	</string>
+	<string id="ui_st_mp_experience_grow">
+		<text>-</text>
+	</string>
+	<string id="zat_b12_conteiner_full_locked">
+		<text>Il contenitore и chiuso a chiave. Servono due chiavi per aprirlo.</text>
+	</string>
+	<string id="zat_b12_conteiner_has_one_key">
+		<text>Usa chiave ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b12_conteiner_has_two_key">
+		<text>Usa chiavi ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b12_conteiner_locked">
+		<text>Il contenitore и chiuso a chiave. Ti serve la seconda chiave per aprirlo.</text>
+	</string>
+	<string id="zat_b12_conteiner_open">
+		<text>Apri contenitore ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b14_door_locked_hint">
+		<text>Il meccanismo della porta и stato bloccato dall'interno</text>
+	</string>
+	<string id="zat_b57_balon_use_hint">
+		<text>Collega tanica del gas ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b57_gas_warning">
+		<text>Attenzione!?Pericolo chimico!</text>
+	</string>
+	<string id="zat_b57_vintil_press">
+		<text>Gira la valvola ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b33_car_searching_tip">
+		<text>Ispeziona automobile ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_resupply_ready">
+		<text>Puoi fare scorta di medicinali e munizioni dal Tenente Rogovets e dal Tenente Kirillov.</text>
+	</string>
+	<string id="st_surge_while_asleep">
+		<text>Da poco si и verificata un'emissione nella Zona</text>
+	</string>
+	<string id="st_ach_marked_by_zone">
+		<text>Hai ottenuto l'obiettivo Marcato dalla Zona</text>
+	</string>
+	<string id="st_mutant_hunter_news">
+		<text>Delle munizioni sono state collocate nel tuo ripostiglio personale a Yanov per aver eliminato i mutanti.</text>
+	</string>
+	<string id="st_found_old_treasure">
+		<text>Hai ricevuto le coordinate di un ripostiglio giа scoperto.</text>
+	</string>
+	<string id="st_got_treasure">
+		<text>Ripostiglio individuato</text>
+	</string>
+	<string id="st_found_new_treasure">
+		<text>Coordinate del ripostiglio ricevute</text>
+	</string>
+	<string id="st_press_any_key">
+		<text>Premi un tasto per giocare</text>
+	</string>
+</string_table>

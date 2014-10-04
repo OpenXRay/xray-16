@@ -1,0 +1,21 @@
+[logic]
+active = sr_idle@start
+
+[sr_idle@start]
+on_actor_inside = {!black_screen} sr_no_weapon@wait
+
+[sr_idle@wait]
+on_actor_inside = {=check_smart_alarm_status(pri_a16:normal) !actor_has_weapon} sr_no_weapon@wait
+on_info = {=actor_in_zone(pri_a16_sr_light)} sr_no_weapon@wait
+on_info2 = {+pri_a28_update_task_cover_strelok -pri_a28_actor_in_zone_stay} sr_idle@wait_stalkers
+on_info3 = {+pri_b305_third_cam_go -pri_b305_quest_completed} sr_idle@wait_b305
+
+[sr_no_weapon@wait]
+on_actor_outside = sr_idle@wait
+on_info = {+pri_a28_update_task_cover_strelok -pri_a28_actor_in_zone_stay} sr_idle@wait_stalkers
+
+[sr_idle@wait_stalkers]
+on_info = {+pri_a28_actor_in_zone_stay} sr_idle@wait
+
+[sr_idle@wait_b305]
+on_info = {+pri_b305_fifth_cam_end} sr_idle@wait

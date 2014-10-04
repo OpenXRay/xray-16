@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_antirad">
+		<text>Drogas antirradiaciуn</text>
+	</string>
+	<string id="st_antirad_descr">
+		<text>Las drogas antirradiaciуn de mexamina son muy comunes en la Zona. Cuando se usan, inducen una vasoconstricciуn perifйrica y privaciуn de oxнgeno, lo que ayuda a tratar y prevenir la exposiciуn a la radiaciуn. No tienen efectos secundarios graves, aunque pueden darse casos aislados de nбuseas, mareos, calambres y dolores estomacales.</text>
+	</string>
+	<string id="st_bandage">
+		<text>Venda</text>
+	</string>
+	<string id="st_bandage_descr">
+		<text>Venda elбstica normal que detiene hemorragias y evita que las heridas se infecten. Si se trata de una hemorragia normal, basta con aplicar cuidadosamente el vendaje sobre la herida. Si es una hemorragia arterial, debe atarse rбpidamente alrededor de la zona afectada.</text>
+	</string>
+	<string id="st_binocular_descr">
+		<text>Prismбticos militares reglamentarios con una ampliaciуn mбxima de 7.5 aumentos. Son muy ъtiles en la Zona, ya que permiten al usuario observarlo todo desde una distancia prudencial.</text>
+	</string>
+	<string id="st_binocular_name">
+		<text>Prismбticos</text>
+	</string>
+	<string id="st_bread">
+		<text>Pan</text>
+	</string>
+	<string id="st_bread_descr">
+		<text>No se conoce de la existencia de ningъn panadero en la Zona, pero este pan no estб contaminado ni es radiactivo; no solo estб fresco, sino que es comestible. Hasta ahora no se ha quejado nadie.</text>
+	</string>
+	<string id="st_conserva">
+		<text>Lata de "Desayuno para turistas"</text>
+	</string>
+	<string id="st_conserva_descr">
+		<text>Supuestamente, esta comida enlatada la saquearon unos stalkers de un almacйn de suministros militares; es difнcil decirlo, ya que no tienen etiqueta. Pero si la fecha de caducidad es correcta, aъn se puede comer.</text>
+	</string>
+	<string id="st_detector1">
+		<text>Detector Eco</text>
+	</string>
+	<string id="st_detector1_descr">
+		<text>Este anticuado detector de actividades anуmalas emite una seсal de alarma cuando capta partнculas anуmalas. Puede registrar la presencia de artefactos y medir la distancia a la que se encuentra el mбs cercano variando la frecuencia del sonido emitido por el detector. Para activar la modalidad de bъsqueda de artefactos, basta con abrir el panel frontal. Debido a la sencillez de su diseсo, este detector solo sirve para encontrar los artefactos mбs comunes.</text>
+	</string>
+	<string id="st_detector2">
+		<text>Detector "Oso"</text>
+	</string>
+	<string id="st_detector3">
+		<text>Detector Veles</text>
+	</string>
+	<string id="st_detector3_descr">
+		<text>Escбner detector cientнfico de alta tecnologнa. Con sus tres cбmaras de detecciуn modernizadas, registra la posiciуn de los artefactos en una pantalla especial. Cuando estб cerrado, el dispositivo solo capta radiaciуn y anomalнas. Para activar la modalidad de bъsqueda de artefactos, basta con abrir el panel frontal. En modo bъsqueda, puede localizar todos los artefactos conocidos por la ciencia.</text>
+	</string>
+	<string id="st_detector4">
+		<text>Prototipo de detector Svarog</text>
+	</string>
+	<string id="st_detector4_descr">
+		<text>Prototipo de escбner de anomalнas de funcionalidad mejorada. Este dispositivo incluye un programa en su base de datos que identifica zonas estбticas de actividad anуmala y localiza artefactos. La posiciуn de estas zonas anуmalas y artefactos se muestra en una pantalla especial. El modo de bъsqueda de artefactos, que puede activarse abriendo el panel frontal, ha sido modificado para detectar formaciones anуmalas actualmente desconocidas para la ciencia.</text>
+	</string>
+	<string id="st_device_torch_descr">
+		<text>Linterna estбndar acoplada a la cabeza. Es muy prбctica para los stalkers a quienes sorprende la noche en el exterior, pero si no se utiliza con precauciуn puede llamar la atenciуn de compaснa no deseada.</text>
+	</string>
+	<string id="st_device_torch_name">
+		<text>Linterna</text>
+	</string>
+	<string id="st_drug_anabiotic">
+		<text>Anabiуticos</text>
+	</string>
+	<string id="st_drug_antidot">
+		<text>Antнdoto</text>
+	</string>
+	<string id="st_drug_antidot_descr">
+		<text>La antitoxina IP2 es una droga compleja compuesta por varios antнdotos, incluidos metoclopramida, piridoxina, tiamina, riboxina y otros productos farmacйuticos. Se usa para inyectar en el torrente sanguнneo una dosis de antibiуticos que neutralizan venenos naturales e inhiben los artificiales. La IP2 no es muy popular en la Zona, ya que la mayorнa de los stalkers utilizan mбscaras de gas y trajes protectores, pero algunos guardan a buen recaudo un paquete de este antнdoto. Sus efectos son duraderos.</text>
+	</string>
+	<string id="st_drug_booster">
+		<text>Hйrcules</text>
+	</string>
+	<string id="st_drug_coagulant">
+		<text>Vinca</text>
+	</string>
+	<string id="st_drug_coagulant_descr">
+		<text>Vikasolum ucraniano, el equivalente artificial de la vitamina K. El principal propуsito de esta droga es incrementar la velocidad de coagulaciуn de la sangre. Tiene mucha demanda entre los stalkers que quieren curarse cuanto antes de las heridas y laceraciones causadas por los mutantes. Los efectos de esta droga son duraderos.</text>
+	</string>
+	<string id="st_drug_psy_blockade">
+		<text>Inhibidor psнquico</text>
+	</string>
+	<string id="st_drug_psy_blockade_descr">
+		<text>Droga que bloquea los impulsos nerviosos mбs impetuosos. Su consumo causa una pйrdida emocional a corto plazo. Se usa exclusivamente en la Zona para contrarrestar los efectos de campos psнquicos anуmalos. Los efectos de esta droga son duraderos.</text>
+	</string>
+	<string id="st_drug_radioprotector">
+		<text>Radioprotector</text>
+	</string>
+	<string id="st_energy_drink">
+		<text>Bebida energ. de stalker</text>
+	</string>
+	<string id="st_energy_drink_descr">
+		<text>Usada por los stalkers en viajes largos sin oportunidad de descanso. Contiene carbohidratos de fбcil digestiуn y drogas que estimulan la liberaciуn de adrenalina en el torrente sanguнneo.</text>
+	</string>
+	<string id="st_guitar_descr">
+		<text>Una guitarra fiable.</text>
+	</string>
+	<string id="st_guitar_name">
+		<text>Guitarra</text>
+	</string>
+	<string id="st_kolbasa">
+		<text>Salchicha dietйtica</text>
+	</string>
+	<string id="st_kolbasa_descr">
+		<text>Para bien o para mal, esta salchicha de pollo y sucedбneo de soja suele ser desayuno y cena de un stalker, todo en uno. Gracias a su elevado contenido en conservantes puede conservarse durante mucho tiempo.</text>
+	</string>
+	<string id="st_medkit">
+		<text>Botiquнn de primeros auxilios</text>
+	</string>
+	<string id="st_medkit_army">
+		<text>Botiquнn militar</text>
+	</string>
+	<string id="st_medkit_army_descr">
+		<text>Botiquнn especializado para practicar primeros auxilios a los heridos en combate. Incluye coagulantes con base de menadiona, analgйsicos, antibiуticos e inmunoestimuladores, asн como instrumental para extraer balas y esquirlas del cuerpo. Es equipo reglamentario estбndar del ejйrcito, y a menudo lo utilizan las fuerzas de Deber.</text>
+	</string>
+	<string id="st_medkit_descr">
+		<text>Botiquнn de un solo uso. Ъtil para tratar diversas heridas: laceraciones, magulladuras, quemaduras (normales o quнmicas) y varios tipos de envenenamiento. Tiene mucha demanda entre los stalkers.</text>
+	</string>
+	<string id="st_medkit_science">
+		<text>Botiquнn cientнfico</text>
+	</string>
+	<string id="st_medkit_science_descr">
+		<text>Botiquнn diseсado especнficamente para la Zona. Incluye productos para el tratamiento de heridas, la prevenciуn de envenenamiento radiactivo y la reducciуn del nivel de radiaciуn presente en el organismo. A diferencia de otros botiquines, йste contiene vikasolum, batilolum y nafazolina.</text>
+	</string>
+	<string id="st_pda_descr">
+		<text>No hay datos almacenados.</text>
+	</string>
+	<string id="st_pda_name">
+		<text>PDA</text>
+	</string>
+	<string id="st_vodka">
+		<text>Vodka "El cosaco"</text>
+	</string>
+	<string id="st_vodka_descr">
+		<text>Destilado por GSC. Entra con suavidad y reduce considerablemente los efectos de la radiaciуn. Debe disfrutarse con moderaciуn.</text>
+	</string>
+	<string id="st_detector2_descr">
+		<text>Este novedoso detector de anomalнas se usa para localizar formaciones anуmalas y tiene un panel frontal de diodos que no solo indica su posiciуn, sino que mide la distancia a la que se encuentran. Para activar la modalidad de bъsqueda de artefactos, basta con abrir el panel frontal. Por desgracia, el dispositivo estб programado con una lista anticuada de artefactos detectables.</text>
+	</string>
+	<string id="st_drug_anabiotic_descr">
+		<text>Droga experimental desarrollada por el profesor Ozersky para equipos de investigaciуn cientнfica de la Zona. Contiene tetrodotoxina, conocida coloquialmente como "polvo zombi" debido a que inhibe completamente el sistema nervioso central del sujeto, permitiйndole sobrevivir a las emisiones sin protecciуn. La droga no ha sido sometida a pruebas clнnicas ni de campo, por lo que su eficacia es dudosa y es posible que tenga efectos secundarios.</text>
+	</string>
+	<string id="st_bolt">
+		<text>Rayo</text>
+	</string>
+	<string id="st_drug_booster_descr">
+		<text>El principal componente de este producto es un andrуgeno anabуlico, un esteroide artificial de composiciуn quнmica parecida a la de la testosterona. Desarrolla los mъsculos, alivia la fatiga y mejora la circulaciуn. Los stalkers suelen usarlo en incursiones largas para poder cargar con mбs peso. Los efectos de esta droga son duraderos.</text>
+	</string>
+	<string id="st_drug_radioprotector_descr">
+		<text>Radioprotector Indraline B190, incluido en botiquines para el personal de centrales nucleares. En la Zona se utilizaba en lugar del hidrocloruro de cistamina, muy tуxico, pues su consumo repetido podнa causar la muerte. Reduce los efectos de la radiaciуn gamma en tejidos vivos. Es mejor ingerirlo antes de la exposiciуn; sus efectos no son instantбneos, sн duraderos.</text>
+	</string>
+	<string id="st_harmonica_name">
+		<text>Harmуnica</text>
+	</string>
+	<string id="st_harmonica_descr">
+		<text>Para los amantes del blues y los romбnticos de la cбrcel.</text>
+	</string>
+</string_table>

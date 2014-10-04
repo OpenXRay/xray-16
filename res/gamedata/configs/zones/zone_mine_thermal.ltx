@@ -1,0 +1,139 @@
+[zone_mine_thermal]:zone_base
+GroupControlSection	= spawn_group_zone
+$def_sphere = 2
+$prefetch 		= 16
+class			= ZS_MBALD
+hit_impulse_scale	= 0.0
+effective_radius	= 1.0
+
+postprocess		= postprocess_thermal_mine
+
+ef_anomaly_type			= 1
+ef_weapon_type			= 13
+
+
+;----------- Anomaly settings -----------------------
+max_start_power		= 1.00
+attenuation			= 1
+
+idle_particles		= static\buble_distort
+blowout_particles	= static\zharka_static
+
+hit_small_particles			= damage_fx\burn_creatures
+hit_big_particles			= damage_fx\burn_creatures00
+idle_small_particles		= damage_fx\burn_creatures
+idle_big_particles			= damage_fx\burn_creatures00
+
+idle_particles_dont_stop	= true;
+
+idle_sound			= anomaly\fire_idle
+blowout_sound		= anomaly\zhar_blow
+hit_sound			= ambient\zhar
+entrance_sound		= ambient\zhar
+
+hit_type			= light_burn
+
+disable_time		= 10000
+disable_time_small	= -1
+disable_idle_time	= 50000
+
+ignore_nonalive		= false
+ignore_small		= false
+ignore_artefacts	= true
+
+blowout_light		= on
+light_color		    = 1.9,1.6,1.3
+light_range		    = 9.0
+light_time 		    = 10
+light_height		= 2
+
+
+idle_light			= off
+idle_light_range	= 8.0
+idle_light_anim		= koster_01
+idle_light_height	= 0.70
+
+awaking_time		= 100
+blowout_time		= 7000
+accamulate_time		= 250
+
+blowout_wind		= off
+
+shape_transp_color		= 255, 0, 0, 60
+shape_edge_color		= 32, 32, 32, 255
+
+
+[zone_mine_thermal_weak]:zone_mine_thermal
+$spawn 			= "zones\mine_thermal_weak"
+max_start_power		= 0.2
+use_secondary_hit = true
+secondary_hit_power = 0.008
+
+[zone_mine_thermal_average]:zone_mine_thermal
+$spawn 			= "zones\mine_thermal_average"
+max_start_power		= 0.2
+use_secondary_hit = true
+secondary_hit_power = 0.008
+
+[zone_mine_thermal_strong]:zone_mine_thermal
+$spawn 			= "zones\mine_thermal_strong"
+max_start_power		= 0.2
+use_secondary_hit = true
+secondary_hit_power = 0.008
+
+
+[zone_mine_steam]:zone_base
+postprocess		= postprocess_steam_mine
+
+blowout_particles	= static\zharka_static_steam
+
+hit_small_particles			= damage_fx\smoke
+hit_big_particles			= damage_fx\smoke
+idle_small_particles		= damage_fx\smoke
+idle_big_particles			= damage_fx\smoke
+
+idle_sound			= anomaly\steam
+blowout_sound		= anomaly\steam_blowout
+hit_sound			= anomaly\steam_hit
+entrance_sound		= anomaly\steam_hit
+
+blowout_light		= off
+
+
+[zone_mine_steam_weak]:zone_mine_thermal_weak, zone_mine_steam
+$spawn 			= "zones\scenes\mine_steam_weak"
+max_start_power		= 0.17
+use_secondary_hit = true
+secondary_hit_power = 0.01
+
+[zone_mine_steam_average]:zone_mine_thermal_average, zone_mine_steam
+$spawn 			= "zones\scenes\mine_steam_average"
+max_start_power		= 0.17
+use_secondary_hit = true
+secondary_hit_power = 0.01
+
+[zone_mine_steam_strong]:zone_mine_thermal_strong, zone_mine_steam
+$spawn 			= "zones\scenes\mine_steam_strong"
+max_start_power		= 0.17
+use_secondary_hit = true
+secondary_hit_power = 0.01
+
+
+[zone_zharka_static]:zone_mine_thermal
+postprocess		= postprocess_flame
+idle_sound			= ambient\fire2
+
+
+[zone_zharka_static_weak]:zone_zharka_static
+$spawn 			= "zones\mp\zharka_statik_weak"
+max_start_power		= 0.50
+
+
+[zone_zharka_static_average]:zone_zharka_static
+$spawn 			= "zones\mp\zharka_statik_average"
+max_start_power		= 1.20
+
+
+[zone_zharka_static_strong]:zone_zharka_static
+$spawn 			= "zones\mp\zharka_statik_strong"
+max_start_power		= 2.00

@@ -1,0 +1,2022 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_prop_bullet_speed">
+		<text>Stabilitа</text>
+	</string>
+	<string id="st_prop_calibre">
+		<text>Calibro</text>
+	</string>
+	<string id="st_prop_recoil">
+		<text>Rinculo</text>
+	</string>
+	<string id="st_prop_reliability">
+		<text>Affidabilitа</text>
+	</string>
+	<string id="st_prop_scope_1.6x">
+		<text>Ottica reflex 1.6x</text>
+	</string>
+	<string id="st_prop_scope_4x">
+		<text>Mirino ottico 4.0x</text>
+	</string>
+	<string id="st_prop_silencer">
+		<text>Silenziatore</text>
+	</string>
+	<string id="st_prop_underbarrel_slot">
+		<text>incastro sottocanna</text>
+	</string>
+	<string id="st_prop_weight">
+		<text>Peso</text>
+	</string>
+	<string id="st_up_add_a1_descr">
+		<text>La filettatura esterna consente l'installazione di un silenziatore.</text>
+	</string>
+	<string id="st_up_add_a1_name">
+		<text>Filettatura esterna della canna</text>
+	</string>
+	<string id="st_up_add_a2_descr">
+		<text>Installazione di un incastro per il collegamento di un mirino ottico.</text>
+	</string>
+	<string id="st_up_add_a2_name">
+		<text>Incastro per ottica</text>
+	</string>
+	<string id="st_up_add_a3_descr">
+		<text>Installazione di un incastro per il collegamento di un lanciagranate sottocanna.</text>
+	</string>
+	<string id="st_up_add_a3_name">
+		<text>Incastro per lanciagranate sottocanna</text>
+	</string>
+	<string id="st_up_add_a4_descr">
+		<text>Sostituzione del caricatore standard con uno piщ capiente.</text>
+	</string>
+	<string id="st_up_add_a4_name">
+		<text>Capienza caricatore aumentata</text>
+	</string>
+	<string id="st_up_add_b1_descr">
+		<text>Una modifica complessa e integrata delle parti meccaniche e automatiche dell'arma, in modo da cambiare il calibro a scapito dell'affidabilitа.</text>
+	</string>
+	<string id="st_up_add_b1_name">
+		<text>Passaggio al calibro 5x45</text>
+	</string>
+	<string id="st_up_add_b2_descr">
+		<text>Una modifica complessa e integrata delle parti meccaniche e automatiche dell'arma, in modo da cambiare il calibro a scapito dell'affidabilitа.</text>
+	</string>
+	<string id="st_up_add_b2_name">
+		<text>Passaggio al calibro 5x56</text>
+	</string>
+	<string id="st_up_add_b3_descr">
+		<text>Una modifica complessa e integrata delle parti meccaniche e automatiche dell'arma, in modo da cambiare il calibro a scapito dell'affidabilitа.</text>
+	</string>
+	<string id="st_up_add_b3_name">
+		<text>Passaggio al calibro 9x18</text>
+	</string>
+	<string id="st_up_add_b4_descr">
+		<text>Una modifica complessa e integrata delle parti meccaniche e automatiche dell'arma, in modo da cambiare il calibro a scapito dell'affidabilitа.</text>
+	</string>
+	<string id="st_up_add_b4_name">
+		<text>Passaggio al calibro 9x19</text>
+	</string>
+	<string id="st_up_addd_a1_descr">
+		<text>Capienza del caricatore aumentata senza incrementare la lunghezza dell'arma.</text>
+	</string>
+	<string id="st_up_addd_a1_name">
+		<text>Aumento capienza caricatore</text>
+	</string>
+	<string id="st_up_addh_a1_descr">
+		<text>Un caricatore in policarbonato piщ leggero ma piщ capiente, in modo da compensare parzialmente l'inevitabile aumento di peso.</text>
+	</string>
+	<string id="st_up_addh_a1_name">
+		<text>Capienza caricatore aumentata</text>
+	</string>
+	<string id="st_up_arm_a1_descr">
+		<text>Numero di piastre in titanio aumentato per migliorare notevolmente la durabilitа dell'armatura.</text>
+	</string>
+	<string id="st_up_arm_a1_name">
+		<text>Piastre in alluminio/titanio aggiuntive</text>
+	</string>
+	<string id="st_up_arm_a2_descr">
+		<text>Piastre rinforzate decisamente piщ resistenti, pur non essendo molto piщ durevoli.</text>
+	</string>
+	<string id="st_up_arm_a2_name">
+		<text>Piastre in kevlar</text>
+	</string>
+	<string id="st_up_arm_a3_descr">
+		<text>Una lega di alluminio e titanio consente di ridurre il peso del titanio per l'uso nell'equipaggiamento di difesa personale.</text>
+	</string>
+	<string id="st_up_arm_a3_name">
+		<text>Piastre in alluminio e titanio</text>
+	</string>
+	<string id="st_up_arm_a4_descr">
+		<text>Di norma il titanio и troppo pesante per l'uso nell'equipaggiamento di difesa personale, ma talvolta viene utilizzato negli esoscheletri.</text>
+	</string>
+	<string id="st_up_arm_a4_name">
+		<text>Componenti in titanio massiccio</text>
+	</string>
+	<string id="st_up_arm_a5_descr">
+		<text>La sostituzione del metallo con la fibra di carbonio consente di ridurre il peso dell'armatura senza sacrificare l'affidabilitа.</text>
+	</string>
+	<string id="st_up_arm_a5_name">
+		<text>Sostituzione componenti metallici dell'armatura con fibra di carbonio</text>
+	</string>
+	<string id="st_up_arm_a6_descr">
+		<text>Il kevlar и uno dei materiali piщ comuni usati per costruire le armature.</text>
+	</string>
+	<string id="st_up_arm_a6_name">
+		<text>Piastre in kevlar</text>
+	</string>
+	<string id="st_up_arm_a7_descr">
+		<text>Il policarbonato puт resistere ai colpi di pistola ed и leggero come la plastica.</text>
+	</string>
+	<string id="st_up_arm_a7_name">
+		<text>Piastre in policarbonato</text>
+	</string>
+	<string id="st_up_arm_a8_descr">
+		<text>Le piastre in ceramica non durano a lungo ma sono piщ affidabili di quelle in kevlar, essendo in grado di assorbire meglio la forza d'urto dei proiettili.</text>
+	</string>
+	<string id="st_up_arm_a8_name">
+		<text>Installazione di piastre in ceramica</text>
+	</string>
+	<string id="st_up_arm_a9_descr">
+		<text>Semplici piastre in acciaio cucite in un impermeabile.</text>
+	</string>
+	<string id="st_up_arm_a9_name">
+		<text>Piastre in acciaio</text>
+	</string>
+	<string id="st_up_arm_b1_descr">
+		<text>Uno strato esterno in ceramica puт deviare i proiettili perforanti che colpiscono di taglio e disintegrare quelli che effettuano un impatto diretto.</text>
+	</string>
+	<string id="st_up_arm_b1_name">
+		<text>Strato esterno in ceramica per armatura</text>
+	</string>
+	<string id="st_up_arm_b2_descr">
+		<text>Uno strato corazzato interno aggiuntivo, in caso di danneggiamento dello strato esterno.</text>
+	</string>
+	<string id="st_up_arm_b2_name">
+		<text>Strato corazzato protettivo di riserva</text>
+	</string>
+	<string id="st_up_arm_b3_descr">
+		<text>Armatura con uno strato interno che distribuisce la forza d'urto in un'area piщ ampia.</text>
+	</string>
+	<string id="st_up_arm_b3_name">
+		<text>Aggiunta di un elemento di compensazione</text>
+	</string>
+	<string id="st_up_arm_b4_descr">
+		<text>Il telaio puт resistere ai colpi di pistola, se l'armatura principale viene danneggiata.</text>
+	</string>
+	<string id="st_up_arm_b4_name">
+		<text>Telaio corazzato aggiuntivo</text>
+	</string>
+	<string id="st_up_arm_b5_descr">
+		<text>Strati corazzati piщ sottili che aumentano la resistenza all'usura dell'armatura.</text>
+	</string>
+	<string id="st_up_arm_b5_name">
+		<text>Protezione segmentata</text>
+	</string>
+	<string id="st_up_arm_b6_descr">
+		<text>L'aggiunta di piastre non migliora la protezione, ma garantisce una maggiore durabilitа.</text>
+	</string>
+	<string id="st_up_arm_b6_name">
+		<text>Strato di riserva aggiuntivo</text>
+	</string>
+	<string id="st_up_arm_b7_descr">
+		<text>Piastre mobili che proteggono le articolazioni dalle ferite d'arma da fuoco.</text>
+	</string>
+	<string id="st_up_arm_b7_name">
+		<text>Installazione di piastre protettive mobili per le articolazioni</text>
+	</string>
+	<string id="st_up_arm_b8_descr">
+		<text>Un telaio in alluminio piщ leggero per le piastre che sostituisce il telaio in acciaio.</text>
+	</string>
+	<string id="st_up_arm_b8_name">
+		<text>Telaio in alluminio piщ leggero</text>
+	</string>
+	<string id="st_up_arm_b9_descr">
+		<text>Inserti ispessiti che riducono la forza d'urto del proiettile percepita sotto l'armatura.</text>
+	</string>
+	<string id="st_up_arm_b9_name">
+		<text>Inserti in pelle ispessiti</text>
+	</string>
+	<string id="st_up_arm_c10_descr">
+		<text>Strato in ceramica aggiuntivo con silicone ammortizzante.</text>
+	</string>
+	<string id="st_up_arm_c10_name">
+		<text>Piastre in ceramica rinforzate</text>
+	</string>
+	<string id="st_up_arm_c11_descr">
+		<text>Utilizzo di materiali piщ leggeri per ridurre il peso dell'armatura.</text>
+	</string>
+	<string id="st_up_arm_c11_name">
+		<text>Installazione di componenti in plastica e sintetici piщ leggeri</text>
+	</string>
+	<string id="st_up_arm_c12_descr">
+		<text>Mentre le piastre in titanio massiccio sono troppo pesanti per un soldato di fanteria, i potenti servomotori di un esoscheletro sono perfettamente in grado di gestire il peso.</text>
+	</string>
+	<string id="st_up_arm_c12_name">
+		<text>Armatura in titanio corazzata</text>
+	</string>
+	<string id="st_up_arm_c13_descr">
+		<text>SBK-RKhZ.m.II – Una tuta da battaglia speciale per la protezione radiochimica, seconda versione.</text>
+	</string>
+	<string id="st_up_arm_c13_name">
+		<text>Tuta protettiva ermetica anti-radiazioni SBK-RKhZ.m.II </text>
+	</string>
+	<string id="st_up_arm_c1_descr">
+		<text>Questo potenziamento laborioso e lungo da eseguire non и molto popolare, ma in passato ha salvato molte vite.</text>
+	</string>
+	<string id="st_up_arm_c1_name">
+		<text>Maglia corazzata</text>
+	</string>
+	<string id="st_up_arm_c2_descr">
+		<text>Comprende delle piastre in ceramica sovrapposte per fare in modo che l'utilizzatore non venga colpito nello stesso punto.</text>
+	</string>
+	<string id="st_up_arm_c2_name">
+		<text>Rivestimento in ceramica deflettente "Scaglia" </text>
+	</string>
+	<string id="st_up_arm_c3_descr">
+		<text>Una volta trattata con il composto "Sovrano", la tuta diventa praticamente invulnerabile ai danni meccanici e alle lacerazioni del tessuto.</text>
+	</string>
+	<string id="st_up_arm_c3_name">
+		<text>Trattamento con composto rinforzante "Sovrano"</text>
+	</string>
+	<string id="st_up_arm_c4_descr">
+		<text>La ceramica attutisce notevolmente l'impatto dei proiettili, che vengono deviati e ridotti in frammenti.</text>
+	</string>
+	<string id="st_up_arm_c4_name">
+		<text>Applicazione di uno strato di ceramica sulle piastre</text>
+	</string>
+	<string id="st_up_arm_c5_descr">
+		<text>La matrice rinforzata che usa il berillio al posto dell'alluminio и uno dei sistemi piщ affidabili per proteggere i soldati di fanteria.</text>
+	</string>
+	<string id="st_up_arm_c6_descr">
+		<text>La ceramica attutisce notevolmente l'impatto dei proiettili, che vengono deviati e ridotti in frammenti.</text>
+	</string>
+	<string id="st_up_arm_c6_name">
+		<text>Strato di ceramica sulle piastre</text>
+	</string>
+	<string id="st_up_arm_c7_descr">
+		<text>La fibra di carbonio и uno dei materiali piщ durevoli e resistenti all'usura, tanto che viene usata anche in campo aeronautico.</text>
+	</string>
+	<string id="st_up_arm_c8_descr">
+		<text>Rivestimento combinato multi-strato in ceramica e polimeri.</text>
+	</string>
+	<string id="st_up_arm_c8_name">
+		<text>Rivestimento schermante combinato</text>
+	</string>
+	<string id="st_up_arm_c9_descr">
+		<text>Uno degli ultimi sviluppi nel campo della protezione personale: la crescita "artigianale" di zaffiri sintetici.</text>
+	</string>
+	<string id="st_up_autd_a1_descr">
+		<text>La regolazione dei componenti consente all'arma di durare piщ a lungo senza incepparsi.</text>
+	</string>
+	<string id="st_up_autd_a1_name">
+		<text>Regolazione componenti</text>
+	</string>
+	<string id="st_up_autd_a2_descr">
+		<text>L'inserimento di componenti in plastica и uno dei potenziamenti piщ utili e richiesti.</text>
+	</string>
+	<string id="st_up_autd_a2_name">
+		<text>Componenti poli-materiali</text>
+	</string>
+	<string id="st_up_autd_b1_descr">
+		<text>Un meccanismo di fuoco a impulso ridotto che riduce il rinculo rispetto alle versioni precedenti.</text>
+	</string>
+	<string id="st_up_autd_b1_name">
+		<text>Meccanismo di fuoco a impulso ridotto</text>
+	</string>
+	<string id="st_up_autd_b2_descr">
+		<text>L'efficace posizionamento del proiettile al momento dello sparo consente di mantenere la traiettoria di tiro e di colpire il bersaglio con maggiore precisione.</text>
+	</string>
+	<string id="st_up_autd_b2_name">
+		<text>Installazione di un'unitа di posizionamento del proiettile</text>
+	</string>
+	<string id="st_up_autd_b3_descr">
+		<text>Un sistema di bloccaggio a rulli che riduce il rinculo e migliora i colpi multipli.</text>
+	</string>
+	<string id="st_up_autd_b3_name">
+		<text>Otturatore semi-libero con sistema a rulli</text>
+	</string>
+	<string id="st_up_autd_b4_descr">
+		<text>L'installazione di un cilindro a gas aggiuntivo riduce il tempo di caricamento dell'arma, in modo da aumentare sensibilmente la cadenza di fuoco.</text>
+	</string>
+	<string id="st_up_autd_b4_name">
+		<text>Installazione di un cilindro a gas aggiuntivo</text>
+	</string>
+	<string id="st_up_autd_b5_descr">
+		<text>Un motore a gas utilizzato nelle doppiette semi-automatiche per alzare automaticamente il cane.</text>
+	</string>
+	<string id="st_up_autd_b5_name">
+		<text>Installazione motore a gas</text>
+	</string>
+	<string id="st_up_autd_c1_descr">
+		<text>Uno sputter protettivo che rende impossibili i colpi accidentali dovuti a un guasto meccanico.</text>
+	</string>
+	<string id="st_up_autd_c1_name">
+		<text>Sputter protettivo</text>
+	</string>
+	<string id="st_up_autd_c2_descr">
+		<text>Quando il proiettile viene sparato, un componente apre un varco nella canna e torna in posizione chiusa tramite un movimento scarrellante dell'impugnatura anteriore lungo l'asse dell'arma.</text>
+	</string>
+	<string id="st_up_autd_c2_name">
+		<text>Sistema di chiusura della canna</text>
+	</string>
+	<string id="st_up_autd_c3_descr">
+		<text>Un sistema automatico inerziale che consente di trasformare le normali doppiette a pompa in armi semi-automatiche.</text>
+	</string>
+	<string id="st_up_autd_c3_name">
+		<text>Installazione di un sistema automatico inerziale</text>
+	</string>
+	<string id="st_up_autd_c4_descr">
+		<text>Un modulo di massa battente unificato и un'ottima soluzione tecnologica per ridurre il rinculo.</text>
+	</string>
+	<string id="st_up_autd_c4_name">
+		<text>Modulo di massa battente unificato</text>
+	</string>
+	<string id="st_up_autd_c5_descr">
+		<text>La bacchetta automatica migliora la precisione dell'arma.</text>
+	</string>
+	<string id="st_up_autd_c5_name">
+		<text>Installazione di una bacchetta automatica</text>
+	</string>
+	<string id="st_up_auth_a1_descr">
+		<text>Un contrappeso attivo si sposta dal blocco dell'otturatore, compensando parzialmente il rinculo.</text>
+	</string>
+	<string id="st_up_auth_a1_name">
+		<text>Aggiunta di un contrappeso attivo</text>
+	</string>
+	<string id="st_up_auth_b1_descr">
+		<text>L'installazione di rulli aggiuntivi riduce il rinculo.</text>
+	</string>
+	<string id="st_up_auth_b1_name">
+		<text>Installazione di un sistema di compensazione a rulli</text>
+	</string>
+	<string id="st_up_auth_c1_descr">
+		<text>La sostituzione del meccanismo di scatto dell'arma con un otturatore piщ efficace migliora la cadenza di fuoco.</text>
+	</string>
+	<string id="st_up_auth_c1_name">
+		<text>Meccanismo di fuoco a otturatore aperto</text>
+	</string>
+	<string id="st_up_auth_c2_descr">
+		<text>Quando il proiettile viene sparato, il contrappeso del blocco dell'otturatore si muove nella direzione opposta dell'otturatore, in modo da aumentare la facilitа d'uso del mitragliatore.</text>
+	</string>
+	<string id="st_up_auth_c2_name">
+		<text>Installazione di un contrappeso autoregolante</text>
+	</string>
+	<string id="st_up_auto_a1_descr">
+		<text>Un contrappeso viene inserito come componente aggiuntivo nel castello per ridurre il rinculo applicando una forza contraria.</text>
+	</string>
+	<string id="st_up_auto_a1_name">
+		<text>Aggiunta di un contrappeso mobile</text>
+	</string>
+	<string id="st_up_auto_a2_descr">
+		<text>L'inserimento di componenti polimerici и uno dei potenziamenti piщ utili e richiesti.</text>
+	</string>
+	<string id="st_up_auto_a2_name">
+		<text>Componenti polimerici resistenti all'impatto per elementi automatici</text>
+	</string>
+	<string id="st_up_auto_b1_descr">
+		<text>Viene installato un meccanismo speciale che protegge l'arma dalla sporcizia.</text>
+	</string>
+	<string id="st_up_auto_b1_name">
+		<text>Regolatore automatico a gas e a due posizioni</text>
+	</string>
+	<string id="st_up_auto_b2_descr">
+		<text>Un componente speciale chiude ermeticamente la canna per aumentare la pressione quando il proiettile viene sparato.</text>
+	</string>
+	<string id="st_up_auto_b2_name">
+		<text>Installazione di un meccanismo di chiusura ermetica della canna</text>
+	</string>
+	<string id="st_up_auto_b3_descr">
+		<text>La sincronizzazione viene garantita da una ruota dentata, in modo da raddrizzare la traiettoria di tiro.</text>
+	</string>
+	<string id="st_up_auto_b3_name">
+		<text>Sincronizzazione movimento bacchetta</text>
+	</string>
+	<string id="st_up_auto_b4_descr">
+		<text>Un componente installato nella parte posteriore del castello riduce la velocitа dell'otturatore per migliorare l'efficacia del fuoco di precisione.</text>
+	</string>
+	<string id="st_up_auto_b4_name">
+		<text>Meccanismo ritardante inerziale</text>
+	</string>
+	<string id="st_up_auto_c1_descr">
+		<text>Un componente speciale installato nel meccanismo di scatto per rendere piщ fluido il movimento dell'otturatore e ridurre il rinculo.</text>
+	</string>
+	<string id="st_up_auto_c1_name">
+		<text>Aggiunta di un dispositivo di rallentamento della massa battente</text>
+	</string>
+	<string id="st_up_auto_c2_descr">
+		<text>Un miglioramento integrato che in genere viene applicato nei fucili da cecchino per compensare il notevole peso dell'arma.</text>
+	</string>
+	<string id="st_up_auto_c2_name">
+		<text>Ammortizzatore integrato del rinculo</text>
+	</string>
+	<string id="st_up_auto_c3_descr">
+		<text>L'installazione di un meccanismo con componenti mobili aumenta la velocitа di ricarica.</text>
+	</string>
+	<string id="st_up_auto_c3_name">
+		<text>Ricarica automatica</text>
+	</string>
+	<string id="st_up_auto_c4_descr">
+		<text>Miglioramento dei componenti automatici dell'arma che richiede la sostituzione di molte parti. Aumenta la precisione.</text>
+	</string>
+	<string id="st_up_auto_c4_name">
+		<text>Sistema bilanciato anti-impatto</text>
+	</string>
+	<string id="st_up_auto_c5_descr">
+		<text>Un componente sintetico posizionato davanti alla zona di movimento dell'otturatore, che viene notevolmente ridotta per migliorare la precisione dell'arma.</text>
+	</string>
+	<string id="st_up_auto_c5_name">
+		<text>Aggiunta di un dispositivo bloccante</text>
+	</string>
+	<string id="st_up_auto_c6_descr">
+		<text>Un ponte regola la posizione della canna e, se questa si muove, vengono aperti dei fori di compensazione aggiuntivi.</text>
+	</string>
+	<string id="st_up_auto_c6_name">
+		<text>Installazione di un componente di "compensazione intelligente"</text>
+	</string>
+	<string id="st_up_auts_a1_descr">
+		<text>Una miglioria che rende piщ fluido il meccanismo del grilletto, molto importante per i cecchini.</text>
+	</string>
+	<string id="st_up_auts_a1_name">
+		<text>Installazione di un meccanismo di regolazione del grilletto</text>
+	</string>
+	<string id="st_up_auts_a2_descr">
+		<text>Questo componente consente di avvertire meglio il momento in cui il colpo viene sparato, migliorando la precisione del tiro.</text>
+	</string>
+	<string id="st_up_auts_a2_name">
+		<text>Installazione di un grilletto piщ sensibile</text>
+	</string>
+	<string id="st_up_auts_b1_descr">
+		<text>Un sistema di bloccaggio a rulli, inserito spesso nelle armi occidentali, che riduce il rinculo e migliora i colpi multipli.</text>
+	</string>
+	<string id="st_up_auts_b1_name">
+		<text>Otturatore semi-libero con sistema a rulli</text>
+	</string>
+	<string id="st_up_auts_b2_descr">
+		<text>Un meccanismo speciale assorbe parte della forza d'urto generata dal colpo, aumentando la facilitа d'uso e la comoditа dell'arma.</text>
+	</string>
+	<string id="st_up_auts_b2_name">
+		<text>Sistema di ammortizzazione del colpo</text>
+	</string>
+	<string id="st_up_auts_b3_descr">
+		<text>Dato che i fucili da cecchino sono piщ difficili da mantenere rispetto agli altri tipi di armi, possono essere migliorati con dispositivi di regolazione a gas a tre posizioni.</text>
+	</string>
+	<string id="st_up_auts_b3_name">
+		<text>Installazione di un dispositivo di regolazione automatica a gas a tre posizioni</text>
+	</string>
+	<string id="st_up_auts_c1_descr">
+		<text>Lo sputter previene la dispersione dell'energia cinetica, aumentando l'impulso del proiettile.</text>
+	</string>
+	<string id="st_up_auts_c1_name">
+		<text>Perfezionamento delle parti automatiche con uno sputter</text>
+	</string>
+	<string id="st_up_auts_c2_descr">
+		<text>L'installazione di una bacchetta piщ lunga consente di usare i fucili da cecchino in modalitа automatica.</text>
+	</string>
+	<string id="st_up_auts_c2_name">
+		<text>Meccanismo di fuoco con bacchetta lunga</text>
+	</string>
+	<string id="st_up_auts_c3_descr">
+		<text>Un dispositivo frenante applicato al meccanismo della massa bloccante, per migliorare la precisione.</text>
+	</string>
+	<string id="st_up_auts_c3_name">
+		<text>Installazione di un dispositivo frenante</text>
+	</string>
+	<string id="st_up_bar_a1_descr">
+		<text>La sostituzione della canna normale con una canna piщ lunga migliora la precisione e la stabilitа della traiettoria di tiro.</text>
+	</string>
+	<string id="st_up_bar_a1_name">
+		<text>Canna piщ lunga</text>
+	</string>
+	<string id="st_up_bar_a2_descr">
+		<text>L'assenza di grosse camere a gas e di incastri sull'impugnatura anteriore contribuisce a migliorare la precisione.</text>
+	</string>
+	<string id="st_up_bar_a2_name">
+		<text>Installazione di una canna "libera"</text>
+	</string>
+	<string id="st_up_bar_a3_descr">
+		<text>Questa modifica riduce i danni causati dalle modifiche "estreme" che aumentano la cadenza di fuoco.</text>
+	</string>
+	<string id="st_up_bar_a3_name">
+		<text>Installazione di una canna con alette di raffreddamento</text>
+	</string>
+	<string id="st_up_bar_b1_descr">
+		<text>Un componente obsoleto viene sostituito con un modello piщ moderno per ridurre il rinculo.</text>
+	</string>
+	<string id="st_up_bar_b1_name">
+		<text>Freno di bocca con compensazione ottimizzata</text>
+	</string>
+	<string id="st_up_bar_b2_descr">
+		<text>L'installazione di una canna con scanalature aggiuntive migliora la velocitа del proiettile e la precisione dell'arma, aumentando tuttavia il rinculo.</text>
+	</string>
+	<string id="st_up_bar_b2_name">
+		<text>Canna con scanalature aggiuntive</text>
+	</string>
+	<string id="st_up_bar_b3_descr">
+		<text>Questa canna aumenta il raggio d'azione nei combattimenti ravvicinati, quindi non и adatta al fuoco di precisione. Migliora la cadenza di fuoco grazie alla semplificazione della parte scanalata della canna.</text>
+	</string>
+	<string id="st_up_bar_b3_name">
+		<text>Installazione di una canna con la sezione scanalata semplificata</text>
+	</string>
+	<string id="st_up_bar_c1_descr">
+		<text>La scanalatura poligonale serve ad aumentare la precisione.</text>
+	</string>
+	<string id="st_up_bar_c1_name">
+		<text>Installazione di una canna con la sezione scanalata poligonale</text>
+	</string>
+	<string id="st_up_bar_c2_descr">
+		<text>Riduce il surriscaldamento della canna aumentando al tempo stesso la cadenza di fuoco.</text>
+	</string>
+	<string id="st_up_bar_c2_name">
+		<text>Scanalatura sinusoidale della canna</text>
+	</string>
+	<string id="st_up_bar_c3_descr">
+		<text>Una canna speciale per le armi con un'ottima stabilitа della traiettoria di tiro. Migliora la precisione.</text>
+	</string>
+	<string id="st_up_bar_c3_name">
+		<text>Canna scanalata per fucili da cecchino</text>
+	</string>
+	<string id="st_up_bard_a1_descr">
+		<text>I materiali ad alta durabilitа riducono l'usura della canna dell'arma.</text>
+	</string>
+	<string id="st_up_bard_a1_name">
+		<text>Canna in lega ad alta durabilitа</text>
+	</string>
+	<string id="st_up_bard_b1_descr">
+		<text>Un trattamento della superficie interna della canna per proteggerla dai danni meccanici.</text>
+	</string>
+	<string id="st_up_bard_b1_name">
+		<text>Trattamento della canna</text>
+	</string>
+	<string id="st_up_bard_b2_descr">
+		<text>Un addensamento sintetico della cavitа della canna che migliora sensibilmente i colpi multipli.</text>
+	</string>
+	<string id="st_up_bard_b2_name">
+		<text>Addensante sintetico per la canna</text>
+	</string>
+	<string id="st_up_bard_b3_descr">
+		<text>La sostituzione della canna normale con una canna piщ lunga migliora la stabilitа della traiettoria.</text>
+	</string>
+	<string id="st_up_bard_b3_name">
+		<text>Sezioni della canna piщ lunghe</text>
+	</string>
+	<string id="st_up_bard_b4_descr">
+		<text>L'introduzione di canali di ventilazione del gas nella canna previene l'accumulo di sporcizia e trasmette parzialmente il rinculo alla canna stessa.</text>
+	</string>
+	<string id="st_up_bard_b4_name">
+		<text>Canali di ventilazione longitudinali</text>
+	</string>
+	<string id="st_up_bard_b5_descr">
+		<text>La sostituzione della canna normale con una canna piщ lunga migliora la stabilitа della traiettoria.</text>
+	</string>
+	<string id="st_up_bard_b5_name">
+		<text>Sezione della canna piщ lunga</text>
+	</string>
+	<string id="st_up_bard_b6_descr">
+		<text>Questo sputter previene il surriscaldamento dell'arma, elimina i difetti di fabbricazione e aumenta notevolmente la durabilitа della canna.</text>
+	</string>
+	<string id="st_up_bard_b6_name">
+		<text>Applicazione di uno sputter protettivo nella parte interna della canna</text>
+	</string>
+	<string id="st_up_bard_c1_descr">
+		<text>Il sistema di bilanciamento della canna include diversi pistoni mobili che rendono l'arma piщ stabile.</text>
+	</string>
+	<string id="st_up_bard_c1_name">
+		<text>Sistema di bilanciamento della canna</text>
+	</string>
+	<string id="st_up_bard_c2_descr">
+		<text>La parte scanalata della canna impedisce di sparare pallettoni, ma garantisce una precisione eccezionale.</text>
+	</string>
+	<string id="st_up_bard_c2_name">
+		<text>Canne scanalate</text>
+	</string>
+	<string id="st_up_bard_c3_descr">
+		<text>L'addensamento con poli-materiali consente di incrementare la pressione nella canna, aumentando la velocitа del proiettile.</text>
+	</string>
+	<string id="st_up_bard_c3_name">
+		<text>Addensante dinamico per la canna</text>
+	</string>
+	<string id="st_up_bard_c4_descr">
+		<text>La foratura cilindrica della canna migliora la cadenza di fuoco senza ridurre la precisione.</text>
+	</string>
+	<string id="st_up_bard_c4_name">
+		<text>Foratura cilindrica della canna</text>
+	</string>
+	<string id="st_up_bard_c5_descr">
+		<text>Quando il proiettile viene sparato, un contrappeso attivo si sposta verso la parte anteriore della canna, compensando parzialmente il rinculo.</text>
+	</string>
+	<string id="st_up_bard_c5_name">
+		<text>Aggiunta di un contrappeso attivo all'involucro della canna</text>
+	</string>
+	<string id="st_up_barp_a1_descr">
+		<text>La sostituzione della canna normale con una canna piщ lunga migliora la precisione e la stabilitа della traiettoria, ma riduce la cadenza di fuoco.</text>
+	</string>
+	<string id="st_up_barp_a1_name">
+		<text>Sezione della canna piщ lunga</text>
+	</string>
+	<string id="st_up_barp_a2_descr">
+		<text>La foratura della canna riduce il rinculo facendo fuoriuscire il gas attraverso delle cavitа speciali.</text>
+	</string>
+	<string id="st_up_barp_a2_name">
+		<text>Sezione della canna forata</text>
+	</string>
+	<string id="st_up_barp_a3_descr">
+		<text>Una canna accorciata migliora la cadenza di fuoco dell'arma senza sacrificare la precisione e la stabilitа della traiettoria.</text>
+	</string>
+	<string id="st_up_barp_a3_name">
+		<text>Sezione della canna accorciata</text>
+	</string>
+	<string id="st_up_barp_b1_descr">
+		<text>Il rivestimento in cromo aumenta la durabilitа dell'arma.</text>
+	</string>
+	<string id="st_up_barp_b1_name">
+		<text>Rivestimento in cromo della parte interna della canna</text>
+	</string>
+	<string id="st_up_barp_b2_descr">
+		<text>I separatori assorbono parte del rinculo.</text>
+	</string>
+	<string id="st_up_barp_b2_name">
+		<text>Aggiunta di separatori in gomma</text>
+	</string>
+	<string id="st_up_barp_b3_descr">
+		<text>La parte scanalata semplificata и utile nei combattimenti ravvicinati, dove la cadenza di fuoco и piщ importante della precisione.</text>
+	</string>
+	<string id="st_up_barp_b3_name">
+		<text>Installazione di una canna con la sezione scanalata semplificata</text>
+	</string>
+	<string id="st_up_barp_b4_descr">
+		<text>L'installazione di una canna con scanalature aggiuntive migliora la velocitа del proiettile e la precisione dell'arma, aumentando tuttavia il rinculo.</text>
+	</string>
+	<string id="st_up_barp_b4_name">
+		<text>Canna con scanalature aggiuntive</text>
+	</string>
+	<string id="st_up_barp_b5_descr">
+		<text>L'alleggerimento della canna consente di ridurre sensibilmente il rinculo.</text>
+	</string>
+	<string id="st_up_barp_b5_name">
+		<text>Trasferimento del compensatore/riduttore di fiammata dalla canna al telaio</text>
+	</string>
+	<string id="st_up_barp_c1_descr">
+		<text>Riduce il calore prodotto dalla canna aumentando al tempo stesso la cadenza di fuoco, senza sacrificare la stabilitа della traiettoria.</text>
+	</string>
+	<string id="st_up_barp_c1_name">
+		<text>Scanalatura sinusoidale della canna</text>
+	</string>
+	<string id="st_up_barp_c2_descr">
+		<text>La scanalatura poligonale serve ad aumentare la precisione dei fucili da cecchino.</text>
+	</string>
+	<string id="st_up_barp_c2_name">
+		<text>Installazione di una canna con la sezione scanalata poligonale</text>
+	</string>
+	<string id="st_up_barp_c3_descr">
+		<text>Il potenziatore pneumatico consente di convertire parte del rinculo aumentando la pressione nella canna e accelerando la velocitа di volata.</text>
+	</string>
+	<string id="st_up_barp_c3_name">
+		<text>Installazione di un potenziatore pneumatico</text>
+	</string>
+	<string id="st_up_exo_a1_descr">
+		<text>I dispositivi di movimento aggiuntivi aumentano la capacitа di carico.</text>
+	</string>
+	<string id="st_up_exo_a1_name">
+		<text>Servomotori aggiuntivi</text>
+	</string>
+	<string id="st_up_exo_b1_descr">
+		<text>Un'invenzione dei tecnici della Freedom, che sono stati i primi a sostituire il metallo con la fibra di carbonio per ridurre il peso degli esoscheletri.</text>
+	</string>
+	<string id="st_up_exo_b1_name">
+		<text>Sostituzione dei componenti metallici con fibra di carbonio</text>
+	</string>
+	<string id="st_up_exo_b2_descr">
+		<text>La blindatura evita che i componenti vitali dell'esoscheletro vengano danneggiati dai colpi di precisione nemici.</text>
+	</string>
+	<string id="st_up_exo_b2_name">
+		<text>Blindatura dispositivi di guida</text>
+	</string>
+	<string id="st_up_exo_c1_descr">
+		<text>Questo sistema di movimento facilitato utilizza giunture e ammortizzatori rinforzati, consentendo di sfruttare il peso dell'esoscheletro per ottimizzare le funzioni di guida.</text>
+	</string>
+	<string id="st_up_exo_c1_name">
+		<text>Sistema di movimento facilitato Shagohod</text>
+	</string>
+	<string id="st_up_exo_c2_descr">
+		<text>L'installazione dei potenziamenti idraulici и una modifica che distingue gli esoscheletri di terza generazione da quelli di quarta. Consente di eseguire movimenti scattanti con l'esoscheletro.</text>
+	</string>
+	<string id="st_up_exo_c2_name">
+		<text>Aggiunta di potenziatori idraulici nei dispositivi di movimento</text>
+	</string>
+	<string id="st_up_kom_a1_descr">
+		<text>L'inserto in tessuto riduce l'entitа del danno subito in caso di impatto contro la piastra.</text>
+	</string>
+	<string id="st_up_kom_a1_name">
+		<text>Strato di tessuto ammortizzante</text>
+	</string>
+	<string id="st_up_kom_a2_descr">
+		<text>Piщ efficaci degli equivalenti in gomma, gli addensanti in silicone assorbono l'impatto riducendo i danni subiti.</text>
+	</string>
+	<string id="st_up_kom_a2_name">
+		<text>Addensanti in silicone ammortizzanti</text>
+	</string>
+	<string id="st_up_kom_a3_descr">
+		<text>Il tessuto, le chiusure e gli addensanti vengono sostituiti con materiali sintetici per ridurre il peso dell'armatura.</text>
+	</string>
+	<string id="st_up_kom_a3_name">
+		<text>Materiali polimerici sintetici e piщ leggeri</text>
+	</string>
+	<string id="st_up_kom_a4_descr">
+		<text>Lo strato in gomma riduce l'entitа del danno subito in caso di impatto contro la piastra.</text>
+	</string>
+	<string id="st_up_kom_a4_name">
+		<text>Strato in gomma ammortizzante</text>
+	</string>
+	<string id="st_up_kom_a5_descr">
+		<text>Lo strato inferiore и utile in caso di lacerazione del tessuto principale.</text>
+	</string>
+	<string id="st_up_kom_a6_descr">
+		<text>Uno strato in policarbonato, silicone e fibra di carbonio utile in caso di penetrazione dell'armatura principale.</text>
+	</string>
+	<string id="st_up_kom_a6_name">
+		<text>Inserti polimerici protettivi</text>
+	</string>
+	<string id="st_up_kom_a7_descr">
+		<text>La tuta ermetica "Espansione" della Freedom serve a individuare i manufatti nelle aree anomale.</text>
+	</string>
+	<string id="st_up_kom_a7_name">
+		<text>Tuta protettiva anti-anomalie "Espansione"</text>
+	</string>
+	<string id="st_up_kom_a8_descr">
+		<text>Strato ermetico in materiali sintetici, utile in caso di danneggiamento dello strato esterno.</text>
+	</string>
+	<string id="st_up_kom_a8_name">
+		<text>Strato sintetico</text>
+	</string>
+	<string id="st_up_kom_b10_descr">
+		<text>Varie modifiche ergonomiche che usano componenti in gomma, per conservare la mobilitа anche indossando le armature piщ pesanti.</text>
+	</string>
+	<string id="st_up_kom_b10_name">
+		<text>Tuta in gomma per aumentare la mobilitа</text>
+	</string>
+	<string id="st_up_kom_b11_descr">
+		<text>La constantana и un ottimo isolante elettrico e ha un punto di fusione molto elevato.</text>
+	</string>
+	<string id="st_up_kom_b11_name">
+		<text>Inserti in constantana per isolamento termico</text>
+	</string>
+	<string id="st_up_kom_b12_descr">
+		<text>Il piombo и un'ottima difesa contro le radiazioni, essendo in grado di assorbirne tutte e tre le tipologie.</text>
+	</string>
+	<string id="st_up_kom_b12_name">
+		<text>Aggiunta di piombo nella tuta</text>
+	</string>
+	<string id="st_up_kom_b1_descr">
+		<text>Protezione di base contro la pioggia e le sostanze corrosive che entrano in contatto con la pelle.</text>
+	</string>
+	<string id="st_up_kom_b1_name">
+		<text>Tuta in tessuto</text>
+	</string>
+	<string id="st_up_kom_b2_descr">
+		<text>Tessuto trattato con una sostanza ignifuga, molto apprezzato dagli stalker che cercano manufatti di fuoco.</text>
+	</string>
+	<string id="st_up_kom_b2_name">
+		<text>Tessuto trattato con sostanza ignifuga</text>
+	</string>
+	<string id="st_up_kom_b3_descr">
+		<text>Gli inserti in magnesio offrono una buona protezione dai picchi di calore.</text>
+	</string>
+	<string id="st_up_kom_b3_name">
+		<text>Inserti in magnesio</text>
+	</string>
+	<string id="st_up_kom_b4_descr">
+		<text>Anche un semplice strato interno in plastica puт proteggere l'indossatore dai pericoli chimici ed elettrici.</text>
+	</string>
+	<string id="st_up_kom_b4_name">
+		<text>Strato interno ermetico in plastica</text>
+	</string>
+	<string id="st_up_kom_b5_descr">
+		<text>Il tessuto, le chiusure e gli addensanti vengono sostituiti con materiali sintetici per ridurre il peso dell'armatura.</text>
+	</string>
+	<string id="st_up_kom_b5_name">
+		<text>Sostituzione del tessuto con materiali sintetici</text>
+	</string>
+	<string id="st_up_kom_b6_descr">
+		<text>Il plexiglas assorbe solo due tipi di radiazioni, ma и molto piщ leggero del piombo.</text>
+	</string>
+	<string id="st_up_kom_b6_name">
+		<text>Strato interno in plexiglas anti-radiazioni</text>
+	</string>
+	<string id="st_up_kom_b7_descr">
+		<text>Una buona protezione dai pericoli chimici ed elettrici.</text>
+	</string>
+	<string id="st_up_kom_b7_name">
+		<text>Strato interno in plastica, ermetico ed elastico</text>
+	</string>
+	<string id="st_up_kom_b8_descr">
+		<text>Un sottile strato in constantana per garantire un ottimo isolamento elettrico.</text>
+	</string>
+	<string id="st_up_kom_b8_name">
+		<text>Strato interno in constantana per isolamento elettrico</text>
+	</string>
+	<string id="st_up_kom_b9_descr">
+		<text>La lana di vetro viene utilizzata nelle tute indossate dalle squadre di intervento nei luoghi colpiti da disastri naturali.</text>
+	</string>
+	<string id="st_up_kom_b9_name">
+		<text>Protezione termica in lana di vetro </text>
+	</string>
+	<string id="st_up_kom_c1_descr">
+		<text>Il tessuto impregnato previene la contaminazione chimica.</text>
+	</string>
+	<string id="st_up_kom_c1_name">
+		<text>Tessuto della tuta impregnato</text>
+	</string>
+	<string id="st_up_kom_c2_descr">
+		<text>La gomma и il materiale di base per proteggersi dalle brevi esposizioni alle radiazioni.</text>
+	</string>
+	<string id="st_up_kom_c2_name">
+		<text>Tessuto della tuta in gomma</text>
+	</string>
+	<string id="st_up_kom_c3_descr">
+		<text>Utilizzato dagli stalker per aumentare la durabilitа.</text>
+	</string>
+	<string id="st_up_kom_c3_name">
+		<text>Telaio protettivo schermante ad alta durabilitа</text>
+	</string>
+	<string id="st_up_kom_c4_descr">
+		<text>Il nichel и un materiale sufficientemente ignifugo per essere utilizzato negli inserti delle armature.</text>
+	</string>
+	<string id="st_up_kom_c4_name">
+		<text>Tuta ignifuga con inserti in nichel</text>
+	</string>
+	<string id="st_up_kom_c5_descr">
+		<text>Questa lega di nichel e magnesio viene usata nelle armature per prevenire le scosse elettriche.</text>
+	</string>
+	<string id="st_up_kom_c5_name">
+		<text>Tuta isolante con inserti in manganina</text>
+	</string>
+	<string id="st_up_kom_c6_descr">
+		<text>Tuta ermetica con uno strato anti-corrosione e blindatura in kevlar.</text>
+	</string>
+	<string id="st_up_kom_c6_name">
+		<text>Tuta blindata integrata "Seconda pelle"</text>
+	</string>
+	<string id="st_up_kom_c7_descr">
+		<text>Una tuta creata usando i polimeri innovativi precedentemente impiegati dall'istituto di ricerca di Kiev per sviluppare la tuta "Ecologista", con le cavitа riempite di bismuto.</text>
+	</string>
+	<string id="st_up_kom_c7_name">
+		<text>Tuta polimerica "Ecologista" con inserti in bismuto</text>
+	</string>
+	<string id="st_up_kom_c8_descr">
+		<text>La maglia in piombo crea una protezione impenetrabile contro le radiazioni e le contaminazioni chimiche, senza sacrificare la mobilitа.</text>
+	</string>
+	<string id="st_up_kom_c8_name">
+		<text>Tuta in plexiglas "Salvavita" con maglia piombata flessibile</text>
+	</string>
+	<string id="st_up_kom_c9_descr">
+		<text>Una tuta artigianale sviluppata dopo il disastro di Chernobyl. Utilizzata negli esoscheletri per prevenire i guasti elettronici.</text>
+	</string>
+	<string id="st_up_kom_c9_name">
+		<text>Tuta "Evacuatore" con inserti in piombo</text>
+	</string>
+	<string id="st_up_opt_a1_descr">
+		<text>Installazione di un mirino d'assalto per i combattimenti ravvicinati.</text>
+	</string>
+	<string id="st_up_opt_a1_name">
+		<text>Ottica reflex 1.6x</text>
+	</string>
+	<string id="st_up_opt_a2_descr">
+		<text>Installazione di un mirino ottico per i combattimenti a medio-lungo raggio.</text>
+	</string>
+	<string id="st_up_opt_a2_name">
+		<text>Mirino ottico 4.0x</text>
+	</string>
+	<string id="st_up_opt_a3_descr">
+		<text>Installazione di un mirino ottico per i combattimenti a lungo raggio.</text>
+	</string>
+	<string id="st_up_opt_a3_name">
+		<text>Mirino ottico 5.0x</text>
+	</string>
+	<string id="st_up_opt_a4_descr">
+		<text>Installazione di un mirino ottico per i combattimenti a lungo raggio.</text>
+	</string>
+	<string id="st_up_opt_a4_name">
+		<text>Mirino ottico 6.0x</text>
+	</string>
+	<string id="st_up_opt_b1_descr">
+		<text>Una modifica effettuata nelle armi d'assalto con ottica reflex migliorando semplicemente il livello di contrasto nella scala del giallo. Essenziale in condizioni di luce crepuscolare o all'interno di edifici poco illuminati.</text>
+	</string>
+	<string id="st_up_opt_b1_name">
+		<text>Livello di contrasto dell'ottica migliorato</text>
+	</string>
+	<string id="st_up_opt_c1_descr">
+		<text>Il visore termico consente di rilevare e identificare le fonti di calore.</text>
+	</string>
+	<string id="st_up_opt_c1_name">
+		<text>Acquisizione ottica automatica del bersaglio</text>
+	</string>
+	<string id="st_up_opt_c2_descr">
+		<text>I dispositivi di visione notturna hanno salvato la vita a molti cecchini.</text>
+	</string>
+	<string id="st_up_opt_c2_name">
+		<text>Installazione dispositivo visione notturna</text>
+	</string>
+	<string id="st_up_opt_c3_descr">
+		<text>Questa modifica consente di regolare facilmente l'ottica in base alla distanza di tiro.</text>
+	</string>
+	<string id="st_up_opt_c3_name">
+		<text>Ottica regolabile con indicatore di distanza</text>
+	</string>
+	<string id="st_up_pri_a1_descr">
+		<text>Un calcio pneumatico che riduce il rinculo durante le raffiche.</text>
+	</string>
+	<string id="st_up_pri_a1_name">
+		<text>Calcio pneumatico</text>
+	</string>
+	<string id="st_up_pri_b1_descr">
+		<text>Il poggiaspalla mobile riduce notevolmente l'impatto del rinculo sul corpo.</text>
+	</string>
+	<string id="st_up_pri_b1_name">
+		<text>Installazione di un poggiaspalla ammortizzante</text>
+	</string>
+	<string id="st_up_pri_b2_descr">
+		<text>Un calcio piщ moderno sviluppato in seguito a studi approfonditi sull'anatomia umana.</text>
+	</string>
+	<string id="st_up_pri_b2_name">
+		<text>Calcio ergonomico</text>
+	</string>
+	<string id="st_up_pri_c1_descr">
+		<text>Quando il proiettile viene sparato, parte dei gas di scarico vengono spostati dalla canna alla cavitа dietro l'otturatore, in modo da rendere piщ fluido il suo arresto mentre torna in posizione.</text>
+	</string>
+	<string id="st_up_pri_c1_name">
+		<text>Installazione di un tampone per i gas nel blocco dell'otturatore</text>
+	</string>
+	<string id="st_up_pri_c2_descr">
+		<text>L'allungamento del telaio dell'otturatore nel calcio migliora la stabilitа della traiettoria, aumentando perт il rinculo.</text>
+	</string>
+	<string id="st_up_pri_c2_name">
+		<text>Allungamento del telaio dell'otturatore nel calcio</text>
+	</string>
+	<string id="st_up_pri_c3_descr">
+		<text>L'installazione di un componente mobile nel calcio genera un contro-effetto quando il colpo viene sparato.</text>
+	</string>
+	<string id="st_up_pri_c3_name">
+		<text>Contrappeso mobile</text>
+	</string>
+	<string id="st_up_prih_a1_descr">
+		<text>Un supporto piщ ampio aumenta la precisione.</text>
+	</string>
+	<string id="st_up_prih_a1_name">
+		<text>Supporto piщ ampio</text>
+	</string>
+	<string id="st_up_prih_b1_descr">
+		<text>Il tampone ammortizzante a molla riduce parzialmente il fastidioso rinculo prodotto dai mitragliatori portatili.</text>
+	</string>
+	<string id="st_up_prih_b1_name">
+		<text>Tampone ammortizzante a molla integrato</text>
+	</string>
+	<string id="st_up_prih_c1_descr">
+		<text>L'inserimento di un tampone per l'otturatore nel calcio riduce e assorbe gran parte del rinculo.</text>
+	</string>
+	<string id="st_up_prih_c1_name">
+		<text>Tampone a gas aggiuntivo per l'otturatore</text>
+	</string>
+	<string id="st_up_pris_a1_descr">
+		<text>Una parte ammortizzante in gomma viene spesso inserita nei calci di produzione industriale dei fucili da cecchino piщ grandi.</text>
+	</string>
+	<string id="st_up_pris_a1_name">
+		<text>Componente ammortizzante per il calcio</text>
+	</string>
+	<string id="st_up_pris_b1_descr">
+		<text>Il calcio regolabile con cuscinetto integrato и utile per sparare anche nelle posizioni meno confortevoli.</text>
+	</string>
+	<string id="st_up_pris_b1_name">
+		<text>Calcio regolabile con cuscinetto</text>
+	</string>
+	<string id="st_up_pris_c1_descr">
+		<text>Un componente installato nel calcio delle armi a grosso calibro con un potente rinculo.</text>
+	</string>
+	<string id="st_up_pris_c1_name">
+		<text>Ammortizzatore idraulico per calcio</text>
+	</string>
+	<string id="st_up_res_a1_descr">
+		<text>I filtri attivi possono resistere anche alle sostanze chimiche corrosive.</text>
+	</string>
+	<string id="st_up_res_a1_name">
+		<text>Filtri attivi</text>
+	</string>
+	<string id="st_up_res_a2_descr">
+		<text>И stato dimostrato che la fascia chiusa fornisce una protezione parziale contro le psico-emissioni dirette.</text>
+	</string>
+	<string id="st_up_res_a2_name">
+		<text>Fascia psico-protettiva con griglie d'acciaio sovrapposte</text>
+	</string>
+	<string id="st_up_res_a3_descr">
+		<text>Una maschera utilizzata in presenza di aria contaminata o temperature critiche che non consentono di respirare normalmente.</text>
+	</string>
+	<string id="st_up_res_b1_descr">
+		<text>Applicazione di un rivestimento schermante</text>
+	</string>
+	<string id="st_up_res_b1_name">
+		<text>Applicazione di un rivestimento schermante</text>
+	</string>
+	<string id="st_up_res_b2_descr">
+		<text>Un filtro con un rivestimento rinforzato anti-corrosione e uno strato aggiuntivo precauzionale per la rimozione dei veleni.</text>
+	</string>
+	<string id="st_up_res_b2_name">
+		<text>Filtro per operazioni in aree contaminate</text>
+	</string>
+	<string id="st_up_res_b3_descr">
+		<text>Una maschera in plexiglas che protegge parzialmente dalle radiazioni.</text>
+	</string>
+	<string id="st_up_res_b3_name">
+		<text>Rivestimento in plexiglas</text>
+	</string>
+	<string id="st_up_res_b4_descr">
+		<text>Una maschera in plexiglas che protegge parzialmente dalle radiazioni.</text>
+	</string>
+	<string id="st_up_res_b4_name">
+		<text>Maschera respiratoria in plexiglas</text>
+	</string>
+	<string id="st_up_res_b5_descr">
+		<text>Un respiratore in grado di filtrare qualsiasi tipo di veleno.</text>
+	</string>
+	<string id="st_up_res_b5_name">
+		<text>Maschera respiratoria impregnata</text>
+	</string>
+	<string id="st_up_res_c1_descr">
+		<text>Questa matrice in berillio e alluminio fornisce un'eccellente protezione senza aumentare troppo il peso del casco.</text>
+	</string>
+	<string id="st_up_res_c1_name">
+		<text>Piastre in berillio e alluminio</text>
+	</string>
+	<string id="st_up_res_c2_descr">
+		<text>Una matrice in berillio e titanio che assicura una protezione piщ efficace senza aumentare troppo il peso.</text>
+	</string>
+	<string id="st_up_res_c2_name">
+		<text>Piastre in berillio e titanio</text>
+	</string>
+	<string id="st_up_res_c3_descr">
+		<text>Filtri migliorati che mantengono il livello di ossigeno anche nelle aree piщ contaminate.</text>
+	</string>
+	<string id="st_up_res_c3_name">
+		<text>Installazione di filtri migliorati per operazioni scientifiche</text>
+	</string>
+	<string id="st_up_res_c4_descr">
+		<text>Una sofisticata psico-protezione che pare sia stata inventata da uno scienziato di nome Sakharov.</text>
+	</string>
+	<string id="st_up_res_c4_name">
+		<text>Installazione della fascia "Psico-difensore"</text>
+	</string>
+	<string id="st_up_res_c5_descr">
+		<text>Un telaio in lega protettiva che previene i danni termici ed elettrici.</text>
+	</string>
+	<string id="st_up_res_c5_name">
+		<text>Protezione facciale in constantana "Uccello di fuoco"</text>
+	</string>
+	<string id="st_up_res_c6_descr">
+		<text>Blindatura aggiuntiva che aumenta la durabilitа del casco.</text>
+	</string>
+	<string id="st_up_res_c6_name">
+		<text>Blindatura casco aggiuntiva</text>
+	</string>
+	<string id="st_up_res_c7_descr">
+		<text>Un filtro con un rivestimento purificatore aggiuntivo e un sistema per la rimozione dei veleni.</text>
+	</string>
+	<string id="st_up_res_c7_name">
+		<text>Respiratore rinforzato per condizioni estreme</text>
+	</string>
+	<string id="st_up_resp_a1_descr">
+		<text>Installazione di un dispositivo di visione notturna per le operazioni notturne o in condizioni di scarsa illuminazione.</text>
+	</string>
+	<string id="st_up_resp_a1_name">
+		<text>Dispositivo di prima generazione per la visione notturna</text>
+	</string>
+	<string id="st_up_resp_a2_descr">
+		<text>Un sistema che attiva la respirazione a ciclo chiuso in caso di grave contaminazione dell'aria a causa di particelle radioattive o chimiche.</text>
+	</string>
+	<string id="st_up_resp_a2_name">
+		<text>Sistema di prevenzione per minacce radioattive e chimiche</text>
+	</string>
+	<string id="st_up_resp_a3_name">
+		<text>Maschera di respirazione e purificazione</text>
+	</string>
+	<string id="st_up_resp_b1_descr">
+		<text>Installazione di un dispositivo per la visione notturna piщ avanzato che consente di operare anche in totale assenza di luce.</text>
+	</string>
+	<string id="st_up_resp_b1_name">
+		<text>Dispositivo di seconda generazione per la visione notturna</text>
+	</string>
+	<string id="st_up_resp_b2_descr">
+		<text>Il visore termico consente di rilevare e identificare le fonti di calore.</text>
+	</string>
+	<string id="st_up_resp_b2_name">
+		<text>Sistema di acquisizione automatica del bersaglio</text>
+	</string>
+	<string id="st_up_resp_b3_descr">
+		<text>Un dispositivo scientifico a onde sviluppato per le operazioni in aree anomale con psico-emissioni.</text>
+	</string>
+	<string id="st_up_resp_b3_name">
+		<text>Psico-stimolatore "Oracolo"</text>
+	</string>
+	<string id="st_up_resp_c1_descr">
+		<text>Installazione di un dispositivo per la visione notturna piщ avanzato che consente di operare anche in totale assenza di luce.</text>
+	</string>
+	<string id="st_up_resp_c1_name">
+		<text>Dispositivo di terza generazione per la visione notturna</text>
+	</string>
+	<string id="st_up_resp_c2_descr">
+		<text>Le particelle d'aria ionizzate si muovono tra gli elettrodi del sistema in senso inverso rispetto agli elettroni, creando un vento ionico.</text>
+	</string>
+	<string id="st_up_resp_c2_name">
+		<text>Sistema di raffreddamento a vento ionico</text>
+	</string>
+	<string id="st_up_resp_c3_descr">
+		<text>Uno scanner a infrarossi che consente di rilevare gli umani nelle vicinanze.</text>
+	</string>
+	<string id="st_up_resp_c3_name">
+		<text>Scanner a infrarossi</text>
+	</string>
+	<string id="st_up_resp_c4_descr">
+		<text>L'SPB – VPZ.m.IV и la quarta versione di un sistema psico-protettivo di sicurezza psicologica.</text>
+	</string>
+	<string id="st_up_resp_c4_name">
+		<text>Sistema da battaglia SPB – VPZ.m.IV</text>
+	</string>
+	<string id="st_up_ret_a1_descr">
+		<text>La molla rinforzata serve ad aumentare la velocitа del proiettile.</text>
+	</string>
+	<string id="st_up_ret_a1_name">
+		<text>Molla di ritorno rinforzata</text>
+	</string>
+	<string id="st_up_ret_a2_descr">
+		<text>L'applicazione di addensanti sulle parti mobili del meccanismo riduce la deviazione della canna dalla traiettoria di tiro durante il fuoco.</text>
+	</string>
+	<string id="st_up_ret_a2_name">
+		<text>Meccanismo di ritorno ammortizzato</text>
+	</string>
+	<string id="st_up_ret_a3_descr">
+		<text>L'installazione di una molla aggiuntiva a spirale inversa riduce il rinculo senza sacrificare la stabilitа della traiettoria di tiro.</text>
+	</string>
+	<string id="st_up_ret_a3_name">
+		<text>Molla di ritorno aggiuntiva</text>
+	</string>
+	<string id="st_up_ret_b1_descr">
+		<text>Lo sputter protettivo aumenta l'affidabilitа e, soprattutto, assicura l'ermeticitа, in modo da prevenire la dissipazione di energia.</text>
+	</string>
+	<string id="st_up_ret_b1_name">
+		<text>Sputter protettivo per meccanismo di ritorno</text>
+	</string>
+	<string id="st_up_ret_b2_descr">
+		<text>Le bacchette in titanio possono sopportare cadenze di fuoco piщ intense rispetto a quelle normali.</text>
+	</string>
+	<string id="st_up_ret_b2_name">
+		<text>Bacchette meccanismo di ritorno in titanio</text>
+	</string>
+	<string id="st_up_ret_b3_descr">
+		<text>Un elemento sintetico installato sulle bacchette le fa muovere nel modo piщ efficace, aumentando la precisione.</text>
+	</string>
+	<string id="st_up_ret_b3_name">
+		<text>Aggiunta di un elemento di bilanciamento</text>
+	</string>
+	<string id="st_up_ret_c1_descr">
+		<text>L'ispessimento dell'involucro consente di aumentare la pressione nella canna e la velocitа del proiettile.</text>
+	</string>
+	<string id="st_up_ret_c1_name">
+		<text>Addensante involucro meccanismo di ritorno</text>
+	</string>
+	<string id="st_up_ret_c2_descr">
+		<text>Un ponte che viene aperto dai gas e chiuso dal meccanismo di ritorno, in modo da usare parte dell'energia del gas per azionare lo stesso meccanismo di ritorno.</text>
+	</string>
+	<string id="st_up_ret_c2_name">
+		<text>Installazione di un ponte di distribuzione</text>
+	</string>
+	<string id="st_up_ret_c3_descr">
+		<text>Sostituzione del meccanismo di ritorno con una versione piщ potente con due bacchette di guida e molle di ritorno. Aumenta la cadenza di fuoco dell'arma.</text>
+	</string>
+	<string id="st_up_ret_c3_name">
+		<text>Conversione al sistema a due bacchette</text>
+	</string>
+	<string id="st_up_roun_a1_descr">
+		<text>I canali di uscita speciali per il gas vicino al tamburo dell'arma consentono di ridurre il rinculo.</text>
+	</string>
+	<string id="st_up_roun_a1_name">
+		<text>Utilizzo dell'energia del gas</text>
+	</string>
+	<string id="st_up_roun_a2_descr">
+		<text>Le camere diagonali aggiunte al tamburo accelerano la rotazione del meccanismo che usa l'energia del gas.</text>
+	</string>
+	<string id="st_up_roun_a2_name">
+		<text>Aggiunta di camere diagonali al tamburo</text>
+	</string>
+	<string id="st_up_stk_a1_descr">
+		<text>Questa modifica standard europea consente di ridurre il peso senza rinunciare all'affidabilitа.</text>
+	</string>
+	<string id="st_up_stk_a1_name">
+		<text>Calcio polimerico anti-impatto</text>
+	</string>
+	<string id="st_up_stk_a2_descr">
+		<text>Un castello altamente durevole che consente l'uso frequente dei fucili d'assalto in battaglia.</text>
+	</string>
+	<string id="st_up_stk_a2_name">
+		<text>Castello in lega ad alta durabilitа</text>
+	</string>
+	<string id="st_up_stk_a3_descr">
+		<text>Un semplice aumento di peso nella parte anteriore del castello per ridurre il rinculo.</text>
+	</string>
+	<string id="st_up_stk_a3_name">
+		<text>Aggiunta di un contrappeso al castello</text>
+	</string>
+	<string id="st_up_stk_b1_descr">
+		<text>L'installazione di questi involucri aiuta a ridurre il surriscaldamento prodotto quando la cadenza di tiro dell'arma и particolarmente elevata.</text>
+	</string>
+	<string id="st_up_stk_b1_name">
+		<text>Involucri raffreddanti aggiuntivi</text>
+	</string>
+	<string id="st_up_stk_b2_descr">
+		<text>Una maniglia piщ ergonomica consente di impugnare meglio l'arma quando si spara in movimento.</text>
+	</string>
+	<string id="st_up_stk_b2_name">
+		<text>Castello ergonomico</text>
+	</string>
+	<string id="st_up_stk_c1_descr">
+		<text>Una modifica utilizzata esclusivamente per le canne con castello "bullpup", per semplificare la manutenzione dell'arma.</text>
+	</string>
+	<string id="st_up_stk_c1_name">
+		<text>Castello modulare</text>
+	</string>
+	<string id="st_up_stk_c2_descr">
+		<text>Questo sputter previene il surriscaldamento dell'arma, elimina i difetti di fabbricazione e aumenta notevolmente la durabilitа della canna.</text>
+	</string>
+	<string id="st_up_stk_c2_name">
+		<text>Sputter dentellato con solco liscio</text>
+	</string>
+	<string id="st_up_stk_c3_descr">
+		<text>Un componente mobile leggero viene installato sulla maniglia inclinata per stabilizzare l'arma e compensare il rinculo.</text>
+	</string>
+	<string id="st_up_stk_c3_name">
+		<text>Maniglia inclinata</text>
+	</string>
+	<string id="st_up_stvd_a1_descr">
+		<text>La cavitа all'interno della maniglia consente di ridurre il peso dell'arma.</text>
+	</string>
+	<string id="st_up_stvd_a1_name">
+		<text>Maniglia inclinata</text>
+	</string>
+	<string id="st_up_stvd_a2_descr">
+		<text>Versione piщ leggera del calcio standard.</text>
+	</string>
+	<string id="st_up_stvd_a2_name">
+		<text>Calcio piщ leggero</text>
+	</string>
+	<string id="st_up_stvd_a3_descr">
+		<text>Un materiale polimerico piщ leggero che consente di ridurre il peso dell'arma.</text>
+	</string>
+	<string id="st_up_stvd_a3_name">
+		<text>Calcio polimerico anti-impatto</text>
+	</string>
+	<string id="st_up_stvd_b1_descr">
+		<text>L'aggiunta di un contrappeso all'arma aiuta a ridurre il rinculo.</text>
+	</string>
+	<string id="st_up_stvd_b1_name">
+		<text>Aggiunta di un contrappeso</text>
+	</string>
+	<string id="st_up_stvd_b2_descr">
+		<text>Una maniglia piщ moderna e confortevole che aumenta l'ergonomia dell'arma.</text>
+	</string>
+	<string id="st_up_stvd_b2_name">
+		<text>Maniglia ergonomica</text>
+	</string>
+	<string id="st_up_stvd_b3_descr">
+		<text>Una maniglia ammortizzante che riduce il rinculo.</text>
+	</string>
+	<string id="st_up_stvd_b3_name">
+		<text>Maniglia ammortizzante</text>
+	</string>
+	<string id="st_up_stvd_b4_descr">
+		<text>Un calcio piщ moderno e confortevole che aumenta l'ergonomia dell'arma.</text>
+	</string>
+	<string id="st_up_stvd_b4_name">
+		<text>Calcio ergonomico</text>
+	</string>
+	<string id="st_up_stvd_b5_descr">
+		<text>Un rivestimento speciale che protegge l'arma dalle intemperie.</text>
+	</string>
+	<string id="st_up_stvd_b5_name">
+		<text>Rivestimento anti-corrosione</text>
+	</string>
+	<string id="st_up_stvd_c1_descr">
+		<text>Un assorbitore in mercurio posizionato nel calcio dell'arma che elimina parzialmente il rinculo.</text>
+	</string>
+	<string id="st_up_stvd_c1_name">
+		<text>Assorbitore in mercurio</text>
+	</string>
+	<string id="st_up_stvd_c2_descr">
+		<text>Un contrappeso mobile che si sposta dall'otturatore quando il proiettile viene sparato e assorbe parte del rinculo.</text>
+	</string>
+	<string id="st_up_stvd_c2_name">
+		<text>Aggiunta di un contrappeso di impulso</text>
+	</string>
+	<string id="st_up_stvh_a1_descr">
+		<text>La sostituzione dei materiali serve a ridurre il danno subito dalla canna dovuto al surriscaldamento, aumentando di conseguenza la cadenza di fuoco.</text>
+	</string>
+	<string id="st_up_stvh_a1_name">
+		<text>Leghe a resistenza termica e alta durabilitа</text>
+	</string>
+	<string id="st_up_stvh_b1_descr">
+		<text>Una modifica importante che protegge l'arma dagli effetti della temperatura dell'aria durante l'uso.</text>
+	</string>
+	<string id="st_up_stvh_b1_name">
+		<text>Aggiunta di involucri di regolazione termica</text>
+	</string>
+	<string id="st_up_stvh_b2_descr">
+		<text>L'alettatura и una miglioria tecnica che richiede la massima precisione per evitare la formazione di punti di surriscaldamento sulla canna.</text>
+	</string>
+	<string id="st_up_stvh_b2_name">
+		<text>Alettatura esterna della canna</text>
+	</string>
+	<string id="st_up_stvh_c1_descr">
+		<text>La sostituzione della canna con una versione piщ moderna consente di aumentare notevolmente la precisione.</text>
+	</string>
+	<string id="st_up_stvh_c1_name">
+		<text>Modifica della geometria della canna</text>
+	</string>
+	<string id="st_up_stvp_a1_descr">
+		<text>Un telaio costoso che aumenta enormemente la durabilitа dell'arma.</text>
+	</string>
+	<string id="st_up_stvp_a1_name">
+		<text>Telaio in titanio</text>
+	</string>
+	<string id="st_up_stvp_a2_descr">
+		<text>Questo telaio и piщ affidabile di quello composito.</text>
+	</string>
+	<string id="st_up_stvp_a2_name">
+		<text>Telaio in acciaio massiccio</text>
+	</string>
+	<string id="st_up_stvp_b1_descr">
+		<text>Una sostituzione tecnica del telaio della pistola con una versione piщ leggera che non riduce l'affidabilitа dell'arma.</text>
+	</string>
+	<string id="st_up_stvp_b1_name">
+		<text>Telaio polimerico per pistola</text>
+	</string>
+	<string id="st_up_stvp_b2_descr">
+		<text>Una maniglia piщ moderna e confortevole che aumenta l'ergonomia dell'arma.</text>
+	</string>
+	<string id="st_up_stvp_b2_name">
+		<text>Maniglia ergonomica</text>
+	</string>
+	<string id="st_up_stvp_b3_descr">
+		<text>Una maniglia ammortizzante che riduce il rinculo.</text>
+	</string>
+	<string id="st_up_stvp_b3_name">
+		<text>Maniglia ammortizzante</text>
+	</string>
+	<string id="st_up_stvp_b4_descr">
+		<text>Flap addensanti che proteggono l'arma dalla sporcizia e dagli impatti.</text>
+	</string>
+	<string id="st_up_stvp_b4_name">
+		<text>Addensanti protettivi per il corpo dell'arma</text>
+	</string>
+	<string id="st_up_stvp_b5_descr">
+		<text>Una modifica nella sezione posteriore per aumentare l'ergonomia della maniglia.</text>
+	</string>
+	<string id="st_up_stvp_b5_name">
+		<text>Maniglia con sezione posteriore dritta</text>
+	</string>
+	<string id="st_up_stvp_b6_descr">
+		<text>La possibilitа di regolare la lunghezza della maniglia aumenta l'ergonomia dell'arma.</text>
+	</string>
+	<string id="st_up_stvp_b6_name">
+		<text>Maniglia regolabile</text>
+	</string>
+	<string id="st_up_stvp_c1_descr">
+		<text>Questa modifica и possibile solo se nella maniglia и stata installata una molla di ritorno.</text>
+	</string>
+	<string id="st_up_stvp_c1_name">
+		<text>Installazione di un componente ammortizzante per la molla di ritorno</text>
+	</string>
+	<string id="st_up_stvp_c2_descr">
+		<text>La possibilitа di scegliere la piastra piщ adatta aumenta l'ergonomia dell'arma.</text>
+	</string>
+	<string id="st_up_stvp_c2_name">
+		<text>Maniglia modificata con piastre sostituibili</text>
+	</string>
+	<string id="st_up_stvs_a1_descr">
+		<text>Questo involucro protegge le armi dall'usura, soprattutto se vengono usate spesso.</text>
+	</string>
+	<string id="st_up_stvs_a1_name">
+		<text>Installazione di un involucro in acciaio perforato</text>
+	</string>
+	<string id="st_up_stvs_b1_descr">
+		<text>Un componente piщ sofisticato e piщ efficace nello smorzamento del rinculo rispetto a quelli utilizzati nelle armi automatiche standard.</text>
+	</string>
+	<string id="st_up_stvs_b1_name">
+		<text>Freno di bocca con compensazione migliorata</text>
+	</string>
+	<string id="st_up_stvs_b2_descr">
+		<text>Una canna piщ adatta e moderna per i colpi di precisione a lunghissimo raggio.</text>
+	</string>
+	<string id="st_up_stvs_b2_name">
+		<text>Installazione di una canna pesante con scanalatura poligonale</text>
+	</string>
+	<string id="st_up_stvs_b3_descr">
+		<text>I fuller longitudinali sulla canna prevengono il surriscaldamento e l'accumulo di sporcizia.</text>
+	</string>
+	<string id="st_up_stvs_b3_name">
+		<text>Fuller longitudinali sulla canna </text>
+	</string>
+	<string id="st_up_stvs_c1_descr">
+		<text>Silenziatore e soppressore della fiammata integrati, essenziali per il fuoco furtivo.</text>
+	</string>
+	<string id="st_up_stvs_c1_name">
+		<text>Installazione di un silenziatore integrato</text>
+	</string>
+	<string id="st_up_stvs_c2_descr">
+		<text>In genere la scanalatura sinusoidale della canna viene eseguita nelle armi d'assalto per aumentare la cadenza di fuoco.</text>
+	</string>
+	<string id="st_up_stvs_c2_name">
+		<text>Scanalatura sinusoidale della canna</text>
+	</string>
+	<string id="st_up_tch_a1_descr">
+		<text>L'iniettore "Generazione A", sviluppato da un istituto di ricerca di Kiev, inietta regolarmente nel flusso sanguigno piccole dosi di adrenalina. Decisamente pericoloso, ma in casi di emergenza puт salvare la vita.</text>
+	</string>
+	<string id="st_up_tch_a1_name">
+		<text>Iniettore di adrenalina "Furia"</text>
+	</string>
+	<string id="st_up_tch_a2_descr">
+		<text>Un sistema per la rimozione di particelle tossiche dal filtro di purificazione.</text>
+	</string>
+	<string id="st_up_tch_a2_name">
+		<text>Sistema per rimuovere sostanze tossiche</text>
+	</string>
+	<string id="st_up_tch_a3_descr">
+		<text>Se viene portato costantemente sulla schiena, questo piccolo emettitore di onde sviluppato dalla Clear Sky puт aumentare la velocitа di coagulazione del sangue.</text>
+	</string>
+	<string id="st_up_tch_a3_name">
+		<text>Emostimolatore "Raggio"</text>
+	</string>
+	<string id="st_up_tch_a4_descr">
+		<text>Un sistema che carica elettricamente l'esterno della tuta, respingendo le particelle radioattive e chimiche.</text>
+	</string>
+	<string id="st_up_tch_a4_name">
+		<text>Sistema anti-particelle integrato</text>
+	</string>
+	<string id="st_up_tch_b1_descr">
+		<text>Un iniettore "Generazione B" che introduce periodicamente nel flusso sanguigno un agente coagulante quando la pressione cala notevolmente.</text>
+	</string>
+	<string id="st_up_tch_b1_name">
+		<text>Iniettore di emoglobina "Idra"</text>
+	</string>
+	<string id="st_up_tch_b2_descr">
+		<text>Questo sistema previene l'affaticamento mantenendo la temperatura corporea ottimale.</text>
+	</string>
+	<string id="st_up_tch_b2_name">
+		<text>Installazione di un sistema di regolazione termica</text>
+	</string>
+	<string id="st_up_tch_b3_descr">
+		<text>Questo emettitore di onde da portare costantemente sul petto aumenta notevolmente la velocitа di guarigione delle ferite, la risposta del sistema immunitario e la soglia del dolore dell'utilizzatore.</text>
+	</string>
+	<string id="st_up_tch_b3_name">
+		<text>Biostimolatore "Sole"</text>
+	</string>
+	<string id="st_up_tch_b4_descr">
+		<text>Un dispositivo scientifico a onde sviluppato per le operazioni in aree anomale con psico-emissioni.</text>
+	</string>
+	<string id="st_up_tch_b4_name">
+		<text>Psico-stimolatore "Oracolo"</text>
+	</string>
+	<string id="st_up_tch_c1_descr">
+		<text>Un iniettore "Generazione C" che introduce un insieme di sostanze non meglio identificate nel flusso sanguigno, accelerando la rigenerazione dei tessuti e lenendo il dolore.</text>
+	</string>
+	<string id="st_up_tch_c1_name">
+		<text>Sistema di recupero "Fenice"</text>
+	</string>
+	<string id="st_up_tch_c2_descr">
+		<text>Un sistema integrato che controlla le condizioni di salute dell'utilizzatore, somministrando vitamine, adrenalina e sostanze anaboliche in caso di necessitа.</text>
+	</string>
+	<string id="st_up_tch_c2_name">
+		<text>Installazione di un sistema di supporto vitale</text>
+	</string>
+	<string id="st_up_tch_c3_descr">
+		<text>Questo emettitore di onde va posizionato sul collo. Nonostante il suo funzionamento sia poco chiaro, esercita un potente effetto calmante.</text>
+	</string>
+	<string id="st_up_tch_c3_name">
+		<text>Neurostimolatore "Riflesso"</text>
+	</string>
+	<string id="st_up_usm_a1_descr">
+		<text>Lo scopo del compensatore del cane и quello di assorbire parte del rinculo, migliorando l'efficacia dei colpi multipli durante le raffiche.</text>
+	</string>
+	<string id="st_up_usm_a1_name">
+		<text>Compensatore per il cane dell'otturatore</text>
+	</string>
+	<string id="st_up_usm_a2_descr">
+		<text>Una delle modifiche piщ facili e popolari che consente di ridurre la resistenza del grilletto. Semplice e utile.</text>
+	</string>
+	<string id="st_up_usm_a2_name">
+		<text>Grilletto morbido</text>
+	</string>
+	<string id="st_up_usm_b1_descr">
+		<text>Una selezione speciale di componenti fatti con i vari materiali presenti nell'arma. Non sono affatto economici, ma aumentano la durabilitа dell'arma.</text>
+	</string>
+	<string id="st_up_usm_b1_name">
+		<text>Componenti misti per il meccanismo di fuoco</text>
+	</string>
+	<string id="st_up_usm_b2_descr">
+		<text>Consente di aumentare la cadenza di fuoco, a scapito di precisione e affidabilitа.</text>
+	</string>
+	<string id="st_up_usm_b2_name">
+		<text>Dispositivo ritardante per il grilletto</text>
+	</string>
+	<string id="st_up_usm_b3_descr">
+		<text>La rimozione della molla da battaglia consente di sparare il primo colpo mezzo secondo prima. Non и molto, ma puт salvare la vita.</text>
+	</string>
+	<string id="st_up_usm_b3_name">
+		<text>Rilascio senza molla</text>
+	</string>
+	<string id="st_up_usm_c1_descr">
+		<text>Uno sputter protettivo che rende impossibili i colpi accidentali dovuti a un guasto del meccanismo di fuoco.</text>
+	</string>
+	<string id="st_up_usm_c1_name">
+		<text>Sputter protettivo meccanismo di fuoco</text>
+	</string>
+	<string id="st_up_usm_c2_descr">
+		<text>La rimozione dell'otturatore consente di migliorare la carica automatica, aumentando di conseguenza la cadenza di fuoco dell'arma.</text>
+	</string>
+	<string id="st_up_usm_c2_name">
+		<text>Rimozione dell'otturatore dal meccanismo di fuoco</text>
+	</string>
+	<string id="st_up_usm_c3_descr">
+		<text>Questo sistema privo di impatto perfora il proiettile con un cane speciale invece di colpirlo, rendendo meno violento l'intero processo di fuoco.</text>
+	</string>
+	<string id="st_up_usm_c3_name">
+		<text>Installazione di un meccanismo di fuoco privo di impatto</text>
+	</string>
+	<string id="st_up_usmp_a1_descr">
+		<text>Il grilletto viene armato dal primo colpo, mentre tutti quelli successivi avvengono durante l'innesco automatico del grilletto.</text>
+	</string>
+	<string id="st_up_usmp_a1_name">
+		<text>Meccanismo di fuoco a doppio grilletto</text>
+	</string>
+	<string id="st_up_usmp_b1_descr">
+		<text>Una delle modifiche piщ facili e popolari che consente di ridurre la resistenza del grilletto. Semplice e utile.</text>
+	</string>
+	<string id="st_up_usmp_b1_name">
+		<text>Grilletto morbido</text>
+	</string>
+	<string id="st_up_usmp_b2_descr">
+		<text>L'innesco parziale consente di aumentare la precisione.</text>
+	</string>
+	<string id="st_up_usmp_b2_name">
+		<text>Meccanismo di fuoco a innesco parziale</text>
+	</string>
+	<string id="st_up_usmp_b3_descr">
+		<text>Consente di applicare la stessa pressione al grilletto dal primo all'ultimo colpo, migliorando la facilitа d'uso.</text>
+	</string>
+	<string id="st_up_usmp_b3_name">
+		<text>Dispositivo di rilascio sicuro</text>
+	</string>
+	<string id="st_up_usmp_b4_descr">
+		<text>Una modifica moderna che previene il distacco della sezione dell'otturatore.</text>
+	</string>
+	<string id="st_up_usmp_b4_name">
+		<text>Testa dell'otturatore migliorata</text>
+	</string>
+	<string id="st_up_usmp_b5_descr">
+		<text>Un meccanismo di fuoco modulare che semplifica la manutenzione e la sostituzione delle parti, migliorando al tempo stesso la facilitа d'uso.</text>
+	</string>
+	<string id="st_up_usmp_b5_name">
+		<text>Meccanismo di fuoco modulare</text>
+	</string>
+	<string id="st_up_usmp_c1_descr">
+		<text>Il componente di innesco riduce sensibilmente la quantitа di pressione da applicare sul grilletto, migliorando la precisione.</text>
+	</string>
+	<string id="st_up_usmp_c1_name">
+		<text>Installazione di un componente di innesco</text>
+	</string>
+	<string id="st_up_usmp_c2_descr">
+		<text>Un nuovo ritrovato tecnologico che consente di modificare la modalitа del meccanismo di fuoco con una semplice modifica. Un altro passo in avanti per migliorare l'ergonomia e la facilitа d'uso.</text>
+	</string>
+	<string id="st_up_usmp_c2_name">
+		<text>Modalitа di fuoco doppia</text>
+	</string>
+	<string id="st_up_usmp_c3_descr">
+		<text>Dopo il primo colpo, basta premere il grilletto a metа per sparare i colpi successivi.</text>
+	</string>
+	<string id="st_up_usmp_c3_name">
+		<text>Meccanismo di fuoco a corsa breve</text>
+	</string>
+	<string id="st_up_uti_a1_descr">
+		<text>I dispositivi di movimento aggiuntivi aumentano la capacitа di carico.</text>
+	</string>
+	<string id="st_up_uti_a1_name">
+		<text>Servomotori aggiuntivi</text>
+	</string>
+	<string id="st_up_uti_a2_descr">
+		<text>Il sistema somministra sostanze anti-tetaniche, anti-infiammatorie e antibiotiche.</text>
+	</string>
+	<string id="st_up_uti_a2_name">
+		<text>Sistema integrato "Dottore da campo"</text>
+	</string>
+	<string id="st_up_uti_a3_descr">
+		<text>Un sistema di ventilazione per la tuta con un filtro precauzionale per le operazioni in aree contaminate.</text>
+	</string>
+	<string id="st_up_uti_a3_name">
+		<text>Sistema interno di regolazione termica</text>
+	</string>
+	<string id="st_up_uti_a4_descr">
+		<text>Un miglioramento dell'ergonomia: gli agganci speciali collegati alla tuta riducono il peso percepito dell'equipaggiamento trasportato.</text>
+	</string>
+	<string id="st_up_uti_a4_name">
+		<text>Corpetto per la distribuzione del peso</text>
+	</string>
+	<string id="st_up_uti_a5_descr">
+		<text>Le bombole d'ossigeno sono necessarie nelle zone con l'aria contaminata da particelle chimiche o radioattive.</text>
+	</string>
+	<string id="st_up_uti_a5_name">
+		<text>Installazione di una bombola d'ossigeno</text>
+	</string>
+	<string id="st_up_uti_b1_descr">
+		<text>Installazione di un contenitore di manufatti aggiuntivo.</text>
+	</string>
+	<string id="st_up_uti_b1_name">
+		<text>Contenitore di manufatti aggiuntivo</text>
+	</string>
+	<string id="st_up_uti_b2_descr">
+		<text>Un sistema di agganci che consente di distribuire il peso su tutto il corpo in modo uniforme.</text>
+	</string>
+	<string id="st_up_uti_b2_name">
+		<text>Sistema per la distribuzione del peso</text>
+	</string>
+	<string id="st_up_uti_b3_descr">
+		<text>Un supporto posteriore riduce la concentrazione del peso sulle spalle, distribuendolo in tutto il corpo e aumentando di conseguenza il carico massimo.</text>
+	</string>
+	<string id="st_up_uti_b3_name">
+		<text>Supporto posteriore per la distribuzione del peso </text>
+	</string>
+	<string id="st_up_uti_b4_descr">
+		<text>Un sistema che somministra sostanze antisettiche, anti-tetaniche e stimolanti. Pur essendo artigianale, non sembra avere effetti negativi sull'organismo.</text>
+	</string>
+	<string id="st_up_uti_b4_name">
+		<text>Sistema integrato "Cura"</text>
+	</string>
+	<string id="st_up_uti_b5_descr">
+		<text>Questo sistema carica una griglia speciale con la stessa carica dell'anomalia, riducendone la pericolositа.</text>
+	</string>
+	<string id="st_up_uti_b5_name">
+		<text>Sistema di contromisura elettrostatica "Trigone"</text>
+	</string>
+	<string id="st_up_uti_b6_descr">
+		<text>Lo strato interno impregnato previene la contaminazione chimica.</text>
+	</string>
+	<string id="st_up_uti_b6_name">
+		<text>Strato interno impregnato per protezione chimica</text>
+	</string>
+	<string id="st_up_uti_b7_descr">
+		<text>Modello sperimentale di un sistema di corsa per maratone, non impiegato fuori dalla Zona per via del costo eccessivo e la dubbia utilitа.</text>
+	</string>
+	<string id="st_up_uti_b7_name">
+		<text>Sistema integrato "Atleta"</text>
+	</string>
+	<string id="st_up_uti_b8_descr">
+		<text>Questo sistema rimuove le sostanze tossiche dalle cavitа respiratorie.</text>
+	</string>
+	<string id="st_up_uti_b8_name">
+		<text>Sistema di rimozione sostanze tossiche "Antidoto"</text>
+	</string>
+	<string id="st_up_uti_c1_descr">
+		<text>Installazione di un contenitore di manufatti aggiuntivo.</text>
+	</string>
+	<string id="st_up_uti_c1_name">
+		<text>Contenitore di manufatti a due compartimenti aggiuntivo</text>
+	</string>
+	<string id="st_up_uti_c2_descr">
+		<text>Un sistema di supporto da battaglia integrato nell'intera tuta. Usato raramente, soprattutto dagli Spetsnaz. Include dei sistemi per la somministrazione di adrenalina e la coagulazione del sangue.</text>
+	</string>
+	<string id="st_up_uti_c2_name">
+		<text>Sistema di supporto da campo "Varyag"</text>
+	</string>
+	<string id="st_up_uti_c3_descr">
+		<text>Con questo sistema di supporto da battaglia sperimentale, i progettisti hanno eliminato le pericolose iniezioni di adrenalina, preferendo includere delle sostanze curative nel sistema dedicato alla coagulazione del sangue.</text>
+	</string>
+	<string id="st_up_uti_c3_name">
+		<text>Sistema di supporto da campo "Skif"</text>
+	</string>
+	<string id="st_up_zat_a1_descr">
+		<text>Questa modifica piuttosto costosa и in realtа molto comune nelle armi di nuova generazione.</text>
+	</string>
+	<string id="st_up_zat_a1_name">
+		<text>Installazione di un otturatore massiccio</text>
+	</string>
+	<string id="st_up_zat_a2_descr">
+		<text>L'ispessimento dell'otturatore previene la dissipazione di energia e migliora la stabilitа della traiettoria di tiro.</text>
+	</string>
+	<string id="st_up_zat_a2_name">
+		<text>Ispessimento dell'otturatore con inserti sintetici</text>
+	</string>
+	<string id="st_up_zat_a3_descr">
+		<text>Nonostante il nome, la parte sostituita и quella dell'otturatore, che deve sopportare l'aumento della cadenza di fuoco.</text>
+	</string>
+	<string id="st_up_zat_a3_name">
+		<text>Rilascio automatico rapido</text>
+	</string>
+	<string id="st_up_zat_b1_descr">
+		<text>Oltre allo sfiatatoio per il gas, viene inserito un blocco che si muove alla stessa velocitа, assorbendo parte del rinculo.</text>
+	</string>
+	<string id="st_up_zat_b1_name">
+		<text>Installazione di uno sfiatatoio con blocco mobile</text>
+	</string>
+	<string id="st_up_zat_b2_descr">
+		<text>Un secondo pistone muove il contrappeso per compensare l'impulso generato dal movimento dell'otturatore.</text>
+	</string>
+	<string id="st_up_zat_b2_name">
+		<text>Installazione di un pistone a gas aggiuntivo</text>
+	</string>
+	<string id="st_up_zat_b3_descr">
+		<text>Lo sputter protettivo aumenta l'affidabilitа e, soprattutto, assicura l'ermeticitа, in modo da prevenire un'eccessiva dissipazione di energia.</text>
+	</string>
+	<string id="st_up_zat_b3_name">
+		<text>Sputter protettivo per l'otturatore</text>
+	</string>
+	<string id="st_up_zat_b4_descr">
+		<text>La funzione dei solchi sul castello и quella di ridurre la frizione e raccogliere le particelle piщ piccole, prevenendo la contaminazione della sezione dell'otturatore.</text>
+	</string>
+	<string id="st_up_zat_b4_name">
+		<text>Aggiunta di solchi longitudinali</text>
+	</string>
+	<string id="st_up_zat_b5_descr">
+		<text>La riduzione del diametro della camera del gas mediante addensanti sintetici aumenta notevolmente la velocitа dei proiettili.</text>
+	</string>
+	<string id="st_up_zat_b5_name">
+		<text>Energia del gas concentrata</text>
+	</string>
+	<string id="st_up_zat_b6_descr">
+		<text>Tornando nella posizione iniziale, l'otturatore ridireziona il flusso d'aria attraverso la canna, raffreddandola.</text>
+	</string>
+	<string id="st_up_zat_b6_name">
+		<text>Raffreddamento forzato</text>
+	</string>
+	<string id="st_up_zat_c1_descr">
+		<text>L'otturatore dell'arma scivola lungo la canna, impedendo alla parte anteriore di muoversi verso l'alto.</text>
+	</string>
+	<string id="st_up_zat_c1_name">
+		<text>Installazione di un otturatore scarrellante</text>
+	</string>
+	<string id="st_up_zat_c2_descr">
+		<text>L'installazione di un pistone a gas impedisce ai gas di entrare nella sezione dell'otturatore, migliorando notevolmente la pulizia dell'arma.</text>
+	</string>
+	<string id="st_up_zat_c2_name">
+		<text>Installazione di un pistone a gas</text>
+	</string>
+	<string id="st_up_zat_c3_descr">
+		<text>Questo sistema raccoglie parte dei gas usando la sezione dell'otturatore per migliorarne il movimento.</text>
+	</string>
+	<string id="st_up_zat_c3_name">
+		<text>Sistema di raccolta dell'energia del gas</text>
+	</string>
+	<string id="st_up_zat_c4_descr">
+		<text>Una sostituzione delle parti automatiche che и piщ un'ottimizzazione che un miglioramento del pistone a gas. Aumenta notevolmente la cadenza di fuoco dell'arma.</text>
+	</string>
+	<string id="st_up_zat_c4_name">
+		<text>Pistone a gas a corsa breve</text>
+	</string>
+	<string id="st_up_zat_c5_descr">
+		<text>Un sistema di bloccaggio a rulli che riduce il rinculo e migliora i colpi multipli, usato spesso nelle armi moderne.</text>
+	</string>
+	<string id="st_up_zat_c5_name">
+		<text>Passaggio a un sistema a rulli con otturatore semi-libero</text>
+	</string>
+	<string id="st_up_zath_a1_descr">
+		<text>Assorbendo parte del calore, questi componenti riducono il surriscaldamento dell'arma.</text>
+	</string>
+	<string id="st_up_zath_a1_name">
+		<text>Componenti ad assorbimento termico</text>
+	</string>
+	<string id="st_up_zath_b1_descr">
+		<text>Il movimento piщ lungo del pistone a gas aumenta leggermente la lunghezza dell'arma, migliorando molto la stabilitа della traiettoria di tiro.</text>
+	</string>
+	<string id="st_up_zath_b1_name">
+		<text>Movimento lungo del pistone a gas</text>
+	</string>
+	<string id="st_up_zath_b2_descr">
+		<text>Un tampone per le parti mobili che distribuisce uniformemente il rinculo in tutta l'arma, riducendone gli effetti.</text>
+	</string>
+	<string id="st_up_zath_b2_name">
+		<text>Installazione di un tampone speciale per le parti mobili</text>
+	</string>
+	<string id="st_up_zath_c1_descr">
+		<text>Il raffreddamento forzato simmetrico di una parte della canna avviene grazie a un espulsore, prevenendo il surriscaldamento dell'arma.</text>
+	</string>
+	<string id="st_up_zath_c1_name">
+		<text>Sistema di raffreddamento forzato simmetrico</text>
+	</string>
+	<string id="st_up_zatp_a1_descr">
+		<text>Aumenta la cadenza di fuoco senza sovraccaricare le altre parti con un maggiore rinculo.</text>
+	</string>
+	<string id="st_up_zatp_a1_name">
+		<text>Otturatore mobile</text>
+	</string>
+	<string id="st_up_zatp_b1_descr">
+		<text>Aumenta la stabilitа della traiettoria di tiro migliorando il trasferimento dell'impulso al proiettile.</text>
+	</string>
+	<string id="st_up_zatp_b1_name">
+		<text>Sistema di chiusura della canna nella sezione dell'otturatore</text>
+	</string>
+	<string id="st_up_zatp_b2_descr">
+		<text>Riduce il rinculo rallentando il movimento dell'otturatore.</text>
+	</string>
+	<string id="st_up_zatp_b2_name">
+		<text>Sistema di rallentamento dell'otturatore</text>
+	</string>
+	<string id="st_up_zatp_b3_descr">
+		<text>Lo sputter previene l'usura dell'arma.</text>
+	</string>
+	<string id="st_up_zatp_b3_name">
+		<text>Sputter protettivo per l'otturatore</text>
+	</string>
+	<string id="st_up_zatp_b4_descr">
+		<text>Aumenta la stabilitа della traiettoria di tiro migliorando il trasferimento dell'impulso al proiettile.</text>
+	</string>
+	<string id="st_up_zatp_b4_name">
+		<text>Sistema di chiusura obliqua della canna</text>
+	</string>
+	<string id="st_up_zatp_b5_descr">
+		<text>Un otturatore chiuso e piщ pesante che garantisce il corretto funzionamento dell'intera sezione.</text>
+	</string>
+	<string id="st_up_zatp_b5_name">
+		<text>Otturatore chiuso e rinforzato</text>
+	</string>
+	<string id="st_up_zatp_b6_descr">
+		<text>Un piccolo tampone che assorbe parte del rinculo.</text>
+	</string>
+	<string id="st_up_zatp_b6_name">
+		<text>Tampone anti-rinculo polimerico</text>
+	</string>
+	<string id="st_up_zatp_b7_descr">
+		<text>L'installazione di un inserto in acciaio aiuta a ridurre il rinculo.</text>
+	</string>
+	<string id="st_up_zatp_b7_name">
+		<text>Installazione di un inserto di chiusura con solco a spirale</text>
+	</string>
+	<string id="st_up_zatp_b8_descr">
+		<text>Aumentando il movimento dell'otturatore e rinforzando correttamente il meccanismo di ritorno и possibile migliorare la stabilitа della traiettoria di tiro.</text>
+	</string>
+	<string id="st_up_zatp_b8_name">
+		<text>Aumento del movimento dell'otturatore</text>
+	</string>
+	<string id="st_up_zatp_c1_descr">
+		<text>Il movimento ridotto migliora notevolmente la cadenza di fuoco senza ridurre la stabilitа della traiettoria di tiro.</text>
+	</string>
+	<string id="st_up_zatp_c1_name">
+		<text>Installazione di un limitatore di movimento per l'otturatore</text>
+	</string>
+	<string id="st_up_zatp_c2_descr">
+		<text>Il movimento piщ lungo dell'otturatore applica al proiettile una maggiore energia.</text>
+	</string>
+	<string id="st_up_zatp_c2_name">
+		<text>Installazione di un amplificatore di movimento per l'otturatore</text>
+	</string>
+	<string id="st_up_zatp_c3_descr">
+		<text>Una sostituzione delle parti automatiche che и piщ un'ottimizzazione che un miglioramento del pistone a gas. Aumenta notevolmente la cadenza di fuoco dell'arma.</text>
+	</string>
+	<string id="st_up_zatp_c3_name">
+		<text>Installazione di un dispositivo a corsa breve per il recupero dell'energia</text>
+	</string>
+	<string id="st_up_zatp_c4_descr">
+		<text>L'installazione di questo modulo migliora notevolmente i colpi multipli senza sacrificare la velocitа di fuoco.</text>
+	</string>
+	<string id="st_up_zatp_c4_name">
+		<text>Modulo di ritorno a due molle combinate </text>
+	</string>
+	<string id="st_up_zatp_c5_descr">
+		<text>L'inserimento di fori di compensazione aggiuntivi riduce sensibilmente il rinculo.</text>
+	</string>
+	<string id="st_up_zatp_c5_name">
+		<text>Compensatore di sollevamento della canna integrato</text>
+	</string>
+	<string id="st_up_zatp_c6_descr">
+		<text>Una modernizzazione delle parti automatiche della pistola per il fuoco automatico.</text>
+	</string>
+	<string id="st_up_zatp_c6_name">
+		<text>Modalitа di fuoco totalmente automatica</text>
+	</string>
+	<string id="st_up_zatp_c7_descr">
+		<text>Una modernizzazione delle parti automatiche della pistola per sparare raffiche di tre colpi.</text>
+	</string>
+	<string id="st_up_zatp_c7_name">
+		<text>Modalitа di fuoco con raffica a tre colpi</text>
+	</string>
+	<string id="st_upgr_cost">
+		<text>Costo</text>
+	</string>
+	<string id="st_upgr_disable">
+		<text>Installazione impossibile</text>
+	</string>
+	<string id="st_upgr_installed">
+		<text>Installato</text>
+	</string>
+	<string id="st_upgrade_install">
+		<text>Sei sicuro di voler installare:</text>
+	</string>
+	<string id="st_prop_autolock">
+		<text>Sist. acq. aut. bersaglio</text>
+	</string>
+	<string id="st_prop_autolockscope">
+		<text>Sist. acq. aut. bersaglio</text>
+	</string>
+	<string id="st_prop_scope_5x">
+		<text>Mirino ottico 5.0x</text>
+	</string>
+	<string id="st_prop_scope_6x">
+		<text>Mirino ottico 6.0x</text>
+	</string>
+	<string id="st_prop_scanner">
+		<text>Scanner a infrarossi</text>
+	</string>
+	<string id="st_prop_weightoutfit">
+		<text>Peso dell'armatura</text>
+	</string>
+	<string id="st_prop_night_vision_2">
+		<text>Visore notturno 2a gen.</text>
+	</string>
+	<string id="st_prop_night_vision_3">
+		<text>Visore notturno 3a gen.</text>
+	</string>
+	<string id="st_prop_scope_attach">
+		<text>Aggancio mirino ottico</text>
+	</string>
+	<string id="st_int_silencer">
+		<text>Silenziatore integrato</text>
+	</string>
+	<string id="st_prop_grenade_launcher">
+		<text>Lanciagranate sottocanna</text>
+	</string>
+	<string id="st_prop_restore_bleeding">
+		<text>Guarigione ferite</text>
+	</string>
+	<string id="st_prop_restore_health">
+		<text>Ripristino salute</text>
+	</string>
+	<string id="st_prop_night_vision">
+		<text>Visore notturno 1a gen.</text>
+	</string>
+	<string id="st_prop_scope">
+		<text>Ottica regolabile</text>
+	</string>
+	<string id="st_prop_contrast">
+		<text>Ottica ad alto contrasto</text>
+	</string>
+	<string id="st_prop_sprint">
+		<text>Potenziatori servomotore </text>
+	</string>
+	<string id="st_prop_durability">
+		<text>Durabilitа della tuta</text>
+	</string>
+	<string id="st_gauss_cannot_be_repaired">
+		<text>Non и chiaro come funzioni quest'arma. Non puт essere riparata senza maggiori informazioni sulla sua progettazione.</text>
+	</string>
+	<string id="st_upgr_cant_do">
+		<text>Il tecnico non puт eseguire questa modifica</text>
+	</string>
+	<string id="st_upgr_group">
+		<text>Questa parte и giа stata modificata</text>
+	</string>
+	<string id="st_upgr_enough_money">
+		<text>Denaro insufficiente</text>
+	</string>
+	<string id="st_no_buck">
+		<text>Non usa i colpi</text>
+	</string>
+	<string id="st_auto_fire">
+		<text>Modalitа fuoco automatico</text>
+	</string>
+	<string id="st_semi_auto_fire">
+		<text>Mod. fuoco raff. 3 colpi</text>
+	</string>
+	<string id="st_prop_artefact">
+		<text>Numero di contenitori</text>
+	</string>
+	<string id="st_upgr_vodka">
+		<text>al tecnico serve della vodka</text>
+	</string>
+	<string id="st_upgr_toolkit_1">
+		<text>al tecnico servono gli strumenti per il lavoro di base</text>
+	</string>
+	<string id="st_upgr_toolkit_2">
+		<text>al tecnico servono gli strumenti per il lavoro di precisione</text>
+	</string>
+	<string id="st_upgr_toolkit_3">
+		<text>al tecnico servono gli strumenti per la calibrazione</text>
+	</string>
+	<string id="st_upgr_condlist">
+		<text>al tecnico servono maggiori informazioni</text>
+	</string>
+	<string id="st_upgr_parents">
+		<text>sono necessarie modifiche precedenti</text>
+	</string>
+	<string id="st_up_arm_c9_name">
+		<text>Rivestimento protettivo "Armadillo", basato su zaffiri</text>
+	</string>
+	<string id="st_up_arm_c5_name">
+		<text>Matrice rinforzata in titanio e berillio</text>
+	</string>
+	<string id="st_up_arm_c7_name">
+		<text>Rivestimento extra in fibra di carbonio</text>
+	</string>
+	<string id="st_up_kom_a5_name">
+		<text>Strato inferiore in tessuto gommato</text>
+	</string>
+</string_table>

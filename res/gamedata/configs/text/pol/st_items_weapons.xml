@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="ammo-11.43x23-fmj">
+		<text>Naboje .45 ACP</text>
+	</string>
+	<string id="ammo-11.43x23-fmj_descr">
+		<text>Naboje peіnopіaszczowe kalibru .45 ciesz№ siк popularnoњci№ od ponad stu lat, co zawdziкczaj№ duїemu ciкїarowi kuli i stosunkowo maіemu іadunkowi miotaj№cemu. Skutkuje to tym, їe pocisk jest relatywnie wolny, ale bardzo precyzyjny i zapewnia znaczn№ moc obalaj№c№.</text>
+	</string>
+	<string id="ammo-11.43x23-fmj_s">
+		<text>.45 ACP</text>
+	</string>
+	<string id="ammo-11.43x23-hydro">
+		<text>Naboje Hydroshock .45 ACP</text>
+	</string>
+	<string id="ammo-11.43x23-hydro_descr">
+		<text>Te niezwykіe naboje ACP kalibru .45 to okryte pіaszczem, kule z miкkkim czubkiem i rozszerzaj№c№ siк pust№ czкњci№ i stalowym rdzeniem, ktуre і№cz№ w sobie zarуwno wady, jak i zalety peіnopіaszczowych, ekspansywnych kul z miкkkim czubkiem oraz naboi przeciwpancernych.</text>
+	</string>
+	<string id="ammo-11.43x23-hydro_s">
+		<text>.45 Hydro</text>
+	</string>
+	<string id="ammo-12x70-buck">
+		<text>Naboje њrutowe 12x70</text>
+	</string>
+	<string id="ammo-12x70-buck_descr">
+		<text>Standardowe naboje kalibru 12 wypeіnione 6-milimetrowym њrutem. Zabуjcze na krуtki dystans. Nadaj№ siк tylko do broni gіadkolufowej.</text>
+	</string>
+	<string id="ammo-12x70-buck_s">
+		<text>Њrutowe 12x70</text>
+	</string>
+	<string id="ammo-12x76-zhekan">
+		<text>Naboje kulowe 12x76</text>
+	</string>
+	<string id="ammo-12x76-zhekan_descr">
+		<text>Te ciкїkie kule kalibru 12 s№ zwykle uїywane do іowуw na grubego zwierza, ale nadaj№ siк teї do innych celуw. Zamiast przebijaж pancerz, po prostu go miaїdї№.</text>
+	</string>
+	<string id="ammo-12x76-zhekan_s">
+		<text>Kulowe 12x76</text>
+	</string>
+	<string id="ammo-5.45x39-ap">
+		<text>Naboje 5.45x39 mm AP</text>
+	</string>
+	<string id="ammo-5.45x39-ap_descr">
+		<text>Wojskowe naboje przeciwpancerne 5.45x39 7H22 s№ uїywane w karabinach automatycznych w krajach Ukіadu Warszawskiego. Kula zawiera element przeciwpancerny z twardego stopu. Skuteczne przeciw kamizelkom kuloodpornym.</text>
+	</string>
+	<string id="ammo-5.45x39-ap_s">
+		<text>5.45x39 AP</text>
+	</string>
+	<string id="ammo-5.45x39-fmj">
+		<text>Naboje 5.45x39</text>
+	</string>
+	<string id="ammo-5.45x39-fmj_descr">
+		<text>Ulepszone wojskowe naboje przeciwpancerne 5.45x39 7H10 uїywane w karabinach automatycznych w krajach Ukіadu Warszawskiego. Dziкki zmniejszonemu odrzutowi i o sto metrуw dіuїszemu dystansowi raїenia s№ bardziej precyzyjne niї naboje kalibru 7.62.</text>
+	</string>
+	<string id="ammo-5.45x39-fmj_s">
+		<text>5.45x39</text>
+	</string>
+	<string id="ammo-5.56x45-ap">
+		<text>Naboje 5.564x5 mm AP</text>
+	</string>
+	<string id="ammo-5.56x45-ap_descr">
+		<text>Popularne w wojskach NATO naboje przeciwpancerne kalibru 5.564x5, znane pod symbolem SS190/M855, czкsto uїywane przez zachodnie agencje bezpieczeсstwa i sіuїby specjalne. Skuteczne przeciw kamizelkom kuloodpornym.</text>
+	</string>
+	<string id="ammo-5.56x45-ap_s">
+		<text>5.564x5 mm AP</text>
+	</string>
+	<string id="ammo-5.56x45-ss190">
+		<text>Naboje 5.454x5 mm</text>
+	</string>
+	<string id="ammo-5.56x45-ss190_descr">
+		<text>Standardowe naboje NATO 5.564x5 zaprojektowane specjalnie do precyzyjnego ostrzaіu automatycznego. Poniewaї s№ wzorowane na amunicji myњliwskiej, posiadaj№ dobre parametry balistyczne. Powszechnie znane pod symbolem SS109.</text>
+	</string>
+	<string id="ammo-5.56x45-ss190_s">
+		<text>5.564x5</text>
+	</string>
+	<string id="ammo-7.62x54-7h14">
+		<text>Naboje 7.62x54 mm 7H1</text>
+	</string>
+	<string id="ammo-7.62x54-7h14_descr">
+		<text>Naboje kalibru 7.62 do karabinu snajperskiego, wyposaїone w stalowy element przebijaj№cy zaprojektowany specjalnie do SWD. W przeciwieсstwie do amunicji karabinуw maszynowych, 7H1 charakteryzuje siк silnym skupieniem i znakomit№ zdolnoњci№ penetracji.</text>
+	</string>
+	<string id="ammo-7.62x54-7h14_s">
+		<text>7.62 7H1</text>
+	</string>
+	<string id="ammo-7.62x54-ap">
+		<text>Naboje 7.62x54 mm PP</text>
+	</string>
+	<string id="ammo-7.62x54-ap_descr">
+		<text>Tanie naboje 7.62 do karabinu maszynowego. Nie nadaj№ siк do karabinуw snajperskich, s№ wiкc uїywane tylko w karabinach maszynowych RP-74.</text>
+	</string>
+	<string id="ammo-7.62x54-ap_s">
+		<text>7.62x54 PP</text>
+	</string>
+	<string id="ammo-9x18-fmj">
+		<text>Naboje 9x18 mm</text>
+	</string>
+	<string id="ammo-9x18-fmj_descr">
+		<text>Naboje peіnopіaszczowe ze stalowym elementem przebijaj№cym i oіowianym rdzeniem. Maj№ dobr№ moc obalaj№c№, ale s№ nieskuteczne przeciw kamizelkom kuloodpornym.</text>
+	</string>
+	<string id="ammo-9x18-fmj_s">
+		<text>9x18</text>
+	</string>
+	<string id="ammo-9x18-pmm">
+		<text>Naboje 9x18 mm +P+</text>
+	</string>
+	<string id="ammo-9x18-pmm_descr">
+		<text>S№ to naboje ze zwiкkszona moc№ obalaj№c№, a europejskie oznaczenie +P+ wskazuje na „amunicjк o zwiкkszonym ciњnieniu gazуw prochowych" z 30% zwiкkszeniem prкdkoњci wylotowej. Nieskuteczne przeciw kamizelkom kuloodpornym.</text>
+	</string>
+	<string id="ammo-9x18-pmm_s">
+		<text>9x18 +P+ </text>
+	</string>
+	<string id="ammo-9x19-fmj">
+		<text>Naboje 9x19 mm FMJ</text>
+	</string>
+	<string id="ammo-9x19-fmj_descr">
+		<text>Podstawowe naboje pіaszczowe kalibru 9x19 і№cz№ zadowalaj№c№ skutecznoњж z іatwoњci№ produkcji. S№ popularne ze wzglкdu na to, їe konwencje miкdzynarodowe zakazuj№ uїywania amunicji ekspansywnej w dziaіaniach wojennych. Nieskuteczne przeciw kamizelkom kuloodpornym.</text>
+	</string>
+	<string id="ammo-9x19-fmj_s">
+		<text>9x19 FMJ</text>
+	</string>
+	<string id="ammo-9x19-pbp">
+		<text>Naboje 9x19 mm JHP</text>
+	</string>
+	<string id="ammo-9x19-pbp_descr">
+		<text>Te pіaszczowe kule kalibru 9x19 z ekspansywnym wgікbieniem czubkowym zapewniaj№ duї№ moc obalaj№c№ i maіe prawdopodobieсstwo rykoszetu. S№ uїywane przez policjк i w samoobronie. Ze wzglкdu na niski potencjaі penetracyjny nieskuteczne przeciw kamizelkom kuloodpornym.</text>
+	</string>
+	<string id="ammo-9x19-pbp_s">
+		<text>9x19 JHP</text>
+	</string>
+	<string id="ammo-9x39-ap">
+		<text>Naboje 9x39 mm SP-6</text>
+	</string>
+	<string id="ammo-9x39-ap_descr">
+		<text>SP-6 to poddџwiкkowe naboje do karabinуw szturmowych, pіaszczowe, z miкkkim czubkiem i twardym stalowym rdzeniem, ktуry wystaje z obudowy. Ciche strzelanie wymaga tіumika. Uїywane przez sіuїby specjalne w krajach Ukіadu Warszawskiego. Skuteczne przeciw kamizelkom kuloodpornym.</text>
+	</string>
+	<string id="ammo-9x39-ap_s">
+		<text>9x39 SP-6</text>
+	</string>
+	<string id="ammo-9x39-pab9">
+		<text>Naboje 9x39 mm SP-5</text>
+	</string>
+	<string id="ammo-9x39-pab9_descr">
+		<text>SP-5 to poddџwiкkowe naboje do karabinуw snajperskich z dwumetaliczn№ obudow№. Zawieraj№ stalowy rdzeс, za ktуrym znajduje siк przestrzeс wypeіniona oіowiem. Ciche strzelanie wymaga tіumika. Uїywane przez sіuїby specjalne w krajach Ukіadu Warszawskiego.</text>
+	</string>
+	<string id="ammo-9x39-pab9_s">
+		<text>9x39 mm SP-5</text>
+	</string>
+	<string id="ammo-gauss">
+		<text>Baterie</text>
+	</string>
+	<string id="ammo-m209">
+		<text>Granat M203</text>
+	</string>
+	<string id="ammo-m209_descr">
+		<text>Granat 40 mm do granatnika podwieszanego M203. Ten pocisk jest zabуjczy w promieniu 5 metrуw. Nadaje siк takїe do zintegrowanego granatnika FT-200M.</text>
+	</string>
+	<string id="ammo-m209_s">
+		<text>M203</text>
+	</string>
+	<string id="ammo-og-7b">
+		<text>Gіowica bojowa OG-7V</text>
+	</string>
+	<string id="ammo-og-7b_descr">
+		<text>Odіamkowa, przeciwpiechotna gіowica bojowa uїywana w granatnikach RPG-7u. Wykorzystuje siк j№ przede wszystkim do zabijania wrogуw znajduj№cych siк poza zasiкgiem granatуw rкcznych.</text>
+	</string>
+	<string id="ammo-og-7b_s">
+		<text>OG-7V</text>
+	</string>
+	<string id="ammo-vog-25">
+		<text>Granat VOG-25</text>
+	</string>
+	<string id="ammo-vog-25_descr">
+		<text>Zwykіy granat odіamkowy do granatnika podwieszanego GP-25 Koster. Ten pocisk jest zabуjczy w promieniu 5 metrуw. Granat VOG-25 jest teї uїywany w karabinie Grom S14 i w granatnikach rewolwerowych typu Buldog-6.</text>
+	</string>
+	<string id="ammo-vog-25_s">
+		<text>VOG-25</text>
+	</string>
+	<string id="st_addon_scope">
+		<text>Celownik PSO-1m</text>
+	</string>
+	<string id="st_addon_scope_descr">
+		<text>Popularny radziecki celownik optyczny ze staіym przybliїeniem 5x ze skal№ zasiкgu. Przyczepia siк go do broni za pomoc№ standardowej w krajach Ukіadu Warszawskiego szyny „jaskуіczy ogon”.</text>
+	</string>
+	<string id="st_addon_scope_detector">
+		<text>Celownik PSS-2x</text>
+	</string>
+	<string id="st_addon_scope_detector_descr">
+		<text>Celownik optyczny ze staіym przybliїeniem 5x i wbudowanym czujnikiem ciepіa, uїywanym do wykrywania џrуdeі ciepіa charakterystycznych dla ludzkiego ciaіa. Zaprojektowany dla siі specjalnych. Przyczepia siк go do broni za pomoc№ szyny „jaskуіczy ogon".</text>
+	</string>
+	<string id="st_addon_scope_night_vision">
+		<text>Celownik NSPU-3</text>
+	</string>
+	<string id="st_addon_scope_night_vision_descr">
+		<text>Celownik ze staіym przybliїeniem 5x i wzmacniaj№cym obraz noktowizorem, przeznaczony do walki w ciemnoњci. Przyczepia siк go do broni za pomoc№ szyny „jaskуіczy ogon"</text>
+	</string>
+	<string id="st_addon_scope_susat">
+		<text>Celownik SUSAT x4</text>
+	</string>
+	<string id="st_addon_scope_susat_custom_descr">
+		<text>Celownik ze zmiennym przybliїeniem 1.6-4x, ktуry wykorzystuje sterowanie automatyczne do zapewnienia wiкkszej skutecznoњci ostrzaіu. Przyczepia siк go do broni za pomoc№ standardowej w NATO szyny Picatinny.</text>
+	</string>
+	<string id="st_addon_scope_susat_descr">
+		<text>Celownik ze staіym przybliїeniem 4x, produkowany gіуwnie na Zachodzie. Przyczepia siк go do broni za pomoc№ standardowej w NATO szyny Picatinny. Czкsto uїywany w celu zwiкkszenia precyzyjnoњci broni strzeleckiej na њrednim i dіugim dystansie.</text>
+	</string>
+	<string id="st_addon_scope_susat_dusk">
+		<text>Celownik SUSAT Zmrok x1.6</text>
+	</string>
+	<string id="st_addon_scope_susat_dusk_descr">
+		<text>Optyczny celownik z podwyїszonym kontrastem SUSAT 1.6x do walki w warunkach ograniczonego oњwietlenia. Przyczepia siк go do broni za pomoc№ standardowej w NATO szyny Picatinny.</text>
+	</string>
+	<string id="st_addon_scope_susat_night_vision">
+		<text>Celownik SUSAT Noc x4</text>
+	</string>
+	<string id="st_addon_scope_susat_night_vision_descr">
+		<text>Celownik optyczny ze staіym przybliїeniem 4x i noktowizorem do walki w ciemnoњci i na dіugi dystans. Przyczepia siк go do broni za pomoc№ standardowej w NATO szyny Picatinny.</text>
+	</string>
+	<string id="st_addon_scope_susat_x1.6">
+		<text>Celownik SUSAT 1.6x</text>
+	</string>
+	<string id="st_addon_scope_susat_x1.6_descr">
+		<text>Celownik optyczny 1.6x do walki na krуtki i њredni dystans. Przyczepia siк go do broni za pomoc№ standardowej w NATO szyny Picatinny.</text>
+	</string>
+	<string id="st_addon_scope_x2.7">
+		<text>Celownik PSU-1</text>
+	</string>
+	<string id="st_addon_scope_x2.7_descr">
+		<text>Celownik optyczny z przybliїeniem 2.7x, idealny do walki w warunkach miejskich na њrednim dystansie. Przyczepia siк go do broni za pomoc№ szyny „jaskуіczy ogon”. </text>
+	</string>
+	<string id="st_addon_silencer">
+		<text>Tіumik</text>
+	</string>
+	<string id="st_addon_silencer_descr">
+		<text>Skuteczny tіumik, ktуry moїna na bieї№co modyfikowaж zaleїnie od potrzeb. Czкњж wokуі lufy to rolka solidnej mosiкїnej siatki, a element przedni to zestaw metalowych przesіon z otworami, przez ktуre maj№ przechodziж kule. Komplet zawiera teї adaptery i uszczelki dla wiкkszoњci broni. Zazwyczaj uїywa siк go do przerzedzenia szeregуw wroga bez przyci№gania jego uwagi.</text>
+	</string>
+	<string id="st_grenade_f1">
+		<text>Granat F1</text>
+	</string>
+	<string id="st_grenade_f1_descr">
+		<text>Obronny granat rкczny, ktуrego odіamki mog№ przebiж њredniej klasy kamizelkк kuloodporn№. Jest zabуjczy w promieniu 7 metrуw. Stalkerzy zdobywaj№ granaty F1 dziкki handlowi z wojskiem, ktуre skreњla je jako uїywane do walki z mutantami.</text>
+	</string>
+	<string id="st_grenade_launcher">
+		<text>GP-25 Koster</text>
+	</string>
+	<string id="st_grenade_launcher_descr">
+		<text>Jednostrzaіowy, іadowany od przodu, podwieszany granatnik do karabinуw szturmowych, produkowany w krajach Ukіadu Warszawskiego. Posiada samonapinaj№cy mechanizm strzelaj№cy z rкczn№ zapadk№ zabezpieczaj№c№ i automatyczn№ blokad№ strzaіu na wypadek nieprawidіowego zamocowania na karabinie. Uїywa granatуw VOG-25.</text>
+	</string>
+	<string id="st_grenade_launcher_m203">
+		<text>M203</text>
+	</string>
+	<string id="st_grenade_launcher_m203_descr">
+		<text>Zmodyfikowany, skrуcony o 8 cm granatnik M203, przyczepiany do broni za pomoc№ szyny Picatinny. Dziкki zmienionemu umocowaniu granatnik ten jest powszechnie uїywany na caіym њwiecie.</text>
+	</string>
+	<string id="st_grenade_rgd5">
+		<text>Granat RGD-5</text>
+	</string>
+	<string id="st_grenade_rgd5_descr">
+		<text>Ofensywny granat rкczny, zabуjczy w promieniu 5 metrуw. Ze wzglкdu na stosunkowo nisk№ cenк czкsto uїywany przez stalkerуw do „wykurzania" mutantуw.</text>
+	</string>
+	<string id="st_grenade_smoke">
+		<text>Granat dymny</text>
+	</string>
+	<string id="st_grenade_smoke_descr">
+		<text>Rкczny granat dymny. Uїywany do tworzenia zasіon dymnych, ktуre powstaj№ w ci№gu 10 sekund po rzuceniu granatu.</text>
+	</string>
+	<string id="st_knife">
+		<text>Nуї</text>
+	</string>
+	<string id="st_wpn_abakan">
+		<text>AC-96/2</text>
+	</string>
+	<string id="st_wpn_ak74">
+		<text>AKM-74/2</text>
+	</string>
+	<string id="st_wpn_ak74u">
+		<text>AKM-74/2U</text>
+	</string>
+	<string id="st_wpn_beretta">
+		<text>Martha</text>
+	</string>
+	<string id="st_wpn_bm16">
+		<text>Obrzyn</text>
+	</string>
+	<string id="st_wpn_bm16_descr">
+		<text>Dubeltowa strzelba myњliwska ze skrуcon№ luf№, lїejsza i mniejsza niї zwykіa strzelba. Jedna z najpopularniejszych broni bandytуw, ktуrzy ceni№ іatwoњж jej ukrycia i ogromn№ skutecznoњж w walce w zwarciu.</text>
+	</string>
+	<string id="st_wpn_colt1911">
+		<text>Kora-920</text>
+	</string>
+	<string id="st_wpn_desert_eagle_nimble">
+		<text>Stepowy Orzeі</text>
+	</string>
+	<string id="st_wpn_desert_eagle_nimble_descr">
+		<text>Pistolet rкcznej roboty oparty na projekcie Czarnego Orіa. Jego elementy s№ precyzyjnie dopasowane, dziкki czemu jest on niesamowicie precyzyjny jak na broс rкczn№ tego typu.</text>
+	</string>
+	<string id="st_wpn_eagle">
+		<text>Czarny Orzeі</text>
+	</string>
+	<string id="st_wpn_fn2000">
+		<text>FT-200M</text>
+	</string>
+	<string id="st_wpn_fort">
+		<text>Fora-12</text>
+	</string>
+	<string id="st_wpn_g36">
+		<text>GP37</text>
+	</string>
+	<string id="st_wpn_gauss">
+		<text>Karabin Gaussa</text>
+	</string>
+	<string id="st_wpn_groza">
+		<text>Grom S14</text>
+	</string>
+	<string id="st_wpn_groza_descr">
+		<text>Ten poі№czony z granatnikiem karabin szturmowy, podobny do serii AKM, zaprojektowano specjalnie dla jednostek szybkiego reagowania. Gіуwne rуїnice to amunicja kalibru 9x39, budowa bezkolbowa i duїe moїliwoњci konfiguracji. Broс wysoko ceniona przez stalkerуw wojskowych ze wzglкdu na moїliwoњж zabicia z niej z duїej odlegіoњci wroga w kamizelce kuloodpornej, oraz za ogromn№ moc obalaj№c№.</text>
+	</string>
+	<string id="st_wpn_groza_nimble">
+		<text>Burza</text>
+	</string>
+	<string id="st_wpn_groza_nimble_descr">
+		<text>Ta broс to eksperymentalna wersja poі№czenia karabinu szturmowego i granatnika, rosyjska modyfikacja standardowego Gromu S14, zaprojektowana specjalnie dla jednostek dziaіaj№cych w Zonie. Ceniona za zwiкkszona pojemnoњж magazynka.</text>
+	</string>
+	<string id="st_wpn_hpsa">
+		<text>HPSS-1m</text>
+	</string>
+	<string id="st_wpn_hpsa_descr">
+		<text>Zmodyfikowany pistolet z pierwszej poіowy XX w., rуwnie potкїny, niezawodny i celny, jak oryginaі. Pistolety z tej serii sіusznie ciesz№ siк reputacj№ najlepszej broni palnej XX w., a w Zonie panuje na nie ogromny popyt.</text>
+	</string>
+	<string id="st_wpn_l85">
+		<text>IL 86</text>
+	</string>
+	<string id="st_wpn_lr300">
+		<text>TRs 301</text>
+	</string>
+	<string id="st_wpn_mp5">
+		<text>Їmija 5</text>
+	</string>
+	<string id="st_wpn_mp5_descr">
+		<text>Ten pistolet maszynowy zyskaі њwiatow№ popularnoњж dziкki swej niezawodnoњci, іatwoњci obsіugi i celnoњci. Przez ostatnie kilka dziesiкcioleci Їmija 5 byіa uїywana przez specjalne siіy zbrojne i policyjne na caіym њwiecie. Nic wiкc dziwnego, їe po zalaniu globalnego czarnego rynku, trafiіa w koсcu do Zony.</text>
+	</string>
+	<string id="st_wpn_mp5_nimble">
+		<text>Przecinak</text>
+	</string>
+	<string id="st_wpn_mp5_nimble_descr">
+		<text>Prototyp pistoletu maszynowego oparty na znakomitej Їmii 5. Zaprojektowany jako broс nowej generacji do walki w zwarciu, charakteryzuje siк wiкkszym kalibrem, szybkoњci№ ogniow№ i celnoњci№.</text>
+	</string>
+	<string id="st_wpn_pb">
+		<text>PB-1s</text>
+	</string>
+	<string id="st_wpn_pkm_zulus">
+		<text>RP-74 Zulusa</text>
+	</string>
+	<string id="st_wpn_pkm_zulus_descr">
+		<text>Ta broс naleїaіa do Zulusa. Posiada kilka wyj№tkowych cech, miкdzy innymi zwiкkszony pojemnik na amunicjк i wyj№tkowo niezawodny mechanizm retrakcyjny. Modyfikacje zwiкkszyіy ciкїar broni, ale dla poprzedniego wіaњciciela nie stanowiіo to problemu.</text>
+	</string>
+	<string id="st_wpn_pm">
+		<text>PMm</text>
+	</string>
+	<string id="st_wpn_pm_actor">
+		<text>Honorowy PMm</text>
+	</string>
+	<string id="st_wpn_pm_actor_descr">
+		<text>Bardzo stary PMm, ktуry Diegtiariow otrzymaі w nagrodк „za pomyњlne wykonanie wysoce niebezpiecznych rozkazуw paсstwowych oraz za odwagк i mкstwo okazane podczas peіnienia obowi№zkуw sіuїbowych”.</text>
+	</string>
+	<string id="st_wpn_protecta">
+		<text>Eliminator</text>
+	</string>
+	<string id="st_wpn_rg6">
+		<text>Buldog-6</text>
+	</string>
+	<string id="st_wpn_rg6_descr">
+		<text>Ten rewolwerowy granatnik posiada szeњж іadowanych od przodu luf, identycznych z elementami granatnika podwieszanego. Bкben rуwnieї іaduje siк od przodu. Jest powszechnie uїywany do ostrzaіu zaporowego pozycji wroga, a na otwartej przestrzeni do atakowania bronionych, nieruchomych celуw lub do walki z wyj№tkowo groџnymi potworami.</text>
+	</string>
+	<string id="st_wpn_rp">
+		<text>RP-75</text>
+	</string>
+	<string id="st_wpn_rp_descr">
+		<text>Ten іadowany taњmowo karabin maszynowy to przenoњna wersja ze zіoїonym, dwuetapowym systemem іadowania. Mimo їe jest ciкїki i maіo celny, znalazі w Zonie grono zwolennikуw. Uїywa siк go gіуwnie do walki z przewaїaj№cymi siіami wroga podczas konfliktуw frakcji i do oczyszczania siedzib mutantуw.</text>
+	</string>
+	<string id="st_wpn_rpg7">
+		<text>RPG-7u</text>
+	</string>
+	<string id="st_wpn_sig220">
+		<text>SIP-t M200</text>
+	</string>
+	<string id="st_wpn_sig220_nimble">
+		<text>Alpine</text>
+	</string>
+	<string id="st_wpn_sig220_nimble_descr">
+		<text>Unikalny model broni palnej SIP-t M200. Czкњж maіej, limitowanej serii wykonanej dla niezidentyfikowanej jednostki siі specjalnych. Charakteryzuje siк zwiкkszon№ pojemnoњci№ magazynka, bardzo wytrzymaі№ stalow№ luf№ i niezwykle odporn№ polimerow№ komor№. </text>
+	</string>
+	<string id="st_wpn_sig550">
+		<text>SGI-5k</text>
+	</string>
+	<string id="st_wpn_sig550_descr">
+		<text>Stosunkowo nowy karabin szturmowy, ktуry mimo „niemodnego” wygl№du szybko znalazі zwolennikуw na caіym њwiecie. Bronie z tej serii naleї№ do najlepszych w swojej klasie, s№ znane z niezawodnoњci, celnoњci i іatwoњci obsіugi. Mimo їe ten karabin jest relatywnie trudno zdobyж w Zonie, doњwiadczeni stalkerzy czкsto zamawiaj№ go nie bacz№c na wysoki koszt.</text>
+	</string>
+	<string id="st_wpn_sig550_strelok">
+		<text>SGI-5k Strieіoka</text>
+	</string>
+	<string id="st_wpn_sig550_strelok_descr">
+		<text>Szwedzki karabin szturmowy SGI-5k. Chociaї trudno go nazwaж nowym, widaж, їe poprzedni wіaњciciel dobrze o niego dbaі: broс zostaіa rozebrana, a potem zіoїona ponownie, po tym jak zoptymalizowano dziaіanie kaїdego elementu, zwiкkszaj№c moc obalaj№c№. Na kolbie wyryto literк „S" i 16 maіych kresek.</text>
+	</string>
+	<string id="st_wpn_spas12">
+		<text>SPSA-14 </text>
+	</string>
+	<string id="st_wpn_spas12_m2">
+		<text>SPSA-AUT</text>
+	</string>
+	<string id="st_wpn_spas12_m2_descr">
+		<text>Strzelba SPSA-AUT z samonapinaj№cym mechanizmem strzelaj№cym powstaje wyі№cznie w warsztatach Powinnoњci. Ta broс jest przeznaczona do walki z duїymi grupami mutantуw. Ulepszony mechanizm іaduj№cy zapewnia duї№ szybkoњж strzaіu, a pojemnoњж magazynka zwiкkszono do 10. Strzela nabojami kalibru 12x70.</text>
+	</string>
+	<string id="st_wpn_spas12_nimble">
+		<text>Karabinier</text>
+	</string>
+	<string id="st_wpn_spas12_nimble_descr">
+		<text>Strzelba wojskowa zaprojektowana specjalnie dla jednostek szturmowych na bazie SPSA-14. Tak jak jej poprzednik moїe strzelaж automatycznie, ale dziкki zrуwnowaїonemu systemowi bezwstrz№sowemu lepiej radzi sobie z odrzutem.</text>
+	</string>
+	<string id="st_wpn_svd">
+		<text>SWDm-2</text>
+	</string>
+	<string id="st_wpn_svd_descr">
+		<text>Wojskowy karabin snajperski obecny na rynku od ponad 50 lat i ceniony za wyj№tkow№ niezawodnoњж i іatwoњж obsіugi. SWDm-2 jest uїywany przez wojsko w celu zwiкkszenia skutecznego zasiкgu ich jednostek, ale stalkerzy szanuj№ tк broс za zdolnoњж przebijania pancerzy, dziкki ktуrej pokonuje zarуwno skуrк mutantуw, jak i kamizelki kuloodporne.</text>
+	</string>
+	<string id="st_wpn_svd_nimble">
+		<text>Ryњ</text>
+	</string>
+	<string id="st_wpn_svd_nimble_descr">
+		<text>Rкcznie skіadana wersja karabinu snajperskiego SWDm-2. Nie rуїni siк od niego wygl№dem, ale zapewnia idealne poі№czenie celnoњci i mocy obalaj№cej.</text>
+	</string>
+	<string id="st_wpn_svu">
+		<text>SWUmk-2</text>
+	</string>
+	<string id="st_wpn_svu_nimble">
+		<text>SWU2-A</text>
+	</string>
+	<string id="st_wpn_svu_nimble_descr">
+		<text>Ten skrуcony karabin snajperski ze zwiкkszon№ szybkoњci№ strzaіu to kolejny etap ewolucji karabinu snajperskiego SWUmk-2. Ta broс naleїaіa do Maksa, legendarnego straїnika Wolnoњci.</text>
+	</string>
+	<string id="st_wpn_toz34">
+		<text>Strzelba myњliwska</text>
+	</string>
+	<string id="st_wpn_toz34_descr">
+		<text>Ta niezwykle popularna strzelba myњliwska typu „bok" zapewnia lepsz№ obronк przed mutantami niї pistolet - jest bardziej precyzyjna i ma wiкksz№ moc obalaj№c№. Uїywana gіуwnie przez nowicjuszy na obrzeїach Zony.</text>
+	</string>
+	<string id="st_wpn_umirotvoritel">
+		<text>Niezidentyfikowana broс</text>
+	</string>
+	<string id="st_wpn_umirotvoritel_descr">
+		<text>Nieznana broс, ktуrej mechanizm ogniowy nie zostaі zidentyfikowany. Wydaje siк uszkodzona - po naciњniкciu spustu nic siк nie dzieje.</text>
+	</string>
+	<string id="st_wpn_usp">
+		<text>UDP Compact</text>
+	</string>
+	<string id="st_wpn_usp_descr">
+		<text>Najznakomitsze cechy tej broni to absolutna niezawodnoњж i wytrzymaіoњж poі№czone z wyborn№ celnoњci№. Do drobnych wad naleї№ jej znaczne rozmiary, stosunkowo wysoko poіoїony њrodek ciкїkoњci i masywny zamek, co czyni j№ trudn№ do ukrycia, ale to wci№ї za maіo by przesіoniж jej liczne zalety. Broс ta jest szczegуlnie popularna wњrуd weteranуw Zony.</text>
+	</string>
+	<string id="st_wpn_usp_nimble">
+		<text>Marsz</text>
+	</string>
+	<string id="st_wpn_usp_nimble_descr">
+		<text>Maіy, wielkokalibrowy pistolet z krуtkim ruchem zamka i jego lekkim mechanizmem montaїowym. Naleїaі do stalkera zwanego Wilczarzem. Najwyraџniej jest to zmodyfikowany pistolet UDP Compact.</text>
+	</string>
+	<string id="st_wpn_val">
+		<text>SA Lawina</text>
+	</string>
+	<string id="st_wpn_vintorez">
+		<text>Wintar BC </text>
+	</string>
+	<string id="st_wpn_vintorez_descr">
+		<text>Specjalny wojskowy karabin snajperski zbudowany z myњl№ o cichym, bezbіyskowym oddawaniu strzaіуw podczas operacji specjalnych, gdzie wczesne wykrycie strzelca moїe zawaїyж na wyniku misji. Wintar BC skutecznie przebija pancerze i ma duї№ moc obalaj№c№, posiada teї zintegrowany celownik snajperski i optyczny. Mimo maіego magazynka wysoko ceniony przez wielu stalkerуw.</text>
+	</string>
+	<string id="st_wpn_vintorez_nimble">
+		<text>Przypіyw</text>
+	</string>
+	<string id="st_wpn_vintorez_nimble_descr">
+		<text>Broс wykonana dla jednostek wojskowych na bazie cichego karabinu snajperskiego. W porуwnaniu z poprzednikiem, strzelb№ Wintar BC, karabin ten ma zmniejszon№ szybkoњж strzaіu i zwiкkszon№ moc obalaj№c№, dziкki czemu strzelec moїe po kolei wyeliminowaж wrogуw nie ujawniaj№c przy tym swojej pozycji.</text>
+	</string>
+	<string id="st_wpn_walther">
+		<text>Walker P9m</text>
+	</string>
+	<string id="st_wpn_wincheaster1300">
+		<text>Chaser 13</text>
+	</string>
+	<string id="st_wpn_wincheaster1300_descr">
+		<text>Zachodnia strzelba gіadkolufowa, niezwykle popularna na caіym њwiecie dziкki niezwykіej niezawodnoњci i szybszemu przeіadowaniu. Przez іowcуw z Zony szczegуlnie ceniona za sw№ funkcjonalnoњж. Wszystkie jej elementy s№ powleczone њrodkiem antykorozyjnym. </text>
+	</string>
+	<string id="st_wpn_wincheaster1300_trapper">
+		<text>Drapieїca</text>
+	</string>
+	<string id="st_wpn_wincheaster1300_trapper_descr">
+		<text>Spersonalizowana, іadowana pompkowo strzelba naleї№ca wczeњniej do Trapera. Myњliwy wymagaі od swojej broni tylko tego, by zabijaіa drapieїniki jednym strzaіem. Ta filozofia opieraіa siк na przekonaniu, їe niezaleїnie od tego, ilu ludzi zabiіo zwierzк, wci№ї byіo tylko zwierzкciem i w zwi№zku z tym nie powinno cierpieж.</text>
+	</string>
+	<string id="ammo-gauss_cardan">
+		<text>Baterie domowej roboty</text>
+	</string>
+	<string id="st_addon_scope_susat_custom">
+		<text>Celownik SUSAT Mera</text>
+	</string>
+	<string id="st_wpn_abakan_descr">
+		<text>Nowoczesny karabin szturmowy opracowany jako zastкpstwo dla starzej№cego siк AKM 74/2. Gіуwna rуїnica to tryb bardzo szybkiego strzelania dwiema seriami, dziкki ktуremu dwie kule mog№ trafiж w dokіadnie ten sam punkt znajduj№cy siк na celu oddalonym nawet o 100 metrуw. W porуwnaniu z trybem jednoseryjnym znacznie podnosi to prawdopodobieсstwo trafienia celu, tym samym potencjaі zabуjczy, moc obalaj№c№ oraz zdolnoњж penetracji pancerza.</text>
+	</string>
+	<string id="st_wpn_ak74_descr">
+		<text>Ta opracowana w 1974 r. broс byіa zwiastunem przejmowania maіokalibrowych i niskoimpulsowych naboi przez kraje Ukіadu Warszawskiego. AKM-74/2, potomek najpopularniejszego karabinu szturmowego na њwiecie, ma jeszcze wiкkszy hamulec wylotowy, ktуry dodatkowo zmniejsza i tak juї zadowalaj№cy odrzut. Daje to lepsz№ celnoњж i skupienie, zwіaszcza przy oddawaniu szybkich pojedynczych strzaіуw lub krуtkich serii. Karabin jest bardzo prosty i niezawodny.</text>
+	</string>
+	<string id="st_wpn_ak74u_descr">
+		<text>Mimo їe pod wzglкdem rozmiaru, wagi i celуw taktycznych broс ta przypomina pistolety maszynowe, z uwagi na fakt, ze jej mechanizm wewnкtrzny jest taki sam, jak w AKM 74/2, jest ona zaliczana do karabinуw szturmowych. Jest ona ceniona za swoj№ mobilnoњж w walce na krуtki dystans i wysok№ zdolnoњж przebijania pancerzy, natomiast jej wad№ jest krуtki efektywny zasiкg (pomimo doњж dіugiego zasiкgu kuli), tendencja do przegrzewania siк i duїe prawdopodobieсstwo rykoszetu.</text>
+	</string>
+	<string id="st_wpn_colt1911_descr">
+		<text>Ulepszona wersja klasycznego pistoletu automatycznego, ktуry sprawdziі siк znakomicie we wszystkich konfliktach zbrojnych XX w. i pewnym krokiem wszedі w nowe tysi№clecie. Jest produkowany przez dziesi№tki, jeњli nie setki wytwуrcуw broni na caіym њwiecie, zarуwno w wersji standardowej, jaki i w zmodyfikowanych konfiguracjach. Jej jedyna wada, maіa pojemnoњж magazynka, jest z nadwyїk№ rekompensowana przez duї№ siік, z jak№ uderza amunicja.</text>
+	</string>
+	<string id="st_wpn_eagle_descr">
+		<text>Najwyїsza forma rozwoju dziaіka rкcznego: duїego, ciкїkiego i bardzo zabуjczego. Opracowano j№ jako specjalistyczn№ broс myњliwsk№ do іowуw na grubego i њredniego zwierza, a takїe do zawodуw strzeleckich, podczas ktуrych strzela siк z ponad 50 metrуw do celуw ze stali. Ograniczone wystкpowanie w Zonie moїna wytіumaczyж cen№, rozmiarem i wag№, ktуre dwukrotnie przekraczaj№ analogiczne cechy innych pistoletуw.</text>
+	</string>
+	<string id="st_wpn_fn2000_descr">
+		<text>Ta futurystyczna z wygl№du broс o budowie bezkolbowej to w rzeczywistoњci produkowany masowo system moduіowy, і№cz№cy w sobie karabin ze skomputeryzowanym systemem kontroli ognia i 40-milimetrowy granatnik. Mimo duїych rozmiarуw broс jest bardzo ergonomiczna, іatwa w uїyciu i o dobrych parametrach technicznych.</text>
+	</string>
+	<string id="st_wpn_fort_descr">
+		<text>Pistolet produkcji ukraiсskiej uїywany gіуwnie przez siіy policyjne. Ma lepsz№ celnoњж i wiкkszy magazynek oraz jest bardziej ergonomiczny niї pistolety PMm. Trafia do Zony w duїych iloњciach dziкki sprzedaїy broni z defektami spowodowanymi bікdami technicznymi we wczesnych modelach. Mimo tego jest na ni№ duїy popyt wњrуd stalkerуw, poniewaї posiada dobre parametry bojowe.</text>
+	</string>
+	<string id="st_wpn_g36_descr">
+		<text>Nowy czіonek rodziny produkowanych na Zachodzie karabinуw szturmowych, ktуry znacz№co rуїni siк od poprzednich modeli w tej serii, zbudowanych na bazie automatu z pуіotwartym naci№giem montaїowym zamka. Ta broс bardziej przypomina amerykaсskie automatyczne karabiny szturmowe na gaz, z systemem krуtkosuwowych tіokуw gazowych. Te zmiany powoduj№, їe karabin ten jest pierwszorzкdnym przykіadem nowoczesnej broni - lekkiej, niezawodnej i ergonomicznej.</text>
+	</string>
+	<string id="st_wpn_l85_descr">
+		<text>Znaczna liczba wad tej broni sprawiіa, ze zostaіa ona zmodernizowana, kiedy jej przestarzaіe zapasy dotarіy do Zony za poњrednictwem czarnego rynku. Gіуwne zalety broni to wbudowany celownik 4x, wysoka precyzyjnoњж jednego strzaіu i niezawodna technologia ulepszeс. Kiedy strzela siк seriami, precyzyjnoњж broni znacznie spada, a jej wewnкtrzne mechanizmy staj№ siк nieco zawodne.</text>
+	</string>
+	<string id="st_wpn_lr300_descr">
+		<text>Kolejny krok w rozwoju tej sіawnej rodziny broni. Zmian dokonano w gуrnej poіowie stalowej konstrukcji zіoїonej z lufy, tuby gazowej i naci№gu montaїowego zamka, co zmniejszyіo jej wagк i poprawiіo ergonomiк i system gazowy. Broс jest bardzo precyzyjna, ale skіonnoњж do gromadzenia brudu czyni j№ maіo przydatn№ w trudnych warunkach Zony.</text>
+	</string>
+	<string id="st_wpn_pb_descr">
+		<text>Ten pistolet zostaі wyprodukowany w drugiej poіowie XX w. na bazie PMm dla siі specjalnych i jednostek zwiadowczych. Na przedniej czкњci lufy znajduje siк zintegrowany z ni№ tіumik, a mechanizm naci№gu jest krуtki, dziкki czemu cofaj№cy siк zamek jest umieszczony nie w nim, a na rкkojeњci broni. Choж pistolet ten wyszedі juї z mody, we wіaњciwych rкkach nadal jest skuteczn№ broni№.</text>
+	</string>
+	<string id="st_wpn_pm_descr">
+		<text>Ta radziecka broс jest najpopularniejszym pistoletem w Zonie i jedn№ z najlepszych wњrуd dostкpnych niewielkich, obronnych broni palnych. Jest maіy, іatwy w uїyciu i utrzymaniu, rzadko zawodzi. Posiada teї kilka wad, do ktуrych naleїy maіy zasiкg, niska celnoњж i sіaba moc obalaj№ca, a ponadto, w porуwnaniu do nowoczesnych pistoletуw, niekorzystna waga i wielkoњж magazynka.</text>
+	</string>
+	<string id="st_wpn_protecta_descr">
+		<text>Gіadkolufowa strzelba bojowa typu rewolwerowego, maj№ca zapewniж ogromn№ siік ogniow№ jednostkom wojskowym. Jej zaletami s№ duїy magazynek i znaczna szybkoњж strzaіu, ale cen№ za nie s№ wielkoњж i ciкїar w poі№czeniu z dіugim czasem іadowania. W Zonie spotyka siк j№ rzadko, jest uїywana gіуwnie do walki z mutantami w zamkniкtej przestrzeni.</text>
+	</string>
+	<string id="st_wpn_rpg7_descr">
+		<text>Ten granatnik z lat 60. XX w. trafiі do Zony z magazynуw wojskowych. Jest to gіadkolufowy, bezodrzutowy system jednostrzaіowy z otwart№ z tyіu luf№. Posiada celownik optyczny PGO-7 2.7x. Chociaї jego znaczne rozmiary i waga czyni№ go maіo przydatnym dla stalkerуw, dziкki duїej sile niszcz№cej i іatwej obsіudze zyskaі w Zonie oddanych wielbicieli.</text>
+	</string>
+	<string id="st_wpn_sig220_descr">
+		<text>Ta broс, jedyny istniej№cy masowo produkowany model znanego na caіym њwiecie pistoletu, zdobyіa sіawк dziкki znakomitej ergonomii i celnoњci, a chociaї jej magazynek jest stosunkowo maіy, rekompensuje to potкїna amunicja i mechanizm dziaіaj№cy jak szwajcarski zegarek. Niektуrzy uwaїaj№, їe SIP-t M200 to najlepsza masowo produkowana broс palna kalibru .45ACP na њwiecie, posiada ona wielu zwolennikуw wњrуd doњwiadczonych stalkerуw i najemnikуw.</text>
+	</string>
+	<string id="st_wpn_spas12_descr">
+		<text>Zaprojektowana w drugiej poіowie XX w. ta gіadkolufowa strzelba automatyczna posiada moїliwoњж przeі№czania siк pomiкdzy rуїnymi trybami prowadzenia ostrzaіu. Uniwersalna broс policji i oddziaіуw szturmowych. Ceniona za niezawodnoњж i wszechstronnoњж taktyczn№. Mimo duїej wagi, skomplikowanego mechanizmu i wysokiej ceny, w Zonie panuje na ni№ duїy popyt, poniewaї jest bardzo skuteczna przeciw mutantom.</text>
+	</string>
+	<string id="st_wpn_svu_descr">
+		<text>Unowoczeњniona wersja karabinu snajperskiego SWDm-2 w kompaktowej wersji bezkolbowej, opracowana na zamуwienie siі szybkiego reagowania. Umoїliwia szybszy ostrzaі precyzyjny i jest znacznie lїejsza, a celnoњж jednostrzaіowa na krуtki i њredni dystans jest zbliїona do celnoњci jej poprzednika. Dziкki tym cechom jest ceniona przez niezliczone rzesze stalkerуw.</text>
+	</string>
+	<string id="st_wpn_val_descr">
+		<text>Ten karabin szturmowy, zmodyfikowana wersja cichego karabinu snajperskiego Wintar BC, byіa przeznaczona dla siі specjalnych. Jego gіуwnym zadaniem jest zapewnienie skutecznego ostrzaіu wrogуw wykorzystuj№cych nowoczesny sprzкt ochronny przy rуwnoczesnym nieujawnianiu pozycji strzelaj№cego. Dziкki zintegrowanemu tіumikowi i amunicji kalibru 9x39 z ciкїkimi poddџwiкkowymi kulami, dџwiкk i rozbіysk broni zostaіy zredukowane do minimum.</text>
+	</string>
+	<string id="st_wpn_gauss_descr">
+		<text>Ten supercelny, zaawansowany karabin, znany jako obiekt 62, zostaі zaprojektowany w tajnych laboratoriach Zony. Dziкki systemowi elektromagnesуw naboje s№ wyrzucane z ogromn№ prкdkoњci№, co daje niewiarygodn№ moc obalaj№c№ przy praktycznie zerowym odrzucie. Broс jest zasilana umieszczanymi w bateriach fragmentami artefaktуw.</text>
+	</string>
+	<string id="st_wpn_beretta_descr">
+		<text>Pistolety Martha ciesz№ siк w њwiecie opini№ maіo zawodnych, chociaї nieco przyciкїkich. Uїywaj№ ich siіy zbrojne i policyjne z caіego њwiata. Dziкki potкїnym nabojom i pojemnoњci magazynka pistolet ten jest popularny takїe w pуіњwiatku. Marthy znajdowane w Zonie s№ zwykle przestarzaіe, prawdopodobnie pochodz№ ze starych zapasуw.</text>
+	</string>
+	<string id="st_wpn_walther_descr">
+		<text>Znakomity zachodni pistolet znany z niezawodnoњci, duїej pojemnoњci magazynka i dobrej celnoњci, jak rуwnieї znakomitej ergonomicznoњci w porуwnaniu do innych broni palnych w swojej klasie. Jeden z najczкњciej uїywanych pistoletуw w Zonie, zarуwno poњrуd zawodowcуw, jak i їуіtodziobуw, ktуrych na niego staж.</text>
+	</string>
+	<string id="ammo-gauss_descr">
+		<text>Baterie, ktуre wykorzystuj№ jako џrуdіo mocy fragment artefaktu Bіysk. Wytwarzane przy uїyciu zaawansowanego sprzкtu.</text>
+	</string>
+	<string id="ammo-gauss_cardan_descr">
+		<text>Te ogniwa o mniejszej pojemnoњci wykorzystuj№ jako џrуdіo mocy fragment artefaktu Bіysk. Niїsza pojemnoњж wynika z prymitywnych warunkуw produkcji i braku specjalistycznego sprzкtu.</text>
+	</string>
+</string_table>

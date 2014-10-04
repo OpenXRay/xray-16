@@ -1,0 +1,16 @@
+[logic@pri_a21_kontroler]
+active = mob_home@pri_a21_start
+suitable = {=target_squad_name(pri_a21_kontroler_squad)} true
+prior = 70
+monster_job = true
+on_death = death
+
+[mob_home@pri_a21_start]
+path_home = chasovoi_mad_walk
+home_min_radius = 15
+home_max_radius = 15
+on_info = {=dist_to_actor_le(50) -pri_a21_hit_kontroler_from_actor} %=hit_npc_from_actor +pri_a21_hit_kontroler_from_actor%
+on_info2 = {=dist_to_actor_ge(100)} %+pri_a21_from_kontroler_100_m -pri_a21_hit_kontroler_from_actor%
+
+[death]
+on_info = %+pri_a21_kontro_dead%

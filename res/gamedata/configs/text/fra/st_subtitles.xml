@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="zat_a1_cutscene_phrase_1">
+		<text>А 01:23, le 26 avril 1986, le rйacteur du gйnйrateur n° 4 de la centrale de Tchernobyl est dйtruit suite а plusieurs explosions. Le nuage radioactif qui en rйsulte survole la partie occidentale de l'URSS, l'Europe de l'Est et la Scandinavie, avant d'atteindre l'Amйrique du Nord.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_2">
+		<text>Les consйquences de cette catastrophe sont si graves que le gouvernement doit faire йvacuer tous les habitants des villes et villages environnants.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_3">
+		<text>Une zone d'exclusion de 30 km est йtablie afin d'empкcher les civils de revenir dans la zone contaminйe.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_4">
+		<text>Malgrй la catastrophe, la centrale de Tchernobyl continue de fonctionner. Le conseil des ministres de l'URSS dйcide alors de crйer un rйseau de laboratoires secrets dans la Zone d'exclusion dйsormais dйsertйe.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_5">
+		<text>11 janvier 2006. Une lumiиre йblouissante enveloppe toute la Zone d'exclusion et des nuages de vapeur s'йlиvent dans le ciel. Aprиs un instant de silence, des grondements sourds font trembler le sol. La plupart des forces gouvernementales qui gardent le pйrimиtre sont tuйes sur le coup.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_6">
+		<text>2007. Les scientifiques sont toujours incapables d'expliquer ce qui s'est passй. Les expйditions dans la Zone se terminent gйnйralement en tragйdie et les rares survivants racontent des histoires incroyables d'animaux mutants aux capacitйs extraordinaires.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_7">
+		<text>Selon diffйrentes estimations, la Zone hйberge en 2010 entre 100 et 300 individus non identifiйs. Ils se donnent le nom de stalkers et survivent en rйcupйrant des objets anormaux, connus sous le nom d'artefacts, qu'ils revendent а prix d'or.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_8">
+		<text>2011. Malgrй les cordons militaires, le nombre de stalkers ne cesse d'augmenter. Ces derniers se cantonnent nйanmoins aux secteurs pйriphйriques de la Zone, son centre restant largement inexplorй. Les rares tentatives de pйnйtrer plus avant dans la Zone se soldent toutes par des йchecs.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_9">
+		<text>2012. Un Stalker du nom de Strelok parvient а rйsoudre le mystиre du Lobotomisateur, l'йmetteur d'ondes psychiques qui bloquait l'accиs au centre de la Zone depuis des annйes. Une fois la machine dйsactivйe, tous les Stalker se ruent vers les territoires jusqu'alors inexplorйs. Certains espиrent y trouver une cache remplie d'artefacts, d'autres sont а la recherche de l'Exauceur de vњux.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_10">
+		<text>Le gouvernement dйcide alors de lancer une vaste opйration militaire, nom de code : Fairway. Son l'objectif : envoyer des hйlicoptиres jusqu'а la centrale. Malgrй les nombreux prйparatifs et les cartes des anomalies dont disposaient les appareils, l'opйration est un йchec cuisant et aucun des hйlicoptиres n'en revient.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_11">
+		<text>Le major Degtyarev, agent spйcial du SBU, est envoyй dans la Zone afin d'enquкter sur la disparition des hйlicoptиres.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_12">
+		<text>Dйguisй en stalker et emportant avec lui un fusil d'assaut standard, deux semaines de provisions et une radio pour communiquer avec le QG, le major entame son voyage vers le cњur de la zone.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_13">
+		<text>Ses discussions avec les stalkers ne donnent rien... Soit ils n'ont pas d'informations, soit ils ne veulent pas les partager...</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_14">
+		<text>La Zone rappelle constamment au major qu'elle n'a rien d'une colonie de vacances. Pas un jour ne s'йcoule sans une attaque d'ennemis mutants ou, pire, humains.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_15">
+		<text>Les communications rйguliиres avec le QG n'amйliorent rien : les informations sont rares, en dehors des coordonnйes des йpaves des cinq hйlicoptиres, obtenues par satellite. Alors que le major s'approche а 5 km de la centrale de Tchernobyl, sa radio rend l'вme.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_16">
+		<text>Degtyarev est dйsormais seul...</text>
+	</string>
+	<string id="pri_a28_outro_phrase_1">
+		<text>En rйcompense pour la rйussite de son enquкte, Degtyarev est promu colonel et se voit vu offrir un poste de coordinateur de mission. Il dйcline cependant cette opportunitй de travailler au QG et demande l'autorisation de retourner dans la Zone en tant qu'observateur permanent du SBU.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_2">
+		<text>Les informations sur le dйveloppement d'appareils psi obtenues par Degtyarev sont considйrйes comme trop dangereuses par ses supйrieurs du SBU et les dossiers concernant les laboratoires X sont retirйs des archives militaires et classйs top secrets. Les personnels de la Zone reзoivent l'ordre d'йtouffer l'affaire, coыte que coыte.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_3">
+		<text>Plusieurs prototypes sont crййs а partir des donnйes techniques de l'objet 62. Suite aux tests, il est dйcidй de ne pas passer а la fabrication en masse car les munitions sont considйrйes comme trop coыteuses. Cependant, il semble probable que le perfectionnement de la technologie Gauss se poursuit.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_4_a">
+		<text>Aprиs avoir tentй en vain de prendre le contrфle du Skadovsk, Sultan et ses hommes quittent les lieux pour continuer leurs opйrations douteuses ailleurs. Le calme relatif qui s'instaure alors dans la Zone voit une augmentation massive du nombre d'artefacts vendus au Barbu et le Skadovsk, bien que proche du centre de la Zone, devient aussi populaire que le fameux bar des 100 rads.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_4_b">
+		<text>Le Skadovsk devient le repaire principal des bandits. Aprиs l'instauration d'une taxe pour tous les stalkers et l'йviction forcйe de quelques fortes tкtes pendant des йmissions, un calme relatif s'installe, sous la fйrule de Sultan. Peu enclin а partager ses bйnйfices avec les bandits, le Barbu rassemble un groupe de stalkers et part explorer les secteurs inconnus de la Zone.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_4_c">
+		<text>Le Skadovsk devient le foyer de tous ceux qui parviennent а l'atteindre. Et si la farouche rйsistance des stalkers n'empкche pas les bandits de tenter rйguliиrement de prendre le contrфle des lieux, le navire reste un оlot de paix au milieu du chaos ambiant.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_5_a">
+		<text>Malheureusement, le statu quo ne dure pas. Des sangsues du marais voisin finissent par atteindre le navire. Lorsqu'elles s'enhardissent mкme а attaquer en plein jour, les hommes du Skadovsk dйcident de se dйbarrasser du nid une fois pour toutes. Malheureusement, l'expйdition dans les tunnels ne fait que provoquer une contre-attaque massive des crйatures, au cours de laquelle tous les habitants du navire sont tuйs.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_5_b">
+		<text>La destruction du nid des sangsues assure а jamais l'avenir et la stabilitй du Skadovsk. Le vieux navire reste ainsi un оlot de paix au milieu du chaos ambiant de la Zone.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_6_a">
+		<text>La Libertй parvient а conclure un accord avec les stalkers de la gare de Yanov. Le Devoir dйcide alors d'employer la maniиre forte et lance un assaut vouй а l'йchec. Le lieutenant-colonel Shulga est tuй peu aprиs lors d'une йchauffourйe. Suite а la perte de son chef, l'unitй du Devoir se disperse rapidement.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_6_b">
+		<text>Des renforts et une popularitй croissante auprиs des stalkers permettent а l'unitй du Devoir de se dйbarrasser des soldats de la Libertй dans la gare de Yanov. Loki et son unitй ne survivent pas aux combats qui s'ensuivent.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_6_c">
+		<text>Un fragile йquilibre s'instaure entre le Devoir et la Libertй dans la gare de Yanov. Йpuisйs par des combats incessants, les hommes des deux factions commencent а dйserter leurs unitйs pour rejoindre les rangs des stalkers indйpendants. </text>
+	</string>
+	<string id="pri_a28_outro_phrase_7_a">
+		<text>L'expйdition scientifique menйe par les professeurs Hermann et Ozersky est un succиs retentissant. Les donnйes rйcupйrйes permettent la crйation de mйdicaments et de technologies rйvolutionnaires qui incitent le ministиre de l'йducation а augmenter le budget consacrй а la recherche dans la Zone.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_7_b">
+		<text>Les professeurs Hermann et Ozersky doivent interrompre leurs recherches dans la Zone, faute de donnйes. А leur retour dans le monde normal, ils se lancent dans des activitйs scientifiques sans lien avec la Zone.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_8_a">
+		<text>Les histoires de Garry sur les difficultйs de l'armйe dans Pripyat encouragent les stalkers а explorer la ville fantфme. Malgrй les attaques constantes des forces du Monolithe, ils parviennent а prendre le contrфle de l'ancien camp militaire, d'oщ ils lancent des raids au cњur de la ville. Leurs progrиs sont lents, mais constants.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_8_b">
+		<text>Les histoires de Garry sur le sort des militaires maintiennent les stalkers а distance de Pripyat. Ceux qui osent s'y aventurer rencontrent d'inexplicables phйnomиnes, ce qui ne fait qu'ajouter de sombres chapitres а la lйgende dйjа macabre de cette ville fantфme.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_9">
+		<text>La lйgende de l'Oasis n'en est plus une... L'identitй de ceux qui ont trouvй cette mystйrieuse anomalie devient un sujet de plus en plus frйquent dans les conversations des stalkers et nombre d'entre eux souhaitent а prйsent tenter leur chance, pour la plus grande joie des bandits, ravis d'organiser des groupes qu'ils se chargent ensuite de dйpouiller а bonne distance des camps de stalkers.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_10">
+		<text>Les groupes de mercenaires maintiennent une prйsence constante dans la Zone et leur intйrкt pour les laboratoires X devient de plus en plus difficile а dissimuler aux observateurs du SBU. Toutes les tentatives pour identifier leur commanditaire restent cependant vaines.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_11_a">
+		<text>Les alentours de Yanov continuent d'attirer de plus en plus de stalkers. L'absence de mutants dangereux et l'abondance d'anomalies permettent а la gare de gagner rapidement le surnom de "cache au trйsor".</text>
+	</string>
+	<string id="pri_a28_outro_phrase_11_b">
+		<text>Les environs de la gare de Yanov restent parmi les plus dangereux de la Zone. De moins en moins de stalkers reviennent des expйditions, certains se faisant mкme йcharper а quelques mиtres du camp. Parti chasser une chimиre, Trappeur figure йgalement au nombre des disparus.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_12_a">
+		<text>Zulu est retournй а la base principale du Devoir, dans la centrale de Rostock. Personne ne sait ce qu'il a dit au gйnйral Voronin, le chef du Devoir, mais, quelques jours plus tard, Zulu est aperзu а la tкte d'une importante formation en route pour le centre de la Zone.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_12_b">
+		<text>Les nouvelles du sort de Zulu sont parvenues jusqu'aux oreilles du gйnйral Voronin, le chef du Devoir. Contrairement а toutes les attentes, ce dernier dйcide de lui attribuer le Bouclier d'argent, la dйcoration la plus prestigieuse du Devoir.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_13_a">
+		<text>Vano s'est dirigй vers les entrepфts militaires contrфlйs par la Libertй, oщ sa personnalitй et son optimisme le rendent rapidement trиs populaire. Il finit par prendre la tкte d'un groupe de chercheurs spйcialisйs dans l'йtude des anomalies.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_13_b">
+		<text>Les stalkers de la gare de Yanov se souviennent de temps а autre de Vano et regrettent sa bonne humeur et son expertise. Et si certains de ses choix de carriиre ont pu кtre contestables, il reste йvident qu'avec sa malchance, il n'aurait jamais dы s'aventurer sur la route de Pripyat.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_14_a">
+		<text>Un nouveau groupe, constituй d'йlйments bien entraоnйs, a fait son apparition dans la Zone. Nul ne connaоt ses objectifs. Certains disent qu'il s'agit d'anciens membres du Monolithe. Leur chef est connu sous le nom d'Arpenteur.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_14_b">
+		<text>Rares sont ceux qui ont remarquй la disparition d'Arpenteur. Il semblerait que son dйsir de trouver un moyen de contrer l'emprise du Monolithe l'a conduit а sa perte.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_15_a">
+		<text>Le lieutenant Sokolov continue de voler au-dessus de la Zone. Au cours d'une mission de reconnaissance а Limansk, son appareil est abattu par des mercenaires, mais il est rйcupйrй deux semaines plus tard par une patrouille prиs du Cordon. Un mois aprиs, il quitte l'armйe de l'air pour rejoindre une compagnie aйrienne civile.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_15_b">
+		<text>Un nouveau nom vient s'ajouter а la longue liste des victimes de l'opйration Fairway : "Lieutenant O. N. Sokolov, mort au combat".</text>
+	</string>
+	<string id="pri_a28_outro_phrase_16">
+		<text>Le Hibou a rйussi а contacter des clients en dehors de la Zone. Il йchange des informations et, si elles sont vйrifiйes, en fait bйnйficier le SBU.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_17">
+		<text>Lors d'une йmission particuliиrement forte, un groupe de stalkers est obligй de se rйfugier chez Noah. Lorsque la barge est ensuite attaquйe par des snorks, les stalkers sont forcйs de reconnaоtre que celle-ci constitue une formidable forteresse contre les mutants, mкme si le plus йtonnant reste la portйe de pseudo-chiots que Noah lui-mкme mиne au combat contre les snorks.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_18_a">
+		<text>Aprиs avoir dйcouvert le sort de ses amis, Cardan abandonne la carriиre de stalker. Parvenant а surmonter son alcoolisme, il s'installe а Yanov, oщ il s'associe avec Nitro pour ouvrir un magasin de rйparations. Les deux techniciens y passent tout leur temps libre а mettre au point un vйhicule adaptй aux conditions particuliиres de la Zone.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_18_b">
+		<text>Aprиs avoir enfin rйussi а surmonter son alcoolisme, Cardan quitte le Skadovsk а la recherche de ses amis. Il revient quelques jours plus tard, blessй et gravement empoisonnй par les radiations. Dиs qu'il est de nouveau sur pied, il repart pour ne jamais revenir.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_19_a">
+		<text>Strelok transmet les informations recueillies dans la centrale de Tchernobyl aux autoritйs du SBU. Le gouvernement fonde alors un Institut de recherche sur la Zone anormale de Tchernobyl, oщ Strelok occupe le poste de consultant scientifique en chef.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_19_b">
+		<text>Les connaissances de Strelok disparaissent avec lui. Tout ce qu'il a dйcouvert а Tchernobyl et qui aurait pu кtre utilisй pour mieux comprendre la Zone est perdu а jamais. Il semblerait que la Zone soit avare de ses secrets...</text>
+	</string>
+	<string id="pri_a28_outro_phrase_20_a">
+		<text>Lorsque le colonel Kovalsky, commandant du groupe Stingray, revient de la Zone, il est obligй de s'expliquer sur les raisons de l'йchec de l'opйration Fairway. Aprиs une enquкte interminable et de nombreuses fausses accusations, il est finalement libйrй de ses obligations envers l'armйe, avec les honneurs.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_20_b">
+		<text>Le colonel Kovalsky, commandant du groupe Stingray, repose dйsormais non loin de la plupart de ses hommes. Leurs corps sont venus grossir les rangs des victimes de la Zone et seules quelques photographies jaunies tйmoignent encore de leur sacrifice.</text>
+	</string>
+</string_table>

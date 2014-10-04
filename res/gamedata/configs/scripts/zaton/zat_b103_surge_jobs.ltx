@@ -1,0 +1,118 @@
+;GENERAL
+
+[hit]
+on_info = %+zat_b103_merc_fight%
+
+[meet@snd_1]
+use = false
+snd_on_use = {-zat_b103_merc_fight} zat_b103_merc_talk_to_commander_1, nil
+trade_enable = false
+
+[meet@snd_2]
+use = false
+snd_on_use = {-zat_b103_merc_fight} zat_b103_merc_talk_to_commander_2, nil
+trade_enable = false
+
+[animpoint@def]
+reach_movement = sprint
+meet = no_meet
+out_restr = zat_surge_hide_b103
+combat_ignore_cond = {-zat_b103_merc_fight} true
+on_info = {=actor_in_zone(zat_b103_merc_inside_yard) -zat_b103_merc_task_done} %+zat_b103_merc_fight =set_squad_goodwill(zat_b103_lost_merc_squad1:enemy)%
+
+;LEADER JOB
+
+[logic@surge_job_leader]
+suitable   = {=check_npc_name(zat_b103_lost_merc_leader) =surge_started}
+active     = animpoint@leader
+prior      = 200
+on_hit = hit
+
+[animpoint@leader]
+out_restr = zat_surge_hide_b103
+cover_name = zat_b103_animp_surge_leader
+reach_movement = sprint
+on_actor_in_zone = zat_surge_hide_b103 | {=actor_has_weapon} remark@leader %=play_sound(zat_b103_merc_warning)%
+on_info = {=actor_in_zone(zat_b103_merc_inside_yard) -zat_b103_merc_task_done} %+zat_b103_merc_fight =set_squad_goodwill(zat_b103_lost_merc_squad1:enemy)%
+meet = no_meet
+
+[remark@leader]
+out_restr = zat_surge_hide_b103
+anim = threat
+target = story | actor
+on_signal = sound_end | {=actor_has_weapon} remark@leader_wait, animpoint@leader
+
+[remark@leader_wait]
+out_restr = zat_surge_hide_b103
+anim = threat
+target = story | actor
+on_game_timer = 50 | {-zat_b103_merc_fight} %+zat_b103_merc_fight% 
+
+;JOB HEADERS  
+
+[logic@surge_job_1]
+suitable = {!check_npc_name(zat_b103_lost_merc_leader) =surge_started} true
+active = animpoint@1
+prior = 200
+on_hit = hit
+
+[logic@surge_job_2]
+suitable = {!check_npc_name(zat_b103_lost_merc_leader) =surge_started}
+active = animpoint@2
+prior = 200
+on_hit = hit
+
+[logic@surge_job_3]
+suitable = {!check_npc_name(zat_b103_lost_merc_leader) =surge_started}
+active = animpoint@3
+prior = 200
+on_hit = hit
+
+[logic@surge_job_4]
+suitable = {!check_npc_name(zat_b103_lost_merc_leader) =surge_started}
+active = animpoint@4
+prior = 200
+on_hit = hit
+
+[logic@surge_job_5]
+suitable = {!check_npc_name(zat_b103_lost_merc_leader) =surge_started}
+active = animpoint@5
+prior = 200
+on_hit = hit
+
+[logic@surge_job_6]
+suitable = {!check_npc_name(zat_b103_lost_merc_leader) =surge_started}
+active = animpoint@6
+prior = 200
+on_hit = hit
+
+[logic@surge_job_7]
+suitable = {!check_npc_name(zat_b103_lost_merc_leader) =surge_started}
+active = animpoint@7
+prior = 200
+on_hit = hit
+
+;JOB SECTIONS
+
+[animpoint@1]:animpoint@def
+cover_name = zat_b103_animp_surge_1
+
+[animpoint@2]:animpoint@def
+cover_name = zat_b103_animp_surge_2
+
+[animpoint@3]:animpoint@def
+cover_name = zat_b103_animp_surge_3
+
+[animpoint@4]:animpoint@def
+cover_name = zat_b103_animp_surge_4
+
+[animpoint@5]:animpoint@def
+cover_name = zat_b103_animp_surge_5
+
+[animpoint@6]:animpoint@def
+cover_name = zat_b103_animp_surge_6 
+
+[animpoint@7]:animpoint@def
+cover_name = zat_b103_animp_surge_7
+
+

@@ -1,0 +1,27 @@
+[logic]
+active = ph_idle@start
+
+[ph_idle@start]
+on_info = ph_door@open %+pri_a16_down_door_open%
+
+[ph_door@closed]
+closed = true
+locked = false
+on_use = ph_door@open %+pri_a16_down_door_open%
+on_info = {+pri_b305_fifth_cam_end -pri_a28_update_task_cover_strelok} ph_door@locked_pri_a28
+on_info2 = {+pri_a16_down_door_open} ph_door@open
+
+[ph_door@open]
+closed = false
+locked = false
+on_use = ph_door@closed %-pri_a16_down_door_open%
+on_info = {+pri_b305_fifth_cam_end -pri_a28_update_task_cover_strelok} ph_door@locked_pri_a28 %-pri_a16_down_door_open%
+on_info2 = {-pri_a16_down_door_open} ph_door@closed
+not_for_npc = true
+
+[ph_door@locked_pri_a28]
+closed = true
+locked = true
+on_info = {+pri_a28_update_task_cover_strelok} ph_door@closed
+snd_open_start = trader_door_locked
+not_for_npc = true

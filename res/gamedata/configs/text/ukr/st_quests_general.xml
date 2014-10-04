@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="hide_from_surge_message">
+		<text>Увага! До викиду залишилося</text>
+	</string>
+	<string id="hide_from_surge_descr_1_a">
+		<text>Необхідно терміново бігти до найближчого укриття і сховатися від викиду.</text>
+	</string>
+	<string id="hide_from_surge_descr_2_a">
+		<text>Під час викиду в жодному разі не можна залишати укриття.</text>
+	</string>
+	<string id="hide_from_surge_name_1">
+		<text>Викид: знайти укриття</text>
+	</string>
+	<string id="hide_from_surge_name_2">
+		<text>Викид: перечекати в укритті</text>
+	</string>
+</string_table>

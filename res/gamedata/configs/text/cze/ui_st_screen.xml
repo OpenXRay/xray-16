@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="actor_inventory_box_use">
+		<text>Otevшнt osobnн skшнтku ($$ACTION_USE$$)</text>
+	</string>
+	<string id="cant_walk">
+		<text>Jsi tak vyиerpanэ, ћe ani nemщћeљ chodit</text>
+	</string>
+	<string id="cant_walk_weight">
+		<text>Jsi tak pшetнћenэ, ћe ani nemщћeљ chodit</text>
+	</string>
+	<string id="car_character_use">
+		<text>Otevшнt dveшe ($$ACTION_USE$$)</text>
+	</string>
+	<string id="character_use">
+		<text>Mluvit ($$ACTION_USE$$)</text>
+	</string>
+	<string id="dead_character_use">
+		<text>Prohledat tмlo ($$ACTION_USE$$)</text>
+	</string>
+	<string id="dead_character_use_or_drag">
+		<text>Prohledat tмlo ($$ACTION_USE$$)\nOdtбhnout tмlo (SHIFT+$$ACTION_USE$$)</text>
+	</string>
+	<string id="general_complete_task">
+		<text>Dokonиena mise:</text>
+	</string>
+	<string id="general_fail_task">
+		<text>Nesplnмna mise:</text>
+	</string>
+	<string id="general_in_item">
+		<text>Zнskбn pшedmмt:</text>
+	</string>
+	<string id="general_in_money">
+		<text>Zнskбny penнze:</text>
+	</string>
+	<string id="general_new_task">
+		<text>Novб mise:</text>
+	</string>
+	<string id="general_out_item">
+		<text>Odebrбn pшedmмt:</text>
+	</string>
+	<string id="general_out_money">
+		<text>Odeиteny penнze:</text>
+	</string>
+	<string id="general_reverse_task">
+		<text>Zruљena mise:</text>
+	</string>
+	<string id="general_update_task">
+		<text>Aktualizovбna mise:</text>
+	</string>
+	<string id="gun_jammed">
+		<text>Zasekla se ti zbraт. Musнљ znovu nabнt.</text>
+	</string>
+	<string id="inventory_box_use">
+		<text>Prohledat skшнтku ($$ACTION_USE$$)</text>
+	</string>
+	<string id="inventory_item_use">
+		<text>Sebrat pшedmмt ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b10_ufo_searching_tips">
+		<text>Prohledat letadlo ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b1_bar_door">
+		<text>Dveшe jsou zaseknutй</text>
+	</string>
+	<string id="jup_b1_door_is_closed">
+		<text>Dveшe jsou zamиenй zevnitш</text>
+	</string>
+	<string id="jup_b202_treasures_closed">
+		<text>Trezor je zamиenэ</text>
+	</string>
+	<string id="jup_b205_tip_door_closed">
+		<text>Potшebujeљ kуd</text>
+	</string>
+	<string id="jup_b205_tip_door_decode">
+		<text>Zadat kуd ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b206_use_plant">
+		<text>Utrhnout rostlinu ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b209_scanner_place_tips">
+		<text>Nastavit skener ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b209_scanner_remove_tips">
+		<text>Sebrat skener ($$ACTION_USE$$)</text>
+	</string>
+	<string id="lx8_raduga">
+		<text>Potlaиovaи agrese „Duha“\nModel vnмjљнho ozaшovacнho komplexu\nMмшнtko 1:20</text>
+	</string>
+	<string id="pas_b400_tip_switcher">
+		<text>Zapnout vypнnaи ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_a18_use_idol">
+		<text>Prozkoumat pшнstroj ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_a25_blow_up_enter_door">
+		<text>Umнstit nбloћ ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_a28_talk_with_stupid_medic">
+		<text>Pшivйst ke smyslщm ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_b306_elevator_door_locked_used">
+		<text>Vэtah nenн pod proudem</text>
+	</string>
+	<string id="pri_b306_generator_use">
+		<text>Aktivovat generбtor ($$ACTION_USE$$)</text>
+	</string>
+	<string id="sleep_ok_button">
+		<text>Spбt</text>
+	</string>
+	<string id="sleep_warning_all_pleasures">
+		<text>Teп nemщћeљ spбt! Nebezpeиnм krvбcнљ a mбљ kritickou hladinu ozбшenн. Pouћij lйиiva, nebo se obraќ na zdravotnнka.</text>
+	</string>
+	<string id="sleep_warning_bleeding">
+		<text>Teп nemщћeљ spбt! Nebezpeиnм krvбcнљ. Pouћij lйиiva, nebo se obraќ na zdravotnнka.</text>
+	</string>
+	<string id="sleep_warning_radiation">
+		<text>Teп nemщћeљ spбt! Mбљ kritickou hladinu ozбшenн. Pouћij lйиiva, nebo se obraќ na zdravotnнka.</text>
+	</string>
+	<string id="sleep_zone_tip">
+		<text>Spбt ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_ach_balance_advocate">
+		<text>Zнskбvбљ ocenмnн „Nezaujatэ“.</text>
+	</string>
+	<string id="st_ach_battle_systems_master">
+		<text>Zнskбvбљ ocenмnн „Machr pшes zbranм“.</text>
+	</string>
+	<string id="st_ach_detective">
+		<text>Zнskбvбљ ocenмnн „Detektiv“.</text>
+	</string>
+	<string id="st_ach_diplomat">
+		<text>Zнskбvбљ ocenмnн „Diplomat“.</text>
+	</string>
+	<string id="st_ach_friend_of_duty">
+		<text>Zнskбvбљ ocenмnн „Pшнtel Povinnosti“.</text>
+	</string>
+	<string id="st_ach_friend_of_freedom">
+		<text>Zнskбvбљ ocenмnн „Pшнtel Svobody“.</text>
+	</string>
+	<string id="st_ach_friend_of_stalkers">
+		<text>Zнskбvбљ ocenмnн „Pшнtel stalkerщ“.</text>
+	</string>
+	<string id="st_ach_herald_of_justice">
+		<text>Zнskбvбљ ocenмnн „Posel spravedlnosti“.</text>
+	</string>
+	<string id="st_ach_high_tech_master">
+		<text>Zнskбvбљ ocenмnн „Hi-tech profнk“.</text>
+	</string>
+	<string id="st_ach_information_dealer">
+		<text>Zнskбvбљ ocenмnн „Pшekupnнk informacн“.</text>
+	</string>
+	<string id="st_ach_keeper_of_secrets">
+		<text>Zнskбvбљ ocenмnн „Strбћce tajemstvн“.</text>
+	</string>
+	<string id="st_ach_kingpin">
+		<text>Zнskбvбљ ocenмnн „Љйf“.</text>
+	</string>
+	<string id="st_ach_leader">
+		<text>Zнskбvбљ ocenмnн „Vщdce“.</text>
+	</string>
+	<string id="st_ach_mutant_hunter">
+		<text>Zнskбvбљ ocenмnн „Lovec mutantщ“.</text>
+	</string>
+	<string id="st_ach_one_of_the_lads">
+		<text>Zнskбvбљ ocenмnн „Jeden z nбs“.</text>
+	</string>
+	<string id="st_ach_pioneer">
+		<text>Zнskбvбљ ocenмnн „Prщzkumnнk“.</text>
+	</string>
+	<string id="st_ach_research_man">
+		<text>Zнskбvбљ ocenмnн „Vмdeckэ pracovnнk“.</text>
+	</string>
+	<string id="st_ach_seeker">
+		<text>Zнskбvбљ ocenмnн „Hledaи artefaktщ“.</text>
+	</string>
+	<string id="st_ach_skilled_stalker">
+		<text>Zнskбvбљ ocenмnн „Ostшнlenэ stalker“.</text>
+	</string>
+	<string id="st_ach_wealthy">
+		<text>Zнskбvбљ ocenмnн „Solventnн klient“.</text>
+	</string>
+	<string id="st_autosave">
+		<text>Automatickй uklбdбnн...</text>
+	</string>
+	<string id="st_can_use_weapon_now">
+		<text>Teп uћ mщћeљ vytasit zbraт.</text>
+	</string>
+	<string id="st_codelock">
+		<text>Zбmek na kуd ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_detective_news">
+		<text>Za vyшeљenн zбhady ztracenэch stalkerщ byly do tvй osobnн skшнтky na Skadovsku vloћeny zdravotnickй potшeby.</text>
+	</string>
+	<string id="st_duty_first_reward_news">
+		<text>Za pomoc Povinnosti byl do tvй osobnн skшнтky na Janovм umнstмn univerzбlnн ochrannэ odмv PS5-M.</text>
+	</string>
+	<string id="st_duty_second_reward_news">
+		<text>Za pomoc Povinnosti byla do tvй osobnн skшнтky na Janovм umнstмna sluћebnн zbroj Povinnosti, model PSZ-9d.</text>
+	</string>
+	<string id="st_freedom_first_reward_news">
+		<text>Za pomoc Svobodм byla do tvй osobnн skшнтky na Janovм umнstмna zbroj „Vнtr Svobody“.</text>
+	</string>
+	<string id="st_freedom_second_reward_news">
+		<text>Za pomoc Svobodм byla do tvй osobnн skшнтky na Janovм umнstмna zbroj Svobodnй gardy.</text>
+	</string>
+	<string id="st_freeplay_text_ok">
+		<text>Nepodaшilo se ti vиas dojнt k vrtulnнkщm a evakuaиnн druћstvo odletмlo ze Zуny bez tebe.</text>
+	</string>
+	<string id="st_freeplay_text_yes_no">
+		<text>Jsi pшipraven odletмt ze Zуny? Nebudeљ se moct vrбtit.</text>
+	</string>
+	<string id="st_game_over">
+		<text>Konec hry.</text>
+	</string>
+	<string id="st_game_over_press_jump">
+		<text>Stiskem ($$ACTION_JUMP$$) se vrбtнљ do hlavnн nabнdky.</text>
+	</string>
+	<string id="st_game_paused">
+		<text>Pauza</text>
+	</string>
+	<string id="st_game_saved">
+		<text>Hra uloћena</text>
+	</string>
+	<string id="st_herald_of_justice_news">
+		<text>Za pomoc pшi odhalenн Strakбиe byl do tvй osobnн skшнтky na Skadovsku umнstмn artefakt.</text>
+	</string>
+	<string id="st_jup_b41_door_locked">
+		<text>Musнљ poиkat, neћ se dveшe neprodyљnм uzavшou.</text>
+	</string>
+	<string id="st_lx8_button_press_true">
+		<text>Pшнstup povolen</text>
+	</string>
+	<string id="st_lx8_lift_button">
+		<text>Vyjeп vэtahem nahoru ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_pri_b306_go_down">
+		<text>Vyjeп vэtahem dolщ ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_psy_danger">
+		<text>Kritickб ъroveт psionickйho zбшenн. Neprodlenм odejdi z nebezpeиnй oblasti.</text>
+	</string>
+	<string id="st_radiation_danger">
+		<text>Nebezpeиnб hladina radiace. Bez ochrany se dбl nedostaneљ.</text>
+	</string>
+	<string id="st_search_helicopter">
+		<text>Prozkoumat vrtulnнk ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_search_treasure">
+		<text>Prohledat skrэљ ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_sleep_hours">
+		<text>h.</text>
+	</string>
+	<string id="st_tip">
+		<text>Zprбva</text>
+	</string>
+	<string id="tip_door_blocked">
+		<text>Dveшe jsou zablokovanй</text>
+	</string>
+	<string id="tip_door_close">
+		<text>Zavшнt dveшe ($$ACTION_USE$$)</text>
+	</string>
+	<string id="tip_door_closed_base_alarm">
+		<text>Dveшe jsou zamиenй - byl vyhlбљen poplach</text>
+	</string>
+	<string id="tip_door_closed_hide_weapon">
+		<text>Dveшe jsou zamиenй - nejdшнv schovej zbraт</text>
+	</string>
+	<string id="tip_door_locked">
+		<text>Dveшe jsou zamиenй</text>
+	</string>
+	<string id="tip_door_no_electricity">
+		<text>Dveшe nejsou pod proudem</text>
+	</string>
+	<string id="tip_door_open">
+		<text>Otevшнt dveшe ($$ACTION_USE$$)</text>
+	</string>
+	<string id="tip_gate_locked">
+		<text>Brбna je zablokovanб</text>
+	</string>
+	<string id="tip_need_access_card">
+		<text>Pouћнt pшнstupovou kartu ($$ACTION_USE$$)</text>
+	</string>
+	<string id="tip_no_access_card">
+		<text>Je zapotшebн pшнstupovб karta</text>
+	</string>
+	<string id="tip_open_another_site">
+		<text>Tyto dveшe se nedajн otevшнt z tйto strany</text>
+	</string>
+	<string id="ui_st_mp_experience_grow">
+		<text>-</text>
+	</string>
+	<string id="zat_b12_conteiner_full_locked">
+		<text>Kontejner je zamиenэ. K odemиenн budeљ potшebovat dva klниe.</text>
+	</string>
+	<string id="zat_b12_conteiner_has_one_key">
+		<text>Pouћнt klни ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b12_conteiner_has_two_key">
+		<text>Pouћнt klниe ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b12_conteiner_locked">
+		<text>Kontejner je zamиenэ. K odemиenн budeљ potшebovat jeљtм druhэ klни.</text>
+	</string>
+	<string id="zat_b12_conteiner_open">
+		<text>Otevшнt kontejner ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b14_door_locked_hint">
+		<text>Mechanismus dveшн je zablokovбn zevnitш.</text>
+	</string>
+	<string id="zat_b57_balon_use_hint">
+		<text>Pшipojit nбdrћ ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b57_gas_warning">
+		<text>Pozor! Chemickй nebezpeин!</text>
+	</string>
+	<string id="zat_b57_vintil_press">
+		<text>Otoиit ventilem ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b33_car_searching_tip">
+		<text>Prohledat auto ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_resupply_ready">
+		<text>Aћ budeљ potшebovat doplnit zdravotnickй potшeby nebo munici, stav se u poruинkщ Rogovce a Kirilova.</text>
+	</string>
+	<string id="st_surge_while_asleep">
+		<text>V Zуnм nedбvno doљlo k emisi.</text>
+	</string>
+	<string id="st_ach_marked_by_zone">
+		<text>Zнskбvбљ ocenмnн „Poznamenбn Zуnou“.</text>
+	</string>
+	<string id="st_mutant_hunter_news">
+		<text>Za pomoc pшi likvidaci nebezpeиnэch mutantщ byly do tvй osobnн skшнтky v Janovм vloћeny nбboje.</text>
+	</string>
+	<string id="st_found_old_treasure">
+		<text>Zнskбny souшadnice skrэљe, kterou uћ jsi objevil dшнve.</text>
+	</string>
+	<string id="st_got_treasure">
+		<text>Nalezena skrэљ</text>
+	</string>
+	<string id="st_found_new_treasure">
+		<text>Zнskбny souшadnice skrэљe</text>
+	</string>
+	<string id="st_press_any_key">
+		<text>Pokraиuj stiskem libovolnй klбvesy</text>
+	</string>
+</string_table>

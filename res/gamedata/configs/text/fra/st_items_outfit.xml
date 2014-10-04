@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="csky_heavy_outfit_name">
+		<text>Combinaison CS-3a</text>
+	</string>
+	<string id="dolg_heavy_outfit_name">
+		<text>Armure du Devoir PSZ-9d</text>
+	</string>
+	<string id="dolg_outfit_name">
+		<text>PS5-M "Protection universelle"</text>
+	</string>
+	<string id="exo_outfit_name">
+		<text>Exosquelette</text>
+	</string>
+	<string id="military_outfit_name">
+		<text>Combinaison blindйe "Bulat"</text>
+	</string>
+	<string id="mp_exo_outfit_description">
+		<text>L'exosquelette protиge extrкmement bien contre les balles et les йclats, mais rйduit la mobilitй du porteur. Inefficace face aux balles perforantes.</text>
+	</string>
+	<string id="mp_exo_outfit_name">
+		<text>Exosquelette</text>
+	</string>
+	<string id="mp_military_outfit_description">
+		<text>Combinaison blindйe conзue pour les opйrations d'assaut. Procure une protection exceptionnelle contre les balles blindйes et les йclats sans entraver la mobilitй du porteur. Inefficace face aux balles perforantes.</text>
+	</string>
+	<string id="mp_military_outfit_name">
+		<text>Combinaison blindйe militaire</text>
+	</string>
+	<string id="novice_outfit_description">
+		<text>Manteau en cuir noir classique. Sa seule fonction : rйchauffer son porteur la nuit et le protйger de la morsure d'un chien aveugle. Bien que peu confortable, c'est l'йquipement prйfйrй des bandits de la Zone, soit parce qu'il leur permet de se cacher dans le noir, soit parce qu'il leur donne un air "cool".</text>
+	</string>
+	<string id="novice_outfit_name">
+		<text>Manteau en cuir</text>
+	</string>
+	<string id="scientific_outfit_name">
+		<text>Combinaison SEVA</text>
+	</string>
+	<string id="specops_outfit_name">
+		<text>Combinaison blindйe Berill-5M</text>
+	</string>
+	<string id="st_helm_battle">
+		<text>Casque M12 Sphиre</text>
+	</string>
+	<string id="st_helm_battle_descr">
+		<text>Casque intйgral en titane et aluminium. L'extйrieur en tissu comprend des poches permettant d'ajouter des plaques de blindage. Le Sphиre M12 est gйnйralement utilisй avec une combinaison blindйe, comme la sйrie des PSZ militaires. Trиs populaire dans la Zone, il dispose d'un masque filtrant intйgrй et d'un dispositif de vision nocturne de premiиre gйnйration. Dispose d'emplacements йlectroniques.</text>
+	</string>
+	<string id="st_helm_hardhat">
+		<text>Casque en acier</text>
+	</string>
+	<string id="st_helm_hardhat_descr">
+		<text>Casque en acier aussi ancien que dйpassй. Ne procure aucune protection contre les anomalies ou les radiations, mais peut dйvier une balle. N'a jamais йtй trиs populaire dans la Zone, hormis lors de brefs conflits entre factions.</text>
+	</string>
+	<string id="st_helm_protective">
+		<text>Casque intйgral</text>
+	</string>
+	<string id="st_helm_protective_descr">
+		<text>Casque intйgral lйger et йtanche permettant de se protйger contre les anomalies. А en juger par son design, il est issu du mкme institut de recherche que la combinaison SEVA. Il a probablement йtй conзu pour кtre utilisй avec des combinaisons blindйes militaires dans des zones hautement anormales. </text>
+	</string>
+	<string id="st_helm_respirator">
+		<text>Masque а gaz</text>
+	</string>
+	<string id="st_helm_respirator_descr">
+		<text>Masque а gaz en plastique et caoutchouc utilisй pour filtrer les particules radioactives et les substances empoisonnйes. Trиs utilisй par les dйbutants et les vйtйrans de toutes les factions. Ne procure aucune protection physique.</text>
+	</string>
+	<string id="st_helm_tactic">
+		<text>Casque tactique</text>
+	</string>
+	<string id="st_helm_tactic_descr">
+		<text>Modиle occidental d'un casque tactique sans camouflage. Nul ne sait comment il est arrivй dans la Zone. Ce casque a йtй conзu pour fournir au chef de groupe des informations stratйgiques via un ensemble de dйtecteurs et dispositifs de communication, qui ne sont toutefois pas inclus dans cet exemplaire. Comprend des plaques de blindage en kevlar composite, des composants йlectroniques blindйs, un masque filtrant et un dispositif de vision nocturne de premiиre gйnйration.</text>
+	</string>
+	<string id="stalker_outfit_name">
+		<text>Combinaison "Lever de soleil"</text>
+	</string>
+	<string id="svoboda_heavy_outfit_name">
+		<text>Combinaison de garde de la Libertй</text>
+	</string>
+	<string id="svoboda_light_outfit_description">
+		<text>Cette combinaison de stalker lйgиre est produite par les artisans de la Libertй. Son tissu a йtй traitй avec de l'Horizon, une solution spйciale mise au point par les chercheurs de la faction pour amйliorer la rйsistance aux anomalies. А l'instar de la combinaison "Lever de soleil", le "Vent de Libertй" comprend des protections corporelles et des poches а artefacts.</text>
+	</string>
+	<string id="svoboda_light_outfit_name">
+		<text>Combinaison "Vent de Libertй"</text>
+	</string>
+	<string id="dolg_outfit_description">
+		<text>Cette version modernisйe de la combinaison du Devoir est parfaite pour les nouvelles recrues habituйes aux combinaisons lйgиres. Contrairement а la sйrie PSZ, elle protиge bien contre les anomalies tout en arrкtant les balles de petit calibre. Il est impossible d'y ajouter une poche а artefacts, mais elle peut кtre amйliorйe avec un systиme d'aide au combat.</text>
+	</string>
+	<string id="military_outfit_description">
+		<text>Cette combinaison a йtй conзue pour les assauts en zone anormale. Elle se compose d'une combinaison militaire blindйe PSZ-12p, de compensateurs intйgrйs et un justaucorps de protection contre les anomalies. Le blindage fournit une excellente protection contre les balles et les йclats, sans trop rйduire la mobilitй du porteur. N'inclut pas de poche а artefacts.</text>
+	</string>
+	<string id="mp_scientific_outfit_description">
+		<text>Cette combinaison conзue pour les recherches scientifiques dans la Zone combine un module respiratoire en circuit fermй et un revкtement isolant, ce qui permet de fournir une excellente protection contre les anomalies. Par contre, elle ne procure quasiment aucune protection contre les balles ou les fragments. Inclut une poche а artefacts.</text>
+	</string>
+	<string id="scientific_outfit_description">
+		<text>Cette combinaison crййe par un institut militaire de Kiev est une bonne alternative aux combinaisons artisanales. Si son blindage intйgrй n'est efficace que contre les balles de petit calibre, le systиme de protection contre les anomalies et les radiations est l'un des meilleurs de la Zone. Trиs apprйciйe des vйtйrans pour son йvolutivitй et ses deux poches а artefacts.</text>
+	</string>
+	<string id="specops_outfit_description">
+		<text>Ce vкtement se compose d'une combinaison blindйe militaire PS5 et d'un revкtement protecteur au bйryllium spйcialement conзu pour la Zone. Peu efficace contre les anomalies, il procure une excellente protection contre les radiations. Il est souvent donnй aux stalkers par les militaires en йchange de butin. N'inclut pas de poche а artefacts.</text>
+	</string>
+	<string id="stalker_outfit_description">
+		<text>Cette combinaison de stalker artisanale se compose d'un justaucorps en caoutchouc йpais, d'un revкtement en plexiglas et de plaques de blindages. Bien que ce dernier n'arrкte mкme pas les balles de petit calibre, cette combinaison reste trиs populaire de par son faible coыt et son potentiel d'йvolution. Inclut des poches а artefacts.</text>
+	</string>
+	<string id="svoboda_heavy_outfit_description">
+		<text>Cette combinaison au blindage renforcй produite par les artisans de la Libertй est un bon compromis entre capacitйs de combat et protection contre les anomalies. Son blindage se compose de plaques renforcйes et de couches de kevlar capables d'arrкter les balles de petit calibre. Son revкtement au Sovereign protиge contre les anomalies. Inclut une poche а artefacts.</text>
+	</string>
+	<string id="dolg_heavy_outfit_description">
+		<text>Cet ancien modиle de combinaison du Devoir s'inspire d'une Spetsnaz PSZ-9 modifiйe pour la Zone. Disposant d'un blindage capable d'arrкter des balles de gros calibre, elle est lourde, encombrante et ne protиge quasiment pas des anomalies. Il est impossible de rajouter une poche а artefacts, mais cette combinaison peut кtre amйliorйe avec un systиme d'aide au combat.</text>
+	</string>
+	<string id="csky_heavy_outfit_description">
+		<text>Ancien йquipement standard des groupes d'assaut de Firmament, cette armure sert а rappeler, mкme aprиs la disparition de sa faction d'origine, que la meilleure des protections ne garantit en aucun cas votre survie dans la Zone. Capable d'arrкter des balles de petit calibre, elle protиge йgalement contre les anomalies. Inclut une poche а artefacts.</text>
+	</string>
+	<string id="exo_outfit_description">
+		<text>Version expйrimentale d'un exosquelette militaire, cette armure n'a jamais йtй produite en sйrie en raison de son coыt de fabrication exorbitant et de ses dйfauts de conception. Elle est cependant trиs demandйe dans la Zone pour sa capacitй d'emport et est donc fabriquйe en petits nombres hors d'Ukraine. Inclut une poche а artefacts.</text>
+	</string>
+	<string id="mp_scientific_outfit_name">
+		<text>Combinaison SEVA</text>
+	</string>
+</string_table>

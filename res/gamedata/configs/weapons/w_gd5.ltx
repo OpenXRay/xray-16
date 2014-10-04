@@ -1,0 +1,140 @@
+[grenade_gd-05]:identity_immunities,weapon_probability,default_weapon_params
+grenade_remove_time		= 60000
+detonation_threshold_hit= 200
+GroupControlSection		= spawn_group
+discovery_dependency	=
+$spawn 					= "weapons\grenades\gd-05"
+$prefetch				= 128
+class						= G_F1_S
+cform						= skeleton
+visual					= dynamics\weapons\wpn_grenades\wpn_gd5.ogf
+inv_name				= st_grenade_smoke
+inv_name_short			= st_grenade_smoke
+inv_weight				= 0.63	;.1
+description				= st_grenade_smoke_descr
+ef_weapon_type			= 4
+default_to_ruck			= false
+sprint_allowed			= true
+control_inertion_factor	= 1
+;---DOF-------------------------------------------------------------------------
+zoom_dof					= 0.5, 1.0, 180
+reload_dof				= 0.0, 0.5, 5, 1.7
+;-------------------------------------------------------------------------------
+
+inv_grid_width			= 1
+inv_grid_height		= 1
+inv_grid_x				= 19
+inv_grid_y				= 3
+
+kill_msg_x				= 240
+kill_msg_y				= 123
+kill_msg_width			= 14
+kill_msg_height		= 23
+
+animation_slot			= 7
+single_handed			= 1
+
+slot						= 3
+hud						= grenade_gd-05_hud
+force_min				= 10	; ~30% от максимума
+force_const				= 25;20
+force_max				= 30
+force_grow_speed		= 15;2 ;30
+
+destroy_time			= 2500;3500
+
+cost					= 300
+
+;-------------------------------------------------------------------------------
+blast					= 0
+blast_r					= 0
+blast_impulse			= 0
+;delete
+blast_impulse_factor	 = 0
+
+frags					= 0
+frags_r					= 0
+frag_hit				= 0
+frag_hit_impulse		= 0
+
+hit_type_blast			= strike
+hit_type_frag			= fire_wound
+
+up_throw_factor			= 0
+;-------------------------------------------------------------------------------
+
+
+explode_particles		 = explosions\explosion_dym
+
+
+light_color		         = 0.9,0.6,0.5
+light_range		         = 2.0
+light_time 		         = 2.85
+
+;трассы от осколков
+fragment_speed				= 50
+explode_duration			= 12		;подолжительность взрыва (с)
+
+;звуки
+snd_explode = weapons\grenade_gd05
+snd_checkout = weapons\generic_checkout, 1.0, 0.4
+
+attach_position_offset	= -0.053,-0.089,0.0
+attach_angle_offset		= 0,0,0
+attach_bone_name		=
+
+// should be deleted after update
+bone_name				= bip01_r_hand
+position_offset			 = 0.0,0.0,0.0
+angle_offset			 = 1.570790,1.570790,3.92699
+
+
+throw_point			= 0.4, 0.3, 0.1
+throw_dir				 = 0,0,1
+third_person_throw_point_offset = -0.05,0.848,0.706
+
+wm_size                  = 0.1
+
+wallmark_section		 =explosion_marks
+
+[grenade_gd-05_hud]:hud_base
+fire_point		= 0,0,0
+fire_bone               = wpn_body
+
+
+attach_place_idx	= 0
+item_visual		= dynamics\weapons\wpn_grenades\wpn_gd5_hud.ogf
+
+hands_position          	= -0.044000,-0.156000,0.100000
+hands_orientation       	= -0.500000,1.000000,-2.000000
+hands_position_16x9     	= -0.044000,-0.156000,0.100000
+hands_orientation_16x9  	= -0.500000,1.000000,-2.000000
+
+
+item_position				= -0.001215,0.005992,0.000966
+item_orientation			= -359.925262,-2.224621,-7.030276
+
+
+aim_hud_offset_pos			= 0,0,0
+aim_hud_offset_rot			= 0,0,0
+gl_hud_offset_pos			= 0,0,0
+gl_hud_offset_rot			= 0,0,0
+
+lean_hud_offset_pos			= 0,0,0
+lean_hud_offset_rot			= 0,0,0
+
+anm_hide				= f1_holster
+anm_show				= f1_draw
+anm_idle				= f1_idle
+anm_bore				= f1_idle_bore
+anm_idle_moving	 			= f1_idle_moving
+anm_idle_sprint	 			= f1_idle_sprint
+
+anm_throw_begin				= f1_throw_begin
+anm_throw_idle				= f1_throw_idle
+anm_throw				= f1_throw
+
+
+throw_point			= 0.0,0.4,0.3
+throw_dir			= 0,0,1
+third_person_throw_point_offset = -0.05,0.848,0.706

@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="actor_inventory_box_use">
+		<text>Otwуrz skrytkк ($$ACTION_USE$$)</text>
+	</string>
+	<string id="cant_walk">
+		<text>Wyczerpanie nie pozwala ci iњж dalej</text>
+	</string>
+	<string id="cant_walk_weight">
+		<text>Nadmierne obci№їenie nie pozwala ci iњж dalej</text>
+	</string>
+	<string id="car_character_use">
+		<text>Otwуrz drzwi ($$ACTION_USE$$)</text>
+	</string>
+	<string id="character_use">
+		<text>Rozmawiaj ($$ACTION_USE$$)</text>
+	</string>
+	<string id="dead_character_use">
+		<text>Przeszukaj ciaіo ($$ACTION_USE$$)</text>
+	</string>
+	<string id="dead_character_use_or_drag">
+		<text>Przeszukaj ciaіo ($$ACTION_USE$$)\nPrzeci№gnij ciaіo (SHIFT+$$ACTION_USE$$)</text>
+	</string>
+	<string id="general_complete_task">
+		<text>Zadanie wykonane:</text>
+	</string>
+	<string id="general_fail_task">
+		<text>Zadanie nie powiodіo siк:</text>
+	</string>
+	<string id="general_in_item">
+		<text>Otrzymany przedmiot:</text>
+	</string>
+	<string id="general_in_money">
+		<text>Otrzymane pieni№dze:</text>
+	</string>
+	<string id="general_new_task">
+		<text>Nowe zadanie:</text>
+	</string>
+	<string id="general_out_item">
+		<text>Utracony przedmiot:</text>
+	</string>
+	<string id="general_out_money">
+		<text>Utracone pieni№dze:</text>
+	</string>
+	<string id="general_reverse_task">
+		<text>Zadanie anulowane:</text>
+	</string>
+	<string id="general_update_task">
+		<text>Nowe informacje o zadaniu:</text>
+	</string>
+	<string id="gun_jammed">
+		<text>Broс siк zaciкіa. Musisz przeіadowaж.</text>
+	</string>
+	<string id="inventory_box_use">
+		<text>Przeszukaj skrzynkк ($$ACTION_USE$$)</text>
+	</string>
+	<string id="inventory_item_use">
+		<text>Podnieњ przedmiot ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b10_ufo_searching_tips">
+		<text>Przeszukaj samolot ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b1_bar_door">
+		<text>Drzwi siк zaciкіy</text>
+	</string>
+	<string id="jup_b1_door_is_closed">
+		<text>Drzwi s№ zamkniкte od њrodka</text>
+	</string>
+	<string id="jup_b202_treasures_closed">
+		<text>Sejf zamkniкty</text>
+	</string>
+	<string id="jup_b205_tip_door_closed">
+		<text>Potrzebny jest kod</text>
+	</string>
+	<string id="jup_b205_tip_door_decode">
+		<text>Wprowadџ kod ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b206_use_plant">
+		<text>Podnieњ roњlinк ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b209_scanner_place_tips">
+		<text>Ustaw skaner ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b209_scanner_remove_tips">
+		<text>Weџ skaner ($$ACTION_USE$$)</text>
+	</string>
+	<string id="lx8_raduga">
+		<text>Supresor agresji Tкcza\nmodel zewnкtrznego kompleksu emisji\nskala1:20</text>
+	</string>
+	<string id="pas_b400_tip_switcher">
+		<text>Uїyj przeі№cznika ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_a18_use_idol">
+		<text>Zbadaj urz№dzenie ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_a25_blow_up_enter_door">
+		<text>Podіуї іadunki wybuchowe ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_a28_talk_with_stupid_medic">
+		<text>Odzyskaj ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_b306_elevator_door_locked_used">
+		<text>Brak zasilania windy</text>
+	</string>
+	<string id="pri_b306_generator_use">
+		<text>Wі№cz generator ($$ACTION_USE$$)</text>
+	</string>
+	<string id="sleep_ok_button">
+		<text>Њpij</text>
+	</string>
+	<string id="sleep_warning_all_pleasures">
+		<text>Nie moїesz spaж! Gwaіtownie krwawisz, a aktualny stopieс napromieniowania zagraїa twojemu їyciu. Uїyj lekarstw lub odwiedџ medyka. </text>
+	</string>
+	<string id="sleep_warning_bleeding">
+		<text>Nie moїesz spaж! Gwaіtownie krwawisz. Uїyj lekarstw lub odwiedџ medyka.</text>
+	</string>
+	<string id="sleep_warning_radiation">
+		<text>Nie moїesz spaж! Aktualny stopieс napromieniowania zagraїa twojemu їyciu. Uїyj lekarstw lub odwiedџ medyka. </text>
+	</string>
+	<string id="sleep_zone_tip">
+		<text>Њpij ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_ach_balance_advocate">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Obroсca rуwnowagi”.</text>
+	</string>
+	<string id="st_ach_battle_systems_master">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Ekspert systemуw obronnych”.</text>
+	</string>
+	<string id="st_ach_detective">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Detektyw”.</text>
+	</string>
+	<string id="st_ach_diplomat">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Dyplomata”. </text>
+	</string>
+	<string id="st_ach_friend_of_duty">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Przyjaciel Powinnoњci”.</text>
+	</string>
+	<string id="st_ach_friend_of_freedom">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Przyjaciel Wolnoњci”.</text>
+	</string>
+	<string id="st_ach_friend_of_stalkers">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Przyjaciel stalkerуw”.</text>
+	</string>
+	<string id="st_ach_herald_of_justice">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Wysіannik sprawiedliwoњci”.</text>
+	</string>
+	<string id="st_ach_high_tech_master">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Ekspert wysokiej technologii”.</text>
+	</string>
+	<string id="st_ach_information_dealer">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Handlarz informacjami”.</text>
+	</string>
+	<string id="st_ach_keeper_of_secrets">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Straїnik sekretуw”.</text>
+	</string>
+	<string id="st_ach_kingpin">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Szef”.</text>
+	</string>
+	<string id="st_ach_leader">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Przywуdca”.</text>
+	</string>
+	<string id="st_ach_mutant_hunter">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Јowca mutantуw”.</text>
+	</string>
+	<string id="st_ach_one_of_the_lads">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Jeden z nas”.</text>
+	</string>
+	<string id="st_ach_pioneer">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Pionier”.</text>
+	</string>
+	<string id="st_ach_research_man">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Asystent”.</text>
+	</string>
+	<string id="st_ach_seeker">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Јowca artefaktуw”.</text>
+	</string>
+	<string id="st_ach_skilled_stalker">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Doњwiadczony stalker”.</text>
+	</string>
+	<string id="st_ach_wealthy">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Bogaty klient”.</text>
+	</string>
+	<string id="st_autosave">
+		<text>Autozapis…</text>
+	</string>
+	<string id="st_can_use_weapon_now">
+		<text>Moїesz teraz wyj№ж broс.</text>
+	</string>
+	<string id="st_codelock">
+		<text>Zamek szyfrowy ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_detective_news">
+		<text>W nagrodк za rozwi№zanie tajemnicy zaginionych stalkerуw w twojej skrytce na Skadowsku zostaіy umieszczone њrodki medyczne.</text>
+	</string>
+	<string id="st_duty_first_reward_news">
+		<text>W nagrodк za pomoc Powinnoњci w twojej skrytce na stacji Janуw umieszczony zostaі kombinezon PS5-M Uniwersalna ochrona.</text>
+	</string>
+	<string id="st_duty_second_reward_news">
+		<text>W nagrodк za pomoc Powinnoњci w twojej skrytce na stacji Janуw umieszczony zostaі kombinezon Pancerz Powinnoњci PSZ-9d. </text>
+	</string>
+	<string id="st_freedom_first_reward_news">
+		<text>W nagrodк za pomoc Wolnoњci w twojej skrytce na stacji Janуw umieszczony zostaі kombinezon Powiew Wolnoњci.</text>
+	</string>
+	<string id="st_freedom_second_reward_news">
+		<text>W nagrodк za pomoc Wolnoњci w twojej skrytce na stacji Janуw umieszczony zostaі kombinezon Straїnik wolnoњci.</text>
+	</string>
+	<string id="st_freeplay_text_ok">
+		<text>Nie udaіo ci siк dotrzeж do helikopterуw i druїyna ewakuacyjna opuњciіa Zonк bez ciebie.</text>
+	</string>
+	<string id="st_freeplay_text_yes_no">
+		<text>Czy na pewno chcesz opuњciж Zonк? Powrуt jest niemoїliwy.</text>
+	</string>
+	<string id="st_game_over">
+		<text>Koniec gry.</text>
+	</string>
+	<string id="st_game_over_press_jump">
+		<text>Naciњnij klawisz ($$ACTION_JUMP$$), aby wyjњж do menu gіуwnego.</text>
+	</string>
+	<string id="st_game_paused">
+		<text>Pauza</text>
+	</string>
+	<string id="st_game_saved">
+		<text>Gra zapisana</text>
+	</string>
+	<string id="st_herald_of_justice_news">
+		<text>W nagrodк za pomoc w zdemaskowaniu Sroki w twojej skrytce na Skadowsku umieszczony zostaі artefakt.</text>
+	</string>
+	<string id="st_jup_b41_door_locked">
+		<text>Musisz poczekaж, aї dok zostanie uszczelniony.</text>
+	</string>
+	<string id="st_lx8_button_press_true">
+		<text>Przyznano dostкp</text>
+	</string>
+	<string id="st_lx8_lift_button">
+		<text>Jedџ wind№ do gуry ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_pri_b306_go_down">
+		<text>Jedџ wind№ w dуі ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_psy_danger">
+		<text>Krytyczny poziom emisji psionicznych. Opuњж natychmiast zagroїony obszar.</text>
+	</string>
+	<string id="st_radiation_danger">
+		<text>Niebezpieczny poziom promieniowania. Aby przejњж dalej, niezbкdna jest ochrona.</text>
+	</string>
+	<string id="st_search_helicopter">
+		<text>Zbadaj helikopter ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_search_treasure">
+		<text>Przeszukaj schowek ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_sleep_hours">
+		<text>g.</text>
+	</string>
+	<string id="st_tip">
+		<text>Wiadomoњж</text>
+	</string>
+	<string id="tip_door_blocked">
+		<text>Drzwi zablokowane</text>
+	</string>
+	<string id="tip_door_close">
+		<text>Zamknij drzwi ($$ACTION_USE$$)</text>
+	</string>
+	<string id="tip_door_closed_base_alarm">
+		<text>Drzwi zamkniкte - obуz jest w stanie pogotowia</text>
+	</string>
+	<string id="tip_door_closed_hide_weapon">
+		<text>Drzwi zamkniкte - musisz schowaж broс</text>
+	</string>
+	<string id="tip_door_locked">
+		<text>Drzwi zamkniкte</text>
+	</string>
+	<string id="tip_door_no_electricity">
+		<text>Brak zasilania drzwi</text>
+	</string>
+	<string id="tip_door_open">
+		<text>Otwуrz drzwi ($$ACTION_USE$$)</text>
+	</string>
+	<string id="tip_gate_locked">
+		<text>Brama zablokowana</text>
+	</string>
+	<string id="tip_need_access_card">
+		<text>Uїyj karty dostкpu ($$ACTION_USE$$)</text>
+	</string>
+	<string id="tip_no_access_card">
+		<text>Wymagana karta dostкpu</text>
+	</string>
+	<string id="tip_open_another_site">
+		<text>Drzwi nie moїna otworzyж z tej strony</text>
+	</string>
+	<string id="ui_st_mp_experience_grow">
+		<text>-</text>
+	</string>
+	<string id="zat_b12_conteiner_full_locked">
+		<text>Pojemnik jest zamkniкty. Aby go otworzyж, potrzebne s№ dwa klucze.</text>
+	</string>
+	<string id="zat_b12_conteiner_has_one_key">
+		<text>Uїyj klucza ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b12_conteiner_has_two_key">
+		<text>Uїyj kluczy ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b12_conteiner_locked">
+		<text>Pojemnik jest zamkniкty. Aby go otworzyж, potrzebny jest drugi klucz.</text>
+	</string>
+	<string id="zat_b12_conteiner_open">
+		<text>Otwуrz pojemnik ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b14_door_locked_hint">
+		<text>Mechanizm drzwi zostaі zablokowany od њrodka.</text>
+	</string>
+	<string id="zat_b57_balon_use_hint">
+		<text>Podі№cz zbiornik z gazem ($$ACTION_USE$$) </text>
+	</string>
+	<string id="zat_b57_gas_warning">
+		<text>Uwaga! Zagroїenie chemiczne!</text>
+	</string>
+	<string id="zat_b57_vintil_press">
+		<text>Otwуrz zawуr ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b33_car_searching_tip">
+		<text>Przeszukaj samochуd ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_resupply_ready">
+		<text>Moїesz uzupeіniж swуj zapas њrodkуw medycznych, odwiedzaj№c porucznikуw Rogowca i Kiryіowa.</text>
+	</string>
+	<string id="st_surge_while_asleep">
+		<text>Niedawno w Zonie nast№piіa emisja.</text>
+	</string>
+	<string id="st_ach_marked_by_zone">
+		<text>Udaіo ci siк zdobyж osi№gniкcie „Naznaczony przez Zonк".</text>
+	</string>
+	<string id="st_mutant_hunter_news">
+		<text>W nagrodк za eliminacjк niebezpiecznych mutantуw w twojej skrytce na stacji Janуw zostaіa umieszczona amunicja.</text>
+	</string>
+	<string id="st_found_old_treasure">
+		<text>Otrzymano wspуіrzкdne schowka, ktуry juї wczeњniej zostaі odkryty.</text>
+	</string>
+	<string id="st_got_treasure">
+		<text>Znaleziono schowek</text>
+	</string>
+	<string id="st_found_new_treasure">
+		<text>Otrzymano wspуіrzкdne schowka</text>
+	</string>
+	<string id="st_press_any_key">
+		<text>Naciњnij dowolny klawisz, aby rozpocz№ж grк</text>
+	</string>
+</string_table>

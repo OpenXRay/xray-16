@@ -1,0 +1,77 @@
+
+
+combat_sectors = {}
+
+function register_combat_restrictor(restrictor)
+	if combat_sectors[restrictor:name()] == nil then
+		combat_sectors[restrictor:name()] = restrictor
+	end
+end
+
+
+function apply_combat_restrictor(npc)
+	-- итерируемся по рестрикторам, ищем в котором мы находимся и апплаим его
+	local npc_position = npc:position()
+	for k,v in pairs(combat_sectors) do
+		if v:inside(npc_position) then
+			npc:add_restrictions(k, "")
+		end
+	end
+end
+
+
+function clear_combat_restrictor(npc)
+	local out_restr = utils.parse_names(npc:out_restrictions())
+	
+	for k,v in pairs(out_restr) do
+		if combat_sectors[v] ~= nil then
+			npc:remove_restrictions(v, "")
+		end	
+	end
+end
+
+
+
+
+function accessible_job(se_obj, way_name)
+	local obj = db.storage[se_obj.id]
+	if obj == nil then
+		return false
+	end
+	-- Берем клиентский объект НПС	
+	obj = obj.object
+	if obj == nil then
+		return false
+	end
+
+	local npc_position = obj:position()
+	local job_position = patrol(way_name):point(0)
+		
+	-- Берем рестриктор по позиции пути	
+	-- Берем рестриктор по позиции НПС
+	local is_npc_inside = false
+	for k,v in pairs(combat_sectors) do
+		if v:inside(npc_position) then
+			is_npc_inside = true
+			if v:inside(job_position) then
+				return true
+			end
+		end
+	end
+		
+	-- Если они совпадают - то истина, иначе ложь.
+	return is_npc_inside ~= true
+end
+
+
+function get_job_restrictor(way_name)
+	-- Берем смарт по позиции пути
+	local job_position = patrol(way_name):point(0)
+	for k,v in pairs(combat_sectors) do
+		if v:inside(job_position) then
+			return k
+		end
+	end
+	-- Возвращаем его имя
+	return ""
+end

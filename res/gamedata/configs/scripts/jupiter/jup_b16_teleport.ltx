@@ -1,0 +1,16 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_info = {+jup_b16_row_complete_1 +jup_b16_row_complete_2 +jup_b16_row_complete_3 +jup_b16_row_complete_4} %+jup_b16_no_teleport%
+on_info2 = {-jup_b16_actor_leave_oazis =dist_to_actor_ge(150)} %+jup_b16_actor_leave_oazis% 
+on_actor_in_zone = jup_b16_teleport | {+jup_b16_actor_leave_oazis} %-jup_b16_actor_leave_oazis%
+on_actor_in_zone2 = jup_b16_teleport | {-jup_b16_no_teleport} sr_idle@teleport %-jup_b16_show_particles -jup_b16_go_particle%
+on_actor_in_zone3 = jup_b16_show_particles_sr| {+jup_b16_go_particle} %+jup_b16_show_particles%
+
+
+[sr_idle@teleport]
+;on_info = {-jup_b16_no_teleport} sr_idle %-jup_b16_no_teleport  +jup_b16_go_particle  =jup_teleport_actor%
+on_info = {-jup_b16_no_teleport} sr_idle % +jup_b16_go_particle  =jup_teleport_actor%
+
+

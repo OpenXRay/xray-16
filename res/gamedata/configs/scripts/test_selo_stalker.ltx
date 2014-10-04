@@ -1,0 +1,80 @@
+[logic@stalker]
+suitable = {=check_npc_name(sim_default) -b}
+active = walker@1_1
+
+[walker@1_1]
+path_walk = walker_walk
+path_look = walker_look
+combat_ignore_cond = {=check_enemy_name(tushkano)} true
+on_info = {+a} walker@1_2
+
+[walker@1_2]
+path_walk = walker_walk
+path_look = walker_look
+combat_ignore_cond = {=check_enemy_name(tushkano)} true
+on_info = {-a} walker@1_1
+ 
+
+[logic@stalker2]
+suitable = {=check_npc_name(sim_default) +b}
+active = walker@2_1
+
+[walker@2_1]
+path_walk = walker_walk
+path_look = walker_look
+combat_ignore_cond = {=check_enemy_name(tushkano)} true
+on_info = {+a} walker@2_2
+
+[walker@2_2]
+path_walk = walker_walk
+path_look = walker_look
+combat_ignore_cond = {=check_enemy_name(tushkano)} true
+on_info = {-a} walker@2_1
+;---------------------------------------------------------------------------------------->
+[logic@boar]  
+active = mob_home@not_aggressive
+suitable = {=target_squad_name(sim_boar)} true
+prior = 200
+monster_job = true	
+
+[mob_home@aggressive]
+path_home = agr_home
+home_min_radius = 2
+home_max_radius = 10
+aggressive = true
+combat_ignore_cond = true
+;on_info = 
+
+[mob_home@not_aggressive]
+path_home = home
+home_min_radius = 2
+home_max_radius = 10
+;aggressive = true
+combat_ignore_cond = true
+on_info = mob_home@aggressive
+;-------------------------------------------------------------------------------------->
+[logic@polter]
+active = mob_home@poltergeist
+suitable = {=target_squad_name(sim_polter)} true
+prior = 200
+monster_job = true	
+
+[mob_home@poltergeist]
+path_home = polter_home
+home_min_radius = 2
+home_max_radius = 10
+aggressive = true
+;combat_ignore_cond = true
+;----------------------------------------------------------------------------------------->
+[logic@pseudodog]
+active = mob_home@pseudodog
+suitable = {=target_squad_name(sim_pseudodog)} true
+prior = 200
+monster_job = true	
+
+[mob_home@pseudodog]
+path_home = pseudodog_home
+home_min_radius = 2
+home_max_radius = 10
+aggressive = true
+;combat_ignore_cond = true

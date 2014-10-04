@@ -1,0 +1,271 @@
+----------------------------------------------------------------------------------------------------------------------
+-- STALKER NPC INFO
+----------------------------------------------------------------------------------------------------------------------
+function set_npc_info(npc, ini, scheme, section)
+	--printf("INFO SECTION [%s]", utils.to_str(section))
+
+	local in_info	= get_infos_from_data(npc, utils.cfg_get_string(ini, section, "in", npc, false, ""))
+	local out_info	= get_infos_from_data(npc, utils.cfg_get_string(ini, section, "out", npc, false, ""))
+
+	for k,v in pairs(in_info) do
+		npc:give_info_portion(v)
+	end
+	for k,v in pairs(out_info) do
+		npc:disable_info_portion(v)
+	end
+end
+function get_infos_from_data(npc, s)
+--	printf("get_infos_from_data [%s]", utils.to_str(s))
+	local t = {}
+		if s then
+		for name in string.gfind( s, "(%|*[^%|]+%|*)%p*" ) do
+--			printf("[%s]", utils.to_str(name))
+			local condlist = xr_logic.parse_condlist(npc, "in", name, name)
+			if condlist then
+				table.insert(t, xr_logic.pick_section_from_condlist(db.actor, npc, condlist))
+			end
+		end
+	end
+		return t
+end
+
+
+----------------------------------------------------------------------------------------------------------------------
+-- STALKER IGNORE MONSTER THRESHOLD
+----------------------------------------------------------------------------------------------------------------------
+-- Вызывается на переключении на новую секцию. Производит вычитывание настроек из текущей секции.
+function reset_threshold(npc, scheme, st, section)
+	local threshold_section
+	if scheme == nil or scheme == "nil" then
+		threshold_section = utils.cfg_get_string(st.ini, st.section_logic, "threshold", npc, false, "")
+	else
+		threshold_section = utils.cfg_get_string(st.ini, section, "threshold", npc, false, "")
+	end
+
+	--'printf("THRESHOLD SECTION [%s]", utils.to_str(threshold_section))
+	if threshold_section then
+		local max_ignore_distance	= utils.cfg_get_number(st.ini, threshold_section, "max_ignore_distance", npc, false)
+		if max_ignore_distance then
+			npc:max_ignore_monster_distance(max_ignore_distance)
+		else
+			npc:restore_max_ignore_monster_distance()
+		end
+		local ignore_monster		= utils.cfg_get_number(st.ini, threshold_section, "ignore_monster", npc, false)
+		if ignore_monster then
+			npc:ignore_monster_threshold(ignore_monster)
+		else
+			npc:restore_ignore_monster_threshold()
+		end
+	end
+end
+
+
+----------------------------------------------------------------------------------------------------------------------
+-- STALKER MAP SHOW
+----------------------------------------------------------------------------------------------------------------------
+-- Вызывается на переключении на новую секцию. Производит вычитывание настроек из текущей секции.
+function reset_show_spot(npc, scheme, st, section)
+	local spot_section
+	if scheme == nil or scheme == "nil" then
+		spot_section = utils.cfg_get_string(st.ini, st.section_logic, "show_spot", npc, false, "")
+	else
+		spot_section = utils.cfg_get_string(st.ini, section, "show_spot", npc, false, "")
+	end
+	local map_spot = utils.cfg_get_string(st.ini, st.section_logic, "level_spot", npc, false, "")
+	if map_spot == nil then
+		map_spot = utils.cfg_get_string(st.ini, section, "level_spot", npc, false, "")
+	end
+	if map_spot ~= nil then
+			map_spot = xr_logic.parse_condlist(npc, section, "level_spot", map_spot)
+			map_spot = xr_logic.pick_section_from_condlist(db.actor, npc, map_spot)
+	end
+	--' printf("STALKER SPOT SECTION [%s]", utils.to_str(spot_section))
+
+	if spot_section == nil then
+		spot_section = "true"
+	end
+
+		local spot = "false"
+--    if character_community(npc) ~= "zombied" then
+			local spot_condlist = xr_logic.parse_condlist(npc, section, "show_spot", spot_section)
+			spot = xr_logic.pick_section_from_condlist(db.actor, npc, spot_condlist)
+--    end
+
+	local sim  = alife()
+	if not sim then
+		return
+	end
+
+	local obj  = sim:object(npc:id())
+	if obj and obj.online then
+		local npc_id = npc:id()
+		if spot == "false" then
+			-- прячем
+			obj:visible_for_map(false)
+		else
+			-- ставим
+			obj:visible_for_map(true)
+		end
+		if map_spot ~= nil then
+						local map_location = ""
+						local hint = ""
+						if map_spot == "trader" then
+								map_location = "ui_pda2_trader_location"
+								hint = "st_ui_pda_legend_trader"
+						elseif map_spot == "mechanic" then
+								map_location = "ui_pda2_mechanic_location"
+								hint = "st_ui_pda_legend_mechanic"
+						elseif map_spot == "guider" then
+								map_location = "ui_pda2_scout_location"
+								hint = "st_ui_pda_legend_scout"
+--[[
+								local smarts_tbl = sim_board.get_sim_board().smarts
+								local npc_smrt_id = obj.m_smart_terrain_id
+								if npc_smrt_id ~= 65535 and npc_smrt_id ~= nil then
+										local npc_smart = smarts_tbl[npc_smrt_id].smrt
+										if npc_smart then
+												local smart_name = smart_names.get_smart_terrain_name(npc_smart)
+												hint = game.translate_string(hint).."\\n"..game.translate_string("st_location").." "..smart_name
+										end
+								end
+]]
+						elseif map_spot == "quest_npc" then
+								map_location = "ui_pda2_quest_npc_location"
+								hint = "st_ui_pda_legend_vip"
+						elseif map_spot == "medic" then
+								map_location = "ui_pda2_medic_location"
+								hint = "st_ui_pda_legend_medic"
+						end
+			if level.map_has_object_spot(npc_id, map_location) ~= 0 then
+								level.map_remove_object_spot(npc_id, map_location)
+			end
+						if db.actor and npc and npc:general_goodwill(db.actor) > -1000 then
+				level.map_add_object_spot(npc_id, map_location, hint)
+			end
+		else
+						if level.map_has_object_spot(npc_id, "ui_pda2_trader_location") ~= 0 then
+								level.map_remove_object_spot(npc_id, "ui_pda2_trader_location")
+						elseif level.map_has_object_spot(npc_id, "ui_pda2_mechanic_location") ~= 0 then
+								level.map_remove_object_spot(npc_id, "ui_pda2_mechanic_location")
+						elseif level.map_has_object_spot(npc_id, "ui_pda2_scout_location") ~= 0 then
+								level.map_remove_object_spot(npc_id, "ui_pda2_scout_location")
+						elseif level.map_has_object_spot(npc_id, "ui_pda2_quest_npc_location") ~= 0 then
+								level.map_remove_object_spot(npc_id, "ui_pda2_quest_npc_location")
+						elseif level.map_has_object_spot(npc_id, "ui_pda2_medic_location") ~= 0 then
+								level.map_remove_object_spot(npc_id, "ui_pda2_medic_location")
+						end
+		end
+	end
+end
+
+function remove_level_spot(npc, st)
+	local map_spot = utils.cfg_get_string(st.ini, st.section_logic, "level_spot", npc, false, "")
+	if map_spot == nil then
+		map_spot = utils.cfg_get_string(st.ini, st.active_section, "level_spot", npc, false, "")
+	end
+	if map_spot ~= nil then
+			map_spot = xr_logic.parse_condlist(npc, st.active_section, "level_spot", map_spot)
+			map_spot = xr_logic.pick_section_from_condlist(db.actor, npc, map_spot)
+	end
+	local sim  = alife()
+	if not sim then
+		return
+	end
+
+	local obj  = sim:object(npc:id())
+	if obj then
+		local npc_id = npc:id()
+		if map_spot ~= "" and map_spot ~= nil then
+					local map_location = ""
+					if map_spot == "trader" then
+							map_location = "ui_pda2_trader_location"
+					elseif map_spot == "mechanic" then
+							map_location = "ui_pda2_mechanic_location"
+					elseif map_spot == "guider" then
+							map_location = "ui_pda2_scout_location"
+					elseif map_spot == "quest_npc" then
+							map_location = "ui_pda2_quest_npc_location"
+					elseif map_spot == "medic" then
+							map_location = "ui_pda2_medic_location"
+					end
+			if level.map_has_object_spot(npc_id, map_location) ~= 0 then
+						level.map_remove_object_spot(npc_id, map_location)
+			end
+		end
+	end
+end
+
+--'--------------------------------------------------------------------------------------------------------------------
+--' INVULNERABILITY
+--'--------------------------------------------------------------------------------------------------------------------
+function is_need_invulnerability(npc)
+	local npc_st = db.storage[npc:id()]
+	local invulnerability = utils.cfg_get_string(npc_st.ini, npc_st.active_section, "invulnerable", npc, false, "", nil)
+
+	if invulnerability == nil then
+		return false
+	end
+
+	invulnerability = xr_logic.parse_condlist(npc, "invulnerability", "invulnerability", invulnerability)
+
+	return xr_logic.pick_section_from_condlist(db.actor, npc, invulnerability) == "true"
+end
+
+--' Вызывается на переключении на новую секцию. Производит вычитывание настроек из текущей секции.
+function reset_invulnerability(npc, ini, section)
+	local invulnerability = is_need_invulnerability(npc)
+
+	printf("RESET INVULNERABILITY. npc[%s] = [%s]", npc:name(), tostring(invulnerability))
+	if npc:invulnerable() ~= invulnerability then
+		npc:invulnerable(invulnerability)
+	end
+end
+function disable_invulnerability(npc)
+	printf("DISABLE INVULNERABILITY. npc[%s] = [false]", npc:name())
+	npc:invulnerable(false)
+end
+
+function update_invulnerability(npc)
+	local invulnerability = is_need_invulnerability(npc)
+
+	if npc:invulnerable() ~= invulnerability then
+		printf("UPDATE INVULNERABILITY. npc[%s] = [%s]", npc:name(), tostring(invulnerability))
+		npc:invulnerable(invulnerability)
+	end
+end
+
+
+
+
+--'--------------------------------------------------------------------------------------------------------------------
+--' TEAM SQUAD GROUP
+--'--------------------------------------------------------------------------------------------------------------------
+--' Вызывается на переключении на новую секцию. Производит вычитывание настроек из текущей секции.
+function reset_group(npc, ini, section)
+	local group = utils.cfg_get_number(ini, section, "group", npc, false, -1)
+
+	if group ~= -1 then
+		npc:change_team(npc:team(), npc:squad(), group)
+	end
+end
+
+function take_items_enabled(npc, scheme, st, section)
+		local take_items = nil
+		if(st.ini:line_exist(section, "take_items")) then
+				take_items = utils.cfg_get_bool(st.ini, section, "take_items", npc, false, true)
+		else
+				take_items = utils.cfg_get_bool(st.ini, st.section_logic, "take_items", npc, false, true)
+		end
+		npc:take_items_enabled(take_items)
+end
+
+function can_select_weapon(npc, scheme, st, section)
+	local str = utils.cfg_get_string(st.ini, section, "can_select_weapon", npc, false, "", "")
+	if(str=="") then
+		str = utils.cfg_get_string(st.ini, st.section_logic, "can_select_weapon", npc, false, "", "true")
+	end
+
+		local cond = xr_logic.parse_condlist(npc, section, "can_select_weapon", str)
+		local can = xr_logic.pick_section_from_condlist(db.actor, npc, cond)
+		npc:can_select_weapon(can=="true")
+end

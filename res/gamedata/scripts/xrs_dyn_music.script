@@ -1,0 +1,342 @@
+--constants
+TRACK_SWITCH_DELTA = 3000			-- switch between tracks delta
+MAX_DIST = 100						-- max distance for dynamic sound stopping
+MIN_DIST = 75						-- min distance for dynamic sound playing
+THEME_FADE_UPDATE_DELTA = 100       -- update theme volume fade twice per second
+AMBIENT_FADE_UPDATE_DELTA = 200     -- update ambient volume fade twice per second
+VOLUME_DELTA = 0					-- sound volume fade delta (is set on initialize)
+-- global variables (used from other scripts)
+npc_table = {}
+-- local variables (reinit on initialize())
+themes = {}
+ambient_vol = get_console():get_float("snd_volume_music")
+m_ambient_vol = 0
+FadeTo_ambient = 0
+m_theme_volume = 0
+FadeTo_theme = 0
+
+cur_theme_number = 0
+cur_track_number = 0
+next_track_start_time = 0
+theme = nil
+-- local variables
+local init_failed = false
+local themes_inited = false
+local prev_fade_time = 0
+local force_fade = false
+local was_in_silence = false
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function init()
+	xr_s.register_callback("update", on_actor_update, nil)
+	xr_s.register_callback("actor_destroy", on_actor_destroy, nil)
+	xr_s.register_callback("main_menu_on", main_menu_on, nil)
+	xr_s.register_callback("main_menu_off", main_menu_off, nil)
+end
+
+function initialize_themes()
+	if not(xrs_dynamic_music_themes) or not(xrs_dynamic_music_themes.themes) then
+		init_failed = true
+		return
+	end
+	local new_table = {}
+	local lname = level.name()
+	for k,v in pairs(xrs_dynamic_music_themes.themes) do
+		if not(v.maps) or (v.maps=="") or (string.find(v.maps,lname)) then
+			table.insert(new_table,v.files)
+		end
+	end
+	themes = new_table
+	if(#themes==0) then
+		init_failed = true
+		return
+	end
+
+	m_ambient_vol = ambient_vol
+	m_theme_volume = ambient_vol
+	FadeTo_theme = ambient_vol
+	FadeTo_ambient = ambient_vol
+
+	cur_theme_number = 0
+	cur_track_number = 0
+	next_track_start_time = 0
+	theme = nil
+
+	VOLUME_DELTA = m_ambient_vol/50
+
+	themes_inited = true
+end
+
+function on_actor_destroy()
+	if(theme) and (theme:playing()) then
+		theme:stop()
+	end
+	get_console():execute("snd_volume_music "..ambient_vol)
+end
+
+function main_menu_on()
+	get_console():execute("snd_volume_music "..ambient_vol)
+end
+
+function main_menu_off()
+	local amb = get_console():get_float("snd_volume_music")
+	if(amb~=ambient_vol) then
+		ambient_vol = amb
+	end
+	if(theme) and (theme:playing()) then
+		if not(IsDynamicMusic()) then
+			themes_inited = false
+			theme:stop()
+		else
+			get_console():execute("snd_volume_music "..m_ambient_vol)
+		end
+	end
+end
+
+function on_actor_update()
+	if(init_failed) then
+		return
+	end
+	if(surge_manager.sound_started()) then
+		if(surge_manager.is_killing_all()) then
+			force_fade = true
+			FadeTo_ambient = ambient_vol
+			fade_ambient()
+			force_fade = false
+		else
+			FadeTo_ambient = 0
+			fade_ambient()
+		end
+	end
+	if(IsDynamicMusic()) then
+		if not(themes_inited) then
+			initialize_themes()
+		end
+
+		if(theme) then
+			theme:update(m_theme_volume)
+		end
+		local state = get_theme_state()
+		if(state=="start") then
+			start_theme()
+		elseif(state=="idle") then
+			if(theme_is_fading()) then
+				fade_theme()
+			elseif(ambient_is_fading()) then
+				fade_ambient()
+			end
+			if(time_global()>next_track_start_time) then
+				select_next_track()
+			end
+		elseif(state=="finish") then
+			finish_theme()
+		end
+	end
+end
+
+function get_theme_state()
+	local actor = db.actor
+	force_fade = false
+	if(actor:alive()) then
+		if not(actor_in_silence_zone()) then
+		local actor_pos = actor:position()
+			local nearest_enemy = nil
+			local nearest_dist = 100
+			for k, obj_id in pairs(npc_table) do
+				local object = db.storage[obj_id] and db.storage[obj_id].object
+				if(object) then
+					local enemy = object:best_enemy()
+					if(enemy) and (enemy:id()==actor:id()) then
+						local dist = actor_pos:distance_to(object:position())
+						if(dist<nearest_dist) then
+							nearest_enemy = object
+							nearest_dist = dist
+						end
+					end
+				end
+			end
+			if(nearest_enemy) then
+				if(nearest_dist<MIN_DIST) then
+					force_fade = true
+					FadeTo_theme = ambient_vol
+					FadeTo_ambient = 0
+					if(theme) then
+						return "idle"
+					else
+						return "start"
+					end
+				elseif(nearest_dist>MAX_DIST) then
+					if(theme) then
+						FadeTo_theme = 0
+						FadeTo_ambient = ambient_vol
+						return "idle"
+					end
+				else
+					if(theme) then
+						if(was_in_silence) then
+							was_in_silence = false
+							FadeTo_ambient = ambient_vol
+						end
+						return "idle"
+					end
+				end
+			end
+		else
+-- if actor is in silence zone - fade volume to zero
+			if(theme) then
+				was_in_silence = true
+				FadeTo_theme = 0
+				FadeTo_ambient = 0
+				return "idle"
+			end
+		end
+	end
+	if(theme) then
+-- if actor is dead or there is no enemies in distance - fade out and finish theme
+		FadeTo_theme = 0
+		FadeTo_ambient = ambient_vol
+		if(theme_is_fading() or ambient_is_fading()) then
+			return "idle"
+		else
+			get_console():execute("snd_volume_music "..ambient_vol)
+			return "finish"
+		end
+	end
+	return nil
+end
+
+function theme_is_fading()
+	return m_theme_volume~=FadeTo_theme
+end
+
+function ambient_is_fading()
+	return m_ambient_vol~=FadeTo_ambient
+end
+
+function actor_in_silence_zone()
+	local silence_zones = db.storage.silence_zone_table
+	if(silence_zones) then
+		local actor_pos = db.actor:position()
+		for k,v in pairs(silence_zones) do
+			local zone = db.zone_by_name[v]
+			if(zone:inside(actor_pos)) then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+function start_theme()
+	m_ambient_vol = 0
+	get_console():execute("snd_volume_music "..m_ambient_vol)
+
+	m_theme_volume = ambient_vol
+
+	cur_theme_number = math.random(1, #themes)
+	cur_track_number = math.random(1, #themes[cur_theme_number])
+	if(theme==nil) then
+		theme = xrs_stereo.stereo_sound()
+	end
+	theme:initialize(themes[cur_theme_number][cur_track_number], m_theme_volume)
+	next_track_start_time = theme:play() - TRACK_SWITCH_DELTA
+	theme:update(m_theme_volume)
+end
+
+function clamp(val, min, max)
+	local res = val
+	if(res<min) then
+		res = min
+		return res
+	end
+	if(res>max) then
+		res = max
+		return res
+	end
+	return res
+end
+
+function fade_theme()
+	local g_time = time_global()
+	if(g_time-prev_fade_time<=THEME_FADE_UPDATE_DELTA) then
+		return
+	end
+	prev_fade_time = g_time
+
+	FadeTo_theme = clamp(FadeTo_theme, 0, ambient_vol)
+
+	if(m_theme_volume>FadeTo_theme) then
+		if(force_fade) then
+			m_theme_volume = FadeTo_theme
+		else
+			m_theme_volume = m_theme_volume - VOLUME_DELTA
+		end
+		m_theme_volume = clamp(m_theme_volume, FadeTo_theme, m_theme_volume)
+	elseif(m_theme_volume<FadeTo_theme) then
+		if(force_fade) then
+			m_theme_volume = FadeTo_theme
+		else
+			m_theme_volume = m_theme_volume + VOLUME_DELTA
+		end
+		m_theme_volume = clamp(m_theme_volume, m_theme_volume, FadeTo_theme)
+	end
+end
+
+function fade_ambient()
+	local g_time = time_global()
+	if(g_time-prev_fade_time<=AMBIENT_FADE_UPDATE_DELTA) then
+		return
+	end
+	prev_fade_time = g_time
+
+	FadeTo_ambient = clamp(FadeTo_ambient, 0, ambient_vol)
+
+	if(m_ambient_vol>FadeTo_ambient) then
+		if(force_fade) then
+			m_ambient_vol = FadeTo_ambient
+		else
+			m_ambient_vol = m_ambient_vol - VOLUME_DELTA
+		end
+		m_ambient_vol = clamp(m_ambient_vol, FadeTo_ambient, m_ambient_vol)
+	elseif(m_ambient_vol<FadeTo_ambient) then
+		if(force_fade) then
+			m_ambient_vol = FadeTo_ambient
+		else
+			m_ambient_vol = m_ambient_vol + VOLUME_DELTA
+		end
+		m_ambient_vol = clamp(m_ambient_vol, m_ambient_vol, FadeTo_ambient)
+	end
+	get_console():execute("snd_volume_music "..m_ambient_vol)
+end
+
+function select_next_track()
+	if(cur_theme_number==nil or themes[cur_theme_number]==nil) then
+		print_table(themes)
+		log("-------->cur_theme_number="..tostring(cur_theme_number))
+		log("-------->cur_track_number="..tostring(cur_track_number))
+		log("-------->theme="..tostring(theme~=nil))
+		if(theme) then
+			log("-------->theme is playing="..tostring(theme:playing()~=nil))
+		end
+		log("-------->cur_state="..tostring(get_theme_state()))
+		abort("wrong theme number")
+	end
+	if(cur_track_number<#themes[cur_theme_number]) then
+		cur_track_number = cur_track_number + 1
+	else
+		cur_track_number = 1
+	end
+	if(theme) then
+		next_track_start_time = theme:play_at_time(next_track_start_time + TRACK_SWITCH_DELTA,
+												   themes[cur_theme_number][cur_track_number],
+												   m_theme_volume) - TRACK_SWITCH_DELTA
+	end
+end
+
+function finish_theme()
+	if(theme) then
+		theme:stop()
+	end
+	themes_inited = false
+end

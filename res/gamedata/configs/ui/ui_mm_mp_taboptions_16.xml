@@ -1,0 +1,271 @@
+	<tab_options>
+	    <main x="347" y="362" width="550" height="341"/>
+        <frame_1 x="17" y="0" width="171" height="326">
+            <texture>ui_inGame2_servers_list_frame</texture>
+        </frame_1>
+        <frame_2 x="193" y="0" width="171" height="340">
+            <texture>ui_inGame2_servers_list_frame</texture>
+        </frame_2>
+        <frame_3 x="370" y="0" width="171" height="326">
+            <texture>ui_inGame2_servers_list_frame</texture>
+        </frame_3>
+
+		<cap_network_connection x="19" y="2" width="168" height="15">
+			<texture>ui_inGame2_servers_list_button</texture>
+			<auto_static x="8" y="0" width="155" height="15">
+				<text font="letterica16" vert_align="c">mm_mp_network_connection</text>
+			</auto_static>
+		</cap_network_connection>
+		<cap_respawn_options x="19" y="139" width="168" height="15">
+			<texture>ui_inGame2_servers_list_button</texture>
+			<auto_static x="8" y="0" width="155" height="15">
+				<text font="letterica16" vert_align="c">mm_mp_respawnoptions</text>
+			</auto_static>
+		</cap_respawn_options>
+		<cap_server_list x="195" y="2" width="168" height="15">
+			<texture>ui_inGame2_servers_list_button</texture>
+			<auto_static x="8" y="0" width="155" height="15">
+				<text font="letterica16" vert_align="c">mm_mp_serverlist</text>
+			</auto_static>
+		</cap_server_list>
+		<cap_weather_options x="372" y="2" width="168" height="15">
+			<texture>ui_inGame2_servers_list_button</texture>
+			<auto_static x="8" y="0" width="155" height="15">
+				<text font="letterica16" vert_align="c">mm_mp_weatheroptions</text>
+			</auto_static>
+		</cap_weather_options>
+		<cap_spectator_options x="372" y="89" width="168" height="15">
+			<texture>ui_inGame2_servers_list_button</texture>
+			<auto_static x="8" y="0" width="155" height="15">
+				<text font="letterica16" vert_align="c">mm_mp_spectator_options</text>
+			</auto_static>
+		</cap_spectator_options>
+		<cap_demosave_options x="372" y="234" width="168" height="15">
+			<texture>ui_inGame2_servers_list_button</texture>
+			<auto_static x="8" y="0" width="155" height="15">
+				<text font="letterica16" vert_align="c">mm_mp_demosave_options</text>
+			</auto_static>
+		</cap_demosave_options>
+
+		<public_server_t x="16" y="17" width="35" height="29" stretch="1">
+			<texture>ui_inGame2_checkbox_t</texture>
+			<auto_static x="32" y="14">
+				<text font="arial_14" vert_align="c">mm_mp_publicserver</text>
+			</auto_static>
+		</public_server_t>
+		<public_server_d x="16" y="17" width="35" height="29" stretch="1">
+			<texture>ui_inGame2_checkbox_d</texture>
+			<auto_static x="32" y="14">
+				<text font="arial_14" vert_align="c">mm_mp_publicserver</text>
+			</auto_static>
+		</public_server_d>
+
+		<cap_max_ping x="25" y="64" width="96" height="24">
+			<text font="arial_14" vert_align="c">mm_mp_max_ping</text>
+		</cap_max_ping>
+		<spin_max_ping x="132" y="66" width="51" height="20">
+			<options_item entry="sv_max_ping_limit" group="mm_mp_server"/>
+		</spin_max_ping>
+
+		<check_spectator x="16" y="85" width="35" height="29" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+			<options_item entry="mm_net_con_spectator_on" group="mm_mp_server"/>
+			<text x="-13" font="arial_14" vert_align="c">mm_mp_spectator</text>
+		</check_spectator>
+		<spin_spectator x="132" y="89" width="51" height="20">
+			<options_item entry="mm_net_con_spectator" group="mm_mp_server"/>
+		</spin_spectator>
+
+		<check_allow_voting x="16" y="107" width="35" height="29" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+			<options_item entry="sv_vote_enabled" group="mm_mp_server"/>
+			<text x="-13" font="arial_14" vert_align="c">mm_mp_allowvoting</text>
+		</check_allow_voting>
+
+		<radio_tab_respawn_options x="22" y="155" width="108" height="76" radio="1">
+			<options_item entry="mm_net_srv_reinforcement_type" group="mm_mp_server"/>
+			<button x="-8" y="0" width="37" height="28" id="forcerespawn" stretch="1">
+				<text font="arial_14" align="l" x="32" y="3">mm_mp_forcerespawn</text>
+			</button>
+			<button x="-8" y="25" width="37" height="28" id="reinforcement" stretch="1">
+				<text font="arial_14" align="l" x="32" y="3">mm_mp_reinforcement</text>
+			</button>
+			<button x="-8" y="50" width="37" height="28" id="artefactcapture" stretch="1">
+				<text font="arial_14" align="l" x="32" y="3">mm_mp_artefactcapture</text>
+			</button>
+		</radio_tab_respawn_options>
+
+		<spin_force_respawn x="132" y="159" width="51" height="20">
+			<options_item entry="sv_forcerespawn" group="mm_mp_server"/>
+		</spin_force_respawn>
+
+		<spin_reinforcement x="132" y="184" width="51" height="20">
+			<options_item entry="sv_reinforcement_time" group="mm_mp_server"/>
+		</spin_reinforcement>
+
+		<cap_damage_block x="25" y="232" width="96" height="24">
+			<text font="arial_14" vert_align="c">mm_mp_damageblock</text>
+		</cap_damage_block>
+
+		<spin_damage_block x="132" y="234" width="51" height="20">
+			<options_item entry="sv_dmgblocktime" group="mm_mp_server"/>
+		</spin_damage_block>
+
+		<check_damage_block x="16" y="252" width="35" height="29" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+			<options_item entry="sv_dmgblockindicator" group="mm_mp_server"/>
+			<text x="-13" font="arial_14" vert_align="c">mm_mp_damageblockindicator</text>
+		</check_damage_block>
+
+		<cap_artreturn_time x="25" y="278" width="96" height="24">
+			<text font="arial_14" vert_align="c">mm_mp_artret_time</text>
+		</cap_artreturn_time>
+
+		<spin_artreturn_time x="132" y="280" width="51" height="20">
+			<options_item entry="sv_artefact_returning_time" group="mm_mp_server"/>
+		</spin_artreturn_time>
+
+		<check_activated_return x="16" y="297" width="35" height="29" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+			<options_item entry="sv_activated_return" group="mm_mp_server"/>
+			<text x="-13" font="arial_14" vert_align="c">mm_mp_actret_time</text>
+		</check_activated_return>
+
+		<cap_friendly_fire x="201" y="20" width="96" height="24">
+			<text font="arial_14" vert_align="c">mm_mp_friendlyfire</text>
+		</cap_friendly_fire>
+		<spin_friendly_fire x="308" y="22" width="51" height="20">
+			<options_item entry="sv_friendlyfire" group="mm_mp_server"/>
+		</spin_friendly_fire>
+
+		<cap_frag_limit x="201" y="41" width="96" height="24">
+			<text font="arial_14" vert_align="c">mm_mp_fraglimit</text>
+		</cap_frag_limit>
+		<spin_frag_limit x="308" y="43" width="51" height="20">
+			<options_item entry="sv_fraglimit" group="mm_mp_server"/>
+		</spin_frag_limit>
+
+		<cap_time_limit x="201" y="62" width="96" height="24">
+			<text font="arial_14" vert_align="c">mm_mp_timelimit</text>
+		</cap_time_limit>
+		<spin_time_limit x="308" y="64" width="51" height="20">
+			<options_item entry="sv_timelimit" group="mm_mp_server"/>
+		</spin_time_limit>
+
+		<cap_artefact_stay x="201" y="83" width="96" height="24">
+			<text font="arial_14" vert_align="c">mm_mp_artefstay</text>
+		</cap_artefact_stay>
+		<spin_artefact_stay x="308" y="85" width="51" height="20">
+			<options_item entry="sv_artefact_stay_time" group="mm_mp_server"/>
+		</spin_artefact_stay>
+
+		<cap_artefact_num x="201" y="105" width="96" height="24">
+			<text font="arial_14" vert_align="c">mm_mp_artefnum</text>
+		</cap_artefact_num>
+		<spin_artefacts_num x="308" y="107" width="51" height="20">
+			<options_item entry="sv_artefacts_count" group="mm_mp_server"/>
+		</spin_artefacts_num>
+
+		<cap_artefact_delay x="201" y="126" width="96" height="24">
+			<text font="arial_14" vert_align="c">mm_mp_artefdelay</text>
+		</cap_artefact_delay>
+		<spin_artefact_delay x="308" y="128" width="51" height="20">
+			<options_item entry="sv_artefact_respawn_delta" group="mm_mp_server"/>
+		</spin_artefact_delay>
+
+		<check_pda_hunt x="192" y="147" width="35" height="29" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+			<options_item entry="sv_pda_hunt" group="mm_mp_server"/>
+			<text x="-13" font="arial_14" vert_align="c">mm_mp_pda_hunt</text>
+		</check_pda_hunt>
+		<check_auto_team_balance x="192" y="170" width="35" height="29" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+			<options_item entry="sv_auto_team_balance" group="mm_mp_server"/>
+			<text x="-13" font="arial_14" vert_align="c">mm_mp_autoteambalance</text>
+		</check_auto_team_balance>
+		<check_auto_team_swap x="192" y="193" width="35" height="29" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+			<options_item entry="sv_auto_team_swap" group="mm_mp_server"/>
+			<text x="-13" font="arial_14" vert_align="c">mm_mp_autoteamswap</text>
+		</check_auto_team_swap>
+		<check_friendly_indicators x="192" y="216" width="35" height="29" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+			<options_item entry="sv_friendly_indicators" group="mm_mp_server"/>
+			<text x="-13" font="arial_14" vert_align="c">mm_mp_friendlyindicators</text>
+		</check_friendly_indicators>
+		<check_friendly_names x="192" y="239" width="35" height="29" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+	        <options_item entry="sv_friendly_names" group="mm_mp_server"/>
+	        <text x="-13" font="arial_14" vert_align="c">mm_mp_friendlynames</text>
+		</check_friendly_names>
+	    <check_no_anmalies x="192" y="262" width="35" height="29" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+	        <options_item entry="sv_anomalies_enabled" group="mm_mp_server"/>
+	        <text x="-13" font="arial_14" vert_align="c">mm_mp_noanomalies</text>
+	    </check_no_anmalies>
+
+	    <cap_anomaly_time x="201" y="289" width="96" height="24">
+	        <text font="arial_14" vert_align="c">mm_mp_anomalytime</text>
+	    </cap_anomaly_time>
+	    <spin_anomaly_time x="308" y="291" width="51" height="20">
+		    <options_item entry="sv_anomalies_length" group="mm_mp_server"/>
+	    </spin_anomaly_time>
+
+	    <cap_warm_up_time x="201" y="310" width="96" height="24">
+		    <text font="arial_14" vert_align="c">mm_mp_warmuptime</text>
+	    </cap_warm_up_time>
+	    <spin_warm_up_time x="308" y="312" width="51" height="20">
+	    	<options_item entry="sv_warm_up" group="mm_mp_server"/>
+	    </spin_warm_up_time>
+
+	    <cap_starting_weather x="376" y="24" width="96" height="24">
+	        <text font="arial_14" vert_align="c">mm_mp_startweather</text>
+	    </cap_starting_weather>
+	    <spin_weather x="459" y="26" width="73" height="20">
+		    <text_color>
+	            <e r="255" g="255" b="255"/>
+		    </text_color>
+	    </spin_weather>
+
+	    <cap_rate_of_change x="376" y="49" width="96" height="24">
+		    <text font="arial_14" vert_align="c">mm_mp_rateofchange</text>
+	    </cap_rate_of_change>
+	    <spin_rate_of_change x="481" y="51" width="51" height="20">
+		    <options_item entry="mm_net_weather_rateofchange" group="mm_mp_server"/>
+	    </spin_rate_of_change>
+
+	    <check_spec_teamonly x="367" y="104" width="35" height="29" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+	        <text x="-13" font="arial_14" vert_align="c">mm_mp_spectator_teamonly</text>
+		    <options_item entry="sv_spectr_teamcamera" group="mm_mp_server"/>
+	    </check_spec_teamonly>
+	    <check_spec_freefly x="367" y="127" width="35" height="29" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+	        <text x="-13" font="arial_14" vert_align="c">mm_mp_spectator_freefly</text>
+		    <options_item entry="sv_spectr_freefly" group="mm_mp_server"/>
+	    </check_spec_freefly>
+	    <check_spec_firsteye x="367" y="150" width="35" height="29" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+	        <text x="-13" font="arial_14" vert_align="c">mm_mp_spectator_firsteye</text>
+		    <options_item entry="sv_spectr_firsteye" group="mm_mp_server"/>
+	    </check_spec_firsteye>
+	    <check_spec_lookat x="367" y="173" width="35" height="29" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+	        <text x="-13" font="arial_14" vert_align="c">mm_mp_spectator_lookat</text>
+		    <options_item entry="sv_spectr_lookat" group="mm_mp_server"/>
+	    </check_spec_lookat>
+	    <check_spec_freelook x="367" y="196" width="35" height="29" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+	        <text x="-13" font="arial_14" vert_align="c">mm_mp_spectator_freelook</text>
+	    	<options_item entry="sv_spectr_freelook" group="mm_mp_server"/>
+	    </check_spec_freelook>
+
+
+
+	    <check_demosave x="367" y="249" width="35" height="29" stretch="1">
+	        <texture>ui_inGame2_checkbox</texture>
+	        <options_item entry="cl_mpdemosave" group="mm_mp_client"/>
+	        <text x="-13" font="arial_14" vert_align="c">mm_mp_demosave</text>
+	    </check_demosave>
+
+	</tab_options>

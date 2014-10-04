@@ -1,0 +1,267 @@
+[wpn_fort]:identity_immunities,weapon_probability,default_weapon_params
+GroupControlSection			= spawn_group
+$spawn                   	= "weapons\fort"		; option for Level Editor
+$npc			 			= on						; option for Level Editor
+$prefetch 					= 8
+scheduled            		= off              	; option for ALife Simulator
+cform                    	= skeleton
+class                    	= WP_PM
+description					= st_wpn_fort_descr
+ef_weapon_type			  	= 5
+
+;-----------------------------------------------------------------------------
+cost					= 600
+inv_weight				= 0.83
+
+upgrades                = up_gr_firstab_fort, up_gr_seconab_fort, up_gr_thirdab_fort, up_gr_fourtab_fort, up_gr_fifthab_fort, up_gr_fifthcd_fort
+installed_upgrades      =
+upgrade_scheme          = upgrade_scheme_fort
+
+;--TTX----------------------------------------------------------------------------
+hit_power           		= 0.33, 0.33, 0.33, 0.33
+hit_impulse	 		 		= 75
+hit_type 					= fire_wound
+fire_distance           	= 200
+bullet_speed		 		= 175
+rpm                     	= 183
+rpm_empty_click 	 		= 120
+
+hud                      	= wpn_fort_hud
+
+use_aim_bullet				= false		;Поддерживается ли первая суппер пуля
+time_to_aim					= 1.0
+
+misfire_probability        = 0.005 ;вероятность осечки при максимальном износе  !!!old - now not working
+;изношенность, при которой появляется шанс осечки
+misfire_start_condition		= 0.6
+;изношеность при которой шанс осечки становится константным
+misfire_end_condition		= 0.1
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= 0.0075
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= 0.075
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= 0.0036
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= 0.0036
+
+ammo_elapsed		 	= 12
+ammo_mag_size		 	= 12
+ammo_class		 		= ammo_9x18_fmj, ammo_9x18_pmm
+hand_dependence		 	= 1
+single_handed			= 1
+
+;---DOF-------------------------------------------------------------------------
+zoom_dof				= -1000, 1.0, 1000
+reload_dof				= 0.0, 0.5, 5, 1.7
+
+;-дисперсия-----------------------------------------------------------------------------
+;базовая дисперсия
+fire_dispersion_base	= 0.22 ;0.18  ;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor = 1.0
+crosshair_inertion		= 2.75
+
+;отдача
+cam_return				= 0
+cam_relax_speed         = 8	;скорость возврата в исходное положение
+cam_relax_speed_ai      = 360
+cam_dispersion          = 0.9	;увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc		= 0.9	;увеличениe cam_dispersion с каждым выстрелом
+cam_dispersion_frac		= 1.0	;ствол будет подыматься на cam_dispersion*cam_dispersion_frac +- cam_dispersion*(1-cam_dispersion_frac)
+cam_max_angle			= 5.0	;максимальный угол отдачи
+cam_max_angle_horz		= 5.0	;(degree) maximum shot horizontal degree
+cam_step_angle_horz		= 1.0	;(degree) size of step camera moved in horizontal position while shooting
+
+PDM_disp_base 				= 0.5
+PDM_disp_vel_factor 		= 1.1
+PDM_disp_accel_factor 		= 1.1
+PDM_disp_crouch	 			= 1.0
+PDM_disp_crouch_no_acc 		= 1.0
+
+fire_dispersion_condition_factor = 10	;увеличение дисперсии в процентах при максимальном износе
+
+;------------------------------------------------------------------------------
+holder_range_modifier	= 1.0               ; во сколько раз увеличивается eye_range
+holder_fov_modifier		= 1.0              ; во сколько раз увеличивается eye_fov
+
+hit_probability_gd_novice	= 0.80
+hit_probability_gd_stalker	= 0.80
+hit_probability_gd_veteran	= 0.80
+hit_probability_gd_master	= 0.80
+
+min_radius               	= 0
+max_radius               	= 30
+
+;-------------------------------------------------------------------------------
+slot 			 		= 1
+animation_slot			= 1									; type of the animation that will be used
+default_to_ruck			= false
+sprint_allowed			= true
+control_inertion_factor	= 1
+
+inv_name				= st_wpn_fort
+inv_name_short			= st_wpn_fort
+
+inv_grid_width			= 1
+inv_grid_height			= 1
+inv_grid_x				= 0
+inv_grid_y				= 25
+
+upgr_icon_x			= 855
+upgr_icon_y			= 129
+upgr_icon_width		= 161
+upgr_icon_height   	= 120
+
+kill_msg_x				= 104
+kill_msg_y				= 178
+kill_msg_width			= 28
+kill_msg_height			= 21
+
+;-------------------------------------------------------------------------------
+visual                   	= dynamics\weapons\wpn_fort\wpn_fort.ogf
+
+position                	= -0.021, -0.1, 0.0
+orientation             	= 0, 0, 0
+
+fire_point              	= 0.0, 0.148, 0.161
+
+;--STRAP PARAMETERS-----------------------------------------------------------------
+;strap_position         	= -0.1,-0.45,0.2			; position (offset) and orientation of the weapon when it is strapped
+;strap_orientation      	= 1.57,0,0						; (3rd person view)
+;strap_bone0					= bip01_spine2
+;strap_bone1					= bip01_spine1
+
+flame_particles		   	= weapons\generic_weapon03
+smoke_particles		   	= weapons\generic_shoot_00
+
+shell_point		 				= 0.0, 0.133, 0.047
+shell_dir		 				= 0.0, 0.0, 0.4
+shell_particles	 			= weapons\generic_shells
+
+;-------------------------------------------------------------------------------
+light_color		 				= 0.6,0.5,0.3
+light_range		 				= 3.0
+light_var_color		 		= 0.05
+light_var_range		 		= 0.5
+light_time 		 				= 0.2
+
+ph_mass			 				= 1
+
+;addons
+scope_status				= 0
+silencer_status				= 0
+grenade_launcher_status		= 0
+
+zoom_enabled					= true
+zoom_rotate_time				= 0.25
+scope_zoom_factor	    		= 55
+
+;звуки
+snd_draw							= weapons\fort_draw
+snd_holster						= weapons\generic_holster
+snd_shoot						= weapons\n_fort_shot
+snd_empty						= weapons\pistol_empty
+snd_reload						= weapons\pistol_reload, 0.8
+snd_close						= weapons\generic_close
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; silencer
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+silencer_name  				= wpn_addon_silencer		; section name for the attachable silencer
+silencer_x 						= 36						; offset in inventory icon
+silencer_y 						= -17
+
+;params when silencer is attached
+;similar to corresponding params without prefix silencer_
+
+;silencer_flame_particles 	= weapons\generic_weapon01
+silencer_smoke_particles 	= weapons\generic_shoot_00
+snd_silncer_shot				= weapons\n_pb_shot
+silencer_light_color			= 0.6,0.5,0.3
+silencer_light_range			= 0.01
+silencer_light_var_color	= 0.05
+silencer_light_var_range	= 0.5
+silencer_light_time 			= 0.2
+
+[wpn_fort_hud]:hud_base
+zoom_hide_crosshair			= true
+
+
+hands_position				= -0.021000,-0.160000,0.002500
+hands_orientation			= -0.500000,1.000000,1.149999
+hands_position_16x9				= 0.033000,-0.189500,0.039000
+hands_orientation_16x9			= 2.349998,2.749999,2.849998
+
+
+;hands_position				= -0.021000,-0.160000,0.002500
+;hands_orientation			= -0.500000,1.000000,-2.000000
+;hands_position_16x9				= 0.009000,-0.170500,0.039000
+;hands_orientation_16x9			= 0.900000,1.649999,1.699999
+
+;item_position					= 0.000746,-0.000321,0.003479
+;item_orientation				= 1.239378,-0.134046,-2.052052
+
+item_position				= 0.000494,-0.000025,-0.003510
+item_orientation			= 1.239378,-0.134046,-2.052052
+
+
+item_visual             	= dynamics\weapons\wpn_fort\wpn_fort_hud
+attach_place_idx				= 0
+
+shell_point						= 0.013,0.041,0.474
+shell_bone              	= wpn_body
+
+fire_point			= 0,0.04,0.149
+fire_bone               	= wpn_body
+
+anm_show					= fort_draw
+anm_show_empty				= fort_draw, fort_opened
+
+anm_hide             		= fort_holster
+anm_hide_empty        		= fort_holster, fort_opened
+
+anm_idle             		= fort_idle
+anm_idle_empty         		= fort_idle, fort_opened
+
+anm_shots					= fort_shoot
+anm_shot_l					= fort_shoot,  fort_open
+
+anm_idle_aim				= fort_idle_aim
+anm_idle_aim_empty			= fort_idle_aim, fort_opened
+
+anm_reload					= fort_reload
+anm_reload_empty			= fort_reload,    fort_close
+
+anm_idle_moving 			= fort_idle_moving
+anm_idle_moving_empty 		= fort_idle_moving, fort_opened
+
+anm_idle_sprint				= fort_idle_sprint
+anm_idle_sprint_empty		= fort_idle_sprint, fort_opened
+
+anm_bore					= fort_idle_bore
+anm_bore_empty				= fort_idle_bore, fort_opened
+
+aim_hud_offset_pos				= -0.108000,0.045500,0.000000
+aim_hud_offset_rot				= 0.007500,0.005000,-0.015000
+
+gl_hud_offset_pos				= 0,0,0
+gl_hud_offset_rot				= 0,0,0
+
+lean_hud_offset_pos			= 0,0,0
+lean_hud_offset_rot			= 0,0,0
+
+aim_hud_offset_pos_16x9				= -0.170499,0.074000,0.000000
+aim_hud_offset_rot_16x9				= 0.035000,0.057500,0.010000
+
+;-----------------------------------------------------------------------------
+; Уникальные
+;-----------------------------------------------------------------------------
+[wpn_fort_snag]:wpn_fort
+$spawn                  	= "weapons\wpn_fort_snag"		; option for Level Editor
+
+cost					= 700
+
+upgrades                = up_gr_firstab_fort, up_gr_seconab_fort, up_gr_thirdab_fort, up_gr_fourtab_fort, up_gr_fifthab_fort, up_gr_fifthcd_fort
+installed_upgrades      = up_firsta_fort, up_thirda_fort
+upgrade_scheme          = upgrade_scheme_fort

@@ -1,0 +1,217 @@
+ANIMATED_OBJECT_SECT = "animated_object"
+
+--------------------------------------------------------------------------------
+-- Animated doors' binder
+--------------------------------------------------------------------------------
+function bind(obj)
+	obj:bind_object(door_binder_labx8(obj))
+	db.storage[obj:id()] = {}
+end
+--------------------------------------------------------------------------------
+class "door_binder_labx8" (object_binder)
+function door_binder_labx8:__init(obj) super(obj)
+	local ini = obj:spawn_ini()
+
+	if not ini:section_exist(ANIMATED_OBJECT_SECT) then
+		printf( "[animated object %s] no configuration!", obj:name() )
+		return
+	end
+	
+	local filename = utils.cfg_get_string(ini, ANIMATED_OBJECT_SECT, "cfg", nil, false, "", nil)
+	if filename then
+		ini = ini_file(filename)
+	end
+
+--	self.idle = 5000
+	self.is_idle = true
+	self.is_play_fwd = false
+--	self.idle_end = 0
+
+	local idle_snd 	= utils.cfg_get_string(ini, ANIMATED_OBJECT_SECT, "idle_snd", nil, false, "", "device\\airtight_door_idle")
+	local start_snd = utils.cfg_get_string(ini, ANIMATED_OBJECT_SECT, "start_snd", nil, false, "", "device\\airtight_door_start")
+	local stop_snd 	= utils.cfg_get_string(ini, ANIMATED_OBJECT_SECT, "stop_snd", nil, false, "", "device\\airtight_door_stop")
+
+	if idle_snd ~= nil and idle_snd ~= "nil" then
+		self.idle_snd 	= 	sound_object(idle_snd)
+	end
+	if start_snd then
+		self.start_snd 	= 	sound_object(start_snd)
+	end
+	if stop_snd ~= nil and stop_snd ~= "nil" then
+		self.stop_snd 	= 	sound_object(stop_snd)
+	end
+	
+ 	self.tip		= xr_logic.parse_condlist(nil, "door_binder_labx8", "tip_condlist", utils.cfg_get_string(ini, ANIMATED_OBJECT_SECT, "tip", nil, false, "", "none")) 
+
+	local on_use 	= "true"
+	local on_start 	= "true"
+	local on_stop	= "true"
+
+	if(ini:line_exist(ANIMATED_OBJECT_SECT, "on_use")) then
+		on_use = ini:r_string(ANIMATED_OBJECT_SECT, "on_use")
+	end
+	self.on_use = xr_logic.parse_condlist(nil, "door_binder_labx8", "on_use", on_use)
+
+	if(ini:line_exist(ANIMATED_OBJECT_SECT, "on_start")) then
+		on_start = ini:r_string(ANIMATED_OBJECT_SECT, "on_start")
+	end
+	self.on_start = xr_logic.parse_condlist(nil, "door_binder_labx8", "on_start", on_start)
+
+	if(ini:line_exist(ANIMATED_OBJECT_SECT, "on_stop")) then
+		on_stop = ini:r_string(ANIMATED_OBJECT_SECT, "on_stop")
+	end
+	self.on_stop = xr_logic.parse_condlist(nil, "door_binder_labx8", "on_stop", on_stop)
+
+	self.idle_delay = utils.cfg_get_number(ini, ANIMATED_OBJECT_SECT, "idle_delay", nil, false, 2000)
+	self.start_delay = utils.cfg_get_number(ini, ANIMATED_OBJECT_SECT, "start_delay", nil, false, 0)
+	
+	self.loaded = false
+	self.anim_time = 0
+end
+
+function door_binder_labx8:net_spawn(server_object)
+	if not(object_binder.net_spawn(self, server_object)) then
+		return false
+	end
+	db.add_anim_obj(self.object, self)
+	self.object:get_physics_object():stop_anim()
+	self.object:get_physics_object():anim_time_set(0)
+	self.object:set_callback(callback.script_animation, self.animation_end_callback, self)
+	self.object:set_callback(callback.use_object, self.use_callback, self)
+	return true
+end
+
+function door_binder_labx8:net_destroy()
+	if self.idle_snd then
+		self.idle_snd:stop()
+	end
+	if self.start_snd then
+		self.start_snd:stop()
+	end
+	if self.stop_snd then
+		self.stop_snd:stop()
+	end
+	self.object:set_callback(callback.script_animation, nil)
+	db.del_anim_obj(self.object)
+	object_binder.net_destroy(self)
+end
+
+function door_binder_labx8:update(delta)
+	object_binder.update(self, delta)
+	if self.anim_time and self.loaded then
+		self.object:get_physics_object():anim_time_set(self.anim_time)
+		self.anim_time = nil
+	end
+	if not self.is_idle then
+--		if(self.idle_end<=game.time()) then
+		if self.is_play_fwd then
+			self.object:get_physics_object():run_anim_forward()
+		else
+			self.object:get_physics_object():run_anim_back()
+		end
+--		end
+	else
+		self.object:get_physics_object():stop_anim()
+		if self.anim_time then
+			self.object:get_physics_object():anim_time_set(self.anim_time)
+		end
+		if self.idle_snd then
+			self.idle_snd:stop()
+		end
+	end
+	
+	local tip_string = xr_logic.pick_section_from_condlist(get_story_object("actor"), nil, self.tip)
+	
+	if tip_string ~= "none" then 
+		self.object:set_tip_text(tip_string)
+	else
+		self.object:set_tip_text("")
+	end
+end
+
+function door_binder_labx8:anim_forward()
+	if self.idle_snd then
+		self.idle_snd:stop()
+	end
+	self.object:get_physics_object():stop_anim()
+--	self.idle_end = self.idle + game.time()
+	if self.start_snd then
+		self.start_snd:play_at_pos(self.object, self.object:position(), self.start_delay/1000, sound_object.s3d)
+	end
+	if self.idle_snd then
+		self.idle_snd:play_at_pos(self.object, self.object:position(), (self.start_delay + self.idle_delay)/1000, sound_object.s3d + sound_object.looped)
+	end
+	self.is_idle = false
+	self.is_play_fwd = true
+	xr_logic.pick_section_from_condlist(get_story_object("actor"), obj, self.on_start)	
+end
+
+function door_binder_labx8:anim_backward()
+	if self.idle_snd then
+		self.idle_snd:stop()
+	end
+	self.object:get_physics_object():stop_anim()
+--	self.idle_end = self.idle + game.time()
+	if self.start_snd then
+		self.start_snd:play_at_pos(self.object, self.object:position(), self.start_delay/1000, sound_object.s3d)
+	end
+	if self.idle_snd then
+		self.idle_snd:play_at_pos(self.object, self.object:position(), (self.start_delay + self.idle_delay)/1000, sound_object.s3d + sound_object.looped)
+	end
+	self.is_idle = false
+	self.is_play_fwd = false
+	xr_logic.pick_section_from_condlist(get_story_object("actor"), obj, self.on_start)	
+end
+
+function door_binder_labx8:anim_stop()
+	self.object:get_physics_object():stop_anim()
+	self.is_idle = true
+	if self.stop_snd then
+		self.stop_snd:play_at_pos(self.object, self.object:position(), 0, sound_object.s3d)
+	end
+	self.anim_time = self.object:get_physics_object():anim_time_get()
+	xr_logic.pick_section_from_condlist(get_story_object("actor"), obj, self.on_stop)	
+end
+
+function door_binder_labx8:animation_end_callback(is_end)
+	if is_end then
+		if self.stop_snd then
+			self.stop_snd:play_at_pos(self.object, self.object:position(), 0, sound_object.s3d)
+		end
+		self.is_idle = true
+		self.anim_time = self.object:get_physics_object():anim_time_get()
+		xr_logic.pick_section_from_condlist(get_story_object("actor"), obj, self.on_stop)
+	end
+end
+
+function door_binder_labx8:use_callback(obj)
+    xr_logic.pick_section_from_condlist(get_story_object("actor"), obj, self.on_use)
+end
+
+-- Standart function for save
+function door_binder_labx8:net_save_relevant()
+	return true
+end
+-- Saving
+function door_binder_labx8:save(packet)
+	set_save_marker(packet, "save", false, "door_binder_labx8")
+	object_binder.save(self, packet)
+	xr_logic.save_obj(self.object, packet)
+	packet:w_bool(self.is_idle)
+	packet:w_bool(self.is_play_fwd)
+--	packet:w_u32(self.idle_end)
+	packet:w_float(self.object:get_physics_object():anim_time_get())
+	set_save_marker(packet, "save", true, "door_binder_labx8")
+end
+-- Loading
+function door_binder_labx8:load(packet)
+	set_save_marker(packet, "load", false, "door_binder_labx8")
+	object_binder.load(self, packet)
+	xr_logic.load_obj(self.object, packet)
+	self.is_idle = packet:r_bool()
+	self.is_play_fwd = packet:r_bool()
+--	self.idle_end = packet:r_u32()
+	self.anim_time = packet:r_float()
+	self.loaded = true
+	set_save_marker(packet, "load", true, "door_binder_labx8")
+end

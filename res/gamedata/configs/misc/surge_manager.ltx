@@ -1,0 +1,141 @@
+[settings]
+condlist = {-pri_a16_kovalski_start =actor_on_level(pripyat)} false, {+pri_a25_rfi_source_eliminated -pri_a28_actor_in_zone_stay} false, true
+survive = {+actor_marked_by_zone_3_times} true, {+anabiotic_in_process} true, false
+
+[list]
+;zaton
+zat_surge_hide_a2
+zat_surge_hide_b42
+zat_surge_hide_b44
+zat_surge_hide_b7
+zat_surge_hide_b18
+zat_surge_hide_b101
+zat_surge_hide_b38
+zat_surge_hide_b33
+zat_b33_surge_hide_2
+zat_surge_hide_b40
+zat_surge_hide_a23
+zat_surge_hide_b100
+zat_surge_hide_b28
+zat_surge_hide_b5
+zat_surge_hide_b400
+zat_b22_stalker_medic_identified
+zat_surge_hide_b103
+zat_b103_surge_hide_2
+zat_surge_hide_b38_down
+zat_surge_hide_b38_side
+zat_b14_surge_hide_1
+zat_b14_surge_hide_2
+zat_b14_surge_hide_3
+
+;jupiter
+jup_surge_hide_a10
+jup_surge_hide_a12
+jup_surge_hide_a6
+jup_b15_sr_light
+jup_surge_hide_b1
+jup_surge_hide_b1_2
+jup_surge_hide_b16
+jup_surge_hide_b200
+jup_b200_surge_hide_2
+jup_b200_surge_hide_3
+jup_b200_surge_hide_4
+jup_b200_surge_hide_5
+jup_surge_hide_b202
+jup_surge_hide_b203
+jup_surge_hide_b205
+jup_surge_hide_b207
+jup_surge_hide_b208
+jup_surge_hide_b208_2
+jup_surge_hide_b214
+jup_surge_hide_b219
+jup_surge_hide_b41
+jup_surge_hide_b47
+jup_a9_surge_hide
+jup_surge_hide_b8
+jup_surge_hide_a9
+;pripyat
+pri_surge_hide_a15
+pri_surge_hide_a16
+pri_surge_hide_b304
+pri_surge_hide_b304_2
+pri_surge_hide_b35
+pri_b35_mercs_surge_hide_1
+pri_b35_mercs_surge_hide_2
+pri_b35_mercs_surge_hide_3
+pri_b35_mercs_surge_hide_4
+pri_b35_military_surge_hide_1
+pri_surge_hide_a18
+pri_surge_hide_a18_2
+pri_surge_hide_a21
+pri_surge_hide_b306
+pri_surge_hide_b301
+pri_surge_hide_b303
+pri_surge_hide_a28
+pri_surge_hide_a28_2
+pri_surge_hide_a17
+pri_surge_hide_b36
+;test
+;sr_out_1
+;sr_out_2
+
+[zat_surge_hide_a2]
+condlist = {=check_smart_alarm_status(zat_stalker_base_smart:normal)} true, false
+
+[zat_surge_hide_b40]
+condlist = {=squad_exist(zat_b40_merc_squad)} false, true
+
+[zat_surge_hide_b100]
+condlist = true;{-zat_a23_actor_used_access_card} false, true
+
+[zat_surge_hide_b28]
+condlist = {=actor_in_zone(zat_sr_plateu)} true, false
+
+[zat_surge_hide_b103]
+condlist = {+zat_b103_merc_task_done} true, false
+
+[zat_b103_surge_hide_2]
+condlist = false
+
+[zat_surge_hide_a23]
+condlist = {+zat_a23_actor_used_access_card} true, false
+
+[zat_b22_stalker_medic_identified]
+condlist = {+zat_b22_can_go_in} true, false
+
+;[zat_surge_hide_b38_side]
+;condlist = {-zat_b38_lift_opened} true, false
+
+[zat_surge_hide_b38_down]
+condlist = {+zat_b38_lift_opened} true, false
+
+
+
+[jup_surge_hide_a6]
+condlist = {=check_smart_alarm_status(jup_a6:normal)} true, false
+
+[jup_surge_hide_b41]
+condlist = {=check_smart_alarm_status(jup_b41:normal)} true, false
+
+[jup_surge_hide_b207]
+condlist = {-jup_b207_morgan_gived_depot -jup_b207_freedom_knows_about_depot -jup_b207_duty_knows_about_depot} false, true
+
+[jup_surge_hide_a10]
+condlist = {+jup_a10_fals} true, {+jup_a10_vano_give_task_end} true, {-jup_a10_vano_give_task} false, true
+
+[jup_surge_hide_b205]
+condlist = {+jup_b205_pass_code_valide} true, false
+
+[jup_surge_hide_a12]
+condlist = {+jup_a12_task_done} true, {+jup_a12_actor_has_pass_to_containers -jup_a12_actor_enemy_to_bandits} true, false
+
+[jup_surge_hide_b202]
+condlist = {+jup_b202_actor_items_stolen} true, false
+
+
+
+[pri_surge_hide_a16]
+condlist = {=check_smart_alarm_status(pri_a16:normal)} true, false
+
+[pri_surge_hide_b303]
+condlist = {+pri_b303_door_closed} true, false

@@ -1,0 +1,17 @@
+[smart_terrain]
+squad_id = 10
+max_population = 1
+respawn_params = respawn@pri_sim_1
+arrive_dist = 100
+
+[respawn@pri_sim_1]
+spawn_monolith
+spawn_monolith_kniga
+
+[spawn_monolith]
+spawn_squads =  monolith_sim_squad_advanced, monolith_sim_squad_advanced, monolith_sim_squad_veteran
+spawn_num = 2
+
+[spawn_monolith_kniga]
+spawn_squads =  monolith_sim_squad_advanced, monolith_sim_squad_veteran, monolith_sim_squad_veteran
+spawn_num = {+pri_a18_use_idol_done} 2, 0

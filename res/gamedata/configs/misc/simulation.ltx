@@ -1,0 +1,338 @@
+[sim_faction]
+GroupControlSection	= 
+$spawn 			= "ai\DO_NOT_USE"
+class			= SCRIPTZN
+;script_binding	= bind_faction.bind
+
+shape_transp_color		= 0, 0, 255, 60 ;0x1800FF00
+shape_edge_color		= 32, 32, 32, 255 ;0xFF202020
+
+
+[smart_terrain]
+GroupControlSection	= 
+$spawn 			= "ai\smart_terrain"
+;$prefetch 		= 4
+$def_sphere		= 2
+class			= SMRTTRRN
+script_binding	= bind_smart_terrain.bind
+
+shape_transp_color		= 100, 100, 180, 60 ;0x1800FF00
+shape_edge_color		= 32, 32, 32, 255 ;0xFF202020
+
+
+[smart_terrain_stay_time]
+quick   = 2,  5
+medium  = 6,  8
+long    = 12, 14
+default = 10000, 10001
+
+
+
+;В simulation.ltx создаете поле [start_position_<имя уровня>]
+;В нем пишите строку <ид сквада> = <имя смарта>
+
+;;;;;;;;;;;;;;;;;;;;;; FINAL JUPITER ;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[start_position_jupiter]
+jup_b208_burers_squad = jup_b208
+jup_b6_scientist_group = jup_b41
+jup_b43_stalker_assistant_squad_sq = jup_b41
+jup_b218_sokolov = jup_b41
+jup_b1_stalker_squad = jup_b41
+jup_b47_merc_guard_squad = jup_b41
+jup_a12_stalker_squad = jup_a6
+jup_a12_prisoner = jup_a12
+jup_a12_bandit_cashier_squad = jup_a12
+jup_a12_bandit_chief_squad = jup_a12
+jup_a12_bandit_guard_squad = jup_a12
+jup_a12_bandit_sim_squad = jup_a12
+jup_b207_duty_base = jup_a6
+jup_b207_freedom_base = jup_a6
+jup_a10_bandit_squad = jup_a10_smart_terrain
+jup_a10_bandit_squad_1 = jup_a10_smart_terrain
+jup_a10_bandit_squad_2 = jup_a10_smart_terrain
+jup_a10_bandit_squad_3 = jup_a10_smart_terrain
+jup_b25_alex_squad = jup_a6
+jup_b8_psy_dog_squad = jup_b8_smart_terrain
+;jup_b200_stalker_squad = jup_b200
+jup_b200_tushkano_squad = jup_b200_tushkan_smart_terrain
+jup_a6_stalker_medik_squad = jup_a6
+jup_b15_zulus_squad = jup_a6
+jup_a6_stalker_barmen_squad = jup_a6
+jup_b6_swamp_hunters = jup_b211
+zat_b215_stalker_guide_jupiter_squad = jup_a6
+jup_b19_freedom_yar_squad = jup_a6
+jup_b19_kopatci_zombied_squad = jup_b19
+jup_a6_freedom_leader_squad = jup_a6
+jup_a6_duty_leader_squad = jup_a6
+jup_b4_squad = jup_b4
+jup_b203_zombied_squad = jup_b203
+jup_b203_tushkano = jup_b203
+jup_b204_squad = jup_b204
+jup_b205_zombie_01_squad = jup_b205_smart_terrain
+jup_b205_zombie_02_squad = jup_b205_smart_terrain
+jup_b205_monster_01_squad = jup_b205_smart_terrain
+jup_b205_monster_02_squad = jup_b205_smart_terrain_tushkano
+jup_b205_monster_04_squad = jup_b205_smart_terrain
+jup_b10_stalker_drunk_squad = jup_a6
+jup_a9_dogs_normal = jup_b47
+
+[start_position_jupiter_b4]
+jup_b4_squad = jup_b4_smart_terrain
+jup_b4_on_b25_level_squad = jup_b25_smart_terrain
+jup_a6_freedom_leader_squad = jup_b25_smart_terrain
+jup_a6_duty_leader_squad = jup_b25_smart_terrain
+
+;;;;;;;;;;;;;;;;;;;;;; FINAL ZATON ;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[start_position_zaton]
+zat_a2_stalker_nimble_squad = zat_stalker_base_smart
+zat_b30_owl_stalker_trader_squad = zat_stalker_base_smart
+zat_b7_bandit_boss_sultan_squad = zat_stalker_base_smart
+zat_a2_stalker_mechanic_squad = zat_stalker_base_smart
+;zat_a2_stalkers_guards = zat_stalker_base_smart
+stalker_sim_squad_novice = zat_stalker_base_smart
+stalker_sim_squad_novice = zat_stalker_base_smart
+stalker_sim_squad_advanced = zat_stalker_base_smart
+zat_b22_barmen = zat_stalker_base_smart
+zat_b22_medic = zat_stalker_base_smart
+zat_b7_stalkers_raiders = zat_stalker_base_smart
+zat_b104_zombied_1 = zat_b104_zombied
+zat_b104_zombied_2 = zat_b104_zombied
+zat_b104_zombied_3 = zat_b104_zombied
+zat_b103_lost_merc_squad1 = zat_b103_merc_smart
+zat_b33_stalker_snag_squad = zat_stalker_base_smart
+zat_b33_snork_first_wave = zat_b33
+zat_b18_noah_squad = zat_b18
+zat_b18_dog_noah_squad = zat_b18
+zat_b215_stalker_guide_zaton_squad = zat_stalker_base_smart
+zat_b28_snork_squad = zat_b28
+zat_b42_controller_squad = zat_b42_smart_terrain
+zat_b40_merc_squad = zat_b40_smart_terrain
+zat_b106_stalker_gonta_squad = zat_stalker_base_smart
+;zat_b106_stalker_garmata_squad = zat_stalker_base_smart
+zat_b106_stalker_crab_squad = zat_stalker_base_smart
+zat_b38_default_bloodsucker = zat_b38
+zat_b7_stalkers_victims_1 = zat_b7
+zat_b53_artefact_hunter_1_squad = zat_b53
+zat_b100_poltergeist_squad_01 = zat_b100
+zat_b39_dogs_squad = zat_b39
+zat_b38_stalker_cop_squad = zat_stalker_base_smart
+stalker_sim_squad_novice = zat_sim_11
+stalker_sim_squad_novice = zat_sim_12
+stalker_sim_squad_advanced = zat_sim_13
+simulation_snork = zat_sim_14
+simulation_stalker_for_a1 = zat_sim_15
+simulation_mix_boar_flesh = zat_b42_smart_terrain
+simulation_dog = zat_sim_17
+
+;[start_position_bes_smart_test]
+;lain_selo_stalker_squad = selo_smart_terrain
+;lain_selo_tushkano_squad = selo_smart_terrain
+;lain_selo_snork_squad = level_prefix_smart_terrain
+;bes_sim_boar = bes_test_smart_terrain
+;sim_polter = selo_smart_terrain
+;sim_pseudodog = selo_smart_terrain
+[start_position_lain_selo]
+lain_selo_dog = lain_test_smart_terrain
+
+[start_position_zaton_b52]
+zat_a2_general_characters = zat_stalker_base_smart
+zat_b22_barmen = zat_stalker_base_smart 
+zat_b22_medic = zat_medic_home_smart
+;zat_b7_stalkers_raiders = zat_b7_stalker_base
+zat_b103_mechanic = zat_stalker_base_smart
+zat_b103_lost_merc_squad1 = zat_b103_merc_smart
+;zat_b103_lost_merc_squad2 = zat_b103_merc_smart
+zat_b33_stalker_snag_squad = zat_stalker_base_smart
+zat_b33_snork_first_wave = zat_b33
+
+[start_position_zaton_b18]
+zat_b18_noah_squad = zat_b18
+zat_b18_dog_noah_squad = zat_b18
+
+[start_position_zaton_b28]
+zat_b28_snork_squad = zat_b28
+
+[start_position_zaton_b106]
+zat_b106_stalker_crab_squad = zat_stalker_base_smart
+;zat_b106_chimera_squad = zat_b106_smart_terrain
+zat_b106_stalker_gonta_squad = zat_stalker_base_smart
+;zat_b106_stalker_garmata_squad = zat_stalker_base_smart
+
+[start_position_tgm_bug_test_2]
+simulation_bandit_1 = smart
+
+[start_position_tgm_bug_test_3]
+test_tgm_bug_test_3_bandit = smart_terrain_1
+test_tgm_bug_test_3_stalker = smart_terrain_2
+
+;;;;;;;;;;;;;;;;;;;;;; FINAL PRIPYAT ;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[start_position_pripyat]
+;;;base
+pri_a22_military_merkulov_squad = pri_a16
+pri_a22_military_skelja_squad = pri_a16
+pri_a22_military_yarmoshuk_squad = pri_a16
+pri_a25_base_army_medic = pri_a16
+pri_a20_missing_military_recon = pri_a16
+pri_a21_chasovoi = pri_a16
+pri_b35_military_squad = pri_a16
+pri_a17_military_colonel_kovalski_squad = pri_a16
+pri_a17_recon_squad = pri_a16
+;;;
+pri_b304_dogs = pri_b304_monsters_smart_terrain
+pri_b306_4_floor_monolith = pri_b306
+pri_b306_4_floor_monolith_2 = pri_b306
+pri_b306_3_floor_monolith = pri_b306
+pri_b306_3_floor_zombied = pri_b306
+pri_b306_2_floor_monolith = pri_b306
+pri_b306_2_floor_zombied = pri_b306
+pri_b306_1_floor_zombied = pri_b306
+pri_b306_1_floor_zombied_2 = pri_b306
+pri_b36_monolith_sniper_squad = pri_b36_smart_terrain
+pri_b36_monolith_master_hiding_place_squad = pri_b36_smart_terrain
+pri_b36_zombied_squad = pri_b36_smart_terrain
+pri_b36_monolith_marine_squad = pri_b36_smart_terrain
+pri_b36_monolith_guard_squad = pri_b36_smart_terrain
+;pri_a15_squad = pri_a15
+;pri_a15_military_squad = pri_a15
+pri_b303_burer_squad = pri_b303
+pri_a18_monolith_idol_squad = pri_a18_smart_terrain
+pri_a18_monolith_post_guard_squad = pri_a18_smart_terrain
+pri_a18_monolith_corridor_squad = pri_a18_smart_terrain
+pri_a18_monolith_2nd_corridor_squad = pri_a18_smart_terrain
+
+;;;;;;;;;;;;;;;;;;;;;; FINAL JUPITER UNDERGROUND ;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[start_position_jupiter_underground]
+pas_b400_elevator_tushkano = pas_b400_elevator
+pas_b400_snork_elevator_4 = pas_b400_elevator
+pas_b400_snork_track_2 = pas_b400_track
+pas_b400_track_tushkano = pas_b400_track
+pas_b400_downstairs_tushkano = pas_b400_downstairs
+pas_b400_tunnel_tushkano = pas_b400_tunnel
+pas_b400_snork_tunnel_2 = pas_b400_tunnel
+pas_b400_snork_tunnel_3 = pas_b400_tunnel
+pas_b400_snork_tunnel_5 = pas_b400_hall
+pas_b400_hall_tushkano = pas_b400_hall
+pas_b400_canalisation_tushkano = pas_b400_canalisation
+pas_b400_canalisation_snork_2 = pas_b400_canalisation
+pas_b400_canalisation_1_zombied = pas_b400_canalisation
+pas_b400_canalisation_3_zombied = pas_b400_canalisation
+pas_b400_canalisation_5_zombied = pas_b400_canalisation
+
+[start_position_jupiter_B9]
+jup_b25_alex_squad = jup_b25_smart_terrain
+
+[start_position_bes_selo_jupiter]
+jup_b19_freedom_yar_squad = jup_a6
+jup_b19_kopatci_zombied_squad = jup_b19
+
+[start_position_jupiter_b203]
+jup_b203_zombied = jup_b203_smart_terrain
+jup_b203_tushkano = jup_b203_smart_terrain
+
+[start_position_pripyat_b36]
+pri_b36_monolith_sniper_squad = pri_b36_smart_terrain
+pri_b36_monolith_master_hiding_place_squad = pri_b36_smart_terrain
+pri_b36_zombied_squad = pri_b36_smart_terrain
+pri_b36_monolith_marine_squad = pri_b36_smart_terrain
+pri_b36_monolith_guard_squad = pri_b36_smart_terrain
+
+[start_position_pripyat_a17]
+pri_a17_recon_squad = pri_a16
+
+[start_position_plecha_selo]
+sim_stalker_squad_1 = sim_smart_1
+sim_stalker_squad_2 = sim_smart_2
+;sim_stalker_squad_4 = sim_smart_8
+;sim_snork_4			= sim_smart_6
+;sim_monolith_squad_3= sim_smart_base
+
+;run_string bind_camfire.campfire_table_by_smart_names["sim_smart_5"][40]:turn_on()
+
+
+[start_position_stohe_selo]
+;test_duty = smart_1
+
+;;;;;;;;;;;;;;;;;;;;;;;; labx8 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[start_position_labx8]
+lx8_snork_down_squad = lx8_smart_terrain
+lx8_snork_up_squad = lx8_smart_terrain
+lx8_burers_squad = lx8_smart_terrain
+lx8_toilet_burer_squad = lx8_smart_terrain
+lx8_tushkano_1_squad = lx8_smart_terrain
+lx8_tushkano_2_squad = lx8_smart_terrain
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;; hein_selo ;;;;;;;;;;;;;;;;;;;;;
+[start_position_hein_selo]
+;zat_b33_snork_first_wave = zat_b33
+;hein_selo_squad = redstain_selo_smart_terrain
+;hein_selo_dog = smart_03
+;merc_jupiter = smart_01
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;; corr ;;;;;;;;;;;;;;;;;;;;;;;;;;
+[start_position_corr_selo]
+corr_selo_squad = corr_selo_smart
+
+[start_position_corr_selo_02]
+corr_selo_02_squad = corr_selo_02_smart
+
+[start_position_corr_snorks]
+zat_b12_bridge_snorks = zat_b12
+
+[start_position_corr_bloodsuckers]
+zat_b38_default_bloodsucker = zat_b38
+zat_b38_stalker_cop_squad = corr_bloodsuckers_smart_terrain
+
+[start_position_corr_snorks2]
+zat_b33_snork_first_wave = zat_b33
+
+[start_position_corr_controler]
+zat_b42_controller_squad = zat_b42_smart_terrain
+
+[start_position_corr_chimera]
+zat_b106_stalker_gonta_squad = zat_stalker_base_smart
+;zat_b106_stalker_garmata_squad = zat_stalker_base_smart
+zat_b106_stalker_crab_squad = zat_stalker_base_smart
+
+[start_position_corr_tushkano]
+pri_b304_dogs = pri_b304_monsters_smart_terrain
+
+[start_position_corr_burer]
+jup_b208_burers_squad = jup_b208
+
+[start_position_corr_poltergeist]
+zat_b100_poltergeist_squad_01 = zat_b100
+;zat_b100_poltergeist_squad_02 = zat_b100
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;[start_position_bes_selo]
+;bes_selo_test = bes_selo_smart
+
+[start_position_yojig_selo]
+test_yojig_squad = smart_1
+
+[start_position_renderman_selo]
+test_squad_snork_for_renderman = alex_selo_smart_terrain
+test_squad_zulus_for_renderman = alex_selo_smart_terrain
+
+[start_position_alex_selo]
+alex_selo_squad_1 = alex_selo_smart
+
+
+[start_position_bes_selo_zaton]
+zat_b18_noah_squad = zat_b18
+zat_b18_dog_noah_squad = zat_b18
+
+[start_position_redstain_selo]
+;hein_selo_squad = redstain_selo_smart_terrain
+;zat_b38_stalker_cop_squad_temp = redstain_selo_smart_terrain
+ 
+[start_position_bes_selo_lab]
+lx8_snork_down_squad = lx8_smart_terrain
+lx8_snork_up_squad = lx8_smart_terrain
+
+[start_position_bes_selo_zat]
+test_tushkano = bes_test

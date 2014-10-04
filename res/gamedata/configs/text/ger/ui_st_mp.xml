@@ -1,0 +1,741 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="af_neutral">
+		<text>Artefakt</text>
+	</string>
+	<string id="friend">
+		<text>Freund</text>
+	</string>
+	<string id="mm_mp_max_ping">
+		<text>Max. Ping</text>
+	</string>
+	<string id="mm_mp_profile">
+		<text>Profil</text>
+	</string>
+	<string id="modes">
+		<text>Modi</text>
+	</string>
+	<string id="mp_art_destroyed">
+		<text>Das Artefakt wurde zerstцrt.</text>
+	</string>
+	<string id="mp_art_spowned">
+		<text>Das Artefakt ist aufgetaucht. Bringen Sie es in die Basis, um zu punkten.</text>
+	</string>
+	<string id="mp_artefact_dropped">
+		<text>Das Artefakt wurde verloren.</text>
+	</string>
+	<string id="mp_artefact_on_base">
+		<text>Das Artefakt befindet sich in unserer Basis.</text>
+	</string>
+	<string id="mp_artefact_on_enemy_base">
+		<text>Das Artefakt befindet sich in der gegnerischen Basis.</text>
+	</string>
+	<string id="mp_artefacts">
+		<text>Artefakte</text>
+	</string>
+	<string id="mp_artefacts_upcase">
+		<text>Artefakte</text>
+	</string>
+	<string id="mp_auto_select">
+		<text>Autom. Auswahl</text>
+	</string>
+	<string id="mp_back">
+		<text>Zurьck</text>
+	</string>
+	<string id="mp_ban">
+		<text>4. Sperren</text>
+	</string>
+	<string id="mp_by_anomaly">
+		<text>Nach Anomalie</text>
+	</string>
+	<string id="mp_cancel">
+		<text>Abbrechen</text>
+	</string>
+	<string id="mp_captured_artefact">
+		<text>hat das Artefakt erobert</text>
+	</string>
+	<string id="mp_change_map">
+		<text>5. Karte wechseln</text>
+	</string>
+	<string id="mp_change_weather">
+		<text>6. Wetter дndern</text>
+	</string>
+	<string id="mp_change_weather_header">
+		<text>Wetter дndern in</text>
+	</string>
+	<string id="mp_chat">
+		<text>Chat</text>
+	</string>
+	<string id="mp_connected">
+		<text>Verbunden</text>
+	</string>
+	<string id="mp_deaths">
+		<text>Tode</text>
+	</string>
+	<string id="mp_description">
+		<text>Beschreibung</text>
+	</string>
+	<string id="mp_disconnected">
+		<text>Nicht verbunden</text>
+	</string>
+	<string id="mp_enter_text">
+		<text>Text fьr Abstimmung eingeben</text>
+	</string>
+	<string id="mp_entered_game">
+		<text>ist dem Spiel beigetreten</text>
+	</string>
+	<string id="mp_firestation">
+		<text>Feuerwache</text>
+	</string>
+	<string id="mp_first_eye">
+		<text>(Erste-Person-Ansicht)</text>
+	</string>
+	<string id="mp_frags">
+		<text>Kills</text>
+	</string>
+	<string id="mp_frags_upcase">
+		<text>Kills</text>
+	</string>
+	<string id="mp_free_fly">
+		<text>(Freie Kamera)</text>
+	</string>
+	<string id="mp_free_look">
+		<text>(Dritte-Person-Ansicht)</text>
+	</string>
+	<string id="mp_from">
+		<text>mit</text>
+	</string>
+	<string id="mp_gamemode">
+		<text>7. Modus</text>
+	</string>
+	<string id="mp_garbage">
+		<text>Abfall</text>
+	</string>
+	<string id="mp_go">
+		<text>LOS!</text>
+	</string>
+	<string id="mp_has_drop_art">
+		<text>hat das Artefakt %s fallen gelassen</text>
+	</string>
+	<string id="mp_has_dropped_artefact">
+		<text>hat das Artefakt fallen gelassen</text>
+	</string>
+	<string id="mp_has_tak_art">
+		<text>hat das Artefakt % genommen</text>
+	</string>
+	<string id="mp_headhuntrs">
+		<text>Sцldner</text>
+	</string>
+	<string id="mp_is_now">
+		<text>ist jetzt</text>
+	</string>
+	<string id="mp_joined">
+		<text>ist beigetreten</text>
+	</string>
+	<string id="mp_kick">
+		<text>3. Kicken</text>
+	</string>
+	<string id="mp_limansk">
+		<text>Limansk</text>
+	</string>
+	<string id="mp_loading_awards">
+		<text>Lade Auszeichnungen...</text>
+	</string>
+	<string id="mp_loading_best_scores">
+		<text>Lade Rekorde...</text>
+	</string>
+	<string id="mp_look_at">
+		<text>(Free-Locked)</text>
+	</string>
+	<string id="mp_map_desc">
+		<text>Kartenbeschreibung</text>
+	</string>
+	<string id="mp_match_started">
+		<text>Die Partie hat begonnen!</text>
+	</string>
+	<string id="mp_military_2">
+		<text>Altes Dorf</text>
+	</string>
+	<string id="mp_modes">
+		<text>Modi</text>
+	</string>
+	<string id="mp_name">
+		<text>Name</text>
+	</string>
+	<string id="mp_next">
+		<text>Weiter</text>
+	</string>
+	<string id="mp_no_voted">
+		<text>Nicht abgestimmt</text>
+	</string>
+	<string id="mp_ping">
+		<text>Ping</text>
+	</string>
+	<string id="mp_player_wins">
+		<text>%s hat die Partie gewonnen!</text>
+	</string>
+	<string id="mp_players">
+		<text>Spieler</text>
+	</string>
+	<string id="mp_press_fire2spectator">
+		<text>Zum Wechseln in den Zuschauermodus "Feuern" drьcken</text>
+	</string>
+	<string id="mp_press_jump2pay_spaw">
+		<text>Zum Kaufen eines sofortigen Respawns "Springen" drьcken</text>
+	</string>
+	<string id="mp_press_jump2select_skin">
+		<text>Zum Auswдhlen eines Skins "Springen" drьcken</text>
+	</string>
+	<string id="mp_press_jump2select_team">
+		<text>Zum Auswдhlen der Teams "Springen" drьcken</text>
+	</string>
+	<string id="mp_press_jump2spawn">
+		<text>Zum Spawnen "Springen" drьcken</text>
+	</string>
+	<string id="mp_press_jump2start">
+		<text>Zum Starten "Springen" drьcken</text>
+	</string>
+	<string id="mp_press_to_buy">
+		<text>Zum Цffnen des Kaufmenьs ($$ACTION_BUY_MENU$$) drьcken</text>
+	</string>
+	<string id="mp_press_yes2pay">
+		<text>Sie haben %d$. Fьr %d$ kцnnen Sie respawnen. Klicken Sie auf "Ja", um zu spielen.</text>
+	</string>
+	<string id="mp_ready">
+		<text>Bereit...</text>
+	</string>
+	<string id="mp_rembasa">
+		<text>Reparaturbasis</text>
+	</string>
+	<string id="mp_restart">
+		<text>1. Neustart</text>
+	</string>
+	<string id="mp_restart_fast">
+		<text>2. Schneller Neustart</text>
+	</string>
+	<string id="mp_returned_artefact">
+		<text>hat das Artefakt zurьckgebracht</text>
+	</string>
+	<string id="mp_scores">
+		<text>hat einen Punkt erzielt</text>
+	</string>
+	<string id="mp_select_ban">
+		<text>Spieler auswдhlen, der per Abstimmung gesperrt werden soll</text>
+	</string>
+	<string id="mp_select_category">
+		<text>Abstimmungskategorie auswдhlen</text>
+	</string>
+	<string id="mp_select_kick">
+		<text>Spieler auswдhlen, der per Abstimmung gekickt werden soll</text>
+	</string>
+	<string id="mp_select_kick_player">
+		<text>Spieler auswдhlen, der per Abstimmung gekickt werden soll</text>
+	</string>
+	<string id="mp_select_map">
+		<text>Karte auswдhlen, ьber die abgestimmt werden soll</text>
+	</string>
+	<string id="mp_si_afbearer_cant_sprint">
+		<text>Rennen mit Artefakt nicht mцglich</text>
+	</string>
+	<string id="mp_si_afcount">
+		<text>- Count</text>
+	</string>
+	<string id="mp_si_afrespawntime">
+		<text>- Stay time</text>
+	</string>
+	<string id="mp_si_afstaytime">
+		<text>- Respawnzeit</text>
+	</string>
+	<string id="mp_si_anomalies">
+		<text>Anomalien</text>
+	</string>
+	<string id="mp_si_anomalies_period">
+		<text>Anomalieperiode</text>
+	</string>
+	<string id="mp_si_any_time">
+		<text>Jederzeit</text>
+	</string>
+	<string id="mp_si_artefact_captured">
+		<text>Artefakt erobert</text>
+	</string>
+	<string id="mp_si_artefacts">
+		<text>Artefakte:</text>
+	</string>
+	<string id="mp_si_autoteam_balance">
+		<text>Automatische Teambalance</text>
+	</string>
+	<string id="mp_si_autoteam_swap">
+		<text>Automatischer Teamtausch</text>
+	</string>
+	<string id="mp_si_battleye">
+		<text>BattlEye</text>
+	</string>
+	<string id="mp_si_disabled">
+		<text>Deaktiviert</text>
+	</string>
+	<string id="mp_si_enabled">
+		<text>Aktiviert</text>
+	</string>
+	<string id="mp_si_first_eye">
+		<text>- Erste Person</text>
+	</string>
+	<string id="mp_si_forcerespawn">
+		<text>Zwangsrespawn</text>
+	</string>
+	<string id="mp_si_fraglimit">
+		<text>Kill-Limit</text>
+	</string>
+	<string id="mp_si_free_fly">
+		<text>- Free Fly</text>
+	</string>
+	<string id="mp_si_free_look">
+		<text>- Free Look</text>
+	</string>
+	<string id="mp_si_friendly_fire">
+		<text>Schaden durch Freunde</text>
+	</string>
+	<string id="mp_si_friendly_indicators">
+		<text>Freundesanzeige</text>
+	</string>
+	<string id="mp_si_friendly_names">
+		<text>Freundesnamen</text>
+	</string>
+	<string id="mp_si_infinite">
+		<text>Unendlich</text>
+	</string>
+	<string id="mp_si_invinsibility">
+		<text>Unsichtbarkeit</text>
+	</string>
+	<string id="mp_si_invinsibility_indicators">
+		<text>- Anzeigen</text>
+	</string>
+	<string id="mp_si_invinsibility_time">
+		<text>- Zeit</text>
+	</string>
+	<string id="mp_si_look_at">
+		<text>- Dritte Person</text>
+	</string>
+	<string id="mp_si_maprotation">
+		<text>Kartenrotation</text>
+	</string>
+	<string id="mp_si_max_ping">
+		<text>Max. Ping</text>
+	</string>
+	<string id="mp_si_min">
+		<text>Min.</text>
+	</string>
+	<string id="mp_si_no">
+		<text>Nein</text>
+	</string>
+	<string id="mp_si_players_respawn">
+		<text>Respawn</text>
+	</string>
+	<string id="mp_si_return_players">
+		<text>Spieler zurьck in der Basis</text>
+	</string>
+	<string id="mp_si_sec">
+		<text>Sek.</text>
+	</string>
+	<string id="mp_si_servername">
+		<text>Servername:</text>
+	</string>
+	<string id="mp_si_shielded_bases">
+		<text>Shielded Bases</text>
+	</string>
+	<string id="mp_si_spectatormodes">
+		<text>Zuschauermodi:</text>
+	</string>
+	<string id="mp_si_team_only">
+		<text>- Nur Team</text>
+	</string>
+	<string id="mp_si_time_limit">
+		<text>Zeitlimit</text>
+	</string>
+	<string id="mp_si_version">
+		<text>Version:</text>
+	</string>
+	<string id="mp_si_voting">
+		<text>Abstimmung</text>
+	</string>
+	<string id="mp_si_warmuptime">
+		<text>Aufwдrmen</text>
+	</string>
+	<string id="mp_si_yes">
+		<text>Ja</text>
+	</string>
+	<string id="mp_skin_selection">
+		<text>Skin-Auswahl</text>
+	</string>
+	<string id="mp_spectator">
+		<text>Zuschauer</text>
+	</string>
+	<string id="mp_spectators">
+		<text>ZUSCHAUER</text>
+	</string>
+	<string id="mp_sport_center">
+		<text>Sportzentrum</text>
+	</string>
+	<string id="mp_status">
+		<text>Status</text>
+	</string>
+	<string id="mp_switched_to">
+		<text>hat gewechselt zu</text>
+	</string>
+	<string id="mp_team_free_stalkers">
+		<text>Freiheit</text>
+	</string>
+	<string id="mp_team_selection">
+		<text>Teamauswahl</text>
+	</string>
+	<string id="mp_team_wins">
+		<text>Team %s hat GEWONNEN!</text>
+	</string>
+	<string id="mp_text">
+		<text>Text</text>
+	</string>
+	<string id="mp_time2respawn">
+		<text>Zeit bis zum Respawn</text>
+	</string>
+	<string id="mp_time2start">
+		<text>Zeit bis zum Start:</text>
+	</string>
+	<string id="mp_timeleft">
+		<text>Verbleibende Zeit: %d:%d; Vereinbart: %2.f</text>
+	</string>
+	<string id="mp_training_camp">
+		<text>Trainingslager</text>
+	</string>
+	<string id="mp_vote_hint">
+		<text>DAFЬR stimmen - [$$ACTION_VOTE_YES$$]\nDAGEGEN stimmen - [$$ACTION_VOTE_NO$$]\nErgebnis - [$$ACTION_VOTE$$]</text>
+	</string>
+	<string id="mp_vote_no">
+		<text>Nein</text>
+	</string>
+	<string id="mp_vote_yes">
+		<text>Ja</text>
+	</string>
+	<string id="mp_voted">
+		<text>Abgestimmt</text>
+	</string>
+	<string id="mp_voted_no">
+		<text>Nein</text>
+	</string>
+	<string id="mp_voted_yes">
+		<text>Ja</text>
+	</string>
+	<string id="mp_voting_broken">
+		<text>Abstimmung von Server abgebrochen!</text>
+	</string>
+	<string id="mp_voting_started">
+		<text>Abstimmung "%s" gestartet durch %s.</text>
+	</string>
+	<string id="mp_voting_started_msg">
+		<text>Die Abstimmung hat begonnen!</text>
+	</string>
+	<string id="mp_weather_clear">
+		<text>1. Klar</text>
+	</string>
+	<string id="mp_weather_cloudy">
+		<text>2. Bewцlkt</text>
+	</string>
+	<string id="mp_weather_night">
+		<text>3. Nacht</text>
+	</string>
+	<string id="mp_weather_rain">
+		<text>4. Regen</text>
+	</string>
+	<string id="mp_with_backstab">
+		<text>Von hinten getroffen!</text>
+	</string>
+	<string id="mp_with_headshot">
+		<text>Kopfschuss!</text>
+	</string>
+	<string id="mp_you_captured_artefact">
+		<text>Sie haben das gegnerische Artefakt erobert, tragen Sie es jetzt in Ihre Basis!</text>
+	</string>
+	<string id="mp_you_captured_own_artefact">
+		<text>Sie haben das Artefakt. Aktivieren Sie es, um es in Ihre Basis zurьckzubringen!</text>
+	</string>
+	<string id="mp_your_rank">
+		<text>Ihr Rang lautet jetzt</text>
+	</string>
+	<string id="self">
+		<text>Das sind Sie</text>
+	</string>
+	<string id="st_mp_disabled_voting">
+		<text>Auf diesem Server sind Abstimmungen nicht mцglich.</text>
+	</string>
+	<string id="st_mp_no_current_voting">
+		<text>Keine laufenden Abstimmungen.</text>
+	</string>
+	<string id="st_mp_only_one_voting">
+		<text>Nur eine aktive Abstimmung gestattet.</text>
+	</string>
+	<string id="st_mp_ready">
+		<text>Bereit</text>
+	</string>
+	<string id="st_mp_say_to_all">
+		<text>An alle</text>
+	</string>
+	<string id="st_mp_say_to_team">
+		<text>Ans Team</text>
+	</string>
+	<string id="st_mp_voting_failed">
+		<text>Abstimmung fehlgeschlagen!</text>
+	</string>
+	<string id="st_mp_voting_succeed">
+		<text>Abstimmung erfolgreich!</text>
+	</string>
+	<string id="team_base_1">
+		<text>Freiheitsbasis</text>
+	</string>
+	<string id="team_base_2">
+		<text>Sцldnerbasis</text>
+	</string>
+	<string id="ui_mp_ah">
+		<text>2. Artefaktjagd</text>
+	</string>
+	<string id="ui_mp_cta">
+		<text>4. Artefakteroberung</text>
+	</string>
+	<string id="ui_mp_dm">
+		<text>1. Jeder gegen Jeden</text>
+	</string>
+	<string id="ui_mp_gamespy_creating_new_profile">
+		<text>Neues Profil erstellen</text>
+	</string>
+	<string id="ui_mp_gamespy_getting_account_profiles">
+		<text>Accountprofile werden geladen</text>
+	</string>
+	<string id="ui_mp_gamespy_loading_rewards_hello">
+		<text>Hallo</text>
+	</string>
+	<string id="ui_mp_gamespy_logining_to_profile">
+		<text>Verbindung mit Profil wird hergestellt</text>
+	</string>
+	<string id="ui_mp_gamespy_profile_created">
+		<text>Profil wurde erfolgreich erstellt. Bitte verbinden Sie sich damit.</text>
+	</string>
+	<string id="ui_mp_gamespy_suggesting_unique_name">
+		<text>Eindeutiger Name wird verifiziert...</text>
+	</string>
+	<string id="ui_mp_gamespy_use_existing_profile">
+		<text>Wollen Sie das folgende vorhandene Profil benutzen:</text>
+	</string>
+	<string id="ui_mp_gamespy_verify_account_profiles">
+		<text>Account gefunden. Registrierte Profile werden geladen...</text>
+	</string>
+	<string id="ui_mp_gamespy_verify_account_profiles_error1">
+		<text>Sie haben bereits ein Profil. Bitte verbinden Sie sich damit.</text>
+	</string>
+	<string id="ui_mp_gamespy_verify_email">
+		<text>Account wird verifiziert...</text>
+	</string>
+	<string id="ui_mp_gamespy_verify_nickname_error1">
+		<text>Dieser eindeutige Name wird bereits verwendet. Bitte wдhlen Sie aus der Auswahlliste eine Alternative aus oder geben Sie einen neuen Namen ein.</text>
+	</string>
+	<string id="ui_mp_gamespy_verify_password_error1">
+		<text>Passwцrter stimmen nicht ьberein!</text>
+	</string>
+	<string id="ui_mp_tdm">
+		<text>3. Teamspiel</text>
+	</string>
+	<string id="ui_st_btn_copy_url">
+		<text>Link kopieren</text>
+	</string>
+	<string id="ui_st_btn_download_map">
+		<text>Karte laden</text>
+	</string>
+	<string id="ui_st_description">
+		<text>Beschreibung</text>
+	</string>
+	<string id="ui_st_map_data_corrupted">
+		<text>Karte nicht korrekt oder beschдdigt</text>
+	</string>
+	<string id="ui_st_map_not_found">
+		<text>Karte nicht gefunden</text>
+	</string>
+	<string id="ui_st_mp_awards">
+		<text>Auszeichnungen</text>
+	</string>
+	<string id="ui_st_mp_best_results">
+		<text>Rekorde</text>
+	</string>
+	<string id="ui_st_mp_check_avaliability">
+		<text>Ьberprьfen</text>
+	</string>
+	<string id="ui_st_mp_confirm_password">
+		<text>Passwort bestдtigen</text>
+	</string>
+	<string id="ui_st_mp_email">
+		<text>E-Mail-Adresse</text>
+	</string>
+	<string id="ui_st_mp_forgot_password">
+		<text>Passw. vergessen?</text>
+	</string>
+	<string id="ui_st_mp_gamespy_account_creation">
+		<text>GameSpy-Seite </text>
+	</string>
+	<string id="ui_st_mp_password">
+		<text>Passwort</text>
+	</string>
+	<string id="ui_st_mp_remember_me">
+		<text>Speichern</text>
+	</string>
+	<string id="ui_st_mp_unique_nickname">
+		<text>Eindeutiger Name</text>
+	</string>
+	<string id="ui_st_mp_unique_nickname_change">
+		<text>Eindeutiger Name wurde erfolgreich geдndert in</text>
+	</string>
+	<string id="ui_st_team">
+		<text>Team</text>
+	</string>
+	<string id="ui_st_team1_name">
+		<text>Freiheit</text>
+	</string>
+	<string id="ui_st_team2_name">
+		<text>Sцldner</text>
+	</string>
+	<string id="ui_st_mp_create_new_account">
+		<text>Neues Profil</text>
+	</string>
+	<string id="ui_st_mp_gamespy_login_page">
+		<text>GameSpy-Autorisation</text>
+	</string>
+	<string id="mpd_play">
+		<text>Abspielen</text>
+	</string>
+	<string id="mpd_rewind">
+		<text>Zurьck</text>
+	</string>
+	<string id="mpd_restart">
+		<text>Neu starten</text>
+	</string>
+	<string id="mpd_rewind_until_start">
+		<text>An den Anfang</text>
+	</string>
+	<string id="mpd_rewind_until_kill">
+		<text>Zum Kill</text>
+	</string>
+	<string id="mpd_rewind_until_die">
+		<text>Zum Tod</text>
+	</string>
+	<string id="mpd_rewind_until_arttake">
+		<text>Zur Artefakteroberung</text>
+	</string>
+	<string id="mpd_rewind_until_artdrop">
+		<text>Zum Artefaktverlust</text>
+	</string>
+	<string id="mpd_rewind_until_artdeliver">
+		<text>Zur Artefaktlieferung</text>
+	</string>
+	<string id="mpd_any_player">
+		<text>beliebig</text>
+	</string>
+	<string id="mm_mp_login">
+		<text>Anmelden</text>
+	</string>
+	<string id="ui_mp_am_screen_all">
+		<text>Screenshot (alle)</text>
+	</string>
+	<string id="ui_mp_am_config_all">
+		<text>Konfigurationen fьr alle</text>
+	</string>
+	<string id="ui_mp_am_ping_limit">
+		<text>Pinglimit:</text>
+	</string>
+	<string id="ui_mp_am_set_ping_limit">
+		<text>Pinglimit</text>
+	</string>
+	<string id="ui_mp_am_screen_selected">
+		<text>Screens. (ausg. Spieler)</text>
+	</string>
+	<string id="ui_mp_am_config_selected">
+		<text>Konf. fьr ausg. Spieler</text>
+	</string>
+	<string id="ui_mp_am_kick_selected">
+		<text>Ausgew. Spieler kicken</text>
+	</string>
+	<string id="ui_mp_am_ban_selected">
+		<text>Ausgew. Spieler sperren</text>
+	</string>
+	<string id="ui_mp_am_restart">
+		<text>Neu starten</text>
+	</string>
+	<string id="ui_mp_am_fast_restart">
+		<text>Schneller Neustart</text>
+	</string>
+	<string id="ui_mp_am_change_weather">
+		<text>Wetter дndern</text>
+	</string>
+	<string id="ui_mp_am_set_change_rate">
+		<text>Geschwindigk. Wetterwechsel</text>
+	</string>
+	<string id="ui_mp_am_change_game_type">
+		<text>Spielart дndern</text>
+	</string>
+	<string id="ui_mp_am_change_game_limits">
+		<text>Spieleinstellungen дndern</text>
+	</string>
+	<string id="ui_mp_am_stop_cur_voting">
+		<text>Laufende Abstimmung stoppen</text>
+	</string>
+	<string id="ui_mp_am_set_time_limit">
+		<text>Zeitlimit (0, 180)</text>
+	</string>
+	<string id="ui_mp_am_set_frag_limit">
+		<text>Kill-Limit (0, 1000)</text>
+	</string>
+	<string id="ui_mp_am_set_art_limit">
+		<text>Artefaktlimit (0, 100)</text>
+	</string>
+	<string id="ui_mp_am_set_warm_up_time">
+		<text>Aufwдrmzeit (0, 3600)</text>
+	</string>
+	<string id="ui_mp_am_set_invincible_time">
+		<text>Unverwundbarkeit (0, 60 AE)</text>
+	</string>
+	<string id="ui_mp_am_set_damage_block_time">
+		<text>Unverwundbark. (0, 600 T/DM)</text>
+	</string>
+	<string id="ui_mp_am_set_reinforcement_time">
+		<text>Respawn-Zeit (-1, 3600)</text>
+	</string>
+	<string id="mp_gp_unknown_error_4">
+		<text>Unbekannter Profilfehler (Code: 4)</text>
+	</string>
+	<string id="ui_mp_am_10_minutes">
+		<text>10 Minuten</text>
+	</string>
+	<string id="ui_mp_am_30_minutes">
+		<text>30 Minuten</text>
+	</string>
+	<string id="ui_mp_am_1_hour">
+		<text>1 Stunde</text>
+	</string>
+	<string id="ui_mp_am_6_hours">
+		<text>6 Stunden</text>
+	</string>
+	<string id="ui_mp_am_1_day">
+		<text>1 Tag</text>
+	</string>
+	<string id="ui_mp_am_1_week">
+		<text>1 Woche</text>
+	</string>
+	<string id="ui_mp_am_1_month">
+		<text>1 Monat</text>
+	</string>
+	<string id="ui_mp_am_3_monthes">
+		<text>3 Monate</text>
+	</string>
+	<string id="ui_mp_am_forever">
+		<text>Permanent</text>
+	</string>
+	<string id="mp_gp_unique_nick_too_short">
+		<text>Der Benutzername ist zu kurz</text>
+	</string>
+	<string id="mp_gp_unknown_error_512">
+		<text>Profilfehler</text>
+	</string>
+</string_table>

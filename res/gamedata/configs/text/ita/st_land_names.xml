@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_zat_b55_name">
+		<text>Anomalia Artiglio</text>
+	</string>
+	<string id="st_zat_b100_name">
+		<text>Anomalia Foresta d'acciaio</text>
+	</string>
+	<string id="st_zat_b104_name">
+		<text>Segheria</text>
+	</string>
+	<string id="st_zat_b38_name">
+		<text>Complesso dell'antenna Krug</text>
+	</string>
+	<string id="st_zat_b40_name">
+		<text>Impianto dei rifiuti</text>
+	</string>
+	<string id="st_zat_b56_name">
+		<text>Anomalia Circo</text>
+	</string>
+	<string id="st_zat_b5_name">
+		<text>Stazione dei ranger</text>
+	</string>
+	<string id="st_zat_a2_name">
+		<text>Skadovsk</text>
+	</string>
+	<string id="st_zat_b20_name">
+		<text>Fattoria bruciata</text>
+	</string>
+	<string id="st_zat_b53_name">
+		<text>Anomalia Boiler</text>
+	</string>
+	<string id="st_zat_b101_name">
+		<text>Palude</text>
+	</string>
+	<string id="st_zat_b106_name">
+		<text>Izumrudnoye</text>
+	</string>
+	<string id="st_zat_b7_name">
+		<text>Shevchenko</text>
+	</string>
+	<string id="st_zat_b14_name">
+		<text>Stazione di drenaggio</text>
+	</string>
+	<string id="st_zat_b52_name">
+		<text>Gru del porto</text>
+	</string>
+	<string id="st_zat_b39_name">
+		<text>Anomalia Pinquercia</text>
+	</string>
+	<string id="st_zat_b33_name">
+		<text>Stazione di rifornimento</text>
+	</string>
+	<string id="st_zat_b18_name">
+		<text>Vecchia chiatta</text>
+	</string>
+	<string id="st_zat_b54_name">
+		<text>Anomalia Cicatrice</text>
+	</string>
+	<string id="st_zat_b12_name">
+		<text>Ponte di Preobrazhensky</text>
+	</string>
+	<string id="st_zat_b28_name">
+		<text>Altopiano meridionale</text>
+	</string>
+	<string id="st_zat_b103_name">
+		<text>Officine delle sotto-stazioni</text>
+	</string>
+	<string id="st_jup_b1_name">
+		<text>Anomalia Cumulo di cenere</text>
+	</string>
+	<string id="st_jup_b46_name">
+		<text>Torre di raffreddamento</text>
+	</string>
+	<string id="st_jup_b202_name">
+		<text>Sotto-stazione</text>
+	</string>
+	<string id="st_jup_b211_name">
+		<text>Anomalia Plavni</text>
+	</string>
+	<string id="st_jup_b200_name">
+		<text>Fabbrica di cemento</text>
+	</string>
+	<string id="st_jup_b19_name">
+		<text>Kopachy</text>
+	</string>
+	<string id="st_jup_a6_name">
+		<text>Yanov</text>
+	</string>
+	<string id="st_jup_b25_name">
+		<text>Cava</text>
+	</string>
+	<string id="st_jup_b6_name">
+		<text>Bunker degli scienziati</text>
+	</string>
+	<string id="st_jup_b205_name">
+		<text>Complesso Volkhov AA</text>
+	</string>
+	<string id="st_jup_b206_name">
+		<text>Boschetto anomalo</text>
+	</string>
+	<string id="st_jup_b32_name">
+		<text>Parcheggio</text>
+	</string>
+	<string id="st_jup_a10_name">
+		<text>Checkpoint</text>
+	</string>
+	<string id="st_jup_b209_name">
+		<text>Anomalia Bitume</text>
+	</string>
+	<string id="st_jup_b208_name">
+		<text>Tunnel orientale</text>
+	</string>
+	<string id="st_jup_a12_name">
+		<text>Magazzino dei contenitori</text>
+	</string>
+	<string id="st_jup_b212_name">
+		<text>Complesso di ventilazione</text>
+	</string>
+	<string id="st_jup_b9_name">
+		<text>Piattaforme di atterraggio degli elicotteri</text>
+	</string>
+	<string id="st_jup_b201_name">
+		<text>Anomalia Bagno di cemento</text>
+	</string>
+	<string id="st_jup_a9_name">
+		<text>Stabilimento Jupiter</text>
+	</string>
+	<string id="st_pri_a28_name">
+		<text>Cinema Prometheus</text>
+	</string>
+	<string id="st_pri_b36_name">
+		<text>Porto del fiume</text>
+	</string>
+	<string id="st_pri_b303_name">
+		<text>Vecchio centro servizio</text>
+	</string>
+	<string id="st_pri_b301_name">
+		<text>Scuola</text>
+	</string>
+	<string id="st_pri_a17_name">
+		<text>Ospedale</text>
+	</string>
+	<string id="st_pri_b306_name">
+		<text>Centro servizi Yubileiny</text>
+	</string>
+	<string id="st_pri_a16_name">
+		<text>Lavanderia</text>
+	</string>
+	<string id="st_pri_a25_name">
+		<text>Asilo</text>
+	</string>
+	<string id="st_pri_b35_name">
+		<text>Complesso di appartamenti</text>
+	</string>
+	<string id="st_pri_a21_name">
+		<text>Macelleria</text>
+	</string>
+	<string id="st_pri_b304_name">
+		<text>Grande magazzino</text>
+	</string>
+	<string id="st_pri_a18_name">
+		<text>Libreria</text>
+	</string>
+	<string id="st_pri_b307_name">
+		<text>Anomalia Vulcano</text>
+	</string>
+	<string id="st_pri_b302_name">
+		<text>Anomalia Vite</text>
+	</string>
+</string_table>

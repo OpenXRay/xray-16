@@ -1,0 +1,66 @@
+class "action_process_hit"
+
+function action_process_hit:__init(obj, storage)
+	self.object = obj
+	self.st = storage
+end
+
+function action_process_hit:hit_callback(obj, amount, local_direction, who, bone_index)
+	db.storage[self.object:id()].hit.bone_index = bone_index
+	if amount == 0 and not(obj:invulnerable()) then
+		-- FIXME if_then_else
+--		printf("[%s] hit by [%s]: 0 damage, ignoring", obj:name(), if_then_else(who, who:name(), "<no one>"))
+		return
+	end
+	if who then
+		printf("[%s] hit by [%s]", obj:name(), who:name())
+		db.storage[obj:id()].hit.who = who:id()
+	else
+		printf("[%s] hit by [Unknown]", victim:name())
+		db.storage[obj:id()].hit.who = -1
+	end
+	if db.storage[self.object:id()].active_scheme then
+		--printf("DEADLY HIT %s %s", amount, self.object.health)
+		db.storage[self.object:id()].hit.deadly_hit = amount >= self.object.health*100
+
+		if xr_logic.try_switch_to_another_section(obj, db.storage[self.object:id()].hit, db.actor) then
+			db.storage[self.object:id()].hit.deadly_hit = false
+			return
+		end
+		db.storage[self.object:id()].hit.deadly_hit = false
+	end
+end
+
+----------------------------------------------------------------------------------------------------------------------
+-- binder
+----------------------------------------------------------------------------------------------------------------------
+function add_to_binder(npc, ini, scheme, section, storage)
+ 	local new_action = this.action_process_hit(npc, storage)
+	storage.action = new_action
+end
+
+function set_hit_checker(npc, ini, scheme, section)
+	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
+	
+	if not ini:section_exist(section) then
+		abort("There is no section [%s] for npc [%s]", section, npc:name())
+	end
+	
+	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, npc)
+
+	-- НЕ СТАВИТЬ hit callback напрямую - получаем его из motivator-а через
+	-- event в подписанном на него action-е:
+	--npc:set_callback(callback.hit, st.action.hit_callback, st.action)
+	xr_logic.subscribe_action_for_events(npc, st, st.action)
+end
+
+function disable_scheme(npc, scheme)
+	-- При отключении схемы, нужно снять подписку, чтобы hit callback перестал
+	-- передаваться:
+	--npc:set_callback(callback.hit, nil)
+	local st = db.storage[npc:id()][scheme]
+	if st then
+		xr_logic.unsubscribe_action_from_events(npc, st, st.action)
+	end
+end
+

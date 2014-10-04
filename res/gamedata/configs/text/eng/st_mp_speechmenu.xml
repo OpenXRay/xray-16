@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="speech_attack">
+		<text>Everyone, attack!</text>
+	</string>
+	<string id="speech_covermeartifact">
+		<text>I'm going for the artifact! Cover me!</text>
+	</string>
+	<string id="speech_followme">
+		<text>Follow me!</text>
+	</string>
+	<string id="speech_guardartifact">
+		<text>Guard the artifact for now. Don’t take it yet!</text>
+	</string>
+	<string id="speech_holdingpos">
+		<text>I'm holding my position!</text>
+	</string>
+	<string id="speech_holdpos">
+		<text>Hold your positions!</text>
+	</string>
+	<string id="speech_icoverartifact">
+		<text>Take the artifact! I’ll cover you!</text>
+	</string>
+	<string id="speech_needhelp">
+		<text>I need help!</text>
+	</string>
+	<string id="speech_needmoney">
+		<text>No money - buy me equipment!</text>
+	</string>
+	<string id="speech_no">
+		<text>No.</text>
+	</string>
+	<string id="speech_noenemy">
+		<text>No one in sight!</text>
+	</string>
+	<string id="speech_report">
+		<text>Report, now!</text>
+	</string>
+	<string id="speech_retreat">
+		<text>Retreat!</text>
+	</string>
+	<string id="speech_returntheartefact">
+		<text>Return the artifact!</text>
+	</string>
+	<string id="speech_roger">
+		<text>Roger.</text>
+	</string>
+	<string id="speech_silence">
+		<text>Shut up!</text>
+	</string>
+	<string id="speech_sticktogether">
+		<text>Stick together.</text>
+	</string>
+	<string id="speech_takeartifact">
+		<text>Take the artifact!</text>
+	</string>
+</string_table>

@@ -1,0 +1,9 @@
+[logic]
+active = ph_idle@humm
+
+[ph_idle@humm]
+;on_info = ph_idle@nil %=play_sound_looped(pas_b400_transformer)%
+on_info = {!black_screen} %=play_sound_looped(pas_b400_transformer)%
+
+[ph_idle@nil]
+on_info = ph_idle@humm

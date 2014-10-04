@@ -1,0 +1,120 @@
+-- Состояние смарттеррейна
+-- Может быть трех видов: normal, danger, alarm
+-- normal - все как обычно, без ограничений
+-- danger - в зоне контроля находится игрок с оружием. Нужно запереть двери и предложить ему убираться
+-- alarm - игрок атаковал смарт. Нужно запереть двери и подождать время.
+
+NORMAL = 0
+DANGER = 1
+ALARM = 2
+
+current_smart_id = nil
+
+local ALARM_TIME = 2*60*60
+
+
+class "CBaseOnActorControl"
+function CBaseOnActorControl:__init(smart, ini, section)
+
+	self.noweap_zone	= utils.cfg_get_string(ini, section, "noweap_zone", self, true, "")
+	self.ignore_zone	= utils.cfg_get_string(ini, section, "ignore_zone", self, false, "")
+
+	self.alarm_start_sound 	= xr_logic.parse_condlist(smart, section, "alarm_start_sound", 		utils.cfg_get_string(ini, section, "alarm_start_sound", self, false, "") )
+	self.alarm_stop_sound 	= xr_logic.parse_condlist(smart, section, "alarm_stop_sound", 		utils.cfg_get_string(ini, section, "alarm_stop_sound", self, false, "") )
+
+	self.smart = smart
+
+	self.status = NORMAL
+end
+
+function CBaseOnActorControl:update()
+	--printf("%s alarm status [%s]", self.smart:name(), self.status)
+
+	if self.status == ALARM then
+		if game.get_game_time():diffSec(self.alarm_time) < ALARM_TIME then
+			--printf("TIME %s", game.get_game_time():diffSec(self.alarm_time))
+			return
+		end
+
+		local sound = xr_logic.pick_section_from_condlist(db.actor, self.smart, self.alarm_stop_sound)
+		--printf("SOUND = %s", tostring(sound))
+		--' Озвучка на конец атаки
+		if sound ~= nil then
+			xr_sound.set_sound_play(db.actor:id(), sound)
+		end
+
+		for squad_id,squad in pairs(sim_board.get_sim_board().smarts[self.smart.id].squads) do
+			game_relations.set_squad_goodwill(squad_id, "neutral")
+		end
+	end
+
+	if self:get_actor_treat() == true then
+		self.status = DANGER
+	else
+		self.status = NORMAL
+	end
+end
+
+-- Возвращает статус угрожает ли игрок смарту или нет (находится ли с оружием в пределах новеапон зоны).
+function CBaseOnActorControl:get_actor_treat()
+	local zone = db.zone_by_name[self.noweap_zone]
+	if zone == nil then
+		return false
+	end
+
+	if not zone:inside(db.actor:position()) then
+		if current_smart_id == self.smart.id then
+			current_smart_id = nil
+		end
+		return false
+	else
+		current_smart_id = self.smart.id
+	end
+
+	if isWeapon(db.actor:active_item()) then
+		return true
+	end
+
+	return false
+end
+
+-- Устанавливает, что игрок атаковал смарт
+function CBaseOnActorControl:actor_attack()
+
+	if self.status ~= ALARM then
+		local sound = xr_logic.pick_section_from_condlist(db.actor, self.smart, self.alarm_start_sound)
+		--' Озвучка на начало атаки.
+		if sound ~= nil then
+			xr_sound.set_sound_play(db.actor:id(), sound)
+		end
+		for squad_id,squad in pairs(sim_board.get_sim_board().smarts[self.smart.id].squads) do
+			game_relations.set_squad_goodwill(squad_id, "enemy")
+		end
+	end
+	self.status = ALARM
+	self.alarm_time = game.get_game_time()
+end
+
+function CBaseOnActorControl:get_status()
+	return self.status
+end
+
+-- НЕ ЗАБЫТЬ СЕЙВ ЛОАД
+function CBaseOnActorControl:save(packet)
+	set_save_marker(packet, "save", false, "CBaseOnActorControl")
+
+	packet:w_u8(self.status)
+	utils.w_CTime(packet, self.alarm_time)
+
+	set_save_marker(packet, "save", true, "CBaseOnActorControl")
+end
+
+
+function CBaseOnActorControl:load(packet)
+	set_save_marker(packet, "load", false, "CBaseOnActorControl")
+
+	self.status = packet:r_u8()
+	self.alarm_time = utils.r_CTime(packet)
+
+	set_save_marker(packet, "load", true, "CBaseOnActorControl")
+end

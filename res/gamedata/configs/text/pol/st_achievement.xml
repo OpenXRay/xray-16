@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_achievement_10_descr">
+		<text>Co za upokorzenie dla wroga! Udaіo ci siк zabiж dziesiкciu przeciwnikуw pod rz№d, nie gin№c przy tym! Nie moїna jednak nazwaж tego okrucieсstwem. Po prostu dajesz im powody do dalszego doskonalenia umiejкtnoњci.</text>
+	</string>
+	<string id="st_achievement_10_name">
+		<text>Pora їniw</text>
+	</string>
+	<string id="st_achievement_11_descr">
+		<text>Jesteњ wcielon№ њmierci№! Udaіo ci siк upiec dwie pieczenie przy jednym ogniu, zabijaj№c dwуch wrogуw jednym strzaіem z karabinu Gaussa.</text>
+	</string>
+	<string id="st_achievement_11_name">
+		<text>Szaszіyk</text>
+	</string>
+	<string id="st_achievement_12_descr">
+		<text>Eliminujesz swoich wrogуw ze spokojem i wyrachowaniem, dziкki czemu udaіo ci siк trafiж dwуch wrogуw z dwururki w odstкpie ledwie kilku sekund.</text>
+	</string>
+	<string id="st_achievement_12_name">
+		<text>Dwa strzaіy, dwa trupy</text>
+	</string>
+	<string id="st_achievement_13_descr">
+		<text>Doskonale wiesz, na czym polega bycie stalkerem, dlatego teї jesteњ pierwszym z okolicznych stalkerуw, ktуry zyskaі miano legendy.</text>
+	</string>
+	<string id="st_achievement_13_name">
+		<text>Awans spoіeczny</text>
+	</string>
+	<string id="st_achievement_14_descr">
+		<text>Przeci№ж egzoszkielet noїem? Uwielbiasz stawiaж sobie trudne cele i je realizowaж.</text>
+	</string>
+	<string id="st_achievement_14_name">
+		<text>Otwieracz do puszek</text>
+	</string>
+	<string id="st_achievement_15_descr">
+		<text>Wydawaіo im siк, їe juї po tobie, ale nie zdawali sobie sprawy, z kim maj№ do czynienia. Nawet na skraju њmierci udaіo ci siк zabiж piкciu z nich.</text>
+	</string>
+	<string id="st_achievement_15_name">
+		<text>Drogo sprzedaж swoj№ skуrк</text>
+	</string>
+	<string id="st_achievement_16_descr">
+		<text>Co za przypіyw adrenaliny! Udaіo ci siк zebraж krwawe їniwo wњrуd wrogуw, eliminuj№c piкж osуb w piкж sekund! Niewiarygodne!</text>
+	</string>
+	<string id="st_achievement_16_name">
+		<text>Nieokieіznana furia</text>
+	</string>
+	<string id="st_achievement_17_descr">
+		<text>Niesamowita celnoњж! Udaіo ci siк zabiж dwуch wrogуw strzaіami w oko, nie gin№c przy tym.</text>
+	</string>
+	<string id="st_achievement_17_name">
+		<text>Okulista</text>
+	</string>
+	<string id="st_achievement_18_descr">
+		<text>Niech siк kryj№ za wкgіami i szykuj№ zasadzki, dla ciebie to їaden problem. Potrafisz trafiж nawet ruchomy cel bez przymierzenia!</text>
+	</string>
+	<string id="st_achievement_18_name">
+		<text>Bіyskawiczny refleks</text>
+	</string>
+	<string id="st_achievement_19_descr">
+		<text>Niech biegnie tak szybko, jak tylko potrafi... I tak dogoni№ go twoje pociski.</text>
+	</string>
+	<string id="st_achievement_19_name">
+		<text>Zatrzymaж uciekiniera</text>
+	</string>
+	<string id="st_achievement_1_descr">
+		<text>Udaіo ci siк zabiж dwudziestu wrogуw pod rz№d, nie gin№c przy tym! Co za masakra!</text>
+	</string>
+	<string id="st_achievement_1_name">
+		<text>Masakra</text>
+	</string>
+	<string id="st_achievement_20_descr">
+		<text>Moїe i byіo ich trzech, moїe i mieli karabiny snajperskie, ale przy twoich umiejкtnoњciach i tak byli bez szans.</text>
+	</string>
+	<string id="st_achievement_20_name">
+		<text>Najcelniejszy strzelec</text>
+	</string>
+	<string id="st_achievement_21_descr">
+		<text>Pozostawiaj№c barbarzyсskie zachowania wrogom, udaіo ci siк pokazaж, їe nie trzeba oddaж ani jednego strzaіu, aby wygraж.</text>
+	</string>
+	<string id="st_achievement_21_name">
+		<text>Zwiastun pokoju</text>
+	</string>
+	<string id="st_achievement_22_descr">
+		<text>Dystans to nie problem dla prawdziwego snajpera! Potrafisz trafiж w cel z ponad 120 metrуw.</text>
+	</string>
+	<string id="st_achievement_22_name">
+		<text>Њmiercionoњna celnoњж</text>
+	</string>
+	<string id="st_achievement_23_descr">
+		<text>Wrogowie zdoіali ciк pokonaж, ale zostaіa po tobie pami№tka w postaci odbezpieczonego granatu!</text>
+	</string>
+	<string id="st_achievement_23_name">
+		<text>Coњ na pami№tkк</text>
+	</string>
+	<string id="st_achievement_24_descr">
+		<text>Zabili twoich przyjaciуі i zasіugiwali na krwaw№ zemstк. Trzech wrogуw za trzech przyjaciуі to sprawiedliwy przelicznik.</text>
+	</string>
+	<string id="st_achievement_24_name">
+		<text>Mњciciel</text>
+	</string>
+	<string id="st_achievement_25_descr">
+		<text>Jesteњ anioіem strуїem jednego ze swoich przyjaciуі. Dwa razy udaіo ci siк ocaliж go przed atakiem, podczas gdy niуsі artefakt.</text>
+	</string>
+	<string id="st_achievement_25_name">
+		<text>Cherubin</text>
+	</string>
+	<string id="st_achievement_26_descr">
+		<text>Udaіo ci siк ocaliж honor swуj i swojej druїyny poprzez zdobycie kilku punktуw.</text>
+	</string>
+	<string id="st_achievement_26_name">
+		<text>Obroсca honoru</text>
+	</string>
+	<string id="st_achievement_27_descr">
+		<text>Naprawdк wiesz, gdzie pojawi siк nastкpny artefakt? Udaіo ci siк go podnieњж w ci№gu kilku sekund od pojawienia siк.</text>
+	</string>
+	<string id="st_achievement_27_name">
+		<text>Intuicja stalkera</text>
+	</string>
+	<string id="st_achievement_28_descr">
+		<text>Ale fart! Udaіo ci siк zabiж wroga ostatnim nabojem w magazynku! Za to w jego przypadku trudno mуwiж o farcie…</text>
+	</string>
+	<string id="st_achievement_28_name">
+		<text>Cholerny szczкњciarz</text>
+	</string>
+	<string id="st_achievement_29_descr">
+		<text>Udaіo ci siк zabiж oњmiu wrogуw pod rz№d. Zobaczymy teraz, czy odwaї№ siк podj№ж rкkawicк.</text>
+	</string>
+	<string id="st_achievement_29_name">
+		<text>Czarna lista</text>
+	</string>
+	<string id="st_achievement_2_descr">
+		<text>Nikt nie zdoіaі ciк zabiж przez caі№ grк, poniewaї cechujesz siк ostroїnoњci№ i rozwag№. Przy tym moїesz siк poszczyciж zdobyciem piкtnastu punktуw.</text>
+	</string>
+	<string id="st_achievement_2_name">
+		<text>Paranoja</text>
+	</string>
+	<string id="st_achievement_30_descr">
+		<text>Dziкki tіumikowi zaіatwiasz sprawк nie przyci№gaj№c uwagi. Po co wrуg ma wiedzieж, sk№d nadchodzi њmierж?</text>
+	</string>
+	<string id="st_achievement_30_name">
+		<text>Bezgіoњna њmierж</text>
+	</string>
+	<string id="st_achievement_3_descr">
+		<text>Udaіo ci siк rozbiж przeciwnikуw w pyі, zwyciкїaj№c i zdobywaj№c przy tym dwa razy wiкcej punktуw niї najlepszy z nich.</text>
+	</string>
+	<string id="st_achievement_3_name">
+		<text>Przytіaczaj№ca przewaga</text>
+	</string>
+	<string id="st_achievement_4_descr">
+		<text>Twуj њmiaіy plan natychmiastowego zdobycia artefaktu zakoсczyі siк sukcesem, dziкki czemu twoja druїyna zdobyіa punkt w ci№gu trzech minut od rozpoczкcia gry.</text>
+	</string>
+	<string id="st_achievement_4_name">
+		<text>Blitzkrieg</text>
+	</string>
+	<string id="st_achievement_5_descr">
+		<text>Nie pozostawiliњcie przeciwnikom nawet cienia nadziei, zwyciкїaj№c zanim zdoіali oni zdobyж choж jeden artefakt. To dla nich prawdziwa lekcja pracy zespoіowej!</text>
+	</string>
+	<string id="st_achievement_5_name">
+		<text>Pobieda!</text>
+	</string>
+	<string id="st_achievement_6_descr">
+		<text>Udaіo ci siк uzyskaж najlepszy wynik w kaїdej dziedzinie, eliminuj№c najwiкcej wrogуw i zdobywaj№c najwiкcej artefaktуw przy najmniejszej liczbie њmierci. Tak trzymaj!</text>
+	</string>
+	<string id="st_achievement_6_name">
+		<text>Wszechstronne uzdolnienia</text>
+	</string>
+	<string id="st_achievement_7_descr">
+		<text>Twoje umiejкtnoњci walki noїem s№ niezrуwnane! Udaіo ci siк wypatroszyж trzech przeciwnikуw w ci№gu dwudziestu sekund, udowadniaj№c, їe masz prawdziwy talent do walki wrкcz.</text>
+	</string>
+	<string id="st_achievement_7_name">
+		<text>Furia</text>
+	</string>
+	<string id="st_achievement_8_descr">
+		<text>Kaїdy wrуg ma czuіy punkt w swoim opancerzeniu. Tobie udaіo siк go znaleџж, trafiaj№c z pistoletu w oko w peіni opancerzonego przeciwnika.</text>
+	</string>
+	<string id="st_achievement_8_name">
+		<text>Piкta achillesowa</text>
+	</string>
+	<string id="st_achievement_9_descr">
+		<text>Wrogim kulom siк nie kіaniasz! Przechodzisz przez ich grad bez zadraњniкcia i rozbijasz przeciwnikуw w pyі!</text>
+	</string>
+	<string id="st_achievement_9_name">
+		<text>Szybciej niї pocisk</text>
+	</string>
+	<string id="st_sp_achievement_1_descr">
+		<text>Chкtnie zajmujesz siк њledzeniem rozwoju wydarzeс w Zonie. Udaіo ci siк powiкkszyж zasуb wiedzy o niej przez odkrycie anomalii wczeњniej nieznanych nauce. </text>
+	</string>
+	<string id="st_sp_achievement_1_name">
+		<text>Pionier</text>
+	</string>
+	<string id="st_sp_achievement_2_hint">
+		<text>Inni stalkerzy maj№ o tobie coraz lepsz№ opiniк. \nCzasami zostawiaj№ oni amunicjк w twojej skrytce na stacji Janуw jako wyraz szacunku.</text>
+	</string>
+	<string id="st_sp_achievement_2_descr">
+		<text>Nie unikasz niebezpiecznych mutantуw - polujesz na nich i to z dobrymi wynikami. Dobrzy іowcy s№ szanowani wњrуd stalkerуw.</text>
+	</string>
+	<string id="st_sp_achievement_2_name">
+		<text>Јowca mutantуw</text>
+	</string>
+	<string id="st_sp_achievement_3_hint">
+		<text>Inni stalkerzy maj№ o tobie coraz lepsz№ opiniк. \nCzasami zostawiaj№ oni њrodki medyczne w twojej skrytce na Skadowsku jako wyraz szacunku.</text>
+	</string>
+	<string id="st_sp_achievement_3_descr">
+		<text>Udaіo ci siк odkryж sekret stoj№cy za zaginiкciami stalkerуw na Skadowsku: winni byli nie mutanci, lecz duїo groџniejszy wrуg - czіowiek. Udane dochodzenie przysporzyіo ci szacunku wielu stalkerуw.</text>
+	</string>
+	<string id="st_sp_achievement_3_name">
+		<text>Detektyw</text>
+	</string>
+	<string id="st_sp_achievement_4_hint">
+		<text>Inni stalkerzy maj№ o tobie coraz lepsz№ opiniк. \nPoprosili oni handlarza Sowк, aby udzieliі ci zniїki. \Brodacz z kolei oferuje ci teraz najwyїsze stawki za artefakty.</text>
+	</string>
+	<string id="st_sp_achievement_4_descr">
+		<text>Pokazaіeњ bandytom i ich przywуdcy Suіtanowi, kto jest szefem, co przysporzyіo ci popularnoњci wњrуd stalkerуw. Na Skadowsku zawsze czeka ciк serdeczne przyjкcie.</text>
+	</string>
+	<string id="st_sp_achievement_4_name">
+		<text>Jeden z nas</text>
+	</string>
+	<string id="st_sp_achievement_5_hint">
+		<text>Udaіo ci siк zdobyж szacunek bandytуw. \nHandlarz Sowa udzieliі ci zniїki ze strachu . \nZgodnie z umow№, Brodacz bкdzie od teraz pіaciі ci haracz od swoich dochodуw.</text>
+	</string>
+	<string id="st_sp_achievement_5_descr">
+		<text>Z twoj№ pomoc№ Suіtan wymanewrowaі stalkerуw i przej№і kontrolк nad interesem Brodacza. Budzisz teraz strach i szacunek w mieszkaсcach Zatonu.</text>
+	</string>
+	<string id="st_sp_achievement_5_name">
+		<text>Szef</text>
+	</string>
+	<string id="st_sp_achievement_6_hint">
+		<text>Stalkerzy zdecydowali siк oddaж іupy, ktуre Sroka zdobyі kіamstwami i podstкpem, komuњ bardziej wartoњciowemu. Umieњcili je w twojej skrytce na stacji Janуw.</text>
+	</string>
+	<string id="st_sp_achievement_6_descr">
+		<text>Udaіo ci siк wymierzyж sprawiedliwoњж zіoczyсcy. Sroka oszukaі i zwiуdі wielu stalkerуw, ale teraz wybiіa jego godzina.</text>
+	</string>
+	<string id="st_sp_achievement_6_name">
+		<text>Wysіannik sprawiedliwoњci</text>
+	</string>
+	<string id="st_sp_achievement_7_hint">
+		<text>Inni stalkerzy maj№ o tobie coraz lepsz№ opiniк. \nBandyci bкd№ na ciebie polowaж podczas twoich wypraw w gі№b Zony.</text>
+	</string>
+	<string id="st_sp_achievement_7_descr">
+		<text>Udaіo ci siк zdobyж wszystkie typy artefaktуw znane badaczom Zony. To osi№gniкcie wzbudziіo szacunek stalkerуw, ale z drugiej strony њci№gnкіo na ciebie uwagк bandytуw.</text>
+	</string>
+	<string id="st_sp_achievement_7_name">
+		<text>Јowca artefaktуw</text>
+	</string>
+	<string id="st_sp_achievement_8_hint">
+		<text>Kardan moїe wykonaж unikaln№ modyfikacjк, ktуra pozwoli ci na zachowanie mobilnoњci przy noszeniu egzoszkieletu dziкki instalacji hydraulicznych wzmacniaczy serwomotorуw.</text>
+	</string>
+	<string id="st_sp_achievement_8_descr">
+		<text>Kardan ma teraz wszystkie narzкdzia, jakich potrzebuje. Pozwoli mu to na wykonywanie nowych, bardziej skomplikowanych ulepszeс.</text>
+	</string>
+	<string id="st_sp_achievement_8_name">
+		<text>Ekspert systemуw obronnych</text>
+	</string>
+	<string id="st_sp_achievement_9_hint">
+		<text>Azot moїe wykonaж unikaln№ modyfikacjк heіmu taktycznego: montaї skanera podczerwieni pozwalaj№cego na wykrywanie ludzi znajduj№cych siк w pobliїu.</text>
+	</string>
+	<string id="st_sp_achievement_9_descr">
+		<text>Azot posiada wszystkie narzкdzia, o jakich moїe marzyж technik pracuj№cy w Zonie. Moїe on wykonywaж zaawansowane technologicznie modyfikacje.</text>
+	</string>
+	<string id="st_sp_achievement_9_name">
+		<text>Ekspert wysokiej technologii</text>
+	</string>
+	<string id="st_sp_achievement_10_hint">
+		<text>Doњwiadczenie pozwala ci czкњciej znajdowaж artefakty.</text>
+	</string>
+	<string id="st_sp_achievement_10_descr">
+		<text>Udaіo ci siк odwiedziж praktycznie wszystkie dostкpne obszary poіoїone w pobliїu centrum Zony. Zdarzyіo ci siк wpaњж w prawie kaїd№ anomaliк.</text>
+	</string>
+	<string id="st_sp_achievement_10_name">
+		<text>Doњwiadczony stalker</text>
+	</string>
+	<string id="st_sp_achievement_11_hint">
+		<text>Twoje umiejкtnoњci przywуdcze zwiкkszaj№ szanse przeїycia twojej druїyny.</text>
+	</string>
+	<string id="st_sp_achievement_11_descr">
+		<text>Kiedy zaszіa potrzeba dziaіania w grupie, udaіo ci siк zgromadziж њwietn№ druїynк i dowieњж swoich umiejкtnoњci przywуdczych.</text>
+	</string>
+	<string id="st_sp_achievement_11_name">
+		<text>Przywуdca</text>
+	</string>
+	<string id="st_sp_achievement_12_hint">
+		<text>Wolnoњж, Powinnoњж, wolni stalkerzy, a nawet bandyci poznali twoje zdolnoњci negocjacyjne i darz№ ciк z ich powodu szacunkiem.</text>
+	</string>
+	<string id="st_sp_achievement_12_descr">
+		<text>Wiesz, jak rozwi№zaж problem bez rozlewu krwi. Kto potrzebuje siіy, kiedy sіowa mog№ rozwi№zaж spor rуwnie skutecznie? Nadal jednak musisz wystrzegaж siк osуb, ktуre najpierw strzelaj№, a pуџniej zadaj№ pytania.</text>
+	</string>
+	<string id="st_sp_achievement_12_name">
+		<text>Dyplomata</text>
+	</string>
+	<string id="st_sp_achievement_13_descr">
+		<text>Wspуіpracujesz z naukowcami juї tak dіugo, їe moїna ciк uznaж za peіnoprawnego asystenta. Wszyscy w bunkrze naukowcуw uwaїaj№ ciк za jednego ze swoich.</text>
+	</string>
+	<string id="st_sp_achievement_13_name">
+		<text>Asystent</text>
+	</string>
+	<string id="st_sp_achievement_14_hint">
+		<text>Twoje stosunki z Powinnoњci№ ulegіy poprawie. Jeњli napytasz sobie biedy, bojownicy tej frakcji bкd№ prуbowali ci pomуc. \nAzot, technik sympatyzuj№cy z Powinnoњci№, zaoferowaі ci zniїkк. \nTwoje stosunki z Wolnoњci№ ulegіy pogorszeniu. \Hawajczyk, handlarz sympatyzuj№cy z t№ frakcj№, od tej chwili bкdzie ї№daі od ciebie wyїszych cen.</text>
+	</string>
+	<string id="st_sp_achievement_14_descr">
+		<text>Pomoc udzielona przez ciebie Powinnoњci sprawiіa, їe bojownicy i sympatycy tej frakcji nabrali do ciebie szacunku. Musisz jednak pamiкtaж, їe nie kaїda osoba, jak№ napotkasz w Zonie, jest pozytywnie nastawiona do Powinnoњci.</text>
+	</string>
+	<string id="st_sp_achievement_14_name">
+		<text>Przyjaciel Powinnoњci</text>
+	</string>
+	<string id="st_sp_achievement_15_hint">
+		<text>Twoje stosunki z Wolnoњci№ ulegіy poprawie. Jeњli napytasz sobie biedy, bojownicy tej frakcji bкd№ prуbowali ci pomуc. \nHawajczyk, technik sympatyzuj№cy z Wolnoњci№, zaoferowaі ci zniїkк. \nTwoje stosunki z Powinnoњci№ ulegіy pogorszeniu. \Azot, handlarz sympatyzuj№cy z t№ frakcj№, od tej chwili bкdzie ї№daі od ciebie wyїszych cen.</text>
+	</string>
+	<string id="st_sp_achievement_15_descr">
+		<text>Pomoc udzielona przez ciebie Wolnoњci sprawiіa, їe bojownicy i sympatycy tej frakcji nabrali do ciebie szacunku. Musisz jednak pamiкtaж, їe nie kaїda osoba, jak№ napotkasz w Zonie, jest pozytywnie nastawiona do Wolnoњci.</text>
+	</string>
+	<string id="st_sp_achievement_15_name">
+		<text>Przyjaciel Wolnoњci</text>
+	</string>
+	<string id="st_sp_achievement_16_hint">
+		<text>Stalkerzy ze stacji Janуw ceni№ sobie rуwnowagк siі miкdzy Powinnoњci№ a Wolnoњci№, dlatego teї zarуwno technik, jak i handlarz udzielili ci zniїki.</text>
+	</string>
+	<string id="st_sp_achievement_16_descr">
+		<text>Nie stoisz po stronie їadnej z frakcji i zawsze dziaіasz jako wolny stalker. Nie masz їadnych nowych wrogуw z tego powodu, ale nie udaіo ci siк teї zyskaж nowych przyjaciуі.</text>
+	</string>
+	<string id="st_sp_achievement_16_name">
+		<text>Obroсca rуwnowagi</text>
+	</string>
+	<string id="st_sp_achievement_17_hint">
+		<text>Handlarze oferuj№ ci rzadkie i kosztowne towary.</text>
+	</string>
+	<string id="st_sp_achievement_17_descr">
+		<text>Wiesz, jak to jest nie mieж grosza przy duszy, ale obecnie nie masz powodуw do narzekaс. Jako їe zdarza ci siк dysponowaж znacz№cymi sumami pieniкdzy, handlarze ceni№ sobie ciebie jako klienta.</text>
+	</string>
+	<string id="st_sp_achievement_17_name">
+		<text>Bogaty klient</text>
+	</string>
+	<string id="st_sp_achievement_18_hint">
+		<text>Po otrzymaniu notatek, Strieіok odzyskaі chкж do їycia i dojњcia do celu, niezaleїnie od kosztуw.</text>
+	</string>
+	<string id="st_sp_achievement_18_descr">
+		<text>Moїesz poszczyciж siк dalekowzrocznoњci№: przechowywane przez ciebie zapiski znalezione w schowkach grupy Strieіoka wrуciіy do prawowitego wіaњciciela.</text>
+	</string>
+	<string id="st_sp_achievement_18_name">
+		<text>Straїnik sekretуw</text>
+	</string>
+	<string id="st_sp_achievement_19_descr">
+		<text>Udaіo ci siк przeїyж emisjк bez ukrywania siк dziкki lekom anabiotycznym. Wpіyw tego zdarzenia na twoj№ psychikк nie jest do koсca zrozumiaіy, poniewaї twуj umysі wypeіnia dziwna cisza. Wydaje siк, їe juї nie sіyszysz ci№gіego strumienia myњli.</text>
+	</string>
+	<string id="st_sp_achievement_19_name">
+		<text>Naznaczony przez Zonк</text>
+	</string>
+	<string id="st_sp_achievement_20_hint">
+		<text>Handlarz Sowa zaoferowaі ci zniїkк, poniewaї jesteњ jego najlepszym informatorem i partnerem.</text>
+	</string>
+	<string id="st_sp_achievement_20_descr">
+		<text>Kiedy zdobкdziesz waїn№ informacjк, zawsze znajdujesz dla niej odpowiedniego nabywcк. Oczywiњcie sprzedaj№c informacje odpowiednim osobom kierujesz siк wіasn№ korzyњci№.</text>
+	</string>
+	<string id="st_sp_achievement_20_name">
+		<text>Handlarz informacjami</text>
+	</string>
+	<string id="st_sp_achievement_21_hint">
+		<text>Twoje stosunki ze stalkerami ulegіy poprawie. Jeњli kiedykolwiek napytasz sobie biedy, bкd№ oni prуbowali ci pomуc. \nStalkerscy medycy zgodzili siк sprzedawaж ci lekarstwa po kosztach.</text>
+	</string>
+	<string id="st_sp_achievement_21_descr">
+		<text>Zawsze pomagasz stalkerom w potrzebie. Mimo їe ich frakcja nie jest specjalnie zїyta, masz teraz w nieoficjalnym bractwie sojusznikуw, ktуrzy bкd№ udzielaж ci pomocy w walce i poza ni№.</text>
+	</string>
+	<string id="st_sp_achievement_21_name">
+		<text>Przyjaciel stalkerуw</text>
+	</string>
+	<string id="st_sp_achievement_1_hint">
+		<text>Rуїne nowe informacje pozwoliіy profesorom Hermanowi i Oziorskiemu na stworzenie w Zonie nowego eksperymentalnego leku, tak zwanego anabiotyku.</text>
+	</string>
+	<string id="st_sp_achievement_19_hint">
+		<text>Istnieje szansa przeїycia emisji nawet bez pomocy lekarstw, pod warunkiem, їe jesteњ w peіni zdrowia.</text>
+	</string>
+	<string id="st_sp_achievement_13_hint">
+		<text>Ze wzglкdu na twoj№ uїytecznoњж, profesor Herman oferuje ci teraz po kosztach њrodki medyczne i wyposaїenie przeznaczone tylko dla personelu bunkra. \nNowikow na tyle do ciebie przywykі, їe przy wykonywaniu modyfikacji oczekuje tylko zwrotu kosztu uїytych czкњci.</text>
+	</string>
+</string_table>

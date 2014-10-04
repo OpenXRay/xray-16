@@ -1,0 +1,301 @@
+[logic@walker_1]
+active = walker@walker_1
+suitable = {-jup_a12_actor_enemy_to_bandits} true
+prior = 65
+
+[logic@walker_2]
+active = walker@walker_2
+suitable = {-jup_a12_actor_enemy_to_bandits} true
+prior = 65
+
+[logic@walker_3]
+active = walker@walker_3
+suitable = {-jup_a12_actor_enemy_to_bandits} true
+prior = 65
+
+[logic@walker_4]
+active = walker@walker_4
+suitable = {-jup_a12_actor_enemy_to_bandits} true
+prior = 65
+
+[logic@walker_5]
+active = walker@walker_5
+suitable = {-jup_a12_actor_enemy_to_bandits} true
+prior = 65
+
+[logic@walker_6]
+active = walker@walker_6
+suitable = {-jup_a12_actor_enemy_to_bandits} true
+prior = 65
+
+
+[logic@guard_1]
+active = camper@guard_1
+suitable = {-jup_a12_actor_enemy_to_bandits} true
+prior = 75
+
+[logic@guard_2]
+active = camper@guard_2
+suitable = {-jup_a12_actor_enemy_to_bandits} true
+prior = 75
+
+[logic@guard_3]
+active = camper@guard_3
+suitable = {-jup_a12_actor_enemy_to_bandits} true
+prior = 75
+
+[logic@guard_4]
+active = camper@guard_4
+suitable = {-jup_a12_actor_enemy_to_bandits} true
+prior = 75
+
+[logic@guard_5]
+active = camper@guard_5
+suitable = {-jup_a12_actor_enemy_to_bandits} true
+prior = 90
+
+[logic@guard_6]
+active = camper@guard_6
+suitable = {-jup_a12_actor_enemy_to_bandits} true
+prior = 90
+
+
+[walker@walker_1]
+path_walk = walker_1_walk
+combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true, {-jup_a12_merc_attack_started =check_enemy_smart(jup_a12_merc)} true, false
+on_info = {=actor_enemy} camper@walker_1_wait, {+jup_a12_actor_enemy_to_bandits} camper@walker_1_wait
+
+[camper@walker_1_wait]
+path_walk = walker_1_camper
+path_look = stalker_prisoner_battle_look
+def_state_standing = hide_na
+radius = 0
+on_info = {!actor_enemy} walker@walker_1
+
+[walker@walker_2]
+path_walk = walker_2_walk
+combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true, {-jup_a12_merc_attack_started =check_enemy_smart(jup_a12_merc)} true, false
+on_info = {=actor_enemy} camper@walker_2_wait, {+jup_a12_actor_enemy_to_bandits} camper@walker_2_wait
+
+[camper@walker_2_wait]
+path_walk = walker_2_camper
+path_look = stalker_prisoner_battle_look
+def_state_standing = hide_na
+radius = 0
+on_info = {!actor_enemy} walker@walker_2
+
+[walker@walker_3]
+path_walk = walker_3_walk
+combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true, {-jup_a12_merc_attack_started =check_enemy_smart(jup_a12_merc)} true, false
+
+[walker@walker_4]
+path_walk = walker_4_walk
+combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true, {-jup_a12_merc_attack_started =check_enemy_smart(jup_a12_merc)} true, false
+
+[walker@walker_5]
+path_walk = walker_5_walk
+combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true, {-jup_a12_merc_attack_started =check_enemy_smart(jup_a12_merc)} true, false
+
+[walker@walker_6]
+path_walk = walker_6_walk
+combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true, {-jup_a12_merc_attack_started =check_enemy_smart(jup_a12_merc)} true, false
+
+
+[camper@guard_1]
+path_walk = guard_1_walk
+path_look = guard_1_look
+combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true, {-jup_a12_merc_attack_started =check_enemy_smart(jup_a12_merc)} true, false
+meet = meet@guard_base
+on_info = {=dist_to_actor_le(15) +jup_a12_actor_paid_to_cashier -jup_a12_bandit_taunt} %+jup_a12_bandit_taunt =play_sound(jup_a12_bandit_say_jump)%
+on_actor_in_zone = jup_a12_sr_containers_kampzone | {-jup_a12_actor_has_pass_to_containers} %+jup_a12_actor_enemy_to_bandits%
+on_info2 = {-jup_a12_actor_has_pass_to_containers -jup_a12_bandits_warning_actor =dist_to_actor_le(22)} %+jup_a12_bandits_warning_actor =play_sound(jup_a12_bandits_warning_actor)%
+
+[meet@guard_base]
+close_distance = 15
+close_anim = {+jup_a12_actor_has_pass_to_containers} guard_na, threat_na
+close_victim = actor
+close_snd_hello = nil
+close_snd_bye = nil
+far_distance = 45
+far_anim = {+jup_a12_actor_has_pass_to_containers} guard, threat
+far_victim = actor
+far_snd = nil
+snd_on_use = nil
+use	= {!actor_enemy !actor_has_weapon} true
+meet_dialog	= {+jup_a12_actor_has_pass_to_containers} jup_a12_bandit_guard_visited, jup_a12_bandit_guard_start
+trade_enable = false
+
+
+[camper@guard_2]
+path_walk = guard_2_walk
+path_look = guard_2_look
+combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true, {-jup_a12_merc_attack_started =check_enemy_smart(jup_a12_merc)} true, false
+meet = meet@guard_base
+on_info = {=dist_to_actor_le(15) +jup_a12_actor_paid_to_cashier -jup_a12_bandit_taunt} %+jup_a12_bandit_taunt =play_sound(jup_a12_bandit_say_jump)%
+on_actor_in_zone = jup_a12_sr_containers_kampzone | {-jup_a12_actor_has_pass_to_containers} %+jup_a12_actor_enemy_to_bandits%
+on_info2 = {-jup_a12_actor_has_pass_to_containers -jup_a12_bandits_warning_actor =dist_to_actor_le(22)} %+jup_a12_bandits_warning_actor =play_sound(jup_a12_bandits_warning_actor)%
+
+[camper@guard_3]
+path_walk = guard_3_walk
+path_look = guard_3_look
+combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true, {-jup_a12_merc_attack_started =check_enemy_smart(jup_a12_merc)} true, false
+meet = meet@guard_base
+on_info = {=dist_to_actor_le(15) +jup_a12_actor_paid_to_cashier -jup_a12_bandit_taunt} %+jup_a12_bandit_taunt =play_sound(jup_a12_bandit_say_jump)%
+on_actor_in_zone = jup_a12_sr_containers_kampzone | {-jup_a12_actor_has_pass_to_containers} %+jup_a12_actor_enemy_to_bandits%
+on_info2 = {-jup_a12_actor_has_pass_to_containers -jup_a12_bandits_warning_actor =dist_to_actor_le(22)} %+jup_a12_bandits_warning_actor =play_sound(jup_a12_bandits_warning_actor)%
+
+[camper@guard_4]
+path_walk = guard_4_walk
+path_look = guard_4_look
+combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true, {-jup_a12_merc_attack_started =check_enemy_smart(jup_a12_merc)} true, false
+meet = meet@guard_base
+on_info = {=dist_to_actor_le(15) +jup_a12_actor_paid_to_cashier -jup_a12_bandit_taunt} %+jup_a12_bandit_taunt =play_sound(jup_a12_bandit_say_jump)%
+on_actor_in_zone = jup_a12_sr_containers_kampzone | {-jup_a12_actor_has_pass_to_containers} %+jup_a12_actor_enemy_to_bandits%
+on_info2 = {-jup_a12_actor_has_pass_to_containers -jup_a12_bandits_warning_actor =dist_to_actor_le(22)} %+jup_a12_bandits_warning_actor =play_sound(jup_a12_bandits_warning_actor)%
+
+[camper@guard_5]
+path_walk = guard_5_walk
+path_look = guard_5_look
+combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner)} true, {!actor_in_zone(jup_a12_sr_prisoner_guards)} true, {-jup_a12_merc_attack_started =check_enemy_smart(jup_a12_merc)} true, false
+meet = meet@guard_base
+on_info = {=dist_to_actor_le(15) +jup_a12_actor_paid_to_cashier -jup_a12_bandit_taunt} %+jup_a12_bandit_taunt =play_sound(jup_a12_bandit_say_jump)%
+on_actor_in_zone = jup_a12_sr_containers_kampzone | {-jup_a12_actor_has_pass_to_containers} %+jup_a12_actor_enemy_to_bandits%
+on_info2 = {-jup_a12_actor_has_pass_to_containers -jup_a12_bandits_warning_actor =dist_to_actor_le(22)} %+jup_a12_bandits_warning_actor =play_sound(jup_a12_bandits_warning_actor)%
+
+[camper@guard_6]
+path_walk = guard_6_walk
+path_look = guard_6_look
+combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner)} true, {!actor_in_zone(jup_a12_sr_prisoner_guards)} true, {-jup_a12_merc_attack_started =check_enemy_smart(jup_a12_merc)} true, false
+meet = meet@guard_base
+on_info = {=dist_to_actor_le(15) +jup_a12_actor_paid_to_cashier -jup_a12_bandit_taunt} %+jup_a12_bandit_taunt =play_sound(jup_a12_bandit_say_jump)%
+on_actor_in_zone = jup_a12_sr_containers_kampzone | {-jup_a12_actor_has_pass_to_containers} %+jup_a12_actor_enemy_to_bandits%
+on_info2 = {-jup_a12_actor_has_pass_to_containers -jup_a12_bandits_warning_actor =dist_to_actor_le(22)} %+jup_a12_bandits_warning_actor =play_sound(jup_a12_bandits_warning_actor)%
+
+
+
+
+[walker@jup_a12_surge_def]
+;path_walk = surge_hide_1_walk
+;path_look = surge_hide_1_look
+combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner)} true, {-jup_a12_actor_enemy_to_bandits} true, false
+on_info = {-jup_a12_actor_enemy_to_bandits -jup_a12_actor_has_pass_to_containers =actor_in_zone(jup_a12_sr_bandit_bodyguard)} %+jup_a12_actor_enemy_to_bandits%
+def_state_standing = sit
+def_state_moving = assault
+
+[logic@jup_a12_surge_def]
+;active = walker@jup_a12_surge_work_1
+suitable = {=check_npc_name(bandit) =surge_started} true
+prior = 100
+
+
+
+
+[logic@jup_a12_surge_work_1]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_1
+
+[logic@jup_a12_surge_work_2]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_2
+
+[logic@jup_a12_surge_work_3]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_3
+
+[logic@jup_a12_surge_work_4]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_4
+
+[logic@jup_a12_surge_work_5]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_5
+
+[logic@jup_a12_surge_work_6]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_6
+
+[logic@jup_a12_surge_work_7]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_7
+
+[logic@jup_a12_surge_work_8]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_8
+
+[logic@jup_a12_surge_work_9]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_9
+
+[logic@jup_a12_surge_work_10]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_10
+
+[logic@jup_a12_surge_work_11]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_11
+
+[logic@jup_a12_surge_work_12]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_12
+
+[logic@jup_a12_surge_work_13]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_13
+
+[logic@jup_a12_surge_work_14]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_14
+
+
+
+[walker@jup_a12_surge_work_1]:walker@jup_a12_surge_def
+path_walk = surge_hide_1_walk
+path_look = surge_hide_1_look
+out_restr = jup_a12_sr_threat_prisoner_zone
+
+[walker@jup_a12_surge_work_2]:walker@jup_a12_surge_def
+path_walk = surge_hide_2_walk
+path_look = surge_hide_1_look
+out_restr = jup_a12_sr_threat_prisoner_zone
+
+[walker@jup_a12_surge_work_3]:walker@jup_a12_surge_def
+path_walk = surge_hide_3_walk
+path_look = surge_hide_1_look
+out_restr = jup_a12_sr_threat_prisoner_zone
+
+[walker@jup_a12_surge_work_4]:walker@jup_a12_surge_def
+path_walk = surge_hide_4_walk
+path_look = surge_hide_1_look
+out_restr = jup_a12_sr_threat_prisoner_zone
+
+[walker@jup_a12_surge_work_5]:walker@jup_a12_surge_def
+path_walk = surge_hide_5_walk
+path_look = surge_hide_5_look
+out_restr = jup_a12_sr_threat_prisoner_zone
+
+[walker@jup_a12_surge_work_6]:walker@jup_a12_surge_def
+path_walk = surge_hide_6_walk
+path_look = surge_hide_5_look
+out_restr = jup_a12_sr_threat_prisoner_zone
+
+[walker@jup_a12_surge_work_7]:walker@jup_a12_surge_def
+path_walk = surge_hide_7_walk
+path_look = surge_hide_5_look
+out_restr = jup_a12_sr_threat_prisoner_zone
+
+[walker@jup_a12_surge_work_8]:walker@jup_a12_surge_def
+path_walk = surge_hide_8_walk
+path_look = surge_hide_5_look
+out_restr = jup_a12_sr_threat_prisoner_zone
+
+[walker@jup_a12_surge_work_9]:walker@jup_a12_surge_def
+path_walk = surge_hide_9_walk
+path_look = surge_hide_9_look
+
+[walker@jup_a12_surge_work_10]:walker@jup_a12_surge_def
+path_walk = surge_hide_10_walk
+path_look = surge_hide_9_look
+
+[walker@jup_a12_surge_work_11]:walker@jup_a12_surge_def
+path_walk = surge_hide_11_walk
+path_look = surge_hide_9_look
+out_restr = jup_a12_sr_threat_prisoner_zone
+
+[walker@jup_a12_surge_work_12]:walker@jup_a12_surge_def
+path_walk = surge_hide_12_walk
+path_look = surge_hide_12_look
+out_restr = jup_a12_sr_threat_prisoner_zone
+
+[walker@jup_a12_surge_work_13]:walker@jup_a12_surge_def
+path_walk = surge_hide_13_walk
+path_look = surge_hide_13_look
+
+[walker@jup_a12_surge_work_14]:walker@jup_a12_surge_def
+path_walk = surge_hide_14_walk
+path_look = surge_hide_13_look

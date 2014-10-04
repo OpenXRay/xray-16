@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="actor_inventory_box_use">
+		<text>Ouvrir cantine ($$ACTION_USE$$)</text>
+	</string>
+	<string id="cant_walk">
+		<text>Vous кtes trop йpuisй pour pouvoir vous dйplacer.</text>
+	</string>
+	<string id="cant_walk_weight">
+		<text>Vous кtes trop chargй pour pouvoir vous dйplacer.</text>
+	</string>
+	<string id="car_character_use">
+		<text>Ouvrir la porte ($$ACTION_USE$$)</text>
+	</string>
+	<string id="character_use">
+		<text>Parler ($$ACTION_USE$$)</text>
+	</string>
+	<string id="dead_character_use">
+		<text>Fouiller le cadavre ($$ACTION_USE$$)</text>
+	</string>
+	<string id="dead_character_use_or_drag">
+		<text>Fouiller le cadavre ($$ACTION_USE$$)\nTraоner le cadavre (MAJ. +$$ACTION_USE$$)</text>
+	</string>
+	<string id="general_complete_task">
+		<text>Mission accomplie :</text>
+	</string>
+	<string id="general_fail_task">
+		<text>Йchec de la mission :</text>
+	</string>
+	<string id="general_in_item">
+		<text>Objet reзu :</text>
+	</string>
+	<string id="general_in_money">
+		<text>Argent reзu :</text>
+	</string>
+	<string id="general_new_task">
+		<text>Nouvelle mission :</text>
+	</string>
+	<string id="general_out_item">
+		<text>Objet perdu :</text>
+	</string>
+	<string id="general_out_money">
+		<text>Argent perdu :</text>
+	</string>
+	<string id="general_reverse_task">
+		<text>Mission annulйe :</text>
+	</string>
+	<string id="general_update_task">
+		<text>Mission mise а jour :</text>
+	</string>
+	<string id="gun_jammed">
+		<text>Votre arme s'est enrayйe. Vous devez la recharger.</text>
+	</string>
+	<string id="inventory_box_use">
+		<text>Fouiller la boоte ($$ACTION_USE$$)</text>
+	</string>
+	<string id="inventory_item_use">
+		<text>Prendre l'objet ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b10_ufo_searching_tips">
+		<text>Fouiller l'appareil ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b1_bar_door">
+		<text>Porte bloquйe</text>
+	</string>
+	<string id="jup_b1_door_is_closed">
+		<text>La porte est verrouillйe de l'intйrieur.</text>
+	</string>
+	<string id="jup_b202_treasures_closed">
+		<text>Coffre verrouillй</text>
+	</string>
+	<string id="jup_b205_tip_door_closed">
+		<text>Code nйcessaire</text>
+	</string>
+	<string id="jup_b205_tip_door_decode">
+		<text>Saisir le code ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b206_use_plant">
+		<text>Prendre la plante ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b209_scanner_place_tips">
+		<text>Rйgler le dйtecteur ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b209_scanner_remove_tips">
+		<text>Prendre le dйtecteur ($$ACTION_USE$$)</text>
+	</string>
+	<string id="lx8_raduga">
+		<text>Modйrateur d'agressivitй Arc-en-ciel\nModиle du complexe d'йmission externe\nйchelle 1:20</text>
+	</string>
+	<string id="pas_b400_tip_switcher">
+		<text>Actionner l'interrupteur ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_a18_use_idol">
+		<text>Examiner l'objet ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_a25_blow_up_enter_door">
+		<text>Placer des explosifs ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_a28_talk_with_stupid_medic">
+		<text>Se reposer ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_b306_elevator_door_locked_used">
+		<text>L'ascenseur n'est pas sous tension.</text>
+	</string>
+	<string id="pri_b306_generator_use">
+		<text>Allumer le gйnйrateur ($$ACTION_USE$$)</text>
+	</string>
+	<string id="sleep_ok_button">
+		<text>Dormir</text>
+	</string>
+	<string id="sleep_warning_all_pleasures">
+		<text>Vous ne pouvez pas dormir : vous souffrez d'une grave hйmorragie et avez йtй irradiй. Prenez des mйdicaments ou consultez un mйdecin !</text>
+	</string>
+	<string id="sleep_warning_bleeding">
+		<text>Vous ne pouvez pas dormir : vous souffrez d'une grave hйmorragie. Prenez des mйdicaments ou consultez un mйdecin !</text>
+	</string>
+	<string id="sleep_warning_radiation">
+		<text>Vous ne pouvez pas dormir : vous avez йtй irradiй. Prenez des mйdicaments ou consultez un mйdecin !</text>
+	</string>
+	<string id="sleep_zone_tip">
+		<text>Dormir ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_ach_balance_advocate">
+		<text>Vous avez obtenu le succиs Homme йquilibrй.</text>
+	</string>
+	<string id="st_ach_battle_systems_master">
+		<text>Vous avez obtenu le succиs Expert en armement.</text>
+	</string>
+	<string id="st_ach_detective">
+		<text>Vous avez obtenu le succиs Dйtective.</text>
+	</string>
+	<string id="st_ach_diplomat">
+		<text>Vous avez obtenu le succиs Diplomate.</text>
+	</string>
+	<string id="st_ach_friend_of_duty">
+		<text>Vous avez obtenu le succиs Ami du Devoir.</text>
+	</string>
+	<string id="st_ach_friend_of_freedom">
+		<text>Vous avez obtenu le succиs Ami de la Libertй.</text>
+	</string>
+	<string id="st_ach_friend_of_stalkers">
+		<text>Vous avez obtenu le succиs Ami des stalkers.</text>
+	</string>
+	<string id="st_ach_herald_of_justice">
+		<text>Vous avez obtenu le succиs Messager de la Justice.</text>
+	</string>
+	<string id="st_ach_high_tech_master">
+		<text>Vous avez obtenu le succиs Expert en technologie de pointe.</text>
+	</string>
+	<string id="st_ach_information_dealer">
+		<text>Vous avez obtenu le succиs Trafiquant d'informations.</text>
+	</string>
+	<string id="st_ach_keeper_of_secrets">
+		<text>Vous avez obtenu le succиs Gardien des secrets.</text>
+	</string>
+	<string id="st_ach_kingpin">
+		<text>Vous avez obtenu le succиs Boss.</text>
+	</string>
+	<string id="st_ach_leader">
+		<text>Vous avez obtenu le succиs Chef.</text>
+	</string>
+	<string id="st_ach_mutant_hunter">
+		<text>Vous avez obtenu le succиs Chasseur de mutants.</text>
+	</string>
+	<string id="st_ach_one_of_the_lads">
+		<text>Vous avez obtenu le succиs L'un des nфtres.</text>
+	</string>
+	<string id="st_ach_pioneer">
+		<text>Vous avez obtenu le succиs Pionnier.</text>
+	</string>
+	<string id="st_ach_research_man">
+		<text>Vous avez obtenu le succиs Assistant de recherche.</text>
+	</string>
+	<string id="st_ach_seeker">
+		<text>Vous avez obtenu le succиs Chasseur d'artefacts.</text>
+	</string>
+	<string id="st_ach_skilled_stalker">
+		<text>Vous avez obtenu le succиs Stalker aguerri.</text>
+	</string>
+	<string id="st_ach_wealthy">
+		<text>Vous avez obtenu le succиs Bon client.</text>
+	</string>
+	<string id="st_autosave">
+		<text>Sauvegarde automatique...</text>
+	</string>
+	<string id="st_can_use_weapon_now">
+		<text>Vous pouvez maintenant sortir votre arme.</text>
+	</string>
+	<string id="st_codelock">
+		<text>Serrure numйrique ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_detective_news">
+		<text>Des fournitures mйdicales ont йtй placйes dans votre cantine du Skadovsk pour vous remercier d'avoir йlucidй le mystиre des stalkers disparus.</text>
+	</string>
+	<string id="st_duty_first_reward_news">
+		<text>Une combinaison PS5-M a йtй placйe dans votre cantine de Yanov, en remerciement de l'aide apportйe au Devoir.</text>
+	</string>
+	<string id="st_duty_second_reward_news">
+		<text>Une combinaison PSZ-9d a йtй placйe dans votre cantine de Yanov, en remerciement de l'aide apportйe au Devoir.</text>
+	</string>
+	<string id="st_freedom_first_reward_news">
+		<text>Une combinaison "Vent de Libertй" a йtй placйe dans votre cantine de Yanov, en remerciement de l'aide apportйe а la Libertй.</text>
+	</string>
+	<string id="st_freedom_second_reward_news">
+		<text>Une combinaison "Garde de la Libertй" a йtй placйe dans votre cantine de Yanov, en remerciement de l'aide apportйe а la Libertй.</text>
+	</string>
+	<string id="st_freeplay_text_ok">
+		<text>Vous n'avez pas rйussi а atteindre les hйlicoptиres а temps et l'йquipe d'йvacuation est partie sans vous.</text>
+	</string>
+	<string id="st_freeplay_text_yes_no">
+		<text>Prкt а quitter la Zone ? C'est un voyage а sens unique...</text>
+	</string>
+	<string id="st_game_over">
+		<text>Fin de la partie.</text>
+	</string>
+	<string id="st_game_over_press_jump">
+		<text>Appuyez sur ($$ACTION_JUMP$$) pour revenir au menu principal.</text>
+	</string>
+	<string id="st_game_paused">
+		<text>Pause</text>
+	</string>
+	<string id="st_game_saved">
+		<text>Partie sauvegardйe</text>
+	</string>
+	<string id="st_herald_of_justice_news">
+		<text>Un artefact a йtй placй dans votre cantine du Skadovsk en remerciement pour votre aide dans l'affaire de la Pie.</text>
+	</string>
+	<string id="st_jup_b41_door_locked">
+		<text>Vous devez attendre que le dock devienne йtanche.</text>
+	</string>
+	<string id="st_lx8_button_press_true">
+		<text>Accиs autorisй</text>
+	</string>
+	<string id="st_lx8_lift_button">
+		<text>Prendre l'ascenseur pour monter ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_pri_b306_go_down">
+		<text>Prendre l'ascenseur pour descendre ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_psy_danger">
+		<text>Niveau d'йmissions psi critique. Quittez immйdiatement la zone dangereuse !</text>
+	</string>
+	<string id="st_radiation_danger">
+		<text>Niveaux de radiations йlevйs. Vous ne pouvez pas aller plus loin sans protection.</text>
+	</string>
+	<string id="st_search_helicopter">
+		<text>Examiner l'hйlicoptиre ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_search_treasure">
+		<text>Fouiller la planque ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_sleep_hours">
+		<text>h</text>
+	</string>
+	<string id="st_tip">
+		<text>Message</text>
+	</string>
+	<string id="tip_door_blocked">
+		<text>Porte bloquйe</text>
+	</string>
+	<string id="tip_door_close">
+		<text>Fermer la porte ($$ACTION_USE$$)</text>
+	</string>
+	<string id="tip_door_closed_base_alarm">
+		<text>Porte verrouillйe. Le camp est en alerte.</text>
+	</string>
+	<string id="tip_door_closed_hide_weapon">
+		<text>Porte verrouillйe. Vous devez ranger votre arme.</text>
+	</string>
+	<string id="tip_door_locked">
+		<text>Porte verrouillйe</text>
+	</string>
+	<string id="tip_door_no_electricity">
+		<text>La porte n'est pas sous tension.</text>
+	</string>
+	<string id="tip_door_open">
+		<text>Ouvrir la porte ($$ACTION_USE$$)</text>
+	</string>
+	<string id="tip_gate_locked">
+		<text>Portail fermй</text>
+	</string>
+	<string id="tip_need_access_card">
+		<text>Utiliser la carte d'accиs ($$ACTION_USE$$)</text>
+	</string>
+	<string id="tip_no_access_card">
+		<text>Carte d'accиs nйcessaire</text>
+	</string>
+	<string id="tip_open_another_site">
+		<text>Cette porte ne peut pas кtre ouverte de ce cфtй.</text>
+	</string>
+	<string id="ui_st_mp_experience_grow">
+		<text>-</text>
+	</string>
+	<string id="zat_b12_conteiner_full_locked">
+		<text>Ce conteneur est verrouillй. Deux clefs sont nйcessaires pour l'ouvrir.</text>
+	</string>
+	<string id="zat_b12_conteiner_has_one_key">
+		<text>Utiliser la clef ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b12_conteiner_has_two_key">
+		<text>Utiliser les clefs ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b12_conteiner_locked">
+		<text>Ce conteneur est verrouillй. Vous avez besoin de la deuxiиme clef pour l'ouvrir.</text>
+	</string>
+	<string id="zat_b12_conteiner_open">
+		<text>Ouvrir le conteneur ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b14_door_locked_hint">
+		<text>Le mйcanisme de la porte est bloquй de l'intйrieur.</text>
+	</string>
+	<string id="zat_b57_balon_use_hint">
+		<text>Placer la bombonne de gaz ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b57_gas_warning">
+		<text>Attention ! Danger chimique !</text>
+	</string>
+	<string id="zat_b57_vintil_press">
+		<text>Tourner la valve ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b33_car_searching_tip">
+		<text>Fouiller le vйhicule ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_resupply_ready">
+		<text>Vous pouvez obtenir des fournitures mйdicales et des munitions auprиs des lieutenants Rogovets et Kirillov.</text>
+	</string>
+	<string id="st_surge_while_asleep">
+		<text>Une йmission s'est produite rйcemment dans la Zone.</text>
+	</string>
+	<string id="st_ach_marked_by_zone">
+		<text>Vous avez obtenu le succиs Affectй par la Zone.</text>
+	</string>
+	<string id="st_mutant_hunter_news">
+		<text>Des munitions ont йtй placйes dans votre cantine de Yanov, pour vous remercier d'avoir йliminй de dangereux mutants.</text>
+	</string>
+	<string id="st_found_old_treasure">
+		<text>Coordonnйes d'une planque dйjа dйcouverte rйcupйrйes</text>
+	</string>
+	<string id="st_got_treasure">
+		<text>Planque trouvйe</text>
+	</string>
+	<string id="st_found_new_treasure">
+		<text>Coordonnйes de la planque reзues</text>
+	</string>
+	<string id="st_press_any_key">
+		<text>Appuyez sur une touche pour jouer</text>
+	</string>
+</string_table>

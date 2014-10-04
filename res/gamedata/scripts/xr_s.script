@@ -1,0 +1,223 @@
+--[[
+pseudo-framework by Red75, sokol_jack & xStream
+01.2008
+]]
+-- Framework initialization ----------
+
+-- Вспомогательная функция инициализации модуля.
+-- Проверяет наличие скрипта с имененм module и вызывает module.init()
+local function init_module_if_exists(module)
+  if _G[module] and _G[module].init then
+    _G[module].init()
+  else
+    warning("init_module_if_exists: cannot find module "..module)
+  end
+end
+
+-- Эта функция вызывается при старте игры. Необходимо дать возможность модулям зарегистрировать коллбэки.
+function init()
+  -- init_module_if_exists("xrs_dyn_weather")
+  init_module_if_exists("xrs_dyn_music")
+  -- init_module_if_exists("xrs_debug")
+end
+
+
+----------callbacks-----------
+
+local callbacks={
+	update={},
+	game_load={},
+	death={},
+	npc_death={},
+	monster_death={},
+	offline_death={},
+	net_spawn={},
+	net_destroy={},
+	info={},
+	item_drop={},
+	item_take={},
+	item_take_from_box={},
+	hit={},
+	monster_hit={},
+	npc_hit={},
+	enemy_see_actor={},
+	actor_see_enemy={},
+	npc_shot_actor={},
+	respawn={},
+	use={},
+	actor_destroy={},
+	main_menu_on={},
+	main_menu_off={}
+}
+
+function register_callback(name,func,userobj)
+  if callbacks[name]==nil then
+    abort("register_callback: callback name '%s' is unknown.",name)
+  end
+  callbacks[name][func]={userobj=userobj} -- Чтобы можно было регистрировать каллбэки с userobj==nil
+end
+
+function unregister_callback(name,func)
+  if callbacks[name]==nil then
+    abort("register_callback: callback name '%s' is unknown.",name)
+  end
+  callbacks[name][func]=nil
+end
+
+function on_actor_update(delta)
+  for func,o in pairs(callbacks.update) do
+    func(o.userobj,delta)
+  end
+end
+
+function on_game_load()
+  if db.storage[db.actor:id()].pstor == nil then
+    db.storage[db.actor:id()].pstor = {}
+  end
+	math.randomseed (device():time_global())
+  for func,o in pairs(callbacks.game_load) do
+    func(o.userobj)
+  end  
+end
+
+function on_actor_destroy()
+  for func,o in pairs(callbacks.actor_destroy) do
+    func(o.userobj)
+  end  
+end
+
+-- Ударили монстра или сталкера
+local function on_hit(obj, amount, local_direction, who, bone_index)
+  for func,o in pairs(callbacks.hit) do
+    func(o.userobj,obj,amount,local_direction,who,bone_index)
+  end
+end
+
+function on_npc_hit(obj, amount, local_direction, who, bone_index)
+  for func,o in pairs(callbacks.npc_hit) do
+    func(o.userobj,obj,amount,local_direction,who,bone_index)
+  end
+  on_hit(obj,amount,local_direction,who,bone_index)
+end
+
+function on_monster_hit(obj, amount, local_direction, who, bone_index)
+  for func,o in pairs(callbacks.monster_hit) do
+    func(o.userobj,obj,amount,local_direction,who,bone_index)
+  end
+  on_hit(obj,amount,local_direction,who,bone_index)
+end
+
+-- проверка на видимость производится раз в секунду
+function on_enemy_see_actor(obj,typ) 
+  for func,o in pairs(callbacks.enemy_see_actor) do
+    func(o.userobj,obj,typ)
+  end
+end
+function on_actor_see_enemy(obj,typ) 
+  for func,o in pairs(callbacks.actor_see_enemy) do
+    func(o.userobj,obj,typ)
+  end
+end
+
+-- непись стрелял в гг
+function on_npc_shot_actor(obj) 
+  for func,o in pairs(callbacks.npc_shot_actor) do
+    func(o.userobj,obj)
+  end
+end
+
+function on_main_menu_on() 
+  for func,o in pairs(callbacks.main_menu_on) do
+    func(o.userobj)
+  end
+end
+
+function on_main_menu_off() 
+  for func,o in pairs(callbacks.main_menu_off) do
+    func(o.userobj)
+  end
+end
+
+function on_item_drop(obj)
+  for func,o in pairs(callbacks.item_drop) do
+    func(o.userobj,obj)
+  end
+end
+
+-----------methods-----------
+
+--записываем переменную
+function save_variable(vn, value)
+  if value==nil then
+    del_variable(vn)
+  else
+    xr_logic.pstor_store(db.actor, vn, value)
+  end
+end
+
+--загружаем переменную
+function load_variable(vn, value_if_not_found)
+  return xr_logic.pstor_retrieve(db.actor, vn, value_if_not_found)
+end
+
+--удаляем переменную
+function del_variable(vn)
+  if db.storage[db.actor:id()].pstor[vn] then
+    db.storage[db.actor:id()].pstor[vn] = nil
+  end
+end
+
+function warning(msg,...)
+  log(string.format(msg,...))
+end
+
+function notice(msg,...)
+  log(string.format(msg,...))
+  if xrs_debug.debug_on then
+    get_console():execute("flush")
+  end
+end
+
+--выпарсиваем секцию инифайла в табличку
+function parse_ini_section_to_array(ini,section)
+	local tmp=nil
+	if ini and ini:section_exist(section) then
+		tmp={}
+		local result, id, value = nil, nil, nil
+		for a=0,ini:line_count(section)-1 do
+			result, id, value = ini:r_line(section,a,"","")
+			if id~=nil and trim(id)~="" and trim(id)~=nil then
+				tmp[trim(id)]=trim(value)
+			end
+		end
+	end
+	return tmp
+end
+
+--обрезаем пробельные символы в начале и в конце строки
+function trim (s)
+	return (string.gsub(s, "^%s*(.-)%s*$", "%1"))
+end
+
+--разбиваем строку по разделителям
+function str_explode(div,str,clear)
+	local t={}
+	local cpt = string.find (str, div, 1, true)
+	if cpt then
+		repeat
+			if clear then
+				table.insert( t, trim(string.sub(str, 1, cpt-1)) )
+			else
+				table.insert( t, string.sub(str, 1, cpt-1) )
+			end
+			str = string.sub( str, cpt+string.len(div) )
+			cpt = string.find (str, div, 1, true)
+		until cpt==nil
+	end
+	if clear then
+		table.insert(t, trim(str))
+	else
+		table.insert(t, str)
+	end
+	return t
+end

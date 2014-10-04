@@ -1,0 +1,28 @@
+[smart_terrain]
+squad_id = 43
+max_population = 1
+respawn_only_smart = true
+respawn_params = respawn@jup_sim_5
+
+[respawn@jup_sim_5]
+spawn_stalker@advanced
+spawn_stalker@master
+spawn_freedom@advanced
+spawn_freedom@veteran
+
+[spawn_stalker@advanced]
+spawn_squads = stalker_sim_squad_advanced, stalker_sim_squad_advanced, stalker_sim_squad_novice
+spawn_num = {+jup_b218_pripyat_group_gathering} 0, {+zat_b28_heli_3_searched} 2, {+zat_b100_heli_2_searched} 2, {+zat_b101_heli_5_searched} 2, 0
+
+[spawn_stalker@master]
+spawn_squads = stalker_sim_squad_advanced, stalker_sim_squad_advanced, stalker_sim_squad_veteran 
+spawn_num = {+jup_b218_pripyat_group_gathering} 2, 0
+
+[spawn_freedom@advanced]
+spawn_squads =  freedom_sim_squad_advanced, freedom_sim_squad_advanced, freedom_sim_squad_novice
+spawn_num = {-jup_b218_pripyat_group_gathering} 2, 0
+
+[spawn_freedom@veteran]
+spawn_squads =  freedom_sim_squad_advanced, freedom_sim_squad_advanced, freedom_sim_squad_veteran
+spawn_num = {+jup_b218_pripyat_group_gathering} 2, 0
+

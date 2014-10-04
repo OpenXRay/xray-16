@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="actor_inventory_box_use">
+		<text>Відкрити особистий ящик ($$ACTION_USE$$)</text>
+	</string>
+	<string id="cant_walk">
+		<text>Ви надто виснажені, щоб рухатися</text>
+	</string>
+	<string id="cant_walk_weight">
+		<text>Ви надто переобтяжені, щоб рухатися</text>
+	</string>
+	<string id="car_character_use">
+		<text>Відчинити двері ($$ACTION_USE$$)</text>
+	</string>
+	<string id="character_use">
+		<text>Розмовляти ($$ACTION_USE$$)</text>
+	</string>
+	<string id="dead_character_use">
+		<text>Обшукати труп ($$ACTION_USE$$)</text>
+	</string>
+	<string id="dead_character_use_or_drag">
+		<text>Обшукати труп ($$ACTION_USE$$)\nТягнути труп (SHIFT+$$ACTION_USE$$)</text>
+	</string>
+	<string id="general_complete_task">
+		<text>Завдання виконане:</text>
+	</string>
+	<string id="general_fail_task">
+		<text>Завдання провалене:</text>
+	</string>
+	<string id="general_in_item">
+		<text>Отримано предмет:</text>
+	</string>
+	<string id="general_in_money">
+		<text>Отримано гроші:</text>
+	</string>
+	<string id="general_new_task">
+		<text>Нове завдання:</text>
+	</string>
+	<string id="general_out_item">
+		<text>Втрачено предмет:</text>
+	</string>
+	<string id="general_out_money">
+		<text>Втрачено гроші:</text>
+	</string>
+	<string id="general_reverse_task">
+		<text>Завдання відмінене:</text>
+	</string>
+	<string id="general_update_task">
+		<text>Завдання оновлене:</text>
+	</string>
+	<string id="gun_jammed">
+		<text>Зброю заклинило. Необхідно перезарядити</text>
+	</string>
+	<string id="inventory_box_use">
+		<text>Обшукати ящик ($$ACTION_USE$$)</text>
+	</string>
+	<string id="inventory_item_use">
+		<text>Підняти предмет ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b10_ufo_searching_tips">
+		<text>Обшукати літальний апарат ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b1_bar_door">
+		<text>Двері заклинило</text>
+	</string>
+	<string id="jup_b1_door_is_closed">
+		<text>Двері зачинено зсередини</text>
+	</string>
+	<string id="jup_b202_treasures_closed">
+		<text>Сейф закритий</text>
+	</string>
+	<string id="jup_b205_tip_door_closed">
+		<text>Потрібний код</text>
+	</string>
+	<string id="jup_b205_tip_door_decode">
+		<text>Ввести код ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b206_use_plant">
+		<text>Зірвати рослину ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b209_scanner_place_tips">
+		<text>Встановити сканер ($$ACTION_USE$$)</text>
+	</string>
+	<string id="jup_b209_scanner_remove_tips">
+		<text>Забрати сканер ($$ACTION_USE$$)</text>
+	</string>
+	<string id="lx8_raduga">
+		<text>Пригнічувач агресії «Веселка»\nмакет зовнішнього комлексу випромінювання\nмасштаб 1:20</text>
+	</string>
+	<string id="pas_b400_tip_switcher">
+		<text>Увімкнути рубильник ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_a18_use_idol">
+		<text>Оглянути конструкцію ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_a25_blow_up_enter_door">
+		<text>Встановити вибухівку ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_a28_talk_with_stupid_medic">
+		<text>Привести до тями ($$ACTION_USE$$)</text>
+	</string>
+	<string id="pri_b306_elevator_door_locked_used">
+		<text>Ліфт знеструмлено</text>
+	</string>
+	<string id="pri_b306_generator_use">
+		<text>Запустити генератор ($$ACTION_USE$$)</text>
+	</string>
+	<string id="sleep_ok_button">
+		<text>Спати</text>
+	</string>
+	<string id="sleep_warning_all_pleasures">
+		<text>Ви не можете спати! У Вас небезпечна кровотеча та високий рівень опромінення організму. Використайте медикаменти або зверніться до медика.</text>
+	</string>
+	<string id="sleep_warning_bleeding">
+		<text>Ви не можете спати! У Вас небезпечна кровотеча. Використайте медикаменти або зверніться до медика.</text>
+	</string>
+	<string id="sleep_warning_radiation">
+		<text>Ви не можете спати! У Вас високий рівень опромінення організму. Використайте медикаменти або зверніться до медика.</text>
+	</string>
+	<string id="sleep_zone_tip">
+		<text>Спати ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_ach_balance_advocate">
+		<text>Отримано досягнення «Прибічник рівноваги»</text>
+	</string>
+	<string id="st_ach_battle_systems_master">
+		<text>Отримано досягнення «Майстер бойових систем»</text>
+	</string>
+	<string id="st_ach_detective">
+		<text>Отримано досягнення «Сищик»</text>
+	</string>
+	<string id="st_ach_diplomat">
+		<text>Отримано досягнення «Дипломат»</text>
+	</string>
+	<string id="st_ach_friend_of_duty">
+		<text>Отримано досягнення «Друг «Долгу»</text>
+	</string>
+	<string id="st_ach_friend_of_freedom">
+		<text>Отримано досягнення «Друг «Волі»</text>
+	</string>
+	<string id="st_ach_friend_of_stalkers">
+		<text>Отримано досягнення «Друг сталкерів»</text>
+	</string>
+	<string id="st_ach_herald_of_justice">
+		<text>Отримано досягнення «Гінець правосуддя»</text>
+	</string>
+	<string id="st_ach_high_tech_master">
+		<text>Отримано досягнення «Майстер високих технологій»</text>
+	</string>
+	<string id="st_ach_information_dealer">
+		<text>Отримано досягнення «Торговець інформацією»</text>
+	</string>
+	<string id="st_ach_keeper_of_secrets">
+		<text>Отримано досягнення «Зберігач таємниць»</text>
+	</string>
+	<string id="st_ach_kingpin">
+		<text>Отримано досягнення «Авторитет»</text>
+	</string>
+	<string id="st_ach_leader">
+		<text>Отримано досягнення «Лідер»</text>
+	</string>
+	<string id="st_ach_mutant_hunter">
+		<text>Отримано досягнення «Мисливець на мутантів»</text>
+	</string>
+	<string id="st_ach_one_of_the_lads">
+		<text>Отримано досягнення «Свій хлопець»</text>
+	</string>
+	<string id="st_ach_pioneer">
+		<text>Отримано досягнення «Першовідкривач»</text>
+	</string>
+	<string id="st_ach_research_man">
+		<text>Отримано досягнення «Науковій співробітник»</text>
+	</string>
+	<string id="st_ach_seeker">
+		<text>Отримано досягнення «Шукач»</text>
+	</string>
+	<string id="st_ach_skilled_stalker">
+		<text>Отримано досягнення «Досвідчений сталкер»</text>
+	</string>
+	<string id="st_ach_wealthy">
+		<text>Отримано досягнення «Заможний клієнт»</text>
+	</string>
+	<string id="st_autosave">
+		<text>Автозбереження... </text>
+	</string>
+	<string id="st_can_use_weapon_now">
+		<text>Тепер можна дістати зброю</text>
+	</string>
+	<string id="st_codelock">
+		<text>Кодовий замок ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_detective_news">
+		<text>За розкриття справи про пропажу сталкерів до особистого ящика на «Скадовську» покладено медикаменти.</text>
+	</string>
+	<string id="st_duty_first_reward_news">
+		<text>За допомогу «Долгу» до особистого ящика на «Янові» поміщено костюм ПС5-М «Універсальний захист».</text>
+	</string>
+	<string id="st_duty_second_reward_news">
+		<text>За допомогу «Долгу» до особистого ящика на «Янові» поміщено костюм ПСЗ-9д «Броня «Долгу».</text>
+	</string>
+	<string id="st_freedom_first_reward_news">
+		<text>За допомогу «Волі» до особистого ящика на «Янові» поміщено костюм «Вітер свободи».</text>
+	</string>
+	<string id="st_freedom_second_reward_news">
+		<text>За допомогу «Волі» до особистого ящика на «Янові» поміщено костюм «Вартовий волі».</text>
+	</string>
+	<string id="st_freeplay_text_ok">
+		<text>Ви не встигли дістатися гелікоптерів. Група евакуації полишила Зону без Вас.</text>
+	</string>
+	<string id="st_freeplay_text_yes_no">
+		<text>Чи готові Ви покинути Зону? Дороги назад не буде.</text>
+	</string>
+	<string id="st_game_over">
+		<text>Гру закінчено</text>
+	</string>
+	<string id="st_game_over_press_jump">
+		<text>Натисніть ($$ACTION_JUMP$$) для виходу до головного меню</text>
+	</string>
+	<string id="st_game_paused">
+		<text>Пауза</text>
+	</string>
+	<string id="st_game_saved">
+		<text>Гру збережено</text>
+	</string>
+	<string id="st_herald_of_justice_news">
+		<text>За допомогу у викритті Сороки до особистого ящика на «Скадовську» покладено артефакт.</text>
+	</string>
+	<string id="st_jup_b41_door_locked">
+		<text>Необхідно дочекатися герметизації шлюзу</text>
+	</string>
+	<string id="st_lx8_button_press_true">
+		<text>Доступ дозволено</text>
+	</string>
+	<string id="st_lx8_lift_button">
+		<text>Піднятися ліфтом ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_pri_b306_go_down">
+		<text>Спуститися ліфтом ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_psy_danger">
+		<text>Критичний рівень псі-віпромінювання. Негайно полишіть небезпечну зону.</text>
+	</string>
+	<string id="st_radiation_danger">
+		<text>Небезпечний рівень радіації. Для проходу необхідний захист.</text>
+	</string>
+	<string id="st_search_helicopter">
+		<text>Оглянути вертоліт ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_search_treasure">
+		<text>Обшукати схованку ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_sleep_hours">
+		<text>ч</text>
+	</string>
+	<string id="st_tip">
+		<text>Повідомлення</text>
+	</string>
+	<string id="tip_door_blocked">
+		<text>Двері заблоковано</text>
+	</string>
+	<string id="tip_door_close">
+		<text>Зачинити двері ($$ACTION_USE$$)</text>
+	</string>
+	<string id="tip_door_closed_base_alarm">
+		<text>Двері зачинено - у таборі тривога</text>
+	</string>
+	<string id="tip_door_closed_hide_weapon">
+		<text>Двері зачинено - необхідно сховати зброю</text>
+	</string>
+	<string id="tip_door_locked">
+		<text>Двері зачинено</text>
+	</string>
+	<string id="tip_door_no_electricity">
+		<text>Двері знеструмлено</text>
+	</string>
+	<string id="tip_door_open">
+		<text>Відчинити двері ($$ACTION_USE$$)</text>
+	</string>
+	<string id="tip_gate_locked">
+		<text>Ворота заблоковано</text>
+	</string>
+	<string id="tip_need_access_card">
+		<text>Скористатися картою доступу ($$ACTION_USE$$)</text>
+	</string>
+	<string id="tip_no_access_card">
+		<text>Необхідна карта доступу</text>
+	</string>
+	<string id="tip_open_another_site">
+		<text>Двері неможливо відчинити із цього боку</text>
+	</string>
+	<string id="ui_st_mp_experience_grow">
+		<text>-</text>
+	</string>
+	<string id="zat_b12_conteiner_full_locked">
+		<text>Контейнер закритий - необхідні два ключі</text>
+	</string>
+	<string id="zat_b12_conteiner_has_one_key">
+		<text>Використати ключ ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b12_conteiner_has_two_key">
+		<text>Використати ключі ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b12_conteiner_locked">
+		<text>Контейнер закритий - необхідний другий ключ</text>
+	</string>
+	<string id="zat_b12_conteiner_open">
+		<text>Відчинити контейнер ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b14_door_locked_hint">
+		<text>Механізм дверей заблоковано зсередини</text>
+	</string>
+	<string id="zat_b57_balon_use_hint">
+		<text>Підключити газовий балон ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b57_gas_warning">
+		<text>Обережно! Хімічна небезпека!</text>
+	</string>
+	<string id="zat_b57_vintil_press">
+		<text>Повернути вентиль ($$ACTION_USE$$)</text>
+	</string>
+	<string id="zat_b33_car_searching_tip">
+		<text>Обшукати «Запорожець» ($$ACTION_USE$$)</text>
+	</string>
+	<string id="st_resupply_ready">
+		<text>Перед операцією можна поповнити запас медикаментів та боєприпасів у лейтенантів Рогівця та Кирилова.</text>
+	</string>
+	<string id="st_surge_while_asleep">
+		<text>У Зоні нещодавно стався викид.</text>
+	</string>
+	<string id="st_ach_marked_by_zone">
+		<text>Отримано досягнення «Мічений Зоною»</text>
+	</string>
+	<string id="st_mutant_hunter_news">
+		<text>За знищення небезпечних мутантів до особистого ящика на «Янові» покладено боєприпаси.</text>
+	</string>
+	<string id="st_found_old_treasure">
+		<text>Отримано координати раніше знайденої схованки</text>
+	</string>
+	<string id="st_got_treasure">
+		<text>Знайдено схованку</text>
+	</string>
+	<string id="st_found_new_treasure">
+		<text>Отримано координати схованки</text>
+	</string>
+	<string id="st_press_any_key">
+		<text>Натисніть будь-яку клавішу для переходу до гри</text>
+	</string>
+</string_table>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="mp_autostation">
+		<text>Fahrzeugstation</text>
+	</string>
+	<string id="ui_map_desc_mp_agroprom_large">
+		<text>Ein seltsamer Ort. Dieses stille Gebдude birgt sicherlich so manches Geheimnis, aber die Stalker werden aus einem anderen Grund davon angezogen: Man kann hier zahlreiche Artefakte finden. Das Risiko ist zwar hoch, aber der mцgliche Gewinn ist ebenfalls enorm. Wenn Sie schnell denken und handeln, werden Sie das Glьck sicher auf Ihrer Seite haben.</text>
+	</string>
+	<string id="ui_map_desc_mp_agroprom_short">
+		<text>Ein seltsamer Ort. Dieses stille Gebдude birgt sicherlich so manches Geheimnis, aber die Stalker werden aus einem anderen Grund davon angezogen: Man kann hier zahlreiche Artefakte finden.</text>
+	</string>
+	<string id="ui_map_desc_mp_atp_large">
+		<text>Ein Depot beim Eingang der Zone. Die Traktoren, Busse und Lastwagen, die hier stehen, haben ihre beste Zeit bereits hinter sich. Bisher wurden hier keine Artefakte gefunden, aber der Ort ist beliebt bei Rдubern, die Jagd auf Anfдnger machen und sie um der Beute willen tцten. Suchen Sie Deckung in den Gebдuden oder hinter den Fahrzeugen... und hьten Sie sich vor Gegnern auf den Dдchern!</text>
+	</string>
+	<string id="ui_map_desc_mp_atp_short">
+		<text>Ein Depot beim Eingang der Zone. Die Traktoren, Busse und Lastwagen, die hier stehen, haben ihre beste Zeit bereits hinter sich.</text>
+	</string>
+	<string id="ui_map_desc_mp_autostation_large">
+		<text>Ein verlassenes Depotgebдude und das angrenzende Gebiet. Hier kцnnen Sie einiges an Ausrьstung und Vorrдten finden, wenn Sie sich anstrengen. Sehen Sie sich vor starken Anomalien und Scharfschьtzen auf den Dдchern vor - von dort hat man so gut wie alle Zugangswege perfekt im Blick.</text>
+	</string>
+	<string id="ui_map_desc_mp_autostation_short">
+		<text>Ein verlassenes Depotgebдude und das angrenzende Gebiet. Sehen Sie sich vor starken Anomalien und Scharfschьtzen auf den Dдchern vor.</text>
+	</string>
+	<string id="ui_map_desc_mp_bath_large">
+		<text>Ein geheimnisvoller und zugleich faszinierender Ort. Dieses Becken wurde fьr Experimente an jemandem oder etwas gebaut, aber der genaue Zweck wird wohl fьr immer ein Rдtsel bleiben. Hier gibt es keine nennenswerten Artefakte, daher kommen die Stalker lediglich wegen der Ьberreste von bizarren Bauteilen und Gerдten hierher. Passen Sie gut auf die Dдcher auf und vergessen Sie nicht, dass die Gegend extrem stark verstrahlt ist.</text>
+	</string>
+	<string id="ui_map_desc_mp_bath_short">
+		<text>Ein geheimnisvoller und zugleich faszinierender Ort. Dieses Becken wurde fьr Experimente an jemandem oder etwas gebaut, aber der genaue Zweck wird wohl fьr immer ein Rдtsel bleiben.</text>
+	</string>
+	<string id="ui_map_desc_mp_darkvalley_large">
+		<text>Dieser gefдhrliche Teil des Dunklen Tals besteht aus einer langen StraЯe und einem verlassenen Institut. Wer weiЯ, was dort frьher alles gelehrt wurde! Das Einzige, was man heute hier lernen kann, ist, wie man auch unter den schlimmsten Bedingungen ьberlebt! Oh, zu erwдhnen wдre noch, dass Sie die Dдcher immer im Auge behalten sollten...</text>
+	</string>
+	<string id="ui_map_desc_mp_darkvalley_short">
+		<text>Dieser gefдhrliche Teil des Dunklen Tals besteht aus einer langen StraЯe und einem verlassenen Institut.</text>
+	</string>
+	<string id="ui_map_desc_mp_factory_large">
+		<text>Diese dьstere, verlassene Fabrik wurde schon zahllosen Stalkern zum Grab. Unzдhlige Anomalien warten hier auf unvorsichtige Besucher... aber die Leute lassen sich nicht abschrecken und strцmen weiterhin massenweise her - angelockt von den wertvollen Artefakten, die man hier finden kann. Vorsicht vor der Strahlung!</text>
+	</string>
+	<string id="ui_map_desc_mp_factory_short">
+		<text>Diese dьstere, verlassene Fabrik wurde schon zahllosen Stalkern zum Grab.</text>
+	</string>
+	<string id="ui_map_desc_mp_firestation_large">
+		<text>Die Feuerwache, deren gesamte Einsatzkrдfte bei der Katastrophe im Atomkraftwerk Tschernobyl 1986 verheizt wurden. Von dem Turm hat man eine gute Ьbersicht ьber die Umgebung. Nur wenige wagen sich in die hцheren Stockwerke und die Untergeschosse des Gebдudes. Es wird schon einen Grund dafьr geben. In dieser Gegend prallen bereits seit einiger Zeit die Fraktionen der Zone aufeinander - beim Kampf um die beste strategische Ausgangsposition.</text>
+	</string>
+	<string id="ui_map_desc_mp_firestation_short">
+		<text>Die Feuerwache, deren gesamte Einsatzkrдfte bei der Katastrophe im Atomkraftwerk Tschernobyl 1986 verheizt wurden. Sie stellt eine hervorragende taktische Position dar.</text>
+	</string>
+	<string id="ui_map_desc_mp_garbage_large">
+		<text>Teil einer riesigen Mьllhalde, auf der nach der Katastrophe von 1986 haufenweise radioaktive Abfдlle entsorgt wurden. Hier gibt es zahlreiche baufдllige Krдne und eine gewisse Auswahl an Ausrьstung. Weitere Attraktionen sind abbruchreife Gebдude und ein groЯer Hangar. Die Nдhe zum Kordon und die relativ zahlreichen Artefakte sorgen dafьr, dass vor allem Stalker hierher kommen, die einfache Arbeit bevorzugen.</text>
+	</string>
+	<string id="ui_map_desc_mp_garbage_short">
+		<text>Teil einer riesigen Mьllhalde, auf der nach der Katastrophe von 1986 haufenweise radioaktive Abfдlle entsorgt wurden.</text>
+	</string>
+	<string id="ui_map_desc_mp_limansk_large">
+		<text>Ein kleiner Teil der rдtselhaften Stadt Limansk - man findet hier verlassene Wohnblocks und ein halb fertig gestelltes Gebдude vor. Als verschiedene wertvolle Artefakte gefunden wurden, breitete sich die Nachricht wie ein Lauffeuer in der Zone aus. Seitdem einige StraЯen nach Limansk geцffnet wurden, wird hier ununterbrochen gekдmpft.</text>
+	</string>
+	<string id="ui_map_desc_mp_limansk_short">
+		<text>Ein kleiner Teil der rдtselhaften Stadt Limansk - man findet hier verlassene Wohnblocks und ein halb fertig gestelltes Gebдude vor.</text>
+	</string>
+	<string id="ui_map_desc_mp_lost_village_large">
+		<text>Ein menschenleeres, gottverlassenes Dorf mitten in der Zone. Der kleine, seichte, schmutzige See, in dem zahlreiche Fahrzeugwracks ihre letzte Ruhestдtte gefunden haben, erfьllt Sie mit einer unterbewussten Angst vor der Wirklichkeit der Zone. Sehen Sie sich vor Scharfschьtzen vor, aber vergessen Sie auch nicht, dass die Zone die Mutigen belohnt.</text>
+	</string>
+	<string id="ui_map_desc_mp_lost_village_short">
+		<text>Ein menschenleeres, gottverlassenes Dorf mitten in der Zone. Der kleine, seichte, schmutzige See, in dem zahlreiche Fahrzeugwracks ihre letzte Ruhestдtte gefunden haben, erfьllt Sie mit einer unterbewussten Angst vor der Wirklichkeit der Zone. </text>
+	</string>
+	<string id="ui_map_desc_mp_military_1_large">
+		<text>Eine verlassene Armeebasis mit den Ьberresten von Lastwagen und Schьtzenpanzern sowie verfallenen Hauptquartieren und Kasernen. Der trostlose Eindruck trьgt allerdings, denn die Basis ist eine wahre Fundgrube fьr Artefakte. Das bedeutet aber auch, dass hinter jeder Ecke ein Gegner lauern kцnnte.</text>
+	</string>
+	<string id="ui_map_desc_mp_military_1_short">
+		<text>Eine verlassene Armeebasis mit den Ьberresten von Lastwagen und Schьtzenpanzern sowie verfallenen Hauptquartieren und Kasernen.</text>
+	</string>
+	<string id="ui_map_desc_mp_military_2_large">
+		<text>Dieses alte Dorf ist ein wirklich unheimlicher Ort. Sollten Sie mutig genug sein, hierher zu kommen, wundern Sie sich nicht, wenn Sie mit einer Kugel begrьЯt werden. Hier ist kein Fleck sicher! Mцgen Ihr Zielfernrohr und der Schalldдmpfer Ihnen gute Dienste leisten!</text>
+	</string>
+	<string id="ui_map_desc_mp_military_2_short">
+		<text>Dieses alte Dorf ist ein wirklich unheimlicher Ort. Sie haben es zwar bis hierher geschafft, aber dьrfen sich keine Sekunde ausruhen.</text>
+	</string>
+	<string id="ui_map_desc_mp_pool_large">
+		<text>Dies ist kein Becken, sondern vielmehr ein Blutbad. Echos von Schьssen, Explosionen und Schreien der Sterbenden hallen durch die gefliesten Korridore. Nur wenige Stalker kennen den Weg hierher, aber noch weniger kennen einen Weg heraus.</text>
+	</string>
+	<string id="ui_map_desc_mp_pool_short">
+		<text>Dies ist kein Becken, sondern vielmehr ein Blutbad. Echos von Schьssen, Explosionen und Schreien der Sterbenden hallen durch die gefliesten Korridore. </text>
+	</string>
+	<string id="ui_map_desc_mp_railraod_short">
+		<text>Eine kleine Eisenbahnstation in der Nдhe der Rostok-Fabrik.</text>
+	</string>
+	<string id="ui_map_desc_mp_railroad_large">
+		<text>Eine kleine Eisenbahnstation in der Nдhe der Rostok-Fabrik, voller verrosteter Waggons und Lokomotiven, die schon lange nicht mehr fahren. Eine Fьlle von Artefakten lockt furchtlose Stalker aus der gesamten Zone hierher.</text>
+	</string>
+	<string id="ui_map_desc_mp_rembasa_large">
+		<text>Eine Reparaturbasis in der Nдhe eines kleinen Dorfes. Sдmtliche betriebsfдhigen Fahrzeuge wurden nach der Katastrophe von Tschernobyl eingesetzt. Inzwischen wurde der Rest der Ausrьstung geplьndert. Die Gegend ist voller Gefahren wie z.B. tьckischer Sьmpfe und verseuchtem Schilf. Aber mit Glьck kann man dort etwas Wertvolles finden.</text>
+	</string>
+	<string id="ui_map_desc_mp_rembasa_short">
+		<text>Eine Reparaturbasis in der Nдhe eines kleinen Dorfes. Die Gegend ist voller Gefahren wie z.B. tьckischer Sьmpfe und verseuchtem Schilf.</text>
+	</string>
+	<string id="ui_map_desc_mp_rostok_large">
+		<text>Berge von Metall rosten hinter Betonwдnden ruhig vor sich hin. Vor dem Jahrhundertwechsel war die Fabrik durchgehend in Betrieb und wurde von zahllosen Lautsprechern mit sozialistischen Slogans beschallt. Aber das Gebдude wurde schon vor langer Zeit aufgegeben und verlassen.</text>
+	</string>
+	<string id="ui_map_desc_mp_rostok_short">
+		<text>Alte, verlassene Fabrik: Berge von Metall hinter Betonwдnden - das ist alles, was noch ьbrig ist.</text>
+	</string>
+	<string id="ui_map_desc_mp_sport_center_large">
+		<text>Ein Sportzentrum in Pripyat, unweit der verlassenen Schule. Die Sportarten, die hier bevorzugt werden, haben sich seit 1986 grundlegend geдndert, genauso wie die Zahl der Aktiven. Die Stalker zieht es wegen zweifelhaftem Ruhm, Beute und Artefakten hierher... und manche von ihnen bleiben fьr immer.</text>
+	</string>
+	<string id="ui_map_desc_mp_sport_center_short">
+		<text>Ein Sportzentrum in Pripyat, unweit der verlassenen Schule.</text>
+	</string>
+	<string id="ui_map_desc_mp_training_camp_large">
+		<text>Ein дuЯerst seltsamer Ort. Viele lachen ьber Stalker, die behaupten, dass sie den Ort schon einmal gesehen hдtten, aber er existiert wirklich. Gravitationsanomalien haben dort die Erde aufgerissen und eine Mondlandschaft hinterlassen. Das Gebiet wird von drei groЯen Tьrmen bestimmt, Ьberbleibseln der Militдrprдsenz, die auf groЯen Erdhaufen thronen.</text>
+	</string>
+	<string id="ui_map_desc_mp_training_camp_short">
+		<text>Ein дuЯerst seltsamer Ort. Gravitationsanomalien haben dort die Erde aufgerissen und eine Mondlandschaft hinterlassen.</text>
+	</string>
+	<string id="ui_map_desc_mp_workshop_large">
+		<text>Hierbei hat es sich um den Randbereich der Rostok-Fabrik gehandelt, bevor sich die Wдchter hier niedergelassen haben. Ein unheimlicher Ort, der jedoch reichlich Artefakte zu bieten hat. Alle leeren Hangars und Lagerhдuser sind voller tцdlicher Gefahren. Seien Sie дuЯerst vorsichtig und behalten Sie besonders den weiЯen Turm im Auge.</text>
+	</string>
+	<string id="ui_map_desc_mp_workshop_short">
+		<text>Hierbei hat es sich um den Randbereich der Rostok-Fabrik gehandelt, bevor sich die Wдchter hier niedergelassen haben. Ein unheimlicher Ort, der jedoch reichlich Artefakte zu bieten hat.</text>
+	</string>
+	<string id="ui_map_desc_mp_pripyat_large">
+		<text>Nur wenige wagen sich bis in die verlassene Stadt Pripyat vor, in der frьher die Angestellten des Atomkraftwerks Tschernobyl lebten. Dennoch toben auf den StraЯen der toten Stadt wilde Feuergefechte, und zwar in einem kleinen Gebiet zwischen dem Prometheus-Kino, dem Pier und den Hдusern auf der Kurschatowa-StraЯe.</text>
+	</string>
+	<string id="ui_map_desc_mp_pripyat_short">
+		<text>In einem kleinen Teil von Pripyat zwischen dem Prometheus-Kino, dem Pier und den Hдusern auf der Kurschatowa-StraЯe toben Feuergefechte zwischen den wenigen, die es bis in die tote Stadt geschafft haben.</text>
+	</string>
+</string_table>

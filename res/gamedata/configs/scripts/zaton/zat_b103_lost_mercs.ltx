@@ -1,0 +1,171 @@
+;************************************< общие секции >******************************
+[hit]
+on_info = {=actor_enemy -zat_b103_merc_fight} %+zat_b103_merc_fight%
+
+[meet@snd_1]
+use = false
+snd_on_use = {-zat_b103_merc_fight} zat_b103_merc_talk_to_commander_1, nil
+trade_enable = false
+
+[meet@snd_2]
+use = false
+snd_on_use = {-zat_b103_merc_fight} zat_b103_merc_talk_to_commander_2, nil
+trade_enable = false
+
+[remark@nil]
+
+;************************************< lost_merc #1 >******************************
+[logic@lost_merc_1]
+suitable = {=check_npc_name(zat_b103_lost_merc_1) !surge_started}
+active = walker@1
+prior = 200
+on_hit = hit
+
+[walker@1]
+path_walk = lost_merc_1_walk
+path_look = lost_merc_1_look
+def_state_moving1 = sprint
+on_actor_in_zone = zat_b103_sr_def_restr | {=actor_has_weapon -zat_b103_force_maj_after} remark@1
+meet = meet@snd_1
+on_info = {+zat_b103_force_maj -zat_b103_merc_fight} remark@fm_1
+
+[remark@fm_1]
+on_actor_not_in_zone = zat_b103_sr_def_restr | walker@1
+
+[remark@1]
+target = story | actor
+anim = threat_na
+on_info = {+zat_b103_force_maj -zat_b103_merc_fight} remark@fm_1
+on_info2 = {!actor_has_weapon} walker@1
+on_actor_not_in_zone = zat_b103_sr_def_restr | walker@1 
+meet = no_meet
+
+;************************************< lost_merc #2 >******************************
+[logic@lost_merc_2]
+suitable = {=check_npc_name(zat_b103_lost_merc_2) !surge_started}
+active = walker@2
+prior = 200
+on_hit = hit
+
+[walker@2]
+path_walk = lost_merc_2_walk
+path_look = lost_merc_2_look
+def_state_moving1 = sprint
+on_actor_in_zone = zat_b103_sr_def_restr | {=actor_has_weapon -zat_b103_force_maj_after} remark@2
+meet = meet@snd_2
+on_info = {+zat_b103_force_maj -zat_b103_merc_fight} remark@fm_2
+
+[remark@fm_2]
+on_actor_not_in_zone = zat_b103_sr_def_restr | walker@2
+
+[remark@2]
+target = story | actor
+anim = threat_na
+on_info = {+zat_b103_force_maj -zat_b103_merc_fight} remark@fm_2
+on_info2 = {!actor_has_weapon} walker@2
+on_actor_not_in_zone = zat_b103_sr_def_restr | walker@2 
+meet = no_meet
+
+;************************************< lost_merc #3 >******************************
+[logic@lost_merc_3]
+suitable = {=target_squad_name(zat_b103_lost_merc_squad1) !check_npc_name(zat_b103_lost_merc_1) !surge_started}
+active = animpoint@3
+prior = 200
+on_hit = hit
+
+[animpoint@3]
+cover_name = zat_b103_merc_smart_animpoint_1
+reach_distance = 1
+on_actor_in_zone = zat_b103_sr_def_restr | {=actor_has_weapon -zat_b103_force_maj_after} remark@3
+meet = meet@snd_1
+on_info = {+zat_b103_force_maj -zat_b103_merc_fight} remark@fm_3
+on_info2 = {=actor_enemy} remark@nil 
+
+[remark@fm_3]
+on_actor_not_in_zone = zat_b103_sr_def_restr | animpoint@3
+
+[remark@3]
+target = story | actor
+anim = threat_na
+on_info = {!actor_has_weapon} animpoint@3
+on_info2 = {+zat_b103_force_maj -zat_b103_merc_fight} remark@fm_3
+on_actor_not_in_zone = zat_b103_sr_def_restr | animpoint@3 
+meet = no_meet
+
+;************************************< lost_merc #4 >******************************
+[logic@lost_merc_4]
+suitable = {=target_squad_name(zat_b103_lost_merc_squad1) !check_npc_name(zat_b103_lost_merc_1) !surge_started}
+active = animpoint@4
+prior = 200
+on_hit = hit
+
+[animpoint@4]
+cover_name = zat_b103_merc_smart_animpoint_2
+reach_distance = 1
+on_actor_in_zone = zat_b103_sr_def_restr | {=actor_has_weapon -zat_b103_force_maj_after} remark@4
+meet = meet@snd_2
+on_info = {+zat_b103_force_maj -zat_b103_merc_fight} remark@fm_4
+on_info2 = {=actor_enemy} remark@nil 
+
+[remark@fm_4]
+on_actor_not_in_zone = zat_b103_sr_def_restr | animpoint@4
+
+[remark@4]
+target = story | actor
+anim = threat_na
+on_info = {!actor_has_weapon} animpoint@4
+on_info2 = {+zat_b103_force_maj -zat_b103_merc_fight} remark@fm_4
+on_actor_not_in_zone = zat_b103_sr_def_restr | animpoint@4 
+meet = no_meet
+
+;************************************< lost_merc #5 >******************************
+[logic@lost_merc_5]
+suitable = {=target_squad_name(zat_b103_lost_merc_squad1) !check_npc_name(zat_b103_lost_merc_1) !surge_started}
+active = animpoint@5
+prior = 200
+on_hit = hit
+
+[animpoint@5]
+cover_name = zat_b103_merc_smart_animpoint_3
+reach_distance = 1
+on_actor_in_zone = zat_b103_sr_def_restr | {=actor_has_weapon -zat_b103_force_maj_after} remark@5
+meet = meet@snd_1
+on_info = {+zat_b103_force_maj -zat_b103_merc_fight} remark@fm_5
+on_info2 = {=actor_enemy} remark@nil 
+
+[remark@fm_5]
+on_actor_not_in_zone = zat_b103_sr_def_restr | animpoint@5
+
+[remark@5]
+target = story | actor
+anim = threat_na
+on_info = {!actor_has_weapon} animpoint@5
+on_info2 = {+zat_b103_force_maj -zat_b103_merc_fight} remark@fm_5
+on_actor_not_in_zone = zat_b103_sr_def_restr | animpoint@5 
+meet = no_meet
+
+;*********************************************< lost_merc #6 >**************************************
+[logic@lost_merc_6]
+suitable = {=check_npc_name(zat_b103_lost_merc_6) !surge_started}
+active = walker@6
+prior = 100
+
+[walker@6]
+path_walk = lost_merc_6_walk
+path_look = lost_merc_6_look
+on_info = {+zat_b103_merc_fight -zat_b103_angry_6} %=hit_npc_from_actor =set_squad_goodwill(zat_b103_lost_merc_squad1:enemy) +zat_b103_angry_6%
+on_info2 = {+zat_b103_force_maj -zat_b103_merc_fight} remark@fm_6
+
+[remark@fm_6]
+on_actor_not_in_zone = zat_b103_sr_def_restr | walker@6
+
+;*********************************************< lost_merc #7 >**************************************
+[logic@lost_merc_7]
+suitable = {=check_npc_name(zat_b103_lost_merc_7) !surge_started}
+active = walker@7
+prior = 100
+
+[walker@7]
+path_walk = lost_merc_7_walk
+path_look = lost_merc_7_look
+on_info = {+zat_b103_merc_fight -zat_b103_angry_7} %=hit_npc_from_actor =set_squad_goodwill(zat_b103_lost_merc_squad1:enemy) +zat_b103_angry_7%

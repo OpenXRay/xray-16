@@ -1,0 +1,361 @@
+<w>
+	<team_panels_wnd x="169" y="76" width="676" height="669">
+	    <frame class="static" x="0" y="0" width="676" height="669" stretch="1">
+		    <texture>ui_inGame2_screen_1</texture>
+	    </frame>
+	    <team tname="greenteam" x="14" y="27" width="327" height="450">
+	        <auto_static x="21" y="16" width="64">
+		        <text font="letterica18" r="170" g="170" b="170">mp_team_free_stalkers</text>
+	        </auto_static>
+	        <scroll_panels count="1">
+	            <panel number="0">
+	                <scroll_panel x="9" y="81" width="313" height="365" always_show_scroll="0" vert_interval="20" left_ident="10"/>
+	                <team_header x="9" y="50" width="313" height="26">
+	                    <field name="mp_artefacts_upcase" x="92" y="-32" width="64">
+	                        <text font="letterica16" r="120" g="120" b="120" />
+	                    </field>
+	                    <field name="mp_players" x="176" y="-32" width="48">
+	                        <text font="letterica16" r="120" g="120" b="120" />
+	                    </field>
+	                    <field name="mp_frags_upcase" x="240" y="-32" width="64">
+	                        <text font="letterica16" r="120" g="120" b="120" />
+	                    </field>
+	                    <column name="mp_name" x="0" y="0" width="132" height="26">
+	                        <text vert_align="c" align="c" font="letterica16" r="120" g="120" b="120">mp_name</text>
+	                    </column>
+	                    <auto_frameline x="135" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <column name="mp_frags" x="133" y="0" width="28" height="26"/>
+	                    <auto_frameline x="164" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <column name="mp_deaths" x="163" y="0" width="29" height="26"/>
+	                    <auto_frameline x="195" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <column name="mp_artefacts" x="192" y="26" width="28" height="21"/>
+	                    <auto_frameline x="224" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <column name="mp_spots" x="223" y="0" width="29" height="26"/>
+	                    <auto_frameline x="255" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <column name="mp_status" x="254" y="0" width="29" height="26"/>
+	                    <auto_frameline x="284" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <column name="mp_ping" x="284" y="0" width="36" height="26"/>
+	                </team_header>
+	            </panel>
+	        </scroll_panels>
+	        <player_item>
+	            <textparam name="mp_name" x="8" y="0" width="124" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="l"/>
+	            </textparam>
+	            <textparam name="mp_frags" x="133" y="0" width="28" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <textparam name="mp_deaths" x="163" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <textparam name="mp_artefacts" x="194" y="0" width="28" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <textparam name="mp_spots" x="224" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <iconparam name="rank" x="256" y="0" width="12" height="16" stretch="1"/>
+	            <iconparam name="death_atf" x="269" y="0" width="12" height="16" stretch="1"/>
+	            <textparam name="mp_ping" x="284" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	        </player_item>
+	        <local_player_item>
+	            <auto_static x="0" y="0" width="313" height="16" stretch="1">
+		            <texture a="200">ui_inGame2_mp_screen_selection</texture>
+	            </auto_static>
+	            <textparam name="mp_name" x="8" y="0" width="124" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="l"/>
+	            </textparam>
+	            <textparam name="mp_frags" x="133" y="0" width="28" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <textparam name="mp_deaths" x="163" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <textparam name="mp_artefacts" x="194" y="0" width="28" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <textparam name="mp_spots" x="224" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <iconparam name="rank" x="256" y="0" width="12" height="16" stretch="1"/>
+	            <iconparam name="death_atf" x="269" y="0" width="12" height="16" stretch="1"/>
+	            <textparam name="mp_ping" x="284" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	        </local_player_item>
+	    </team>
+	    <team tname="blueteam" x="342" y="27" width="327" height="450">
+	        <auto_static x="21" y="16" width="64">
+		        <text font="letterica18" r="170" g="170" b="170">mp_headhuntrs</text>
+	        </auto_static>
+	        <scroll_panels count="1">
+	            <panel number="0">
+	                <scroll_panel x="3" y="81" width="313" height="365" always_show_scroll="0" vert_interval="20" left_ident="10"/>
+	                <team_header x="3" y="50" width="313" height="26">
+	                    <field name="mp_artefacts_upcase" x="92" y="-32" width="64">
+	                        <text font="letterica16" r="120" g="120" b="120" />
+	                    </field>
+	                    <field name="mp_players" x="176" y="-32" width="48">
+	                        <text font="letterica16" r="120" g="120" b="120" />
+	                    </field>
+	                    <field name="mp_frags_upcase" x="240" y="-32" width="64">
+	                        <text font="letterica16" r="120" g="120" b="120" />
+	                    </field>
+	                    <column name="mp_name" x="0" y="0" width="132" height="26">
+	                        <text vert_align="c" align="c" font="letterica16" r="120" g="120" b="120">mp_name</text>
+	                    </column>
+	                    <auto_frameline x="135" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <column name="mp_frags" x="133" y="0" width="28" height="26"/>
+	                    <auto_frameline x="164" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <column name="mp_deaths" x="163" y="0" width="29" height="26"/>
+	                    <auto_frameline x="194" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <column name="mp_artefacts" x="192" y="26" width="28" height="21"/>
+	                    <auto_frameline x="224" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <column name="mp_spots" x="223" y="0" width="29" height="26"/>
+	                    <auto_frameline x="254" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <column name="mp_status" x="254" y="0" width="29" height="26"/>
+	                    <auto_frameline x="285" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <column name="mp_ping" x="284" y="0" width="36" height="26"/>
+	                </team_header>
+	            </panel>
+	        </scroll_panels>
+	        <player_item>
+	            <textparam name="mp_name" x="8" y="0" width="124" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="l"/>
+	            </textparam>
+	            <textparam name="mp_frags" x="133" y="0" width="28" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <textparam name="mp_deaths" x="163" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <textparam name="mp_artefacts" x="194" y="0" width="28" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <textparam name="mp_spots" x="224" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <iconparam name="rank" x="256" y="0" width="12" height="16" stretch="1"/>
+	            <iconparam name="death_atf" x="269" y="0" width="12" height="16" stretch="1"/>
+	            <textparam name="mp_ping" x="284" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	        </player_item>
+	        <local_player_item>
+	            <auto_static x="0" y="0" width="313" height="16" stretch="1">
+		            <texture a="200">ui_inGame2_mp_screen_selection</texture>
+	            </auto_static>
+	            <textparam name="mp_name" x="8" y="0" width="124" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="l"/>
+	            </textparam>
+	            <textparam name="mp_frags" x="133" y="0" width="28" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <textparam name="mp_deaths" x="163" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <textparam name="mp_artefacts" x="194" y="0" width="28" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <textparam name="mp_spots" x="224" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <iconparam name="rank" x="256" y="0" width="12" height="16" stretch="1"/>
+	            <iconparam name="death_atf" x="269" y="0" width="12" height="16" stretch="1"/>
+	            <textparam name="mp_ping" x="284" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	        </local_player_item>
+	    </team>
+	    <team tname="spectatorsteam" x="14" y="477" width="655" height="212">
+	        <auto_static x="251" y="7" width="154" height="16">
+		        <text font="letterica16" r="120" g="120" b="120" align="c">mp_spectators</text>
+	        </auto_static>
+	        <scroll_panels count="3">
+	            <panel number="0">
+	                <scroll_panel x="10" y="30" width="209" height="150" always_show_scroll="0" vert_interval="20" />
+	                <team_header x="9" y="0" width="209" height="20"/>
+                </panel>
+                <panel number="1">
+                    <scroll_panel x="220" y="30" width="209" height="150" always_show_scroll="0" vert_interval="20" />
+                    <team_header x="219" y="0" width="209" height="20"/>
+                </panel>
+                <panel number="2">
+                    <scroll_panel x="431" y="30" width="209" height="150" always_show_scroll="0" vert_interval="20" />
+                    <team_header x="430" y="0" width="209" height="20"/>
+	            </panel>
+	        </scroll_panels>
+	        <player_item>
+	            <textparam name="mp_name" x="8" y="0" width="172" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="l"/>
+	            </textparam>
+	            <textparam name="mp_ping" x="172" y="0" width="36" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	        </player_item>
+	        <local_player_item>
+	            <auto_static x="0" y="0" width="206" height="16" stretch="1">
+		            <texture a="200">ui_inGame2_mp_screen_selection</texture>
+	            </auto_static>
+	            <textparam name="mp_name" x="8" y="0" width="172" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="l"/>
+	            </textparam>
+	            <textparam name="mp_ping" x="172" y="0" width="36" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	        </local_player_item>
+	    </team>
+	    <team tname="greenteam_pending" x="14" y="27" width="327" height="450">
+	        <auto_static x="21" y="16" width="64">
+		        <text font="letterica18" r="170" g="170" b="170">mp_team_free_stalkers</text>
+	        </auto_static>
+	        <scroll_panels count="1">
+	            <panel number="0">
+	                <scroll_panel x="9" y="81" width="313" height="365" always_show_scroll="0" vert_interval="20" left_ident="10"/>
+	                <team_header x="9" y="50" width="313" height="26">
+	                    <field name="mp_players" x="176" y="-32" width="48">
+	                        <text font="letterica16" r="120" g="120" b="120" />
+	                    </field>
+	                    <column name="mp_name" x="0" y="0" width="132" height="26">
+	                        <text vert_align="c" align="c" font="letterica16" r="120" g="120" b="120">mp_name</text>
+	                    </column>
+	                    <auto_frameline x="135" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <auto_frameline x="164" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <auto_frameline x="195" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <auto_frameline x="224" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <auto_frameline x="255" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <column name="mp_status" x="254" y="0" width="29" height="26"/>
+	                    <auto_frameline x="284" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <column name="mp_ping" x="284" y="0" width="36" height="26"/>
+	                </team_header>
+	            </panel>
+	        </scroll_panels>
+	        <player_item>
+	            <textparam name="mp_name" x="8" y="0" width="124" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="l"/>
+	            </textparam>
+	            <textparam name="mp_status" x="254" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <textparam name="mp_ping" x="284" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	        </player_item>
+	        <local_player_item>
+	            <auto_static x="0" y="0" width="313" height="16" stretch="1">
+		            <texture a="200">ui_inGame2_mp_screen_selection</texture>
+	            </auto_static>
+	            <textparam name="mp_name" x="8" y="0" width="124" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="l"/>
+	            </textparam>
+	            <textparam name="mp_status" x="254" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <textparam name="mp_ping" x="284" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	        </local_player_item>
+	    </team>
+	    <team tname="blueteam_pending" x="342" y="27" width="327" height="450">
+	        <auto_static x="21" y="16" width="64">
+		        <text font="letterica18" r="170" g="170" b="170">mp_headhuntrs</text>
+	        </auto_static>
+	        <scroll_panels count="1">
+	            <panel number="0">
+	                <scroll_panel x="3" y="81" width="313" height="365" always_show_scroll="0" vert_interval="20" left_ident="10"/>
+	                <team_header x="3" y="50" width="313" height="26">
+	                    <field name="mp_players" x="176" y="-32" width="48">
+	                        <text font="letterica16" r="120" g="120" b="120" />
+	                    </field>
+	                    <column name="mp_name" x="0" y="0" width="132" height="26">
+	                        <text vert_align="c" align="c" font="letterica16" r="120" g="120" b="120">mp_name</text>
+	                    </column>
+	                    <auto_frameline x="135" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <auto_frameline x="164" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <auto_frameline x="194" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <auto_frameline x="224" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <auto_frameline x="254" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <column name="mp_status" x="254" y="0" width="29" height="26"/>
+	                    <auto_frameline x="285" y="31" width="1" height="365" vertical="1">
+	                        <texture>ui_inGame2_pda_line_vertical</texture>
+	                    </auto_frameline>
+	                    <column name="mp_ping" x="284" y="0" width="36" height="26"/>
+	                </team_header>
+	            </panel>
+	        </scroll_panels>
+	        <player_item>
+	            <textparam name="mp_name" x="8" y="0" width="124" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="l"/>
+	            </textparam>
+	            <textparam name="mp_status" x="254" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <textparam name="mp_ping" x="284" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	        </player_item>
+	        <local_player_item>
+	            <auto_static x="0" y="0" width="313" height="16" stretch="1">
+		            <texture a="200">ui_inGame2_mp_screen_selection</texture>
+	            </auto_static>
+	            <textparam name="mp_name" x="8" y="0" width="124" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="l"/>
+	            </textparam>
+	            <textparam name="mp_status" x="254" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	            <textparam name="mp_ping" x="284" y="0" width="29" height="16">
+		            <text font="letterica16" r="170" g="170" b="170" align="c"/>
+	            </textparam>
+	        </local_player_item>
+	    </team>
+	</team_panels_wnd>
+</w>

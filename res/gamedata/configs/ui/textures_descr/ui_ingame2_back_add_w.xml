@@ -1,0 +1,14 @@
+<w>
+    <file name="ui\ui_ingame2_back_add_w">
+
+    <texture id="ui_inGame2_back_01w10_l" x="67"  y="0" width="101" height="768" />
+    <texture id="ui_inGame2_back_01w10_r" x="171" y="0" width="101" height="768" />
+    
+    <texture id="ui_inGame2_back_02w10_l" x="408" y="0" width="101" height="768" />
+    <texture id="ui_inGame2_back_02w10_r" x="511" y="0" width="101" height="768" />
+    
+    <texture id="ui_inGame2_back_03w10_l" x="748" y="0" width="101" height="768" />
+    <texture id="ui_inGame2_back_03w10_r" x="851" y="0" width="101" height="768" />
+
+   </file>
+</w>

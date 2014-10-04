@@ -1,0 +1,129 @@
+[grenade_f1]:identity_immunities,weapon_probability,default_weapon_params
+grenade_remove_time		= 60000
+detonation_threshold_hit= 200
+GroupControlSection		= spawn_group
+discovery_dependency	=
+$spawn 					= "weapons\grenades\f1"
+$prefetch				= 128
+class					= G_F1_S
+cform					= skeleton
+visual					= dynamics\weapons\wpn_grenades\wpn_f1.ogf
+inv_name				= st_grenade_f1
+inv_name_short			= st_grenade_f1
+inv_weight				= 0.3	;.1
+description				= st_grenade_f1_descr
+ef_weapon_type			= 4
+default_to_ruck			= false
+sprint_allowed			= true
+control_inertion_factor	= 1
+
+inv_grid_width			= 1
+inv_grid_height			= 1
+inv_grid_x				= 9
+inv_grid_y				= 9
+
+upgr_icon_x			= 924
+upgr_icon_y			= 384
+upgr_icon_width		= 60
+upgr_icon_height   	= 132
+
+kill_msg_x				= 1
+kill_msg_y				= 232
+kill_msg_width			= 13
+kill_msg_height			= 23
+
+animation_slot			= 7
+single_handed			= 1
+
+slot					= 3
+hud						= grenade_f1_hud
+force_min				= 10	; ~30% от максимума
+force_const				= 25;20
+force_max				= 30
+force_grow_speed		= 20;2 ;30
+
+destroy_time			= 2500;3500
+
+cost					= 500
+
+;-------------------------------------------------------------------------------
+blast					= 3
+blast_r					= 5
+blast_impulse			= 150
+;delete
+blast_impulse_factor	 = 1
+
+frags					= 12
+frags_r					= 20
+frag_hit				= 0.30
+frag_hit_impulse		= 50
+
+hit_type_blast			= explosion
+hit_type_frag			= fire_wound
+
+up_throw_factor			= 1.2
+;-------------------------------------------------------------------------------
+
+
+explode_particles		 = explosions\explosion_01
+
+
+light_color		         = 1.9,1.4,0.5
+light_range		         = 25.0
+light_time 		         = 0.85
+
+;трассы от осколков
+fragment_speed				= 50
+explode_duration			= 3		;подолжительность взрыва (с)
+
+;звуки
+snd_explode = weapons\t_rgd5_explosion        ; t_f1_explosion ; f1_explode
+snd_checkout = weapons\generic_checkout, 1.0, 0.4
+
+attach_position_offset	= -0.053,-0.089,0.0
+attach_angle_offset		= 0,0,0
+attach_bone_name		=
+
+
+throw_point				 =  0.4, 0.3, 0.1           ;0.18, 1.636, -0.788     \\0.118 0.737 0.788
+throw_dir				 = 0,0,1
+third_person_throw_point_offset = -0.198,1.8,-0.833 ;-0.05,0.848,0.706
+
+wm_size                  = 0.1
+
+wallmark_section		 =explosion_marks
+
+[grenade_f1_hud]:hud_base
+fire_point			= 0,0,0
+fire_bone           = wpn_body
+
+
+attach_place_idx	= 0
+item_visual		= dynamics\weapons\wpn_grenades\wpn_f1_hud
+
+hands_position				= -0.021000,-0.160000,0.002500
+hands_orientation			= -0.500000,1.000000,-2.000000
+
+
+hands_position_16x9				= -0.096500,-0.163000,0.039000
+hands_orientation_16x9			= -4.399999,1.000000,-2.000000
+
+
+item_position				= 0.004498,-0.003965,0.000290
+item_orientation			= -359.925262,-2.224621,-7.030276
+
+anm_hide				= f1_holster
+anm_show				= f1_draw
+anm_idle				= f1_idle
+anm_bore				= f1_idle_bore
+anm_idle_moving	 			= f1_idle_moving
+anm_idle_sprint	 			= f1_idle_sprint
+
+anm_throw_begin			= f1_throw_begin
+anm_throw_idle			= f1_throw_idle
+anm_throw				= f1_throw
+
+
+throw_point			= 0.0,0.4,0.3
+throw_dir			= 0,0,1
+third_person_throw_point_offset = -0.05,0.848,0.706

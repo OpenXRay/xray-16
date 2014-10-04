@@ -1,0 +1,184 @@
+[stalker_zombied_vision_free]
+min_view_distance   		= 0.4				; коэффициент, который множится на eye_range, в зависимости от угла
+max_view_distance	 		= 1.0				; коэффициент, который множится на eye_range, в зависимости от угла
+visibility_threshold	 	= 80.0				; значение, при достижении суммой которого объект считается видимым
+always_visible_distance 	= 0.1
+time_quant					= 0.005
+decrease_value				= 0.1				; значение, на которое уменьшается вес, если объект попал в фрустум, но отсёкся по каким-то причинам
+velocity_factor		     	= 1.0 ;0.5
+luminocity_factor			= 0.8 ;0.5				; фактор освещения (только для Актёра)
+transparency_threshold	 	= 0.4
+
+[stalker_zombied_vision_danger]
+min_view_distance   		= 0.7				; коэффициент, который множится на eye_range, в зависимости от угла
+max_view_distance	 		= 1.0				; коэффициент, который множится на eye_range, в зависимости от угла
+visibility_threshold	 	= 40.0				; значение, при достижении суммой которого объект считается видимым
+always_visible_distance 	= 0.1
+time_quant					= 0.001
+decrease_value				= 0.01				; значение, на которое уменьшается вес, если объект попал в фрустум, но отсёкся по каким-то причинам
+velocity_factor		     	= 1.0 ;0.5
+luminocity_factor			= 0.8 ;0.5 				; фактор освещения (только для Актёра)
+transparency_threshold	 	= 0.4
+
+[stalker_zombied_condition]
+satiety_v					= 0.00001				;скорость уменьшения сытости со временем
+radiation_v					= 0.0001				;скорость уменьшения радиации
+satiety_power_v				= 0.0005				;увеличение силы при уменьшении сытости 
+satiety_health_v			= 0.001					;увеличение здоровья при уменьшении сытости 
+satiety_critical			= 0.0					;критическое значения сытости (в процентах от 0..1) когда здоровье начианает уменьшаться
+radiation_health_v			= 0.001					;уменьшение здоровья при воздействии радиации
+morale_v					= 0.0001				;скорость восстановления морали
+health_hit_part				= 1.0					;процент хита, уходящий на отнимание здоровья
+power_hit_part				= 0.0					;процент хита, уходящий на отнимание силы
+psy_health_v				= 0.1					;скорость восстановления psy-здоровья
+health_restore_v			= 0.001					;скорость восстановления здоровья
+
+sleep_health				= 1.0					;коэффициенты скоростей изменения параметров во время сна
+sleep_power					= 1.0
+sleep_satiety				= 1.0
+sleep_radiation 			= 1.0
+sleep_psy_health			= 1.0
+
+;---LIMPING STATE-----------------------------------------------------
+use_limping_state			= off
+limping_threshold			= 0.5
+
+;открытые раны
+bleeding_v					= 0						;потеря крови при номинальной ране в секунду
+wound_incarnation_v			= 0.0					;крутизна кривой заживления (какой процент раны останется после заживления в игровую секунду)
+min_wound_size				= 0.01
+
+[stalker_zombied_immunities]:stalker_immunities
+telepatic_immunity 			= 0.0
+burn_immunity 				= 0.0				;коэффициенты иммунитета 
+strike_immunity 			= 0.0
+shock_immunity 				= 0.0
+wound_immunity				= 0.0
+radiation_immunity 			= 0.0
+chemical_burn_immunity 		= 0.0
+explosion_immunity 			= 0.0
+fire_wound_immunity  		= 1.0 
+wound_2_immunity  			= 0.0
+
+[stalker_zombied_movement_speeds]
+; zombied stalkers can't crouch or run
+	; danger
+	;; crouch
+	;;; walk
+	danger_crouch_walk_forward	= 0.8
+	danger_crouch_walk_backward	= 0.575
+	danger_crouch_walk_left		= 0.8
+	danger_crouch_walk_right	= 0.8
+	;;; run						  
+	danger_crouch_run_forward	= 0.8
+	danger_crouch_run_backward	= 0.575
+	danger_crouch_run_left		= 0.8
+	danger_crouch_run_right		= 0.8
+	;; stand
+	;;; walk
+	danger_stand_walk_forward	= 0.8
+	danger_stand_walk_backward	= 0.8
+	danger_stand_walk_left		= 0.8
+	danger_stand_walk_right		= 0.8
+	;;; run
+	danger_stand_run_forward	= 0.8
+	danger_stand_run_backward	= 0.8
+	danger_stand_run_left		= 0.8
+	danger_stand_run_right		= 0.8
+	; free
+	;; stand
+	;;; forward
+	free_stand_walk_forward		= 0.8
+	free_stand_run_forward		= 0.8
+	; panic
+	;; stand
+	;;; run
+	;;;; forward
+	panic_stand_run_forward		= 7.0
+
+[stalker_zombied]:stalker
+;---LEVEL EDITOR------------------------------------------------------
+$spawn							= "stalkers\stalker_zombied"	; option for Level Editor
+attachable_items				= device_torch,attachable_item
+
+;---SECTIONS----------------------------------------------------------
+condition_sect					= stalker_zombied_condition
+;---IMMUNITIES -------------------------------------------------------
+immunities_sect					= stalker_zombied_immunities
+;---VISIBILITY--------------------------------------------------------
+vision_danger_section			= stalker_zombied_vision_danger
+vision_free_section				= stalker_zombied_vision_free
+eye_fov							= 160 ; 170	
+eye_range						= 50;70	
+;---ENEMY------------------------------------------------------------
+ignore_monster_threshold		= 0.8
+max_ignore_distance				= 10.0
+panic_threshold					= 0
+sound_threshold					= 0.5
+
+;---SOUND PLAYER------------------------------------------------------
+sound_death						= fight\death\death_
+sound_anomaly_death				= fight\death\death_
+sound_hit						= fight\hit\hit_
+sound_humming					= states\idle\idle_
+
+sound_backup					= ;fight\attack\attack_ ;fight\backup\stalker\backup_
+sound_detour					= ;fight\enemy\enemy_ ;fight\detour\stalker\detour_
+sound_search					= ;fight\attack\attack_ ;fight\searching_enemy\stalker\search_
+sound_friendly_fire				= ;fight\friendly_fire\stalker\friendly_fire_
+sound_panic_human				= ;states\panic_human\stalker\panic_
+sound_panic_monster				= ;states\panic_monster\stalker\panic_
+sound_tolls						= ;fight\tolls\tolls_
+sound_grenade_alarm				= ;fight\grenade\grenade_
+sound_friendly_grenade_alarm	= ;fight\friendly_grenade\friendly_grenade_
+sound_need_backup               = ;fight\attack\attack_ ;fight\cover_fire\cover_fire_
+sound_running_in_danger			= ;states\breath\stalker\breath_1
+sound_walking_in_danger			= ;states\breath\stalker\breath_2
+
+sound_kill_wounded				= ;help\wounded\kill_wounded_
+sound_enemy_critically_wounded	= ;fight\enemy_hit\enemy_hit_
+sound_enemy_killed_or_wounded	= ;fight\enemy_down\enemy_down_
+
+sound_attack_no_allies				= ;fight\fire\fire_,fight\threat\threat_distant_
+sound_attack_allies_single_enemy	= ;fight\attack\attack_,fight\attack\attack_one_,fight\fire\fire_
+sound_attack_allies_several_enemies	= ;fight\attack\attack_,fight\attack\attack_many_,fight\fire\fire_
+sound_search1_no_allies				= ;fight\threat\threat_distant_
+sound_search1_with_allies			= ;fight\searching_enemy\search_,fight\searching_enemy\enemy_lost_
+sound_throw_grenade					= ;fight\grenade\grenade_ready_
+
+
+
+
+
+;---MOVEMENT----------------------------------------------------------
+movement_speeds					= stalker_zombied_movement_speeds;
+
+;---FIRE DISPERSIONS--------------------------------------------------
+disp_walk_stand					= 16
+disp_walk_crouch				= 16	
+disp_run_stand					= 16
+disp_run_crouch					= 16
+disp_stand_stand				= 10; 16
+disp_stand_crouch				= 5; 16
+disp_stand_stand_zoom			= 1
+disp_stand_crouch_zoom			= 1
+
+;----------- MONSTR SPECIES ----------------------------
+species							= zombie
+
+;---CRITICAL WOUND------------------------------------------------------------------
+critical_wound_threshold		= 1.1
+critical_wound_decrease_quant	= 0.
+body_parts_section_id			= critical_wound_body_parts_section
+
+[stalker_fresh_zombied]:stalker_zombied
+;---LEVEL EDITOR------------------------------------------------------
+$spawn							= "stalkers\stalker_fresh_zombied"	; option for Level Editor
+
+;---MOVEMENT----------------------------------------------------------
+movement_speeds					= stalker_movement_speeds
+
+;---CRITICAL WOUND------------------------------------------------------------------
+critical_wound_threshold		= 1.1
+critical_wound_decrease_quant	= 0.
+body_parts_section_id			= critical_wound_body_parts_section

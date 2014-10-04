@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="name_bandit_0">
+		<text>Sanek</text>
+	</string>
+	<string id="name_bandit_1">
+		<text>Shurik</text>
+	</string>
+	<string id="name_bandit_10">
+		<text>Vadya</text>
+	</string>
+	<string id="name_bandit_11">
+		<text>Vasyan</text>
+	</string>
+	<string id="name_bandit_12">
+		<text>Vasek</text>
+	</string>
+	<string id="name_bandit_13">
+		<text>Vityukha</text>
+	</string>
+	<string id="name_bandit_14">
+		<text>Vetal</text>
+	</string>
+	<string id="name_bandit_15">
+		<text>Vovan</text>
+	</string>
+	<string id="name_bandit_16">
+		<text>Zhorka</text>
+	</string>
+	<string id="name_bandit_17">
+		<text>Grishka</text>
+	</string>
+	<string id="name_bandit_18">
+		<text>Grishko</text>
+	</string>
+	<string id="name_bandit_19">
+		<text>Dimon</text>
+	</string>
+	<string id="name_bandit_2">
+		<text>Lekha</text>
+	</string>
+	<string id="name_bandit_20">
+		<text>Dimukha</text>
+	</string>
+	<string id="name_bandit_21">
+		<text>Zheka</text>
+	</string>
+	<string id="name_bandit_22">
+		<text>Fimka</text>
+	</string>
+	<string id="name_bandit_23">
+		<text>Ilyukha</text>
+	</string>
+	<string id="name_bandit_24">
+		<text>Kostyan</text>
+	</string>
+	<string id="name_bandit_25">
+		<text>Mitka</text>
+	</string>
+	<string id="name_bandit_26">
+		<text>Mikhal</text>
+	</string>
+	<string id="name_bandit_27">
+		<text>Mikha</text>
+	</string>
+	<string id="name_bandit_28">
+		<text>Mikhas</text>
+	</string>
+	<string id="name_bandit_29">
+		<text>Kolyan</text>
+	</string>
+	<string id="name_bandit_3">
+		<text>Tolyan</text>
+	</string>
+	<string id="name_bandit_30">
+		<text>Pavlukha</text>
+	</string>
+	<string id="name_bandit_31">
+		<text>Sashok</text>
+	</string>
+	<string id="name_bandit_32">
+		<text>Stepka</text>
+	</string>
+	<string id="name_bandit_33">
+		<text>Stepukha</text>
+	</string>
+	<string id="name_bandit_34">
+		<text>Timokha</text>
+	</string>
+	<string id="name_bandit_35">
+		<text>Felka</text>
+	</string>
+	<string id="name_bandit_36">
+		<text>Yuras</text>
+	</string>
+	<string id="name_bandit_37">
+		<text>Yashka</text>
+	</string>
+	<string id="name_bandit_4">
+		<text>Andryukha</text>
+	</string>
+	<string id="name_bandit_5">
+		<text>Tokha</text>
+	</string>
+	<string id="name_bandit_6">
+		<text>Arkasha</text>
+	</string>
+	<string id="name_bandit_7">
+		<text>Temka</text>
+	</string>
+	<string id="name_bandit_8">
+		<text>Boryan</text>
+	</string>
+	<string id="name_bandit_9">
+		<text>Bodya</text>
+	</string>
+	<string id="name_captain_0">
+		<text>Capitбn</text>
+	</string>
+	<string id="name_lieutenant_0">
+		<text>Teniente</text>
+	</string>
+	<string id="name_private_0">
+		<text>Soldado raso</text>
+	</string>
+	<string id="name_science_0">
+		<text>Andrey</text>
+	</string>
+	<string id="name_science_1">
+		<text>Anton</text>
+	</string>
+	<string id="name_science_10">
+		<text>Oleg</text>
+	</string>
+	<string id="name_science_11">
+		<text>Roman</text>
+	</string>
+	<string id="name_science_12">
+		<text>Aleksandr</text>
+	</string>
+	<string id="name_science_13">
+		<text>Sergey</text>
+	</string>
+	<string id="name_science_14">
+		<text>Anatoly</text>
+	</string>
+	<string id="name_science_15">
+		<text>Yuri</text>
+	</string>
+	<string id="name_science_2">
+		<text>Bohdan</text>
+	</string>
+	<string id="name_science_3">
+		<text>Veniamin</text>
+	</string>
+	<string id="name_science_4">
+		<text>Vitaly</text>
+	</string>
+	<string id="name_science_5">
+		<text>Vladimir</text>
+	</string>
+	<string id="name_science_6">
+		<text>Dimitri</text>
+	</string>
+	<string id="name_science_7">
+		<text>Ivбn</text>
+	</string>
+	<string id="name_science_8">
+		<text>Konstantin</text>
+	</string>
+	<string id="name_science_9">
+		<text>Alexey</text>
+	</string>
+	<string id="name_stalker_0">
+		<text>Sanya</text>
+	</string>
+	<string id="name_stalker_1">
+		<text>Sanek</text>
+	</string>
+	<string id="name_stalker_10">
+		<text>Arthur</text>
+	</string>
+	<string id="name_stalker_100">
+		<text>Yashka</text>
+	</string>
+	<string id="name_stalker_101">
+		<text>Yarik</text>
+	</string>
+	<string id="name_stalker_102">
+		<text>Yara</text>
+	</string>
+	<string id="name_stalker_103">
+		<text>Slava</text>
+	</string>
+	<string id="name_stalker_11">
+		<text>Borya</text>
+	</string>
+	<string id="name_stalker_12">
+		<text>Borka</text>
+	</string>
+	<string id="name_stalker_13">
+		<text>Bohdan</text>
+	</string>
+	<string id="name_stalker_14">
+		<text>Slavik</text>
+	</string>
+	<string id="name_stalker_15">
+		<text>Vadim</text>
+	</string>
+	<string id="name_stalker_16">
+		<text>Vadya</text>
+	</string>
+	<string id="name_stalker_17">
+		<text>Vadik</text>
+	</string>
+	<string id="name_stalker_18">
+		<text>Valik</text>
+	</string>
+	<string id="name_stalker_19">
+		<text>Valera</text>
+	</string>
+	<string id="name_stalker_2">
+		<text>Shurik</text>
+	</string>
+	<string id="name_stalker_20">
+		<text>Vasya</text>
+	</string>
+	<string id="name_stalker_21">
+		<text>Vaska</text>
+	</string>
+	<string id="name_stalker_22">
+		<text>Vasko</text>
+	</string>
+	<string id="name_stalker_23">
+		<text>Venya</text>
+	</string>
+	<string id="name_stalker_24">
+		<text>Vitya</text>
+	</string>
+	<string id="name_stalker_25">
+		<text>Vitka</text>
+	</string>
+	<string id="name_stalker_26">
+		<text>Vitalik</text>
+	</string>
+	<string id="name_stalker_27">
+		<text>Vlad</text>
+	</string>
+	<string id="name_stalker_28">
+		<text>Vova</text>
+	</string>
+	<string id="name_stalker_29">
+		<text>Vovka</text>
+	</string>
+	<string id="name_stalker_3">
+		<text>Lenya</text>
+	</string>
+	<string id="name_stalker_30">
+		<text>Seva</text>
+	</string>
+	<string id="name_stalker_31">
+		<text>Sevka</text>
+	</string>
+	<string id="name_stalker_32">
+		<text>Gena</text>
+	</string>
+	<string id="name_stalker_33">
+		<text>Genka</text>
+	</string>
+	<string id="name_stalker_34">
+		<text>George</text>
+	</string>
+	<string id="name_stalker_35">
+		<text>Gosha</text>
+	</string>
+	<string id="name_stalker_36">
+		<text>Zhora</text>
+	</string>
+	<string id="name_stalker_37">
+		<text>Mark</text>
+	</string>
+	<string id="name_stalker_38">
+		<text>Gleb</text>
+	</string>
+	<string id="name_stalker_39">
+		<text>Grisha</text>
+	</string>
+	<string id="name_stalker_4">
+		<text>Alex</text>
+	</string>
+	<string id="name_stalker_40">
+		<text>Grishka</text>
+	</string>
+	<string id="name_stalker_41">
+		<text>Grishko</text>
+	</string>
+	<string id="name_stalker_42">
+		<text>Danya</text>
+	</string>
+	<string id="name_stalker_43">
+		<text>Kiryukha</text>
+	</string>
+	<string id="name_stalker_44">
+		<text>Danko</text>
+	</string>
+	<string id="name_stalker_45">
+		<text>Dennis</text>
+	</string>
+	<string id="name_stalker_46">
+		<text>Dima</text>
+	</string>
+	<string id="name_stalker_47">
+		<text>Dimka</text>
+	</string>
+	<string id="name_stalker_48">
+		<text>Dmitro</text>
+	</string>
+	<string id="name_stalker_49">
+		<text>Zhenya</text>
+	</string>
+	<string id="name_stalker_5">
+		<text>Leshka</text>
+	</string>
+	<string id="name_stalker_50">
+		<text>Zhenka</text>
+	</string>
+	<string id="name_stalker_51">
+		<text>Egor</text>
+	</string>
+	<string id="name_stalker_52">
+		<text>Egorka</text>
+	</string>
+	<string id="name_stalker_53">
+		<text>Fima</text>
+	</string>
+	<string id="name_stalker_54">
+		<text>Vanya</text>
+	</string>
+	<string id="name_stalker_55">
+		<text>Vanka</text>
+	</string>
+	<string id="name_stalker_56">
+		<text>Igorek</text>
+	</string>
+	<string id="name_stalker_57">
+		<text>Ilya</text>
+	</string>
+	<string id="name_stalker_58">
+		<text>Kostya</text>
+	</string>
+	<string id="name_stalker_59">
+		<text>Kostik</text>
+	</string>
+	<string id="name_stalker_6">
+		<text>Tolik</text>
+	</string>
+	<string id="name_stalker_60">
+		<text>Leva</text>
+	</string>
+	<string id="name_stalker_61">
+		<text>Lenya</text>
+	</string>
+	<string id="name_stalker_62">
+		<text>Lyonka</text>
+	</string>
+	<string id="name_stalker_63">
+		<text>Max</text>
+	</string>
+	<string id="name_stalker_64">
+		<text>Matvei</text>
+	</string>
+	<string id="name_stalker_65">
+		<text>Mitya</text>
+	</string>
+	<string id="name_stalker_66">
+		<text>Misha </text>
+	</string>
+	<string id="name_stalker_67">
+		<text>Mishka</text>
+	</string>
+	<string id="name_stalker_68">
+		<text>Nikita</text>
+	</string>
+	<string id="name_stalker_69">
+		<text>Nik</text>
+	</string>
+	<string id="name_stalker_7">
+		<text>Anton</text>
+	</string>
+	<string id="name_stalker_70">
+		<text>Kolya</text>
+	</string>
+	<string id="name_stalker_71">
+		<text>Oleg</text>
+	</string>
+	<string id="name_stalker_72">
+		<text>Pasha</text>
+	</string>
+	<string id="name_stalker_73">
+		<text>Pashka</text>
+	</string>
+	<string id="name_stalker_74">
+		<text>Petro</text>
+	</string>
+	<string id="name_stalker_75">
+		<text>Petya</text>
+	</string>
+	<string id="name_stalker_76">
+		<text>Petka</text>
+	</string>
+	<string id="name_stalker_77">
+		<text>Roma</text>
+	</string>
+	<string id="name_stalker_78">
+		<text>Romka</text>
+	</string>
+	<string id="name_stalker_79">
+		<text>Rostik</text>
+	</string>
+	<string id="name_stalker_8">
+		<text>Toshka</text>
+	</string>
+	<string id="name_stalker_80">
+		<text>Rus</text>
+	</string>
+	<string id="name_stalker_81">
+		<text>Savva</text>
+	</string>
+	<string id="name_stalker_82">
+		<text>Semyon</text>
+	</string>
+	<string id="name_stalker_83">
+		<text>Sema</text>
+	</string>
+	<string id="name_stalker_84">
+		<text>Serega</text>
+	</string>
+	<string id="name_stalker_85">
+		<text>Rusik</text>
+	</string>
+	<string id="name_stalker_86">
+		<text>Stepan</text>
+	</string>
+	<string id="name_stalker_87">
+		<text>Stepa</text>
+	</string>
+	<string id="name_stalker_88">
+		<text>Tima</text>
+	</string>
+	<string id="name_stalker_89">
+		<text>Timka</text>
+	</string>
+	<string id="name_stalker_9">
+		<text>Artem</text>
+	</string>
+	<string id="name_stalker_90">
+		<text>Fedor</text>
+	</string>
+	<string id="name_stalker_91">
+		<text>Fedya</text>
+	</string>
+	<string id="name_stalker_92">
+		<text>Fedka</text>
+	</string>
+	<string id="name_stalker_93">
+		<text>Filya</text>
+	</string>
+	<string id="name_stalker_94">
+		<text>Filka</text>
+	</string>
+	<string id="name_stalker_95">
+		<text>Edik</text>
+	</string>
+	<string id="name_stalker_96">
+		<text>Yurka</text>
+	</string>
+	<string id="name_stalker_97">
+		<text>Yurik</text>
+	</string>
+	<string id="name_stalker_98">
+		<text>Yurko</text>
+	</string>
+	<string id="name_stalker_99">
+		<text>Yasha</text>
+	</string>
+	<string id="name_private_1">
+		<text>Sargento primero</text>
+	</string>
+	<string id="name_sergeant_0">
+		<text>Sargento</text>
+	</string>
+</string_table>

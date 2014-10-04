@@ -1,0 +1,48 @@
+[logic@jup_b200_stalker]
+suitable = {=check_npc_name(sim_default)}
+active = walker@1
+
+[walker@1]
+path_walk = guard_1_walk
+path_look  = guard_1_look
+combat_ignore_cond = {=check_enemy_name(tushkano)} true
+
+
+[logic@jup_b200_stalker1]
+suitable = {=check_npc_name(sim_default)}
+active = walker@2
+
+[walker@2]
+path_walk = walker_1_walk
+path_look = walker_1_look
+combat_ignore_cond = {=check_enemy_name(tushkano)} true 
+
+
+[logic@jup_b200_stalker2]
+suitable = {=check_npc_name(sim_default)}
+active = walker@3
+
+[walker@3]
+path_walk = walker_2_walk
+path_look  = walker_2_look
+combat_ignore_cond = {=check_enemy_name(tushkano)} true
+
+
+[logic@jup_b200_stalker3]
+suitable = {=check_npc_name(sim_default)}
+active = walker@4
+
+[walker@4]
+path_walk = walker_3_walk
+path_look  = walker_3_look
+combat_ignore_cond = {=check_enemy_name(tushkano)} true
+
+
+[logic@jup_b200_stalker4]
+suitable = {=check_npc_name(sim_default)}
+active = walker@5
+
+[walker@5]
+path_walk = walker_4_walk
+path_look  = walker_4_look
+combat_ignore_cond = {=check_enemy_name(tushkano)} true

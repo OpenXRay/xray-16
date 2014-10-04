@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="Btn_Cancel">
+		<text>Cancelar</text>
+	</string>
+	<string id="Btn_No">
+		<text>No</text>
+	</string>
+	<string id="Btn_OK">
+		<text>Aceptar</text>
+	</string>
+	<string id="Btn_Yes">
+		<text>Sн</text>
+	</string>
+	<string id="bad">
+		<text>Malo</text>
+	</string>
+	<string id="enemy">
+		<text>Enemigo</text>
+	</string>
+	<string id="excellent">
+		<text>Excelente</text>
+	</string>
+	<string id="experienced">
+		<text>Experimentado</text>
+	</string>
+	<string id="friendly">
+		<text>Amigo</text>
+	</string>
+	<string id="global_map">
+		<text>Mapa de la Zona</text>
+	</string>
+	<string id="good">
+		<text>Bien</text>
+	</string>
+	<string id="indifferent">
+		<text>Indiferente</text>
+	</string>
+	<string id="master">
+		<text>Maestro</text>
+	</string>
+	<string id="mm_mp_pda_hunt">
+		<text>Bonificaciуn de PDA</text>
+	</string>
+	<string id="mp_only_one_voting">
+		<text>Solo se permite una votaciуn activa.</text>
+	</string>
+	<string id="neutral">
+		<text>Neutral</text>
+	</string>
+	<string id="novice">
+		<text>Principiante</text>
+	</string>
+	<string id="st_game">
+		<text>Partida</text>
+	</string>
+	<string id="st_item_used">
+		<text>Usado</text>
+	</string>
+	<string id="st_level">
+		<text>Nivel</text>
+	</string>
+	<string id="st_loading_ai_objects">
+		<text>Cargando objetos IA</text>
+	</string>
+	<string id="st_loading_alife_simulator">
+		<text>Servidor: cargando simulador activo</text>
+	</string>
+	<string id="st_loading_cform">
+		<text>Cargando CFORM</text>
+	</string>
+	<string id="st_loading_details">
+		<text>Cargando detalles</text>
+	</string>
+	<string id="st_loading_geometry">
+		<text>Cargando geometrнa</text>
+	</string>
+	<string id="st_loading_saved_game">
+		<text>Cargando partida guardada</text>
+	</string>
+	<string id="st_loading_sectors_portals">
+		<text>Cargando sectores y portales</text>
+	</string>
+	<string id="st_loading_shaders">
+		<text>Cargando shaders</text>
+	</string>
+	<string id="st_loading_spatial_db">
+		<text>Cargando base de datos espacial</text>
+	</string>
+	<string id="st_loading_textures">
+		<text>Cargando texturas</text>
+	</string>
+	<string id="st_mp_direct_ip">
+		<text>IP directa</text>
+	</string>
+	<string id="st_no_active_task">
+		<text>Tarea inactiva</text>
+	</string>
+	<string id="st_not_enough_money">
+		<text>No tienes suficiente dinero</text>
+	</string>
+	<string id="st_not_enough_money_npc">
+		<text>El PNJ no tiene dinero suficiente</text>
+	</string>
+	<string id="st_opening_stream">
+		<text>Abriendo secuencia</text>
+	</string>
+	<string id="st_prefetching_objects">
+		<text>Buscando objetos con antelaciуn</text>
+	</string>
+	<string id="st_rubles">
+		<text>escombros.</text>
+	</string>
+	<string id="st_server_connecting">
+		<text>SERVIDOR: conectando</text>
+	</string>
+	<string id="st_server_starting">
+		<text>SERVIDOR: iniciando</text>
+	</string>
+	<string id="st_validating_cdkey">
+		<text>Validando clave del CD</text>
+	</string>
+	<string id="st_video">
+		<text>Vнdeo</text>
+	</string>
+	<string id="terrible">
+		<text>Terrible</text>
+	</string>
+	<string id="ui_inv_repair">
+		<text>Arreglar</text>
+	</string>
+	<string id="ui_st_cant_run_r2">
+		<text>No es posible ejecutar Render 2 en el PC</text>
+	</string>
+	<string id="ui_st_community">
+		<text>Facciуn</text>
+	</string>
+	<string id="ui_st_conn_cdkey_disabled">
+		<text>Error de conexiуn: clave del CD desactivada. Contactar con el servicio de atenciуn al cliente.</text>
+	</string>
+	<string id="ui_st_conn_cdkey_in_use">
+		<text>Error de conexiуn: clave del CD en uso</text>
+	</string>
+	<string id="ui_st_conn_cdkey_invalid">
+		<text>Error de conexiуn: clave del CD no vбlida</text>
+	</string>
+	<string id="ui_st_conn_invalid_host">
+		<text>Error de conexiуn: host no vбlido</text>
+	</string>
+	<string id="ui_st_conn_invalid_pass">
+		<text>Error de conexiуn: contraseсa no vбlida</text>
+	</string>
+	<string id="ui_st_conn_new_patch">
+		<text>Nuevo parche disponible.\n Versiуn: %s\n Localizaciуn: %s\nїDescargar ahora?</text>
+	</string>
+	<string id="ui_st_conn_no_new_patch">
+		<text>No hay nuevos parches disponibles</text>
+	</string>
+	<string id="ui_st_conn_rejected_server">
+		<text>Error de conexiуn: conexiуn rechazada por el servidor</text>
+	</string>
+	<string id="ui_st_conn_sess_full">
+		<text>Error de conexiуn: servidor lleno</text>
+	</string>
+	<string id="ui_st_conn_version_differs">
+		<text>Error de conexiуn: versiуn diferente</text>
+	</string>
+	<string id="ui_st_connecting_to_masterserver">
+		<text>Conectando con servidor principal</text>
+	</string>
+	<string id="ui_st_days">
+		<text>Dнas</text>
+	</string>
+	<string id="ui_st_error">
+		<text>Error</text>
+	</string>
+	<string id="ui_st_error_loading">
+		<text>Error de carga</text>
+	</string>
+	<string id="ui_st_file_exist_owerwrite_q">
+		<text>Ya existe un archivo con este nombre. їQuieres sobrescribirlo?</text>
+	</string>
+	<string id="ui_st_file_name_is_empty">
+		<text>El archivo no tiene nombre</text>
+	</string>
+	<string id="ui_st_hours">
+		<text>Horas</text>
+	</string>
+	<string id="ui_st_kicked_by_battleye">
+		<text>Desconectado por el sistema de protecciуn de BattleEye:</text>
+	</string>
+	<string id="ui_st_kicked_by_server">
+		<text>Desconectado. Razуn:</text>
+	</string>
+	<string id="ui_st_leave">
+		<text>Salir</text>
+	</string>
+	<string id="ui_st_load_game_confirm">
+		<text>Si cargas esta partida, se perderбn los datos no guardados. їContinuar?</text>
+	</string>
+	<string id="ui_st_mins">
+		<text>min.</text>
+	</string>
+	<string id="ui_st_months">
+		<text>meses</text>
+	</string>
+	<string id="ui_st_opponent_items">
+		<text>Mochila</text>
+	</string>
+	<string id="ui_st_params">
+		<text>Parбmetros</text>
+	</string>
+	<string id="ui_st_patch_download_error">
+		<text>No es posible descargar el parche</text>
+	</string>
+	<string id="ui_st_patch_download_success">
+		<text>El parche se ha descargado correctamente. їQuieres instalarlo?</text>
+	</string>
+	<string id="ui_st_price">
+		<text>Precio</text>
+	</string>
+	<string id="ui_st_rank">
+		<text>Rango</text>
+	</string>
+	<string id="ui_st_relation">
+		<text>Actitud</text>
+	</string>
+	<string id="ui_st_reputation">
+		<text>Reputaciуn</text>
+	</string>
+	<string id="ui_st_secs">
+		<text>seg.</text>
+	</string>
+	<string id="ui_st_select_one_map">
+		<text>Selecciona al menos un mapa</text>
+	</string>
+	<string id="ui_st_take_all">
+		<text>Coger todo</text>
+	</string>
+	<string id="ui_st_time_remains">
+		<text>Restante</text>
+	</string>
+	<string id="ui_st_voting_disabled">
+		<text>Error al votar</text>
+	</string>
+	<string id="ui_st_want_to_leave_game_q">
+		<text>їSeguro que quieres salir del juego?</text>
+	</string>
+	<string id="ui_total_price">
+		<text>Total</text>
+	</string>
+	<string id="very_bad">
+		<text>muy mala</text>
+	</string>
+	<string id="very_good">
+		<text>muy buena</text>
+	</string>
+	<string id="veteran">
+		<text>Veterano</text>
+	</string>
+	<string id="ui_st_inv_repair">
+		<text>Arreglar</text>
+	</string>
+	<string id="ui_repair_button_hint">
+		<text>Reparar el objeto seleccionado</text>
+	</string>
+	<string id="st_key_notbinded">
+		<text>...</text>
+	</string>
+	<string id="st_save_uni_travel_generic">
+		<text>moviйndose en una zona</text>
+	</string>
+	<string id="st_save_uni_travel_zat_to_jup">
+		<text>moviйndose de Zaton a Yanov</text>
+	</string>
+	<string id="st_save_uni_travel_zat_to_pri">
+		<text>moviйndose de Zaton a Pripyat</text>
+	</string>
+	<string id="st_save_uni_travel_jup_to_zat">
+		<text>moviйndose de Yanov a Zaton</text>
+	</string>
+	<string id="st_save_uni_travel_jup_to_pri">
+		<text>moviйndose de Yanov a Pripyat</text>
+	</string>
+	<string id="st_save_uni_travel_pri_to_zat">
+		<text>moviйndose de Pripyat a Zaton</text>
+	</string>
+	<string id="st_save_uni_travel_pri_to_jup">
+		<text>moviйndose de Pripyat a Yanov</text>
+	</string>
+	<string id="st_save_uni_pri_to_labx8">
+		<text>moviйndose de Pripyat a X8</text>
+	</string>
+	<string id="st_save_uni_labx8_to_pri">
+		<text>moviйndose de X8 a Pripyat</text>
+	</string>
+	<string id="st_save_uni_surge_start">
+		<text>emisiуn</text>
+	</string>
+	<string id="st_save_zat_a1_game_start">
+		<text>comienzo de la partida</text>
+	</string>
+	<string id="st_save_zat_a2_reached_skadovsk">
+		<text>llegada a Skadovsk</text>
+	</string>
+	<string id="st_save_jup_b9_searched_heli_1">
+		<text>Pez Raya 1 registrado</text>
+	</string>
+	<string id="st_save_zat_b100_searched_heli_2">
+		<text>Pez Raya 2 registrado</text>
+	</string>
+	<string id="st_save_zat_b28_searched_heli_3">
+		<text>Pez Raya 3 registrado</text>
+	</string>
+	<string id="st_save_jup_b8_searched_heli_4">
+		<text>Pez Raya 4 registrado</text>
+	</string>
+	<string id="st_save_zat_b101_searched_heli_5">
+		<text>Pez Raya 5 registrado</text>
+	</string>
+	<string id="st_save_zat_b18_noah_showed_teleport">
+		<text>llegando a la meseta</text>
+	</string>
+	<string id="st_save_jup_b217_arrived_to_jup">
+		<text>llegada a Yanov</text>
+	</string>
+	<string id="st_save_jup_a9_got_underpass_docs">
+		<text>camino a Pripyat encontrado</text>
+	</string>
+	<string id="st_save_jup_b15_drunk_with_zulu">
+		<text>Zulu se une al escuadrуn</text>
+	</string>
+	<string id="st_save_jup_a10_gonna_return_debt">
+		<text>Deuda de Vano saldada</text>
+	</string>
+	<string id="st_save_jup_b218_vano_in_squad">
+		<text>Vano se une al escuadrуn</text>
+	</string>
+	<string id="st_save_jup_b206_got_anomalous_plant">
+		<text>planta extraсa recogida</text>
+	</string>
+	<string id="st_save_jup_b218_sokolov_in_squad">
+		<text>Sokolov se une al escuadrуn</text>
+	</string>
+	<string id="st_save_jup_b218_strider_in_squad">
+		<text>Strider se une al escuadrуn</text>
+	</string>
+	<string id="st_save_jup_b218_travel_jup_to_pas">
+		<text>pelotуn reunido</text>
+	</string>
+	<string id="st_save_pas_b400_underpass_start">
+		<text>llegada al paso subterrбneo</text>
+	</string>
+	<string id="st_save_uni_travel_pas_to_pri">
+		<text>llegada a Pripyat</text>
+	</string>
+	<string id="st_save_pri_a16_arrived_to_pri">
+		<text>fuerzas militares localizadas</text>
+	</string>
+	<string id="st_save_pri_a17_hospital_start">
+		<text>arma no identificada capturada</text>
+	</string>
+	<string id="st_save_pri_a20_found_dead_recon">
+		<text>pelotуn de reconocimiento encontrado</text>
+	</string>
+	<string id="st_save_pri_a18_met_reinforcement">
+		<text>refuerzos recibidos</text>
+	</string>
+	<string id="st_save_pri_a18_searched_antenna">
+		<text>"antena" registrada</text>
+	</string>
+	<string id="st_save_pri_a21_approached_mad_sentry">
+		<text>centinela desaparecido encontrado</text>
+	</string>
+	<string id="st_save_pri_a21_killed_controller">
+		<text>controlador cercano al centinela asesinado</text>
+	</string>
+	<string id="st_save_zat_a23_entered_test_center">
+		<text>taller de pruebas alcanzado</text>
+	</string>
+	<string id="st_save_zat_a23_got_gauss_docs">
+		<text>documentaciуn de fusil Gauss encontrada</text>
+	</string>
+	<string id="st_save_pri_a22_found_dead_squad">
+		<text>cadбver de soldado encontrado</text>
+	</string>
+	<string id="st_save_pri_a25_gonna_place_explosive">
+		<text>entrada al jardнn de infancia</text>
+	</string>
+	<string id="st_save_pri_a25_freed_medic">
+		<text>mйdico militar rescatado</text>
+	</string>
+	<string id="st_save_pri_a28_talked_with_ssu">
+		<text>comunicaciones con el cuartel general establecidas</text>
+	</string>
+	<string id="st_save_pri_a28_evacutaion_start">
+		<text>evacuaciуn de Pripyat iniciada</text>
+	</string>
+	<string id="st_save_pri_a28_evacuation_end">
+		<text>helicуpteros de evacuaciуn alcanzados</text>
+	</string>
+	<string id="st_save_uni_zone_to_reality">
+		<text>evacuaciуn completada</text>
+	</string>
+	<string id="st_save_jup_b209_placed_mutant_scanner">
+		<text>detector de mutantes</text>
+	</string>
+	<string id="st_save_jup_a12_gave_artefact_for_hostage">
+		<text>rescate pagado</text>
+	</string>
+	<string id="st_save_jup_a12_met_with_liberators">
+		<text>rehйn liberado</text>
+	</string>
+	<string id="st_save_jup_b6_arrived_to_ash_heap">
+		<text>medidas de la anomalнa del Cenizal</text>
+	</string>
+	<string id="st_save_jup_b6_arrived_to_fen">
+		<text>medidas de la anomalнa Plavni</text>
+	</string>
+	<string id="st_save_zat_b38_met_with_grouse">
+		<text>guarida de chupasangres</text>
+	</string>
+	<string id="st_save_jup_b19_arrived_to_kopachy">
+		<text>enviado a Kopachy</text>
+	</string>
+	<string id="st_save_zat_b40_warned_by_mercs">
+		<text>acercamiento a la planta de tratamiento de basura</text>
+	</string>
+	<string id="st_save_zat_b7_met_with_robbers">
+		<text>stalker alcanzado</text>
+	</string>
+	<string id="st_save_zat_b33_got_container">
+		<text>contenedor encontrado en el escondite</text>
+	</string>
+	<string id="st_save_zat_b106_arrived_to_chimera_lair">
+		<text>caza de la quimera</text>
+	</string>
+	<string id="st_save_jup_b16_passed_labyrinth">
+		<text>Oasis encontrado</text>
+	</string>
+	<string id="st_save_pri_b35_ready_to_snipe">
+		<text>Operaciуn Un disparo iniciada</text>
+	</string>
+	<string id="st_save_jup_b1_entered_railroad_tunnel">
+		<text>bъsqueda del origen de las emisiones psнquicas</text>
+	</string>
+	<string id="st_save_jup_b47_got_admin_docs">
+		<text>documentos administrativos</text>
+	</string>
+	<string id="st_save_zat_b103_warned_by_mercs">
+		<text>acercamiento al taller de la subestaciуn</text>
+	</string>
+	<string id="st_save_zat_b5_met_with_others">
+		<text>trato junto al puesto de guardabosques</text>
+	</string>
+	<string id="st_save_jup_b207_arrived_to_duty_depot">
+		<text>almacйn de Deber</text>
+	</string>
+	<string id="st_save_zat_b14_got_altered_wheel">
+		<text>origen del extraсo brillo encontrado</text>
+	</string>
+	<string id="st_save_pri_b301_arrived_to_help_zulu">
+		<text>Zulu encontrado</text>
+	</string>
+	<string id="st_save_zat_b42_arrived_to_controler_lair">
+		<text>cueva peligrosa</text>
+	</string>
+	<string id="ui_st_upgrade">
+		<text>Reparaciones/modificaciones</text>
+	</string>
+	<string id="ui_st_buy">
+		<text>Comprar</text>
+	</string>
+	<string id="ui_st_sell">
+		<text>Vender</text>
+	</string>
+	<string id="ui_st_trade">
+		<text>Intercambiar</text>
+	</string>
+	<string id="ui_st_exit_hint">
+		<text>Cerrar ventana ($$ACTION_USE$$)</text>
+	</string>
+	<string id="ui_st_trade_hint">
+		<text>Abrir ventana de intercambio ($$ACTION_SPRINT_TOGGLE$$)</text>
+	</string>
+	<string id="ui_st_upgrade_hint">
+		<text>Abrir ventana de reparaciones y modificaciones ($$ACTION_SPRINT_TOGGLE$$)</text>
+	</string>
+	<string id="ui_st_take_all_hint">
+		<text>Mover todos los objetos a tu mochila ($$ACTION_SPRINT_TOGGLE$$)</text>
+	</string>
+	<string id="ui_st_buy_hint">
+		<text>Comprar los objetos seleccionados</text>
+	</string>
+	<string id="ui_st_sell_hint">
+		<text>Vender los objetos seleccionados</text>
+	</string>
+	<string id="st_save_pri_a28_evacuation_heli">
+		<text>despegue del helicуptero de evacuaciуn</text>
+	</string>
+</string_table>

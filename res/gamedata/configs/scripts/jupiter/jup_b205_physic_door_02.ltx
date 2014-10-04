@@ -1,0 +1,30 @@
+[logic]
+active = ph_door@locked
+
+[ph_door@locked]
+locked = true
+closed = true
+on_info = {!actor_in_zone(jup_b205_zombie_zone_01)} ph_door@closed
+snd_open_start = metal_small_open
+snd_close_start = metal_small_close_start
+snd_close_stop = metal_small_close_stop
+tip_open = tip_open_another_site
+
+[ph_door@closed]
+locked = false
+closed = true
+on_info = {=actor_in_zone(jup_b205_zombie_zone_01)} ph_door@locked
+snd_open_start = metal_small_open
+snd_close_start = metal_small_close_start
+snd_close_stop = metal_small_close_stop
+on_use = ph_door@open
+not_for_npc = true
+tip_open = tip_door_open
+
+[ph_door@open]
+locked = false
+closed = false
+snd_open_start = metal_small_open
+snd_close_start = metal_small_close_start
+snd_close_stop = metal_small_close_stop
+show_tips = false

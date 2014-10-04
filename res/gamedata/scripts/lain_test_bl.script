@@ -1,0 +1,4 @@
+function main ()
+	db.actor:give_info_portion("zat_b38_underground_door_open")
+	db.actor:give_info_portion("zat_b38_disappearance_stalkers_find_to_be_missing_hunter_give")
+end

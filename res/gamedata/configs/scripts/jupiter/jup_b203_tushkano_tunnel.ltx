@@ -1,0 +1,69 @@
+;----------------- коридор 1 ------------------
+[logic@tushkano_1]
+suitable = {=is_monster_tushkano} true
+active = mob_home@tushkano_1
+monster_job = true
+prior = 100
+
+[mob_home@tushkano_1]
+path_home = home_1
+home_min_radius = 1
+home_max_radius = 4
+aggressive = true
+out_restr = jup_b203_tushkano_restr
+on_timer = 20000 | mob_home@tushkano_1_1
+
+[mob_home@tushkano_1_1]
+path_home = home_1_1
+home_min_radius = 1
+home_max_radius = 15
+aggressive = true
+out_restr = jup_b203_tushkano_restr
+on_timer = 15000 | mob_home@tushkano_1
+
+
+;----------------- коридор 2 ------------------
+[logic@tushkano_2]
+suitable = {=is_monster_tushkano} true
+active = mob_home@tushkano_2
+monster_job = true
+prior = 100
+
+[mob_home@tushkano_2]
+path_home = home_1
+home_min_radius = 1
+home_max_radius = 5
+aggressive = true
+out_restr = jup_b203_tushkano_restr
+on_timer = 10000 | mob_home@tushkano_2_1
+
+[mob_home@tushkano_2_1]
+path_home = home_1_1
+home_min_radius = 1
+home_max_radius = 15
+aggressive = true
+out_restr = jup_b203_tushkano_restr
+on_timer = 20000 | mob_home@tushkano_2
+
+;----------------- коридор 3 ------------------
+[logic@tushkano_3]
+suitable = {=is_monster_tushkano} true
+active = mob_home@tushkano_3
+monster_job = true
+prior = 100
+
+[mob_home@tushkano_3]
+path_home = home_1
+home_min_radius = 1
+home_max_radius = 5
+aggressive = true
+out_restr = jup_b203_tushkano_restr
+on_timer = 10000 | mob_home@tushkano_3_1
+
+[mob_home@tushkano_3_1]
+path_home = home_1_1
+home_min_radius = 1
+home_max_radius = 15
+aggressive = true
+out_restr = jup_b203_tushkano_restr
+on_timer = 15000 | mob_home@tushkano_3

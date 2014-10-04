@@ -1,0 +1,192 @@
+--[[------------------------------------------------------------------------------------------------------------------
+Игнорирование врагов
+Чугай Александр
+--------------------------------------------------------------------------------------------------------------------]]
+local ignored_smart = {
+	zat_stalker_base_smart	= true,
+	jup_b41					= true,
+	jup_a6					= true,
+	pri_a16					= true
+}
+
+fighting_with_actor_npcs = {
+}
+
+local smarts_by_no_assault_zones = {
+									["zat_a2_sr_no_assault"] 	= "zat_stalker_base_smart",
+									["jup_a6_sr_no_assault"] 	= "jup_a6",
+									["jup_b41_sr_no_assault"] 	= "jup_b41"
+}
+
+
+function is_enemy(obj, enemy, st, not_check_sim)
+	if not obj:alive() then
+		return false
+	end
+
+	if obj:critically_wounded() then
+		return true
+	end
+
+	if st.enabled == false then
+		return true
+	end
+
+	local overrides = st.overrides
+	local obj_id = obj:id()
+	local storage = db.storage[obj_id]
+	if storage == nil then
+		return true
+	end
+	storage.enemy_id = enemy:id()
+
+	--' Отсеиваем по зоне
+	local active_sector = storage.active_sector
+	if active_sector ~= nil then
+		if sr_danger.check_danger_position(enemy:position(), active_sector) == false then
+--			obj:enable_memory_object( enemy, false )
+			return false
+		end
+	end
+
+	-- Проверка на зоны комбат игнора возле баз:
+		-- игнорировать если:
+		-- враг не актер.
+		-- сталкер находится в зоне.
+		-- смарт в котором находится сталкер не в состоянии тревоги.
+	if enemy:id() ~= db.actor:id() then
+		for k,v in pairs (smarts_by_no_assault_zones) do
+			local zone = db.zone_by_name[k]
+			if zone and (utils.npc_in_zone(obj, zone) or utils.npc_in_zone(enemy, zone)) then
+				local smart = sim_board.get_sim_board():get_smart_by_name(v)
+				if smart and smart.base_on_actor_control ~= nil and smart.base_on_actor_control.status ~= smart_terrain_control.ALARM then
+					return false
+				end
+			end
+		end
+	end
+
+	local se_enemy = alife():object(enemy:id())
+	if se_enemy ~= nil and se_enemy.m_smart_terrain_id ~= nil and se_enemy.m_smart_terrain_id ~= 65535 then
+		local enemy_smart = alife():object(se_enemy.m_smart_terrain_id)
+		local smart_name = enemy_smart:name()
+		if ignored_smart[smart_name] == true then
+--			obj:enable_memory_object( enemy, false )
+			return false
+		end
+	end
+	--printf("checking combat_ignore for stalker[%s] enemy name [%s] in section[%s]",obj:name(), enemy:name(),storage.active_section)
+	--' Если есть оверрайды, то работаем по ним.
+	if overrides and
+		 overrides.combat_ignore
+	then
+		local ret_value = xr_logic.pick_section_from_condlist( enemy, obj, overrides.combat_ignore.condlist )
+		if ret_value == "true" then
+			--printf("pl:Disabling_memory_object[1] for stalker[%s] enemy name [%s] in section[%s]",obj:name(), enemy:name(),storage.active_section)
+--			obj:enable_memory_object( enemy, false )
+			return false
+		end
+		return true
+	end
+	return true
+end
+----------------------------------------------------------------------------------------------------------------------
+
+class "action_process_enemy"
+
+function action_process_enemy:__init( obj, storage )
+	self.object = obj
+	self.st     = storage
+end
+
+function action_process_enemy:enemy_callback( obj, enemy )
+--'	local obj_pos = self.object:position()
+--'	local ene_pos = enemy:position()
+--'	printf("FOUND ENEMY [%s](%s,%s,%s) -> [%s](%s,%s,%s)", self.object:name(), obj_pos.x, obj_pos.y, obj_pos.z,
+--'														   enemy:name(), ene_pos.x, ene_pos.y, ene_pos.z)
+	if enemy:id() == db.actor:id() then
+		fighting_with_actor_npcs[obj:id()] = true
+	end
+
+	local is_obj_enemy = is_enemy( obj, enemy, self.st, false )
+	if is_obj_enemy == true then
+		local se_obj = alife():object(obj:id())
+		if se_obj and se_obj.m_smart_terrain_id ~= 65535 then
+			local smart_obj = alife():object(se_obj.m_smart_terrain_id)
+			smart_obj:set_alarm()
+
+			if enemy:id() == db.actor:id() and smart_obj.base_on_actor_control ~= nil then
+				smart_obj.base_on_actor_control:actor_attack()
+			end
+		end
+		local se_enemy			= alife():object(enemy:id())
+		if se_obj and se_enemy then
+			local sim_obj_registry 	= simulation_objects.get_sim_obj_registry()
+			if 	se_obj.group_id ~= 65535 	and sim_obj_registry.objects[se_obj.group_id] ~= nil and
+				se_enemy.group_id ~= 65535 	and sim_obj_registry.objects[se_enemy.group_id] == nil and
+				se_obj.position:distance_to_sqr(se_enemy.position) > 900 then
+				return false
+			end
+		end
+	end
+
+	return is_obj_enemy
+end
+
+function action_process_enemy:hit_callback(obj, amount, local_direction, who, bone_index)
+	if who == nil then
+		return
+	end
+
+--	printf("_bp: action_process_enemy: hit_callback(): obj='%s'", obj:name())
+	if amount == 0 then
+		-- Кто-то стрельнул в воздух
+		return
+	end
+
+	if who:id() == db.actor:id() then
+		local overrides = self.st.overrides
+		if not overrides or not overrides.combat_ignore_keep_when_attacked then
+			--printf("_bp: action_process_enemy: hit_callback(): obj='%s': SCHEME DISABLED", obj:name())
+			self.st.enabled = false
+		end
+	end
+end
+
+----------------------------------------------------------------------------------------------------------------------
+-- binder
+----------------------------------------------------------------------------------------------------------------------
+function add_to_binder( npc, ini, scheme, section, storage )
+	local new_action = this.action_process_enemy( npc, storage )
+	storage.action = new_action
+end
+
+function set_combat_ignore_checker( npc, ini, scheme)
+	local st = xr_logic.assign_storage_and_bind( npc, ini, scheme )
+end
+
+function reset_combat_ignore_checker(npc, scheme, st, section)
+	local storage = st.combat_ignore
+
+	npc:set_enemy_callback( storage.action.enemy_callback, storage.action )
+
+	-- Подписываемся на hit callback-и:
+	xr_logic.subscribe_action_for_events( npc, storage, storage.action )
+
+	storage.overrides = xr_logic.generic_scheme_overrides(npc)
+
+	storage.enabled = true
+end
+
+
+
+function disable_scheme( npc, scheme )
+	npc:set_enemy_callback()
+
+	-- Отписываемся от hit callback. Это делать обязательно, потому что иначе при переключении на другой набор
+	-- схем, в котором нет перехвата боя, продолжится вызываться callback в старом подписанном action-е.
+	local st = db.storage[npc:id()][scheme]
+	if st then
+		xr_logic.unsubscribe_action_from_events(npc, st, st.action)
+	end
+end

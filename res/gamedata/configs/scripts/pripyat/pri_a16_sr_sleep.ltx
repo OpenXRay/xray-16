@@ -1,0 +1,13 @@
+[logic]
+active = sr_idle@wait
+
+[sr_idle@wait]
+on_actor_inside = sr_idle@run %=run_tutorial(tutorial_sleep)%
+on_info = {+pri_b305_fifth_cam_end -pri_a28_actor_in_zone_stay} sr_idle@idle
+
+[sr_idle@run]
+on_info = {+tutorial_sleep} %-tutorial_sleep =run_tutorial(tutorial_sleep)%
+on_actor_outside = {+tutorial_sleep} sr_idle@wait, sr_idle@wait %=stop_tutorial%
+
+[sr_idle@idle]
+on_info = {+pri_a28_actor_in_zone_stay} sr_idle@wait

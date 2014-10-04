@@ -1,0 +1,226 @@
+[game_relations]
+;реальное разделение на группы репутаций на шкалы
+rating			= novice, 300, experienced, 600, veteran, 900, master
+monster_rating	= weak, 400, normal, 800, strong
+reputation		= terrible, -1000, very_bad, -150, bad, -50, neutral, 50, good, 150, very_good, 1000, excellent
+
+;шкалы для вывода названий вместо чисел
+;рейтингов, репутаций и благосклонности в интерфейсе
+rating_names		= novice, 30, experienced, 60, veteran, 90, master
+reputation_names	= terrible, -1000, very_bad, -150, bad, -50, neutral, 50, good, 150, very_good, 1000, excellent
+goodwill_names      = enemy, -400, indifferent, 500, friendly
+
+;пороговые значения для отношения персонажей
+attitude_neutal_threshold = -999		;когда attitude меньше значения, то выставляется ALife::eRelationEnemy
+attitude_friend_threshold =  999		;когда attitude меньше значения, то выставляется ALife::eRelationNeutral, иначе ALife::eRelationFriend
+
+;константы, которые присвоят скриптовые функции set_relation для personal goodwill
+goodwill_enemy  = -1000
+goodwill_neutal = 0
+goodwill_friend = 1000
+
+;названия группировок (порядок должен совпадать с communities_relations)
+communities		= actor, 0, bandit, 1, dolg, 2, ecolog, 3, freedom, 4, killer, 5, army, 6, monolith, 7, monster, 8, stalker, 9, zombied, 10
+;communities		= actor, 0, actor_dolg, 1, actor_freedom, 2, stalker, 5, monolith, 6, army, 7, killer, 8, ecolog, 9, dolg, 10, freedom, 11, bandit, 12, zombied, 13, csky, 14, trader, 15, arena_enemy, 16, monster, 17
+
+;	отношение персонажа к актеру (или другому NPC) вычисляется по формуле
+;	attitude = personal_goodwill +				//личное отношение персонажа к актеру (если раньше не встречались, то 0)
+;			   community_goodwill +				//отношение группировки персонажа лично к актеру (если раньше контактов не было, то 0)
+;			   community_to_community +			//отношение группировки персонажа к группировке актера из [communities_relations]
+;              reputation_goodwill +			//отношение репутации персонажа к репутации актера из [reputation_relations]
+;			   rank_goodwill					//отношение ранга персонажа к рангу актера из [rank_relations]
+;   столбцы и строки дописывать в алфавитном порядке!
+
+[communities_relations]
+;              |actor|bandit| dolg|ecolog|freedom|killer|    army|monolith|monster|stalker| zombied|
+;===================================================================================================
+actor         =     0,     0,	 0,     0,   	0, -1000,       0,   -5000,  -5000,      0,   -5000
+bandit        =     0,  5000,-5000,     0,  -5000,     0,   -5000,   -5000,  -5000,  -1000,   -5000
+dolg          =     0, -5000, 5000,     0,  -5000,     0,       0,   -5000,  -5000,      0,   -5000
+ecolog        =     0,     0,    0,     0,      0,     0,       0,       0,      0,      0,       0
+freedom       =     0, -5000,-5000,     0,   5000,     0,       0,   -5000,  -5000,      0,   -5000
+killer        = -1000,     0,    0,     0,      0,  1000,   -5000,   -5000,  -5000,      0,   -5000
+army      	  =     0, -5000,    0,     0,      0, -5000,    1000,   -5000,  -5000,      0,   -5000
+monolith      = -5000, -5000,-5000,     0,  -5000, -5000,   -5000,    1000,  -5000,  -5000,    1000
+monster       = -5000, -5000,-5000,     0,  -5000, -5000,   -5000,   -5000,      0,  -5000,   -5000
+stalker       =     0, -1000,    0,     0,      0,     0,       0,   -5000,  -5000,      0,   -5000
+zombied       = -5000, -5000,-5000,     0,  -5000, -5000,   -5000,    1000,  -5000,  -5000,    1000
+
+
+[rank_relations]
+;			  	novice, experienced, veteran, master
+;================================================================
+novice			=	0,		0,        0,		0
+experienced		=   0,		0,        0,		0
+veteran			=   0,      0,        0,        0
+master			=   0,      0,        0,        0
+
+
+
+[reputation_relations]
+;			   terrible, very_bad, bad, neutral, good, very_good, excellent
+;================================================================
+terrible		=	0,		0,		0,	    0,	  0,	  0,	 0
+very_bad		=	0,		0,		0,	    0,	  0,	  0,	 0
+bad	        	=	0,		0,		0,	    0,	  0,	  0,	 0
+neutral			=	0,		0,		0,	    0,	  0,	  0,	 0
+good			=	0,		0,		0,	    0,	  0,	  0,	 0
+very_good		=	0,		0,		0,	    0,	  0,	  0,	 0
+excellent		=	0,		0,		0,	    0,	  0,	  0,	 0
+
+
+;
+; очки рейтинга и репутации начисляемые за определенные действия
+;
+
+;очки рейтинга, получаемые за убийство персонажа
+;с определенным статусом
+[rank_kill_points]
+novice			=        0
+experienced		=		 0
+veteran			=        0
+master			=        0
+
+;коэффициенты "сочувствия" группировок
+;после воздействия на одного из членов группировки
+;goodwill его распространится на остальных членов группировки
+;с определенным коэффициентом
+;(порядок должен совпадать с communities_relations)
+[communities_sympathy]
+actor			=		0.0
+bandit			=		0.0
+dolg			=		0.0
+ecolog			=		0.0
+freedom			=		0.0
+killer			=		0.0
+army			=		0.0
+monolith		=		0.0
+monster			=		0.0
+stalker			=		0.0 ;0.01
+zombied			=		0.0
+
+
+
+
+;очки рейтинга, репутации и доброжелательности начисляемые
+;в зависимости от совершенного действия
+[action_points]
+personal_goodwill_limits			= -3000, 1000
+community_goodwill_limits			= -3000, 1000
+
+
+;-------------------------------------------------------
+;убийство члена группировки отражается на отношении
+;группировки (умножается на communities_sympathy)
+community_member_kill_goodwill  = -1000
+friend_kill_goodwill			= -3000 ;-1000
+neutral_kill_goodwill			= -3000
+enemy_kill_goodwill				= -1
+
+free_community_member_attack_goodwill  	= -500
+free_friend_attack_goodwill				= -3000 ;-2500
+free_neutral_attack_goodwill			= -3000
+free_enemy_attack_goodwill				= -1
+
+danger_community_member_attack_goodwill = -1
+danger_friend_attack_goodwill			= -1
+danger_neutral_attack_goodwill			= -1
+danger_enemy_attack_goodwill			= -1
+
+friend_kill_reputation				= 0
+neutral_kill_reputation				= 0
+enemy_kill_reputation				= 0
+free_friend_attack_reputation		= 0
+free_neutral_attack_reputation		= 0
+free_enemy_attack_reputation		= 0
+danger_friend_attack_reputation		= 0
+danger_neutral_attack_reputation	= 0
+danger_enemy_attack_reputation		= 0
+
+
+;помощь актера персонажу во время боя
+community_member_fight_help_goodwill	= 1000
+friend_fight_help_goodwill   			= 200
+neutral_fight_help_goodwill	 			= 200
+enemy_fight_help_goodwill    			= 1
+
+friend_fight_help_reputation  = 0
+neutral_fight_help_reputation = 0
+enemy_fight_help_reputation	  = 0
+
+
+
+
+
+
+
+;--------------------------------------------------
+;(сек) минимальное время через которое снова будет зарегистрировано
+;сообщение об атаке на персонажа, и соответственно вычтеся attack_goodwill и attack_reputation
+;(работает аналогично и при помощи другим персонажам в бою)
+min_attack_delta_time = 1
+fight_remember_time = 0.2		;(cек) время которое про драку будет помнить реестр
+
+;свойства, которые изменяются у сталкеров в
+;зависимости от их ранга
+;коэффициенты линейно интерполируются для рангов от 0 (novice) до 100 (experienced)
+
+
+
+
+
+
+
+
+
+
+[ranks_properties]
+immunities_novice_k			= 1.0
+immunities_experienced_k	= 1.0
+
+visibility_novice_k			= 1
+visibility_experienced_k	= 1
+
+dispersion_novice_k			= 1.0
+dispersion_experienced_k	= 0.05
+
+
+; диапазон изменения рангов при регистрации в новом смарт террейне
+[smart_terrain_rank_change]
+min = 1
+max = 2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; for monsters
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[monster_communities]
+;номера team которые присваиваются соответствующим видам
+;255 - команда не задается
+communities = actor, 255, human, 255, zoo_monster, 39, boar, 40, bloodsucker, 41, flesh, 42,  dog, 43, pseudodog, 44, cat, 45, chimera, 46, giant, 47, zombie, 48,  burer, 49, controller, 50, poltergeist, 51, snork, 52, fracture, 53, bird, 54, rat, 55, tushkano, 56
+
+[monster_relations]
+; [1] друг, [0] нейтрал, [-1] враг, [-2] злейший враг
+;				    actor,human,zoo_monstr, boar, bloodsucker, flesh,  dog, pseudodog, cat, chimera, giant, zombie,  burer, controller, poltergeist, snork, fracture, bird,   rat, tushkano
+;============================================================================================================================================================================================
+actor			=	 1,		 1,	    1,		-1,		-1,			-1,		-1,		-1,		-1,		-1,		-1,		-1,		-1,		-1,			-1,			-1,		-1,		0,		 0,		-1
+human			= 	 0,		 1,	    1,		-1,		-1,			-1,		-1,		-1,		-1,		-1,		-1,		-1,		-1,		-1,			-1,			-1,		-1,		0,		 0,		-1
+zoo_monster		=	 1,		 1,		0,		 0,		 0,			 0,		 0,		 0,		 0,		 0,		 0,		 0,		 0,		 0,			 0,			 0,		 0,		0,		 0,		 0
+boar			=	-2,		-2,		0,		 1,		-1,			 0,		-1,		-1,		 0,		-1,		-1,		 0,		-1,		 0,			 0,			-1,		 0,		0,		 0,		-1
+bloodsucker		=	-2,		-2,		0,		-1,		 1,			-1,		-1,		-1,		 0,		 0,		-1,		 0,		-1,		-1,			 0,			-1,		 0,		0,		 0,		 0
+flesh			=	-2,		-2,		0,		 1,		-1,			 1,		-1,		-1,		 0,		-1,		 0,		 0,		 0,		 0,			 0,			-1,		 0,		0,		 0,		-1
+dog				=	-2,		-2,		0,		-1,		-1,			-1,		 1,		 1,		 0,		 0,		-1,		 0,		-1,		 0,			 0,			-1,		 0,		0,		 0,		 0
+pseudodog		=	-2,		-2,		0,		-1,		-1,			-1,		 1,		 1,		 0,		 0,		-1,		 0,		-1,		 0,			 0,			-1,		 0,		0,		 0,		 0
+cat				=	-2,		-2,		0,		 0,		 0,			 0,		 0,		 0, 	 1,		 0,		 0,		 0,		 0,		 0,			 0,			 0,		 0,		0,		 0,		 0
+chimera			=	-2,		-2,		0,		-1,		 0,			-1,		 0,		 0,		 0, 	 1,		-1,		 0,		-1,		-1,			 0,			-1,		 0,		0,		 0,		 0
+giant			=	-2,		-2,		0,		-1,		-1,			 0,		-1,		-1,		 0,		-1,		 1,		 0,		 0,		 0,			 0,			 0,		 0,		0,		 0,		-1
+zombie			=	-2,		-2,		0,		 0,		 0,			 0,		 0,		 0,		 0,		 0,		 0,		 1,		 0,		 0,			 0,			 0,		 0,		0,		 0,		 0
+burer			=	-2,		-2,		0,		-1,		-1,			 0,		-1,		-1,		 0,		-1,		 0,		 0,		 1,		 0,			 0,			 0,		 0,		0,		 0,		 0
+controller		=	-2,		-2,		0,		 0,		-1,			 0,		 0,		 0,		 0,		-1,		 0,		 0,		 0,		 1,			 0,			-1,		 0,		0,		 0,		 0
+poltergeist		=	-2,		-2,		0,		 0,		 0,		     0,		 0,		 0,		 0,		 0,		 0,		 0,		 0,		 0,			 1,			 0,		 0,		0,		 0,		 0
+snork			=	-2,		-2,		0,		-1,		-1,			-1,		-1,		-1,		 0,		-1,		 0,		 0,		 0,		-1,			 0,			 1,		 0,		0,		 0,		 0
+fracture		=	-2,		-2,		0,		 0,		 0,			 0,		 0,		 0,		 0,		 0,		 0,		 0,		 0,		 0,			 0,			 0,		 1,		0,		 0,		 0
+bird			=	 0,		 0,		0,		 0,		 0,			 0,		 0,		 0,		 0,		 0,		 0,		 0,		 0,		 0,			 0,			 0,		 0,		1,		 0,		 0
+rat				=	-2,		-1,		0,		 0,		 0,			 0,		 0,		 0,		 0,		 0,		 0,		 0,		 0,		 0,			 0,			 0,		 0, 	0,		 1,		 0
+tushkano		=	-2,		-1,		0,		-1,		 0,			-1,		 0,		 0,		 0,		 0,		-1,		 0,		 0,		 0,			 0,			 0,		 0,		0,		 0,		 1
+

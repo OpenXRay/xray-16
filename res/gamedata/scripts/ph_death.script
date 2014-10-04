@@ -1,0 +1,46 @@
+----------------------------------------------------------------------------------------------------
+-- Physics death checker
+----------------------------------------------------------------------------------------------------
+-- Разработчик: Tunduk Vladimir aka Sidorovich
+----------------------------------------------------------------------------------------------------
+
+class "ph_on_death"
+
+function ph_on_death:__init(obj, storage)
+	self.object = obj
+	self.st = storage
+end
+
+function ph_on_death:reset_scheme()
+end
+
+function ph_on_death:update(delta)
+end
+
+function ph_on_death:death_callback (obj, who)
+	if db.storage[self.object:id()].active_scheme then
+		if xr_logic.try_switch_to_another_section (obj, self.st, db.actor) then
+			return
+		end
+	end
+end
+
+---------------------------------------------------------------------------------------------------------------------
+function add_to_binder(npc, ini, scheme, section, storage)
+	printf("DEBUG: add_to_binder: npc:name()='%s', scheme='%s', section='%s'", npc:name(), scheme, section)
+
+ 	local action = ph_on_death(npc, storage)
+	storage.action = action
+	xr_logic.subscribe_action_for_events (npc, storage, action)
+end
+
+function set_scheme(npc, ini, scheme, section, gulag_name)
+	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
+	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, npc)
+end
+
+function disable_scheme(npc, scheme)
+---	npc:set_callback(callback.death, nil)
+end
+
+

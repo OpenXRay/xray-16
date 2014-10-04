@@ -1,0 +1,23 @@
+[logic]
+active = sr_idle@pas_b400_sr_tunnel_1
+
+[sr_idle@pas_b400_sr_tunnel_1]
+on_info = {-pas_b400_sr_tunnel_1 =actor_in_zone(pas_b400_sr_tunnel_1)} %+pas_b400_sr_tunnel_1%
+on_info2 = {=actor_in_zone(pas_b400_sr_tunnel_2)} sr_idle@pas_b400_sr_tunnel_2 %-pas_b400_sr_tunnel_1 +pas_b400_sr_tunnel_2%
+
+[sr_idle@pas_b400_sr_tunnel_2]
+on_info = {=actor_in_zone(pas_b400_sr_tunnel_3) !actor_in_zone(pas_b400_sr_tunnel_2)} sr_idle@pas_b400_sr_tunnel_3 %-pas_b400_sr_tunnel_2 +pas_b400_sr_tunnel_3%
+
+[sr_idle@pas_b400_sr_tunnel_3]
+on_info = {=actor_in_zone(pas_b400_sr_tunnel_2) !actor_in_zone(pas_b400_sr_tunnel_3)} sr_idle@pas_b400_sr_tunnel_2 %-pas_b400_sr_tunnel_3 +pas_b400_sr_tunnel_2%
+on_info2 = {=actor_in_zone(pas_b400_sr_tunnel_4)} sr_idle@pas_b400_sr_tunnel_4 %-pas_b400_sr_tunnel_3 +pas_b400_sr_tunnel_4%
+
+[sr_idle@pas_b400_sr_tunnel_4]
+on_info = {=actor_in_zone(pas_b400_sr_tunnel_3) !actor_in_zone(pas_b400_sr_tunnel_4)} sr_idle@pas_b400_sr_tunnel_3 %-pas_b400_sr_tunnel_4 +pas_b400_sr_tunnel_3%
+on_info2 = {=actor_in_zone(pas_b400_sr_tunnel_5)} sr_idle@pas_b400_sr_tunnel_5 %-pas_b400_sr_tunnel_4 +pas_b400_sr_tunnel_5%
+
+[sr_idle@pas_b400_sr_tunnel_5]
+on_info = {=actor_in_zone(pas_b400_sr_tunnel_4) !actor_in_zone(pas_b400_sr_tunnel_5)} sr_idle@pas_b400_sr_tunnel_4 %-pas_b400_sr_tunnel_5 +pas_b400_sr_tunnel_4%
+on_info2 = {+pas_b400_tunnel_done} sr_idle@nil
+
+[sr_idle@nil]

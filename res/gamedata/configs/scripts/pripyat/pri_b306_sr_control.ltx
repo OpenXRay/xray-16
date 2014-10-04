@@ -1,0 +1,40 @@
+[logic]
+active = sr_idle@spawn_envoy
+
+[sr_idle@spawn_envoy]
+on_info = sr_idle@wait %=spawn_corpse(pri_b306_envoy:pri_b306_spawn_envoy:0) =turn_off(pri_b306_lamp_1:pri_b306_lamp_2:pri_b306_lamp_3:pri_b306_lamp_4:pri_b306_lamp_5:pri_b306_lamp_6:pri_b306_lamp_7:pri_b306_lamp_8:pri_b306_lamp_9)%
+
+[sr_idle@wait]
+on_info = {+zat_a23_actor_has_gauss_rifle_documentation +pri_b306_task_start} sr_idle@wait_for_generator %=give_task(pri_b306_task)%
+on_info2 = {-zat_a23_actor_has_gauss_rifle_documentation +pri_b306_lift_used -pri_b306_lift_generator_started} sr_idle@wait_for_task
+on_info3 = {-zat_a23_actor_has_gauss_rifle_documentation +pri_b306_lift_used +pri_b306_lift_generator_started} sr_idle@wait_for_generator
+on_info4 = {-pri_b306_task_start +pri_b306_lift_used} %+pri_b306_task_start%
+on_info5 = {-pri_b306_lift_used +pri_b306_lift_generator_started} %+pri_b306_lift_used +pri_b306_task_start%
+
+[sr_idle@wait_for_task]
+on_info = {-zat_a23_actor_has_gauss_rifle_documentation +pri_b306_lift_generator_started} sr_idle@wait_for_generator
+on_info2 = {+zat_a23_actor_has_gauss_rifle_documentation +pri_b306_lift_generator_started} sr_idle@wait_for_generator %=give_task(pri_b306_task)%
+
+[sr_idle@wait_for_generator]
+on_info = {+pri_b306_lift_generator_started} sr_idle@wait_for_end %=turn_on(pri_b306_lamp_1:pri_b306_lamp_2:pri_b306_lamp_3) =anim_obj_forward(pri_b306_door:pri_b306_door_0000:pri_b306_door_0001:pri_b306_door_0002)%
+
+[sr_idle@wait_for_end]
+on_info = {+pri_b306_actor_to_lab} sr_idle@add_mercs %+pri_b306_task_end%
+
+[sr_idle@add_mercs]
+on_info = {-pri_a19_lab_x8_investigated +lx8_doc_1} %+pri_a19_lab_x8_investigated%
+on_info2 = {+lx8_door_open +pri_b35_envoy_escape -pri_b35_merc_leader_escape} sr_idle@mercs_attack %=create_squad(pri_b306_mercs_squad_light:pri_b306)%
+on_info3 = {+lx8_door_open +pri_b35_envoy_escape +pri_b35_merc_leader_escape} sr_idle@mercs_attack %=create_squad(pri_b306_mercs_squad_strong:pri_b306)%
+on_info4 = {-pri_b306_attack_end +pri_b35_envoy_out} sr_idle@wait_lab %+pri_b306_attack_end%
+on_info5 = {+pri_b35_task_refuse} sr_idle@wait_lab %+pri_b306_attack_end%
+
+[sr_idle@mercs_attack]
+on_info = {!black_screen !actor_in_zone(pri_b306_sr_lift_exit)} sr_idle@wait_for_attack_end %+pri_b306_mercs_attack_start%
+
+[sr_idle@wait_for_attack_end]
+on_info = {=distance_to_obj_ge(pri_b306_sr_control:75)} sr_idle@wait_lab %+pri_b306_attack_end%
+
+[sr_idle@wait_lab]
+on_info = {-pri_a19_lab_x8_investigated +lx8_doc_1} %+pri_a19_lab_x8_investigated%, {+pri_a19_lab_x8_investigated} sr_idle@nil
+
+[sr_idle@nil]

@@ -1,0 +1,879 @@
+local	temp = {}
+if (move ~= nil) then
+	temp = move
+end
+move	= temp
+
+function get_smart_cover()
+	return {
+			need_weapon = true,
+			loopholes = {
+				-- Крауч
+				smart_covers_loophole_crouch_front_left.get_loophole	("crouch_front_left",	vector():set(-1,	0,	-0.7)),
+				smart_covers_loophole_crouch_front.get_loophole			("crouch_front",		vector():set(-1,	0,	0)),
+				smart_covers_loophole_crouch_front_right.get_loophole	("crouch_front_right",	vector():set(-1,	0,	0.7)),
+				smart_covers_loophole_crouch_right.get_loophole			("crouch_right",		vector():set(0.2,	0,	1)),
+				smart_covers_loophole_crouch_back.get_loophole			("crouch_back",			vector():set(1,		0,	0)),
+				smart_covers_loophole_crouch_left.get_loophole			("crouch_left",			vector():set(0.2,	0,	-1)),
+
+				-- Стоя
+				smart_covers_loophole_stand_front_left.get_loophole		("stand_front_left",	vector():set(-1,	0,	-0.7)),
+				smart_covers_loophole_stand_front_right.get_loophole	("stand_front_right",	vector():set(-1,	0,	0.7)),
+				smart_covers_loophole_stand_right.get_loophole			("stand_right",		vector():set(0.2,	0,	1)),
+				smart_covers_loophole_stand_back.get_loophole			("stand_back",			vector():set(1,		0,	0)),
+				smart_covers_loophole_stand_left.get_loophole			("stand_left",			vector():set(0.2,	0,	-1))
+
+
+				-- Лежа
+			},
+
+
+
+
+
+
+
+
+
+
+
+			transitions = {
+			--' Анимации входа в бойницы
+			{
+				vertex0 = "",
+				vertex1 = "crouch_front_left",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_crouch_in_front_left_0",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+														}
+							}
+			},
+			{
+				vertex0 = "",
+				vertex1 = "crouch_front",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_crouch_in_front_0",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+														}
+							}
+			},
+			{
+				vertex0 = "",
+				vertex1 = "crouch_front_right",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_crouch_in_front_right_0",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+														}
+							}
+			},
+			{
+				vertex0 = "",
+				vertex1 = "crouch_right",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_crouch_in_right_0",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+														}
+							}
+			},
+			{
+				vertex0 = "",
+				vertex1 = "crouch_back",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_crouch_in_back_0",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+														}
+							}
+			},
+			{
+				vertex0 = "",
+				vertex1 = "crouch_left",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_crouch_in_left_0",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+														}
+							}
+			},
+
+			{
+				vertex0 = "",
+				vertex1 = "stand_front_left",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_stand_in_front_left_0",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+														}
+							}
+			},
+			{
+				vertex0 = "",
+				vertex1 = "stand_front_right",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_stand_in_front_right_0",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+														}
+							}
+			},
+			{
+				vertex0 = "",
+				vertex1 = "stand_right",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_stand_in_right_0",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+														}
+							}
+			},
+			{
+				vertex0 = "",
+				vertex1 = "stand_back",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_stand_in_back_0",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+														}
+							}
+			},
+			{
+				vertex0 = "",
+				vertex1 = "stand_left",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_stand_in_left_0",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+														}
+							}
+			},
+
+
+
+
+
+
+			--' Анимации перехода.
+			{
+				vertex0 = "crouch_front_left",
+				vertex1 = "crouch_back",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_crauch_transition_front_left_to_back",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "crouch_front_left",
+				vertex1 = "crouch_left",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_crouch_front_left_attack_idle_0",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "crouch_front",
+				vertex1 = "crouch_back",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_crauch_transition_front_right_to_back",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "crouch_front_right",
+				vertex1 = "crouch_back",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_crauch_transition_front_right_to_back",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "crouch_left",
+				vertex1 = "crouch_back",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_crauch_transition_left_to_back",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "crouch_right",
+				vertex1 = "crouch_back",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_crauch_transition_right_to_back",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+
+			{
+				vertex0 = "crouch_back",
+				vertex1 = "crouch_front_left",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_crauch_transition_back_to_front_left",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "crouch_back",
+				vertex1 = "crouch_front",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_crauch_transition_back_to_front_right",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "crouch_back",
+				vertex1 = "crouch_front_right",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_crauch_transition_back_to_front_right",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "crouch_back",
+				vertex1 = "crouch_left",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_crauch_transition_back_to_left",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "crouch_back",
+				vertex1 = "crouch_right",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_crauch_transition_back_to_right",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+
+
+
+
+			{
+				vertex0 = "stand_front_left",
+				vertex1 = "stand_back",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_stand_transition_front_left_to_back",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "stand_front_right",
+				vertex1 = "stand_back",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_stand_transition_front_right_to_back",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "stand_left",
+				vertex1 = "stand_back",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_stand_transition_left_to_back",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "stand_right",
+				vertex1 = "stand_back",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_stand_transition_right_to_back",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+
+			{
+				vertex0 = "stand_back",
+				vertex1 = "stand_front_left",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_stand_transition_back_to_front_left",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "stand_back",
+				vertex1 = "stand_front_right",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_stand_transition_back_to_front_right",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "stand_back",
+				vertex1 = "stand_left",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_stand_transition_back_to_left",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "stand_back",
+				vertex1 = "stand_right",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_stand_transition_back_to_right",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+
+
+			{
+				vertex0 = "stand_back",
+				vertex1 = "crouch_back",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "stand_to_crauth",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "crouch_back",
+				vertex1 = "stand_back",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "crouch_to_stand",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+
+
+
+
+
+
+			--' Анимации выхода из бойниц.
+			{
+				vertex0 = "crouch_front_left",
+				vertex1 = "",
+				weight = 1.1,
+				actions =	{
+							{
+
+								precondition_functor = "smart_covers.script_functor_jump",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_1_jump_0",
+												position = vector():set(-3,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							},
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "crouch_front",
+				vertex1 = "",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_jump",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_2_jump_0",
+												position = vector():set(-3,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							},
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "crouch_front_right",
+				vertex1 = "",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_jump",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "loophole_3_jump_0",
+												position = vector():set(-3,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							},
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "crouch_right",
+				vertex1 = "",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+														}
+							}
+			},
+			{
+				vertex0 = "crouch_back",
+				vertex1 = "",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+														}
+							}
+			},
+			{
+				vertex0 = "crouch_left",
+				vertex1 = "",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+														}
+							}
+			},
+
+			{
+				vertex0 = "stand_front_left",
+				vertex1 = "",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "stand_front_right",
+				vertex1 = "",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "stand_right",
+				vertex1 = "",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+														}
+							}
+			},
+			{
+				vertex0 = "stand_back",
+				vertex1 = "",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+														}
+							}
+			},
+			{
+				vertex0 = "stand_left",
+				vertex1 = "",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+								actions =	{
+											{
+												animation = "",
+												position = vector():set(0,0,0),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+														}
+							}
+			}
+
+
+
+		}
+	}
+end

@@ -1,0 +1,39 @@
+class "se_level_changer" (cse_alife_level_changer)
+--------------------
+function se_level_changer:__init(section) super (section)
+	self.enabled = true
+	self.hint = "level_changer_invitation"
+end
+--------------------
+function se_level_changer:on_register()
+	cse_alife_level_changer.on_register(self)
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
+end
+--------------------
+function se_level_changer:on_unregister()
+	unregister_story_object_by_id(self.id)
+	cse_alife_level_changer.on_unregister(self)
+end
+--------------------
+function se_level_changer:STATE_Write(packet)
+	cse_alife_level_changer.STATE_Write(self, packet)
+
+	set_save_marker(packet, "save", false, "se_level_changer")
+	packet:w_bool(self.enabled)
+		packet:w_stringZ(self.hint)
+	set_save_marker(packet, "save", true, "se_level_changer")
+end
+--------------------
+function se_level_changer:STATE_Read(packet, size)
+	cse_alife_level_changer.STATE_Read(self, packet, size)
+	-- под LevelEditor не пытаться читать из пакета ничего
+	if editor() then
+		return
+	end
+
+	set_save_marker(packet, "load", false, "se_level_changer")
+	self.enabled = packet:r_bool()
+	self.hint = packet:r_stringZ()
+	set_save_marker(packet, "load", true, "se_level_changer")
+end

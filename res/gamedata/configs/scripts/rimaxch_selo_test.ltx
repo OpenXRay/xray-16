@@ -1,0 +1,32 @@
+[walker@def]
+path_walk = way
+corpse_detection_enabled = false
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true 
+meet = no_meet
+
+
+
+
+[logic@work1]
+active = walker@1
+suitable = {=check_npc_name(pri_a22_military_yarmoshuk)} true
+prior = 200
+known_info = known_info
+
+[walker@1]:walker@def
+on_game_timer = 100 | %=kill_npc%
+
+[known_info]
+test_info
+
+
+
+
+[logic@work2]
+active = walker@2
+suitable = {=check_npc_name(pri_a22_military_skelja)} true
+prior = 200
+
+[walker@2]:walker@def
+on_game_timer = 100 | %=kill_npc%

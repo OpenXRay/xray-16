@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="ammo-11.43x23-fmj">
+		<text>Stшelivo .45 ACP</text>
+	</string>
+	<string id="ammo-11.43x23-fmj_descr">
+		<text>Celoplбљќovб munice rбћe .45 je dнky svй tмћkй kulce a relativnм malй prachovй nбloћi populбrnн uћ pшes sto let. Stшela je sice relativnм pomalб, ale velmi pшesnб a mб sluљnou zastavovacн sнlu.</text>
+	</string>
+	<string id="ammo-11.43x23-fmj_s">
+		<text>.45 ACP</text>
+	</string>
+	<string id="ammo-11.43x23-hydro">
+		<text>Stшelivo .45 ACP Hydrashock</text>
+	</string>
+	<string id="ammo-11.43x23-hydro_descr">
+		<text>Toto nezvyklй stшelivo rбћe .45 ACP tvoшн plбљќovanб kulka s expanznн dutou љpiиkou a ocelovэm jбdrem. Ve vэsledku jde v podstatм o kombinaci prщraznй a expanznн stшely, kterб mб vэhody obou typщ stшeliva, ale takй jejich nevэhody.</text>
+	</string>
+	<string id="ammo-11.43x23-hydro_s">
+		<text>.45 Hydro</text>
+	</string>
+	<string id="ammo-12x70-buck">
+		<text>Stшelivo 12x70 broky</text>
+	</string>
+	<string id="ammo-12x70-buck_descr">
+		<text>Standardnн nбboje pro brokovnici dvanбctku naplnмnй 6 mm broky. Na krбtkou vzdбlenost smrtнcн. Vhodnй pouze pro zbranм bez vэvrtu hlavnм.</text>
+	</string>
+	<string id="ammo-12x70-buck_s">
+		<text>12x70 brok</text>
+	</string>
+	<string id="ammo-12x76-zhekan">
+		<text>Stшelivo 12x76 kulobrok</text>
+	</string>
+	<string id="ammo-12x76-zhekan_descr">
+		<text>Tato tмћkб kulovб stшela pro brokovnice dvanбctky se normбlnм pouћнvб pro lov velkй zvмшe, ale hodн se i na jinй pouћitн. Tмћkб kula pшнpadnou zbroj neprorazн, ale prostм ji rozdrtн. </text>
+	</string>
+	<string id="ammo-12x76-zhekan_s">
+		<text>12x76 kulobrok</text>
+	</string>
+	<string id="ammo-5.45x39-ap">
+		<text>Stшelivo 5.45x39 mm AP</text>
+	</string>
+	<string id="ammo-5.45x39-ap_descr">
+		<text>Vojenskй stшelivo 7H22 rбћe 5.45x39, prщraznб munice pro automatickй puљky zemн Varљavskй smlouvy. Stшela obsahuje penetrбtor z tvrzenй slitiny. Efektivnн proti pancйшovбnн.</text>
+	</string>
+	<string id="ammo-5.45x39-ap_s">
+		<text>5.45x39 AP</text>
+	</string>
+	<string id="ammo-5.45x39-fmj">
+		<text>Stшelivo 5.45x39 mm</text>
+	</string>
+	<string id="ammo-5.45x39-fmj_descr">
+		<text>Vojenskй stшelivo 7H10 rбћe 5.45x39, vylepљenб prщraznб munice pro automatickй puљky zemн Varљavskй smlouvy. Je pшesnмjљн neћ stшely rбћe 7.62 dнky snнћenйmu zpмtnйmu rбzu. Mб i o cca 100 metrщ delљн dosah.</text>
+	</string>
+	<string id="ammo-5.45x39-fmj_s">
+		<text>5.45x39</text>
+	</string>
+	<string id="ammo-5.56x45-ap">
+		<text>Stшelivo 5.56x45 mm AP</text>
+	</string>
+	<string id="ammo-5.56x45-ap_descr">
+		<text>Bмћnй prщraznй vojenskй NATO stшelivo rбћe 5.56x45, oznaиovanй jako SS190/M855. Bмћnм pouћнvanй zбpadnнmi bezpeиnostnнmi agenturami a zvlбљtnнmi sluћbami. Velmi efektivnн proti osobnнm zbrojнm.</text>
+	</string>
+	<string id="ammo-5.56x45-ap_s">
+		<text>5.56x45 mm AP</text>
+	</string>
+	<string id="ammo-5.56x45-ss190">
+		<text>Stшelivo 5.45x45 mm</text>
+	</string>
+	<string id="ammo-5.56x45-ss190_descr">
+		<text>Standardnн munice NATO rбћe 5.56x45, urиenб pro pшesnou automatickou stшelbu. Zaloћeno na loveckй munici, mб dobrou balistickou charakteristiku. Bмћnм oznaиovбno indexem SS109.</text>
+	</string>
+	<string id="ammo-5.56x45-ss190_s">
+		<text>5.56x45</text>
+	</string>
+	<string id="ammo-7.62x54-7h14">
+		<text>Stшelivo 7.62x54 mm 7H1</text>
+	</string>
+	<string id="ammo-7.62x54-7h14_descr">
+		<text>Odstшelovaиskб munice rбћe 7.62 s ocelovэm penetrбtorem, speciбlnм navrћenб pro SVD. Na rozdнl od stшeliva urиenйho pro kulomety mб 7H1 lepљн soustшel a vynikajнcн prщraznost.</text>
+	</string>
+	<string id="ammo-7.62x54-7h14_s">
+		<text>7.62 7H1</text>
+	</string>
+	<string id="ammo-7.62x54-ap">
+		<text>Stшelivo 7.62x54 mm PP</text>
+	</string>
+	<string id="ammo-7.62x54-ap_descr">
+		<text>Lacinй stшelivo rбћe 7.62 urиenй pro kulomety. Nenн vhodnй pro odstшelovaиskй puљky, pouћнvб se pouze u kulometщ RP-74.</text>
+	</string>
+	<string id="ammo-7.62x54-ap_s">
+		<text>7.62x54 PP</text>
+	</string>
+	<string id="ammo-9x18-fmj">
+		<text>Stшelivo 9x18 mm</text>
+	</string>
+	<string id="ammo-9x18-fmj_descr">
+		<text>Celoplбљќovб stшela s ocelovэm penetrбtorem a olovмnэm jбdrem. Dobrб zastavovacн sнla, neefektivnн proti neprщstшelnэm vestбm.</text>
+	</string>
+	<string id="ammo-9x18-fmj_s">
+		<text>9x18</text>
+	</string>
+	<string id="ammo-9x18-pmm">
+		<text>Stшelivo 9x18 mm +P+</text>
+	</string>
+	<string id="ammo-9x18-pmm_descr">
+		<text>Toto stшelivo pouћнvб kulky s vylepљenou zastavovacн silou. Evropskй oznaиenн +P+ urиuje, ћe jde o "pшetlakovou munici" s 30% zvэљenнm ъsќovй rychlosti. Neefektivnн na neprщstшelnй vesty a osobnн pancйшovбnн.</text>
+	</string>
+	<string id="ammo-9x18-pmm_s">
+		<text>9x18 +P+ </text>
+	</string>
+	<string id="ammo-9x19-fmj">
+		<text>Stшelivo 9x19 mm FMJ</text>
+	</string>
+	<string id="ammo-9x19-fmj_descr">
+		<text>Zбkladnн stшelivo rбћe 9x19 s celoplбљќovou kulkou mб dobrй charakteristiky a jeho vэroba je lacinб. Stшelivo je populбrnн s ohledem na fakt, ћe mezinбrodnн konvence zakazujн pouћнvбnн expanznн munice v boji. Neefektivnн na neprщstшelnй vesty a osobnн pancйшovбnн.</text>
+	</string>
+	<string id="ammo-9x19-fmj_s">
+		<text>9x19 FMJ</text>
+	</string>
+	<string id="ammo-9x19-pbp">
+		<text>Stшelivo 9x19 mm JHP</text>
+	</string>
+	<string id="ammo-9x19-pbp_descr">
+		<text>Stшelivo rбћe 9x19 s celoplбљќovэm kulkami s dutou љpiиkou mб vysokou zastavovacн sнlu a malй sklony k odrazщm. Pouћнvб se pro osobnн ochranu a pro policejnн ъиely. Neefektivnн na neprщstшelnй vesty a osobnн pancйшovбnн s ohledem na nнzkou prщraznost.</text>
+	</string>
+	<string id="ammo-9x19-pbp_s">
+		<text>9x19 JHP</text>
+	</string>
+	<string id="ammo-9x39-ap">
+		<text>Stшelivo 9x39 mm SP-6</text>
+	</string>
+	<string id="ammo-9x39-ap_descr">
+		<text>SP-6 je podzvukovб munice pro ъtoиnй puљky s mмkkou celoplбљќovou stшelou a tvrdэm ocelovэm jбdrem. Pro tichou stшelbu vyћaduje tlumiи. Munici pouћнvajн speciбlnн sluћby zemн Varљavskй smlouvy. Efektivnн pшi stшelbм na neprщstшelnй vesty.</text>
+	</string>
+	<string id="ammo-9x39-ap_s">
+		<text>9x39 SP-6</text>
+	</string>
+	<string id="ammo-9x39-pab9">
+		<text>Stшelivo 9x39 mm SP-5</text>
+	</string>
+	<string id="ammo-9x39-pab9_descr">
+		<text>SP-5 je podzvukovб odstшelovaиskб munice s bimetalickэm plбљtмm. Stшela obsahuje ocelovй jбdro obalenй olovem. Pro tichou stшelbu vyћaduje tlumiи. Munici pouћнvajн speciбlnн sluћby zemн Varљavskй smlouvy.</text>
+	</string>
+	<string id="ammo-9x39-pab9_s">
+		<text>9x39 mm SP-5</text>
+	</string>
+	<string id="ammo-gauss">
+		<text>Baterie</text>
+	</string>
+	<string id="ammo-m209">
+		<text>Granбt M203</text>
+	</string>
+	<string id="ammo-m209_descr">
+		<text>Granбt rбћe 40 mm pro podvмsnэ granбtomet M203. Granбt mб zуnu ъиinku o prщmмru pмt metrщ. Je takй vhodnэ pro pouћitн v integrovanйm granбtometu FT-200M.</text>
+	</string>
+	<string id="ammo-m209_s">
+		<text>M203</text>
+	</string>
+	<string id="ammo-og-7b">
+		<text>Hlavice OG-7V</text>
+	</string>
+	<string id="ammo-og-7b_descr">
+		<text>Tшнљtivб hlavice pro protipмchotnн boj pouћнvanб raketometem RPG-7u. Hlavice se pouћнvб pro likvidaci nepшбtel v krytu, kteшн jsou mimo dosah ruиnнch granбtщ.</text>
+	</string>
+	<string id="ammo-og-7b_s">
+		<text>OG-7V</text>
+	</string>
+	<string id="ammo-vog-25">
+		<text>Granбt VOG-25</text>
+	</string>
+	<string id="ammo-vog-25_descr">
+		<text>Bмћnэ tшнљtivэ granбt pro podvмsnэ granбtomet GP-25 Koster. Zуna ъиinku je pмt metrщ. Granбt se takй pouћнvб v revolverovйm granбtometu Bulldog 6 a v komplexu Tunder S14.</text>
+	</string>
+	<string id="ammo-vog-25_s">
+		<text>VOG-25</text>
+	</string>
+	<string id="st_addon_scope">
+		<text>Optika PSO-1m</text>
+	</string>
+	<string id="st_addon_scope_descr">
+		<text>Bмћnб sovмtskб fixnн optika se zvмtљenнm 5x. Pшipojuje se ke standardnн montбћnн liљtм zbranн zemн Varљavskй smlouvy.</text>
+	</string>
+	<string id="st_addon_scope_detector">
+		<text>Optika PSS-2x</text>
+	</string>
+	<string id="st_addon_scope_detector_descr">
+		<text>Optika s fixnнm zvмtљenнm 5.0x se zabudovanou termovizн pouћнvanou k identifikaci tepelnэch zdrojщ typickэch pro lidskй tмlo. Urиenб pro pouћitн speciбlnнmi jednotkami. Pшipojuje se ke standardnн montбћnн liљtм zbranн zemн Varљavskй smlouvy.</text>
+	</string>
+	<string id="st_addon_scope_night_vision">
+		<text>Optika NSPU-3</text>
+	</string>
+	<string id="st_addon_scope_night_vision_descr">
+		<text>Fixnн optika se zvмtљenнm 5.0x s optickэm nбsobiиem pro boj v temnotм. Pшipojuje se ke standardnн montбћnн liљtм zbranн zemн Varљavskй smlouvy.</text>
+	</string>
+	<string id="st_addon_scope_susat">
+		<text>Optika SUSAT 4x</text>
+	</string>
+	<string id="st_addon_scope_susat_custom_descr">
+		<text>Nastavitelnб optika 1.6-4x s automatickou ъpravou obrazu pro lepљн palebnou efektivitu. Pшipojuje se ke standardnн montбћnн liљtм Picatinny zbranн NATO.</text>
+	</string>
+	<string id="st_addon_scope_susat_descr">
+		<text>Fixnн optika 4x vyrбbмnб v zбpadnнch zemнch. Pшipojuje se ke standardnн montбћnн liљtм Picatinny zbranн NATO. Иasto pouћнvanб pro vedenн pшesnй palby ruиnнmi zbranмmi na stшednн aћ velkй vzdбlenosti.</text>
+	</string>
+	<string id="st_addon_scope_susat_dusk">
+		<text>Optika SUSAT Twilight x1.6</text>
+	</string>
+	<string id="st_addon_scope_susat_dusk_descr">
+		<text>Puљkohled SUSAT 1.6x s vysokэm kontrastem pro boj ve zhorљenэch svмtelnэch podmнnkбch. Pшipojuje se ke standardnн montбћnн liљtм Picatinny zbranн NATO.</text>
+	</string>
+	<string id="st_addon_scope_susat_night_vision">
+		<text>Optika SUSAT Night x4</text>
+	</string>
+	<string id="st_addon_scope_susat_night_vision_descr">
+		<text>Fixnн optika 4.0x se systйmem noиnнho vidмnн pro vedenн palby na velkou vzdбlenost za noиnнch podmнnek. Pшipojuje se ke standardnн montбћnн liљtм Picatinny zbranн NATO.</text>
+	</string>
+	<string id="st_addon_scope_susat_x1.6">
+		<text>Optika SUSAT 1.6x</text>
+	</string>
+	<string id="st_addon_scope_susat_x1.6_descr">
+		<text>Optika SUSAT 1.6x pro boj na krбtkй aћ stшednн vzdбlenosti. Pшipojuje se ke standardnн montбћnн liљtм Picatinny zbranн NATO.</text>
+	</string>
+	<string id="st_addon_scope_x2.7">
+		<text>Optika PSU-1</text>
+	</string>
+	<string id="st_addon_scope_x2.7_descr">
+		<text>Optika 2.7x pro boj ve mмstech na stшednн vzdбlenosti. Pшipojuje se ke standardnн montбћnн liљtм zbranн zemн Varљavskй smlouvy.</text>
+	</string>
+	<string id="st_addon_silencer">
+		<text>Tlumiи</text>
+	</string>
+	<string id="st_addon_silencer_descr">
+		<text>Efektivnн tlumiи, kterэ je moћnй snadno modifikovat podle poћadavkщ. Tмlo tlumiиe obsahuje jemnou kovovou sнќ pohlcujнcн unikajнcн plyny. Sada obsahuje adaptйry a tмsnмnн pro vмtљinu typщ zbranн. Bмћnм se pouћнvб ke zmenљenн poиtu nepшбtel, aniћ by k sobм stшelec pшilбkal neћбdoucн pozornost.</text>
+	</string>
+	<string id="st_grenade_f1">
+		<text>Granбt F1</text>
+	</string>
+	<string id="st_grenade_f1_descr">
+		<text>Obrannэ ruиnн granбt, jehoћ stшepiny jsou schopnй prorazit prщmмrnм silnй neprщstшelnй vesty. Exploze mб efektivnн dosah 7 metrщ. Stalkeшi zнskбvajн granбty F1 dнky obchodu s armбdou, vojбci je odepisujн jako pouћitй v boji s mutanty.</text>
+	</string>
+	<string id="st_grenade_launcher">
+		<text>GP-25 Koster</text>
+	</string>
+	<string id="st_grenade_launcher_descr">
+		<text>Jednorannэ zpшedu nabнjenэ podvмsnэ granбtomet pro ъtoиnй puљky vyrбbмnй v zemнch Varљavskй smlouvy. Palebnэ mechanismus je samonabнjecн, s manuбlnн pojistkou a automatickou zбbranou vэstшelu pшi nesprбvnй instalaci. Pouћнvб granбty VOG-25.</text>
+	</string>
+	<string id="st_grenade_launcher_m203">
+		<text>M203</text>
+	</string>
+	<string id="st_grenade_launcher_m203_descr">
+		<text>Modifikovanэ granбtomet M203, zkrбcenэ o sedm centimetrщ a pшipojenэ ke zbrani na montбћnн liљtu Picatinny. Dнky moћnosti snadnй instalace je tento granбtomet љiroce pouћнvanэ v celйm svмtм.</text>
+	</string>
+	<string id="st_grenade_rgd5">
+		<text>Granбt RGD-5</text>
+	</string>
+	<string id="st_grenade_rgd5_descr">
+		<text>Ъtoиnэ ruиnн granбt s explozн s krбtkэm dosahem pмti metrщ. Stalkeшi ho kvщli relativnм nнzkй cenм иasto pouћнvajн pшi lovu mutantщ.</text>
+	</string>
+	<string id="st_grenade_smoke">
+		<text>Kouшovэ granбt</text>
+	</string>
+	<string id="st_grenade_smoke_descr">
+		<text>Ruиnн kouшovэ granбt. Pouћнvб se k vytvбшenн kouшovй clony. Po vrћenн granбtu trvб deset sekund, neћ se kouшovб clona vytvoшн.</text>
+	</string>
+	<string id="st_knife">
+		<text>Nщћ</text>
+	</string>
+	<string id="st_wpn_abakan">
+		<text>AC-96/2</text>
+	</string>
+	<string id="st_wpn_ak74">
+		<text>AKM-74/2</text>
+	</string>
+	<string id="st_wpn_ak74u">
+		<text>AKM-74/2U</text>
+	</string>
+	<string id="st_wpn_beretta">
+		<text>Martha</text>
+	</string>
+	<string id="st_wpn_bm16">
+		<text>Upilovanб brokovnice</text>
+	</string>
+	<string id="st_wpn_bm16_descr">
+		<text>Upilovanб loveckб brokovnice dvojka, dнky zkrбcenн hlavnн je lehин a kompaktnмjљн neћ pщvodnн zbraт. Jedna z nejpopulбrnмjљнch zbranн mezi bandity, s ohledem na moћnost snadnйho ukrytн zbranм a extrйmnн efektivitм pшi boji zblнzka.</text>
+	</string>
+	<string id="st_wpn_colt1911">
+		<text>Kora-919</text>
+	</string>
+	<string id="st_wpn_desert_eagle_nimble">
+		<text>Steppe Eagle</text>
+	</string>
+	<string id="st_wpn_desert_eagle_nimble_descr">
+		<text>Ruиnм vyrobenб pistole zaloћenб na typu Black Kite. Komponenty zbranм jsou peиlivм upravenй, takћe je pistole nezvykle pшesnб.</text>
+	</string>
+	<string id="st_wpn_eagle">
+		<text>Black Kite</text>
+	</string>
+	<string id="st_wpn_fn2000">
+		<text>FT-200M</text>
+	</string>
+	<string id="st_wpn_fort">
+		<text>Fora-12</text>
+	</string>
+	<string id="st_wpn_g36">
+		<text>GP37</text>
+	</string>
+	<string id="st_wpn_gauss">
+		<text>Gaussova puљka</text>
+	</string>
+	<string id="st_wpn_groza">
+		<text>Tunder S14</text>
+	</string>
+	<string id="st_wpn_groza_descr">
+		<text>Tato ъtoиnб puљka kombinovanб s granбtometem, zaloћenб na sйrii AKM, byla vyvinuta pro jednotky rychlйho nasazenн. Hlavnнm rozdнlem oproti pщvodnнmu typu je pouћitн munice rбћe 9x39, bullpup design a znaиnй moћnosti konfigurace. Mezi vojenskэmi stalkery je to velmi cenмnб zbraт, pшedevљнm kvщli moћnosti zabнt nepшбtele v neprщstшelnэch vestбch nebo za improvizovanэmi kryty i na vмtљн vzdбlenosti, takй dнky skvмlй zastavovacн sнle.</text>
+	</string>
+	<string id="st_wpn_groza_nimble">
+		<text>Storm</text>
+	</string>
+	<string id="st_wpn_groza_nimble_descr">
+		<text>Experimentбlnн verze ъtoиnй puљky s granбtometem, ruskб modifikace standardnнho Tunder S14. Zbraт byla speciбlnм navrћena pro jednotky operujнcн v Zуnм. Zajнmavэ je mimo jinй i zvмtљenэ zбsobnнk.</text>
+	</string>
+	<string id="st_wpn_hpsa">
+		<text>HPSS-1m</text>
+	</string>
+	<string id="st_wpn_hpsa_descr">
+		<text>Modifikovanб verze pistole pщvodnм vyrбbмnй v prvnн polovinм dvacбtйho stoletн, kterб je stejnм spolehlivб, silnб a pшesnб jako originбl. Pistole z tйto sйrie si zaslouћн svou povмst zbranн patшнcн mezi nejlepљн pistole dvacбtйho stoletн, v Zуnм je o nм velkэ zбjem.</text>
+	</string>
+	<string id="st_wpn_l85">
+		<text>IL 86</text>
+	</string>
+	<string id="st_wpn_lr300">
+		<text>TRs 301</text>
+	</string>
+	<string id="st_wpn_mp5">
+		<text>Viper 5</text>
+	</string>
+	<string id="st_wpn_mp5_descr">
+		<text>Tento samopal si zнskal ve svмtм popularitu dнky svй spolehlivosti, snadnйmu pouћitн a pшesnosti. Za poslednнch nмkolik desetiletн se Viper 5 dostal do sluћeb speciбlnнch armбdnнch jednotek i policejnнch sil na celйm svмtм. Nenн nijak pшekvapivй, ћe se z иernйho trhu dostal nakonec i do Zуny.</text>
+	</string>
+	<string id="st_wpn_mp5_nimble">
+		<text>Frasier</text>
+	</string>
+	<string id="st_wpn_mp5_nimble_descr">
+		<text>Prototyp samopalu zaloћenйho na vynikajнcнm modelu Viper 5. Urиen pro pouћitн jako zbraт dalљн generace v uzavшenэch prostorбch, mб vysokou kadenci, pшesnost a pouћнvб silnй stшelivo.</text>
+	</string>
+	<string id="st_wpn_pb">
+		<text>PB-1s</text>
+	</string>
+	<string id="st_wpn_pkm_zulus">
+		<text>Zulusova RP-74</text>
+	</string>
+	<string id="st_wpn_pkm_zulus_descr">
+		<text>Tuto zbraт dшнve vlastnil Zulus. Mezi modifikace patшн zvмtљenб nбbojovб schrбnka a vэjimeиnм spolehlivэ systйm zбvмru. Modifikace znamenaly navэљenн hmotnosti zbranм, coћ pшedchozнmu majiteli vщbec nevadilo.</text>
+	</string>
+	<string id="st_wpn_pm">
+		<text>PMm</text>
+	</string>
+	<string id="st_wpn_pm_actor">
+		<text>Velebenб PMm</text>
+	</string>
+	<string id="st_wpn_pm_actor_descr">
+		<text>Pradбvnб PMm, kterou obdrћel Dмgtarjev jako odmмnu „za ъspмљnй provedenн velmi nebezpeиnэch rozkazщ a za odvahu a иest prokбzanou bмhem vykonбvбnн sluћby".</text>
+	</string>
+	<string id="st_wpn_protecta">
+		<text>Eliminator</text>
+	</string>
+	<string id="st_wpn_rg6">
+		<text>Bulldog-6</text>
+	</string>
+	<string id="st_wpn_rg6_descr">
+		<text>Tento revolverovэ granбtomet pouћнvб љest zepшedu nabнjenэch hlavnн s vэvrtem, obdobnэch jakй majн podvмsnй granбtomety. Buben se takй nabнjн zepшedu. Pouћнvб se k rychlйmu potlaиenн nepшбtelskэch palebnэch pozicн a na otevшenйm prostranstvн k ъtoku na fixnн cнle, pшнpadnм k likvidaci vэjimeиnм silnэch monster.</text>
+	</string>
+	<string id="st_wpn_rp">
+		<text>RP-74</text>
+	</string>
+	<string id="st_wpn_rp_descr">
+		<text>Pбsem nabнjenэ kulomet, pшenosnб modifikace s komplexnнm dvoustupтovэm nabнjecнm systйmem. Navzdory svй tнze a nнzkй pшesnosti si v Zуnм naљel svй obdivovatele. Vмtљinou se pouћнvб v boji s nepшбtelskou pшesilou v konfliktech mezi frakcemi, nebo pro иiљtмnн hnнzd mutantщ.</text>
+	</string>
+	<string id="st_wpn_rpg7">
+		<text>RPG-7u</text>
+	</string>
+	<string id="st_wpn_sig220">
+		<text>SIP-t M200</text>
+	</string>
+	<string id="st_wpn_sig220_nimble">
+		<text>Alpine</text>
+	</string>
+	<string id="st_wpn_sig220_nimble_descr">
+		<text>Unikбtnн model pistole SIP-t M200. Ибst z omezenй sйrie urиenй pro neidentifikovanou speciбlnн jednotku. Tento model mб zvэљenou kapacitu zбsobnнku, vysoce odolnou ocelovou hlaveт a neuvмшitelnм odolnэ polymerovэ zбvмr.</text>
+	</string>
+	<string id="st_wpn_sig550">
+		<text>SGI-5k</text>
+	</string>
+	<string id="st_wpn_sig550_descr">
+		<text>Relativnм novб ъtoиnб puљka, kterб si v celйm svмtм rychle naљla svй obdivovatele, aиkoli jejн design nenн pшнliљ "trendy". Zbranм tйto sйrie patшн mezi nejlepљн ve svй tшнdм, jsou znбmй svou spolehlivostн, pшesnostн a snadnэm pouћнvбnнm. Aиkoli se v Zуnм nedб snadno sehnat, zkuљenн stalkeшi si ji za velkй penнze poшizujн na objednбvku.</text>
+	</string>
+	<string id="st_wpn_sig550_strelok">
+		<text>Stшelcova SGI-5k</text>
+	</string>
+	<string id="st_wpn_sig550_strelok_descr">
+		<text>Љvэcarskб ъtoиnб puљka SGI-5k. Aиkoli jde o relativnм novэ model, je zjevnй, ћe se o ni pшedchozн majitel dobшe staral. Zbraт byla rozebrбna a sloћena znovu, po detailnнm vyladмnн vљech komponentщ, aby bylo dosaћeno maximбlnнho vэkonu a zvэљenй zastavovacн sнly. Do paћby je vyшezбno pнsmeno S, a takй љestnбct malэch zбшezщ.</text>
+	</string>
+	<string id="st_wpn_spas12">
+		<text>SPSA-14 </text>
+	</string>
+	<string id="st_wpn_spas12_m2">
+		<text>SPSA-AUT</text>
+	</string>
+	<string id="st_wpn_spas12_m2_descr">
+		<text>Samonabнjecн brokovnice SPSA-AUT se vyrбbн v dнlnбch Povinnosti. Tato zbraт je urиenб pro boj s velkэmi skupinami mutantщ. Vylepљenэ nabнjecн systйm zajiљќuje vysokou kadenci, kapacita zбsobnнku byla zvмtљena na 10 nбbojщ. Pouћнvб munici typu 12x70.</text>
+	</string>
+	<string id="st_wpn_spas12_nimble">
+		<text>Carabineer</text>
+	</string>
+	<string id="st_wpn_spas12_nimble_descr">
+		<text>Armбdnн brokovnice navrћenб speciбlnм pro ъtoиnй jednotky, zaloћenб na zбkladм SPSA-14. Stejnм jako jejн pшedchщdce umoћтuje plnм automatickou palbu, ale dнky vyvбћenйmu systйmu pohlcovбnн nбrazщ mб lepљн zpмtnэ rбz.</text>
+	</string>
+	<string id="st_wpn_svd">
+		<text>SVDm-2</text>
+	</string>
+	<string id="st_wpn_svd_descr">
+		<text>Armбdnн odstшelovaиskб puљka, kterб je na trhu uћ vнce neћ padesбt let, bмhem kterэch si vyslouћila povмst vэjimeиnм pшesnй zbranм, navнc snadno pouћitelnй. SVDm-2 bмћnм pouћнvб armбda k zvмtљenн efektivnнho dostшelu jednotlivэch oddнlщ, ale stalkeшi si jн cenн kvщli jejн prщraznosti, protoћe jejн stшely dokбћн provrtat tlustou kщћi mutantщ i armбdnн neprщstшelnй vesty.</text>
+	</string>
+	<string id="st_wpn_svd_nimble">
+		<text>Lynx</text>
+	</string>
+	<string id="st_wpn_svd_nimble_descr">
+		<text>Ruиnм sestavenб verze odstшelovaиskй puљky SVDm-2. Vzhledem se nijak neliљн, ale poskytuje stшelci ideбlnн kombinaci pшesnosti a zastavovacн sнly.</text>
+	</string>
+	<string id="st_wpn_svu">
+		<text>SVUmk-2</text>
+	</string>
+	<string id="st_wpn_svu_nimble">
+		<text>SVU2-A</text>
+	</string>
+	<string id="st_wpn_svu_nimble_descr">
+		<text>Zkrбcenб odstшelovacн puљka se zvэљenou kadencн, dalљн evoluиnн stupeт v sйrii zbranн SVUmk-2. Tato zbraт patшila Maxovi, legendбrnнmu ochrбnci Svobody.</text>
+	</string>
+	<string id="st_wpn_toz34">
+		<text>Loveckб brokovnice</text>
+	</string>
+	<string id="st_wpn_toz34_descr">
+		<text>Velmi bмћnб loveckб brokovnice nabнzн svйmu majiteli lepљн ochranu pшed mutanty neћ normбlnн pistole, to dнky svй pшesnosti a zastavovacн sнle. Иasto pouћнvanб novбиky na okrajнch Zуny.</text>
+	</string>
+	<string id="st_wpn_umirotvoritel">
+		<text>Neidentifikovanб zbraт</text>
+	</string>
+	<string id="st_wpn_umirotvoritel_descr">
+		<text>Neznбmб zbraт, jejнћ zбkladnн princip nenн identifikovбn. Vypadб to, ћe je zbraт vadnб, stisknutн spouљtм nic nedмlб.</text>
+	</string>
+	<string id="st_wpn_usp">
+		<text>UDP Compact</text>
+	</string>
+	<string id="st_wpn_usp_descr">
+		<text>Neochvмjnб spolehlivost a odolnost kombinovanб s vynikajнcн pшesnostн, to jsou hlavnн charakteristiky tйto zbranм. Mezi drobnй nevэhody patшн jejн nezvyklб velikost, relativnм vysoko postavenй tмћiљtм a masivnн zбvмr, kvщli kterйmu se zbraт љpatnм skrэvб, nicmйnм jejн vэhody to nepшevбћн. Jde o velmi populбrnн zbraт mezi veterбny Zуny.</text>
+	</string>
+	<string id="st_wpn_usp_nimble">
+		<text>March</text>
+	</string>
+	<string id="st_wpn_usp_nimble_descr">
+		<text>Kompaktnн velkokalibernн pistole s krбtkэm pohybem zбvмru vyrobenб z lehkэch materiбlщ. Dшнve patшila ћoldбkovi Ohaшovi. Zшejmм jde o modifikaci pistole UDP Compact.</text>
+	</string>
+	<string id="st_wpn_val">
+		<text>SA Avalanche</text>
+	</string>
+	<string id="st_wpn_vintorez">
+		<text>Vintar BC </text>
+	</string>
+	<string id="st_wpn_vintorez_descr">
+		<text>Speciбlnн vojenskб odstшelovaиskб puљka vyrobenб pro tichй neodhalitelnй odstшelovбnн bмhem vojenskэch operacн, ve kterэch nesmн dojнt k odhalenн stшelce. Vintar BC pouћнvб stшelivo s vysokou prщraznostн a velkou zastavovacн silou, navнc je vybaven integrovanou optikou. Navzdory malйmu zбsobnнky je stalkery vysoce cenмn.</text>
+	</string>
+	<string id="st_wpn_vintorez_nimble">
+		<text>Tide</text>
+	</string>
+	<string id="st_wpn_vintorez_nimble_descr">
+		<text>Zbraт urиenб pro vojenskй jednotky, zaloћenб na tlumenй odstшelovacн puљce. Zbraт mб vмtљн zastavovacн sнlu neћ jejн pшedchщdce Vintar BC na ъkor kadence. Majiteli mб umoћтovat eliminaci nepшбtel jednoho za druhэm, aniћ by byla odhalena jeho pozice.</text>
+	</string>
+	<string id="st_wpn_walther">
+		<text>Walker P9m</text>
+	</string>
+	<string id="st_wpn_wincheaster1300">
+		<text>Chaser 13</text>
+	</string>
+	<string id="st_wpn_wincheaster1300_descr">
+		<text>Brokovnice populбrnн po celйm svмtм dнky svй ъћasnй spolehlivosti a rychlйmu pшebнjenн. V Zуnм si jн cenн pшedevљнm lovci. Vљechny souибsti jsou pokryty antikorozivnнm nбtмrem.</text>
+	</string>
+	<string id="st_wpn_wincheaster1300_trapper">
+		<text>Predator</text>
+	</string>
+	<string id="st_wpn_wincheaster1300_trapper_descr">
+		<text>Upravenб pumpovacн brokovnice, kterб dшнve patшila Pastiиkбшi. Ten od svй zbranм ћбdб pшedevљнm schopnost zabнt predбtora jedinэm vэstшelem. Tato filozofie je zaloћena na vншe, ћe bez ohledu na to, kolik lidн zvншe zabilo, stбle je to zvншe, a tak by nemмlo trpмt.</text>
+	</string>
+	<string id="ammo-gauss_cardan">
+		<text>Podomбcku vyrobenй baterie</text>
+	</string>
+	<string id="st_addon_scope_susat_custom">
+		<text>SUSAT zamмшovaи "Mera"</text>
+	</string>
+	<string id="st_wpn_abakan_descr">
+		<text>Modernн ъtoиnб puљka vyvinutб jako nбhrada za stбrnoucн AKM 74/2. Hlavnн zmмnou je vysokorychlostnн reћim stшelby po malэch dбvkбch dvou kulek, kterэ dokбћe s oslтujнcн pшesnostн poslat dvм stшely do stejnйho mнsta, a to na vzdбlenost aћ 100 metrщ. V porovnбnн s jednoduchou palbou roste љance na zбsah cнle dvojnбsobnм. Zbraт je tak nebezpeиnмjљн, efektivnмjљн a snбze prorazн zbroj.</text>
+	</string>
+	<string id="st_wpn_ak74_descr">
+		<text>Tato zbraт, navrћenб v roce 1974, pшedznamenala pшechod vojsk Varљavskй smlouvy na munici s niћљн rбћн a slabљн dopadovou energiн. AKM-74/2, nбstupce nejpopulбrnмjљн ъtoиnй puљky svмta, mб jeљtм vмtљн ъsќovou brzdu neћ jeho pшedchщdce, dнky иemuћ se podaшilo dбle snнћit jiћ tak uchбzejнcн zpмtnэ rбz. V boji se to projevuje lepљн pшesnostн, zejmйna pшi stшelbм krбtkэmi dбvkami. Jako dшнvмjљн modely, i tento je velmi jednoduchэ a spolehlivэ.</text>
+	</string>
+	<string id="st_wpn_ak74u_descr">
+		<text>Pшestoћe se tato zbraт velikostн, hmotnostн i taktickэm ъиelem podobб spнљe samopalщm, bмћnм se шadн mezi ъtoиnй puљky - to proto, ћe mб totoћnэ vnitшnн mechanismus s AKM 74/2. Tato puљka vynikб vysokou manipulovatelnostн ve stнsnмnэch prostorбch a dobrou prщraznostн, k jejнm nevэhodбm naopak patшн krбtkэ ъиinnэ dostшel (pшestoћe kulky lнtajн relativnм daleko) a sklony k pшehшнvбnн. Navнc jejн odraћenй stшely mнvajн nebezpeиnэ sklon.</text>
+	</string>
+	<string id="st_wpn_colt1911_descr">
+		<text>Vylepљenб varianta klasickй automatickй pistole, kterб s hrdм vztyиenou bradou proљla vљemi hlavnнmi ozbrojenэmi konflikty 20. stoletн a s nezmenљenou jistotou vkroиila i do novйho tisнciletн. Vyrбbн ji stovky, ne-li tisнce zbrojovek po celйm svмtм - jak ve standardnнm, tak v modifikovanйm provedenн. Jejн jedinou nevэhodou je nevelikб kapacita zбsobnнku, jнћ alespoт ибsteиnм kompenzuje efektivnн munice.</text>
+	</string>
+	<string id="st_wpn_eagle_descr">
+		<text>Doslova ruиnн kanуn - tмћkэ, neskladnэ a smrtнcн. Tato pistole byla navrћena ke specializovanэm ъиelщm, zejmйna pro lov vysokй zvмшe a rovnмћ stшeleckй soutмћe, pшi nichћ se na vzdбlenosti vмtљн neћ 50 metrщ stшнlelo do ocelovэch terищ. V Zуnм se vyskytuje jen vzбcnм, coћ mщћeme pшipsat jejн cenм, velikosti i vбze. Kaћdэ z tмchto faktorщ je v porovnбnн s jinэmi pistolemi zhruba dvojnбsobnэ.</text>
+	</string>
+	<string id="st_wpn_fn2000_descr">
+		<text>Tato futuristicky vyhlнћejнcн puљka vyuћнvajнcн uspoшбdбnн „bullpup“ je ve skuteиnosti sйriovм vyrбbмnэm modulбrnнm systйmem, kterэ se sklбdб z puљky, 40 mm granбtometu a elektronickйho modulu шнzenн stшelby. Pшestoћe vypadб neohrabanм, je znaиnм ergonomickб, snadno se pouћнvб a pyљnн se dobrэmi technickэmi parametry.</text>
+	</string>
+	<string id="st_wpn_fort_descr">
+		<text>Ukrajinskб pistole pouћнvanб pшedevљнm policejnнmi sbory. Poskytuje vyљљн pшesnost, lepљн ergonomiku a vмtљн zбsobnнk neћ PMM. Tyto pistole se dostбvajн do Zуny ve velkэm poиtech, protoћe na иernйm trhu se prodбvajн vadnй kusy, nebo ranй modely, kterй trpмly technickэmi nedotaћenostmi. Pшes to vљechno si stalkeшi pistoli pochvalujн pro jejн dobrй bojovй vlastnosti.</text>
+	</string>
+	<string id="st_wpn_g36_descr">
+		<text>Tento novэ pшнrщstek do rodiny zбpadnнch ъtoиnэch puљek, kterэ se znaиnм liљн od ostatnнch modelщ svй sйrie, je postaven na automatickй konstrukci s polootevшenэm zбvмrem. Svэm systйmem nabнjenн pomocн odbмru plynщ z hlavnм a krбtkэmi pнsty pшipomнnб spнљe americkй ъtoиnй puљky. Dнky uvedenэm zmмnбm je stroj prvotшнdnн ukбzkou modernн zbranм - lehkй, spolehlivй a ergonomickй.</text>
+	</string>
+	<string id="st_wpn_l85_descr">
+		<text>Tato puљka mмla tolik nevэhod, ћe vмtљina vyrobenэch kusщ jiћ byla modernizovбna a pшeћнvajн jen vyшazenй kusy, kterй pronikly na иernэ trh a skrz nмj aћ do Zуny. Jejн hlavnнmi pшednostmi jsou zabudovanэ puљkohled se иtyшnбsobnэm zvмtљenнm, vysokб pшesnost pшi stшelbм jednou ranou a moћnost spolehlivэch vylepљenн. Pokud se z nн stшнlн v dбvkбch, pшesnost vэraznм klesб a vnitшnн mechanismy puљky zaинnajн bэt ponмkud nespolehlivй.</text>
+	</string>
+	<string id="st_wpn_lr300_descr">
+		<text>Novэ krok ve vэvoji tйto slovutnй rodiny zbranн. Zmмn se doиkala pшedevљнm hornн ибst ocelovй konstrukce, tj. hlaveт, plynovб trubice a zбvмr. Doљlo ke snнћenн hmotnosti, navэљenн ergonomiky a zlepљenн plynovйho nabнjenн. Tato zbraт je velmi pшesnб, nicmйnм do obtнћnэch podmнnek Zуny se pшнliљ nehodн kvщli svйmu zlozvyku nechat se vykolejit neиistotami.</text>
+	</string>
+	<string id="st_wpn_pb_descr">
+		<text>Tato pistole byla vyvinuta ve druhй polovinм 20. stoletн na konstrukci PMM. Je urиena speciбlnнm jednotkбm a prщzkumnнkщm. K hlavni je napevno zabudovбn tlumiи a mechanismus zбvмru je velmi krбtkэ, coћ znamenб, ћe hlavnн pruћina musela bэt umнstмna do rukojeti. Pшestoћe je tato zbraт ve vљech ohledech zastaralб, ve sprбvnэch rukou dokбћe stбle nadмlat paseku.</text>
+	</string>
+	<string id="st_wpn_pm_descr">
+		<text>Tato pamбtka na йru Sovмtskйho svazu je nejbмћnмjљн pistolн v Zуnм, jelikoћ stбle patшн k tмm nejlepљнm kompaktnнm zbranнm urиenэm pro sebeobranu. Je malб, vysoce spolehlivб, snadno se pouћнvб a mбlokdy se porouchб. Mб rovnмћ шadu nevэhod, zejmйna krбtkэ dostшel, nнzkou pшesnost stшelby a slabou sнlu. V porovnбnн s modernнmi pistolemi prohrбvб i na kolbiљti vбhy a velikosti zбsobnнku.</text>
+	</string>
+	<string id="st_wpn_protecta_descr">
+		<text>Bojovб brokovnice revolverovйho typu s hladkou hlavnн, urиenб policejnнm jednotkбm touћнcнch po extrйmnн palebnй sнle. Jejнmi vэhodami jsou zejmйna velkэ zбsobnнk a vysokб kadence, ty vљak vнce neћ kompenzujн tмћkopбdnost, nezanedbatelnб hmotnost a dlouhб doba nabнjenн. V Zуnм je vzбcnб a nejиastмji se pouћнvб pшi иiљtмnн uzavшenэch prostor zamoшenэch mutanty.</text>
+	</string>
+	<string id="st_wpn_rpg7_descr">
+		<text>Tento granбtomet ze 60. let si naљel cestu i do armбdnнch skladiљќ v Zуnм. Jde o bezzбkluzovou zbraт na jeden vэstшel, s hladkou, vzadu otevшenou hlavnн. Mб napevno pшimontovanй optickй hledн PGO-7 x2.7. Pшestoћe se jн vмtљina stalkerщ vyhэbб pro obrovitost a vбhu, jejн zбvratnб niиivб sнla si v Zуnм naљla nejednoho obdivovatele.</text>
+	</string>
+	<string id="st_wpn_sig220_descr">
+		<text>Poslednн masovм vyrбbмnэ model celosvмtovм znбmй pistole. Vydobyl si dobrou povмst za svou vэteиnou ergonomiku a pшesnost. Pшestoћe mб relativnм malэ zбsobnнk, pouћнvб silnou munici a mб mechanismus, kterэ funguje jako љvэcarskй hodinky. Najdou se i lidй, podle nichћ je SIP-t M200 bezkonkurenиnм nejlepљн pistole kalibru .45ACP. Mezi stalkery a ћoldбky mб kaћdopбdnм mnoho fanouљkщ.</text>
+	</string>
+	<string id="st_wpn_spas12_descr">
+		<text>Tato specializovanб automatickб brokovnice s hladkou hlavnн byla navrћena ve druhй polovinм 20. stoletн. Disponuje reћimy poloautomatickй a pumpovacн stшelby. Jde o univerzбlnн zbraт pouћнvanou policejnнmi sbory i speciбlnнmi jednotkami. Vyznaиuje se spolehlivostн a flexibilitou. I pшes vysokou hmotnost, komplexnн mechanismy a nezanedbatelnou cenu je po nн v Zуnм poptбvka, jelikoћ skvмle pomбhб v boji s mutanty.</text>
+	</string>
+	<string id="st_wpn_svu_descr">
+		<text>Tato modernizovanб verze odstшelovaиskй puљky SVDm-2 se na zakбzku zбsahovэch jednotek doиkala tzv. „bullpupovй“ kontrukce. Nejenћe se tнm snнћila vбha, ale navнc narostla pшesnost pшi palbм v rychlйm sledu. Pшesnost pшi stшelbм jednotlivэmi ranami na krбtkй иi stшednн vzdбlenosti zщstala v porovnбnн s pшedchщdcem prakticky nezmмnмna. Pшesto si vљak novй pшednosti zнskaly srdce nespoиtu stalketщ.</text>
+	</string>
+	<string id="st_wpn_val_descr">
+		<text>Tato ъtoиnб puљka, ve skuteиnosti modifikovanб verze tlumenй odstшelovacн puљky Vintar VC, byla navrћena pro pouћitн speciбlnнmi jednotkami. Jejнm hlavnнm cнlem je efektivnн a neprozrazenб palba proti nepшбtelщm, kteшн pouћнvajн modernн neprщstшelnй vesty. Integrovanэ tlumiи a nбboj rбћe 9x39 s podzvukovou kulkou snнћily zбblesky a hluk vnikajнcн pшi vэstшelu na naprostй minimum.</text>
+	</string>
+	<string id="st_wpn_gauss_descr">
+		<text>Extrйmnм pшesnб, supermodernн zbraт znбmб pod oznaиenнm „pшedmмt 62“. Byla vyvinuta v tajnэch laboratoшнch umнstмnэch v Zуnм. Funguje na principu urychlovбnн projektilщ pomocн elektromagnetickйho pole. Vэsledkem je zбvratnб sнla a prakticky ћбdnэ zpмtnэ rбz. Zbraт je pohбnмna bateriemi, kterй se vyrбbмjн z ъlomkщ artefaktщ.</text>
+	</string>
+	<string id="st_wpn_beretta_descr">
+		<text>Pistole Marta si po celйm svмtм vybudovala povмst relativnм spolehlivй, byќ ponмkud tмћkopбdnй zbranм. Pouћнvajн ji armбdy i vojenskй sbory za oceбnem a mimoto i jinй vojenskй a policejnн organizace po celйm svмtм. Stejnй popularity se pistole tмљн i v podsvмtн, tentokrбt dнky svй silnй nбbojnici a kapacitм zбsobnнku. Marty, kterй se dostanou do Zуny, bэvajн zpravidla opotшebovanй a zшejmм pochбzн z vyшazenэch zбsob.</text>
+	</string>
+	<string id="st_wpn_walther_descr">
+		<text>Vynikajнcн zбpadnн pistole znбmб pro svou spolehlivost, vysokou kapacitu zбsobnнku a dobrou pшesnost. Nezapomeтte zmнnit i љpiиkovou ergonomii. Jde o jednu z nejpouћнvanмjљнch pistolн Zуny, pouћнvanou jak profнky, tak i novбиky, kteшн nemajн hluboko do kapsy.</text>
+	</string>
+	<string id="ammo-gauss_descr">
+		<text>Baterie, kterй иerpajн energii z ъlomkщ artefaktu Blesk. Vyrobeny pomocн nejmodernмjљн techniky. </text>
+	</string>
+	<string id="ammo-gauss_cardan_descr">
+		<text>Tyto nнzkokapacitnн baterie иerpajн energii z ъlomkщ artefaktu Blesk. Nнzkou kapacitu majн kvщli improvizovanэm vэrobnнm podmнnkбm a nedostatku speciбlnнho vybavenн.</text>
+	</string>
+</string_table>

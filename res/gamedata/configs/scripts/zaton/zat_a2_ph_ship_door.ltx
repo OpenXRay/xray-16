@@ -1,0 +1,38 @@
+[logic]
+active = ph_door@closed
+
+[ph_door@closed]
+closed = true
+locked = false
+on_use = ph_door@open
+on_info = {!check_smart_alarm_status(zat_stalker_base_smart:normal) !actor_in_zone(zat_a2_sr_light)} ph_door@locked
+snd_open_start = trader_door_open_start
+snd_close_start = trader_door_close_start
+snd_close_stop = trader_door_close_stop
+
+[ph_door@open]
+closed = false
+locked = false
+on_use = ph_door@closed
+on_info = {!check_smart_alarm_status(zat_stalker_base_smart:normal) !actor_in_zone(zat_a2_sr_light)} ph_door@locked
+on_game_timer = 50 | ph_door@closed
+snd_open_start = trader_door_open_start
+snd_close_start = trader_door_close_start
+snd_close_stop = trader_door_close_stop
+
+[ph_door@locked]
+closed = true
+locked = true
+on_info = {=check_smart_alarm_status(zat_stalker_base_smart:normal)} ph_door@closed
+on_info2 = {=check_smart_alarm_status(zat_stalker_base_smart:alarm)} ph_door@locked_alarm
+on_info3 = {=actor_in_zone(zat_a2_sr_light)} ph_door@closed
+snd_open_start = trader_door_locked
+tip_open = tip_door_closed_hide_weapon
+
+[ph_door@locked_alarm]
+closed = true
+locked = true
+on_info = {=check_smart_alarm_status(zat_stalker_base_smart:normal)} ph_door@closed
+on_info2 = {=check_smart_alarm_status(zat_stalker_base_smart:danger)} ph_door@locked
+snd_open_start = trader_door_locked
+tip_open = tip_door_closed_base_alarm

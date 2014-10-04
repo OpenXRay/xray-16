@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_zat_b55_name">
+		<text>Griffe (anomalie)</text>
+	</string>
+	<string id="st_zat_b100_name">
+		<text>Forкt de Fer (anomalie)</text>
+	</string>
+	<string id="st_zat_b104_name">
+		<text>Scierie</text>
+	</string>
+	<string id="st_zat_b38_name">
+		<text>Station-relais de Krug</text>
+	</string>
+	<string id="st_zat_b40_name">
+		<text>Station de traitement des dйchets</text>
+	</string>
+	<string id="st_zat_b56_name">
+		<text>Soleil (anomalie)</text>
+	</string>
+	<string id="st_zat_b5_name">
+		<text>Poste des rangers</text>
+	</string>
+	<string id="st_zat_a2_name">
+		<text>Skadovsk</text>
+	</string>
+	<string id="st_zat_b20_name">
+		<text>Ferme brыlйe</text>
+	</string>
+	<string id="st_zat_b53_name">
+		<text>Bouilloire (anomalie)</text>
+	</string>
+	<string id="st_zat_b101_name">
+		<text>Marais</text>
+	</string>
+	<string id="st_zat_b106_name">
+		<text>Izumrudnoye</text>
+	</string>
+	<string id="st_zat_b7_name">
+		<text>Chevtchenko</text>
+	</string>
+	<string id="st_zat_b14_name">
+		<text>Station de dragage</text>
+	</string>
+	<string id="st_zat_b52_name">
+		<text>Grues</text>
+	</string>
+	<string id="st_zat_b39_name">
+		<text>Pinchкne (anomalie)</text>
+	</string>
+	<string id="st_zat_b33_name">
+		<text>Station-essence</text>
+	</string>
+	<string id="st_zat_b18_name">
+		<text>Vieille pйniche</text>
+	</string>
+	<string id="st_zat_b54_name">
+		<text>Balafre (anomalie)</text>
+	</string>
+	<string id="st_zat_b12_name">
+		<text>Pont de Preobrazhensky</text>
+	</string>
+	<string id="st_zat_b28_name">
+		<text>Plateau sud</text>
+	</string>
+	<string id="st_zat_b103_name">
+		<text>Ateliers du poste йlectrique</text>
+	</string>
+	<string id="st_jup_b1_name">
+		<text>Tas de cendres (anomalie)</text>
+	</string>
+	<string id="st_jup_b46_name">
+		<text>Tour de refroidissement</text>
+	</string>
+	<string id="st_jup_b202_name">
+		<text>Poste йlectrique</text>
+	</string>
+	<string id="st_jup_b211_name">
+		<text>Plavni (anomalie)</text>
+	</string>
+	<string id="st_jup_b200_name">
+		<text>Cimenterie</text>
+	</string>
+	<string id="st_jup_b19_name">
+		<text>Kopachy</text>
+	</string>
+	<string id="st_jup_a6_name">
+		<text>Yanov</text>
+	</string>
+	<string id="st_jup_b25_name">
+		<text>Carriиre</text>
+	</string>
+	<string id="st_jup_b6_name">
+		<text>Bunker des scientifiques</text>
+	</string>
+	<string id="st_jup_b205_name">
+		<text>Complexe Volkhov AA</text>
+	</string>
+	<string id="st_jup_b206_name">
+		<text>Bosquet anormal</text>
+	</string>
+	<string id="st_jup_b32_name">
+		<text>Parking</text>
+	</string>
+	<string id="st_jup_a10_name">
+		<text>Poste de contrфle</text>
+	</string>
+	<string id="st_jup_b209_name">
+		<text>Puits а bitume (anomalie)</text>
+	</string>
+	<string id="st_jup_b208_name">
+		<text>Tunnel est</text>
+	</string>
+	<string id="st_jup_a12_name">
+		<text>Entrepфt</text>
+	</string>
+	<string id="st_jup_b212_name">
+		<text>Systиme d'aйration</text>
+	</string>
+	<string id="st_jup_b9_name">
+		<text>Hйliports</text>
+	</string>
+	<string id="st_jup_b201_name">
+		<text>Bain de bйton (anomalie)</text>
+	</string>
+	<string id="st_jup_a9_name">
+		<text>Usine de Jupiter</text>
+	</string>
+	<string id="st_pri_a28_name">
+		<text>Salle de cinйma Prometheus</text>
+	</string>
+	<string id="st_pri_b36_name">
+		<text>Port fluvial</text>
+	</string>
+	<string id="st_pri_b303_name">
+		<text>Ancien centre de service</text>
+	</string>
+	<string id="st_pri_b301_name">
+		<text>Йcole</text>
+	</string>
+	<string id="st_pri_a17_name">
+		<text>Hфpital</text>
+	</string>
+	<string id="st_pri_b306_name">
+		<text>Centre de service Yubileiny</text>
+	</string>
+	<string id="st_pri_a16_name">
+		<text>Laverie</text>
+	</string>
+	<string id="st_pri_a25_name">
+		<text>Maternelle</text>
+	</string>
+	<string id="st_pri_b35_name">
+		<text>Complexe rйsidentiel</text>
+	</string>
+	<string id="st_pri_a21_name">
+		<text>Йpicerie</text>
+	</string>
+	<string id="st_pri_b304_name">
+		<text>Grand magasin</text>
+	</string>
+	<string id="st_pri_a18_name">
+		<text>Librairie</text>
+	</string>
+	<string id="st_pri_b307_name">
+		<text>Volcan (anomalie)</text>
+	</string>
+	<string id="st_pri_b302_name">
+		<text>Liane (anomalie)</text>
+	</string>
+</string_table>

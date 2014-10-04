@@ -1,0 +1,366 @@
+-- вызывается  1 раз в 3 секунды
+function fill_faction_state(state)
+	local board = sim_board.get_sim_board()
+
+	state.member_count = 0
+	state.resource = 0
+	state.power = 0
+
+
+ 	state.actor_goodwill = 3000
+	state.name = "ui_inGame2_hint_wnd_bar"
+	state.icon = "ui_inGame2_hint_wnd_bar"
+	state.icon_big = "logos_big_empty"
+	state.target = game.translate_string("ui_st_no_faction")
+	state.target_desc = "aaa"
+	state.location = "a"
+
+	state.war_state1 = "a"
+	state.war_state_hint1 = "1"
+	state.war_state2 = "3"
+	state.war_state_hint2 = "2"
+	state.war_state3 = "33"
+	state.war_state_hint3 = ""
+	state.war_state4 = "23"
+	state.war_state_hint4 = ""
+	state.war_state5 = "5"
+	state.war_state_hint5 = "5"
+
+	state.bonus = 0
+
+
+
+
+end
+
+--int		get_max_member_count	();   ------ 1 раз в 3 секунды
+--float	get_max_resource();
+--float	get_max_power();
+
+function get_max_member_count()
+	return 10
+end
+
+function get_max_resource()
+	return 10
+end
+
+function get_max_power()
+	return 10
+end
+
+
+-- потом это нужно стереть
+
+-- int mode:
+-- 0 = 	Undefined = закрыто
+-- 1 = 	Inventory
+-- 2 = 	Trade
+-- 3 = 	Upgrade
+-- 4 = 	DeadBodySearch
+-- 10 =  Talk dialog  show
+-- 11 =  Talk dialog  hide
+local last_mode = 0
+dialog_closed = false
+trade_closed = false
+upgrade_closed = false
+function actor_menu_mode(mode)
+	if(mode==0) then
+		if(last_mode==1) then
+			inventory_wnd_closed()
+		elseif(last_mode==2) then
+			trade_wnd_closed()
+		elseif(last_mode==3) then
+			upgrade_wnd_closed()
+		elseif(last_mode==4) then
+			dead_body_search_wnd_closed()
+		end
+		last_mode = 0
+	elseif(mode==1) then
+		last_mode = 1
+		inventory_wnd_opened()
+	elseif(mode==2) then
+		last_mode = 2
+		trade_wnd_opened()
+	elseif(mode==3) then
+		last_mode = 3
+		upgrade_wnd_opened()
+	elseif(mode==4) then
+		last_mode = 4
+		dead_body_search_wnd_opened()
+	elseif(mode==10) then
+		dialog_wnd_showed()
+	elseif(mode==11) then
+		dialog_wnd_closed()
+	end
+end
+
+function inventory_wnd_opened()
+	--printf("---:>Inventory opened")
+end
+
+function inventory_wnd_closed()
+	--printf("---:>Inventory closed")
+end
+
+function trade_wnd_opened()
+	dialog_closed = false
+	--printf("---:>Trade opened")
+end
+
+function trade_wnd_closed()
+	--printf("---:>Trade closed")
+	trade_closed = true
+end
+
+function upgrade_wnd_opened()
+	dialog_closed = false
+	--printf("---:>Upgrade opened")
+end
+
+function upgrade_wnd_closed()
+	--printf("---:>Upgrade closed")
+	upgrade_closed = true
+end
+
+function dead_body_search_wnd_opened()
+	--printf("---:>DeadBodySearch opened")
+end
+
+function dead_body_search_wnd_closed()
+	--printf("---:>DeadBodySearch closed")
+end
+
+function dialog_wnd_showed()
+	dialog_closed = false
+	for k,v in pairs(db.storage) do
+		local npc = v.object
+		if npc ~= nil then
+			local npc_id = npc:id()
+			if npc:is_talking() and npc_id ~= db.actor:id() then
+				local sound_theme = xr_sound.sound_table[npc_id]
+				if sound_theme and sound_theme.reset then
+					sound_theme:reset(npc_id)
+				end
+				break
+			end
+		end
+	end
+	--printf("---:>Talk Dialog show")
+end
+
+function dialog_wnd_closed()
+	--printf("---:>Talk Dialog hide")
+	dialog_closed = true
+end
+
+function get_stat(index) -- index= int        return string
+	if(index==0) then
+		return "00:00:00"
+	elseif(index==1) then
+		return tostring(xr_statistic.actor_statistic.surges)
+	elseif(index==2) then
+		return tostring(xr_statistic.actor_statistic.completed_quests)
+	elseif(index==3) then
+		return tostring(xr_statistic.actor_statistic.killed_monsters)
+	elseif(index==4) then
+		return tostring(xr_statistic.actor_statistic.killed_stalkers)
+	elseif(index==5) then
+		return tostring(xr_statistic.actor_statistic.artefacts_founded)
+	elseif(index==6) then
+		return tostring(xr_statistic.actor_statistic.founded_secrets)
+	end
+end
+
+killed_monsters_tbl =
+{
+	bloodsucker_weak  	= {back = "ui_inGame2_Krovosos", 		icon = ""},
+	bloodsucker_normal	= {back = "ui_inGame2_Krovosos_1", 		icon = ""},
+	bloodsucker_strong	= {back = "ui_inGame2_Krovosos_2", 		icon = ""},
+	boar_weak  			= {back = "ui_inGame2_Kaban_1", 		icon = ""},
+	boar_strong			= {back = "ui_inGame2_Kaban", 			icon = ""},
+	burer 				= {back = "ui_inGame2_Burer", 			icon = ""},
+	chimera 			= {back = "ui_inGame2_Himera", 			icon = ""},
+	controller 			= {back = "ui_inGame2_Controller", 		icon = ""},
+	dog 				= {back = "ui_inGame2_Blind_Dog", 		icon = ""},
+	flesh_weak 			= {back = "ui_inGame2_Flesh", 			icon = ""},
+	flesh_strong		= {back = "ui_inGame2_Flesh_1", 		icon = ""},
+	gigant 				= {back = "ui_inGame2_Pseudo_Gigant", 	icon = ""},
+	poltergeist_tele 	= {back = "ui_inGame2_Poltergeyst", 	icon = ""},
+	poltergeist_flame	= {back = "ui_inGame2_Poltergeist_1", 	icon = ""},
+	psy_dog_weak  		= {back = "ui_inGame2_PseudoDog_1", 	icon = ""},
+	psy_dog_strong		= {back = "ui_inGame2_PseudoDog", 		icon = ""},
+	pseudodog_weak 		= {back = "ui_inGame2_PseudoDog_1", 	icon = ""},
+	pseudodog_strong	= {back = "ui_inGame2_PseudoDog",  		icon = ""},
+	snork 				= {back = "ui_inGame2_Snork", 			icon = ""},
+	tushkano 			= {back = "ui_inGame2_Tushkan", 		icon = ""},
+	none 				= {back = "", icon = ""}
+}
+function get_monster_back()
+	if not(xr_statistic.actor_statistic.best_monster) or not(killed_monsters_tbl[xr_statistic.actor_statistic.best_monster]) then
+		return tostring(killed_monsters_tbl.none.back)
+	end
+		return tostring(killed_monsters_tbl[xr_statistic.actor_statistic.best_monster].back)
+end
+function get_monster_icon()
+	if not(xr_statistic.actor_statistic.best_monster) or not(killed_monsters_tbl[xr_statistic.actor_statistic.best_monster]) then
+		return tostring(killed_monsters_tbl.none.icon)
+	end
+		return tostring(killed_monsters_tbl[xr_statistic.actor_statistic.best_monster].icon)
+end
+function get_favorite_weapon()
+	if not(xr_statistic.actor_statistic.favorite_weapon_sect) then
+		return "wpn_knife"
+	end
+		return xr_statistic.actor_statistic.favorite_weapon_sect
+end
+
+local primary_objects_tbl =
+{
+	{target="zat_b55_spot",		hint="st_zat_b55_name"},
+	{target="zat_b100_spot",	hint="st_zat_b100_name"},
+	{target="zat_b104_spot",	hint="st_zat_b104_name"},
+	{target="zat_b38_spot",		hint="st_zat_b38_name"},
+	{target="zat_b40_spot",		hint="st_zat_b40_name"},
+	{target="zat_b56_spot",		hint="st_zat_b56_name"},
+	{target="zat_b5_spot",		hint="st_zat_b5_name"},
+	{target="zat_a2_spot",		hint="st_zat_a2_name"},
+	{target="zat_b20_spot",		hint="st_zat_b20_name"},
+	{target="zat_b53_spot",		hint="st_zat_b53_name"},
+	{target="zat_b101_spot",	hint="st_zat_b101_name"},
+	{target="zat_b106_spot",	hint="st_zat_b106_name"},
+	{target="zat_b7_spot",		hint="st_zat_b7_name"},
+	{target="zat_b14_spot",		hint="st_zat_b14_name"},
+	{target="zat_b52_spot",		hint="st_zat_b52_name"},
+	{target="zat_b39_spot",		hint="st_zat_b39_name"},
+	{target="zat_b33_spot",		hint="st_zat_b33_name"},
+	{target="zat_b18_spot",		hint="st_zat_b18_name"},
+	{target="zat_b54_spot",		hint="st_zat_b54_name"},
+	{target="zat_b12_spot",		hint="st_zat_b12_name"},
+	{target="zat_b28_spot",		hint="st_zat_b28_name"},
+	{target="zat_b103_spot",	hint="st_zat_b103_name"},
+
+	{target="jup_b1_spot",		hint="st_jup_b1_name"},
+	{target="jup_b46_spot",		hint="st_jup_b46_name"},
+	{target="jup_b202_spot",	hint="st_jup_b202_name"},
+	{target="jup_b211_spot",	hint="st_jup_b211_name"},
+	{target="jup_b200_spot",	hint="st_jup_b200_name"},
+	{target="jup_b19_spot",		hint="st_jup_b19_name"},
+	{target="jup_a6_spot",		hint="st_jup_a6_name"},
+	{target="jup_b25_spot",		hint="st_jup_b25_name"},
+	{target="jup_b6_spot",		hint="st_jup_b6_name"},
+	{target="jup_b205_spot",	hint="st_jup_b205_name"},
+	{target="jup_b206_spot",	hint="st_jup_b206_name"},
+	{target="jup_b32_spot",		hint="st_jup_b32_name"},
+	{target="jup_a10_spot",		hint="st_jup_a10_name"},
+	{target="jup_b209_spot",	hint="st_jup_b209_name"},
+	{target="jup_b208_spot",	hint="st_jup_b208_name"},
+	{target="jup_a12_spot",		hint="st_jup_a12_name"},
+	{target="jup_b212_spot",	hint="st_jup_b212_name"},
+	{target="jup_b9_spot",		hint="st_jup_b9_name"},
+	{target="jup_b201_spot",	hint="st_jup_b201_name"},
+	{target="jup_a9_spot",		hint="st_jup_a9_name"},
+
+	{target="pri_a28_spot",		hint="st_pri_a28_name"},
+	{target="pri_b36_spot",		hint="st_pri_b36_name"},
+	{target="pri_b303_spot",	hint="st_pri_b303_name"},
+	{target="pri_b301_spot",	hint="st_pri_b301_name"},
+	{target="pri_a17_spot",		hint="st_pri_a17_name"},
+	{target="pri_b306_spot",	hint="st_pri_b306_name"},
+	{target="pri_a16_spot",		hint="st_pri_a16_name"},
+	{target="pri_a25_spot",		hint="st_pri_a25_name"},
+	{target="pri_b35_spot",		hint="st_pri_b35_name"},
+	{target="pri_a21_spot",		hint="st_pri_a21_name"},
+	{target="pri_b304_spot",	hint="st_pri_b304_name"},
+	{target="pri_a18_spot",		hint="st_pri_a18_name"}
+}
+
+local change_objects_tbl =
+{
+	{target = "jup_b32_spot",		hint = "st_jup_b32_name",	zone = "jup_b32_anomal_zone",	group = "jup_b32_scanner_1_placed",	enabled = false},
+	{target = "jup_b201_spot",		hint = "st_jup_b201_name",	zone = "jup_b201_anomal_zone",	group = "jup_b32_scanner_2_placed",	enabled = false},
+	{target = "jup_b209_spot",		hint = "st_jup_b209_name",	zone = "jup_b209_anomal_zone",	group = "jup_b32_scanner_3_placed",	enabled = false},
+	{target = "jup_b211_spot",		hint = "st_jup_b211_name",	zone = "jup_b211_anomal_zone",	group = "jup_b32_scanner_4_placed",	enabled = false},
+	{target = "jup_b1_spot",		hint = "st_jup_b1_name",	zone = "jup_b10_anomal_zone",	group = "jup_b32_scanner_5_placed",	enabled = false},
+
+}
+
+local sleep_zones_tbl =
+{
+	{target = "zat_a2_sr_sleep_id",		hint = "st_ui_pda_sleep_place"},
+	{target = "jup_a6_sr_sleep_id",		hint = "st_ui_pda_sleep_place"},
+	{target = "pri_a16_sr_sleep_id",	hint = "st_ui_pda_sleep_place"},
+}
+
+function fill_primary_objects()
+	for k,v in pairs(primary_objects_tbl) do
+		local obj_id = get_story_object_id(v.target)
+		if(obj_id) then
+			level.map_add_object_spot(obj_id, "primary_object", v.hint)
+		end
+	end
+	change_anomalies_names()
+	fill_sleep_zones()
+end
+
+function fill_sleep_zones()
+	for k,v in pairs(sleep_zones_tbl) do
+		local obj_id = get_story_object_id(v.target)
+		if(obj_id and db.storage[obj_id] and db.storage[obj_id].object) then
+			if(db.storage[obj_id].object:position():distance_to(db.actor:position())<=150 and level.map_has_object_spot(obj_id, "ui_pda2_actor_sleep_location")==0) then
+				level.map_add_object_spot(obj_id, "ui_pda2_actor_sleep_location", v.hint)
+			elseif(db.storage[obj_id].object:position():distance_to(db.actor:position())>150 and level.map_has_object_spot(obj_id, "ui_pda2_actor_sleep_location")~=0) then
+				level.map_remove_object_spot(obj_id, "ui_pda2_actor_sleep_location")
+			end
+		end
+	end
+end
+
+function add_quick_slot_items_on_game_start()
+	local _ini = system_ini()
+	local str = utils.cfg_get_string(_ini, "actor", "quick_item_1", db.actor, false, "", "")
+	get_console():execute("slot_0 "..str)
+	local str = utils.cfg_get_string(_ini, "actor", "quick_item_2", db.actor, false, "", "")
+	get_console():execute("slot_1 "..str)
+	local str = utils.cfg_get_string(_ini, "actor", "quick_item_3", db.actor, false, "", "")
+	get_console():execute("slot_2 "..str)
+	local str = utils.cfg_get_string(_ini, "actor", "quick_item_4", db.actor, false, "", "")
+	get_console():execute("slot_3 "..str)
+end
+
+function change_anomalies_names()
+	if has_alife_info("jup_b32_scanner_reward") then
+		for k,v in pairs(change_objects_tbl) do
+			if has_alife_info(v.group) and not v.enabled then
+				v.enabled = true
+			end
+		end
+	end
+
+	if level.name() ~= "jupiter" then
+		return
+	end
+	for k,v in pairs(change_objects_tbl) do
+		if v.enabled then
+			local obj_id = get_story_object_id(v.target)
+			if (obj_id) and (level.map_has_object_spot(obj_id, "primary_object") ~= 0) then
+				level.map_remove_object_spot(obj_id, "primary_object")
+			end
+			local hint = game.translate_string(v.hint).."\\n".." \\n"
+			local has_af = false
+			local af_table = {}
+			has_af, af_table = xr_conditions.anomaly_has_artefact(db.actor, nil, {v.zone})
+			if has_af then
+				hint = hint..game.translate_string("st_jup_b32_has_af")
+				for k,v in pairs(af_table) do
+					hint = hint.."\\n"..game.translate_string("st_"..v.."_name")
+				end
+			else
+				hint = hint..game.translate_string("st_jup_b32_no_af")
+			end
+			if (obj_id) and level.map_has_object_spot(obj_id, "primary_object") == 0 then
+				level.map_add_object_spot(obj_id, "primary_object", hint)
+			end
+		end
+	end
+end

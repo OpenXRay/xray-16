@@ -1,0 +1,79 @@
+[smart_terrain]
+def_restr = pri_a16_sr_noweap
+safe_restr = pri_surge_hide_a16; pri_a16_sr_light
+smart_control = smart_control
+squad_id = 26
+max_population = 3
+;respawn_params = respawn@pri_a16
+arrive_dist = 65
+
+;[respawn@pri_a16]
+;spawn_stalker
+
+;[spawn_stalker]
+;spawn_squads = stalker_sim_squad_advanced, stalker_sim_squad_advanced, stalker_sim_squad_veteran
+;spawn_num = {+pri_a28_actor_in_zone_stay} 2, 0
+
+[smart_control]
+noweap_zone = pri_a16_sr_noweap
+ignore_zone = pri_surge_hide_a16; pri_a16_sr_light
+alarm_start_sound = {-pri_b305_fifth_cam_end} pri_a16_base_alarm, nil
+alarm_stop_sound = {-pri_b305_fifth_cam_end} pri_a16_base_relax, nil
+
+[exclusive]
+pri_a16_kovalski_start = pripyat\pri_a16_kovalski_start.ltx
+pri_a16_vano = pripyat\pri_a16_vano.ltx
+pri_a16_wanderer = pripyat\pri_a16_wanderer.ltx
+pri_a16_sokolov = pripyat\pri_a16_sokolov.ltx
+pri_a16_kirillov = pripyat\pri_a16_kirillov.ltx
+pri_b301_zulus = pripyat\pri_b301_zulus_base.ltx
+jup_b43_stalker_assistant = pripyat\pri_b35_home_logic.ltx
+pri_a16_tarasov = pripyat\pri_a16_tarasov.ltx
+pri_a16_recon_1 = pripyat\pri_a16_recon_squad.ltx
+pri_a16_recon_2 = pripyat\pri_a16_recon_squad.ltx
+pri_a16_recon_3 = pripyat\pri_a16_recon_squad.ltx
+pri_a16_medic = pripyat\pri_a16_medic.ltx
+pri_a16_wounded = pripyat\pri_a16_wounded.ltx
+
+pri_a22_military_yarmoshuk 	= pripyat\pri_a22_military_yarmoshuk.ltx
+pri_a22_military_skelja 	= pripyat\pri_a22_military_skelja.ltx
+pri_a22_military_merkulov 	= pripyat\pri_a22_military_merkulov.ltx
+
+pri_a20_missing_military_recon_leader = pripyat\pri_a20_recon_squad.ltx
+pri_a20_missing_military_recon_1 = pripyat\pri_a20_recon_squad.ltx
+
+pri_a16_guarder_main = pripyat\pri_a16_logic.ltx
+pri_a16_guarder_1 = pripyat\pri_a16_logic.ltx
+pri_a16_guarder_2 = pripyat\pri_a16_logic.ltx
+pri_a16_guarder_3 = pripyat\pri_a16_logic.ltx
+pri_a16_guarder_4 = pripyat\pri_a16_logic.ltx
+
+pri_a16_stalker_1 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_2 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_3 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_4 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_5 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_6 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_7 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_8 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_9 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_10 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_11 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_stalker_12 = pripyat\pri_a16_logic_stalker.ltx
+pri_a16_yar		   = pripyat\pri_a16_logic_stalker.ltx
+
+;B305, in order of appearance
+pri_b305_kovalskiy = pripyat\pri_b305_kovalskiy.ltx
+pri_b305_kirillov = pripyat\pri_b305_kirillov.ltx
+pri_b305_strelok = pripyat\pri_b305_strelok.ltx
+pri_b305_medic = pripyat\pri_b305_medic.ltx
+
+;A28, in order of appearance
+pri_a28_kovalskiy = pripyat\pri_a28_kovalskiy.ltx
+pri_a28_kirillov = pripyat\pri_a28_kirillov.ltx
+pri_a28_strelok = pripyat\pri_a28_strelok.ltx
+pri_a28_medic = pripyat\pri_a28_medic.ltx
+pri_a28_military_sokolov = pripyat\pri_a28_military_sokolov.ltx
+pri_a28_military_tarasov = pripyat\pri_a28_military_tarasov.ltx
+pri_a28_military_valentyr = pripyat\pri_a28_military_valentyr.ltx
+pri_a28_military_podorojniy = pripyat\pri_a28_military_podorojniy.ltx

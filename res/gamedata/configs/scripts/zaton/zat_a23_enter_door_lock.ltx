@@ -1,0 +1,22 @@
+[logic]
+active = ph_button@turn_off
+
+[ph_button@turn_off]
+anim = idle
+on_info = ph_button@no_card %=turn_off(zat_a23_light_switch_1_green_id) =turn_off(zat_a23_light_switch_1_flash_id)%
+
+[ph_button@no_card]
+anim = idle
+tooltip = tip_no_access_card
+on_info = {=actor_has_item(zat_a23_access_card)} ph_button@has_card
+
+[ph_button@has_card]
+anim = idle
+tooltip = tip_need_access_card
+on_press = ph_button@unlocked %=scenario_autosave(st_save_zat_a23_entered_test_center)%
+on_info = {!actor_has_item(zat_a23_access_card)} ph_button@no_card
+
+[ph_button@unlocked]
+anim = idle
+on_game_timer = 10 | {-zat_a23_actor_used_access_card} %+zat_a23_actor_used_access_card =anim_obj_forward(zat_a23_enter_door)%
+tooltip = st_lx8_button_press_true

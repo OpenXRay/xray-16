@@ -1,0 +1,284 @@
+[mp_af_electra_flash]:af_electra_flash
+$spawn              	= ""
+class					= ARTEFACT
+slot = 10
+af_rank				= 0
+default_to_ruck			= false
+
+[mp_zone_witches_galantine]:zone_witches_galantine
+$spawn					= "network\anomalies\zone_mine_electric"
+class					= Z_MBALD
+
+[mp_af_cta_green]:af_base
+GroupControlSection	= spawn_group
+$spawn				= "artefacts\CTA green"
+slot = 10
+default_to_ruck			= false
+
+hud				= artefact_hud_green
+cform				= skeleton
+class				= AF_CTA
+
+af_rank				= 0
+
+visual				= dynamics\artefacts\artefact_electra_green.ogf
+description			= st_af_electra_moonlight_descr
+inv_name			= st_af_electra_moonlight_name
+inv_name_short		= st_af_electra_moonlight_name
+inv_weight			= 0.5
+
+inv_grid_x			= 14
+inv_grid_y			= 1
+
+cost				= 999999
+
+jump_height			= .1
+
+particles					= artefact\af_electra_idle
+det_show_particles		= artefact\af_electra_show
+det_hide_particles		= artefact\af_electra_hide
+
+lights_enabled = true
+
+trail_light_color 		= 0.6,0.7,0.9
+trail_light_range 		= 2.0
+
+artefact_activation_seq		= af_activation_electra
+;скорости увеличения (уменьшения)
+health_restore_speed = 0.0
+radiation_restore_speed = 0.0
+satiety_restore_speed = 0.0
+power_restore_speed = 0.004
+bleeding_restore_speed = 0.0
+hit_absorbation_sect = af_electra_flash_absorbation
+additional_inventory_weight = 0
+
+[mp_af_cta_blue]:af_base
+GroupControlSection	= spawn_group
+$spawn				= "artefacts\CTA blue"
+slot = 10
+default_to_ruck			= false
+
+hud				= artefact_hud_blue
+cform				= skeleton
+class				= AF_CTA
+
+af_rank				= 0
+
+visual				= dynamics\artefacts\artefact_electra_blue.ogf
+description			= st_af_electra_moonlight_descr
+inv_name			= st_af_electra_moonlight_name
+inv_name_short		= st_af_electra_moonlight_name
+inv_weight			= 0.5
+
+inv_grid_x			= 15
+inv_grid_y			= 1
+
+cost				= 999999
+
+jump_height			= .1
+
+particles					= artefact\af_electra_idle
+det_show_particles		= artefact\af_electra_show
+det_hide_particles		= artefact\af_electra_hide
+
+lights_enabled = true
+
+trail_light_color 		= 0.6,0.7,0.9
+trail_light_range 		= 2.0
+
+artefact_activation_seq		= af_activation_electra
+;скорости увеличения (уменьшения)
+health_restore_speed = 0.0
+radiation_restore_speed = 0.0
+satiety_restore_speed = 0.0
+power_restore_speed = 0.004
+bleeding_restore_speed = 0.0
+hit_absorbation_sect = af_electra_flash_absorbation
+additional_inventory_weight = 0
+
+
+[artefact_hud_green]:artefact_hud
+item_visual                  	= dynamics\artefacts\artefact_electra_green_hud
+
+[artefact_hud_blue]:artefact_hud
+item_visual                  	= dynamics\artefacts\artefact_electra_blue_hud
+
+;new items
+[mp_medkit]:medkit
+$spawn             	= "network\equipment\mp_medkit"
+class				= II_MEDKI
+boost_time				= 8 ;10.0
+boost_health_restore	= 0.15
+boost_radiation_restore	= 0.0
+boost_bleeding_restore	= 0.05
+
+[mp_medkit_scientic]:medkit
+$spawn             	= "network\equipment\mp_medkit_scientic"
+class				= II_MEDKI
+
+[mp_medkit_army]:medkit_army
+$spawn             	= "network\equipment\mp_medkit_army"
+class				= II_MEDKI
+
+[mp_energy_drink]:energy_drink
+$spawn             	= "network\equipment\mp_energy_drink"
+class				= II_BOTTL
+boost_power_restore	= 0.04 
+
+boost_time				= 60.0
+boost_radiation_restore	= 0
+
+[mp_bandage]:bandage
+$spawn             	= "network\equipment\mp_bandage"
+class				= II_BANDG
+
+boost_time				= 5.0
+boost_bleeding_restore	= 0.02
+
+[mp_antirad]:antirad
+$spawn             	= "network\equipment\mp_antirad"
+class				= II_ANTIR
+
+boost_radiation_restore	= 0.19
+
+boost_time			= 10.0
+
+
+[mp_drug_coagulant]:drug_coagulant
+$spawn             	= "network\equipment\mp_drug_coagulant"
+class				= II_FOOD
+
+[mp_drug_radioprotector]:drug_radioprotector
+$spawn             	= "network\equipment\mp_drug_radioprotector"
+class				= II_FOOD
+
+;old items
+[mp_medkit_old]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency =
+$spawn              	= "network\equipment\mp_medkit_old"
+$prefetch 			= 8
+class				= S_MEDKI
+cform				= skeleton
+visual				= dynamics\devices\dev_aptechka\dev_aptechka_low.ogf
+description			= st_medkit_descr
+inv_name			= st_medkit
+inv_name_short		= st_medkit
+inv_weight			= 0.1
+
+inv_grid_width		= 2
+inv_grid_height		= 1
+inv_grid_x			= 6
+inv_grid_y			= 14
+cost				= 300
+
+; eatable item
+eat_health			= 0.5
+eat_satiety			= 0
+eat_power			= 0.0
+eat_radiation		= -0.05
+wounds_heal_perc	= 0.1
+eat_portions_num	= 1
+eat_max_power		= 0.1
+apply_time_sec		= 5
+
+[mp_antirad_old]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency =
+$spawn              	= "network\equipment\mp_antirad_old"
+$prefetch 		= 32
+class			= II_ANTIR
+cform           = skeleton
+visual          = dynamics\devices\dev_antirad\dev_antirad.ogf
+description		= st_antirad_descr
+
+inv_name			= st_antirad
+inv_name_short		= st_antirad
+inv_weight			= 0.05
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 18
+inv_grid_y			= 12
+cost				= 300
+
+; eatable item
+eat_health = 0
+eat_satiety = 0
+eat_power = 0
+eat_radiation = -0.5
+wounds_heal_perc = 0
+eat_portions_num = 1
+
+apply_time_sec		= -1
+
+
+[mp_detector_advanced]:detector_elite
+$spawn              	= ""
+
+[mp_device_torch]:device_torch
+$spawn              	= ""
+
+[mp_players_rukzak]:identity_immunities
+$spawn              	= ""
+GroupControlSection	= spawn_group
+cform				= skeleton
+class				= MP_PLBAG
+visual				= dynamics\devices\dev_rukzak\dev_rukzak.ogf
+
+;--------
+description					= "rukzak"
+default_to_ruck				= true
+sprint_allowed				= false;
+control_inertion_factor		= 0.0
+;----------
+
+inv_name			= Rukzak
+inv_name_short		= Rukzak
+inv_weight			= 0
+cost				= 0
+
+inv_grid_width		= 2
+inv_grid_height		= 2
+inv_grid_x			= 0
+inv_grid_y			= 18
+
+slot				= 5
+
+;///////////////////////////////////////////////
+;//	explosive items !!!
+;///////////////////////////////////////////////
+
+[mp_wood_stolb_fixed]
+GroupControlSection = spawn_group
+$spawn        = "network\fixed_objects\stolb"
+class       = P_DSTRBL
+remove_time     = 30		; after this time  unbreaked removable bone will be removed
+;script_binding      = bind_physic_object.init
+visual		 		= dynamics\wood_doski\wood_stolb_fixed.ogf
+
+immunities_sect			= mp_wood_stolb_fixed_immunities
+
+[mp_wood_stolb_fixed_immunities]
+burn_immunity            = 0.6 
+strike_immunity          = 0.005
+shock_immunity           = 0.002
+wound_immunity           = 0
+radiation_immunity       = 0
+telepatic_immunity       = 0
+chemical_burn_immunity   = 0
+explosion_immunity       = 0.6
+fire_wound_immunity      = 0.6
+
+[mp_explosive_fuelcan]:explosive_fuelcan
+$spawn 				= "network\explosive\fuelcan"
+class				= II_EXPLO
+
+[mp_explosive_tank]:explosive_tank
+$spawn 				= "network\explosive\tank"
+class				= II_EXPLO
+
+[mp_explosive_barrel]:explosive_barrel
+$spawn 				= "network\explosive\barrel_low"
+class				= II_EXPLO

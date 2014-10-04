@@ -1,0 +1,1655 @@
+function zat_b30_owl_stalker_trader_actor_has_item_to_sell(first_speaker, second_speaker)
+	local items_table = {
+						"zat_b20_noah_pda",
+						"zat_b40_notebook",
+						"zat_b40_pda_1",
+						"zat_b40_pda_2",
+						"pri_b36_monolith_hiding_place_pda",
+						"pri_b306_envoy_pda",
+						"jup_b46_duty_founder_pda",
+						"jup_b207_merc_pda_with_contract",
+						"device_pda_zat_b5_dealer",
+						"jup_b10_notes_01",
+						"jup_b10_notes_02",
+						"jup_b10_notes_03",
+						"jup_a9_evacuation_info",
+						"jup_a9_meeting_info",
+						"jup_a9_losses_info",
+						"jup_a9_delivery_info",
+						"zat_b12_documents_1",
+						"zat_b12_documents_2",
+						"device_flash_snag",
+						"jup_b202_bandit_pda",
+						"device_pda_port_bandit_leader",
+						"jup_b10_ufo_memory_2",
+						-- no sell
+						"jup_b1_half_artifact",
+						"af_quest_b14_twisted",
+						"af_oasis_heart",
+						"detector_scientific",
+						}
+
+	local info_table = {
+						["jup_b1_half_artifact"] = "zat_b30_owl_stalker_about_halfart_jup_b6_asked",
+						["af_quest_b14_twisted"] = "zat_b30_owl_stalker_about_halfart_zat_b14_asked",
+						["af_oasis_heart"] = "zat_b30_owl_stalker_trader_about_osis_art",
+						["detector_scientific"] = "zat_b30_owl_detectors_approached",
+						}
+
+	for k,v in pairs(items_table) do
+		if db.actor:object(v) ~= nil then
+			if v == "detector_scientific" and not has_alife_info("zat_b30_second_detector") then
+			else
+				if info_table[v] then
+					if not has_alife_info(info_table[v]) then
+						return true
+					end
+				else
+					return true
+				end
+			end
+		end
+	end
+
+	return false
+end
+
+function zat_b30_owl_can_say_about_heli(first_speaker, second_speaker)
+	local cnt = 3
+	local table = {
+					[1] = "zat_b28_heli_3_searched",
+					[2] = "zat_b100_heli_2_searched",
+					[3] = "zat_b101_heli_5_searched",
+					}
+
+	local table2 = {
+					[1] = "zat_b30_owl_scat_1",
+					[2] = "zat_b30_owl_scat_2",
+					[3] = "zat_b30_owl_scat_3",
+					}
+
+
+	for k = 1, #table do
+		if has_alife_info(table[k]) or has_alife_info(table2[k]) then
+			cnt = cnt - 1
+		end
+	end
+
+	return cnt > 0
+end
+
+function zat_b30_actor_has_1000(first_speaker, second_speaker)
+	return db.actor:money() >= 1000
+end
+
+function zat_b30_actor_has_200(first_speaker, second_speaker)
+	return db.actor:money() >= 200
+end
+
+function zat_b30_actor_has_pri_b36_monolith_hiding_place_pda(first_speaker, second_speaker)
+	return db.actor:object("pri_b36_monolith_hiding_place_pda") ~= nil
+end
+
+function zat_b30_actor_has_pri_b306_envoy_pda(first_speaker, second_speaker)
+	return db.actor:object("pri_b306_envoy_pda") ~= nil
+end
+
+function zat_b30_actor_has_jup_b10_strelok_notes_1(first_speaker, second_speaker)
+	return db.actor:object("jup_b10_notes_01") ~= nil
+end
+
+function zat_b30_actor_has_jup_b10_strelok_notes_2(first_speaker, second_speaker)
+	return db.actor:object("jup_b10_notes_02") ~= nil
+end
+
+function zat_b30_actor_has_jup_b10_strelok_notes_3(first_speaker, second_speaker)
+	return db.actor:object("jup_b10_notes_03") ~= nil
+end
+
+function zat_b30_actor_has_detector_scientific(first_speaker, second_speaker)
+	return db.actor:object("detector_scientific") ~= nil
+end
+
+function zat_b30_actor_has_device_flash_snag(first_speaker, second_speaker)
+	return db.actor:object("device_flash_snag") ~= nil
+end
+
+function zat_b30_actor_has_device_pda_port_bandit_leader(first_speaker, second_speaker)
+	return db.actor:object("device_pda_port_bandit_leader") ~= nil
+end
+
+function zat_b30_actor_has_jup_b10_ufo_memory(first_speaker, second_speaker)
+	return db.actor:object("jup_b10_ufo_memory_2") ~= nil
+end
+
+function zat_b30_actor_has_jup_b202_bandit_pda(first_speaker, second_speaker)
+	return db.actor:object("jup_b202_bandit_pda") ~= nil
+end
+
+function zat_b30_transfer_1000(first_speaker, second_speaker)
+	dialogs.relocate_money_from_actor(first_speaker, second_speaker, 1000)
+end
+
+function zat_b30_transfer_200(first_speaker, second_speaker)
+	dialogs.relocate_money_from_actor(first_speaker, second_speaker, 200)
+end
+
+function zat_b30_sell_pri_b36_monolith_hiding_place_pda(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "pri_b36_monolith_hiding_place_pda")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 5000)
+end
+
+function zat_b30_sell_pri_b306_envoy_pda(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "pri_b306_envoy_pda")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 4000)
+end
+
+function zat_b30_sell_jup_b207_merc_pda_with_contract(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "jup_b207_merc_pda_with_contract")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 1000)
+	db.actor:give_info_portion("jup_b207_merc_pda_with_contract_sold")
+end
+
+function zat_b30_sell_jup_b10_strelok_notes_1(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "jup_b10_notes_01")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 500)
+end
+
+function zat_b30_sell_jup_b10_strelok_notes_2(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "jup_b10_notes_02")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 500)
+end
+
+function zat_b30_sell_jup_b10_strelok_notes_3(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "jup_b10_notes_03")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 500)
+end
+
+function jup_a9_owl_stalker_trader_sell_jup_a9_evacuation_info(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "jup_a9_evacuation_info")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 750)
+	db.actor:give_info_portion("jup_a9_evacuation_info_sold")
+end
+
+function jup_a9_owl_stalker_trader_sell_jup_a9_meeting_info(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "jup_a9_meeting_info")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 750)
+	db.actor:give_info_portion("jup_a9_meeting_info_sold")
+end
+
+function jup_a9_owl_stalker_trader_sell_jup_a9_losses_info(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "jup_a9_losses_info")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 750)
+	db.actor:give_info_portion("jup_a9_losses_info_sold")
+end
+
+function jup_a9_owl_stalker_trader_sell_jup_a9_delivery_info(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "jup_a9_delivery_info")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 750)
+	db.actor:give_info_portion("jup_a9_delivery_info_sold")
+end
+
+function zat_b30_owl_stalker_trader_sell_device_flash_snag(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "device_flash_snag")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 200)
+	db.actor:give_info_portion("device_flash_snag_sold")
+end
+
+function zat_b30_owl_stalker_trader_sell_device_pda_port_bandit_leader(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "device_pda_port_bandit_leader")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 1000)
+	db.actor:give_info_portion("device_pda_port_bandit_leader_sold")
+end
+
+function zat_b30_owl_stalker_trader_sell_jup_b10_ufo_memory(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "jup_b10_ufo_memory_2")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 500)
+	db.actor:give_info_portion("jup_b10_ufo_memory_2_sold")
+end
+
+function zat_b30_owl_stalker_trader_sell_jup_b202_bandit_pda(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "jup_b202_bandit_pda")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 500)
+end
+
+-------- B14
+function zat_b14_bar_transfer_money(first_speaker, second_speaker)
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 1000)
+end
+
+function zat_b14_transfer_artefact(first_speaker, second_speaker)
+	local npc = dialogs.who_is_npc(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "af_quest_b14_twisted")
+end
+
+function actor_has_artefact(first_speaker, second_speaker)
+	return first_speaker:object("af_quest_b14_twisted") ~= nil
+end
+
+function actor_hasnt_artefact(first_speaker, second_speaker)
+	return not actor_has_artefact(first_speaker, second_speaker)
+end
+
+--Zaton B7
+
+function zat_b7_give_bandit_reward_to_actor(first_speaker, second_speaker)
+	local amount = math.random(15, 30)*100
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, amount)
+	treasure_manager.get_treasure_manager():give_treasure("zat_hiding_place_30")
+end
+
+function zat_b7_give_stalker_reward_to_actor(first_speaker, second_speaker)
+	local reward = math.random(1,3)
+	if reward == 1 then
+		dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "bandage", 6)
+		dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "vodka", 4)
+	end
+ 	if reward == 2 then
+		dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "medkit", 2)
+		dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "vodka", 4)
+	end
+ 	if reward == 3 then
+		dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "antirad",3)
+		dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "vodka", 4)
+	end
+	treasure_manager.get_treasure_manager():give_treasure("zat_hiding_place_29")
+end
+
+function zat_b7_give_stalker_reward_2_to_actor(first_speaker, second_speaker)
+	dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "bandage", 4)
+	dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "medkit", 2)
+	dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "antirad",2)
+end
+
+function zat_b7_rob_actor(first_speaker, second_speaker)
+	local amount = math.floor(db.actor:money()*math.random(75,100)/100)
+	if db.actor:money() < amount then
+		amount = db.actor:money()
+	end
+	dialogs.relocate_money_from_actor(first_speaker, second_speaker, amount)
+end
+
+function zat_b7_killed_self_precond(first_speaker, second_speaker)
+	if has_alife_info("zat_b7_stalkers_raiders_meet") or has_alife_info("zat_b7_victims_disappeared") then
+		return false
+	end
+
+	if xr_conditions.squad_exist(nil,nil, {"zat_b7_stalkers_victims_1"}) then
+		return false
+	end
+
+	return true
+end
+
+function zat_b7_squad_alive(first_speaker, second_speaker)
+	if xr_conditions.squad_exist(nil,nil, {"zat_b7_stalkers_victims_1"}) then
+		return true
+	end
+
+	return false
+end
+
+function zat_b103_transfer_merc_supplies(first_speaker, second_speaker)
+	local npc = dialogs.who_is_npc(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	local i = 6
+	local j = 0
+	local section
+	local item_sections	= {
+		[1] = "conserva",
+		[2] = "kolbasa",
+		[3] = "bread"
+	}
+
+	local function transfer_object_item(temp, item)
+		if (item:section() == section and i ~= 0) then
+			actor:transfer_item(item, npc)
+			i = i - 1
+		end
+	end
+
+	for k,v in pairs(item_sections) do
+		section = v
+		j = i
+		actor:iterate_inventory(transfer_object_item, nil)
+		if ((j - i) ~= 0) then
+			news_manager.relocate_item(actor, "out", section, j - i)
+		end
+--		printf("?zat_b103_transfer_merc_supplies? : section [%s] lasts [%s] from 6", tostring(v), tostring(i))
+	end
+end
+
+function zat_b103_transfer_mechanic_toolkit_2(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "toolkit_2")
+end
+
+-- по мере появления новых механиков, в эту функцию следует прописывать их имена! проверка на юзабельность stalker_toolkit_dialog.(redstain)
+function check_npc_name_mechanics (first_speaker, second_speaker)
+	return (not xr_conditions.check_npc_name(first_speaker, second_speaker, {"mechanic"})
+			and not xr_conditions.check_npc_name(first_speaker, second_speaker, {"zat_b103_lost_merc"})
+			and not xr_conditions.check_npc_name(first_speaker, second_speaker, {"tech"})
+			and not xr_conditions.check_npc_name(first_speaker, second_speaker, {"zulus"})
+			and xr_conditions.check_npc_name(first_speaker, second_speaker, {"stalker"}))
+end
+
+-- zaton b33
+
+function zat_b33_set_counter_10(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	xr_effects.set_counter(actor, nil, {"zat_b33_items",10})
+end
+
+function zat_b33_counter_ge_2(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	return xr_conditions.counter_greater(actor, nil, {"zat_b33_items",1})
+end
+
+function zat_b33_counter_ge_4(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	return xr_conditions.counter_greater(actor, nil, {"zat_b33_items",3})
+end
+
+function zat_b33_counter_ge_8(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	return xr_conditions.counter_greater(actor, nil, {"zat_b33_items",7})
+end
+
+function zat_b33_counter_le_2(first_speaker, second_speaker)
+	return not zat_b33_counter_ge_2(first_speaker, second_speaker)
+end
+
+function zat_b33_counter_le_4(first_speaker, second_speaker)
+	return not zat_b33_counter_ge_4(first_speaker, second_speaker)
+end
+
+function zat_b33_counter_le_8(first_speaker, second_speaker)
+	return not zat_b33_counter_ge_8(first_speaker, second_speaker)
+end
+
+function zat_b33_counter_de_2(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	return xr_effects.dec_counter(actor, nil, {"zat_b33_items",2})
+end
+
+function zat_b33_counter_de_4(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	return xr_effects.dec_counter(actor, nil, {"zat_b33_items",4})
+end
+
+function zat_b33_counter_de_8(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	return xr_effects.dec_counter(actor, nil, {"zat_b33_items",8})
+end
+
+function zat_b33_counter_eq_10(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	return xr_conditions.counter_equal(actor, nil, {"zat_b33_items",10})
+end
+
+function zat_b33_counter_ne_10(first_speaker, second_speaker)
+	return not zat_b33_counter_eq_10(first_speaker, second_speaker)
+end
+
+function zat_b33_transfer_first_item(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	dialogs.relocate_item_section(actor,"wpn_fort_snag","in")
+end
+
+function zat_b33_transfer_second_item(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	dialogs.relocate_item_section(actor,"medkit_scientic","in",3)
+	dialogs.relocate_item_section(actor,"antirad","in",3)
+	dialogs.relocate_item_section(actor,"bandage","in",5)
+end
+
+function zat_b33_transfer_third_item(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	dialogs.relocate_item_section(actor,"wpn_ak74u_snag","in")
+end
+
+function zat_b33_transfer_fourth_item(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	dialogs.relocate_item_section(actor,"af_soul","in")
+end
+
+function zat_b33_transfer_fifth_item(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	dialogs.relocate_item_section(actor,"helm_hardhat_snag","in")
+end
+
+function zat_b33_transfer_safe_container(first_speaker, second_speaker)
+	local npc = dialogs.who_is_npc(first_speaker, second_speaker)
+	dialogs.relocate_item_section(npc,"zat_b33_safe_container","out")
+end
+
+function zat_b33_aractor_has_habar(first_speaker, second_speaker)
+	return db.actor:object("zat_b33_safe_container") ~= nil
+end
+
+function zat_b33_actor_hasnt_habar(first_speaker, second_speaker)
+	return not zat_b33_aractor_has_habar(first_speaker, second_speaker)
+end
+
+function zat_b33_actor_has_needed_money(first_speaker, second_speaker)
+	local zat_b33_tech_money = 500
+	return db.actor:money() >= zat_b33_tech_money
+end
+
+function zat_b33_actor_hasnt_needed_money(first_speaker, second_speaker)
+ 	return not zat_b33_actor_has_needed_money(first_speaker, second_speaker)
+end
+
+function zat_b33_relocate_money(first_speaker, second_speaker)
+	local zat_b33_tech_money = 500
+	if zat_b33_actor_has_needed_money(first_speaker, second_speaker) then
+		dialogs.relocate_money_from_actor(first_speaker, second_speaker, zat_b33_tech_money)
+	end
+end
+
+
+-- Zaton B29
+
+zat_b29_af_table = {
+--[[
+	[1] = "af_cristall",
+	[2] = "af_blood",
+	[3] = "af_electra_sparkler",
+	[4] = "af_cristall_flower",
+	[5] = "af_medusa",
+	[6] = "af_fireball",
+	[7] = "af_mincer_meat",
+	[8] = "af_electra_flash",
+	[9] = "af_night_star",
+	[10] = "af_dummy_glassbeads",
+	[11] = "af_soul",
+	[12] = "af_electra_moonlight",
+	[13] = "af_dummy_battery",
+	[14] = "af_vyvert",
+	[15] = "af_fuzz_kolobok",
+]]--
+	[16] = "af_gravi",
+	[17] = "af_eye",
+	[18] = "af_baloon",
+	[19] = "af_dummy_dummy",
+	[20] = "af_gold_fish",
+	[21] = "af_fire",
+	[22] = "af_glass",
+	[23] = "af_ice",
+}
+
+zat_b29_af_names_table = {
+--[[
+	[1] = "st_af_cristall_name",
+	[2] = "st_af_blood_name",
+	[3] = "st_af_electra_sparkler_name",
+	[4] = "st_af_cristall_flower_name",
+	[5] = "st_af_medusa_name",
+	[6] = "st_af_fireball_name",
+	[7] = "st_af_mincer_meat_name",
+	[8] = "st_af_electra_flash_name",
+	[9] = "st_af_night_star_name",
+	[10] = "st_af_dummy_glassbeads_name",
+	[11] = "st_af_soul_name",
+	[12] = "st_af_electra_moonlight_name",
+	[13] = "st_af_dummy_battery_name",
+	[14] = "st_af_vyvert_name",
+	[15] = "st_af_fuzz_kolobok_name",
+]]--
+	[16] = "st_af_gravi_name",
+	[17] = "st_af_eye_name",
+	[18] = "st_af_baloon_name",
+	[19] = "st_af_dummy_dummy_name",
+	[20] = "st_af_gold_fish_name",
+	[21] = "st_af_fire_name",
+	[22] = "st_af_glass_name",
+	[23] = "st_af_ice_name",
+}
+
+zat_b29_infop_table = {
+	[16] = "zat_b29_af_16",
+	[17] = "zat_b29_af_17",
+	[18] = "zat_b29_af_18",
+	[19] = "zat_b29_af_19",
+	[20] = "zat_b29_af_20",
+	[21] = "zat_b29_af_21",
+	[22] = "zat_b29_af_22",
+	[23] = "zat_b29_af_23",
+}
+
+zat_b29_infop_bring_table = {
+	[16] = "zat_b29_bring_af_16",
+ 	[17] = "zat_b29_bring_af_17",
+ 	[18] = "zat_b29_bring_af_18",
+ 	[19] = "zat_b29_bring_af_19",
+ 	[20] = "zat_b29_bring_af_20",
+	[21] = "zat_b29_bring_af_21",
+ 	[22] = "zat_b29_bring_af_22",
+ 	[23] = "zat_b29_bring_af_23",
+}
+
+function zat_b29_create_af_in_anomaly(first_speaker, second_speaker)
+	local anom_tbl = {
+						[16] = "gravi",
+					 	[17] = "thermal",
+					 	[18] = "acid",
+					 	[19] = "electra",
+					 	[20] = "gravi",
+						[21] = "thermal",
+					 	[22] = "acid",
+					 	[23] = "electra",
+					}
+
+	local anomalies_names_tbl = {
+								["gravi"] = {
+											[1] = "zat_b14_anomal_zone",
+											[2] = "zat_b55_anomal_zone",
+											[3] = "zat_b44_anomal_zone_gravi",
+											},
+								["thermal"] = {
+											[1] = "zat_b20_anomal_zone",
+											[2] = "zat_b53_anomal_zone",
+											[3] = "zaton_b56_anomal_zone",
+											},
+								["acid"] = {
+											[1] = "zat_b39_anomal_zone",
+											[2] = "zat_b101_anomal_zone",
+											[3] = "zat_b44_anomal_zone_acid",
+											},
+								["electra"] = {
+											[1] = "zat_b54_anomal_zone",
+											[2] = "zat_b100_anomal_zone",
+											},
+								}
+
+	local zone = ""
+	local zone_name = ""
+	local key
+
+	for k,v in pairs(zat_b29_infop_bring_table) do
+		if has_alife_info(v) then
+			key = k
+			zone = anom_tbl[key]
+			break
+		end
+	end
+
+	zone_name = anomalies_names_tbl[zone][math.random(1, #anomalies_names_tbl[zone])]
+
+	db.anomaly_by_name[zone_name]:set_forced_override(zat_b29_af_table[key])
+end
+
+function zat_b29_linker_give_adv_task(first_speaker, second_speaker)
+	local result
+	local f_first = true
+	for i = 16, 23 do
+		disable_info(zat_b29_infop_bring_table[i])
+		if has_alife_info(zat_b29_infop_table[i]) then
+			if f_first then
+				result = game.translate_string(zat_b29_af_names_table[i])
+				f_first = false
+			else
+				result = result..", "..game.translate_string(zat_b29_af_names_table[i])
+			end
+		end
+	end
+	result = result.."."
+	return result
+end
+
+function zat_b29_actor_do_not_has_adv_task_af(first_speaker, second_speaker)
+	for i = 16, 23 do
+		if (has_alife_info(zat_b29_infop_bring_table[i]) and db.actor:object(zat_b29_af_table[i])) then
+			return false
+		end
+	end
+	return true
+end
+
+function zat_b29_actor_has_adv_task_af(first_speaker, second_speaker)
+	for i = 16, 23 do
+		if (has_alife_info(zat_b29_infop_bring_table[i]) and db.actor:object(zat_b29_af_table[i])) then
+			return true
+		end
+	end
+	return false
+end
+
+function zat_b29_actor_do_not_has_adv_task_af_1(first_speaker, second_speaker)
+	if has_alife_info(zat_b29_infop_table[16]) and not db.actor:object(zat_b29_af_table[16]) then
+		return true
+	end
+
+	return false
+end
+
+function zat_b29_actor_do_not_has_adv_task_af_2(first_speaker, second_speaker)
+	if has_alife_info(zat_b29_infop_table[17]) and not db.actor:object(zat_b29_af_table[17]) then
+		return true
+	end
+	return false
+end
+
+function zat_b29_actor_do_not_has_adv_task_af_3(first_speaker, second_speaker)
+	if has_alife_info(zat_b29_infop_table[18]) and not db.actor:object(zat_b29_af_table[18]) then
+		return true
+	end
+	return false
+end
+
+function zat_b29_actor_do_not_has_adv_task_af_4(first_speaker, second_speaker)
+	if has_alife_info(zat_b29_infop_table[19]) and not db.actor:object(zat_b29_af_table[19]) then
+		return true
+	end
+	return false
+end
+
+function zat_b29_actor_do_not_has_adv_task_af_5(first_speaker, second_speaker)
+	if has_alife_info(zat_b29_infop_table[20]) and not db.actor:object(zat_b29_af_table[20]) then
+		return true
+	end
+	return false
+end
+
+function zat_b29_actor_do_not_has_adv_task_af_6(first_speaker, second_speaker)
+	if has_alife_info(zat_b29_infop_table[21]) and not db.actor:object(zat_b29_af_table[21]) then
+		return true
+	end
+	return false
+end
+
+function zat_b29_actor_do_not_has_adv_task_af_7(first_speaker, second_speaker)
+	if has_alife_info(zat_b29_infop_table[22]) and not db.actor:object(zat_b29_af_table[22]) then
+		return true
+	end
+	return false
+end
+
+function zat_b29_actor_do_not_has_adv_task_af_8(first_speaker, second_speaker)
+	if has_alife_info(zat_b29_infop_table[23]) and not db.actor:object(zat_b29_af_table[23]) then
+		return true
+	end
+	return false
+end
+
+function zat_b29_actor_has_adv_task_af_1(first_speaker, second_speaker)
+	if has_alife_info(zat_b29_infop_table[16]) and db.actor:object(zat_b29_af_table[16]) then
+		return true
+	end
+	return false
+end
+
+function zat_b29_actor_has_adv_task_af_2(first_speaker, second_speaker)
+	if has_alife_info(zat_b29_infop_table[17]) and db.actor:object(zat_b29_af_table[17]) then
+		return true
+	end
+	return false
+end
+
+function zat_b29_actor_has_adv_task_af_3(first_speaker, second_speaker)
+	if has_alife_info(zat_b29_infop_table[18]) and db.actor:object(zat_b29_af_table[18]) then
+		return true
+	end
+	return false
+end
+
+function zat_b29_actor_has_adv_task_af_4(first_speaker, second_speaker)
+	if has_alife_info(zat_b29_infop_table[19]) and db.actor:object(zat_b29_af_table[19]) then
+		return true
+	end
+	return false
+end
+
+function zat_b29_actor_has_adv_task_af_5(first_speaker, second_speaker)
+	if has_alife_info(zat_b29_infop_table[20]) and db.actor:object(zat_b29_af_table[20]) then
+		return true
+	end
+	return false
+end
+
+function zat_b29_actor_has_adv_task_af_6(first_speaker, second_speaker)
+	if has_alife_info(zat_b29_infop_table[21]) and db.actor:object(zat_b29_af_table[21]) then
+		return true
+	end
+	return false
+end
+
+function zat_b29_actor_has_adv_task_af_7(first_speaker, second_speaker)
+	if has_alife_info(zat_b29_infop_table[22]) and db.actor:object(zat_b29_af_table[22]) then
+		return true
+	end
+	return false
+end
+
+function zat_b29_actor_has_adv_task_af_8(first_speaker, second_speaker)
+	if has_alife_info(zat_b29_infop_table[23]) and db.actor:object(zat_b29_af_table[23]) then
+		return true
+	end
+	return false
+end
+
+function zat_b29_linker_get_adv_task_af(first_speaker, second_speaker)
+	for i = 16, 23 do
+		if has_alife_info(zat_b29_infop_bring_table[i])then
+			disable_info("zat_b29_adv_task_given")
+			dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, zat_b29_af_table[i])
+			if i < 20 then
+				if has_alife_info("zat_b29_linker_take_af_from_rival") then
+					dialogs.relocate_money_to_actor(first_speaker, second_speaker, 12000)
+				else
+					dialogs.relocate_money_to_actor(first_speaker, second_speaker, 18000)
+				end
+			elseif i > 19 then
+				if has_alife_info("zat_b29_linker_take_af_from_rival") then
+					dialogs.relocate_money_to_actor(first_speaker, second_speaker, 18000)
+				else
+					dialogs.relocate_money_to_actor(first_speaker, second_speaker, 24000)
+				end
+			end
+			break
+		end
+	end
+end
+
+local actor_wpn_table = {}
+
+function is_good_gun(npc, item)
+	local section = item:section()
+	local wpn_table = {
+						[1] = "wpn_sig550",
+						[2] = "wpn_g36",
+						[3] = "wpn_val",
+						[4] = "wpn_groza",
+						[5] = "wpn_vintorez",
+						[6] = "wpn_fn2000",
+						}
+
+	for k,v in pairs(wpn_table) do
+		if section == v then
+			table.insert(actor_wpn_table,v)
+			break
+		end
+	end
+end
+
+function zat_b29_actor_has_exchange_item(first_speaker, second_speaker)
+	db.actor:iterate_inventory(is_good_gun, nil)
+	if #actor_wpn_table > 0 then
+		db.actor.good_gun = actor_wpn_table[math.random(1,#actor_wpn_table)]
+	end
+	if (db.actor.good_gun ~= nil) then
+		return true
+	end
+
+	return false
+end
+
+function zat_b29_actor_exchange(first_speaker, second_speaker)
+	for i = 16, 23 do
+		if has_alife_info(zat_b29_infop_bring_table[i]) then
+			--db.actor:iterate_inventory(is_good_gun, nil)
+			if (db.actor.good_gun ~= nil) then
+				dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, db.actor.good_gun)
+				dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, zat_b29_af_table[i])
+				db.actor.good_gun = nil
+				break
+			end
+		end
+	end
+end
+
+-- Zaton B30
+
+function zat_b30_transfer_detector_to_actor(first_speaker, second_speaker)
+	dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "detector_scientific")
+end
+
+function zat_b30_give_owls_share_to_actor(first_speaker, second_speaker)
+	local amount = 1500
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, amount)
+end
+
+function zat_b30_actor_has_compass(first_speaker, second_speaker)
+	return db.actor:object("af_compass") ~= nil
+end
+
+function zat_b30_transfer_af_from_actor(first_speaker, second_speaker)
+	local amount = 10000
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "af_compass")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, amount)
+	treasure_manager.get_treasure_manager():give_treasure("zat_hiding_place_49")
+	treasure_manager.get_treasure_manager():give_treasure("zat_hiding_place_15")
+end
+
+function zat_b30_barmen_has_percent(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	local cnt = xr_logic.pstor_retrieve(actor, "zat_b30_days_cnt", 0)
+	return cnt > 0
+end
+
+function zat_b30_barmen_do_not_has_percent(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	local cnt = xr_logic.pstor_retrieve(actor, "zat_b30_days_cnt", 0)
+	return cnt < 1
+end
+
+function zat_b30_transfer_percent(first_speaker, second_speaker)
+	local amount = math.random(5,25)*100
+	local days = xr_logic.pstor_retrieve(db.actor, "zat_b30_days_cnt", 0)
+	amount = amount * days
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, amount)
+	xr_logic.pstor_store(db.actor, "zat_b30_days_cnt", 0)
+end
+
+function zat_b30_npc_has_detector(first_speaker, second_speaker)
+	local npc = dialogs.who_is_npc(first_speaker, second_speaker)
+	if npc:object("detector_scientific") then
+		return true
+	end
+
+	return false
+end
+
+function zat_b30_actor_exchange(first_speaker, second_speaker)
+	if (db.actor.good_gun ~= nil) then
+		dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, db.actor.good_gun)
+		dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "detector_scientific")
+		db.actor.good_gun = nil
+	end
+	if xr_conditions.check_npc_name(first_speaker, second_speaker, {"zat_b29_stalker_rival_1"}) then
+		db.actor:give_info_portion("zat_b30_rival_1_wo_detector")
+	elseif xr_conditions.check_npc_name(first_speaker, second_speaker, {"zat_b29_stalker_rival_2"}) then
+		db.actor:give_info_portion("zat_b30_rival_2_wo_detector")
+	end
+end
+
+function zat_b30_actor_has_two_detectors(first_speaker, second_speaker)
+ 	local cnt = 0
+	local function zat_b30_count(npc, item)
+		--printf("item:section: %s", item:section())
+		if item:section() == "detector_scientific" then
+			cnt = cnt + 1
+		end
+	end
+
+	db.actor:iterate_inventory(zat_b30_count, nil)
+	if cnt > 1 then
+		return true
+	end
+
+	return false
+end
+
+function zat_b30_actor_second_exchange(first_speaker, second_speaker)
+	dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "detector_scientific")
+end
+
+--Zaton B52
+
+function actor_has_nimble_weapon(first_speaker, second_speaker)
+	return db.actor:object("wpn_groza_nimble") ~= nil or
+	db.actor:object("wpn_vintorez_nimble") ~= nil or
+	db.actor:object("wpn_desert_eagle_nimble") ~= nil or
+	db.actor:object("wpn_fn2000_nimble") ~= nil or
+	db.actor:object("wpn_g36_nimble") ~= nil or
+	db.actor:object("wpn_protecta_nimble") ~= nil or
+	db.actor:object("wpn_mp5_nimble") ~= nil or
+	db.actor:object("wpn_sig220_nimble") ~= nil or
+	db.actor:object("wpn_spas12_nimble") ~= nil or
+	db.actor:object("wpn_usp_nimble") ~= nil or
+	db.actor:object("wpn_svu_nimble") ~= nil or
+	db.actor:object("wpn_svd_nimble") ~= nil
+end
+
+function zat_b51_robbery(first_speaker, second_speaker)
+	local amount = math.floor(db.actor:money()*math.random(35,50)/100)
+	if amount > db.actor:money() then
+		amount = db.actor:money()
+	end
+	local need_item = {}
+
+	need_item["wpn_usp"] = true
+	need_item["wpn_desert_eagle"] = true
+	need_item["wpn_protecta"] = true
+	need_item["wpn_sig550"] = true
+	need_item["wpn_fn2000"] = true
+	need_item["wpn_g36"] = true
+	need_item["wpn_val"] = true
+	need_item["wpn_vintorez"] = true
+	need_item["wpn_groza"] = true
+	need_item["wpn_svd"] = true
+	need_item["wpn_svu"] = true
+	need_item["wpn_pkm"] = true
+	need_item["wpn_sig550_luckygun"] = true
+	need_item["wpn_pkm_zulus"] = true
+	need_item["wpn_wincheaster1300_trapper"] = true
+	need_item["wpn_gauss"] = true
+	need_item["wpn_groza_nimble"] = true
+	need_item["wpn_desert_eagle_nimble"] = true
+	need_item["wpn_fn2000_nimble"] = true
+	need_item["wpn_g36_nimble"] = true
+	need_item["wpn_protecta_nimble"] = true
+	need_item["wpn_mp5_nimble"] = true
+	need_item["wpn_sig220_nimble"] = true
+	need_item["wpn_spas12_nimble"] = true
+	need_item["wpn_usp_nimble"] = true
+	need_item["wpn_vintorez_nimble"] = true
+	need_item["wpn_svu_nimble"] = true
+	need_item["wpn_svd_nimble"] = true
+
+	for k,v in pairs(need_item) do
+		if db.actor:object(k) ~= nil then
+			dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, k, "all")
+		end
+	end
+	dialogs.relocate_money_from_actor(first_speaker, second_speaker, amount)
+end
+
+function zat_b51_rob_nimble_weapon(first_speaker, second_speaker)
+	local need_item = {}
+	local actor_has_item = {}
+
+	need_item["wpn_groza_nimble"] = true
+	need_item["wpn_desert_eagle_nimble"] = true
+	need_item["wpn_fn2000_nimble"] = true
+	need_item["wpn_g36_nimble"] = true
+	need_item["wpn_protecta_nimble"] = true
+	need_item["wpn_mp5_nimble"] = true
+	need_item["wpn_sig220_nimble"] = true
+	need_item["wpn_spas12_nimble"] = true
+	need_item["wpn_usp_nimble"] = true
+	need_item["wpn_vintorez_nimble"] = true
+	need_item["wpn_svu_nimble"] = true
+	need_item["wpn_svd_nimble"] = true
+
+	for k,v in pairs(need_item) do
+		if db.actor:object(k) ~= nil then
+			table.insert(actor_has_item, k)
+		end
+		if db.actor:item_in_slot(2)~= nil and db.actor:item_in_slot(2):section() == k then
+			dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, k)
+			return
+		elseif db.actor:item_in_slot(3)~= nil and db.actor:item_in_slot(3):section() == k then
+			dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, k)
+			return
+		end
+	end
+
+	if #actor_has_item > 0 then
+		dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, actor_has_item[math.random(1, #actor_has_item)])
+	end
+end
+
+-- Zaton B18
+
+function give_compass_to_actor(first_speaker, second_speaker)
+	dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "af_compass")
+end
+
+-- b51
+local item_count_by_category = {}
+item_count_by_category[1] = 3
+item_count_by_category[2] = 3
+item_count_by_category[3] = 3
+item_count_by_category[4] = 3
+item_count_by_category[5] = 1
+item_count_by_category[6] = 1
+item_count_by_category[7] = 1
+
+local zat_b51_costs_table = {}
+zat_b51_costs_table[1] = {prepay_agreed = 700, 		prepay_refused = 1400,	cost = 2800}
+zat_b51_costs_table[2] = {prepay_agreed = 2000, 	prepay_refused = 4000,	cost = 8000}
+zat_b51_costs_table[3] = {prepay_agreed = 4000, 	prepay_refused = 8000,	cost = 16000}
+zat_b51_costs_table[4] = {prepay_agreed = 4000, 	prepay_refused = 8000,	cost = 16000}
+zat_b51_costs_table[5] = {prepay_agreed = 8000, 	prepay_refused = 16000,	cost = 32000}
+zat_b51_costs_table[6] = {prepay_agreed = 6000, 	prepay_refused = 12000,	cost = 24000}
+zat_b51_costs_table[7] = {prepay_agreed = 12000,	prepay_refused = 24000,	cost = 48000}
+
+local zat_b51_buy_item_table = {}
+zat_b51_buy_item_table[1] = {		[1] = {item = {"wpn_desert_eagle_nimble"}},
+									[2] = {item = {"wpn_sig220_nimble"}},
+									[3] = {item = {"wpn_usp_nimble"}}
+	}
+zat_b51_buy_item_table[2] = {		[1] = {item = {"wpn_mp5_nimble"}},
+								[2] = {item = {"wpn_spas12_nimble"}},
+								[3] = {item = {"wpn_protecta_nimble"}}
+	}
+zat_b51_buy_item_table[3] = {		[1] = {item = {"wpn_groza_nimble"}},
+								[2] = {item = {"wpn_g36_nimble"}},
+								[3] = {item = {"wpn_fn2000_nimble"}}
+	}
+zat_b51_buy_item_table[4] = {	[1] = {item = {"wpn_vintorez_nimble"}},
+								[2] = {item = {"wpn_svu_nimble"}},
+								[3] = {item = {"wpn_svd_nimble"}}
+	}
+zat_b51_buy_item_table[5] = {		[1] = {item = {"helm_tactic", "cs_heavy_outfit"}}
+	}
+zat_b51_buy_item_table[6] = {		[1] = {item = {"scientific_outfit"}}
+	}
+zat_b51_buy_item_table[7] = {		[1] = {item = {"exo_outfit"}}
+	}
+
+function zat_b51_randomize_item(first_speaker, second_speaker)
+	for i = 1,7 do
+		if has_alife_info("zat_b51_processing_category_"..tostring(i)) then
+			local zat_b51_available_items_table = {}
+			for j = 1, item_count_by_category[i] do
+				if not has_alife_info("zat_b51_done_item_"..tostring(i).."_"..tostring(j)) then
+					table.insert(zat_b51_available_items_table, j)
+				end
+			end
+			give_info("zat_b51_ordered_item_"..tostring(i).."_"..tostring(zat_b51_available_items_table[math.random(1,#zat_b51_available_items_table)]))
+		end
+	end
+end
+
+function zat_b51_give_prepay(first_speaker, second_speaker)
+	for i = 1,7 do
+		if has_alife_info("zat_b51_processing_category_"..tostring(i))  then
+			if not has_alife_info("zat_b51_order_refused") then
+				dialogs.relocate_money_from_actor(first_speaker, second_speaker, zat_b51_costs_table[i].prepay_agreed)
+				return
+			end
+			dialogs.relocate_money_from_actor(first_speaker, second_speaker, zat_b51_costs_table[i].prepay_refused)
+			return
+		end
+	end
+end
+
+function zat_b51_has_prepay(first_speaker, second_speaker)
+	for i = 1,7 do
+		if has_alife_info("zat_b51_processing_category_"..tostring(i))  then
+			if not has_alife_info("zat_b51_order_refused") then
+				return db.actor:money() >= zat_b51_costs_table[i].prepay_agreed
+			end
+			return db.actor:money() >= zat_b51_costs_table[i].prepay_refused
+		end
+	end
+end
+
+function zat_b51_hasnt_prepay(first_speaker, second_speaker)
+	return not zat_b51_has_prepay(first_speaker, second_speaker)
+end
+
+function zat_b51_buy_item(first_speaker, second_speaker)
+	for i = 1,7 do
+		if has_alife_info("zat_b51_processing_category_"..tostring(i)) then
+			for j = 1,#zat_b51_buy_item_table[i] do
+				if has_alife_info("zat_b51_ordered_item_"..tostring(i).."_"..tostring(j)) then
+					for k,v in pairs(zat_b51_buy_item_table[i][j].item) do
+						dialogs.relocate_item_section_to_actor(first_speaker, second_speaker,v)
+					end
+					dialogs.relocate_money_from_actor(first_speaker, second_speaker, zat_b51_costs_table[i].cost)
+					disable_info("zat_b51_processing_category_"..tostring(i))
+					disable_info("zat_b51_ordered_item_"..tostring(i).."_"..tostring(j))
+					give_info("zat_b51_done_item_"..tostring(i).."_"..tostring(j))
+					break
+				end
+			end
+			local category_finishing = true
+			for j = 1,#zat_b51_buy_item_table[i] do
+				if not has_alife_info("zat_b51_done_item_"..tostring(i).."_"..tostring(j)) then
+					category_finishing = false
+					break
+				end
+			end
+			if category_finishing == true then
+				give_info("zat_b51_finishing_category_"..tostring(i))
+			end
+			return
+		end
+	end
+end
+
+function zat_b51_refuse_item(first_speaker, second_speaker)
+	for i = 1,7 do
+		if has_alife_info("zat_b51_processing_category_"..tostring(i)) then
+			for j = 1,#zat_b51_buy_item_table[i] do
+				if has_alife_info("zat_b51_ordered_item_"..tostring(i).."_"..tostring(j)) then
+					disable_info("zat_b51_processing_category_"..tostring(i))
+					disable_info("zat_b51_ordered_item_"..tostring(i).."_"..tostring(j))
+					give_info("zat_b51_done_item_"..tostring(i).."_"..tostring(j))
+					break
+				end
+			end
+			local category_finishing = true
+			for j = 1,#zat_b51_buy_item_table[i] do
+				if not has_alife_info("zat_b51_done_item_"..tostring(i).."_"..tostring(j)) then
+					category_finishing = false
+					break
+				end
+			end
+			if category_finishing == true then
+				give_info("zat_b51_finishing_category_"..tostring(i))
+			end
+			return
+		end
+	end
+end
+
+function zat_b51_has_item_cost(first_speaker, second_speaker)
+	for i = 1,7 do
+		if has_alife_info("zat_b51_processing_category_"..tostring(i)) then
+			return db.actor:money() >= zat_b51_costs_table[i].cost
+		end
+	end
+	return false
+end
+
+function zat_b51_hasnt_item_cost(first_speaker, second_speaker)
+	return not zat_b51_has_item_cost(first_speaker, second_speaker)
+end
+
+--b12
+
+function zat_b12_actor_have_documents(first_speaker, second_speaker)
+	if db.actor:object("zat_b12_documents_1") ~= nil
+		or db.actor:object("zat_b12_documents_2") ~= nil then
+		return true
+	end
+
+	return false
+end
+
+function zat_b12_actor_transfer_documents(first_speaker, second_speaker)
+	local amount_doc1 = 1000
+	local amount_doc2 = 600
+	local amount_doc3 = 400
+	local amount_total = 0
+	local npc = dialogs.who_is_npc(first_speaker, second_speaker)
+	local cnt = 0
+ 	local cnt2 = 0
+
+	local function zat_b12_check_npc(temp, item)
+		if item:section() == "zat_b12_documents_2" then
+			cnt = cnt + 1
+		end
+	end
+
+	local function zat_b12_check_actor(temp, item)
+		if item:section() == "zat_b12_documents_2" then
+			cnt2 = cnt2 + 1
+		end
+	end
+
+	if db.actor:object("zat_b12_documents_1") ~= nil then
+		dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "zat_b12_documents_1")
+		db.actor:give_info_portion("zat_b12_documents_sold_1")
+		amount_total = amount_total + amount_doc1
+	end
+
+	npc:iterate_inventory(zat_b12_check_npc, nil)
+	db.actor:iterate_inventory(zat_b12_check_actor, nil)
+
+	if db.actor:object("zat_b12_documents_2") ~= nil then
+		if cnt < 1 then
+			amount_total = amount_total + amount_doc2
+			if cnt2 > 1 then
+				amount_total = amount_total + amount_doc3*(cnt2-1)
+				db.actor:give_info_portion("zat_b12_documents_sold_2")
+			end
+		else
+			amount_total = amount_total + amount_doc3*cnt2
+			db.actor:give_info_portion("zat_b12_documents_sold_3")
+		end
+		dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "zat_b12_documents_2", cnt2)
+	end
+
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, amount_total)
+	return false
+end
+
+-- Zaton B3 functions -------------------------------------------------
+
+
+function zat_b3_actor_got_toolkit(first_speaker, second_speaker)
+	local function is_toolkit(npc, item)
+		local section = item:section()
+		if(section=="toolkit_1" and not has_alife_info("zat_b3_tech_instrument_1_brought"))
+		or(section=="toolkit_2" and not has_alife_info("zat_b3_tech_instrument_2_brought"))
+		or(section=="toolkit_3" and not has_alife_info("zat_b3_tech_instrument_3_brought")) then
+			db.actor.toolkit = section
+			return
+		end
+	end
+
+	db.actor:iterate_inventory(is_toolkit, nil)
+	if (db.actor.toolkit ~= nil) then
+		return true
+	end
+
+	return false
+end
+
+
+function give_toolkit_1(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "toolkit_1")
+	db.actor.toolkit = nil
+	local amount = 1000
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, amount)
+end
+
+function if_actor_has_toolkit_1(first_speaker, second_speaker)
+	return db.actor:object("toolkit_1") ~= nil
+end
+
+
+function give_toolkit_2(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "toolkit_2")
+	db.actor.toolkit = nil
+	local amount = 1200
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, amount)
+end
+
+function if_actor_has_toolkit_2(first_speaker, second_speaker)
+	return db.actor:object("toolkit_2") ~= nil
+end
+
+
+function give_toolkit_3(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "toolkit_3")
+	db.actor.toolkit = nil
+	local amount = 1500
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, amount)
+end
+
+function if_actor_has_toolkit_3(first_speaker, second_speaker)
+	return db.actor:object("toolkit_3") ~= nil
+end
+
+
+function give_vodka(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "vodka")
+end
+
+function if_actor_has_vodka(first_speaker, second_speaker)
+	return db.actor:object("vodka") ~= nil
+end
+
+
+function actor_has_more_then_need_money_to_buy_battery(first_speaker, second_speaker)
+	return db.actor:money() >= 2000
+end
+
+function actor_has_less_then_need_money_to_buy_battery(first_speaker, second_speaker)
+	return db.actor:money() < 2000
+end
+
+function relocate_need_money_to_buy_battery(first_speaker, second_speaker)
+	local money_to_buy_battery = 2000
+	dialogs.relocate_money_from_actor(first_speaker, second_speaker, money_to_buy_battery)
+end
+
+
+function give_actor_battery(first_speaker, second_speaker)
+	dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "ammo_gauss_cardan")
+end
+
+function give_actor_zat_a23_access_card(first_speaker, second_speaker)
+	dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "zat_a23_access_card")
+end
+
+function give_zat_a23_gauss_rifle_docs(first_speaker, second_speaker)
+		dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "zat_a23_gauss_rifle_docs")
+end
+
+function return_zat_a23_gauss_rifle_docs(first_speaker, second_speaker)
+		dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "zat_a23_gauss_rifle_docs")
+end
+
+function if_actor_has_zat_a23_gauss_rifle_docs(first_speaker, second_speaker)
+	return first_speaker:object("zat_a23_gauss_rifle_docs") ~= nil
+end
+
+function if_actor_has_gauss_rifle(first_speaker, second_speaker)
+	return first_speaker:object("pri_a17_gauss_rifle") ~= nil
+end
+
+function give_tech_gauss_rifle(first_speaker, second_speaker)
+		dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "pri_a17_gauss_rifle")
+end
+
+function give_actor_repaired_gauss_rifle(first_speaker, second_speaker)
+	dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "wpn_gauss")
+end
+
+-- Zaton B 215 functions -------------------------------------------------
+
+function zat_b215_actor_has_money_poor(first_speaker, second_speaker)
+	return db.actor:money() >= 1000
+end
+
+function zat_b215_actor_has_no_money_poor(first_speaker, second_speaker)
+	return db.actor:money() < 1000
+end
+
+function zat_b215_actor_has_money_poor_pripyat(first_speaker, second_speaker)
+	return db.actor:money() >= 4000
+end
+
+function zat_b215_actor_has_no_money_poor_pripyat(first_speaker, second_speaker)
+	return db.actor:money() < 4000
+end
+
+function zat_b215_actor_has_money_rich(first_speaker, second_speaker)
+	return db.actor:money() >= 3000
+end
+
+function zat_b215_actor_has_no_money_rich(first_speaker, second_speaker)
+	return db.actor:money() < 3000
+end
+
+function zat_b215_actor_has_money_rich_pripyat(first_speaker, second_speaker)
+	return db.actor:money() >= 6000
+end
+
+function zat_b215_actor_has_no_money_rich_pripyat(first_speaker, second_speaker)
+	return db.actor:money() < 6000
+end
+
+function zat_b215_relocate_money_poor(first_speaker, second_speaker)
+	local zat_b215_money_poor = 1000
+	dialogs.relocate_money_from_actor(first_speaker, second_speaker, zat_b215_money_poor)
+end
+
+function zat_b215_relocate_money_poor_pripyat(first_speaker, second_speaker)
+	local zat_b215_money_poor = 4000
+	dialogs.relocate_money_from_actor(first_speaker, second_speaker, zat_b215_money_poor)
+end
+
+function zat_b215_relocate_money_rich(first_speaker, second_speaker)
+	local zat_b215_money_rich = 3000
+	dialogs.relocate_money_from_actor(first_speaker, second_speaker, zat_b215_money_rich)
+end
+
+function zat_b215_relocate_money_rich_pripyat(first_speaker, second_speaker)
+	local zat_b215_money_rich = 6000
+	dialogs.relocate_money_from_actor(first_speaker, second_speaker, zat_b215_money_rich)
+end
+
+function zat_b215_counter_greater_3(first_speaker, second_speaker)
+	local npc = dialogs.who_is_npc(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	return xr_conditions.counter_greater(actor, npc, {"zat_a9_way_to_pripyat_counter",3})
+end
+
+function zat_b215_counter_less_4(first_speaker, second_speaker)
+	local npc = dialogs.who_is_npc(first_speaker, second_speaker)
+	local actor = dialogs.who_is_actor(first_speaker, second_speaker)
+	return not xr_conditions.counter_greater(actor, npc, {"jup_a9_way_gates_counter",4})
+end
+
+function zat_b30_actor_has_noah_pda(first_speaker, second_speaker)
+	return db.actor:object("zat_b20_noah_pda") ~= nil
+end
+
+function zat_b30_sell_noah_pda(first_speaker, second_speaker)
+	local amount = 1000
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "zat_b20_noah_pda")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, amount)
+end
+
+-------------------------------------b40------------------------------------
+function zat_b40_actor_has_notebook(first_speaker, second_speaker)
+	return db.actor:object("zat_b40_notebook") ~= nil
+end
+
+function zat_b40_actor_has_merc_pda_1(first_speaker, second_speaker)
+	return db.actor:object("zat_b40_pda_1") ~= nil
+end
+
+function zat_b40_actor_has_merc_pda_2(first_speaker, second_speaker)
+	return db.actor:object("zat_b40_pda_2") ~= nil
+end
+
+function zat_b40_transfer_notebook(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "zat_b40_notebook")
+	db.actor:give_info_portion("zat_b40_notebook_saled")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 2000)
+end
+
+function zat_b40_transfer_merc_pda_1(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "zat_b40_pda_1")
+	db.actor:give_info_portion("zat_b40_pda_1_saled")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 1000)
+
+	if (db.actor:has_info("zat_b40_notebook_saled") and db.actor:has_info("zat_b40_pda_1_saled") and db.actor:has_info("zat_b40_pda_2_saled")) then
+		db.actor:give_info_portion("zat_b40_all_item_saled")
+	end
+end
+
+function zat_b40_transfer_merc_pda_2(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "zat_b40_pda_2")
+	db.actor:give_info_portion("zat_b40_pda_2_saled")
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 1000)
+
+	if (db.actor:has_info("zat_b40_notebook_saled") and db.actor:has_info("zat_b40_pda_1_saled") and db.actor:has_info("zat_b40_pda_2_saled")) then
+		db.actor:give_info_portion("zat_b40_all_item_saled")
+	end
+end
+
+--------------------------------B44------------------------------------------------
+function zat_b44_actor_has_pda_global(first_speaker, second_speaker)
+	return ((db.actor:object("zat_b39_joker_pda") ~= nil) or (db.actor:object("zat_b44_barge_pda") ~= nil))
+end
+
+function zat_b44_actor_has_not_pda_global(first_speaker, second_speaker)
+	return ((db.actor:object("zat_b39_joker_pda") == nil) or (db.actor:object("zat_b44_barge_pda") == nil))
+end
+
+function zat_b44_actor_has_pda_barge(first_speaker, second_speaker)
+	return db.actor:object("zat_b44_barge_pda") ~= nil
+end
+
+function zat_b44_actor_has_pda_joker(first_speaker, second_speaker)
+	return db.actor:object("zat_b39_joker_pda") ~= nil
+end
+
+function zat_b44_actor_has_pda_both(first_speaker, second_speaker)
+	return ((db.actor:object("zat_b39_joker_pda") ~= nil) and (db.actor:object("zat_b44_barge_pda") ~= nil))
+end
+
+function zat_b44_transfer_pda_barge(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "zat_b44_barge_pda")
+end
+
+function zat_b44_transfer_pda_joker(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "zat_b39_joker_pda")
+end
+
+function zat_b44_transfer_pda_both(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "zat_b44_barge_pda")
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "zat_b39_joker_pda")
+end
+
+function zat_b44_frends_dialog_enabled(first_speaker, second_speaker)
+	local a = ((db.actor:has_info("zat_b3_tech_have_couple_dose")) and (db.actor:has_info("zat_b3_tech_discount_1")))
+	local b = zat_b44_actor_has_pda_global(first_speaker, second_speaker)
+	return a or b
+end
+
+----------------------	b53 ----------------------
+function zat_b53_if_actor_has_detector_advanced(first_speaker, second_speaker)
+	return db.actor:object("detector_advanced") ~= nil or
+	db.actor:object("detector_elite") ~= nil or
+	db.actor:object("detector_scientific") ~= nil
+end
+
+function zat_b53_if_actor_hasnt_detector_advanced(first_speaker, second_speaker)
+	return not zat_b53_if_actor_has_detector_advanced(first_speaker, second_speaker)
+end
+
+function zat_b53_transfer_detector_advanced_to_actor(first_speaker, second_speaker)
+	dialogs.relocate_item_section_to_actor(second_speaker, first_speaker, "detector_advanced")
+end
+
+function zat_b53_transfer_fireball_to_actor(first_speaker, second_speaker)
+	dialogs.relocate_item_section_to_actor(second_speaker, first_speaker, "af_fireball")
+end
+
+function zat_b53_transfer_medkit_to_actor(first_speaker, second_speaker)
+	dialogs.relocate_item_section_to_actor(second_speaker, first_speaker, "medkit")
+end
+
+function zat_b53_transfer_medkit_to_npc(first_speaker, second_speaker)
+	local section
+	if db.actor:object("medkit") ~= nil then
+		section = "medkit"
+	elseif db.actor:object("medkit_army") ~= nil then
+		section = "medkit_army"
+	elseif db.actor:object("medkit_scientic") ~= nil then
+		section = "medkit_scientic"
+	end
+
+	alife():release(alife():object(db.actor:object(section):id()), true)
+
+	news_manager.relocate_item(db.actor, "out", section, 1)
+
+	db.actor:change_character_reputation(10)
+end
+
+-------------------------- a23 -----------------------------
+function zat_a23_actor_has_access_card(first_speaker, second_speaker)
+	return db.actor:object("zat_a23_access_card") ~= nil
+end
+
+function zat_a23_transfer_access_card_to_tech(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "zat_a23_access_card")
+	dialogs.relocate_item_section_to_actor(second_speaker, first_speaker, "medkit_scientic",3)
+end
+
+----- b57 new ----
+
+function zat_b57_stalker_reward_to_actor_detector(first_speaker, second_speaker)
+	dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "detector_elite")
+	treasure_manager.get_treasure_manager():give_treasure("zat_hiding_place_54")
+end
+
+function actor_has_gas(first_speaker, second_speaker)
+	return db.actor:object("zat_b57_gas") ~= nil
+end
+
+function actor_has_not_gas(first_speaker, second_speaker)
+	return not actor_has_gas(first_speaker, second_speaker)
+end
+
+function zat_b57_actor_has_money(first_speaker, second_speaker)
+	return db.actor:money() >= 2000
+end
+
+function zat_b57_actor_hasnt_money(first_speaker, second_speaker)
+	return not zat_b57_actor_has_money(first_speaker, second_speaker)
+end
+
+function zat_b57_transfer_gas_money(first_speaker, second_speaker)
+	dialogs.relocate_money_from_actor(first_speaker, second_speaker, 2000)
+end
+
+function is_zat_b106_hunting_time (first_speaker, second_speaker)
+	if level.get_time_hours() >= 2 and level.get_time_hours() < 5 then
+		if level.get_time_hours() > 2 then
+			return true
+		elseif level.get_time_minutes() >= 45 then
+			return true
+		end
+	end
+
+	return false
+end
+
+function is_not_zat_b106_hunting_time (first_speaker, second_speaker)
+	if level.get_time_hours() >= 2 and level.get_time_hours() < 5 then
+		if level.get_time_hours() > 2 then
+			return false
+		elseif level.get_time_minutes() >= 45 then
+			return false
+		end
+	end
+
+	return true
+end
+
+function zat_b106_transfer_weap_to_actor(first_speaker, second_speaker)
+	dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "wpn_spas12")
+end
+
+function zat_b106_soroka_reward(first_speaker, second_speaker)
+	if has_alife_info("jup_b25_flint_blame_done_to_duty") or has_alife_info("jup_b25_flint_blame_done_to_freedom") then
+		dialogs.relocate_money_to_actor(first_speaker, second_speaker, 1000)
+	else
+		dialogs.relocate_money_to_actor(first_speaker, second_speaker, 3000)
+	end
+end
+
+function zat_b106_soroka_gone(first_speaker, second_speaker)
+	return (has_alife_info("jup_b25_flint_blame_done_to_duty") or has_alife_info("jup_b25_flint_blame_done_to_freedom"))
+end
+
+function zat_b106_soroka_not_gone(first_speaker, second_speaker)
+	return not zat_b106_soroka_gone(first_speaker, second_speaker)
+end
+
+function zat_b22_actor_has_proof(first_speaker, second_speaker)
+	return dialogs.actor_has_item(first_speaker, second_speaker, "zat_b22_medic_pda")
+end
+
+function zat_b22_transfer_proof(first_speaker, second_speaker)
+	dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, "zat_b22_medic_pda")
+end
+
+function zat_b103_actor_has_needed_food(first_speaker, second_speaker)
+	local item_sections	= {
+		[1] = "bread",
+		[2] = "kolbasa",
+		[3] = "conserva"
+	}
+	local needed = 6
+	local count	= 0
+	local item_section
+
+	local function calc(temp, item)
+		if item:section() == item_section then
+			count = count + 1
+		end
+	end
+
+	for k,v in pairs(item_sections) do
+		item_section = v
+		get_story_object("actor"):iterate_inventory(calc, actor)
+--		printf("?zat_b103_actor_has_needed_food? : section [%s] count [%s]", tostring(v), tostring(count))
+	end
+
+	return count >= needed
+end
+
+function zat_b5_stalker_transfer_money(first_speaker, second_speaker)
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 2500)
+	treasure_manager.get_treasure_manager():give_treasure("zat_hiding_place_7")
+end
+
+function zat_b5_dealer_full_revard(first_speaker, second_speaker)
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 6000)
+end
+
+function zat_b5_dealer_easy_revard(first_speaker, second_speaker)
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 3000)
+end
+
+function zat_b5_bandits_revard(first_speaker, second_speaker)
+	dialogs.relocate_money_to_actor(first_speaker, second_speaker, 5000)
+	treasure_manager.get_treasure_manager():give_treasure("zat_hiding_place_20")
+end
+
+function zat_b106_give_reward(first_speaker, second_speaker)
+	treasure_manager.get_treasure_manager():give_treasure("zat_hiding_place_50")
+end
+
+function zat_b3_tech_drinks_precond(first_speaker, second_speaker)
+	if has_alife_info("zat_b3_gauss_repaired") and not has_alife_info("zat_b3_tech_drink_no_more") then
+		return true
+	elseif not has_alife_info("zat_b3_tech_see_produce_62") then
+		return true
+	end
+
+	return false
+end

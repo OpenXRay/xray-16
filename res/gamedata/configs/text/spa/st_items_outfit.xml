@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="csky_heavy_outfit_name">
+		<text>Blindaje personal CS-3a</text>
+	</string>
+	<string id="dolg_heavy_outfit_name">
+		<text>Blind. Deber PSZ-9d</text>
+	</string>
+	<string id="dolg_outfit_name">
+		<text>PS5-M Protecciуn universal</text>
+	</string>
+	<string id="exo_outfit_name">
+		<text>Exoesqueleto</text>
+	</string>
+	<string id="military_outfit_name">
+		<text>Traje blindado Bulat</text>
+	</string>
+	<string id="mp_exo_outfit_description">
+		<text>Este exoesqueleto ofrece una protecciуn extraordinaria contra proyectiles y metralla a costa de sacrificar movilidad. Es vulnerable a la municiуn perforante.</text>
+	</string>
+	<string id="mp_exo_outfit_name">
+		<text>Exoesqueleto</text>
+	</string>
+	<string id="mp_military_outfit_description">
+		<text>Traje blindado militar diseсado para operaciones de asalto. Ofrece una protecciуn extraordinaria contra proyectiles de chaqueta metбlica y metralla sin reducir la movilidad del usuario. Es vulnerable a la municiуn perforante.</text>
+	</string>
+	<string id="mp_military_outfit_name">
+		<text>Traje blindado militar</text>
+	</string>
+	<string id="novice_outfit_description">
+		<text>Gabardina de cuero negro normal y corriente. Su ъnica funciуn es abrigar al usuario por las noches o protegerlo del ocasional mordisco de perro. Aunque no es particularmente cуmoda, los bandidos de la Zona suelen utilizarla a menudo porque les permite ocultarse en la oscuridad (o sencillamente porque mola mбs).</text>
+	</string>
+	<string id="novice_outfit_name">
+		<text>Gabardina de cuero</text>
+	</string>
+	<string id="scientific_outfit_name">
+		<text>Traje SEVA</text>
+	</string>
+	<string id="specops_outfit_name">
+		<text>Traje blindado Berill-5M</text>
+	</string>
+	<string id="st_helm_battle">
+		<text>Casco Sphere M12</text>
+	</string>
+	<string id="st_helm_battle_descr">
+		<text>Casco de aluminio/titanio con cobertura de tela y capacidad para acoplar piezas metбlicas adicionales y una mбscara protectora. El Sphere M12 suele usarse en combinaciуn con blindajes de Spetsnaz de la gama PSZ. Es muy popular en la Zona por su respirador y su dispositivo integrado de visiуn nocturna, ademбs de ofrecer la mejor protecciуn posible para la cabeza. Dispone de ranuras para dispositivos electrуnicos.</text>
+	</string>
+	<string id="st_helm_hardhat">
+		<text>Casco de acero</text>
+	</string>
+	<string id="st_helm_hardhat_descr">
+		<text>Casco militar terriblemente desfasado sin ningъn aditamento. No ofrece protecciуn contra anomalнas ni radiaciуn, pero puede desviar balas. Este casco nunca ha sido muy popular en la Zona, salvo en breves conflictos armados entre facciones.</text>
+	</string>
+	<string id="st_helm_protective">
+		<text>Casco hermйtico</text>
+	</string>
+	<string id="st_helm_protective_descr">
+		<text>Casco ligero con un visor de cierre estanco diseсado como protecciуn contra anomalнas. A juzgar por su diseсo, ha sido fabricado por los mismos Institutos de Investigaciуn para la Defensa que hicieron el traje SEVA. Podrнa estar diseсado para usarlo en combinaciуn con trajes militares en operaciones en zonas llenas de anomalнas. </text>
+	</string>
+	<string id="st_helm_respirator">
+		<text>Mбscara de gas</text>
+	</string>
+	<string id="st_helm_respirator_descr">
+		<text>Mбscara de gas corriente de plбstico y goma, utilizada para filtrar el aire de partнculas radiactivas y sustancias venenosas. Muy usada por novatos y veteranos de todas las facciones por su funcionalidad universal. No ofrece ninguna protecciуn fнsica.</text>
+	</string>
+	<string id="st_helm_tactic">
+		<text>Casco tбctico</text>
+	</string>
+	<string id="st_helm_tactic_descr">
+		<text>Modelo occidental de casco tбctico sin camuflaje. Nadie sabe cуmo llegу a la Zona. Ha sido diseсado para proporcionar superioridad estratйgica a un lнder de escuadrуn sobre sus enemigos mediante numerosos dispositivos de rastreo y comunicaciуn vнa satйlite, aunque en este en particular no han sido instalados. Posee varias capas de kevlar y componentes blindados para proteger sus sistemas electrуnicos. Incluye respirador y dispositivo de visiуn nocturna de primera generaciуn.</text>
+	</string>
+	<string id="stalker_outfit_name">
+		<text>Traje Amanecer</text>
+	</string>
+	<string id="svoboda_heavy_outfit_name">
+		<text>Traje de guardia de Libertad</text>
+	</string>
+	<string id="svoboda_light_outfit_description">
+		<text>Este traje ligero de stalker ha sido fabricado por los artesanos de Libertad. El tejido ha sido tratado con Horizonte, una soluciуn especial desarrollada por la facciуn a base de ensayo y error que incrementa su resistencia contra anomalнas. Al igual que el traje Amanecer, el Viento de Libertad dispone de blindaje integrado y cavidades para artefactos.</text>
+	</string>
+	<string id="svoboda_light_outfit_name">
+		<text>Traje Viento de Libertad</text>
+	</string>
+	<string id="dolg_outfit_description">
+		<text>Versiуn moderna del blindaje estбndar de Deber, mejor equipada para los reclutas stalkers acostumbrados a las protecciones livianas. A diferencia de la gama PSZ, este blindaje ofrece buena protecciуn contra anomalнas y ademбs puede detener una bala de pistola. No puede modificarse para aсadirle un contenedor para artefactos, pero sн un sistema de apoyo para combate.</text>
+	</string>
+	<string id="military_outfit_description">
+		<text>Este traje blindado militar estб diseсado para operaciones de asalto en zonas de anomalнas. Estб formado por un traje blindado pesado PSZ-12p, un compensador integrado y una malla de protecciуn. El blindaje proporciona una protecciуn excelente contra balas y metralla, sin reducir demasiado la movilidad. No dispone de contenedores para artefactos.</text>
+	</string>
+	<string id="mp_scientific_outfit_description">
+		<text>Este traje, diseсado para realizar investigaciones en la Zona, combina un mуdulo respiratorio de ciclo cerrado y una capa de aislamiento externa que ofrece una protecciуn excelente contra las anomalнas. Dado que apenas protege de los impactos fнsicos, este traje no sirve de gran cosa contra balas y metralla. Dispone de un contenedor para artefactos.</text>
+	</string>
+	<string id="scientific_outfit_description">
+		<text>Este traje, fabricado por uno de los Institutos de Investigaciуn para la Defensa de Kiev, es una buena alternativa a otros improvisados. Aunque el blindaje integrado solo es capaz de detener balas de pistola, la protecciуn contra anomalнas y radiaciуn es de las mejores. Es modificable y dispone de dos contenedores para artefactos. Es el favorito de muchos stalkers.</text>
+	</string>
+	<string id="specops_outfit_description">
+		<text>Este objeto incluye un blindaje personal de gama PS5 con rociador de berilio modificado para su uso en la Zona. Se ha diseсado para operaciones de asalto en zonas muy radiactivas, pero es muy poco eficaz en zonas con elevada actividad anуmala. El traje llega a manos de los stalkers por el ejйrcito, que los canjea por botines. No dispone de contenedores para artefactos.</text>
+	</string>
+	<string id="stalker_outfit_description">
+		<text>Este traje de stalker, fabricado por amantes del bricolaje, es una combinaciуn de material recauchutado, un revestimiento de plexiglбs y un blindaje personal integrado. Aunque ni siquiera protege al usuario de balas de pistola, es muy popular por su bajo coste y posibilidades de modificaciуn. Dispone de contenedores para artefactos.</text>
+	</string>
+	<string id="svoboda_heavy_outfit_description">
+		<text>Este traje de stalker, reforzado con un blindaje fabricado por artesanos de Libertad, combina funciones de combate y protecciуn contra anomalнas. Dispone de varias placas de blindaje y capas de kevlar que pueden detener una bala de pistola. El traje utiliza el raro y costoso compuesto Soberano para proteger contra anomalнas. Dispone de contenedor para artefactos.</text>
+	</string>
+	<string id="dolg_heavy_outfit_description">
+		<text>Esta versiуn antigua del traje de Deber es el blindaje Spetsnaz PSZ-9 modificado para la Zona. El traje puede detener una bala de fusil, pero tal grado de protecciуn se paga con su peso, su volumen y su escasнsima protecciуn contra anomalнas. No puede modificarse para aсadirle una contenedor para artefactos, pero sн un sistema de apoyo para combate.</text>
+	</string>
+	<string id="csky_heavy_outfit_description">
+		<text>Utilizado anteriormente por escuadrones de asalto de Cielo Despejado. Tras la desapariciуn de esta facciуn, el blindaje sirve como recordatorio de que ni el mejor de los trajes protectores garantiza la seguridad a este lado del perнmetro. Es capaz de detener una bala de pistola y de proteger a su portador de las anomalнas. Dispone de contenedor para guardar artefactos.</text>
+	</string>
+	<string id="exo_outfit_description">
+		<text>Prototipo experimental de exoesqueleto militar. No llegу a fabricarse en serie por su elevado coste y defectos de diseсo. Se sigue demandando gracias a su habilidad para soportar el peso del equipo transportado. Por eso, en ciertas instalaciones subterrбneas del exterior de Ucrania se produce en pequeсas cantidades. Dispone de un contenedor para artefactos.</text>
+	</string>
+	<string id="mp_scientific_outfit_name">
+		<text>Traje SEVA</text>
+	</string>
+</string_table>

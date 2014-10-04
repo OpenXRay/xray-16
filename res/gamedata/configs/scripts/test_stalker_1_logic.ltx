@@ -1,0 +1,76 @@
+[logic]
+active = walker@stoop
+
+[walker@threat]
+path_walk = walk_6
+path_look = look_6
+def_state_moving1 = raid
+def_state_moving2 = raid
+def_state_moving3 = raid
+def_state_standing = threat
+combat_ignore_cond = true
+on_game_timer = 100 | walker@stoop
+on_info = {+cover_test_attack} patrol
+
+[walker@stoop]
+danger = danger
+path_walk = walk_stoop
+path_look = look_stoop
+def_state_moving1 = walk
+def_state_moving2 = walk
+def_state_moving3 = walk
+def_state_standing = wait_na
+combat_ignore_cond = true
+;on_signal = stoop | animpoint@in %+test_cutscene_start%
+on_game_timer = 100 | animpoint@in
+
+[animpoint@in]
+combat_ignore_cond = true
+cover_name = animpoint_radio_1
+meet = no_meet
+avail_animations = pri_a22_colonel_lean_on_table
+on_info = {+pri_a22_kovalski_speak} %=play_sound(pri_a22_colonel_about_situation)%
+on_signal = sound_end | remark@talk
+
+[remark@talk]
+danger = danger
+meet = no_meet
+combat_ignore_cond = true
+target = story | pri_a17_military_colonel_kovalski
+anim = ward_noweap
+on_game_timer = 15 | {-test_sound_2_play} %+test_sound_2_play =play_sound(pri_a22_colonel_about_rfi_and_lost_suad)%
+on_signal = sound_end | remark@fold_arms
+
+[remark@fold_arms]
+danger = danger
+meet = no_meet
+combat_ignore_cond = true
+target = story | pri_a17_military_colonel_kovalski
+anim = fold_arms
+on_game_timer = 10 | {-test_sound_3_play} %+test_sound_3_play =play_sound(pri_a22_colonel_give_task)%
+on_signal = sound_end | walker
+
+[walker@fold_arms]
+danger = danger
+meet = no_meet
+combat_ignore_cond = true
+path_walk = side_walk
+path_look = side_look
+def_state_moving1 = walk
+def_state_moving2 = walk
+def_state_moving3 = walk
+def_state_standing = fold_arms
+on_game_timer = 10 | {-test_sound_3_play} %+test_sound_3_play =play_sound(pri_a22_colonel_give_task)%
+on_signal = sound_end | walker
+
+[walker]
+path_walk = walk_6
+path_look = look_6
+def_state_moving1 = walk
+def_state_moving2 = walk
+def_state_moving3 = walk
+def_state_standing = wait
+combat_ignore_cond = true
+
+[danger]
+ignore_distance = 0

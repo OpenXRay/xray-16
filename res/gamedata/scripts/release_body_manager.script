@@ -1,0 +1,180 @@
+---------------------------------------------------------------------------------------------
+--' Для того, что бы мир не был загружен кучей трупов,
+--' будем их потихоньку удалять.
+--' Made by Distemper ----------------------------------------------------------------
+--' 11.02.08 ----------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
+local IDLE_AFTER_DEATH = 40000
+local function add_to_release_table(release_tbl, object_id)
+	printf("add to release_objects_table ["..object_id.."]")
+	local obj_params = {}
+	obj_params.id = object_id
+	obj_params.death_time = time_global()
+	table.insert(release_tbl, obj_params)
+end
+
+local function find_nearest_obj_to_release(release_tbl)
+	local max_distanse = 4900
+	local pos_in_table = nil
+	local actor = db.actor
+	local actor_pos = actor:position()
+	for k,v in pairs(release_tbl) do
+		printf("release_objects_table["..k.."] = "..v.id)
+		local object = alife():object(v.id)
+		if object then
+			printf("object_id = "..object.id)
+			printf("object_position x = "..vec_to_str(object.position))
+			local distance_to_body = actor_pos:distance_to_sqr(object.position)
+			printf("distanse = "..distance_to_body)
+			if distance_to_body > max_distanse and ((v.death_time == nil) or (time_global() > v.death_time + IDLE_AFTER_DEATH)) then
+				max_distanse = distance_to_body
+				pos_in_table = k
+			end
+		end
+	end
+	return pos_in_table
+end
+
+local RB_manager = nil
+
+class "Crelease_body"
+
+function Crelease_body:__init()
+	self.release_objects_table = {} -- таблица "СТЕК" трупов
+	self.keep_items_table = {} -- таблица квестовых предметов
+ 	self.body_max_count = 15 -- количество тел которое одновременно может находится в игре
+	self.current_object_id = 0 -- id только что убитого npc
+	--' Итерируемся по списку квестовых итемов.
+	local snd_ini = ini_file("misc\\death_generic.ltx")
+	if not snd_ini:section_exist("keep_items") then
+		abort("There is no section [keep_items] in death_generic.ltx")
+	end
+	local n = snd_ini:line_count("keep_items")
+	local value = ""
+	for i = 0, n - 1 do
+		result, section, value  = snd_ini:r_line("keep_items", i, "", "")
+		table.insert(self.keep_items_table, section)
+	end
+end
+
+function Crelease_body:moving_dead_body(obj)
+	printf("current body name ["..obj:name().."]")
+	printf("-------table-------")
+	print_table(self.release_objects_table)
+	printf("-----end table-----")
+
+	local object_id = obj:id()
+	if self:inspection_result(obj) then
+		printf("inspection_result return  ->  true")
+		if #self.release_objects_table <= self.body_max_count then
+			add_to_release_table(self.release_objects_table, object_id)
+			return
+		else
+			self:try_to_release()
+		end
+		add_to_release_table(self.release_objects_table, object_id)
+	end
+end
+
+function Crelease_body:try_to_release()
+	printf("dead body -> ["..self.body_max_count.."]")
+	local pos_in_table = nil
+	local overflow_count = #self.release_objects_table - self.body_max_count
+	for i = 1, overflow_count do
+		pos_in_table = find_nearest_obj_to_release(self.release_objects_table)
+
+		if pos_in_table == nil then
+			return
+		end
+
+		local release_object = alife():object(self.release_objects_table[pos_in_table].id)
+
+		if release_object then
+			printf("releasing object ["..release_object:name().."]")
+			if (IsStalker(release_object) or IsMonster(release_object)) and not release_object:alive() then
+				alife():release(release_object, true)
+			end
+		end
+
+		table.remove(self.release_objects_table, pos_in_table)
+	end
+end
+
+
+
+function Crelease_body:inspection_result(obj)
+	for k,v in pairs(self.keep_items_table) do
+		if obj:object(self.keep_items_table[k]) ~= nil then
+			printf("Object << "..obj:name().." >> presence_in_keep_items_table") -- в инвентаре есть квестовый предмет
+			return false
+		end
+	end
+	if get_object_story_id(obj:id()) ~= nil then
+		printf("Object << "..obj:name().." >> presence_in_story") -- помечен как сюжетный
+		return false
+	end
+	if self:check_for_known_info(obj) then
+		printf("Object << "..obj:name().." >> presence_in_known_info")
+		return false
+	end
+	return true
+end
+
+function  Crelease_body:check_for_known_info(obj)
+	local char_ini = ""
+	local spawn_ini = obj:spawn_ini()
+	local filename = nil
+	if spawn_ini then
+		filename = utils.cfg_get_string(spawn_ini, "logic", "cfg", obj, false, "")
+		printf("filename is [%s]", tostring(filename))
+	end
+	if filename ~= nil then
+		if not getFS():exist("$game_config$", filename) then
+			abort("There is no configuration file [%s] in [%s]", filename, obj:name())
+		end
+		char_ini = ini_file(filename)
+	else
+		char_ini = obj:spawn_ini() or ini_file("scripts\\dummy.ltx")
+	end
+	local st = db.storage[obj:id()]
+	local known_info = utils.cfg_get_string(char_ini, st.section_logic, "known_info", obj, false, "", nil) or "known_info"
+	if char_ini:section_exist(known_info) then
+		return true
+	end
+	return false
+end
+
+function Crelease_body:save(packet)
+	set_save_marker(packet, "save", false, "Crelease_body")
+	local count = #self.release_objects_table
+	packet:w_u16(count)
+	for k,v in pairs(self.release_objects_table) do
+		packet:w_u16(v.id)
+	end
+	local level_id = game_graph():vertex(alife():actor().m_game_vertex_id):level_id()
+	packet:w_u16(level_id)
+	set_save_marker(packet, "save", true, "Crelease_body")
+end
+
+function Crelease_body:load(reader)
+	set_save_marker(reader, "load", false, "Crelease_body")
+	local count = reader:r_u16()
+	self.release_objects_table = {}
+	for i = 1, count do
+		local vid = reader:r_u16()
+		self.release_objects_table[i] = {}
+		self.release_objects_table[i].id = vid
+	end
+	local level_id = reader:r_u16()
+	if level_id ~= game_graph():vertex(alife():object(0).m_game_vertex_id):level_id() then
+		self.release_objects_table = {}
+	end
+	set_save_marker(reader, "load", true, "Crelease_body")
+end
+
+function get_release_body_manager()
+	if(RB_manager==nil) then
+		RB_manager = Crelease_body()
+	end
+	return RB_manager
+end

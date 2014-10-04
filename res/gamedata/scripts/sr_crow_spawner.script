@@ -1,0 +1,74 @@
+--------------------------------------------------------------------------------
+-- Space restrictor scheme for crowkiller minigame -----------------------------
+-- Made by Peacemaker ----------------------------------------------------------
+-- 26.12.07 --------------------------------------------------------------------
+--------------------------------------------------------------------------------
+class "crowkiller"
+-- Class constructor
+function crowkiller:__init(obj, storage)
+    self.object = obj
+    self.st = storage
+    self.spawn_time_constant = 120000
+    self.time_for_spawn = time_global()
+    self.spawn_points_idle = {}
+    self.spawned_count = nil
+end
+-- On scheme switch resets all self params
+function crowkiller:reset_scheme()
+    for k,v in pairs(self.st.path_table) do
+        self.spawn_points_idle[v] = time_global()
+    end
+end
+-- Class update
+function crowkiller:update(delta)
+-- check for spawn crows on level
+    if(self.time_for_spawn<time_global()) then
+        self.spawned_count = bind_crow.crow_counter
+        if(self.spawned_count<self.st.max_crows_on_level) then
+-- need to spawn
+            self:check_for_spawn_new_crow()
+        else
+-- now look for spawn later
+            self.time_for_spawn = time_global() + self.spawn_time_constant
+        end
+    end
+-- try to switch to another scheme
+    if(xr_logic.try_switch_to_another_section(self.object, self.st, db.actor)) then
+        return
+    end
+end
+-- Checks a need for spawn a new crow
+function crowkiller:check_for_spawn_new_crow()
+    local path_table = {}
+    utils.copy_table(path_table, self.st.path_table)
+    for i=1,#self.st.path_table do
+        local idx = math.random(#path_table)
+        local selected_path = path_table[idx]
+        table.remove(path_table,idx)
+        if(self.spawn_points_idle[selected_path]<=time_global()) then
+-- if we have not spawned already in this point
+            local ptr = patrol(selected_path)
+			if(ptr:point(0):distance_to(db.actor:position())>100) then
+	            local obj = alife():create("m_crow", ptr:point(0), ptr:level_vertex_id(0), ptr:game_vertex_id(0))
+	            self.spawn_points_idle[selected_path] = time_global() + 10000
+	            return
+			end
+        end
+    end
+end
+--------------------------------------------------------------------------------
+-- Standart functions
+--------------------------------------------------------------------------------
+function add_to_binder(npc, ini, scheme, section, storage)
+    xr_logic.subscribe_action_for_events(npc, storage, crowkiller(npc, storage))
+end
+function set_scheme(obj, ini, scheme, section, gulag_name)
+-- standart lines: assigning new storage and binding our space restrictor
+    local st = xr_logic.assign_storage_and_bind(obj, ini, scheme, section)
+    st.logic = xr_logic.cfg_get_switch_conditions(ini, section, obj)
+-- getting maximum number of crows on level
+    st.max_crows_on_level = utils.cfg_get_number(ini, section, "max_crows_on_level", obj, false, 16)
+-- getting path names from custom_data
+    local path = utils.cfg_get_string(ini, section, "spawn_path", obj, false, "", nil)
+    st.path_table = parse_names(path)
+end

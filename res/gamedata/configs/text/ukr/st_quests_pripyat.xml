@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="pri_a17_get_gauss_rifle_documentation_name">
+		<text>«Виріб №62»: знайти документацію у випробувальному цеху</text>
+	</string>
+	<string id="pri_a17_get_gauss_rifle_documentation_text">
+		<text>Необхідно знайти документацію щодо «Виробу №62». З документації має стати ясно - чи могла ця зброя виявитися причиною падіння гелікоптерів.</text>
+	</string>
+	<string id="pri_a17_get_in_cover_name">
+		<text>Невідома зброя: укритися в будинку</text>
+	</string>
+	<string id="pri_a17_get_in_cover_text">
+		<text>Необхідно укритися в будинку і відбити напад «монолітівців».</text>
+	</string>
+	<string id="pri_a17_get_info_name">
+		<text>Невідома зброя: добути інформацію</text>
+	</string>
+	<string id="pri_a17_get_info_text">
+		<text>Зброя несправна, а принцип її дії невідомий. Необхідно знайти техніка, який розібрався б у цьому дивному зразку.</text>
+	</string>
+	<string id="pri_a17_kill_preacher_name">
+		<text>Невідома зброя: вбити ватажка «монолітівців»</text>
+	</string>
+	<string id="pri_a17_kill_preacher_text">
+		<text>Необхідно вбити ватажка «монолітівців», який має невідому зброю.</text>
+	</string>
+	<string id="pri_a17_maraud_name">
+		<text>Невідома зброя: обшукати тіла «монолітівців»</text>
+	</string>
+	<string id="pri_a17_maraud_text">
+		<text>«Монолітівці» повинні були мати при собі невідому зброя, котру потрібно знайти.</text>
+	</string>
+	<string id="pri_a17_stalker_tech_produce_62_get_info_name">
+		<text>Невідома зброя: поговорити з Карданом</text>
+	</string>
+	<string id="pri_a17_stalker_tech_produce_62_get_info_text">
+		<text>Кардан, мабуть, уже проспався. Настав час поговорити з ним про невідому зброю.</text>
+	</string>
+	<string id="pri_a17_stalker_tech_produce_62_show_name">
+		<text>Невідома зброя: почекати, поки Кардан прийде до тями</text>
+	</string>
+	<string id="pri_a17_stalker_tech_produce_62_show_text">
+		<text>Здається, Кардан щось знає про цю зброю. Треба буде з ним поговорити, коли він проспиться.</text>
+	</string>
+	<string id="pri_a17_talk_with_kovalski_about_gauss_rifle_information_name">
+		<text>Гаус-пушка: розповісти Ковальському про зброю</text>
+	</string>
+	<string id="pri_a17_talk_with_kovalski_about_gauss_rifle_information_text">
+		<text>Потрібно викласти полковнику Ковальському всю інформацію, отриману про «Виріб №62».</text>
+	</string>
+	<string id="pri_a17_task_find_gauss_rifle_name">
+		<text>Невідома зброя: приєднатися до загону</text>
+	</string>
+	<string id="pri_a17_task_find_gauss_rifle_text">
+		<text>Потрібно приєднатися до спецзагону для спільного проведення операції із захоплення зброї.</text>
+	</string>
+	<string id="pri_a17_task_get_gauss_rifle_from_preacher_name">
+		<text>Невідома зброя: підібрати зброю</text>
+	</string>
+	<string id="pri_a17_task_get_gauss_rifle_from_preacher_text">
+		<text>Необхідно підібрати зброю ватажка «Моноліту».</text>
+	</string>
+	<string id="pri_a17_task_give_gauss_rifle_to_kovalski_name">
+		<text>Невідома зброя: віднести зброю Ковальському</text>
+	</string>
+	<string id="pri_a17_task_give_gauss_rifle_to_kovalski_text">
+		<text>Зброю отримано. Тепер варто показати її Ковальському та з'ясувати, чи не стала саме вона причиною падіння гелікоптерів.</text>
+	</string>
+	<string id="pri_a17_watch_recons_six_name">
+		<text>Невідома зброя: взяти участь у засідці на «Моноліт»</text>
+	</string>
+	<string id="pri_a17_watch_recons_six_text">
+		<text>Розвідувальна група військових організує засідку на загін «Моноліту». Необхідно взяти участь в операції.</text>
+	</string>
+	<string id="pri_a18_get_reinforcement_name">
+		<text>Скупчення «Моноліту»: зустрітися із підмогою</text>
+	</string>
+	<string id="pri_a18_get_reinforcement_text">
+		<text>Ковальський вислав підкріплення, щоб допомогти знищити групу «монолітівців», які засіли в магазині «Книги».</text>
+	</string>
+	<string id="pri_a18_go_post_name">
+		<text>Скупчення «Моноліту»: зачистити магазин «Книги»</text>
+	</string>
+	<string id="pri_a18_go_post_text">
+		<text>Необхідно знищити всіх «монолітівців», які засіли у будинку. Їхні скупчення становлять загрозу для табору військових.</text>
+	</string>
+	<string id="pri_a18_use_idol_name">
+		<text>Скупчення «Моноліту»: обстежити дивну конструкцію</text>
+	</string>
+	<string id="pri_a18_use_idol_text">
+		<text>Всередині будинку, в якому були «монолітівці», виявлено дивну конструкцію. Необхідно вивчити її.</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_name">
+		<text>Лабораторія Х8: знайти документи про експерименти</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_text">
+		<text>Знайдена інформація вказує на центральну лабораторію під індексом Х8. Там може знаходитися інформація про секретні експерименти, що проводилися на території Зони.</text>
+	</string>
+	<string id="pri_a20_check_recon_squad_task_name">
+		<text>Зникла розвідувальна група: розшукати загін</text>
+	</string>
+	<string id="pri_a20_check_recon_squad_task_text">
+		<text>Розвідувальна група, котру послав Ковальський, зникла після дивного сеансу зв'язку. Необхідно знайти їх та довідатися, що сталося.</text>
+	</string>
+	<string id="pri_a21_chasovoi_body_search_name">
+		<text>Зниклий вартовий: оглянути місце загибелі вартового</text>
+	</string>
+	<string id="pri_a21_chasovoi_body_search_text">
+		<text>Вартовий поводився дуже дивно. Мабуть, слід роззирнутися навколо і знайти причину такої його поведінки.</text>
+	</string>
+	<string id="pri_a21_find_chasovoi_name">
+		<text>Зниклий вартовий: знайти вартового</text>
+	</string>
+	<string id="pri_a21_find_chasovoi_text">
+		<text>Один з військових зник зі свого посту. Потрібно знайти його та з'ясувати причину зникнення.</text>
+	</string>
+	<string id="pri_a21_kill_kontroler_name">
+		<text>Зниклий вартовий: убити контролера</text>
+	</string>
+	<string id="pri_a21_kill_kontroler_text">
+		<text>Поруч зі зниклим вартовим знаходився контролер. Небезпечного мутанта необхідно знищити.</text>
+	</string>
+	<string id="pri_a22_find_dead_squad_name">
+		<text>Радіозавади: знайти зниклий загін</text>
+	</string>
+	<string id="pri_a22_find_dead_squad_text">
+		<text>Загін, що вийшов на пошуки джерела радіозавад, пропав. Треба знайти його.</text>
+	</string>
+	<string id="pri_a22_search_bodys_name">
+		<text>Радіозавади: обшукати тіла загиблих бійців</text>
+	</string>
+	<string id="pri_a22_search_bodys_text">
+		<text>Слід оглянути тіла. Можливо, це допоможе встановити причину загибелі людей.</text>
+	</string>
+	<string id="pri_a22_search_yarmoshuk_body_name">
+		<text>Радіозавади: обшукати тіло загиблого бійця</text>
+	</string>
+	<string id="pri_a22_search_yarmoshuk_body_text">
+		<text>Треба оглянути тіло. Можливо, це допоможе встановити причину загибелі людини.</text>
+	</string>
+	<string id="pri_a25_blow_up_door_name">
+		<text>Радіозавади: підірвати двері</text>
+	</string>
+	<string id="pri_a25_blow_up_door_text">
+		<text>Щоб проникнути до будинку, слід розчистити прохід за допомогою вибухівки.</text>
+	</string>
+	<string id="pri_a25_check_freezer_knock_name">
+		<text>Радіозавади: перевірити джерело звуку</text>
+	</string>
+	<string id="pri_a25_check_freezer_knock_text">
+		<text>Із холодильника лунає стукіт: схоже, всередині хтось замкнений. Треба перевірити джерело звуку.</text>
+	</string>
+	<string id="pri_a25_destroy_antenna_name">
+		<text>Радіозавади: знищити джерело завад</text>
+	</string>
+	<string id="pri_a25_destroy_antenna_text">
+		<text>Джерело радіозавад виявлене. Тепер слід знищити його.</text>
+	</string>
+	<string id="pri_a25_find_antenna_name">
+		<text>Радіозавади: знайти джерело завад</text>
+	</string>
+	<string id="pri_a25_find_antenna_text">
+		<text>Десь у будинку знаходиться джерело радіозавад. Необхідно знайти його.</text>
+	</string>
+	<string id="pri_a25_find_explosive_name">
+		<text>Радіозавади: знайти вибухівку</text>
+	</string>
+	<string id="pri_a25_find_explosive_text">
+		<text>Загін, котрий шукав джерело завад, мав вибухівку. Потрібно знайти її, щоб розчистити вхід до будинку.</text>
+	</string>
+	<string id="pri_a25_remove_source_of_hindrances_name">
+		<text>Радіозавади: проникнути до будівлі дитячого садка</text>
+	</string>
+	<string id="pri_a25_remove_source_of_hindrances_text">
+		<text>Джерело сигналу знаходиться десь у будівлі дитячого садка. Необхідно туди проникнути.</text>
+	</string>
+	<string id="pri_a28_cover_militarys_name">
+		<text>Евакуація: прикривати військових</text>
+	</string>
+	<string id="pri_a28_cover_militarys_text">
+		<text>Попри те, що Стрілець загинув, слід допомогти військовим дістатися гелікоптерів.</text>
+	</string>
+	<string id="pri_a28_cover_strelok_name">
+		<text>Евакуація: прикривати Стрільця</text>
+	</string>
+	<string id="pri_a28_cover_strelok_text">
+		<text>Командування зацікавлене в інформації, що відома Стрільцеві. Треба доставити Стрільця до гелікоптерів.</text>
+	</string>
+	<string id="pri_a28_go_hellis_name">
+		<text>Евакуація: дістатися гелікоптерів</text>
+	</string>
+	<string id="pri_a28_go_hellis_text">
+		<text>Уся команда загинула, тепер доведеться діставатися гелікоптерів самому.</text>
+	</string>
+	<string id="pri_a28_talk_with_kovalski_name">
+		<text>Евакуація: поговорити з Ковальським</text>
+	</string>
+	<string id="pri_a28_talk_with_kovalski_text">
+		<text>Потрібно поговорити з Ковальським перед початком евакуації.</text>
+	</string>
+	<string id="pri_a28_tell_kovalski_when_ready_name">
+		<text>Евакуація: повідомити Ковальському про свою готовність</text>
+	</string>
+	<string id="pri_a28_tell_kovalski_when_ready_text">
+		<text>Варто повідомити Ковальському про свою готовність до початку евакуації.</text>
+	</string>
+	<string id="pri_a28_wait_surge_end_name">
+		<text>Евакуація: перечекати викид</text>
+	</string>
+	<string id="pri_a28_wait_surge_end_text">
+		<text>Необхідно дочекатися закінчення викиду.</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_1_name">
+		<text>Невідомий: перевірити джерело сигналу</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_1_text">
+		<text>Кирилов засік дивний сигнал неподалік бази. Треба перевірити джерело сигналу.</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_2_name">
+		<text>Невідомий: рухатися за сигналом</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_2_text">
+		<text>Координати сигналу знову доступні. Треба рухатися за ним.</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_3_name">
+		<text>Невідомий: обстежувати місце останньої появи сигналу</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_3_text">
+		<text>Сигнал зник у дворі будинку. Слід обстежити місце останньої появи сигналу.</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_4_name">
+		<text>Невідомий: підготуватися до атаки на базу</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_4_text">
+		<text>Повернуться на армійську базу та підготуватися до можливої атаки.</text>
+	</string>
+	<string id="pri_b305_kovalskiy_talk_name">
+		<text>Радіозавади: поговорити з Ковальським</text>
+	</string>
+	<string id="pri_b305_kovalskiy_talk_text">
+		<text>Полковник Ковальський просив зайти до нього для розмови.</text>
+	</string>
+	<string id="pri_b306_task_1_name">
+		<text>Лабораторія Х8: потрапити до шахти ліфта</text>
+	</string>
+	<string id="pri_b306_task_1_text">
+		<text>Під будівлею КБО «Ювілейний» знаходиться вхід до підземної лабораторії. Потрапити туди можна лише через шахту ліфта.</text>
+	</string>
+	<string id="pri_b306_task_2_name">
+		<text>Лабораторія Х8: знайти генератор</text>
+	</string>
+	<string id="pri_b306_task_2_text">
+		<text>Двері до шахти ліфта знеструмлено. Щоб їх відкрити, треба знайти і запустити аварійний генератор.</text>
+	</string>
+	<string id="pri_b306_task_3_name">
+		<text>Лабораторія Х8: спуститися до лабораторії</text>
+	</string>
+	<string id="pri_b306_task_3_text">
+		<text>Треба скористатися ліфтом, щоби потрапити до лабораторії Х8, котра знаходиться під будівлею КБО «Ювілейний».</text>
+	</string>
+	<string id="pri_b35_task_envoy_name">
+		<text>Один постріл: ліквідувати посланця</text>
+	</string>
+	<string id="pri_b35_task_envoy_text">
+		<text>Треба ліквідувати посланця: без нього найманці не зможуть знайти лабораторію.</text>
+	</string>
+	<string id="pri_b35_task_envoy_wait_name">
+		<text>Один постріл: дочекатися появи людей замовника</text>
+	</string>
+	<string id="pri_b35_task_envoy_wait_text">
+		<text>Треба дочекатися появи людей замовника і ліквідувати їхнього лідера. Без нього найманці не зможуть знайти лабораторію.</text>
+	</string>
+	<string id="pri_b35_task_merc_name">
+		<text>Один постріл: ліквідувати лідера найманців</text>
+	</string>
+	<string id="pri_b35_task_merc_text">
+		<text>Треба ліквідувати лідера найманців: без нього найманці не матимуть згуртованості, тож стануть не такі небезпечні.</text>
+	</string>
+	<string id="pri_b35_task_merc_wait_name">
+		<text>Один постріл: дочекатися появи найманців</text>
+	</string>
+	<string id="pri_b35_task_merc_wait_text">
+		<text>Треба дочекатися появи найманців і ліквідувати їхнього лідера. Без нього найманці не матимуть згуртованості, тож стануть не такі небезпечні.</text>
+	</string>
+	<string id="pri_b35_task_reward_name">
+		<text>Один постріл: поговорити з Ковальським</text>
+	</string>
+	<string id="pri_b35_task_reward_text">
+		<text>Слід повідомити Ковальському про результати операції.</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_1_name">
+		<text>Лабораторія Х8: Залишити підземний комплекс або продовжити пошук документів</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_1_text">
+		<text>Документи знайдено, лабораторію можна залишити. Проте в межах комплексу можуть залишатися й інші документи.</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_2_name">
+		<text>Лабораторія Х8: залишити підземний комплекс або продовжити пошук документів</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_2_text">
+		<text>Документи знайдено, лабораторію можна залишити. Проте в межах комплексу можуть залишатися й інші документи.</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_3_name">
+		<text>Лабораторія Х8: Залишити підземний комплекс</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_3_text">
+		<text>Зважаючи на все, у лабораторії зібрано уже всю документацію. Можна залишити підземний комплекс.</text>
+	</string>
+	<string id="pri_a18_wait_reinf_name">
+		<text>Скупчення «Моноліту»: дочекатися підмоги</text>
+	</string>
+	<string id="pri_a18_wait_reinf_text">
+		<text>Необхідно дочекатися підкріплення, висланого Ковальським для знищення групи «монолітівців» у магазині «Книги»</text>
+	</string>
+	<string id="pri_a22_talk_with_kovalski_name">
+		<text>Розмова віч-на-віч: поговорити з Ковальським</text>
+	</string>
+	<string id="pri_a22_talk_with_kovalski_text">
+		<text>Необхідно поговорити з Ковальським. Судячи з усього, він хоче повідомити щось важливе</text>
+	</string>
+	<string id="pri_a28_defend_helis_name">
+		<text>Евакуація: протриматися коло гелікоптерів</text>
+	</string>
+	<string id="pri_a28_defend_helis_text">
+		<text>Необхідно захищати гелікоптери від противника, поки не виникне можливість здійнятися в повітря.</text>
+	</string>
+	<string id="pri_a28_save_medic_name">
+		<text>Евакуація: привести медика до тями</text>
+	</string>
+	<string id="pri_a28_save_medic_text">
+		<text>Схоже, медик знову потрапив під невідомий вплив. Необхідно терміново привести його до тями.</text>
+	</string>
+	<string id="pri_a28_return_to_helis_name">
+		<text>Евакуація: повернутися до гелікоптерів</text>
+	</string>
+	<string id="pri_a28_return_to_helis_text">
+		<text>Необхідно повернутися до гелікоптерів, можливість злетіти може виникнути в будь-який момент.</text>
+	</string>
+	<string id="pri_a28_helis_gonna_fly_name">
+		<text>Евакуація: терміново повернутися до гелікоптерів</text>
+	</string>
+	<string id="pri_a28_helis_gonna_fly_text">
+		<text>Гелікоптери готові до відльоту. Необхідно терміново потрапити на борт одного з них - пілоти довго не чекатимуть.</text>
+	</string>
+</string_table>

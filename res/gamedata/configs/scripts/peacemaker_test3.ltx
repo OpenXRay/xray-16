@@ -1,0 +1,75 @@
+[logic]
+;active = animpoint
+active = walker@1
+;relation = friend
+;level_spot = quest_npc
+
+[animpoint]
+on_info = {+test_info_1} walker@1, {+test_info_2} animpoint@1
+cover_name = level_prefix_smart_cover
+use_camp = false
+avail_animations = jup_b10_drunk_ravings
+can_select_weapon = false
+
+[walker@1]
+on_info = {+test_info_1} walker@2
+path_walk = path_walk_3
+meet = meet@1
+[walker@2]
+on_info = {-test_info_1} walker@1
+path_walk = path_walk_3
+meet = meet@2
+;combat_ignore_cond = true
+;combat_ignore_keep_when_attacked = true
+;on_info={=is_shooting_finished} walker@2
+;invulnerable = true
+;meet = meet@main
+;meet = meet@minigame_crowkiller
+
+[animpoint@1]
+cover_name = level_prefix_smart_cover
+on_info = {-test_info_2} animpoint
+use_camp = false
+avail_animations = jup_b10_drunk_ravings
+;combat_ignore_cond = true
+;combat_ignore_keep_when_attacked = true
+;on_info={!is_shooting_finished} walker@1
+;invulnerable = true
+;meet = meet@after_game
+
+;for shooting
+[meet@1]
+allow_break = false
+use = true
+
+[meet@2]
+allow_break = true
+use = true
+
+[meet@after_game]
+meet_state = 2|nil@actor
+meet_state_wpn = 2|nil@actor
+victim = 2|actor
+victim_wpn = 2|actor
+use = {=dist_to_actor_le(2.5) +agr_shooting_door_exit} self %-agr_shooting_door_exit%
+use_wpn = {=dist_to_actor_le(2.5) +agr_shooting_door_exit} self %-agr_shooting_door_exit%
+precond = visibility
+allow_break = false
+trade_enable = false
+sound_stop 		= agr_duty_weaponmaster_meet_bye
+quest_npc 		= true
+
+
+;for crowkiller
+[meet@minigame_crowkiller]
+use_wpn	= {!is_playing_sound} true, false
+use = {!is_playing_sound} true, false
+victim = 20 | actor
+victim_wpn = 20 | actor
+trade_enable = false
+allow_break = false
+meet_state 	= 5|nil@nil
+sound_start = gar_bandit_bookmaker_meet
+sound_stop = gar_bandit_bookmaker_meet_bye
+quest_npc = true
+

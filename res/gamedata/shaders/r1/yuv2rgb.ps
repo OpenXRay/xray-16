@@ -1,0 +1,26 @@
+#include "common.h"
+
+half4	main_ps_2_0	(float2 uv : TEXCOORD0)	: COLOR
+{
+	half3	YUV	= tex2D	(s_base, uv);
+
+	half	Y	= YUV.x;
+	half	U	= YUV.y;
+	half	V	= YUV.z;
+
+	/*
+	half	_T = 1.16406f*Y;
+	half R1 = _T 				+ 1.59765f*V 	- 0.86961f;
+	half G1 = _T - 0.390625f*U 	- 0.8125f*V  	+ 0.53076f;
+	half B1 = _T + 2.01562f*U 					- 1.0786f;
+	*/
+
+	half	c	= 1.16406f	;
+	half3	_Y	= half3		(c,				c,			c)			*Y	;
+	half3	_U	= half3		(0, 			-0.390625f, +2.01562f)	*U	;
+	half3	_V	= half3		(+1.59765f,		-0.8125f,	0)			*V	;
+	half3	_S	= half3		(-0.86961f,		+0.53076f,	-1.0786f)		;
+	
+
+	return half4(_Y+_U+_V+_S,1);
+}

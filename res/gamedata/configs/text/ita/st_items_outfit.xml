@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="csky_heavy_outfit_name">
+		<text>Armatura CS-3a</text>
+	</string>
+	<string id="dolg_heavy_outfit_name">
+		<text>Armatura Duty PSZ-9d</text>
+	</string>
+	<string id="dolg_outfit_name">
+		<text>Protezione universale PS5-M</text>
+	</string>
+	<string id="exo_outfit_name">
+		<text>Esoscheletro</text>
+	</string>
+	<string id="military_outfit_name">
+		<text>Tuta corazzata Bulat</text>
+	</string>
+	<string id="mp_exo_outfit_description">
+		<text>Questo esoscheletro fornisce un'eccellente protezione contro i proiettili e i danni da frammentazione, limitando perт la mobilitа. Vulnerabile ai proiettili perforanti.</text>
+	</string>
+	<string id="mp_exo_outfit_name">
+		<text>Esoscheletro</text>
+	</string>
+	<string id="mp_military_outfit_description">
+		<text>Una tuta corazzata militare progettata per le operazioni d'assalto. Fornisce una protezione straordinaria contro i proiettili blindati e i danni da frammentazione, senza ridurre la mobilitа. Vulnerabile ai proiettili perforanti.</text>
+	</string>
+	<string id="mp_military_outfit_name">
+		<text>Tuta corazzata militare</text>
+	</string>
+	<string id="novice_outfit_description">
+		<text>Un normale impermeabile nero. Non ha funzioni particolari, a parte quelle di scaldare il corpo dell'utilizzatore di notte e di proteggerlo dai morsi dei cani ciechi. Pur non essendo particolarmente comodo, spesso viene utilizzato dai banditi della Zona per le sue capacitа di mimetizzazione al buio o, semplicemente, per il suo aspetto "da duri".</text>
+	</string>
+	<string id="novice_outfit_name">
+		<text>Impermeabile in pelle</text>
+	</string>
+	<string id="scientific_outfit_name">
+		<text>Tuta SEVA</text>
+	</string>
+	<string id="specops_outfit_name">
+		<text>Tuta corazzata Berill-5M</text>
+	</string>
+	<string id="st_helm_battle">
+		<text>Casco Sphere M12</text>
+	</string>
+	<string id="st_helm_battle_descr">
+		<text>Un casco in alluminio/titanio con un rivestimento in tessuto fornito di tasche per parti di armatura aggiuntive e una maschera corazzata. Di norma viene usato insieme all'armatura Spetsnaz PSZ. Molto popolare nella Zona grazie al suo respiratore e al dispositivo di prima generazione per la visione notturna, garantisce il livello di protezione massimo per la zona della testa. Include degli scomparti elettronici.</text>
+	</string>
+	<string id="st_helm_hardhat">
+		<text>Casco d'acciaio</text>
+	</string>
+	<string id="st_helm_hardhat_descr">
+		<text>Un casco d'acciaio terribilmente obsoleto e privo di qualsiasi miglioria. Non fornisce alcuna protezione contro le radiazioni o le anomalie, ma puт deviare i proiettili. Non и mai stato particolarmente popolare nella Zona, se non durante i brevi conflitti armati tra le fazioni.</text>
+	</string>
+	<string id="st_helm_protective">
+		<text>Casco schermato</text>
+	</string>
+	<string id="st_helm_protective_descr">
+		<text>Un casco leggero con un visore ermetico per proteggersi dalle anomalie. A giudicare dal suo aspetto, и stato prodotto dagli stessi istituti di ricerca responsabili della tuta SEVA. Il suo utilizzo ideale и in combinazione con le tute militari per le operazioni in aree altamente anomale. </text>
+	</string>
+	<string id="st_helm_respirator">
+		<text>Maschera antigas</text>
+	</string>
+	<string id="st_helm_respirator_descr">
+		<text>Una normale maschera antigas in plastica e gomma, utilizzata per filtrare l'aria da sostanze tossiche e particelle radioattive. Utilizzata comunemente da reclute e veterani di tutte le fazioni, per via della sua funzionalitа universale. Non fornisce alcuna protezione fisica.</text>
+	</string>
+	<string id="st_helm_tactic">
+		<text>Casco tattico</text>
+	</string>
+	<string id="st_helm_tactic_descr">
+		<text>Modello di produzione occidentale del tutto privo di camuffamento, arrivato inspiegabilmente nella Zona. I sistemi di comunicazione satellitare e i diversi scanner di questo casco, non installati nella versione della Zona, forniscono al leader della squadra un notevole vantaggio strategico sulle forze nemiche. И composto da varie piastre in kevlar e alcuni elementi corazzati che proteggono i componenti elettronici. Include un respiratore e un dispositivo di prima generazione per la visione notturna.</text>
+	</string>
+	<string id="stalker_outfit_name">
+		<text>Tuta "Alba"</text>
+	</string>
+	<string id="svoboda_heavy_outfit_name">
+		<text>Tuta "Guardia della Freedom"</text>
+	</string>
+	<string id="svoboda_light_outfit_description">
+		<text>Una tuta da stalker leggera realizzata dagli artigiani della Freedom. Il tessuto и trattato con una soluzione speciale chiamata "Orizzonte", sviluppata dalla fazione con esperimenti piщ o meno casuali per aumentare la resistenza alle anomalie. Come la tuta "Alba", la tuta "Vento della Freedom" include un'armatura integrata e un contenitore di manufatti.</text>
+	</string>
+	<string id="svoboda_light_outfit_name">
+		<text>Tuta "Vento della Freedom"</text>
+	</string>
+	<string id="dolg_outfit_description">
+		<text>Questa versione moderna della tuta della Duty и particolarmente adatta alle reclute, abituate alle protezioni leggere. A differenza del modello PSZ, questa tuta fornisce una buona protezione contro le anomalie. Non puт essere modificata con un contenitore di manufatti, ma и possibile potenziarla con un sistema di supporto da battaglia.</text>
+	</string>
+	<string id="military_outfit_description">
+		<text>Questa tuta corazzata militare и stata progettata per gli assalti nelle aree anomale. Comprende una tuta corazzata pesante PSZ-12p, una tuta di compensazione e un rivestimento protettivo contro le anomalie. Fornisce una protezione eccellente contro i proiettili e i danni da frammentazione, senza ridurre eccessivamente la mobilitа. Non include un contenitore di manufatti.</text>
+	</string>
+	<string id="mp_scientific_outfit_description">
+		<text>Questa tuta, progettata per condurre ricerche nella Zona, combina un modulo respiratorio a ciclo chiuso e un rivestimento isolante esterno, in modo da offrire una protezione eccellente. Per via della sua scarsa resistenza agli impatti fisici, la tuta non offre una difesa efficace contro i proiettili e i danni da frammentazione. Include un contenitore di manufatti.</text>
+	</string>
+	<string id="scientific_outfit_description">
+		<text>Questa tuta, prodotta da uno degli istituti di ricerca di Kiev, и un'ottima alternativa alle altre tute da stalker "fatte in casa". L'armatura puт resistere solo ai colpi di pistola, ma il sistema di protezione contro anomalie e radiazioni non ha rivali. Puт essere migliorata e vanta due contenitori di manufatti. Ciт la rende una delle tute piщ ricercate dagli stalker.</text>
+	</string>
+	<string id="specops_outfit_description">
+		<text>Questo comprende la tuta militare serie PS5 con uno sputter al berillio modificato per essere usato nella Zona. Pensata per le operazioni d'assalto nelle aree altamente radioattive, и inefficace in aree particolarmente anomale. La tuta viene fornita agli stalker dai militari in cambio di bottini. Non include un contenitore di manufatti.</text>
+	</string>
+	<string id="stalker_outfit_description">
+		<text>Una tuta da stalker "fai-da-te" che unisce un doppio strato di tessuto gommato rivestito in plexiglas a un'armatura integrata. Pur non essendo in grado di proteggere l'utilizzatore nemmeno dai colpi di pistola, la tuta и molto popolare grazie al suo prezzo contenuto e alle potenziali modifiche apportabili. Include un contenitore di manufatti.</text>
+	</string>
+	<string id="svoboda_heavy_outfit_description">
+		<text>Questa tuta da stalker dispone di un'armatura migliorata, creata dagli artigiani della Freedom: и un buon compromesso tra combattimento e protezione dalle anomalie. L'armatura integrata resiste ai colpi di pistola e comprende un rivestimento corazzato e piastre in kevlar. La tuta usa un composto denominato "Sovrano" contro le anomalie. Include un contenitore di manufatti.</text>
+	</string>
+	<string id="dolg_heavy_outfit_description">
+		<text>Il modello originario della tuta Duty и la Spetsnaz PSZ-9, modificata per la Zona. La tuta resiste ai colpi di pistola, ma questo livello di protezione si paga con scarsa manovrabilitа e protezione dalle anomalie pressochй inesistente. La tuta non puт essere modificata con un contenitore per manufatti, ma puт essere potenziata con un sistema di supporto da battaglia.</text>
+	</string>
+	<string id="csky_heavy_outfit_description">
+		<text>Un tempo usata dalle squadre d'assalto Clear Sky, dopo l'eliminazione della fazione questa armatura serve a ricordare che persino un'eccellente tuta non puт garantire la tua sicurezza in questa parte di mondo. L'armatura и in grado di resistere ai colpi di pistola e fornire una buona protezione dalle anomalie. Dotata di un contenitore di manufatti.</text>
+	</string>
+	<string id="exo_outfit_description">
+		<text>Un campione sperimentale di esoscheletro militare, mai entrato in produzione in serie per via dei costi e di alcuni difetti. Nonostante questo, и ancora richiesto per la sua capacitа di reggere tutta l'attrezzatura trasportata, e perciт ne vengono realizzati dei piccoli quantitativi negli stabilimenti all'esterno dei confini ucraini. Dotato di un contenitore per manufatti.</text>
+	</string>
+	<string id="mp_scientific_outfit_name">
+		<text>Tuta SEVA</text>
+	</string>
+</string_table>

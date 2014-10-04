@@ -1,0 +1,66 @@
+function bind(obj)
+	obj:bind_object(camp_binder( obj ))
+end
+
+-- Таблица, содержащая кемпы
+camps = {}
+CAMP_SECTION = "camp"
+
+----------------------------------------------------------------------------------------------------
+class "camp_binder" ( object_binder )
+function camp_binder:__init(obj, char_ini) super(obj)
+end
+function camp_binder:reload(section)
+	object_binder.reload(self, section)
+end
+function camp_binder:reinit()
+	object_binder.reinit(self)
+
+	camps[self.object:id()] = { object = self.object }
+end
+function camp_binder:net_spawn(data)
+	if not object_binder.net_spawn( self,data ) then
+		return false
+	end
+
+	local ini = self.object:spawn_ini()
+
+	if ini:section_exist(CAMP_SECTION) then
+		local filename = utils.cfg_get_string(ini, CAMP_SECTION, "cfg", nil, false, "", nil)
+		if filename then
+			ini = ini_file(filename)
+		end
+	
+		--printf("!!!!!")
+		camps[self.object:id()].camp = sr_camp.CCampManager(self.object, ini)
+	end
+
+	return true
+end
+function camp_binder:net_destroy()
+	camps[self.object:id()] = nil
+
+	object_binder.net_destroy(self)
+end
+-- вызывается из обновления актёра!
+function camp_binder:update(delta)
+	local cc = camps[self.object:id()]
+	if cc ~= nil then
+		cc.camp:update()
+	end
+end
+function camp_binder:net_save_relevant()
+	return true
+end
+function camp_binder:save(packet)
+	set_save_marker(packet, "save", false, "camp_binder")
+	object_binder.save(self, packet)
+
+	set_save_marker(packet, "save", true, "camp_binder")
+end
+function camp_binder:load(reader)
+	set_save_marker(reader, "load", false, "camp_binder")
+	object_binder.load(self, reader)
+
+	set_save_marker(reader, "load", true, "camp_binder")
+end

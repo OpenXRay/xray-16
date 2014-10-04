@@ -1,0 +1,10 @@
+<w>
+    <file name="ui\ui_actor_MP_screen">
+	    <texture id="ui_inGame2_Mp_HUD_art_hunt" x="881" y="242" width="54" height="63" />
+	    <texture id="ui_inGame2_Mp_HUD_DM" x="728" y="285" width="114" height="41" />
+	    <texture id="ui_inGame2_Mp_HUD_left_panel" x="728" y="366" width="175" height="32" />
+	    <texture id="ui_inGame2_Mp_HUD_right_panel" x="728" y="330" width="175" height="32" />
+	    <texture id="ui_inGame2_Mp_HUD_money_panel" x="728" y="242" width="146" height="42" />
+   </file>
+</w>
+

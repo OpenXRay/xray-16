@@ -1,0 +1,369 @@
+----------------------------------------------------------------------------------------------------------------------
+--'	Схема обыска трупов
+--'	автор: Диденко Руслан (Stohe)
+--'	TODO:
+----------------------------------------------------------------------------------------------------------------------
+lootable_table = {}
+
+--Патроны
+lootable_table["ammo_9x18_fmj"] = true
+lootable_table["ammo_9x18_pmm"] = true
+lootable_table["ammo_9x19_pbp"] = true
+lootable_table["ammo_9x19_fmj"] = true
+lootable_table["ammo_11.43x23_hydro"] = true
+lootable_table["ammo_11.43x23_fmj"] = true
+lootable_table["ammo_12x70_buck"] = true
+lootable_table["ammo_12x76_zhekan"] = true
+lootable_table["ammo_5.45x39_ap"] = true
+lootable_table["ammo_5.45x39_fmj"] = true
+lootable_table["ammo_9x39_ap"] = true
+lootable_table["ammo_9x39_pab9"] = true
+lootable_table["ammo_5.56x45_ss190"] = true
+lootable_table["ammo_5.56x45_ap"] = true
+lootable_table["ammo_7.62x54_7h1"] = true
+lootable_table["ammo_og-7b"] = true
+lootable_table["ammo_vog-25"] = true
+lootable_table["grenade_f1"] = true
+lootable_table["grenade_rgd5"] = true
+lootable_table["ammo_m209"] = true
+lootable_table["ammo_pkm_100"] = true
+
+--Оружие
+lootable_table["wpn_pm"] = true
+lootable_table["wpn_pb"] = true
+lootable_table["wpn_fort"] = true
+lootable_table["wpn_hpsa"] = true
+lootable_table["wpn_beretta"] = true
+lootable_table["wpn_walther"] = true
+lootable_table["wpn_sig220"] = true
+lootable_table["wpn_colt1911"] = true
+lootable_table["wpn_usp"] = true
+lootable_table["wpn_desert_eagle"] = true
+lootable_table["wpn_bm16"] = true
+lootable_table["wpn_toz34"] = true
+lootable_table["wpn_wincheaster1300"] = true
+lootable_table["wpn_spas12"] = true
+lootable_table["wpn_ak74u"] = true
+lootable_table["wpn_mp5"] = true
+lootable_table["wpn_ak74"] = true
+lootable_table["wpn_abakan"] = true
+lootable_table["wpn_l85"] = true
+lootable_table["wpn_lr300"] = true
+lootable_table["wpn_sig550"] = true
+lootable_table["wpn_groza"] = true
+lootable_table["wpn_val"] = true
+lootable_table["wpn_vintorez"] = true
+lootable_table["wpn_svu"] = true
+lootable_table["wpn_svd"] = true
+lootable_table["wpn_rg-6"] = true
+lootable_table["wpn_rpg7"] = true
+lootable_table["wpn_g36"] = true
+lootable_table["wpn_fn2000"] = true
+lootable_table["wpn_pkm"] = true
+
+-- Аддоны
+lootable_table["wpn_addon_scope"] = true
+lootable_table["wpn_addon_scope_x2.7"] = true
+lootable_table["wpn_addon_scope_detector"] = true
+lootable_table["wpn_addon_scope_night"] = true
+lootable_table["wpn_addon_scope_susat"] = true
+lootable_table["wpn_addon_scope_susat_x1.6"] = true
+lootable_table["wpn_addon_scope_susat_custom"] = true
+lootable_table["wpn_addon_scope_susat_dusk"] = true
+lootable_table["wpn_addon_scope_susat_night"] = true
+lootable_table["wpn_addon_silencer"] = true
+lootable_table["wpn_addon_grenade_launcher"] = true
+lootable_table["wpn_addon_grenade_launcher_m203"] = true
+
+-- Броники
+lootable_table["novice_outfit"] = true
+lootable_table["specops_outfit"] = true
+lootable_table["military_outfit"] = true
+lootable_table["stalker_outfit"] = true
+lootable_table["scientific_outfit"] = true
+lootable_table["exo_outfit"] = true
+lootable_table["svoboda_light_outfit"] = true
+lootable_table["svoboda_heavy_outfit"] = true
+lootable_table["cs_heavy_outfit"] = true
+lootable_table["dolg_outfit"] = true
+lootable_table["dolg_heavy_outfit"] = true
+
+-- Шлемы
+lootable_table["helm_respirator"] = true
+lootable_table["helm_hardhat"] = true
+lootable_table["helm_protective"] = true
+lootable_table["helm_tactic"] = true
+lootable_table["helm_battle"] = true
+
+--Медикаменты
+lootable_table["bandage"] = true
+lootable_table["medkit"] = true
+lootable_table["medkit_scientic"] = true
+lootable_table["medkit_army"] = true
+lootable_table["antirad"] = true
+
+--Бустеры
+lootable_table["drug_booster"] = true
+lootable_table["drug_coagulant"] = true
+lootable_table["drug_psy_blockade"] = true
+lootable_table["drug_antidot"] = true
+lootable_table["drug_radioprotector"] = true
+lootable_table["drug_anabiotic"] = true
+
+--Еда
+lootable_table["bread"] = true
+lootable_table["kolbasa"] = true
+lootable_table["conserva"] = true
+lootable_table["vodka"] = true
+lootable_table["energy_drink"] = true
+
+--Предметы
+lootable_table["detector_simple"] = true
+lootable_table["detector_advanced"] = true
+lootable_table["detector_elite"] = true
+lootable_table["detector_scientific"] = true
+
+--Уникальные предметы
+lootable_table["wpn_pm_actor"] = true
+lootable_table["wpn_sig550_luckygun"] = true
+lootable_table["wpn_pkm_zulus"] = true
+lootable_table["wpn_wincheaster1300_trapper"] = true
+lootable_table["wpn_desert_eagle_nimble"] = true
+lootable_table["wpn_groza_nimble"] = true
+lootable_table["wpn_mp5_nimble"] = true
+lootable_table["wpn_sig220_nimble"] = true
+lootable_table["wpn_spas12_nimble"] = true
+lootable_table["wpn_svd_nimble"] = true
+lootable_table["wpn_svu_nimble"] = true
+lootable_table["wpn_usp_nimble"] = true
+lootable_table["wpn_vintorez_nimble"] = true
+lootable_table["wpn_g36_nimble"] = true
+lootable_table["wpn_fn2000_nimble"] = true
+lootable_table["wpn_protecta_nimble"] = true
+lootable_table["stalker_outfit_barge"] = true
+lootable_table["helm_respirator_joker"] = true
+lootable_table["helm_hardhat_snag"] = true
+lootable_table["wpn_ak74u_snag"] = true
+lootable_table["wpn_fort_snag"] = true
+
+
+
+local corpse_contain_any_valuable
+
+function check_item(npc, item)
+--	printf("found item %s", item:name())
+	if lootable_table[item:section()] == true then
+		corpse_contain_any_valuable = true
+	end
+end
+
+----------------------------------------------------------------------------------------------------------------------
+-- EVALUATORS
+----------------------------------------------------------------------------------------------------------------------
+class "evaluator_corpse" (property_evaluator)
+function evaluator_corpse:__init(name, storage, npc) super (nil, name)
+	self.a = storage
+end
+function evaluator_corpse:evaluate()
+	if not self.object:alive() then
+		return false
+	end
+
+	if self.object:best_enemy() ~= nil then
+		return false
+	end
+
+	if self.object:character_community() == "zombied" then
+		return false
+	end
+
+	if self.a.corpse_detection_enabled == false then
+		return false
+	end
+
+	if xr_wounded.is_wounded(self.object) then
+		return false
+	end
+
+	if self.object:section() == "actor_visual_stalker" then
+		return false
+	end
+
+	local corpses = release_body_manager.get_release_body_manager().release_objects_table
+
+	local nearest_corpse_dist = 400 -- Будет выбирать только трупы, ближе чем эта дистанция (проверяется по квадрату расстояния)
+	local nearest_corpse_vertex = nil
+	local nearest_corpse_position = nil
+	local corpse_id	= nil
+
+	for k,v in pairs(corpses) do
+		local id = v.id
+		local corpse_npc = db.storage[id] and db.storage[id].object
+
+		if corpse_npc ~= nil and self.object:see(corpse_npc) and (db.storage[id].corpse_already_selected == nil or db.storage[id].corpse_already_selected == self.object:id()) then
+			if self.object:position():distance_to_sqr(corpse_npc:position()) < nearest_corpse_dist then
+
+				corpse_contain_any_valuable = nil
+				corpse_npc:iterate_inventory(check_item, corpse_npc)
+
+				if corpse_contain_any_valuable == true then
+
+					--printf("FOUND NEW PRIOR CORPSE %s", corpse_npc:name())
+					corpse_vertex = level.vertex_id(corpse_npc:position())
+					if self.object:accessible(corpse_vertex) then
+						nearest_corpse_dist = self.object:position():distance_to_sqr(corpse_npc:position())
+						nearest_corpse_vertex = corpse_vertex
+						nearest_corpse_position = corpse_npc:position()
+						corpse_id = id
+					end
+
+				end
+--			else
+--				printf("FOUND CORPSE %s FAR %s", corpse_npc:name(), self.object:position():distance_to_sqr(corpse_npc:position()))
+			end
+
+		end
+	end
+
+	if nearest_corpse_vertex ~= nil then
+		self.a.vertex_id = nearest_corpse_vertex
+		self.a.vertex_position = nearest_corpse_position
+		
+		if self.a.selected_corpse_id ~= nil and self.a.selected_corpse_id ~= corpse_id then
+			if db.storage[self.a.selected_corpse_id] ~= nil then
+				db.storage[self.a.selected_corpse_id].corpse_already_selected = nil
+			end			
+		end
+
+		self.a.selected_corpse_id = corpse_id
+		db.storage[self.a.selected_corpse_id].corpse_already_selected = self.object:id()		
+		
+		return true
+	end
+
+	return false
+end
+
+
+
+----------------------------------------------------------------------------------------------------------------------
+--Actions
+----------------------------------------------------------------------------------------------------------------------
+class "action_search_corpse" (action_base)
+function action_search_corpse:__init (npc_name,action_name, storage) super (nil, action_name)
+	self.a = storage
+end
+function action_search_corpse:initialize()
+	action_base.initialize(self)
+	self.object:set_desired_position()
+	self.object:set_desired_direction()
+
+	self.object:set_dest_level_vertex_id(self.a.vertex_id)
+	--state_mgr.set_state(self.object, "patrol", nil, nil, {look_position = self.a.vertex_position})
+	state_mgr.set_state(self.object, "patrol")
+end
+function action_search_corpse:execute ()
+	action_base.execute(self)
+
+	if self.object:position():distance_to_sqr(self.a.vertex_position) > 2 then
+		return
+	end
+
+	state_mgr.set_state(self.object, "search_corpse", nil, nil, {look_position = self.a.vertex_position})
+	xr_sound.set_sound_play(self.object:id(), "corpse_loot_begin")
+end
+function action_search_corpse:finalize ()
+	if self.a.selected_corpse_id ~= nil and db.storage[self.a.selected_corpse_id] ~= nil then 
+		db.storage[self.a.selected_corpse_id].corpse_already_selected = nil
+	end
+	
+	action_base.finalize(self)
+end
+
+local transfer_to_npc = nil
+
+function get_item(npc, item)
+	if lootable_table[item:section()] == true then
+		npc:transfer_item(item, transfer_to_npc)
+	end
+end
+
+function get_all_from_corpse(npc)
+	printf("GET ALL FROM CORPSE")
+
+	local corpse_npc_id = db.storage[npc:id()].corpse_detection.selected_corpse_id
+	local corpse_npc = db.storage[corpse_npc_id] and db.storage[corpse_npc_id].object
+
+	if corpse_npc == nil then
+		return
+	end
+
+	transfer_to_npc = npc
+	corpse_npc:iterate_inventory(get_item, corpse_npc)
+	
+	if math.random(100) > 20 then
+		xr_sound.set_sound_play(npc:id(), "corpse_loot_begin")
+	else
+		xr_sound.set_sound_play(npc:id(), "corpse_loot_bad")
+	end
+end
+
+----------------------------------------------------------------------------------------------------------------------
+-- BINDER
+----------------------------------------------------------------------------------------------------------------------
+function add_to_binder(npc, char_ini, scheme, section, st)
+	local operators	= {}
+	local properties  = {}
+
+
+	properties["corpse_exist"]				= xr_evaluators_id.corpse_exist
+	properties["wounded"]					= xr_evaluators_id.sidor_wounded_base
+
+	operators["search_corpse"]				= xr_actions_id.corpse_exist
+	operators["state_mgr_to_idle_alife"]	= xr_actions_id.state_mgr + 2
+
+	local manager = npc:motivation_action_manager()
+
+
+	-- Evaluators
+	manager:add_evaluator (properties["corpse_exist"], 		evaluator_corpse("corpse_exist", st))
+
+	-- Actions
+	local action = action_search_corpse (npc:name(),"action_search_corpse", st)
+	action:add_precondition		(world_property(stalker_ids.property_alive, true))
+	action:add_precondition		(world_property(stalker_ids.property_enemy,	false))
+	action:add_precondition		(world_property(stalker_ids.property_danger,false))
+	action:add_precondition		(world_property(stalker_ids.property_anomaly,false))
+	action:add_precondition		(world_property(stalker_ids.property_items,false))
+	action:add_precondition		(world_property(properties["corpse_exist"],	true))
+	action:add_precondition		(world_property(properties["wounded"], 		false))
+	action:add_precondition 	(world_property(xr_evaluators_id.wounded_exist,		false))
+	action:add_effect (world_property(properties["corpse_exist"], 			false))
+	manager:add_action (operators["search_corpse"], action)
+
+	action = manager:action (xr_actions_id.alife)
+	action:add_precondition		(world_property(properties["corpse_exist"],		false))
+
+	action = manager:action (operators["state_mgr_to_idle_alife"])
+	action:add_precondition		(world_property(properties["corpse_exist"],		false))
+end
+
+function set_corpse_detection(npc, ini, scheme, section)
+	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
+end
+
+
+function reset_corpse_detection(npc, scheme, st, section)
+	st.corpse_detection.corpse_detection_enabled = utils.cfg_get_bool(st.ini, section, "corpse_detection_enabled", npc, false, true)
+end
+
+function is_under_corpse_detection(npc)
+	local mgr = npc:motivation_action_manager()
+
+	if not mgr:initialized() then
+		return false
+	end
+
+	local current_action_id = mgr:current_action_id() 
+	return  current_action_id == xr_actions_id.corpse_exist
+end

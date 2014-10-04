@@ -1,0 +1,780 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="zat_a2_reach_base_name">
+		<text>Bezpieczne miejsce: dostaс siк do Skadowska</text>
+	</string>
+	<string id="zat_a2_reach_base_text">
+		<text>Jedynymi wzglкdnie bezpiecznymi miejscami w Zonie s№ duїe obozy. Najbliїszym z nich jest Skadowsk - tam wіaњnie musisz siк skierowaж.</text>
+	</string>
+	<string id="zat_b100_guide_maps_01_name">
+		<text>Mapy terenu: znajdџ kogoњ, kto interesuje siк mapami</text>
+	</string>
+	<string id="zat_b100_guide_maps_02_name">
+		<text>Mapy terenu: zaoferuj mapy Pilotowi</text>
+	</string>
+	<string id="zat_b100_guide_maps_02_text">
+		<text>Moїliwe, їe Pilot, miejscowy przewodnik, bкdzie zainteresowany mapami terenu pomiкdzy Zatonem i Jupiterem.</text>
+	</string>
+	<string id="zat_b100_heli_2_crash_name">
+		<text>Ogoсcza 2: zbadaj miejsce katastrofy</text>
+	</string>
+	<string id="zat_b100_heli_2_crash_text">
+		<text>Zbadaj miejsce katastrofy Ogoсczy 2.</text>
+	</string>
+	<string id="zat_b101_heli_5_crash_name">
+		<text>Ogoсcza 5: zbadaj miejsce katastrofy</text>
+	</string>
+	<string id="zat_b101_heli_5_crash_name_02">
+		<text>Ogoсcza 5: znajdџ przyczynк spalenia siк elektroniki</text>
+	</string>
+	<string id="zat_b101_heli_5_crash_name_03">
+		<text>Oddziaі Ogoсczy: znajdџ џrуdіo wyіadowaс, ktуre uderzyіy w dwa њmigіowce</text>
+	</string>
+	<string id="zat_b101_heli_5_crash_text">
+		<text>Zbadaj miejsce katastrofy Ogoсczy 5.</text>
+	</string>
+	<string id="zat_b101_heli_5_crash_text_02">
+		<text>Musisz znaleџж џrуdіo silnego wyіadowania elektrycznego, ktуre uderzyіo w њmigіowiec Ogoсcza 5.</text>
+	</string>
+	<string id="zat_b101_heli_5_crash_text_03">
+		<text>Musisz znaleџж przyczynк spalenia siк elektroniki w Ogoсczach 4 i 5. Wygl№da na to, їe zostaіy trafione przez silne wyіadowania elektryczne.</text>
+	</string>
+	<string id="zat_b103_merc_bring_supplies_name">
+		<text>Їywnoњж: zdob№dџ jedzenie dla najemnikуw</text>
+	</string>
+	<string id="zat_b103_merc_bring_supplies_text">
+		<text>Oddziaі najemnikуw z warsztatуw podstacji poprosiі ciк o przyniesienie szeњciu puszek miкsa, kawaіkуw kieіbasy lub chleba.</text>
+	</string>
+	<string id="zat_b103_merc_supplies_got_name">
+		<text>Їywnoњж: zanieњ jedzenie najemnikom</text>
+	</string>
+	<string id="zat_b103_merc_supplies_got_text">
+		<text>Musisz zanieњж zgromadzone jedzenie najemnikom w warsztatach podstacji.</text>
+	</string>
+	<string id="zat_b103_toolkit_2_substation_workshop_name">
+		<text>Narzкdzia: zbadaj warsztaty podstacji</text>
+	</string>
+	<string id="zat_b103_toolkit_2_substation_workshop_text">
+		<text>Mуwi№, їe w warsztatach podstacji mog№ znajdowaж siк narzкdzia. Moїe nawet znajdziesz te, ktуrych szuka technik.</text>
+	</string>
+	<string id="zat_b106_find_chimera_name">
+		<text>Polowanie na chimerк: znajdџ mutanta, dopуki њpi</text>
+	</string>
+	<string id="zat_b106_find_chimera_text">
+		<text>Musisz znaleџж chimerк, zanim siк obudzi.</text>
+	</string>
+	<string id="zat_b106_found_soroka_name">
+		<text>W poszukiwaniu Sroki: poinformuj Gontк</text>
+	</string>
+	<string id="zat_b106_found_soroka_text">
+		<text>Wygl№da na to, їe Sroka, stalker, ktуry wystawiі druїynк Gonty, zostaі odnaleziony. Doі№czyі do Wolnoњci i teraz zwie siк Flintem.</text>
+	</string>
+	<string id="zat_b106_kill_chimera_name">
+		<text>Polowanie na chimerк: zabij mutanta</text>
+	</string>
+	<string id="zat_b106_kill_chimera_text">
+		<text>Chimera nie њpi. Musisz j№ zabiж, zanim bкdzie za pуџno.</text>
+	</string>
+	<string id="zat_b106_meet_with_gonta_at_night_name">
+		<text>Polowanie na chimerк: spotkaj siк z Gont№ w barze o 3 rano</text>
+	</string>
+	<string id="zat_b106_meet_with_gonta_at_night_text">
+		<text>Musisz spotkaж siк z Gont№ przed њwitem, aby doі№czyж do jego druїyny podczas polowania na chimerк.</text>
+	</string>
+	<string id="zat_b106_receipt_reward_name">
+		<text>Polowanie na chimerк: poinformuj Trapera</text>
+	</string>
+	<string id="zat_b106_receipt_reward_text">
+		<text>Poinformuj stalkera zwanego Traperem, їe polowanie na chimerк zakoсczyіo siк sukcesem. Powinien daж ci nagrodк.</text>
+	</string>
+	<string id="zat_b106_search_soroka_name">
+		<text>W poszukiwaniu Sroki: znajdџ stalkera</text>
+	</string>
+	<string id="zat_b106_search_soroka_text">
+		<text>Stalker zwany Srok№ wystawiі ludzi Gonty na atak chimery. Poprosili ciк o znalezienie tego gnojka.</text>
+	</string>
+	<string id="zat_b107_evacuation_jupiter_name">
+		<text>Miejsca ewakuacji: zbadaj punkt B205</text>
+	</string>
+	<string id="zat_b107_evacuation_jupiter_text">
+		<text>Mapa znaleziona w jednym ze њmigіowcуw wskazywaіa miejsca ewakuacji. Sprawdџ, czy їoіnierze pojawili siк w punkcie B205.</text>
+	</string>
+	<string id="zat_b107_evacuation_pripyat_1_name">
+		<text>Miejsca ewakuacji: zbadaj punkt B28</text>
+	</string>
+	<string id="zat_b107_evacuation_pripyat_1_text">
+		<text>Mapa znaleziona w jednym ze њmigіowcуw wskazywaіa miejsca ewakuacji. Sprawdџ, czy їoіnierze pojawili siк w punkcie B28</text>
+	</string>
+	<string id="zat_b107_evacuation_pripyat_2_name">
+		<text>Miejsce ewakuacji: znajdџ wspуіrzкdne punktu B28</text>
+	</string>
+	<string id="zat_b107_evacuation_pripyat_2_text">
+		<text>W czarnej skrzynce jednego ze њmigіowcуw Ogoсcza znajdowaіo siк nagranie, w ktуrym dowуdca oddziaіu wyznaczyі miejsce zbiуrki. Jest nim punkt ewakuacyjny B28. Musisz okreњliж jego wspуіrzкdne.</text>
+	</string>
+	<string id="zat_b107_evacuation_pripyat_3_name">
+		<text>Miejsce ewakuacji: znajdџ punkt B28</text>
+	</string>
+	<string id="zat_b107_evacuation_pripyat_3_text">
+		<text>Miejsce zbiуrki їoіnierzy znajduje siк w Prypeci. Znajdџ sposуb, by siк tam dostaж.</text>
+	</string>
+	<string id="zat_b107_evacuation_zaton_name">
+		<text>Miejsca ewakuacji: zbadaj punkt B2</text>
+	</string>
+	<string id="zat_b107_evacuation_zaton_text">
+		<text>Mapa znaleziona w jednym ze њmigіowcуw wskazywaіa miejsca ewakuacji. Sprawdџ, czy їoіnierze pojawili siк w punkcie B2.</text>
+	</string>
+	<string id="zat_b14_bring_strange_object_name">
+		<text>Dziwne zjawisko: zanieњ artefakt Brodaczowi</text>
+	</string>
+	<string id="zat_b14_bring_strange_object_text">
+		<text>Џrуdіem dziwnego blasku byі rуwnie dziwny artefakt. Na pewno zainteresuje on Brodacza.</text>
+	</string>
+	<string id="zat_b14_learn_about_strange_occurrence_by_stalkers_name">
+		<text>Dziwne zjawisko: popytaj stalkerуw o artefakt</text>
+	</string>
+	<string id="zat_b14_learn_about_strange_occurrence_by_stalkers_text">
+		<text>Stalkerzy mog№ wiedzieж coњ na temat dziwnego artefaktu lub poleciж kogoњ, kto coњ wie. Porozmawiaj z nimi.</text>
+	</string>
+	<string id="zat_b14_learn_about_strange_occurrence_name">
+		<text>Dziwne zjawisko: znajdџ џrуdіo blasku w pogікbiarce</text>
+	</string>
+	<string id="zat_b14_learn_about_strange_occurrence_text">
+		<text>Zauwaїono dziwny blask w pogікbiarce. Brodacz poprosiі ciк o znalezienie jego џrуdіa.</text>
+	</string>
+	<string id="zat_b14_take_artefact_name">
+		<text>Dziwne zjawisko: zabierz artefakt</text>
+	</string>
+	<string id="zat_b14_take_artefact_text">
+		<text>Џrуdіem dziwnego blasku byі rуwnie dziwny artefakt. Zabierz go ze sob№.</text>
+	</string>
+	<string id="zat_b14_tell_svyaznoy_about_all_name">
+		<text>Dziwne zjawisko: powiedz Brodaczowi o artefakcie</text>
+	</string>
+	<string id="zat_b14_tell_svyaznoy_about_all_text">
+		<text>Џrуdіem dziwnego blasku byі rуwnie dziwny artefakt. Mimo їe nie masz artefaktu, powiedz o nim Brodaczowi.</text>
+	</string>
+	<string id="zat_b20_cross_the_teleport_name">
+		<text>Њcieїka na pіaskowyї: wskocz do anomalii</text>
+	</string>
+	<string id="zat_b20_cross_the_teleport_text">
+		<text>Wygl№da na to, їe droga na pіaskowyї prowadzi przez anomaliк. Musisz w ni№ wskoczyж.</text>
+	</string>
+	<string id="zat_b20_find_the_teleport_name">
+		<text>Њcieїka na pіaskowyї: znajdџ sekretn№ њcieїkк Noego</text>
+	</string>
+	<string id="zat_b20_find_the_teleport_text">
+		<text>W PDA Noego byіa wzmianka o jego wіasnej „sekretnej њcieїce" na pіaskowyї. Musisz j№ znaleџж.</text>
+	</string>
+	<string id="zat_b20_plato_talk_to_noah_name">
+		<text>Њcieїka na pіaskowyї: dowiedz siк od Noego, jak siк tam dostaж </text>
+	</string>
+	<string id="zat_b20_plato_talk_to_noah_text">
+		<text>Mуwi№, їe stalker znany jako Noe zna њcieїkк na pіaskowyї. Musisz siк dowiedzieж, jak siк tam dostaж.</text>
+	</string>
+	<string id="zat_b22_bring_proof_name">
+		<text>Zaginieni stalkerzy: przynieњ dowуd udziaіu Wstrz№sa</text>
+	</string>
+	<string id="zat_b22_bring_proof_text">
+		<text>Musisz zabraж PDA z nagraniami Wstrz№sa do Skadowska i pokazaж je Brodaczowi. Nagrania dowodz№, їe medyk byі odpowiedzialny za znikniкcia stalkerуw.</text>
+	</string>
+	<string id="zat_b22_find_proof_name">
+		<text>Zaginieni stalkerzy: znajdџ dowуd udziaіu Wstrz№sa</text>
+	</string>
+	<string id="zat_b22_find_proof_text">
+		<text>Musisz sprawdziж, czy Wstrz№s pozostawiі jakiekolwiek dowody swojego udziaіu w znikniкciach stalkerуw.</text>
+	</string>
+	<string id="zat_b28_heli_3_crash_name">
+		<text>Ogoсcza 3: zbadaj miejsce katastrofy</text>
+	</string>
+	<string id="zat_b28_heli_3_crash_text">
+		<text>Zbadaj miejsce katastrofy Ogoсczy 3.</text>
+	</string>
+	<string id="zat_b29_simple_bring_text_1">
+		<text>Musisz przynieњж Brodaczowi artefakt, ale nie masz juї forуw. Twoi konkurenci teї zaczкli go szukaж.</text>
+	</string>
+	<string id="zat_b29_simple_bring_text_2">
+		<text>Musisz przynieњж Brodaczowi artefakt. Pamiкtaj: twoi konkurenci teї go szukaj№.</text>
+	</string>
+	<string id="zat_b29_simple_bring_text_3">
+		<text>Musisz przynieњж Brodaczowi artefakt, ale wedіug doniesieс, inna grupa juї go znalazіa. Sprуbuj namierzyж sygnaі i wykonaж zadanie, zanim zrobi№ to twoi konkurenci.</text>
+	</string>
+	<string id="zat_b29_simple_bring_text_4">
+		<text>Musisz przynieњж Brodaczowi artefakt, ale inny grupa juї to zrobiіa. Teraz dostaniesz za niego tylko poіowк zapіaty.</text>
+	</string>
+	<string id="zat_b29_simple_bring_text_5">
+		<text>Musisz przynieњж Brodaczowi artefakt.</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_16">
+		<text>Zamуwienie na artefakt: przynieњ Grawi</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_17">
+		<text>Zamуwienie na artefakt: przynieњ Oko</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_18">
+		<text>Zamуwienie na artefakt: przynieњ B№bel</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_19">
+		<text>Zamуwienie na artefakt: przynieњ Muszlк</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_20">
+		<text>Zamуwienie na artefakt: przynieњ Zіot№ rybkк</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_21">
+		<text>Zamуwienie na artefakt: przynieњ Pіomieс</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_22">
+		<text>Zamуwienie na artefakt: przynieњ Њwietlika</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_23">
+		<text>Zamуwienie na artefakt: przynieњ Њnieїynkк</text>
+	</string>
+	<string id="zat_b29_simple_find_text_1">
+		<text>Musisz znaleџж artefakt dla Brodacza, ale nie masz juї forуw. Twoi konkurenci teї zaczкli go szukaж.</text>
+	</string>
+	<string id="zat_b29_simple_find_text_2">
+		<text>Musisz znaleџж artefakt dla Brodacza. Pamiкtaj: twoi konkurenci teї go szukaj№.</text>
+	</string>
+	<string id="zat_b29_simple_find_text_3">
+		<text>Musisz znaleџж artefakt dla Brodacza, ale wedіug doniesieс, inna grupa juї go znalazіa. Sprуbuj namierzyж sygnaі i wykonaж zadanie, zanim zrobi№ to twoi konkurenci.</text>
+	</string>
+	<string id="zat_b29_simple_find_text_4">
+		<text>Musisz znaleџж artefakt dla Brodacza, ale inna grupa juї wypeіniіa polecenie. Teraz dostaniesz za niego tylko poіowк zapіaty.</text>
+	</string>
+	<string id="zat_b29_simple_find_text_5">
+		<text>Musisz znaleџж artefakt dla Brodacza.</text>
+	</string>
+	<string id="zat_b29_simple_find_title_16">
+		<text>Zamуwienie na artefakt: znajdџ Grawi</text>
+	</string>
+	<string id="zat_b29_simple_find_title_17">
+		<text>Zamуwienie na artefakt: znajdџ Oko</text>
+	</string>
+	<string id="zat_b29_simple_find_title_18">
+		<text>Zamуwienie na artefakt: znajdџ B№bel</text>
+	</string>
+	<string id="zat_b29_simple_find_title_19">
+		<text>Zamуwienie na artefakt: znajdџ Muszlк</text>
+	</string>
+	<string id="zat_b29_simple_find_title_20">
+		<text>Zamуwienie na artefakt: znajdџ Zіot№ rybkк</text>
+	</string>
+	<string id="zat_b29_simple_find_title_21">
+		<text>Zamуwienie na artefakt: znajdџ Pіomieс</text>
+	</string>
+	<string id="zat_b29_simple_find_title_22">
+		<text>Zamуwienie na artefakt: znajdџ Њwietlika</text>
+	</string>
+	<string id="zat_b29_simple_find_title_23">
+		<text>Zamуwienie na artefakt: znajdџ Њnieїynkк</text>
+	</string>
+	<string id="zat_b30_compass_to_barmen_task_find_name">
+		<text>Kompas: znajdџ Noego i dowiedz siк, gdzie moїesz zdobyж ten rzadki artefakt</text>
+	</string>
+	<string id="zat_b30_compass_to_barmen_task_find_text">
+		<text>Musisz znaleџж Noego na starej barce i dowiedzieж siк, gdzie moїesz zdobyж rzadki artefakt - Kompas. Brodacz szuka tego artefaktu od dіugiego czasu i jest w stanie duїo za niego zapіaciж.</text>
+	</string>
+	<string id="zat_b30_compass_to_barmen_task_give_name">
+		<text>Kompas: zanieњ artefakt Brodaczowi</text>
+	</string>
+	<string id="zat_b30_compass_to_sultan_task_find_name">
+		<text>Kompas: dowiedz siк od Noego, gdzie moїesz zdobyж ten rzadki artefakt</text>
+	</string>
+	<string id="zat_b30_compass_to_sultan_task_find_text">
+		<text>Suіtan chce przechwyciж artefakt, ktуrego szuka Brodacz. Musisz znaleџж Noego na starej barce i dowiedzieж siк, gdzie moїesz zdobyж ten artefakt.</text>
+	</string>
+	<string id="zat_b30_compass_to_sultan_task_give_name">
+		<text>Kompas: zanieњ artefakt Suіtanowi</text>
+	</string>
+	<string id="zat_b30_compass_to_sultan_task_give_text">
+		<text>Artefakt, ktуry daі Ci Noe, to Kompas poszukiwany przez Suіtana.</text>
+	</string>
+	<string id="zat_b30_percent_task_name">
+		<text>Ciemne interesy: odbierz swoj№ dolк od Brodacza</text>
+	</string>
+	<string id="zat_b30_percent_task_text">
+		<text>Odbierz od Brodacza swoj№ dolк z jego wynagrodzenia.</text>
+	</string>
+	<string id="zat_b30_sultan_task_1_name">
+		<text>Kusz№cy interes: porozmawiaj z Suіtanem</text>
+	</string>
+	<string id="zat_b30_sultan_task_1_text">
+		<text>Handlarz Sowa uwaїa, їe Brodacz nie wywi№zuje siк z umowy i sugeruje, by zgіosiж siк po pomoc do Suіtana, bossa miejscowej mafii.</text>
+	</string>
+	<string id="zat_b30_sultan_task_2_name">
+		<text>Ciemne interesy: zabierz stalkerom detektory </text>
+	</string>
+	<string id="zat_b30_sultan_task_2_text">
+		<text>Musisz zrobiж co w twojej mocy, by zabraж prototypy detektorуw stalkerom szukaj№cym artefaktуw dla Brodacza. Jeњli nie bкdzie miaі detektorуw, bкdzie musiaі przystaж na warunki Suіtana.</text>
+	</string>
+	<string id="zat_b30_sultan_task_3_name">
+		<text>Ciemne interesy: porozmawiaj z Suіtanem</text>
+	</string>
+	<string id="zat_b30_sultan_task_3_text">
+		<text>Brodacz nie ma detektorуw, wiкc trzeba porozmawiaж z Suіtanem, by dowiedzieж siк, czy rozwi№zaі problem z jego pozostaіymi dostawcami.</text>
+	</string>
+	<string id="zat_b30_sultan_task_4_name">
+		<text>Ciemne interesy: zmuњ Brodacza, by pracowaі dla Suіtana</text>
+	</string>
+	<string id="zat_b30_sultan_task_4_text">
+		<text>Teraz, gdy Brodacz nie ma dostawcуw i detektorуw, nie moїe nic zrobiж na wіasn№ rкkк - zmuњ go, by pracowaі dla Suіtana.</text>
+	</string>
+	<string id="zat_b30_sultan_task_6_name">
+		<text>Ciemne interesy: zdob№dџ informacje o aktualnych interesach Brodacza</text>
+	</string>
+	<string id="zat_b30_sultan_task_6_text">
+		<text>Musisz dowiedzieж siк, w jakie interesy jest w tej chwili zaangaїowany Brodacz. Pomoїe to odci№ж jego џrуdіa zaopatrzenia.</text>
+	</string>
+	<string id="zat_b30_sultan_task_7_name">
+		<text>Ciemne interesy: zabierz stalkerom drugi detektor </text>
+	</string>
+	<string id="zat_b30_sultan_task_7_text">
+		<text>Musisz zrobiж co w twojej mocy, by zabraж prototypy detektorуw stalkerom szukaj№cym artefaktуw dla Brodacza. Jeњli nie bкdzie miaі detektorуw, bкdzie musiaі przystaж na warunki Suіtana.</text>
+	</string>
+	<string id="zat_b30_task_1_name">
+		<text>Kusz№cy interes: przynieњ Nowikowowi trzy detektory Weles</text>
+	</string>
+	<string id="zat_b30_task_1_text">
+		<text>Handlarz Sowa zaoferowaі ci udziaі w zyskownym przedsiкwziкciu. Twoim zadaniem jest odnalezienie trzech detektorуw Weles i zaniesienie ich Nowikowowi do bunkra naukowcуw.</text>
+	</string>
+	<string id="zat_b30_task_2_name">
+		<text>Kusz№cy interes: poczekaj, aї Sowa dostanie detektory</text>
+	</string>
+	<string id="zat_b30_task_2_text">
+		<text>Nowikow przyj№і detektory i obiecaі osobiњcie odesіaж je Sowie. Musisz poczekaж, aї skoсczy pracк z detektorami i dowiedzieж siк o wynikach od Sowy.</text>
+	</string>
+	<string id="zat_b30_task_3_name">
+		<text>Kusz№cy interes: porozmawiaj z Sow№</text>
+	</string>
+	<string id="zat_b30_task_3_text">
+		<text>Handlarz Sowa skontaktowaі siк z tob№ przez radio, by powiedzieж ci, їe ma problemy i їe chce siк z tob№ zobaczyж.</text>
+	</string>
+	<string id="zat_b30_task_4_name">
+		<text>Kusz№cy interes: przekonaj Brodacza, by wywi№zaі siк z umowy</text>
+	</string>
+	<string id="zat_b30_task_4_text">
+		<text>Handlarz Sowa uwaїa, їe Brodacz nie wywi№zuje siк z umowy. Musisz z nim porozmawiaж i przekonaж go, by przestaі іamaж jej warunki.</text>
+	</string>
+	<string id="zat_b30_task_5_name">
+		<text>Kusz№cy interes: zaї№daj swojej doli od Sowy</text>
+	</string>
+	<string id="zat_b30_task_5_text">
+		<text>Brodacz uwaїa, їe nic nie jest Sowie winien - musisz dowiedzieж siк, kto ma racjк, i zaї№daж zapіaty od tej osoby.</text>
+	</string>
+	<string id="zat_b33_zaporojec_text_01">
+		<text>Sкk poprosiі ciк o przyniesienie jego pudeіka. Ukryі je w starym samochodzie Zaporoїec, ktуry wpadі do rozpadliny po trzкsieniu ziemi. Sкk boi siк pуjњж tam samemu, bo roi siк tam od snorkуw.</text>
+	</string>
+	<string id="zat_b33_zaporojec_text_02">
+		<text>Masz pudeіko Sкka. Zanieњ je do wіaњciciela, by sprawiedliwie podzieliж siк jego zawartoњci№.</text>
+	</string>
+	<string id="zat_b38_den_of_the_bloodsucker_inform_stalkers_name">
+		<text>Legowisko pijawek: powiadom stalkerуw</text>
+	</string>
+	<string id="zat_b38_den_of_the_bloodsucker_inform_stalkers_text">
+		<text>Musisz poinformowaж stalkerуw o legowisku pijawek pod stacj№ antenow№ Krug.</text>
+	</string>
+	<string id="zat_b38_den_of_the_bloodsucker_tell_barman_about_all_name">
+		<text>Legowisko pijawek: powiadom Brodacza</text>
+	</string>
+	<string id="zat_b38_den_of_the_bloodsucker_tell_barman_about_all_text">
+		<text>Musisz powiadomiж Brodacza o legowisku pijawek znalezionym pod stacj№ antenow№ Krug, їeby mуgі zdecydowaж, w jaki sposуb chroniж stalkerуw.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_clean_den_of_the_bloodsucker_name">
+		<text>Zaginieni stalkerzy: pod№їaj za Gіuszcem</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_clean_den_of_the_bloodsucker_text">
+		<text>Gіuszec poprosiі ciк o zbadanie razem z nim opuszczonego budynku stacji antenowej. Dostrzegі pijawki i chce sprawdziж, czy znajduje siк tam іowca.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_deal_with_medic_name">
+		<text>Zaginieni stalkerzy: dowiedz siк co siк staіo</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_deal_with_medic_text">
+		<text>Wygl№da na to, їe Wstrz№s nie jest takim niewini№tkiem, jak siк wydawaіo. Musisz odkryж, co siк staіo.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_find_cop_near_port_krans_name">
+		<text>Zaginieni stalkerzy: znajdџ Gіuszca</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_find_cop_near_port_krans_text">
+		<text>Z jakiegoњ powodu Gіuszec udaі siк w stronк dџwigуw portowych - moїe dowiedziaі siк czegoњ o zaginionych stalkerach. Poszukaj go tam.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_find_out_where_is_cop_name">
+		<text>Zaginieni stalkerzy: dowiedz siк, gdzie jest Gіuszec</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_find_out_where_is_cop_text">
+		<text>Gіuszca nie ma tam, gdzie normalnie bywa. Zapytaj Brodacza, dok№d poszedі.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_find_to_be_missing_hunter_name">
+		<text>Zaginieni stalkerzy: znajdџ zaginionego іowcк</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_find_to_be_missing_hunter_text">
+		<text>Gіuszec poprosiі ciк o pomoc w poszukiwaniach zaginionego іowcy. Miaі on odnaleџж legowisko pijawek. Wedіug aktualnych informacji, to pijawki s№ odpowiedzialne za ostatnie znikniкcia stalkerуw.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_get_out_from_den_of_the_bloodsucker_name">
+		<text>Zaginieni stalkerzy: wydostaс siк z legowiska pijawek</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_get_out_from_den_of_the_bloodsucker_text">
+		<text>Udaіo ci siк odkryж legowisko pijawek w piwnicach. Znajduj№ siк one w jakimњ stanie odrкtwienia. Musisz siк st№d wydostaж, zachowuj№c ciszк.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_meet_cop_24h_past_name">
+		<text>Zaginieni stalkerzy: spotkaj siк z Gіuszcem</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_meet_cop_24h_past_text">
+		<text>Prawdopodobnie naleїy teraz porozmawiaж z Gіuszcem na temat poszukiwania zaginionego іowcy.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_meet_cop_later_name">
+		<text>Zaginieni stalkerzy: spotkaj siк pуџniej z Gіuszcem</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_meet_cop_later_text">
+		<text>W budynku stacji antenowej nie byіo њladu po іowcy Danile. Jednak Gіuszec wydawaі siк zakіopotany tym, co udaіo ci siк tam znaleџж. Poprosiі ciк o spotkanie siк z nim pуџniej, aby bardziej szczegуіowo omуwiж tк kwestiк.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_meet_ment_name">
+		<text>Zaginieni stalkerzy: spotkaj siк z Gіuszcem</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_meet_ment_text">
+		<text>W miejscu, ktуre wskazaі Gіuszec, byіa martwa pijawka i їadnych њladуw іowcy Daniіy. Wydaje siк jednak, їe Gіuszec znalazі coњ interesuj№cego i prosi ciк o towarzyszenie mu.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_tell_barmen_about_medic_text">
+		<text>Jak siк okazaіo, pijawki nie miaіy nic wspуlnego ze znikniкciami stalkerуw - to byіa sprawka Wstrz№sa, skadowskiego medyka.</text>
+	</string>
+	<string id="zat_b3_get_tools_1_2_name">
+		<text>Narzкdzia: przynieњ Kardanowi narzкdzia</text>
+	</string>
+	<string id="zat_b3_get_tools_1_2_text">
+		<text>Kardan poprosiі ciк o zdobycie dwуch zestawуw narzкdzi: jednego podstawowego i jednego do precyzyjnej pracy. Technik zapіaci ci za narzкdzia i bкdzie w stanie wykonaж bardziej zaawansowane modyfikacje broni i pancerzy.</text>
+	</string>
+	<string id="zat_b3_get_tools_1_3_name">
+		<text>Narzкdzia: przynieњ Kardanowi narzкdzia</text>
+	</string>
+	<string id="zat_b3_get_tools_1_3_text">
+		<text>Kardan poprosiі ciк o zdobycie dwуch zestawуw narzкdzi: jednego podstawowego i jednego do kalibracji. Technik zapіaci ci za narzкdzia i bкdzie w stanie wykonaж bardziej zaawansowane modyfikacje broni i pancerzy.</text>
+	</string>
+	<string id="zat_b3_get_tools_1_name">
+		<text>Narzкdzia: przynieњ Kardanowi narzкdzia</text>
+	</string>
+	<string id="zat_b3_get_tools_1_text">
+		<text>Kardan poprosiі ciк o zdobycie zestawu narzкdzi podstawowych. Technik zapіaci ci za narzкdzia i bкdzie w stanie wykonaж bardziej zaawansowane modyfikacje broni i pancerzy.</text>
+	</string>
+	<string id="zat_b3_get_tools_2_3_name">
+		<text>Narzкdzia: przynieњ Kardanowi narzкdzia</text>
+	</string>
+	<string id="zat_b3_get_tools_2_3_text">
+		<text>Kardan poprosiі ciк o zdobycie dwуch zestawуw narzкdzi: jednego do precyzyjnej pracy i jednego do kalibracji. Technik zapіaci ci za narzкdzia i bкdzie w stanie wykonaж bardziej zaawansowane modyfikacje broni i pancerzy.</text>
+	</string>
+	<string id="zat_b3_get_tools_2_name">
+		<text>Narzкdzia: przynieњ Kardanowi narzкdzia</text>
+	</string>
+	<string id="zat_b3_get_tools_2_text">
+		<text>Kardan poprosiі ciк o zdobycie zestawu narzкdzi do precyzyjnej pracy. Technik zapіaci ci za narzкdzia i bкdzie w stanie wykonaж bardziej zaawansowane modyfikacje broni i pancerzy.</text>
+	</string>
+	<string id="zat_b3_get_tools_3_name">
+		<text>Narzкdzia: przynieњ Kardanowi narzкdzia</text>
+	</string>
+	<string id="zat_b3_get_tools_3_text">
+		<text>Kardan poprosiі ciк o zdobycie zestawu narzкdzi do kalibracji. Technik zapіaci ci za narzкdzia i bкdzie w stanie wykonaж bardziej zaawansowane modyfikacje broni i pancerzy.</text>
+	</string>
+	<string id="zat_b3_mechanic_toolkit_search_name">
+		<text>Narzкdzia: przynieњ Kardanowi narzкdzia</text>
+	</string>
+	<string id="zat_b3_mechanic_toolkit_search_text">
+		<text>Kardan poprosiі ciк o zdobycie trzech zestawуw narzкdzi: jednego podstawowego, jednego do precyzyjnej pracy i jednego do kalibracji. Technik zapіaci ci za narzкdzia i bкdzie w stanie wykonaж bardziej zaawansowane modyfikacje broni i pancerzy.</text>
+	</string>
+	<string id="zat_b40_reconnoitre_merc_camp_01_name">
+		<text>Obуz najemnikуw: wynieњ wszystkie informacje, jakie uda ci siк znaleџж</text>
+	</string>
+	<string id="zat_b40_reconnoitre_merc_camp_01_text">
+		<text>Handlarz Sowa obiecaі przyzwoit№ zapіatк za jakiekolwiek informacje z obozu najemnikуw w zakіadzie utylizacji opadуw. Interesuj№ go plany najemnikуw.</text>
+	</string>
+	<string id="zat_b40_reconnoitre_merc_camp_02_name">
+		<text>Obуz najemnikуw: wynieњ wszystkie informacje, jakie uda ci siк znaleџж</text>
+	</string>
+	<string id="zat_b40_reconnoitre_merc_camp_02_text">
+		<text>Handlarz Sowa obiecaі przyzwoit№ zapіatк za jakiekolwiek informacje z obozu najemnikуw w zakіadzie utylizacji opadуw. Interesuj№ go plany najemnikуw.</text>
+	</string>
+	<string id="zat_b44_tech_buddies_barge_name">
+		<text>Trzej towarzysze: dowiedz siк czegoњ o losie Stoga</text>
+	</string>
+	<string id="zat_b44_tech_buddies_barge_text">
+		<text>Kardan poprosiі ciк o przekazanie przeprosin swojemu towarzyszowi, stalkerowi znanemu jako Stуg. Pokіуcili siк i Stуg odszedі w nieznanym kierunku.</text>
+	</string>
+	<string id="zat_b44_tech_buddies_both_name">
+		<text>Trzej towarzysze: dowiedz siк czegoњ o losach Stoga i Kawalarza</text>
+	</string>
+	<string id="zat_b44_tech_buddies_both_text">
+		<text>Kardan poprosiі ciк o przekazanie przeprosin swoim towarzyszom, stalkerom znanym jako Stуg i Kawalarz. Pokіуcili siк i jego towarzysze odeszli w nieznanym kierunku.</text>
+	</string>
+	<string id="zat_b44_tech_buddies_joker_name">
+		<text>Trzej towarzysze: dowiedz siк czegoњ o losie Kawalarza</text>
+	</string>
+	<string id="zat_b44_tech_buddies_joker_text">
+		<text>Kardan poprosiі ciк o przekazanie przeprosin swojemu towarzyszowi, stalkerowi znanemu jako Kawalarz. Pokіуcili siк i Kawalarz odszedі w nieznanym kierunku.</text>
+	</string>
+	<string id="zat_b51_nimble_items_get_order_name">
+		<text>Specjalne zamуwienie: odbierz towar</text>
+	</string>
+	<string id="zat_b51_nimble_items_get_order_text">
+		<text>Towar zostaі dostarczony - czas odebraж go od Їwawego.</text>
+	</string>
+	<string id="zat_b51_nimble_items_wait_order_name">
+		<text>Specjalne zamуwienie: poczekaj na dostawк</text>
+	</string>
+	<string id="zat_b51_nimble_items_wait_order_text">
+		<text>Zamуwienie zostaіo zіoїone, teraz musisz poczekaж, aї Їwawy dostanie towar.</text>
+	</string>
+	<string id="zat_b52_reputation_find_snag_name">
+		<text>Reputacja: znajdџ Sкka</text>
+	</string>
+	<string id="zat_b52_reputation_find_snag_text">
+		<text>Musisz znaleџж Sкka i zmusiж go, їeby trzymaі gкbк na kіуdkк. Їwawy nigdy nie handlowaі kradzionym towarem, podczas gdy Sкk wydaje siк byж z zasady nieuczciwy. Ostatnio widziano go przy dџwigach portowych. Moїe wci№ї tam jest.</text>
+	</string>
+	<string id="zat_b52_reputation_find_snag_text_2">
+		<text>Musisz znaleџж Sкka i zmusiж go, їeby trzymaі gкbк na kіуdkк. Sкka nie ma przy dџwigach portowych, ale bandyci mog№ wiedzieж, gdzie go znaleџж.</text>
+	</string>
+	<string id="zat_b52_reputation_find_snag_text_3">
+		<text>Musisz znaleџж Sкka i zmusiж go, їeby trzymaі gкbк na kіуdkк. Wygl№da na to, їe bandyci s№ w to zamieszani, wiкc powinni wiedzieж, gdzie go szukaж.</text>
+	</string>
+	<string id="zat_b52_reputation_find_snag_text_4">
+		<text>Musisz znaleџж Sкka i zmusiж go, їeby trzymaі gкbк na kіуdkк. Na chwilк obecn№ nie ma їadnych wskazуwek, gdzie moїna go znaleџж.</text>
+	</string>
+	<string id="zat_b52_reputation_find_snag_text_5">
+		<text>Musisz znaleџж Sкka i zmusiж go, їeby trzymaі gкbк na kіуdkк. Wnioskuj№c z PDA znalezionego przy jednym z bandytуw, ludzie Suіtana szukaj№ Sкka. Niestety, nie ma їadnych wskazуwek, gdzie moїna go znaleџж.</text>
+	</string>
+	<string id="zat_b52_reputation_know_there_snog_name">
+		<text>Reputacja: dowiedz siк, gdzie znikn№і Sкk</text>
+	</string>
+	<string id="zat_b52_reputation_know_there_snog_text">
+		<text>Sкka nie ma tam, gdzie zwykle bywaі, musisz wiкc popytaж miejscowych, czy widzieli, gdzie poszedі.</text>
+	</string>
+	<string id="zat_b52_reputation_know_there_snog_text_2">
+		<text>Musisz znaleџж Sкka i zmusiж go, їeby trzymaі gкbк na kіуdkк. Nie ma go tam, gdzie zwykle bywaі. Moїe Suіtan wie, gdzie go szukaж.</text>
+	</string>
+	<string id="zat_b52_reputation_know_there_snog_text_3">
+		<text>Musisz znaleџж Sкka i zmusiж go, їeby trzymaі gкbк na kіуdkк. Nie ma go tam, gdzie zwykle bywaі. Moїe Brodacz wie, gdzie go szukaж.</text>
+	</string>
+	<string id="zat_b52_reputation_tell_snag_name">
+		<text>Reputacja: porozmawiaj z Sкkiem</text>
+	</string>
+	<string id="zat_b52_reputation_tell_snag_text">
+		<text>Musisz znaleџж Sкka i zmusiж go, їeby trzymaі gкbк na kіуdkк. Їwawy nigdy nie handlowaі kradzionym towarem, podczas gdy Sкk wydaje siк byж z zasady nieuczciwy.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_destroy_lair_name">
+		<text>Legowisko pijawek: znajdџ szyb wentylacyjny</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_destroy_lair_text">
+		<text>Znajdџ szyb wentylacyjny, aby wypeіniж legowisko pijawek truj№cym gazem.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_find_gas_name">
+		<text>Legowisko pijawek: znajdџ truj№cy gaz</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_find_gas_text">
+		<text>Bкdziesz potrzebowaж truj№cego gazu, aby zniszczyж legowisko pijawek. Sowa powinien wiedzieж, gdzie moїesz go zdobyж.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_find_gas_text_2">
+		<text>Bкdziesz potrzebowaж truj№cego gazu, aby zniszczyж legowisko pijawek. Sowa twierdzi, їe zbiorniki z gazem znajdziesz w opuszczonym konwoju wojskowym.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_get_gas_name">
+		<text>Legowisko pijawek: znajdџ klucze do pojemnika</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_get_gas_text">
+		<text>Znalezione dokumenty wspominaj№ o kluczach do pojemnika, w ktуrym znajduje siк zbiornik z gazem. Musisz je znaleџж.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_open_gas_box_name">
+		<text>Legowisko pijawek: odkryj, jak otworzyж pojemnik, w ktуrym jest butla z gazem</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_open_gas_box_text">
+		<text>Pojemnik, w ktуrym znajduje siк zbiornik z gazem, jest zamkniкty. Musisz znaleџж sposуb, by go otworzyж.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_place_gas_name">
+		<text>Legowisko pijawek: zainstaluj zbiornik z gazem</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_place_gas_text">
+		<text>Zainstaluj zbiornik z gazem w systemie wentylacyjnym piwnic stacji antenowej. Gaz powinien popіyn№ж szybem wentylacyjnym i wypeіniж piwnicк, zabijaj№c pijawki.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_tell_stalkers_about_destroy_lair_name">
+		<text>Legowisko pijawek: powiadom Brodacza, їe legowisko zostaіo zniszczone</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_tell_stalkers_about_destroy_lair_text">
+		<text>Poinformuj Brodacza, їe udaіo ci siк zniszczyж legowisko pijawek, zapewniaj№c tym samym bezpieczeсstwo stalkerom ze Skadowska.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_twist_vintil_name">
+		<text>Legowisko pijawek: odkrкж zawуr</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_twist_vintil_text">
+		<text>Odkrкж zawуr, aby gaz mуgі wypeіniж piwnicк z legowiskiem pijawek przez szyb wentylacyjny.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_wait_destroy_name">
+		<text>Legowisko pijawek: poczekaj, aї gaz zacznie dziaіaж </text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_wait_destroy_text">
+		<text>Musisz siк upewniж, їe gaz wypeіniі legowisko i pijawki s№ martwe.</text>
+	</string>
+	<string id="zat_b5_come_to_bandits_name">
+		<text>Transakcja: spotkaj siк z bandytami koіo straїnicy</text>
+	</string>
+	<string id="zat_b5_come_to_bandits_text">
+		<text>Suіtan poprosiі ciк o udziaі w transakcji z jednym z handlarzy. Musisz towarzyszyж jego ludziom, by zapewniж im ochronк, gdyby coњ siк wydarzyіo.</text>
+	</string>
+	<string id="zat_b5_come_to_dealer_name">
+		<text>Transakcja: spotkaj siк z handlarzem</text>
+	</string>
+	<string id="zat_b5_come_to_dealer_text">
+		<text>Sowa zaproponowaі ci pracк przy ochronie pewnego handlarza podczas transakcji. Oczywiњcie jest to szemrany interes i moїe nie pуjњж zbyt gіadko.</text>
+	</string>
+	<string id="zat_b5_come_to_stalkers_name">
+		<text>Transakcja: spotkaj siк ze stalkerami koіo straїnicy</text>
+	</string>
+	<string id="zat_b5_come_to_stalkers_text">
+		<text>Spotkaj siк ze stalkerami koіo straїnicy, aby pomуc im powstrzymaж transakcjк pomiкdzy bandytami i handlarzem broni№.</text>
+	</string>
+	<string id="zat_b5_cover_dealer_name">
+		<text>Transakcja: ochraniaj handlarza</text>
+	</string>
+	<string id="zat_b5_cover_dealer_text">
+		<text>Handlarz wyjaњniі ci twoje zadanie - musisz go chroniж podczas transakcji.</text>
+	</string>
+	<string id="zat_b5_intercept_talking_name">
+		<text>Transakcja: podsіuchaj rozmowк</text>
+	</string>
+	<string id="zat_b5_intercept_talking_text">
+		<text>Stalkerzy chc№ podsіuchaж rozmowк pomiкdzy bandytami i handlarzem broni№.</text>
+	</string>
+	<string id="zat_b5_kill_dealer_name">
+		<text>Transakcja: przeszkodџ w zakupie broni</text>
+	</string>
+	<string id="zat_b5_kill_dealer_text">
+		<text>Zrуb co tylko siк da, їeby przeszkodziж w transakcji pomiкdzy bandytami i handlarzem.</text>
+	</string>
+	<string id="zat_b5_kill_stalkers_name">
+		<text>Transakcja: zlikwiduj њwiadkуw</text>
+	</string>
+	<string id="zat_b5_kill_stalkers_text">
+		<text>Transakcja z handlarzem siк nie udaіa, wiкc musisz zlikwidowaж wszystkich њwiadkуw.</text>
+	</string>
+	<string id="zat_b5_protect_dealer_name">
+		<text>Transakcja: ochraniaj handlarza</text>
+	</string>
+	<string id="zat_b5_protect_dealer_text">
+		<text>Musisz ochraniaж handlarza. Zleciі ci teї zlikwidowanie wszystkich њwiadkуw transakcji, і№cznie z jego klientami.</text>
+	</string>
+	<string id="zat_b5_search_body_name">
+		<text>Transakcja: przeszukaj handlarza</text>
+	</string>
+	<string id="zat_b5_search_body_text">
+		<text>Handlarz moїe mieж waїne informacje, ktуre mog№ siк przydaж pуџniej. Zabierz mu je.</text>
+	</string>
+	<string id="zat_b5_secure_bandits_name">
+		<text>Transakcja: ochraniaj bandytуw podczas transakcji </text>
+	</string>
+	<string id="zat_b5_secure_bandits_text">
+		<text>Stуj na straїy i zapewniaj bandytom ochronк podczas negocjacji z handlarzem.</text>
+	</string>
+	<string id="zat_b5_speak_dealer_name">
+		<text>Transakcja: porozmawiaj z handlarzem</text>
+	</string>
+	<string id="zat_b5_speak_dealer_text">
+		<text>Transakcja z bandytami zostaіa zakoсczona, moїesz wiкc odebraж swoj№ nagrodк.</text>
+	</string>
+	<string id="zat_b5_talk_barmen_name">
+		<text>Transakcja: odbierz nagrodк od Brodacza</text>
+	</string>
+	<string id="zat_b5_talk_barmen_text">
+		<text>Brodacz obiecaі ci nagrodк, jeњli przeszkodzisz w transakcji pomiкdzy bandytami i handlarzem. Transakcja zostaіa zakіуcona, moїesz wiкc odebraж swoj№ nagrodк.</text>
+	</string>
+	<string id="zat_b5_talk_to_sultan_name">
+		<text>Transakcja: porozmawiaj z dowуdc№ bandytуw</text>
+	</string>
+	<string id="zat_b5_talk_to_sultan_text">
+		<text>Musisz poinformowaж dowуdcк bandytуw o gotowoњci do wziкcia udziaіu w transakcji.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_name">
+		<text>Atak: zdecyduj, co zrobiж</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_raiders_name">
+		<text>Atak: zaatakuj stalkerуw</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_stalkers_reward_name">
+		<text>Atak: odbierz swoj№ nagrodк</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_stalkers_reward_text">
+		<text>Atak na obуz zostaі odparty, moїesz wiкc porozmawiaж ze stalkerami i odebraж swoj№ nagrodк. Prawdopodobnie mieliby niezіe piekіo, gdyby nie zostali ostrzeїeni o ataku.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_text">
+		<text>Grupa stalkerуw postanowiіa zostaж bandytami i rabowaж swoich. Musisz zdecydowaж, czy weџmiesz udziaі w ataku, ostrzeїesz stalkerуw, czy nie bкdziesz siк w to mieszaж.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_wait_name">
+		<text>Atak: poczekaj na uzgodnion№ chwilк</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_time_name">
+		<text>Atak: Poczekaj na wіaњciw№ chwilк</text>
+	</string>
+	<string id="zat_b33_zaporojec_name">
+		<text>Niedostкpny schowek: zanieњ pudeіko Sкkowi</text>
+	</string>
+	<string id="zat_b5_talk_stalkers_name">
+		<text>Transakcja: porozmawiaj z dowуdc№ oddziaіu stalkerуw</text>
+	</string>
+	<string id="zat_b5_talk_stalkers_text">
+		<text>Transakcja zostaіa udaremniona. Handlarz broni№ nie їyje. Porozmawiaj z dowуdc№ oddziaіu stalkerуw.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_tell_barmen_about_medic_name">
+		<text>Zaginieni stalkerzy: powiedz ludziom w Skadowsku, co siк staіo</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_open_container_text">
+		<text>Musisz otworzyж pojemnik, uїywaj№c znalezionych kluczy, i zabraж zbiornik z gazem.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_open_container_name">
+		<text>Legowisko pijawek: zabierz zbiornik z gazem z pojemnika</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_backstab_name">
+		<text>Atak: zaatakuj zіodziei</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_backstab_text">
+		<text>Zaatakowanie zіodziei od tyіu pomoїe stalkerom odeprzeж atak.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_meet_name">
+		<text>Atak: spotkaj siк ze zіodziejami</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_raiders_text">
+		<text>Przyі№cz siк do zіodziei podczas ataku na obуz stalkerуw.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_stalkers_name">
+		<text>Zabуjstwo: przyі№cz siк do zіodziei</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_stalkers_text">
+		<text>Stalkerzy poprosili ciк o pomoc w odparciu ataku zіodziei. Przyі№cz siк do zіodziei. Gdy rozpoczn№ napad, bкdzie moїna bezkarnie zaatakowaж ich od tyіu.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_meet_text">
+		<text>Zіodzieje powinni czekaж przy Szewczence. Musisz siк z nimi spotkaж, aby wzi№ж udziaі w ataku na stalkerуw.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_wait_text">
+		<text>Poczekaj na spotkanie ze zіodziejami. Chc№ zaatakowaж obуz stalkerуw po pуіnocy, dopуki jest ciemno. Uzgodnione miejsce spotkania to Szewczenko.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_raiders_reward_name">
+		<text>Atak: odbierz swoj№ dolк</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_raiders_reward_text">
+		<text>Atak na stalkerуw zakoсczyі siк sukcesem. Moїesz odebraж swoj№ dolк z іupуw.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_time_text">
+		<text>Poczekaj na wіaњciwy moment, gdy zіodzieje bкd№ rozproszeni przez atak. Wtedy moїesz napaњж ich od tyіu i pomуc stalkerom z Szewczenki.</text>
+	</string>
+	<string id="zat_b30_sultan_task_8_name">
+		<text>Ciemne interesy: zacznij pracowaж dla Brodacza</text>
+	</string>
+	<string id="zat_b30_sultan_task_8_text">
+		<text>Aby zabraж prototypy detektorуw stalkerom pracuj№cym dla Brodacza, musisz wst№piж w ich szeregi. Dziкki temu dowiesz siк, gdzie s№ twoi rywale.</text>
+	</string>
+	<string id="zat_b33_zaporojec_text_03">
+		<text>Musisz wzi№ж pojemnik i dostarczyж go wіaњcicielowi.</text>
+	</string>
+	<string id="zat_b100_guide_maps_01_text">
+		<text>Komputer pokіadowy Ogoсczy 2 zawieraі mapy terenu pomiкdzy Zatonem i Jupiterem. Znajdџ kogoњ, kto mуgіby zrobiж z nich uїytek.</text>
+	</string>
+	<string id="zat_b20_ask_a_stalkers_name">
+		<text>Њcieїka na pіaskowyї: porozmawiaj ze stalkerami</text>
+	</string>
+	<string id="zat_b20_ask_a_stalkers_text">
+		<text>Wygl№da na to, їe nie ma bezpoњredniej drogi na pіaskowyї. Popytaj miejscowych stalkerуw, jak moїna siк tam dostaж.</text>
+	</string>
+	<string id="zat_b30_compass_to_barmen_task_give_text">
+		<text>Artefakt, ktуry daі ci Noe, to Kompas, ktуrego szuka Brodacz.</text>
+	</string>
+</string_table>

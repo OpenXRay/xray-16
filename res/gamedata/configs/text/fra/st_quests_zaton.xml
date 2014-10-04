@@ -1,0 +1,780 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="zat_a2_reach_base_name">
+		<text>En lieu sыr : aller au Skadovsk.</text>
+	</string>
+	<string id="zat_a2_reach_base_text">
+		<text>Les lieux les plus sыrs de la Zone sont les camps. Le plus proche est le Skadovsk ; c'est lа que vous devriez vous rendre.</text>
+	</string>
+	<string id="zat_b100_guide_maps_01_name">
+		<text>Cartes de la zone : trouver une personne intйressйe par les cartes.</text>
+	</string>
+	<string id="zat_b100_guide_maps_02_name">
+		<text>Cartes de la zone : remettre les cartes а Pilote.</text>
+	</string>
+	<string id="zat_b100_guide_maps_02_text">
+		<text>Pilote, le guide du coin, pourrait кtre intйressй par les cartes de la rйgion entre Zaton et Jupiter.</text>
+	</string>
+	<string id="zat_b100_heli_2_crash_name">
+		<text>Stingray 2 : fouiller les lieux de l'accident.</text>
+	</string>
+	<string id="zat_b100_heli_2_crash_text">
+		<text>Fouillez les lieux de l'accident du Stingray 2.</text>
+	</string>
+	<string id="zat_b101_heli_5_crash_name">
+		<text>Stingray 5 : fouiller les lieux de l'accident.</text>
+	</string>
+	<string id="zat_b101_heli_5_crash_name_02">
+		<text>Stingray 5 : trouver la cause du court-circuit.</text>
+	</string>
+	<string id="zat_b101_heli_5_crash_name_03">
+		<text>Unitй Stingray : trouver la source des dйcharges qui ont frappй les deux hйlicoptиres.</text>
+	</string>
+	<string id="zat_b101_heli_5_crash_text">
+		<text>Fouillez les lieux de l'accident du Stingray 5.</text>
+	</string>
+	<string id="zat_b101_heli_5_crash_text_02">
+		<text>Trouvez la source de la puissante dйcharge йlectrique qui a frappй l'hйlicoptиre Stingray 5.</text>
+	</string>
+	<string id="zat_b101_heli_5_crash_text_03">
+		<text>Trouvez la cause du court-circuit des Stringray 4 et 5. Il semblerait qu'ils aient йtй frappйs par de puissantes dйcharges йlectriques.</text>
+	</string>
+	<string id="zat_b103_merc_bring_supplies_name">
+		<text>Nourriture : trouver de la nourriture pour les mercenaires.</text>
+	</string>
+	<string id="zat_b103_merc_bring_supplies_text">
+		<text>Les mercenaires des ateliers du poste йlectrique vous ont demandй de leur rapporter six conserves de viande, des saucisses ou du pain.</text>
+	</string>
+	<string id="zat_b103_merc_supplies_got_name">
+		<text>Nourriture : apporter la nourriture aux mercenaires.</text>
+	</string>
+	<string id="zat_b103_merc_supplies_got_text">
+		<text>Rapportez la nourriture que vous avez rйcupйrйe aux mercenaires des ateliers du poste йlectrique.</text>
+	</string>
+	<string id="zat_b103_toolkit_2_substation_workshop_name">
+		<text>Outils : fouiller les ateliers du poste йlectrique.</text>
+	</string>
+	<string id="zat_b103_toolkit_2_substation_workshop_text">
+		<text>Il semble y avoir des outils dans les ateliers du poste йlectrique. Qui sait, vous trouverez peut-кtre ceux que le technicien recherche.</text>
+	</string>
+	<string id="zat_b106_find_chimera_name">
+		<text>La chasse а la chimиre : trouver le mutant pendant son sommeil.</text>
+	</string>
+	<string id="zat_b106_find_chimera_text">
+		<text>Trouvez la chimиre avant qu'elle ne se rйveille.</text>
+	</string>
+	<string id="zat_b106_found_soroka_name">
+		<text>А la recherche de la Pie : informer Gonta.</text>
+	</string>
+	<string id="zat_b106_found_soroka_text">
+		<text>La Pie, le stalker qui a tendu un piиge au groupe de Gonta, a йtй retrouvй. Il s'est enrфlй dans la Libertй et se prйnomme dйsormais Flint.</text>
+	</string>
+	<string id="zat_b106_kill_chimera_name">
+		<text>La chasse а la chimиre : tuer le mutant.</text>
+	</string>
+	<string id="zat_b106_kill_chimera_text">
+		<text>La chimиre s'est rйveillйe ; vous devriez l'achever avant qu'il ne soit trop tard !</text>
+	</string>
+	<string id="zat_b106_meet_with_gonta_at_night_name">
+		<text>La chasse а la chimиre : rejoindre Gonta au bar а 3h du matin.</text>
+	</string>
+	<string id="zat_b106_meet_with_gonta_at_night_text">
+		<text>Rejoignez Gonta et son groupe avant l'aube pour participer а la chasse а la chimиre.</text>
+	</string>
+	<string id="zat_b106_receipt_reward_name">
+		<text>La chasse а la chimиre : informer Trappeur.</text>
+	</string>
+	<string id="zat_b106_receipt_reward_text">
+		<text>Dites au stalker nommй Trappeur que la chimиre est morte. Il devrait vous remettre une rйcompense.</text>
+	</string>
+	<string id="zat_b106_search_soroka_name">
+		<text>А la recherche de la Pie : trouver le stalker.</text>
+	</string>
+	<string id="zat_b106_search_soroka_text">
+		<text>Un stalker surnommй la Pie a tendu un piиge au groupe de Gonta qui a йtй attaquй par une chimиre. On vous a demandй de retrouver cette ordure.</text>
+	</string>
+	<string id="zat_b107_evacuation_jupiter_name">
+		<text>Points d'йvacuation : examiner le point d'йvacuation B205.</text>
+	</string>
+	<string id="zat_b107_evacuation_jupiter_text">
+		<text>La carte trouvйe dans l'un des hйlicoptиres indiquait des points d'йvacuation. Vйrifiez si les soldats se sont dirigйs vers le point B205.</text>
+	</string>
+	<string id="zat_b107_evacuation_pripyat_1_name">
+		<text>Points d'йvacuation : examiner le point d'йvacuation B28.</text>
+	</string>
+	<string id="zat_b107_evacuation_pripyat_1_text">
+		<text>La carte trouvйe dans l'un des hйlicoptиres indiquait des points d'йvacuation. Vйrifiez si les soldats se sont dirigйs vers le point B28.</text>
+	</string>
+	<string id="zat_b107_evacuation_pripyat_2_name">
+		<text>Point d'йvacuation : trouver les coordonnйes du point B28.</text>
+	</string>
+	<string id="zat_b107_evacuation_pripyat_2_text">
+		<text>La boоte noire de l'un des hйlicoptиres Stingray contenait un enregistrement dans lequel le chef d'unitй indiquait un point de convergence. Il s'agissait du point d'йvacuation B28. Vous devez trouver les coordonnйes correspondantes.</text>
+	</string>
+	<string id="zat_b107_evacuation_pripyat_3_name">
+		<text>Point d'йvacuation : se rendre au point B28.</text>
+	</string>
+	<string id="zat_b107_evacuation_pripyat_3_text">
+		<text>L'endroit oщ doivent se retrouver les soldats se situe а Pripyat. Trouvez un moyen de vous y rendre.</text>
+	</string>
+	<string id="zat_b107_evacuation_zaton_name">
+		<text>Points d'йvacuation : examiner le point d'йvacuation B2.</text>
+	</string>
+	<string id="zat_b107_evacuation_zaton_text">
+		<text>La carte trouvйe dans l'un des hйlicoptиres indiquait des points d'йvacuation. Vйrifiez si les soldats se sont dirigйs vers le point B2.</text>
+	</string>
+	<string id="zat_b14_bring_strange_object_name">
+		<text>Йtrange phйnomиne : apporter l'artefact au Barbu.</text>
+	</string>
+	<string id="zat_b14_bring_strange_object_text">
+		<text>L'йtrange lueur provenait d'un artefact tout aussi bizarre qui intйressera forcйment le Barbu.</text>
+	</string>
+	<string id="zat_b14_learn_about_strange_occurrence_by_stalkers_name">
+		<text>Йtrange phйnomиne : demander des informations concernant l'artefact aux stalkers.</text>
+	</string>
+	<string id="zat_b14_learn_about_strange_occurrence_by_stalkers_text">
+		<text>Les stalkers ont peut-кtre des informations concernant l'йtrange artefact ou peut-кtre connaissent-ils quelqu'un qui pourrait vous aider. Vous devriez leur parler.</text>
+	</string>
+	<string id="zat_b14_learn_about_strange_occurrence_name">
+		<text>Йtrange phйnomиne : trouver la source de la lueur dans la station de dragage.</text>
+	</string>
+	<string id="zat_b14_learn_about_strange_occurrence_text">
+		<text>Une йtrange lueur a йtй repйrйe dans la station de dragage. Le Barbu vous a demandй d'en trouver la source.</text>
+	</string>
+	<string id="zat_b14_take_artefact_name">
+		<text>Йtrange phйnomиne : rйcupйrer l'artefact.</text>
+	</string>
+	<string id="zat_b14_take_artefact_text">
+		<text>L'йtrange lueur provenait d'un artefact tout aussi bizarre. Vous devriez le prendre.</text>
+	</string>
+	<string id="zat_b14_tell_svyaznoy_about_all_name">
+		<text>Йtrange phйnomиne : parler de l'artefact au Barbu.</text>
+	</string>
+	<string id="zat_b14_tell_svyaznoy_about_all_text">
+		<text>L'йtrange lueur provenait d'un artefact tout aussi bizarre. Vous n'avez pas l'artefact, mais vous devriez en parler au Barbu.</text>
+	</string>
+	<string id="zat_b20_cross_the_teleport_name">
+		<text>Le plateau : sauter dans l'anomalie.</text>
+	</string>
+	<string id="zat_b20_cross_the_teleport_text">
+		<text>Il semble qu'il faille traverser l'anomalie pour atteindre le plateau. Vous devez sauter dedans.</text>
+	</string>
+	<string id="zat_b20_find_the_teleport_name">
+		<text>Le plateau : trouver le chemin secret de Noah.</text>
+	</string>
+	<string id="zat_b20_find_the_teleport_text">
+		<text>Le PDA de Noah mentionne son "chemin secret" menant au plateau. Vous devez le trouver.</text>
+	</string>
+	<string id="zat_b20_plato_talk_to_noah_name">
+		<text>Le plateau : demander а Noah comment vous y rendre. </text>
+	</string>
+	<string id="zat_b20_plato_talk_to_noah_text">
+		<text>Un stalker du nom de Noah connaоtrait un chemin menant au plateau. Trouvez un moyen de vous y rendre.</text>
+	</string>
+	<string id="zat_b22_bring_proof_name">
+		<text>Stalkers disparus : rapporter la preuve de l'implication de Sismik.</text>
+	</string>
+	<string id="zat_b22_bring_proof_text">
+		<text>Apportez le PDA contenant les enregistrements de Sismik au Skadovsk et montrez-le au Barbu. Ces enregistrements prouvent que le toubib est responsable de la disparition des stalkers.</text>
+	</string>
+	<string id="zat_b22_find_proof_name">
+		<text>Stalkers disparus : trouver la preuve de l'implication de Sismik.</text>
+	</string>
+	<string id="zat_b22_find_proof_text">
+		<text>Cherchez des preuves de l'implication de Sismik dans la disparition des stalkers.</text>
+	</string>
+	<string id="zat_b28_heli_3_crash_name">
+		<text>Stingray 3 : fouiller les lieux de l'accident.</text>
+	</string>
+	<string id="zat_b28_heli_3_crash_text">
+		<text>Fouillez les lieux de l'accident du Stingray 3.</text>
+	</string>
+	<string id="zat_b29_simple_bring_text_1">
+		<text>Vous devez apporter l'artefact au Barbu, mais vous avez perdu votre avance. D'autres personnes sont aussi а sa recherche.</text>
+	</string>
+	<string id="zat_b29_simple_bring_text_2">
+		<text>Vous devez apporter l'artefact au Barbu. Souvenez-vous que vos rivaux sont aussi а sa recherche.</text>
+	</string>
+	<string id="zat_b29_simple_bring_text_3">
+		<text>Vous devez apporter l'artefact au Barbu, mais vous avez entendu dire qu'un autre groupe en avait aussi trouvй un. Suivez son signal et tentez de terminer la mission avant eux.</text>
+	</string>
+	<string id="zat_b29_simple_bring_text_4">
+		<text>Vous devez apporter l'artefact au Barbu, mais un autre groupe s'en est dйjа chargй. Vous n'allez recevoir que la moitiй de la prime offerte.</text>
+	</string>
+	<string id="zat_b29_simple_bring_text_5">
+		<text>Apportez l'artefact au Barbu.</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_16">
+		<text>Commande d'artefact : rapporter un Gravi.</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_17">
+		<text>Commande d'artefact : rapporter un Њil.</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_18">
+		<text>Commande d'artefact : rapporter une Bulle.</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_19">
+		<text>Commande d'artefact : rapporter une Coquille.</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_20">
+		<text>Commande d'artefact : rapporter un Garde du corps.</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_21">
+		<text>Commande d'artefact : rapporter une Flammиche.</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_22">
+		<text>Commande d'artefact : rapporter une Luciole.</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_23">
+		<text>Commande d'artefact : rapporter un Flocon.</text>
+	</string>
+	<string id="zat_b29_simple_find_text_1">
+		<text>Vous devez trouver l'artefact pour le Barbu, mais vous avez perdu votre avance. D'autres personnes sont aussi а sa recherche.</text>
+	</string>
+	<string id="zat_b29_simple_find_text_2">
+		<text>Vous devez trouver l'artefact pour le Barbu. Souvenez-vous que des rivaux sont aussi а sa recherche.</text>
+	</string>
+	<string id="zat_b29_simple_find_text_3">
+		<text>Vous devez trouver l'artefact pour le Barbu, mais vous avez entendu dire qu'un autre groupe en avait aussi trouvй un. Suivez son signal et tentez de terminer la mission avant eux.</text>
+	</string>
+	<string id="zat_b29_simple_find_text_4">
+		<text>Vous devez trouver l'artefact pour le Barbu, mais un autre groupe a dйjа livrй la commande. Vous ne recevrez que la moitiй de la prime offerte.</text>
+	</string>
+	<string id="zat_b29_simple_find_text_5">
+		<text>Trouvez l'artefact pour le Barbu.</text>
+	</string>
+	<string id="zat_b29_simple_find_title_16">
+		<text>Commande d'artefact : trouver un Gravi.</text>
+	</string>
+	<string id="zat_b29_simple_find_title_17">
+		<text>Commande d'artefact : trouver un Њil.</text>
+	</string>
+	<string id="zat_b29_simple_find_title_18">
+		<text>Commande d'artefact : trouver une Bulle.</text>
+	</string>
+	<string id="zat_b29_simple_find_title_19">
+		<text>Commande d'artefact : trouver une Coquille.</text>
+	</string>
+	<string id="zat_b29_simple_find_title_20">
+		<text>Commande d'artefact : trouver un Garde du corps.</text>
+	</string>
+	<string id="zat_b29_simple_find_title_21">
+		<text>Commande d'artefact : trouver une Flammиche.</text>
+	</string>
+	<string id="zat_b29_simple_find_title_22">
+		<text>Commande d'artefact : trouver une Luciole.</text>
+	</string>
+	<string id="zat_b29_simple_find_title_23">
+		<text>Commande d'artefact : trouver un Flocon.</text>
+	</string>
+	<string id="zat_b30_compass_to_barmen_task_find_name">
+		<text>Boussole : trouver Noah pour dйcouvrir l'emplacement de l'artefact.</text>
+	</string>
+	<string id="zat_b30_compass_to_barmen_task_find_text">
+		<text>Cherchez Noah sur la vieille pйniche pour savoir oщ trouver l'artefact Boussole. Le Barbu le cherche depuis longtemps et est prкt а payer une somme rondelette pour l'obtenir.</text>
+	</string>
+	<string id="zat_b30_compass_to_barmen_task_give_name">
+		<text>Boussole : apporter l'artefact au Barbu.</text>
+	</string>
+	<string id="zat_b30_compass_to_sultan_task_find_name">
+		<text>Boussole : demander а Noah oщ trouver l'artefact.</text>
+	</string>
+	<string id="zat_b30_compass_to_sultan_task_find_text">
+		<text>Sultan souhaite intercepter l'artefact recherchй par le Barbu. Cherchez Noah sur la vieille pйniche et demandez-lui oщ trouver l'artefact.</text>
+	</string>
+	<string id="zat_b30_compass_to_sultan_task_give_name">
+		<text>Boussole : apporter l'artefact а Sultan.</text>
+	</string>
+	<string id="zat_b30_compass_to_sultan_task_give_text">
+		<text>L'artefact que vous a remis Noah est la Boussole que recherche Sultan.</text>
+	</string>
+	<string id="zat_b30_percent_task_name">
+		<text>Affaires louches : demander votre part du gвteau au Barbu.</text>
+	</string>
+	<string id="zat_b30_percent_task_text">
+		<text>Rйcupйrez votre part des bйnйfices du Barbu.</text>
+	</string>
+	<string id="zat_b30_sultan_task_1_name">
+		<text>Affaires allйchantes : parler а Sultan.</text>
+	</string>
+	<string id="zat_b30_sultan_task_1_text">
+		<text>Le marchand nommй le Hibou pense que le Barbu ne remplit pas sa part du marchй et vous a conseillй de demander de l'aide а Sultan, un caпd local.</text>
+	</string>
+	<string id="zat_b30_sultan_task_2_name">
+		<text>Affaires louches : rйcupйrer les dйtecteurs auprиs des stalkers. </text>
+	</string>
+	<string id="zat_b30_sultan_task_2_text">
+		<text>Vous devez а tout prix rйcupйrer les prototypes de dйtecteurs des stalkers qui cherchent des artefacts pour le Barbu. Sans ces dйtecteurs, il devra accepter les conditions de Sultan.</text>
+	</string>
+	<string id="zat_b30_sultan_task_3_name">
+		<text>Affaires louches : parler а Sultan.</text>
+	</string>
+	<string id="zat_b30_sultan_task_3_text">
+		<text>Le Barbu n'a pas les dйtecteurs. Vous devriez donc parler а Sultan pour savoir s'il a rйsolu le problиme concernant les autres fournisseurs du Barbu.</text>
+	</string>
+	<string id="zat_b30_sultan_task_4_name">
+		<text>Affaires louches : obliger le Barbu а travailler avec Sultan.</text>
+	</string>
+	<string id="zat_b30_sultan_task_4_text">
+		<text>Sans fournisseur ni dйtecteur, le Barbu a les mains liйes. Obligez-le а travailler pour Sultan.</text>
+	</string>
+	<string id="zat_b30_sultan_task_6_name">
+		<text>Affaires louches : dйcouvrir ce que trafique le Barbu.</text>
+	</string>
+	<string id="zat_b30_sultan_task_6_text">
+		<text>Dйcouvrez dans quelles affaires trempe le Barbu. Vous pourrez ainsi l'empкcher de contacter ses fournisseurs.</text>
+	</string>
+	<string id="zat_b30_sultan_task_7_name">
+		<text>Affaires louches : rйcupйrer le deuxiиme dйtecteur aux stalkers. </text>
+	</string>
+	<string id="zat_b30_sultan_task_7_text">
+		<text>Vous devez а tout prix rйcupйrer les prototypes de dйtecteurs des stalkers qui cherchent des artefacts pour le Barbu. Sans ces dйtecteurs, il devra accepter les conditions de Sultan.</text>
+	</string>
+	<string id="zat_b30_task_1_name">
+		<text>Affaires allйchantes : apporter trois dйtecteurs Veles а Novikov.</text>
+	</string>
+	<string id="zat_b30_task_1_text">
+		<text>Le Hibou vous a proposй de participer а une mission trиs lucrative. Votre mission consiste а trouver trois dйtecteurs Veles et а les rapporter а Novikov dans le bunker des scientifiques.</text>
+	</string>
+	<string id="zat_b30_task_2_name">
+		<text>Affaires allйchantes : attendre que le Hibou reзoive les dйtecteurs.</text>
+	</string>
+	<string id="zat_b30_task_2_text">
+		<text>Novikov a acceptй les dйtecteurs et a promis de les renvoyer au Hibou. Attendez qu'il ait fini ses tests et dйcouvrez quels sont les rйsultats en parlant au Hibou.</text>
+	</string>
+	<string id="zat_b30_task_3_name">
+		<text>Affaires allйchantes : parler au Hibou.</text>
+	</string>
+	<string id="zat_b30_task_3_text">
+		<text>Le Hibou vous a contactй par radio pour vous dire qu'il a des problиmes et qu'il veut vous voir.</text>
+	</string>
+	<string id="zat_b30_task_4_name">
+		<text>Affaires allйchantes : obliger le Barbu а respecter le contrat.</text>
+	</string>
+	<string id="zat_b30_task_4_text">
+		<text>Le marchand nommй le Hibou pense que le Barbu ne remplit pas sa part du marchй. Vous devez lui parler pour le convaincre de respecter le contrat.</text>
+	</string>
+	<string id="zat_b30_task_5_name">
+		<text>Affaires allйchantes : exiger du Hibou qu'il vous donne votre part.</text>
+	</string>
+	<string id="zat_b30_task_5_text">
+		<text>Le Barbu estime qu'il ne doit rien au Hibou. Dйcouvrez qui des deux a raison et demandez-lui la part qui vous revient.</text>
+	</string>
+	<string id="zat_b33_zaporojec_text_01">
+		<text>Accroc vous a demandй de lui apporter le coffre qu'il a dissimulй dans une vieille voiture Zaporozhets, tombйe dans une faille suite а un tremblement de terre. Accroc refuse d'y aller lui-mкme car l'endroit grouille de snorks.</text>
+	</string>
+	<string id="zat_b33_zaporojec_text_02">
+		<text>Vous avez rйcupйrй le coffre d'Accroc. Rapportez-le-lui afin de partager йquitablement son contenu.</text>
+	</string>
+	<string id="zat_b38_den_of_the_bloodsucker_inform_stalkers_name">
+		<text>Le nid de sangsues : parler du nid aux stalkers.</text>
+	</string>
+	<string id="zat_b38_den_of_the_bloodsucker_inform_stalkers_text">
+		<text>Informez les stalkers de la prйsence d'un nid de sangsues sous la station-relais de Krug. </text>
+	</string>
+	<string id="zat_b38_den_of_the_bloodsucker_tell_barman_about_all_name">
+		<text>Le nid de sangsues : parler du nid au Barbu.</text>
+	</string>
+	<string id="zat_b38_den_of_the_bloodsucker_tell_barman_about_all_text">
+		<text>Informez le Barbu de la prйsence d'un nid de sangsues sous la station-relais de Krug afin qu'il dйcide d'un moyen de protйger les stalkers.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_clean_den_of_the_bloodsucker_name">
+		<text>Stalkers disparus : suivre le Faisan.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_clean_den_of_the_bloodsucker_text">
+		<text>Le Faisan vous a demandй de l'accompagner pour inspecter la station-relais abandonnйe. Il a repйrй des sangsues et souhaite vйrifier si le chasseur s'y trouve.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_deal_with_medic_name">
+		<text>Stalkers disparus : dйcouvrir ce qui s'est passй.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_deal_with_medic_text">
+		<text>Sismik n'est pas aussi innocent qu'il en a l'air. Vous devez dйcouvrir ce qui s'est passй.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_find_cop_near_port_krans_name">
+		<text>Stalkers disparus : trouver le Faisan.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_find_cop_near_port_krans_text">
+		<text>Le Faisan est parti en direction des grues sur les quais. Peut-кtre a-t-il trouvй un indice sur la disparition des stalkers... Vous devriez le retrouver lа-bas.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_find_out_where_is_cop_name">
+		<text>Stalkers disparus : retrouver le Faisan.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_find_out_where_is_cop_text">
+		<text>Le Faisan est introuvable. Demandez au Barbu oщ il est parti.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_find_to_be_missing_hunter_name">
+		<text>Stalkers disparus : trouver le chasseur disparu.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_find_to_be_missing_hunter_text">
+		<text>Le Faisan vous a demandй de l'aider а retrouver le chasseur disparu, qui avait йtй chargй de trouver le nid de sangsues. Selon les derniиres informations, les sangsues seraient responsables de la disparition des stalkers.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_get_out_from_den_of_the_bloodsucker_name">
+		<text>Stalkers disparus : sortir du nid de sangsues</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_get_out_from_den_of_the_bloodsucker_text">
+		<text>Vous avez dйcouvert un nid de sangsues au sous-sol et ses rйsidents sont comme йtourdis. Vous feriez mieux de filer en silence.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_meet_cop_24h_past_name">
+		<text>Stalkers disparus : rejoindre le Faisan.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_meet_cop_24h_past_text">
+		<text>Vous feriez bien d'aller voir le Faisan pour discuter avec lui du chasseur disparu.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_meet_cop_later_name">
+		<text>Stalkers disparus : rejoindre le Faisan plus tard.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_meet_cop_later_text">
+		<text>Vous n'avez trouvй aucune trace du chasseur Danila dans la station-relais. Mais ce que vous avez trouvй а l'intйrieur rend le Faisan perplexe et il souhaite en discuter plus en dйtail avec vous.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_meet_ment_name">
+		<text>Stalkers disparus : aller voir le Faisan.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_meet_ment_text">
+		<text>Une sangsue morte se trouvait а l'endroit indiquй par le Faisan, mais aucun signe du chasseur. Toutefois, il semble que le Faisan soit tombй sur un йlйment important et il vous a demandй de venir le voir.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_tell_barmen_about_medic_text">
+		<text>Les sangsues n'avaient en fait aucun rapport avec la disparition des stalkers. Sismik, le mйdecin du Skadovsk, en est le seul responsable.</text>
+	</string>
+	<string id="zat_b3_get_tools_1_2_name">
+		<text>Outils : apporter des outils а Cardan.</text>
+	</string>
+	<string id="zat_b3_get_tools_1_2_text">
+		<text>Cardan vous a demandй de lui apporter deux jeux d'outils : des outils rudimentaires et des outils de prйcision. Le technicien vous paiera et sera en mesure d'effectuer des modifications d'armes et d'armures plus complexes.</text>
+	</string>
+	<string id="zat_b3_get_tools_1_3_name">
+		<text>Outils : apporter des outils а Cardan.</text>
+	</string>
+	<string id="zat_b3_get_tools_1_3_text">
+		<text>Cardan vous a demandй de rйcupйrer deux jeux d'outils : des outils rudimentaires et des outils de calibrage. Le technicien vous paiera et sera en mesure d'effectuer des modifications d'armes et d'armures plus complexes.</text>
+	</string>
+	<string id="zat_b3_get_tools_1_name">
+		<text>Outils : apporter des outils а Cardan.</text>
+	</string>
+	<string id="zat_b3_get_tools_1_text">
+		<text>Cardan vous a demandй de rйcupйrer un jeu d'outils rudimentaires. Le technicien vous paiera et sera en mesure d'effectuer des modifications d'armes et d'armures plus complexes.</text>
+	</string>
+	<string id="zat_b3_get_tools_2_3_name">
+		<text>Outils : apporter des outils а Cardan.</text>
+	</string>
+	<string id="zat_b3_get_tools_2_3_text">
+		<text>Cardan vous a demandй de rйcupйrer deux jeux d'outils : des outils de prйcision et des outils de calibrage. Le technicien vous paiera et sera en mesure d'effectuer des modifications d'armes et d'armures plus complexes.</text>
+	</string>
+	<string id="zat_b3_get_tools_2_name">
+		<text>Outils : apporter des outils а Cardan.</text>
+	</string>
+	<string id="zat_b3_get_tools_2_text">
+		<text>Cardan vous a demandй de rйcupйrer un jeu d'outils de prйcision. Le technicien vous paiera et sera en mesure d'effectuer des modifications d'armes et d'armures plus complexes.</text>
+	</string>
+	<string id="zat_b3_get_tools_3_name">
+		<text>Outils : apporter des outils а Cardan.</text>
+	</string>
+	<string id="zat_b3_get_tools_3_text">
+		<text>Cardan vous a demandй de rйcupйrer un jeu d'outils de calibrage. Le technicien vous paiera et sera en mesure d'effectuer des modifications d'armes et d'armures plus complexes.</text>
+	</string>
+	<string id="zat_b3_mechanic_toolkit_search_name">
+		<text>Outils : apporter des outils а Cardan.</text>
+	</string>
+	<string id="zat_b3_mechanic_toolkit_search_text">
+		<text>Cardan vous a demandй de rйcupйrer trois jeux d'outils : des outils rudimentaires, des outils de prйcisions et des instruments de calibrage. Le technicien vous paiera et sera en mesure d'effectuer des modifications d'armes et d'armures plus complexes.</text>
+	</string>
+	<string id="zat_b40_reconnoitre_merc_camp_01_name">
+		<text>Camp de mercenaires : rйcupйrer autant d'informations que possible.</text>
+	</string>
+	<string id="zat_b40_reconnoitre_merc_camp_01_text">
+		<text>Le Faisan vous a promis une belle rйcompense pour toute information recueillie dans le camp des mercenaires dans la station de traitement des dйchets. Il aimerait en savoir plus sur leurs projets.</text>
+	</string>
+	<string id="zat_b40_reconnoitre_merc_camp_02_name">
+		<text>Camp de mercenaires : rйcupйrer autant d'informations que possible.</text>
+	</string>
+	<string id="zat_b40_reconnoitre_merc_camp_02_text">
+		<text>Le Faisan vous a promis une belle rйcompense pour toute information recueillie dans le camp des mercenaires dans la station de traitement des dйchets. Il aimerait en savoir plus sur leurs projets.</text>
+	</string>
+	<string id="zat_b44_tech_buddies_barge_name">
+		<text>Trois camarades : dйcouvrir ce qui est arrivй а Barge.</text>
+	</string>
+	<string id="zat_b44_tech_buddies_barge_text">
+		<text>Cardan vous a demandй de transmettre ses excuses а son camarade, le stalker surnommй Barge. А la suite d'une dispute, celui-ci йtait parti sans dire oщ il se rendait.</text>
+	</string>
+	<string id="zat_b44_tech_buddies_both_name">
+		<text>Trois camarades : dйcouvrir ce qui est arrivй а Barge et au Joker.</text>
+	</string>
+	<string id="zat_b44_tech_buddies_both_text">
+		<text>Cardan vous a demandй de transmettre ses excuses а ses camarades, les stalkers surnommйs Barge et le Joker. А la suite d'une dispute, ses amis йtaient partis sans dire oщ ils se rendaient.</text>
+	</string>
+	<string id="zat_b44_tech_buddies_joker_name">
+		<text>Trois camarades : dйcouvrir ce qui est arrivй au Joker.</text>
+	</string>
+	<string id="zat_b44_tech_buddies_joker_text">
+		<text>Cardan vous a demandй de transmettre ses excuses а son camarade, le stalker surnommй Joker. А la suite d'une dispute, celui-ci йtait parti sans dire oщ il se rendait.</text>
+	</string>
+	<string id="zat_b51_nimble_items_get_order_name">
+		<text>Commande spйciale : rйcupйrer la marchandise.</text>
+	</string>
+	<string id="zat_b51_nimble_items_get_order_text">
+		<text>La marchandise a йtй livrйe : il est temps d'aller la rйcupйrer auprиs d'Allegro.</text>
+	</string>
+	<string id="zat_b51_nimble_items_wait_order_name">
+		<text>Commande spйciale : attendre la livraison.</text>
+	</string>
+	<string id="zat_b51_nimble_items_wait_order_text">
+		<text>La commande a йtй passйe. Attendez qu'Allegro rйcupиre la marchandise.</text>
+	</string>
+	<string id="zat_b52_reputation_find_snag_name">
+		<text>Rйputation : trouver Accroc.</text>
+	</string>
+	<string id="zat_b52_reputation_find_snag_text">
+		<text>Vous devez trouver Accroc et l'obliger а tenir sa langue. Allegro n'a jamais trempй dans des affaires de marchandises volйes, tandis qu'Accroc a tout d'une belle ordure. Il a йtй aperзu pour la derniиre fois prиs des grues sur les quais. Il s'y trouve peut-кtre encore.</text>
+	</string>
+	<string id="zat_b52_reputation_find_snag_text_2">
+		<text>Trouvez Accroc et obligez-le а tenir sa langue. Il ne se trouve pas prиs des grues sur les quais, mais les bandits savent peut-кtre oщ il est.</text>
+	</string>
+	<string id="zat_b52_reputation_find_snag_text_3">
+		<text>Trouvez Accroc et obligez-le а tenir sa langue. Les bandits semblent impliquйs et savent peut-кtre oщ il se trouve.</text>
+	</string>
+	<string id="zat_b52_reputation_find_snag_text_4">
+		<text>Trouvez Accroc et obligez-le а tenir sa langue. Personne ne sait oщ il se trouve.</text>
+	</string>
+	<string id="zat_b52_reputation_find_snag_text_5">
+		<text>Vous devez trouver Accroc et l'obliger а tenir sa langue. D'aprиs le PDA retrouvй sur l'un des bandits, les hommes de Sultan le recherchent. Malheureusement, rien n'indique oщ il se trouve.</text>
+	</string>
+	<string id="zat_b52_reputation_know_there_snog_name">
+		<text>Rйputation : dйcouvrir oщ se trouve Accroc.</text>
+	</string>
+	<string id="zat_b52_reputation_know_there_snog_text">
+		<text>Accroc est introuvable. Vous devriez donc demander aux gens du coin s'ils ne l'ont pas vu.</text>
+	</string>
+	<string id="zat_b52_reputation_know_there_snog_text_2">
+		<text>Trouvez Accroc et forcez-le а tenir sa langue. Malheureusement, il semble introuvable. Peut-кtre que Sultan en sait davantage.</text>
+	</string>
+	<string id="zat_b52_reputation_know_there_snog_text_3">
+		<text>Trouvez Accroc et forcez-le а tenir sa langue. Malheureusement, il semble introuvable. Peut-кtre que le Barbu en sait davantage.</text>
+	</string>
+	<string id="zat_b52_reputation_tell_snag_name">
+		<text>Rйputation : parler а Accroc</text>
+	</string>
+	<string id="zat_b52_reputation_tell_snag_text">
+		<text>Vous devez trouver Accroc et l'obliger а tenir sa langue. Allegro n'a jamais trempй dans des affaires de marchandises volйes, tandis qu'Accroc a tout d'une belle ordure. </text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_destroy_lair_name">
+		<text>Le nid de sangsues : trouver le conduit d'aйration.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_destroy_lair_text">
+		<text>Trouvez le conduit d'aйration pour remplir le nid de sangsues de gaz mortel.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_find_gas_name">
+		<text>Le nid des sangsues : trouver du gaz mortel.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_find_gas_text">
+		<text>Il vous faut du gaz pour йradiquer le nid des sangsues. Le Hibou sait oщ s'en procurer.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_find_gas_text_2">
+		<text>Il vous faut du gaz pour dйtruire le nid de sangsues. Le Hibou vous a assurй que vous trouveriez des bombonnes de gaz dans le convoi militaire abandonnй.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_get_gas_name">
+		<text>Le nid de sangsues : trouver les clйs du conteneur.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_get_gas_text">
+		<text>Les documents que vous avez trouvйs йvoquent les clйs du conteneur de bombonnes de gaz. Vous devez les trouver.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_open_gas_box_name">
+		<text>Le nid de sangsues : trouver un moyen d'ouvrir le conteneur de bombonnes de gaz.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_open_gas_box_text">
+		<text>Le conteneur renfermant les bombonnes de gaz est fermй а clй. Trouvez un moyen de l'ouvrir.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_place_gas_name">
+		<text>Le nid de sangsues : placer la bombonne de gaz.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_place_gas_text">
+		<text>Placez la bombonne de gaz dans le systиme d'aйration du sous-sol de la station-relais. Le gaz devrait s'йchapper par les conduits, se propager dans le sous-sol et asphyxier les sangsues.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_tell_stalkers_about_destroy_lair_name">
+		<text>Le nid sangsues : informer le Barbu de la destruction du nid.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_tell_stalkers_about_destroy_lair_text">
+		<text>Dites au Barbu que vous avez йradiquй le nid de sangsues et ainsi assurй la sйcuritй des stalkers du Skadovsk.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_twist_vintil_name">
+		<text>Le nid de sangsues : tourner la valve.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_twist_vintil_text">
+		<text>Tournez la valve pour laisser le gaz mortel se propager dans le sous-sol abritant le nid de sangsues а travers le conduit d'aйration.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_wait_destroy_name">
+		<text>Le nid de sangsues : patienter jusqu'а ce que le gaz fasse effet. </text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_wait_destroy_text">
+		<text>Vous devez vous assurer que le gaz s'est bien propagй dans le nid et que toutes les sangsues sont mortes.</text>
+	</string>
+	<string id="zat_b5_come_to_bandits_name">
+		<text>Transaction : rencontrer les bandits prиs du poste des rangers.</text>
+	</string>
+	<string id="zat_b5_come_to_bandits_text">
+		<text>Sultan vous a demandй de participer а une transaction avec un marchand. Vous devez accompagner ses hommes et les couvrir en cas de problиme.</text>
+	</string>
+	<string id="zat_b5_come_to_dealer_name">
+		<text> Transaction : rejoindre le marchand.</text>
+	</string>
+	<string id="zat_b5_come_to_dealer_text">
+		<text>Le Hibou vous a confiй une mission. Vous devez protйger un marchand pendant une transaction. Il s'agit clairement d'une affaire louche et il y a des chances que les choses tournent mal.</text>
+	</string>
+	<string id="zat_b5_come_to_stalkers_name">
+		<text> Transaction : rejoindre les stalkers prиs du poste des rangers.</text>
+	</string>
+	<string id="zat_b5_come_to_stalkers_text">
+		<text>Rejoignez les stalkers prиs du poste des rangers et aidez-les а interrompre la transaction entre les bandits et le marchand d'armes.</text>
+	</string>
+	<string id="zat_b5_cover_dealer_name">
+		<text>Transaction : protйger le marchand.</text>
+	</string>
+	<string id="zat_b5_cover_dealer_text">
+		<text>Le marchand vous a expliquй votre rфle : le protйger pendant la transaction.</text>
+	</string>
+	<string id="zat_b5_intercept_talking_name">
+		<text>Transaction : йcouter la conversation.</text>
+	</string>
+	<string id="zat_b5_intercept_talking_text">
+		<text>Les stalkers souhaitent йcouter la conversation entre les bandits et le marchand d'armes.</text>
+	</string>
+	<string id="zat_b5_kill_dealer_name">
+		<text>Transaction : empкcher la vente des armes.</text>
+	</string>
+	<string id="zat_b5_kill_dealer_text">
+		<text>Faites votre possible pour empкcher la transaction entre les bandits et le marchand d'armes.</text>
+	</string>
+	<string id="zat_b5_kill_stalkers_name">
+		<text>Transaction : йliminer les tйmoins.</text>
+	</string>
+	<string id="zat_b5_kill_stalkers_text">
+		<text>La transaction n'a pas abouti, vous devez йliminer tous les tйmoins.</text>
+	</string>
+	<string id="zat_b5_protect_dealer_name">
+		<text>Transaction : protйger le marchand.</text>
+	</string>
+	<string id="zat_b5_protect_dealer_text">
+		<text>Vous devez protйger le marchand. Il vous a йgalement ordonnй d'йliminer tous les tйmoins de la transaction, y compris ses clients.</text>
+	</string>
+	<string id="zat_b5_search_body_name">
+		<text>Transaction : fouiller le marchand.</text>
+	</string>
+	<string id="zat_b5_search_body_text">
+		<text>Le marchand a peut-кtre des informations capitales qui pourront vous кtre utiles. Vous feriez mieux de les prendre.</text>
+	</string>
+	<string id="zat_b5_secure_bandits_name">
+		<text>Transaction : couvrir les bandits pendant la transaction. </text>
+	</string>
+	<string id="zat_b5_secure_bandits_text">
+		<text>Restez sur le qui-vive et couvrez les bandits pendant leurs nйgociations avec le marchand.</text>
+	</string>
+	<string id="zat_b5_speak_dealer_name">
+		<text>Transaction : parler au marchand.</text>
+	</string>
+	<string id="zat_b5_speak_dealer_text">
+		<text>La transaction avec les bandits est terminйe. Allez rйcupйrer votre rйcompense.</text>
+	</string>
+	<string id="zat_b5_talk_barmen_name">
+		<text>Transaction : demander votre rйcompense au Barbu.</text>
+	</string>
+	<string id="zat_b5_talk_barmen_text">
+		<text>Le Barbu vous a promis une rйcompense si vous parveniez а interrompre la transaction entre les bandits et le marchand. Vous avez rйussi et pouvez а prйsent rйcupйrer votre rйcompense.</text>
+	</string>
+	<string id="zat_b5_talk_to_sultan_name">
+		<text>Transaction : parler au chef des bandits.</text>
+	</string>
+	<string id="zat_b5_talk_to_sultan_text">
+		<text>Vous devez informer le chef des bandits que vous кtes prкt а participer а la transaction.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_name">
+		<text>Braquage : prendre une dйcision.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_raiders_name">
+		<text>Braquage : attaquer les stalkers.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_stalkers_reward_name">
+		<text>Braquage : rйcupйrer votre rйcompense.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_stalkers_reward_text">
+		<text>L'attaque menйe sur le camp a йtй repoussйe. Vous pouvez maintenant parler aux stalkers pour obtenir votre rйcompense. Sans votre avertissement, ils auraient passй un sale quart d'heure.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_text">
+		<text>Des stalkers peu scrupuleux dйtroussent leurs congйnиres. Vous devez dйcider entre participer а l'assaut, avertir les stalkers ou ne pas vous impliquer.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_wait_name">
+		<text>Braquage : attendre jusqu'а l'heure convenue.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_time_name">
+		<text>Braquage : attendre jusqu'а l'heure convenue.</text>
+	</string>
+	<string id="zat_b33_zaporojec_name">
+		<text>Une planque bien cachйe : apporter le coffre а Accroc.</text>
+	</string>
+	<string id="zat_b5_talk_stalkers_name">
+		<text>Transaction : parler au chef du groupe de stalkers.</text>
+	</string>
+	<string id="zat_b5_talk_stalkers_text">
+		<text>La transaction a йtй interrompue, le marchand d'armes est mort. Allez parler au chef du groupe de stalkers.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_tell_barmen_about_medic_name">
+		<text>Stalkers disparus : relater les йvйnements aux stalkers du Skadovsk.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_open_container_text">
+		<text>Vous devez ouvrir le conteneur avec les clйs trouvйes et sortir la bombonne de gaz empoisonnй.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_open_container_name">
+		<text>Le nid de sangsues : sortir la bonbonne de gaz du conteneur.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_backstab_name">
+		<text>Braquage : attaquer les voleurs.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_backstab_text">
+		<text>Attaquer les voleurs par derriиre permettra aux stalkers de repousser leur attaque.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_meet_name">
+		<text>Braquage : rejoindre les voleurs.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_raiders_text">
+		<text>Rejoignez les voleurs pour attaquer le camp des stalkers.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_stalkers_name">
+		<text>Braquage : rejoindre les voleurs.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_stalkers_text">
+		<text>Les stalkers vous ont demandй de les aider а repousser l'attaque des voleurs. Vous devriez rejoindre les bandits. Lorsqu'ils commenceront l'assaut, vous pourrez les attaquer par derriиre en toute impunitй.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_meet_text">
+		<text>Les voleurs doivent attendre prиs du Chevtchenko. Vous devez les rejoindre pour participer а l'attaque du camp des stalkers.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_wait_text">
+		<text>Attendez votre rendez-vous avec les voleurs ! Ils veulent attaquer le camp de stalkers entre minuit et le lever du soleil. Le point de rendez-vous se trouve au Chevtchenko.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_raiders_reward_name">
+		<text>Braquage : rйcupйrer votre part.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_raiders_reward_text">
+		<text>L'attaque sur les stalkers a rйussi. Vous devriez aller rйcupйrer votre part du butin.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_time_text">
+		<text>Attendez le bon moment, quand les voleurs seront distraits par l'attaque en cours ! Vous pourrez alors les prendre а revers et aider les stalkers de Chevtchenko.</text>
+	</string>
+	<string id="zat_b30_sultan_task_8_name">
+		<text>Affaires louches : travailler pour le Barbu.</text>
+	</string>
+	<string id="zat_b30_sultan_task_8_text">
+		<text>Pour vous emparer des prototypes de dйtecteur des stalkers qui travaillent pour le Barbu, vous devrez infiltrer leurs rangs. Cela vous permettra de dйcouvrir qui sont vos concurrents.</text>
+	</string>
+	<string id="zat_b33_zaporojec_text_03">
+		<text>Vous devez prendre le coffre et l'apporter а son propriйtaire.</text>
+	</string>
+	<string id="zat_b100_guide_maps_01_text">
+		<text>L'ordinateur de bord de Stingray 2 contenait des cartes du secteur entre Zaton et Jupiter. Vous devriez trouver quelqu'un qui en aura l'utilitй.</text>
+	</string>
+	<string id="zat_b20_ask_a_stalkers_name">
+		<text>Aller au plateau du sud : parler aux stalkers</text>
+	</string>
+	<string id="zat_b20_ask_a_stalkers_text">
+		<text>On dirait qu'il n'y a pas de chemin direct menant au plateau. Demander aux stalkers du coin s'ils ne connaissent pas d'autres moyens de s'y rendre.</text>
+	</string>
+	<string id="zat_b30_compass_to_barmen_task_give_text">
+		<text>L'artefact que vous a remis Noah est la Boussole que recherche le Barbu.</text>
+	</string>
+</string_table>

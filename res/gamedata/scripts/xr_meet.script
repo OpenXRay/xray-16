@@ -1,0 +1,645 @@
+----------------------------------------------------------------------------------------------------------------------
+--	Схема встречи двух сталкеров
+--	автор: Диденко Руслан (Stohe)
+--	TODO:
+----------------------------------------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------------------------------------
+--Evaluators
+----------------------------------------------------------------------------------------------------------------------
+--' Возвращает есть ли у нас контакт с другим сталкером
+class "evaluator_contact" (property_evaluator)
+function evaluator_contact:__init(name, storage) super (nil, name)
+	self.a = storage
+end
+function evaluator_contact:evaluate()
+	if self.a.meet_set ~= true then return false end
+
+--	if self.a.meet_only_at_path == true and not db.storage[self.object:id()].move_mgr:arrived_to_first_waypoint() then
+--		return false
+--	end
+
+	if db.actor then
+		if not db.actor:alive() then
+			return false
+		end
+
+		self.a.meet_manager:update()
+
+		if xr_wounded.is_wounded(self.object) then
+			return false
+		end
+
+		if self.object:best_enemy() ~= nil then
+			return false
+		end
+
+		if self.mgr == nil then
+			self.mgr = self.object:motivation_action_manager()
+		end
+		if self.mgr:evaluator(stalker_ids.property_enemy):evaluate() then
+			self.a.meet_manager.use = "false"
+			self.object:disable_talk()
+			return false
+		end
+
+		return self.a.meet_manager.current_distance ~= nil
+	else
+		return false
+	end
+end
+
+----------------------------------------------------------------------------------------------------------------------
+--Actions
+----------------------------------------------------------------------------------------------------------------------
+--' Приглашение к тороговле
+class "action_meet_wait" (action_base)
+function action_meet_wait:__init (npc_name,action_name, storage, char_ini) super (nil, action_name)
+	self.char_ini = char_ini
+	self.a = storage
+end
+function action_meet_wait:initialize()
+	action_base.initialize(self)
+	self.object:set_desired_position()
+	self.object:set_desired_direction()
+
+end
+function action_meet_wait:execute ()
+	action_base.execute(self)
+	self.a.meet_manager:update_state()
+end
+function action_meet_wait:finalize ()
+	action_base.finalize(self)
+end
+
+
+
+-- Функционал
+--[[
+
+-- звук на юзание CB
+
+]]
+
+class "Cmeet_manager"
+function Cmeet_manager:__init(npc, storage)
+	self.npc = npc
+	self.a = storage
+
+	self.startdialog = nil
+	self.abuse_mode = nil
+	self.trade_enable = nil
+	self.use = nil
+	self.allow_break = nil
+	self.npc_is_camp_director = false
+
+	self.curent_distance = nil -- nil - мит не активен, close - близко, far - далеко
+
+	self.hello_passed = false 	-- Говорили ли мы привет
+	self.bye_passed = false	 	-- Говорили ли мы пока
+end
+function Cmeet_manager:update_state()
+	local state = nil
+	local victim = nil
+
+	if self.current_distance == "close" then
+		-- анимация, пока в близком радиусе
+		state = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.close_anim)
+
+		-- направление, пока в близком радиусе
+		victim = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.close_victim)
+
+	elseif self.current_distance == "far" then
+		-- анимация, пока в дальнем радиусе
+		state = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.far_anim)
+
+		-- направление, пока в близком радиусе
+		victim = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.far_victim)
+
+	end
+
+	if tostring(victim) ~= "nil" then
+		local sim = alife()
+		if sim then
+			victim = get_story_object(victim)
+		end
+	else
+		victim = nil
+	end
+	if tostring(state) ~= "nil" then
+		if victim == nil then
+			state_mgr.set_state(self.npc, state, nil, nil, nil)
+		else
+			state_mgr.set_state(self.npc, state, nil, nil, {look_object = victim})
+		end
+	end
+
+	local snd = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.far_snd)
+
+	-- звук, пока в дальнем радиусе  (отыгрывается, даже если мы в ближнем)
+	if tostring(snd) ~= "nil" then
+		xr_sound.set_sound_play(self.npc:id(), snd)
+	end
+
+end
+function Cmeet_manager:set_start_distance()
+	if db.actor == nil then
+		self.hello_passed = false
+		self.bye_passed = false
+		self.current_distance = nil
+		return
+	end
+
+	if not self.npc:alive() then
+		self.hello_passed = false
+		self.bye_passed = false
+		self.current_distance = nil
+		return
+	end
+
+	-- Определение, в каком радиусе находимся
+	local distance = self.npc:position():distance_to(db.actor:position())
+
+	local actor_visible = self.npc:see(db.actor)
+
+	local is_object_far = actor_visible and distance <= tonumber(xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.far_distance))
+	local is_object_close = (actor_visible and distance <= tonumber(xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.close_distance))) or self.npc:is_talking()
+
+	if is_object_close == true then
+		self.hello_passed = true
+		self.current_distance = "close"
+	elseif is_object_far == true then
+		self.bye_passed = true
+		self.current_distance = "far"
+	elseif distance > self.a.reset_distance then
+		self.hello_passed = false
+		self.bye_passed = false
+		self.current_distance = nil
+	else
+		self.current_distance = nil
+	end
+
+end
+function Cmeet_manager:update()
+	-- Определение, в каком радиусе находимся
+	local distance = self.npc:position():distance_to(db.actor:position())
+
+	local actor_visible = self.npc:see(db.actor)
+
+	if actor_visible then
+		--printf("%s check distance %s <= %s <= %s", self.npc:name(), distance, tonumber(xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.close_snd_distance)), tonumber(xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.far_snd_distance)) )
+		if distance <= tonumber(xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.close_snd_distance)) then
+			-- Коллбек на приближение
+			-- звук при приближении
+			if self.hello_passed == false then
+				local snd = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.close_snd_hello)
+				if tostring(snd) ~= "nil" and not state_mgr.is_npc_in_combat(self.npc) then
+					xr_sound.set_sound_play(self.npc:id(), snd)
+				end
+	
+				self.hello_passed = true
+			end
+	
+		elseif distance <= tonumber(xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.far_snd_distance)) then
+			if self.hello_passed == true then
+				-- Коллбек на отдаление
+				-- звук при отдалении
+				if self.bye_passed == false then
+					local snd = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.close_snd_bye)
+					if tostring(snd) ~= "nil" and not state_mgr.is_npc_in_combat(self.npc) then
+						xr_sound.set_sound_play(self.npc:id(), snd)
+					end
+	
+					self.bye_passed = true
+				end
+			end
+		end
+	end
+	
+	local is_object_far = actor_visible and distance <= tonumber(xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.far_distance))
+	local is_object_close = (actor_visible and distance <= tonumber(xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.close_distance))) or (self.npc:is_talking() and self.a.meet_on_talking)
+
+	--printf("!!! %s %s %s", self.npc:name(), tostring(is_object_far), tostring(is_object_close))
+	--printf("%s",  xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.close_distance))
+
+	if is_object_close == true then
+		if self.current_distance ~= "close" then
+			self.current_distance = "close"
+		end
+	elseif is_object_far == true then
+		self.current_distance = "far"
+	elseif distance > self.a.reset_distance then
+		-- ресет флажков при выходе в дальний радиус CB
+		self.hello_passed = false
+		self.bye_passed = false
+		self.current_distance = nil
+	else
+		self.current_distance = nil
+	end
+
+
+	-- Можно или нет оборвать диалог
+	local allow_break = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.allow_break)
+	if self.allow_break ~= (allow_break == "true") then
+		self.allow_break = (allow_break == "true")
+	end
+
+	-- стартовый диалог
+	if self.a.meet_dialog ~= nil then
+		local start_dialog = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.meet_dialog)
+		if self.startdialog ~= start_dialog then
+			self.startdialog = start_dialog
+			--printf("*DIALOGS %s* SET [%s]", self.npc:name(), tostring(start_dialog))
+			if start_dialog == nil or start_dialog == "nil" then
+				-- восстановление начального
+				--printf("RESTORE")
+				self.npc:restore_default_start_dialog()
+			else
+				--printf("SET %s allow_break %s", start_dialog, tostring(self.allow_break))
+				-- установка нового
+				self.npc:set_start_dialog(start_dialog)
+				if self.npc:is_talking() then
+					db.actor:run_talk_dialog(self.npc, not(self.allow_break))
+				end
+			end
+		end
+	end
+
+
+	local is_talking = self.npc:is_talking()
+
+
+	local use = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.use)
+
+	-- Проверяем, играем ли мы что то в кампе
+	if self.npc_is_camp_director == true then
+		use = "false"
+	end
+
+
+	--printf("%s self.use[%s] use [%s]", self.npc:name(), tostring(self.use), tostring(use))
+	--print_table(self.a.use)
+	-- доступность юзания
+	if self.use ~= use then
+		if use == "self" then
+			if not is_talking and device().precache_frame < 1 then
+				self.npc:enable_talk()
+				--printf("SET allow_break %s", tostring(self.allow_break))
+				self.npc:allow_break_talk_dialog(self.allow_break)
+				db.actor:run_talk_dialog(self.npc, not(self.allow_break))
+			end
+		end
+		if device().precache_frame < 1 then
+			self.use = use
+		end
+	end
+
+
+	local use_text = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.use_text)
+	if use_text ~= "nil" then
+		self.npc:set_tip_text(use_text)
+	else
+		if self.npc:is_talk_enabled() then
+			self.npc:set_tip_text("character_use")
+		else
+			self.npc:set_tip_text("")
+		end
+	end
+
+		self.npc:allow_break_talk_dialog(self.allow_break)
+--[[
+	if is_talking then
+		db.actor:allow_break_talk_dialog(self.allow_break)
+	end
+]]
+	-- Проверяем включать ли обижание на заюзывание
+	local abuse = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.abuse)
+	if self.abuse_mode ~= abuse then
+		if abuse == "true" then
+			xr_abuse.enable_abuse(self.npc)
+		else
+			xr_abuse.disable_abuse(self.npc)
+		end
+		self.abuse_mode = abuse
+	end
+
+	-- доступность торговли
+	if xr_wounded.is_wounded(self.npc) then
+		self.trade_enable = false
+	else
+		local trade_enable = xr_logic.pick_section_from_condlist(db.actor, self.npc, self.a.trade_enable)
+		--printf("npc [%s] self %s *** %s", self.npc:name(), tostring(self.trade_enable), tostring(trade_enable))
+		if self.trade_enable ~= trade_enable then
+			if trade_enable == "true" then
+				self.npc:enable_trade()
+			else
+				self.npc:disable_trade()
+			end
+			self.trade_enable = trade_enable
+		end
+	end
+end
+
+function notify_on_use(victim, who)
+	--printf("NOTIFY [%s] used by [%s]", victim:name(), who:name())
+
+	-- Если мы мертвы - на юзание не реагировать
+	if not victim:alive() then
+		return
+	end
+
+	local st = db.storage[victim:id()].meet
+
+	if st == nil then
+		return
+	end
+
+	local snd = xr_logic.pick_section_from_condlist(db.actor, victim, st.snd_on_use)
+	if tostring(snd) ~= "nil" then
+		xr_sound.set_sound_play(victim:id(), snd)
+	end
+
+
+	local meet_manager = st.meet_manager
+
+	if meet_manager.use == "false" and meet_manager.abuse_mode == "true" and
+		game_relations.get_npcs_relation(victim, db.actor) == game_object.friend
+	then
+		xr_abuse.add_abuse(victim, 1)
+	end
+end
+
+
+----------------------------------------------------------------------------------------------------------------------
+-- binder
+----------------------------------------------------------------------------------------------------------------------
+function add_to_binder(object, char_ini, scheme, section, st)
+	local operators		= {}
+	local properties	= {}
+
+	local manager = object:motivation_action_manager()
+
+	properties["contact"]		= xr_evaluators_id.stohe_meet_base + 1
+	properties["wounded"]		= xr_evaluators_id.sidor_wounded_base
+	properties["abuse"]			= xr_evaluators_id.abuse_base
+	properties["wounded_exist"]				= xr_evaluators_id.wounded_exist
+	properties["corpse_exist"]				= xr_evaluators_id.corpse_exist
+
+	operators["contact"]		= xr_actions_id.stohe_meet_base + 1
+	operators["state_mgr_to_idle_alife"]	= xr_actions_id.state_mgr + 2
+
+	-- Evaluators
+	manager:add_evaluator (properties["contact"], 		evaluator_contact("meet_contact", st))
+
+	-- Actions
+	local action = action_meet_wait (object:name(),"action_process_meet", st, char_ini)
+	action:add_precondition		(world_property(stalker_ids.property_alive, true))
+	action:add_precondition		(world_property(stalker_ids.property_enemy,	false))
+	action:add_precondition		(world_property(stalker_ids.property_danger,false))
+	action:add_precondition		(world_property(stalker_ids.property_anomaly,false))
+	
+	action:add_precondition		(world_property(stalker_ids.property_items,	false))
+	action:add_precondition		(world_property(properties["wounded_exist"],false))
+	action:add_precondition		(world_property(properties["corpse_exist"],	false))
+	
+	action:add_precondition		(world_property(properties["contact"], 		true))
+	action:add_precondition		(world_property(properties["wounded"], 		false))
+	action:add_precondition		(world_property(properties["abuse"],		false))
+	action:add_effect (world_property(properties["contact"], 			false))
+	manager:add_action (operators["contact"], action)
+
+	action = manager:action (xr_actions_id.alife)
+	action:add_precondition		(world_property(properties["contact"],		false))
+
+	action = manager:action (operators["state_mgr_to_idle_alife"])
+	action:add_precondition		(world_property(properties["contact"],		false))
+
+	st.meet_manager = Cmeet_manager(object, st)
+
+	xr_logic.subscribe_action_for_events(object, st, st.meet_manager)
+end
+
+
+
+------------
+-- Вызывается только в начале на чтении логики, создает экшены, эвалуаторы и производит
+-- первичную настройку.
+function set_meet(npc, ini, scheme, section)
+	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
+end
+-- Вызывается на переключении на новую секцию. Производит вычитывание настроек из текущей секции.
+function reset_meet(npc, scheme, st, section)
+	local meet_section
+--	printf("[%s]", utils.to_str(st.section_logic))
+	if scheme == nil or scheme == "nil" then
+		meet_section = utils.cfg_get_string(st.ini, st.section_logic, "meet", npc, false, "")
+	else
+		meet_section = utils.cfg_get_string(st.ini, section, "meet", npc, false, "")
+	end
+
+	init_meet(npc, st.ini, meet_section, st.meet, scheme)
+end
+
+
+-- Функция чтения настроек. В нее передается секция, откуда их нужно читать.
+function init_meet(npc, ini, section, st, scheme)
+	--printf("MEET SECTION [%s][%s][%s]", tostring(st.meet_section), tostring(section), tostring(scheme))
+
+	if tostring(section) == st.meet_section and
+		 tostring(section) ~= "nil"
+	then
+		return
+	end
+
+	st.meet_section = utils.tostring(section)
+
+-- Что можно настраивать в meet
+--[[
+[meet]
+close_distance 	= {=actor_has_weapon} 3, 3
+close_anim 		= {=actor_has_weapon} a, b
+close_snd_hello = {=actor_has_weapon} a, b
+close_snd_bye 	= {=actor_has_weapon} a, b
+close_victim 	= {=actor_has_weapon} a, b
+
+
+far_distance 	= {=actor_has_weapon} 30, 30
+far_anim 		= {=actor_has_weapon} a, b
+far_snd 		= {=actor_has_weapon} a, b
+far_victim 		= {=actor_has_weapon} a, b
+
+
+snd_on_use 		= {=in_battle} a, {=no_talk} b, c
+
+use				= {=actor_has_weapon} true, false  -- self - юзает сам
+meet_dialog		= {=actor_has_weapon} a
+abuse			= {=in_battle} true, false
+trade_enable	= {=in_battle} true, false
+allow_break		= {=in_battle} true, false
+
+Ненастраиваемые параметры:
+
+reset_distance	= 30
+
+]]
+
+	-- Устанавливаем дефолты
+	local def = {}
+
+	local relation = game_relations.get_npcs_relation(npc, db.actor)
+
+	if relation == game_object.enemy then
+		def.close_distance 		= "0"
+		def.close_anim 			= "nil"
+		def.close_snd_distance 	= "0"
+		def.close_snd_hello		= "nil"
+		def.close_snd_bye		= "nil"
+		def.close_victim		= "nil"
+		def.far_distance		= "0"
+		def.far_anim			= "nil"
+		def.far_snd_distance	= "0"
+		def.far_snd				= "nil"
+		def.far_victim			= "nil"
+		def.snd_on_use			= "nil"
+		def.use					= "false"
+		def.meet_dialog			= "nil"
+		def.abuse				= "false"
+		def.trade_enable		= "true"
+		def.allow_break			= "true"
+		def.meet_on_talking		= "false"
+		def.use_text			= "nil"
+		
+	else
+		def.close_distance 		= "{=is_wounded} 0, {!is_squad_commander} 0, 3"
+		def.close_anim 			= "{=is_wounded} nil, {!is_squad_commander} nil, {=actor_has_weapon} threat_na, talk_default"
+		def.close_snd_distance 	= "{=is_wounded} 0, {!is_squad_commander} 0, 3"
+		def.close_snd_hello		= "{=is_wounded} nil, {!is_squad_commander} nil, {=actor_enemy} nil, {=actor_has_weapon} meet_hide_weapon, meet_hello"
+		def.close_snd_bye		= "{=is_wounded} nil, {!is_squad_commander} nil, {=actor_enemy} nil, {=actor_has_weapon} nil, meet_hello"
+		def.close_victim		= "{=is_wounded} nil, {!is_squad_commander} nil, actor"
+		def.far_distance		= "{=is_wounded} 0, {!is_squad_commander} 0, 5"
+		def.far_anim			= "nil"
+		def.far_snd_distance	= "{=is_wounded} 0, {!is_squad_commander} 0, 5"
+		def.far_snd				= "nil"
+		def.far_victim			= "nil"
+		def.snd_on_use			= "{=is_wounded} nil, {!is_squad_commander} meet_use_no_talk_leader, {=actor_enemy} nil, {=has_enemy} meet_use_no_fight, {=actor_has_weapon} meet_use_no_weapon, {!dist_to_actor_le(3)} nil"
+		def.use					= "{=is_wounded} false, {!is_squad_commander} false, {=actor_enemy} false, {=has_enemy} false, {=actor_has_weapon} false, {=dist_to_actor_le(3)} true, false"
+		def.meet_dialog			= "nil"
+		def.abuse				= "{=has_enemy} false, true"
+		def.trade_enable		= "true"
+		def.allow_break			= "true"
+		def.meet_on_talking		= "true"
+		def.use_text			= "nil"
+	end
+
+
+	if tostring(section) == "no_meet" then
+		st.close_distance 	= xr_logic.parse_condlist(npc, section, "close_distance", 		"0")
+		st.close_anim 		= xr_logic.parse_condlist(npc, section, "close_anim", 			"nil")
+		st.close_snd_distance=xr_logic.parse_condlist(npc, section, "close_distance", 		"0")
+		st.close_snd_hello	= xr_logic.parse_condlist(npc, section, "close_snd_hello", 		"nil")
+		st.close_snd_bye	= xr_logic.parse_condlist(npc, section, "close_snd_bye", 		"nil")
+		st.close_victim		= xr_logic.parse_condlist(npc, section, "close_victim", 		"nil")
+
+		st.far_distance		= xr_logic.parse_condlist(npc, section, "far_distance", 		"0")
+		st.far_anim			= xr_logic.parse_condlist(npc, section, "far_anim", 			"nil")
+		st.far_snd_distance	= xr_logic.parse_condlist(npc, section, "far_distance", 		"0")
+		st.far_snd			= xr_logic.parse_condlist(npc, section, "far_snd", 				"nil")
+		st.far_victim		= xr_logic.parse_condlist(npc, section, "far_victim", 			"nil")
+
+		st.snd_on_use		= xr_logic.parse_condlist(npc, section, "snd_on_use", 			"nil")
+		st.use				= xr_logic.parse_condlist(npc, section, "use", 					"false")
+		st.meet_dialog		= xr_logic.parse_condlist(npc, section, "meet_dialog", 			"nil")
+		st.abuse			= xr_logic.parse_condlist(npc, section, "abuse", 				"false")
+		st.trade_enable		= xr_logic.parse_condlist(npc, section, "trade_enable", 		"true")
+		st.allow_break		= xr_logic.parse_condlist(npc, section, "allow_break", 			"true")
+		st.meet_on_talking	= xr_logic.parse_condlist(npc, section, "meet_on_talking",		"false")
+		st.use_text			= xr_logic.parse_condlist(npc, section, "use_text", 			"nil")
+
+		st.reset_distance	= 30
+		st.meet_only_at_path = true
+
+	else
+		st.close_distance 	= xr_logic.parse_condlist(npc, section, "close_distance", 		utils.cfg_get_string(ini, section, "close_distance", npc, false, "", 	def.close_distance))
+		st.close_anim 		= xr_logic.parse_condlist(npc, section, "close_anim", 			utils.cfg_get_string(ini, section, "close_anim", npc, false, "", 		def.close_anim))
+		st.close_snd_distance=xr_logic.parse_condlist(npc, section, "close_snd_distance", 	utils.cfg_get_string(ini, section, "close_snd_distance", npc, false, "",def.close_distance))
+		st.close_snd_hello	= xr_logic.parse_condlist(npc, section, "close_snd_hello", 		utils.cfg_get_string(ini, section, "close_snd_hello", npc, false, "", 	def.close_snd_hello))
+		st.close_snd_bye	= xr_logic.parse_condlist(npc, section, "close_snd_bye", 		utils.cfg_get_string(ini, section, "close_snd_bye", npc, false, "", 	def.close_snd_bye))
+		st.close_victim		= xr_logic.parse_condlist(npc, section, "close_victim", 		utils.cfg_get_string(ini, section, "close_victim", npc, false, "", 		def.close_victim))
+
+		st.far_distance		= xr_logic.parse_condlist(npc, section, "far_distance", 		utils.cfg_get_string(ini, section, "far_distance", npc, false, "", 		def.far_distance))
+		st.far_anim			= xr_logic.parse_condlist(npc, section, "far_anim", 			utils.cfg_get_string(ini, section, "far_anim", npc, false, "", 			def.far_anim))
+		st.far_snd_distance	= xr_logic.parse_condlist(npc, section, "far_snd_distance", 	utils.cfg_get_string(ini, section, "far_snd_distance", npc, false, "", 	def.far_snd_distance))
+		st.far_snd			= xr_logic.parse_condlist(npc, section, "far_snd", 				utils.cfg_get_string(ini, section, "far_snd", npc, false, "", 			def.far_snd))
+		st.far_victim		= xr_logic.parse_condlist(npc, section, "far_victim", 			utils.cfg_get_string(ini, section, "far_victim", npc, false, "", 		def.far_victim))
+
+		st.snd_on_use		= xr_logic.parse_condlist(npc, section, "snd_on_use", 			utils.cfg_get_string(ini, section, "snd_on_use", npc, false, "", 		def.snd_on_use))
+		st.use				= xr_logic.parse_condlist(npc, section, "use", 					utils.cfg_get_string(ini, section, "use", npc, false, "", 				def.use))
+		st.meet_dialog		= xr_logic.parse_condlist(npc, section, "meet_dialog", 			utils.cfg_get_string(ini, section, "meet_dialog", npc, false, "", 		def.meet_dialog))
+		st.abuse			= xr_logic.parse_condlist(npc, section, "abuse", 				utils.cfg_get_string(ini, section, "abuse", npc, false, "", 			def.abuse))
+		st.trade_enable		= xr_logic.parse_condlist(npc, section, "trade_enable", 		utils.cfg_get_string(ini, section, "trade_enable", npc, false, "", 		def.trade_enable))
+		st.allow_break		= xr_logic.parse_condlist(npc, section, "allow_break", 			utils.cfg_get_string(ini, section, "allow_break", npc, false, "", 		def.allow_break))
+		st.meet_on_talking	= xr_logic.parse_condlist(npc, section, "meet_on_talking", 		utils.cfg_get_string(ini, section, "meet_on_talking", npc, false, "", 	def.meet_on_talking))
+		st.use_text			= xr_logic.parse_condlist(npc, section, "use_text", 			utils.cfg_get_string(ini, section, "use_text", npc, false, "", 			def.use_text))
+
+
+		st.reset_distance	= 30
+		st.meet_only_at_path = true
+	end
+
+	st.meet_manager:set_start_distance()
+
+	--print_table(st.far_distance)
+	-- флажок, что функция хотя бы раз вызывалась
+	st.meet_set = true
+end
+
+function disable_scheme(npc, scheme)
+	db.storage[npc:id()].actor_dialogs = nil
+	db.storage[npc:id()].actor_disable = nil
+end
+
+--- Находится ли чувак в данный момент в состоянии мита
+function is_meet(npc)
+	local manager = npc:motivation_action_manager()
+	if manager and manager:initialized() then
+		local id = manager:current_action_id()
+		if id == xr_actions_id.stohe_meet_base + 1 then
+			return true
+		end
+	end
+	return false
+end
+
+function process_npc_usability(npc)
+	if xr_wounded.is_wounded(npc) then
+		if npc:relation(db.actor) == game_object.enemy then
+			npc:disable_talk()
+		else
+			local wounded = db.storage[npc:id()].wounded
+			if wounded.enable_talk then
+				npc:enable_talk()
+			else
+				npc:disable_talk()
+			end
+		end
+		return
+	end
+
+	local meet = db.storage[npc:id()].meet
+
+	local use = meet.meet_manager.use
+
+	if use == "true" then
+		if xr_corpse_detection.is_under_corpse_detection(npc) or xr_help_wounded.is_under_help_wounded(npc) then
+			npc:disable_talk()
+		else
+			npc:enable_talk()
+		end
+	elseif use == "false" then
+		npc:disable_talk()
+		if npc:is_talking() then
+			npc:stop_talk()
+		end
+	end
+
+end

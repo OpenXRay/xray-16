@@ -1,0 +1,285 @@
+[wpn_gauss]:identity_immunities,weapon_probability,default_weapon_params
+GroupControlSection		= spawn_group
+discovery_dependency 	=
+$spawn                  = "weapons\gauss"	; option for Level Editor
+$npc			 				= on				; option for Level Editor
+$prefetch 		 			= 8
+scheduled               = off              	; option for ALife Simulator
+cform                   = skeleton
+class                   = WP_SVD
+description				= st_wpn_gauss_descr
+
+ef_main_weapon_type		= 3
+ef_weapon_type			= 11
+
+default_to_ruck         = false
+sprint_allowed       	= true
+control_inertion_factor = 1.0
+
+;-------------------------------------------------------------------------------
+cost					= 25000
+weapon_class			= sniper_rifle
+inv_weight				= 5.5
+
+;---TTX---------------------------------------------------------------------------
+hit_power           		= 2.0, 2.0, 2.0, 2.0
+hit_impulse		 			= 100
+hit_type 					= fire_wound
+fire_distance           = 1000
+bullet_speed		 	= 15000	;начальная скорость пули
+rpm                     = 30
+rpm_empty_click         = 200
+
+use_aim_bullet			= false		;Поддерживается ли первая суппер пуля
+time_to_aim				= 1.0
+
+hud                     = wpn_gauss_hud
+
+misfire_probability        = 0.005 ;вероятность осечки при максимальном износе  !!!old - now not working
+;изношенность, при которой появляется шанс осечки
+misfire_start_condition		= 0.6
+;изношеность при которой шанс осечки становится константным
+misfire_end_condition		= 0.1
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= 0.002
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= 0.02
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= 0.0012
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= 0.0012
+
+ammo_limit				= 60
+ammo_current			= 10
+ammo_elapsed			= 0
+
+ammo_mag_size			= 10
+ammo_class				= ammo_gauss, ammo_gauss_cardan
+hand_dependence         = 1
+single_handed           = 0
+
+
+;---DOF-------------------------------------------------------------------------
+;zoom_dof				= 0.5, 1.0, 180
+reload_dof				= 0.0, 0.5, 5, 1.7
+
+;--дисперсия----------------------------------------------------------------------------
+;базовая дисперсия
+fire_dispersion_base	= 0.001 ;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor	= 1.4f
+crosshair_inertion   	= 5
+
+;отдача
+cam_relax_speed         = 3	;скорость возврата в исходное положение
+cam_relax_speed_ai      = 360	;скорость возврата в исходное положение
+cam_dispersion          = 0.01	;увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc		= 0.01	;увеличениe cam_dispersion с каждым выстрелом
+cam_dispersion_frac		= 1.0	;ствол будет подыматься на cam_dispersion*cam_dispersion_frac +- cam_dispersion*(1-cam_dispersion_frac)
+cam_max_angle			= 0.01	;максимальный угол отдачи
+cam_max_angle_horz		= 0.01	;(degree) maximum shot horizontal degree
+cam_step_angle_horz		= 0.01	;(degree) size of step camera moved in horizontal position while shooting
+
+PDM_disp_base 			= 2.0
+PDM_disp_vel_factor 	= 2.0
+PDM_disp_accel_factor 	= 2.0
+PDM_disp_crouch	 		= 1.0
+PDM_disp_crouch_no_acc 	= 1.0
+
+zoom_cam_relax_speed        = 3   ; scope & ironsight
+zoom_cam_relax_speed_ai     = 360
+zoom_cam_dispersion         = 0.01
+zoom_cam_dispersion_inc     = 0.01
+zoom_cam_dispersion_frac    = 1.0
+zoom_cam_max_angle          = 0.01
+zoom_cam_max_angle_horz     = 0.01
+zoom_cam_step_angle_horz    = 0.01
+
+fire_dispersion_condition_factor = 5	;увеличение дисперсии в процентах при максимальном износе
+;-------------------------------------------------------------------------------
+holder_range_modifier	= 2.85           ; во сколько раз увеличивается eye_range
+holder_fov_modifier		= 1.0           ; во сколько раз увеличивается eye_fov
+
+min_radius              = 0
+max_radius              = 50
+
+hit_probability_gd_novice	= 1
+hit_probability_gd_stalker	= 1
+hit_probability_gd_veteran	= 1
+hit_probability_gd_master	= 1
+
+;-------------------------------------------------------------------------------
+slot                    = 2                ; // secondary
+animation_slot          = 2                ; type of the animation that will be used
+
+inv_name				= st_wpn_gauss
+inv_name_short			= st_wpn_gauss
+
+inv_grid_width			= 5
+inv_grid_height			= 2
+inv_grid_x				= 10
+inv_grid_y				= 6
+
+upgr_icon_x			= 298
+upgr_icon_y			= 939
+upgr_icon_width		= 297
+upgr_icon_height   	= 81
+
+kill_msg_x				= 166
+kill_msg_y				= 59
+kill_msg_width			= 82
+kill_msg_height			= 23
+
+position                = -0.026, -0.070, 0.0
+orientation             = 0, 0, 0
+
+fire_point				= 0.00,0.12,0.69
+fire_point2				= 0.00,0.12,0.69
+
+flame_particles         = weapons\generic_weapon_gauss
+smoke_particles	 		= weapons\generic_weapon07
+rpm_empty_click 		= 120
+
+shell_point		 		= 0.0, 0.129, 0.192
+shell_dir		 		= 0.0, 0.0, 0.4
+shell_particles	 		= weapons\generic_shells
+
+;--STRAP PARAMETERS-----------------------------------------------------------------
+;под мишкой
+strap_position         	= -0.26,-0.11,0.15			; position (offset) and orientation of the weapon when it is strapped
+strap_orientation      	= -15,-9,110				; (3rd person view in degrees)
+strap_bone0					= bip01_spine2
+strap_bone1					= bip01_spine1
+
+startup_ammo            = 10
+visual                  = dynamics\weapons\wpn_gauss\wpn_gauss.ogf
+
+light_disabled				= false
+light_color		 			= 1.3,1.5,2
+light_range		 			= 4.0
+light_var_color		 	= 0.05
+light_var_range		 	= 0.5
+light_time 		 			= 0.5
+
+ph_mass			 			= 3
+
+;addons
+scope_status				= 1
+silencer_status			= 0
+grenade_launcher_status	= 0
+
+zoom_enabled				= true
+zoom_rotate_time			= 0.25
+scope_zoom_factor			= 5		;ПСО-1 4X
+
+scope_texture				= wpn_crosshair_l85
+scope_name 					= wpn_addon_scope
+scope_x 						= 60
+scope_y 						= -2
+
+;звуки
+snd_draw			  			= weapons\svd_draw
+snd_holster					= weapons\generic_holster
+snd_shoot					= weapons\gauss_shoot
+snd_empty					= weapons\gen_empty, 0.5
+snd_reload					= weapons\gauss_reload
+snd_close					= weapons\generic_close
+snd_bore					= weapons\draw_silent
+snd_bore1					= weapons\gauss_bore_2
+
+[wpn_gauss_hud]:hud_base
+zoom_hide_crosshair		= true
+attach_place_idx			= 0
+item_visual             = dynamics\weapons\wpn_gauss\wpn_gauss_hud.ogf
+
+
+hands_position				= -0.063000,-0.144499,0.096000
+hands_orientation			= -1.150000,0.150000,2.649999
+
+
+
+hands_position_16x9				= -0.032000,-0.161999,0.073500
+hands_orientation_16x9			= -1.050000,0.300000,2.949999
+
+item_position				= 0.000746,-0.000321,0.003479
+item_orientation			= 1.239378,-0.134046,-2.052052
+
+shell_point					= 0,0,0
+shell_dir               = 0.0, 1.0, 0.0
+shell_bone					= wpn_body
+
+fire_point				= 0,		0.058, 0.788
+fire_bone               = wpn_body
+
+aim_hud_offset_pos		= -0.102000,0.019500,-0.148000
+aim_hud_offset_rot		= -0.002000,0.000600,-0.010000
+
+aim_hud_offset_pos_16x9     		= -0.111500,0.032500,-0.130500
+aim_hud_offset_rot_16x9     				= 0.012500,0.002500,-0.010000
+
+gl_hud_offset_pos			= 0,0,0
+gl_hud_offset_rot			= 0,0,0
+
+lean_hud_offset_pos		= 0,0,0
+lean_hud_offset_rot		= 0,0,0
+
+anm_show						= gauss_draw
+anm_hide             	= gauss_holster
+anm_shots					= gauss_shoot
+anm_reload					= gauss_reload
+anm_bore						= gauss_idle_bore
+anm_idle             	= gauss_idle
+anm_idle_aim				= gauss_idle_aim
+anm_idle_moving 			= gauss_idle_moving
+anm_idle_sprint			= gauss_idle_sprint
+
+;-----------------------------------------------------------------------------
+; Уникальные
+;-----------------------------------------------------------------------------
+
+;<--UMIROTVORITEL
+[pri_a17_gauss_rifle]:wpn_gauss	;Gauss UMIROTVORITEL
+$spawn          = "weapons\uniq\pri_a17_gauss_rifle"
+quest_item 		= true
+story_id = pri_a17_gauss_rifle
+hud 							= wpn_gauss_hud
+inv_name                = st_wpn_umirotvoritel
+description				= st_wpn_umirotvoritel_descr
+
+upgr_icon_x			= 298
+upgr_icon_y			= 939
+upgr_icon_width		= 297
+upgr_icon_height   	= 81
+
+; ttc
+hit_power           		= 2.0, 2.0, 2.0, 2.0
+hit_impulse		 			= 100
+hit_type 					= fire_wound
+
+hit_probability_gd_novice	= 1
+hit_probability_gd_stalker	= 1
+hit_probability_gd_veteran	= 1
+hit_probability_gd_master	= 1
+
+fire_distance           = 2000
+bullet_speed		 	= 100000	;начальная скорость пули
+;rpm                     = 20
+
+ammo_limit				= 10
+ammo_current			= 10
+ammo_elapsed			= 0
+
+ammo_mag_size			= 10
+ammo_class				= ammo_gauss
+
+;изношенность, при которой появляется шанс осечки
+misfire_start_condition		= 0.6
+;изношеность при которой шанс осечки становится константным
+misfire_end_condition		= 0.3
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= 1
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= 1
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= 0.00001
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= 0.00002

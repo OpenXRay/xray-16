@@ -1,0 +1,164 @@
+--[[------------------------------------------------------------------------------------------------------------------
+Схема "Охотник за вертолётами"
+Чугай Александр
+--------------------------------------------------------------------------------------------------------------------]]
+
+local def_attack_dist = 1000 -- расстояние, на котором вертолёт может быть атакован
+local def_actor_dist  = 20  -- расстояние, на котором игрок может быть атакован
+
+function get_nearest_heli(npc_position, attack_dist_sqr)
+--	print_table(db.heli)
+
+	local heli = nil
+
+	for k,v in pairs(db.heli) do
+		if v:position():distance_to_sqr(npc_position) <= attack_dist_sqr and
+		   (heli == nil or
+		   v:position():distance_to_sqr(npc_position) < heli:position():distance_to_sqr(npc_position))
+		then
+			heli = v
+		end
+	end
+
+	return heli
+end
+---------------------------------------------------------------------------------------------------------------------
+-- Эвалуатор свойства "можно пострелять по вертолёту"
+---------------------------------------------------------------------------------------------------------------------
+local overrides
+
+class "evaluator_shoot" ( property_evaluator )
+
+function evaluator_shoot:__init( name, a ) super( nil, name )
+	self.a = a
+end
+
+function evaluator_shoot:evaluate()
+	if not self.a.enabled then
+		return false
+	end
+
+	overrides = xr_logic.generic_scheme_overrides( self.object )
+
+	if overrides and overrides.heli_hunter ~= nil and
+	   xr_logic.pick_section_from_condlist(db.actor, self.object, overrides.heli_hunter) ~= nil
+	then
+--		if self.a.heli == nil then
+			-- поиск вертолета
+			self.a.heli = get_nearest_heli(self.object:position(), self.a.attack_dist_sqr)
+--		end
+
+		if self.a.heli == nil then
+			return false
+		end
+
+		-- Проверка на то, что вертолет еще живой.
+		if not bind_heli.is_heli_alive(self.a.heli) then
+			self.a.heli = nil
+			return false
+		end
+
+		-- проверка не потерялся ли вертолет.
+--		if db.heli[self.a.heli:id()] ~= nil and
+--		printf( "dist=%d", self.a.heli:position():distance_to_sqr(self.object:position()) )
+		if self.a.heli:position():distance_to_sqr(self.object:position()) > self.a.attack_dist_sqr then
+			self.a.heli = nil
+			return false
+		end
+
+		-- Проверка на то, что враг-игрок не подошел слишком близко
+		local best_enemy = self.object:best_enemy()
+		if best_enemy and
+		   best_enemy:id() == db.actor:id()
+		then
+		    if db.actor:position():distance_to_sqr(self.object:position()) < self.a.attack_actor_sqr then
+				return false
+		    end
+		end
+
+		-- Проверка на то, что денжер-игрок не подошел слишком близко
+		local best_danger = self.object:best_danger()
+		if best_danger then
+		   local bd_object = best_danger:object()
+		   if bd_object ~= nil and
+		      bd_object:id() == db.actor:id()
+		   then
+				if best_danger:position():distance_to_sqr(self.object:position()) < self.a.attack_actor_sqr then
+					return false
+				end
+		   end
+		end
+
+		return true
+	end
+
+	return false
+end
+
+----------------------------------------------------------------------------------------------------------------------
+-- Действие "стрелять по вертолёту"
+----------------------------------------------------------------------------------------------------------------------
+class "action_shoot" ( action_base )
+
+function action_shoot:__init( name, a )  super ( nil, name )
+	self.a = a
+end
+
+function action_shoot:initialize()
+	action_base.initialize( self )
+
+end
+
+function action_shoot:execute()
+	action_base.execute( self )
+
+	state_mgr.set_state( self.object, "threat_fire", nil, nil,
+	                     {look_object = self.a.heli})
+end
+
+function action_shoot:finalize()
+	action_base.finalize( self )
+end
+
+----------------------------------------------------------------------------------------------------------------------
+
+function add_to_binder( npc, ini, scheme, section, storage )
+	--'printf( "DEBUG: add_to_binder: scheme='%s'", scheme )
+
+	local manager = npc:motivation_action_manager()
+
+	manager:add_evaluator( xr_evaluators_id.chugai_heli_hunter_base, evaluator_shoot( "heli_hunter", storage ) )
+
+	local action = this.action_shoot( "action_shoot", storage )
+	action:add_precondition( world_property(stalker_ids.property_alive,               true  ) )
+	action:add_precondition( world_property(xr_evaluators_id.chugai_heli_hunter_base, true  ) )
+	action:add_effect      ( world_property(xr_evaluators_id.chugai_heli_hunter_base, false ) )
+	manager:add_action( xr_actions_id.chugai_heli_hunter_base, action )
+
+	action = manager:action( xr_actions_id.alife )
+	action:add_precondition( world_property( xr_evaluators_id.chugai_heli_hunter_base, false ) )
+
+	action = manager:action( stalker_ids.action_combat_planner )
+	action:add_precondition( world_property( xr_evaluators_id.chugai_heli_hunter_base, false ) )
+
+	action = manager:action( stalker_ids.action_danger_planner )
+	action:add_precondition( world_property( xr_evaluators_id.chugai_heli_hunter_base, false ) )
+end
+
+function set_scheme( npc, ini, scheme, section )
+	--'printf( "DEBUG: set_scheme: scheme='%s' section='%s'", scheme, utils.to_str(section) )
+
+	local a = xr_logic.assign_storage_and_bind( npc, ini, scheme, section )
+
+	a.attack_dist_sqr = math.pow( utils.cfg_get_number( ini, section, "dist", npc, false, def_attack_dist ), 2 )
+	a.attack_actor_sqr = math.pow( utils.cfg_get_number( ini, section, "actor_dist", npc, false, def_actor_dist ), 2 )
+	a.heli = nil
+	a.enabled = true
+end
+
+function disable_scheme(npc, scheme)
+	local st = db.storage[npc:id()][scheme]
+	if st then
+		st.enabled = false
+	end
+end

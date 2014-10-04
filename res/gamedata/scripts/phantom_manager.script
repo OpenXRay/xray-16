@@ -1,0 +1,33 @@
+class "PhantomManager"
+function PhantomManager:__init()
+	self.phantom_count		= 0;
+end
+g_PhantomManager			= PhantomManager();
+
+function PhantomManager:add_phantom		()
+	self.phantom_count		= self.phantom_count + 1;
+end
+function PhantomManager:remove_phantom	()
+	self.phantom_count		= self.phantom_count - 1;
+end
+function PhantomManager:spawn_phantom	(pos)
+	level.spawn_phantom		(pos);
+end
+
+class "Phantom"		(object_binder)
+function Phantom:__init(obj) super(obj)
+	g_PhantomManager:add_phantom();
+end
+function Phantom:net_destroy()
+	g_PhantomManager:remove_phantom();
+end
+function bind(obj)
+	obj:bind_object	(Phantom(obj))
+end
+
+function spawn_phantom		(pos)
+	g_PhantomManager:spawn_phantom(pos);
+end
+function phantom_count		()
+	return g_PhantomManager.phantom_count;
+end

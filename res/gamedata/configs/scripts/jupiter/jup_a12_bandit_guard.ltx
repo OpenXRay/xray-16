@@ -1,0 +1,37 @@
+[logic@jup_a12_bandit_guard]
+active = walker@bandit_guard_stand
+suitable = {=check_npc_name(jup_a12_bandit_guard) !surge_started} true
+prior = 200
+on_hit = hit
+on_death = death
+
+[walker@bandit_guard_stand]
+path_walk = bandit_guard_stand_walk
+path_look = bandit_guard_stand_look
+combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true, {+jup_a12_bandit_guard_can_be_easily_killed -jup_a12_merc_attack_started} true, {-jup_a12_merc_attack_started =check_enemy_smart(jup_a12_merc)} true, false
+meet = meet@guard_base
+on_info = {=dist_to_actor_le(15) +jup_a12_actor_paid_to_cashier -jup_a12_bandit_taunt} %+jup_a12_bandit_taunt =play_sound(jup_a12_bandit_say_jump)%
+on_info2 = {+jup_a12_bandit_guard_killed  =is_alive(jup_a12_bandit_guard)} %=kill_npc%
+on_info3 = {-jup_a12_actor_has_pass_to_containers -jup_a12_actor_enemy_to_bandits =actor_in_zone(jup_a12_sr_containers_kampzone)} %+jup_a12_actor_enemy_to_bandits%
+on_info4 = {-jup_a12_actor_has_pass_to_containers -jup_a12_bandits_warning_actor =dist_to_actor_le(22)} %+jup_a12_bandits_warning_actor =play_sound(jup_a12_bandits_warning_actor)%
+
+[meet@guard_base]
+close_distance = 15
+close_anim = {+jup_a12_actor_has_pass_to_containers} guard_na, threat_na
+close_victim = actor
+close_snd_hello = nil
+close_snd_bye = nil
+far_distance = 45
+far_anim = {+jup_a12_actor_has_pass_to_containers} guard, threat
+far_victim = actor
+far_snd = nil
+snd_on_use = nil
+use	= {!actor_enemy !actor_has_weapon} true
+meet_dialog	= {+jup_a12_actor_has_pass_to_containers} jup_a12_bandit_guard_visited, jup_a12_bandit_guard_start
+trade_enable = false
+
+[hit]
+on_info = {+jup_a12_bandit_guard_can_be_easily_killed =is_alive -jup_a12_merc_attack_started -jup_a12_bandit_guard_killed} %+jup_a12_bandit_guard_killed%
+
+[death]
+on_info = %+jup_a12_bandit_guard_killed%

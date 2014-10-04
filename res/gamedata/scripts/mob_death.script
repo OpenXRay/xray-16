@@ -1,0 +1,44 @@
+----------------------------------------------------------------------------------------------------
+-- Mob death
+----------------------------------------------------------------------------------------------------
+-- Разработчик: Andrey Fidrya (Zmey) af@svitonline.com
+----------------------------------------------------------------------------------------------------
+
+class "mob_death"
+
+function mob_death:__init(obj, storage)
+	self.object = obj
+	self.st = storage
+end
+
+function mob_death:death_callback(victim, who)
+	if who ~= nil then
+		printf("mob_death: [%s] killed by [%s]", victim:name(), who:name())
+		local death = db.storage[victim:id()].death
+		if not death then
+			death = {}
+			db.storage[victim:id()].death = death
+		end
+		death.killer = who:id()
+		death.killer_name = who:name()
+	else
+		printf("mob_death: [%s] killed by [Unknown]", victim:name())
+		death.killer = -1
+		death.killer_name = nil
+	end
+
+	if xr_logic.try_switch_to_another_section(victim, self.st, db.actor) then
+		return
+	end
+end
+
+---------------------------------------------------------------------------------------------------------------------
+function add_to_binder(npc, ini, scheme, section, storage)
+ 	local action = mob_death(npc, storage)
+ 	xr_logic.subscribe_action_for_events(npc, storage, action)
+end
+
+function set_scheme(npc, ini, scheme, section, gulag_name)
+	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
+	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, npc)
+end

@@ -1,0 +1,84 @@
+[logic@work_killer_3]
+active = walker@walk1
+suitable = {=check_npc_name(jup_b19_merc_3)}
+prior = 100
+on_death = death
+on_hit = hit
+
+[walker@walk1]
+path_walk = merc3_1_walk
+path_look = merc3_1_look
+on_signal = merc1_1 | walker@walk2
+def_state_moving1 = rush
+combat_ignore_cond = {=check_enemy_name(jup_b19_freedom_yar:actor:jup_b19_zombied) -jup_b19_fight_begun} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+wounded = wounded
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@walk2]
+path_walk = merc3_2_walk
+path_look = merc3_2_look
+on_signal = merc1_2 | walker@walk3
+def_state_moving1 = rush
+combat_ignore_cond = {=check_enemy_name(jup_b19_freedom_yar:actor:jup_b19_zombied) -jup_b19_fight_begun} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+wounded = wounded
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@walk3]
+path_walk = merc3_3_walk
+path_look = merc3_3_look
+on_signal = merc1_3 | walker@walk4
+def_state_moving1 = rush
+combat_ignore_cond = {=check_enemy_name(jup_b19_freedom_yar:actor:jup_b19_zombied) -jup_b19_fight_begun} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+wounded = wounded
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@walk4]
+path_walk = merc3_4_walk
+path_look = merc3_4_look
+on_signal = merc1_4 | {-jup_b19_mercs_can_fight} walker@walk5  %+jup_b19_mercs_can_fight%
+on_info = {+jup_b19_mercs_can_fight} walker@walk5
+on_info2 = {+jup_b19_fight_begun} walker@walk5
+def_state_moving1 = rush
+combat_ignore_cond = {=check_enemy_name(jup_b19_freedom_yar:actor:jup_b19_zombied) -jup_b19_fight_begun} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+danger = danger
+wounded = wounded
+out_restr = jup_b19_zombied_restrictor
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@walk5]
+path_walk = merc3_10_walk
+path_look = merc3_10_look
+wounded = wounded
+combat_ignore_cond = {=check_enemy_name(jup_b19_freedom_yar:actor:jup_b19_zombied) -jup_b19_fight_begun} true, {=check_enemy_name(sim_default) =fighting_dist_ge(30)} true
+;out_restr = jup_b19_sr_actor_close_by_yar
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+
+[wounded]
+hp_state = 0|wounded_heavy@help_heavy
+hp_state_see = 0|wounded_heavy@help_heavy
+hp_victim = 0|nil
+hp_fight = 0|false
+hp_cover = 0|false
+
+[hit]
+on_info = {-jup_b19_fight_begun} %+jup_b19_fight_begun%
+
+[danger]
+ignore_distance = 0
+
+[death]
+on_info = %=inc_counter(merc_death)%

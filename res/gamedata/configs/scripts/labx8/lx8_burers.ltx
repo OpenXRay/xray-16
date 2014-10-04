@@ -1,0 +1,55 @@
+[logic@burer]
+active = mob_home
+suitable = {=check_npc_name(lx8_burer)} true
+prior = 100
+monster_job = true
+on_hit = hit_1
+
+[mob_home]
+path_home = burer_home
+actor_friendly = false
+home_min_radius = 30
+home_max_radius = 30
+aggressive = true
+out_restr = lx8_sr_burer_out_restr
+
+[hit_1]
+on_info = {=hit_by_actor !actor_in_zone(lx8_sr_burer_out_restr)} %=restore_health% 
+
+
+[logic@burer_2]
+active = mob_home@2
+suitable = {=check_npc_name(lx8_burer_2)} true
+prior = 100
+monster_job = true
+on_hit = hit_2
+
+[mob_home@2]
+path_home = burer_home
+actor_friendly = false
+home_min_radius = 30
+home_max_radius = 30
+aggressive = true
+out_restr = lx8_sr_burer_out_restr
+
+[hit_2]
+on_info = {=hit_by_actor !actor_in_zone(lx8_sr_burer_out_restr)} %=restore_health% 
+
+
+[logic@burer_3]
+active = mob_home@3
+suitable = {=check_npc_name(lx8_burer_3)} true
+prior = 100
+monster_job = true
+on_hit = hit_3
+
+[mob_home@3]
+path_home = burer_home
+actor_friendly = false
+home_min_radius = 30
+home_max_radius = 30
+aggressive = true
+out_restr = lx8_sr_burer_out_restr
+
+[hit_3]
+on_info = {=hit_by_actor !actor_in_zone(lx8_sr_burer_out_restr)} %=restore_health% 

@@ -1,0 +1,244 @@
+function pri_b301_zulus_reward(first_speaker, second_speaker)
+	dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "wpn_pkm_zulus")
+end
+
+function pri_a17_reward(first_speaker, second_speaker)
+	if has_alife_info("pri_a17_reward_well") then
+		dialogs.relocate_money_to_actor(first_speaker, second_speaker, 7500)
+	elseif has_alife_info("pri_a17_reward_norm") then
+		dialogs.relocate_money_to_actor(first_speaker, second_speaker, 4000)
+	elseif has_alife_info("pri_a17_reward_bad") then
+		dialogs.relocate_money_to_actor(first_speaker, second_speaker, 3000)
+	end
+end
+
+function actor_has_pri_a17_gauss_rifle(first_speaker, second_speaker)
+	return db.actor:object("pri_a17_gauss_rifle") ~= nil
+end
+
+function actor_hasnt_pri_a17_gauss_rifle(first_speaker, second_speaker)
+	return not actor_has_pri_a17_gauss_rifle(first_speaker, second_speaker)
+end
+
+-- передача артефакта игроку от проводника в память о выполненном заданиия на Юпитере
+
+function transfer_artifact_af_baloon(first_speaker, second_speaker)
+	dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "af_baloon")
+end
+
+-- плата за телепорт игрока на Затон через Юпитер (диалог с проводником с Юпитера)
+
+function pay_cost_to_guide_to_zaton(first_speaker, second_speaker)
+	if has_alife_info("zat_b215_gave_maps") then
+		dialogs.relocate_money_from_actor(first_speaker, second_speaker, 1000)
+	else
+		dialogs.relocate_money_from_actor(first_speaker, second_speaker, 3000)
+	end
+end
+
+-- проверка, платежеспособности игрока за телепорт на Затон через Юпитер
+
+function jup_b43_actor_has_10000_money(first_speaker, second_speaker)
+	if has_alife_info("zat_b215_gave_maps") then
+		return db.actor:money() >= 3000
+	end
+	return db.actor:money() >= 5000
+end
+
+function jup_b43_actor_do_not_has_10000_money(first_speaker, second_speaker)
+	return not jup_b43_actor_has_10000_money(first_speaker, second_speaker)
+end
+
+-- плата за телепорт игрока на Юпитер (диалог с проводником с Юпитера)
+
+function pay_cost_to_guide_to_jupiter(first_speaker, second_speaker)
+	dialogs.relocate_money_from_actor(first_speaker, second_speaker, 7000)
+end
+
+-- проверка платежеспособности игрока за телепорт на Юпитер
+
+function jup_b43_actor_has_7000_money(first_speaker, second_speaker)
+	return db.actor:money() >= 7000
+end
+
+function jup_b43_actor_do_not_has_7000_money(first_speaker, second_speaker)
+	return db.actor:money() < 7000
+end
+
+-- Pripyat B35
+
+function pri_b35_transfer_svd(first_speaker, second_speaker)
+	dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "wpn_svd")
+	dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "ammo_7.62x54_7h1")
+end
+
+function pri_b35_give_actor_reward(first_speaker, second_speaker)
+	local amount = 1
+	if has_alife_info("pri_b35_secondary") then amount = 3 end
+	dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "ammo_7.62x54_7h1", amount)
+end
+
+-- Medic support
+local medic_items_table = {
+						["basic"] = {
+									["conserva"] 	= 2,
+									["medkit_army"] = 2,
+									["antirad"] 	= 2,
+									["bandage"] 	= 4,
+									},
+
+						["advanced"] = {
+									["conserva"] 			= 3,
+									["medkit_army"] 		= 3,
+									["antirad"] 			= 3,
+									["bandage"] 			= 5,
+									},
+
+						["elite"] = {
+									["conserva"] 			= 4,
+									["medkit_army"] 		= 5,
+									["antirad"] 			= 5,
+									["bandage"] 			= 8,
+									},
+					}
+
+function pri_a25_medic_give_kit(first_speaker, second_speaker)
+	local kit = "basic"
+
+	if has_alife_info("pri_a25_actor_needs_medikit_advanced_supply") then
+		kit = "advanced"
+	elseif has_alife_info("pri_a25_actor_needs_medikit_elite_supply") then
+		kit = "elite"
+	end
+
+	for k,v in pairs(medic_items_table) do
+		if k == kit then
+			for kk,vv in pairs(v) do
+				dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, kk, vv)
+			end
+			disable_info(k)
+		end
+	end
+end
+
+local supp_table = {
+					["supply_ammo_1"] = {["ammo_9x18_fmj"] = 2, ["ammo_9x18_pmm"] = 1},
+					["supply_ammo_2"] = {["ammo_9x19_fmj"] = 2, ["ammo_9x19_pbp"] = 1},
+					["supply_ammo_3"] = {["ammo_11.43x23_fmj"] = 2, ["ammo_11.43x23_hydro"] = 1},
+					["supply_ammo_4"] = {["ammo_12x70_buck"] = 10, ["ammo_12x76_zhekan"] = 5},
+					["supply_ammo_5"] = {["ammo_5.45x39_fmj"] = 2, ["ammo_5.45x39_ap"] = 1},
+					["supply_ammo_6"] = {["ammo_5.56x45_ss190"] = 2, ["ammo_5.56x45_ap"] = 1},
+					["supply_ammo_7"] = {["ammo_9x39_pab9"] = 1, ["ammo_9x39_ap"] = 1},
+					["supply_ammo_8"] = {["ammo_7.62x54_7h1"] = 1},
+					["supply_ammo_9"] = {["ammo_pkm_100"] = 1},
+					["supply_grenade_1"] = {["grenade_rgd5"] = 3, ["grenade_f1"] = 2},
+					["supply_grenade_2"] = {["ammo_vog-25"] = 3},
+					["supply_grenade_3"] = {["ammo_m209"] = 3},
+					}
+
+function pri_a22_army_signaller_supply(first_speaker, second_speaker)
+	for k,v in pairs(supp_table) do
+		if has_alife_info(k) then
+			for kk,vv in pairs(v) do
+				dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, kk, vv)
+			end
+			disable_info(k)
+		end
+	end
+end
+
+function pri_a22_give_actor_outfit (first_speaker, second_speaker)
+	dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "military_outfit")
+	dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "helm_battle")
+end
+
+-- Pripyat B305
+function pri_b305_actor_has_strelok_notes(first_speaker, second_speaker)
+	return db.actor:object("jup_b10_notes_01") ~= nil
+			or db.actor:object("jup_b10_notes_02") ~= nil
+			or db.actor:object("jup_b10_notes_03") ~= nil
+end
+
+function pri_b305_actor_has_strelok_note_1(first_speaker, second_speaker)
+	return db.actor:object("jup_b10_notes_01") ~= nil
+			and db.actor:object("jup_b10_notes_02") == nil
+			and db.actor:object("jup_b10_notes_03") == nil
+end
+
+function pri_b305_actor_has_strelok_note_2(first_speaker, second_speaker)
+	return db.actor:object("jup_b10_notes_02") ~= nil
+			and db.actor:object("jup_b10_notes_01") == nil
+			and db.actor:object("jup_b10_notes_03") == nil
+end
+
+function pri_b305_actor_has_strelok_note_3(first_speaker, second_speaker)
+	return db.actor:object("jup_b10_notes_03") ~= nil
+			and db.actor:object("jup_b10_notes_01") == nil
+			and db.actor:object("jup_b10_notes_02") == nil
+end
+
+function pri_b305_actor_has_strelok_note_12(first_speaker, second_speaker)
+	return db.actor:object("jup_b10_notes_01") ~= nil
+			and db.actor:object("jup_b10_notes_02") ~= nil
+			and db.actor:object("jup_b10_notes_03") == nil
+end
+
+function pri_b305_actor_has_strelok_note_13(first_speaker, second_speaker)
+	return db.actor:object("jup_b10_notes_01") ~= nil
+			and db.actor:object("jup_b10_notes_03") ~= nil
+			and db.actor:object("jup_b10_notes_02") == nil
+end
+
+function pri_b305_actor_has_strelok_note_23(first_speaker, second_speaker)
+	return db.actor:object("jup_b10_notes_02") ~= nil
+			and db.actor:object("jup_b10_notes_03") ~= nil
+			and db.actor:object("jup_b10_notes_01") == nil
+end
+
+function pri_b305_actor_has_strelok_note_all(first_speaker, second_speaker)
+	return db.actor:object("jup_b10_notes_01") ~= nil
+			and db.actor:object("jup_b10_notes_02") ~= nil
+			and db.actor:object("jup_b10_notes_03") ~= nil
+end
+
+
+function pri_b305_sell_strelok_notes(first_speaker, second_speaker)
+	local amount = 0
+	local items_table = {
+						"jup_b10_notes_01",
+						"jup_b10_notes_02",
+						"jup_b10_notes_03",
+						}
+
+	for k,v in pairs(items_table) do
+		if db.actor:object(v) ~= nil then
+			dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, v)
+			amount = amount + 1
+		end
+	end
+
+	if db.actor:object("wpn_gauss") ~= nil then
+		dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "ammo_gauss", 2)
+	else
+		dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "medkit_scientic", 3)
+	end
+
+	if amount > 1 then
+		dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "af_fire")
+	end
+
+	if amount > 2 then
+		dialogs.relocate_item_section_to_actor(first_speaker, second_speaker, "af_glass")
+		db.actor:give_info_portion("pri_b305_all_strelok_notes_given")
+	end
+end
+
+function pri_a17_sokolov_is_not_at_base(first_speaker, second_speaker)
+	if has_alife_info("pri_a15_sokolov_out") and has_alife_info("pas_b400_sokolov_dead") then
+		return true
+--	elseif has_alife_info("pri_a16_sokolov_on_pripyat") and not xr_conditions.squad_exist(nil,nil, {"pri_a16_sokolov_squad"}) then
+--		return true
+	end
+
+	return false
+end

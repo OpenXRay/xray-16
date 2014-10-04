@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_af_baloon_descr">
+		<text>Tento artefakt je sloћen z nмkolika dutэch organickэch formacн a vypouљtн chemickou lбtku schopnou neutralizovat radioaktivnн ибstice v tмle, aniћ by zpщsobily љkody na zdravн. S ohledem na velkou efektivitu je tento artefakt velmi ћбdanэ.</text>
+	</string>
+	<string id="st_af_baloon_name">
+		<text>Bublina</text>
+	</string>
+	<string id="st_af_blood_descr">
+		<text>Zarudlб formace zkompresovanэch a fosilizovanэch rostlin, hlнny a zvншecнch pozщstatkщ. Dokбћe ибsteиnм neutralizovat chemickй jedy. Vyzaшuje radiaci.</text>
+	</string>
+	<string id="st_af_blood_name">
+		<text>Kamennб krev</text>
+	</string>
+	<string id="st_af_cristall_descr">
+		<text>Tento artefakt vznikб v anomбlnнch zуnбch s vysokou termбlnн aktivitou. Aktivnм pohlcuje ћбr a pшitom zщstбvб chladnэ na dotek. Vyzaшuje radiaci.</text>
+	</string>
+	<string id="st_af_cristall_flower_descr">
+		<text>Tento artefakt je vytvoшen z kamene podobnйho ћule, deformovanйmu extrйmnн gravitaиnн silou. Vэslednб krystalickб formace nebyla dodnes vмdou objasnмna. Dokбћe poskytnout ибsteиnou ochranu pшed psionickэmi vlnami a je radioaktivnн.</text>
+	</string>
+	<string id="st_af_cristall_flower_name">
+		<text>Kamennэ kvмt</text>
+	</string>
+	<string id="st_af_cristall_name">
+		<text>Krystal</text>
+	</string>
+	<string id="st_af_dummy_battery_descr">
+		<text>Tento artefakt obsahuje elektrostatickй elementy, ale vмdci prozatнm nedokбzali identifikovat pшesnй fyzickй podmнnky potшebnй pro jeho vznik. Artefakt je v Zуnм populбrnн a cenмn nбvљtмvnнky i trvalэmi obyvateli pro svщj posilovacн ъиinek, aиkoli pшi prodlouћenйm pouћнvбnн mщћe tмlo znaиnм oslabit. Vyzaшuje radiaci.</text>
+	</string>
+	<string id="st_af_dummy_battery_name">
+		<text>Baterka</text>
+	</string>
+	<string id="st_af_dummy_dummy_descr">
+		<text>Tento artefakt byl dшнv povaћovбn za odpad bez jakэchkoli uћiteиnэch vlastnostн. Vмdci ale nedбvno zjistili, ћe pokud je drћen v kontaktu s tмlem, mб stimulaиnн ъиinky na nervovэ systйm. Vyzaшuje radiaci.</text>
+	</string>
+	<string id="st_af_dummy_dummy_name">
+		<text>Skoшбpka</text>
+	</string>
+	<string id="st_af_dummy_glassbeads_descr">
+		<text>Tento artefakt zщstбvб pro vмdce velkou zбhadou. Nicmйnм je znбmo, ћe emise vytvбшenй pulsy uvnitш silnмjљнch ибstн artefaktu zpщsobujн rychlejљн srбћenн krve a vytvбшejн ochrannй vrstvy ztvrdlй krve. Tento artefakt tedy znaиnм zvyљuje rychlost hojenн zranмnн. Vyzaшuje radiaci.</text>
+	</string>
+	<string id="st_af_dummy_glassbeads_name">
+		<text>Mбminy korбlky</text>
+	</string>
+	<string id="st_af_electra_flash_descr">
+		<text>Tento elektrostatickэ artefakt dokбћe pohlcovat elektшinu a pozdмji ji vypustit jako vэboj. Blesk dokбћe chrбnit svйho nositele pшed elektrickэmi љoky aћ do vэљe 5000 voltщ. Vyzaшuje radiaci.</text>
+	</string>
+	<string id="st_af_electra_flash_name">
+		<text>Blesk</text>
+	</string>
+	<string id="st_af_electra_moonlight_descr">
+		<text>Tento unikбtnн elektrostatickэ artefakt pod vlivem psionickэch vln rezonuje. Stalkeшi se nauиili artefakt vyladit tak, ћe rezonuje v opaиnй fбzi oproti zdroji emisн a tak ve vэsledku jejich ъиinky neutralizuje. Vyzaшuje radiaci.</text>
+	</string>
+	<string id="st_af_electra_moonlight_name">
+		<text>Mмsниnн svмtlo</text>
+	</string>
+	<string id="st_af_electra_sparkler_descr">
+		<text>Nejzбшivмjљн pшedstavitel elektrostatickйho typu artefaktщ dokбћe vyrovnбvat fluktuace v elektrickйm poli. Vyzaшuje radiaci.</text>
+	</string>
+	<string id="st_af_electra_sparkler_name">
+		<text>Jiskшiи</text>
+	</string>
+	<string id="st_af_eye_descr">
+		<text>Tento artefakt pшipomнnajнcн lidskй oko zvyљuje rychlost lidskйho metabolismu a urychluje hojenн zranмnн. Zkuљenн stalkeшi tvrdн, ћe oko takй pшinбљн љtмstн. Vyzaшuje radiaci. </text>
+	</string>
+	<string id="st_af_eye_name">
+		<text>Oko</text>
+	</string>
+	<string id="st_af_fire_descr">
+		<text>Tento artefakt vznikб v oblastech s velkou termбlnн aktivitou. Vyzaшuje silnй infraиervenй zбшenн, kterй zrychluje metabolickй procesy a hojн rбny pшнmo pшed oиima. Jelikoћ je tento artefakt velmi vzбcnэ, je takй velmi drahэ. Vyzaшuje radiaci.</text>
+	</string>
+	<string id="st_af_fire_name">
+		<text>Plamen</text>
+	</string>
+	<string id="st_af_fireball_descr">
+		<text>Aиkoli je Ohnivбk termбlnн artefakt, je moћnй pouћнvat ho bez obav z popбlenin. Artefakt je cenмn pro svou schopnost zachovбvat kolem sebe teplotu 25 stupтщ Celsia prakticky bez ohledu na okolн. Vyzaшuje radiaci.</text>
+	</string>
+	<string id="st_af_fireball_name">
+		<text>Ohnivбk</text>
+	</string>
+	<string id="st_af_fuzz_kolobok_descr">
+		<text>Relativnм vzбcnэ artefakt vznikajнcн v oblastech kontaminovanэch chemikбliemi je cenмn pro svou schopnost zhojit tйmмш jakбkoli zranмnн bмhem nмkolika minut. Z neznбmйho dщvodu vмdci mezi stalkery љншн tvrzenн, ћe artefakt naruљuje genetickэ kуd svйho nositele. Vyzaшuje radiaci.</text>
+	</string>
+	<string id="st_af_fuzz_kolobok_name">
+		<text>Koblнћek</text>
+	</string>
+	<string id="st_af_glass_name">
+		<text>Svмtluљka</text>
+	</string>
+	<string id="st_af_gold_fish_descr">
+		<text>Zlatб rybka vznikб nбsledkem interakce mezi vмtљнm poиtem gravitaиnнch anomбliн a sama o sobм vytvбшн silnй internн gravitaиnн pole, dнky kterйmu zanikб tнha pшedmмtщ v jeho okolн. Artefakt je velmi vhodnэ pro zvyљovбnн nosnosti, proto je po nмm vysokб poptбvka. Vyzaшuje radiaci.</text>
+	</string>
+	<string id="st_af_gold_fish_name">
+		<text>Zlatб rybka</text>
+	</string>
+	<string id="st_af_gravi_descr">
+		<text>Gravi vznikб z kovovэch substancн vystavenэch delљнmu pщsobenн gravitaиnнch anomбliн. Dнky tomu dokбћe vytvбшet antigravitaиnн pole a mnozн stalkeшi ho pouћнvajн na snнћenн tнhy svэch batohщ. Vyzaшuje radiaci.</text>
+	</string>
+	<string id="st_af_gravi_name">
+		<text>Gravi</text>
+	</string>
+	<string id="st_af_ice_descr">
+		<text>Tento artefakt na prvnн pohled pшipomнnб koblнћek. Obиas se tvrdн, ћe jde o koblнћek, jehoћ vlastnosti byly posнleny vystavenнm pщsobenн silnйho elektrickйho pole. Dнky svэm unikбtnнm vlastnostem dokбћe tento artefakt zvyљovat svalovэ tonus svйho nositele. Vyzaшuje radiaci.</text>
+	</string>
+	<string id="st_af_ice_name">
+		<text>Snмhovб vloиka</text>
+	</string>
+	<string id="st_af_medusa_descr">
+		<text>Tento gravitaиnн artefakt pшitahuje a absorbuje radioaktivnн ибstice a sniћuje ъиinek ozбшenн na lidskй tмlo. V Zуnм je bмћnэ a neoficiбlnм se mimo Zуnu pouћнvб k lйиenн nemoci z ozбшenн.</text>
+	</string>
+	<string id="st_af_medusa_name">
+		<text>Medъza</text>
+	</string>
+	<string id="st_af_mincer_meat_descr">
+		<text>Tento organickэ artefakt tvoшн deformovanб mutovanб zvншecн tkбт. Pokud se artefakt nachбzн v chemicky kontaminovanй zуnм, koncentruje chemikбlie ve vzduchu na slizkou tekutinu. Vyzaшuje radiaci.</text>
+	</string>
+	<string id="st_af_mincer_meat_name">
+		<text>Masovб kuliиka</text>
+	</string>
+	<string id="st_af_night_star_descr">
+		<text>Tento zбшнcн artefakt dokбћe vytvбшet lokбlnн smмrovanй gravitaиnн pole. Stalkeшi ho spolu s podobnэm artefaktem gravi иasto pouћнvajн k zvэљenн svй nosnosti. Vyzaшuje radiaci.</text>
+	</string>
+	<string id="st_af_night_star_name">
+		<text>Noиnн hvмzda</text>
+	</string>
+	<string id="st_af_soul_descr">
+		<text>Unikбtnн organickэ artefakt s unikбtnнmi vlastnostmi. Nмjak dokбћe zvyљovat schopnost tмla vyrovnбvat se se zranмnнm a poљkozenнm, aniћ by pшitom zvyљoval rychlost uklбdбnн toxinщ v tkбni. Dнky svэm ъиinkщm a atraktivnнmu vzhledu jde o velmi cenмnэ kousek. Vyzaшuje radiaci.</text>
+	</string>
+	<string id="st_af_soul_name">
+		<text>Duљe</text>
+	</string>
+	<string id="st_af_vyvert_descr">
+		<text>Tento bizarnм vytvarovanэ artefakt vznikб v mнstech se zvэљenou gravitaиnн aktivitou. Chovб se jako houba nasбvajнcн radioaktivnн ибstice a poskytuje tak ochranu pшed vnмjљн radiacн i pшed radioaktivnнmi ибsticemi, kterй uћ pronikly do tмla.</text>
+	</string>
+	<string id="st_af_vyvert_name">
+		<text>Kшivбk</text>
+	</string>
+	<string id="st_compass">
+		<text>Kompas</text>
+	</string>
+	<string id="st_compass_descr">
+		<text>Vzбcnэ artefakt, naposledy nalezenэ pшed nмkolika lety. Dokбћe identifikovat mezery mezi anomбlnнmi poli. Vмшн se, ћe umoћтuje prochбzet mezi komplexnнmi systйmy anomбliн, aniћ by byl jeho nositel ohroћen. Jen mбlokdo ale vн, jak ho sprбvnм pouћнvat.</text>
+	</string>
+	<string id="st_oasis_heart">
+		<text>Srdce Oбzy</text>
+	</string>
+	<string id="st_oasis_heart_descr">
+		<text>Tento artefakt byl nalezen v centru legendбrnн Oбzy. Jde zшejmм o krystalizovanou rostlinu, kterб zнskala lйиivй vlastnosti Oбzy. Na rozdнl od Oбzy je vљak artefakt extrйmnм radioaktivnн.</text>
+	</string>
+	<string id="st_af_glass_descr">
+		<text>Svмtluљka, vyskytujнcн se v dosud neprozkoumanэch polнch, vэraznм zrychluje regeneraci tkбnн a orgбnщ ћivэch organismщ a normalizuje metabolickй procesy. Tento artefakt mщћe tмћce zranмnйho stalkera dostat bмhem pбr vteшin zpбtky na nohy. Svмtluљka je vљak velice vzбcnб a radioaktivnн.</text>
+	</string>
+</string_table>

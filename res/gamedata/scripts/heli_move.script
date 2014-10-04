@@ -1,0 +1,294 @@
+--[[------------------------------------------------------------------------------------------------
+Helicopter movement
+Андрущенко Иван
+
+--------------------------------------------------------------------------------------------------]]
+local state_move = 0
+----------------------------------------------------------------------------------------------------
+class "heli_move"
+
+function heli_move:__init( obj, storage )
+	self.object     = obj
+	self.heliObject = obj:get_helicopter()
+	self.a          = storage
+
+		self.heli_fly = heli_fly.get_heli_flyer(obj)
+		self.heli_fire = heli_fire.get_heli_firer(obj)
+		self.heli_look = heli_look.get_heli_looker(obj)
+
+end
+
+
+
+function heli_move:reset_scheme( loading )
+	printf("heli_move: reset_scheme: %s", self.object:name())
+		self.a.signals = {}
+		self.heliObject:TurnEngineSound( self.a.engine_sound )
+----------------------------------Вейпоинты - Начало------------------------------------------------
+	if not level.patrol_path_exists(self.a.path_move) then
+		abort("Patrol path %s doesnt exist", self.a.path_move)
+	end
+
+	self.patrol_move = patrol(self.a.path_move)
+	self.patrol_move_info = utils.path_parse_waypoints(self.a.path_move)
+
+	if self.a.path_look then
+				if self.a.path_look == "actor" then
+						self.heli_fly:set_look_point(db.actor:position())
+						self:update_look_state()
+				else
+				self.patrol_look = patrol(self.a.path_look)
+						self.heli_fly:set_look_point(self.patrol_look:point( 0 ))
+						self:update_look_state()
+				if not self.patrol_look then
+					abort("object '%s': unable to find path_look '%s' on the map",
+						self.object:name(), self.a.path_look)
+				end
+				end
+	else
+		self.patrol_look = nil
+	end
+
+	self.max_velocity = self.a.max_velocity
+	if loading then
+
+		self.state            = xr_logic.pstor_retrieve( self.object, "st"  )
+
+		self.last_index       = xr_logic.pstor_retrieve( self.object, "li"  ) or nil
+		self.next_index       = xr_logic.pstor_retrieve( self.object, "ni"  ) or nil
+
+		self.was_callback     = xr_logic.pstor_retrieve( self.object, "wc"  )
+	else
+		self.last_index       = nil
+		self.next_index       = nil
+
+				self.heli_fly.max_velocity = self.max_velocity
+				self.heli_fly.heliLAccFW = self.max_velocity / 15
+				self.heli_fly.heliLAccBW = 2 * self.heli_fly.heliLAccFW / 3
+				self.heliObject:SetLinearAcc(self.heli_fly.heliLAccFW, self.heli_fly.heliLAccBW);
+
+		self.heliObject:SetMaxVelocity( self.max_velocity )
+
+		self.state                          = nil
+				self.stop_point                     = nil
+				self.by_stop_fire_fly               = false
+
+		self.was_callback                   = false
+		self._flag_to_wp_callback           = false
+				self.heli_fire.enemy_               = self.a.enemy_
+				self.heli_fire.enemy                = nil
+				self.heli_fire.flag_by_enemy        = true
+				if self.a.fire_point then
+						self.heli_fire.fire_point       = patrol(self.a.fire_point):point( 0 )
+				end
+				if self.a.max_mgun_dist then
+						self.heliObject.m_max_mgun_dist = self.a.max_mgun_dist
+				end
+				if self.a.max_rocket_dist then
+						self.heliObject.m_max_rocket_dist = self.a.max_rocket_dist
+				end
+				if self.a.min_mgun_dist then
+						self.heliObject.m_min_mgun_dist = self.a.min_mgun_dist
+				end
+				if self.a.min_rocket_dist then
+						self.heliObject.m_min_rocket_dist = self.a.min_rocket_dist
+				end
+
+				if self.a.use_mgun then
+						self.heliObject.m_use_mgun_on_attack = true
+				else
+						self.heliObject.m_use_mgun_on_attack = false
+				end
+				if self.a.use_rocket then
+						self.heliObject.m_use_rocket_on_attack = true
+				else
+						self.heliObject.m_use_rocket_on_attack = false
+				end
+				self.heli_fire.upd_vis = self.a.upd_vis
+				self.heli_fire:update_enemy_state()
+		self:update_movement_state()
+				if self.a.show_health then
+						self.heli_fire:cs_remove()
+						self.heli_fire.show_health = true
+						self.heli_fire:cs_heli()
+				else
+						self.heli_fire.show_health = false
+						self.heli_fire:cs_remove()
+				end
+				self.heliObject:UseFireTrail(self.a.fire_trail)
+	end
+end
+
+
+
+function heli_move:save()
+	xr_logic.pstor_store( self.object, "st",  self.state )
+----------------------------------Вейпоинты - Начало------------------------------------------------
+	xr_logic.pstor_store( self.object, "li",  self.last_index       or false )
+	xr_logic.pstor_store( self.object, "ni",  self.next_index       or false )
+----------------------------------Вейпоинты - Конец-------------------------------------------------
+	xr_logic.pstor_store( self.object, "wc",  self.was_callback )
+end
+
+function heli_move:update( delta )
+
+		if xr_logic.try_switch_to_another_section(self.object, self.a, db.actor) then
+					return
+		end
+		--self.heli_fire:update_enemy_state()
+	if self.was_callback then
+		self:update_movement_state()
+		self.was_callback = false
+	end
+		if self.a.path_look then
+				if self.a.path_look == "actor" then
+						self.heli_fly:set_look_point(db.actor:position())
+						if self.a.stop_fire then
+								if self.heliObject:isVisible( db.actor ) then
+										if not self.by_stop_fire_fly then
+												self.stop_point = self.object:position()
+												self.by_stop_fire_fly = true
+												self.was_callback = true
+												--'printf("Stop Fire!")
+										end
+								else
+										--'printf("Fly to next point!")
+										self.by_stop_fire_fly = false
+										self.was_callback = true
+								end
+						end
+				end
+				self:update_look_state()
+		end
+		if not self.a.path_look and self.heli_look.look_state then
+				self.heli_look:calc_look_point(self.heli_fly.dest_point, true)
+		end
+end
+
+function heli_move:update_movement_state()
+	--'printf("update_movement_state()")
+
+	self.state = state_move
+
+	if self.patrol_move then
+		if not self.last_index then
+			self.last_index = 0
+			self.next_index = 1
+		else
+			self.next_index = self.last_index + 1
+
+			if self.next_index >= self.patrol_move:count() then
+				self.next_index = 0
+			end
+		end
+	end
+		if not self.by_stop_fire_fly then
+				if self.patrol_move:count() > 2 then
+						self._flag_to_wp_callback = self.heli_fly:fly_on_point_with_vector(
+								self.patrol_move:point( self.last_index ),
+								self.patrol_move:point( self.next_index ),
+								self.max_velocity, self._flag_to_wp_callback, false)
+				else
+						if self.patrol_move:count() > 1 then
+								self._flag_to_wp_callback = self.heli_fly:fly_on_point_with_vector(
+										self.patrol_move:point( self.last_index ),
+										self.patrol_move:point( self.next_index ),
+										self.max_velocity, true, true)
+						else
+								self._flag_to_wp_callback = self.heli_fly:fly_on_point_with_vector(
+										self.patrol_move:point( self.last_index ),
+										self.patrol_move:point( self.last_index ),
+										self.max_velocity, true, true)
+						end
+				end
+		else
+				self._flag_to_wp_callback = self.heli_fly:fly_on_point_with_vector(
+						self.stop_point,
+						self.stop_point,
+						self.max_velocity, true, false)
+				self._flag_to_wp_callback = true
+		end
+end
+
+function heli_move:update_look_state()
+--'    printf("update_look_state()")
+		self.heli_fly:set_block_flook(true)
+		self.heli_fly:look_at_position()
+end
+
+function heli_move:waypoint_callback( obj, action_type, index )
+
+----------------------------------Вейпоинты - Начало------------------------------------------------
+	if not self._flag_to_wp_callback then
+				--'printf("heli_pos=[%d;%d;%d]",self.object:position().x,self.object:position().y,self.object:position().z)
+				--'printf("dist_to_dest_point=%d",self.heliObject:GetDistanceToDestPosition())
+
+		if self.patrol_move then
+			if index == self.last_index then
+				return
+			end
+
+			if index ~= -1 then
+				self.last_index = index
+			else
+		--' Выдать коллбек
+						if self.patrol_move_info[self.last_index] ~= nil then
+							local signal = self.patrol_move_info[self.last_index]["sig"]
+										if signal ~= nil then
+									self.a.signals[signal] = true
+										end
+						end
+								if self.patrol_move:count()>1 then
+										self.last_index = self.next_index
+								end
+			end
+		end
+	end
+
+----------------------------------Вейпоинты - Конец-------------------------------------------------
+
+
+--'	printf("Dist To Dest Point: %s", self.heliObject:GetDistanceToDestPosition())
+--'	printf("heli_move:waypoint_callback(): name=%s, index=%d", self.object:name(), index)
+
+	self.was_callback = true
+
+end
+
+---------------------------------------------------------------------------------------------------------------------
+
+function add_to_binder( npc, ini, scheme, section, storage )
+	printf( "DEBUG: add_to_binder: npc:name()='%s', scheme='%s', section='%s'", npc:name(), scheme, section )
+
+	local new_action = heli_move( npc, storage )
+
+	-- Зарегистрировать все actions, в которых должен быть вызван метод reset_scheme при изменении настроек схемы:
+	xr_logic.subscribe_action_for_events( npc, storage, new_action )
+end
+
+function set_scheme( npc, ini, scheme, section )
+	local a = xr_logic.assign_storage_and_bind( npc, ini, scheme, section )
+
+	a.logic = xr_logic.cfg_get_switch_conditions( ini, section, npc )
+
+	a.path_move         = utils.cfg_get_string( ini, section, "path_move", npc, true,  "")
+	a.path_look         = utils.cfg_get_string( ini, section, "path_look", npc, false, "")
+	a.max_velocity      = utils.cfg_get_number( ini, section, "max_velocity", npc, true, max_velocity )
+	a.enemy_            = utils.cfg_get_string( ini, section, "enemy", npc, false, "")
+	a.fire_point        = utils.cfg_get_string( ini, section, "fire_point", npc, false, "")
+	a.max_mgun_dist     = utils.cfg_get_number( ini, section, "max_mgun_attack_dist", npc, false )
+	a.max_rocket_dist   = utils.cfg_get_number( ini, section, "max_rocket_attack_dist", npc, false )
+	a.min_mgun_dist     = utils.cfg_get_number( ini, section, "min_mgun_attack_dist", npc, false )
+	a.min_rocket_dist   = utils.cfg_get_number( ini, section, "min_rocket_attack_dist", npc, false )
+	a.use_rocket        = utils.cfg_get_bool( ini, section, "use_rocket", npc, false, true )
+	a.use_mgun          = utils.cfg_get_bool( ini, section, "use_mgun", npc, false, true )
+	a.engine_sound      = utils.cfg_get_bool( ini, section, "engine_sound", npc, false, true )
+	a.upd_vis           = utils.cfg_get_number( ini, section, "upd_vis", npc, false, 10 )
+	a.stop_fire         = utils.cfg_get_bool( ini, section, "stop_fire", npc, false, false )
+	a.show_health       = utils.cfg_get_bool( ini, section, "show_health", npc, false, false )
+	a.fire_trail        = utils.cfg_get_bool( ini, section, "fire_trail", npc, false, false )
+	local st = db.storage[npc:id()]
+	st.invulnerable = utils.cfg_get_bool( ini, section, "invulnerable", npc, false, false )
+	st.immortal     = utils.cfg_get_bool( ini, section, "immortal",     npc, false, false )
+	st.mute         = utils.cfg_get_bool( ini, section, "mute",         npc, false, false )
+end

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="zat_a1_cutscene_phrase_1">
+		<text>En la maсana del 26 de abril de 1986, el reactor del bloque de energнa 4 de la central nuclear de Chernуbil quedу destruido tras una gran explosiуn tйrmica. El viento desplazу la nube radiactiva resultante por toda la URSS y tambiйn por Europa e incluso Amйrica.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_2">
+		<text>Las ramificaciones de este desastre son tan graves que el gobierno de la Uniуn Soviйtica se ve obligado a evacuar de urgencia a los residentes de las ciudades y pueblos cercanos.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_3">
+		<text>Las бreas contaminadas en un radio de 30 kilуmetros en torno a la central nuclear se convierten en una zona de exclusiуn poderosamente protegida.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_4">
+		<text>La operaciуn de Chernуbil continъa con la construcciуn de un sarcуfago reforzado con cemento sobre los restos de la central. La existencia de una fuente masiva de energнa, junto con el hecho de que el бrea ha quedado deshabitada, se traduce en la creaciуn de una red de laboratorios secretos.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_5">
+		<text>10 de junio de 2006. Un destello cegador ilumina la Zona, una explosiуn de luz seguida de un segundo de silencio total mientras varias nubes se evaporan en el cielo. Despuйs, un trueno sacude el suelo. La mayor parte de los soldados del gobierno que protegen el perнmetro fallecen al instante.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_6">
+		<text>2007. Los cientнficos siguen sin explicarse lo sucedido. Las escasas expediciones que se adentran en la Zona suelen terminar en tragedia, y los supervivientes afirman haber visto seres mutantes con increнbles habilidades.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_7">
+		<text>2009. Segъn diversos estudios, en la Zona viven entre 100 y 300 individuos desconocidos. Se llaman a sн mismos stalkers y se dedican a recoger formaciones anуmalas denominadas artefactos, que despuйs venden a cambio de considerables sumas de dinero.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_8">
+		<text>2010. A pesar de los cordones militares que rodean el perнmetro, el fenуmeno de los stalkers se multiplica. Pero йstos se mueven principalmente por los lнmites de la Zona. Todos los escasos intentos de adentrarse en la Zona han fracasado.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_9">
+		<text>2012. El stalker Strelok resuelve el secreto del Cauterizador cerebral, un poderoso emisor capaz de destruir mentes humanas, y logra desactivarlo. Despuйs, todos los stalkers se dirigen al centro de la Zona; algunos con la esperanza de encontrar un arsenal de artefactos, otros en busca del Genio.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_10">
+		<text>En estas circunstancias tan inestables, el consejo de defensa y de seguridad nacional de Ucrania decide poner en marcha una operaciуn inminente especial, conocida como la Operaciуn Puente. Docenas de helicуpteros transportan soldados hacia Chernуbil, moviйndose por los cielos por medio de mapas de campos de anomalнas. A pesar de lo meticuloso de los preparativos, la operaciуn es un fracaso y ningъn helicуptero regresa de la misiуn.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_11">
+		<text>El mayor Degtyarev, agente especial de la USS y antiguo stalker experimentado, es enviado a la Zona para investigar el fracaso de la operaciуn.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_12">
+		<text>El mayor, equipado con un fusil de asalto, vнveres para dos semanas y una radio para comunicarse con el cuartel general, comienza su viaje al centro de la Zona.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_13">
+		<text>Habla con varios stalkers pero sin resultado. Ninguno tiene informaciуn o no la quiere compartir.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_14">
+		<text>La Zona dista mucho de ser un complejo turнstico. No pasa un solo dнa sin que el mayor sea atacado por los mutantes o, peor aъn, la gente.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_15">
+		<text>Las comunicaciones con el cuartel general son, como mнnimo, poco ъtiles: la ъnica informaciуn veraz disponible son las coordenadas de los cinco helicуpteros estrellados. Estando a varios kilуmetros de la central, la radio del mayor se averнa.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_16">
+		<text>Degtyarev se queda solo.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_1">
+		<text>Como premio por completar con йxito la investigaciуn, Degtyarev es premiado con un ascenso anticipado al cargo de coronel. Pero йste rechaza ocupar un cуmodo puesto de oficina y en su lugar solicita ser enviado a la Zona como observador permanente del servicio de seguridad.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_2">
+		<text>La informaciуn de Degtyarev sobre los dispositivos psнquicos pone en alerta a sus superiores. Toda la informaciуn de los laboratorios X se elimina de los archivos militares y se clasifica como altamente confidencial. Todo el personal de la USS presente en la Zona recibe уrdenes de no revelar los datos descubiertos en los laboratorios bajo ningъn concepto.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_3">
+		<text>Se realizaron varios experimentos tomando como base diversos documentos tйcnicos sobre el objeto 62. Tras una serie de pruebas, se decidiу no seguir adelante con el despliegue a gran escala del arma dado el alto coste de municiуn que supondrнa. De todas formas, existen pruebas de que todavнa se sigue trabajando en el desarrollo del fusil Gauss.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_4_a">
+		<text>Tras fracasar en su intento de capturar la nave, Sultбn y su grupo abandonaron Skadovsk. Esto creу un ambiente de relativa seguridad entre los stalkers, pero tambiйn un aumento desmesurado del nъmero de artefactos vendidos a Barbas, impulsando la popularidad de su negocio. Skadovsk se hizo tan famoso como Los 100 Rads.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_4_b">
+		<text>El grupo de Sultбn se estableciу con fuerza en Skadovsk, y la nave se convirtiу en una base de bandidos. Barbas se negу a seguir pagando un porcentaje de sus beneficios y montу un grupo de stalkers para explorar las regiones vнrgenes de la Zona. Los intentos por parte de los stalkers para recuperar el control de la nave cesaron rбpidamente tras echar por la borda a varios individuos problemбticos para dar ejemplo y dejarlos morir en las emisiones.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_4_c">
+		<text>Skadovsk siguiу siendo el hogar de todos aquellos que tuvieron la suerte de llegar allн. Los bandidos intentaron imponer su "ley" en la nave, pero los stalkers los mantuvieron a raya y se instaurу una frбgil tranquilidad en la nave.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_5_a">
+		<text>Por desgracia, esta situaciуn no durу mucho tiempo. Los chupasangres de una guarida cercana a Skadovsk consiguieron llegar a la nave y empezaron a atacar a plena luz del dнa. Se organizу una misiуn para acabar con el problema, pero fracasу en su intento de despejar los tъneles. Poco despuйs, una oleada de chupasangres aniquilу a todos los residentes de la nave.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_5_b">
+		<text>Tras la destrucciуn de la guarida de chupasangres, los mutantes no consiguieron cambiar significativamente la situaciуn de Skadovsk. Por un breve tiempo, la vieja nave se convirtiу en un punto de relativa estabilidad en el mundo siempre cambiante de la Zona.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_6_a">
+		<text>Libertad se ganу la confianza de los stalkers de la estaciуn de Yanov. Deber organizу un ataque para intentar recuperar el territorio perdido, pero el teniente coronel Shulga muriу poco despuйs en un tiroteo. El escuadrуn de Deber se disolviу poco despuйs de perder a su lнder.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_6_b">
+		<text>Gracias a los refuerzos y a la creciente popularidad de Deber entre los stalkers, su escuadrуn liberу a la estaciуn de Yanov de las garras de Libertad. Tras una salvaje batalla, Loki y su escuadrуn fueron aniquilados.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_6_c">
+		<text>En la estaciуn de Yanov se creу un equilibrio muy frбgil entre los escuadrones de Libertad y Deber. Hartos de luchar sin descanso, muchos soldados abandonaron sus facciones para unirse a los stalkers libres. </text>
+	</string>
+	<string id="pri_a28_outro_phrase_7_a">
+		<text>La expediciуn organizada por los profesores Hermann y Ozersky fue todo un йxito. Los datos recopilados ayudaron en el desarrollo de nuevos y exclusivos dispositivos y drogas, por lo que las subvenciones a programas de investigaciуn en la Zona aumentaron considerablemente.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_7_b">
+		<text>La expediciуn cientнfica organizada por los profesores Hermann y Ozersky no reuniу datos suficientes y fue cancelada. Los profesores regresaron al mundo exterior para dedicarse a otras actividades.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_8_a">
+		<text>Las historias de Garry sobre la lucha del ejйrcito contra los peligros de Pripyat despertaron mucho interйs, y pronto varios grupos comenzaron a explorar la ciudad fantasma. A pesar de los constantes ataques de Monolith, los stalkers consiguieron hacerse con el antiguo campamento enemigo, y desde allн organizaron ataques a la ciudad, de forma lenta pero constante.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_8_b">
+		<text>Las historias de Garry sobre el final del ejйrcito desanimaron a los stalkers en su intento por entrar en Pripyat. Los pocos que lo intentaron vieron fenуmenos inexplicables y aterradores que aсadieron mбs toques sombrнos a su ya de por sн oscura leyenda.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_9">
+		<text>La leyenda del Oasis dejу de serlo. La identidad de los que consiguieron llegar a la anomalнa secreta se convirtiу en tema de conversaciуn habitual entre los stalkers. Muchos aventureros siguieron intentando encontrar el Oasis, algo de lo que se aprovecharon los bandidos, que se ofrecнan a guiar a los novatos hacia dicho lugar para tenderles una trampa una vez lejos de sus compaсeros stalkers.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_10">
+		<text>Los escuadrones de mercenarios siguen activos en la Zona. Su creciente interйs en los laboratorios secretos los puso en el punto de mira de los operativos de la USS. Sin embargo, fracasaron todos los intentos por descubrir la identidad del cliente que pagaba a los mercenarios.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_11_a">
+		<text>El бrea en torno a la estaciуn de Yanov sigue atrayendo a un nъmero creciente de stalkers. La ausencia de mutantes peligrosos y la abundancia de бreas anуmalas ha provocado que muchos se refieran a dicha zona como “la cueva del tesoro”.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_11_b">
+		<text>El бrea en torno a la estaciуn de Yanov se convirtiу en uno de los lugares mбs peligrosos de la Zona. Cada vez menos stalkers regresaban de sus incursiones en ella; muchos morнan a manos de los mutantes sin haberse alejado siquiera de sus campamentos. Entre ellos estб Zveroboi, que muriу en su ъltima cacerнa, mientras perseguнa a una quimera.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_12_a">
+		<text>Zulu volviу a la base principal de Deber de la central de Rostok. Nadie sabe de quй discutiу con el lнder de Deber, el general Voronin, pero poco despuйs le vieron dirigiendo un gran escuadrуn de camino al centro de la Zona.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_12_b">
+		<text>Los rumores sobre el final de Zulu llegaron a oнdos del lнder de Deber, el general Voronin. Para sorpresa de muchos, Voronin decidiу premiarle de forma pуstuma con el escudo de plata, la mбxima condecoraciуn.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_13_a">
+		<text>Vano se trasladу a los almacenes militares controlados por Libertad. Su personalidad alegre y optimista le hizo tan popular como se merecнa. Terminу dirigiendo a un grupo de investigadores de бreas anуmalas.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_13_b">
+		<text>Los stalkers de la estaciуn de Yanov se siguen acordando del talento natural y de la bondad de Vano. Todos parecen estar de acuerdo en que Vano cometiу un grave error al intentar buscar el camino hacia Pripyat, y que por eso tuvo tan triste final.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_14_a">
+		<text>Se creу en la Zona un grupo nuevo de stalkers, bien entrenado pero sin objetivos claros. Se rumoreaba que estaba formado por antiguos soldados de Monolith. Su lнder se llama Strider.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_14_b">
+		<text>Pocos echaron en falta a Strider, la ъnica persona que intentу entender y ayudar a los que cayeron bajo el influjo del monolito.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_15_a">
+		<text>El teniente segundo Sokolov siguiу volando por toda la Zona y su aviуn fue abatido por mercenarios en Limansk. Dos semanas mбs tarde fue recogido por una patrulla cerca del Cordуn. Sokolov cambiу los aviones de combate por los vuelos civiles poco despuйs.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_15_b">
+		<text>A la lista de bajas durante la Operaciуn Puente se ha aсadido un nuevo nombre: “Teniente segundo O.N. Sokolov. Fallecido en combate.”</text>
+	</string>
+	<string id="pri_a28_outro_phrase_16">
+		<text>Bъho contactу con clientes del exterior de la Zona. Intercambia informaciуn y, de ser ciertos los rumores, uno de sus mejores clientes es la USS.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_17">
+		<text>Unos stalkers se vieron obligados a cobijarse en la vieja barcaza de Noй durante una emisiуn especialmente poderosa. Poco despuйs, la barca fue asaltada por una horda de snorks y los stalkers se dieron cuenta de que ese lugar era una fortaleza pequeсa pero sуlida. Tambiйn se sorprendieron con la manada de pseudocachorros que el mismo Noй azuzу contra los snorks.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_18_a">
+		<text>Tras enterarse del final de sus amigos, Cardбn abandonу su carrera como stalker. Superу su alcoholismo y se fue a Yanov, donde se aliу con Nitro para crear un taller de reparaciones. Ambos tйcnicos dedicaron todo su tiempo libre a construir un vehнculo que pudiese moverse por el entorno implacable de la Zona.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_18_b">
+		<text>Tras superar su alcoholismo, Cardбn se fue de Skadovsk. Los stalkers dicen que se marchу a buscar a sus amigos. Regresу unos dнas mбs tarde, herido e intoxicado por la radiaciуn. En cuanto se curaron sus heridas, se fue de la Zona para siempre.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_19_a">
+		<text>Strelok pasу a los comandantes de la USS la informaciуn que consiguiу en la central de Chernуbil. Esto provocу que el gobierno crease un instituto de investigaciуn del бrea anуmala de Chernуbil. Strelok ocupу el puesto de asesor cientнfico del instituto.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_19_b">
+		<text>Los descubrimientos de Strelok desaparecieron con йl. La informaciуn que encontrу en la central de Chernуbil habrнa servido para comprender mejor los misterios de la Zona, pero se quedу para siempre en sus confines. La Zona sabe guardar sus secretos.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_20_a">
+		<text>Cuando el coronel Kovalsky, comandante del grupo Pez Raya, regresу de la Zona, informу a sus superiores sobre los motivos del fracaso de la Operaciуn Puente. Tras una investigaciуn y el intento fallido por parte del alto mando de convertirlo en cabeza de turco, le concedieron una baja honrosa.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_20_b">
+		<text>El coronel Kovalsky, comandante del grupo Pez Raya, pereciу junto a gran parte de su escuadrуn. Sus cuerpos desaparecieron en la Zona, y como prueba de su sacrificio tan solo quedan unas viejas y amarillentas fotografнas en un museo militar.</text>
+	</string>
+</string_table>

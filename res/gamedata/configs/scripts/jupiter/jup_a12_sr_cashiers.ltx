@@ -1,0 +1,32 @@
+[logic]
+active = sr_idle@warning
+
+[sr_idle@warning]
+on_info = {+jup_a12_bandits_warning_actor} sr_idle@timer
+on_info2 = {+jup_a12_actor_has_pass_to_containers} sr_idle@wait
+on_info3 = {+jup_a12_actor_enemy_to_bandits} sr_idle@wait
+
+[sr_idle@timer]
+on_game_timer = 100 | sr_idle@warning %-jup_a12_bandits_warning_actor%
+on_info = {+jup_a12_actor_has_pass_to_containers} sr_idle@wait
+on_info2 = {+jup_a12_actor_enemy_to_bandits} sr_idle@wait
+
+[sr_idle@wait]
+on_info = {+jup_a12_actor_did_not_pay_to_cashier} %+jup_a12_actor_enemy_to_bandits%
+on_info2 = {+jup_a12_actor_paid_to_cashier} sr_idle@end
+on_info3 = {=is_squad_enemy_to_actor(jup_a12_bandit_cashier_squad)} %+jup_a12_actor_enemy_to_bandits%
+on_info4 = {+jup_a12_actor_enemy_to_bandits} sr_idle@after %=set_squad_enemy_to_actor(jup_a12_bandit_guard_squad) =set_squad_enemy_to_actor(jup_a12_bandit_chief_squad) =set_squad_enemy_to_actor(jup_a12_bandit_cashier_squad) =set_squad_enemy_to_actor(jup_a12_bandit_sim_squad)%
+on_info5 = {+jup_a12_stalkers_on_base} sr_idle@nil, {+jup_a12_stalker_prisoner_dead} sr_idle@nil
+on_info6 = {-jup_a12_gave_artefact_for_hostage -jup_a12_stalker_prisoner_dead +jup_a12_stalker_prisoner_free !talking} %+jup_a12_gave_artefact_for_hostage =scenario_autosave(st_save_jup_a12_gave_artefact_for_hostage)%
+
+[sr_idle@end]
+on_info = {+jup_a12_actor_enemy_to_bandits} sr_idle@after %=set_squad_enemy_to_actor(jup_a12_bandit_guard_squad) =set_squad_enemy_to_actor(jup_a12_bandit_chief_squad) =set_squad_enemy_to_actor(jup_a12_bandit_cashier_squad) =set_squad_enemy_to_actor(jup_a12_bandit_sim_squad)% 
+on_info2 = {-jup_a12_actor_enemy_to_bandits =is_squad_enemy_to_actor(jup_a12_bandit_cashier_squad)} %+jup_a12_actor_enemy_to_bandits%
+on_info3 = {+jup_a12_stalkers_on_base} sr_idle@nil, {+jup_a12_stalker_prisoner_dead} sr_idle@nil
+
+[sr_idle@after]
+on_info = {+jup_a12_actor_enemy_to_bandits +jup_a12_actor_choose_ransom -jup_a12_bandit_payment_started} %+jup_a12_actor_switched_from_ransom_to_power -jup_a12_actor_choose_self_or_ransom -jup_a12_actor_choose_ransom +jup_a12_actor_choose_power +jup_a12_actor_is_ready%
+on_info2 = {-jup_a12_actor_is_ready +jup_a12_stalker_prisoner_free_dialog_done} %+jup_a12_actor_is_ready%
+on_info3 = {+jup_a12_stalkers_on_base} sr_idle@nil, {+jup_a12_stalker_prisoner_dead} sr_idle@nil
+
+[sr_idle@nil]

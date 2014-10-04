@@ -1,0 +1,60 @@
+[volume]
+	EmittersNum		= 1
+	Hemi			= 0.2
+;	ConfinementScale	= 0.06
+;	Decay				= 0.994
+;	Type			= Fog
+
+;	Type				= Fire
+;	ConfinementScale	= 0.13		;	Fire default
+;	Decay				= 0.9995	;	Fire default
+
+	GravityBuoyancy		= 0.001;
+;	GravityBuoyancy		= -0.003;
+
+[emitter00]
+	Type 			= SimpleGaussian
+	Position 		= 35.0, 34.0, 7.0
+	Radius			= 0.15
+	Sigma			= 1
+	FlowSpeed		= 0.4
+;	FlowSpeed		= 0.5
+	FlowDirection	= -0.3, 0.5, 0.8
+	Density			= 1.0
+
+;	Density			= 1.2
+
+	ApplyDensity	= 1
+	ApplyImpulse	= 1
+
+[emitter01]
+;	Type 			= SimpleDraught
+	Type 			= SimpleGaussian
+;	Position 		= 10.0, 48.0, 45.0
+	Position 		= 10.0, 40.0, 45.0
+;	WorldPosition 	= 76.736, -16.126, 75.767
+;	WorldPosition 	= 76.736, -12.126, 75.767
+	Radius			= 0.15
+;	Radius			= 0.05
+	Sigma			= 1
+	FlowSpeed		= 0.2
+	FlowDirection	= 0.5, 0.0, 0.0
+	Density			= 1.0
+
+	ApplyDensity	= 0
+	ApplyImpulse	= 1
+
+[emitter11]
+	Type 			= SimpleGaussian
+;	Position 		= 35.0, 10.0, 40.0
+;	WorldPosition 	= 76.736, -16.126, 75.767
+	WorldPosition 	= 76.736, -12.126, 75.767
+;	Radius			= 0.15
+	Radius			= 0.35
+	Sigma			= 1
+	FlowSpeed		= 0.2
+	FlowDirection	= 0.0, 0.5, 0.0
+	Density			= 1.0
+
+	ApplyDensity	= 1
+	ApplyImpulse	= 1

@@ -1,0 +1,978 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="about_quests_dialog_bandit_0">
+		<text>Hele, mмl bych dotaz...</text>
+	</string>
+	<string id="about_quests_dialog_bandit_1">
+		<text>Tak to vybal.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_10">
+		<text>Co si myslнљ o Иiperovi?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_101">
+		<text>O Иiperovi? Jednoho krбsnэho dne si toho kokota odchytнme i se zboћнm, odvedeme si ho na тбkэ tichэ mнsto a pмknм mu zvalchujeme zбda!</text>
+	</string>
+	<string id="about_quests_dialog_bandit_11">
+		<text>Nevнљ nмco o Oбze?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_111">
+		<text>Jу, to je povedenб historka. V zбsadм jde o to, ћe borci ze Smeќбku si vymysleli pшнbмh o Oбze a dali si sakra zбleћet, aby byl uvмшitelnej a aby obsahoval i popis cesty. Pak se posadili na zadky a hezky иekali. No a co se nestalo? Napochodovalo jim tam tolik dщvмшivejch mamlasщ, ћe kdyћ je vљechny voљkubali, byli v balнku a odeљli ze Zуny. Kdo by se jim divil? Jsou na celej ћivot zajiљtмnн. Zщstal tu jenom jeden z nich, jakejsi Jogнn.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_112">
+		<text>Ћe kdyћ tam pшijdeљ, doиista se uzdravнљ ze vљeho. Znн to celkem slibnм - kdybych uћ nemмl kocoviny ani hemoroidy, to bych si nechal lнbit! Najdi Oбzu, zaшiп si tam lбznм a jsi vysmбtej.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_113">
+		<text>Proи bych o nн mмl nмco vмdмt? Jsou to jenom ћvбsty pro debily. Pravej chlap takovэ pниovinм nevмшн. Si to pшedstav... sedнљ si takhle v hospodм s pмknм vychlazenэm kouskem, kolem tebe se ћvanмj stalkeшi a dohadujou se, kde ta Oбza vlastnм je. Kaћdej z nich pшнsahб na vlastnн babiиku, ћe na tom mнstм byl... ale kde pшesnм to mб bejt, to se z nмjakэho dщvodu neshodnou.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_12">
+		<text>Neznбљ nмjakйho Strakбиe?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_121">
+		<text>Ale jo... staиil mi jeden pohled, abych poznal, ћe je to totбlnн vщl. I mezi stalkerama se o nмm povнdб, ћe je totбlnн vщl. Ale kde ho najнt, to fakt nevнm. Jestli tм tak zajнmб, budeљ si ho muset najнt sбm.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_122">
+		<text>Ne... jsi prvnн, od koho to jmйno slyљнm.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_13">
+		<text>Nevнљ, kdo mi mohl ukrбst vмci z osobnн skшнтky?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_131">
+		<text>Leda krysa. Mмl by ses optat papalбљщ na Janovм, ty jsou v lovenн krys fakt dobrэ.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_14">
+		<text>Kdo by dokбzal deљifrovat nмjakб data?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_141">
+		<text>No, prej ћe Nitrбk z Janova je dobrej. Kdyћ jeљtм nepracoval pro Povinnost, naљi chlapi si u nмj pбrkrбt nechali hacknout PDA cizнch stalkerщ... Jу, starэ zlatэ иasy.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_143">
+		<text>Mм se na tyhle vмdeckэ sraиiиky neptej, љйfiku. Radљi si seћeт hackera. Pбr let jsem љel sedмl a jednoho jsem potkal v lochu, ale kromм nмj ћбdnэho neznбm. Kdyћ mм pustili ven, jemu poшбd jeљtм zbejval bщr...</text>
+	</string>
+	<string id="about_quests_dialog_bandit_15">
+		<text>Mбm PDA toho obchodnнka z Povinnosti. Kdo by o nмj mohl mнt zбjem?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_151">
+		<text>Na Skadovsku bydlн obchodnнk, шнkajн mu Hejkal. Platн fakt sluљnм a chlapi mu иas od иasu stшelej i nмjakэ to PDA. Nemб ћбdnэ vlezlэ otбzky, to se taky cenн.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_152">
+		<text>Prakticky kdokoliv, kбmo. Vћdyќ si to vem: lidi z jeho vlastnн frakce by toho srбиe pohшbili zaћiva, ostatnн frakce by spustily solidnн rotyku, akorбt Hejkal na Zatonu dokбћe zaшнdit, aby to PDA zmizelo. S tim rozdнlem, ћe jenom Hejkal bude vмdмt, kde se to PDA zase objevн... volba je na tobм.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_16">
+		<text>Kde se tu dб sehnat nбшadн?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_165">
+		<text>Jestli potшebujeљ chirurgickэ nбиinн, prolezl bych nemocnice a zбchranky. Jestli potшebujeљ stavaшskэ nбшadн, mrkni se do lomu u Jupitera. No a jestli potшebujeљ kleљtм, kladiva a tak, prohledej nмjakou dнlnu.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_166">
+		<text>Proи bych to jako mмl vмdмt? Dokбћu ze stalkerщ vytшнskat prachy i bez nбшadн, sleduj... Klнdek, jenom si dмlбm prdel.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_17">
+		<text>Kdo umн odblokovat pamмќovэ modul?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_171">
+		<text>Dobrб otбzka! Jб jsem totiћ mнstnн specialista, ћe jo? Ha! Jseљ blbej, vole? Poptej se u nмjakejch vмdcщ nebo technikщ... pшece vбћnм nevмшнљ, ћe bych se v takovэch vмcech vyznal.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_172">
+		<text>Шeknu ti to takhle: naposledy, co jsem odemykal pamмќovej modul, byl jsem jeљtм na zбkladce a ten pamмќovej modul byla tшнapщlpalcovб disketa. S timhle bмћ votravovat jinэ experty.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_18">
+		<text>Kdo by se dokбzal vloupat do ocelovйho kontejneru?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_181">
+		<text>Znбљ Kardana ze Skadovsku? No tak ten se onehdб ztшнskal, popadl pбиidlo a zaиal po celэ lodi honit jednoho magora. Jak ale znбm Kardana, dokбzal by to pбиidlo pouћнt i k uћiteиnмjљнm ъиelщm. Tшeba by i vylomil sejf.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_182">
+		<text>Se sprбvnэm vybavenниkem bych to zmбknul tшeba i jб, ale kdo mб sebou do Zуny tahat nбшadн? Zajdi za technikama, vole, ty jsou v takovэch vмcech dobrэ. </text>
+	</string>
+	<string id="about_quests_dialog_bandit_19">
+		<text>Shбnнm jistйho Pahejla. Nevнљ, kde bych ho mohl najнt?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_191">
+		<text>Co jб vim. Optej se na Skadovsku u Sultбna. Takovej boss bude vмdмt, kde mб svэ potlouky.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_193">
+		<text>Jo, o tomhle hovadu uћ jsem slyљel. Normбlnм se vometб kolem Zatonu, takћe tady ho nehledej.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_2">
+		<text>Nevнљ nic o tмch zшнcenэch vrtulnнcнch?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_20">
+		<text>Koho by mohly zajнmat informace o zakladateli Povinnosti?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_201">
+		<text>A koho by takovэ echo nezajнmalo? Mбљ vznмtlivэ informace, kamarбde, nejrozumnмjљн bude obrбtit se na Hejkala ze Skadovsku. Tak si vydмlбљ pмknэ prachy, ale zбroveт si nenadмlбљ nepшбtele.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_22">
+		<text>Ne. Vћij se do mэ kщћe: nalevo mбm Povinnost, napravo Svobodu, za prdelн stalkery. A ty иekбљ, ћe budu sledovat oblohu?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_23">
+		<text>Hoљi шнkali, ћe nмjakej vrtulnнk se zamotal do drбtщ v Ћeleznэm lese. Jenomћe tam narazнљ i na kopu jinэch vмcн... dшнv nebo pozdмjc vlezeљ do anomбlie nebo ti poltergeist rozmбzne lebku.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_24">
+		<text>Jo, pбr chlapщ vidмlo, jak se jeden vrtulnнk zшнtil na ploљinu. Vtip je ale v tom, ћe tam nevede ћбdnб cesta. Ten vrtulnнk prej letмl divnм љejdrem, skoro jako kdyby si pilot nмco љlehnul.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_26">
+		<text>Slyљel jsem, ћe jeden vrtulnнk si chtмl hrбt na ponorku a љvihnul to sebou do baћin. Jak se dalo иekat, daleko nedoplul. A voda z baћin taky nenн zrovna dobrб na zdravн - jedy, chemikбlie a dalљн sraиky.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_3">
+		<text>Nepohybuje se tu armбda?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_30">
+		<text>Kdo by mohl mнt zбjem o mapu mнst mezi Zatonem a Jupiterem?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_301">
+		<text>Navigбtor, si myslim... je to tady v okolн hlavnн prщvodce. Bylo by fajn, kdyby mмl i nмjakэ mapy a neшнdil se poшбd jenom hvмzdama jako teп.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_31">
+		<text>Chlapi prej vidмli druћstvo vojбkщ, jak si to љine z jiћnн ploљiny pшнmo smмrem k ћoldбckэmu tбboru. Bylo jim jasno, ћe tam se zaиnou vмci srбt, a tak radљi vypadli pryи.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_32">
+		<text>Nмkdo mi vyprбvмl, jak se banda vojenskэch dutohlavщ snaћila vytahat svщj vercajk z vrtulnнku, co se jim zaboшil do baћin. Si to pшedstav: pмt hoљanщ v uniformбch poskakuje v moибle a snaћн se neuљpinit... ti museli nadбval tak, ћe by se i nбmoшnнk stydмl.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_33">
+		<text>Jeden borec mi povнdal, jak sledoval jistэho stalkera, aby ho potom mohl oљkubat. Najednou zaslechl vэstшely a tak. Ukбzalo se, ћe armбda tam bojuje se ћoldбkama. Borec zalehl a pшeиkal pшestшelku, jenomћe ten stalker mu mezitim vzal roha. Smщla, co?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_34">
+		<text>No, jeden kбmoљ zaћil docela srandovnн scйnu. Pшedstav si tu loп, co mб na palubм mlejn, a pшed nн si to rбzuje Noe, celej rozpбlenej, na plnou hubu nadбvб. Deset vojclщ couvб a snaћн se uklidit co nejdбl od nмj. Kбmoљ se tenkrбt pмknм zasmбl, pak je zas nechal svэmu osudu a odeљel.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_35">
+		<text>Ne, tady to bejvб dost oљemetnэ. Vљude chlapi s nabitэma puљkama a dalљн srandy... nemбm иas zkoumat, kdo z nich patшн k armбdм nebo kdo pro zmмnu k Povinnosti.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_4">
+		<text>Vнљ, jak se dб dostat do Pripjati?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_40">
+		<text>Koho bych si mohl najmout na ochranu vмdcщ?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_403">
+		<text>He he, jб a chlapi ti rбdi poslouћнme! Zaшнdнme tмm vмdcщm takovou ochranu, jakou jeљtм nezaћili! Stalkeшi a mutanti budou posranэ aћ za uљima, vљichni se vмdcщm budou vyhejbat obloukem! Zacбlujeљ kaћdej tejden na ruku a jsme dohodnutн. Nezapomeт na vбnoиnн pшнplatek!</text>
+	</string>
+	<string id="about_quests_dialog_bandit_41">
+		<text>Pмљky, kбmo. Hezky se projdi do Jupiteru a zeptej se tam, protoћe ze Zatonu do Pripjati ћбdnб pшнmб cesta nevede. To je vмdecky dokбzбno.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_43">
+		<text>Hele, vole, vypadбm snad jako nмjakej zasranej prщvodce? Mбm na иele vytetovбno „Zde se mщћete ptбt na kokotiny,“ nebo co? Bмћ se optat Navigбtor, ten je za takovэ odpovмdi placenej.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_44">
+		<text>Ne... beztak bych tam nemмl co dмlat. Nejsou tam stalkeшi, co by se dali oљkubat!</text>
+	</string>
+	<string id="about_quests_dialog_bandit_5">
+		<text>Mщћeљ mi doporuиit nмkoho, kdo tady nemб pшнliљ zбvazkщ a chtмl by vyrazit do Pripjati?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_51">
+		<text>Pripjaќ neni mнsto pro lidi, jako jsme my. Vћdyќ si to vem, samэ mutanti a anomбlie... teda stejnм jako ve zbytku Zуny, s tнm rozdнlem, ћe tam nenн koho okrбst. Aћ se do Pripjati nasбиkujou stalkeшi, dej nбm echo a my tam dorazнme, abysme zachovali pшirozenou rovnovбhu.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_57">
+		<text>Nemбm tuљenн, kбmo. Sorry.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_6">
+		<text>Naљel jsem divnou puљku. Nevнљ, kdo by o nн mohl nмco vмdмt?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_62">
+		<text>Bejt tebou, zeptбm se technikщ. Je to jejich prбce, vyznat se v takovэch vмcech, ne?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_63">
+		<text>Co jб vнm. Na Skadovsku majн nмjakэho Cardana, prej je to technickej gйnius a kdesi cosi. Zeptej se tшeba jeho... i kdyћ podle mм je to jen starej oћrala.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_7">
+		<text>Kde by se dal najmout nмkdo, kdo by vмdcщm pomohl s mмшenнm?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_73">
+		<text>To je snadnэ - svмш to naљim chlapщm. Teda ne ћe by vystudovali nмjakou љkolu ani nic takovэho, ale dej jim libovolnэho chlapa a oni mu vezmou mнry odshora aћ dolщ. Aћ si ho namмшej, uћ staин jenom vykopat pмknej hrobeиek, a to taky zvlбdneme!</text>
+	</string>
+	<string id="about_quests_dialog_bandit_8">
+		<text>Naљel jsem zvlбљtnн artefakt. Doporuиil bys mi kupce?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_81">
+		<text>Tak zvlбљtnн artefakt, povнdбљ? To se na to podнvejme... Podej mi ho, aќ si ho mщћu prohlнdnout... Ha, klнdek! Dмlбm si prdel. Ale bejt tebou, tak to moc neukazuju. Ne kaћdej mб takovej smysl pro humor jak jб.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_83">
+		<text>Ty si vмшнљ, kdyћ tady tak mбvбљ artefaktem. Respekt. Takћe ti poradнm: chlap, kterэho potшebujeљ, se jmenuje Fousби a sнdlн na Skadovsku. Nikdo nevн, jak paљuje artefakty ze Zуny, ale koupн od tebe prakticky cokoliv.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_9">
+		<text>Nedaleko odsud jsem naљel hnнzdo upнrщ. Co budeme dмlat?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_91">
+		<text>Ech, mбme snad na vэbмr? Vypadneme odsud, to udмlбme!</text>
+	</string>
+	<string id="about_quests_dialog_bandit_98">
+		<text>Zapomeт, ћe jsem nмco шekl.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_0">
+		<text>Mмl bych jednu otбzeиku...</text>
+	</string>
+	<string id="about_quests_dialog_dolg_1">
+		<text>Ptej se.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_10">
+		<text>Co si myslнљ o Иiperovi?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_101">
+		<text>O Иiperovi? Toho neznбm. Moћnб je v jinэm druћstvu, ne?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_11">
+		<text>Neslyљel jsi nмco o Oбze?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_111">
+		<text>Stalkerovskб pohбdka. To jsou celэ stalkeшi: vymэљlejн si pниoviny, potom jim sami uvмшej a zaиnou je hledat! Bejt tebou, prostм to pшehlнћнm. Tyhlety bбchorky jsou nakaћlivэ: uvмшнљ jednэ a zanedlouho budeљ vмшit, ћe Plniи pшбnн doopravdy existoval.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_112">
+		<text>Myslнљ to mнsto, kde se vљechny rбny zбzraиnм hojн a kde se ti magicky obnovн veљkerб energie? Mбm pro tebe novinku, kamarбde: nic takovэho neexistuje. Stalkeшi si to vymysleli, aby Zуna nepщsobila tak nebezpeиnм. Krutб realita se mб tak, ћe v Zуnм ћбdnэ bezpeиnэ mнsto nenajdeљ. Dбvej si pozor a za kaћdэch okolnostн zщstaт pшi zemi - snнlci tady v Zуnм dlouho nepшeћijou.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_113">
+		<text>Jasnм. Nachбzejн se tam hromady artefaktщ, kterэ se vyvaћujou zlatem, a navнc ti lнtajн prakticky samy do huby, zatнmco ty se vбlнљ v bahnм a nechбљ se masнrovat... to byl vtip, mimochodem. Jб na Oбzu nevмшнm, i kdyћ by to bylo pмknэ mнsto. Dala by se tam postavit nemocnice, kde by nemuseli bejt ћбdnэ doktoшi. Lidi by prostм pшiљli a automaticky se uzdravili. Ty vole, to je ъlet.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_12">
+		<text>Nepotkal jsi stalkera jmйnem Strakби?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_121">
+		<text>Mбm co dмlat, abych si zapamatoval jmйna lidн z Povinnosti, a ty se mм ptбљ jeљtм na stalkery? Majн zбkladnu na Skadovsku, zeptej se tam.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_122">
+		<text>Nepotkal.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_13">
+		<text>Nevнљ, kdo mi mohl ukrбst vмci z osobnн skшнтky?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_131">
+		<text>Ha, vidнљ? Na zбkladnм Povinnosti by se nic takovэho stбt nemohlo, ale tady se to hemћн hovadama ze Svobody. Pбtrej mezi nima.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_14">
+		<text>Kdo by mi mohl pomoct s deљifrovбnнm dat?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_141">
+		<text>Na janovskэm nбdraћн majн technika, jmenuje se Nitrбk. S elektronikou je fakt dobrej. Kdysi jsem zapomnмl heslo od svэho PDA a on ho hacknul bмhem pмti vteшin!</text>
+	</string>
+	<string id="about_quests_dialog_dolg_143">
+		<text>Zajdi si do Janova. Tam se poptej po Nitrбkovi, ten je na tohle machr.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_15">
+		<text>Mбm PDA toho obchodnнka z Povinnosti. Kdo by o nмj mohl mнt zбjem?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_151">
+		<text>Obchodnнka z Povinnosti? To nenн moћnэ! No ale jestli pшece jenom mбљ nмjakэ info, mмl bys ho pшedat podplukovnнku Љulgovi. Ten uћ si s tнm poradн.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_16">
+		<text>Kde se tu dб sehnat nбшadн?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_163">
+		<text>Kousek odsud je celб tovбrna. Teп uћ samozшejmм bude dost vybrakovanб, ale stejnм by ses mohl podнvat do jejнch skladщ.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_165">
+		<text>Bejt tebou, zaиnu u opuљtмnэch dнlen. Nмco by se taky mohlo najнt v obchodech.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_166">
+		<text>Tady nemбme nic neћ anomбlie a mutanty. Cha! Do anomбliн bych se radљi nedнval a bjureшi s kontrolorama ti taky ћбdnэ nбшadн neprodajн!</text>
+	</string>
+	<string id="about_quests_dialog_dolg_169">
+		<text>Teп jsi mnм pшipomnмl, ћe tady kousek pod mostem stojн vlak. Takovэ vlaky jsem vнdal uћ dшнv, cestujou v nich technickэ specialisti. Tшeba najdeљ nмjakэ nбшadн tam. </text>
+	</string>
+	<string id="about_quests_dialog_dolg_17">
+		<text>Kdo by zvlбdl odblokovat pamмќovэ modul?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_171">
+		<text>Nitrбk - to je jedinej chlap na janovskэm nбdraћн, kterej se v takovэch vмcech vyznб.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_172">
+		<text>To se budeљ muset optat technika. A jedinej uchбzejнcн technik љiroko daleko je Nitrбk z Janova.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_18">
+		<text>Kdo by se mohl vloupat do ocelovйho kontejneru?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_181">
+		<text>Prej ћe stalkeшi majн nмjakэho technika. Chlastб jako Dбn, ale ve svэ prбci se vyznб. Zkus to u nмj.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_182">
+		<text>Cha, to je jako kdybys to na mм zkusil s trezorem. S ocelovou srandou si neporadн urиitм ani Nitrбk... leda by mмla elektronickej zбmek, to by pak byla jinб.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_19">
+		<text>Hledбm jistйho Pahejla, patшн ke stalkerщm. Nevнљ, kde by byl k nalezenн?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_191">
+		<text>Proи se nezeptбљ stalkerщ? Vљechny svoje lidi znajн. O Hejlovi, nebo jak se to jmenuje, jsem nikdy neslyљel.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_2">
+		<text>Vнљ  nмco o tмch ztroskotanэch vrtulnнcнch?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_20">
+		<text>Kdo by mмl zбjem o informace tэkajнcн se zakladatele Povinnosti?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_201">
+		<text>Urиitм nбљ velitel. Nahlas vљechno, co vнљ, Љulgovi a vyslouћнљ si vdмk celэ Povinnosti.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_22">
+		<text>Jo, naљi prщzkumnнci zahlнdli vojenskou helikoptйru, jak se snaћн pшistбt na ploљe za Jupiterem. Prej se jim snaћili signalizovat, aby zmмnili kurs, ale pilot mмl asi plnэ ruce prбce s nмиim jinэm. Doufбm, ћe se ti bagouni v pohodм dostali pшes to minovэ pole.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_23">
+		<text>Tady nic nevнme. Mбme celkem omezenэ zprбvy... zkus se zeptat naљich lidн u Janova.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_25">
+		<text>Jedna naљe hlнdka nahlбsila, ћe jakбsi vojenskб helikoptйra se pokouљela nouzovм pшistбt na ploљe u Jupiteru. Bohuћel se nepovedlo a vrtulnнk prolнtl stшechou pшнmo do tovбrnн haly. Nemohl to nikdo pшeћнt - a naљe hlнdka po nehodм nezachytila ћбdnэ nouzovэ volбnн.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_3">
+		<text>Nevidмli jste tu nмjakй vojбky?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_30">
+		<text>Kdo by mohl mнt zбjem o mapu mнst mezi Zatonem a Jupiterem?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_301">
+		<text>Nмkdo, komu by se hodila. A teп narбћнm na Navigбtora - dмlб tu prщvodce na cestм mezi Janovem a Skadovskem. Ty mapy by mu urиitм pшiљly vhod.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_31">
+		<text>Vojбky? Tady jsem ћбdnэ nevidмl. Je ale pravda, ћe v tмhle mнstech moc иasu netrбvнme.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_35">
+		<text>Nedбvno jsme vidмli mrtvolu vojбka v minovэm poli. Nejspнљ patшil k tмm tэpkщm, co se zшнtili v tom vrtulnнku. Do maљiny se vejde aћ osm lidн plus posбdka a ti se logicky museli nмjak dostat pryи. Nikdo si ale nevљiml, kam љli.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_36">
+		<text>Jeden cбpek v uniformм vyшizoval cosi s vмdci v bunkru. Pшiљel teprv nedбvno. Vнc nevнm.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_37">
+		<text>Nedбvno jsme vidмli nмjakэho vojбka, jak vchбzн do budovy poblнћ protiletadlovйho komplexu Volchov. Je ale celkem moћnэ, ћe to byl jenom zombнk v uniformм.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_38">
+		<text>Stalkeшi se s jednou vojenskou jednotkou potkali u Jupiteru. Podle popisu to vypadalo na vэsadkбшe. Doprovбzel je neznбmej stalker a mмli namншeno k Pripjati. Popis znн celkem spolehlivм, ale z vlastnнch zkuљenostн vнm, ћe podobnэm historkбm se nedб moc vмшit.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_4">
+		<text>Vнљ, kudy se dб dojнt do Pripjati?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_40">
+		<text>Koho si mщћu najmout na ochranu vмdcщ?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_401">
+		<text>Nikdo neposkytne lepљн ochranu neћ Povinnost. Bмћ se do Janova domluvit s podplukovnнkem Љulgou. Urиitм to nмjak vymyslнte.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_402">
+		<text>Kdepak. Sice pro nм pracujou lidi ze Svobody, ale mi se do toho nehodlбme plйst. Celej den poslouchat, jak ti idioti melou jednu hovadinu za druhou... to uћ je lepљн umшнt.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_42">
+		<text>Povinnost nemб zatнm ћбdnэ dщvod, proи hledat cestu do Pripjati. Ale stejnм hromadнme informace. Mбme tшeba nepotvrzenэ zprбvy, ћe zpod Jupitera vedou  pшнmo do Pripjati podzemnн chodby. Jenomћe ovмшit tyhle informace, to by vyћadovalo dщkladnм prozkoumat kaћdou pнп tovбrny.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_43">
+		<text>Ne. Jestli shбnнљ podobnэ informace, budeљ si muset promluvit s civilnнm prщvodcem. Naљi prщzkumnнci majн svй prбce aћ po hlavu.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_44">
+		<text>Naљi prщzkumnнci prщbмћnм hledajн bezpeиnй cesty do Pripjati, ale zatнm bezvэslednм.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_5">
+		<text>Mohl bys mi doporuиit nмkoho, koho tady nic nedrћн a kdo by chtмl vyrazit do Pripjati?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_51">
+		<text>Povinnost mб v tэhle oblasti omezenэ moћnosti. Zeptej se naљich na Janovм.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_52">
+		<text>Љuљkб se, ћe u vмdcщ v bunkru bydlн i nмjakej typan od armбdy. Zkejsnul tam a nemб se jak dostat pryи. Vмdci totiћ slouћн termнny na dvanбct aћ osmnбct mмsнcщ, ti s nim nepщjdou, a on se nezvedne a nepщjde pмљky sбm aћ na okraj Zуny. Zeptej se ho, tшeba by љel s tebou .</text>
+	</string>
+	<string id="about_quests_dialog_dolg_53">
+		<text>Zkus se poptat mezi lidma, co touћej po dobrodruћstvн. Napшнklad na janovskэm nбdraћн ћije jeden stalker, jakejsi Vбтo. Je mu jedno, do jakэho prщseru se zase dostane, a tшeba by mohl bejt i uћiteиnej - je to frajer, dokбћe najнt cestu skrz anomбlii klidnм i se zavшenэma oиima.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_54">
+		<text>Uspoшбdej nбborovou kampaт v ъstavu pro duљevnм chorй... A nebo bych pro tebe mмl lepљн alternativu - bojovnнci Monolitu. Coћ mi pшipomнnб, nedбvno jsme jedno jejich druћstvo zahlнdli poblнћ protileteckэ zбkladny. Ti nejspнљ budou znбt cestu do Pripjati... Hele, vole, doufбm, ћe mм nebereљ vбћnм.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_56">
+		<text>Poptej se po dobrovolnнcнch u nбs v Povinnosti. Co tшeba Tulбk? Tomu jeљtм nepшidмlili misi, tak by ho podplukovnнk moћnб mohl poslat s tebou.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_57">
+		<text>Oba dva vнme, ћe nejlepљн bojovnнky najdeљ u Povinnosti. Bohuћel, v tuhle chvнli mбme jinэ starosti.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_6">
+		<text>Naљel jsem zvlбљtnн puљku. Neznбљ nмkoho, kdo by o nн mohl cokoliv vмdмt?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_62">
+		<text>No maucta! To je poшбdnэ dмlo! To sis vyrбbмl sбm, nebo jsi to vбћnм naљel? Nic podobnэho jsem jaktмћiv nevidмl... no, zeptej se u technikщ.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_7">
+		<text>Koho bych si mohl najmout, aby provбdмl mмшenн pro vмdce?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_71">
+		<text>To je blbб otбzka - Povinnost, jak jinak. Mбme spoustu zkuљenэch chlapщ a s vмdcema jsme spolupracovali uћ dшнv. Zajdi za podplukovnнkem Љulgou. Urиitм pro tu prбci splaљн nмjakэ volnэ druћstvo.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_72">
+		<text>Kdo by se tam chtмl motat, kdyћ bunkr strбћн Svoboda? Tihle zasranэ pacifisti jsou vмtљinu иasu tak zhulenэ, ћe je љance tak fifty, fifty, jestli odbouchnou nepшнtele nebo nмkoho z vlastnнch.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_8">
+		<text>Naљel jsem podivnэ artefakt. Doporuинљ mi kupce?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_81">
+		<text>Artefakty jsou vљechny podivnэ. A nedoporuиuju ti tahat tenhle kousek jen tak s sebou. Pшedej ho znalcщm a pusќ ho z hlavy.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_83">
+		<text>Mмl bys ho ukбzat stalkerщm – ti se v tмhle hovadinkбch vyznaj. A nebo jeљtм lнp, ukaћ ho tomu иlovмku, komu stalkeшi sami prodбvajн artefakty.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_9">
+		<text>Kousek odsud jsem naљel hnнzdo upнrщ. Co budeme dмlat?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_91">
+		<text>Druћstva Povinnosti se momentбlnм nevмnujн ъklidovэm akcнm v tэhle oblasti. Hnнzda budou muset poиkat.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_98">
+		<text>Jako kdybych nic neшekl.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_0">
+		<text>Poslyљ, mмl bych dotaz...</text>
+	</string>
+	<string id="about_quests_dialog_freedom_1">
+		<text>Vyval to.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_10">
+		<text>Co si myslнљ o Иiperovi?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_101">
+		<text>O tom jsem toho moc neslyљel. Radљi se poptej u stalkerщ... k tмm patшн, nebo ne?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_11">
+		<text>Neslyљel jsi nic o Oбze?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_111">
+		<text>Ledacos... musim uznat, ћe historka je to pмknб. Palбc v pustinбch, ostrov v mlze, zбmek v oblacнch... Љambala, Eden... Oбza. Kaћdej svobodnej иlovмk mб nмco, o иem s nн. Tak uћ to hold chodн.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_112">
+		<text>No, jeden stalker mi kdysi vyprбvмl zajнmavej pшнbмh. To byl myslнm prvnн иlovмk, od kterэho jsem slyљel o Oбze. Шнkal mi, ћe podle legendy se ti tam uzdravн vљechny zranмnн, uklidnнљ se a uvolnнљ se, skoro jako kdybys uћ nebyl v Zуnм. Od tэ doby jsem ho nevidмl... teprv po nмkolika dnech jsem si vzpomnмl, ћe kdysi kulhal, ale kdyћ ode mм odchбzel, tak љel zpшнma. Jo, a taky vypadal o pмknou шбdku let mladљн.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_113">
+		<text>Jo, stalkeшi mi od nн dokonce dali souшadnice... desatery rщznэ souшadnice. Kdyћ si je zakreslнm na mapu, vznikne okruh sahajнcн od Vypalovaиe aћ k elektrбrnм, zhruba uprostшed pak je Janov. Je dost moћnэ, ћe v Oбze stojнme pшнmo tady a teп, tak si to uћij!</text>
+	</string>
+	<string id="about_quests_dialog_freedom_12">
+		<text>Neznбљ stalkera jmйnem Strakби?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_121">
+		<text>Kdepak. Jб moc svobodnэch stalkerщ neznбm.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_122">
+		<text>Strakби? Ne, ale mб suprovэ jmйno.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_13">
+		<text>Nevнљ, kdo mi mohl ukrбst vмci z osobnн skшнтky?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_131">
+		<text>Ne, takovэ lidi u nбs nemбme. Jsou tu tэpci, co si z tvэho chleba ukrojej krajнc, kdyћ se nedнvбљ, nebo ti upijou trochu koшalky, ale vyloћenэ zlodмje fakt ne...</text>
+	</string>
+	<string id="about_quests_dialog_freedom_14">
+		<text>Kdo mi mщћe pomoct s deљifrovбnнm dat?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_141">
+		<text>Шнkб se, ћe Nitrбk z Janova je machr pшes rщznэ kombinace a algoritmy. Nejsem si ale jistej, nikdy jsem s nнm nemluvil. Pracuje pro Povinnost, a tak si na nбs svobodnэ moc иasu neudмlб.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_143">
+		<text>Nejsem expert pшes mнstnн experty... Aћ pшнљtм pщjdeљ do Janova, zeptej se tam naљich. Urиitм ti poradмj.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_15">
+		<text>Mбm PDA toho obchodnнka z Povinnosti. Kdo by o nмj mohl mнt zбjem?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_151">
+		<text>To znн lбkavм! Ukбzal bych ho Lokimu, to je nбљ љйf. Bydlн v Janovм. Vљak on uћ zaшнdн, aby se svobodnэ lidi dozvмdмli, jakou pakбћ do svэch шad pшijнmб Povinnost.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_16">
+		<text>Kde se tady dб sehnat nбшadн?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_163">
+		<text>V tovбrnм, vole, kde jinde? Nenн tam zrovna moc ћivo, ale aћ uvidнљ sklady, spravн se ti nбlada. Je v nich trochu bezpeиnмjc a dб se tam najнt solidnн vercajck.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_165">
+		<text>To je dobrб otбzka, ийиe. Zkusнme se nad nн zamyslet... Kde bys shбnмl nбшadн, kdybys nebyl v Zуnм? No jestli nejsi ъplnм vymatlanej, zaљel bys ho koupit do obchodu. Jestli si, vlezeљ do nмjakэ dнlny. Nemбm pravdu? V Zуnм je to ъplnм stejnэ - musнљ se jнt nмkam podнvat. Jednoduљљн uћ to bejt nemщћe, stalkere!</text>
+	</string>
+	<string id="about_quests_dialog_freedom_166">
+		<text>Nбшadн? Ty vole, to je nмjakэ krycн slovo? Hele, tady nemбme ћбdnэ chlupatэ, mщћeљ mluvit otevшenм. Poиkat... tys to myslel vбћnм? Tak v tom pшнpadм fakt nevim.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_169">
+		<text>Slyљel jsem, ћe jeden z naљich chlapщ kdysi hledal nбшadн a vlezl do toho vagуnu pod mostem. Naљel tam starou Teslu... jo a taky povнdal, ћe to tam nenн ћбdnб prdel... Proи ti tohle vlastnм povнdбm?  Jo, protoћe tam zahlнdl nмjakэ nбшadн na podlaze, ale nakonec ho tam nechal. Bylo to moc nebezpeиnэ.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_17">
+		<text>Kdo umн odblokovat pamмќovэ modul?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_171">
+		<text>To by mмl zvlбdnout Novikov, ten z vмdeckэho bunkru. Je rychlej, dobrej a zdvoшilej. Pak jeљtм v Janovм sнdlн Nitrбk, ten nohsled Povinnosti. Je levnej a neљikovnej, i kdyћ tohle by mohl zvlбdnout.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_172">
+		<text>Asi nмjakej zkuљenej technik. Ten mнstnн dмlб spнљ do hejblбtek a mechanismщ, takћe jestli tomu pamмќovэmu modulu nepotшebujeљ vymмnit hlaveт, zkus to radљi v Jupiteru.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_18">
+		<text>Kdo by se dokбzal vloupat do ocelovйho kontejneru?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_181">
+		<text>Kdosi mi kdysi doporuиoval Kardana, toho ze Skadovsku. Prej ћe ten se ve svэ prбci vyznб, i kdyћ je vмtљinu иasu totбlnм naљrot. Tшeba ti s tou vloupбvaиkou pomщћe.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_182">
+		<text>Myslнљ nмkoho, kdo se vylamovбnнm ocelovэch dveшн ћivн? V tom pшнpadм ti mнstnн technik Nitrбk nepomщћe. Ten se vlamuje spнљ do cizн elektroniky.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_19">
+		<text>Hledбm stalkera jmйnem Pahejl. Nevнљ, kde bych ho naљel?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_191">
+		<text>To mi nic neшнkб... bejt tebou, zeptбm se jinэch stalkerщ.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_2">
+		<text>Nevнљ nic o tмch ztroskotanэch vrtulnнcнch?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_20">
+		<text>Koho by mohly zajнmat informace o zakladateli Povinnosti?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_201">
+		<text>Rozhodnм Likoho. To je nбљ velitel, sнdlн v Janovм. I kdyby nevмdмl, co s tмma informacema mб dмlat, poшбd mu je dej - hlavnн je, aby se k nim nedostala Povinnost. Dokбћeљ si pшedstavit, jakэ mnoћstvн propagandy by z toho uvaшili? Bolн mм hlava, jen co na to pomyslнm.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_22">
+		<text>Jo. Znбљ tu historku o vrtulnнku uprostшed minovэho pole? Ve struиnosti jde o to, ћe zelenэ mozky sebou љvihly pшнmo na rezervnн pшistбvacн plochu, kterou jinэ zelenэ mozky pшed љesti jбrama podminovaly. Nмkdo si myslн, ћe ztroskotali z иistэ hlouposti, ale jб bych za tнm hledal nмco jinэho. Pшeber si to takhle: teп majн hoљi v baganиatбch jistotu, ћe jim do vrtulnнku nikdo nepoleze. Splnмj si svou misi, jednoduљe se k nмmu vrбtмj, trochu ho zalбtaj a tradб! Mщћou letмt. To by mм zajнmalo, o co v tэ jejich misi jde...</text>
+	</string>
+	<string id="about_quests_dialog_freedom_23">
+		<text>Nejsem zdejљн, vнm leda velkэ hovno. Poptej se radљi v Janovм - naљi lidi ti povyprбvмj vљechno, co potшebujeљ vмdмt, a nбdavkem ti pшihodмj jeљtм vљechno, co vмdмt nepotшebujeљ.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_25">
+		<text>Jo, pбr chlapщ onehdб zahlнdlo vrtulnнk, co letмl tak jako fakt divnм. A pшistбnн nemмl taky zrovna hladkэ - plбcnul s sebou pшнmo na stшechu jednэ haly v Jupiteru. Prej se tou stшechou proboшil pшнmo dovnitш a pak ho zasypala poшбdnб hromada bordelu.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_3">
+		<text>Nevidмli jste tu armбdu?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_30">
+		<text>Koho by mohla zajнmat mapa mнst mezi Zatonem a Jupiterem?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_301">
+		<text>Kaћdopбdnм Navigбtora. Dмlб tady stalkerщm hlavnнho prщvodce. Jestli chceљ hodit шeи o mapбch, hledбљ jeho.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_31">
+		<text>To chce klid, vole. Nemбme tu fнzly, ani bagouny, ani lidovэ milice a nic takovэho. V Zуnм jseљ v naprostэm bezpeин.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_35">
+		<text>Ne, ale chlapi mi шнkali, ћe zahlнdli nмjakou vojenskou jednotku, jak kliиkuje minovэm polem za pшistбvacн plochou. Nejdшнv jim chtмli pнchnout, ale pak se na nм vysrali. Vojclщm se nedб vмшit, ani co by se za nehet veљlo. Nikdy nevнљ, kdy jim rupne v bednм a oni tм stшelej do zad.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_36">
+		<text>Sбm jsem nikoho nepotkal, ale proslejchб se, ћe jednoho zoldбta majн vмdci v tom svэm bunkru. Ozerskij, ten biolog, povнdal, ћe k nim pшiљel od toho vrtulnнku, co spadnul do tovбrny... koluje takovej vtip, ћe prej si vмdci koneиnм naљli pokusnэho krбlнka.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_37">
+		<text>Osobnм ne, ale nмco se povнdб mezi svobodnэma stalkerama. Prej ћe zahlнdli jednoho vojcla u protileteckэ zбkladny Volchov. Stopro jde o zombнka nebo nмjakэho probuzenэho ducha... co myslнљ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_38">
+		<text>Ne. Jeden borec si navymejљlel, ћe vidмl sedm vojбkщ a jednoho svobodnэho stalkera, kterej je vedl houљtнm za rбdiozбvodem smмrem na Pripjaќ. Trбvu uћ jsme v Zуnм nemмli ani nepamatuju, takћe to musely bejt иistэ lћi.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_4">
+		<text>Vнљ, jak se dostat do Pripjati?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_40">
+		<text>Koho bych si mohl najmout na ochranu vмdcщ?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_401">
+		<text>Svobodu. Jinэmi slovy nбs. S vмdcama spolupracujeme neustбle, takћe pohlнdat je by pro nбs byla hraиka. Zeptej se v Janovм naљeho љйfa Lokiho. Urиitм nebude mнt nic proti.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_402">
+		<text>No nevim, ийиe. Ke mnм se doneslo, ћe vмdбtoшi si najali druћstvo Povinnosti, kterэ pro nм teп makб. Rбdi bysme ty obrejlence pohlнdali, ale иumмt od rбna do veиera na ty nafouklэ ksichty z Povinnosti? To nбm za to nestojн.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_42">
+		<text>Prej se tam dб projнt z Jupitera... jakoћe z tэ tovбrny, ne z planety! Ha ha ha! Ten se povedl, to musнљ uznat!</text>
+	</string>
+	<string id="about_quests_dialog_freedom_43">
+		<text>Nemбm sebemenљн potuchy. Furt nemбm иas, abych se tam podнval. Zkusil bych to v tбboшe u Navigбtora. Je to svobodnej stalker a v tмhle mнstech se vyznб jak nikdo jinej.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_44">
+		<text>Brбcho, kdybych to vмdмl, uћ bych tam dбvno byl. Zdrhnout pшed Povinnostн, vojenskэma a vљнm tнm stшнlenнm, to by bylo bбjo.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_5">
+		<text>Doporuинљ mi nмkoho, kdo tu nemб moc zбvazkщ a kdo by se chtмl vydat do Pripjati?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_51">
+		<text>Sorry, kбmo. V Zatonu nikoho takovэho neznбm. Poradil bych ti, aby ses zeptal naљich v Janovм.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_52">
+		<text>Vнљ, kde majн vмdci bunkr, ћe jo? No, tak nedбvno se jim to tam zaиalo vymykat z rukou. Nejdшнv se Garik, ten stalker, rozhodl odejнt do Pripjati a teп se o totйћ pokouљн ten vojбиek. Garik je samotбш a zaklбdб si na tom, ale ten vojбk... to je pшesnм ten, koho hledбљ.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_53">
+		<text>Pro mм za mм zkus tшeba Vana z Janova. Je to fajnovej chlap a kdyby chtмl, mohl by se uћ dбvno pшidat ke Svobodм. Ale asi se nechce motat do rubaиek s Povinnostн... nebo jakejchkoli jinejch rubaиek. Je to ale jeho nбzor a my ho respektujeme!</text>
+	</string>
+	<string id="about_quests_dialog_freedom_54">
+		<text>No jasnм. Pбr naљich chlapщ zahlнdlo dole u vyschlэho jezera jakousi partu - pшesnм takovэ lidi, jakэ hledбљ. Urиitм znajн Pripjaќ jako vlastnн boty a navнc se zdб, ћe pro nikoho nepracujou. A urиitм budou pмknм nebojбcnэ, jsou to totiћ kretйni z Monolitu!</text>
+	</string>
+	<string id="about_quests_dialog_freedom_55">
+		<text>Jo. Tulбk, velitel naљich novбиkщ... pшestбvб se mu mezi nбma lнbit. Jeho hoљi se pшizpщsobili jedna bбseт, ale on se furt tvбшн jak zaraћenej prd. Zeptej se ho. Nerad vidнm, kdyћ musн fйrovej chlap tvrdnout nмkde, kde ho to neba.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_57">
+		<text>Nemбm tucha.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_6">
+		<text>Naљel jsem zvlбљtnн puљku. Neznбљ nмkoho, kdo by o nн mohl nмco vмdмt?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_62">
+		<text>Manuбl u nн asi pшibalenej nebyl, co? Nebyl? Tak v tom pшнpadм nevнm.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_7">
+		<text>Vмdci potшebujн provйst pбr mмшenн. Kdo by se na to dal najmout?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_71">
+		<text>Naљi hoљi by to mмli zmбknout. Ve Svobodм mбme dost chytrэch mozkщ a kdyћ nмco nevнme, zeptбme se v bunkru. Milerбdi poslouћнme pro prospмch vмdy! Zeptej se v Janovм Lokiho, urиitм ti шekne to samэ.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_72">
+		<text>Jб bych to s chlapama celkem rбd namмшil, ale pшed bunkrem teп hlнdkuje Povinnost. Nezcvoknout z vмdбtorщ je husarskej kousek sбm o sobм, ale tvrdnout tam kaћdej den celej den, to rozhodnм nemщћe bejt zdravэ.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_8">
+		<text>Naљel jsem zvlбљtnн artefakt. Nedoporuиil bys mi kupce?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_81">
+		<text>Poptej se po sbмratelнch, kбmo. V Janovм ћбdnэho nenajdeљ, vћdyќ sem se bojн chodit i lecjakej stalker. Nejlepљн bude zeptat se v Zatonu, tam bejvб trochu vмtљн klid.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_83">
+		<text>Znбљ Fousбиe, toho barmana z tбbora svobodnejch stalkerщ? Skupuje artefakty a ani tм pшitom tolik neoљkube. Milej chlap, aќ se na nмj dнvбљ z jakэhokoliv ъhlu. Je vбћnм љkoda, ћe nepracuje pro nбs.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_9">
+		<text>Kousek odsud jsem naљel hnнzdo upнrщ. Co budeme dмlat?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_91">
+		<text>Ty vole, musнљ varovat svobodnэ stalkery! Nмkde v tмch konиinбch majн svщj tбbor. Ћivэ bytosti ze Zуny se sice musej ochraтovat, ale tady uћ bych mмl spнљ obavy o ћivoty lidн.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_98">
+		<text>OK, kaљli na to.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_0">
+		<text>Mбm pбr otбzek...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_1">
+		<text>Ptej se.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_10">
+		<text>Co si myslнљ o Иiperovi?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_101">
+		<text>S tнm jsem jeљtм nemмl tu иest. Zeptej se borcщ ze Skadovsku.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_11">
+		<text>Neslyљel jsi nic o Oбze? </text>
+	</string>
+	<string id="about_quests_dialog_stalkers_111">
+		<text>O Oбze jsem slyљel ъplnм vљechno! Je to bбchorka, povнdaиka! Kaћdej stalker si od nн slibuje nмco ъplnм jinэho a kaћdej zбroveт tvrdн, ћe znб jejн pшesnэ souшadnice. Љkoda, ћe jedinб vмc, kterou majн vљechny ty mнsta spoleиnэho, je mizernб pшнstupnost.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_112">
+		<text>No, povнdб se, ћe se ti tam okamћitм zahojej vљechny zranмnн a ћe budeљ do nмkolika minut zas plnej elбnu. V Oбze prej zmizн kaћdб nemoc nebo choroba, a dokonce i otrava zбшenнm! Jedinб vмc, kterou si nikdo nenн jist, je, kde to vlastnм je. Mбm ti to prozradit? Uprostшed Zуny! Ale tahle informace musн zщstat mezi nбma dvмma! Nikomu ani muk!</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_113">
+		<text>Slyљel jsem, ћe vљichni mutanti, kterэ tam potkбљ, kolem tebe jen neљkodnм projdou. Taky se tam prej nachбzн artefakt, kterэmu se шнkб srdce Oбzy. Nikdo nevн, co pшesnм dмlб, ale jedno je jistэ: nemмl by ses ho dotknout. Kdo by ho ukradnul, ten uћ by v Zуnм nikdy nenaљel klidu... A kde ta Oбza vlastnм je? Kaћdej pшece vн, ћe pod ruskэm kolem v Pripjati! Vћdyќ to je jasnэ jako facka!</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_12">
+		<text>Neznбљ stalkera jmйnem Strakби?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_121">
+		<text>Jasnм, ћe znбm... ale kde je teп, to nevнm.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_122">
+		<text>Hmm... to mi nic neшнkб.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_13">
+		<text>Nevнљ, kdo mi mohl ukrбst vмci z osobnн skшнтky?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_131">
+		<text>Ehm... ne? Zeptej se veterбnщ z Janova, ti by ti tшeba mohli pomoct.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_14">
+		<text>Kdo mi mщћe pomoct s deљifrovбnнm dat?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_141">
+		<text>Janovskej Nitrбk! Kdo jinej? Ten tyhle komplikovanэ technickэ sraиiиky miluje... hrabe se v nich mnohem radљi neћ ve zbranнch.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_143">
+		<text>Nikoho takovэho neznбm. Poptej se v Janovм - majн tam jakэhosi experta.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_15">
+		<text>Mбm PDA toho obchodnнka z Povinnosti. Kdo by o nмj mohl mнt zбjem?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_151">
+		<text>Znбљ Hejkala ze Skadovsku? Ten by se na nмj urиitм moc rбd podнval. Rбd se sere do citlivэch zбleћitostн...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_152">
+		<text>Na Skadovsku za Zatonem bejval tэpek jmйnem Hejkal. Kљeftoval s informacema... tшeba by o tvэ PDA mмl zбjem.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_16">
+		<text>Kde se tu dб sehnat nбшadн?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_161">
+		<text>Jeden stalker mi vyprбvмl, ћe jeho dмda pracoval pшed љestaosmdesбtэm na rozvodnм. Prej tam mнvali vљelijakэ vybavenн, takћe bych si tipnul, ћe se tam dб najнt i nбшadн. Dneska uћ nejspнљ bude zrezlэ jak prdel, ale stejnм bys to tam mohl zkusit.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_162">
+		<text>Znбљ tu pilu v lese na kopci? Mмlo by tam bejt i nмjakэ nбшadн, leda by ho nмkdo zиуroval jeљtм pшed tebou. O tom ale silnм pochybuju - инm vнc se k tomu mнstu pшiblнћнљ, tнm vмtљн chuќ mбљ nasrat si do kalhot a vzнt nohy na ramena. A musн se nechat, ћe tam jsou i daleko dмsivмjљн vмci neћ jenom zбшenн...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_163">
+		<text>Tak Jupiter mбљ kousek za prdelн, tam urиitм nмjakэ nбшadн bude. K hlavnн tovбrnн hale bych se ale osobnм moc nepшibliћoval... naskakuje mi z nн husina. Radљi to zkus ve skladech, v tмch ъplnм na kraji tovбrny.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_164">
+		<text>V Pripjati ъdajnм existuje nмkolik mнst, kde se dajн najнt vљemoћnэ technickэ srandy. Jednнm z nich je ten starej sovмtskej koloniбl. Jedinэ mнsto, kde se za starejch иasщ dalo sehnat nмco uћiteиnэho.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_165">
+		<text>Jak to jako mбm vмdмt? Prohledej starэ dнlny nebo obchody, tam by mohlo bejt nмco pouћitelnэho.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_166">
+		<text>Upшнmnм шeиeno, poslednн mнsto, kde jsem vidмl solidnн nбшadн, byl Sidoroviищv bunkr v Kordonu. Jasnм, muselo se za nмj platit, ale bylo novэ a nijak zvlбљќ drahэ.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_167">
+		<text>Шeknu ti to takhle, kбmo. Nepшiљel jsem do Zуny hledat nбшadн. Zapoj mozek, k иemu ti bude dobrэ radioaktivnн kladivo?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_168">
+		<text>Povнdб se, ћe rщznэ hejblata a srandiиky se dajн posbнrat ve starэm domм sluћeb. Tшeba tam najdeљ i nбшadн. Ale mбљ to jako se vљнm ostatnнm: jedinej zpщsob, jak se dostat k tмm libovэm vмcem, je pшijнt prvnн.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_169">
+		<text>Dobrб otбzka... bejt tebou, mrknu se do toho starэho vlaku pod mostem. Neptej se proи. Cнtнm v kostech, ћe by tam mohlo nмco bejt.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_17">
+		<text>Kdo dokбћe odemknout pamмќovэ modul?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_171">
+		<text>Okamћниek... Hmm... Nitrбk z Janova by to urиitм mмl zvlбdnout. Kromм nмho uћ mм napadб jenom Novikov, ten technik od vмdcщ. Celkem profнk. Musнљ si ale v hlavм srovnat priority, protoћe Nitrбk je o mnohem levnмjљн.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_172">
+		<text>No, potшebujeљ technika, ale tady nemбme nikoho jinэho neћ Kardana. Problйm je v tom, ћe ten si po nмkolika letech s flaљkou u huby pшнliљ nerozumн se sloћitou elektronikou. Bejt tebou, optбm se v Jupiteru - tam na to majн odbornнky.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_18">
+		<text>Kdo by se dokбzal dostat do ocelovйho kontejneru?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_181">
+		<text>Kardan ze Skadovsku. Tipoval bych. Mмl bys vidмt, jak se dokбћe proшezat zбmkem. Radost pohledмt.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_182">
+		<text>Nejspнљ nмjakej technik, ne? Nitrбk to ale nejspнљ nezvlбdne, ten je spнљ na jemnмjљн prбci.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_183">
+		<text>Ha, na tohle se ptбљ v Pripjati? Nech si poradit a zkus љtмstн radљi nмkde dбl od stшedu Zуny.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_19">
+		<text>Hledбm stalkera jmйnem Pahejl. Nevнљ, kde by se dal najнt?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_191">
+		<text>Zeptej se Fousбиe, toho barmana ze Skadovsku. Ten mб o stalkerech pшehled.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_193">
+		<text>Pahejl? Co jб vim, kudy camrб. Zeptej se v Zatonu, tam trбvн vмtљinu иasu.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_2">
+		<text>Nevнљ nмco o tмch zшнcenэch vrtulnнcнch?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_20">
+		<text>Koho by mohly zajнmat informace o zakladateli Povinnosti?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_201">
+		<text>Hodil bych шeи s Hejkalem ze Skadovsku, ten kљeftuje s informacema. Dal bych ruku do ohnм za to, ћe spolehlivэ echo o takovэhle legendм hu zaujme.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_21">
+		<text>Jeden z nich jsem sбm vidмl... ne ћe by se zrovna шнtil, ale zrovna nejlнp taky neletмl. Mlбtil sebou ze strany na stranu, aћ nakonec pшistбl na tэ nбhornн ploљinм za Zatonem. Mohla by bejt sranda skoиit se podнvat, jestli nмkdo nepшeћil... kdybych ale vмdмl, jak se tam nahoru dostat. I kdyћ, moћnб by to vмdмl Noe z bбrky psychotikщ...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_22">
+		<text>Slyљel jsem, ћe pбr armбdnнch vrtulnнkщ sebou seklo nedaleko odsud... Lidi шнkali rщznэ vмci, ale tohleto si pamatuju jasnм - prej ћe ten vrtulnнk pшistбl na rezervnн pшistбvacн ploљe, kterou vojenskэ sami pшed pбr lety podminovali. Tomu se шнkб ironie osudu. Kdo jinйmu jбmu kopб, sбm do nн padб. Tady to mбљ na vlastnн oиi.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_23">
+		<text>Kбmoљ mi vyprбvмl jednu historku... vyrazil do Ћeleznэho lesa na lov artefaktщ a jakmile se zanoшil pod stromy, uslyљel za sebou dмsnou шachu. Otoиil se, aby zjistil, co se dмje, a uvidмl vrtulnнk, jak se plnou rychlostн шнtн pшнmo na nмj a cestou porбћн stoћбry, a tak dбle. Kбmoљ to stшelil kolmo do houљtн... se divнm, ћe nenabмhl pшнmo do nмjakэ anomбlky. Ћeleznej les najdeљ bez problйmщ, je vidмt na mнle daleko. Jenomћe se to v nмm hemћн poltergeistema, tak si dбvej poшбdnэho bacha.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_24">
+		<text>Jeden prej pшistбl na jiћnн ploљinм, jenomћe dostat se tam nahoru nenн ћбdnб prdel. Ale taky jsem slyљel, ћe kdosi nahoшe na ploљinм zahlнdl Noema, coћ znamenб, ћe ten starej psychouљ tam znб cestu.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_25">
+		<text>Jб sбm jsem ћбdnej nevidмl, ale prej ћe jeden sebou prбsknul pшнmo do fabriky... nikdo to ale neљel omrknout. Je to tam moc nebezpeиnэ.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_26">
+		<text>Jeden stalker mi povнdal, ћe vidмl nмkolik vojenskej vrtulnнkщ, co se dostaly do nмjakэho prщseru. Jednomu vyљlehly plameny z motoru a ten stroj pak zahuиel do baћiny plnэ anomбliн. Odsud se tam dб dostat snadno, akorбt ћe baћiny jsou ztмlesnмnej zlej sen. To nenн mнsto pro soudnэho иlovмka.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_3">
+		<text>Nezahlнdli jste tu vojбky?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_30">
+		<text>Kdo by mohl mнt zбjem o mapu mнst mezi Zatonem a Jupiterem?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_301">
+		<text>Navigбtor, kdo jinej? Vљak vнљ, mнstnн prщvodce. Neustбle pendluje mezi Skadovskem a Janovem, takћe tu tvojн mapu rozhodnм uћije.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_302">
+		<text>Tady nejsme v Zatonu ani v Jupiteru, takћe ta mapa ti je na dvм vмci. Zeptej se pшнmo na tмch dvou mнstech a tшeba pochodнљ lнp.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_31">
+		<text>Sбm jsem nic nevidмl, ale povнdб se o tom, ћe parta vojбkщ slezla z jiћnнho svahu nбhornн ploљiny - z tэ strany od иistiиky. Prej to nejdшнv zkouљeli hezky podle pшнruиky a chtмli se slaтovat, nebo cosi. Ale nakonec to hezky sjeli po prdeli! Haha! Novej sport!Bobovбnн v Zуnм! </text>
+	</string>
+	<string id="about_quests_dialog_stalkers_32">
+		<text>Ve Skadovsku jsem zaslechl historku, jak nмkdo zahlнdl si tak pмt vojclщ, kterak vylejzajн z kanalizaиnнho tunelu v baћinбch. Byli prej doslova zasranэ od hlavy aћ k patм a jeden z nich vypadal k nerozeznбnн od baћinnэho upнra. Odshora dolщ pokrytej zelenэm blivajzem.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_33">
+		<text>Osobnм ne, ale mщj kбmoљ vidмl u zpracovacн fabriky jednu vojenskou jednotku bojovat se ћoldбkama. Neћ si stihl najнt flek s pмknэm vэhledem, bylo uћ po srandм, protoћe zelenэ mozky ustoupily. Na ћбdnэ stranм ani jeden mrtvej... kurva klika, co?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_34">
+		<text>Nмkdo vidмl skupinku plus mнnus deseti vojбkщ, jak se motб kolem Noemovy bбrky. Soudм podle toho, ћe ten psychouљ byl u toho a dejchal, museli se s nim na nмиem dohodnout... jak typickэ. Samozшejmм ћe Noema se nikdo neptal, co po nмm chtмli. Иlovмk nikdy nemщћe vмdмt, jak se ten starej zkurvysyn zachovб.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_35">
+		<text>Pшed pбr nocema jsem slyљel poшбdnej vэbuch a pak mi chlapi v Janovм povмdмli, ћe v minovэm poli zahlнdli tuhэho vojбka a za nim prбzdnou vojenskou helikoptйru. Nejspнљ v tэ tmм nepoznali, do иeho to pшistбli, a nakrбиeli si to pшнmo do min. Nikdo nevн, kolik jich od tama vyvбzlo naћivu, ale ten borec urиitм nepшiletмl sбm.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_36">
+		<text>Ћбdnэ vojбky jsem nevidмl... ale љuљkб se, ћe nмkdo ve vojenskym mundщru teп bydlн u vмdcщ. Prej ћe ho naљel Garik, ten stalker, kdyћ se vydal do raketovэ zбkladny hledat ztracenэ kбmoљe. Oba dva vнme, ћe zбkladna je doslova napмchovanб zombнkama, kterэ nemajн lidskэ nбvљtмvy zrovna v lбsce, takћe Garik ho prakticky zachrбnil pшed jistou smrtн.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_37">
+		<text>Ne, ale slyљel jsem, ћe nмkdo zahlнdl vojбka poblнћ protileteckэ zбkladny Volchov. Ne ћe bych tomu sбm vмшil... ten иlovмk mohl lhбt, nebo tшeba nedokбћe rozeznat vojбka od zombнka.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_38">
+		<text>Vojбky? No, mezi lidmi se povнdб, ћe „celб vojenskб jednotka vedenб stalkerem“ si to rбzovala smмrem k Jupiteru. Ale pшece bys nevмnoval pozornost takovэm drbщm. </text>
+	</string>
+	<string id="about_quests_dialog_stalkers_4">
+		<text>Vнљ, jak se dostat do Pripjati?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_40">
+		<text>Koho bych si mohl najmout na ochranu vмdcщ?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_401">
+		<text>Znбљ Spartaka a jeho partu? Vћdyќ vнљ, ty stalkery ze Zatonu? Jsou to fajn lidi a v boji se taky neztratмj. Tмћko bys hledal ostшнlenмjљн љнbry. Mбm pocit, ћe hlнdбnн vмdcщ by se jim mohlo lнbit.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_402">
+		<text>Nepotkal jsi v dнlnбch u rozvodny Sekerбkovy chlapy? Majн sice svэ mouchy, ostatnм jako vљichni ћoldбci, ale aspoт se nejdшнv ptajн a teprv potom stшнlej. Tipuju, ћe kdybys je pro tuhle prбci ukecal, vмdci by koneиnм mмli lehkэ spanн a dokonce i stalkeшi by si vydechli. Vљichni budou љќastnэ, idylka.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_403">
+		<text>Ehm... nikdo mм nenapadб. Sorби.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_41">
+		<text>Jedinэ, co vim jistм, je, ћe odsud ze Zatonu tam ћбdnб cesta nevede. Kaћdej, kdo se pakoval do Pripjati, to nejdшнv vzal pшes Jupiter. Tam by ses mмl poptat.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_42">
+		<text>No, љuљkб se, ћe do Pripjati vedou tajnэ podzemnн chodby z Jupiteru. Problйm je tak trochu v tom, ћe tyhle povнdaиky se zaинnaj vynoшovat aћ tak po druhэ rundм, a v takovэm stбdiu uћ se Jupiter zdб pмknм dмsivej a nikomu se tam nechce.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_43">
+		<text>Jak to mбm vмdмt, vole? Nemмl bych nмjakэ snazљн otбzky? Jб ti leda tak doporuинm, aby ses zaљel zeptat Navigбrora - jestli ti nмkdo dokбћe poradit, tak je to on.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_44">
+		<text>Ha! Kdybych znal cestu do Pripjati, dбvno uћ bych tady netvrdnul! Proи myslнљ, ћe jsem se vydal ke stшedu Zуny? Ty vole, Pripjaќ je jeden artefakt vedle druhэho! Kdo se tam dostane prvnн, je vysmбtej na celej ћivot!</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_5">
+		<text>Nemщћeљ mi doporuиit nмkoho, kdo tu nemб moc zбvazkщ a chtмl by vyrazit do Pripjati?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_51">
+		<text>Tady u nбs nikoho takovэho nesplaљнљ. Vљichni, kdo chtмli vyrazit blнћ ke stшedu Zуny, uћ dбvno odeљli do Jupiteru. Bejt tebou, zkusнm to tam.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_52">
+		<text>Uћ jsi slyљel o tom vojбkovi, co se nasбиkoval k vмdcщm? Podle mм by s tebou klidnм љel, nemб tнm co ztratit. Vмdci jeљtм nмjakou dobu domщ nepщjdou a sбm se do Kordonu nedostane, takћe moћnб mu doиista hrбbne a nechб se od tebe ukecat na Pripjaќ!</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_53">
+		<text>Znбљ Vana, toho z janovskэho nбdraћн? Je to fйrovej chlap, dobrej stalker a nechб si nabulнkovat cokoliv. Je to taky blбzen, co se vнc vyznб v anomбliнch neћ v lidech... poшбd ho jenom nмkdo vyuћнvб, a to se nezmмnн, dokud neodejde.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_54">
+		<text>Hele, vole, chlapi nedбvno zahlнdli jakэsi druћstvo u protiletadlovэ zбkladny, na jih od vyschlэho jezera. Patrnм neљlo o obyиejnэ stalkery, ani Povinnost, ani svobodu - byli to feљбci z Monolitu! Takћe jestli potшebujeљ svйzt do Pripjati, zkus to u nich! Haha! Neber mм vбћnм, dмlбm si prdel.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_55">
+		<text>Znбљ Chodce, myslнm toho velitele novэho druћstva Svobody? Kdybys vidмl ten jeho kyselej ksicht, trklo by ti, ћe Janov nenн mнsto pro nмj. Bмћ s nim hodit pokec. Tшeba se nechб ukecat.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_56">
+		<text>Znбљ Chodce, myslнm toho velitele novэho druћstva Povinnosti? Kdybys vidмl ten jeho kyselej ksicht, trklo by ti, ћe Janov nenн mнsto pro nмj. Bмћ s nim hodit pokec. Tшeba se nechб ukecat.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_57">
+		<text>Hmm... nikdo mм nenapadб.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_6">
+		<text>Naљel jsem zvlбљtnн puљku. Neznбљ nмkoho, kdo by toho o nн vмdмl vнc?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_62">
+		<text>Co jб vim? Zeptej se profнkщ... jako ћe technikщ nebo tak...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_63">
+		<text>Zeptej se ve Skadovsku Kardana, za to nic nedбљ. Vмnuje je zbranнm a je to fakt machr... a moћnб mu i po tom vљem chlastбnн pшeћilo pбr mozkovэch bunмk.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_7">
+		<text>Vмdci potшebujн provйst pбr mмшenн. Kdo by se na to dal najmout?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_71">
+		<text>Znбљ Gontu, toho lovce? Hбdбm, ћe jemu a jeho chlapщm by nevadilo makat pro vмdce. A kdyby se do vмci nбhodou zaиali srбt mutanti, tak tihle chlapi jsou pшesnм to, co potшebujeљ.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_72">
+		<text>Znбљ Grizzlyho, Torbu a Mitjaje? Vљichni jsou to stalkeшi z Janova. Pracujou jako trojka a jsou fest dobrэ! Na takovouhle prбci by byli jako stvoшenэ... jen jestli se Mitjaj zase nezapletl do nмjakэho prщseru.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_73">
+		<text>Netuљнm, vole. Mбme tady aћ po uљi vlastnнch starostн.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_8">
+		<text>Naљel jsem zvlбљtnн artefakt. Nedoporuиil bys mi kupce?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_81">
+		<text>To asi ne. Naљinci kupujou jen znбmэ a ovмшenэ vмci. Zeptej se v Zatonu, ten je blнћ k okraji Zуny a tak vљelijak.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_83">
+		<text>Ukбzal bych ho Fousбиovi, tomu hospodskэmu ze Skadovsku. Ten prej spolupracuje se sbмrateli z venkovnнho svмta, kterэ se mщћou po divnejch vмcech utlouct.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_9">
+		<text>Kousek odsud jsem naљel doupм upнrщ. Co budeme dмlat?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_91">
+		<text>Ty vole, musнљ bмћet do Skadovsku a povмdмt to Fousбиovi! Protoћe buп je vykosнme, nebo nбm natrhajн novэ dнry do prdelн.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_98">
+		<text>Uћ nic.</text>
+	</string>
+	<string id="about_skadovsk_dialog_bandit_0">
+		<text>Kde je tu nejbliћљн tбbor stalkerщ?</text>
+	</string>
+	<string id="about_skadovsk_dialog_bandit_1">
+		<text>Jseљ debil, nebo co? Jб se v tбborech stalkerщ nevyznбm... ale nejbliћљн tбbor odsud je Skadovsk. Dбm ti k nмmu souшadnice a dokonce za nм nebudu nic chtнt. Super, ћe jo?</text>
+	</string>
+	<string id="about_skadovsk_dialog_stalkers_0">
+		<text>Kde je tu nejbliћљн tбbor stalkerщ?</text>
+	</string>
+	<string id="about_skadovsk_dialog_stalkers_1">
+		<text>Poљlu ti souшadnice do PDA... jedinej podstatnej tбbor v okolн je Skadovsk.</text>
+	</string>
+	<string id="actor_break_dialog_2">
+		<text>Zatнm se mмj.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_27">
+		<text>O nмjakэch havбrkбch jsem slyљel... Ale vнc o tom nevнm, na klepy nejsem. Sorry, pokud jsem ti nepomohl.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_28">
+		<text>Chlape, i bez tvэch vrtulnнkщ mбm co dмlat... Hele, vybourat s helikoptйrou asi nebude zrovna pшнjemnй, ale to je tak vљechno, co ti k tomu mщћu шнct.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_27">
+		<text>O иem to mluvнљ, vole? Asi hulнљ nмco fakt hodnм tvrdэho, pokud jsi tady vidмl vrtulnнky, protoћe na tomhle mнstм nemaj co dмlat.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_27">
+		<text>Huh? Ne, chlape, takovй kraviny mм nezajнmajн. Mй prбci rozљiшovбnн informacн nijak nemщћe. Vљak vнљ, co myslнm.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_27">
+		<text>Naљe hlнdka vidмla nмjakй klesajнcн helikoptйry, ale bliћљн podrobnosti byly hlбљeny pшнmo podplukovnнkovi. Jde o nмjakй tajnй vмci a radљi o tom nechci nic vмdмt.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_50">
+		<text>Kde bych naљel oblek s uzavшenэm dэchacнm modulem?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_501">
+		<text>Nejsem si jistэ, ale dostatek prachщ dokбћe zбzraky – samozшejmм pokud vнљ, jak je investovat. Promluv si s Иiperou... Pokud se s nнm dohodneљ, dokбћe sehnat cokoliv. A jб doufбm, ћe se ti to podaшн... tмch pбr dnн bez nмj by Skadovsku urиitм prospмlo...</text>
+	</string>
+	<string id="about_quests_dialog_bandit_502">
+		<text>Jak bych to sakra mмl vмdмt? Ani jб tady nejsem dlouho... Radљi se zeptej v Zatonu, naљi kбmoљi tam majн rozhozeny vlastnн sнtм.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_503">
+		<text>Nemбm pбru. Proи, chceљ snad do tй anomбlie strkat svщj nos? Koukni, pokud narazнљ na nмjakэ artefakt, dej nбm vмdмt. Budem tam dшнv, neћ шekneљ љvec... Abysme ti pogratulovali k dobrй prбci! Ha ha ha!</text>
+	</string>
+	<string id="about_quests_dialog_dolg_50">
+		<text>Kde bych naљel oblek s uzavшenэm dэchacнm modulem?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_501">
+		<text>Jak bych to mмl vмdмt? Poиkat... tady v Skadovsku ћije jeden chlбpek, kterэ prэ mщћe sehnat vљechno, co chceљ. Sedн na hornнm poschodн, шнkaj mu Иipera.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_502">
+		<text>Ne, v takovэm divnэm obleku tady rozhodnм nikdo nechodн.. Moћnб by ses mohl zeptat v Zatonu, je troљku blнћ civilizaci.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_503">
+		<text>Netuљнm, kde bys nмco takovйho mohl najнt.. Takovй obleky jsou vzбcnэ i mezi иleny Povinnosti. Vydбvaj je jen kvщli odliљenн v boji nebo pшi operacнch probнhajнcнch v anomбlnнch oblastech.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_50">
+		<text>Kde bych naљel oblek s uzavшenэm dэchacнm modulem?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_501">
+		<text>Zaslechl jsem, jak se stalkeшi o takovйm иlovмku s konexemi bavн, шнkali mu Иipera nebo nмjak tak. Dokбћe sehnat skoro vљechno. Vљak vнљ: vэbavu, stшelce a podobnй kraviny... ale drogy ne. Vysedбvб ve Skadovsku, pokud bys za nнm chtмl zajнt.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_502">
+		<text>Dobrб otбzka, chlape... Tady ve Svobodм nic takovйho nenosнme... Bэt tebou, zeptal bych se stalkerщ v Zatonu. Tam bys mohl najнt nмkoho, kdo se tмmihle vмcmi zabэvб.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_503">
+		<text>Heh, na co takovэ krбm potшebujeљ? Je to k niиemu. I kdyћ... Moћnб by se mohl hodit. Lнp se s nнm dэchб a slunce tak nesvнtн do oин... Moћnб bych si ho taky mohl poшнdit. Hej, nevнљ, kde bych ho sehnal?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_50">
+		<text>Kde bych naљel oblek s uzavшenэm dэchacнm modulem?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_501">
+		<text>No, tipnul bych to na Иiperu. Tшetн poschodн ve Skadovsku. Ten chlбpek dokбћe sehnat snнh i na posranэ pouљti... Jeho sluћby ale nмco stojej.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_502">
+		<text>Poиkej... V Zatonu kdysi takovэ chlбpek bejval, pracoval s Иiperou. Zkus se podнvat, jestli tam poшбd je. Slyљel jsem, ћe se zamмшuje na vмtљн vмci.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_503">
+		<text>Kбmo, ty o tom mluvнљ, jako by to byly nмjakй tuћky do kancelбшe... Nikdo ti to neшekne jistм. Takovй vмci se objevн jen tu a tam... Pokud to najdeљ, budeљ mнt fakt љtмstн.</text>
+	</string>
+	<string id="actor_break_dialog_3">
+		<text>Mмj se.</text>
+	</string>
+	<string id="actor_break_dialog_1">
+		<text>Zatнm.</text>
+	</string>
+	<string id="actor_break_dialog_0">
+		<text>Иaues.</text>
+	</string>
+</string_table>

@@ -1,0 +1,212 @@
+----------------------------------------------------------------------------------------------------
+-- Guide
+----------------------------------------------------------------------------------------------------
+-- Разработчик: Andrey Fidrya (Zmey) af@svitonline.com
+----------------------------------------------------------------------------------------------------
+
+local state_main = 1
+local state_lead = 2
+local state_wait = 3
+
+---------------------------------------------------------------------------------------------------------------------
+class "evaluator_need_guide" (property_evaluator)
+
+function evaluator_need_guide:__init(storage) super(nil, name)
+  	self.st = storage
+end
+
+function evaluator_need_guide:evaluate()
+	--printf("guide [%s] best_enemy = ", self.object:name()--[[,
+	--	if_then_else(self.object:best_enemy(), self.object:best_enemy():name(), "none")]])
+  	return self.st.enabled == true
+end
+
+----------------------------------------------------------------------------------------------------------------------
+class "action_guide_activity" (action_base)
+
+function action_guide_activity:__init (npc_name, action_name, storage) super(nil, action_name)
+	self.st = storage
+	self.move_mgr = move_mgr.move_mgr()
+end
+
+function action_guide_activity:initialize()
+	--printf("_bp: action_guide_activity: initialize")
+	action_base.initialize(self)
+--	self.object:set_node_evaluator()
+--	self.object:set_path_evaluator()
+	self.object:set_desired_position()
+	self.object:set_desired_direction()
+
+	self.move_mgr:initialize(self.object)
+
+	--printf("initiz")
+	self.initialized = true
+
+	self:reset_scheme()
+end
+
+
+function action_guide_activity:reset_scheme()
+	--printf("reset_scheme, initialized=%s", utils.to_str(self.initialized))
+	if not self.initialized then
+		return
+	end
+
+	self.object:clear_animations()
+	
+	if self.st.path_main_walk_info == nil then
+		self.st.path_main_walk_info = utils.path_parse_waypoints(self.st.path_main_walk)
+	end
+	if self.st.path_main_look_info == nil then
+		self.st.path_main_look_info = utils.path_parse_waypoints(self.st.path_main_look)
+	end
+	if self.st.path_lead_walk_info == nil then
+		self.st.path_lead_walk_info = utils.path_parse_waypoints(self.st.path_lead_walk)
+	end
+	if self.st.path_lead_look_info == nil then
+		self.st.path_lead_look_info = utils.path_parse_waypoints(self.st.path_lead_look)
+	end
+
+	self.state = state_main
+	
+	self.move_mgr:reset(self.st.path_main_walk, self.st.path_main_walk_info,
+		self.st.path_main_look, self.st.path_main_look_info,
+		self.st.team,
+		nil, {obj = self, func = self.move_callback})
+end	
+
+function action_guide_activity:move_callback(mode, number)
+	if number == 1 then
+		printf("WAIT")
+		local actor = level.actor()
+		if not actor then
+			return false
+		end
+		if distance_between(self.object, actor) > 5 then
+			utils.stalker_stop(self.object)
+			utils.stalker_look_at_stalker(self.object, actor)
+			self.state = state_wait
+			return true
+		end
+		return false
+	elseif number == 2 then
+		printf("SWITCH_TO_ROBBER")
+		self.st.enabled = false
+		xr_motivator.storage[self.object:id()].robber.enabled = true
+		return false -- false т.к. мы не меняли параметры движения в схеме, просто активировали другую...
+	end
+	abort("object '%s': invalid 'ret' value specified in path: ret = %d", self.object:name(), number)
+	return false
+end
+
+function action_guide_activity:execute()
+	action_base.execute(self)
+
+	local actor = level.actor()
+	if not actor then
+		return
+	end
+	
+	if self.state == state_main then
+		if self.object:see(actor) and distance_between(self.object, actor) < 3 then
+			self.move_mgr:reset(self.st.path_lead_walk, self.st.path_lead_walk_info,
+				self.st.path_lead_look, self.st.path_lead_look_info,
+				self.st.team,
+				nil, {obj = self, func = self.move_callback})
+			self.state = state_lead
+		else
+			self.move_mgr:update()
+		end
+		return
+	end
+
+	if self.state == state_lead then
+		self.move_mgr:update()
+		return
+	end
+
+	if self.state == state_wait then
+		if distance_between(self.object, actor) < 4 then
+			self.move_mgr:update_movement_state()
+			self.state = state_lead
+		else
+			utils.stalker_look_at_stalker(self.object, actor)
+		end
+	end
+end
+
+function action_guide_activity:finalize()
+	self.move_mgr:finalize()
+	self.object:clear_animations()
+	action_base.finalize(self)
+end
+
+----------------------------------------------------------------------------------------------------------------------
+--guide binder
+----------------------------------------------------------------------------------------------------------------------
+function add_to_binder(npc, char_ini)
+	if char_ini == nil  or char_ini:section_exist ("guide") == true then
+		printf("xr_guide: add_to_binder")
+  		local operators	= {}
+	  	local properties  = {}
+		
+	   	local manager = npc:motivation_action_manager()
+
+		properties["event"] = xr_evaluators_id.reaction
+	 	properties["need_guide"] = xr_evaluators_id.zmey_guide_base + 1
+		--properties["override_fight"] = xr_evaluators_id.zmey_guide_base + 2
+
+	 	operators["action_guide"] = xr_actions_id.zmey_guide_base + 1
+	 	operators["action_guide_2"] = xr_actions_id.zmey_guide_base + 2
+
+	   	-- evaluators
+		manager:add_evaluator(properties["need_guide"], this.evaluator_need_guide(xr_motivator.storage[npc:id()].guide, "guide_need_guide"))
+
+		local new_action = this.action_guide_activity(npc, "action_guide_activity", xr_motivator.storage[npc:id()].guide)
+		new_action:add_precondition(world_property(stalker_ids.property_alive, true))
+		new_action:add_precondition(world_property(stalker_ids.property_enemy, false))
+		new_action:add_precondition(world_property(properties["need_guide"], true))
+		new_action:add_precondition(world_property(properties["event"], false))
+		xr_motivator.addCommonPrecondition(new_action)
+	   	new_action:add_effect(world_property(properties["need_guide"], false))
+		manager:add_action(operators["action_guide"], new_action)
+
+		local st = xr_motivator.storage[npc:id()].guide
+		st.action = new_action
+
+	  	new_action = manager:action(xr_actions_id.alife)
+	  	new_action:add_precondition(world_property(properties["need_guide"], false))
+
+		if char_ini ~= nil then
+			xr_guide.set_guide(npc)
+		end
+	end
+end
+
+-- Включение схемы
+-- 
+-- enabled - включена ли схема
+function set_guide(object, enabled, path_main_walk, path_main_look, path_lead_walk, path_lead_look, team)
+	--printf("_bp: set_guide (path_main_walk=%s)", path_main_walk)
+	local char_ini = object:spawn_ini()	
+	local st = xr_motivator.storage[object:id()].guide
+
+	st.enabled = utils.conf_get_bool(char_ini, "guide", "enabled", enabled, object, true)
+	st.path_main_walk = utils.conf_get_string(char_ini, "guide", "path_main_walk", path_main_walk, object, true)
+	st.path_main_look = utils.conf_get_string(char_ini, "guide", "path_main_look", path_main_look, object, false)
+	st.path_lead_walk = utils.conf_get_string(char_ini, "guide", "path_lead_walk", path_lead_walk, object, true)
+	st.path_lead_look = utils.conf_get_string(char_ini, "guide", "path_lead_look", path_lead_look, object, false)
+	st.team = utils.conf_get_string(char_ini, "guide", "team", team, object, false)
+
+	st.path_main_walk_info = nil -- Будут инициализированы в reset(), сейчас пути могут быть еще
+	st.path_main_look_info = nil -- не загружены.
+	st.path_lead_walk_info = nil -- Будут инициализированы в reset(), сейчас пути могут быть еще
+	st.path_lead_look_info = nil -- не загружены.
+
+	if st.action ~= nil then
+		printf("_bp: set_guide: reset_scheme")
+		st.action:reset_scheme()
+	end
+	xr_motivator.checkStorage(object)
+end
+

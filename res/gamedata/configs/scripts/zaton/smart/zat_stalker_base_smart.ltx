@@ -1,0 +1,81 @@
+[smart_terrain];zat_stalker_base_smart
+squad_id = 1
+def_restr = zat_a2_sr_noweap
+safe_restr = zat_a2_sr_light
+smart_control = smart_control
+respawn_params = respawn@zat_stalker_base_smart
+max_population = 6
+arrive_dist = 65
+
+[respawn@zat_stalker_base_smart]
+spawn_stalker@novice
+spawn_stalker@advanced
+spawn_stalker@master
+
+[spawn_stalker@novice]
+spawn_squads = stalker_sim_squad_novice
+spawn_num = {-zat_b28_heli_3_searched -zat_b100_heli_2_searched -zat_b101_heli_5_searched} 4, 0 
+
+[spawn_stalker@advanced]
+spawn_squads = stalker_sim_squad_advanced, stalker_sim_squad_novice
+spawn_num = {+jup_b218_pripyat_group_gathering} 0, {+zat_b28_heli_3_searched} 4, {+zat_b100_heli_2_searched} 4, {+zat_b101_heli_5_searched} 4, 0
+
+[spawn_stalker@master]
+spawn_squads = stalker_sim_squad_veteran, stalker_sim_squad_advanced
+spawn_num = {+jup_b218_pripyat_group_gathering} 4, 0
+
+[smart_control]
+noweap_zone = zat_a2_sr_noweap
+ignore_zone = zat_a2_sr_light
+alarm_start_sound = zat_a2_base_alarm
+alarm_stop_sound = zat_a2_base_relax
+
+[exclusive]
+zat_a2_stalker_barmen = zaton\zat_a2_stalker_barmen.ltx
+zat_a2_stalker_mechanic = zaton\zat_a2_stalker_mechanic.ltx
+zat_b30_owl_stalker_trader = zaton\zat_b30_owl_stalker_trader.ltx
+zat_a2_stalker_nimble = zaton\zat_a2_stalker_nimble.ltx
+zat_b33_stalker_snag = zaton\zat_b33_stalker_snag.ltx
+zat_b38_stalker_medic = zaton\zat_b38_stalker_medic.ltx
+zat_b29_stalker_rival = zaton\zat_b29_stalkers_rivals.ltx
+zat_b7_bandit_boss_sultan = zaton\zat_b7_bandit_boss_sultan.ltx
+zat_b7_stalker_raider_leader = zaton\zat_b7_stalker_raider.ltx
+zat_b215_stalker_guide_zaton = zaton\zat_b215_stalker_guide_zaton.ltx
+zat_b38_stalker_cop = zaton\zat_b38_stalker_cop.ltx
+zat_b106_stalker_gonta = zaton\zat_b106_stalker_gonta.ltx
+zat_b106_stalker_garmata = zaton\zat_b106_stalker_garmata.ltx
+zat_b106_stalker_crab = zaton\zat_b106_stalker_crab.ltx
+zat_b7_stalker_victim_leader = zaton\zat_a2_logic.ltx
+zat_b14_stalker = zaton\zat_b14_stalker_1_base.ltx
+;generic jobs
+zat_a2_guarder_1 = zaton\zat_a2_logic.ltx
+zat_a2_guarder_2 = zaton\zat_a2_logic.ltx
+zat_a2_guarder_3 = zaton\zat_a2_logic.ltx
+zat_a2_guarder_4 = zaton\zat_a2_logic.ltx
+zat_a2_guarder_5 = zaton\zat_a2_logic.ltx
+zat_a2_guarder_6 = zaton\zat_a2_logic.ltx
+zat_a2_animp_1 = zaton\zat_a2_logic.ltx
+zat_a2_animp_2 = zaton\zat_a2_logic.ltx
+zat_a2_animp_3 = zaton\zat_a2_logic.ltx
+zat_a2_animp_4 = zaton\zat_a2_logic.ltx
+zat_a2_animp_5 = zaton\zat_a2_logic.ltx
+zat_a2_animp_6 = zaton\zat_a2_logic.ltx
+zat_a2_animp_7 = zaton\zat_a2_logic.ltx
+zat_a2_animp_8 = zaton\zat_a2_logic.ltx
+zat_a2_animp_9 = zaton\zat_a2_logic.ltx
+zat_a2_animp_10 = zaton\zat_a2_logic.ltx
+zat_a2_animp_11 = zaton\zat_a2_logic.ltx
+zat_a2_animp_12 = zaton\zat_a2_logic.ltx
+zat_a2_animp_13 = zaton\zat_a2_logic.ltx
+zat_a2_animp_14 = zaton\zat_a2_logic.ltx
+zat_a2_animp_15 = zaton\zat_a2_logic.ltx
+zat_a2_animp_16 = zaton\zat_a2_logic.ltx
+zat_a2_animp_17 = zaton\zat_a2_logic.ltx
+zat_a2_animp_18 = zaton\zat_a2_logic.ltx
+zat_a2_animp_19 = zaton\zat_a2_logic.ltx
+zat_a2_animp_20 = zaton\zat_a2_logic.ltx
+zat_a2_animp_21 = zaton\zat_a2_logic.ltx
+zat_a2_animp_22 = zaton\zat_a2_logic.ltx
+;test jobs
+zat_a2_barmen_trade = zaton\zat_a2_logic_addon.ltx
+zat_a2_mechanic_trade = zaton\zat_a2_logic_addon.ltx

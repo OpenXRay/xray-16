@@ -1,0 +1,438 @@
+--function printf(fmt,...)
+--    log(string.format(fmt,unpack(arg)))
+--end
+
+class "CSE_NewAttachableItem"				(cse_alife_item)
+
+function CSE_NewAttachableItem:__init		(section) super(section)
+	log							("CSE_NewAttachableItem::CSE_NewAttachableItem called!")
+	-- s8
+--	self._s8_0					= 8
+--	self._s8_1					= 7
+--	self._s8_2					= 6
+--	self._s8_3					= 5
+	-- s16
+	self._s16_0					= 16
+	self._s16_1					= 15
+	self._s16_2					= 14
+	self._s16_3					= 13
+	-- s32
+	self._s32_0					= 32
+	self._s32_1					= 31
+	self._s32_2					= 30
+	self._s32_3					= 29
+	-- u8
+	self._u8_0					= 8
+	self._u8_1					= 7
+	self._u8_2					= 6
+	self._u8_3					= 5
+	-- u16
+	self._u16_0					= 16
+	self._u16_1					= 15
+	self._u16_2					= 14
+	self._u16_3					= 13
+	-- u32
+	self._u32_0					= 32
+	self._u32_1					= 31
+	self._u32_2					= 30
+	self._u32_3					= 29
+	-- float
+	self._float_0				= 1.0
+	self._float_1				= 0.9
+	self._float_2				= 0.8
+	self._float_3				= 0.7
+	self._float_4				= 0.6
+	-- bool
+	self._bool_0				= true
+	-- vector
+	self._vector_0				= vector():set(0.0,0.0,0.0)
+	self._vector_1				= vector():set(0.1,0.1,0.1)
+	self._vector_2				= vector():set(0.2,0.2,0.2)
+	self._vector_3				= vector():set(0.3,0.3,0.3)
+	self._vector_4				= vector():set(0.4,0.4,0.4)
+	-- vcolor
+	self._vcolor_0				= vector():set(0,0,0)
+	-- angle
+	self._angle_0				= 1.0
+	self._angle_1				= 0.9
+	self._angle_2				= 0.8
+	self._angle_3				= 0.7
+	self._angle_4				= 0.6
+	-- vangle
+	self._vangle_0				= vector():set(0.0,0.0,0.0)
+	self._vangle_1				= vector():set(0.1,0.1,0.1)
+	self._vangle_2				= vector():set(0.2,0.2,0.2)
+	self._vangle_3				= vector():set(0.3,0.3,0.3)
+	self._vangle_4				= vector():set(0.4,0.4,0.4)
+	-- flags16
+	self._flag16_0				= flags16()
+	self._flag16_0:zero			()
+	-- flags32
+	self._flag32_0				= flags32()
+	self._flag32_0:zero			()
+	-- color
+	self._color_0				= 0
+	-- time
+	self._time_0				= 0.0
+	self._time_1				= 0.1
+	self._time_2				= 0.2
+	-- text
+	self._text_0				= "text"
+	-- token8
+	self.tokens8				= token_list()
+	self.tokens8:add			("token8_0",0)
+	self.tokens8:add			("token8_1",1)
+	self.tokens8:add			("token8_2",2)
+	self._token8_0				= self.tokens8:id("token8_0")
+	-- token16
+	self.tokens16				= token_list()
+	self.tokens16:add			("token16_0",0)
+	self.tokens16:add			("token16_1",1)
+	self.tokens16:add			("token16_2",2)
+	self._token16_0				= self.tokens16:id("token16_0")
+	-- token32
+	self.tokens32				= token_list()
+	self.tokens32:add			("token32_0",0)
+	self.tokens32:add			("token32_1",1)
+	self.tokens32:add			("token32_2",2)
+	self._token32_0				= self.tokens32:id("token32_0")
+	-- list
+	self.list					= rtoken_list()
+	self.list:add				("listitem_0")
+	self.list:add				("listitem_1")
+	self.list:add				("listitem_2")
+	self._listvalue_0			= ""
+	-- choose
+	self._choose_00				= ""
+	self._choose_01				= ""
+	self._choose_02				= ""
+	self._choose_03				= ""
+	self._choose_04				= ""
+	self._choose_05				= ""
+	self._choose_06				= ""
+	self._choose_07				= ""
+	self._choose_08				= ""
+	self._choose_09				= ""
+	self._choose_10				= ""
+	self._choose_11				= ""
+	self._choose_12				= ""
+	self._choose_13				= ""
+	self._choose_14				= ""
+	self._choose_15				= ""
+	self._choose_16				= ""
+end
+
+function CSE_NewAttachableItem:__finalize	()
+	log							("CSE_NewAttachableItem::~CSE_NewAttachableItem called!")
+end
+
+function CSE_NewAttachableItem:STATE_Write	(packet)
+	log							("CSE_NewAttachableItem::STATE_Write called!")
+	cse_alife_item.STATE_Write	(self,packet)
+	-- s8
+--	packet:w_s8					(self._s8_0)
+--	packet:w_s8					(self._s8_1)
+--	packet:w_s8					(self._s8_2)
+--	packet:w_s8					(self._s8_3)
+	-- s16
+	packet:w_s16				(self._s16_0)
+	packet:w_s16				(self._s16_1)
+	packet:w_s16				(self._s16_2)
+	packet:w_s16				(self._s16_3)
+	-- s32
+	packet:w_s32				(self._s32_0)
+	packet:w_s32				(self._s32_1)
+	packet:w_s32				(self._s32_2)
+	packet:w_s32				(self._s32_3)
+	-- u8
+	packet:w_u8					(self._u8_0)
+	packet:w_u8					(self._u8_1)
+	packet:w_u8					(self._u8_2)
+	packet:w_u8					(self._u8_3)
+	-- u16							   
+	packet:w_u16				(self._u16_0)
+	packet:w_u16				(self._u16_1)
+	packet:w_u16				(self._u16_2)
+	packet:w_u16				(self._u16_3)
+	-- u32							   
+	packet:w_u32				(self._u32_0)
+	packet:w_u32				(self._u32_1)
+	packet:w_u32				(self._u32_2)
+	packet:w_u32				(self._u32_3)
+	-- float
+	packet:w_float				(self._float_0)
+	packet:w_float				(self._float_1)
+	packet:w_float				(self._float_2)
+	packet:w_float				(self._float_3)
+	packet:w_float				(self._float_4)
+	-- bool
+	packet:w_bool				(self._bool_0)
+	-- vector
+	packet:w_vec3				(self._vector_0)
+	packet:w_vec3				(self._vector_1)
+	packet:w_vec3				(self._vector_2)
+	packet:w_vec3				(self._vector_3)
+	packet:w_vec3				(self._vector_4)
+	-- vcolor
+	packet:w_vec3				(self._vcolor_0)
+	-- angle
+	packet:w_float				(self._angle_0)
+	packet:w_float				(self._angle_1)
+	packet:w_float				(self._angle_2)
+	packet:w_float				(self._angle_3)
+	packet:w_float				(self._angle_4)
+	-- vangle
+	packet:w_vec3				(self._vangle_0)
+	packet:w_vec3				(self._vangle_1)
+	packet:w_vec3				(self._vangle_2)
+	packet:w_vec3				(self._vangle_3)
+	packet:w_vec3				(self._vangle_4)
+	-- flags16
+	packet:w_u16				(self._flag16_0:get())
+    -- flags32
+	packet:w_u32				(self._flag32_0:get())
+    -- color
+	packet:w_u32				(self._color_0)
+	-- time
+	packet:w_float				(self._time_0)
+	packet:w_float				(self._time_1)
+	packet:w_float				(self._time_2)
+	-- text
+	packet:w_stringZ			(self._text_0)
+	-- token8
+	packet:w_u8					(self._token8_0)
+	-- token16
+	packet:w_u16				(self._token16_0)
+	-- token32
+	packet:w_u32				(self._token32_0)
+	-- list
+	packet:w_stringZ			(self._listvalue_0)
+	-- choose
+	packet:w_stringZ			(self._choose_00)
+	packet:w_stringZ			(self._choose_01)
+	packet:w_stringZ			(self._choose_02)
+	packet:w_stringZ			(self._choose_03)
+	packet:w_stringZ			(self._choose_04)
+	packet:w_stringZ			(self._choose_05)
+	packet:w_stringZ			(self._choose_06)
+	packet:w_stringZ			(self._choose_07)
+	packet:w_stringZ			(self._choose_08)
+	packet:w_stringZ			(self._choose_09)
+	packet:w_stringZ			(self._choose_10)
+	packet:w_stringZ			(self._choose_11)
+	packet:w_stringZ			(self._choose_12)
+	packet:w_stringZ			(self._choose_13)
+	packet:w_stringZ			(self._choose_14)
+	packet:w_stringZ			(self._choose_15)
+	packet:w_stringZ			(self._choose_16)
+end
+
+function CSE_NewAttachableItem:STATE_Read	(packet, size)
+	log							("CSE_NewAttachableItem::STATE_Read called!")
+	cse_alife_item.STATE_Read	(self,packet,size)
+	-- s8
+--	self._s8_0					= packet:r_s8	()
+--	self._s8_1					= packet:r_s8	()
+--	self._s8_2					= packet:r_s8	()
+--	self._s8_3					= packet:r_s8	()
+	-- s16
+	self._s16_0					= packet:r_s16	()
+	self._s16_1					= packet:r_s16	()
+	self._s16_2					= packet:r_s16	()
+	self._s16_3					= packet:r_s16	()
+	-- s32
+	self._s32_0					= packet:r_s32	()
+	self._s32_1					= packet:r_s32	()
+	self._s32_2					= packet:r_s32	()
+	self._s32_3					= packet:r_s32	()
+	-- u8
+	self._u8_0					= packet:r_u8	()
+	self._u8_1					= packet:r_u8	()
+	self._u8_2					= packet:r_u8	()
+	self._u8_3					= packet:r_u8	()
+	-- u16								   
+	self._u16_0					= packet:r_u16	()
+	self._u16_1					= packet:r_u16	()
+	self._u16_2					= packet:r_u16	()
+	self._u16_3					= packet:r_u16	()
+	-- u32								   
+	self._u32_0					= packet:r_u32	()
+	self._u32_1					= packet:r_u32	()
+	self._u32_2					= packet:r_u32	()
+	self._u32_3					= packet:r_u32	()
+	-- float								   
+	self._float_0				= packet:r_float()
+	self._float_1				= packet:r_float()
+	self._float_2				= packet:r_float()
+	self._float_3				= packet:r_float()
+	self._float_4				= packet:r_float()
+	-- bool
+	self._bool_0				= packet:r_bool()
+	-- vector
+	packet:r_vec3				(self._vector_0)
+	packet:r_vec3				(self._vector_1)
+	packet:r_vec3				(self._vector_2)
+	packet:r_vec3				(self._vector_3)
+	packet:r_vec3				(self._vector_4)
+	-- vcolor
+	packet:r_vec3				(self._vcolor_0)
+	-- angle								   
+	self._angle_0				= packet:r_float()
+	self._angle_1				= packet:r_float()
+	self._angle_2				= packet:r_float()
+	self._angle_3				= packet:r_float()
+	self._angle_4				= packet:r_float()
+	-- vangle
+	packet:r_vec3				(self._vangle_0)
+	packet:r_vec3				(self._vangle_1)
+	packet:r_vec3				(self._vangle_2)
+	packet:r_vec3				(self._vangle_3)
+	packet:r_vec3				(self._vangle_4)
+	-- flags16
+	self._flag16_0:assign		(packet:r_u16())
+	-- flags32
+	self._flag32_0:assign		(packet:r_u32())
+    -- color
+	self._color_0				= packet:r_u32	()
+	-- float								   
+	self._time_0				= packet:r_float()
+	self._time_1				= packet:r_float()
+	self._time_2				= packet:r_float()
+	-- text
+	self._text_0				= packet:r_stringZ()
+	-- token8
+	self._token8_0				= packet:r_u8()
+	-- token16
+	self._token16_0				= packet:r_u16()
+	-- token32
+	self._token32_0				= packet:r_u32()
+	-- list
+	self._listvalue_0			= packet:r_stringZ()
+	-- choose
+	self._choose_00				= packet:r_stringZ()
+	self._choose_01				= packet:r_stringZ()
+	self._choose_02				= packet:r_stringZ()
+	self._choose_03				= packet:r_stringZ()
+	self._choose_04				= packet:r_stringZ()
+	self._choose_05				= packet:r_stringZ()
+	self._choose_06				= packet:r_stringZ()
+	self._choose_07				= packet:r_stringZ()
+	self._choose_08				= packet:r_stringZ()
+	self._choose_09				= packet:r_stringZ()
+	self._choose_10				= packet:r_stringZ()
+	self._choose_11				= packet:r_stringZ()
+	self._choose_12				= packet:r_stringZ()
+	self._choose_13				= packet:r_stringZ()
+	self._choose_14				= packet:r_stringZ()
+	self._choose_15				= packet:r_stringZ()
+	self._choose_16				= packet:r_stringZ()
+end
+
+function CSE_NewAttachableItem:FillProps	(pref,items)
+	log							("CSE_NewAttachableItem::FillProps called!")
+	cse_alife_item.FillProps	(self,pref,items)
+
+	local						prefix = pref .. "\\" .. self.section_name .. "\\script\\"
+	-- s8
+--	properties_helper():create_s8		(items, prefix .. "s8\\0",	self,"_s8_0")
+--	properties_helper():create_s8		(items, prefix .. "s8\\1",	self,"_s8_1",-8)
+--	properties_helper():create_s8		(items, prefix .. "s8\\2",	self,"_s8_2",-8,8)
+--	properties_helper():create_s8		(items, prefix .. "s8\\3",	self,"_s8_3",-8,8,2)
+	-- s16
+	properties_helper():create_s16		(items, prefix .. "s16\\0",self,"_s16_0")
+	properties_helper():create_s16		(items, prefix .. "s16\\1",self,"_s16_1",-16)
+	properties_helper():create_s16		(items, prefix .. "s16\\2",self,"_s16_2",-16,16)
+	properties_helper():create_s16		(items, prefix .. "s16\\3",self,"_s16_3",-16,16,4)
+	-- s32
+	properties_helper():create_s32		(items, prefix .. "s32\\0",self,"_s32_0")
+	properties_helper():create_s32		(items, prefix .. "s32\\1",self,"_s32_1",-32)
+	properties_helper():create_s32		(items, prefix .. "s32\\2",self,"_s32_2",-32,32)
+	properties_helper():create_s32		(items, prefix .. "s32\\3",self,"_s32_3",-32,32,8)
+	-- u8
+	properties_helper():create_u8		(items, prefix .. "u8\\0",	self,"_u8_0")
+	properties_helper():create_u8		(items, prefix .. "u8\\1",	self,"_u8_1",1)
+	properties_helper():create_u8		(items, prefix .. "u8\\2",	self,"_u8_2",1,8)
+	properties_helper():create_u8		(items, prefix .. "u8\\3",	self,"_u8_3",1,8,2)
+	-- u16														   
+	properties_helper():create_u16		(items, prefix .. "u16\\0",self,"_u16_0")
+	properties_helper():create_u16		(items, prefix .. "u16\\1",self,"_u16_1",1)
+	properties_helper():create_u16		(items, prefix .. "u16\\2",self,"_u16_2",1,16)
+	properties_helper():create_u16		(items, prefix .. "u16\\3",self,"_u16_3",1,16,4)
+	-- u32														   
+	properties_helper():create_u32		(items, prefix .. "u32\\0",self,"_u32_0")
+	properties_helper():create_u32		(items, prefix .. "u32\\1",self,"_u32_1",1)
+	properties_helper():create_u32		(items, prefix .. "u32\\2",self,"_u32_2",1,32)
+	properties_helper():create_u32		(items, prefix .. "u32\\3",self,"_u32_3",1,32,8)
+	-- float														   
+	properties_helper():create_float	(items, prefix .. "float\\0",self,"_float_0")
+	properties_helper():create_float	(items, prefix .. "float\\1",self,"_float_1",0)
+	properties_helper():create_float	(items, prefix .. "float\\2",self,"_float_2",0,10)
+	properties_helper():create_float	(items, prefix .. "float\\3",self,"_float_3",0,10,0.1)
+	properties_helper():create_float	(items, prefix .. "float\\4",self,"_float_4",0,10,0.1,3)
+	-- bool														   
+	properties_helper():create_bool		(items, prefix .. "bool\\0",self,"_bool_0")
+	-- vector
+	properties_helper():create_vector	(items, prefix .. "vector\\0",self,"_vector_0")
+	properties_helper():create_vector	(items, prefix .. "vector\\1",self,"_vector_1",-1)
+	properties_helper():create_vector	(items, prefix .. "vector\\2",self,"_vector_2",-10,10)
+	properties_helper():create_vector	(items, prefix .. "vector\\3",self,"_vector_3",-10,10,0.5)
+	properties_helper():create_vector	(items, prefix .. "vector\\4",self,"_vector_4",-10,10,0.5,4)
+	-- vcolor
+	properties_helper():create_vcolor	(items, prefix .. "vcolor\\0",self,"_vcolor_0")
+	-- angle
+	properties_helper():create_float	(items, prefix .. "angle\\0",self,"_angle_0")
+	properties_helper():create_float	(items, prefix .. "angle\\1",self,"_angle_1",0)
+	properties_helper():create_float	(items, prefix .. "angle\\2",self,"_angle_2",0,10)
+	properties_helper():create_float	(items, prefix .. "angle\\3",self,"_angle_3",0,10,0.1)
+	properties_helper():create_float	(items, prefix .. "angle\\4",self,"_angle_4",0,10,0.1,3)
+	-- vangle
+	properties_helper():create_vangle	(items, prefix .. "vangle\\0",self,"_vangle_0")
+	properties_helper():create_vangle	(items, prefix .. "vangle\\1",self,"_vangle_1",-1)
+	properties_helper():create_vangle	(items, prefix .. "vangle\\2",self,"_vangle_2",-10,10)
+	properties_helper():create_vangle	(items, prefix .. "vangle\\3",self,"_vangle_3",-10,10,0.5)
+	properties_helper():create_vangle	(items, prefix .. "vangle\\4",self,"_vangle_4",-10,10,0.5,4)
+	-- flags16
+	properties_helper():create_flag16	(items, prefix .. "flags16\\0",self,"_flag16_0",1)
+	properties_helper():create_flag16	(items, prefix .. "flags16\\1",self,"_flag16_0",2)
+	properties_helper():create_flag16	(items, prefix .. "flags16\\2",self,"_flag16_0",4)
+	properties_helper():create_flag16	(items, prefix .. "flags16\\3",self,"_flag16_0",8)
+	-- flags32
+	properties_helper():create_flag32	(items, prefix .. "flags32\\0",self,"_flag32_0",1)
+	properties_helper():create_flag32	(items, prefix .. "flags32\\1",self,"_flag32_0",2)
+	properties_helper():create_flag32	(items, prefix .. "flags32\\2",self,"_flag32_0",4)
+	properties_helper():create_flag32	(items, prefix .. "flags32\\3",self,"_flag32_0",8)
+	-- color
+	properties_helper():create_color	(items, prefix .. "color\\0",self,"_color_0")
+	-- time
+	properties_helper():create_time		(items, prefix .. "time\\0",self,"_time_0")
+	properties_helper():create_time		(items, prefix .. "time\\1",self,"_time_1",100)
+	properties_helper():create_time		(items, prefix .. "time\\2",self,"_time_2",0,100000.0)
+	-- text
+	properties_helper():create_text		(items, prefix .. "text\\0",self,"_text_0")
+	-- token8
+	properties_helper():create_token8	(items, prefix .. "token8\\0",self,"_token8_0",self.tokens8)
+	-- token16
+	properties_helper():create_token16	(items, prefix .. "token16\\0",self,"_token16_0",self.tokens16)
+	-- token32
+	properties_helper():create_token32	(items, prefix .. "token32\\0",self,"_token32_0",self.tokens32)
+	-- list
+	properties_helper():create_list		(items, prefix .. "list\\0",self,"_listvalue_0",self.list)
+	-- choose
+	properties_helper():create_choose	(items, prefix .. "choose\\00",self,"_choose_00",choose_type.sound_source)
+	properties_helper():create_choose	(items, prefix .. "choose\\01",self,"_choose_01",choose_type.sound_environment)
+	properties_helper():create_choose	(items, prefix .. "choose\\02",self,"_choose_02",choose_type.library_object)
+	properties_helper():create_choose	(items, prefix .. "choose\\03",self,"_choose_03",choose_type.engine_shader)
+	properties_helper():create_choose	(items, prefix .. "choose\\04",self,"_choose_04",choose_type.compiler_shader)
+	properties_helper():create_choose	(items, prefix .. "choose\\05",self,"_choose_05",choose_type.particle_effect)
+	properties_helper():create_choose	(items, prefix .. "choose\\06",self,"_choose_06",choose_type.particle_system)
+	properties_helper():create_choose	(items, prefix .. "choose\\07",self,"_choose_07",choose_type.texture)
+	properties_helper():create_choose	(items, prefix .. "choose\\08",self,"_choose_08",choose_type.entity)
+	properties_helper():create_choose	(items, prefix .. "choose\\09",self,"_choose_09",choose_type.spawn_item,"","spawn_group")
+	properties_helper():create_choose	(items, prefix .. "choose\\10",self,"_choose_10",choose_type.light_animation)
+	properties_helper():create_choose	(items, prefix .. "choose\\11",self,"_choose_11",choose_type.visual)
+	properties_helper():create_choose	(items, prefix .. "choose\\12",self,"_choose_12",choose_type.skeleton_animations,"","equipment\\fmradio.ogf")
+	properties_helper():create_choose	(items, prefix .. "choose\\13",self,"_choose_13",choose_type.skeleton_bones,"","equipment\\fmradio.ogf")
+	properties_helper():create_choose	(items, prefix .. "choose\\14",self,"_choose_14",choose_type.material)
+	properties_helper():create_choose	(items, prefix .. "choose\\15",self,"_choose_15",choose_type.game_animation)
+	properties_helper():create_choose	(items, prefix .. "choose\\16",self,"_choose_16",choose_type.game_motion)
+end

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_af_baloon_descr">
+		<text>Artefakt ten stanowi poі№czenie kilku pustych w њrodku formacji organicznych. Emituje on gazow№ substancjк, ktуra neutralizuje radioaktywne cz№steczki bez wyrz№dzania szkуd. Popyt na ten artefakt jest bardzo wysoki ze wzglкdu na jego efektywnoњж.</text>
+	</string>
+	<string id="st_af_baloon_name">
+		<text>B№bel</text>
+	</string>
+	<string id="st_af_blood_descr">
+		<text>Czerwonawa formacja sprasowanych i skamieniaіych roњlin, gleby i szcz№tkуw zwierz№t. Moїe czкњciowo neutralizowaж chemiczne trucizny. Emituje promieniowanie.</text>
+	</string>
+	<string id="st_af_blood_name">
+		<text>Kamienna krew</text>
+	</string>
+	<string id="st_af_cristall_descr">
+		<text>Ten artefakt powstaje w strefach anomalii o wysokiej aktywnoњci termicznej. Aktywnie pochіania ciepіo, pozostaj№c zimnym w dotyku. Emituje promieniowanie.</text>
+	</string>
+	<string id="st_af_cristall_flower_descr">
+		<text>Ten artefakt jest zіoїony z podobnego do granitu kamienia poddanego dziaіaniu olbrzymiej siіy grawitacyjnej, co spowodowaіo powstanie formacji krystalicznej, ktуrej nauka w chwili obecnej nie jest w stanie zrozumieж. Zapewnia њredni№ ochronк przed emisjami psionicznymi. Emituje promieniowanie.</text>
+	</string>
+	<string id="st_af_cristall_flower_name">
+		<text>Kamienny kwiat</text>
+	</string>
+	<string id="st_af_cristall_name">
+		<text>Krysztaі</text>
+	</string>
+	<string id="st_af_dummy_battery_descr">
+		<text>W skіad tego artefaktu wchodz№ elementy elektrostatyczne, ale naukowcy nie odkryli jeszcze, jakie warunki s№ niezbкdne dla jego powstania. Jest on popularny w Zonie - zarуwno jej mieszkaсcy, jak i goњcie ceni№ jego wіaњciwoњci energetyzuj№ce. Uїywany zbyt dіugo moїe doprowadziж do wycieсczenia organizmu. Emituje promieniowanie.</text>
+	</string>
+	<string id="st_af_dummy_battery_name">
+		<text>Bateria</text>
+	</string>
+	<string id="st_af_dummy_dummy_descr">
+		<text>Artefakt ten byі uwaїany za odpad pozbawiony uїytecznych wіaњciwoњci. Jednak niedawno naukowcy odkryli, їe jeњli ma staіy kontakt z ciaіem, silnie stymuluje ukіad nerwowy. Emituje promieniowanie. </text>
+	</string>
+	<string id="st_af_dummy_dummy_name">
+		<text>Muszla</text>
+	</string>
+	<string id="st_af_dummy_glassbeads_descr">
+		<text>Wiele z wіaњciwoњci tego artefaktu pozostaje tajemnic№ dla naukowcуw. Wiadomo jednak, їe emisje wywoіywane przez drgania w jego grubszej czкњci powoduj№, їe krew w otwartych ranach krzepnie szybciej, tworz№c ochronny strup. Jednym z najbardziej widocznych skutkуw dziaіania tego artefaktu jest zwiкkszona szybkoњж gojenia siк ran. Emituje promieniowanie. </text>
+	</string>
+	<string id="st_af_dummy_glassbeads_name">
+		<text>Korale mamy</text>
+	</string>
+	<string id="st_af_electra_flash_descr">
+		<text>Ten elektrostatyczny artefakt jest potкїnym pochіaniaczem elektrycznoњci, ktуr№ nastкpnie rozіadowuje. Bіysk moїe chroniж posiadacza przed poraїeniem pr№dem o napiкciu do 5000 woltуw. Emituje promieniowanie.</text>
+	</string>
+	<string id="st_af_electra_flash_name">
+		<text>Bіysk</text>
+	</string>
+	<string id="st_af_electra_moonlight_descr">
+		<text>Ten unikalny artefakt elektrostatyczny rezonuje pod wpіywem fal psionicznych. Stalkerzy potrafi№ wyregulowaж go w ten sposуb, їe rezonans zachodzi w fazie przeciwnej do gіуwnego џrуdіa emisji, znacz№co osіabiaj№c efekty jej dziaіania. Emituje promieniowanie.</text>
+	</string>
+	<string id="st_af_electra_moonlight_name">
+		<text>Blask ksiкїyca</text>
+	</string>
+	<string id="st_af_electra_sparkler_descr">
+		<text>Ten jasno њwiec№cy przedstawiciel rodziny artefaktуw elektrostatycznych moїe іagodziж fluktuacje gкstoњci pola elektrycznego. Emituje promieniowanie.</text>
+	</string>
+	<string id="st_af_electra_sparkler_name">
+		<text>Њwiecideіko</text>
+	</string>
+	<string id="st_af_eye_descr">
+		<text>Ten przypominaj№cy ludzkie oko artefakt znacz№co przyspiesza metabolizm wіaњciciela, dziкki czemu rany goj№ siк szybciej. Doњwiadczeni stalkerzy twierdz№ takїe, їe Oko przynosi szczкњcie. Emituje promieniowanie.</text>
+	</string>
+	<string id="st_af_eye_name">
+		<text>Oko</text>
+	</string>
+	<string id="st_af_fire_descr">
+		<text>Ten artefakt powstaje w obszarach wysokiej aktywnoњci termicznej. Wytwarza on potкїne emisje podczerwieni, ktуre wzmacniaj№ procesy metaboliczne, lecz№c rany na oczach uїytkownika. Poniewaї jest on bardzo rzadki, cechuje siк wysok№ wartoњci№. Emituje promieniowanie.</text>
+	</string>
+	<string id="st_af_fire_name">
+		<text>Pіomieс</text>
+	</string>
+	<string id="st_af_fireball_descr">
+		<text>Chociaї Kula ognista jest artefaktem termicznym, moїna siк nim posіugiwaж bez obawy o poparzenie. Jest on ceniony za zdolnoњж utrzymywania na niewielkim obszarze staіej temperatury 24 stopni Celsjusza, bez wzglкdu na warunki panuj№ce dookoіa. Emituje promieniowanie.</text>
+	</string>
+	<string id="st_af_fireball_name">
+		<text>Kula ognista</text>
+	</string>
+	<string id="st_af_fuzz_kolobok_descr">
+		<text>Kulebiak to stosunkowo rzadki artefakt, powstaj№cy w miejscach silnie skaїonych chemicznie. Jest on ceniony ze wzglкdu na moїliwoњж leczenia dowolnych ran w ci№gu sekund. Z nieznanych powodуw naukowcy rozprzestrzeniaj№ wњrуd stalkerуw pogіoski, jakoby modyfikowaі kod genetyczny wіaњciciela. Emituje promieniowanie.</text>
+	</string>
+	<string id="st_af_fuzz_kolobok_name">
+		<text>Kulebiak</text>
+	</string>
+	<string id="st_af_glass_name">
+		<text>Њwietlik</text>
+	</string>
+	<string id="st_af_gold_fish_descr">
+		<text>Artefakt powstaіy w wyniku interakcji duїej liczby pуl grawitacyjnych. Artefakt ten wytwarza wіasne silne kierunkowe pole grawitacyjne, ktуre sprawia, їe przedmioty w jego zasiкgu prawie nic nie waї№. Poniewaї zmniejsza wagк niesionego ekwipunku, jest bardzo poszukiwany przez stalkerуw. Emituje promieniowanie.</text>
+	</string>
+	<string id="st_af_gold_fish_name">
+		<text>Zіota rybka</text>
+	</string>
+	<string id="st_af_gravi_descr">
+		<text>Grawi powstaje z metalicznych substancji wystawionych na dіugotrwaіe dziaіanie grawitacji. Dziкki temu wytwarza pole antygrawitacyjne, ktуrego wielu stalkerуw uїywa w celu zmniejszenia wagi swojego ekwipunku. Emituje promieniowanie.</text>
+	</string>
+	<string id="st_af_gravi_name">
+		<text>Grawi</text>
+	</string>
+	<string id="st_af_ice_descr">
+		<text>Na pierwszy rzut oka artefakt ten przypomina Kulebiaka. Niektуrzy uwaїaj№, їe jest to Kulebiak, ktуrego wіaњciwoњci zostaіy wzmocnione poprzez wystawienie na dziaіanie potкїnego pola elektrycznego. Dziкki swoim unikalnym wіaњciwoњciom moїe on znacz№co zwiкkszyж napiкcie miкњniowe posiadacza. Emituje promieniowanie.</text>
+	</string>
+	<string id="st_af_ice_name">
+		<text>Њnieїynka</text>
+	</string>
+	<string id="st_af_medusa_descr">
+		<text>Ten artefakt grawitacyjny przyci№ga i pochіania radioaktywne cz№stki, zmniejszaj№c wpіyw promieniowania na organizm. Bardzo popularny w Zonie, jest takїe nieoficjalnie uїywany poza ni№ do leczenia ostrej choroby popromiennej w szczegуlnych przypadkach.</text>
+	</string>
+	<string id="st_af_medusa_name">
+		<text>Meduza</text>
+	</string>
+	<string id="st_af_mincer_meat_descr">
+		<text>Ten organiczny artefakt skіada siк ze zdeformowanej, zmutowanej tkanki zwierzкcej. Po umieszczeniu w skaїonym chemicznie miejscu zmienia unosz№ce siк w powietrzu chemikalia w њluzowaty pіyn. Emituje promieniowanie.</text>
+	</string>
+	<string id="st_af_mincer_meat_name">
+		<text>Kotlet</text>
+	</string>
+	<string id="st_af_night_star_descr">
+		<text>Ten њwiec№cy artefakt moїe tworzyж miejscowe, kierunkowe pole niskiej grawitacji. Umieszczony w pobliїu plecaka zmniejsza jego wagк. Powszechnie uїywany przez stalkerуw, razem z podobnym artefaktem o nazwie Grawi, do zwiкkszania maksymalnego іadunku. Emituje promieniowanie.</text>
+	</string>
+	<string id="st_af_night_star_name">
+		<text>Gwiazda wieczorna</text>
+	</string>
+	<string id="st_af_soul_descr">
+		<text>Unikalny artefakt organiczny o rуwnie unikalnych wіaњciwoњciach. W jakiњ sposуb zwiкksza stopieс regeneracji wszystkich rodzajуw obraїeс, nie przyspieszaj№c jednoczeњnie odkіadania siк substancji toksycznych. Z powodu jego dziaіania i atrakcyjnego wygl№du jest poszukiwany przez kolekcjonerуw. Emituje promieniowanie.</text>
+	</string>
+	<string id="st_af_soul_name">
+		<text>Dusza</text>
+	</string>
+	<string id="st_af_vyvert_descr">
+		<text>Ten artefakt o dziwacznym ksztaіcie pojawia siк w miejscach o zwiкkszonej aktywnoњci grawitacyjnej. Zachowuje siк jak g№bka wchіaniaj№ca promieniowanie. Dziкki temu artefakt zapewnia skuteczn№ ochronк zarуwno przed promieniowaniem z zewn№trz, jak i przed radioaktywnymi cz№stkami, ktуre juї znalazіy siк w organizmie.</text>
+	</string>
+	<string id="st_af_vyvert_name">
+		<text>Skrкtak</text>
+	</string>
+	<string id="st_compass">
+		<text>Kompas</text>
+	</string>
+	<string id="st_compass_descr">
+		<text>Rzadki artefakt - minкіo kilka lat od ostatniego razu, kiedy znaleziono jeden z nich. Pozwala on zlokalizowaж przerwy w polach anomalii. Uwaїa siк, їe pozwala on wіaњcicielowi na przebycie nawet najbardziej skomplikowanych pуl anomalii bez szkody. Niewiele osуb wie jednak, jak siк z nim prawidіowo obchodziж.</text>
+	</string>
+	<string id="st_oasis_heart">
+		<text>Serce Oazy</text>
+	</string>
+	<string id="st_oasis_heart_descr">
+		<text>Artefakt ten zostaі znaleziony w samym sercu legendarnej Oazy. Wydaje siк, їe serce to skrystalizowana roњlina, ktуra nabyіa leczniczych wіaњciwoњci Oazy. W odrуїnieniu od niej, artefakt ten jest silnie radioaktywny.</text>
+	</string>
+	<string id="st_af_glass_descr">
+		<text>Њwietlik oddziaіuje z polami nieznanym nauce, znacz№co przyspieszaj№c regeneracjк tkanek i organуw u istot їywych, stabilizuj№c przy tym procesy metaboliczne. Artefakt ten pozwala ciкїko rannemu stalkerowi wyzdrowieж w ci№gu dosіownie kilku sekund. Niestety, Њwietlik jest bardzo rzadkim znaleziskiem. Emituje promieniowanie.</text>
+	</string>
+</string_table>

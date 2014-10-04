@@ -1,0 +1,72 @@
+[logic]
+active = sr_idle@run_black
+
+[sr_idle@run_black]
+on_info = sr_idle@prestart %=stop_surge =disable_ui =run_postprocess(black:3009:true) =set_counter(pri_a15_squad_count:5) =create_squad(pri_a15_squad:pri_a15) =create_squad(pri_a15_military_squad:pri_a15)%
+
+[sr_idle@prestart]
+;on_game_timer = 5 | sr_idle@give_info %=teleport_actor(pri_a15_actor_walk:pri_a15_actor_look)%
+;затычка
+on_game_timer = 5 | sr_idle@start %=teleport_actor(pri_a15_actor_walk:pri_a15_actor_look)%
+
+[sr_idle@start]
+on_info = {+pas_b400_done} sr_idle@give_info
+;затычка
+on_info2 = {-pas_b400_done} sr_idle@nil %+pri_a15_cutscene_end =teleport_actor(pri_a15_actor_start_walk:pri_a15_actor_start_look)%   
+;on_info2 = {-pas_b400_done} %+pas_b400_done%   
+
+[sr_idle@give_info]
+on_info = { -pri_a15_vano_out -pri_a15_sokolov_out -pri_a15_zulus_out -pri_a15_wanderer_out} sr_idle@spawn_military %+pri_a15_all_alive%
+
+on_info2 = { +pri_a15_vano_out -pri_a15_sokolov_out -pri_a15_zulus_out -pri_a15_wanderer_out} sr_idle@spawn_military %+pri_a15_1_vano%
+on_info3 = { -pri_a15_vano_out +pri_a15_sokolov_out -pri_a15_zulus_out -pri_a15_wanderer_out} sr_idle@spawn_military %+pri_a15_1_sokolov%
+on_info4 = { -pri_a15_vano_out -pri_a15_sokolov_out +pri_a15_zulus_out -pri_a15_wanderer_out} sr_idle@spawn_military %+pri_a15_1_zulus%
+on_info5 = { -pri_a15_vano_out -pri_a15_sokolov_out -pri_a15_zulus_out +pri_a15_wanderer_out} sr_idle@spawn_military %+pri_a15_1_wanderer%
+
+on_info6 = { +pri_a15_vano_out +pri_a15_sokolov_out -pri_a15_zulus_out -pri_a15_wanderer_out} sr_idle@spawn_military %+pri_a15_2_vano_sokolov%
+on_info7 = { +pri_a15_vano_out -pri_a15_sokolov_out +pri_a15_zulus_out -pri_a15_wanderer_out} sr_idle@spawn_military %+pri_a15_2_vano_zulus%
+on_info8 = { +pri_a15_vano_out -pri_a15_sokolov_out -pri_a15_zulus_out +pri_a15_wanderer_out} sr_idle@spawn_military %+pri_a15_2_vano_wanderer%
+on_info9 = { -pri_a15_vano_out +pri_a15_sokolov_out +pri_a15_zulus_out -pri_a15_wanderer_out} sr_idle@spawn_military %+pri_a15_2_sokolov_zulus%
+on_info10 = { -pri_a15_vano_out +pri_a15_sokolov_out -pri_a15_zulus_out +pri_a15_wanderer_out} sr_idle@spawn_military %+pri_a15_2_sokolov_wanderer%
+on_info11 = { -pri_a15_vano_out -pri_a15_sokolov_out +pri_a15_zulus_out +pri_a15_wanderer_out} sr_idle@spawn_military %+pri_a15_2_zulus_wanderer%
+
+on_info12 = { +pri_a15_vano_out +pri_a15_sokolov_out +pri_a15_zulus_out -pri_a15_wanderer_out} sr_idle@spawn_military %+pri_a15_3_wanderer_alive%
+on_info13 = { +pri_a15_vano_out +pri_a15_sokolov_out -pri_a15_zulus_out +pri_a15_wanderer_out} sr_idle@spawn_military %+pri_a15_3_zulus_alive%
+on_info14 = { +pri_a15_vano_out -pri_a15_sokolov_out +pri_a15_zulus_out +pri_a15_wanderer_out} sr_idle@spawn_military %+pri_a15_3_sokolov_alive%
+on_info15 = { -pri_a15_vano_out +pri_a15_sokolov_out +pri_a15_zulus_out +pri_a15_wanderer_out} sr_idle@spawn_military %+pri_a15_3_vano_alive%
+
+on_info16 = { +pri_a15_vano_out +pri_a15_sokolov_out +pri_a15_zulus_out +pri_a15_wanderer_out} sr_idle@spawn_military %+pri_a15_all_dead%
+
+[sr_idle@spawn_military]
+on_info = sr_idle@spawn_vano %=create_squad_member(pri_a15_military_2:pri_a15_military_squad:pri_a15_military_2_spawn) =create_squad_member(pri_a15_military_3:pri_a15_military_squad:pri_a15_military_3_spawn) =create_squad_member(pri_a15_military_4:pri_a15_military_squad:pri_a15_military_4_spawn)%
+
+[sr_idle@spawn_vano]
+on_info = {-pri_a15_vano_out} sr_idle@spawn_sokolov %=create_squad_member(pri_a15_vano:pri_a15_squad:pri_a15_vano_spawn) =inc_counter(pri_a15_squad_count)%
+on_info2 = {+pri_a15_vano_out} sr_idle@spawn_sokolov
+
+[sr_idle@spawn_sokolov]
+on_info = {-pri_a15_sokolov_out} sr_idle@spawn_zulus %=create_squad_member(pri_a15_sokolov_scene:pri_a15_squad:pri_a15_sokolov_spawn) =inc_counter(pri_a15_squad_count)%
+on_info2 = {+pri_a15_sokolov_out} sr_idle@spawn_zulus
+
+[sr_idle@spawn_zulus]
+on_info = {-pri_a15_zulus_out} sr_idle@spawn_wanderer %=create_squad_member(pri_a15_zulus:pri_a15_squad:pri_a15_zulus_spawn) =inc_counter(pri_a15_squad_count)%
+on_info2 = {+pri_a15_zulus_out} sr_idle@spawn_wanderer
+
+[sr_idle@spawn_wanderer]
+on_info = {-pri_a15_wanderer_out} sr_idle@count_squad %=create_squad_member(pri_a15_wanderer:pri_a15_squad:pri_a15_wanderer_spawn) =inc_counter(pri_a15_squad_count)%
+on_info2 = {+pri_a15_wanderer_out} sr_idle@count_squad
+
+[sr_idle@count_squad]
+on_info = {!counter_greater(pri_a15_squad_count:0)} sr_idle@start_cam %=stop_surge%
+
+[sr_idle@start_cam]
+on_game_timer = 20 | sr_idle@wait %=stop_postprocess(3009) +pri_a15_cutscene_go =update_npc_logic(pri_a15_actor:pri_a15_vano:pri_a15_sokolov_scene:pri_a15_zulus:pri_a15_wanderer:pri_a15_military_tarasov:pri_a15_military_2:pri_a15_military_3:pri_a15_military_4) =update_obj_logic(pri_a15_exit)%
+
+[sr_idle@wait]
+on_info = {+pri_a15_cutscene_end} sr_idle@end %=run_postprocess(fade_to_black_9_sec)%
+
+[sr_idle@end]
+on_game_timer = 75 | sr_idle@nil %=run_postprocess(black:3009:true)%
+on_info = {+pri_a16_kovalski_start} sr_idle@nil
+
+[sr_idle@nil]

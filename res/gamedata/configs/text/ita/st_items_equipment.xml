@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_antirad">
+		<text>Droghe anti-radiazioni</text>
+	</string>
+	<string id="st_antirad_descr">
+		<text>Le Droghe anti-radiazioni a base di mexamin sono comuni nella Zona. Causano la contrazione dei vasi sanguigni periferici e la riduzione dei livelli di ossigeno, in modo da curare e prevenire l'esposizione alle radiazioni. Non hanno gravi effetti collaterali, anche se in alcuni casi possono provocare nausea, vertigini, crampi e dolori addominali.</text>
+	</string>
+	<string id="st_bandage">
+		<text>Fasciatura</text>
+	</string>
+	<string id="st_bandage_descr">
+		<text>Una normale fascia elastica usata per bloccare le emorragie e prevenire l'infezione delle ferite. Nei casi meno gravi, basta applicare la fasciatura sulla ferita; in caso di emorragie arteriose, и necessario fasciare accuratamente l'area interessata.</text>
+	</string>
+	<string id="st_binocular_descr">
+		<text>Binocolo militare standard con un fattore di ingrandimento massimo x7.5. Particolarmente utile nella Zona per osservare gli oggetti piщ distanti.</text>
+	</string>
+	<string id="st_binocular_name">
+		<text>Binocolo</text>
+	</string>
+	<string id="st_bread">
+		<text>Pane</text>
+	</string>
+	<string id="st_bread_descr">
+		<text>Nella Zona non sono mai stati trovati dei fornai, ma questo pane non и contaminato nй radioattivo. Anzi, sembra fresco e commestibile. Finora non sono state segnalate lamentele.</text>
+	</string>
+	<string id="st_conserva">
+		<text>Barattolo "Colazione del turista"</text>
+	</string>
+	<string id="st_conserva_descr">
+		<text>Pare che questo cibo in scatola sia stato rubato dagli stalker in un deposito di razioni militari. Senza alcun tipo di etichetta, perт, и difficile stabilirlo con certezza. Se ci si attiene alla data di scadenza, dovrebbe essere ancora commestibile.</text>
+	</string>
+	<string id="st_detector1">
+		<text>Rilevatore "Eco"</text>
+	</string>
+	<string id="st_detector1_descr">
+		<text>Questo rilevatore di attivitа anomale piuttosto antiquato emette un segnale d'allarme quando particelle anomale entrano in una camera speciale, nei pressi di un'anomalia. Inoltre и in grado di rilevare la presenza di manufatti e misurare la distanza dal piщ vicino, indicata dalla frequenza dei segnali acustici emessi dallo strumento. Per attivare la modalitа di ricerca dei manufatti basta sollevare il coperchio anteriore. Il rilevatore "Eco" и un dispositivo rudimentale, quindi puт rilevare la presenza solo dei manufatti piщ comuni.</text>
+	</string>
+	<string id="st_detector2">
+		<text>Rilevatore "Orso"</text>
+	</string>
+	<string id="st_detector3">
+		<text>Rilevatore "Veles"</text>
+	</string>
+	<string id="st_detector3_descr">
+		<text>Uno scanner scientifico di nuova generazione. Grazie alle sue tre camere di rilevazione, la posizione dei manufatti viene indicata su uno schermo speciale. In posizione chiusa, lo strumento registra solo radiazioni e anomalie. Per attivare la modalitа di ricerca dei manufatti basta aprire il display LED anteriore. In questa modalitа, il rilevatore puт individuare tutti i manufatti noti alla scienza.</text>
+	</string>
+	<string id="st_detector4">
+		<text>Rilevatore sperimentale "Svarog"</text>
+	</string>
+	<string id="st_detector4_descr">
+		<text>Prototipo di uno scanner di anomalie potenziato. Possiede un programma integrato in grado identificare aree statiche che presentano attivitа anomale registrate nel database, mantenendo la capacitа di individuare i manufatti. La posizione delle aree anomale e dei manufatti viene indicata su uno schermo speciale. La modalitа di ricerca dei manufatti, attivabile aprendo il display LED anteriore, и stata modificata per rilevare anche le formazioni anomale attualmente sconosciute alla scienza.</text>
+	</string>
+	<string id="st_device_torch_descr">
+		<text>Una torcia standard da applicare in testa. Utile per gli stalker rimasti bloccati all'esterno dopo il tramonto, ma potrebbe attirare guai se usata con scarsa prudenza.</text>
+	</string>
+	<string id="st_device_torch_name">
+		<text>Torcia</text>
+	</string>
+	<string id="st_drug_anabiotic">
+		<text>Anabiotico</text>
+	</string>
+	<string id="st_drug_antidot">
+		<text>Antidoto</text>
+	</string>
+	<string id="st_drug_antidot_descr">
+		<text>L'antitossina IP2 и una sostanza complessa che include numerosi antidoti, come la metoclopramide, la piridossina, la tiamina, la ribossina e altri composti farmaceutici. Viene utilizzata per iniettare nel flusso sanguigno una vasta gamma di antibiotici che neutralizzano i veleni naturali, insieme a diversi assorbitori di veleni sintetici. L'antitossina IP2 non и molto comune nella Zona, dato che gli stalker preferiscono usare maschere antigas e tute protettive, ma alcuni conservano gelosamente scorte di questo antidoto. Gli effetti durano molto a lungo.</text>
+	</string>
+	<string id="st_drug_booster">
+		<text>Ercole</text>
+	</string>
+	<string id="st_drug_coagulant">
+		<text>Vinca</text>
+	</string>
+	<string id="st_drug_coagulant_descr">
+		<text>Vikasol di fabbricazione ucraina, equivalente artificiale della vitamina K. La funzione principale di questa sostanza и accelerare la coagulazione del sangue. Molto richiesto dagli stalker per rimarginare in fretta le ferite piщ gravi e le lacerazioni inflitte dai mutanti. Gli effetti durano molto a lungo.</text>
+	</string>
+	<string id="st_drug_psy_blockade">
+		<text>Psico-bloccante</text>
+	</string>
+	<string id="st_drug_psy_blockade_descr">
+		<text>Una sostanza che blocca gli impulsi nervosi "a valanga". La somministrazione provoca l'annullamento temporaneo di qualsiasi sensazione. Utilizzato esclusivamente nella Zona per contrastare gli effetti degli psico-campi anomali. Gli effetti durano molto a lungo.</text>
+	</string>
+	<string id="st_drug_radioprotector">
+		<text>Radioprotettore</text>
+	</string>
+	<string id="st_energy_drink">
+		<text>Bevanda energetica</text>
+	</string>
+	<string id="st_energy_drink_descr">
+		<text>Usata spesso dagli stalker durante i lunghi viaggi in cui non ci si puт concedere delle soste. La bevanda contiene carboidrati facilmente digeribili e sostanze che stimolano il rilascio di adrenalina nel flusso sanguigno.</text>
+	</string>
+	<string id="st_guitar_descr">
+		<text>Una semplice chitarra.</text>
+	</string>
+	<string id="st_guitar_name">
+		<text>Chitarra</text>
+	</string>
+	<string id="st_kolbasa">
+		<text>Salsiccia dietetica</text>
+	</string>
+	<string id="st_kolbasa_descr">
+		<text>Nel bene o nel male, spesso questa salsiccia (un misto di pollo e surrogato di soia) costituisce la colazione, il pranzo e la cena degli stalker. Praticamente non ha una data di scadenza, per via dell'alto contenuto di conservanti.</text>
+	</string>
+	<string id="st_medkit">
+		<text>Kit di pronto soccorso</text>
+	</string>
+	<string id="st_medkit_army">
+		<text>Kit di pronto soccorso militare</text>
+	</string>
+	<string id="st_medkit_army_descr">
+		<text>Un kit di pronto soccorso speciale per fornire assistenza medica ai feriti di guerra. Include coagulanti a base di menadione, antidolorifici, antibiotici e immunostimolanti, oltre a un kit per rimuovere proiettili e frammenti dal corpo. Questo kit di pronto soccorso и fornito come standard al personale militare e talvolta viene utilizzato dalle forze della Duty.</text>
+	</string>
+	<string id="st_medkit_descr">
+		<text>Un kit di pronto soccorso generico e monouso. Utile per trattare vari tipi di ferite, ustioni termiche, ustioni chimiche e i piщ comuni sintomi da avvelenamento. И molto popolare tra gli stalker.</text>
+	</string>
+	<string id="st_medkit_science">
+		<text>Kit di pronto soccorso scientifico</text>
+	</string>
+	<string id="st_medkit_science_descr">
+		<text>Un kit di pronto soccorso progettato specificamente per la Zona. Contiene prodotti per curare le ferite, prevenire gli sviluppi della contaminazione da radiazioni e ridurre l'accumulo di radiazioni nel corpo. A differenza degli altri kit di pronto soccorso, include anche vikasol, batilol e nafazolina.</text>
+	</string>
+	<string id="st_pda_descr">
+		<text>Nessun dato presente.</text>
+	</string>
+	<string id="st_pda_name">
+		<text>PDA</text>
+	</string>
+	<string id="st_vodka">
+		<text>Vodka "Cosacchi"</text>
+	</string>
+	<string id="st_vodka_descr">
+		<text>Prodotta dalla GSC. Si beve volentieri e riduce in modo significativo gli effetti delle radiazioni. Da consumare con moderazione.</text>
+	</string>
+	<string id="st_detector2_descr">
+		<text>Questo rilevatore di anomalie di ultima generazione puт localizzare formazioni anomale e ha un pannello a diodi a colori, che non solo ti indica la direzione in cui si trovano i manufatti, ma calcola anche la distanza. Per passare alla modalitа ricerca manufatti, apri il pannello frontale del dispositivo. Purtroppo, и programmato con una lista di manufatti piuttosto datata.</text>
+	</string>
+	<string id="st_drug_anabiotic_descr">
+		<text>Una sostanza sperimentale sviluppata dal professor Ozersky per le squadre di ricerca scientifica che lavorano nella Zona. L'ingrediente principale и la tetradotossina, nota anche come "polvere zombi", che provoca il blocco totale del sistema nervoso centrale per consentire di sopravvivere all'esposizione diretta alle emissioni. La sostanza non и stata ancora sperimentata clinicamente o sul campo, e ciт solleva qualche dubbio sulla sua efficacia e sui possibili effetti collaterali.</text>
+	</string>
+	<string id="st_bolt">
+		<text>Bolt</text>
+	</string>
+	<string id="st_drug_booster_descr">
+		<text>Il componente principale di questo prodotto и un androgeno anabolico, uno steroide artificiale, la cui composizione chimica ricorda il testosterone. Viene spesso usato dagli stalker durante i lunghi attacchi per ridurre l'affaticamento muscolare. Aumenta notevolmente la capacitа di trasportare pesi. Gli effetti della droga sono di lunga durata.</text>
+	</string>
+	<string id="st_drug_radioprotector_descr">
+		<text>L'indralina B190 и un radioprotettore incluso nei kit medici forniti al personale degli impianti nucleari. Viene utilizzata nella Zona al posto del cloridato di cistamina PC1, eccessivamente tossico e potenzialmente letale se usato troppo spesso. Riduce gli effetti delle radiazioni gamma sui tessuti viventi. Va assunta prima dell'esposizione, dato che non agisce immediatamente. Gli effetti durano molto a lungo.</text>
+	</string>
+	<string id="st_harmonica_name">
+		<text>Armonica</text>
+	</string>
+	<string id="st_harmonica_descr">
+		<text>Per gli amanti del blues.</text>
+	</string>
+</string_table>

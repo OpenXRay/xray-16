@@ -1,0 +1,38 @@
+[logic@pas_b400_snork_elevator_4]
+active = mob_home@pas_b400_snork_elevator_4
+suitable = {=target_squad_name(pas_b400_snork_elevator_4)} true 
+prior = 200
+monster_job = true
+
+[mob_home@pas_b400_snork_elevator_4]
+path_home = 4_snork_spawn
+home_min_radius = 10
+home_max_radius = 20
+aggressive = true
+on_info = {=actor_in_zone(pas_b400_sr_elevator_3)} mob_home@pas_b400_snork_elevator_4_attack
+
+[mob_home@pas_b400_snork_elevator_4_attack]
+path_home = 4_snork_home
+home_min_radius = 10
+home_max_radius = 20
+aggressive = true
+
+
+[logic@pas_b400_tushkano_elevator_1]
+active = mob_home@pas_b400_tushkano_elevator_1
+suitable = {=is_monster_tushkano =target_squad_name(pas_b400_elevator_tushkano)} true
+prior = 200
+monster_job = true
+
+[mob_home@pas_b400_tushkano_elevator_1]
+path_home = tushkano_home_1
+
+
+[logic@pas_b400_tushkano_elevator_2]
+active = mob_home@pas_b400_tushkano_elevator_2
+suitable = {=is_monster_tushkano =target_squad_name(pas_b400_elevator_tushkano)} true
+prior = 200
+monster_job = true
+
+[mob_home@pas_b400_tushkano_elevator_2]
+path_home = tushkano_home_2

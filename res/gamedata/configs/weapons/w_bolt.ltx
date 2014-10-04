@@ -1,0 +1,81 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; BOLT
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[bolt]:identity_immunities,weapon_probability,default_weapon_params
+class				= II_BOLT
+cform				= skeleton
+visual				= dynamics\devices\dev_bolt\dev_bolt.ogf
+inv_name			= st_bolt
+$prefetch 			= 16
+inv_name_short		= st_bolt
+inv_weight			= .0
+
+ef_weapon_type		= 1
+
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 0
+inv_grid_y			= 0
+
+animation_slot		= 6
+single_handed		= 0
+
+attach_position_offset	= -0.03, -0.05, 0.03
+attach_angle_offset		= 0,0,0
+attach_bone_name		=
+
+slot				= 5
+hud					= bolt_hud
+force_min			= 10
+force_const			= 20
+force_max			= 20
+force_grow_speed		= 10
+
+destroy_time		= 10000
+
+cost				= 0
+
+throw_point			= 0.4, 0.3, 0.1
+throw_dir			= 0,0,1
+
+third_person_throw_point_offset = -0.05,0.848,0.706
+
+PDM_disp_base           = 1.0
+PDM_disp_vel_factor     = 1.0
+PDM_disp_accel_factor   = 1.0
+PDM_disp_crouch         = 1.0
+PDM_disp_crouch_no_acc  = 1.0
+
+[bolt_hud]:hud_base
+fire_point				= 0,0,0
+fire_bone				= wpn_body
+
+attach_place_idx		= 0
+item_visual				= dynamics\devices\dev_bolt\dev_bolt_hud
+
+hands_position				= -0.021000,-0.160000,0.002500
+hands_orientation			= -0.500000,1.000000,1.149999
+hands_position_16x9				= 0.033000,-0.189500,0.039000
+hands_orientation_16x9			= 2.349998,2.749999,2.849998
+
+
+item_position			= 0 , 0 ,0
+item_orientation		= 0 , 0 ,0
+
+anm_hide				= dev_bolt_holster
+anm_show				= dev_bolt_draw
+anm_idle				= dev_bolt_idle
+anm_bore				= dev_bolt_idle_bore
+anm_idle_moving	 		= dev_bolt_idle_moving
+anm_idle_sprint	 		= dev_bolt_idle_sprint
+
+anm_throw_begin			= dev_bolt_shoot_start
+anm_throw_idle			= dev_bolt_shoot_idle
+anm_throw				= dev_bolt_shoot_end
+
+
+throw_point				= 0.0,0.4,0.3
+throw_dir				= 0,0,1
+

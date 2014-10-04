@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="speech_attack">
+		<text>Tout le monde, а l'attaque !</text>
+	</string>
+	<string id="speech_covermeartifact">
+		<text>Je vais rйcupйrer l'artefact ! Couvrez-moi !</text>
+	</string>
+	<string id="speech_followme">
+		<text>Suivez-moi !</text>
+	</string>
+	<string id="speech_guardartifact">
+		<text>Protйgez l'artefact pour l'instant ! Ne le prenez pas encore !</text>
+	</string>
+	<string id="speech_holdingpos">
+		<text>Je tiens ma position !</text>
+	</string>
+	<string id="speech_holdpos">
+		<text>Tenez vos positions !</text>
+	</string>
+	<string id="speech_icoverartifact">
+		<text>Prenez l'artefact ! Je vous couvre !</text>
+	</string>
+	<string id="speech_needhelp">
+		<text>J'ai besoin d'aide !</text>
+	</string>
+	<string id="speech_needmoney">
+		<text>Je n'ai pas assez d'argent ! Achetez-moi de l'йquipement !</text>
+	</string>
+	<string id="speech_no">
+		<text>Non.</text>
+	</string>
+	<string id="speech_noenemy">
+		<text>Personne en vue !</text>
+	</string>
+	<string id="speech_report">
+		<text>Au rapport, maintenant !</text>
+	</string>
+	<string id="speech_retreat">
+		<text>Repliez-vous !</text>
+	</string>
+	<string id="speech_returntheartefact">
+		<text>Rapportez l'artefact !</text>
+	</string>
+	<string id="speech_roger">
+		<text>Compris !</text>
+	</string>
+	<string id="speech_silence">
+		<text>Silence !</text>
+	</string>
+	<string id="speech_sticktogether">
+		<text>Restez groupйs !</text>
+	</string>
+	<string id="speech_takeartifact">
+		<text>Prenez l'artefact !</text>
+	</string>
+</string_table>

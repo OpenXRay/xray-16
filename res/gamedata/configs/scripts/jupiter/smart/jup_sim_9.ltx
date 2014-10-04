@@ -1,0 +1,18 @@
+[smart_terrain]
+squad_id = 47
+max_population = 1
+respawn_only_smart = true
+respawn_params = respawn@jup_sim_9
+
+[respawn@jup_sim_9]
+spawn_duty@advanced
+spawn_duty@veteran
+
+
+[spawn_duty@advanced]
+spawn_squads = duty_sim_squad_advanced, duty_sim_squad_advanced, duty_sim_squad_novice
+spawn_num = {-jup_b218_pripyat_group_gathering} 2, 0
+
+[spawn_duty@veteran]
+spawn_squads = duty_sim_squad_advanced, duty_sim_squad_advanced, duty_sim_squad_veteran
+spawn_num = {+jup_b218_pripyat_group_gathering} 2, 0

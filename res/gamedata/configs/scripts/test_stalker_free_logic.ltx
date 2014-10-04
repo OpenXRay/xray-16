@@ -1,0 +1,14 @@
+[logic]
+active = walker@guard
+
+[walker@guard]
+combat_ignore_cond = true
+combat_ignore_cond = true
+path_walk = free_1_walk_1
+path_look = free_1_look
+on_info = {=see_actor} walker@walk_free
+
+[walker@walk_free]
+combat_ignore_cond = true
+path_walk = free_1_walk_2
+path_look = free_1_look

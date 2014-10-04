@@ -1,0 +1,119 @@
+[logic]
+active = sr_idle@turn_lamps_off
+
+[sr_idle@turn_lamps_off]
+on_info = sr_idle@prestart %=run_postprocess(black:3009:true) =disable_ui =turn_off_underpass_lamps%
+
+[sr_idle@prestart]
+;затычка
+;on_info = {-leader_achievement_gained} %+jup_a10_vano_agree_go_und +jup_b218_soldier_hired +jup_b218_monolith_hired +leader_achievement_gained%
+on_info2 = {+leader_achievement_gained} sr_idle@start %=create_squad(pas_b400_stalkers_squad_strong:pas_b400_elevator)% 
+on_info3 = {-leader_achievement_gained} sr_idle@start %=create_squad(pas_b400_stalkers_squad:pas_b400_elevator)% 
+
+[sr_idle@start]
+on_info = sr_idle@spawn_vano %=teleport_actor(pas_b400_elevator_actor_1_walk:pas_b400_elevator_actor_1_look)%
+
+[sr_idle@spawn_vano]
+on_info = {+jup_a10_vano_agree_go_und +leader_achievement_gained} sr_idle@spawn_sokolov %=create_squad_member(pas_b400_vano_strong:pas_b400_stalkers_squad:pas_b400_elevator_vano_1_walk)%
+on_info2 = {+jup_a10_vano_agree_go_und -leader_achievement_gained} sr_idle@spawn_sokolov %=create_squad_member(pas_b400_vano:pas_b400_stalkers_squad:pas_b400_elevator_vano_1_walk)%
+on_info3 = {-jup_a10_vano_agree_go_und} sr_idle@spawn_sokolov %+pri_a15_vano_out%
+
+[sr_idle@spawn_sokolov]
+on_info = {+jup_b218_soldier_hired +leader_achievement_gained} sr_idle@spawn_wanderer %=create_squad_member(pas_b400_sokolov_strong:pas_b400_stalkers_squad:pas_b400_elevator_sokolov_1_walk)%
+on_info2 = {+jup_b218_soldier_hired -leader_achievement_gained} sr_idle@spawn_wanderer %=create_squad_member(pas_b400_sokolov:pas_b400_stalkers_squad:pas_b400_elevator_sokolov_1_walk)%
+on_info3 = {-jup_b218_soldier_hired} sr_idle@spawn_wanderer %+pri_a15_sokolov_out%
+
+[sr_idle@spawn_wanderer]
+on_info = {+jup_b218_monolith_hired +leader_achievement_gained} sr_idle@out %=create_squad_member(pas_b400_wanderer_strong:pas_b400_stalkers_squad:pas_b400_elevator_wanderer_1_walk)%
+on_info2 = {+jup_b218_monolith_hired -leader_achievement_gained} sr_idle@out %=create_squad_member(pas_b400_wanderer:pas_b400_stalkers_squad:pas_b400_elevator_wanderer_1_walk)%
+on_info3 = {-jup_b218_monolith_hired} sr_idle@out %+pri_a15_wanderer_out%
+
+[sr_idle@out]
+on_info = sr_idle@save %=stop_postprocess(3009) =enable_ui =give_task(pas_b400_pripyat) =set_counter(pas_b400_actor_zulus_hit:0) =set_counter(pas_b400_actor_vano_hit:0) =set_counter(pas_b400_actor_sokolov_hit:0) =set_counter(pas_b400_actor_wanderer_hit:0) +pas_b400_task_given =set_squad_goodwill(pas_b400_stalkers_squad:friend)%
+
+[sr_idle@save]
+on_info = {-pas_b400_underpass_start} %+pas_b400_underpass_start =scenario_autosave(st_save_pas_b400_underpass_start)%
+on_info2 = {+pas_b400_underpass_start} sr_idle@wait_for_shutdown
+
+[sr_idle@wait_for_shutdown]
+on_info = {!actor_in_zone(pas_b400_sr_elevator_1)} sr_idle@shutdown
+
+[sr_idle@shutdown]
+;shutdown lamps
+on_game_timer = 10 | %=play_sound_by_story(pas_b400_bwd:pas_b400_elevator_off)%
+on_game_timer2 = 20 | sr_idle@elevator %=turn_off(pas_b400_lamp_start_green) +pas_b400_sr_elevator_1_passed%
+
+[sr_idle@elevator]
+on_info = {=actor_in_zone(pas_b400_sr_track_1)} sr_idle@track %+pas_b400_elevator_done%
+on_info2 = {!squad_exist(pas_b400_snork_track_2) +pas_b400_sr_elevator_5_passed} sr_idle@track %+pas_b400_elevator_done%
+on_info3 = {-pas_b400_sr_elevator_5 =actor_in_zone(pas_b400_sr_elevator_5_in)} %+pas_b400_sr_elevator_5%
+on_info4 = {-pas_b400_elevator_button_pressed =squad_in_zone_all(pas_b400_stalkers_squad:pas_b400_sr_elevator_5)} sr_idle@elevator_talk
+
+[sr_idle@elevator_talk]
+on_info = {=actor_in_zone(pas_b400_sr_track_1)} sr_idle@track %+pas_b400_elevator_done%
+on_info2 = {!squad_exist(pas_b400_snork_track_2) +pas_b400_sr_elevator_5_passed} sr_idle@track %+pas_b400_elevator_done%
+on_info3 = {-pas_b400_sr_elevator_5 =actor_in_zone(pas_b400_sr_elevator_5_in)} %+pas_b400_sr_elevator_5%
+on_game_timer = 150 | {-pas_b400_elevator_button_pressed -pas_b400_about_gates} sr_idle@elevator %+pas_b400_about_gates%
+
+[sr_idle@track]
+on_info = {=actor_in_zone(pas_b400_sr_downstairs_1)} sr_idle@tunnel %+pas_b400_track_done%
+on_info2 = {-pas_b400_sr_track_4 =actor_in_zone(pas_b400_sr_track_4_in)} %+pas_b400_sr_track_4%
+on_info3 = {-pas_b400_track_button_pressed =squad_in_zone_all(pas_b400_stalkers_squad:pas_b400_sr_track_4)} sr_idle@track_talk
+
+[sr_idle@track_talk]
+on_info = {=actor_in_zone(pas_b400_sr_downstairs_1)} sr_idle@tunnel %+pas_b400_track_done%
+on_info2 = {-pas_b400_sr_track_4 =actor_in_zone(pas_b400_sr_track_4_in)} %+pas_b400_sr_track_4%
+on_game_timer = 150 | {=is_alive(pas_b400_zulus) -pas_b400_zulus_about_obstacle_2} sr_idle@track 
+on_game_timer2 = 150 | {-pas_b400_track_button_pressed -pas_b400_about_gates !is_alive(pas_b400_zulus)} sr_idle@track %+pas_b400_about_gates%
+on_game_timer3 = 150 | {-pas_b400_track_button_pressed -pas_b400_about_gates +pas_b400_zulus_about_obstacle_2} sr_idle@track %+pas_b400_about_gates%
+
+[sr_idle@tunnel]
+on_info = {=actor_in_zone(pas_b400_sr_tunnel_1)} sr_idle@hall %+pas_b400_downstairs_done%
+on_info2 = {!squad_exist(pas_b400_tunnel_tushkano) +pas_b400_downstairs_door_opened} sr_idle@hall %+pas_b400_downstairs_done%
+on_info3 = {-pas_b400_sr_downstairs_2 =actor_in_zone(pas_b400_sr_downstairs_2)} %+pas_b400_sr_downstairs_2%
+on_info4 = {-pas_b400_downstairs_button_pressed =squad_in_zone_all(pas_b400_stalkers_squad:pas_b400_sr_downstairs_2)} sr_idle@downstairs_talk
+
+[sr_idle@downstairs_talk]
+on_info = {=actor_in_zone(pas_b400_sr_tunnel_1)} sr_idle@hall %+pas_b400_downstairs_done%
+on_info2 = {!squad_exist(pas_b400_tunnel_tushkano) +pas_b400_downstairs_door_opened} sr_idle@hall %+pas_b400_downstairs_done%
+on_info3 = {-pas_b400_sr_downstairs_2 =actor_in_zone(pas_b400_sr_downstairs_2)} %+pas_b400_sr_downstairs_2%
+on_game_timer = 150 | {-pas_b400_downstairs_button_pressed -pas_b400_about_gates} sr_idle@tunnel %+pas_b400_about_gates%
+
+[sr_idle@hall]
+on_info = {=actor_in_zone(pas_b400_sr_hall_1)} sr_idle@way %+pas_b400_tunnel_done =spawn_corpse(sim_default_monolith_1:pas_b400_hall_monolith_dead_spawn:0)%
+on_info2 = {!squad_has_enemy(pas_b400_stalkers_squad) !squad_exist(pas_b400_snork_tunnel_5) +pas_b400_zulus_about_train_gates_2 +pas_b400_tunnel_gates_opened} sr_idle@way %+pas_b400_tunnel_done =spawn_corpse(sim_default_monolith_1:pas_b400_hall_monolith_dead_spawn:0)%
+on_info3 = {!squad_has_enemy(pas_b400_stalkers_squad) !squad_exist(pas_b400_snork_tunnel_5) !is_alive(pas_b400_zulus) +pas_b400_tunnel_gates_opened} sr_idle@way %+pas_b400_tunnel_done =spawn_corpse(sim_default_monolith_1:pas_b400_hall_monolith_dead_spawn:0)%
+on_info4 = {=squad_in_zone(pas_b400_snork_tunnel_4:pas_b400_sr_tunnel_4) -pas_b400_snork_tunnel_4_attack} %+pas_b400_snork_tunnel_4_attack%
+on_info5 = {-pas_b400_snork_tunnel_2_jumped !squad_exist(pas_b400_snork_tunnel_2)} %+pas_b400_snork_tunnel_2_jumped%
+on_info6 = {-pas_b400_snork_tunnel_3_jumped !squad_exist(pas_b400_snork_tunnel_3)} %+pas_b400_snork_tunnel_3_jumped%
+on_info7 = {-pas_b400_sr_tunnel_5_in !actor_in_zone(pas_b400_sr_tunnel_4) =actor_in_zone(pas_b400_sr_tunnel_5)} %+pas_b400_sr_tunnel_5_in%
+
+[sr_idle@way]
+on_info = {=actor_in_zone(pas_b400_sr_way_1)} sr_idle@canalisation %+pas_b400_hall_done%
+on_info2 = {+pas_b400_hall_monolith_squad_attacked -pas_b400_hall_monolith_squad_dead !squad_exist(pas_b400_hall_monolith_squad) !squad_exist(pas_b400_hall_monolith_2_squad)} %+pas_b400_hall_monolith_squad_dead%
+on_info3 = {+pas_b400_hall_monolith_snipers_attacked -pas_b400_hall_monolith_snipers_dead !squad_exist(pas_b400_hall_monolith_sniper_1) !squad_exist(pas_b400_hall_monolith_sniper_2)} %+pas_b400_hall_monolith_snipers_dead%
+
+[sr_idle@canalisation]
+on_info = {=actor_in_zone(pas_b400_sr_canalisation_1)} sr_idle@exit %+pas_b400_way_done%
+on_info2 = {!squad_exist(pas_b400_canalisation_1_zombied)} sr_idle@exit %+pas_b400_way_done%
+on_info3 = {-pas_b400_sr_way_2 =actor_in_zone(pas_b400_sr_way_2_in)} %+pas_b400_sr_way_2%
+on_info4 = {-pas_b400_way_button_pressed =squad_in_zone_all(pas_b400_stalkers_squad:pas_b400_sr_way_2)} sr_idle@way_talk
+
+[sr_idle@way_talk]
+on_info = {=actor_in_zone(pas_b400_sr_canalisation_1)} sr_idle@exit %+pas_b400_way_done%
+on_info2 = {!squad_exist(pas_b400_canalisation_1_zombied)} sr_idle@exit %+pas_b400_way_done%
+on_info3 = {-pas_b400_sr_way_2 =actor_in_zone(pas_b400_sr_way_2_in)} %+pas_b400_sr_way_2%
+on_game_timer = 150 | {-pas_b400_about_gates -pas_b400_way_button_pressed} sr_idle@canalisation %+pas_b400_about_gates%
+
+[sr_idle@exit]
+on_info = {=actor_in_zone(pas_b400_sr_exit)} sr_idle@disable %+pas_b400_canalisation_done +pas_b400_done =run_postprocess(fade_in)%
+on_info2 = {+pas_b400_canalisation_tushkano_attacked -pas_b400_canalisation_snork_rl_spawned !actor_in_zone(pas_b400_sr_canalisation_tushkano_revert)} sr_idle@canalisation_spawn %=heal_squad(pas_b400_stalkers_squad)%
+
+[sr_idle@canalisation_spawn]
+on_info = {~50} sr_idle@exit %+pas_b400_canalisation_snork_rl_spawned =create_squad(pas_b400_canalisation_snork_2_r:pas_b400_canalisation)%, sr_idle@exit %+pas_b400_canalisation_snork_rl_spawned =create_squad(pas_b400_canalisation_snork_2_l:pas_b400_canalisation)%
+
+[sr_idle@disable]
+on_game_timer = 15 | {-pas_b400_disabled_ui} %+pas_b400_disabled_ui =disable_ui%
+on_game_timer2 = 25 | sr_idle@nil %=run_postprocess(black:3009:true) =remove_squad(pas_b400_stalkers_squad) =teleport_actor(pas_b400_actor_exit)%
+
+[sr_idle@nil]

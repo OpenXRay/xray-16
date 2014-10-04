@@ -1,0 +1,293 @@
+[wpn_svu]:identity_immunities,weapon_probability,default_weapon_params
+GroupControlSection		= spawn_group
+$spawn                  = "weapons\svu"      ; option for Level Editor
+$npc			 		= on				; option for Level Editor
+$prefetch 		 		= 8
+scheduled               = off              	; option for ALife Simulator
+cform                   = skeleton
+class                   = WP_SVU
+description             = st_wpn_svu_descr
+ef_main_weapon_type		= 3
+ef_weapon_type			= 11
+
+default_to_ruck         = false
+sprint_allowed          = true
+
+;-------------------------------------------------------------------------------
+cost                    = 17000
+weapon_class			= sniper_rifle
+inv_weight              = 4.4
+
+upgrades                = up_gr_firstab_svu, up_gr_seconab_svu, up_gr_thirdab_svu, up_gr_fourtab_svu, up_gr_fourtcd_svu, up_gr_fourtef_svu, up_gr_fifthab_svu
+installed_upgrades      =
+upgrade_scheme          = upgrade_scheme_svu
+
+;----TTX------------------------------------------------------------------------
+hit_power               = 0.6, 0.6, 0.6, 0.6
+hit_impulse             = 125
+hit_type 				= fire_wound
+fire_distance           = 1000
+bullet_speed		 	= 700 ;800	;начальная скорость пули
+rpm                     = 75
+rpm_empty_click         = 200
+
+use_aim_bullet				= false		;Поддерживается ли первая суппер пуля
+time_to_aim					= 1.0
+
+hud                     = wpn_svu_hud
+
+misfire_probability        = 0.005 ;вероятность осечки при максимальном износе  !!!old - now not working
+;изношенность, при которой появляется шанс осечки
+misfire_start_condition		= 0.6
+;изношеность при которой шанс осечки становится константным
+misfire_end_condition		= 0.1
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= 0.0065
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= 0.065
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= 0.0065
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= 0.0065
+
+ammo_elapsed			= 10
+ammo_mag_size			= 10
+fire_modes		  = 1;, -1
+ammo_class				= ammo_7.62x54_7h1
+hand_dependence         = 1
+single_handed           = 0
+
+;---дисперсия-------------------------------------------------------------------------
+;базовая дисперсия
+fire_dispersion_base    = 0.15   ;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor = 1.7
+crosshair_inertion		= 6.15
+
+;отдача
+cam_return				= 1
+cam_relax_speed         = 3.0   ;скорость возврата в исходное положение
+cam_relax_speed_ai      = 360	;скорость возврата в исходное положение
+cam_dispersion          = 1.8 ;увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc		= 1.8	;увеличениe cam_dispersion с каждым выстрелом
+cam_dispersion_frac		= 1.0	;ствол будет подыматься на cam_dispersion*cam_dispersion_frac +- cam_dispersion*(1-cam_dispersion_frac)
+cam_max_angle           = 12.0   ;максимальный угол отдачи
+cam_max_angle_horz		= 3.0	;(degree) maximum shot horizontal degree
+cam_step_angle_horz     = 1.5 ;(degree) size of step camera moved in horizontal position while shooting
+
+;PDM_disp_base           = 0.85
+;PDM_disp_vel_factor     = 3.4
+;PDM_disp_accel_factor 	= 3.4
+;PDM_disp_crouch	 		= 1.0
+;PDM_disp_crouch_no_acc 	= 1.0
+
+PDM_disp_base 			= 2.0
+PDM_disp_vel_factor 	= 4.0
+PDM_disp_accel_factor 	= 4.0
+PDM_disp_crouch	 		= 1.0
+PDM_disp_crouch_no_acc 	= 1.0
+
+
+zoom_cam_relax_speed        = 0.7    ; scope & ironsight
+zoom_cam_relax_speed_ai     = 120.75
+zoom_cam_dispersion         = 0.65
+zoom_cam_dispersion_inc     = 0.65
+zoom_cam_dispersion_frac    = 1.0
+zoom_cam_max_angle          = 10.0
+zoom_cam_max_angle_horz     = 5.0
+zoom_cam_step_angle_horz    = 0.5
+
+fire_dispersion_condition_factor = 10	;увеличение дисперсии в процентах при максимальном износе
+
+;---DOF-------------------------------------------------------------------------
+;zoom_dof				= 0.5, 1.0, 350
+reload_dof				= 0.0, 0.5, 5, 2
+
+;-------------------------------------------------------------------------------
+holder_range_modifier	= 2.15               ; во сколько раз увеличивается eye_range
+holder_fov_modifier		= 1.0             ; во сколько раз увеличивается eye_fov
+
+min_radius              = 0
+max_radius              = 50
+
+hit_probability_gd_novice	= 1
+hit_probability_gd_stalker	= 1
+hit_probability_gd_veteran	= 1
+hit_probability_gd_master	= 1
+
+;-------------------------------------------------------------------------------
+slot                    = 2                ; // secondary
+animation_slot          = 2                ; type of the animation that will be used
+
+inv_name                = st_wpn_svu
+inv_name_short          = st_wpn_svu
+
+inv_grid_width          = 5
+inv_grid_height			= 2
+inv_grid_x				= 0
+inv_grid_y              = 2
+
+upgr_icon_x			= 594
+upgr_icon_y			= 395
+upgr_icon_width		= 294
+upgr_icon_height   	= 80
+
+kill_msg_x				= 0
+kill_msg_y              = 59
+kill_msg_width          = 80
+kill_msg_height         = 26
+
+;-------------------------------------------------------------------------------
+position                = -0.026, -0.084, 0.0
+orientation             = 0, 0, 0
+
+fire_point              = 0.0, 0.128, 0.522
+fire_point2             = 0.0, 0.128, 0.522
+
+flame_particles         = weapons\generic_weapon05
+smoke_particles			= weapons\generic_shoot_00
+rpm_empty_click 		= 200
+
+shell_point             = 0.0, 0.128, 0.0
+shell_dir		 		= 0.0, 0.0, 0.4
+shell_particles	 		= weapons\generic_shells
+
+;--STRAP PARAMETERS-----------------------------------------------------------------
+;под мишкой
+strap_position          = -0.26,-0.11,0.25         ; position (offset) and orientation of the weapon when it is strapped
+strap_orientation       = -15,-9,110            ; (3rd person view in degrees)
+strap_bone0					= bip01_spine2
+strap_bone1					= bip01_spine1
+
+startup_ammo            = 10
+visual                  = dynamics\weapons\wpn_svu\wpn_svu.ogf
+
+light_disabled          = true
+light_color		 		= 0.6,0.5,0.3
+light_range		 		= 4.0
+light_var_color		 	= 0.05
+light_var_range		 	= 0.5
+light_time 		 		= 0.2
+
+ph_mass			 		= 3
+
+;addons
+scope_status            = 1
+silencer_status			= 0
+grenade_launcher_status	= 0
+
+zoom_enabled			= true
+zoom_rotate_time		= 0.35
+scope_zoom_factor       = 20     ;ПСО-1 4X
+
+scope_texture			= wpn_crosshair
+scope_name 				= wpn_addon_scope
+scope_x 				= 60
+scope_y 				= -2
+
+;звуки
+snd_draw                = weapons\svu_draw
+snd_holster					= weapons\generic_holster
+snd_shoot               = weapons\n_svu_shot
+snd_empty					= weapons\gen_empty, 0.5
+snd_reload              = weapons\svu_reload
+snd_close					= weapons\generic_close
+
+[wpn_svu_hud]:hud_base
+zoom_hide_crosshair		= true
+attach_place_idx		= 0
+item_visual             = dynamics\weapons\wpn_svu\wpn_svu_hud
+
+
+hands_position				= -0.044500,-0.209998,0.273998
+hands_orientation			= 1.800001,-0.600001,0.200002
+
+hands_position_16x9				= 0.005000,-0.227498,0.332498
+hands_orientation_16x9			= 3.649998,2.150000,-0.250000
+
+item_position			= 0,0,0
+item_orientation		= 0,0,0
+
+shell_point				= 0.025,0.05,0.124
+shell_dir               = 0.0, 1.0, 0.0
+shell_bone				= wpn_body
+
+fire_point              = 0.0,0.043,0.495
+fire_bone               = wpn_body
+
+aim_hud_offset_pos				= -0.071000,0.031999,-0.103000
+aim_hud_offset_rot				= -0.002500,0.020000,0.000000
+
+aim_hud_offset_pos_16x9				= -0.143500,0.024000,-0.120500
+aim_hud_offset_rot_16x9				= -0.005000,-0.005000,0.000000
+
+gl_hud_offset_pos		= 0,0,0
+gl_hud_offset_rot			= 0,0,0
+
+lean_hud_offset_pos		= 0,0,0
+lean_hud_offset_rot		= 0,0,0
+
+anm_show						= svu_draw
+anm_hide             	= svu_holster
+anm_shots					= svu_shoot
+anm_reload					= svu_reload
+anm_bore						= svu_idle_bore
+anm_idle             	= svu_idle
+anm_idle_aim				= svu_idle_aim
+anm_idle_moving 			= svu_idle_moving
+anm_idle_sprint			= svu_idle_moving
+
+;-----------------------------------------------------------------------------
+; Уникальные
+;-----------------------------------------------------------------------------
+[wpn_svu_nimble]:wpn_svu
+$spawn              = "weapons\wpn_svu_nimble"
+class               = WP_SVU
+inv_name				= st_wpn_svu_nimble
+description					= st_wpn_svu_nimble_descr
+
+cost                    = 20000
+
+grenade_class        = ammo_vog-25         ; name of the ltx-section of used grenades
+rpm 				= 150
+ammo_mag_size		= 10
+fire_modes          = 1;, -1
+
+scope_status            = 1
+silencer_status			= 0
+grenade_launcher_status	= 0
+
+launch_speed 		= 0
+;---дисперсия-------------------------------------------------------------------------
+;базовая дисперсия
+fire_dispersion_base    = 0.12   ;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor = 1.6f
+
+;отдача
+cam_return				= 0
+cam_relax_speed         = 5   ;скорость возврата в исходное положение
+cam_relax_speed_ai      = 360	;скорость возврата в исходное положение
+cam_dispersion          = 1.5 ;увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc		= 1.5	;увеличениe cam_dispersion с каждым выстрелом
+cam_dispersion_frac		= 1.0	;ствол будет подыматься на cam_dispersion*cam_dispersion_frac +- cam_dispersion*(1-cam_dispersion_frac)
+cam_max_angle           = 12.0   ;максимальный угол отдачи
+cam_max_angle_horz		= 3.0	;(degree) maximum shot horizontal degree
+cam_step_angle_horz     = 1.5 ;(degree) size of step camera moved in horizontal position while shooting
+
+PDM_disp_base           = 1.8
+PDM_disp_vel_factor     = 3.5
+PDM_disp_accel_factor 	= 3.5
+PDM_disp_crouch	 		= 1.0
+PDM_disp_crouch_no_acc 	= 1.0
+
+zoom_cam_relax_speed        = 5    ; scope & ironsight
+zoom_cam_relax_speed_ai     = 120.75
+zoom_cam_dispersion         = 0.45
+zoom_cam_dispersion_inc     = 0.45
+zoom_cam_dispersion_frac    = 1.0
+zoom_cam_max_angle          = 10.0
+zoom_cam_max_angle_horz     = 5.0
+zoom_cam_step_angle_horz    = 1.5
+
+fire_dispersion_condition_factor = 8	;увеличение дисперсии в процентах при максимальном износе
+
+grenade_flame_particles = weapons\generic_weapon01

@@ -1,0 +1,978 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="about_quests_dialog_bandit_0">
+		<text>Mam do ciebie pytanie w jednej sprawie…</text>
+	</string>
+	<string id="about_quests_dialog_bandit_1">
+		<text>Pytaj њmiaіo.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_10">
+		<text>Co s№dzisz o Їwawym?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_101">
+		<text>O Їwawym? S№dzк, їe pewnego dnia dorwiemy go z towarem w jakimњ ustronnym miejscu i porz№dnie temu zіamasowi doіoїymy!</text>
+	</string>
+	<string id="about_quests_dialog_bandit_11">
+		<text>Sіyszaіeњ coњ na temat Oazy?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_111">
+		<text>Sіyszaіem raz przeњmieszn№ historiк. Krуtko mуwi№c, chіopaki na Wysypisku rozpuњcili plotkк o lokalizacji Oazy - brzmiaіa bardzo wiarygodnie. Potem poszli w to miejsce i zaczaili siк. Co tu duїo mуwiж, tylu frajerуw przyszіo podzieliж siк swoim towarem, їe wielu z chіopakуw, ktуrzy rozpuњcili plotkк, niedіugo pуџniej caіkiem wyniosіo siк z Zony. A czemu by nie? Ustawili siк do koсca їycia. Zostaі tylko jeden z nich, niejaki Joga...</text>
+	</string>
+	<string id="about_quests_dialog_bandit_112">
+		<text>Їe jeњli tam pуjdziesz, znikn№ wszystkie twoje przypadіoњci... Odpowiadaіoby mi coњ takiego - їadnego kaca ani hemoroidуw do koсca їycia - to byіoby coњ! Znajdџ j№, zaіуї tam oњrodek wypoczynkowy i licz zarobion№ kasк.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_113">
+		<text>Czemu miaіbym cokolwiek o niej sіyszeж? To tylko czcze gadanie dla frajerуw... Prawdziwi faceci nie wierz№ w takie bzdury. Siedzisz sobie w barze z siwuch№ w dіoni, a nad gіow№ krкc№ ci siк stalkerzy, dyskutuj№cy nad poіoїeniem Oazy. A kaїdy z tych pajacуw przysiкga, їe wie, gdzie ona jest... Tylko jakoњ tak siк skіada, їe kaїdy mуwi co innego.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_12">
+		<text>Znasz stalkera, ktуrego nazywaj№ Sroka?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_121">
+		<text>Jasne, na pierwszy rzut oka wiedziaіem, їe to zupeіny frajer, do tego usіyszaіem, jak stalkerzy mуwi№, їe to teї ostatnia kanalia... Ale nie mam pojкcia, gdzie jest... Jeњli go szukasz, musisz sam go znaleџж.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_122">
+		<text>Ni cholery... Pierwszy raz o nim sіyszк.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_13">
+		<text>Wiesz, kto mуgі ukraњж zawartoњж osobistej skrytki?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_131">
+		<text>Jakiњ szczur. Pogadaj z tymi, co rz№dz№ w Janowie, oni s№ znani z іowienia szczurуw.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_14">
+		<text>Kto moїe pomуc mi coњ rozszyfrowaж?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_141">
+		<text>Sіyszaіem, їe Azot w Janowie jest niezіy. Podobno jak jeszcze nie pracowaі dla Powinnoњci, parк razy hakowaі stalkerskie PDA dla chіopakуw... Stare, dobre czasy.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_143">
+		<text>Ja tam siк nie znam na tych naukowych sprawach. Potrzebny ci do tego haker. Poznaіem jednego w czasie odsiadki, ale innych nie znam. Jak wyszedіem, jemu zostaіa jeszcze pi№tka...</text>
+	</string>
+	<string id="about_quests_dialog_bandit_15">
+		<text>Mam PDA handlarza Powinnoњci. Znasz kogoњ, kto byіby nim zainteresowany?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_151">
+		<text>Na Skadowsku jest handlarz Sowa. Chіopaki od czasu do czasu sprzedaj№ mu stalkerskie PDA, nieџle pіaci. Poza tym nie zadaje zbyt wielu pytaс, wiкc nie ma siк o co martwiж.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_152">
+		<text>Wіaњciwie kaїdy. Zastanуw siк: kumple z frakcji bкd№ chcieli go pogrzebaж їywcem, inne frakcje narobi№ dymu, ale Sowa na Zatonie moїe sprawiж, їe PDA przepadnie jak kamieс w wodк. Rzecz w tym, їe tylko Sowa wie, gdzie pуџniej ten PDA wypіynie... To twoja sprawa. </text>
+	</string>
+	<string id="about_quests_dialog_bandit_16">
+		<text>Gdzie tu znajdк narzкdzia?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_165">
+		<text>Jeњli potrzebujesz narzкdzi chirurgicznych, szukaj w szpitalach i na pogotowiu. Jeњli chodzi o narzкdzia budowlane, zajrzyj do kamienioіomуw koіo Jupitera. A jeњli szukasz narzкdzi њlusarskich, przeszukaj stare warsztaty.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_166">
+		<text>Sk№d mam do cholery wiedzieж? Sіuchaj, ja od stalkerуw i bez narzкdzi wyci№gam forsк... Spokojnie, tylko їartujк.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_17">
+		<text>Kto moїe odblokowaж moduі pamiкci?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_171">
+		<text>Dobre pytanie! Przecieї siк w tym specjalizujк, nie? Ha, ha! Z byka spadіeњ, kolego? Pewnie jakiњ technik albo naukowiec... Chyba ci siк naprawdк nie wydaje, їe ja dіubiк w takich rzeczach?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_172">
+		<text>Bкdк z tob№ szczery: ostatni raz odblokowaіem moduі pamiкci, jak byіem w szkole, a tym moduіem pamiкci byіa dyskietka. Idџ do specуw i im zawracaj gіowк.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_18">
+		<text>Kto mуgіby siк wіamaж do stalowego kontenera?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_181">
+		<text>Znasz Kardana ze Skadowska? Ktуregoњ dnia siк nar№baі i zacz№і ganiaж z іomem jakiegoњ pacana. Myњlк, їe Kardan mуgіby uїyж tego іomu do czegoњ poїyteczniejszego i wywaїyж dla ciebie to i owo.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_182">
+		<text>Maj№c odpowiednie narzкdzia, nawet ja bym mуgі, ale kto zabiera ze sob№ sprzкt do Zony? Odwiedџ technikуw, oni s№ dobrzy w te klocki.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_19">
+		<text>Szukam stalkera Sкka. Wiesz, gdzie go znaleџж?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_191">
+		<text>A kto to wie? Zapytaj Suіtana na Skadowsku. Szef zwykle wie, gdzie siк szwendaj№ wszyscy frajerzy.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_193">
+		<text>Tak, sіyszaіem o tym palancie. Zwykle krкci siк po Zatonie, wiкc tutaj go nie znajdziesz.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_2">
+		<text>Wiesz coњ na temat rozbitych њmigіowcуw?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_20">
+		<text>Kto moїe byж zainteresowany informacjami na temat zaіoїyciela Powinnoњci?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_201">
+		<text>Nie wiem, kto nie byіby zainteresowany! Takie informacje to dynamit, kolego, wiкc najlepiej pogadaj z Sow№ na Skadowsku - coњ ci jeszcze za to wpadnie, a nie narobisz sobie wrogуw.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_22">
+		<text>Nie. Zastanуw siк, mam Powinnoњж na lewo, Wolnoњж na prawo i stalkerуw na tyіku - mam siк jeszcze rozgl№daж po niebie?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_23">
+		<text>Chіopcy mуwili, їe widzieli, jak jeden z nich wisi na kablach w Їelaznym Lesie, ale tam zobaczysz o wiele wiкcej... Na sto procent wpadniesz w jak№њ anomaliк albo poltergeist rozbije ci czaszkк.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_24">
+		<text>Tak, paru chіopakуw widziaіo, jak jeden z nich rozbiі siк na pіaskowyїu, ale problem w tym, їe nie ma tam jak wejњж... Podobno lataі tak dziwnie, jakby pilot byі na prochach czy coњ.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_26">
+		<text>Podobno jakiњ њmigіowiec chciaі udawaж okrкt podwodny i wleciaі prosto w bagna. Jak moїna sobie wyobraziж, zaraz zaliczyі glebк. Zreszt№ woda teї nie jest tam zbyt zdrowa - trucizny, chemikalia i tak dalej.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_3">
+		<text>Widziaіeњ tu jakieњ wojsko?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_30">
+		<text>Kto moїe byж zainteresowany mapami obszaru pomiкdzy Zatonem i Jupiterem?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_301">
+		<text>Podejrzewam, їe Pilot - jest gіуwnym przewodnikiem w tej okolicy. Przydaіyby mu siк jakieњ mapy zamiast patrzenia na gwiazdy...</text>
+	</string>
+	<string id="about_quests_dialog_bandit_31">
+		<text>Sіyszaіem od chіopakуw, їe oddziaі wojska zszedі z poіudniowego pіaskowyїu do obozu najemnikуw. Chіopaki wyczuli, їe bкdzie zadyma, i wziкli nogi za pas.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_32">
+		<text>Sіyszaіem, їe armijne mendy prуbowaіy coњ wydostaж ze swojego rozbitego њmigіowca na bagnach. Wyobraџ sobie piкciu їoіnierzykуw skacz№cych po bagnie, їeby sobie mundurkуw nie zamoczyж... Na pewno puszczali takie wi№chy, їe zawstydziliby niejednego bandytк.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_33">
+		<text>Jeden goњж opowiadaі mi, jak szedі za stalkerem, їeby go obrobiж z іupu, aї tu nagle usіyszaі strzaіy. Okazaіo siк, їe armia walczy z najemnikami. Schowaі siк i przeczekaі strzelaninк, ale stalker byі juї wtedy daleko. Pecha miaі chіopina, co?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_34">
+		<text>Kumpel opowiadaі mi, їe widziaі zabawn№ scenк. Jest ta barka z wiatrakiem na dachu, obok niej Noe lata jak nakrкcony machaj№c іapami, a dziesiкciu wojakуw spieprza przed psem Noego. Mуj kumpel zdrowo siк uњmiaі i poszedі sobie od tej szopki.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_35">
+		<text>Nie, to niespokojne miejsce, peіno tu nerwusуw z naіadowanymi strzelbami... Nie pali mi siк do sprawdzania, ktуrzy s№ z wojska, a ktуrzy wykonuj№ misjк dla Powinnoњci.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_4">
+		<text>Wiesz, jak siк dostaж do Prypeci?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_40">
+		<text>Kogo moїna wynaj№ж do ochrony naukowcуw?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_403">
+		<text>Ha, zrobiк to ja z chіopakami! Damy im ochronк, jakiej w їyciu nie widzieli! Stalkerzy i mutanty bкd№ zwiewaж przed nami, gdzie pieprz roњnie! Co tydzieс odpalasz kasк i jesteњmy do twojej dyspozycji. Nie zapomnij teї o premii na њwiкta!</text>
+	</string>
+	<string id="about_quests_dialog_bandit_41">
+		<text>Na piechotк, kolego. Idџ w stronк Jupitera i tam zadawaj swoje pytania, bo nie ma bezpoњredniej drogi z Zatonu do Prypeci i taka jest prawda.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_43">
+		<text>Sіuchaj no, czy ja ci wygl№dam na jakiegoњ przewodnika czy co? Mam na czole wytatuowane sіowa „Tutaj zadawaж gіupie pytania”? Pogadaj z Pilotem, jemu pіac№ za odpowiadanie na takie pytania.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_44">
+		<text>Nie... Czego w ogуle miaіbym tam szukaж? Nie ma tam stalkerуw do obrobienia!</text>
+	</string>
+	<string id="about_quests_dialog_bandit_5">
+		<text>Moїesz zaproponowaж kogoњ, kto nie jest zbyt zajкty i chciaіby ruszyж do Prypeci?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_51">
+		<text>Prypeж to nie miejsce dla prawdziwych mкїczyzn jak my. Pomyњl tylko, peіno tam mutantуw i anomalii... jak w caіej Zonie... ale nie ma stalkerуw z ich dobytkiem. Jak stalkerzy pokaї№ siк w Prypeci, daj znaж, a ruszymy tam zachowaж naturalny іad rzeczy.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_57">
+		<text>Przykro mi, nie mam pojкcia.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_6">
+		<text>Znalazіem dziwn№ broс. Znasz kogoњ, kto moїe coњ o niej wiedzieж?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_62">
+		<text>Zapytaj technikуw. W koсcu od tego s№, їeby siк na tym znaж.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_63">
+		<text>Nie mam pojкcia, ale stalkerzy ze Skadowska uwaїaj№ Kardana za jakiegoњ technicznego geniusza. Pogadaj z nim, jeњli chcesz... Moim zdaniem to tylko stary pijaczyna...</text>
+	</string>
+	<string id="about_quests_dialog_bandit_7">
+		<text>Kto moїe wykonaж pomiary dla naukowcуw?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_73">
+		<text>Prosta sprawa - nasi chіopcy to zrobi№. Oni szkуі nie koсczyli ani nic, ale mog№ pacjenta obmierzyж z gуry na dуі i w poprzek przez plecy, a wtedy tylko zbiж parк desek, do ziemi i gotowe!</text>
+	</string>
+	<string id="about_quests_dialog_bandit_8">
+		<text>Znalazіem bardzo dziwny artefakt. Komu mogк go sprzedaж?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_81">
+		<text>Dziwny artefakt, powiadasz? Pokaї no... Daj mi go, їebym mуgі siк lepiej przyjrzeж... Spokojnie, kolego - їartujк tylko, ale na twoim miejscu nie trzymaіbym go na widoku. Inni mog№ mieж gorsze poczucie humoru.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_83">
+		<text>Odwaїnyњ, їe tak tu њwiecisz po oczach tym artefaktem. Twardziel z ciebie. Dobra, sіuchaj: powinieneњ z tym iњж do Brodacza w Skadowsku. Nie dowiedzieliњmy siк jeszcze, jak przemyca artefakty poza Zonк, wiкc masz szansк sprzedaж mu swуj.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_9">
+		<text>Znalazіem niedaleko legowisko pijawek. Co robiж?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_91">
+		<text>A niby co? Bierz nogi za pas!</text>
+	</string>
+	<string id="about_quests_dialog_bandit_98">
+		<text>Dobra, niewaїne.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_0">
+		<text>Sіuchaj, mam tak№ sprawк…</text>
+	</string>
+	<string id="about_quests_dialog_dolg_1">
+		<text>Wal њmiaіo.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_10">
+		<text>Co s№dzisz o Їwawym?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_101">
+		<text>O Їwawym? Nigdy o nim nie sіyszaіem. Moїe jest w innym oddziale?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_11">
+		<text>Sіyszaіeњ coњ na temat Oazy?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_111">
+		<text>To bajeczka dla stalkerуw. Tacy oni wіaњnie s№: wymyњlaj№ niestworzon№ bzdurк, potem siк zbieraj№ i id№ jej szukaж! Na twoim miejscu daіbym sobie z tym spokуj, bo jak uwierzysz w to, to niedіugo zaczniesz wierzyж w istnienie Speіniacza Їyczeс.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_112">
+		<text>Chodzi o to miejsce, gdzie rany same siк lecz№ i magicznie odzyskujesz siіy? Mam dla ciebie nowinк, koleїko: Oaza nie istnieje. Stalkerzy wymyњlaj№ takie brednie, їeby oswoiж siк z Zon№, ale gorzka prawda jest taka, їe w Zonie nie ma bezpiecznych miejsc. Tutaj trzeba mocno staж nogami na ziemi - marzyciele nie wytrzymuj№ w Zonie zbyt dіugo.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_113">
+		<text>Aha, wszystkie artefakty stamt№d s№ warte tyle co zіoto i przynosz№ ci je na srebrnym pуіmisku, a piкkne panie w tym czasie robi№ ci masaї stуp... Jaja sobie robiк. W№tpiк, by istniaіa, chociaї byіoby miіo. Moglibyњmy nawet zaіoїyж tam szpital bez lekarzy - ludzie by przychodzili i sami zdrowieli... Ale to tylko bajeczka.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_12">
+		<text>Znasz stalkera, ktуrego nazywaj№ Sroka?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_121">
+		<text>Ciкїko mi zapamiкtaж wszystkich ludzi z Powinnoњci, a ty mnie pytasz o stalkerуw? Maj№ swoj№ bazк na Skadowsku - tam pytaj.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_122">
+		<text>Nie znam takiego.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_13">
+		<text>Wiesz, kto mуgі ukraњж zawartoњж osobistej skrytki?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_131">
+		<text>No іadnie! Coњ takiego nie zdarzyіoby siк w bazie Powinnoњci, ale tutaj peіno jest tych mкtуw z Wolnoњci - wњrуd nich bym szukaі.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_14">
+		<text>Kto moїe pomуc mi coњ rozszyfrowaж?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_141">
+		<text>Na stacji Janуw jest pewien technik, Azot. Ma smykaіkк do elektroniki. Jak raz zapomniaіem hasіo do PDA, to zіamaі go w piкж sekund!</text>
+	</string>
+	<string id="about_quests_dialog_dolg_143">
+		<text>Musisz iњж do Janowa. Szukaj tam Azota, jest dobry w te klocki.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_15">
+		<text>Mam PDA handlarza Powinnoњci. Znasz kogoњ, kto byіby nim zainteresowany?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_151">
+		<text>Handlarz w Powinnoњci? Nie moїe byж! Ale jeњli masz jakieњ informacje, przekaї je podpuіkownikowi Szuldze i niech on siк tym martwi.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_16">
+		<text>Gdzie tu znajdк narzкdzia?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_163">
+		<text>Niedaleko jest caіa fabryka. Oczywiњcie, pewnie juї j№ caіkiem rozszabrowali, ale na twoim miejscu sprawdziіbym w tamtejszych magazynach.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_165">
+		<text>Na twoim miejscu poszukaіbym w starych warsztatach. Moїe teї znajdziesz coњ w sklepach.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_166">
+		<text>Tutaj znajdziesz tylko mutantуw i anomalie. Ha! W anomaliach lepiej nie szukaж, a burery i kontrolerzy teї nie pomog№ ci w szukaniu.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_169">
+		<text>Gdzieњ tu pod mostem stoi skіad. Widziaіem juї takie - czкsto woї№ nimi personel techniczny. A gdzie technicy, tam i narzкdzia.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_17">
+		<text>Kto moїe odblokowaж moduі pamiкci?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_171">
+		<text>Azot - to jedyna osoba na stacji Janуw, ktуra siк na tym zna.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_172">
+		<text>Idџ z tym do technika. Jedynym przyzwoitym technikiem w okolicy jest Azot w Janowie.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_18">
+		<text>Kto mуgіby siк wіamaж do stalowego kontenera?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_181">
+		<text>Podobno wњrуd stalkerуw jest jakiњ technik. To moczymorda, ale zna siк na robocie. Pogadaj z nim.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_182">
+		<text>Ha, jeszcze sejf chcesz na plecach nosiж. Gdyby miaі elektroniczny zamek, Azot mуgіby ci z nim pomуc.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_19">
+		<text>Szukam stalkera Sкka. Wiesz, gdzie go znaleџж?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_191">
+		<text>Popytaj stalkerуw - znaj№ siк miкdzy sob№. Nigdy nie sіyszaіem o їadnym Sкku czy jak mu tam.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_2">
+		<text>Wiesz coњ na temat rozbitych њmigіowcуw?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_20">
+		<text>Kto moїe byж zainteresowany informacjami na temat zaіoїyciela Powinnoњci?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_201">
+		<text>Nasz dowуdca, naturalnie. Przekaї Szuldze wszystko, co wiesz, a Powinnoњж na pewno bкdzie ci wdziкczna.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_22">
+		<text>Tak, nasi zwiadowcy widzieli, jak wojskowy њmigіowiec schodziі do l№dowania na rezerwowych l№dowiskach przy Jupiterze. Dawali mu znaki, їeby zmieniі kurs, ale piloci mieli chyba inne zmartwienia. Ciekawe, czy wojakom udaіo siк wydostaж w jednym kawaіku z pola minowego.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_23">
+		<text>W tej okolicy - nie. Nasza obecnoњж jest tu ograniczona... Popytaj naszych chіopakуw koіo Janowa.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_25">
+		<text>Nasz patrol zgіosiі, їe wojskowy њmigіowiec prуbowaі l№dowaж awaryjnie koіo fabryki Jupiter. Niestety, њmigіowiec rozbiі siк na dachu hal fabrycznych. Raczej nikt nie przeїyі - patrol nie odebraі po wypadku їadnych sygnaіуw alarmowych.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_3">
+		<text>Widziaіeњ tu jakieњ wojsko?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_30">
+		<text>Kto moїe byж zainteresowany mapami obszaru pomiкdzy Zatonem i Jupiterem?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_301">
+		<text>Ktoњ, kto miaіby z nich jakiњ uїytek. Mam na myњli Pilota - jest przewodnikiem na trasie pomiкdzy Janowem i Skadowskiem, wiкc te mapy na pewno by mu siк przydaіy.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_31">
+		<text>Wojsko? Nie widziaіem tu їadnego, ale my tu rzadko bywamy.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_35">
+		<text>Niedawno ktoњ widziaі zwіoki їoіnierza na polu minowym. To pewnie jeden z tych, ktуrzy lecieli tym њmigіowcem. Oprуcz zaіogi w њmigіowcu mieњci siк osiem osуb, wiкc musieli siк jakoњ wydostaж, ale nikt nie wie, gdzie siк podziali.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_36">
+		<text>W bunkrze uczonych pojawiі siк niedawno jakiњ їoіnierz. Ale nic wiкcej nie wiem.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_37">
+		<text>Niedawno widziano, jak czіowiek w wojskowym mundurze wchodzi do budynku przy kompleksie obrony przeciwlotniczej Woіchow. Moїliwe teї, їe ktoњ wzi№і zombi za їoіnierza.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_38">
+		<text>Stalkerzy widzieli oddziaі wojska koіo fabryki Jupiter. S№dz№c z opisu, byіy to siіy specjalne. Towarzyszyі im niezidentyfikowany stalker. Kierowali siк w stronк Prypeci. Opis brzmiaі wiarygodnie, ale z doњwiadczenia wiem, їe takim informacjom zwykle nie moїna ufaж.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_4">
+		<text>Wiesz, jak siк dostaж do Prypeci?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_40">
+		<text>Kogo moїna wynaj№ж do ochrony naukowcуw?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_401">
+		<text>Nikt im nie da lepszej ochrony niї Powinnoњж. Porozmawiaj z podpuіkownikiem Szulg№ w Janowie - na pewno siк dogadacie.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_402">
+		<text>Dopуki pracuj№ dla nich ludzie Wolnoњci, trzymamy siк stamt№d z dala. Sіuchanie caіy dzieс przygіupich dowcipуw tej bandy debili jest gorsze niї њmierж.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_42">
+		<text>Powinnoњж nie ma w tej chwili powodu, їeby szukaж drogi do Prypeci, ale na wszelki wypadek zbieramy informacje. Dotarіy do nas niepotwierdzone raporty, їe tunele pod fabryk№ Jupiter prowadz№ do Prypeci. Їeby to sprawdziж, trzeba by dokіadnie przeszukaж caіy obszar fabryki.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_43">
+		<text>Nie. Takie informacje moїesz uzyskaж od cywilnych przewodnikуw - nasi zwiadowcy i tak maj№ co robiж.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_44">
+		<text>Nasi zwiadowcy regularnie poszukuj№ bezpiecznych њcieїek do Prypeci, ale na razie bez rezultatu.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_5">
+		<text>Moїesz zaproponowaж kogoњ, kto nie jest zbyt zajкty i chciaіby ruszyж do Prypeci?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_51">
+		<text>Obecnoњж Powinnoњci na tym terenie jest ograniczona. Porozmawiaj z naszymi ludџmi w Janowie.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_52">
+		<text>Podobno jakiњ їoіnierz siedzi u naukowcуw w bunkrze. Nie ma za bardzo innego wyjњcia. Naukowcy maj№ program badawczy na rok-pуіtora, a on sam nie dotrze na piechotк do obrzeїy Zony. Dlatego myњlк, їe mуgіby byж zainteresowany.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_53">
+		<text>Sprуbuj znaleџж jakiegoњ poszukiwacza przygуd. Na przykіad na stacji Janуw jest stalker Wano. Jemu wszystko jedno, w jaki bajzel wdepnie, a moїe siк do czegoњ przydaж. Potrafi omijaж anomalie nawet z zamkniкtymi oczami.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_54">
+		<text>Moїesz zacz№ж kampaniк werbunkow№ w psychuszce... Ale jest teї inny dobry sposуb - їoіnierze Monolitu. A wіaњnie, ich oddziaі widziano niedaleko stanowiska przeciwlotniczego. Drogк do Prypeci teї pewnie znaj№... Sіuchaj, mam nadziejк, їe nie bierzesz tego na powaїnie...</text>
+	</string>
+	<string id="about_quests_dialog_dolg_56">
+		<text>Szukaj ochotnikуw w Powinnoњci. Na przykіad taki Wіуczкga. Nie dostaі jeszcze przydziaіu, wiкc podpuіkownik moїe puњciж go z tob№.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_57">
+		<text>Wszyscy wiedz№, їe najlepsi bojownicy s№ w Powinnoњci... Ale w tej chwili mamy inne zadania.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_6">
+		<text>Znalazіem dziwn№ broс. Znasz kogoњ, kto moїe coњ o niej wiedzieж?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_62">
+		<text>A niech mnie! Co za rusznica! Sam j№ zrobiіeњ czy naprawdк j№ znalazіeњ? Nigdy czegoњ takiego nie widziaіem... Zapytaj technikуw.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_7">
+		<text>Kto moїe wykonaж pomiary dla naukowcуw?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_71">
+		<text>Gіupie pytanie - oczywiњcie, їe Powinnoњж. Mamy wielu doњwiadczonych ludzi i pracowaliњmy juї z naukowcami. Porozmawiaj z podpuіkownikiem Szulg№. Na pewno wybierze oddziaі do tego zadania.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_72">
+		<text>Kto by chciaі tam pracowaж, skoro bunkier jest ochraniany przez Wolnoњж? Ci chromoleni pacyfiњci przez wiкkszoњж czasu s№ tak naжpani, їe mog№ zacz№ж strzelaж do siebie zamiast do przeciwnika.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_8">
+		<text>Znalazіem bardzo dziwny artefakt. Komu mogк go sprzedaж?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_81">
+		<text>Wszystkie artefakty s№ dziwne, a w ogуle nie radzк ci nosiж go przy sobie. Przekaї go ekspertom i miej to z gіowy.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_83">
+		<text>Powinieneњ pokazaж go stalkerom - oni s№ ekspertami od takich rzeczy. A jeszcze lepiej bкdzie, jak pokaїesz go osobie, ktуrej oni sprzedaj№ artefakty.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_9">
+		<text>Znalazіem niedaleko legowisko pijawek. Co robiж?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_91">
+		<text>Oddziaіy Powinnoњci nie prowadz№ teraz operacji oczyszczania na tym obszarze, wiкc legowisko musi poczekaж.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_98">
+		<text>Dobra, niewaїne.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_0">
+		<text>Mam do ciebie pytanie w jednej sprawie…</text>
+	</string>
+	<string id="about_quests_dialog_freedom_1">
+		<text>Strzelaj.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_10">
+		<text>Co s№dzisz o Їwawym?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_101">
+		<text>Nie sіyszaіem o nim zbyt wiele... Najlepiej popytaj wњrуd stalkerуw, to chyba jeden z nich?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_11">
+		<text>Sіyszaіeњ coњ na temat Oazy?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_111">
+		<text>Od cholery... Muszк przyznaж, to іadna historyjka. Paіac wњrуd piasku, wyspa we mgle, zamek siкgaj№cy nieba... Szambala, Eden... Oaza. Wszyscy wolni ludzie o czymњ marz№ i czy moїna ich za to winiж?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_112">
+		<text>Sіyszaіem interesuj№c№ historiк od jednego stalkera. On chyba jako pierwszy wspomniaі o Oazie. Powiedziaі, їe wedіug legendy wszystkie lecz№ siк tam wszystkie rany i stajesz siк spokojny i wyluzowany, jakbyњ wcale nie byі w Zonie. Od tego czasu go nie widziaіem... Dopiero jak znikn№і, przypomniaіem sobie, їe wczeњniej kulaі, a kiedy odszedі, chodziі prosto i wygl№daі o wiele mіodziej.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_113">
+		<text>Tak, wolni stalkerzy podali mi wspуіrzкdne... Dziesiкж razy, a za kaїdym razem inne. Jak siк je zіoїy do kupy, powstaje obszar od Zwкglacza do CEJ, a bar w Janowie jest gdzieњ poњrodku. Caіkiem moїliwe, їe w tej chwili jesteњmy w Oazie, wiкc korzystaj z tego!</text>
+	</string>
+	<string id="about_quests_dialog_freedom_12">
+		<text>Znasz stalkera, ktуrego nazywaj№ Sroka?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_121">
+		<text>Nie. Nie znam tu zbyt wielu wolnych stalkerуw.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_122">
+		<text>Sroka? Nie, ale fajnie siк nazywa.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_13">
+		<text>Wiesz, kto mуgі ukraњж zawartoњж osobistej skrytki?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_131">
+		<text>Nie... Tutaj takich nie ma. Zdarzaj№ siк tacy, co podgryz№ ci chleb albo poci№gn№ z twojej manierki, jak nie patrzysz, ale nie zіodzieje.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_14">
+		<text>Kto moїe pomуc mi coњ odszyfrowaж?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_141">
+		<text>Sіyszaіem, їe Azot w Janowie lubi szyfry i algorytmy. Ale nie jestem pewny, nigdy z nim nie rozmawiaіem - pracuje dla Powinnoњci, wiкc dla nas, wolnych ludzi, nie ma czasu.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_143">
+		<text>Nie jestem specem od miejscowych specуw... Popytaj chіopakуw w Janowie, jak tam bкdziesz - oni na pewno bкd№ wiedzieж.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_15">
+		<text>Mam PDA handlarza Powinnoњci. Znasz kogoњ, kto byіby nim zainteresowany?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_151">
+		<text>Brzmi ciekawie! Daіbym go Lokiemu, naszemu przywуdcy w Janowie. On juї siк postara, їeby wolni stalkerzy siк dowiedzieli, jakich ludzi rekrutuje Powinnoњж.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_16">
+		<text>Gdzie tu znajdк narzкdzia?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_163">
+		<text>W fabryce, gdzieїby indziej? To niebezpieczne miejsce, ale w magazynach znajdziesz pocieszenie. W nich jest trochк spokojniej i na pewno znajdziesz tam jakieњ przyzwoite narzкdzia.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_165">
+		<text>Dobre pytanie. Zastanуwmy siк. Gdzie moїna znaleџж narzкdzia poza Zon№? Jeњli nie masz dwуch lewych r№k, kupisz je w sklepie... W innym przypadku idziesz szukaж narzкdzi i naprostowaж rкce w jakimњ warsztacie. Zgadza siк? W Zonie jest tak samo - musisz szukaж w tych samych miejscach. To takie proste, stalkerze!</text>
+	</string>
+	<string id="about_quests_dialog_freedom_166">
+		<text>Narzкdzia? Sіuchaj no, czy to jakiњ szyfr? Nie ma tu glin ani niczego takiego, moїesz mуwiж otwarcie... A, ty tak powaїnie? W takim razie naprawdк nie wiem.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_169">
+		<text>Sіyszaіem, їe jeden z naszych szukaі narzкdzi i trafiі do poci№gu stoj№cego pod mostem. Najwyraџniej jest tam Tesla... W kaїdym razie nie jest zbyt miіo. Czemu ci to mуwiк? Powiedziaі, їe widziaі tam narzкdzia, ale nie braі ich, bo nie byіo bezpiecznie.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_17">
+		<text>Kto moїe odblokowaж moduі pamiкci?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_171">
+		<text>Nowikow w bunkrze naukowcуw siк to tego nadaje. Jest szybki, doby i uprzejmy. Jest teї Azot w Janowie, on wspуіpracuje z Powinnoњci№. Jest tani i do dupy, ale powinien daж sobie radк.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_172">
+		<text>Pewnie jakiњ zdolny technik. Tutejszy zna siк lepiej na mechanice, wiкc o ile nie chcesz przegwintowaж lufy swojego moduіu pamiкci, popytaj w okolicach Jupitera.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_18">
+		<text>Kto mуgіby siк wіamaж do stalowego kontenera?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_181">
+		<text>Niedawno ktoњ mi polecaі Kardana ze Skadowska. Podobno zna siк na robocie, chociaї prawie ci№gle jest pijany. Moїe on ci pomoїe w otwarciu tego pojemnika.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_182">
+		<text>Kaїdy kto zarabia na їycie otwieraniem stalowych kontenerуw? Ale Azot, miejscowy technik, siк nie nada. Podobno bardziej interesuje go wіamywanie siк do elektroniki.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_19">
+		<text>Szukam stalkera Sкka. Wiesz, gdzie go znaleџж?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_191">
+		<text>Nigdy o nim nie sіyszaіem... Popytaj innych wolnych stalkerуw.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_2">
+		<text>Wiesz coњ na temat rozbitych њmigіowcуw?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_20">
+		<text>Kto moїe byж zainteresowany informacjami na temat zaіoїyciela Powinnoњci?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_201">
+		<text>Na pewno Loki. To nasz przywуdca w Janowie. Nawet jeњli nie bкdzie wiedziaі, co zrobiж z tymi informacjami - najwaїniejsze, їeby Powinnoњж nie poіoїyіa na nich іap. Wyobraїasz sobie, ile powstanie z tego bzdurnej propagandy? Aї mnie gіowa boli na myњl o tym.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_22">
+		<text>Tak, sіyszaіeњ historiк o њmigіowcu na polu minowym? Krуtko mуwi№c, wojacy rozbili siк na rezerwowym l№dowisku, ktуre inni wojacy zaminowali szeњж lat temu. Niektуrzy mуwi№, їe wyl№dowali tam z gіupoty, ale moim zdaniem jest w tym coњ wiкcej. Popatrz: nikt siк tam nie zapuњci, wiкc jak їoіnierze skoсcz№ swoj№ misjк, mog№ wrуciж do њmigіowca, trochк go poіataж i fru do domu. Strasznie mnie ciekawi, co to za misja...</text>
+	</string>
+	<string id="about_quests_dialog_freedom_23">
+		<text>Nie jestem st№d, wiкc gуwno wiem. Wpadnij do naszych w Janowie - powiedz№ ci wszystko, co chcesz wiedzieж, a nawet wszystko, czego nie chcesz.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_25">
+		<text>Tak, chіopaki widzieli ostatnio њmigіowiec lataj№cy jak szalony. Wyl№dowaі teї nie najlepiej - na jednym z dachуw Jupitera. Mуwili, їe waln№і w dach i spadі do њrodka budynku, ci№gn№c za sob№ kupк rуїnego њmiecia.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_3">
+		<text>Widziaіeњ tu jakieњ wojsko?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_30">
+		<text>Kto moїe byж zainteresowany mapami obszaru pomiкdzy Zatonem i Jupiterem?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_301">
+		<text>Na pewno Pilot. On tu jest gіуwnym przewodnikiem wolnych stalkerуw - jeњli chcesz rozmawiaж o mapach, idџ do niego.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_31">
+		<text>Spokojnie, kolego. Nie ma tu glin, wojska ani їadnej straїy obywatelskiej. A my jesteњmy pokojowo nastawieni - bez powodu nie bкdziemy do ciebie strzelaж.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_35">
+		<text>Nie, ale paru chіopakуw mуwiіo mi, їe widzieli, jak oddziaі armii przedziera siк przez pole minowe przy l№dowiskach њmigіowcуw. Chіopaki zastanawiali siк, czy im nie pomуc, ale im przeszіo. Z wojakami nigdy nie wiadomo, czy coњ im nie odwali i nie strzel№ ci w plecy.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_36">
+		<text>Sam nie widziaіem, ale podobno jakiњ wojak siedzi w bunkrze naukowcуw. Oziorski, ten biolog, mуwiі, їe chіopak byі w tym њmigіowcu, ktуry rozbiі siк w fabryce... Kr№їy dowcip, їe jajogіowi przygarnкli zwierz№tko z armii.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_37">
+		<text>Osobiњcie nie, ale sіyszaіem co nieco od wolnych stalkerуw. Podobno widziano wojaka przy kompleksie przeciwlotniczym Woіchow. Pewnie to jakiњ duch albo przebudzony zombi... Jak s№dzisz?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_38">
+		<text>Nie. Byі taki jeden, co mуwiі, їe widziaі, jak siedmiu їoіnierzy szіo za wolnym stalkerem w kierunku Prypeci. Trawy od dawna u nas nie ma, wiкc musiaіo mu siк pomieszaж w gіowie i tyle.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_4">
+		<text>Wiesz, jak siк dostaж do Prypeci?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_40">
+		<text>Kogo moїna wynaj№ж do ochrony naukowcуw?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_401">
+		<text>Wolnoњж, czyli nas. Caіy czas wspуіpracujemy z naukowcami, wiкc danie im ochrony to dla nas pestka. Pogadaj z naszym szefem Lokim w Janowie - na pewno siк zgodzi.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_402">
+		<text>Wіaњciwie nie wiem, bo sіyszaіem, їe jajogіowi wynajкli oddziaі Powinnoњci... Z chкci№ ochranialibyњmy naukowcуw, ale trudno by wytrzymaж patrzenie caіy dzieс na kamienne twarze ludzi z Powinnoњci.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_42">
+		<text>Podobno moїna siк tam dostaж z Jupitera... To znaczy, z fabryki, nie z planety... Ha, ha! Niezіy їart, co?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_43">
+		<text>Wiesz, nie mam pojкcia. Nie mam czasu siк tam wybraж... Sprуbuj zapytaж Pilota w obozie. To wolny stalker i zna teren jak nikt inny.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_44">
+		<text>Brachu, gdybym wiedziaі, dawno bym siк tam wybraі. Dobrze byіoby oderwaж siк od Powinnoњci, wojakуw i caіej tej walki...</text>
+	</string>
+	<string id="about_quests_dialog_freedom_5">
+		<text>Moїesz zaproponowaж kogoњ, kto nie jest zbyt zajкty i chciaіby ruszyж do Prypeci?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_51">
+		<text>Przykro mi, nie znam nikogo na Zatonie... Dam ci radк, popytaj naszych chіopakуw w Janowie.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_52">
+		<text>Kojarzysz bunkier naukowcуw? Maj№ tam kiepsk№ sytuacjк. Najpierw Garri, wolny stalker, postanowiі ruszyж do Prypeci, a teraz ichni їoіnierz wpadі na ten sam pomysі. Garri to zatwardziaіy samotnik, ale ten wojak bкdzie dla ciebie w sam raz.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_53">
+		<text>Wano w Janowie siк do tego nada. Przyzwoity z niego goњж i gdyby chciaі, w kaїdej chwili mуgіby wst№piж do Wolnoњci. Ale chyba nie podoba mu siк nasza walka z Powinnoњci№... ani w ogуle їadna walka. Taki ma punkt widzenia i my to szanujemy!</text>
+	</string>
+	<string id="about_quests_dialog_freedom_54">
+		<text>Jasne. Jeden z naszych natkn№і siк przy wyschniкtym jeziorze na oddziaі, ktуry bкdzie ci idealnie pasowaі. Na pewno znaj№ Prypeж jak wіasn№ dіoс i dla nikogo nie pracuj№. Musz№ byж teї odwaїni, bo to bojownicy Monolitu!</text>
+	</string>
+	<string id="about_quests_dialog_freedom_55">
+		<text>Owszem. Wіуczкgк, przywуdcк naszych nowych rekrutуw... W naszych szeregach niezbyt mu dobrze. Jego ludzie siк dostosowali, ale on nie jest tu zbyt szczкњliwy... Porozmawiaj z nim - nie lubiк, kiedy dobry czіowiek robi coњ wbrew swemu sercu...</text>
+	</string>
+	<string id="about_quests_dialog_freedom_57">
+		<text>Nie, nie mam pojкcia.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_6">
+		<text>Znalazіem dziwn№ broс. Znasz kogoњ, kto moїe coњ o niej wiedzieж?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_62">
+		<text>Nie byіo przy niej instrukcji? No to nie mam pojкcia.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_7">
+		<text>Kto moїe wykonaж pomiary dla naukowcуw?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_71">
+		<text>Nasi chіopcy nadaliby siк do tego. W Wolnoњci nie brakuje bystrych gіуw, a jak czegoњ nie bкdziemy wiedzieж, zapytamy w bunkrze. Bardzo chcielibyњmy przysіuїyж siк nauce! Porozmawiaj z Lokim w Janowie - na pewno to potwierdzi.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_72">
+		<text>Z chкci№ byњmy to zrobili z chіopakami, ale bunkra naukowcуw pilnuje ostatnio Powinnoњж. Wpadanie do naukowcуw z wizyt№ i tak jest juї problemem, a siedzenie tam caіymi dniami na pewno nie odbiіoby siк dobrze na naszym zdrowiu.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_8">
+		<text>Znalazіem bardzo dziwny artefakt. Komu mogк go sprzedaж?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_81">
+		<text>Musisz znaleџж kolekcjonera. W Janowie takiego nie ma, bo nawet niektуrzy stalkerzy boj№ siк tu przychodziж. Najlepiej zapytaj na Zatonie, tam jest trochк spokojniej.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_83">
+		<text>Znasz Brodacza, barmana w obozie wolnych stalkerуw? Skupuje artefakty, a pіaci teї nie najgorzej. Jak by nie patrzeж, miіy goњж. Szkoda, їe nie pracuje dla nas.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_9">
+		<text>Znalazіem niedaleko legowisko pijawek. Co robiж?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_91">
+		<text>Musisz ostrzec wolnych stalkerуw - przecieї maj№ tu niedaleko swуj gіуwny obуz. Fauna Zony jest na pewno waїna, ale bardziej przejmujк siк tutaj ludџmi.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_98">
+		<text>Dobra, niewaїne.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_0">
+		<text>Sіuchaj, mam tak№ sprawк…</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_1">
+		<text>Pytaj њmiaіo.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_10">
+		<text>Co s№dzisz o Їwawym?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_101">
+		<text>Nie miaіem przyjemnoњci... Popytaj staіych bywalcуw na Skadowsku.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_11">
+		<text>Sіyszaіeњ coњ na temat Oazy?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_111">
+		<text>Czego ja nie sіyszaіem na temat Oazy! To legenda, mit... Kaїdy stalker spodziewa siк po niej czegoњ innego i kaїdy co do jednego twierdzi, їe zna jej dokіadne poіoїenie. Szkoda tylko, їe wszystkie te miejsca maj№ jedn№ cechк wspуln№ - cholernie ciкїko do nich dotrzeж.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_112">
+		<text>Podobno natychmiast lecz№ siк tam rany i w oczach odzyskujesz siіy... Mуwi№, їe w Oazie їadna choroba nie ma szans, nawet choroba popromienna! Jedno tylko wiem na pewno - wiem, gdzie siк znajduje... Chcesz wiedzieж? Jest w samym њrodku Zony! Ale zachowajmy to miкdzy nami, ani sіуwka nikomu!</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_113">
+		<text>Podobno jeњli napotkasz tam mutanta, w ogуle siк tob№ nie zainteresuje. Mуwi№ teї, їe jest tam artefakt nazywany Sercem Oazy... Nikt nie wie, jakie ma dziaіanie, ale jedno jest pewne - nie naleїy go dotykaж. Nie ma w Zonie miejsca dla tego, kto go zabierze... Pytasz, gdzie ta Oaza? Wszyscy wiedz№, їe w Prypeci pod diabelskim mіynem! Gdzie niby miaіaby byж?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_12">
+		<text>Znasz stalkera, ktуrego nazywaj№ Sroka?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_121">
+		<text>Jasne... Ale nie mam pojкcia, co teraz porabia.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_122">
+		<text>Hm... Nigdy o nim nie sіyszaіem.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_13">
+		<text>Wiesz, kto mуgі ukraњж zawartoњж osobistej skrytki?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_131">
+		<text>Nie mam pojкcia. Popytaj starszyznк w Janowie, moїe oni ci pomog№.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_14">
+		<text>Kto moїe pomуc mi coњ rozszyfrowaж?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_141">
+		<text>Azot w Janowie, ktуїby inny? Uwielbia grzebanie w technicznych pierdуіkach... Duїo bardziej niї dіubanie w broni.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_143">
+		<text>Nikt, kogo znam. Zapytaj w Janowie - maj№ tam jakiegoњ speca.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_15">
+		<text>Mam PDA handlarza Powinnoњci. Znasz kogoњ, kto byіby nim zainteresowany?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_151">
+		<text>Znasz Sowк ze Skadowska? On powinien byж tym zainteresowany. Lubi mieszaж siк w delikatne sprawy...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_152">
+		<text>Na Skadowsku na Zatonie byі niejaki Sowa. On handluje informacjami... Twуj PDA moїe go zainteresowaж.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_16">
+		<text>Gdzie tu znajdк narzкdzia?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_161">
+		<text>Jeden stalker mуwiі mi, їe jego stary pracowaі w warsztatach podstacji przed '86. Mуwiі, їe mieli tam najrуїniejszy sprzкt, wiкc chyba i narzкdzia. Teraz juї pewnie wszystko w cholerк zardzewiaіo, ale moїe warto tam zajrzeж.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_162">
+		<text>Znasz tartak w lesie na wzgуrzu? Powinny byж tam jakieњ narzкdzia, chyba їe ktoњ siк juї na nie poіakomiі. Ale w№tpiк. Im bliїej tartaku podejdziesz, tym wiкksz№ masz ochotк narobiж w portki i zwiaж, gdzie pieprz roњnie. I to nawet nie chodzi o promieniowanie...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_163">
+		<text>Jest tu fabryka Jupiter, tam na pewno s№ jakieњ narzкdzia. Ale lepiej siк do samej fabryki nie zbliїaж... Strasznie tam jest. Moїesz za to zajrzeж do magazynуw Jupitera z boku fabryki.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_164">
+		<text>Sіyszaіem, їe w Prypeci jest kilka miejsc, w ktуrych moїna znaleџж najrуїniejszy techniczny szajs. Jedno z nich to stary radziecki dom handlowy. Dawniej tylko tam moїna byіo kupiж cokolwiek przydatnego.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_165">
+		<text>Sk№d mam wiedzieж? Szukaj w starych warsztatach i sklepach, tam moїe byж coњ uїytecznego.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_166">
+		<text>Szczerze mуwi№c, porz№dne narzкdzia ostatni raz widziaіem w bunkrze Sidorowicza w Kordonie. Jasne, trzeba za nie zapіaciж, ale s№ nowe i wcale nie takie drogie.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_167">
+		<text>Wiesz, kolego, nie przyszedіem do Zony szukaж narzкdzi. Ile poїytku bкdziesz miaі z napromieniowanego mіotka?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_168">
+		<text>Sіyszaіem plotkк, їe moїna co nieco znaleџж w starym centrum usіugowym... Moїe znajdziesz tam teї narzкdzia. Ale zasada jest taka jak wszкdzie - kto pierwszy, ten lepszy.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_169">
+		<text>Dobre pytanie... Na twoim miejscu sprawdziіbym w starym poci№gu pod mostem. Nie pytaj dlaczego... Przeczucie mуwi mi, їe moїesz tam coњ znaleџж.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_17">
+		<text>Kto moїe odblokowaж moduі pamiкci?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_171">
+		<text>Niech pomyњlк... Na pewno Azot w Janowie da radк. Oprуcz niego jest jeszcze Nowikow, technik naukowcуw, prawdziwy fachura. Ale zastanуw siк, na czym ci zaleїy, bo Azot jest duїo taсszy.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_172">
+		<text>Potrzebny ci bкdzie technik, a jedyny, ktуrego tu znam to Kardan. Problem w tym, їe po tylu latach zagl№dania w kieliszek nie najlepiej radzi sobie ze zіoїon№ elektronik№. Na twoim miejscu popytaіbym w okolicach Jupitera - maj№ tam prawdziwych fachowcуw.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_18">
+		<text>Kto mуgіby siк wіamaж do stalowego kontenera?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_181">
+		<text>Moїe Kardan ze Skadowska. Aї miіo patrzeж, jak przecina kіуdki.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_182">
+		<text>Chyba jakiњ technik. Ale Azot raczej tego nie zrobi - nie lubi siіowej roboty.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_183">
+		<text>Pytasz o to w Prypeci?! Posіuchaj mojej rady i poszukaj kogoњ dalej od centrum Zony.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_19">
+		<text>Szukam stalkera Sкka. Wiesz, gdzie go znaleџж?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_191">
+		<text>Zapytaj Brodacza, barmana na Skadowsku. On zwykle wie, gdzie znaleџж stalkerуw.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_193">
+		<text>Sкka? Sk№d mam wiedzieж, do diabіa? Zapytaj na Zatonie, czкsto siк tam krкci.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_2">
+		<text>Wiesz coњ na temat rozbitych њmigіowcуw?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_20">
+		<text>Kto moїe byж zainteresowany informacjami na temat zaіoїyciela Powinnoњci?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_201">
+		<text>Pogadaj z Sow№, handlarzem informacji ze Skadowska. Zaіoїк siк, їe bкdzie zainteresowany wiarygodnymi informacjami na temat takiej legendy.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_21">
+		<text>Sam jeden widziaіem... Nie wygl№daі, jakby siк rozbiі, ale zbyt prosto teї nie lataі. Bujaі siк na boki, aї w koсcu wyl№dowaі na pіaskowyїu na poіudnie od Zatonu... Ciekawe, czy ktoњ przeїyі... Gdyby tylko byіo jak tam wejњж. Sіyszaіem, їe Noe z wariackiej barki moїe wiedzieж...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_22">
+		<text>Sіyszaіem, їe niedaleko st№d rozbiіo siк parк њmigіowcуw... Ludzie mуwi№ rуїne rzeczy, ale jedno pamiкtam dobrze. Mуwili, їe wyl№dowaі na rezerwowym l№dowisku, ktуre sami wojacy zaminowali parк lat temu. Dasz gіowк, co za ironia? Mуj stary mawiaі „Kto pod kim doіki kopie, ten sam w nie wpada". Szczera prawda, nie?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_23">
+		<text>Kumpel opowiedziaі mi tak№ historiк... Poszedі do Їelaznego Lasu szukaж artefaktуw i jak tylko tam doszedі, usіyszaі za sob№ wielki huk. Odwrуciі siк i zobaczyі, їe prosto na niego leci њmigіowiec, њcinaj№c po drodze sіupy energetyczne. Koleњ wiaі, aї siк za nim kurzyіo... Aї dziw bierze, їe nie wpadі po drodze w їadn№ anomaliк. Їelazny Las nietrudno znaleџж - widaж go z daleka. Roi siк w nim od cholernych poltergeistуw, wiкc musisz mieж oczy dookoіa gіowy.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_24">
+		<text>Podobno jeden wyl№dowaі na poіudniowym pіaskowyїu, ale ciкїko bкdzie siк tam dostaж. Sіyszaіem teї, їe ktoњ widziaі Noego na krawкdzi tego pіaskowyїu, co oznacza, їe ten wariat wie, jak tam wejњж.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_25">
+		<text>Sam їadnego nie widziaіem, ale kr№їy plotka, їe jeden rozbiі siк w fabryce... Nikt nie chce tego sprawdziж - jest tam zbyt niebezpiecznie.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_26">
+		<text>Pewien stalker opowiadaі mi, їe widziaі kilka wojskowych њmigіowcуw w kiepskiej sytuacji... Jeden spadі z pіon№cym silnikiem na bagno peіne anomalii. Dostaж siк tam іatwo, ale samo bagno to istny koszmar... To nie miejsce dla ludzi, moїesz mi wierzyж.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_3">
+		<text>Widziaіeњ tu jakieњ wojsko?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_30">
+		<text>Kto moїe byж zainteresowany mapami obszaru pomiкdzy Zatonem i Jupiterem?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_301">
+		<text>Pilot, ktуїby inny? To przewodnik. Ci№gle kr№їy pomiкdzy Skadowskiem i Janowem, wiкc na pewno przydadz№ mu siк twoje mapy.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_302">
+		<text>To nie Zaton ani Jupiter, wiкc te mapy s№ tu bezuїyteczne. Popytaj w ktуrymњ z tych miejsc, a moїe bardziej ci siк poszczкњci!</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_31">
+		<text>Sam nic nie widziaіem, ale sіyszaіem historiк o їoіnierzach schodz№cych z poіudniowego pіaskowyїu po stronie oczyszczalni њciekуw. Podobno na pocz№tku prуbowali schodziж jak naleїy, za pomoc№ lin i caіej reszty. Potem dali sobie spokуj i zjechali na dupach! Bobsleje w Zonie - rewelacja!</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_32">
+		<text>Sіyszaіem na Skadowsku rozmowк, їe ktoњ widziaі, jak pi№tka їoіnierzy wychodzi z kanaіu њciekowego koіo bagna. Mуwili їe їoіnierze byli piekielnie umorusani, a jednego z nich nie odrуїniіbyњ od bagiennej pijawki, bo byі pokryty szlamem od stуp do gіуw.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_33">
+		<text>Osobiњcie nie, ale mуj kumpel widziaі, jak oddziaі їoіnierzy atakuje grupк najemnikуw koіo oczyszczalni. Zanim znalazі dobry punkt widokowy, byіo juї po zabawie, bo wojacy siк wycofali. Po obu stronach nie byіo їadnych ofiar... Typowe, co?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_34">
+		<text>Podobno jakichњ dziesiкciu їoіnierzy widziano koіo barki Noego. Skoro ten wariat przeїyі to spotkanie, musiaі siк z nimi jakoњ dogadaж... jak to on. Oczywiњcie, nikt nie pytaі Noego, co siк staіo - nigdy nie wiadomo, czego siк spodziewaж po tym r№bniкtym sukinsynu.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_35">
+		<text>Sіyszaіem w nocy wybuch, a potem ktoњ w Janowie powiedziaі mi, їe widziaі martwego їoіnierza na starym polu minowym i porzucony armijny helikopter za nim. Wygl№da na to, їe po ciemku nie widzieli, gdzie l№duj№, i wlecieli prosto na miny. Nikt nie wie, ilu siк stamt№d wydostaіo, ale w№tpiк, їeby tamten przyleciaі sam tym helikopterem.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_36">
+		<text>Nie widziaіem їadnych їoіnierzy... ale sіyszaіem pogіoski, їe jakiњ wojak krкci siк u naukowcуw. Podobno znalazі go stalker Garri, jak poszedі szukaж swoich kumpli na stanowisku rakietowym. Tam roi siк od zombi, ktуre nie s№ zbyt przyjazne dla zbі№kanych ludzi, wiкc Garri wіaњciwie uratowaі go od pewnej њmierci.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_37">
+		<text>Nie, ale sіyszaіem, їe widziano їoіnierza przy kompleksie przeciwlotniczym Woіchow. Tak naprawdк w to nie wierzк... Moїe to kіamstwo, a moїe ktoњ nie potrafi odrуїniж їoіnierza od zombi.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_38">
+		<text>Wojsko? Sіyszaіem, jak ludzie mуwili, їe „caіy oddziaі їoіnierzy prowadzony przez stalkera” przeszedі obok fabryki Jupiter, ale nie zwracaіem wiкkszej uwagi na te plotki.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_4">
+		<text>Wiesz, jak siк dostaж do Prypeci?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_40">
+		<text>Kogo moїna wynaj№ж do ochrony naukowcуw?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_401">
+		<text>Znasz Spartakusa i jego oddziaі? Wiesz, tych stalkerуw z Zatonu? Dobrzy z nich ludzie, walcz№ teї caіkiem nieџle - nieraz rуїnym bykom dawali odpуr. Czujк, їe odpowiadaіoby im pilnowanie naukowcуw.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_402">
+		<text>Spotkaіeњ oddziaі Tasaka koіo warsztatуw podstacji na Zatonie? S№ z nimi problemy, jak ze wszystkimi najemnikami, ale ci przynajmniej najpierw zadaj№ pytania, a dopiero potem strzelaj№. Jeњli siк z nimi dogadasz co do tej roboty, naukowcy siк uciesz№, a i stalkerzy trochк odetchn№. Wszyscy bкd№ zadowoleni.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_403">
+		<text>Eee... Nic mi nie przychodzi do gіowy... Przykro mi.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_41">
+		<text>Wiem na pewno, їe nie moїna siк tam dostaж z Zatonu. Wszyscy, ktуrych piliіo do Prypeci, szli w kierunku Jupitera, wiкc popytaj w tamtych okolicach.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_42">
+		<text>Kr№ї№ plotki, їe pod fabryk№ Jupiter s№ ukryte tunele prowadz№ce do Prypeci... Rzecz w tym, їe takie plotki zwykle wychodz№ na jaw po drugiej kolejce, a do tego Jupiter to taki koszmar, їe nikt nie odwaїy siк tam podejњж.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_43">
+		<text>Sk№d mam wiedzieж, brachu? Nie masz prostszych pytaс? Mogк tylko powiedzieж, їe powinieneњ znaleџж Pilota i z nim pogadaж - jeњli ktoњ moїe ci pomуc, to na pewno on.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_44">
+		<text>Gdybym znaі drogк do Prypeci, nie byіoby mnie tu. Jak myњlisz, czemu poszedіem w stronк centrum Zony? Prypeж jest peіna artefaktуw, bracie! Kto dotrze tam pierwszy, bкdzie їyі jak krуl!</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_5">
+		<text>Moїesz zaproponowaж kogoњ, kto nie jest zbyt zajкty i chciaіby ruszyж do Prypeci?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_51">
+		<text>Nie s№dzк, їeby byі tu ktoњ taki. Wszyscy, ktуrzy chcieli byж bliїej centrum Zony, poszli do Jupitera. Na twoim miejscu tam bym popytaі.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_52">
+		<text>Sіyszaіeњ o їoіnierzu, ktуry siedzi teraz u naukowcуw? On nie miaіby wiele do stracenia, id№c z tob№. Naukowcy prкdko siк stamt№d nie rusz№, a sam nie dotrze do Kordonu, wiкc moїe bкdzie na tyle gіupi, їeby pуjњж z tob№ do Prypeci!</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_53">
+		<text>Znasz Wano ze stacji Janуw? To uczciwy czіowiek i dobry stalker, do tego strasznie іatwowierny. Jemu lepiej wњrуd anomalii niї wњrуd ludzi - dopуki tam siedzi, zawsze znajdzie siк ktoњ, kto go wycycka.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_54">
+		<text>Sіuchaj, podobno widziano jakiњ oddziaі nad wyschniкtym jeziorem na poіudnie od stanowiska przeciwlotniczego... Nie byli to zwykli stalkerzy, Powinnoњж ani Wolnoњж - to ludzie z Monolitu! Jeњli potrzebujesz towarzyszy podrуїy do Prypeci, oni bкd№ jak znalazі. Ha, ha, rozumiesz chyba, їe їartujк?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_55">
+		<text>Znasz Wіуczкgк, przywуdcк nowego oddziaіu Wolnoњci? Gdybyњ widziaі jego їaіosn№ gкbк, sam byњ wiedziaі, їe Janуw to nie miejsce dla niego. Powinieneњ z nim porozmawiaж. Moїe siк nawet zgodzi.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_56">
+		<text>Znasz Wіуczкgк, przywуdcк nowego oddziaіu Powinnoњci? Gdybyњ widziaі jego їaіosn№ gкbк, sam byњ wiedziaі, їe Janуw to nie miejsce dla niego. Powinieneњ z nim porozmawiaж. Moїe siк nawet zgodzi.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_57">
+		<text>Hm... Nikt mi nie przychodzi do gіowy.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_6">
+		<text>Znalazіem dziwn№ broс. Znasz kogoњ, kto moїe coњ o niej wiedzieж?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_62">
+		<text>Cholera wie. Zapytaj fachowcуw... Moїe technicy coњ wiedz№...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_63">
+		<text>Nie zaszkodzi zapytaж Kardana na Skadowsku. On ma smykaіkк do broni... Wszystkich szarych komуrek moїe jeszcze nie przepiі...</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_7">
+		<text>Kto moїe wykonaж pomiary dla naukowcуw?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_71">
+		<text>Znasz myњliwego Gontк? Myњlк, їe jemu i jego chіopakom nie przeszkadzaіaby praca dla naukowcуw. Znaczy siк, jeњli mutanty bкd№ przeszkadzaж w pracy, ci chіopcy њwietnie sobie z nimi poradz№.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_72">
+		<text>Sіyszaіeњ o stalkerach Grizlim, Torbie i Mitaju z Janowa? Pracuj№ we trzech i lepszych ciкїko znaleџж! Myњlк, їe nadaj№ siк do takiej pracy... O ile Mitaj nie wpakuje siк znowu w jakieњ kіopoty.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_73">
+		<text>Nie mam pojкcia, bracie. Mamy tu doњж wіasnych zmartwieс.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_8">
+		<text>Znalazіem bardzo dziwny artefakt. Komu mogк go sprzedaж?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_81">
+		<text>Nie wiem. Tutejsi ludzie handluj№ tylko z zaufanymi osobami. Popytaj na Zatonie, tam jest bliїej skraju Zony.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_83">
+		<text>Pokaї go Brodaczowi, barmanowi ze Skadowska. Podobno wspуіpracuje z kolekcjonerami z zewnкtrznego њwiata, a oni zawsze chкtnie іykaj№ dziwne okazy.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_9">
+		<text>Znalazіem niedaleko legowisko pijawek. Co robiж?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_91">
+		<text>Ho, ho! Powiedz o tym Brodaczowi na Skadowsku... Bo albo siк z nimi rozprawimy, albo one nas zaіatwi№ w trymiga.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_98">
+		<text>Dobra, niewaїne.</text>
+	</string>
+	<string id="about_skadovsk_dialog_bandit_0">
+		<text>Gdzie jest najbliїszy obуz stalkerуw?</text>
+	</string>
+	<string id="about_skadovsk_dialog_bandit_1">
+		<text>Coњ ty, gіupi?... Nie znam siк na obozach stalkerуw, ale najbliїszy obуz jest na Skadowsku. Dam ci wspуіrzкdne, i to za darmo. Dobry ze mnie chіop, co?</text>
+	</string>
+	<string id="about_skadovsk_dialog_stalkers_0">
+		<text>Gdzie jest najbliїszy obуz stalkerуw?</text>
+	</string>
+	<string id="about_skadovsk_dialog_stalkers_1">
+		<text>Przeњlк ci wspуіrzкdne na PDA... Skadowsk to jedyny duїy obуz w okolicy.</text>
+	</string>
+	<string id="actor_break_dialog_2">
+		<text>Do zobaczenia.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_27">
+		<text>Sіyszaіem, їe kilka siк rozbiіo... Nie znam szczegуіуw - nie zajmujк siк plotkami. Przykro mi, їe nie mogк bardziej ci pomуc.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_28">
+		<text>Czіowieku, mam wystarczaj№co wiele na gіowie i bez twoich њmigіowcуw... Zakіadam, їe rozbicie takiej maszyny to nic przyjemnego, ale poza tym nie bardzo wiem, co miaіbym ci powiedzieж.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_27">
+		<text>O czym ty mуwisz, do cholery? Trzeba siк napaliж mocnego towaru, їeby zobaczyж tu њmigіowiec, bo prawdziwych tutaj nie uњwiadczysz.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_27">
+		<text>Hк? Nie, nie zawracam sobie gіowy takimi rzeczami. Ani trochк nie pomagaj№ mi w mojej misji rozpowszechniania wiedzy.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_27">
+		<text>Nasz patrol widziaі spadaj№ce њmigіowce, ale szczegуіy przekazaі podpuіkownikowi osobiњcie. Nic wiкcej o tym nie wiem, to problem podpuіkownika.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_50">
+		<text>Gdzie znajdк kombinezon z aparatem tlenowym o zamkniкtym obiegu?</text>
+	</string>
+	<string id="about_quests_dialog_bandit_501">
+		<text>Nie wiem, jak ze znalezieniem, ale odpowiednia kwota potrafi zdziaіaж cuda - o ile siк wie, gdzie j№ zainwestowaж. Porozmawiaj ze Їwawym... Jeњli siк dogadacie, zdobкdzie dla ciebie strуj. Mam nadziejк, їe tak siк stanie... Przydaіoby siк nam na Skadowsku parк dni bez niego...</text>
+	</string>
+	<string id="about_quests_dialog_bandit_502">
+		<text>Sk№d mam wiedzieж, do diabіa? Sam jestem tu od niedawna... Najlepiej zapytaj na Zatonie, nasi bracia maj№ tam swoje kontakty.</text>
+	</string>
+	<string id="about_quests_dialog_bandit_503">
+		<text>Nie mam pojкcia. A co, zamierzasz wetkn№ж nos w anomaliк? Sіuchaj, jeњli znajdziesz jakieњ artefakty, daj nam znaж. Dotrzemy na miejsce raz-dwa... Їeby pogratulowaж ci dobrej roboty! Ha, ha!</text>
+	</string>
+	<string id="about_quests_dialog_dolg_50">
+		<text>Gdzie znajdк kombinezon z aparatem tlenowym o zamkniкtym obiegu?</text>
+	</string>
+	<string id="about_quests_dialog_dolg_501">
+		<text>Sk№d mam wiedzieж? Czekaj... Jest w Skadowsku pewien goњж, podobno jest w stanie zaіatwiж wszystko, o co zapytasz. Siedzi na gуrnym pokіadzie, nazywa siк Їwawy.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_502">
+		<text>Nie, nikt tu nie przytaszczy ze sob№ dodatkowego kombinezonu... Zapytaj na Zatonie - jest o krok bliїej cywilizacji.</text>
+	</string>
+	<string id="about_quests_dialog_dolg_503">
+		<text>Nie mam pojкcia, gdzie go szukaж... Takie kombinezony s№ rzadkoњci№ wњrуd czіonkуw Powinnoњci. Moїna taki dostaж tylko za wyrуїnienie siк w walce albo gdy siк prowadzi dziaіania wњrуd skupisk anomalii.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_50">
+		<text>Gdzie znajdк kombinezon z aparatem tlenowym o zamkniкtym obiegu?</text>
+	</string>
+	<string id="about_quests_dialog_freedom_501">
+		<text>Sіyszaіem, jak stalkerzy mуwili o czіowieku z kontaktami, chyba nazywali go Їwawy. Moїe ci zaіatwiж niemal wszystko, sprzкt, spluwy, tego typu rzeczy... Trawy ci nie zaіatwi. Siedzi w Skadowsku, jeњli chcesz go odwiedziж.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_502">
+		<text>Dobre pytanie... W Wolnoњci takich nie nosimy. Na twoim miejscu zapytaіbym stalkerуw na Zatonie. Tam moїe byж ktoњ, kto zajmuje siк takimi sprawami.</text>
+	</string>
+	<string id="about_quests_dialog_freedom_503">
+		<text>A na cholerк ci to? Do walki siк nie nadaje. Ale na coњ chyba moїe siк przydaж. Јatwiej w nim oddychaж i sіoсce tak nie њwieci w oczy. Sam z chкci№ bym sobie zaіatwiі taki kombinezon. Nie wiesz, gdzie moїna go dostaж?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_50">
+		<text>Gdzie znajdк kombinezon z aparatem tlenowym o zamkniкtym obiegu?</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_501">
+		<text>Myњlк, їe u Їwawego. Trzeci pokіad Skadowska. On ci moїe zaіatwiж њnieg na pustyni... Ale portfel ciкїko znosi jego usіugi.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_502">
+		<text>Niech pomyњlк... Byі taki jeden na Zatonie, niejaki Їwawy. Sprawdџ, czy ci№gle tam jest. Podobno specjalizuje siк w ekskluzywnym towarze.</text>
+	</string>
+	<string id="about_quests_dialog_stalkers_503">
+		<text>Czіowieku, pytasz, jakby to byі zszywacz do papieru albo coњ. Nikt nie wie. Taki towar to rarytas, pojawia siк rzadko. Jeњli go zdobкdziesz, moїesz uwaїaж siк za szczкњciarza.</text>
+	</string>
+	<string id="actor_break_dialog_3">
+		<text>Czeњж.</text>
+	</string>
+	<string id="actor_break_dialog_1">
+		<text>Na razie.</text>
+	</string>
+	<string id="actor_break_dialog_0">
+		<text>Do zobaczenia.</text>
+	</string>
+</string_table>

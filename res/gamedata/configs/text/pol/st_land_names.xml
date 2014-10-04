@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_zat_b55_name">
+		<text>Anomalia Pazur</text>
+	</string>
+	<string id="st_zat_b100_name">
+		<text>Anomalia Їelazny Las</text>
+	</string>
+	<string id="st_zat_b104_name">
+		<text>Tartak</text>
+	</string>
+	<string id="st_zat_b38_name">
+		<text>Stacja antenowa Krug</text>
+	</string>
+	<string id="st_zat_b40_name">
+		<text>Zakіad utylizacji odpadуw</text>
+	</string>
+	<string id="st_zat_b56_name">
+		<text>Anomalia Cyrk</text>
+	</string>
+	<string id="st_zat_b5_name">
+		<text>Leњniczуwka</text>
+	</string>
+	<string id="st_zat_a2_name">
+		<text>Skadowsk</text>
+	</string>
+	<string id="st_zat_b20_name">
+		<text>Spalone gospodarstwo</text>
+	</string>
+	<string id="st_zat_b53_name">
+		<text>Anomalia Kocioі</text>
+	</string>
+	<string id="st_zat_b101_name">
+		<text>Bagno</text>
+	</string>
+	<string id="st_zat_b106_name">
+		<text>Izumrudnoje</text>
+	</string>
+	<string id="st_zat_b7_name">
+		<text>Szewczenko</text>
+	</string>
+	<string id="st_zat_b14_name">
+		<text>Pogікbiarka</text>
+	</string>
+	<string id="st_zat_b52_name">
+		<text>Dџwigi portowe</text>
+	</string>
+	<string id="st_zat_b39_name">
+		<text>Anomalia Sosnod№b</text>
+	</string>
+	<string id="st_zat_b33_name">
+		<text>Stacja benzynowa</text>
+	</string>
+	<string id="st_zat_b18_name">
+		<text>Stara barka</text>
+	</string>
+	<string id="st_zat_b54_name">
+		<text>Anomalia Szrama</text>
+	</string>
+	<string id="st_zat_b12_name">
+		<text>Most Przemienienia Paсskiego</text>
+	</string>
+	<string id="st_zat_b28_name">
+		<text>Pіaskowyї poіudniowy</text>
+	</string>
+	<string id="st_zat_b103_name">
+		<text>Magazyny podstacji</text>
+	</string>
+	<string id="st_jup_b1_name">
+		<text>Anomalia Popielisko</text>
+	</string>
+	<string id="st_jup_b46_name">
+		<text>Wieїa chіodnicza</text>
+	</string>
+	<string id="st_jup_b202_name">
+		<text>Podstacja</text>
+	</string>
+	<string id="st_jup_b211_name">
+		<text>Anomalia Szuwary</text>
+	</string>
+	<string id="st_jup_b200_name">
+		<text>Cementownia</text>
+	</string>
+	<string id="st_jup_b19_name">
+		<text>Kopaczi</text>
+	</string>
+	<string id="st_jup_a6_name">
+		<text>Janуw</text>
+	</string>
+	<string id="st_jup_b25_name">
+		<text>Kamienioіomy</text>
+	</string>
+	<string id="st_jup_b6_name">
+		<text>Bunkier naukowcуw</text>
+	</string>
+	<string id="st_jup_b205_name">
+		<text>Kompleks przeciwlotniczy Woіkow</text>
+	</string>
+	<string id="st_jup_b206_name">
+		<text>Zagajnik anomalii</text>
+	</string>
+	<string id="st_jup_b32_name">
+		<text>Parking</text>
+	</string>
+	<string id="st_jup_a10_name">
+		<text>Posterunek</text>
+	</string>
+	<string id="st_jup_b209_name">
+		<text>Anomalia Bitumin</text>
+	</string>
+	<string id="st_jup_b208_name">
+		<text>Wschodni tunel</text>
+	</string>
+	<string id="st_jup_a12_name">
+		<text>Magazyn kontenerуw</text>
+	</string>
+	<string id="st_jup_b212_name">
+		<text>Kompleks wentylacyjny</text>
+	</string>
+	<string id="st_jup_b9_name">
+		<text>L№dowiska dla helikopterуw</text>
+	</string>
+	<string id="st_jup_b201_name">
+		<text>Anomalia Betonowa Wanna</text>
+	</string>
+	<string id="st_jup_a9_name">
+		<text>Fabryka Jupiter</text>
+	</string>
+	<string id="st_pri_a28_name">
+		<text>Kino Prometeusz</text>
+	</string>
+	<string id="st_pri_b36_name">
+		<text>Port rzeczny</text>
+	</string>
+	<string id="st_pri_b303_name">
+		<text>Stara stacja obsіugi</text>
+	</string>
+	<string id="st_pri_b301_name">
+		<text>Szkoіa</text>
+	</string>
+	<string id="st_pri_a17_name">
+		<text>Szpital</text>
+	</string>
+	<string id="st_pri_b306_name">
+		<text>Centrum usіugowe Jubilejny</text>
+	</string>
+	<string id="st_pri_a16_name">
+		<text>Pralnia samoobsіugowa</text>
+	</string>
+	<string id="st_pri_a25_name">
+		<text>Przedszkole</text>
+	</string>
+	<string id="st_pri_b35_name">
+		<text>Osiedle</text>
+	</string>
+	<string id="st_pri_a21_name">
+		<text>Warzywniak</text>
+	</string>
+	<string id="st_pri_b304_name">
+		<text>Dom towarowy</text>
+	</string>
+	<string id="st_pri_a18_name">
+		<text>Ksiкgarnia</text>
+	</string>
+	<string id="st_pri_b307_name">
+		<text>Anomalia Wulkan</text>
+	</string>
+	<string id="st_pri_b302_name">
+		<text>Anomalia Winoroњl</text>
+	</string>
+</string_table>

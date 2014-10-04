@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="hide_from_surge_message">
+		<text>Attention! Emission starts in:</text>
+	</string>
+	<string id="hide_from_surge_descr_1_a">
+		<text>You must run to the nearest cover immediately and hide from the emission.</text>
+	</string>
+	<string id="hide_from_surge_descr_2_a">
+		<text>You must not leave cover during an emission.</text>
+	</string>
+	<string id="hide_from_surge_name_1">
+		<text>Emission: find cover</text>
+	</string>
+	<string id="hide_from_surge_name_2">
+		<text>Emission: wait in cover</text>
+	</string>
+</string_table>

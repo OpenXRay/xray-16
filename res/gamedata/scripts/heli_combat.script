@@ -1,0 +1,775 @@
+--[[------------------------------------------------------------------------------------------------
+Универсальная боевая схема вертолёта
+Чугай Александр
+
+В отличие от сталкеров боевая схема не является отдельным действием, а вызывается из других схем.
+--------------------------------------------------------------------------------------------------]]
+
+local combat_type_flyby   = 0   -- атака пролётами над целью
+local combat_type_round   = 1   -- кружение вокруг позиции, атака кружась вокруг цели
+local combat_type_search  = 2   -- поиск врага, кружение вокруг точки, где последний раз видел, атака кружась вокруг цели
+local combat_type_retreat = 3   -- улёт за пределы уровня
+
+local flyby_state_to_attack_dist = 0
+local flyby_state_to_enemy       = 1
+
+local combat_type_change_delay   = 5000
+local visibility_delay           = 3000
+local search_shoot_delay         = 2000
+local round_shoot_delay          = 2000
+
+local dummy_vector = vector()
+
+local debug_combat_type
+
+function debug_switch_combat_type()
+	if debug_combat_type == combat_type_flyby then
+		debug_combat_type = combat_type_search
+	else
+		debug_combat_type = combat_type_flyby
+	end
+end
+
+function distance_2d( a, b )
+	return math.sqrt( (b.x-a.x)^2 + (b.z-a.z)^2 )
+end
+
+-- пересечение луча и круга.
+-- p - точка начала луча, v - направление луча (орт), o - центр круга, r - радиус круга
+-- точка p должна быть внутри круга
+function cross_ray_circle( p, v, o, r )
+	local po = vector():set( o ):sub( p )
+	local vperp = vector():set( -v.z, 0, v.x )
+	local l = math.sqrt( ( r ^ 2 ) - ( vector():set( po ):dotproduct( vperp ) ^ 2 ) )
+	return vector():set( p ):add( vector():set( v ):mul( vector():set( po ):dotproduct( v ) + l ) )
+end
+
+----------------------------------------------------------------------------------------------------
+class "heli_combat"
+
+function heli_combat:__init( object, heliObject )
+	self.st                    = db.storage[object:id()]
+	self.object                = object
+	self.heliObject            = heliObject
+	self.initialized           = false
+
+	self.level_max_y           = level.get_bounding_volume().max.y
+
+	local ltx                  = system_ini()
+
+	self.flyby_attack_dist     = utils.cfg_get_number( ltx, "helicopter", "flyby_attack_dist",    self.object, true )
+	self.search_attack_dist    = utils.cfg_get_number( ltx, "helicopter", "search_attack_dist",   self.object, true )
+	self.default_safe_altitude = utils.cfg_get_number( ltx, "helicopter", "safe_altitude",        self.object, true ) + self.level_max_y
+	self.m_max_mgun_dist       = utils.cfg_get_number( ltx, "helicopter", "max_mgun_attack_dist", self.object, true )
+
+	self.default_velocity      = utils.cfg_get_number( ltx, "helicopter", "velocity",             self.object, true )
+	self.search_velocity       = utils.cfg_get_number( ltx, "helicopter", "search_velocity",      self.object, true )
+	self.round_velocity        = utils.cfg_get_number( ltx, "helicopter", "round_velocity",       self.object, true )
+
+	self.vis_time_quant        = utils.cfg_get_number( ltx, "helicopter", "vis_time_quant",       self.object, true )
+	self.vis_threshold         = utils.cfg_get_number( ltx, "helicopter", "vis_threshold",        self.object, true )
+	self.vis_inc               = utils.cfg_get_number( ltx, "helicopter", "vis_inc",              self.object, true ) * self.vis_time_quant * 0.001
+	self.vis_dec               = utils.cfg_get_number( ltx, "helicopter", "vis_dec",              self.object, true ) * self.vis_time_quant * 0.001
+	self.vis                   = 0
+	self.vis_next_time         = 0
+
+	self.forget_timeout        = utils.cfg_get_number( ltx, "helicopter", "forget_timeout",       self.object, true ) * 1000
+
+	self.flame_start_health    = utils.cfg_get_number( ltx, "helicopter", "flame_start_health",   self.object, true )
+
+	self.attack_before_retreat = false
+	self.enemy_forgetable      = true
+	self.section_changed       = false
+	debug_combat_type          = nil
+end
+
+function heli_combat:read_custom_data( ini, section )
+	self.combat_use_rocket = utils.cfg_get_bool  ( ini, section, "combat_use_rocket", self.object, false, true )
+	self.combat_use_mgun   = utils.cfg_get_bool  ( ini, section, "combat_use_mgun",   self.object, false, true )
+--	self.combat_ignore     = utils.cfg_get_bool  ( ini, section, "combat_ignore",     self.object, false, false )
+
+	local combat_ignore    = utils.cfg_get_string( ini, section, "combat_ignore",     self.object, false, "", nil )
+	if combat_ignore then
+		self.combat_ignore = xr_logic.parse_condlist( self.object, section, "combat_ignore", combat_ignore )
+	else
+		self.combat_ignore = nil
+	end
+
+	local combat_enemy     = utils.cfg_get_string( ini, section, "combat_enemy",      self.object, false, "", nil )
+	self:set_enemy_from_custom_data( combat_enemy )
+
+	self.max_velocity      = utils.cfg_get_number( ini, section, "combat_velocity",      self.object, false, self.default_velocity )
+	self.safe_altitude     = utils.cfg_get_number( ini, section, "combat_safe_altitude", self.object, false,
+	                                               self.default_safe_altitude ) + self.level_max_y
+
+	self.section_changed   = true
+end
+
+-- установка врага по custom data
+-- если враг установился этой функцией, то он не будет забываться при длительной потере видимости!
+-- если установился новый враг, то combat будет переинициализирован
+function heli_combat:set_enemy_from_custom_data( combat_enemy )
+	if combat_enemy == nil then
+		self.enemy_forgetable = true
+	else
+		if combat_enemy == "actor" then
+			if db.actor then
+				self.enemy_id = db.actor:id()
+			else
+				self:forget_enemy()
+			end
+		elseif combat_enemy == "nil" then
+			self:forget_enemy()
+		else
+			self.enemy_id = id_by_sid( tonumber( combat_enemy ) )
+		end
+
+		if self.enemy_id then
+			self.enemy_forgetable = false
+			self.initialized      = false
+		else
+			self.enemy_forgetable = true
+			self:forget_enemy()
+		end
+	end
+end
+
+function heli_combat:set_combat_type( new_combat_type )
+	if new_combat_type ~= self.combat_type then
+		self.flyby_initialized  = false
+		self.round_initialized  = false
+		self.search_initialized = false
+
+		self.combat_type        = new_combat_type
+	end
+end
+
+function heli_combat:initialize()
+	self.enemy_last_seen_pos   = self.enemy:position()
+	self.enemy_last_seen_time  = 0
+	self.enemy_last_spot_time  = nil
+	self.can_forget_enemy      = false
+	self.section_changed       = true
+
+--	self:set_combat_type( combat_type_flyby )
+--	self:set_combat_type( combat_type_search )
+	self.combat_type                = combat_type_flyby
+	self.change_combat_type_time    = nil
+	self.change_combat_type_allowed = true
+
+	self.heliObject.m_max_mgun_dist = self.m_max_mgun_dist
+
+	self.flyby_states_for_one_pass  = 2
+
+	self.object:set_fastcall( self.fastcall, self )
+
+	self.initialized = true
+end
+
+function heli_combat:save( packet )
+--	packet:w_bool( self.retreat_already )
+	set_save_marker(packet, "save", false, "heli_combat")
+	printf( "heli_combat:save level_changing=%s", tostring( utils.level_changing() ) )
+
+	if utils.level_changing() then
+		packet:w_bool( false )
+		set_save_marker(packet, "save", true, "heli_combat")
+		return
+	end
+
+	packet:w_bool( self.initialized )
+
+	if self.initialized then
+		local t = time_global()
+
+		packet:w_s16 ( self.enemy_id )
+		packet:w_u32 ( t - self.enemy_last_seen_time )
+		packet:w_bool( self.can_forget_enemy )
+		packet:w_bool( self.enemy_forgetable )
+		packet:w_vec3( self.enemy_last_seen_pos )
+
+		packet:w_u8  ( self.combat_type )
+
+		if self.combat_type == combat_type_search then
+			packet:w_u32 ( self.change_dir_time - t )
+			packet:w_u32 ( self.change_pos_time - t )
+			packet:w_bool( self.flight_direction )
+			packet:w_vec3( self.center_pos )
+
+		elseif self.combat_type == combat_type_flyby then
+			packet:w_s16( self.flyby_states_for_one_pass )
+		end
+	end
+	set_save_marker(packet, "save", true, "heli_combat")
+end
+
+function heli_combat:load( packet )
+
+	printf( "heli_combat:LOAD level_changing=%s", tostring( utils.level_changing() ) )
+--	self.retreat_already = packet:r_bool()
+	set_save_marker(packet, "load", false, "heli_combat")
+
+
+	self.initialized     = packet:r_bool()
+	printf("initialized = [%s]", tostring(self.initialized))
+
+	if self.initialized then
+		local t = time_global()
+		printf("t = [%s]", tostring(t))
+		self.enemy_last_seen_pos  = vector()
+		
+		self.enemy_id             = packet:r_s16()
+		printf("self.enemy_id = [%s]", tostring(self.enemy_id))
+		self.enemy_last_seen_time = t - packet:r_u32()
+		printf("self.enemy_last_seen_time = [%s]", tostring(self.enemy_last_seen_time))
+		self.can_forget_enemy     = packet:r_bool()
+		printf("self.can_forget_enemy = [%s]", tostring(self.can_forget_enemy))
+		self.enemy_forgetable     = packet:r_bool()
+		printf("self.enemy_forgetable = [%s]", tostring(self.enemy_forgetable))
+		packet:r_vec3( self.enemy_last_seen_pos )
+		printf("self.enemy_last_seen_pos = [%s]", vec_to_str(self.enemy_last_seen_pos))
+		self.combat_type          = packet:r_u8()
+		printf("self.combat_type = [%s]", tostring(self.combat_type))
+
+		if self.combat_type == combat_type_search then
+			self.center_pos           = vector()
+
+			self.change_dir_time      = packet:r_u32() + t
+			printf("self.change_dir_time = [%s]", tostring(self.change_dir_time))
+			self.change_pos_time      = packet:r_u32() + t
+			printf("self.change_pos_time = [%s]", tostring(self.change_pos_time))
+			self.flight_direction     = packet:r_bool()
+			printf("self.flight_direction = [%s]", tostring(self.flight_direction))
+			packet:r_vec3( self.center_pos )
+			printf("self.center_pos = [%s]", vec_to_str(self.center_pos))
+
+		elseif self.combat_type == combat_type_flyby then
+			self.flyby_states_for_one_pass = packet:r_s16()
+			printf("self.flyby_states_for_one_pass = [%s]", tostring(self.flyby_states_for_one_pass))
+		end
+	end
+	set_save_marker(packet, "load", true, "heli_combat")
+end
+
+function heli_combat:waypoint_callback()
+	if self.enemy_id and not self:combat_ignore_check() then
+		self.was_callback = true
+		printf( "heli_combat:waypoint_callback" )
+		return true
+	else
+		return false
+	end
+end
+
+-- Обновление параметров вертолёта, задаваемых в custom data.
+-- Нужно делать на каждом обновлении на случай, если во время боя логика переключилась на другую секцию.
+function heli_combat:update_custom_data_settings()
+	if self.section_changed then
+		self.heliObject.m_use_rocket_on_attack = self.combat_use_rocket
+		self.heliObject.m_use_mgun_on_attack   = self.combat_use_mgun
+
+		if self.combat_type == combat_type_flyby then
+			printf( "heli_combat:update_custom_data_settings SetMaxVelocity=%d", self.max_velocity )
+			self.heliObject:SetMaxVelocity( self.max_velocity )
+		end
+
+		self.section_changed = false
+	end
+end
+
+function heli_combat:update_enemy_visibility()
+	self.object:info_add( "vis=" .. self.vis )
+
+	if self.vis >= self.vis_threshold then
+		self.enemy_last_seen_time = time_global()
+		self.enemy_last_seen_pos  = self.enemy:position()
+
+		return true
+	else
+		return false
+	end
+end
+
+function heli_combat:forget_enemy()
+	self.enemy_id    = nil
+	self.enemy       = nil
+
+	self.initialized = false
+end
+
+function heli_combat:update_forgetting()
+	if ( ( self.enemy_forgetable and self.can_forget_enemy ) and
+	   ( time_global() - self.enemy_last_seen_time > self.forget_timeout ) ) or not self.enemy:alive()
+	then
+		self:forget_enemy()
+	end
+end
+
+function heli_combat:update_combat_type( see_enemy )
+--	do return combat_type_flyby end
+
+	-- DEBUG
+	if debug_combat_type ~= nil then
+		self:set_combat_type( debug_combat_type )
+		return
+	end
+	--------
+
+	local ct = self.combat_type
+
+--	printf( "flyby_states_for_one_pass=%d", self.flyby_states_for_one_pass )
+
+	if self.combat_type == combat_type_flyby then
+		if self.flyby_states_for_one_pass <= 0 then
+			if self.attack_before_retreat then
+				ct = combat_type_retreat
+			else
+				ct = combat_type_round
+			end
+		end
+
+	elseif self.combat_type == combat_type_round then
+		if see_enemy then
+			if distance_2d( self.object:position(), self.enemy:position() ) > self.flyby_attack_dist + 70 --and
+--			   not self.flyby_pass_finished
+			then
+				ct = combat_type_flyby
+			end
+		else
+			ct = combat_type_search
+		end
+
+		if bind_heli.get_heli_health( self.heliObject, self.st ) < self.flame_start_health then
+			self.attack_before_retreat = true
+
+			self.heliObject.m_use_rocket_on_attack = true
+
+			ct = combat_type_flyby
+		end
+
+	elseif self.combat_type == combat_type_search then
+		if see_enemy then
+			if distance_2d( self.object:position(), self.enemy:position() ) > self.flyby_attack_dist then
+				ct = combat_type_flyby
+			else
+				ct = combat_type_round
+			end
+		end
+
+		if bind_heli.get_heli_health( self.heliObject, self.st ) < self.flame_start_health then
+			self.attack_before_retreat = true
+
+			self.heliObject.m_use_rocket_on_attack = true
+
+			ct = combat_type_flyby
+		end
+	end
+
+--	printf( "combat_type = %s", tostring( self.combat_type ) )
+	self:set_combat_type( ct )
+--	printf( "combat_type = %s", tostring( self.combat_type ) )
+end
+
+-- нужно ли игнорировать врага
+function heli_combat:combat_ignore_check()
+	return self.combat_ignore ~= nil and xr_logic.pick_section_from_condlist( db.actor, self.object, self.combat_ignore ) ~= nil
+end
+
+-- частое обновление.
+-- нужно для отслеживания видимости врага
+function heli_combat:fastcall()
+	if self.initialized then
+		if self.vis_next_time < time_global() then
+			self.vis_next_time = time_global() + self.vis_time_quant
+
+			if self.heliObject:isVisible( self.enemy ) then
+				self.vis = self.vis + self.vis_inc
+
+				if self.vis > 100 then
+					self.vis = 100
+				end
+			else
+				self.vis = self.vis - self.vis_dec
+
+				if self.vis < 0 then
+					self.vis = 0
+				end
+			end
+		end
+
+		return false
+	else
+		return true
+	end
+end
+
+-- Обновление боевой схемы. Вызывается из обновлений схем логики вертолёта.
+-- возвращает true, если бой активен (то есть нету combat_ignore и есть враг)
+function heli_combat:update()
+	if self.enemy_id then
+		self.enemy = level.object_by_id( self.enemy_id )
+		if not self.enemy then
+			self:forget_enemy()
+			return false
+		end
+	else
+		return false
+	end
+
+	if self:combat_ignore_check() then
+		return false
+	end
+
+	self:update_custom_data_settings()
+
+	if not self.initialized then
+		self:initialize()
+	end
+
+	local see_enemy = self:update_enemy_visibility()
+
+	self:update_combat_type( see_enemy )
+	-- FIXME
+--	self.heliObject:GetSpeedInDestPoint(0)
+
+	if self.combat_type == combat_type_search then
+		self:search_update( see_enemy )
+	elseif self.combat_type == combat_type_round then
+		self:round_update( see_enemy )
+	elseif self.combat_type == combat_type_flyby then
+		self:flyby_update( see_enemy )
+	elseif self.combat_type == combat_type_retreat then
+		self:retreat_update()
+	end
+
+	self:update_forgetting()
+
+	return true
+end
+
+-- посчитать точку на заданном радиусе от последней видимой позиции врага в текущем направлении скорости вертолёта
+function heli_combat:calc_position_in_radius( r )
+	local p = self.object:position()
+	p.y = 0
+
+	local v = self.heliObject:GetCurrVelocityVec()
+	v.y = 0
+	v:normalize()
+
+	local o = self.enemy_last_seen_pos
+	o.y = 0
+
+	local ret = cross_ray_circle( p, v, o, r )
+	ret.y = self.safe_altitude
+
+	return ret
+end
+
+----------------------------------------------------------------------------------------------
+-- Фунциии кружащего боя
+----------------------------------------------------------------------------------------------
+function heli_combat:round_initialize()
+	self.change_dir_time            = 0
+	self.change_pos_time            = 0
+	self.center_pos                 = self.enemy_last_seen_pos
+	self.flight_direction           = random_choice( true, false )
+	self.change_combat_type_allowed = true
+	self.round_begin_shoot_time    = 0
+
+
+	printf( "heli_combat:round_initialize SetMaxVelocity=%d", self.round_velocity )
+	self.heliObject:SetMaxVelocity( self.round_velocity )
+	self.heliObject:SetSpeedInDestPoint( self.round_velocity )
+	self.heliObject:UseFireTrail( false )
+
+	self.round_initialized         = true
+
+	self:round_setup_flight( self.flight_direction )
+end
+
+function heli_combat:round_setup_flight( direction )
+	self.center_pos   = self.enemy_last_seen_pos
+	self.center_pos.y = self.safe_altitude
+
+	printf( "heli_combat:round_setup_flight GoPatrolByRoundPath" )
+	self.heliObject:GoPatrolByRoundPath( self.center_pos, self.search_attack_dist, direction )
+	self.heliObject:LookAtPoint( self.enemy:position(), true )
+end
+
+function heli_combat:round_update_shooting( see_enemy )
+	if see_enemy then
+		if self.round_begin_shoot_time then
+			if self.round_begin_shoot_time < time_global() then
+				self.heliObject:SetEnemy( self.enemy )
+			end
+		else
+			self.round_begin_shoot_time = time_global() + round_shoot_delay
+		end
+	else
+		self.heliObject:ClearEnemy()
+
+		self.round_begin_shoot_time = nil
+	end
+end
+
+function heli_combat:round_update_flight( see_enemy )
+	-- менять время от времени направление облёта
+--[[	if self.change_dir_time < time_global() then
+		local t
+
+		if see_enemy then
+			t = math.random( 6000, 10000 )
+		else
+			t = math.random( 15000, 20000 )
+		end
+
+		self.change_dir_time = time_global() + t --+ 1000000
+
+		printf( "heli_combat: going by round path, t=%d", t )
+
+		self.flight_direction = not self.flight_direction
+		self:round_setup_flight( self.flight_direction )
+
+		return
+	end
+]]
+	-- периодически проверть, не переместился ли враг и достаточно ли у вертолёта здоровья
+	if self.change_pos_time < time_global() then
+		self.change_pos_time = time_global() + 2000
+
+		if not self.can_forget_enemy and
+		   distance_2d( self.object:position(), self.enemy_last_seen_pos ) <= self.search_attack_dist
+		then
+			self.can_forget_enemy = true
+		end
+
+		if distance_2d( self.center_pos, self.enemy_last_seen_pos ) > 10 then
+			printf( "heli_combat: enemy has changed his position" )
+
+			self:round_setup_flight( self.flight_direction )
+		end
+	end
+end
+
+function heli_combat:round_update( see_enemy )
+	if not self.round_initialized then
+		self:round_initialize()
+	end
+
+--	printf( "heli_combat: round_update" )
+
+	self:round_update_shooting( see_enemy )
+	self:round_update_flight  ( see_enemy )
+end
+
+----------------------------------------------------------------------------------------------
+-- Фунциии для поиска врага (скопировано с кружащего боя)
+----------------------------------------------------------------------------------------------
+function heli_combat:search_initialize()
+	self.change_speed_time          = time_global() + math.random( 5000, 7000 ) --+ 1000000
+	self.speed_is_0                 = true
+
+	self.change_pos_time            = 0
+	self.center_pos                 = self.enemy_last_seen_pos
+
+	self.flight_direction           = random_choice( true, false )
+	self.change_combat_type_allowed = true
+	self.search_begin_shoot_time    = 0
+
+	self.heliObject:UseFireTrail( false )
+
+	self.search_initialized         = true
+
+	self:search_setup_flight()
+end
+
+function heli_combat:search_setup_flight()
+	self.center_pos   = self.enemy_last_seen_pos
+	self.center_pos.y = self.safe_altitude
+
+	local v
+	if self.speed_is_0 then
+		v = 0
+	else
+		v = self.search_velocity
+	end
+
+	printf( "heli_combat:search_setup_flight SetMaxVelocity=%d", v )
+	self.heliObject:SetMaxVelocity( v )
+	self.heliObject:SetSpeedInDestPoint( v )
+
+	printf( "heli_combat:search_setup_flight GoPatrolByRoundPath" )
+	self.heliObject:GoPatrolByRoundPath( self.center_pos, self.search_attack_dist, self.flight_direction )
+	self.heliObject:LookAtPoint( self.enemy:position(), true )
+end
+
+function heli_combat:search_update_shooting( see_enemy )
+	if see_enemy then
+		if self.search_begin_shoot_time then
+			if self.search_begin_shoot_time < time_global() then
+				self.heliObject:SetEnemy( self.enemy )
+			end
+		else
+			self.search_begin_shoot_time = time_global() + search_shoot_delay
+		end
+	else
+		self.heliObject:ClearEnemy()
+
+		self.search_begin_shoot_time = nil
+	end
+end
+
+function heli_combat:search_update_flight( see_enemy )
+	-- останавливаться и возобновлять движение время от времени
+	if self.change_speed_time < time_global() then
+		local t
+		t = math.random( 8000, 12000 )
+		self.change_speed_time = time_global() + t
+
+		self.speed_is_0 = not self.speed_is_0
+
+--		self.flight_direction = not self.flight_direction
+		self:search_setup_flight( self.flight_direction )
+
+		return
+	end
+
+	-- периодически проверть, не переместился ли враг и достаточно ли у вертолёта здоровья
+	if self.change_pos_time < time_global() then
+		self.change_pos_time = time_global() + 2000
+
+		if not self.can_forget_enemy and
+		   distance_2d( self.object:position(), self.enemy_last_seen_pos ) <= self.search_attack_dist
+		then
+			self.can_forget_enemy = true
+		end
+
+		if distance_2d( self.center_pos, self.enemy_last_seen_pos ) > 10 then
+			printf( "heli_combat: enemy has changed his position" )
+
+			self:search_setup_flight( self.flight_direction )
+		end
+	end
+end
+
+function heli_combat:search_update( see_enemy )
+	if not self.search_initialized then
+		self:search_initialize()
+	end
+
+--	printf( "heli_combat: search_update" )
+
+	self:search_update_shooting( see_enemy )
+	self:search_update_flight  ( see_enemy )
+end
+
+----------------------------------------------------------------------------------------------
+-- Фунциии для боя с пролётами над целью
+----------------------------------------------------------------------------------------------
+function heli_combat:flyby_initialize()
+	self:flyby_set_initial_state()
+
+	self.state_initialized         = false
+	self.was_callback              = false
+	self.flyby_states_for_one_pass = 2
+	self.flyby_initialized         = true
+
+	printf( "heli_combat:flyby_initialize SetMaxVelocity=%d", self.max_velocity )
+	self.heliObject:SetMaxVelocity( self.max_velocity )
+	self.heliObject:SetSpeedInDestPoint( self.max_velocity )
+	self.heliObject:LookAtPoint( dummy_vector, false )
+end
+
+function heli_combat:flyby_set_initial_state()
+--	if self.object:position():distance_to( self.enemy_last_seen_pos ) < self.flyby_attack_dist then
+	if distance_2d( self.object:position(), self.enemy_last_seen_pos ) < self.flyby_attack_dist then
+--		self.heliObject:LookAtPoint( dummy_vector, false )
+
+		self.state = flyby_state_to_attack_dist
+	else
+--		self.heliObject:LookAtPoint( self.enemy:position(), true )
+
+		self.state = flyby_state_to_enemy
+	end
+end
+
+function heli_combat:flyby_update_flight( see_enemy )
+	if self.was_callback then
+		if self.state == flyby_state_to_attack_dist then
+			printf( "switch state -> ENEMY" )
+			self.state = flyby_state_to_enemy
+
+		elseif self.state == flyby_state_to_enemy then
+			printf( "switch state -> DIST" )
+			self.state = flyby_state_to_attack_dist
+		end
+
+		self.was_callback      = false
+		self.state_initialized = false
+	end
+
+	if self.state == flyby_state_to_attack_dist then
+		if not self.state_initialized then
+			local p = self:calc_position_in_radius( self.flyby_attack_dist )
+--			printf( "heli_combat:flyby_update_flight 1 SetDestPosition %f %f %f", p.x, p.y, p.z )
+			self.heliObject:SetDestPosition( p )
+
+			self.heliObject:ClearEnemy()
+
+			self.change_combat_type_allowed = false
+
+			self.state_initialized  = true
+		end
+
+	elseif self.state == flyby_state_to_enemy then
+		if not self.state_initialized then
+			self.heliObject:SetEnemy( self.enemy )
+			self.heliObject:UseFireTrail( true )
+
+			self.flyby_states_for_one_pass = self.flyby_states_for_one_pass - 1
+
+			self.state_initialized = true
+		end
+
+		local p = self.enemy_last_seen_pos
+		p:set( p.x, self.safe_altitude, p.z )
+
+		self.change_combat_type_allowed = distance_2d( self.object:position(), p ) > self.search_attack_dist
+
+--		printf( "heli_combat:flyby_update_flight 2 SetDestPosition %f %f %f", p.x, p.y, p.z )
+		self.heliObject:SetDestPosition( p )
+	end
+end
+
+function heli_combat:flyby_update( see_enemy )
+	if not self.flyby_initialized then
+		self:flyby_initialize()
+	end
+
+--	printf( "heli_combat: flyby_update" )
+
+	self:flyby_update_flight( see_enemy )
+
+--	printf( "speed in dest point %d", self.heliObject:GetSpeedInDestPoint(0) )
+end
+
+----------------------------------------------------------------------------------------------
+-- Фунциии для улетания за пределы уровня
+----------------------------------------------------------------------------------------------
+function heli_combat:retreat_initialize()
+	self.retreat_initialized = true
+
+	self.heliObject:SetMaxVelocity( self.max_velocity )
+	self.heliObject:SetSpeedInDestPoint( self.max_velocity )
+	self.heliObject:LookAtPoint( dummy_vector, false )
+	self.heliObject:SetDestPosition( self:calc_position_in_radius( 5000 ) )
+	self.heliObject:ClearEnemy()
+end
+
+function heli_combat:retreat_update()
+	if not self.retreat_initialized then
+		self:retreat_initialize()
+	end
+
+--	printf( "heli_combat: retreat_update" )
+end

@@ -1,0 +1,233 @@
+local not_spawn_levels = {
+	l05_bar = true
+}
+
+function is_single_player_game	()
+	if (_G.alife == nil) then
+		return	(true)
+	end
+
+	if (alife() ~= nil) then
+		return	(true)
+	end
+
+	if (_G.IsGameTypeSingle == nil) then
+		return	(true)
+	end
+
+	if (IsGameTypeSingle() == true) then
+		return	(true)
+	end
+
+	return		(false)
+end
+
+class "se_zone_anom" (cse_anomalous_zone)
+function se_zone_anom:__init (section) super (section)
+	self.m_registred = false
+end
+function se_zone_anom:on_register()
+	cse_anomalous_zone.on_register(self)
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
+
+	self.m_registred = true
+	self.artefact_spawn_idle = 60*60*1000*utils.cfg_get_number(system_ini(), self:section_name(), "artefact_spawn_idle", self, false, 24)
+	self.artefact_spawn_rnd = utils.cfg_get_number(system_ini(), self:section_name(), "artefact_spawn_rnd", self, false, 100)
+end
+function se_zone_anom:update()
+	cse_anomalous_zone.update(self)
+
+	if self.last_spawn_time == nil then
+		self.last_spawn_time = game.get_game_time()
+	end
+
+	if game.get_game_time():diffSec(self.last_spawn_time) >= self.artefact_spawn_idle then
+		self.last_spawn_time = game.get_game_time()
+		if math.random(100) <= self.artefact_spawn_rnd then
+			self:spawn_artefacts()
+		end
+	end
+end
+function se_zone_anom:STATE_Write(packet)
+	cse_anomalous_zone.STATE_Write(self, packet)
+
+--	if self.m_registred ~= true then
+--		return
+--	end
+	--printf("name[%s]", self:name())
+	if (is_single_player_game() == false) then
+		return
+	end
+
+	if self.last_spawn_time == nil then
+		packet:w_u8(0)
+	else
+		packet:w_u8(1)
+		utils.w_CTime(packet, self.last_spawn_time)
+	end
+end
+-- восстановление
+function se_zone_anom:STATE_Read( packet, size )
+	cse_anomalous_zone.STATE_Read( self, packet, size )
+
+	if editor() then
+		return
+	end
+--	if self.m_registred ~= true then
+--		return
+--	end
+
+	if (is_single_player_game() == false) then
+		return
+	end
+
+	local flag = packet:r_u8()
+	if flag == 1 then
+		self.last_spawn_time = utils.r_CTime(packet)
+	end
+end
+
+class "se_zone_torrid" (cse_torrid_zone)
+function se_zone_torrid:__init (section) super (section)
+	self.m_registred = false
+end
+function se_zone_torrid:on_register()
+	cse_torrid_zone.on_register(self)
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
+
+	self.m_registred = true
+	self.artefact_spawn_idle = 60*60*1000*utils.cfg_get_number(system_ini(), self:section_name(), "artefact_spawn_idle", self, false, 24)
+	self.artefact_spawn_rnd = utils.cfg_get_number(system_ini(), self:section_name(), "artefact_spawn_rnd", self, false, 100)
+end
+function se_zone_torrid:update()
+	cse_torrid_zone.update(self)
+
+	if self.last_spawn_time == nil then
+		self.last_spawn_time = game.get_game_time()
+	end
+
+	if game.get_game_time():diffSec(self.last_spawn_time) >= self.artefact_spawn_idle then
+		self.last_spawn_time = game.get_game_time()
+		if math.random(100) <= self.artefact_spawn_rnd then
+			self:spawn_artefacts()
+		end
+	end
+end
+function se_zone_torrid:STATE_Write(packet)
+	cse_torrid_zone.STATE_Write(self, packet)
+
+--	if self.m_registred ~= true then
+--		return
+--	end
+	--printf("name[%s]", self:name())
+	if (is_single_player_game() == false) then
+		return
+	end
+
+	if self.last_spawn_time == nil then
+		packet:w_u8(0)
+	else
+		packet:w_u8(1)
+		utils.w_CTime(packet, self.last_spawn_time)
+	end
+end
+-- восстановление
+function se_zone_torrid:STATE_Read( packet, size )
+	cse_torrid_zone.STATE_Read( self, packet, size )
+
+	if editor() then
+		return
+	end
+--	if self.m_registred ~= true then
+--		return
+--	end
+
+	if (is_single_player_game() == false) then
+		return
+	end
+
+	local flag = packet:r_u8()
+	if flag == 1 then
+		self.last_spawn_time = utils.r_CTime(packet)
+	end
+end
+
+
+class "se_zone_visual" (cse_zone_visual)
+function se_zone_visual:__init (section) super (section)
+end
+function se_zone_visual:on_register()
+	cse_zone_visual.on_register(self)
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
+
+	self.artefact_spawn_idle = 60*60*1000*utils.cfg_get_number(system_ini(), self:section_name(), "artefact_spawn_idle", self, false, 24)
+	self.artefact_spawn_rnd = utils.cfg_get_number(system_ini(), self:section_name(), "artefact_spawn_rnd", self, false, 100)
+end
+function se_zone_visual:update()
+	cse_zone_visual.update(self)
+
+	if self.last_spawn_time == nil then
+		self.last_spawn_time = game.get_game_time()
+	end
+
+	if game.get_game_time():diffSec(self.last_spawn_time) >= self.artefact_spawn_idle then
+		self.last_spawn_time = game.get_game_time()
+		if math.random(100) <= self.artefact_spawn_rnd then
+			self:spawn_artefacts()
+		end
+	end
+end
+
+function se_zone_visual:STATE_Write(packet)
+	cse_zone_visual.STATE_Write(self, packet)
+
+	if (is_single_player_game() == false) then
+		return
+	end
+
+	if self.last_spawn_time == nil then
+		packet:w_u8(0)
+	else
+		packet:w_u8(1)
+		utils.w_CTime(packet, self.last_spawn_time)
+	end
+end
+-- восстановление
+function se_zone_visual:STATE_Read( packet, size )
+	cse_zone_visual.STATE_Read( self, packet, size )
+
+	if editor() then
+		return
+	end
+
+	if (is_single_player_game() == false) then
+		return
+	end
+
+	local flag = packet:r_u8()
+	if flag == 1 then
+		self.last_spawn_time = utils.r_CTime(packet)
+	end
+end
+
+
+
+--' Рестрикторы
+class "se_restrictor" (cse_alife_space_restrictor)
+function se_restrictor:__init (section) super (section)
+end
+
+function se_restrictor:on_register()
+	cse_alife_space_restrictor.on_register(self)
+	-- Проверяем кастомдату обьекта на наличие стори айди.
+	story_objects.check_spawn_ini_for_story_id(self)
+
+	treasure_manager.get_treasure_manager():register_restrictor(self)
+end
+
+function se_restrictor:keep_saved_data_anyway()
+	return true
+end

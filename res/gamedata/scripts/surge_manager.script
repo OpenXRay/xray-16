@@ -1,0 +1,763 @@
+--------------------------------------------------------------------------------
+-- Surge manager class ---------------------------------------------------------
+-- Made by Peacemaker ----------------------------------------------------------
+-- 05.03.07 --------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local surge_manager 		= nil
+
+local surge_shock_pp_eff 	= 1
+local earthquake_cam_eff 	= 2
+local sleep_cam_eff 		= 3
+local sleep_fade_pp_eff		= 4
+
+local START_MIN_SURGE_TIME 	= 2*60*60
+local START_MAX_SURGE_TIME 	= 4*60*60
+local MIN_SURGE_TIME 		= 12*60*60
+local MAX_SURGE_TIME 		= 24*60*60
+local prev_sec 				= 0
+
+local immuned_to_surge_squads = {
+						["monster_predatory_day"] 	= true,
+						["monster_predatory_night"] = true,
+						["monster_vegetarian"] 		= true,
+						["monster_zombied_day"] 	= true,
+						["monster_zombied_night"] 	= true,
+						["monster_special"] 		= true,
+						["monster"]					= true,
+						["zombied"]					= true
+						 }
+
+
+class "CSurgeManager"
+function CSurgeManager:__init()
+end
+
+function CSurgeManager:initialize()
+	self.ini = ini_file("misc\\surge_manager.ltx")
+
+	self.levels_respawn = {zaton = false, jupiter = false, pripyat = false}
+
+	self.started = false
+	self.finished = true
+	self.time_forwarded = false
+	self.skip_message = false
+
+	self.task_given 			= false
+	self.effector_set 			= false
+	self.second_message_given 	= false
+	self.ui_disabled 			= false
+	self.blowout_sound 			= false
+
+	self.surge_time = 190
+	self.inited_time = game.CTime()
+	self.last_surge_time = game.get_game_time()
+	self._delta = math.random(START_MIN_SURGE_TIME, START_MAX_SURGE_TIME) -- global minutes, время между выбросами
+
+	self.count = 0
+	self.covers = {}
+
+	self.condlist = {}
+	self.survive = {}
+
+	local ini = self.ini
+	local cond_string = "true"
+	if(ini:line_exist("settings", "condlist")) then
+		cond_string = ini:r_string("settings", "condlist")
+	end
+	self.condlist = xr_logic.parse_condlist(nil, "surge_manager", "condlist", cond_string)
+
+	cond_string = "false"
+	if(ini:line_exist("settings", "survive")) then
+		cond_string = ini:r_string("settings", "survive")
+	end
+	self.survive = xr_logic.parse_condlist(nil, "surge_manager", "survive_condlist", cond_string)
+
+	self:init_surge_covers()
+
+	self.surge_message = ""
+	self.surge_task_sect = ""
+	self.loaded = false
+end
+
+function CSurgeManager:init_surge_covers()
+	local ini = self.ini
+	for i = 0, ini:line_count("list")-1 do
+		temp1, id, temp2 = ini:r_line("list", i, "", "")
+		local zone = db.zone_by_name[id]
+		if zone ~= nil then
+			self.count = self.count + 1
+			self.covers[self.count] = zone
+			if(ini:line_exist(id, "condlist")) then
+				self.covers[self.count].condlist = {}
+				self.covers[self.count].condlist = xr_logic.parse_condlist(npc, id, "condlist", ini:r_string(id, "condlist"))
+			end
+		end
+	end
+end
+
+function CSurgeManager:get_nearest_cover()
+	if(self.loaded) then
+		self:init_surge_covers()
+	end
+	local hides = {}
+	utils.copy_table(hides, self.covers)
+	if(self.count>0) then
+		for k,v in pairs(hides) do
+			if (v.condlist) then
+				local sect = xr_logic.pick_section_from_condlist(db.actor, nil, v.condlist)
+				if(sect~="true" and sect~=nil) then
+					table.remove(hides, k)
+				end
+			end
+		end
+		local nearest_cover_id = hides[1]:id()
+		local nearest_cover_dist = hides[1]:position():distance_to(db.actor:position())
+		for k,v in pairs(hides) do
+			if db.storage[v:id()].object:inside(db.actor:position()) then
+				return v:id()
+			end
+			local dist = v:position():distance_to(db.actor:position())
+			if(dist<nearest_cover_dist) then
+				if(v.condlist) then
+					local sect = xr_logic.pick_section_from_condlist(db.actor, nil, v.condlist)
+					if(sect=="true") then
+						nearest_cover_id = v:id()
+						nearest_cover_dist = dist
+					end
+				else
+					nearest_cover_id = v:id()
+					nearest_cover_dist = dist
+				end
+			end
+		end
+		if(nearest_cover_id==hides[1]:id()) then
+			if(hides[1].condlist) then
+				local sect = xr_logic.pick_section_from_condlist(db.actor, nil, hides[1].condlist)
+				if(sect~="true" and sect~=nil) then
+					return nil
+				end
+			end
+		end
+		return nearest_cover_id
+	else
+		return nil
+	end
+end
+
+function CSurgeManager:update()
+	if(device().precache_frame > 1) then
+		return
+	end
+	if not(self.started) then
+		local g_time = game.get_game_time()
+		if(self.time_forwarded) then
+			log("--->delta="..tostring(self._delta))
+			log("--->diffSec="..tostring(g_time:diffSec(self.last_surge_time)))
+			local diff = math.abs(self._delta - g_time:diffSec(self.last_surge_time))
+			log("--->diff="..tostring(diff))
+			if(diff<3600) then
+				self._delta = 3*3600+g_time:diffSec(self.last_surge_time)
+			end
+			self.time_forwarded = false
+		end
+		if(g_time:diffSec(self.last_surge_time) < self._delta) then
+			return
+		end
+		if(xr_logic.pick_section_from_condlist(get_story_object("actor"), nil, self.condlist) ~= "true") then
+			return
+		end
+		if not(self:get_nearest_cover()) then
+			return
+		end
+		self:start()
+		return
+	end
+-------------------------------------------------------------------- update here
+	local diff_sec = math.ceil(game.get_game_time():diffSec(self.inited_time)/level.get_time_factor())
+	if(prev_sec~=diff_sec) then
+		prev_sec = diff_sec
+		log("------>diff_sec="..tostring(diff_sec))
+		local level_name = level.name()
+		if(level_name=="labx8" or level_name=="jupiter_underground") then
+			printf("Surge stopped because of level!")
+			self:end_surge()
+			return
+		end
+		local cover = self:get_nearest_cover()
+		if(cover==nil and self.count==0) then
+			self:init_surge_covers()
+			return
+		end
+		if(diff_sec>=self.surge_time) then
+			if(level) then
+				if(level.name()=="zaton") then
+					xr_sound.set_sound_play(db.actor:id(), "zat_a2_stalker_barmen_after_surge")
+				elseif(level.name()=="jupiter") then
+					xr_sound.set_sound_play(db.actor:id(), "jup_a6_stalker_medik_after_surge")
+				elseif not has_alife_info("pri_b305_fifth_cam_end") then
+					xr_sound.set_sound_play(db.actor:id(), "pri_a17_kovalsky_after_surge")
+				end
+			end
+			self:end_surge()
+		else
+			if(self.loaded) then
+				if(self.blowout_sound)then
+					xr_sound.play_sound_looped(db.actor:id(), "blowout_rumble")
+				end
+				if(self.effector_set) then
+					level.add_pp_effector("surge_shock.ppe", surge_shock_pp_eff, true)
+				end
+				if(self.second_message_given) then
+					xr_sound.play_sound_looped(db.actor:id(), "surge_earthquake_sound_looped")
+					level.add_cam_effector("camera_effects\\earthquake.anm", earthquake_cam_eff, true, "")
+				end
+				self.loaded = false
+			end
+			self:launch_rockets()
+			if(self.effector_set) then
+				level.set_pp_effector_factor(surge_shock_pp_eff, diff_sec/90, 0.1)
+			end
+			if(self.blowout_sound) then
+				xr_sound.set_volume_sound_looped(db.actor:id(), "blowout_rumble", diff_sec/180)
+			end
+			if(diff_sec>=140 and not(self.ui_disabled) and (cover==nil or not(db.storage[cover].object:inside(db.actor:position())))) then
+				local att = 1-(185-diff_sec)/(185-140)
+				att = att*att*att*0.3
+	            local h = hit()
+	            h.type = hit.telepatic
+	            h.power = att
+	            h.impulse = 0.0
+	            h.direction = vector():set(0,0,1)
+	            h.draftsman = db.actor
+				if(xr_logic.pick_section_from_condlist(get_story_object("actor"), nil, self.survive)=="true") then
+					if(db.actor.health<=h.power) then
+			            h.power = db.actor.health - 0.05
+						if(h.power<0) then
+							h.power = 0
+						end
+					end
+				end
+                db.actor:hit(h)
+			end
+			if(diff_sec>=185) and not(self.ui_disabled) then
+				self:kill_all_unhided()
+				self.ui_disabled = true
+			elseif(diff_sec>=140) and not(self.second_message_given) then
+				if(level) then
+					if(level.name()=="zaton") then
+						xr_sound.set_sound_play(db.actor:id(), "zat_a2_stalker_barmen_surge_phase_2")
+					elseif(level.name()=="jupiter") then
+						xr_sound.set_sound_play(db.actor:id(), "jup_a6_stalker_medik_phase_2")
+					elseif not has_alife_info("pri_b305_fifth_cam_end") then
+						xr_sound.set_sound_play(db.actor:id(), "pri_a17_kovalsky_surge_phase_2")
+					end
+				end
+				xr_sound.play_sound_looped(db.actor:id(), "surge_earthquake_sound_looped")
+				level.add_cam_effector("camera_effects\\earthquake.anm", earthquake_cam_eff, true, "")
+				self.second_message_given = true
+			elseif(diff_sec>=100) and not(self.effector_set) then
+				level.add_pp_effector("surge_shock.ppe", surge_shock_pp_eff, true)
+--				level.set_pp_effector_factor(surge_shock_pp_eff, 0, 10)
+				self.effector_set = true
+			elseif(diff_sec>=35) and not(self.blowout_sound)then
+				xr_sound.set_sound_play(db.actor:id(), "blowout_begin")
+				xr_sound.play_sound_looped(db.actor:id(), "blowout_rumble")
+				xr_sound.set_volume_sound_looped(db.actor:id(), "blowout_rumble", 0.25)
+				self.blowout_sound = true
+			elseif(diff_sec>=0) and not(self.task_given)then
+				if(level) then
+					if(level.name()=="zaton") then
+						xr_sound.set_sound_play(db.actor:id(), "zat_a2_stalker_barmen_surge_phase_1")
+					elseif(level.name()=="jupiter") then
+						xr_sound.set_sound_play(db.actor:id(), "jup_a6_stalker_medik_phase_1")
+					elseif not has_alife_info("pri_b305_fifth_cam_end") then
+						xr_sound.set_sound_play(db.actor:id(), "pri_a17_kovalsky_surge_phase_1")
+					end
+				end
+				level.set_weather_fx("fx_surge_day_3")
+				self:give_surge_hide_task()
+				self.task_given = true
+			end
+		end
+	end
+end
+
+function CSurgeManager:start(manual)
+	local Y, M, D, h, m, s, ms = 0, 0, 0, 0, 0, 0, 0
+	Y, M, D, h, m, s, ms = self.last_surge_time:get(Y, M, D, h, m, s, ms)
+	if(manual) then
+		self.inited_time = game.get_game_time()
+	else
+		self.inited_time:set(Y, M, D, h, m, s + self._delta, ms)
+	end
+
+	diff_sec = math.ceil(game.get_game_time():diffSec(self.inited_time)/level.get_time_factor())
+	log("--->start diff_sec="..tostring(diff_sec))
+	local level_name = level.name()
+	if(level_name=="labx8" or level_name=="jupiter_underground") then
+		printf("Surge skipped because of level!")
+		self.skip_message = true
+		self:skip_surge()
+		return
+	end
+	if(diff_sec+6>self.surge_time)then
+		printf("Surge skipped while time forwarding!")
+		self:skip_surge()
+	else
+		self.started = true
+		self.finished = false
+-- autosave
+		if not has_alife_info("pri_b305_fifth_cam_end") or has_alife_info("pri_a28_actor_in_zone_stay") then
+			xr_effects.scenario_autosave(nil,nil,{"st_save_uni_surge_start"})
+		end
+	end
+end
+
+function CSurgeManager:skip_surge()
+	local Y, M, D, h, m, s, ms = 0, 0, 0, 0, 0, 0, 0
+	Y, M, D, h, m, s, ms = self.inited_time:get(Y, M, D, h, m, s, ms)
+	self.last_surge_time:set(Y, M, D, h, m, s + self.surge_time, ms)
+
+	self.started 			= false
+	self.finished 			= true
+	self.levels_respawn 	= {zaton = true, jupiter = true, pripyat = true}
+	self._delta 			= math.random(MIN_SURGE_TIME, MAX_SURGE_TIME)
+	self.surge_message 		= ""
+	self.surge_task_sect 	= ""
+	self.task_given 		= false
+
+	self.effector_set			= false
+	self.second_message_given 	= false
+	self.ui_disabled			= false
+	self.blowout_sound			= false
+	prev_sec				= 0
+
+	self:respawn_artefacts_and_replace_anomaly_zone()
+	xr_statistic.inc_surges_counter()
+	if (not self.skip_message) then
+		news_manager.send_tip(db.actor, "st_surge_while_asleep", nil, "recent_surge", nil, nil)
+		self.skip_message = true
+	end
+end
+
+function CSurgeManager:end_surge(manual)
+	self.started 			= false
+	self.finished 			= true
+	self.levels_respawn 	= {zaton = true, jupiter = true, pripyat = true}
+	self.last_surge_time 	= game.get_game_time()
+	self._delta 			= math.random(MIN_SURGE_TIME, MAX_SURGE_TIME)
+	self.surge_message 		= ""
+	self.surge_task_sect 	= ""
+	self.task_given 		= false
+
+	if(self.effector_set) then
+		xr_sound.stop_sound_looped(db.actor:id(), "blowout_rumble")
+	end
+	if(self.second_message_given) then
+		xr_sound.stop_sound_looped(db.actor:id(), "surge_earthquake_sound_looped")
+	end
+	level.remove_pp_effector(surge_shock_pp_eff)
+	level.remove_cam_effector(earthquake_cam_eff)
+
+	if(manual or (self.time_forwarded and level_weathers.get_weather_manager().weather_fx)) then
+		level.stop_weather_fx()
+--		level_weathers.get_weather_manager():select_weather(true)
+		level_weathers.get_weather_manager():forced_weather_change()
+	end
+
+	self.effector_set 			= false
+	self.second_message_given 	= false
+	self.ui_disabled  			= false
+	self.blowout_sound			= false
+	prev_sec				= 0
+
+	for k,v in pairs(db.signal_light) do
+		v:stop_light()
+		v:stop()
+	end
+
+	if self.loaded then
+		self:kill_all_unhided()
+	end
+
+	self:respawn_artefacts_and_replace_anomaly_zone()
+	xr_statistic.inc_surges_counter()
+end
+
+function CSurgeManager:respawn_artefacts_and_replace_anomaly_zone()
+	local lvl_nm = level.name()
+	if(self.levels_respawn[lvl_nm]) then
+		self.levels_respawn[lvl_nm] = false
+	end
+	local anomalies = db.anomaly_by_name
+	for k,v in pairs(anomalies) do
+		v:respawn_artefacts_and_replace_anomaly_zone()
+		--printf("respawn artefacts in anomal zone [%s]", tostring(k))
+	end
+	pda.change_anomalies_names()
+end
+
+function CSurgeManager:give_surge_hide_task()
+	if(self.surge_message~="empty") then
+		local mess = ""
+		if(self.surge_message=="") then
+			local time = 0
+			mess = game.translate_string("hide_from_surge_message")
+		else
+			mess = game.translate_string(self.surge_message)
+		end
+	end
+	if(self.surge_task_sect~="empty") then
+		if(self.surge_task_sect=="") then
+			task_manager.get_task_manager():give_task("hide_from_surge")
+		else
+			task_manager.get_task_manager():give_task(self.surge_task_sect)
+		end
+	end
+end
+
+function get_squad_members(squad_id)
+	local npcs_tbl = {}
+	local squad = alife():object(squad_id)
+	if(squad) then
+		for obj in squad:squad_members() do
+			npcs_tbl[obj.id] = true
+		end
+	end
+	return npcs_tbl
+end
+
+function check_squad_level(squad_id)
+	local squad = alife():object(squad_id)
+	if(squad) then
+		local squad_level = alife():level_name(game_graph():vertex(squad.m_game_vertex_id):level_id())
+		if(squad_level==level.name()) then
+			return true
+		end
+	end
+	return false	-- can't delete squad on other level
+end
+
+function check_squad_community_and_story_id(squad_id)
+	local squad = alife():object(squad_id)
+	if(squad) then
+		if(immuned_to_surge_squads[squad.player_id]) then
+			return false	-- can't delete squad immune to surge
+		end
+		if(get_object_story_id(squad.id)) then
+			return false	-- can't delete squad with story id
+		end
+	end
+	return true
+end
+
+function check_squad_community(squad_id)
+	local squad = alife():object(squad_id)
+	if(squad) then
+		if(immuned_to_surge_squads[squad.player_id]) then
+			return false	-- can't delete squad immune to surge
+		end
+	end
+	return true
+end
+
+function check_squad_smart_props(squad_id)
+	local squad = alife():object(squad_id)
+	if(squad) then
+		local board = sim_board.get_sim_board()
+		if(board and squad.smart_id and board.smarts[squad.smart_id]) then
+			local smart = board.smarts[squad.smart_id].smrt
+			if(tonumber(smart.props["surge"])<=0) then
+				return true
+			end
+		end
+	end
+	return false	-- can't delete squad in his smart if squad is in cover
+end
+
+function CSurgeManager:kill_all_unhided()
+	local h = hit()
+	h.type = hit.fire_wound
+	h.power = 0.9
+	h.impulse = 0.0
+	h.direction = vector():set(0,0,1)
+	h.draftsman = db.actor
+	for k,v in pairs(bind_crow.crow_storage) do
+		local obj = alife():object(v)
+		if obj then
+			local crow = level.object_by_id(obj.id)
+			if(crow and crow:alive()) then
+				crow:hit(h)
+			end
+		end
+	end
+
+	local board = sim_board.get_sim_board()
+	for k,v in pairs(board.squads) do
+		local squad = v
+		if(check_squad_level(squad.id)) then
+			if(check_squad_community_and_story_id(squad.id)) then
+				local squad_npcs = get_squad_members(squad.id)
+				for kk,vv in pairs(squad_npcs) do
+					local obj = alife():object(kk)
+					if(obj and not(get_object_story_id(obj.id))) then
+						if(check_squad_smart_props(squad.id)) then
+							printf("Releasing npc [%s] from squad [%s] because of surge!",obj:name(), squad:name())
+							local cl_obj = level.object_by_id(obj.id)
+							if cl_obj ~= nil then
+								cl_obj:kill(cl_obj)
+							else
+								obj:kill()
+							end
+						else
+							local release = true
+							for i = 1,#self.covers do
+								local sr = self.covers[i]
+								if(sr and sr:inside(obj.position)) then
+									release = false
+								end
+							end
+							if(release) then
+								printf("Releasing npc [%s] from squad [%s] because of surge!",obj:name(), squad:name())
+								local cl_obj = level.object_by_id(obj.id)
+								if cl_obj ~= nil then
+									cl_obj:kill(cl_obj)
+								else
+									obj:kill()
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+
+	local cover = self:get_nearest_cover()
+	if(db.actor and db.actor:alive()) then
+		if not(cover and db.storage[cover] and db.storage[cover].object:inside(db.actor:position())) then
+			if has_alife_info("anabiotic_in_process") then
+				local counter_name = "actor_marked_by_zone_cnt"
+				local cnt_value = xr_logic.pstor_retrieve(db.actor, counter_name, 0)
+				xr_logic.pstor_store(db.actor, counter_name, cnt_value + 1)
+			end
+--[[
+			local hud = get_hud()
+			hud:HideActorMenu()
+			hud:HidePdaMenu()
+			db.actor:stop_talk()
+			level.disable_input()
+			level.hide_indicators_safe()
+			db.actor:hide_weapon()
+]]--
+			xr_effects.disable_ui_only(db.actor, nil)
+			if(xr_logic.pick_section_from_condlist(get_story_object("actor"), nil, self.survive)~="true") then
+				self:kill_all_unhided_after_actor_death()
+				db.actor:kill(db.actor)
+				return
+			else
+				level.add_cam_effector("camera_effects\\surge_02.anm", sleep_cam_eff, false, "surge_manager.surge_callback")
+				level.add_pp_effector("surge_fade.ppe", sleep_fade_pp_eff, false)
+				db.actor.health = db.actor.health-0.05
+			end
+		end
+	end
+end
+
+function CSurgeManager:kill_all_unhided_after_actor_death()
+	local board = sim_board.get_sim_board()
+	for k,v in pairs(board.squads) do
+		local squad = v
+		if(check_squad_level(squad.id)) then
+			if(check_squad_community(squad.id)) then
+				local squad_npcs = get_squad_members(squad.id)
+				for kk,vv in pairs(squad_npcs) do
+					local obj = alife():object(kk)
+					if obj then
+						local release = true
+						for i = 1,#self.covers do
+							local sr = self.covers[i]
+							if(sr and sr:inside(obj.position)) then
+								release = false
+							end
+						end
+						if(release) then
+							printf("Releasing npc [%s] from squad [%s] after actors death because of surge!",obj:name(), squad:name())
+							local cl_obj = level.object_by_id(obj.id)
+							if cl_obj ~= nil then
+								cl_obj:kill(cl_obj)
+							else
+								obj:kill()
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+function surge_callback()
+	level.add_cam_effector("camera_effects\\surge_01.anm", sleep_cam_eff, false, "surge_manager.surge_callback2")
+--	level.stop_weather_fx()
+--	level.change_game_time(0,0,15)
+--	level_weathers.get_weather_manager():forced_weather_change()
+end
+
+function surge_callback2()
+	xr_effects.enable_ui(db.actor, nil)
+--[[
+	level.enable_input()
+	level.show_indicators()
+	db.actor:restore_weapon()
+]]--
+end
+
+function CSurgeManager:launch_rockets()
+	for k,v in pairs(db.signal_light) do
+		if not(v:is_flying()) then
+			v:launch()
+		end
+	end
+end
+
+function CSurgeManager:save(packet)
+	set_save_marker(packet, "save", false, "SurgeHide")
+	packet:w_bool(self.finished)
+	packet:w_bool(self.started)
+	utils.w_CTime(packet, self.last_surge_time)
+	if(self.started) then
+		utils.w_CTime(packet, self.inited_time)
+
+		packet:w_bool(self.levels_respawn.zaton)
+		packet:w_bool(self.levels_respawn.jupiter)
+		packet:w_bool(self.levels_respawn.pripyat)
+
+		packet:w_bool(self.task_given)
+		packet:w_bool(self.effector_set)
+		packet:w_bool(self.second_message_given)
+		packet:w_bool(self.ui_disabled)
+		packet:w_bool(self.blowout_sound)
+
+		packet:w_stringZ(self.surge_message)
+		packet:w_stringZ(self.surge_task_sect)
+	end
+	packet:w_u32(self._delta)
+	set_save_marker(packet, "save", true, "SurgeHide")
+end
+
+function CSurgeManager:load(packet)
+	set_save_marker(packet, "load", false, "SurgeHide")
+	self:initialize()
+	self.finished = packet:r_bool()
+	self.started = packet:r_bool()
+	self.last_surge_time = utils.r_CTime(packet)
+	if(self.started) then
+		self.inited_time = utils.r_CTime(packet)
+
+		self.levels_respawn.zaton = packet:r_bool()
+		self.levels_respawn.jupiter = packet:r_bool()
+		self.levels_respawn.pripyat = packet:r_bool()
+
+		self.task_given = packet:r_bool()
+		self.effector_set = packet:r_bool()
+		self.second_message_given = packet:r_bool()
+		self.ui_disabled = packet:r_bool()
+		self.blowout_sound = packet:r_bool()
+
+		self.surge_message = packet:r_stringZ()
+		self.surge_task_sect = packet:r_stringZ()
+	end
+	self._delta = packet:r_u32()
+	self.loaded = true
+	set_save_marker(packet, "load", true, "SurgeHide")
+end
+--------------------------------------------------------------------------------
+function get_surge_manager()
+	if surge_manager == nil then
+		surge_manager = CSurgeManager()
+	end
+	return surge_manager
+end
+
+function start_surge(p)
+	local m = get_surge_manager()
+	if(m:get_nearest_cover()) then
+		m:start(true)
+	else
+		printf("Error: Surge covers are not set! Can't manually start")
+	end
+end
+
+function actor_in_cover()
+	local m = get_surge_manager()
+	local cover_id = m:get_nearest_cover()
+	if (cover_id ~= nil) and (db.storage[cover_id].object:inside(db.actor:position())) then
+		return true
+	else
+		return false
+	end
+end
+
+function stop_surge()
+	local m = get_surge_manager()
+	if(m.started) then
+		m:end_surge(true)
+	end
+end
+
+function get_task_descr()
+	local descr = ""
+	if(actor_in_cover()) then
+		descr = game.translate_string("hide_from_surge_descr_2_a")
+	else
+		descr = game.translate_string("hide_from_surge_descr_1_a")
+	end
+	return descr
+end
+
+function get_task_target()
+	local m = get_surge_manager()
+	if(actor_in_cover()) then
+		return nil
+	end
+	return m:get_nearest_cover()
+end
+
+function set_surge_message(mess)
+	local m = get_surge_manager()
+	m.surge_message = mess
+end
+
+function set_surge_task(task)
+	local m = get_surge_manager()
+	m.surge_task_sect = task
+end
+
+function is_started()
+	local m = get_surge_manager()
+	return m.started
+end
+
+function is_killing_all()
+	local m = get_surge_manager()
+	if(m.started and m.ui_disabled) then
+		return true
+	end
+	return false
+end
+
+function is_finished()
+	local m = get_surge_manager()
+	return m.finished == true
+end
+
+function resurrect_skip_message()
+	local m = get_surge_manager()
+	m.skip_message = false
+end
+
+function sound_started()
+	local m = get_surge_manager()
+	return m.started and m.blowout_sound
+end

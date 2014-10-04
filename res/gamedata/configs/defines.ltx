@@ -1,0 +1,117 @@
+[hud_base]
+aim_hud_offset_pos				= 0,0,0
+aim_hud_offset_rot				= 0,0,0
+
+aim_hud_offset_pos_16x9			= 0,0,0
+aim_hud_offset_rot_16x9			= 0,0,0
+
+gl_hud_offset_pos_16x9			= 0,0,0
+gl_hud_offset_rot_16x9			= 0,0,0
+
+gl_hud_offset_pos				= 0,0,0
+gl_hud_offset_rot				= 0,0,0
+
+lean_hud_offset_pos		= 0,0,0
+lean_hud_offset_rot		= 0,0,0
+
+[sect_identity_immunities]
+burn_immunity			= 1.0
+strike_immunity			= 1.0
+shock_immunity			= 1.0
+wound_immunity			= 1.0
+wound_2_immunity		= 1.0
+radiation_immunity		= 1.0
+telepatic_immunity		= 1.0
+chemical_burn_immunity	= 1.0
+explosion_immunity		= 1.0
+fire_wound_immunity		= 1.0
+
+[sect_helm_immunities]
+burn_immunity			= 1.0
+strike_immunity			= 0.0
+shock_immunity			= 1.0
+wound_immunity			= 0.0
+wound_2_immunity		= 0.0
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 1.0
+explosion_immunity		= 1.0
+fire_wound_immunity		= 1.0
+
+[sect_zero_immunities]
+burn_immunity			= 0.0
+strike_immunity			= 0.0
+shock_immunity			= 0.0
+wound_immunity			= 0.0
+wound_2_immunity		= 0.0
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 0.0
+explosion_immunity		= 0.0
+fire_wound_immunity		= 0.0
+
+
+[identity_immunities]
+immunities_sect				= sect_identity_immunities
+slot 						= -1
+description				= no_description
+default_to_ruck             = false
+sprint_allowed              = true
+control_inertion_factor     = 1.0
+zoom_rotate_time            = 0.25
+
+[zero_immunities]:identity_immunities
+immunities_sect				= sect_zero_immunities
+
+[weapon_probability]
+hit_probability_gd_novice	= 0.20
+hit_probability_gd_stalker	= 0.30
+hit_probability_gd_veteran	= 0.40
+hit_probability_gd_master	= 0.50
+
+
+[default_weapon_params]
+use_aim_bullet				= false
+hit_power_critical			= 0.0, 0.0, 0.0, 0.0
+k_hit_critical				= 0
+frag_hit_critical			= 0
+slot 						= -1
+description				= no_description
+;-----------
+default_to_ruck             = false
+sprint_allowed              = true
+control_inertion_factor     = 1.0
+zoom_rotate_time            = 0.25
+use_first_bullet			= false
+
+
+
+[common_ph_friction_params_on_npc_death] ;ѕараметры дл€ задани€ изменени€ трени€ в момент смерти персонажа
+
+ph_skeleton_airr_lin_factor   = 2.0 ;550.0 (изменно из-за того, что убрано домножение коэффициент 0.002 из кода)
+ph_skeleton_airr_ang_factor   = 0.0 ;0.0 (изменно из-за того, что убрано домножение на коэффициент 0.3 из кода (0.0*0.3=0.0))
+ph_skeleton_hinger_factor1    = 1.0 ;1.0 (изменно из-за того, что убрано домножение на коэффициент 5.0 из кода)
+ph_skeleton_ddelay	     	  = 15.0 ;¬рем€ изменени€ значени€ трени€ в суставе с момента создани€ шелла, сек
+
+ph_skel_fatal_impulse_factor  = 6.0
+ph_after_death_velocity_factor= 0.75
+ph_skel_shot_up_factor        = 0.25
+
+
+
+ph_skeleton_skin_friction_start	= 0.0   ;—тартовое значение трени€ дл€ оболочки
+ph_skeleton_skin_friction_end	= 2.0   ;‘инальное значение трени€ дл€ оболочки
+ph_skeleton_skin_ddelay			= 6.0		;¬рем€ изменени€ значени€ трени€ с момента создани€ шелла, сек.
+ph_skeleton_skin_ddelay_after_wound = 2.0 ;¬рем€ изменени€ значени€ трени€ с момента создани€ шелла, сек.(дл€ персонажа после ранени€)
+ph_pelvis_factor_low_pose_detect =0.3	;длинна луча на коллизию с землЄй из центра пелвиса
+										;если коллизитьс€, то персонаж находитьс€ в нижней позе(или ранен)(в этом случае дл€ него задаютьс€ другие параметры 
+										;трени€ и отсутствует домножение импульса дл€ первого хита)
+ph_character_have_wounded_state = false; имеет ли персонаж состо€ние раненый
+
+[monster_base]:common_ph_friction_params_on_npc_death
+actor_hit_effect 	= effector_monster_hit
+custom_data			= default_custom_data.ltx		; option for Level Editor
+
+feel_enemy_who_made_sound_max_distance = 20
+feel_enemy_who_just_hit_max_distance = 40
+feel_enemy_max_distance = 15

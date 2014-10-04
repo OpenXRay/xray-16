@@ -1,0 +1,405 @@
+----------------------------------------------------------------------------------------------------------------------
+--	Схема изменений положения тела
+--	автор: Диденко Руслан (Stohe)
+--	TODO: 
+----------------------------------------------------------------------------------------------------------------------
+
+stand = 0
+sit   = 2
+sit_wait = 3
+sleep = 4
+
+class "body_state"
+function body_state:__init(npc)
+	self.npc = npc
+	self.target_state = xr_state.stand
+	self.current_state = xr_state.stand
+
+	self.tanim = {
+		[xr_state.stand]	= {	[xr_state.sit]		= {"stalker_2_down"},
+								[xr_state.sit_wait]	= {"stalker_3_down"},
+								[xr_state.sleep]	= {"stalker_2_down", "spit_0"} },
+		[xr_state.sit]		= { [xr_state.stand]	= {"stalker_2_up"},
+								[xr_state.sit_wait]	= {"stalker_2v3"},
+								[xr_state.sleep]	= {"spit_0"} },
+		[xr_state.sit_wait]	= {	[xr_state.stand]	= {"stalker_3_up"},
+								[xr_state.sit]		= {"stalker_3v2"} },
+		[xr_state.sleep]	= {	[xr_state.stand]	= {"spit_3", "stalker_2_up"},
+								[xr_state.sit]		= {"spit_3"}}}								
+	self.ianim = {
+		[xr_state.sit] = "stalker_2_1",
+		[xr_state.sit_wait] = "item_0_idle_0",
+		[xr_state.sleep] = "spit_2"
+	}
+	self.states = {
+		last_id = nil,
+		current_state = nil,
+		begin = nil,
+		idle = nil
+	}					
+	self.animations = {
+		idle		= {	state_id = xr_state.stand,
+						prop	= { maxidle = 5,
+									sumidle = 3,
+									rnd = 80 },	
+						into	= nil,
+						out		= nil,
+						idle	= { [0]	= "idle_0_idle_1",
+									[1]	= "idle_1_idle_1",
+									[2]	= "idle_2_idle_1",
+									[3]	= "idle_3_idle_1",
+									[4]	= "idle_4_idle_1" },
+						rnd		= {	[0]	= {	"idle_0_idle_0",
+											"idle_0_idle_2",
+											"idle_0_idle_3",
+											"idle_0_idle_4" },
+									[1]	= {	"idle_1_idle_0",
+											"idle_1_idle_2",
+											"idle_1_idle_3",
+											"idle_1_idle_4" },
+									[2]	= {	"idle_2_idle_0",
+											"idle_2_idle_2",
+											"idle_2_idle_3",
+											"idle_2_idle_4",
+											"idle_2_idle_5",
+											"idle_2_idle_6",
+											"idle_2_idle_7",
+											"idle_2_idle_8",
+											"idle_2_idle_9" },	
+									[3]	= { "idle_3_idle_0",
+											"idle_3_idle_2",
+											"idle_3_idle_3",
+											"idle_3_idle_4" },
+									[4]	= {	"idle_4_idle_0",
+											"idle_4_idle_2",
+											"idle_4_idle_3",
+											"idle_4_idle_4" }}},
+		prisluh	= {		state_id = xr_state.stand,
+						prop	= { maxidle = 5,
+									sumidle = 3,
+									rnd = 80 },	
+						into	= { [0]	= "prisluh_0_idle_0",
+									[1]	= "prisluh_1_idle_0",
+									[2]	= "prisluh_2_idle_0",
+									[3]	= "prisluh_3_idle_0",
+									[4]	= "prisluh_4_idle_0" },
+						out		= { [0]	= "prisluh_0_idle_5",
+									[1]	= "prisluh_1_idle_5",
+									[2]	= "prisluh_2_idle_6",
+									[3]	= "prisluh_3_idle_5",
+									[4]	= "prisluh_4_idle_5" },
+						idle	= { [0]	= "prisluh_0_idle_1",
+									[1]	= "prisluh_1_idle_1",
+									[2]	= "prisluh_2_idle_1",
+									[3]	= "prisluh_3_idle_1",
+									[4]	= "prisluh_4_idle_1" },
+						rnd		= { [0]	= {	"prisluh_0_idle_2",
+											"prisluh_0_idle_3",
+											"prisluh_0_idle_4" },
+									[1]	= {	"prisluh_1_idle_2",
+											"prisluh_1_idle_3",
+											"prisluh_1_idle_4" },
+									[2]	= {	"prisluh_2_idle_2",
+											"prisluh_2_idle_3",
+											"prisluh_2_idle_4",
+											"prisluh_2_idle_5" },
+									[3]	= {	"prisluh_3_idle_2",
+											"prisluh_3_idle_3",
+											"prisluh_3_idle_4" },
+									[4]	= {	"prisluh_4_idle_2",
+											"prisluh_4_idle_3",
+											"prisluh_4_idle_4" }}},										
+		poisk		= {	state_id = xr_state.stand,
+						prop	= { maxidle = 5,
+									sumidle = 3,
+									rnd = 80 },
+						into	= nil,
+						out		= nil,
+						idle	= { [0]	= "poisk_0_idle_1",
+									[1]	= "poisk_1_idle_1",
+									[2]	= "poisk_2_idle_1",
+									[3]	= "poisk_3_idle_1",
+									[4]	= "poisk_4_idle_1" },
+						rnd		= { [0]	= {	"poisk_0_idle_0",
+											"poisk_0_idle_2",
+											"poisk_0_idle_3",
+											"poisk_0_idle_4" },
+									[1]	= {	"poisk_1_idle_0",
+											"poisk_1_idle_2",
+											"poisk_1_idle_3",
+											"poisk_1_idle_4" },
+									[2]	= {	"poisk_2_idle_0",
+											"poisk_2_idle_2",
+											"poisk_2_idle_3",
+											"poisk_2_idle_4" },
+									[3]	= { "poisk_3_idle_0",
+											"poisk_3_idle_2",
+											"poisk_3_idle_3",
+											"poisk_3_idle_4" },
+									[4]	= {	"poisk_4_idle_0",
+											"poisk_4_idle_2",
+											"poisk_4_idle_3",
+											"poisk_4_idle_4" }}},
+		hide		= {	state_id = xr_state.stand,
+						prop	= { maxidle = 5,
+									sumidle = 3,
+									rnd = 80 },
+						into	= nil,
+						out		= nil,
+						idle	= { [0]	= "d_0_idle_1",
+									[1]	= "d_1_idle_1",
+									[2]	= "d_2_idle_1",
+									[3]	= "d_3_idle_1",
+									[4]	= "d_4_idle_1" },
+						rnd		= { [0] = { "d_0_idle_0",
+											"d_0_idle_2" },
+									[1] = { "d_1_idle_0",
+											"d_1_idle_2" },
+									[2] = { "d_2_idle_0",
+											"d_2_idle_2" },
+									[3] = { "d_3_idle_0",
+											"d_3_idle_2" },
+									[4] = { "d_4_idle_0",
+											"d_4_idle_2" }}},
+		hello		= {	state_id = xr_state.stand,
+						prop	= { maxidle = 3,
+									sumidle = 1,
+									rnd = 100 },
+						into	= nil,
+						out		= nil,
+						idle	= { [0]	= "idle_0_idle_1",
+									[1]	= "idle_1_idle_1",
+									[2]	= "idle_2_idle_1",
+									[3]	= "idle_3_idle_1",
+									[4]	= "idle_4_idle_1" },
+						rnd		= {	[0]	= {	"hello_0_idle_0" },
+									[1]	= {	"hello_1_idle_0" },
+									[2]	= {	"hello_2_idle_0" },
+									[3]	= { "hello_3_idle_0" },
+									[4]	= {	"hello_4_idle_0" }}},
+		refuse		= {	state_id = xr_state.stand,
+						prop	= { maxidle = 3,
+									sumidle = 3,
+									rnd = 100 },
+						into	= nil,
+						out		= nil,
+						idle	= nil,
+						rnd		= {	[0]	= {	"net_0_0",
+											"net_0_1" },
+									[1]	= {	"net_1_0" },
+									[2]	= {	"net_2_0" },
+									[3]	= {	"net_3_0" },
+									[4]	= {	"net_4_0" }}},
+		claim		= {	state_id = xr_state.stand,
+						prop	= { maxidle = 5,
+									sumidle = 2,
+									rnd = 100 },
+						into	= nil,
+						out		= nil,
+						idle	= nil,
+						rnd		= {	[0]	= {	"gop_stop_1_0" },
+									[1]	= {	"gop_stop_1_0" },
+									[2]	= {	"gop_stop_2_0" },
+									[3]	= {	"gop_stop_3_0" },
+									[4]	= {	"gop_stop_4_0" }}},
+		backoff		= {	state_id = xr_state.stand,
+						prop	= { maxidle = 5,
+									sumidle = 2,
+									rnd = 100 },
+						into	= nil,
+						out		= nil,
+						idle	= nil,
+						rnd		= {	[0]	= {	"uhodi_1_0" },
+									[1]	= {	"uhodi_1_0" },
+									[2]	= {	"uhodi_2_0" },
+									[3]	= {	"uhodi_3_0" },
+									[4]	= {	"uhodi_4_0" }}},
+		backoff2		= {	state_id = xr_state.stand,
+						prop	= { maxidle = 5,
+									sumidle = 2,
+									rnd = 100 },
+						into	= nil,
+						out		= nil,
+						idle	= nil,
+						rnd		= {	[0]	= {	"uhodi_1_1" },
+									[1]	= {	"uhodi_1_1" },
+									[2]	= {	"uhodi_2_1" },
+									[3]	= {	"uhodi_3_1" },
+									[4]	= {	"uhodi_4_1" }}}									
+	}
+	--print_table(self.animations)
+end
+--' Проверяет закончили ли мы изменение положения тела
+function body_state:finish_state()
+	if self.target_state == xr_state.stand and 
+	   self.npc:animation_count() == 0
+	then
+		self.current_state = self.target_state
+	end
+
+	if self.target_state ~= xr_state.stand and 
+	   self.npc:animation_count() <= 1
+	then
+		self.current_state = self.target_state
+	end
+	
+	return self.target_state == self.current_state
+end
+function body_state:set_state(id)
+	if id ~= self.current_state and
+	   id ~= self.target_state
+	then
+		self.npc:clear_animations()
+		self.target_state = id
+		self:transanim(self.npc, id)
+		return true
+	end
+	return false
+end
+function body_state:transanim(object, target_state)
+	if self.tanim[self.current_state][target_state] ~= nil then
+		for k,v in pairs(self.tanim[self.current_state][target_state]) do
+			object:add_animation(v, true)
+		end
+	end
+	if self.ianim[target_state] ~= nil then
+		object:add_animation(self.ianim[target_state], true)
+	end
+end
+function body_state:weapon_slot()
+	local weapon = self.npc:active_item()
+	if weapon == nil or self.npc:weapon_strapped() == true then
+		return 0
+	end
+	local id = get_clsid(weapon)
+	if id == nil then 
+		return 0
+	end
+	if id == clsid.wpn_pm_s or
+    	   id == clsid.wpn_walther_s or
+	   id == clsid.wpn_hpsa_s or
+	   id == clsid.wpn_fort_s or
+	   id == clsid.wpn_usp45_s then
+		return 1
+	end
+	if id == clsid.wpn_vintorez_s or
+	   id == clsid.wpn_val_s or
+	   id == clsid.wpn_groza_s or
+	   id == clsid.wpn_fn2000_s or   
+	   id == clsid.wpn_ak74_s or	
+	   id == clsid.wpn_lr300_s or
+	   id == clsid.wpn_svd_s or
+   	   id == clsid.wpn_svu_s then
+		return 2
+	end
+	if id == clsid.wpn_shotgun_S then
+		return 3
+	end
+    if id == clsid.wpn_rpg7_s then
+		return 4
+	end
+	return 0
+end
+function body_state:anim_update(type)
+	--' Определяем - это у нас включение новой анимации или продолжение старой
+	if type ~= self.states.current_state then
+		if type ~= nil then
+			printf("ANIMS: |%s| for %s", type, self.npc:name())
+		else
+			printf("ANIMS: |nil| for %s", self.npc:name())
+		end
+		
+		--' Проверка на существование темы
+		if type ~= nil and self.animations[type] == nil then
+			printf("ERROR: Non existen ANIM STATEd called: %s", type)
+			return
+		end
+		
+		--' завершение старой
+		self.npc:clear_animations()
+		if self.states.current_state ~= nil then		
+			if self.animations[self.states.current_state].out ~= nil then
+				self.npc:add_animation(self.animations[self.states.current_state].out[self:weapon_slot()], true)
+			end
+		end
+		
+		--' простановка новой
+		if type ~= nil then
+			--' Проверка соответствия состояния.
+			if self.current_state ~= self.animations[type].state_id then
+				self:set_state(self.animations[type].state_id)
+			end
+		
+			if self.animations[type].into ~= nil then
+				self.npc:add_animation(self.animations[type].into[self:weapon_slot()], true)				
+			end	
+			if self.animations[type].idle ~= nil then
+				self.npc:add_animation(self.animations[type].idle[self:weapon_slot()], true)
+			end
+		else
+			self:set_state(xr_state.stand)
+		end
+		self.states.current_state = type
+		self.states.last_id = nil
+		self.states.begin = nil
+		self.states.idle = nil
+	end
+
+	--' Определяем нужно ли добавлять анимацию или ждать
+	if (self.states.begin == nil or
+	   time_global() - self.states.begin > self.states.idle) and
+	   self.npc:animation_count() <= 1 and
+	   self.states.current_state ~= nil
+	then
+		--' Определение промежутков времени между анимациями
+		self.states.begin = time_global()
+		self.states.idle = (math.random(self.animations[self.states.current_state].prop.maxidle) + 
+										self.animations[self.states.current_state].prop.sumidle) * 1000
+		if math.random(100) < self.animations[self.states.current_state].prop.rnd then
+			local r
+			if #self.animations[self.states.current_state].rnd[self:weapon_slot()] > 1 then			
+				if self.states.last_id == nil then
+					r = math.random(#self.animations[self.states.current_state].rnd[self:weapon_slot()])
+				else
+					r = math.random(#self.animations[self.states.current_state].rnd[self:weapon_slot()]-1)
+					if r >= self.states.last_id then
+						r = r + 1
+					end
+				end
+				self.states.last_id = r
+			else
+				r = 1
+			end
+			
+			self.npc:clear_animations()
+			if self.animations[self.states.current_state].rnd[self:weapon_slot()][r] ~= nil then
+				self.npc:add_animation (self.animations[self.states.current_state].rnd[self:weapon_slot()][r], true)
+			else
+				printf("ANIM ERROR: Select wrong animation %d of %d, type: %s, weapon_slot: %d", r,
+							#self.animations[self.states.current_state].rnd[self:weapon_slot()],
+							self.states.current_state, self:weapon_slot() )
+			end
+			if self.animations[type].idle ~= nil then
+				self.npc:add_animation (self.animations[self.states.current_state].idle[self:weapon_slot()], true)
+			end	
+		end
+	end
+	--printf("animcount %d", self.npc:animation_count())
+	
+	return self:finish_state() and self.npc:animation_count() == 0
+end                            
+
+----------------------------------------------------------------------------------------------------------------------
+-- Functions
+----------------------------------------------------------------------------------------------------------------------
+-- Проверка, изменилось ли уже положение тела или нет
+function finish_state(npc)
+	return db.storage[npc:id()].state:finish_state()
+end
+function change_state(npc, id)
+	return db.storage[npc:id()].state:set_state(id)
+end
+
+function anim_update(type, npc)
+	return db.storage[npc:id()].state:anim_update(type)
+end

@@ -1,0 +1,224 @@
+<header>
+
+        <hud_timer  x="869" y="0" width="155" height="66">
+                <text x="-15" y="23it" font="graffiti32" r="238" g="155" b="23" a="255" align="r"/>
+                <texture>ui_hud_timer_games</texture>
+        </hud_timer>
+
+        <hud_timer_text x="852" y="80" width="157" height="67" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+                <text x="0" y="0" font="graffiti22" r="240" g="217" b="182" a="255" align="c"/>
+        </hud_timer_text>
+
+
+        <sleep_001  x="20" y="20" width="984" height="728">
+                <texture x="0" y="0" width="984" height="728">car\trabantnoise</texture>
+        </sleep_001>
+
+        <controller_fx  x="0" y="0" width="1024" height="768" stretch="1">
+                <texture>act\act_controller_hit</texture>
+        </controller_fx>
+
+        <controller_fx2  x="0" y="0" width="1024" height="768" stretch="1">
+                <texture>act\act_controller_hit1</texture>
+        </controller_fx2>
+
+        <monster_claws  x="512" y="384" width="512" height="512" alignment="c" stretch="1" heading="1" light_anim="monster_claws" la_alpha="1" la_cyclic="0" ttl="3">
+                <texture>controller\controller_blood_01</texture>
+        </monster_claws>
+
+	<main_task  x="235" y="120" width="554" height="60" complex_mode="1">
+		<text align="c" font="graffiti32"  r="240" g="217" b="182" a="255"/>
+	</main_task>
+
+	<secondary_task  x="235" y="180" width="554" height="60" complex_mode="1" light_anim="ui_tesk_description" la_alpha="1" la_text="1" la_cyclic="0">
+		<text align="c" font="graffiti22"  r="240" g="217" b="182" a="200"/>
+	</secondary_task>
+
+  <cs_psy_danger  x="262" y="30" width="500" height="20" complex_mode="1">
+                <text font="graffiti22"  r="240" g="217" b="182" a="255" align="c"/>
+        </cs_psy_danger>
+
+        <cs_radiation_danger  x="262" y="50" width="500" height="20" complex_mode="1">
+                <text font="graffiti22"  r="240" g="217" b="182" a="255" align="c"/>
+        </cs_radiation_danger>
+
+  <cs_demo_play  x="30" y="710" width="600" height="50" complex_mode="1" stretch="1"
+                                                        light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+    <text font="letterica18"  r="240" g="217" b="182" a="255" align="l"/>
+  </cs_demo_play>
+
+	<cs_subtitles_npc  x="200" y="690" width="600" height="50" complex_mode="1" stretch="1" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+		<text font="graffiti22"  r="240" g="217" b="182" a="255" align="c"/>
+	</cs_subtitles_npc>
+
+	<cs_subtitles_actor  x="200" y="690" width="600" height="50" complex_mode="1" stretch="1" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+		<text font="graffiti22"  r="240" g="217" b="182" a="255" align="c"/>
+	</cs_subtitles_actor>
+
+	<cs_subtitles_object  x="200" y="690" width="600" height="50" complex_mode="1" stretch="1" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+		<text font="graffiti22"  r="240" g="217" b="182" a="255" align="c"/>
+	</cs_subtitles_object>
+
+	<cs_subtitles  x="200" y="690" width="600" height="50" complex_mode="1" stretch="1" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+		<text font="graffiti22"  r="240" g="217" b="182" a="255" align="c"/>
+	</cs_subtitles>
+
+        <cs_yantar_td  x="200" y="200" width="600" height="50" complex_mode="1" stretch="1"
+                                                        light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+                <text font="graffiti22"  r="240" g="217" b="182" a="255" align="c"/>
+        </cs_yantar_td>
+
+  <cs_arena_kills  x="30" y="300" width="600" height="50" complex_mode="1" stretch="1"
+                                                        light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+    <text font="graffiti32"  r="240" g="217" b="182" a="255" align="l"/>
+  </cs_arena_kills>
+
+		<game_saved x="100" y="730" width="800" height="30" ttl="3">
+			<text font="graffiti22" r="240" g="217" b="182" a="255" align="c"/>
+		</game_saved>
+
+        <autosave  x="100" y="730" width="800" height="30" ttl="3">
+                <text font="graffiti22"  r="240" g="217" b="182" a="255" align="c">st_autosave</text>
+        </autosave>
+
+        <item_used  x="100" y="700" width="800" height="30" ttl="3">
+                <text font="graffiti22"  r="240" g="217" b="182" a="255" align="c"/>
+        </item_used>
+
+        <gun_jammed x="200" y="70" width="600" height="50" ttl="3">
+                <text font="graffiti32"  r="240" g="217" b="182" a="255" align="c">gun_jammed</text>
+        </gun_jammed>
+
+        <can_use_weapon_now x="200" y="70" width="600" height="50" ttl="3">
+                <text font="graffiti32"  r="240" g="217" b="182" a="255" align="c">can_use_weapon_now</text>
+        </can_use_weapon_now>
+
+        <cant_walk x="200" y="650" width="600" height="30" ttl="3">
+                <text font="graffiti22"  r="240" g="217" b="182" a="255" align="c">cant_walk</text>
+        </cant_walk>
+
+        <cant_walk_weight x="200" y="650" width="600" height="30" ttl="3">
+                <text font="graffiti22"  r="240" g="217" b="182" a="255" align="c">cant_walk_weight</text>
+        </cant_walk_weight>
+
+        <not_enough_money_mine  x="100" y="100" width="800" height="60">
+                <text font="graffiti32"  r="240" g="217" b="182" a="255" align="c">st_not_enough_money</text>
+        </not_enough_money_mine>
+
+        <not_enough_money_other  x="100" y="100" width="800" height="60">
+                <text font="graffiti32"  r="240" g="217" b="182" a="255" align="c">st_not_enough_money_npc</text>
+        </not_enough_money_other>
+
+  <max_ping_warn_1 x="512" y="300" width="360" height="64" alignment="c" ttl="10">
+    <texture x="0" y="0" width="360" height="64" a="30">ui\ui_cm_connection_error</texture>
+    <text x="80" y="50" font="graffiti32" r="238" g="155" b="23" a="255"/>
+    <auto_static x="180" y="50" width="180" height="14">
+      <window_name>cur_num</window_name>
+      <text font="graffiti32" r="238" g="155" b="23" a="255"/>
+    </auto_static>
+  </max_ping_warn_1>
+  <max_ping_warn_2 x="512" y="300" width="360" height="64" alignment="c" ttl="8">
+    <texture x="0" y="0" width="360" height="64" a="64">ui\ui_cm_connection_error</texture>
+    <text x="80" y="50" font="graffiti32" r="238" g="155" b="23" a="255"/>
+    <auto_static x="180" y="50" width="180" height="14">
+      <window_name>cur_num</window_name>
+      <text font="graffiti32" r="238" g="155" b="23" a="255"/>
+    </auto_static>
+  </max_ping_warn_2>
+  <max_ping_warn_3 x="512" y="300" width="360" height="64" alignment="c" ttl="8">
+    <texture x="0" y="0" width="360" height="64" a="160">ui\ui_cm_connection_error</texture>
+    <text x="80" y="50" font="graffiti32" r="238" g="155" b="23" a="255"/>
+    <auto_static x="180" y="50" width="180" height="14">
+      <window_name>cur_num</window_name>
+      <text font="graffiti32" r="238" g="155" b="23" a="255"/>
+    </auto_static>
+  </max_ping_warn_3>
+  <max_ping_warn_4 x="512" y="300" width="360" height="64" alignment="c" ttl="8">
+    <texture x="0" y="0" width="360" height="64" a="255">ui\ui_cm_connection_error</texture>
+    <text x="80" y="50" font="graffiti32" r="238" g="155" b="23" a="255"/>
+    <auto_static x="180" y="50" width="180" height="14">
+      <window_name>cur_num</window_name>
+      <text font="graffiti32" r="238" g="155" b="23" a="255"/>
+    </auto_static>
+  </max_ping_warn_4>
+
+        <cs_heli_health  x="680" y="15" width="325" height="25" stretch="1">
+                <!--                <text font="graffiti22"  r="240" g="217" b="182" a="255" align="l"/>
+                <texture x="0" y="0" width="325" height="25" a="255">ui_sega_healph</texture> -->
+                <texture>ui_sega_healph</texture>
+        </cs_heli_health>
+
+        <cs_strelok_health  x="680" y="15" width="325" height="25" stretch="1">
+                <!--                <text font="graffiti22"  r="240" g="217" b="182" a="255" align="l"/>
+                <texture x="0" y="0" width="325" height="25" a="255">ui_sega_healph</texture> -->
+                <texture>ui_sega_healph</texture>
+        </cs_strelok_health>
+
+	<crow_timer  x="869" y="0" width="155" height="66">
+		<text x="20" y="23it" font="graffiti32" r="238" g="155" b="23" a="255" align="c"/>
+		<texture>ui_hud_timer_games</texture>
+<!--
+		<text x="-15" y="23it" font="graffiti32" r="238" g="155" b="23" a="255" align="r"/>
+		<texture>ui_hud_timer_games</texture>
+-->
+	</crow_timer>
+	<crow_timer_text x="852" y="80" width="157" height="67" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+		<text x="0" y="0" font="graffiti22" r="240" g="217" b="182" a="255" align="c"/>
+	</crow_timer_text>
+
+	<shooting_timer x="869" y="0" width="155" height="66">
+		<text x="20" y="23it" font="graffiti32" r="238" g="155" b="23" a="255" align="c"/>
+		<texture>ui_hud_timer_games</texture>
+	</shooting_timer>
+	<shooting_counter  x="433" y="0" width="224" height="46">
+		<text x="2" y="6it" font="graffiti32" r="238" g="155" b="23" a="255" align="c"/>
+		<texture>ui_hud_points_count</texture>
+	</shooting_counter>
+	<shooting_get_ready  x="212" y="300" width="600" height="68" complex_mode="1" light_anim="ui_slow_blinking_alpha">
+		<text font="graffiti32"  r="240" g="217" b="182" a="255" align="c"/>
+	</shooting_get_ready>
+
+
+	<text_on_screen_center x="212" y="300" width="600" height="68" complex_mode="1" light_anim="ui_slow_blinking_alpha">
+		<text font="graffiti32"  r="240" g="217" b="182" a="255" align="c"/>
+	</text_on_screen_center>
+
+  <mp_timelimit x="100" y="77" width="824" height="30">
+    <text font="graffiti19" color="ui_red" align="c"/>
+  </mp_timelimit>
+  <mp_spetatormode x="100" y="115" width="824" height="30">
+    <text font="graffiti19" color="ui_red" align="c"/>
+  </mp_spetatormode>
+  <mp_spectator x="100" y="115" width="824" height="30">
+    <text font="graffiti19" color="ui_white" align="c"/>
+  </mp_spectator>
+  <mp_pressjump x="100" y="729" width="824" height="30">
+    <text font="graffiti19" color="ui_white" align="c"/>
+  </mp_pressjump>
+  <mp_pressbuy x="100" y="749" width="824" height="30">
+    <text font="graffiti19" color="ui_white" align="c"/>
+  </mp_pressbuy>
+  <mp_round_result x="100" y="345" width="824" height="30">
+    <text font="graffiti19" r="240" g="255" b="240"    align="c"/>
+  </mp_round_result>
+  <mp_force_respawn_time x="100" y="38" width="824" height="30">
+    <text font="graffiti19" color="ui_white" align="c"/>
+  </mp_force_respawn_time>
+  <mp_demo_play x="0" y="195" width="824" height="30">
+    <text font="graffiti19" color="ui_green"/>
+  </mp_demo_play>
+  <mp_warm_up x="100" y="75" width="824" height="30">
+    <text font="graffiti19" color="ui_green" align="c"/>
+  </mp_warm_up>
+  <mp_ah_buy x="100" y="729" width="824" height="30">
+    <text font="graffiti19" r="255" g="255" b="0"    align="c"/>
+  </mp_ah_buy>
+  <mp_tdm_buy x="100" y="729" width="824" height="30">
+    <text font="graffiti19" r="255" g="255" b="0"    align="c"/>
+  </mp_tdm_buy>
+
+  <blackscreen width="1024" height="768" stretch="1">
+    <texture>intro\intro_back</texture>
+  </blackscreen>
+
+</header>

@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_achievement_10_descr">
+		<text>Il tuo nemico si sentirа umiliato, dopo essere stato ucciso per dieci volte di fila senza riuscire a ucciderti neppure una volta! Comunque, la tua non и crudeltа: lo stai semplicemente spronando ad allenarsi.</text>
+	</string>
+	<string id="st_achievement_10_name">
+		<text>Il mietitore</text>
+	</string>
+	<string id="st_achievement_11_descr">
+		<text>Sei inarrestabile! Hai preso due piccioni con una fava... falciati entrambi con il tuo fucile Gauss.</text>
+	</string>
+	<string id="st_achievement_11_name">
+		<text>Doppio colpo</text>
+	</string>
+	<string id="st_achievement_12_descr">
+		<text>La tua calma e la tua attenta pianificazione sono letali per il nemico: nel giro di un paio di secondi, sei riuscito ad abbattere due bersagli sparando per due volte con la tua doppietta.</text>
+	</string>
+	<string id="st_achievement_12_name">
+		<text>Due colpi, due morti</text>
+	</string>
+	<string id="st_achievement_13_descr">
+		<text>Tu sai che cosa significhi essere uno stalker, ed и per questo che sei diventato un'autentica leggenda!</text>
+	</string>
+	<string id="st_achievement_13_name">
+		<text>Arrampicatore sociale</text>
+	</string>
+	<string id="st_achievement_14_descr">
+		<text>Vuoi sfondare un esoscheletro usando un coltello? Sembra che ti piacciano le imprese difficili, eh?</text>
+	</string>
+	<string id="st_achievement_14_name">
+		<text>Apriscatole</text>
+	</string>
+	<string id="st_achievement_15_descr">
+		<text>Pensavano di averti fregato, ma gli hai fatto capire chi comanda, ammazzandone cinque nonostante fossi a un passo dalla morte!</text>
+	</string>
+	<string id="st_achievement_15_name">
+		<text>Duro a morire</text>
+	</string>
+	<string id="st_achievement_16_descr">
+		<text>Che scarica di adrenalina! Hai fatto a pezzi il tuo nemico con una pioggia di proiettili: 5 uccisioni in 5 secondi, incredibile!</text>
+	</string>
+	<string id="st_achievement_16_name">
+		<text>Furia scatenata</text>
+	</string>
+	<string id="st_achievement_17_descr">
+		<text>Wow, che mira strepitosa! Hai ucciso due nemici con un colpo negli occhi, senza morire nel frattempo.</text>
+	</string>
+	<string id="st_achievement_17_name">
+		<text>Specialista degli occhi</text>
+	</string>
+	<string id="st_achievement_18_descr">
+		<text>Che si nascondano pure dietro gli angoli per tenderti un'imboscata: non ti fermeranno! Tu sai colpire un bersaglio in movimento, senza neppure mirare!</text>
+	</string>
+	<string id="st_achievement_18_name">
+		<text>Riflessi fulminei</text>
+	</string>
+	<string id="st_achievement_19_descr">
+		<text>Che scappi piщ forte che puт: tanto alla fine i tuoi proiettili lo raggiungeranno.</text>
+	</string>
+	<string id="st_achievement_19_name">
+		<text>Ferma il fuggiasco</text>
+	</string>
+	<string id="st_achievement_1_descr">
+		<text>Hai massacrato venti nemici di fila, senza morire! Accidenti, che bagno di sangue!</text>
+	</string>
+	<string id="st_achievement_1_name">
+		<text>Massacro</text>
+	</string>
+	<string id="st_achievement_20_descr">
+		<text>Erano in tre e avevano dei fucili di precisione, ma alla fine la tua grande abilitа ha avuto ragione di loro.</text>
+	</string>
+	<string id="st_achievement_20_name">
+		<text>Tiratore scelto</text>
+	</string>
+	<string id="st_achievement_21_descr">
+		<text>Lasciando che siano i nemici a comportarsi da barbari, hai mostrato loro che sei in grado di vincere anche senza sparare un solo colpo.</text>
+	</string>
+	<string id="st_achievement_21_name">
+		<text>Messaggero di pace</text>
+	</string>
+	<string id="st_achievement_22_descr">
+		<text>La distanza non и un problema per un vero cecchino! Sai centrare il bersaglio anche da oltre 120 metri. </text>
+	</string>
+	<string id="st_achievement_22_name">
+		<text>Precisione letale</text>
+	</string>
+	<string id="st_achievement_23_descr">
+		<text>Il nemico и riuscito ad abbatterti, ma tu gli hai lasciato come ricordino una bella granata!</text>
+	</string>
+	<string id="st_achievement_23_name">
+		<text>Non ti scordar di me</text>
+	</string>
+	<string id="st_achievement_24_descr">
+		<text>Hanno ucciso i tuoi amici, la tua vendetta и stata piщ che legittima. Tre cadaveri di nemici per i tuoi tre amici morti: giustizia и fatta.</text>
+	</string>
+	<string id="st_achievement_24_name">
+		<text>Vendicatore</text>
+	</string>
+	<string id="st_achievement_25_descr">
+		<text>Sei il difensore del tuo amico: lo hai salvato per due volte da un attacco, mentre trasportava il manufatto.</text>
+	</string>
+	<string id="st_achievement_25_name">
+		<text>Angelo custode</text>
+	</string>
+	<string id="st_achievement_26_descr">
+		<text>Sei riuscito a difendere il tuo onore e quello della tua squadra, mettendo a segno alcuni punti.</text>
+	</string>
+	<string id="st_achievement_26_name">
+		<text>L'onore и salvo</text>
+	</string>
+	<string id="st_achievement_27_descr">
+		<text>Per caso sapevi dove sarebbe comparso il prossimo manufatto? Beh, fatto sa che sei riuscito a prenderlo, nel giro di pochi secondi!</text>
+	</string>
+	<string id="st_achievement_27_name">
+		<text>Intuito da stalker</text>
+	</string>
+	<string id="st_achievement_28_descr">
+		<text>Sei stato fortunato: hai ucciso il nemico con l'ultimo proiettile del caricatore! Beh, alla fine quello che conta и il risultato.</text>
+	</string>
+	<string id="st_achievement_28_name">
+		<text>Lucky Bastard</text>
+	</string>
+	<string id="st_achievement_29_descr">
+		<text>Hai ucciso otto nemici di fila. Bene, hai lanciato la sfida: ora vediamo cosa sapranno fare loro.</text>
+	</string>
+	<string id="st_achievement_29_name">
+		<text>La sfida </text>
+	</string>
+	<string id="st_achievement_2_descr">
+		<text>Nessuno и riuscito a ucciderti, grazie alla tua grande cautela. Non sei mai morto nel corso della partita e hai ottenuto piщ di 15 punti.</text>
+	</string>
+	<string id="st_achievement_2_name">
+		<text>Paranoia</text>
+	</string>
+	<string id="st_achievement_30_descr">
+		<text>Sai come fare il tuo lavoro senza attirare l'attenzione: non scordi mai il silenziatore. Perchй far sapere al nemico da che direzione giunge la sua morte?</text>
+	</string>
+	<string id="st_achievement_30_name">
+		<text>Morte silente</text>
+	</string>
+	<string id="st_achievement_3_descr">
+		<text>Hai annichilito il tuo nemico, vincendo e ottenendo il doppio dei punti del loro miglior rappresentante.</text>
+	</string>
+	<string id="st_achievement_3_name">
+		<text>Superioritа schiacciante</text>
+	</string>
+	<string id="st_achievement_4_descr">
+		<text>Il tuo piano per catturare all'istante il manufatto ha avuto successo: hai segnato per la tua squadra entro tre minuti dall'inizio della partita.</text>
+	</string>
+	<string id="st_achievement_4_name">
+		<text>Guerra lampo</text>
+	</string>
+	<string id="st_achievement_5_descr">
+		<text>Non hai lasciato scampo al nemico, dato che non gli hai lasciato mettere le mani su neppure un manufatto. Cosм impareranno a che cosa serve il lavoro di squadra!</text>
+	</string>
+	<string id="st_achievement_5_name">
+		<text>Nessuna speranza!</text>
+	</string>
+	<string id="st_achievement_6_descr">
+		<text>Hai ottenuto il massimo dei punti in ogni area: il maggior numero di uccisioni, piщ manufatti e il minor numero di morti! Continua cosм!</text>
+	</string>
+	<string id="st_achievement_6_name">
+		<text>Campione completo</text>
+	</string>
+	<string id="st_achievement_7_descr">
+		<text>Con una lama in mano sai fare meraviglie! Hai sbudellato 3 nemici in 20 secondi, dimostrando di essere una macchina della morte anche senza armi da fuoco.</text>
+	</string>
+	<string id="st_achievement_7_name">
+		<text>Furia</text>
+	</string>
+	<string id="st_achievement_8_descr">
+		<text>Ogni nemico ha un punto debole, e tu hai trovato quello di questo sventurato colpendo un nemico corazzato nell'occhio, con la tua fida arma.</text>
+	</string>
+	<string id="st_achievement_8_name">
+		<text>Tallone d'Achille</text>
+	</string>
+	<string id="st_achievement_9_descr">
+		<text>I proiettili nemici non riescono neppure a sfiorarti! Li hai superati senza neppure un graffio e hai risolto il problema!</text>
+	</string>
+	<string id="st_achievement_9_name">
+		<text>Piщ veloce di un proiettile</text>
+	</string>
+	<string id="st_sp_achievement_1_descr">
+		<text>Sei disposto a eseguire ricerche sugli ultimi sviluppi della Zona. Ci hai aiutato a comprendere meglio la Zona scoprendo nuove formazioni anomale precedentemente sconosciute alla scienza.</text>
+	</string>
+	<string id="st_sp_achievement_1_name">
+		<text>Pioniere</text>
+	</string>
+	<string id="st_sp_achievement_2_hint">
+		<text>Ora gli stalker hanno una considerazione molto piщ alta di te.\nPer ringraziarti dei tuoi sforzi, ti hanno lasciato delle munizioni nel tuo ripostiglio personale della stazione Yanov.</text>
+	</string>
+	<string id="st_sp_achievement_2_descr">
+		<text>Tu non cerchi di evitare i mutanti pericolosi: gli dai la caccia e sei anche molto bravo. I bravi cacciatori sono molto stimati tra gli stalker.</text>
+	</string>
+	<string id="st_sp_achievement_2_name">
+		<text>Cacciatore di mutanti</text>
+	</string>
+	<string id="st_sp_achievement_3_hint">
+		<text>Ora gli stalker hanno una considerazione molto piщ alta di te.\nPer ringraziarti dei tuoi sforzi, ti hanno lasciato dei medicinali nel tuo ripostiglio personale sulla Skadovsk.</text>
+	</string>
+	<string id="st_sp_achievement_3_descr">
+		<text>Hai scoperto il segreto dietro le scomparse degli stalker sulla Skadovsk. Il gruppo di colpevoli non era affatto composto da mutanti, ma da un nemico molto piщ pericoloso: l'uomo. Ora che hai scoperto la veritа ti sei guadagnato il rispetto degli stalker.</text>
+	</string>
+	<string id="st_sp_achievement_3_name">
+		<text>Detective</text>
+	</string>
+	<string id="st_sp_achievement_4_hint">
+		<text>Ora gli stalker hanno una considerazione molto piщ alta di te.\nGli stalker hanno chiesto a Owl di farti uno sconto.\nOra Beard ti propone i prezzi migliori per i suoi manufatti.</text>
+	</string>
+	<string id="st_sp_achievement_4_descr">
+		<text>Hai dimostrato ai banditi e a Sultan, il loro capo, chi comanda da queste parti. Ora sei famoso tra gli stalker. Sulla Skadovsk sei sempre il benvenuto.</text>
+	</string>
+	<string id="st_sp_achievement_4_name">
+		<text>Uno dei nostri</text>
+	</string>
+	<string id="st_sp_achievement_5_hint">
+		<text>Ti sei guadagnato il rispetto dei banditi.\nOwl ti ha fatto uno sconto per paura di essere la tua prossima vittima.\nCome d'accordo, ora Beard ti darа una parte dei suoi profitti.</text>
+	</string>
+	<string id="st_sp_achievement_5_descr">
+		<text>Hai aiutato Sultan a sconfiggere gli stalker e hai preso l'attivitа di Beard sotto il tuo controllo. Ora a Zaton tutti ti temono e ti rispettano.</text>
+	</string>
+	<string id="st_sp_achievement_5_name">
+		<text>Boss</text>
+	</string>
+	<string id="st_sp_achievement_6_hint">
+		<text>Gli stalker hanno deciso di dare il bottino di Magpie, che lui aveva ottenuto con le menzogne e l'inganno, a qualcuno che lo meritasse di piщ. Hanno messo la sua roba nel tuo ripostiglio personale a Yanov.</text>
+	</string>
+	<string id="st_sp_achievement_6_descr">
+		<text>Hai consegnato quel sacco di immondizia alla giustizia. Magpie ha ingannato molti stalker, e ora и giunta la sua ora.</text>
+	</string>
+	<string id="st_sp_achievement_6_name">
+		<text>Corriere della giustizia</text>
+	</string>
+	<string id="st_sp_achievement_7_hint">
+		<text>Ora gli stalker hanno una considerazione piщ alta di te.\nI banditi ti daranno la caccia non appena ti avventurerai nella Zona.</text>
+	</string>
+	<string id="st_sp_achievement_7_descr">
+		<text>Hai trovato ogni tipo di manufatto conosciuto ai ricercatori della Zona. Questo ti и valso il rispetto degli stalker e l'attenzione dei banditi.</text>
+	</string>
+	<string id="st_sp_achievement_7_name">
+		<text>Cacciatore di manufatti</text>
+	</string>
+	<string id="st_sp_achievement_8_hint">
+		<text>Cardan puт eseguire solo una modifica, che ti permetterа di muoverti piщ velocemente quando indossi un esoscheletro, installando dei potenziatori idraulici al servomotore.</text>
+	</string>
+	<string id="st_sp_achievement_8_descr">
+		<text>Ora Cardan ha tutti gli strumenti che gli serviranno. Questo gli permetterа di eseguire potenziamenti nuovi e piщ complessi.</text>
+	</string>
+	<string id="st_sp_achievement_8_name">
+		<text>Esperto di sistemi d'armi</text>
+	</string>
+	<string id="st_sp_achievement_9_hint">
+		<text>Azot puт eseguire una sola modifica all'elmo tattico: uno scanner a infrarossi che permette di individuare gli umani vicini.</text>
+	</string>
+	<string id="st_sp_achievement_9_descr">
+		<text>Azot ha tutti gli strumenti che un tecnico della Zona potrebbe desiderare. Ora puт eseguire anche le modifiche tecnologiche piщ sofisticate.</text>
+	</string>
+	<string id="st_sp_achievement_9_name">
+		<text>Esperto di tecnologia</text>
+	</string>
+	<string id="st_sp_achievement_10_hint">
+		<text>La tua esperienza ti permette di trovare piщ spesso manufatti rari.</text>
+	</string>
+	<string id="st_sp_achievement_10_descr">
+		<text>Nei pressi del centro della Zona sei stato praticamente dappertutto. Hai visitato praticamente tutte le anomalie locali.</text>
+	</string>
+	<string id="st_sp_achievement_10_name">
+		<text>Stalker esperto</text>
+	</string>
+	<string id="st_sp_achievement_11_hint">
+		<text>Le tue qualitа di leader migliorano le possibilitа di sopravvivenza della tua squadra.</text>
+	</string>
+	<string id="st_sp_achievement_11_descr">
+		<text>Dovevi svolgere un lavoro di squadra, quindi hai radunato grandi uomini e dimostrato che sei un vero leader.</text>
+	</string>
+	<string id="st_sp_achievement_11_name">
+		<text>Leader</text>
+	</string>
+	<string id="st_sp_achievement_12_hint">
+		<text>La Freedom, la Duty, gli stalker liberi e persino i banditi riconoscono le tue capacitа di negoziazione, e hanno una grande considerazione di te.</text>
+	</string>
+	<string id="st_sp_achievement_12_descr">
+		<text>Sai come risolvere un problema in modo pacifico. A che serve la forza bruta quando bastano le parole a risolvere le dispute? Nonostante questo, guardati da quelli che prima sparano poi fanno domande.</text>
+	</string>
+	<string id="st_sp_achievement_12_name">
+		<text>Diplomatico</text>
+	</string>
+	<string id="st_sp_achievement_13_descr">
+		<text>Hai lavorato con gli scienziati talmente a lungo che non sarebbe fuori luogo definirti un assistente ricercatore. Tutti, nel bunker degli scienziati, ti considerano uno di loro.</text>
+	</string>
+	<string id="st_sp_achievement_13_name">
+		<text>Assistente ricercatore</text>
+	</string>
+	<string id="st_sp_achievement_14_hint">
+		<text>I tuoi rapporti con la Duty sono migliorati. Se dovessi trovarti nei guai, i combattenti della Duty cercheranno di aiutarti.\nAzot, il tecnico che sostiene la Duty, ti ha offerto uno sconto.\nI tuoi rapporti con la Freedom si sono deteriorati. \nHawaiian, il commerciante che sostiene la Freedom, ti farа pagare di piщ la sua merce.</text>
+	</string>
+	<string id="st_sp_achievement_14_descr">
+		<text>Hai aiutato molto la Duty, e questo ti и valso il rispetto dei combattenti della Duty e dei loro amici. Ma ricorda che nella Zona non tutti sono dei sostenitori della Duty.</text>
+	</string>
+	<string id="st_sp_achievement_14_name">
+		<text>Un amico della Duty</text>
+	</string>
+	<string id="st_sp_achievement_15_hint">
+		<text>\nI tuoi rapporti con la Freedom sono migliorati. Se dovessi trovarti nei guai, i combattenti della Freedom cercheranno di aiutarti.\nHawaiian, il commerciante che sostiene la Freedom, ti ha offerto uno sconto.\nI tuoi rapporti con la Duty si sono deteriorati. \nAzot, il tecnico che sostiene la Duty, ti farа pagare di piщ per i suoi servizi.</text>
+	</string>
+	<string id="st_sp_achievement_15_descr">
+		<text>Hai aiutato molto la Freedom, e questo ti и valso il rispetto dei combattenti della Freedom e dei loro amici. Ma ricorda che nella Zona non tutti sono dei sostenitori della Freedom.</text>
+	</string>
+	<string id="st_sp_achievement_15_name">
+		<text>Un amico della Freedom</text>
+	</string>
+	<string id="st_sp_achievement_16_hint">
+		<text>Gli stalker di Yanov fanno molta attenzione a che ci sia un equilibrio di forze tra la Duty e la Freedom, ecco perchй sia il tecnico che il commerciante ti hanno offerto uno sconto.</text>
+	</string>
+	<string id="st_sp_achievement_16_descr">
+		<text>Non ti sei schierato con nessuna fazione e hai scelto di agire come stalker libero. Non ti sei fatto alcun nemico, ma nemmeno nessun nuovo amico.</text>
+	</string>
+	<string id="st_sp_achievement_16_name">
+		<text>Un uomo equilibrato</text>
+	</string>
+	<string id="st_sp_achievement_17_hint">
+		<text>I commercianti ti offrono merci piщ rare e costose.</text>
+	</string>
+	<string id="st_sp_achievement_17_descr">
+		<text>Anche se sai cosa vuol dire "essere al verde", al momento non navighi in cattive acque. Infatti, ci sono volte, quando la tua ricchezza puт essere considerevole, che i commercianti ti vedono come un cliente importante.</text>
+	</string>
+	<string id="st_sp_achievement_17_name">
+		<text>Un ricco cliente</text>
+	</string>
+	<string id="st_sp_achievement_18_hint">
+		<text>Dopo aver ricevuto gli appunti, Strelok ha trovato un nuovo motivo di vita e ha scelto di perseguire i suoi obiettivi, a qualunque costo.</text>
+	</string>
+	<string id="st_sp_achievement_18_descr">
+		<text>La tua previsione ti и stata utile: dopo aver trovato gli appunti nei ripostigli del gruppo di Strelok, li hai tenuti finchй non li hai consegnati al legittimo proprietario.</text>
+	</string>
+	<string id="st_sp_achievement_18_name">
+		<text>Custode di segreti</text>
+	</string>
+	<string id="st_sp_achievement_19_descr">
+		<text>Sei riuscito a sopravvivere a un'emissione senza metterti al riparo grazie alle pillole anabiotiche. Gli effetti sulla tua psiche non sono chiari, e senti uno strano silenzio nella tua mente. A quanto pare non percepisci piщ un flusso di pensieri costante.</text>
+	</string>
+	<string id="st_sp_achievement_19_name">
+		<text>Segnato dalla zona</text>
+	</string>
+	<string id="st_sp_achievement_20_hint">
+		<text>Owl il commerciante ti ha offerto uno sconto perchй sei il suo socio e informatore migliore.</text>
+	</string>
+	<string id="st_sp_achievement_20_descr">
+		<text>Quando metti le mani su un'informazione trovi sempre l'acquirente giusto. Ovviamente, quando vendi le informazioni hai sempre a mente il tuo profitto personale.</text>
+	</string>
+	<string id="st_sp_achievement_20_name">
+		<text>Trafficante d'informazioni</text>
+	</string>
+	<string id="st_sp_achievement_21_hint">
+		<text>Il tuo rapporto con gli stalker и migliorato. Se ti trovi nei guai, gli stalker cercheranno di aiutarti.\nI medici degli stalker hanno accettato di venderti i medicinali a prezzo di costo.</text>
+	</string>
+	<string id="st_sp_achievement_21_descr">
+		<text>Hai sempre aiutato gli stalker in difficoltа. Anche se la loro fazione и molto unita e chiusa, ora hai degli alleati nell'ufficiosa fratellanza degli stalker che ti aiuteranno in combattimento e anche dopo.</text>
+	</string>
+	<string id="st_sp_achievement_21_name">
+		<text>Amico degli stalker</text>
+	</string>
+	<string id="st_sp_achievement_1_hint">
+		<text>Varie nuove informazioni hanno permesso ai professori Hermann e Ozersky di creare una nuova droga, un anabiotico, nella Zona.</text>
+	</string>
+	<string id="st_sp_achievement_19_hint">
+		<text>A patto che tu disponga di sufficiente salute, puoi riuscire a sopravvivere a un'emissione anche senza utilizzare droghe anti-radiazioni.</text>
+	</string>
+	<string id="st_sp_achievement_13_hint">
+		<text>Considerata la tua utilitа, il professor Hermann ti offre dei medicinali e degli equipaggiamenti solitamente riservati al peronale del bunker, a prezzo di costo.\nNovikov si и cosм abituato alla tua presenza che ti chiede solo il pagamento delle parti utilizzate per le modifiche.</text>
+	</string>
+</string_table>

@@ -1,0 +1,89 @@
+[logic@jup_a6_freedom_leader]
+suitable = {=check_npc_name(jup_a6_freedom_leader)}
+prior = 200
+active = walker@freedom_leader
+
+[animpoint@freedom_leader]
+cover_name = jup_a6_animpint_freedom_leader
+avail_animations = animpoint_sit_normal_no_rnd
+use_camp = false
+meet = meet@stand_base
+on_info = {+jup_b207_freedom_knows_about_depot -jup_b207_ui} remark@jup_b207_radio_talk
+on_game_timer = 900 | walker@freedom_leader
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = jup_a6_sr_noweap
+corpse_detection_enabled = false
+gather_items_enabled = false
+help_wounded_enabled = false
+
+[walker@freedom_leader]
+path_walk = freedom_leader_walk
+path_look = freedom_leader_look
+def_state_standing = wait_na
+def_state_moving = walk_noweap
+meet = meet@walker
+on_info = {+jup_b207_freedom_knows_about_depot -jup_b207_ui} remark@jup_b207_radio_talk
+on_game_timer = 900 | animpoint@freedom_leader
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = jup_a6_sr_noweap
+corpse_detection_enabled = false
+gather_items_enabled = false
+help_wounded_enabled = false
+use_camp = false
+
+
+
+[meet@stand_base]
+close_snd_hello = jup_a6_freedom_leader_greeting
+close_snd_bye 	= jup_a6_freedom_leader_farewell
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+allow_break = false
+trade_enable = false
+meet_on_talking = false
+
+[meet@walker]:meet@stand_base
+close_anim 		= wait_na
+close_victim 	= actor
+close_distance  = 3
+
+[remark@jup_b207_radio_talk]
+target = story | actor
+anim = wait_rac
+on_signal = anim_end | %=play_sound(jup_b207_freedom_leader_about_depot)%
+on_signal2 = sound_end | remark@jup_b207_radio_talk_done
+meet = no_meet
+;combat_ignore_cond = {=check_enemy_smart(jup_a6)} true
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[remark@jup_b207_radio_talk_done]
+target = story | actor
+anim = wait_na
+on_signal = anim_end | %=play_sound(jup_b207_freedom_leader_about_depot_after)%
+on_signal2 = sound_end | %+jup_b207_ui -jup_b207_lock_door%
+on_info = {+jup_b207_ui} animpoint@freedom_leader
+meet = no_meet
+;combat_ignore_cond = {=check_enemy_smart(jup_a6)} true
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false

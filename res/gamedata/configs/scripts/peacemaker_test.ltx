@@ -1,0 +1,68 @@
+[logic]
+active = sr_idle@wait
+;[logic]
+;active = sr_idle
+
+;[sr_idle]
+;on_info = {=actor_in_zone(actor_surge_hide_2) -zat_b101_heli_5_searching} sr_idle@2 %=run_tutorial(zat_b101_heli_5)%
+;on_info2 = {+zat_b101_heli_5_searching} sr_idle@3
+
+[sr_idle@2]
+on_info = {!actor_in_zone(actor_surge_hide_2)} sr_idle %=stop_tutorial%
+on_info2 = {!has_active_tutorial} sr_idle
+
+
+
+
+[sr_idle@wait]
+on_actor_inside = sr_idle@run %=run_tutorial(tutorial_sleep)%
+
+[sr_idle@run]
+on_info = {+tutorial_sleep} %-tutorial_sleep =run_tutorial(tutorial_sleep)%
+on_actor_outside = {+tutorial_sleep} sr_idle@wait, sr_idle@wait %=stop_tutorial%
+on_info2 = {!has_active_tutorial -sleep_active} sr_idle@wait
+;on_actor_inside = {!has_active_tutorial} sr_idle@wait
+
+
+;[logic]
+;active = sr_idle@1
+;active = sr_deimos
+;[sr_idle@1]
+;on_info = {!signal_rocket_flying(level_prefix_lights_signal_light)} sr_idle@2 %=launch_signal_rocket(level_prefix_lights_signal_light)%
+;on_actor_inside = %=oasis_heal()%
+;on_timer = 10000 | %=spawn_items()% nil
+;on_info = %=create_squad(test_duty2:smart_terrain_3)% nil
+;on_info = %=give_task(test_storyline_task) =give_task(test_storyline_task2)% nil
+;sr_deimos
+;=give_treasure(test_treasure) =add_map_spot(65000:primary_object)% nil
+;%=send_tip(st_zat_a2_linker_name)%
+;on_info= sr_idle@2 %=create_squad(test_freedom2:smart_terrain_2) =create_squad(test_bandit:smart_terrain_4) =create_squad(test_duty2:smart_terrain_1) =create_squad(test_monster:smart_terrain_3)%
+;on_info = sr_idle@2 %=create_squad(test_monster:smart_terrain_3)%
+
+;[sr_idle@2]
+;on_info = nil
+;on_timer = 25000|sr_idle@1
+;on_info = {-test_info_2} sr_deimos
+
+[sr_deimos]
+on_info = {=check_deimos_phase(disable_bound:decreasing)} sr_idle@2
+movement_speed = 50
+growing_koef = 0.05
+pp_effector = surge_shock
+cam_effector = earthquake
+noise_sound = pri_a28_deimos_noise_sound
+heartbeet_sound = pri_a28_deimos_heartbeat
+cam_effector_repeating_time = 10
+health_lost = 0.1
+disable_bound = 0.1
+switch_lower_bound = 0.5
+switch_upper_bound = 0.75
+
+
+;Ладно, потом расскажешь. Вот тебе:
+
+;Электра - 0.8
+;Кислота - 0.2
+;Огонь - 0.3
+;Радио - 0.03
+;Пси - 0.1

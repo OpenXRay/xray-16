@@ -1,0 +1,60 @@
+[volume]
+	EmittersNum			= 2
+	ConfinementScale	= 0.15          ;	Турбулентность. 0 - поток гладкий
+	Decay				= 0.990         ;	Затухание дыма. 1 - дым не затухает
+	GravityBuoyancy		= -0.005		;	Вес положительный/отрицательный дыма
+	Hemi				= -1.5
+
+[emitter01]
+	Type 			= SimpleGaussian	; просто скопировать
+	Position 		= 61.0, 66.0, 35.0	; в локальных координатах
+	Radius			= 0.33				; размер источника. чем больше число, тем меньше источник 
+	Sigma			= 1					; просто скопировать
+	FlowSpeed		= 0.2				; скорость потока
+	FlowDirection	= -0.5, -1.0, 0.0		; направление потока в локальных координатах
+	Density			= 1.0				; плотность дыма
+
+	ApplyDensity	= 1					; источник генерирует вещество
+	ApplyImpulse	= 1					; источник применяет скорость
+
+[emitter00]
+	Type 			= SimpleDraught
+;	Type 			= SimpleGaussian
+	Position 		= 61.0, 58.0, 18.0
+	Radius			= 0.23
+	Sigma			= 1
+	FlowSpeed		= 0.5
+	FlowDirection	= 0.0, 0.0, 0.5
+	Density			= 1.0
+	DraughtPeriod	= 10.0				; период колебаний скорости в секундах
+	DraughtPhase	= 0.0				; фаза колебаний скорости [0..1]
+	DraughtAmp		= 0.5				; aмплитуда колебаний [FlowSpeed*(1-DraughtAmp)..FlowSpeed*(1+DraughtAmp)]
+
+	ApplyDensity	= 0
+	ApplyImpulse	= 1
+
+[emitter11]
+	Type 			= SimpleGaussian
+	Position 		= 70.0, 60.0, 35.0
+	Radius			= 0.15
+	Sigma			= 1
+	FlowSpeed		= 1
+	FlowDirection	= -0.5, -1.0, 0.0
+	Density			= 1.0
+
+	ApplyDensity	= 0
+	ApplyImpulse	= 1
+
+[emitter12]
+	Type 			= SimpleGaussian
+	Position 		= 50.0, 60.0, 35.0
+	Radius			= 0.3
+	Sigma			= 1
+	FlowSpeed		= 0.6
+	FlowDirection	= -0.5, -1.0, 0.0
+	Density			= 1.0
+
+	ApplyDensity	= 0
+	ApplyImpulse	= 1
+
+;	r3_fog_reload

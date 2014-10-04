@@ -1,0 +1,6 @@
+<w>
+    <file name="ui\ui_actor_dialog_screen">
+	    <texture id="ui_inGame2_dialog_main_window" x="0" y="0" width="634" height="760" />
+<!--	    <texture id="ui_inGame2_message_box" x="0" y="764" width="677" height="255" /> -->
+   </file>
+</w>

@@ -1,0 +1,66 @@
+[logic@jup_a12_bandit_chief]
+active = walker@bandit_chief_stand
+suitable = {=check_npc_name(jup_a12_bandit_chief)} true
+prior = 200
+on_death = death
+
+[walker@bandit_chief_stand]
+path_walk = bandit_chief_stand_walk
+path_look = bandit_chief_stand_look
+def_state_standing = wait_na
+combat_ignore_cond = true
+meet = meet@bandit_chief_stand
+on_info = {+jup_a12_chief_bandit_wait_threat_prisoner -jup_a12_stalker_prisoner_free} walker@wait_threat_prisoner, {+jup_a12_stalker_prisoner_dead} walker@stand, {+jup_a12_stalker_prisoner_free +jup_a12_stalker_prisoner_thanked_actor} walker@stand, {+jup_a12_actor_enemy_to_bandits -jup_a12_chief_bandit_wait_threat_prisoner} %+jup_a12_chief_bandit_wait_threat_prisoner%
+
+[meet@bandit_chief_stand]
+close_anim = wait_na
+close_snd_hello = nil
+close_snd_bye = nil
+close_victim = actor
+snd_on_use = nil
+use = {!actor_enemy !actor_has_weapon} true, false
+use_wpn = false
+meet_dialog = jup_a12_bandit_chief_dialog
+trade_enable = false
+		
+[walker@wait_threat_prisoner]
+path_walk = bandit_chief_threat_prisoner_walk
+path_look = bandit_chief_threat_prisoner_look
+def_state_standing = threat_na
+combat_ignore_cond = true
+on_actor_in_zone = jup_a12_sr_threat_prisoner_zone | %+jup_a12_chief_bandit_threat_prisoner%
+on_info = {+jup_a12_chief_bandit_threat_prisoner} walker@threat_prisoner
+def_state_moving = rush
+meet = no_meet
+out_restr = jup_a12_sr_threat_prisoner_zone
+
+[walker@threat_prisoner]
+path_walk = bandit_chief_threat_prisoner_walk
+path_look = bandit_chief_threat_prisoner_look
+combat_ignore_cond = true
+def_state_standing = threat_na
+on_info = {+jup_a12_chief_bandit_kill_prisoner} walker@kill_prisoner, {+jup_a12_stalker_prisoner_dead} walker@stand, %=play_sound(jup_a12_bandit_threat_to_prisoner)%
+on_game_timer = 25 | %+jup_a12_chief_bandit_kill_prisoner%
+def_state_moving = rush
+meet = no_meet
+out_restr = jup_a12_sr_threat_prisoner_zone
+
+[walker@kill_prisoner]
+path_walk = bandit_chief_kill_prisoner_walk
+path_look = bandit_chief_kill_prisoner_look
+def_state_standing = threat_na
+on_info = {+jup_a12_stalker_prisoner_dead} walker@stand
+combat_ignore_cond = {!check_enemy_name(jup_a12_stalker_prisoner)} true
+meet = no_meet
+out_restr = jup_a12_sr_threat_prisoner_zone
+
+[walker@stand]
+path_walk = bandit_chief_stand_walk
+path_look = bandit_chief_stand_look
+def_state_standing = wait_na
+meet = meet@bandit_chief_stand
+combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true
+out_restr = jup_a12_sr_bandit_bodyguard
+
+[death]
+on_info = %+jup_a12_bandit_out% 

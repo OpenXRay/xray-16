@@ -1,0 +1,121 @@
+----------------------------------------------------------------------------------------------------
+-- Таймер с выводом изображения на экран.
+----------------------------------------------------------------------------------------------------
+
+local k,v = 0,0
+
+class "action_timer"
+function action_timer:__init(obj, storage)
+	self.object = obj
+	self.st = storage
+end
+function action_timer:update(delta)
+	local actor = db.actor
+	if xr_logic.try_switch_to_another_section(self.object, self.st, actor) then
+		return
+	end
+	-- Высчитываем сколько времени уже работает счетчик
+	local nn = time_global() - db.storage[self.object:id()].activation_time
+
+	-- Изменяем значение счетчика
+	local value_time = 0
+	if self.st.type == "inc" then
+		value_time = self.st.start_value + nn
+	else
+		value_time = self.st.start_value - nn
+	end
+	if value_time <= 0 then
+		value_time = 0
+	end
+	-- Формируем строку счетчика
+	local hours = math.floor(value_time/3600000)
+	local minutes = math.floor(value_time/60000 - hours*60)
+	local seconds = math.floor(value_time/1000 - hours*3600 - minutes*60)
+	local str = tostring(hours)..":"..sr_timer.time2str(minutes)..":"..sr_timer.time2str(seconds)
+
+	self.st.timer:TextControl():SetTextST(str)
+
+	-- Определяем нужно ли куда то переходить.
+	for k,v in pairs(self.st.on_value) do
+		if (self.st.type == "dec" and value_time <= v.dist) or
+			 (self.st.type == "inc" and value_time >= v.dist)
+		then
+			-- Обработка значения.
+			xr_logic.switch_to_section(self.object, self.st.ini, xr_logic.pick_section_from_condlist(db.actor, self.object, v.state))
+		end
+	end
+end
+function action_timer:deactivate(delta)
+	self.st.ui:RemoveCustomStatic(self.st.timer_id)
+	if self.st.string ~= nil then
+		self.st.ui:RemoveCustomStatic("hud_timer_text")
+	end
+end
+--function action_timer:save()
+--	xr_logic.pstor_store( self.object, "timer_value", self.state )
+--end
+
+function time2str(n)
+	if n >= 10 then
+		return tostring(n)
+	else
+		return "0"..tostring(n)
+	end
+end
+---------------------------------------------------------------------------------------------------------------------
+function add_to_binder(obj, ini, scheme, section, storage)
+	local action = action_timer(obj, storage)
+	xr_logic.subscribe_action_for_events(obj, storage, action)
+end
+function set_scheme(obj, ini, scheme, section, gulag_name)
+	local st = xr_logic.assign_storage_and_bind(obj, ini, scheme, section)
+	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, obj)
+	st.type = utils.cfg_get_string( ini, section, "type", obj, false, "", "inc")
+	if st.type ~= "inc" and st.type ~= "dec" then
+		abort("ERROR: wrong sr_timer type. Section [%s], Restrictor [%s]", section, obj:name())
+	end
+
+	if st.type == "dec" then
+		st.start_value = utils.cfg_get_number(ini, section, "start_value", obj, true)
+	else
+		st.start_value = utils.cfg_get_number(ini, section, "start_value", obj, false, 0)
+	end
+	-- Вычитываем значения перехода.
+	st.on_value = parse_data(obj, utils.cfg_get_string(ini, section, "on_value", obj, false, ""))
+	st.timer_id = utils.cfg_get_string( ini, section, "timer_id", obj, false, "", "hud_timer")
+	st.string	= utils.cfg_get_string( ini, section, "string", obj, false, "")
+
+	st.ui = get_hud()
+	st.ui:AddCustomStatic(st.timer_id, true)
+	st.timer = st.ui:GetCustomStatic(st.timer_id):wnd()
+
+	if st.string ~= nil then
+		st.ui:AddCustomStatic("hud_timer_text", true)
+		local timer_text = st.ui:GetCustomStatic("hud_timer_text"):wnd()
+		timer_text:TextControl():SetTextST(st.string)
+	end
+end
+
+function parse_data(npc,s)
+	local t = {}
+
+		if s then
+		for name in string.gfind( s, "(%|*%d+%|[^%|]+)%p*" ) do
+			local dat = {	dist = nil,
+							state = nil}
+
+			local t_pos = string.find( name, "|", 1, true )
+
+			local dist = string.sub( name, 1, t_pos - 1 )
+			local state	= string.sub( name, t_pos + 1)
+
+
+			dat.dist = tonumber(dist)
+			if state then
+				dat.state = xr_logic.parse_condlist(npc, dist, state, state)
+			end
+			table.insert(t, dat)
+		end
+	end
+		return t
+end

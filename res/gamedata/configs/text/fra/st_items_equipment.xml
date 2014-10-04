@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_antirad">
+		<text>Mйdicament antiradiations</text>
+	</string>
+	<string id="st_antirad_descr">
+		<text>Le mйdicament antiradiation Mexaminum est assez courant dans la Zone. Il provoque la contraction des vaisseaux sanguins pйriphйriques et une privation d'oxygиne, ce qui permet de traiter et prйvenir les effets de l'exposition aux radiations. Aucun effet secondaire sйvиre. Peut dans certains cas provoquer nausйes, crampes et douleurs d'estomac.</text>
+	</string>
+	<string id="st_bandage">
+		<text>Pansement</text>
+	</string>
+	<string id="st_bandage_descr">
+		<text>Bandages йlastiques classiques permettant de limiter les saignements et d'empкcher l'infection des blessures. Appliquer le pansement directement sur les plaies. En cas d'atteinte artйrielle, faire pression sur la blessure а travers le bandage.</text>
+	</string>
+	<string id="st_binocular_descr">
+		<text>Jumelles militaires standard, avec zoom optique x7,5. Utiles pour observer les environs tout en restant а bonne distance.</text>
+	</string>
+	<string id="st_binocular_name">
+		<text>Jumelles</text>
+	</string>
+	<string id="st_bread">
+		<text>Pain</text>
+	</string>
+	<string id="st_bread_descr">
+		<text>Difficile de dire qui a rйussi а pйtrir ce pain dans la Zone, mais il n'est ni contaminй, ni radioactif, plutфt frais et tout а fait comestible. Aucun stalker ne s'en est plaint jusqu'ici.</text>
+	</string>
+	<string id="st_conserva">
+		<text>Dйlice du touriste</text>
+	</string>
+	<string id="st_conserva_descr">
+		<text>Nourriture en conserve provenant d'un entrepфt militaire pillй par les stalkers. Difficile de savoir ce que contiennent ces boоtes, mais ce doit encore кtre comestible, si l'on en croit la date d'expiration.</text>
+	</string>
+	<string id="st_detector1">
+		<text>Dйtecteur "Йcho"</text>
+	</string>
+	<string id="st_detector1_descr">
+		<text>Ce vieux dйtecteur d'activitй anormale йmet un signal sonore lorsque vous approchez d'une anomalie. Il signale йgalement la prйsence d'artefacts et indique la distance vous sйparant du plus proche par la frйquence de ses bips. Pour passer en mode Recherche d'artefacts, il suffit de soulever le couvercle. En raison de son caractиre quelque peu rustique, ce dйtecteur ne peut repйrer que les artefacts les plus courants.</text>
+	</string>
+	<string id="st_detector2">
+		<text>Dйtecteur "Ours"</text>
+	</string>
+	<string id="st_detector3">
+		<text>Dйtecteur "Veles"</text>
+	</string>
+	<string id="st_detector3_descr">
+		<text>Dйtecteur nouvelle gйnйration. Grвce а trois chambres de dйtection modernisйes, l'emplacement des artefacts s'affiche sur un йcran spйcialisй, ce qui permet de les localiser plus facilement. Lorsqu'il est fermй, le dйtecteur ne signale que les radiations et les anomalies. Pour passer en mode Recherche d'artefacts, il suffit d'ouvrir le couvercle frontal. Il peut alors repйrer tous les artefacts connus.</text>
+	</string>
+	<string id="st_detector4">
+		<text>Dйtecteur prototype "Svarog"</text>
+	</string>
+	<string id="st_detector4_descr">
+		<text>Dйtecteur expйrimental aux fonctionnalitйs perfectionnйes. Il est fourni avec une base de donnйes des zones statiques anormales, tout en restant capable de dйtecter les artefacts. La position des anomalies et des artefacts s'affiche sur un йcran spйcial. Le mode Recherche d'artefacts s'active en relevant le couvercle de l'йcran et permet de dйtecter tous les types de formations anormales, mкme celles inconnues а ce jour.</text>
+	</string>
+	<string id="st_device_torch_descr">
+		<text>Torche frontale standard. Utile pour les stalkers qui veulent voir oщ ils vont dans le noir, mais peut attirer l'attention.</text>
+	</string>
+	<string id="st_device_torch_name">
+		<text>Lampe de poche</text>
+	</string>
+	<string id="st_drug_anabiotic">
+		<text>Anabiotique</text>
+	</string>
+	<string id="st_drug_antidot">
+		<text>Antidote</text>
+	</string>
+	<string id="st_drug_antidot_descr">
+		<text>L'antitoxine IP2 est un mйdicament complexe composй de plusieurs antidotes, dont le metoclopramidum, la pyridoxine, la thiamine et la riboxine. L'injection de toute une gamme d'antibiotiques permet de neutraliser poisons et venins, naturels ou synthйtiques. L'IP2 n'est pas particuliиrement populaire dans la Zone car la majoritй des stalkers utilisent une combinaison et un masque а gaz. Cependant, certains prйfиrent en avoir toujours une dose sur eux. Ses effets sont de longue durйe.</text>
+	</string>
+	<string id="st_drug_booster">
+		<text>Hercule</text>
+	</string>
+	<string id="st_drug_coagulant">
+		<text>Vinca</text>
+	</string>
+	<string id="st_drug_coagulant_descr">
+		<text>Vikasolum ukrainien, йquivalent artificiel de la vitamine K. Ce mйdicament sert essentiellement а accйlйrer la coagulation. Trиs recherchй par les stalkers qui cherchent а soigner plus rapidement entailles et lacйrations. Ses effets sont de longue durйe.</text>
+	</string>
+	<string id="st_drug_psy_blockade">
+		<text>Psi-bloquant</text>
+	</string>
+	<string id="st_drug_psy_blockade_descr">
+		<text>Mйdicament empкchant l'emballement neuronal. Sa consommation induit une perte а court-terme des йmotions. Utilisй dans la Zone pour compenser les effets des champs psi. Ses effets sont de longue durйe.</text>
+	</string>
+	<string id="st_drug_radioprotector">
+		<text>Radioprotecteur</text>
+	</string>
+	<string id="st_energy_drink">
+		<text>Boisson йnergйtique</text>
+	</string>
+	<string id="st_energy_drink_descr">
+		<text>Souvent bue par les stalkers qui ne peuvent pas se payer le luxe de faire une pause. Contient une grande quantitй de glucides et stimule la production d'adrйnaline.</text>
+	</string>
+	<string id="st_guitar_descr">
+		<text>Une guitare qui a bien servi.</text>
+	</string>
+	<string id="st_guitar_name">
+		<text>Guitare</text>
+	</string>
+	<string id="st_kolbasa">
+		<text>Saucisse diйtйtique</text>
+	</string>
+	<string id="st_kolbasa_descr">
+		<text>Cette saucisse а base de poulet et de soja est souvent au menu des stalkers au petit-dйjeuner, au dйjeuner et au dоner... faute de mieux. Reste comestible trиs longtemps grвce а sa haute teneur en conservateurs.</text>
+	</string>
+	<string id="st_medkit">
+		<text>Mйdikit</text>
+	</string>
+	<string id="st_medkit_army">
+		<text>Mйdikit militaire</text>
+	</string>
+	<string id="st_medkit_army_descr">
+		<text>Mйdikit de premiers soins pour les blessures au combat. Contient des coagulants а base de menadione, des antalgiques, des antibiotiques et des immunostimulants, ainsi qu'un kit d'extraction de balles et autres fragments. Йquipement standard des forces armйes, souvent utilisй par les membres du Devoir.</text>
+	</string>
+	<string id="st_medkit_descr">
+		<text>Mйdikit de premiers soins standard. Permet de traiter toute une gamme de blessures : plaies, ecchymoses, brыlures classiques et chimiques, empoisonnements. Trиs demandй.</text>
+	</string>
+	<string id="st_medkit_science">
+		<text>Mйdikit scientifique</text>
+	</string>
+	<string id="st_medkit_science_descr">
+		<text>Mйdikit spйcialement conзu pour la Zone. Contient des produits permettant de traiter les blessures, mais aussi de ralentir et d'empкcher l'irradiation. Contient du vikasolum, du batilolum et de la naphazoline.</text>
+	</string>
+	<string id="st_pda_descr">
+		<text>Aucune donnйe.</text>
+	</string>
+	<string id="st_pda_name">
+		<text>PDA</text>
+	</string>
+	<string id="st_vodka">
+		<text>Vodka cosaque</text>
+	</string>
+	<string id="st_vodka_descr">
+		<text>Distillйe par GSC, cette vodka descend facilement et rйduit considйrablement les effets des radiations. А consommer avec modйration !</text>
+	</string>
+	<string id="st_detector2_descr">
+		<text>Ce dйtecteur d'activitй anormale de derniиre gйnйration dispose d'un йcran qui indique non seulement dans quelle direction, mais aussi а quelle distance se trouvent les artefacts. Pour passer en mode Recherche d'artefacts, il suffit de soulever le couvercle. Malheureusement, la liste des signatures d'artefacts en mйmoire est quelque peu datйe.</text>
+	</string>
+	<string id="st_drug_anabiotic_descr">
+		<text>Mйdicament expйrimental conзu par le professeur Ozersky pour les йquipes de recherche qui travaillent dans la Zone. C'est un dйrivй de tйtrodotoxine surnommй "Poudre а zombie" qui dйsactive complиtement le systиme nerveux central de faзon а permettre au sujet de survivre а des йmissions а dйcouvert. Aucun test officiel ou de terrain n'ayant йtй effectuй, l'efficacitй et les effets secondaires peuvent varier.</text>
+	</string>
+	<string id="st_bolt">
+		<text>Boulon</text>
+	</string>
+	<string id="st_drug_booster_descr">
+		<text>Le composant principal de ce produit est un stйroпde de synthиse trиs proche de la testostйrone. Souvent utilisй par les stalkers pour les opйrations de longue durйe, il rйduit la fatigue musculaire et augmente nettement la capacitй d'emport. Ses effets sont de longue durйe.</text>
+	</string>
+	<string id="st_drug_radioprotector_descr">
+		<text>Mйdicament antiradiations B190 Indraline, inclus dans les mйdikits du personnel des centrales nuclйaires. Trиs utilisй dans la Zone а la place de l'hydrochloride de cystйamine, dont la prise rйpйtйe peut кtre mortelle. Rйduit les effets des radiations gamma sur les tissus vivants. Comme ses effets ne sont pas instantanйs, il est conseillй de l'utiliser avant l'exposition. Ses effets sont de longue durйe.</text>
+	</string>
+	<string id="st_harmonica_name">
+		<text>Harmonica</text>
+	</string>
+	<string id="st_harmonica_descr">
+		<text>Pour le blues et les histoires d'amour en prison.</text>
+	</string>
+</string_table>

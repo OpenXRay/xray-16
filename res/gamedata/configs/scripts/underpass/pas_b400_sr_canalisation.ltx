@@ -1,0 +1,44 @@
+[logic]
+active = sr_idle@pas_b400_sr_canalisation_1
+
+[sr_idle@pas_b400_sr_canalisation_1]
+on_info = {-pas_b400_sr_canalisation_1 =actor_in_zone(pas_b400_sr_canalisation_1)} %+pas_b400_sr_canalisation_1%
+on_info2 = {=actor_in_zone(pas_b400_sr_canalisation_2) -pas_b400_canalisation_tushkano_start} %+pas_b400_canalisation_tushkano_start%
+on_info3 = {!squad_exist(pas_b400_canalisation_tushkano) !squad_exist(pas_b400_canalisation_snork_2)} sr_idle@pas_b400_sr_canalisation_2 %-pas_b400_sr_canalisation_1 +pas_b400_sr_canalisation_2%
+on_info4 = {-pas_b400_canalisation_zombied_3_attacked =actor_in_zone(pas_b400_sr_canalisation_3)} %+pas_b400_canalisation_zombied_3_attacked =heal_squad(pas_b400_stalkers_squad)%
+on_info5 = {-pas_b400_canalisation_zombied_5_attacked =actor_in_zone(pas_b400_sr_canalisation_5)} %+pas_b400_canalisation_zombied_5_attacked =heal_squad(pas_b400_stalkers_squad)%
+
+[sr_idle@pas_b400_sr_canalisation_2]
+on_info = {=actor_in_zone(pas_b400_sr_canalisation_3)} sr_idle@pas_b400_sr_canalisation_3 %-pas_b400_sr_canalisation_2 +pas_b400_sr_canalisation_3%
+on_info2 = {=actor_in_zone(pas_b400_sr_canalisation_4)} sr_idle@pas_b400_sr_canalisation_4 %-pas_b400_sr_canalisation_2 +pas_b400_sr_canalisation_4%
+on_info3 = {=actor_in_zone(pas_b400_sr_canalisation_5)} sr_idle@pas_b400_sr_canalisation_5 %-pas_b400_sr_canalisation_2 +pas_b400_sr_canalisation_5%
+on_info4 = {=actor_in_zone(pas_b400_sr_canalisation_6)} sr_idle@pas_b400_sr_canalisation_6 %-pas_b400_sr_canalisation_2 +pas_b400_sr_canalisation_6%
+on_info5 = {=actor_in_zone(pas_b400_sr_canalisation_7)} sr_idle@pas_b400_sr_canalisation_7 %-pas_b400_sr_canalisation_2 +pas_b400_sr_canalisation_7 =scenario_autosave(st_save_uni_travel_pas_to_pri)%
+
+[sr_idle@pas_b400_sr_canalisation_3]
+on_info = {=actor_in_zone(pas_b400_sr_canalisation_2) !actor_in_zone(pas_b400_sr_canalisation_3)} sr_idle@pas_b400_sr_canalisation_2 %-pas_b400_sr_canalisation_3 +pas_b400_sr_canalisation_2%
+on_info2 = {=actor_in_zone(pas_b400_sr_canalisation_4)} sr_idle@pas_b400_sr_canalisation_4 %-pas_b400_sr_canalisation_3 +pas_b400_sr_canalisation_4%
+on_info3 = {-pas_b400_canalisation_zombied_3_attacked} %+pas_b400_canalisation_zombied_3_attacked =heal_squad(pas_b400_stalkers_squad)%
+
+[sr_idle@pas_b400_sr_canalisation_4]
+on_info = {=actor_in_zone(pas_b400_sr_canalisation_3) !actor_in_zone(pas_b400_sr_canalisation_4)} sr_idle@pas_b400_sr_canalisation_3 %-pas_b400_sr_canalisation_4 +pas_b400_sr_canalisation_3%
+on_info2 = {=actor_in_zone(pas_b400_sr_canalisation_5)} sr_idle@pas_b400_sr_canalisation_5 %-pas_b400_sr_canalisation_4 +pas_b400_sr_canalisation_5%
+on_info3 = {-pas_b400_canalisation_zombied_5_attacked} %+pas_b400_canalisation_zombied_5_attacked =heal_squad(pas_b400_stalkers_squad)%
+
+[sr_idle@pas_b400_sr_canalisation_5]
+on_info = {=actor_in_zone(pas_b400_sr_canalisation_4) !actor_in_zone(pas_b400_sr_canalisation_5)} sr_idle@pas_b400_sr_canalisation_4 %-pas_b400_sr_canalisation_5 +pas_b400_sr_canalisation_4%
+on_info2 = {=actor_in_zone(pas_b400_sr_canalisation_6)} sr_idle@pas_b400_sr_canalisation_6 %-pas_b400_sr_canalisation_5 +pas_b400_sr_canalisation_6%
+on_info3 = {-pas_b400_sokolov_about_exit_1_can +pas_b400_zulus_about_exit_1} sr_idle@sokolov_talks
+
+[sr_idle@sokolov_talks]
+on_game_timer = 20 | sr_idle@pas_b400_sr_canalisation_5 %+pas_b400_sokolov_about_exit_1_can%
+
+[sr_idle@pas_b400_sr_canalisation_6]
+on_info = {=actor_in_zone(pas_b400_sr_canalisation_5) !actor_in_zone(pas_b400_sr_canalisation_6)} sr_idle@pas_b400_sr_canalisation_5 %-pas_b400_sr_canalisation_6 +pas_b400_sr_canalisation_5%
+on_info2 = {=actor_in_zone(pas_b400_sr_canalisation_7)} sr_idle@pas_b400_sr_canalisation_7 %-pas_b400_sr_canalisation_6 +pas_b400_sr_canalisation_7 =scenario_autosave(st_save_uni_travel_pas_to_pri)%
+
+[sr_idle@pas_b400_sr_canalisation_7]
+on_info = {=actor_in_zone(pas_b400_sr_canalisation_6) !actor_in_zone(pas_b400_sr_canalisation_7)} sr_idle@pas_b400_sr_canalisation_6 %-pas_b400_sr_canalisation_7 +pas_b400_sr_canalisation_6%
+on_info2 = {+pas_b400_canalisation_done} sr_idle@nil
+
+[sr_idle@nil]

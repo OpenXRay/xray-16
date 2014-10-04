@@ -1,0 +1,344 @@
+----------------------------------------------------------------------------------------------------
+-- Mob Camp
+----------------------------------------------------------------------------------------------------
+-- Разработчик: Jim
+----------------------------------------------------------------------------------------------------
+
+local STATE_CAMP					= 1
+local STATE_ALIFE					= 2
+local STATE_MOVE_HOME				= 3
+
+class "mob_camp"
+
+----------------------------------------------------------------------------------------------------
+-- CONSTRUCTION SCHEME
+----------------------------------------------------------------------------------------------------
+function mob_camp:__init(obj, storage)
+	self.object = obj
+	self.st		= storage
+end
+
+----------------------------------------------------------------------------------------------------
+-- RESET SCHEME
+----------------------------------------------------------------------------------------------------
+function mob_camp:reset_scheme()
+    printf("Camp: reset_scheme: %s", self.object:name())
+	xr_logic.mob_capture		(self.object, true)
+
+	mob_state_mgr.set_state		(self.object, db.actor, self.st.state)
+	
+	-- reset signals
+	self.st.signals				= {}
+	
+	-- initialize look point
+	self.look_path = patrol(self.st.look_point)
+	if not self.look_path then
+		_G.abort("object '%s': unable to find look_point '%s' on the map",
+			self.object:name(), self.st.look_point)
+	end
+
+	-- initialize home point
+	if self.st.home_point then
+		self.home_path = patrol(self.st.home_point)
+		if not self.home_path then
+			_G.abort("object '%s': unable to find home_point '%s' on the map",
+				self.object:name(), self.st.home_point)
+		end
+	else
+		self.home_path = nil
+	end
+
+	-- checkings
+	-- if there is home path and look path - point count must be equal
+	if self.home_path then
+		if (self.home_path:count() ~= self.look_path:count()) then
+			_G.abort("object '%s': you must setup home path points count must be equal to look path points count!", self.object:name())	
+		end
+	end
+
+	-- save position and node of object
+	self.camp_position		= vector():set(self.object:position())
+	self.camp_node			= self.object:level_vertex_id()
+
+	self.state_current		= STATE_CAMP
+	self.state_prev			= self.state_current
+	
+	-- select cur point
+	self.cur_point_index	= 0
+	self:select_current_home_point(true)
+	
+	self.time_point_changed = time_global()
+	
+	self.prev_enemy			= false
+	
+	-- check enemy transfering
+	if self.st.skip_transfer_enemy then
+		self.object:skip_transfer_enemy(true)
+	end
+end
+
+----------------------------------------------------------------------------------------------------
+-- UPDATE
+----------------------------------------------------------------------------------------------------
+
+function mob_camp:update(delta)
+	
+	if xr_logic.try_switch_to_another_section(self.object, self.st, db.actor) then
+		return
+	end
+
+	-- if dead then release
+	if not self.object:alive() then
+		xr_logic.mob_release(self.object)
+		return
+	end
+
+	-- update point changer
+	if (self.time_point_changed + self.st.time_change_point < time_global()) then
+		self:select_current_home_point(false)
+		self.time_point_changed = time_global()
+	end
+	
+	-- update fsm
+	self:select_state	()	
+	self:execute_state  ()	
+
+end
+
+----------------------------------------------------------------------------------------------------
+-- SERVICE FUNCTIONS
+----------------------------------------------------------------------------------------------------
+function mob_camp:select_current_home_point(first_call)
+	local prev_point_index = self.cur_point_index
+	
+	if self.home_path then
+		-- fill table of free points
+		local free_points	= {}
+		
+		if (db.camp_storage[self.st.home_point] == nil) then
+			db.camp_storage[self.st.home_point] = {}
+		end
+		
+		
+		for i = 1, self.home_path:count() do
+			if	(db.camp_storage[self.st.home_point][i] == nil) or 
+				(db.camp_storage[self.st.home_point][i] == false) then
+				table.insert(free_points, i)
+			end
+		end
+
+		if (#free_points < 1) then
+			if first_call == true then
+				_G.abort("Mob_Camp : too many campers for home path")
+			end
+		else 
+			local free_points_index = math.random(1, #free_points)
+			self.cur_point_index	= free_points[free_points_index]-1
+		end
+		
+		if not first_call then
+			if prev_point_index ~= self.cur_point_index then
+				db.camp_storage[self.st.home_point][prev_point_index+1] = false
+			end
+		end
+		db.camp_storage[self.st.home_point][self.cur_point_index+1]	= true
+	else 
+		self.cur_point_index	= math.random(0, self.look_path:count() - 1)
+	end
+end
+
+---------------------------------------------------------------------------------
+function mob_camp:select_state()
+	self.state_prev = self.state_current
+	
+	local home_position = self.camp_position
+	local home_node		= self.camp_node
+	
+	if self.home_path then
+		home_position	= self.home_path:point(self.cur_point_index)
+		home_node		= self.home_path:level_vertex_id(self.cur_point_index)
+	end
+	
+	-- if enemy
+	local enemy = self.object:get_enemy()
+	
+	-- if enemy just appeared - signal
+	if enemy ~= nil then
+		if not self.prev_enemy then
+			self.st.signals["enemy"] = true
+		end
+		self.prev_enemy = true
+	else 
+		self.prev_enemy = false
+	end
+	
+	
+	if enemy ~= nil then
+		local enemy_dist	= enemy:position():distance_to(home_position)
+		--local my_dist		= self.object:position():distance_to(home_position)
+		
+		if (self.state_prev == STATE_MOVE_HOME) and (enemy_dist > self.st.home_min_radius) then 
+		elseif (self.state_prev == STATE_ALIFE) and (enemy_dist > self.st.home_max_radius) then
+			self.state_current = STATE_MOVE_HOME
+		elseif (self.state_prev == STATE_CAMP) and (enemy_dist > self.st.home_min_radius) then
+		else 
+			self.state_current = STATE_ALIFE
+		end
+		
+	end
+	
+	-- select MOVE_HOME OR CAMP
+	if (enemy == nil) or ((enemy ~= nil) and (self.state_current ~= STATE_ALIFE) ) then
+		-- check if we go home
+		if  (home_position:distance_to(self.object:position()) > 1) and
+			(home_node ~= self.object:level_vertex_id()) then
+			self.state_current = STATE_MOVE_HOME
+		else 
+			-- we are on place - camp!
+			self.state_current = STATE_CAMP
+		end
+	end
+	
+	-- Отпускать в alife монстров, которых обстреляли
+	local h = self.object:get_monster_hit_info()
+	if (enemy == nil) and (h.who) and (h.time ~= 0) and (IsMonster(h.who) or IsStalker(h.who))then
+		local dist = self.object:position():distance_to(home_position)
+		if (dist < self.st.home_min_radius) then 
+			self.state_current = STATE_ALIFE
+		end
+	end
+	
+end
+
+----------------------------------
+-- EXECUTE_STATE
+function mob_camp:execute_state()
+	
+	-- DBG
+--	if (self.state_current ~= self.state_prev) then
+--		local str1 = ""
+--		local str2 = ""
+--		
+--		if self.state_current == STATE_CAMP then str1 = "STATE_CAMP" end
+--		if self.state_current == STATE_JUMP then str1 = "STATE_JUMP" end
+--		if self.state_current == STATE_ALIFE then str1 = "STATE_ALIFE" end
+--		if self.state_current == STATE_MOVE_HOME then str1 = "STATE_MOVE_HOME" end
+--		
+--		if self.state_prev == STATE_CAMP then str2 = "STATE_CAMP" end
+--		if self.state_prev == STATE_JUMP then str2 = "STATE_JUMP" end
+--		if self.state_prev == STATE_ALIFE then str2 = "STATE_ALIFE" end
+--		if self.state_prev == STATE_MOVE_HOME then str2 = "STATE_MOVE_HOME" end
+--		
+--		printf("~MOB_CAMP: From [%s] To [%s]", str2, str1)		
+--	end
+		
+	
+	if (self.state_current == STATE_ALIFE) and (self.state_prev == STATE_ALIFE) then
+		return
+	end
+	
+	if (self.state_current == STATE_ALIFE) and (self.state_prev ~= STATE_ALIFE) then
+		xr_logic.mob_release(self.object)
+		return
+	end
+
+	if (self.state_current ~= STATE_ALIFE) and (self.state_prev == STATE_ALIFE) then
+		xr_logic.mob_capture(self.object, true)
+	end
+	
+	
+	-- STATE_CAMP
+	if self.state_current == STATE_CAMP then
+		-- handle look point
+		if not self.object:action() then
+			action(	self.object, 
+					anim(anim.stand_idle),
+					look(look.point, self.look_path:point(self.cur_point_index)), 
+					cond(cond.look_end)
+			)
+		end
+	
+		return
+	end
+	
+	-- STATE_MOVE_HOME
+	if self.state_current == STATE_MOVE_HOME then
+		if not self.object:action() then
+
+			local home_position = self.camp_position
+			local home_node		= self.camp_node
+			
+			if self.home_path then
+				home_position	= self.home_path:point(self.cur_point_index)
+				home_node		= self.home_path:level_vertex_id(self.cur_point_index)
+			end
+			
+			action(	self.object, 
+					move(move.run_fwd, 
+					home_node, 
+					home_position),
+					cond(cond.move_end))
+		end
+		return
+	end
+
+end
+
+function mob_camp:deactivate()
+	if self.home_path then
+		db.camp_storage[self.st.home_point][self.cur_point_index+1] = false
+	end
+	self.object:skip_transfer_enemy(false)
+end
+
+function mob_camp:net_destroy()
+	if self.home_path then
+		db.camp_storage[self.st.home_point][self.cur_point_index+1] = false
+	end
+	self.object:skip_transfer_enemy(false)
+end
+
+----------------------------------------------------------------------------------------------------
+-- ADD_TO_BINDER
+----------------------------------------------------------------------------------------------------
+function add_to_binder(npc, ini, scheme, section, storage)
+	printf("DEBUG: add_to_binder: npc:name()='%s', scheme='%s', section='%s'", npc:name(), scheme, section)
+
+	local new_action = mob_camp(npc, storage)
+
+	-- Зарегистрировать все actions, в которых должен быть вызван метод reset_scheme при изменении настроек схемы:
+	xr_logic.subscribe_action_for_events(npc, storage, new_action)
+end
+
+----------------------------------------------------------------------------------------------------
+-- SET_SCHEME
+----------------------------------------------------------------------------------------------------
+function set_scheme(npc, ini, scheme, section, gulag_name)
+	local storage				= xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
+
+	storage.logic				= xr_logic.cfg_get_switch_conditions(ini, section, npc)
+	
+	storage.state				= mob_state_mgr.get_state(ini, section, npc)
+	
+	storage.look_point			= utils.cfg_get_string(ini, section, "path_look",			npc, false, gulag_name)
+	storage.home_point			= utils.cfg_get_string(ini, section, "path_home",			npc, false, gulag_name)
+	storage.time_change_point	= utils.cfg_get_number(ini, section, "time_change_point",	npc, false, 10000)
+	storage.home_min_radius		= utils.cfg_get_number(ini, section, "home_min_radius",		npc, false, 30)
+	storage.home_max_radius		= utils.cfg_get_number(ini, section, "home_max_radius",		npc, false, 40)
+	 
+	
+	-- check min and max radius
+	if	storage.home_min_radius > storage.home_max_radius then
+		_G.abort("Mob_Camp : Home Min Radius MUST be < Max Radius")
+	end 
+	
+	-- check if there is look point (must be!)
+	if (not storage.look_point) or (not patrol(storage.look_point)) then
+		_G.abort("Mob_Camp : object '%s': unable to find look_point '%s' on the map",
+					npc:name(), storage.look_point)
+	end
+
+	-- load transfer enemy flag ()
+	storage.skip_transfer_enemy = ini:line_exist( section, "skip_transfer_enemy")
+end
+

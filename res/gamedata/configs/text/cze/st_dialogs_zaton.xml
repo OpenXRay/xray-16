@@ -1,0 +1,3117 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="zat_a2_linker_b14_quest_done_0">
+		<text>V rэpacн stanici se nachбzel zvlбљtnн artefakt. Tady je.</text>
+	</string>
+	<string id="zat_a2_linker_b14_quest_done_1">
+		<text>Zajнmavй, poloartefakt... Tady jsou tvoje penнze. Za dobшe vykonanou prбci dobшe platнm... Zdб se, ћe ses toho dost nauиil. Aћ budeљ potшebovat prбci, pшijп za mnou. Иasto dostбvбm objednбvky na urиitй artefakty a odmмna je opravdu lбkavб.</text>
+	</string>
+	<string id="zat_a2_linker_b14_quest_init_0">
+		<text>Mбљ pro mм nмjakou prбci?</text>
+	</string>
+	<string id="zat_a2_linker_b14_quest_init_1">
+		<text>Nмco bych tady mмl... Stalkeшi minulou noc zpozorovali v rэpacн stanici zvlбљtnн druh zбшe... I na tuhle oblast byla moc divnб. Nechtмl by ses tam porozhlйdnout?</text>
+	</string>
+	<string id="zat_a2_linker_b14_quest_init_11">
+		<text>Urиitм.</text>
+	</string>
+	<string id="zat_a2_linker_b14_quest_init_111">
+		<text>Dбvej tam na sebe pozor. To mнsto je zamoшeno radiacн. Nezapomeт na svoje lйky, pozdмji mi za nм podмkujeљ.</text>
+	</string>
+	<string id="zat_a2_linker_b14_quest_init_12">
+		<text>Teп ne.</text>
+	</string>
+	<string id="zat_a2_linker_b14_quest_init_2">
+		<text>Veљkerй ъkoly, kterй jsem si na dneљnн den naplбnoval, jsem zvlбdl.</text>
+	</string>
+	<string id="zat_a2_linker_b14_quest_sell_artefact_0">
+		<text>Vezmi tento poloartefakt.</text>
+	</string>
+	<string id="zat_a2_linker_b14_quest_sell_artefact_1">
+		<text>Tady je tvoje odmмna. Za dobшe vykonanou prбci dobшe platнm... Zdб se, ћe ses toho dost nauиil. Aћ budeљ potшebovat prбci, pшijп za mnou. Иasto dostбvбm objednбvky na urиitй artefakty a odmмna je opravdu lбkavб.</text>
+	</string>
+	<string id="zat_a2_linker_b14_quest_strange_item_0">
+		<text>V rэpacн stanici jsem naљel zvlбљtnн artefakt. Chceљ se podнvat?</text>
+	</string>
+	<string id="zat_a2_linker_b14_quest_strange_item_1">
+		<text>Zajнmavй, poloartefakt... Dovol mi ulehиit ti od nмj. 3000 se mi zdб jako dobrб cena.</text>
+	</string>
+	<string id="zat_a2_linker_b14_quest_wrong_0">
+		<text>Vљiml jsem si, ћe ti nмkdo pшinesl artefakt, kterэ jsem naљel.</text>
+	</string>
+	<string id="zat_a2_linker_b14_quest_wrong_1">
+		<text>Promiт, ale do toho se nenechбm zatбhnout. Moje pravidla jsou jednoduchб – dodej zboћн a dostaneљ penнze. Dobшe vнљ, jak to v Zуnм funguje – mмj oиi otevшenй, jednej rychle a nevмш nikomu. Ale pokud hledбљ stбlou prбci, jsi na sprбvnйm mнstм. Иasto dostбvбm objednбvky na urиitй artefakty a odmмna je opravdu lбkavб.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_0">
+		<text>Kterй artefakty potшebujeљ?</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_11">
+		<text>Seћenu Gravi.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_112">
+		<text>Skvмlй! To byla rychlost! Tady mбљ svou odmмnu.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_12">
+		<text>Seћenu Oko.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_13">
+		<text>Seћenu Bublinu.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_14">
+		<text>Seћenu Skoшбpku.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_15">
+		<text>Seћenu Zlatou rybku.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_16">
+		<text>Seћenu Plamen.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_17">
+		<text>Seћenu Svмtluљku.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_18">
+		<text>Seћenu Vloиku.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_19">
+		<text>Mщћu ti prodat Gravi.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_2">
+		<text>Dмje se nмco divnйho. Chlapi pшijmou zakбzku a pak zmizн... Zaинnбm mнt problйmy, asi budu muset zavшнt krбm.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_20">
+		<text>Mщћu ti prodat Oko.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_21">
+		<text>Mщћu ti prodat Bublinu.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_22">
+		<text>Mщћu ti prodat Skoшбpku.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_23">
+		<text>Mщћu ti prodat Zlatou rybku.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_24">
+		<text>Mщћu ti prodat Plamen.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_25">
+		<text>Mщћu ti prodat Svмtluљku.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_26">
+		<text>Mщћu ti prodat Vloиku.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_27">
+		<text>Jasnм. Vrбtнm se o nмco pozdмji.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_3">
+		<text>Oba tэmy, kterй pro mм pracovaly, zmizely... Rozhodl jsem se, ћe od nynмjљka nebudu pшijнmat ћбdnй dalљн objednбvky.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_give_adv_task_0">
+		<text>Prбce je hotovб.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_give_adv_task_1">
+		<text>Skvмle! Tady mбљ svou odmмnu.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_give_adv_task_2">
+		<text>Tady mбљ. Nenн to mnoho, ale lepљн neћ nic.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_info_0">
+		<text>Шekni mi o objednбvkбch artefaktщ.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_about_sci_guards_0">
+		<text>Koho bych mohl najmout na ochranu vмdcщ?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_about_sci_guards_1">
+		<text>Moje chlapy – Spartaka a jeho tэm. Nмco uћ majн za sebou. Nмkteшн pшed pшнchodem do Zуny pracovali jako hlнdaиi a vмш tomu nebo ne, nмkteшн dokonce patшili ke speciбlnнm policejnнm ъtvarщm. Ti chlapi vн, jak se zachбzн se spouљtн... Pokud budou k dispozici, poskytnou ti dobrou ochranu.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_about_sci_guards_2">
+		<text>Jindy bych pro tebe  mмl jeden tip, ale vzhledem k poslednнm udбlostem... Spartakus a jeho tэmu uћ zkrбtka nenн, aќ odpoинvajн v pokoji.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_about_sci_helpers_0">
+		<text>Koho bych mohl najmout kvщli provedenн nмkolika mмшenн pro vмdce?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_about_sci_helpers_1">
+		<text>Znбљ Gontu a jeho chlapy? Mimo loveckou sezуnu jsou … ehm … jsou rбdi za jakoukoliv prбci. Zvlбљќ kdyћ kvщli nн nemusн stшнlet. Jejich myљlenн by se dalo popsat slovy "kdyћ cнtнm, ћe mм zaинnajн svrbмt prsty, jdu lovit.“</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_about_sci_helpers_2">
+		<text>V tomhle ti nepomщћu. Doporuиil bych ti Gontщv tэm, ale uћ dlouho jsem o nich neslyљel.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_0">
+		<text>Шekni mi, jak se tady ћije.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_1">
+		<text>To je na dlouho. Zkus se zeptat na nмco konkrйtnнho a moћnб ti na to odpovнm.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_1111">
+		<text>Co tady stalkeшi dмlajн?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_11111">
+		<text>Ptej se sбm sebe, kбmo. Vychбzejн ze Skadovsku, aby prozkoumali terйn, hledali artefakty a zastшнleli si na vљechno a na vљechny, kdo je pшi tom ruљн. Pшichбzejн zpбtky do Skadovsku, aby se opili a pobili... a odpoиinuli si pшed dalљнmi nбjezdy. Ale kdyћ se objevн emise, vљechno je jinak. Pak si vљichni spoleиnм sedneme a vzpomнnбme na ty, kteшн se nestihli ukrэt...</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_1112">
+		<text>Co ћene stalkery dovnitш Zуny?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_11121">
+		<text>Vtipnб otбzka. Nмkteшн se tam snaћili najнt dalљн Klondike artefaktщ. Nмkteшн byli pшivбbeni legendami o Oбze. Jinн hledali Plniи pшбnн. A pak tady mбme klasickй lidskй potшeby jako chamtivost a zvмdavost... Kaћdэ mб svщj dщvod. Jsem si jistэ, ћe ty taky...</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_1113">
+		<text>Jak to, ћe jsi zrovna tady?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_11131">
+		<text>Pшiљel jsem s Tetшevem, jakmile byl vypnut Vypalovaи. Ale tohle asi poslouchat nechceљ, ћe? Jedu hlavnм v artefaktech. Tretek uћ je venku dost a bohatљн zбkaznнci poћadujн vzбcnмjљн vмci. Proto jsem se rozhodl zakotvit v tбboшe stalkerщ, kde se dajн najнt opravdu cennй vмciиky. Hele, kdyћ se stalker vrбtн se svou koшistн, co opravdu potшebuje? Chladivэ kov v rukou a trochu toho lidskйho kontaktu. A to vљechno Skadovsk mщћe nabнdnout.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_1114">
+		<text>Co si myslнљ o banditech?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_11141">
+		<text>No, vмc se mб takhle. Na palubм Skadovsku proti nim nic nemбm, pokud se ovљem chovajн jako lidi. Nakonec, vмtљinou tady nepotkбvбљ ъplnй pitomce. Nмkteшн z nich jsou vlastnм bэvalн stalkeшi. Kdo vн, nмkteшн z tмch bнdбkщ se moћnб rozhodnou, ћe bude lepљн nechat svй kшivбckй prбce neћ chytnout kulku do hlavy... Ћivot je plnэ pшekvapenн.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_1115">
+		<text>Ne, v pohodм. Kaљli na to.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_11151">
+		<text>Kdyћ шнkбљ...</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_army_0">
+		<text>Шekni mi, objevila se tady armбda?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_army_1">
+		<text>Zamysli se. Co by mariтбci dмlali v naљem tбboшe? Vмш mi, kdyћ ti шeknu, ћe se tomuhle mнstu radљi vyhэbajн. Pшнliљ mnoho mнstnнch si jeљtм ћivм pamatuje, jak se v Kordonu plazili blбtem, zatнmco na nм vojбci pбlili ze svэch kulometщ...</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_about_compass_0">
+		<text>Povмz mi nмco o Kompasu.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_about_compass_1">
+		<text>Tenhle artefakt je opravdovб legenda. Шнkб se, ћe nemб ћбdnй љkodlivй vedlejљн ъиinky, a pokud ho umнљ vyuћнt, mщћe tм vyvйst z anomбlie. Teп ti je asi jasnй, proи o nмj zбkaznнci majн takovэ zбjem. Pшed pбr dny mi nмkdo шнkal, ћe Noe o tom nмco vн. Je to stalker, kterэ bydlн na jih odsud.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_about_compass_11">
+		<text>Dobrб, zajdu za Noem.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_about_compass_12">
+		<text>Budu nad tнm uvaћovat.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_about_compass_2">
+		<text>Legendбrnн artefakt, jak uћ jsem ti dшнv шekl. Шнkб se, ћe stalker zvanэ Noe by o nмm mohl nмco vмdмt. Bydlн jiћnм odsud.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_about_halfart_jup_b1_0">
+		<text>Nedaleko Janova jsem narazil na zvlбљtnн artefakt. Mбљ o nмj zбjem?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_about_halfart_jup_b1_1">
+		<text>Ukaћ to... Rozhodnм to je zajнmavб vмciиka, ale nemyslнm si, ћe bych to nмkomu prodal. Doporuиuju, abys zamншil zpбtky do Janova a ukбzal to vмdcщm. Tyhle divnй hovadiny jim dokбћou rozproudit krev v ћilбch.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_about_new_detector_0">
+		<text>Hejkal шнkб, ћe neplnнљ svou ибst dohody.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_about_new_detector_1">
+		<text>Mмli jsme naprosto jasnou dohodu: jб dostanu detektory, vyuћiju je pro mмшenн pole a on dostane ибst ziskщ. Uћ jsem mu zaplatil za dva detektory, takћe ty podmнnky dodrћuju. To je vљechno, co naљe dohoda s Hejkalem obsahuje. Pokud pro nмj pracujeљ, mщћeљ mu vzнt tшetн detektor – nekoupнm ho.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_about_new_detector_11">
+		<text>Takћe co bych mмl шнct Hejkalovi?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_about_new_detector_2">
+		<text>Budiћ.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_about_new_detector_3">
+		<text>Kdybych byl tebou, s Hejkalem bych nejednal. Pokud si chceљ sluљnм vydмlat, mщћu ti pro zaибtek dбt pбr rad ohlednм hledбnн artefaktщ. Dvм, tшi nebo иtyшi hodiny – dost na to, abys vмdмl vнc neћ ostatnн. A pokud budeљ mнt zбjem, mмl bych tady navнc jednu speciбlnн objednбvku. Co nejdшнv potшebuju sehnat artefakt jmйnem Kompas.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_compass_double_dialog_0">
+		<text>Sultбn dokбzal sebrat Kompas.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_compass_double_dialog_1">
+		<text>Ten hajzl se s tнm nepбrб... dobrб, nevadн. Zkus si zase promluvit s Noem. Zaинnб se mluvit o tom, ћe ta vмciиka by mohla bэt... uћiteиnб.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_compass_give_dialog_0">
+		<text>Naљel jsem Kompas. Tady je.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_compass_give_dialog_1">
+		<text>Kбmo, zachrбnil jsi mi ћivot! Koneиnм mбm tuhle ћбdanou vмciиku u sebe. Шнkб se, ћe Sultбn chtмl pшevzнt nadvlбdu nad mэm obchodem. Asi bude naљtvanэ, ale dobшe mu tak, zaslouћн si to. Tady mбљ – rozhodnм sis to zaslouћil.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_compass_revert_dialog_0">
+		<text>Odmнtбm pro tebe hledat Kompas.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_compass_revert_dialog_1">
+		<text>Љkoda. Jak chceљ.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_take_business_actor_dialog_0">
+		<text>Sultбn tм pozdravuje. Mimochodem, vљechny tvoje obchodnн zdroje byly odшнznuty.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_take_business_actor_dialog_1">
+		<text>Teп uћ je jasnй, kdo za tнm vљнm stojн... No, Skadovsk neopustнm. Takћe asi nemбm jinou moћnost neћ pracovat pro tebe a Sultбna. Dostane svou ибst ziskщ a ty si budeљ kaћdэ den chodit pro tu svou. Penнze tady budou иekat.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_take_money_actor_dialog_0">
+		<text>Dej mi mщj podнl.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_take_money_actor_dialog_1">
+		<text>Tady mбљ.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b30_take_money_actor_dialog_2">
+		<text>Jdeљ brzy. Jeљtм ћбdnй prachy nemбm.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b52_about_nimble_0">
+		<text>Myslнљ, ћe by Иipera mohl jet v kradenйm zboћн?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b52_about_nimble_1">
+		<text>O tom pochybuju... Podle toho, co o nмm vнm, tyhle иernй obchody nechбvб na ostatnнch. Poctivн obchodnнci si jeho jmйna a povмsti vбћн. Abych to shrnul, nikdy jsem neslyљel, ћe by o nмm nмkdo шekl nмco љpatnйho.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b52_about_snag_0">
+		<text>Hledбm Pahejla. Nevнљ, kde bych ho naљel?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b52_about_snag_1">
+		<text>Kdyћ jsem ho vidмl naposled, vychбzel z baru. Pokud si dobшe vzpomнnбm, v baru se bavil o tom, ћe pщjde k jeшбbщm v docнch. Tam by ses po nмm mohl podнvat.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b7_actor_start_0">
+		<text>Nмkdo se chystб okrбst skupinu stalkerщ. Vиetnм naљich chlapщ.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b7_actor_start_1">
+		<text>Pбni. Nestaин, ћe banditщ pшibэvб jako krбlнkщ, to se jeљtм budeme mlбtit mezi sebou?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b7_actor_start_11">
+		<text>Chtмli po mnм, abych v noci zaъtoиil na tбbor u Љevиenka.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b7_actor_start_111">
+		<text>Svinм... Vlastnм by bylo hezkй, kdybys jejich nabнdku pшijal. Vнљ, kam mншнm? Pak bych mohl шнct svэm chlapcщm, aby naљim hostщm pшichystali pшнjemnй pшivнtбnн.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b7_actor_start_1111">
+		<text>Souhlasнm.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b7_actor_start_11111">
+		<text>OK, zajdi za tмmi blbci a jб o tom zatнm шeknu chlapщm.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_b7_actor_start_1112">
+		<text>Promiт, jsi v tom sбm.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_oasis_art_sell_0">
+		<text>Mбm tady artefakt z Oбzy. Mбљ o nмj zбjem?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_oasis_art_sell_1">
+		<text>Srdce Oбzy? Ne, myslнm, ћe ti ho nechбm. Lidi шнkajн rщznй vмci... Mщћou to bэt jen povмry, ale radљi se od toho budu drћet dбl. Myslнm, ћe neudмlбљ chybu, kdyћ ho pшedбљ vмdcщm. Ti artefakt prostudujн a pomohou nбm pochopit, jak ovlivтuje lidi. </text>
+	</string>
+	<string id="zat_a2_stalker_barmen_start_dialog_11">
+		<text>Jsi tady novэ? To je v poшбdku, brzy zapadneљ... Vнљ, Zуna je tvrdэ uиitel. Jsem Fousби, mнstnн barman. Pokud budeљ mнt nмjakй otбzky, zastav se.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_start_dialog_21">
+		<text>Do toho.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_start_dialog_31">
+		<text>Co bys шekl na to, vydмlat si nмjakй penнze hledбnнm artefaktщ?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_start_dialog_32">
+		<text>Jak si stojн stav mй objednбvky? Pamatuj: rychlejљн stalker si vydмlб vнc...</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_start_dialog_33">
+		<text>Jdeљ pozdм, ten artefakt uћ mi nмkdo pшinesl. Ale pokud jsi ъkol dokonиil, poшбd ti za to zaplatнm. Jen ne tolik.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_start_dialog_41">
+		<text>Nмco se zrovna objevilo. Шнkб se, ћe banditi se chystajн nakoupit spoustu zbranн. Naљi chlapi je chtмjн sledovat a transakci pшekazit. Ocenili bychom jakoukoliv pomoc.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_start_dialog_51">
+		<text>Tak co?</text>
+	</string>
+	<string id="zat_b103_lost_merc_leader_b40_about_merc_camp_0">
+		<text>Co ћoldбci pohledбvajн v tovбrnм na zpracovбnн odpadu?</text>
+	</string>
+	<string id="zat_b103_lost_merc_leader_b40_about_merc_camp_1">
+		<text>Radљi se od toho mнsta drћ dбl. Nenн to tvoje starost.</text>
+	</string>
+	<string id="zat_b103_lost_merc_leader_bunker_guarding_0">
+		<text>Bavн tм pracovat pro vмdce?</text>
+	</string>
+	<string id="zat_b103_lost_merc_leader_bunker_guarding_1">
+		<text>Docela jo. Jsem rбd, ћe sis ze vљech lidн vybral nбs. Jsme ta nejlepљн moћnб ochrana, jakou vмdci mohli dostat.</text>
+	</string>
+	<string id="zat_b103_lost_merc_leader_come_with_me_0">
+		<text>Dбvбm dohromady tэm na cestu do Pripjati. Pшipojнљ se k nбm?</text>
+	</string>
+	<string id="zat_b103_lost_merc_leader_come_with_me_1">
+		<text>Ne. Musнm dбvat pozor na vмdce... Ale mщћeљ si promluvit se Sokolovem – myslнm, ћe do Pripjati chtмl jнt.</text>
+	</string>
+	<string id="zat_b103_lost_merc_leader_come_with_me_2">
+		<text>Ne. Musнm dбvat pozor na vмdce... Proto tady vlastnм jsme.</text>
+	</string>
+	<string id="zat_b103_lost_merc_leader_come_with_me_3">
+		<text>Ehm... Ne, moje mнsto je teп tady.</text>
+	</string>
+	<string id="zat_b103_lost_merc_leader_employ_stalkers_0">
+		<text>Chtмl bys pracovat pro vмdce?</text>
+	</string>
+	<string id="zat_b103_lost_merc_leader_employ_stalkers_1">
+		<text>To zбleћн... Co je to za prбci?</text>
+	</string>
+	<string id="zat_b103_lost_merc_leader_employ_stalkers_11">
+		<text>Hlнdбnн jejich bunkru.</text>
+	</string>
+	<string id="zat_b103_lost_merc_leader_employ_stalkers_111">
+		<text>Jasnм, a dнky za nabнdku.</text>
+	</string>
+	<string id="zat_b103_lost_merc_leader_employ_stalkers_12">
+		<text>Provбdмnн mмшenн v anomбliнch.</text>
+	</string>
+	<string id="zat_b103_lost_merc_leader_employ_stalkers_121">
+		<text>Tenhle typ prбce nenн nic pro nбs. Radљi se zeptej stalkerщ.</text>
+	</string>
+	<string id="zat_b103_lost_merc_leader_employ_stalkers_2">
+		<text>Poslouchej, stalkere. Uћ teп mм mщj prбzdnэ ћaludek ubнjн a tvoje remcбnн to jeљtм zhorљuje...</text>
+	</string>
+	<string id="zat_b103_merc_dialog_about_supplies_0">
+		<text>Mohl bych ti pшinйst nмco k jнdlu.</text>
+	</string>
+	<string id="zat_b103_merc_dialog_about_supplies_1">
+		<text>Hah! Dobrб, udмlej to. Maso v plechovce, klobбsy a chleba... Љest kusщ z kaћdйho. Pшines toho dost, protoћe jsme hladovн jako vlci.</text>
+	</string>
+	<string id="zat_b103_merc_dialog_about_toolkit_0">
+		<text>Slyљel jsem, ћe by tady mohlo bэt nмjakй nбшadн.</text>
+	</string>
+	<string id="zat_b103_merc_dialog_about_toolkit_1">
+		<text>Jak to mбm sakra vмdмt? Ale byl bych rбd, kdybys tady pшestal pobнhat jak splaљenэ. Uћ tak tady mбme tolik prбce, ћe nemбme koho poslat pro jнdlo.</text>
+	</string>
+	<string id="zat_b103_merc_dialog_about_toolkit_2">
+		<text>Jak to mбm sakra vмdмt? Ale klidnм se v tomhle harampбdн hrabej. Moћnб najdeљ, co potшebujeљ.</text>
+	</string>
+	<string id="zat_b103_merc_dialog_find_supplies_0">
+		<text>Tady je to jнdlo.</text>
+	</string>
+	<string id="zat_b103_merc_dialog_find_supplies_1">
+		<text>Wow, uћ jsem ztrбcel nadмji... Dнky. Teп si s chlapy udмlбme dobrэ obмd. Tak cos chtмl? Pohrabat se v harampбdн? Klidnм se do toho pusќ. Moћnб najdeљ, co potшebujeљ. Ale pшestaт tady mбvat tou svou pistolkou!</text>
+	</string>
+	<string id="zat_b103_merc_dialog_find_supplies_2">
+		<text>Wow, uћ jsem ztrбcel nadмji... Dнky. Teп si s chlapy udмlбme dobrэ obмd. Poslyљ, pokud si to tady chceљ prohlйdnout... Jen do toho. Ale pшestaт tady mбvat tou svou pistolkou.</text>
+	</string>
+	<string id="zat_b103_merc_dialog_start_11">
+		<text>Tady nejsi vнtбn. Tenhle tбbor patшн nбm a ty tady nemбљ co pohledбvat. Moji chlapi jsou i bez tebe aћ pшнliљ hladovн a nervуznн...</text>
+	</string>
+	<string id="zat_b103_merc_dialog_start_12">
+		<text>Vypadni, protoћe moji chlapi jsou tak hladovн, ћe uћ neovlбdajн prsty na spouљtнch.</text>
+	</string>
+	<string id="zat_b103_merc_dialog_start_21">
+		<text>Hele, stalkere... Jde o nмco dщleћitйho? Pokud ne, prбce mбm dost.</text>
+	</string>
+	<string id="zat_b106_hunt_himera_0">
+		<text>Jsem pшipraven na lov.</text>
+	</string>
+	<string id="zat_b106_hunt_himera_1">
+		<text>Dobrб. Jdeme.</text>
+	</string>
+	<string id="zat_b106_hunt_himera_11">
+		<text>Jdeme.</text>
+	</string>
+	<string id="zat_b106_hunt_himera_2">
+		<text>Jeљtм nenadeљel sprбvnэ иas. Vraќ se ve tшi rбno.</text>
+	</string>
+	<string id="zat_b106_hunt_himera_21">
+		<text>Aha.</text>
+	</string>
+	<string id="zat_b106_hunt_himera_3">
+		<text>My taky... Ale dнky tй emisi teп chimйra rozhodnм nebude spбt. Myslнm, ћe to musнme zkusit jindy.</text>
+	</string>
+	<string id="zat_b106_stalker_garmata_b106_after_hunt_11">
+		<text>Gonta je mrtvэ. Jak se to jen mohlo stбt... Nejdeљ nбhodou do Janova? Mмl by tam bэt Pastiиkбш, Gontщv pшнtel. Mohl bys mu vyшнdit, ћe chimйra je mrtvб? Jб teп asi pщjdu domщ.</text>
+	</string>
+	<string id="zat_b106_stalker_garmata_b106_after_hunt_111">
+		<text>Mмj se.</text>
+	</string>
+	<string id="zat_b106_stalker_garmata_b106_after_hunt_12">
+		<text>Vypadni odsud. Gonta zemшel i kvщli tobм... Co teп budeme dмlat?</text>
+	</string>
+	<string id="zat_b106_stalker_garmata_b106_after_hunt_121">
+		<text>Mмj se.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_himself_0">
+		<text>Шekni mi nмco o sobм.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_himself_1">
+		<text>Шнkajн mi Gonta a jsem velitel loveckйho tэmu. Likvidujeme mutanty za penнze. Mщћeme je chytat i ћivй, buп pro vмdeckй ъиely nebo pro lidi, kteшн si chtмjн poшнdit exotickйho mazlниka... jak шнkбval Pastiиkбш: "Kaћdб ћivб potvora si zaslouћн svou vlastnн kulku..."</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_mutants_0">
+		<text>Povмz mi nмco o lovenн mutantщ.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_mutants_1">
+		<text>Hele, nejsem nejzkuљenмjљнm lovcem, ale vнm toho docela dost o zvншatech pohybujнcнch se ve skupinбch. O flaksбch, kancнch, slepэch psech, pseudopsech, snorcнch, tarbнcнch... Dokonce vнm nмco mбlo i o upнrech.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_mutants_1111">
+		<text>Шekni mi o flaksбch a kancнch.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_mutants_11111">
+		<text>Dobrб. Flaksy jsou nejneљkodnмjљн ze vљech mutantщ. Snaћн se stalkerщm vyhэbat, ale pokud na nм zaъtoинљ, brбnн se. Pokud ale mezi flaksami pobнhб kanec, smrdн z toho prщser. Tшi metrбky vzteku nejsou nic, s инm by sis chtмl zahrбvat. Pokud na tebe zaъtoин, snaћ se uhnout... Vyuћij jejich setrvaиnosti. Takovб hromada masa asi nebude ћбdnб baletka, ћe? Uskoи do strany a pak tu potvoru zasypej sprљkou stшel.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_mutants_1112">
+		<text>Шekni mi nмco o slepэch psech a pseudopsech.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_mutants_11121">
+		<text>Samotnй psovitй љelmy nejsou tak nebezpeиnм, ale pokud jsou v tlupм, nenн to ћбdnб sranda. Ъtoин, jen pokud jsou hladovй... problйm je v tom, ћe jsou hladovй skoro poшбd. Pokud proti tobм stojн celб smeиka, zkus si s nimi poradit z nмjakйho vyvэљenйho mнsta, jinak tм prostм pшevбlcujou. Zvlбљќ pokud mezi nimi jsou dospмlн pseudopsi. Nejsou o moc nбsilnмjљн neћ slepн psi, ale jsou mnohem mazanмjљн a nebezpeиnмjљн... Pokud se ocitneљ uprostшed smeиky, pak si pamatuj, ћe na tebe ъtoин slepн psi. Pseudopes vмtљinou stojн stranou a ъtoин jen obиas... Snaћ se ho najнt, protoћe jakmile ho zabijeљ, slepн psi uteиou.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_mutants_1113">
+		<text>Шekni mi nмco o snorcнch.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_mutants_11131">
+		<text>Pozщstatky lidн... Samotбшskэ snork pro zkuљenйho lovce nepшedstavuje takovэ problйm. Poиkбљ, aћ na tebe skoин a ve vzduchu ho zasypeљ sprљkou stшel. Ale kdyћ jich je vнc... Jakmile uhэbбљ jejich skokщm, nezbэvб ti neћ do nich sypat jednu stшelu za druhou. Moc dobшe to vн a proto ъtoин spoleиnм.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_mutants_1114">
+		<text>Шekni mi o tarbнcнch.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_mutants_11141">
+		<text>Noиnн mщra kaћdйho lovce... To nejhorљн, co mщћeљ udмlat, je dбt na jejich velikost a podcenit je. Jsou neuvмшitelnм rychlн, pohotovн a vћdy se pohybujou ve skupinбch. Aћ ucнtнљ, jak do tebe bodajн desнtky malэch tesбkщ, je na иase pшestat je ignorovat a zaинt stшнlet... A to je prбvм problйm – zasбhnout je nenн jen tak. Proto vљem lovcщm radнm, aby u sebe poшбd mмli nabitou brokovnici.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_mutants_1115">
+		<text>Шekni mi nмco o upнrech.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_mutants_11151">
+		<text>Upншi jsou sami o sobм zkuљenэmi lovci v perfektnнm pшestrojenн. Kdyћ se maskujн, jsou skoro neviditelnн. Pokud chceљ ulovit upнra, musнљ ho pшekvapit. Lйpe ho spatшнљ, kdyћ se pohybuje... Pamatuj na to, ћe upнr se bude snaћit pшikrбst za tebe a omotat ti chapadla kolem krku. Fakt to nenн nic pшнjemnйho, chlape... Pokud budeљ mнt smщlu a vbмhneљ do skupinky upнrщ, dбvej si pozor na zбda.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_mutants_1116">
+		<text>OK, nech to bэt.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_soroka_actor_task_0">
+		<text>Pokud Strakбиe uvidнm, urиitм ti dбm vмdмt.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_soroka_actor_task_1">
+		<text>Postarбm se, aby to stбlo za to... Servu z nмj vљechnu kщћi.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_soroka_dialog_0">
+		<text>Co ti Strakби vlastnм provedl?</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_soroka_dialog_1">
+		<text>Jednou ke mnм pшiљel a шнkal, ћe kvщli kontrolorovi nemщћe zнskat svou koшist. Mйmu tэmu tenkrбt chybмl jeden chlap. Nбљ stopaш Danila byl pryи, protoћe se snaћil stopovat upнry aћ k jejich hnнzdu. Tak jsme se rozhodli, ћe Strakбиovi pomщћeme zнskat jeho koшist a vzali jsme ho na lov. Jeho jedinэm ъkolem bylo hlнdat v okolн doupмte, jestli se neobjevн chimйra...</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_soroka_dialog_11">
+		<text>A co se stalo?</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_about_soroka_dialog_111">
+		<text>Co se stalo? Ta svinм utekla se svou i s naљн koшistн. Kdyћ se chimйra objevila, nebylo to pшнjemnй pшekvapenн. Napшнklad Garmata vщbec nemмl иas zareagovat. Ale kdo by mмl? Mнsto toho, abych si dobшe zalovil, jsem jen brбnil svй chlapy. Nakonec jsem tu chimйru zranil, ale stejnм dokбzala dбt Rejpalovi sluљnou rбnu a vypaшila se. Ztratili jsme celэ tэden pшнprav.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_after_fight_11">
+		<text>Lov mбљ v krvi, chlape! Tady mбљ trofej, pшнmo ode mм... Jak Pastiиkбш шнkбval: "Tou hlavnн zbranн jsou naљe schopnosti..." Mimochodem, nechystбљ se do Janova? Bylo by dobrй vyшнdit Pastiиkбшi, ћe chimйra je mrtvб. Jб zatнm zщstanu tady ve Skadovsku a poиkбm, aћ se dб Rejpal do poшбdku. Jdeљ s nбmi?</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_after_fight_111">
+		<text>Jo. Jdeme.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_after_fight_112">
+		<text>Ne. Jeљtм se tady porozhlйdnu.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_after_fight_12">
+		<text>Dokбzali jsme to. Tady ode mм mбљ takovou malou trofej... Mohlo to probмhnout trochu klidnмji, ale na tom uћ nezбleћн. Jak шнkбval Pastiиkбш: "Kdo potшebuje pasti, kdyћ mб zkuљenosti?..."  Mimochodem, nechystбљ se do Janova? Bylo by dobrй vyшнdit Pastiиkбшi, ћe chimйra je mrtvб. Jб zatнm zщstanu tady ve Skadovsku a poиkбm, aћ se dб Rejpal do poшбdku. Jdeљ s nбmi?</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_after_fight_13">
+		<text>Garmata je po smrti... Ta chimйra nбs vyљla draho. Nemншнљ nбhodou do Janova? Bylo by dobrй vyшнdit Pastiиkбшi, ћe chimйra je mrtvб. Jб zatнm zщstanu tady ve Skadovsku a poиkбm, aћ se dб Rejpal do poшбdku. Jdeљ taky?</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_b22_about_stalker_vampire_0">
+		<text>Naљel jsem Danilu. Je mrtvэ. Zabil ho Straљбk.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_b22_about_stalker_vampire_1">
+		<text>To ne! Proи vћdycky odchбzejн ti nejlepљн z nбs? Ten hajzl Straљбk! Zabнt Danilu... Byl to skvмlэ иlovмk!</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_b52_about_nimble_0">
+		<text>Myslнљ, ћe by Иipera mohl jet v kradenйm zboћн?</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_b52_about_nimble_1">
+		<text>Kradenй zboћн? Jak jsi na nмco takovйho pшiљel? Иiperu znбm uћ dlouho, pravidelnм u nмj objednбvбm zbranм. Skvмlй zboћн za dobrй ceny. Tohle slyљнm poprvй. Шekl bych, ћe mб novй protivnнky, kteшн uћ jsou tak zoufalн, ћe rozљiшujou tyhle povмsti...</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_come_with_me_0">
+		<text>Dбvбm dohromady tэm na cestu do Pripjati. Pшipojнљ se k nбm?</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_come_with_me_1">
+		<text>Mбm s vмdci dohodu, kterou musнm dodrћet. Navнc se na takovou cestu necнtнm. Mмl by sis promluvit se Sokolovem. Poшбd mi pшipomнnб, jak moc se potшebuje dostat do Pripjati, ale samotnэ se bojн. Skuteиnэ vojбk, tenhle chlap.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_come_with_me_2">
+		<text>Mбm s vмdci dohodu, kterou musнm dodrћet. Navнc se na takovou cestu necнtнm. Sorry, chlape.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_come_with_me_3">
+		<text>Ne, necнtнm se na to. Инhб tam smrt. Sбm dobшe vнљ, ћe se v tмch konиinбch prohбnн spousta mutantщ – dost na to, aby ukonиili ћivot nejednoho zkuљenйho lovce.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_employ_stalkers_0">
+		<text>Chtмl bys pracovat pro vмdce?</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_employ_stalkers_1">
+		<text>Co je to za prбci?</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_employ_stalkers_11">
+		<text>Hlнdat jejich bunkr.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_employ_stalkers_111">
+		<text>Ne, dнky. Jsem lovec, zabэvбm se mutantama. A mutanti bunkr neohroћujou. Jo, lidi, to je nмco jinэho.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_employ_stalkers_12">
+		<text>Provйst mмшenн v anomбliнch.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_employ_stalkers_121">
+		<text>Proи ne? To zvlбdnem. Oficiбlnм vyhlaљuju konec loveckэ sezуny! Bude to fajn zmмna oproti rutinм, vљak vнљ, ty nervy, kterэ chytнљ, vћdycky kdyћ tam vyrazнљ...</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_employ_stalkers_2">
+		<text>Ne, teп prбvм ne. Jde o lov, chбpeљ. Musнm si to nejdшнv vyшнdit s tou chimйrou. Nemщћeme nechat krveћнznivou bestii pobнhat po Zуnм a ћrбt stalkery hlava nehlava, noha nenoha.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_employ_stalkers_3">
+		<text>Teп prбvм chci chytnout Strakбиe hezky pod krkem. A pak budu naprosto klidnej a budu s tebou moct probrat prбci.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_employ_stalkers_4">
+		<text>Pozdмjc. Uћ teп toho mбme na talншi aћ moc. Potшebujeme oddмlat chimйru a vystopovat Strakбиe. Na jinэ kљefty nenн иas.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_info_about_soroka_0">
+		<text>Naљel jsem Strakбиe. Je v Janovskй stanici, шнkб si 'Pazourek'.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_info_about_soroka_1">
+		<text>Ten zkurvysyn jeљtм ћije? No, dlouho mu to nevydrћн... vezmi si tohle, dнky za tip. Uћ se nemщћu doиkat, aћ si s tнm hajzlem popovнdбm. Takћe Pazourek, jo...</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_info_about_soroka_11">
+		<text>Jo. Dнky.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_info_about_soroka_start_11">
+		<text>Vole, nevidмls nбhodou nмkde chlбpka jmйnem Strakби? Neznбљ ho? Ne... No kdybys na toho љmejda nмkde narazil, udмlej mi radost a provмtrej mu palici dбvkou. Nebo mi шekni, kde ho najdu, a jб se postarбm, abys nelitoval.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_start_11">
+		<text>No nazdбrek.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_start_12">
+		<text>Poиkej! Vystopovali jsme chimйru, takћe nemщћeme ztrбcet иas. Rejpal je furt mimo, Danila se jeљtм nevrбtil a honit tu bestii jen ve dvou by byla pмknб blbost. Potшebujeme tшetнho. Ty seљ celkem schopnej. Naљels Strakбиe. Co kdybys љel s nбma ulovit tu zasranou chimйru?</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_start_13">
+		<text>Poиkej! Vystopovali jsme chimйru, takћe nemщћeme ztrбcet иas. Rejpal je furt mimo, a Danila... honit tu bestii jen ve dvou by byla pмknб blbost. Potшebujeme tшetнho. Ty vypadбљ celkem schopnм. Co kdybys љel s nбma ulovit tu zasranou chimйru?</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_start_131">
+		<text>S potмљenнm.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_start_1311">
+		<text>Jak шнkal Pastiиkбш: "Kdyћ jdeљ na lov, lovenн je jen pщlka prбce..." Hele, poslouchej: po noиnнm lovu se chimйra vracн do svэho hnнzda nмkdy nad rбnem. Kdyћ uћ je venku skoro svмtlo. A v tu chvнli na ni udeшнme... Aћ budeљ pшipravenej, stav se tady ve tшi rбno a pщjdeme na to. Poиkбme na tebe v baru.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_start_132">
+		<text>Promyslнm si to.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_start_1321">
+		<text>No, aћ se rozmyslнљ, stav se v baru kolem tшetн rбno. Nмkdy tou dobou se chimйra plazн zpбtky do nory, vychrбpat se.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_start_14">
+		<text>Nazdar. Jak se vede? Vypadбљ odpoиatм.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_start_15">
+		<text>Pohoda. Svмt je malej, co?</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_start_16">
+		<text>Takћe? Je prбvм tak иas jнt odstшelit nмjakou chimйru...</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_start_17">
+		<text>Jseљ pшed lovem nervуznн?</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_trapper_send_0">
+		<text>Pastiиkбш mм poћбdal, abych vбm pomohl ulovit chimйru.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_trapper_send_1">
+		<text>Aha, furt se na to necejtн. No jde o to, ћe jsme tu blbou chimйru koneиnм vystopovali. Naneљtмstн je Rejpal furt mimo a Danila se taky jeљtм nevrбtil... takћe budem jen tшi. Ale pokud tм Pastiиkбш vybral, musнљ bejt dobrej lovec. Hele, chimйra pшes noc lovн a nad rбnem, tak kolem tшetн rбno, se vracн do svэho hnнzda. To uћ je venku skoro svмtlo. A v tu chvнli na ni vlнtnem. Aћ budeљ pшipravenej, stav se tady kolem tшetн rбno a pщjdeme do toho. Budeme v baru.</text>
+	</string>
+	<string id="zat_b14_stalker_at_bar_start_0">
+		<text>Snaћнљ se ze mм udмlat blbce?</text>
+	</string>
+	<string id="zat_b14_stalker_at_bar_start_1">
+		<text>To uћ jseљ. A blbce je tшeba pouиit.</text>
+	</string>
+	<string id="zat_b14_stalker_at_bar_start_11">
+		<text>Na tom nezбleћн. Svмt je malej a Zуna je jeљtм menљн. Jeљtм se potkбme.</text>
+	</string>
+	<string id="zat_b14_stalker_at_bar_start_111">
+		<text>Bмћ... vypadni odsud. Ve Skadovsku nejsou bitky povolenэ.</text>
+	</string>
+	<string id="zat_b14_stalker_at_bar_start_1111">
+		<text>Jo, jasnм.</text>
+	</string>
+	<string id="zat_b14_stalker_at_bar_start_12">
+		<text>Uznбvбm, udмlal jsem chybu. Ale ty jsi poruљil pravidla.</text>
+	</string>
+	<string id="zat_b14_stalker_at_bar_start_121">
+		<text>Jo, to je prostм Zуna. Tak dobшe, dost kecщ.</text>
+	</string>
+	<string id="zat_b14_stalker_at_bar_start_13">
+		<text>Asi je to fakt debil, kdyћ si nechal artefakt uniknout.</text>
+	</string>
+	<string id="zat_b14_stalker_at_bar_start_131">
+		<text>Fajn, hlavnм nezaиni bulit. Chybama se иlovмk uин. Aќ si to zapamatujeљ, dej si na mnм pivo, to tм rozveselн.</text>
+	</string>
+	<string id="zat_b14_stalker_at_bar_start_1311">
+		<text>Vezmu si, co dostanu.</text>
+	</string>
+	<string id="zat_b14_stalker_at_bar_start_1312">
+		<text>Ne, dнk, pitн si platнm sбm.</text>
+	</string>
+	<string id="zat_b14_stalker_robbery_0">
+		<text>Co si myslнљ, ћe jseљ? Zavшi hubu a ani se nehni! A naval artefakt, debile!</text>
+	</string>
+	<string id="zat_b14_stalker_robbery_1">
+		<text>Kretйne. Nech si ten artefakt... doufбm, ћe se s nнm udбvнљ.</text>
+	</string>
+	<string id="zat_b14_stalker_robbery_2">
+		<text>Jdi do hajzlu.</text>
+	</string>
+	<string id="zat_b14_stalker_start_0">
+		<text>Brбcho! Poslouchej, existuje jeden artefakt, co mб lйиivou moc... a jб ho fakt nutnм potшebuju. Jeden mщj kбmoљ asi brzo zdechne na тбkou divnou nemoc, naљe lйky vщbec nefungujou... snaћil jsem se ten artefakt sebrat, ale spadnul jsem do plynovэ anomбlie. Nenarazil jsi na nмj nбhodou, na ten artefakt?</text>
+	</string>
+	<string id="zat_b14_stalker_start_1">
+		<text>Kdyћ jde o tolik, tak tady mбљ.</text>
+	</string>
+	<string id="zat_b14_stalker_start_11">
+		<text>Dнky, brбcho! Nezapomenu na to.</text>
+	</string>
+	<string id="zat_b14_stalker_start_111">
+		<text>Opatruj se.</text>
+	</string>
+	<string id="zat_b14_stalker_start_2">
+		<text>Jeden mбm. Ale potшebuju ho pro sebe.</text>
+	</string>
+	<string id="zat_b14_stalker_start_21">
+		<text>Ale no tak! Mщj kбmoљ... on fakt umнrб!</text>
+	</string>
+	<string id="zat_b14_stalker_start_211">
+		<text>V Zуnм jede kaћdej sбm za sebe. Dбvej na sebe bacha.</text>
+	</string>
+	<string id="zat_b14_stalker_start_3">
+		<text>Ne, nevidмl jsem ho. Dбvej na sebe bacha.</text>
+	</string>
+	<string id="zat_b14_stalker_start_last_chance_0">
+		<text>Ten artefakt ti nakonec vщbec nepomщћe. Pamatuj na mэ slova.</text>
+	</string>
+	<string id="zat_b14_stalker_start_last_chance_1">
+		<text>Kdyћ ho potшebujeљ tak nutnм, tak na, tady mбљ.</text>
+	</string>
+	<string id="zat_b14_stalker_start_last_chance_11">
+		<text>Dнky, brбcho! Nezapomenu ti to.</text>
+	</string>
+	<string id="zat_b14_stalker_start_last_chance_111">
+		<text>Dбvej na sebe bacha.</text>
+	</string>
+	<string id="zat_b14_stalker_start_last_chance_2">
+		<text>Uvidнme.</text>
+	</string>
+	<string id="zat_b14_stalker_start_last_chance_end_0">
+		<text>Nemбm s tebou o иem mluvit.</text>
+	</string>
+	<string id="zat_b18_noah_arc_0">
+		<text>Proи ћijeљ v tэ popelnici?</text>
+	</string>
+	<string id="zat_b18_noah_arc_1">
+		<text>Je to archa! Pamatuj na to... pamatuj, pokud chceљ ћнt! Kdyћ zaиne Vlna, drћ se poblнћ. Tady mбљ љanci pшeћнt. Ћбdnej mutant se sem nikdy nedostane.</text>
+	</string>
+	<string id="zat_b18_noah_catastrophe_0">
+		<text>Шнkals nмco o Vlnм...</text>
+	</string>
+	<string id="zat_b18_noah_catastrophe_1">
+		<text>Jo, vlna mutantщ, kterб vљechny pozabнjн nebo vyћene ze Zуny! A pokud by nбhodou nмjakej chudбk pшece jen pшeћil, sundб ho obrovskб emise!!! Zlikviduje to vљechno ћivэ v Zуnм! Kromм tмch, co jsou pшipravenэ.</text>
+	</string>
+	<string id="zat_b18_noah_dog_0">
+		<text>Kde jsi sehnal toho psa?</text>
+	</string>
+	<string id="zat_b18_noah_dog_1">
+		<text>To je Lassie. Roztomilб malб иubka... nebэt jн, uћ by mм dбvno ve spбnku nмco seћralo. Zatracenн mutanti... nenбvidнm je! Jakmile zavшeљ oиi, zaиnou kolem иmuchat, љkrбbat tмma svэma hnusnэma drбpama, cvakat tesбkama, љustit chapadlama....</text>
+	</string>
+	<string id="zat_b18_noah_first_artefact_0">
+		<text>Potшebuju artefakt Kompas. Nevнљ, kde bych ho mohl sehnat?</text>
+	</string>
+	<string id="zat_b18_noah_first_artefact_1">
+		<text>Ten nesmysl tм nezachrбnн, aћ z lesa vybмhnou mutanti! Na, vem si tohle a vypadni.</text>
+	</string>
+	<string id="zat_b18_noah_first_artefact_11">
+		<text>Dнky.</text>
+	</string>
+	<string id="zat_b18_noah_plateau_way_0">
+		<text>Nevнљ nмco o zшнzenйm vrtulnнku?</text>
+	</string>
+	<string id="zat_b18_noah_plateau_way_1">
+		<text>O jednom nмco vнm... vнm, ћe je na nбhornн ploљinм a vљude kolem nмj je plno snorkщ. Kaћdejch pбr dnщ si na nм jdu zastшнlet... proи se na mм tak divnм koukбљ? Celэ hnнzdo na jeden zбtah nevyhubнљ.</text>
+	</string>
+	<string id="zat_b18_noah_plateau_way_11">
+		<text>Jak se mщћu dostat na tu nбhornн ploљinu?</text>
+	</string>
+	<string id="zat_b18_noah_plateau_way_111">
+		<text>Chceљ si taky odprбsknout pбr snorkщ, co? No... mщћu tм tam zavнst.</text>
+	</string>
+	<string id="zat_b18_noah_plateau_way_1111">
+		<text>Tak pщjdeme.</text>
+	</string>
+	<string id="zat_b18_noah_plateau_way_1112">
+		<text>Nмkdy jindy.</text>
+	</string>
+	<string id="zat_b18_noah_plateau_way_1121">
+		<text>Stalker.</text>
+	</string>
+	<string id="zat_b18_noah_plateau_way_11211">
+		<text>Aha. O co ti jde?</text>
+	</string>
+	<string id="zat_b18_noah_plateau_way_1122">
+		<text>Po tom ti nic nenн.</text>
+	</string>
+	<string id="zat_b18_noah_plateau_way_113">
+		<text>Zavedu tм tam. Zatнm zщstaт tady. Bude emise. Chбpeљ? Emise!!!</text>
+	</string>
+	<string id="zat_b18_noah_plateau_way_12">
+		<text>V tom hnнzdм jsem byl.</text>
+	</string>
+	<string id="zat_b18_noah_plateau_way_121">
+		<text>Jo? Na tom nesejde... mutantщ je furt инm dбl vнc. A jednoho dne zaъtoиej! Jejich vlna oиistн Zуnu od vљech, co nebudou pшipravenэ!</text>
+	</string>
+	<string id="zat_b18_noah_second_artefact_0">
+		<text>Hele, nemбљ u sebe nбhodou Kompas?</text>
+	</string>
+	<string id="zat_b18_noah_second_artefact_1">
+		<text>Myslнљ, ћe tм to pшed emisн ochrбnн? Pche... na, ber a vypadni!</text>
+	</string>
+	<string id="zat_b18_noah_second_artefact_11">
+		<text>Dмkuju.</text>
+	</string>
+	<string id="zat_b18_noah_start_11">
+		<text>Co jseљ zaи?</text>
+	</string>
+	<string id="zat_b18_noah_start_111">
+		<text>Stalker. Uћ jsme se jednou setkali.</text>
+	</string>
+	<string id="zat_b18_noah_start_1111">
+		<text>Nepamatuju si to. No jo, co potшebujeљ?</text>
+	</string>
+	<string id="zat_b18_noah_start_112">
+		<text>Stalker. Prostм stalker.</text>
+	</string>
+	<string id="zat_b18_noah_start_1121">
+		<text>Aha. Hledбљ ъtoиiљtм v Arљe? Jako doma, jako doma.</text>
+	</string>
+	<string id="zat_b18_noah_start_113">
+		<text>Po tom ti nic nenн.</text>
+	</string>
+	<string id="zat_b18_noah_start_21">
+		<text>Aha, to jseљ ty. Co chceљ?</text>
+	</string>
+	<string id="zat_b18_noah_third_artefact_0">
+		<text>Nemбљ u sebe nбhodou jeden Kompas navнc?</text>
+	</string>
+	<string id="zat_b215_stalker_guide_about_anomalies_0">
+		<text>Шekni mi nмco o anomбliнch.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_about_anomalies_1">
+		<text>Kdyћ se dostaneљ k anomбlii, musнљ pamatovat na to, ћe buп bude hodnм ћhavб, nebo bude luft plnej toxickэho svinstva, nebo straљnм silnэ radiace. Taky tam mщћou bэt psionickэ vlny, ale o tмch teпka mluvit nebudu. Prostм zбleћн na tom, jakб je to anomбlie... jestli ћбr, plyn nebo elektшina... nebo gravitace, ale doufej, ћe na ty zatнm nenarazнљ. Taky existujou pohyblivэ anomбlie, ale to je zas nмco ъplnм jinэho.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_about_anomalies_1111">
+		<text>Шekni mi nмco o ћбrovэch anomбliнch.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_about_anomalies_11111">
+		<text>Pokud uvidнљ takovэ divnэ chvмnн jako vzduch, kterej se tшepe nad rozpбlenэm chodnнkem, tak to bude ћбrovб anomбlie. Kdyћ se do nн nмco dostane, tak z nн vyљlehne extrйmnм horkej plamen. Lidi si nejdшнv mysleli, ћe to vyvмrб metan nebo tak nмco, ale иasem pochopili, ћe to tak asi nenн.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_about_anomalies_1112">
+		<text>Шekni mi nмco o plynovэch anomбliнch.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_about_anomalies_11121">
+		<text>Tмmhle se tak шнkб, protoћe v nich furt probнhajн divnэ chemickэ procesy. Vytvбшej kyselinu, kterб tм bмhem pбr sekund proћere skrz naskrz, a taky toxickэ plyny, kterэ ti vypбlej plнce jeљtм rychlejc. Naљtмstн se dajн venku plynovэ anomбlie snadno poznat. Ale kdyћ do nмjakэ vlezeљ v temnэm tunelu, je to hodnм blbэ.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_about_anomalies_1113">
+		<text>Шekni mi nмco o elektrickэch anomбliнch.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_about_anomalies_11131">
+		<text>To jsou fakt zajнmavэ anomбlie, kterэ v sobм akumulujou velkej nбboj statickэ elektшiny. Stalkeшi vмtљinou vyuћнvajн to, ћe se tyhle anomбlie dajн vybнt nминm kovovэm. Hodнљ tam љroub a rychle probмhneљ, neћ se staин zase nabнt. Jб je teda radљi obchбzнm, na mщj vkus se dobнjej aћ moc rychle.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_about_anomalies_1114">
+		<text>Шekni mi nмco o gravitaиnнch anomбliнch.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_about_anomalies_11141">
+		<text>Ty se vмtљinou nehejbou. Kdyћ se podнvбљ na nмjakэ mнsto a vљimneљ si, ћe vмci za nнm jsou nмjak pokroucenэ, to je gravitaиnн anomбlie. A radљi se k nн nepшibliћuj. Vљechny tшi znбmэ varianty reagujou okamћitм, jakmile se jich nмco dotkne. Trampolнna odhodн vљechno, co je poblнћ, na velkэ vzdбlenosti. Vortex udмlб pшesnej opak, nasaje vмci do sebe, rozdrtн je brutбlnнm tlakem a pak kousky rozhodн kolem. Vнr zvedne obмќ do vzduchu, roztoин ji a rozerve na kusy... fakt nepшнjemnej konec.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_about_anomalies_1115">
+		<text>Шekni mi nмco o pohyblivэch anomбliнch.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_about_anomalies_11151">
+		<text>Osobnм jsem narazil akorбt na Kometu a Teslu. Kometa je ohnivб koule, asi metr v prщmмru. Ale mщћeљ si bejt jistej, ћe horko ucнtнљ na vмtљн vzdбlenost. To druhэ se dб jen tмћko popsat, nejpшesnмjљн je asi nмco jako kulovej blesk. Je to kulatэ a je to elektrickэ, nic moc vнc se o tom nevн. Obм tyhle anomбlie se furt pohybujou, vмtљinou na uzavшenэ trase. Opatrnej stalker by je mмl dokбzat snadno obejнt... ale nesmнљ ztratit soustшedмnн.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_about_anomalies_1116">
+		<text>Fajn, tak jo.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_about_himself_0">
+		<text>Шekni mi nмco o sobм.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_about_himself_1">
+		<text>Neшнkaj mi Navigбtor jen tak. Pouћнvбm jen bezpeиnэ trasy. Nemбm nervy na sbнrбnн artefaktщ nebo bitky s banditama, takћe... kaћdej by mмl pouћнvat svщj talent a poskytovat ho ostatnнm. A samozшejmм ћe kaћdej talent mб svou cenu. </text>
+	</string>
+	<string id="zat_b215_stalker_guide_about_surge_0">
+		<text>Шekni mi nмco o emisнch.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_maps_0">
+		<text>Mбm nмjakэ mapy oblasti mezi Zatonem a Jupiterem. Chceљ se kouknout?</text>
+	</string>
+	<string id="zat_b215_stalker_guide_maps_1">
+		<text>Ukaћ... dobrэ, spousta detailщ. V naљem byznysu jsou detaily rozdнl mezi ћivotem a smrtн. Jo! Tyhle mapy ukazujou bezpeиnou cestu pшнmo mezi Skadovskem a Janovem. Zkopнruju si to do PDA, pokud ti to nevadн. A odteп mбљ u mм slevu.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_start_11">
+		<text>Moћnб potшebujeљ prщvodce? Kterej by ti ukбzal cestu kolem anomбliн, udrћel tм v bezpeин pшed emisema? Navigбtor, k tvejm sluћbбm.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_start_21">
+		<text>Potшebujeљ prщvodce?</text>
+	</string>
+	<string id="zat_b215_stalker_guide_start_31">
+		<text>Rбd tм vidнm. Co pro tebe mщћe Navigбtor udмlat?</text>
+	</string>
+	<string id="zat_b215_stalker_guide_start_41">
+		<text>Zase vyrбћнљ.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_start_51">
+		<text>Mмj se. Nedokбћeљ zщstat na jednom mнstм moc dlouho, co? Jsem ti k sluћbбm.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_start_61">
+		<text>Nazdar. Pokud potшebujeљ prщvodce, jsem tvщj иlovмk. Jakmile emise skonин. Mezitнm mщћem zabнt иas a pokecat o anomбliнch...</text>
+	</string>
+	<string id="zat_b215_stalker_guide_start_71">
+		<text>Obбvбm se, ћe teп ti jako prщvodce moc nepomщћu... emise jede na plnэ pecky.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_jupiter_0">
+		<text>Za kolik mм dovedeљ do Janovskй stanice?</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_jupiter_1">
+		<text>Bohuћel je to poшбdnб љtreka, takћe to bude za 3000.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_jupiter_11">
+		<text>Fajn, pщjdeme.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_jupiter_12">
+		<text>Tolik u sebe nemбm.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_jupiter_13">
+		<text>Jeљtм nechci odejнt.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_jupiter_2">
+		<text>S tvejma mapama jen za 1000.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_jupiter_21">
+		<text>Fajn, pщjdeme.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_jupiter_22">
+		<text>Tolik u sebe nemбm.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_jupiter_23">
+		<text>Jeљtм nechci odejнt.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_jupiter_3">
+		<text>Je to odsud kus cesty, takћe to bude za 3000. Jakmile se emise uklidnн, mщћeme vyrazit.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_jupiter_4">
+		<text>S tvejma mapama jen za 1000. Akorбt musнme poиkat, aћ se emise zklidnн.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_pripyat_0">
+		<text>Mщћeљ mм zavйst do Pripjati?</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_pripyat_3">
+		<text>Ne. Kaћdej mб svou specialitu. Vidнљ tбmhle Garika? Myslнm, ћe ten by ti mohl pomoct.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_pripyat_4">
+		<text>Osobnм ne. Ale za 6000 tм mщћu vzнt k Janovskэ stanici a domluvit se s Garikem. On tм odtamtud zavede do Pripjati. Co ty na to?</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_pripyat_41">
+		<text>Fajn, pщjdeme.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_pripyat_42">
+		<text>Tolik u sebe nemбm.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_pripyat_43">
+		<text>Jeљtм nechci odejнt.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_pripyat_5">
+		<text>Osobnм ne. Ale jen za 4000 tм mщћu vzнt k Janovskэ stanici a domluvit se s Garikem.  On tм odtamtud zavede do Pripjati. Co ty na to?</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_pripyat_51">
+		<text>Fajn, pщjdeme.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_pripyat_52">
+		<text>Tolik u sebe nemбm.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_pripyat_53">
+		<text>Jeљtм nechci odejнt.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_pripyat_6">
+		<text>Ne. Kaћdej mб svou specialitu. Vidнљ tбmhle Garika? Myslнm, ћe ten by ti mohl pomoct. Aћ teda emise skonин.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_pripyat_7">
+		<text>Osobnм ne. Ale za 6000 tм mщћu vzнt k Janovskэ stanici a domluvit se s Garikem.  On tм odtamtud zavede do Pripjati. Teda aћ emise skonин pochopitelnм</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_pripyat_8">
+		<text>Osobnм ne. Ale jen za 4000 tм mщћu vzнt k Janovskэ stanici a domluvit se s Garikem.  On tм odtamtud zavede do Pripjati. Teda aћ emise skonин pochopitelnм.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_pripyat_no_way_0">
+		<text>Mщћeљ mм zavйst do Pripjati?</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_pripyat_no_way_1">
+		<text>Do Pripjati? Ne. O mou obvyklou trasu je velkej zбjem, takћe nemusнm hledat dalљн. Ale mбm dobrэho kбmoљe, kterej dшнv pracoval v Jupiteru. Шнkal, ћe jsou tam podzemnн tunely, kterэ vedou do Pripjati. Neшekl kde pшesnм, jen ћe je tшeba zaинt hledat v administrativnн ибsti.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_pripyat_no_way_2">
+		<text>Ne. Pokud se tam chceљ dostat, zkus najнt ty tunely pod tovбrnou Jupiter.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_zaton_0">
+		<text>Za kolik mм zavedeљ do Skadovska?</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_zaton_1">
+		<text>Jelikoћ to budeme muset vzнt oklikou, bude to za 3000.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_zaton_11">
+		<text>Fajn, pщjdeme.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_zaton_12">
+		<text>Nemбm u sebe teп tolik.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_zaton_13">
+		<text>Jeљtм nechci odejнt.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_zaton_2">
+		<text>Dнky tэ novэ trase je to jen za 1000.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_zaton_21">
+		<text>Fajn, pщjdeme.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_zaton_22">
+		<text>Nemбm u sebe teп tolik.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_zaton_23">
+		<text>Jeљtм nechci odejнt.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_zaton_3">
+		<text>Jelikoћ to budeme muset vzнt oklikou, bude to za 3000. Jakmile se emise uklidnн, mщћeme vyrazit.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_to_zaton_4">
+		<text>Dнky tэ novэ trase je to jen za 1000. Akorбt musнme poиkat, aћ se emise zklidnн.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_where_to_0">
+		<text>Kam mм mщћeљ zavйst?</text>
+	</string>
+	<string id="zat_b215_stalker_guide_where_to_1">
+		<text>K Janovskэ stanici, kousek od tovбrny Jupiter. A odtamtud zpбtky do Skadovsku. Radљi znбm jednu trasu fakt dobшe, neћ abych se chlubil, ћe jich znбm hodnм.</text>
+	</string>
+	<string id="zat_b22_barmen_about_after_quest_b5_dealer_actor4_0">
+		<text>Pшekazil jsem banditщm pшedбvku zbranн.</text>
+	</string>
+	<string id="zat_b22_barmen_about_after_quest_b5_dealer_actor4_1">
+		<text>Dнky za pomoc. Vћdycky si vzpomenu na devadesбtэ lйta, vidнm ty mizery s raketometama a ъplnм to se mnou zatшese. Na, vem si tohle. Prachy se hodн vћdycky.</text>
+	</string>
+	<string id="zat_b22_barmen_about_vampire_actor1_0">
+		<text>Hledбm Tetшeva. Mмli jsme se tady setkat.</text>
+	</string>
+	<string id="zat_b22_barmen_about_vampire_actor1_1">
+		<text>Tetшev ti tady nechal zprбvu. Шнkal, ћe vyrazн k jeшбbщm v doku. A ћe se dozvмdмl nмco novэho o tмch ztracenejch stalkerech.</text>
+	</string>
+	<string id="zat_b22_barmen_about_vampire_actor2_0">
+		<text>Tetшev je mrtvej. Straљбk ho zabil, stejnм jako ostatnн stalkery... Straљбk je taky mrtvej.</text>
+	</string>
+	<string id="zat_b22_barmen_about_vampire_actor2_1">
+		<text>Straљбk? Sakra. Mмli jsme tu svini pшнmo pod nosem... mohl to bejt kdokoli z nбs... Chci шнct, kdyћ zrovna Tetшev... Dнky, kбmo. Zachrбnil jsi celej tбbor. Na.</text>
+	</string>
+	<string id="zat_b22_barmen_about_vampire_actor3_1">
+		<text>Straљбk?!... Je mi lнto, kбmo, ale tohle neberu. Kdybys mмl nмjakej dщkaz, tak moћnб... chudбk Tetшev.</text>
+	</string>
+	<string id="zat_b22_barmen_about_vampire_actor4_0">
+		<text>Tady je Straљбkaovo PDA. Obsahuje dщkazy potvrzujнcн, ћe v tom byl zapletenэ.</text>
+	</string>
+	<string id="zat_b22_barmen_about_vampire_actor4_1">
+		<text>Sakra. Mмli jsme tu svini pшнmo pod nosem... mohl to bejt kdokoli z nбs... Chci шнct, kdyћ zrovna Tetшev... Dнky, kбmo. Zachrбnil jsi celej tбbor. Na.</text>
+	</string>
+	<string id="zat_b22_barmen_b5_daring_quest_stalkers_0">
+		<text>Pomщћu ti postarat se o bandity.</text>
+	</string>
+	<string id="zat_b22_barmen_b5_daring_quest_stalkers_1">
+		<text>Super. Jdi k stanici lovcщ - tam jsou naљi chlapi. Шeknou ti, co potшebujeљ vмdмt.</text>
+	</string>
+	<string id="zat_b22_stalker_medic_b52_about_nimble_0">
+		<text>Co vнљ o Иiperovi? Nemohl by kљeftovat s ukradenэma zbranмma?</text>
+	</string>
+	<string id="zat_b22_stalker_medic_b52_about_nimble_1">
+		<text>Moc ho neznбm. Ale pochybuju, ћe by v tom jel. Pokud jedeљ v horkэm zboћн, nebereљ na nм objednбvky...</text>
+	</string>
+	<string id="zat_b22_stalker_medic_dialog_start_11">
+		<text>Vмdмl jsem, ћe mм dшнv nebo pozdмjc nмkdo odhalн. Byla to jen otбzka иasu...</text>
+	</string>
+	<string id="zat_b22_stalker_medic_dialog_start_111">
+		<text>Straљбk?!... Nechceљ mi vysvмtlit, co se dмje?</text>
+	</string>
+	<string id="zat_b22_stalker_medic_dialog_start_1111">
+		<text>Uћ se nehodlбm schovбvat. Nemб to smysl. Uћ vнљ, ћe Tetшeva jsem zabil jб... stejnм tak Danilu a dalљн chybмjнcн stalkery.</text>
+	</string>
+	<string id="zat_b22_stalker_medic_dialog_start_11112">
+		<text>Fajn, chбpu. Dost kecщ.</text>
+	</string>
+	<string id="zat_b22_stalker_medic_dialog_start_111121">
+		<text>Nic nechбpeљ. Mм nikdy nikdo nedostane...</text>
+	</string>
+	<string id="zat_b22_stalker_medic_dialog_start_112">
+		<text>Proи jsi to udмlal?</text>
+	</string>
+	<string id="zat_b22_stalker_medic_dialog_start_1121">
+		<text>Zбvislost na hemoglobinu... nepшбl bych to ani nejhorљнmu nepшнteli... nedб se toho zbavit. Nмkdy mбљ pocit, ћe vydrћнљ celej mмsнc bez kapky krve, to se mi obиas povedlo, ale pak... uvnitш tebe to prostм vybuchne a zaиneљ jak љнlenej shбnмt krev.</text>
+	</string>
+	<string id="zat_b22_stalker_medic_dialog_start_113">
+		<text>Jak se ti to podaшilo uchovat v tajnosti?</text>
+	</string>
+	<string id="zat_b22_stalker_medic_dialog_start_1131">
+		<text>Kdyћ jsem makal na klinice, dalo se to snadno zamaskovat. Vћdycky byla trocha krve od dбrcщ navнc. Ale v Zуnм... v Zуnм to bylo jinэ... myslel jsem si, ћe tohle tvrdэ prostшedн ty moje chutм potlaин. Ale spletl jsem se. Zaћil jsem tu nejsilnмjљн explozi a prostм jsem nedokбzal myslet na nic jinэho. Rozhodl jsem se to maskovat, jakoby to byly ъtoky upнra. Vмtљinou jsem si vybнral uћ zranмnэ cнle.</text>
+	</string>
+	<string id="zat_b22_stalker_medic_dialog_start_114">
+		<text>A co Danila a Tetшev?</text>
+	</string>
+	<string id="zat_b22_stalker_medic_dialog_start_1141">
+		<text>Danila za mnou pшiљel pro pomoc po tom ъtoku upнrщ. Byl zranмnej. Kdyћ se s Tetшevem rozhodli vyrazit na lov upнrщ spoleиnм, uvмdomil jsem si, ћe uћ se dlouho neudrћнm. Snaћil jsem se zachovat svэ tajemstvн, ale moje odhodlбnн dlouho nevydrћelo... pak se objevil Tetшev. Pochopil, o co jde, a zkusil mм zabнt. A tak jsme teп tady. Je mi jich vљech lнto, ale moje lнtost je zpбtky nevrбtн.</text>
+	</string>
+	<string id="zat_b22_stalker_medic_dialog_start_11411">
+		<text>Fajn, chбpu. Dost kecщ.</text>
+	</string>
+	<string id="zat_b22_stalker_medic_dialog_start_114111">
+		<text>Nic nechбpeљ. Mм nikdy nikdo nedostane...</text>
+	</string>
+	<string id="zat_b22_stalker_medic_dialog_start_21">
+		<text>Poslouchбm.</text>
+	</string>
+	<string id="zat_b22_stalker_medic_dialog_start_22">
+		<text>Hej, potшebujeљ pomoc?</text>
+	</string>
+	<string id="zat_b22_stalker_medic_dialog_start_23">
+		<text>Nazdar.</text>
+	</string>
+	<string id="zat_b22_stalker_medic_need_health_care_0">
+		<text>Potшebuju zdravotnнka.</text>
+	</string>
+	<string id="zat_b22_stalker_medic_need_health_care_1">
+		<text>Ukaћ mi to...</text>
+	</string>
+	<string id="zat_b22_stalker_medic_need_health_care_111">
+		<text>No, to by bylo. Mщћeљ jнt.</text>
+	</string>
+	<string id="zat_b29_rivals_start_dialog_11">
+		<text>Nazdar! Taky hledбљ artefakty?</text>
+	</string>
+	<string id="zat_b29_rivals_start_dialog_12">
+		<text>Hej! Jdeљ na artefakty, co? No, mмlo by jich bэt dost pro vљechny.</text>
+	</string>
+	<string id="zat_b29_rivals_start_dialog_13">
+		<text>Oh, hej! Taky se snaћнљ najнt nмjakej artefakt?</text>
+	</string>
+	<string id="zat_b29_stalker_rival_exchange_actor_dialog_0">
+		<text>Nazdar. Neseљ ten artefakt k Fousбиovi?</text>
+	</string>
+	<string id="zat_b29_stalker_rival_exchange_actor_dialog_1">
+		<text>Moћnб jo, moћnб ne. Co je ti potom?</text>
+	</string>
+	<string id="zat_b29_stalker_rival_exchange_actor_dialog_11">
+		<text>Potшebuju ho.</text>
+	</string>
+	<string id="zat_b29_stalker_rival_exchange_actor_dialog_111">
+		<text>Jб taky... ale moћnб bych ho vymмnil za novou bouchaиku. Nмjakou sakra dobrou.</text>
+	</string>
+	<string id="zat_b29_stalker_rival_exchange_actor_dialog_1111">
+		<text>Mбm dobrou zbraт. Udмlбme kљeft...</text>
+	</string>
+	<string id="zat_b29_stalker_rival_exchange_actor_dialog_11111">
+		<text>Dobшe.</text>
+	</string>
+	<string id="zat_b29_stalker_rival_exchange_actor_dialog_1112">
+		<text>Ne, tohle nenн ono.</text>
+	</string>
+	<string id="zat_b29_stalker_rival_exchange_actor_dialog_11121">
+		<text>Tak sakra tбhni odkud jsi pшiљel.</text>
+	</string>
+	<string id="zat_b29_stalker_rival_exchange_actor_dialog_111211">
+		<text>Dobшe.</text>
+	</string>
+	<string id="zat_b29_stalker_rival_exchange_actor_dialog_12">
+		<text>No, vlastnм ћбdnэ.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_about_nimble_0">
+		<text>Co vнљ o Иiperovi?</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_about_nimble_1">
+		<text>Ale nic moc... nekљeftujem spolu. Zatнmco on prohledбvб Zуnu a snaћн se sehnat nмjakou nabuљenou krochnu, jб mezitнm prodбm stovku normбlnнch bouchaиek. Taky je pмknм namyљlenej, odmнtб kљeftovat s mнstnнma mizerama. Takћe je to mizernej obchodnнk, coћ je pro mne vlastnм dobrэ.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_b30_actor_after_barmen_0">
+		<text>Fousби mi шekl, ћe jste se dohodli jinak.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_b30_actor_after_barmen_1">
+		<text>Hovno jinak! To fousatэ prase si zaинnб ze svэho chlнvu nмjak vyskakovat! Nмkdo by mu mмl pшipomenout, kdo je tady љйf... Hele, v Zatonu se poflakuje jeden dщleћitej tэpek, шнkб si Sultan. Navљtiv ho - шekne ti, co je potшeba udмlat.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_b30_actor_after_barmen_11">
+		<text>Pщjdu si promluvit se Sultбnem.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_b30_actor_after_barmen_12">
+		<text>Ћбdnэ takovэ. Hned teп mi naval mщj podнl!</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_b30_actor_after_barmen_121">
+		<text>Uhh... dobшe. Tady mбљ prachy... ale pamatuj, Fousби z tebe dмlб blba.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_0">
+		<text>Potшebuju informace.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_1">
+		<text>Co potшebujeљ vмdмt?</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_11">
+		<text>Potшebuju jedovatej plyn. Prej bych se mмl zeptat tebe.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_111">
+		<text>Sprбvnм. Шeknu ti to za dva tбcy.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_1111">
+		<text>Na.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_11111">
+		<text>Hele. Kdysi tudma projнћdмla vojenskб kolona s plynem, kterб to nezvlбdla. Nikdo nevн, co se stalo, ale nбdrћe s plynem by tam furt mohly bejt. Je ti to jasnэ? Jo, taky by tam mohly bejt nмjakэ dokumenty. Pokud je najdeљ, pшines mi je a jeљtм na tom moћnб vydмlбљ.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_1112">
+		<text>To je na mм moc drahэ.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_11121">
+		<text>Jak chceљ.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_12">
+		<text>Kde bych naљel stalkera, co si шнkб Strakби?</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_121">
+		<text>Mщћu ti dбt radu... za litr.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_1211">
+		<text>Na.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_12111">
+		<text>Tady ho nenajdeљ, ale jeden malej ptбиek povнdal, ћe by mohl bejt nмkde u Jupiteru, moћnб v Janovskэ stanici. Pamatuj, ћe kdyћ nмkdo jednou nмkde udмlб bordel, tak si pak иasto zmмnн jmйno, kdyћ jde jinam. Nejspнљ se i nмjak zamaskoval, urиitм иekб, ћe ho budou lidi mezi stalkerama hledat.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_13">
+		<text>Hledбm Pahejla. Nevнљ, kde bych ho naљel?</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_131">
+		<text>Za tisнcovku ti to шeknu.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_1311">
+		<text>Tady mбљ.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_13111">
+		<text>Pahejl je chamtivej idiot, kterej se zapletl s nebezpeиnejma lidma. Spбlil za sebou vљechny mosty, mмl bys ho hledat nмkde kolem Jupiteru. Nemб kam jinam jнt. Nejseљ jedinej, kdo ho hledб.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_15">
+		<text>Vнљ nмco o havarovanэch vrtulnнcнch?</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_151">
+		<text>Hrm... Vљichni tady vн, kde padajн. Jeden skonиil na jiћnн nбhornн ploљinм, druhej v baћinм, tшetн sebou prбsknul pшнmo na nosnнky stanice. Na kterэ mнsto se ptбљ?</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_1511">
+		<text>Ploљina.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_1512">
+		<text>Stanice.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_1513">
+		<text>Baћina.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_1516">
+		<text>To je o vrtulnнcнch vљechno, co mм zajнmalo.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_152">
+		<text>A teп zaplaќ, dluћнљ mi dvм stovky.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_1521">
+		<text>Tady mбљ.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_15211">
+		<text>Takћe ten vrtulnнk sebou prбsknul hned vedle hnнzda snorkщ. Co vнm, tak se odtamtud vojclovй dostali, ne vљichni, ale vмtљina. Postшнleli mutanty a seљplhali dolщ. Mimochodem, pokud tam zamншнљ, mщћu ti prodat fajnovou brokovnici a nмjakэ broky, to ti na ty bestie pomщћe. Akorбt nikdo kromм Noa, toho magora, nevн, jak se na tu ploљinu dostat.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_1522">
+		<text>To je na mм moc drahэ.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_15221">
+		<text>Jak chceљ.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_153">
+		<text>Шeknu ti to za 200.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_1531">
+		<text>Tady mбљ.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_154">
+		<text>Шeknu ti to za 200.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_1541">
+		<text>Tady mбљ.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_99">
+		<text>Teп zrovna nic.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_0">
+		<text>Mбљ pro mм prбci?</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_111">
+		<text>No je tady jeden malej kљeft pro vмdбtory. Pak potшebujem informace o ћoldбckэm tбboшe. A do tшetice pшekupnнk furt potшebuje ochranku. Dмje se tady spousta vмcн, takћe si vyber.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_1111">
+		<text>Шekni mi o tй fuљce pro vмdбtory.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_11111">
+		<text>Musнљ najнt tшi detektory Veles a pшinйst je vмdбtorщm do bunkru u Jupitera. Aћ tam budeљ, najdi si Novikova, шнkal, ћe si s nima chce pohrбt... kdyћ z tмch detektorщ bude zisk, rozdмlнme se pщl na pщl. Je to jasnэ? Tak padej, tohle bude brnkaиka.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_111111">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_111112">
+		<text>Moћnб nмkdy jindy.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_1112">
+		<text>Шekni mi o tom ћoldбckэm tбboшe.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_11121">
+		<text>U иistiиky se objevili nмjacн ћoldбci a mм by fakt zajнmalo, co tam peиou... proplaz se jim do tбbora a vyhrabej jakэkoli informace, nмco o jejich plбnech. PDA, papнrovэ dokumenty, dones mi, co najdeљ. Jasnэ? Tak bмћ. Kdyћ budeљ dбvat bacha, bude to hraиka jak pro malэho pionэra.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_111211">
+		<text>Souhlasнm.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_111212">
+		<text>Teп ne.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_1113">
+		<text>Шekni mi o ochrance pro pшekupnнka.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_11131">
+		<text>Pшekupnнk potшebuje ochranku pшi jednom kљeftм. Nebudeљ muset skoro nic dмlat, prostм tam jen stбt, aby to vypadalo dobшe. Jasnэ? Pшekupnнk na tebe poиkб u loveckй  stanice. Шekne ti detaily.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_111311">
+		<text>Dobшe.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_111312">
+		<text>Poиkej.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_1114">
+		<text>Nмkdy jindy.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_112">
+		<text>No je tady jeden malej kљeft pro vмdбtory, pak jeљtм potшebuju informace o ћoldбckэm tбboшe. Vyber si...</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_113">
+		<text>No je tady jeden malej kљeft pro vмdбtory a jeden pшekupnнk potшebuje ochranku. Vyber si, co chceљ.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_114">
+		<text>Potшebuju nмjakэ informace o ћoldбckэm tбboшe, to je jeden kљeft, druhej je ochranka pro jednoho pшekupnнka. Je to na tobм, co si vybereљ.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_115">
+		<text>Byla by tu malб fuљka pro vмdбtory. Pohodiиka, jen jim nмco seћeneљ a pшineseљ.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_117">
+		<text>Pшekupnнk potшebuje ochranku pшi jednom kљeftм. Silnм na pohodu, nic to nebude.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_118">
+		<text>Dalљн kљefty uћ nemбm.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_0">
+		<text>Myslнm, ћe by tм to mohlo zajнmat.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_1">
+		<text>Co mбљ?</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_11">
+		<text>Noeovo PDA.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_111">
+		<text>Toho magora z lodм? Dбm ti za nмj litr.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_1111">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_1112">
+		<text>Dнky, ale ne. Jeљtм si ho nechбm.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_11121">
+		<text>No aby ti nepropбlilo dнru v kapse...</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_12">
+		<text>PDA ћoldбka jmйnem Hбk. Naљel jsem ho v иistiиce.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_121">
+		<text>Dбm ti 1000.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_1211">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_12112">
+		<text>Zajнmavэ... dobrб prбce.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_13">
+		<text>PDA ћoldбka jmйnem Hrbби. Naљel jsem ho v иistiиce.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_131">
+		<text>Dбm ti 1000.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_1311">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_14">
+		<text>PDA s informacemi o zбsobбrnбch Monolitu.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_141">
+		<text>Dбm ti 5000.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_1411">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_15">
+		<text>PDA chlapa napojenйho na klienta ћoldбkщ.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_151">
+		<text>Dбm ti 4000.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_1511">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_16">
+		<text>PDA jednoho ze zakladatelщ Povinnosti, generбla Taиenka.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_161">
+		<text>Za to ti zaplatнm dobшe - 2500.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_1611">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_17">
+		<text>Ћoldбkovo PDA.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_171">
+		<text>Dбm ti 1000.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_1711">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_18">
+		<text>Morganovo PDA.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_182">
+		<text>Informace o pшekupnнkovi Povinnosti, kterэ prodбvб zbranм, jakoby mмla nastat tшetн svмtovб. Mohlo by to bэt uћiteиnэ. Dбm ti 4000.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_1821">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_19">
+		<text>Vzkaz ze skrэљe Stшelcovy skupiny. Adresovanэ Duchovi.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_191">
+		<text>Dбm ti 500.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_1911">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_20">
+		<text>Vzkaz ze skrэљe Stшelcovy skupiny. Adresovanэ Stшelci.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_201">
+		<text>Dбm ti 500.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_2011">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_21">
+		<text>Vzkaz ze skrэљe Stшelcovy skupiny. Adresovanэ Tesбkovi.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_211">
+		<text>Dбm ti 500.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_2111">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_22">
+		<text>Dokumenty z tovбrny Jupiter, sloћka s evakuaиnнmi pшнkazy.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_221">
+		<text>Dбm ti 750.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_2211">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_23">
+		<text>Dokumenty z tovбrny Jupiter, zбznam v zбpisnнku.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_231">
+		<text>Dбm ti 750.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_2311">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_24">
+		<text>Dokumenty z tovбrny Jupiter, rozpis dodбvek.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_241">
+		<text>Dбm ti 750.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_2411">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_25">
+		<text>Dokumenty z tovбrny Jupiter, dopis s pшнkazem transportovat pшedmмt 62 jen podjezdem.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_251">
+		<text>Dбm ti 750.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_2511">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_261">
+		<text>Uћ ne. Kdyћ je v tom Sultбn, radљi se do toho nebudu zaplнtat.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_271">
+		<text>Tak ukaћ... jo, to je dobrэ. Prodбљ mi to?</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_2711">
+		<text>Jasnм, mnм to k niиemu nenн.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_30">
+		<text>Notebook z ћoldбckйho tбbora u иistiиky.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_301">
+		<text>Nabнzнm ti 2000.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_3011">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_311">
+		<text>Heh... no, vezmi to Fousбиovi nebo vмdбtorщm. Jб o podezшelэ kousky zбjem nemбm... nerad bych se jednou v noci probudil s nemocн z ozбшenн.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_321">
+		<text>A tam to taky mб zщstat. Nerad zbyteиnм riskuju. Kdo vн, moћnб kolem sebe ten krбm v noci udмlб anomбlii... Radљi to odnes vмdбtorщm, aќ si to prostudujou, nebo tak nмco.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_331">
+		<text>A jб mбm ve spнћi atomovou hlavici! Ale vмdбtory to moћnб pobavн - ty takovй blbosti ћerou.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_34">
+		<text>Pahejlovo PDA.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_341">
+		<text>Ukaћ. Hm... nic zajнmavэho. Skrэљ uћ jsi bez tak vyиistil, takћe ti dбm akorбt dvм kila.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_3411">
+		<text>Souhlasнm.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_35">
+		<text>PDA jednoho ze Sultбnovэch chlapщ.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_351">
+		<text>Zajнmavэ... mohlo by se hodit. Dбm ti 1000.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_3511">
+		<text>Souhlasнm.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_36">
+		<text>Pamмќovэ modul z bezpilotnнho letadla.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_361">
+		<text>Hodnм zajнmavej kousek... ale na tom nezbohatneљ. Kdo vн, jestli jsem prvnн, kdo to vidн? Dбm ti pмtistovku.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_3611">
+		<text>Dobшe.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_99">
+		<text>Teп zrovna nic.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_stages_0">
+		<text>Ohlednм tмch detektorщ...</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_stages_1">
+		<text>Jo?</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_stages_11">
+		<text>Kde je najdu?</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_stages_111">
+		<text>Nemбm tuљenн. Prostм je najdi.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_stages_12">
+		<text>Mбm ty detektory.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_stages_121">
+		<text>Tak proи tady jeљtм stojнљ? Vezmi je Novikovovi do bunkru vмdбtorщ u Jupiteru.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_stages_13">
+		<text>Odnesl jsem detektory Novikovovi.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_stages_131">
+		<text>Super. Teп poиkбme, aћ si s nima pohraje. Novikov mi slнbil, ћe je sem poљle po nмjakэm dщvмryhodnэm chlapovi, jakmile s nima bude hotovej.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_start_dialog_12">
+		<text>Mбme problйm. Ten nбљ kљeft teп visн v luftu. Novikov na tмch detektorech odvedl sakra dobrou prбci - zlepљil dosah, upravil citlivost a pбr dalљнch vмcн... s takovэm detektorem pшevezeљ kaћdэho lovce artefaktщ, kterej takovej nemб. Dohodnul jsem se s Fousбиem, ћe budou stalkeшi, kterэ najнmб, teп pouћнvat tyhle novэ detektory...</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_start_dialog_121">
+		<text>A?</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_start_dialog_1211">
+		<text>Dohodli jsme se, ћe se o koшist podмlнme pщl na pщl, ale stalkeшi odmнtajн navalit tu pщlku. Zajdi za Fousбиem a pшesvмdи ho, ћe dohody se maj drћet. No tak, chceљ snad svщj podнl, ne?</text>
+	</string>
+	<string id="zat_b30_stalker_rival_1_about_detector_0">
+		<text>Potшebuju novej detektor.</text>
+	</string>
+	<string id="zat_b30_stalker_rival_1_about_detector_1">
+		<text>Ha. A jб potшebuju poшбdnou bouchaиku. Jestli mбљ nмjakou dobrou drahou krochnu, vymмnнme.</text>
+	</string>
+	<string id="zat_b30_stalker_rival_1_about_detector_11">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b30_stalker_rival_1_about_detector_12">
+		<text>Ne, dнky.</text>
+	</string>
+	<string id="zat_b30_stalker_rival_2_about_detector_0">
+		<text>Potшebuju tvщj novej detektor.</text>
+	</string>
+	<string id="zat_b30_stalker_rival_2_about_detector_1">
+		<text>Snaћнљ se mi vyhroћovat? Jб ho totiћ taky potшebuju.</text>
+	</string>
+	<string id="zat_b30_stalker_rival_2_about_detector_11">
+		<text>Ty to nechбpeљ, co? Tvщj je poslednн. Nemмl jsem moc prбce zbavit se ostatnнch majitelщ...</text>
+	</string>
+	<string id="zat_b30_stalker_rival_2_about_detector_111">
+		<text>Coћe? Tys je oddмlal? Tak si ho vezmi a dej mi pokoj.</text>
+	</string>
+	<string id="zat_b30_stalker_rival_2_about_detector_112">
+		<text>Co kdybys љel do hajzlu?</text>
+	</string>
+	<string id="zat_b30_stalker_rival_2_about_detector_12">
+		<text>Budu o tom uvaћovat. A teп tм sluљnм ћбdбm, naval ten detektor.</text>
+	</string>
+	<string id="zat_b30_stalker_rival_2_about_detector_123">
+		<text>A jб tм sluљnм ћбdбm, jdi do hajzlu a nevracej se.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_about_cache_dialog_11">
+		<text>Stalkere, chceљ dostat zaplaceno?</text>
+	</string>
+	<string id="zat_b33_stalker_snag_about_cache_dialog_111">
+		<text>O co jde?</text>
+	</string>
+	<string id="zat_b33_stalker_snag_about_cache_dialog_1111">
+		<text>Vнљ, schoval jsem nмjakou koшist ve starэ kбшe, v Zбporoћci. Ale pak pшiљlo zemмtшesenн a kбra spadla do podzemн. Byl jsem se tam kouknout a vypadб to, ћe by se do toho auta dalo dostat... Akorбt jsou tam mutanti, vљak vнљ, snorkovй. Vмш mi nebo ne, jб se nebojнm ani kontrolorщ, ale ti zatracenн snorkovй... ti mi nahбnмj husн kщћi, jsou straљnм nechutnн. Pokud se ti podaшн dostat ke kontejneru s bezpeиnostnнm zбmkem, podмlнme se o koшist, spravedlivм.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_about_cache_dialog_11111">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_about_cache_dialog_111111">
+		<text>Dмkuju, stalkere.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_about_cache_dialog_11112">
+		<text>Je tohle tvщj kontejner?</text>
+	</string>
+	<string id="zat_b33_stalker_snag_about_cache_dialog_111121">
+		<text>Jo, to je on! Sakra ty seљ dobrej!</text>
+	</string>
+	<string id="zat_b33_stalker_snag_about_cache_dialog_11113">
+		<text>Moћnб nмkdy jindy.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_about_cache_dialog_111131">
+		<text>Љkoda.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_about_cache_dialog_112">
+		<text>Ne, teп nemбm zrovna moc иasu.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_about_cache_dialog_1121">
+		<text>Fajn, jak chceљ.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_about_cache_dialog_21">
+		<text>Tak co? Nмco novэho?</text>
+	</string>
+	<string id="zat_b33_stalker_snag_about_cache_dialog_31">
+		<text>Co chceљ? Nevidнљ, ћe mбm prбci?</text>
+	</string>
+	<string id="zat_b33_stalker_snag_b52_my_gun_dialog_0">
+		<text>Hej, to je moje bouchaиka! Kdes ji sebral, ty zlodмji?! Nedбvno mi ji nмjakб svinм љlohnula.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_b52_my_gun_dialog_1">
+		<text>O иem to mluvнљ? Jsem ji nedбvno koupil.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_b52_my_gun_dialog_11">
+		<text>Nevнm, jak se ti dostala do pracek, ale tuhle mi nмkdo ukradnul. Takћe hele, nechceљ mм nasrat, fakt ne, takћe naval bouchaиku a zщstanem kamarбdi.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_b52_my_gun_dialog_111">
+		<text>Fajn, tady mбљ. O problйmy nestojнm.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_b52_my_gun_dialog_1111">
+		<text>Naval.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_b52_my_gun_dialog_112">
+		<text>To je moje bouchaиka.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_b52_my_gun_dialog_1121">
+		<text>Jo takhle, jo?! Varuju tм, mбm kontakty! Vљichni tady mм znajн! Myslнљ si, ћe vydrћнљ v Zуnм s mizernou povмstн, stalkere? Fakt si to myslнљ?! Neиekej tady od nikoho pomoc, vљichni tм poљlou ke vљem иertщm!</text>
+	</string>
+	<string id="zat_b33_stalker_snag_b52_my_gun_dialog_11211">
+		<text>Tбhni!</text>
+	</string>
+	<string id="zat_b33_stalker_snag_b52_my_gun_dialog_2">
+		<text>Seљ si jistej, ћe je to tvoje zbraт?</text>
+	</string>
+	<string id="zat_b33_stalker_snag_b52_my_gun_dialog_21">
+		<text>Samozшejmм, ћe jsem si jistej. Nenн to zrovna bмћnej kousek ze Zуny, ne? A tahle je urиitм moje.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_b52_my_gun_dialog_3">
+		<text>Spletl ses. Zklidni se a nikomu se nic nestane.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_b52_my_gun_dialog_31">
+		<text>Coћe? Tak jб jsem se spletl?! To si jeљtм sakra rozmysli, debile! Pokud si tady nмco zkusнљ, vљichni budou na mэ stranм. Naval bouchaиku a vљechno bude v pohodм. Dokonce budu tak hodnej a nikomu o tom neшeknu.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_b52_my_gun_dialog_311">
+		<text>Coћe?! Napadlo tм, ћe ti s tou mizernou bouchaиkou mщћu prбvм teп navrtat do palice pбr dмr?</text>
+	</string>
+	<string id="zat_b33_stalker_snag_b52_my_gun_dialog_3111">
+		<text>Hej, zklidni, vole. Trochu se nбm to vymklo z rukou, ale jб uћ jsem v pohodм. V klidu. Asi jsem se spletl.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_refuse_task_0">
+		<text>Ohlednм toho kontejneru...</text>
+	</string>
+	<string id="zat_b33_stalker_snag_refuse_task_1">
+		<text>Naљels ho?</text>
+	</string>
+	<string id="zat_b33_stalker_snag_refuse_task_11">
+		<text>Jeљtм na tom pracuju.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_refuse_task_12">
+		<text>Rozhodl jsem se, ћe uћ na to kaљlu.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_refuse_task_121">
+		<text>Љkoda.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_refuse_task_2">
+		<text>Fajn, ukaћ...</text>
+	</string>
+	<string id="zat_b33_stalker_snag_refuse_task_21">
+		<text>Jasnм. Chviliиku...</text>
+	</string>
+	<string id="zat_b33_stalker_snag_refuse_task_22">
+		<text>Rozhodl jsem se, ћe si ho nechбm.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_refuse_task_221">
+		<text>Ty malej... nemysli si, ћe ti tohle zapomenu!</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_0">
+		<text>Tady je ten kontejner.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_1">
+		<text>Fajn, tak se podмlнme, jo?</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_11">
+		<text>Jen do toho.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_111">
+		<text>Tak se podнvбme, co je tady... moje starб, ale smrtonosnб Fora. Kdysi dбvno ji upravil mщj vlastnн strejda. Je to skoro jako rodinnэ dмdictvн, to jo... tohle si nechбm.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_1111">
+		<text>Ne, dej ji mnм!</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_11111">
+		<text>No, dobшe.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_111111">
+		<text>Copak je tady dбl.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_11112">
+		<text>Ne, uћ mбљ dost vмcн.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_111121">
+		<text>Ukaћ, co je dalљн.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_1112">
+		<text>Fajn, vem si to. Co je tam jeљtм?</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_112">
+		<text>Fajn... vэbornб lйkбrniиka. Dost dobrб, kdyћ tм pocuchб medvмd nebo dokonce kontrolor. Ta bude moje.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_1121">
+		<text>Hej, mмn by se lйkбrniиka hodila.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_11211">
+		<text>Hmm... okay.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_112111">
+		<text>Ukaћ, co je tam dбl.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_11212">
+		<text>Ne, uћ mбљ dost.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_112121">
+		<text>Ukaћ, co je tam dбl.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_1122">
+		<text>To si nech. Co je tam jeљtм?</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_113">
+		<text>Okay... Hele... pochybuju, ћes takovou bouchaиku mмl nмkdy v ruce. Vylepљenб AKM-74/2U. Za tuhle krбsku jsem dal jednomu tэpkovi z Povinnosti tunu lйkбrniиek. Bylo to v dobм, kdy Svoboda dala Povinnosti tak na drћku, ћe jim doљly lйky. Od tэ doby mi tohle bejby tшikrбt zachrбnilo ћivot... tu si rozhodnм nechбm.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_1131">
+		<text>Moћnб bych si ji mohl nechat jб, co ty na to?</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_11311">
+		<text>Hmm... lбme mi to srdce. Ale dohoda je dohoda. Vem si to.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_113111">
+		<text>Ukaћ, co je tam dбl.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_11312">
+		<text>Ne, uћ mбљ dost.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_113121">
+		<text>Ukaћ, co je tam dбl.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_1132">
+		<text>Fajn, nech si ji. Co je tam dalљнho?</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_114">
+		<text>Oh-h-h... Krбsnej a cennej kousek. Tenhle artefakt mб cenu hromady zlata! Sбm jsem ho vytбhl z anomбlie. Posral jsem si pшitom gatм. Je to moje trofej, zaslouћil jsem si ji vlastnн krvн a slzami.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_1141">
+		<text>Myslнm, ћe ho potшebuju vнc neћ ty.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_11411">
+		<text>Ty mм niинљ... na, vem si ho, mй љtмdrosti urиitм litovat nebudeљ.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_114111">
+		<text>Ukaћ, co je tam dбl.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_11412">
+		<text>Uћ mбљ dost vмcн.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_114121">
+		<text>Ukaћ, co je tam dбl.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_1142">
+		<text>Nech si ho. Co je tam dбl.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_115">
+		<text>A naposled, ale zdaleka ne nejhorљн... vynikajнcн helma, ruиnм dмlanб. Pшed иasem se u Kordуnu objevil novej stalker, fakt љikula. Neћ zakalil, udмlal spoustu љikovnejch vмcн. Tahle helma je jedna z nich. Dalљн takovou nenajdeљ! Tu si nechбm.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_1151">
+		<text>Hele, jб jsem riskoval ћivot v boji proti hordм snorkщ... tu helmu si zaslouћнm.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_11511">
+		<text>No... tak jo. Uћij si to.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_115111">
+		<text>Ukaћ, co je tam dбl.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_11512">
+		<text>Uћ mбљ dost vмcн. Snad si taky mщћu nмco nechat, ne?!</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_115121">
+		<text>Ukaћ, co je tam dбl.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_1152">
+		<text>Fajn, nech si to.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_11611">
+		<text>To je vљechno, vнc koшisti tam nebylo.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_116111">
+		<text>No tak jo, mмj se.</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_11621">
+		<text>A je to. Ale nenechбm tм odejнt s prбzdnejma rukama... Na, vem si moji pistoli!</text>
+	</string>
+	<string id="zat_b33_stalker_snag_share_package_dialog_116211">
+		<text>Hodnм љtмstн?</text>
+	</string>
+	<string id="zat_b38_cop_about_himself_dialog_0">
+		<text>Co dмlбљ?</text>
+	</string>
+	<string id="zat_b38_cop_about_himself_dialog_1">
+		<text>Slouћнm a chrбnнm. Dшнv jsem bэval policejnн detektiv a teп jsem nмco jako mнstnн љerif. Pшiљel jsem sem s Fousбиem, kterej se rozhodl usadit tady. Proи jнt dбl, kdyћ nikdo stejnм neznб cestu do Pripjati? I tady je dost artefaktщ. A tak jsme zщstali tady.</text>
+	</string>
+	<string id="zat_b38_stalker_cop_about_sci_guards_0">
+		<text>Koho bych mohl najmout na ochranu vмdcщ?</text>
+	</string>
+	<string id="zat_b38_stalker_cop_about_sci_guards_1">
+		<text>Je tady pбr dobrejch chlapщ. Tшeba Spartakova grupa. Fakt profнci, majн na to, spousta z nich byla dшнv u policie. Pokud majн иas, myslнm ћe lepљн ochranku jen tak nмkde neseћeneљ.</text>
+	</string>
+	<string id="zat_b38_stalker_cop_about_sci_guards_2">
+		<text>Dшнv bych ti mohl pбr jmen poradit, ale teп uћ ne. Ћбdnej z mнstnнch stalkerщ se na to nenechб upsat.</text>
+	</string>
+	<string id="zat_b38_stalker_cop_about_sci_helpers_0">
+		<text>Koho bych mohl najmout na mмшenн pro vмdбtory?</text>
+	</string>
+	<string id="zat_b38_stalker_cop_about_sci_helpers_1">
+		<text>Jednu partu stalkerщ, kterou vede Gonta. Zeptej se ho, moћnб do toho pщjde... urиitм to pro nмj bude vнtanб zmмna od stшнlenн mutantщ.</text>
+	</string>
+	<string id="zat_b38_stalker_cop_about_sci_helpers_2">
+		<text>Kdyby tady byl Gonta se svou partou, poslal bych tм za nнm. Ale jelikoћ tady nenн... nikdo jinej vhodnej mм nenapadб.</text>
+	</string>
+	<string id="zat_b38_stalker_cop_b52_about_nimble_0">
+		<text>Koupil jsi zbranм od Иipery? Nevнљ, jestli jede v kradenэm zboћн?</text>
+	</string>
+	<string id="zat_b38_stalker_cop_b52_about_nimble_1">
+		<text>Myslнљ, ћe je dost odvбћnej, aby si troufnul dмlat nмco takovэho mnм pod nosem? Houby. Ani nбhodou. Jsem si celkem jistej, ћe Иipera pшekupnнk nenн.</text>
+	</string>
+	<string id="zat_b38_stalker_cop_b52_about_snag_0">
+		<text>Hledбm Pahejla. Nevнљ, kde bych ho naљel?</text>
+	</string>
+	<string id="zat_b38_stalker_cop_b52_about_snag_1">
+		<text>Pahejla? Jasnм, znбm ho. Poшбdnej pitomec. Nмkdo ho vidмl nedбvno u jeшбbщ v docнch. Nejspнљ jeho novб schovбvaиka. Zkus se tam podнvat.</text>
+	</string>
+	<string id="zat_b38_stalker_cop_start_dialog_11">
+		<text>Nazdar, stalkere. Nechceљ si vydмlat pбr drobnejch a pшi tom i pomoct naљemu tбboru?</text>
+	</string>
+	<string id="zat_b38_stalker_cop_start_dialog_12">
+		<text>Nazdar, stalkere. Seљ poшбd tady? Pokud nezaиneљ nмco dмlat, tak nбs ti upншi brzo seћerou.</text>
+	</string>
+	<string id="zat_b38_stalker_cop_start_dialog_14">
+		<text>Pokecбme pak. Musнm se na nмco podнvat.</text>
+	</string>
+	<string id="zat_b38_stalker_cop_task_dialog_0">
+		<text>Jakou prбci mi nabнzнљ?</text>
+	</string>
+	<string id="zat_b38_stalker_cop_task_dialog_1">
+		<text>Jde o tohle: zmizelo pбr stalkerщ. Nikdo o nich nic nevн, ale nedбvno jsme naљli jedno tмlo. Ћбdnэ znбmky nбsilн, ale byl vysбtej do sucha, do poslednн kapky krve. Straљбk naљel tмlo, mщћe ti шнct vнc... podle mм to musн bэt upншi! Bavil jsem se o tom s lovcem Danilou a ten pak vyrazil hledat jejich hnнzdo. Ale od tэ doby po nмm nenн ani stopa.</text>
+	</string>
+	<string id="zat_b38_stalker_cop_task_dialog_11">
+		<text>Co mбm udмlat?</text>
+	</string>
+	<string id="zat_b38_stalker_cop_task_dialog_111">
+		<text>Musнљ najнt jejich hnнzdo a s trochou љtмstн i Danilu. Nenн to snadnб prбce, ale vyplatн se ti to. Co ty na to?</text>
+	</string>
+	<string id="zat_b38_stalker_cop_task_dialog_1111">
+		<text>Souhlasнm.</text>
+	</string>
+	<string id="zat_b38_stalker_cop_task_dialog_11111">
+		<text>OK, oznaиil jsem ti dvм mнsta, kam by ses mмl podнvat. Nahrбl jsem ti souшadnice. Musнm se podнvat na pбr vмcн, pak se podнvбm na to druhэ. Dбm ti vмdмt, co najdu.</text>
+	</string>
+	<string id="zat_b38_stalker_cop_task_dialog_111111">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b38_stalker_cop_task_dialog_1112">
+		<text>Myslнm, ћe se obejdu.</text>
+	</string>
+	<string id="zat_b38_stalker_cop_task_dialog_11121">
+		<text>Pokud si to rozmyslнљ, vraќ se.</text>
+	</string>
+	<string id="zat_b38_stalker_cop_task_dialog_12">
+		<text>Nemбm zбjem.</text>
+	</string>
+	<string id="zat_b38_stalker_cop_task_dialog_2">
+		<text>Furt to samэ... dokud je tady nмkde upнrskэ hnнzdo, vљichni riskujeme kejhбky. A lovec Danila se furt neobjevil. Nechceљ nбm s tнm pomoct?</text>
+	</string>
+	<string id="zat_b38_stalker_medic_bloodsucker_dialog_0">
+		<text>Tetшev mi шekl, ћe jsi prohledбval tмlo jednoho ze ztracenэch stalkerщ. Myslнљ, ћe ho mohl zabнt upнr?</text>
+	</string>
+	<string id="zat_b38_stalker_medic_bloodsucker_dialog_1">
+		<text>Jo, to jo... stejnэ jako ostatnн mrtvoly... to nedokбћe ћбdnб jinб potvora, vysбt chlapovi z tмla vљechny krev aћ do poslednн kapky. Vљechno ukazuje na upнra... co jinэho si o tom myslet?</text>
+	</string>
+	<string id="zat_b38_stalker_medic_info_actor_dialog_0">
+		<text>Шekni mi nмco o sobм.</text>
+	</string>
+	<string id="zat_b38_stalker_medic_info_actor_dialog_1">
+		<text>Jsem lйkaш. Vystudovanэ neurochirurg. Co jeљtм chceљ vмdмt? Dokбћu otevшнt hypothalamus s naprostou pшesnostн, ale o nмco takovэho nemб v Zуnм nikdo zбjem. Zatнm. Tady funguju jako obyиejnэ doktor, jeden z mnoha, ale znбm svou prбci dobшe.</text>
+	</string>
+	<string id="zat_b38_stalker_medic_start_dialog_11">
+		<text>Poslouchбm.</text>
+	</string>
+	<string id="zat_b3_stalker_mechanic_b207_about_dealer_pda_0">
+		<text>Dokбzal bys deљifrovat иernou skшнnku?</text>
+	</string>
+	<string id="zat_b3_stalker_mechanic_b207_about_dealer_pda_1">
+		<text>No... na to nejsem zrovna specialista. Vљechny ty mapy a algoritmy... to nenн nic pro mм. Dones mi nмco, co je zaloћenэ na obyиejnэ fyzice a hned je mi jasnэ, co to je... poљќourбm se tady, tбmhle a hned to jede jako z praku.</text>
+	</string>
+	<string id="zat_b3_stalker_mechanic_b52_about_nimble_0">
+		<text>Myslнљ, ћe by mohl Иipera jet v kradenэm zboћн?</text>
+	</string>
+	<string id="zat_b3_stalker_mechanic_b52_about_nimble_1">
+		<text>Hej, poиkej, Иipera a kradenэ krбmy? Tomu nevмшнm. Kdyћ jsem si stavмl dнlnu, pomбhal mi zrovna Иipera. A ani za to nic nechtмl... aќ ti kdo chce, шнkб, co chce, Иipera je fajn chlap.</text>
+	</string>
+	<string id="zat_b3_stalker_mechanic_electro_toolkit_dialog_0">
+		<text>Nemбљ pro mм nмjakou prбci?</text>
+	</string>
+	<string id="zat_b3_stalker_mechanic_electro_toolkit_dialog_1">
+		<text>Ale jo, jasnм. Potшebuju pбr nбstrojщ, ale nemбm иas je shбnмt. Vybavenн uћ je takovэ, seћere ti veљkerej иas. Pokud mi doneseљ pбr uћiteиnejch hraиek, ukбћu ti, jak se vмci vylepљujou. A taky si vydмlбљ pбr drobnejch.</text>
+	</string>
+	<string id="zat_b3_stalker_mechanic_electro_toolkit_dialog_11">
+		<text>Fajn, mrknu na to.</text>
+	</string>
+	<string id="zat_b3_stalker_mechanic_electro_toolkit_dialog_12">
+		<text>Ne. Moћnб pozdмji.</text>
+	</string>
+	<string id="zat_b3_stalker_mechanic_electro_toolkit_dialog_2">
+		<text>Jo, jasnм. Potшebuju nбstroje, pamatujeљ? Kdyћ mi pomщћeљ, pomщћu jб tobм a pшihodнm pбr babek navнc.</text>
+	</string>
+	<string id="zat_b3_stalker_mechanic_ufo_memory_repair_0">
+		<text>Dokбћeљ odblokovat pamмќovej modul?</text>
+	</string>
+	<string id="zat_b3_stalker_mechanic_ufo_memory_repair_1">
+		<text>Nee, tak tady ti nepomщћu. Tyhle modernн elektronickэ a poинtaиovэ krбmy... to nenн nic pro mм. Najdi si nмkoho mladљнho, ti tyhle nesmysly nasбvaj uћ s mateшskэm mlнkem.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_b33_about_snags_container_0">
+		<text>Dokбћeљ otevшнt ocelovej kontejner?</text>
+	</string>
+	<string id="zat_b3_stalker_tech_b33_about_snags_container_1">
+		<text>V pohodм. Kvalitnн sluћba, jen za 500.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_b33_about_snags_container_11">
+		<text>Tady.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_b33_about_snags_container_111">
+		<text>Fajn, tak ukaћ... zvedni tohle, zatlaи tady... a bum! Hotovo! Zatнm nikdo nevynalezl nic, co bych nedokбzal otevшнt pбиidlem a kladivem. </text>
+	</string>
+	<string id="zat_b3_stalker_tech_b33_about_snags_container_12">
+		<text>Tolik nemбm.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_b33_about_snags_container_121">
+		<text>Tak pшijп, aћ budeљ mнt. Jб nikam nepщjdu, neboj se!</text>
+	</string>
+	<string id="zat_b3_stalker_tech_b33_about_snags_container_13">
+		<text>Promyslнm si to.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_drink_1_0">
+		<text>Mбm trochu chlastu. Chceљ panбka?</text>
+	</string>
+	<string id="zat_b3_stalker_tech_drink_1_2">
+		<text>Nee, jб uћ nepiju. Kdyћ jsem vidмl pшedmмt 62, шнkal jsem si, to je ono, uћ jsem v deliriu.... Chlast ti akorбt rozdrbe mozek. Nenн to zdravэ. A kdyћ bude po mnм, kdo bude dмlat nбboje pro tvoji gausovku?</text>
+	</string>
+	<string id="zat_b3_stalker_tech_drink_2_0">
+		<text>Tady mбљ dalљн flaљku.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_drink_3_0">
+		<text>Mбm tшetн flaљku, jestli chceљ jeљtм.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_instruments_0">
+		<text>Pшinesl jsem ti nбшadн.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_instruments_1">
+		<text>Fajn. Jakэ?</text>
+	</string>
+	<string id="zat_b3_stalker_tech_instruments_11">
+		<text>Pro zбkladnн prбci.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_instruments_111">
+		<text>Super! Teп uћ jen potшebuju nбшadн pro jemnou prбci a na kalibraci.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_instruments_12">
+		<text>Pro jemnou prбci.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_instruments_121">
+		<text>Super! Teп uћ jen potшebuju nбшadн pro zбkladnн prбci a na kalibraci.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_instruments_13">
+		<text>Kalibraиnн nбstroje.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_instruments_131">
+		<text>Super! Teп uћ jen potшebuju nбшadн pro zбkladnн a jemnou prбci.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_instruments_14">
+		<text>Zatнm ћбdnэ.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_instruments_141">
+		<text>Super! Teп uћ jen potшebuju nбшadн pro kalibraci a mбm vљechno.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_instruments_151">
+		<text>Super! Teп uћ jen potшebuju nбшadн pro jemnou prбci a mбm vљechno.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_instruments_161">
+		<text>Super! Teп uћ jen potшebuju nбшadн pro zбkladnн prбci a mбm vљechno.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_instruments_171">
+		<text>Super! Vэbornм! Jak to dмlбљ, chlape? Teп mбm vљechno, co potшebuju na poшбdnэ modifikace! Jen koukej, udмlбm kulomet ze zapalovaиe!</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_end_0">
+		<text>Pшinesl jsem ti schйma a dokumentaci k pшedmмtu 62.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_end_1">
+		<text>Tys to dokбzal! Super duper! Vмdмl jsem, ћe ty svinм nebudou mнt иas vљechno zniиit. Ukaћ... Hm.... Tak o tohle tмm svinнm љlo. Fajn! Budu si s tнm muset pбr hodin pohrбt. Nech mi tady gausku, zkusнm ji opravit. Jen chvilku poиkej, za pбr minut bude bejby zase zpнvat!</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_make_battery_0">
+		<text>Potшebuju baterky do gaus puљky.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_make_battery_1">
+		<text>Cena pro oblнbenэ zбkaznнky: 2000.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_make_battery_11">
+		<text>Tady mбљ.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_make_battery_12">
+		<text>Promyslнm si to.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_make_battery_13">
+		<text>Tolik u sebe teп nemбm.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_repair_gauss_0">
+		<text>Uћ jsi skonиil s tou gaussovkou?</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_repair_gauss_1">
+		<text>Pohodiиka. Energetickej systйm je vyиiљtмnej, jako bys ho omyl svмcenou vodou. Jestli zaиne blbnout, tak se s nн stav, poladнme to.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_repair_gauss_2">
+		<text>Jeљtм na tom makбm. Miluju svou prбci...</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_show_0">
+		<text>Mбm tady neznбmэ druh zbranм.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_show_1">
+		<text>Co to meleљ, jakej neznбmej druh? Ukaћ, podнvбm se...</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_show_2">
+		<text>Hele... vidмls nмkdy nмco takovэho?</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_start_0">
+		<text>Ah, to seљ ty... sakra jsme si uћili. Mмl jsem sen, ve kterэm jsi mi pшines nмco z minulosti... dobrб chlastaиka, fakt jo...</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_start_1">
+		<text>Nenн tohle zbraт z tvйho snu?</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_start_11">
+		<text>Sakra, ty vole... tak to asi nebyl sen. Tohle je Gaussova puљka, oficiбlnм teda pшedmмt 62. Pche... kdysi jsem dмlal na kontrakt pro tovбrnu Jupiter, navrhoval jsem zbranм, pokud si dobшe pamatuju, "zaloћenэ na principu akcelerace projektilu pomocн elektromagnetickйho pole". Vidнљ ty cнvky? Ty jsem dмlal jб... љkoda, ћe se ten projekt v roce 2004 zruљil. Nikdy jsme nenaљli dost kompaktnн zdroj energie.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_start_111">
+		<text>Z tйhle zbranм nмkdo stшнlel. Co se mohlo zmмnit?</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_start_1111">
+		<text>Jak to mбm sakra vмdмt? Abych pravdu шekl, jб bych si do tэ baterky netroufnul љќourat љroubovбkem. A taky je tady nмjakэ mechanickэ poљkozenн, v energetickэm okruhu. Teп by se mi fakt hodily plбny. V testovacн dнlnм, kde jsem makal, byla veљkerб projektovб dokumentace. Moћnб tam plбny a dokumenty ke gaussce jeљtм jsou... A vнљ, co je sranda? Poшбd mбm magnetickou klниovou kartu k dнlnм...</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_start_11111">
+		<text>Dбљ mi tu kartu?</text>
+	</string>
+	<string id="zat_b3_stalker_tech_produce_62_start_111111">
+		<text>Jo, jasnм... asi jo. Hlavnм ji neztraќ. Pokud mi ty dokumenty doneseљ, moћnб tu bouchaиku dokбћu opravit.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_return_access_card_0">
+		<text>Tady mбљ zpбtky svou pшнstupovou kartu.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_return_access_card_1">
+		<text>Dнky. Pшipomнnб mi starэ dobrэ иasy.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_start_1111">
+		<text>Takћe? Noo... klidnм mi dones тбky rozbitэ bouchaиky, prostшнlenэ, prorezlэ i olezlэ... stшнzlivej moc dobrej nejsem, ale mщћu to zkusit....</text>
+	</string>
+	<string id="zat_b3_stalker_tech_start_1112">
+		<text>Kde jsi byl? Uћ jsem mмl strach, vљude jsem tм hledal. Kde je ten stalker, ptal jsem se.... na zdravн, co шнkбљ?</text>
+	</string>
+	<string id="zat_b3_stalker_tech_start_1113">
+		<text>Nazdбrek. Fajn, ћe ses stavil. Jako doma, jako doma... pшinesls mi nмco na opravenн, nebo nмco k pitн?</text>
+	</string>
+	<string id="zat_b3_stalker_tech_start_1211">
+		<text>Haaa! Dobrэ! Ruce se mi tшepou, ale hlava chce vнc... nalej mi jeљtм jednu, mladнku!</text>
+	</string>
+	<string id="zat_b3_stalker_tech_start_1212">
+		<text>Kdo ti zakбzal nalejvat? Otevшi dalљн flaљku! Pшipijem si na nмco. Jo. Vodka ve mnм probouzн mechanickэho gйnia, fakt nekecбm.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_start_1312">
+		<text>Љkoda, ћe tady nenн Vtipoт, mohli jsme si pшipнt spoleиnм na Bбrku.... no, aќ odpoинvб v pokoji. Byl to dobrej chlap, fakt tvrпбk. Tvrdej jako skбla.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_start_1313">
+		<text>Љkoda ћe tady nenн Bбrka, mohli jsme si pшipнt spoleиnм na Vtiponм.... no, aќ odpoинvб v pokoji. Byl to dobrej chlap, fakt tvrпбk. Tvrdej jako skбla.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_start_1314">
+		<text>Uhh... Bбrka... Vtipoт... Jak se to jen mohlo stбt... jedna vмc vede k druhэ....</text>
+	</string>
+	<string id="zat_b3_stalker_tech_start_1315">
+		<text>Mmm? Copak to tady mбme? O ty pancйшovanэ samopaly se postarбm zнtra... neboj se, nic to nenн. Иekб na mne flaљka.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_start_14">
+		<text>To je инslo љedesбt dva... fakt bych se rбd podнval na schйma obvodщ.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_start_15">
+		<text>Moudrej vэbмr, kamarбde. Bouchaиku je tшeba udrћovat ve stoprocentnнm stavu. A jestli u sebe mбљ flaљku nebo dvм, rovnou ti ji mщћu i vylepљit. Chceљ k brokбrnм pшidмlat padбk? I to dokбћu, hehe.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_start_16">
+		<text>No koukej na to! Narvali do baterky elektrostatickej artefakt! Ha! Vмdмl jsem, ћe to bude nмjakб anomбlnн sraиka! Princip je jasnej, teп mщћu dмlat baterky sбm.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_start_17">
+		<text>Potшebujeљ nмco seљroubovat?</text>
+	</string>
+	<string id="zat_b3_stalker_tech_start_18">
+		<text>Vщbec tomu nerozumнm, jakoby to bylo hotentotsky. Uћ jsem dlouho ћбdnэ technickэ dokumenty neиetl.</text>
+	</string>
+	<string id="zat_b3_tech_buddies_about_1">
+		<text>Jo, pшiљel jsem do Zatonu se dvмma kamarбdama, Bбrkou a Vtiponмm... mladэ kluci, plnэ adrenalinu a testosteronu. Straљnм chtмli nahrabat spoustu artefaktщ, bejt nejlepљн, nejrychlejљн... A jб se na nм podнval svejma pшisleplejma oиima a шekl jsem si, to jim nic dobrэho nepшinese. Koшist je fajn, jasnм, ale nemб smysl kvщli nн skoиit mutantovi pшнmo do otevшenэ tlamy.</text>
+	</string>
+	<string id="zat_b3_tech_buddies_about_11">
+		<text>Co se stalo?</text>
+	</string>
+	<string id="zat_b3_tech_buddies_about_111">
+		<text>No... jednu noc jsme sedмli, pochlastбvali a hбdali se, co bude dбl. Jestli bychom mмli pokraиovat, nebo zщstat, a pokud pokraиovat, tak kam. Kaћdej v ruce bouchaиku, љermovali jsme s nima kolem sebe i na sebe, kapku jsme se rozehшбli. A kdyћ jsme se dohбdali, љli jsme vљichni vlastnн cestou, jб taky. Шekl jsem jim, ћe jeљtм neznaj ћivot... a hlavnм ty jeho nepшнjemnмjљн kousky. Ty vole... kdybych je tak mohl znova vidмt, chtмl bych se jim omluvit za to, co jsem na nм шval... zas bychom to tбhli chvнli spolu a vzpomнnali na starэ dobrэ иasy....</text>
+	</string>
+	<string id="zat_b3_tech_buddies_apologies_barge_0">
+		<text>Pokud na Bбrku narazнm, vyшнdнm mu tvoji omluvu.</text>
+	</string>
+	<string id="zat_b3_tech_buddies_apologies_barge_1">
+		<text>To by bylo fajn.</text>
+	</string>
+	<string id="zat_b3_tech_buddies_apologies_both_0">
+		<text>Pokud na tvэ kamarбdy narazнm, vyшнdнm jim tvoji omluvu.</text>
+	</string>
+	<string id="zat_b3_tech_buddies_apologies_both_1">
+		<text>To by bylo fajn.</text>
+	</string>
+	<string id="zat_b3_tech_buddies_apologies_joker_0">
+		<text>Pokud na Vtiponм narazнm, vyшнdнm mu tvoji omluvu.</text>
+	</string>
+	<string id="zat_b3_tech_buddies_apologies_joker_1">
+		<text>To by bylo fajn.</text>
+	</string>
+	<string id="zat_b3_tech_buddies_pda_0">
+		<text>Naљel jsem tohle PDA, podнvej se.</text>
+	</string>
+	<string id="zat_b3_tech_buddies_pda_1">
+		<text>K иemu by mi ten krбm byl? Ин to bylo?</text>
+	</string>
+	<string id="zat_b3_tech_buddies_pda_111">
+		<text>Bбrka je mrtvej?!... Tomu nemщћu uvмшit!... Ty vole! Ten byl tak tvrdej, jak to jen љlo... Oh, Bбrko... Odpoинvej v pokoji. Doufбm, ћe aspoт Vtipoт je v pohodм.</text>
+	</string>
+	<string id="zat_b3_tech_buddies_pda_112">
+		<text>Bбrka je mrtvej?!... Tomu nemщћu uvмшit!... Ty vole! Ten byl tak tvrdej, jak to jen љlo... Oh, Bбrko... a Vtiponi... Odpoинvejte v pokoji, kluci. Jak se to jen mohlo stбt...</text>
+	</string>
+	<string id="zat_b3_tech_buddies_pda_131">
+		<text>Jsou mrtvн!?... Tomu nemщћu uvмшit!... Ty vole! Bбrka byl tak tvrdej, jak to jen љlo... a Vtipoт... Vtiponi... Uћ se tvejm vtнpkщm nikdo nezasmмje. Odpoинvejte v pokoji, kluci. Jak se to jen mohlo stбt...</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_about_0">
+		<text>Mщћeљ mi odpovмdмt na pбr otбzek?</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_about_1">
+		<text>Jasnм.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_about_1111">
+		<text>Jak dlouho ti bude trvat, neћ splnнљ moji objednбvku?</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_about_11111">
+		<text>To zбleћн na tom, jak tмћkэ to bude. Vмtљinou mi to trvб tak den, nмkdy mнт.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_about_1114">
+		<text>Шekni mi nмco o sobм.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_about_11141">
+		<text>Nenн moc co шнct. Mбm za sebou dobrэ иasy i zlэ jako vмtљina lidн. Vlezl jsem do pбr anomбliн, unesli mм banditi... do Zуny jsem pшiљel jako mladej smrad, uћ kdysi dбvno. Ze zaибtku jsem dмlal poslниka - antirady, prщraznб munice, takovэ vмci. Pak jsem chvнli dшel na Sidoroviиe... splбcel jsem mu, ћe mi zachrбnil prdel. Zatнmco jsem za nмj tahal z ohnм horkэ brambory, udмlal jsem si pбr kontaktщ a nakonec jsem se pustil na vlastnн pмst, jakmile jsem si na to troufnul. Zatнm se mi podaшilo uhnout pшed vљнm, co po mм ћivot hodil, ale mбm pocit, ћe uћ mi dochбzн љtмstн. Ale na druhou stranu si uћ nehodlбm sedшнt prdel do krve kvщli hromбdce drobnejch.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_about_1116">
+		<text>Dнky.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_about_11161">
+		<text>Rбd jsem pomohl.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_b52_about_gun_questions_0">
+		<text>Prodal jsi mi kradenou bouchaиku!</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_b52_about_gun_questions_1">
+		<text>O иem to mluvнљ? V иorkбch jб nejedu. Dмlбm jen rovnэ kљefty. Pokud mi nevмшнљ, zeptej se, koho chceљ, na zбkladnм, vљichni ti шeknou, ћe jsem poctivej pшekupnнk, kterej nikdy s nikэm nevyjebal.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_b52_about_gun_questions_11">
+		<text>Narazil jsem na stalkera, kterej tvrdil, ћe je to jeho zbraт.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_b52_about_gun_questions_111">
+		<text>A jak se jmenoval?</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_b52_about_gun_questions_1111">
+		<text>Pahejl.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_b52_about_gun_questions_1112">
+		<text>Co je ti po tom?</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_b52_about_gun_questions_11121">
+		<text>Zбleћн na tom. Nмkdo tм totiћ tahб za nohu, stalkere.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_b52_about_gun_questions_12">
+		<text>No to se jeљtм uvidн.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_b52_about_gun_questions_121">
+		<text>Nмkdo tм totiћ tahб za nohu, stalkere.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_0">
+		<text>Jdu si vyzvednout svou objednбvku.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_111">
+		<text>Tady mбљ svэho stepnнho orlнka. Byla to nakonec vмtљн fuљka, neћ jsem si myslel. Nмjakej magor do pistolн o ni mмl fakt zбjem, ale sbalil jsem ji vиas. Jen se podнvej - ruиnм udмlanб pistole, komponenty jsou sladмnэ s totбlnн pшesnostн. Zajнmalo tм nмkdy, jak by vypadala odstшelovaиskб pistole? Tak pшesnм takhle nмjak. Dluћнљ mi o dva tisнce osmset vнc.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_1111">
+		<text>Okay, tady mбљ.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_11111">
+		<text>Tady mбљ. Radost s tebou obchodovat, kбmo.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_1112">
+		<text>Tolik u sebe nemбm.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_11121">
+		<text>Fajn, zatнm si ji u sebe nechбm. Doufбm, ћe brzo seћeneљ prachy.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_1113">
+		<text>Tohle koupit nechci.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_11131">
+		<text>Pokud si odmнtneљ vyzvednout objednбvku, pшнљtм uћ ti nebudu vмшit. Budu muset poинtat s rizikem v cenм a budu chtнt vмtљн zбlohu.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_111311">
+		<text>Stejnм tohle nechci.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_1113111">
+		<text>Fajn, jak chceљ.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_1114">
+		<text>Promyslнm si to.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_11141">
+		<text>Jasnм, jak chceљ. Zatнm si tu bouchaиku nechбm.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_112">
+		<text>Tady mбљ svэho ultra pшesnэho stepnнho orlнka. Dluћнљ mi 2800 navrch.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_121">
+		<text>Zнrej na Alpine - opravdovб krбska. Mщћeљ si bejt jistej, ћe je jedinб svэho druhu v celэ Zуnм. Unikбtnн kousek, z hroznм omezenэ sйrie pro speciбlnн jednotku. Nebylo snadnэ ji sehnat, dokonce jsem musel pouћнt nмjakэ svэ zбmoшskэ kontakty. Rozљншenej zбsobnнk, extra tvrzenб hlaveт, zбvмr ze speciбlnнch polymerщ. Pшihoп 2800 navrch a je tvoje.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_122">
+		<text>Tady mбљ svou pistoli Alpine se zvмtљenэm zбsobnнkem. Pшihoп zbэvajнcнch 2800 a bejby je tvoje.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_131">
+		<text>Hele, todle je March. Tahle pistolka kdysi patшila ћoldбkovi, kterэmu se шнkalo Ohaш. Je to kompaktnн velkokalibernн bouchaиka s malэm zpмtnэm rбzem a odlehиenou spouљtн. Ohaш byl stoprocentnн љmejd, ale ve zbranнch se vyznal, to mu musнљ uznat. Prej mмl v oblibм ustшelit obмti vљechny иtyшi konиetiny a aћ pak poslat poslednн kulku do palice jeљtм pшed tнm, neћ dopadla obмќ na zem. Dluћнљ mi 2800.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_132">
+		<text>Tady mбљ rychlopalnou pistoli March. Dluћнљ mi 2800.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_211">
+		<text>Tady mбљ - samopal Cutter. Шeknu ti to na rovinu, nevљнmej si, jak vypadб. Je to fungl novej model, jeљtм ani nenн v sйriovэ vэrobм. Prototyp, pшнmo ze zbrojovky. Snaћili se udмlat bouchaиku novэ generace: kombinace velkэho kalibru, vysokэ kadence a pшitom to mмlo mнt sluљnou pшesnost. Pшihodнљ mi jeљtм 8000 navrch.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_212">
+		<text>Jo, tady mбљ rychlopalnej samopal Cutter. Dluћнљ mi jeљtм 8000.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_221">
+		<text>Tohle je fajn krбm - Carabineer. Poшбdnб vojenskб brokбrna. Dokбћe jet v plnм automatickэm reћimu, ale pшitom mб dнky speciбlnнm ъpravбm sluљnej zpмtnej rбz. Pшihoп 8000 a je tvoje.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_222">
+		<text>Tady mбљ automatickou brokovnici Carabineer. Dej mi 8000 a je tvoje.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_231">
+		<text>Myslнm, ћe tohle pшesnм potшebujeљ. Eliminator, nejnovмjљн kousek. Celб zбsilka mмla skonиit v centrбlnн Africe, ale kamarбdi mi jako laskavost pшedali jeden vzorek. Automatickб brokovnice s velkэm zбsobnнkem a vynikajнcн kadencн. Mщћe bejt tvoje jen za 8000.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_232">
+		<text>Jasnм. Automatickб brokovnice Eliminator s velkэm zбsobnнkem. Za 8000.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_311">
+		<text>Jasnм. Tohle je Storm, samopal s integrovanэm granбtometem. Tenhle prototyp je modifikovanб verze konvenиnнho samopalu pro speciбlnн jednotky v Zуnм. Velkэ technickэ vylepљenн, navнc je to vlasteneckб bouchaиka, protoћe ji udмlali Slovani... pшidej mi 16000 a je tvoje.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_312">
+		<text>Jasnм, tohle je Storm, samopal s integrovanэm granбtometem, za 16000 navнc.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_321">
+		<text>Tady to je, GP37, ъtoиnб puљka novэ generace. Pшesnб, spolehlivб a se zabudovanou optikou. Pщvodnм patшila pozorovateli OSN z party, kterou poslali na prщzkum Zуny. Ale nмjak se jim nezadaшilo... 16000 a puљka je tvoje.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_322">
+		<text>Tady to je, GP37, ъtoиnб puљka novэ generace. Bude tм stбt 16000.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_331">
+		<text>Hned to bude. Tohle je modulбrnн puљka FT-200M, dмќбtko belgickэch puљkaшщ. Pшesnб univerzбlnн, vhodnб pro levбky i pravбky, mб vlastnн optiku a granбtomet. Dostal jsem ji od jednoho neљќastnэho pozorovatele OSN... Bude tм stбt 16000 navнc.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_332">
+		<text>Tady je modulбrnн puљka FT-200M. Dostanu navнc 16000.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_411">
+		<text>Tohle je Tide. Jejн design je zaloћenэ na tichэ odstшelovaиce, speciбlnм upravenэ pro vojбky v Zуnм na likvidaci zombбkщ. Dбvб pшed kadencн pшednost zastavovacн sнle, takћe mщћe snajpr sundбvat zombice jednu po druhэ, aniћ by se prozradil. Ale kdyћ se ukбzalo, ћe stalkeшi na likvidaci zombбkщ u Bariйry budou staиit sami, tak se objednбvka na sйriovou produkci zruљila. Tohle dмќбtko mщћeљ dostat za 16000.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_412">
+		<text>Tohle je Tide, tichб odstшelovaиka se zvэљenou silou. Pшidej mi 16000 a mщћeљ si ji hned vyzkouљet.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_421">
+		<text>Tady tohle je SVU2-A, zkrбcenб odstшelovaиka se zvэљenou kadencн. Koupil jsem ji od Maca, legendбrnнho иlena Svobody. Pшнsahal, ћe v Zуnм druhб takovб nenн. Je to exkluzivnн kousek, alespoт v tэhle oblasti. Bude tм stбt dalљнch 16000.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_422">
+		<text>Jo, SVU2-A, zkrбcenб odstшelovaиka se zvэљenou kadencн. Mщћe bejt tvoje za 16000.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_431">
+		<text>Jasnм, jen koukni tady na Lynxe. Ruиnм udмlanej jednнm mнstnнm expertem. Ten uћ je mrtvej, takћe dalљн uћ asi neudмlб. Lynx vypadб jako kaћdб jinб bouchaиka, ale staин z nн pбrkrбt vystшelit a pochopнљ, v иem je rozdнl. Vynikajнcн kombinace pшesnosti a sнly. Pшihoп mi 16000 a mщћeљ ji шнkat milбиku.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_432">
+		<text>Jo, Lynx - odstшelovaиka se zvэљenou pшesnostн a silou. Pшihoп 16000 a je tvoje.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_511">
+		<text>Hele, podaшilo se mi sehnat tohle - CS-3a s helmou. Ta helma sama o sobм nenн nic extra, ale umoћтuje instalovat mobilnн taktickej systйm, do kterэho patшн kvalitnн systйm noиnнho vidмnн a aktivnн infraиervenej senzor. CS-3a je fakt krбsnej kus zbroje. Vynikajнcн ochrana pшed kulkama i anomбliema, to v tak lehkэ zbroji normбlnм nenajdeљ. Celэ tм to bude stбt 32000.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_512">
+		<text>Jo. Zbroj CS-3a s taktickou helmou. 32000 dohromady.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_611">
+		<text>Speciбlnм pro tebe tady mбm oblek SEVA. Pшesnм, jak sis objednal - uzavшenej respiraиnн systйm, odolnб vщиi ћбru, chrбnн pшed elektшinou, vnмjљн povrch pokrytej antikorozivnнma materiбlama. Plus nмkolik zabudovanejch kontejnerщ na artefakty jako malej bonus. Kaћdej stalker by takovou chtмl. Pшihoп mi 24000, jak jsme se dohodli, a je to tvoje.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_612">
+		<text>Tady, oblek Seva. Jak jsme se dohodli, dluћнљ mi 24000.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_711">
+		<text>Tady to mбme, bojovej exoskeleton, skoro jak z nмjakэho filmu. Nejlepљн ochrana v Zуnм proti kulkбm, paшбtщm nebo stшepinбm, akorбt na tanky si budeљ muset dбvat bacha. Navнc ti pшidбvб poшбdnou sнlu, ale tank neuneseљ, na ty si fakt dбvej bacha. 48000 a je tvoje se vљнm vљudy, i s baterkama a servama.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_get_order_712">
+		<text>Tady to je, bojovej exoskeleton jak z nмjakэho filmu. 48000 a je tvщj.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_0">
+		<text>Chci si u tebe nмco objednat.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_1">
+		<text>V pohodм. Co potшebujeљ?</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_11">
+		<text>Pistoli.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_111">
+		<text>Jasnм. Bude stбt 3500 a chci zбlohu sedm stovek.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_1111">
+		<text>Okay, tady mбљ.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_11111">
+		<text>Dбm ti vмdмt, jakmile objednбvka dorazн.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_1112">
+		<text>Nemбm u sebe penнze.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_11121">
+		<text>No tak se stav, aћ budeљ mнt.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_1113">
+		<text>Vнљ co, rozmyslel jsem si to.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_11131">
+		<text>Fajn. Aћ se rozhodneљ si nмco objednat, jб budu tady.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_112">
+		<text>Nejseљ moc spolehlivej zбkaznнk, takћe tм bude pistole stбt 4200. A chci zбlohu 1400.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_113">
+		<text>Obбvбm se, ћe nejlepљн pistole uћ jsou prodanэ. Jestli chceљ nмjakou normбlnн, stav se za Hejkalem.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_12">
+		<text>Zbraт pro uzavшenэ prostory</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_121">
+		<text>Jasnм. Bude tм stбt 10000 a chci zбlohu 2000.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_122">
+		<text>Jednu objednбvku uћ sis odmнtnul pшevzнt. Takћe tм bude stбt 12000, z toho 4000 zбloha.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_123">
+		<text>Hrm... vнљ, asi ti moc nepomщћu. O ty je moc velkej zбjem.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_13">
+		<text>Ъtoиnou puљku.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_131">
+		<text>Takћe nмco s velkэm kalibrem a poшбdnou kadencн, jasnм... cena je 20000, z toho 4000 zбloha. Co ty na to?</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_132">
+		<text>Nejseљ moc dobrej zбkaznнk, takћe ti naъиtuju 24000 a 8000 chci pшedem. Dohodnuto?</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_133">
+		<text>Teп se mi to moc nehodн... armбda dмlб u Kordуnu potнћe. Nмkdo jim nedбvno zaъtoиil na zбkladnu, takћe jsou pмknм nasranэ a nedб se s nima moc domluvit.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_14">
+		<text>Odstшelovaиku</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_141">
+		<text>Pro tebe mщћu sehnat to nejlepљн jen za 20000, ale budeљ mi muset dбt 4000 jako zбlohu.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_142">
+		<text>Tvoje objednбvky nejsou moc spolehlivэ... mщћu ti zkusit sehnat nмco za 24000, ale budeљ mi muset dбt zбlohu 8000.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_143">
+		<text>Je mi lнto, ale takovэ bouchaиky teп moc nejsou dostupnэ. Mщj kontakt na odstшelovaиky je... шeknмme ћe indisponovanej.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_15">
+		<text>Pancйшovanэ oblek.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_151">
+		<text>Jo, vymyslнm nмco... vhodnэho. Ale bude tм stбt 40000, z toho 8000 pшedem.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_152">
+		<text>Jo, vymyslнm nмco... vhodnэho. Akorбt minulou objednбvku sis nepшevzal, takћe ti pшirazнm, bude to stбt 48000 a z toho chci zбlohu 16000.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_153">
+		<text>Lepљн neћ ten, co uћ jsem ti prodal, asi neseћenu. Byl to unikбtnн kousek, nejlepљн dostupnej.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_16">
+		<text>Oblek s uzavшenэm dэchacнm systйmem</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_161">
+		<text>To je velkб objednбvka... nebude snadnэ to sehnat, to ani nбhodou. Mщћu zkusit jeden sehnat, pro tebe za 30000, ale chci zбlohu 6000.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_162">
+		<text>U poslednн objednбvky ses na mм vykaљlal, takћe nevнm, nevнm. No, mщћu ti zkusit nмjakej sehnat, ale bude to za 36000 a chci zбlohu 12000.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_163">
+		<text>Na poslednн objednбvce jsem kvщli tobм prodмlal. Po druhэ to riskovat to nebudu.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_17">
+		<text>Exoskeleton.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_171">
+		<text>Nejspнљ sis to poшбdnм promэљlel. Moћnб se mi podaшн sehnat bojovou verzi, bude to stбt 60000. Jб vнm, drahэ, ale vyplatн se. A nezapomeт, ћe 12000 chci jako zбlohu.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_172">
+		<text>Pшi minulэ objednбvce jsi mм celkem nasral, takћe tohle budeљ mнt za 72000. A z toho chci 24000 teп hned.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_173">
+		<text>Ani nбhodou. Co zavшeli tovбrnu, mщћeљ sehnat nepouћнvanej exoskeleton akorбt u nмjakэ mrtvoly... a do toho jб nejdu.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_18">
+		<text>Teп zrovna nic.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_place_order_2">
+		<text>Je mi lнto, mбm teп krбm zavшenej... Doиasnэ problйmy s dodбvkama.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_start_11">
+		<text>Nazdar. Mnм шнkaj Иipera. Lidi za mnou chodн pro unikбtnн bouchaиky. Vzбcnэ modely, prototypy, unikбtnн kousky, takovэhle vмci. Plus nejlepљн moћnэ vybavenн, modifikovanэ ochrannэ a bojovэ obleky. Kaћdej kousek osobnм testuju, takћe za kvalitu ruинm.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_start_12">
+		<text>Nazdar, chceљ si nмco objednat?</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_start_13">
+		<text>Nazdar</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_start_14">
+		<text>Brzo budeљ mнt objednбvku tady.</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_start_15">
+		<text>Objednбvka je tady. Stav se pro ni.</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_0">
+		<text>Hej! Ty seљ Pahejlщv kбmoљ?</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_1">
+		<text>No, znбm ho.</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_11">
+		<text>Шekl mi, ћe nбm pшineseљ nмjakou koшist.</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_111">
+		<text>Nepamatuju si, ћe bych se takhle dohodnul.</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_111111">
+		<text>Jo, jasnм. Tak to ti asi budem muset osvмћit pamмќ.</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_1111111">
+		<text>Sbohem.</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_11112">
+		<text>Nic takovэho!</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_111121">
+		<text>Teп dobшe rozmэљlej. Jestli mбљ pщlku mozku, tak snad pochopнљ, ћe s pшesilou houby nadмlбљ a je lepљн bejt hodnej.</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_1111211">
+		<text>Шek jsem ne!</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_2">
+		<text>Ne. Neznбm ho.</text>
+	</string>
+	<string id="zat_b53_artefact_hunter_1_gathering_artefacts_11">
+		<text>Ahh... sakra... jsem fakt tмћce zranмnej... pomoz mi, kбmo, potшebuju lйkбrniиku... uћ dlouho nevydrћнm...</text>
+	</string>
+	<string id="zat_b53_artefact_hunter_1_gathering_artefacts_111">
+		<text>Vezmi si tuhle lйkбrniиku.</text>
+	</string>
+	<string id="zat_b53_artefact_hunter_1_gathering_artefacts_1111">
+		<text>Uf. Dмkuju, kбmo. Uћ jsem byl fakt jen kousek od toho, abych v Bojleru zdechnul. Zmutovanэ иokli by si to uћili. Na, vem si aspoт mщj detektor, moћnб se ti bude nмkdy hodit. A fakt dнk, ћes mм zachrбnil. Jб si teп pщjdu odpoиinout na zбkladnu.</text>
+	</string>
+	<string id="zat_b53_artefact_hunter_1_gathering_artefacts_11111">
+		<text>Hodnм љtмstн.</text>
+	</string>
+	<string id="zat_b53_artefact_hunter_1_gathering_artefacts_1112">
+		<text>Uf. Dмkuju, kбmo. Uћ jsem byl fakt jen kousek od toho, abych zdechnul. Zmutovanэ иokli by si to uћili. Na, vem si tenhle artefakt, moћnб se ti bude nмkdy hodit. A fakt dнk, ћes mм zachrбnil. Jб si teп pщjdu odpoиinout na zбkladnu.</text>
+	</string>
+	<string id="zat_b53_artefact_hunter_1_gathering_artefacts_112">
+		<text>Potшebuju je sбm..</text>
+	</string>
+	<string id="zat_b53_artefact_hunter_1_gathering_artefacts_113">
+		<text>Nemбm lйkбrniиku.</text>
+	</string>
+	<string id="zat_b53_artefact_hunter_1_gathering_artefacts_12">
+		<text>Jeљtм jednou dнky! Nebejt tebe, prdмl bych teп do hlнny...</text>
+	</string>
+	<string id="zat_b53_artefact_hunter_2_gathering_artefacts_11">
+		<text>Stalkere! Pojп rychle pomoct Petruљovi! Tбmhle, na okraji strћe! Chytla ho anomбlie! Oblek mu vщbec nepomohl! A jб dokonce ani ћбdnej nemбm. Sloћili jsme se spoleиnм s Petruљou na jeden... pokud udмlбm jeљtм krok, je po mnм! Pomoz nбm, prosнm!</text>
+	</string>
+	<string id="zat_b53_artefact_hunter_2_gathering_artefacts_111">
+		<text>OK, zщstaт, kde jseљ. Zkusнm to.</text>
+	</string>
+	<string id="zat_b53_artefact_hunter_2_gathering_artefacts_112">
+		<text>To je tvщj problйm.</text>
+	</string>
+	<string id="zat_b53_artefact_hunter_2_gathering_artefacts_12">
+		<text>Dмkuju ti, ћes zachrбnil Petruљu. Sakra, ћe jsme si nenaљetшili na lepљн oblek!</text>
+	</string>
+	<string id="zat_b53_artefact_hunter_2_gathering_artefacts_13">
+		<text>Tбhni mi z oин, hajzle. Nechal jsi Petruљu chcнpnout... oproti nмmu jseљ ъplnej posera!</text>
+	</string>
+	<string id="zat_b53_artefact_hunter_2_gathering_artefacts_131">
+		<text>Na vidмnou.</text>
+	</string>
+	<string id="zat_b57_barman_reward_dialog_0">
+		<text>Zlikvidoval jsem hnнzdo upнrщ.</text>
+	</string>
+	<string id="zat_b57_barman_reward_dialog_1">
+		<text>Dobшe. Pomstil jsi naљe mrtvй bratry, aќ je jim zemм lehkб... Tuhle odmмnu sis zaslouћil.</text>
+	</string>
+	<string id="zat_b57_barmen_about_bloodsucker_lair_dialog_0">
+		<text>Pod komplexem antйn jsem naљel celй hnнzdo upнrщ.</text>
+	</string>
+	<string id="zat_b57_barmen_about_bloodsucker_lair_dialog_1">
+		<text>Fajn. To hnнzdo je tшeba zlikvidovat. Nech mм chvilku pшemэљlet... иert vн, kolik v tмch tunelech upнrщ bude. Moћnб bysme je mмli zaplynovat. Mбm pocit, ћe Hejkal шнkal nмco o nбdrћнch s plynem. Stav se za nнm -  jб s nнm teп nejsem moc zadobшe. Pokud by se ti podaшilo sehnat nбdrћ s plynem, staиilo by ji pшipojit na ventilaиnн systйm komplexu a za pбr minut bude klid.</text>
+	</string>
+	<string id="zat_b57_barmen_about_bloodsucker_lair_dialog_11">
+		<text>Fajn, udмlбm to.</text>
+	</string>
+	<string id="zat_b57_barmen_about_bloodsucker_lair_dialog_12">
+		<text>Promyslнm si to.</text>
+	</string>
+	<string id="zat_b57_barmen_about_bloodsucker_lair_dialog_13">
+		<text>Nбdrћ s plynem uћ mбm.</text>
+	</string>
+	<string id="zat_b57_barmen_about_bloodsucker_lair_dialog_131">
+		<text>No teda, seљ dobrej, brбcho.</text>
+	</string>
+	<string id="zat_b5_bandit_hide_dialog_11">
+		<text>A hele, tady je stalker, na kterэho иekбme.</text>
+	</string>
+	<string id="zat_b5_bandit_hide_dialog_111">
+		<text>Co je v plбnu?</text>
+	</string>
+	<string id="zat_b5_bandit_hide_dialog_1111">
+		<text>Pщjdeme na setkбnн. Nebudeљ muset skoro nic dмlat, aspoт doufбm. Prostм stщj poblнћ a tvaш se vэhrщћnм.</text>
+	</string>
+	<string id="zat_b5_bandit_hide_dialog_11111">
+		<text>Ok.</text>
+	</string>
+	<string id="zat_b5_bandit_hide_dialog_21">
+		<text>Heh. Rozhodnм budou litovat, ћe si s nбma zaинnali. S bouchaиkou seљ dobrej, stalkere. Na, vezmi si tohle.</text>
+	</string>
+	<string id="zat_b5_bandit_hide_dialog_211">
+		<text>Hodnм љtмstн.</text>
+	</string>
+	<string id="zat_b5_bandit_hide_dialog_31">
+		<text>Ty zatracenej posero. Podмlals to, tak teп tбhni.</text>
+	</string>
+	<string id="zat_b5_bandit_hide_dialog_311">
+		<text>Sbohem.</text>
+	</string>
+	<string id="zat_b5_bandit_hide_dialog_41">
+		<text>Proи ten spмch?</text>
+	</string>
+	<string id="zat_b5_bandit_hide_dialog_411">
+		<text>Nic.</text>
+	</string>
+	<string id="zat_b5_illicit_dealer_dialog_11">
+		<text>Poslal tм Hejkal?</text>
+	</string>
+	<string id="zat_b5_illicit_dealer_dialog_111">
+		<text>Jo. Шekl, ћe potшebujeљ pomoc.</text>
+	</string>
+	<string id="zat_b5_illicit_dealer_dialog_1111">
+		<text>Potшebuju pomoc, to je pravda. No, mмl bys to zvlбdnout, jak se na tebe tak koukбm.</text>
+	</string>
+	<string id="zat_b5_illicit_dealer_dialog_11111">
+		<text>Fajn. O co jde?</text>
+	</string>
+	<string id="zat_b5_illicit_dealer_dialog_111111">
+		<text>Budeљ dмlat ochranku bмhem obchodu. Nic vнc.</text>
+	</string>
+	<string id="zat_b5_illicit_dealer_dialog_1111111">
+		<text>To zvlбdnu.</text>
+	</string>
+	<string id="zat_b5_illicit_dealer_dialog_21">
+		<text>Drћ se poblнћ a krej mм.</text>
+	</string>
+	<string id="zat_b5_illicit_dealer_dialog_211">
+		<text>Jasnм.</text>
+	</string>
+	<string id="zat_b5_illicit_dealer_dialog_31">
+		<text>Budu mluvit jen se љйfem.</text>
+	</string>
+	<string id="zat_b5_illicit_dealer_dialog_311">
+		<text>Jak chceљ.</text>
+	</string>
+	<string id="zat_b5_illicit_dealer_dialog_41">
+		<text>Dмkuju, stalkere. Moc jsi mi pomohl. Mмl jsem pocit, ћe se mnou ti debilovй zkusн nмjak vybмhnout. Sledovali nбs celou dobu! Tohle mбљ za nбmahu.</text>
+	</string>
+	<string id="zat_b5_illicit_dealer_dialog_411">
+		<text>Hodnм љtмstн.</text>
+	</string>
+	<string id="zat_b5_illicit_dealer_dialog_42">
+		<text>Jako lenoch seљ dobrej, jako ochranka nic moc. Ale slнbil jsem ti zaplatit, tak tady mбљ.</text>
+	</string>
+	<string id="zat_b5_illicit_dealer_dialog_421">
+		<text>Hodnм љtмstн.</text>
+	</string>
+	<string id="zat_b5_illicit_dealer_dialog_43">
+		<text>Jako lenoch seљ dobrej, jako ochranka nic moc. Ale slнbil jsem ti zaplatit, tak tady mбљ.</text>
+	</string>
+	<string id="zat_b5_illicit_dealer_dialog_431">
+		<text>Hodnм љtмstн.</text>
+	</string>
+	<string id="zat_b5_illicit_dealer_dialog_44">
+		<text>Co chceљ? Nic ti nedluћнm, sotva jsem to zvlбdnul.... tбhni!</text>
+	</string>
+	<string id="zat_b5_illicit_dealer_dialog_441">
+		<text>Hodnм љtмstн.</text>
+	</string>
+	<string id="zat_b5_stalker_commander_dialog_11">
+		<text>Dнk, ћes pшiљel. Chceme se pшiplнћit k banditщm a poslechnout si, co kecajн. Pak se uvidн.</text>
+	</string>
+	<string id="zat_b5_stalker_commander_dialog_111">
+		<text>Aha.</text>
+	</string>
+	<string id="zat_b5_stalker_commander_dialog_21">
+		<text>Dмkuju, stalkere. Vezmi si od nбs tohle... Barman ti dб hlavnн odmмnu.</text>
+	</string>
+	<string id="zat_b5_stalker_commander_dialog_211">
+		<text>Aha.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_0">
+		<text>Шekni mi o tom, jak tady ћijeљ.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_1">
+		<text>No nenн to prochбzka parkem, to je jasnэ... co pшesnм tм zajнmб?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_1111">
+		<text>Co tady dмlбte?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_11111">
+		<text>Hlнdбme stalkery. Musнљ pшiznat, ћe tak pщlka z vбs jsou jeљtм malэ dмti. Pшijdete si do Zуny s hloupouиkэma snama, nebo si hrбt na hrdiny, nebo jen proto, ћe venku je na vбs nмkdo zlej. Neuvмdomujete si, co tady na vбs иekб - a vмtљinou je to smrtka. Na takovэhle dбvбme pozor. Kdyћ najdem nмjakэho na Smeќбku, seberem mu vмci a poљlem ho zpбtky ke Kordуnu. Nмkterэ dostanou rozum a vrбtмj se ven. Ti, kteшн majн vнc koulн neћ mozku a tak se vrбtмj - ty pak chrбnнme, ale platмj nбm za to danм. Шнkбm ti, na naљe ъzemн si nikdo netroufб. Ani armбda, ani ћoldбci, dokonce ani mutanti.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_1112">
+		<text>Co vбs pшivedlo do centra Zуny?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_11121">
+		<text>Naљe nohy. Pшiљli jsme sem za stalkery, jak jinak? Bez nбs, kteшн udrћujem poшбdek, by tady byl totбlnн chaos. Co najdeљ, to je tvoje, jasnм, ale kdo bude platit danм? Vљak vнљ, mнrovэ a bezpeиnostnн danм. Jakoћe zatнmco jeden z vбs dojн anomбlii, jeden z nбs hlнdб, aby ho nмco neseћralo. Kdyћ se pak vrбtн, tak si vezmem podнl... za dodrћovбnн bezpeиnosti, vљak chбpeљ.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_1113">
+		<text>Jak ses stal љйfem?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_11131">
+		<text>No kde zaинt... asi se to se mnou tбhne uћ od stшednн. Mмl jsem dobrэho kбmoљe, dalo by se шнct nejlepљнho. Tбhli jsme to spolu, kouшili, chlastali a tak. Akorбt on chtмl furt vнc a vнc vzrщљa. Pustil se do drog: nejdшнv trбvu, pak hбиko a koks, kdyћ zaиal vydмlбvat prachy. Шнkal jsem mu: "Vyser se na to svinstvo, Toljo, neћ bude pozdм." Ale neposlouchal. Jednou si prбsknul nмco шнznutэho a nedal to. Naљel jsem jeho dealera a vyrovnal ъиty... akorбt mм pшi tom nмkdo vyfotil a nastalo peklo - skonиil jsem v lapбku, zapletl se do bitek, dostal kudlou do bшicha. Kdyћ jsem vylezl ven, pustil jsem se do kљeftovбnн a zavшeli mм zas. No a kdyћ jsem vylez z dнry po druhэ, na vљechno jsem se vykaљlal a zamншil k Zуnм. Pбr mмsнcщ jsem si budoval pozici, pak mм povэљili. A tak tomu teп tady љйfuju a prosazuju mнstnн zбkony.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_1114">
+		<text>Co si myslнљ o stalkerech?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_11141">
+		<text>Kaћdej je nмjakej. Najdeљ blbce, kteшн nevydrћн ani tejden, jinн tvrdм makaj... a jinн jsou fajn chlapi, se kterэma ћivot mlбtн na obou stranбch Kordуnu, a tak se s tнm nauиili vychбzet. Ten prvnн typ sdнrбme dohola, druhej zdaтujem. A ten druhej... no, s tмma si prostм navzбjem nelezem do cesty. Љkoda, ћe je od sebe nedokбћeљ rozeznat na prvnн pohled.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_1115">
+		<text>Ale to nic, zapomeт na to.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_11151">
+		<text>Jak chceљ.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_barmen_under_actor_dialog_0">
+		<text>A teп Fousби pracuje pro nбs.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_barmen_under_actor_dialog_1">
+		<text>Vнљ, co se шнkб: "Krбva je naљe, jdem ji podojit." Obиas se za nнm stav a pшipomeт mu, ћe mб navalit poplatek.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_compass_actor_dialog_0">
+		<text>Fousби mб dщleћitou objednбvku na artefakt, kterэmu se шнkб Kompas.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_compass_actor_dialog_1">
+		<text>Musнme ten Kompas sebrat. Fousби by se pro nмjakou malou rybu takhle nenervoval. Mбm tuљenн, ћe si tak chce zachrбnit prdel... a zщstat v byznysu. Dones mi ten Kompas, jakmile ho najdeљ.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_compass_give_actor_dialog_0">
+		<text>Naљel jsem Kompas. Tady mбљ.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_compass_revert_actor_dialog_0">
+		<text>Nechce se mi hledat ti ten Kompas.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_compass_revert_actor_dialog_1">
+		<text>Hele, debile, pochop jednu vмc. Pokud ti nмco шeknu a ty mм zklameљ, tak uћ se mi moc lнbit nebudeљ. A lidi, kterэ se mi nelнbмj, vмtљinou brzo smrdмj nмkde v pшнkopм. Je ti to jasnэ?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_compass_revert_actor_dialog_11">
+		<text>Budu na to pamatovat.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_detectors_actor_dialog_0">
+		<text>Seћenu od stalkerщ ty detektory.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_detectors_actor_dialog_1">
+		<text>Fajn. Jб se mezitнm postarбm o zablokovбnн dalљнch cestiиek.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_refuse_af_dialog_0">
+		<text>Jeden malej ptбиek mi vyzvonil, ћe jsi dal Kompas Fousбиovi. Tak teп mм pozornм poslouchej, debile. Kdyћ mм nмkdo zklame, jsem na nмj vмtљinou nasranej. Nerad jsem na nмkoho nasranej a tak to vмtљinou vyшeљнm pмknм rychle. Rozumнљ mi?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_refuse_af_dialog_1">
+		<text>Budu na to pamatovat.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_ruin_actor_dialog_0">
+		<text>Fousбиovi uћ doљly vylepљenй detektory.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_ruin_actor_dialog_1">
+		<text>Vэbornм. Zatнmco jsi byl pryи, odшнznul jsem mu pбr dalљнch kanбlщ. Teп je klient nбљ, celej nбљ. Stav se za Fousбиem a шekni mu, ћe ho pozdravuje Sultбn.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_start_actor_dialog_0">
+		<text>Fousби mi dluћн prachy. Hejkal шнkal, ћe bys mi mohl pomoct.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_start_actor_dialog_1">
+		<text>Asi jo... vidнm to takhle, doћeneme Fousбиe k bankrotu a pшevezmem mu ten jeho kљeft. Ty dostaneљ zpбtky svэ prachy a podнl na kљeftu. Dohodnuto?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_start_actor_dialog_11">
+		<text>Dohodnuto.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_start_actor_dialog_111">
+		<text>Teп musнљ zjistit, s инm mб Fousби takovэ prбce. Kdyћ mu odшнznem zбsobovacн kanбly, pщjde to snadno.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_start_actor_dialog_12">
+		<text>Promyslнm si to.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_start_actor_dialog_121">
+		<text>Ale nezapomeт, ћe pшemejљlenн љkodн zdravн.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b52_about_nimble_0">
+		<text>Myslнљ, ћe by mohl Иipera jet v kradenэch zbranнch?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b52_about_nimble_1">
+		<text>Иipera? Houby, ten na to nemб ћaludek. Horkэ vмci mб pod palcem Hejkal. Co prodбљ, on koupн a na nic se neptб.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b52_about_snag_0">
+		<text>Hledбm Pahejla. Nevнљ, kde bych ho naљel?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b52_about_snag_1">
+		<text>Vнm. Chlapi ho vidмli pшed pбr dny u jeшбbщ v doku. Mмl bych toho blba zmбиknout a dostat z nмj prachy, kterэ mi dluћн, ale furt na to zapomнnбm,</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b5_give_task_dialog_11">
+		<text>Mбm pro tebe prбci. Chlapi jdou na setkбnн s pшekupnнkem... jde o kљeft, vљak vнљ. V poslednн dobм je v Zуnм nмjak horko, tak si шнkбm, dalљн stшelec navнc vadit nebude. Hlavnм je tшeba, aby to љlo vљechno hladce.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b5_give_task_dialog_111">
+		<text>OK.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b5_give_task_dialog_1111">
+		<text>Dobшe. Chlapi na tebe poиkajн u loveckй stanice. Souшadnice jsem ti nahrбl do PDA.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b5_give_task_dialog_11111">
+		<text>Aha.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b5_give_task_dialog_112">
+		<text>Nemбm zбjem.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b5_give_task_dialog_31">
+		<text>Co tady sakra jeљtм dмlбљ? Padej k loveckй stanici.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b5_give_task_dialog_311">
+		<text>Uh-huh.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b5_give_task_dialog_41">
+		<text>Tak co, uћ ses rozmyslel? Seљ s nбma, nebo jak?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b5_give_task_dialog_411">
+		<text>Jsem s vбma.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b5_give_task_dialog_412">
+		<text>Zщstanu na vlastnн pмst.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_intro_0">
+		<text>Pamatuj. Jsem Sultбn. Vљechno, co se tady dмje, buп pшнmo шнdнm, nebo budu. Pokud si chceљ spokojenм ћнt, budeљ makat pro mм. Pokud ne, budeљ to mнt sakra blbэ. Tak to tady funguje, brбcho.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_start_dialog_11">
+		<text>Co potшebujeљ?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_start_dialog_21">
+		<text>Co tм sem pшivбdн?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_start_dialog_31">
+		<text>No?</text>
+	</string>
+	<string id="zat_b7_killed_self_actor_dialog_0">
+		<text>Pozabнjel jsem ty stalkery sбm.</text>
+	</string>
+	<string id="zat_b7_killed_self_actor_dialog_1">
+		<text>No ty vole, ty se s tнm nesereљ. Prostм nabмhneљ a hotovo, ty vole. Proи jsem tм jen verboval, do prdele... nic jsi nбm nevydмlal, jen teп budem mнt problйmy. Zklidni se sakra, chlape, takhle to nejde....</text>
+	</string>
+	<string id="zat_b7_stalker_squad_leader_bunker_guarding_0">
+		<text>Lнbн se ti makat pro vмdбtory?</text>
+	</string>
+	<string id="zat_b7_stalker_squad_leader_bunker_guarding_1">
+		<text>Nenн to љpatnэ. Zatнm ћбdnэ problйmy, vљechno vypadб v pohodм. Vмdбtoшi nбm dali nмjakэ vybavenн, takћe se nбm celkem daшн.</text>
+	</string>
+	<string id="zat_b7_stalker_squad_leader_bunker_guarding_2">
+		<text>Je to skvмlэ. Jednoduchб, ale dobшe placenб prбce. Co jsme tady, zatнm nikdo po vмdбtorech neљel. Dokonce ani mutanti.</text>
+	</string>
+	<string id="zat_b7_stalker_squad_leader_come_with_me_0">
+		<text>Dбvбm dohromady oddнl, se kterэm bych vyrazil do Pripjati. Nechceљ se pшidat?</text>
+	</string>
+	<string id="zat_b7_stalker_squad_leader_come_with_me_1">
+		<text>Nee... na rozdнl od jinejch se mi nepostavн, sotva slyљнm slovo Pripjat. Navнc tady mбme prбci, musнme chrбnit vмdбtory... Moћnб bys sebou mohl vzнt toho vojcla. Bude mнt љanci podнvat se po svejch kбmoљнch z armбdy a my tady budeme mнt chvilku klidu. Je celkem v pohodм, ale tohle pro nмj nenн vhodnэ mнsto.</text>
+	</string>
+	<string id="zat_b7_stalker_squad_leader_come_with_me_2">
+		<text>Nee... na rozdнl od jinejch se mi nepostavн, sotva slyљнm slovo Pripjat. Navнc tady mбme prбci, musнme chrбnit vмdбtory...</text>
+	</string>
+	<string id="zat_b7_stalker_squad_leader_employ_stalkers_0">
+		<text>Nechceљ pracovat pro vмdбtory?</text>
+	</string>
+	<string id="zat_b7_stalker_squad_leader_employ_stalkers_1">
+		<text>O co jde?</text>
+	</string>
+	<string id="zat_b7_stalker_squad_leader_employ_stalkers_11">
+		<text>Hlнdat jejich bunkr.</text>
+	</string>
+	<string id="zat_b7_stalker_squad_leader_employ_stalkers_111">
+		<text>Heh, hlнdat... nebylo by to po prvэ. Dobшe. Jakmile budem pшipravenэ, zaиnem hlнdat bunkr.</text>
+	</string>
+	<string id="zat_b7_stalker_squad_leader_employ_stalkers_12">
+		<text>Provбdмt mмшenн v anomбliнch.</text>
+	</string>
+	<string id="zat_b7_stalker_squad_leader_employ_stalkers_121">
+		<text>Mмшenн, jo? Vypadбm snad jako nмjakej laborant? To nenн nic pro mne.</text>
+	</string>
+	<string id="zat_b7_stalker_squad_leader_employ_stalkers_2">
+		<text>Promluvнme si o tom pak. Pobнhб tady aћ moc novejch ksichtщ, je tшeba ukбzat jim, kde je jejich mнsto, pak zaиnu uvaћovat o prбci.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_actor_choose_dialog_1">
+		<text>Fajn, tak do toho. Poшбdnм jim natrhnem!</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_actor_teleport_dialog_11">
+		<text>Dobшe.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_actor_teleport_dialog_2">
+		<text>Radљi bysme si ale mмli nмkam zalнzt, jde na nбs zatracenб emise!</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_dialog_15">
+		<text>Fajn, tak do toho. Poшбdnм jim natrhnem! Zщstaт v pohodм, bude to v klidu.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_dialog_16">
+		<text>Pмknм jsme jim dali, co? Tady mбљ prachy, kбmo. Pokud budem mнt nмjakej dalљн 'kљeft', zaшvu na tebe.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_dialog_18">
+		<text>No ty vole, ty se s tнm nesereљ. Prostм nabмhneљ a hotovo, ty vole. Proи jsem tм jen verboval, do prdele... nic jsi nбm nevydмlal, jen teп budem mнt problйmy. Zklidni se sakra, chlape, takhle to nejde....</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_dialog_19">
+		<text>Ses posral, co? Kde jsou stalkeшi, co?! Co je to za sraиky? Tys nбs prбsknul, co? Nikdo jinej to bejt nemohl! Vљichni mн brбchovй byli se mnou celou dobu... a teп, debile, vyrazнљ a pщjdeљ ty stalkery obrat sбm! Na co sakra иumнљ, jdi jim vyprбzdnit kapsy, blbe!</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_dialog_20">
+		<text>Mмli bysme jнt... za Bбrkou.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_dialog_31">
+		<text>Hej, nбиelnнku. Sorry, ale teп nemбm chuќ na kecy.</text>
+	</string>
+	<string id="zat_b7_stalkers_victims_actor_choose_dialog_0">
+		<text>Pomщћu ti.</text>
+	</string>
+	<string id="zat_b7_stalkers_victims_actor_choose_dialog_1">
+		<text>Skvмlэ. Zaшнdнme schщzku a ty pak s nima vyrazнљ. Aћ pшilezou, љoupneme to na nм ze vљech stran. Dбvej si bacha, aќ nejseљ moc blнzko, mohl bys taky nмjakou koupit.</text>
+	</string>
+	<string id="zat_b7_stalkers_victims_actor_choose_dialog_11">
+		<text>OK.</text>
+	</string>
+	<string id="zat_b7_stalkers_victims_actor_choose_dialog_12">
+		<text>Nee. To se mi nelнbн.</text>
+	</string>
+	<string id="zat_b7_stalkers_victims_dialog_11">
+		<text>Nazdar, stalkere. Nemбm teпka иas. Pokecбme pozdмjc, jo?</text>
+	</string>
+	<string id="zat_b7_stalkers_victims_dialog_12">
+		<text>Dнk za varovбnн. Moћnб bys mohl jнt s nбma? Bude to hezkб љance stшelit ty svinм do zad.</text>
+	</string>
+	<string id="zat_b7_stalkers_victims_dialog_13">
+		<text>Pшepadneme je. Aћ to udмlбme, ty je zaиneљ stшнlet do zad.</text>
+	</string>
+	<string id="zat_b7_stalkers_victims_dialog_14">
+		<text>Ti kretйni jsou uћ teпka mrtvн. Dнk za varovбnн,</text>
+	</string>
+	<string id="zat_b7_stalkers_victims_dialog_15">
+		<text>Dнk za pomoc.</text>
+	</string>
+	<string id="zat_b7_stalkers_victims_dialog_31">
+		<text>Nazdar. Hele, pokud to nenн nalйhavэ, stav se pozdмjc, jo?</text>
+	</string>
+	<string id="zat_b7_stalkers_victims_leader_start_dialog_11">
+		<text>Nazdar.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_info_about_soroka_gone_0">
+		<text>Naљel jsem Strakбиe. Byl ve stanici Janov, vystupoval pod jmйnem Pazourek. Postaral jsem se o nмho.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_info_about_soroka_gone_1">
+		<text>Postaral? Љkoda. Moc rбd bych z toho kшivбka vymlбtil duљi sбm... Nevadн, i tak to slyљнm rбd. Tady mбљ – moje slovo platн.</text>
+	</string>
+	<string id="zat_b106_stalker_gonta_info_about_soroka_gone_11">
+		<text>Dнky.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_leave_zone_0">
+		<text>Chci opustit Zуnu.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_leave_zone_1">
+		<text>Opravdu? Nenн cesty zpмt.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_leave_zone_11">
+		<text>Urиitм. Jdeme.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_leave_zone_12">
+		<text>I kdyћ... Zatнm zщstanu.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_dialog_191">
+		<text>OK, vem si prachy. Nechci bojovat.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_dialog_1911">
+		<text>Huh? Dej mi vљechno, co mбљ, hajzle! Pak se ztraќ a nevracej se!</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_dialog_19111">
+		<text>Odchбzнm.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_dialog_192">
+		<text>Ani nбpad!</text>
+	</string>
+	<string id="zat_b22_stalker_medic_need_health_care_2">
+		<text>Podнvбm se na to... Vћdyќ jsi ъplnм v poшбdku. No, pokud se tobм vede љpatnм, pak jб uћ musнm bэt mrtvэ...</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_start_dialog_13">
+		<text>Poslyљ, mбm tady takovou urgentnн prбciиku. Jeden mщj znбmэ chce dojednat nмjakэ obchod. Problйm je v tom, ћe jeho zбkaznнci jsou docela otravnн, takћe pro jistotu si chce najmout ochranku. Mбљ zбjem?</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_start_dialog_131">
+		<text>Urиitм.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_start_dialog_1311">
+		<text>OK. Bude na tebe иekat u љerifa, pak ti шekne podrobnosti.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_start_dialog_132">
+		<text>Ani ne.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_start_dialog_1321">
+		<text>Jak chceљ. Pokud bys jeљtм zmмnil nбzor, nabнdka moћnб bude poшбd platit.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b7_give_task_dialog_0">
+		<text>Jakou prбci pro mм mбљ?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b7_give_task_dialog_1">
+		<text>Takovou, na kterй se dб vydмlat. Zamysli se: proи se ptбm tebe? Jsi novбиek bez vэraznмjљнch konexн, ale pokud budeљ rozumnэ, mohl bys rychle zнskat respekt mнstnнch. Mбm pokraиovat?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b7_give_task_dialog_11">
+		<text>Jo, pokraиuj.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b7_give_task_dialog_111">
+		<text>Dobrб, poslouchej. Chtмli bysme obrat pбr Fousбиovэch stalkerщ. Je to tutovka. V noci pшijdeљ s naљimi chlapy k Љevиenkovi a neћ ti turisti zjistн, co se dмje, projedeљ se s nimi. My dostanem prachy, ty respekt... Chбpeљ? Dobшe. Vidнљ tбmhle Boxera? Ten ti шekne vнc.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b7_give_task_dialog_12">
+		<text>Ani ne.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b7_give_task_dialog_121">
+		<text>Љkoda. Jeљtм o tom pouvaћuj... Aћ zjistнљ, co je pro tebe dobrй, vraќ se.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b7_give_task_dialog_2">
+		<text>Takovou, kterou ocenнљ, pokud chceљ zнskat respekt... Chceљ vмdмt, co mбm na mysli?</text>
+	</string>
+	<string id="zat_b3_tech_buddies_pda_11">
+		<text>Bбrkovo PDA. Jeho mrtvй tмlo jsem naљel v jeskynнch pod vyhoшelэm statkem.</text>
+	</string>
+	<string id="zat_b3_tech_buddies_pda_12">
+		<text>Naљel jsem to u kostн nedaleko Dubovic. Je to Vtipoтovo PDA.</text>
+	</string>
+	<string id="zat_b3_tech_buddies_pda_121">
+		<text>Vtipoтovo?! To nenн moћnй! Pбni, teп jsi mм dostal...  Vtipoт je po smrti... Chudбk Vtipoт, teп uћ se jeho vtнpkщm nezasmмjeme... Odpoинvej v pokoji... Doufбm, ћe aspoт Bбrka je v poшбdku...</text>
+	</string>
+	<string id="zat_b3_tech_buddies_pda_122">
+		<text>Vtipoтovo?! To nenн moћnй! Pбni, teп jsi mм dostal... Takћe Vtipoт je taky po smrti... Chudбk Vtipoт, teп uћ se jeho vtнpkщm nezasmмjeme... Odpoинvej v pokoji... A ty taky, Bбrko... Jak se to jen mohlo stбt...</text>
+	</string>
+	<string id="zat_b3_tech_buddies_pda_13">
+		<text>Bбrkovo a Vtiponм. Jedno jsem naљel u kostry poblнћ Dubovic, druhй leћelo na mrtvole v jeskynнch pod vypбlenэm statkem.</text>
+	</string>
+	<string id="zat_b215_stalker_guide_about_surge_1">
+		<text>Abych byl upшнmnэ, moc toho nenн. Emise jsou velice nebezpeиnй a tйmмш vћdy smrtelnй. Jejich pшнchod mщћeљ poznat podle postupnй zmмny poиasн, ale brzy po svйm vrcholu odeznнvajн. Pшi prvnнch nбznacнch pшichбzejнcн emise okamћitм vyhledej dobrэ ъkryt – jeskyni, nмco z betonu, cihel nebo oceli... Jб, stejnм jako pбr dalљнch lidн, poznбm pшichбzejнcн emisi tak, ћe mм zaиnou bolet zбda. Co se vlastnostн emise tэиe, k tomu ti nic nepovнm, protoћe zkrбtka nic nevнm.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_start_dialog_11">
+		<text>Potшebujeљ zboћн? Informace? Nebo snad chceљ informace prodat?</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_actor_choose_dialog_0">
+		<text>Sultбn шнkб, ћe mбљ v plбnu obrat stalkery. Poинtej se mnou.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_actor_choose_dialog_2">
+		<text>Skvмle. Po pщlnoci dotбhni svщj zadek k Љevиenkovi, budem tam na tebe иekat. Ale nenechбvej to aћ na rбno.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_dialog_13">
+		<text>Aha, to jsi ty, kбmo. Tak na иem jste se se Sultбnem dohodli?</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_dialog_14">
+		<text>Takћe... Nмkdy mezi pщlnocн a ъsvitem pшijп ke иlunu, budem tam na tebe иekat.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_actor_teleport_dialog_0">
+		<text>Myslнm, ћe radљi zщstanu s tebou. Poиkбme do pщlnoci a pak mм mщћeљ dovйst k Љevиenkovi.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_actor_teleport_dialog_1">
+		<text>To nebude problйm, buп poblнћ. Klidnм tм tam zavedu.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_actor_teleport_dialog_12">
+		<text>Vlastnм... Musнm jeљtм nмco zaшнdit.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_info_1">
+		<text>Mimo Zуnu mбm dщleћitй zбkaznнky, kteшн si pravidelnм objednбvajн urиitй artefakty s pevnм danou dodacн lhщtou. Ty mi pшineseљ, co potшebuju, a jб ti za to dobшe zaplatнm. Zapamatuj si, ћe tyhle obchody jsou pro mм fakt dщleћitй a taky proto se snaћнm vysнlat vнce agentщ najednou... Celou ибstku ti zaplatнm jen v pшнpadм, ћe ъkol splnнљ jako prvnн.</text>
+	</string>
+	<string id="zat_b18_noah_plateau_way_112">
+		<text>Pшes vypбlenэ statek. Ehm... Kdo vlastnм jsi?</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_15311">
+		<text>Lidй to mнsto nazэvaj Ћeleznэm lesem. Vrtulnнk to napбlil pшнmo do stoћбrщ elektrickйho vedenн. Ћбdnэ z tмch mariтбkщ nepшeћil... A i kdyby nмkdo pшeћil, nedostal by se z toho ћivej. Tyhle pшнzraky zkrбtka milujн nahбnмnн lidн do elektrickэch anomбliн... Ti zvrhlнci reagujн na sebemenљн pohyb, to ale asi vнљ.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_buy_info_15411">
+		<text>Poslyљ... Kdyћ se vrtulnнk zшнtil, pobнhalo tam pмt ozbrojenejch chlбpkщ. Dokonce se dokбzali dostat z baћin... Dojнt tam nenн nic tмћkйho, jen se drћ co nejdбl od vody a dбvej pozor, abys mмl pevnou pщdu pod nohama. Taky budeљ potшebovat obranu proti chemikбliнm. Takћe pokud se tam chceљ fakt vydat, poшiп si u doktora nмjakй protilбtky.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_start_1311">
+		<text>Љkoda, ћe tady mн kбmoљi Vtipoт a Bбrka nejsou s nбmi... Mмli bychom spoustu иasu. Byli jsme jako bratшi, dбvali jsme na sebe pozor... Jak se to mohlo stбt? … Jб jsem poшбd tady, ale ale oni jsou bщhvн kde.</text>
+	</string>
+	<string id="zat_b3_tech_buddies_about_0">
+		<text>Шekni mi o Vtipoтovi a Bбrkovi.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_111213">
+		<text>Nмco jsem si odtamtud pшinesl.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_1112131">
+		<text>Tak povнdej... pшinesl jsi nмco i mм?</text>
+	</string>
+	<string id="zat_b51_stalker_nimble_b52_about_gun_questions_11111">
+		<text>Tнm se vљechno vysvмtluje, toho kluka znбm. Bэval to vћdycky tak trochu grбzl, ale poslednн dobou uћ to fakt pшehбnн. Takhle obнrat stalkery... nмkdo by ho mмl umravnit.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_choose_task_116">
+		<text>Potшebuju pбr informacн z tбbora ћoldбkщ. Nenн to tak hroznэ, jak se zdб.</text>
+	</string>
+	<string id="zat_a2_linker_b29_actor_get_adv_task_111">
+		<text>Dobшe, poиkбm... ale nezapomeт, ћe to fakt pospнchб. Potшebuju to mнt do dvou dnн.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_28">
+		<text>PDA Sultбnova posla</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_281">
+		<text>Nijak zvlбљќ zajнmavэ to nenн. Dбm ti za to pмt stovek.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_2811">
+		<text>Platн.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_26">
+		<text>Prototypy detektorщ. Nechceљ je vykoupit?</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_27">
+		<text>Tajnй dokumenty. Naљel jsem je na mostм u jednoho sloupu. Chceљ se na nм mrknout?</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_31">
+		<text>Divnэ artefakt. Naљel jsem ho u шниnнho bagru.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_32">
+		<text>Divnэ artefakt. Naљel jsem ho u janovskйho nбdraћн.</text>
+	</string>
+	<string id="zat_b30_owl_stalker_trader_sell_items_33">
+		<text>Artefakt Srdce Oбzy</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_dialog_151">
+		<text>Jdeme na to.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_dialog_152">
+		<text>Poиkejte.</text>
+	</string>
+	<string id="zat_b7_stalkers_victims_actor_start_dialog_0">
+		<text>Partiиka stalkerщ tм chce oљkubat. Dбvej si bacha.</text>
+	</string>
+	<string id="zat_b7_stalkers_victims_actor_start_dialog_1">
+		<text>Svinм jedny... dobшe, dopшejeme jim vшelйho uvнtбnн. Co kdyby ses mezi nм vetшel a nalhal jim, ћe jsi na jejich stranм? Pak bys nбm je pomohl odehnat. Bohatм se ti odvdминme.</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_1111">
+		<text>Mnм je jedno, na иem jste se dohodli. Davaj!</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_1111212">
+		<text>Dobшe, tu mбљ.</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_21">
+		<text>Neznajeљ? Ale to nбs vщbec nezajнmб. Naval prachy, magore!</text>
+	</string>
+	<string id="zat_b52_robbery_port_bandits_1_11111">
+		<text>Hlavnм klнdek... vezmмte si je.</text>
+	</string>
+	<string id="zat_b7_stalkers_victims_actor_start_dialog_2">
+		<text>Svinм jedny... dobшe, dopшejeme jim vшelйho uvнtбnн. Co kdybys nбm je pomohl odehnat? Bohatм se ti odvdминme.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_dialog_21">
+		<text>Pмknм jsme je rozjebali! Ale ty ses nijak nezapojil, tak nic nedostaneљ. Ozvu se ti, aћ zas seћeneme nмjakej „kљeft“.</text>
+	</string>
+	<string id="zat_b5_stalker_commander_dialog_31">
+		<text>Byls nбm k niиemu... neиekej ћбdnou odmмnu. No ale aspoт, ћe ses stavil na kus шeиi. Snaha se cenн.</text>
+	</string>
+	<string id="zat_b5_stalker_commander_dialog_311">
+		<text>Mмj se.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_compass_give_actor_dialog_1">
+		<text>Paљбk! Teп mщћeme klienta troљiиku skшнpnout. Doneslo se mi, ћe Fousби svэm stalkerщm rozdбvб vэkonnэ detektory, se kterэma pak hledajн vzбcnэ artefakty. Od tebe potшebuju, aby ses k nim pшidal a ty detektory jeden po druhэm љtнpnul. Rozumнme si?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_b30_start_actor_dialog_2">
+		<text>S nнm jen tak nehneme. Chtмl jsem mu vlнtnout na zбsobovacн trasy, ale tomu vousatэmu kretйnovi se stejnм povedlo dostat Kompas. Mб se jako prase v ћitм... prozatнm.</text>
+	</string>
+	<string id="zat_b22_stalker_medic_dialog_start_1111211">
+		<text>[pokraиovat...]</text>
+	</string>
+	<string id="zat_b22_stalker_medic_dialog_start_1141111">
+		<text>[pokraиovat...]</text>
+	</string>
+	<string id="zat_b22_stalker_medic_need_health_care_11">
+		<text>[pokraиovat...]</text>
+	</string>
+	<string id="zat_b22_barmen_about_vampire_actor3_0">
+		<text>Tetшev zaшval. Nejspнљ ho sejmul Straљбk... ale ten uћ je taky tuhej.</text>
+	</string>
+</string_table>

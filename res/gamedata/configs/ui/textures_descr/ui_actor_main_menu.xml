@@ -1,0 +1,14 @@
+<w>
+    <file name="ui\ui_actor_main_menu">
+	    <texture id="ui_inGame2_background" x="0" y="0" width="1024" height="768" />
+	    <texture id="ui_inGame2_slider" x="5" y="773" width="274" height="61" />
+   </file>
+	<file name="ui\ui_actor_widescreen_sidepanels">
+	    <texture id="ui_inGame2_left_widepanel" x="256" y="0" width="128" height="768" />
+	    <texture id="ui_inGame2_right_widepanel" x="384" y="0" width="128" height="768" />
+   </file>
+	<file name="ui\ui_actor_widescreen_sidepanels_1">
+	    <texture id="ui_credits_left_widepanel" x="0" y="0" width="128" height="768" />
+	    <texture id="ui_credits_right_widepanel" x="128" y="0" width="128" height="768" />
+   </file>
+</w>

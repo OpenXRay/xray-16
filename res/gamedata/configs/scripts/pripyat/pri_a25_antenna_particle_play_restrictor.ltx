@@ -1,0 +1,13 @@
+[logic]
+active = sr_particle
+
+[sr_particle]
+name = anomaly2\effects\anomaly_electra_idle_sparks
+path = pri_a25_smart_terrain_pri_a25_antenna_blow_up_particle_point
+mode = 2
+looped = true
+on_info = {+pri_a25_antenna_destroyed} sr_idle@update_task_check_cnock
+
+[sr_idle@update_task_check_cnock]
+on_game_timer = 50 | %+pri_a25_check_freezer_knock%
+on_info = {=actor_in_zone(pri_a25_antenna_1_st_floor)} %+pri_a25_check_freezer_knock%

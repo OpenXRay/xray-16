@@ -1,0 +1,199 @@
+-- File:		UI_NUMPAD.SCRIPT
+-- Description:		Numpad for password input
+-- Created:		23.02.2005
+-- Author:		Serge Vynnychenko
+--
+-- Copyright 2004 GSC Game World
+
+
+function main()
+	super_dlg = ui_numpad.numpad()
+	super_dlg:ShowDialog(true)
+end
+
+class "numpad" (CUIScriptWnd)
+
+function numpad:__init(owner) super()
+	self.owner = owner
+	self:InitControls()
+	self:InitCallBacks()
+end
+
+function numpad:__finalize()
+
+end
+
+function numpad:InitControls()
+	self:SetWndPos			(vector2():set(342,199))
+	self:SetWndSize			(vector2():set(339,369))
+	local xml = CScriptXmlInit()
+	xml:ParseFile("ui_numpad_wnd.xml")
+	xml:InitStatic("background", self)
+	self.st =  xml:InitStatic("edit_box", self)
+	self.st:SetWindowName("edit_window")
+	self:Register(xml:Init3tButton("btn_0", self),"btn_0")
+	self:Register(xml:Init3tButton("btn_1", self),"btn_1")
+	self:Register(xml:Init3tButton("btn_2", self),"btn_2")
+	self:Register(xml:Init3tButton("btn_3", self),"btn_3")
+	self:Register(xml:Init3tButton("btn_4", self),"btn_4")
+	self:Register(xml:Init3tButton("btn_5", self),"btn_5")
+	self:Register(xml:Init3tButton("btn_6", self),"btn_6")
+	self:Register(xml:Init3tButton("btn_7", self),"btn_7")
+	self:Register(xml:Init3tButton("btn_8", self),"btn_8")
+	self:Register(xml:Init3tButton("btn_9", self),"btn_9")
+
+	self:Register(xml:Init3tButton("btn_c",			self),	"btn_c")
+	self:Register(xml:Init3tButton("btn_backspase",	self),	"btn_backspase")
+	self:Register(xml:Init3tButton("btn_enter",		self),	"btn_enter")
+	self:Register(xml:Init3tButton("btn_cancel",	self),	"btn_cancel")
+end
+
+
+function numpad:InitCallBacks()
+	-- new game
+	self:AddCallback("btn_enter",	ui_events.BUTTON_CLICKED,	self.OnButton_OK_clicked,		self)
+	self:AddCallback("btn_cancel",	ui_events.BUTTON_CLICKED,	self.OnButton_CANCEL_clicked,	self)
+
+	self:AddCallback("btn_0",		ui_events.BUTTON_CLICKED,	self.OnButton_0_clicked,		self)
+	self:AddCallback("btn_1",		ui_events.BUTTON_CLICKED,	self.OnButton_1_clicked,		self)
+	self:AddCallback("btn_2",		ui_events.BUTTON_CLICKED,	self.OnButton_2_clicked,		self)
+	self:AddCallback("btn_3",		ui_events.BUTTON_CLICKED,	self.OnButton_3_clicked,		self)
+	self:AddCallback("btn_4",		ui_events.BUTTON_CLICKED,	self.OnButton_4_clicked,		self)
+	self:AddCallback("btn_5",		ui_events.BUTTON_CLICKED,	self.OnButton_5_clicked,		self)
+	self:AddCallback("btn_6",		ui_events.BUTTON_CLICKED,	self.OnButton_6_clicked,		self)
+	self:AddCallback("btn_7",		ui_events.BUTTON_CLICKED,	self.OnButton_7_clicked,		self)
+	self:AddCallback("btn_8",		ui_events.BUTTON_CLICKED,	self.OnButton_8_clicked,		self)
+	self:AddCallback("btn_9",		ui_events.BUTTON_CLICKED,	self.OnButton_9_clicked,		self)
+
+	self:AddCallback("btn_c",			ui_events.BUTTON_CLICKED,	self.OnButton_c_clicked,			self)
+	self:AddCallback("btn_backspase",	ui_events.BUTTON_CLICKED,	self.OnButton_backspace_clicked,	self)
+end
+
+function numpad:AddNumber(number)
+	
+	local text = self.st:TextControl():GetText()
+
+	if text == nil then
+		text = "" .. number
+	else
+		if (string.len(text) > 12) then
+			return
+		end
+
+		text = text .. number
+	end
+
+	self.st:TextControl():SetText(text)
+end
+
+
+function numpad:OnButton_backspace_clicked()
+	local text = self.st:TextControl():GetText()
+
+	if text == nil then
+		return
+	end
+
+	local b = 1
+	local e = string.len(text) - 1
+
+	text = string.sub(text, b, e)
+
+	self.st:TextControl():SetText(text)
+end
+
+function numpad:OnButton_c_clicked()
+	self.st:TextControl():SetText("")
+end
+
+function numpad:OnButton_0_clicked()
+	self:AddNumber(0)
+end
+
+function numpad:OnButton_1_clicked()
+	self:AddNumber(1)
+end
+
+function numpad:OnButton_2_clicked()
+	self:AddNumber(2)
+end
+
+function numpad:OnButton_3_clicked()
+	self:AddNumber(3)
+end
+
+function numpad:OnButton_4_clicked()
+	self:AddNumber(4)
+end
+
+function numpad:OnButton_5_clicked()
+	self:AddNumber(5)
+end
+
+function numpad:OnButton_6_clicked()
+	self:AddNumber(6)
+end
+
+function numpad:OnButton_7_clicked()
+	self:AddNumber(7)
+end
+
+function numpad:OnButton_8_clicked()
+	self:AddNumber(8)
+end
+
+function numpad:OnButton_9_clicked()
+	self:AddNumber(9)
+end
+
+function numpad:OnButton_CANCEL_clicked()
+	self.owner:OnNumberReceive("")
+	self:HideDialog()
+end
+
+function numpad:OnButton_OK_clicked()
+	self:HideDialog()
+	local text = self.st:TextControl():GetText()
+	self.owner:OnNumberReceive(text)
+end
+
+function numpad:OnKeyboard(dik, keyboard_action)  --virtual function
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+		if dik == DIK_keys.DIK_ESCAPE then
+			self:HideDialog()
+		end
+
+		if dik == DIK_keys.DIK_0 or dik == DIK_keys.DIK_NUMPAD0 then
+			self:AddNumber(0)
+		elseif dik == DIK_keys.DIK_1 or dik == DIK_keys.DIK_NUMPAD1 then
+			self:AddNumber(1)
+		elseif dik == DIK_keys.DIK_2 or dik == DIK_keys.DIK_NUMPAD2 then
+			self:AddNumber(2)
+		elseif dik == DIK_keys.DIK_3 or dik == DIK_keys.DIK_NUMPAD3 then
+			self:AddNumber(3)
+		elseif dik == DIK_keys.DIK_4 or dik == DIK_keys.DIK_NUMPAD4 then
+			self:AddNumber(4)
+		elseif dik == DIK_keys.DIK_5 or dik == DIK_keys.DIK_NUMPAD5 then
+			self:AddNumber(5)
+		elseif dik == DIK_keys.DIK_6 or dik == DIK_keys.DIK_NUMPAD6 then
+			self:AddNumber(6)
+		elseif dik == DIK_keys.DIK_7 or dik == DIK_keys.DIK_NUMPAD7 then
+			self:AddNumber(7)
+		elseif dik == DIK_keys.DIK_8 or dik == DIK_keys.DIK_NUMPAD8 then
+			self:AddNumber(8)
+		elseif dik == DIK_keys.DIK_9 or dik == DIK_keys.DIK_NUMPAD9 then
+			self:AddNumber(9)
+		elseif dik == DIK_keys.DIK_BACK then
+			self:OnButton_backspace_clicked()
+		elseif dik == DIK_keys.DIK_RETURN or dik == DIK_keys.DIK_NUMPADENTER then
+			self:OnButton_OK_clicked()
+		elseif dik == DIK_keys.DIK_DELETE or dik == DIK_keys.DIK_NUMPADCOMMA then
+			self:OnButton_c_clicked()
+		end
+	end
+
+	return true
+end
+

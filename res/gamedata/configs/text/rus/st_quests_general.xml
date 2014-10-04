@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="hide_from_surge_message">
+		<text>Внимание! До выброса осталось</text>
+	</string>
+	<string id="hide_from_surge_descr_1_a">
+		<text>Необходимо срочно бежать к ближайшему укрытию и спрятаться от выброса.</text>
+	</string>
+	<string id="hide_from_surge_descr_2_a">
+		<text>Во время выброса ни в коем случае нельзя покидать укрытие.</text>
+	</string>
+	<string id="hide_from_surge_name_1">
+		<text>Выброс: найти укрытие</text>
+	</string>
+	<string id="hide_from_surge_name_2">
+		<text>Выброс: переждать в укрытии</text>
+	</string>
+</string_table>

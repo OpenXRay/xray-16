@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="Time">
+		<text>Time</text>
+	</string>
+	<string id="actor">
+		<text>Free Stalker</text>
+	</string>
+	<string id="army">
+		<text>Military</text>
+	</string>
+	<string id="bandit">
+		<text>Bandit</text>
+	</string>
+	<string id="dolg">
+		<text>Duty</text>
+	</string>
+	<string id="ecolog">
+		<text>Scientist</text>
+	</string>
+	<string id="filter_secondary_tasks_text">
+		<text>Side missions</text>
+	</string>
+	<string id="filter_treasures_text">
+		<text>Stashes</text>
+	</string>
+	<string id="freedom">
+		<text>Freedom</text>
+	</string>
+	<string id="killer">
+		<text>Mercenary</text>
+	</string>
+	<string id="missions_list">
+		<text>Mission log</text>
+	</string>
+	<string id="monolith">
+		<text>Monolith</text>
+	</string>
+	<string id="monster">
+		<text>Mutant</text>
+	</string>
+	<string id="month_april">
+		<text>April</text>
+	</string>
+	<string id="month_august">
+		<text>August</text>
+	</string>
+	<string id="month_december">
+		<text>December</text>
+	</string>
+	<string id="month_february">
+		<text>February</text>
+	</string>
+	<string id="month_january">
+		<text>January</text>
+	</string>
+	<string id="month_july">
+		<text>July</text>
+	</string>
+	<string id="month_june">
+		<text>June</text>
+	</string>
+	<string id="month_march">
+		<text>March</text>
+	</string>
+	<string id="month_may">
+		<text>May</text>
+	</string>
+	<string id="month_november">
+		<text>November</text>
+	</string>
+	<string id="month_october">
+		<text>October</text>
+	</string>
+	<string id="month_september">
+		<text>September</text>
+	</string>
+	<string id="pda_btn_close">
+		<text>Deactivate PDA</text>
+	</string>
+	<string id="pda_btn_logs">
+		<text>Message log</text>
+	</string>
+	<string id="pda_btn_logs_hint">
+		<text>Show message history</text>
+	</string>
+	<string id="pda_btn_quests">
+		<text>Area map</text>
+	</string>
+	<string id="pda_btn_quests_hint">
+		<text>Show Zone map and mission log</text>
+	</string>
+	<string id="pda_btn_ranking">
+		<text>Stats</text>
+	</string>
+	<string id="pda_btn_ranking_hint">
+		<text>Show personal stats</text>
+	</string>
+	<string id="pda_cur_time">
+		<text>Current time:</text>
+	</string>
+	<string id="pda_date_filter">
+		<text>Date filter</text>
+	</string>
+	<string id="pda_filter_news">
+		<text>Show news</text>
+	</string>
+	<string id="pda_filter_talk">
+		<text>Show dialogs</text>
+	</string>
+	<string id="pda_legend_caption">
+		<text>Legend</text>
+	</string>
+	<string id="pda_stat_1">
+		<text>Zone time:</text>
+	</string>
+	<string id="pda_stat_2">
+		<text>Emissions survived:</text>
+	</string>
+	<string id="pda_stat_3">
+		<text>Missions completed:</text>
+	</string>
+	<string id="pda_stat_4">
+		<text>Mutants killed:</text>
+	</string>
+	<string id="pda_stat_5">
+		<text>Stalkers killed:</text>
+	</string>
+	<string id="pda_stat_6">
+		<text>Artifacts found:</text>
+	</string>
+	<string id="pda_stat_7">
+		<text>Stashes found:</text>
+	</string>
+	<string id="pda_stat_favorite_weapon">
+		<text>Favorite weapon</text>
+	</string>
+	<string id="pda_stat_mutant_killed">
+		<text>Most powerful mutant killed</text>
+	</string>
+	<string id="st_location">
+		<text>Location:</text>
+	</string>
+	<string id="st_target">
+		<text>Objective</text>
+	</string>
+	<string id="st_ui_pda_legend_additional_task">
+		<text>Side mission</text>
+	</string>
+	<string id="st_ui_pda_legend_enemies">
+		<text>Enemies</text>
+	</string>
+	<string id="st_ui_pda_legend_friends">
+		<text>Friends</text>
+	</string>
+	<string id="st_ui_pda_legend_leader">
+		<text>Faction leader</text>
+	</string>
+	<string id="st_ui_pda_legend_main_task">
+		<text>Main mission</text>
+	</string>
+	<string id="st_ui_pda_legend_neutrals">
+		<text>Neutrals</text>
+	</string>
+	<string id="st_ui_pda_legend_scout">
+		<text>Guide</text>
+	</string>
+	<string id="st_ui_pda_legend_secrets">
+		<text>Stashes</text>
+	</string>
+	<string id="st_ui_pda_legend_squad">
+		<text>Squad commander</text>
+	</string>
+	<string id="st_ui_pda_legend_trader">
+		<text>Trader</text>
+	</string>
+	<string id="stalker">
+		<text>Stalker</text>
+	</string>
+	<string id="ui_logs_center_caption">
+		<text>Message log</text>
+	</string>
+	<string id="ui_map_btn_center">
+		<text>Center on player</text>
+	</string>
+	<string id="ui_map_btn_down">
+		<text>Move down</text>
+	</string>
+	<string id="ui_map_btn_left">
+		<text>Move left</text>
+	</string>
+	<string id="ui_map_btn_legend">
+		<text>Show legend</text>
+	</string>
+	<string id="ui_map_btn_right">
+		<text>Move right</text>
+	</string>
+	<string id="ui_map_btn_up">
+		<text>Move up</text>
+	</string>
+	<string id="ui_map_btn_zmreset">
+		<text>Maximum zoom out</text>
+	</string>
+	<string id="ui_map_btn_zoom_in">
+		<text>Zoom</text>
+	</string>
+	<string id="ui_map_btn_zoom_out">
+		<text>Zoom out</text>
+	</string>
+	<string id="ui_ranking_center_caption">
+		<text>Achievements</text>
+	</string>
+	<string id="ui_task_btn_focus_center">
+		<text>Center map on mission</text>
+	</string>
+	<string id="ui_task_btn_focus_center2">
+		<text>Center map on mission</text>
+	</string>
+	<string id="zombied">
+		<text>Zombie</text>
+	</string>
+	<string id="zoom_in_btn_hint">
+		<text>scale +</text>
+	</string>
+	<string id="zoom_out_btn_hint">
+		<text>scale -</text>
+	</string>
+	<string id="st_ui_pda_legend_mechanic">
+		<text>Technician</text>
+	</string>
+	<string id="st_ui_pda_legend_medic">
+		<text>Medic</text>
+	</string>
+	<string id="ui_pda_secondary_task">
+		<text>Current Missions</text>
+	</string>
+	<string id="ui_show_second_task_wnd">
+		<text>Show/Hide Missions</text>
+	</string>
+	<string id="st_ui_pda_actor_box">
+		<text>Personal box</text>
+	</string>
+	<string id="zaton">
+		<text>Zaton</text>
+	</string>
+	<string id="jupiter">
+		<text>The area around Jupiter</text>
+	</string>
+	<string id="pripyat">
+		<text>Pripyat</text>
+	</string>
+	<string id="jupiter_underground">
+		<text>Pripyat 1 underpass</text>
+	</string>
+	<string id="labx8">
+		<text>Laboratory X8</text>
+	</string>
+	<string id="filter_primary_objects_text">
+		<text>Areas</text>
+	</string>
+	<string id="filter_quest_npcs_text">
+		<text>Important objects</text>
+	</string>
+	<string id="st_ui_pda_legend_primary_objects">
+		<text>Area</text>
+	</string>
+	<string id="st_jup_b32_has_af">
+		<text>Scanners have detected artifacts:</text>
+	</string>
+	<string id="st_jup_b32_no_af">
+		<text>Scanners have not detected any artifacts</text>
+	</string>
+	<string id="st_ui_pda_secret">
+		<text>Stash</text>
+	</string>
+	<string id="st_ui_pda_sleep_place">
+		<text>Sleeping area</text>
+	</string>
+</string_table>

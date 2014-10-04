@@ -1,0 +1,28 @@
+; general section 
+
+[ph_door@zat_a23_exit_door_gen]
+locked = false
+snd_open_start = metal_small_open
+snd_close_start = metal_small_close_start
+snd_close_stop = metal_small_close_stop
+
+; door section
+
+[logic]
+active = ph_door@closed_out
+
+[ph_door@closed_out]:ph_door@zat_a23_exit_door_gen
+closed = true
+tip_open = tip_open_another_site
+on_info = {=actor_in_zone(zat_a23_exit_door_restrictor)} ph_door@closed_in
+
+[ph_door@open]:ph_door@zat_a23_exit_door_gen
+closed = false
+tip_close = tip_door_close
+on_use = ph_door@closed_in 
+
+[ph_door@closed_in]ph_door@zat_a23_exit_door_gen
+closed = true
+tip_close = tip_door_open
+on_use = ph_door@open 
+

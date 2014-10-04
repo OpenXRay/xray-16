@@ -1,0 +1,240 @@
+local weather_manager = nil
+--18.02.2008 - added dynamic weather
+
+class "WeatherManager"
+function WeatherManager:__init()
+	self.wfx_time = 0
+	self.weather_fx = nil
+	self.update_time = 0
+	self.update_level = ""
+	self.forced_weather_change_on_time_change = false
+	self.last_hour = 0
+		self.state={}
+	self.graphs={}
+	self.graphs_ini = ini_file("environment\\dynamic_weather_graphs.ltx")
+	if not self.graphs_ini then
+		abort("error when open weather_dynamic_graphs.ltx")
+	end
+end
+
+-- Вызывается после load(). Состояние погоды уже загружено.
+function WeatherManager:reset()
+	printf("WeatherManager:WeatherManager():Reset()")
+	-- Загрузить кондлист с погодой.
+	local ini = ini_file("game.ltx")
+	local weather = utils.cfg_get_string(ini, level.name(), "weathers", db.actor, false, "", "[default]")
+	local postprocess = utils.cfg_get_string(ini, level.name(), "postprocess", db.actor, false, "")
+	if postprocess ~= nil then
+		printf("LEVEL POSTPROCESS: level: [%s], postprocess: [%s]", level.name(), postprocess)
+		level.add_pp_effector(postprocess, 999, true)
+	else
+		printf("LEVEL POSTPROCESS: level: [%s], postprocess: [none]", level.name())
+		level.remove_pp_effector(999)
+	end
+	if weather == "[default]" then
+		-- сетим дефолтовую погоду
+		self.weather_list = xr_logic.parse_condlist(db.actor, level.name(), "weather", "[default]")
+	else
+		self.weather_list = xr_logic.parse_condlist(db.actor, level.name(), "weather", weather)
+	end
+    self:select_weather(true)
+	self.last_hour=level.get_time_hours()
+end
+function WeatherManager:forced_weather_change()
+	self.forced_weather_change_on_time_change = true
+end
+-- Обновляем погоду раз в час.
+function WeatherManager:update()
+	if(level.is_wfx_playing()) then
+		self.weather_fx = level.get_weather()
+	else
+		self.weather_fx = nil
+	end
+	if not benchmark.weather then
+		if self.last_hour~=level.get_time_hours() then
+				self.last_hour=level.get_time_hours()
+				for lvl,st in pairs(self.state) do
+				st.current_state=st.next_state
+				st.next_state=get_next_state(st.graph,st.current_state)
+				end
+				-- Устанавливаем погоду на текущем уровне
+				self:select_weather(false)
+		end
+	end
+end
+
+function WeatherManager:select_weather(now)
+	local weather = xr_logic.pick_section_from_condlist(db.actor, db.actor, self.weather_list)
+	local graph=self:get_graph_by_name(weather)
+	local weather_section_name=""
+	-- Проверим, совпадает ли текущий граф уровня с полученным по кондлисту...
+	if graph==nil then
+		-- Переходим на статику
+		self.state[weather]=nil
+			weather_section_name=weather
+	else
+		-- Новая погода - динамическая. Проверим, нужно ли менять/устанавливать граф
+			if self.state[weather]==nil or self.state[weather].graph_name~=weather then
+			-- Граф изменился. Переходим на него.
+			self.state[weather]=self:init_by_graph(graph,weather)
+		-- else
+			-- now = false
+			end
+			-- Получаем название секции по текущему состоянию.
+			local st=self.state[weather]
+			--weather_section_name="dw_"..st.current_state.."_"..st.next_state.."_"..level.get_time_hours()
+			weather_section_name="default_"..st.current_state
+	end
+	if now then
+		self.last_hour=level.get_time_hours()
+	end
+	if self.forced_weather_change_on_time_change then
+		now = true
+		self.forced_weather_change_on_time_change = false
+	end
+	if not(self.weather_fx) then
+		level.set_weather(weather_section_name,now)
+	else
+		level.start_weather_fx_from_time(self.weather_fx, self.wfx_time)
+	end
+	printf("WEATHER: '%s' now '%s'", weather_section_name, tostring(now))
+	-- if xrs_news then
+		-- xrs_news.news_call(1,1,nil,nil,weather_section_name,nil)
+	-- end
+end
+
+-- Возвращает начальное состояние погоды.
+function WeatherManager:init_by_graph(graph,graph_name)
+	local cur_state=get_next_state(graph,"")
+	local next_state=get_next_state(graph,cur_state)
+	return {current_state=cur_state,next_state=next_state,graph_name=graph_name,graph=graph}
+end
+
+-- Возвращает одно из следующих состояний графа, согласно прописанным вероятностям.
+function get_next_state(graph,state)
+	local sum=0
+	for st,prob in pairs(graph) do
+		--if state==st then prob=prob*2 end
+		sum=sum+prob
+	end
+	local rnd=math.random()*sum
+	local next_state
+	for st,prob in pairs(graph) do
+		--if state==st then prob=prob*2 end
+		next_state=st
+		rnd=rnd-prob
+		if (rnd<=0) then
+			break
+		end
+	end
+	return next_state
+end
+
+-- Устанавливаем состояние менеджера, распарсивая строку состояния
+function WeatherManager:set_state_as_string(ss)
+	self.state={}
+		for lvlstring in string.gmatch(ss,"[^;]+") do
+		local i,j,grname,curs,nexs=string.find(lvlstring,"([^=]+)=([^,]+),([^,]+)")
+		if not grname then
+			abort("WeatherManager:set_state_as_string: malformed state string. "..ss)
+		end
+		--local lvl_name=self:unpack_level(lvl)
+		local current_state=self:unpack_state(curs)
+		local next_state=self:unpack_state(nexs)
+		local graph_name=self:unpack_graph_name(grname)
+		local graph=self:get_graph_by_name(graph_name)
+		if graph==nil then
+		-- Старая сохранёнка? Будем считать что на этом уровне - статическая погода
+		else
+			self.state[graph_name]={current_state=current_state,next_state=next_state,graph_name=graph_name,graph=graph}
+		end
+	end
+end
+
+-- Преобразуем текущее состояние менеджера в строку
+function WeatherManager:get_state_as_string()
+	local lvlstrings={}
+	for lvl_name,st in pairs(self.state) do
+		--local lvl=self:pack_level(lvl_name)
+		local curs=self:pack_state(st.current_state)
+		local nexs=self:pack_state(st.next_state)
+		local grn=self:pack_graph_name(st.graph_name)
+		table.insert(lvlstrings,grn.."="..curs..","..nexs)
+	end
+	return table.concat(lvlstrings,";")
+end
+
+-- Получить граф (таблицу переходов состояний погоды) по его названию и названию игрового уровня
+function WeatherManager:get_graph_by_name(name)
+	if not self.graphs[name] then
+		self.graphs[name] = xr_s.parse_ini_section_to_array(self.graphs_ini,name)
+	end
+	return self.graphs[name]
+end
+
+-- Запаковать название вершины графа
+function WeatherManager:pack_state(state)
+	-- Пока паковать не будем.
+	return state
+end
+
+-- Распаковать название вершины графа
+function WeatherManager:unpack_state(st)
+	-- Пока паковать не будем
+	return st
+end
+
+-- Запаковать название графа переходов погоды
+function WeatherManager:pack_graph_name(graph_name)
+	-- Пока паковать не будем.
+	return graph_name
+end
+
+-- Распаковать название графа переходов погоды
+function WeatherManager:unpack_graph_name(grn)
+	-- Пока паковать не будем
+	return grn
+end
+
+function WeatherManager:load(F)
+	set_save_marker(F, "load", false, "WeatherManager")
+	printf("WEATHER LOAD")
+	--self.update_level  = F:r_stringZ();
+	local state_string = F:r_stringZ();
+	printf("str = "..state_string)
+	if state_string == "" then
+		printf("str = empty string")
+	end
+	self:set_state_as_string(state_string)
+	self.update_time = F:r_u32();
+	local str = F:r_stringZ()
+	if(str~="nil") then
+		self.weather_fx = str
+		self.wfx_time = F:r_float()
+	end
+	set_save_marker(F, "load", true, "WeatherManager")
+end
+
+function WeatherManager:save(F)
+	set_save_marker(F, "save", false, "WeatherManager")
+	printf("WEATHER SAVE")
+	--F:w_stringZ(self.update_level);
+	printf("str = "..tostring(self:get_state_as_string()))
+	if self:get_state_as_string() == "" then
+		printf("str = empty string")
+	end
+	F:w_stringZ(self:get_state_as_string())
+	F:w_u32(self.update_time)
+	F:w_stringZ(tostring(self.weather_fx))
+	if(self.weather_fx) then
+		F:w_float(level.get_wfx_time())
+	end
+	set_save_marker(F, "save", true, "WeatherManager")
+end
+
+function get_weather_manager ()
+	if weather_manager == nil then
+		weather_manager = WeatherManager()
+	end
+	return weather_manager
+end

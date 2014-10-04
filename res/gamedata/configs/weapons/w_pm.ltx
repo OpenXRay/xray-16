@@ -1,0 +1,275 @@
+[wpn_pm]:identity_immunities,weapon_probability,default_weapon_params
+GroupControlSection			= spawn_group
+$spawn                  	= "weapons\pm"		; option for Level Editor
+$npc			 			= on							; option for Level Editor
+$prefetch 					= 8
+scheduled         			= off              		; option for ALife Simulator
+cform             			= skeleton
+class                   	= WP_PM
+description					= st_wpn_pm_descr
+
+ef_weapon_type				= 5
+
+;-----------------------------------------------------------------------------
+cost					= 400
+inv_weight				= 0.5
+
+upgrades                = up_gr_firstab_pm, up_gr_seconab_pm, up_gr_thirdab_pm, up_gr_fourtab_pm, up_gr_fifthab_pm, up_gr_fifthcd_pm
+installed_upgrades      =
+upgrade_scheme          = upgrade_scheme_pm
+
+;---TTX-------------------------------------------------------------------------
+hit_power           		= 0.32, 0.32, 0.32, 0.32
+hit_impulse	 		 		= 75
+hit_type 					= fire_wound
+fire_distance           = 200
+bullet_speed		 	= 145
+rpm                     = 172
+rpm_empty_click 	 	= 120
+
+use_aim_bullet				= false		;Поддерживается ли первая суппер пуля
+time_to_aim					= 1.0
+
+hud                     	= wpn_pm_hud
+
+;изношенность, при которой появляется шанс осечки
+misfire_start_condition		= 0.6
+;изношеность при которой шанс осечки становится константным
+misfire_end_condition		= 0.1
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= 0.007
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= 0.07
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= 0.003
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= 0.003
+
+ammo_elapsed		 	= 8
+ammo_mag_size		 	= 8
+ammo_class		 		= ammo_9x18_fmj, ammo_9x18_pmm
+
+hand_dependence		 	= 1
+single_handed			= 1
+
+;-----дисперсия-------------------------------------------------------------------------
+;базовая дисперсия
+fire_dispersion_base	= 0.25 ;0.19 			;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor = 1.0
+crosshair_inertion		= 3
+
+;отдача
+cam_return				= 0
+cam_relax_speed         = 8				;скорость возврата в исходное положение
+cam_relax_speed_ai      = 360
+cam_dispersion          = 0.75				;увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc		= 0.75				;увеличениe cam_dispersion с каждым выстрелом
+cam_dispersion_frac		= 1.0				;ствол будет подыматься на cam_dispersion*cam_dispersion_frac +- cam_dispersion*(1-cam_dispersion_frac)
+cam_max_angle			= 5.0			;максимальный угол отдачи
+cam_max_angle_horz		= 5.0				;(degree) maximum shot horizontal degree
+cam_step_angle_horz		= 1.0				;(degree) size of step camera moved in horizontal position while shooting
+
+fire_dispersion_condition_factor = 11		;увеличение дисперсии в процентах при максимальном износе
+
+PDM_disp_base 				= 0.5
+PDM_disp_vel_factor 		= 1.1
+PDM_disp_accel_factor 		= 1.1
+PDM_disp_crouch	 			= 1
+PDM_disp_crouch_no_acc 		= 1
+
+misfire_probability        = 0.005 ;вероятность осечки при максимальном износе  !!!old - now not working
+
+;---DOF-------------------------------------------------------------------------
+zoom_dof					= -1000, 1.0, 1000
+reload_dof					= 0.0, 0.5, 5, 1.7
+
+;-------------------------------------------------------------------------------
+holder_range_modifier	= 1.0               ; во сколько раз увеличивается eye_range
+holder_fov_modifier		= 1.0              ; во сколько раз увеличивается eye_fov
+
+min_radius              	= 0
+max_radius              	= 30
+
+hit_probability_gd_novice	= 0.80
+hit_probability_gd_stalker	= 0.80
+hit_probability_gd_veteran	= 0.80
+hit_probability_gd_master	= 0.80
+
+;-------------------------------------------------------------------------------
+slot 			 		= 1
+animation_slot			= 1									; type of the animation that will be used
+default_to_ruck			= false
+sprint_allowed			= true
+control_inertion_factor	= 1
+
+inv_name				= st_wpn_pm
+inv_name_short			= st_wpn_pm
+
+inv_grid_width			= 1
+inv_grid_height			= 1
+inv_grid_x				= 4
+inv_grid_y				= 26
+
+upgr_icon_x			= 830
+upgr_icon_y			= 8
+upgr_icon_width		= 133
+upgr_icon_height   	= 118
+
+
+kill_msg_x				= 227
+kill_msg_y				= 82
+kill_msg_width			= 27
+kill_msg_height			= 23
+
+;-------------------------------------------------------------------------------
+visual                  	= dynamics\weapons\wpn_pm\wpn_pm.ogf
+
+position                	= -0.021, -0.085, 0.0
+orientation             	= 0, 0, 0
+
+fire_point              	= 0.0, 0.133, 0.161
+
+;--STRAP PARAMETERS-----------------------------------------------------------------
+;strap_position         	= -0.1,-0.45,0.2			; position (offset) and orientation of the weapon when it is strapped
+;strap_orientation      	= 1.57,0,0						; (3rd person view)
+;strap_bone0					= bip01_spine2
+;strap_bone1					= bip01_spine1
+
+flame_particles		   	= weapons\generic_weapon03
+smoke_particles		   	= weapons\generic_shoot_00
+
+shell_point		 				= 0.0, 0.133, 0.047
+shell_dir		 				= 0.0, 0.0, 0.4
+shell_particles	 			= weapons\generic_shells
+
+;-------------------------------------------------------------------------------
+light_color		 				= 0.6,0.5,0.3
+light_range		 				= 3.0
+light_var_color		 		= 0.05
+light_var_range		 		= 0.5
+light_time 		 				= 0.2
+
+ph_mass			 				= 1
+
+;addons
+scope_status				= 0
+silencer_status				= 0
+grenade_launcher_status		= 0
+
+zoom_enabled					= true
+zoom_rotate_time				= 0.25
+scope_zoom_factor	    		= 55
+
+;звуки
+snd_draw							= weapons\pm_draw
+snd_holster						= weapons\generic_holster
+snd_shoot						= weapons\n_pm_shot
+snd_empty						= weapons\pistol_empty
+snd_reload						= weapons\pistol_reload, 0.8
+snd_close						= weapons\generic_close
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; silencer
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+silencer_name  				= wpn_addon_silencer		; section name for the attachable silencer
+silencer_x 						= 39						; offset in inventory icon
+silencer_y 						= -16
+
+;params when silencer is attached
+;similar to corresponding params without prefix silencer_
+
+;silencer_flame_particles 	= weapons\generic_weapon01
+silencer_smoke_particles 	= weapons\generic_shoot_00
+snd_silncer_shot				= weapons\n_pb_shot
+silencer_light_color			= 0.6,0.5,0.3
+silencer_light_range			= 0.01
+silencer_light_var_color	= 0.05
+silencer_light_var_range	= 0.5
+silencer_light_time 			= 0.2
+
+[wpn_pm_hud]:hud_base
+zoom_hide_crosshair			= true
+
+hands_position				= -0.021000,-0.160000,0.002500
+hands_orientation			= -0.500000,1.000000,1.149999
+hands_position_16x9				= 0.033000,-0.189500,0.039000
+hands_orientation_16x9			= 2.349998,2.749999,2.849998
+
+
+;hands_position				= -0.025000,-0.155500,0.002500
+;hands_orientation			= 0.450000,1.300000,0.749999
+;hands_position_16x9				= 0.007500,-0.168500,0.039000
+;hands_orientation_16x9			= 0.700000,1.699999,2.8499983
+
+;item_position					= 0.000746,-0.000321,0.003479
+;item_orientation				= 1.239378,-0.134046,-2.052052
+
+item_position				= 0.000481,-0.000050,-0.004011
+item_orientation			= 1.239378,-0.134046,-2.052052
+
+item_visual             	= dynamics\weapons\wpn_pm\wpn_pm_hud.ogf
+attach_place_idx				= 0
+
+shell_point						= 0.013,0.046,0.463
+shell_bone              	= wpn_body
+
+fire_point			= 0,0.045,0.142
+fire_bone               	= wpn_body
+
+anm_show						= pm_draw
+anm_show_empty					= pm_draw, pm_opened
+
+anm_hide             			= pm_holster
+anm_hide_empty             		= pm_holster
+
+anm_idle             			= pm_idle
+anm_idle_empty             		= pm_idle, pm_opened
+
+anm_shots						= pm_shoot
+anm_shot_l						= pm_shoot, pm_open
+
+anm_idle_aim					= pm_idle_aim
+anm_idle_aim_empty				= pm_idle_aim, pm_opened
+
+anm_reload						= pm_reload
+anm_reload_empty				= pm_reload, pm_close
+
+anm_idle_moving 				= pm_idle_moving
+anm_idle_moving_empty 			= pm_idle_moving, pm_opened
+
+anm_idle_sprint					= pm_idle_sprint
+anm_idle_sprint_empty			= pm_idle_sprint, pm_opened
+
+anm_bore						= pm_idle_bore
+anm_bore_empty					= pm_idle_bore, pm_opened
+
+aim_hud_offset_pos				= -0.106000,0.036500,0.000000
+aim_hud_offset_rot				= -0.002500,0.005000,-0.035000
+
+gl_hud_offset_pos				= 0,0,0
+gl_hud_offset_rot				= 0,0,0
+
+lean_hud_offset_pos			= 0,0,0
+lean_hud_offset_rot			= 0,0,0
+
+aim_hud_offset_pos_16x9				= -0.165000,0.075000,-0.001500
+aim_hud_offset_rot_16x9				= 0.032500,0.055000,-0.025000
+
+;-----------------------------------------------------------------------------
+; Уникальные
+;-----------------------------------------------------------------------------
+[wpn_pm_actor]:wpn_pm ;zaton b33
+$spawn                  	= "weapons\pm_actor"		; option for Level Editor
+inv_name                = st_wpn_pm_actor
+description				= st_wpn_pm_actor_descr
+
+cost					= 500
+
+upgrades                = up_gr_firstab_pm, up_gr_seconab_pm, up_gr_thirdab_pm, up_gr_fourtab_pm, up_gr_fifthab_pm, up_gr_fifthcd_pm
+installed_upgrades      =
+upgrade_scheme          = upgrade_scheme_pm
+
+condition_shot_dec      	= 0.0015
+condition_queue_shot_dec	= 0.0015
+

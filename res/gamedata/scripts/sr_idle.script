@@ -1,0 +1,45 @@
+----------------------------------------------------------------------------------------------------
+-- Do nothing
+----------------------------------------------------------------------------------------------------
+
+class "action_idle"
+
+function action_idle:__init(obj, storage)
+	self.object = obj
+	self.st = storage
+end
+
+function action_idle:reset_scheme()
+     --printf("_bp: sr_idle: action_idle:reset_scheme: self.object:name()='%s'", self.object:name())
+     self.st.signals = {}
+end
+
+function action_idle:update(delta)
+	--printf("_br: sr_idle: action_idle:update()")
+
+	--if not xr_logic.is_active(self.object, self.st) then
+	--	return
+	--end
+
+	local actor = db.actor
+
+	if xr_logic.try_switch_to_another_section(self.object, self.st, actor) then
+		return
+	end	
+end
+
+---------------------------------------------------------------------------------------------------------------------
+function add_to_binder(npc, ini, scheme, section, storage)
+	printf("DEBUG: add_to_binder: scheme='%s', section='%s'", scheme, section)
+
+	local new_action = action_idle(npc, storage)
+
+	-- Зарегистрировать все actions, в которых должен быть вызван метод reset_scheme при изменении настроек схемы:
+	xr_logic.subscribe_action_for_events(npc, storage, new_action)
+end
+
+function set_scheme(npc, ini, scheme, section, gulag_name)
+	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
+	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, npc)
+end
+

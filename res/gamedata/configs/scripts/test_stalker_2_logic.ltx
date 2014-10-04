@@ -1,0 +1,76 @@
+[logic]
+active = walker
+
+[walker]
+path_walk = radio_walk_1
+path_look = radio_look_1
+combat_ignore_cond = true
+on_game_timer = 50 | walker@search
+
+[walker@search]
+path_walk = search_walk_1
+path_look = search_look_1
+combat_ignore_cond = true
+on_signal = action | remark@search
+
+[remark@search]
+combat_ignore_cond = true
+target = path | search_look_1, 0
+anim = search
+on_signal = anim_end | remark@speak_radio
+;on_game_timer = 50 | remark@speak_radio
+
+[remark@speak_radio]
+combat_ignore_cond = true
+anim = guard_rac
+on_game_timer = 150 | walker
+
+
+[remark@sit_knee]
+meet = no_meet
+combat_ignore_cond = true
+target = path | search_look_1, 0
+anim = wait_rac
+target = path | radio_walk_1, 0
+on_game_timer = 50 | remark@radio_speek_with_base
+
+[remark@stand_up]
+meet = no_meet
+combat_ignore_cond = true
+anim = wait_na
+target = path | radio_walk_1, 0
+on_game_timer = 30 | remark@radio_speek_with_base
+
+[remark@radio_speek_with_base]
+meet = no_meet
+combat_ignore_cond = true
+anim = wait_rac
+target = path | radio_look_1, 0
+
+
+[walker@sit_knee]
+combat_ignore_cond = true
+path_walk = radio_walk_1
+path_look = sit_look_1
+on_game_timer = 100 | walker@radio_speek_with_base
+
+[walker@radio_speek_with_base]
+path_walk = radio_walk_1
+path_look = radio_look_1
+;target = path | radio_look_1, 0
+
+[animpoint@radio]
+combat_ignore_cond = true
+cover_name = animpoint_radio_2
+meet = no_meet
+avail_animations = pri_a20_colonel_radio
+on_info = {=animpoint_reached -test_info_radio_start} %+test_info_radio_start%
+on_info2 = {+test_info_radio_stop -test_info_kovalsky_talk} %+test_info_kovalsky_talk =play_sound(pri_a20_colonel_talk_in_radio)%
+on_signal = sound_end | animpoint@out
+
+[animpoint@out]
+combat_ignore_cond = true
+cover_name = animpoint_radio_2
+meet = no_meet
+avail_animations = pri_a20_colonel_radio_out
+on_game_timer = 30 | walker

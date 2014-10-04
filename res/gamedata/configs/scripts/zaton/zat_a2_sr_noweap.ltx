@@ -1,0 +1,9 @@
+[logic]
+active = sr_idle@wait
+
+[sr_idle@wait]
+on_actor_inside = {=check_smart_alarm_status(zat_stalker_base_smart:normal) !actor_has_weapon} sr_no_weapon@wait
+on_info = {=actor_in_zone(zat_surge_hide_a2)} sr_no_weapon@wait
+
+[sr_no_weapon@wait]
+on_actor_outside = sr_idle@wait

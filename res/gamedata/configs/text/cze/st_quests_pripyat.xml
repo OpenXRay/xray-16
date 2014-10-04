@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="pri_a17_get_gauss_rifle_documentation_name">
+		<text>Poloћka 62: najdi dokumenty ve zkuљebnн dнlnм</text>
+	</string>
+	<string id="pri_a17_get_gauss_rifle_documentation_text">
+		<text>Musнљ najнt dokumenty tэkajнcн se poloћky 62. Dokumenty by mмly objasnit, zda zbraт mohla bэt pouћita k sestшelenн vrtulnнkщ.</text>
+	</string>
+	<string id="pri_a17_get_in_cover_name">
+		<text>Neznбmб zbraт: skryj se v budovм</text>
+	</string>
+	<string id="pri_a17_get_in_cover_text">
+		<text>Musнљ se skrэt v budovм a odrazit ъtok Monolitu.</text>
+	</string>
+	<string id="pri_a17_get_info_name">
+		<text>Neznбmб zbraт: najdi informace</text>
+	</string>
+	<string id="pri_a17_get_info_text">
+		<text>Zbraт nenн v provozu a nenн znбmo, jak funguje. Musнљ najнt technika, kterэ by celou zбleћitost s neznбmou zbranн mohl objasnit.</text>
+	</string>
+	<string id="pri_a17_kill_preacher_name">
+		<text>Neznбmб zbraт: zabij velitele jednotky Monolitu</text>
+	</string>
+	<string id="pri_a17_kill_preacher_text">
+		<text>Musнљ zabнt velitele bojovnнkщ Monolitu pouћнvajнcнho neznбmou zbraт.</text>
+	</string>
+	<string id="pri_a17_maraud_name">
+		<text>Neznбmб zbraт: prohledej mrtvб tмla bojovnнkщ Monolitu</text>
+	</string>
+	<string id="pri_a17_maraud_text">
+		<text>Bojovnнci Monolitu sebou mмli mнt neznбmou zbraт – najdi ji.</text>
+	</string>
+	<string id="pri_a17_stalker_tech_produce_62_get_info_name">
+		<text>Neznбmб zbraт: promluv si s Kardanem</text>
+	</string>
+	<string id="pri_a17_stalker_tech_produce_62_get_info_text">
+		<text>Kardan se koneиnм zbavil kocoviny, mмl by sis s nнm promluvit o neznбmй zbrani.</text>
+	</string>
+	<string id="pri_a17_stalker_tech_produce_62_show_name">
+		<text>Neznбmб zbraт: poиkej, aћ Kardan pшijde k sobм</text>
+	</string>
+	<string id="pri_a17_stalker_tech_produce_62_show_text">
+		<text>Kardan zbraт pravdмpodobnм znб a aћ se probudн, musнљ si s nнm promluvit.</text>
+	</string>
+	<string id="pri_a17_talk_with_kovalski_about_gauss_rifle_information_name">
+		<text>Gaussova puљka: шekni o zbrani Kovalskйmu</text>
+	</string>
+	<string id="pri_a17_talk_with_kovalski_about_gauss_rifle_information_text">
+		<text>Musнљ шнct Kovalskйmu vљechno, co ses dozvмdмl o poloћce 62.</text>
+	</string>
+	<string id="pri_a17_task_find_gauss_rifle_name">
+		<text>Neznбmб zbraт: pшipoj se k tэmu</text>
+	</string>
+	<string id="pri_a17_task_find_gauss_rifle_text">
+		<text>Musнљ se pшipojit ke speciбlnн jednotce, se kterou budeљ moci ukoшistit zbraт.</text>
+	</string>
+	<string id="pri_a17_task_get_gauss_rifle_from_preacher_name">
+		<text>Neznбmб zbraт: seber zbraт</text>
+	</string>
+	<string id="pri_a17_task_get_gauss_rifle_from_preacher_text">
+		<text>Musнљ sebrat zbraт velitele jednotky Monolitu.</text>
+	</string>
+	<string id="pri_a17_task_give_gauss_rifle_to_kovalski_name">
+		<text>Neidentifikovanб zbraт: odnes zbraт Kovalskйmu</text>
+	</string>
+	<string id="pri_a17_task_give_gauss_rifle_to_kovalski_text">
+		<text>Zнskal jsi zbraт – teп bys ji mмl ukбzat Kovalskйmu a zjistit, zda tato zbraт mohla zpщsobit pбd vrtulnнkщ.</text>
+	</string>
+	<string id="pri_a17_watch_recons_six_name">
+		<text>Neidentifikovanб zbraт: zъиastni se lйиky na Monolit</text>
+	</string>
+	<string id="pri_a17_watch_recons_six_text">
+		<text>Prщzkumnб vojenskб jednotka pшipravuje ъtok na skupinu Monolitu. Mмl by ses tйto operace zъиastnit.</text>
+	</string>
+	<string id="pri_a18_get_reinforcement_name">
+		<text>Armбda Monolitu: setkej se s posilami</text>
+	</string>
+	<string id="pri_a18_get_reinforcement_text">
+		<text>Kovalskэ poslal posily, kterй ti pomohou zniиit jednotku Monolitu schovбvajнcн se v knihkupectvн.</text>
+	</string>
+	<string id="pri_a18_go_post_name">
+		<text>Armбda Monolitu: vyиisti knihkupectvн</text>
+	</string>
+	<string id="pri_a18_go_post_text">
+		<text>Musнљ zniиit vљechny bojovnнky Monolitu v budovм. Velkй jednotky Monolitu pшedstavujн nebezpeин pro vojenskй tбbory.</text>
+	</string>
+	<string id="pri_a18_use_idol_name">
+		<text>Armбda Monolitu: prozkoumej zvlбљtnн vэtvor</text>
+	</string>
+	<string id="pri_a18_use_idol_text">
+		<text>V budovм se nachбzelo velice zvlбљtnн zaшнzenн. Prozkoumej ho.</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_name">
+		<text>Laboratoш X8: najdi dokumenty tэkajнcн se experimentщ</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_text">
+		<text>Nalezenй informace se vztahujн k centrбlnн laboratoшi zvanй X8. Mohla by obsahovat informace o tajnэch experimentech provбdмnэch v Zуnм.</text>
+	</string>
+	<string id="pri_a20_check_recon_squad_task_name">
+		<text>Nezvмstnб prщzkumnб jednotka: najdi jednotku</text>
+	</string>
+	<string id="pri_a20_check_recon_squad_task_text">
+		<text>Prщzkumnб jednotka vyslanб Kovalskэm zmizela po ukonиenн podivnй komunikace. Musнљ ji najнt a zjistit, co se stalo.</text>
+	</string>
+	<string id="pri_a21_chasovoi_body_search_name">
+		<text>Nezvмstnб hlнdka: prozkoumej oblast, ve kterй hlнdka zahynula.</text>
+	</string>
+	<string id="pri_a21_chasovoi_body_search_text">
+		<text>Hlнdka se chovala podivnм, proto bys mмl najнt a vyљetшit dщvod tohoto chovбnн.</text>
+	</string>
+	<string id="pri_a21_find_chasovoi_name">
+		<text>Nezvмstnб hlнdka: najdi hlнdku</text>
+	</string>
+	<string id="pri_a21_find_chasovoi_text">
+		<text>Jeden z vojбkщ se bмhem svй sluћby ztratil – musнљ ho najнt a zjistit, proи zmizel.</text>
+	</string>
+	<string id="pri_a21_kill_kontroler_name">
+		<text>Nezvмstnб hlнdka: zabij dozorce</text>
+	</string>
+	<string id="pri_a21_kill_kontroler_text">
+		<text>Nedaleko ztracenй hlнdky se objevil dozorce – musнљ ho zlikvidovat.</text>
+	</string>
+	<string id="pri_a22_find_dead_squad_name">
+		<text>Rбdiovй ruљenн: najdi pohшeљovanou jednotku</text>
+	</string>
+	<string id="pri_a22_find_dead_squad_text">
+		<text>Jednotka, kterб pбtrala po zdroji ruљenн rбdiovйho vysнlбnн, se ztratila – musнљ ji najнt.</text>
+	</string>
+	<string id="pri_a22_search_bodys_name">
+		<text>Rбdiovй ruљenн: prozkoumej tмla</text>
+	</string>
+	<string id="pri_a22_search_bodys_text">
+		<text>Prozkoumej tмla – moћnб tak zjistнљ, proи zemшeli.</text>
+	</string>
+	<string id="pri_a22_search_yarmoshuk_body_name">
+		<text>Rбdiovй ruљenн: prozkoumej tмla</text>
+	</string>
+	<string id="pri_a22_search_yarmoshuk_body_text">
+		<text>Prozkoumej tмla – moћnб tak zjistнљ, proи zemшeli.</text>
+	</string>
+	<string id="pri_a25_blow_up_door_name">
+		<text>Rбdiovй ruљenн: vyhoп dveшe do povмtшн</text>
+	</string>
+	<string id="pri_a25_blow_up_door_text">
+		<text>Pomocн vэbuљnin musнљ odstranit dveшe a dostat se do budovy.</text>
+	</string>
+	<string id="pri_a25_check_freezer_knock_name">
+		<text>Rбdiovй ruљenн: proљetшi zvuky</text>
+	</string>
+	<string id="pri_a25_check_freezer_knock_text">
+		<text>Z chladniиky vychбzн zvlбљtnн zvuky – vypadб to, jako by byl nмkdo zamиenэ uvnitш. Zjisti, co se dмje.</text>
+	</string>
+	<string id="pri_a25_destroy_antenna_name">
+		<text>Rбdiovй ruљenн: odstraт zdroj ruљenн</text>
+	</string>
+	<string id="pri_a25_destroy_antenna_text">
+		<text>Naљel jsi zdroj ruљenн rбdiovйho vysнlбnн – musнљ ho zniиit.</text>
+	</string>
+	<string id="pri_a25_find_antenna_name">
+		<text>Rбdiovй ruљenн: najdi zdroj ruљenн</text>
+	</string>
+	<string id="pri_a25_find_antenna_text">
+		<text>V budovм se nachбzн zdroj rбdiovйho ruљenн – najdi jej.</text>
+	</string>
+	<string id="pri_a25_find_explosive_name">
+		<text>Rбdiovй ruљenн: najdi vэbuљniny</text>
+	</string>
+	<string id="pri_a25_find_explosive_text">
+		<text>Jednotka vyslanб za ъиelem nalezenн zdroje ruљenн u sebe mмla vэbuљniny. Najdi je, abys mohl odstranit vchod do budovy.</text>
+	</string>
+	<string id="pri_a25_remove_source_of_hindrances_name">
+		<text>Rбdiovй ruљenн: dostaт se do budovy љkolky</text>
+	</string>
+	<string id="pri_a25_remove_source_of_hindrances_text">
+		<text>Zdroj signбlu je nмkde v budovм љkolky, takћe se musнљ dostat dovnitш.</text>
+	</string>
+	<string id="pri_a28_cover_militarys_name">
+		<text>Evakuace: kryj armбdu</text>
+	</string>
+	<string id="pri_a28_cover_militarys_text">
+		<text>Stшelec moћnб umшel, ale armбda se bez tebe k vrtulnнkщm stбle nedostane.</text>
+	</string>
+	<string id="pri_a28_cover_strelok_name">
+		<text>Evakuace: kryj Stшelce</text>
+	</string>
+	<string id="pri_a28_cover_strelok_text">
+		<text>Velitelstvн se zajнmб o informace, kterй by Stшelec mohl nabнdnout. Musнљ ho dostat k vrtulnнkщm.</text>
+	</string>
+	<string id="pri_a28_go_hellis_name">
+		<text>Evakuace: dostaт se k vrtulnнkщm</text>
+	</string>
+	<string id="pri_a28_go_hellis_text">
+		<text>Vљichni jsou mrtvн – musнљ se k vrtulnнkщm dostat sбm</text>
+	</string>
+	<string id="pri_a28_talk_with_kovalski_name">
+		<text>Evakuace: pшed evakuacн si promluv s Kovalskэm</text>
+	</string>
+	<string id="pri_a28_talk_with_kovalski_text">
+		<text>Jeљtм pшed zahбjenнm evakuace si musнљ promluvit s Kovalskэm.</text>
+	</string>
+	<string id="pri_a28_tell_kovalski_when_ready_name">
+		<text>Evakuace: шekni Kovalskйmu, ћe jsi pшipraven</text>
+	</string>
+	<string id="pri_a28_tell_kovalski_when_ready_text">
+		<text>Mмl bys informovat Kovalskйho, ћe uћ jsi pшipraven k zahбjenн evakuace.</text>
+	</string>
+	<string id="pri_a28_wait_surge_end_name">
+		<text>Evakuace: poиkej, aћ emise pшejde</text>
+	</string>
+	<string id="pri_a28_wait_surge_end_text">
+		<text>Musнљ poиkat, aћ pшejde souиasnб vlna emise.</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_1_name">
+		<text>Zбhada: najdi zdroj signбlu</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_1_text">
+		<text>Nedaleko zбkladny Kirillov identifikoval zvlбљtnн neznбmэ signбl. Musнљ najнt jeho zdroj.</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_2_name">
+		<text>Zбhada: sleduj signбl</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_2_text">
+		<text>Souшadnice signбlu jsou opмt k dispozici, takћe je sleduj.</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_3_name">
+		<text>Zбhada: zjisti poslednн znбmэ vэskyt signбlu</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_3_text">
+		<text>Signбl zmizel na dvoшe pшed budovou, proto najdi poslednн znбmou pozici signбlu.</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_4_name">
+		<text>Zбhada: pшiprav se na ъtok na zбkladnu</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_4_text">
+		<text>Vraќ se na vojenskou zбkladnu a pшiprav se na pravdмpodobnэ ъtok.</text>
+	</string>
+	<string id="pri_b305_kovalskiy_talk_name">
+		<text>Rбdiovй ruљenн: promluv si s Kovalskэm</text>
+	</string>
+	<string id="pri_b305_kovalskiy_talk_text">
+		<text>Ptal se po tobм plukovnнk Kovalsky.</text>
+	</string>
+	<string id="pri_b306_task_1_name">
+		<text>Laboratoш X8: dostaт se do vэtahovй љachty</text>
+	</string>
+	<string id="pri_b306_task_1_text">
+		<text>Vstup do podzemnн laboratoшe se nachбzн pod centrem sluћeb Jubilejnyj a jedinэm zpщsobem, jak se do nн dostat, je vyuћнt vэtahovй љachty.</text>
+	</string>
+	<string id="pri_b306_task_2_name">
+		<text>Laboratoш X8: najdi generбtor</text>
+	</string>
+	<string id="pri_b306_task_2_text">
+		<text>Napбjenн dveшн vэtahovй љachty bylo pшeruљeno. Pro otevшenн dveшн musнљ najнt a zapnout zбloћnн generбtor.</text>
+	</string>
+	<string id="pri_b306_task_3_name">
+		<text>Laboratoш X8: sestup do laboratoшe</text>
+	</string>
+	<string id="pri_b306_task_3_text">
+		<text>Aby ses dostal do laboratoшe X8, musнљ vyuћнt vэtahu, kterэ se nachбzн pod centrem sluћeb Jubilejnyj.</text>
+	</string>
+	<string id="pri_b35_task_envoy_name">
+		<text>Jedinэ vэstшel: zlikviduj poslниka</text>
+	</string>
+	<string id="pri_b35_task_envoy_text">
+		<text>Musнљ zlikvidovat poslниka. Bez jeho informacн ћoldбci nebudou schopnн najнt laboratoш.</text>
+	</string>
+	<string id="pri_b35_task_envoy_wait_name">
+		<text>Jedinэ vэstшel: poиkej na zбkaznнkovy lidi</text>
+	</string>
+	<string id="pri_b35_task_envoy_wait_text">
+		<text>Poиkej, aћ se ukбћou zбkaznнkovi lidi a zabij jejich velitele. Bez nмj ћoldбci nebudou schopni najнt cestu do laboratoшe.</text>
+	</string>
+	<string id="pri_b35_task_merc_name">
+		<text>Jedinэ vэstшel: zabij velitele jednotky ћoldбkщ</text>
+	</string>
+	<string id="pri_b35_task_merc_text">
+		<text>Musнљ zabнt velitele jednotky ћoldбkщ. Bez nмj budou ћoldбci neorganizovanн a nebudou pшedstavovat takovou hrozbu.</text>
+	</string>
+	<string id="pri_b35_task_merc_wait_name">
+		<text>Jedinэ vэstшel: poиkej, aћ se objevн ћoldбci</text>
+	</string>
+	<string id="pri_b35_task_merc_wait_text">
+		<text>Musнљ poиkat, aћ se objevн ћoldбci a zabнt jejich velitele. Bez nмj se ћoldбci nedokбћou dohodnout a nebudou pшedstavovat takovou hrozbu.</text>
+	</string>
+	<string id="pri_b35_task_reward_name">
+		<text>Jedinэ vэstшel: promluv si s Kovalskэm</text>
+	</string>
+	<string id="pri_b35_task_reward_text">
+		<text>Nahlaљ vэsledky mise Kovalskйmu</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_1_name">
+		<text>Laboratoш X8: odejdi z komplexu, nebo pokraиuj v hledбnн dokumentщ.</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_1_text">
+		<text>Naљel jsi dokumenty a nynн mщћeљ odejнt z laboratoшe. Je vљak moћnй, ћe v komplexu se nachбzejн i dalљн dokumenty.</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_2_name">
+		<text>Laboratoш X8: buп odejdi z podzemnнho komplexu, nebo pokraиuj v hledбnн dokumentщ.</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_2_text">
+		<text>Naљel jsi dokumenty a nynн mщћeљ odejнt z laboratoшe. Je vљak moћnй, ћe v komplexu se nachбzejн i dalљн dokumenty.</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_3_name">
+		<text>Laboratoш X8: odejdi z podzemnнho komplexu</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_3_text">
+		<text>Patrnм jsi naљel uћ vљechny dokumenty, kterй v laboratoшi byly. Koneиnм mщћeљ z tohoto podzemnнho komplexu odejнt.</text>
+	</string>
+	<string id="pri_a18_wait_reinf_name">
+		<text>Vojбci Monolitu: poиkej na posily</text>
+	</string>
+	<string id="pri_a18_wait_reinf_text">
+		<text>Kovalskij za tebou vyslal posily. Poиkej na nм a potom zabijte vojбky Monolitu, co se udadili v knihkupectvн.</text>
+	</string>
+	<string id="pri_a22_talk_with_kovalski_name">
+		<text>Tichэ svмt: promluv si s Kovalskэm</text>
+	</string>
+	<string id="pri_a22_talk_with_kovalski_text">
+		<text>Bмћ si promluvit s Kovalskim. Patrnм ti chce sdмlit cosi dщleћitйho.</text>
+	</string>
+	<string id="pri_a28_defend_helis_name">
+		<text>Evakuace: braт vrtulnнky</text>
+	</string>
+	<string id="pri_a28_defend_helis_text">
+		<text>Musнљ brбnit vrtulnнky pшed nepшнtelem, dokud nebudou moci odstartovat.</text>
+	</string>
+	<string id="pri_a28_save_medic_name">
+		<text>Evakuace: prober zdravotnнka</text>
+	</string>
+	<string id="pri_a28_save_medic_text">
+		<text>Zdб se, ћe zdravotnнka opмt zasбhly neznбmн ъtoиnнci. Co nejrychleji ho opмt pшiveп k vмdomн.</text>
+	</string>
+	<string id="pri_a28_return_to_helis_name">
+		<text>Evakuace: vraќ se k vrtulnнkщm</text>
+	</string>
+	<string id="pri_a28_return_to_helis_text">
+		<text>Musнљ se rychle vrбtit k vrtulnнkщm, kaћdou chvнli mщћou startovat.</text>
+	</string>
+	<string id="pri_a28_helis_gonna_fly_name">
+		<text>Evakuace: okamћitм se vraќ k vrtulnнkщm</text>
+	</string>
+	<string id="pri_a28_helis_gonna_fly_text">
+		<text>Vrtulnнky jsou pшipraveny ke startu. Musнљ okamћitм do jednoho nastoupit. Piloti nemohou dlouho иekat!</text>
+	</string>
+</string_table>

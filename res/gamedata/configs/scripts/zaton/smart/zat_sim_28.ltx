@@ -1,0 +1,22 @@
+[smart_terrain];zat_sim_28
+squad_id = 56
+max_population = 1
+respawn_only_smart = true
+respawn_params = respawn@zat_sim_b28   
+
+[respawn@zat_sim_b28]
+spawn_bandit@novice
+spawn_bandit@advanced
+spawn_bandit@master
+
+[spawn_bandit@novice]
+spawn_squads = bandit_sim_squad_novice
+spawn_num = {-zat_b28_heli_3_searched -zat_b100_heli_2_searched -zat_b101_heli_5_searched} 4, 0
+
+[spawn_bandit@advanced]
+spawn_squads = bandit_sim_squad_novice, bandit_sim_squad_advanced
+spawn_num = {+jup_b218_pripyat_group_gathering} 0, {+zat_b28_heli_3_searched} 4, {+zat_b100_heli_2_searched} 4, {+zat_b101_heli_5_searched} 4, 0
+
+[spawn_bandit@master]
+spawn_squads = bandit_sim_squad_veteran, bandit_sim_squad_advanced
+spawn_num = {+jup_b218_pripyat_group_gathering} 4, 0

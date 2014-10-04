@@ -1,0 +1,17 @@
+[logic]
+active = mob_home
+
+[mob_home]
+path_home = jup_b16_psy_dog_home
+home_min_radius = 1
+home_max_radius = 2
+aggressive = true
+on_info = {=npc_in_zone(jup_b16_oasis)} mob_home@1
+out_restr = jup_oasis_default_in_restrictor
+
+[mob_home@1]
+path_home = jup_b16_psy_dog_home
+home_min_radius = 30
+home_max_radius = 50
+aggressive = true
+out_restr = jup_oasis_default_in_restrictor

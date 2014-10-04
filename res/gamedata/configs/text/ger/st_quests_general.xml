@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="hide_from_surge_message">
+		<text>Achtung! Emission beginnt in:</text>
+	</string>
+	<string id="hide_from_surge_descr_1_a">
+		<text>Sie mьssen sich in den nдchsten Unterschlupf begeben, um sich vor der Emission zu schьtzen.</text>
+	</string>
+	<string id="hide_from_surge_descr_2_a">
+		<text>Sie dьrfen Ihren Unterschlupf wдhrend der Emission nicht verlassen.</text>
+	</string>
+	<string id="hide_from_surge_name_1">
+		<text>Emission: Deckung suchen</text>
+	</string>
+	<string id="hide_from_surge_name_2">
+		<text>Emission: In Deckung warten</text>
+	</string>
+</string_table>

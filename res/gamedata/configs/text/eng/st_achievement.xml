@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_achievement_10_descr">
+		<text>Your enemy must feel humiliated after being killed by you ten times in a row and failing to kill you even once during this time! You are not cruel, though - you're just giving him a reason to keep practicing.</text>
+	</string>
+	<string id="st_achievement_10_name">
+		<text>Time to Reap</text>
+	</string>
+	<string id="st_achievement_11_descr">
+		<text>You're deadly! Killing two birds with one stone... You skewered them both with your Gauss rifle.</text>
+	</string>
+	<string id="st_achievement_11_name">
+		<text>Skewer</text>
+	</string>
+	<string id="st_achievement_12_descr">
+		<text>Your calm and calculating approach brings  a swift death to the enemy, as you expertly hit two targets with two shots of your double-barreled shotgun in the space of a couple of seconds.</text>
+	</string>
+	<string id="st_achievement_12_name">
+		<text>Two shots, two kills.</text>
+	</string>
+	<string id="st_achievement_13_descr">
+		<text>You obviously know what being a stalker is all about, which is why you're become the number one legendary stalker!</text>
+	</string>
+	<string id="st_achievement_13_name">
+		<text>Social Climber</text>
+	</string>
+	<string id="st_achievement_14_descr">
+		<text>Cutting through an exoskeleton with a knife? It looks like you’re the kind who likes to cut right down to the bone.</text>
+	</string>
+	<string id="st_achievement_14_name">
+		<text>Tin Opener</text>
+	</string>
+	<string id="st_achievement_15_descr">
+		<text>They thought they had you, but you showed them who's boss by killing five of them, despite knock'in on death's doorstep yourself!</text>
+	</string>
+	<string id="st_achievement_15_name">
+		<text>Die Hard</text>
+	</string>
+	<string id="st_achievement_16_descr">
+		<text>What an adrenalin rush! You annihilated your enemy with a hail of bullets - 5 kills in five seconds! Sweet!</text>
+	</string>
+	<string id="st_achievement_16_name">
+		<text>Unbridled Rage</text>
+	</string>
+	<string id="st_achievement_17_descr">
+		<text>Wow, great aim! You got two for the price of 1 by shooting the enemy in the eye without dying.</text>
+	</string>
+	<string id="st_achievement_17_name">
+		<text>Eye Specialist</text>
+	</string>
+	<string id="st_achievement_18_descr">
+		<text>Let them hide behind corners and lay their ambushes - that won't stop you. Hell, you can hit a target on the move without even aiming!</text>
+	</string>
+	<string id="st_achievement_18_name">
+		<text>Lightning Reflexes</text>
+	</string>
+	<string id="st_achievement_19_descr">
+		<text>Let him run as fast as he can - your bullets will catch him either way.</text>
+	</string>
+	<string id="st_achievement_19_name">
+		<text>Stop the Runner</text>
+	</string>
+	<string id="st_achievement_1_descr">
+		<text>You have slaughtered twenty enemies in a row without dying! Wow, what a bloodbath!</text>
+	</string>
+	<string id="st_achievement_1_name">
+		<text>Massacre</text>
+	</string>
+	<string id="st_achievement_20_descr">
+		<text>There may have been three of them and they may have had sniper rifles, but your skill put an end to them.</text>
+	</string>
+	<string id="st_achievement_20_name">
+		<text>Most Accurate Shooter</text>
+	</string>
+	<string id="st_achievement_21_descr">
+		<text>You don't need to fire a single round to outwit the barbarians.</text>
+	</string>
+	<string id="st_achievement_21_name">
+		<text>Peace Messenger</text>
+	</string>
+	<string id="st_achievement_22_descr">
+		<text>Distance is not a problem for a real sniper! You can hit the bull's eye at distances over 120 meters. </text>
+	</string>
+	<string id="st_achievement_22_name">
+		<text>Deadly Accuracy</text>
+	</string>
+	<string id="st_achievement_23_descr">
+		<text>Your enemy got you down, but you left him a nice surprise with that live grenade!</text>
+	</string>
+	<string id="st_achievement_23_name">
+		<text>Something to Remember You By</text>
+	</string>
+	<string id="st_achievement_24_descr">
+		<text>They killed your friends and they deserve your unleashed vengeance. Three enemy corpses for three dead friends - that's justice.</text>
+	</string>
+	<string id="st_achievement_24_name">
+		<text>Avenger</text>
+	</string>
+	<string id="st_achievement_25_descr">
+		<text>You are your friend's guardian angel. You saved him twice from an attack since he was carrying the artifact.</text>
+	</string>
+	<string id="st_achievement_25_name">
+		<text>Cherub</text>
+	</string>
+	<string id="st_achievement_26_descr">
+		<text>You kept your honor and your team's by putting some points on the board.</text>
+	</string>
+	<string id="st_achievement_26_name">
+		<text>Keeping Your Honor</text>
+	</string>
+	<string id="st_achievement_27_descr">
+		<text>Do you really know where the next artifact will show up? Well, you picked it up in a matter of seconds when it appeared!</text>
+	</string>
+	<string id="st_achievement_27_name">
+		<text>Stalker's Intuition</text>
+	</string>
+	<string id="st_achievement_28_descr">
+		<text>You got lucky there - you killed the enemy with the last bullet in your clip! Better them than you, that's for sure!</text>
+	</string>
+	<string id="st_achievement_28_name">
+		<text>Lucky Bastard</text>
+	</string>
+	<string id="st_achievement_29_descr">
+		<text>You killed eight enemies in a row. You've drawn a line in the sand - let's see if they're willing to cross it.</text>
+	</string>
+	<string id="st_achievement_29_name">
+		<text>Blacklist </text>
+	</string>
+	<string id="st_achievement_2_descr">
+		<text>Nobody killed you because you're careful and cautious. You didn't die once during the game and scored over fifteen points.</text>
+	</string>
+	<string id="st_achievement_2_name">
+		<text>Paranoia</text>
+	</string>
+	<string id="st_achievement_30_descr">
+		<text>You do your work without attracting attention by always using a silencer. Why let the enemy know the direction of death?</text>
+	</string>
+	<string id="st_achievement_30_name">
+		<text>Silent Death</text>
+	</string>
+	<string id="st_achievement_3_descr">
+		<text>You destroyed your enemy by winning and scoring twice as many points as their leading scorer.</text>
+	</string>
+	<string id="st_achievement_3_name">
+		<text>Overwhelming Superiority</text>
+	</string>
+	<string id="st_achievement_4_descr">
+		<text>Your bold plan to instantly capture the artifact was successful and within the first three minutes of the game you scored for your team.</text>
+	</string>
+	<string id="st_achievement_4_name">
+		<text>Blitzkrieg</text>
+	</string>
+	<string id="st_achievement_5_descr">
+		<text>You annihilated the enemy without giving up a single artifact.  That’ll show them what real team work is all about.</text>
+	</string>
+	<string id="st_achievement_5_name">
+		<text>Shutout!</text>
+	</string>
+	<string id="st_achievement_6_descr">
+		<text>You scored highest in every area by getting the most kills, the most artifacts and dying the least! Keep it up!</text>
+	</string>
+	<string id="st_achievement_6_name">
+		<text>All-rounder</text>
+	</string>
+	<string id="st_achievement_7_descr">
+		<text>Your blade skills are unrivaled! You gutted three enemies in twenty seconds, showing off your hand skills.</text>
+	</string>
+	<string id="st_achievement_7_name">
+		<text>Fury</text>
+	</string>
+	<string id="st_achievement_8_descr">
+		<text>Every enemy has a weakness, and you found it shooting him in the eye with your sidearm.</text>
+	</string>
+	<string id="st_achievement_8_name">
+		<text>Achilles' Heel</text>
+	</string>
+	<string id="st_achievement_9_descr">
+		<text>The enemy's bullets are powerless against you. You walk through them without a scratch and moe the enemy down!</text>
+	</string>
+	<string id="st_achievement_9_name">
+		<text>Faster Than Bullets</text>
+	</string>
+	<string id="st_sp_achievement_1_descr">
+		<text>You’re willing to research the most recent developments in the Zone. You have advanced our understanding of the Zone by finding new anomalous formations previously unknown to science.</text>
+	</string>
+	<string id="st_sp_achievement_1_name">
+		<text>Pioneer</text>
+	</string>
+	<string id="st_sp_achievement_2_hint">
+		<text>Stalkers think more of you now.\nIn appreciation of your efforts, stalkers have taken to leaving ammo in your personal box at Yanov station.</text>
+	</string>
+	<string id="st_sp_achievement_2_descr">
+		<text>You don’t try to avoid dangerous mutants - you hunt them down and do it well. Good hunters are held in high esteem among stalkers.</text>
+	</string>
+	<string id="st_sp_achievement_2_name">
+		<text>Mutant Hunter</text>
+	</string>
+	<string id="st_sp_achievement_3_hint">
+		<text>Stalkers think more of you now.\nAs a sign of respect, stalkers have taken to leaving medical supplies in your personal box at Skadovsk.</text>
+	</string>
+	<string id="st_sp_achievement_3_descr">
+		<text>You uncovered the secret behind stalker disappearances at Skadovsk: the guilty party weren’t mutants after all, but a far more dangerous foe - man. Your successful pursuit of the truth has earned you the respect of stalkers.</text>
+	</string>
+	<string id="st_sp_achievement_3_name">
+		<text>Detective</text>
+	</string>
+	<string id="st_sp_achievement_4_hint">
+		<text>Stalkers think more of you now.\nStalkers have asked Owl the trader to give you a discount. \nBeard is now offering you his best prices for artifacts.</text>
+	</string>
+	<string id="st_sp_achievement_4_descr">
+		<text>You showed the bandits and their leader, Sultan, who’s boss, thus making you a popular man among stalkers. You’re always welcome at Skadovsk.</text>
+	</string>
+	<string id="st_sp_achievement_4_name">
+		<text>One of Ours</text>
+	</string>
+	<string id="st_sp_achievement_5_hint">
+		<text>You have earned the respect of bandits.\nOwl the trader has given you a discount out of fear that he may be your next victim. \nAs agreed, Beard will now pay you a cut of his proceeds.</text>
+	</string>
+	<string id="st_sp_achievement_5_descr">
+		<text>You helped Sultan outmaneuver the stalkers and take Beard’s business under your control. You are now feared and respected at Zaton.</text>
+	</string>
+	<string id="st_sp_achievement_5_name">
+		<text>Boss</text>
+	</string>
+	<string id="st_sp_achievement_6_hint">
+		<text>Stalkers decided to give Magpie’s loot, which he had acquired through lies and deceit, to someone more worthy. They put his stuff in your personal box at Yanov.</text>
+	</string>
+	<string id="st_sp_achievement_6_descr">
+		<text>You brought the scumbag to justice. Magpie cheated and deceived many a stalker, and now his time has come.</text>
+	</string>
+	<string id="st_sp_achievement_6_name">
+		<text>Courier of Justice</text>
+	</string>
+	<string id="st_sp_achievement_7_hint">
+		<text>Stalkers think more of you now.\nBandits will try to hunt you down whenever you venture out into the Zone.</text>
+	</string>
+	<string id="st_sp_achievement_7_descr">
+		<text>You found every type of artifact known to Zone researchers. This earned you the respect of stalkers and the close attention of bandits.</text>
+	</string>
+	<string id="st_sp_achievement_7_name">
+		<text>Artifact Hunter</text>
+	</string>
+	<string id="st_sp_achievement_8_hint">
+		<text>Cardan can perform a unique modification, which will allow you to move quickly while wearing an exoskeleton, by installing hydraulic servomotor boosters.</text>
+	</string>
+	<string id="st_sp_achievement_8_descr">
+		<text>Now Cardan has all the tools he’ll ever need. This will allow him to perform new and more complex upgrades.</text>
+	</string>
+	<string id="st_sp_achievement_8_name">
+		<text>Weapon Systems Expert</text>
+	</string>
+	<string id="st_sp_achievement_9_hint">
+		<text>Azot can perform a unique tactical helmet modification: an infrared scanner that allows for detection of nearby humans.</text>
+	</string>
+	<string id="st_sp_achievement_9_descr">
+		<text>Azot has all the tools a Zone technician could dream of. He can now perform hi-tech modifications.</text>
+	</string>
+	<string id="st_sp_achievement_9_name">
+		<text>Hi-Tech Expert</text>
+	</string>
+	<string id="st_sp_achievement_10_hint">
+		<text>Your experience allows you to find rare artifacts more often.</text>
+	</string>
+	<string id="st_sp_achievement_10_descr">
+		<text>There are virtually no accessible areas by the center of the Zone that you haven’t been to yet. You’ve been a guest of almost every local anomaly.</text>
+	</string>
+	<string id="st_sp_achievement_10_name">
+		<text>Seasoned Stalker</text>
+	</string>
+	<string id="st_sp_achievement_11_hint">
+		<text>Your leadership qualities improve your team’s chances of survival.</text>
+	</string>
+	<string id="st_sp_achievement_11_descr">
+		<text>You had a team job to do, so you put a great squad together and proved you're a leader.</text>
+	</string>
+	<string id="st_sp_achievement_11_name">
+		<text>Leader</text>
+	</string>
+	<string id="st_sp_achievement_12_hint">
+		<text>Freedom, Duty, free stalkers and even bandits have come to recognize your negotiation skills, and think highly of you as a result.</text>
+	</string>
+	<string id="st_sp_achievement_12_descr">
+		<text>You know how to solve a problem peacefully. Who needs brute force when simple words can resolve a dispute just as well? Nonetheless, you should watch out for people that shoot first and ask questions later.</text>
+	</string>
+	<string id="st_sp_achievement_12_name">
+		<text>Diplomat</text>
+	</string>
+	<string id="st_sp_achievement_13_descr">
+		<text>You’ve worked with the scientists for so long that you could rightfully be called a research assistant. Everyone in the scientists’ bunker considers you one of their own.</text>
+	</string>
+	<string id="st_sp_achievement_13_name">
+		<text>Research Assistant</text>
+	</string>
+	<string id="st_sp_achievement_14_hint">
+		<text>Your relations with Duty have improved. If you find yourself in a pickle, Duty fighters will try to help you.\nAzot, the technician who favors Duty, has offered you a discount. \nYour relations with Freedom have deteriorated. \Hawaiian, the trader who favors Freedom, will now charge you more for his goods.</text>
+	</string>
+	<string id="st_sp_achievement_14_descr">
+		<text>You have provided plenty of help to Duty, and this has earned you the respect of Duty fighters and their friends. But keep in mind that not everyone in the Zone is a Duty fan.</text>
+	</string>
+	<string id="st_sp_achievement_14_name">
+		<text>A Friend of Duty</text>
+	</string>
+	<string id="st_sp_achievement_15_hint">
+		<text>\nYour relations with Freedom have improved. If you find yourself in a pickle, Freedom fighters will try to help you.\Hawaiian, the trader who favors Freedom, has offered you a discount. \nYour relations with Duty have deteriorated. \nAzot, the technician who favors Duty, will now charge you more for his services.</text>
+	</string>
+	<string id="st_sp_achievement_15_descr">
+		<text>You have provided plenty of help to Freedom, and this has earned you the respect of Freedom fighters and their friends. But keep in mind that not everyone in the Zone is a Freedom fan.</text>
+	</string>
+	<string id="st_sp_achievement_15_name">
+		<text>A Friend of Freedom</text>
+	</string>
+	<string id="st_sp_achievement_16_hint">
+		<text>Stalkers at Yanov value a balance of power between Duty and Freedom, which is why both the technician and the trader have given you discounts now.</text>
+	</string>
+	<string id="st_sp_achievement_16_descr">
+		<text>You didn’t side with either faction and always acted as a free stalker. You’ve not made any enemies, but you haven’t got any new friends either.</text>
+	</string>
+	<string id="st_sp_achievement_16_name">
+		<text>A Man of Balance</text>
+	</string>
+	<string id="st_sp_achievement_17_hint">
+		<text>Traders offer you more rare and expensive goods.</text>
+	</string>
+	<string id="st_sp_achievement_17_descr">
+		<text>Although you know what it’s like to be short of cash, you’re not doing too badly at the moment. In fact, sometimes your wealth can be considerable, and traders value a client of your stature.</text>
+	</string>
+	<string id="st_sp_achievement_17_name">
+		<text>A Wealthy Client</text>
+	</string>
+	<string id="st_sp_achievement_18_hint">
+		<text>After getting the notes, Strelok found a new reason to live on and make it to his objective, whatever the cost.</text>
+	</string>
+	<string id="st_sp_achievement_18_descr">
+		<text>Your foresight has served you well: on finding notes in Strelok's group’s stashes, you kept them until you found their rightful owner.</text>
+	</string>
+	<string id="st_sp_achievement_18_name">
+		<text>A Keeper of Secrets</text>
+	</string>
+	<string id="st_sp_achievement_19_descr">
+		<text>You managed to survive an emission without taking cover thanks to the anabiotic pills. The effects of this on your psyche are unclear, as you notice a strange silence inside your mind. It seems that you no longer hear a constant stream of thoughts.</text>
+	</string>
+	<string id="st_sp_achievement_19_name">
+		<text>Marked by the Zone</text>
+	</string>
+	<string id="st_sp_achievement_20_hint">
+		<text>Owl the trader has offered you a discount for being his best informer and partner.</text>
+	</string>
+	<string id="st_sp_achievement_20_descr">
+		<text>When you get your hands on a piece of info, you always find the right buyer. Obviously, you always have your own profit in mind when selling information to those who need it.</text>
+	</string>
+	<string id="st_sp_achievement_20_name">
+		<text>Trafficker of Information</text>
+	</string>
+	<string id="st_sp_achievement_21_hint">
+		<text>Your relations with stalkers have improved. If you find yourself in a pickle, stalkers will try to help you.\nStalker medics have agreed to sell you medical supplies at cost price.</text>
+	</string>
+	<string id="st_sp_achievement_21_descr">
+		<text>You’ve always helped out stalkers in trouble. Although their faction is not very tight-knit, you now have allies in the unofficial stalker brotherhood who will help you in combat and afterwards too.</text>
+	</string>
+	<string id="st_sp_achievement_21_name">
+		<text>A Friend of Stalkers</text>
+	</string>
+	<string id="st_sp_achievement_1_hint">
+		<text>Various new information allowed Professors Hermann and Ozersky to create a new experimental drug, an anabiotic, in the Zone.</text>
+	</string>
+	<string id="st_sp_achievement_19_hint">
+		<text>You have a chance of surviving an emission even without the aid of drugs, provided your health is in order.</text>
+	</string>
+	<string id="st_sp_achievement_13_hint">
+		<text>Given how useful you are, Professor Hermann is now offering you medical supplies and equipment intended exclusively for bunker personnel at cost price.\nNovikov is so used to you that he only wants you to pay for parts when performing modifications.</text>
+	</string>
+</string_table>

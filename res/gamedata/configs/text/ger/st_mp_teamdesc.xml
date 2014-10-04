@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="team_1_desc">
+		<text>Die Anarchisten der Zone. Sie halten die Zone fьr einen Ort der Freiheit und sind der Meinung, dass alle Gesetze, Regeln und Konventionen der restlichen Welt hier nicht gelten. Ihr Motto lautet: "Tu, was du willst, und mach dein Ding." Die Freiheitler kдmpfen gegen die Versuche der Regierung, Kontrolle ьber die Zone zu erlangen, und sie liegen mit den Sцldnern im Krieg. Ihre Mitglieder tragen hauptsдchlich sowjetische und russische Waffen.</text>
+	</string>
+	<string id="team_1_name">
+		<text>Freiheitsfraktion (Freie Stalker)</text>
+	</string>
+	<string id="team_2_desc">
+		<text>Diese abenteuerlustigen Halsabschneider kommen aus aller Welt und sind sich fьr nichts zu schade. Ihr Motto lautet: "Geld stinkt nicht". Solange es Bedarf an Artefakten gibt, werden sie um die vollstдndige Kontrolle ьber die Artefaktfelder kдmpfen. Die Sцldner tragen hauptsдchlich westliche Waffen.</text>
+	</string>
+	<string id="team_2_name">
+		<text>Sцldnerfraktion (Die Halsabschneider)</text>
+	</string>
+</string_table>

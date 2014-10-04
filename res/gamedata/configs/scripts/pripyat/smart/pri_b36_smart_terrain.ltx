@@ -1,0 +1,29 @@
+[smart_terrain]
+squad_id = 11
+spawn_point = pri_b36_smart_terrain_spawn_point
+max_population = 2
+respawn_params = respawn@pri_b36   
+
+[respawn@pri_b36]
+spawn_monolith_zombied
+
+[spawn_monolith_zombied]
+spawn_squads =  monolith_sim_squad_advanced, zombied_sim_squad_veteran
+spawn_num = {+pri_b36_master_dead} 4, 0
+
+[exclusive]
+sniper = pripyat\pri_b36_monolith_sniper.ltx
+master = pripyat\pri_b36_monolith_master.ltx
+zombied_1 = pripyat\pri_b36_zombied.ltx
+zombied_2 = pripyat\pri_b36_zombied.ltx
+zombied_3 = pripyat\pri_b36_zombied.ltx
+zombied_4 = pripyat\pri_b36_zombied.ltx
+zombied_5 = pripyat\pri_b36_zombied.ltx
+guard_1 = pripyat\pri_b36_monolith_guard.ltx
+guard_2 = pripyat\pri_b36_monolith_guard.ltx
+marine_1 = pripyat\pri_b36_monolith_marines_1.ltx
+marine_2 = pripyat\pri_b36_monolith_marines_2.ltx
+marine_3 = pripyat\pri_b36_monolith_marines_3.ltx
+marine_4 = pripyat\pri_b36_monolith_marines_4.ltx
+marine_5 = pripyat\pri_b36_monolith_marines_5.ltx
+marine_sniper = pripyat\pri_b36_monolith_marines_sniper.ltx

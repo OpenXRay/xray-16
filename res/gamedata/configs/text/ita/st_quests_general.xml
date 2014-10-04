@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="hide_from_surge_message">
+		<text>Attenzione! Inizio emissione tra:</text>
+	</string>
+	<string id="hide_from_surge_descr_1_a">
+		<text>Devi raggiungere subito la copertura piщ vicina per ripararti dall'emissione.</text>
+	</string>
+	<string id="hide_from_surge_descr_2_a">
+		<text>Non devi mai uscire allo scoperto durante un'emissione.</text>
+	</string>
+	<string id="hide_from_surge_name_1">
+		<text>Emissione: trova un riparo</text>
+	</string>
+	<string id="hide_from_surge_name_2">
+		<text>Emissione: attendi al riparo</text>
+	</string>
+</string_table>

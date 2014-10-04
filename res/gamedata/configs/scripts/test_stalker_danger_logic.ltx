@@ -1,0 +1,18 @@
+[logic]
+active = walker@guard
+
+[walker@guard]
+combat_ignore_cond = true
+path_walk = danger_1_walk_1
+path_look = danger_1_look
+on_info = {=see_actor} walker@walk_danger
+;def_state_standing = threat_na
+
+[walker@walk_danger]
+combat_ignore_cond = true
+path_walk = danger_1_walk_2
+path_look = danger_1_look
+def_state_moving1 = raid
+def_state_moving2 = raid
+def_state_moving3 = raid
+def_state_standing = threat

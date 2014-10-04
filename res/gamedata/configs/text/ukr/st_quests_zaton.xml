@@ -1,0 +1,780 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="zat_a2_reach_base_name">
+		<text>Безпечне місце: дістатися «Скадовська»</text>
+	</string>
+	<string id="zat_a2_reach_base_text">
+		<text>У Зоні відносно безпечно лише у великих таборах. Має сенс дістатися найближчого з них - «Скадовська».</text>
+	</string>
+	<string id="zat_b100_guide_maps_01_name">
+		<text>Карти місцевості: знайти зацікавлених</text>
+	</string>
+	<string id="zat_b100_guide_maps_02_name">
+		<text>Карти місцевості: запропонувати Лоцманові</text>
+	</string>
+	<string id="zat_b100_guide_maps_02_text">
+		<text>Є припущення, що мапи місцевості між Затоном та «Юпітером» можуть зацікавити Лоцмана, місцевого проводиря.</text>
+	</string>
+	<string id="zat_b100_heli_2_crash_name">
+		<text>«Скат-2»: дослідити місце падіння</text>
+	</string>
+	<string id="zat_b100_heli_2_crash_text">
+		<text>Дослідити місце падіння гелікоптера «Скат-2».</text>
+	</string>
+	<string id="zat_b101_heli_5_crash_name">
+		<text>«Скат-5»: дослідити місце падіння</text>
+	</string>
+	<string id="zat_b101_heli_5_crash_name_02">
+		<text>«Скат-5»: знайти причину згоряння електроніки.</text>
+	</string>
+	<string id="zat_b101_heli_5_crash_name_03">
+		<text>Загін «Скат»: знайти джерело розрядів, що вразили два гелікоптери</text>
+	</string>
+	<string id="zat_b101_heli_5_crash_text">
+		<text>Дослідити місце падіння гелікоптера «Скат-5».</text>
+	</string>
+	<string id="zat_b101_heli_5_crash_text_02">
+		<text>Потрібно з'ясувати джерело потужного електричного розряду, що вразив вертоліт «Скат-5».</text>
+	</string>
+	<string id="zat_b101_heli_5_crash_text_03">
+		<text>Необхідно знайти причину, через яку згоріла електроніка гелікоптерів «Скат-4» та «Скат-5». Під час обстеження з'ясувалося, що обидві машини було вражено потужним електричним розрядом.</text>
+	</string>
+	<string id="zat_b103_merc_bring_supplies_name">
+		<text>Припаси: дістати їжу для найманців</text>
+	</string>
+	<string id="zat_b103_merc_bring_supplies_text">
+		<text>Загін найманців, що розташувався у цехах підстанції, просить принести їм припаси - шість банок консервів, стільки ж палок ковбаси або батонів.</text>
+	</string>
+	<string id="zat_b103_merc_supplies_got_name">
+		<text>Припаси: віднести їжу найманцям</text>
+	</string>
+	<string id="zat_b103_merc_supplies_got_text">
+		<text>Необхідно віднести зібрані припаси найманцям, які розташувалися у цехах підстанції.</text>
+	</string>
+	<string id="zat_b103_toolkit_2_substation_workshop_name">
+		<text>Інструменти: обстежити цехи підстанції</text>
+	</string>
+	<string id="zat_b103_toolkit_2_substation_workshop_text">
+		<text>Кажуть, що в цехах підстанції можуть знайтися інструменти. Можливо, там знайдуться і такі, що потрібні технікові.</text>
+	</string>
+	<string id="zat_b106_find_chimera_name">
+		<text>Полювання на химеру: знайти мутанта, поки той спить</text>
+	</string>
+	<string id="zat_b106_find_chimera_text">
+		<text>Потрібно знайти химеру, поки вона не прокинулася.</text>
+	</string>
+	<string id="zat_b106_found_soroka_name">
+		<text>У пошуках Сороки: повідомити Гонті</text>
+	</string>
+	<string id="zat_b106_found_soroka_text">
+		<text>Схоже, що Сороку - сталкера, який підставив групу Гонти, - виявлено. Зараз він вступив до угруповання «Воля» і називає себе Флінт.</text>
+	</string>
+	<string id="zat_b106_kill_chimera_name">
+		<text>Полювання на химеру: вбити мутанта</text>
+	</string>
+	<string id="zat_b106_kill_chimera_text">
+		<text>Химера прокинулася! Потрібно вбити її, поки є така можливість.</text>
+	</string>
+	<string id="zat_b106_meet_with_gonta_at_night_name">
+		<text>Полювання на химеру: зустрітися із Гонтою в барі о третій годині ночі</text>
+	</string>
+	<string id="zat_b106_meet_with_gonta_at_night_text">
+		<text>Треба зустрітися із Гонтою удосвіта, щоб разом із його групою вийти полювати на химеру.</text>
+	</string>
+	<string id="zat_b106_receipt_reward_name">
+		<text>Полювання на химеру: повідомити Звіробоя</text>
+	</string>
+	<string id="zat_b106_receipt_reward_text">
+		<text>Слід повідомити сталкера на прізвисько Звіробій про успішне полювання на химеру - він має видати нагороду.</text>
+	</string>
+	<string id="zat_b106_search_soroka_name">
+		<text>У пошуках Сороки: знайти сталкера</text>
+	</string>
+	<string id="zat_b106_search_soroka_text">
+		<text>Сталкер на прізвисько Сорока підставив групу Гонти під напад химери. Хлопці просять знайти покидька.</text>
+	</string>
+	<string id="zat_b107_evacuation_jupiter_name">
+		<text>Місця евакуації: перевірити точку Б205</text>
+	</string>
+	<string id="zat_b107_evacuation_jupiter_text">
+		<text>На знайденій в одному з гелікоптерів мапі були позначені точки евакуації. Треба перевірити, чи з'являлися військові у точці Б205.</text>
+	</string>
+	<string id="zat_b107_evacuation_pripyat_1_name">
+		<text>Місця евакуації: перевірити точку Б28</text>
+	</string>
+	<string id="zat_b107_evacuation_pripyat_1_text">
+		<text>На знайденій в одному з гелікоптерів мапі були позначені точки евакуації. Треба перевірити, чи з'являлися військові у точці Б28.</text>
+	</string>
+	<string id="zat_b107_evacuation_pripyat_2_name">
+		<text>Місце евакуації: знайти координати точки Б28</text>
+	</string>
+	<string id="zat_b107_evacuation_pripyat_2_text">
+		<text>На записі, що зберігся у «чорному ящику» одного з гелікоптерів групи «Скат», командир групи вказує місце для збору - так звану точку евакуації Б28. Необхідно визначити її координати.</text>
+	</string>
+	<string id="zat_b107_evacuation_pripyat_3_name">
+		<text>Місце евакуації: дістатися точки Б28</text>
+	</string>
+	<string id="zat_b107_evacuation_pripyat_3_text">
+		<text>Точка, де мали зібратися військові, знаходиться у Прип'яті. Треба знайти спосіб дістатися туди.</text>
+	</string>
+	<string id="zat_b107_evacuation_zaton_name">
+		<text>Місця евакуації: перевірити точку Б2</text>
+	</string>
+	<string id="zat_b107_evacuation_zaton_text">
+		<text>На знайденій в одному з гелікоптерів мапі були позначені точки евакуації. Треба перевірити, чи з'являлися військові у точці евакуації Б2.</text>
+	</string>
+	<string id="zat_b14_bring_strange_object_name">
+		<text>Дивне явище: принести артефакт Бороді</text>
+	</string>
+	<string id="zat_b14_bring_strange_object_text">
+		<text>Джерелом дивного світіння був не менш дивний артефакт. Він явно зацікавить Бороду.</text>
+	</string>
+	<string id="zat_b14_learn_about_strange_occurrence_by_stalkers_name">
+		<text>Дивне явище: розпитати сталкерів про артефакт</text>
+	</string>
+	<string id="zat_b14_learn_about_strange_occurrence_by_stalkers_text">
+		<text>Можливо, сталкери щось знають про дивний артефакт, або підкажуть того, хто може знати. Варто з ними поговорити.</text>
+	</string>
+	<string id="zat_b14_learn_about_strange_occurrence_name">
+		<text>Дивне явище: знайти джерело світіння на земснаряді</text>
+	</string>
+	<string id="zat_b14_learn_about_strange_occurrence_text">
+		<text>На земснаряді було помічено незвичайне навіть для Зони світіння. Борода просить визначити його джерело.</text>
+	</string>
+	<string id="zat_b14_take_artefact_name">
+		<text>Дивне явище: взяти артефакт</text>
+	</string>
+	<string id="zat_b14_take_artefact_text">
+		<text>Джерело дивного світіння - не менш дивний артефакт. Варто взяти його із собою.</text>
+	</string>
+	<string id="zat_b14_tell_svyaznoy_about_all_name">
+		<text>Дивне явище: розповісти Бороді про артефакт</text>
+	</string>
+	<string id="zat_b14_tell_svyaznoy_about_all_text">
+		<text>Джерелом дивного світіння був не менш дивний артефакт. Про це варто розказати Бороді.</text>
+	</string>
+	<string id="zat_b20_cross_the_teleport_name">
+		<text>Шлях на плато: стрибнути в аномалію</text>
+	</string>
+	<string id="zat_b20_cross_the_teleport_text">
+		<text>Схоже, шлях на плато лежить через аномалію. Доведеться у неї стрибнути.</text>
+	</string>
+	<string id="zat_b20_find_the_teleport_name">
+		<text>Шлях на плато: знайти особистий хід Ноя</text>
+	</string>
+	<string id="zat_b20_find_the_teleport_text">
+		<text>У КПК Ноя згадувався якийсь «особистий хід» на плато. Необхідно знайти цю дорогу.</text>
+	</string>
+	<string id="zat_b20_plato_talk_to_noah_name">
+		<text>Шлях на плато: довідатися дорогу в Ноя</text>
+	</string>
+	<string id="zat_b20_plato_talk_to_noah_text">
+		<text>Кажуть, що сталкер на прізвисько Ной знає шлях на плато. Необхідно довідатися цю дорогу.</text>
+	</string>
+	<string id="zat_b22_bring_proof_name">
+		<text>Зникнення сталкерів: принести докази провини Тремора</text>
+	</string>
+	<string id="zat_b22_bring_proof_text">
+		<text>Треба віднести КПК із записами Тремора на «Скадовськ» і показати Бороді. Із записів зрозуміло, що в зникненні сталкерів винний медик.</text>
+	</string>
+	<string id="zat_b22_find_proof_name">
+		<text>Зникнення сталкерів: знайти докази провини Тремора</text>
+	</string>
+	<string id="zat_b22_find_proof_text">
+		<text>Потрібно визначити, чи не залишив Тремор якихось свідчень своєї провини у зникненні сталкерів.</text>
+	</string>
+	<string id="zat_b28_heli_3_crash_name">
+		<text>«Скат-3»: дослідити місце падіння</text>
+	</string>
+	<string id="zat_b28_heli_3_crash_text">
+		<text>Дослідити місце падіння гелікоптера «Скат-3».</text>
+	</string>
+	<string id="zat_b29_simple_bring_text_1">
+		<text>Треба принести артефакт на завдання Бороди. Однак час фори вже минув, тепер конкуренти теж шукають замовлення.</text>
+	</string>
+	<string id="zat_b29_simple_bring_text_2">
+		<text>Треба принести артефакт на завдання Бороди. Не варто, однак, забувати, що конкуренти теж намагаються виконати це замовлення.</text>
+	</string>
+	<string id="zat_b29_simple_bring_text_3">
+		<text>На завдання Бороди треба принести артефакт, однак сигнал від іншої групи свідчить, що вони вже знайшли потрібний. Є можливість відстежити сигнал та випередити конкурентів.</text>
+	</string>
+	<string id="zat_b29_simple_bring_text_4">
+		<text>На завдання Бороди треба принести артефакт, однак інша група уже виконала замовлення. Тепер за артефакт вдасться виручити лише половину ціни.</text>
+	</string>
+	<string id="zat_b29_simple_bring_text_5">
+		<text>Потрібно принести артефакт на завдання Бороди.</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_16">
+		<text>Артефакти на замовлення: принести артефакт «Граві»</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_17">
+		<text>Артефакти на замовлення: принести артефакт «Око»</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_18">
+		<text>Артефакти на замовлення: принести артефакт «Пузир»</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_19">
+		<text>Артефакти на замовлення: принести артефакт «Порожнявка»</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_20">
+		<text>Артефакти на замовлення: принести артефакт «Золота рибка»</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_21">
+		<text>Артефакти на замовлення: принести артефакт «Полум'я»</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_22">
+		<text>Артефакти на замовлення: принести артефакт «Світляк»</text>
+	</string>
+	<string id="zat_b29_simple_bring_title_23">
+		<text>Артефакти на замовлення: принести артефакт «Сніжинка»</text>
+	</string>
+	<string id="zat_b29_simple_find_text_1">
+		<text>Треба знайти артефакт на завдання Бороди, але час фори минув. Тепер конкуренти теж шукають замовлення.</text>
+	</string>
+	<string id="zat_b29_simple_find_text_2">
+		<text>Потрібно знайти артефакт на завдання Бороди. Не слід забувати, що конкуренти теж шукають замовлення.</text>
+	</string>
+	<string id="zat_b29_simple_find_text_3">
+		<text>Потрібно знайти артефакт на завдання Бороди, однак надійшов сигнал від іншої групи - вони вже знайшли артефакт. Є можливість відстежити сигнал і випередити конкурентів.</text>
+	</string>
+	<string id="zat_b29_simple_find_text_4">
+		<text>Потрібно знайти артефакт на завдання Бороди, але інша група уже виконала замовлення. Тепер можна отримати лише половину ціни за артефакт.</text>
+	</string>
+	<string id="zat_b29_simple_find_text_5">
+		<text>Потрібно знайти артефакт на завдання Бороди.</text>
+	</string>
+	<string id="zat_b29_simple_find_title_16">
+		<text>Артефакти на замовлення: знайти артефакт «Граві»</text>
+	</string>
+	<string id="zat_b29_simple_find_title_17">
+		<text>Артефакти на замовлення: знайти артефакт «Око»</text>
+	</string>
+	<string id="zat_b29_simple_find_title_18">
+		<text>Артефакти на замовлення: знайти артефакт «Пузир»</text>
+	</string>
+	<string id="zat_b29_simple_find_title_19">
+		<text>Артефакти на замовлення: знайти артефакт «Порожнявка»</text>
+	</string>
+	<string id="zat_b29_simple_find_title_20">
+		<text>Артефакти на замовлення: знайти артефакт «Золота рибка»</text>
+	</string>
+	<string id="zat_b29_simple_find_title_21">
+		<text>Артефакти на замовлення: знайти артефакт «Полум'я»</text>
+	</string>
+	<string id="zat_b29_simple_find_title_22">
+		<text>Артефакти на замовлення: знайти артефакт «Світляк»</text>
+	</string>
+	<string id="zat_b29_simple_find_title_23">
+		<text>Артефакти на замовлення: знайти артефакт «Сніжинка»</text>
+	</string>
+	<string id="zat_b30_compass_to_barmen_task_find_name">
+		<text>«Компас»: знайти Ноя і довідатися, де можна дістати цей рідкий артефакт</text>
+	</string>
+	<string id="zat_b30_compass_to_barmen_task_find_text">
+		<text>Необхідно знайти Ноя на старій баржі й довідатися, де можна дістати рідкий «Компас». Борода вже двно шукає цей артефакт і готовий добре заплатити за нього.</text>
+	</string>
+	<string id="zat_b30_compass_to_barmen_task_give_name">
+		<text>«Компас»: принести артефакт Бороді</text>
+	</string>
+	<string id="zat_b30_compass_to_sultan_task_find_name">
+		<text>«Компас»: довідатися в Ноя, де можна добути артефакт</text>
+	</string>
+	<string id="zat_b30_compass_to_sultan_task_find_text">
+		<text>Султан хоче перехопити артефакт, котрий шукає Борода. Треба знайти Ноя на старій баржі й довідатися, де можна добути артефакт.</text>
+	</string>
+	<string id="zat_b30_compass_to_sultan_task_give_name">
+		<text>«Компас»: принести артефакт Султанові</text>
+	</string>
+	<string id="zat_b30_compass_to_sultan_task_give_text">
+		<text>Артефакт, що дав Ной, і є той самий «Компас», потрібний Султанові.</text>
+	</string>
+	<string id="zat_b30_percent_task_name">
+		<text>Темний бізнес: отримати від Бороди відсотки</text>
+	</string>
+	<string id="zat_b30_percent_task_text">
+		<text>Має сенс забрати в Бороди певний відсоток з його доходів.</text>
+	</string>
+	<string id="zat_b30_sultan_task_1_name">
+		<text>Привабливий бізнес: поговорити із Султаном</text>
+	</string>
+	<string id="zat_b30_sultan_task_1_text">
+		<text>Торговець Сич вважає, що Борода не виконує умови угоди, і радить звернутися по допомогу до місцевого авторитета Султана.</text>
+	</string>
+	<string id="zat_b30_sultan_task_2_name">
+		<text>Темний бізнес: забрати детектори в сталкерів</text>
+	</string>
+	<string id="zat_b30_sultan_task_2_text">
+		<text>Необхідно в будь-який спосіб відібрати прототипи детекторів у сталкерів, які шукають артефакти для Бороди. Коли Борода втратить детектори, йому доведеться погодитися на умови Султана.</text>
+	</string>
+	<string id="zat_b30_sultan_task_3_name">
+		<text>Темний бізнес: поговорити із Султаном</text>
+	</string>
+	<string id="zat_b30_sultan_task_3_text">
+		<text>Борода уже втратив детектори. Треба прийти до Султана й довідатися, чи вирішив він проблему з іншими постачальниками Бороди.</text>
+	</string>
+	<string id="zat_b30_sultan_task_4_name">
+		<text>Темний бізнес: змусити Бороду працювати на Султана</text>
+	</string>
+	<string id="zat_b30_sultan_task_4_text">
+		<text>Тепер Борода не зможе вести справи самостійно: у нього немає ані постачальників, ані детекторів. Треба змусити його працювати на Султана.</text>
+	</string>
+	<string id="zat_b30_sultan_task_6_name">
+		<text>Темний бізнес: довідатися про нинішні справи Бороди</text>
+	</string>
+	<string id="zat_b30_sultan_task_6_text">
+		<text>Необхідно довідатися, якими справами на поточний момент займається Борода. Це допоможе перекрити канали його постачань.</text>
+	</string>
+	<string id="zat_b30_sultan_task_7_name">
+		<text>Темний бізнес: забрати другий детектор у сталкерів</text>
+	</string>
+	<string id="zat_b30_sultan_task_7_text">
+		<text>Необхідно в будь-який спосіб відібрати прототипи детекторів у сталкерів, які шукають артефакти для Бороди. Коли Борода втратить детектори, йому доведеться погодитися на умови Султана.</text>
+	</string>
+	<string id="zat_b30_task_1_name">
+		<text>Привабливий бізнес: принести Новікову три детектори «Велес»</text>
+	</string>
+	<string id="zat_b30_task_1_text">
+		<text>Торговець Сич запропонував узяти участь в одній прибутковій справі. Для цього треба знайти три детектори «Велес», віднести їх до бункеру вчених і віддати Новікову.</text>
+	</string>
+	<string id="zat_b30_task_2_name">
+		<text>Привабливий бізнес: дочекатися одержання детекторів Сичем</text>
+	</string>
+	<string id="zat_b30_task_2_text">
+		<text>Новіков узяв детектори і сказав, що назад переправить їх Сичеві сам. Треба почекати, поки Новіков попрацює з детекторами, а потім довідатися в Сича результати.</text>
+	</string>
+	<string id="zat_b30_task_3_name">
+		<text>Привабливий бізнес: поговорити із Сичем</text>
+	</string>
+	<string id="zat_b30_task_3_text">
+		<text>Торговець Сич по рації передав, що в нього виникли проблеми, і попрохав зайти до нього.</text>
+	</string>
+	<string id="zat_b30_task_4_name">
+		<text>Привабливий бізнес: переконати Бороду дотримуватися домовленостей</text>
+	</string>
+	<string id="zat_b30_task_4_text">
+		<text>Торговець Сич вважає, що Борода не виконує умови угоди. Необхідно поговорити з Бородою і примусити того дотримуватися домовленостей.</text>
+	</string>
+	<string id="zat_b30_task_5_name">
+		<text>Привабливий бізнес: зажадати долю в Сича</text>
+	</string>
+	<string id="zat_b30_task_5_text">
+		<text>Борода не визнає, що заборгував Сичеві. Необхідно з'ясувати, хто з торговців правий, і зажадати у винного свою частку.</text>
+	</string>
+	<string id="zat_b33_zaporojec_text_01">
+		<text>Сталкер Корч просить роздобути контейнер із його речами. Контейнер він сховав до старого «Запорожця», та після землетрусу машина провалилася до розлому. Сам Корч побоюється спускатися вниз: там водяться снорки.</text>
+	</string>
+	<string id="zat_b33_zaporojec_text_02">
+		<text>Контейнер Корча отримано. Тепер слід віднести його власникові по-чесному й розділити вміст.</text>
+	</string>
+	<string id="zat_b38_den_of_the_bloodsucker_inform_stalkers_name">
+		<text>Лігвище кровососів: розповісти сталкерам</text>
+	</string>
+	<string id="zat_b38_den_of_the_bloodsucker_inform_stalkers_text">
+		<text>Потрібно повідомити сталкерам про лігвище кровососів, виявлене під ВНЗ «Коло».</text>
+	</string>
+	<string id="zat_b38_den_of_the_bloodsucker_tell_barman_about_all_name">
+		<text>Лігвище кровососів: розповісти Бороді</text>
+	</string>
+	<string id="zat_b38_den_of_the_bloodsucker_tell_barman_about_all_text">
+		<text>Необхідно розповісти Бороді про лігвище кровососів, виявлене під ВНЗ «Коло»: він знає, яких заходів ужити для убезпечення сталкерів.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_clean_den_of_the_bloodsucker_name">
+		<text>Зникнення сталкерів: іти за Глухарем</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_clean_den_of_the_bloodsucker_text">
+		<text>Глухар прохає обстежити разом із ним закинуту будівлю ВНЗ. Він помітив кровососів і хоче перевірити, чи немає тут мисливця.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_deal_with_medic_name">
+		<text>Зникнення сталкерів: розібратися, що сталося</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_deal_with_medic_text">
+		<text>Здається, Тремор не такий уже й невинний. Треба розібратися, що тут сталося.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_find_cop_near_port_krans_name">
+		<text>Зникнення сталкерів: знайти Глухаря</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_find_cop_near_port_krans_text">
+		<text>Глухар нащось пішов до портових кранів - можливо, щось довідався про зниклих сталкерів. Треба пошукати його там.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_find_out_where_is_cop_name">
+		<text>Зникнення сталкерів: дізнатися, де Глухар</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_find_out_where_is_cop_text">
+		<text>Глухаря нема на звичному місці. Варто запитати в Бороди, куди той попрямував</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_find_to_be_missing_hunter_name">
+		<text>Зникнення сталкерів: знайти зниклого мисливця</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_find_to_be_missing_hunter_text">
+		<text>Глухар просив допомогти у пошуках зниклого мисливця, який виглядав лігвище кровососів. Судячи з наявних відомостей, саме кровососи причетні до всіх недавніх зникнень сталкерів.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_get_out_from_den_of_the_bloodsucker_name">
+		<text>Зникнення сталкерів: вибратися з лігвища кровососів</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_get_out_from_den_of_the_bloodsucker_text">
+		<text>У підвалі виявилося лігвище кровососів, причому тварини знаходяться у стані дивного заціпеніння. Потрібно вибратися звідси - і при цьому дуже бажано не шуміти.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_meet_cop_24h_past_name">
+		<text>Зникнення сталкерів: зустрітися із Глухарем</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_meet_cop_24h_past_text">
+		<text>Мабуть, варто зустрітися із Глухарем і поговорити про подальші пошуки мисливця.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_meet_cop_later_name">
+		<text>Зникнення сталкерів: зустрітися із Глухарем пізніше</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_meet_cop_later_text">
+		<text>У будинку не виявилося жодних слідів Данила-мисливця. Однак Глухар, здається, здивований тим, що вдалося знайти всередині ВНЗ; він просить зустрітися із ним пізніше - хоче дізнатися якісь деталі.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_meet_ment_name">
+		<text>Зникнення сталкерів: зустрітися із Глухарем</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_meet_ment_text">
+		<text>У місці, зазначеному Глухарем, був тільки мертвий кровосос і жодних слідів мисливця Данила. Але сам Глухар, мабуть, знайшов щось цікаве і просить приєднатися до нього.</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_tell_barmen_about_medic_text">
+		<text>Як з'ясувалося, у зникненні сталкерів винуваті не кровососи, а Тремор - медик зі «Скадовська».</text>
+	</string>
+	<string id="zat_b3_get_tools_1_2_name">
+		<text>Інструменти: принести інструменти Карданові</text>
+	</string>
+	<string id="zat_b3_get_tools_1_2_text">
+		<text>Кардан просив знайти два набори інструментів: один для тонкої роботи, інший для грубої. Технік заплатить за інструмент і, крім того, зможе забезпечити складнішу модернізацію зброї чи бронежилета.</text>
+	</string>
+	<string id="zat_b3_get_tools_1_3_name">
+		<text>Інструменти: принести інструменти Карданові</text>
+	</string>
+	<string id="zat_b3_get_tools_1_3_text">
+		<text>Кардан просив знайти два набори інструментів: один для грубої роботи, інший для калібрування. Технік заплатить за інструмент і, крім того, зможе забезпечити складнішу модернізацію зброї чи бронежилета.</text>
+	</string>
+	<string id="zat_b3_get_tools_1_name">
+		<text>Інструменти: принести інструменти Карданові</text>
+	</string>
+	<string id="zat_b3_get_tools_1_text">
+		<text>Кардан просив знайти набір інструментів для грубої роботи. Технік заплатить за інструмент і, крім того, зможе забезпечити складнішу модернізацію зброї чи бронежилета.</text>
+	</string>
+	<string id="zat_b3_get_tools_2_3_name">
+		<text>Інструменти: принести інструменти Карданові</text>
+	</string>
+	<string id="zat_b3_get_tools_2_3_text">
+		<text>Кардан просив знайти два набори інструментів: один для тонкої роботи, інший для калібрування. Технік заплатить за інструмент і, крім того, зможе забезпечити складнішу модернізацію зброї чи бронежилета.</text>
+	</string>
+	<string id="zat_b3_get_tools_2_name">
+		<text>Інструменти: принести інструменти Карданові</text>
+	</string>
+	<string id="zat_b3_get_tools_2_text">
+		<text>Кардан просив знайти набір інструментів для тонкої роботи. Технік заплатить за інструмент і, крім того, зможе забезпечити складнішу модернізацію зброї чи бронежилета.</text>
+	</string>
+	<string id="zat_b3_get_tools_3_name">
+		<text>Інструменти: принести інструменти Карданові</text>
+	</string>
+	<string id="zat_b3_get_tools_3_text">
+		<text>Кардан просив знайти набір інструментів для калібрування. Технік заплатить за інструмент і, крім того, зможе забезпечити складнішу модернізацію зброї чи бронежилета.</text>
+	</string>
+	<string id="zat_b3_mechanic_toolkit_search_name">
+		<text>Інструменти: принести інструменти Карданові</text>
+	</string>
+	<string id="zat_b3_mechanic_toolkit_search_text">
+		<text>Кардан просив знайти три набори інструментів: для грубої роботи, для тонкої роботи плюс набір для калібрування. Технік заплатить за інструмент і, крім того, зможе забезпечити складнішу модернізацію зброї чи бронежилета.</text>
+	</string>
+	<string id="zat_b40_reconnoitre_merc_camp_01_name">
+		<text>Табір найманців: забрати будь-яку знайдену інформацію</text>
+	</string>
+	<string id="zat_b40_reconnoitre_merc_camp_01_text">
+		<text>Торговець Сич обіцяв добре заплатити за будь-який носій інформації, знайдений у таборі найманців на станції переробляння відходів. Його цікавлять плани найманців.</text>
+	</string>
+	<string id="zat_b40_reconnoitre_merc_camp_02_name">
+		<text>Табір найманців: забрати із собою будь-яку знайдену інформацію</text>
+	</string>
+	<string id="zat_b40_reconnoitre_merc_camp_02_text">
+		<text>Торговець Сич обіцяв добре заплатити за будь-який носій інформації, знайдений у таборі найманців на станції переробляння відходів. Його цікавлять плани найманців.</text>
+	</string>
+	<string id="zat_b44_tech_buddies_barge_name">
+		<text>Три товариші: довідатися про долю Баржі</text>
+	</string>
+	<string id="zat_b44_tech_buddies_barge_text">
+		<text>Кардан просив передати вибачення своєму товаришеві - сталкеру на прізвисько Баржа. Вони посварилися, і той пішов у невідомому напрямку.</text>
+	</string>
+	<string id="zat_b44_tech_buddies_both_name">
+		<text>Три товариші: довідатися про долю Баржі та Жартівника</text>
+	</string>
+	<string id="zat_b44_tech_buddies_both_text">
+		<text>Кардан просив передати вибачення своїм товаришам - сталкерам Баржі і Жартівнику. Після сварки хлопці пішли в невідомому напрямку.</text>
+	</string>
+	<string id="zat_b44_tech_buddies_joker_name">
+		<text>Три товариші: довідатися про долю Жартівника</text>
+	</string>
+	<string id="zat_b44_tech_buddies_joker_text">
+		<text>Кардан просив передати вибачення своєму товаришеві - сталкеру на прізвисько Жартівник. Вони посварилися, і Жартівник пішов у невідомому напрямку.</text>
+	</string>
+	<string id="zat_b51_nimble_items_get_order_name">
+		<text>Особливе замовлення: забрати товар</text>
+	</string>
+	<string id="zat_b51_nimble_items_get_order_text">
+		<text>Замовлення доставлене, необхідно забрати його в Спритника.</text>
+	</string>
+	<string id="zat_b51_nimble_items_wait_order_name">
+		<text>Особливе замовлення: очікувати на доставку</text>
+	</string>
+	<string id="zat_b51_nimble_items_wait_order_text">
+		<text>Замовлення зроблено. Доведеться почекати, поки Спритник дістане товар.</text>
+	</string>
+	<string id="zat_b52_reputation_find_snag_name">
+		<text>Репутація: знайти Корча</text>
+	</string>
+	<string id="zat_b52_reputation_find_snag_text">
+		<text>Потрібно знайти Корча і змусити його прикусити язика. Спритник ніколи не торгував краденим, а от Корч, швидше за все, ще й як звик брехати. Востаннє його бачили біля портових кранів - можливо, він усе ще там.</text>
+	</string>
+	<string id="zat_b52_reputation_find_snag_text_2">
+		<text>Потрібно знайти Корча і змусити його прикусити язика. Біля портових кранів Корча немає - але, можливо, бандити знають, де він.</text>
+	</string>
+	<string id="zat_b52_reputation_find_snag_text_3">
+		<text>Треба знайти Корча і змусити його прикусити язика. Здається, бандити замішані у цій справі й знають, де він зараз є.</text>
+	</string>
+	<string id="zat_b52_reputation_find_snag_text_4">
+		<text>Потрібно знайти Корча і змусити його прикусити язика. Поки немає жодних зачіпок щодо його місцезнаходження.</text>
+	</string>
+	<string id="zat_b52_reputation_find_snag_text_5">
+		<text>Потрібно знайти Корча і змусити його прикусити язика. Судячи з КПК, знайденого в одного з бандитів, Корча шукають люди Султана. Однак де саме його шукати, невідомо.</text>
+	</string>
+	<string id="zat_b52_reputation_know_there_snog_name">
+		<text>Репутація: довідатися, куди пропав Корч</text>
+	</string>
+	<string id="zat_b52_reputation_know_there_snog_text">
+		<text>На колишнім місці Корча немає. Варто розпитати місцевих - можливо, хтось бачив, куди він подівся.</text>
+	</string>
+	<string id="zat_b52_reputation_know_there_snog_text_2">
+		<text>Потрібно знайти Корча і змусити його прикусити язика. На колишнім місці його немає. Можливо, Султан знає, де знайти Корча.</text>
+	</string>
+	<string id="zat_b52_reputation_know_there_snog_text_3">
+		<text>Потрібно знайти Корч і змусити його прикусити язика. На колишнім місці Корча немає. Можливо, щось про це знає Борода.</text>
+	</string>
+	<string id="zat_b52_reputation_tell_snag_name">
+		<text>Репутація: поговорити з Корчем</text>
+	</string>
+	<string id="zat_b52_reputation_tell_snag_text">
+		<text>Потрібно знайти Корча і змусити його прикусити язика. Спритник ніколи не торгував краденим, а от Корч, швидше за все, ще й як звик брехати.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_destroy_lair_name">
+		<text>Лігвище кровососів: знайти вентиляційну шахту</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_destroy_lair_text">
+		<text>Знайти вентиляційну шахту, щоб пустити отруйний газ до лігвища кровососів.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_find_gas_name">
+		<text>Лігвище кровососів: знайти отруйний газ</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_find_gas_text">
+		<text>Для знищення лігвища необхідний отруйний газ. Сич має знати, де можна знайти таку штуку.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_find_gas_text_2">
+		<text>Для знищення лігвища необхідний отруйний газ. Сич стверджує, що балони з газом мають знайтися у кинутій військовій автоколоні.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_get_gas_name">
+		<text>Лігвище кровососів: знайти ключі для контейнера</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_get_gas_text">
+		<text>У знайденій документації згадуються ключі до контейнера із газовим балоном. Необхідно їх знайти.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_open_gas_box_name">
+		<text>Лігвище кровососів: знайти спосіб відкрити контейнер із газовим балоном</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_open_gas_box_text">
+		<text>Контейнер, в якому зберігається балон із газом, закритий. Необхідно знайти спосіб відкрити його.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_place_gas_name">
+		<text>Лігвище кровососів: установити газовий балон</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_place_gas_text">
+		<text>Установити газовий балон до системи вентиляції підвалів ВНЗ. Газ, проникнувши через вентиляційну шахту, заповнить підвали і знищить кровососів.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_tell_stalkers_about_destroy_lair_name">
+		<text>Лігвище кровососів: повідомити Бороді про знищення лігвища</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_tell_stalkers_about_destroy_lair_text">
+		<text>Є сенс повідомити Бороді про те, що лігвище кровососів знищене, тож нині «Скадовськ» поза небезпекою.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_twist_vintil_name">
+		<text>Лігвище кровососів: повернути вентиль</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_twist_vintil_text">
+		<text>Повернути вентиль, щоб отрутний газ проникнув через вентиляційну шахту до підвалів, де знаходиться лігвище кровососів.</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_wait_destroy_name">
+		<text>Лігвище кровососів: почекати, доки газ подіє</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_wait_destroy_text">
+		<text>Треба переконатися, що газ потрапив до лігвища і всі кровососі знищені.</text>
+	</string>
+	<string id="zat_b5_come_to_bandits_name">
+		<text>Угода: зустрітися з бандитами біля лісництва</text>
+	</string>
+	<string id="zat_b5_come_to_bandits_text">
+		<text>Султан попросив узяти участь в угоді з одним баригою. Треба супроводити людей Султана до місця зустрічі та прикривати їх на випадок непередбачуваних обставин.</text>
+	</string>
+	<string id="zat_b5_come_to_dealer_name">
+		<text>Угода: зустрітися із торговцем</text>
+	</string>
+	<string id="zat_b5_come_to_dealer_text">
+		<text>Сич запропонував роботу - охороняти якогось торговця під час угоди. Вочевидь, угода має сумнівний характер і в процесі можуть виникнути неприємності.</text>
+	</string>
+	<string id="zat_b5_come_to_stalkers_name">
+		<text>Угода: зустрітися зі сталкерами біля лісництва</text>
+	</string>
+	<string id="zat_b5_come_to_stalkers_text">
+		<text>Зустрітися зі сталкерами біля лісництва та допомогти їм запобігти угоді між бандитами і продавцем зброї.</text>
+	</string>
+	<string id="zat_b5_cover_dealer_name">
+		<text>Угода: охороняти торговця</text>
+	</string>
+	<string id="zat_b5_cover_dealer_text">
+		<text>За словами торговця, завдання є простим: охороняти його під час угоди.</text>
+	</string>
+	<string id="zat_b5_intercept_talking_name">
+		<text>Угода: підслухати розмову</text>
+	</string>
+	<string id="zat_b5_intercept_talking_text">
+		<text>Сталкери хочуть підслухати розмову між бандитами і торговцем зброєю.</text>
+	</string>
+	<string id="zat_b5_kill_dealer_name">
+		<text>Угода: запобігти купівлі зброї</text>
+	</string>
+	<string id="zat_b5_kill_dealer_text">
+		<text>Треба у будь-який спосіб запобігти угоді між бандитами та баригою.</text>
+	</string>
+	<string id="zat_b5_kill_stalkers_name">
+		<text>Угода: прибрати свідків</text>
+	</string>
+	<string id="zat_b5_kill_stalkers_text">
+		<text>Угода з баригою зірвалася. Потрібно прибрати усіх свідків.</text>
+	</string>
+	<string id="zat_b5_protect_dealer_name">
+		<text>Угода: захистити торговця</text>
+	</string>
+	<string id="zat_b5_protect_dealer_text">
+		<text>Необхідно захистити торговця. Окрім того, він наказав прибрати усіх свідків угоди, в тому числі й власних клієнтів.</text>
+	</string>
+	<string id="zat_b5_search_body_name">
+		<text>Угода: обшукати торговця</text>
+	</string>
+	<string id="zat_b5_search_body_text">
+		<text>У торговця могла лишитися важлива інформація. Треба її забрати - може стати в нагоді.</text>
+	</string>
+	<string id="zat_b5_secure_bandits_name">
+		<text>Угода: прикривати бандитів під час угоди</text>
+	</string>
+	<string id="zat_b5_secure_bandits_text">
+		<text>Поки бандити домовлятимуться із баригою, слід бути напоготові та, як щось станеться, прикрити їх.</text>
+	</string>
+	<string id="zat_b5_speak_dealer_name">
+		<text>Угода: поговорити з торговцем</text>
+	</string>
+	<string id="zat_b5_speak_dealer_text">
+		<text>Умови угоди із торговцем виконано, залишається забрати нагороду.</text>
+	</string>
+	<string id="zat_b5_talk_barmen_name">
+		<text>Угода: отримати нагороду в Бороди</text>
+	</string>
+	<string id="zat_b5_talk_barmen_text">
+		<text>Борода обіцяв винагороду, якщо угоду між бандитами та баригою буде зірвано. Оскільки нині угоду вже точно не буде укладено, можна відправлятися по обіцяне.</text>
+	</string>
+	<string id="zat_b5_talk_to_sultan_name">
+		<text>Угода: поговорити із ватажком бандитів</text>
+	</string>
+	<string id="zat_b5_talk_to_sultan_text">
+		<text>Треба повідомити ватажкові бандитів про готовність взяти участь в угоді.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_name">
+		<text>Наїзд: вирішити, що вчинити</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_raiders_name">
+		<text>Наїзд: напасти на сталкерів</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_stalkers_reward_name">
+		<text>Наїзд: отримати нагороду</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_stalkers_reward_text">
+		<text>Напад на табір відбито, можна поговорити зі сталкерами та отримати винагороду. Швидше за все, сталкерам велося б непереливки, якби їх не було попереджено про напад.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_text">
+		<text>Група сталкерів вирішила перетворитися на банду і грабувати своїх же вчорашніх колег. Настав час вирішувати, як бути: взяти участь у наїзді, попередити сталкерів або ж не втручатися?</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_wait_name">
+		<text>Наїзд: дочекатися призначеного часу</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_time_name">
+		<text>Наїзд: дочекатися слушного моменту</text>
+	</string>
+	<string id="zat_b33_zaporojec_name">
+		<text>Недоступна схованка: принести Корчу контейнер</text>
+	</string>
+	<string id="zat_b5_talk_stalkers_name">
+		<text>Угода: поговорити з лідером загону сталкерів</text>
+	</string>
+	<string id="zat_b5_talk_stalkers_text">
+		<text>Угоду зірвано, торговець зброєю мертвий. Необхідно поговорити з лідером загону сталкерів</text>
+	</string>
+	<string id="zat_b38_disappearance_stalkers_tell_barmen_about_medic_name">
+		<text>Зникнення сталкерів: розповісти на «Скадовську» про те, що сталося</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_open_container_text">
+		<text>Необхідно відкрити контейнер знайденими ключами та дістати з нього балон з отруйним газом</text>
+	</string>
+	<string id="zat_b57_den_of_the_bloodsucker_open_container_name">
+		<text>Лігвище кровососів: дістати газовий балон з контейнера</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_backstab_name">
+		<text>Наїзд: атакувати грабіжників</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_backstab_text">
+		<text>Треба напасти на грабіжників зі спини, щоб допомогти сталкерам відбити напад.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_meet_name">
+		<text>Наїзд: зустрітися з грабіжниками</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_raiders_text">
+		<text>Разом із грабіжниками здійснити напад на табір сталкерів.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_stalkers_name">
+		<text>Наїзд: влитися до лав грабіжників</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_stalkers_text">
+		<text>Сталкери попрохали допомогти їм відбити атаку грабіжників. Потрібно влитися до лав грабіжників, тоді під час нападу можна буде спокійно напасти на них зі спини.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_meet_text">
+		<text>Грабіжники мають чекати біля «Шевченка». Слід зустрітися з ними, щоб взяти участь у наїзді на сталкерів.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_wait_text">
+		<text>Дочекатися часу зустрічі із грабіжниками: ті хочуть напасти на табір сталкерів пізно вночі, у темряві. Обумовлене місце зустрічі - «Шевченко».</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_raiders_reward_name">
+		<text>Наїзд: поговорити із грабіжниками</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_raiders_reward_text">
+		<text>Напад на сталкерів пройшов успішно. Тепер треба перемовитися із подільниками.</text>
+	</string>
+	<string id="zat_b7_stalkers_raiders_time_text">
+		<text>Необхідно дочекатися моменту, коли увагу грабіжників буде відвернуто наїздом. Тоді можна буде вдарити їм у спину, щоб допомогти сталкерам на «Шевченко».</text>
+	</string>
+	<string id="zat_b30_sultan_task_8_name">
+		<text>Темний бізнес: почати працювати на Бороду</text>
+	</string>
+	<string id="zat_b30_sultan_task_8_text">
+		<text>Щоб відібрати прототипи детекторів у сталкерів, які працюють на Бороду, необхідно стати до їхніх лав. Це дозволить розвідати табір конкурентів</text>
+	</string>
+	<string id="zat_b33_zaporojec_text_03">
+		<text>Необхідно взяти контейнер та віднести його власникові.</text>
+	</string>
+	<string id="zat_b100_guide_maps_01_text">
+		<text>У бортовому комп'ютері гелікоптеру «Скат-2» містилися мапи місцевості між Затоном та «Юпітером». Варто знайти того, кому ці мапи можуть знадобитися.</text>
+	</string>
+	<string id="zat_b20_ask_a_stalkers_name">
+		<text>Шлях на плато: розпитати сталкерів</text>
+	</string>
+	<string id="zat_b20_ask_a_stalkers_text">
+		<text>Судячи по всьому, на плато не вдасться трапити прямим шляхом. Необхідно розпитати місцевих сталкерів щодо інших можливих доріг.</text>
+	</string>
+	<string id="zat_b30_compass_to_barmen_task_give_text">
+		<text>Отриманий в Ноя артефакт - це і є той самий «Компас», котрий так потрібен Бороді.</text>
+	</string>
+</string_table>

@@ -1,0 +1,108 @@
+-- Lua class for managing story_objects.
+
+local story_obj_registry = nil
+
+class "story_objects_registry"
+
+function story_objects_registry:__init ()
+	self.id_by_story_id = {}
+	self.story_id_by_id = {}
+end
+
+function story_objects_registry:register(obj_id , story_obj_id, on_register)
+	if self.id_by_story_id[story_obj_id] ~= nil then
+		if obj_id ~= self.id_by_story_id[story_obj_id] then
+			local exist_obj_name = alife():object(self.id_by_story_id[story_obj_id]):name()
+			local adding_obj_name = alife():object(obj_id):name()
+			abort("You are trying to spawn two or more objects with the same story_id:[%s] --> [%s] try to add:[%s]", story_obj_id, exist_obj_name, adding_obj_name)
+		end
+	elseif self.story_id_by_id[obj_id] ~= nil then
+		if self.story_id_by_id[obj_id] ~= story_obj_id then
+			abort("Object [%s] is already in story_objects_registry with story_id[%s]", tostring(obj_id), story_obj_id)
+		end
+	end
+	self.id_by_story_id[story_obj_id] 	= obj_id
+	self.story_id_by_id[obj_id]			= story_obj_id
+end
+
+function story_objects_registry:unregister_by_id(obj_id)
+	if self.story_id_by_id[obj_id] ~= nil then
+		self.id_by_story_id[self.story_id_by_id[obj_id]]	= nil
+		self.story_id_by_id[obj_id] 						= nil
+	end
+end
+
+function story_objects_registry:unregister_by_story_id(story_id)
+	if self.id_by_story_id[story_id] ~= nil then
+		self.story_id_by_id[self.id_by_story_id[story_id]]	= nil
+		self.id_by_story_id[story_id]						= nil
+	end
+end
+
+function story_objects_registry:get(story_obj_id)
+	return self.id_by_story_id[story_obj_id]
+end
+
+function story_objects_registry:get_story_id(obj_id)
+	return self.story_id_by_id[obj_id]
+end
+
+function story_objects_registry:save(packet)
+	set_save_marker(packet, "save", false, "story_objects")
+	local count = 0
+	for k,v in pairs(self.id_by_story_id) do
+		count = count + 1
+	end
+	if count > 65534 then
+		print_table(self.id_by_story_id)
+		abort("There is too many story_ids!!!")
+	end
+	packet:w_u16(count)
+	for k,v in pairs(self.id_by_story_id) do
+		packet:w_stringZ(k)
+		packet:w_u16(v)
+	end
+	set_save_marker(packet, "save", true, "story_objects")
+end
+
+function story_objects_registry:load(packet)
+	set_save_marker(packet, "load", false, "story_objects")
+	local count = packet:r_u16()
+	for i = 1, count do
+		local story_id 	= packet:r_stringZ()
+		local obj_id	= packet:r_u16()
+		self.id_by_story_id[story_id] 	= obj_id
+		self.story_id_by_id[obj_id]		= story_id
+	end
+	set_save_marker(packet, "load", true, "story_objects")
+ end
+
+function get_story_objects_registry()
+	if story_obj_registry == nil then
+		story_obj_registry = story_objects_registry()
+	end
+	return story_obj_registry
+end
+
+function check_spawn_ini_for_story_id(se_obj)
+	--printf("checking obj[%s] for story_id!!!",se_obj:name())
+	local spawn_ini = se_obj:spawn_ini()
+	if spawn_ini:section_exist("story_object") then
+		local result, id, value
+		result, id, value	= spawn_ini:r_line("story_object",0,"","")
+		if id ~= "story_id" then
+			abort("There is no 'story_id' field in [story_object] section :object [%s]", se_obj:name())
+		end
+		if value == "" then
+			abort("Field 'story_id' in [story_object] section got no value :object [%s]", se_obj:name())
+		end
+		get_story_objects_registry():register(se_obj.id , value, true)
+		return
+	end
+	spawn_ini = system_ini()
+	local spawn_sect = se_obj:section_name()
+	local story_id = utils.cfg_get_string(spawn_ini, spawn_sect, "story_id", nil, false, "", nil)
+	if story_id ~= nil then
+		get_story_objects_registry():register(se_obj.id , story_id, true)
+	end
+end

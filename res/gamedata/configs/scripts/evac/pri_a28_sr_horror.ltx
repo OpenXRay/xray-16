@@ -1,0 +1,33 @@
+[logic]
+active = sr_idle@start
+;active = sr_deimos
+
+[sr_idle@start]
+on_info = {+pri_b305_fifth_cam_end =actor_in_zone(pri_a28_sr_horror)} sr_deimos, {+pri_a28_scene_end} sr_idle@wait_2
+
+[sr_deimos]
+movement_speed = 42
+growing_koef = 0.45; 0.25
+lowering_koef = 0.22; 0.06
+pp_effector = psi
+pp_effector2 = deimos1
+cam_effector = pripyat_horror
+cam_effector_repeating_time = 5
+noise_sound = pri_a28_deimos_noise_sound
+heartbeet_sound = pri_a28_deimos_heartbeat
+health_lost = 0.1
+disable_bound = 0.2
+switch_lower_bound = 0.4 ;0.3
+switch_upper_bound = 0.75 ;0.6
+on_info = {=actor_in_surge_cover} sr_idle@wait_2
+on_info2 = {-pri_a28_actor_in_zone_stay +pri_a28_evac_com_to_helicopter} sr_idle@wait_2
+on_info3 = {!actor_in_zone(pri_a28_sr_horror)} sr_idle@wait_2
+on_game_timer = 100 | {=check_deimos_phase(disable_bound:decreasing) !actor_in_zone(pri_a28_sr_horror)} sr_idle@wait_1
+
+[sr_idle@wait_1]
+on_game_timer = 18000 | {~20} sr_deimos, sr_idle@wait_2
+on_info = {-pri_a28_evac_com_to_helicopter =actor_in_zone(pri_a28_sr_horror)} sr_deimos
+
+[sr_idle@wait_2]
+on_game_timer = 9000 | {~25} sr_deimos, sr_idle@wait_1
+on_info = {-pri_a28_evac_com_to_helicopter =actor_in_zone(pri_a28_sr_horror)} sr_deimos

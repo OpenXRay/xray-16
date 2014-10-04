@@ -1,0 +1,17 @@
+[logic]
+active = ph_idle@wait
+
+[ph_idle@wait] 
+on_info = {=actor_in_zone(jup_b41_sr_noweap) !actor_in_zone(jup_b41_sr_light) !check_smart_alarm_status(jup_b41:normal)} ph_idle@pleaseplease
+
+[ph_idle@pleaseplease]
+on_info =  {=check_smart_alarm_status(jup_b41:danger)} %=play_sound(jup_b41_bunker_megaphone)%
+on_info2 = {=check_smart_alarm_status(jup_b41:alarm)} ph_idle@swear
+on_info3 = {=check_smart_alarm_status(jup_b41:normal)} ph_idle@wait
+on_info4 = {!actor_in_zone(jup_b41_sr_noweap)} ph_idle@wait
+on_info5 = {=actor_in_zone(jup_b41_sr_light)} ph_idle@wait
+
+[ph_idle@swear]
+on_info = {!check_smart_alarm_status(jup_b41:alarm)} ph_idle@wait
+on_info2 = {!actor_in_zone(jup_b41_sr_noweap)} ph_idle@wait
+on_info3 = {=actor_in_zone(jup_b41_sr_light)} ph_idle@wait

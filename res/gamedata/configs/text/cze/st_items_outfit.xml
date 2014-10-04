@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="csky_heavy_outfit_name">
+		<text>Osobnн zbroj CS-3a</text>
+	</string>
+	<string id="dolg_heavy_outfit_name">
+		<text>Zbroj Povinnosti PSZ-9d</text>
+	</string>
+	<string id="dolg_outfit_name">
+		<text>Univerzбlnн ochrana PS5-M</text>
+	</string>
+	<string id="exo_outfit_name">
+		<text>Exoskeleton</text>
+	</string>
+	<string id="military_outfit_name">
+		<text>Obrnмnэ oblek Bulat</text>
+	</string>
+	<string id="mp_exo_outfit_description">
+		<text>Tento exoskeleton poskytuje vynikajнcн ochranu pшed kulkami a stшepinami, nicmйnм omezuje pohyblivost. Je snadno prostшelitelnэ prщraznou municн.</text>
+	</string>
+	<string id="mp_exo_outfit_name">
+		<text>Exoskeleton</text>
+	</string>
+	<string id="mp_military_outfit_description">
+		<text>Vojenskэ obrnмnэ oblek pro ъtoиnй operace. Poskytuje vynikajнcн ochranu pшed celoplбљќovэmi stшelami a stшepinami, aniћ by negativnм ovlivтoval pohyblivost nositele. Zranitelnэ prщraznэm stшelivem.</text>
+	</string>
+	<string id="mp_military_outfit_name">
+		<text>Vojenskэ obrnмnэ oblek</text>
+	</string>
+	<string id="novice_outfit_description">
+		<text>Bмћnэ plбљќ z иernй kщћe. Nemб jinэ ъиel neћ uchovat svйho nositele v teple a chrбnit ho pшed kousnutнm slepэm psem. Aиkoli nenн kabбt pшнliљ pohodlnэ, иasto ho v Zуnм pouћнvajн banditi - buп proto, ћe se v nмm mohou snбze schovat ve tmм, nebo prostм proto, ћe vypadб "cool".</text>
+	</string>
+	<string id="novice_outfit_name">
+		<text>Koћenэ plбљќ</text>
+	</string>
+	<string id="scientific_outfit_name">
+		<text>Oblek SEVA</text>
+	</string>
+	<string id="specops_outfit_name">
+		<text>Obrnмnэ oblek Berill-5M</text>
+	</string>
+	<string id="st_helm_battle">
+		<text>Helma Sphere M12</text>
+	</string>
+	<string id="st_helm_battle_descr">
+		<text>Hlinнkovo titanovб helma s lбtkovэm pokrytнm, ve kterйm jsou kapsy pro dalљн ochrannй kovovй plбty, a s pancйшovanou obliиejovou maskou. Sphere M12 se bмћnм pouћнvб v kombinaci s osobnн zbrojн Speznas sйrie PSZ. V Zуnм je celkem populбrnн dнky respirбtoru a zabudovanйmu systйmu noиnнho vidмnн prvnн generace, navнc poskytuje maximбlnн moћnou ochranu hlavy. Je vybavenб sloty na elektroniku.</text>
+	</string>
+	<string id="st_helm_hardhat">
+		<text>Ocelovб helma</text>
+	</string>
+	<string id="st_helm_hardhat_descr">
+		<text>Zoufale zastaralб ocelovб armбdnн helma bez dalљнch modifikacн. Neposkytuje ћбdnou ochranu pшed anomбliemi nebo radiacн, ale dokбћe odrбћet kulky. Tato helma v Zуnм nikdy nebyla moc populбrnн, pouћнvala se vнce pouze bмhem krбtkэch ozbrojenэch konfliktщ mezi frakcemi.</text>
+	</string>
+	<string id="st_helm_protective">
+		<text>Zakrytovanб helma</text>
+	</string>
+	<string id="st_helm_protective_descr">
+		<text>Lehkб helma s neprodyљnэm vizorem, urиenб pro ochranu pшed anomбliemi. Podle designu se dб usuzovat, ћe helmu navrhl stejnэ vэzkumnэ institut obrany, kterэ mб na svмdomн oblek SEVA. Zamэљlenй pouћitн je v kombinaci s vojenskэmi obleky pro operaci v oblastech s velkэm vэskytem anomбliн.</text>
+	</string>
+	<string id="st_helm_respirator">
+		<text>Plynovб maska</text>
+	</string>
+	<string id="st_helm_respirator_descr">
+		<text>Bмћnб plastovб a gumovб plynovб maska, schopnб filtrovat ze vzduchu radioaktivnн ибstice a jedovatй plyny. Bмћnм pouћнvanб zelenбиi i veterбny vљech frakcн s ohledem na univerzбlnн funkиnost. Neposkytuje ћбdnou fyzickou ochranu.</text>
+	</string>
+	<string id="st_helm_tactic">
+		<text>Taktickб helma</text>
+	</string>
+	<string id="st_helm_tactic_descr">
+		<text>Zбpadnн model taktickй helmy bez kamuflбћe. Nenн znбmo, jak se tato helma do Zуny dostala. Je urиena pro velitele druћstva, kterйmu poskytuje prostшednictvнm skenerщ a satelitnнch komunikбtorщ strategickou vэhodu nad nepшнtelem. Nicmйnм v tйto helmм komunikaиnн zaшнzenн chybн. Helma je chrбnмna nмkolika vrstvami kevlaru a pancйшovэch vloћek, kterй majн chrбnit elektronickй komponenty. V helmм je zabudovбn respirбtor a noиnн vidмnн prvnн generace</text>
+	</string>
+	<string id="stalker_outfit_name">
+		<text>Oblek Ъsvit</text>
+	</string>
+	<string id="svoboda_heavy_outfit_name">
+		<text>Oblek strбћн Svobody</text>
+	</string>
+	<string id="svoboda_light_outfit_description">
+		<text>Tento lehkэ stalkerskэ oblek vyrбbн шemeslnнci Svobody. Lбtka obleku je napuљtмna Horizonem, speciбlnнm roztokem vyvinutэm frakcн metodou pokus a omyl k zvэљenн ochrany pшed anomбliemi. Stejnм jako oblek Ъsvit je i Vнtr svobody vybaven pancйшovou vloћkou a kontejnery na artefakty.</text>
+	</string>
+	<string id="svoboda_light_outfit_name">
+		<text>Oblek Vнtr svobody</text>
+	</string>
+	<string id="dolg_outfit_description">
+		<text>Tato modernн varianta neprщstшelnй vesty Povinnosti je lйpe uzpщsobena potшebбm zaинnajнcнch stalkerщ, kteшн jsou zvyklн na lehkй zbroje. Na rozdнl od шady PSZ dokбћe nejen zastavit vэstшel z pistole, ale poskytuje dobrou ochranu i proti anomбliнm. Do vesty nenн moћnй zabudovat kapsu na artefakt, nicmйnм je moћnй ji mнsto toho vylepљit podpщrnэm bojovэm systйmem.</text>
+	</string>
+	<string id="military_outfit_description">
+		<text>Tato modernн armбdnн zbroj je urиena k bojovэm akcнm v anomбlnнch oblastech. Sklбdб se ze znaиnм modifikovanй neprщstшelnй vesty PSZ-12p se zabudovanэm kompenzбtorem a kombinйzy na ochranu pшed anomбliemi. Zbroj vэteиnм chrбnн pшed kulkami a љrapnely, aniћ by nositele vэraznмji omezovala v pohybu. Patшн k nн i kapsa na artefakty. </text>
+	</string>
+	<string id="mp_scientific_outfit_description">
+		<text>Tento oblek je urиenэ k provбdмnн vэzkumu v Zуnм. Jeho souибstн je i dэchacн systйm s uzavшenэm cyklem a vnмjљн izolaиnн vrstva, coћ v kombinaci vede k vэbornй ochranм pшed anomбliemi. Oblek vљak jen mбlo chrбnн pшed fyzickэmi nбrazy, a proto nenн vhodnэ jako obrana pшed kulkami a љrapnely. Mб s sobм zabudovбnu schrбnku na pшenos artefaktщ.</text>
+	</string>
+	<string id="scientific_outfit_description">
+		<text>Tento oblek, vyrбbмnэ jistэm vojenskэm vэzkumnэm institutem, je skvмlou alternativou k oblekщm љitэm na koleni. Pшestoћe jeho zabudovanб vesta dokбћe zastavit pouze vэstшel z pistole, systйmy na ochranu pшed anomбliemi a radiacн patшн ke љpiиce. Pшiиtмte si k tomu snadnou modifikovatelnost a dvм schrбnky na artefakty a pochopнte, proи je tento oblek tak populбrnн.</text>
+	</string>
+	<string id="specops_outfit_description">
+		<text>Tento oblek sestбvб z neprщstшelnй vesty шady PS5 potшenй - pro ъиely pobytu v Zуnм - vrstvou berylia. Byl navrћen pro bojovй operace ve znaиnм radioaktivnнch oblastech, ale v mнstech s иastэm vэskytem anomбliн pшнliљ neobstojн. Tyto obleky se ke stalkerщm dostбvajн od vojбkщ, kteшн je vymмтujн za koшist. Neobsahujн schrбnku na artefakty.</text>
+	</string>
+	<string id="stalker_outfit_description">
+		<text>Stalkerskэ oblek vyrobenэ nмkэm z mнstnнch. Efektivnн kombinace lehkй vojenskй neprщstшelnй vesty a pogumovanйho lбtkovйho obleku. Aиkoli nedokбћe ochrбnit nositele ani pшed stшelami z pistole, je dнky svй nнzkй cenм a modifikaиnнm moћnostem velmi populбrnн. Obsahuje kapsy, do kterэch je moћnй vloћit dva artefakty.</text>
+	</string>
+	<string id="svoboda_heavy_outfit_description">
+		<text>Tento zesнlenэ stalkerskэ oblek vyrбbмnэ шemeslnнky ze Svobody pшedstavuje kompromis mezi bojovou efektivitou a ochranou pшed anomбliemi. Zabudovanб neprщstшelnб vesta se sklбdб z pancншovэch destiиek a deseti vrstev kevlaru, kterй dokбћн zastavit vэstшel z pistole. K ochranм pшed anomбliemi pouћнvб oblek relativnм drahэ pшнpraven „Suverйn“. Obsahuje kapsu na artefakty.</text>
+	</string>
+	<string id="dolg_heavy_outfit_description">
+		<text>Ranэ model sluћebnн zbroje Povinnosti. Jde prakticky jen o neprщstшelnou vestu PSD-9, kterб byla pшetvoшena pro ъиely Zуny. Dokбћe sice zastavit i vэstшel z puљky, to je vљak vyvбћeno vysokou hmotnostн, neohrabanostн a prakticky nulovou ochranou pшed anomбliemi. Do vesty nenн moћnй zabudovat kapsu na artefakty, nicmйnм je moћnй ji vylepљit podpщrnэm bojovэm systйmem.</text>
+	</string>
+	<string id="csky_heavy_outfit_description">
+		<text>Tato zbroj kdysi slouћila иlenщm Jasnйho nebe, ovљem po zniиenн tйto frakce funguje pшedevљнm jako pшipomнnka, ћe ani sebelepљн obrannэ oblek vбm v poli nezajistн stoprocentnн bezpeин. Dokбћe zastavit vэstшel z pistole a zбroveт dobшe chrбnн pшed anomбliemi. Mб zabudovanou kapsu na artefakty.</text>
+	</string>
+	<string id="exo_outfit_description">
+		<text>Prototyp vojenskйho exoskeletonu. Do sйriovй produkce se kvщli obrovskй cenм a nмkolika technickэm chybбm nikdy nedostal, pшesto se ale v malйm mnoћstvн vyrбbн v ilegбlnнch tovбrnбch mimo Ukrajinu. Za svou popularitu vdмин schopnosti pojmout tнhu veљkerйho nesenйho vybavenн. Mб rovnмћ zabudovanou kapsu na artefakty.</text>
+	</string>
+	<string id="mp_scientific_outfit_name">
+		<text>Kombinйza SEVA</text>
+	</string>
+</string_table>

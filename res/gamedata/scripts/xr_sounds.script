@@ -1,0 +1,466 @@
+local themes = {}   --name = "themes"
+
+-----------------------------------------------------------------------------------------------------------------------------------
+function load_sounds (obj)
+    local sounds_base = stalker_ids.sound_script + 8192
+    printf ("SOUNDS BASE %d", stalker_ids.sound_script)
+    sounds_base = this.load_common (obj, sounds_base)
+end
+-----------------------------------------------------------------------------------------------------------------------------------
+function play_sound (obj, delay, theme, sub_theme, phrase_set, sub_phrase)
+--Ќемного помен€л ƒжон. ѕросьба не ругатьс€ и не бить(особенно по голове - ей еще думать). «акоментированное
+--надо будет стереь. ” мен€ рука не подн€лась.
+    this.play_sound_rnd(obj, delay, delay + 1, theme, sub_theme, phrase_set, sub_phrase)
+end
+-----------------------------------------------------------------------------------------------------------------------------------
+function play_sound_rnd (obj, min_delay, max_delay, theme, sub_theme, phrase_set, sub_phrase)
+
+    if obj == nil or theme == nil then return end
+--    printf ("Theme %s", theme)
+    if sub_theme == nil or #themes[theme] < sub_theme then
+       sub_theme = this.get_random_subtheme (theme)
+       if sub_theme == 0 then return end
+    end
+--    printf ("Sub_theme %d", sub_theme)
+    if phrase_set == nil or #themes[theme][sub_theme] < (phrase_set - 1) then
+       phrase_set = math.random (1, #themes[theme][sub_theme] - 1)
+    end
+--    printf ("Phrase_set %d", phrase_set)
+    if sub_phrase == nil or this.get_num_subphrases (theme, sub_theme, phrase_set) < sub_phrase then
+       local num = get_num_subphrases (theme, sub_theme, phrase_set)
+	if num == nil then
+		return
+	end
+       if num == 0 then
+          printf ("NO SOUNDS LOADED !!! Theme : %s, sub theme : %d, phrases set : %d", theme, sub_theme, phrase_set)
+          return
+       end
+       if num == 1 then
+          sub_phrase = 0
+       else
+          sub_phrase = math.random (num - 1)
+       end
+    else
+       sub_phrase = sub_phrase - 1
+    end
+--    printf ("Sub_phrase %d", sub_phrase)
+	stop_play_sound(obj)
+    obj:play_sound (themes[theme][sub_theme][1] + phrase_set - 1, max_delay, min_delay, 1, 0, sub_phrase)
+end
+-----------------------------------------------------------------------------------------------------------------------------------
+function get_num_themes ()
+    return #themes
+end
+-----------------------------------------------------------------------------------------------------------------------------------
+function get_num_sub_themes (theme)
+    if theme == nil then return 0 end
+    return #themes[theme]
+end
+-----------------------------------------------------------------------------------------------------------------------------------
+function get_num_phrases (theme, sub_theme)
+    if theme == nil or sub_theme == nil then return 0 end
+    return #themes[theme][sub_theme] - 1
+end
+-----------------------------------------------------------------------------------------------------------------------------------
+function get_num_subphrases (theme, sub_theme, phrases)
+    if theme == nil or sub_theme == nil or phrases == nil then return 0 end
+    return themes[theme][sub_theme][phrases + 1]
+end
+-----------------------------------------------------------------------------------------------------------------------------------
+function get_random_subtheme (theme)
+    local num = #themes[theme]
+    if num == 0 then
+       printf ("No subthemes in %s theme", theme)
+       return
+    end
+    if num == 1 then return 1 end
+    return math.random (1, num)
+end
+-----------------------------------------------------------------------------------------------------------------------------------
+function get_random_phrases_set (theme, sub_theme)
+    local num = #themes[theme][sub_theme]
+    if num == 0 then
+       printf ("No phrases set in %s theme, %d sub theme", theme, sub_theme)
+       return
+    end
+    if num == 1 then return 1 end
+    return math.random (1, num - 1)
+end
+-----------------------------------------------------------------------------------------------------------------------------------
+function get_random_phrase (theme, sub_theme, phrase_set)
+    local num = this.get_num_subphrases (theme, sub_theme, phrase_set)
+    if num == 0 then
+       printf ("NO SOUNDS LOADED !!! Theme : %s, sub theme : %d, phrases set : %d", theme, sub_theme, phrase_set)
+       return
+    end
+    if num == 1 then
+       sub_phrase = 0
+    else
+       sub_phrase = math.random (0, num - 1)
+    end
+end
+-----------------------------------------------------------------------------------------------------------------------------------
+function create_sound_constructor (theme, sub_theme)
+    if theme == nil then return nil end
+    if sub_theme == nil or #themes[theme] < sub_theme then
+       sub_theme = math.random (1, #themes[theme])
+    end
+    local t = {
+              idle = 0,
+              begin = nil,
+              maxidle = 10,
+              sumidle = 10,
+              rnd = 100,
+              lastsound = nil,
+              sounds = {}
+              }
+    local num = this.get_num_phrases (theme, sub_theme)
+    for a = 1, num, 1 do
+        local index = themes[theme][sub_theme][a + 1]
+--        printf( "%d", index )
+        t.sounds[a] = {pack = themes[theme][sub_theme][1] + a - 1, id = math.random (1, index) - 1}
+--        printf( "ok" )
+    end
+    return t
+end
+-----------------------------------------------------------------------------------------------------------------------------------
+--  ѕример конструктора, описывающего звуки
+--
+--  self.sound = {idle = 0,     -- служебное поле
+--           begin = nil,   -- служебное поле
+--           maxidle = 10,  -- максимальное врем€ между звуками
+--           sumidle = 10,  -- надбавочное врем€, добавл€етс€ к рандомно выбранному от 1 до максимального.
+--               rnd = 100,     -- веро€тность, с которой будет проигран звук, если пришло врем€
+--           lastsound = nil,   -- служебное поле
+--          sounds = {      {pack = sounds["idle"], id = 0},    -- пачка звуков, из которых будет выбиратьс€
+--                  {pack = sounds["idle"], id = 1},
+--                  {pack = sounds["idle"], id = 3},
+--                  {pack = sounds["idle"], id = 4},
+--                  {pack = sounds["idle"], id = 7},
+--                  {pack = sounds["idle"], id = 9},
+--                  {pack = sounds["idle"], id = 11},
+--                  {pack = sounds["idle"], id = 12},
+--                  {pack = sounds["idle"], id = 14}    }}
+--
+--
+-- ѕроигрыш саундов (By Stohe)
+-- npc - object который будет играть звук
+-- sound - конструктр звуков, см выше
+-- now - если звук отыграть надо пр€мо сейчас
+-----------------------------------------------------------------------------------------------------------------------------------
+function set_sound(npc, sound, now)
+    local a = now
+
+    if sound.begin == nil or
+       (device():time_global()/1000 - sound.begin) > sound.idle then
+        sound.begin = device():time_global()/1000
+        sound.idle = math.random(sound.maxidle) + sound.sumidle
+        a = true
+    end
+
+    if a == true then
+        if math.random(100) < sound.rnd or now == true then
+            local r
+            if sound.lastsound == nil then
+                r = math.random(#sound.sounds)
+            else
+                r = math.random(#sound.sounds-1)
+                if r >= sound.lastsound then
+                    r = r + 1
+                end
+            end
+            sound.lastsound = r
+            npc:play_sound (sound.sounds[r].pack , 1, 0, 1, 0, sound.sounds[r].id)
+        end
+    end
+end
+-----------------------------------------------------------------------------------------------------------------------------------
+function load_common (obj, sounds_base)
+    function id ()
+        local t = sounds_base
+        sounds_base = sounds_base + 1
+        return t
+    end
+
+    -- create patrol commander radio speech
+    themes["commander_radio"] =
+               {
+               --speech 1
+               {
+               sounds_base,
+               obj:add_sound ("script_replics\\radio\\message\\radio_turn_on_",  30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\radio\\commander\\radio_start_",  30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\radio\\message\\radio_voice_",    30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\radio\\commander\\radio_reply_",  30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\radio\\message\\radio_voice_",    30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\radio\\commander\\radio_finish_", 30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\radio\\message\\radio_turn_off_", 30, snd_type.talk, 2, 1, id ())
+              }
+              }
+              
+    --themes["commander_patrol"] =
+              --{
+              --{
+              --sounds_base,
+              --obj:add_sound ("Scripts\\Patrol\\Commander1_",   20, snd_type.talk, 2, 1, id ()),
+              --}
+              --}
+
+	themes["commander_agroprom"] =
+    		{
+			{
+			sounds_base,
+			obj:add_sound ("script_replics\\military\\replics\\military_phrase_12",  1, snd_type.talk, 2, 1, id ()),
+			obj:add_sound ("script_replics\\military\\replics\\military_phrase_13",  1, snd_type.talk, 2, 1, id ()),
+			obj:add_sound ("script_replics\\military\\replics\\petrovich_mission_1", 1, snd_type.talk, 2, 1, id ()),
+			obj:add_sound ("script_replics\\military\\replics\\petrovich_mission_2", 1, snd_type.talk, 2, 1, id ()),
+			obj:add_sound ("script_replics\\military\\replics\\petrovich_mission_3", 1, snd_type.talk, 2, 1, id ()),
+			obj:add_sound ("script_replics\\military\\replics\\petrovich_mission_4", 1, snd_type.talk, 2, 1, id ()),
+			obj:add_sound ("script_replics\\military\\replics\\petrovich_mission_5", 1, snd_type.talk, 2, 1, id ())
+			}
+			}
+
+    themes["trivial"] =
+    --«вуки используемые в простеньких сюжетных скриптах
+    {
+            {
+            --«вуки дл€ зомби сталкера
+              sounds_base,
+              obj:add_sound ("script_replics\\zombie\\stalker_zombie\\zombie_phrase_", 30, snd_type.talk, 2, 1, id ())
+            },
+            {
+              --«вуки дл€ сталкера новичка, который лазит по свалке и ищет артефакты.   1 - задолбалс€ ходить, пойду отдохну, 2 - где эти гребанные артефакты
+              sounds_base,
+              obj:add_sound ("script_replics\\stalker_1\\newbie\\newbie_replic_1_1", 30, snd_type.talk, 2, 1, id ()),
+              obj:add_sound ("script_replics\\stalker_1\\newbie\\newbie_replic_2_",  30, snd_type.talk, 2, 1, id ())
+            },
+            {
+              --«вуки дл€ сталкера новичка, который ходит вокруг артефакта в аномалии, и пытаетс€ его достать
+              sounds_base,
+              obj:add_sound ("script_replics\\stalker_1\\newbie\\newbie_phrase_artifact_", 30, snd_type.talk, 2, 1, id ())
+            },
+            {
+              --«вуки дл€ сталкера новичка, которого ограбили. 1 - ѕочему так все плохо, 2 - зовет актера, 3 - пойди и убью этих козлов
+              sounds_base,
+              obj:add_sound ("script_replics\\stalker_1\\newbie\\robbered_replic_1_", 30, snd_type.talk, 2, 1, id ()),
+              obj:add_sound ("script_replics\\stalker_1\\newbie\\robbered_replic_2_", 30, snd_type.talk, 2, 1, id ()),
+              obj:add_sound ("script_replics\\stalker_1\\newbie\\robbered_replic_3_", 30, snd_type.talk, 2, 1, id ())
+            }
+    }
+
+    themes["escape_blockpost_commander"] =
+              {
+              {
+              sounds_base,
+              obj:add_sound ("script_replics\\comandir_1\\drunk\\comandir_song_",         13, snd_type.talk, 2, 1, id ()), --snd_singing
+              obj:add_sound ("script_replics\\comandir_1\\drunk\\comandir_outside_",      13, snd_type.talk, 2, 1, id ()), --snd_stretch_himself
+              obj:add_sound ("script_replics\\comandir_1\\normal\\comandir_to_soldier_",  13, snd_type.talk, 2, 1, id ()), --snd_talk_path
+              obj:add_sound ("script_replics\\comandir_1\\drunk\\comandir_see_enemy_",    13, snd_type.talk, 2, 1, id ()), --snd_enemy_stalker
+              obj:add_sound ("script_replics\\comandir_1\\normal\\comandir_alarm_",       13, snd_type.talk, 2, 1, id ()), --snd_enemy_monster
+              obj:add_sound ("script_replics\\comandir_1\\normal\\comandir_walking_",     13, snd_type.talk, 2, 1, id ()), --snd_walking
+              obj:add_sound ("script_replics\\comandir_1\\normal\\comandir_lostbox_",     13, snd_type.talk, 2, 1, id ()), --snd_lost_box
+              obj:add_sound ("script_replics\\comandir_1\\drunk\\comandir_lostbox_",      13, snd_type.talk, 2, 1, id ()), --snd_lost_box_drunk
+              obj:add_sound ("script_replics\\comandir_1\\drunk\\comandir_dronk_",        13, snd_type.talk, 2, 1, id ()), --snd_drunk
+              obj:add_sound ("script_replics\\comandir_1\\drunk\\comandir_sleep_",        13, snd_type.talk, 2, 1, id ()), --snd_sleep
+
+              obj:add_sound ("script_replics\\radio\\commander\\radio_commander_",        30, snd_type.talk, 2, 1, id ()), --radio_noise
+              obj:add_sound ("script_replics\\radio\\message\\radio_noise_",               5, snd_type.talk, 2, 1, id ()), --radio_voice
+              obj:add_sound ("script_replics\\radio\\message\\radio_voice_",               5, snd_type.talk, 2, 1, id ()), --radio_on
+              obj:add_sound ("script_replics\\radio\\message\\radio_turn_on_",             5, snd_type.talk, 2, 1, id ()), --radio_off
+              obj:add_sound ("script_replics\\radio\\message\\radio_turn_off_",            5, snd_type.talk, 2, 1, id ())  --radio_commander
+              }
+              }
+
+    themes["dolg_leader"] =
+			{
+			{
+			sounds_base,
+			obj:add_sound ("script_replics\\comandir_1\\drunk\\comandir_song_",         13, snd_type.talk, 2, 1, id ()), --snd_singing
+			0 * id (), --snd_stretch_himself
+			0 * id (), --snd_talk_path
+			0 * id (), --snd_enemy_stalker
+			0 * id (), --snd_enemy_monster
+			obj:add_sound ("script_replics\\comandir_1\\normal\\comandir_walking_",     13, snd_type.talk, 2, 1, id ()), --snd_walking
+			0 * id (), --snd_lost_box
+			0 * id (), --snd_lost_box_drunk
+			0 * id (), --snd_drunk
+			0 * id (), --snd_sleep
+
+			0 * id (), --radio_noise
+			0 * id (), --radio_voice
+			0 * id (), --radio_on
+			0 * id (), --radio_off
+			0 * id ()  --radio_commander
+			}
+			}
+
+    themes["agroprom_military_commander"] =
+              {
+              {
+              sounds_base,
+              0 * id (), --snd_singing
+              0 * id (), --snd_stretch_himself
+              0 * id (), --snd_talk_path
+              0 * id (), --snd_enemy_stalker
+              0 * id (), --snd_enemy_monster
+              obj:add_sound ("script_replics\\military\\replics\\petrovich_phrase_",     13, snd_type.talk, 2, 1, id ()), --snd_walking
+              0 * id (), --snd_lost_box
+              0 * id (), --snd_lost_box_drunk
+              0 * id (), --snd_drunk
+              0 * id (), --snd_sleep
+              obj:add_sound ("script_replics\\radio\\commander\\radio_commander_",        30, snd_type.talk, 2, 1, id ()), --radio_noise
+              obj:add_sound ("script_replics\\radio\\message\\radio_noise_",               5, snd_type.talk, 2, 1, id ()), --radio_voice
+              obj:add_sound ("script_replics\\radio\\message\\radio_voice_",               5, snd_type.talk, 2, 1, id ()), --radio_on
+              obj:add_sound ("script_replics\\radio\\message\\radio_turn_on_",             5, snd_type.talk, 2, 1, id ()), --radio_off
+              obj:add_sound ("script_replics\\radio\\message\\radio_turn_off_",            5, snd_type.talk, 2, 1, id ())  --radio_commander
+              }
+              }
+
+    themes["bar_talk_single"] =
+               {
+               --speech 1
+               {
+               sounds_base,
+               obj:add_sound ("script_replics\\radio\\message\\radio_turn_on_",  30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\radio\\commander\\radio_start_",  30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\radio\\message\\radio_voice_",    30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\radio\\commander\\radio_reply_",  30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\radio\\message\\radio_voice_",    30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\radio\\commander\\radio_finish_", 30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\radio\\message\\radio_turn_off_", 30, snd_type.talk, 2, 1, id ())
+              }
+              }
+
+    themes["bar_talk_double"] =
+               {
+               --speech 1
+               { 
+               sounds_base,  
+               obj:add_sound ("script_replics\\bandit_1\\replics\\bandit_about_novice_1",  1, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\bandit_1\\replics\\bandit_about_novice_2",  1, snd_type.talk, 2, 1, id ())
+               },
+               --speech 2
+               {
+               sounds_base, 
+               obj:add_sound ("script_replics\\bandit_1\\replics\\bandit_about_zone_1",  1, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\bandit_1\\replics\\bandit_about_zone_2",  1, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\bandit_1\\replics\\bandit_about_zone_3",  1, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\bandit_1\\replics\\bandit_about_zone_4",  1, snd_type.talk, 2, 1, id ())
+               },
+               --speech 3
+               {
+               sounds_base, 
+               obj:add_sound ("script_replics\\bandit_1\\replics\\bandit_hiding_place_1",  1, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\bandit_1\\replics\\bandit_hiding_place_2",  1, snd_type.talk, 2, 1, id ())
+               }
+               }
+
+    themes["laboratory_scientist"] =
+               {
+               {
+               sounds_base,
+               --1 - убери оружие и заходи
+               --2 - приветствие
+               --3,... - различные задани€
+               obj:add_sound ("script_replics\\bandit_1\\replics\\bandit_ambush_3", 30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\trader\\trader_script1a_",           30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\trader\\trader_monolog",             30, snd_type.talk, 2, 1, id ())
+              }
+              }
+
+    themes["barman"] =
+               {
+               -- misc
+               {
+               sounds_base,
+               obj:add_sound ("script_replics\\stalker_1\\talk\\stalker_talk_",     30, snd_type.talk, 2, 1, id ()), -- lets go
+               obj:add_sound ("script_replics\\trader\\trader_script1a_1",           1, snd_type.talk, 2, 1, id ())
+               },
+               -- idle_bar
+               {
+               sounds_base,
+               obj:add_sound ("script_replics\\bandit_1\\idle\\bandit_idle_2",        1, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\bandit_1\\idle\\bandit_idle_3",        1, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\bandit_1\\idle\\bandit_idle_4",        1, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\bandit_1\\idle\\bandit_idle_9",        1, snd_type.talk, 2, 1, id ())
+               },
+               -- idle_room
+               {
+               sounds_base,
+               obj:add_sound ("script_replics\\stalker_1\\trade\\stalker_trade_2",    1, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\stalker_1\\trade\\stalker_trade_3",    1, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\stalker_1\\trade\\stalker_trade_4",    1, snd_type.talk, 2, 1, id ())
+               }
+               }
+
+    themes["ambush"] =
+               {
+               -- idle
+               {
+               sounds_base,
+               obj:add_sound ("script_replics\\bandit_1\\idle\\bandit_idle_2",  1, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\bandit_1\\idle\\bandit_idle_3",  1, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\bandit_1\\idle\\bandit_idle_4",  1, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\bandit_1\\idle\\bandit_idle_8",  1, snd_type.talk, 2, 1, id ()),
+              }
+              }
+
+    themes["sos"] =
+               {
+               -- пришел
+               {
+               sounds_base,
+               obj:add_sound ("script_replics\\bandit_1\\replics\\bandit_about_zone_1",  1, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\bandit_1\\replics\\bandit_about_zone_2",  1, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\bandit_1\\replics\\bandit_about_zone_3",  1, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\bandit_1\\replics\\bandit_about_zone_4",  1, snd_type.talk, 2, 1, id ())
+              },
+              -- ожидание
+              {
+               sounds_base,
+               obj:add_sound ("script_replics\\radio\\message\\radio_turn_on_",  30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\radio\\commander\\radio_start_",  30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\radio\\message\\radio_voice_",    30, snd_type.talk, 2, 1, id ()),
+              },
+              --ушел
+              {
+               sounds_base,
+               obj:add_sound ("script_replics\\radio\\commander\\radio_reply_",  30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\radio\\message\\radio_voice_",    30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\radio\\commander\\radio_finish_", 30, snd_type.talk, 2, 1, id ()),
+               obj:add_sound ("script_replics\\radio\\message\\radio_turn_off_", 30, snd_type.talk, 2, 1, id ())
+              }
+              }
+
+    themes["wounded"] =
+             {
+             {
+             sounds_base,
+             obj:add_sound ("script_sound\\help\\soldier\\soldier_help_1",  1, snd_type.talk, 2, 1, id ()),
+             obj:add_sound ("script_sound\\help\\soldier\\soldier_help_2",  1, snd_type.talk, 2, 1, id ()),
+             obj:add_sound ("script_sound\\help\\soldier\\soldier_help_3",  1, snd_type.talk, 2, 1, id ()),
+             obj:add_sound ("script_sound\\help\\soldier\\soldier_help_4",  1, snd_type.talk, 2, 1, id ()),
+             obj:add_sound ("script_sound\\help\\soldier\\soldier_help_5",  1, snd_type.talk, 2, 1, id ())
+             }
+             }
+    themes["bar"] =
+             {
+             {
+             sounds_base,
+             obj:add_sound ("script_replics\\stalker_1\\talk\\stalker_talk_2", 5, snd_type.talk, 2, 1, id ()),
+             obj:add_sound ("monsters\\stalker\\hiccup\\hic", 5, snd_type.talk, 2, 1, id ())
+             }
+             }
+   
+   themes["outcast"] =
+             {
+             {
+             sounds_base,
+             obj:add_sound ("script_replics\\trader\\trader_script1a_",           30, snd_type.talk, 2, 1, id ()),
+             obj:add_sound ("script_replics\\trader\\trader_monolog",             30, snd_type.talk, 2, 1, id ())
+             }
+             }
+			 
+
+    return sounds_base
+end

@@ -1,0 +1,48 @@
+function main ()
+local items_table = {
+						"conserva",
+						"conserva",
+						"conserva",
+						"conserva",
+						"conserva",
+						"medkit",
+						"medkit",
+						"medkit",
+						"medkit",
+						"medkit",
+					}
+local ammo_table = {
+						"ammo_5.56x45_ss190",
+						"ammo_5.56x45_ss190",
+						"ammo_5.56x45_ss190",
+						"ammo_5.56x45_ss190",
+						"ammo_5.56x45_ss190",
+						"ammo_5.56x45_ss190",
+						"ammo_5.56x45_ss190",
+						"ammo_5.56x45_ss190",
+						"ammo_5.56x45_ss190",
+						"ammo_5.56x45_ss190",
+						"ammo_5.56x45_ap",
+						"ammo_5.56x45_ap",
+						"ammo_5.56x45_ap",
+						"ammo_5.56x45_ap",
+						"ammo_5.56x45_ap",
+						"ammo_5.56x45_ap",
+						"ammo_5.56x45_ap",
+						"ammo_5.56x45_ap",
+						"ammo_5.56x45_ap",
+						"ammo_5.56x45_ap",
+					}
+local actor = db.actor
+local actor_id = actor:id()
+local actor_position = actor:position()
+	for i = 1, #items_table do
+		alife():create(items_table[i], actor_position, 0, 0, actor_id)
+	end
+	local ini = system_ini()
+	for i = 1, #ammo_table do
+		local num_in_box = ini:r_u32(ammo_table[i], "box_size")
+		alife():create_ammo(ammo_table[i], actor_position, 0, 0, actor_id, num_in_box)
+	end
+	db.actor:give_money(10000)
+end

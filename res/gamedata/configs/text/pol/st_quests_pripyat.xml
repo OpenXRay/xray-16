@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="pri_a17_get_gauss_rifle_documentation_name">
+		<text>Przedmiot 62: znajdџ dokumenty w warsztacie testowym</text>
+	</string>
+	<string id="pri_a17_get_gauss_rifle_documentation_text">
+		<text>Musisz znaleџж dokumenty dotycz№ce przedmiotu 62. Wyjaњni№ one, czy broс ta mogіa zostaж uїyta do zestrzelenia helikopterуw.</text>
+	</string>
+	<string id="pri_a17_get_in_cover_name">
+		<text>Niezidentyfikowana broс: ukryj siк w budynku</text>
+	</string>
+	<string id="pri_a17_get_in_cover_text">
+		<text>Musisz ukryж siк w budynku i odeprzeж atak Monolitu.</text>
+	</string>
+	<string id="pri_a17_get_info_name">
+		<text>Niezidentyfikowana broс: znajdџ informacje</text>
+	</string>
+	<string id="pri_a17_get_info_text">
+		<text>Broс jest niesprawna i nie wiadomo, w jaki sposуb dziaіa. Musisz znaleџж technika, ktуry zrozumie sposуb jej dziaіania.</text>
+	</string>
+	<string id="pri_a17_kill_preacher_name">
+		<text>Niezidentyfikowana broс: zabij dowуdcк druїyny Monolitu</text>
+	</string>
+	<string id="pri_a17_kill_preacher_text">
+		<text>Musisz zabiж dowуdcк druїyny Monolitu - to bojownik uїywaj№cy niezidentyfikowanej broni. </text>
+	</string>
+	<string id="pri_a17_maraud_name">
+		<text>Niezidentyfikowana broс: przeszukaj zabitych bojownikуw Monolitu</text>
+	</string>
+	<string id="pri_a17_maraud_text">
+		<text>Bojownicy Monolitu powinni mieж niezidentyfikowan№ broс przy sobie - znajdџ j№.</text>
+	</string>
+	<string id="pri_a17_stalker_tech_produce_62_get_info_name">
+		<text>Niezidentyfikowana broс: porozmawiaj z Kardanem</text>
+	</string>
+	<string id="pri_a17_stalker_tech_produce_62_get_info_text">
+		<text>Kardan pewnie juї odchorowaі kaca - czas porozmawiaж z nim o niezidentyfikowanej broni.</text>
+	</string>
+	<string id="pri_a17_stalker_tech_produce_62_show_name">
+		<text>Niezidentyfikowana broс: poczekaj, aї Kardan odzyska przytomnoњж</text>
+	</string>
+	<string id="pri_a17_stalker_tech_produce_62_show_text">
+		<text>Kardan powinien wiedzieж coњ o broni - musisz z nim porozmawiaж, kiedy siк obudzi.</text>
+	</string>
+	<string id="pri_a17_talk_with_kovalski_about_gauss_rifle_information_name">
+		<text>Karabin Gaussa: powiedz Kowalskiemu o broni</text>
+	</string>
+	<string id="pri_a17_talk_with_kovalski_about_gauss_rifle_information_text">
+		<text>Musisz przekazaж Kowalskiemu wszystko, co wiesz o przedmiocie 62.</text>
+	</string>
+	<string id="pri_a17_task_find_gauss_rifle_name">
+		<text>Niezidentyfikowana broс: doі№cz do oddziaіu</text>
+	</string>
+	<string id="pri_a17_task_find_gauss_rifle_text">
+		<text>Musisz doі№czyж do oddziaіu szturmowego w celu zdobycia broni.</text>
+	</string>
+	<string id="pri_a17_task_get_gauss_rifle_from_preacher_name">
+		<text>Niezidentyfikowana broс: podnieњ broс</text>
+	</string>
+	<string id="pri_a17_task_get_gauss_rifle_from_preacher_text">
+		<text>Musisz podnieњж broс dowуdcy druїyny Monolitu.</text>
+	</string>
+	<string id="pri_a17_task_give_gauss_rifle_to_kovalski_name">
+		<text>Niezidentyfikowana broс: zabierz broс do Kowalskiego</text>
+	</string>
+	<string id="pri_a17_task_give_gauss_rifle_to_kovalski_text">
+		<text>Masz broс - teraz musisz zabraж j№ do Kowalskiego i dowiedzieж siк, czy to ona zestrzeliіa helikoptery.</text>
+	</string>
+	<string id="pri_a17_watch_recons_six_name">
+		<text>Niezidentyfikowana broс: weџ udziaі w zasadzce na bojownikуw Monolitu</text>
+	</string>
+	<string id="pri_a17_watch_recons_six_text">
+		<text>Wojskowy oddziaі zwiadowczy przygotowuje zasadzkк na druїynк Monolitu.</text>
+	</string>
+	<string id="pri_a18_get_reinforcement_name">
+		<text>Siіy Monolitu: spotkaj siк ze wsparciem</text>
+	</string>
+	<string id="pri_a18_get_reinforcement_text">
+		<text>Kowalski przysіaі wsparcie, ktуre pomoїe ci wyeliminowaж druїynк Monolitu zabarykadowan№ w ksiкgarni. </text>
+	</string>
+	<string id="pri_a18_go_post_name">
+		<text>Siіy Monolitu: pozb№dџ siк bojownikуw z ksiкgarni</text>
+	</string>
+	<string id="pri_a18_go_post_text">
+		<text>Musisz wyeliminowaж siіy Monolitu w budynku. Duїe oddziaіy Monolitu s№ zagroїeniem dla obozu wojskowego.</text>
+	</string>
+	<string id="pri_a18_use_idol_name">
+		<text>Siіy Monolitu: zbadaj dziwn№ konstrukcjк</text>
+	</string>
+	<string id="pri_a18_use_idol_text">
+		<text>W budynku znajdowaіo siк dziwne urz№dzenie. Dowiedz siк o nim czegoњ wiкcej.</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_name">
+		<text>Laboratorium X8: znajdџ dokumenty dotycz№ce eksperymentуw</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_text">
+		<text>Informacje przez ciebie znalezione odnosz№ siк do centralnego laboratorium oznaczonego jako X8. Moїe ono zawieraж dane na temat tajnych eksperymentуw przeprowadzanych w Zonie.</text>
+	</string>
+	<string id="pri_a20_check_recon_squad_task_name">
+		<text>Zaginiony oddziaі zwiadowczy: znajdџ druїynк</text>
+	</string>
+	<string id="pri_a20_check_recon_squad_task_text">
+		<text>Oddziaі zwiadowczy wysіany przez Kowalskiego znikn№і po nadaniu dziwnego komunikatu. Musisz odkryж, co siк staіo.</text>
+	</string>
+	<string id="pri_a21_chasovoi_body_search_name">
+		<text>Zaginiony wartownik: zbadaj miejsce, w ktуrym zgin№і wartownik</text>
+	</string>
+	<string id="pri_a21_chasovoi_body_search_text">
+		<text>Wartownik zachowywaі siк bardzo dziwnie, wiкc musisz odkryж przyczyny.</text>
+	</string>
+	<string id="pri_a21_find_chasovoi_name">
+		<text>Zaginiony wartownik: znajdџ wartownika</text>
+	</string>
+	<string id="pri_a21_find_chasovoi_text">
+		<text>Jeden z їoіnierzy zagin№і z posterunku - musisz go odnaleџж i odkryж przyczyny jego znikniкcia.</text>
+	</string>
+	<string id="pri_a21_kill_kontroler_name">
+		<text>Zaginiony wartownik: zabij kontrolera</text>
+	</string>
+	<string id="pri_a21_kill_kontroler_text">
+		<text>W pobliїu zaginionego wartownika znajdowaі siк kontroler - musi on zostaж wyeliminowany.</text>
+	</string>
+	<string id="pri_a22_find_dead_squad_name">
+		<text>Zakіуcenia radiowe: znajdџ zaginiony oddziaі</text>
+	</string>
+	<string id="pri_a22_find_dead_squad_text">
+		<text>Oddziaі szukaj№cy џrуdіa zakіуceс radiowych zagin№і. Twoim zadaniem jest jego odnalezienie.</text>
+	</string>
+	<string id="pri_a22_search_bodys_name">
+		<text>Zakіуcenia radiowe: przeszukaj ciaіa</text>
+	</string>
+	<string id="pri_a22_search_bodys_text">
+		<text>Przeszukaj ciaіa - moїe to pomуc w ustaleniu przyczyny zgonu.</text>
+	</string>
+	<string id="pri_a22_search_yarmoshuk_body_name">
+		<text>Zakіуcenia radiowe: przeszukaj ciaіo</text>
+	</string>
+	<string id="pri_a22_search_yarmoshuk_body_text">
+		<text>Przeszukaj ciaіo - moїe to pomуc w ustaleniu przyczyny zgonu.</text>
+	</string>
+	<string id="pri_a25_blow_up_door_name">
+		<text>Zakіуcenia radiowe: wysadџ drzwi</text>
+	</string>
+	<string id="pri_a25_blow_up_door_text">
+		<text>Musisz wysadziж drzwi uїywaj№c materiaіуw wybuchowych, aby dostaж siк do budynku.</text>
+	</string>
+	<string id="pri_a25_check_freezer_knock_name">
+		<text>Zakіуcenia radiowe: zbadaj џrуdіo dџwiкku</text>
+	</string>
+	<string id="pri_a25_check_freezer_knock_text">
+		<text>Z lodуwki dochodzi haіas - brzmi, jakby ktoњ byі w niej zamkniкty. Zbadaj to.</text>
+	</string>
+	<string id="pri_a25_destroy_antenna_name">
+		<text>Zakіуcenia radiowe: usuс џrуdіo zakіуceс</text>
+	</string>
+	<string id="pri_a25_destroy_antenna_text">
+		<text>Wiesz juї, gdzie znajduje siк џrуdіo zakіуceс radiowych - teraz musisz je zniszczyж.</text>
+	</string>
+	<string id="pri_a25_find_antenna_name">
+		<text>Zakіуcenia radiowe: znajdџ џrуdіo zakіуceс</text>
+	</string>
+	<string id="pri_a25_find_antenna_text">
+		<text>W budynku znajduje siк џrуdіo zakіуceс radiowych - znajdџ je.</text>
+	</string>
+	<string id="pri_a25_find_explosive_name">
+		<text>Zakіуcenia radiowe: znajdџ materiaіy wybuchowe</text>
+	</string>
+	<string id="pri_a25_find_explosive_text">
+		<text>Druїyna szukaj№ca џrуdіa zakіуceс radiowych miaіa przy sobie materiaіy wybuchowe. Musisz je znaleџж, aby dostaж siк do budynku.</text>
+	</string>
+	<string id="pri_a25_remove_source_of_hindrances_name">
+		<text>Zakіуcenia radiowe: dostaс siк do budynku przedszkola</text>
+	</string>
+	<string id="pri_a25_remove_source_of_hindrances_text">
+		<text>Џrуdіo sygnaіu znajduje siк gdzieњ w budynku przedszkola, tak wiкc musisz dostaж siк do њrodka.</text>
+	</string>
+	<string id="pri_a28_cover_militarys_name">
+		<text>Ewakuacja: osіaniaj їoіnierzy</text>
+	</string>
+	<string id="pri_a28_cover_militarys_text">
+		<text>Strieіok moїe i jest martwy, ale ty nadal musisz doprowadziж їoіnierzy do helikopterуw.</text>
+	</string>
+	<string id="pri_a28_cover_strelok_name">
+		<text>Ewakuacja: osіaniaj Strieіoka</text>
+	</string>
+	<string id="pri_a28_cover_strelok_text">
+		<text>Kwatera gіуwna jest zainteresowana informacjami, ktуre posiada Strieіok. Musisz doprowadziж go do helikopterуw.</text>
+	</string>
+	<string id="pri_a28_go_hellis_name">
+		<text>Ewakuacja: dostaс siк do helikopterуw</text>
+	</string>
+	<string id="pri_a28_go_hellis_text">
+		<text>Wszyscy zginкli - musisz sam dostaж siк do helikopterуw.</text>
+	</string>
+	<string id="pri_a28_talk_with_kovalski_name">
+		<text>Ewakuacja: porozmawiaj z Kowalskim</text>
+	</string>
+	<string id="pri_a28_talk_with_kovalski_text">
+		<text>Musisz porozmawiaж z Kowalskim przed rozpoczкciem ewakuacji.</text>
+	</string>
+	<string id="pri_a28_tell_kovalski_when_ready_name">
+		<text>Ewakuacja: poinformuj Kowalskiego o swojej gotowoњci</text>
+	</string>
+	<string id="pri_a28_tell_kovalski_when_ready_text">
+		<text>Musisz poinformowaж Kowalskiego o swojej gotowoњci do rozpoczкcia ewakuacji.</text>
+	</string>
+	<string id="pri_a28_wait_surge_end_name">
+		<text>Ewakuacja: zaczekaj, aї emisja siк zakoсczy</text>
+	</string>
+	<string id="pri_a28_wait_surge_end_text">
+		<text>Musisz poczekaж, aї emisja siк zakoсczy.</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_1_name">
+		<text>Nieznany: zbadaj џrуdіo sygnaіu</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_1_text">
+		<text>Kiryіow wykryі dziwny sygnaі niedaleko bazy. Musisz zbadaж jego џrуdіo.</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_2_name">
+		<text>Nieznany: pod№їaj za sygnaіem</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_2_text">
+		<text>Wspуіrzкdne sygnaіu s№ znowu dostкpne, wiкc pod№їaj za nimi.</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_3_name">
+		<text>Nieznany: zbadaj ostatni№ znan№ lokacjк sygnaіu</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_3_text">
+		<text>Sygnaі ucichі na dziedziсcu budynku, tak wiкc zbadaj jego ostatni№ znan№ lokalizacjк.</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_4_name">
+		<text>Nieznany: przygotuj siк na atak na bazк</text>
+	</string>
+	<string id="pri_b305_check_unknown_signal_4_text">
+		<text>Wrуж do bazy wojskowej i przygotuj siк na prawdopodobny atak.</text>
+	</string>
+	<string id="pri_b305_kovalskiy_talk_name">
+		<text>Zakіуcenia radiowe: porozmawiaj z Kowalskim</text>
+	</string>
+	<string id="pri_b305_kovalskiy_talk_text">
+		<text>Puіkownik Kowalski pytaі o ciebie.</text>
+	</string>
+	<string id="pri_b306_task_1_name">
+		<text>Laboratorium X8: dostaс siк do szybu windy</text>
+	</string>
+	<string id="pri_b306_task_1_text">
+		<text>Do wejњcia do podziemnego laboratorium pod centrum usіugowym Jubilejny moїna dostaж siк tylko przez szyb windy.</text>
+	</string>
+	<string id="pri_b306_task_2_name">
+		<text>Laboratorium X8: znajdџ generator</text>
+	</string>
+	<string id="pri_b306_task_2_text">
+		<text>Zasilanie drzwi szybu windy zostaіo odciкte. Aby je przywrуciж, musisz znaleџж generator awaryjny. </text>
+	</string>
+	<string id="pri_b306_task_3_name">
+		<text>Laboratorium X8: zejdџ do laboratorium</text>
+	</string>
+	<string id="pri_b306_task_3_text">
+		<text>Musisz uїyж windy, aby dostaж siк do laboratorium X8, znajduj№cego siк pod centrum usіugowym Jubilejny.</text>
+	</string>
+	<string id="pri_b35_task_envoy_name">
+		<text>Jeden strzaі: wyeliminuj posіaсca</text>
+	</string>
+	<string id="pri_b35_task_envoy_text">
+		<text>Musisz wyeliminowaж posіaсca. Bez niego najemnicy nie bкd№ w stanie odnaleџж laboratorium.</text>
+	</string>
+	<string id="pri_b35_task_envoy_wait_name">
+		<text>Jeden strzaі: poczekaj na ludzi klienta</text>
+	</string>
+	<string id="pri_b35_task_envoy_wait_text">
+		<text>Poczekaj na ludzi klienta i zabij ich dowуdcк. Bez niego najemnicy nie bкd№ w stanie odnaleџж laboratorium.</text>
+	</string>
+	<string id="pri_b35_task_merc_name">
+		<text>Jeden strzaі: zabij dowуdcк druїyny najemnikуw</text>
+	</string>
+	<string id="pri_b35_task_merc_text">
+		<text>Musisz zabiж dowуdcк druїyny najemnikуw. Bez niego bкd№ zdezorganizowani i niegroџni.</text>
+	</string>
+	<string id="pri_b35_task_merc_wait_name">
+		<text>Jeden strzaі: poczekaj, aї pojawi№ siк najemnicy</text>
+	</string>
+	<string id="pri_b35_task_merc_wait_text">
+		<text>Musisz poczekaж, aї pojawi№ siк najemnicy i zabij ich dowуdcк. Bez niego bкd№ zdezorganizowani i niegroџni.</text>
+	</string>
+	<string id="pri_b35_task_reward_name">
+		<text>Jeden strzaі: porozmawiaj z Kowalskim</text>
+	</string>
+	<string id="pri_b35_task_reward_text">
+		<text>Zіуї raport o wynikach misji Kowalskiemu. </text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_1_name">
+		<text>Laboratorium X8: opuњж podziemny kompleks lub dalej szukaj dokumentуw</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_1_text">
+		<text>Udaіo ci siк znaleџж dokumenty. Moїesz teraz opuњciж laboratorium, ale moїliwe jest, їe w kompleksie znajduj№ siк jeszcze inne wartoњciowe informacje.</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_2_name">
+		<text>Laboratorium X8: opuњж podziemny kompleks lub dalej szukaj dokumentуw</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_2_text">
+		<text>Udaіo ci siк znaleџж dokumenty. Moїesz teraz opuњciж laboratorium, ale moїliwe jest, їe w kompleksie znajduj№ siк jeszcze inne wartoњciowe informacje.</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_3_name">
+		<text>Laboratorium X8: opuњж podziemny kompleks</text>
+	</string>
+	<string id="pri_a19_lab_x8_investigation_3_text">
+		<text>Wygl№da na to, їe udaіo ci siк znaleџж wszystkie dokumenty znajduj№ce siк w laboratorium. Moїesz teraz opuњciж podziemny kompleks.</text>
+	</string>
+	<string id="pri_a18_wait_reinf_name">
+		<text>Siіy monolitu: poczekaj na posiіki </text>
+	</string>
+	<string id="pri_a18_wait_reinf_text">
+		<text>Musisz poczekaж na posiіki wysіane przez Kowalskiego, aby wyeliminowaж siіy Monolitu w ksiкgarni.</text>
+	</string>
+	<string id="pri_a22_talk_with_kovalski_name">
+		<text>Cicha rozmowa: porozmawiaj z Kowalskim</text>
+	</string>
+	<string id="pri_a22_talk_with_kovalski_text">
+		<text>Musisz porozmawiaж z Kowalskim. Wygl№da na to, їe ma coњ waїnego do powiedzenia.</text>
+	</string>
+	<string id="pri_a28_defend_helis_name">
+		<text>Ewakuacja: utrzymaj siк przy helikopterach</text>
+	</string>
+	<string id="pri_a28_defend_helis_text">
+		<text>Musisz osіaniaж helikoptery do chwili ich startu.</text>
+	</string>
+	<string id="pri_a28_save_medic_name">
+		<text>Ewakuacja: ocuж medyka</text>
+	</string>
+	<string id="pri_a28_save_medic_text">
+		<text>Medyk zostaі poraїony przez nieznan№ siік. Musisz jak najszybciej przywrуciж go do przytomnoњci.</text>
+	</string>
+	<string id="pri_a28_return_to_helis_name">
+		<text>Ewakuacja: wrуж do helikopterуw</text>
+	</string>
+	<string id="pri_a28_return_to_helis_text">
+		<text>Musisz wrуciж do helikopterуw, poniewaї mog№ one wkrуtce wystartowaж.</text>
+	</string>
+	<string id="pri_a28_helis_gonna_fly_name">
+		<text>Ewakuacja: jak najszybciej wrуж do helikopterуw</text>
+	</string>
+	<string id="pri_a28_helis_gonna_fly_text">
+		<text>Helikoptery s№ gotowe do startu. Musisz natychmiast wejњж na pokіad jednego z nich - piloci nie mog№ dіugo czekaж.</text>
+	</string>
+</string_table>

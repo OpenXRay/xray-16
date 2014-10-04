@@ -1,0 +1,35 @@
+[logic]
+active = ph_door@close
+
+[ph_door@close]
+locked = false
+closed = true
+snd_open_start = trader_door_open_start
+snd_close_start = trader_door_close_start
+snd_close_stop = trader_door_close_stop
+on_use = {-zat_b18_noah_shot_door -zat_b18_door_open} ph_door@free %+zat_b18_noah_shot_door +zat_b18_door_open%, ph_door@open
+on_info = {+zat_b18_reset_memory}  %-zat_b18_noah_shot_door -zat_b18_noah_remembers -zat_b18_reset_memory -zat_b18_door_open%
+on_info2 = {-zat_b18_dog_close}  %+zat_b18_dog_close -zat_b18_dog_open%
+on_info3 = {+zat_b18_dog_noah_free -zat_b18_dog_noah_free_door} ph_door@open %+zat_b18_dog_noah_free_door%
+
+[ph_door@open]
+locked = false
+closed = false
+snd_open_start = trader_door_open_start
+snd_close_start = trader_door_close_start
+snd_close_stop = trader_door_close_stop
+on_use = ph_door@close %-zat_b18_noah_shot_door%
+on_info = {+zat_b18_reset_memory} ph_door@close %-zat_b18_noah_shot_door -zat_b18_noah_remembers -zat_b18_door_open%
+on_info2 = {-zat_b18_dog_open}  %+zat_b18_dog_open -zat_b18_dog_close%
+
+[ph_door@free]
+locked = false
+closed = false
+snd_open_start = trader_door_open_start
+snd_close_start = trader_door_close_start
+snd_close_stop = trader_door_close_stop
+no_force = true
+on_use = ph_door@open
+on_info = {+zat_b18_reset_memory} ph_door@close %-zat_b18_noah_shot_door -zat_b18_noah_remembers -zat_b18_door_open%
+on_info2 = {-zat_b18_dog_open}  %+zat_b18_dog_open -zat_b18_dog_close%
+on_info3 = {+zat_b18_dog_noah_free -zat_b18_dog_noah_free_door} ph_door@open %+zat_b18_dog_noah_free_door%

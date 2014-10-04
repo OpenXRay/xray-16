@@ -1,0 +1,86 @@
+--------------------------------------------------------------------------------
+-- Crow binding ----------------------------------------------------------------
+-- Made by Peacemaker ----------------------------------------------------------
+-- 25.12.07 --------------------------------------------------------------------
+--------------------------------------------------------------------------------
+crow_storage = {}
+crow_counter = 0
+-- Standart function for object binding
+function bind(obj)
+--    local new_binder = crow_binder(obj)
+    obj:bind_object(crow_binder(obj))
+end
+--------------------------------------------------------------------------------
+-- Class "crow_binder"
+--------------------------------------------------------------------------------
+class "crow_binder" (object_binder)
+-- Class constructor
+function crow_binder:__init(obj) super(obj)
+    self.body_timer = 0
+end
+-- Class update
+function crow_binder:update(delta)
+-- standart update
+    object_binder.update(self, delta)
+    if not(self.object:alive()) and (self.body_timer<=time_global()-120000) and (self.body_timer~=0) then
+-- if crow is killed and body lays down for two minutes - release it
+        printf("releasing object ["..self.object:name().."]")
+        alife():release(alife():object(self.object:id()), true)
+    end
+end
+-- Reload object
+function crow_binder:reload(section)
+    object_binder.reload(self, section)
+end
+-- Reinitialize object
+function crow_binder:reinit()
+    self.body_timer = 0
+    object_binder.reinit(self)
+    db.storage[self.object:id()] = {}
+    self.st = db.storage[self.object:id()]
+end
+-- Net spawn
+function crow_binder:net_spawn(sobject)
+    if not(object_binder.net_spawn(self, sobject)) then
+        return false
+    end
+    db.add_obj(self.object)
+    bind_crow.crow_storage[self.object:id()] = self.object:id()
+	bind_crow.crow_counter = bind_crow.crow_counter + 1
+    self.object:set_callback(callback.death, self.death_callback, self)
+    return true
+end
+-- Net destroy
+function crow_binder:net_destroy()
+    self.object:set_callback(callback.death, nil)
+    bind_crow.crow_storage[self.object:id()] = nil
+	bind_crow.crow_counter = bind_crow.crow_counter - 1
+    db.del_obj(self.object)
+    object_binder.net_destroy(self)
+end
+-- Crow death callback
+function crow_binder:death_callback(victim, who)
+    self.body_timer = time_global()
+    bind_crow.crow_storage[self.object:id()] = nil
+	bind_crow.crow_counter = bind_crow.crow_counter - 1
+end
+-- Standart function for save
+function crow_binder:net_save_relevant()
+	return true
+end
+-- Saving crow
+function crow_binder:save(package)
+	set_save_marker(package, "save", false, "crow_binder")
+	object_binder.save(self, package)
+	xr_logic.save_obj(self.object, package)
+	package:w_u32(self.body_timer)
+	set_save_marker(package, "save", true, "crow_binder")
+end
+-- Loading crow
+function crow_binder:load(reader)
+	set_save_marker(reader, "load", false, "crow_binder")
+	object_binder.load(self, reader)
+	xr_logic.load_obj(self.object, reader)
+	self.body_timer = reader:r_u32()
+	set_save_marker(reader, "load", true, "crow_binder")
+end

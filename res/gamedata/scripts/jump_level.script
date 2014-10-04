@@ -1,0 +1,35 @@
+need_jump = false
+
+local levels = { 
+				zaton = "jupiter", 
+				jupiter = "jupiter_underground", 
+				jupiter_underground = "pripyat",  
+				pripyat = "labx8",  
+				labx8 = "end",
+				}
+
+function try_to_jump()
+	local dest_level
+ 	if need_jump == true then
+ 		local console = get_console()
+		console:execute("flush")
+		
+		console:execute("save build_save_" .. tostring(time_global()) )
+		
+		for k,v in pairs(levels) do
+			if level.name() == k then
+				if v ~= "end" then
+					dest_level = v
+				else
+					printf("BUILD:QUIT!!!")
+					need_jump = false
+					dest_level = "zaton"
+				end
+				printf("BUILD:jumping to level [%s] from level [%s]", tostring(dest_level), tostring(k))
+				console:execute("flush")
+				console:execute("jump_to_level "..dest_level)
+				break
+			end
+		end
+	end
+end

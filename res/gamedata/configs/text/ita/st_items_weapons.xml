@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="ammo-11.43x23-fmj">
+		<text>Munizioni .45 ACP</text>
+	</string>
+	<string id="ammo-11.43x23-fmj_descr">
+		<text>Avendo una massa molto pesante e una carica propellente relativamente piccola, i proiettili blindati calibro .45 sono stati ampiamente utilizzati per piщ di un secolo. I colpi sono relativamente lenti ma altamente precisi, oltre che dotati di una notevole capacitа d'arresto.</text>
+	</string>
+	<string id="ammo-11.43x23-fmj_s">
+		<text>.45 ACP</text>
+	</string>
+	<string id="ammo-11.43x23-hydro">
+		<text>Munizioni .45 ACP hydro-shock</text>
+	</string>
+	<string id="ammo-11.43x23-hydro_descr">
+		<text>Questi insoliti proiettili calibro .45 ACP hanno una punta soffice blindata con una cavitа di espansione e un nucleo d'acciaio. Essendo un incrocio tra i proiettili a punta soffice blindati e i proiettili perforanti, presentano gli stessi pro e contro di questi due tipi di munizioni.</text>
+	</string>
+	<string id="ammo-11.43x23-hydro_s">
+		<text>.45 hydro-shock</text>
+	</string>
+	<string id="ammo-12x70-buck">
+		<text>Munizioni a pallettoni 12x70</text>
+	</string>
+	<string id="ammo-12x70-buck_descr">
+		<text>Munizioni standard calibro 12 riempite con pallettoni da 6 mm. Micidiali a distanza ravvicinata. Da usare solo con le armi ad anima liscia.</text>
+	</string>
+	<string id="ammo-12x70-buck_s">
+		<text>Munizioni 12x70 </text>
+	</string>
+	<string id="ammo-12x76-zhekan">
+		<text>Munizioni slug 12x76</text>
+	</string>
+	<string id="ammo-12x76-zhekan_descr">
+		<text>Munizioni slug pesanti calibro 12 usate di norma per la caccia grossa, ma efficaci anche in altre circostanze. Invece di perforare il bersaglio, i proiettili pesanti esercitano un'azione di sfondamento. </text>
+	</string>
+	<string id="ammo-12x76-zhekan_s">
+		<text>Slug 12x76</text>
+	</string>
+	<string id="ammo-5.45x39-ap">
+		<text>Munizioni 5.45x39 mm AP</text>
+	</string>
+	<string id="ammo-5.45x39-ap_descr">
+		<text>Munizioni perforanti militari calibro 5.45x39 7H22 per i fucili automatici dei paesi del Patto di Varsavia. Il proiettile contiene un elemento perforante blindato in lega pesante. Efficaci contro le armature.</text>
+	</string>
+	<string id="ammo-5.45x39-ap_s">
+		<text>5.45x39 AP</text>
+	</string>
+	<string id="ammo-5.45x39-fmj">
+		<text>Munizioni 5.45x39 mm</text>
+	</string>
+	<string id="ammo-5.45x39-fmj_descr">
+		<text>Munizioni perforanti militari potenziate calibro 5.45x39 7H10 per i fucili automatici dei paesi del Patto di Varsavia. Garantiscono una maggiore precisione rispetto ai colpi calibro 7.62, per via del rinculo ridotto e ai 100 metri di gittata in piщ.</text>
+	</string>
+	<string id="ammo-5.45x39-fmj_s">
+		<text>5.45x39</text>
+	</string>
+	<string id="ammo-5.56x45-ap">
+		<text>Munizioni 5.56x45 mm AP</text>
+	</string>
+	<string id="ammo-5.56x45-ap_descr">
+		<text>Munizioni perforanti calibro 5.56x45 in dotazione standard alla NATO, con la denominazione SS190/M855, ampiamente utilizzate dai servizi speciali e dalle agenzie di sicurezza occidentali. Efficaci contro le armature.</text>
+	</string>
+	<string id="ammo-5.56x45-ap_s">
+		<text>5.56x45 mm AP</text>
+	</string>
+	<string id="ammo-5.56x45-ss190">
+		<text>Munizioni 5.56x45 mm</text>
+	</string>
+	<string id="ammo-5.56x45-ss190_descr">
+		<text>Munizioni standard della NATO calibro 5.56x45 progettate specificamente per il fuoco automatico di precisione. Presentano ottime caratteristiche balistiche, avendo origine da un tipo di munizioni da caccia. Meglio note con la denominazione SS109.</text>
+	</string>
+	<string id="ammo-5.56x45-ss190_s">
+		<text>5.56x45</text>
+	</string>
+	<string id="ammo-7.62x54-7h14">
+		<text>Munizioni 7.62x54 mm 7H1</text>
+	</string>
+	<string id="ammo-7.62x54-7h14_descr">
+		<text>Munizioni di precisione calibro 7.62 con un elemento penetrante in acciaio progettate specificamente per gli SVD. A differenza delle munizioni da mitragliatore, le 7H1 sono efficaci nei colpi multipli e presentano eccellenti capacitа di penetrazione.</text>
+	</string>
+	<string id="ammo-7.62x54-7h14_s">
+		<text>7.62x54 7H1</text>
+	</string>
+	<string id="ammo-7.62x54-ap">
+		<text>Munizioni 7.62x54 mm PP</text>
+	</string>
+	<string id="ammo-7.62x54-ap_descr">
+		<text>Munizioni da mitragliatore calibro 7.62, poco costose. La forma le rende inadatte al fucile da cecchino, quindi sono utilizzabili solo con il mitragliatore RP-74.</text>
+	</string>
+	<string id="ammo-7.62x54-ap_s">
+		<text>7.62x54 PP</text>
+	</string>
+	<string id="ammo-9x18-fmj">
+		<text>Munizioni 9x18 mm</text>
+	</string>
+	<string id="ammo-9x18-fmj_descr">
+		<text>Munizioni blindate con elemento penetrante in acciaio e un nucleo di piombo rivestito. Forniscono una buona capacitа d'arresto, ma risultano inefficaci contro le armature.</text>
+	</string>
+	<string id="ammo-9x18-fmj_s">
+		<text>9x18</text>
+	</string>
+	<string id="ammo-9x18-pmm">
+		<text>Munizioni 9x18 mm +P+</text>
+	</string>
+	<string id="ammo-9x18-pmm_descr">
+		<text>Questo tipo di proiettile dispone di una maggiore capacitа d'arresto. La designazione europea "+P+" significa "munizioni in sovrappressione" con un aumento del 30% della velocitа di volata. Inefficaci contro le armature.</text>
+	</string>
+	<string id="ammo-9x18-pmm_s">
+		<text>9x18 +P+ </text>
+	</string>
+	<string id="ammo-9x19-fmj">
+		<text>Munizioni 9x19 mm FMJ</text>
+	</string>
+	<string id="ammo-9x19-fmj_descr">
+		<text>Munizioni blindate di base calibro 9x19 con buone caratteristiche e semplici da produrre. Sono diventate popolari dopo che le convenzioni internazionali hanno vietato l'uso di munizioni a espansione in battaglia. Inefficaci contro le armature.</text>
+	</string>
+	<string id="ammo-9x19-fmj_s">
+		<text>9x19 FMJ</text>
+	</string>
+	<string id="ammo-9x19-pbp">
+		<text>Munizioni 9x19 mm JHP</text>
+	</string>
+	<string id="ammo-9x19-pbp_descr">
+		<text>Questi proiettili calibro 9x19 a punta cava con cavitа di espansione garantiscono un'elevata capacitа d'arresto a fronte di una ridotta probabilitа di rimbalzo. Sono usati dalle forze di polizia e dai singoli individui a scopo di autodifesa. Inefficaci contro le armature per via del potenziale penetrante ridotto.</text>
+	</string>
+	<string id="ammo-9x19-pbp_s">
+		<text>9x19 JHP</text>
+	</string>
+	<string id="ammo-9x39-ap">
+		<text>Munizioni 9x39 mm SP-6</text>
+	</string>
+	<string id="ammo-9x39-ap_descr">
+		<text>Le munizioni subsoniche SP-6 per fucili d'assalto presentano una punta soffice blindata e un nucleo d'acciaio rinforzato che sporge dall'involucro. Richiede un silenziatore per l'uso furtivo. Utilizzate dai servizi speciali dei paesi del Patto di Varsavia. Efficaci contro le armature.</text>
+	</string>
+	<string id="ammo-9x39-ap_s">
+		<text>9x39 SP-6</text>
+	</string>
+	<string id="ammo-9x39-pab9">
+		<text>Munizioni 9x39 mm SP-5</text>
+	</string>
+	<string id="ammo-9x39-pab9_descr">
+		<text>Le munizioni subsoniche SP-5 per fucili da cecchino dispongono di un involucro bimetallico e di un nucleo in acciaio con una cavitа sul retro riempita di piombo. Richiedono un silenziatore per l'uso furtivo. Utilizzate dai servizi speciali dei paesi del Patto di Varsavia.</text>
+	</string>
+	<string id="ammo-9x39-pab9_s">
+		<text>9x39 mm SP-5</text>
+	</string>
+	<string id="ammo-gauss">
+		<text>Batterie</text>
+	</string>
+	<string id="ammo-m209">
+		<text>Granata M203</text>
+	</string>
+	<string id="ammo-m209_descr">
+		<text>Granata da 40 mm per il lanciagranate sottocanna M203 con un raggio di esplosione di 5 metri. Utilizzabile anche con il lanciagranate integrato dell'FT-200M.</text>
+	</string>
+	<string id="ammo-m209_s">
+		<text>M203</text>
+	</string>
+	<string id="ammo-og-7b">
+		<text>Testata OG-7V</text>
+	</string>
+	<string id="ammo-og-7b_descr">
+		<text>Testata a frammentazione anti-uomo per il lanciagranate RPG-7u. La funzione principale della testata, in combinazione con il lanciagranate RPG-7u, и l'eliminazione dei nemici al riparo e fuori dalla portata delle granate a mano.</text>
+	</string>
+	<string id="ammo-og-7b_s">
+		<text>OG-7V</text>
+	</string>
+	<string id="ammo-vog-25">
+		<text>Granata VOG-25</text>
+	</string>
+	<string id="ammo-vog-25_descr">
+		<text>Granata a frammentazione standard per il lanciagranate sottocanna GP-25 Koster con un raggio di esplosione di 5 metri. La granata VOG-25 puт essere utilizzata anche con il Tunder S14 e il lanciagranate a revolver Bulldog 6.</text>
+	</string>
+	<string id="ammo-vog-25_s">
+		<text>VOG-25</text>
+	</string>
+	<string id="st_addon_scope">
+		<text>Mirino PSO-1m</text>
+	</string>
+	<string id="st_addon_scope_descr">
+		<text>Un mirino ottico fisso 5.0x di fabbricazione sovietica con tacche di mira. Si collega all'arma tramite un incastro a coda di rondine, uno standard nei paesi del Patto di Varsavia.</text>
+	</string>
+	<string id="st_addon_scope_detector">
+		<text>Mirino PSS-2x</text>
+	</string>
+	<string id="st_addon_scope_detector_descr">
+		<text>Un mirino ottico fisso 5.0x con un visore termico integrato per identificare le fonti di calore emesse dal corpo umano. Progettato per le forze speciali. Si collega all'arma tramite un incastro a coda di rondine.</text>
+	</string>
+	<string id="st_addon_scope_night_vision">
+		<text>Mirino NSPU-3</text>
+	</string>
+	<string id="st_addon_scope_night_vision_descr">
+		<text>Un mirino notturno fisso 5.0x a immagini intensificate che consente di combattere in assenza di luce. Si collega all'arma tramite un incastro a coda di rondine.</text>
+	</string>
+	<string id="st_addon_scope_susat">
+		<text>Mirino SUSAT 4x</text>
+	</string>
+	<string id="st_addon_scope_susat_custom_descr">
+		<text>Un mirino regolabile a lungo raggio con ingrandimento 1.6-4x che puт usare la regolazione automatica per aumentare l'efficacia di fuoco. Si collega all'arma tramite l'incastro Picatinny, standard per la NATO.</text>
+	</string>
+	<string id="st_addon_scope_susat_descr">
+		<text>Un mirino fisso 4.0x prodotto principalmente nei paesi occidentali. Si collega all'arma tramite l'incastro Picatinny, standard per la NATO. Utilizzato spesso nelle armi leggere per eseguire colpi di precisione a medio-lungo raggio.</text>
+	</string>
+	<string id="st_addon_scope_susat_dusk">
+		<text>Mirino SUSAT x1.6 "Tramonto"</text>
+	</string>
+	<string id="st_addon_scope_susat_dusk_descr">
+		<text>Un mirino ottico SUSAT 1.6x a contrasto elevato per combattere in condizioni di luminositа ridotta. Si collega all'arma tramite l'incastro Picatinny, standard per la NATO.</text>
+	</string>
+	<string id="st_addon_scope_susat_night_vision">
+		<text>Mirino SUSAT x4 "Notte"</text>
+	</string>
+	<string id="st_addon_scope_susat_night_vision_descr">
+		<text>Un mirino fisso 4.0x con un visore notturno per gli scontri a fuoco a lungo raggio in assenza di luce. Si collega all'arma tramite l'incastro Picatinny, standard per la NATO.</text>
+	</string>
+	<string id="st_addon_scope_susat_x1.6">
+		<text>Mirino SUSAT 1.6x</text>
+	</string>
+	<string id="st_addon_scope_susat_x1.6_descr">
+		<text>Un mirino ottico SUSAT 1.6x per gli scontri a fuoco a corto-medio raggio. Si collega all'arma tramite l'incastro Picatinny, standard per la NATO.</text>
+	</string>
+	<string id="st_addon_scope_x2.7">
+		<text>Mirino PSU-1</text>
+	</string>
+	<string id="st_addon_scope_x2.7_descr">
+		<text>Un mirino ottico 2.7x per i combattimenti urbani a medio raggio. Si collega all'arma tramite un incastro a coda di rondine.</text>
+	</string>
+	<string id="st_addon_silencer">
+		<text>Silenziatore</text>
+	</string>
+	<string id="st_addon_silencer_descr">
+		<text>Un efficace silenziatore che puт essere modificato in azione in base alle attuali necessitа. Il corpo del silenziatore intorno alla canna contiene una bobina di fine maglia d'ottone, mentre la parte anteriore comprende una serie di diaframmi metallici con una cavitа al centro. Il kit completo include adattatori e sigillanti per gran parte delle armi. Di norma, il silenziatore viene usato per colpire il nemico senza attirare troppa attenzione.</text>
+	</string>
+	<string id="st_grenade_f1">
+		<text>Granata F1</text>
+	</string>
+	<string id="st_grenade_f1_descr">
+		<text>Una granata a mano difensiva, con frammenti in grado di perforare le armature di livello intermedio e un raggio di esplosione di 7 metri. Gli stalker si procurano le granate F1 dal personale militare, che si giustifica dicendo di averle usate per combattere i mutanti.</text>
+	</string>
+	<string id="st_grenade_launcher">
+		<text>GP-25 Koster</text>
+	</string>
+	<string id="st_grenade_launcher_descr">
+		<text>Un lanciagranate scanalato sottocanna, a carica frontale e a colpo singolo per i fucili d'assalto costruiti nei paesi del Patto di Varsavia. Il meccanismo di fuoco и semi-automatico, con una sicura manuale e un sistema automatico per evitare i colpi accidentali, se il lanciagranate non и installato correttamente. Utilizza le granate VOG-25.</text>
+	</string>
+	<string id="st_grenade_launcher_m203">
+		<text>M203</text>
+	</string>
+	<string id="st_grenade_launcher_m203_descr">
+		<text>Un lanciagranate M203 modificato che и stato accorciato di circa 8 centimetri, collegato all'arma tramite un incastro Picatinny. Grazie a questa modifica, oggi viene ampiamente utilizzato in ogni parte del mondo.</text>
+	</string>
+	<string id="st_grenade_rgd5">
+		<text>Granata RGD-5</text>
+	</string>
+	<string id="st_grenade_rgd5_descr">
+		<text>Una granata a mano offensiva con un raggio di esplosione di soli 5 metri. Avendo un costo relativamente ridotto, spesso gli stalker la utilizzano per "stanare" i mutanti.</text>
+	</string>
+	<string id="st_grenade_smoke">
+		<text>Granata fumogena</text>
+	</string>
+	<string id="st_grenade_smoke_descr">
+		<text>Una granata a mano fumogena, utile per creare coperture di fumo. Dopo il lancio, impiega circa 10 secondi per creare la coltre di fumo.</text>
+	</string>
+	<string id="st_knife">
+		<text>Coltello</text>
+	</string>
+	<string id="st_wpn_abakan">
+		<text>AC-96/2</text>
+	</string>
+	<string id="st_wpn_ak74">
+		<text>AKM-74/2</text>
+	</string>
+	<string id="st_wpn_ak74u">
+		<text>AKM-74/2U</text>
+	</string>
+	<string id="st_wpn_beretta">
+		<text>Martha</text>
+	</string>
+	<string id="st_wpn_bm16">
+		<text>Doppietta a canne mozze</text>
+	</string>
+	<string id="st_wpn_bm16_descr">
+		<text>Una doppietta da caccia a canne mozze con due canne affiancate, piщ leggera e compatta della doppietta standard. И una delle armi piщ utilizzate dai banditi, essendo facile da nascondere ed estremamente efficace a distanza ravvicinata.</text>
+	</string>
+	<string id="st_wpn_colt1911">
+		<text>Kora-919</text>
+	</string>
+	<string id="st_wpn_desert_eagle_nimble">
+		<text>Aquila delle steppe</text>
+	</string>
+	<string id="st_wpn_desert_eagle_nimble_descr">
+		<text>Una pistola artigianale basata sul modello dell'Aquilone nero. I vari componenti sono perfettamente calibrati per garantire una precisione eccezionale per un'arma di questo tipo.</text>
+	</string>
+	<string id="st_wpn_eagle">
+		<text>Aquilone nero</text>
+	</string>
+	<string id="st_wpn_fn2000">
+		<text>FT-200M</text>
+	</string>
+	<string id="st_wpn_fort">
+		<text>Fora-12</text>
+	</string>
+	<string id="st_wpn_g36">
+		<text>GP37</text>
+	</string>
+	<string id="st_wpn_gauss">
+		<text>Fucile Gauss</text>
+	</string>
+	<string id="st_wpn_groza">
+		<text>Tunder S14</text>
+	</string>
+	<string id="st_wpn_groza_descr">
+		<text>Un fucile d'assalto con lanciagranate, simile alla serie AKM, progettato specificamente per le unitа a intervento rapido. Le differenze principali sono le munizioni calibro 9x39, la configurazione "bullpup" e le opzioni di modifica. И molto ricercato dagli stalker militari per via della sua efficacia contro i nemici con armatura mentre si и nascosti dietro coperture negli scenari urbani, ma anche per la sua eccezionale capacitа d'arresto.</text>
+	</string>
+	<string id="st_wpn_groza_nimble">
+		<text>Tempesta</text>
+	</string>
+	<string id="st_wpn_groza_nimble_descr">
+		<text>Versione sperimentale russa di un sistema integrato fucile d'assalto/lanciagranate, basata sul Tunder S14 standard, progettata per le unitа operanti nella Zona. Da notare la maggiore capienza del caricatore.</text>
+	</string>
+	<string id="st_wpn_hpsa">
+		<text>HPSS-1m</text>
+	</string>
+	<string id="st_wpn_hpsa_descr">
+		<text>Modello modificato di una pistola della prima metа del 20° secolo, affidabile, potente e preciso come l'originale. Le pistole di questa serie, giustamente considerate tra le migliori del 20° secolo, sono molto richieste nella Zona.</text>
+	</string>
+	<string id="st_wpn_l85">
+		<text>IL 86</text>
+	</string>
+	<string id="st_wpn_lr300">
+		<text>TRs 301</text>
+	</string>
+	<string id="st_wpn_mp5">
+		<text>Viper 5</text>
+	</string>
+	<string id="st_wpn_mp5_descr">
+		<text>Questo mitragliatore и apprezzato a livello mondiale per la facilitа d'uso, l'affidabilitа e la precisione. Negli ultimi decenni il Viper 5 и stato utilizzato dalle forze armate speciali e dalle unitа di polizia di tutto il mondo. Per questo motivo ha letteralmente invaso i mercati neri, arrivando in seguito anche nella Zona.</text>
+	</string>
+	<string id="st_wpn_mp5_nimble">
+		<text>Frasier</text>
+	</string>
+	<string id="st_wpn_mp5_nimble_descr">
+		<text>Un mitragliatore sperimentale basato sull'eccellente modello Viper 5. Progettato per essere un'arma da battaglia a corto raggio di nuova generazione, si distingue per il grosso calibro, la cadenza di fuoco e la precisione.</text>
+	</string>
+	<string id="st_wpn_pb">
+		<text>PB-1s</text>
+	</string>
+	<string id="st_wpn_pkm_zulus">
+		<text>RP-74 di Zulu</text>
+	</string>
+	<string id="st_wpn_pkm_zulus_descr">
+		<text>Quest'arma apparteneva a Zulu. Presenta diverse caratteristiche speciali, come il caricatore piщ capiente e un meccanismo di estrazione particolarmente affidabile. Le varie modifiche hanno aumentato il peso dell'arma, ma questo non era un problema per il precedente proprietario.</text>
+	</string>
+	<string id="st_wpn_pm">
+		<text>PMm</text>
+	</string>
+	<string id="st_wpn_pm_actor">
+		<text>PMm onoraria</text>
+	</string>
+	<string id="st_wpn_pm_actor_descr">
+		<text>Un'antica PMm ricevuta da Degtyarev come ricompensa per la "perfetta esecuzione di ordini di stato estremamente rischiosi, e per il valore e il coraggio dimostrati in servizio".</text>
+	</string>
+	<string id="st_wpn_protecta">
+		<text>Eliminatore</text>
+	</string>
+	<string id="st_wpn_rg6">
+		<text>Bulldog-6</text>
+	</string>
+	<string id="st_wpn_rg6_descr">
+		<text>Questo lanciagranate a revolver utilizza sei canne scanalate a carica frontale, identiche a quelle montate sotto la canna dei fucili. Anche il tamburo и a carica frontale. Il Bulldog-6 viene usato per neutralizzare rapidamente le postazioni nemiche e, in campo aperto, per attaccare bersagli fissi ben difesi o combattere mostri particolarmente forti.</text>
+	</string>
+	<string id="st_wpn_rp">
+		<text>RP-74</text>
+	</string>
+	<string id="st_wpn_rp_descr">
+		<text>Questo mitragliatore a nastro и una versione portatile con un complesso sistema di ricarica a due fasi. Nonostante il peso e la scarsa precisione, puт vantare molti estimatori nella Zona. Viene usato prevalentemente per respingere folti gruppi di nemici durante i conflitti tra fazioni e per ripulire le tane dei mutanti.</text>
+	</string>
+	<string id="st_wpn_rpg7">
+		<text>RPG-7u</text>
+	</string>
+	<string id="st_wpn_sig220">
+		<text>SIP-t M200</text>
+	</string>
+	<string id="st_wpn_sig220_nimble">
+		<text>Alpina</text>
+	</string>
+	<string id="st_wpn_sig220_nimble_descr">
+		<text>Un modello unico della pistola SIP-t M200, parte di un'edizione limitata progettata per un'unitа speciale non meglio identificata. Questo modello offre un caricatore piщ capiente, una canna d'acciaio ad alta durabilitа e un corpo polimerico ultradurevole.</text>
+	</string>
+	<string id="st_wpn_sig550">
+		<text>SGI-5k</text>
+	</string>
+	<string id="st_wpn_sig550_descr">
+		<text>Un fucile d'assalto relativamente recente che si и conquistato molti ammiratori in tutto il mondo, malgrado il suo aspetto un po' anonimo. Le armi di questa serie sono tra le migliori della loro classe, celebri per l'affidabilitа, la precisione e la facilitа d'uso. Nonostante sia piuttosto difficile da reperire nella Zona, spesso questo fucile d'assalto viene ordinato dagli stalker piщ esperti a prezzi molto elevati.</text>
+	</string>
+	<string id="st_wpn_sig550_strelok">
+		<text>SGI-5k di Strelok</text>
+	</string>
+	<string id="st_wpn_sig550_strelok_descr">
+		<text>Un fucile d'assalto SGI-5k di fabbricazione svizzera. Pur essendo tutt'altro che nuovo, и evidente che il precedente proprietario l'ha curato con la massima attenzione. L'arma и stata smontata e rimontata, calibrando ogni singolo componente e aumentando di conseguenza la capacitа d'arresto. Nel calcio dell'arma и stata incisa la lettera "S", e si possono notare anche 16 piccole tacche.</text>
+	</string>
+	<string id="st_wpn_spas12">
+		<text>SPSA-14 </text>
+	</string>
+	<string id="st_wpn_spas12_m2">
+		<text>SPSA-AUT</text>
+	</string>
+	<string id="st_wpn_spas12_m2_descr">
+		<text>La doppietta SPSA-AUT semi-automatica viene prodotta solo nelle officine della Duty, ed и l'ideale per combattere gruppi numerosi di mutanti. Il suo meccanismo di ricarica migliorato assicura un'elevata cadenza di fuoco, mentre la capienza del caricatore и stata aumentata a 10 colpi. Utilizza munizioni calibro 12x70.</text>
+	</string>
+	<string id="st_wpn_spas12_nimble">
+		<text>Fuciliere</text>
+	</string>
+	<string id="st_wpn_spas12_nimble_descr">
+		<text>Una doppietta militare progettata specificamente per le unitа d'assalto. Possiede una modalitа di fuoco automatico come la doppietta SPSA-AUT, il suo diretto predecessore, ma fornisce una migliore compensazione del rinculo grazie a un sofisticato sistema anti-urto.</text>
+	</string>
+	<string id="st_wpn_svd">
+		<text>SVDm-2</text>
+	</string>
+	<string id="st_wpn_svd_descr">
+		<text>Un fucile da cecchino militare sul mercato da oltre 50 anni e noto per l'eccezionale affidabilitа e facilitа d'uso. In genere l'SVDm-2 viene impiegato dai militari per aumentare la gittata effettiva delle unitа in campo. Gli stalker, tuttavia, apprezzano quest'arma soprattutto per le sue capacitа perforanti, che consentono di penetrare la pelle dei mutanti e le armature militari.</text>
+	</string>
+	<string id="st_wpn_svd_nimble">
+		<text>Lince</text>
+	</string>
+	<string id="st_wpn_svd_nimble_descr">
+		<text>Una versione artigianale del fucile da cecchino SVDm-2. Apparentemente identico all'originale, fornisce la stessa combinazione ideale tra precisione e capacitа d'arresto.</text>
+	</string>
+	<string id="st_wpn_svu">
+		<text>SVUmk-2</text>
+	</string>
+	<string id="st_wpn_svu_nimble">
+		<text>SVU2-A</text>
+	</string>
+	<string id="st_wpn_svu_nimble_descr">
+		<text>Un fucile da cecchino accorciato e dalla notevole cadenza di fuoco, evoluzione del fucile SVUmk-2. Quest'arma apparteneva a Max, il leggendario guardiano della Freedom.</text>
+	</string>
+	<string id="st_wpn_toz34">
+		<text>Doppietta da caccia</text>
+	</string>
+	<string id="st_wpn_toz34_descr">
+		<text>Una normalissima doppietta da caccia che puт dimostrarsi piщ efficace contro i mutanti rispetto a una pistola, grazie ai suoi valori di precisione e capacitа d'arresto. Utilizzata soprattutto dai principianti ai margini della Zona.</text>
+	</string>
+	<string id="st_wpn_umirotvoritel">
+		<text>Arma non identificata</text>
+	</string>
+	<string id="st_wpn_umirotvoritel_descr">
+		<text>Un'arma sconosciuta con un meccanismo di fuoco non identificato. Potrebbe essere rotta, visto che la pressione del grilletto non produce alcun risultato.</text>
+	</string>
+	<string id="st_wpn_usp">
+		<text>UDP Compact</text>
+	</string>
+	<string id="st_wpn_usp_descr">
+		<text>I valori impeccabili di affidabilitа e durabilitа, oltre all'eccellente precisione, sono le caratteristiche principali di quest'arma. Presenta tuttavia alcuni difetti minori, come le dimensioni considerevoli, il baricentro relativamente alto e l'otturatore enorme, difetti che rendono l'arma difficile da nascondere ma che non riescono a oscurare i suoi tanti pregi. L'UDP Compact и molto popolare soprattutto tra i veterani della Zona.</text>
+	</string>
+	<string id="st_wpn_usp_nimble">
+		<text>Marcia</text>
+	</string>
+	<string id="st_wpn_usp_nimble_descr">
+		<text>Una pistola compatta a grosso calibro con l'otturatore a movimento breve e un meccanismo di scatto leggero. Apparteneva a un mercenario chiamato Wolfhound. Sembra una pistola UDP Compact modificata.</text>
+	</string>
+	<string id="st_wpn_val">
+		<text>SA "Valanga"</text>
+	</string>
+	<string id="st_wpn_vintorez">
+		<text>Vintar BC </text>
+	</string>
+	<string id="st_wpn_vintorez_descr">
+		<text>Un fucile da cecchino speciale progettato per garantire la massima furtivitа durante le operazioni in cui la posizione delle forze in campo non deve essere rivelata al nemico. Il Vintar BC garantisce un'elevata capacitа d'arresto e di perforazione, ed и equipaggiato con un mirino ottico integrato. Apprezzato da moltissimi stalker, nonostante il caricatore poco capiente.</text>
+	</string>
+	<string id="st_wpn_vintorez_nimble">
+		<text>Marea</text>
+	</string>
+	<string id="st_wpn_vintorez_nimble_descr">
+		<text>Un'arma progettata per le unitа militari sulla base del fucile da cecchino silenzioso. La sua capacitа d'arresto и superiore a quella del Vintar BC, il diretto predecessore, a scapito perт della cadenza di fuoco. Consente di eliminare le forze nemiche, un'unitа alla volta, senza rivelare la posizione dell'utilizzatore.</text>
+	</string>
+	<string id="st_wpn_walther">
+		<text>Walker P9m</text>
+	</string>
+	<string id="st_wpn_wincheaster1300">
+		<text>Chaser 13</text>
+	</string>
+	<string id="st_wpn_wincheaster1300_descr">
+		<text>Una doppietta occidentale ad anima liscia, estremamente popolare in tutto il mondo per l'eccellente affidabilitа e l'ottima velocitа di ricarica. La sua funzionalitа и particolarmente apprezzata dai cacciatori della Zona. Tutti i suoi componenti sono trattati con un composto anti-corrosione.</text>
+	</string>
+	<string id="st_wpn_wincheaster1300_trapper">
+		<text>Predatore</text>
+	</string>
+	<string id="st_wpn_wincheaster1300_trapper_descr">
+		<text>Una doppietta a pompa personalizzata che apparteneva a Trapper, un cacciatore che aveva solo bisogno di un'arma in grado di uccidere i predatori con un singolo colpo. Secondo lui, infatti, anche gli animali considerati piщ feroci e pericolosi hanno il diritto di morire senza soffrire.</text>
+	</string>
+	<string id="ammo-gauss_cardan">
+		<text>Batterie fatte in casa.</text>
+	</string>
+	<string id="st_addon_scope_susat_custom">
+		<text>Mirino SUSAT tipo Mera</text>
+	</string>
+	<string id="st_wpn_abakan_descr">
+		<text>Un fucile d'assalto moderno sviluppato per sostituire l'AKM 74/2. La differenza principale и la modalitа di fuoco rapido a 2 colpi, che consente di sparare due proiettili verso la stessa zona del bersaglio a una distanza di 100 metri. Ciт aumenta nettamente la probabilitа di colpire il bersaglio rispetto alla modalitа a colpo singolo, incrementando di conseguenza la letalitа dell'arma, la capacitа d'arresto e il potenziale di perforamento.</text>
+	</string>
+	<string id="st_wpn_ak74_descr">
+		<text>Quest'arma, progettata nel 1974, introdusse le munizioni a piccolo calibro e impulso ridotto nei paesi del Patto di Varsavia. Successore del fucile piщ famoso al mondo, l'AKM-74/2, possiede un freno di bocca piщ grande, che riduce un rinculo giа relativamente gestibile. Ciт aumenta precisione e facilitа dei colpi multipli, specialmente con raffiche o colpi singoli rapidi. Questo fucile и semplice e affidabile come il suo predecessore.</text>
+	</string>
+	<string id="st_wpn_ak74u_descr">
+		<text>Pur simile ai mitragliatori per peso e dimensioni, nonchй per l'uso tattico, quest'arma и un fucile d'assalto per via del suo meccanismo, uguale a quello dell'AKM-74/2. Viene apprezzato per la mobilitа nei combattimenti ravvicinati e la capacitа penetrante. I suoi difetti, invece, sono il raggio d'effetto ridotto (anche se la gittata и relativamente lunga), la tendenza a surriscaldarsi durante le raffiche e l'elevata probabilitа di rimbalzo.</text>
+	</string>
+	<string id="st_wpn_colt1911_descr">
+		<text>Una versione migliorata dell'arma automatica che ha superato con successo i maggiori conflitti armati del 20° secolo ed и entrata con decisione nel nuovo millennio. Centinaia di aziende di tutto il mondo continuano a produrre l'arma originale e le sue varie modifiche. L'unico difetto, vale a dire la scarsa capienza del caricatore, и ampiamente compensato dall'estrema potenza delle munizioni utilizzate.</text>
+	</string>
+	<string id="st_wpn_eagle_descr">
+		<text>La pistola definitiva: grossa, pesante e incredibilmente letale. И stata progettata come arma speciale per la caccia di prede medio-grandi e per le gare di tiro con bersagli d'acciaio posizionati a piщ di 50 metri di distanza. La sua scarsa diffusione nella Zona puт essere dovuta al prezzo elevato, alle sue dimensioni e al peso eccessivo rispetto alle altre pistole disponibili. И un'arma che non passa certo inosservata.</text>
+	</string>
+	<string id="st_wpn_fn2000_descr">
+		<text>Quest'arma di tipo "bullpup" e dall'aspetto futuristico и in realtа un sistema modulare prodotto in massa. Include un fucile, un sistema di controllo del fuoco computerizzato e un lanciagranate 40 mm. Nonostante il suo aspetto ingombrante, и un'arma molto ergonomica, facile da usare e con ottime caratteristiche tattiche. Nella Zona non ha ancora raggiunto la popolaritа che merita per via del prezzo elevato e la scarsa reperibilitа.</text>
+	</string>
+	<string id="st_wpn_fort_descr">
+		<text>Una pistola di fabbricazione ucraina utilizzata dalle forze di sicurezza. Presenta una maggiore precisione, una migliore ergonomia e un caricatore piщ capiente rispetto alla PMm. И molto diffusa nella Zona in seguito alla vendita di numerose partite di armi difettose, che presentano gli stessi errori tecnici dei primi modelli sviluppati. Ciononostante, la pistola и apprezzata dagli stalker per via delle sue buone prestazioni in battaglia.</text>
+	</string>
+	<string id="st_wpn_g36_descr">
+		<text>Una nuova aggiunta alla famiglia dei fucili d'assalto occidentali. И sensibilmente diverso dai precedenti modelli della serie, fondamentalmente automatici e con un meccanismo di scatto semi-aperto, somigliante da vicino ai fucili d'assalto automatici a recupero di gas di fabbricazione americana con pistoni a corsa breve. Queste modifiche rendono il GP37 un perfetto esempio di arma moderna: leggera, affidabile ed ergonomica.</text>
+	</string>
+	<string id="st_wpn_l85_descr">
+		<text>Il numero considerevole di difetti di questo fucile ha richiesto la modernizzazione dell'arma, mentre le serie ritirate dal mercato sono finite sul mercato nero della Zona. I principali vantaggi del fucile sono il mirino integrato 4.0x, l'elevata precisione a colpo singolo e la possibilitа di modifica. Durante le raffiche prolungate, la precisione cala sensibilmente e i principali meccanismi interni diventano piuttosto inaffidabili.</text>
+	</string>
+	<string id="st_wpn_lr300_descr">
+		<text>Un nuovo passo in avanti in questa celebre famiglia di armi americane. Sono state apportate modifiche alla metа superiore della struttura in acciaio che comprende la canna, la camera del gas e il meccanismo di scatto, in modo da ridurre il peso dell'arma e migliorare sia l'ergonomia sia il sistema a gas. И un'arma molto precisa, anche se la sua propensione a sporcarsi non la rende ideale alle condizioni difficili della Zona.</text>
+	</string>
+	<string id="st_wpn_pb_descr">
+		<text>Pistola sviluppata nella seconda metа del 20° secolo sulla base del modello PMm per l'uso da parte di forze speciali e unitа da ricognizione. La parte anteriore della canna и coperta dal silenziatore, mentre il meccanismo di scatto и troppo corto perchй vi sia spazio per la molla di ritorno, che и posizionata nell'impugnatura della pistola. Ormai obsoleta, la PB-1s rimane efficace nelle mani giuste.</text>
+	</string>
+	<string id="st_wpn_pm_descr">
+		<text>Questo cimelio sovietico и la pistola piщ comune nella Zona e una delle migliori armi compatte in assoluto. И piccola, molto affidabile e facile da usare e mantenere. Presenta tuttavia numerosi difetti come la gittata limitata, la scarsa precisione dei colpi e la ridotta capacitа d'arresto. Inoltre, rispetto ai suoi equivalenti moderni, и piuttosto pesante e possiede un caricatore poco capiente.</text>
+	</string>
+	<string id="st_wpn_protecta_descr">
+		<text>Una doppietta da battaglia a revolver con anima liscia, progettata per fornire alle unitа militari un'eccellente potenza di fuoco unita a un'elevata cadenza di tiro e una grande capienza del caricatore. Il suo ingombro e il peso considerevole, tuttavia, oltre al lungo tempo di ricarica, sono difetti da tenere in considerazione. Non molto diffusa nella Zona, viene usata principalmente per neutralizzare i mutanti negli spazi chiusi.</text>
+	</string>
+	<string id="st_wpn_rpg7_descr">
+		<text>Lanciagranate degli anni '60, giunto nella Zona dai depositi di armi. L'arma и un sistema di lancio privo di rinculo, a colpo singolo e con un tubo di lancio aperto sul retro. Include un mirino PGO-7 2.7x. Le dimensioni e il peso notevoli costituiscono un difetto, ma nella Zona molti apprezzano il suo potenziale distruttivo, la semplicitа della sua struttura e la relativa facilitа d'uso.</text>
+	</string>
+	<string id="st_wpn_sig220_descr">
+		<text>Unico modello ancora prodotto di una pistola conosciuta ovunque, и nota per l'eccellente ergonomia e la precisione. Nonostante il caricatore sia poco capiente, il meccanismo dell'arma и infallibile. Un altro vantaggio и la potenza delle munizioni utilizzate. Secondo alcuni, il SIP-t M200 и il miglior modello di pistola calibro .45 ACP prodotto in massa, e anche gli stalker e i mercenari piщ esperti sembrano apprezzare le sue caratteristiche.</text>
+	</string>
+	<string id="st_wpn_spas12_descr">
+		<text>Una doppietta automatica speciale ad anima liscia progettata nella seconda metа del 20° secolo, con un meccanismo di fuoco a pompa semi-automatico. Viene utilizzata come arma multiuso dai corpi di polizia e dalle truppe d'assalto. Pur essendo molto affidabile e versatile, и anche un'arma pesante, complessa e costosa, ma questo non ha impedito la sua diffusione nella Zona grazie alla sua efficacia contro i mutanti.</text>
+	</string>
+	<string id="st_wpn_svu_descr">
+		<text>Una versione aggiornata del fucile da cecchino SVDm-2 con un design "bullpup" piщ compatto, progettata per le forze di intervento rapido. И un fucile da cecchino che consente di sparare piщ rapidamente e notevolmente piщ leggero, mentre la precisione in modalitа colpo singolo a medio-lungo raggio и simile a quella del suo predecessore. Grazie a queste qualitа, si и conquistato l'ammirazione di moltissimi stalker.</text>
+	</string>
+	<string id="st_wpn_val_descr">
+		<text>Versione modificata del fucile da cecchino Vintar BC, questo fucile d'assalto и un'arma per le forze speciali. La sua funzione primaria и l'eliminazione di nemici che utilizzano equipaggiamento protettivo avanzato senza rivelare la posizione di chi sta sparando. Grazie alle sue munizioni pesanti subsoniche calibro 9x39 e al silenziatore integrato, il rumore e la fiammata emessa dalla bocca dell'arma sono stati ridotti al minimo.</text>
+	</string>
+	<string id="st_wpn_gauss_descr">
+		<text>Un'arma tecnologica conosciuta come oggetto 62, questo fucile fu sviluppato nei laboratori segreti all'interno della Zona. L'arma, molto precisa, accelera i proiettili ad altissime velocitа tramite un sistema di elettromagneti che forniscono un'incredibile potenza di arresto senza pressochй alcun rinculo. L'arma и potenziata dall'uso di frammenti di manufatti incapsulati nelle batterie.</text>
+	</string>
+	<string id="st_wpn_beretta_descr">
+		<text>Le pistole Martha sono famose per essere relativamente affidabili, anche se ingombranti. Sono in dotazione alle forze armate e di polizia d'oltreoceano e vengono usate anche da eserciti e organizzazioni di sicurezza in tutto il mondo. La pistola Martha и diffusa anche nella criminalitа, grazie a potenza e capienza del caricatore. Di solito le Martha della Zona sono molto datate, forse perchй provenienti da serie ritirate dal mercato.</text>
+	</string>
+	<string id="st_wpn_walther_descr">
+		<text>Un'eccellente pistola occidentale nota per l'affidabilitа, la grande capienza del caricatore e l'ottima precisione. Inoltre, и considerata la pistola piщ ergonomica della sua classe. La Walker P9m и una delle pistole piщ diffuse nella Zona, ma solo tra i principianti o i professionisti che possono permettersela.</text>
+	</string>
+	<string id="ammo-gauss_descr">
+		<text>Batterie che utilizzano un frammento capsulato del manufatto Lampo come fonte d'alimentazione. Prodotte utilizzando attrezzature a elevata tecnologia.</text>
+	</string>
+	<string id="ammo-gauss_cardan_descr">
+		<text>Queste cellule a bassa capacitа usano frammenti capsulati del manufatto Lampo come fonte energetica. La loro bassa capacitа и dovuta alle condizioni improvvisate in cui sono state realizzate e alla mancanza di attrezzatura specialistica.</text>
+	</string>
+</string_table>

@@ -1,0 +1,20 @@
+----------------------------------------------------------------------------------------------------------------------
+-- Класс CZoneNoWeapon. При входе игрока в зону, у него убирается оружие. При выходе - достается
+----------------------------------------------------------------------------------------------------------------------
+
+class "CZoneNoWeapon"
+
+function CZoneNoWeapon:__init( zone, binder, ini )
+	-- Если уже есть актер и он в зоне, то убираем оружие
+	if binder.actor_inside then
+		db.actor:hide_weapon()
+	end
+end
+
+function CZoneNoWeapon:on_enter( actor )
+	actor:hide_weapon()
+end
+
+function CZoneNoWeapon:on_leave( actor )
+	actor:restore_weapon()
+end

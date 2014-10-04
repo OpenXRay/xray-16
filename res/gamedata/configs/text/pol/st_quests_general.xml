@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="hide_from_surge_message">
+		<text>Uwaga! Emisja rozpocznie siк za:</text>
+	</string>
+	<string id="hide_from_surge_descr_1_a">
+		<text>Musisz natychmiast biec do najbliїszego schronienia i ukryж siк przed emisj№.</text>
+	</string>
+	<string id="hide_from_surge_descr_2_a">
+		<text>Nie moїesz wychodziж ze schronienia w trakcie emisji.</text>
+	</string>
+	<string id="hide_from_surge_name_1">
+		<text>Emisja: znajdџ schronienie</text>
+	</string>
+	<string id="hide_from_surge_name_2">
+		<text>Emisja: czekaj w schronieniu</text>
+	</string>
+</string_table>

@@ -1,0 +1,22 @@
+[logic]
+active = ph_button@wait
+
+[ph_button@wait]
+anim_blend = true
+anim = idle_close
+on_info = {+zat_b38_open_info} ph_button@open %=play_sound(zat_b38_electro_box_door)%
+
+[ph_button@open]
+anim_blend = true
+anim = idle_open_off
+on_info = {+zat_b38_switch_info} ph_button@switch %=play_sound(zat_b38_electro_box_switch)%
+
+[ph_button@switch]
+anim_blend = true
+anim = switch
+on_timer = 150 | ph_button@turned
+
+[ph_button@turned]
+anim_blend = true
+anim = idle_open_on
+on_game_timer = 30 | {-zat_b38_lift_open} %+zat_b38_lift_open%

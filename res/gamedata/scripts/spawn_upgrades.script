@@ -1,0 +1,126 @@
+function main ()
+local items_table = {
+wpn_pm = 2,
+wpn_pb = 2,
+wpn_fort = 2,
+
+wpn_hpsa = 2,
+wpn_beretta = 2,
+wpn_walther = 2,
+wpn_colt1911 = 2,
+
+wpn_usp = 2,
+wpn_sig220 = 2,
+wpn_desert_eagle = 2,
+
+wpn_bm16 = 2,
+wpn_toz34 = 2,
+wpn_wincheaster1300 = 2,
+wpn_spas12 = 2,
+wpn_protecta = 2,
+
+wpn_mp5 = 2,
+
+wpn_ak74u = 2,
+wpn_ak74 = 2,
+wpn_abakan = 2,
+
+wpn_l85 = 2,
+wpn_lr300 = 2,
+wpn_sig550 = 2,
+wpn_fn2000 = 2,
+wpn_g36 = 2,
+
+wpn_val = 2,
+wpn_vintorez = 2,
+wpn_groza = 2,
+
+wpn_svd = 2,
+wpn_svu = 2,
+
+wpn_pkm = 2,
+
+wpn_pm_actor = 2,
+wpn_sig550_luckygun = 2,
+wpn_pkm_zulus = 2,
+wpn_desert_eagle_nimble = 2,
+wpn_groza_nimble = 2,
+wpn_mp5_nimble = 2,
+wpn_sig220_nimble = 2,
+wpn_spas12_nimble = 2,
+wpn_svd_nimble = 2,
+wpn_svu_nimble = 2,
+wpn_usp_nimble = 2,
+wpn_vintorez_nimble = 2,
+wpn_wincheaster1300_trapper = 2,
+wpn_g36_nimble = 2,
+wpn_fn2000_nimble = 2,
+wpn_protecta_nimble = 2,
+wpn_ak74u_snag = 2,
+wpn_fort_snag = 2,
+
+novice_outfit = 2,
+specops_outfit = 2,
+military_outfit = 2,
+stalker_outfit = 2,
+scientific_outfit = 2,
+exo_outfit = 2,
+svoboda_light_outfit = 2,
+svoboda_heavy_outfit = 2,
+cs_heavy_outfit = 2,
+dolg_outfit = 2,
+dolg_heavy_outfit = 2,
+
+helm_battle = 2,
+helm_hardhat = 2,
+helm_protective = 2,
+helm_respirator = 2,
+helm_tactic = 2,
+
+stalker_outfit_barge = 2,
+helm_respirator_joker = 2,
+helm_hardhat_snag = 2,
+
+wpn_addon_scope = 1,
+["wpn_addon_scope_x2.7"] = 1,
+wpn_addon_scope_detector = 1,
+wpn_addon_scope_night = 1,
+["wpn_addon_scope_susat_x1.6"] = 1,
+wpn_addon_scope_susat_dusk = 1,
+wpn_addon_scope_susat_custom = 1,
+wpn_addon_scope_susat_night = 1,
+wpn_addon_scope_susat = 1,
+wpn_addon_silencer = 1,
+wpn_addon_grenade_launcher = 1,
+wpn_addon_grenade_launcher_m203 = 1,
+
+wpn_gauss = 1,
+pri_a17_gauss_rifle = 1,
+toolkit_1 = 1,
+toolkit_2 = 1,
+toolkit_3 = 1,
+vodka = 10,
+					}
+
+	local actor = db.actor
+	local actor_id = actor:id()
+	local actor_position = actor:position()
+
+	local function drop_item(item)
+		if item ~= nil then
+			alife():release(alife():object(item:id()), true)
+		end
+	end
+	
+	db.actor:inventory_for_each(drop_item)
+	
+	if db.actor:money() < 999999 then
+		db.actor:give_money(999999)
+	end
+	
+	for k,v in pairs(items_table) do
+		for j = 1, v do
+			alife():create(k, actor_position, 0, 0, actor_id)
+		end
+	end
+end

@@ -1,0 +1,684 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_chechin">
+		<text>Сергій Чечін</text>
+	</string>
+	<string id="st_abramowicz">
+		<text>Maciej Abramowicz</text>
+	</string>
+	<string id="st_abroyan">
+		<text>Армен Аброян</text>
+	</string>
+	<string id="st_actors">
+		<text>Актори</text>
+	</string>
+	<string id="st_all_qa">
+		<text>Тестери</text>
+	</string>
+	<string id="st_amdati">
+		<text>компанії AMD/ATI</text>
+	</string>
+	<string id="st_androshchuk">
+		<text>Роман Андрощук</text>
+	</string>
+	<string id="st_animator">
+		<text>Аніматор</text>
+	</string>
+	<string id="st_art_department">
+		<text>Відділ графіки</text>
+	</string>
+	<string id="st_art_director">
+		<text>Арт-директор</text>
+	</string>
+	<string id="st_atroshenko">
+		<text>Микита Атрошенко</text>
+	</string>
+	<string id="st_bajorek">
+		<text>Damian Bajorek</text>
+	</string>
+	<string id="st_bastrikin">
+		<text>Михайло Бастрикін</text>
+	</string>
+	<string id="st_bilinski">
+		<text>Kamil Bilinski</text>
+	</string>
+	<string id="st_binkowski">
+		<text>Krzysztof Binkowski</text>
+	</string>
+	<string id="st_bochenek">
+		<text>Arkadiusz Bochenek</text>
+	</string>
+	<string id="st_boggs">
+		<text>Justin Boggs</text>
+	</string>
+	<string id="st_bogush">
+		<text>Анатолій Богуш</text>
+	</string>
+	<string id="st_borowy">
+		<text>Wojciech Borowy</text>
+	</string>
+	<string id="st_burtsau">
+		<text>Stanislaw Burtsau</text>
+	</string>
+	<string id="st_character_models">
+		<text>Моделі персонажів</text>
+	</string>
+	<string id="st_cherevatenko">
+		<text>Олексій Череватенко</text>
+	</string>
+	<string id="st_chrul">
+		<text>Jerzy Chrul</text>
+	</string>
+	<string id="st_ciemny">
+		<text>Wojciech Ciemny</text>
+	</string>
+	<string id="st_composer">
+		<text>Композитор</text>
+	</string>
+	<string id="st_davidian">
+		<text>Дмитро «Abe» Давидян</text>
+	</string>
+	<string id="st_davies">
+		<text>Aaron Davies</text>
+	</string>
+	<string id="st_demidenko">
+		<text>Олександр Демиденко</text>
+	</string>
+	<string id="st_dep_programmers">
+		<text>Відділ</text>
+	</string>
+	<string id="st_dep_programmers1">
+		<text>програмування</text>
+	</string>
+	<string id="st_derewonko">
+		<text>Lukasz Derewonko</text>
+	</string>
+	<string id="st_didenko">
+		<text>Руслан Діденко</text>
+	</string>
+	<string id="st_doroshenko">
+		<text>Юрій Дорошенко</text>
+	</string>
+	<string id="st_dovgoluk">
+		<text>Олена Довгалюк</text>
+	</string>
+	<string id="st_durajczyk">
+		<text>Rafal Durajczyk</text>
+	</string>
+	<string id="st_dushinskiy">
+		<text>Петро Душинський</text>
+	</string>
+	<string id="st_dziarnowski">
+		<text>Maciej Dziarnowski</text>
+	</string>
+	<string id="st_eremenko">
+		<text>Сергій Єрьоменко</text>
+	</string>
+	<string id="st_falchenko">
+		<text>Юрій «Dark» Фальченко</text>
+	</string>
+	<string id="st_gabryel">
+		<text>Jakub Gabryel</text>
+	</string>
+	<string id="st_galach">
+		<text>Cezary Galach</text>
+	</string>
+	<string id="st_gamedesign_department">
+		<text>Відділ геймдизайну</text>
+	</string>
+	<string id="st_gameplay">
+		<text>Програмісти геймплею</text>
+	</string>
+	<string id="st_genega_qa">
+		<text>CENEGA QA</text>
+	</string>
+	<string id="st_genega_thanks">
+		<text>Окрема подяка</text>
+	</string>
+	<string id="st_gerasimov">
+		<text>Филип Герасимов</text>
+	</string>
+	<string id="st_german">
+		<text>Григорій Герман</text>
+	</string>
+	<string id="st_girich">
+		<text>Анжеліка Гирич</text>
+	</string>
+	<string id="st_golubinski">
+		<text>Pawel Golubinski</text>
+	</string>
+	<string id="st_gorniak">
+		<text>Marcin Gorniak</text>
+	</string>
+	<string id="st_goscicki">
+		<text>Tomasz Goscicki</text>
+	</string>
+	<string id="st_graphics">
+		<text>Програмісти графіки</text>
+	</string>
+	<string id="st_grun">
+		<text>Holger Grun</text>
+	</string>
+	<string id="st_grzywaczewski">
+		<text>Pawel Grzywaczewski</text>
+	</string>
+	<string id="st_gsc">
+		<text>Сергій Григорович</text>
+	</string>
+	<string id="st_gutowski">
+		<text>Marcin Gutowski</text>
+	</string>
+	<string id="st_iassenev">
+		<text>Дмитро Ясєнєв</text>
+	</string>
+	<string id="st_intel">
+		<text>компанії Intel</text>
+	</string>
+	<string id="st_ivancov">
+		<text>Сергій Іванцов</text>
+	</string>
+	<string id="st_jankowski">
+		<text>Norbert Jankowski</text>
+	</string>
+	<string id="st_kachanuyk">
+		<text>Олександр Качанюк</text>
+	</string>
+	<string id="st_kalita">
+		<text>Дмитро Калита</text>
+	</string>
+	<string id="st_keska">
+		<text>Aleksander Keska</text>
+	</string>
+	<string id="st_kirienko">
+		<text>Андрій «Darin» Кириєнко</text>
+	</string>
+	<string id="st_kobylanski">
+		<text>Lukasz Kobylanski</text>
+	</string>
+	<string id="st_kolomiech">
+		<text>Андрій Коломієць</text>
+	</string>
+	<string id="st_komorek">
+		<text>Artur Komorek</text>
+	</string>
+	<string id="st_konstantinov">
+		<text>Юрій Костянтинов</text>
+	</string>
+	<string id="st_kotolovskaya">
+		<text>Марія Котоловська</text>
+	</string>
+	<string id="st_kovach">
+		<text>Олександр Ковач</text>
+	</string>
+	<string id="st_koval">
+		<text>Кирило Коваль</text>
+	</string>
+	<string id="st_krivchenko">
+		<text>Ірина Кривчикова</text>
+	</string>
+	<string id="st_krivets">
+		<text>Дмитро Кривець</text>
+	</string>
+	<string id="st_kuchma">
+		<text>Євген Кучма</text>
+	</string>
+	<string id="st_kudrya">
+		<text>Світлана Кудря</text>
+	</string>
+	<string id="st_kurbatov">
+		<text>Сергій Курбатов</text>
+	</string>
+	<string id="st_kuzhel">
+		<text>Ольга Кужель</text>
+	</string>
+	<string id="st_kuzmenko">
+		<text>Дмитро Кузьменко</text>
+	</string>
+	<string id="st_kuznecov">
+		<text>Олексій Кузнєцов</text>
+	</string>
+	<string id="st_kuznecov1">
+		<text>Олег Кузнєцов</text>
+	</string>
+	<string id="st_lazarski">
+		<text>Szymon Lazarski</text>
+	</string>
+	<string id="st_lead_animator">
+		<text>Провідний аніматор</text>
+	</string>
+	<string id="st_lead_artist">
+		<text>Провідний художник</text>
+	</string>
+	<string id="st_lead_game_designer">
+		<text>Провідний геймдизайнер</text>
+	</string>
+	<string id="st_lead_programmer">
+		<text>Провідний програміст</text>
+	</string>
+	<string id="st_lead_qa">
+		<text>Провідні тестери</text>
+	</string>
+	<string id="st_lead_specialist">
+		<text>Провідні спеціалісти</text>
+	</string>
+	<string id="st_level_design">
+		<text>Дизайн рівнів</text>
+	</string>
+	<string id="st_lit_editor">
+		<text>Робота над текстами</text>
+	</string>
+	<string id="st_litvinenko">
+		<text>Володимир «Fiachna» Литвиненко</text>
+	</string>
+	<string id="st_lundgren">
+		<text>Eric Lundgren</text>
+	</string>
+	<string id="st_maistrenko">
+		<text>Сергій Майстренко</text>
+	</string>
+	<string id="st_makedon">
+		<text>Дмитро Македон</text>
+	</string>
+	<string id="st_malinkin">
+		<text>Роман Малінкін</text>
+	</string>
+	<string id="st_manager_qa">
+		<text>Менеджери проекту</text>
+	</string>
+	<string id="st_manilyuk">
+		<text>Александр Манилюк</text>
+	</string>
+	<string id="st_mankowski">
+		<text>Daniel Mankowski</text>
+	</string>
+	<string id="st_matveenko">
+		<text>Денис Матвієнко</text>
+	</string>
+	<string id="st_mazurek">
+		<text>Maciej Mazurek</text>
+	</string>
+	<string id="st_mazurkiewicz">
+		<text>Piotr Mazurkiewicz</text>
+	</string>
+	<string id="st_mcphee">
+		<text>Darren McPhee</text>
+	</string>
+	<string id="st_melnikov">
+		<text>Ігор Мельников</text>
+	</string>
+	<string id="st_merkulov">
+		<text>Віктор Меркулов</text>
+	</string>
+	<string id="st_mielnik">
+		<text>Damian Mielnik</text>
+	</string>
+	<string id="st_mikhailov">
+		<text>Павло Михайлов</text>
+	</string>
+	<string id="st_mironov">
+		<text>Костянтин Миронов</text>
+	</string>
+	<string id="st_mocap">
+		<text>Величезна подяка Олегові Фоменку</text>
+	</string>
+	<string id="st_mocap1">
+		<text>та компанії «BuntarMedia»</text>
+	</string>
+	<string id="st_mocap3">
+		<text>за консультації щодо MOCAP</text>
+	</string>
+	<string id="st_mopev">
+		<text>Володимир Морєв</text>
+	</string>
+	<string id="st_moroz">
+		<text>Андрій Мороз</text>
+	</string>
+	<string id="st_mrozowski">
+		<text>Dawid Mrozowski</text>
+	</string>
+	<string id="st_negrobov">
+		<text>Юрий Негробов</text>
+	</string>
+	<string id="st_network">
+		<text>Програміст гри в мережі</text>
+	</string>
+	<string id="st_nvidia">
+		<text>компанії nVidia</text>
+	</string>
+	<string id="st_omelchuk">
+		<text>Олексій Омельчук</text>
+	</string>
+	<string id="st_osinski">
+		<text>Lukasz Osinski</text>
+	</string>
+	<string id="st_parphenyuk">
+		<text>Михайло Парфенюк</text>
+	</string>
+	<string id="st_pashin">
+		<text>Євген Пашин</text>
+	</string>
+	<string id="st_pasichniy">
+		<text>Ігор Пасічний</text>
+	</string>
+	<string id="st_peas">
+		<text>Bartosz Peas</text>
+	</string>
+	<string id="st_physic">
+		<text>Програміст фізики</text>
+	</string>
+	<string id="st_piotrowski">
+		<text>Jacek Piotrowski</text>
+	</string>
+	<string id="st_plichko">
+		<text>Олександр Плічко</text>
+	</string>
+	<string id="st_pr_department">
+		<text>Відділ PR</text>
+	</string>
+	<string id="st_pr_director">
+		<text>Директор PR</text>
+	</string>
+	<string id="st_pr_manager">
+		<text>Менеджери PR</text>
+	</string>
+	<string id="st_prishepa">
+		<text>Сергій Прищепа</text>
+	</string>
+	<string id="st_producer">
+		<text>Продюсер</text>
+	</string>
+	<string id="st_project_lead">
+		<text>Керівник проекту</text>
+	</string>
+	<string id="st_qa_department">
+		<text>Тестування</text>
+	</string>
+	<string id="st_ravin">
+		<text>Антон Равін</text>
+	</string>
+	<string id="st_rejent">
+		<text>Sebastian Rejent</text>
+	</string>
+	<string id="st_rekorajski">
+		<text>Mateusz Rekorajski</text>
+	</string>
+	<string id="st_resiak">
+		<text>Filip Resiak</text>
+	</string>
+	<string id="st_ross">
+		<text>Peter Ross</text>
+	</string>
+	<string id="st_rozin">
+		<text>Іван Розін</text>
+	</string>
+	<string id="st_ruminski">
+		<text>Lukasz Ruminski</text>
+	</string>
+	<string id="st_rutkovskiy">
+		<text>Денис Рутковський</text>
+	</string>
+	<string id="st_rynkowski">
+		<text>Lukasz Rynkowski</text>
+	</string>
+	<string id="st_sales_department">
+		<text>Менеджер із розвитку бізнесу</text>
+	</string>
+	<string id="st_samborowski">
+		<text>Piotr Samborowski</text>
+	</string>
+	<string id="st_shapunova">
+		<text>Марія Шапунова</text>
+	</string>
+	<string id="st_shelest">
+		<text>Сергій Шелест</text>
+	</string>
+	<string id="st_sidorenko">
+		<text>Ігор Сидоренко</text>
+	</string>
+	<string id="st_sitkiewicz">
+		<text>Mikolaj Sitkiewicz</text>
+	</string>
+	<string id="st_skripal">
+		<text>Юрій Скрипаль</text>
+	</string>
+	<string id="st_slipchenko">
+		<text>Костянтин Сліпченко</text>
+	</string>
+	<string id="st_sobotka">
+		<text>Tomasz Sobotka</text>
+	</string>
+	<string id="st_sound_producer">
+		<text>Звукорежисер</text>
+	</string>
+	<string id="st_special_thanks">
+		<text>Окрема</text>
+	</string>
+	<string id="st_special_thanks1">
+		<text>подяка</text>
+	</string>
+	<string id="st_stalchuk">
+		<text>Олег Стальчук</text>
+	</string>
+	<string id="st_starodub">
+		<text>Людмила Стародуб</text>
+	</string>
+	<string id="st_stavickiy">
+		<text>Володимир Ставицький</text>
+	</string>
+	<string id="st_stempien">
+		<text>Pawel Stempien</text>
+	</string>
+	<string id="st_strzelczyk">
+		<text>Pawel Strzelczyk</text>
+	</string>
+	<string id="st_stuff">
+		<text>Творці гри</text>
+	</string>
+	<string id="st_stupicev">
+		<text>Костянтин Ступівцев</text>
+	</string>
+	<string id="st_support">
+		<text>Служба підтримки</text>
+	</string>
+	<string id="st_support1">
+		<text>користувачів</text>
+	</string>
+	<string id="st_szekalski">
+		<text>Rafal Szekalski</text>
+	</string>
+	<string id="st_szumowski">
+		<text>Maciej Szumowski</text>
+	</string>
+	<string id="st_szwargolinski">
+		<text>Marcin Szwargolinski</text>
+	</string>
+	<string id="st_tereshchyk">
+		<text>Володимир Терещук</text>
+	</string>
+	<string id="st_terlik">
+		<text>Сергій Терлюк</text>
+	</string>
+	<string id="st_textures">
+		<text>Текстури</text>
+	</string>
+	<string id="st_thanks">
+		<text>А також усім, хто допоміг нам</text>
+	</string>
+	<string id="st_thanks1">
+		<text>зробити гру кращою:</text>
+	</string>
+	<string id="st_thanks10">
+		<text>Костянтин Морозков</text>
+	</string>
+	<string id="st_thanks11">
+		<text>Ярослав «Дядько Яр» Олександров</text>
+	</string>
+	<string id="st_thanks12">
+		<text>Дмитро «Командор» Іванов</text>
+	</string>
+	<string id="st_thanks13">
+		<text>Олег Чернов</text>
+	</string>
+	<string id="st_thanks14">
+		<text>иг. Валеріан (Головченко) aka oVal</text>
+	</string>
+	<string id="st_thanks15">
+		<text>М. Бистрикін</text>
+	</string>
+	<string id="st_thanks16">
+		<text>Євген «Mulder» Халецький</text>
+	</string>
+	<string id="st_thanks17">
+		<text>Павло «Goon» Болотов</text>
+	</string>
+	<string id="st_thanks18">
+		<text>Олександр «Leks» Абрамов</text>
+	</string>
+	<string id="st_thanks19">
+		<text>Олександр Новіков</text>
+	</string>
+	<string id="st_thanks2">
+		<text>Олександр Поштарук, Андрій Олешк</text>
+	</string>
+	<string id="st_thanks20">
+		<text>Євген (KRANZ) Гончаренко</text>
+	</string>
+	<string id="st_thanks21">
+		<text>Сергій Двужильний</text>
+	</string>
+	<string id="st_thanks22">
+		<text>Олексій «Don Reba» Бадалов</text>
+	</string>
+	<string id="st_thanks23">
+		<text>Сергій Двужильний, Tolusha</text>
+	</string>
+	<string id="st_thanks24">
+		<text>Артем «BAC9-FLCL» Зуєв</text>
+	</string>
+	<string id="st_thanks25">
+		<text>Glot, Patriot, Mers</text>
+	</string>
+	<string id="st_thanks26">
+		<text>Tiger, Demesis, Kharon, Moby</text>
+	</string>
+	<string id="st_thanks3">
+		<text>Олександр Олійник</text>
+	</string>
+	<string id="st_thanks4">
+		<text>Костянтин «Инквизитор» Крючков</text>
+	</string>
+	<string id="st_thanks5">
+		<text>Олександр Шаховський, Ігор Долженко</text>
+	</string>
+	<string id="st_thanks6">
+		<text>Сергій «Тур» Лещенко</text>
+	</string>
+	<string id="st_thanks7">
+		<text>Дмитро «Hill» Горбань</text>
+	</string>
+	<string id="st_thanks8">
+		<text>Михайло Клюєв</text>
+	</string>
+	<string id="st_thanks9">
+		<text>Сергій «Терміт» Волчанов</text>
+	</string>
+	<string id="st_tihomirov">
+		<text>Сергій Тихомиров</text>
+	</string>
+	<string id="st_tolmachev">
+		<text>Ілля Толмачов</text>
+	</string>
+	<string id="st_trudzik">
+		<text>Jakub Trudzik</text>
+	</string>
+	<string id="st_ui_art">
+		<text>Дизайн інтерфейсу</text>
+	</string>
+	<string id="st_uralskiy">
+		<text>Юрій Уральський</text>
+	</string>
+	<string id="st_usupov">
+		<text>Денис «Tetri$Zz» Юсупов</text>
+	</string>
+	<string id="st_vander">
+		<text>RandyJ VanderHeyden</text>
+	</string>
+	<string id="st_vazinskiy">
+		<text>Володимир Важинський</text>
+	</string>
+	<string id="st_verpahovskiy">
+		<text>Андрій Верпаховський</text>
+	</string>
+	<string id="st_vilkov">
+		<text>Олександр Вилков</text>
+	</string>
+	<string id="st_voskolovich">
+		<text>Анастасія Восколович</text>
+	</string>
+	<string id="st_wardziak">
+		<text>Andrzej Wardziak</text>
+	</string>
+	<string id="st_web_programmer">
+		<text>Web-програміст</text>
+	</string>
+	<string id="st_wojcik">
+		<text>Dominik Wojcik</text>
+	</string>
+	<string id="st_wtroba">
+		<text>Lukasz Watroba</text>
+	</string>
+	<string id="st_yablon">
+		<text>Євген Яблонь</text>
+	</string>
+	<string id="st_yacenko">
+		<text>Юрій Яценко</text>
+	</string>
+	<string id="st_yacyk">
+		<text>Євген Яцюк</text>
+	</string>
+	<string id="st_yavorsky">
+		<text>Олег Яворський</text>
+	</string>
+	<string id="st_yeltyshev">
+		<text>Валентин Єлтишев</text>
+	</string>
+	<string id="st_zaitsev">
+		<text>Євген Зайцев</text>
+	</string>
+	<string id="st_zakolukin">
+		<text>Андрій Заколюкін</text>
+	</string>
+	<string id="st_zdziarski">
+		<text>Marek Zdziarski</text>
+	</string>
+	<string id="st_zegarski">
+		<text>Michal Zegarski</text>
+	</string>
+	<string id="st_zmudzki">
+		<text>Albert Zmudzki</text>
+	</string>
+	<string id="st_zorin">
+		<text>Олексій Зорин</text>
+	</string>
+	<string id="st_zukowski">
+		<text>Bartosz Zukowski</text>
+	</string>
+	<string id="st_yuhno">
+		<text>Вікторія «Morrant» Юхно</text>
+	</string>
+	<string id="st_kalintsev">
+		<text>Сергій «ion» Калинцев</text>
+	</string>
+	<string id="st_kulikov">
+		<text>Роман «RVCool» Куликов</text>
+	</string>
+	<string id="st_smirnov">
+		<text>Максим Смирнов</text>
+	</string>
+	<string id="st_alshekhly">
+		<text>Omar Al-Shekhly</text>
+	</string>
+	<string id="st_arhipov">
+		<text>Роман «Marauder» Архіпов</text>
+	</string>
+</string_table>

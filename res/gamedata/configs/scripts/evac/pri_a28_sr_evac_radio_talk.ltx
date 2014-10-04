@@ -1,0 +1,30 @@
+[logic]
+active = sr_idle@wait_for_start
+
+[sr_idle@wait_for_start]
+on_info = {+pri_b305_fifth_cam_end} sr_idle@wait
+
+[sr_idle@wait]
+on_info = {=squad_in_zone(pri_a16_military_squad:pri_a28_sr_evac_radio_talk)} sr_idle@first_sound_play
+on_info2 = {=actor_in_zone(pri_a28_sr_evac_radio_talk)} sr_idle@first_sound_play
+
+[sr_idle@first_sound_play]
+on_info = {=dist_to_actor_le(15)} %=play_sound(pri_a28_evac_com_where_you)%
+on_signal = sound_end | sr_idle@wait_for_answer
+on_game_timer = 300 | %=play_sound(pri_a28_evac_com_where_you)%
+
+[sr_idle@wait_for_answer]
+on_game_timer = 10 | {-pri_a28_evac_com_where_you} %+pri_a28_evac_com_where_you%
+on_info = {+pri_a28_colonel_we_close} sr_idle@timer
+
+[sr_idle@timer]
+on_game_timer = 10 | sr_idle@say_cant_wait
+
+[sr_idle@say_cant_wait]
+on_info = %=play_sound(pri_a28_evac_com_cant_wait)%
+on_signal = sound_end | sr_idle@timer_after
+
+[sr_idle@timer_after]
+on_game_timer = 10 | sr_idle@nil %+pri_a28_evac_com_cant_wait%
+
+[sr_idle@nil]

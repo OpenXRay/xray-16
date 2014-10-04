@@ -1,0 +1,126 @@
+[thunderbolt_common]
+altitude				= 10,20	 			;(10)		altitude in deg (min/max по вертикали)
+delta_longitude			= 30				;(17)		in deg 	(разброс по горизонту)
+min_dist_factor			= 0.94				;(<0.95) 	(расстояние от FAR_PLANE)
+tilt					= 17				;(17)		lightning tilt in deg (15-30) (отклонение молнии от оси)
+second_propability		= 0.5				;(0-1) 		(вероятность появления следующей молнии после этой)
+sky_color				= 0.1				;(0-1) 		(коэффициет сколько прибавится к цвету неба)
+sun_color				= 0.9				;(0-1) 		(коэффициет сколько прибавится к цвету солнца)
+fog_color				= 0.1				;(0-1) 		(коэффициет сколько прибавится к цвету fog)
+
+[thunderbolt_collection_default]
+sect_thunderbolt_00
+sect_thunderbolt_01
+sect_thunderbolt_02
+sect_thunderbolt_03
+
+[thunderbolt_collection_stancia]
+sect_thunderbolt_stancia_00
+sect_thunderbolt_stancia_01
+sect_thunderbolt_stancia_02
+sect_thunderbolt_stancia_03
+
+[sect_thunderbolt_stancia_00]
+lightning_model			= dm\dm_lightning_stancia_01.dm
+color_anim				= weathers\thunderbolt_00	; отыгрывается вся последовательность, независимо от FPS and FrameCount
+sound					= anomaly\stancia_thunder
+gradient_top_opacity   	= 0.75
+gradient_top_radius     = 2.500, 1.250
+gradient_top_texture    = pfx\pfx_anomaly_8
+gradient_top_shader    	= effects\sun
+gradient_center_opacity = 1
+gradient_center_radius  = 2.000, 1.000
+gradient_center_texture = fx\fx_gradient
+gradient_center_shader 	= effects\sun
+
+[sect_thunderbolt_stancia_01]
+lightning_model			= dm\dm_lightning_stancia_02.dm
+color_anim				= weathers\thunderbolt_00	; отыгрывается вся последовательность, независимо от FPS and FrameCount
+sound					= anomaly\stancia_thunder
+gradient_top_opacity   	= 1
+gradient_top_radius     = 3, 1.750
+gradient_top_texture    = fx\fx_gradient
+gradient_top_shader    	= effects\sun
+gradient_center_opacity = 1
+gradient_center_radius  = 2.000, 1.000
+gradient_center_texture = fx\fx_gradient
+gradient_center_shader 	= effects\sun
+
+[sect_thunderbolt_stancia_02]
+lightning_model			= dm\dm_lightning_stancia_03.dm
+color_anim				= weathers\thunderbolt_00	; отыгрывается вся последовательность, независимо от FPS and FrameCount
+sound					= anomaly\stancia_thunder
+gradient_top_opacity   	= 0.8
+gradient_top_radius     = 2, 1
+gradient_top_texture    = fx\fx_gradient
+gradient_top_shader    	= effects\sun
+gradient_center_opacity = 1
+gradient_center_radius  = 2.000, 1.000
+gradient_center_texture = fx\fx_gradient
+gradient_center_shader 	= effects\sun
+
+[sect_thunderbolt_stancia_03]
+lightning_model			= dm\dm_lightning-01.dm
+color_anim				= weathers\thunderbolt_00	; отыгрывается вся последовательность, независимо от FPS and FrameCount
+sound					= nature\thunder-0
+gradient_top_opacity   	= 0.6
+gradient_top_radius     = 0.500, 0.250
+gradient_top_texture    = fx\fx_gradient
+gradient_top_shader    	= effects\sun
+gradient_center_opacity = 0.6
+gradient_center_radius  = 2.000, 1.000
+gradient_center_texture = fx\fx_gradient
+gradient_center_shader 	= effects\sun
+
+[sect_thunderbolt_00]
+lightning_model			= dm\dm_lightning-01.dm
+color_anim				= weathers\thunderbolt_00	; отыгрывается вся последовательность, независимо от FPS and FrameCount
+sound					= nature\thunder-0
+gradient_top_opacity   	= 0.6
+gradient_top_radius     = 0.500, 0.250
+gradient_top_texture    = fx\fx_gradient
+gradient_top_shader    	= effects\sun
+gradient_center_opacity = 0.6
+gradient_center_radius  = 2.000, 1.000
+gradient_center_texture = fx\fx_gradient
+gradient_center_shader 	= effects\sun
+
+[sect_thunderbolt_01]
+lightning_model			= dm\dm_lightning-02.dm
+color_anim				= weathers\thunderbolt_00
+sound					= nature\thunder-1
+gradient_top_opacity   	= 0.6
+gradient_top_radius     = 0.500, 0.250
+gradient_top_texture    = fx\fx_gradient
+gradient_top_shader    	= effects\sun
+gradient_center_opacity = 0.6
+gradient_center_radius  = 2.000, 1.000
+gradient_center_texture = fx\fx_gradient
+gradient_center_shader 	= effects\sun
+
+[sect_thunderbolt_02]
+lightning_model			= dm\dm_lightning-03.dm
+color_anim				= weathers\thunderbolt_00
+sound					= nature\thunder-2
+gradient_top_opacity   	= 0.6
+gradient_top_radius     = 0.500, 0.250
+gradient_top_texture    = fx\fx_gradient
+gradient_top_shader    	= effects\sun
+gradient_center_opacity = 0.6
+gradient_center_radius  = 2.000, 1.000
+gradient_center_texture = fx\fx_gradient
+gradient_center_shader 	= effects\sun
+
+[sect_thunderbolt_03]
+lightning_model			= dm\dm_lightning-04.dm
+color_anim				= weathers\thunderbolt_00
+sound					= nature\thunder-3
+gradient_top_opacity   	= 0.6
+gradient_top_radius     = 0.500, 0.250
+gradient_top_texture    = fx\fx_gradient
+gradient_top_shader    	= effects\sun
+gradient_center_opacity = 0.6
+gradient_center_radius  = 2.000, 1.000
+gradient_center_texture = fx\fx_gradient
+gradient_center_shader 	= effects\sun
+

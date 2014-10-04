@@ -1,0 +1,19 @@
+[logic]
+active = ph_button@wait
+
+[ph_button@wait] 
+anim = idle
+on_press = ph_button@switch %+pas_b400_switcher_use%
+on_info = {+pas_b400_switcher_use} ph_button@switch
+
+[ph_button@switch]
+anim = off
+on_game_timer = 10 | ph_idle@open %=anim_obj_forward(pas_b400_door_hall) =heal_squad(pas_b400_stalkers_squad) +pas_b400_hall_button_pressed%
+
+[ph_idle@open]
+on_info = ph_idle@spawn %+pas_b400_hall_door_opened%
+
+[ph_idle@spawn]
+on_info = {!actor_in_zone(pas_b400_sr_way_1)} ph_idle@nil %=create_squad(pas_b400_hall_monolith_after_fwd_squad:pas_b400_hall)%
+
+[ph_idle@nil]

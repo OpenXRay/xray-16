@@ -1,0 +1,255 @@
+[logic@zat_b106_stalker_gonta]
+suitable = {=check_npc_name(zat_b106_stalker_gonta)} true
+prior = 200
+active = walker@start
+
+[walker@start]
+path_walk = gonta_1_walk
+path_look = garmata_1_walk
+def_state_standing = wait_na
+meet = no_meet
+on_info = {-zat_b106_start_dialogs} walker@infirmary ;%+zat_b106_start_dialogs%
+on_info2 =  {+zat_b106_start_dialogs -zat_b106_hunt_finish} animpoint@base
+on_info3 =  {+zat_b106_start_dialogs +zat_b106_hunt_finish} walker@ya_doma %+zat_b106_gonta_free%
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+def_state_moving = walk
+
+[walker@infirmary]
+path_walk = gonta_1_walk
+path_look = garmata_1_walk
+def_state_standing = wait_na
+meet = no_meet
+on_info = {=actor_in_zone(zat_b106_sr_infirmary)} remark@story_ask %+zat_b106_start_dialogs%
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+def_state_moving = walk
+
+[remark@story_ask]
+anim = wait_na
+target = path | zat_stalker_base_smart_garmata_1_walk, 0
+on_info = %=play_sound(zat_b106_gonta_story_ask)%
+on_signal = sound_end | walker@story_wait %+zat_b106_gonta_story_ask_done%
+meet = no_meet
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+def_state_moving = walk
+
+[walker@story_wait]
+path_walk = gonta_1_walk
+path_look = garmata_1_walk
+def_state_standing = wait_na
+meet = no_meet
+on_info = {+zat_b106_garmata_story_reply_done} remark@story_angry
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+def_state_moving = walk
+
+[remark@story_angry]
+anim = wait_na
+target = path | zat_stalker_base_smart_garmata_1_walk, 0
+on_info = %=play_sound(zat_b106_gonta_story_angry)%
+on_signal = sound_end | walker@story_angry
+meet = no_meet
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+def_state_moving = walk
+
+[walker@story_angry]
+path_walk = gonta_1_walk
+path_look = gonta_2_look
+def_state_standing = wait_na
+meet = no_meet
+on_game_timer = 30 | remark@story_calm
+;on_signal = crab_look | remark@story_calm 
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+def_state_moving = walk
+
+[remark@story_calm]
+anim = stoop_no_weap ;wait_na
+target = story | zat_b106_stalker_crab
+on_info = %=play_sound(zat_b106_gonta_story_calm)%
+on_signal = anim_end | {!actor_in_zone(zat_b106_actor_go_on)} walker@story_calm %+zat_b106_gonta_story_calm_done%, {=actor_in_zone(zat_b106_actor_go_on)} walker@to_actor
+meet = no_meet
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+def_state_moving = walk
+
+[walker@story_calm]
+path_walk = gonta_1_walk
+path_look = gonta_1_look
+def_state_standing = wait_na
+meet = no_meet
+on_game_timer = 10 | animpoint@base
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+def_state_moving = walk
+
+[walker@to_actor]
+path_walk = gonta_1_walk
+path_look = gonta_1_look
+def_state_standing = wait_na
+meet = no_meet
+on_game_timer = 20 | {!is_playing_sound} remark@to_actor
+;on_signal = actor_look | {!is_playing_sound} remark@story_calm 
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+def_state_moving = walk
+
+[remark@to_actor]
+anim = wait_na
+target = story | actor
+on_info = %=play_sound(zat_b106_gonta_to_actor)%
+on_signal = sound_end | {!actor_in_zone(zat_b106_actor_go_on)} walker@story_calm %+zat_b106_gonta_story_calm_done%, {=actor_in_zone(zat_b106_actor_go_on)} remark@wait_actor ;walker@wait_actor
+meet = no_meet
+snd_anim_sync = true
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+def_state_moving = walk
+
+[walker@wait_actor]                                                             
+path_walk = gonta_1_walk
+path_look = gonta_1_look
+def_state_standing = wait_na
+on_game_timer = 10 | remark@wait_actor
+;on_info =  {!actor_in_zone(zat_b106_actor_go_on)} walker@story_calm %+zat_b106_gonta_story_calm_done%
+meet = no_meet 
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+def_state_moving = walk
+
+[remark@wait_actor]
+anim = wait_na
+target = story | actor
+on_info =  {!actor_in_zone(zat_b106_actor_go_on)} walker@story_calm %+zat_b106_gonta_story_calm_done%
+meet = meet
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+def_state_moving = walk
+
+
+[walker@ya_doma]
+path_walk = gonta_4_walk
+path_look = gonta_4_look
+on_signal = gonta_home | animpoint@base
+def_state_standing = guard_na
+meet = no_meet 
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+def_state_moving = assault
+wounded = wounded
+
+[animpoint@base]
+cover_name = zat_a2_sc_zat_b106_stalker_gonta
+meet = meet
+use_camp = false
+;on_info = {+zat_b106_give_gonta_items -zat_b106_give_gonta_items_done} %=give_items(wpn_ak74:ammo_5.45x39_fmj) +zat_b106_give_gonta_items_done%
+;on_info2 = {+zat_b106_give_gonta_items_2 -zat_b106_give_gonta_items_2_done} %=give_items(wpn_ak74:ammo_5.45x39_fmj) +zat_b106_give_gonta_items_2_done%
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+
+[meet@idle]
+close_victim    = actor
+close_distance  = 5
+close_snd_hello = nil
+close_snd_bye   = nil
+close_anim      = wait_na
+use			    = {!dist_to_actor_le(3)} false, {=actor_enemy} false, true
+meet_dialog		= {-zat_b106_first_dialog_done} zat_b106_stalker_gonta_info_about_soroka_start
+trade_enable 	= false
+allow_break = false
+abuse		= true
+
+[meet]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_hello = nil
+close_snd_bye   = nil
+use				= {!dist_to_actor_le(3)} false, {=actor_enemy} false, true
+meet_dialog		= {-zat_b106_first_dialog_done} zat_b106_stalker_gonta_info_about_soroka_start
+trade_enable 	= false
+allow_break 	= false
+meet_on_talking = false
+
+[wounded]
+hp_state = 0|wounded_heavy@help_heavy
+hp_state_see = 0|wounded_heavy@help_heavy
+hp_victim = 0|nil
+hp_fight = 0|false
+hp_cover = 0|false

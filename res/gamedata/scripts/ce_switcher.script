@@ -1,0 +1,99 @@
+function _printf(ss)
+--if editor() == false then
+--	printf(ss)
+--end
+end
+-- -i -noprefetch -ltx user_andy.ltx -external -start server(andy_test_switch/single) client(localhost)
+--client entity
+class "ce_switcher" (CGameObject)
+
+function ce_switcher:__init() super()
+	self.m_state = 0
+	_printf("ce_switcher:__init() is called (%d)",self.m_state)
+end
+
+function ce_switcher:SetState(s)
+	if self.m_state == s then
+		return
+	end
+	local old = self.m_state
+
+	self.m_state = s
+
+	self:OnStateChanged(old, self.m_state)
+end
+
+function ce_switcher:GetState()
+	return self.m_state;
+end
+
+function ce_switcher:PlayAnim(anim_name)
+	local visual = self:Visual()
+	local ska = visual:dcast_PKinematicsAnimated()
+	ska:PlayCycle(anim_name)
+end
+
+function ce_switcher:Load(section)
+	CGameObject.Load(self, section)
+end
+
+function ce_switcher:shedule_Update(dt)
+	CGameObject.shedule_Update(self,dt)
+end
+
+function ce_switcher:net_Export(packet)
+	_printf("ce_switcher:net_Export called")
+	CGameObject.net_Export(self, packet)
+	packet:w_u32(self.m_state)
+	_printf("ce_switcher:net_Export done")
+end
+
+function ce_switcher:net_Import(packet)
+	_printf("ce_switcher:net_Import called")
+	CGameObject.net_Import(self, packet)
+	self.m_state = packet:r_u32()
+	_printf("ce_switcher:net_Import done")
+end
+
+function ce_switcher:net_Spawn(se_object)
+	_printf("ce_switcher:net_Spawn called")
+	CGameObject.net_Spawn(self, se_object)
+
+	self.m_state = se_object.m_state
+	local anm = se_object:getStartupAnimation()
+	self:PlayAnim(anm)
+
+	self:setVisible(1)
+	self:setEnabled(1)
+
+	_printf("ce_switcher:net_Spawn done")
+
+	return true;
+end
+
+function ce_switcher:net_Destroy()
+	CGameObject.net_Destroy(self)
+end
+
+function ce_switcher:OnStateChanged(old_state, new_state)
+	if new_state==0 then
+		self:PlayAnim("idle")
+	end
+
+	if new_state==1 then
+		self:PlayAnim("idle_on")
+	end
+end
+
+
+function ce_switcher:use(who)
+	printf("----ce_switcher used " )
+
+	if self.m_state==0 then
+		self:SetState(1)
+	else
+		self:SetState(0)
+	end
+
+	return true;
+end

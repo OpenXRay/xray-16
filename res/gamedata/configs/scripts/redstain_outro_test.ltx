@@ -1,0 +1,39 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_info = {+all_good} sr_idle@all_good
+on_info2 = {+all_bad} sr_idle@all_bad
+
+[sr_idle@all_good]
+on_info1 = %+one_of_the_lads_gained% ;4b
+on_info2 = %+zat_b57_bloodsucker_lair_clear% ;5b
+on_info3 = %+sim_freedom_help_harder% ;6a
+on_info4 = %+research_man_gained% ;7a
+on_info5 = %+pri_a28_army_leaved_alive% ;8a
+on_info6 = %+jup_b16_oasis_artefact_to_scientist% ;9, 10
+on_info7 = %+mutant_hunter_achievement_gained% ;11a
+on_info8 = %+pri_b301_save_zulus_complete% ;12a
+on_info9 = %+jup_a10_vano_agree_go_und% ;13a
+on_info10 = %+pri_a16_vano_was_alive_when_removed% ;13a
+on_info11 = %+jup_b218_monolith_hired% ;14a
+on_info12 = %+pri_a16_wanderer_was_alive_when_removed% ;14a
+on_info13 = %+jup_b218_soldier_hired% ;15a
+on_info14 = %+pri_a28_sokolov_left_alive% ;15a
+on_info15 = %+balance_advocate_gained% ;16
+on_info16 = %+zat_b18_noah_met% ;17
+on_info17 = %+zat_b44_tech_buddies_both_told% ;18a, 19a, 20a
+on_game_timer = 20 | sr_idle@run
+
+[sr_idle@all_bad]
+on_info1 = %+kingpin_gained% ;4a, 5a
+on_info2 = %+sim_duty_help_harder% ;6b, 7b, 8b, 11b, 12b
+on_info3 = %+jup_a10_vano_agree_go_und% ;13b
+on_info4 = %+jup_b218_monolith_hired% ;14b
+on_info5 = %+jup_b218_soldier_hired% ;15b, 18b
+on_info6 = %+pri_a28_strelok_dead% ;19b
+on_info7 = %+pri_a28_koval_dead% ;20b
+on_game_timer = 20 | sr_idle@run
+
+[sr_idle@run]
+on_info = nil %=run_tutorial(outro_game)%

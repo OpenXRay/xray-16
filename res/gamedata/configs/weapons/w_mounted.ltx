@@ -1,0 +1,102 @@
+[mounted_weapon]
+GroupControlSection			= spawn_group
+class						= W_MOUNTD
+$spawn						= "weapons\mounted_weapon"
+cform   	                = skeleton
+visual  	                = dynamics\weapons\wpn_mounted\wpn_mounted_pkm_trenoga.ogf
+
+;-------------------------------------------------------------------------------
+
+;params of weapon recoil
+fire_dispersion_base		= 0.12 		;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+
+;отдача
+cam_relax_speed         	= 5.0		;скорость возврата в исходное положение
+cam_dispersion          	= 0.2		;увеличения угла (в градусах) с каждым выстрелом
+cam_max_angle				= 8	    	;максимальный угол отдачи
+cam_max_angle_horz			= 9.0   	;(degree) maximum shot horizontal degree
+cam_step_angle_horz			= 1.8		;(degree) size of step camera moved in horizontal position while shooting
+
+
+fire_dispersion_condition_factor = 5	;увеличение дисперсии в процентах при максимальном износе
+misfire_probability        = 0.005 ;вероятность осечки при максимальном износе  !!!old - now not working
+;изношенность, при которой появляется шанс осечки
+misfire_start_condition		= 0.6
+;изношеность при которой шанс осечки становится константным
+misfire_end_condition		= 0.1
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= 0.001
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= 0.02
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= 0.00001
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= 0.00002
+;-------------------------------------------------------------------------------
+
+
+; ttc
+hit_power					= 0.0
+hit_impulse					= 100
+hit_type 					= fire_wound
+
+fire_distance  		         = 1000
+bullet_speed				= 1500			;начальная скорость пули
+rpm            		        = 650
+
+light_color		 = 0.9,0.9,0.5
+light_range		 = 6
+light_var_color  = 0.05
+light_var_range  = 0.5
+light_time 		 = 0.3
+
+
+flame_particles		    = weapons\generic_weapon08
+smoke_particles		    = weapons\generic_shoot_00
+
+shell_point		 = 0.00, 0.0,0
+shell_particles	 = weapons\generic_shells00
+
+snd_shoot			= weapons\pkm_shot
+
+ammo_class		 = ammo_7.62x54_7h1
+
+
+[stationary_mgun]:identity_immunities,weapon_probability,default_weapon_params
+GroupControlSection			= spawn_group
+class						= W_STMGUN
+$spawn						= "weapons\stationary_mgun"
+cform   	                = skeleton
+visual  	                = dynamics\weapons\wpn_mounted\wpn_mounted_pkm_trenoga.ogf
+
+cam_relax_speed         	= 3.0		;скорость возврата в исходное положение
+cam_max_angle				= 8	    	;максимальный угол отдачи
+snd_shoot					= weapons\pkm_shot
+use_aim_bullet				= false
+
+ammo_class					= ammo_7.62x54_7h1
+fire_dispersion_base		= 0.5 ;1 		;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+fire_dispersion_null		= 0.5
+rpm            		        = 900
+hit_power					= 0.6
+hit_impulse					= 100
+fire_distance  		        = 1000
+bullet_speed				= 1000			;начальная скорость пули
+
+light_color					= 0.9,0.9,0.5
+light_range					= 6
+light_var_color				= 0.05
+light_var_range				= 0.5
+light_time 					= 0.3
+
+flame_particles				= weapons\generic_weapon_btr
+smoke_particles				= weapons\generic_shoot_00
+shell_point					= 0.0, 0.0, 0.0
+shell_particles				= weapons\generic_shells00
+
+tracer_trail_scale	 = 0.15
+tracer_start_length	 = 2
+tracer_width		 = 0.07
+
+inv_name	        	= Mounted Weapon								; name in inventory
+inv_name_short			= Mounted Weapon

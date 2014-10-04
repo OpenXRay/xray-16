@@ -1,0 +1,160 @@
+	
+<!-- multiplayer -->
+	<mp_team_base_0_location hint="team_base_1">
+		<level_map  spot="mp_team_base_2_level_spot"  pointer="mp_team_base_2_pointer"/>
+		<mini_map  spot="mp_team_base_2_mini_spot"  pointer="mp_team_base_2_pointer"/>
+	</mp_team_base_0_location>
+
+	<mp_team_base_1_location hint="team_base_1">
+		<level_map  spot="mp_team_base_1_level_spot"  pointer="mp_team_base_1_pointer"/>
+		<mini_map  spot="mp_team_base_1_mini_spot"  pointer="mp_team_base_1_pointer"/>
+	</mp_team_base_1_location>
+	
+	<mp_team_base_2_location hint="team_base_2">
+		<level_map  spot="mp_team_base_2_level_spot"  pointer="mp_team_base_2_pointer"/>
+		<mini_map  spot="mp_team_base_2_mini_spot"  pointer="mp_team_base_2_pointer"/>
+	</mp_team_base_2_location>
+
+	<mp_friend_location hint="friend">
+		<level_map  spot="mp_friend_level_spot"/>
+		<mini_map  spot="mp_friend_mini_spot"/>
+	</mp_friend_location>
+
+	<mp_self_location hint="self">
+		<level_map  spot="mp_self_level_spot"/>
+	</mp_self_location>
+	
+	<mp_friend_radio_location hint="friend_radio" ttl="3">
+		<level_map  spot="mp_friend_radio_level_spot" pointer="mp_af_friend_mini_pointer"/>
+		<mini_map  spot="mp_friend_radio_mini_spot" pointer="mp_af_friend_mini_pointer"/>
+	</mp_friend_radio_location>
+						
+	<mp_af_neutral_location hint="af_neutral">
+		<level_map  spot="mp_af_neutral_level_spot" pointer="mp_af_neutral_mini_pointer"/>
+		<mini_map  spot="mp_af_neutral_mini_spot" pointer="mp_af_neutral_mini_pointer"/>
+	</mp_af_neutral_location>
+	
+	<mp_free_af_friend_location hint="af_neutral">
+		<level_map  spot="mp_free_af_friend_level_spot" pointer="mp_af_friend_mini_pointer"/>
+		<mini_map  spot="mp_free_af_friend_mini_spot" pointer="mp_af_friend_mini_pointer"/>
+	</mp_free_af_friend_location>
+	
+	<mp_af_enemy_location hint="enemy">
+		<level_map  spot="mp_af_enemy_level_spot" pointer="mp_af_enemy_mini_pointer"/>
+		<mini_map  spot="mp_af_enemy_mini_spot" pointer="mp_af_enemy_mini_pointer"/>
+	</mp_af_enemy_location>
+
+	<mp_af_friend_location hint="friend">
+		<level_map  spot="mp_af_friend_level_spot" pointer="mp_af_friend_mini_pointer"/>
+		<mini_map  spot="mp_af_friend_mini_spot" pointer="mp_af_friend_mini_pointer"/>
+	</mp_af_friend_location>
+	
+	<mp_hit_sector_location hint="hit_sector" ttl="3" pos_to_actor="1">
+		<mini_map  spot="mp_hit_sector_mini_spot"/>
+	</mp_hit_sector_location>
+
+	<!-- multiplayer level spots -->
+
+	<mp_team_base_1_level_spot x="0" y="0" width="32" stretch = "1" height="32" alignment="c"> 
+		<texture r="0" g="255" b="0">ui_teambase</texture>
+	</mp_team_base_1_level_spot>
+	
+	<mp_team_base_2_level_spot x="0" y="0" width="32" stretch = "1" height="32" alignment="c"> 
+		<texture r="0" g="255" b="255">ui_teambase</texture>
+	</mp_team_base_2_level_spot>
+	
+	<mp_friend_level_spot width="8" height="8" stretch = "1" alignment="c"> 
+		<texture r="0" g="255" b="0">ui_minimap_point</texture>
+	</mp_friend_level_spot>
+
+	<mp_self_level_spot width="8" height="8" stretch = "1" alignment="c" light_anim="ui_mp_minimap_af_friend"> 
+		<texture r="0" g="255" b="0">ui_minimap_point</texture>
+	</mp_self_level_spot>
+	
+	<mp_friend_radio_level_spot width="32" height="32" stretch = "1" alignment="c" light_anim="ui_mp_minimap_af_friend"> 
+		<texture x="525" y="904" width="32" height="32">ui\ui_common</texture>
+	</mp_friend_radio_level_spot>
+	
+	<mp_af_friend_level_spot width="13" height="15" alignment="c" light_anim="ui_mp_minimap_af_friend"> 
+		<texture r="0" g="255" b="0">ui_mini_af_spot</texture>
+	</mp_af_friend_level_spot>
+	
+	<mp_free_af_friend_level_spot width="13" height="15" alignment="c"> 
+		<texture r="0" g="255" b="0">ui_mini_af_spot</texture>
+	</mp_free_af_friend_level_spot>
+
+	<mp_af_enemy_level_spot width="13" height="15" alignment="c" light_anim="ui_mp_minimap_af_enemy"> 
+		<texture r="255" g="0" b="0">ui_mini_af_spot</texture>
+	</mp_af_enemy_level_spot>
+	
+	<mp_af_neutral_level_spot width="13" height="15" alignment="c" light_anim="ui_mp_minimap_af_neutral">
+		<texture r="255" g="255" b="255">ui_mini_af_spot</texture>
+	</mp_af_neutral_level_spot>	
+
+	<!-- multiplayer -->
+	<mp_team_base_1_mini_spot x="0" y="0" width="15" height="15" stretch="0" alignment="c">
+		<texture r="0" g="255" b="0">ui_mmap_base</texture>
+	</mp_team_base_1_mini_spot>
+	
+	<mp_team_base_2_mini_spot x="0" y="0" width="15" height="15" stretch="0" alignment="c">
+		<texture r="0" g="255" b="255">ui_mmap_base</texture>
+	</mp_team_base_2_mini_spot>
+	
+	<mp_friend_mini_spot width="6" height="6" stretch = "1" alignment="c"> 
+		<texture r="0" g="255" b="0">ui_minimap_point</texture>
+	</mp_friend_mini_spot>
+	
+	<mp_friend_radio_mini_spot width="13" height="13" stretch = "1" alignment="c" light_anim="ui_mp_minimap_af_friend"> 
+		<texture x="525" y="904" width="32" height="32">ui\ui_common</texture>
+	</mp_friend_radio_mini_spot>
+	
+	<mp_af_friend_mini_spot width="13" height="15" alignment="c" light_anim="ui_mp_minimap_af_friend"> 
+		<texture r="0" g="255" b="0">ui_mini_af_spot</texture>
+		<texture_below r="0" g="255" b="0">ui_mini_af_spot_below</texture_below>
+		<texture_above r="0" g="255" b="0">ui_mini_af_spot_above</texture_above>
+	</mp_af_friend_mini_spot>
+	
+	<mp_free_af_friend_mini_spot width="13" height="15" alignment="c"> 
+		<texture r="0" g="255" b="0">ui_mini_af_spot</texture>
+		<texture_below r="0" g="255" b="0">ui_mini_af_spot_below</texture_below>
+		<texture_above r="0" g="255" b="0">ui_mini_af_spot_above</texture_above>
+	</mp_free_af_friend_mini_spot>
+
+	<mp_af_enemy_mini_spot width="13" height="15" alignment="c" light_anim="ui_mp_minimap_af_enemy"> 
+		<texture r="255" g="64" b="64">ui_mini_af_spot</texture>
+		<texture_below r="255" g="0" b="0">ui_mini_af_spot_below</texture_below>
+		<texture_above r="255" g="0" b="0">ui_mini_af_spot_above</texture_above>
+	</mp_af_enemy_mini_spot>
+	
+	<mp_af_neutral_mini_spot width="13" height="15" alignment="c" light_anim="ui_mp_minimap_af_neutral">
+		<texture r="255" g="255" b="255">ui_mini_af_spot</texture>
+		<texture_below r="255" g="0" b="255">ui_mini_af_spot_below</texture_below>
+		<texture_above r="255" g="255" b="0">ui_mini_af_spot_above</texture_above>
+	</mp_af_neutral_mini_spot>
+
+	
+	<mp_hit_sector_mini_spot x="0" y="0" width="80" height="256" heading="1" alignment="c"> 
+		<texture x="305" y="762" width="80" height="256">ui\ui_hud</texture>
+	</mp_hit_sector_mini_spot>
+
+	<!-- multiplayer -->
+	<mp_team_base_1_pointer x="0" y="0" width="15" height="17" heading="1" alignment="c"> 
+		<texture a="255" color="green">ui_hud_map_arrow</texture>
+	</mp_team_base_1_pointer>
+	
+	<mp_team_base_2_pointer x="0" y="0" width="15" height="17" heading="1" alignment="c"> 
+		<texture a="255" r="0" g="255" b="255">ui_hud_map_arrow</texture>
+	</mp_team_base_2_pointer>	
+	
+	<mp_af_neutral_mini_pointer x="0" y="0" width="15" height="17" heading="1" alignment="c" light_anim="ui_mp_minimap_af_neutral"> 
+		<texture a="255">ui_hud_map_arrow</texture>
+	</mp_af_neutral_mini_pointer>	
+	
+	<mp_af_enemy_mini_pointer x="0" y="0" width="15" height="17" heading="1" alignment="c" light_anim="ui_mp_minimap_af_enemy"> 
+		<texture a="255" color="red">ui_hud_map_arrow</texture>
+	</mp_af_enemy_mini_pointer>	
+	
+	<mp_af_friend_mini_pointer x="0" y="0" width="15" height="17" heading="1" alignment="c" light_anim="ui_mp_minimap_af_friend"> 
+		<texture a="255" color="green">ui_hud_map_arrow</texture>
+	</mp_af_friend_mini_pointer>	
+

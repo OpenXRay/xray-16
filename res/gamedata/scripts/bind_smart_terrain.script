@@ -1,0 +1,70 @@
+--[[------------------------------------------------------------------------------------------------------------------
+Smart terrain binder
+Нужен для того, чтобы серверный объект smart terrain получал обновления.
+Чугай Александр
+--------------------------------------------------------------------------------------------------------------------]]
+
+function bind( obj )
+	local ini = obj:spawn_ini()
+
+	if not ini then
+		return
+	end
+
+	if ini:section_exist( "gulag1" ) or ini:section_exist( "smart_terrain" ) then
+		if obj:clsid() == clsid.smart_terrain then
+			if alife() then
+				obj:bind_object( smart_terrain_binder( obj ) )
+			else
+				printf( "No simulation! SMART_TERRAIN '%s' disabled.", obj:name() )
+			end
+		else
+			abort( "You must use SMART_TERRAIN instead of SCRIPT_ZONE %s", obj:name() )
+		end
+	end
+end
+
+----------------------------------------------------------------------------------------------------------------------
+
+class "smart_terrain_binder" ( object_binder )
+
+function smart_terrain_binder:__init( obj ) super( obj )
+end
+
+function smart_terrain_binder:net_spawn( server_object )
+	if not object_binder.net_spawn( self, server_object ) then
+		return false
+	end
+
+	-- получить ссылку на настоящий серверный объект
+	self.se_smart_terrain = alife():object( server_object.id )
+
+	db.add_zone( self.object )
+	db.add_smart_terrain( self.se_smart_terrain )
+
+	return true
+end
+
+function smart_terrain_binder:net_destroy()
+	xr_sound.stop_sounds_by_id(self.object:id())
+	
+	db.del_zone( self.object )
+	db.del_smart_terrain( self.se_smart_terrain )
+
+	object_binder.net_destroy( self )
+end
+
+function smart_terrain_binder:net_Relcase( obj )
+--	printf( "smart_terrain_binder.net_Relcase: self.object=%s obj=%s", self.object:name(), obj:name() )
+
+	if self.se_smart_terrain.npc_info[obj:id()] then
+		--self.se_smart_terrain.gulag:object_setup_offline( obj:id(), true )
+		-- TODO: Заменить на аналог
+	end
+end
+
+function smart_terrain_binder:update( delta )
+	object_binder.update( self, delta )
+
+	self.se_smart_terrain:update()
+end

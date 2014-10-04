@@ -1,0 +1,35 @@
+;zat_b40_logic
+[sr_idle@zat_b40_qwest]
+on_info1 = {+zat_b40_find_information -zat_b40_task_gived -zat_b40_find_information_comlpete} %+zat_b40_task_gived =give_task(zat_b40_reconnoitre_merc_camp)%
+on_info2 = {=actor_has_item(zat_b40_notebook) -zat_b40_actor_has_notebook} %+zat_b40_actor_has_notebook%
+on_info3 = {+pri_a17_actor_has_gauss_rifle -zat_b40_pripyat_case} sr_idle@zat_b40_pripyat %+zat_b40_pripyat_case%
+
+[logic]
+active = sr_idle@zat_b40_wait
+
+[sr_idle@zat_b40_wait]:sr_idle@zat_b40_qwest
+on_info4 = {+zat_b40_start_worning_time} sr_idle@zat_b40_save
+
+[sr_idle@zat_b40_save]:sr_idle@zat_b40_qwest
+on_info4 = {-zat_b40_scenario_save_after_warning} %+zat_b40_scenario_save_after_warning =scenario_autosave(st_save_zat_b40_warned_by_mercs)% 
+on_info5 = {+zat_b40_scenario_save_after_warning} sr_idle@zat_b40_worning_sad 
+
+[sr_idle@zat_b40_worning_sad]:sr_idle@zat_b40_qwest
+on_game_timer = 100 | %+zat_b40_worning_time_out%
+on_info4 = {+zat_b40_actor_find_mer_camp +zat_b40_actor_has_notebook -zat_b40_merc_in_combat} %+zat_b40_merc_in_combat%
+on_info5 = {-zat_b40_scenario_save_after_warning} %+zat_b40_scenario_save_after_warning =scenario_autosave(st_save_zat_b40_warned_by_mercs)%
+on_info6 = {+zat_b40_actor_has_notebook} sr_idle@zat_b40_end
+
+[sr_idle@zat_b40_end] 
+on_info = {+pri_a17_actor_has_gauss_rifle -zat_b40_pripyat_case} sr_idle@zat_b40_pripyat %+zat_b40_pripyat_case%
+
+[sr_idle@zat_b40_pripyat]
+on_info1 = {-zat_b40_merc_gone =squad_exist(zat_b40_merc_squad)} %=remove_squad(zat_b40_merc_squad) +zat_b40_merc_gone%
+on_info2 = {-zat_b40_find_information} %+zat_b40_find_information +zat_b40_find_information_comlpete%
+on_info3 = {-zat_b40_actor_has_notebook =object_exist(zat_b40_notebook) -zat_b40_notebook_replaced} %=destroy_object(story:zat_b40_notebook) =spawn_corpse(sim_default_killer_1:zat_b40_dead_merc_spawn) =spawn_object(zat_b40_notebook:zat_b40_notebook_spawn_2) +zat_b40_notebook_replaced% 
+on_info4 = {=actor_has_item(zat_b40_notebook) -zat_b40_actor_has_notebook} %+zat_b40_actor_has_notebook%
+on_info5 = {-zat_b103_lost_merc_leader_bunker_guards_work -zat_b103_merc_bring_supplies =distance_to_obj_ge(zat_b103_logic:100)} %+zat_b103_merc_can_gone%, {+zat_b103_merc_bring_supplies +zat_b103_merc_task_done =distance_to_obj_ge(zat_b103_logic:100)} %+zat_b103_merc_can_gone%, {+zat_b103_merc_bring_supplies +zat_b103_merc_fight =distance_to_obj_ge(zat_b103_logic:100)} %+zat_b103_merc_can_gone%
+on_info6 = {-zat_b103_merc_gone1 +zat_b103_merc_can_gone =squad_exist(zat_b103_lost_merc_squad1)} %=remove_squad(zat_b103_lost_merc_squad1) +zat_b103_merc_gone1 +zat_b103_merc_gone%
+on_info7 = {+zat_b40_actor_has_notebook !squad_exist(zat_b40_merc_squad) !squad_exist(zat_b103_lost_merc_squad1)} sr_idle@zat_b40_nil
+
+[sr_idle@zat_b40_nil] 
