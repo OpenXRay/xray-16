@@ -1342,7 +1342,7 @@ public:
 		bool bMapFound				= false;
 		for(u32 i=0; i<cnt; ++i)
 		{
-			const SGameTypeMaps::SMapItm& itm = M.m_map_names[i];
+			const MPLevelDesc& itm = M.m_map_names[i];
 			if (!xr_strcmp(itm.map_name.c_str(), LevelName) &&
 				!xr_strcmp(itm.map_ver.c_str(), LevelVersion))
 			{

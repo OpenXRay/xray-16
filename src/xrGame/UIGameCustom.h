@@ -36,21 +36,21 @@ struct StaticDrawableWrapper : public IPureDestroyableObject
     void SetText(const char* text);
 };
 
-struct SGameTypeMaps
+struct MPLevelDesc
 {
-    struct SMapItm
-    {
-        shared_str map_name;
-        shared_str map_ver;
-        bool operator == (const SMapItm& rhs) { return map_name == rhs.map_name && map_ver == rhs.map_ver; }
-    };
-
-    shared_str m_game_type_name;
-    EGameIDs m_game_type_id;
-    xr_vector<SMapItm> m_map_names;
+    shared_str map_name;
+    shared_str map_ver;
+    bool operator == (const MPLevelDesc& rhs) { return map_name == rhs.map_name && map_ver == rhs.map_ver; }
 };
 
-struct SGameWeathers
+struct SGameTypeMaps
+{
+    shared_str m_game_type_name;
+    EGameIDs m_game_type_id;
+    xr_vector<MPLevelDesc> m_map_names;
+};
+
+struct MPWeatherDesc
 {
     shared_str Name;
     shared_str StartTime;
@@ -60,12 +60,12 @@ class CMapListHelper
 {
 private:
     xr_vector<SGameTypeMaps> m_storage;
-    xr_vector<SGameWeathers> m_weathers;
+    xr_vector<MPWeatherDesc> m_weathers;
 
 public:
     const SGameTypeMaps& GetMapListFor(const shared_str& gameType);
     const SGameTypeMaps& GetMapListFor(const EGameIDs gameId);
-    const xr_vector<SGameWeathers>& GetGameWeathers();
+    const xr_vector<MPWeatherDesc>& GetGameWeathers();
 
 private:
     void Load();

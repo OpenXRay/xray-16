@@ -39,7 +39,7 @@ public:
 			void	StartDedicatedServer();
 			void	ClearList();
 			bool	IsEmpty();
-			const	SGameTypeMaps::SMapItm&	GetMapNameInt(EGameIDs _type, u32 idx);
+            const	MPLevelDesc&	GetMapNameInt(EGameIDs _type, u32 idx);
 
 private:
 	CUIListBoxItem* GetMapItem_fromList1(shared_str const& map_name);
@@ -69,7 +69,7 @@ private:
 //	CUISpinText*		m_pModeSelector;
 	CUIStatic*			m_pMapPic;
 	CUIMapInfo*			m_pMapInfo;
-
+    // XXX nitrocaster: use MPWeatherDesc
 	struct Sw{
 		shared_str	weather_name;
 		shared_str	weather_time;

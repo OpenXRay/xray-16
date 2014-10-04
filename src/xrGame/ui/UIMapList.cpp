@@ -130,7 +130,7 @@ void CUIMapList::OnListItemClicked()
 	
 	CUIListBoxItem* itm				= m_pList1->GetSelectedItem();
 	u32 _idx						= (u32)(__int64)(itm->GetData());
-	const SGameTypeMaps::SMapItm& M	= GetMapNameInt(GetCurGameType(), _idx);
+    const MPLevelDesc& M = GetMapNameInt(GetCurGameType(), _idx);
 
 	map_name						+=	M.map_name.c_str();
 	xr_string full_name				= map_name + ".dds";
@@ -203,7 +203,7 @@ const char* CUIMapList::GetCommandLine(LPCSTR player_name){
 		return						NULL;
 
 	u32 _idx						= (u32)(__int64)(itm->GetData());
-	const SGameTypeMaps::SMapItm& M	= GetMapNameInt	(GetCurGameType(), _idx);
+    const MPLevelDesc& M = GetMapNameInt(GetCurGameType(), _idx);
 
 	m_command.clear();
 	m_command = "start server(";
@@ -248,7 +248,7 @@ void CUIMapList::LoadMapList()
 {
     const auto& weathers = gMapListHelper.GetGameWeathers();
     u32 cnt = 0;
-    for (const SGameWeathers& weather : weathers)
+    for (const MPWeatherDesc& weather : weathers)
         AddWeather(weather.Name, weather.StartTime, cnt++);
     if (weathers.size() > 0)
         m_pWeatherSelector->SetItemIDX(0);
@@ -275,7 +275,7 @@ void	CUIMapList::SaveMapList()
 	{
 		CUIListBoxItem* itm				= m_pList2->GetItemByIDX(idx);
 		u32 _idx						= (u32)(__int64)(itm->GetData());
-		const SGameTypeMaps::SMapItm& M	= GetMapNameInt(GetCurGameType(), _idx);
+        const MPLevelDesc& M = GetMapNameInt(GetCurGameType(), _idx);
 
 		xr_sprintf						(map_name, "sv_addmap %s/ver=%s", M.map_name.c_str(), M.map_ver.c_str() );
 		pW->w_string					(map_name);
@@ -426,7 +426,7 @@ bool CUIMapList::IsEmpty()
 	return 0 == m_pList2->GetSize();
 }
 
-const SGameTypeMaps::SMapItm& CUIMapList::GetMapNameInt(EGameIDs _type, u32 idx)
+const MPLevelDesc& CUIMapList::GetMapNameInt(EGameIDs _type, u32 idx)
 {
 	const SGameTypeMaps& M		= gMapListHelper.GetMapListFor(_type);
 	R_ASSERT					(M.m_map_names.size()>idx);

@@ -336,7 +336,7 @@ void CMapListHelper::LoadMapInfo(const char* cfgName, const xr_string& levelName
                 lastItem.m_game_type_id = ParseStringToGameType(gameType.c_str());
                 suitableLevels = &m_storage.back();
             }
-            SGameTypeMaps::SMapItm levelDesc;
+            MPLevelDesc levelDesc;
             levelDesc.map_name = shLevelName;
             levelDesc.map_ver = shLevelVer;
             auto& levelNames = suitableLevels->m_map_names;
@@ -365,7 +365,7 @@ void CMapListHelper::Load()
     m_weathers.reserve(weatherCfg.Data.size());
     for (CInifile::Item& weatherDesc : weatherCfg.Data)
     {
-        SGameWeathers gw;
+        MPWeatherDesc gw;
         gw.Name = weatherDesc.first;
         gw.StartTime = weatherDesc.second;
         m_weathers.push_back(gw);
@@ -435,7 +435,7 @@ const SGameTypeMaps& CMapListHelper::GetMapListFor(const EGameIDs gameId)
 	return m_storage[0];
 }
 
-const xr_vector<SGameWeathers>& CMapListHelper::GetGameWeathers() 
+const xr_vector<MPWeatherDesc>& CMapListHelper::GetGameWeathers() 
 {
     if (m_weathers.size() == 0)
         Load();
