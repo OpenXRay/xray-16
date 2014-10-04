@@ -424,6 +424,7 @@ Naming conventions:
 Casing styles:
 - class/struct/enum: PascalCase
   - Math primitives can be in lowercase: vector2f, angle3f, matrix44f
+  - Using declarations of primitive types can be in lowercase: uint, int16, uint64
 - Functions: PascalCase
 - Public and protected fields: PascalCase
   - Math primitives can use lowercase: vector2f.x, angle3f.yaw, matrix44f.m03
@@ -812,7 +813,7 @@ code fragments, put a comment line.
     
     if (storage.size() == 0)
         Log("! ERROR: No items found");
-  GOOD
+ GOOD
     for (auto& item : items)
         storage.push_back(item);
     // check if there's no items
