@@ -14,9 +14,9 @@ void CUIGameCustom::script_register(lua_State *L)
 {
 	module(L)
 		[
-			class_< SDrawStaticStruct >("SDrawStaticStruct")
-			.def_readwrite("m_endTime",		&SDrawStaticStruct::m_endTime)
-			.def("wnd",					&SDrawStaticStruct::wnd),
+			class_< StaticDrawableWrapper >("StaticDrawableWrapper")
+			.def_readwrite("m_endTime",		&StaticDrawableWrapper::m_endTime)
+			.def("wnd",					&StaticDrawableWrapper::wnd),
 
 			class_< CUIGameCustom >("CUIGameCustom")
 			.def("AddDialogToRender",		&CUIGameCustom::AddDialogToRender)

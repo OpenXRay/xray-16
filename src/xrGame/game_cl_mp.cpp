@@ -513,7 +513,7 @@ void game_cl_mp::OnWarnMessage(NET_Packet* P)
 		{
 			string512					_buff;
 			xr_sprintf					(_buff,"max_ping_warn_%d", _cnt);
-			SDrawStaticStruct* ss		= CurrentGameUI()->AddCustomStatic(_buff, true);
+			StaticDrawableWrapper* ss		= CurrentGameUI()->AddCustomStatic(_buff, true);
 			
 			xr_sprintf					(_buff,"%d ms.", _ping);
 			ss->m_static->TextItemControl()->SetText	(_buff);

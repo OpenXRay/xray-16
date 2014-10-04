@@ -21,13 +21,14 @@ struct KillMessageStruct;
 class CUIMainIngameWnd;
 class CUIMessagesWindow;
 
-struct SDrawStaticStruct : public IPureDestroyableObject
+struct StaticDrawableWrapper : public IPureDestroyableObject
 {
-    SDrawStaticStruct();
-    virtual	void destroy();
     CUIStatic* m_static;
     float m_endTime;
     shared_str m_name;
+
+    StaticDrawableWrapper();
+    virtual	void destroy();
     void Draw();
     void Update();
     CUIStatic* wnd() { return m_static; }
@@ -81,7 +82,7 @@ class CUIGameCustom :
 protected:
     CUIWindow* Window;
     CUIXml* MsgConfig;
-    xr_vector<SDrawStaticStruct*> CustomStatics;
+    xr_vector<StaticDrawableWrapper*> CustomStatics;
     CUIActorMenu* ActorMenu;
     CUIPdaWnd* PdaMenu;
     bool showGameIndicators;
@@ -111,8 +112,8 @@ public:
     void ShowCrosshair(bool show) { psHUD_Flags.set(HUD_CROSSHAIR_RT, show); }
     bool CrosshairShown() { return !!psHUD_Flags.test(HUD_CROSSHAIR_RT); }    
     virtual void HideShownDialogs() {}
-    SDrawStaticStruct* AddCustomStatic(const char* id, bool singleInstance);
-    SDrawStaticStruct* GetCustomStatic(const char* id);
+    StaticDrawableWrapper* AddCustomStatic(const char* id, bool singleInstance);
+    StaticDrawableWrapper* GetCustomStatic(const char* id);
     void RemoveCustomStatic(const char* id);
     void CommonMessageOut(const char* text);
     virtual void ChangeTotalMoneyIndicator(const char* newMoneyString) {}

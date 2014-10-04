@@ -838,7 +838,7 @@ C++ class color {
 
 };
 
-C++ class SDrawStaticStruct {
+C++ class StaticDrawableWrapper {
     property m_endTime;
     
     function wnd();

@@ -40,7 +40,7 @@ public:
 	CUITalkWnd*			TalkMenu;
 	CChangeLevelWnd*	UIChangeLevelWnd;
 
-	SDrawStaticStruct*	m_game_objective;
+	StaticDrawableWrapper*	m_game_objective;
 };
 
 

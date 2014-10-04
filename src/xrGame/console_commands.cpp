@@ -570,7 +570,7 @@ public:
 #ifdef DEBUG
 		Msg						("Game save overhead  : %f milliseconds",timer.GetElapsed_sec()*1000.f);
 #endif
-		SDrawStaticStruct* _s		= CurrentGameUI()->AddCustomStatic("game_saved", true);
+		StaticDrawableWrapper* _s		= CurrentGameUI()->AddCustomStatic("game_saved", true);
 		LPSTR						save_name;
 		STRCONCAT					(save_name, CStringTable().translate("st_game_saved").c_str(), ": ", S);
 		_s->wnd()->TextItemControl()->SetText(save_name);

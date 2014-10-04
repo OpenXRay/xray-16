@@ -24,7 +24,7 @@ struct predicate_find_stat
 {
     const char* id;
     predicate_find_stat(const char* id) { this->id = id; }
-    bool operator()(SDrawStaticStruct* s)
+    bool operator()(StaticDrawableWrapper* s)
     {
         return s->m_name == id;
     }
@@ -55,7 +55,7 @@ void CUIGameCustom::OnFrame()
     CDialogHolder::OnFrame();
     for (auto item : CustomStatics)
         item->Update();
-    auto comparer = [](const SDrawStaticStruct* s1, const SDrawStaticStruct* s2)
+    auto comparer = [](const StaticDrawableWrapper* s1, const StaticDrawableWrapper* s2)
     {
         return s1->IsActual() > s2->IsActual();
     };
@@ -79,7 +79,7 @@ void CUIGameCustom::OnFrame()
 
 void CUIGameCustom::Render()
 {
-    for (SDrawStaticStruct* item : CustomStatics)
+    for (StaticDrawableWrapper* item : CustomStatics)
         item->Draw();
     Window->Draw();
     CEntity* pEntity = smart_cast<CEntity*>(Level().CurrentEntity());
@@ -105,7 +105,7 @@ void CUIGameCustom::Render()
     DoRenderDialogs();
 }
 
-SDrawStaticStruct* CUIGameCustom::AddCustomStatic(const char* id, bool singleInstance)
+StaticDrawableWrapper* CUIGameCustom::AddCustomStatic(const char* id, bool singleInstance)
 {
     if (singleInstance)
     {
@@ -114,8 +114,8 @@ SDrawStaticStruct* CUIGameCustom::AddCustomStatic(const char* id, bool singleIns
             return *it;
     }
     CUIXmlInit xmlInit;
-    CustomStatics.push_back(xr_new<SDrawStaticStruct>());
-    SDrawStaticStruct* sss = CustomStatics.back();
+    CustomStatics.push_back(xr_new<StaticDrawableWrapper>());
+    StaticDrawableWrapper* sss = CustomStatics.back();
     sss->m_static = xr_new<CUIStatic>();
     sss->m_name = id;
     xmlInit.InitStatic(*MsgConfig, id, 0, sss->m_static);
@@ -125,7 +125,7 @@ SDrawStaticStruct* CUIGameCustom::AddCustomStatic(const char* id, bool singleIns
     return sss;
 }
 
-SDrawStaticStruct* CUIGameCustom::GetCustomStatic(const char* id)
+StaticDrawableWrapper* CUIGameCustom::GetCustomStatic(const char* id)
 {
     auto it = std::find_if(CustomStatics.begin(), CustomStatics.end(), predicate_find_stat(id));
     if (it != CustomStatics.end())
@@ -270,25 +270,25 @@ void CUIGameCustom::enable_fake_indicators(bool enable)
     UIMainIngameWnd->get_hud_states()->EnableFakeIndicators(enable);
 }
 
-SDrawStaticStruct::SDrawStaticStruct()
+StaticDrawableWrapper::StaticDrawableWrapper()
 {
     m_static = nullptr;
     m_endTime = -1.0f;
 }
 
-void SDrawStaticStruct::destroy()
+void StaticDrawableWrapper::destroy()
 {
     delete_data(m_static);
 }
 
-bool SDrawStaticStruct::IsActual() const
+bool StaticDrawableWrapper::IsActual() const
 {
     if (m_endTime < 0)
         return true;
     return Device.fTimeGlobal < m_endTime;
 }
 
-void SDrawStaticStruct::SetText(const char* text)
+void StaticDrawableWrapper::SetText(const char* text)
 {
     m_static->Show(text != nullptr);
     if (text)
@@ -298,13 +298,13 @@ void SDrawStaticStruct::SetText(const char* text)
     }
 }
 
-void SDrawStaticStruct::Draw()
+void StaticDrawableWrapper::Draw()
 {
     if (m_static->IsShown())
         m_static->Draw();
 }
 
-void SDrawStaticStruct::Update()
+void StaticDrawableWrapper::Update()
 {
     if (IsActual() && m_static->IsShown())
         m_static->Update();
