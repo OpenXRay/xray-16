@@ -29,7 +29,7 @@ nitrocaster: Pavel Kovalenko
     - dig through current ODE and analyze changes that were made by GSC
     - get the latest ODE and make sure it can be used with xray
   - remove openssl code from crypto, use it as external library
-- known bugs
+- bugs/issues
   - generic
     - stackoverflow when starting with too long command line
     - stackoverflow when game directory contains too many files (_alloca)
@@ -38,18 +38,19 @@ nitrocaster: Pavel Kovalenko
     - GetColorFromText bug
     - (bytes_need<=mSize) && vl_Count
     - "! tab named [1] doesnt exist"
+    - clip cursor in windowed mode with enabled input capture
   - core
     - buffer overflow when copying command line to Core.Params
     - misplaced arguments in calls to xrDebug::backend
   - multiplayer
     - xrGameSpy: fix master server name (gamespy is down)
     - dedicated server
-      - known multiple vulnerabilities (verify)
+      - vulnerabilities (verify)
         - dirtysky
         - stalkazz
         - stalkerbof
         - stalkerboom
-    - voting for weather: rainy/cloudy buttons are mixed up
+    + voting for weather: rainy/cloudy buttons are mixed up
   - render
     - when d3d compiler fails to compile some shader, it displays message
       "Your video card doesn't meet game requirements ..." even if GPU actually meets game requirements (feature level)
@@ -59,6 +60,8 @@ nitrocaster: Pavel Kovalenko
     - update plugins for new 3DS Max versions
 - improvements
   - common/unsorted
+    - review and refactor code
+    - fix log messages format (normally, the 'color' character should be followed by a space)
   - multiplayer
     - use GSC server instead of GameSpy one
   	- ipv6 support
@@ -79,9 +82,7 @@ nitrocaster: Pavel Kovalenko
   - render
     - FXAA
     - glow material doesn't cast shadows (causes artefacts on actor shadow)
-- consider disabling accel when falling (more realistic)
-- log messages
-  - fix log messages format (normally, the 'color' character should be followed by a space)
+  - consider disabling accel when falling (more realistic)
 
 STALKER_2010: Andrew Boyarshin
 * detach/update LuaJIT
