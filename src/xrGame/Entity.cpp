@@ -322,17 +322,43 @@ DLL_Pure *CEntity::_construct	()
 
 const u32 FORGET_KILLER_TIME = 180000;
 
-void CEntity::shedule_Update	(u32 dt)
+void CEntity::shedule_Update(u32 dt)
 {
-	inherited::shedule_Update	(dt);
-	if (!getDestroy() && !g_Alive() && (m_killer_id != u16(-1))) {
-		if (Device.dwTimeGlobal > m_level_death_time + FORGET_KILLER_TIME) {
-			m_killer_id			= u16(-1);
-			NET_Packet			P;
-			u_EventGen			(P,GE_ASSIGN_KILLER,ID());
-			P.w_u16				(u16(-1));
-			if (IsGameTypeSingle())	u_EventSend			(P);
+	inherited::shedule_Update(dt);
+	BOOL lDestroy = TRUE;
+	BOOL lAlive = TRUE;
+	BOOL lKillerId = TRUE;
+	try {
+		lDestroy = getDestroy();
+	}
+	catch (std::exception& e) {
+		Msg("RELEASE CONFIGURATION FIX: lDestroy failed");
+	}
+	try {
+		lAlive = g_Alive();
+	}
+	catch (std::exception& e) {
+		Msg("RELEASE CONFIGURATION FIX: lAlive failed");
+	}
+	try {
+		lKillerId = m_killer_id != u16(-1);
+	}
+	catch (std::exception& e) {
+		Msg("RELEASE CONFIGURATION FIX: lKillerId failed");
+	}
+	try {
+		if (!lDestroy && !lAlive && lKillerId) {
+			if (Device.dwTimeGlobal > m_level_death_time + FORGET_KILLER_TIME) {
+				m_killer_id = u16(-1);
+				NET_Packet			P;
+				u_EventGen(P, GE_ASSIGN_KILLER, ID());
+				P.w_u16(u16(-1));
+				if (IsGameTypeSingle())	u_EventSend(P);
+			}
 		}
+	}
+	catch (std::exception& e) {
+		Msg("RELEASE CONFIGURATION FIX: if block failed");
 	}
 }
 
