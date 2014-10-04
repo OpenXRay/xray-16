@@ -1,8 +1,8 @@
 TITLE: X-Ray 1.6 build instructions
 
 By default, all libraries mentioned below (except Windows/DirectX SDK) are assumed to be in the directory
-defined by XRAY_16X_LIBS environment variable (set this by going to System, then going to Advanced system
-settings and then clicking on Environmental Variables).
+defined by XRAY_16X_LIBS environment variable. It can be set with following command (run as administrator):
+  $ setx XRAY_16X_LIBS E:\dev\ /M
 
 To build X-Ray Engine you'll need following libraries:
 * OpenAutomate: https://developer.nvidia.com/openautomate
