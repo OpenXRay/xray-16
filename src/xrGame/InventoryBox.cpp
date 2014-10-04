@@ -42,9 +42,9 @@ void CInventoryBox::OnEvent(NET_Packet& P, u16 type)
 			VERIFY					(pIItem);
 			if( CurrentGameUI() )
 			{
-				if(CurrentGameUI()->ActorMenu().GetMenuMode()==mmDeadBodySearch)
+				if(CurrentGameUI()->GetActorMenu().GetMenuMode()==mmDeadBodySearch)
 				{
-					if(this==CurrentGameUI()->ActorMenu().GetInvBox())
+					if(this==CurrentGameUI()->GetActorMenu().GetInvBox())
 						CurrentGameUI()->OnInventoryAction(pIItem, GE_OWNERSHIP_TAKE);
 				}
 			};

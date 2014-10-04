@@ -16,488 +16,432 @@
 #include "inventory.h"
 #include "game_cl_base.h"
 
-#include "../xrEngine/x_ray.h"
+#include "xrEngine/x_ray.h"
 
-EGameIDs ParseStringToGameType(LPCSTR str);
+EGameIDs ParseStringToGameType(const char* str);
 
-bool predicate_sort_stat(const SDrawStaticStruct* s1, const SDrawStaticStruct* s2) 
+bool predicate_sort_stat(const SDrawStaticStruct* s1, const SDrawStaticStruct* s2)
 {
-	return ( s1->IsActual() > s2->IsActual() );
+    return s1->IsActual() > s2->IsActual();
 }
 
-struct predicate_find_stat 
+struct predicate_find_stat
 {
-	LPCSTR	m_id;
-	predicate_find_stat(LPCSTR id):m_id(id)	{}
-	bool	operator() (SDrawStaticStruct* s) 
-	{
-		return ( s->m_name==m_id );
-	}
+    const char* id;
+    predicate_find_stat(const char* id) { this->id = id; }
+    bool operator()(SDrawStaticStruct* s)
+    {
+        return s->m_name == id;
+    }
 };
 
 CUIGameCustom::CUIGameCustom()
-:m_msgs_xml(NULL),m_ActorMenu(NULL),m_PdaMenu(NULL),m_window(NULL),UIMainIngameWnd(NULL),m_pMessagesWnd(NULL)
 {
-	ShowGameIndicators		(true);
-	ShowCrosshair			(true);
-
+    MsgConfig = nullptr;
+    ActorMenu = nullptr;
+    PdaMenu = nullptr;
+    Window = nullptr;
+    UIMainIngameWnd = nullptr;
+    m_pMessagesWnd = nullptr;
+    ShowGameIndicators(true);
+    ShowCrosshair(true);
 }
+
 bool g_b_ClearGameCaptions = false;
 
 CUIGameCustom::~CUIGameCustom()
 {
-	delete_data				(m_custom_statics);
-	g_b_ClearGameCaptions	= false;
+    delete_data(CustomStatics);
+    g_b_ClearGameCaptions = false;
 }
 
-
-void CUIGameCustom::OnFrame() 
+void CUIGameCustom::OnFrame()
 {
-	CDialogHolder::OnFrame();
-	st_vec_it it = m_custom_statics.begin();
-	st_vec_it it_e = m_custom_statics.end();
-	for(;it!=it_e;++it)
-		(*it)->Update();
-
-	std::sort(	it, it_e, predicate_sort_stat );
-
-	
-	while(!m_custom_statics.empty() && !m_custom_statics.back()->IsActual())
-	{
-		delete_data					(m_custom_statics.back());
-		m_custom_statics.pop_back	();
-	}
-	
-	if(g_b_ClearGameCaptions)
-	{
-		delete_data				(m_custom_statics);
-		g_b_ClearGameCaptions	= false;
-	}
-	m_window->Update();
-
-	//update windows
-	if( GameIndicatorsShown() && psHUD_Flags.is(HUD_DRAW|HUD_DRAW_RT) )
-		UIMainIngameWnd->Update	();
-
-	m_pMessagesWnd->Update();
+    CDialogHolder::OnFrame();
+    auto it = CustomStatics.begin();
+    auto it_e = CustomStatics.end();
+    for (; it != it_e; ++it)
+        (*it)->Update();
+    // BUG: sort is never performed here, so not all inactual items will be deleted
+    std::sort(it, it_e, predicate_sort_stat);
+    while (!CustomStatics.empty() && !CustomStatics.back()->IsActual())
+    {
+        delete_data(CustomStatics.back());
+        CustomStatics.pop_back();
+    }
+    if (g_b_ClearGameCaptions)
+    {
+        delete_data(CustomStatics);
+        g_b_ClearGameCaptions = false;
+    }
+    Window->Update();
+    //update windows
+    if (GameIndicatorsShown() && psHUD_Flags.is(HUD_DRAW | HUD_DRAW_RT))
+        UIMainIngameWnd->Update();
+    m_pMessagesWnd->Update();
 }
 
 void CUIGameCustom::Render()
 {
-	st_vec_it it = m_custom_statics.begin();
-	st_vec_it it_e = m_custom_statics.end();
-	for(;it!=it_e;++it)
-		(*it)->Draw();
-
-	m_window->Draw();
-
-	CEntity* pEntity = smart_cast<CEntity*>(Level().CurrentEntity());
-	if (pEntity)
-	{
-		CActor* pActor			=	smart_cast<CActor*>(pEntity);
-		if(pActor && pActor->HUDview() && pActor->g_Alive() && psHUD_Flags.is(HUD_WEAPON|HUD_WEAPON_RT|HUD_WEAPON_RT2))
-		{
-			u16 ISlot = pActor->inventory().FirstSlot();
-			u16 ESlot = pActor->inventory().LastSlot();
-
-			for( ; ISlot<=ESlot; ++ISlot)
-			{
-				PIItem itm			= pActor->inventory().ItemFromSlot(ISlot);
-				if(itm && itm->render_item_ui_query())
-					itm->render_item_ui();
-			}
-		}
-
-		if( GameIndicatorsShown() && psHUD_Flags.is(HUD_DRAW | HUD_DRAW_RT) )
-			UIMainIngameWnd->Draw();
-	}
-
-	m_pMessagesWnd->Draw();
-
-	DoRenderDialogs();
+    for (SDrawStaticStruct* item : CustomStatics)
+        item->Draw();
+    Window->Draw();
+    CEntity* pEntity = smart_cast<CEntity*>(Level().CurrentEntity());
+    if (pEntity)
+    {
+        CActor* pActor = smart_cast<CActor*>(pEntity);
+        if (pActor && pActor->HUDview() && pActor->g_Alive() &&
+            psHUD_Flags.is(HUD_WEAPON | HUD_WEAPON_RT | HUD_WEAPON_RT2))
+        {
+            CInventory& inventory = pActor->inventory();
+            u16 lastSlot = inventory.LastSlot();
+            for (u16 slot = inventory.FirstSlot(); slot <= lastSlot; slot++)
+            {
+                CInventoryItem* item = inventory.ItemFromSlot(slot);
+                if (item && item->render_item_ui_query())
+                    item->render_item_ui();
+            }
+        }
+        if (GameIndicatorsShown() && psHUD_Flags.is(HUD_DRAW | HUD_DRAW_RT))
+            UIMainIngameWnd->Draw();
+    }
+    m_pMessagesWnd->Draw();
+    DoRenderDialogs();
 }
 
-SDrawStaticStruct* CUIGameCustom::AddCustomStatic(LPCSTR id, bool bSingleInstance)
+SDrawStaticStruct* CUIGameCustom::AddCustomStatic(const char* id, bool singleInstance)
 {
-	if(bSingleInstance)
-	{
-		st_vec::iterator it = std::find_if(m_custom_statics.begin(),m_custom_statics.end(), predicate_find_stat(id) );
-		if(it!=m_custom_statics.end())
-			return (*it);
-	}
-	
-	CUIXmlInit xml_init;
-	m_custom_statics.push_back		( xr_new<SDrawStaticStruct>() );
-	SDrawStaticStruct* sss			= m_custom_statics.back();
-
-	sss->m_static					= xr_new<CUIStatic>();
-	sss->m_name						= id;
-	xml_init.InitStatic				(*m_msgs_xml, id, 0, sss->m_static);
-	float ttl						= m_msgs_xml->ReadAttribFlt(id, 0, "ttl", -1);
-	if(ttl>0.0f)
-		sss->m_endTime				= Device.fTimeGlobal + ttl;
-
-	return sss;
+    if (singleInstance)
+    {
+        auto it = std::find_if(CustomStatics.begin(), CustomStatics.end(), predicate_find_stat(id));
+        if (it != CustomStatics.end())
+            return *it;
+    }
+    CUIXmlInit xmlInit;
+    CustomStatics.push_back(xr_new<SDrawStaticStruct>());
+    SDrawStaticStruct* sss = CustomStatics.back();
+    sss->m_static = xr_new<CUIStatic>();
+    sss->m_name = id;
+    xmlInit.InitStatic(*MsgConfig, id, 0, sss->m_static);
+    float ttl = MsgConfig->ReadAttribFlt(id, 0, "ttl", -1.0f);
+    if (ttl > 0.0f)
+        sss->m_endTime = Device.fTimeGlobal+ttl;
+    return sss;
 }
 
-SDrawStaticStruct* CUIGameCustom::GetCustomStatic(LPCSTR id)
+SDrawStaticStruct* CUIGameCustom::GetCustomStatic(const char* id)
 {
-	st_vec::iterator it = std::find_if(m_custom_statics.begin(),m_custom_statics.end(), predicate_find_stat(id));
-	if(it!=m_custom_statics.end())
-		return (*it);
-
-	return NULL;
+    auto it = std::find_if(CustomStatics.begin(), CustomStatics.end(), predicate_find_stat(id));
+    if (it != CustomStatics.end())
+        return *it;
+    return nullptr;
 }
 
-void CUIGameCustom::RemoveCustomStatic(LPCSTR id)
+void CUIGameCustom::RemoveCustomStatic(const char* id)
 {
-	st_vec::iterator it = std::find_if(m_custom_statics.begin(),m_custom_statics.end(), predicate_find_stat(id) );
-	if(it!=m_custom_statics.end())
-	{
-			delete_data				(*it);
-		m_custom_statics.erase	(it);
-	}
+    auto it = std::find_if(CustomStatics.begin(), CustomStatics.end(), predicate_find_stat(id));
+    if (it != CustomStatics.end())
+    {
+        delete_data(*it);
+        CustomStatics.erase(it);
+    }
 }
 
-void CUIGameCustom::OnInventoryAction(PIItem item, u16 action_type)
+void CUIGameCustom::OnInventoryAction(PIItem item, u16 actionType)
 {
-	if ( m_ActorMenu->IsShown() )
-		m_ActorMenu->OnInventoryAction( item, action_type );
+    if (ActorMenu->IsShown())
+        ActorMenu->OnInventoryAction(item, actionType);
 }
 
 #include "ui/UIGameTutorial.h"
-
+// XXX nitrocaster: move to appropriate header
 extern CUISequencer* g_tutorial;
 extern CUISequencer* g_tutorial2;
 
 bool CUIGameCustom::ShowActorMenu()
 {
-	if ( m_ActorMenu->IsShown() )
-	{
-		m_ActorMenu->HideDialog();
-	}else
-	{
-		HidePdaMenu();
-		CInventoryOwner* pIOActor	= smart_cast<CInventoryOwner*>( Level().CurrentViewEntity() );
-		VERIFY						(pIOActor);
-		m_ActorMenu->SetActor		(pIOActor);
-		m_ActorMenu->SetMenuMode	(mmInventory);
-		m_ActorMenu->ShowDialog		(true);
-	}
-	return true;
+    if (ActorMenu->IsShown())
+    {
+        ActorMenu->HideDialog();
+    }
+    else
+    {
+        HidePdaMenu();
+        auto actor = smart_cast<CInventoryOwner*>(Level().CurrentViewEntity());
+        VERIFY(actor);
+        ActorMenu->SetActor(actor);
+        ActorMenu->SetMenuMode(mmInventory);
+        ActorMenu->ShowDialog(true);
+    }
+    return true;
 }
 
 void CUIGameCustom::HideActorMenu()
 {
-	if ( m_ActorMenu->IsShown() )
-	{
-		m_ActorMenu->HideDialog();
-	}
+    if (ActorMenu->IsShown())
+        ActorMenu->HideDialog();
 }
 
 void CUIGameCustom::HideMessagesWindow()
 {
-	if ( m_pMessagesWnd->IsShown() )
-		m_pMessagesWnd->Show(false);
+    if (m_pMessagesWnd->IsShown())
+        m_pMessagesWnd->Show(false);
 }
 
 void CUIGameCustom::ShowMessagesWindow()
 {
-	if ( !m_pMessagesWnd->IsShown() )
-		m_pMessagesWnd->Show(true);
+    if (!m_pMessagesWnd->IsShown())
+        m_pMessagesWnd->Show(true);
 }
 
 bool CUIGameCustom::ShowPdaMenu()
 {
-	HideActorMenu();
-	m_PdaMenu->ShowDialog(true);
-	return true;
+    HideActorMenu();
+    PdaMenu->ShowDialog(true);
+    return true;
 }
 
 void CUIGameCustom::HidePdaMenu()
 {
-	if ( m_PdaMenu->IsShown() )
-	{
-		m_PdaMenu->HideDialog();
-	}
+    if (PdaMenu->IsShown())
+        PdaMenu->HideDialog();
 }
 
-void CUIGameCustom::SetClGame(game_cl_GameState* g)
+void CUIGameCustom::SetClGame(game_cl_GameState* gameState)
 {
-	g->SetGameUI(this);
+    gameState->SetGameUI(this);
 }
 
 void CUIGameCustom::UnLoad()
 {
-	xr_delete					(m_msgs_xml);
-	xr_delete					(m_ActorMenu);
-	xr_delete					(m_PdaMenu);
-	xr_delete					(m_window);
-	xr_delete					(UIMainIngameWnd);
-	xr_delete					(m_pMessagesWnd);
+    xr_delete(MsgConfig);
+    xr_delete(ActorMenu);
+    xr_delete(PdaMenu);
+    xr_delete(Window);
+    xr_delete(UIMainIngameWnd);
+    xr_delete(m_pMessagesWnd);
 }
 
 void CUIGameCustom::Load()
 {
-	if(g_pGameLevel)
-	{
-		R_ASSERT				(NULL==m_msgs_xml);
-		m_msgs_xml				= xr_new<CUIXml>();
-		m_msgs_xml->Load		(CONFIG_PATH, UI_PATH, "ui_custom_msgs.xml");
-
-		R_ASSERT				(NULL==m_ActorMenu);
-		m_ActorMenu				= xr_new<CUIActorMenu>		();
-
-		R_ASSERT				(NULL==m_PdaMenu);
-		m_PdaMenu				= xr_new<CUIPdaWnd>			();
-		
-		R_ASSERT				(NULL==m_window);
-		m_window				= xr_new<CUIWindow>			();
-
-		R_ASSERT				(NULL==UIMainIngameWnd);
-		UIMainIngameWnd			= xr_new<CUIMainIngameWnd>	();
-		UIMainIngameWnd->Init	();
-
-		R_ASSERT				(NULL==m_pMessagesWnd);
-		m_pMessagesWnd			= xr_new<CUIMessagesWindow>();
-		
-		Init					(0);
-		Init					(1);
-		Init					(2);
-	}
+    if (!g_pGameLevel)
+        return;
+    R_ASSERT(!MsgConfig);
+    MsgConfig = xr_new<CUIXml>();
+    MsgConfig->Load(CONFIG_PATH, UI_PATH, "ui_custom_msgs.xml");
+    R_ASSERT(!ActorMenu);
+    ActorMenu = xr_new<CUIActorMenu>();
+    R_ASSERT(!PdaMenu);
+    PdaMenu = xr_new<CUIPdaWnd>();
+    R_ASSERT(!Window);
+    Window = xr_new<CUIWindow>();
+    R_ASSERT(!UIMainIngameWnd);
+    UIMainIngameWnd = xr_new<CUIMainIngameWnd>();
+    UIMainIngameWnd->Init();
+    R_ASSERT(!m_pMessagesWnd);
+    m_pMessagesWnd = xr_new<CUIMessagesWindow>();
+    Init(0);
+    Init(1);
+    Init(2);
 }
 
 void CUIGameCustom::OnConnected()
 {
-	if(g_pGameLevel)
-	{
-		if(!UIMainIngameWnd)
-			Load();
-
-		UIMainIngameWnd->OnConnected();
-	}
+    if (!g_pGameLevel)
+        return;
+    if (!UIMainIngameWnd)
+        Load();
+    UIMainIngameWnd->OnConnected();
 }
 
 void CUIGameCustom::CommonMessageOut(LPCSTR text)
 {
-	m_pMessagesWnd->AddLogMessage(text);
+    m_pMessagesWnd->AddLogMessage(text);
 }
+
 void CUIGameCustom::UpdatePda()
 {
-	PdaMenu().UpdatePda();
+    GetPdaMenu().UpdatePda();
 }
 
 void CUIGameCustom::update_fake_indicators(u8 type, float power)
 {
-	UIMainIngameWnd->get_hud_states()->FakeUpdateIndicatorType(type, power);
+    UIMainIngameWnd->get_hud_states()->FakeUpdateIndicatorType(type, power);
 }
 
 void CUIGameCustom::enable_fake_indicators(bool enable)
 {
-	UIMainIngameWnd->get_hud_states()->EnableFakeIndicators(enable);
+    UIMainIngameWnd->get_hud_states()->EnableFakeIndicators(enable);
 }
 
-SDrawStaticStruct::SDrawStaticStruct	()
+SDrawStaticStruct::SDrawStaticStruct()
 {
-	m_static	= NULL;
-	m_endTime	= -1.0f;	
+    m_static = nullptr;
+    m_endTime = -1.0f;
 }
 
 void SDrawStaticStruct::destroy()
 {
-	delete_data(m_static);
+    delete_data(m_static);
 }
 
 bool SDrawStaticStruct::IsActual() const
 {
-	if(m_endTime<0)			return true;
-	return (Device.fTimeGlobal < m_endTime);
+    if (m_endTime < 0)
+        return true;
+    return Device.fTimeGlobal < m_endTime;
 }
 
-void SDrawStaticStruct::SetText(LPCSTR text)
+void SDrawStaticStruct::SetText(const char* text)
 {
-	m_static->Show(text!=NULL);
-	if(text)
-	{
-		m_static->TextItemControl()->SetTextST(text);
-		m_static->ResetColorAnimation();
-	}
+    m_static->Show(text != nullptr);
+    if (text)
+    {
+        m_static->TextItemControl()->SetTextST(text);
+        m_static->ResetColorAnimation();
+    }
 }
 
 void SDrawStaticStruct::Draw()
 {
-	if(m_static->IsShown())
-		m_static->Draw();
+    if (m_static->IsShown())
+        m_static->Draw();
 }
 
 void SDrawStaticStruct::Update()
 {
-	if(IsActual() && m_static->IsShown())	
-		m_static->Update();
+    if (IsActual() && m_static->IsShown())
+        m_static->Update();
 }
 
-CMapListHelper	gMapListHelper;
-xr_token		game_types[];
+CMapListHelper gMapListHelper;
 
-void CMapListHelper::LoadMapInfo(LPCSTR map_cfg_fn, const xr_string& map_name, LPCSTR map_ver)
+void CMapListHelper::LoadMapInfo(const char* cfgName, const xr_string& levelName, const char* levelVer /*= "1.0"*/)
 {
-	CInifile	ini				(map_cfg_fn);
-
-	shared_str _map_name		= map_name.substr(0,map_name.find('\\')).c_str();
-	shared_str _map_ver			= map_ver;
-
-	if(ini.section_exist("map_usage"))
-	{
-		if(ini.line_exist("map_usage","ver") && !map_ver)
-			_map_ver				= ini.r_string("map_usage", "ver");
-
-		CInifile::Sect S			= ini.r_section("map_usage");
-		CInifile::SectCIt si		= S.Data.begin();
-		CInifile::SectCIt si_e		= S.Data.end();
-		for( ;si!=si_e; ++si)
-		{
-			const shared_str& game_type = (*si).first;
-			
-			if(game_type=="ver")		continue;
-
-			SGameTypeMaps* M			= GetMapListInt(game_type);
-			if(!M)
-			{
-				Msg						("--unknown game type-%s",game_type.c_str());
-				m_storage.resize		(m_storage.size()+1);
-				SGameTypeMaps&	Itm		= m_storage.back();
-				Itm.m_game_type_name	= game_type;
-				Itm.m_game_type_id		= ParseStringToGameType(game_type.c_str());
-				M						= &m_storage.back();
-			}
-			
-			SGameTypeMaps::SMapItm	Itm;
-			Itm.map_name				= _map_name;
-			Itm.map_ver					= _map_ver;
-			
-			if(M->m_map_names.end()!=std::find(M->m_map_names.begin(),M->m_map_names.end(),Itm))
-			{
-				Msg("! duplicate map found [%s] [%s]", _map_name.c_str(), _map_ver.c_str());
-			}else
-			{
+    CInifile levelCfg(cfgName);
+    shared_str shLevelName = levelName.substr(0, levelName.find('\\')).c_str();
+    shared_str shLevelVer = levelVer;
+    if (levelCfg.section_exist("map_usage"))
+    {
+        if (levelCfg.line_exist("map_usage", "ver") && !levelVer)
+            shLevelVer = levelCfg.r_string("map_usage", "ver");
+        for (CInifile::Item& kv : levelCfg.r_section("map_usage").Data)
+        {
+            const shared_str& gameType = kv.first;
+            if (gameType == "ver")
+                continue;
+            SGameTypeMaps* suitableLevels = GetMapListInt(gameType);
+            if (!suitableLevels)
+            {
+                Msg("--unknown game type-%s", gameType.c_str());
+                m_storage.resize(m_storage.size()+1);
+                SGameTypeMaps& lastItem = m_storage.back();
+                lastItem.m_game_type_name = gameType;
+                lastItem.m_game_type_id = ParseStringToGameType(gameType.c_str());
+                suitableLevels = &m_storage.back();
+            }
+            SGameTypeMaps::SMapItm levelDesc;
+            levelDesc.map_name = shLevelName;
+            levelDesc.map_ver = shLevelVer;
+            auto& levelNames = suitableLevels->m_map_names;
+            if (std::find(levelNames.begin(), levelNames.end(), levelDesc) != levelNames.end())
+            {
+                Msg("! duplicate map found [%s] [%s]", shLevelName.c_str(), shLevelVer.c_str());
+            }
+            else
+            {
 #ifndef MASTER_GOLD
-				Msg("added map [%s] [%s]", _map_name.c_str(), _map_ver.c_str());
-#endif // #ifndef MASTER_GOLD
-				M->m_map_names.push_back	(Itm);
-			}
-		}			
-	}
-
+                Msg("added map [%s] [%s]", shLevelName.c_str(), shLevelVer.c_str());
+#endif
+                levelNames.push_back(levelDesc);
+            }
+        }
+    }
 }
 
 void CMapListHelper::Load()
 {
-	string_path					fn;
-	FS.update_path				(fn, "$game_config$", "mp\\map_list.ltx");
-	CInifile map_list_cfg		(fn);
-
-	//read weathers set
-	CInifile::Sect w			= map_list_cfg.r_section("weather");
-	CInifile::SectCIt wi		= w.Data.begin();
-	CInifile::SectCIt wi_e		= w.Data.end();
-	for( ;wi!=wi_e; ++wi)
-	{
-		m_weathers.resize		(m_weathers.size()+1);
-		SGameWeathers& gw		= m_weathers.back();
-		gw.m_weather_name		= (*wi).first;
-		gw.m_start_time			= (*wi).second;
-	}
-
-	// scan for additional maps
-	FS_FileSet			fset;
-	FS.file_list		(fset,"$game_levels$",FS_ListFiles,"*level.ltx");
-
-	FS_FileSetIt fit	= fset.begin();
-	FS_FileSetIt fit_e	= fset.end();
-
-	for( ;fit!=fit_e; ++fit)
-	{
-		string_path					map_cfg_fn;
-		FS.update_path				(map_cfg_fn, "$game_levels$", (*fit).name.c_str());
-		LoadMapInfo					(map_cfg_fn, (*fit).name);
-	}
-	//scan all not laoded archieves
-	LPCSTR tmp_entrypoint			= "temporary_gamedata\\";
-	FS_Path* game_levels			= FS.get_path("$game_levels$");
-	xr_string prev_root				= game_levels->m_Root;
-	game_levels->_set_root			(tmp_entrypoint);
-
-	CLocatorAPI::archives_it it		= FS.m_archives.begin();
-	CLocatorAPI::archives_it it_e	= FS.m_archives.end();
-
-	for(;it!=it_e;++it)
-	{
-		CLocatorAPI::archive& A		= *it;
-		if(A.hSrcFile)				continue;
-
-		LPCSTR ln					= A.header->r_string("header", "level_name");
-		LPCSTR lv					= A.header->r_string("header", "level_ver");
-		FS.LoadArchive				(A, tmp_entrypoint);
-
-		string_path					map_cfg_fn;
-		FS.update_path				(map_cfg_fn, "$game_levels$", ln);
-
-		
-		xr_strcat					(map_cfg_fn,"\\level.ltx");
-		LoadMapInfo					(map_cfg_fn, ln, lv);
-		FS.unload_archive			(A);
-	}
-	game_levels->_set_root			(prev_root.c_str());
-
-
-	R_ASSERT2	(m_storage.size(), "unable to fill map list");
-	R_ASSERT2	(m_weathers.size(), "unable to fill weathers list");
+    string_path cfgFileName;
+    FS.update_path(cfgFileName, "$game_config$", "mp\\map_list.ltx");
+    CInifile maplistCfg(cfgFileName);
+    //read weathers set
+    CInifile::Sect weatherCfg = maplistCfg.r_section("weather");
+    m_weathers.reserve(weatherCfg.Data.size());
+    for (CInifile::Item& weatherDesc : weatherCfg.Data)
+    {
+        SGameWeathers gw;
+        gw.Name = weatherDesc.first;
+        gw.StartTime = weatherDesc.second;
+        m_weathers.push_back(gw);
+    }
+    // scan for additional maps
+    FS_FileSet levelCfgs;
+    FS.file_list(levelCfgs, "$game_levels$", FS_ListFiles, "*level.ltx");
+    for (const FS_File& cfg : levelCfgs)
+    {
+        FS.update_path(cfgFileName, "$game_levels$", cfg.name.c_str());
+        LoadMapInfo(cfgFileName, cfg.name);
+    }
+    //scan all not loaded archieves
+    LPCSTR tempRoot = "temporary_gamedata\\";
+    FS_Path* levelsPath = FS.get_path("$game_levels$");
+    xr_string prevRoot = levelsPath->m_Root;
+    levelsPath->_set_root(tempRoot);
+    for (CLocatorAPI::archive& arch : FS.m_archives)
+    {
+        if (arch.hSrcFile)
+            continue; // skip if loaded
+        const char* levelName = arch.header->r_string("header", "level_name");
+        const char* levelVersion = arch.header->r_string("header", "level_ver");
+        FS.LoadArchive(arch, tempRoot);
+        FS.update_path(cfgFileName, "$game_levels$", levelName);
+        xr_strcat(cfgFileName, "\\level.ltx");
+        LoadMapInfo(cfgFileName, levelName, levelVersion);
+        FS.unload_archive(arch);
+    }
+    levelsPath->_set_root(prevRoot.c_str());
+    // XXX nitrocaster: is that really fatal?
+    R_ASSERT2(m_storage.size() > 0, "unable to fill map list");
+    R_ASSERT2(m_weathers.size() > 0, "unable to fill weathers list");
 }
 
-
-const SGameTypeMaps& CMapListHelper::GetMapListFor(const shared_str& game_type)
+const SGameTypeMaps& CMapListHelper::GetMapListFor(const shared_str& gameType)
 {
-	if( !m_storage.size() )
-		Load		();
-
-	return *GetMapListInt(game_type);
+    if (m_storage.size() == 0)
+        Load();
+    // XXX nitrocaster: always use enum for game type representation
+    return *GetMapListInt(gameType);
 }
 
-SGameTypeMaps* CMapListHelper::GetMapListInt(const shared_str& game_type)
+SGameTypeMaps* CMapListHelper::GetMapListInt(const shared_str& gameType)
 {
-
-	TSTORAGE_CIT it		= m_storage.begin();
-	TSTORAGE_CIT it_e	= m_storage.end();
-	for( ;it!=it_e; ++it)
-	{
-		if(game_type==(*it).m_game_type_name )
-			return &(*it);
-	}
-	return NULL;
+    for (SGameTypeMaps& maps : m_storage)
+    {
+        if (maps.m_game_type_name == gameType)
+            return &maps;
+    }
+    return nullptr;
 }
 
-const SGameTypeMaps& CMapListHelper::GetMapListFor(const EGameIDs game_id)
+const SGameTypeMaps& CMapListHelper::GetMapListFor(const EGameIDs gameId)
 {
-	if( !m_storage.size() )
-	{
-		Load		();
-		R_ASSERT2	(m_storage.size(), "unable to fill map list");
-	}
-	TSTORAGE_CIT it		= m_storage.begin();
-	TSTORAGE_CIT it_e	= m_storage.end();
-	for( ;it!=it_e; ++it)
-	{
-		if(game_id==(*it).m_game_type_id )
-			return (*it);
-	}
+    if (m_storage.size() == 0)
+    {
+        Load();
+        // XXX nitrocaster: is that really fatal?
+        R_ASSERT2(m_storage.size() > 0, "unable to fill map list");
+    }
+    for (SGameTypeMaps& maps : m_storage)
+    {
+        if (maps.m_game_type_id == gameId)
+            return maps;
+    }
 	return m_storage[0];
 }
 
-const GAME_WEATHERS& CMapListHelper::GetGameWeathers() 
+const xr_vector<SGameWeathers>& CMapListHelper::GetGameWeathers() 
 {
-	if(!m_weathers.size())
-		Load();
-
-	return m_weathers;
+    if (m_weathers.size() == 0)
+        Load();
+    return m_weathers;
 }
-

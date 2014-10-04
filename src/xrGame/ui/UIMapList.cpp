@@ -246,18 +246,12 @@ const char* CUIMapList::GetCommandLine(LPCSTR player_name){
 #include "../UIGameCustom.h"
 void CUIMapList::LoadMapList()
 {
-
-	GAME_WEATHERS game_weathers = gMapListHelper.GetGameWeathers();
-	GAME_WEATHERS_CIT it		= game_weathers.begin();
-	GAME_WEATHERS_CIT it_e		= game_weathers.end();
-	
-	u32 cnt=0;
-	for( ;it!=it_e; ++it, ++cnt)
-	{
-		AddWeather			( (*it).m_weather_name, (*it).m_start_time, cnt);
-	}
-	if( game_weathers.size() )
-		m_pWeatherSelector->SetItemIDX(0);
+    const auto& weathers = gMapListHelper.GetGameWeathers();
+    u32 cnt = 0;
+    for (const SGameWeathers& weather : weathers)
+        AddWeather(weather.Name, weather.StartTime, cnt++);
+    if (weathers.size() > 0)
+        m_pWeatherSelector->SetItemIDX(0);
 }
 
 void	CUIMapList::SaveMapList()

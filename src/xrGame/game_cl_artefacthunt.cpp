@@ -520,7 +520,7 @@ BOOL game_cl_ArtefactHunt::CanCallBuyMenu			()
 	{
 		return FALSE;
 	};
-	if ( m_game_ui && m_game_ui->ActorMenu().IsShown() )
+	if ( m_game_ui && m_game_ui->GetActorMenu().IsShown() )
 	{
 		return FALSE;
 	}

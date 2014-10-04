@@ -124,7 +124,7 @@ void CLevel::net_Stop		()
 	if(CurrentGameUI())
 	{
 		CurrentGameUI()->HideShownDialogs();
-		CurrentGameUI()->PdaMenu().Reset();
+		CurrentGameUI()->GetPdaMenu().Reset();
 	}
 
 	if(g_tutorial && !g_tutorial->Persistent())

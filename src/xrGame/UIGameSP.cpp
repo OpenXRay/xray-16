@@ -155,22 +155,22 @@ void  CUIGameSP::StartTrade(CInventoryOwner* pActorInv, CInventoryOwner* pOtherO
 {
 //.	if( MainInputReceiver() )	return;
 
-	m_ActorMenu->SetActor		(pActorInv);
-	m_ActorMenu->SetPartner		(pOtherOwner);
+	ActorMenu->SetActor		(pActorInv);
+	ActorMenu->SetPartner		(pOtherOwner);
 
-	m_ActorMenu->SetMenuMode	(mmTrade);
-	m_ActorMenu->ShowDialog		(true);
+	ActorMenu->SetMenuMode	(mmTrade);
+	ActorMenu->ShowDialog		(true);
 }
 
 void  CUIGameSP::StartUpgrade(CInventoryOwner* pActorInv, CInventoryOwner* pMech)
 {
 //.	if( MainInputReceiver() )	return;
 
-	m_ActorMenu->SetActor		(pActorInv);
-	m_ActorMenu->SetPartner		(pMech);
+	ActorMenu->SetActor		(pActorInv);
+	ActorMenu->SetPartner		(pMech);
 
-	m_ActorMenu->SetMenuMode	(mmUpgrade);
-	m_ActorMenu->ShowDialog		(true);
+	ActorMenu->SetMenuMode	(mmUpgrade);
+	ActorMenu->ShowDialog		(true);
 }
 
 void CUIGameSP::StartTalk(bool disable_break)
@@ -187,23 +187,23 @@ void CUIGameSP::StartCarBody(CInventoryOwner* pActorInv, CInventoryOwner* pOther
 {
 	if( TopInputReceiver() )		return;
 
-	m_ActorMenu->SetActor		(pActorInv);
-	m_ActorMenu->SetPartner		(pOtherOwner);
+	ActorMenu->SetActor		(pActorInv);
+	ActorMenu->SetPartner		(pOtherOwner);
 
-	m_ActorMenu->SetMenuMode	(mmDeadBodySearch);
-	m_ActorMenu->ShowDialog		(true);
+	ActorMenu->SetMenuMode	(mmDeadBodySearch);
+	ActorMenu->ShowDialog		(true);
 }
 
 void CUIGameSP::StartCarBody(CInventoryOwner* pActorInv, CInventoryBox* pBox) //Deadbody search
 {
 	if( TopInputReceiver() )		return;
 	
-	m_ActorMenu->SetActor		(pActorInv);
-	m_ActorMenu->SetInvBox		(pBox);
+	ActorMenu->SetActor		(pActorInv);
+	ActorMenu->SetInvBox		(pBox);
 	VERIFY( pBox );
 
-	m_ActorMenu->SetMenuMode	(mmDeadBodySearch);
-	m_ActorMenu->ShowDialog		(true);
+	ActorMenu->SetMenuMode	(mmDeadBodySearch);
+	ActorMenu->ShowDialog		(true);
 }
 
 

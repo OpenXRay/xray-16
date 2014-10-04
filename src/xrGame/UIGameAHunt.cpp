@@ -25,7 +25,7 @@ void CUIGameAHunt::Init	(int stage)
 	if(stage==0)
 	{ // shared
 		inherited::Init					(stage);
-		m_buy_msg_caption				= UIHelper::CreateTextWnd(*m_msgs_xml, "mp_ah_buy", m_window);
+		m_buy_msg_caption				= UIHelper::CreateTextWnd(*MsgConfig, "mp_ah_buy", Window);
 	}
 	if(stage==1)
 	{ //unique
@@ -34,7 +34,7 @@ void CUIGameAHunt::Init	(int stage)
 		CUIXml							uiXml;
 		uiXml.Load						(CONFIG_PATH, UI_PATH, "ui_game_ahunt.xml");
 
-		CUIXmlInit::InitWindow			(uiXml, "global", 0,		m_window);
+		CUIXmlInit::InitWindow			(uiXml, "global", 0,		Window);
 		CUIXmlInit::InitTextWnd			(uiXml, "fraglimit",0,		m_pFragLimitIndicator);
 
 		m_pReinforcementInidcator		= xr_new<CUITextWnd>();
@@ -52,7 +52,7 @@ void CUIGameAHunt::Init	(int stage)
 	if(stage==2)
 	{ //after
 		inherited::Init					(stage);
-		m_window->AttachChild			(m_pReinforcementInidcator);
+		Window->AttachChild			(m_pReinforcementInidcator);
 	}
 };
 

@@ -72,22 +72,22 @@ void	CUIGameDM::Init(int stage)
 		m_pFragLimitIndicator->SetAutoDelete(true);
 		
 		inherited::Init					(stage);
-		m_time_caption					= UIHelper::CreateTextWnd(*m_msgs_xml, "mp_timelimit", m_window);
-		m_spectrmode_caption			= UIHelper::CreateTextWnd(*m_msgs_xml, "mp_spetatormode", m_window);
-		m_spectator_caption				= UIHelper::CreateTextWnd(*m_msgs_xml, "mp_spectator", m_window);
-		m_pressjump_caption				= UIHelper::CreateTextWnd(*m_msgs_xml, "mp_pressjump", m_window);
-		m_pressbuy_caption				= UIHelper::CreateTextWnd(*m_msgs_xml, "mp_pressbuy", m_window);
-		m_round_result_caption			= UIHelper::CreateTextWnd(*m_msgs_xml, "mp_round_result", m_window);
-		m_force_respawn_time_caption	= UIHelper::CreateTextWnd(*m_msgs_xml, "mp_force_respawn_time", m_window);
-		m_demo_play_caption				= UIHelper::CreateTextWnd(*m_msgs_xml, "mp_demo_play", m_window);
-		m_warm_up_caption				= UIHelper::CreateTextWnd(*m_msgs_xml, "mp_warm_up", m_window);
+		m_time_caption					= UIHelper::CreateTextWnd(*MsgConfig, "mp_timelimit", Window);
+		m_spectrmode_caption			= UIHelper::CreateTextWnd(*MsgConfig, "mp_spetatormode", Window);
+		m_spectator_caption				= UIHelper::CreateTextWnd(*MsgConfig, "mp_spectator", Window);
+		m_pressjump_caption				= UIHelper::CreateTextWnd(*MsgConfig, "mp_pressjump", Window);
+		m_pressbuy_caption				= UIHelper::CreateTextWnd(*MsgConfig, "mp_pressbuy", Window);
+		m_round_result_caption			= UIHelper::CreateTextWnd(*MsgConfig, "mp_round_result", Window);
+		m_force_respawn_time_caption	= UIHelper::CreateTextWnd(*MsgConfig, "mp_force_respawn_time", Window);
+		m_demo_play_caption				= UIHelper::CreateTextWnd(*MsgConfig, "mp_demo_play", Window);
+		m_warm_up_caption				= UIHelper::CreateTextWnd(*MsgConfig, "mp_warm_up", Window);
 	}
 	if(stage==1)
 	{ //unique
 		m_pTeamPanels->Init				(TEAM_PANELS_DM_XML_NAME, "team_panels_wnd");
 		CUIXml							uiXml;
 		uiXml.Load						(CONFIG_PATH, UI_PATH, "ui_game_dm.xml");
-		CUIXmlInit::InitWindow			(uiXml,"global", 0, m_window);
+		CUIXmlInit::InitWindow			(uiXml,"global", 0, Window);
 		m_pMoneyIndicator->InitFromXML	(uiXml);
 		m_pRankIndicator->InitFromXml	(uiXml);
 		CUIXmlInit::InitTextWnd			(uiXml,"fraglimit",0, m_pFragLimitIndicator);
@@ -95,9 +95,9 @@ void	CUIGameDM::Init(int stage)
 	if(stage==2)
 	{ //after
 		inherited::Init					(stage);
-		m_window->AttachChild			(m_pMoneyIndicator);
-		m_window->AttachChild			(m_pRankIndicator);
-		m_window->AttachChild			(m_pFragLimitIndicator);
+		Window->AttachChild			(m_pMoneyIndicator);
+		Window->AttachChild			(m_pRankIndicator);
+		Window->AttachChild			(m_pFragLimitIndicator);
 
 	}
 };

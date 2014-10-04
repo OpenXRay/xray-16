@@ -45,7 +45,7 @@ void CUIGameTDM::Init (int stage)
 		m_buy_msg_caption->SetAutoDelete(true);
 
 		inherited::Init					(stage);
-		CUIXmlInit::InitTextWnd			(*m_msgs_xml, "mp_tdm_buy",0,		m_buy_msg_caption);
+		CUIXmlInit::InitTextWnd			(*MsgConfig, "mp_tdm_buy",0,		m_buy_msg_caption);
 	}
 	if(stage==1)
 	{ //unique
@@ -54,7 +54,7 @@ void CUIGameTDM::Init (int stage)
 		CUIXml							uiXml, xml2;
 		uiXml.Load						(CONFIG_PATH, UI_PATH, "ui_game_tdm.xml");
 
-		CUIXmlInit::InitWindow			(uiXml, "global",		0,  m_window);
+		CUIXmlInit::InitWindow			(uiXml, "global",		0,  Window);
 		CUIXmlInit::InitStatic			(uiXml, "team1_icon",	0,	m_team1_icon);
 		CUIXmlInit::InitStatic			(uiXml, "team2_icon",	0,	m_team2_icon);
 		CUIXmlInit::InitTextWnd			(uiXml, "team1_score",	0,	m_team1_score);
@@ -67,9 +67,9 @@ void CUIGameTDM::Init (int stage)
 	if(stage==2)
 	{ //after
 		inherited::Init(stage);
-		m_window->AttachChild			(m_team1_score);
-		m_window->AttachChild			(m_team2_score);
-		m_window->AttachChild			(m_buy_msg_caption);
+		Window->AttachChild			(m_team1_score);
+		Window->AttachChild			(m_team2_score);
+		Window->AttachChild			(m_buy_msg_caption);
 	}
 }
 

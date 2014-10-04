@@ -1649,7 +1649,7 @@ public:
 		{
 			return;
 		}
-		PIItem item = ui_game_sp->ActorMenu().get_upgrade_item();
+		PIItem item = ui_game_sp->GetActorMenu().get_upgrade_item();
 		if ( item )
 		{
 			item->log_upgrades();
@@ -1678,7 +1678,7 @@ public:
 		}
 		int d = 0;
 		sscanf( args, "%d", &d );
-		if ( ui_game_sp->ActorMenu().DropAllItemsFromRuck( d == 1 ) )
+		if ( ui_game_sp->GetActorMenu().DropAllItemsFromRuck( d == 1 ) )
 		{
 			Msg( "- All items from ruck of Actor is dropping now." );
 		}

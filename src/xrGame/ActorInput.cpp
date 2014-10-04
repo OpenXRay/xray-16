@@ -184,7 +184,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
 					strconcat					(sizeof(str),str,*CStringTable().translate("st_item_used"),": ", itm->NameItem());
 					_s->wnd()->TextItemControl()->SetText(str);
 					
-					CurrentGameUI()->ActorMenu().m_pQuickSlot->ReloadReferences(this);
+					CurrentGameUI()->GetActorMenu().m_pQuickSlot->ReloadReferences(this);
 				}
 			}
 		}break;

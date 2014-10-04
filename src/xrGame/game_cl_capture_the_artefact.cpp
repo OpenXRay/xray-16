@@ -984,7 +984,7 @@ bool game_cl_CaptureTheArtefact::OnKeyboardPress(int key)
 				}break;
 			case kINVENTORY:
 				{
-					if ( m_game_ui->ActorMenu().IsShown() )
+					if ( m_game_ui->GetActorMenu().IsShown() )
 					{
 						m_game_ui->HideActorMenu();
 					}

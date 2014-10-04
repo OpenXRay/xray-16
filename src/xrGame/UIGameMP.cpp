@@ -125,7 +125,7 @@ void UIGameMP::SetClGame(game_cl_GameState* g)
 	m_pServerInfo			= xr_new<CUIServerInfo>();
 	m_pAchivementIdicator	= xr_new<CUIAchivementIndicator>();
 	m_pAchivementIdicator->SetAutoDelete(true);
-	m_window->AttachChild	(m_pAchivementIdicator);
+	Window->AttachChild	(m_pAchivementIdicator);
 	
 }
 

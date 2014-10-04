@@ -64,14 +64,14 @@ void CUIGameCTA::Init(int stage)
 {
 	if(stage==0)
 	{
-		m_round_result_caption		= UIHelper::CreateTextWnd(*m_msgs_xml, "mp_round_result", m_window);
-		m_pressbuy_caption			= UIHelper::CreateTextWnd(*m_msgs_xml, "mp_pressbuy", m_window);
-		m_pressjump_caption			= UIHelper::CreateTextWnd(*m_msgs_xml, "mp_pressjump", m_window);
-		m_spectator_caption			= UIHelper::CreateTextWnd(*m_msgs_xml, "mp_spectator", m_window);
-		m_spectrmode_caption		= UIHelper::CreateTextWnd(*m_msgs_xml, "mp_spetatormode", m_window);
-		m_warm_up_caption			= UIHelper::CreateTextWnd(*m_msgs_xml, "mp_warm_up", m_window);
-		m_time_caption				= UIHelper::CreateTextWnd(*m_msgs_xml, "mp_timelimit", m_window);
-		m_demo_play_caption			= UIHelper::CreateTextWnd(*m_msgs_xml, "mp_demo_play", m_window);
+		m_round_result_caption		= UIHelper::CreateTextWnd(*MsgConfig, "mp_round_result", Window);
+		m_pressbuy_caption			= UIHelper::CreateTextWnd(*MsgConfig, "mp_pressbuy", Window);
+		m_pressjump_caption			= UIHelper::CreateTextWnd(*MsgConfig, "mp_pressjump", Window);
+		m_spectator_caption			= UIHelper::CreateTextWnd(*MsgConfig, "mp_spectator", Window);
+		m_spectrmode_caption		= UIHelper::CreateTextWnd(*MsgConfig, "mp_spetatormode", Window);
+		m_warm_up_caption			= UIHelper::CreateTextWnd(*MsgConfig, "mp_warm_up", Window);
+		m_time_caption				= UIHelper::CreateTextWnd(*MsgConfig, "mp_timelimit", Window);
+		m_demo_play_caption			= UIHelper::CreateTextWnd(*MsgConfig, "mp_demo_play", Window);
 
 		teamPanels					= xr_new<UITeamPanels>();
 		teamPanels->Init			(TEAM_PANELS_XML_NAME, "team_panels_wnd");
@@ -80,7 +80,7 @@ void CUIGameCTA::Init(int stage)
 		CUIXml							uiXml;
 		uiXml.Load						(CONFIG_PATH, UI_PATH, CTA_GAME_WND_XML);
 
-		CUIXmlInit::InitWindow			(uiXml, "global", 0, m_window);
+		CUIXmlInit::InitWindow			(uiXml, "global", 0, Window);
 
 		m_pMoneyIndicator				= xr_new<CUIMoneyIndicator>();
 		m_pMoneyIndicator->SetAutoDelete(true);
@@ -114,12 +114,12 @@ void CUIGameCTA::Init(int stage)
 	if(stage==2)
 	{
 		inherited::Init					(stage);
-		m_window->AttachChild			(m_pMoneyIndicator);
-		m_window->AttachChild			(m_pRankIndicator);
-		m_window->AttachChild			(m_pReinforcementInidcator);
-		m_window->AttachChild			(m_pFragLimitIndicator);
-		m_window->AttachChild			(m_team1_score);
-		m_window->AttachChild			(m_team2_score);
+		Window->AttachChild			(m_pMoneyIndicator);
+		Window->AttachChild			(m_pRankIndicator);
+		Window->AttachChild			(m_pReinforcementInidcator);
+		Window->AttachChild			(m_pFragLimitIndicator);
+		Window->AttachChild			(m_team1_score);
+		Window->AttachChild			(m_team2_score);
 	}
 }
 

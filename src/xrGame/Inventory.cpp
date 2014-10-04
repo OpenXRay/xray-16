@@ -195,9 +195,9 @@ void CInventory::Take(CGameObject *pObj, bool bNotActivate, bool strict_placemen
 		{
 			CurrentGameUI()->OnInventoryAction(pIItem, GE_OWNERSHIP_TAKE);
 		}
-		else if(CurrentGameUI()->ActorMenu().GetMenuMode()==mmDeadBodySearch)
+		else if(CurrentGameUI()->GetActorMenu().GetMenuMode()==mmDeadBodySearch)
 		{
-			if(m_pOwner==CurrentGameUI()->ActorMenu().GetPartner())
+			if(m_pOwner==CurrentGameUI()->GetActorMenu().GetPartner())
 				CurrentGameUI()->OnInventoryAction(pIItem, GE_OWNERSHIP_TAKE);
 		}
 	};

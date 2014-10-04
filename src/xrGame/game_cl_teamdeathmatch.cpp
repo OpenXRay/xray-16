@@ -594,7 +594,7 @@ BOOL game_cl_TeamDeathmatch::CanCallBuyMenu			()
 	if (pCurSkinMenu && pCurSkinMenu->IsShown())
 		return FALSE;
 	
-	if ( m_game_ui && m_game_ui->ActorMenu().IsShown() )
+	if ( m_game_ui && m_game_ui->GetActorMenu().IsShown() )
 		return FALSE;
 	
 	return m_bBuyEnabled;
@@ -623,7 +623,7 @@ BOOL game_cl_TeamDeathmatch::CanCallTeamSelectMenu			()
 {
 	if (Phase()!=GAME_PHASE_INPROGRESS) return false;
 	if (!local_player) return false;
-	if ( m_game_ui && m_game_ui->ActorMenu().IsShown() )
+	if ( m_game_ui && m_game_ui->GetActorMenu().IsShown() )
 	{
 		return FALSE;
 	}
