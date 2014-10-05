@@ -1,5 +1,7 @@
-TITLE: X-Ray 1.6 build instructions
+TITLE: X-Ray 1.6 build and setup instructions
 
+Build:
+------
 By default, all libraries mentioned below (except Windows/DirectX SDK) are assumed to be in the directory
 defined by XRAY_16X_LIBS environment variable. It can be set with following command (run as administrator):
   $ setx XRAY_16X_LIBS E:\dev\ /M
@@ -25,3 +27,33 @@ To build X-Ray Engine you'll need following libraries:
 
 You can download all these libraries (except Windows/DirectX SDK) with compiled binaries here:
 https://dl.dropboxusercontent.com/u/63973281/dev/xray/xray-16-libraries.7z
+
+Setup:
+------
+- Install S.T.A.L.K.E.R Call of Pripyat
+- Install patch 1.6.02 (only for russian locale, worldwide release should have it included):
+  http://cop.stalker-game.ru/?page=patches#2
+- Download and unpack archive with libraries
+- Create _bin_dbg, _bin_mix and _bin_rel folders in the game installation directory
+- Copy following files from bin to _bin_dbg, _bin_mix and _bin_rel:
+  - dbghelp.dll
+  - eax.dll
+  - wrap_oal.dll
+- Copy following files from bin to _bin_dbg\dedicated, _bin_mix\dedicated and _bin_rel\dedicated:
+  - eax.dll
+  - wrap_oal.dll
+- For _bin_rel and _bin_mix:
+  - Copy BugTrap.dll from %XRAY_16X_LIBS%BugTrap\Bin
+- For _bin_dbg:
+  - Copy BugTrapD.dll from %XRAY_16X_LIBS%BugTrap\Bin and rename it to BugTrap.dll
+- Create soft link to /gamedata in the game installation directory:
+  $ mklink /D <game installation directory>\gamedata <xray-16 repository root>\res\gamedata  
+- After successful build use xrbinup.cmd to update game binaries:
+  $ xrbinup.cmd "E:\Program Files (x86)\GSC World Publishing\STALKER-COP" %src% dbg  
+- You can create cmd script to update binaries in a single click, for example:
+  @echo off
+  setlocal
+  set src="E:\git\xray-16"
+  set dst="E:\Program Files (x86)\GSC World Publishing\STALKER-COP"
+  call xrbinup.cmd %dst% %src% dbg
+  endlocal
