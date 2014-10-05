@@ -11,11 +11,11 @@ if !null_args!==1 (
   echo usage: %0 ^<game_installation_dir^> ^<repository_root_dir^> {dbg^|mix^|rel}
   goto ret
 )
-if not exist [%1] (
+if not exist %1 (
   echo path not found: %1
   goto ret
 )
-if not exist [%2] (
+if not exist %2 (
   echo path not found: %2
   goto ret
 )
