@@ -38,7 +38,9 @@ nitrocaster: Pavel Kovalenko
     - GetColorFromText bug
     - (bytes_need<=mSize) && vl_Count
     - "! tab named [1] doesnt exist"
+  - UI
     - clip cursor in windowed mode with enabled input capture
+    - dragging music volume slider doesn't make any effect until one presses 'Apply' button
   - core
     - buffer overflow when copying command line to Core.Params
     - misplaced arguments in calls to xrDebug::backend
@@ -54,6 +56,9 @@ nitrocaster: Pavel Kovalenko
   - render
     - when d3d compiler fails to compile some shader, it displays message
       "Your video card doesn't meet game requirements ..." even if GPU actually meets game requirements (feature level)
+    - blurred text on r4
+    - alpha transparency works improperly - objects like steelworks and meshes quickly lose details and become
+      invisible when camera moves away (r1 looks better)
   - physics
     - falling actor can continue being in falling state under specific conditions
   - plugins
@@ -62,6 +67,8 @@ nitrocaster: Pavel Kovalenko
   - common/unsorted
     - review and refactor code
     - fix log messages format (normally, the 'color' character should be followed by a space)
+  - UI
+    - close sleep dialog by ESC key
   - multiplayer
     - use GSC server instead of GameSpy one
   	- ipv6 support
