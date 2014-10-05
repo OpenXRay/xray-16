@@ -331,19 +331,19 @@ void CEntity::shedule_Update(u32 dt)
 	try {
 		lDestroy = getDestroy();
 	}
-	catch (std::exception& e) {
+	catch (...) {
 		Msg("RELEASE CONFIGURATION FIX: lDestroy failed");
 	}
 	try {
 		lAlive = g_Alive();
 	}
-	catch (std::exception& e) {
+	catch (...) {
 		Msg("RELEASE CONFIGURATION FIX: lAlive failed");
 	}
 	try {
 		lKillerId = m_killer_id != u16(-1);
 	}
-	catch (std::exception& e) {
+	catch (...) {
 		Msg("RELEASE CONFIGURATION FIX: lKillerId failed");
 	}
 	try {
@@ -357,7 +357,7 @@ void CEntity::shedule_Update(u32 dt)
 			}
 		}
 	}
-	catch (std::exception& e) {
+	catch (...) {
 		Msg("RELEASE CONFIGURATION FIX: if block failed");
 	}
 }
