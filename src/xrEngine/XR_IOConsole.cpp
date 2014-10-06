@@ -594,7 +594,6 @@ void CConsole::ExecuteCommand( LPCSTR cmd_str, bool record_cmd )
 	}
 	else
 	{
-		first[CONSOLE_BUF_SIZE-21] = 0;
 		Log( "! Unknown command: ", first );
 	}
 
