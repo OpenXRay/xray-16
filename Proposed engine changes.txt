@@ -4,6 +4,7 @@ If you've implemented a given feature already by experimenting on the CS
 source, put a * next to it.
 Note: Source for COP released! Will update this with source asap.
 
+Gameplay / Engine changes;
 1) Convert to 64-bit (to allow more than 4gb RAM to be used)
 2) Multi-thread the engine for up to 4 cores
 3) Solve stuttering problem (likely due to LuaJit. Solution would be to
@@ -42,8 +43,24 @@ Note: Source for COP released! Will update this with source asap.
 20) Re-enable grass shadows - *
 21) Add Instanced Tessellation for DX9&10:
     http://developer.download.nvidia.com/SDK/10.5/Samples/InstancedTessellation.zip
+    
+    -- Newly added by LoNer1
+    -- Proposing some heavy rendering changes / additions
+    -- https://github.com/NVIDIAGameWorks/D3DSamples
+    -- https://developer.nvidia.com/gameworks-directx-samples
+    -- https://developer.nvidia.com/sites/default/files/akamai/BAVOIL_ParticleShadowsAndCacheEfficientPost.pdf
+    -- http://docs.nvidia.com/gameworks/index.html#gameworks_landing_page.htm%3FTocPath%3D_____1
+22) Add proper GI algorythms -that actually work- such as radiosity. 
+23) Add / Replace current SSAO/HDAO
+24) Particle Shadows / Overhauled particles system (solid?) - actually an SDK proposal like 25
+25) Adding (configurable) 'wind' in the game - note: Preferably with the SDK and a 'pathfinding' / node system like in CE / FB3
+26) Make vegitation rigid / enable collision with vegetation. 
+27) Stereo sounds anyone?
+28) (detailed ideas about this will probably surface later) more gore / realistic(?)* gore.
+    -- * Wouldn't know if that's the right choice of words, but I'm not for this kind of gore;
+    -- http://www.ask-resimleri.com/wp-content/uploads/Soldier-of-Fortune-Payback-1.jpeg
 
-SDK
+SDK improvements;
 1) Get SDK compiled with Visual Studio (=> get rid of Borland trash)
 2) Less errors and crashes, loads of these.
 3) Visible level-loaded decals and the ability to see decals that aren't just
@@ -54,7 +71,7 @@ SDK
 6) "Render" / "ingame" like editor. Not WYSIWYG, but for example, having proper
    lighting settings which are configurable from a weather editor in-editor.
 
-Weapon related changes
+Weapon related changes;
 1) Add ability to give weapons like the Abakan the ability to specify a fire
    mode where they fire at a different RPM (Abakan fires 2 shots at 1800rpm.
    The new AK-12 fires 3 shots at 1,000rpm. I'm not adding an AK-12,
@@ -78,3 +95,4 @@ Weapon related changes
 15) Ironsight zoom in/out sounds - *
 16) Add a quick-grenade slot (can also be done currently, but imho also wiser to hardcode)
 17) Animations for attaching weapon attachements (opinions on this may differ, but it's nice to have?)
+18) While-zoomed-in reloads (like far cry). Not only for sidearms, also sniper rifles and shotguns. No AR's.
