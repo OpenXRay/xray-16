@@ -59,6 +59,7 @@ nitrocaster: Pavel Kovalenko
     - blurred text on r4
     - alpha transparency works improperly - objects like steelworks and meshes quickly lose details and become
       invisible when camera moves away (r1 looks better)
+    - R1: incorrect sun path
   - physics
     - falling actor can continue being in falling state under specific conditions
   - plugins
@@ -88,8 +89,12 @@ nitrocaster: Pavel Kovalenko
       - tweak CConsole to use new logger
   - render
     - FXAA
+    - SMAA
+    - PCSS (or some other alternative)
     - glow material doesn't cast shadows (causes artefacts on actor shadow)
   - consider disabling accel when falling (more realistic)
+  - xrLC
+    - try to optimize memory requirements (use disk cache for intermediate data?)
 
 STALKER_2010: Andrew Boyarshin
 * detach/update LuaJIT
