@@ -136,7 +136,7 @@ void compute_build_id	()
 	sscanf				(buffer,"%s %d %d",month,&days,&years);
 
 	for (int i=0; i<12; i++) {
-		if (_stricmp(month_id[i],month))
+		if (!stricmp(month_id[i],month))
 			continue;
 
 		months			= i;
