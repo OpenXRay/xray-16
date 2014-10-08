@@ -438,7 +438,7 @@ void CConsole::DrawBackgrounds( bool bGame )
 	if ( m_select_tip < (int)m_tips.size() )
 	{
 		Frect r;
-
+        xr_string tmp;
 		vecTipsEx::iterator itb = m_tips.begin() + m_start_tip;
 		vecTipsEx::iterator ite = m_tips.end();
 		for ( u32 i = 0; itb != ite; ++itb, ++i ) // tips
@@ -455,14 +455,12 @@ void CConsole::DrawBackgrounds( bool bGame )
 			}
 
 			r.null();
-			LPSTR  tmp      = (PSTR)_alloca( (str_size + 1) * sizeof(char) );
-
-			strncpy_s( tmp, str_size+1, ts.text.c_str(), ts.HL_start );
-			r.x1 = pr.x1 + w1 + pFont->SizeOf_( tmp );
+            tmp.assign(ts.text.c_str(), ts.HL_start);
+			r.x1 = pr.x1 + w1 + pFont->SizeOf_( tmp.c_str() );
 			r.y1 = pr.y1 + i * font_h;
 
-			strncpy_s( tmp, str_size+1, ts.text.c_str(), ts.HL_finish );
-			r.x2 = pr.x1 + w1 + pFont->SizeOf_( tmp );
+			tmp.assign(ts.text.c_str(), ts.HL_finish);
+			r.x2 = pr.x1 + w1 + pFont->SizeOf_( tmp.c_str() );
 			r.y2 = r.y1 + font_h;
 
 			DrawRect( r, tips_word_color );
