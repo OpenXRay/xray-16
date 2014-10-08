@@ -305,7 +305,7 @@ void engine_impl::weather_time_factor	(float const &value_raw)
 	float					value = value_raw;
 	clamp					(value, .01f, 100000.f);
 	
-	if (g_pGameLevel)
+    if (g_pGameLevel && g_pGamePersistent)
 		g_pGameLevel->SetEnvironmentGameTimeFactor	(iFloor(g_pGamePersistent->Environment().GetGameTime()*1000.f), value);
 
 	if (g_pGamePersistent)
