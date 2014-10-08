@@ -11,6 +11,7 @@ BOOL		mem_initialized	= FALSE;
 bool		shared_str_initialized	= false;
 
 //fake fix of memory corruptions in multiplayer game :(
+// XXX nitrocaster: to be removed
 XRCORE_API	bool	g_allow_heap_min = true;
 
 // Processor specific implementations
