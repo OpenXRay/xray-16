@@ -114,9 +114,9 @@ private:
     void OnSecureKeySync(NET_Packet& P);
     void SecureSend(NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0);
     secure_messaging::key_t m_secret_key;
-    BOOL m_bNeed_CrPr = false;
+    bool m_bNeed_CrPr = false;
     u32 m_dwNumSteps = 0;
-    BOOL m_bIn_CrPr = false;
+    bool m_bIn_CrPr = false;
     xr_vector<CGameObject*> pObjects4CrPr;
     xr_vector<CGameObject*> pActors4CrPr;
     CObject* pCurrentControlEntity = nullptr;
@@ -135,7 +135,7 @@ private:
     u32 m_dwLastNetUpdateTime = 0;
     void UpdateDeltaUpd(u32 LastTime);
     void BlockCheatLoad();
-    BOOL Connect2Server(LPCSTR options);
+    bool Connect2Server(const char* options);
     void SendClientDigestToServer();
     shared_str m_client_digest;	// for screenshots
 
@@ -155,8 +155,8 @@ public:
     DEFINE_VECTOR(CParticlesObject*, POVec, POIt);
     POVec m_StaticParticles;
     game_cl_GameState* game = nullptr;
-    BOOL m_bGameConfigStarted = false;
-    BOOL game_configured = false;
+    bool m_bGameConfigStarted = false;
+    bool game_configured = false;
     NET_Queue_Event* game_events = nullptr;
     xr_deque<CSE_Abstract*> game_spawn_queue;
     xrServer* Server = nullptr;
@@ -170,13 +170,13 @@ private:
     SoundRegistryMap sound_registry;
 
 public:
-    void PrefetchSound(LPCSTR name);
+    void PrefetchSound(const char* name);
 
 protected:
-    BOOL net_start_result_total;
-    BOOL connected_to_server;
-    BOOL deny_m_spawn; // only for debug...
-    BOOL sended_request_connection_data;
+    bool net_start_result_total;
+    bool connected_to_server;
+    bool deny_m_spawn; // only for debug...
+    bool sended_request_connection_data;
     void MakeReconnect();
     LevelMapSyncData map_data;
     bool synchronize_map_data();
@@ -203,20 +203,20 @@ public:
     shared_str m_caServerOptions;
     shared_str m_caClientOptions;
     // Starting/Loading
-    virtual BOOL net_Start(LPCSTR op_server, LPCSTR op_client);
-    virtual void net_Load(LPCSTR name);
-    virtual void net_Save(LPCSTR name);
+    virtual bool net_Start(const char* op_server, const char* op_client);
+    virtual void net_Load(const char* name);
+    virtual void net_Save(const char* name);
     virtual void net_Stop();
-    virtual BOOL net_Start_client(LPCSTR name);
+    virtual bool net_Start_client(const char* name);
     virtual void net_Update();
-    virtual BOOL Load_GameSpecific_Before();
-    virtual BOOL Load_GameSpecific_After();
+    virtual bool Load_GameSpecific_Before();
+    virtual bool Load_GameSpecific_After();
     virtual void Load_GameSpecific_CFORM(CDB::TRI* T, u32 count);
     // Events
     virtual void OnEvent(EVENT E, u64 P1, u64 P2);
     virtual void _BCL OnFrame(void);
     virtual void OnRender();
-    virtual	shared_str OpenDemoFile(LPCSTR demo_file_name);
+    virtual	shared_str OpenDemoFile(const char* demo_file_name);
     virtual void net_StartPlayDemo();
     void cl_Process_Event(u16 dest, u16 type, NET_Packet& P);
     void cl_Process_Spawn(NET_Packet& P);
@@ -395,5 +395,5 @@ IC bool OnServer() { return Level().IsServer(); }
 IC bool OnClient() { return Level().IsClient(); }
 IC bool IsGameTypeSingle() { return (g_pGamePersistent->GameType() == eGameIDSingle); }
 
-extern BOOL g_bDebugEvents;
+extern bool g_bDebugEvents;
 

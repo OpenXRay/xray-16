@@ -37,7 +37,7 @@ public:
 	virtual float		Radius				() const;
 	virtual void		shedule_Update		(u32 dt);
 	virtual void		feel_touch_new		(CObject* O);
-	virtual BOOL		feel_touch_contact	(CObject* O);
+	virtual bool		feel_touch_contact	(CObject* O);
 
 	virtual bool		IsVisibleForZones() { return false;}
 	void				EnableLevelChanger	(bool b)				{m_b_enabled=b;}

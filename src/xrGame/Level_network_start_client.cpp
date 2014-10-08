@@ -18,9 +18,9 @@
 #include "physics_game.h"
 extern	pureFrame*				g_pNetProcessor;
 
-BOOL CLevel::net_Start_client	( LPCSTR options )
+bool CLevel::net_Start_client	( const char* options )
 {
-	return FALSE;
+	return false;
 }
 #include "string_table.h"
 bool	CLevel::net_start_client1				()

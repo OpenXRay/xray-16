@@ -22,13 +22,13 @@ CActorMemory::CActorMemory					(CActor *actor) :
 	VERIFY			(m_actor);
 }
 
-BOOL CActorMemory::feel_vision_isRelevant	(CObject* O)
+bool CActorMemory::feel_vision_isRelevant	(CObject* O)
 {
 	CEntityAlive	*entity_alive = smart_cast<CEntityAlive*>(O);
 	if (!entity_alive)
-		return		(FALSE);
+		return		(false);
 
-	return			(TRUE);
+	return			(true);
 }
 
 void CActorMemory::camera					(

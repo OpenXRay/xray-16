@@ -30,7 +30,7 @@ private:
 
 public:
 	virtual void		Load							(LPCSTR section);
-	virtual BOOL		feel_touch_on_contact			(CObject *)				{ return FALSE; }
+	virtual bool		feel_touch_on_contact			(CObject *)				{ return FALSE; }
 	virtual bool		use								(CGameObject* who_use)	{ return false; }
 	virtual BOOL		net_Spawn						(CSE_Abstract* DC);
 	virtual void		UpdateCL						();

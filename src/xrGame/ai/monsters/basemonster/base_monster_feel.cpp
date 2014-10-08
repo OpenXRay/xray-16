@@ -195,15 +195,15 @@ void CBaseMonster::HitEntity(const CEntity *pEntity, float fDamage, float impuls
 }
 
 
-BOOL  CBaseMonster::feel_vision_isRelevant(CObject* O)
+bool  CBaseMonster::feel_vision_isRelevant(CObject* O)
 {
-	if (!g_Alive())					return FALSE;
-	if (0==smart_cast<CEntity*>(O))	return FALSE;
+	if (!g_Alive())					return false;
+	if (0==smart_cast<CEntity*>(O))	return false;
 	
-	if ((O->spatial.type & STYPE_VISIBLEFORAI) != STYPE_VISIBLEFORAI) return FALSE;
+	if ((O->spatial.type & STYPE_VISIBLEFORAI) != STYPE_VISIBLEFORAI) return false;
 	
 	// если спит, то ничего не видит
-	if (m_bSleep) return FALSE;
+	if (m_bSleep) return false;
 	
 	// если не враг - не видит
 	CEntityAlive* entity = smart_cast<CEntityAlive*> (O);
@@ -212,11 +212,11 @@ BOOL  CBaseMonster::feel_vision_isRelevant(CObject* O)
 			// если видит друга - проверить наличие у него врагов
 			CBaseMonster *monster = smart_cast<CBaseMonster *>(entity);
 			if (monster && !m_skip_transfer_enemy) EnemyMan.transfer_enemy(monster);
-			return FALSE;
+			return false;
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
 void CBaseMonster::HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16 element)

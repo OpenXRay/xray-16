@@ -620,7 +620,7 @@ void CCustomZone::feel_touch_delete(CObject* O)
 	}
 }
 
-BOOL CCustomZone::feel_touch_contact(CObject* O) 
+bool CCustomZone::feel_touch_contact(CObject* O) 
 {
 	if (smart_cast<CCustomZone*>(O))				return FALSE;
 	if (smart_cast<CBreakableObject*>(O))			return FALSE;
@@ -1391,10 +1391,10 @@ void CCustomZone::GoEnabledState()
 		u_EventSend		(P);
 }
 
-BOOL CCustomZone::feel_touch_on_contact	(CObject *O)
+bool CCustomZone::feel_touch_on_contact	(CObject *O)
 {
 	if ((spatial.type | STYPE_VISIBLEFORAI) != spatial.type)
-		return			(FALSE);
+		return			(false);
 
 	return				(inherited::feel_touch_on_contact(O));
 }

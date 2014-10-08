@@ -27,7 +27,7 @@ namespace Feel
 								Touch						();
 		virtual					~Touch						();
 
-		virtual BOOL			feel_touch_contact			(CObject* O);
+		virtual bool			feel_touch_contact			(CObject* O);
 		virtual void			feel_touch_update			(Fvector& P, float	R);
 		virtual void			feel_touch_deny				(CObject* O, DWORD	T);
 		virtual void			feel_touch_new				(CObject* O)			{	};

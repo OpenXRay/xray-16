@@ -339,7 +339,7 @@ void CCustomDetector::UpdateNightVisionMode(bool b_on)
 {
 }
 
-BOOL CAfList::feel_touch_contact	(CObject* O)
+bool CAfList::feel_touch_contact	(CObject* O)
 {
 	TypesMapIt it				= m_TypesMap.find(O->cNameSect());
 

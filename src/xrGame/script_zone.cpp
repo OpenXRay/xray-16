@@ -88,7 +88,7 @@ void CScriptZone::net_Relcase			(CObject *O)
 	}
 }
 
-BOOL CScriptZone::feel_touch_contact	(CObject* O)
+bool CScriptZone::feel_touch_contact	(CObject* O)
 {
 	return						(((CCF_Shape*)CFORM())->Contact(O));
 }

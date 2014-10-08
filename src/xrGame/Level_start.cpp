@@ -17,7 +17,7 @@
 int		g_cl_save_demo = 0;
 extern XRCORE_API bool g_allow_heap_min;
 
-shared_str CLevel::OpenDemoFile(LPCSTR demo_file_name)
+shared_str CLevel::OpenDemoFile(const char* demo_file_name)
 {
 	PrepareToPlayDemo(demo_file_name);
 	return m_demo_server_options;
@@ -27,7 +27,7 @@ void CLevel::net_StartPlayDemo()
 	net_Start(m_demo_server_options.c_str(), "localhost");
 }
 
-BOOL CLevel::net_Start	( LPCSTR op_server, LPCSTR op_client )
+bool CLevel::net_Start(const char* op_server, const char* op_client)
 {
 	net_start_result_total				= TRUE;
 

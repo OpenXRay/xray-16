@@ -82,21 +82,21 @@ public:
 	virtual shared_str			name					() const = 0;
 	virtual void				GetLevelInfo			( CServerInfo* si ) = 0;
 
-	virtual BOOL				net_Start				( LPCSTR op_server, LPCSTR op_client)	= 0;
-	virtual void				net_Load				( LPCSTR name )							= 0;
-	virtual void				net_Save				( LPCSTR name )							= 0;
+	virtual bool				net_Start				( const char* op_server, const char* op_client)	= 0;
+	virtual void				net_Load				( const char* name )							= 0;
+	virtual void				net_Save				( const char* name )							= 0;
 	virtual void				net_Stop				( );
 	virtual void				net_Update				( )										= 0;
 
-	virtual BOOL				Load					( u32 dwNum );
-	virtual BOOL				Load_GameSpecific_Before( )										{ return TRUE; };		// before object loading
-	virtual BOOL				Load_GameSpecific_After	( )										{ return TRUE; };		// after object loading
+	virtual bool				Load					( u32 dwNum );
+	virtual bool				Load_GameSpecific_Before( )										{ return TRUE; };		// before object loading
+	virtual bool				Load_GameSpecific_After	( )										{ return TRUE; };		// after object loading
 	virtual void				Load_GameSpecific_CFORM	( CDB::TRI* T, u32 count )				= 0;
 
 	virtual void	_BCL		OnFrame					( void );
 	virtual void				OnRender				( void );
 
-	virtual	shared_str			OpenDemoFile			(LPCSTR demo_file_name) = 0;
+	virtual	shared_str			OpenDemoFile			(const char* demo_file_name) = 0;
 	virtual void				net_StartPlayDemo		() = 0;
 
 	// Main interface

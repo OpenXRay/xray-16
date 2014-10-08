@@ -336,7 +336,7 @@ pureFrame*	g_pNetProcessor	= &NET_processor;
 
 const int ConnectionTimeOut = 60000; //1 min
 
-BOOL			CLevel::Connect2Server				(LPCSTR options)
+bool			CLevel::Connect2Server				(const char* options)
 {
 	NET_Packet					P;
 	m_bConnectResultReceived	= false	;

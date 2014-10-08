@@ -79,7 +79,7 @@ static void __stdcall	build_callback	(Fvector* V, int Vcnt, CDB::TRI* T, int Tcn
 	g_pGameLevel->Load_GameSpecific_CFORM( T, Tcnt );
 }
 
-BOOL IGame_Level::Load			(u32 dwNum) 
+bool IGame_Level::Load			(u32 dwNum) 
 {
 	SECUROM_MARKER_PERFORMANCE_ON(10)
 
@@ -139,7 +139,7 @@ BOOL IGame_Level::Load			(u32 dwNum)
 
 	SECUROM_MARKER_PERFORMANCE_OFF(10)
 
-	return TRUE;	
+	return true;	
 }
 
 #ifndef _EDITOR

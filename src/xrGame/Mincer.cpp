@@ -75,7 +75,7 @@ void CMincer::feel_touch_new				(CObject* O)
 		Telekinesis().activate(GO, m_fThrowInImpulse, m_fTeleHeight, 100000);
 	}
 }
-BOOL	CMincer::feel_touch_contact				(CObject* O)
+bool	CMincer::feel_touch_contact				(CObject* O)
 {
 	return inherited::feel_touch_contact(O)&&smart_cast<CPhysicsShellHolder *>(O);
 }

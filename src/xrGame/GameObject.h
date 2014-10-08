@@ -90,7 +90,7 @@ public:
 	virtual CBaseMonster*				cast_base_monster			()						{return NULL;}
 
 public:
-	virtual BOOL						feel_touch_on_contact	(CObject *)					{return TRUE;}
+	virtual bool						feel_touch_on_contact	(CObject *)					{return TRUE;}
 	virtual bool						use						(CGameObject* who_use)		{return CUsableScriptObject::use(who_use);};
 
 public:

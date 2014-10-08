@@ -33,37 +33,37 @@ void CActor::feel_touch_delete	(CObject* O)
 	if(sh&&sh->character_physics_support()) m_feel_touch_characters--;
 }
 
-BOOL CActor::feel_touch_contact		(CObject *O)
+bool CActor::feel_touch_contact		(CObject *O)
 {
 	CInventoryItem	*item = smart_cast<CInventoryItem*>(O);
 	CInventoryOwner	*inventory_owner = smart_cast<CInventoryOwner*>(O);
 
 	if (item && item->Useful() && !item->object().H_Parent()) 
-		return TRUE;
+		return true;
 
 	if(inventory_owner && inventory_owner != smart_cast<CInventoryOwner*>(this))
 	{
 		//CPhysicsShellHolder* sh=smart_cast<CPhysicsShellHolder*>(O);
 		//if(sh&&sh->character_physics_support()) m_feel_touch_characters++;
-		return TRUE;
+		return true;
 	}
 
-	return		(FALSE);
+	return		(false);
 }
 
-BOOL CActor::feel_touch_on_contact	(CObject *O)
+bool CActor::feel_touch_on_contact	(CObject *O)
 {
 	CCustomZone	*custom_zone = smart_cast<CCustomZone*>(O);
 	if (!custom_zone)
-		return	(TRUE);
+		return	(true);
 
 	Fsphere		sphere;
 	Center		(sphere.P);
 	sphere.R	= 0.1f;
 	if (custom_zone->inside(sphere))
-		return	(TRUE);
+        return	(true);
 
-	return		(FALSE);
+	return		(false);
 }
 
 ICF static BOOL info_trace_callback(collide::rq_result& result, LPVOID params)

@@ -260,14 +260,14 @@ void CBastArtefact::feel_touch_delete(CObject* O)
 	}
 }
 
-BOOL CBastArtefact::feel_touch_contact(CObject* O) 
+bool CBastArtefact::feel_touch_contact(CObject* O) 
 {
 	CEntityAlive* pEntityAlive = smart_cast<CEntityAlive*>(O);
 
 	if(pEntityAlive && pEntityAlive->g_Alive()) 
-		return TRUE;
+		return true;
 	else
-		return FALSE;
+		return false;
 }
 
 void CBastArtefact::setup_physic_shell	()

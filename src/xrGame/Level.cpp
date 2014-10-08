@@ -242,7 +242,7 @@ int	CLevel::get_RPID(LPCSTR /**name/**/)
     return -1;
 }
 
-BOOL g_bDebugEvents = FALSE;
+bool g_bDebugEvents = false;
 
 void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
 {
@@ -1041,7 +1041,7 @@ CZoneList* CLevel::create_hud_zones_list()
     return hud_zones_list;
 }
 
-BOOL CZoneList::feel_touch_contact(CObject* O)
+bool CZoneList::feel_touch_contact(CObject* O)
 {
     TypesMapIt it = m_TypesMap.find(O->cNameSect());
     bool res = (it != m_TypesMap.end());

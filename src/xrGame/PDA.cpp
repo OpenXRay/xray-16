@@ -104,13 +104,13 @@ void CPda::feel_touch_delete(CObject* O)
 	}
 }
 
-BOOL CPda::feel_touch_contact(CObject* O) 
+bool CPda::feel_touch_contact(CObject* O) 
 {
 	CEntityAlive* entity_alive = smart_cast<CEntityAlive*>(O);
 
 	if ( entity_alive && entity_alive->cast_base_monster() )
 	{
-		return TRUE;
+		return true;
 	}
 	else if ( CInventoryOwner* pInvOwner = smart_cast<CInventoryOwner*>(O) )
 	{
@@ -118,12 +118,12 @@ BOOL CPda::feel_touch_contact(CObject* O)
 		{
 			CEntityAlive* pEntityAlive = smart_cast<CEntityAlive*>(O);
 			if(pEntityAlive)
-				return TRUE;
+				return true;
 		}else
-		return FALSE;
+		return false;
 	}
 
-	return FALSE;
+	return false;
 }
 
 void CPda::OnH_A_Chield() 

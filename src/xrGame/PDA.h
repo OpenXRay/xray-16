@@ -33,7 +33,7 @@ public:
 
 	virtual void 							feel_touch_new			(CObject* O);
 	virtual void 							feel_touch_delete		(CObject* O);
-	virtual BOOL 							feel_touch_contact		(CObject* O);
+	virtual bool 							feel_touch_contact		(CObject* O);
 
 
 	virtual u16								GetOriginalOwnerID		() {return m_idOriginalOwner;}

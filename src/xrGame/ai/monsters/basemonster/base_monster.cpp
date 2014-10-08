@@ -600,12 +600,12 @@ void CBaseMonster::set_state_sound(u32 type, bool once)
 	m_prev_sound_type	= type;
 }
 
-BOOL CBaseMonster::feel_touch_on_contact	(CObject *O)
+bool CBaseMonster::feel_touch_on_contact	(CObject *O)
 {
 	return		(inherited::feel_touch_on_contact(O));
 }
 
-BOOL CBaseMonster::feel_touch_contact(CObject *O)
+bool CBaseMonster::feel_touch_contact(CObject *O)
 {
 	m_anomaly_detector->on_contact(O);
 	return inherited::feel_touch_contact(O);
