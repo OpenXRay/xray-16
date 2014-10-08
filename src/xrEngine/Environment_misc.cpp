@@ -588,7 +588,7 @@ void CEnvironment::load_weathers		()
 	typedef xr_vector<LPSTR>		file_list_type;
 	file_list_type*					file_list = FS.file_list_open("$game_weathers$","");
 	VERIFY							(file_list);
-
+    xr_string id;
 	file_list_type::const_iterator	i = file_list->begin();
 	file_list_type::const_iterator	e = file_list->end();
 	for ( ; i != e; ++i) {
@@ -598,14 +598,11 @@ void CEnvironment::load_weathers		()
 		VERIFY						((*i)[length - 3] == 'l');
 		VERIFY						((*i)[length - 2] == 't');
 		VERIFY						((*i)[length - 1] == 'x');
-		u32							new_length = length - 4;
-		LPSTR						identifier = (LPSTR)_alloca((new_length + 1)*sizeof(char));
-		Memory.mem_copy				(identifier, *i, new_length*sizeof(char));
-		identifier[new_length]		= 0;
-		EnvVec& env					= WeatherCycles[identifier];
+        id.assign(*i, length-4);
+		EnvVec& env					= WeatherCycles[id.c_str()];
 
 		string_path					file_name;
-		FS.update_path				(file_name, "$game_weathers$", identifier);
+		FS.update_path				(file_name, "$game_weathers$", id.c_str());
 		xr_strcat					(file_name, ".ltx");
 		CInifile*					config = CInifile::Create(file_name);
 
