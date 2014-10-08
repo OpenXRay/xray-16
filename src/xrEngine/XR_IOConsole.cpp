@@ -765,20 +765,17 @@ bool CConsole::add_internal_cmds( LPCSTR in_str, vecTipsEx& out_v )
 	
 	bool res = false;
 	// word in begin
+    xr_string name2;
 	vecCMD_IT itb = Commands.begin();
 	vecCMD_IT ite = Commands.end();
 	for ( ; itb != ite; ++itb )
 	{
 		LPCSTR name = itb->first;
 		u32 name_sz = xr_strlen(name);
-		PSTR  name2 = (PSTR)_alloca( (name_sz+1) * sizeof(char) );
-		
 		if ( name_sz >= in_sz )
 		{
-			strncpy_s( name2, name_sz+1, name, in_sz );
-			name2[in_sz] = 0;
-
-			if ( !stricmp( name2, in_str ) )
+            name2.assign(name, in_sz);
+			if ( !stricmp( name2.c_str(), in_str ) )
 			{
 				shared_str temp;
 				temp._set( name );
