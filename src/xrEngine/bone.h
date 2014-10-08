@@ -193,7 +193,7 @@ struct ECORE_API SBoneShape
     }
     bool			Valid(){  
     	switch (type){
-        case stBox: 	return !fis_zero(box.m_halfsize.x)&&!fis_zero(box.m_halfsize.x)&&!fis_zero(box.m_halfsize.x);
+        case stBox: 	return !fis_zero(box.m_halfsize.x)&&!fis_zero(box.m_halfsize.y)&&!fis_zero(box.m_halfsize.z);
         case stSphere: 	return !fis_zero(sphere.R);
         case stCylinder:return !fis_zero(cylinder.m_height)&&!fis_zero(cylinder.m_radius)&&!fis_zero(cylinder.m_direction.square_magnitude());
         };
