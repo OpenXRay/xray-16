@@ -261,7 +261,7 @@ void			ISpatial_DB::insert		(ISpatial* S)
 	if (!bValid)	
 	{
 		CObject*	O	= dynamic_cast<CObject*>(S);
-		if	(O)			Debug.fatal(DEBUG_INFO,"Invalid OBJECT position or radius (%s)",O->cName());
+		if	(O)			Debug.fatal(DEBUG_INFO,"Invalid OBJECT position or radius (%s)",O->cName().c_str());
 		else			{
 			CPS_Instance* P = dynamic_cast<CPS_Instance*>(S);
 			if (P)		Debug.fatal(DEBUG_INFO,"Invalid PS spatial position{%3.2f,%3.2f,%3.2f} or radius{%3.2f}",VPUSH(S->spatial.sphere.P),S->spatial.sphere.R);
