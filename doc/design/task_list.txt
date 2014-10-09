@@ -13,8 +13,6 @@ c Canceled
 
 nitrocaster: Pavel Kovalenko
 - Mgc::Math::PI (MgcMath.h) conflicts with PI macro
-- try to remove OpenAL from repository
-- remove lzo and other compression libs from repository
 - get the entire solution compiled with ForceConformanceInForLoopScope=false
 - get rid of atimgpu, use amd ags instead (will also eliminate LNK4098)
 - scan solution with PVS-Studio and fix found bugs
@@ -25,10 +23,15 @@ nitrocaster: Pavel Kovalenko
   - merge xrXMLParser into xrCore
   - merge crypto into xrCore
 - 3rd party libraries
-  - detach/update ODE
+  - decouple/update ODE
     - dig through current ODE and analyze changes that were made by GSC
     - get the latest ODE and make sure it can be used with xray
-  - remove openssl code from crypto, use it as external library
+  - decouple OpenSSL
+  - decouple OpenAL
+  - decouple GameSpy
+  - decouple lzo
+  - decouple PPMd
+  - decouple hxGrid
 - bugs/issues
   - generic
     - stackoverflow when starting with too long command line
@@ -48,10 +51,10 @@ nitrocaster: Pavel Kovalenko
     - xrGameSpy: fix master server name (gamespy is down)
     - dedicated server
       - vulnerabilities (verify)
-        - dirtysky
-        - stalkazz
-        - stalkerbof
-        - stalkerboom
+        c dirtysky
+        + stalkazz
+        + stalkerbof
+        + stalkerboom
     + voting for weather: rainy/cloudy buttons are mixed up
   - render
     - when d3d compiler fails to compile some shader, it displays message
@@ -72,7 +75,7 @@ nitrocaster: Pavel Kovalenko
     - close sleep dialog by ESC key
   - multiplayer
     - use GSC server instead of GameSpy one
-  	- ipv6 support
+    - ipv6 support
     - get rid of DirectPlay
     - log suspicious packets and kick/ban its senders after X attempts
     - dedicated server
