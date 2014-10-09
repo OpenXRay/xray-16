@@ -213,7 +213,7 @@ C++ class vector {
     function mad(const vector&, const vector&, const vector&);
 
     function clamp(const vector&);
-    function clamp(const vector&, vector);
+    function clamp(const vector&, const vector&);
 
     function inertion(const vector&, number);
 
