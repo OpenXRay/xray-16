@@ -94,7 +94,7 @@ struct str_container_impl
 			str_value* value = buffer[i];
 			while ( value )
 			{
-				fprintf	(f,"ref[%4d]-len[%3d]-crc[%8X] : %s\n",value->dwReference,value->dwLength,value->dwCRC,value->value);
+				fprintf	(f,"ref[%4u]-len[%3u]-crc[%8X] : %s\n",value->dwReference,value->dwLength,value->dwCRC,value->value);
 				value = value->next;
 			}
 		}
@@ -108,7 +108,7 @@ struct str_container_impl
 			string4096		temp;
 			while ( value )
 			{
-				xr_sprintf	(temp, sizeof(temp), "ref[%4d]-len[%3d]-crc[%8X] : %s\n", value->dwReference, value->dwLength, value->dwCRC, value->value);
+				xr_sprintf	(temp, sizeof(temp), "ref[%4u]-len[%3u]-crc[%8X] : %s\n", value->dwReference, value->dwLength, value->dwCRC, value->value);
 				f->w_string	(temp);
 				value		= value->next;
 			}

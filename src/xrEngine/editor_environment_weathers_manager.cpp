@@ -59,7 +59,7 @@ void manager::load			()
 	typedef xr_vector<LPSTR>		file_list_type;
 	file_list_type*					file_list = FS.file_list_open("$game_weathers$","");
 	VERIFY							(file_list);
-	
+    xr_string id;
 	file_list_type::const_iterator	i = file_list->begin();
 	file_list_type::const_iterator	e = file_list->end();
 	for ( ; i != e; ++i) {
@@ -79,11 +79,9 @@ void manager::load			()
 		if ((*i)[length - 1] != 'x')
 			continue;
 
-		u32							new_length = length - 4;
-		LPSTR						identifier = (LPSTR)_alloca((new_length + 1)*sizeof(char));
-		Memory.mem_copy				(identifier, *i, new_length*sizeof(char));
-		identifier[new_length]		= 0;
-		weather*					object = xr_new<weather>(&m_manager, identifier);
+        id = *i;
+        id[length-4] = 0;
+		weather*					object = xr_new<weather>(&m_manager, id.c_str());
 		object->load				();
 		object->fill				(m_collection);
 		m_weathers.push_back		(object);
