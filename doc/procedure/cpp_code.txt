@@ -433,6 +433,22 @@ Casing styles:
 - Global variables: PascalCase
 - Namespaces: PascalCase
 
+When overriding virtual function, use override specifier on function declaration.
+ BAD
+    class Server : public IServer
+    {
+        ...
+        virtual void OnClientConnected(IClient* client);
+        ...
+    };
+ GOOD
+    class Server : public IServer
+    {
+        ...
+        virtual void OnClientConnected(IClient* client) override;
+        ...
+    };
+
 Checking function return values:
 Functions that return bool or a pointer will be checked without
 comparing, if they return true or false.

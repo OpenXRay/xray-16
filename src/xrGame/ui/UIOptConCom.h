@@ -1,6 +1,8 @@
 #pragma once
 
 class CUIOptConCom {
+private:
+    string64 reinforcementType;
 public:
 	void Init();
 	CUIOptConCom();
@@ -25,8 +27,6 @@ protected:
 	string64	m_playerName;
 	string64	m_serverName;
 	int			m_iNetConSpectator;
-	int			m_iReinforcementType;
-	//string64	m_sReinforcementType;
 	float		m_fNetWeatherRate;
 
 	void		ReadPlayerNameFromRegistry		();

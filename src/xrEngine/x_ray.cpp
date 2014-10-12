@@ -1556,8 +1556,10 @@ void doBenchmark(LPCSTR name)
 		xr_strcpy				(g_sBenchmarkName, test_name);
 		
 		test_command		= ini.r_string_wb("benchmark",test_name);
-		xr_strcpy			(Core.Params,*test_command);
-		_strlwr_s				(Core.Params);
+        u32 cmdSize = test_command.size()+1;
+        Core.Params = (char*)xr_realloc(Core.Params, cmdSize);
+        xr_strcpy(Core.Params, cmdSize, test_command.c_str());
+        xr_strlwr(Core.Params);
 		
 		InitInput					();
 		if(i){

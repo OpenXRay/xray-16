@@ -61,11 +61,8 @@ void CUIOptConCom::Init()
 	m_iNetConSpectator	= 20;
 	CMD4(CCC_Integer,	"mm_net_con_spectator",				&m_iNetConSpectator, 1, 32);
 
-	m_iReinforcementType = 1;
-	CMD4(CCC_Integer,	"mm_net_srv_reinforcement_type",	&m_iReinforcementType, 0, 2 );
-
-	//xr_strcpy			(m_sReinforcementType,"reinforcement");
-	//CMD3(CCC_String,	"mm_net_srv_reinforcement_type",	m_sReinforcementType, sizeof(m_sReinforcementType));
+    xr_strcpy(reinforcementType, "reinforcement");
+    CMD3(CCC_String, "mm_net_srv_reinforcement_type", reinforcementType, sizeof(reinforcementType));
 	
 	m_fNetWeatherRate = 1.0f;
 	CMD4(CCC_Float,		"mm_net_weather_rateofchange",		&m_fNetWeatherRate,	0.0, 100.0f);
