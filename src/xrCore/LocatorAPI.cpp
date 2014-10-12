@@ -560,10 +560,7 @@ bool CLocatorAPI::Recurse		(const char* path)
     _finddata_t findData;
     intptr_t handle = _findfirst(scanPath, &findData);
     if (handle == -1)
-    {
-        Log("! FS: Invalid path: ", path);
         return false;
-    }
     rec_files.reserve(256);
     size_t oldSize = rec_files.size();
     intptr_t done = handle;
