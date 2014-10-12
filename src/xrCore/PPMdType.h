@@ -51,18 +51,18 @@ const int MAX_O=16;                         /* maximum allowed model order  */
 
 /* PPMd module works with file streams via ...GETC/...PUTC macros only      */
 #ifndef VERIFY
-#	define VERIFY(a)
-#	define VERIFY2(a,b)
-#	define VERIFY_is_defined_in_ppmdtype_h
+# define VERIFY(a)
+# define VERIFY2(a,b)
+# define VERIFY_is_defined_in_ppmdtype_h
 #endif // VERIFY
-	typedef unsigned char	u8;
-	typedef unsigned int	u32;
-#	include "compression_ppmd_stream.h"
+ typedef unsigned char u8;
+ typedef unsigned int u32;
+# include "compression_ppmd_stream.h"
 
 #ifdef VERIFY_is_defined_in_ppmdtype_h
-#	undef VERIFY
-#	undef VERIFY2
-#	undef VERIFY_is_defined_in_ppmdtype_h
+# undef VERIFY
+# undef VERIFY2
+# undef VERIFY_is_defined_in_ppmdtype_h
 #endif // VERIFY_is_defined_in_ppmdtype_h
 
 #include "compression_ppmd_stream.h"
