@@ -117,7 +117,6 @@ void xrCore::_initialize	(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs,
 		EFS._initialize		();
 #ifdef DEBUG
     #ifndef	_EDITOR
-		Msg					("CRT heap 0x%08x",_get_heap_handle());
 		Msg					("Process heap 0x%08x",GetProcessHeap());
     #endif
 #endif // DEBUG
