@@ -47,11 +47,13 @@ XRCORE_API u32 build_id;
 #endif // #ifdef MASTER_GOLD
 
 
-static LPSTR month_id[12] = {
+static LPSTR month_id[12] =
+{
     "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 };
 
-static int days_in_month[12] = {
+static int days_in_month[12] =
+{
     31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
 };
 
@@ -69,57 +71,60 @@ static int start_year = 1999; // 1999
 #define DEFAULT_MODULE_HASH "3CAABCFCFF6F3A810019C6A72180F166"
 static char szEngineHash[33] = DEFAULT_MODULE_HASH;
 
-PROTECT_API char * ComputeModuleHash( char * pszHash )
+PROTECT_API char* ComputeModuleHash(char* pszHash)
 {
     SECUROM_MARKER_HIGH_SECURITY_ON(3)
 
-        char szModuleFileName[ MAX_PATH ];
-    HANDLE hModuleHandle = NULL , hFileMapping = NULL;
+    char szModuleFileName[MAX_PATH];
+    HANDLE hModuleHandle = NULL, hFileMapping = NULL;
     LPVOID lpvMapping = NULL;
     MEMORY_BASIC_INFORMATION MemoryBasicInformation;
 
-    if ( ! GetModuleFileName( NULL , szModuleFileName , MAX_PATH ) )
+    if (!GetModuleFileName(NULL, szModuleFileName, MAX_PATH))
         return pszHash;
 
-    hModuleHandle = CreateFile( szModuleFileName , GENERIC_READ , FILE_SHARE_READ , NULL , OPEN_EXISTING , 0 , NULL );
+    hModuleHandle = CreateFile(szModuleFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 
-    if ( hModuleHandle == INVALID_HANDLE_VALUE )
+    if (hModuleHandle == INVALID_HANDLE_VALUE)
         return pszHash;
 
-    hFileMapping = CreateFileMapping( hModuleHandle , NULL , PAGE_READONLY , 0 , 0 , NULL );
+    hFileMapping = CreateFileMapping(hModuleHandle, NULL, PAGE_READONLY, 0, 0, NULL);
 
-    if ( hFileMapping == NULL ) {
-        CloseHandle( hModuleHandle );
-        return pszHash;
-    }
-
-    lpvMapping = MapViewOfFile( hFileMapping , FILE_MAP_READ , 0 , 0 , 0 );
-
-    if ( lpvMapping == NULL ) {
-        CloseHandle( hFileMapping );
-        CloseHandle( hModuleHandle );
+    if (hFileMapping == NULL)
+    {
+        CloseHandle(hModuleHandle);
         return pszHash;
     }
 
-    ZeroMemory( &MemoryBasicInformation , sizeof( MEMORY_BASIC_INFORMATION ) );
+    lpvMapping = MapViewOfFile(hFileMapping, FILE_MAP_READ, 0, 0, 0);
 
-    VirtualQuery( lpvMapping , &MemoryBasicInformation , sizeof( MEMORY_BASIC_INFORMATION ) );
+    if (lpvMapping == NULL)
+    {
+        CloseHandle(hFileMapping);
+        CloseHandle(hModuleHandle);
+        return pszHash;
+    }
 
-    if ( MemoryBasicInformation.RegionSize ) {
+    ZeroMemory(&MemoryBasicInformation, sizeof(MEMORY_BASIC_INFORMATION));
+
+    VirtualQuery(lpvMapping, &MemoryBasicInformation, sizeof(MEMORY_BASIC_INFORMATION));
+
+    if (MemoryBasicInformation.RegionSize)
+    {
         char szHash[33];
-        MD5Digest( ( unsigned char *)lpvMapping , (unsigned int) MemoryBasicInformation.RegionSize , szHash );
-        MD5Digest( ( unsigned char *)szHash , 32 , pszHash );
-        for ( int i = 0 ; i < 32 ; ++i )
-            pszHash[ i ] = (char)toupper( pszHash[ i ] );
+        MD5Digest((unsigned char*)lpvMapping, (unsigned int)MemoryBasicInformation.RegionSize, szHash);
+        MD5Digest((unsigned char*)szHash, 32, pszHash);
+        for (int i = 0; i < 32; ++i)
+            pszHash[i] = (char)toupper(pszHash[i]);
     }
 
-    UnmapViewOfFile( lpvMapping );
-    CloseHandle( hFileMapping );
-    CloseHandle( hModuleHandle );
+    UnmapViewOfFile(lpvMapping);
+    CloseHandle(hFileMapping);
+    CloseHandle(hModuleHandle);
 
     SECUROM_MARKER_HIGH_SECURITY_OFF(3)
 
-        return pszHash;
+    return pszHash;
 }
 #endif // DEDICATED_SERVER
 
@@ -193,7 +198,7 @@ void InitEngine()
 
 struct path_excluder_predicate
 {
-    explicit path_excluder_predicate(xr_auth_strings_t const * ignore) :
+    explicit path_excluder_predicate(xr_auth_strings_t const* ignore) :
         m_ignore(ignore)
     {
     }
@@ -204,13 +209,13 @@ struct path_excluder_predicate
 
         return allow_to_include_path(*m_ignore, path);
     }
-    xr_auth_strings_t const * m_ignore;
+    xr_auth_strings_t const* m_ignore;
 };
 
 PROTECT_API void InitSettings()
 {
 #ifndef DEDICATED_SERVER
-    Msg( "EH: %s\n" , ComputeModuleHash( szEngineHash ) );
+    Msg("EH: %s\n", ComputeModuleHash(szEngineHash));
 #endif // DEDICATED_SERVER
 
     string_path fname;
@@ -229,13 +234,13 @@ PROTECT_API void InitSettings()
     CInifile::allow_include_func_t tmp_functor;
     tmp_functor.bind(&tmp_excluder, &path_excluder_predicate::is_allow_include);
     pSettingsAuth = xr_new<CInifile>(
-        fname,
-        TRUE,
-        TRUE,
-        FALSE,
-        0,
-        tmp_functor
-        );
+                        fname,
+                        TRUE,
+                        TRUE,
+                        FALSE,
+                        0,
+                        tmp_functor
+                    );
 
     FS.update_path(fname, "$game_config$", "game.ltx");
     pGameIni = xr_new<CInifile>(fname, TRUE);
@@ -250,9 +255,9 @@ PROTECT_API void InitConsole()
         Console = xr_new<CTextConsole>();
     }
 #else
-        // else
+    // else
     {
-        Console = xr_new<CConsole> ();
+        Console = xr_new<CConsole>();
     }
 #endif
     Console->Initialize();
@@ -359,10 +364,10 @@ void Startup()
         LPCSTR pStartup = strstr(Core.Params, "-start ");
         if (pStartup) Console->Execute(pStartup + 1);
     }
- {
-     LPCSTR pStartup = strstr(Core.Params, "-load ");
-     if (pStartup) Console->Execute(pStartup + 1);
- }
+    {
+        LPCSTR pStartup = strstr(Core.Params, "-load ");
+        if (pStartup) Console->Execute(pStartup + 1);
+    }
 
     // Initialize APP
     //#ifndef DEDICATED_SERVER
@@ -611,7 +616,7 @@ BOOL IsOutOfVirtualMemory()
 
     SECUROM_MARKER_HIGH_SECURITY_ON(1)
 
-        MEMORYSTATUSEX statex;
+    MEMORYSTATUSEX statex;
     DWORD dwPageFileInMB = 0;
     DWORD dwPhysMemInMB = 0;
     HINSTANCE hApp = 0;
@@ -643,7 +648,7 @@ BOOL IsOutOfVirtualMemory()
 
     SECUROM_MARKER_HIGH_SECURITY_OFF(1)
 
-        return 1;
+    return 1;
 }
 
 #include "xr_ioc_cmd.h"
@@ -657,36 +662,36 @@ BOOL IsOutOfVirtualMemory()
 //#define RUSSIAN_BUILD
 
 #if 0
-void foo ()
+void foo()
 {
-    typedef std::map<int,int> TEST_MAP;
+    typedef std::map<int, int> TEST_MAP;
     TEST_MAP temp;
-    temp.insert (std::make_pair(0,0));
+    temp.insert(std::make_pair(0, 0));
     TEST_MAP::const_iterator I = temp.upper_bound(2);
     if (I == temp.end())
-        OutputDebugString ("end() returned\r\n");
+        OutputDebugString("end() returned\r\n");
     else
-        OutputDebugString ("last element returned\r\n");
+        OutputDebugString("last element returned\r\n");
 
     typedef void* pvoid;
 
     LPCSTR path = "d:\\network\\stalker_net2";
-    FILE *f = fopen(path,"rb");
+    FILE* f = fopen(path, "rb");
     int file_handle = _fileno(f);
     u32 buffer_size = _filelength(file_handle);
     pvoid buffer = xr_malloc(buffer_size);
-    size_t result = fread(buffer,buffer_size,1,f);
-    R_ASSERT3 (!buffer_size || (result && (buffer_size >= result)),"Cannot read from file",path);
-    fclose (f);
+    size_t result = fread(buffer, buffer_size, 1, f);
+    R_ASSERT3(!buffer_size || (result && (buffer_size >= result)), "Cannot read from file", path);
+    fclose(f);
 
     u32 compressed_buffer_size = rtc_csize(buffer_size);
     pvoid compressed_buffer = xr_malloc(compressed_buffer_size);
-    u32 compressed_size = rtc_compress(compressed_buffer,compressed_buffer_size,buffer,buffer_size);
+    u32 compressed_size = rtc_compress(compressed_buffer, compressed_buffer_size, buffer, buffer_size);
 
     LPCSTR compressed_path = "d:\\network\\stalker_net2.rtc";
-    FILE *f1 = fopen(compressed_path,"wb");
-    fwrite (compressed_buffer,compressed_size,1,f1);
-    fclose (f1);
+    FILE* f1 = fopen(compressed_path, "wb");
+    fwrite(compressed_buffer, compressed_size, 1, f1);
+    fclose(f1);
 }
 #endif // 0
 
@@ -694,18 +699,18 @@ ENGINE_API bool g_dedicated_server = false;
 
 #ifndef DEDICATED_SERVER
 // forward declaration for Parental Control checks
-BOOL IsPCAccessAllowed(); 
+BOOL IsPCAccessAllowed();
 #endif // DEDICATED_SERVER
 
 int APIENTRY WinMain_impl(HINSTANCE hInstance,
-    HINSTANCE hPrevInstance,
-    char * lpCmdLine,
-    int nCmdShow)
+                          HINSTANCE hPrevInstance,
+                          char* lpCmdLine,
+                          int nCmdShow)
 {
 #ifdef DEDICATED_SERVER
     Debug._initialize(true);
 #else // DEDICATED_SERVER
-    Debug._initialize (false);
+    Debug._initialize(false);
 #endif // DEDICATED_SERVER
 
     if (!IsDebuggerPresent())
@@ -724,10 +729,10 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
             BOOL const result =
 #endif // #ifdef DEBUG
                 heap_set_information(
-                GetProcessHeap(),
-                HeapCompatibilityInformation,
-                &HeapFragValue,
-                sizeof(HeapFragValue)
+                    GetProcessHeap(),
+                    HeapCompatibilityInformation,
+                    &HeapFragValue,
+                    sizeof(HeapFragValue)
                 );
             VERIFY2(result, "can't set process heap low fragmentation");
         }
@@ -737,12 +742,13 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 #ifndef DEDICATED_SERVER
 
     // Check for virtual memory
-    if ( ( strstr( lpCmdLine , "--skipmemcheck" ) == NULL ) && IsOutOfVirtualMemory() )
+    if ((strstr(lpCmdLine, "--skipmemcheck") == NULL) && IsOutOfVirtualMemory())
         return 0;
 
     // Parental Control for Vista and upper
-    if ( ! IsPCAccessAllowed() ) {
-        MessageBox( NULL , "Access restricted" , "Parental Control" , MB_OK | MB_ICONERROR );
+    if (!IsPCAccessAllowed())
+    {
+        MessageBox(NULL, "Access restricted", "Parental Control", MB_OK | MB_ICONERROR);
         return 1;
     }
 
@@ -751,16 +757,19 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 #define STALKER_PRESENCE_MUTEX "Local\\STALKER-COP"
 
     HANDLE hCheckPresenceMutex = INVALID_HANDLE_VALUE;
-    hCheckPresenceMutex = OpenMutex( READ_CONTROL , FALSE , STALKER_PRESENCE_MUTEX );
-    if ( hCheckPresenceMutex == NULL ) {
+    hCheckPresenceMutex = OpenMutex(READ_CONTROL, FALSE, STALKER_PRESENCE_MUTEX);
+    if (hCheckPresenceMutex == NULL)
+    {
         // New mutex
-        hCheckPresenceMutex = CreateMutex( NULL , FALSE , STALKER_PRESENCE_MUTEX );
-        if ( hCheckPresenceMutex == NULL )
+        hCheckPresenceMutex = CreateMutex(NULL, FALSE, STALKER_PRESENCE_MUTEX);
+        if (hCheckPresenceMutex == NULL)
             // Shit happens
             return 2;
-    } else {
+    }
+    else
+    {
         // Already running
-        CloseHandle( hCheckPresenceMutex );
+        CloseHandle(hCheckPresenceMutex);
         return 1;
     }
 #endif
@@ -789,7 +798,7 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
         logoRect.right - logoRect.left,
         logoRect.bottom - logoRect.top,
         SWP_NOMOVE | SWP_SHOWWINDOW// | SWP_NOSIZE
-        );
+    );
     UpdateWindow(logoWindow);
 
     // AVI
@@ -823,93 +832,92 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
     }
 
 #ifndef DEDICATED_SERVER
- {
-     damn_keys_filter filter;
-     (void)filter;
+    {
+        damn_keys_filter filter;
+        (void)filter;
 #endif // DEDICATED_SERVER
 
-     FPU::m24r();
-     InitEngine();
+        FPU::m24r();
+        InitEngine();
 
-     InitInput();
+        InitInput();
 
-     InitConsole();
+        InitConsole();
 
-     Engine.External.CreateRendererList();
+        Engine.External.CreateRendererList();
 
-     LPCSTR benchName = "-batch_benchmark ";
-     if (strstr(lpCmdLine, benchName))
-     {
-         int sz = xr_strlen(benchName);
-         string64 b_name;
-         sscanf(strstr(Core.Params, benchName) + sz, "%[^ ] ", b_name);
-         doBenchmark(b_name);
-         return 0;
-     }
+        LPCSTR benchName = "-batch_benchmark ";
+        if (strstr(lpCmdLine, benchName))
+        {
+            int sz = xr_strlen(benchName);
+            string64 b_name;
+            sscanf(strstr(Core.Params, benchName) + sz, "%[^ ] ", b_name);
+            doBenchmark(b_name);
+            return 0;
+        }
 
-     Msg("command line %s", lpCmdLine);
-     LPCSTR sashName = "-openautomate ";
-     if (strstr(lpCmdLine, sashName))
-     {
-         int sz = xr_strlen(sashName);
-         string512 sash_arg;
-         sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sash_arg);
-         //doBenchmark (sash_arg);
-         g_SASH.Init(sash_arg);
-         g_SASH.MainLoop();
-         return 0;
-     }
+        Msg("command line %s", lpCmdLine);
+        LPCSTR sashName = "-openautomate ";
+        if (strstr(lpCmdLine, sashName))
+        {
+            int sz = xr_strlen(sashName);
+            string512 sash_arg;
+            sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sash_arg);
+            //doBenchmark (sash_arg);
+            g_SASH.Init(sash_arg);
+            g_SASH.MainLoop();
+            return 0;
+        }
 
-     if (strstr(lpCmdLine, "-launcher"))
-     {
-         int l_res = doLauncher();
-         if (l_res != 0)
-             return 0;
-     };
+        if (strstr(lpCmdLine, "-launcher"))
+        {
+            int l_res = doLauncher();
+            if (l_res != 0)
+                return 0;
+        };
 
 #ifndef DEDICATED_SERVER
-     if(strstr(Core.Params,"-r2a")) 
-         Console->Execute ("renderer renderer_r2a");
-     else
-         if(strstr(Core.Params,"-r2")) 
-             Console->Execute ("renderer renderer_r2");
-         else
-         {
-             CCC_LoadCFG_custom* pTmp = xr_new<CCC_LoadCFG_custom>("renderer ");
-             pTmp->Execute (Console->ConfigFile);
-             xr_delete (pTmp);
-         }
+        if (strstr(Core.Params, "-r2a"))
+            Console->Execute("renderer renderer_r2a");
+        else if (strstr(Core.Params, "-r2"))
+            Console->Execute("renderer renderer_r2");
+        else
+        {
+            CCC_LoadCFG_custom* pTmp = xr_new<CCC_LoadCFG_custom>("renderer ");
+            pTmp->Execute(Console->ConfigFile);
+            xr_delete(pTmp);
+        }
 #else
-     Console->Execute("renderer renderer_r1");
+        Console->Execute("renderer renderer_r1");
 #endif
-     //. InitInput ( );
-     Engine.External.Initialize();
-     Console->Execute("stat_memory");
+        //. InitInput ( );
+        Engine.External.Initialize();
+        Console->Execute("stat_memory");
 
-     Startup();
-     Core._destroy();
+        Startup();
+        Core._destroy();
 
-     // check for need to execute something external
-     if (/*xr_strlen(g_sLaunchOnExit_params) && */xr_strlen(g_sLaunchOnExit_app))
-     {
-         //CreateProcess need to return results to next two structures
-         STARTUPINFO si;
-         PROCESS_INFORMATION pi;
-         ZeroMemory(&si, sizeof(si));
-         si.cb = sizeof(si);
-         ZeroMemory(&pi, sizeof(pi));
-         //We use CreateProcess to setup working folder
-         char const * temp_wf = (xr_strlen(g_sLaunchWorkingFolder) > 0) ? g_sLaunchWorkingFolder : NULL;
-         CreateProcess(g_sLaunchOnExit_app, g_sLaunchOnExit_params, NULL, NULL, FALSE, 0, NULL,
-             temp_wf, &si, &pi);
+        // check for need to execute something external
+        if (/*xr_strlen(g_sLaunchOnExit_params) && */xr_strlen(g_sLaunchOnExit_app))
+        {
+            //CreateProcess need to return results to next two structures
+            STARTUPINFO si;
+            PROCESS_INFORMATION pi;
+            ZeroMemory(&si, sizeof(si));
+            si.cb = sizeof(si);
+            ZeroMemory(&pi, sizeof(pi));
+            //We use CreateProcess to setup working folder
+            char const* temp_wf = (xr_strlen(g_sLaunchWorkingFolder) > 0) ? g_sLaunchWorkingFolder : NULL;
+            CreateProcess(g_sLaunchOnExit_app, g_sLaunchOnExit_params, NULL, NULL, FALSE, 0, NULL,
+                          temp_wf, &si, &pi);
 
-     }
+        }
 #ifndef DEDICATED_SERVER
-#ifdef NO_MULTI_INSTANCES 
-     // Delete application presence mutex
-     CloseHandle( hCheckPresenceMutex );
+#ifdef NO_MULTI_INSTANCES
+        // Delete application presence mutex
+        CloseHandle(hCheckPresenceMutex);
 #endif
- }
+    }
     // here damn_keys_filter class instanse will be destroyed
 #endif // DEDICATED_SERVER
 
@@ -933,9 +941,9 @@ int stack_overflow_exception_filter(int exception_code)
 #include <boost/crc.hpp>
 
 int APIENTRY WinMain(HINSTANCE hInstance,
-    HINSTANCE hPrevInstance,
-    char * lpCmdLine,
-    int nCmdShow)
+                     HINSTANCE hPrevInstance,
+                     char* lpCmdLine,
+                     int nCmdShow)
 {
     //FILE* file = 0;
     //fopen_s ( &file, "z:\\development\\call_of_prypiat\\resources\\gamedata\\shaders\\r3\\objects\\r4\\accum_sun_near_msaa_minmax.ps\\2048__1___________4_11141_", "rb" );
@@ -968,15 +976,15 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
 LPCSTR _GetFontTexName(LPCSTR section)
 {
-    static char* tex_names[] = { "texture800", "texture", "texture1600" };
+    static char* tex_names[] = {"texture800", "texture", "texture1600"};
     int def_idx = 1;//default 1024x768
     int idx = def_idx;
 
 #if 0
     u32 w = Device.dwWidth;
 
-    if(w<=800) idx = 0;
-    else if(w<=1280)idx = 1;
+    if (w <= 800) idx = 0;
+    else if (w <= 1280)idx = 1;
     else idx = 2;
 #else
     u32 h = Device.dwHeight;
@@ -1103,17 +1111,17 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
 
 #ifdef NO_SINGLE
         Console->Execute("main_menu on");
-        if ( (op_server == NULL) ||
-            (!xr_strlen(op_server)) ||
-            (
-            ( strstr(op_server, "/dm") || strstr(op_server, "/deathmatch") ||
-            strstr(op_server, "/tdm") || strstr(op_server, "/teamdeathmatch") ||
-            strstr(op_server, "/ah") || strstr(op_server, "/artefacthunt") ||
-            strstr(op_server, "/cta") || strstr(op_server, "/capturetheartefact")
-            ) && 
-            !strstr(op_server, "/alife")
-            )
-            )
+        if ((op_server == NULL) ||
+                (!xr_strlen(op_server)) ||
+                (
+                    (strstr(op_server, "/dm") || strstr(op_server, "/deathmatch") ||
+                     strstr(op_server, "/tdm") || strstr(op_server, "/teamdeathmatch") ||
+                     strstr(op_server, "/ah") || strstr(op_server, "/artefacthunt") ||
+                     strstr(op_server, "/cta") || strstr(op_server, "/capturetheartefact")
+                    ) &&
+                    !strstr(op_server, "/alife")
+                )
+           )
 #endif // #ifdef NO_SINGLE
         {
             Console->Execute("main_menu off");
@@ -1200,7 +1208,7 @@ void CApplication::LoadBegin()
         g_appLoaded = FALSE;
 
 #ifndef DEDICATED_SERVER
-        _InitializeFont (pFontSystem,"ui_font_letterica18_russian",0);
+        _InitializeFont(pFontSystem, "ui_font_letterica18_russian", 0);
 
         m_pRender->LoadBegin();
 #endif
@@ -1262,7 +1270,8 @@ void CApplication::LoadStage()
 {
     load_stage++;
     VERIFY(ll_dwReference);
-    Msg("* phase time: %d ms", phase_timer.GetElapsed_ms()); phase_timer.Start();
+    Msg("* phase time: %d ms", phase_timer.GetElapsed_ms());
+    phase_timer.Start();
     Msg("* phase cmem: %d K", Memory.mem_usage() / 1024);
 
     if (g_pGamePersistent->GameType() == 1 && strstr(Core.Params, "alife"))
@@ -1298,7 +1307,7 @@ void CApplication::Level_Append(LPCSTR folder)
         FS.exist("$game_levels$", N2) &&
         FS.exist("$game_levels$", N3) &&
         FS.exist("$game_levels$", N4)
-        )
+    )
     {
         sLevelInfo LI;
         LI.folder = xr_strdup(folder);
@@ -1311,11 +1320,11 @@ void CApplication::Level_Scan()
 {
     SECUROM_MARKER_PERFORMANCE_ON(8)
 
-        for (u32 i = 0; i < Levels.size(); i++)
-        {
+    for (u32 i = 0; i < Levels.size(); i++)
+    {
         xr_free(Levels[i].folder);
         xr_free(Levels[i].name);
-        }
+    }
     Levels.clear();
 
 
@@ -1347,7 +1356,7 @@ void CApplication::Level_Set(u32 L)
 {
     SECUROM_MARKER_PERFORMANCE_ON(9)
 
-        if (L >= Levels.size()) return;
+    if (L >= Levels.size()) return;
     FS.get_path("$level$")->_set(Levels[L].folder);
 
     static string_path path;
@@ -1390,7 +1399,7 @@ int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
 
     SECUROM_MARKER_SECURITY_ON(7)
 
-        CLocatorAPI::archives_it it = FS.m_archives.begin();
+    CLocatorAPI::archives_it it = FS.m_archives.begin();
     CLocatorAPI::archives_it it_e = FS.m_archives.end();
     bool arch_res = false;
 
@@ -1431,7 +1440,7 @@ int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
 
     SECUROM_MARKER_SECURITY_OFF(7)
 
-        return result;
+    return result;
 }
 
 CInifile* CApplication::GetArchiveHeader(LPCSTR name, LPCSTR ver)
@@ -1464,62 +1473,64 @@ void CApplication::LoadAllArchives()
 
 #ifndef DEDICATED_SERVER
 // Parential control for Vista and upper
-typedef BOOL (*PCCPROC)( CHAR* ); 
+typedef BOOL(*PCCPROC)(CHAR*);
 
 BOOL IsPCAccessAllowed()
 {
-    CHAR szPCtrlChk[ MAX_PATH ] , szGDF[ MAX_PATH ] , *pszLastSlash;
+    CHAR szPCtrlChk[MAX_PATH], szGDF[MAX_PATH], *pszLastSlash;
     HINSTANCE hPCtrlChk = NULL;
     PCCPROC pctrlchk = NULL;
     BOOL bAllowed = TRUE;
 
-    if ( ! GetModuleFileName( NULL , szPCtrlChk , MAX_PATH ) )
+    if (!GetModuleFileName(NULL, szPCtrlChk, MAX_PATH))
         return TRUE;
 
-    if ( ( pszLastSlash = strrchr( szPCtrlChk , '\\' ) ) == NULL )
-        return TRUE;
-
-    *pszLastSlash = '\0';
-
-    strcpy_s( szGDF , szPCtrlChk );
-
-    strcat_s( szPCtrlChk , "\\pctrlchk.dll" );
-    if ( GetFileAttributes( szPCtrlChk ) == INVALID_FILE_ATTRIBUTES )
-        return TRUE;
-
-    if ( ( pszLastSlash = strrchr( szGDF , '\\' ) ) == NULL )
+    if ((pszLastSlash = strrchr(szPCtrlChk, '\\')) == NULL)
         return TRUE;
 
     *pszLastSlash = '\0';
 
-    strcat_s( szGDF , "\\Stalker-COP.exe" );
-    if ( GetFileAttributes( szGDF ) == INVALID_FILE_ATTRIBUTES )
+    strcpy_s(szGDF, szPCtrlChk);
+
+    strcat_s(szPCtrlChk, "\\pctrlchk.dll");
+    if (GetFileAttributes(szPCtrlChk) == INVALID_FILE_ATTRIBUTES)
         return TRUE;
 
-    if ( ( hPCtrlChk = LoadLibrary( szPCtrlChk ) ) == NULL )
+    if ((pszLastSlash = strrchr(szGDF, '\\')) == NULL)
         return TRUE;
 
-    if ( ( pctrlchk = (PCCPROC) GetProcAddress( hPCtrlChk , "pctrlchk" ) ) == NULL ) {
-        FreeLibrary( hPCtrlChk );
+    *pszLastSlash = '\0';
+
+    strcat_s(szGDF, "\\Stalker-COP.exe");
+    if (GetFileAttributes(szGDF) == INVALID_FILE_ATTRIBUTES)
+        return TRUE;
+
+    if ((hPCtrlChk = LoadLibrary(szPCtrlChk)) == NULL)
+        return TRUE;
+
+    if ((pctrlchk = (PCCPROC)GetProcAddress(hPCtrlChk, "pctrlchk")) == NULL)
+    {
+        FreeLibrary(hPCtrlChk);
         return TRUE;
     }
 
-    bAllowed = pctrlchk( szGDF );
+    bAllowed = pctrlchk(szGDF);
 
-    FreeLibrary( hPCtrlChk );
+    FreeLibrary(hPCtrlChk);
 
     return bAllowed;
 }
 #endif // DEDICATED_SERVER
 
 //launcher stuff----------------------------
-extern "C"{
+extern "C" {
     typedef int __cdecl LauncherFunc(int);
 }
 HMODULE hLauncher = NULL;
 LauncherFunc* pLauncher = NULL;
 
-void InitLauncher(){
+void InitLauncher()
+{
     if (hLauncher)
         return;
     hLauncher = LoadLibrary("xrLauncher.dll");
@@ -1530,11 +1541,13 @@ void InitLauncher(){
     R_ASSERT2(pLauncher, "Cannot obtain RunXRLauncher function from xrLauncher.dll");
 };
 
-void FreeLauncher(){
+void FreeLauncher()
+{
     if (hLauncher)
     {
         FreeLibrary(hLauncher);
-        hLauncher = NULL; pLauncher = NULL;
+        hLauncher = NULL;
+        pLauncher = NULL;
     };
 }
 

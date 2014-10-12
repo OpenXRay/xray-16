@@ -1,5 +1,5 @@
-#include	"stdafx.h"
+#include "stdafx.h"
 
-#include	"iphdebug.h"
+#include "iphdebug.h"
 
 IPhDebugRender* ph_debug_render = 0;
