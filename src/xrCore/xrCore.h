@@ -299,7 +299,7 @@ public:
 	string_path	WorkingPath;
 	string64	UserName;
 	string64	CompName;
-	string512	Params;
+    char* Params;
 	DWORD		dwFrame;
 
 public:

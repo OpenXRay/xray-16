@@ -34,21 +34,23 @@ nitrocaster: Pavel Kovalenko
   - decouple hxGrid
 - bugs/issues
   - generic
-    - stackoverflow when starting with too long command line
-    - stackoverflow when game directory contains too many files (_alloca)
+    + stackoverflow when game directory contains too many files (_alloca)
+      + partially fixed by loxotron
       - can me improved (get rid of recursive directory traversal)
-      - exclude $app_data_root$/logs and $app_data_root$/screenshots from index
-    - GetColorFromText bug
+      c exclude $app_data_root$/logs and $app_data_root$/screenshots from index
+      + don't scan directory if it contains .xrignore file.
+    + GetColorFromText bug
     - (bytes_need<=mSize) && vl_Count
-    - "! tab named [1] doesnt exist"
+    + "! tab named [1] doesnt exist"
   - UI
-    - clip cursor in windowed mode with enabled input capture
+    + clip cursor in windowed mode with enabled input capture
     - dragging music volume slider doesn't make any effect until one presses 'Apply' button
+    ? save MP settings
   - core
-    - buffer overflow when copying command line to Core.Params
+    + buffer overflow when copying command line to Core.Params
     - misplaced arguments in calls to xrDebug::backend
   - multiplayer
-    - xrGameSpy: fix master server name (gamespy is down)
+    + xrGameSpy: fix master server name (gamespy is down)
     - dedicated server
       - vulnerabilities (verify)
         c dirtysky
@@ -74,7 +76,6 @@ nitrocaster: Pavel Kovalenko
   - UI
     - close sleep dialog by ESC key
   - multiplayer
-    - use GSC server instead of GameSpy one
     - ipv6 support
     - get rid of DirectPlay
     - log suspicious packets and kick/ban its senders after X attempts

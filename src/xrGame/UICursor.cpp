@@ -4,6 +4,7 @@
 #include "ui/UIStatic.h"
 #include "ui/UIBtnHint.h"
 #include "xrEngine/IInputReceiver.h"
+#include "xrEngine/xr_input.h"
 
 #define C_DEFAULT	D3DCOLOR_XRGB(0xff,0xff,0xff)
 
@@ -113,6 +114,8 @@ void CUICursor::UpdateCursorPosition(int _dx, int _dy)
 	}
 	clamp		(vPos.x, 0.f, UI_BASE_WIDTH);
 	clamp		(vPos.y, 0.f, UI_BASE_HEIGHT);
+    if (m_b_use_win_cursor && pInput->get_exclusive_mode())
+        SetUICursorPosition(vPos);
 }
 
 void CUICursor::SetUICursorPosition(Fvector2 pos)

@@ -353,7 +353,7 @@ _DDS:
 
 		S						= FS.r_open	(fn);
 #ifdef DEBUG
-		Msg						("* Loaded: %s[%d]b",fn,S->length());
+		Msg						("* Loaded: %s[%d]",fn,S->length());
 #endif // DEBUG
 		img_size				= S->length	();
 		R_ASSERT				(S);
