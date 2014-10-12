@@ -494,29 +494,27 @@ bool CLocatorAPI::load_all_unloaded_archives()
 }
 
 
-void CLocatorAPI::ProcessOne(LPCSTR path, void* _F)
+void CLocatorAPI::ProcessOne(LPCSTR path, const _finddata_t& entry)
 {
-	_finddata_t& F	= *((_finddata_t*)_F);
-
 	string_path		N;
 	xr_strcpy		(N,sizeof(N),path);
-	xr_strcat		(N,F.name);
+	xr_strcat		(N,entry.name);
 	xr_strlwr		(N);
 	
-	if (F.attrib&_A_HIDDEN)			return;
+	if (entry.attrib&_A_HIDDEN)			return;
 
-	if (F.attrib&_A_SUBDIR) {
+	if (entry.attrib&_A_SUBDIR) {
 		if (bNoRecurse)					return;
-		if (0==xr_strcmp(F.name,"."))	return;
-		if (0==xr_strcmp(F.name,".."))	return;
+		if (0==xr_strcmp(entry.name,"."))	return;
+		if (0==xr_strcmp(entry.name,".."))	return;
 		xr_strcat		(N,"\\");
-		Register	(N,0xffffffff,0,0,F.size,F.size,(u32)F.time_write);
+		Register	(N,0xffffffff,0,0,entry.size,entry.size,(u32)entry.time_write);
 		Recurse		(N);
 	} else {
 		if (strext(N) && (0==strncmp(strext(N),".db",3) || 0==strncmp(strext(N),".xdb",4))  )
 			ProcessArchive	(N);
 		else												
-			Register		(N,0xffffffff,0,0,F.size,F.size,(u32)F.time_write);
+			Register		(N,0xffffffff,0,0,entry.size,entry.size,(u32)entry.time_write);
 	}
 }
 
@@ -551,66 +549,49 @@ bool ignore_path(const char* _path){
 
 bool CLocatorAPI::Recurse		(const char* path)
 {
-    _finddata_t		sFile;
-    intptr_t		hFile;
-
-	string_path		N;
-	xr_strcpy		(N,sizeof(N),path);
-	xr_strcat			(N,"*.*");
-
-	rec_files.reserve(1224);
-
-	// find all files    
-	if (-1==(hFile=_findfirst(N, &sFile)))
-	{
-    	// Log		("! Wrong path: ",path);
-    	return		false;
+    string_path scanPath;
+    xr_strcpy(scanPath, sizeof(scanPath), path);
+    xr_strcat(scanPath, "*.*");
+    _finddata_t findData;
+    intptr_t handle = _findfirst(scanPath, &findData);
+    if (handle == -1)
+    {
+        Log("! FS: Invalid path: ", path);
+        return false;
     }
-
-	string1024 full_path;
-	if (m_Flags.test(flNeedCheck))
-	{
-		xr_strcpy(full_path,sizeof(full_path), path);
-		xr_strcat(full_path, sFile.name);
-
-		// загоняем в вектор для того *.db* приходили в сортированном порядке
-		if(!ignore_name(sFile.name) && !ignore_path(full_path))
-			rec_files.push_back(sFile);
-
-		while ( _findnext( hFile, &sFile ) == 0 )
-		{
-			xr_strcpy(full_path,sizeof(full_path), path);
-			xr_strcat(full_path, sFile.name);
-			if(!ignore_name(sFile.name) && !ignore_path(full_path)) 
-				rec_files.push_back(sFile);
-		}
-	}
-	else
-	{
-		// загоняем в вектор для того *.db* приходили в сортированном порядке
-		if(!ignore_name(sFile.name))
-			rec_files.push_back(sFile);
-
-		while ( _findnext( hFile, &sFile ) == 0 )
-		{
-			if(!ignore_name(sFile.name)) 
-				rec_files.push_back(sFile);
-		}
-
-	}
-
-	_findclose		( hFile );
-
-	FFVec buffer(rec_files);
-	rec_files.clear_not_free();
-	std::sort		(buffer.begin(), buffer.end(), pred_str_ff);
-	for (FFIt I = buffer.begin(), E = buffer.end(); I != E; ++I)
-		ProcessOne	(path, &*I);
-
-	// insert self
-    if (path&&path[0])\
-		Register	(path,0xffffffff,0,0,0,0,0);
-
+    rec_files.reserve(256);
+    size_t oldSize = rec_files.size();
+    intptr_t done = handle;
+    while (done != -1)
+    {
+        string1024 fullPath;
+        bool ignore = false;
+        if (m_Flags.test(flNeedCheck))
+        {
+            xr_strcpy(fullPath, sizeof(fullPath), path);
+            xr_strcat(fullPath, findData.name);
+            ignore = ignore_name(findData.name) || ignore_path(fullPath);
+        }
+        else
+        {
+            ignore = ignore_name(findData.name);
+        }
+        if (!ignore)
+            rec_files.push_back(findData);
+        done = _findnext(handle, &findData);
+    }
+    _findclose(handle);
+    size_t newSize = rec_files.size();
+    if (newSize > oldSize)
+    {
+        std::sort(rec_files.begin()+oldSize, rec_files.end(), pred_str_ff);
+        for (size_t i = oldSize; i < newSize; i++)
+            ProcessOne(path, rec_files[i]);
+        rec_files.erase(rec_files.begin()+oldSize, rec_files.end());
+    }
+    // insert self
+    if (path && path[0] != 0)
+        Register(path, 0xffffffff, 0, 0, 0, 0, 0);
     return true;
 }
 
