@@ -18,7 +18,7 @@ using namespace ppmd;
 enum { UP_FREQ=5, INT_BITS=7, PERIOD_BITS=7, TOT_BITS=INT_BITS+PERIOD_BITS,
     INTERVAL=1 << INT_BITS, BIN_SCALE=1 << TOT_BITS, MAX_FREQ=124, O_BOUND=9 };
 
-compression::ppmd::stream	*trained_model = 0;
+compression::ppmd::stream *trained_model = 0;
 
 
 template <class TMP_TYPE>
@@ -340,14 +340,14 @@ static void RestoreModelRare(PPM_CONTEXT* pc1,PPM_CONTEXT* MinContext,
         while ( MaxContext->Suffix )        MaxContext=MaxContext->Suffix;
         MaxContext->removeBinConts(0);      MRMethod=MR_METHOD(MRMethod+1);
         GlueCount=0;                        OrderFall=MaxOrder;
-	} else if (MRMethod == MRM_RESTART || GetUsedMemory() < (SubAllocatorSize >> 1)) {
+ } else if (MRMethod == MRM_RESTART || GetUsedMemory() < (SubAllocatorSize >> 1)) {
         StartModelRare(MaxOrder,MRMethod);
         EscCount=0;                         PrintCount=0xFF;
     } else {
         while ( MaxContext->Suffix )        MaxContext=MaxContext->Suffix;
         do {
             MaxContext->cutOff(0);          ExpandTextArea();
-		} while (GetUsedMemory() > 3*(SubAllocatorSize >> 2));
+  } while (GetUsedMemory() > 3*(SubAllocatorSize >> 2));
         GlueCount=0;                        OrderFall=MaxOrder;
     }
 }

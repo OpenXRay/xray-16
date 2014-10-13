@@ -10,18 +10,18 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CEffectorPP::CEffectorPP(EEffectorPPType type, f32 lifeTime, bool free_on_remove) 
-:bOverlap(true)
+CEffectorPP::CEffectorPP(EEffectorPPType type, f32 lifeTime, bool free_on_remove)
+    :bOverlap(true)
 {
-	eType			= type;
-	fLifeTime		= lifeTime;
-	bFreeOnRemove	= free_on_remove;
+    eType = type;
+    fLifeTime = lifeTime;
+    bFreeOnRemove = free_on_remove;
 }
 
 CEffectorPP::~CEffectorPP() {}
 
-BOOL CEffectorPP::Process(SPPInfo &PPInfo) 
+BOOL CEffectorPP::Process(SPPInfo& PPInfo)
 {
-	fLifeTime -= Device.fTimeDelta;
-	return TRUE;
+    fLifeTime -= Device.fTimeDelta;
+    return TRUE;
 }
