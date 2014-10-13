@@ -1,170 +1,171 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: property_collection_inline.hpp
-//	Created 	: 12.12.2007
-//  Modified 	: 27.12.2007
-//	Author		: Dmitriy Iassenev
-//	Description : property collection template class inline functions
+// Module : property_collection_inline.hpp
+// Created : 12.12.2007
+// Modified : 27.12.2007
+// Author : Dmitriy Iassenev
+// Description : property collection template class inline functions
 ////////////////////////////////////////////////////////////////////////////
 
 #ifndef PROPERTY_COLLECTION_INLINE_HPP_INCLUDED
 #define PROPERTY_COLLECTION_INLINE_HPP_INCLUDED
 
-#define SPECIALIZATION		template <typename container_type, typename holder_type>
-#define PROPERTY_COLLECTION	property_collection<container_type, holder_type>
+#define SPECIALIZATION template <typename container_type, typename holder_type>
+#define PROPERTY_COLLECTION property_collection<container_type, holder_type>
 
 SPECIALIZATION
-inline PROPERTY_COLLECTION::property_collection			(
-		container_type* container,
-		holder_type* holder,
-		bool* changed
-	) :
-	m_container			(*container),
-	m_holder			(*holder),
-	m_changed			(changed)
+inline PROPERTY_COLLECTION::property_collection(
+    container_type* container,
+    holder_type* holder,
+    bool* changed
+) :
+    m_container(*container),
+    m_holder(*holder),
+    m_changed(changed)
 {
 }
 
 SPECIALIZATION
-inline PROPERTY_COLLECTION::~property_collection		()
+inline PROPERTY_COLLECTION::~property_collection()
 {
-	delete_data			(m_container);
-//	Msg					("container is destroyed");
+    delete_data(m_container);
+    // Msg ("container is destroyed");
 }
 
 SPECIALIZATION
-inline holder_type& PROPERTY_COLLECTION::holder			() const
+inline holder_type& PROPERTY_COLLECTION::holder() const
 {
-	return				(m_holder);
+    return (m_holder);
 }
 
 SPECIALIZATION
-void PROPERTY_COLLECTION::clear							()
+void PROPERTY_COLLECTION::clear()
 {
-	make_state_changed	();
-	m_container.clear	();
-//	Msg					("container is cleared");
+    make_state_changed();
+    m_container.clear();
+    // Msg ("container is cleared");
 }
 
 SPECIALIZATION
-u32 PROPERTY_COLLECTION::size							()
+u32 PROPERTY_COLLECTION::size()
 {
-	return				(m_container.size());
+    return (m_container.size());
 }
 
 SPECIALIZATION
-void PROPERTY_COLLECTION::insert						(property_holder* holder, u32 const& position)
+void PROPERTY_COLLECTION::insert(property_holder* holder, u32 const& position)
 {
-//	Msg					("insert into container");
-	make_state_changed	();
+    // Msg ("insert into container");
+    make_state_changed();
 
-	VERIFY				(position <= m_container.size());
-	
-	editor::property_holder_holder*	value_raw = holder->holder();
-	VERIFY				(value_raw);
-	
-	typedef typename container_type::value_type	value_type;
-	value_type			value = dynamic_cast<value_type>(value_raw);
-	VERIFY				(value);
+    VERIFY(position <= m_container.size());
 
-	m_container.insert	(m_container.begin() + position, value);
+    editor::property_holder_holder* value_raw = holder->holder();
+    VERIFY(value_raw);
+
+    typedef typename container_type::value_type value_type;
+    value_type value = dynamic_cast<value_type>(value_raw);
+    VERIFY(value);
+
+    m_container.insert(m_container.begin() + position, value);
 }
 
 SPECIALIZATION
-void PROPERTY_COLLECTION::erase							(u32 const& position)
+void PROPERTY_COLLECTION::erase(u32 const& position)
 {
-//	Msg					("erase from container");
-	make_state_changed	();
+    // Msg ("erase from container");
+    make_state_changed();
 
-	VERIFY				(position < m_container.size());
-	container_type::value_type	value = m_container[position];
-	m_container.erase	(m_container.begin() + position);
-	delete_data			(value);
+    VERIFY(position < m_container.size());
+    container_type::value_type value = m_container[position];
+    m_container.erase(m_container.begin() + position);
+    delete_data(value);
 }
 
 SPECIALIZATION
-editor::property_holder* PROPERTY_COLLECTION::item		(u32 const& position)
+editor::property_holder* PROPERTY_COLLECTION::item(u32 const& position)
 {
-	return				(m_container[position]->object());
+    return (m_container[position]->object());
 }
 
 SPECIALIZATION
-inline PROPERTY_COLLECTION::predicate::predicate		(property_holder* holder) :
-	m_holder			(holder)
+inline PROPERTY_COLLECTION::predicate::predicate(property_holder* holder) :
+    m_holder(holder)
 {
 }
 
 SPECIALIZATION
-inline bool PROPERTY_COLLECTION::predicate::operator()	(typename container_type::value_type const& value) const
+inline bool PROPERTY_COLLECTION::predicate::operator() (typename container_type::value_type const& value) const
 {
-	return				(m_holder == value->object());
+    return (m_holder == value->object());
 }
 
 SPECIALIZATION
-int PROPERTY_COLLECTION::index							(property_holder* holder)
+int PROPERTY_COLLECTION::index(property_holder* holder)
 {
-	typedef typename container_type::iterator	iterator_type;
-	iterator_type		i = std::find_if(m_container.begin(), m_container.end(), predicate(holder));
-	if (i == m_container.end())
-		return			(-1);
+    typedef typename container_type::iterator iterator_type;
+    iterator_type i = std::find_if(m_container.begin(), m_container.end(), predicate(holder));
+    if (i == m_container.end())
+        return (-1);
 
-	return				(int(i - m_container.begin()));
+    return (int(i - m_container.begin()));
 }
 
 SPECIALIZATION
-void PROPERTY_COLLECTION::destroy						(editor::property_holder* holder)
+void PROPERTY_COLLECTION::destroy(editor::property_holder* holder)
 {
-	delete_data			(holder->holder());
+    delete_data(holder->holder());
 }
 
 SPECIALIZATION
 inline PROPERTY_COLLECTION::unique_id_predicate::unique_id_predicate(LPCSTR id) :
-	m_id				(id)
+    m_id(id)
 {
 }
 
 SPECIALIZATION
-inline bool PROPERTY_COLLECTION::unique_id_predicate::operator()	(typename container_type::value_type const& value) const
+inline bool PROPERTY_COLLECTION::unique_id_predicate::operator() (typename container_type::value_type const& value) const
 {
-	return				(!xr_strcmp(m_id, value->id()));
+    return (!xr_strcmp(m_id, value->id()));
 }
 
 SPECIALIZATION
-bool PROPERTY_COLLECTION::unique_id						(LPCSTR id) const
+bool PROPERTY_COLLECTION::unique_id(LPCSTR id) const
 {
-	return				(
-		std::find_if(
-			m_container.begin(),
-			m_container.end(),
-			unique_id_predicate(id)
-		) == m_container.end()
-	);
+    return (
+               std::find_if(
+                   m_container.begin(),
+                   m_container.end(),
+                   unique_id_predicate(id)
+               ) == m_container.end()
+           );
 }
 
 SPECIALIZATION
-shared_str PROPERTY_COLLECTION::generate_unique_id		(LPCSTR prefix) const
+shared_str PROPERTY_COLLECTION::generate_unique_id(LPCSTR prefix) const
 {
-	for (u32 i=0; ; ++i) {
-		string_path		result;
-		xr_strcpy		(result, prefix);
+    for (u32 i = 0;; ++i)
+    {
+        string_path result;
+        xr_strcpy(result, prefix);
 
-		string_path		number;
-		R_ASSERT		(!_itoa_s(i, number, 10));
-		xr_strcat		(result, number);
+        string_path number;
+        R_ASSERT(!_itoa_s(i, number, 10));
+        xr_strcat(result, number);
 
-		if (!unique_id(result))
-			continue;
+        if (!unique_id(result))
+            continue;
 
-		return			(result);
-	}
+        return (result);
+    }
 }
 
 SPECIALIZATION
-inline void PROPERTY_COLLECTION::make_state_changed		()
+inline void PROPERTY_COLLECTION::make_state_changed()
 {
-	if (!m_changed)
-		return;
+    if (!m_changed)
+        return;
 
-	*m_changed			= true;
+    *m_changed = true;
 }
 
 #undef PROPERTY_COLLECTION

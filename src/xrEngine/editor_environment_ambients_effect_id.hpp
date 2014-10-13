@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: editor_environment_ambients_effect_id.hpp
-//	Created 	: 04.01.2008
-//  Modified 	: 04.01.2008
-//	Author		: Dmitriy Iassenev
-//	Description : editor environment ambients effect identifier class
+// Module : editor_environment_ambients_effect_id.hpp
+// Created : 04.01.2008
+// Modified : 04.01.2008
+// Author : Dmitriy Iassenev
+// Description : editor environment ambients effect identifier class
 ////////////////////////////////////////////////////////////////////////////
 
 #ifndef EDITOR_WEATHER_AMBIENTS_EFFECT_ID_HPP_INCLUDED
@@ -14,40 +14,45 @@
 #include <boost/noncopyable.hpp>
 #include "../include/editor/property_holder.hpp"
 
-namespace editor {
+namespace editor
+{
 
 class property_holder_collection;
 
-namespace environment {
-	namespace effects {
-		class manager;
-	} // namespace effects
+namespace environment
+{
+namespace effects
+{
+class manager;
+} // namespace effects
 
-namespace ambients {
+namespace ambients
+{
 
 class effect_id :
-	public editor::property_holder_holder,
-	private boost::noncopyable {
+    public editor::property_holder_holder,
+    private boost::noncopyable
+{
 public:
-							effect_id		(effects::manager const& manager, shared_str const& id);
-	virtual					~effect_id		();
-			void			fill			(editor::property_holder_collection* collection);
-	inline	shared_str const& id			() const { return m_id; }
+    effect_id(effects::manager const& manager, shared_str const& id);
+    virtual ~effect_id();
+    void fill(editor::property_holder_collection* collection);
+    inline shared_str const& id() const { return m_id; }
 
 private:
-	typedef editor::property_holder			property_holder_type;
+    typedef editor::property_holder property_holder_type;
 
 public:
-	virtual	property_holder_type* object	();
+    virtual property_holder_type* object();
 
 private:
-	LPCSTR const* xr_stdcall collection		();
-	u32  xr_stdcall			collection_size	();
+    LPCSTR const* xr_stdcall collection();
+    u32 xr_stdcall collection_size();
 
 private:
-	property_holder_type*	m_property_holder;
-	effects::manager const&	m_manager;
-	shared_str				m_id;
+    property_holder_type* m_property_holder;
+    effects::manager const& m_manager;
+    shared_str m_id;
 }; // class effect_id
 } // namespace ambients
 } // namespace environment
