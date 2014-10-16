@@ -38,6 +38,8 @@ xr_token qmsaa__atest_token[] = {
 u32 ps_r3_minmax_sm = 3; // = 0;
 xr_token qminmax_sm_token[] = {{"off", 0}, {"on", 1}, {"auto", 2}, {"autodetect", 3}, {nullptr, 0}};
 
+int ps_r3_fxaa = 0;
+
 // “Off”
 // “DX10.0 style [Standard]”
 // “DX10.1 style [Higher quality]”
@@ -875,6 +877,7 @@ void xrRender_initconsole()
 #ifdef DETAIL_RADIUS
     CMD4(CCC_detail_radius, "r__detail_radius", &ps_r__detail_radius, 49, 300);
 #endif
+    CMD4(CCC_Integer, "r3_fxaa", &ps_r3_fxaa, 0, 1);
 
 //  Allow real-time fog config reload
 #if (RENDER == R_R3) || (RENDER == R_R4)
