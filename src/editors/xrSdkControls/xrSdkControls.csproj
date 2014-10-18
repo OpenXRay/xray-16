@@ -49,11 +49,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\ColorPicker\ColorPicker.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ColorPicker\ColorPicker.Designer.cs">
+      <DependentUpon>ColorPicker.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\IntegerUpDown\IntegerUpDown.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\IntegerUpDown\IntegerUpDownAcceleration.cs" />
     <Compile Include="Controls\IntegerUpDown\IntegerUpDownAccelerationCollection.cs" />
+    <Compile Include="Controls\ColorSampleBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Controls\PropertyGrid.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -62,8 +71,25 @@
     <Compile Include="Controls\Interfaces\IIncrementable.cs" />
     <Compile Include="Controls\Interfaces\IMouseListener.cs" />
     <Compile Include="Controls\Interfaces\IProperty.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Content Include="Resources\background.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Controls\ColorPicker\ColorPicker.resx">
+      <DependentUpon>ColorPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
