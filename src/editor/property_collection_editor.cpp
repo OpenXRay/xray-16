@@ -43,7 +43,7 @@ Object^ property_collection_editor::CreateInstance					(Type^ type)
 {
 	property_container^			container = safe_cast<property_container^>(Context->Instance);
 	PropertySpecDescriptor^		descriptor = safe_cast<PropertySpecDescriptor^>(Context->PropertyDescriptor);
-	property_value^				raw_value = container->value(descriptor->item);
+	IProperty^				raw_value = container->GetProperty(descriptor->item);
 	property_collection^		collection = safe_cast<property_collection^>(raw_value);
 	return						(collection->create());
 }

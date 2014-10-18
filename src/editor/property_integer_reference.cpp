@@ -24,12 +24,12 @@ property_integer_reference::!property_integer_reference			()
 	delete		(m_value);
 }
 
-System::Object ^property_integer_reference::get_value	()
+System::Object ^property_integer_reference::GetValue	()
 {
 	return		(m_value->get());
 }
 
-void property_integer_reference::set_value			(System::Object ^object)
+void property_integer_reference::SetValue			(System::Object ^object)
 {
 	int			value = safe_cast<int>(object);
 	m_value->set(value);

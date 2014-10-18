@@ -102,10 +102,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <Reference Include="DockPanelSkin">
-      <HintPath>..\..\sdk\binaries\DockPanelSkin.dll</HintPath>
+      <HintPath>$(xrSdkDir)binaries\DockPanelSkin.dll</HintPath>
     </Reference>
     <Reference Include="Flobbster.Windows.Forms.PropertyGrid">
-      <HintPath>..\..\sdk\binaries\Flobbster.Windows.Forms.PropertyGrid.dll</HintPath>
+      <HintPath>$(xrSdkDir)binaries\Flobbster.Windows.Forms.PropertyGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="WeifenLuo.WinFormsUI.Docking">
+      <HintPath>$(xrSdkDir)binaries\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualC">
       <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
@@ -134,9 +137,6 @@
     <Reference Include="System.Xml">
       <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
       <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-    </Reference>
-    <Reference Include="WeifenLuo.WinFormsUI.Docking">
-      <HintPath>..\..\sdk\binaries\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -345,8 +345,8 @@
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)editor_controls\editor_controls.vcxproj">
-      <Project>{b45374aa-c7ed-42cf-bbd3-deaa2b7acb48}</Project>
+    <ProjectReference Include="$(SolutionDir)editors\xrSdkControls\xrSdkControls.csproj">
+      <Project>{e9dc16a3-d0fa-4924-af6e-f6fdf3ea0661}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

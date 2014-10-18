@@ -25,9 +25,9 @@ property_integer_values_value_reference::property_integer_values_value_reference
 		m_collection->Add	(to_string(values[i]));
 }
 
-System::Object ^property_integer_values_value_reference::get_value		()
+System::Object ^property_integer_values_value_reference::GetValue		()
 {
-	int						value = safe_cast<int>(inherited::get_value());
+	int						value = safe_cast<int>(inherited::GetValue());
 	if (value < 0)
 		value				= 0;
 
@@ -37,12 +37,12 @@ System::Object ^property_integer_values_value_reference::get_value		()
 	return					(value);
 }
 
-void property_integer_values_value_reference::set_value					(Object ^object)
+void property_integer_values_value_reference::SetValue					(Object ^object)
 {
 	String^					string_value = dynamic_cast<String^>(object);
 	int						index = m_collection->IndexOf(string_value);
 	VERIFY					((index >= 0));
-	inherited::set_value	(index);
+	inherited::SetValue	(index);
 }
 
 IList^ property_integer_values_value_reference::collection				()

@@ -22,11 +22,11 @@ property_boolean_values_value_reference::property_boolean_values_value_reference
 		m_collection->Add	(to_string(values[i]));
 }
 
-void property_boolean_values_value_reference::set_value							(Object ^object)
+void property_boolean_values_value_reference::SetValue							(Object ^object)
 {
 	String^					string_value = dynamic_cast<String^>(object);
 	int						index = m_collection->IndexOf(string_value);
 	VERIFY					((index < 2));
 	VERIFY					((index >= 0));
-	inherited::set_value	((index == 1));
+	inherited::SetValue	((index == 1));
 }

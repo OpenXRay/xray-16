@@ -43,7 +43,7 @@ namespace editor {
 				delete components;
 			}
 		}
-	private: editor::controls::property_grid^  PropertyGrid;
+	private: XRay::SdkControls::PropertyGrid^  PropertyGrid;
 	protected: 
 
 	protected: 
@@ -63,7 +63,7 @@ namespace editor {
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			this->PropertyGrid = (gcnew editor::controls::property_grid());
+			this->PropertyGrid = (gcnew XRay::SdkControls::PropertyGrid());
 			this->SuspendLayout();
 			// 
 			// PropertyGrid

@@ -71,7 +71,7 @@ Object^	property_editor_file_name::EditValue					(
 
 	property_container^						container = safe_cast<property_container^>(context->Instance);
 	PropertySpecDescriptor^					descriptor = safe_cast<PropertySpecDescriptor^>(context->PropertyDescriptor);
-	property_value^							raw_value = container->value(descriptor->item);
+	IProperty^							raw_value = container->GetProperty(descriptor->item);
 	property_file_name_value_base^			real_value = safe_cast<property_file_name_value_base^>(raw_value);
 
 #ifndef USE_CUSTOM_DIALOG
@@ -99,7 +99,7 @@ Object^	property_editor_file_name::EditValue					(
 			if (real_value->remove_extension() && (file_name->EndsWith(default_extension)))
 				file_name					= file_name->Substring(0, file_name->Length - default_extension->Length);
 
-			real_value->set_value			(file_name);
+			real_value->SetValue			(file_name);
 			break;
 		}
 	}

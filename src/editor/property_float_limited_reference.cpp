@@ -21,9 +21,9 @@ property_float_limited_reference::property_float_limited_reference			(
 {
 }
 
-System::Object ^property_float_limited_reference::get_value		()
+System::Object ^property_float_limited_reference::GetValue		()
 {
-	float					value = safe_cast<float>(inherited::get_value());
+	float					value = safe_cast<float>(inherited::GetValue());
 	if (value < m_min)
 		value				= m_min;
 
@@ -33,7 +33,7 @@ System::Object ^property_float_limited_reference::get_value		()
 	return					(value);
 }
 
-void property_float_limited_reference::set_value			(System::Object ^object)
+void property_float_limited_reference::SetValue			(System::Object ^object)
 {
 	float					new_value = safe_cast<float>(object);
 
@@ -43,5 +43,5 @@ void property_float_limited_reference::set_value			(System::Object ^object)
 	if (new_value > m_max)
 		new_value			= m_max;
 
-	inherited::set_value	(new_value);
+	inherited::SetValue	(new_value);
 }	

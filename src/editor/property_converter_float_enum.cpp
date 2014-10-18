@@ -29,7 +29,7 @@ StandardValuesCollection ^property_converter_float_enum::GetStandardValues	(ITyp
 {
 	property_container^				container = safe_cast<property_container^>(context->Instance);
 	PropertySpecDescriptor^			descriptor = safe_cast<PropertySpecDescriptor^>(context->PropertyDescriptor);
-	property_value^					raw_value = container->value(descriptor->item);
+	IProperty^					raw_value = container->GetProperty(descriptor->item);
 	property_float_enum_value^	value = safe_cast<property_float_enum_value^>(raw_value);
 	return							(gcnew StandardValuesCollection(value->m_collection));
 }
@@ -63,7 +63,7 @@ Object^	property_converter_float_enum::ConvertTo								(
 
 	property_container^				container = safe_cast<property_container^>(context->Instance);
 	PropertySpecDescriptor^			descriptor = safe_cast<PropertySpecDescriptor^>(context->PropertyDescriptor);
-	property_value^					raw_value = container->value(descriptor->item);
+	IProperty^					raw_value = container->GetProperty(descriptor->item);
 	property_float_enum_value^	real_value = safe_cast<property_float_enum_value^>(raw_value);
 	float								float_value = safe_cast<float>(value);
 

@@ -37,8 +37,8 @@ public:
 							);
 	virtual					~property_integer_values_value_getter	();
 							!property_integer_values_value_getter	();
-	virtual Object			^get_value								() override;
-	virtual void			set_value								(Object ^object) override;
+	virtual Object			^GetValue								() override;
+	virtual void			SetValue								(Object ^object) override;
 	virtual	IList^			collection								();
 
 public:

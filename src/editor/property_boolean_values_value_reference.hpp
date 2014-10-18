@@ -23,7 +23,7 @@ private:
 
 public:
 					property_boolean_values_value_reference	(bool& value, LPCSTR values[2]);
-	virtual void	set_value								(Object ^object) override;
+	virtual void	SetValue								(Object ^object) override;
 
 public:
 	collection_type	^m_collection;

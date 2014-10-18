@@ -11,7 +11,8 @@
 
 #include "property_holder_include.hpp"
 
-public ref class property_integer : public property_value {
+public ref class property_integer : public XRay::SdkControls::IProperty
+{
 public:
 	typedef editor::property_holder::integer_getter_type	integer_getter_type;
 	typedef editor::property_holder::integer_setter_type	integer_setter_type;
@@ -23,8 +24,8 @@ public:
 							);
 	virtual					~property_integer	();
 							!property_integer	();
-	virtual System::Object	^get_value			();
-	virtual void			set_value			(System::Object ^object);
+	virtual System::Object	^GetValue			();
+	virtual void			SetValue			(System::Object ^object);
 
 private:
 	integer_getter_type		*m_getter;

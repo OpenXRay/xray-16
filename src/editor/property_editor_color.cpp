@@ -87,7 +87,7 @@ Object^ property_editor_color::EditValue					(
 
 	property_container^						container = safe_cast<property_container^>(context->Instance);
 	PropertySpecDescriptor^					descriptor = safe_cast<PropertySpecDescriptor^>(context->PropertyDescriptor);
-	property_value^							raw_value = container->value(descriptor->item);
+	IProperty^							raw_value = container->GetProperty(descriptor->item);
 	property_color_base^					real_value = safe_cast<property_color_base^>(raw_value);
 
 	ColorDialog								^dialog = gcnew ColorDialog();
@@ -95,7 +95,7 @@ Object^ property_editor_color::EditValue					(
 	editor::color							color = real_value->get_value_raw();
 	dialog->Color							= System::Drawing::Color::FromArgb(255, int(255.f*color.r), int(255.f*color.g), int(255.f*color.b));
 	if (dialog->ShowDialog() != System::Windows::Forms::DialogResult::Cancel)
-		real_value->set_value				(::Color(dialog->Color.R/255.f, dialog->Color.G/255.f, dialog->Color.B/255.f));
+		real_value->SetValue				(::Color(dialog->Color.R/255.f, dialog->Color.G/255.f, dialog->Color.B/255.f));
 
 	return									(inherited::EditValue(context, provider, value));
 }

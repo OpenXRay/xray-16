@@ -173,12 +173,12 @@ property_color_base::!property_color_base	()
 	delete				(m_container);
 }
 
-Object^ property_color_base::get_value		()
+Object^ property_color_base::GetValue		()
 {
 	return				(m_container);
 }
 
-void property_color_base::set_value			(Object ^object)
+void property_color_base::SetValue			(Object ^object)
 {
 	Color				color = safe_cast<Color>(object);
 	editor::color		value;
@@ -209,7 +209,7 @@ void property_color_base::blue				(float value)
 	set_value_raw		(current);
 }
 
-void property_color_base::on_double_click	(editor::controls::property_grid^ property_grid)
+void property_color_base::OnDoubleClick	(XRay::SdkControls::PropertyGrid^ property_grid)
 {
 #if 0
 	ColorDialog					^dialog = gcnew ColorDialog();
@@ -219,7 +219,7 @@ void property_color_base::on_double_click	(editor::controls::property_grid^ prop
 	if (dialog->ShowDialog() == System::Windows::Forms::DialogResult::Cancel)
 		return;
 
-	set_value					(::Color(dialog->Color.R/255.f, dialog->Color.G/255.f, dialog->Color.B/255.f));
+	SetValue					(::Color(dialog->Color.R/255.f, dialog->Color.G/255.f, dialog->Color.B/255.f));
 	property_grid->Refresh		();
 #endif // #if 0
 }
@@ -236,7 +236,7 @@ static void increment_and_clamp				(float& value, float const& increment)
 		value					= 0.f;
 }
 
-void property_color_base::increment			(float const% increment)
+void property_color_base::Increment			(float increment)
 {
 	float						increment_value = increment*s_increment_factor;
 	editor::color				value = get_value_raw();

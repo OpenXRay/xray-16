@@ -11,7 +11,8 @@
 
 #include "property_holder_include.hpp"
 
-public ref class property_string : public property_value {
+public ref class property_string : public XRay::SdkControls::IProperty
+{
 public:
 	typedef editor::property_holder::string_getter_type	string_getter_type;
 	typedef editor::property_holder::string_setter_type	string_setter_type;
@@ -23,8 +24,8 @@ public:
 							);
 	virtual					~property_string();
 							!property_string();
-	virtual System::Object	^get_value		();
-	virtual void			set_value		(System::Object ^object);
+	virtual System::Object	^GetValue		();
+	virtual void			SetValue		(System::Object ^object);
 
 private:
 	string_getter_type		*m_getter;

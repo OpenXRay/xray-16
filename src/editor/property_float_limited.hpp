@@ -23,8 +23,8 @@ public:
 						float const %min,
 						float const %max
 					);
-	virtual Object	^get_value				() override;
-	virtual void	set_value				(System::Object ^object) override;
+	virtual Object	^GetValue				() override;
+	virtual void	SetValue				(System::Object ^object) override;
 
 private:
 	float			m_min;

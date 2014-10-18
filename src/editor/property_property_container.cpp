@@ -17,12 +17,12 @@ property_property_container::property_property_container(property_holder* object
 {
 }
 
-Object^ property_property_container::get_value			()
+Object^ property_property_container::GetValue			()
 {
 	return		(m_object->container());
 }
 
-void property_property_container::set_value				(Object ^object)
+void property_property_container::SetValue				(Object ^object)
 {
 	NODEFAULT;
 }

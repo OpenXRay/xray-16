@@ -24,12 +24,12 @@ property_boolean_reference::!property_boolean_reference	()
 	delete					(m_value);
 }
 
-System::Object ^property_boolean_reference::get_value	()
+System::Object ^property_boolean_reference::GetValue	()
 {
 	return					(m_value->get());
 }
 
-void property_boolean_reference::set_value				(System::Object ^object)
+void property_boolean_reference::SetValue				(System::Object ^object)
 {
 	bool					value = safe_cast<bool>(object);
 	m_value->set			(value);

@@ -11,13 +11,14 @@
 
 #include "property_holder_include.hpp"
 
-public ref class property_boolean_reference : public property_value {
+public ref class property_boolean_reference : public XRay::SdkControls::IProperty
+{
 public:
 							property_boolean_reference	(bool& value);
 	virtual					~property_boolean_reference	();
 							!property_boolean_reference	();
-	virtual System::Object	^get_value					();
-	virtual void			set_value					(System::Object ^object);
+	virtual System::Object	^GetValue					();
+	virtual void			SetValue					(System::Object ^object);
 
 private:
 	value_holder<bool>*		m_value;

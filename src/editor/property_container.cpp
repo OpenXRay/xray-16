@@ -147,7 +147,7 @@ void property_container::update_names			(String^ name)
 		try_update_name			(i, name);
 }
 
-void property_container::add_property			(PropertySpec^ description, property_value^ value)
+void property_container::add_property			(PropertySpec^ description, IProperty^ value)
 {
 	VERIFY						(!m_properties[description]);
 
@@ -168,10 +168,10 @@ void property_container::add_property			(PropertySpec^ description, property_val
 	m_ordered_properties->Add	(description);
 }
 
-property_value^ property_container::value		(PropertySpec^ description)
+IProperty^ property_container::GetProperty		(PropertySpec^ description)
 {
 	VERIFY						(m_properties[description]);
-	return						(safe_cast<property_value^>(m_properties[description]));
+	return						(safe_cast<IProperty^>(m_properties[description]));
 }
 
 IDictionary% property_container::properties		()
@@ -188,16 +188,16 @@ ArrayList% property_container::ordered_properties	()
 
 void property_container::get_value_handler		(Object^ sender, PropertySpecEventArgs^ e)
 {
-	property_value				^value = safe_cast<property_value^>(m_properties[e->Property]);
+	IProperty				^value = safe_cast<IProperty^>(m_properties[e->Property]);
 	VERIFY						(value);
-	e->Value					= value->get_value();
+	e->Value					= value->GetValue();
 }
 
 void property_container::set_value_handler		(Object^ sender, PropertySpecEventArgs^ e)
 {
-	property_value				^value = safe_cast<property_value^>(m_properties[e->Property]);
+	IProperty				^value = safe_cast<IProperty^>(m_properties[e->Property]);
 	VERIFY						(value);
-	value->set_value			(e->Value);
+	value->SetValue			(e->Value);
 }
 
 void property_container::clear					()

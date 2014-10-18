@@ -47,10 +47,10 @@ public:
 }; // value struct Color
 
 public ref class property_color_base abstract :
-	public property_value,
+    public XRay::SdkControls::IProperty,
 	public property_container_holder,
-	public editor::controls::property_mouse_events,
-	public editor::controls::property_incrementable
+	public XRay::SdkControls::IMouseListener,
+    public XRay::SdkControls::IIncrementable
 {
 public:
 	typedef System::Attribute					Attribute;
@@ -64,10 +64,10 @@ public:
 			void			blue				(float value);
 
 public:
-	virtual System::Object	^get_value			();
-	virtual void			set_value			(System::Object ^object);
-	virtual	void			on_double_click		(editor::controls::property_grid^ property_grid);
-	virtual void			increment			(float const% increment);
+	virtual System::Object	^GetValue			();
+	virtual void			SetValue			(System::Object ^object);
+	virtual	void			OnDoubleClick		(XRay::SdkControls::PropertyGrid^ property_grid);
+	virtual void			Increment			(float increment);
 
 public:
 	virtual editor::color	get_value_raw		() = 0;

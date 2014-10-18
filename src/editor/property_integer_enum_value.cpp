@@ -28,9 +28,9 @@ property_integer_enum_value::property_integer_enum_value	(
 	}
 }
 
-System::Object ^property_integer_enum_value::get_value		()
+System::Object ^property_integer_enum_value::GetValue		()
 {
-	int						value = safe_cast<int>(inherited::get_value());
+	int						value = safe_cast<int>(inherited::GetValue());
 	for each (ValuePair^ i in m_collection) {
 		if (i->first != value)
 			continue;
@@ -41,7 +41,7 @@ System::Object ^property_integer_enum_value::get_value		()
 	return					(safe_cast<ValuePair^>(m_collection[0])->first);
 }
 
-void property_integer_enum_value::set_value					(Object ^object)
+void property_integer_enum_value::SetValue					(Object ^object)
 {
 	String^					string_value = dynamic_cast<String^>(object);
 
@@ -49,9 +49,9 @@ void property_integer_enum_value::set_value					(Object ^object)
 		if (!i->second->Equals(string_value))
 			continue;
 
-		inherited::set_value(i->first);
+		inherited::SetValue(i->first);
 		return;
 	}
 
-	inherited::set_value	(safe_cast<ValuePair^>(m_collection[0])->first);
+	inherited::SetValue	(safe_cast<ValuePair^>(m_collection[0])->first);
 }

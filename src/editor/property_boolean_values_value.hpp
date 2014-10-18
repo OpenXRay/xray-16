@@ -27,7 +27,7 @@ public:
 						boolean_setter_type const &setter,
 						LPCSTR values[2]
 					);
-	virtual void	set_value						(Object ^object) override;
+	virtual void	SetValue						(Object ^object) override;
 
 public:
 	collection_type	^m_collection;

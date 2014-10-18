@@ -29,12 +29,12 @@ property_integer::!property_integer			()
 	delete					(m_setter);
 }
 
-System::Object ^property_integer::get_value	()
+System::Object ^property_integer::GetValue	()
 {
 	return					((*m_getter)());
 }
 
-void property_integer::set_value			(System::Object ^object)
+void property_integer::SetValue			(System::Object ^object)
 {
 	(*m_setter)				(safe_cast<int>(object));
 }

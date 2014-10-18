@@ -31,17 +31,17 @@ property_float::!property_float			()
 	delete					(m_setter);
 }
 
-System::Object ^property_float::get_value	()
+System::Object ^property_float::GetValue	()
 {
 	return					((*m_getter)());
 }
 
-void property_float::set_value			(System::Object ^object)
+void property_float::SetValue			(System::Object ^object)
 {
 	(*m_setter)				(safe_cast<float>(object));
 }
 
-void property_float::increment			(float const% increment)
+void property_float::Increment			(float value)
 {
-	set_value				(safe_cast<float>(get_value()) + increment*m_increment_factor);
+	SetValue				(safe_cast<float>(GetValue()) + value*m_increment_factor);
 }

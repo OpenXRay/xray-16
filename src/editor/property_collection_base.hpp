@@ -18,7 +18,7 @@ ref class property_collection_converter;
 [System::ComponentModel::EditorAttribute(property_collection_editor::typeid,System::Drawing::Design::UITypeEditor::typeid)]
 [System::ComponentModel::TypeConverter(property_collection_converter::typeid)]
 public ref class property_collection_base abstract :
-	public property_value,
+	public XRay::SdkControls::IProperty,
 	public System::Collections::IList
 {
 public:
@@ -32,8 +32,8 @@ public:
 							property_collection_base	();
 	virtual					~property_collection_base	();
 							!property_collection_base	();
-	virtual Object			^get_value					();
-	virtual void			set_value					(Object ^object);
+	virtual Object			^GetValue					();
+	virtual void			SetValue					(Object ^object);
 
 public:
 	virtual	void			CopyTo						(Array^ items, int index);

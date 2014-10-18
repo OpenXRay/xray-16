@@ -21,9 +21,9 @@ property_integer_limited::property_integer_limited	(
 {
 }
 
-System::Object ^property_integer_limited::get_value	()
+System::Object ^property_integer_limited::GetValue	()
 {
-	int						value = safe_cast<int>(inherited::get_value());
+	int						value = safe_cast<int>(inherited::GetValue());
 	if (value < m_min)
 		value				= m_min;
 
@@ -33,7 +33,7 @@ System::Object ^property_integer_limited::get_value	()
 	return					(value);
 }
 
-void property_integer_limited::set_value			(System::Object ^object)
+void property_integer_limited::SetValue			(System::Object ^object)
 {
 	int						new_value = safe_cast<int>(object);
 
@@ -43,5 +43,5 @@ void property_integer_limited::set_value			(System::Object ^object)
 	if (new_value > m_max)
 		new_value			= m_max;
 
-	inherited::set_value	(new_value);
+	inherited::SetValue	(new_value);
 }

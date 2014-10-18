@@ -29,7 +29,7 @@ StandardValuesCollection ^property_converter_boolean_values::GetStandardValues	(
 {
 	property_container^				container = safe_cast<property_container^>(context->Instance);
 	PropertySpecDescriptor^			descriptor = safe_cast<PropertySpecDescriptor^>(context->PropertyDescriptor);
-	property_value^					raw_value = container->value(descriptor->item);
+	IProperty^					raw_value = container->GetProperty(descriptor->item);
 	property_boolean_values_value^	value = safe_cast<property_boolean_values_value^>(raw_value);
 	return							(gcnew StandardValuesCollection(value->m_collection));
 }
@@ -58,7 +58,7 @@ Object^	property_converter_boolean_values::ConvertTo							(
 
 	property_container^				container = safe_cast<property_container^>(context->Instance);
 	PropertySpecDescriptor^			descriptor = safe_cast<PropertySpecDescriptor^>(context->PropertyDescriptor);
-	property_value^					raw_value = container->value(descriptor->item);
+	IProperty^					raw_value = container->GetProperty(descriptor->item);
 	property_boolean_values_value^	real_value = safe_cast<property_boolean_values_value^>(raw_value);
 	bool							bool_value = safe_cast<bool>(value);
 	return							(real_value->m_collection[bool_value ? 1 : 0]);

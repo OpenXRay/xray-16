@@ -36,9 +36,9 @@ property_integer_values_value_reference_getter::!property_integer_values_value_r
 	delete					(m_collection_size_getter);
 }
 
-Object ^property_integer_values_value_reference_getter::get_value								()
+Object ^property_integer_values_value_reference_getter::GetValue								()
 {
-	int						value = safe_cast<int>(inherited::get_value());
+	int						value = safe_cast<int>(inherited::GetValue());
 	if (value < 0)
 		value				= 0;
 
@@ -49,12 +49,12 @@ Object ^property_integer_values_value_reference_getter::get_value								()
 	return					(value);
 }
 
-void property_integer_values_value_reference_getter::set_value									(Object ^object)
+void property_integer_values_value_reference_getter::SetValue									(Object ^object)
 {
 	String^					string_value = dynamic_cast<String^>(object);
 	int						index = collection()->IndexOf(string_value);
 	VERIFY					((index >= 0));
-	inherited::set_value	(index);
+	inherited::SetValue	(index);
 }
 
 IList^ property_integer_values_value_reference_getter::collection								()

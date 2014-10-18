@@ -46,7 +46,7 @@ namespace editor {
 
 	private: System::Windows::Forms::ToolStrip^  toolStrip1;
 	private: System::Windows::Forms::ToolStripButton^  SaveButton;
-	private: editor::controls::property_grid^  PropertyGrid;
+	private: XRay::SdkControls::PropertyGrid^  PropertyGrid;
 	private: System::Windows::Forms::ToolStripButton^  ReloadWeatherButton;
 	private: System::Windows::Forms::ToolStripButton^  ReloadAllWeathersButton;
 	protected: 
@@ -71,7 +71,7 @@ namespace editor {
 			this->SaveButton = (gcnew System::Windows::Forms::ToolStripButton());
 			this->ReloadWeatherButton = (gcnew System::Windows::Forms::ToolStripButton());
 			this->ReloadAllWeathersButton = (gcnew System::Windows::Forms::ToolStripButton());
-			this->PropertyGrid = (gcnew editor::controls::property_grid());
+			this->PropertyGrid = (gcnew XRay::SdkControls::PropertyGrid());
 			this->toolStrip1->SuspendLayout();
 			this->SuspendLayout();
 			// 

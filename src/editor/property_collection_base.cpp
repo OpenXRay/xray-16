@@ -28,12 +28,12 @@ property_collection_base::!property_collection_base		()
 {
 }
 
-Object ^property_collection_base::get_value				()
+Object ^property_collection_base::GetValue				()
 {
 	return						(this);
 }
 
-void property_collection_base::set_value				(Object ^object)
+void property_collection_base::SetValue				(Object ^object)
 {
 }
 

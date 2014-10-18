@@ -9,7 +9,8 @@
 #ifndef PROPERTY_FILE_NAME_VALUE_BASE_HPP_INCLUDED
 #define PROPERTY_FILE_NAME_VALUE_BASE_HPP_INCLUDED
 
-interface class property_file_name_value_base : public property_value {
+interface class property_file_name_value_base : public XRay::SdkControls::IProperty
+{
 	virtual	System::String^	default_extension	() = 0;
 	virtual	System::String^	filter				() = 0;
 	virtual	System::String^	initial_directory	() = 0;

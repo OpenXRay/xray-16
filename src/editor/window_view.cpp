@@ -12,7 +12,7 @@
 
 using editor::window_ide;
 using editor::window_view;
-using editor::controls::property_incrementable;
+using XRay::SdkControls::IIncrementable;
 
 using System::Windows::Forms::GridItem;
 using Flobbster::Windows::Forms::PropertyBag;
@@ -216,14 +216,14 @@ Void window_view::ViewPanel_MouseMove			(System::Object^  sender, System::Window
 
 	PropertySpecDescriptor^		descriptor = safe_cast<PropertySpecDescriptor^>(descriptor_raw);
 	property_container^			container = safe_cast<property_container^>(descriptor->bag);
-	::property_value^			raw_value = container->value(descriptor->item);
+	::IProperty^			raw_value = container->GetProperty(descriptor->item);
 	VERIFY						(raw_value);
 
-	property_incrementable^		incrementable = dynamic_cast<property_incrementable^>(raw_value);
+	IIncrementable^		incrementable = dynamic_cast<IIncrementable^>(raw_value);
 	if (!incrementable)
 		return;
 
-	incrementable->increment	(float(e->Location.X - m_previous_location.X));
+	incrementable->Increment	(float(e->Location.X - m_previous_location.X));
 	m_previous_location			= e->Location;
 }
 
@@ -255,7 +255,7 @@ Void window_view::ViewPanel_MouseClick			(Object^ sender, MouseEventArgs^ e)
 	VERIFY						(descriptor_raw);
 	PropertySpecDescriptor^		descriptor = safe_cast<PropertySpecDescriptor^>(descriptor_raw);
 	property_container^			container = safe_cast<property_container^>(descriptor->bag);
-	::property_value^			raw_value = container->value(descriptor->item);
+	::IProperty^			raw_value = container->GetProperty(descriptor->item);
 	VERIFY						(raw_value);
 
 	property_color_base^		color = dynamic_cast<property_color_base^>(raw_value);
@@ -317,7 +317,7 @@ bool window_view::pick_color_cursor	()
 	VERIFY						(descriptor_raw);
 	PropertySpecDescriptor^		descriptor = safe_cast<PropertySpecDescriptor^>(descriptor_raw);
 	property_container^			container = safe_cast<property_container^>(descriptor->bag);
-	::property_value^			raw_value = container->value(descriptor->item);
+	::IProperty^			raw_value = container->GetProperty(descriptor->item);
 	VERIFY						(raw_value);
 
 	property_color_base^		color = dynamic_cast<property_color_base^>(raw_value);

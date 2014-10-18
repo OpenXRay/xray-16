@@ -29,12 +29,12 @@ property_boolean::!property_boolean			()
 	delete					(m_setter);
 }
 
-System::Object ^property_boolean::get_value	()
+System::Object ^property_boolean::GetValue	()
 {
 	return					((*m_getter)());
 }
 
-void property_boolean::set_value			(System::Object ^object)
+void property_boolean::SetValue			(System::Object ^object)
 {
 	(*m_setter)				(safe_cast<bool>(object));
 }

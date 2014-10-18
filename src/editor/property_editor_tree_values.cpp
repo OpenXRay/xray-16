@@ -53,12 +53,12 @@ Object^	property_editor_tree_values::EditValue					(
 
 	property_container^						container = safe_cast<property_container^>(context->Instance);
 	PropertySpecDescriptor^					descriptor = safe_cast<PropertySpecDescriptor^>(context->PropertyDescriptor);
-	property_value^							raw_value = container->value(descriptor->item);
+	IProperty^							raw_value = container->GetProperty(descriptor->item);
 	property_string_values_value_base^		real_value = safe_cast<property_string_values_value_base^>(raw_value);
-	m_dialog->values						(real_value->values(), safe_cast<String^>(raw_value->get_value()));
+	m_dialog->values						(real_value->values(), safe_cast<String^>(raw_value->GetValue()));
 	switch (m_dialog->ShowDialog()) {
 		case System::Windows::Forms::DialogResult::OK : {
-			raw_value->set_value			(m_dialog->Result);
+			raw_value->SetValue			(m_dialog->Result);
 			break;
 		}
 	}

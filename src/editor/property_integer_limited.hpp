@@ -25,8 +25,8 @@ public:
 								int const %min,
 								int const %max
 							);
-	virtual Object	^get_value				() override;
-	virtual void	set_value				(System::Object ^object) override;
+	virtual Object	^GetValue				() override;
+	virtual void	SetValue				(System::Object ^object) override;
 
 private:
 	int				m_min;

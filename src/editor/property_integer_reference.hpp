@@ -11,13 +11,14 @@
 
 #include "property_holder_include.hpp"
 
-public ref class property_integer_reference : public property_value {
+public ref class property_integer_reference : public XRay::SdkControls::IProperty
+{
 public:
 							property_integer_reference	(int& value);
 	virtual					~property_integer_reference	();
 							!property_integer_reference	();
-	virtual System::Object	^get_value					();
-	virtual void			set_value					(System::Object ^object);
+	virtual System::Object	^GetValue					();
+	virtual void			SetValue					(System::Object ^object);
 
 private:
 	value_holder<int>*		m_value;

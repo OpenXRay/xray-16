@@ -26,18 +26,18 @@ property_float_reference::!property_float_reference			()
 	delete							(m_value);
 }
 
-System::Object ^property_float_reference::get_value	()
+System::Object ^property_float_reference::GetValue	()
 {
 	return							(m_value->get());
 }
 
-void property_float_reference::set_value			(System::Object ^object)
+void property_float_reference::SetValue			(System::Object ^object)
 {
 	float							value = safe_cast<float>(object);
 	m_value->set					(value);
 }
 
-void property_float_reference::increment			(float const% increment)
+void property_float_reference::Increment			(float value)
 {
-	set_value						(safe_cast<float>(get_value()) + increment*m_increment_factor);
+	SetValue						(safe_cast<float>(GetValue()) + value*m_increment_factor);
 }

@@ -15,13 +15,14 @@ namespace editor {
 	class engine;
 } // namespace editor
 
-public ref class property_string_shared_str : public property_value {
+public ref class property_string_shared_str : public XRay::SdkControls::IProperty
+{
 public:
 							property_string_shared_str	(editor::engine* engine, shared_str& value);
 	virtual					~property_string_shared_str	();
 							!property_string_shared_str	();
-	virtual System::Object	^get_value					();
-	virtual void			set_value					(System::Object ^object);
+	virtual System::Object	^GetValue					();
+	virtual void			SetValue					(System::Object ^object);
 
 private:
 	editor::engine* m_engine;

@@ -132,12 +132,12 @@ property_vec3f_base::!property_vec3f_base	()
 	delete				(m_container);
 }
 
-Object^ property_vec3f_base::get_value		()
+Object^ property_vec3f_base::GetValue		()
 {
 	return				(m_container);
 }
 
-void property_vec3f_base::set_value			(Object ^object)
+void property_vec3f_base::SetValue			(Object ^object)
 {
 	Vec3f				vec3f = safe_cast<Vec3f>(object);
 	editor::vec3f		value;

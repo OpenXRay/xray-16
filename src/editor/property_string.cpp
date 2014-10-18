@@ -29,12 +29,12 @@ property_string::!property_string			()
 	delete					(m_setter);
 }
 
-System::Object ^property_string::get_value	()
+System::Object ^property_string::GetValue	()
 {
 	return					(to_string((*m_getter)()));
 }
 
-void property_string::set_value			(System::Object ^object)
+void property_string::SetValue			(System::Object ^object)
 {
 	LPSTR					result = to_string(safe_cast<System::String^>(object));
 	(*m_setter)				(result);

@@ -47,7 +47,7 @@ public:
 }; // value struct  Vec3f
 
 public ref class property_vec3f_base abstract :
-	public property_value,
+	public XRay::SdkControls::IProperty,
 	public property_container_holder
 {
 public:
@@ -59,8 +59,8 @@ public:
 			void			z					(float value);
 
 public:
-	virtual System::Object	^get_value			();
-	virtual void			set_value			(System::Object ^object);
+	virtual System::Object	^GetValue			();
+	virtual void			SetValue			(System::Object ^object);
 
 public:
 	virtual editor::vec3f	get_value_raw		() = 0;

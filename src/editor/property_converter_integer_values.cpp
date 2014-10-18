@@ -29,7 +29,7 @@ StandardValuesCollection ^property_converter_integer_values::GetStandardValues	(
 {
 	property_container^				container = safe_cast<property_container^>(context->Instance);
 	PropertySpecDescriptor^			descriptor = safe_cast<PropertySpecDescriptor^>(context->PropertyDescriptor);
-	property_value^					raw_value = container->value(descriptor->item);
+	IProperty^					raw_value = container->GetProperty(descriptor->item);
 	property_integer_values_value_base^	value = safe_cast<property_integer_values_value_base^>(raw_value);
 	return							(gcnew StandardValuesCollection(value->collection()));
 }
@@ -58,7 +58,7 @@ Object^	property_converter_integer_values::ConvertTo							(
 
 	property_container^				container = safe_cast<property_container^>(context->Instance);
 	PropertySpecDescriptor^			descriptor = safe_cast<PropertySpecDescriptor^>(context->PropertyDescriptor);
-	property_value^					raw_value = container->value(descriptor->item);
+	IProperty^					raw_value = container->GetProperty(descriptor->item);
 	property_integer_values_value_base^	real_value = safe_cast<property_integer_values_value_base^>(raw_value);
 	int								int_value = safe_cast<int>(value);
 	return							(real_value->collection()[int_value]);

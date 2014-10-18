@@ -28,8 +28,8 @@ public:
 							LPCSTR const* values,
 							u32 const &value_count
 						);
-	virtual Object^		get_value								() override;
-	virtual void		set_value								(Object ^object) override;
+	virtual Object^		GetValue								() override;
+	virtual void		SetValue								(Object ^object) override;
 	virtual	IList^		collection								();
 
 private:
