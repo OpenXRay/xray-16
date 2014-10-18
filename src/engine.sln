@@ -131,6 +131,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xrSdkControls", "editors\xr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrWeatherEditor", "editors\xrWeatherEditor\xrWeatherEditor.vcxproj", "{492D3DFE-9068-4E7E-A008-7C2420A651C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xrPostprocessEditor", "editors\xrPostprocessEditor\xrPostprocessEditor.csproj", "{CB449DB5-9C97-447A-AA25-35EA7712F62C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_Dedicated|Any CPU = Debug_Dedicated|Any CPU
@@ -1568,6 +1570,36 @@ Global
 		{492D3DFE-9068-4E7E-A008-7C2420A651C0}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{492D3DFE-9068-4E7E-A008-7C2420A651C0}.Release|Win32.ActiveCfg = Release|Win32
 		{492D3DFE-9068-4E7E-A008-7C2420A651C0}.Release|Win32.Build.0 = Release|Win32
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Debug_Dedicated|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Debug_Dedicated|Any CPU.Build.0 = Debug|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Debug_Dedicated|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Debug_Dedicated|Mixed Platforms.Build.0 = Debug|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Debug_Dedicated|Win32.ActiveCfg = Debug|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Mixed_Dedicated|Any CPU.ActiveCfg = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Mixed_Dedicated|Any CPU.Build.0 = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Mixed_Dedicated|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Mixed_Dedicated|Mixed Platforms.Build.0 = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Mixed_Dedicated|Win32.ActiveCfg = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Mixed|Any CPU.ActiveCfg = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Mixed|Any CPU.Build.0 = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Mixed|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Mixed|Mixed Platforms.Build.0 = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Mixed|Win32.ActiveCfg = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Release_Dedicated|Any CPU.ActiveCfg = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Release_Dedicated|Any CPU.Build.0 = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Release_Dedicated|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Release_Dedicated|Mixed Platforms.Build.0 = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Release_Dedicated|Win32.ActiveCfg = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1611,6 +1643,7 @@ Global
 		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 		{E9DC16A3-D0FA-4924-AF6E-F6FDF3EA0661} = {CB0C814D-FB4E-453B-B7A0-716F4A1EACA4}
 		{492D3DFE-9068-4E7E-A008-7C2420A651C0} = {CB0C814D-FB4E-453B-B7A0-716F4A1EACA4}
+		{CB449DB5-9C97-447A-AA25-35EA7712F62C} = {CB0C814D-FB4E-453B-B7A0-716F4A1EACA4}
 	EndGlobalSection
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}
