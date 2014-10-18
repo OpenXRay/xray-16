@@ -16,6 +16,14 @@ nitrocaster: Pavel Kovalenko
 - get the entire solution compiled with ForceConformanceInForLoopScope=false
 - get rid of atimgpu, use amd ags instead (will also eliminate LNK4098)
 - scan solution with PVS-Studio and fix found bugs
+* get rid of any borland specific code
+  * write new or use existing controls instead of ones from VCL/ElPack/AlexMX
+  * adopt/rewrite editors
+    - LevelEditor
+    - ActorEditor
+    - ShaderEditor
+    - ParticleEditor
+    * PPEditor
 - Modules
   - subdivide xrGame into multiple modules (so changed code could be compiled faster)
   - merge xrCPU_Pipe into xrCore
