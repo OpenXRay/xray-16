@@ -7,6 +7,11 @@ using namespace System::Windows::Forms;
 using namespace System::Data;
 using namespace System::Drawing;
 
+namespace editor
+{
+ref class window_ide;
+}
+
 namespace WeifenLuo {
 namespace WinFormsUI {
 	interface class IDockContent;
