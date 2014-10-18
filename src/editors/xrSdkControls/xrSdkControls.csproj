@@ -49,15 +49,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PropertyGrid.cs">
+    <Compile Include="Controls\IntegerUpDown\IntegerUpDown.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\IntegerUpDown\IntegerUpDownAcceleration.cs" />
+    <Compile Include="Controls\IntegerUpDown\IntegerUpDownAccelerationCollection.cs" />
+    <Compile Include="Controls\PropertyGrid.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="IPropertyContainer.cs" />
-    <Compile Include="IIncrementable.cs" />
-    <Compile Include="IMouseListener.cs" />
-    <Compile Include="IProperty.cs" />
+    <Compile Include="Controls\Interfaces\IPropertyContainer.cs" />
+    <Compile Include="Controls\Interfaces\IIncrementable.cs" />
+    <Compile Include="Controls\Interfaces\IMouseListener.cs" />
+    <Compile Include="Controls\Interfaces\IProperty.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
