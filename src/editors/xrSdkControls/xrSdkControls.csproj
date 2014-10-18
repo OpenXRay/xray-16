@@ -20,7 +20,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>$(xrBinDir)</OutputPath>
-    <IntermediateOutputPath>$(xrIntDir)$(ProjectName)\</IntermediateOutputPath>
+    <IntermediateOutputPath>$(xrIntDir)$(AssemblyName)\</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -29,7 +29,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>$(xrBinDir)</OutputPath>
-    <IntermediateOutputPath>$(xrIntDir)$(ProjectName)\</IntermediateOutputPath>
+    <IntermediateOutputPath>$(xrIntDir)$(AssemblyName)\</IntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
