@@ -750,7 +750,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="editor.rc">
+    <ResourceCompile Include="xrWeatherEditor.rc">
       <Filter>resources</Filter>
     </ResourceCompile>
   </ItemGroup>

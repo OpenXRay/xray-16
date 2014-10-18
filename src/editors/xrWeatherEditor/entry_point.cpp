@@ -2,7 +2,7 @@
 
 #pragma unmanaged
 #include <windows.h>
-#include "../Include/editor/engine.hpp"
+#include "Include/editor/engine.hpp"
 #include "ide_impl.hpp"
 #pragma managed
 

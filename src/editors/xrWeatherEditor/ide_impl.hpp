@@ -11,9 +11,9 @@
 
 #pragma unmanaged
 #include <windows.h>
-#include "../xrcore/fastdelegate.h"
+#include "xrcore/fastdelegate.h"
 #include <utility>
-#include "../include/editor/ide.hpp"
+#include "include/editor/ide.hpp"
 #pragma managed
 
 #include <vcclr.h>

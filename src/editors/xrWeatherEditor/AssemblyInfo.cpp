@@ -11,11 +11,11 @@ using namespace System::Security::Permissions;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-[assembly:AssemblyTitleAttribute("editor")];
+[assembly:AssemblyTitleAttribute("xrWeatherEditor")];
 [assembly:AssemblyDescriptionAttribute("")];
 [assembly:AssemblyConfigurationAttribute("")];
 [assembly:AssemblyCompanyAttribute("GSC Game World")];
-[assembly:AssemblyProductAttribute("editor")];
+[assembly:AssemblyProductAttribute("xrWeatherEditor")];
 [assembly:AssemblyCopyrightAttribute("Copyright (c) GSC Game World 2008")];
 [assembly:AssemblyTrademarkAttribute("")];
 [assembly:AssemblyCultureAttribute("")];

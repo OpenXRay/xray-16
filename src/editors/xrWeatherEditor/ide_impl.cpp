@@ -13,7 +13,7 @@
 #include "window_levels.h"
 #include "window_weather.h"
 #include "window_weather_editor.h"
-#include "../include/editor/engine.hpp"
+#include "include/editor/engine.hpp"
 #include "property_holder.hpp"
 #include "property_container.hpp"
 #include "property_holder_include.hpp"

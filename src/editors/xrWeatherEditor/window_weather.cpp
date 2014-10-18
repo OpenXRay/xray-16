@@ -2,7 +2,7 @@
 
 #pragma unmanaged
 #include <windows.h>
-#include "../include/editor/engine.hpp"
+#include "include/editor/engine.hpp"
 #pragma managed
 
 #include "window_weather.h"

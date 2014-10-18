@@ -11,9 +11,9 @@
 
 #pragma unmanaged
 #include <boost/noncopyable.hpp>
-#include "../xrcore/fastdelegate.h"
+#include "xrcore/fastdelegate.h"
 #include <utility>
-#include "../include/editor/property_holder.hpp"
+#include "include/editor/property_holder.hpp"
 #pragma managed
 
 generic <typename type0, typename type1>

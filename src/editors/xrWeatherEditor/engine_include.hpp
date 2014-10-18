@@ -11,7 +11,7 @@
 
 #pragma unmanaged
 #include <windows.h>
-#include "../include/editor/engine.hpp"
+#include "include/editor/engine.hpp"
 #pragma managed
 
 #endif // #ifndef ENGINE_INCLUDE_HPP_INCLUDED
