@@ -13,6 +13,7 @@ namespace XRay.SdkControls
         private bool hexadecimal;
         private bool ignoreOnChanged = false;
         private bool alphaEnabled = true;
+        private HorizontalAlignment textAlignment = HorizontalAlignment.Left;
         
         public ColorPicker()
         {
@@ -75,6 +76,21 @@ namespace XRay.SdkControls
                 nslGreen.Hexadecimal = value;
                 nslBlue.Hexadecimal = value;
                 nslAlpha.Hexadecimal = value;
+            }
+        }
+
+        public HorizontalAlignment TextAlign
+        {
+            get { return textAlignment; }
+            set
+            {
+                if (textAlignment == value)
+                    return;
+                textAlignment = value;
+                nslAlpha.TextAlign = value;
+                nslRed.TextAlign = value;
+                nslGreen.TextAlign = value;
+                nslBlue.TextAlign = value;
             }
         }
 
