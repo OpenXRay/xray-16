@@ -43,6 +43,7 @@
             this.trackBar.Location = new System.Drawing.Point(0, -1);
             this.trackBar.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.trackBar.Maximum = 255;
+            this.trackBar.MinimumSize = new System.Drawing.Size(32, 0);
             this.trackBar.Name = "trackBar";
             this.trackBar.Size = new System.Drawing.Size(212, 23);
             this.trackBar.SmallChange = 16;
@@ -60,6 +61,7 @@
             this.numSpinner.Location = new System.Drawing.Point(212, 0);
             this.numSpinner.Maximum = 255;
             this.numSpinner.Minimum = 0;
+            this.numSpinner.MinimumSize = new System.Drawing.Size(32, 0);
             this.numSpinner.Name = "numSpinner";
             this.numSpinner.Size = new System.Drawing.Size(44, 21);
             this.numSpinner.TabIndex = 0;
@@ -73,7 +75,7 @@
             this.Controls.Add(this.numSpinner);
             this.Controls.Add(this.trackBar);
             this.MaximumSize = new System.Drawing.Size(9000, 21);
-            this.MinimumSize = new System.Drawing.Size(100, 21);
+            this.MinimumSize = new System.Drawing.Size(64, 21);
             this.Name = "IntegerSlider";
             this.Size = new System.Drawing.Size(256, 21);
             ((System.ComponentModel.ISupportInitialize)(this.trackBar)).EndInit();

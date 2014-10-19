@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace XRay.SdkControls
@@ -8,6 +9,7 @@ namespace XRay.SdkControls
         public IntegerSlider()
         {
             InitializeComponent();
+            MinimumSize = Size.Empty; // just to trigger MinimumSize setter logic
         }
 
         public event EventHandler ValueChanged;
@@ -84,6 +86,43 @@ namespace XRay.SdkControls
         {
             get { return trackBar.TickStyle; }
             set { trackBar.TickStyle = value; }
+        }
+
+        public int SpinnerWidth
+        {
+            get { return numSpinner.Width; }
+            set
+            {
+                var minSpinnerWidth = numSpinner.MinimumSize.Width;
+                var minTrackBarWidth = trackBar.MinimumSize.Width;
+                if (value < minSpinnerWidth)
+                    value = minSpinnerWidth;
+                if (trackBar.Width+numSpinner.Width-value < minTrackBarWidth)
+                {
+                    value = trackBar.Width+numSpinner.Width-minTrackBarWidth;
+                    if (value == numSpinner.Width)
+                        return;
+                }
+                var delta = value-numSpinner.Width;
+                if (delta == 0)
+                    return;
+                var spinnerLoc = numSpinner.Location;
+                numSpinner.Location = new Point(spinnerLoc.X-delta, spinnerLoc.Y);
+                trackBar.Width -= delta;
+                numSpinner.Width = value;
+            }
+        }
+
+        public override Size MinimumSize
+        {
+            get { return base.MinimumSize; }
+            set
+            {
+                var minWidth = numSpinner.MinimumSize.Width+trackBar.MinimumSize.Width;
+                if (value.Width < minWidth)
+                    value.Width = minWidth;
+                base.MinimumSize = value;
+            }
         }
 
         private void OnValueChanged()
