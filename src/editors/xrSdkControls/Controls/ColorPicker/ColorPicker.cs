@@ -12,6 +12,7 @@ namespace XRay.SdkControls
         private Color color;
         private bool hexadecimal;
         private bool ignoreOnChanged = false;
+        private bool alphaEnabled = true;
         
         public ColorPicker()
         {
@@ -29,7 +30,8 @@ namespace XRay.SdkControls
                     return;
                 color = value;
                 ignoreOnChanged = true;
-                nslAlpha.Value = color.A;
+                if (alphaEnabled)
+                    nslAlpha.Value = color.A;
                 nslRed.Value = color.R;
                 nslGreen.Value = color.G;
                 nslBlue.Value = color.B;
@@ -42,6 +44,23 @@ namespace XRay.SdkControls
         public byte Green { get; private set; }
         public byte Blue { get; private set; }
         public byte Alpha { get; private set; }
+
+        public bool AlphaEnabled
+        {
+            get { return alphaEnabled; }
+            set
+            {
+                if (alphaEnabled == value)
+                    return;
+                alphaEnabled = value;
+                ignoreOnChanged = true;
+                nslAlpha.Value = nslAlpha.Maximum;
+                ignoreOnChanged = false;
+                UpdateColor();
+                lAlpha.Enabled = alphaEnabled;
+                nslAlpha.Enabled = alphaEnabled;
+            }
+        }
 
         public bool Hexadecimal
         {
