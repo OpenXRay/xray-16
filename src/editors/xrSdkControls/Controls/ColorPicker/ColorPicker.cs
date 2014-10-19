@@ -50,8 +50,9 @@ namespace XRay.SdkControls
             }
         }
 
-        private void ColorPicker_Load(object sender, EventArgs e)
+        protected override void OnLoad(EventArgs e)
         {
+            base.OnLoad(e);
             nslRed.ValueChanged += (obj, args) => UpdateColor();
             nslGreen.ValueChanged += (obj, args) => UpdateColor();
             nslBlue.ValueChanged += (obj, args) => UpdateColor();

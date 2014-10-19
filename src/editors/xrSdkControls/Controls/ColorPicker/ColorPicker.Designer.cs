@@ -217,7 +217,6 @@
             this.MinimumSize = new System.Drawing.Size(256, 144);
             this.Name = "ColorPicker";
             this.Size = new System.Drawing.Size(256, 144);
-            this.Load += new System.EventHandler(this.ColorPicker_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
