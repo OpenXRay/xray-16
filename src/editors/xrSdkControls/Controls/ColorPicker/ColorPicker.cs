@@ -11,6 +11,7 @@ namespace XRay.SdkControls
 
         private Color color;
         private bool hexadecimal;
+        private bool ignoreOnChanged = false;
         
         public ColorPicker()
         {
@@ -24,7 +25,15 @@ namespace XRay.SdkControls
             get { return color; }
             set
             {
+                if (color == value)
+                    return;
                 color = value;
+                ignoreOnChanged = true;
+                nslAlpha.Value = color.A;
+                nslRed.Value = color.R;
+                nslGreen.Value = color.G;
+                nslBlue.Value = color.B;
+                ignoreOnChanged = false;
                 UpdateColor();
             }
         }
@@ -60,9 +69,17 @@ namespace XRay.SdkControls
             chkHexadecimal.CheckedChanged += (obj, args) => Hexadecimal = chkHexadecimal.Checked;
             UpdateColor();
         }
-        
+
+        private void OnColorChanged()
+        {
+            if (!ignoreOnChanged && ColorChanged != null)
+                ColorChanged(this, Value);
+        }
+
         private void UpdateColor()
         {
+            if (ignoreOnChanged)
+                return;
             var newColor = Color.FromArgb(
                 Convert.ToInt32(nslAlpha.Value),
                 Convert.ToInt32(nslRed.Value),
@@ -71,8 +88,7 @@ namespace XRay.SdkControls
             if (pbColor.ColorSample == newColor)
                 return;
             pbColor.ColorSample = newColor;
-            if (ColorChanged != null)
-                ColorChanged(this, Value);
+            OnColorChanged();
         }
     }
 }
