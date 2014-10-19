@@ -66,6 +66,12 @@
     <Compile Include="Controls\ColorSampleBox.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Controls\IntegerSlider\IntegerSlider.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\IntegerSlider\IntegerSlider.Designer.cs">
+      <DependentUpon>IntegerSlider.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\PropertyGrid.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -87,6 +93,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Controls\ColorPicker\ColorPicker.resx">
       <DependentUpon>ColorPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\IntegerSlider\IntegerSlider.resx">
+      <DependentUpon>IntegerSlider.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
