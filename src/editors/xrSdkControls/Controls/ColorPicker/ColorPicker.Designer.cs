@@ -37,10 +37,10 @@
             this.tbHexColor = new System.Windows.Forms.TextBox();
             this.lHexColor = new System.Windows.Forms.Label();
             this.pbColor = new XRay.SdkControls.ColorSampleBox();
-            this.islRed = new XRay.SdkControls.IntegerSlider();
-            this.islGreen = new XRay.SdkControls.IntegerSlider();
-            this.islBlue = new XRay.SdkControls.IntegerSlider();
-            this.islAlpha = new XRay.SdkControls.IntegerSlider();
+            this.nslRed = new XRay.SdkControls.NumericSlider();
+            this.nslGreen = new XRay.SdkControls.NumericSlider();
+            this.nslBlue = new XRay.SdkControls.NumericSlider();
+            this.nslAlpha = new XRay.SdkControls.NumericSlider();
             this.SuspendLayout();
             // 
             // lRed
@@ -124,85 +124,77 @@
             this.pbColor.TabIndex = 8;
             this.pbColor.TabStop = false;
             // 
-            // islRed
+            // nslRed
             // 
-            this.islRed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.islRed.BackColor = System.Drawing.SystemColors.Window;
-            this.islRed.Hexadecimal = false;
-            this.islRed.LargeChange = 5;
-            this.islRed.Location = new System.Drawing.Point(17, 9);
-            this.islRed.Maximum = 255;
-            this.islRed.MaximumSize = new System.Drawing.Size(9000, 21);
-            this.islRed.Minimum = 0;
-            this.islRed.MinimumSize = new System.Drawing.Size(100, 21);
-            this.islRed.Name = "islRed";
-            this.islRed.Size = new System.Drawing.Size(128, 21);
-            this.islRed.SmallChange = 16;
-            this.islRed.SpinnerWidth = 44;
-            this.islRed.TabIndex = 16;
-            this.islRed.TickFrequency = 64;
-            this.islRed.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.islRed.Value = 0;
+            this.nslRed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.nslRed.BackColor = System.Drawing.SystemColors.Window;
+            this.nslRed.Hexadecimal = false;
+            this.nslRed.Location = new System.Drawing.Point(17, 9);
+            this.nslRed.Maximum = 255;
+            this.nslRed.MaximumSize = new System.Drawing.Size(9000, 21);
+            this.nslRed.Minimum = 0;
+            this.nslRed.MinimumSize = new System.Drawing.Size(100, 21);
+            this.nslRed.Name = "nslRed";
+            this.nslRed.Size = new System.Drawing.Size(128, 21);
+            this.nslRed.SpinnerWidth = 44;
+            this.nslRed.TabIndex = 16;
+            this.nslRed.TickFrequency = 64;
+            this.nslRed.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.nslRed.Value = 0;
             // 
-            // islGreen
+            // nslGreen
             // 
-            this.islGreen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.islGreen.BackColor = System.Drawing.SystemColors.Window;
-            this.islGreen.Hexadecimal = false;
-            this.islGreen.LargeChange = 5;
-            this.islGreen.Location = new System.Drawing.Point(17, 35);
-            this.islGreen.Maximum = 255;
-            this.islGreen.MaximumSize = new System.Drawing.Size(9000, 21);
-            this.islGreen.Minimum = 0;
-            this.islGreen.MinimumSize = new System.Drawing.Size(100, 21);
-            this.islGreen.Name = "islGreen";
-            this.islGreen.Size = new System.Drawing.Size(128, 21);
-            this.islGreen.SmallChange = 16;
-            this.islGreen.SpinnerWidth = 44;
-            this.islGreen.TabIndex = 17;
-            this.islGreen.TickFrequency = 64;
-            this.islGreen.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.islGreen.Value = 0;
+            this.nslGreen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.nslGreen.BackColor = System.Drawing.SystemColors.Window;
+            this.nslGreen.Hexadecimal = false;
+            this.nslGreen.Location = new System.Drawing.Point(17, 35);
+            this.nslGreen.Maximum = 255;
+            this.nslGreen.MaximumSize = new System.Drawing.Size(9000, 21);
+            this.nslGreen.Minimum = 0;
+            this.nslGreen.MinimumSize = new System.Drawing.Size(100, 21);
+            this.nslGreen.Name = "nslGreen";
+            this.nslGreen.Size = new System.Drawing.Size(128, 21);
+            this.nslGreen.SpinnerWidth = 44;
+            this.nslGreen.TabIndex = 17;
+            this.nslGreen.TickFrequency = 64;
+            this.nslGreen.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.nslGreen.Value = 0;
             // 
-            // islBlue
+            // nslBlue
             // 
-            this.islBlue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.islBlue.BackColor = System.Drawing.SystemColors.Window;
-            this.islBlue.Hexadecimal = false;
-            this.islBlue.LargeChange = 5;
-            this.islBlue.Location = new System.Drawing.Point(17, 61);
-            this.islBlue.Maximum = 255;
-            this.islBlue.MaximumSize = new System.Drawing.Size(9000, 21);
-            this.islBlue.Minimum = 0;
-            this.islBlue.MinimumSize = new System.Drawing.Size(100, 21);
-            this.islBlue.Name = "islBlue";
-            this.islBlue.Size = new System.Drawing.Size(128, 21);
-            this.islBlue.SmallChange = 16;
-            this.islBlue.SpinnerWidth = 44;
-            this.islBlue.TabIndex = 18;
-            this.islBlue.TickFrequency = 64;
-            this.islBlue.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.islBlue.Value = 0;
+            this.nslBlue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.nslBlue.BackColor = System.Drawing.SystemColors.Window;
+            this.nslBlue.Hexadecimal = false;
+            this.nslBlue.Location = new System.Drawing.Point(17, 61);
+            this.nslBlue.Maximum = 255;
+            this.nslBlue.MaximumSize = new System.Drawing.Size(9000, 21);
+            this.nslBlue.Minimum = 0;
+            this.nslBlue.MinimumSize = new System.Drawing.Size(100, 21);
+            this.nslBlue.Name = "nslBlue";
+            this.nslBlue.Size = new System.Drawing.Size(128, 21);
+            this.nslBlue.SpinnerWidth = 44;
+            this.nslBlue.TabIndex = 18;
+            this.nslBlue.TickFrequency = 64;
+            this.nslBlue.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.nslBlue.Value = 0;
             // 
-            // islAlpha
+            // nslAlpha
             // 
-            this.islAlpha.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.islAlpha.BackColor = System.Drawing.SystemColors.Window;
-            this.islAlpha.Hexadecimal = false;
-            this.islAlpha.LargeChange = 5;
-            this.islAlpha.Location = new System.Drawing.Point(17, 87);
-            this.islAlpha.Maximum = 255;
-            this.islAlpha.MaximumSize = new System.Drawing.Size(9000, 21);
-            this.islAlpha.Minimum = 0;
-            this.islAlpha.MinimumSize = new System.Drawing.Size(100, 21);
-            this.islAlpha.Name = "islAlpha";
-            this.islAlpha.Size = new System.Drawing.Size(128, 21);
-            this.islAlpha.SmallChange = 16;
-            this.islAlpha.SpinnerWidth = 44;
-            this.islAlpha.TabIndex = 19;
-            this.islAlpha.TickFrequency = 64;
-            this.islAlpha.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.islAlpha.Value = 255;
+            this.nslAlpha.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.nslAlpha.BackColor = System.Drawing.SystemColors.Window;
+            this.nslAlpha.Hexadecimal = false;
+            this.nslAlpha.Location = new System.Drawing.Point(17, 87);
+            this.nslAlpha.Maximum = 255;
+            this.nslAlpha.MaximumSize = new System.Drawing.Size(9000, 21);
+            this.nslAlpha.Minimum = 0;
+            this.nslAlpha.MinimumSize = new System.Drawing.Size(100, 21);
+            this.nslAlpha.Name = "nslAlpha";
+            this.nslAlpha.Size = new System.Drawing.Size(128, 21);
+            this.nslAlpha.SpinnerWidth = 44;
+            this.nslAlpha.TabIndex = 19;
+            this.nslAlpha.TickFrequency = 64;
+            this.nslAlpha.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.nslAlpha.Value = 255;
             // 
             // ColorPicker
             // 
@@ -217,10 +209,10 @@
             this.Controls.Add(this.lGreen);
             this.Controls.Add(this.lRed);
             this.Controls.Add(this.pbColor);
-            this.Controls.Add(this.islRed);
-            this.Controls.Add(this.islGreen);
-            this.Controls.Add(this.islBlue);
-            this.Controls.Add(this.islAlpha);
+            this.Controls.Add(this.nslRed);
+            this.Controls.Add(this.nslGreen);
+            this.Controls.Add(this.nslBlue);
+            this.Controls.Add(this.nslAlpha);
             this.MaximumSize = new System.Drawing.Size(9000, 144);
             this.MinimumSize = new System.Drawing.Size(256, 144);
             this.Name = "ColorPicker";
@@ -241,9 +233,9 @@
         private System.Windows.Forms.CheckBox chkHexadecimal;
         private System.Windows.Forms.Label lHexColor;
         private System.Windows.Forms.TextBox tbHexColor;
-        private IntegerSlider islRed;
-        private IntegerSlider islGreen;
-        private IntegerSlider islBlue;
-        private IntegerSlider islAlpha;
+        private NumericSlider nslRed;
+        private NumericSlider nslGreen;
+        private NumericSlider nslBlue;
+        private NumericSlider nslAlpha;
     }
 }

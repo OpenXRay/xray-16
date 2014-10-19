@@ -43,26 +43,30 @@ namespace XRay.SdkControls
                     return;
                 hexadecimal = value;
                 chkHexadecimal.Checked = value;
-                islRed.Hexadecimal = value;
-                islGreen.Hexadecimal = value;
-                islBlue.Hexadecimal = value;
-                islAlpha.Hexadecimal = value;
+                nslRed.Hexadecimal = value;
+                nslGreen.Hexadecimal = value;
+                nslBlue.Hexadecimal = value;
+                nslAlpha.Hexadecimal = value;
             }
         }
 
         private void ColorPicker_Load(object sender, EventArgs e)
         {
-            islRed.ValueChanged += (obj, args) => UpdateColor();
-            islGreen.ValueChanged += (obj, args) => UpdateColor();
-            islBlue.ValueChanged += (obj, args) => UpdateColor();
-            islAlpha.ValueChanged += (obj, args) => UpdateColor();
+            nslRed.ValueChanged += (obj, args) => UpdateColor();
+            nslGreen.ValueChanged += (obj, args) => UpdateColor();
+            nslBlue.ValueChanged += (obj, args) => UpdateColor();
+            nslAlpha.ValueChanged += (obj, args) => UpdateColor();
             chkHexadecimal.CheckedChanged += (obj, args) => Hexadecimal = chkHexadecimal.Checked;
             UpdateColor();
         }
         
         private void UpdateColor()
         {
-            var newColor = Color.FromArgb(islAlpha.Value, islRed.Value, islGreen.Value, islBlue.Value);
+            var newColor = Color.FromArgb(
+                Convert.ToInt32(nslAlpha.Value),
+                Convert.ToInt32(nslRed.Value),
+                Convert.ToInt32(nslGreen.Value),
+                Convert.ToInt32(nslBlue.Value));
             if (pbColor.ColorSample == newColor)
                 return;
             pbColor.ColorSample = newColor;
