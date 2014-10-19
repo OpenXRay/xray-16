@@ -52,6 +52,12 @@ namespace XRay.SdkControls
             set { numSpinner.Hexadecimal = value; }
         }
 
+        public HorizontalAlignment TextAlign
+        {
+            get { return numSpinner.TextAlign; }
+            set { numSpinner.TextAlign = value; }
+        }
+
         public int DecimalPlaces
         {
             get { return numSpinner.DecimalPlaces; }
