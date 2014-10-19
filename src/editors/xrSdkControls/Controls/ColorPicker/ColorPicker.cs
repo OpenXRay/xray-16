@@ -43,46 +43,26 @@ namespace XRay.SdkControls
                     return;
                 hexademical = value;
                 chkHexademical.Checked = value;
-                numRed.Hexadecimal = value;
-                numGreen.Hexadecimal = value;
-                numBlue.Hexadecimal = value;
-                numAlpha.Hexadecimal = value;
+                islRed.Hexademical = value;
+                islGreen.Hexademical = value;
+                islBlue.Hexademical = value;
+                islAlpha.Hexademical = value;
             }
         }
 
         private void ColorPicker_Load(object sender, EventArgs e)
         {
-            numRed.ValueChanged += (obj, args) => SyncValues(tbrRed, numRed);
-            numGreen.ValueChanged += (obj, args) => SyncValues(tbrGreen, numGreen);
-            numBlue.ValueChanged += (obj, args) => SyncValues(tbrBlue, numBlue);
-            numAlpha.ValueChanged += (obj, args) => SyncValues(tbrAlpha, numAlpha);
-            tbrRed.ValueChanged += (obj, args) => SyncValues(numRed, tbrRed);
-            tbrGreen.ValueChanged += (obj, args) => SyncValues(numGreen, tbrGreen);
-            tbrBlue.ValueChanged += (obj, args) => SyncValues(numBlue, tbrBlue);
-            tbrAlpha.ValueChanged += (obj, args) => SyncValues(numAlpha, tbrAlpha);
+            islRed.ValueChanged += (obj, args) => UpdateColor();
+            islGreen.ValueChanged += (obj, args) => UpdateColor();
+            islBlue.ValueChanged += (obj, args) => UpdateColor();
+            islAlpha.ValueChanged += (obj, args) => UpdateColor();
             chkHexademical.CheckedChanged += (obj, args) => Hexademical = chkHexademical.Checked;
             UpdateColor();
         }
-
-        private void SyncValues(TrackBar tbr, IntegerUpDown num)
-        {
-            if (tbr.Value == num.Value)
-                return;
-            tbr.Value = num.Value;
-            UpdateColor();
-        }
-
-        private void SyncValues(IntegerUpDown num, TrackBar tbr)
-        {
-            if (num.Value == tbr.Value)
-                return;
-            num.Value = tbr.Value;
-            UpdateColor();
-        }
-
+        
         private void UpdateColor()
         {
-            var newColor = Color.FromArgb(tbrAlpha.Value, tbrRed.Value, tbrGreen.Value, tbrBlue.Value);
+            var newColor = Color.FromArgb(islAlpha.Value, islRed.Value, islGreen.Value, islBlue.Value);
             if (pbColor.ColorSample == newColor)
                 return;
             pbColor.ColorSample = newColor;

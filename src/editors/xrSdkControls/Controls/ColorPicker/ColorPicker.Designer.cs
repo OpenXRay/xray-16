@@ -29,10 +29,6 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ColorPicker));
-            this.tbrRed = new System.Windows.Forms.TrackBar();
-            this.tbrGreen = new System.Windows.Forms.TrackBar();
-            this.tbrAlpha = new System.Windows.Forms.TrackBar();
-            this.tbrBlue = new System.Windows.Forms.TrackBar();
             this.lRed = new System.Windows.Forms.Label();
             this.lGreen = new System.Windows.Forms.Label();
             this.lBlue = new System.Windows.Forms.Label();
@@ -41,88 +37,11 @@
             this.tbHexColor = new System.Windows.Forms.TextBox();
             this.lHexColor = new System.Windows.Forms.Label();
             this.pbColor = new XRay.SdkControls.ColorSampleBox();
-            this.numAlpha = new XRay.SdkControls.IntegerUpDown();
-            this.numBlue = new XRay.SdkControls.IntegerUpDown();
-            this.numGreen = new XRay.SdkControls.IntegerUpDown();
-            this.numRed = new XRay.SdkControls.IntegerUpDown();
-            ((System.ComponentModel.ISupportInitialize)(this.tbrRed)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tbrGreen)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tbrAlpha)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tbrBlue)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numAlpha)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numBlue)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numGreen)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numRed)).BeginInit();
+            this.islRed = new XRay.SdkControls.IntegerSlider();
+            this.islGreen = new XRay.SdkControls.IntegerSlider();
+            this.islBlue = new XRay.SdkControls.IntegerSlider();
+            this.islAlpha = new XRay.SdkControls.IntegerSlider();
             this.SuspendLayout();
-            // 
-            // tbrRed
-            // 
-            this.tbrRed.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbrRed.AutoSize = false;
-            this.tbrRed.BackColor = System.Drawing.SystemColors.Window;
-            this.tbrRed.Location = new System.Drawing.Point(17, 8);
-            this.tbrRed.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
-            this.tbrRed.Maximum = 255;
-            this.tbrRed.Name = "tbrRed";
-            this.tbrRed.Size = new System.Drawing.Size(81, 23);
-            this.tbrRed.SmallChange = 16;
-            this.tbrRed.TabIndex = 4;
-            this.tbrRed.TabStop = false;
-            this.tbrRed.TickFrequency = 64;
-            this.tbrRed.TickStyle = System.Windows.Forms.TickStyle.None;
-            // 
-            // tbrGreen
-            // 
-            this.tbrGreen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbrGreen.AutoSize = false;
-            this.tbrGreen.BackColor = System.Drawing.SystemColors.Window;
-            this.tbrGreen.Location = new System.Drawing.Point(17, 34);
-            this.tbrGreen.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
-            this.tbrGreen.Maximum = 255;
-            this.tbrGreen.Name = "tbrGreen";
-            this.tbrGreen.Size = new System.Drawing.Size(81, 23);
-            this.tbrGreen.SmallChange = 16;
-            this.tbrGreen.TabIndex = 5;
-            this.tbrGreen.TabStop = false;
-            this.tbrGreen.TickFrequency = 64;
-            this.tbrGreen.TickStyle = System.Windows.Forms.TickStyle.None;
-            // 
-            // tbrAlpha
-            // 
-            this.tbrAlpha.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbrAlpha.AutoSize = false;
-            this.tbrAlpha.BackColor = System.Drawing.SystemColors.Window;
-            this.tbrAlpha.Location = new System.Drawing.Point(17, 86);
-            this.tbrAlpha.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
-            this.tbrAlpha.Maximum = 255;
-            this.tbrAlpha.Name = "tbrAlpha";
-            this.tbrAlpha.Size = new System.Drawing.Size(81, 23);
-            this.tbrAlpha.SmallChange = 16;
-            this.tbrAlpha.TabIndex = 7;
-            this.tbrAlpha.TabStop = false;
-            this.tbrAlpha.TickFrequency = 64;
-            this.tbrAlpha.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.tbrAlpha.Value = 255;
-            // 
-            // tbrBlue
-            // 
-            this.tbrBlue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbrBlue.AutoSize = false;
-            this.tbrBlue.BackColor = System.Drawing.SystemColors.Window;
-            this.tbrBlue.Location = new System.Drawing.Point(17, 60);
-            this.tbrBlue.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
-            this.tbrBlue.Maximum = 255;
-            this.tbrBlue.Name = "tbrBlue";
-            this.tbrBlue.Size = new System.Drawing.Size(81, 23);
-            this.tbrBlue.SmallChange = 16;
-            this.tbrBlue.TabIndex = 6;
-            this.tbrBlue.TabStop = false;
-            this.tbrBlue.TickFrequency = 64;
-            this.tbrBlue.TickStyle = System.Windows.Forms.TickStyle.None;
             // 
             // lRed
             // 
@@ -205,61 +124,81 @@
             this.pbColor.TabIndex = 8;
             this.pbColor.TabStop = false;
             // 
-            // numAlpha
+            // islRed
             // 
-            this.numAlpha.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.numAlpha.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.numAlpha.Hexadecimal = false;
-            this.numAlpha.Increment = 1;
-            this.numAlpha.Location = new System.Drawing.Point(101, 87);
-            this.numAlpha.Maximum = 255;
-            this.numAlpha.Minimum = 0;
-            this.numAlpha.Name = "numAlpha";
-            this.numAlpha.Size = new System.Drawing.Size(44, 21);
-            this.numAlpha.TabIndex = 3;
-            this.numAlpha.Value = 255;
+            this.islRed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.islRed.BackColor = System.Drawing.SystemColors.Window;
+            this.islRed.Hexademical = false;
+            this.islRed.LargeChange = 5;
+            this.islRed.Location = new System.Drawing.Point(17, 9);
+            this.islRed.Maximum = 255;
+            this.islRed.MaximumSize = new System.Drawing.Size(9000, 21);
+            this.islRed.Minimum = 0;
+            this.islRed.MinimumSize = new System.Drawing.Size(100, 21);
+            this.islRed.Name = "islRed";
+            this.islRed.Size = new System.Drawing.Size(128, 21);
+            this.islRed.SmallChange = 16;
+            this.islRed.TabIndex = 16;
+            this.islRed.TickFrequency = 64;
+            this.islRed.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.islRed.Value = 0;
             // 
-            // numBlue
+            // islGreen
             // 
-            this.numBlue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.numBlue.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.numBlue.Hexadecimal = false;
-            this.numBlue.Increment = 1;
-            this.numBlue.Location = new System.Drawing.Point(101, 61);
-            this.numBlue.Maximum = 255;
-            this.numBlue.Minimum = 0;
-            this.numBlue.Name = "numBlue";
-            this.numBlue.Size = new System.Drawing.Size(44, 21);
-            this.numBlue.TabIndex = 2;
-            this.numBlue.Value = 0;
+            this.islGreen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.islGreen.BackColor = System.Drawing.SystemColors.Window;
+            this.islGreen.Hexademical = false;
+            this.islGreen.LargeChange = 5;
+            this.islGreen.Location = new System.Drawing.Point(17, 35);
+            this.islGreen.Maximum = 255;
+            this.islGreen.MaximumSize = new System.Drawing.Size(9000, 21);
+            this.islGreen.Minimum = 0;
+            this.islGreen.MinimumSize = new System.Drawing.Size(100, 21);
+            this.islGreen.Name = "islGreen";
+            this.islGreen.Size = new System.Drawing.Size(128, 21);
+            this.islGreen.SmallChange = 16;
+            this.islGreen.TabIndex = 17;
+            this.islGreen.TickFrequency = 64;
+            this.islGreen.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.islGreen.Value = 0;
             // 
-            // numGreen
+            // islBlue
             // 
-            this.numGreen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.numGreen.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.numGreen.Hexadecimal = false;
-            this.numGreen.Increment = 1;
-            this.numGreen.Location = new System.Drawing.Point(101, 35);
-            this.numGreen.Maximum = 255;
-            this.numGreen.Minimum = 0;
-            this.numGreen.Name = "numGreen";
-            this.numGreen.Size = new System.Drawing.Size(44, 21);
-            this.numGreen.TabIndex = 1;
-            this.numGreen.Value = 0;
+            this.islBlue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.islBlue.BackColor = System.Drawing.SystemColors.Window;
+            this.islBlue.Hexademical = false;
+            this.islBlue.LargeChange = 5;
+            this.islBlue.Location = new System.Drawing.Point(17, 61);
+            this.islBlue.Maximum = 255;
+            this.islBlue.MaximumSize = new System.Drawing.Size(9000, 21);
+            this.islBlue.Minimum = 0;
+            this.islBlue.MinimumSize = new System.Drawing.Size(100, 21);
+            this.islBlue.Name = "islBlue";
+            this.islBlue.Size = new System.Drawing.Size(128, 21);
+            this.islBlue.SmallChange = 16;
+            this.islBlue.TabIndex = 18;
+            this.islBlue.TickFrequency = 64;
+            this.islBlue.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.islBlue.Value = 0;
             // 
-            // numRed
+            // islAlpha
             // 
-            this.numRed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.numRed.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.numRed.Hexadecimal = false;
-            this.numRed.Increment = 1;
-            this.numRed.Location = new System.Drawing.Point(101, 9);
-            this.numRed.Maximum = 255;
-            this.numRed.Minimum = 0;
-            this.numRed.Name = "numRed";
-            this.numRed.Size = new System.Drawing.Size(44, 21);
-            this.numRed.TabIndex = 0;
-            this.numRed.Value = 0;
+            this.islAlpha.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.islAlpha.BackColor = System.Drawing.SystemColors.Window;
+            this.islAlpha.Hexademical = false;
+            this.islAlpha.LargeChange = 5;
+            this.islAlpha.Location = new System.Drawing.Point(17, 87);
+            this.islAlpha.Maximum = 255;
+            this.islAlpha.MaximumSize = new System.Drawing.Size(9000, 21);
+            this.islAlpha.Minimum = 0;
+            this.islAlpha.MinimumSize = new System.Drawing.Size(100, 21);
+            this.islAlpha.Name = "islAlpha";
+            this.islAlpha.Size = new System.Drawing.Size(128, 21);
+            this.islAlpha.SmallChange = 16;
+            this.islAlpha.TabIndex = 19;
+            this.islAlpha.TickFrequency = 64;
+            this.islAlpha.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.islAlpha.Value = 255;
             // 
             // ColorPicker
             // 
@@ -274,27 +213,15 @@
             this.Controls.Add(this.lGreen);
             this.Controls.Add(this.lRed);
             this.Controls.Add(this.pbColor);
-            this.Controls.Add(this.numAlpha);
-            this.Controls.Add(this.tbrAlpha);
-            this.Controls.Add(this.numBlue);
-            this.Controls.Add(this.tbrBlue);
-            this.Controls.Add(this.numGreen);
-            this.Controls.Add(this.tbrGreen);
-            this.Controls.Add(this.numRed);
-            this.Controls.Add(this.tbrRed);
+            this.Controls.Add(this.islRed);
+            this.Controls.Add(this.islGreen);
+            this.Controls.Add(this.islBlue);
+            this.Controls.Add(this.islAlpha);
             this.MaximumSize = new System.Drawing.Size(9000, 144);
             this.MinimumSize = new System.Drawing.Size(256, 144);
             this.Name = "ColorPicker";
             this.Size = new System.Drawing.Size(256, 144);
             this.Load += new System.EventHandler(this.ColorPicker_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.tbrRed)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tbrGreen)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tbrAlpha)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tbrBlue)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numAlpha)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numBlue)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numGreen)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numRed)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -302,14 +229,6 @@
 
         #endregion
 
-        private XRay.SdkControls.IntegerUpDown numRed;
-        private XRay.SdkControls.IntegerUpDown numGreen;
-        private XRay.SdkControls.IntegerUpDown numBlue;
-        private XRay.SdkControls.IntegerUpDown numAlpha;
-        private System.Windows.Forms.TrackBar tbrRed;
-        private System.Windows.Forms.TrackBar tbrGreen;
-        private System.Windows.Forms.TrackBar tbrBlue;
-        private System.Windows.Forms.TrackBar tbrAlpha;
         private System.Windows.Forms.Label lRed;
         private System.Windows.Forms.Label lGreen;
         private System.Windows.Forms.Label lBlue;
@@ -318,5 +237,9 @@
         private System.Windows.Forms.CheckBox chkHexademical;
         private System.Windows.Forms.Label lHexColor;
         private System.Windows.Forms.TextBox tbHexColor;
+        private IntegerSlider islRed;
+        private IntegerSlider islGreen;
+        private IntegerSlider islBlue;
+        private IntegerSlider islAlpha;
     }
 }
