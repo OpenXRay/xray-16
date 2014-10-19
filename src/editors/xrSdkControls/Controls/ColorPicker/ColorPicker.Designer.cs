@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ColorPicker));
             this.tbrRed = new System.Windows.Forms.TrackBar();
             this.tbrGreen = new System.Windows.Forms.TrackBar();
             this.tbrAlpha = new System.Windows.Forms.TrackBar();
@@ -59,6 +60,7 @@
             this.tbrRed.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbrRed.AutoSize = false;
+            this.tbrRed.BackColor = System.Drawing.SystemColors.Window;
             this.tbrRed.Location = new System.Drawing.Point(17, 8);
             this.tbrRed.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.tbrRed.Maximum = 255;
@@ -75,6 +77,7 @@
             this.tbrGreen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbrGreen.AutoSize = false;
+            this.tbrGreen.BackColor = System.Drawing.SystemColors.Window;
             this.tbrGreen.Location = new System.Drawing.Point(17, 34);
             this.tbrGreen.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.tbrGreen.Maximum = 255;
@@ -91,6 +94,7 @@
             this.tbrAlpha.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbrAlpha.AutoSize = false;
+            this.tbrAlpha.BackColor = System.Drawing.SystemColors.Window;
             this.tbrAlpha.Location = new System.Drawing.Point(17, 86);
             this.tbrAlpha.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.tbrAlpha.Maximum = 255;
@@ -108,6 +112,7 @@
             this.tbrBlue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbrBlue.AutoSize = false;
+            this.tbrBlue.BackColor = System.Drawing.SystemColors.Window;
             this.tbrBlue.Location = new System.Drawing.Point(17, 60);
             this.tbrBlue.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.tbrBlue.Maximum = 255;
@@ -191,7 +196,9 @@
             // pbColor
             // 
             this.pbColor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.pbColor.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pbColor.BackgroundImage")));
             this.pbColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pbColor.ColorSample = System.Drawing.Color.Empty;
             this.pbColor.Location = new System.Drawing.Point(149, 9);
             this.pbColor.Name = "pbColor";
             this.pbColor.Size = new System.Drawing.Size(98, 98);
@@ -258,7 +265,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.Control;
+            this.BackColor = System.Drawing.SystemColors.Window;
             this.Controls.Add(this.lHexColor);
             this.Controls.Add(this.tbHexColor);
             this.Controls.Add(this.chkHexademical);
@@ -275,7 +282,7 @@
             this.Controls.Add(this.tbrGreen);
             this.Controls.Add(this.numRed);
             this.Controls.Add(this.tbrRed);
-            this.MaximumSize = new System.Drawing.Size(9000, 146);
+            this.MaximumSize = new System.Drawing.Size(9000, 144);
             this.MinimumSize = new System.Drawing.Size(256, 144);
             this.Name = "ColorPicker";
             this.Size = new System.Drawing.Size(256, 144);
