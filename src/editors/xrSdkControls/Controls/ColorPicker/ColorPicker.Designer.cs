@@ -79,11 +79,11 @@
             this.lAlpha.TabIndex = 12;
             this.lAlpha.Text = "A";
             // 
-            // chkHexademical
+            // chkHexadecimal
             // 
             this.chkHexadecimal.AutoSize = true;
             this.chkHexadecimal.Location = new System.Drawing.Point(3, 115);
-            this.chkHexadecimal.Name = "chkHexademical";
+            this.chkHexadecimal.Name = "chkHexadecimal";
             this.chkHexadecimal.Size = new System.Drawing.Size(87, 17);
             this.chkHexadecimal.TabIndex = 13;
             this.chkHexadecimal.Text = "Hexademical";
@@ -138,6 +138,7 @@
             this.islRed.Name = "islRed";
             this.islRed.Size = new System.Drawing.Size(128, 21);
             this.islRed.SmallChange = 16;
+            this.islRed.SpinnerWidth = 44;
             this.islRed.TabIndex = 16;
             this.islRed.TickFrequency = 64;
             this.islRed.TickStyle = System.Windows.Forms.TickStyle.None;
@@ -157,6 +158,7 @@
             this.islGreen.Name = "islGreen";
             this.islGreen.Size = new System.Drawing.Size(128, 21);
             this.islGreen.SmallChange = 16;
+            this.islGreen.SpinnerWidth = 44;
             this.islGreen.TabIndex = 17;
             this.islGreen.TickFrequency = 64;
             this.islGreen.TickStyle = System.Windows.Forms.TickStyle.None;
@@ -176,6 +178,7 @@
             this.islBlue.Name = "islBlue";
             this.islBlue.Size = new System.Drawing.Size(128, 21);
             this.islBlue.SmallChange = 16;
+            this.islBlue.SpinnerWidth = 44;
             this.islBlue.TabIndex = 18;
             this.islBlue.TickFrequency = 64;
             this.islBlue.TickStyle = System.Windows.Forms.TickStyle.None;
@@ -195,6 +198,7 @@
             this.islAlpha.Name = "islAlpha";
             this.islAlpha.Size = new System.Drawing.Size(128, 21);
             this.islAlpha.SmallChange = 16;
+            this.islAlpha.SpinnerWidth = 44;
             this.islAlpha.TabIndex = 19;
             this.islAlpha.TickFrequency = 64;
             this.islAlpha.TickStyle = System.Windows.Forms.TickStyle.None;
