@@ -42,7 +42,7 @@ namespace XRay.SdkControls
             }
         }
 
-        public bool Hexademical
+        public bool Hexadecimal
         {
             get { return numSpinner.Hexadecimal; }
             set { numSpinner.Hexadecimal = value; }

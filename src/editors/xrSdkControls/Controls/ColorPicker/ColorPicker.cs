@@ -10,7 +10,7 @@ namespace XRay.SdkControls
         public delegate void ColorChangedEventHandler(object sender, Color color);
 
         private Color color;
-        private bool hexademical;
+        private bool hexadecimal;
         
         public ColorPicker()
         {
@@ -34,19 +34,19 @@ namespace XRay.SdkControls
         public byte Blue { get; private set; }
         public byte Alpha { get; private set; }
 
-        public bool Hexademical
+        public bool Hexadecimal
         {
-            get { return hexademical; }
+            get { return hexadecimal; }
             set
             {
-                if (hexademical == value)
+                if (hexadecimal == value)
                     return;
-                hexademical = value;
-                chkHexademical.Checked = value;
-                islRed.Hexademical = value;
-                islGreen.Hexademical = value;
-                islBlue.Hexademical = value;
-                islAlpha.Hexademical = value;
+                hexadecimal = value;
+                chkHexadecimal.Checked = value;
+                islRed.Hexadecimal = value;
+                islGreen.Hexadecimal = value;
+                islBlue.Hexadecimal = value;
+                islAlpha.Hexadecimal = value;
             }
         }
 
@@ -56,7 +56,7 @@ namespace XRay.SdkControls
             islGreen.ValueChanged += (obj, args) => UpdateColor();
             islBlue.ValueChanged += (obj, args) => UpdateColor();
             islAlpha.ValueChanged += (obj, args) => UpdateColor();
-            chkHexademical.CheckedChanged += (obj, args) => Hexademical = chkHexademical.Checked;
+            chkHexadecimal.CheckedChanged += (obj, args) => Hexadecimal = chkHexadecimal.Checked;
             UpdateColor();
         }
         

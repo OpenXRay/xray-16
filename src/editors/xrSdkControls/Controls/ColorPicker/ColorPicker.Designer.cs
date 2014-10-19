@@ -33,7 +33,7 @@
             this.lGreen = new System.Windows.Forms.Label();
             this.lBlue = new System.Windows.Forms.Label();
             this.lAlpha = new System.Windows.Forms.Label();
-            this.chkHexademical = new System.Windows.Forms.CheckBox();
+            this.chkHexadecimal = new System.Windows.Forms.CheckBox();
             this.tbHexColor = new System.Windows.Forms.TextBox();
             this.lHexColor = new System.Windows.Forms.Label();
             this.pbColor = new XRay.SdkControls.ColorSampleBox();
@@ -81,13 +81,13 @@
             // 
             // chkHexademical
             // 
-            this.chkHexademical.AutoSize = true;
-            this.chkHexademical.Location = new System.Drawing.Point(3, 115);
-            this.chkHexademical.Name = "chkHexademical";
-            this.chkHexademical.Size = new System.Drawing.Size(87, 17);
-            this.chkHexademical.TabIndex = 13;
-            this.chkHexademical.Text = "Hexademical";
-            this.chkHexademical.UseVisualStyleBackColor = true;
+            this.chkHexadecimal.AutoSize = true;
+            this.chkHexadecimal.Location = new System.Drawing.Point(3, 115);
+            this.chkHexadecimal.Name = "chkHexademical";
+            this.chkHexadecimal.Size = new System.Drawing.Size(87, 17);
+            this.chkHexadecimal.TabIndex = 13;
+            this.chkHexadecimal.Text = "Hexademical";
+            this.chkHexadecimal.UseVisualStyleBackColor = true;
             // 
             // tbHexColor
             // 
@@ -128,7 +128,7 @@
             // 
             this.islRed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.islRed.BackColor = System.Drawing.SystemColors.Window;
-            this.islRed.Hexademical = false;
+            this.islRed.Hexadecimal = false;
             this.islRed.LargeChange = 5;
             this.islRed.Location = new System.Drawing.Point(17, 9);
             this.islRed.Maximum = 255;
@@ -147,7 +147,7 @@
             // 
             this.islGreen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.islGreen.BackColor = System.Drawing.SystemColors.Window;
-            this.islGreen.Hexademical = false;
+            this.islGreen.Hexadecimal = false;
             this.islGreen.LargeChange = 5;
             this.islGreen.Location = new System.Drawing.Point(17, 35);
             this.islGreen.Maximum = 255;
@@ -166,7 +166,7 @@
             // 
             this.islBlue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.islBlue.BackColor = System.Drawing.SystemColors.Window;
-            this.islBlue.Hexademical = false;
+            this.islBlue.Hexadecimal = false;
             this.islBlue.LargeChange = 5;
             this.islBlue.Location = new System.Drawing.Point(17, 61);
             this.islBlue.Maximum = 255;
@@ -185,7 +185,7 @@
             // 
             this.islAlpha.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.islAlpha.BackColor = System.Drawing.SystemColors.Window;
-            this.islAlpha.Hexademical = false;
+            this.islAlpha.Hexadecimal = false;
             this.islAlpha.LargeChange = 5;
             this.islAlpha.Location = new System.Drawing.Point(17, 87);
             this.islAlpha.Maximum = 255;
@@ -207,7 +207,7 @@
             this.BackColor = System.Drawing.SystemColors.Window;
             this.Controls.Add(this.lHexColor);
             this.Controls.Add(this.tbHexColor);
-            this.Controls.Add(this.chkHexademical);
+            this.Controls.Add(this.chkHexadecimal);
             this.Controls.Add(this.lAlpha);
             this.Controls.Add(this.lBlue);
             this.Controls.Add(this.lGreen);
@@ -234,7 +234,7 @@
         private System.Windows.Forms.Label lBlue;
         private System.Windows.Forms.Label lAlpha;
         private XRay.SdkControls.ColorSampleBox pbColor;
-        private System.Windows.Forms.CheckBox chkHexademical;
+        private System.Windows.Forms.CheckBox chkHexadecimal;
         private System.Windows.Forms.Label lHexColor;
         private System.Windows.Forms.TextBox tbHexColor;
         private IntegerSlider islRed;
