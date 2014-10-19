@@ -19,7 +19,11 @@ namespace XRay.SdkControls
         public decimal Value
         {
             get { return numSpinner.Value; }
-            set { numSpinner.Value = value; }
+            set
+            {
+                numSpinner.Value = value;
+                SliderPos = numSpinner.Value;
+            }
         }
 
         public decimal Minimum
