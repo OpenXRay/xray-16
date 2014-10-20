@@ -259,7 +259,7 @@ void CEnvironment::ChangeGameTime(float game_time)
 void CEnvironment::SetGameTime(float game_time, float time_factor)
 {
 #ifndef _EDITOR
-    if (m_paused)
+    if (m_paused) // BUG nitrocaster: g_pGameLevel may be null (game not started) -> crash
     {
         g_pGameLevel->SetEnvironmentGameTimeFactor(iFloor(fGameTime*1000.f), fTimeFactor);
         return;
