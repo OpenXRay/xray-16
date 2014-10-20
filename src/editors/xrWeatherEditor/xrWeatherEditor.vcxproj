@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{492D3DFE-9068-4E7E-A008-7C2420A651C0}</ProjectGuid>
-    <RootNamespace>xrWeatherEditor</RootNamespace>
+    <RootNamespace>editor</RootNamespace>
     <Keyword>ManagedCProj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
