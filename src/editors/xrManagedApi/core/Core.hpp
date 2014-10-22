@@ -6,6 +6,9 @@ namespace XRay
 {
 namespace ManagedApi
 {
+namespace Core
+{
+
 public ref class Core
 {
 public:
@@ -21,5 +24,7 @@ public:
     static void Initialize(String^ appName);
     static void Destroy();
 };
+
+}
 }
 }

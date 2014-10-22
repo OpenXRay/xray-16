@@ -7,6 +7,8 @@ namespace XRay
 {
 namespace ManagedApi
 {
+namespace Core
+{
 
 Core::Core() { }
 
@@ -51,5 +53,6 @@ void Core::Destroy()
     ::Core._destroy();
 }
 
+}
 }
 }
