@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="wrappers">
+      <UniqueIdentifier>{5701e3e7-534d-4d78-8018-13a0da121c00}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="wrappers\Core.hpp">
+      <Filter>wrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="Pch.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="wrappers\Core.cpp">
+      <Filter>wrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="Pch.cpp" />
+  </ItemGroup>
+</Project>

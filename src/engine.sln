@@ -133,6 +133,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrWeatherEditor", "editors\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xrPostprocessEditor", "editors\xrPostprocessEditor\xrPostprocessEditor.csproj", "{CB449DB5-9C97-447A-AA25-35EA7712F62C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrManagedApi", "editors\xrManagedApi\xrManagedApi.vcxproj", "{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_Dedicated|Any CPU = Debug_Dedicated|Any CPU
@@ -1600,6 +1602,36 @@ Global
 		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{CB449DB5-9C97-447A-AA25-35EA7712F62C}.Release|Win32.ActiveCfg = Release|Any CPU
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Debug_Dedicated|Any CPU.ActiveCfg = Debug|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Debug_Dedicated|Mixed Platforms.ActiveCfg = Debug|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Debug_Dedicated|Mixed Platforms.Build.0 = Debug|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Debug_Dedicated|Win32.ActiveCfg = Debug|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Debug_Dedicated|Win32.Build.0 = Debug|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Debug|Win32.Build.0 = Debug|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Mixed_Dedicated|Any CPU.ActiveCfg = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Mixed_Dedicated|Mixed Platforms.ActiveCfg = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Mixed_Dedicated|Mixed Platforms.Build.0 = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Mixed_Dedicated|Win32.ActiveCfg = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Mixed_Dedicated|Win32.Build.0 = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Mixed|Any CPU.ActiveCfg = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Mixed|Mixed Platforms.ActiveCfg = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Mixed|Mixed Platforms.Build.0 = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Mixed|Win32.ActiveCfg = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Mixed|Win32.Build.0 = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Release_Dedicated|Any CPU.ActiveCfg = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Release_Dedicated|Mixed Platforms.ActiveCfg = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Release_Dedicated|Mixed Platforms.Build.0 = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Release_Dedicated|Win32.ActiveCfg = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Release_Dedicated|Win32.Build.0 = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Release|Any CPU.ActiveCfg = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Release|Win32.ActiveCfg = Release|Win32
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1644,6 +1676,7 @@ Global
 		{E9DC16A3-D0FA-4924-AF6E-F6FDF3EA0661} = {CB0C814D-FB4E-453B-B7A0-716F4A1EACA4}
 		{492D3DFE-9068-4E7E-A008-7C2420A651C0} = {CB0C814D-FB4E-453B-B7A0-716F4A1EACA4}
 		{CB449DB5-9C97-447A-AA25-35EA7712F62C} = {CB0C814D-FB4E-453B-B7A0-716F4A1EACA4}
+		{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5} = {CB0C814D-FB4E-453B-B7A0-716F4A1EACA4}
 	EndGlobalSection
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}
