@@ -10,8 +10,6 @@ namespace ManagedApi
 namespace Core
 {
 
-Core::Core() { }
-
 static void LogCallbackWrapper(const char* msg)
 {
     if (!Core::ManagedLogCallback)
