@@ -4,11 +4,17 @@
     <Filter Include="core">
       <UniqueIdentifier>{113a9e8a-dd8b-4994-82d5-a4affedd1911}</UniqueIdentifier>
     </Filter>
+    <Filter Include="core\fs">
+      <UniqueIdentifier>{51256af0-c709-4484-b27b-a2cf4bf2e101}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Pch.hpp" />
     <ClInclude Include="core\Core.hpp">
       <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\fs\FS.hpp">
+      <Filter>core\fs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -16,6 +22,9 @@
     <ClCompile Include="Pch.cpp" />
     <ClCompile Include="core\Core.cpp">
       <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\fs\FS.cpp">
+      <Filter>core\fs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

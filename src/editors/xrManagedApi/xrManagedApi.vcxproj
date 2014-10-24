@@ -89,11 +89,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core\Core.hpp" />
+    <ClInclude Include="core\fs\FS.hpp" />
     <ClInclude Include="Pch.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="core\Core.cpp" />
+    <ClCompile Include="core\fs\FS.cpp" />
     <ClCompile Include="Pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
