@@ -1,6 +1,5 @@
 #pragma once
-
-#include "CameraDefs.h"
+#include "xrEngine/CameraDefs.h"
 struct SPPInfo;
 
 // постпроцесс
