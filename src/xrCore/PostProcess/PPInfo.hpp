@@ -1,5 +1,5 @@
 #pragma once
-#include "StdAfx.h"
+#include "xrCore/xrCore.h"
 
 struct XRCORE_API SPPInfo
 {

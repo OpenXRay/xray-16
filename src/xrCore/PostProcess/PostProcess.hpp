@@ -1,5 +1,5 @@
 #pragma once
-#include "StdAfx.h"
+#include "xrCore/xrCore.h"
 #include "xrCore/Animation/Envelope.hpp"
 #include "xrCore/PostProcess/PPInfo.hpp"
 
