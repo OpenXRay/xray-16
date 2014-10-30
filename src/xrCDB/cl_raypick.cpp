@@ -3,7 +3,7 @@
 
 #include "cl_RAPID.h"
 #include "cl_defs.h"
-#include "cl_intersect.h"
+#include "xrCDB/Intersect.hpp"
 
 #ifdef ENGINE_BUILD
 #define R_BEGIN Device.Statistic->clRAY.Begin()

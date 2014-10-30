@@ -2,7 +2,7 @@
 #include	"ik_foot_collider.h"
 
 #include "xrEngine/GameMtlLib.h"
-#include "../xrEngine/cl_intersect.h"
+#include "xrCDB/Intersect.hpp"
 #include "../include/xrrender/Kinematics.h"
 
 #include "Level.h"

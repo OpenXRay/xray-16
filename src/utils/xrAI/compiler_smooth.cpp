@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "compiler.h"
-#include "cl_intersect.h"
+#include "xrCDB/Intersect.hpp"
 
 // MagicFM
 #pragma warning(disable:4995)

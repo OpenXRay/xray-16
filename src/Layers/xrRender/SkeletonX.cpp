@@ -420,7 +420,7 @@ void 	get_pos_bones(const vertBoned4W &vert, Fvector& p, CKinematics* Parent )
 //-----------------------------------------------------------------------------------------------------
 // Wallmarks
 //-----------------------------------------------------------------------------------------------------
-#include "cl_intersect.h"
+#include "xrCDB/Intersect.hpp"
 BOOL	CSkeletonX::_PickBoneSoft1W	(IKinematics::pick_result &r, float dist, const Fvector& S, const Fvector& D, u16* indices, CBoneData::FacesVec& faces)
 {
 		return pick_bone<vertBoned1W>( Vertices1W, Parent, r, dist, S, D, indices, faces);

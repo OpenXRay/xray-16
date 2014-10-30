@@ -371,7 +371,6 @@
     <ClInclude Include="ChooseTypes.h" />
     <ClInclude Include="client_id.h" />
     <ClInclude Include="cl_collector.h" />
-    <ClInclude Include="cl_intersect.h" />
     <ClInclude Include="cl_log.h" />
     <ClInclude Include="communicate.h" />
     <ClInclude Include="compiler.h" />

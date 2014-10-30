@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "cl_intersect.h"
+#include "xrCDB/Intersect.hpp"
 #include "SoundRender_Core.h"
 #include "SoundRender_Emitter.h"
 #include "SoundRender_Target.h"

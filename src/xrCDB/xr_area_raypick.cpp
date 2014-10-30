@@ -3,7 +3,7 @@
 #include "ispatial.h"
 #include "../xrengine/xr_collide_form.h"
 #include "../xrengine/xr_object.h"
-#include "../xrengine/cl_intersect.h"
+#include "Intersect.hpp"
 #include "d3d9types.h"
 //#include "igame_level.h"
 //#include "x_ray.h"

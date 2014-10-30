@@ -156,9 +156,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\xrRender\cl_intersect.h">
-      <Filter>Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Kernel</Filter>
     </ClInclude>

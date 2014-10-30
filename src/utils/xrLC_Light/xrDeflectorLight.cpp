@@ -2,7 +2,7 @@
 
 #include "xrdeflector.h"
 //#include "build.h"
-#include "cl_intersect.h"
+#include "xrCDB/Intersect.hpp"
 #include "xrlc_globaldata.h"
 //#include "std_classes.h"
 #include "xrImage_Resampler.h"

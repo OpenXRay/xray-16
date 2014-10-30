@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "phmovementcontrol.h"
 
-#include "../xrEngine/cl_intersect.h"
+#include "xrCDB/Intersect.hpp"
 #include "../xrserverentities/alife_space.h"
 
 //#include "entity.h"

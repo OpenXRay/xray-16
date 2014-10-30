@@ -186,9 +186,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cl_intersect.h">
-      <Filter>Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRenderDX10\DXCommonTypes.h">
       <Filter>Kernel</Filter>
     </ClInclude>

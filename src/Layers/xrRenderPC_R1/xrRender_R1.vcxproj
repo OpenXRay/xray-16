@@ -223,7 +223,6 @@
     <ClInclude Include="..\xrRender\Blender_Particle.h" />
     <ClInclude Include="..\xrRender\Blender_Screen_SET.h" />
     <ClInclude Include="..\xrRender\Blender_tree.h" />
-    <ClInclude Include="..\xrRender\cl_intersect.h" />
     <ClInclude Include="..\xrRender\ColorMapManager.h" />
     <ClInclude Include="..\xrRender\D3DUtils.h" />
     <ClInclude Include="..\xrRender\DetailFormat.h" />

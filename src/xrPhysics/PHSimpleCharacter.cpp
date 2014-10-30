@@ -2,7 +2,7 @@
 
 #include "PHDynamicData.h"
 #include "ExtendedGeom.h"
-#include "../xrEngine/cl_intersect.h"
+#include "xrCDB/Intersect.hpp"
 #include "../xrEngine/xr_object_list.h"
 #include "tri-colliderKNoOPC\__aabb_tri.h"
 #include "PHSimpleCharacter.h"

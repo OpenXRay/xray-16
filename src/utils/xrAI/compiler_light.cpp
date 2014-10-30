@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "compiler.h"
-#include "cl_intersect.h"
+#include "xrCDB/Intersect.hpp"
 #include "xrThread.h"
 #include <mmsystem.h>
 

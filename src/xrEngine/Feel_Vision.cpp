@@ -4,7 +4,7 @@
 #include "xr_object.h"
 #include "xr_collide_form.h"
 #include "igame_level.h"
-#include "cl_intersect.h"
+#include "xrCDB/Intersect.hpp"
 
 namespace Feel
 {

@@ -338,6 +338,7 @@
     <ClCompile Include="xr_area_raypick.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Intersect.hpp" />
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="ISpatial.h" />
     <ClInclude Include="Opcode.h" />

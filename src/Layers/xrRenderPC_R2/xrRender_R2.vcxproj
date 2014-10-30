@@ -322,7 +322,6 @@
     <ClInclude Include="blender_light_spot.h" />
     <ClInclude Include="blender_luminance.h" />
     <ClInclude Include="blender_ssao.h" />
-    <ClInclude Include="cl_intersect.h" />
     <ClInclude Include="DetailFormat.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="light_gi.h" />

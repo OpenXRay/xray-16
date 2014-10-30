@@ -477,9 +477,6 @@
     <ClInclude Include="cl_collector.h">
       <Filter>Compiler\Kernel\Generic\CDB</Filter>
     </ClInclude>
-    <ClInclude Include="cl_intersect.h">
-      <Filter>Compiler\Kernel\Generic\CDB</Filter>
-    </ClInclude>
     <ClInclude Include="random32.h">
       <Filter>Compiler\Kernel\Random32</Filter>
     </ClInclude>

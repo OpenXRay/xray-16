@@ -4,7 +4,7 @@
 #include "PHDynamicData.h"
 #include "Physics.h"
 #include "ExtendedGeom.h"
-#include "../xrEngine/cl_intersect.h"
+#include "xrCDB/Intersect.hpp"
 #include "tri-colliderKNoOPC\__aabb_tri.h"
 
 #include "phaicharacter.h"

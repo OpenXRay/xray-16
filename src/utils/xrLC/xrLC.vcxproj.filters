@@ -69,9 +69,6 @@
     <ClInclude Include="cl_log.h">
       <Filter>Kernel\Log</Filter>
     </ClInclude>
-    <ClInclude Include="cl_intersect.h">
-      <Filter>CDB</Filter>
-    </ClInclude>
     <ClInclude Include="b_globals.h">
       <Filter>External</Filter>
     </ClInclude>

@@ -236,7 +236,6 @@
     <ClInclude Include="Build.h" />
     <ClInclude Include="b_globals.h" />
     <ClInclude Include="cform_build.h" />
-    <ClInclude Include="cl_intersect.h" />
     <ClInclude Include="cl_log.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="ELight_def.h" />

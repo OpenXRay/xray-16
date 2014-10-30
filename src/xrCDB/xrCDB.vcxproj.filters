@@ -272,6 +272,9 @@
     <ClInclude Include="xrXRC.h">
       <Filter>engine</Filter>
     </ClInclude>
+    <ClInclude Include="Intersect.hpp">
+      <Filter>Kernel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt">
