@@ -7,9 +7,9 @@
 #include "MeshExpUtility.h"
 #include "..\..\..\editors\ECore\Editor\EditObject.h"
 #include "..\..\..\editors\ECore\Editor\EditMesh.h"
-#include "Bone.h"
-#include "Motion.h"
-#include "Envelope.h"
+#include "xrCore/Animation/Bone.hpp"
+#include "xrCore/Animation/Motion.hpp"
+#include "xrCore/Animation/Envelope.hpp"
 
 BOOL CExporter::ExportMotion(INode* pNode, LPCSTR fname)
 {

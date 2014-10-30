@@ -14,7 +14,7 @@
 #include "../Include/xrRender/Kinematics.h"
 #include <boost/crc.hpp>
 
-#include "../xrEngine/bone.h"
+#include "xrCore/Animation/Bone.hpp"
 
 #pragma warning(push)
 #pragma warning(disable:4995)

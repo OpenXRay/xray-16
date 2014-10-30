@@ -63,7 +63,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(DXSDK_DIR)Include;$(XRAY_16X_LIBS)maya/ver-2009/include;../Shared;$(SolutionDir)xrEngine;$(SolutionDir)utils/xrQSlim/src/;$(XRAY_16X_LIBS)MagicSoftware\FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(DXSDK_DIR)Include;$(XRAY_16X_LIBS)maya/ver-2009/include;../Shared;$(SolutionDir)xrEngine;$(SolutionDir)utils/xrQSlim/src/;$(XRAY_16X_LIBS)MagicSoftware\FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>DEBUG;WIN32;_WINDOWS;NT_PLUGIN;_MAYA_EXPORT;_MAYA_PLUGIN;XRCORE_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -105,7 +105,7 @@
     </Midl>
     <ClCompile>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(DXSDK_DIR)Include;$(XRAY_16X_LIBS)maya/ver-2009/include;../Shared;$(SolutionDir)xrEngine;$(SolutionDir)utils/xrQSlim/src/;$(XRAY_16X_LIBS)MagicSoftware\FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(DXSDK_DIR)Include;$(XRAY_16X_LIBS)maya/ver-2009/include;../Shared;$(SolutionDir)xrEngine;$(SolutionDir)utils/xrQSlim/src/;$(XRAY_16X_LIBS)MagicSoftware\FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;NT_PLUGIN;_MAYA_EXPORT;_MAYA_PLUGIN;XRCORE_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>
@@ -143,7 +143,6 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
     </ClCompile>
-    <ClCompile Include="..\..\editors\ECore\Editor\bone.cpp" />
     <ClCompile Include="..\..\editors\ECore\Editor\EditMesh.cpp" />
     <ClCompile Include="..\..\editors\ECore\Editor\EditMeshIO.cpp" />
     <ClCompile Include="..\..\editors\ECore\Editor\EditMeshModify.cpp" />
@@ -195,11 +194,7 @@
     <ClCompile Include="..\..\utils\ETools\object.cpp" />
     <ClCompile Include="..\..\utils\ETools\object_sliding.cpp" />
     <ClCompile Include="..\..\utils\ETools\PropSlimTools.cpp" />
-    <ClCompile Include="..\..\xrEngine\fmesh.cpp" />
     <ClCompile Include="..\Shared\ELog.cpp" />
-    <ClCompile Include="..\Shared\Envelope.cpp" />
-    <ClCompile Include="..\Shared\interp.cpp" />
-    <ClCompile Include="..\Shared\motion.cpp" />
     <ClCompile Include="Export\camera_exporter.cpp" />
     <ClCompile Include="Export\ExportDefines.cpp" />
     <ClCompile Include="Export\maTranslator.cpp">
@@ -246,10 +241,7 @@
     <ClInclude Include="..\..\editors\ECore\WildMagic\WmlVector3.h" />
     <ClInclude Include="..\..\editors\ECore\WildMagic\WmlVector4.h" />
     <ClInclude Include="..\..\editors\ECore\WildMagic\WmlWinSystem.h" />
-    <ClInclude Include="..\..\xrEngine\bone.h" />
     <ClInclude Include="..\Shared\ELog.h" />
-    <ClInclude Include="..\Shared\envelope.h" />
-    <ClInclude Include="..\Shared\motion.h" />
     <ClInclude Include="Export\camera_exporter.h" />
     <ClInclude Include="Export\ExportDefines.h" />
     <CustomBuild Include="Export\maTranslator.h" />

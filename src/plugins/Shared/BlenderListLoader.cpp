@@ -2,8 +2,8 @@
 #pragma hdrstop
 
 #include "BlenderListLoader.h"
-#include "Shader_XRLC.h"
-#include "GameMtlLib.h"
+#include "utils/Shader_xrLC.h"
+#include "xrEngine/GameMtlLib.h"
 
 IC bool str_pred(LPCSTR x, LPCSTR y)
 {

@@ -1,26 +1,14 @@
 #include "stdafx.h"
 #include "../../../xrCore/FileSystem.h"
 #include "../../../xrCore/FS.h"
-#include <lwrender.h>
-#include <lwhost.h>
-#include "Envelope.h"
-#include "Bone.h"
-#include "Motion.h"
+#include "utils/LWO/envelope.h"
+#include "xrCore/Animation/Bone.hpp"
+#include "xrCore/Animation/Motion.hpp"
+#include "Globals.hpp"
 #include "scenscan\objectdb.h"
-#include <lwdisplay.h>
+#include "OMotionLW.hpp"
 
-extern "C"	LWItemInfo		*g_iteminfo;
-extern "C"	LWChannelInfo	*g_chinfo;
-extern "C"	LWEnvelopeFuncs	*g_envf;
-extern "C"	LWSceneInfo		*g_lwsi;
-extern "C"	LWInterfaceInfo	*g_intinfo;
-extern "C"	LWMessageFuncs	*g_msg;
-extern "C"	LWBoneInfo		*g_boneinfo;
-extern "C"	LWObjectFuncs	*g_objfunc;
-extern "C"	LWObjectInfo	*g_objinfo;
-extern "C"	HostDisplayInfo *g_hdi;
-
-static COMotion* m_Motion;
+static OMotionLW* m_Motion;
 
 void SelectedCount(LWItemType type, int& sel_obj_count, LWItemID& last_sel_obj)
 {
@@ -59,7 +47,7 @@ void __cdecl SaveObjectMotion(GlobalFunc *global)
 		if (sel_obj_cnt==1){
 			string_path					name;
 			_splitpath					(buf, 0, 0, name, 0);
-			m_Motion					= xr_new<COMotion>();
+			m_Motion					= xr_new<OMotionLW>();
 			m_Motion->SetName			(name);
 			m_Motion->ParseObjectMotion	(sel_object);
 			m_Motion->SetParam			(g_intinfo->previewStart, g_intinfo->previewEnd, (float)g_lwsi->framesPerSecond);

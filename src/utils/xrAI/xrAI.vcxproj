@@ -84,7 +84,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.;$(DXSDK_DIR)Include;$(SolutionDir)xrServerEntities;$(xrSdkDir)include;$(XRAY_16X_LIBS)MagicSoftware\Sdk\Include;$(XRAY_16X_LIBS)FreeImage\Dist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;$(SolutionDir);$(DXSDK_DIR)Include;$(SolutionDir)xrServerEntities;$(xrSdkDir)include;$(XRAY_16X_LIBS)MagicSoftware\Sdk\Include;$(XRAY_16X_LIBS)FreeImage\Dist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;DEBUG;AI_COMPILER;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Sync</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -137,7 +137,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>.;$(DXSDK_DIR)Include;$(SolutionDir)xrServerEntities;$(xrSdkDir)include;$(XRAY_16X_LIBS)MagicSoftware\Sdk\Include;$(XRAY_16X_LIBS)FreeImage\Dist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;$(SolutionDir);$(DXSDK_DIR)Include;$(SolutionDir)xrServerEntities;$(xrSdkDir)include;$(XRAY_16X_LIBS)MagicSoftware\Sdk\Include;$(XRAY_16X_LIBS)FreeImage\Dist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;AI_COMPILER;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling />
@@ -190,7 +190,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>.;$(DXSDK_DIR)Include;$(SolutionDir)xrServerEntities;$(xrSdkDir)include;$(XRAY_16X_LIBS)MagicSoftware\Sdk\Include;$(XRAY_16X_LIBS)FreeImage\Dist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;$(SolutionDir);$(DXSDK_DIR)Include;$(SolutionDir)xrServerEntities;$(xrSdkDir)include;$(XRAY_16X_LIBS)MagicSoftware\Sdk\Include;$(XRAY_16X_LIBS)FreeImage\Dist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;DEBUG;_WINDOWS;AI_COMPILER;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -366,7 +366,6 @@
     <ClInclude Include="alife_artefact_order.h" />
     <ClInclude Include="a_star.h" />
     <ClInclude Include="a_star_inline.h" />
-    <ClInclude Include="bone.h" />
     <ClInclude Include="builder_allocator_constructor.h" />
     <ClInclude Include="builder_allocator_constructor_inline.h" />
     <ClInclude Include="ChooseTypes.h" />
@@ -463,7 +462,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="server_entity_wrapper.h" />
     <ClInclude Include="server_entity_wrapper_inline.h" />
-    <ClInclude Include="Shader_xrLC.h" />
+    <ClInclude Include="..\Shader_xrLC.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="space_restrictor_wrapper.h" />
     <ClInclude Include="space_restrictor_wrapper_inline.h" />

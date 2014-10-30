@@ -1,6 +1,6 @@
 #pragma once
 class	CBlend;
-class	ENGINE_API	motion_marks;
+class	XRCORE_API	motion_marks;
 class	IKinematicsAnimated;
 class	ik_anim_state
 {

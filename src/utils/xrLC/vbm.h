@@ -1,6 +1,6 @@
 #pragma once
 
-#include	"../../xrEngine/fmesh.h"
+#include	"xrCore/FMesh.hpp"
 #include	"../../xrcore/fs.h"
 
 static const	u32								c_VB_maxSize			= 4096*1024;	// bytes

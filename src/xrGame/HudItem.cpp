@@ -9,7 +9,7 @@
 #include "inventory.h"
 #include "../xrEngine/CameraBase.h"
 #include "player_hud.h"
-#include "../xrEngine/SkeletonMotions.h"
+#include "xrCore/Animation/SkeletonMotions.hpp"
 
 CHudItem::CHudItem()
 {

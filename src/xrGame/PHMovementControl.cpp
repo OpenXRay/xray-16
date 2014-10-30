@@ -22,7 +22,7 @@
 #include "../xrphysics/iphworld.h"
 //#include "../xrserverentities/ai_space.h"
 #include "detail_path_manager.h"
-#include "../xrEngine/gamemtllib.h"
+#include "xrEngine/GameMtlLib.h"
 #include "../xrEngine/xr_object.h"
 #include "CaptureBoneCallback.h"
 #include "Level.h"

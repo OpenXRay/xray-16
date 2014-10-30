@@ -64,7 +64,7 @@
     </Midl>
     <ClCompile>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(XRAY_16X_LIBS)lightwave/ver-8.0/include;$(XRAY_16X_LIBS)lightwave/ver-8.0/include/lwsdk;../Shared;$(ProjectDir)export;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(XRAY_16X_LIBS)lightwave/ver-8.0/include;$(XRAY_16X_LIBS)lightwave/ver-8.0/include/lwsdk;../Shared;$(ProjectDir)export;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_X86_;_WIN32;WIN32;_WINDOWS;_USRDLL;_LW_PLUGIN;_LW_EXPORT;XRCORE_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling />
@@ -110,7 +110,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(XRAY_16X_LIBS)lightwave/ver-8.0/include;$(XRAY_16X_LIBS)lightwave/ver-8.0/include/lwsdk;../Shared;$(ProjectDir)export;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(XRAY_16X_LIBS)lightwave/ver-8.0/include;$(XRAY_16X_LIBS)lightwave/ver-8.0/include/lwsdk;../Shared;$(ProjectDir)export;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>DEBUG;_X86_;_WIN32;WIN32;_WINDOWS;_USRDLL;_LW_PLUGIN;_LW_EXPORT;XRCORE_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -273,14 +273,7 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
     </ClCompile>
-    <ClCompile Include="..\Shared\bone.cpp" />
-    <ClCompile Include="..\Shared\Envelope.cpp">
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
-      <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
-    </ClCompile>
-    <ClCompile Include="..\Shared\interp.cpp" />
-    <ClCompile Include="..\Shared\motion.cpp" />
-    <ClCompile Include="Export\bone_lw.cpp" />
+    <ClCompile Include="Export\Util.cpp" />
     <ClCompile Include="Export\envtest.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
@@ -291,12 +284,13 @@
     <ClCompile Include="Export\LW_export_keys.cpp" />
     <ClCompile Include="Export\LW_export_motion.cpp" />
     <ClCompile Include="Export\LW_export_object.cpp" />
-    <ClCompile Include="Export\motion_lw.cpp" />
     <ClCompile Include="Export\scenscan\objectdb.cpp" />
     <ClCompile Include="Export\scenscan\ptsearch.cpp" />
     <ClCompile Include="Export\scenscan\surface.cpp" />
     <ClCompile Include="Export\scenscan\vecmat.cpp" />
     <ClCompile Include="Export\scenscan\vmap.cpp" />
+    <ClCompile Include="Export\OMotionLW.cpp" />
+    <ClCompile Include="Export\SMotionLW.cpp" />
     <ClCompile Include="Export\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -319,14 +313,15 @@
     <ClInclude Include="..\..\utils\LWO\envelope.h" />
     <ClInclude Include="..\..\utils\LWO\lwo2.h" />
     <ClInclude Include="..\..\utils\LWO\StdAfx.h" />
-    <ClInclude Include="..\Shared\bone.h" />
-    <ClInclude Include="..\Shared\envelope.h" />
-    <ClInclude Include="..\Shared\motion.h" />
+    <ClInclude Include="Export\Util.hpp" />
+    <ClInclude Include="Export\Globals.hpp" />
     <ClInclude Include="Export\lwo2.h" />
     <ClInclude Include="Export\resource.h" />
     <ClInclude Include="Export\scenscan\objectdb.h" />
     <ClInclude Include="Export\scenscan\scenscan.h" />
     <ClInclude Include="Export\scenscan\vecmat.h" />
+    <ClInclude Include="Export\OMotionLW.hpp" />
+    <ClInclude Include="Export\SMotionLW.hpp" />
     <ClInclude Include="Export\stdafx.h" />
   </ItemGroup>
   <ItemGroup>

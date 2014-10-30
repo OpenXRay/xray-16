@@ -67,7 +67,7 @@ enum OGF_SkeletonVertType
 const u16 xrOGF_SMParamsVersion = 4;
 
 // OGF_DESC
-struct ECORE_API ogf_desc
+struct XRCORE_API ogf_desc
 {
     shared_str source_file;
     shared_str build_name;
@@ -107,13 +107,13 @@ struct ogf_header
 };
 
 // Sliding Window Record
-struct ENGINE_API FSlideWindow
+struct XRCORE_API FSlideWindow
 {
     u32 offset;
     u16 num_tris;
     u16 num_verts;
 };
-struct ENGINE_API FSlideWindowItem
+struct XRCORE_API FSlideWindowItem
 {
     FSlideWindow* sw;
     u32 count;

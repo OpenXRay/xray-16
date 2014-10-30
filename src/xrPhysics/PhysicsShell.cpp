@@ -17,7 +17,7 @@
 
 #include "../Include/xrRender/Kinematics.h"
 #include "../xrengine/xr_object.h"
-#include "../xrengine/bone.h"
+#include "xrCore/Animation/Bone.hpp"
 
 extern CPHWorld			*ph_world;
 CPhysicsShell::~CPhysicsShell()

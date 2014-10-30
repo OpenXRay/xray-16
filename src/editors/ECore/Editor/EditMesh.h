@@ -17,7 +17,7 @@ class	CCustomObject;
 #	include "pick_defs.h"
 #endif
 
-#include <bone.h>
+#include "xrCore/Animation/Bone.hpp"
 
 #pragma pack( push,1 )
 const u8	vmtUV		= 0;

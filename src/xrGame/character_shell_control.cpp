@@ -3,7 +3,7 @@
 #include "character_shell_control.h"
 
 #include "../Include/xrRender/Kinematics.h"
-#include "../xrEngine/bone.h"
+#include "xrCore/Animation/Bone.hpp"
 
 //#include "Physics.h"
 #include "../xrphysics/ExtendedGeom.h"

@@ -9,7 +9,7 @@
 #include "MathUtilsOde.h"
 #include "iphysicsshellholder.h"
 #include "phcharacter.h"
-#include "../xrEngine/gamemtllib.h"
+#include "xrEngine/GameMtlLib.h"
 
 ObjectContactCallbackFun* saved_callback		=	0	;
 static float max_depth							=	0.f	;

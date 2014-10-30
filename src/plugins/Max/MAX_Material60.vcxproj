@@ -64,7 +64,7 @@
     <ClCompile>
       <AdditionalOptions>/LD %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(XRAY_16X_LIBS)3dsmax/ver-6.0/include;$(XRAY_16X_LIBS)3dsmax/ver-6.0/cssdk/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(XRAY_16X_LIBS)3dsmax/ver-6.0/include;$(XRAY_16X_LIBS)3dsmax/ver-6.0/cssdk/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>DEBUG;WIN32;_WINDOWS;_USRDLL;_MAX_MATERIAL;_MAX_PLUGIN;XRCORE_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -108,7 +108,7 @@
     <ClCompile>
       <AdditionalOptions>/LD %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(XRAY_16X_LIBS)3dsmax/ver-6.0/include;$(XRAY_16X_LIBS)3dsmax/ver-6.0/cssdk/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(XRAY_16X_LIBS)3dsmax/ver-6.0/include;$(XRAY_16X_LIBS)3dsmax/ver-6.0/cssdk/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_MAX_MATERIAL;_MAX_PLUGIN;XRCORE_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>
@@ -144,10 +144,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\xrEngine\GameMtlLib.cpp" />
+    <ClCompile Include="..\..\xrEngine\GameMtlLib_Engine.cpp" />
     <ClCompile Include="..\Shared\BlenderListLoader.cpp" />
     <ClCompile Include="..\Shared\ELog.cpp" />
     <ClCompile Include="..\Shared\GameMaterial.cpp" />
-    <ClCompile Include="..\Shared\GameMtlLib.cpp" />
     <ClCompile Include="..\Shared\TexMaps.cpp" />
     <ClCompile Include="Material\DllEntry.cpp" />
     <ClCompile Include="Material\stdafx.cpp">
@@ -159,11 +160,11 @@
     <None Include="..\Shared\GameMaterial.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\xrEngine\GameMtlLib.h" />
     <ClInclude Include="..\Shared\BlenderListLoader.h" />
     <ClInclude Include="..\Shared\ELog.h" />
     <ClInclude Include="..\Shared\GameMaterial.h" />
-    <ClInclude Include="..\Shared\GameMtlLib.h" />
-    <ClInclude Include="..\Shared\Shader_xrLC.h" />
+    <ClInclude Include="..\..\utils\Shader_xrLC.h" />
     <ClInclude Include="..\Shared\TexMaps.h" />
     <ClInclude Include="..\Shared\XRayMtlRes.h" />
     <ClInclude Include="Material\Stdafx.h" />

@@ -85,6 +85,15 @@
     <Filter Include="OS">
       <UniqueIdentifier>{6d6f8325-ad31-4677-b0b9-de5d952c320b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Animation">
+      <UniqueIdentifier>{86750e08-f848-4a14-9172-b814d89d820f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FMesh">
+      <UniqueIdentifier>{b6411446-6a41-4ebd-8b5a-a2756768198e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PostProcess">
+      <UniqueIdentifier>{bbc600e5-2e74-4d2b-b7b7-d73c23290817}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -289,6 +298,30 @@
       <Filter>OS</Filter>
     </ClCompile>
     <ClCompile Include="xrSyncronize.cpp" />
+    <ClCompile Include="animation\Bone.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\Envelope.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\interp.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\Motion.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\SkeletonMotions.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="FMesh.cpp">
+      <Filter>FMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="PostProcess\PPInfo.cpp">
+      <Filter>PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="PostProcess\PostProcess.cpp">
+      <Filter>PostProcess</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -598,6 +631,30 @@
       <Filter>OS</Filter>
     </ClInclude>
     <ClInclude Include="xrSyncronize.h" />
+    <ClInclude Include="animation\Bone.hpp">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\Envelope.hpp">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\Motion.hpp">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="FMesh.hpp">
+      <Filter>FMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\SkeletonMotionDefs.hpp">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\SkeletonMotions.hpp">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="PostProcess\PPInfo.hpp">
+      <Filter>PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="PostProcess\PostProcess.hpp">
+      <Filter>PostProcess</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">

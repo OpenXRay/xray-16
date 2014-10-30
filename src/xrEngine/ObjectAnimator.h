@@ -2,7 +2,7 @@
 #define ObjectAnimatorH
 #pragma once
 
-#include "motion.h"
+#include "xrCore/Animation/Motion.hpp"
 
 // refs
 class ENGINE_API CObjectAnimator

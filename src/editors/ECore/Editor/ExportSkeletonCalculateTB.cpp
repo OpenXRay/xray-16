@@ -20,7 +20,7 @@ class CGameFont;
 #include "..\..\Layers\xrRender\shader.h"
 #include "..\..\Layers\xrRender\R_Backend.h"
 
-#include "..\..\xrEngine\fmesh.h"
+#include "xrCore/FMesh.hpp"
 #include "..\..\xrEngine\_d3d_extensions.h"
 #include "..\..\xrEngine\properties.h"
 

@@ -2,10 +2,10 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "SkeletonMotions.h"
+#include "SkeletonMotions.hpp"
 //#include "SkeletonAnimated.h"
-#include "Fmesh.h"
-#include "motion.h"
+#include "FMesh.hpp"
+#include "Motion.hpp"
 #include "..\Include\xrRender\Kinematics.h"
 
 motions_container* g_pMotionsContainer = 0;
@@ -457,7 +457,7 @@ float motion_marks::time_to_next_mark(float time) const
     return result_dist;
 }
 
-void ENGINE_API motion_marks::Load(IReader* R)
+void motion_marks::Load(IReader* R)
 {
     xr_string tmp;
     R->r_string(tmp);
@@ -471,7 +471,7 @@ void ENGINE_API motion_marks::Load(IReader* R)
         item.second = R->r_float();
     }
 }
-#ifdef _EDITOR
+
 void motion_marks::Save(IWriter* W)
 {
     W->w_string (name.c_str());
@@ -484,4 +484,3 @@ void motion_marks::Save(IWriter* W)
         W->w_float (item.second);
     }
 }
-#endif

@@ -15,7 +15,7 @@
 #include "lightProjector.h"
 #include "lightPPA.h"
 #include "../xrRender/light_DB.h"
-#include "../../xrEngine/fmesh.h"
+#include "xrCore/FMesh.hpp"
 
 class dxRender_Visual;
 

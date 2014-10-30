@@ -21,8 +21,13 @@ typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
 #include "..\..\Shared\ELog.h"
 #include <d3d9types.h>
 #include <time.h>
-
 #include <string>
+#include <lwsdk/lwrender.h>
+#include <lwsdk/lwenvel.h>
+#include <lwsdk/lwdisplay.h>
+#include <lwsdk/lwmeshes.h>
+#include <lwsdk/lwhost.h>
+#include <lwsdk/lwserver.h>
 
 #define AnsiString std::string
 

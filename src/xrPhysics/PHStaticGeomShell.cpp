@@ -9,7 +9,7 @@
 #include "../Include/xrRender/Kinematics.h"
 #include "PHCollideValidator.h"
 #include "../xrengine/xr_object.h"
-#include "../xrengine/bone.h"
+#include "xrCore/Animation/Bone.hpp"
 
 //#include "game_object_space.h"
 

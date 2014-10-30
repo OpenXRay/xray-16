@@ -1,26 +1,14 @@
 #include "stdafx.h"
 #include "../../../xrCore/FileSystem.h"
 #include "../../../xrCore/FS.h"
-#include <lwrender.h>
-#include <lwhost.h>
-#include "Envelope.h"
-#include "Bone.h"
-#include "Motion.h"
+#include "utils/LWO/envelope.h"
+#include "xrCore/Animation/Bone.hpp"
+#include "xrCore/Animation/Motion.hpp"
+#include "Globals.hpp"
 #include "scenscan\objectdb.h"
-#include <lwdisplay.h>
+#include "SMotionLW.hpp"
 
-extern "C"	LWItemInfo		*g_iteminfo;
-extern "C"	LWChannelInfo	*g_chinfo;
-extern "C"	LWEnvelopeFuncs	*g_envf;
-extern "C"	LWSceneInfo		*g_lwsi;
-extern "C"	LWInterfaceInfo	*g_intinfo;
-extern "C"	LWMessageFuncs	*g_msg;
-extern "C"	LWBoneInfo		*g_boneinfo;
-extern "C"	LWObjectFuncs	*g_objfunc;
-extern "C"	LWObjectInfo	*g_objinfo;
-extern "C"	HostDisplayInfo *g_hdi;
-
-static CSMotion* m_Motion;
+static SMotionLW* m_Motion;
 
 static void RecurseBone(LWItemID parent){
 	LWItemID bone = g_iteminfo->firstChild(parent);
@@ -96,7 +84,7 @@ void __cdecl SaveSkeletonMotion(GlobalFunc *global)
 		object		= g_iteminfo->first( LWI_OBJECT, NULL );
 		int obj_cnt = 0;
 		_splitpath( buf, 0, 0, name, 0 );
-		m_Motion	= xr_new<CSMotion>();
+		m_Motion	= xr_new<SMotionLW>();
 		m_Motion->SetName(name);
 		while ( object ) {
 			if(g_intinfo->itemFlags(object)&LWITEMF_SELECTED){

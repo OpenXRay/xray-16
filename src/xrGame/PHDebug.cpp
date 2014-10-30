@@ -19,7 +19,7 @@
 
 #include "../Include/xrRender/Kinematics.h"
 #include "../Include/xrRender/KinematicsAnimated.h"
-#include "../xrEngine/bone.h"
+#include "xrCore/Animation/Bone.hpp"
 #include "../xrEngine/iphdebug.h"
 //#include "phelement.h"
 #include "ui_base.h"

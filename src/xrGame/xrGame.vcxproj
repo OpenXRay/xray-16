@@ -248,8 +248,6 @@
     <ClInclude Include="..\xrServerEntities\character_info.h" />
     <ClInclude Include="..\xrServerEntities\character_info_defs.h" />
     <ClInclude Include="..\xrServerEntities\clsid_game.h" />
-    <ClInclude Include="..\xrServerEntities\DrawUtils.h" />
-    <ClInclude Include="..\xrServerEntities\FastDelegate.h" />
     <ClInclude Include="..\xrServerEntities\gametype_chooser.h" />
     <ClInclude Include="..\xrServerEntities\game_base_space.h" />
     <ClInclude Include="..\xrServerEntities\game_graph_space.h" />
@@ -839,7 +837,6 @@
     <ClInclude Include="Bolt.h" />
     <ClInclude Include="BoneProtections.h" />
     <ClInclude Include="bone_groups.h" />
-    <ClInclude Include="bone_utils.h" />
     <ClInclude Include="BottleItem.h" />
     <ClInclude Include="BreakableObject.h" />
     <ClInclude Include="builder_allocator_constructor.h" />
@@ -1340,7 +1337,6 @@
     <ClInclude Include="profiler_inline.h" />
     <ClInclude Include="profile_data_types.h" />
     <ClInclude Include="profile_store.h" />
-    <ClInclude Include="PropertiesListHelper.h" />
     <ClInclude Include="property_evaluator.h" />
     <ClInclude Include="property_evaluator_const.h" />
     <ClInclude Include="property_evaluator_const_inline.h" />

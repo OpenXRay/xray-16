@@ -22,7 +22,7 @@
 #else // _EDITOR
 	#include "../xrCore/xrCore.h"
 	#include "../Layers/xrRender/SkeletonXVertRender.h"
-	#include "../xrEngine/bone.h"
+	#include "../xrCore/Animation/Bone.hpp"
 	#define RENDER 1
 	#include "../xrEngine/Render.h"
 	#include "../xrEngine/Device.h"

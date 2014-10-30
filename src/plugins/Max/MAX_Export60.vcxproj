@@ -221,12 +221,8 @@
     <ClCompile Include="..\..\editors\ECore\Editor\EditObject.cpp" />
     <ClCompile Include="..\..\editors\ECore\Editor\EditObjectIO.cpp" />
     <ClCompile Include="..\..\editors\ECore\Editor\EditObjectMotions.cpp" />
-    <ClCompile Include="..\Shared\bone.cpp" />
     <ClCompile Include="..\Shared\ELog.cpp" />
-    <ClCompile Include="..\Shared\Envelope.cpp" />
     <ClCompile Include="..\Shared\Helper.cpp" />
-    <ClCompile Include="..\Shared\interp.cpp" />
-    <ClCompile Include="..\Shared\motion.cpp" />
     <ClCompile Include="Export\BoneDef.cpp" />
     <ClCompile Include="Export\EditMeshExportMAX.cpp" />
     <ClCompile Include="Export\EditObjectExportLWO.cpp" />
@@ -252,24 +248,17 @@
   <ItemGroup>
     <ClInclude Include="..\..\editors\ECore\Editor\EditMesh.h" />
     <ClInclude Include="..\..\editors\ECore\Editor\editobject.h" />
-    <ClInclude Include="..\Shared\bone.h" />
     <ClInclude Include="..\Shared\ELog.h" />
-    <ClInclude Include="..\Shared\envelope.h" />
     <ClInclude Include="..\Shared\Face.h" />
     <ClInclude Include="..\Shared\Helper.h" />
-    <ClInclude Include="..\Shared\motion.h" />
     <ClInclude Include="..\Shared\Vert.h" />
     <ClInclude Include="Export\Exporter.h" />
-    <ClInclude Include="Export\Fmesh.h" />
     <ClInclude Include="Export\FS2.H" />
-    <ClInclude Include="Export\GameMaterial.h" />
     <ClInclude Include="Export\lwchunks.h" />
     <ClInclude Include="Export\MeshExpUtility.h" />
     <ClInclude Include="Export\NetDeviceLog.h" />
-    <ClInclude Include="Export\Shader_xrLC.h" />
+    <ClInclude Include="..\..\utils\Shader_xrLC.h" />
     <ClInclude Include="Export\Stdafx.h" />
-    <ClInclude Include="Export\TexMaps.h" />
-    <ClInclude Include="Export\XRayMtlRes.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Export\MeshExpUtility.rc" />

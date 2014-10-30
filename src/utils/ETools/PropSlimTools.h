@@ -2,7 +2,6 @@
 #define PropSlimToolsH
 
 #ifndef _MAYA_EXPORT
-
 	#ifdef ETOOLS_EXPORTS
 		#define ETOOLS_API __declspec( dllexport )
 	#else

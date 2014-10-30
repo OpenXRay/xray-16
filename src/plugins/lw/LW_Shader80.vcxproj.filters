@@ -27,9 +27,6 @@
     <ClCompile Include="shader\stdafx.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\GameMtlLib.cpp">
-      <Filter>Shared Files\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="..\Shared\ELog.cpp">
       <Filter>Shared Files\Editor</Filter>
     </ClCompile>
@@ -45,16 +42,16 @@
     <ClCompile Include="shader\blotch.c">
       <Filter>Shader</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\xrEngine\GameMtlLib_Engine.cpp">
+      <Filter>Shared Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\xrEngine\GameMtlLib.cpp">
+      <Filter>Shared Files\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shader\stdafx.h">
       <Filter>Kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\GameMtlLib.h">
-      <Filter>Shared Files\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Shader_xrLC.h">
-      <Filter>Shared Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ELog.h">
       <Filter>Shared Files\Editor</Filter>
@@ -67,6 +64,12 @@
     </ClInclude>
     <ClInclude Include="shader\resource.h">
       <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\utils\Shader_xrLC.h">
+      <Filter>Shared Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xrEngine\GameMtlLib.h">
+      <Filter>Shared Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

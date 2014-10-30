@@ -2,7 +2,7 @@
 #include "radioactivezone.h"
 #include "level.h"
 #include "xrmessages.h"
-#include "../xrEngine/bone.h"
+#include "xrCore/Animation/Bone.hpp"
 #include "actor.h"
 #include "game_base_space.h"
 #include "Hit.h"

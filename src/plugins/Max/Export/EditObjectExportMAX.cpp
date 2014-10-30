@@ -7,7 +7,7 @@
 
 #include "..\..\..\editors\ECore\Editor\EditObject.h"
 #include "..\..\..\editors\ECore\Editor\EditMesh.h"
-#include "Bone.h"
+#include "xrCore/Animation/Bone.hpp"
 #include "Exporter.h"
 #include "..\..\Shared\GameMaterial.h"
 

@@ -36,17 +36,10 @@
 #define GAMEMTL_NONE_IDX u16(-1)
 #define GAMEMTL_FILENAME "gamemtl.xr"
 
-#ifdef _EDITOR
+#ifndef GM_NON_GAME
+#if defined(_EDITOR) || defined(_MAX_PLUGIN) || defined(_LW_SHADER) || defined(_MAYA_PLUGIN)
 #define GM_NON_GAME
 #endif
-#ifdef _MAX_PLUGIN
-#define GM_NON_GAME
-#endif
-#ifdef _LW_SHADER
-#define GM_NON_GAME
-#endif
-#ifdef _MAYA_PLUGIN
-#define GM_NON_GAME
 #endif
 
 #ifndef MTL_EXPORT_API
@@ -62,12 +55,12 @@
 #define SoundVec shared_str
 #define PSVec shared_str
 #define ShaderVec shared_str
-// #define ShaderVec shared_str
 #else
+#include "xrSound/Sound.h"
+#include "Include/xrRender/WallMarkArray.h"
+#include "Include/xrRender/RenderFactory.h"
 DEFINE_VECTOR(ref_sound, SoundVec, SoundIt);
 DEFINE_VECTOR(shared_str, PSVec, PSIt);
-#include "../Include/xrRender/WallMarkArray.h"
-#include "../Include/xrRender/RenderFactory.h"
 // DEFINE_VECTOR(ref_shader,ShaderVec,ShaderIt);
 #endif
 
@@ -239,7 +232,7 @@ class MTL_EXPORT_API CGameMtlLibrary
     int material_pair_index;
     BENCH_SEC_SCRAMBLEMEMBER1
 
-        GameMtlVec materials;
+    GameMtlVec materials;
     GameMtlPairVec material_pairs;
 
 #ifndef _EDITOR
@@ -364,7 +357,7 @@ extern MTL_EXPORT_API CGameMtlLibrary GMLib;
 //#ifdef _EDITOR
 //extern MTL_EXPORT_API CGameMtlLibrary* PGMLib;
 //#else
-#include "../include/xrapi/xrapi.h"
+#include "Include/xrAPI/xrAPI.h"
 //#endif
 
 #endif

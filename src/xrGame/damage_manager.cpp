@@ -11,7 +11,7 @@
 #include "damage_manager.h"
 #include "../xrEngine/xr_object.h"
 #include "../Include/xrRender/Kinematics.h"
-#include "../xrEngine/bone.h"
+#include "xrCore/Animation/Bone.hpp"
 
 CDamageManager::CDamageManager			()
 {

@@ -165,9 +165,6 @@
     <ClInclude Include="OGF_Face.h">
       <Filter>%2a%2a%2a COMPILER %2a%2a%2a\XRAY</Filter>
     </ClInclude>
-    <ClInclude Include="PropSlimTools.h">
-      <Filter>%2a%2a%2a COMPILER %2a%2a%2a\XRAY</Filter>
-    </ClInclude>
     <ClInclude Include="vbm.h">
       <Filter>%2a%2a%2a COMPILER %2a%2a%2a\Internal</Filter>
     </ClInclude>

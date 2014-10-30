@@ -9,7 +9,7 @@
 //#include "ode_include.h"
 #include "../xrphysics/MathUtils.h"
 #include "../include/xrrender/Kinematics.h"
-#include "../xrEngine/bone.h"
+#include "xrCore/Animation/Bone.hpp"
 #include "../xrEngine/ennumerateVertices.h"
 #include <boost/noncopyable.hpp>
 

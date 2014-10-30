@@ -7,7 +7,7 @@
 #include "xr_level_controller.h"
 #include "UsableScriptObject.h"
 #include "customzone.h"
-#include "../xrEngine/gamemtllib.h"
+#include "xrEngine/GameMtlLib.h"
 #include "ui/UIMainIngameWnd.h"
 #include "UIGameCustom.h"
 #include "Grenade.h"

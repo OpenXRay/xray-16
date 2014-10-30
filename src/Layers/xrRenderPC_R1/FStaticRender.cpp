@@ -8,7 +8,7 @@
 #include "../xrRender/fbasicvisual.h"
 #include "../../xrEngine/CustomHUD.h"
 #include "../../xrEngine/xr_object.h"
-#include "../../xrEngine/fmesh.h"
+#include "xrCore/FMesh.hpp"
 #include "../xrRender/SkeletonCustom.h"
 #include "../xrRender/lighttrack.h"
 #include "../xrRender/dxRenderDeviceRender.h"

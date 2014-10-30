@@ -22,4 +22,4 @@
 #include "../xrEngine/xr_object.h"
 #include "../xrEngine/igame_level.h"
 #include "../xrphysics/xrphysics.h"
-#include "smart_cast.h"
+#include "xrServerEntities/smart_cast.h"

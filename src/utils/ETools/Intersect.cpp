@@ -4,7 +4,7 @@
 
 #include "../../include/xrrender/kinematics.h"
 #define ECORE_API 
-#include "../../xrEngine/bone.h"
+#include "xrCore/Animation/Bone.hpp"
 
 namespace ETOOLS{
 

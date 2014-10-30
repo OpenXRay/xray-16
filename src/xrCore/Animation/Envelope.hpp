@@ -19,12 +19,12 @@ programs that, for example, read scene or object files and must store
 the envelopes.
 ====================================================================== */
 
-#define SHAPE_TCB 0
-#define SHAPE_HERM 1
-#define SHAPE_BEZI 2
-#define SHAPE_LINE 3
-#define SHAPE_STEP 4
-#define SHAPE_BEZ2 5
+#define SHAPE_TCB   0
+#define SHAPE_HERM  1
+#define SHAPE_BEZI  2
+#define SHAPE_LINE  3
+#define SHAPE_STEP  4
+#define SHAPE_BEZ2  5
 
 #define BEH_RESET 0
 #define BEH_CONSTANT 1
@@ -112,7 +112,7 @@ DEFINE_VECTOR(st_Key*, KeyVec, KeyIt);
 // refs
 class CExporter;
 
-class ENGINE_API CEnvelope
+class XRCORE_API CEnvelope
 {
 public:
     KeyVec keys;

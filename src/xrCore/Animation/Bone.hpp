@@ -2,9 +2,7 @@
 #ifndef BoneH
 #define BoneH
 
-#ifdef _LW_EXPORT
-#include <lwsdk/lwrender.h>
-#endif
+#include "xrCore/xrCore.h"
 
 // refs
 class CBone;
@@ -15,7 +13,7 @@ class CBone;
 
 #define MAX_BONE_PARAMS 4
 
-class ENGINE_API CBoneInstance;
+class XRCORE_API CBoneInstance;
 // callback
 typedef void _BCL BoneCallbackFunction(CBoneInstance* P);
 typedef BoneCallbackFunction* BoneCallback;
@@ -23,7 +21,7 @@ typedef BoneCallbackFunction* BoneCallback;
 
 //*** Bone Instance *******************************************************************************
 #pragma pack(push,8)
-class ENGINE_API CBoneInstance
+class XRCORE_API CBoneInstance
 {
 public:
     // data
@@ -71,7 +69,7 @@ public:
 #pragma pack(pop)
 
 #pragma pack( push,2 )
-struct ENGINE_API vertBoned1W // (3+3+3+3+2+1)*4 = 15*4 = 60 bytes
+struct XRCORE_API vertBoned1W // (3+3+3+3+2+1)*4 = 15*4 = 60 bytes
 {
     Fvector P;
     Fvector N;
@@ -85,7 +83,7 @@ struct ENGINE_API vertBoned1W // (3+3+3+3+2+1)*4 = 15*4 = 60 bytes
     u16 get_bone_id(u8 bone)const { VERIFY(bone < bones_count); return u16(matrix); }
 #endif
 };
-struct ENGINE_API vertBoned2W // (1+3+3 + 1+3+3 + 2)*4 = 16*4 = 64 bytes
+struct XRCORE_API vertBoned2W // (1+3+3 + 1+3+3 + 2)*4 = 16*4 = 64 bytes
 {
     u16 matrix0;
     u16 matrix1;
@@ -101,7 +99,7 @@ struct ENGINE_API vertBoned2W // (1+3+3 + 1+3+3 + 2)*4 = 16*4 = 64 bytes
     u16 get_bone_id(u8 bone)const { VERIFY(bone < bones_count); return bone == 0 ? matrix0 : matrix1; }
 #endif
 };
-struct ENGINE_API vertBoned3W // 70 bytes
+struct XRCORE_API vertBoned3W // 70 bytes
 {
     u16 m[3];
     Fvector P;
@@ -116,7 +114,7 @@ struct ENGINE_API vertBoned3W // 70 bytes
     u16 get_bone_id(u8 bone)const { VERIFY(bone < bones_count); return m[bone]; }
 #endif
 };
-struct ENGINE_API vertBoned4W //76 bytes
+struct XRCORE_API vertBoned4W //76 bytes
 {
     u16 m[4];
     Fvector P;
@@ -145,7 +143,7 @@ enum EJointType
     jtForceU32 = u32(-1)
 };
 
-struct ECORE_API SJointLimit
+struct XRCORE_API SJointLimit
 {
     Fvector2 limit;
     float spring_factor;
@@ -159,7 +157,7 @@ struct ECORE_API SJointLimit
     }
 };
 
-struct ECORE_API SBoneShape
+struct XRCORE_API SBoneShape
 {
     enum EShapeType
     {
@@ -208,7 +206,7 @@ struct ECORE_API SBoneShape
     }
 };
 
-struct ECORE_API SJointIKData
+struct XRCORE_API SJointIKData
 {
     // IK
     EJointType type;
@@ -289,7 +287,7 @@ struct ECORE_API SJointIKData
 
 
 
-class IBoneData
+class XRCORE_API IBoneData
 {
 public:
 
@@ -305,6 +303,7 @@ public:
     virtual const Fvector& _BCL get_center_of_mass()const = 0;
     virtual float _BCL get_mass()const = 0;
     virtual u16 _BCL get_game_mtl_idx()const = 0;
+    virtual shared_str GetMaterialName() const = 0;
     virtual u16 _BCL GetParentID() const = 0;
     virtual float _BCL lo_limit(u8 k) const = 0;
     virtual float _BCL hi_limit(u8 k) const = 0;
@@ -316,10 +315,13 @@ public:
 class CBone;
 DEFINE_VECTOR(CBone*, BoneVec, BoneIt);
 
-class ECORE_API CBone :
+class XRCORE_API CBone :
     public CBoneInstance,
     public IBoneData
 {
+public:
+    friend class LWBoneParser;
+private:
     shared_str name;
     shared_str parent_name;
     shared_str wmap;
@@ -396,17 +398,11 @@ public:
     void Save(IWriter& F);
     void Load_0(IReader& F);
     void Load_1(IReader& F);
-#ifdef _LW_EXPORT
-    void ParseBone(LWItemID bone);
-#endif
     IC float _BCL engine_lo_limit(u8 k) const { return -IK_data.limits[k].limit.y; }
     IC float _BCL engine_hi_limit(u8 k) const { return -IK_data.limits[k].limit.x; }
 
     IC float _BCL editor_lo_limit(u8 k) const { return IK_data.limits[k].limit.x; }
     IC float _BCL editor_hi_limit(u8 k) const { return IK_data.limits[k].limit.y; }
-
-
-
 
     void SaveData(IWriter& F);
     void LoadData(IReader& F);
@@ -437,18 +433,14 @@ private:
     u16 _BCL GetSelfID() const { return (u16)SelfID; }
     u16 _BCL GetNumChildren() const { return u16(children.size()); }
     const SJointIKData& _BCL get_IK_data() const { return IK_data; }
-    const Fmatrix& _BCL get_bind_transform() const
-    {
-
-        return local_rest_transform;
-
-    }
+    const Fmatrix& _BCL get_bind_transform() const { return local_rest_transform; }
     const SBoneShape& _BCL get_shape() const { return shape; }
-
     const Fobb& _BCL get_obb() const;
     const Fvector& _BCL get_center_of_mass() const { return center_of_mass; }
     float _BCL get_mass() const { return mass; }
-    u16 _BCL get_game_mtl_idx() const;
+    // the caller should use GMLib.GetMaterialIdx instead
+    virtual u16 _BCL get_game_mtl_idx() const override { return u16(-1); }
+    virtual shared_str GetMaterialName() const override { return game_mtl; }
     u16 _BCL GetParentID() const { if (parent) return u16(parent->SelfID); else return u16(-1); };
     float _BCL lo_limit(u8 k) const { return engine_lo_limit(k); }
     float _BCL hi_limit(u8 k) const { return engine_hi_limit(k); }
@@ -461,7 +453,7 @@ typedef xr_vector<CBoneData*> vecBones;
 typedef vecBones::iterator vecBonesIt;
 
 
-class ENGINE_API CBoneData :
+class XRCORE_API CBoneData :
     public IBoneData
 {
 protected:
@@ -517,7 +509,8 @@ private:
     const Fobb& _BCL get_obb() const { return obb; }
     const Fvector& _BCL get_center_of_mass() const { return center_of_mass; }
     float _BCL get_mass() const { return mass; }
-    u16 _BCL get_game_mtl_idx() const { return game_mtl_idx; }
+    virtual u16 _BCL get_game_mtl_idx() const override { return game_mtl_idx; }
+    virtual shared_str GetMaterialName() const override { return name; }
     float _BCL lo_limit(u8 k) const { return IK_data.limits[k].limit.x; }
     float _BCL hi_limit(u8 k) const { return IK_data.limits[k].limit.y; }
 public:

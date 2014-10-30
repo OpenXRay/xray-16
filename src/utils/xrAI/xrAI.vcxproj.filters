@@ -411,7 +411,7 @@
     <ClInclude Include="motion_simulator.h">
       <Filter>Compiler</Filter>
     </ClInclude>
-    <ClInclude Include="Shader_xrLC.h">
+    <ClInclude Include="..\Shader_xrLC.h">
       <Filter>Compiler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\xr_3da\xrLevel.h">
@@ -775,9 +775,6 @@
       <Filter>ALife\Shared\ServerEntities</Filter>
     </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\xrServer_Space.h">
-      <Filter>ALife\Shared\ServerEntities</Filter>
-    </ClInclude>
-    <ClInclude Include="bone.h">
       <Filter>ALife\Shared\ServerEntities</Filter>
     </ClInclude>
     <ClInclude Include="ChooseTypes.h">

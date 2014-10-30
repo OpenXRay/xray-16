@@ -3,8 +3,8 @@
 #include "SmdMaya.h"
 #include "..\..\..\editors\Ecore\editor\EditObject.h"
 #include "..\..\..\editors\Ecore\editor\EditMesh.h"
-#include "Motion.h"
-#include "Envelope.h"
+#include "xrCore/Animation/Motion.hpp"
+#include "xrCore/Animation/Envelope.hpp"
 #include "smoth_flags.h"
 
 #pragma warning ( disable : 4786 )

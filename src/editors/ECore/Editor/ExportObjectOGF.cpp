@@ -4,9 +4,9 @@
 #include "ExportObjectOGF.h"
 #include "EditObject.h"
 #include "EditMesh.h"
-#include "fmesh.h"
-#include "bone.h"
-#include "motion.h"
+#include "xrCore/FMesh.hpp"
+#include "xrCore/Animation/Bone.hpp"
+#include "xrCore/Animation/Motion.hpp"
 
 #ifdef _EDITOR
 #include "std_classes.h"

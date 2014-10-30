@@ -2,7 +2,7 @@
 #include "alife_space.h"
 #include "hit.h"
 //#include "ode_include.h"
-#include "../xrEngine/bone.h"
+#include "xrCore/Animation/Bone.hpp"
 #include "xrMessages.h"
 #include "Level.h"
 #include "../xrphysics/mathutils.h"

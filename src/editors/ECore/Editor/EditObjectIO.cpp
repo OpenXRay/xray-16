@@ -7,8 +7,8 @@
 
 #include "EditObject.h"
 #include "EditMesh.h"
-#include "bone.h"
-#include "motion.h"
+#include "xrCore/Animation/Bone.hpp"
+#include "xrCore/Animation/Motion.hpp"
 
  #include "exportskeleton.h"
  #include "exportobjectOGF.h"

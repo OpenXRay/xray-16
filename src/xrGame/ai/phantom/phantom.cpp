@@ -2,7 +2,7 @@
 #include "phantom.h"
 #include "../../level.h"
 #include "../../../xrServerEntities/xrserver_objects_alife_monsters.h"
-#include "../../../xrEngine/motion.h"
+#include "xrCore/Animation/Motion.hpp"
 #include "../Include/xrRender/RenderVisual.h"
 #include "../Include/xrRender/KinematicsAnimated.h"
 

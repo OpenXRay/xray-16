@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "hudtarget.h"
-#include "../xrEngine/gamemtllib.h"
+#include "xrEngine/GameMtlLib.h"
 
 #include "../xrEngine/Environment.h"
 #include "../xrEngine/CustomHUD.h"

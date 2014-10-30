@@ -6,7 +6,7 @@
 #include "igame_level.h"
 #include "fdemoplay.h"
 #include "xr_ioconsole.h"
-#include "motion.h"
+#include "xrCore/Animation/Motion.hpp"
 #include "Render.h"
 #include "CameraManager.h"
 

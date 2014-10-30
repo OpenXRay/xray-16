@@ -506,7 +506,7 @@ void player_hud::render_hud()
 }
 
 
-#include "../xrEngine/motion.h"
+#include "xrCore/Animation/Motion.hpp"
 
 u32 player_hud::motion_length(const shared_str& anim_name, const shared_str& hud_name, const CMotionDef*& md)
 {

@@ -12,7 +12,8 @@
 #include "iPhysicsShellHolder.h"
 #include "../Include/xrRender/Kinematics.h"
 #include "PHCollideValidator.h"
-#include "../xrengine/bone.h"
+#include "../xrCore/animation/Bone.hpp"
+#include "xrEngine/GameMtlLib.h"
 //#include "game_object_space.h"
 //#pragma warning(disable:4995)
 //#pragma warning(disable:4267)
@@ -39,6 +40,7 @@
 #ifdef DEBUG
 #include    "debug_output.h"
 #endif
+
 IC      bool    PhOutOfBoundaries           (const Fvector& v)
 {
     return v.y < phBoundaries.y1;
@@ -814,7 +816,10 @@ void CPHShell::AddElementRecursive(CPhysicsElement* root_e, u16 id,Fmatrix globa
             E   = P_create_Element();
             E->m_SelfID=id;
             E->mXFORM.set       (fm_position);
-            E->SetMaterial      (bone_data.get_game_mtl_idx());
+            u16 mtlIndex = bone_data.get_game_mtl_idx();
+            if (mtlIndex == u16(-1))
+                mtlIndex = GMLibrary().GetMaterialIdx(bone_data.GetMaterialName().c_str());
+            E->SetMaterial(mtlIndex);
             //Fvector mc;
             //fm_position.transform_tiny(mc,bone_data.center_of_mass);
             E->set_ParentElement(root_e);

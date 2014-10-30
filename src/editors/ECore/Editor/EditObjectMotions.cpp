@@ -10,8 +10,8 @@
 	#include "ui_main.h"
 #endif
 
-#include "motion.h"
-#include "bone.h"
+#include "xrCore/Animation/Motion.hpp"
+#include "xrCore/Animation/Bone.hpp"
 #include "EditMesh.h"
 
 

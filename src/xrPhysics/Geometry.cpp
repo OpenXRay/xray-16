@@ -4,7 +4,7 @@
 #include "ExtendedGeom.h"
 #include "dcylinder//dCylinder.h"
 
-#include "../xrEngine/bone.h"
+#include "xrCore/Animation/Bone.hpp"
 
 //global
 #ifdef DEBUG

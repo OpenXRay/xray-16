@@ -39,21 +39,6 @@
     <ClCompile Include="Export\XRayExport.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\editors\ECore\Editor\bone.cpp">
-      <Filter>Shared Files\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Envelope.cpp">
-      <Filter>Shared Files\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrEngine\fmesh.cpp">
-      <Filter>Shared Files\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\interp.cpp">
-      <Filter>Shared Files\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\motion.cpp">
-      <Filter>Shared Files\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\common\NvMender2003\NVMeshMender.cpp">
       <Filter>Shared Files\Engine\Mender2003</Filter>
     </ClCompile>
@@ -178,15 +163,6 @@
   <ItemGroup>
     <ClInclude Include="Export\Stdafx.h">
       <Filter>Kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrEngine\bone.h">
-      <Filter>Shared Files\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\envelope.h">
-      <Filter>Shared Files\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\motion.h">
-      <Filter>Shared Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\common\NvMender2003\convert.h">
       <Filter>Shared Files\Engine\Mender2003</Filter>

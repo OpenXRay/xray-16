@@ -6,7 +6,7 @@
 #include "extendedgeom.h"
 #include "mathutilsode.h"
 
-#include "../xrengine/gamemtllib.h"
+#include "xrEngine/GameMtlLib.h"
 
 
 

@@ -5,7 +5,7 @@
 #include "../../xrcdb/xrCDB.h"
 #include "../../xrEngine/xrLevel.h"
 #include "AIMapExport.h"
-#include "Shader_xrLC.h"
+#include "utils/Shader_xrLC.h"
 #include "../../editors/LevelEditor/Engine/communicate.h"
 #include "Etextureparams.h"
 

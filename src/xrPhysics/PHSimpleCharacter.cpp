@@ -13,7 +13,7 @@
 #include "params.h"
 #include "MathUtils.h" 
 //#include "level.h"
-#include "../xrEngine/gamemtllib.h"
+#include "xrEngine/GameMtlLib.h"
 //#include "gameobject.h"
 #include "iphysicsshellholder.h"
 #include "../Include/xrRender/Kinematics.h"
@@ -26,7 +26,7 @@
 
 //#include "phvalide.h"
 
-#include "../xrengine/bone.h"
+#include "xrCore/Animation/Bone.hpp"
 #include "../xrengine/xr_object.h"
 #include "ph_valid_ode.h"
 

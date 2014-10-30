@@ -16,7 +16,7 @@
 #include "../Include/xrRender/Kinematics.h"
 #include "ai_object_location.h"
 #include "game_cl_base.h"
-#include "../xrEngine/motion.h"
+#include "xrCore/Animation/Motion.hpp"
 #include "artefact.h"
 #include "IKLimbsController.h"
 #include "player_hud.h"

@@ -12,7 +12,7 @@
 #include "ai/stalker/ai_stalker_space.h"
 #include "ai_space.h"
 #include "../xrEngine/xr_object.h"
-#include "../xrEngine/bone.h"
+#include "xrCore/Animation/Bone.hpp"
 #include "../Include/xrRender/Kinematics.h"
 #include "profiler.h"
 #include "sound_collection_storage.h"

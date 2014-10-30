@@ -7,11 +7,11 @@
 #include "Environment.h"
 //#include "SkeletonCustom.h"
 // Instead of SkeletonCustom:
-#include "bone.h"
-#include "../Include/xrRender/Kinematics.h"
+#include "xrCore/Animation/Bone.hpp"
+#include "Include/xrRender/Kinematics.h"
 #include "cl_intersect.h"
 
-#include "../xrServerEntities/object_broker.h"
+#include "xrServerEntities/object_broker.h"
 
 #ifdef _EDITOR
 #include "ui_toolscustom.h"

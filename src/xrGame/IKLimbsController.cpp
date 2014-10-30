@@ -11,7 +11,7 @@
 #include "../Include/xrRender/Kinematics.h"
 //#include "ode_include.h"
 #include "characterphysicssupport.h"
-#include "../xrEngine/motion.h"
+#include "xrCore/Animation/Motion.hpp"
 #ifdef DEBUG
 #	include "PHDebug.h"
 #endif // DEBUG

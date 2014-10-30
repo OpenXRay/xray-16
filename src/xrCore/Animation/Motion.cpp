@@ -1,18 +1,13 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "motion.h"
-#include "envelope.h"
+#include "Motion.hpp"
+#include "xrCore/Animation/Envelope.hpp"
 
 #define EOBJ_OMOTION 0x1100
 #define EOBJ_SMOTION 0x1200
 #define EOBJ_OMOTION_VERSION 0x0005
 #define EOBJ_SMOTION_VERSION 0x0007
-
-#ifdef _LW_EXPORT
-extern void ReplaceSpaceAndLowerCase(shared_str& s);
-#endif
-
 
 //------------------------------------------------------------------------------------------
 // CCustomMotion
@@ -35,9 +30,6 @@ CCustomMotion::~CCustomMotion()
 
 void CCustomMotion::Save(IWriter& F)
 {
-#ifdef _LW_EXPORT
-    ReplaceSpaceAndLowerCase(name);
-#endif
     F.w_stringZ(name);
     F.w_u32(iFrameStart);
     F.w_u32(iFrameEnd);
@@ -150,7 +142,6 @@ bool COMotion::Load(IReader& F)
     {
         if (vers!=EOBJ_OMOTION_VERSION) return false;
         Clear ();
-
         for (int ch=0; ch<ctMaxChannel; ch++)
         {
             envs[ch] = xr_new<CEnvelope> ();
@@ -160,7 +151,6 @@ bool COMotion::Load(IReader& F)
     return true;
 }
 
-#ifdef _EDITOR
 void COMotion::CreateKey(float t, const Fvector& P, const Fvector& R)
 {
     envs[ctPositionX]->InsertKey(t,P.x);
@@ -261,15 +251,7 @@ BOOL COMotion::NormalizeKeys(float from_time, float to_time, float speed)
      */
     return TRUE;
 }
-#endif
 
-
-//------------------------------------------------------------------------------------------
-// Skeleton Motion
-//------------------------------------------------------------------------------------------
-#ifdef _EDITOR
-
-//#include "SkeletonCustom.h"
 CSMotion::CSMotion():CCustomMotion()
 {
     mtype =mtSkeleton;
@@ -413,12 +395,10 @@ void CSMotion::Save(IWriter& F)
         for (int ch=0; ch<ctMaxChannel; ch++)
             bm_it->envs[ch]->Save(F);
     }
-
     u32 sz = marks.size();
     F.w_u32 (sz);
     for(u32 i=0; i<sz; ++i)
         marks[i].Save(&F);
-
 }
 
 bool CSMotion::Load(IReader& F)
@@ -507,6 +487,7 @@ bool CSMotion::Load(IReader& F)
                 marks[i].Load(&F);
         }
     }
+    
     for(BoneMotionIt bm_it=bone_mots.begin(); bm_it!=bone_mots.end(); bm_it++)
         xr_strlwr (bm_it->name);
     return true;
@@ -527,6 +508,7 @@ void CSMotion::SortBonesBySkeleton(BoneVec& bones)
     for (BoneIt b_it = bones.begin(); b_it != bones.end(); ++b_it)
     {
         st_BoneMotion* BM = FindBoneMotion((*b_it)->Name());
+        // previously there was R_ASSERT(BM) (for use with plugins only)
         if (!BM)
         {
             CBone* B = *(b_it);
@@ -554,7 +536,6 @@ void CSMotion::SortBonesBySkeleton(BoneVec& bones)
     bone_mots.clear();
     bone_mots = new_bone_mots;
 }
-#endif
 
 void SAnimParams::Set(float start_frame, float end_frame, float fps)
 {
@@ -592,3 +573,62 @@ void SAnimParams::Update(float dt, float speed, bool loop)
         tmp = t_current;
     }
 }
+
+//------------------------------------------------------------------------------
+// Clip
+//------------------------------------------------------------------------------
+#define EOBJ_CLIP_VERSION       2
+#define EOBJ_CLIP_VERSION_CHUNK 0x9000
+#define EOBJ_CLIP_DATA_CHUNK    0x9001
+
+void CClip::Save(IWriter& F)
+{
+    F.open_chunk    (EOBJ_CLIP_VERSION_CHUNK);
+    F.w_u16         (EOBJ_CLIP_VERSION);
+    F.close_chunk   ();
+
+    F.open_chunk    (EOBJ_CLIP_DATA_CHUNK);
+    F.w_stringZ     (name);
+    for (int k=0; k<4; k++){ 
+        F.w_stringZ (cycles[k].name);
+        F.w_u16     (cycles[k].slot);
+    }
+    F.w_stringZ     (fx.name);
+    F.w_u16         (fx.slot);
+    F.w_float       (fx_power);
+    F.w_float       (length);
+    F.close_chunk   ();
+}
+//------------------------------------------------------------------------------
+
+bool CClip::Load(IReader& F)
+{
+    R_ASSERT        (F.find_chunk(EOBJ_CLIP_VERSION_CHUNK));
+    u16 ver         = F.r_u16();
+    if (ver!=EOBJ_CLIP_VERSION) return false;
+    R_ASSERT(F.find_chunk(EOBJ_CLIP_DATA_CHUNK));
+    F.r_stringZ     (name);
+    for (int k=0; k<4; k++){ 
+        F.r_stringZ     (cycles[k].name); 
+        cycles[k].slot  = F.r_u16(); 
+    }
+    F.r_stringZ     (fx.name);
+    fx.slot         = F.r_u16();
+    fx_power        = F.r_float();
+    length          = F.r_float();
+    return true;
+}
+//------------------------------------------------------------------------------
+
+bool CClip::Equal(CClip* c)
+{
+    if (!name.equal(c->name))           return false;
+    if (!cycles[0].equal(c->cycles[0])) return false;
+    if (!cycles[1].equal(c->cycles[1])) return false;
+    if (!cycles[2].equal(c->cycles[2])) return false;
+    if (!cycles[3].equal(c->cycles[3])) return false;
+    if (!fx.equal(c->fx))               return false;
+    if (length!=c->length)              return false;
+    return true;
+}
+//------------------------------------------------------------------------------

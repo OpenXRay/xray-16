@@ -3,8 +3,8 @@
 #define SkeletonMotionsH
 
 //#include "skeletoncustom.h"
-#include "bone.h"
-#include "skeletonmotiondefs.h"
+#include "Bone.hpp"
+#include "SkeletonMotionDefs.hpp"
 // refs
 class CKinematicsAnimated;
 class CBlend;
@@ -49,7 +49,7 @@ s16 x1,y1,z1;
 #pragma pack(pop)
 
 //*** Motion Data *********************************************************************************
-class ENGINE_API CMotion
+class XRCORE_API CMotion
 {
     struct
     {
@@ -82,7 +82,7 @@ public:
     }
 };
 
-class ENGINE_API motion_marks
+class XRCORE_API motion_marks
 {
 public:
     typedef std::pair< float, float > interval;
@@ -99,10 +99,7 @@ private:
 public:
     shared_str name;
     void Load(IReader*);
-
-#ifdef _EDITOR
     void Save(IWriter*);
-#endif
     bool is_empty() const { return intervals.empty(); }
     const interval* pick_mark(float const& t) const;
     bool is_mark_between(float const& t0, float const& t1) const;
@@ -111,7 +108,7 @@ public:
 
 
 const float fQuantizerRangeExt = 1.5f;
-class ENGINE_API CMotionDef
+class XRCORE_API CMotionDef
 {
 public:
     u16 bone_or_part;
@@ -147,7 +144,7 @@ DEFINE_VECTOR(MotionVec*, BoneMotionsVec, BoneMotionsVecIt);
 DEFINE_MAP(shared_str, MotionVec, BoneMotionMap, BoneMotionMapIt);
 
 // partition
-class ENGINE_API CPartDef
+class XRCORE_API CPartDef
 {
 public:
     shared_str Name;
@@ -156,7 +153,7 @@ public:
 
     u32 mem_usage() { return sizeof(*this) + bones.size()*sizeof(u32) + sizeof(Name); }
 };
-class ENGINE_API CPartition
+class XRCORE_API CPartition
 {
     CPartDef P[MAX_PARTS];
 public:
@@ -169,7 +166,7 @@ public:
 };
 
 // shared motions
-struct ENGINE_API motions_value
+struct XRCORE_API motions_value
 {
     accel_map m_motion_map; // motion associations
     accel_map m_cycle; // motion data itself (shared)
@@ -197,7 +194,7 @@ struct ENGINE_API motions_value
     }
 };
 
-class ENGINE_API motions_container
+class XRCORE_API motions_container
 {
     DEFINE_MAP(shared_str, motions_value*, SharedMotionsMap, SharedMotionsMapIt);
     SharedMotionsMap container;
@@ -210,9 +207,9 @@ public:
     void clean(bool force_destroy);
 };
 
-extern ENGINE_API motions_container* g_pMotionsContainer;
+extern XRCORE_API motions_container* g_pMotionsContainer;
 
-class ENGINE_API shared_motions
+class XRCORE_API shared_motions
 {
 private:
     motions_value* p_;

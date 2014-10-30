@@ -724,7 +724,7 @@ void	R_dsgraph_structure::r_dsgraph_render_subspace	(IRender_Sector* _sector, CF
 
 #include "fhierrarhyvisual.h"
 #include "SkeletonCustom.h"
-#include "../../xrEngine/fmesh.h"
+#include "xrCore/FMesh.hpp"
 #include "flod.h"
 
 void	R_dsgraph_structure::r_dsgraph_render_R1_box	(IRender_Sector* _S, Fbox& BB, int sh)

@@ -2,20 +2,15 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "../xrEngine/GameMtlLib.h"
+#include "GameMtlLib.h"
+
+#ifndef GM_NON_GAME
 
 void DestroySounds(SoundVec& lst)
 {
     for (SoundIt it = lst.begin(); lst.end() != it; ++it)
         it->destroy();
 }
-/*
-void DestroyMarks(ShaderVec& lst)
-{
-for (ShaderIt it=lst.begin(); lst.end() != it; ++it)
-it->destroy();
-}
-*/
 
 void DestroyPSs(PSVec& lst)
 {
@@ -32,19 +27,7 @@ void CreateSounds(SoundVec& lst, LPCSTR buf)
     for (int k = 0; k < cnt; ++k)
         lst[k].create(_GetItem(buf, k, tmp), st_Effect, sg_SourceType);
 }
-/*
-void CreateMarks(ShaderVec& lst, LPCSTR buf)
-{
-string256 tmp;
-int cnt =_GetItemCount(buf); R_ASSERT(cnt<=GAMEMTL_SUBITEM_COUNT);
-ref_shader s;
-for (int k=0; k<cnt; ++k)
-{
-s.create ("effects\\wallmark",_GetItem(buf,k,tmp));
-lst.push_back (s);
-}
-}
-*/
+
 void CreateMarks(IWallMarkArray* pMarks, LPCSTR buf)
 {
     string256 tmp;
@@ -63,9 +46,11 @@ void CreatePSs(PSVec& lst, LPCSTR buf)
     for (int k = 0; k < cnt; ++k)
         lst.push_back(_GetItem(buf, k, tmp));
 }
+#endif
 
 SGameMtlPair::~SGameMtlPair()
 {
+#ifndef GM_NON_GAME
     // destroy all media
     DestroySounds(BreakingSounds);
     DestroySounds(StepSounds);
@@ -74,33 +59,57 @@ SGameMtlPair::~SGameMtlPair()
     // DestroyMarks (CollideMarks);
     //RenderFactory->DestroyGameMtlPair(m_pCollideMarks);
     //m_pCollideMarks->
+#endif
 }
 
 void SGameMtlPair::Load(IReader& fs)
 {
     shared_str buf;
-
     R_ASSERT(fs.find_chunk(GAMEMTLPAIR_CHUNK_PAIR));
     mtl0 = fs.r_u32();
     mtl1 = fs.r_u32();
     ID = fs.r_u32();
     ID_parent = fs.r_u32();
-    OwnProps.assign(fs.r_u32());
-
+    u32 own_mask = fs.r_u32();
+#ifdef GM_NON_GAME
+    if (GAMEMTL_NONE_ID == ID_parent)
+        OwnProps.one();
+    else
+        OwnProps.assign(own_mask);
+#else
+    OwnProps.assign(own_mask);
+#endif
     R_ASSERT(fs.find_chunk(GAMEMTLPAIR_CHUNK_BREAKING));
     fs.r_stringZ(buf);
+#ifdef GM_NON_GAME
+    BreakingSounds = *buf ? *buf : "";
+#else
     CreateSounds(BreakingSounds, *buf);
-
+#endif
     R_ASSERT(fs.find_chunk(GAMEMTLPAIR_CHUNK_STEP));
     fs.r_stringZ(buf);
+#ifdef GM_NON_GAME
+    StepSounds = *buf ? *buf : "";
+#else
     CreateSounds(StepSounds, *buf);
-
+#endif
     R_ASSERT(fs.find_chunk(GAMEMTLPAIR_CHUNK_COLLIDE));
     fs.r_stringZ(buf);
+#ifdef GM_NON_GAME
+    CollideSounds = *buf ? *buf : "";
+#else
     CreateSounds(CollideSounds, *buf);
+#endif
     fs.r_stringZ(buf);
+#ifdef GM_NON_GAME
+    CollideParticles = *buf ? *buf : "";
+#else
     CreatePSs(CollideParticles, *buf);
+#endif
     fs.r_stringZ(buf);
-    //CreateMarks (CollideMarks,*buf);
+#ifdef GM_NON_GAME
+    CollideMarks = *buf ? *buf : "";
+#else
     CreateMarks(&*m_pCollideMarks, *buf);
+#endif
 }

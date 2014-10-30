@@ -2,7 +2,7 @@
 
 #include "fhierrarhyvisual.h"
 #include "SkeletonCustom.h"
-#include "../../xrEngine/fmesh.h"
+#include "xrCore/FMesh.hpp"
 #include "../../xrEngine/irenderable.h"
 
 #include "flod.h"

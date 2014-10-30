@@ -31,9 +31,6 @@
     <Filter Include="Debug core">
       <UniqueIdentifier>{8e800879-38b7-4d47-a2f3-c4d6bc2ccb32}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Debug core\BugTrap">
-      <UniqueIdentifier>{410bb2f7-3898-4513-84b3-6e525d609c42}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Debug core\BlackBox">
       <UniqueIdentifier>{4695eac1-e8ff-440d-9b52-2cda631653ec}</UniqueIdentifier>
     </Filter>
@@ -75,6 +72,15 @@
     </Filter>
     <Filter Include="string_concatenations">
       <UniqueIdentifier>{f6022e16-616b-4dde-8d60-c400d6f0e855}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Animation">
+      <UniqueIdentifier>{0c4bb9ca-d95b-488e-bcf6-7e4c78761622}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FMesh">
+      <UniqueIdentifier>{899095e5-c12f-4b6e-b698-cd0b01c99a6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PostProcess">
+      <UniqueIdentifier>{90109cda-1ebf-485f-bfd5-42442150fa12}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -257,6 +263,30 @@
     </ClCompile>
     <ClCompile Include="os_clipboard.cpp" />
     <ClCompile Include="xrSyncronize.cpp" />
+    <ClCompile Include="animation\Bone.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\Envelope.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\interp.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\Motion.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="FMesh.cpp">
+      <Filter>FMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\SkeletonMotions.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="PostProcess\PPInfo.cpp">
+      <Filter>PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="PostProcess\PostProcess.cpp">
+      <Filter>PostProcess</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -427,12 +457,6 @@
     <ClInclude Include="xrDebug_macros.h">
       <Filter>Debug core</Filter>
     </ClInclude>
-    <ClInclude Include="BTTrace.h">
-      <Filter>Debug core\BugTrap</Filter>
-    </ClInclude>
-    <ClInclude Include="BugTrap.h">
-      <Filter>Debug core\BugTrap</Filter>
-    </ClInclude>
     <ClInclude Include="blackbox\BugslayerUtil.h">
       <Filter>Debug core\BlackBox</Filter>
     </ClInclude>
@@ -540,6 +564,30 @@
     </ClInclude>
     <ClInclude Include="os_clipboard.h" />
     <ClInclude Include="xrSyncronize.h" />
+    <ClInclude Include="animation\Bone.hpp">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\Envelope.hpp">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\Motion.hpp">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="FMesh.hpp">
+      <Filter>FMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\SkeletonMotions.hpp">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\SkeletonMotionDefs.hpp">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="PostProcess\PPInfo.hpp">
+      <Filter>PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="PostProcess\PostProcess.hpp">
+      <Filter>PostProcess</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">

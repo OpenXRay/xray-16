@@ -8,7 +8,7 @@
 #include "level.h"
 #include "game_cl_base.h"
 #include "../xrEngine/x_ray.h"
-#include "../xrEngine/gamemtllib.h"
+#include "xrEngine/GameMtlLib.h"
 #include "../xrphysics/PhysicsCommon.h"
 #include "level_sounds.h"
 #include "GamePersistent.h"

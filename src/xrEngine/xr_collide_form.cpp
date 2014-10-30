@@ -2,15 +2,15 @@
 #include "igame_level.h"
 #include "xr_collide_form.h"
 #include "xr_object.h"
-#include "../xrcdb/xr_area.h"
+#include "xrCDB/xr_area.h"
 #include "x_ray.h"
 #include "xrLevel.h"
-#include "fmesh.h"
-#include "../xrCDB/frustum.h"
+#include "xrCore/FMesh.hpp"
+#include "xrCDB/Frustum.h"
 
 //#include "skeletoncustom.h"
-#include "../Include/xrRender/Kinematics.h"
-#include "bone.h"
+#include "Include/xrRender/Kinematics.h"
+#include "xrCore/Animation/Bone.hpp"
 #ifdef DEBUG
 IC float DET(const Fmatrix& a)
 {

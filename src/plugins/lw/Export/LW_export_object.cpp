@@ -1,27 +1,38 @@
 #include "stdafx.h"
-#include <lwrender.h>
-#include <lwhost.h>
 #include "../../../editors/ECore/Editor/editobject.h"
 #include "../../../xrCore/FileSystem.h"
 #include "../../../xrCore/FS.h"
-#include "bone.h"
-#include <lwdisplay.h>
-#include <lwserver.h>
+#include "xrCore/Animation/Bone.hpp"
+#include "Globals.hpp"
 
-extern "C" LWItemInfo		*g_iteminfo;
-extern "C" LWMessageFuncs	*g_msg;
-extern "C" LWInterfaceInfo	*g_intinfo;
-extern "C" HostDisplayInfo  *g_hdi;
-extern "C" LWObjectInfo		*g_objinfo;
+class LWBoneParser final
+{
+public:
+    LWBoneParser() = delete;
+
+    static void LWBoneParser::Parse(CBone& bone, LWItemID boneId)
+    {
+        LWItemID P = g_iteminfo->parent(boneId);
+        if (g_iteminfo->type(P) == LWI_BONE)
+            bone.SetParentName(g_iteminfo->name(P));
+        LWDVector vec;
+        g_boneinfo->restParam(boneId, LWIP_POSITION, vec);
+        bone.rest_offset.set((float)vec[0], (float)vec[1], (float)vec[2]);
+        g_boneinfo->restParam(boneId, LWIP_ROTATION, vec);
+        bone.rest_rotate.set((float)vec[1], (float)vec[0], (float)vec[2]);
+        bone.rest_length = (float)g_boneinfo->restLength(boneId);
+        bone.SetWMap(g_boneinfo->weightMap(boneId));
+    }
+};
 
 static BoneVec* m_LWBones=0;
 
 static void AppendBone(LWItemID bone)
 {
 	m_LWBones->push_back(xr_new<CBone>());
-	CBone* B = m_LWBones->back();
-	B->SetName(g_iteminfo->name(bone));
-	B->ParseBone(bone);
+	CBone& B = *m_LWBones->back();
+	B.SetName(g_iteminfo->name(bone));
+    LWBoneParser::Parse(B, bone);
 }
 
 static void RecurseBone(LWItemID parent)
@@ -67,6 +78,21 @@ static bool ParseObjectBones(LWItemID object, int& obj_cnt)
 		obj_cnt++;
 	}
 	return true;
+}
+
+extern void ReplaceSpaceAndLowerCase(shared_str& s);
+
+static void RefineBoneNames(CEditableObject* obj)
+{
+    for (CBone* bone : obj->Bones())
+    {
+        shared_str name = bone->Name();
+        shared_str parentName = bone->ParentName();
+        ReplaceSpaceAndLowerCase(name);
+        ReplaceSpaceAndLowerCase(parentName);
+        bone->SetName(name.c_str());
+        bone->SetParentName(parentName.c_str());
+    }
 }
 
 extern "C" {
@@ -125,6 +151,7 @@ extern "C" {
 							else{ 
 								obj->m_Flags.set(CEditableObject::eoDynamic,TRUE);
 								obj->Optimize	();
+                                RefineBoneNames(obj);
                                 obj->Save(buf);
 							}
 						}else

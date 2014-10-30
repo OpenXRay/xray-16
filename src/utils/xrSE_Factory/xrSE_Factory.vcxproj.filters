@@ -444,9 +444,6 @@
     <ClInclude Include="..\..\xrServerEntities\inventory_space.h">
       <Filter>ServerStuff\Common\GameStuff</Filter>
     </ClInclude>
-    <ClInclude Include="bone.h">
-      <Filter>ServerStuff\Common\GameStuff</Filter>
-    </ClInclude>
     <ClInclude Include="client_id.h">
       <Filter>ServerStuff\Common\NetworkStuff</Filter>
     </ClInclude>

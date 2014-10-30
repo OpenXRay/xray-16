@@ -7,7 +7,7 @@
 #include "iphysicsshellholder.h"
 
 #include "../xrEngine/cl_intersect.h"
-#include "../xrEngine/gamemtllib.h"
+#include "xrEngine/GameMtlLib.h"
 
 #include "tri-colliderKNoOPC\__aabb_tri.h"
 #include "../3rd party/ode/ode/src/util.h"

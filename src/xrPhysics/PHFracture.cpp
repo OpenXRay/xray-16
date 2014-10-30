@@ -7,7 +7,7 @@
 
 #include "../Include/xrRender/Kinematics.h"
 #include "ph_valid_ode.h"
-#include "../xrEngine/bone.h"
+#include "xrCore/Animation/Bone.hpp"
 
 #pragma warning(disable:4995)
 #pragma warning(disable:4267)

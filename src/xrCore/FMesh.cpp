@@ -4,7 +4,7 @@
 #pragma warning(disable:4995)
 #include <d3dx9.h>
 #pragma warning(default:4995)
-#include "fmesh.h"
+#include "FMesh.hpp"
 
 //BOOL ValidateIndices(u32 vCount, u32 iCount, u16* pIndices)
 //{
@@ -182,4 +182,3 @@ void ogf_desc::Save(IWriter& F)
     F.w_stringZ(modif_name);
     F.w(&modif_time, sizeof(modif_time));
 }
-

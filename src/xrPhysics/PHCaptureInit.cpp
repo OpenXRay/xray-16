@@ -11,7 +11,7 @@
 //#include "Inventory.h"
 //#include "CaptureBoneCallback.h"
 #include "iphysicsshellholder.h"
-#include "../xrengine/bone.h"
+#include "xrCore/Animation/Bone.hpp"
 #include "../xrengine/device.h"
 extern	class CPHWorld	*ph_world;
 ///////////////////////////////////////////////////////////////////////////////////

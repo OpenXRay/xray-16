@@ -2,12 +2,7 @@
 #ifndef MotionH
 #define MotionH
 
-#ifdef _LW_EXPORT
-#include <lwrender.h>
-#include <lwhost.h>
-#endif
-
-#include "bone.h"
+#include "xrCore/Animation/Bone.hpp"
 
 // refs
 class CEnvelope;
@@ -43,7 +38,7 @@ struct st_BoneMotion
 DEFINE_VECTOR(st_BoneMotion, BoneMotionVec, BoneMotionIt);
 
 //--------------------------------------------------------------------------
-class ENGINE_API CCustomMotion
+class XRCORE_API CCustomMotion
 {
 protected:
     enum EMotionType
@@ -76,15 +71,12 @@ public:
 
     virtual void SaveMotion(const char* buf) = 0;
     virtual bool LoadMotion (const char* buf)=0;
-
-#ifdef _LW_EXPORT
-    CEnvelope* CreateEnvelope(LWChannelID chan, LWChannelID* chan_parent = 0);
-#endif
 };
 
 //--------------------------------------------------------------------------
-class ENGINE_API COMotion : public CCustomMotion
+class XRCORE_API COMotion : public CCustomMotion
 {
+protected:
     CEnvelope* envs[ctMaxChannel];
 public:
     COMotion();
@@ -100,10 +92,6 @@ public:
     virtual void SaveMotion(const char* buf);
     virtual bool LoadMotion (const char* buf);
 
-#ifdef _LW_EXPORT
-    void ParseObjectMotion(LWItemID object);
-#endif
-#ifdef _EDITOR
     void FindNearestKey (float t, float& min_k, float& max_k, float eps=EPS_L);
     void CreateKey (float t, const Fvector& P, const Fvector& R);
     void DeleteKey (float t);
@@ -113,7 +101,6 @@ public:
     BOOL ScaleKeys (float from_time, float to_time, float scale_factor);
     BOOL NormalizeKeys(float from_time, float to_time, float speed);
     float GetLength(float* mn = 0, float* mx = 0);
-#endif
 };
 
 //--------------------------------------------------------------------------
@@ -130,11 +117,11 @@ enum ESMFlags
     esmUseWeaponBone = 1<<7,
 };
 
-#if defined(_EDITOR) || defined(_MAX_EXPORT) || defined(_MAYA_EXPORT)
-#include "SkeletonMotions.h"
+#include "SkeletonMotions.hpp"
 
-class ENGINE_API CSMotion: public CCustomMotion
+class XRCORE_API CSMotion : public CCustomMotion
 {
+protected:
     BoneMotionVec bone_mots;
 public:
     u16 m_BoneOrPart;
@@ -171,13 +158,9 @@ public:
     void WorldRotate (int boneId, float h, float p, float b);
 
     void Optimize ();
-#ifdef _LW_EXPORT
-    void ParseBoneMotion(LWItemID bone);
-#endif
 };
-#endif
 
-struct ECORE_API SAnimParams
+struct XRCORE_API SAnimParams
 {
     float t_current;
     float tmp;
@@ -196,4 +179,27 @@ public:
     void Pause(bool val) { bPlay = !val; }
 };
 
+class XRCORE_API CClip
+{
+public:
+    struct AnimItem{
+        shared_str  name;
+        u16         slot;
+                    AnimItem    ():slot(u16(-1)){}
+        void        set         (shared_str nm, u16 s){name=nm;slot=s;}
+        void        clear       (){set("",u16(-1));}
+        bool        valid       (){return !!(name.size()&&(slot!=u16(-1)));}
+        bool        equal       (const AnimItem& d) const {return name.equal(d.name)&&(slot==d.slot);}
+    };
+    shared_str      name;
+    AnimItem        cycles[4];
+    AnimItem        fx;
+    
+    float           fx_power;
+    float           length;
+public:
+    virtual void    Save    (IWriter& F);
+    virtual bool    Load    (IReader& F);
+    bool            Equal   (CClip* c);
+};
 #endif

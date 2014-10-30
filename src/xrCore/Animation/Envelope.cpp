@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "envelope.h"
+#include "Envelope.hpp"
 
 CEnvelope::~CEnvelope()
 {
@@ -60,7 +60,8 @@ KeyIt CEnvelope::FindKey(float t, float eps)
 
 void CEnvelope::InsertKey(float t, float val)
 {
-    for (KeyIt k_it = keys.begin(); k_it != keys.end(); k_it++)
+    KeyIt k_it;
+    for (k_it=keys.begin(); k_it!=keys.end(); k_it++)
     {
         if (fsimilar((*k_it)->time, t, EPS_L))
         {
@@ -112,7 +113,8 @@ BOOL CEnvelope::ScaleKeys(float from_time, float to_time, float scale_factor, fl
         if (max_k != keys.end()) max_k++;
         float t0 = (*min_k)->time;
         float offset = 0;
-        for (KeyIt it = min_k + 1; it != max_k; it++)
+        KeyIt it;
+        for (it=min_k+1; it!=max_k; it++)
         {
             float new_time = offset + t0 + ((*it)->time - t0)*scale_factor;
             offset += ((new_time - (*(it - 1))->time) - ((*it)->time - t0));

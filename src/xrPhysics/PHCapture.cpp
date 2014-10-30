@@ -10,7 +10,7 @@
 //#include "phmovementcontrol.h"
 #include "../Include/xrRender/Kinematics.h"
 #include "iphysicsshellholder.h"
-#include "../xrengine/bone.h"
+#include "xrCore/Animation/Bone.hpp"
 #include "../xrengine/device.h"
 #include "mathutilsode.h"
 #include "phelement.h"

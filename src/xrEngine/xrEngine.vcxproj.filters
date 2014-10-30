@@ -61,9 +61,6 @@
     <Filter Include="Game API\Demo">
       <UniqueIdentifier>{e1069bff-104f-4b80-b679-70c0b3577fd5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game API\GameMaterials">
-      <UniqueIdentifier>{c16d36cf-5e63-4375-8133-d81ba4982147}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game API\Debug">
       <UniqueIdentifier>{897c02e1-3ef6-4941-ade5-7ca637d3298a}</UniqueIdentifier>
     </Filter>
@@ -141,12 +138,6 @@
     </Filter>
     <Filter Include="RenderRef\Execution &amp; 3D\Device">
       <UniqueIdentifier>{43966447-6d34-46c3-956d-adaa49b48525}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RenderRef\Execution &amp; 3D\Visuals">
-      <UniqueIdentifier>{2e6b0e5e-5f71-4eca-a5a7-9e4ab9a6ef2f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RenderRef\Execution &amp; 3D\Visuals\Skeleton">
-      <UniqueIdentifier>{efcab557-a4fd-44af-825c-b401bd01da48}</UniqueIdentifier>
     </Filter>
     <Filter Include="RenderRef\doug_lea_memory_allocator">
       <UniqueIdentifier>{6c14caad-1705-4fbf-87b0-9ad1d734d338}</UniqueIdentifier>
@@ -249,6 +240,9 @@
     </Filter>
     <Filter Include="My Amplifier Results">
       <UniqueIdentifier>{6aec60dd-7590-4a0f-accf-2550c71f6aa4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game API\MaterialSystem">
+      <UniqueIdentifier>{59004dc1-5e77-4968-8321-6290b1ab9d3a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -381,15 +375,6 @@
     <ClInclude Include="xr_collide_form.h">
       <Filter>Game API\Collision</Filter>
     </ClInclude>
-    <ClInclude Include="bone.h">
-      <Filter>Game API\Animator</Filter>
-    </ClInclude>
-    <ClInclude Include="envelope.h">
-      <Filter>Game API\Animator</Filter>
-    </ClInclude>
-    <ClInclude Include="motion.h">
-      <Filter>Game API\Animator</Filter>
-    </ClInclude>
     <ClInclude Include="ObjectAnimator.h">
       <Filter>Game API\Animator</Filter>
     </ClInclude>
@@ -407,9 +392,6 @@
     </ClInclude>
     <ClInclude Include="FDemoRecord.h">
       <Filter>Game API\Demo</Filter>
-    </ClInclude>
-    <ClInclude Include="GameMtlLib.h">
-      <Filter>Game API\GameMaterials</Filter>
     </ClInclude>
     <ClInclude Include="ObjectDump.h">
       <Filter>Game API\Debug</Filter>
@@ -431,9 +413,6 @@
     </ClInclude>
     <ClInclude Include="MbHelpers.h">
       <Filter>Render\Font output</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader_xrLC.h">
-      <Filter>Render\Execution &amp; 3D\Shaders</Filter>
     </ClInclude>
     <ClInclude Include="WaveForm.h">
       <Filter>Render\Execution &amp; 3D\Shaders</Filter>
@@ -512,15 +491,6 @@
     </ClInclude>
     <ClInclude Include="Stats.h">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
-    </ClInclude>
-    <ClInclude Include="Fmesh.h">
-      <Filter>RenderRef\Execution &amp; 3D\Visuals</Filter>
-    </ClInclude>
-    <ClInclude Include="SkeletonMotionDefs.h">
-      <Filter>RenderRef\Execution &amp; 3D\Visuals\Skeleton</Filter>
-    </ClInclude>
-    <ClInclude Include="SkeletonMotions.h">
-      <Filter>RenderRef\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClInclude>
     <ClInclude Include="doug_lea_memory_allocator.h">
       <Filter>RenderRef\doug_lea_memory_allocator</Filter>
@@ -620,6 +590,9 @@
     </ClInclude>
     <ClInclude Include="xrSASH.h">
       <Filter>OpenAutomate</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMtlLib.h">
+      <Filter>Game API\MaterialSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -722,18 +695,6 @@
     <ClCompile Include="xr_collide_form.cpp">
       <Filter>Game API\Collision</Filter>
     </ClCompile>
-    <ClCompile Include="bone.cpp">
-      <Filter>Game API\Animator</Filter>
-    </ClCompile>
-    <ClCompile Include="Envelope.cpp">
-      <Filter>Game API\Animator</Filter>
-    </ClCompile>
-    <ClCompile Include="interp.cpp">
-      <Filter>Game API\Animator</Filter>
-    </ClCompile>
-    <ClCompile Include="motion.cpp">
-      <Filter>Game API\Animator</Filter>
-    </ClCompile>
     <ClCompile Include="ObjectAnimator.cpp">
       <Filter>Game API\Animator</Filter>
     </ClCompile>
@@ -748,12 +709,6 @@
     </ClCompile>
     <ClCompile Include="FDemoRecord.cpp">
       <Filter>Game API\Demo</Filter>
-    </ClCompile>
-    <ClCompile Include="GameMtlLib.cpp">
-      <Filter>Game API\GameMaterials</Filter>
-    </ClCompile>
-    <ClCompile Include="GameMtlLib_Engine.cpp">
-      <Filter>Game API\GameMaterials</Filter>
     </ClCompile>
     <ClCompile Include="ObjectDump.cpp">
       <Filter>Game API\Debug</Filter>
@@ -869,12 +824,6 @@
     <ClCompile Include="Stats.cpp">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
     </ClCompile>
-    <ClCompile Include="fmesh.cpp">
-      <Filter>RenderRef\Execution &amp; 3D\Visuals</Filter>
-    </ClCompile>
-    <ClCompile Include="SkeletonMotions.cpp">
-      <Filter>RenderRef\Execution &amp; 3D\Visuals\Skeleton</Filter>
-    </ClCompile>
     <ClCompile Include="doug_lea_memory_allocator.c">
       <Filter>RenderRef\doug_lea_memory_allocator</Filter>
     </ClCompile>
@@ -964,6 +913,12 @@
     </ClCompile>
     <ClCompile Include="xrSASH.cpp">
       <Filter>OpenAutomate</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMtlLib.cpp">
+      <Filter>Game API\MaterialSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMtlLib_Engine.cpp">
+      <Filter>Game API\MaterialSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

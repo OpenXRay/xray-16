@@ -22,7 +22,7 @@ Free the memory used by an lwEnvelope.
 ====================================================================== */
 
 void w_free(void* p){
-	free(p);
+    free(p);
 }
 
 void lwFreeEnvelope( lwEnvelope *env )
@@ -503,7 +503,7 @@ float lwEvalEnvelope( lwEnvelope *env, float time )
                case SHAPE_TCB:
                case SHAPE_HERM:
                case SHAPE_BEZI:
-                  out = outgoing( skey, (Key*)(skey->next) )
+                  out = outgoing( skey, (Key*)skey->next )
                       / ( skey->next->time - skey->time );
                   return out * ( time - skey->time ) + skey->value;
                case SHAPE_BEZ2:
@@ -553,7 +553,7 @@ float lwEvalEnvelope( lwEnvelope *env, float time )
                case SHAPE_TCB:
                case SHAPE_HERM:
                case SHAPE_BEZI:
-                  in = incoming( (Key*)(ekey->prev), (Key*)ekey )
+                  in = incoming( (Key*)ekey->prev, (Key*)ekey )
                      / ( ekey->time - ekey->prev->time );
                   return in * ( time - ekey->time ) + ekey->value;
                case SHAPE_BEZ2:

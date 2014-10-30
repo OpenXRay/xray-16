@@ -2,7 +2,7 @@
 
 #include "animation_utils.h"
 #include "../Include/xrRender/Kinematics.h"
-#include "../xrEngine/bone.h"
+#include "xrCore/Animation/Bone.hpp"
 #include "game_object_space.h"
 
 anim_bone_fix::anim_bone_fix()

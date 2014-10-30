@@ -4,7 +4,7 @@
 
 //#include	"../Include/xrRender/KinematicsAnimated.h"
 #include	"../Include/xrRender/KinematicsAnimated.h"
-#include	"../xrEngine/motion.h"
+#include "xrCore/Animation/Motion.hpp"
 
 IC bool is_in( const motion_marks::interval &i, float v )
 {

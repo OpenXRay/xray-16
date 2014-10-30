@@ -8,7 +8,7 @@
 #include "../console_vars.h"
 #include "../phworld.h"
 #include "../../xrcdb/xr_area.h"
-#include "../../xrEngine/gamemtllib.h"
+#include "xrEngine/GameMtlLib.h"
 #ifdef DEBUG
 #include "../debug_output.h"
 #endif

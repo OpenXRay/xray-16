@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "../../xrEngine/fmesh.h"
+#include "xrCore/FMesh.hpp"
 #include "FProgressive.h"
 
 //////////////////////////////////////////////////////////////////////

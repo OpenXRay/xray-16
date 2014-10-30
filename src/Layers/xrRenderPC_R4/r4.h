@@ -20,7 +20,7 @@
 #include "../xrRender/r_sun_cascades.h"
 
 #include "../../xrEngine/irenderable.h"
-#include "../../xrEngine/fmesh.h"
+#include "xrCore/FMesh.hpp"
 
 class dxRender_Visual;
 

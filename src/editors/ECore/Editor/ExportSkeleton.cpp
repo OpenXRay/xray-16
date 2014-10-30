@@ -5,12 +5,12 @@
 #include "ExportObjectOGF.h"
 #include "EditObject.h"
 #include "EditMesh.h"
-#include "fmesh.h"
+#include "xrCore/FMesh.hpp"
 
-#include "std_classes.h"
-#include "bone.h"
-#include "SkeletonMotions.h"
-#include "motion.h"
+#include "xrEngine/std_classes.h"
+#include "xrCore/Animation/Bone.hpp"
+#include "xrCore/Animation/SkeletonMotions.hpp"
+#include "xrCore/Animation/Motion.hpp"
 
 //#include "library.h"
 
