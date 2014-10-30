@@ -72,6 +72,10 @@ if defined dbg (
 %cp_tool% %src%\%cfg_long%\OpenAL32.dll %dst%\OpenAL32.dll
 %cp_tool% %src%\%cfg_long%\OpenAL32.dll %dst%\dedicated\OpenAL32.dll
 %cp_tool% %src%\%cfg_long%_Dedicated\dedicated\xrEngine.exe %dst%\dedicated\xrEngine.exe
+%cp_tool% %src%\%cfg_long%\xrWeatherEditor.dll %dst%\xrWeatherEditor.dll
+%cp_tool% %src%\%cfg_long%\xrManagedApi.dll %dst%\xrManagedApi.dll
+%cp_tool% %src%\%cfg_long%\xrSdkControls.dll %dst%\xrSdkControls.dll
+%cp_tool% %src%\%cfg_long%\xrPostprocessEditor.exe %dst%\xrPostprocessEditor.exe
 
 :ret
 endlocal
