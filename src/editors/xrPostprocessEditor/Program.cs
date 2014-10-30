@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using XRay.ManagedApi.Core;
 
 namespace xrPostprocessEditor
 {
@@ -15,7 +16,9 @@ namespace xrPostprocessEditor
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Core.Initialize(Application.ProductName);
             Application.Run(new MainDialog());
+            Core.Destroy();
         }
     }
 }

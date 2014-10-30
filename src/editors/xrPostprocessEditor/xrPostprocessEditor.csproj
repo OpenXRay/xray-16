@@ -93,6 +93,12 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\xrManagedApi\xrManagedApi.vcxproj">
+      <Project>{55b0e2ca-e27a-47fc-bc92-21abdc1044f5}</Project>
+      <Name>xrManagedApi</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
