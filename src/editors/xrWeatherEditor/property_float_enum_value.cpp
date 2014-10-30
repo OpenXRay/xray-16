@@ -56,6 +56,6 @@ void property_float_enum_value::SetValue					(Object ^object)
 	inherited::SetValue	(safe_cast<ValuePair^>(m_collection[0])->first);
 }
 
-void property_float_enum_value::increment					(float const% increment)
+void property_float_enum_value::Increment					(float increment)
 {
 }

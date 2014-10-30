@@ -32,7 +32,7 @@ public:
 					);
 	virtual Object	^GetValue						() override;
 	virtual void	SetValue						(Object ^object) override;
-	virtual void	increment						(float const% increment) override;
+	virtual void	Increment						(float increment) override;
 
 public:
 	collection_type^m_collection;
