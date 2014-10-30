@@ -542,18 +542,6 @@
     <ClInclude Include="pch.hpp">
       <Filter>core</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\editor\engine.hpp">
-      <Filter>interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Include\editor\ide.hpp">
-      <Filter>interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Include\editor\interfaces.hpp">
-      <Filter>interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Include\editor\property_holder.hpp">
-      <Filter>interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="property_holder_include.hpp">
       <Filter>implementations\properties</Filter>
     </ClInclude>
@@ -742,6 +730,18 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\editor\engine.hpp">
+      <Filter>interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\editor\ide.hpp">
+      <Filter>interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\editor\interfaces.hpp">
+      <Filter>interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\editor\property_holder.hpp">
+      <Filter>interfaces</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
