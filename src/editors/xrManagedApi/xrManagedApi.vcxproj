@@ -57,30 +57,30 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>XR_MANAGED_API;WIN32;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>.;$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;$(SolutionDir);$(xrSdkDir)include</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>Pch.hpp</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>xrCore.lib</AdditionalDependencies>
+      <AdditionalDependencies>xrCore.lib;xrGame.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrLibDir)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>XR_MANAGED_API;WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>.;$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;$(SolutionDir);$(xrSdkDir)include</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>Pch.hpp</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>xrCore.lib</AdditionalDependencies>
+      <AdditionalDependencies>xrCore.lib;xrGame.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrLibDir)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -92,12 +92,14 @@
   <ItemGroup>
     <ClInclude Include="core\Core.hpp" />
     <ClInclude Include="core\fs\FS.hpp" />
+    <ClInclude Include="core\PostProcessAnimator.hpp" />
     <ClInclude Include="Pch.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="core\Core.cpp" />
     <ClCompile Include="core\fs\FS.cpp" />
+    <ClCompile Include="core\PostProcessAnimator.cpp" />
     <ClCompile Include="Pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

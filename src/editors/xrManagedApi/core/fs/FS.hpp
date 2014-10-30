@@ -1,9 +1,3 @@
-using namespace System;
-using System::Runtime::InteropServices::OutAttribute;
-using System::Runtime::InteropServices::StructLayoutAttribute;
-using System::Runtime::InteropServices::LayoutKind;
-using System::Runtime::InteropServices::FieldOffsetAttribute;
-
 class IReader;
 class IWriter;
 
@@ -15,6 +9,12 @@ namespace ManagedApi
 {
 namespace Core
 {
+
+using namespace System;
+using System::Runtime::InteropServices::OutAttribute;
+using System::Runtime::InteropServices::StructLayoutAttribute;
+using System::Runtime::InteropServices::LayoutKind;
+using System::Runtime::InteropServices::FieldOffsetAttribute;
 
 [StructLayout(LayoutKind::Sequential, Size = sizeof(Fcolor))]
 public value struct ColorF

@@ -16,6 +16,9 @@
     <ClInclude Include="core\fs\FS.hpp">
       <Filter>core\fs</Filter>
     </ClInclude>
+    <ClInclude Include="core\PostProcessAnimator.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
@@ -25,6 +28,9 @@
     </ClCompile>
     <ClCompile Include="core\fs\FS.cpp">
       <Filter>core\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="core\PostProcessAnimator.cpp">
+      <Filter>core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
