@@ -16,6 +16,7 @@ namespace ManagedApi
 namespace Core
 {
 
+WriterBase::WriterBase(::IWriter* impl) { this->impl = impl; }
 WriterBase::~WriterBase()
 {
     delete impl;

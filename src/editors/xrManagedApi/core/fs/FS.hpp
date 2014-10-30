@@ -62,9 +62,12 @@ public value struct Vector4I
 
 public ref class WriterBase abstract
 {
-private:
+internal:
     ::IWriter* impl;
+private:
     String^ fileName;
+internal:
+    WriterBase(::IWriter* impl);
 public:
     property String^ FileName { String^ get(); }
     ~WriterBase();
