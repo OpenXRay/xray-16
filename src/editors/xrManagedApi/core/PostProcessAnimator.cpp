@@ -76,18 +76,16 @@ void PostProcessInfo::ColorMappingInterpolate::set(float value) { impl->cm_inter
 String^ PostProcessInfo::ColorMappingGradient1::get() { return gcnew String(impl->cm_tex1.c_str()); }
 void PostProcessInfo::ColorMappingGradient1::set(String^ value)
 {
-    auto context = gcnew marshal_context();
-    auto tmpStr = context->marshal_as<const char*>(value);
+    marshal_context context;
+    auto tmpStr = context.marshal_as<const char*>(value);
     impl->cm_tex1 = tmpStr;
-    delete context;
 }
 String^ PostProcessInfo::ColorMappingGradient2::get() { return gcnew String(impl->cm_tex2.c_str()); }
 void PostProcessInfo::ColorMappingGradient2::set(String^ value)
 {
-    auto context = gcnew marshal_context();
-    auto tmpStr = context->marshal_as<const char*>(value);
+    marshal_context context;
+    auto tmpStr = context.marshal_as<const char*>(value);
     impl->cm_tex2 = tmpStr;
-    delete context;
 }
 PostProcessInfo::PostProcessInfo(::SPPInfo* impl) { this->impl = impl; }
 PostProcessInfo::PostProcessInfo(::SPPInfo* impl, bool dontDestroy) : PostProcessInfo(impl)

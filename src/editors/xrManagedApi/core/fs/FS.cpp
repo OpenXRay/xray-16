@@ -41,17 +41,15 @@ void WriterBase::WriteString(const char* buffer) { impl->w_string(buffer); }
 void WriterBase::WriteStringZ(const char* buffer) { impl->w_stringZ(buffer); }
 void WriterBase::WriteString(String^ value)
 {
-    auto context = gcnew marshal_context();
-    auto tmpStr = context->marshal_as<const char*>(value);
+    marshal_context context;
+    auto tmpStr = context.marshal_as<const char*>(value);
     impl->w_string(tmpStr);
-    delete context;
 }
 void WriterBase::WriteStringZ(String^ value)
 {
-    auto context = gcnew marshal_context();
-    auto tmpStr = context->marshal_as<const char*>(value);
+    marshal_context context;
+    auto tmpStr = context.marshal_as<const char*>(value);
     impl->w_stringZ(tmpStr);
-    delete context;
 }
 void WriterBase::WriteColorF(ColorF value) { impl->w_fcolor((const Fcolor&)value); }
 void WriterBase::WriteVector4F(Vector4F value) { impl->w_fvector4((const Fvector4&)value); }
@@ -69,10 +67,9 @@ void WriterBase::WriteScaledDirection(Vector3F value) { impl->w_sdir((const Fvec
 void WriterBase::WriteString(String^ format, ... array<Object^>^ args)
 {
     auto str = String::Format(format, args);
-    auto context = gcnew marshal_context();
-    auto tmpStr = context->marshal_as<const char*>(str);
+    marshal_context context;
+    auto tmpStr = context.marshal_as<const char*>(str);
     impl->w(tmpStr, xr_strlen(tmpStr));
-    delete context;
 }
 void WriterBase::OpenChunk(UInt32 type) { impl->open_chunk(type); }
 void WriterBase::CloseChunk() { impl->close_chunk(); }
