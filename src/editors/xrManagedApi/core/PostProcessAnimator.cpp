@@ -20,7 +20,10 @@ PostProcessParamBase::PostProcessParamBase(::CPostProcessParam* impl) { this->im
 PostProcessParamBase::~PostProcessParamBase()
 {
     if (!dontDestroy)
-        delete impl;
+    {
+        auto p = impl;
+        xr_delete(p);
+    }
     impl = nullptr;
 }
 
@@ -92,7 +95,10 @@ PostProcessInfo::PostProcessInfo(::SPPInfo* impl, bool dontDestroy) : PostProces
 PostProcessInfo::~PostProcessInfo()
 {
     if (!dontDestroy)
-        delete impl;
+    {
+        auto p = impl;
+        xr_delete(p);
+    }
     impl = nullptr;
 }
 PostProcessInfo% PostProcessInfo::Add(const PostProcessInfo% ppi)
@@ -138,12 +144,14 @@ void PostProcessParamProxy::GetValue(float time, [Out] float% value, int index)
 float PostProcessParamProxy::GetKeyTime(int index) { return impl->get_key_time(index); }
 void PostProcessParamProxy::Reset() { impl->clear_all_keys(); }
 
-BasicPostProcessAnimator::BasicPostProcessAnimator() : impl(new ::BasicPostProcessAnimator()) {}
+BasicPostProcessAnimator::BasicPostProcessAnimator() : impl(xr_new<::BasicPostProcessAnimator>()) {}
 BasicPostProcessAnimator::BasicPostProcessAnimator(int id, bool cyclic) :
-    impl(new ::BasicPostProcessAnimator(id, cyclic)) {}
+    impl(xr_new<::BasicPostProcessAnimator>(id, cyclic)) {}
+
 BasicPostProcessAnimator::~BasicPostProcessAnimator()
 {
-    delete impl;
+    auto p = impl;
+    xr_delete(p);
     impl = nullptr;
 }
 void BasicPostProcessAnimator::Clear() { impl->Clear(); }
