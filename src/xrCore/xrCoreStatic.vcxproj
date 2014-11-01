@@ -368,6 +368,7 @@
     <ClCompile Include="_std_extensions.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\Util.hpp" />
     <ClInclude Include="animation\Bone.hpp" />
     <ClInclude Include="Animation\Envelope.hpp" />
     <ClInclude Include="Animation\Motion.hpp" />

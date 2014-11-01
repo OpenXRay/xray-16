@@ -655,6 +655,9 @@
     <ClInclude Include="PostProcess\PostProcess.hpp">
       <Filter>PostProcess</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\Util.hpp">
+      <Filter>Kernel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">
