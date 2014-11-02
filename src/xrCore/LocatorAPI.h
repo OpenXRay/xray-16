@@ -10,10 +10,34 @@
 #pragma warning(disable:4995)
 #include <io.h>
 #pragma warning(pop)
-
+#include "Common/Util.hpp"
 #include "LocatorAPI_defs.h"
 
 class XRCORE_API CStreamReader;
+
+enum class FSType
+{
+    Virtual = 1,
+    External = 2,
+    Any = Virtual | External,
+};
+
+IMPLEMENT_ENUM_FLAG_OPERATORS(FSType, int);
+
+class FileStatus
+{
+public:
+    bool Exists;
+    bool External; // File can be accessed only as external
+
+    inline FileStatus(bool exists, bool external)
+    {
+        Exists = exists;
+        External = external;
+    }
+
+    inline operator bool() { return Exists; }
+};
 
 class XRCORE_API CLocatorAPI
 {
@@ -69,7 +93,8 @@ private:
     xrCriticalSection m_auth_lock;
     u64 m_auth_code;
 
-    void Register(LPCSTR name, u32 vfs, u32 crc, u32 ptr, u32 size_real, u32 size_compressed, u32 modif);
+    const file* RegisterExternal(const char* name);
+    const file* Register(LPCSTR name, u32 vfs, u32 crc, u32 ptr, u32 size_real, u32 size_compressed, u32 modif);
     void ProcessArchive(LPCSTR path);
     void ProcessOne(LPCSTR path, const _finddata_t& entry);
     bool Recurse(LPCSTR path);
@@ -136,11 +161,13 @@ public:
     IWriter* w_open_ex(LPCSTR initial, LPCSTR N);
     IC IWriter* w_open_ex(LPCSTR N) { return w_open_ex(0, N); }
     void w_close(IWriter*& S);
+    // For registered files only
+    const file* GetFileDesc(const char* path);
 
-    const file* exist(LPCSTR N);
-    const file* exist(LPCSTR path, LPCSTR name);
-    const file* exist(string_path& fn, LPCSTR path, LPCSTR name);
-    const file* exist(string_path& fn, LPCSTR path, LPCSTR name, LPCSTR ext);
+    FileStatus exist(LPCSTR N, FSType fsType = FSType::Virtual);
+    FileStatus exist(LPCSTR path, LPCSTR name, FSType fsType = FSType::Virtual);
+    FileStatus exist(string_path& fn, LPCSTR path, LPCSTR name, FSType fsType = FSType::Virtual);
+    FileStatus exist(string_path& fn, LPCSTR path, LPCSTR name, LPCSTR ext, FSType fsType = FSType::Virtual);
 
     BOOL can_write_to_folder(LPCSTR path);
     BOOL can_write_to_alias(LPCSTR path);

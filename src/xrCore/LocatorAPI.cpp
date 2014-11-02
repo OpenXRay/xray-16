@@ -203,7 +203,16 @@ CLocatorAPI::~CLocatorAPI()
     _dump_open_files(1);
 }
 
-void CLocatorAPI::Register(LPCSTR name, u32 vfs, u32 crc, u32 ptr, u32 size_real, u32 size_compressed, u32 modif)
+const CLocatorAPI::file* CLocatorAPI::RegisterExternal(const char* name)
+{
+    struct stat buffer;
+    if (stat(name, &buffer) == -1)
+        return nullptr;
+    return Register(name, u32(-1), 0, 0, buffer.st_size, buffer.st_size, u32(buffer.st_mtime));
+}
+
+const CLocatorAPI::file* CLocatorAPI::Register(LPCSTR name, u32 vfs, u32 crc, u32 ptr,
+    u32 size_real, u32 size_compressed, u32 modif)
 {
     //Msg("Register[%d] [%s]",vfs,name);
     string256 temp_file_name;
@@ -231,7 +240,7 @@ void CLocatorAPI::Register(LPCSTR name, u32 vfs, u32 crc, u32 ptr, u32 size_real
         // sad but true, performance option
         // correct way is to erase and then insert new record:
         const_cast<file&>(*I) = desc;
-        return;
+        return &*I;
     }
     else
     {
@@ -239,7 +248,7 @@ void CLocatorAPI::Register(LPCSTR name, u32 vfs, u32 crc, u32 ptr, u32 size_real
     }
 
     // otherwise insert file
-    m_files.insert(desc);
+    auto result = m_files.insert(desc).first;
 
     // Try to register folder(s)
     string_path temp;
@@ -265,6 +274,7 @@ void CLocatorAPI::Register(LPCSTR name, u32 vfs, u32 crc, u32 ptr, u32 size_real
         xr_strcpy(temp, sizeof(temp), folder);
         if (xr_strlen(temp)) temp[xr_strlen(temp) - 1] = 0;
     }
+    return &*result;
 }
 
 IReader* open_chunk(void* ptr, u32 ID)
@@ -874,31 +884,50 @@ void CLocatorAPI::_destroy()
     m_archives.clear();
 }
 
-const CLocatorAPI::file* CLocatorAPI::exist(const char* fn)
+const CLocatorAPI::file* CLocatorAPI::GetFileDesc(const char* path)
 {
-    files_it it = file_find_it(fn);
-    return (it != m_files.end()) ? &(*it) : 0;
+    auto it = file_find_it(path);
+    return it != m_files.end() ? &*it : nullptr;
 }
 
-const CLocatorAPI::file* CLocatorAPI::exist(const char* path, const char* name)
+FileStatus CLocatorAPI::exist(const char* fn, FSType fsType /*= FSType::Virtual*/)
+{
+    if ((fsType | FSType::Virtual) == FSType::Virtual)
+    {
+        files_it it = file_find_it(fn);
+        if (it != m_files.end())
+            return FileStatus(true, false);
+    }
+    if ((fsType | FSType::External) == FSType::External)
+    {
+        struct stat buffer;
+        buffer.st_size;
+        return FileStatus(stat(fn, &buffer) == 0, true);
+    }
+    return FileStatus(false, false);
+}
+
+FileStatus CLocatorAPI::exist(const char* path, const char* name, FSType fsType /*= FSType::Virtual*/)
 {
     string_path temp;
     update_path(temp, path, name);
-    return exist(temp);
+    return exist(temp, fsType);
 }
 
-const CLocatorAPI::file* CLocatorAPI::exist(string_path& fn, LPCSTR path, LPCSTR name)
+FileStatus CLocatorAPI::exist(string_path& fn, LPCSTR path, LPCSTR name,
+    FSType fsType /*= FSType::Virtual*/)
 {
     update_path(fn, path, name);
-    return exist(fn);
+    return exist(fn, fsType);
 }
 
-const CLocatorAPI::file* CLocatorAPI::exist(string_path& fn, LPCSTR path, LPCSTR name, LPCSTR ext)
+FileStatus CLocatorAPI::exist(string_path& fn, LPCSTR path, LPCSTR name, LPCSTR ext,
+    FSType fsType /*= FSType::Virtual*/)
 {
     string_path nm;
     strconcat(sizeof(nm), nm, name, ext);
     update_path(fn, path, nm);
-    return exist(fn);
+    return exist(fn, fsType);
 }
 
 xr_vector<char*>* CLocatorAPI::file_list_open(const char* initial, const char* folder, u32 flags)
@@ -1306,13 +1335,19 @@ bool CLocatorAPI::check_for_file(LPCSTR path, LPCSTR _fname, string_path& fname,
     // Search entry
     file desc_f;
     desc_f.name = fname;
-
     files_it I = m_files.find(desc_f);
     if (I == m_files.end())
-        return (false);
-
+    {
+        if (!exist(fname, FSType::External))
+            return false;
+        const file* extFile = RegisterExternal(fname);
+        if (!extFile)
+            return false;
+        desc = extFile;
+    }
+    else
+        desc = &*I;
     ++dwOpenCounter;
-    desc = &*I;
     return (true);
 }
 
@@ -1546,8 +1581,13 @@ void CLocatorAPI::file_rename(LPCSTR src, LPCSTR dest, bool bOwerwrite)
 
 int CLocatorAPI::file_length(LPCSTR src)
 {
-    files_it I = file_find_it(src);
-    return (I != m_files.end()) ? I->size_real : -1;
+    files_it it = file_find_it(src);
+    if (it != m_files.end())
+        return it->size_real;
+    struct stat buffer;
+    if (stat(src, &buffer) != -1)
+        return buffer.st_size;
+    return -1;
 }
 
 bool CLocatorAPI::path_exist(LPCSTR path)

@@ -2628,6 +2628,12 @@ C++ class CLevelChanger : CGameObject {
 
 };
 
+C++ class FileStatus
+{
+    bool Exists const;
+    bool External const;
+};
+
 C++ class FS {
     const FS_ClampExt = 4;
     const FS_ListFiles = 1;
@@ -2639,6 +2645,10 @@ C++ class FS {
     const FS_sort_by_name_up = 0;
     const FS_sort_by_size_down = 3;
     const FS_sort_by_size_up = 2;
+    
+    const FSType_Virtual = 1;
+    const FSType_External = 2;
+    const FSType_Any = 3;
     
     function get_file_age(string);
 

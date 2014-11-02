@@ -25,9 +25,10 @@ struct file_comparer{
 //		xr_strcpy(m_short_name,c+xr_strlen(arget_folder)+1);
 		xr_strcpy(m_full_name,c);
 
-		const CLocatorAPI::file* f = m_fs_new->exist("$target_folder$",m_full_name);
-		if(f)
-			m_file_size = f->size_real;
+        string_path path;
+        m_fs_new->update_path(path, "$target_folder$", m_full_name);
+        if (m_fs_new->exist(path))
+            m_file_size = m_fs_new->file_length(path);
 	}
 
 	bool operator ()(char* o){
@@ -40,10 +41,12 @@ struct file_comparer{
 		
 		if( !m_flags.test(eDontCheckFileSize) ){
 			//compare file size
-			const CLocatorAPI::file* f = m_fs_old->exist("$target_folder$",o);
-			u32 file_size = f->size_real;
-
-			if ( (f->vfs==0xffffffff) && (file_size != m_file_size) )
+            string_path path;
+            m_fs_old->update_path(path, "$target_folder$", o);
+            if (!m_fs_old->exist(path))
+                return false;
+            auto fileDesc = m_fs_old->GetFileDesc(path);
+            if (fileDesc->vfs == 0xffffffff && fileDesc->size_real != m_file_size)
 				return false;
 		};
 		//compare file crc
