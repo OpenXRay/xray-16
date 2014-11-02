@@ -58,8 +58,12 @@ namespace XRay.SdkControls
                 nslAlpha.Value = nslAlpha.Maximum;
                 ignoreOnChanged = false;
                 UpdateColor();
-                lAlpha.Enabled = alphaEnabled;
-                nslAlpha.Enabled = alphaEnabled;
+                lAlpha.Visible = alphaEnabled;
+                nslAlpha.Visible = alphaEnabled;
+                int delta = (alphaEnabled ? 1 : -1)*27;
+                Point loc = chkHexadecimal.Location;
+                loc.Y += delta;
+                chkHexadecimal.Location = loc;
             }
         }
 
