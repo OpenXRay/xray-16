@@ -126,7 +126,8 @@
             // 
             // nslRed
             // 
-            this.nslRed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.nslRed.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.nslRed.BackColor = System.Drawing.SystemColors.Window;
             this.nslRed.DecimalPlaces = 0;
             this.nslRed.Hexadecimal = false;
@@ -159,7 +160,8 @@
             // 
             // nslGreen
             // 
-            this.nslGreen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.nslGreen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.nslGreen.BackColor = System.Drawing.SystemColors.Window;
             this.nslGreen.DecimalPlaces = 0;
             this.nslGreen.Hexadecimal = false;
@@ -192,7 +194,8 @@
             // 
             // nslBlue
             // 
-            this.nslBlue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.nslBlue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.nslBlue.BackColor = System.Drawing.SystemColors.Window;
             this.nslBlue.DecimalPlaces = 0;
             this.nslBlue.Hexadecimal = false;
@@ -225,7 +228,8 @@
             // 
             // nslAlpha
             // 
-            this.nslAlpha.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.nslAlpha.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.nslAlpha.BackColor = System.Drawing.SystemColors.Window;
             this.nslAlpha.DecimalPlaces = 0;
             this.nslAlpha.Hexadecimal = false;
