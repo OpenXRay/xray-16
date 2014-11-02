@@ -65,6 +65,7 @@
     <Compile Include="Dialogs\KeyFrameBox.Designer.cs">
       <DependentUpon>KeyFrameBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="EditorEngine.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Dialogs\MainDialog.resx">

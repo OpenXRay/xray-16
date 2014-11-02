@@ -68,7 +68,6 @@ namespace xrPostprocessEditor
             this.tpBlur = new System.Windows.Forms.TabPage();
             this.tlpBlur = new System.Windows.Forms.TableLayoutPanel();
             this.pnBlur = new System.Windows.Forms.Panel();
-            this.colorPicker1 = new XRay.SdkControls.ColorPicker();
             this.kfbBlur = new xrPostprocessEditor.KeyFrameBox();
             this.tpColorMapping = new System.Windows.Forms.TabPage();
             this.tlpColorMapping = new System.Windows.Forms.TableLayoutPanel();
@@ -87,6 +86,8 @@ namespace xrPostprocessEditor
             this.miLoad = new System.Windows.Forms.ToolStripMenuItem();
             this.miSave = new System.Windows.Forms.ToolStripMenuItem();
             this.pbDrawingSurface = new System.Windows.Forms.PictureBox();
+            this.nslBlur = new XRay.SdkControls.NumericSlider();
+            this.lBlur = new System.Windows.Forms.Label();
             this.tabEffects.SuspendLayout();
             this.tpAC.SuspendLayout();
             this.tlpAC.SuspendLayout();
@@ -166,6 +167,7 @@ namespace xrPostprocessEditor
             this.kfbAC.Margin = new System.Windows.Forms.Padding(0);
             this.kfbAC.MinimumSize = new System.Drawing.Size(183, 100);
             this.kfbAC.Name = "kfbAC";
+            this.kfbAC.SelectedIndex = -1;
             this.kfbAC.Size = new System.Drawing.Size(183, 181);
             this.kfbAC.TabIndex = 0;
             // 
@@ -252,6 +254,7 @@ namespace xrPostprocessEditor
             this.kfbBC.Margin = new System.Windows.Forms.Padding(0);
             this.kfbBC.MinimumSize = new System.Drawing.Size(183, 100);
             this.kfbBC.Name = "kfbBC";
+            this.kfbBC.SelectedIndex = -1;
             this.kfbBC.Size = new System.Drawing.Size(183, 181);
             this.kfbBC.TabIndex = 0;
             // 
@@ -313,6 +316,7 @@ namespace xrPostprocessEditor
             this.kfbGC.Margin = new System.Windows.Forms.Padding(0);
             this.kfbGC.MinimumSize = new System.Drawing.Size(183, 100);
             this.kfbGC.Name = "kfbGC";
+            this.kfbGC.SelectedIndex = -1;
             this.kfbGC.Size = new System.Drawing.Size(183, 181);
             this.kfbGC.TabIndex = 0;
             // 
@@ -444,6 +448,7 @@ namespace xrPostprocessEditor
             this.kfbDuality.Margin = new System.Windows.Forms.Padding(0);
             this.kfbDuality.MinimumSize = new System.Drawing.Size(183, 100);
             this.kfbDuality.Name = "kfbDuality";
+            this.kfbDuality.SelectedIndex = -1;
             this.kfbDuality.Size = new System.Drawing.Size(183, 181);
             this.kfbDuality.TabIndex = 0;
             // 
@@ -618,6 +623,7 @@ namespace xrPostprocessEditor
             this.kfbNoise.Margin = new System.Windows.Forms.Padding(0);
             this.kfbNoise.MinimumSize = new System.Drawing.Size(183, 100);
             this.kfbNoise.Name = "kfbNoise";
+            this.kfbNoise.SelectedIndex = -1;
             this.kfbNoise.Size = new System.Drawing.Size(183, 181);
             this.kfbNoise.TabIndex = 0;
             // 
@@ -649,28 +655,14 @@ namespace xrPostprocessEditor
             // 
             // pnBlur
             // 
-            this.pnBlur.Controls.Add(this.colorPicker1);
+            this.pnBlur.Controls.Add(this.nslBlur);
+            this.pnBlur.Controls.Add(this.lBlur);
             this.pnBlur.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnBlur.Location = new System.Drawing.Point(183, 0);
             this.pnBlur.Margin = new System.Windows.Forms.Padding(0);
             this.pnBlur.Name = "pnBlur";
             this.pnBlur.Size = new System.Drawing.Size(419, 181);
             this.pnBlur.TabIndex = 2;
-            // 
-            // colorPicker1
-            // 
-            this.colorPicker1.AlphaEnabled = true;
-            this.colorPicker1.BackColor = System.Drawing.SystemColors.Window;
-            this.colorPicker1.Hexadecimal = false;
-            this.colorPicker1.Location = new System.Drawing.Point(0, 0);
-            this.colorPicker1.Margin = new System.Windows.Forms.Padding(0);
-            this.colorPicker1.MaximumSize = new System.Drawing.Size(9000, 144);
-            this.colorPicker1.MinimumSize = new System.Drawing.Size(256, 144);
-            this.colorPicker1.Name = "colorPicker1";
-            this.colorPicker1.Size = new System.Drawing.Size(264, 144);
-            this.colorPicker1.TabIndex = 1;
-            this.colorPicker1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.colorPicker1.Value = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(127)))), ((int)(((byte)(127)))));
             // 
             // kfbBlur
             // 
@@ -679,6 +671,7 @@ namespace xrPostprocessEditor
             this.kfbBlur.Margin = new System.Windows.Forms.Padding(0);
             this.kfbBlur.MinimumSize = new System.Drawing.Size(183, 100);
             this.kfbBlur.Name = "kfbBlur";
+            this.kfbBlur.SelectedIndex = -1;
             this.kfbBlur.Size = new System.Drawing.Size(183, 181);
             this.kfbBlur.TabIndex = 0;
             // 
@@ -786,6 +779,7 @@ namespace xrPostprocessEditor
             this.kfbColorMapping.Margin = new System.Windows.Forms.Padding(0);
             this.kfbColorMapping.MinimumSize = new System.Drawing.Size(183, 100);
             this.kfbColorMapping.Name = "kfbColorMapping";
+            this.kfbColorMapping.SelectedIndex = -1;
             this.kfbColorMapping.Size = new System.Drawing.Size(183, 181);
             this.kfbColorMapping.TabIndex = 0;
             // 
@@ -846,6 +840,7 @@ namespace xrPostprocessEditor
             this.miNew.ShortcutKeyDisplayString = "Ctrl+N";
             this.miNew.Size = new System.Drawing.Size(143, 22);
             this.miNew.Text = "New";
+            this.miNew.Click += new System.EventHandler(this.CreateEffect);
             // 
             // miLoad
             // 
@@ -853,6 +848,7 @@ namespace xrPostprocessEditor
             this.miLoad.ShortcutKeyDisplayString = "Ctrl+O";
             this.miLoad.Size = new System.Drawing.Size(143, 22);
             this.miLoad.Text = "Load";
+            this.miLoad.Click += new System.EventHandler(this.LoadEffect);
             // 
             // miSave
             // 
@@ -860,6 +856,7 @@ namespace xrPostprocessEditor
             this.miSave.ShortcutKeyDisplayString = "Ctrl+S";
             this.miSave.Size = new System.Drawing.Size(143, 22);
             this.miSave.Text = "Save";
+            this.miSave.Click += new System.EventHandler(this.SaveEffect);
             // 
             // pbDrawingSurface
             // 
@@ -873,6 +870,47 @@ namespace xrPostprocessEditor
             this.pbDrawingSurface.Size = new System.Drawing.Size(614, 170);
             this.pbDrawingSurface.TabIndex = 3;
             this.pbDrawingSurface.TabStop = false;
+            // 
+            // nslBlur
+            // 
+            this.nslBlur.BackColor = System.Drawing.SystemColors.Window;
+            this.nslBlur.DecimalPlaces = 2;
+            this.nslBlur.Hexadecimal = false;
+            this.nslBlur.Location = new System.Drawing.Point(55, 9);
+            this.nslBlur.Maximum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nslBlur.MaximumSize = new System.Drawing.Size(9000, 21);
+            this.nslBlur.Minimum = new decimal(new int[] {
+            0,
+            0,
+            0,
+            0});
+            this.nslBlur.MinimumSize = new System.Drawing.Size(64, 0);
+            this.nslBlur.Name = "nslBlur";
+            this.nslBlur.Size = new System.Drawing.Size(150, 21);
+            this.nslBlur.SliderPrecision = 100;
+            this.nslBlur.SpinnerWidth = 54;
+            this.nslBlur.TabIndex = 18;
+            this.nslBlur.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.nslBlur.TickFrequency = 25;
+            this.nslBlur.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.nslBlur.Value = new decimal(new int[] {
+            0,
+            0,
+            0,
+            0});
+            // 
+            // lBlur
+            // 
+            this.lBlur.AutoSize = true;
+            this.lBlur.Location = new System.Drawing.Point(3, 11);
+            this.lBlur.Name = "lBlur";
+            this.lBlur.Size = new System.Drawing.Size(40, 13);
+            this.lBlur.TabIndex = 17;
+            this.lBlur.Text = "Radius";
             // 
             // MainDialog
             // 
@@ -908,6 +946,7 @@ namespace xrPostprocessEditor
             this.tpBlur.ResumeLayout(false);
             this.tlpBlur.ResumeLayout(false);
             this.pnBlur.ResumeLayout(false);
+            this.pnBlur.PerformLayout();
             this.tpColorMapping.ResumeLayout(false);
             this.tlpColorMapping.ResumeLayout(false);
             this.pnColorMapping.ResumeLayout(false);
@@ -975,11 +1014,12 @@ namespace xrPostprocessEditor
         private Label lNoiseGrain;
         private XRay.SdkControls.NumericSlider nslNoiseGrain;
         private Label lNoiseIntensity;
-        private XRay.SdkControls.ColorPicker colorPicker1;
         private Label lColorMappingInfluence;
         private TextBox tbColorMappingTexture;
         private Label lColorMappingTexture;
         private XRay.SdkControls.NumericSlider nslColorMappingInfluence;
+        private XRay.SdkControls.NumericSlider nslBlur;
+        private Label lBlur;
     }
 }
 

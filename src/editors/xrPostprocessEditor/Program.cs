@@ -6,18 +6,20 @@ using XRay.ManagedApi.Core;
 
 namespace xrPostprocessEditor
 {
-    static class Program
+    internal static class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
         [STAThread]
         static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Core.Initialize(Application.ProductName);
-            Application.Run(new MainDialog());
+            using (var engine = new EditorEngine())
+            {
+                var mainDialog = new MainDialog();
+                mainDialog.Initialize(engine);
+                Application.Run(mainDialog);
+            }
             Core.Destroy();
         }
     }

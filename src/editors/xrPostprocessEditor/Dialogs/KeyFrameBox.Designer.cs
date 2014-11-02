@@ -44,8 +44,8 @@ namespace xrPostprocessEditor
             this.btnClear = new System.Windows.Forms.Button();
             this.btnCopyFrom = new XRay.SdkControls.MenuButton();
             this.pnBottom = new System.Windows.Forms.Panel();
-            this.lKeyFrameTime = new System.Windows.Forms.Label();
             this.numKeyFrameTime = new System.Windows.Forms.NumericUpDown();
+            this.lKeyFrameTime = new System.Windows.Forms.Label();
             this.tlpPointList.SuspendLayout();
             this.flpPointListControls.SuspendLayout();
             this.pnBottom.SuspendLayout();
@@ -160,15 +160,6 @@ namespace xrPostprocessEditor
             this.pnBottom.Size = new System.Drawing.Size(183, 21);
             this.pnBottom.TabIndex = 4;
             // 
-            // lKeyFrameTime
-            // 
-            this.lKeyFrameTime.AutoSize = true;
-            this.lKeyFrameTime.Location = new System.Drawing.Point(3, 2);
-            this.lKeyFrameTime.Name = "lKeyFrameTime";
-            this.lKeyFrameTime.Size = new System.Drawing.Size(90, 13);
-            this.lKeyFrameTime.TabIndex = 3;
-            this.lKeyFrameTime.Text = "Key frame time (s)";
-            // 
             // numKeyFrameTime
             // 
             this.numKeyFrameTime.DecimalPlaces = 2;
@@ -183,6 +174,16 @@ namespace xrPostprocessEditor
             this.numKeyFrameTime.Size = new System.Drawing.Size(80, 21);
             this.numKeyFrameTime.TabIndex = 4;
             this.numKeyFrameTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.numKeyFrameTime.ValueChanged += new System.EventHandler(this.numKeyFrameTime_ValueChanged);
+            // 
+            // lKeyFrameTime
+            // 
+            this.lKeyFrameTime.AutoSize = true;
+            this.lKeyFrameTime.Location = new System.Drawing.Point(3, 2);
+            this.lKeyFrameTime.Name = "lKeyFrameTime";
+            this.lKeyFrameTime.Size = new System.Drawing.Size(90, 13);
+            this.lKeyFrameTime.TabIndex = 3;
+            this.lKeyFrameTime.Text = "Key frame time (s)";
             // 
             // KeyFrameBox
             // 
