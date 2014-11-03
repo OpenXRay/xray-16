@@ -9,7 +9,6 @@ namespace XRay.SdkControls
     {
         public delegate void ColorChangedEventHandler(object sender, Color color);
 
-        private Color color;
         private bool hexadecimal;
         private bool ignoreOnChanged = false;
         private bool alphaEnabled = true;
@@ -24,18 +23,18 @@ namespace XRay.SdkControls
 
         public Color Value
         {
-            get { return color; }
+            get { return pbColor.ColorSample; }
             set
             {
-                if (color == value)
+                if (pbColor.ColorSample == value)
                     return;
-                color = value;
                 ignoreOnChanged = true;
                 if (alphaEnabled)
-                    nslAlpha.Value = color.A;
-                nslRed.Value = color.R;
-                nslGreen.Value = color.G;
-                nslBlue.Value = color.B;
+                    nslAlpha.Value = value.A;
+                nslRed.Value = value.R;
+                nslGreen.Value = value.G;
+                nslBlue.Value = value.B;
+                pbColor.ColorSample = value;
                 ignoreOnChanged = false;
                 UpdateColor();
             }
