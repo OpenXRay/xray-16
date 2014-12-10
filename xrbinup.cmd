@@ -42,7 +42,7 @@ if %cfg%==dbg (
   set dst=%1\_bin_rel
 )
 
-set cp_tool=cp
+set cp_tool=copy
 
 %cp_tool% %src%\%cfg_long%\xrEngine.exe %dst%\xrEngine.exe
 %cp_tool% %src%\%cfg_long%\xrAPI.dll %dst%\xrAPI.dll
@@ -71,7 +71,7 @@ if defined dbg (
 %cp_tool% %src%\%cfg_long%\ODE.dll %dst%\ODE.dll
 %cp_tool% %src%\%cfg_long%\OpenAL32.dll %dst%\OpenAL32.dll
 %cp_tool% %src%\%cfg_long%\OpenAL32.dll %dst%\dedicated\OpenAL32.dll
-%cp_tool% %src%\%cfg_long%_Dedicated\dedicated\xrEngine.exe %dst%\dedicated\xrEngine.exe
+rem %cp_tool% %src%\%cfg_long%\_Dedicated\dedicated\xrEngine.exe %dst%\dedicated\xrEngine.exe
 
 :ret
 endlocal
