@@ -277,6 +277,11 @@
     <None Include="Export\xraySkinExportOptions.mel" />
     <None Include="Export\xraySkinMotionExportOptions.mel" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\utils\xrQSlim\xrQSlim.vcxproj">
+      <Project>{f1836ce2-59ef-4189-8b9c-d103a511cb27}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

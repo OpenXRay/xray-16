@@ -2,41 +2,58 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <xrBinRootDir>$(SolutionDir)..\bin\</xrBinRootDir>
-    <xrBinPlugRootDir>$(SolutionDir)..\bin_plugs\</xrBinPlugRootDir>
-    <xrLibRootDir>$(SolutionDir)..\lib\</xrLibRootDir>
-    <xrBinDir>$(SolutionDir)..\bin\$(Configuration)\</xrBinDir>
-    <xrBinPlugDir>$(SolutionDir)..\bin_plugs\$(Configuration)\</xrBinPlugDir>
-    <xrLibDir>$(SolutionDir)..\lib\$(Configuration)\</xrLibDir>
-    <xrIntDir>$(SolutionDir)..\intermediate\$(Configuration)\</xrIntDir>
+    <xrBinRootDir>$(SolutionDir)..\_build\bin\</xrBinRootDir>
+    <xrBinPlugRootDir>$(SolutionDir)..\_build\bin_plugs\</xrBinPlugRootDir>
+    <xrLibRootDir>$(SolutionDir)..\_build\lib\</xrLibRootDir>
+    <xrBinDir>$(xrBinRootDir)$(Configuration)\</xrBinDir>
+    <xrBinPlugDir>$(xrBinPlugRootDir)$(Configuration)\</xrBinPlugDir>
+    <xrLibDir>$(xrLibRootDir)$(Configuration)\</xrLibDir>
+    <xrIntDir>$(SolutionDir)..\_build\intermediate\$(Configuration)\</xrIntDir>
     <xrSdkDir>$(SolutionDir)..\sdk\</xrSdkDir>
+    <xrGameDir>$(XRAY_16X_GAME)</xrGameDir>
+    <xrGameBinDir>$(xrGameDir)bin\</xrGameBinDir>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
   <ItemGroup>
-      <BuildMacro Include="xrBinRootDir">
+    <BuildMacro Include="xrBinRootDir">
       <Value>$(xrBinRootDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
     <BuildMacro Include="xrBinPlugRootDir">
       <Value>$(xrBinPlugRootDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
     <BuildMacro Include="xrLibRootDir">
       <Value>$(xrLibRootDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
     <BuildMacro Include="xrBinDir">
       <Value>$(xrBinDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
     <BuildMacro Include="xrBinPlugDir">
       <Value>$(xrBinPlugDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
     <BuildMacro Include="xrLibDir">
       <Value>$(xrLibDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
     <BuildMacro Include="xrIntDir">
       <Value>$(xrIntDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
     <BuildMacro Include="xrSdkDir">
       <Value>$(xrSdkDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="xrGameDir">
+      <Value>$(xrGameDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="xrGameBinDir">
+      <Value>$(xrGameBinDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
   </ItemGroup>
 </Project>
