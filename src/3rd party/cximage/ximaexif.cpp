@@ -7,6 +7,7 @@
  */
 
 #include "ximajpg.h"
+#include "ximacfg.h"
 
 #if CXIMAGEJPG_SUPPORT_EXIF
 
