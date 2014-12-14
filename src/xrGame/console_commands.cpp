@@ -1186,7 +1186,7 @@ public:
 */
 #endif
 
-#ifndef MASTER_GOLD
+//#ifndef MASTER_GOLD
 #	include "game_graph.h"
 struct CCC_JumpToLevel : public IConsole_Command {
 	CCC_JumpToLevel(LPCSTR N) : IConsole_Command(N)  {};
@@ -1341,7 +1341,7 @@ public:
 	}
 };
 
-#endif // MASTER_GOLD
+//#endif // MASTER_GOLD
 
 #include "GamePersistent.h"
 
@@ -1835,17 +1835,17 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"hud_crosshair",		&psHUD_Flags,	HUD_CROSSHAIR);
 	CMD3(CCC_Mask,				"hud_crosshair_dist",	&psHUD_Flags,	HUD_CROSSHAIR_DIST);
 
-#ifdef DEBUG
+//#ifdef DEBUG
 	CMD4(CCC_Float,				"hud_fov",				&psHUD_FOV,		0.1f,	1.0f);
 	CMD4(CCC_Float,				"fov",					&g_fov,			5.0f,	180.0f);
-#endif // DEBUG
+//#endif // DEBUG
 
 	// Demo
-#if 1//ndef MASTER_GOLD
+//#ifndef MASTER_GOLD
 	CMD1(CCC_DemoPlay,			"demo_play"				);
 	CMD1(CCC_DemoRecord,		"demo_record"			);
 	CMD1(CCC_DemoRecordSetPos,	"demo_set_cam_position"	);
-#endif // #ifndef MASTER_GOLD
+//#endif // #ifndef MASTER_GOLD
 	
 #ifndef MASTER_GOLD
 	// ai
@@ -1975,14 +1975,14 @@ CMD4(CCC_Integer,			"hit_anims_tune",						&tune_hit_anims,		0, 1);
 	CMD3(CCC_Mask,				"g_no_clip",					&psActorFlags,	AF_NO_CLIP	);
 #endif // DEBUG
 
-#ifndef MASTER_GOLD
+//#ifndef MASTER_GOLD
 	CMD1(CCC_JumpToLevel,	"jump_to_level"		);
 	CMD3(CCC_Mask,			"g_god",			&psActorFlags,	AF_GODMODE	);
 	CMD3(CCC_Mask,			"g_unlimitedammo",	&psActorFlags,	AF_UNLIMITEDAMMO);
 	CMD1(CCC_Script,		"run_script");
 	CMD1(CCC_ScriptCommand,	"run_string");
 	CMD1(CCC_TimeFactor,	"time_factor");		
-#endif // MASTER_GOLD
+//#endif // MASTER_GOLD
 
 	CMD3(CCC_Mask,		"g_autopickup",			&psActorFlags,	AF_AUTOPICKUP);
 	CMD3(CCC_Mask,		"g_dynamic_music",		&psActorFlags,	AF_DYNAMIC_MUSIC);

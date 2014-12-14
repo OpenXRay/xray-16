@@ -459,7 +459,7 @@ bool allow_intro()
 
 bool allow_logo() // AVO: skip NVIDIA and other logos at load time
 {
-    if (0 != strstr(Core.Params, "-nologo"))
+    if (0 != strstr(Core.Params, "-skiplogo"))
     {
         return false;
     }
