@@ -85,6 +85,11 @@ function actor_binder:net_destroy()
 	self.object:set_callback(callback.take_item_from_box, nil)
 	self.object:set_callback(callback.use_object, nil)
 
+	----| aVo |--------------------------------------------------------------------
+	self.object:set_callback(callback.hit, nil)
+	--self.object:set_callback(123, nil)
+	----| end:aVo |----------------------------------------------------------------
+
 	log("--------->"..tostring(_G.amb_vol))
 	log("--------->"..tostring(_G.mus_vol))
 	if(_G.amb_vol~=0) then
@@ -118,7 +123,25 @@ function actor_binder:reinit()
 	self.object:set_callback(callback.task_state, self.task_callback, self)
 	self.object:set_callback(callback.take_item_from_box, self.take_item_from_box, self)
 	self.object:set_callback(callback.use_object, self.use_inventory_item, self)
+	
+	----| aVo |--------------------------------------------------------------------
+	self.object:set_callback(callback.hit, self.actor_hit, self)
+	-- self.object:set_callback(123, self.key_press, self)
+	----| end:aVo |----------------------------------------------------------------
 end
+---------------------------------------------------------------------------------------------------------------------
+
+
+----| aVo |--------------------------------------------------------------------
+-- Actor hit callback
+function actor_binder:actor_hit(obj, amount, local_direction, who, bone_index)
+	-- local msg = string.format("actor_hit %f, %i", amount, bone_index)
+	-- get_console():execute("load ~:"..msg)
+end
+-- x-ray extensions key press callback
+--function actor_binder:key_press(key)
+	--sm:call("key_press", key)
+--end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:take_item_from_box(box, item)
 	local box_name = box:name()
