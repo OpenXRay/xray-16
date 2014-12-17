@@ -1,0 +1,20 @@
+This directory contains some useful files and code.
+Unlike the code in ../src, everything here is in the public domain.
+
+lua.hpp
+	Lua header files for C++ using 'extern "C"'.
+
+luajit.ico
+	A LuaJIT icon for Windows (and web sites: save as favicon.ico).
+	Lua icon drawn by hand by Markus Gritsch. Modified for LuaJIT.
+
+luajit.pc
+	pkg-config data for LuaJIT
+
+luavs.bat
+	Script to build LuaJIT under "Visual Studio .NET Command Prompt".
+	Run it from the toplevel as etc\luavs.bat.
+
+strict.lua
+	Traps uses of undeclared global variables.
+
