@@ -120,6 +120,9 @@
     <ClCompile Include="src\lzio.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\lua.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\lapi.h">

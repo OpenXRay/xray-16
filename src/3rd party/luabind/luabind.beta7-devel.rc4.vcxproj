@@ -227,9 +227,13 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\luajit\lua.JIT.1.1.4.vcxproj">
-      <Project>{f6c4f74a-152c-4612-9e3b-d02346234855}</Project>
+    <ProjectReference Include="..\LuaJIT-1.1.8\LuaJIT-1.1.8.vcxproj">
+      <Project>{2ac1029e-e582-40cf-9cd1-5efa4211afc9}</Project>
+      <Private>false</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

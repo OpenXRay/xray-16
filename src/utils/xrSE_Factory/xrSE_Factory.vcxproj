@@ -691,9 +691,8 @@
       <Project>{cc52e0b3-cc35-4934-9302-035b748f3f2c}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\3rd party\luajit\lua.JIT.1.1.4.vcxproj">
-      <Project>{f6c4f74a-152c-4612-9e3b-d02346234855}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    <ProjectReference Include="..\..\3rd party\LuaJIT-1.1.8\LuaJIT-1.1.8.vcxproj">
+      <Project>{2ac1029e-e582-40cf-9cd1-5efa4211afc9}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
