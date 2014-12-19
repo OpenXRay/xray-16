@@ -24,6 +24,8 @@
 
 #include "Include/xrRender/DebugRender.h"
 
+#include "Common/Config.hpp"
+
 #ifdef DEBUG
 #include "ai/monsters/BaseMonster/base_monster.h"
 
@@ -45,6 +47,11 @@ void CLevel::IR_OnMouseWheel(int direction)
 {
     if (g_bDisableAllInput)
         return;
+
+    /* avo: script callback */
+    if (g_actor)
+        g_actor->callback(GameObject::eMouseWheel)(direction);
+    /* avo: end */
 
     if (CurrentGameUI()->IR_UIOnMouseWheel(direction))
         return;
@@ -72,6 +79,14 @@ void CLevel::IR_OnMouseMove(int dx, int dy)
 {
     if (g_bDisableAllInput)
         return;
+
+#ifdef MOUSE_MOVE_CALLBACK
+    /* avo: script callback */
+    if (g_actor)
+        g_actor->callback(GameObject::eMouseMove)(dx, dy);
+    /* avo: end */
+#endif // MOUSE_MOVE_CALLBACK
+
     if (CurrentGameUI()->IR_UIOnMouseMove(dx, dy))
         return;
     if (Device.Paused() && !IsDemoPlay()
@@ -111,6 +126,11 @@ void CLevel::IR_OnKeyboardPress(int key)
     bool b_ui_exist = (!!CurrentGameUI());
 
     EGameActions _curr = get_binded_action(key);
+
+    /* avo: script callback */
+    if (!g_bDisableAllInput && g_actor)
+        g_actor->callback(GameObject::eKeyPress)(key);
+    /* avo: end */
 
     if (_curr == kPAUSE)
     {
@@ -483,6 +503,14 @@ void CLevel::IR_OnKeyboardRelease(int key)
 {
     if (!bReady || g_bDisableAllInput)
         return;
+
+#ifdef KEY_RELEASE_CALLBACK
+    /* avo: script callback */
+    if (g_actor)
+        g_actor->callback(GameObject::eKeyRelease)(key);
+    /* avo: end */
+#endif // KEY_RELEASE_CALLBACK
+
     if (CurrentGameUI() && CurrentGameUI()->IR_UIOnKeyboardRelease(key))
         return;
     if (game && game->OnKeyboardRelease(get_binded_action(key)))
@@ -506,6 +534,13 @@ void CLevel::IR_OnKeyboardHold(int key)
 {
     if (g_bDisableAllInput)
         return;
+
+#ifdef KEY_HOLD_CALLBACK
+    /* avo: script callback */
+    if (g_actor)
+        g_actor->callback(GameObject::eKeyHold)(key);
+    /* avo: end */
+#endif // KEY_HOLD_CALLBACK
 
 #ifdef DEBUG
     // Lain: added

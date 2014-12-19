@@ -73,6 +73,8 @@
 #include "ActorHelmet.h"
 #include "UI/UIDragDropReferenceList.h"
 
+#include "Common/Config.hpp"
+
 const u32 patch_frames = 50;
 const float respawn_delay = 1.f;
 const float respawn_auto = 7.f;
@@ -808,7 +810,11 @@ void CActor::Die(IGameObject* who)
 
     if (IsGameTypeSingle())
     {
+#ifdef FP_DEATH
+        cam_Set(eacFirstEye);
+#else
         cam_Set(eacFreeLook);
+#endif // FP_DEATH
         CurrentGameUI()->HideShownDialogs();
         start_tutorial("game_over");
     }
