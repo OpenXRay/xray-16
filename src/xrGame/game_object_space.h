@@ -1,58 +1,72 @@
 #pragma once
 
-namespace GameObject {
-	enum ECallbackType {
-		eTradeStart = u32(0),
-		eTradeStop,
-		eTradeSellBuyItem,
-		eTradePerformTradeOperation,
+namespace GameObject
+{
+    enum ECallbackType
+    {
+        eTradeStart = u32(0),
+        eTradeStop,
+        eTradeSellBuyItem,
+        eTradePerformTradeOperation,
 
-		eZoneEnter,
-		eZoneExit,
-		eExitLevelBorder,
-		eEnterLevelBorder,
-		eDeath,
+        eZoneEnter,
+        eZoneExit,
+        eExitLevelBorder,
+        eEnterLevelBorder,
+        eDeath,
 
-		ePatrolPathInPoint,
+        ePatrolPathInPoint,
 
-		eInventoryPda,
-		eInventoryInfo,
-		eArticleInfo,
-		eTaskStateChange,
-		eMapLocationAdded,
+        eInventoryPda,
+        eInventoryInfo,
+        eArticleInfo,
+        eTaskStateChange,
+        eMapLocationAdded,
 
-		eUseObject,
+        eUseObject,
 
-		eHit,
+        eHit,
 
-		eSound,
+        eSound,
 
-		eActionTypeMovement,
-		eActionTypeWatch,
-		eActionTypeRemoved,
-		eActionTypeAnimation,
-		eActionTypeSound,
-		eActionTypeParticle,
-		eActionTypeObject,
+        eActionTypeMovement,
+        eActionTypeWatch,
+        eActionTypeRemoved,
+        eActionTypeAnimation,
+        eActionTypeSound,
+        eActionTypeParticle,
+        eActionTypeObject,
 
-		eActorSleep,
+        eActorSleep,
 
-		eHelicopterOnPoint,
-		eHelicopterOnHit,
+        eHelicopterOnPoint,
+        eHelicopterOnHit,
 
-		eOnItemTake,
-		eOnItemDrop,
+        eOnItemTake,
+        eOnItemDrop,
 
-		eScriptAnimation,
-		
-		eTraderGlobalAnimationRequest,
-		eTraderHeadAnimationRequest,
-		eTraderSoundEnd,
+        eScriptAnimation,
 
-		eInvBoxItemTake,
-		eWeaponNoAmmoAvailable,
+        eTraderGlobalAnimationRequest,
+        eTraderHeadAnimationRequest,
+        eTraderSoundEnd,
 
-		eDummy = u32(-1),
-	};
+        eInvBoxItemTake,
+        eWeaponNoAmmoAvailable,
+
+        /* avo: custom callbacks */
+        // input
+        eKeyPress,
+        eKeyRelease,
+        eKeyHold,
+        eMouseMove,
+        eMouseWheel,
+        // inventory
+        eItemToBelt,
+        eItemToSlot,
+        eItemToRuck,
+        /* avo: end */
+
+        eDummy = u32(-1),
+    };
 };
-
