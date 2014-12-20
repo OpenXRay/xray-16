@@ -9,8 +9,9 @@ and work on the source code
 
 * Build instructions can be found [here](https://github.com/openxray/xray-16/blob/master/doc/howto/build.txt).
 * If you find a bug or have an enhancement request, file an [Issue](https://github.com/openxray/xray-16/issues).
-* Detailed description of changes and instructions can be found on WIKI pages
+* Detailed description of changes and instructions can be found on [WIKI pages](https://github.com/avoitishin/xray-16/wiki)
 
+---
 Pull requests appreciated! Just check out 
 [the task list](https://github.com/openxray/xray-16/blob/master/doc/design/task_list.txt) 
 and follow our [procedures](https://github.com/OpenXRay/xray-16/tree/master/doc/procedure).
