@@ -11,6 +11,6 @@ and work on the source code
 * Detailed description of changes and instructions can be found on [WIKI pages](https://github.com/avoitishin/xray-16/wiki)
 
 ---
-> Pull requests appreciated! Just check out 
+Pull requests appreciated! Just check out 
 [the task list](https://github.com/openxray/xray-16/blob/master/doc/design/task_list.txt) 
 and follow our [procedures](https://github.com/OpenXRay/xray-16/tree/master/doc/procedure).
