@@ -3,7 +3,7 @@
 This repository contains XRAY Engine sources based on version 1.6.02.
 The original engine is used in S.T.A.L.K.E.R. Call of Pripyat game released by GSC Game World and any changes to this engine are allowed for ***non-commercial*** use only.
 
-**Note** that [Master](https://github.com/avoitishin/xray-16/tree/master) branch contains stable code that is documented on [Wiki](https://github.com/avoitishin/xray-16/wiki) but you cal also checkout [Working](https://github.com/avoitishin/xray-16/tree/working) branch for nightly builds
+**Note** that [Master](https://github.com/avoitishin/xray-16/tree/master) branch contains stable code that is documented on [Wiki](https://github.com/avoitishin/xray-16/wiki) but you can also checkout [Working](https://github.com/avoitishin/xray-16/tree/working) for nightly builds
 
 * Build instructions can be found [here](https://github.com/openxray/xray-16/blob/master/doc/howto/build.txt) (**not** updated for this code base yet).
 * If you find a bug or have an enhancement request, file an [Issue](https://github.com/openxray/xray-16/issues).
