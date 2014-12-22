@@ -13,6 +13,7 @@
 #include "uiabstract.h"
 #include "xrUIXmlParser.h"
 #include "Include/xrRender/UIShader.h"
+#include <iostream>
 
 xr_map<shared_str, TEX_INFO> CUITextureMaster::m_textures;
 xr_map<sh_pair, ui_shader> CUITextureMaster::m_shaders;
@@ -50,7 +51,15 @@ void CUITextureMaster::ParseShTexInfo(LPCSTR xml_file)
             info.rect.y1 = xml.ReadAttribFlt(node, "texture", i, "y");
             info.rect.y2 = xml.ReadAttribFlt(node, "texture", i, "height") + info.rect.y1;
             shared_str id = xml.ReadAttrib(node, "texture", i, "id");
-            m_textures.insert(std::make_pair(id, info));
+            /* avo: fix issue when values were not updated (silently skipped) when same key is encountered more than once. This is how std::map is designed. 
+            /* Also used more efficient C++11 std::map::emplace method instead of outdated std::pair::make_pair */
+            /* XXX: avo: note that xxx.insert(mk_pair(v1,v2)) pattern is used extensively throughout solution so there is a good potential for other bug fixes/improvements */
+            if (m_textures.find(id) == m_textures.end())
+                m_textures.emplace(id, info);
+            else
+                m_textures[id] = info;
+            /* avo: end */
+            //m_textures.insert(mk_pair(id,info)); // original GSC insert call
         }
 
         xml.SetLocalRoot(root_node);
