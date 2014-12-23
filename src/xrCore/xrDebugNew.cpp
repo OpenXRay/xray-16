@@ -24,7 +24,7 @@ extern bool shared_str_initialized;
 static BOOL bException = TRUE;
 # define USE_BUG_TRAP
 #else
-# define USE_BUG_TRAP
+//# define USE_BUG_TRAP
 # define DEBUG_INVOKE __asm int 3
 static BOOL bException = FALSE;
 #endif
@@ -53,7 +53,7 @@ static BOOL bException = FALSE;
 #include <new.h> // for _set_new_mode
 #include <signal.h> // for signals
 
-#ifdef DEBUG
+#if 1//def DEBUG
 # define USE_OWN_ERROR_MESSAGE_WINDOW
 #else // DEBUG
 # define USE_OWN_MINI_DUMP
@@ -199,9 +199,10 @@ void xrDebug::backend(const char* expression, const char* description, const cha
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
     LPCSTR endline = "\r\n";
     LPSTR buffer = assertion_info + xr_strlen(assertion_info);
-    buffer += xr_sprintf(buffer, sizeof(assertion_info) - u32(buffer - &assertion_info[0]), "%sPress CANCEL to abort execution%s", endline, endline);
+    buffer += xr_sprintf(buffer, sizeof(assertion_info) - u32(buffer - &assertion_info[0]), "%sPress OK to abort execution%s", endline, endline);
+    /*buffer += xr_sprintf(buffer, sizeof(assertion_info) - u32(buffer - &assertion_info[0]), "%sPress CANCEL to abort execution%s", endline, endline);
     buffer += xr_sprintf(buffer, sizeof(assertion_info) - u32(buffer - &assertion_info[0]), "Press TRY AGAIN to continue execution%s", endline);
-    buffer += xr_sprintf(buffer, sizeof(assertion_info) - u32(buffer - &assertion_info[0]), "Press CONTINUE to continue execution and ignore all the errors of this type%s%s", endline, endline);
+    buffer += xr_sprintf(buffer, sizeof(assertion_info) - u32(buffer - &assertion_info[0]), "Press CONTINUE to continue execution and ignore all the errors of this type%s%s", endline, endline);*/
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
 
     if (handler)
@@ -216,12 +217,14 @@ void xrDebug::backend(const char* expression, const char* description, const cha
     MessageBox (NULL,assertion_info,"X-Ray error",MB_OK|MB_ICONERROR|MB_SYSTEMMODAL);
 #else
 # ifdef USE_OWN_ERROR_MESSAGE_WINDOW
+    ShowCursor(true);
+    ShowWindow(GetActiveWindow(), SW_FORCEMINIMIZE);
     int result =
         MessageBox(
             GetTopWindow(NULL),
             assertion_info,
             "Fatal Error",
-            MB_CANCELTRYCONTINUE | MB_ICONERROR | MB_SYSTEMMODAL
+            /*MB_CANCELTRYCONTINUE*/MB_OK | MB_ICONERROR | /*MB_SYSTEMMODAL |*/ MB_DEFBUTTON1 | MB_SETFOREGROUND
         );
 
     switch (result)
@@ -245,6 +248,11 @@ void xrDebug::backend(const char* expression, const char* description, const cha
         ignore_always = true;
         break;
     }
+    case IDOK:
+    {
+        FlushLog();
+        TerminateProcess(GetCurrentProcess(), 1);
+    }
     default:
         NODEFAULT;
     }
@@ -260,6 +268,7 @@ void xrDebug::backend(const char* expression, const char* description, const cha
         get_on_dialog() (false);
 
     CS.Leave();
+
 }
 
 LPCSTR xrDebug::error2string(long code)
@@ -763,7 +772,7 @@ void _terminate ()
 
     LPCSTR endline = "\r\n";
     LPSTR buffer = assertion_info + xr_strlen(assertion_info);
-    buffer += xr_sprintf(buffer,"Press OK to abort execution%s",endline);
+    buffer += xr_sprintf(buffer, sizeof(buffer), "Press OK to abort execution%s",endline);
 
     MessageBox (
         GetTopWindow(NULL),
