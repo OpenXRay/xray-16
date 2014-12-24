@@ -303,10 +303,10 @@ void CScriptStorage::reinit	()
 	luajit::open_lib	(lua(),	LUA_STRLIBNAME,		luaopen_string);
 
 //#ifdef DEBUG
-    if (strstr(Core.Params, "-dbg"))
-    {
+    //if (strstr(Core.Params, "-dbg"))
+    //{
         luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
-    }
+    //}
 //#endif // #ifdef DEBUG
 
 	if (!strstr(Core.Params,"-nojit")) {
