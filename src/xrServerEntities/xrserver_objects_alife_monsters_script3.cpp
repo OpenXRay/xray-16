@@ -63,6 +63,7 @@ static void CSE_ALifeOnlineOfflineGroup_Export(lua_State* luaState)
             .def("add_location_type", &CSE_ALifeOnlineOfflineGroup::add_location_type)
             .def("clear_location_types", &CSE_ALifeOnlineOfflineGroup::clear_location_types)
             .def("force_change_position", &CSE_ALifeOnlineOfflineGroup::force_change_position)
+            //.def("force_change_game_vertex_id", &CSE_ALifeOnlineOfflineGroup::force_change_game_vertex_id)
 #endif
     ];
 }

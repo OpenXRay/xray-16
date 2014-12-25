@@ -720,6 +720,7 @@ public:
     void clear_location_types();
     void add_location_type(LPCSTR mask);
     void force_change_position(Fvector position);
+    //void force_change_game_vertex_id(u32 game_vertex_id);
     virtual void on_failed_switch_online();
 #else
 public:
