@@ -854,7 +854,26 @@ void CActor::Die(CObject* who)
         cam_Set(eacFreeLook);
 #endif // FP_DEATH
         CurrentGameUI()->HideShownDialogs();
-        //start_tutorial("game_over");
+        
+        /* avo: attempt to set camera on timer */
+        /*CTimer T;
+        T.Start();
+
+        if (!SwitchToThread())
+        Sleep(2);
+
+        while (true)
+        {
+        if (T.GetElapsed_sec() == 5)
+        {
+        cam_Set(eacFreeLook);
+        start_tutorial("game_over");
+        break;
+        }
+        }*/
+        /* avo: end */
+
+        start_tutorial("game_over");
     }
     else
     {
