@@ -355,13 +355,12 @@ void CSE_ALifeOnlineOfflineGroup::force_change_position(Fvector position)
 
 //Alundaio: force new graph location
 /*
-void CSE_ALifeOnlineOfflineGroup::force_change_game_vertex_id(u32 game_vertex_id)
+void CSE_ALifeOnlineOfflineGroup::force_change_game_vertex_id(GameGraph::_GRAPH_ID game_vertex_id)
 {
 	if (game_vertex_id && ai().game_graph().valid_vertex_id(game_vertex_id))
 	{
-		const CGameGraph::CVertex vertex = *ai().game_graph().vertex(game_vertex_id);
-		m_tNodeID = vertex.level_vertex_id;
-		o_Position = vertex.level_point;
+		m_tNodeID = ai().game_graph().vertex(game_vertex_id)->level_vertex_id();
+		o_Position = ai().game_graph().vertex(game_vertex_id)->level_point();
 
 		if (m_tGraphID != game_vertex_id)
 		{

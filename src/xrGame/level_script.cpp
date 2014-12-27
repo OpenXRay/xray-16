@@ -36,6 +36,7 @@
 #include "ui/UIInventoryUtilities.h"
 #include "alife_object_registry.h"
 #include "xrServer_Objects_ALife_Monsters.h"
+#include "hudmanager.h"
 
 using namespace luabind;
 
@@ -704,6 +705,31 @@ bool has_active_tutotial()
 	return (g_tutorial!=NULL);
 }
 
+//Alundaio: namespace level exports extension
+
+//ability to update level netpacket
+void g_send(NET_Packet& P, bool bReliable = 0, bool bSequential = 1, bool bHighPriority = 0, bool bSendImmediately = 0)
+{
+	Level().Send(P,net_flags(bReliable,bSequential,bHighPriority,bSendImmediately));
+}
+
+//ability to get the target game_object at crosshair
+CGameObject* g_get_target_obj()
+{
+	collide::rq_result& RQ = HUD().GetCurrentRayQuery();
+	CGameObject* object = smart_cast<CGameObject*>(RQ.O);
+	if (object)
+		return object;
+}
+
+float g_get_target_dist()
+{
+	collide::rq_result& RQ = HUD().GetCurrentRayQuery();
+	CGameObject* object = smart_cast<CGameObject*>(RQ.O);
+	if (object)
+		return RQ.range;
+}
+//Alundaio: END
 
 
 #pragma optimize("s",on)
@@ -718,6 +744,12 @@ void CLevel::script_register(lua_State *L)
 
 	module(L,"level")
 	[
+		//Alundaio: Extend level namespace exports
+		def("send", g_send), //allow the ability to send netpacket to level
+		//def("ray_pick",g_ray_pick),
+		def("get_target_obj",g_get_target_obj), //intentionally named to what is in xray extensions
+		def("get_target_dist",g_get_target_dist),
+		//Alundaio: END
 		// obsolete\deprecated
 		def("object_by_id",						get_object_by_id),
 #ifdef DEBUG

@@ -742,7 +742,7 @@ struct raii_guard : private boost::noncopyable {
 #ifdef DEBUG
 			static bool const break_on_assert	= !!strstr(Core.Params,"-break_on_assert");
 #else // #ifdef DEBUG
-			static bool const break_on_assert	= true;
+			static bool const break_on_assert	= false; //Alundaio: Can't get a proper stack trace with this enabled
 #endif // #ifdef DEBUG
 			if ( !m_error_code  )
 				return;
