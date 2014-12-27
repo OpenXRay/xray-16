@@ -208,9 +208,6 @@ void CStalkerActionRetreatFromEnemy::execute()
     if (!object().memory().enemy().selected())
         return;
 
-    if (!object().memory().enemy().selected())
-        return;
-
     object().movement().set_movement_type(eMovementTypeRun);
     object().movement().set_path_type(MovementManager::ePathTypeLevelPath);
     object().movement().set_detail_path_type(DetailPathManager::eDetailPathTypeSmooth);
@@ -437,27 +434,26 @@ void CStalkerActionKillEnemy::execute()
 #endif // TEST_MENTAL_STATE
 
     inherited::execute();
-
-    object().sight().setup(CSightAction(object().memory().enemy().selected(), true, true));
-
-    //	u32									min_queue_size, max_queue_size, min_queue_interval, max_queue_interval;
-    //	float								distance =
-    // object().memory().enemy().selected()->Position().distance_to(object().Position());
-    //	select_queue_params					(distance,min_queue_size, max_queue_size, min_queue_interval,
-    // max_queue_interval);
-    //	object().CObjectHandler::set_goal	(eObjectActionFire1,object().best_weapon(),min_queue_size, max_queue_size,
-    // min_queue_interval, max_queue_interval);
-    fire();
-
-    if (object().memory().enemy().selected())
+    //Alundaio
+    if (object().memory().enemy().selected() && object().memory().enemy().selected()->g_Alive())
     {
+        object().sight().setup(CSightAction(object().memory().enemy().selected(), true, true));
+
+        // u32 min_queue_size, max_queue_size, min_queue_interval, max_queue_interval;
+        // float distance = object().memory().enemy().selected()->Position().distance_to(object().Position());
+        // select_queue_params(distance,min_queue_size, max_queue_size, min_queue_interval, max_queue_interval);
+        // object().CObjectHandler::set_goal (eObjectActionFire1,object().best_weapon(),min_queue_size, max_queue_size, min_queue_interval, max_queue_interval);
+        fire();
+
         CMemoryInfo mem_object = object().memory().memory(object().memory().enemy().selected());
 
         if (mem_object.m_object)
-        {
             object().best_cover(mem_object.m_object_params.m_position);
-        }
     }
+    else
+        object().sight().setup(CSightAction(SightManager::eSightTypePathDirection, true, true));
+
+    //Alundaio: END
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -488,7 +484,7 @@ void CStalkerActionTakeCover::initialize()
     m_storage->set_property(eWorldPropertyEnemyDetoured, false);
 
 #ifndef SILENT_COMBAT
-    if (object().memory().enemy().selected()->human_being())
+    if (object().memory().enemy().selected() && object().memory().enemy().selected()->human_being())
     {
         if (object().agent_manager().member().can_cry_noninfo_phrase())
             if (object().Position().distance_to_sqr(object().memory().enemy().selected()->Position()) < _sqr(10.f))
@@ -507,6 +503,9 @@ void CStalkerActionTakeCover::execute()
 #endif // TEST_MENTAL_STATE
 
     inherited::execute();
+
+    if (!object().memory().enemy().selected())
+        return;
 
     CMemoryInfo mem_object = object().memory().memory(object().memory().enemy().selected());
 
@@ -625,6 +624,9 @@ void CStalkerActionLookOut::execute()
 
     inherited::execute();
 
+    if (!object().memory().enemy().selected())
+        return;
+
     CMemoryInfo mem_object = object().memory().memory(object().memory().enemy().selected());
 
     if (!mem_object.m_object)
@@ -709,6 +711,9 @@ void CStalkerActionHoldPosition::execute()
 #endif // TEST_MENTAL_STATE
 
     inherited::execute();
+
+    if (!object().memory().enemy().selected())
+        return;
 
     CMemoryInfo mem_object = object().memory().memory(object().memory().enemy().selected());
 
@@ -1016,7 +1021,7 @@ void CStalkerActionSuddenAttack::execute()
 
     inherited::execute();
 
-    //Alundaio: Removed check to allow stalkers to sneak up on enemy even if they are in a squad; most likely removed because of friendly fire but not an issue with rx_ff scheme
+    //Alundaio: Removed check to allow stalkers to sneak up on enemy even if they are in a group.
     //if (object().agent_manager().member().combat_members().size() > 1)
     //    m_storage->set_property(eWorldPropertyUseSuddenness, false);
     //Alundaio: END
@@ -1093,7 +1098,7 @@ void CStalkerActionSuddenAttack::execute()
 
     CVisualMemoryManager* visual_memory_manager = object().memory().enemy().selected()->visual_memory();
     VERIFY(visual_memory_manager);
-    if (!visual_memory_manager->visible_now(&object()))
+    if (object().memory().enemy().selected()->g_Alive() && !visual_memory_manager->visible_now(&object()))
         return;
 
     m_storage->set_property(eWorldPropertyUseSuddenness, false);
@@ -1179,16 +1184,19 @@ void CStalkerActionCriticalHit::initialize()
     object().brain().affect_cover(false);
     object().movement().set_movement_type(eMovementTypeStand);
 
-    if (object().memory().enemy().selected())
+    if (object().inventory().ActiveItem() && object().best_weapon() && (object().inventory().ActiveItem()->object().ID() == object().best_weapon()->object().ID()))
     {
-        u32 min_queue_size, max_queue_size, min_queue_interval, max_queue_interval;
-        float distance = object().memory().enemy().selected()->Position().distance_to(object().Position());
-        select_queue_params(distance, min_queue_size, max_queue_size, min_queue_interval, max_queue_interval);
-        object().CObjectHandler::set_goal(eObjectActionIdle, object().best_weapon(), min_queue_size, max_queue_size,
-            min_queue_interval, max_queue_interval);
+        if (object().memory().enemy().selected())
+        {
+            u32 min_queue_size, max_queue_size, min_queue_interval, max_queue_interval;
+            float distance = object().memory().enemy().selected()->Position().distance_to(object().Position());
+            select_queue_params(distance, min_queue_size, max_queue_size, min_queue_interval, max_queue_interval);
+            object().set_goal(eObjectActionIdle, object().best_weapon(), min_queue_size, max_queue_size,
+                              min_queue_interval, max_queue_interval);
+        }
+        else
+            object().set_goal(eObjectActionIdle, object().best_weapon());
     }
-    else
-        object().CObjectHandler::set_goal(eObjectActionIdle, object().best_weapon());
 
     object().sight().setup(CSightAction(SightManager::eSightTypeCurrentDirection, true, true));
     object().sound().play(eStalkerSoundInjuring);

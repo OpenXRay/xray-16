@@ -352,6 +352,10 @@ SCRIPT_EXPORT(CALifeSimulator, (), {
                          .def("dont_has_info", &dont_has_info)
                          .def("switch_distance", &CALifeSimulator::switch_distance)
                          .def("switch_distance", &CALifeSimulator::set_switch_distance)
+                         //Alundaio: extend alife simulator exports
+                         .def("jump_to_level", (void (CALifeSimulator::*) (LPCSTR))(&CALifeSimulator::jump_to_level))
+                         .def("teleport_object", (void (CALifeSimulator::*) (ALife::_OBJECT_ID, GameGraph::_GRAPH_ID, u32, Fvector))(&CALifeSimulator::teleport_object))
+                         //Alundaio: END
 
                          ,
         def("alife", &alife)];
