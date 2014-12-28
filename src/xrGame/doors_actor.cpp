@@ -10,6 +10,7 @@
 #include "ai/stalker/ai_stalker.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "debug_renderer.h"
+#include "script_game_object.h" //Alundaio
 
 using doors::actor;
 using doors::door;
@@ -47,6 +48,13 @@ pcstr actor::get_name				( ) const
 {
 	return							m_object.cName().c_str();
 }
+
+//Alundaio: add the ability to get lua game object
+CScriptGameObject *actor::lua_game_object() const
+{
+	return m_object.lua_game_object();
+}
+//Alundaio: END
 
 void actor::revert_states			( doors_type& doors, door_state const state )
 {

@@ -151,7 +151,8 @@ void door::unlock				( )
 #endif // #ifdef DEBUG
 }
 
-void door::change_state			( )
+//Alundaio: Modified to pass the initiator to ph_door:use_callback
+void door::change_state(actor* initiator)
 {
 	VERIFY						( valid(m_state) );
 	VERIFY						( valid(m_target_state) );
@@ -160,12 +161,13 @@ void door::change_state			( )
 	if ( m_state == m_target_state )
 		return;
 
-	m_object.callback(GameObject::eUseObject)( m_object.lua_game_object(), (CScriptGameObject*)0 );
+	m_object.callback(GameObject::eUseObject)( m_object.lua_game_object(), (CScriptGameObject*) initiator->lua_game_object() );
 #ifdef DEBUG
 	if ( g_debug_doors)
 		Msg						( "door[%s] started to change its state to [%s]", m_object.cName().c_str(), m_target_state == door_state_open ? "open" : "closed" );
 #endif // #ifdef DEBUG
 }
+//Alundaio: END
 
 void door::change_state			( actor* const initiator, door_state const start_state, door_state const stop_state )
 {
@@ -186,7 +188,7 @@ void door::change_state			( actor* const initiator, door_state const start_state
 //		if ( !xr_strcmp( "sim_default_duty_28212", initiator->get_name()) ) {
 //			int i=0; (void)i;
 //		}
-		change_state			( );
+		change_state(initiator); //Alundaio: Pass the initator! We need to know who is trying to open door!
 		return;
 	}
 
@@ -229,7 +231,7 @@ void door::change_state			( actor* const initiator, door_state const start_state
 //		if ( !xr_strcmp( "sim_default_duty_28212", initiator->get_name()) ) {
 //			int i=0; (void)i;
 //		}
-		change_state			( );
+		change_state			(initiator); //Alundaio: Pass the initator! We need to know who is trying to open door!
 	}
 	else
 		VERIFY					( m_previous_state == stop_state );
@@ -261,7 +263,7 @@ void door::on_change_state		( door_state const state )
 		return;
 	}
 
-	change_state				( );
+	change_state((actor*)0);	//Alundaio: NULL - no need to know who
 }
 
 #ifdef DEBUG

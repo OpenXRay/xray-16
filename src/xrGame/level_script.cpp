@@ -714,20 +714,24 @@ void g_send(NET_Packet& P, bool bReliable = 0, bool bSequential = 1, bool bHighP
 }
 
 //ability to get the target game_object at crosshair
-CGameObject* g_get_target_obj()
+CScriptGameObject* g_get_target_obj()
 {
 	collide::rq_result& RQ = HUD().GetCurrentRayQuery();
-	CGameObject* object = smart_cast<CGameObject*>(RQ.O);
-	if (object)
-		return object;
+	if (RQ.O)
+	{
+		CGameObject	*game_object = static_cast<CGameObject*>(RQ.O);
+		if (game_object)
+			return game_object->lua_game_object();
+	}
+	return (CScriptGameObject*)0;
 }
 
 float g_get_target_dist()
 {
 	collide::rq_result& RQ = HUD().GetCurrentRayQuery();
-	CGameObject* object = smart_cast<CGameObject*>(RQ.O);
-	if (object)
+	if (RQ.O)
 		return RQ.range;
+	return 0.f;
 }
 //Alundaio: END
 
