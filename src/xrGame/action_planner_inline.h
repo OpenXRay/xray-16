@@ -99,20 +99,25 @@ void CPlanner::update				()
 
 	THROW							(!solution().empty());
 
-	if (initialized()) {
-		if (current_action_id() != solution().front()) {
-			current_action().finalize	();
-			m_current_action_id			= solution().front();
-			current_action().initialize	();
+	//Alundaio: Attempt to workaround strange line 114 crash when loading generators
+	if (!solution().empty())
+	{
+		if (initialized()) {
+			if (current_action_id() != solution().front()) {
+				current_action().finalize();
+				m_current_action_id = solution().front();
+				current_action().initialize();
+			}
 		}
-	}
-	else {
-		m_initialized				= true;
-		m_current_action_id			= solution().front();
-		current_action().initialize	();
-	}
+		else {
+			m_initialized = true;
+			m_current_action_id = solution().front();
+			current_action().initialize();
+		}
 
-	current_action().execute	();
+		current_action().execute	();
+	}
+	//Alundaio: END
 }
 
 TEMPLATE_SPECIALIZATION

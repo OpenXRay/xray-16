@@ -192,6 +192,11 @@ void CAI_Stalker::process_enemies		()
 			continue;
 		}
 
+		//Alundaio: Only transfer enemy if I can see member at this very moment!
+		if (!memory().visual().visible_now(member))
+			continue;
+		//Alundaio: END
+
 		memory().make_object_visible_somewhen	(member->memory().enemy().selected());
 		found					= true;
 		break;
