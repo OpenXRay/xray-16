@@ -723,7 +723,7 @@ CScriptGameObject* g_get_target_obj()
 		if (game_object)
 			return game_object->lua_game_object();
 	}
-	return (CScriptGameObject*)0;
+	return (0);
 }
 
 float g_get_target_dist()
@@ -731,7 +731,7 @@ float g_get_target_dist()
 	collide::rq_result& RQ = HUD().GetCurrentRayQuery();
 	if (RQ.O)
 		return RQ.range;
-	return 0.f;
+	return (0);
 }
 //Alundaio: END
 
@@ -750,7 +750,6 @@ void CLevel::script_register(lua_State *L)
 	[
 		//Alundaio: Extend level namespace exports
 		def("send", g_send), //allow the ability to send netpacket to level
-		//def("ray_pick",g_ray_pick),
 		def("get_target_obj",g_get_target_obj), //intentionally named to what is in xray extensions
 		def("get_target_dist",g_get_target_dist),
 		//Alundaio: END

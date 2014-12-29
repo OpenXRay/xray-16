@@ -41,6 +41,11 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial)
 	string_path				fn;
 	for(;It!=It_e;++It)
 	{
+//Alundaio: Print list of *.thm to find bad .thms!
+#ifdef DEBUG
+		Msg("%s", (*It).name.c_str());
+#endif
+//Alundaio: END
 		
 		FS.update_path		(fn, initial, (*It).name.c_str());
 		IReader* F			= FS.r_open(fn);
