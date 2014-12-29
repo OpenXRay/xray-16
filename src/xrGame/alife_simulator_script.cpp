@@ -309,6 +309,11 @@ bool dont_has_info								(const CALifeSimulator *self, const ALife::_OBJECT_ID 
 	return								(!has_info(self,id,info_id));
 }
 
+void teleport_object(CALifeSimulator *alife, ALife::_OBJECT_ID id, GameGraph::_GRAPH_ID game_vertex_id, u32 level_vertex_id, const Fvector &position)
+{
+	alife->teleport_object(id, game_vertex_id, level_vertex_id, position);
+}
+
 //void disable_info_portion						(const CALifeSimulator *self, const ALife::_OBJECT_ID &id)
 //{
 //	THROW								(self);
@@ -354,11 +359,10 @@ void CALifeSimulator::script_register			(lua_State *L)
 			.def("switch_distance",			&CALifeSimulator::switch_distance)
 			.def("switch_distance",			&CALifeSimulator::set_switch_distance)
 			//Alundaio: extend alife simulator exports
-			.def("jump_to_level", (void (CALifeSimulator::*) (LPCSTR))(&CALifeSimulator::jump_to_level))
-			.def("teleport_object", (void (CALifeSimulator::*) (ALife::_OBJECT_ID, GameGraph::_GRAPH_ID, u32, Fvector))(&CALifeSimulator::teleport_object))
+			.def("teleport_object", &teleport_object)
 			//Alundaio: END
-		,def("alife",						&alife)
 	];
+		,def("alife",						&alife)
 
 	{
 		if (story_ids.empty())
