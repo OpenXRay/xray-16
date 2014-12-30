@@ -216,15 +216,12 @@ void CScriptIniFile::w_u8(LPCSTR S, LPCSTR L, u8 V, LPCSTR comment)
 
 bool CScriptIniFile::save_as(LPCSTR new_fname)
 {
-    THROW3(inherited::section_exist(S), "Cannot find section", S);
-    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    THROW2(new_fname, "File name is null");
     return(inherited::save_as(new_fname));
 }
 
 void CScriptIniFile::save_at_end(BOOL b)
 {
-    THROW3(inherited::section_exist(S), "Cannot find section", S);
-    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
     inherited::save_at_end(b);
 }
 
@@ -237,14 +234,10 @@ void CScriptIniFile::remove_line(LPCSTR S, LPCSTR L)
 
 void CScriptIniFile::set_override_names(BOOL b)
 {
-    THROW3(inherited::section_exist(S), "Cannot find section", S);
-    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
     inherited::set_override_names(b);
 }
 
 u32 CScriptIniFile::section_count()
 {
-    THROW3(inherited::section_exist(S), "Cannot find section", S);
-    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
     return(inherited::section_count());
 }
