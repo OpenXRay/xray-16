@@ -309,6 +309,7 @@ bool dont_has_info								(const CALifeSimulator *self, const ALife::_OBJECT_ID 
 	return								(!has_info(self,id,info_id));
 }
 
+//Alundaio: teleport object
 void teleport_object(CALifeSimulator *alife, ALife::_OBJECT_ID id, GameGraph::_GRAPH_ID game_vertex_id, u32 level_vertex_id, const Fvector &position)
 {
 	alife->teleport_object(id, game_vertex_id, level_vertex_id, position);
@@ -361,8 +362,9 @@ void CALifeSimulator::script_register			(lua_State *L)
 			//Alundaio: extend alife simulator exports
 			.def("teleport_object", &teleport_object)
 			//Alundaio: END
-	];
+	
 		,def("alife",						&alife)
+    ];
 
 	{
 		if (story_ids.empty())
