@@ -16,8 +16,7 @@
 CScriptIniFile::CScriptIniFile(IReader* F, LPCSTR path) : inherited(F, path) {}
 CScriptIniFile::CScriptIniFile(LPCSTR szFileName, BOOL ReadOnly, BOOL bLoadAtStart, BOOL SaveAtEnd)
     : inherited(update(szFileName), ReadOnly, bLoadAtStart, SaveAtEnd)
-{
-}
+{}
 
 CScriptIniFile::~CScriptIniFile() {}
 LPCSTR CScriptIniFile::update(LPCSTR file_name)
@@ -76,4 +75,145 @@ Fvector CScriptIniFile::r_fvector3(LPCSTR S, LPCSTR L)
     VERIFY3(inherited::section_exist(S), "Cannot find section", S);
     VERIFY3(inherited::line_exist(S, L), "Cannot find line", L);
     return inherited::r_fvector3(S, L);
+}
+
+//AVO: additional methods to allow writing to ini files
+void CScriptIniFile::w_bool(pcstr S, pcstr L, bool V, pcstr comment)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    inherited::w_bool(S, L, V, comment);
+}
+
+void CScriptIniFile::w_color(pcstr S, pcstr L, u32 V, pcstr comment)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    inherited::w_color(S, L, V, comment);
+}
+
+void CScriptIniFile::w_fcolor(pcstr S, pcstr L, const Fcolor& V, pcstr comment)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    inherited::w_fcolor(S, L, V, comment);
+}
+
+void CScriptIniFile::w_float(pcstr S, pcstr L, float V, pcstr comment)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    inherited::w_float(S, L, V, comment);
+}
+
+void CScriptIniFile::w_fvector2(pcstr S, pcstr L, const Fvector2& V, pcstr comment)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    inherited::w_fvector2(S, L, V, comment);
+}
+
+void CScriptIniFile::w_fvector3(pcstr S, pcstr L, const Fvector3& V, pcstr comment)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    inherited::w_fvector3(S, L, V, comment);
+}
+
+void CScriptIniFile::w_fvector4(pcstr S, pcstr L, const Fvector4& V, pcstr comment)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    inherited::w_fvector4(S, L, V, comment);
+}
+
+void CScriptIniFile::w_s16(pcstr S, pcstr L, s16 V, pcstr comment)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    inherited::w_s16(S, L, V, comment);
+}
+
+void CScriptIniFile::w_s32(pcstr S, pcstr L, s32 V, pcstr comment)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    inherited::w_s32(S, L, V, comment);
+}
+
+void CScriptIniFile::w_s64(pcstr S, pcstr L, s64 V, pcstr comment)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    inherited::w_s64(S, L, V, comment);
+}
+
+void CScriptIniFile::w_s8(pcstr S, pcstr L, s8 V, pcstr comment)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    inherited::w_s8(S, L, V, comment);
+}
+
+void CScriptIniFile::w_string(pcstr S, pcstr L, pcstr V, pcstr comment)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    inherited::w_string(S, L, V, comment);
+}
+
+void CScriptIniFile::w_u16(pcstr S, pcstr L, u16 V, pcstr comment)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    inherited::w_u16(S, L, V, comment);
+}
+
+void CScriptIniFile::w_u32(pcstr S, pcstr L, u32 V, pcstr comment)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    inherited::w_u32(S, L, V, comment);
+}
+
+void CScriptIniFile::w_u64(pcstr S, pcstr L, u64 V, pcstr comment)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    inherited::w_u64(S, L, V, comment);
+}
+
+void CScriptIniFile::w_u8(pcstr S, pcstr L, u8 V, pcstr comment)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    inherited::w_u8(S, L, V, comment);
+}
+
+bool CScriptIniFile::save_as(pcstr new_fname)
+{
+    THROW2(new_fname, "File name is null");
+    return(inherited::save_as(new_fname));
+}
+
+void CScriptIniFile::save_at_end(bool b)
+{
+    inherited::save_at_end(b);
+}
+
+void CScriptIniFile::remove_line(pcstr S, pcstr L)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    inherited::remove_line(S, L);
+}
+
+void CScriptIniFile::set_override_names(bool b)
+{
+    inherited::set_override_names(b);
+}
+
+u32 CScriptIniFile::section_count()
+{
+    return(inherited::section_count());
 }
