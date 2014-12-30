@@ -29,6 +29,12 @@ class CScriptThread;
 #	endif // #ifndef NDEBUG
 #endif // #ifdef XRGAME_EXPORTS
 
+//AVO: allow LUA debug prints (i.e.: ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CWeapon : cannot access class member Weapon_IsScopeAttached!");)
+#include "build_config_defines.h"
+#ifdef LUA_DEBUG_PRINT
+#define PRINT_CALL_STACK
+#endif
+
 using namespace ScriptStorage;
 
 class CScriptStorage {
