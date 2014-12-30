@@ -628,10 +628,10 @@ IC static void CLevel_Export(lua_State* luaState)
 
     module(luaState, "level")[
         //Alundaio: Extend level namespace exports
-        def("send", g_send) , //allow the ability to send netpacket to level
+        def("send", &g_send) , //allow the ability to send netpacket to level
         //def("ray_pick",g_ray_pick),
-        def("get_target_obj", g_get_target_obj) , //intentionally named to what is in xray extensions
-        def("get_target_dist", g_get_target_dist) ,
+        def("get_target_obj", &g_get_target_obj) , //intentionally named to what is in xray extensions
+        def("get_target_dist", &g_get_target_dist) ,
         //Alundaio: END
         // obsolete\deprecated
         def("object_by_id", get_object_by_id),
