@@ -37,7 +37,7 @@ bool r_bool(NET_Packet *self)
 u32 r_begin(NET_Packet *self)
 {
 	u16 dummy_u16;
-	return (!!self->r_begin(dummy_u16));
+	return (self->r_begin(dummy_u16));
 }
 
 ClientID r_clientID(NET_Packet *self)

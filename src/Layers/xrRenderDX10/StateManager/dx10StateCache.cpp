@@ -66,7 +66,7 @@ dx10StateCache<ID3DDepthStencilState, D3D_DEPTH_STENCIL_DESC>
 
 	//	TODO: DX10: Remove this.
 #ifdef	DEBUG
-	Msg("ID3DDepthStencilState #%d created.", m_StateArray.size());
+	//Msg("ID3DDepthStencilState #%d created.", m_StateArray.size());
 #endif	//	DEBUG
 }
 
