@@ -321,7 +321,8 @@ void CScriptStorage::reinit()
 #ifdef DEBUG
     luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
 #else
-    if (strstr(Core.Params, "-dbg"))
+	//Alundaio: I can't use command line params on Windows 8.1 because no log is flushed when using a shortcut to xrEngine.exe started inside main game directory
+    //if (strstr(Core.Params, "-dbg"))
         luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
 #endif // #ifdef DEBUG
 
@@ -356,8 +357,9 @@ int CScriptStorage::vscript_log(ScriptStorage::ELuaMessageType tLuaMessageType, 
 #ifndef NO_XRGAME_SCRIPT_ENGINE
     //AVO: allow LUA debug prints (i.e.: ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CWeapon : cannot access class member Weapon_IsScopeAttached!");)
 #ifndef DEBUG
-    if (!strstr(Core.Params, "-dbg"))
-        return(0);
+	//Alundaio: I can't use command line params on Windows 8.1 because no log is flushed when using a shortcut to xrEngine.exe started inside main game directory
+    //if (!strstr(Core.Params, "-dbg"))
+    //    return(0);
 #endif
           
 #ifdef LUA_DEBUG_PRINT
