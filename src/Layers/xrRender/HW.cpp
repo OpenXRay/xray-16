@@ -31,8 +31,8 @@ CHW HW;
 IDirect3DStateBlock9* dwDebugSB = nullptr;
 #endif
 
-CHW::CHW() : hD3D(nullptr), pD3D(nullptr), pDevice(nullptr), pBaseRT(nullptr), pBaseZB(nullptr), m_move_window(true) { ; }
-CHW::~CHW() { ; }
+CHW::CHW() : hD3D(nullptr), pD3D(nullptr), pDevice(nullptr), pBaseRT(nullptr), pBaseZB(nullptr), m_move_window(true), maxRefreshRate(200)/*ECO_RENDER*/ {}
+CHW::~CHW() {}
 void CHW::Reset(HWND hwnd)
 {
 #ifdef DEBUG
@@ -504,8 +504,10 @@ u32 CHW::selectRefresh(u32 dwWidth, u32 dwHeight, D3DFORMAT fmt)
             pD3D->EnumAdapterModes(DevAdapter, fmt, I, &Mode);
             if (Mode.Width == dwWidth && Mode.Height == dwHeight)
             {
-                if (Mode.RefreshRate > selected)
-                    selected = Mode.RefreshRate;
+                //if (Mode.RefreshRate > selected)
+                //    selected = Mode.RefreshRate;
+                if (Mode.RefreshRate <= maxRefreshRate && Mode.RefreshRate>selected)
+                    selected = Mode.RefreshRate;  //ECO_RENDER modif.
             }
         }
         return selected;

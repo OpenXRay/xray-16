@@ -88,6 +88,7 @@ public:
     void Prefetch();
 #endif
     IMainMenu* m_pMainMenu;
+    static bool IsMainMenuActive();
 
     ParticleStatistics stats;
 

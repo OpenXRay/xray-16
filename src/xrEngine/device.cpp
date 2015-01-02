@@ -28,6 +28,8 @@
 #include "IGame_Persistent.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
+#include "Common/Config.hpp"
+
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
 
@@ -231,7 +233,20 @@ void CRenderDevice::on_idle()
     mView_saved = mView;
     mProject_saved = mProject;
     syncProcessFrame.Set(); // allow secondary thread to do its job
+
+#ifdef ECO_RENDER // ECO_RENDER START
+    static u32 time_frame = 0;
+    u32 time_curr = timeGetTime();
+    u32 time_diff = time_curr - time_frame;
+    time_frame = time_curr;
+    u32 optimal = 10;
+    if (Device.Paused() || IGame_Persistent::IsMainMenuActive())
+        optimal = 32;
+    if (time_diff < optimal)
+        Sleep(optimal - time_diff);
+#else
     Sleep(0);
+#endif // ECO_RENDER END
 
 #ifndef DEDICATED_SERVER
     // all rendering is done here
