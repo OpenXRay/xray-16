@@ -28,6 +28,8 @@
 #include "xrSash.h"
 #include "igame_persistent.h"
 
+#include "../build_config_defines.h"
+
 #pragma comment( lib, "d3dx9.lib" )
 
 ENGINE_API CRenderDevice Device;
@@ -236,6 +238,8 @@ int g_svDedicateServerUpdateReate = 100;
 
 ENGINE_API xr_list<LOADING_EVENT> g_loading_events;
 
+extern bool IsMainMenuActive(); //ECO_RENDER add
+
 void CRenderDevice::on_idle()
 {
     if (!b_is_Ready)
@@ -295,7 +299,20 @@ void CRenderDevice::on_idle()
     // Release start point - allow thread to run
     mt_csLeave.Enter();
     mt_csEnter.Leave();
-    Sleep(0);
+
+#ifdef ECO_RENDER // ECO_RENDER START
+	static u32 time_frame = 0;
+	u32 time_curr = timeGetTime();
+	u32 time_diff = time_curr - time_frame;
+	time_frame = time_curr;
+	u32 optimal = 10;
+	if (Device.Paused() || IsMainMenuActive())
+		optimal = 32;
+	if (time_diff < optimal)
+		Sleep(optimal - time_diff);
+#else
+	Sleep(0);
+#endif // ECO_RENDER END
 
 #ifndef DEDICATED_SERVER
     Statistic->RenderTOTAL_Real.FrameStart();

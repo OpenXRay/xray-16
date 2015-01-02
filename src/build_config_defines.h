@@ -9,3 +9,4 @@
 #define SPAWN_ANTIFREEZE // spread spawn of game objects thoughout multiple frames to prevent lags (by alpet)
 #define NON_FATAL_VERIFY // don't crash game when VERIFY fails
 #define DETAIL_RADIUS // detail draw radius (by KD)
+#define ECO_RENDER // limit FPS in menu to prevent video card overheat (by alpet)
