@@ -8,3 +8,4 @@
 #define LUA_DEBUG_PRINT // allow LUA debug prints (i.e.: ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CWeapon : cannot access class member Weapon_IsScopeAttached!");)
 #define SPAWN_ANTIFREEZE // spread spawn of game objects thoughout multiple frames to prevent lags (by alpet)
 #define NON_FATAL_VERIFY // don't crash game when VERIFY fails
+#define DETAIL_RADIUS // detail draw radius (by KD)
