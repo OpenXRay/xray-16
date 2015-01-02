@@ -2,6 +2,7 @@
 #pragma hdrstop
 
 #include "xrRender_console.h"
+#include "Common/Config.hpp"
 
 u32 ps_Preset = 2;
 xr_token qpreset_token[] = {{"Minimum", 0}, {"Low", 1}, {"Default", 2}, {"High", 3}, {"Extreme", 4}, {nullptr, 0}};
@@ -167,6 +168,27 @@ float ps_r3_dyn_wet_surf_near = 10.f; // 10.0f
 float ps_r3_dyn_wet_surf_far = 30.f; // 30.0f
 int ps_r3_dyn_wet_surf_sm_res = 256; // 256
 
+//AVO: detail draw radius
+Flags32 ps_common_flags = {0}; // r1-only
+u32 ps_steep_parallax = 0;
+int ps_r__detail_radius = 49;
+#ifdef DETAIL_RADIUS // управление радиусом отрисовки травы
+u32 dm_size = 24;
+u32 dm_cache1_line = 12; //dm_size*2/dm_cache1_count
+u32 dm_cache_line = 49; //dm_size+1+dm_size
+u32 dm_cache_size = 2401; //dm_cache_line*dm_cache_line
+float dm_fade = 47.5; //float(2*dm_size)-.5f;
+u32 dm_current_size = 24;
+u32 dm_current_cache1_line = 12; //dm_current_size*2/dm_cache1_count
+u32 dm_current_cache_line = 49; //dm_current_size+1+dm_current_size
+u32 dm_current_cache_size = 2401; //dm_current_cache_line*dm_current_cache_line
+float dm_current_fade = 47.5; //float(2*dm_current_size)-.5f;
+#endif
+float ps_current_detail_density = 0.6;
+xr_token ext_quality_token[] = {{"qt_off", 0}, {"qt_low", 1}, {"qt_medium", 2},
+    {"qt_high", 3}, {"qt_extreme", 4}, {nullptr, 0}};
+//-AVO
+
 //- Mad Max
 float ps_r2_gloss_factor = 4.0f;
 //- Mad Max
@@ -179,6 +201,38 @@ float ps_r2_gloss_factor = 4.0f;
 #endif // USE_DX10
 
 //-----------------------------------------------------------------------
+
+//AVO: detail draw radius
+#ifdef DETAIL_RADIUS
+class CCC_detail_radius : public CCC_Integer
+{
+public:
+    void apply()
+    {
+        dm_current_size = iFloor((float)ps_r__detail_radius / 4) * 2;
+        dm_current_cache1_line = dm_current_size * 2 / 4; // assuming cache1_count = 4
+        dm_current_cache_line = dm_current_size + 1 + dm_current_size;
+        dm_current_cache_size = dm_current_cache_line * dm_current_cache_line;
+        dm_current_fade = float(2 * dm_current_size) - .5f;
+    }
+
+    CCC_detail_radius(LPCSTR N, int* V, int _min = 0, int _max = 999) : CCC_Integer(N, V, _min, _max) {};
+
+    void Execute(LPCSTR args) override
+    {
+        CCC_Integer::Execute(args);
+        apply();
+    }
+
+    void Status(TStatus& S) override
+    {
+        CCC_Integer::Status(S);
+    }
+};
+
+//-AVO
+#endif
+
 class CCC_tf_Aniso : public CCC_Integer
 {
 public:
@@ -626,11 +680,11 @@ void xrRender_initconsole()
 
     Fvector tw_min, tw_max;
 
-    CMD4(CCC_Float, "r__geometry_lod", &ps_r__LOD, 0.1f, 1.2f);
+    CMD4(CCC_Float, "r__geometry_lod", &ps_r__LOD, 0.1f, 3.f); //AVO: extended from 1.2f to 3.f
     //CMD4(CCC_Float, "r__geometry_lod_pow", &ps_r__LOD_Power, 0, 2);
 
     //CMD4(CCC_Float, "r__detail_density", &ps_r__Detail_density, .05f, 0.99f);
-    CMD4(CCC_Float, "r__detail_density", &ps_r__Detail_density, .2f, 0.6f);
+    CMD4(CCC_Float, "r__detail_density", &ps_current_detail_density/*&ps_r__Detail_density*/, 0.04f, 0.6f); //AVO: extended from 0.2f to 0.04f and replaced variable
 
 #ifdef DEBUG
     CMD4(CCC_Float, "r__detail_l_ambient", &ps_r__Detail_l_ambient, .5f, .95f);
@@ -716,7 +770,7 @@ void xrRender_initconsole()
     CMD3(CCC_Mask, "r2_sun_tsm", &ps_r2_ls_flags, R2FLAG_SUN_TSM);
     CMD4(CCC_Float, "r2_sun_tsm_proj", &ps_r2_sun_tsm_projection, .001f, 0.8f);
     CMD4(CCC_Float, "r2_sun_tsm_bias", &ps_r2_sun_tsm_bias, -0.5, +0.5);
-    CMD4(CCC_Float, "r2_sun_near", &ps_r2_sun_near, 1.f, 50.f);
+    CMD4(CCC_Float, "r2_sun_near", &ps_r2_sun_near, 1.f, 150.f); //AVO: extended from 50.f to 150.f
 #if RENDER != R_R1
     CMD4(CCC_Float, "r2_sun_far", &OLES_SUN_LIMIT_27_01_07, 51.f, 180.f);
 #endif
@@ -814,6 +868,10 @@ void xrRender_initconsole()
     //CMD3(CCC_Mask, "r3_msaa_alphatest", &ps_r2_ls_flags, (u32)R3FLAG_MSAA_ALPHATEST);
     CMD3(CCC_Token, "r3_msaa_alphatest", &ps_r3_msaa_atest, qmsaa__atest_token);
     CMD3(CCC_Token, "r3_minmax_sm", &ps_r3_minmax_sm, qminmax_sm_token);
+
+#ifdef DETAIL_RADIUS
+    CMD4(CCC_detail_radius, "r__detail_radius", &ps_r__detail_radius, 49, 300);
+#endif
 
 //  Allow real-time fog config reload
 #if (RENDER == R_R3) || (RENDER == R_R4)
