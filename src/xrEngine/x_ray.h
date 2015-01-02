@@ -1,5 +1,6 @@
 #ifndef __X_RAY_H__
 #define __X_RAY_H__
+#define ECO_RENDER  //ECO_RENDER adds a small delay between rendering, reduce FPS in main menu or in videos
 
 // refs
 class ENGINE_API CGameFont;
