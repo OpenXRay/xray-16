@@ -1198,6 +1198,9 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
 
 static CTimer phase_timer;
 extern ENGINE_API BOOL g_appLoaded = FALSE;
+//AVO: used by SPAWN_ANTIFREEZE (by alpet)
+extern ENGINE_API BOOL g_bootComplete = FALSE;
+//-AVO
 
 void CApplication::LoadBegin()
 {
@@ -1206,6 +1209,10 @@ void CApplication::LoadBegin()
     {
 
         g_appLoaded = FALSE;
+        
+        //AVO:
+        g_bootComplete = FALSE;
+        //-AVO
 
 #ifndef DEDICATED_SERVER
         _InitializeFont(pFontSystem, "ui_font_letterica18_russian", 0);
@@ -1235,6 +1242,11 @@ void CApplication::LoadEnd()
 void CApplication::destroy_loading_shaders()
 {
     m_pRender->destroy_loading_shaders();
+
+    //AVO:
+    g_bootComplete = TRUE;
+    //-AVO
+
     //hLevelLogo.destroy ();
     //sh_progress.destroy ();
     //. ::Sound->mute (false);

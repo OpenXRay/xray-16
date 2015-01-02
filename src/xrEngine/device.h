@@ -83,6 +83,11 @@ protected:
     u32 Timer_MM_Delta;
     CTimer_paused Timer;
     CTimer_paused TimerGlobal;
+
+    //AVO: 
+    CTimer frame_timer;   //TODO: проверить, не дублируется-ли схожий таймер (alpet)
+    //-AVO
+
 public:
 
     // Registrators
@@ -280,6 +285,12 @@ public:
                 );
         if (I != seqParallel.end())
             seqParallel.erase(I);
+    }
+
+    //AVO: elapsed famed counter (by alpet)
+    IC u32 frame_elapsed()
+    {
+        return frame_timer.GetElapsed_ms();
     }
 
 public:

@@ -49,6 +49,7 @@
 #include "CustomDetector.h"
 #include "xrPhysics/IPHWorld.h"
 #include "xrPhysics/console_vars.h"
+#include "../xrEngine/device.h"
 
 #ifdef DEBUG
 #include "level_debug.h"
@@ -58,22 +59,47 @@
 #include "PHDebug.h"
 #include "debug_text_tree.h"
 #endif
-
 ENGINE_API bool g_dedicated_server;
+//AVO: used by SPAWN_ANTIFREEZE (by alpet)
+ENGINE_API BOOL	g_bootComplete;
+//-AVO
 extern CUISequencer* g_tutorial;
 extern CUISequencer* g_tutorial2;
 
 float g_cl_lvInterp = 0.1;
 u32 lvInterpSteps = 0;
 
+//AVO: get object ID from spawn data (used by SPAWN_ANTIFREEZE by alpet)
+u16	GetSpawnInfo(NET_Packet &P, u16 &parent_id)
+{
+    u16 dummy16, id;
+    P.r_begin(dummy16);
+    shared_str	s_name;
+    P.r_stringZ(s_name);
+    CSE_Abstract*	E = F_entity_Create(*s_name);
+    E->Spawn_Read(P);
+    if (E->s_flags.is(M_SPAWN_UPDATE))
+        E->UPDATE_Read(P);
+    id = E->ID;
+    parent_id = E->ID_Parent;
+    F_entity_Destroy(E);
+    P.r_pos = 0;
+    return id;
+}
+//-AVO
+
+
 CLevel::CLevel() :
-    IPureClient(Device.GetTimerGlobal())
+IPureClient(Device.GetTimerGlobal())
 #ifdef PROFILE_CRITICAL_SECTIONS
-    , DemoCS(MUTEX_PROFILE_ID(DemoCS))
+, DemoCS(MUTEX_PROFILE_ID(DemoCS))
 #endif
 {
     g_bDebugEvents = strstr(Core.Params, "-debug_ge") != nullptr;
     game_events = xr_new<NET_Queue_Event>();
+    //AVO: queue to hold spawn events for SPAWN_ANTIFREEZE
+    spawn_events = xr_new<NET_Queue_Event>();
+    //-AVO
     eChangeRP = Engine.Event.Handler_Attach("LEVEL:ChangeRP", this);
     eDemoPlay = Engine.Event.Handler_Attach("LEVEL:PlayDEMO", this);
     eChangeTrack = Engine.Event.Handler_Attach("LEVEL:PlayMusic", this);
@@ -85,7 +111,7 @@ CLevel::CLevel() :
         m_map_manager = xr_new<CMapManager>();
         m_game_task_manager = xr_new<CGameTaskManager>();
     }
-    m_dwDeltaUpdate = u32(fixed_step*1000);
+    m_dwDeltaUpdate = u32(fixed_step * 1000);
     m_seniority_hierarchy_holder = xr_new<CSeniorityHierarchyHolder>();
     if (!g_dedicated_server)
     {
@@ -159,7 +185,7 @@ CLevel::~CLevel()
     pObjects4CrPr.clear();
     pActors4CrPr.clear();
     ai().unload();
-#ifdef DEBUG	
+#ifdef DEBUG
     xr_delete(m_level_debug);
 #endif
     xr_delete(m_map_manager);
@@ -302,6 +328,23 @@ void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
         }
     }
 }
+//AVO: used by SPAWN_ANTIFREEZE (by alpet)
+bool CLevel::PostponedSpawn(u16 id)
+{
+    for (auto it = spawn_events->queue.begin(); it != spawn_events->queue.end(); ++it)
+    {
+        const NET_Event& E = *it;
+        NET_Packet P;
+        if (M_SPAWN != E.ID) continue;
+        E.implication(P);
+        u16 parent_id;
+        if (id == GetSpawnInfo(P, parent_id))
+            return true;
+    }
+
+    return false;
+}
+//-AVO
 
 void CLevel::ProcessGameEvents()
 {
@@ -309,10 +352,51 @@ void CLevel::ProcessGameEvents()
     {
         NET_Packet P;
         u32 svT = timeServer() - NET_Latency;
+
+        //AVO: spawn antifreeze implementation by alpet
+#ifdef   SPAWN_ANTIFREEZE
+        while (spawn_events->available(svT))
+        {
+            u16 ID, dest, type;
+            spawn_events->get(ID, dest, type, P);
+            game_events->insert(P);
+        }
+        u32 avail_time = 5;
+        u32 elps = Device.frame_elapsed();
+        if (elps < 30) avail_time = 33 - elps;
+        u32 work_limit = elps + avail_time;
+
+#endif
+        //-AVO
+
         while (game_events->available(svT))
         {
             u16 ID, dest, type;
             game_events->get(ID, dest, type, P);
+            //AVO: spawn antifreeze implementation by alpet
+#ifdef   SPAWN_ANTIFREEZE
+            // не отправлять события не заспавненным объектам
+            if (g_bootComplete && M_EVENT == ID && PostponedSpawn(dest))
+            {
+                spawn_events->insert(P);
+                continue;
+            }
+            if (g_bootComplete && M_SPAWN == ID && Device.frame_elapsed() > work_limit) // alpet: позволит плавнее выводить объекты в онлайн, без заметных фризов
+            {
+                u16 parent_id;
+                GetSpawnInfo(P, parent_id);
+                //-------------------------------------------------				
+                if (parent_id < 0xffff) // откладывать спавн только объектов в контейнеры
+                {
+                    if (!spawn_events->available(svT))
+                        Msg("* ProcessGameEvents, spawn event postponed. Events rest = %d", game_events->queue.size());
+
+                    spawn_events->insert(P);
+                    continue;
+                }
+            }
+#endif
+            //-AVO
             switch (ID)
             {
             case M_SPAWN:
@@ -465,12 +549,12 @@ void CLevel::OnFrame()
         if (IsGameTypeSingle() && Device.dwPrecacheFrame == 0)
         {
             // XXX nitrocaster: was enabled in x-ray 1.5; to be restored or removed
-            //if (g_mt_config.test(mtMap)) 
+            //if (g_mt_config.test(mtMap))
             //{
             //    Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(
             //    m_game_task_manager,&CGameTaskManager::UpdateTasks));
             //}
-            //else								
+            //else
             GameTaskManager().UpdateTasks();
         }
     }
@@ -717,7 +801,6 @@ void CLevel::OnRender()
         }
     }
 
-
     if (psAI_Flags.test(aiDrawVisibilityRays))
     {
         for (u32 I = 0; I < Level().Objects.o_count(); I++)
@@ -745,7 +828,7 @@ void CLevel::OnEvent(EVENT E, u64 P1, u64 /**P2/**/)
     }
     else if (E == eDemoPlay && P1)
     {
-        char* name = (char*)P1;
+        char* name = (char*) P1;
         string_path RealName;
         xr_strcpy(RealName, name);
         xr_strcat(RealName, ".xrdemo");
@@ -774,7 +857,6 @@ void CLevel::AddObject_To_Objects4CrPr(CGameObject* pObj)
             return;
     }
     pObjects4CrPr.push_back(pObj);
-
 }
 void CLevel::AddActor_To_Actors4CrPr(CGameObject* pActor)
 {
@@ -879,10 +961,10 @@ void CLevel::UpdateDeltaUpd(u32 LastTime)
     if (0 == g_cl_lvInterp)
         ReculcInterpolationSteps();
     else
-    if (g_cl_lvInterp > 0)
-    {
-        lvInterpSteps = iCeil(g_cl_lvInterp / fixed_step);
-    }
+        if (g_cl_lvInterp > 0)
+        {
+            lvInterpSteps = iCeil(g_cl_lvInterp / fixed_step);
+        }
 }
 
 void CLevel::ReculcInterpolationSteps()
@@ -1054,8 +1136,7 @@ bool CZoneList::feel_touch_contact(CObject* O)
 }
 
 CZoneList::CZoneList()
-{
-}
+{}
 
 CZoneList::~CZoneList()
 {

@@ -158,6 +158,9 @@ public:
     bool m_bGameConfigStarted = false;
     bool game_configured = false;
     NET_Queue_Event* game_events = nullptr;
+    //AVO: queue to hold spawn events for SPAWN_ANTIFREEZE
+    NET_Queue_Event* spawn_events = nullptr;
+    //-AVO
     xr_deque<CSE_Abstract*> game_spawn_queue;
     xrServer* Server = nullptr;
     GlobalFeelTouch m_feel_deny;
@@ -220,6 +223,9 @@ public:
     virtual void net_StartPlayDemo();
     void cl_Process_Event(u16 dest, u16 type, NET_Packet& P);
     void cl_Process_Spawn(NET_Packet& P);
+    //AVO: used by SPAWN_ANTIFREEZE (by alpet)
+    bool PostponedSpawn(u16 id);
+    //-AVO
     void ProcessGameEvents();
     void ProcessGameSpawns();
     void ProcessCompressedUpdate(NET_Packet& P, u8 const compression_type);
