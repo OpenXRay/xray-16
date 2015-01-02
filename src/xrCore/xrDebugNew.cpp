@@ -323,6 +323,33 @@ void xrDebug::fail(const char* e1, const char* e2, const char* e3, const char* e
     backend(e1, e2, e3, e4, file, line, function, ignore_always);
 }
 
+//AVO: print, dont crash
+void xrDebug::soft_fail(LPCSTR e1, LPCSTR file, int line, LPCSTR function)
+{
+    Msg("! VERIFY_FAILED: %s[%d] {%s}  %s", file, line, function, e1);
+}
+void xrDebug::soft_fail(LPCSTR e1, const std::string &e2, LPCSTR file, int line, LPCSTR function)
+{
+    Msg("! VERIFY_FAILED: %s[%d] {%s}  %s %s", file, line, function, e1, e2.c_str());
+}
+void xrDebug::soft_fail(LPCSTR e1, LPCSTR e2, LPCSTR file, int line, LPCSTR function)
+{
+    Msg("! VERIFY_FAILED: %s[%d] {%s}  %s %s", file, line, function, e1, e2);
+}
+void xrDebug::soft_fail(LPCSTR e1, LPCSTR e2, LPCSTR e3, LPCSTR file, int line, LPCSTR function)
+{
+    Msg("! VERIFY_FAILED: %s[%d] {%s}  %s %s %s", file, line, function, e1, e2, e3);
+}
+void xrDebug::soft_fail(LPCSTR e1, LPCSTR e2, LPCSTR e3, LPCSTR e4, LPCSTR file, int line, LPCSTR function)
+{
+    Msg("! VERIFY_FAILED: %s[%d] {%s}  %s %s %s %s", file, line, function, e1, e2, e3, e4);
+}
+void xrDebug::soft_fail(LPCSTR e1, LPCSTR e2, LPCSTR e3, LPCSTR e4, LPCSTR e5, LPCSTR file, int line, LPCSTR function)
+{
+    Msg("! VERIFY_FAILED: %s[%d] {%s}  %s %s %s %s %s", file, line, function, e1, e2, e3, e4, e5);
+}
+//-AVO
+
 void __cdecl xrDebug::fatal(const char* file, int line, const char* function, const char* F, ...)
 {
     string1024 buffer;
