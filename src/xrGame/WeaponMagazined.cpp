@@ -42,6 +42,7 @@ CWeaponMagazined::CWeaponMagazined(ESoundTypes eSoundType) : CWeapon()
 	m_eSoundShot				= ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING | eSoundType);
 	m_eSoundEmptyClick			= ESoundTypes(SOUND_TYPE_WEAPON_EMPTY_CLICKING | eSoundType);
 	m_eSoundReload				= ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
+	m_eSoundReloadEmpty				= ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);  
 	m_sounds_enabled			= true;
 	
 	m_sSndShotCurrent			= NULL;
@@ -76,7 +77,7 @@ void CWeaponMagazined::Load	(LPCSTR section)
 	m_sounds.LoadSound(section,"snd_shoot", "sndShot"		, false, m_eSoundShot		);
 	m_sounds.LoadSound(section,"snd_empty", "sndEmptyClick"	, false, m_eSoundEmptyClick	);
 	m_sounds.LoadSound(section,"snd_reload", "sndReload"		, true, m_eSoundReload		);
-	
+	m_sounds.LoadSound(section,"snd_reload_empty", "sndReloadEmpty"		, true, m_eSoundReloadEmpty		);	
 	m_sSndShotCurrent = "sndShot";
 		
 	//звуки и партиклы глушителя, еслит такой есть
@@ -464,6 +465,7 @@ void CWeaponMagazined::UpdateSounds	()
 	m_sounds.SetPosition("sndHide", P);
 //. nah	m_sounds.SetPosition("sndShot", P);
 	m_sounds.SetPosition("sndReload", P);
+	m_sounds.SetPosition("sndReloadEmpty", P);  
 //. nah	m_sounds.SetPosition("sndEmptyClick", P);
 }
 
@@ -720,7 +722,14 @@ void CWeaponMagazined::switch2_Empty()
 void CWeaponMagazined::PlayReloadSound()
 {
 	if(m_sounds_enabled)
-		PlaySound	("sndReload",get_LastFP());
+  if(iAmmoElapsed == 0)
+  {
+    PlaySound ("sndReloadEmpty",get_LastFP());
+  }
+  else
+  {
+    PlaySound	("sndReload",get_LastFP());
+  }
 }
 
 void CWeaponMagazined::switch2_Reload()
@@ -1098,7 +1107,12 @@ void CWeaponMagazined::PlayAnimHide()
 void CWeaponMagazined::PlayAnimReload()
 {
 	VERIFY(GetState()==eReload);
-	PlayHUDMotion("anm_reload", TRUE, this, GetState());
+	if(iAmmoElapsed==0)
+	{
+		PlayHUDMotion("anm_reload_empty", TRUE, this, GetState());
+	}else{
+		PlayHUDMotion("anm_reload", TRUE, this, GetState());
+	}
 }
 
 void CWeaponMagazined::PlayAnimAim()
@@ -1366,6 +1380,10 @@ bool CWeaponMagazined::install_upgrade_impl( LPCSTR section, bool test )
 	result2 = process_if_exists_set( section, "snd_reload", &CInifile::r_string, str, test );
 	if ( result2 && !test ) { m_sounds.LoadSound( section, "snd_reload"	, "sndReload"		, true, m_eSoundReload	);	}
 	result |= result2;
+  
+	result2 = process_if_exists_set( section, "snd_reload_empty", &CInifile::r_string, str, test );
+	if ( result2 && !test ) { m_sounds.LoadSound( section, "snd_reload_empty"	, "sndReloadEmpty"		, true, m_eSoundReloadEmpty	);	}
+	result |= result2;  
 
 	//snd_shoot1     = weapons\ak74u_shot_1 ??
 	//snd_shoot2     = weapons\ak74u_shot_2 ??

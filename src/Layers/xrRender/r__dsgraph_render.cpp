@@ -715,6 +715,11 @@ void	R_dsgraph_structure::r_dsgraph_render_subspace	(IRender_Sector* _sector, CF
 				renderable->renderable_Render	();
 			}
 		}
+#if RENDER!=R_R1
+if (g_pGameLevel && (phase==RImplementation.PHASE_SMAP) && ps_actor_shadow_flags.test(RFLAG_ACTOR_SHADOW)) g_hud->Render_Actor_Shadow(); // Actor Shadow
+#endif    
+
+    
 	}
 
 	// Restore

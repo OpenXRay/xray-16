@@ -606,9 +606,13 @@ void CWeaponMagazinedWGrenade::PlayAnimHide()
 void CWeaponMagazinedWGrenade::PlayAnimReload()
 {
 	VERIFY(GetState()==eReload);
-
 	if(IsGrenadeLauncherAttached())
+   	if(iAmmoElapsed==0)
+	{
+		PlayHUDMotion("anm_reload_empty_w_gl", TRUE, this, GetState());
+	}else{
 		PlayHUDMotion("anm_reload_w_gl", TRUE, this, GetState());
+	}
 	else
 		inherited::PlayAnimReload();
 }
@@ -635,10 +639,15 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
 				{
 					act_state = 1;
 				}else
-				if(pActor->AnyMove())
+				if(pActor->AnyMove() && (!st.bCrouch))
 				{
 					act_state = 2;
 				}
+				else
+				if(pActor->AnyMove() && (st.bCrouch))
+				{
+					act_state = 3;
+				}        
 			}
 
 			if(m_bGrenadeMode)
@@ -651,7 +660,9 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
 				else
 				if(act_state==2)
 					PlayHUDMotion("anm_idle_moving_g", TRUE, NULL,GetState());
-
+				else
+				if(act_state==3)
+					PlayHUDMotion("anm_idle_moving_crouch_g", TRUE, NULL,GetState());
 			}else
 			{
 				if(act_state==0)
@@ -662,6 +673,9 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
 				else
 				if(act_state==2)
 					PlayHUDMotion("anm_idle_moving_w_gl", TRUE, NULL,GetState());
+				else
+				if(act_state==3)
+					PlayHUDMotion("anm_idle_moving_crouch_w_gl", TRUE, NULL,GetState());          
 			}
 		
 		}

@@ -195,6 +195,13 @@ enum
 	R2FLAGEXT_SUN_OLD				= (1<<9),
 };
 
+extern ECORE_API Flags32 ps_actor_shadow_flags; 
+
+enum
+{
+RFLAG_ACTOR_SHADOW = (1<<0),
+};
+
 extern void						xrRender_initconsole	();
 extern BOOL						xrRender_test_hw		();
 extern void						xrRender_apply_tf		();

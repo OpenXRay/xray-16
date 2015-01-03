@@ -1,6 +1,7 @@
 #pragma once
 
-#include "weaponpistol.h"
+//#include "weaponpistol.h"
+#include "weaponcustompistol.h"
 #include "rocketlauncher.h"
 #include "script_export_space.h"
 

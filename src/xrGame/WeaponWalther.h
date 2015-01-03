@@ -1,6 +1,6 @@
 #pragma once
 
-#include "weaponpistol.h"
+#include "weaponrevolver.h"
 #include "script_export_space.h"
 
 class CWeaponWalther :
