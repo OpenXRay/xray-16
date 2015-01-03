@@ -783,6 +783,11 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
         }
     }
 
+#if RENDER != R_R1
+    if (g_pGameLevel && (phase == RImplementation.PHASE_SMAP) && ps_actor_shadow_flags.test(RFLAG_ACTOR_SHADOW))
+        g_hud->Render_Actor_Shadow(); // Actor Shadow
+#endif
+
     // Restore
     ViewBase = ViewSave;
     View = nullptr;

@@ -817,6 +817,7 @@ public:
     bool isTorch() const;
     bool isWeaponGL() const;
     bool isInventoryBox() const;
+    bool IsActorOutdoors() const;
     //end AVO
 
     doors::door* m_door;

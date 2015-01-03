@@ -309,6 +309,9 @@ public:
     }
     IC CCameraBase* cam_Active() { return cameras[cam_active]; }
     IC CCameraBase* cam_FirstEye() { return cameras[eacFirstEye]; }
+
+    EActorCameras active_cam() const { return cam_active; } // KD: we need to know which cam is active outside actor methods
+
 protected:
     virtual void cam_Set(EActorCameras style);
     void cam_Update(float dt, float fFOV);

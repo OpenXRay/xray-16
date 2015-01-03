@@ -26,6 +26,8 @@ public:
     virtual void Render_Last();
     virtual void OnFrame();
 
+    void Render_Actor_Shadow() override; // added by KD
+
     virtual void RenderUI();
 
     //.				CUI*		GetUI				(){return pUI;}

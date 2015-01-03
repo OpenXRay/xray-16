@@ -210,6 +210,23 @@ void CHUDManager::Render_Last()
     GlobalEnv.Render->set_HUD(FALSE);
 }
 
+void CHUDManager::Render_Actor_Shadow() // added by KD
+{
+    if (pUIGame == nullptr) return;
+
+    auto object = g_pGameLevel->CurrentViewEntity();
+    if (object == nullptr) return;
+
+    auto actor = smart_cast<CActor*>(object);
+    if (!actor) return;
+
+    // KD: we need to render actor shadow only in first eye cam mode because
+    // in other modes actor model already in scene graph and renders well
+    if (actor->active_cam() != eacFirstEye) return;
+    GlobalEnv.Render->set_Object(object->H_Root());
+    object->renderable_Render();
+}
+
 #include "player_hud.h"
 bool CHUDManager::RenderActiveItemUIQuery()
 {

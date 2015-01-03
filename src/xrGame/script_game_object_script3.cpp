@@ -341,7 +341,8 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("start_particles", &CScriptGameObject::start_particles)
         .def("stop_particles", &CScriptGameObject::stop_particles)
 
-        //AVO: functions for object testing
+        //AVO: additional functions
+        .def("is_actor_outdoors", &CScriptGameObject::IsActorOutdoors)
         .def("is_game_object", &CScriptGameObject::isGameObject)
         //.def("is_car", &CScriptGameObject::isCar)
         .def("is_helicopter", &CScriptGameObject::isHeli)
