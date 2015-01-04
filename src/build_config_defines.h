@@ -10,3 +10,5 @@
 #define NON_FATAL_VERIFY // don't crash game when VERIFY fails
 #define DETAIL_RADIUS // detail draw radius (by KD)
 #define ECO_RENDER // limit FPS in menu to prevent video card overheat (by alpet)
+#define NEW_ANIMS // use new animations. Please enclose any new animation addions with this define
+#define NEW_SOUNDS // use new sounds. Please enclose any new sound addions with this define
