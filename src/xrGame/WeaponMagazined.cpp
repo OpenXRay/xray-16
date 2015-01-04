@@ -21,6 +21,9 @@
 #include "game_object_space.h"
 #include "script_callback_ex.h"
 #include "script_game_object.h"
+#include "HudSound.h"
+
+#include "Common/Config.hpp"
 
 ENGINE_API bool g_dedicated_server;
 
@@ -42,6 +45,7 @@ CWeaponMagazined::CWeaponMagazined(ESoundTypes eSoundType) : CWeapon()
     m_eSoundShot = ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING | eSoundType);
     m_eSoundEmptyClick = ESoundTypes(SOUND_TYPE_WEAPON_EMPTY_CLICKING | eSoundType);
     m_eSoundReload = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
+    m_eSoundReloadEmpty = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
     m_sounds_enabled = true;
 
     m_sSndShotCurrent = NULL;
@@ -60,6 +64,20 @@ CWeaponMagazined::~CWeaponMagazined()
 }
 
 void CWeaponMagazined::net_Destroy() { inherited::net_Destroy(); }
+
+//AVO: for custom added sounds check if sound exists
+bool CWeaponMagazined::WeaponSoundExist(LPCSTR section, LPCSTR sound_name)
+{
+    pcstr str;
+    bool sec_exist = process_if_exists_set(section, sound_name, &CInifile::r_string, str, true);
+    if (sec_exist)
+        return true;
+    Msg("~ [WARNING] ------ Sound [%s] does not exist in [%s]", sound_name, section);
+    return false;
+}
+
+//-AVO
+
 void CWeaponMagazined::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -70,6 +88,11 @@ void CWeaponMagazined::Load(LPCSTR section)
     m_sounds.LoadSound(section, "snd_shoot", "sndShot", false, m_eSoundShot);
     m_sounds.LoadSound(section, "snd_empty", "sndEmptyClick", false, m_eSoundEmptyClick);
     m_sounds.LoadSound(section, "snd_reload", "sndReload", true, m_eSoundReload);
+
+#ifdef NEW_SOUNDS //AVO: custom sounds go here
+    if (WeaponSoundExist(section, "snd_reload_empty"))
+        m_sounds.LoadSound(section, "snd_reload_empty", "sndReloadEmpty", true, m_eSoundReloadEmpty);
+#endif //-NEW_SOUNDS
 
     m_sSndShotCurrent = "sndShot";
 
@@ -457,6 +480,12 @@ void CWeaponMagazined::UpdateSounds()
     m_sounds.SetPosition("sndHide", P);
     //. nah	m_sounds.SetPosition("sndShot", P);
     m_sounds.SetPosition("sndReload", P);
+
+#ifdef NEW_SOUNDS //AVO: custom sounds go here
+    if (m_sounds.FindSoundItem("sndReloadEmpty", false))
+        m_sounds.SetPosition("sndReloadEmpty", P);
+#endif //-NEW_SOUNDS
+
     //. nah	m_sounds.SetPosition("sndEmptyClick", P);
 }
 
@@ -688,7 +717,17 @@ void CWeaponMagazined::switch2_Empty()
 void CWeaponMagazined::PlayReloadSound()
 {
     if (m_sounds_enabled)
-        PlaySound("sndReload", get_LastFP());
+        if (iAmmoElapsed == 0)
+        {
+#ifdef NEW_SOUNDS //AVO: custom reload sound
+            if (m_sounds.FindSoundItem("sndReloadEmpty", false))
+                PlaySound("sndReloadEmpty", get_LastFP());
+            else
+#endif //-NEW_SOUNDS
+                PlaySound("sndReload", get_LastFP());
+        }
+        else
+            PlaySound("sndReload", get_LastFP());
 }
 
 void CWeaponMagazined::switch2_Reload()
@@ -1053,7 +1092,17 @@ void CWeaponMagazined::PlayAnimShow()
 void CWeaponMagazined::PlayAnimHide()
 {
     VERIFY(GetState() == eHiding);
-    PlayHUDMotion("anm_hide", TRUE, this, GetState());
+    if (iAmmoElapsed == 0)
+    {
+#ifdef NEW_ANIMS //AVO: new reload animation
+        if (isHUDAnimationExist("anm_reload_empty"))
+            PlayHUDMotion("anm_reload_empty", true, this, GetState());
+        else
+#endif //-NEW_ANIMS
+            PlayHUDMotion("anm_reload", true, this, GetState());
+    }
+    else
+        PlayHUDMotion("anm_reload", true, this, GetState());
 }
 
 void CWeaponMagazined::PlayAnimReload()
@@ -1347,6 +1396,15 @@ bool CWeaponMagazined::install_upgrade_impl(LPCSTR section, bool test)
         m_sounds.LoadSound(section, "snd_reload", "sndReload", true, m_eSoundReload);
     }
     result |= result2;
+
+#ifdef NEW_SOUNDS //AVO: custom sounds go here
+    result2 = process_if_exists_set(section, "snd_reload_empty", &CInifile::r_string, str, test);
+    if (result2 && !test)
+    {
+        m_sounds.LoadSound(section, "snd_reload_empty", "sndReloadEmpty", true, m_eSoundReloadEmpty);
+    }
+    result |= result2;
+#endif //-NEW_SOUNDS
 
     // snd_shoot1     = weapons\ak74u_shot_1 ??
     // snd_shoot2     = weapons\ak74u_shot_2 ??

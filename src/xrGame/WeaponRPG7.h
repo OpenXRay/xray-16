@@ -1,12 +1,11 @@
 #pragma once
 
-#include "weaponpistol.h"
-#include "rocketlauncher.h"
+#include "WeaponCustomPistol.h"
+#include "RocketLauncher.h"
 
 class CWeaponRPG7 : public CWeaponCustomPistol, public CRocketLauncher
 {
-private:
-    typedef CWeaponCustomPistol inherited;
+    using inherited = CWeaponCustomPistol;
 
 public:
     CWeaponRPG7();

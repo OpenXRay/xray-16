@@ -180,4 +180,6 @@ public:
     virtual void debug_draw_firedeps(){};
 
     virtual CHudItem* cast_hud_item() { return this; }
+    void PlayAnimIdleMovingCrouch(); //AVO: new crouch idle animation
+    bool isHUDAnimationExist(pcstr anim_name);
 };

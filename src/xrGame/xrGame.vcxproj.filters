@@ -6649,6 +6649,12 @@
     <ClInclude Include="profile_data_types_script.h">
       <Filter>Core\Server\Games\PlayerAccounts</Filter>
     </ClInclude>
+    <ClInclude Include="WeaponRevolver.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
+    </ClInclude>
+    <ClInclude Include="WeaponCustomPistolAuto.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -10156,6 +10162,12 @@
       <Filter>PCH</Filter>
     </ClCompile>
     <ClCompile Include="$(xrExternals)GameSpy\src\GameSpy\md5c.c" />
+    <ClCompile Include="WeaponRevolver.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
+    </ClCompile>
+    <ClCompile Include="WeaponCustomPistolAuto.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ai\monsters\chimera\chimera_attack_state.h">

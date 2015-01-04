@@ -12,3 +12,5 @@
 //#define FP_DEATH // first person death view
 #define DETAIL_RADIUS // detail draw radius (by K.D.)
 #define ECO_RENDER  //ECO_RENDER adds a small delay between rendering, reduce FPS in main menu or in videos
+#define NEW_ANIMS // use new animations. Please enclose any new animation additions with this define
+#define NEW_SOUNDS // use new sounds. Please enclose any new sound additions with this define 

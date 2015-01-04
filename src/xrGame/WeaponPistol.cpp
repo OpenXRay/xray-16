@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "weaponpistol.h"
+#include "WeaponPistol.h"
 #include "ParticlesObject.h"
-#include "actor.h"
+#include "Actor.h"
 
 CWeaponPistol::CWeaponPistol()
 {
