@@ -134,6 +134,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NVTT", "3rd party\NVTT\NVTT
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LuaJIT-1.1.8", "3rd party\LuaJIT-1.1.8\LuaJIT-1.1.8.vcxproj", "{2AC1029E-E582-40CF-9CD1-5EFA4211AFC9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua_extensions", "3rd party\lua-extensions\lua_extensions.vcxproj", "{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_Dedicated|Win32 = Debug_Dedicated|Win32
@@ -593,6 +595,18 @@ Global
 		{2AC1029E-E582-40CF-9CD1-5EFA4211AFC9}.Release_Dedicated|Win32.Build.0 = Release|Win32
 		{2AC1029E-E582-40CF-9CD1-5EFA4211AFC9}.Release|Win32.ActiveCfg = Release|Win32
 		{2AC1029E-E582-40CF-9CD1-5EFA4211AFC9}.Release|Win32.Build.0 = Release|Win32
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Debug_Dedicated|Win32.ActiveCfg = Debug|Win32
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Debug_Dedicated|Win32.Build.0 = Debug|Win32
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Debug|Win32.Build.0 = Debug|Win32
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Mixed_Dedicated|Win32.ActiveCfg = Release|Win32
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Mixed_Dedicated|Win32.Build.0 = Release|Win32
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Mixed|Win32.ActiveCfg = Release|Win32
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Mixed|Win32.Build.0 = Release|Win32
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Release_Dedicated|Win32.ActiveCfg = Release|Win32
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Release_Dedicated|Win32.Build.0 = Release|Win32
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Release|Win32.ActiveCfg = Release|Win32
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -637,6 +651,7 @@ Global
 		{880CD250-BA77-4DAF-A8D4-552F12DD3AE4} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 		{0EB257DC-5CFC-44B0-82C9-CE6B158BE473} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 		{2AC1029E-E582-40CF-9CD1-5EFA4211AFC9} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 	EndGlobalSection
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}

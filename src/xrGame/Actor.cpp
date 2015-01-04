@@ -732,14 +732,13 @@ void CActor::HitMark(float P,
 
 void CActor::HitSignal(float perc, Fvector& vLocalDir, CObject* who, s16 element)
 {
+    //AVO: get bone names from IDs
+    //LPCSTR bone_name = smart_cast<IKinematics*>(this->Visual())->LL_BoneName_dbg(element);
+    //Msg("Bone [%d]->[%s]", element, bone_name);
+    //-AVO
+    
     if (g_Alive())
     {
-        /* AVO: to get bone names from IDs*/
-        /*Log("hit info");
-        Log("bone ID = %s", element);
-        Log("bone Name = %s", smart_cast<IKinematics*>(this->Visual())->LL_BoneName_dbg(element));
-        Log("hit info END");*/
-
         // check damage bone
         Fvector D;
         XFORM().transform_dir(D, vLocalDir);

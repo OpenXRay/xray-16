@@ -214,6 +214,14 @@ void CAI_Stalker::Hit(SHit* pHDS)
 	//хит может меняться в зависимости от ранга (новички получают больше хита, чем ветераны)
 	SHit HDS = *pHDS;
 	HDS.add_wound = true;
+
+    //AVO: get bone names from IDs
+    //if (HDS.whoID == 0) // if shot by actor
+    //{
+    //    LPCSTR bone_name = smart_cast<IKinematics*>(this->Visual())->LL_BoneName_dbg(HDS.boneID);
+    //    Msg("Bone [%d]->[%s]", HDS.boneID, bone_name);
+    //}
+    //-AVO
 	
 	float hit_power = HDS.power * m_fRankImmunity;
 
