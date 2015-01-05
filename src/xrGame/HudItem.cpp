@@ -383,20 +383,19 @@ bool CHudItem::TryPlayAnimIdle()
 }
 
 //AVO: check is animation exists
-bool CHudItem::DoesAnimationExist(LPCSTR anim_name)
+bool CHudItem::HudAnimationExist(LPCSTR anim_name)
 {
     string256 anim_name_r;
     bool is_16x9 = UI().is_widescreen();
     u16 attach_place_idx = pSettings->r_u16(HudItemData()->m_sect_name, "attach_place_idx");
     xr_sprintf(anim_name_r, "%s%s", anim_name, ((attach_place_idx == 1) && is_16x9) ? "_16x9" : "");
-    player_hud_motion_container	m_hand_motions;
-    player_hud_motion* anm = m_hand_motions.find_motion(anim_name_r);
+    player_hud_motion* anm = HudItemData()->m_hand_motions.find_motion(anim_name_r);
     //VERIFY2(anm, make_string("Animation [%s] not found", anim_name).c_str());
     if (anm)
         return true;
     else
     {
-        Msg("AVO----->Animation [%s] does not exist", anim_name);
+        Msg("~ [WARNING] ------ Animation [%s] does not exist in [%s]", anim_name, HudItemData()->m_sect_name.c_str());
         return false;
     }
 }
@@ -405,7 +404,7 @@ bool CHudItem::DoesAnimationExist(LPCSTR anim_name)
 //AVO: new crouch idle animation
 void CHudItem::PlayAnimCrouchIdleMoving()
 {
-    if (DoesAnimationExist("anm_idle_moving_crouch"))
+    if (HudAnimationExist("anm_idle_moving_crouch"))
         PlayHUDMotion("anm_idle_moving_crouch", TRUE, NULL, GetState());
 }
 //-AVO

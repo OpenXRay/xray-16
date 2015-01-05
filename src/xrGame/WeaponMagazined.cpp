@@ -68,6 +68,21 @@ void CWeaponMagazined::net_Destroy()
     inherited::net_Destroy();
 }
 
+//AVO: for custom added sounds check if sound exists
+bool CWeaponMagazined::WeaponSoundExist(LPCSTR section, LPCSTR sound_name)
+{
+    LPCSTR str;
+    bool sec_exist = process_if_exists_set(section, sound_name, &CInifile::r_string, str, true);
+    if (sec_exist)
+        return true;
+    else
+    {
+        Msg("~ [WARNING] ------ Sound [%s] does not exist in [%s]", sound_name, section);
+        return false;
+    }
+}
+//-AVO
+
 void CWeaponMagazined::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -80,13 +95,8 @@ void CWeaponMagazined::Load(LPCSTR section)
     m_sounds.LoadSound(section, "snd_reload", "sndReload", true, m_eSoundReload);
 
 #ifdef NEW_SOUNDS //AVO: custom sounds go here
-    //TODO: refactor sound exstance check into its own function
-    LPCSTR str;
-    bool sec_exist = process_if_exists_set(section, "snd_reload_empty", &CInifile::r_string, str, true);
-    if (sec_exist)
+    if (WeaponSoundExist(section, "snd_reload_empty"))
         m_sounds.LoadSound(section, "snd_reload_empty", "sndReloadEmpty", true, m_eSoundReloadEmpty);
-    else
-        Msg("AVO----->Sound snd_reload_empty not found");
 #endif //-NEW_SOUNDS
 
     m_sSndShotCurrent = "sndShot";
@@ -1125,7 +1135,7 @@ void CWeaponMagazined::PlayAnimReload()
     if (iAmmoElapsed == 0)
     {
 #ifdef NEW_ANIMS //AVO: new reload animation
-        if (DoesAnimationExist("anm_reload_empty"))
+        if (HudAnimationExist("anm_reload_empty"))
             PlayHUDMotion("anm_reload_empty", TRUE, this, GetState());
         else
 #endif //-NEW_ANIMS

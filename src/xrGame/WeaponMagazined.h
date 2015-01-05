@@ -161,7 +161,12 @@ public:
     };
     virtual	int		GetCurrentFireMode()
     {
-        return m_aFireModes[m_iCurFireMode];
+        //AVO: fixed crash due to original GSC assumption that CWeaponMagazined will always have firemodes specified in configs.
+        //return m_aFireModes[m_iCurFireMode];
+        if (HasFireModes())
+            return m_aFireModes[m_iCurFireMode];
+        else
+            return 1;
     };
 
     virtual void	save(NET_Packet &output_packet);
@@ -198,4 +203,6 @@ protected:
         u16 parent_id,
         u16 weapon_id,
         bool send_hit);
+    //AVO: for custom added sounds check if sound exists
+    bool WeaponSoundExist(LPCSTR section, LPCSTR sound_name);
 };

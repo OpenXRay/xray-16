@@ -613,7 +613,7 @@ void CWeaponMagazinedWGrenade::PlayAnimReload()
         if (iAmmoElapsed == 0)
         {
 #ifdef NEW_ANIMS //AVO: new reload animation
-            if (DoesAnimationExist("anm_reload_empty_w_gl"))
+            if (HudAnimationExist("anm_reload_empty_w_gl"))
                 PlayHUDMotion("anm_reload_empty_w_gl", TRUE, this, GetState());
             else
 #endif //-NEW_ANIMS
@@ -676,7 +676,7 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
                             if (act_state == 3)
                             {
 #ifdef NEW_ANIMS //AVO: custom move animation
-                                if (DoesAnimationExist("anm_idle_moving_crouch_g")) 
+                                if (HudAnimationExist("anm_idle_moving_crouch_g")) 
                                     PlayHUDMotion("anm_idle_moving_crouch_g", TRUE, NULL, GetState());
 #endif //-NEW_ANIMS
                             }
@@ -695,7 +695,7 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
                             if (act_state == 3)
                             {
 #ifdef NEW_ANIMS //AVO: custom move animation
-                                if (DoesAnimationExist("anm_idle_moving_crouch_w_gl"))
+                                if (HudAnimationExist("anm_idle_moving_crouch_w_gl"))
                                     PlayHUDMotion("anm_idle_moving_crouch_w_gl", TRUE, NULL, GetState());
 #endif //-NEW_ANIMS
                             }
