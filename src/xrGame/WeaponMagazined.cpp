@@ -481,7 +481,7 @@ void CWeaponMagazined::UpdateSounds()
     m_sounds.SetPosition("sndHide", P);
     //. nah	m_sounds.SetPosition("sndShot", P);
     m_sounds.SetPosition("sndReload", P);
-    
+
 #ifdef NEW_SOUNDS //AVO: custom sounds go here
     if (m_sounds.FindSoundItem("sndReloadEmpty", false))
         m_sounds.SetPosition("sndReloadEmpty", P);
@@ -742,20 +742,28 @@ void CWeaponMagazined::switch2_Empty()
 void CWeaponMagazined::PlayReloadSound()
 {
     if (m_sounds_enabled)
-        if (iAmmoElapsed == 0)
+    {
+#ifdef NEW_SOUNDS //AVO: use custom sounds
+        if (bMisfire)
         {
-            
-#ifdef NEW_SOUNDS //AVO: custom reload sound
-            if (m_sounds.FindSoundItem("sndReloadEmpty", false))
-                PlaySound("sndReloadEmpty", get_LastFP());
-            else
-#endif //-NEW_SOUNDS
+            //TODO: make sure correct sound is loaded in CWeaponMagazined::Load(LPCSTR section)
+            if (m_sounds.FindSoundItem("sndReload", false))
                 PlaySound("sndReload", get_LastFP());
         }
         else
         {
-            PlaySound("sndReload", get_LastFP());
+            if (iAmmoElapsed == 0)
+            {
+                if (m_sounds.FindSoundItem("sndReloadEmpty", false))
+                    PlaySound("sndReloadEmpty", get_LastFP());
+            }
+            else
+                PlaySound("sndReload", get_LastFP());
         }
+#else
+        PlaySound("sndReload", get_LastFP());
+#endif //-AVO
+    }
 }
 
 void CWeaponMagazined::switch2_Reload()
@@ -1132,19 +1140,28 @@ void CWeaponMagazined::PlayAnimHide()
 void CWeaponMagazined::PlayAnimReload()
 {
     VERIFY(GetState() == eReload);
-    if (iAmmoElapsed == 0)
+#ifdef NEW_ANIMS //AVO: use new animations
+    if (bMisfire)
     {
-#ifdef NEW_ANIMS //AVO: new reload animation
-        if (HudAnimationExist("anm_reload_empty"))
-            PlayHUDMotion("anm_reload_empty", TRUE, this, GetState());
-        else
-#endif //-NEW_ANIMS
+        Msg("AVO: ------ MISFIRE");
+        if (HudAnimationExist("anm_reload"))
             PlayHUDMotion("anm_reload", TRUE, this, GetState());
     }
     else
     {
-        PlayHUDMotion("anm_reload", TRUE, this, GetState());
+        if (iAmmoElapsed == 0)
+        {
+            if (HudAnimationExist("anm_reload_empty"))
+                PlayHUDMotion("anm_reload_empty", TRUE, this, GetState());
+        }
+        else
+        {
+            PlayHUDMotion("anm_reload", TRUE, this, GetState());
+        }
     }
+#else
+    PlayHUDMotion("anm_reload", TRUE, this, GetState());
+#endif //-NEW_ANIM
 }
 
 void CWeaponMagazined::PlayAnimAim()
