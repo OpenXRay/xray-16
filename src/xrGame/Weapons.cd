@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Comment CommentText="Attachments here">
+    <Position X="19.673" Y="6.793" Height="0.337" Width="1.507" />
+  </Comment>
   <Class Name="CWeaponPistol" Collapsed="true">
     <Position X="41.25" Y="11" Width="1.5" />
     <TypeIdentifier>
@@ -17,12 +20,44 @@
   <Class Name="CWeaponMagazined" Collapsed="true">
     <Position X="19" Y="8.25" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>hPoBiBBJZ6iGxErgZMEEYAMYJMIIgUgBKDEhAyRkTwQ=</HashCode>
+      <HashCode>hPoBiBBJZ6iGxErgZMEEYAMYNMIIgUgBKDEhAyRkTwQ=</HashCode>
       <FileName>WeaponMagazined.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="CWeapon" Collapsed="true">
     <Position X="18" Y="6.75" Width="1.5" />
+    <NestedTypes>
+      <Typedef Name="CWeapon::inherited" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Weapon.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Enum Name="CWeapon::EWeaponStates" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Weapon.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="CWeapon::EWeaponSubStates" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Weapon.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="CWeapon::__unnamed_enum_0f61_1" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Weapon.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Struct Name="CWeapon::SZoomParams" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Weapon.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="CWeapon::SPDM" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Weapon.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
     <TypeIdentifier>
       <HashCode>b9YKtlUjd5jVtrNfL0rfd7I8fGztrz5HT9h+LzLP+/4=</HashCode>
       <FileName>Weapon.h</FileName>
@@ -52,7 +87,7 @@
   <Class Name="CHudItem" Collapsed="true">
     <Position X="21" Y="3.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>BCAQgEAQASxYaPIVoEQQhKhMcIAEaSAgYgKCLxkAGRw=</HashCode>
+      <HashCode>BCAQgEAQASxYaPIVoEQQhKhMcIAEaSAgYgKCLxkAWRQ=</HashCode>
       <FileName>HudItem.h</FileName>
     </TypeIdentifier>
   </Class>
@@ -248,7 +283,7 @@
   <Class Name="CWeaponAutomaticShotgun" Collapsed="true">
     <Position X="2.75" Y="9.75" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AACAlAAAAQgRAABAAAAEAhAAAgEAAAwQCAEAAEAAAAQ=</HashCode>
+      <HashCode>AACAlAAAAQgRAABAAAAEAhAAAgEAAAQQCAEAAEAAAAQ=</HashCode>
       <FileName>WeaponAutomaticShotgun.h</FileName>
     </TypeIdentifier>
   </Class>

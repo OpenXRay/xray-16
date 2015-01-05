@@ -747,7 +747,9 @@ void CWeaponMagazined::PlayReloadSound()
         if (bMisfire)
         {
             //TODO: make sure correct sound is loaded in CWeaponMagazined::Load(LPCSTR section)
-            if (m_sounds.FindSoundItem("sndReload", false))
+            if (m_sounds.FindSoundItem("sndReloadMisfire", false))
+                PlaySound("sndReloadMisfire", get_LastFP());
+            else
                 PlaySound("sndReload", get_LastFP());
         }
         else
@@ -756,6 +758,8 @@ void CWeaponMagazined::PlayReloadSound()
             {
                 if (m_sounds.FindSoundItem("sndReloadEmpty", false))
                     PlaySound("sndReloadEmpty", get_LastFP());
+                else
+                    PlaySound("sndReload", get_LastFP());
             }
             else
                 PlaySound("sndReload", get_LastFP());
@@ -1144,7 +1148,9 @@ void CWeaponMagazined::PlayAnimReload()
     if (bMisfire)
     {
         Msg("AVO: ------ MISFIRE");
-        if (HudAnimationExist("anm_reload"))
+        if (HudAnimationExist("anm_reload_misfire"))
+            PlayHUDMotion("anm_reload_misfire", TRUE, this, GetState());
+        else
             PlayHUDMotion("anm_reload", TRUE, this, GetState());
     }
     else
@@ -1153,6 +1159,8 @@ void CWeaponMagazined::PlayAnimReload()
         {
             if (HudAnimationExist("anm_reload_empty"))
                 PlayHUDMotion("anm_reload_empty", TRUE, this, GetState());
+            else
+                PlayHUDMotion("anm_reload", TRUE, this, GetState());
         }
         else
         {

@@ -382,22 +382,27 @@ bool CHudItem::TryPlayAnimIdle()
     return false;
 }
 
-//AVO: check is animation exists
+//AVO: check if animation exists
 bool CHudItem::HudAnimationExist(LPCSTR anim_name)
 {
-    string256 anim_name_r;
-    bool is_16x9 = UI().is_widescreen();
-    u16 attach_place_idx = pSettings->r_u16(HudItemData()->m_sect_name, "attach_place_idx");
-    xr_sprintf(anim_name_r, "%s%s", anim_name, ((attach_place_idx == 1) && is_16x9) ? "_16x9" : "");
-    player_hud_motion* anm = HudItemData()->m_hand_motions.find_motion(anim_name_r);
-    //VERIFY2(anm, make_string("Animation [%s] not found", anim_name).c_str());
-    if (anm)
-        return true;
-    else
+    if (HudItemData()) // First person
     {
-        Msg("~ [WARNING] ------ Animation [%s] does not exist in [%s]", anim_name, HudItemData()->m_sect_name.c_str());
-        return false;
+        string256 anim_name_r;
+        bool is_16x9 = UI().is_widescreen();
+        u16 attach_place_idx = pSettings->r_u16(HudItemData()->m_sect_name, "attach_place_idx");
+        xr_sprintf(anim_name_r, "%s%s", anim_name, ((attach_place_idx == 1) && is_16x9) ? "_16x9" : "");
+        player_hud_motion* anm = HudItemData()->m_hand_motions.find_motion(anim_name_r);
+        if (anm)
+            return true;
     }
+    else // Third person
+    {
+        if (g_player_hud->motion_length(anim_name, HudSection(), m_current_motion_def) > 100)
+            return true;
+
+    }
+    Msg("~ [WARNING] ------ Animation [%s] does not exist in [%s]", anim_name, HudSection().c_str());
+    return false;
 }
 //-AVO
 
