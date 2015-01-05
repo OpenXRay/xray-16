@@ -11064,5 +11064,8 @@
     <None Include="Weapons.cd">
       <Filter>Class Diagrams</Filter>
     </None>
+    <None Include="Players.cd">
+      <Filter>Class Diagrams</Filter>
+    </None>
   </ItemGroup>
 </Project>
