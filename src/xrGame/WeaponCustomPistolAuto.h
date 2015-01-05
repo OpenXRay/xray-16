@@ -14,4 +14,5 @@ public:
 protected:
     void FireEnd() override;
     void switch2_Fire() override;
+    void PlayAnimReload() override;
 };

@@ -21,3 +21,8 @@ void CWeaponCustomPistolAuto::FireEnd()
         inherited::FireEnd();
     }
 }
+
+void CWeaponCustomPistolAuto::PlayAnimReload()
+{
+    inherited::PlayAnimReload();
+} 

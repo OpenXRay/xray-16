@@ -86,15 +86,13 @@ void CWeaponPistol::PlayAnimAim()
 
 void CWeaponPistol::PlayAnimReload()
 {
-    VERIFY(GetState() == eReload);
+    /*VERIFY(GetState() == eReload);
     if (iAmmoElapsed == 0)
-    {
-        PlayHUDMotion("anm_reload_empty", TRUE, this, GetState());
-    }
+        PlayHUDMotion("anm_reload_empty", true, this, GetState());
     else
-    {
-        PlayHUDMotion("anm_reload", TRUE, this, GetState());
-    }
+        PlayHUDMotion("anm_reload", true, this, GetState());*/
+
+    inherited::PlayAnimReload(); //AVO: refactored to use grand-parent (CWeaponMagazined) function
 }
 
 void CWeaponPistol::PlayAnimHide()
