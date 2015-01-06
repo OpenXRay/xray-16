@@ -399,6 +399,9 @@ public:
     int Weapon_Scope_Status();
     int Weapon_Silencer_Status();
 
+    void Weapon_AddonAttach(CScriptGameObject& item); //Alundaio
+    void Weapon_AddonDetach(pcstr item_section); //Alundaio
+
     LPCSTR ProfileName();
     LPCSTR CharacterName();
     LPCSTR CharacterIcon();

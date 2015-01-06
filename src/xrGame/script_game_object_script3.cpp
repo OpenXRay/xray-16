@@ -203,6 +203,11 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("weapon_scope_status", &CScriptGameObject::Weapon_Scope_Status)
         .def("weapon_silencer_status", &CScriptGameObject::Weapon_Silencer_Status)
 
+        //Alundaio: Extended exports
+        .def("weapon_addon_attach", &CScriptGameObject::Weapon_AddonAttach)
+        .def("weapon_addon_detach", &CScriptGameObject::Weapon_AddonDetach)
+        //Alundaio: END
+
         .def("allow_sprint", &CScriptGameObject::AllowSprint)
 
         .def("set_start_dialog", &CScriptGameObject::SetStartDialog)

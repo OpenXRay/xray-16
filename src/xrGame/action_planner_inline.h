@@ -128,14 +128,14 @@ IC typename CPlanner::CConditionEvaluator& CPlanner::evaluator(const _condition_
 TEMPLATE_SPECIALIZATION
 IC typename CPlanner::_action_id_type CPlanner::current_action_id() const
 {
-    VERIFY(initialized());
+    VERIFY2(initialized(), make_string("ERROR: action by id [%d] not initialized!", m_current_action_id)); //Alundaio: More detailed information needed
     return (m_current_action_id);
 }
 
 TEMPLATE_SPECIALIZATION
 IC typename CPlanner::COperator& CPlanner::current_action() { return (action(current_action_id())); }
 TEMPLATE_SPECIALIZATION
-IC bool CPlanner::initialized() const { return (m_initialized); }
+IC bool CPlanner::initialized() const { return m_initialized; }
 TEMPLATE_SPECIALIZATION
 IC void CPlanner::add_condition(_world_operator* action, _condition_type condition_id, _value_type condition_value)
 {

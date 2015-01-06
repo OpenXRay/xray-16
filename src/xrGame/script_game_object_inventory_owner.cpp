@@ -6,14 +6,14 @@
 #include "script_game_object.h"
 #include "script_game_object_impl.h"
 #include "InventoryOwner.h"
-#include "Pda.h"
+#include "PDA.h"
 #include "xrMessages.h"
 #include "character_info.h"
-#include "gametask.h"
-#include "actor.h"
+#include "GameTask.h"
+#include "Actor.h"
 #include "Level.h"
 #include "date_time.h"
-#include "uigamesp.h"
+#include "UIGameSP.h"
 #include "restricted_object.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "attachable_item.h"
@@ -21,16 +21,16 @@
 #include "string_table.h"
 #include "alife_registry_wrappers.h"
 #include "relation_registry.h"
-#include "custommonster.h"
-#include "actorcondition.h"
+#include "CustomMonster.h"
+#include "ActorCondition.h"
 #include "xrAICore/Navigation/level_graph.h"
-#include "huditem.h"
+#include "HudItem.h"
 #include "ui/UItalkWnd.h"
-#include "inventory.h"
-#include "infoportion.h"
+#include "Inventory.h"
+#include "InfoPortion.h"
 #include "AI/Monsters/BaseMonster/base_monster.h"
-#include "weaponmagazined.h"
-#include "ai/stalker/ai_stalker.h"
+#include "WeaponMagazined.h"
+#include "Ai/Stalker/ai_stalker.h"
 #include "agent_manager.h"
 #include "agent_member_manager.h"
 #include "stalker_animation_manager.h"
@@ -42,11 +42,11 @@
 #include "ai/stalker/ai_stalker_impl.h"
 #include "smart_cover_object.h"
 #include "smart_cover.h"
-#include "customdetector.h"
+#include "CustomDetector.h"
 #include "doors_manager.h"
 #include "doors_door.h"
 #include "Torch.h"
-#include "physicobject.h"
+#include "PhysicObject.h"
 
 bool CScriptGameObject::GiveInfoPortion(LPCSTR info_id)
 {
@@ -1693,3 +1693,32 @@ bool CScriptGameObject::is_door_blocked_by_npc() const
     VERIFY2(m_door, make_string("object %s hasn't been registered as a door already", m_game_object->cName().c_str()));
     return ai().doors().is_door_blocked(m_door);
 }
+
+
+//Alundaio: Methods for exporting the ability to detach/attach addons for magazined weapons
+void CScriptGameObject::Weapon_AddonAttach(CScriptGameObject& item)
+{
+    auto weapon = smart_cast<CWeaponMagazined*>(&object());
+    if (!weapon)
+    {
+        ai().script_engine().script_log(LuaMessageType::Error, "CWeaponMagazined : cannot access class member Weapon_AddonAttach!");
+        return;
+    }
+
+    if (weapon->CanAttach((PIItem)&item))
+        weapon->Attach((PIItem)&item, true);
+}
+
+void CScriptGameObject::Weapon_AddonDetach(pcstr item_section)
+{
+    auto weapon = smart_cast<CWeaponMagazined*>(&object());
+    if (!weapon)
+    {
+        ai().script_engine().script_log(LuaMessageType::Error, "CWeaponMagazined : cannot access class member Weapon_AddonDetach!");
+        return;
+    }
+
+    if (weapon->CanDetach(item_section))
+        weapon->Detach(item_section, true);
+}
+//Alundaio: END 
