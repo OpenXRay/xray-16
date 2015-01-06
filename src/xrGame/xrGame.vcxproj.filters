@@ -2488,6 +2488,9 @@
     <Filter Include="Physics\scripts">
       <UniqueIdentifier>{66d4d9cb-fbc2-4e9a-8483-4eb5c1738ed9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Class Diagrams">
+      <UniqueIdentifier>{3c08723e-1b59-45e4-958f-3a1c5590cfa9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -7377,6 +7380,12 @@
     <ClInclude Include="ui\ChangeWeatherDialog.hpp">
       <Filter>UI\Multiplayer\Voting</Filter>
     </ClInclude>
+    <ClInclude Include="WeaponCustomAuto.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
+    </ClInclude>
+    <ClInclude Include="WeaponRevolver.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -11024,6 +11033,12 @@
     <ClCompile Include="ui\ChangeWeatherDialog.cpp">
       <Filter>UI\Multiplayer\Voting</Filter>
     </ClCompile>
+    <ClCompile Include="WeaponCustomAuto.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
+    </ClCompile>
+    <ClCompile Include="WeaponRevolver.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ai\monsters\chimera\chimera_attack_state.h">
@@ -11044,5 +11059,13 @@
     <CustomBuild Include="ui\UIRankFaction.h">
       <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Weapons.cd">
+      <Filter>Class Diagrams</Filter>
+    </None>
+    <None Include="Players.cd">
+      <Filter>Class Diagrams</Filter>
+    </None>
   </ItemGroup>
 </Project>

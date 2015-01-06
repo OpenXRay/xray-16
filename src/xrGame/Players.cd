@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CActor" Collapsed="true">
+    <Position X="0.5" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>6f/vv3f+79/Wfvvr6/9/7W3zfvP+bzl3b93f75rd//8=</HashCode>
+      <FileName>Actor.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CEntityAlive" Collapsed="true">
+    <Position X="3.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AVAK4OEEUsCAkLFpBu8KlCFBabGYDNUEIxSgQaLAJGk=</HashCode>
+      <FileName>entity_alive.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CInventoryOwner" Collapsed="true">
+    <Position X="6.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>yECpvFHgxZLqmoShGPkCDU5CY7iurgoqCABGyXgbwmA=</HashCode>
+      <FileName>InventoryOwner.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CEntity" Collapsed="true">
+    <Position X="3.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgYIwQAFDASBYYqgAEKCBADDIAoYAQEIBCBAgWgAIDA=</HashCode>
+      <FileName>Entity.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPhysicsShellHolder" Collapsed="true">
+    <Position X="3.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AWAACADCYKKEkJrJYAJBKkSE5aVQIQcKSAYESAaKD6A=</HashCode>
+      <FileName>PhysicsShellHolder.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CDamageManager" Collapsed="true">
+    <Position X="6.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAABAAAAAABAAAAABAIAAIAAAgCAAAACAAAAQ=</HashCode>
+      <FileName>damage_manager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CGameObject" Collapsed="true">
+    <Position X="3.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>KBZPiFAewcGADoGT6HJTRCUXMDNIaQNxbZgIYDcHj1M=</HashCode>
+      <FileName>GameObject.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CObject" Collapsed="true">
+    <Position X="3.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>hPZO0AkAWAK4ioVwDKAXQUIEISDAuhKAwdCEgogIalM=</HashCode>
+      <FileName>g:\stalker\cop\engine\xray-16\src\xrengine\xr_object.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CUsableScriptObject" Collapsed="true">
+    <Position X="6.5" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAANAAAAAAAAAEAAAAAACAAAAAAQAIAABAAAAAABAAE=</HashCode>
+      <FileName>UsableScriptObject.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CScriptBinder" Collapsed="true">
+    <Position X="8.75" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AFCDgAAAAKCAAIAAAAACBAAAIAAIAAIgAAAAAAAAAAA=</HashCode>
+      <FileName>script_binder.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAI_Stalker" Collapsed="true">
+    <Position X="3.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>6nz///dP9f//7e//3+/P3/36/d/c+3t///ze77+f//8=</HashCode>
+      <FileName>Ai\Stalker\ai_stalker.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CCustomMonster" Collapsed="true">
+    <Position X="3.5" Y="9" Width="1.5" />
+    <NestedTypes>
+      <Typedef Name="CCustomMonster::inherited" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CustomMonster.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Struct Name="CCustomMonster::SAnimState" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CustomMonster.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="CCustomMonster::net_update" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CustomMonster.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Typedef Name="CCustomMonster::CriticalWoundType" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CustomMonster.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Typedef Name="CCustomMonster::BODY_PART" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CustomMonster.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>4HPmuMBMYbiE2InxQu7W3iBMcNfdYKkORl2IN06TSUg=</HashCode>
+      <FileName>CustomMonster.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CObjectHandler" Collapsed="true">
+    <Position X="8.5" Y="9.5" Width="1.5" />
+    <NestedTypes>
+      <Typedef Name="CObjectHandler::inherited" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>object_handler.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Typedef Name="CObjectHandler::_value_type" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>object_handler.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Typedef Name="CObjectHandler::_condition_type" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>object_handler.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAgAoAAoNAEIABGQADBaABAAAIBBCACABIIiGGgAA=</HashCode>
+      <FileName>object_handler.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAttachmentOwner" Collapsed="true">
+    <Position X="6.5" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAgEAAAAAAAAgBAEAJAAIKCCAAAAAQAAAgCI=</HashCode>
+      <FileName>attachment_owner.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

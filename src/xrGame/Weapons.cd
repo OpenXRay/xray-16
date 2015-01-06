@@ -1,0 +1,326 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Comment CommentText="Attachments here">
+    <Position X="19.673" Y="6.793" Height="0.337" Width="1.507" />
+  </Comment>
+  <Class Name="CWeaponPistol" Collapsed="true">
+    <Position X="41.25" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BBgBgAAAAwACYAAAAAAQAAAAIAgAQAQAAAAAIAREAAA=</HashCode>
+      <FileName>WeaponPistol.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponAutoPistol" Collapsed="true">
+    <Position X="41.25" Y="9.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AIAACAAAAAAAAAAAQAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>WeaponCustomAuto.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponMagazined" Collapsed="true">
+    <Position X="19" Y="8.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>hPoBiBBJZ6iGxErgZMEEYAMYNMIIgUgBKDEhAyRkTwQ=</HashCode>
+      <FileName>WeaponMagazined.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeapon" Collapsed="true">
+    <Position X="18" Y="6.75" Width="1.5" />
+    <NestedTypes>
+      <Typedef Name="CWeapon::inherited" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Weapon.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Enum Name="CWeapon::EWeaponStates" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Weapon.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="CWeapon::EWeaponSubStates" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Weapon.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="CWeapon::__unnamed_enum_0f61_1" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Weapon.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Struct Name="CWeapon::SZoomParams" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Weapon.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="CWeapon::SPDM" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Weapon.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>b9YKtlUjd5jVtrNfL0rfd7I8fGztrz5HT9h+LzLP+/4=</HashCode>
+      <FileName>Weapon.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CHudItemObject" Collapsed="true">
+    <Position X="18" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAgAAAAAwAAIAQIEAQAIBEJAAAKAAAAACAAogACAQ=</HashCode>
+      <FileName>hud_item_object.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CShootingObject" Collapsed="true">
+    <Position X="21" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>hMEohOAAQQAFoIGEgoAEBISIDCyJC4RCygUwCZIKgvk=</HashCode>
+      <FileName>ShootingObject.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CInventoryItemObject" Collapsed="true">
+    <Position X="17.75" Y="3.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>IBIAiBAAkYWAAoBRAEIUBABAIAAIKAAEAYAIagQDCAE=</HashCode>
+      <FileName>inventory_item_object.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CHudItem" Collapsed="true">
+    <Position X="21" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BCAQgEAQASxYaPIVoEQQhKhMcIAEaSAgYgKCLxkAWRQ=</HashCode>
+      <FileName>HudItem.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CInventoryItem" Collapsed="true">
+    <Position X="18" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>eJMEghCtlf+hKu5VbGJ8dpT5oqNOJJUkYICJawxrCQU=</HashCode>
+      <FileName>inventory_item.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPhysicItem" Collapsed="true">
+    <Position X="21" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAgAAAAAAAAIIRIAAQBAAAIAAIAAIAAAAAYAAKCAA=</HashCode>
+      <FileName>physic_item.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAttachableItem" Collapsed="true">
+    <Position X="18" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAKCAQQAACAAAAAIAAaBBABSkAgJKQQAAAIAAgAEAAE=</HashCode>
+      <FileName>attachable_item.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CHitImmunity" Collapsed="true">
+    <Position X="21" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAgACAEAAAgQAAAAAAAAAAAAAAAAAAAAAQAA=</HashCode>
+      <FileName>hit_immunity.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponCustomPistol" Collapsed="true">
+    <Position X="24.75" Y="9.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AIAACAAAAAAAAAAAAAAAAAAAACAACAgAAAAAAAAAAAA=</HashCode>
+      <FileName>WeaponCustomPistol.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponRevolver" Collapsed="true">
+    <Position X="27" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BBgBgAAAAwACYCAAAAAQAAAAIAAAQAQAAAAAIAREgAA=</HashCode>
+      <FileName>WeaponRevolver.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponWalther" Collapsed="true">
+    <Position X="45.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIA=</HashCode>
+      <FileName>WeaponWalther.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponUSP45" Collapsed="true">
+    <Position X="43.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>WeaponUSP45.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponFORT" Collapsed="true">
+    <Position X="41.25" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>WeaponFORT.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponHPSA" Collapsed="true">
+    <Position X="39" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>WeaponHPSA.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponMagazinedWGrenade" Collapsed="true">
+    <Position X="17" Y="16.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>BYoAgABPY4iCQIpYJEgUAAEgYMAgAAABIABAIAVEAgQ=</HashCode>
+      <FileName>WeaponMagazinedWGrenade.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CGrenade" Collapsed="true">
+    <Position X="56" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IBACgAAIISQAAIAQAEIQQiAAIABCMhAUIQCATgACOAQ=</HashCode>
+      <FileName>Grenade.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponBinoculars" Collapsed="true">
+    <Position X="29.25" Y="11" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>CQADgAAAAISEIIAQCEAAEAIAIAAAAAAAIAAAAAAACAQ=</HashCode>
+      <FileName>WeaponBinoculars.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponBM16" Collapsed="true">
+    <Position X="34" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAgAgAAAAgACYAAAAAAAQAAAAAAAQAAAAAAAIAAQAAA=</HashCode>
+      <FileName>weaponBM16.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CMissile" Collapsed="true">
+    <Position X="55" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QQgCgEEhEZggIKARAMADFAEAKhBAAgAMJQIIBkgCCgQ=</HashCode>
+      <FileName>Missile.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponShotgun" Collapsed="true">
+    <Position X="31.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAnAAAQQgRAABAAAAEAhAAIiEAAAQQCAAAAAAAAAQ=</HashCode>
+      <FileName>WeaponShotgun.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CBolt" Collapsed="true">
+    <Position X="52.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAIAAAAAAAAAIAAAAAABAAAAAAAQAACgAiAAQ=</HashCode>
+      <FileName>Bolt.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponFN2000" Collapsed="true">
+    <Position X="12.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAEAAAAA=</HashCode>
+      <FileName>WeaponFN2000.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CF1" Collapsed="true">
+    <Position X="57.25" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAEAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>F1.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponKnife" Collapsed="true">
+    <Position X="0.5" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEiwFAIIQwsAhRECIBAAKCAwEiBAXgUIgAR4RogQgQ=</HashCode>
+      <FileName>WeaponKnife.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponLR300" Collapsed="true">
+    <Position X="5.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAA=</HashCode>
+      <FileName>WeaponLR300.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponPM" Collapsed="true">
+    <Position X="36.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAACAAAAAAAA=</HashCode>
+      <FileName>WeaponPM.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CRGD5" Collapsed="true">
+    <Position X="55" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>RGD5.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponRPG7" Collapsed="true">
+    <Position X="25" Y="13" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BEAAiAAAIAgAAICAIEAEABAAAIIBAAAAAAACASAAAAA=</HashCode>
+      <FileName>WeaponRPG7.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponSVD" Collapsed="true">
+    <Position X="20.25" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEACAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>WeaponSVD.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponSVU" Collapsed="true">
+    <Position X="22.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAA=</HashCode>
+      <FileName>WeaponSVU.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponAK74" Collapsed="true">
+    <Position X="12.75" Y="18.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>WeaponAK74.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponAutomaticShotgun" Collapsed="true">
+    <Position X="2.75" Y="9.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AACAlAAAAQgRAABAAAAEAhAAAgEAAAQQCAEAAEAAAAQ=</HashCode>
+      <FileName>WeaponAutomaticShotgun.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponGroza" Collapsed="true">
+    <Position X="16" Y="18.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>WeaponGroza.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponRG6" Collapsed="true">
+    <Position X="31.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAABAIAAAEAAAAAAAAAAAAAAAAACAQAAAAA=</HashCode>
+      <FileName>WeaponRG6.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponVal" Collapsed="true">
+    <Position X="8" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAACAAAAAAAA=</HashCode>
+      <FileName>WeaponVal.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWeaponVintorez" Collapsed="true">
+    <Position X="10.25" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAQAAAAAAAAAAAAAAABAAAAAAAAAAAAAA=</HashCode>
+      <FileName>WeaponVintorez.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CRocketLauncher" Collapsed="true">
+    <Position X="13" Y="13" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CoAAoEAAAAIAAAAAAQAIAAAAAAAAAAAgAAAQAAAIAEE=</HashCode>
+      <FileName>RocketLauncher.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

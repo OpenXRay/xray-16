@@ -1832,6 +1832,7 @@
     <ClInclude Include="WeaponBinoculars.h" />
     <ClInclude Include="WeaponBinocularsVision.h" />
     <ClInclude Include="weaponBM16.h" />
+    <ClInclude Include="WeaponCustomAuto.h" />
     <ClInclude Include="WeaponCustomPistol.h" />
     <ClInclude Include="WeaponFN2000.h" />
     <ClInclude Include="WeaponFORT.h" />
@@ -1843,6 +1844,7 @@
     <ClInclude Include="WeaponMagazinedWGrenade.h" />
     <ClInclude Include="WeaponPistol.h" />
     <ClInclude Include="WeaponPM.h" />
+    <ClInclude Include="WeaponRevolver.h" />
     <ClInclude Include="WeaponRG6.h" />
     <ClInclude Include="WeaponRPG7.h" />
     <ClInclude Include="WeaponShotgun.h" />
@@ -4000,6 +4002,7 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
+    <ClCompile Include="WeaponCustomAuto.cpp" />
     <ClCompile Include="WeaponCustomPistol.cpp" />
     <ClCompile Include="WeaponDispersion.cpp" />
     <ClCompile Include="WeaponFire.cpp" />
@@ -4042,6 +4045,7 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
+    <ClCompile Include="WeaponRevolver.cpp" />
     <ClCompile Include="WeaponRG6.cpp" />
     <ClCompile Include="WeaponRG6_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -4184,6 +4188,10 @@
     <ProjectReference Include="..\xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Players.cd" />
+    <None Include="Weapons.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

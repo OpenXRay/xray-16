@@ -172,5 +172,7 @@ public:
 	virtual void				debug_draw_firedeps		() {};
 
 	virtual CHudItem*			cast_hud_item			()				{ return this; }
+    void PlayAnimCrouchIdleMoving(); //AVO: new crouch idle animation
+    bool HudAnimationExist(LPCSTR anim_name);
 };
 

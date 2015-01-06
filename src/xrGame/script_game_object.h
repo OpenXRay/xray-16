@@ -806,6 +806,7 @@ public:
             _DECLARE_FUNCTION10(IsTorch, bool);
             _DECLARE_FUNCTION10(IsWeaponGL, bool);
             _DECLARE_FUNCTION10(IsInventoryBox, bool);
+            bool IsActorOutdoors() const;
             //end AVO
 
 

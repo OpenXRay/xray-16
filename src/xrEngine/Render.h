@@ -297,7 +297,7 @@ public:
     virtual void rmFar() = 0;
     virtual void rmNormal() = 0;
     virtual u32 memory_usage() = 0;
-
+    virtual u32 active_phase() = 0; //Swartz: actor shadow
     // Constructor/destructor
     virtual ~IRender_interface();
 protected:

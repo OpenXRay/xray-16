@@ -195,6 +195,15 @@ enum
 	R2FLAGEXT_SUN_OLD				= (1<<9),
 };
 
+//Swartz: actor shadow
+extern ECORE_API Flags32 ps_actor_shadow_flags; 
+
+enum
+{
+RFLAG_ACTOR_SHADOW = (1<<0),
+};
+//-Swartz
+
 extern void						xrRender_initconsole	();
 extern BOOL						xrRender_test_hw		();
 extern void						xrRender_apply_tf		();
