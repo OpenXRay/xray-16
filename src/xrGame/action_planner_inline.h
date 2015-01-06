@@ -99,9 +99,10 @@ void CPlanner::update				()
 
 	THROW							(!solution().empty());
 
+	//Alundaio: Reverted
 	//Alundaio: Attempt to workaround strange line 114 crash when loading generators
-	if (!solution().empty())
-	{
+	//if (!solution().empty())
+	//{
 		if (initialized()) {
 			if (current_action_id() != solution().front()) {
 				current_action().finalize();
@@ -116,7 +117,7 @@ void CPlanner::update				()
 		}
 
 		current_action().execute	();
-	}
+	//}
 	//Alundaio: END
 }
 
@@ -142,7 +143,7 @@ IC	typename CPlanner::CConditionEvaluator &CPlanner::evaluator		(const _conditio
 TEMPLATE_SPECIALIZATION
 IC	typename CPlanner::_action_id_type CPlanner::current_action_id	() const
 {
-	VERIFY					(initialized());
+	VERIFY2					(initialized(),make_string("ERROR: action by id [%d] not initialized!",m_current_action_id)); //Alundaio: More detailed information needed
 	return					(m_current_action_id);
 }
 

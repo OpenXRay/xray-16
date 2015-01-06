@@ -385,6 +385,8 @@ public:
             bool				Weapon_IsGrenadeLauncherAttached();
             bool				Weapon_IsScopeAttached			();
             bool				Weapon_IsSilencerAttached		();
+			void				Weapon_AddonAttach(CScriptGameObject &item); //Alundaio
+			void				Weapon_AddonDetach(LPCSTR item_section);	//Alundaio
 
             int					Weapon_GrenadeLauncher_Status	();
             int					Weapon_Scope_Status				();

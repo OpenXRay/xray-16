@@ -29,8 +29,20 @@ static void	_BCL callback_rotation		(CBoneInstance* bone)
 		return;
 
 	Fvector	position				= bone->mTransform.c;
-	R_ASSERT						( _valid( *parameter->m_rotation ) );
-	bone->mTransform.mulA_43		(*parameter->m_rotation);
+
+	//Alundaio: Attempt to workaround crash
+	//R_ASSERT						( _valid( *parameter->m_rotation ) );
+	//bone->mTransform.mulA_43		(*parameter->m_rotation);
+
+	if (_valid(*parameter->m_rotation))
+	{
+		bone->mTransform.mulA_43(*parameter->m_rotation);
+	}
+	else {
+		Msg("ERROR: stalker_animation_callbacks.cpp | callback_rotation | _valid(*parameter->m_rotation) failed for %s", object->Name());
+	}
+	//Alundaio: END
+
 	CWeaponShotEffector&			effector = object->weapon_shot_effector();
 	if (!effector.IsActive()) {
 		bone->mTransform.c			= position;

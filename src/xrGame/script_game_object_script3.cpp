@@ -182,6 +182,11 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
         .def("weapon_is_scope",				&CScriptGameObject::Weapon_IsScopeAttached)
         .def("weapon_is_silencer",			&CScriptGameObject::Weapon_IsSilencerAttached)
 
+		//Alundaio: Extended exports
+		.def("weapon_addon_attach", &CScriptGameObject::Weapon_AddonAttach)
+		.def("weapon_addon_detach", &CScriptGameObject::Weapon_AddonDetach)
+		//Alundaio: END
+
         .def("weapon_grenadelauncher_status",	&CScriptGameObject::Weapon_GrenadeLauncher_Status)
         .def("weapon_scope_status",				&CScriptGameObject::Weapon_Scope_Status)
         .def("weapon_silencer_status",			&CScriptGameObject::Weapon_Silencer_Status)
