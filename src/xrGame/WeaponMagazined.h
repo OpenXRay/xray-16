@@ -30,6 +30,7 @@ protected:
     ESoundTypes m_eSoundReload;
 #ifdef NEW_SOUNDS //AVO: new sounds go here
     ESoundTypes m_eSoundReloadEmpty;
+    ESoundTypes m_eSoundReloadMisfire;
 #endif //-NEW_SOUNDS
 
     bool m_sounds_enabled;
@@ -176,5 +177,5 @@ protected:
         u16 parent_id, u16 weapon_id, bool send_hit);
 
     //AVO: for custom added sounds check if sound exists
-    bool WeaponSoundExist(pcstr section, pcstr sound_name);
+    bool WeaponSoundExist(pcstr section, pcstr sound_name) const;
 };

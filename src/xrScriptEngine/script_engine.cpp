@@ -251,7 +251,6 @@ int CScriptEngine::vscript_log(LuaMessageType luaMessageType, LPCSTR caFormat, v
 #endif
 }
 
-#ifdef DEBUG
 void CScriptEngine::print_stack()
 {
     if (!m_stack_is_ready)
@@ -276,7 +275,6 @@ void CScriptEngine::print_stack()
         }
     }
 }
-#endif
 
 int CScriptEngine::script_log(LuaMessageType message, LPCSTR caFormat, ...)
 {
@@ -643,7 +641,6 @@ void CScriptEngine::print_error(lua_State* L, int iErrorCode)
     }
 }
 
-#ifdef DEBUG
 void CScriptEngine::flush_log()
 {
     string_path log_file_name;
@@ -651,7 +648,6 @@ void CScriptEngine::flush_log()
     FS.update_path(log_file_name, "$logs$", log_file_name);
     m_output.save_to(log_file_name);
 }
-#endif
 
 int CScriptEngine::error_log(LPCSTR format, ...)
 {

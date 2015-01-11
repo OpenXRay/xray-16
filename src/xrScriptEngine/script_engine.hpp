@@ -90,9 +90,9 @@ private:
 protected:
     CScriptProcessStorage m_script_processes;
     int m_stack_level;
-#ifdef DEBUG
+
     CMemoryWriter m_output; // for call stack
-#endif
+
 #ifdef USE_DEBUGGER
 #ifndef USE_LUA_STUDIO
     CScriptDebugger* m_scriptDebugger;
@@ -103,9 +103,7 @@ protected:
 #endif
 
 public:
-#ifdef DEBUG
     bool m_stack_is_ready;
-#endif
 
 private:
     static CScriptEngine* GetInstance(lua_State* state);
@@ -145,10 +143,10 @@ private:
 
 public:
     static void on_error(lua_State* state);
-#ifdef DEBUG
+
     void flush_log();
     void print_stack();
-#endif
+
     using ExporterFunc = XRay::ScriptExporter::Node::ExporterFunc;
     CScriptEngine();
     virtual ~CScriptEngine();

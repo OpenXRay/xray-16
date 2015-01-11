@@ -66,13 +66,15 @@ CWeaponMagazined::~CWeaponMagazined()
 void CWeaponMagazined::net_Destroy() { inherited::net_Destroy(); }
 
 //AVO: for custom added sounds check if sound exists
-bool CWeaponMagazined::WeaponSoundExist(LPCSTR section, LPCSTR sound_name)
+bool CWeaponMagazined::WeaponSoundExist(pcstr section, pcstr sound_name) const
 {
     pcstr str;
     bool sec_exist = process_if_exists_set(section, sound_name, &CInifile::r_string, str, true);
     if (sec_exist)
         return true;
+#ifdef DEBUG
     Msg("~ [WARNING] ------ Sound [%s] does not exist in [%s]", sound_name, section);
+#endif
     return false;
 }
 
@@ -92,6 +94,8 @@ void CWeaponMagazined::Load(LPCSTR section)
 #ifdef NEW_SOUNDS //AVO: custom sounds go here
     if (WeaponSoundExist(section, "snd_reload_empty"))
         m_sounds.LoadSound(section, "snd_reload_empty", "sndReloadEmpty", true, m_eSoundReloadEmpty);
+    if (WeaponSoundExist(section, "snd_reload_misfire"))
+        m_sounds.LoadSound(section, "snd_reload_misfire", "sndReloadMisfire", true, m_eSoundReloadMisfire);
 #endif //-NEW_SOUNDS
 
     m_sSndShotCurrent = "sndShot";

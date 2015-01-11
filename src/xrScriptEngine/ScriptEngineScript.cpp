@@ -16,6 +16,9 @@
 
 void LuaLog(LPCSTR caMessage)
 {
+    if (!GlobalEnv.ScriptEngine->m_stack_is_ready)
+        Log(caMessage); // Xottab_DUTY: temporary workaround to get lua log output
+
 #ifndef MASTER_GOLD
     GlobalEnv.ScriptEngine->script_log(LuaMessageType::Message, "%s", caMessage);
 #endif
@@ -27,6 +30,9 @@ void LuaLog(LPCSTR caMessage)
 
 void ErrorLog(LPCSTR caMessage)
 {
+    if (!GlobalEnv.ScriptEngine->m_stack_is_ready)
+        Log(caMessage); // Xottab_DUTY: temporary workaround to get lua error output
+
     GlobalEnv.ScriptEngine->error_log("%s", caMessage);
 #ifdef DEBUG
     GlobalEnv.ScriptEngine->print_stack();
@@ -43,6 +49,13 @@ void ErrorLog(LPCSTR caMessage)
     R_ASSERT2(0, caMessage);
 #endif
 }
+
+//AVO:
+void PrintStack()
+{
+    GlobalEnv.ScriptEngine->print_stack();
+}
+//-AVO
 
 void FlushLogs()
 {
@@ -149,8 +162,8 @@ SCRIPT_EXPORT(CScriptEngine, (), {
                          .def("start", &profile_timer_script::start)
                          .def("stop", &profile_timer_script::stop)
                          .def("time", &profile_timer_script::time),
-        def("log", &LuaLog), def("error_log", &ErrorLog), def("flush", &FlushLogs), def("prefetch", &prefetch_module),
-        def("verify_if_thread_is_running", &verify_if_thread_is_running), def("editor", &is_editor),
+        def("log", &LuaLog), def("error_log", &ErrorLog), def("flush", &FlushLogs), def("print_stack", &PrintStack),
+        def("prefetch", &prefetch_module), def("verify_if_thread_is_running", &verify_if_thread_is_running),
         def("bit_and", &bit_and), def("bit_or", &bit_or), def("bit_xor", &bit_xor), def("bit_not", &bit_not),
-        def("user_name", &user_name)];
+        def("editor", &is_editor), def("user_name", &user_name)];
 });
