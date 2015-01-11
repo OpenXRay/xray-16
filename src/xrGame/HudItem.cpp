@@ -401,7 +401,9 @@ bool CHudItem::HudAnimationExist(LPCSTR anim_name)
             return true;
 
     }
+#ifdef DEBUG
     Msg("~ [WARNING] ------ Animation [%s] does not exist in [%s]", anim_name, HudSection().c_str());
+#endif
     return false;
 }
 //-AVO
