@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //	Module 		: script_storage.cpp
 //	Created 	: 01.04.2004
-//  Modified 	: 01.04.2004
+//  Modified 	: 10.01.2015
 //	Author		: Dmitriy Iassenev
 //	Description : XRay Script Storage
 ////////////////////////////////////////////////////////////////////////////
@@ -15,7 +15,7 @@
 #ifndef DEBUG
 #	include "opt.lua.h"
 #	include "opt_inline.lua.h"
-#endif // #ifndef DEBUG
+#endif //-DEBUG
 
 LPCSTR	file_header_old = "\
                           local function script_name() \
@@ -25,7 +25,7 @@ LPCSTR	file_header_old = "\
                           %s this %s \
                           setmetatable(this, {__index = _G}) \
                           setfenv(1, this) \
-                          		";
+                                ";
 
 LPCSTR	file_header_new = "\
                           local function script_name() \
@@ -35,24 +35,24 @@ LPCSTR	file_header_new = "\
                           this._G = _G \
                           %s this %s \
                           setfenv(1, this) \
-                          		";
+                                ";
 
 LPCSTR	file_header = 0;
 
 #ifndef ENGINE_BUILD
 #	include "script_engine.h"
 #	include "ai_space.h"
-#else
+#else //ENGINE_BUILD
 #	define NO_XRGAME_SCRIPT_ENGINE
-#endif
+#endif //!ENGINE_BUILD
 
 #ifndef XRGAME_EXPORTS
 #	define NO_XRGAME_SCRIPT_ENGINE
-#endif
+#endif //!XRGAME_EXPORTS
 
 #ifndef NO_XRGAME_SCRIPT_ENGINE
 #	include "ai_debug.h"
-#endif
+#endif //!NO_XRGAME_SCRIPT_ENGINE
 
 #ifdef USE_DEBUGGER
 #	include "script_debugger.h"
@@ -61,8 +61,8 @@ LPCSTR	file_header = 0;
 #ifndef PURE_ALLOC
 //#	ifndef USE_MEMORY_MONITOR
 #		define USE_DL_ALLOCATOR
-//#	endif // USE_MEMORY_MONITOR
-#endif // PURE_ALLOC
+//#	endif //!USE_MEMORY_MONITOR
+#endif //!PURE_ALLOC
 
 #ifndef USE_DL_ALLOCATOR
 static void *lua_alloc		(void *ud, void *ptr, size_t osize, size_t nsize) {
@@ -79,17 +79,15 @@ static void *lua_alloc		(void *ud, void *ptr, size_t osize, size_t nsize) {
         return Memory.mem_realloc		(ptr, nsize);
 #endif // DEBUG_MEMORY_MANAGER
 }
-#else // USE_DL_ALLOCATOR
-
-#include "../xrCore/memory_allocator_options.h"
-
-#ifdef USE_ARENA_ALLOCATOR
-static const u32			s_arena_size = 96*1024*1024;
-static char					s_fake_array[s_arena_size];
-static doug_lea_allocator	s_allocator( s_fake_array, s_arena_size, "lua" );
-#else // #ifdef USE_ARENA_ALLOCATOR
-static doug_lea_allocator	s_allocator(0, 0, "lua");
-#endif // #ifdef USE_ARENA_ALLOCATOR
+#else //USE_DL_ALLOCATOR
+#   include "../xrCore/memory_allocator_options.h"
+#   ifdef USE_ARENA_ALLOCATOR
+        static const u32			s_arena_size = 96*1024*1024;
+        static char					s_fake_array[s_arena_size];
+        static doug_lea_allocator	s_allocator( s_fake_array, s_arena_size, "lua" );
+#   else //-USE_ARENA_ALLOCATOR
+        static doug_lea_allocator	s_allocator(0, 0, "lua");
+#   endif //-USE_ARENA_ALLOCATOR
 
 static void *lua_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
 {
@@ -99,14 +97,13 @@ static void *lua_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
     if (!nsize)
     {
         s_allocator.free_impl(ptr);
-        return					0;
+        return 0;
     }
-
     if (!ptr)
-        return					s_allocator.malloc_impl((u32) nsize);
+        return s_allocator.malloc_impl((u32) nsize);
 
-    return						s_allocator.realloc_impl(ptr, (u32) nsize);
-#else // #ifndef USE_MEMORY_MONITOR
+    return s_allocator.realloc_impl(ptr, (u32) nsize);
+#else //USE_MEMORY_MONITOR
     if ( !nsize )	{
         memory_monitor::monitor_free(ptr);
         s_allocator.free_impl		(ptr);
@@ -123,14 +120,14 @@ static void *lua_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
     void* const result				= s_allocator.realloc_impl(ptr, (u32)nsize);
     memory_monitor::monitor_alloc	(result,nsize,"LUA");
     return							result;
-#endif // #ifndef USE_MEMORY_MONITOR
+#endif //!USE_MEMORY_MONITOR
 }
 
 u32 game_lua_memory_usage()
 {
-    return					(s_allocator.get_allocated_size());
+    return (s_allocator.get_allocated_size());
 }
-#endif // USE_DL_ALLOCATOR
+#endif //!USE_DL_ALLOCATOR
 
 static LPVOID __cdecl luabind_allocator(
     luabind::memory_allocation_function_parameter const,
@@ -149,17 +146,17 @@ static LPVOID __cdecl luabind_allocator(
     {
 #ifdef DEBUG
         return	( Memory.mem_alloc(size, "luabind") );
-#else // #ifdef DEBUG
+#else //!DEBUG
         return	(Memory.mem_alloc(size));
-#endif // #ifdef DEBUG
+#endif //-DEBUG
     }
 
     LPVOID		non_const_pointer = const_cast<LPVOID>(pointer);
 #ifdef DEBUG
     return		( Memory.mem_realloc(non_const_pointer, size, "luabind") );
-#else // #ifdef DEBUG
+#else //!DEBUG
     return		(Memory.mem_realloc(non_const_pointer, size));
-#endif // #ifdef DEBUG
+#endif //-DEBUG
 }
 
 void setup_luabind_allocator()
@@ -248,7 +245,7 @@ static int dojitopt(lua_State *L, const char *opt)
     return report(L, lua_pcall(L, *opt ? 1 : 0, 0, 0));
 }
 /* ---- end of LuaJIT extensions */
-#endif // #ifndef DEBUG
+#endif //!DEBUG
 
 CScriptStorage::CScriptStorage()
 {
@@ -256,15 +253,15 @@ CScriptStorage::CScriptStorage()
 
 #ifdef DEBUG
     m_stack_is_ready		= false;
-#endif // DEBUG
+#endif //-DEBUG
 
     m_virtual_machine = 0;
 
 #ifdef USE_LUA_STUDIO
 #	ifndef USE_DEBUGGER
     STATIC_CHECK( false, Do_Not_Define_USE_LUA_STUDIO_macro_without_USE_DEBUGGER_macro );
-#	endif // #ifndef USE_DEBUGGER
-#endif // #ifdef USE_LUA_STUDIO
+#	endif //!USE_DEBUGGER
+#endif //-USE_LUA_STUDIO
 }
 
 CScriptStorage::~CScriptStorage()
@@ -284,7 +281,7 @@ static void put_function(lua_State* state, u8 const* buffer, u32 const buffer_si
     luaL_loadbuffer(state, (char*) buffer, buffer_size, package_id);
     lua_settable(state, -3);
 }
-#endif // #ifndef DEBUG
+#endif //!DEBUG
 
 void CScriptStorage::reinit()
 {
@@ -320,11 +317,11 @@ void CScriptStorage::reinit()
 
 #ifdef DEBUG
     luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
-#else
-	//Alundaio: I can't use command line params on Windows 8.1 because no log is flushed when using a shortcut to xrEngine.exe started inside main game directory
+#else //!DEBUG
+    //Alundaio: I can't use command line params on Windows 8.1 because no log is flushed when using a shortcut to xrEngine.exe started inside main game directory
     //if (strstr(Core.Params, "-dbg"))
         luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
-#endif // #ifdef DEBUG
+#endif //-DEBUG
 
     if (!strstr(Core.Params, "-nojit"))
     {
@@ -333,11 +330,11 @@ void CScriptStorage::reinit()
         put_function(lua(), opt_lua_binary, sizeof(opt_lua_binary), "jit.opt");
         put_function(lua(), opt_inline_lua_binary, sizeof(opt_lua_binary), "jit.opt_inline");
         dojitopt(lua(), "2");
-#endif // #ifndef DEBUG
+#endif //!DEBUG
     }
 
     if (strstr(Core.Params, "-_g"))
-        file_header = file_header_new;
+        file_header = file_header_new; //AVO: I get fatal crash at the start if this is used
     else
         file_header = file_header_old;
 }
@@ -345,34 +342,32 @@ void CScriptStorage::reinit()
 int CScriptStorage::vscript_log(ScriptStorage::ELuaMessageType tLuaMessageType, LPCSTR caFormat, va_list marker)
 {
 #ifndef NO_XRGAME_SCRIPT_ENGINE
-#ifdef DEBUG
-    if (!psAI_Flags.test(aiLua) && (tLuaMessageType != ScriptStorage::eLuaMessageTypeError))
-        return(0);
-#endif
-#endif
+#   ifdef DEBUG
+        if (!psAI_Flags.test(aiLua) && (tLuaMessageType != ScriptStorage::eLuaMessageTypeError))
+            return(0);
+#   endif //-DEBUG
+#endif //!NO_XRGAME_SCRIPT_ENGINE
 
-#ifndef PRINT_CALL_STACK
-    return		(0);
-#else // #ifdef PRINT_CALL_STACK
-#ifndef NO_XRGAME_SCRIPT_ENGINE
+//#ifndef PRINT_CALL_STACK
+    //return		(0);
+//#else //PRINT_CALL_STACK
+#   ifndef NO_XRGAME_SCRIPT_ENGINE
     //AVO: allow LUA debug prints (i.e.: ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CWeapon : cannot access class member Weapon_IsScopeAttached!");)
-#ifndef DEBUG
-	//Alundaio: I can't use command line params on Windows 8.1 because no log is flushed when using a shortcut to xrEngine.exe started inside main game directory
+#       ifndef DEBUG
+    //Alundaio: I can't use command line params on Windows 8.1 because no log is flushed when using a shortcut to xrEngine.exe started inside main game directory
     //if (!strstr(Core.Params, "-dbg"))
     //    return(0);
-#endif
-          
-#ifdef LUA_DEBUG_PRINT
-#ifdef DEBUG
-    if (!psAI_Flags.test(aiLua) && (tLuaMessageType != ScriptStorage::eLuaMessageTypeError))
-        return(0);
-#endif
-    //and AVO
-#else
-    if (!psAI_Flags.test(aiLua) && (tLuaMessageType != ScriptStorage::eLuaMessageTypeError))
-        return(0);
-#endif
-#endif // #ifndef NO_XRGAME_SCRIPT_ENGINE
+#       endif //!DEBUG
+#       ifdef LUA_DEBUG_PRINT
+#           ifdef DEBUG
+                if (!psAI_Flags.test(aiLua) && (tLuaMessageType != ScriptStorage::eLuaMessageTypeError))
+                    return(0);
+#           endif //-DEBUG
+#       else //!LUA_DEBUG_PRINT
+            if (!psAI_Flags.test(aiLua) && (tLuaMessageType != ScriptStorage::eLuaMessageTypeError))
+                return(0);
+#       endif //-LUA_DEBUG_PRINT
+#endif //-NO_XRGAME_SCRIPT_ENGINE
 
     LPCSTR		S = "", SS = "";
     LPSTR		S1;
@@ -390,7 +385,7 @@ int CScriptStorage::vscript_log(ScriptStorage::ELuaMessageType tLuaMessageType, 
         break;
     }
     case ScriptStorage::eLuaMessageTypeMessage: {
-        S = "[LUA] ";
+        S = "~ [LUA] ";
         SS = "[MESSAGE]     ";
         break;
     }
@@ -432,41 +427,55 @@ int CScriptStorage::vscript_log(ScriptStorage::ELuaMessageType tLuaMessageType, 
     vsprintf(S1, caFormat, marker);
     xr_strcat(S2, "\r\n");
 
-#ifdef DEBUG
+#ifdef LUA_DEBUG_PRINT //DEBUG
 #	ifndef ENGINE_BUILD
-    ai().script_engine().m_output.w(S2,xr_strlen(S2)*sizeof(char));
-#	endif // #ifdef ENGINE_BUILD
-#endif // #ifdef DEBUG
+        ai().script_engine().m_output.w(S2,xr_strlen(S2)*sizeof(char));
+#	endif //!ENGINE_BUILD
+#endif //-LUA_DEBUG_PRINT DEBUG
 
     return	(l_iResult);
-#endif // #ifdef PRINT_CALL_STACK
+//#endif //-PRINT_CALL_STACK
 }
 
-#ifdef PRINT_CALL_STACK
+//#ifdef PRINT_CALL_STACK
 void CScriptStorage::print_stack()
 {
 #ifdef DEBUG
     if (!m_stack_is_ready)
         return;
 
-    m_stack_is_ready		= false;
-#endif // #ifdef DEBUG
+    m_stack_is_ready = false;
+#endif //-DEBUG
 
-    lua_State				*L = lua();
-    lua_Debug				l_tDebugInfo;
+    lua_State *L = lua();
+    lua_Debug l_tDebugInfo;
     for (int i = 0; lua_getstack(L, i, &l_tDebugInfo); ++i)
     {
         lua_getinfo(L, "nSlu", &l_tDebugInfo);
         if (!l_tDebugInfo.name)
-            script_log(ScriptStorage::eLuaMessageTypeError, "%2d : [%s] %s(%d) : %s", i, l_tDebugInfo.what, l_tDebugInfo.short_src, l_tDebugInfo.currentline, "");
+            script_log_no_stack(ScriptStorage::eLuaMessageTypeError, "%2d : [%s] %s(%d) : %s", i, l_tDebugInfo.what, l_tDebugInfo.short_src, l_tDebugInfo.currentline, "");
+            //script_log(ScriptStorage::eLuaMessageTypeError, "%2d : [%s] %s(%d) : %s", i, l_tDebugInfo.what, l_tDebugInfo.short_src, l_tDebugInfo.currentline, "");
         else
             if (!xr_strcmp(l_tDebugInfo.what, "C"))
-                script_log(ScriptStorage::eLuaMessageTypeError, "%2d : [C  ] %s", i, l_tDebugInfo.name);
+                script_log_no_stack(ScriptStorage::eLuaMessageTypeError, "%2d : [C  ] %s", i, l_tDebugInfo.name);
+                //script_log(ScriptStorage::eLuaMessageTypeError, "%2d : [C  ] %s", i, l_tDebugInfo.name);   
             else
-                script_log(ScriptStorage::eLuaMessageTypeError, "%2d : [%s] %s(%d) : %s", i, l_tDebugInfo.what, l_tDebugInfo.short_src, l_tDebugInfo.currentline, l_tDebugInfo.name);
+                script_log_no_stack(ScriptStorage::eLuaMessageTypeError, "%2d : [%s] %s(%d) : %s", i, l_tDebugInfo.what, l_tDebugInfo.short_src, l_tDebugInfo.currentline, l_tDebugInfo.name);
+                //script_log(ScriptStorage::eLuaMessageTypeError, "%2d : [%s] %s(%d) : %s", i, l_tDebugInfo.what, l_tDebugInfo.short_src, l_tDebugInfo.currentline, l_tDebugInfo.name);
     }
 }
-#endif // #ifdef PRINT_CALL_STACK
+//#endif //-PRINT_CALL_STACK
+
+//AVO: added to stop duplicate stack output prints in log
+int __cdecl CScriptStorage::script_log_no_stack(ScriptStorage::ELuaMessageType tLuaMessageType, LPCSTR caFormat, ...)
+{
+    va_list	 marker;
+    va_start(marker, caFormat);
+    int result = vscript_log(tLuaMessageType, caFormat, marker);
+    va_end(marker);
+    return result;
+}
+//-AVO
 
 int __cdecl CScriptStorage::script_log(ScriptStorage::ELuaMessageType tLuaMessageType, LPCSTR caFormat, ...)
 {
@@ -485,8 +494,8 @@ int __cdecl CScriptStorage::script_log(ScriptStorage::ELuaMessageType tLuaMessag
             ai().script_engine().print_stack();
         reenterability = false;
     }
-#	endif // #ifndef ENGINE_BUILD
-#endif // #ifdef PRINT_CALL_STACK
+#	endif //!ENGINE_BUILD
+#endif //-PRINT_CALL_STACK
 
     return			(result);
 }
@@ -510,7 +519,7 @@ bool CScriptStorage::parse_namespace(LPCSTR caNamespaceName, LPSTR b, u32 const 
             *S1 = 0;
 
         if (i)
-            xr_strcat(b, b_size, "{");
+        xr_strcat(b, b_size, "{");
         xr_strcat(b, b_size, S);
         xr_strcat(b, b_size, "=");
         if (i)
@@ -549,10 +558,10 @@ bool CScriptStorage::load_buffer(lua_State *L, LPCSTR caBuffer, size_t tSize, LP
             else
             {
 #ifdef DEBUG
-                script					= (LPSTR)Memory.mem_alloc(total_size, "lua script file");
-#else //#ifdef DEBUG
+                script = (LPSTR)Memory.mem_alloc(total_size, "lua script file");
+#else //!DEBUG
                 script = (LPSTR) Memory.mem_alloc(total_size);
-#endif //#ifdef DEBUG
+#endif //-DEBUG
                 dynamic_allocation = true;
             }
         }
@@ -591,7 +600,7 @@ bool CScriptStorage::load_buffer(lua_State *L, LPCSTR caBuffer, size_t tSize, LP
     {
 #ifdef DEBUG
         print_output	(L,caScriptName,l_iErrorCode);
-#endif
+#endif //-DEBUG
         on_error(L);
         return			(false);
     }
@@ -887,7 +896,7 @@ void CScriptStorage::print_error(lua_State *L, int iErrorCode)
     }
 }
 
-#ifdef DEBUG
+#ifdef LUA_DEBUG_PRINT //DEBUG
 void CScriptStorage::flush_log()
 {
     string_path			log_file_name;
@@ -895,7 +904,7 @@ void CScriptStorage::flush_log()
     FS.update_path      (log_file_name,"$logs$",log_file_name);
     m_output.save_to	(log_file_name);
 }
-#endif // DEBUG
+#endif //-DEBUG
 
 int CScriptStorage::error_log(LPCSTR	format, ...)
 {

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //	Module 		: script_engine_script.cpp
 //	Created 	: 25.12.2002
-//  Modified 	: 13.05.2004
+//  Modified 	: 10.01.2015
 //	Author		: Dmitriy Iassenev
 //	Description : ALife Simulator script engine export
 ////////////////////////////////////////////////////////////////////////////
@@ -17,6 +17,8 @@ void LuaLog(LPCSTR caMessage)
 {
 #ifndef MASTER_GOLD
     ai().script_engine().script_log	(ScriptStorage::eLuaMessageTypeMessage,"%s",caMessage);
+#else
+    Log(caMessage);
 #endif // #ifndef MASTER_GOLD
 
 #ifdef USE_DEBUGGER
@@ -30,17 +32,17 @@ void LuaLog(LPCSTR caMessage)
 void ErrorLog(LPCSTR caMessage)
 {
     ai().script_engine().error_log("%s", caMessage);
-#ifdef PRINT_CALL_STACK
+//#ifdef PRINT_CALL_STACK
     ai().script_engine().print_stack();
-#endif // #ifdef PRINT_CALL_STACK
+//#endif //-PRINT_CALL_STACK
 
 #ifdef USE_DEBUGGER
 #	ifndef USE_LUA_STUDIO
     if( ai().script_engine().debugger() ){
         ai().script_engine().debugger()->Write(caMessage);
     }
-#	endif // #ifndef USE_LUA_STUDIO
-#endif // #ifdef USE_DEBUGGER
+#	endif //!USE_LUA_STUDIO
+#endif //-USE_DEBUGGER
 
 #ifdef DEBUG
     bool lua_studio_connected = !!ai().script_engine().debugger();
@@ -49,11 +51,18 @@ void ErrorLog(LPCSTR caMessage)
         R_ASSERT2(0, caMessage);
 }
 
+//AVO:
+void PrintStack()
+{
+    ai().script_engine().print_stack();
+}
+//-AVO
+
 void FlushLogs()
 {
 //#ifdef DEBUG
     FlushLog();
-#ifdef DEBUG
+#ifdef LUA_DEBUG_PRINT //DEBUG
     ai().script_engine().flush_log();
 #endif // DEBUG
 }
@@ -193,12 +202,12 @@ IC	profile_timer_script	operator+	(const profile_timer_script &portion0, const p
 // }
 
 #ifdef XRGAME_EXPORTS
-ICF	u32	script_time_global() { return Device.dwTimeGlobal; }
-ICF	u32	script_time_global_async() { return Device.TimerAsync_MMT(); }
+    ICF	u32	script_time_global() { return Device.dwTimeGlobal; }
+    ICF	u32	script_time_global_async() { return Device.TimerAsync_MMT(); }
 #else
-ICF	u32	script_time_global() { return 0; }
-ICF	u32	script_time_global_async() { return 0; }
-#endif
+    ICF	u32	script_time_global() { return 0; }
+    ICF	u32	script_time_global_async() { return 0; }
+#endif //-XRGAME_EXPORTS
 
 #ifdef XRGAME_EXPORTS
 static bool is_enough_address_space_available_impl()
@@ -206,13 +215,32 @@ static bool is_enough_address_space_available_impl()
     ENGINE_API bool is_enough_address_space_available();
     return is_enough_address_space_available();
 }
-#endif // #ifdef XRGAME_EXPORTS
+#endif //-XRGAME_EXPORTS
 
 #pragma optimize("s",on)
 void CScriptEngine::script_register(lua_State *L)
 {
-    module(L)[
-        def("log1", (void(*) (LPCSTR msg)) &Log), // AVO: log below does not work due to design of vscript_log so adding new function to scripts
+    module(L)
+    [
+        //def("log1", (void(*) (LPCSTR msg)) &Log), // AVO: fixed log func
+        def("log", &LuaLog),
+        def("print_stack", &PrintStack),
+        def("error_log", &ErrorLog),
+        def("flush", &FlushLogs),
+        def("prefetch", &prefetch_module),
+        def("verify_if_thread_is_running", &verify_if_thread_is_running),
+        def("editor", &is_editor),
+        def("bit_and", &bit_and),
+        def("bit_or", &bit_or),
+        def("bit_xor", &bit_xor),
+        def("bit_not", &bit_not),
+        def("user_name", &user_name),
+        def("time_global", &script_time_global),
+        def("time_global_async", &script_time_global_async),
+#ifdef XRGAME_EXPORTS
+        def("device", &get_device),
+        def("is_enough_address_space_available", &is_enough_address_space_available_impl),
+#endif //-XRGAME_EXPORTS
         class_<profile_timer_script>("profile_timer")
             .def(constructor<>())
             .def(constructor<profile_timer_script&>())
@@ -224,21 +252,22 @@ void CScriptEngine::script_register(lua_State *L)
             .def("time", &profile_timer_script::time)
     ];
 
-    function(L, "log", LuaLog);
-    function(L, "error_log", ErrorLog);
-    function(L, "flush", FlushLogs);
-    function(L, "prefetch", prefetch_module);
-    function(L, "verify_if_thread_is_running", verify_if_thread_is_running);
-    function(L, "editor", is_editor);
-    function(L, "bit_and", bit_and);
-    function(L, "bit_or", bit_or);
-    function(L, "bit_xor", bit_xor);
-    function(L, "bit_not", bit_not);
-    function(L, "user_name", user_name);
-    function(L, "time_global", script_time_global);
-    function(L, "time_global_async", script_time_global_async);
-#ifdef XRGAME_EXPORTS
-    function(L, "device", get_device);
-    function(L, "is_enough_address_space_available", is_enough_address_space_available_impl);
-#endif // #ifdef XRGAME_EXPORTS
+    //function(L, "print_stack", PrintStack);
+    //function(L, "log", LuaLog);
+    //function(L, "error_log", ErrorLog);
+    //function(L, "flush", FlushLogs);
+    //function(L, "prefetch", prefetch_module);
+    //function(L, "verify_if_thread_is_running", verify_if_thread_is_running);
+    //function(L, "editor", is_editor);
+    //function(L, "bit_and", bit_and);
+    //function(L, "bit_or", bit_or);
+    //function(L, "bit_xor", bit_xor);
+    //function(L, "bit_not", bit_not);
+    //function(L, "user_name", user_name);
+    //function(L, "time_global", script_time_global);
+    //function(L, "time_global_async", script_time_global_async);
+//#ifdef XRGAME_EXPORTS
+    //function(L, "device", get_device);
+    //function(L, "is_enough_address_space_available", is_enough_address_space_available_impl);
+//#endif //-XRGAME_EXPORTS
 }

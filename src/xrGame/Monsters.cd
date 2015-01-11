@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CAI_Dog" Collapsed="true">
+    <Position X="0.75" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>YAAAghACEABAMIIAAgAiBwNBCCoIAFAAGAABAAaECEA=</HashCode>
+      <FileName>ai\Monsters\Dog\dog.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CBaseMonster" Collapsed="true">
+    <Position X="0.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>d5b7nNHMe/bYt7v8++OmnuxseZ/8avfenW0IZ4bHXfk=</HashCode>
+      <FileName>ai\Monsters\BaseMonster\base_monster.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CControlledEntity&lt;_Object&gt;" Collapsed="true">
+    <Position X="6.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAMAEAABAIARIAAAAABAAAAAAAiAIAAAAAABBQ=</HashCode>
+      <FileName>ai\Monsters\controlled_entity.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CCustomMonster" Collapsed="true">
+    <Position X="0.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>4HPmuMBMYbiE2InxQu7W3iBMcNfdYKkORl2IN06TSUg=</HashCode>
+      <FileName>CustomMonster.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CStepManager" Collapsed="true">
+    <Position X="3.75" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAgwAAAAhAAAIEBAAEAJJAAgoAABAAAEAAA=</HashCode>
+      <FileName>step_manager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CControlledEntityBase" Collapsed="true">
+    <Position X="6.75" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAMAEAABAAABAAAAAABAAAAAAACAIAAAAAAAAQ=</HashCode>
+      <FileName>ai\Monsters\controlled_entity.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CEntityAlive" Collapsed="true">
+    <Position X="0.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AVAK4OEEUsCAkLFpBu8KlCFBabGYDNUEIxSgQaLAJGk=</HashCode>
+      <FileName>entity_alive.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CScriptEntity" Collapsed="true">
+    <Position X="3.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AWCCBggEECUAIoJATABDBohAMBCAUAKkQCAAyACwSQw=</HashCode>
+      <FileName>script_entity.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CEntity" Collapsed="true">
+    <Position X="0.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgYIwQAFDASBYYqgAEKCBADDIAoYAQEIBCBAgWgAIDA=</HashCode>
+      <FileName>Entity.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPhysicsShellHolder" Collapsed="true">
+    <Position X="3.75" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AWAACADCYKKEkJrJYAJBKkSE5aVQIQcKSAYESAaKD6A=</HashCode>
+      <FileName>PhysicsShellHolder.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CDamageManager" Collapsed="true">
+    <Position X="0.75" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAABAAAAAABAAAAABAIAAIAAAgCAAAACAAAAQ=</HashCode>
+      <FileName>damage_manager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

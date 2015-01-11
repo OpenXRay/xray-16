@@ -77,7 +77,9 @@ bool CWeaponMagazined::WeaponSoundExist(LPCSTR section, LPCSTR sound_name)
         return true;
     else
     {
+#ifdef DEBUG
         Msg("~ [WARNING] ------ Sound [%s] does not exist in [%s]", sound_name, section);
+#endif
         return false;
     }
 }
@@ -97,6 +99,8 @@ void CWeaponMagazined::Load(LPCSTR section)
 #ifdef NEW_SOUNDS //AVO: custom sounds go here
     if (WeaponSoundExist(section, "snd_reload_empty"))
         m_sounds.LoadSound(section, "snd_reload_empty", "sndReloadEmpty", true, m_eSoundReloadEmpty);
+    if (WeaponSoundExist(section, "snd_reload_misfire"))
+        m_sounds.LoadSound(section, "snd_reload_misfire", "sndReloadMisfire", true, m_eSoundReloadMisfire);
 #endif //-NEW_SOUNDS
 
     m_sSndShotCurrent = "sndShot";

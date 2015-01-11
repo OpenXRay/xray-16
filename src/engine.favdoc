@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<Favorites xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <folders>
+    <Folder>
+      <name>Scripting</name>
+      <favorites>
+        <Favorite>
+          <name>script_engine.cpp</name>
+          <path>xrServerEntities\script_engine.cpp</path>
+          <absolutePath>G:\Stalker\COP\Engine\xray-16\src\xrServerEntities\script_engine.cpp</absolutePath>
+        </Favorite>
+        <Favorite>
+          <name>script_engine_script.cpp</name>
+          <path>xrServerEntities\script_engine_script.cpp</path>
+          <absolutePath>G:\Stalker\COP\Engine\xray-16\src\xrServerEntities\script_engine_script.cpp</absolutePath>
+        </Favorite>
+        <Favorite>
+          <name>script_storage.cpp</name>
+          <path>xrServerEntities\script_storage.cpp</path>
+          <absolutePath>G:\Stalker\COP\Engine\xray-16\src\xrServerEntities\script_storage.cpp</absolutePath>
+        </Favorite>
+        <Favorite>
+          <name>ScriptClasses.se</name>
+          <path>xrGame\AI\AScript\ScriptClasses</path>
+          <viewKind>Solution Explorer</viewKind>
+        </Favorite>
+      </favorites>
+    </Folder>
+  </folders>
+  <favorites />
+</Favorites>

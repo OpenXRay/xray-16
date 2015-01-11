@@ -15,7 +15,7 @@
 #ifdef USE_DEBUGGER
 #	ifndef USE_LUA_STUDIO
 #		include "script_debugger.h"
-#	else // #ifndef USE_LUA_STUDIO
+#	else //USE_LUA_STUDIO
 #		include "lua_studio.h"
 		typedef cs::lua_studio::create_world_function_type			create_world_function_type;
 		typedef cs::lua_studio::destroy_world_function_type			destroy_world_function_type;
@@ -24,15 +24,15 @@
 		static destroy_world_function_type	s_destroy_world				= 0;
 		static HMODULE						s_script_debugger_handle	= 0;
 		static LogCallback					s_old_log_callback			= 0;
-#	endif // #ifndef USE_LUA_STUDIO
+#	endif //!USE_LUA_STUDIO
 #endif
 
 #ifndef XRSE_FACTORY_EXPORTS
 #	ifdef DEBUG
 #		include "ai_debug.h"
 		extern Flags32 psAI_Flags;
-#	endif
-#endif
+#	endif //-DEBUG
+#endif //!XRSE_FACTORY_EXPORTS
 
 void jit_command(lua_State*, LPCSTR);
 
@@ -121,7 +121,7 @@ void CScriptEngine::disconnect_from_debugger	()
 
 	finalize_lua_studio				( lua(), m_lua_studio_world, m_lua_studio_engine );
 }
-#endif // #if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
+#endif //-(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
 
 CScriptEngine::CScriptEngine			()
 {
@@ -134,9 +134,9 @@ CScriptEngine::CScriptEngine			()
 #	ifndef USE_LUA_STUDIO
 		m_scriptDebugger	= NULL;
 		restartDebugger		();	
-#	else // #ifndef USE_LUA_STUDIO
+#	else //USE_LUA_STUDIO
 		m_lua_studio_world	= 0;
-#	endif // #ifndef USE_LUA_STUDIO
+#	endif //!USE_LUA_STUDIO
 #endif
 }
 
@@ -146,8 +146,12 @@ CScriptEngine::~CScriptEngine			()
 		remove_script_process(m_script_processes.begin()->first);
 
 #ifdef DEBUG
-	flush_log					();
-#endif // DEBUG
+	flush_log();
+#else
+#   ifdef LUA_DEBUG_PRINT
+        flush_log();
+#   endif //-LUA_DEBUG_PRINT
+#endif //-DEBUG
 
 #ifdef USE_DEBUGGER
 #	ifndef USE_LUA_STUDIO

@@ -29,6 +29,7 @@ protected:
     ESoundTypes		m_eSoundReload;
 #ifdef NEW_SOUNDS //AVO: new sounds go here
     ESoundTypes		m_eSoundReloadEmpty;
+    ESoundTypes		m_eSoundReloadMisfire;
 #endif //-NEW_SOUNDS
     bool			m_sounds_enabled;
     // General
