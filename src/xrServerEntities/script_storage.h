@@ -97,7 +97,7 @@ public:
 #ifdef LUA_DEBUG_PRINT //DEBUG
 public:
     void flush_log();
-#endif //-DEBUG
+#endif //-LUA_DEBUG_PRINT DEBUG
 };
 
 #include "script_storage_inline.h"
