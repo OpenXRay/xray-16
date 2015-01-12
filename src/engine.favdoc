@@ -26,6 +26,16 @@
         </Favorite>
       </favorites>
     </Folder>
+    <Folder>
+      <name>ALife</name>
+      <favorites>
+        <Favorite>
+          <name>xrServer_Objects_ALife_Monsters.cpp</name>
+          <path>xrServerEntities\xrServer_Objects_ALife_Monsters.cpp</path>
+          <absolutePath>G:\Stalker\COP\Engine\xray-16\src\xrServerEntities\xrServer_Objects_ALife_Monsters.cpp</absolutePath>
+        </Favorite>
+      </favorites>
+    </Folder>
   </folders>
   <favorites />
 </Favorites>
