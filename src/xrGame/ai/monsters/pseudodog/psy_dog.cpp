@@ -93,8 +93,10 @@ bool CPsyDog::spawn_phantom()
         return false;
 
     // set id to created server object
-    CSE_Abstract* phantom =
-        Level().spawn_item("psy_dog_phantom", ai().level_graph().vertex_position(node), node, 0xffff, true);
+    //Alundaio:
+    pcstr phantomSection = READ_IF_EXISTS(pSettings, r_string, this->get_section(), "phantom_section", "psy_dog_phantom");
+    CSE_Abstract* phantom = Level().spawn_item(phantomSection, ai().level_graph().vertex_position(node), node, 0xffff, true);
+    //Alundaio: END
     CSE_ALifeMonsterBase* pSE_Monster = smart_cast<CSE_ALifeMonsterBase*>(phantom);
     VERIFY(pSE_Monster);
 
