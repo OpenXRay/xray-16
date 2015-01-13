@@ -317,7 +317,7 @@ int open_table(lua_State *L){
 }
 /******************** TABLE END ********************/
 void open_additional_libs(lua_State *L){
-	open_bit(L);
+	//open_bit(L);
 	open_string(L);
 	open_math(L);
 	open_table(L);

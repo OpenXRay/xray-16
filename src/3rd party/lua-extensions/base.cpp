@@ -1,6 +1,6 @@
-#include "../LuaJIT-1.1.8/etc/lua.hpp"
+#include "../luajit-2.0/src/lua.hpp"
 
-#pragma comment(lib, "LuaJIT-1.1.8.lib")
+#pragma comment(lib, "lua51.lib")
 //#pragma comment(lib, "xrCore.lib")
 //#pragma comment(lib, "user32.lib")
 
