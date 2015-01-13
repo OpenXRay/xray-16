@@ -364,7 +364,7 @@ int CScriptStorage::vscript_log(ScriptStorage::ELuaMessageType tLuaMessageType, 
     //if (!strstr(Core.Params, "-dbg"))
     //    return(0);
 #       endif //!DEBUG
-#       ifdef LUA_DEBUG_PRINT
+#       ifndef LUA_DEBUG_PRINT
 #           ifdef DEBUG
                 if (!psAI_Flags.test(aiLua) && (tLuaMessageType != ScriptStorage::eLuaMessageTypeError))
                     return(0);
@@ -686,6 +686,7 @@ bool CScriptStorage::load_file_into_namespace(LPCSTR caScriptName, LPCSTR caName
     int				start = lua_gettop(lua());
     if (!do_file(caScriptName, caNamespaceName))
     {
+        Msg("! [ERROR] --- Failed to load script %s", caNamespaceName);
         lua_settop(lua(), start);
         return		(false);
     }
