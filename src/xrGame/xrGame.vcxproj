@@ -219,9 +219,10 @@
       <Culture>0x0419</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>
+      </AdditionalOptions>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);$(XRAY_16X_LIBS)OpenAutomate\libraries;$(XRAY_16X_LIBS)jpeg\libraries\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rd party\luajit-2.0\src\;$(xrSdkDir)libraries;$(xrLibDir);$(XRAY_16X_LIBS)OpenAutomate\libraries;$(XRAY_16X_LIBS)jpeg\libraries\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>NotSet</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
@@ -4175,9 +4176,6 @@
     <ProjectReference Include="$(SolutionDir)xrXMLParser\xrXMLParser.vcxproj">
       <Project>{94a1c366-3d19-48e6-8170-4adc2e70df98}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\3rd party\LuaJIT-1.1.8\LuaJIT-1.1.8.vcxproj">
-      <Project>{2ac1029e-e582-40cf-9cd1-5efa4211afc9}</Project>
     </ProjectReference>
     <ProjectReference Include="..\utils\xrDXT\DXT.vcxproj">
       <Project>{ebf9b543-0830-4866-9b48-dc0740e87e8a}</Project>

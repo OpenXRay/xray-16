@@ -270,10 +270,9 @@
       <Culture>0x0422</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalOptions>/MACHINE:I386  %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>vfw32.lib;libogg_static.lib;libtheora_static.lib;oalib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(XRAY_16X_LIBS)OpenAutomate\libraries;$(XRAY_16X_LIBS)libogg-1.1.4\win32\lib\$(Platform)\Release;$(XRAY_16X_LIBS)libtheora-1.1.1\win32\lib\$(Platform)\Release;$(xrSdkDir)libraries;$(xrLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(SolutionDir)3rd party\luajit-2.0\src\;$(XRAY_16X_LIBS)OpenAutomate\libraries;$(XRAY_16X_LIBS)libogg-1.1.4\win32\lib\$(Platform)\Release;$(XRAY_16X_LIBS)libtheora-1.1.1\win32\lib\$(Platform)\Release;$(xrSdkDir)libraries;$(xrLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>NotSet</SubSystem>
@@ -751,14 +750,6 @@
     <ProjectReference Include="$(SolutionDir)xrSound\xrSound.vcxproj">
       <Project>{ccca7859-eb86-493e-9b53-c4235f45b3c5}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\3rd party\LuaJIT-1.1.8\LuaJIT-1.1.8.vcxproj">
-      <Project>{2ac1029e-e582-40cf-9cd1-5efa4211afc9}</Project>
-      <Private>false</Private>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
-      <LinkLibraryDependencies>true</LinkLibraryDependencies>
-      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

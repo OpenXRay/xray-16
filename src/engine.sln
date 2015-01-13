@@ -594,7 +594,6 @@ Global
 		{2AC1029E-E582-40CF-9CD1-5EFA4211AFC9}.Release_Dedicated|Win32.ActiveCfg = Release|Win32
 		{2AC1029E-E582-40CF-9CD1-5EFA4211AFC9}.Release_Dedicated|Win32.Build.0 = Release|Win32
 		{2AC1029E-E582-40CF-9CD1-5EFA4211AFC9}.Release|Win32.ActiveCfg = Release|Win32
-		{2AC1029E-E582-40CF-9CD1-5EFA4211AFC9}.Release|Win32.Build.0 = Release|Win32
 		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Debug_Dedicated|Win32.ActiveCfg = Debug|Win32
 		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Debug_Dedicated|Win32.Build.0 = Debug|Win32
 		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Debug|Win32.ActiveCfg = Debug|Win32

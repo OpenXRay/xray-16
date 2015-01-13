@@ -131,7 +131,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>nvapi.lib;atimgpud_s_x86.lib;oalib.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);$(DXSDK_DIR)Lib\x86;$(XRAY_16X_LIBS)OpenAutomate\libraries;$(XRAY_16X_LIBS)nvapi\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rd party\luajit-2.0\src\;$(xrSdkDir)libraries;$(xrLibDir);$(DXSDK_DIR)Lib\x86;$(XRAY_16X_LIBS)OpenAutomate\libraries;$(XRAY_16X_LIBS)nvapi\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>NotSet</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>

@@ -288,7 +288,8 @@ void CScriptStorage::reinit()
     if (m_virtual_machine)
         lua_close(m_virtual_machine);
 
-    m_virtual_machine = lua_newstate(lua_alloc, NULL);
+    //m_virtual_machine = lua_newstate(lua_alloc, NULL);
+    m_virtual_machine = luaL_newstate();
 
     if (!m_virtual_machine)
     {
@@ -296,6 +297,9 @@ void CScriptStorage::reinit()
         return;
     }
 
+    luaL_openlibs(lua());
+
+    /******
     // initialize lua standard library functions
     struct luajit
     {
@@ -332,6 +336,8 @@ void CScriptStorage::reinit()
         dojitopt(lua(), "2");
 #endif //!DEBUG
     }
+
+    ***/
 
     if (strstr(Core.Params, "-_g"))
         file_header = file_header_new; //AVO: I get fatal crash at the start if this is used
