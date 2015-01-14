@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //	Module 		: script_storage.cpp
 //	Created 	: 01.04.2004
-//  Modified 	: 10.01.2015
+//  Modified 	: [1/14/2015 Andrey]
 //	Author		: Dmitriy Iassenev
 //	Description : XRay Script Storage
 ////////////////////////////////////////////////////////////////////////////
@@ -12,10 +12,13 @@
 #include <stdarg.h>
 #include "../xrCore/doug_lea_allocator.h"
 
-#ifndef DEBUG
+#if !defined(DEBUG) && defined(USE_LUAJIT_ONE)
 #	include "opt.lua.h"
 #	include "opt_inline.lua.h"
-#endif //-DEBUG
+#endif //!DEBUG && USE_LUAJIT_ONE
+#ifndef USE_LUAJIT_ONE
+#include "../luajit-2.0/src/lua.hpp"
+#endif
 
 LPCSTR	file_header_old = "\
                           local function script_name() \
@@ -165,11 +168,15 @@ void setup_luabind_allocator()
     luabind::allocator_parameter = 0;
 }
 
+
+#ifdef USE_LUAJIT_ONE //  [1/14/2015 Andrey]
+
 /* ---- start of LuaJIT extensions */
 static void l_message(lua_State* state, const char *msg)
 {
     Msg("! [LUA_JIT] %s", msg);
 }
+
 
 static int report(lua_State *L, int status)
 {
@@ -244,8 +251,22 @@ static int dojitopt(lua_State *L, const char *opt)
     if (*opt) lua_pushstring(L, opt);
     return report(L, lua_pcall(L, *opt ? 1 : 0, 0, 0));
 }
+
+static void put_function(lua_State* state, u8 const* buffer, u32 const buffer_size, LPCSTR package_id)
+{
+    lua_getglobal(state, "package");
+    lua_pushstring(state, "preload");
+    lua_gettable(state, -2);
+
+    lua_pushstring(state, package_id);
+    luaL_loadbuffer(state, (char*) buffer, buffer_size, package_id);
+    lua_settable(state, -3);
+}
+
 /* ---- end of LuaJIT extensions */
 #endif //!DEBUG
+#endif //-USE_LUAJIT_ONE
+
 
 CScriptStorage::CScriptStorage()
 {
@@ -270,36 +291,29 @@ CScriptStorage::~CScriptStorage()
         lua_close(m_virtual_machine);
 }
 
-#ifndef DEBUG
-static void put_function(lua_State* state, u8 const* buffer, u32 const buffer_size, LPCSTR package_id)
-{
-    lua_getglobal(state, "package");
-    lua_pushstring(state, "preload");
-    lua_gettable(state, -2);
-
-    lua_pushstring(state, package_id);
-    luaL_loadbuffer(state, (char*) buffer, buffer_size, package_id);
-    lua_settable(state, -3);
-}
-#endif //!DEBUG
-
 void CScriptStorage::reinit()
 {
     if (m_virtual_machine)
         lua_close(m_virtual_machine);
 
-    //m_virtual_machine = lua_newstate(lua_alloc, NULL);
+#ifdef USE_GSC_MEM_ALLOC
+    m_virtual_machine = lua_newstate(lua_alloc, NULL);
+#else
     m_virtual_machine = luaL_newstate();
-
+#endif //-USE_GSC_MEM_ALLOC
+    
     if (!m_virtual_machine)
     {
         Msg("! ERROR : Cannot initialize script virtual machine!");
         return;
     }
 
-    luaL_openlibs(lua());
 
-    /******
+#ifndef USE_LUAJIT_ONE
+    luaL_openlibs(lua());
+    if (strstr(Core.Params, "-nojit"))
+        luaJIT_setmode(lua(), 0, LUAJIT_MODE_ENGINE | LUAJIT_MODE_OFF);
+#else // USE_LUAJIT_ONE
     // initialize lua standard library functions
     struct luajit
     {
@@ -337,7 +351,7 @@ void CScriptStorage::reinit()
 #endif //!DEBUG
     }
 
-    ***/
+#endif //!USE_LUAJIT_ONE
 
     if (strstr(Core.Params, "-_g"))
         file_header = file_header_new; //AVO: I get fatal crash at the start if this is used
@@ -819,35 +833,35 @@ struct raii_guard : private boost::noncopyable
 #ifdef DEBUG
         bool lua_studio_connected = !!ai().script_engine().debugger();
         if (!lua_studio_connected)
-#endif //#ifdef DEBUG
+#endif //-DEBUG
         {
 #ifdef DEBUG
             static bool const break_on_assert	= !!strstr(Core.Params,"-break_on_assert");
-#else // #ifdef DEBUG
+#else //!DEBUG
             static bool const break_on_assert = false; //Alundaio: Can't get a proper stack trace with this enabled
-#endif // #ifdef DEBUG
+#endif //-DEBUG
             if (!m_error_code)
                 return;
 
             if (break_on_assert)
                 R_ASSERT2(!m_error_code, m_error_description);
             else
-                Msg("! SCRIPT ERROR: %s", m_error_description);
+                Msg("! [SCRIPT ERROR]: %s", m_error_description);
         }
     }
-}; // struct raii_guard
+}; //-struct raii_guard
 
 bool CScriptStorage::print_output(lua_State *L, LPCSTR caScriptFileName, int iErorCode)
 {
     if (iErorCode)
         print_error(L, iErorCode);
 
-    LPCSTR				S = "see call_stack for details!";
+    LPCSTR S = "see call_stack for details!";
 
-    raii_guard			guard(iErorCode, S);
+    raii_guard guard(iErorCode, S);
 
     if (!lua_isstring(L, -1))
-        return				(false);
+        return (false);
 
     S = lua_tostring(L, -1);
     if (!xr_strcmp(S, "cannot resume dead coroutine"))
@@ -859,8 +873,8 @@ bool CScriptStorage::print_output(lua_State *L, LPCSTR caScriptFileName, int iEr
             ai().script_engine().debugger()->Write(S);
             ai().script_engine().debugger()->ErrorBreak();
         }
-#	endif // #ifndef USE_LUA_STUDIO
-#endif // #ifdef USE_DEBUGGER
+#	endif //!USE_LUA_STUDIO
+#endif //-USE_DEBUGGER
     }
     else
     {
@@ -873,8 +887,8 @@ bool CScriptStorage::print_output(lua_State *L, LPCSTR caScriptFileName, int iEr
             ai().script_engine().debugger()->Write		(S);
             ai().script_engine().debugger()->ErrorBreak	();
         }
-#	endif // #ifndef USE_LUA_STUDIO
-#endif // #ifdef USE_DEBUGGER
+#	endif //!USE_LUA_STUDIO
+#endif //-USE_DEBUGGER
     }
     return				(true);
 }

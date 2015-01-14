@@ -8,18 +8,18 @@
 
 #pragma once
 
-IC	lua_State *CScriptStorage::lua					()
+IC	lua_State *CScriptStorage::lua()
 {
-	return				(m_virtual_machine);
+    return(m_virtual_machine);
 }
 
-IC	void CScriptStorage::current_thread				(CScriptThread *thread)
+IC	void CScriptStorage::current_thread(CScriptThread *thread)
 {
-	VERIFY					((thread && !m_current_thread) || !thread);
-	m_current_thread		= thread;
+    VERIFY((thread && !m_current_thread) || !thread);
+    m_current_thread = thread;
 }
 
-IC	CScriptThread *CScriptStorage::current_thread	() const
+IC	CScriptThread *CScriptStorage::current_thread() const
 {
-	return					(m_current_thread);
+    return(m_current_thread);
 }

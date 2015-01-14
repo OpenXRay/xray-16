@@ -1,6 +1,13 @@
-#include "../luajit-2.0/src/lua.hpp"
+#include "../../build_config_defines.h"
 
+#ifdef USE_LUAJIT_ONE
+#pragma comment(lib, "LuaJIT-1.1.8.lib")
+#include "../LuaJIT-1.1.8/etc/lua.hpp"
+#else
 #pragma comment(lib, "lua51.lib")
+#include "../luajit-2.0/src/lua.hpp"
+#endif //-USE_LUAJIT_ONE
+
 //#pragma comment(lib, "xrCore.lib")
 //#pragma comment(lib, "user32.lib")
 

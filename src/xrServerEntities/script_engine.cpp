@@ -35,8 +35,11 @@ static LogCallback					s_old_log_callback			= 0;
 extern Flags32 psAI_Flags;
 #	endif //-DEBUG
 #endif //!XRSE_FACTORY_EXPORTS
+#include "../luajit/src/luajit.h"
 
+#ifdef USE_LUAJIT_ONE
 void jit_command(lua_State*, LPCSTR);
+#endif
 
 #if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
 static void log_callback			(LPCSTR message)
@@ -85,8 +88,12 @@ static void initialize_lua_studio	( lua_State* state, cs::lua_studio::world*& wo
 
     s_old_log_callback				= SetLogCB(&log_callback);
 
+#ifdef USE_LUAJIT_ONE
     jit_command						(state, "debug=2");
     jit_command						(state, "off");
+#else
+    luaJIT_setmode(lua(), 0, LUAJIT_MODE_ENGINE | LUAJIT_MODE_OFF);
+#endif
 
     world->add						(state);
 }
@@ -294,8 +301,12 @@ void CScriptEngine::init()
         if (!lua_studio_connected)
             try_connect_to_debugger		();
         else {
+#ifdef USE_LUAJIT_ONE
             jit_command					(lua(), "debug=2");
             jit_command					(lua(), "off");
+#else
+            luaJIT_setmode(lua(), 0, LUAJIT_MODE_ENGINE | LUAJIT_MODE_OFF);
+#endif
             m_lua_studio_world->add		(lua());
         }
     }
