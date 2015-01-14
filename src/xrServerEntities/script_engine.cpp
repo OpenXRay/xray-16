@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////
 //	Module 		: script_engine.cpp
 //	Created 	: 01.04.2004
-//  Modified 	: 01.04.2004
+//  Modified 	: [1/14/2015 Andrey]
 //	Author		: Dmitriy Iassenev
 //	Description : XRay Script Engine
 ////////////////////////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@ static LogCallback					s_old_log_callback			= 0;
 extern Flags32 psAI_Flags;
 #	endif //-DEBUG
 #endif //!XRSE_FACTORY_EXPORTS
-#include "../luajit/src/luajit.h"
+#include "../luajit-2.0/src/lua.hpp"
 
 #ifdef USE_LUAJIT_ONE
 void jit_command(lua_State*, LPCSTR);
