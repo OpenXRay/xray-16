@@ -69,6 +69,8 @@ td.compatno {
 <a href="ext_jit.html">jit.* Library</a>
 </li><li>
 <a href="ext_c_api.html">Lua/C API</a>
+</li><li>
+<a href="ext_profiler.html">Profiler</a>
 </li></ul>
 </li><li>
 <a href="status.html">Status</a>
@@ -132,18 +134,18 @@ operating systems, CPUs and compilers:
 <td class="compatos compatno">&nbsp;</td>
 </tr>
 <tr class="even">
+<td class="compatcpu"><a href="#cross2">ARM64</a></td>
+<td class="compatos">GCC 4.8+</td>
+<td class="compatos compatno">&nbsp;</td>
+<td class="compatos">Clang 3.5+</td>
+<td class="compatos compatno">&nbsp;</td>
+</tr>
+<tr class="odd">
 <td class="compatcpu"><a href="#cross2">PPC</a></td>
 <td class="compatos">GCC 4.3+</td>
 <td class="compatos">GCC 4.3+<br>GCC 4.1 (<a href="#ps3">PS3</a>)</td>
 <td class="compatos compatno">&nbsp;</td>
 <td class="compatos">XEDK (<a href="#xbox360">Xbox 360</a>)</td>
-</tr>
-<tr class="odd">
-<td class="compatcpu"><a href="#cross2">PPC/e500v2</a></td>
-<td class="compatos">GCC 4.3+</td>
-<td class="compatos">GCC 4.3+</td>
-<td class="compatos compatno">&nbsp;</td>
-<td class="compatos compatno">&nbsp;</td>
 </tr>
 <tr class="even">
 <td class="compatcpu"><a href="#cross2">MIPS</a></td>
@@ -383,10 +385,11 @@ make HOST_CC="gcc -m32" CROSS=arm-linux-gnueabi- \
 # ARM hard-float ABI with VFP (armhf, requires recent toolchain)
 make HOST_CC="gcc -m32" CROSS=arm-linux-gnueabihf-
 
+# ARM64 (requires x64 host)
+make CROSS=aarch64-linux-
+
 # PPC
 make HOST_CC="gcc -m32" CROSS=powerpc-linux-gnu-
-# PPC/e500v2 (fast interpreter only)
-make HOST_CC="gcc -m32" CROSS=powerpc-e500v2-linux-gnuspe-
 
 # MIPS big-endian
 make HOST_CC="gcc -m32" CROSS=mips-linux-

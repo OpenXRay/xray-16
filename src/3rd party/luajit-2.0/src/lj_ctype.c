@@ -11,6 +11,7 @@
 #include "lj_err.h"
 #include "lj_str.h"
 #include "lj_tab.h"
+#include "lj_strfmt.h"
 #include "lj_ctype.h"
 #include "lj_ccallback.h"
 
@@ -568,19 +569,19 @@ GCstr *lj_ctype_repr_int64(lua_State *L, uint64_t n, int isunsigned)
 /* Convert complex to string with 'i' or 'I' suffix. */
 GCstr *lj_ctype_repr_complex(lua_State *L, void *sp, CTSize size)
 {
-  char buf[2*LJ_STR_NUMBUF+2+1];
+  char buf[2*STRFMT_MAXBUF_NUM+2+1], *p = buf;
   TValue re, im;
-  size_t len;
   if (size == 2*sizeof(double)) {
     re.n = *(double *)sp; im.n = ((double *)sp)[1];
   } else {
     re.n = (double)*(float *)sp; im.n = (double)((float *)sp)[1];
   }
-  len = lj_str_bufnum(buf, &re);
-  if (!(im.u32.hi & 0x80000000u) || im.n != im.n) buf[len++] = '+';
-  len += lj_str_bufnum(buf+len, &im);
-  buf[len] = buf[len-1] >= 'a' ? 'I' : 'i';
-  return lj_str_new(L, buf, len+1);
+  p = lj_strfmt_wnum(p, &re);
+  if (!(im.u32.hi & 0x80000000u) || im.n != im.n) *p++ = '+';
+  p = lj_strfmt_wnum(p, &im);
+  *p = *(p-1) >= 'a' ? 'I' : 'i';
+  p++;
+  return lj_str_new(L, buf, p-buf);
 }
 
 /* -- C type state -------------------------------------------------------- */

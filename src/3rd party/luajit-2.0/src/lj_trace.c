@@ -360,7 +360,7 @@ static void trace_start(jit_State *J)
   TraceNo traceno;
 
   if ((J->pt->flags & PROTO_NOJIT)) {  /* JIT disabled for this proto? */
-    if (J->parent == 0) {
+    if (J->parent == 0 && J->exitno == 0) {
       /* Lazy bytecode patching to disable hotcount events. */
       lua_assert(bc_op(*J->pc) == BC_FORL || bc_op(*J->pc) == BC_ITERL ||
 		 bc_op(*J->pc) == BC_LOOP || bc_op(*J->pc) == BC_FUNCF);
@@ -453,6 +453,12 @@ static void trace_stop(jit_State *J)
       root->nextside = (TraceNo1)traceno;
     }
     break;
+  case BC_CALLM:
+  case BC_CALL:
+  case BC_ITERC:
+    /* Trace stitching: patch link of previous trace. */
+    traceref(J, J->exitno)->link = traceno;
+    break;
   default:
     lua_assert(0);
     break;
@@ -467,6 +473,7 @@ static void trace_stop(jit_State *J)
   lj_vmevent_send(L, TRACE,
     setstrV(L, L->top++, lj_str_newlit(L, "stop"));
     setintV(L->top++, traceno);
+    setfuncV(L, L->top++, J->fn);
   );
 }
 
@@ -502,8 +509,12 @@ static int trace_abort(jit_State *J)
     return 1;  /* Retry ASM with new MCode area. */
   }
   /* Penalize or blacklist starting bytecode instruction. */
-  if (J->parent == 0 && !bc_isret(bc_op(J->cur.startins)))
-    penalty_pc(J, &gcref(J->cur.startpt)->pt, mref(J->cur.startpc, BCIns), e);
+  if (J->parent == 0 && !bc_isret(bc_op(J->cur.startins))) {
+    if (J->exitno == 0)
+      penalty_pc(J, &gcref(J->cur.startpt)->pt, mref(J->cur.startpc, BCIns), e);
+    else
+      traceref(J, J->exitno)->link = J->exitno;  /* Self-link is blacklisted. */
+  }
 
   /* Is there anything to abort? */
   traceno = J->cur.traceno;
@@ -672,6 +683,7 @@ static void trace_hotside(jit_State *J, const BCIns *pc)
 {
   SnapShot *snap = &traceref(J, J->parent)->snap[J->exitno];
   if (!(J2G(J)->hookmask & (HOOK_GC|HOOK_VMEVENT)) &&
+      isluafunc(curr_func(J->L)) &&
       snap->count != SNAPCOUNT_DONE &&
       ++snap->count >= J->param[JIT_P_hotexit]) {
     lua_assert(J->state == LJ_TRACE_IDLE);
@@ -680,6 +692,20 @@ static void trace_hotside(jit_State *J, const BCIns *pc)
     lj_trace_ins(J, pc);
   }
 }
+
+/* Stitch a new trace to the previous trace. */
+void LJ_FASTCALL lj_trace_stitch(jit_State *J, const BCIns *pc)
+{
+  /* Only start a new trace if not recording or inside __gc call or vmevent. */
+  if (J->state == LJ_TRACE_IDLE &&
+      !(J2G(J)->hookmask & (HOOK_GC|HOOK_VMEVENT))) {
+    J->parent = 0;  /* Have to treat it like a root trace. */
+    /* J->exitno is set to the invoking trace. */
+    J->state = LJ_TRACE_START;
+    lj_trace_ins(J, pc);
+  }
+}
+
 
 /* Tiny struct to pass data to protected call. */
 typedef struct ExitDataCP {
@@ -767,17 +793,20 @@ int LJ_FASTCALL lj_trace_exit(jit_State *J, void *exptr)
   if (errcode)
     return -errcode;  /* Return negated error code. */
 
-  lj_vmevent_send(L, TEXIT,
-    lj_state_checkstack(L, 4+RID_NUM_GPR+RID_NUM_FPR+LUA_MINSTACK);
-    setintV(L->top++, J->parent);
-    setintV(L->top++, J->exitno);
-    trace_exit_regs(L, ex);
-  );
+  if (!(LJ_HASPROFILE && (G(L)->hookmask & HOOK_PROFILE)))
+    lj_vmevent_send(L, TEXIT,
+      lj_state_checkstack(L, 4+RID_NUM_GPR+RID_NUM_FPR+LUA_MINSTACK);
+      setintV(L->top++, J->parent);
+      setintV(L->top++, J->exitno);
+      trace_exit_regs(L, ex);
+    );
 
   pc = exd.pc;
   cf = cframe_raw(L->cframe);
   setcframe_pc(cf, pc);
-  if (G(L)->gc.state == GCSatomic || G(L)->gc.state == GCSfinalize) {
+  if (LJ_HASPROFILE && (G(L)->hookmask & HOOK_PROFILE)) {
+    /* Just exit to interpreter. */
+  } else if (G(L)->gc.state == GCSatomic || G(L)->gc.state == GCSfinalize) {
     if (!(G(L)->hookmask & HOOK_GC))
       lj_gc_step(L);  /* Exited because of GC: drive GC forward. */
   } else {
@@ -801,7 +830,7 @@ int LJ_FASTCALL lj_trace_exit(jit_State *J, void *exptr)
   ERRNO_RESTORE
   switch (bc_op(*pc)) {
   case BC_CALLM: case BC_CALLMT:
-    return (int)((BCReg)(L->top - L->base) - bc_a(*pc) - bc_c(*pc));
+    return (int)((BCReg)(L->top - L->base) - bc_a(*pc) - bc_c(*pc) + LJ_FR2);
   case BC_RETM:
     return (int)((BCReg)(L->top - L->base) + 1 - bc_a(*pc) - bc_d(*pc));
   case BC_TSETM:

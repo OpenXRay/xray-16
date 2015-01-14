@@ -33,6 +33,7 @@ enum {
   RID_MRM = RID_MAX,		/* Pseudo-id for ModRM operand. */
 
   /* Calling conventions. */
+  RID_SP = RID_ESP,
   RID_RET = RID_EAX,
 #if LJ_64
   RID_FPRET = RID_XMM0,
@@ -277,10 +278,8 @@ typedef enum {
   XO_ROUNDSD =	0x0b3a0ffc,  /* Really 66 0f 3a 0b. See asm_fpmath. */
   XO_UCOMISD =	XO_660f(2e),
   XO_CVTSI2SD =	XO_f20f(2a),
-  XO_CVTSD2SI =	XO_f20f(2d),
   XO_CVTTSD2SI=	XO_f20f(2c),
   XO_CVTSI2SS =	XO_f30f(2a),
-  XO_CVTSS2SI =	XO_f30f(2d),
   XO_CVTTSS2SI=	XO_f30f(2c),
   XO_CVTSS2SD =	XO_f30f(5a),
   XO_CVTSD2SS =	XO_f20f(5a),

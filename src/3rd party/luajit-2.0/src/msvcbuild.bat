@@ -37,6 +37,7 @@ if exist minilua.exe.manifest^
 @if errorlevel 8 goto :X64
 @set DASMFLAGS=-D WIN -D JIT -D FFI
 @set LJARCH=x86
+@set LJCOMPILE=%LJCOMPILE% /arch:SSE2
 :X64
 minilua %DASM% -LN %DASMFLAGS% -o host\buildvm_arch.h vm_x86.dasc
 @if errorlevel 1 goto :BAD
@@ -98,6 +99,7 @@ if exist luajit.exe.manifest^
   %LJMT% -manifest luajit.exe.manifest -outputresource:luajit.exe
 
 @del *.obj *.manifest minilua.exe buildvm.exe
+@copy /B /V /Y %LJDLLNAME% %XRAY_16X_GAME%bin_rel\ 
 @echo.
 @echo === Successfully built LuaJIT for Windows/%LJARCH% ===
 

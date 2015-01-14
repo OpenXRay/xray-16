@@ -27,7 +27,7 @@
 
 #if LJ_OS_NOJIT
 
-/* Disabled callback support. */
+/* Callbacks disabled. */
 #define CALLBACK_SLOT2OFS(slot)	(0*(slot))
 #define CALLBACK_OFS2SLOT(ofs)	(0*(ofs))
 #define CALLBACK_MAX_SLOT	0
@@ -54,23 +54,18 @@ static MSize CALLBACK_OFS2SLOT(MSize ofs)
 #elif LJ_TARGET_ARM
 
 #define CALLBACK_MCODE_HEAD		32
-#define CALLBACK_SLOT2OFS(slot)		(CALLBACK_MCODE_HEAD + 8*(slot))
-#define CALLBACK_OFS2SLOT(ofs)		(((ofs)-CALLBACK_MCODE_HEAD)/8)
-#define CALLBACK_MAX_SLOT		(CALLBACK_OFS2SLOT(CALLBACK_MCODE_SIZE))
+
+#elif LJ_TARGET_ARM64
+
+#define CALLBACK_MCODE_HEAD		32
 
 #elif LJ_TARGET_PPC
 
 #define CALLBACK_MCODE_HEAD		24
-#define CALLBACK_SLOT2OFS(slot)		(CALLBACK_MCODE_HEAD + 8*(slot))
-#define CALLBACK_OFS2SLOT(ofs)		(((ofs)-CALLBACK_MCODE_HEAD)/8)
-#define CALLBACK_MAX_SLOT		(CALLBACK_OFS2SLOT(CALLBACK_MCODE_SIZE))
 
 #elif LJ_TARGET_MIPS
 
 #define CALLBACK_MCODE_HEAD		24
-#define CALLBACK_SLOT2OFS(slot)		(CALLBACK_MCODE_HEAD + 8*(slot))
-#define CALLBACK_OFS2SLOT(ofs)		(((ofs)-CALLBACK_MCODE_HEAD)/8)
-#define CALLBACK_MAX_SLOT		(CALLBACK_OFS2SLOT(CALLBACK_MCODE_SIZE))
 
 #else
 
@@ -79,6 +74,12 @@ static MSize CALLBACK_OFS2SLOT(MSize ofs)
 #define CALLBACK_OFS2SLOT(ofs)	(0*(ofs))
 #define CALLBACK_MAX_SLOT	0
 
+#endif
+
+#ifndef CALLBACK_SLOT2OFS
+#define CALLBACK_SLOT2OFS(slot)		(CALLBACK_MCODE_HEAD + 8*(slot))
+#define CALLBACK_OFS2SLOT(ofs)		(((ofs)-CALLBACK_MCODE_HEAD)/8)
+#define CALLBACK_MAX_SLOT		(CALLBACK_OFS2SLOT(CALLBACK_MCODE_SIZE))
 #endif
 
 /* Convert callback slot number to callback function pointer. */
@@ -153,6 +154,26 @@ static void callback_mcode_init(global_State *g, uint32_t *page)
   for (slot = 0; slot < CALLBACK_MAX_SLOT; slot++) {
     *p++ = ARMI_MOV|ARMF_D(RID_R12)|ARMF_M(RID_PC);
     *p = ARMI_B | ((page-p-2) & 0x00ffffffu);
+    p++;
+  }
+  lua_assert(p - page <= CALLBACK_MCODE_SIZE);
+}
+#elif LJ_TARGET_ARM64
+static void callback_mcode_init(global_State *g, uint32_t *page)
+{
+  uint32_t *p = page;
+  void *target = (void *)lj_vm_ffi_callback;
+  MSize slot;
+  *p++ = A64I_LDRLx | A64F_D(RID_X11) | A64F_S19(4);
+  *p++ = A64I_LDRLx | A64F_D(RID_X10) | A64F_S19(5);
+  *p++ = A64I_BR | A64F_N(RID_X11);
+  *p++ = A64I_NOP;
+  ((void **)p)[0] = target;
+  ((void **)p)[1] = g;
+  p += 4;
+  for (slot = 0; slot < CALLBACK_MAX_SLOT; slot++) {
+    *p++ = A64I_MOVZw | A64F_D(RID_X9) | A64F_U16(slot);
+    *p = A64I_B | A64F_S26((page-p) & 0x03ffffffu);
     p++;
   }
   lua_assert(p - page <= CALLBACK_MCODE_SIZE);
@@ -351,6 +372,29 @@ void lj_ccallback_mcode_free(CTState *cts)
     goto done; \
   } CALLBACK_HANDLE_REGARG_FP2
 
+#elif LJ_TARGET_ARM64
+
+#define CALLBACK_HANDLE_REGARG \
+  if (isfp) { \
+    if (nfpr + n <= CCALL_NARG_FPR) { \
+      sp = &cts->cb.fpr[nfpr]; \
+      nfpr += n; \
+      goto done; \
+    } else { \
+      nfpr = CCALL_NARG_FPR;  /* Prevent reordering. */ \
+    } \
+  } else { \
+    if (!LJ_TARGET_IOS && n > 1) \
+      ngpr = (ngpr + 1u) & ~1u;  /* Align to regpair. */ \
+    if (ngpr + n <= maxgpr) { \
+      sp = &cts->cb.gpr[ngpr]; \
+      ngpr += n; \
+      goto done; \
+    } else { \
+      ngpr = CCALL_NARG_GPR;  /* Prevent reordering. */ \
+    } \
+  }
+
 #elif LJ_TARGET_PPC
 
 #define CALLBACK_HANDLE_REGARG \
@@ -411,6 +455,7 @@ static void callback_conv_args(CTState *cts, lua_State *L)
   int gcsteps = 0;
   CType *ct;
   GCfunc *fn;
+  int fntp;
   MSize ngpr = 0, nsp = 0, maxgpr = CCALL_NARG_GPR;
 #if CCALL_NARG_FPR
   MSize nfpr = 0;
@@ -421,18 +466,27 @@ static void callback_conv_args(CTState *cts, lua_State *L)
 
   if (slot < cts->cb.sizeid && (id = cts->cb.cbid[slot]) != 0) {
     ct = ctype_get(cts, id);
-    rid = ctype_cid(ct->info);
+    rid = ctype_cid(ct->info);  /* Return type. x86: +(spadj<<16). */
     fn = funcV(lj_tab_getint(cts->miscmap, (int32_t)slot));
+    fntp = LJ_TFUNC;
   } else {  /* Must set up frame first, before throwing the error. */
     ct = NULL;
     rid = 0;
     fn = (GCfunc *)L;
+    fntp = LJ_TTHREAD;
   }
-  o->u32.lo = LJ_CONT_FFI_CALLBACK;  /* Continuation returns from callback. */
-  o->u32.hi = rid;  /* Return type. x86: +(spadj<<16). */
-  o++;
-  setframe_gc(o, obj2gco(fn));
-  setframe_ftsz(o, (int)((char *)(o+1) - (char *)L->base) + FRAME_CONT);
+  /* Continuation returns from callback. */
+  if (LJ_FR2) {
+    (o++)->u64 = LJ_CONT_FFI_CALLBACK;
+    (o++)->u64 = rid;
+    o++;
+  } else {
+    o->u32.lo = LJ_CONT_FFI_CALLBACK;
+    o->u32.hi = rid;
+    o++;
+  }
+  setframe_gc(o, obj2gco(fn), fntp);
+  setframe_ftsz(o, ((char *)(o+1) - (char *)L->base) + FRAME_CONT);
   L->top = L->base = ++o;
   if (!ct)
     lj_err_caller(cts->L, LJ_ERR_FFI_BADCBACK);
@@ -483,8 +537,13 @@ static void callback_conv_args(CTState *cts, lua_State *L)
   L->top = o;
 #if LJ_TARGET_X86
   /* Store stack adjustment for returns from non-cdecl callbacks. */
-  if (ctype_cconv(ct->info) != CTCC_CDECL)
+  if (ctype_cconv(ct->info) != CTCC_CDECL) {
+#if LJ_FR2
+    (L->base-3)->u64 |= (nsp << (16+2));
+#else
     (L->base-2)->u32.hi |= (nsp << (16+2));
+#endif
+  }
 #endif
   while (gcsteps-- > 0)
     lj_gc_check(L);
@@ -493,7 +552,11 @@ static void callback_conv_args(CTState *cts, lua_State *L)
 /* Convert Lua object to callback result. */
 static void callback_conv_result(CTState *cts, lua_State *L, TValue *o)
 {
+#if LJ_FR2
+  CType *ctr = ctype_raw(cts, (uint16_t)(L->base-3)->u64);
+#else
   CType *ctr = ctype_raw(cts, (uint16_t)(L->base-2)->u32.hi);
+#endif
 #if LJ_TARGET_X86
   cts->cb.gpr[2] = 0;
 #endif
@@ -529,7 +592,7 @@ lua_State * LJ_FASTCALL lj_ccallback_enter(CTState *cts, void *cf)
   lua_State *L = cts->L;
   global_State *g = cts->g;
   lua_assert(L != NULL);
-  if (gcref(g->jit_L)) {
+  if (tvref(g->jit_base)) {
     setstrV(L, L->top++, lj_err_str(L, LJ_ERR_FFI_BADCBACK));
     if (g->panic) g->panic(L);
     exit(EXIT_FAILURE);
@@ -562,9 +625,9 @@ void LJ_FASTCALL lj_ccallback_leave(CTState *cts, TValue *o)
   }
   callback_conv_result(cts, L, o);
   /* Finally drop C frame and continuation frame. */
-  L->cframe = cframe_prev(L->cframe);
-  L->top -= 2;
+  L->top -= 2+2*LJ_FR2;
   L->base = obase;
+  L->cframe = cframe_prev(L->cframe);
   cts->cb.slot = 0;  /* Blacklist C function that called the callback. */
 }
 

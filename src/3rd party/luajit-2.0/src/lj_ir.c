@@ -15,6 +15,7 @@
 #if LJ_HASJIT
 
 #include "lj_gc.h"
+#include "lj_buf.h"
 #include "lj_str.h"
 #include "lj_tab.h"
 #include "lj_ir.h"
@@ -29,6 +30,7 @@
 #endif
 #include "lj_vm.h"
 #include "lj_strscan.h"
+#include "lj_strfmt.h"
 #include "lj_lib.h"
 
 /* Some local macros to save typing. Undef'd at the end. */
@@ -251,7 +253,7 @@ TRef lj_ir_k64(jit_State *J, IROp op, cTValue *tv)
       goto found;
   ref = ir_nextk(J);
   ir = IR(ref);
-  lua_assert(checkptr32(tv));
+  lua_assert(checkptrGC(tv));
   setmref(ir->ptr, tv);
   ir->t.irt = t;
   ir->o = op;
@@ -305,6 +307,7 @@ TRef lj_ir_kgc(jit_State *J, GCobj *o, IRType t)
 {
   IRIns *ir, *cir = J->cur.ir;
   IRRef ref;
+  lua_assert(!LJ_GC64);  /* TODO_GC64: major changes required. */
   lua_assert(!isdead(J2G(J), o));
   for (ref = J->chain[IR_KGC]; ref; ref = cir[ref].prev)
     if (ir_kgc(&cir[ref]) == o)
@@ -390,7 +393,7 @@ void lj_ir_kvalue(lua_State *L, TValue *tv, const IRIns *ir)
   UNUSED(L);
   lua_assert(ir->o != IR_KSLOT);  /* Common mistake. */
   switch (ir->o) {
-  case IR_KPRI: setitype(tv, irt_toitype(ir->t)); break;
+  case IR_KPRI: setpriV(tv, irt_toitype(ir->t)); break;
   case IR_KINT: setintV(tv, ir->i); break;
   case IR_KGC: setgcV(L, tv, ir_kgc(ir), irt_toitype(ir->t)); break;
   case IR_KPTR: case IR_KKPTR: case IR_KNULL:
@@ -443,7 +446,8 @@ TRef LJ_FASTCALL lj_ir_tostr(jit_State *J, TRef tr)
   if (!tref_isstr(tr)) {
     if (!tref_isnumber(tr))
       lj_trace_err(J, LJ_TRERR_BADTYPE);
-    tr = emitir(IRT(IR_TOSTR, IRT_STR), tr, 0);
+    tr = emitir(IRT(IR_TOSTR, IRT_STR), tr,
+		tref_isnum(tr) ? IRTOSTR_NUM : IRTOSTR_INT);
   }
   return tr;
 }

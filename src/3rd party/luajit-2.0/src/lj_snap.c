@@ -97,8 +97,10 @@ static BCReg snapshot_framelinks(jit_State *J, SnapEntry *map)
 {
   cTValue *frame = J->L->base - 1;
   cTValue *lim = J->L->base - J->baseslot;
-  cTValue *ftop = frame + funcproto(frame_func(frame))->framesize;
+  GCfunc *fn = frame_func(frame);
+  cTValue *ftop = isluafunc(fn) ? (frame+funcproto(fn)->framesize) : J->L->top;
   MSize f = 0;
+  lua_assert(!LJ_FR2);  /* TODO_FR2: store 64 bit PCs. */
   map[f++] = SNAP_MKPC(J->pc);  /* The current PC is always the first entry. */
   while (frame > lim) {  /* Backwards traversal of all frames above base. */
     if (frame_islua(frame)) {
@@ -240,7 +242,8 @@ static BCReg snap_usedef(jit_State *J, uint8_t *udf,
     case BCMbase:
       if (op >= BC_CALLM && op <= BC_VARG) {
 	BCReg top = (op == BC_CALLM || op == BC_CALLMT || bc_c(ins) == 0) ?
-		    maxslot : (bc_a(ins) + bc_c(ins));
+		    maxslot : (bc_a(ins) + bc_c(ins)+LJ_FR2);
+	if (LJ_FR2) DEF_SLOT(bc_a(ins)+1);
 	s = bc_a(ins) - ((op == BC_ITERC || op == BC_ITERN) ? 3 : 0);
 	for (; s < top; s++) USE_SLOT(s);
 	for (; s < maxslot; s++) DEF_SLOT(s);
@@ -599,6 +602,7 @@ static void snap_restoreval(jit_State *J, GCtrace *T, ExitState *ex,
   }
   if (LJ_UNLIKELY(bloomtest(rfilt, ref)))
     rs = snap_renameref(T, snapno, ref, rs);
+  lua_assert(!LJ_GC64);  /* TODO_GC64: handle 64 bit references. */
   if (ra_hasspill(regsp_spill(rs))) {  /* Restore from spill slot. */
     int32_t *sps = &ex->spill[regsp_spill(rs)];
     if (irt_isinteger(t)) {
@@ -612,8 +616,7 @@ static void snap_restoreval(jit_State *J, GCtrace *T, ExitState *ex,
       o->u64 = *(uint64_t *)sps;
     } else {
       lua_assert(!irt_ispri(t));  /* PRI refs never have a spill slot. */
-      setgcrefi(o->gcr, *sps);
-      setitype(o, irt_toitype(t));
+      setgcV(J->L, o, (GCobj *)(uintptr_t)*(GCSize *)sps, irt_toitype(t));
     }
   } else {  /* Restore from register. */
     Reg r = regsp_reg(rs);
@@ -631,10 +634,10 @@ static void snap_restoreval(jit_State *J, GCtrace *T, ExitState *ex,
     } else if (LJ_64 && irt_islightud(t)) {
       /* 64 bit lightuserdata which may escape already has the tag bits. */
       o->u64 = ex->gpr[r-RID_MIN_GPR];
+    } else if (irt_ispri(t)) {
+      setpriV(o, irt_toitype(t));
     } else {
-      if (!irt_ispri(t))
-	setgcrefi(o->gcr, ex->gpr[r-RID_MIN_GPR]);
-      setitype(o, irt_toitype(t));
+      setgcV(J->L, o, (GCobj *)ex->gpr[r-RID_MIN_GPR], irt_toitype(t));
     }
   }
 }
@@ -795,7 +798,7 @@ const BCIns *lj_snap_restore(jit_State *J, void *exptr)
   MSize n, nent = snap->nent;
   SnapEntry *map = &T->snapmap[snap->mapofs];
   SnapEntry *flinks = &T->snapmap[snap_nextofs(T, snap)-1];
-  int32_t ftsz0;
+  ptrdiff_t ftsz0;
   TValue *frame;
   BloomFilter rfilt = snap_renamefilter(T, snapno);
   const BCIns *pc = snap_pc(map[nent]);
@@ -836,8 +839,9 @@ const BCIns *lj_snap_restore(jit_State *J, void *exptr)
 	snap_restoreval(J, T, ex, snapno, rfilt, ref+1, &tmp);
 	o->u32.hi = tmp.u32.lo;
       } else if ((sn & (SNAP_CONT|SNAP_FRAME))) {
+	lua_assert(!LJ_FR2);  /* TODO_FR2: store 64 bit PCs. */
 	/* Overwrite tag with frame link. */
-	o->fr.tp.ftsz = snap_slot(sn) != 0 ? (int32_t)*flinks-- : ftsz0;
+	setframe_ftsz(o, snap_slot(sn) != 0 ? (int32_t)*flinks-- : ftsz0);
 	L->base = o+1;
       }
     }

@@ -11,8 +11,8 @@
 ##############################################################################
 
 MAJVER=  2
-MINVER=  0
-RELVER=  3
+MINVER=  1
+RELVER=  0
 ABIVER=  5.1
 NODOTABIVER= 51
 
@@ -42,17 +42,14 @@ CCOPT= -O2 -fomit-frame-pointer
 #
 # Target-specific compiler options:
 #
-# x86 only: it's recommended to compile at least for i686. Better yet,
-# compile for an architecture that has SSE2, too (-msse -msse2).
-#
 # x86/x64 only: For GCC 4.2 or higher and if you don't intend to distribute
 # the binaries to a different machine you could also use: -march=native
 #
-CCOPT_x86= -march=i686
+CCOPT_x86= -march=i686 -msse -msse2 -mfpmath=sse
 CCOPT_x64=
 CCOPT_arm=
+CCOPT_arm64=
 CCOPT_ppc=
-CCOPT_ppcspe=
 CCOPT_mips=
 #
 CCDEBUG=
@@ -165,7 +162,8 @@ XCFLAGS=
 #   make HOST_CC="gcc -m32" CROSS=i586-mingw32msvc- TARGET_SYS=Windows
 #   make HOST_CC="gcc -m32" CROSS=powerpc-linux-gnu-
 
-CCOPTIONS= $(CCDEBUG) $(CCOPT) $(CCWARN) $(XCFLAGS) $(CFLAGS)
+ASOPTIONS= $(CCOPT) $(CCWARN) $(XCFLAGS) $(CFLAGS)
+CCOPTIONS= $(CCDEBUG) $(ASOPTIONS)
 LDOPTIONS= $(CCDEBUG) $(LDFLAGS)
 
 HOST_CC= $(CC)
@@ -204,6 +202,7 @@ TARGET_XLDFLAGS=
 TARGET_XLIBS= -lm
 TARGET_TCFLAGS= $(CCOPTIONS) $(TARGET_XCFLAGS) $(TARGET_FLAGS) $(TARGET_CFLAGS)
 TARGET_ACFLAGS= $(CCOPTIONS) $(TARGET_XCFLAGS) $(TARGET_FLAGS) $(TARGET_CFLAGS)
+TARGET_ASFLAGS= $(ASOPTIONS) $(TARGET_XCFLAGS) $(TARGET_FLAGS) $(TARGET_CFLAGS)
 TARGET_ALDFLAGS= $(LDOPTIONS) $(TARGET_XLDFLAGS) $(TARGET_FLAGS) $(TARGET_LDFLAGS)
 TARGET_ASHLDFLAGS= $(LDOPTIONS) $(TARGET_XSHLDFLAGS) $(TARGET_FLAGS) $(TARGET_SHLDFLAGS)
 TARGET_ALIBS= $(TARGET_XLIBS) $(LIBS) $(TARGET_LIBS)
@@ -218,11 +217,11 @@ else
 ifneq (,$(findstring LJ_TARGET_ARM ,$(TARGET_TESTARCH)))
   TARGET_LJARCH= arm
 else
+ifneq (,$(findstring LJ_TARGET_ARM64 ,$(TARGET_TESTARCH)))
+  TARGET_LJARCH= arm64
+else
 ifneq (,$(findstring LJ_TARGET_PPC ,$(TARGET_TESTARCH)))
   TARGET_LJARCH= ppc
-else
-ifneq (,$(findstring LJ_TARGET_PPCSPE ,$(TARGET_TESTARCH)))
-  TARGET_LJARCH= ppcspe
 else
 ifneq (,$(findstring LJ_TARGET_MIPS ,$(TARGET_TESTARCH)))
   ifneq (,$(findstring MIPSEL ,$(TARGET_TESTARCH)))
@@ -242,6 +241,7 @@ ifneq (,$(findstring LJ_TARGET_PS3 1,$(TARGET_TESTARCH)))
   TARGET_SYS= PS3
   TARGET_ARCH+= -D__CELLOS_LV2__
   TARGET_XCFLAGS+= -DLUAJIT_USE_SYSMALLOC
+  TARGET_XLIBS+= -lpthread
 endif
 ifneq (,$(findstring LJ_NO_UNWIND 1,$(TARGET_TESTARCH)))
   TARGET_ARCH+= -DLUAJIT_NO_UNWIND
@@ -313,6 +313,9 @@ ifeq (iOS,$(TARGET_SYS))
   TARGET_XSHLDFLAGS= -dynamiclib -single_module -undefined dynamic_lookup -fPIC
   TARGET_DYNXLDOPTS=
   TARGET_XSHLDFLAGS+= -install_name $(TARGET_DYLIBPATH) -compatibility_version $(MAJVER).$(MINVER) -current_version $(MAJVER).$(MINVER).$(RELVER)
+  ifeq (arm64,$(TARGET_LJARCH))
+    TARGET_XCFLAGS+= -fno-omit-frame-pointer
+  endif
 else
   ifneq (SunOS,$(TARGET_SYS))
     ifneq (PS3,$(TARGET_SYS))
@@ -401,13 +404,10 @@ DASM_AFLAGS+= -D VER=$(subst LJ_ARCH_VERSION_,,$(filter LJ_ARCH_VERSION_%,$(subs
 ifeq (Windows,$(TARGET_SYS))
   DASM_AFLAGS+= -D WIN
 endif
-ifeq (x86,$(TARGET_LJARCH))
-  ifneq (,$(findstring __SSE2__ 1,$(TARGET_TESTARCH)))
-    DASM_AFLAGS+= -D SSE
-  endif
-else
 ifeq (x64,$(TARGET_LJARCH))
-  DASM_ARCH= x86
+  ifeq (,$(findstring LJ_FR2 1,$(TARGET_TESTARCH)))
+    DASM_ARCH= x86
+  endif
 else
 ifeq (arm,$(TARGET_LJARCH))
   ifeq (iOS,$(TARGET_SYS))
@@ -430,7 +430,6 @@ ifeq (ppc,$(TARGET_LJARCH))
 endif
 endif
 endif
-endif
 
 DASM_FLAGS= $(DASM_XFLAGS) $(DASM_AFLAGS)
 DASM_DASC= vm_$(DASM_ARCH).dasc
@@ -443,7 +442,7 @@ BUILDVM_X= $(BUILDVM_T)
 HOST_O= $(MINILUA_O) $(BUILDVM_O)
 HOST_T= $(MINILUA_T) $(BUILDVM_T)
 
-LJVM_S= lj_vm.s
+LJVM_S= lj_vm.S
 LJVM_O= lj_vm.o
 LJVM_BOUT= $(LJVM_S)
 LJVM_MODE= elfasm
@@ -452,10 +451,11 @@ LJLIB_O= lib_base.o lib_math.o lib_bit.o lib_string.o lib_table.o \
 	 lib_io.o lib_os.o lib_package.o lib_debug.o lib_jit.o lib_ffi.o
 LJLIB_C= $(LJLIB_O:.o=.c)
 
-LJCORE_O= lj_gc.o lj_err.o lj_char.o lj_bc.o lj_obj.o \
+LJCORE_O= lj_gc.o lj_err.o lj_char.o lj_bc.o lj_obj.o lj_buf.o \
 	  lj_str.o lj_tab.o lj_func.o lj_udata.o lj_meta.o lj_debug.o \
 	  lj_state.o lj_dispatch.o lj_vmevent.o lj_vmmath.o lj_strscan.o \
-	  lj_api.o lj_lex.o lj_parse.o lj_bcread.o lj_bcwrite.o lj_load.o \
+	  lj_strfmt.o lj_api.o lj_profile.o \
+	  lj_lex.o lj_parse.o lj_bcread.o lj_bcwrite.o lj_load.o \
 	  lj_ir.o lj_opt_mem.o lj_opt_fold.o lj_opt_narrow.o \
 	  lj_opt_dce.o lj_opt_loop.o lj_opt_split.o lj_opt_sink.o \
 	  lj_mcode.o lj_snap.o lj_record.o lj_crecord.o lj_ffrecord.o \
@@ -575,6 +575,10 @@ amalg:
 clean:
 	$(HOST_RM) $(ALL_RM)
 
+libbc:
+	./$(LUAJIT_T) host/genlibbc.lua -o host/buildvm_libbc.h $(LJLIB_C)
+	$(MAKE) all
+
 depend:
 	@for file in $(ALL_HDRGEN); do \
 	  test -f $$file || touch $$file; \
@@ -589,7 +593,7 @@ depend:
 	  test -s $$file || $(HOST_RM) $$file; \
 	  done
 
-.PHONY: default all amalg clean depend
+.PHONY: default all amalg clean libbc depend
 
 ##############################################################################
 # Rules for generated files.
@@ -646,10 +650,10 @@ lj_folddef.h: $(BUILDVM_T) lj_opt_fold.c
 	$(Q)$(TARGET_DYNCC) $(TARGET_ACFLAGS) -c -o $(@:.o=_dyn.o) $<
 	$(Q)$(TARGET_CC) $(TARGET_ACFLAGS) -c -o $@ $<
 
-%.o: %.s
+%.o: %.S
 	$(E) "ASM       $@"
-	$(Q)$(TARGET_DYNCC) $(TARGET_ACFLAGS) -c -o $(@:.o=_dyn.o) $<
-	$(Q)$(TARGET_CC) $(TARGET_ACFLAGS) -c -o $@ $<
+	$(Q)$(TARGET_DYNCC) $(TARGET_ASFLAGS) -c -o $(@:.o=_dyn.o) $<
+	$(Q)$(TARGET_CC) $(TARGET_ASFLAGS) -c -o $@ $<
 
 $(LUAJIT_O):
 	$(E) "CC        $@"
