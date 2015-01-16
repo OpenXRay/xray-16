@@ -40,6 +40,7 @@ static void	_BCL callback_rotation		(CBoneInstance* bone)
 	}
 	else {
 		Msg("ERROR: stalker_animation_callbacks.cpp | callback_rotation | _valid(*parameter->m_rotation) failed for %s", object->Name());
+		bone->mTransform.mulA_43(*parameter->m_rotation);
 	}
 	//Alundaio: END
 
