@@ -8,15 +8,15 @@
 
 #include "pch_script.h"
 #include "stalker_combat_actions.h"
-#include "ai/stalker/ai_stalker.h"
+#include "Ai/Stalker/ai_stalker.h"
 #include "script_game_object.h"
 #include "script_game_object_impl.h"
 #include "stalker_decision_space.h"
-#include "inventory.h"
+#include "Inventory.h"
 #include "cover_evaluators.h"
 #include "cover_point.h"
 #include "cover_manager.h"
-#include "missile.h"
+#include "Missile.h"
 #include "stalker_movement_restriction.h"
 #include "movement_manager_space.h"
 #include "detail_path_manager_space.h"
@@ -31,11 +31,11 @@
 #include "agent_member_manager.h"
 #include "agent_location_manager.h"
 #include "danger_cover_location.h"
-#include "ai/stalker/ai_stalker_space.h"
-#include "weapon.h"
+#include "Ai/Stalker/ai_stalker_space.h"
+#include "Weapon.h"
 #include "danger_manager.h"
 #include "detail_path_manager.h"
-#include "weaponmagazined.h"
+#include "WeaponMagazined.h"
 #include "stalker_animation_manager.h"
 #include "hit_memory_manager.h"
 #include "level_path_manager.h"
@@ -504,10 +504,12 @@ void CStalkerActionTakeCover::execute()
 
     inherited::execute();
 
-    if (!object().memory().enemy().selected())
+    const CEntityAlive* enemy = object().memory().enemy().selected();
+
+    if (!enemy)
         return;
 
-    CMemoryInfo mem_object = object().memory().memory(object().memory().enemy().selected());
+    CMemoryInfo mem_object = object().memory().memory(enemy);
 
     if (!mem_object.m_object)
         return;
@@ -537,26 +539,34 @@ void CStalkerActionTakeCover::execute()
     //.	Add fire here
     //	if (object().memory().visual().visible_now(object().memory().enemy().selected()) && object().can_kill_enemy())
     //	if (object().memory().visual().visible_now(object().memory().enemy().selected()))
-    if (fire_make_sense())
-    {
-        fire();
-    }
-    else
-    {
-        aim_ready();
-    }
 
     if (object().movement().path_completed())
-    { // && (object().memory().enemy().selected()->Position().distance_to_sqr(object().Position()) >= 10.f))
+    {// && (object().memory().enemy().selected()->Position().distance_to_sqr(object().Position()) >= 10.f))
         object().best_cover_can_try_advance();
         m_storage->set_property(eWorldPropertyInCover, true);
     }
 
-    if (object().memory().visual().visible_now(object().memory().enemy().selected()))
-        object().sight().setup(CSightAction(object().memory().enemy().selected(), true, true));
+    //Alundaio: Fix CAIStalker shooting at walls or aiming at ceiling or floor during this action
+    u32 last_time_seen = object().memory().visual().visible_object_time_last_seen(enemy);
+    if (last_time_seen != u32(-1) && Device.dwTimeGlobal - last_time_seen <= 2000 && fire_make_sense())
+    {
+        fire();
+    }
     else
-        object().sight().setup(
-            CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
+        aim_ready();
+
+    if (object().memory().visual().visible_now(enemy))
+    {
+        object().sight().setup(CSightAction(object().memory().enemy().selected(), true, true));
+    }
+    else
+    {
+        if (_abs(object().Position().y - enemy->Position().y) > 3.f)
+            object().sight().setup(CSightAction(SightManager::eSightTypePathDirection));
+        else
+            object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
+    }
+    //-Alundaio
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -631,8 +641,12 @@ void CStalkerActionLookOut::execute()
 
     if (!mem_object.m_object)
         return;
-
-    object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
+    //Alundaio: Prevent stalkers from staring at ceiling or floor for this action
+    if (_abs(object().Position().y - mem_object.m_object_params.m_position.y) > 3.f)
+        object().sight().setup(CSightAction(SightManager::eSightTypePathDirection));
+    else
+        object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
+    //-Alundaio
 
     if (current_cover(m_object) >= 3.f)
     {
@@ -723,7 +737,12 @@ void CStalkerActionHoldPosition::execute()
     if (current_cover(m_object) < 3.f)
         m_storage->set_property(eWorldPropertyLookedOut, false);
 
-    object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
+    //Alundaio: Prevent stalkers from staring at floor or ceiling for this action
+    if (_abs(object().Position().y - mem_object.m_object_params.m_position.y) > 3.f)
+        object().sight().setup(CSightAction(SightManager::eSightTypePathDirection));
+    else
+        object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
+    //-Alundaio
 
     if (completed())
     {
@@ -850,7 +869,12 @@ void CStalkerActionDetourEnemy::execute()
             m_storage->set_property(eWorldPropertyEnemyDetoured, true);
     }
 
-    object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
+    //Alundaio: Prevent stalkers from looking at ceiling or floor during action
+    if (_abs(object().Position().y - mem_object.m_object_params.m_position.y) >= 3.f)
+        object().sight().setup(CSightAction(SightManager::eSightTypePathDirection));
+    else
+        object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
+    //-Alundaio
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -869,8 +893,7 @@ void CStalkerActionPostCombatWait::initialize()
     if (object().movement().current_params().cover())
         return;
 
-    object().movement().set_movement_type(eMovementTypeStand);
-
+    object().movement().set_movement_type(eMovementTypeRun); //Alundaio. Was eMovementTypeStand
     EObjectAction action = eObjectActionAimReady1;
     if (m_storage->property(eWorldPropertyKilledWounded))
         action = eObjectActionIdle;
@@ -1024,22 +1047,30 @@ void CStalkerActionSuddenAttack::execute()
     //Alundaio: Removed check to allow stalkers to sneak up on enemy even if they are in a group.
     //if (object().agent_manager().member().combat_members().size() > 1)
     //    m_storage->set_property(eWorldPropertyUseSuddenness, false);
-    //Alundaio: END
+    //-Alundaio
 
-    if (!object().memory().enemy().selected())
+    const CEntityAlive* enemy = object().memory().enemy().selected();
+    if (!enemy)
         return;
 
-    CMemoryInfo mem_object = object().memory().memory(object().memory().enemy().selected());
+    CMemoryInfo mem_object = object().memory().memory(enemy);
 
     if (!mem_object.m_object)
         return;
 
-    bool visible_now = object().memory().visual().visible_now(object().memory().enemy().selected());
+    //Alundaio: Don't aim at ceiling or floor
+    bool visible_now = object().memory().visual().visible_now(enemy);
+
     if (visible_now)
-        object().sight().setup(CSightAction(object().memory().enemy().selected(), true));
+        object().sight().setup(CSightAction(enemy, true));
     else
-        object().sight().setup(
-            CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
+    {
+        if (_abs(object().Position().y - enemy->Position().y) >= 3.f)
+            object().sight().setup(CSightAction(SightManager::eSightTypePathDirection));
+        else
+            object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
+    }
+    //-Alundaio
 
     if (object().movement().accessible(mem_object.m_object_params.m_level_vertex_id))
         object().movement().set_level_dest_vertex(mem_object.m_object_params.m_level_vertex_id);
@@ -1096,9 +1127,9 @@ void CStalkerActionSuddenAttack::execute()
         }
     }
 
-    CVisualMemoryManager* visual_memory_manager = object().memory().enemy().selected()->visual_memory();
+    CVisualMemoryManager* visual_memory_manager = enemy->visual_memory();
     VERIFY(visual_memory_manager);
-    if (object().memory().enemy().selected()->g_Alive() && !visual_memory_manager->visible_now(&object()))
+    if (enemy->g_Alive() && !visual_memory_manager->visible_now(&object()))
         return;
 
     m_storage->set_property(eWorldPropertyUseSuddenness, false);
