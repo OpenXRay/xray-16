@@ -5,47 +5,11 @@
     <ClCompile Include="lfs.c" />
     <ClCompile Include="lmarshal.c" />
     <ClCompile Include="script_additional_libs.cpp" />
-    <ClCompile Include="keyboard.cpp">
-      <Filter>Old Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LibLpack.c">
-      <Filter>Old Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LibMath.cpp">
-      <Filter>Old Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LibStr.cpp">
-      <Filter>Old Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LibTab.cpp">
-      <Filter>Old Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Logger.cpp">
-      <Filter>Old Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lfs.h" />
     <ClInclude Include="lmarshal.h" />
     <ClInclude Include="script_additional_libs.h" />
-    <ClInclude Include="keyboard.h">
-      <Filter>Old Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LibMath.h">
-      <Filter>Old Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Libs.h">
-      <Filter>Old Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LibStr.h">
-      <Filter>Old Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LibTab.h">
-      <Filter>Old Files</Filter>
-    </ClInclude>
-    <ClInclude Include="logger.h">
-      <Filter>Old Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Old Files">
