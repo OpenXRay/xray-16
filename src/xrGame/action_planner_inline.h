@@ -99,25 +99,30 @@ void CPlanner::update				()
 
 	THROW							(!solution().empty());
 
-	//Alundaio: Attempt to workaround strange line 114 crash when loading generators
-	if (!solution().empty())
-	{
 		if (initialized()) {
 			if (current_action_id() != solution().front()) {
 				current_action().finalize();
 				m_current_action_id = solution().front();
+				//Alundaio: More detailed logging for initializing action
+				if (strstr(Core.Params, "-dbgact"))
+					Msg("DEBUG: Action [%d] initializing", m_current_action_id);
 				current_action().initialize();
 			}
 		}
 		else {
 			m_initialized = true;
 			m_current_action_id = solution().front();
+			//Alundaio: More detailed logging for initializing action
+			if (strstr(Core.Params, "-dbgact"))
+				Msg("DEBUG: Action [%d] initializing", m_current_action_id);
 			current_action().initialize();
 		}
+		
+		//Alundaio: More detailed logging for executing action; Knowing the last executing action before a crash can be very useful for debugging
+		if (strstr(Core.Params, "-dbgact"))
+			Msg("DEBUG: Action [%d] executing", m_current_action_id);
 
 		current_action().execute	();
-	}
-	//Alundaio: END
 }
 
 TEMPLATE_SPECIALIZATION
@@ -142,7 +147,7 @@ IC	typename CPlanner::CConditionEvaluator &CPlanner::evaluator		(const _conditio
 TEMPLATE_SPECIALIZATION
 IC	typename CPlanner::_action_id_type CPlanner::current_action_id	() const
 {
-	VERIFY					(initialized());
+	VERIFY2					(initialized(),make_string("ERROR: action by id [%d] not initialized!",m_current_action_id)); //Alundaio: More detailed information needed
 	return					(m_current_action_id);
 }
 
