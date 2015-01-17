@@ -1,0 +1,6 @@
+* major change
+~ minor change
+= bug fix
+- removed
++ added
+

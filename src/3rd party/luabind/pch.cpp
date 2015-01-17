@@ -5,4 +5,4 @@ namespace boost
 {
 	void throw_exception(const std::exception &){}
 }
-#endif // LUABIND_NO_EXCEPTIONS
+#endif //!LUABIND_NO_EXCEPTIONS

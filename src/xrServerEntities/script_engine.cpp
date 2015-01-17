@@ -35,7 +35,7 @@ static LogCallback					s_old_log_callback			= 0;
 extern Flags32 psAI_Flags;
 #	endif //-DEBUG
 #endif //!XRSE_FACTORY_EXPORTS
-#include "../luajit-2.0/src/lua.hpp"
+#include "lua.hpp"
 
 #ifdef USE_LUAJIT_ONE
 void jit_command(lua_State*, LPCSTR);

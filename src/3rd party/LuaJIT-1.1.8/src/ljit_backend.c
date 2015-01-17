@@ -176,7 +176,7 @@ static void jit_mfm_merge(jit_State *J, jit_Mfm *from, jit_Mfm *to, int maxpc)
       jit_assert(nofs >= 0 && m >= 0 && m < JIT_MFM_MAX);
     }
     pc++;
-    *to-- = m;
+    *to-- = (jit_Mfm) m; 
   }
 }
 
@@ -213,11 +213,11 @@ nextdeopt:
     if (firstpc < 1 || firstpc > maxpc || lastpc > maxpc ||
 	J->pt->jit_szmcode == 0)
       return JIT_S_COMPILER_ERROR;
-    *J->mfm++ = JIT_MFM_MARK+firstpc;  /* Seek to firstpc. */
+    *J->mfm++ = (jit_Mfm)(JIT_MFM_MARK+firstpc);  /* Seek to firstpc. */
     jit_compile_irange(J, firstpc, lastpc);
     jit_assert(J->nextpc == lastpc+1);  /* Problem with combined ins? */
     if (J->nextpc <= maxpc) jit_ins_chainto(J, J->nextpc);
-    *J->mfm++ = JIT_MFM_MARK+maxpc+1;  /* Seek to .deopt/.tail. */
+    *J->mfm++ = (jit_Mfm) (JIT_MFM_MARK + maxpc + 1);  /* Seek to .deopt/.tail. */
     for (pc = 1; pc <= maxpc; pc++)
       if (dasm_getpclabel(Dst, pc) == -1) {  /* Undefind label referenced? */
 	jit_ins_setpc(J, pc, luaJIT_findmcode(J->pt, pc));  /* => Old mcode. */

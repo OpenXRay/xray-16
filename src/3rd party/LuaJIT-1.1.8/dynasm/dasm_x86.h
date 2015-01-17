@@ -402,14 +402,14 @@ int dasm_encode(Dst_DECL, void *buffer)
 	  break;
 	}
 	case DASM_LABEL_PC: case DASM_SETLABEL: break;
-	case DASM_SPACE: { int fill = *p++; while (n--) *cp++ = fill; break; }
+	case DASM_SPACE: { int fill = *p++; while (n--) *cp++ = (unsigned char)fill; break; }
 	case DASM_ALIGN:
 	  n = *p++;
 	  while (((cp-base) & n)) *cp++ = 0x90; /* nop */
 	  break;
 	case DASM_MARK: mark = cp; break;
 	case DASM_ESC: action = *p++;
-	default: *cp++ = action; break;
+    default: *cp++ = (unsigned char)action; break;
 	case DASM_SECTION: case DASM_STOP: goto stop;
 	}
       }

@@ -7,4 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch.h"
-#include <lua/library_linkage.h>
+
+//AVO: lua51.dll is now included in Linker settings for the project
+//#include <lua/library_linkage.h>

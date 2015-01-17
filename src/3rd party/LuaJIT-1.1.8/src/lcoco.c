@@ -612,7 +612,7 @@ static void COCO_MAIN_DECL coco_main(COCO_MAIN_PARAM)
 #endif
   coco_State *coco = L2COCO(L);
   for (;;) {
-    L->status = luaD_rawrunprotected(L, coco_start, L->top - (coco->nargs+1));
+    L->status = (lu_byte)luaD_rawrunprotected(L, coco_start, L->top - (coco->nargs+1));
     if (L->status != 0) luaD_seterrorobj(L, L->status, L->top);
     COCO_JUMPOUT(coco)
   }

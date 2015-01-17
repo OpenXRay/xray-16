@@ -11,9 +11,4 @@
     <ClInclude Include="lmarshal.h" />
     <ClInclude Include="script_additional_libs.h" />
   </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Old Files">
-      <UniqueIdentifier>{ec3c7f77-99ea-46d1-ad76-3439ab31bcd2}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
 </Project>

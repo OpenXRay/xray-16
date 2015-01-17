@@ -136,25 +136,26 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_LuaJit_one|Win32'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>
       </FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(xrSdkDir)include;$(SolutionDir)include;dynasm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SDLCheck>
+      </SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(xrSdkDir)include;dynasm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <PreprocessorDefinitions>LUA_BUILD_AS_DLL;WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_LUAJIT_ONE;_CRT_SECURE_NO_WARNINGS;LUA_BUILD_AS_DLL;WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
       </ExceptionHandling>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <DisableSpecificWarnings>4996;4530;4100;4714;4127;4055;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4706;4702;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -202,7 +203,6 @@
     <ClCompile Include="src\ltable.c" />
     <ClCompile Include="src\ltablib.c" />
     <ClCompile Include="src\ltm.c" />
-    <ClCompile Include="src\lua.c" />
     <ClCompile Include="src\lundump.c" />
     <ClCompile Include="src\lvm.c" />
     <ClCompile Include="src\lzio.c" />
@@ -240,16 +240,6 @@
     <ClInclude Include="src\lundump.h" />
     <ClInclude Include="src\lvm.h" />
     <ClInclude Include="src\lzio.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="dynasm\dasm_x86.lua" />
-    <None Include="dynasm\dynasm.lua" />
-    <None Include="jit\dis_x86.lua" />
-    <None Include="jit\dump.lua" />
-    <None Include="jit\dumphints.lua" />
-    <None Include="jit\opt.lua" />
-    <None Include="jit\opt_inline.lua" />
-    <None Include="jit\trace.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
