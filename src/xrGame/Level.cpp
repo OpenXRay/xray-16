@@ -293,6 +293,21 @@ void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
     {
         if (type == GE_DESTROY)
         {
+            //AVO: fix for SPAWN_ANTIFREEZE crashes caused by rapid online-offline switch. In such cases
+            //inventory items are queued up for a spawn, however parent is already destroyed which cases game to crash
+#ifdef SPAWN_ANTIFREEZE
+            for (auto it = spawn_events->queue.begin(); it != spawn_events->queue.end(); ++it)
+            {
+                const NET_Event& E = *it;
+                NET_Packet P;
+                if (M_SPAWN != E.ID) continue;
+                E.implication(P);
+                u16 parent_id;
+                if (GO->ID() == GetSpawnInfo(P, parent_id))
+                    spawn_events->queue.erase(it); // if parent is being destroyed, delete all queued up children
+            }
+#endif
+            //-AVO
             Game().OnDestroy(GO);
         }
         GO->OnEvent(P, type);
@@ -354,7 +369,7 @@ void CLevel::ProcessGameEvents()
         u32 svT = timeServer() - NET_Latency;
 
         //AVO: spawn antifreeze implementation by alpet
-#ifdef   SPAWN_ANTIFREEZE
+#ifdef SPAWN_ANTIFREEZE
         while (spawn_events->available(svT))
         {
             u16 ID, dest, type;
@@ -365,7 +380,6 @@ void CLevel::ProcessGameEvents()
         u32 elps = Device.frame_elapsed();
         if (elps < 30) avail_time = 33 - elps;
         u32 work_limit = elps + avail_time;
-
 #endif
         //-AVO
 
@@ -374,7 +388,7 @@ void CLevel::ProcessGameEvents()
             u16 ID, dest, type;
             game_events->get(ID, dest, type, P);
             //AVO: spawn antifreeze implementation by alpet
-#ifdef   SPAWN_ANTIFREEZE
+#ifdef SPAWN_ANTIFREEZE
             // не отправлять события не заспавненным объектам
             if (g_bootComplete && M_EVENT == ID && PostponedSpawn(dest))
             {
