@@ -10,7 +10,7 @@
 //-SCRIPTS
 
 // CORE:
-#define SPAWN_ANTIFREEZE // spread spawn of game objects thoughout multiple frames to prevent lags (by alpet)
+//#define SPAWN_ANTIFREEZE // spread spawn of game objects thoughout multiple frames to prevent lags (by alpet)
 #define NON_FATAL_VERIFY // don't crash game when VERIFY fails
 #define USE_GSC_MEM_ALLOC // when this is undefined memory allocation for luajit is handled by luajit allocator
 //-CORE

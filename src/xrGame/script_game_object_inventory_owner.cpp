@@ -1602,3 +1602,35 @@ bool CScriptGameObject::is_door_blocked_by_npc() const
     VERIFY2(m_door, make_string("object %s hasn't been registered as a door already", m_game_object->cName().c_str()));
     return								ai().doors().is_door_blocked(m_door);
 }
+
+//Alundaio: Methods for exporting the ability to detach/attach addons for magazined weapons
+void CScriptGameObject::Weapon_AddonAttach(CScriptGameObject &item)
+{
+	CWeaponMagazined* weapon = smart_cast<CWeaponMagazined*>(&object());
+	if (!weapon)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CWeaponMagazined : cannot access class member Weapon_AddonAttach!");
+		return;
+	}
+
+	if (weapon->CanAttach((PIItem)&item))
+	{
+		weapon->Attach((PIItem)&item, true);
+	}
+}
+
+void CScriptGameObject::Weapon_AddonDetach(LPCSTR item_section)
+{
+	CWeaponMagazined* weapon = smart_cast<CWeaponMagazined*>(&object());
+	if (!weapon)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CWeaponMagazined : cannot access class member Weapon_AddonDetach!");
+		return;
+	}
+
+	if (weapon->CanDetach(item_section))
+	{
+		weapon->Detach(item_section, true);
+	}
+}
+//Alundaio: END

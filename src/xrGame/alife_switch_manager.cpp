@@ -61,12 +61,12 @@ void CALifeSwitchManager::add_online(CSE_ALifeDynamicObject *object, bool update
 	clientID.set					(server().GetServerClient() ? server().GetServerClient()->ID.value() : 0);
 	server().Process_spawn			(tNetPacket,clientID,FALSE,l_tpAbstract);
 	object->s_flags.and				(u16(-1) ^ M_SPAWN_UPDATE);
-	R_ASSERT3						(!object->used_ai_locations() || ai().level_graph().valid_vertex_id(object->m_tNodeID),"Invalid vertex for object ",object->name_replace());
 
-#ifdef DEBUG
-	if (psAI_Flags.test(aiALife))
-		Msg							("[LSS] Spawning object [%s][%s][%d]",object->name_replace(),*object->s_name,object->ID);
-#endif
+	//Alundaio: Knowing last object to spawn can be very useful to debugging
+	if (strstr(Core.Params, "-dbg"))
+		Msg("[LSS] Spawning object [%s][%s][%d]", object->name_replace(), *object->s_name, object->ID);
+
+	R_ASSERT2(!object->used_ai_locations() || ai().level_graph().valid_vertex_id(object->m_tNodeID), make_string("Invalid vertex for object %s", object->name_replace()));
 
 	object->add_online				(update_registries);
 	STOP_PROFILE
