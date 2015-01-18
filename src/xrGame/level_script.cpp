@@ -713,6 +713,12 @@ void g_send(NET_Packet& P, bool bReliable = 0, bool bSequential = 1, bool bHighP
 	Level().Send(P,net_flags(bReliable,bSequential,bHighPriority,bSendImmediately));
 }
 
+//can spawn entities like bolts, phantoms, ammo, etc. which normally crash when using alife():create()
+void spawn_section(LPCSTR sSection, Fvector3 vPosition, u32 LevelVertexID, u16 ParentID, bool bReturnItem)
+{
+	Level().spawn_item(sSection, vPosition, LevelVertexID, ParentID, bReturnItem);
+}
+
 //ability to get the target game_object at crosshair
 CScriptGameObject* g_get_target_obj()
 {
@@ -733,7 +739,7 @@ float g_get_target_dist()
 		return RQ.range;
 	return (0);
 }
-//Alundaio: END
+//-Alundaio
 
 
 #pragma optimize("s",on)
@@ -752,6 +758,7 @@ void CLevel::script_register(lua_State *L)
 		def("send", &g_send), //allow the ability to send netpacket to level
 		def("get_target_obj", &g_get_target_obj), //intentionally named to what is in xray extensions
 		def("get_target_dist", &g_get_target_dist),
+		def("spawn_item", &spawn_section),
 		//Alundaio: END
 		// obsolete\deprecated
 		def("object_by_id",						get_object_by_id),
