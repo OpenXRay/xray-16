@@ -885,7 +885,7 @@ local job_type_by_scheme = {
 function add_exclusive_job(sect, work_field, smart_ini, job_table)
 		local work = utils.cfg_get_string(smart_ini, sect, work_field, nil, false, "")
 		if work == nil then return end
-		local ini_path = "\scripts\\"..work
+		local ini_path = "scripts\\"..work
 
 		local fs = getFS()
 		if fs:exist("$game_config$",ini_path) == nil then

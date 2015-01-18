@@ -104,6 +104,8 @@ function printf(fmt,...)
 
 end
 
+printf = function() end
+
 ----------------------------------------------------------------------
 if nil == time_global then
 	time_global = function () return device():time_global() end

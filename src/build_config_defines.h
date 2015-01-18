@@ -18,8 +18,8 @@
 // VISUAL:
 #define DETAIL_RADIUS // detail draw radius (by KD)
 #define VSYNC_FIX // functional VSync by avbaula
-// ECO_RENDER is not needed with VSYNC_FIX enabled
-//#define ECO_RENDER // limit FPS in menu to prevent video card overheat (by alpet)
+//ECO_RENDER is not needed with VSYNC_FIX enabled
+#define ECO_RENDER // limit FPS in menu to prevent video card overheat (by alpet)
 //-VISUAL
 
 // TWEAKS:

@@ -529,8 +529,11 @@ u32 CHW::selectRefresh(u32 dwWidth, u32 dwHeight, D3DFORMAT fmt)
             pD3D->EnumAdapterModes(DevAdapter,fmt,I,&Mode);
             if (Mode.Width==dwWidth && Mode.Height==dwHeight)
             {
-                //if (Mode.RefreshRate>selected) selected = Mode.RefreshRate;
-                if (Mode.RefreshRate <= maxRefreshRate && Mode.RefreshRate>selected) selected = Mode.RefreshRate;  //ECO_RENDER modif.
+#ifndef ECO_RENDER
+                if (Mode.RefreshRate>selected) selected = Mode.RefreshRate;
+#else
+                if (Mode.RefreshRate <= (UINT)maxRefreshRate && Mode.RefreshRate>selected) selected = Mode.RefreshRate;  //ECO_RENDER modif.
+#endif
             }
         }
         return selected;

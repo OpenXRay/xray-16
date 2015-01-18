@@ -17,7 +17,7 @@
 #	include "opt_inline.lua.h"
 #endif //!DEBUG && USE_LUAJIT_ONE
 #ifndef USE_LUAJIT_ONE
-#include "../luajit-2.0/src/lua.hpp"
+#include "lua.hpp"
 #endif
 
 LPCSTR	file_header_old = "\
