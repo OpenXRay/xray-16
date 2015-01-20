@@ -23,6 +23,8 @@
 #include "Include/xrRender/RainRender.h"
 #include "Include/xrRender/ThunderboltRender.h"
 
+#include "Common/Config.hpp"
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -473,9 +475,13 @@ void CEnvironment::OnFrame()
     float current_weight;
     lerp(current_weight);
 
+    //AVO: allow sun to move as defined in configs
+#ifndef CONFIG_SUN_MOVEMENT
     // Igor. Dynamic sun position.
     if (!GlobalEnv.Render->is_sun_static())
         calculate_dynamic_sun_dir();
+#endif
+    //-AVO
 
 #ifndef MASTER_GOLD
     if (CurrentEnv->sun_dir.y > 0)
