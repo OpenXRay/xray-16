@@ -39,6 +39,8 @@
 #include "activatingcharcollisiondelay.h"
 #include "stalker_movement_manager_smart_cover.h"
 
+#include "../build_config_defines.h"
+
 //const float default_hinge_friction = 5.f;//gray_wolf comment
 #ifdef DEBUG
 #	include "PHDebug.h"
@@ -1167,7 +1169,11 @@ void	CCharacterPhysicsSupport::	CreateShell						( CObject* who, Fvector& dp, Fv
 	if(IsGameTypeSingle())
 	{
 		m_pPhysicsShell->SetPrefereExactIntegration	();//use exact integration for ragdolls in single
+        //AVO: turn on collision with dead bodies (thanks malandrinus)
+#ifndef DEAD_BODY_COLLISION
 		m_pPhysicsShell->SetRemoveCharacterCollLADisable();
+#endif
+        //-AVO
 	}
 	else
 		m_pPhysicsShell->SetIgnoreDynamic();

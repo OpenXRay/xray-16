@@ -36,6 +36,26 @@
         </Favorite>
       </favorites>
     </Folder>
+    <Folder>
+      <name>Console</name>
+      <favorites>
+        <Favorite>
+          <name>xr_ioc_cmd.cpp</name>
+          <path>xrEngine\xr_ioc_cmd.cpp</path>
+          <absolutePath>G:\Stalker\COP\Engine\xray-16\src\xrEngine\xr_ioc_cmd.cpp</absolutePath>
+        </Favorite>
+        <Favorite>
+          <name>console_commands.cpp</name>
+          <path>xrGame\console_commands.cpp</path>
+          <absolutePath>G:\Stalker\COP\Engine\xray-16\src\xrGame\console_commands.cpp</absolutePath>
+        </Favorite>
+        <Favorite>
+          <name>Stats.cpp</name>
+          <path>xrEngine\Stats.cpp</path>
+          <absolutePath>G:\Stalker\COP\Engine\xray-16\src\xrEngine\Stats.cpp</absolutePath>
+        </Favorite>
+      </favorites>
+    </Folder>
   </folders>
   <favorites />
 </Favorites>

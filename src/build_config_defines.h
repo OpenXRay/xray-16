@@ -24,6 +24,8 @@
 
 // TWEAKS:
 #define FP_DEATH // first person death view
+#define DEAD_BODY_COLLISION // restore collision with dead bodies (thanks malandrinus)
 #define NEW_ANIMS // use new animations. Please enclose any new animation addions with this define
 #define NEW_SOUNDS // use new sounds. Please enclose any new sound addions with this define
+//#define DYNAMIC_SUN_MOVEMENT // use dynamic sun movement. If this is not defined sun will move as configured in weather ltx files
 //-TWEAKS
