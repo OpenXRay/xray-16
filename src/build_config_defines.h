@@ -10,6 +10,7 @@
 //-SCRIPTS
 
 // CORE:
+#define NO_BUG_TRAP // dont use bug trap
 #define SPAWN_ANTIFREEZE // spread spawn of game objects thoughout multiple frames to prevent lags (by alpet)
 #define NON_FATAL_VERIFY // don't crash game when VERIFY fails
 #define USE_GSC_MEM_ALLOC // when this is undefined memory allocation for luajit is handled by luajit allocator
@@ -18,7 +19,6 @@
 // VISUAL:
 #define DETAIL_RADIUS // detail draw radius (by KD)
 #define VSYNC_FIX // functional VSync by avbaula
-//ECO_RENDER is not needed with VSYNC_FIX enabled
 #define ECO_RENDER // limit FPS in menu to prevent video card overheat (by alpet)
 //-VISUAL
 
