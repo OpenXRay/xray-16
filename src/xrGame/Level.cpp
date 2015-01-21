@@ -394,7 +394,7 @@ void CLevel::ProcessGameEvents()
             // не отправлять события не заспавненным объектам
             if (g_bootComplete && M_EVENT == ID && PostponedSpawn(dest))
             {
-                //spawn_events->insert(P);
+                spawn_events->insert(P);
                 continue;
             }
             if (g_bootComplete && M_SPAWN == ID && Device.frame_elapsed() > work_limit) // alpet: позволит плавнее выводить объекты в онлайн, без заметных фризов
