@@ -379,9 +379,9 @@ void CLevel::ProcessGameEvents()
             game_events->insert(P);
         }
         u32 avail_time = 5;
-        u32 elps = Device.frame_elapsed();
-        if (elps < 30) avail_time = 33 - elps;
-        u32 work_limit = elps + avail_time;
+        u32 elps = Device.frame_elapsed(); //10ms
+        if (elps < 30) avail_time = 33 - elps; //23ms
+        u32 work_limit = elps + avail_time; //33ms
 #endif
         //-AVO
 
@@ -397,17 +397,16 @@ void CLevel::ProcessGameEvents()
                 //spawn_events->insert(P);
                 continue;
             }
-            if (g_bootComplete && M_SPAWN == ID && Device.frame_elapsed() > work_limit) // alpet: позволит плавнее выводить объекты в онлайн, без заметных фризов
+            if (g_bootComplete && M_SPAWN == ID && Device.frame_elapsed() < work_limit) // alpet: позволит плавнее выводить объекты в онлайн, без заметных фризов
             {
                 u16 parent_id;
                 GetSpawnInfo(P, parent_id);
                 //-------------------------------------------------				
                 if (parent_id < 0xffff) // откладывать спавн только объектов в контейнеры
                 {
-                    if (!spawn_events->available(svT))
-                        Msg("* ProcessGameEvents, spawn event postponed. Events rest = %d", game_events->queue.size());
-
                     spawn_events->insert(P);
+                    //if (spawn_events->available(svT))
+                    Msg("* ProcessGameEvents, spawn event postponed. Events rest = %d", spawn_events->queue.size());
                     continue;
                 }
             }
