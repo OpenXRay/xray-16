@@ -269,8 +269,8 @@ void CDetailManager::UpdateVisibleM()
 	// Initialize 'vis' and 'cache'
 	// Collect objects for rendering
 	RDEVICE.Statistic->RenderDUMP_DT_VIS.Begin	();
-	for (int _mz=0; _mz<dm_cache1_line; _mz++){
-		for (int _mx=0; _mx<dm_cache1_line; _mx++){
+	for (u32 _mz=0; _mz<dm_cache1_line; _mz++){
+		for (u32 _mx=0; _mx<dm_cache1_line; _mx++){
 			CacheSlot1& MS		= cache_level1[_mz][_mx];
 			if (MS.empty)
 			{

@@ -12,7 +12,14 @@
 #include "xr_level_controller.h"
 #include "profiler.h"
 
-#include "lua/library_linkage.h"
+//AVO: lua re-org
+#ifdef USE_LUAJIT_ONE //defined in project props
+#pragma comment(lib, "LuaJIT-1.1.8.lib")
+#else
+#pragma comment(lib, "lua51.lib" )
+#endif
+//#include "lua/library_linkage.h"
+//-AVO
 #include "luabind/library_linkage.h"
 
 //#pragma comment(lib,"ode.lib")

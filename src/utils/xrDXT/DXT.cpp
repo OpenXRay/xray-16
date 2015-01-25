@@ -210,8 +210,8 @@ int DXTCompressImage(LPCSTR out_name, u8* raw_data, u32 w, u32 h, u32 pitch,
     inOpt.setNormalizeMipmaps(false);
     nvtt::CompressionOptions compOpt;
     compOpt.setQuality(nvtt::Quality_Highest);
-    compOpt.setQuantization(fmt->flags.is(STextureParams::flDitherColor), false,
-        fmt->flags.is(STextureParams::flBinaryAlpha));
+    compOpt.setQuantization((fmt->flags.is(STextureParams::flDitherColor)!=0), false,
+        (fmt->flags.is(STextureParams::flBinaryAlpha)!=0));
     switch (fmt->fmt)
     {
     case STextureParams::tfDXT1: 	compOpt.setFormat(nvtt::Format_DXT1); 	break;

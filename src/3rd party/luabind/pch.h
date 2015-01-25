@@ -4,4 +4,4 @@
 #include <luabind/lua_include.hpp>
 #include <luabind/luabind.hpp>
 
-#endif // PCH_H
+#endif //!PCH_H

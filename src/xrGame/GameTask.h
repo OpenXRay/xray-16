@@ -3,7 +3,7 @@
 #include "encyclopedia_article_defs.h"
 #include "GameTaskDefs.h"
 #include "script_export_space.h"
-#include "../../sdk/include/luabind/functor.hpp"
+#include <luabind/functor.hpp>
 
 class CGameTaskManager;
 class CMapLocation;

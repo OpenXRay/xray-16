@@ -1,5 +1,5 @@
 /*
-** $Id: lua.h,v 1.218.1.7 2012/01/13 20:36:20 roberto Exp $
+** $Id: lua.h,v 1.218.1.5 2008/08/06 13:30:12 roberto Exp $
 ** Lua - An Extensible Extension Language
 ** Lua.org, PUC-Rio, Brazil (http://www.lua.org)
 ** See Copyright Notice at the end of this file
@@ -17,10 +17,10 @@
 
 
 #define LUA_VERSION	"Lua 5.1"
-#define LUA_RELEASE	"Lua 5.1.5"
+#define LUA_RELEASE	"Lua 5.1.4"
 #define LUA_VERSION_NUM	501
-#define LUA_COPYRIGHT	"Copyright (C) 1994-2012 Lua.org, PUC-Rio"
-#define LUA_AUTHORS 	"R. Ierusalimschy, L. H. de Figueiredo & W. Celes"
+#define LUA_COPYRIGHT	"Copyright (C) 1994-2008 Lua.org, PUC-Rio"
+#define LUA_AUTHORS	"R. Ierusalimschy, L. H. de Figueiredo & W. Celes"
 
 
 /* mark for precompiled code (`<esc>Lua') */
@@ -245,7 +245,7 @@ LUA_API void lua_setallocf (lua_State *L, lua_Alloc f, void *ud);
 
 
 
-/* 
+/*
 ** ===============================================================
 ** some useful macros
 ** ===============================================================
@@ -294,6 +294,9 @@ LUA_API void lua_setallocf (lua_State *L, lua_Alloc f, void *ud);
 #define lua_Chunkwriter		lua_Writer
 
 
+/* hack */
+LUA_API void lua_setlevel	(lua_State *from, lua_State *to);
+
 
 /*
 ** {======================================================================
@@ -333,11 +336,16 @@ LUA_API const char *lua_getlocal (lua_State *L, const lua_Debug *ar, int n);
 LUA_API const char *lua_setlocal (lua_State *L, const lua_Debug *ar, int n);
 LUA_API const char *lua_getupvalue (lua_State *L, int funcindex, int n);
 LUA_API const char *lua_setupvalue (lua_State *L, int funcindex, int n);
-
 LUA_API int lua_sethook (lua_State *L, lua_Hook func, int mask, int count);
 LUA_API lua_Hook lua_gethook (lua_State *L);
 LUA_API int lua_gethookmask (lua_State *L);
 LUA_API int lua_gethookcount (lua_State *L);
+
+/* From Lua 5.2. */
+LUA_API void *lua_upvalueid (lua_State *L, int idx, int n);
+LUA_API void lua_upvaluejoin (lua_State *L, int idx1, int n1, int idx2, int n2);
+LUA_API int lua_loadx (lua_State *L, lua_Reader reader, void *dt,
+		       const char *chunkname, const char *mode);
 
 
 struct lua_Debug {
@@ -359,7 +367,7 @@ struct lua_Debug {
 
 
 /******************************************************************************
-* Copyright (C) 1994-2012 Lua.org, PUC-Rio.  All rights reserved.
+* Copyright (C) 1994-2008 Lua.org, PUC-Rio.  All rights reserved.
 *
 * Permission is hereby granted, free of charge, to any person obtaining
 * a copy of this software and associated documentation files (the

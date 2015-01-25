@@ -1,316 +1,313 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="src">
-      <UniqueIdentifier>{9f21a79f-38cf-41a6-8537-7bb4557e71f4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include">
-      <UniqueIdentifier>{2429653a-5c6e-455d-9a2b-fdc461597c2e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\detail">
-      <UniqueIdentifier>{73f4046b-5a9c-4a36-811d-ad0e91b71ba2}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="luabind\src\class.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="luabind\src\class_info.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="luabind\src\class_registry.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="luabind\src\class_rep.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="luabind\src\create_class.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="luabind\src\error.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="luabind\src\find_best_match.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="luabind\src\function.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="luabind\src\implicit_cast.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="luabind\src\link_compatibility.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="luabind\src\object.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="luabind\src\object_rep.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="luabind\src\open.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="luabind\src\pcall.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="luabind\src\ref.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="luabind\src\scope.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="luabind\src\stack_content_by_name.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="luabind\src\weak_ref.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="luabind\src\wrapper_base.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="library_linkage.cpp" />
     <ClCompile Include="luabind_memory.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="src\class.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\class_info.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\class_registry.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\class_rep.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\create_class.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\error.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\find_best_match.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\function.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\implicit_cast.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\link_compatibility.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\object.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\object_rep.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\open.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pcall.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ref.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scope.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stack_content_by_name.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\weak_ref.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\wrapper_base.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
-    <ClInclude Include="..\..\..\sdk\include\luabind\adopt_policy.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\calc_arity.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\back_reference.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\call.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\back_reference_fwd.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\call_function.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\class.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\call_member.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\class_info.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\call_operator_iterate.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\com_policy.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\class_cache.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\config.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\class_registry.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\container_policy.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\class_rep.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\copy_policy.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\class_rep_scope.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\dependency_policy.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\constructor.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\discard_result_policy.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\construct_rep.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\error.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\convert_to_lua.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\function.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\debug.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\functor.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\decorate_type.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\iterator_policy.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\enum_maker.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\library_linkage.h">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\find_best_match.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\lua_include.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\garbage_collector.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\luabind.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\get_overload_signature.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\luabind_auto_ptr.h">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\get_signature.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\luabind_delete.h">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\implicit_cast.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\luabind_memory.h">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\is_indirect_const.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\luabind_memory_allocator.h">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\link_compatibility.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\luabind_memory_allocator_inline.h">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\method_rep.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\luabind_memory_manager_generator.h">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\object_funs.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\luabind_types.h">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\object_rep.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\object.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\open.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\open.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\operators.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\operator.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\operator_id.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\out_value_policy.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\other.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\prefix.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\overload_rep.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\raw_policy.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\overload_rep_base.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\return_reference_to_policy.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\overload_rep_impl.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\scope.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\pcall.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\weak_ref.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\pointee_sizeof.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\wrapper_base.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\pointee_typeid.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\yield_policy.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="luabind\detail\policy.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\calc_arity.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\detail\primitives.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\call.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\detail\property.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\call_function.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\detail\ref.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\call_member.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\detail\signature_match.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\call_operator_iterate.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\detail\stack_utils.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\class_cache.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\detail\typetraits.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\class_registry.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\detail\yes_no.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\class_rep.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\adopt_policy.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\class_rep_scope.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\back_reference.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\construct_rep.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\back_reference_fwd.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\constructor.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\class.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\convert_to_lua.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\class_info.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\debug.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\com_policy.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\decorate_type.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\config.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\enum_maker.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\container_policy.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\find_best_match.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\copy_policy.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\garbage_collector.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\dependency_policy.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\get_overload_signature.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\discard_result_policy.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\get_signature.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\error.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\implicit_cast.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\function.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\is_indirect_const.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\functor.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\link_compatibility.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\iterator_policy.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\method_rep.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\library_linkage.h">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\object_funs.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\lua_include.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\object_rep.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\luabind.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\open.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\luabind_auto_ptr.h">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\operator_id.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\luabind_delete.h">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\operators.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\luabind_memory.h">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\other.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\luabind_memory_allocator.h">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\overload_rep.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\luabind_memory_allocator_inline.h">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\overload_rep_base.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\luabind_memory_manager_generator.h">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\overload_rep_impl.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\luabind_types.h">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\pcall.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\object.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\pointee_sizeof.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\open.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\pointee_typeid.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\operator.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\policy.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\out_value_policy.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\primitives.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\prefix.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\property.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\raw_policy.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\ref.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\return_reference_to_policy.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\signature_match.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\scope.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\stack_utils.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\weak_ref.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\typetraits.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\wrapper_base.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sdk\include\luabind\detail\yes_no.hpp">
-      <Filter>include\detail</Filter>
+    <ClInclude Include="luabind\yield_policy.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{ca4ed806-a92a-460d-82e1-12c6d54eb9e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{d77de1d4-f96c-4241-9861-1cb5acd23a2b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

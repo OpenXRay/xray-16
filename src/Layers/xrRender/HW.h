@@ -8,6 +8,8 @@
 
 #include "hwcaps.h"
 
+#include "../../build_config_defines.h"
+
 #ifndef _MAYA_EXPORT
 #include "stats_manager.h"
 #endif

@@ -11,11 +11,15 @@
 
 #include "stdafx.h"
 
-extern "C" {
+
+//AVO: lua re-org
+#include "lua.hpp"
+/*extern "C" {
 	#include <lua/lua.h>
 	#include <lua/lualib.h>
 	#include <lua/lauxlib.h>
-};
+}*/
+//-AVO
 
 #pragma warning(push)
 #pragma warning(disable:4995)

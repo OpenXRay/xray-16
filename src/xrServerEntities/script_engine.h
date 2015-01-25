@@ -14,9 +14,12 @@
 #include "associative_vector.h"
 #include "script_storage.h"
 
-extern "C" {
-	#include <lua/lua.h>
-};
+//AVO: lua re-org
+#include "lua.hpp"
+/*extern "C" {
+#include <lua/lua.h>
+}*/
+//-AVO
 
 //#define DBG_DISABLE_SCRIPTS
 

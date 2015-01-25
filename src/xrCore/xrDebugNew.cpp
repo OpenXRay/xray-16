@@ -13,6 +13,8 @@
 #include <direct.h>
 #pragma warning(pop)
 
+#include "../build_config_defines.h"
+
 extern bool shared_str_initialized;
 
 #ifdef __BORLANDC__
@@ -24,7 +26,9 @@ extern bool shared_str_initialized;
 static BOOL bException = TRUE;
 # define USE_BUG_TRAP
 #else
-//# define USE_BUG_TRAP
+#ifndef NO_BUG_TRAP
+# define USE_BUG_TRAP
+#endif //-!NO_BUG_TRAP
 # define DEBUG_INVOKE __asm int 3
 static BOOL bException = FALSE;
 #endif
@@ -53,11 +57,11 @@ static BOOL bException = FALSE;
 #include <new.h> // for _set_new_mode
 #include <signal.h> // for signals
 
-#if 1//def DEBUG
+#ifdef NO_BUG_TRAP //DEBUG
 # define USE_OWN_ERROR_MESSAGE_WINDOW
-#else // DEBUG
+#else
 # define USE_OWN_MINI_DUMP
-#endif // DEBUG
+#endif //-NO_BUG_TRAP //DEBUG
 
 XRCORE_API xrDebug Debug;
 
@@ -84,7 +88,7 @@ void xrDebug::gather_info(const char* expression, const char* description, const
 {
     LPSTR buffer_base = assertion_info;
     LPSTR buffer = assertion_info;
-    int assertion_size = (int)assertion_info_size;
+    int assertion_size = (int) assertion_info_size;
     LPCSTR endline = "\n";
     LPCSTR prefix = "[error]";
     bool extended_description = (description && !argument0 && strchr(description, '\n'));
@@ -143,7 +147,7 @@ void xrDebug::gather_info(const char* expression, const char* description, const
 #ifdef USE_MEMORY_MONITOR
     memory_monitor::flush_each_time(true);
     memory_monitor::flush_each_time(false);
-#endif // USE_MEMORY_MONITOR
+#endif //-USE_MEMORY_MONITOR
 
     if (!IsDebuggerPresent() && !strstr(GetCommandLine(), "-no_call_stack_assert"))
     {
@@ -152,7 +156,7 @@ void xrDebug::gather_info(const char* expression, const char* description, const
 
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
         buffer += xr_sprintf(buffer, assertion_size - u32(buffer - buffer_base), "stack trace:%s%s", endline, endline);
-#endif // USE_OWN_ERROR_MESSAGE_WINDOW
+#endif //-USE_OWN_ERROR_MESSAGE_WINDOW
 
         BuildStackTrace();
 
@@ -163,7 +167,7 @@ void xrDebug::gather_info(const char* expression, const char* description, const
 
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
             buffer += xr_sprintf(buffer, assertion_size - u32(buffer - buffer_base), "%s%s", g_stackTrace[i], endline);
-#endif // USE_OWN_ERROR_MESSAGE_WINDOW
+#endif //-USE_OWN_ERROR_MESSAGE_WINDOW
         }
 
         if (shared_str_initialized)
@@ -180,13 +184,53 @@ void xrDebug::do_exit(const std::string& message)
     TerminateProcess(GetCurrentProcess(), 1);
 }
 
+#ifdef NO_BUG_TRAP
+//AVO: simplified function
 void xrDebug::backend(const char* expression, const char* description, const char* argument0, const char* argument1, const char* file, int line, const char* function, bool& ignore_always)
 {
     static xrCriticalSection CS
 #ifdef PROFILE_CRITICAL_SECTIONS
-    (MUTEX_PROFILE_ID(xrDebug::backend))
+        (MUTEX_PROFILE_ID(xrDebug::backend))
+#endif //-PROFILE_CRITICAL_SECTIONS
+        ;
+
+    CS.Enter();
+
+    string4096 assertion_info;
+
+    gather_info(expression, description, argument0, argument1, file, line, function, assertion_info, sizeof(assertion_info));
+
+    LPCSTR endline = "\r\n";
+    LPSTR buffer = assertion_info + xr_strlen(assertion_info);
+    buffer += xr_sprintf(buffer, sizeof(assertion_info) - u32(buffer - &assertion_info[0]), "%sPress OK to abort execution%s", endline, endline);
+
+    if (handler)
+        handler();
+
+    FlushLog();
+
+    ShowCursor(true);
+    ShowWindow(GetActiveWindow(), SW_FORCEMINIMIZE);
+    MessageBox(
+        GetTopWindow(NULL),
+        assertion_info,
+        "Fatal Error",
+        MB_OK | MB_ICONERROR | MB_SYSTEMMODAL
+        );
+
+    CS.Leave();
+
+    TerminateProcess(GetCurrentProcess(), 1);
+}
+//-AVO
+#else
+void xrDebug::backend(const char* expression, const char* description, const char* argument0, const char* argument1, const char* file, int line, const char* function, bool& ignore_always)
+{
+    static xrCriticalSection CS
+#ifdef PROFILE_CRITICAL_SECTIONS
+        (MUTEX_PROFILE_ID(xrDebug::backend))
 #endif // PROFILE_CRITICAL_SECTIONS
-    ;
+        ;
 
     CS.Enter();
 
@@ -221,10 +265,10 @@ void xrDebug::backend(const char* expression, const char* description, const cha
     ShowWindow(GetActiveWindow(), SW_FORCEMINIMIZE);
     int result =
         MessageBox(
-            GetTopWindow(NULL),
-            assertion_info,
-            "Fatal Error",
-            /*MB_CANCELTRYCONTINUE*/MB_OK | MB_ICONERROR | /*MB_SYSTEMMODAL |*/ MB_DEFBUTTON1 | MB_SETFOREGROUND
+        GetTopWindow(NULL),
+        assertion_info,
+        "Fatal Error",
+        /*MB_CANCELTRYCONTINUE*/MB_OK | MB_ICONERROR | /*MB_SYSTEMMODAL |*/ MB_DEFBUTTON1 | MB_SETFOREGROUND
         );
 
     switch (result)
@@ -268,8 +312,8 @@ void xrDebug::backend(const char* expression, const char* description, const cha
         get_on_dialog() (false);
 
     CS.Leave();
-
 }
+#endif
 
 LPCSTR xrDebug::error2string(long code)
 {
@@ -375,8 +419,8 @@ int out_of_memory_handler(size_t size)
     {
         Memory.mem_compact();
         size_t process_heap = Memory.mem_usage();
-        int eco_strings = (int)g_pStringContainer->stat_economy();
-        int eco_smem = (int)g_pSharedMemoryContainer->stat_economy();
+        int eco_strings = (int) g_pStringContainer->stat_economy();
+        int eco_smem = (int) g_pSharedMemoryContainer->stat_economy();
         Msg("* [x-ray]: process heap[%u K]", process_heap / 1024, process_heap / 1024);
         Msg("* [x-ray]: economy: strings[%d K], smem[%d K]", eco_strings / 1024, eco_smem);
     }
@@ -442,11 +486,11 @@ void SetupExceptionHandler(const bool& dedicated)
     BT_SetDialogMessage(
         BTDM_INTRO2,
         "\
-        This is X-Ray Engine v1.6 crash reporting client. \
-        To help the development process, \
-        please Submit Bug or save report and email it manually (button More...).\
-        \r\nMany thanks in advance and sorry for the inconvenience."
-    );
+                                                This is X-Ray Engine v1.6 crash reporting client. \
+                                                                                                                                                                        To help the development process, \
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                please Submit Bug or save report and email it manually (button More...).\
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                \r\nMany thanks in advance and sorry for the inconvenience."
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                );
 
     BT_SetPreErrHandler(PreErrorHandler, 0);
     BT_SetAppName("XRay Engine");
@@ -456,46 +500,46 @@ void SetupExceptionHandler(const bool& dedicated)
     u32 const minidump_flags =
 #ifndef MASTER_GOLD
         (
-            MiniDumpWithDataSegs |
-            // MiniDumpWithFullMemory |
-            // MiniDumpWithHandleData |
-            // MiniDumpFilterMemory |
-            // MiniDumpScanMemory |
-            // MiniDumpWithUnloadedModules |
+        MiniDumpWithDataSegs |
+        // MiniDumpWithFullMemory |
+        // MiniDumpWithHandleData |
+        // MiniDumpFilterMemory |
+        // MiniDumpScanMemory |
+        // MiniDumpWithUnloadedModules |
 # ifndef _EDITOR
-            MiniDumpWithIndirectlyReferencedMemory |
+        MiniDumpWithIndirectlyReferencedMemory |
 # endif // _EDITOR
-            // MiniDumpFilterModulePaths |
-            // MiniDumpWithProcessThreadData |
-            // MiniDumpWithPrivateReadWriteMemory |
-            // MiniDumpWithoutOptionalData |
-            // MiniDumpWithFullMemoryInfo |
-            // MiniDumpWithThreadInfo |
-            // MiniDumpWithCodeSegs |
-            0
+        // MiniDumpFilterModulePaths |
+        // MiniDumpWithProcessThreadData |
+        // MiniDumpWithPrivateReadWriteMemory |
+        // MiniDumpWithoutOptionalData |
+        // MiniDumpWithFullMemoryInfo |
+        // MiniDumpWithThreadInfo |
+        // MiniDumpWithCodeSegs |
+        0
         );
 #else // #ifndef MASTER_GOLD
         dedicated ?
-        MiniDumpNoDump :
-        (
-            MiniDumpWithDataSegs |
-            // MiniDumpWithFullMemory |
-            // MiniDumpWithHandleData |
-            // MiniDumpFilterMemory |
-            // MiniDumpScanMemory |
-            // MiniDumpWithUnloadedModules |
+    MiniDumpNoDump :
+                   (
+                   MiniDumpWithDataSegs |
+                   // MiniDumpWithFullMemory |
+                   // MiniDumpWithHandleData |
+                   // MiniDumpFilterMemory |
+                   // MiniDumpScanMemory |
+                   // MiniDumpWithUnloadedModules |
 # ifndef _EDITOR
-            MiniDumpWithIndirectlyReferencedMemory |
+                   MiniDumpWithIndirectlyReferencedMemory |
 # endif // _EDITOR
-            // MiniDumpFilterModulePaths |
-            // MiniDumpWithProcessThreadData |
-            // MiniDumpWithPrivateReadWriteMemory |
-            // MiniDumpWithoutOptionalData |
-            // MiniDumpWithFullMemoryInfo |
-            // MiniDumpWithThreadInfo |
-            // MiniDumpWithCodeSegs |
-            0
-        );
+                   // MiniDumpFilterModulePaths |
+                   // MiniDumpWithProcessThreadData |
+                   // MiniDumpWithPrivateReadWriteMemory |
+                   // MiniDumpWithoutOptionalData |
+                   // MiniDumpWithFullMemoryInfo |
+                   // MiniDumpWithThreadInfo |
+                   // MiniDumpWithCodeSegs |
+                   0
+                   );
 #endif // #ifndef MASTER_GOLD
 
     BT_SetDumpType(minidump_flags);
@@ -503,9 +547,8 @@ void SetupExceptionHandler(const bool& dedicated)
     // BT_SetSupportServer ("localhost", 9999);
     // BT_SetSupportURL ("www.gsc-game.com");
 }
-#endif // USE_BUG_TRAP
+#endif //-USE_BUG_TRAP
 
-#if 1
 extern void BuildStackTrace(struct _EXCEPTION_POINTERS* pExceptionInfo);
 typedef LONG WINAPI UnhandledExceptionFilterType(struct _EXCEPTION_POINTERS* pExceptionInfo);
 typedef LONG(__stdcall* PFNCHFILTFN) (EXCEPTION_POINTERS* pExPtrs);
@@ -515,10 +558,10 @@ static UnhandledExceptionFilterType* previous_filter = 0;
 
 #ifdef USE_OWN_MINI_DUMP
 typedef BOOL (WINAPI* MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hFile, MINIDUMP_TYPE DumpType,
-        CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
-        CONST PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
-        CONST PMINIDUMP_CALLBACK_INFORMATION CallbackParam
-                                        );
+    CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
+    CONST PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
+    CONST PMINIDUMP_CALLBACK_INFORMATION CallbackParam
+    );
 
 void save_mini_dump (_EXCEPTION_POINTERS* pExceptionInfo)
 {
@@ -625,7 +668,7 @@ void save_mini_dump (_EXCEPTION_POINTERS* pExceptionInfo)
         szResult = "DBGHELP.DLL not found";
     }
 }
-#endif // USE_OWN_MINI_DUMP
+#endif //-USE_OWN_MINI_DUMP
 
 void format_message(LPSTR buffer, const u32& buffer_size)
 {
@@ -644,10 +687,10 @@ void format_message(LPSTR buffer, const u32& buffer_size)
         NULL,
         error_code,
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPSTR)&message,
+        (LPSTR) &message,
         0,
         NULL
-    );
+        );
 
     xr_sprintf(buffer, buffer_size, "[error][%8d] : %s", error_code, message);
     LocalFree(message);
@@ -656,8 +699,67 @@ void format_message(LPSTR buffer, const u32& buffer_size)
 #ifndef _EDITOR
 #include <errorrep.h>
 #pragma comment( lib, "faultrep.lib" )
-#endif
+#endif //-!_EDITOR
 
+#ifdef NO_BUG_TRAP
+//AVO: simplify function
+LONG WINAPI UnhandledFilter(_EXCEPTION_POINTERS* pExceptionInfo)
+{
+    string256 error_message;
+    format_message(error_message, sizeof(error_message));
+
+    CONTEXT save = *pExceptionInfo->ContextRecord;
+    BuildStackTrace(pExceptionInfo);
+    *pExceptionInfo->ContextRecord = save;
+
+    if (shared_str_initialized)
+        Msg("stack trace:\n");
+
+    if (!IsDebuggerPresent())
+    {
+        os_clipboard::copy_to_clipboard("stack trace:\r\n\r\n");
+    }
+
+    string4096 buffer;
+    for (int i = 0; i < g_stackTraceCount; ++i)
+    {
+        if (shared_str_initialized)
+            Msg("%s", g_stackTrace[i]);
+        xr_sprintf(buffer, sizeof(buffer), "%s\r\n", g_stackTrace[i]);
+#ifdef DEBUG
+        if (!IsDebuggerPresent())
+            os_clipboard::update_clipboard(buffer);
+#endif //-DEBUG
+    }
+
+    if (*error_message)
+    {
+        if (shared_str_initialized)
+            Msg("\n%s", error_message);
+
+        xr_strcat(error_message, sizeof(error_message), "\r\n");
+#ifdef DEBUG
+        if (!IsDebuggerPresent())
+            os_clipboard::update_clipboard(buffer);
+#endif //-DEBUG
+    }
+
+    FlushLog();
+
+    ShowCursor(true);
+    ShowWindow(GetActiveWindow(), SW_FORCEMINIMIZE);
+    MessageBox(
+        GetTopWindow(NULL),
+        "Unhandled exception occured. See log for details",
+        "Fatal Error",
+        MB_OK | MB_ICONERROR | MB_SYSTEMMODAL
+        );
+    TerminateProcess(GetCurrentProcess(), 1);
+
+    return (EXCEPTION_CONTINUE_SEARCH);
+}
+//-AVO
+#else
 LONG WINAPI UnhandledFilter(_EXCEPTION_POINTERS* pExceptionInfo)
 {
     string256 error_message;
@@ -686,7 +788,7 @@ LONG WINAPI UnhandledFilter(_EXCEPTION_POINTERS* pExceptionInfo)
 #ifdef DEBUG
             if (!IsDebuggerPresent())
                 os_clipboard::update_clipboard(buffer);
-#endif // #ifdef DEBUG
+#endif //-DEBUG
         }
 
         if (*error_message)
@@ -698,7 +800,7 @@ LONG WINAPI UnhandledFilter(_EXCEPTION_POINTERS* pExceptionInfo)
 #ifdef DEBUG
             if (!IsDebuggerPresent())
                 os_clipboard::update_clipboard(buffer);
-#endif // #ifdef DEBUG
+#endif //-DEBUG
         }
     }
 
@@ -714,9 +816,14 @@ LONG WINAPI UnhandledFilter(_EXCEPTION_POINTERS* pExceptionInfo)
     {
         if (Debug.get_on_dialog())
             Debug.get_on_dialog() (true);
-
-        MessageBox(NULL, "Fatal error occured\n\nPress OK to abort program execution", "Fatal error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+        MessageBox(
+            NULL,
+            "Fatal error occured\n\nPress OK to abort program execution",
+            "Fatal Error",
+            MB_OK | MB_ICONERROR | MB_SYSTEMMODAL
+            );
     }
+
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
 
 #ifndef _EDITOR
@@ -739,16 +846,15 @@ LONG WINAPI UnhandledFilter(_EXCEPTION_POINTERS* pExceptionInfo)
     if (Debug.get_on_dialog())
         Debug.get_on_dialog() (false);
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
-
     return (EXCEPTION_CONTINUE_SEARCH);
 }
-#endif
+#endif //-NO_BUG_TRAP
 
 //////////////////////////////////////////////////////////////////////
 #ifdef M_BORLAND
 namespace std
 {
-extern new_handler _RTLENTRY _EXPFUNC set_new_handler( new_handler new_p );
+    extern new_handler _RTLENTRY _EXPFUNC set_new_handler(new_handler new_p);
 };
 
 static void __cdecl def_new_handler()
@@ -768,8 +874,9 @@ typedef int(__cdecl* _PNH)(size_t);
 _CRTIMP int __cdecl _set_new_mode(int);
 _CRTIMP _PNH __cdecl _set_new_handler(_PNH);
 
+#ifdef LEGACY_CODE
 #ifndef USE_BUG_TRAP
-void _terminate ()
+void _terminate()
 {
     if (strstr(GetCommandLine(),"-silent_error_mode"))
         exit (-1);
@@ -795,7 +902,7 @@ void _terminate ()
         "",
 #endif // _EDITOR
         assertion_info
-    );
+        );
 
     LPCSTR endline = "\r\n";
     LPSTR buffer = assertion_info + xr_strlen(assertion_info);
@@ -806,12 +913,13 @@ void _terminate ()
         assertion_info,
         "Fatal Error",
         MB_OK|MB_ICONERROR|MB_SYSTEMMODAL
-    );
+        );
 
     exit (-1);
     // FATAL ("Unexpected application termination");
 }
-#endif // USE_BUG_TRAP
+#endif //-!USE_BUG_TRAP
+#endif //-LEGACY_CODE
 
 static void handler_base(LPCSTR reason_string)
 {
@@ -823,7 +931,7 @@ static void handler_base(LPCSTR reason_string)
         0,
         DEBUG_INFO,
         ignore_always
-    );
+        );
 }
 
 static void invalid_parameter_handler(
@@ -832,7 +940,7 @@ static void invalid_parameter_handler(
     const wchar_t* file,
     unsigned int line,
     uintptr_t reserved
-)
+    )
 {
     bool ignore_always = false;
 
@@ -843,33 +951,33 @@ static void invalid_parameter_handler(
     // errno_t err =
     if (expression)
         wcstombs_s(
-            &converted_chars,
-            expression_,
-            sizeof(expression_),
-            expression,
-            (wcslen(expression) + 1) * 2 * sizeof(char)
+        &converted_chars,
+        expression_,
+        sizeof(expression_),
+        expression,
+        (wcslen(expression) + 1) * 2 * sizeof(char)
         );
     else
         xr_strcpy(expression_, "");
 
     if (function)
         wcstombs_s(
-            &converted_chars,
-            function_,
-            sizeof(function_),
-            function,
-            (wcslen(function) + 1) * 2 * sizeof(char)
+        &converted_chars,
+        function_,
+        sizeof(function_),
+        function,
+        (wcslen(function) + 1) * 2 * sizeof(char)
         );
     else
         xr_strcpy(function_, __FUNCTION__);
 
     if (file)
         wcstombs_s(
-            &converted_chars,
-            file_,
-            sizeof(file_),
-            file,
-            (wcslen(file) + 1) * 2 * sizeof(char)
+        &converted_chars,
+        file_,
+        sizeof(file_),
+        file,
+        (wcslen(file) + 1) * 2 * sizeof(char)
         );
     else
     {
@@ -886,7 +994,7 @@ static void invalid_parameter_handler(
         line,
         function_,
         ignore_always
-    );
+        );
 }
 
 static void pure_call_handler()
@@ -895,9 +1003,9 @@ static void pure_call_handler()
 }
 
 #ifdef XRAY_USE_EXCEPTIONS
-static void unexpected_handler ()
+static void unexpected_handler()
 {
-    handler_base ("unexpected program termination");
+    handler_base("unexpected program termination");
 }
 #endif // XRAY_USE_EXCEPTIONS
 
@@ -952,7 +1060,7 @@ void debug_on_thread_spawn()
     _set_purecall_handler(&pure_call_handler);
 
 #if 0// should be if we use exceptions
-    std::set_unexpected (_terminate);
+    std::set_unexpected(_terminate);
 #endif
 }
 
@@ -972,7 +1080,7 @@ void xrDebug::_initialize(const bool& dedicated)
 #if 0
     struct foo
     {
-        static void recurs (const u32& count)
+        static void recurs(const u32& count)
         {
             if (!count)
                 return;

@@ -14,6 +14,8 @@
 
 #include "xr_input.h"
 
+#include "../build_config_defines.h"
+
 //#include "resourcemanager.h"
 
 #ifndef _EDITOR
@@ -538,8 +540,12 @@ void CEnvironment::OnFrame()
     lerp(current_weight);
 
     // Igor. Dynamic sun position.
+    //AVO: allow sun to move as defined in configs
+#ifdef DYNAMIC_SUN_MOVEMENT
     if (!::Render->is_sun_static())
         calculate_dynamic_sun_dir();
+#endif
+    //-AVO
 
 #ifndef MASTER_GOLD
     if (CurrentEnv->sun_dir.y > 0)

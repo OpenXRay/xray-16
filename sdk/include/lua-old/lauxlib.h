@@ -12,34 +12,21 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include <lua/lua.h>
+#include "lua.h"
 
 
-#if defined(LUA_COMPAT_GETN)
-LUALIB_API int (luaL_getn) (lua_State *L, int t);
-LUALIB_API void (luaL_setn) (lua_State *L, int t, int n);
-#else
 #define luaL_getn(L,i)          ((int)lua_objlen(L, i))
 #define luaL_setn(L,i,j)        ((void)0)  /* no op! */
-#endif
-
-#if defined(LUA_COMPAT_OPENLIB)
-#define luaI_openlib	luaL_openlib
-#endif
-
 
 /* extra error code for `luaL_load' */
 #define LUA_ERRFILE     (LUA_ERRERR+1)
-
 
 typedef struct luaL_Reg {
   const char *name;
   lua_CFunction func;
 } luaL_Reg;
 
-
-
-LUALIB_API void (luaI_openlib) (lua_State *L, const char *libname,
+LUALIB_API void (luaL_openlib) (lua_State *L, const char *libname,
                                 const luaL_Reg *l, int nup);
 LUALIB_API void (luaL_register) (lua_State *L, const char *libname,
                                 const luaL_Reg *l);
@@ -88,7 +75,15 @@ LUALIB_API const char *(luaL_gsub) (lua_State *L, const char *s, const char *p,
 LUALIB_API const char *(luaL_findtable) (lua_State *L, int idx,
                                          const char *fname, int szhint);
 
-
+/* From Lua 5.2. */
+LUALIB_API int luaL_fileresult(lua_State *L, int stat, const char *fname);
+LUALIB_API int luaL_execresult(lua_State *L, int stat);
+LUALIB_API int (luaL_loadfilex) (lua_State *L, const char *filename,
+				 const char *mode);
+LUALIB_API int (luaL_loadbufferx) (lua_State *L, const char *buff, size_t sz,
+				   const char *name, const char *mode);
+LUALIB_API void luaL_traceback (lua_State *L, lua_State *L1, const char *msg,
+				int level);
 
 
 /*
@@ -170,5 +165,3 @@ LUALIB_API void (luaL_pushresult) (luaL_Buffer *B);
 #define luaL_reg	luaL_Reg
 
 #endif
-
-

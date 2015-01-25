@@ -127,7 +127,7 @@ DWORD ttapi_Init( _processor_info* ID )
 	QueryPerformanceCounter( &liEnd );
 
 	// We want 1/25 (40ms) fast spin-loop
-	ttapi_dwFastIter = ( dwNumIter * liFrequency.QuadPart ) / ( ( liEnd.QuadPart - liStart.QuadPart ) * 25 );
+	ttapi_dwFastIter = (DWORD)(( dwNumIter * liFrequency.QuadPart ) / ( ( liEnd.QuadPart - liStart.QuadPart ) * 25 ));
 	//Msg( "fast spin-loop iterations : %u" , ttapi_dwFastIter );
 
 	// Get slow spin-loop timings
@@ -143,7 +143,7 @@ DWORD ttapi_Init( _processor_info* ID )
 	QueryPerformanceCounter( &liEnd );
 
 	// We want 1/2 (500ms) slow spin-loop
-	ttapi_dwSlowIter = ( dwNumIter * liFrequency.QuadPart ) / ( ( liEnd.QuadPart - liStart.QuadPart ) * 2 );
+	ttapi_dwSlowIter = (DWORD)(( dwNumIter * liFrequency.QuadPart ) / ( ( liEnd.QuadPart - liStart.QuadPart ) * 2 ));
 	//Msg( "slow spin-loop iterations : %u" , ttapi_dwSlowIter );
 
 	SetPriorityClass( GetCurrentProcess() , NORMAL_PRIORITY_CLASS );

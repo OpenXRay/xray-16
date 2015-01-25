@@ -6,9 +6,12 @@
 //	Description : library linkage file
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef LUABIND_LIBRARY_LINKAGE_H_INCLUDED
-#define LUABIND_LIBRARY_LINKAGE_H_INCLUDED
+#ifndef LUA_LIBRARY_LINKAGE_H_INCLUDED
+#define LUA_LIBRARY_LINKAGE_H_INCLUDED
 
-#pragma comment(lib, "luabind.beta7-devel.rc4.lib" )
+//#pragma comment(lib, "lua.JIT.1.1.4.lib" ) // AVO: upgrade to 1.1.8
+#pragma comment(lib, "lua51.lib" )
+//#pragma comment(lib, "LuaJIT-1.1.8.lib" )
 
-#endif // #ifndef LUABIND_LIBRARY_LINKAGE_H_INCLUDED
+
+#endif // #ifndef LUA_LIBRARY_LINKAGE_H_INCLUDED

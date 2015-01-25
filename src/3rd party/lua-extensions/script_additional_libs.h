@@ -1,6 +1,9 @@
 #pragma once
 
-#include "../LuaJIT-1.1.8/etc/lua.hpp"
+#include "../../build_config_defines.h"
+
+#include "lua.hpp"
+
 #include <cstdlib>
 #include <cctype>
 

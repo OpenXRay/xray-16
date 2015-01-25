@@ -164,7 +164,7 @@ bool CLevelChanger::get_reject_pos(Fvector& p, Fvector& r)
 
 bool CLevelChanger::feel_touch_contact	(CObject *object)
 {
-	bool bRes	= (((CCF_Shape*)CFORM())->Contact(object));
+	bool bRes	= ((((CCF_Shape*)CFORM())->Contact(object)) != 0);
 	bRes		= bRes && smart_cast<CActor*>(object) && smart_cast<CActor*>(object)->g_Alive();
 	return		bRes;
 }
