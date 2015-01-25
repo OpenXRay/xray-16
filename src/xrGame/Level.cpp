@@ -293,6 +293,7 @@ void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
     {
         if (type == GE_DESTROY)
         {
+            /* This is not the right place for this (if this is even required...)
             //AVO: fix for SPAWN_ANTIFREEZE crashes caused by rapid online-offline switch. In such cases
             //inventory items are queued up for a spawn, however parent is already destroyed which cases game to crash
 #ifdef SPAWN_ANTIFREEZE
@@ -308,6 +309,7 @@ void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
             }
 #endif
             //-AVO
+            */
             Game().OnDestroy(GO);
         }
         GO->OnEvent(P, type);
