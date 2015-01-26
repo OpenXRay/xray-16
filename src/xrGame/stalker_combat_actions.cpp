@@ -436,21 +436,22 @@ void CStalkerActionKillEnemy::execute()
     inherited::execute();
     //Alundaio: Prevent Stalkers from shooting at walls for prolonged periods due to kill if not visible
     const CEntityAlive* enemy = object().memory().enemy().selected();
-    if (!enemy || !enemy->g_Alive())
-        return;
-
-    CMemoryInfo mem_object = object().memory().memory(enemy);
-    if (!mem_object.m_object)
-        return;
-
-    object().best_cover(mem_object.m_object_params.m_position);
-
-    u32 last_time_seen = object().memory().visual().visible_object_time_last_seen(enemy);
-    if (last_time_seen != u32(-1) && Device.dwTimeGlobal - last_time_seen <= 2000)
+    if (enemy && enemy->g_Alive())
     {
-        object().sight().setup(CSightAction(enemy, true, true));
-        fire();
+        CMemoryInfo mem_object = object().memory().memory(enemy);
+        if (mem_object.m_object)
+            object().best_cover(mem_object.m_object_params.m_position);
+        u32 last_time_seen = object().memory().visual().visible_object_time_last_seen(enemy);
+
+        //Here NPC will only fire at not visible enemy for no more than 3 seconds instead of shooting at walls like morons
+        if (last_time_seen != u32(-1) && Device.dwTimeGlobal - last_time_seen <= 3000)
+        {
+            object().sight().setup(CSightAction(enemy, true, true));
+            fire();
+        }
     }
+    else
+        object().sight().setup(CSightAction(SightManager::eSightTypePathDirection, true, true));
     //Alundaio: END
 }
 
@@ -502,6 +503,7 @@ void CStalkerActionTakeCover::execute()
 
     inherited::execute();
 
+    //Alundaio:
     const CEntityAlive* enemy = object().memory().enemy().selected();
     if (!enemy)
         return;
@@ -536,9 +538,15 @@ void CStalkerActionTakeCover::execute()
     //	if (object().memory().visual().visible_now(object().memory().enemy().selected()) && object().can_kill_enemy())
     //	if (object().memory().visual().visible_now(object().memory().enemy().selected()))
 
-    //Alundaio: Fix shooting at walls or aiming at ceiling or floor during this action
+    if (object().movement().path_completed()) // && (object().memory().enemy().selected()->Position().distance_to_sqr(object().Position()) >= 10.f))
+    {
+        object().best_cover_can_try_advance();
+        m_storage->set_property(eWorldPropertyInCover, true);
+    }
+
+    //Don't shoot if enemy not visible for longer than 3 seconds
     u32 last_time_seen = object().memory().visual().visible_object_time_last_seen(enemy);
-    if (last_time_seen != u32(-1) && Device.dwTimeGlobal - last_time_seen <= 2000 && fire_make_sense())
+    if (last_time_seen != u32(-1) && Device.dwTimeGlobal - last_time_seen <= 3000 && fire_make_sense())
     {
         fire();
     }
@@ -643,6 +651,8 @@ void CStalkerActionLookOut::execute()
     }
     else
         object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
+
+    object().best_cover(mem_object.m_object_params.m_position);
     //-Alundaio
 
     if (current_cover(m_object) >= 3.f)
@@ -675,8 +685,6 @@ void CStalkerActionLookOut::execute()
     //		m_storage->set_property			(eWorldPropertyLookedOut,true);
     //		object().movement().set_nearest_accessible_position	();
     //	}
-
-    object().best_cover(mem_object.m_object_params.m_position);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -715,6 +723,14 @@ void CStalkerActionHoldPosition::execute()
 
     inherited::execute();
 
+    //Alundaio: Cleaned up
+    /*
+        Possible TODO : This action is a good place to prevent stalkers staring at walls.
+        A simple ray query each execute can do the trick by rotating the stalker until
+        the differences between the last query and new query are larger than some defined threshold.
+        This way you can detect edges of walls and would give the illusion of stalkers looking at corridors or chokepoints instead of through a wall.
+    */
+
     const CEntityAlive* enemy = object().memory().enemy().selected();
     if (!enemy)
         return;
@@ -722,6 +738,8 @@ void CStalkerActionHoldPosition::execute()
     CMemoryInfo mem_object = object().memory().memory(enemy);
     if (!mem_object.m_object)
         return;
+
+    object().best_cover(mem_object.m_object_params.m_position);
 
     if (current_cover(m_object) < 3.f)
         m_storage->set_property(eWorldPropertyLookedOut, false);
@@ -756,16 +774,7 @@ void CStalkerActionHoldPosition::execute()
     {
         aim_ready();
     }
-
-    if (object().memory().enemy().selected())
-    {
-        CMemoryInfo mem_object = object().memory().memory(object().memory().enemy().selected());
-
-        if (mem_object.m_object)
-        {
-            object().best_cover(mem_object.m_object_params.m_position);
-        }
-    }
+    //-Alundaio
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -799,13 +808,13 @@ void CStalkerActionDetourEnemy::initialize()
 
     object().agent_manager().member().member(m_object).cover(0);
 
-    //#ifndef SILENT_COMBAT
-    //Alundaio: Sanity
+//#ifndef SILENT_COMBAT
+    //Alundaio: Added sanity to make sure enemy exists
     if (object().memory().enemy().selected() && object().memory().enemy().selected()->human_being() && object().agent_manager().member().group_behaviour())
     //Alundaio: END
         //object().sound().play(eStalkerSoundNeedBackup);
         object().sound().play(eStalkerSoundDetour);
-    //#endif
+//#endif
 }
 
 void CStalkerActionDetourEnemy::finalize()
@@ -887,7 +896,7 @@ void CStalkerActionPostCombatWait::initialize()
     if (object().movement().current_params().cover())
         return;
 
-    object().movement().set_movement_type(eMovementTypeRun); //Alundaio. Was eMovementTypeStand
+    object().movement().set_movement_type(eMovementTypeRun); //Alundaio: Changed from walk to run. (eMovementTypeStand)
     EObjectAction action = eObjectActionAimReady1;
     if (m_storage->property(eWorldPropertyKilledWounded))
         action = eObjectActionIdle;
