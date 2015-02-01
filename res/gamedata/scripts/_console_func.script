@@ -1,0 +1,480 @@
+--[[ ----------------------------------------------------------------------------------------------
+ Платформы: CoP v1.6.02
+ Описание : Скриптовая консоль (Функции)
+ Поддержка: 2013 © Shoker Mod
+ Версия	  : 1.0 (12.09.2013)
+ Авторы	  : Shoker, ...
+--]] ----------------------------------------------------------------------------------------------
+
+local FSys = getFS()
+
+--\\ Получить ссылку на консоль
+function Get()
+	return _console.Get()
+end
+
+--\\ Таблица цветов, поддерживаемых консолью
+ColorTbl = {
+	White 	= {r = 255,		g = 255,	b = 255,	a = 255},	
+	Red 	= {r = 255,		g = 0,		b = 0,		a = 255},
+	Green 	= {r = 0,		g = 255,	b = 0,		a = 255},
+	Blue 	= {r = 0,		g = 0,		b = 255,	a = 255},
+	Yelow 	= {r = 255,		g = 216,	b = 0,		a = 255},	
+	Log 	= {r = 0,		g = 200,	b = 255,	a = 255},	
+	Alpha	= {r = 255,		g = 255,	b = 255,	a = 120},	
+}
+
+--\\ Все доступные команды
+COMMANDS_LIST	= {
+	{"help",				"ShowHelp",			"",					"Все доступные команды"},
+	{"list",				"ShowList",			"",					"Все консольные переменные"},	
+	{"cls",					"ClearList",		"",					"Очищает список введённых команд"},
+	---------------------[CON]---------------------------
+	{"con.show",			"Con_Show",			"",					"Открыть консоль (нужна для открытия консоли из стандартной консоли)"},		
+	{"con.colors",			"Con_Colors",		"",					"Показывает все доступные цвета текста в консоли"},	
+	{"con.send",			"Con_Send",			"<текст>, <цвет*>",	"Послать в консоль текст заданного цвета"},		
+	{"con.clean",			"Con_Clean",		"string*",			"Очистить дамп лога\\указанный файл в папке с игрокй"},
+	{"con.load",			"Con_Load",			"string",			"Загрузить в консоль лог из указанного файла в папке gamedata (поддерживает цветное форматирование строк)"},	
+	{"con.load_text",		"Con_LoadText",		"string",			"Загрузить в консоль текст из указанного файла (грузит как есть)"},		
+	---------------------[LUA]---------------------------
+	{"lua.do",				"Lua_Execute",		"string",		"Выполняет lua-код, переданный в виде строки и выводит результат, если он есть."},	
+	{"lua.dor",				"Lua_ExecuteR",		"string",		"Выполняет lua-код, переданный в виде строки и всегда выводит результат (добавляет return в начало кода)"},		
+	{"lua.dof",				"Lua_ExecuteF",		"string",		"Загружает скриптовый файл из папки scripts и выполняет код из него"},
+	{"lua.crash",			"Lua_Crash",		"string*",		"Заставить игру вылететь с указанным текстом как причиной"},	
+	{"lua.exit",			"Lua_Exit",			"",				"Закрыть игру"},	
+	---------------------[FS]----------------------------
+	{"fs.list",				"FS_List",			"string*",		"Вывести список файлов по указанной маске относительно папки gamedata"},			
+	---------------------[C]-----------------------------
+	{"c.tlp",				"C_Tlp",			"",				"Телепортировать игрока к камере"},		
+	{"c.ui",				"C_UI",				"",				"Скрыть\\Показать интерфейс и сделать игрока бессмертным (при скрытом)"},	
+	---------------------[CAM]---------------------------
+	{"cam.eff",				"Cam_Eff",			"string",		"Проиграть эффект камеры (путь от папки anims)"},		
+	{"cam.anm",				"Cam_Anm",			"string",		"Проиграть анимацию камеры (путь от папки anims)"},			
+	{"cam.anm_fix",			"Cam_Anm_Fix",		"string",		"Проиграть анимацию камеры от некой начальной точки, зашитой в anm-файле (путь от папки anims)"},				
+	---------------------[G]-----------------------------	
+	{"g.info",				"G_Info",			"radius* = float",				"Выводит информацию о ближайших объектах вокруг камеры в заданном радиусе (5 по умолчанию)"},		
+	{"g.spawn",				"G_Spawn",			"sec = string, x* = float, y* = float, z* = float",		"Заспавнить объект на локацию с игроком в указанные координаты или перед камерой"},		
+	{"g.spawn_inv",			"G_Spawn_Inv",		"sec = string, id* = int",		"Заспавнить предмет в инвентарь объекта с указанным id (если не указать id - спавн к игроку)"},	
+}
+
+---------------------------------------------------------------------------------------------------------------
+
+--[[
+ * Функция cast служит для преобразования строкового значения в заданный тип, по умолчанию типов всего два - num число и bol логическое
+ * Каждой функции здесь передаётся параметр tbl, таблица введённых параметров, в tbl[1] хранится ВСЯ строка без учёта команды, а
+   в остальных каждый параметр по отдельности в порядке их ввода в консоле
+--]]
+
+function cast(value, to_type)
+	if value == nil or value == "nil" then
+		return nil 
+	end
+	
+	if to_type == nil then return tostring(value) end
+	
+	if to_type == "num" then
+		return tonumber(value)
+	end
+	
+	if to_type == "bol" then
+		if value == "1" then
+			return true
+		end
+
+		if value == "0" then
+			return false
+		end
+
+		return not (string.match(value, "false") ~= nil)
+	end
+end
+
+
+--\\ Проверка что такая секция существует
+function sec_exist(sec)
+	local ini = system_ini()
+	if sec == nil then return false end
+	if not ini:section_exist(sec) then return false end
+	return true
+end
+
+--\\ Проверка что такой файл существует
+function exist(path)
+	if path ~= nil then
+		return (FSys:exist("$game_data$", path) ~= nil)
+	else
+		Get():AddString("<!> File name is empty", "Red")
+		return false
+	end
+end
+
+--**************************************************************--
+
+function ShowHelp()
+	Get():AddString("Кнопка Esc      - закрыть консоль",			"White")	
+	Get():AddString("Кнопка Enter     - ввести команду", 			"White")		
+	Get():AddString("Кнопка Left Alt   - очистить текстовое поле", 	"White")
+	
+	Get():AddString("", "White")	
+	
+	Get():AddString("Вызов команды из стандартной консоли: mm_net_srv_name <команда> <параметры...>", "White")	
+	Get():AddString("Параметры команд указаны в скобках, если параметр имеет знак *, значит его можно не писать\\заменить на nil", "White")	
+	
+	Get():AddString("", "White")	
+	
+	for idx,cmnd in ipairs(COMMANDS_LIST) do
+		local type_info = ""
+		
+		if cmnd[3] ~= "" then
+			type_info = " ("..cmnd[3]..")"
+		end
+		
+		Get():AddString(idx..") "..cmnd[1]..type_info, "Log")
+		Get():AddString(cmnd[4], "White")		
+	end
+end
+	
+function ShowList()	
+	for name, tbl in pairs(_console.VALUES_TBL) do		
+		Get():AddString(name.." ("..tbl.descr_1..") = "..tostring(tbl.value_and_def), "Log")
+		Get():AddString(tbl.descr_2, "White")		
+	end
+end
+	 
+function ClearList()
+	Get():Clear()
+end
+
+
+function Con_Show()
+	_console.Show()
+end
+
+function Con_Colors()
+		Get():AddString("-------------------------", "Log")
+		Get():AddString("Print colors:", "Log")
+
+		for color, rgba in pairs(ColorTbl) do
+			Get():AddString(">>> "..color.." = ["..rgba.r..","..rgba.g..","..rgba.b..","..rgba.a.."]", color)
+		end
+		
+		Get():AddString("-------------------------", "Log")
+end
+
+function Con_Send(tbl)
+	local size			= #tbl
+	local color			= "White"
+	local bHaveColor	= false
+	
+	if tbl[size] and ColorTbl[tbl[size]] then
+		color = tbl[size]
+		bHaveColor = true
+	end
+	
+	if bHaveColor then
+		size = size - 1
+	end
+	
+	if size >= 2 then
+		for i=2, size do 
+			Get():AddString(tbl[i], color)
+		end
+	end
+end
+
+function Con_Clean(tbl)
+	local file_name = tbl[1] or _console.LOG_FILE_NAME 
+	local file = io.open( file_name, "w" )
+	file:close()
+end
+
+function Con_Load(tbl)
+	if tbl[1] == nil or tbl[1] == "" then
+		Get():AddString("<!> File name is empty", "Red")
+	else
+		local con = Get()
+		con:Clear()	
+		con:LoadLog("gamedata\\"..tbl[1])
+	end
+end
+
+function Con_LoadText(tbl)
+	if tbl[1] == nil or tbl[1] == "" then
+		Get():AddString("<!> File name is empty", "Red")
+	else
+		local con = Get()
+		con:Clear()	
+		con:LoadLog("gamedata\\"..tbl[1], true)
+	end
+end
+
+function Lua_Crash(tbl)
+	if tbl[1] == "" or tbl[1] == nil then
+		tbl[1] = "nil"
+	end
+	
+	get_console():execute(tbl[1])
+	a = nil + nil
+end
+
+function Lua_Exit()
+	get_console():execute("quit")
+end
+
+function Lua_Execute(tbl)
+	if tbl[1] ~= nil then
+		local func, msg = loadstring(tbl[1])
+		if func ~= nil then
+			local bWork, result = pcall(func)
+			if bWork then
+				if result ~= nil then
+					if type(result) ~= "userdata" then
+						Get():AddString("Result: "..tostring(result), "Log")
+					else
+						Get():AddString("Result: UserData", "Log")
+					end
+				end
+			else
+				Get():AddString("<!> Bad code: "..result, "Red")
+			end
+		else
+			Get():AddString("<!> Can't compile code = "..tostring(msg), "Red")	
+		end
+	else
+		Get():AddString("<!> There is no code to compile", "Red")	
+	end		
+end
+
+function Lua_ExecuteR(tbl)
+	if tbl[1] ~= nil then
+		local func, msg = loadstring("return "..tbl[1])
+
+		if func ~= nil then
+			local bWork, result = pcall(func)
+			if bWork then
+				if result ~= nil then
+					if type(result) ~= "userdata" then
+						Get():AddString("Result: "..tostring(result), "Log")
+					else
+						Get():AddString("Result: UserData", "Log")
+					end
+				end
+			else
+				Get():AddString("<!> Bad code: "..result, "Red")
+			end
+		else
+			Get():AddString("<!> Can't compile code = "..tostring(msg), "Red")	
+		end
+	else
+		Get():AddString("<!> There is no code to compile", "Red")	
+	end
+end
+
+function Lua_ExecuteF(tbl)
+	if tbl[1] ~= nil then
+		local bWork, result = pcall(dofile, "gamedata\\scripts\\"..tbl[1]..".script")
+		
+		if bWork then
+			if result ~= nil then
+				if type(result) ~= "userdata" then
+					Get():AddString("Result: "..tostring(result), "Log")
+				else
+					Get():AddString("Result: UserData", "Log")
+				end
+			end
+		else
+			Get():AddString("<!> Bad file: "..result, "Red")
+		end		
+	else
+		Get():AddString("<!> There is no file to open", "Red")			
+	end
+end
+
+function FS_List(tbl)
+	local mask = tbl[1] or "*"
+	local flist = FSys:file_list_open_ex("$game_data$", FS.FS_ListFiles, mask)
+	local f_cnt = flist:Size()
+
+	Get():AddString("-------------------------", "Log")
+	Get():AddString("List of files:", "Log")
+	
+	for	it=0, f_cnt-1 	do
+		local file		=	flist:GetAt(it)
+		local file_name =	file:NameFull()
+		
+		Get():AddString(file_name, "Log")	
+	end
+
+		
+	Get():AddString("Total: "..tostring(f_cnt), "Log")		
+	Get():AddString("-------------------------", "Log")	
+end
+
+function C_Tlp()
+	if db.actor then
+		db.actor:set_actor_position(device().cam_pos)
+	else
+		Get():AddString("<!> Game not started yet", "Red")		
+	end
+end
+
+local bHideUi = false
+function C_UI(tbl)
+	if db.actor then
+		local bHide = not bHideUi
+		
+		if bHide then
+			level.hide_indicators_safe()	
+		else
+			level.show_indicators()
+		end
+		
+		bHideUi = bHide
+	else
+		Get():AddString("<!> Game not started yet", "Red")		
+	end		
+end
+
+function Cam_Eff(tbl)
+	if db.actor then
+		if tbl[1] == nil or tbl[1] == "" then
+			Get():AddString("<!> File path is empty", "Red")	
+		else
+			if exist("anims\\"..tbl[1]) then
+				level.add_pp_effector(tbl[1], 123321, false)
+			else
+				Get():AddString("<!> Can't find file anims\\"..tbl[1], "Red")	
+			end
+		end
+	else
+		Get():AddString("<!> Game not started yet", "Red")		
+	end		
+end
+
+function Cam_Anm(tbl)
+	if db.actor then
+		if tbl[1] == nil or tbl[1] == "" then
+			Get():AddString("<!> File path is empty", "Red")	
+		else
+			if exist("anims\\"..tbl[1]) then
+				level.add_cam_effector(tbl[1], 123321, false, "")
+			else
+				Get():AddString("<!> Can't find file anims\\"..tbl[1], "Red")	
+			end
+		end
+	else
+		Get():AddString("<!> Game not started yet", "Red")		
+	end		
+end
+
+function Cam_Anm_Fix(tbl)
+	if db.actor then
+		if tbl[1] == nil or tbl[1] == "" then
+			Get():AddString("<!> File path is empty", "Red")	
+		else
+			if exist("anims\\"..tbl[1]) then
+				level.add_cam_effector2(tbl[1], 123321, false, "")
+			else
+				Get():AddString("<!> Can't find file anims\\"..tbl[1], "Red")	
+			end
+		end
+	else
+		Get():AddString("<!> Game not started yet", "Red")		
+	end		
+end
+
+function G_Info(tbl)
+	local distance = cast(tbl[2], "num") or 5
+	
+	if db.actor then
+		Get():AddString("-------------------------", "Log")
+		Get():AddString("Search objects in radius "..tostring(distance).." ...", "Log")
+		local cnt = 0
+		for id = 1, 65534 do
+			local sobj = alife():object(id)
+			if sobj ~= nil and sobj.parent_id == 65535 then
+			-----------------------------
+				local lvert = game_graph():vertex(sobj.m_game_vertex_id)
+				local lid = lvert:level_id()
+				local lvl = alife():level_name(lid)
+				
+				if lvl == level.name() then
+					local dis = device().cam_pos:distance_to(sobj.position)
+					if dis <= distance then
+						Get():AddString(id.." = "..sobj:name().." ("..sobj:section_name()..") Distance = "..tostring(dis), "Log")
+						cnt = cnt + 1
+					end
+				end
+			-----------------------------
+			end
+		end
+		Get():AddString("Total: "..tostring(cnt), "Log")
+		Get():AddString("-------------------------", "Log")
+	else
+		Get():AddString("<!> Game not started yet", "Red")		
+	end
+end
+
+function G_Spawn(tbl, id)
+	if db.actor ~= nil then
+		local sec = tbl[2]
+		
+		if sec ~= nil then
+			if sec_exist(sec) then
+				local x = cast(tbl[3], "num")
+				local y = cast(tbl[4], "num")
+				local z = cast(tbl[5], "num")
+				
+				
+				local bToActorPos = false
+				
+				if x == nil and y == nil and z == nil then
+					bToActorPos = true
+				end
+				
+				if x == nil then x = device().cam_pos.x end
+				if y == nil then y = device().cam_pos.y end
+				if z == nil then z = device().cam_pos.z end
+				
+				local vec = vector():set(x,y,z)
+				
+				if bToActorPos then
+					vec = vec:add(device().cam_dir:mul(3))
+				end
+				
+				if id ~= nil then
+					local sobj = alife():object(id)
+					
+					if sobj then
+						alife():create(sec, sobj.position, sobj.m_level_vertex_id, sobj.m_game_vertex_id, id)
+					else
+						Get():AddString("<!> There is now object with id "..tostring(id), "Red")
+					end
+				else
+					alife():create(sec, vec, db.actor:level_vertex_id(), db.actor:game_vertex_id())
+				end
+			else
+				Get():AddString("<!> There is now section ["..tostring(sec).."] in system.ltx", "Red")
+			end
+		else
+			Get():AddString("<!> Section is nil", "Red")	
+		end
+	else
+		Get():AddString("<!> Game not started yet", "Red")		
+	end
+end
+
+function G_Spawn_Inv(tbl)
+	local id = cast(tbl[3], "num")
+	
+	if id == nil then
+		if db.actor then
+			id = db.actor:id()
+		end
+	end
+	
+	tbl[3] = 0
+	tbl[4] = 0
+	tbl[5] = 0	
+	G_Spawn(tbl, id)
+end

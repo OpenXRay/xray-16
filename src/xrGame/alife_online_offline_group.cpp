@@ -353,24 +353,6 @@ void CSE_ALifeOnlineOfflineGroup::force_change_position(Fvector position)
 	//m_tGraphID				= new_graph_vertex;
 }
 
-//Alundaio: force new graph location
-/*
-void CSE_ALifeOnlineOfflineGroup::force_change_game_vertex_id(GameGraph::_GRAPH_ID game_vertex_id)
-{
-	if (game_vertex_id && ai().game_graph().valid_vertex_id(game_vertex_id))
-	{
-		m_tNodeID = ai().game_graph().vertex(game_vertex_id)->level_vertex_id();
-		o_Position = ai().game_graph().vertex(game_vertex_id)->level_point();
-
-		if (m_tGraphID != game_vertex_id)
-		{
-			alife().graph().change(this, m_tGraphID, game_vertex_id);
-		}
-	}
-}
-*/
-//Alundaio: END
-
 void CSE_ALifeOnlineOfflineGroup::on_failed_switch_online()
 {
 	MEMBERS::const_iterator	I = m_members.begin();
