@@ -9,6 +9,7 @@
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_map.h"
 
+#include "Common/Config.hpp"
 
 // refs
 class ENGINE_API IRender_Visual;
@@ -171,6 +172,10 @@ public:
     Fvector3 sun_dir;
     float m_fSunShaftsIntensity;
     float m_fWaterIntensity;
+
+#ifdef TREE_WIND_EFFECT
+    float m_fTreeAmplitudeIntensity;
+#endif
 
     // int lens_flare_id;
     // int tb_id;

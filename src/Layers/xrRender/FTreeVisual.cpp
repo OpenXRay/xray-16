@@ -7,6 +7,8 @@
 #include "xrCore/FMesh.hpp"
 #include "FTreeVisual.h"
 
+#include "Common/Config.hpp"
+
 shared_str m_xform;
 shared_str m_xform_v;
 shared_str c_consts;
@@ -92,11 +94,26 @@ struct FTreeVisual_setup
     {
         dwFrame = Device.dwFrame;
 
-        // Calc wind-vector3, scale
         float tm_rot = PI_MUL_2 * Device.fTimeGlobal / ps_r__Tree_w_rot;
+
+        // Calc wind-vector3, scale
+#ifdef TREE_WIND_EFFECT
+        CEnvDescriptor& env = *g_pGamePersistent->Environment().CurrentEnv;
+        
+        wind.set(_sin(tm_rot), 0, _cos(tm_rot), 0);
+        wind.normalize();
+#if RENDER!=R_R1
+        float fValue = env.m_fTreeAmplitudeIntensity;
+        wind.mul(fValue);	// dir1*amplitude
+#else // R1
+        wind.mul(ps_r__Tree_w_amp); // dir1*amplitude
+#endif //-RENDER!=R_R1
+#else //!TREE_WIND_EFFECT
         wind.set(_sin(tm_rot), 0, _cos(tm_rot), 0);
         wind.normalize();
         wind.mul(ps_r__Tree_w_amp); // dir1*amplitude
+#endif //-TREE_WIND_EFFECT
+
         scale = 1.f / float(FTreeVisual_quant);
 
         // setup constants

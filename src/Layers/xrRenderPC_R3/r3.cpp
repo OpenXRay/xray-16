@@ -14,6 +14,8 @@
 #include "Layers/xrRenderDX10/3DFluid/dx103DFluidManager.h"
 #include "D3DX10Core.h"
 
+#include "Common/Config.hpp"
+
 CRender RImplementation;
 
 //////////////////////////////////////////////////////////////////////////
@@ -94,6 +96,18 @@ static class cl_water_intensity : public R_constant_setup
         RCache.set_c(C, fValue, fValue, fValue, 0);
     }
 } binder_water_intensity;
+
+#ifdef TREE_WIND_EFFECT
+static class cl_tree_amplitude_intensity : public R_constant_setup
+{
+    void setup(R_constant* C) override
+    {
+        CEnvDescriptor& env = *g_pGamePersistent->Environment().CurrentEnv;
+        float fValue = env.m_fTreeAmplitudeIntensity;
+        RCache.set_c(C, fValue, fValue, fValue, 0);
+    }
+} binder_tree_amplitude_intensity;
+#endif
 
 static class cl_sun_shafts_intensity : public R_constant_setup
 {
