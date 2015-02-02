@@ -20,6 +20,7 @@
 #define DETAIL_RADIUS // detail draw radius (by KD)
 #define VSYNC_FIX // functional VSync by avbaula
 #define ECO_RENDER // limit FPS in menu to prevent video card overheat (by alpet)
+#define TREE_WIND_EFFECT // configurable tree sway, can be used to have trees sway more during storms or lightly on clear days.
 //-VISUAL
 
 // TWEAKS:
