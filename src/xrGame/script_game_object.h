@@ -189,7 +189,7 @@ public:
     _DECLARE_FUNCTION10(Squad, int);
     _DECLARE_FUNCTION10(Group, int);
 
-    void Kill(CScriptGameObject* who);
+    void Kill(CScriptGameObject* who, bool bypass_actor_check = false /*AVO: added for actor before death callback*/);
 
     // CEntityAlive
     _DECLARE_FUNCTION10(GetFOV, float);
@@ -821,7 +821,8 @@ public:
     bool isWeaponGL() const;
     bool isInventoryBox() const;
     bool IsActorOutdoors() const;
-    //end AVO
+    void SetHealthEx(float hp);
+    //-AVO
 
     doors::door* m_door;
 };

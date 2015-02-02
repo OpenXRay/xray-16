@@ -54,18 +54,20 @@ enum ECallbackType
     eInvBoxItemTake,
     eWeaponNoAmmoAvailable,
 
-    /* avo: custom callbacks */
-    // input
+    //AVO: custom callbacks
+    // Input
     eKeyPress,
     eKeyRelease,
     eKeyHold,
     eMouseMove,
     eMouseWheel,
-    // inventory
+    // Inventory
     eItemToBelt,
     eItemToSlot,
     eItemToRuck,
-    /* avo: end */
+    // Actor
+    eActorBeforeDeath,
+    //-AVO
 
     eDummy = u32(-1),
 };

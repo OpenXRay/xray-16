@@ -385,8 +385,9 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("is_torch", &CScriptGameObject::isTorch)
         .def("is_weapon_gl", &CScriptGameObject::isWeaponGL)
         .def("is_inventory_box", &CScriptGameObject::isInventoryBox)
-        //end AVO
+        .def("set_health_ex", &CScriptGameObject::SetHealthEx)
+        //-AVO
 
         ;
-    return (instance);
+    return instance;
 }

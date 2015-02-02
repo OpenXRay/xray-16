@@ -59,7 +59,7 @@ int CScriptGameObject::clsid() const { return (object().clsid()); }
 LPCSTR CScriptGameObject::Name() const { return (*object().cName()); }
 shared_str CScriptGameObject::cName() const { return (object().cName()); }
 LPCSTR CScriptGameObject::Section() const { return (*object().cNameSect()); }
-void CScriptGameObject::Kill(CScriptGameObject* who)
+void CScriptGameObject::Kill(CScriptGameObject* who, bool bypass_actor_check /*AVO: added for actor before death callback*/)
 {
     CEntity* l_tpEntity = smart_cast<CEntity*>(&object());
     if (!l_tpEntity)
@@ -69,7 +69,7 @@ void CScriptGameObject::Kill(CScriptGameObject* who)
         return;
     }
     if (!l_tpEntity->AlreadyDie())
-        l_tpEntity->KillEntity(who ? who->object().ID() : object().ID());
+        l_tpEntity->KillEntity(who ? who->object().ID() : object().ID(), bypass_actor_check);
     else
         ai().script_engine().script_log(LuaMessageType::Error, "attempt to kill dead object %s", *object().cName());
 }
