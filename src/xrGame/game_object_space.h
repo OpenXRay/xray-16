@@ -54,7 +54,7 @@ namespace GameObject
         eInvBoxItemTake,
         eWeaponNoAmmoAvailable,
 
-        /* avo: custom callbacks */
+        //AVO: custom callbacks
         // input
         eKeyPress,
         eKeyRelease,
@@ -65,7 +65,9 @@ namespace GameObject
         eItemToBelt,
         eItemToSlot,
         eItemToRuck,
-        /* avo: end */
+        // actor
+        eActorBeforeDeath,
+        //-AVO
 
         eDummy = u32(-1),
     };

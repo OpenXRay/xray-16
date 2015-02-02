@@ -92,7 +92,7 @@ void CScriptGameObject::script_register(lua_State *L)
                 value("take_item_from_box",			int(GameObject::eInvBoxItemTake)),
                 value("weapon_no_ammo",				int(GameObject::eWeaponNoAmmoAvailable)),
 
-                /* avo: custom callbacks */
+                //AVO: custom callbacks
                 // input
                 value("key_press",                  int(GameObject::eKeyPress)),
                 value("key_release",                int(GameObject::eKeyRelease)),
@@ -103,7 +103,9 @@ void CScriptGameObject::script_register(lua_State *L)
                 value("item_to_belt",               int(GameObject::eItemToBelt)),
                 value("item_to_slot",               int(GameObject::eItemToSlot)),
                 value("item_to_ruck",               int(GameObject::eItemToRuck)),
-                /* avo: end */
+                // actor
+                value("actor_before_death", int(GameObject::eActorBeforeDeath)),
+                //-AVO
                 
                 value("map_location_added",			int(GameObject::eMapLocationAdded))
             ],
