@@ -95,6 +95,7 @@ function actor_binder:net_destroy()
 	self.object:set_callback(callback.item_to_belt, nil)
 	self.object:set_callback(callback.item_to_ruck, nil)
 	self.object:set_callback(callback.item_to_slot, nil)
+	self.object:set_callback(callback.actor_before_death, nil)
 	----| end:aVo |----------------------------------------------------------------
 
 	log("--------->"..tostring(_G.amb_vol))
@@ -141,6 +142,7 @@ function actor_binder:reinit()
 	self.object:set_callback(callback.item_to_ruck, self.item_to_ruck, self)
 	self.object:set_callback(callback.item_to_belt, self.item_to_belt, self)
 	self.object:set_callback(callback.item_to_slot, self.item_to_slot, self)
+	self.object:set_callback(callback.actor_before_death, self.on_actor_before_death, self)
 	----| end:aVo |----------------------------------------------------------------
 end
 ---------------------------------------------------------------------------------------------------------------------
@@ -199,6 +201,14 @@ end
 function actor_binder:item_to_slot(obj)
 	log(string.format("item_to_slot [%s]", obj:name()))
 end
+-- actor before death callback
+-- IMPORTANT: if you wish to kill actor you need to call db.actor:kill(level:object_by_id(whoID), true) in actor_before_death callback, to ensure all objects are properly destroyed.
+function actor_binder:on_actor_before_death(whoID)
+  log("[AVO] on_actor_before_death callback")
+  db.actor:set_health_ex(1)
+  -- db.actor:kill(level:object_by_id(whoID), true)
+end
+
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:take_item_from_box(box, item)
 	local box_name = box:name()

@@ -373,6 +373,7 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
         .def("is_torch", &CScriptGameObject::IsTorch)
         .def("is_weapon_gl", &CScriptGameObject::IsWeaponGL)
         .def("is_inventory_box", &CScriptGameObject::IsInventoryBox)
+        .def("set_health_ex", &CScriptGameObject::SetHealthEx)
         //end AVO
 
 
