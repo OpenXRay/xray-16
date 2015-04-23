@@ -1,42 +1,7 @@
 #include "stdafx.h"
 #include <stdio.h>
 
-HRESULT		HRESULT_Proc(HRESULT ret)
-{
-	return ret;
-};
 
-ULONG		ULONG_Proc(ULONG ret)
-{
-	return ret;
-};
-
-UINT		UINT_Proc(UINT ret)
-{
-	return ret;
-};
-
-BOOL		BOOL_Proc(BOOL ret)
-{
-	return ret;
-};
-
-float		FLOAT_Proc(float ret)
-{
-	return ret;
-};
-void		VOID_proc()
-{
-	int x=0;
-	x=x;
-};
-
-DWORD		DWORD_Proc(DWORD ret)
-{
-	return ret;
-}
-
-//-----------------------------------------------------------------------
 void LogOut( const char *format, ... ) 
 {
 	va_list argptr;

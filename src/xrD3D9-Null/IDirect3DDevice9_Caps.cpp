@@ -311,5 +311,5 @@ HRESULT		xrIDirect3DDevice9::GetDeviceCaps( D3DCAPS9* pCaps)
 
 
 
-	return HRESULT_Proc(S_OK);	     
+	return S_OK;	     
 };								  
