@@ -326,7 +326,7 @@ HRESULT		xrIDirect3DDevice9::GetScissorRect( RECT* pRect)
 HRESULT		xrIDirect3DDevice9::SetSoftwareVertexProcessing( BOOL bSoftware) 
 { APIDEBUG("xrIDirect3DDevice9::SetSoftwareVertexProcessing");  return HRESULT_Proc(S_OK); };
 BOOL		xrIDirect3DDevice9::GetSoftwareVertexProcessing() 
-{ APIDEBUG("xrIDirect3DDevice9::GetSoftwareVertexProcessing");  return HRESULT_Proc(S_OK); };
+{ APIDEBUG("xrIDirect3DDevice9::GetSoftwareVertexProcessing");  return TRUE; };
 HRESULT		xrIDirect3DDevice9::SetNPatchMode( float nSegments) 
 { APIDEBUG("xrIDirect3DDevice9::SetNPatchMode");  return HRESULT_Proc(S_OK); };
 float		xrIDirect3DDevice9::GetNPatchMode() 
