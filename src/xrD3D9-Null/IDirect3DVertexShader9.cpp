@@ -19,16 +19,16 @@ HRESULT			xrIDirect3DVertexShader9::QueryInterface( REFIID riid, void** ppvObj)
 	{
 		*ppvObj = this;
 		AddRef();
-		return HRESULT_Proc(NOERROR);
+		return NOERROR;
 	}
-	return HRESULT_Proc(E_NOINTERFACE);
+	return E_NOINTERFACE;
 }
 
 ULONG			xrIDirect3DVertexShader9::AddRef() 
 {
 	APIDEBUG("xrIDirect3DVertexShader9::AddRef");
 	m_refCount++;
-	return ULONG_Proc(m_refCount);
+	return m_refCount;
 }
 
 ULONG			xrIDirect3DVertexShader9::Release()
@@ -38,9 +38,9 @@ ULONG			xrIDirect3DVertexShader9::Release()
 	if (m_refCount < 0)
 	{
 		delete this;
-		return ULONG_Proc(-1);
+		return -1;
 	}
-	return ULONG_Proc(m_refCount);
+	return m_refCount;
 }
 
 /*** IDirect3DResource9 methods ***/
@@ -49,11 +49,11 @@ HRESULT			__stdcall	xrIDirect3DVertexShader9::GetDevice		( IDirect3DDevice9** pp
 	APIDEBUG("xrIDirect3DVertexShader9::GetDevice");
 	m_pIDirect3DDevice9->AddRef();
 	*ppDevice = m_pIDirect3DDevice9;
-	return HRESULT_Proc(S_OK);
+	return S_OK;
 };
 HRESULT			__stdcall	xrIDirect3DVertexShader9::GetFunction(void* pData,UINT* pSizeOfData)
 {
 	APIDEBUG("xrIDirect3DVertexShader9::GetFunction");
 	*pSizeOfData = 0;
-	return HRESULT_Proc(S_OK);
+	return S_OK;
 };

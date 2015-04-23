@@ -22,16 +22,16 @@ HRESULT			xrIDirect3DQuery9::QueryInterface( REFIID riid, void** ppvObj)
 	{
 		*ppvObj = this;
 		AddRef();
-		return HRESULT_Proc(NOERROR);
+		return NOERROR;
 	}
-	return HRESULT_Proc(E_NOINTERFACE);
+	return E_NOINTERFACE;
 }
 
 ULONG			xrIDirect3DQuery9::AddRef() 
 {
 	APIDEBUG("xrIDirect3DQuery9::AddRef");
 	m_refCount++;
-	return ULONG_Proc(m_refCount);
+	return m_refCount;
 }
 
 ULONG			xrIDirect3DQuery9::Release()
@@ -41,10 +41,10 @@ ULONG			xrIDirect3DQuery9::Release()
 	if (m_refCount < 0)
 	{
 		delete this;
-		return ULONG_Proc(-1);
+		return -1;
 	}
 	
-	return ULONG_Proc(m_refCount);
+	return m_refCount;
 }
 
 /*** IDirect3DQuery9 methods ***/
@@ -53,7 +53,7 @@ HRESULT				xrIDirect3DQuery9::GetDevice	( IDirect3DDevice9** ppDevice)
 	APIDEBUG("xrIDirect3DQuery9::GetDevice");
 	m_pIDirect3DDevice9->AddRef();
 	*ppDevice = m_pIDirect3DDevice9;
-	return HRESULT_Proc(S_OK);
+	return S_OK;
 };
 D3DQUERYTYPE		xrIDirect3DQuery9::GetType		()													
 {
@@ -63,18 +63,18 @@ D3DQUERYTYPE		xrIDirect3DQuery9::GetType		()
 DWORD				xrIDirect3DQuery9::GetDataSize	()													
 {
 	APIDEBUG("xrIDirect3DQuery9::GetDataSize");
-	return DWORD_Proc(DataSize);
+	return DataSize;
 };
 HRESULT				xrIDirect3DQuery9::Issue		( DWORD dwIssueFlags)								
 {
 	APIDEBUG("xrIDirect3DQuery9::Issue");
-	return HRESULT_Proc(S_OK);
+	return S_OK;
 };
 HRESULT				xrIDirect3DQuery9::GetData		( void* pData,DWORD dwSize,DWORD dwGetDataFlags)	
 {
 	APIDEBUG("xrIDirect3DQuery9::GetData");
 	dwSize = 0;
-	return HRESULT_Proc(S_OK);
+	return S_OK;
 };
 //-----------------------------------------------------------------------
 /*
