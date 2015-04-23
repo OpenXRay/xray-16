@@ -2,11 +2,8 @@
 #include "IDirect3D9.h"
 #include "IDirect3DDevice9.h"
 #include "xrD3D9-Null_OutProc.h"
+#include <stdio.h>
 
-#include <stdlib.h>
-#include <objbase.h>
-#include <windows.h>
-#include "stdio.h"
 
 const GUID DECLSPEC_SELECTANY IID_IDirect3D9;
 

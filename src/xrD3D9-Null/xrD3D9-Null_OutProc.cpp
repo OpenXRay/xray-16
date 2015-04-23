@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <stdio.h>
 
 HRESULT		HRESULT_Proc(HRESULT ret)
 {
@@ -36,7 +37,6 @@ DWORD		DWORD_Proc(DWORD ret)
 }
 
 //-----------------------------------------------------------------------
-#include "stdio.h"
 void LogOut( const char *format, ... ) 
 {
 	va_list argptr;
