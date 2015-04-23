@@ -297,8 +297,6 @@ HRESULT		xrIDirect3DDevice9::GetDeviceCaps( D3DCAPS9* pCaps)
 	pCaps->PS20Caps.NumInstructionSlots = 512;
 	pCaps->PS20Caps.NumTemps = 32;
 	pCaps->PS20Caps.StaticFlowControlDepth = 4;
-	
-	pCaps->VertexTextureFilterCaps = pCaps->VertexTextureFilterCaps;
 
 	pCaps->MaxVShaderInstructionsExecuted = 32768;
 	pCaps->MaxPShaderInstructionsExecuted = 32768;
