@@ -96,7 +96,7 @@ void CWeaponMagazined::Load(LPCSTR section)
 
     m_sSndShotCurrent = "sndShot";
 
-    //звуки и партиклы глушителя, еслит такой есть
+    //звуки и партиклы глушителя, если такой есть
     if (m_eSilencerStatus == ALife::eAddonAttachable || m_eSilencerStatus == ALife::eAddonPermanent)
     {
         if (pSettings->line_exist(section, "silencer_flame_particles"))
@@ -532,12 +532,6 @@ void CWeaponMagazined::state_Fire(float dt)
 
         VERIFY(!m_magazine.empty());
 
-        //Alundaio: Use fModeShotTime instead of fOneShotTime if current fire mode is 2-shot burst
-        float rpm = fOneShotTime;
-        if (GetCurrentFireMode() == 2)
-            rpm = modeShotTime;
-        //Alundaio: END
-
         while (!m_magazine.empty() && fShotTimeCounter < 0 && (IsWorking() || m_bFireSingleShot) &&
             (m_iQueueSize < 0 || m_iShotNum < m_iQueueSize))
         {
@@ -549,14 +543,11 @@ void CWeaponMagazined::state_Fire(float dt)
 
             m_bFireSingleShot = false;
 
+            //Alundaio: Use fModeShotTime instead of fOneShotTime if current fire mode is 2-shot burst
             //Alundaio: Cycle down RPM after two shots; used for Abakan/AN-94
-            if (cycleDown == true)
-            {
-                if (m_iShotNum <= 2)
-                    rpm = modeShotTime;
-                else
-                    rpm = fOneShotTime;
-            }
+            float rpm = fOneShotTime;
+            if (GetCurrentFireMode() == 2 || (cycleDown == true && m_iShotNum <= 1))
+                rpm = modeShotTime;
 
             fShotTimeCounter += rpm;
             //Alundaio: END

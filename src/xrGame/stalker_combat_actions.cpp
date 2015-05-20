@@ -559,7 +559,7 @@ void CStalkerActionTakeCover::execute()
     }
     else
     {
-        if (_abs(object().Position().y - mem_object.m_object_params.m_position.y) > 3.f)
+        if (_abs(object().Position().y - mem_object.m_object_params.m_position.y) > 3.5f)
         {
             Fvector3 Vpos = { mem_object.m_object_params.m_position.x, object().Position().y + 1.f, mem_object.m_object_params.m_position.z };
             object().sight().setup(CSightAction(SightManager::eSightTypePosition, Vpos, true));
@@ -644,7 +644,7 @@ void CStalkerActionLookOut::execute()
         return;
 
     //Alundaio: Prevent stalkers from staring at floor or ceiling for this action
-    if (_abs(object().Position().y - mem_object.m_object_params.m_position.y) > 3.f)
+    if (_abs(object().Position().y - mem_object.m_object_params.m_position.y) > 3.5f)
     {
         Fvector3 Vpos = { mem_object.m_object_params.m_position.x, object().Position().y + 1.f, mem_object.m_object_params.m_position.z };
         object().sight().setup(CSightAction(SightManager::eSightTypePosition, Vpos, true));
@@ -745,7 +745,7 @@ void CStalkerActionHoldPosition::execute()
         m_storage->set_property(eWorldPropertyLookedOut, false);
 
     //Alundaio: Prevent stalkers from staring at floor or ceiling for this action
-    if (_abs(object().Position().y - mem_object.m_object_params.m_position.y) > 3.f)
+    if (_abs(object().Position().y - mem_object.m_object_params.m_position.y) > 3.5f)
     {
         Fvector3 Vpos = { mem_object.m_object_params.m_position.x, object().Position().y + 1.f, mem_object.m_object_params.m_position.z };
         object().sight().setup(CSightAction(SightManager::eSightTypePosition, Vpos, true));
@@ -870,7 +870,7 @@ void CStalkerActionDetourEnemy::execute()
     }
 
     //Alundaio: Prevent stalkers from staring at floor or ceiling for this action
-    if (_abs(object().Position().y - mem_object.m_object_params.m_position.y) > 3.f)
+    if (_abs(object().Position().y - mem_object.m_object_params.m_position.y) > 3.5f)
     {
         Fvector3 Vpos = { mem_object.m_object_params.m_position.x, object().Position().y + 1.f, mem_object.m_object_params.m_position.z };
         object().sight().setup(CSightAction(SightManager::eSightTypePosition, Vpos, true));

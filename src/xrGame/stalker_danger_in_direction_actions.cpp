@@ -236,6 +236,11 @@ void CStalkerActionDangerInDirectionHoldPosition::execute()
     //	if (!mem_object.m_object)
     //		return;
 
+    //Alundaio:
+    if (!object().memory().danger().selected())
+        return;
+    //-Alundaio
+
     Fvector position = object().memory().danger().selected()->position();
 
     if (current_cover(m_object) < 3.f)
