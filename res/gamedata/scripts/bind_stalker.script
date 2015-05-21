@@ -200,11 +200,12 @@ function actor_binder:item_to_slot(obj)
 	log(string.format("item_to_slot [%s]", obj:name()))
 end
 -- actor before death callback
--- IMPORTANT: if you wish to kill actor you need to call db.actor:kill(level:object_by_id(whoID), true) in actor_before_death callback, to ensure all objects are properly destroyed.
+-- IMPORTANT: if you wish to kill actor you need to call db.actor:kill(level.object_by_id(whoID), true) in actor_before_death callback, to ensure all objects are properly destroyed.
 function actor_binder:on_actor_before_death(whoID)
 --	log("[AVO] on_actor_before_death callback")
 --	db.actor:set_health_ex(1)
-	db.actor:kill(level:object_by_id(whoID), true)
+	local killer = level.object_by_id(whoID) or db.actor
+	killer:kill(db.actor, true)
 end
 ----| end:aVo |---------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------
