@@ -93,10 +93,26 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	xml:InitTrackBar("video_adv:track_detail_density", _st)
 	table.insert(handler.m_preconditions, {func=all_modes, control=_st})
 
+	-- KD addition start
+	--_st	= xml:InitStatic("video_adv:templ_item", nil)
+	--xml:InitStatic("video_adv:cap_detail_radius", _st)
+	--xml:InitTrackBar("video_adv:track_detail_radius", _st)
+	--table.insert(handler.m_preconditions, {func=all_modes, control=_st})
+	-- KD addition end
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r2_sun", _st)
 	ctl = xml:InitCheck("video_adv:check_r2_sun", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_2, control=_st})
+	
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_r2_sun_details", _st)
+	ctl = xml:InitCheck("video_adv:check_r2_sun_details", _st)
+	table.insert(handler.m_preconditions, {func=mode_ge_2, control=_st})
+	
+	_st = xml:InitStatic("video_adv:templ_item", nil)
+	xml:InitStatic("video_adv:cap_r__actor_shadow", _st)
+	ctl = xml:InitCheck("video_adv:check_r__actor_shadow", _st)
 	table.insert(handler.m_preconditions, {func=mode_ge_2, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)

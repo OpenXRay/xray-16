@@ -666,6 +666,9 @@
 	<string id="ui_mm_sun_quality">
 		<text>Shadow quality</text>
 	</string>
+    <string id="ui_mm_r__actor_shadow">
+    <text>Actor shadow</text>
+    </string>
 	<string id="ui_mm_sun_shafts">
 		<text>Sun rays</text>
 	</string>

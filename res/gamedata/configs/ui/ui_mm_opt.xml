@@ -175,6 +175,15 @@
             <options_item entry="r__detail_density" group="mm_opt_video_adv"/>
         </track_detail_density>
 
+		<!--
+        <cap_detail_radius x="20" y="3" width="135" height="24">
+			<text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_detail_radius</text>
+		</cap_detail_radius>
+		<track_detail_radius x="180" y="6" width="235" height="16" step="4" is_integer="1">
+			<options_item entry="r__detail_radius" group="mm_opt_video_adv"/>
+		</track_detail_radius>
+		-->
+		
         <cap_texture_lod x="20" y="3" width="135" height="24" >
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_texture_quality</text>
         </cap_texture_lod>
@@ -212,6 +221,22 @@
             <options_item entry="r2_sun" group="mm_opt_video"/>
         </check_r2_sun>
 
+        <cap_r2_sun_details x="20" y="3" width="135" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_r2_sun_details</text>
+        </cap_r2_sun_details>
+        <check_r2_sun_details x="167" y="0" width="44" height="29">
+	        <texture>ui_inGame2_checkbox</texture>
+            <options_item entry="r2_sun_details" group="mm_opt_video"/>
+        </check_r2_sun_details>
+
+		<cap_r__actor_shadow x="20" y="3" width="135" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_r__actor_shadow</text>
+        </cap_r__actor_shadow>
+        <check_r__actor_shadow x="167" y="0" width="44" height="29">
+	        <texture>ui_inGame2_checkbox</texture>
+            <options_item entry="r__actor_shadow" group="mm_opt_video"/>
+        </check_r__actor_shadow>
+		
         <cap_r1_detail_textures x="20" y="3" width="135" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_r1_detail_textures</text>
         </cap_r1_detail_textures>
@@ -474,6 +499,46 @@
 	        <texture>ui_inGame2_checkbox</texture>
             <options_item entry="g_dynamic_music" group="mm_opt_sound" depend="snd"/>
         </check_dynamic_music>
+        <!--frame_captioning x="0" y="170" width="393" height="117">
+            <texture>ui_inGame2_servers_list_frame</texture>
+        </frame_captioning-->
+        <cap_captioning x="5" y="202" width="145" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_cc_captioning</text>
+        </cap_captioning>
+        <tab_captioning x="161" y="175" width="200" height="72" radio="1">
+            <button x="0" y="0" width="47" height="28" id="none" stretch="1">
+                <text font="letterica16" vert_align="c" x="37" y="3" align="l">ui_mm_cc_none</text>
+	            <text_color>
+	                <e r="170" g="170" b="170"/>
+	                <d r="70" g="70" b="70"/>
+	            </text_color>
+            </button>
+            <button x="0" y="24" width="47" height="28" id="storyonly" stretch="1">
+                <text font="letterica16" vert_align="c" x="37" y="3" align="l">ui_mm_cc_storyonly</text>
+	            <text_color>
+	                <e r="170" g="170" b="170"/>
+	                <d r="70" g="70" b="70"/>
+	            </text_color>
+            </button>
+            <button x="0" y="48" width="47" height="28" id="all" stretch="1">
+                <text font="letterica16" vert_align="c" x="37" y="3" align="l">ui_mm_cc_all</text>
+	            <text_color>
+	                <e r="170" g="170" b="170"/>
+	                <d r="70" g="70" b="70"/>
+	            </text_color>
+            </button>
+        </tab_captioning>
+        <cap_check_closed_captions x="15" y="263" width="135" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_cc_icc</text>
+        </cap_check_closed_captions>
+        <check_closed_captions x="162" y="260" width="44" height="29">
+	        <texture>ui_inGame2_checkbox</texture>
+		<text x="-5" font="letterica16" vert_align="c">ui_mm_cc_icc_chktext</text>
+	            <text_color>
+	                <e r="170" g="170" b="170"/>
+	                <d r="120" g="120" b="120"/>
+	            </text_color>
+        </check_closed_captions>
     </tab_sound>
     <tab_gameplay>
         <cap_difficulty x="15" y="3" width="135" height="24">
@@ -560,6 +625,13 @@
 				<e r="210" g="210" b="210"/>
 			</text_color>
         </btn_check_updates>
+	  <cap_check_repair_feature x="215" y="123" width="135" height="24">
+        <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_repair_feature</text>
+      </cap_check_repair_feature>
+      <check_repair_feature x="362" y="123" width="44" height="29">
+        <texture>ui_inGame2_checkbox</texture>
+      </check_repair_feature>
+
     </tab_gameplay>
     <tab_controls>
         <cap_mousesens x="15" y="3" width="135" height="24">
