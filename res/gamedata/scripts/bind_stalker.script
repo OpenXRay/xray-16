@@ -324,8 +324,6 @@ function actor_binder:update(delta)
 		return
 	end
   
-  _console.actor_update() --#SM+#--
-
 	if self.already_jumped==false and jump_level.need_jump==true and (device().frame > self.spawn_frame+2000) then
 		jump_level.try_to_jump()
 		self.already_jumped = true
