@@ -46,14 +46,12 @@ Setup:
   - Copy BugTrap.dll from %XRAY_16X_LIBS%BugTrap\Bin
 - For _bin_dbg:
   - Copy BugTrapD.dll from %XRAY_16X_LIBS%BugTrap\Bin and rename it to BugTrap.dll
-- Create soft link to /gamedata in the game installation directory:
-  $ mklink /D <game installation directory>\gamedata <xray-16 repository root>\res\gamedata  
-- After successful build use xrbinup.cmd to update game binaries:
-  $ xrbinup.cmd "E:\Program Files (x86)\GSC World Publishing\STALKER-COP" %src% dbg  
-- You can create cmd script to update binaries in a single click, for example:
-  @echo off
-  setlocal
-  set src="E:\git\xray-16"
-  set dst="E:\Program Files (x86)\GSC World Publishing\STALKER-COP"
-  call xrbinup.cmd %dst% %src% dbg
-  endlocal
+
+
+Build Luajit-2:
+
+You cannot compile luajit 2+ from Visual Studio. To build it you will need to open VS developer command console, cd to your "3rd party/luajit-2/src" folder
+and execute msvcbuild.bat. This will build lua51.lib and lua51.dll. Copy the dll to %XRAY_16X_GAME%bin_rel folder.
+
+It's very important to note you NEED the changes made to the vanilla gulag_general.script which can be found in xray-16\res\gamedata\gulag_general.script
+To be more specific, a forward slash needs removed from  [local ini_path = "\scripts\\"..work] to look like [local ini_path = "scripts\\"..work]

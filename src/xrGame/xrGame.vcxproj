@@ -4260,9 +4260,6 @@
       <Project>{94a1c366-3d19-48e6-8170-4adc2e70df98}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\utils\xrDXT\DXT.vcxproj">
-      <Project>{ebf9b543-0830-4866-9b48-dc0740e87e8a}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\xrCDB\xrCDB.vcxproj">
       <Project>{a19b1df2-82ec-4364-8bdf-85d13a1c89b5}</Project>
     </ProjectReference>

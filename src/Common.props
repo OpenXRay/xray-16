@@ -13,7 +13,9 @@
     <xrGameDir>$(XRAY_16X_GAME)</xrGameDir>
     <xrGameBinDir>$(xrGameDir)bin\</xrGameBinDir>
   </PropertyGroup>
-  <PropertyGroup />
+  <PropertyGroup>
+    <IncludePath>E:\STALKER\X-Ray Source\x_ray_1602_VS13\xray-16\src\3rd party;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup />
   <ItemGroup>
     <BuildMacro Include="xrBinRootDir">

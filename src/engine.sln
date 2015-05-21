@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utils", "utils", "{89F6A7EE-3BBE-45D3-A8A8-5D9366CD987B}"
 EndProject
@@ -135,8 +135,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LuaJIT-1.1.8", "3rd party\LuaJIT-1.1.8\LuaJIT-1.1.8.vcxproj", "{2AC1029E-E582-40CF-9CD1-5EFA4211AFC9}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua_extensions", "3rd party\lua-extensions\lua_extensions.vcxproj", "{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}"
-EndProject
-Project("{F088123C-0E9E-452A-89E6-6BA2F21D5CAC}") = "Diagrams", "..\Diagrams\Diagrams.modelproj", "{2E39994F-B060-45FA-BD07-DABA262E8CE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1066,27 +1064,6 @@ Global
 		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Release|Any CPU.ActiveCfg = Release|Win32
 		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Release|Win32.ActiveCfg = Release|Win32
 		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Release|Win32.Build.0 = Release|Win32
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Debug_Dedicated|Any CPU.ActiveCfg = Debug|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Debug_Dedicated|Any CPU.Build.0 = Debug|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Debug_Dedicated|Win32.ActiveCfg = Debug|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Mixed_Dedicated|Any CPU.ActiveCfg = Release|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Mixed_Dedicated|Any CPU.Build.0 = Release|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Mixed_Dedicated|Win32.ActiveCfg = Release|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Mixed|Any CPU.ActiveCfg = Release|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Mixed|Any CPU.Build.0 = Release|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Mixed|Win32.ActiveCfg = Release|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Release_Dedicated|Any CPU.ActiveCfg = Release|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Release_Dedicated|Any CPU.Build.0 = Release|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Release_Dedicated|Win32.ActiveCfg = Release|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Release_LuaJit_one|Any CPU.ActiveCfg = Release|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Release_LuaJit_one|Any CPU.Build.0 = Release|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Release_LuaJit_one|Win32.ActiveCfg = Release|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2E39994F-B060-45FA-BD07-DABA262E8CE3}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
