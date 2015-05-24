@@ -6,7 +6,7 @@ The original engine is used in S.T.A.L.K.E.R. Call of Pripyat game released by G
 
 **Note** that [Master](https://github.com/revolucas/xray-16/tree/master) branch contains stable code that is documented on [Wiki](https://github.com/revolucas/xray-16/wiki) but you can also checkout [Working](https://github.com/revolucas/xray-16/tree/working) for nightly builds
 
-* Build instructions can be found [here](https://github.com/revolucas/xray-16/blob/working/doc/howto/build.txt) (**not** updated for this code base yet).
+* Build instructions can be found [here](https://github.com/avoitishin/xray-16/wiki/Build-Instructions)
 * If you find a bug or have an enhancement request, file an [Issue](https://github.com/revolucas/xray-16/issues).
 * Please go to our [Wiki](https://github.com/avoitishin/xray-16/wiki) pages for detailed description of changes and other useful information.   
 
