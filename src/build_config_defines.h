@@ -11,7 +11,7 @@
 
 // CORE:
 #define NO_BUG_TRAP // dont use bug trap
-#define SPAWN_ANTIFREEZE // spread spawn of game objects thoughout multiple frames to prevent lags (by alpet)
+//#define SPAWN_ANTIFREEZE // spread spawn of game objects thoughout multiple frames to prevent lags (by alpet)
 #define NON_FATAL_VERIFY // don't crash game when VERIFY fails
 #define USE_GSC_MEM_ALLOC // when this is undefined memory allocation for luajit is handled by luajit allocator
 //-CORE
@@ -24,7 +24,7 @@
 //-VISUAL
 
 // TWEAKS:
-//#define FP_DEATH // first person death view
+#define FP_DEATH // first person death view
 #define DEAD_BODY_COLLISION // restore collision with dead bodies (thanks malandrinus)
 #define NEW_ANIMS // use new animations. Please enclose any new animation addions with this define
 #define NEW_SOUNDS // use new sounds. Please enclose any new sound addions with this define

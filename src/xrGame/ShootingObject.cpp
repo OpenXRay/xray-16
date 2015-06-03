@@ -77,7 +77,12 @@ void CShootingObject::Load	(LPCSTR section)
 	fModeShotTime = 60.f / fModeShotTime;
 
 	//Cycle down RPM after first 2 shots; used for Abakan/AN-94
-	bCycleDown = READ_IF_EXISTS(pSettings, r_bool, section, "cycle_down", FALSE);
+	if (pSettings->line_exist(section, "cycle_down"))
+	{
+		bCycleDown = pSettings->r_bool(section, "cycle_down");
+	}
+	else
+		bCycleDown = false;
 	//Alundaio: END
 
 	LoadFireParams		(section);

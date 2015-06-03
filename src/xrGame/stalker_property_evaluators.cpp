@@ -241,12 +241,14 @@ CStalkerPropertyEvaluatorReadyToKill::CStalkerPropertyEvaluatorReadyToKill	(CAI_
 _value_type CStalkerPropertyEvaluatorReadyToKill::evaluate	()
 {
 	if (!m_object->ready_to_kill())
-		return		(false);
+		return (false);
 
 	if (!m_min_ammo_count)
-		return		(true);
+		return (true);
+	
+	if (!m_object->best_weapon())
+		return (false);
 
-	VERIFY			(m_object->best_weapon());
 	CWeapon&		best_weapon = smart_cast<CWeapon&>(*m_object->best_weapon());
 	if (best_weapon.GetAmmoElapsed() <= (int)m_min_ammo_count) {
 		if (best_weapon.GetAmmoMagSize() <= (int)m_min_ammo_count)
@@ -255,7 +257,7 @@ _value_type CStalkerPropertyEvaluatorReadyToKill::evaluate	()
 			return	(false);
 	}
 
-	return			(best_weapon.GetState() != CWeapon::eReload);
+	return (best_weapon.GetState() != CWeapon::eReload);
 }
 
 //////////////////////////////////////////////////////////////////////////

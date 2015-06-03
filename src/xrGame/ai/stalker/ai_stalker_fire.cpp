@@ -711,7 +711,7 @@ bool CAI_Stalker::inside_anomaly		()
 	xr_vector<CObject*>::const_iterator	E = feel_touch.end();
 	for ( ; I != E; ++I) {
 		CCustomZone			*zone = smart_cast<CCustomZone*>(*I);
-		if ( zone && (zone->restrictor_type() != RestrictionSpace::eRestrictorTypeNone) ) {
+		if ( zone /* && (zone->restrictor_type() != RestrictionSpace::eRestrictorTypeNone) */) {
 			if (smart_cast<CRadioactiveZone*>(zone))
 				continue;
 

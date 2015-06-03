@@ -418,11 +418,13 @@ void CStalkerActionKillEnemy::execute()
 		if (mem_object.m_object) {
 			object().best_cover(mem_object.m_object_params.m_position);
 		}
-		u32	last_time_seen = object().memory().visual().visible_object_time_last_seen(enemy);
-		//Here NPC will only fire at not visible enemy for no more than 3 seconds instead of shooting at walls like morons
-		if (last_time_seen != u32(-1) && Device.dwTimeGlobal - last_time_seen <= 3000) {
+		
+		if (object().memory().visual().visible_now(enemy)) {
 			object().sight().setup(CSightAction(enemy, true, true));
 			fire();
+		} else {
+			if (mem_object.m_object)
+				object().sight().setup(CSightAction(SightManager::eSightTypePosition,mem_object.m_object_params.m_position,true));
 		}
 	}
 	else
@@ -515,18 +517,12 @@ void CStalkerActionTakeCover::execute()
 		m_storage->set_property(eWorldPropertyInCover, true);
 	}
 
-	//Don't shoot if enemy not visible for longer than 3 seconds
-	u32	last_time_seen = object().memory().visual().visible_object_time_last_seen(enemy);
-	if (last_time_seen != u32(-1) && Device.dwTimeGlobal - last_time_seen <= 3000 && fire_make_sense()) {
+	if (object().memory().visual().visible_now(enemy)) 
+	{
+		object().sight().setup(CSightAction(enemy, true, true));
 		fire();
-	}
-	else {
+	} else {
 		aim_ready();
-	}
-
-	if (object().memory().visual().visible_now(enemy))
-		object().sight().setup(CSightAction(object().memory().enemy().selected(), true, true));
-	else {
 		if (_abs(object().Position().y - mem_object.m_object_params.m_position.y) > 3.f)
 		{
 			Fvector3 Vpos = { mem_object.m_object_params.m_position.x, object().Position().y + 1.f, mem_object.m_object_params.m_position.z };
@@ -699,8 +695,6 @@ void CStalkerActionHoldPosition::execute()
 	inherited::execute();
 
 	//Alundaio: Cleaned up
-	//Possible TODO: This action is a good place to prevent stalkers staring at walls. A simple ray query each execute can do the trick by rotating the stalker until the differences between the last query and new query
-	//are larger than some defined threshold. This way you can detect edges of walls and would give the illusion of stalkers looking at corridors or chokepoints instead of through a wall.
 	const CEntityAlive *enemy = object().memory().enemy().selected();
 	if (!enemy)
 		return;
