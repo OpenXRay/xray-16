@@ -548,13 +548,12 @@ void CWeaponMagazined::state_Fire(float dt)
 
 			//Alundaio: Use fModeShotTime instead of fOneShotTime if current fire mode is 2-shot burst
 			//Alundaio: Cycle down RPM after two shots; used for Abakan/AN-94
-			float rpm = fOneShotTime;
 			if (GetCurrentFireMode() == 2 || (bCycleDown == true && m_iShotNum <= 1) )
 			{
-				rpm = fModeShotTime;
+				fShotTimeCounter = fModeShotTime;
 			}
-
-            fShotTimeCounter += rpm;
+			else
+				fShotTimeCounter = fOneShotTime;
             //Alundaio: END
 
             ++m_iShotNum;
