@@ -738,6 +738,12 @@ bool CUIActorMenu::ToQuickSlot(CUICellItem* itm)
     if (!eat_item)
         return false;
 
+    //Alundaio: Prevent icons greater then 1x1 to be quick slotted
+    Ivector2 iWH = iitem->GetInvGridRect().rb;
+    if (iWH.x > 1 || iWH.y > 1)
+        return false;
+    //Alundaio: END
+
     u8 slot_idx = u8(m_pQuickSlot->PickCell(GetUICursor().GetCursorPosition()).x);
     if (slot_idx == 255)
         return false;

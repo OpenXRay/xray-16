@@ -211,13 +211,12 @@ CStalkerPropertyEvaluatorReadyToKill::CStalkerPropertyEvaluatorReadyToKill(
 
 _value_type CStalkerPropertyEvaluatorReadyToKill::evaluate()
 {
-    if (!m_object->ready_to_kill())
+    if (!m_object->ready_to_kill() || !m_object->best_weapon())
         return (false);
 
     if (!m_min_ammo_count)
         return (true);
 
-    VERIFY(m_object->best_weapon());
     CWeapon& best_weapon = smart_cast<CWeapon&>(*m_object->best_weapon());
     if (best_weapon.GetAmmoElapsed() <= (int)m_min_ammo_count)
     {
