@@ -617,9 +617,18 @@ CScriptGameObject* g_get_target_obj()
 float g_get_target_dist()
 {
     collide::rq_result& RQ = HUD().GetCurrentRayQuery();
-    if (RQ.O)
+    if (RQ.range)
         return RQ.range;
     return 0.f;
+}
+
+u32 g_get_target_element()
+{
+	collide::rq_result& RQ = HUD().GetCurrentRayQuery();
+	if (RQ.element)
+		return RQ.element;
+
+	return 0;
 }
 
 //-Alundaio
@@ -638,6 +647,7 @@ IC static void CLevel_Export(lua_State* luaState)
         //def("ray_pick",g_ray_pick),
         def("get_target_obj", &g_get_target_obj), //intentionally named to what is in xray extensions
         def("get_target_dist", &g_get_target_dist),
+        def("get_target_element", &g_get_target_element), //Can get bone cursor is targetting
         def("spawn_item", &spawn_section),
         //Alundaio: END
         // obsolete\deprecated
