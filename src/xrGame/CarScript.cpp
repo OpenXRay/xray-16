@@ -34,6 +34,21 @@ void CCar::script_register(lua_State *L)
 		.def("SetExplodeTime",	&CCar::SetExplodeTime)
 		.def("ExplodeTime",		&CCar::ExplodeTime)
 		.def("CarExplode",		&CCar::CarExplode)
+		/************************************************** added by Ray Twitty (aka Shadows) START **************************************************/
+		.def("GetfFuel",		&CCar::GetfFuel)
+		.def("SetfFuel",		&CCar::SetfFuel)
+		.def("GetfFuelTank",	&CCar::GetfFuelTank)
+		.def("SetfFuelTank",	&CCar::SetfFuelTank)
+		.def("GetfFuelConsumption",		&CCar::GetfFuelConsumption)
+		.def("SetfFuelConsumption",		&CCar::SetfFuelConsumption)
+		.def("ChangefFuel",		&CCar::ChangefFuel)
+		.def("ChangefHealth",	&CCar::ChangefHealth)
+		.def("PlayDamageParticles",		&CCar::PlayDamageParticles)
+		.def("StopDamageParticles",		&CCar::StopDamageParticles)
+		.def("StartEngine",		&CCar::StartEngine)
+		.def("StopEngine",		&CCar::StopEngine)
+		.def("IsActiveEngine",	&CCar::isActiveEngine)
+		/*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/
 		.def(constructor<>())
 	];
 }

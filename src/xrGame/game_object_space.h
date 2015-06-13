@@ -67,6 +67,10 @@ namespace GameObject
         eItemToRuck,
         // actor
         eActorBeforeDeath,
+		// vehicle
+		eAttachVehicle,
+		eDetachVehicle,
+		eUseVehicle,
         //-AVO
 
         eDummy = u32(-1),

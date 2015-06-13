@@ -553,84 +553,6 @@
     <Filter Include="AI\AMonsters\common\base monster">
       <UniqueIdentifier>{cd542964-a88c-4d41-85bb-f549766ac70f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\AMonsters\common\monster states">
-      <UniqueIdentifier>{2f5dd1ce-9927-4917-a6fa-6b0113f79b00}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Rest">
-      <UniqueIdentifier>{69fc9311-024d-451f-bcad-8a5b05ba9ba8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Panic">
-      <UniqueIdentifier>{f76b9f11-e049-4117-be33-eb90695baee0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Interesting Sound">
-      <UniqueIdentifier>{3f0f8bce-f527-47da-86e3-6547a08ff9c9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Attack">
-      <UniqueIdentifier>{917f2215-4fe0-49cd-9710-ad42d4bbf980}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Hitted">
-      <UniqueIdentifier>{d21c6f37-aa25-425f-ab15-dd85562e4dac}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Steal">
-      <UniqueIdentifier>{2fa0f717-0403-4c7e-ad7f-2530a88eb71c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Steal\Squad">
-      <UniqueIdentifier>{fae29cab-3d66-4aba-8a69-75b6d84dc74d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Steal\Squad\Rest">
-      <UniqueIdentifier>{4946196d-1f2b-4e07-9207-f0789b2528fc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Hunt">
-      <UniqueIdentifier>{098ea533-6ac0-45d2-87d0-f7b07721ed96}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Home Point">
-      <UniqueIdentifier>{db21b3a4-109b-4ee8-a49c-f514367ae3a9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Help Sound">
-      <UniqueIdentifier>{986484e0-dae7-4668-9bac-99821ec28ed8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\ALife">
-      <UniqueIdentifier>{ac2feaf9-e056-41bf-ba53-48ee2f244e10}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Group Monsters Home">
-      <UniqueIdentifier>{a5d2eea2-ff2a-4205-9aa4-662793385c62}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Find Enemy">
-      <UniqueIdentifier>{d8f01b6a-bd7d-4d92-836b-7da8f0719f2e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Eat">
-      <UniqueIdentifier>{d98d5aed-0349-4cd2-a98e-aa8828cae8ab}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Eat\Eating">
-      <UniqueIdentifier>{c71ab8da-df07-42c0-8a59-79de3f0e0be8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Eat\Drag">
-      <UniqueIdentifier>{c0671f30-b395-4aaa-b068-48ad750e6229}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\General">
-      <UniqueIdentifier>{786a1168-d1fe-400c-94dd-34b3b7c73b07}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\General\Movement">
-      <UniqueIdentifier>{20b3de5c-c8dd-4115-9638-50e8108ffcfa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\General\Look">
-      <UniqueIdentifier>{da4c1a2f-7fc9-48ac-8335-2fbc70053f19}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\General\Custom Action">
-      <UniqueIdentifier>{509e0ea6-e30e-453c-bf81-20f77ddc1b9a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\General\Test">
-      <UniqueIdentifier>{be8f072a-a4a2-4eb8-b5c0-c33397f263cc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Dangerous Sound">
-      <UniqueIdentifier>{bc35ae2d-65bf-4008-bc50-c26fdad27d6c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Camp">
-      <UniqueIdentifier>{e3f6cc93-c7c7-4f59-b334-e90f6870dd1b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Controlled">
-      <UniqueIdentifier>{71df3723-4ad3-4db1-9eb8-7bf643a66f93}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AI\AMonsters\common\components">
       <UniqueIdentifier>{3c35eeec-8bc5-4153-8485-122dfcdb7e25}</UniqueIdentifier>
     </Filter>
@@ -2491,6 +2413,84 @@
     <Filter Include="Class Diagrams">
       <UniqueIdentifier>{3c08723e-1b59-45e4-958f-3a1c5590cfa9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states">
+      <UniqueIdentifier>{2f5dd1ce-9927-4917-a6fa-6b0113f79b00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Rest">
+      <UniqueIdentifier>{69fc9311-024d-451f-bcad-8a5b05ba9ba8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Panic">
+      <UniqueIdentifier>{f76b9f11-e049-4117-be33-eb90695baee0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Interesting Sound">
+      <UniqueIdentifier>{3f0f8bce-f527-47da-86e3-6547a08ff9c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Attack">
+      <UniqueIdentifier>{917f2215-4fe0-49cd-9710-ad42d4bbf980}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Hitted">
+      <UniqueIdentifier>{d21c6f37-aa25-425f-ab15-dd85562e4dac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Steal">
+      <UniqueIdentifier>{2fa0f717-0403-4c7e-ad7f-2530a88eb71c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Steal\Squad">
+      <UniqueIdentifier>{fae29cab-3d66-4aba-8a69-75b6d84dc74d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Steal\Squad\Rest">
+      <UniqueIdentifier>{4946196d-1f2b-4e07-9207-f0789b2528fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Hunt">
+      <UniqueIdentifier>{098ea533-6ac0-45d2-87d0-f7b07721ed96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Home Point">
+      <UniqueIdentifier>{db21b3a4-109b-4ee8-a49c-f514367ae3a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Help Sound">
+      <UniqueIdentifier>{986484e0-dae7-4668-9bac-99821ec28ed8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\ALife">
+      <UniqueIdentifier>{ac2feaf9-e056-41bf-ba53-48ee2f244e10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Group Monsters Home">
+      <UniqueIdentifier>{a5d2eea2-ff2a-4205-9aa4-662793385c62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Find Enemy">
+      <UniqueIdentifier>{d8f01b6a-bd7d-4d92-836b-7da8f0719f2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Eat">
+      <UniqueIdentifier>{d98d5aed-0349-4cd2-a98e-aa8828cae8ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Eat\Eating">
+      <UniqueIdentifier>{c71ab8da-df07-42c0-8a59-79de3f0e0be8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Eat\Drag">
+      <UniqueIdentifier>{c0671f30-b395-4aaa-b068-48ad750e6229}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\General">
+      <UniqueIdentifier>{786a1168-d1fe-400c-94dd-34b3b7c73b07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\General\Movement">
+      <UniqueIdentifier>{20b3de5c-c8dd-4115-9638-50e8108ffcfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\General\Look">
+      <UniqueIdentifier>{da4c1a2f-7fc9-48ac-8335-2fbc70053f19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\General\Custom Action">
+      <UniqueIdentifier>{509e0ea6-e30e-453c-bf81-20f77ddc1b9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\General\Test">
+      <UniqueIdentifier>{be8f072a-a4a2-4eb8-b5c0-c33397f263cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Dangerous Sound">
+      <UniqueIdentifier>{bc35ae2d-65bf-4008-bc50-c26fdad27d6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Camp">
+      <UniqueIdentifier>{e3f6cc93-c7c7-4f59-b334-e90f6870dd1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\script\monster states\Controlled">
+      <UniqueIdentifier>{71df3723-4ad3-4db1-9eb8-7bf643a66f93}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -3460,388 +3460,388 @@
       <Filter>AI\AMonsters\common\base monster</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_rest.h">
-      <Filter>AI\AMonsters\common\monster states\Rest</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_rest_fun.h">
-      <Filter>AI\AMonsters\common\monster states\Rest</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_rest_fun_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Rest</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_rest_idle.h">
-      <Filter>AI\AMonsters\common\monster states\Rest</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_rest_idle_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Rest</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_rest_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Rest</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_rest_sleep.h">
-      <Filter>AI\AMonsters\common\monster states\Rest</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_rest_sleep_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Rest</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_rest_walk_graph.h">
-      <Filter>AI\AMonsters\common\monster states\Rest</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_rest_walk_graph_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Rest</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_panic.h">
-      <Filter>AI\AMonsters\common\monster states\Panic</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Panic</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_panic_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Panic</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Panic</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_panic_run.h">
-      <Filter>AI\AMonsters\common\monster states\Panic</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Panic</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_panic_run_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Panic</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Panic</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_hear_int_sound.h">
-      <Filter>AI\AMonsters\common\monster states\Interesting Sound</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Interesting Sound</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_hear_int_sound_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Interesting Sound</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Interesting Sound</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_attack.h">
-      <Filter>AI\AMonsters\common\monster states\Attack</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Attack</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_attack_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Attack</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Attack</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_attack_melee.h">
-      <Filter>AI\AMonsters\common\monster states\Attack</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Attack</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_attack_melee_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Attack</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Attack</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\states\monster_state_attack_on_run.h">
-      <Filter>AI\AMonsters\common\monster states\Attack</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Attack</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\states\monster_state_attack_on_run_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Attack</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Attack</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_attack_run.h">
-      <Filter>AI\AMonsters\common\monster states\Attack</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Attack</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\states\monster_state_attack_run_attack.h">
-      <Filter>AI\AMonsters\common\monster states\Attack</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Attack</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\states\monster_state_attack_run_attack_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Attack</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Attack</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_attack_run_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Attack</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Attack</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_hitted.h">
-      <Filter>AI\AMonsters\common\monster states\Hitted</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Hitted</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_hitted_hide.h">
-      <Filter>AI\AMonsters\common\monster states\Hitted</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Hitted</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_hitted_hide_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Hitted</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Hitted</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_hitted_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Hitted</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Hitted</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_hitted_moveout.h">
-      <Filter>AI\AMonsters\common\monster states\Hitted</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Hitted</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_hitted_moveout_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Hitted</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Hitted</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_steal.h">
-      <Filter>AI\AMonsters\common\monster states\Steal</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Steal</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_steal_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Steal</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Steal</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_squad_rest.h">
-      <Filter>AI\AMonsters\common\monster states\Steal\Squad\Rest</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Steal\Squad\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_squad_rest_follow.h">
-      <Filter>AI\AMonsters\common\monster states\Steal\Squad\Rest</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Steal\Squad\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_squad_rest_follow_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Steal\Squad\Rest</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Steal\Squad\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_squad_rest_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Steal\Squad\Rest</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Steal\Squad\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_home_point_attack.h">
-      <Filter>AI\AMonsters\common\monster states\Home Point</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Home Point</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_home_point_attack_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Home Point</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Home Point</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_home_point_danger.h">
-      <Filter>AI\AMonsters\common\monster states\Home Point</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Home Point</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_home_point_danger_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Home Point</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Home Point</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_home_point_rest.h">
-      <Filter>AI\AMonsters\common\monster states\Home Point</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Home Point</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_home_point_rest_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Home Point</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Home Point</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_help_sound.h">
-      <Filter>AI\AMonsters\common\monster states\Help Sound</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Help Sound</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_help_sound_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Help Sound</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Help Sound</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_smart_terrain_task.h">
-      <Filter>AI\AMonsters\common\monster states\ALife</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\ALife</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_smart_terrain_task_graph_walk.h">
-      <Filter>AI\AMonsters\common\monster states\ALife</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\ALife</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_smart_terrain_task_graph_walk_inline.h">
-      <Filter>AI\AMonsters\common\monster states\ALife</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\ALife</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_smart_terrain_task_inline.h">
-      <Filter>AI\AMonsters\common\monster states\ALife</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\ALife</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_attack.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_attack_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_attack_run.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_attack_run_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_custom.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_custom_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_eat.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_eat_drag.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_eat_drag_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_eat_eat.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_eat_eat_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_eat_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_hear_danger_sound.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_hear_danger_sound_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_home_point_attack.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_home_point_attack_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_panic.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_panic_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_panic_run.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_panic_run_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_rest.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_rest_idle.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_rest_idle_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_rest_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_squad_move_to_radius.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\group_state_squad_move_to_radius_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\monsters\group_states\state_adapter.h">
-      <Filter>AI\AMonsters\common\monster states\Group Monsters Home</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Group Monsters Home</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_find_enemy.h">
-      <Filter>AI\AMonsters\common\monster states\Find Enemy</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Find Enemy</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_find_enemy_angry.h">
-      <Filter>AI\AMonsters\common\monster states\Find Enemy</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Find Enemy</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_find_enemy_angry_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Find Enemy</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Find Enemy</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_find_enemy_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Find Enemy</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Find Enemy</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_find_enemy_look.h">
-      <Filter>AI\AMonsters\common\monster states\Find Enemy</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Find Enemy</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_find_enemy_look_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Find Enemy</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Find Enemy</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_find_enemy_run.h">
-      <Filter>AI\AMonsters\common\monster states\Find Enemy</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Find Enemy</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_find_enemy_run_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Find Enemy</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Find Enemy</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_find_enemy_walk.h">
-      <Filter>AI\AMonsters\common\monster states\Find Enemy</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Find Enemy</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_find_enemy_walk_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Find Enemy</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Find Enemy</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_eat.h">
-      <Filter>AI\AMonsters\common\monster states\Eat</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Eat</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_eat_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Eat</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Eat</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_eat_eat.h">
-      <Filter>AI\AMonsters\common\monster states\Eat\Eating</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Eat\Eating</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_eat_eat_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Eat\Eating</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Eat\Eating</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_eat_drag.h">
-      <Filter>AI\AMonsters\common\monster states\Eat\Drag</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Eat\Drag</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_eat_drag_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Eat\Drag</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Eat\Drag</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_data.h">
-      <Filter>AI\AMonsters\common\monster states\General</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_hide_from_point.h">
-      <Filter>AI\AMonsters\common\monster states\General\Movement</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Movement</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_hide_from_point_inline.h">
-      <Filter>AI\AMonsters\common\monster states\General\Movement</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Movement</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_move_around_point.h">
-      <Filter>AI\AMonsters\common\monster states\General\Movement</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Movement</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_move_around_point_inline.h">
-      <Filter>AI\AMonsters\common\monster states\General\Movement</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Movement</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_move_to_point.h">
-      <Filter>AI\AMonsters\common\monster states\General\Movement</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Movement</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_move_to_point_inline.h">
-      <Filter>AI\AMonsters\common\monster states\General\Movement</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Movement</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_move_to_restrictor.h">
-      <Filter>AI\AMonsters\common\monster states\General\Movement</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Movement</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_move_to_restrictor_inline.h">
-      <Filter>AI\AMonsters\common\monster states\General\Movement</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Movement</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_look_point.h">
-      <Filter>AI\AMonsters\common\monster states\General\Look</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Look</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_look_point_inline.h">
-      <Filter>AI\AMonsters\common\monster states\General\Look</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Look</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_look_unprotected_area.h">
-      <Filter>AI\AMonsters\common\monster states\General\Look</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Look</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_look_unprotected_area_inline.h">
-      <Filter>AI\AMonsters\common\monster states\General\Look</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Look</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_custom_action.h">
-      <Filter>AI\AMonsters\common\monster states\General\Custom Action</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Custom Action</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_custom_action_inline.h">
-      <Filter>AI\AMonsters\common\monster states\General\Custom Action</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Custom Action</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_custom_action_look.h">
-      <Filter>AI\AMonsters\common\monster states\General\Custom Action</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Custom Action</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_custom_action_look_inline.h">
-      <Filter>AI\AMonsters\common\monster states\General\Custom Action</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Custom Action</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_hit_object.h">
-      <Filter>AI\AMonsters\common\monster states\General\Test</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Test</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_hit_object_inline.h">
-      <Filter>AI\AMonsters\common\monster states\General\Test</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Test</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_test_look_actor.h">
-      <Filter>AI\AMonsters\common\monster states\General\Test</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Test</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_test_look_actor_inline.h">
-      <Filter>AI\AMonsters\common\monster states\General\Test</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Test</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_test_state.h">
-      <Filter>AI\AMonsters\common\monster states\General\Test</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Test</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\state_test_state_inline.h">
-      <Filter>AI\AMonsters\common\monster states\General\Test</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\General\Test</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_hear_danger_sound.h">
-      <Filter>AI\AMonsters\common\monster states\Dangerous Sound</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Dangerous Sound</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_hear_danger_sound_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Dangerous Sound</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Dangerous Sound</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_attack_camp.h">
-      <Filter>AI\AMonsters\common\monster states\Camp</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Camp</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_attack_camp_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Camp</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Camp</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_attack_camp_stealout.h">
-      <Filter>AI\AMonsters\common\monster states\Camp</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Camp</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_attack_camp_stealout_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Camp</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Camp</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_controlled.h">
-      <Filter>AI\AMonsters\common\monster states\Controlled</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Controlled</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_controlled_attack.h">
-      <Filter>AI\AMonsters\common\monster states\Controlled</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Controlled</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_controlled_attack_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Controlled</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Controlled</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_controlled_follow.h">
-      <Filter>AI\AMonsters\common\monster states\Controlled</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Controlled</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_controlled_follow_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Controlled</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Controlled</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_controlled_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Controlled</Filter>
+      <Filter>AI\AMonsters\common\script\monster states\Controlled</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\ai_monster_defs.h">
       <Filter>AI\AMonsters\common\components</Filter>

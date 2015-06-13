@@ -24,6 +24,7 @@
 #include "../Include/xrRender/Kinematics.h"
 #include "level.h"
 #include "ui/UIMainIngameWnd.h"
+//#include "UIGameCustom.h"
 #include "CarWeapon.h"
 #include "game_object_space.h"
 #include "../xrEngine/gamemtllib.h"
@@ -467,14 +468,16 @@ void CCar::UpdateCL				( )
 // 			OwnerActor()->Cameras().ApplyDevice();
 // 		}
 // 
-/*		if(CurrentGameUI())//
+		/*
+		if(CurrentGameUI())
 		{
 			CurrentGameUI()->UIMainIngameWnd->CarPanel().Show(true);
 			CurrentGameUI()->UIMainIngameWnd->CarPanel().SetCarHealth(GetfHealth());
 			CurrentGameUI()->UIMainIngameWnd->CarPanel().SetSpeed(lin_vel.magnitude()/1000.f*3600.f/100.f);
 			CurrentGameUI()->UIMainIngameWnd->CarPanel().SetRPM(m_current_rpm/m_max_rpm/2.f);
 		}
-*/
+		*/
+
 	}
 
 	UpdateExhausts	();
@@ -544,8 +547,8 @@ void	CCar::Hit							(SHit* pHDS)
 		CDelayedActionFuse::CheckCondition(GetfHealth());
 	}
 	CDamagableItem::HitEffect();
-//	if(Owner()&&Owner()->ID()==Level().CurrentEntity()->ID())
-//		CurrentGameUI()->UIMainIngameWnd->CarPanel().SetCarHealth(GetfHealth());
+	//if(Owner()&&Owner()->ID()==Level().CurrentEntity()->ID())
+	//	CurrentGameUI()->UIMainIngameWnd->CarPanel().SetCarHealth(GetfHealth());
 }
 
 void CCar::ChangeCondition	(float fDeltaCondition)	
@@ -555,8 +558,8 @@ void CCar::ChangeCondition	(float fDeltaCondition)
 	CDamagableItem::HitEffect();
 	if (Local() && !g_Alive() && !AlreadyDie())
 		KillEntity	(Initiator());
-//	if(Owner()&&Owner()->ID()==Level().CurrentEntity()->ID())
-//		CurrentGameUI()->UIMainIngameWnd->CarPanel().SetCarHealth(GetfHealth());
+	//if(Owner()&&Owner()->ID()==Level().CurrentEntity()->ID())
+	//	CurrentGameUI()->UIMainIngameWnd->CarPanel().SetCarHealth(GetfHealth());
 }
 
 void CCar::PHHit(SHit &H)
@@ -838,13 +841,18 @@ void CCar::CreateSkeleton(CSE_Abstract	*po)
 		pK->CalculateBones	(TRUE);
 	}
 	phys_shell_verify_object_model ( *this );
-#pragma todo(" replace below by P_build_Shell or call inherited")
+	//Alundaio: p_build_shell
+	/*
+	#pragma todo(" replace below by P_build_Shell or call inherited")
 	m_pPhysicsShell		= P_create_Shell();
 	m_pPhysicsShell->build_FromKinematics(pK,&bone_map);
 	m_pPhysicsShell->set_PhysicsRefObject(this);
 	m_pPhysicsShell->mXFORM.set(XFORM());
 	m_pPhysicsShell->Activate(true);
 	m_pPhysicsShell->SetAirResistance(0.f,0.f);
+	*/
+	m_pPhysicsShell = P_build_Shell(this, true, &bone_map);
+	//-Alundaio
 	m_pPhysicsShell->SetPrefereExactIntegration();
 
 	ApplySpawnIniToPhysicShell(&po->spawn_ini(),m_pPhysicsShell,false);
@@ -2036,4 +2044,74 @@ Fvector	CCar::		ExitVelocity				()
 	return v;
 }
 
-//#endif // #if 0
+/************************************************** added by Ray Twitty (aka Shadows) START **************************************************/
+// получить и задать текущее количество топлива
+float CCar::GetfFuel()
+{
+	return m_fuel;
+}
+void CCar::SetfFuel(float fuel)
+{
+	m_fuel = fuel;
+}
+// получить и задать размер топливного бака 
+float CCar::GetfFuelTank()
+{
+	return m_fuel_tank;
+}
+void CCar::SetfFuelTank(float fuel_tank)
+{
+	m_fuel_tank = fuel_tank;
+}
+// получить и задать величину потребление топлива
+float CCar::GetfFuelConsumption()
+{
+	return m_fuel_consumption;
+}
+void CCar::SetfFuelConsumption(float fuel_consumption)
+{
+	m_fuel_consumption = fuel_consumption;
+}
+// прибавить или убавить количество топлива
+void CCar::ChangefFuel(float fuel)
+{
+	if(m_fuel + fuel < 0)
+	{
+		m_fuel = 0;
+		return;
+	}
+
+	if(fuel < m_fuel_tank - m_fuel)
+	{
+		m_fuel += fuel;
+	}
+	else
+	{
+		m_fuel = m_fuel_tank;
+	}
+}
+// прибавить или убавить жизней :)
+void CCar::ChangefHealth(float health)
+{
+	float current_health = GetfHealth();
+	if(current_health + health < 0)
+	{
+		SetfHealth(0);
+		return;
+	}
+
+	if(health < 1 - current_health)
+	{
+		SetfHealth(current_health + health);
+	}
+	else
+	{
+		SetfHealth(1);
+	}
+}
+// активен ли сейчас двигатель
+bool CCar::isActiveEngine()
+{
+	return b_engine_on;
+}
+/*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/

@@ -293,23 +293,6 @@ void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
     {
         if (type == GE_DESTROY)
         {
-            /* This is not the right place for this (if this is even required...)
-            //AVO: fix for SPAWN_ANTIFREEZE crashes caused by rapid online-offline switch. In such cases
-            //inventory items are queued up for a spawn, however parent is already destroyed which cases game to crash
-#ifdef SPAWN_ANTIFREEZE
-            for (auto it = spawn_events->queue.begin(); it != spawn_events->queue.end(); ++it)
-            {
-                const NET_Event& E = *it;
-                NET_Packet P;
-                if (M_SPAWN != E.ID) continue;
-                E.implication(P);
-                u16 parent_id;
-                if (GO->ID() == GetSpawnInfo(P, parent_id))
-                    spawn_events->queue.erase(it); // if parent is being destroyed, delete all queued up children
-            }
-#endif
-            //-AVO
-            */
             Game().OnDestroy(GO);
         }
         GO->OnEvent(P, type);
@@ -370,49 +353,57 @@ void CLevel::ProcessGameEvents()
         NET_Packet P;
         u32 svT = timeServer() - NET_Latency;
 
-        //AVO: spawn antifreeze implementation by alpet
-#ifdef SPAWN_ANTIFREEZE
-        while (spawn_events->available(svT))
-        {
-            u16 ID, dest, type;
-            spawn_events->get(ID, dest, type, P);
-            game_events->insert(P);
-        }
-        u32 avail_time = 5;
-        u32 elps = Device.frame_elapsed();
-        if (elps < 30) avail_time = 33 - elps;
-        u32 work_limit = elps + avail_time;
-#endif
+		//Alundaio: Modified to be toggled via console command
+		//AVO: spawn antifreeze implementation by alpet
+		u32 work_limit;
+
+		if (psActorFlags.test(AF_SPAWN_ANTIFREEZE))
+		{
+			while (spawn_events->available(svT))
+			{
+				u16 ID, dest, type;
+				spawn_events->get(ID, dest, type, P);
+				game_events->insert(P);
+			}
+			u32 avail_time = 5;
+			u32 elps = Device.frame_elapsed();
+			if (elps < 30) avail_time = 33 - elps;
+			work_limit = elps + avail_time;
+		}
         //-AVO
+		//-Alundaio
 
         while (game_events->available(svT))
         {
             u16 ID, dest, type;
             game_events->get(ID, dest, type, P);
+			//Alundaio: Modified to be toggled via console command
             //AVO: spawn antifreeze implementation by alpet
-#ifdef SPAWN_ANTIFREEZE
-            // не отправлять события не заспавненным объектам
-            if (g_bootComplete && M_EVENT == ID && PostponedSpawn(dest))
-            {
-                spawn_events->insert(P);
-                continue;
-            }
-            if (g_bootComplete && M_SPAWN == ID && Device.frame_elapsed() > work_limit) // alpet: позволит плавнее выводить объекты в онлайн, без заметных фризов
-            {
-                u16 parent_id;
-                GetSpawnInfo(P, parent_id);
-                //-------------------------------------------------				
-                if (parent_id < 0xffff) // откладывать спавн только объектов в контейнеры
-                {
-                    if (!spawn_events->available(svT))
-                        Msg("* ProcessGameEvents, spawn event postponed. Events rest = %d", game_events->queue.size());
+			if (psActorFlags.test(AF_SPAWN_ANTIFREEZE))
+			{
+				// не отправлять события не заспавненным объектам
+				if (g_bootComplete && M_EVENT == ID && PostponedSpawn(dest))
+				{
+					spawn_events->insert(P);
+					continue;
+				}
+				if (g_bootComplete && M_SPAWN == ID && Device.frame_elapsed() > work_limit) // alpet: позволит плавнее выводить объекты в онлайн, без заметных фризов
+				{
+					u16 parent_id;
+					GetSpawnInfo(P, parent_id);
+					//-------------------------------------------------				
+					if (parent_id < 0xffff) // откладывать спавн только объектов в контейнеры
+					{
+						if (!spawn_events->available(svT))
+							Msg("* ProcessGameEvents, spawn event postponed. Events rest = %d", game_events->queue.size());
 
-                    spawn_events->insert(P);
-                    continue;
-                }
-            }
-#endif
+						spawn_events->insert(P);
+						continue;
+					}
+				}
+			}
             //-AVO
+			//-Alundaio
             switch (ID)
             {
             case M_SPAWN:

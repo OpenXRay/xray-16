@@ -503,6 +503,19 @@ IC	size_t				CurrentTransmission					(){return m_current_transmission_num;}
 	void UpdateFuel										(float time_delta);
 	float AddFuel										(float ammount); //ammount - fuel to load, ret - fuel loaded
 	void CarExplode										();
+	/************************************************** added by Ray Twitty (aka Shadows) START **************************************************/
+	float GetfFuel										();
+	void SetfFuel										(float fuel);
+	float GetfFuelTank									();
+	void SetfFuelTank									(float fuel_tank);
+	float GetfFuelConsumption							();
+	void SetfFuelConsumption							(float fuel_consumption);
+	void ChangefFuel									(float fuel);
+	void ChangefHealth									(float health);
+	void PlayDamageParticles							(){m_damage_particles.Play1(this);m_damage_particles.Play2(this);}
+	void StopDamageParticles							(){m_damage_particles.Stop1(this);m_damage_particles.Stop2(this);}
+	bool isActiveEngine									();
+	/*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/
 	////////////////////////////////////////////		////////
 
 	void					OnCameraChange				(int type);
