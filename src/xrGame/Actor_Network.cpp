@@ -865,7 +865,7 @@ void CActor::OnChangeVisual()
         CStepManager::reload(cNameSect().c_str());
         SetCallbacks();
         m_anims->Create(V);
-        //.		m_vehicle_anims->Create			(V);
+        m_vehicle_anims->Create(V);
         CDamageManager::reload(*cNameSect(), "damage", pSettings);
         //-------------------------------------------------------------------------------
         m_head = smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_head");

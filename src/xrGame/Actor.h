@@ -271,7 +271,7 @@ protected:
 
 public:
     SActorMotions* m_anims;
-    //.	SActorVehicleAnims*		m_vehicle_anims;
+    SActorVehicleAnims* m_vehicle_anims;
 
     CBlend* m_current_legs_blend;
     CBlend* m_current_torso_blend;

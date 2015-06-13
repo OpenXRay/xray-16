@@ -64,6 +64,25 @@ void CCarDamageParticles::Play2(CCar* car)
     }
 }
 
+/***** added by Ray Twitty (aka Shadows) START *****/
+// функции для выключения партиклов дыма
+void CCarDamageParticles::Stop1(CCar* car)
+{
+    if(*m_car_damage_particles1)
+        for (auto bone : bones1)
+            car->StopParticles(car->ID(), bone, false);
+}
+
+void CCarDamageParticles::Stop2(CCar* car)
+{
+    VERIFY(!physics_world()->Processing());
+    if(*m_car_damage_particles2)
+        for (auto bone : bones2)
+            car->StopParticles(car->ID(), bone, false);
+}
+/***** added by Ray Twitty (aka Shadows) END *****/
+
+
 void CCarDamageParticles::PlayWheel1(CCar* car, u16 bone_id) const
 {
     VERIFY(!physics_world()->Processing());

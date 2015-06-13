@@ -69,6 +69,11 @@ enum ECallbackType
     eActorBeforeDeath,
     //-AVO
 
+    // vehicle
+    eAttachVehicle,
+    eDetachVehicle,
+    eUseVehicle,
+
     eDummy = u32(-1),
 };
 };
