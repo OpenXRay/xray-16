@@ -2089,11 +2089,6 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_dynamic_music", &psActorFlags, AF_DYNAMIC_MUSIC);
     CMD3(CCC_Mask, "g_important_save", &psActorFlags, AF_IMPORTANT_SAVE);
 
-	//Alundaio
-    CMD3(CCC_Mask, "g_spawn_antifreeze", &psActorFlags, AF_SPAWN_ANTIFREEZE);
-	//-Alundaio
-    
-
 #ifdef DEBUG
     CMD1(CCC_LuaHelp, "lua_help");
     CMD1(CCC_ShowSmartCastStats, "show_smart_cast_stats");

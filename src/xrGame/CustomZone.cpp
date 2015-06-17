@@ -308,7 +308,7 @@ BOOL CCustomZone::net_Spawn(CSE_Abstract* DC)
 	m_zone_flags.set			(eUseOnOffTime,	(m_TimeToDisable!=0)&&(m_TimeToEnable!=0) );
 
 	//добавить источники света
-	bool br1 = (0==psDeviceFlags.test(rsR2|rsR3|rsR4)); //Alundaio: Renderer R4 to use R1 lighting, too
+	bool br1 = (0==psDeviceFlags.test(rsR2|rsR3|rsR4)); //Alundaio: Renderer R4 to not use R1 lighting, too
 	
 	
 	bool render_ver_allowed = !br1 || (br1&&m_zone_flags.test(eIdleLightR1)) ;

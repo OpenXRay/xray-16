@@ -310,7 +310,15 @@ void CActor::cam_Update(float dt, float fFOV)
 	} else
 		current_ik_cam_shift = 0;
 
-	Fvector point		= {0,CameraHeight() + current_ik_cam_shift,0}; 
+	// Alex ADD: smooth crouch fix
+	float HeightInterpolationSpeed = 4.f;
+
+	if (CurrentHeight != CameraHeight())
+	{
+		CurrentHeight = (CurrentHeight * (1.0f - HeightInterpolationSpeed*dt)) + (CameraHeight() * HeightInterpolationSpeed*dt);
+	}
+
+	Fvector point = { 0, CurrentHeight + current_ik_cam_shift, 0 };
 	Fvector dangle		= {0,0,0};
 	Fmatrix				xform;
 	xform.setXYZ		(0,r_torso.yaw,0);

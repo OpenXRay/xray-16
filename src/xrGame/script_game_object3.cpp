@@ -38,6 +38,11 @@
 #include "sound_player.h"
 #include "stalker_decision_space.h"
 #include "space_restriction_manager.h"
+#include "artefact.h"
+//Alundaio
+#include "holder_custom.h"
+#include "actor.h"
+//-Alundaio
 
 namespace MemorySpace {
 	struct CVisibleObject;
@@ -822,6 +827,7 @@ float CScriptGameObject::GetAnomalyPower()
 	CCustomZone		*zone = smart_cast<CCustomZone*>(&object()); THROW(zone);
 	return zone->GetMaxPower();
 }
+
 void CScriptGameObject::SetAnomalyPower(float p)
 {
 	CCustomZone		*zone = smart_cast<CCustomZone*>(&object()); THROW(zone);
@@ -1098,3 +1104,111 @@ bool CScriptGameObject::is_weapon_going_to_be_strapped	( CScriptGameObject const
 
 	return									stalker->is_weapon_going_to_be_strapped	( &object->object() );
 }
+//Alundaio: Taken from Radium
+float CScriptGameObject::GetArtefactHealthRestoreSpeed()
+{
+	CArtefact* artefact = smart_cast<CArtefact*>(&object());
+	THROW(artefact);
+
+	return artefact->GetHealthPower();
+}
+
+float CScriptGameObject::GetArtefactRadiationRestoreSpeed()
+{
+	CArtefact* artefact = smart_cast<CArtefact*>(&object());
+	THROW(artefact);
+
+	return artefact->GetRadiationPower();
+}
+
+float CScriptGameObject::GetArtefactSatietyRestoreSpeed()
+{
+	CArtefact* artefact = smart_cast<CArtefact*>(&object());
+	THROW(artefact);
+
+	return artefact->GetSatietyPower();
+}
+float CScriptGameObject::GetArtefactPowerRestoreSpeed()
+{
+	CArtefact* artefact = smart_cast<CArtefact*>(&object());
+	THROW(artefact);
+
+	return artefact->GetPowerPower();
+}
+
+float CScriptGameObject::GetArtefactBleedingRestoreSpeed()
+{
+	CArtefact* artefact = smart_cast<CArtefact*>(&object());
+	THROW(artefact);
+
+	return artefact->GetBleedingPower();
+}
+
+void CScriptGameObject::SetArtefactHealthRestoreSpeed(float value)
+{
+	CArtefact* artefact = smart_cast<CArtefact*>(&object());
+	THROW(artefact);
+
+	artefact->SetHealthPower(value);
+}
+
+void CScriptGameObject::SetArtefactRadiationRestoreSpeed(float value)
+{
+	CArtefact* artefact = smart_cast<CArtefact*>(&object());
+	THROW(artefact);
+
+	artefact->SetRadiationPower(value);
+}
+
+void CScriptGameObject::SetArtefactSatietyRestoreSpeed(float value)
+{
+	CArtefact* artefact = smart_cast<CArtefact*>(&object());
+	THROW(artefact);
+
+	artefact->SetSatietyPower(value);
+}
+void CScriptGameObject::SetArtefactPowerRestoreSpeed(float value)
+{
+	CArtefact* artefact = smart_cast<CArtefact*>(&object());
+	THROW(artefact);
+
+	artefact->SetPowerPower(value);
+}
+
+void CScriptGameObject::SetArtefactBleedingRestoreSpeed(float value)
+{
+	CArtefact* artefact = smart_cast<CArtefact*>(&object());
+	THROW(artefact);
+
+	artefact->SetBleedingPower(value);
+}
+//Alundaio
+void CScriptGameObject::AttachVehicle(CScriptGameObject* veh)
+{
+	CActor *actor = smart_cast<CActor*>(&object());
+	if (actor)
+	{
+		CHolderCustom* vehicle = smart_cast<CHolderCustom*>(veh);
+		if (vehicle)
+			actor->attach_Vehicle(vehicle);
+	}
+}
+
+void CScriptGameObject::DetachVehicle()
+{
+	CActor *actor = smart_cast<CActor*>(&object());
+	if (actor)
+		actor->detach_Vehicle();
+}
+
+void CScriptGameObject::ForceSetPosition(Fvector3 pos)
+{
+	CPhysicsShellHolder* P = smart_cast<CPhysicsShellHolder*>(this);
+	if (!P)
+		return;
+
+	Fmatrix	M = P->XFORM();
+	M.translate(pos);
+	P->ForceTransform(M);
+}
+//-Alundaio

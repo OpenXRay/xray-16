@@ -22,10 +22,15 @@
 #include "string_table.h"
 #include "../xrEngine/igame_persistent.h"
 #include "autosave_manager.h"
+//Alundaio
+#include "pch_script.h"
+#include "../../xrServerEntities/script_engine.h" 
+//-Alundaio
 
 XRCORE_API string_path g_bug_report_file;
 
 using namespace ALife;
+using namespace luabind; //Alundaio
 
 extern string_path g_last_saved_game;
 
@@ -90,12 +95,26 @@ void CALifeStorageManager::save	(LPCSTR save_name_no_check, bool update_name)
 	Msg							("* Game %s is successfully saved to file '%s'",m_save_name,temp);
 #endif // DEBUG
 
+	//Alundaio: To get the savegame fname to make our own custom save states
+	luabind::functor<void>	funct;
+	ai().script_engine().functor("alife_storage_manager.CALifeStorageManager_save", funct);
+	if (funct)
+		funct((LPCSTR)m_save_name);
+	//-Alundaio
+
 	if (!update_name)
 		xr_strcpy					(m_save_name,save);
 }
 
 void CALifeStorageManager::load	(void *buffer, const u32 &buffer_size, LPCSTR file_name)
 {
+	//Alundaio: So we can get the fname to make our own custom save states
+	luabind::functor<void>	funct;
+	ai().script_engine().functor("alife_storage_manager.CALifeStorageManager_load", funct);
+	if (funct)
+		funct(file_name);
+	//-Alundaio
+
 	IReader						source(buffer,buffer_size);
 	header().load				(source);
 	time_manager().load			(source);

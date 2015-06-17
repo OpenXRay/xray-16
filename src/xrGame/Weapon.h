@@ -182,7 +182,7 @@ public:
     {
         return true;
     };
-
+	
     //обновление видимости для косточек аддонов
     void UpdateAddonsVisibility();
     void UpdateHUDAddonsVisibility();

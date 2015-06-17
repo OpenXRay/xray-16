@@ -71,6 +71,10 @@ namespace GameObject
 		eAttachVehicle,
 		eDetachVehicle,
 		eUseVehicle,
+		// weapon
+		eOnWeaponZoomIn,
+		eOnWeaponZoomOut,
+		eOnWeaponJammed,
         //-AVO
 
         eDummy = u32(-1),

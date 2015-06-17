@@ -15,7 +15,7 @@
 #include "character_info_defs.h"
 #include "game_graph_space.h"
 #include "game_location_selector.h"
-
+#include "ui/UIWindow.h" //Alundaio
 enum EPdaMsg;
 enum ESoundTypes;
 enum ETaskState;
@@ -87,6 +87,7 @@ class CScriptGameObject;
 class CZoneCampfire;
 class CPhysicObject;
 class CArtefact;
+class CUIWindow; //Alundaio: For ScopeTexture
 
 #ifdef DEBUG
     template <typename _object_type>
@@ -385,8 +386,14 @@ public:
             bool				Weapon_IsGrenadeLauncherAttached();
             bool				Weapon_IsScopeAttached			();
             bool				Weapon_IsSilencerAttached		();
-			void				Weapon_AddonAttach(CScriptGameObject &item); //Alundaio
-			void				Weapon_AddonDetach(LPCSTR item_section);	//Alundaio
+			//Alundaio
+			void				Weapon_AddonAttach(CScriptGameObject* item);
+			void				Weapon_AddonDetach(LPCSTR item_section);
+
+			void				AttachVehicle(CScriptGameObject* veh);
+			void				DetachVehicle();
+			void				ForceSetPosition(Fvector3 pos);
+			//-Alundaio
 
             int					Weapon_GrenadeLauncher_Status	();
             int					Weapon_Scope_Status				();
@@ -591,6 +598,19 @@ public:
             float				GetAnomalyPower			();
             void				SetAnomalyPower			(float p);
             
+			//Alun
+            float				GetArtefactHealthRestoreSpeed			();
+            float				GetArtefactRadiationRestoreSpeed		();
+            float				GetArtefactSatietyRestoreSpeed			();
+            float				GetArtefactPowerRestoreSpeed			();
+            float				GetArtefactBleedingRestoreSpeed			(); 
+                        
+            void				SetArtefactHealthRestoreSpeed			(float value);
+            void				SetArtefactRadiationRestoreSpeed		(float value);
+            void				SetArtefactSatietyRestoreSpeed			(float value);
+            void				SetArtefactPowerRestoreSpeed			(float value);
+            void				SetArtefactBleedingRestoreSpeed			(float value);
+			//-Alun
     
             // HELICOPTER
             CHelicopter*		get_helicopter			();

@@ -182,11 +182,6 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
         .def("weapon_is_scope",				&CScriptGameObject::Weapon_IsScopeAttached)
         .def("weapon_is_silencer",			&CScriptGameObject::Weapon_IsSilencerAttached)
 
-		//Alundaio: Extended exports
-		.def("weapon_addon_attach", &CScriptGameObject::Weapon_AddonAttach)
-		.def("weapon_addon_detach", &CScriptGameObject::Weapon_AddonDetach)
-		//Alundaio: END
-
         .def("weapon_grenadelauncher_status",	&CScriptGameObject::Weapon_GrenadeLauncher_Status)
         .def("weapon_scope_status",				&CScriptGameObject::Weapon_Scope_Status)
         .def("weapon_silencer_status",			&CScriptGameObject::Weapon_Silencer_Status)
@@ -245,6 +240,18 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
         .def("get_anomaly_power",			&CScriptGameObject::GetAnomalyPower)
         .def("set_anomaly_power",			&CScriptGameObject::SetAnomalyPower)
 
+        .def("get_artefact_health",			&CScriptGameObject::GetArtefactHealthRestoreSpeed)
+        .def("get_artefact_radiation",			&CScriptGameObject::GetArtefactRadiationRestoreSpeed)
+        .def("get_artefact_satiety",			&CScriptGameObject::GetArtefactSatietyRestoreSpeed)
+        .def("get_artefact_power",			&CScriptGameObject::GetArtefactPowerRestoreSpeed)
+        .def("get_artefact_bleeding",			&CScriptGameObject::GetArtefactBleedingRestoreSpeed)        
+
+        .def("set_artefact_health",			&CScriptGameObject::SetArtefactHealthRestoreSpeed)
+        .def("set_artefact_radiation",			&CScriptGameObject::SetArtefactRadiationRestoreSpeed)
+        .def("set_artefact_satiety",			&CScriptGameObject::SetArtefactSatietyRestoreSpeed)
+        .def("set_artefact_power",			&CScriptGameObject::SetArtefactPowerRestoreSpeed)
+        .def("set_artefact_bleeding",			&CScriptGameObject::SetArtefactBleedingRestoreSpeed)
+                                
         //HELICOPTER
         .def("get_helicopter",              &CScriptGameObject::get_helicopter)
         .def("get_car",						&CScriptGameObject::get_car)
@@ -334,6 +341,14 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
         .def("start_particles",				&CScriptGameObject::start_particles)
         .def("stop_particles",				&CScriptGameObject::stop_particles)
     
+		//Alundaio: Extended exports
+		.def("attach_vehicle", &CScriptGameObject::AttachVehicle)
+		.def("detach_vehicle", &CScriptGameObject::DetachVehicle)
+		.def("weapon_addon_attach", &CScriptGameObject::Weapon_AddonAttach)
+		.def("weapon_addon_detach", &CScriptGameObject::Weapon_AddonDetach)
+		.def("force_set_position", &CScriptGameObject::ForceSetPosition)
+		//Alundaio: END
+		
         //AVO: additional functions
         .def("is_actor_outdoors", &CScriptGameObject::IsActorOutdoors)
         .def("is_game_object", &CScriptGameObject::IsGameObject)
