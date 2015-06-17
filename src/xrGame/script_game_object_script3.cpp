@@ -204,11 +204,6 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("weapon_scope_status", &CScriptGameObject::Weapon_Scope_Status)
         .def("weapon_silencer_status", &CScriptGameObject::Weapon_Silencer_Status)
 
-        //Alundaio: Extended exports
-        .def("weapon_addon_attach", &CScriptGameObject::Weapon_AddonAttach)
-        .def("weapon_addon_detach", &CScriptGameObject::Weapon_AddonDetach)
-        //Alundaio: END
-
         .def("allow_sprint", &CScriptGameObject::AllowSprint)
 
         .def("set_start_dialog", &CScriptGameObject::SetStartDialog)
@@ -256,6 +251,18 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("disable_anomaly", &CScriptGameObject::DisableAnomaly)
         .def("get_anomaly_power", &CScriptGameObject::GetAnomalyPower)
         .def("set_anomaly_power", &CScriptGameObject::SetAnomalyPower)
+
+        .def("get_artefact_health", &CScriptGameObject::GetArtefactHealthRestoreSpeed)
+        .def("get_artefact_radiation", &CScriptGameObject::GetArtefactRadiationRestoreSpeed)
+        .def("get_artefact_satiety", &CScriptGameObject::GetArtefactSatietyRestoreSpeed)
+        .def("get_artefact_power", &CScriptGameObject::GetArtefactPowerRestoreSpeed)
+        .def("get_artefact_bleeding", &CScriptGameObject::GetArtefactBleedingRestoreSpeed)
+
+        .def("set_artefact_health", &CScriptGameObject::SetArtefactHealthRestoreSpeed)
+        .def("set_artefact_radiation", &CScriptGameObject::SetArtefactRadiationRestoreSpeed)
+        .def("set_artefact_satiety", &CScriptGameObject::SetArtefactSatietyRestoreSpeed)
+        .def("set_artefact_power", &CScriptGameObject::SetArtefactPowerRestoreSpeed)
+        .def("set_artefact_bleeding", &CScriptGameObject::SetArtefactBleedingRestoreSpeed)
 
         // HELICOPTER
         .def("get_helicopter", &CScriptGameObject::get_helicopter)
@@ -346,6 +353,14 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("set_level_changer_invitation", &CScriptGameObject::set_level_changer_invitation)
         .def("start_particles", &CScriptGameObject::start_particles)
         .def("stop_particles", &CScriptGameObject::stop_particles)
+
+        //Alundaio: Extended exports
+        .def("weapon_addon_attach", &CScriptGameObject::Weapon_AddonAttach)
+        .def("weapon_addon_detach", &CScriptGameObject::Weapon_AddonDetach)
+        .def("attach_vehicle", &CScriptGameObject::AttachVehicle)
+        .def("detach_vehicle", &CScriptGameObject::DetachVehicle)
+        .def("force_set_position", &CScriptGameObject::ForceSetPosition)
+        //Alundaio: END
 
         //AVO: additional functions
         .def("is_actor_outdoors", &CScriptGameObject::IsActorOutdoors)

@@ -171,6 +171,12 @@ void CWeaponMagazined::FireStart()
     }
     else
     { // misfire
+        //Alundaio
+        CGameObject	*object = smart_cast<CGameObject*>(H_Parent());
+        if (object)
+            object->callback(GameObject::eOnWeaponJammed)(object->lua_game_object(), this->lua_game_object());
+        //-Alundaio
+
         if (smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
             CurrentGameUI()->AddCustomStatic("gun_jammed", true);
 
@@ -1167,6 +1173,12 @@ void CWeaponMagazined::OnZoomIn()
     if (GetState() == eIdle)
         PlayAnimIdle();
 
+	//Alundaio: callback not sure why vs2013 gives error, it's fine
+	CGameObject	*object = smart_cast<CGameObject*>(H_Parent());
+	if (object)
+		object->callback(GameObject::eOnWeaponZoomIn)(object->lua_game_object(),this->lua_game_object());
+	//-Alundaio
+
     CActor* pActor = smart_cast<CActor*>(H_Parent());
     if (pActor)
     {
@@ -1189,6 +1201,12 @@ void CWeaponMagazined::OnZoomOut()
 
     if (GetState() == eIdle)
         PlayAnimIdle();
+
+	//Alundaio
+	CGameObject	*object = smart_cast<CGameObject*>(H_Parent());
+	if (object)
+		object->callback(GameObject::eOnWeaponZoomOut)(object->lua_game_object(), this->lua_game_object());
+	//-Alundaio
 
     CActor* pActor = smart_cast<CActor*>(H_Parent());
 

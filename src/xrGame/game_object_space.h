@@ -74,6 +74,11 @@ enum ECallbackType
     eDetachVehicle,
     eUseVehicle,
 
+    // weapon
+    eOnWeaponZoomIn,
+    eOnWeaponZoomOut,
+    eOnWeaponJammed,
+
     eDummy = u32(-1),
 };
 };

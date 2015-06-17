@@ -90,6 +90,9 @@ void CActor::detach_Vehicle()
     car->PPhysicsShell()->SplitterHolderActivate();
     m_holder->detach_Actor(); //
 
+    // Real Wolf: колбек на высадку из машины. 01.08.2014.
+    this->callback(GameObject::eDetachVehicle)(car->lua_game_object());
+
     character_physics_support()->movement()->SetPosition(m_holder->ExitPosition());
     character_physics_support()->movement()->SetVelocity(m_holder->ExitVelocity());
 
@@ -106,9 +109,6 @@ void CActor::detach_Vehicle()
 
     //.	SetWeaponHideState(whs_CAR, FALSE);
     SetWeaponHideState(INV_STATE_CAR, false);
-
-    // Real Wolf: колбек на высадку из машины. 01.08.2014.
-    this->callback(GameObject::eDetachVehicle)(car->lua_game_object());
 }
 
 bool CActor::use_Vehicle(CHolderCustom* object)

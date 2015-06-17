@@ -200,6 +200,9 @@ CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
 
     m_disabled_hitmarks = false;
     m_inventory_disabled = false;
+
+    // Alex ADD: for smooth crouch fix
+    CurrentHeight = 0.f;
 }
 
 CActor::~CActor()
@@ -440,6 +443,9 @@ void CActor::Load(LPCSTR section)
     m_sInventoryBoxUseAction = "inventory_box_use";
     //---------------------------------------------------------------------
     m_sHeadShotParticle = READ_IF_EXISTS(pSettings, r_string, section, "HeadShotParticle", 0);
+
+    // Alex ADD: for smooth crouch fix
+    CurrentHeight = CameraHeight();
 }
 
 void CActor::PHHit(SHit& H) { m_pPhysics_support->in_Hit(H, false); }

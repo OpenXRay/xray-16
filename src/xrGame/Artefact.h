@@ -36,6 +36,19 @@ public:
     virtual void create_physic_shell();
 
     virtual CArtefact* cast_artefact() { return this; }
+
+    float GetHealthPower() const { return m_fHealthRestoreSpeed; }
+    float GetRadiationPower() const { return m_fRadiationRestoreSpeed; }
+    float GetSatietyPower() const { return m_fSatietyRestoreSpeed; }
+    float GetPowerPower() const { return m_fPowerRestoreSpeed; }
+    float GetBleedingPower() const { return m_fBleedingRestoreSpeed; }
+
+    void SetHealthPower(const float value) { m_fHealthRestoreSpeed = value; }
+    void SetRadiationPower(const float value) { m_fRadiationRestoreSpeed = value; }
+    void SetSatietyPower(const float value) { m_fSatietyRestoreSpeed = value; }
+    void SetPowerPower(const float value) { m_fPowerRestoreSpeed = value; }
+    void SetBleedingPower(const float value) { m_fBleedingRestoreSpeed = value; }
+
 protected:
     virtual void UpdateCLChild(){};
     virtual void CreateArtefactActivation();
