@@ -387,12 +387,29 @@ public:
             bool				Weapon_IsScopeAttached			();
             bool				Weapon_IsSilencerAttached		();
 			//Alundaio
+			//Weapon
 			void				Weapon_AddonAttach(CScriptGameObject* item);
 			void				Weapon_AddonDetach(LPCSTR item_section);
 
+			//Weapon & Outfit
+			bool				HasUpgrade(LPCSTR upgrade) const;
+			void				AddUpgrade(LPCSTR upgrade);
+			void				IterateInstalledUpgrades(luabind::functor<void> functor);
+			
+			//Car
+			CScriptGameObject*  GetAttachedVehicle();
 			void				AttachVehicle(CScriptGameObject* veh);
 			void				DetachVehicle();
-			void				ForceSetPosition(Fvector3 pos);
+
+			//Any class that has PPhysicsShell
+			void				ForceSetPosition(Fvector pos, bool bActivate);
+
+			//Any class that is derived from CHudItem
+			u32					PlayHudMotion(LPCSTR M, bool bMixIn,u32 state);
+			void				SwitchState(u32 state);
+			u32					GetState();
+			void				ActivateHudItem();
+			void				DeactivateHudItem();
 			//-Alundaio
 
             int					Weapon_GrenadeLauncher_Status	();
@@ -826,7 +843,8 @@ public:
             _DECLARE_FUNCTION10(IsTorch, bool);
             _DECLARE_FUNCTION10(IsWeaponGL, bool);
             _DECLARE_FUNCTION10(IsInventoryBox, bool);
-            bool IsActorOutdoors() const;
+            bool IsActorIndoors() const;
+			bool IsNPCIndoors() const;
             void SetHealthEx(float hp);
             //end AVO
 

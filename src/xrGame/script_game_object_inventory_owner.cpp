@@ -47,6 +47,10 @@
 #include "doors_door.h"
 #include "Torch.h"
 #include "physicobject.h"
+//Alundaio
+#include "inventory_upgrade_manager.h"
+#include "inventory_item.h"
+//-Alundaio
 
 bool CScriptGameObject::GiveInfoPortion(LPCSTR info_id)
 {
@@ -1612,8 +1616,12 @@ void CScriptGameObject::Weapon_AddonAttach(CScriptGameObject* item)
 		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CWeaponMagazined : cannot access class member Weapon_AddonAttach!");
 		return;
 	}
-	
-	PIItem pItm = smart_cast<PIItem>(item);
+	CInventoryItem* pItm = item->object().cast_inventory_item();
+	if (!pItm)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CWeaponMagazined : trying to attach non-CInventoryItem!");
+		return;
+	}
 	if (weapon->CanAttach(pItm))
 	{
 		weapon->Attach(pItm, true);
@@ -1632,6 +1640,54 @@ void CScriptGameObject::Weapon_AddonDetach(LPCSTR item_section)
 	if (weapon->CanDetach(item_section))
 	{
 		weapon->Detach(item_section, true);
+	}
+}
+
+void CScriptGameObject::AddUpgrade(LPCSTR upgrade)
+{
+	CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
+	if (!item)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryItem : cannot access class member AddUpgrade!");
+		return;
+	}
+
+	if (!pSettings->section_exist(upgrade))
+		return;
+
+	item->install_upgrade(upgrade);
+	//ai().alife().inventory_upgrade_manager().upgrade_install(*item, (upgrade), false);
+
+	return;
+}
+
+bool CScriptGameObject::HasUpgrade(LPCSTR upgrade) const
+{
+	CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
+	if (!item)
+	{
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryItem : cannot access class member HasUpgrade!");
+		return false;
+	}
+
+	if (!pSettings->section_exist(upgrade))
+		return false;
+
+	return item->verify_upgrade(upgrade);
+}
+
+void CScriptGameObject::IterateInstalledUpgrades(luabind::functor<void> functor)
+{
+	CInventoryItem* Item = smart_cast<CInventoryItem*>(&object());
+	if (!Item)
+		return;
+
+	CInventoryItem::Upgrades_type m_upgrades = Item->get_upgrades();
+	CInventoryItem::Upgrades_type::const_iterator ib = m_upgrades.begin();
+	CInventoryItem::Upgrades_type::const_iterator ie = m_upgrades.end();
+	for (; ib != ie; ++ib)
+	{
+		functor((*ib).c_str(), object().lua_game_object());
 	}
 }
 //Alundaio: END

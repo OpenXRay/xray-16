@@ -32,6 +32,7 @@ private:
 	CUITextWnd*			m_ui_weapon_cur_ammo;
 	CUITextWnd*			m_ui_weapon_fmj_ammo;
 	CUITextWnd*			m_ui_weapon_ap_ammo;
+	CUITextWnd*			m_ui_weapon_third_ammo; //Alundaio
 	CUITextWnd*			m_fire_mode;
 	CUITextWnd*			m_ui_grenade;
 	II_BriefInfo		m_item_info;

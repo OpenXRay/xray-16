@@ -119,6 +119,11 @@ void CUIHudStatesWnd::InitFromXml( CUIXml& xml, LPCSTR path )
 	m_ui_weapon_cur_ammo		= UIHelper::CreateTextWnd( xml, "static_cur_ammo", this );
 	m_ui_weapon_fmj_ammo		= UIHelper::CreateTextWnd( xml, "static_fmj_ammo", this );
 	m_ui_weapon_ap_ammo			= UIHelper::CreateTextWnd( xml, "static_ap_ammo", this );
+
+	//Alundaio: Option to display a third ammo type
+	m_ui_weapon_third_ammo		= UIHelper::CreateTextWnd(xml, "static_third_ammo", this);		
+	//-Alundaio
+
 	m_fire_mode					= UIHelper::CreateTextWnd( xml, "static_fire_mode", this );
 	m_ui_grenade				= UIHelper::CreateTextWnd( xml, "static_grenade", this );
 	
@@ -328,6 +333,11 @@ void CUIHudStatesWnd::UpdateActiveItemInfo( CActor* actor )
 		m_ui_weapon_cur_ammo->SetText	( m_item_info.cur_ammo.c_str() );
 		m_ui_weapon_fmj_ammo->SetText	( m_item_info.fmj_ammo.c_str() );
 		m_ui_weapon_ap_ammo->SetText	( m_item_info.ap_ammo.c_str() );
+
+		//Alundaio:
+		if (m_ui_weapon_third_ammo)
+			m_ui_weapon_third_ammo->SetText(m_item_info.third_ammo.c_str());
+		//-Alundaio
 		
 		m_ui_grenade->SetText	( m_item_info.grenade.c_str() );
 

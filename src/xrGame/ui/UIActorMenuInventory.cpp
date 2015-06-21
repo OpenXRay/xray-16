@@ -759,7 +759,7 @@ bool CUIActorMenu::ToQuickSlot(CUICellItem* itm)
 	if(!eat_item)
 		return false;
 
-	//Alundaio: Prevent icons greater then 1x1 to be quick slotted
+	//Alundaio: Fix deep recursion if placing icon greater then col/row set in actor_menu.xml
 	Ivector2 iWH = iitem->GetInvGridRect().rb;
 	if (iWH.x > 1 || iWH.y > 1)
 		return false;

@@ -407,31 +407,36 @@ BOOL CDemoRecord::ProcessCam(SCamEffectorInfo& info)
 
 void CDemoRecord::IR_OnKeyboardPress(int dik)
 {
-    if (dik == DIK_MULTIPLY) m_b_redirect_input_to_level = !m_b_redirect_input_to_level;
+	if (dik == DIK_MULTIPLY) m_b_redirect_input_to_level = !m_b_redirect_input_to_level;
 
-    if (m_b_redirect_input_to_level)
-    {
-        g_pGameLevel->IR_OnKeyboardPress(dik);
-        return;
-    }
-    if (dik == DIK_GRAVE)
-        Console->Show();
-    if (dik == DIK_SPACE) RecordKey();
-    if (dik == DIK_BACK) MakeCubemap();
-    if (dik == DIK_F11) MakeLevelMapScreenshot(IR_GetKeyState(DIK_LCONTROL));
-    if (dik == DIK_F12) MakeScreenshot();
-    if (dik == DIK_ESCAPE) fLifeTime = -1;
+	if (m_b_redirect_input_to_level)
+	{
+		g_pGameLevel->IR_OnKeyboardPress(dik);
+		return;
+	}
+	if (dik == DIK_GRAVE)
+		Console->Show();
+	if (dik == DIK_SPACE) RecordKey();
+	if (dik == DIK_BACK) MakeCubemap();
+	if (dik == DIK_F11) MakeLevelMapScreenshot(IR_GetKeyState(DIK_LCONTROL));
+	if (dik == DIK_F12) MakeScreenshot();
+	if (dik == DIK_ESCAPE) fLifeTime = -1;
 
-#ifndef MASTER_GOLD
-    if (dik == DIK_RETURN)
-    {
-        if (g_pGameLevel->CurrentEntity())
-        {
-            g_pGameLevel->CurrentEntity()->ForceTransform(m_Camera);
-            fLifeTime = -1;
-        }
-    }
-#endif // #ifndef MASTER_GOLD
+//Alundaio: Teleport to demo cam
+//#ifndef MASTER_GOLD
+	if (dik == DIK_RETURN)
+	{
+		if (strstr(Core.Params, "-dbg"))
+		{
+			if (g_pGameLevel->CurrentEntity())
+			{
+				g_pGameLevel->CurrentEntity()->ForceTransform(m_Camera);
+				fLifeTime = -1;
+			}
+		}
+	}
+//#endif // #ifndef MASTER_GOLD
+//-Alundaio
 
     if (dik == DIK_PAUSE)
         Device.Pause(!Device.Paused(), TRUE, TRUE, "demo_record");
