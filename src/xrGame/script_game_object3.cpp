@@ -42,6 +42,8 @@
 #include "Artefact.h"
 #include "holder_custom.h"
 #include "Actor.h"
+#include "CharacterPhysicsSupport.h"
+#include "player_hud.h"
 //-Alundaio
 
 namespace MemorySpace
@@ -1224,111 +1226,233 @@ bool CScriptGameObject::is_weapon_going_to_be_strapped(CScriptGameObject const* 
 //Alundaio: Taken from Radium
 float CScriptGameObject::GetArtefactHealthRestoreSpeed()
 {
-	CArtefact* artefact = smart_cast<CArtefact*>(&object());
-	THROW(artefact);
+    CArtefact* artefact = smart_cast<CArtefact*>(&object());
+    THROW(artefact);
 
-	return artefact->GetHealthPower();
+    return artefact->GetHealthPower();
 }
 
 float CScriptGameObject::GetArtefactRadiationRestoreSpeed()
 {
-	CArtefact* artefact = smart_cast<CArtefact*>(&object());
-	THROW(artefact);
+    CArtefact* artefact = smart_cast<CArtefact*>(&object());
+    THROW(artefact);
 
-	return artefact->GetRadiationPower();
+    return artefact->GetRadiationPower();
 }
 
 float CScriptGameObject::GetArtefactSatietyRestoreSpeed()
 {
-	CArtefact* artefact = smart_cast<CArtefact*>(&object());
-	THROW(artefact);
+    CArtefact* artefact = smart_cast<CArtefact*>(&object());
+    THROW(artefact);
 
-	return artefact->GetSatietyPower();
+    return artefact->GetSatietyPower();
 }
 
 float CScriptGameObject::GetArtefactPowerRestoreSpeed()
 {
-	CArtefact* artefact = smart_cast<CArtefact*>(&object());
-	THROW(artefact);
+    CArtefact* artefact = smart_cast<CArtefact*>(&object());
+    THROW(artefact);
 
-	return artefact->GetPowerPower();
+    return artefact->GetPowerPower();
 }
 
 float CScriptGameObject::GetArtefactBleedingRestoreSpeed()
 {
-	CArtefact* artefact = smart_cast<CArtefact*>(&object());
-	THROW(artefact);
+    CArtefact* artefact = smart_cast<CArtefact*>(&object());
+    THROW(artefact);
 
-	return artefact->GetBleedingPower();
+    return artefact->GetBleedingPower();
 }
 
 void CScriptGameObject::SetArtefactHealthRestoreSpeed(float value)
 {
-	CArtefact* artefact = smart_cast<CArtefact*>(&object());
-	THROW(artefact);
+    CArtefact* artefact = smart_cast<CArtefact*>(&object());
+    THROW(artefact);
 
-	artefact->SetHealthPower(value);
+    artefact->SetHealthPower(value);
 }
 
 void CScriptGameObject::SetArtefactRadiationRestoreSpeed(float value)
 {
-	CArtefact* artefact = smart_cast<CArtefact*>(&object());
-	THROW(artefact);
+    CArtefact* artefact = smart_cast<CArtefact*>(&object());
+    THROW(artefact);
 
-	artefact->SetRadiationPower(value);
+    artefact->SetRadiationPower(value);
 }
 
 void CScriptGameObject::SetArtefactSatietyRestoreSpeed(float value)
 {
-	CArtefact* artefact = smart_cast<CArtefact*>(&object());
-	THROW(artefact);
+    CArtefact* artefact = smart_cast<CArtefact*>(&object());
+    THROW(artefact);
 
-	artefact->SetSatietyPower(value);
+    artefact->SetSatietyPower(value);
 }
 
 void CScriptGameObject::SetArtefactPowerRestoreSpeed(float value)
 {
-	CArtefact* artefact = smart_cast<CArtefact*>(&object());
-	THROW(artefact);
+    CArtefact* artefact = smart_cast<CArtefact*>(&object());
+    THROW(artefact);
 
-	artefact->SetPowerPower(value);
+    artefact->SetPowerPower(value);
 }
 
 void CScriptGameObject::SetArtefactBleedingRestoreSpeed(float value)
 {
-	CArtefact* artefact = smart_cast<CArtefact*>(&object());
-	THROW(artefact);
+    CArtefact* artefact = smart_cast<CArtefact*>(&object());
+    THROW(artefact);
 
-	artefact->SetBleedingPower(value);
+    artefact->SetBleedingPower(value);
 }
 
 //Alundaio
 void CScriptGameObject::AttachVehicle(CScriptGameObject* veh)
 {
-	CActor *actor = smart_cast<CActor*>(&object());
-	if (actor)
-	{
-		CHolderCustom* vehicle = smart_cast<CHolderCustom*>(veh);
-		if (vehicle)
-			actor->attach_Vehicle(vehicle);
-	}
+    CActor* actor = smart_cast<CActor*>(&object());
+    if (actor)
+    {
+        CHolderCustom* vehicle = veh->object().cast_holder_custom();//smart_cast<CHolderCustom*>(veh->object());
+        if (vehicle)
+            actor->attach_Vehicle(vehicle);
+    }
 }
 
 void CScriptGameObject::DetachVehicle()
 {
-	CActor *actor = smart_cast<CActor*>(&object());
-	if (actor)
-		actor->detach_Vehicle();
+    CActor* actor = smart_cast<CActor*>(&object());
+    if (actor)
+        actor->detach_Vehicle();
 }
 
-void CScriptGameObject::ForceSetPosition(Fvector3 pos)
+CScriptGameObject* CScriptGameObject::GetAttachedVehicle()
 {
-	CPhysicsShellHolder* P = smart_cast<CPhysicsShellHolder*>(this);
-	if (!P)
-		return;
+    CActor* actor = smart_cast<CActor*>(&object());
+    if (!actor)
+        return nullptr;
 
-	Fmatrix	M = P->XFORM();
-	M.translate(pos);
-	P->ForceTransform(M);
+    CHolderCustom* H = actor->Holder();
+    if (!H)
+        return nullptr;
+
+    CGameObject* GO = smart_cast<CGameObject*>(H);
+    if (!GO)
+        return nullptr;
+
+    return GO->lua_game_object();
 }
+
+u32 CScriptGameObject::PlayHudMotion(pcstr M, bool mixIn, u32 state)
+{
+    CWeapon* Weapon = object().cast_weapon();
+    if (Weapon)
+    {
+        if (!Weapon->isHUDAnimationExist(M))
+            return 0;
+
+        return Weapon->PlayHUDMotion(M, mixIn, Weapon, state);
+    }
+
+    CHudItem* itm = object().cast_inventory_item()->cast_hud_item();
+    if (!itm)
+        return 0;
+
+    if (!itm->isHUDAnimationExist(M))
+        return 0;
+
+    return itm->PlayHUDMotion(M, mixIn, itm, state);
+}
+
+void CScriptGameObject::SwitchState(u32 state)
+{
+    CWeapon* Weapon = object().cast_weapon();
+    if (Weapon)
+    {
+        Weapon->SwitchState(state);
+        return;
+    }
+
+    CInventoryItem* IItem = object().cast_inventory_item();
+    if (IItem)
+    {
+        CHudItem* itm = IItem->cast_hud_item();
+        if (itm)
+            itm->SwitchState(state);
+    }
+}
+
+u32 CScriptGameObject::GetState()
+{
+    CWeapon* Weapon = object().cast_weapon();
+    if (Weapon)
+    {
+        return Weapon->GetState();
+    }
+
+    CInventoryItem* IItem = object().cast_inventory_item();
+    if (IItem)
+    {
+        CHudItem* itm = IItem->cast_hud_item();
+        if (itm)
+            return itm->GetState();
+    }
+
+    return 65535;
+}
+
+void CScriptGameObject::ActivateHudItem()
+{
+    CWeapon* Weapon = object().cast_weapon();
+    if (Weapon)
+    {
+        Weapon->ActivateItem();
+        return;
+    }
+
+    CInventoryItem* IItem = object().cast_inventory_item();
+    if (!IItem)
+        return;
+
+    IItem->ActivateItem();
+}
+
+void CScriptGameObject::DeactivateHudItem()
+{
+    CWeapon* Weapon = object().cast_weapon();
+    if (Weapon)
+    {
+        Weapon->DeactivateItem();
+        return;
+    }
+
+    CInventoryItem* IItem = object().cast_inventory_item();
+    if (!IItem)
+        return;
+
+    IItem->DeactivateItem();
+}
+
+void CScriptGameObject::ForceSetPosition(Fvector pos, bool bActivate = false)
+{
+    CPhysicsShellHolder* sh = object().cast_physics_shell_holder();
+    if (!sh)
+        return;
+
+    CPhysicsShell* shell = sh->PPhysicsShell();
+    if (shell)
+    {
+        if (bActivate)
+            sh->activate_physic_shell();
+
+        Fmatrix M = object().XFORM();
+        M.c = pos;
+        M.set(M);
+
+        shell->SetGlTransformDynamic(M);
+        if (sh->character_physics_support())
+            sh->character_physics_support()->ForceTransform(M);
+    }
+    else
+        ai().script_engine().script_log(LuaMessageType::Error, "force_set_position: object %s has no physics shell!",
+                                        *object().cName());
+}
+
 //-Alundaio

@@ -1338,34 +1338,30 @@ bool CWeaponMagazined::GetBriefInfo(II_BriefInfo& info)
     GetSuitableAmmoTotal(); // update m_BriefInfo_CalcFrame
     info.grenade = "";
 
-    u32 at_size = m_ammoTypes.size();
+    const u32 at_size = m_ammoTypes.size();
     if (unlimited_ammo() || at_size == 0)
     {
         info.fmj_ammo._set("--");
         info.ap_ammo._set("--");
+        info.third_ammo._set("--"); //Alundaio
     }
     else
     {
         // GetSuitableAmmoTotal(); //mp = all type
+        //Alundaio: Added third ammo type and cleanup
+        info.fmj_ammo._set("");
+        info.ap_ammo._set("");
+        info.third_ammo._set("");
 
-        xr_sprintf(int_str, "%d", GetAmmoCount(0)); // !!!!!!!!!!! == 0 temp
+        xr_sprintf(int_str, "%d", GetAmmoCount(m_ammoType));
+
         if (m_ammoType == 0)
-            info.fmj_ammo = int_str;
+            info.fmj_ammo._set(int_str);
+        else if (m_ammoType == 1)
+            info.ap_ammo._set(int_str);
         else
-            info.ap_ammo = int_str;
-
-        if (at_size == 2)
-        {
-            xr_sprintf(int_str, "%d", GetAmmoCount(1));
-            if (m_ammoType == 0)
-                info.ap_ammo = int_str;
-            else
-                info.fmj_ammo = int_str;
-        }
-        else
-        {
-            info.ap_ammo = "";
-        }
+            info.third_ammo._set(int_str);
+        //-Alundaio
     }
 
     if (ae != 0 && m_magazine.size() != 0)

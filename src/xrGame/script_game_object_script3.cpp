@@ -355,15 +355,32 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("stop_particles", &CScriptGameObject::stop_particles)
 
         //Alundaio: Extended exports
-        .def("weapon_addon_attach", &CScriptGameObject::Weapon_AddonAttach)
-        .def("weapon_addon_detach", &CScriptGameObject::Weapon_AddonDetach)
+        //For Car
         .def("attach_vehicle", &CScriptGameObject::AttachVehicle)
         .def("detach_vehicle", &CScriptGameObject::DetachVehicle)
+
+        //For Weapons
+        .def("weapon_addon_attach", &CScriptGameObject::Weapon_AddonAttach)
+        .def("weapon_addon_detach", &CScriptGameObject::Weapon_AddonDetach)
+
+        //For Weapon & Outfit
+        .def("add_upgrade", &CScriptGameObject::AddUpgrade)
+        .def("has_upgrade", &CScriptGameObject::HasUpgrade)
+        .def("iterate_installed_upgrades", &CScriptGameObject::IterateInstalledUpgrades)
+
+        // For CHudItem
+        .def("play_hud_motion", &CScriptGameObject::PlayHudMotion)
+        .def("switch_state", &CScriptGameObject::SwitchState)
+        .def("get_state", &CScriptGameObject::GetState)
+        .def("activate_hud_item", &CScriptGameObject::ActivateHudItem)
+        .def("deactivate_hud_item", &CScriptGameObject::DeactivateHudItem)
+
+        //For anything with PPhysicShell (ie. car, heli, npcs, player)
         .def("force_set_position", &CScriptGameObject::ForceSetPosition)
         //Alundaio: END
 
         //AVO: additional functions
-        .def("is_actor_outdoors", &CScriptGameObject::IsActorOutdoors)
+        .def("is_actor_indoors", &CScriptGameObject::IsActorIndoors)
         .def("is_game_object", &CScriptGameObject::isGameObject)
         //.def("is_car", &CScriptGameObject::isCar)
         .def("is_helicopter", &CScriptGameObject::isHeli)

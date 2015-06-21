@@ -402,12 +402,29 @@ public:
     int Weapon_Silencer_Status();
 
     //Alundaio
+    //Weapon
     void Weapon_AddonAttach(CScriptGameObject* item);
     void Weapon_AddonDetach(pcstr item_section);
 
+    //Weapon & Outfit
+    bool HasUpgrade(pcstr upgrade) const;
+    void AddUpgrade(pcstr upgrade);
+    void IterateInstalledUpgrades(luabind::functor<void> functor);
+
+    //Car
+    CScriptGameObject* GetAttachedVehicle();
     void AttachVehicle(CScriptGameObject* veh);
     void DetachVehicle();
-    void ForceSetPosition(Fvector3 pos);
+
+    //Any class that has PPhysicsShell
+    void ForceSetPosition(Fvector3 pos, bool bActivate);
+
+    //Any class that is derived from CHudItem
+    u32 PlayHudMotion(pcstr M, bool mixIn, u32 state);
+    void SwitchState(u32 state);
+    u32 GetState();
+    void ActivateHudItem();
+    void DeactivateHudItem();
     //-Alundaio
 
     LPCSTR ProfileName();
@@ -705,7 +722,7 @@ public:
 
     bool invulnerable() const;
     void invulnerable(bool invulnerable);
-    LPCSTR get_smart_cover_description() const;
+    pcstr get_smart_cover_description() const;
     void set_visual_name(LPCSTR visual);
     LPCSTR get_visual_name() const;
 
@@ -842,7 +859,7 @@ public:
     bool isTorch() const;
     bool isWeaponGL() const;
     bool isInventoryBox() const;
-    bool IsActorOutdoors() const;
+    bool IsActorIndoors() const;
     void SetHealthEx(float hp);
     //-AVO
 

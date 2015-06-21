@@ -926,26 +926,25 @@ bool CWeaponMagazinedWGrenade::GetBriefInfo(II_BriefInfo& info)
     {
         info.fmj_ammo._set("--");
         info.ap_ammo._set("--");
+        info.third_ammo._set("--"); //Alundaio
     }
     else
     {
-        u8 ammo_type = m_bGrenadeMode ? m_ammoType2 : m_ammoType;
-        xr_sprintf(int_str, "%d", m_bGrenadeMode ? GetAmmoCount2(0) : GetAmmoCount(0));
-        if (ammo_type == 0)
-            info.fmj_ammo._set(int_str);
-        else
-            info.ap_ammo._set(int_str);
+        //Alundaio: Added third ammo type and cleanup
+        info.fmj_ammo._set("");
+        info.ap_ammo._set("");
+        info.third_ammo._set("");
 
-        if (at_size == 2)
-        {
-            xr_sprintf(int_str, "%d", m_bGrenadeMode ? GetAmmoCount2(1) : GetAmmoCount(1));
-            if (ammo_type == 0)
-                info.ap_ammo._set(int_str);
-            else
-                info.fmj_ammo._set(int_str);
-        }
+        const u8 ammo_type = m_bGrenadeMode ? m_ammoType2 : m_ammoType;
+        xr_sprintf(int_str, "%d", m_bGrenadeMode ? GetAmmoCount2(ammo_type) : GetAmmoCount(ammo_type));
+
+        if (m_ammoType == 0)
+            info.fmj_ammo._set(int_str);
+        else if (m_ammoType == 1)
+            info.ap_ammo._set(int_str);
         else
-            info.ap_ammo._set("");
+            info.third_ammo._set(int_str);
+        //-Alundaio
     }
 
     if (ae != 0 && m_magazine.size() != 0)

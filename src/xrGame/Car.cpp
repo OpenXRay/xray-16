@@ -844,7 +844,7 @@ void CCar::CreateSkeleton(CSE_Abstract* po)
     m_pPhysicsShell->SetAirResistance(0.f, 0.f);
     m_pPhysicsShell->SetPrefereExactIntegration();
     */
-    m_pPhysicsShell = P_build_Shell(this, true, &bone_map);
+    m_pPhysicsShell = P_build_Shell(this, false, &bone_map);
     //-Alundaio
 
     ApplySpawnIniToPhysicShell(&po->spawn_ini(), m_pPhysicsShell, false);

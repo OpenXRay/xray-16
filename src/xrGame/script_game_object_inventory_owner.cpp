@@ -47,6 +47,10 @@
 #include "doors_door.h"
 #include "Torch.h"
 #include "PhysicObject.h"
+//Alundaio
+#include "inventory_upgrade_manager.h"
+#include "inventory_item.h"
+//-Alundaio
 
 bool CScriptGameObject::GiveInfoPortion(LPCSTR info_id)
 {
@@ -1705,7 +1709,13 @@ void CScriptGameObject::Weapon_AddonAttach(CScriptGameObject* item)
         return;
     }
 
-    auto pItm = smart_cast<PIItem>(item);
+    CInventoryItem* pItm = item->object().cast_inventory_item();
+    if (!pItm)
+    {
+        ai().script_engine().script_log(LuaMessageType::Error, "CWeaponMagazined : trying to attach non-CInventoryItem!");
+        return;
+    }
+
     if (weapon->CanAttach(pItm))
         weapon->Attach(pItm, true);
 }
@@ -1721,5 +1731,46 @@ void CScriptGameObject::Weapon_AddonDetach(pcstr item_section)
 
     if (weapon->CanDetach(item_section))
         weapon->Detach(item_section, true);
+}
+
+void CScriptGameObject::AddUpgrade(pcstr upgrade)
+{
+    CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
+    if (!item)
+    {
+        ai().script_engine().script_log(LuaMessageType::Error, "CInventoryItem : cannot access class member AddUpgrade!");
+        return;
+    }
+
+    if (!pSettings->section_exist(upgrade))
+        return;
+
+    item->install_upgrade(upgrade);
+    //ai().alife().inventory_upgrade_manager().upgrade_install(*item, (upgrade), false);
+}
+
+bool CScriptGameObject::HasUpgrade(pcstr upgrade) const
+{
+    CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
+    if (!item)
+    {
+        ai().script_engine().script_log(LuaMessageType::Error, "CInventoryItem : cannot access class member HasUpgrade!");
+        return false;
+    }
+
+    if (!pSettings->section_exist(upgrade))
+        return false;
+
+    return item->verify_upgrade(upgrade);
+}
+
+void CScriptGameObject::IterateInstalledUpgrades(luabind::functor<void> functor)
+{
+    CInventoryItem* Item = smart_cast<CInventoryItem*>(&object());
+    if (!Item)
+        return;
+
+    for (auto upgrade : Item->get_upgrades())
+        functor(upgrade.c_str(), object().lua_game_object());
 }
 //Alundaio: END 

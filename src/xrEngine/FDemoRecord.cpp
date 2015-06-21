@@ -423,7 +423,7 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
     if (dik == DIK_ESCAPE)
         fLifeTime = -1;
 
-#ifndef MASTER_GOLD
+#ifdef DEBUG // ndef MASTER_GOLD // Xottab_DUTY: Teleport to demo cam in Debug configuration
     if (dik == DIK_RETURN)
     {
         if (g_pGameLevel->CurrentEntity())
@@ -432,7 +432,7 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
             fLifeTime = -1;
         }
     }
-#endif // #ifndef MASTER_GOLD
+#endif
 
     if (dik == DIK_PAUSE)
         Device.Pause(!Device.Paused(), TRUE, TRUE, "demo_record");
