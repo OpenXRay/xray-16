@@ -40,10 +40,12 @@
 #include "space_restriction_manager.h"
 #include "artefact.h"
 //Alundaio
+#ifdef GAME_OBJECT_EXTENDED_EXPORTS
 #include "holder_custom.h"
 #include "actor.h"
 #include "CharacterPhysicsSupport.h"
 #include "player_hud.h"
+#endif
 //-Alundaio
 
 namespace MemorySpace {
@@ -1106,7 +1108,8 @@ bool CScriptGameObject::is_weapon_going_to_be_strapped	( CScriptGameObject const
 
 	return									stalker->is_weapon_going_to_be_strapped	( &object->object() );
 }
-//Alundaio: Taken from Radium
+//Alundaio:
+#ifdef GAME_OBJECT_EXTENDED_EXPORTS
 float CScriptGameObject::GetArtefactHealthRestoreSpeed()
 {
 	CArtefact* artefact = smart_cast<CArtefact*>(&object());
@@ -1184,7 +1187,7 @@ void CScriptGameObject::SetArtefactBleedingRestoreSpeed(float value)
 
 	artefact->SetBleedingPower(value);
 }
-//Alundaio
+
 void CScriptGameObject::AttachVehicle(CScriptGameObject* veh)
 {
 	CActor *actor = smart_cast<CActor*>(&object());
@@ -1277,41 +1280,58 @@ u32 CScriptGameObject::GetState()
 	return 65535;
 }
 
-void CScriptGameObject::ActivateHudItem()
+void CScriptGameObject::SetBoneVisible(LPCSTR bone_name, bool bVisibility, bool bRecursive)
 {
-	CWeapon* Weapon = object().cast_weapon();
-	if (Weapon){
-		Weapon->ActivateItem();
-		return;
-	}
+	IKinematics* k = object().Visual()->dcast_PKinematics();
 
-	CInventoryItem* IItem = object().cast_inventory_item();
-	if (!IItem)
+	if (!k)
 		return;
 
-	IItem->ActivateItem();
+	u16 bone_id = k->LL_BoneID(bone_name);
+	if (bone_id == BI_NONE)
+		return;
+
+	if (bVisibility == !k->LL_GetBoneVisible(bone_id))
+		k->LL_SetBoneVisible(bone_id, bVisibility, bRecursive);
 
 	return;
 }
 
-void CScriptGameObject::DeactivateHudItem()
+bool CScriptGameObject::IsBoneVisible(LPCSTR bone_name)
 {
-	CWeapon* Weapon = object().cast_weapon();
-	if (Weapon){
-		Weapon->DeactivateItem();
-		return;
-	}
+	IKinematics* k = object().Visual()->dcast_PKinematics();
 
-	CInventoryItem* IItem = object().cast_inventory_item();
-	if (!IItem)
-		return;
+	if (!k)
+		return false;
 
-	IItem->DeactivateItem();
+	u16 bone_id = k->LL_BoneID(bone_name);
+	if (bone_id == BI_NONE)
+		return false;
 
-	return;
+	return k->LL_GetBoneVisible(bone_id)==TRUE?true:false;
 }
 
-void CScriptGameObject::ForceSetPosition(Fvector pos, bool bActivate = false)
+float CScriptGameObject::GetLuminocityHemi()
+{
+	CObject *e = smart_cast<CObject*>(&object());
+	if (!e || !e->renderable_ROS())
+	{
+		return 0;
+	}
+	return e->renderable_ROS()->get_luminocity_hemi();
+}
+
+float CScriptGameObject::GetLuminocity()
+{
+	CObject *e = smart_cast<CObject*>(&object());
+	if (!e || !e->renderable_ROS())
+	{
+		return 0;
+	}
+	return e->renderable_ROS()->get_luminocity();
+}
+
+void CScriptGameObject::ForceSetPosition(Fvector pos, bool bActivate)
 {
 	CPhysicsShellHolder* sh = object().cast_physics_shell_holder();
 	if (!sh)
@@ -1333,4 +1353,5 @@ void CScriptGameObject::ForceSetPosition(Fvector pos, bool bActivate = false)
 	else
 		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "force_set_position: object %s has no physics shell!", *object().cName());
 }
+#endif
 //-Alundaio

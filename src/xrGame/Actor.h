@@ -175,7 +175,11 @@ public:
             void						HitSector		(CObject* who, CObject* weapon);
             void						HitMark			(float P, Fvector dir,			CObject* who, s16 element, Fvector position_in_bone_space, float impulse,  ALife::EHitType hit_type);
 
+//Alundaio
+#ifdef	ACTOR_FEEL_GRENADE
             void						Feel_Grenade_Update( float rad );
+#endif
+//-Alundaio
 
     virtual float						GetMass				() ;
     virtual float						Radius				() const;
@@ -275,7 +279,9 @@ protected:
 
 public:
     SActorMotions*			m_anims;
+#ifdef ENABLE_CAR
 	SActorVehicleAnims*		m_vehicle_anims;
+#endif
 
     CBlend*					m_current_legs_blend;
     CBlend*					m_current_torso_blend;
@@ -313,9 +319,10 @@ public:
     IC CCameraBase*			cam_FirstEye		()	{return cameras[eacFirstEye];}
     //Swartz: actor shadow
     IC EActorCameras active_cam() {return cam_active;} //KD: need to know which cam active outside actor methods
+	virtual	void			cam_Set(EActorCameras style); //Alundaio: made public
     //-Swartz
 protected:
-    virtual	void			cam_Set					(EActorCameras style);
+    //virtual	void			cam_Set					(EActorCameras style);
     void					cam_Update				(float dt, float fFOV);
     void					cam_Lookout				( const Fmatrix &xform, float camera_height );
     void					camUpdateLadder			(float dt);
@@ -367,8 +374,12 @@ protected:
     //режим подбирания предметов
     bool					m_bPickupMode;
     //расстояние (в метрах) на котором актер чувствует гранату (любую)
+//Alundaio
+#ifdef	ACTOR_FEEL_GRENADE
     float					m_fFeelGrenadeRadius;
     float					m_fFeelGrenadeTime; 	//время гранаты (сек) после которого актер чувствует гранату
+#endif
+//-Alundaio
     //расстояние подсветки предметов
     float					m_fPickupInfoRadius;
 

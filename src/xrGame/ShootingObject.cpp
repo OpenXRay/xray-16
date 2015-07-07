@@ -79,7 +79,7 @@ void CShootingObject::Load	(LPCSTR section)
 	//Cycle down RPM after first 2 shots; used for Abakan/AN-94
 	if (pSettings->line_exist(section, "cycle_down"))
 	{
-		bCycleDown = pSettings->r_bool(section, "cycle_down");
+		bCycleDown = pSettings->r_bool(section, "cycle_down")?true:false;
 	}
 	else
 		bCycleDown = false;

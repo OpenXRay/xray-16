@@ -274,15 +274,23 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 	cNameSect_set					(E->s_name);
 	if (E->name_replace()[0])
 		cName_set					(E->name_replace());
+
 	bool demo_spectator = false;
-	
+
+	//Alundaio:
 	if (Level().IsDemoPlayStarted() && E->ID == u16(-1))
 	{
 		Msg("* Spawning demo spectator ...");
 		demo_spectator = true;
 	} else {
-		R_ASSERT(Level().Objects.net_Find(E->ID) == NULL);
+		//R_ASSERT(Level().Objects.net_Find(E->ID) == NULL);
+		if (Level().Objects.net_Find(E->ID) != NULL)
+		{
+			ai().script_engine().script_log(eLuaMessageTypeError, "CGameObject:net_Spawn() | Level().Objects.net_Find(E->ID) != NULL (This mean object already exist on level by this ID) ID=%s s_name=%s", E->ID, E->s_name);
+			return false;
+		}
 	}
+	//-Alundaio
 
 
 	setID							(E->ID);
@@ -503,57 +511,62 @@ void CGameObject::spawn_supplies()
 	if (!spawn_ini()->section_exist("spawn"))
 		return;
 
-	LPCSTR					N,V;
-	float					p;
-	bool bScope				=	false;
-	bool bSilencer			=	false;
-	bool bLauncher			=	false;
+	LPCSTR N, V;
+	float p;
+	bool bScope = false;
+	bool bSilencer = false;
+	bool bLauncher = false;
 
-	for (u32 k = 0, j; spawn_ini()->r_line("spawn",k,&N,&V); k++) {
-		VERIFY				(xr_strlen(N));
-		j					= 1;
-		p					= 1.f;
-		
-		float f_cond						= 1.0f;
-		if (V && xr_strlen(V)) {
-			int				n = _GetItemCount(V);
-			string16		temp;
-			if (n > 0)
-				j			= atoi(_GetItem(V,0,temp)); //count
-			
-			if(NULL!=strstr(V,"prob="))
-				p			=(float)atof(strstr(V,"prob=")+5);
-			if (fis_zero(p))p = 1.f;
-			if (!j)	j		= 1;
-			if(NULL!=strstr(V,"cond="))
-				f_cond		= (float)atof(strstr(V,"cond=")+5);
-			bScope			=	(NULL!=strstr(V,"scope"));
-			bSilencer		=	(NULL!=strstr(V,"silencer"));
-			bLauncher		=	(NULL!=strstr(V,"launcher"));
+	for (u32 k = 0, j; spawn_ini()->r_line("spawn", k, &N, &V); k++) {
+		VERIFY(xr_strlen(N));
+		if (pSettings->section_exist(N)) //Alundaio: Validate section exists
+		{
+			j = 1;
+			p = 1.f;
 
-		}
-		for (u32 i=0; i<j; ++i)
-			if (::Random.randF(1.f) < p){
-				CSE_Abstract* A=Level().spawn_item	(N,Position(),ai_location().level_vertex_id(),ID(),true);
+			float f_cond = 1.0f;
+			if (V && xr_strlen(V)) {
+				int				n = _GetItemCount(V);
+				string16		temp;
+				if (n > 0)
+					j = atoi(_GetItem(V, 0, temp)); //count
 
-				CSE_ALifeInventoryItem*	pSE_InventoryItem = smart_cast<CSE_ALifeInventoryItem*>(A);
-				if(pSE_InventoryItem)
+				if (NULL != strstr(V, "prob="))
+					p = (float)atof(strstr(V, "prob=") + 5);
+				if (fis_zero(p))p = 1.f;
+				if (!j)	j = 1;
+				if (NULL != strstr(V, "cond="))
+					f_cond = (float)atof(strstr(V, "cond=") + 5);
+				bScope = (NULL != strstr(V, "scope"));
+				bSilencer = (NULL != strstr(V, "silencer"));
+				bLauncher = (NULL != strstr(V, "launcher"));
+			}
+			for (u32 i = 0; i < j; ++i)
+			{
+				if (::Random.randF(1.f) < p)
+				{
+					CSE_Abstract* A = Level().spawn_item(N, Position(), ai_location().level_vertex_id(), ID(), true);
+
+					CSE_ALifeInventoryItem*	pSE_InventoryItem = smart_cast<CSE_ALifeInventoryItem*>(A);
+					if (pSE_InventoryItem)
 						pSE_InventoryItem->m_fCondition = f_cond;
 
-				CSE_ALifeItemWeapon* W =  smart_cast<CSE_ALifeItemWeapon*>(A);
-				if (W) {
-					if (W->m_scope_status			== ALife::eAddonAttachable)
-						W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonScope, bScope);
-					if (W->m_silencer_status		== ALife::eAddonAttachable)
-						W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonSilencer, bSilencer);
-					if (W->m_grenade_launcher_status == ALife::eAddonAttachable)
-						W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher, bLauncher);
-				}
+					CSE_ALifeItemWeapon* W = smart_cast<CSE_ALifeItemWeapon*>(A);
+					if (W) {
+						if (W->m_scope_status == ALife::eAddonAttachable)
+							W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonScope, bScope);
+						if (W->m_silencer_status == ALife::eAddonAttachable)
+							W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonSilencer, bSilencer);
+						if (W->m_grenade_launcher_status == ALife::eAddonAttachable)
+							W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher, bLauncher);
+					}
 
-				NET_Packet					P;
-				A->Spawn_Write				(P,TRUE);
-				Level().Send				(P,net_flags(TRUE));
-				F_entity_Destroy			(A);
+					NET_Packet					P;
+					A->Spawn_Write(P, TRUE);
+					Level().Send(P, net_flags(TRUE));
+					F_entity_Destroy(A);
+				}
+			}
 		}
 	}
 }

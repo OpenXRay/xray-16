@@ -15,7 +15,7 @@
 #include "character_info_defs.h"
 #include "game_graph_space.h"
 #include "game_location_selector.h"
-#include "ui/UIWindow.h" //Alundaio
+
 enum EPdaMsg;
 enum ESoundTypes;
 enum ETaskState;
@@ -87,7 +87,6 @@ class CScriptGameObject;
 class CZoneCampfire;
 class CPhysicObject;
 class CArtefact;
-class CUIWindow; //Alundaio: For ScopeTexture
 
 #ifdef DEBUG
     template <typename _object_type>
@@ -386,31 +385,6 @@ public:
             bool				Weapon_IsGrenadeLauncherAttached();
             bool				Weapon_IsScopeAttached			();
             bool				Weapon_IsSilencerAttached		();
-			//Alundaio
-			//Weapon
-			void				Weapon_AddonAttach(CScriptGameObject* item);
-			void				Weapon_AddonDetach(LPCSTR item_section);
-
-			//Weapon & Outfit
-			bool				HasUpgrade(LPCSTR upgrade) const;
-			void				AddUpgrade(LPCSTR upgrade);
-			void				IterateInstalledUpgrades(luabind::functor<void> functor);
-			
-			//Car
-			CScriptGameObject*  GetAttachedVehicle();
-			void				AttachVehicle(CScriptGameObject* veh);
-			void				DetachVehicle();
-
-			//Any class that has PPhysicsShell
-			void				ForceSetPosition(Fvector pos, bool bActivate);
-
-			//Any class that is derived from CHudItem
-			u32					PlayHudMotion(LPCSTR M, bool bMixIn,u32 state);
-			void				SwitchState(u32 state);
-			u32					GetState();
-			void				ActivateHudItem();
-			void				DeactivateHudItem();
-			//-Alundaio
 
             int					Weapon_GrenadeLauncher_Status	();
             int					Weapon_Scope_Status				();
@@ -614,20 +588,6 @@ public:
             void				DisableAnomaly			();
             float				GetAnomalyPower			();
             void				SetAnomalyPower			(float p);
-            
-			//Alun
-            float				GetArtefactHealthRestoreSpeed			();
-            float				GetArtefactRadiationRestoreSpeed		();
-            float				GetArtefactSatietyRestoreSpeed			();
-            float				GetArtefactPowerRestoreSpeed			();
-            float				GetArtefactBleedingRestoreSpeed			(); 
-                        
-            void				SetArtefactHealthRestoreSpeed			(float value);
-            void				SetArtefactRadiationRestoreSpeed		(float value);
-            void				SetArtefactSatietyRestoreSpeed			(float value);
-            void				SetArtefactPowerRestoreSpeed			(float value);
-            void				SetArtefactBleedingRestoreSpeed			(float value);
-			//-Alun
     
             // HELICOPTER
             CHelicopter*		get_helicopter			();
@@ -805,10 +765,12 @@ public:
             bool				is_door_blocked_by_npc					() const;
             bool				is_weapon_going_to_be_strapped			( CScriptGameObject const* object ) const;
 
-            //AVO: functions for object testing
-            _DECLARE_FUNCTION10(IsGameObject, bool);
+           
+#ifdef GAME_OBJECT_TESTING_EXPORTS
+			//AVO: functions for object testing
+            //_DECLARE_FUNCTION10(IsGameObject, bool);
             //_DECLARE_FUNCTION10(IsCar, bool);
-            _DECLARE_FUNCTION10(IsHeli, bool);
+            //_DECLARE_FUNCTION10(IsHeli, bool);
             //_DECLARE_FUNCTION10(IsHolderCustom, bool);
             _DECLARE_FUNCTION10(IsEntityAlive, bool);
             _DECLARE_FUNCTION10(IsInventoryItem, bool);
@@ -816,9 +778,9 @@ public:
             _DECLARE_FUNCTION10(IsActor, bool);
             _DECLARE_FUNCTION10(IsCustomMonster, bool);
             _DECLARE_FUNCTION10(IsWeapon, bool);
-            _DECLARE_FUNCTION10(IsMedkit, bool);
-            _DECLARE_FUNCTION10(IsEatableItem, bool);
-            _DECLARE_FUNCTION10(IsAntirad, bool);
+            //_DECLARE_FUNCTION10(IsMedkit, bool);
+            //_DECLARE_FUNCTION10(IsEatableItem, bool);
+            //_DECLARE_FUNCTION10(IsAntirad, bool);
             _DECLARE_FUNCTION10(IsCustomOutfit, bool);
             _DECLARE_FUNCTION10(IsScope, bool);
             _DECLARE_FUNCTION10(IsSilencer, bool);
@@ -828,26 +790,66 @@ public:
             _DECLARE_FUNCTION10(IsStalker, bool);
             _DECLARE_FUNCTION10(IsAnomaly, bool);
             _DECLARE_FUNCTION10(IsMonster, bool);
-            _DECLARE_FUNCTION10(IsExplosive, bool);
-            _DECLARE_FUNCTION10(IsScriptZone, bool);
-            _DECLARE_FUNCTION10(IsProjector, bool);
+            //_DECLARE_FUNCTION10(IsExplosive, bool);
+            //_DECLARE_FUNCTION10(IsScriptZone, bool);
+            //_DECLARE_FUNCTION10(IsProjector, bool);
             _DECLARE_FUNCTION10(IsTrader, bool);
             _DECLARE_FUNCTION10(IsHudItem, bool);
-            _DECLARE_FUNCTION10(IsFoodItem, bool);
+           //_DECLARE_FUNCTION10(IsFoodItem, bool);
             _DECLARE_FUNCTION10(IsArtefact, bool);
             _DECLARE_FUNCTION10(IsAmmo, bool);
-            _DECLARE_FUNCTION10(IsMissile, bool);
-            _DECLARE_FUNCTION10(IsPhysicsShellHolder, bool);
-            _DECLARE_FUNCTION10(IsGrenade, bool);
-            _DECLARE_FUNCTION10(IsBottleItem, bool);
-            _DECLARE_FUNCTION10(IsTorch, bool);
+            //_DECLARE_FUNCTION10(IsMissile, bool);
+            //_DECLARE_FUNCTION10(IsPhysicsShellHolder, bool);
+            //_DECLARE_FUNCTION10(IsGrenade, bool);
+            //_DECLARE_FUNCTION10(IsBottleItem, bool);
+            //_DECLARE_FUNCTION10(IsTorch, bool);
             _DECLARE_FUNCTION10(IsWeaponGL, bool);
             _DECLARE_FUNCTION10(IsInventoryBox, bool);
-            bool IsActorIndoors() const;
-			bool IsNPCIndoors() const;
-            void SetHealthEx(float hp);
-            //end AVO
+#endif
+//Alundaio
+#ifdef GAME_OBJECT_EXTENDED_EXPORTS
+            void SetHealthEx(float hp); //AVO
+			float				GetLuminocityHemi();
+			float				GetLuminocity();
+			//Weapon
+			void				Weapon_AddonAttach(CScriptGameObject* item);
+			void				Weapon_AddonDetach(LPCSTR item_section);
 
+			//Weapon & Outfit
+			bool				InstallUpgrade(LPCSTR upgrade);
+			bool				HasUpgrade(LPCSTR upgrade);
+			void				IterateInstalledUpgrades(luabind::functor<void> functor);
+
+			//Car
+			CScriptGameObject*  GetAttachedVehicle();
+			void				AttachVehicle(CScriptGameObject* veh);
+			void				DetachVehicle();
+
+			//Any class that is derived from CHudItem
+			u32					PlayHudMotion(LPCSTR M, bool bMixIn, u32 state);
+			void				SwitchState(u32 state);
+			u32					GetState();
+			//Works for anything with visual
+			bool				IsBoneVisible(LPCSTR bone_name);
+			void				SetBoneVisible(LPCSTR bone_name, bool bVisibility, bool bRecursive = true);
+
+			//Anything with PPhysicShell (ie. car, actor, stalker, monster, heli)
+			void				ForceSetPosition(Fvector pos, bool bActivate = false);
+
+			//Artifacts
+			float				GetArtefactHealthRestoreSpeed();
+			float				GetArtefactRadiationRestoreSpeed();
+			float				GetArtefactSatietyRestoreSpeed();
+			float				GetArtefactPowerRestoreSpeed();
+			float				GetArtefactBleedingRestoreSpeed();
+
+			void				SetArtefactHealthRestoreSpeed(float value);
+			void				SetArtefactRadiationRestoreSpeed(float value);
+			void				SetArtefactSatietyRestoreSpeed(float value);
+			void				SetArtefactPowerRestoreSpeed(float value);
+			void				SetArtefactBleedingRestoreSpeed(float value);
+#endif
+//-Alundaio
 
     doors::door*				m_door;
 

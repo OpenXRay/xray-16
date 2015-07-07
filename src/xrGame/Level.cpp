@@ -61,7 +61,9 @@
 #endif
 ENGINE_API bool g_dedicated_server;
 //AVO: used by SPAWN_ANTIFREEZE (by alpet)
+#ifdef SPAWN_ANTIFREEZE
 ENGINE_API BOOL	g_bootComplete;
+#endif
 //-AVO
 extern CUISequencer* g_tutorial;
 extern CUISequencer* g_tutorial2;
@@ -70,6 +72,7 @@ float g_cl_lvInterp = 0.1;
 u32 lvInterpSteps = 0;
 
 //AVO: get object ID from spawn data (used by SPAWN_ANTIFREEZE by alpet)
+#ifdef SPAWN_ANTIFREEZE
 u16	GetSpawnInfo(NET_Packet &P, u16 &parent_id)
 {
     u16 dummy16, id;
@@ -86,6 +89,7 @@ u16	GetSpawnInfo(NET_Packet &P, u16 &parent_id)
     P.r_pos = 0;
     return id;
 }
+#endif
 //-AVO
 
 
@@ -98,7 +102,9 @@ IPureClient(Device.GetTimerGlobal())
     g_bDebugEvents = strstr(Core.Params, "-debug_ge") != nullptr;
     game_events = xr_new<NET_Queue_Event>();
     //AVO: queue to hold spawn events for SPAWN_ANTIFREEZE
+#ifdef SPAWN_ANTIFREEZE
     spawn_events = xr_new<NET_Queue_Event>();
+#endif
     //-AVO
     eChangeRP = Engine.Event.Handler_Attach("LEVEL:ChangeRP", this);
     eDemoPlay = Engine.Event.Handler_Attach("LEVEL:PlayDEMO", this);
@@ -293,23 +299,6 @@ void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
     {
         if (type == GE_DESTROY)
         {
-            /* This is not the right place for this (if this is even required...)
-            //AVO: fix for SPAWN_ANTIFREEZE crashes caused by rapid online-offline switch. In such cases
-            //inventory items are queued up for a spawn, however parent is already destroyed which cases game to crash
-#ifdef SPAWN_ANTIFREEZE
-            for (auto it = spawn_events->queue.begin(); it != spawn_events->queue.end(); ++it)
-            {
-                const NET_Event& E = *it;
-                NET_Packet P;
-                if (M_SPAWN != E.ID) continue;
-                E.implication(P);
-                u16 parent_id;
-                if (GO->ID() == GetSpawnInfo(P, parent_id))
-                    spawn_events->queue.erase(it); // if parent is being destroyed, delete all queued up children
-            }
-#endif
-            //-AVO
-            */
             Game().OnDestroy(GO);
         }
         GO->OnEvent(P, type);
@@ -346,6 +335,7 @@ void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
     }
 }
 //AVO: used by SPAWN_ANTIFREEZE (by alpet)
+#ifdef SPAWN_ANTIFREEZE
 bool CLevel::PostponedSpawn(u16 id)
 {
     for (auto it = spawn_events->queue.begin(); it != spawn_events->queue.end(); ++it)
@@ -361,6 +351,7 @@ bool CLevel::PostponedSpawn(u16 id)
 
     return false;
 }
+#endif
 //-AVO
 
 void CLevel::ProcessGameEvents()

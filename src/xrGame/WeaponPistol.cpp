@@ -144,25 +144,7 @@ void CWeaponPistol::OnAnimationEnd(u32 state)
 
 void CWeaponPistol::OnShot()
 {
-    PlaySound(m_sSndShotCurrent.c_str(), get_LastFP());
-
-    AddShotEffector();
-
-    PlayAnimShoot();
-
-    // Shell Drop
-    Fvector vel;
-    PHGetLinearVell(vel);
-    OnShellDrop(get_LastSP(), vel);
-
-    // ќгонь из ствола
-
-    StartFlameParticles();
-    R_ASSERT2(!m_pFlameParticles || !m_pFlameParticles->IsLooped(),
-        "can't set looped particles system for shoting with pistol");
-
-    //дым из ствола
-    StartSmokeParticles(get_LastFP(), vel);
+	inherited::OnShot(); //Alundaio: not changed from inherited, so instead of copying changes from weaponmagazined, we just do this
 }
 
 void CWeaponPistol::UpdateSounds()

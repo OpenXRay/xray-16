@@ -267,12 +267,14 @@ void CActor::steer_Vehicle(float angle)
 {
 	if(!m_holder)		return;
 	//Alundaio: Re-enable Car
+#ifdef	ENABLE_CAR
 	CCar*	car			= smart_cast<CCar*>(m_holder);
 	u16 anim_type       = car->DriverAnimationType();
 	SVehicleAnimCollection& anims=m_vehicle_anims->m_vehicles_type_collections[anim_type];
 	if(angle==0.f) 		smart_cast<IKinematicsAnimated*>	(Visual())->PlayCycle(anims.idles[0]);
 	else if(angle>0.f)	smart_cast<IKinematicsAnimated*>	(Visual())->PlayCycle(anims.steer_right);
 	else				smart_cast<IKinematicsAnimated*>	(Visual())->PlayCycle(anims.steer_left);
+#endif
 	//-Alundaio
 }
 
@@ -341,6 +343,8 @@ void CActor::g_SetAnimation( u32 mstate_rl )
 		ST 		= &m_anims->m_climb;
 	else							
 		ST 		= &m_anims->m_normal;
+
+	STorsoWpn* __TW = &ST->m_torso[4]; //Alundaio: Animation Set knife/grenade running animation without weapon by XEM #100
 
 	bool bAccelerated = isActorAccelerated(mstate_rl, IsZoomAimingMode());
 	if ( bAccelerated )

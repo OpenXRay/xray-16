@@ -45,7 +45,9 @@ CWeaponMagazined::CWeaponMagazined(ESoundTypes eSoundType) : CWeapon()
     m_eSoundShot = ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING | eSoundType);
     m_eSoundEmptyClick = ESoundTypes(SOUND_TYPE_WEAPON_EMPTY_CLICKING | eSoundType);
     m_eSoundReload = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
+#ifdef NEW_SOUNDS
     m_eSoundReloadEmpty = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
+#endif
     m_sounds_enabled = true;
 
     m_sSndShotCurrent = NULL;
@@ -90,10 +92,18 @@ void CWeaponMagazined::Load(LPCSTR section)
     inherited::Load(section);
 
     // Sounds
-    m_sounds.LoadSound(section, "snd_draw", "sndShow", false, m_eSoundShow);
-    m_sounds.LoadSound(section, "snd_holster", "sndHide", false, m_eSoundHide);
-    m_sounds.LoadSound(section, "snd_shoot", "sndShot", false, m_eSoundShot);
-    m_sounds.LoadSound(section, "snd_empty", "sndEmptyClick", false, m_eSoundEmptyClick);
+    m_sounds.LoadSound(section, "snd_draw", "sndShow", true, m_eSoundShow);
+    m_sounds.LoadSound(section, "snd_holster", "sndHide", true, m_eSoundHide);
+
+	//Alundaio: LAYERED_SND_SHOOT
+#ifdef LAYERED_SND_SHOOT
+	m_layered_sounds.LoadSound(section, "snd_shoot", "sndShot", false, m_eSoundShot);
+#else
+	m_sounds.LoadSound(section, "snd_shoot", "sndShot", false, m_eSoundShot);
+#endif
+	//-Alundaio
+
+    m_sounds.LoadSound(section, "snd_empty", "sndEmptyClick", true, m_eSoundEmptyClick);
     m_sounds.LoadSound(section, "snd_reload", "sndReload", true, m_eSoundReload);
 
 #ifdef NEW_SOUNDS //AVO: custom sounds go here
@@ -176,9 +186,11 @@ void CWeaponMagazined::FireStart()
     else
     {//misfire
 		//Alundaio
+#ifdef EXTENDED_WEAPON_CALLBACKS
 		CGameObject	*object = smart_cast<CGameObject*>(H_Parent());
 		if (object)
 			object->callback(GameObject::eOnWeaponJammed)(object->lua_game_object(), this->lua_game_object());
+#endif
 		//-Alundaio
 
         if (smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
@@ -192,9 +204,11 @@ void CWeaponMagazined::FireEnd()
 {
     inherited::FireEnd();
 
+	/* Alundaio: Removed auto-reload since it's widely asked by just about everyone who is a gun whore
     CActor	*actor = smart_cast<CActor*>(H_Parent());
     if (m_pInventory && !iAmmoElapsed && actor && GetState() != eReload)
         Reload();
+	*/
 }
 
 void CWeaponMagazined::Reload()
@@ -623,7 +637,13 @@ void CWeaponMagazined::SetDefaults()
 void CWeaponMagazined::OnShot()
 {
     // Sound
-    PlaySound(m_sSndShotCurrent.c_str(), get_LastFP());
+//Alundaio: LAYERED_SND_SHOOT
+#ifdef LAYERED_SND_SHOOT
+	m_layered_sounds.PlaySound(m_sSndShotCurrent.c_str(), get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
+#else
+	PlaySound(m_sSndShotCurrent.c_str(), get_LastFP(), (u8)(m_iShotNum - 1)); //Alundaio: Play sound at index (ie. snd_shoot, snd_shoot1, snd_shoot2, snd_shoot3)
+#endif
+//-Alundaio
 
     // Camera
     AddShotEffector();
@@ -677,16 +697,17 @@ void CWeaponMagazined::switch2_Idle()
 #endif
 void CWeaponMagazined::switch2_Fire()
 {
-    CInventoryOwner* io = smart_cast<CInventoryOwner*>(H_Parent());
-    CInventoryItem* ii = smart_cast<CInventoryItem*>(this);
+	CInventoryOwner* io = smart_cast<CInventoryOwner*>(H_Parent());
+	if (!io)
+		return;
+
+	CInventoryItem* ii = smart_cast<CInventoryItem*>(this);
+	if (ii != io->inventory().ActiveItem())
+	{
+		Msg("WARNING: Not an active item, item %s, owner %s, active item %s", *cName(), *H_Parent()->cName(), io->inventory().ActiveItem() ? *io->inventory().ActiveItem()->object().cName() : "no_active_item");	
+		return;
+	}
 #ifdef DEBUG
-    if (!io)
-        return;
-    //VERIFY2					(io,make_string("no inventory owner, item %s",*cName()));
-
-    if (ii != io->inventory().ActiveItem())
-        Msg("! not an active item, item %s, owner %s, active item %s", *cName(), *H_Parent()->cName(), io->inventory().ActiveItem() ? *io->inventory().ActiveItem()->object().cName() : "no_active_item");
-
     if (!(io && (ii == io->inventory().ActiveItem())))
     {
         CAI_Stalker			*stalker = smart_cast<CAI_Stalker*>(H_Parent());
@@ -697,20 +718,7 @@ void CWeaponMagazined::switch2_Fire()
             stalker->planner().show_target_world_state();
         }
     }
-#else
-    if (!io)
-        return;
 #endif // DEBUG
-
-    //
-    //	VERIFY2(
-    //		io && (ii == io->inventory().ActiveItem()),
-    //		make_string(
-    //			"item[%s], parent[%s]",
-    //			*cName(),
-    //			H_Parent() ? *H_Parent()->cName() : "no_parent"
-    //		)
-    //	);
 
     m_bStopedAfterQueueFired = false;
     m_bFireSingleShot = true;
@@ -1196,9 +1204,11 @@ void CWeaponMagazined::OnZoomIn()
         PlayAnimIdle();
 
 	//Alundaio: callback not sure why vs2013 gives error, it's fine
+#ifdef EXTENDED_WEAPON_CALLBACKS
 	CGameObject	*object = smart_cast<CGameObject*>(H_Parent());
 	if (object)
 		object->callback(GameObject::eOnWeaponZoomIn)(object->lua_game_object(),this->lua_game_object());
+#endif
 	//-Alundaio
 
     CActor* pActor = smart_cast<CActor*>(H_Parent());
@@ -1225,9 +1235,11 @@ void CWeaponMagazined::OnZoomOut()
         PlayAnimIdle();
 
 	//Alundaio
+#ifdef EXTENDED_WEAPON_CALLBACKS
 	CGameObject	*object = smart_cast<CGameObject*>(H_Parent());
 	if (object)
 		object->callback(GameObject::eOnWeaponZoomOut)(object->lua_game_object(), this->lua_game_object());
+#endif
 	//-Alundaio
 
     CActor* pActor = smart_cast<CActor*>(H_Parent());
@@ -1369,14 +1381,21 @@ bool CWeaponMagazined::GetBriefInfo(II_BriefInfo& info)
 		info.ap_ammo._set("");
 		info.third_ammo._set("");
 
-		xr_sprintf(int_str, "%d", GetAmmoCount(m_ammoType));
-
-        if (m_ammoType == 0)
-            info.fmj_ammo._set(int_str);
-		else if (m_ammoType == 1)
+		if (at_size >= 1)
+		{
+			xr_sprintf(int_str, "%d", GetAmmoCount(0));
+			info.fmj_ammo._set(int_str);
+		}
+		if (at_size >= 2)
+		{
+			xr_sprintf(int_str, "%d", GetAmmoCount(1));
 			info.ap_ammo._set(int_str);
-		else
+		}
+		if (at_size >= 3)
+		{
+			xr_sprintf(int_str, "%d", GetAmmoCount(2));
 			info.third_ammo._set(int_str);
+		}
 		//-Alundaio
     }
 

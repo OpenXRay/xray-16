@@ -34,10 +34,9 @@ bool r_bool(NET_Packet *self)
 }
 
 //Alundaio: Fix issue with using r_begin
-u32 r_begin(NET_Packet *self)
+u32 r_begin(NET_Packet *self,u16 type)
 {
-	u16 dummy_u16;
-	return (self->r_begin(dummy_u16));
+	return (self->r_begin(type));
 }
 
 ClientID r_clientID(NET_Packet *self)

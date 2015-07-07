@@ -28,7 +28,7 @@
 
 void CActor::attach_Vehicle(CHolderCustom* vehicle)
 {
-
+#ifdef ENABLE_CAR
 	if(!vehicle) return;
 	if(m_holder) return;
 
@@ -64,6 +64,7 @@ void CActor::attach_Vehicle(CHolderCustom* vehicle)
 	//Alundaio
 	this->callback(GameObject::eAttachVehicle)(car->lua_game_object());
 	//-Alundaio
+#endif
 }
 
 void CActor::detach_Vehicle()
@@ -89,7 +90,9 @@ void CActor::detach_Vehicle()
 	m_holder->detach_Actor();//
 	
 	//Alundaio
+#ifdef ENABLE_CAR
 	this->callback(GameObject::eDetachVehicle)(car->lua_game_object());
+#endif
 	//-Alundaio
 
 	character_physics_support()->movement()->SetPosition(m_holder->ExitPosition());
@@ -139,8 +142,10 @@ bool CActor::use_Vehicle(CHolderCustom* object)
 			else
 			{
 				//Alundaio
+#ifdef ENABLE_CAR
 				CCar * car= smart_cast<CCar*>(vehicle);
 				this->callback(GameObject::eUseVehicle)(car->lua_game_object() );
+#endif
 				//-Alundaio
 			}
 

@@ -29,15 +29,17 @@ MotionID CStalkerAnimationManager::aim_animation	(const u32 &slot, const xr_vect
 	if (slot != 2)
 		return						(animation[6].A[index]);
 
-#if 1//def DEBUG
 	if (animation[6].A.size() < 7) {
+		//Alundaio: No need for message as many npcs have special danger move and very few don't
+#ifdef DEBUG
 		Msg							(
 			"! cannot find special danger animations for object with visual %s",
 			object().cNameVisual().c_str()
 		);
+#endif 
+		//-Alundaio
 		return						(animation[6].A[index]);
 	}
-#endif // DEBUG
 
 	switch (index) {
 		case 0  : return			(animation[6].A[4]);

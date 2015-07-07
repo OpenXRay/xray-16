@@ -24,6 +24,9 @@
 #include "mt_config.h"
 
 using namespace ALife;
+#ifdef	ENGINE_LUA_ALIFE_UPDAGE_MANAGER_CALLBACKS
+using namespace luabind; //Alundaio
+#endif
 
 extern string_path g_last_saved_game;
 
@@ -154,6 +157,12 @@ bool CALifeUpdateManager::change_level	(NET_Packet &net_packet)
 	if (m_changing_level)
 		return						(false);
 
+#ifdef	ENGINE_LUA_ALIFE_UPDAGE_MANAGER_CALLBACKS
+	luabind::functor<void>	funct;
+	if (ai().script_engine().functor("_G.CALifeUpdateManager__on_before_change_level", funct))
+		funct(&net_packet);
+#endif
+
 //	prepare_objects_for_save		();
 	// we couldn't use prepare_objects_for_save since we need 
 	// get updates from client 
@@ -255,7 +264,7 @@ void CALifeUpdateManager::new_game			(LPCSTR save_name)
 	save								(save_name);
 #endif // #ifdef DEBUG
 
-	Msg									("* New game is successfully created!");
+	Msg("* New game is successfully created!");
 }
 
 void CALifeUpdateManager::load			(LPCSTR game_name, bool no_assert, bool new_only)

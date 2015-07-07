@@ -423,6 +423,7 @@ void CStalkerActionKillEnemy::execute()
 			object().sight().setup(CSightAction(enemy, true, true));
 			fire();
 		} else {
+			aim_ready();
 			if (mem_object.m_object)
 				object().sight().setup(CSightAction(SightManager::eSightTypePosition,mem_object.m_object_params.m_position,true));
 		}
@@ -482,7 +483,7 @@ void CStalkerActionTakeCover::execute()
 
 	inherited::execute();
 
-	//Alundaio:
+	//Alundaio: verify enemy
 	const CEntityAlive *enemy = object().memory().enemy().selected();
 	if (!enemy)
 		return;
@@ -523,13 +524,7 @@ void CStalkerActionTakeCover::execute()
 		fire();
 	} else {
 		aim_ready();
-		if (_abs(object().Position().y - mem_object.m_object_params.m_position.y) > 3.f)
-		{
-			Fvector3 Vpos = { mem_object.m_object_params.m_position.x, object().Position().y + 1.f, mem_object.m_object_params.m_position.z };
-			object().sight().setup(CSightAction(SightManager::eSightTypePosition, Vpos, true));
-		}
-		else
-			object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
+		object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
 	}
 }
 
@@ -616,17 +611,9 @@ void CStalkerActionLookOut::execute()
 	if (!mem_object.m_object)
 		return;
 
-	//Alundaio: Prevent stalkers from staring at floor or ceiling for this action
-	if (_abs(object().Position().y - mem_object.m_object_params.m_position.y) > 3.5f)
-	{
-		Fvector3 Vpos = { mem_object.m_object_params.m_position.x, object().Position().y + 1.f, mem_object.m_object_params.m_position.z };
-		object().sight().setup(CSightAction(SightManager::eSightTypePosition, Vpos, true));
-	}
-	else
-		object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
+	object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
 
 	object().best_cover(mem_object.m_object_params.m_position);
-	//-Alundaio
 
 	if (current_cover(m_object) >= 3.f) {
 		object().movement().set_nearest_accessible_position();
@@ -709,15 +696,7 @@ void CStalkerActionHoldPosition::execute()
 	if (current_cover(m_object) < 3.f)
 		m_storage->set_property(eWorldPropertyLookedOut, false);
 
-	//Alundaio: Prevent stalkers from staring at floor or ceiling for this action
-	if (_abs(object().Position().y - mem_object.m_object_params.m_position.y) > 3.5f)
-	{
-		Fvector3 Vpos = { mem_object.m_object_params.m_position.x, object().Position().y + 1.f, mem_object.m_object_params.m_position.z };
-		object().sight().setup(CSightAction(SightManager::eSightTypePosition, Vpos, true));
-	}
-	else
-		object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
-	//-Alundaio
+	object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
 
 	if (completed()) {
 		if (
@@ -833,15 +812,7 @@ void CStalkerActionDetourEnemy::execute()
 			m_storage->set_property(eWorldPropertyEnemyDetoured, true);
 	}
 
-	//Alundaio: Prevent stalkers from staring at floor or ceiling for this action
-	if (_abs(object().Position().y - mem_object.m_object_params.m_position.y) > 3.5f)
-	{
-		Fvector3 Vpos = { mem_object.m_object_params.m_position.x, object().Position().y + 1.f, mem_object.m_object_params.m_position.z };
-		object().sight().setup(CSightAction(SightManager::eSightTypePosition, Vpos, true));
-	}
-	else
-		object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
-	//-Alundaio
+	object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1032,15 +1003,7 @@ void CStalkerActionSuddenAttack::execute()
 	if (visible_now)
 		object().sight().setup(CSightAction(object().memory().enemy().selected(), true));
 	else {
-		//Alundaio: Prevent stalkers from staring at floor or ceiling for this action
-		if (_abs(object().Position().y - mem_object.m_object_params.m_position.y) > 3.5f)
-		{
-			Fvector3 Vpos = { mem_object.m_object_params.m_position.x, object().Position().y + 1.f, mem_object.m_object_params.m_position.z };
-			object().sight().setup(CSightAction(SightManager::eSightTypePosition, Vpos, true));
-		}
-		else
-			object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
-		//-Alundaio		
+		object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
 	}
 
 	if (object().movement().accessible(mem_object.m_object_params.m_level_vertex_id))

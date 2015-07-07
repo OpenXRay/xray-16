@@ -206,4 +206,10 @@ protected:
         bool send_hit);
     //AVO: for custom added sounds check if sound exists
     bool WeaponSoundExist(LPCSTR section, LPCSTR sound_name);
+
+	//Alundaio: LAYERED_SND_SHOOT
+#ifdef LAYERED_SND_SHOOT
+	HUD_SOUND_COLLECTION_LAYERED m_layered_sounds;
+#endif
+	//-Alundaio
 };

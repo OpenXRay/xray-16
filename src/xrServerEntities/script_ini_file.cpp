@@ -102,6 +102,7 @@ Fvector CScriptIniFile::r_fvector3(LPCSTR S, LPCSTR L)
 }
 
 //AVO: additional methods to allow writing to ini files
+#ifdef INI_FILE_EXTENDED_EXPORTS
 void CScriptIniFile::w_bool(LPCSTR S, LPCSTR L, BOOL V, LPCSTR comment)
 {
     THROW3(inherited::section_exist(S), "Cannot find section", S);
@@ -241,3 +242,4 @@ u32 CScriptIniFile::section_count()
 {
     return(inherited::section_count());
 }
+#endif

@@ -309,6 +309,8 @@ void CActor::feel_sound_new(CObject* who, int type, CSound_UserDataPtr user_data
 		m_snd_noise = _max(m_snd_noise, power);
 }
 
+//Alundaio: Put this behind define so that it can be disabled
+#ifdef	ACTOR_FEEL_GRENADE
 void CActor::Feel_Grenade_Update( float rad )
 {
 	if ( !IsGameTypeSingle() )
@@ -347,4 +349,5 @@ void CActor::Feel_Grenade_Update( float rad )
 
 	HUD().Update_GrenadeView( pos_actor );
 }
+#endif
 

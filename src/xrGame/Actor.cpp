@@ -155,8 +155,12 @@ CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
 
     m_pPhysicsShell = NULL;
 
+//Alundaio
+#ifdef ACTOR_FEEL_GRENADE
     m_fFeelGrenadeRadius = 10.0f;
     m_fFeelGrenadeTime = 1.0f;
+#endif
+//-Alundaio
 
     m_holder = NULL;
     m_holderID = u16(-1);
@@ -191,7 +195,9 @@ CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
 
     m_anims = xr_new<SActorMotions>();
 	//Alundaio: Needed for car
+#ifdef ENABLE_CAR
     m_vehicle_anims	= xr_new<SActorVehicleAnims>();
+#endif 
 	//-Alundaio
     m_entity_condition = NULL;
     m_iLastHitterID = u16(-1);
@@ -237,7 +243,9 @@ CActor::~CActor()
 
     xr_delete(m_anims);
 	//Alundaio: For car
+#ifdef ENABLE_CAR
     xr_delete(m_vehicle_anims);
+#endif
 	//-Alundaio
 }
 
@@ -376,9 +384,12 @@ void CActor::Load(LPCSTR section)
 
     m_fPickupInfoRadius = pSettings->r_float(section, "pickup_info_radius");
 
+//Alundaio
+#ifdef ACTOR_FEEL_GRENADE
     m_fFeelGrenadeRadius = pSettings->r_float(section, "feel_grenade_radius");
     m_fFeelGrenadeTime = pSettings->r_float(section, "feel_grenade_time");
     m_fFeelGrenadeTime *= 1000.0f;
+#endif
 
     character_physics_support()->in_Load(section);
 
@@ -1236,7 +1247,10 @@ void CActor::shedule_Update(u32 DT)
         Center(C);
         R = Radius();
         feel_touch_update(C, R);
+//Alundaio
+#ifdef ACTOR_FEEL_GRENADE
         Feel_Grenade_Update(m_fFeelGrenadeRadius);
+#endif
 
         // Dropping
         if (b_DropActivated)
