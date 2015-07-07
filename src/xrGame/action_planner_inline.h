@@ -104,8 +104,8 @@ void CPlanner::update				()
 				current_action().finalize();
 				m_current_action_id = solution().front();
 				//Alundaio: More detailed logging for initializing action
-				if (strstr(Core.Params, "-dbgact"))
-					Msg("DEBUG: Action [%d] initializing", m_current_action_id);
+				//if (strstr(Core.Params, "-dbgact"))
+					//Msg("DEBUG: Action [%d] initializing", m_current_action_id);
 				current_action().initialize();
 			}
 		}
@@ -113,14 +113,14 @@ void CPlanner::update				()
 			m_initialized = true;
 			m_current_action_id = solution().front();
 			//Alundaio: More detailed logging for initializing action
-			if (strstr(Core.Params, "-dbgact"))
-				Msg("DEBUG: Action [%d] initializing", m_current_action_id);
+			//if (strstr(Core.Params, "-dbgact"))
+				//Msg("DEBUG: Action [%d] initializing", m_current_action_id);
 			current_action().initialize();
 		}
 		
 		//Alundaio: More detailed logging for executing action; Knowing the last executing action before a crash can be very useful for debugging
-		if (strstr(Core.Params, "-dbgact"))
-			Msg("DEBUG: Action [%d] executing", m_current_action_id);
+		//if (strstr(Core.Params, "-dbgact"))
+			//Msg("DEBUG: Action [%d] executing", m_current_action_id);
 
 		current_action().execute	();
 }

@@ -39,6 +39,8 @@
 #include "smart_cover.h"
 #include "smart_cover_description.h"
 #include "physics_shell_scripted.h"
+#include "CharacterPhysicsSupport.h" //Alundaio: For set_visual
+#include "damage_manager.h" //Alundaio: For set_visual
 
 class CScriptBinderObject;
 
@@ -586,33 +588,4 @@ void CScriptGameObject::set_visual_name(LPCSTR visual)
 LPCSTR CScriptGameObject::get_visual_name() const
 {
     return object().cNameVisual().c_str();
-}
-
-bool CScriptGameObject::IsActorIndoors() const
-{
-    // Check to make sure all the params are available (we're in game and such).
-    if (!g_pGameLevel)
-    {
-        return FALSE;
-    }
-    CObject *e = g_pGameLevel->CurrentViewEntity();
-    if (!e || !e->renderable_ROS())
-    {
-        return FALSE;
-    }
-    // Now do the real check! This is a copy out of another section of code that is also hard coded.
-    // I don't know what the proper limit for this is supposed to be, but this seems good enough.
-    return e->renderable_ROS()->get_luminocity_hemi() > 0.05f;
-}
-
-bool CScriptGameObject::IsNPCIndoors() const
-{
-	CObject *e = smart_cast<CObject*>(&object());
-	if (!e || !e->renderable_ROS())
-	{
-		return FALSE;
-	}
-	// Now do the real check! This is a copy out of another section of code that is also hard coded.
-	// I don't know what the proper limit for this is supposed to be, but this seems good enough.
-	return e->renderable_ROS()->get_luminocity_hemi() > 0.05f;
 }

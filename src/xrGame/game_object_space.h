@@ -53,28 +53,38 @@ namespace GameObject
 
         eInvBoxItemTake,
         eWeaponNoAmmoAvailable,
-
+		//Alundaio: added defines
         //AVO: custom callbacks
-        // input
+#ifdef INPUT_CALLBACKS
+		// input
         eKeyPress,
         eKeyRelease,
         eKeyHold,
         eMouseMove,
         eMouseWheel,
+#endif
+#ifdef EXTENDED_ITEM_CALLBACKS
         // inventory
         eItemToBelt,
         eItemToSlot,
         eItemToRuck,
-        // actor
-        eActorBeforeDeath,
-		// vehicle
-		eAttachVehicle,
-		eDetachVehicle,
-		eUseVehicle,
+#endif
+#ifdef	EXTENDED_WEAPON_CALLBACKS
 		// weapon
 		eOnWeaponZoomIn,
 		eOnWeaponZoomOut,
 		eOnWeaponJammed,
+#endif
+        // actor
+#ifdef ACTOR_BEFORE_DEATH_CALLBACK
+        eActorBeforeDeath,
+#endif
+#ifdef ENABLE_CAR
+		// vehicle
+		eAttachVehicle,
+		eDetachVehicle,
+		eUseVehicle,
+#endif
         //-AVO
 
         eDummy = u32(-1),

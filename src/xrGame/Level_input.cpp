@@ -84,11 +84,11 @@ void CLevel::IR_OnMouseMove(int dx, int dy)
 {
     if (g_bDisableAllInput)							return;
 
-#ifdef MOUSE_MOVE_CALLBACK
+#ifdef INPUT_CALLBACKS
 /* avo: script callback */
     if (g_actor) g_actor->callback(GameObject::eMouseMove)(dx, dy);
     /* avo: end */
-#endif // MOUSE_MOVE_CALLBACK
+#endif // INPUT_CALLBACKS
 
     if (CurrentGameUI()->IR_UIOnMouseMove(dx, dy))		return;
     if (Device.Paused() && !IsDemoPlay()
@@ -129,7 +129,9 @@ void CLevel::IR_OnKeyboardPress(int key)
     EGameActions _curr = get_binded_action(key);
 
     /* avo: script callback */
+#ifdef INPUT_CALLBACKS
     if (!g_bDisableAllInput && g_actor) g_actor->callback(GameObject::eKeyPress)(key);
+#endif
     /* avo: end */
 
     if (_curr == kPAUSE)
@@ -475,11 +477,11 @@ void CLevel::IR_OnKeyboardRelease(int key)
 {
     if (!bReady || g_bDisableAllInput)								return;
 
-#ifdef KEY_RELEASE_CALLBACK 
+#ifdef INPUT_CALLBACKS 
     /* avo: script callback */
     if (g_actor) g_actor->callback(GameObject::eKeyRelease)(key);
     /* avo: end */
-#endif // KEY_RELEASE_CALLBACK
+#endif // INPUT_CALLBACKS
 
     if (CurrentGameUI() && CurrentGameUI()->IR_UIOnKeyboardRelease(key)) return;
     if (game && game->OnKeyboardRelease(get_binded_action(key)))		return;
@@ -500,11 +502,11 @@ void CLevel::IR_OnKeyboardHold(int key)
 {
     if (g_bDisableAllInput) return;
 
-#ifdef KEY_HOLD_CALLBACK
+#ifdef INPUT_CALLBACKS
     /* avo: script callback */
     if (g_actor) g_actor->callback(GameObject::eKeyHold)(key);
     /* avo: end */
-#endif // KEY_HOLD_CALLBACK
+#endif // INPUT_CALLBACKS
 
 
 #ifdef DEBUG

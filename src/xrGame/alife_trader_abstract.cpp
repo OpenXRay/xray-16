@@ -163,21 +163,14 @@ void add_online_impl						(CSE_ALifeDynamicObject *object, const bool &update_re
 	ALife::OBJECT_IT			I = object->children.begin();
 	ALife::OBJECT_IT			E = object->children.end();
 	for ( ; I != E; ++I) {
-//	this was for the car only
-//		if (*I == ai().alife().graph().actor()->ID)
-//			continue;
-//
+		//Alundaio:
+		if (*I == ai().alife().graph().actor()->ID)
+			continue;
+		//-Alundaio
+
 		CSE_ALifeDynamicObject	*l_tpALifeDynamicObject = ai().alife().objects().object(*I);
-		//Alundaio: I don't know why this happens but until I do, this will stop crash. I think maybe a deleted object is registered to come back online
-		if (!l_tpALifeDynamicObject)
-			continue;
-		//Alundaio End
 		CSE_ALifeInventoryItem	*l_tpALifeInventoryItem = smart_cast<CSE_ALifeInventoryItem*>(l_tpALifeDynamicObject);
-		//Alundaio
-		if (!l_tpALifeInventoryItem)
-			continue;
-		//Alundaio End
-		//R_ASSERT2				(l_tpALifeInventoryItem,"Non inventory item object has parent?!");
+		R_ASSERT2				(l_tpALifeInventoryItem,"Non inventory item object has parent?!");
 		l_tpALifeInventoryItem->base()->s_flags.or(M_SPAWN_UPDATE);
 		CSE_Abstract			*l_tpAbstract = smart_cast<CSE_Abstract*>(l_tpALifeInventoryItem);
 		object->alife().server().entity_Destroy(l_tpAbstract);

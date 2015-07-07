@@ -327,6 +327,7 @@ void CUIHudStatesWnd::UpdateActiveItemInfo( CActor* actor )
 		m_ui_weapon_cur_ammo->Show	( true );
 		m_ui_weapon_fmj_ammo->Show	( true );
 		m_ui_weapon_ap_ammo->Show	( true );
+		m_ui_weapon_third_ammo->Show(true); //Alundaio: third_ammo
 		m_fire_mode->Show			( true );
 		m_ui_grenade->Show			( true );
 
@@ -334,24 +335,33 @@ void CUIHudStatesWnd::UpdateActiveItemInfo( CActor* actor )
 		m_ui_weapon_fmj_ammo->SetText	( m_item_info.fmj_ammo.c_str() );
 		m_ui_weapon_ap_ammo->SetText	( m_item_info.ap_ammo.c_str() );
 
-		//Alundaio:
+		//Alundaio: Third ammo type and also set text color for each ammo type
 		if (m_ui_weapon_third_ammo)
 			m_ui_weapon_third_ammo->SetText(m_item_info.third_ammo.c_str());
-		//-Alundaio
 		
 		m_ui_grenade->SetText	( m_item_info.grenade.c_str() );
 
+		m_ui_weapon_fmj_ammo->SetTextColor(color_rgba(238, 155, 23, 150));
+		m_ui_weapon_ap_ammo->SetTextColor(color_rgba(238, 155, 23, 150));
+		m_ui_weapon_third_ammo->SetTextColor(color_rgba(238, 155, 23, 150));
+
 		CWeaponMagazinedWGrenade* wpn = smart_cast<CWeaponMagazinedWGrenade*>(item);
 		if(wpn && wpn->m_bGrenadeMode)
-		{
-			m_ui_weapon_fmj_ammo->SetTextColor(color_rgba(238,155,23,150));
 			m_ui_grenade->SetTextColor(color_rgba(238,155,23,255));
-		}
 		else
+			m_ui_grenade->SetTextColor(color_rgba(238, 155, 23, 150));
+
+		CWeaponMagazined* wpnm = smart_cast<CWeaponMagazined*>(item);
+		if (wpnm)
 		{
-			m_ui_weapon_fmj_ammo->SetTextColor(color_rgba(238,155,23,255));
-			m_ui_grenade->SetTextColor(color_rgba(238,155,23,150));
+			if (wpnm->m_ammoType == 0)
+				m_ui_weapon_fmj_ammo->SetTextColor(color_rgba(238, 155, 23, 255));
+			else if (wpnm->m_ammoType == 1)
+				m_ui_weapon_ap_ammo->SetTextColor(color_rgba(238, 155, 23, 255));
+			else if (wpnm->m_ammoType == 2)
+				m_ui_weapon_third_ammo->SetTextColor(color_rgba(238, 155, 23, 255));
 		}
+		//-Alundaio
 	}
 	else
 	{
@@ -360,6 +370,7 @@ void CUIHudStatesWnd::UpdateActiveItemInfo( CActor* actor )
 		m_ui_weapon_cur_ammo->Show	( false );
 		m_ui_weapon_fmj_ammo->Show	( false );
 		m_ui_weapon_ap_ammo->Show	( false );
+		m_ui_weapon_third_ammo->Show(false); //Alundaio: Third Ammo
 		m_fire_mode->Show			( false );
 		m_ui_grenade->Show			( false );
 	}

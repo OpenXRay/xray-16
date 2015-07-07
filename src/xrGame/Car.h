@@ -504,6 +504,8 @@ IC	size_t				CurrentTransmission					(){return m_current_transmission_num;}
 	float AddFuel										(float ammount); //ammount - fuel to load, ret - fuel loaded
 	void CarExplode										();
 	/************************************************** added by Ray Twitty (aka Shadows) START **************************************************/
+	//Alundaio
+#ifdef ENABLE_CAR
 	float GetfFuel();
 	void SetfFuel(float fuel);
 	float GetfFuelTank();
@@ -515,6 +517,8 @@ IC	size_t				CurrentTransmission					(){return m_current_transmission_num;}
 	void PlayDamageParticles(){ m_damage_particles.Play1(this); m_damage_particles.Play2(this); }
 	void StopDamageParticles(){ m_damage_particles.Stop1(this); m_damage_particles.Stop2(this); }
 	bool isActiveEngine();
+#endif
+	//-Alundaio
 	/*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/
 	////////////////////////////////////////////		////////
 

@@ -178,6 +178,14 @@ void CUIGameCustom::HideActorMenu()
         ActorMenu->HideDialog();
 }
 
+//Alundaio:
+void CUIGameCustom::UpdateActorMenu()
+{
+	if (ActorMenu->IsShown())
+		ActorMenu->UpdateActor();
+}
+//-Alundaio
+
 void CUIGameCustom::HideMessagesWindow()
 {
     if (m_pMessagesWnd->IsShown())

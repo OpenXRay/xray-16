@@ -2045,6 +2045,7 @@ Fvector	CCar::		ExitVelocity				()
 }
 
 /************************************************** added by Ray Twitty (aka Shadows) START **************************************************/
+#ifdef ENABLE_CAR
 // получить и задать текущее количество топлива
 float CCar::GetfFuel()
 {
@@ -2114,4 +2115,5 @@ bool CCar::isActiveEngine()
 {
 	return b_engine_on;
 }
+#endif
 /*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/

@@ -341,32 +341,37 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
         .def("start_particles",				&CScriptGameObject::start_particles)
         .def("stop_particles",				&CScriptGameObject::stop_particles)
    		//Alundaio: Extended exports
+#ifdef ENABLE_CAR
 		//For Car
 		.def("attach_vehicle", &CScriptGameObject::AttachVehicle)
 		.def("detach_vehicle", &CScriptGameObject::DetachVehicle)
 		.def("get_attached_vehicle", &CScriptGameObject::GetAttachedVehicle)
+#endif
+#ifdef GAME_OBJECT_EXTENDED_EXPORTS
+		.def("get_luminocity_hemi", &CScriptGameObject::GetLuminocityHemi)
+		.def("get_luminocity", &CScriptGameObject::GetLuminocity)
+		.def("bone_visible", &CScriptGameObject::IsBoneVisible)
+		.def("set_bone_visible", &CScriptGameObject::SetBoneVisible)
+		.def("set_health_ex", &CScriptGameObject::SetHealthEx)
+		.def("force_set_position", &CScriptGameObject::ForceSetPosition)
 		//For Weapons
 		.def("weapon_addon_attach", &CScriptGameObject::Weapon_AddonAttach)
 		.def("weapon_addon_detach", &CScriptGameObject::Weapon_AddonDetach)
 		//For Weapon & Outfit
-		.def("add_upgrade", &CScriptGameObject::AddUpgrade)
+		.def("install_upgrade", &CScriptGameObject::InstallUpgrade)
 		.def("has_upgrade", &CScriptGameObject::HasUpgrade)
 		.def("iterate_installed_upgrades", &CScriptGameObject::IterateInstalledUpgrades)
-		//For anything with PPhysicShell (ie. car, heli, npcs, player)
-		.def("force_set_position", &CScriptGameObject::ForceSetPosition)
 		// For CHudItem
 		.def("play_hud_motion", &CScriptGameObject::PlayHudMotion)
 		.def("switch_state", &CScriptGameObject::SwitchState)
 		.def("get_state", &CScriptGameObject::GetState)
-		.def("activate_hud_item", &CScriptGameObject::ActivateHudItem)
-		.def("deactivate_hud_item", &CScriptGameObject::DeactivateHudItem)
 		//Alundaio: END
+#endif
+#ifdef GAME_OBJECT_TESTING_EXPORTS
         //AVO: additional functions
-        .def("is_actor_indoors", &CScriptGameObject::IsActorIndoors)
-		.def("is_npc_indoors", &CScriptGameObject::IsNPCIndoors)
-        .def("is_game_object", &CScriptGameObject::IsGameObject)
+        //.def("is_game_object", &CScriptGameObject::IsGameObject)
         //.def("is_car", &CScriptGameObject::IsCar)
-        .def("is_helicopter", &CScriptGameObject::IsHeli)
+        //.def("is_helicopter", &CScriptGameObject::IsHeli)
         //.def("is_holder", &CScriptGameObject::IsHolderCustom)
         .def("is_entity_alive", &CScriptGameObject::IsEntityAlive)
         .def("is_inventory_item", &CScriptGameObject::IsInventoryItem)
@@ -374,9 +379,9 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
         .def("is_actor", &CScriptGameObject::IsActor)
         .def("is_custom_monster", &CScriptGameObject::IsCustomMonster)
         .def("is_weapon", &CScriptGameObject::IsWeapon)
-        .def("is_medkit", &CScriptGameObject::IsMedkit)
-        .def("is_eatable_item", &CScriptGameObject::IsEatableItem)
-        .def("is_antirad", &CScriptGameObject::IsAntirad)
+        //.def("is_medkit", &CScriptGameObject::IsMedkit)
+        //.def("is_eatable_item", &CScriptGameObject::IsEatableItem)
+        //.def("is_antirad", &CScriptGameObject::IsAntirad)
         .def("is_outfit", &CScriptGameObject::IsCustomOutfit)
         .def("is_scope", &CScriptGameObject::IsScope)
         .def("is_silencer", &CScriptGameObject::IsSilencer)
@@ -386,23 +391,23 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
         .def("is_stalker", &CScriptGameObject::IsStalker)
         .def("is_anomaly", &CScriptGameObject::IsAnomaly)
         .def("is_monster", &CScriptGameObject::IsMonster)
-        .def("is_explosive", &CScriptGameObject::IsExplosive)
-        .def("is_script_zone", &CScriptGameObject::IsScriptZone)
-        .def("is_projector", &CScriptGameObject::IsProjector)
+        //.def("is_explosive", &CScriptGameObject::IsExplosive)
+        //.def("is_script_zone", &CScriptGameObject::IsScriptZone)
+        //.def("is_projector", &CScriptGameObject::IsProjector)
         .def("is_trader", &CScriptGameObject::IsTrader)
         .def("is_hud_item", &CScriptGameObject::IsHudItem)
-        .def("is_food_item", &CScriptGameObject::IsFoodItem)
+        //.def("is_food_item", &CScriptGameObject::IsFoodItem)
         .def("is_artefact", &CScriptGameObject::IsArtefact)
         .def("is_ammo", &CScriptGameObject::IsAmmo)
-        .def("is_missile", &CScriptGameObject::IsMissile)
-        .def("is_physics_shell_holder", &CScriptGameObject::IsPhysicsShellHolder)
-        .def("is_grenade", &CScriptGameObject::IsGrenade)
-        .def("is_bottle_item", &CScriptGameObject::IsBottleItem)
-        .def("is_torch", &CScriptGameObject::IsTorch)
+        //.def("is_missile", &CScriptGameObject::IsMissile)
+        //.def("is_physics_shell_holder", &CScriptGameObject::IsPhysicsShellHolder)
+        //.def("is_grenade", &CScriptGameObject::IsGrenade)
+        //.def("is_bottle_item", &CScriptGameObject::IsBottleItem)
+        //.def("is_torch", &CScriptGameObject::IsTorch)
         .def("is_weapon_gl", &CScriptGameObject::IsWeaponGL)
         .def("is_inventory_box", &CScriptGameObject::IsInventoryBox)
-        .def("set_health_ex", &CScriptGameObject::SetHealthEx)
         //end AVO
+#endif
 
 
     ;return	(instance);

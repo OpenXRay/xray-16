@@ -17,6 +17,7 @@ CScriptIniFile *get_system_ini()
 }
 
 //Alundaio: The extended ability to reload system ini after application launch
+#ifdef INI_FILE_EXTENDED_EXPORTS
 CScriptIniFile *reload_system_ini()
 {
 	pSettings->Destroy(const_cast<CInifile*>(pSettings));
@@ -25,6 +26,7 @@ CScriptIniFile *reload_system_ini()
 	pSettings = xr_new<CInifile>(fname);
 	return	((CScriptIniFile*)pSettings);
 }
+#endif
 //Alundaio: END
 
 #ifdef XRGAME_EXPORTS
@@ -78,6 +80,7 @@ void CScriptIniFile::script_register(lua_State *L)
 		class_<CScriptIniFile>("ini_file")
 			.def(constructor<LPCSTR>())
 			//Alundaio: Extend script ini file
+#ifdef INI_FILE_EXTENDED_EXPORTS
             .def(constructor<LPCSTR, bool>())
 			.def("w_bool",&CScriptIniFile::w_bool)
 			.def("w_color", &CScriptIniFile::w_color)
@@ -100,6 +103,7 @@ void CScriptIniFile::script_register(lua_State *L)
 			.def("remove_line", &CScriptIniFile::remove_line)
             .def("set_override_names", &CScriptIniFile::set_override_names)
             .def("section_count", &CScriptIniFile::section_count)
+#endif
 			//Alundaio: END
 			.def("section_exist",	&CScriptIniFile::section_exist	)
 			.def("line_exist",		&CScriptIniFile::line_exist		)
@@ -117,7 +121,9 @@ void CScriptIniFile::script_register(lua_State *L)
 
 		def("system_ini",			&get_system_ini),
 		//Alundaio: extend
+#ifdef INI_FILE_EXTENDED_EXPORTS
 		def("reload_system_ini", &reload_system_ini),
+#endif
 		//Alundaio:: END
 #ifdef XRGAME_EXPORTS
 		def("game_ini",				&get_game_ini),

@@ -35,7 +35,9 @@
 #include "../WeaponRPG7.h"
 #include "../CustomOutfit.h"
 #include "../ActorHelmet.h"
+#include "script_game_object.h" //Alundaio
 
+using namespace luabind; //Alundaio
 // -----
 
 const LPCSTR g_inventory_upgrade_xml = "inventory_upgrade.xml";
@@ -338,6 +340,15 @@ void CUIInventoryUpgradeWnd::OnMesBoxYes()
 		CUIActorMenu* parent_wnd = smart_cast<CUIActorMenu*>( m_pParentWnd );
 		if ( parent_wnd )
 		{
+			//Alundaio: tell script that item has been upgraded
+			luabind::functor<void>	funct;
+			ai().script_engine().functor("inventory_upgrades.effect_upgrade_item", funct);
+			if (funct)
+			{
+				CGameObject* GO = m_inv_item->cast_game_object();
+				funct(GO->lua_game_object(),m_cur_upgrade_id);
+			}
+			//-Alundaio
 			parent_wnd->UpdateActor();
 			parent_wnd->SeparateUpgradeItem();
 		}

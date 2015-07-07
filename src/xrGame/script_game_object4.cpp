@@ -366,6 +366,7 @@ void CScriptGameObject::stop_particles(LPCSTR pname, LPCSTR bone)
 }
 
 //AVO: directly set entity health instead of going throuhg normal health property which operates on delta
+#ifdef GAME_OBJECT_TESTING_EXPORTS
 void CScriptGameObject::SetHealthEx(float hp)
 {
     CEntity *obj = smart_cast<CEntity*>(&object());
@@ -378,22 +379,22 @@ void CScriptGameObject::SetHealthEx(float hp)
 // AVO: functions for testing object class
 // Credits: KD
 //#include "car.h"
-#include "helicopter.h"
+//#include "helicopter.h"
 #include "actor.h"
 #include "customoutfit.h"
 //#include "customzone.h"
 #include "ai\monsters\basemonster\base_monster.h"
 //#include "Artifact.h"
-#include "medkit.h"
-#include "antirad.h"
+//#include "medkit.h"
+//#include "antirad.h"
 #include "scope.h"
 #include "silencer.h"
 #include "torch.h"
 #include "GrenadeLauncher.h"
 #include "searchlight.h"
 //#include "WeaponAmmo.h"
-#include "grenade.h"
-#include "BottleItem.h"
+//#include "grenade.h"
+//#include "BottleItem.h"
 #include "WeaponMagazinedWGrenade.h"
 
 #define TEST_OBJECT_CLASS(A,B)\
@@ -406,9 +407,9 @@ bool A () const\
         return true;\
 };\
 
-TEST_OBJECT_CLASS(CScriptGameObject::IsGameObject, CGameObject)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsGameObject, CGameObject)
 //TEST_OBJECT_CLASS(CScriptGameObject::IsCar, CCar)
-TEST_OBJECT_CLASS(CScriptGameObject::IsHeli, CHelicopter)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsHeli, CHelicopter)
 //TEST_OBJECT_CLASS(CScriptGameObject::IsHolderCustom, CHolderCustom)
 TEST_OBJECT_CLASS(CScriptGameObject::IsEntityAlive, CEntityAlive)
 TEST_OBJECT_CLASS(CScriptGameObject::IsInventoryItem, CInventoryItem)
@@ -416,9 +417,9 @@ TEST_OBJECT_CLASS(CScriptGameObject::IsInventoryOwner, CInventoryOwner)
 TEST_OBJECT_CLASS(CScriptGameObject::IsActor, CActor)
 TEST_OBJECT_CLASS(CScriptGameObject::IsCustomMonster, CCustomMonster)
 TEST_OBJECT_CLASS(CScriptGameObject::IsWeapon, CWeapon)
-TEST_OBJECT_CLASS(CScriptGameObject::IsMedkit, CMedkit)
-TEST_OBJECT_CLASS(CScriptGameObject::IsEatableItem, CEatableItem)
-TEST_OBJECT_CLASS(CScriptGameObject::IsAntirad, CAntirad)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsMedkit, CMedkit)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsEatableItem, CEatableItem)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsAntirad, CAntirad)
 TEST_OBJECT_CLASS(CScriptGameObject::IsCustomOutfit, CCustomOutfit)
 TEST_OBJECT_CLASS(CScriptGameObject::IsScope, CScope)
 TEST_OBJECT_CLASS(CScriptGameObject::IsSilencer, CSilencer)
@@ -428,20 +429,20 @@ TEST_OBJECT_CLASS(CScriptGameObject::IsSpaceRestrictor, CSpaceRestrictor)
 TEST_OBJECT_CLASS(CScriptGameObject::IsStalker, CAI_Stalker)
 TEST_OBJECT_CLASS(CScriptGameObject::IsAnomaly, CCustomZone)
 TEST_OBJECT_CLASS(CScriptGameObject::IsMonster, CBaseMonster)
-TEST_OBJECT_CLASS(CScriptGameObject::IsExplosive, CExplosive)
-TEST_OBJECT_CLASS(CScriptGameObject::IsScriptZone, CScriptZone)
-TEST_OBJECT_CLASS(CScriptGameObject::IsProjector, CProjector)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsExplosive, CExplosive)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsScriptZone, CScriptZone)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsProjector, CProjector)
 TEST_OBJECT_CLASS(CScriptGameObject::IsTrader, CAI_Trader)
 TEST_OBJECT_CLASS(CScriptGameObject::IsHudItem, CHudItem)
-TEST_OBJECT_CLASS(CScriptGameObject::IsFoodItem, CFoodItem)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsFoodItem, CFoodItem)
 TEST_OBJECT_CLASS(CScriptGameObject::IsArtefact, CArtefact)
 TEST_OBJECT_CLASS(CScriptGameObject::IsAmmo, CWeaponAmmo)
-TEST_OBJECT_CLASS(CScriptGameObject::IsMissile, CMissile)
-TEST_OBJECT_CLASS(CScriptGameObject::IsPhysicsShellHolder, CPhysicsShellHolder)
-TEST_OBJECT_CLASS(CScriptGameObject::IsGrenade, CGrenade)
-TEST_OBJECT_CLASS(CScriptGameObject::IsBottleItem, CBottleItem)
-TEST_OBJECT_CLASS(CScriptGameObject::IsTorch, CTorch)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsMissile, CMissile)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsPhysicsShellHolder, CPhysicsShellHolder)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsGrenade, CGrenade)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsBottleItem, CBottleItem)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsTorch, CTorch)
 TEST_OBJECT_CLASS(CScriptGameObject::IsWeaponGL, CWeaponMagazinedWGrenade)
 TEST_OBJECT_CLASS(CScriptGameObject::IsInventoryBox, CInventoryBox)
-
+#endif
 //end AVO

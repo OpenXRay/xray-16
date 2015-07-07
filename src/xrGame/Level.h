@@ -159,7 +159,9 @@ public:
     bool game_configured = false;
     NET_Queue_Event* game_events = nullptr;
     //AVO: queue to hold spawn events for SPAWN_ANTIFREEZE
+#ifdef SPAWN_ANTIFREEZE
     NET_Queue_Event* spawn_events = nullptr;
+#endif
     //-AVO
     xr_deque<CSE_Abstract*> game_spawn_queue;
     xrServer* Server = nullptr;
@@ -224,7 +226,9 @@ public:
     void cl_Process_Event(u16 dest, u16 type, NET_Packet& P);
     void cl_Process_Spawn(NET_Packet& P);
     //AVO: used by SPAWN_ANTIFREEZE (by alpet)
+#ifdef SPAWN_ANTIFREEZE
     bool PostponedSpawn(u16 id);
+#endif
     //-AVO
     void ProcessGameEvents();
     void ProcessGameSpawns();

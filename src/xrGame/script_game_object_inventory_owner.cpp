@@ -49,6 +49,7 @@
 #include "physicobject.h"
 //Alundaio
 #include "inventory_upgrade_manager.h"
+#include "inventory_upgrade_root.h"
 #include "inventory_item.h"
 //-Alundaio
 
@@ -1608,6 +1609,7 @@ bool CScriptGameObject::is_door_blocked_by_npc() const
 }
 
 //Alundaio: Methods for exporting the ability to detach/attach addons for magazined weapons
+#ifdef GAME_OBJECT_EXTENDED_EXPORTS
 void CScriptGameObject::Weapon_AddonAttach(CScriptGameObject* item)
 {
 	CWeaponMagazined* weapon = smart_cast<CWeaponMagazined*>(&object());
@@ -1643,25 +1645,22 @@ void CScriptGameObject::Weapon_AddonDetach(LPCSTR item_section)
 	}
 }
 
-void CScriptGameObject::AddUpgrade(LPCSTR upgrade)
+bool CScriptGameObject::InstallUpgrade(LPCSTR upgrade)
 {
 	CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
 	if (!item)
 	{
-		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryItem : cannot access class member AddUpgrade!");
-		return;
+		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryItem : cannot access class member InstallUpgrade!");
+		return false;
 	}
 
 	if (!pSettings->section_exist(upgrade))
-		return;
+		return false;
 
-	item->install_upgrade(upgrade);
-	//ai().alife().inventory_upgrade_manager().upgrade_install(*item, (upgrade), false);
-
-	return;
+	return ai().alife().inventory_upgrade_manager().upgrade_install(*item, upgrade, false);
 }
 
-bool CScriptGameObject::HasUpgrade(LPCSTR upgrade) const
+bool CScriptGameObject::HasUpgrade(LPCSTR upgrade)
 {
 	CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
 	if (!item)
@@ -1673,7 +1672,7 @@ bool CScriptGameObject::HasUpgrade(LPCSTR upgrade) const
 	if (!pSettings->section_exist(upgrade))
 		return false;
 
-	return item->verify_upgrade(upgrade);
+	return item->has_upgrade(upgrade);
 }
 
 void CScriptGameObject::IterateInstalledUpgrades(luabind::functor<void> functor)
@@ -1690,4 +1689,5 @@ void CScriptGameObject::IterateInstalledUpgrades(luabind::functor<void> functor)
 		functor((*ib).c_str(), object().lua_game_object());
 	}
 }
+#endif
 //Alundaio: END
