@@ -41,7 +41,9 @@ CWeaponMagazined::CWeaponMagazined(ESoundTypes eSoundType) : CWeapon()
     m_eSoundShot = ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING | eSoundType);
     m_eSoundEmptyClick = ESoundTypes(SOUND_TYPE_WEAPON_EMPTY_CLICKING | eSoundType);
     m_eSoundReload = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
+#ifdef NEW_SOUNDS
     m_eSoundReloadEmpty = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
+#endif
     m_sounds_enabled = true;
 
     m_sSndShotCurrent = nullptr;
@@ -83,7 +85,15 @@ void CWeaponMagazined::Load(LPCSTR section)
     // Sounds
     m_sounds.LoadSound(section, "snd_draw", "sndShow", false, m_eSoundShow);
     m_sounds.LoadSound(section, "snd_holster", "sndHide", false, m_eSoundHide);
-    m_sounds.LoadSound(section, "snd_shoot", "sndShot", false, m_eSoundShot);
+
+    //Alundaio: LAYERED_SND_SHOOT
+#ifdef LAYERED_SND_SHOOT
+    m_layered_sounds.LoadSound(section, "snd_shoot", "sndShot", true, m_eSoundShot);
+#else
+    m_sounds.LoadSound(section, "snd_shoot", "sndShot", true, m_eSoundShot);  //Alundaio: Set exclusive to true 
+#endif
+    //-Alundaio
+
     m_sounds.LoadSound(section, "snd_empty", "sndEmptyClick", false, m_eSoundEmptyClick);
     m_sounds.LoadSound(section, "snd_reload", "sndReload", true, m_eSoundReload);
 
@@ -172,9 +182,11 @@ void CWeaponMagazined::FireStart()
     else
     { // misfire
         //Alundaio
+#ifdef EXTENDED_WEAPON_CALLBACKS
         CGameObject	*object = smart_cast<CGameObject*>(H_Parent());
         if (object)
             object->callback(GameObject::eOnWeaponJammed)(object->lua_game_object(), this->lua_game_object());
+#endif
         //-Alundaio
 
         if (smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
@@ -188,6 +200,7 @@ void CWeaponMagazined::FireEnd()
 {
     inherited::FireEnd();
 
+    // XXX: disable autoreload via console
     CActor* actor = smart_cast<CActor*>(H_Parent());
     if (m_pInventory && !iAmmoElapsed && actor && GetState() != eReload)
         Reload();
@@ -612,7 +625,13 @@ void CWeaponMagazined::SetDefaults() { CWeapon::SetDefaults(); }
 void CWeaponMagazined::OnShot()
 {
     // Sound
-    PlaySound(m_sSndShotCurrent.c_str(), get_LastFP());
+    //Alundaio: LAYERED_SND_SHOOT
+#ifdef LAYERED_SND_SHOOT
+    m_layered_sounds.PlaySound(m_sSndShotCurrent.c_str(), get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
+#else
+    PlaySound(m_sSndShotCurrent.c_str(), get_LastFP(), (u8)(m_iShotNum - 1)); //Alundaio: Play sound at index (ie. snd_shoot, snd_shoot1, snd_shoot2, snd_shoot3)
+#endif
+    //-Alundaio
 
     // Camera
     AddShotEffector();
@@ -1173,11 +1192,13 @@ void CWeaponMagazined::OnZoomIn()
     if (GetState() == eIdle)
         PlayAnimIdle();
 
-	//Alundaio: callback not sure why vs2013 gives error, it's fine
-	CGameObject	*object = smart_cast<CGameObject*>(H_Parent());
-	if (object)
-		object->callback(GameObject::eOnWeaponZoomIn)(object->lua_game_object(),this->lua_game_object());
-	//-Alundaio
+    //Alundaio: callback not sure why vs2013 gives error, it's fine
+#ifdef EXTENDED_WEAPON_CALLBACKS
+    CGameObject	*object = smart_cast<CGameObject*>(H_Parent());
+    if (object)
+        object->callback(GameObject::eOnWeaponZoomIn)(object->lua_game_object(),this->lua_game_object());
+#endif
+    //-Alundaio
 
     CActor* pActor = smart_cast<CActor*>(H_Parent());
     if (pActor)
@@ -1203,9 +1224,11 @@ void CWeaponMagazined::OnZoomOut()
         PlayAnimIdle();
 
 	//Alundaio
+#ifdef EXTENDED_WEAPON_CALLBACKS
 	CGameObject	*object = smart_cast<CGameObject*>(H_Parent());
 	if (object)
 		object->callback(GameObject::eOnWeaponZoomOut)(object->lua_game_object(), this->lua_game_object());
+#endif
 	//-Alundaio
 
     CActor* pActor = smart_cast<CActor*>(H_Parent());
@@ -1353,14 +1376,21 @@ bool CWeaponMagazined::GetBriefInfo(II_BriefInfo& info)
         info.ap_ammo._set("");
         info.third_ammo._set("");
 
-        xr_sprintf(int_str, "%d", GetAmmoCount(m_ammoType));
-
-        if (m_ammoType == 0)
+        if (at_size >= 1)
+        {
+            xr_sprintf(int_str, "%d", GetAmmoCount(0));
             info.fmj_ammo._set(int_str);
-        else if (m_ammoType == 1)
+        }
+        if (at_size >= 2)
+        {
+            xr_sprintf(int_str, "%d", GetAmmoCount(1));
             info.ap_ammo._set(int_str);
-        else
+        }
+        if (at_size >= 3)
+        {
+            xr_sprintf(int_str, "%d", GetAmmoCount(2));
             info.third_ammo._set(int_str);
+        }
         //-Alundaio
     }
 

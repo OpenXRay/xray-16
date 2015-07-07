@@ -91,7 +91,7 @@ public:
     virtual void OnH_A_Independent();
 
     virtual void PlaySound(LPCSTR alias, const Fvector& position);
-
+    virtual void PlaySound(pcstr alias, const Fvector& position, u8 index); //Alundaio: Play at index
     virtual bool Action(u16 cmd, u32 flags) { return false; }
     void OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd);
 

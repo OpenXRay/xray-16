@@ -14,7 +14,7 @@
 TEMPLATE_SPECIALIZATION
 IC CEvaluator::CPropertyEvaluatorConst(_value_type value, LPCSTR evaluator_name) : m_value(value)
 {
-#ifdef LOG_ACTION
+#if 1//def LOG_ACTION //Alundaio: m_evaluator_name
     m_evaluator_name = evaluator_name;
 #endif
 }

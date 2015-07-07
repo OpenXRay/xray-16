@@ -43,7 +43,7 @@ CInventory::CInventory()
 {
     m_fMaxWeight = pSettings->r_float("inventory", "max_weight");
 
-    u32 sz = pSettings->r_s32("inventory", "slots_count");
+    u32 sz = LAST_SLOT + 1; //pSettings->r_s32("inventory", "slots_count"); //Alundaio: Get slot count directly to automate this process
     m_slots.resize(sz + 1); // first is [1]
 
     m_iActiveSlot = NO_ACTIVE_SLOT;
@@ -54,10 +54,10 @@ CInventory::CInventory()
     for (u16 i = FirstSlot(); i <= LastSlot(); ++i)
     {
         xr_sprintf(temp, "slot_persistent_%d", i);
-        m_slots[i].m_bPersistent = !!pSettings->r_bool("inventory", temp);
+        m_slots[i].m_bPersistent = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false); // !!pSettings->r_bool("inventory", temp); //Alundaio
 
         xr_sprintf(temp, "slot_active_%d", i);
-        m_slots[i].m_bAct = !!pSettings->r_bool("inventory", temp);
+        m_slots[i].m_bAct = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false); // !!pSettings->r_bool("inventory", temp); //Alundaio
     };
 
     m_bSlotsUseful = true;

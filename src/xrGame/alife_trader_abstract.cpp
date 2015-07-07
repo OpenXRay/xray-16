@@ -160,14 +160,16 @@ void add_online_impl(CSE_ALifeDynamicObject* object, const bool& update_registri
     clientID.set(
         object->alife().server().GetServerClient() ? object->alife().server().GetServerClient()->ID.value() : 0);
 
+    // XXX: Replace with range-based for
     ALife::OBJECT_IT I = object->children.begin();
     ALife::OBJECT_IT E = object->children.end();
     for (; I != E; ++I)
     {
-        //	this was for the car only
-        //		if (*I == ai().alife().graph().actor()->ID)
-        //			continue;
-        //
+        //Alundaio:
+        if (*I == ai().alife().graph().actor()->ID)
+            continue;
+        //-Alundaio
+
         CSE_ALifeDynamicObject* l_tpALifeDynamicObject = ai().alife().objects().object(*I);
         CSE_ALifeInventoryItem* l_tpALifeInventoryItem = smart_cast<CSE_ALifeInventoryItem*>(l_tpALifeDynamicObject);
         R_ASSERT2(l_tpALifeInventoryItem, "Non inventory item object has parent?!");

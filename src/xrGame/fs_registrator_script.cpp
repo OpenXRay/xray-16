@@ -15,6 +15,13 @@ LPCSTR update_path_script(CLocatorAPI* fs, LPCSTR initial, LPCSTR src)
     return *temp_2;
 }
 
+//Alundaio: Set flag to rescan all files in path
+void rescan_path_script(CLocatorAPI* fs, pcstr initial)
+{
+    fs->get_path(initial)->m_Flags.set(FS_Path::flNeedRescan, true);
+}
+//-Alundaio
+
 class FS_file_list
 {
     xr_vector<LPSTR>* m_p;
@@ -226,6 +233,7 @@ SCRIPT_EXPORT(fs_registrator, (), {
             .def("update_path", &update_path_script)
             .def("get_path", &CLocatorAPI::get_path)
             .def("append_path", &CLocatorAPI::append_path)
+            .def("rescan_path", &rescan_path_script) //Alundaio
 
             .def("file_delete", (void (CLocatorAPI::*)(LPCSTR, LPCSTR))(&CLocatorAPI::file_delete))
             .def("file_delete", (void (CLocatorAPI::*)(LPCSTR))(&CLocatorAPI::file_delete))

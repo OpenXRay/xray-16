@@ -49,6 +49,7 @@
 #include "PhysicObject.h"
 //Alundaio
 #include "inventory_upgrade_manager.h"
+#include "inventory_upgrade_root.h"
 #include "inventory_item.h"
 //-Alundaio
 
@@ -1700,6 +1701,7 @@ bool CScriptGameObject::is_door_blocked_by_npc() const
 
 
 //Alundaio: Methods for exporting the ability to detach/attach addons for magazined weapons
+#ifdef GAME_OBJECT_EXTENDED_EXPORTS
 void CScriptGameObject::Weapon_AddonAttach(CScriptGameObject* item)
 {
     auto weapon = smart_cast<CWeaponMagazined*>(&object());
@@ -1733,20 +1735,19 @@ void CScriptGameObject::Weapon_AddonDetach(pcstr item_section)
         weapon->Detach(item_section, true);
 }
 
-void CScriptGameObject::AddUpgrade(pcstr upgrade)
+bool CScriptGameObject::InstallUpgrade(pcstr upgrade)
 {
     CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
     if (!item)
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "CInventoryItem : cannot access class member AddUpgrade!");
-        return;
+        ai().script_engine().script_log(LuaMessageType::Error, "CInventoryItem : cannot access class member InstallUpgrade!");
+        return false;
     }
 
     if (!pSettings->section_exist(upgrade))
-        return;
+        return false;
 
-    item->install_upgrade(upgrade);
-    //ai().alife().inventory_upgrade_manager().upgrade_install(*item, (upgrade), false);
+    return ai().alife().inventory_upgrade_manager().upgrade_install(*item, upgrade, false);
 }
 
 bool CScriptGameObject::HasUpgrade(pcstr upgrade) const
@@ -1761,7 +1762,7 @@ bool CScriptGameObject::HasUpgrade(pcstr upgrade) const
     if (!pSettings->section_exist(upgrade))
         return false;
 
-    return item->verify_upgrade(upgrade);
+    return item->has_upgrade(upgrade);
 }
 
 void CScriptGameObject::IterateInstalledUpgrades(luabind::functor<void> functor)
@@ -1773,4 +1774,5 @@ void CScriptGameObject::IterateInstalledUpgrades(luabind::functor<void> functor)
     for (auto upgrade : Item->get_upgrades())
         functor(upgrade.c_str(), object().lua_game_object());
 }
-//Alundaio: END 
+#endif
+//-Alundaio

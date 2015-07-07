@@ -588,7 +588,7 @@ LPCSTR translate_string(LPCSTR str) { return *CStringTable().translate(str); }
 bool has_active_tutotial() { return (g_tutorial != NULL); }
 
 //Alundaio: namespace level exports extension
-
+#ifdef NAMESPACE_LEVEL_EXPORTS
 //ability to update level netpacket
 void g_send(NET_Packet& P, bool bReliable = false, bool bSequential = true, bool bHighPriority = false, bool bSendImmediately = false)
 {
@@ -596,7 +596,7 @@ void g_send(NET_Packet& P, bool bReliable = false, bool bSequential = true, bool
 }
 
 //can spawn entities like bolts, phantoms, ammo, etc. which normally crash when using alife():create()
-void spawn_section(pcstr sSection, Fvector3 vPosition, u32 LevelVertexID, u16 ParentID, bool bReturnItem)
+void spawn_section(pcstr sSection, Fvector3 vPosition, u32 LevelVertexID, u16 ParentID, bool bReturnItem = false)
 {
     Level().spawn_item(sSection, vPosition, LevelVertexID, ParentID, bReturnItem);
 }
@@ -631,6 +631,22 @@ u32 g_get_target_element()
 	return 0;
 }
 
+u8 get_active_cam()
+{
+    CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+    if (actor)
+        return (u8)actor->active_cam();
+
+    return 255;
+}
+
+void set_active_cam(u8 mode)
+{
+    CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+    if (actor && mode <= eacMaxCam)
+        actor->cam_Set((EActorCameras)mode);
+}
+#endif
 //-Alundaio
 
 IC static void CLevel_Export(lua_State* luaState)
@@ -643,12 +659,16 @@ IC static void CLevel_Export(lua_State* luaState)
 
     module(luaState, "level")[
         //Alundaio: Extend level namespace exports
+#ifdef NAMESPACE_LEVEL_EXPORTS
         def("send", &g_send) , //allow the ability to send netpacket to level
         //def("ray_pick",g_ray_pick),
         def("get_target_obj", &g_get_target_obj), //intentionally named to what is in xray extensions
         def("get_target_dist", &g_get_target_dist),
-        def("get_target_element", &g_get_target_element), //Can get bone cursor is targetting
+        def("get_target_element", &g_get_target_element), //Can get bone cursor is targeting
         def("spawn_item", &spawn_section),
+        def("get_active_cam", &get_active_cam),
+        def("set_active_cam", &set_active_cam),
+#endif
         //Alundaio: END
         // obsolete\deprecated
         def("object_by_id", get_object_by_id),

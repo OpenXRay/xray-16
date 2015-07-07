@@ -921,7 +921,7 @@ bool CWeaponMagazinedWGrenade::GetBriefInfo(II_BriefInfo& info)
 
     GetSuitableAmmoTotal();
 
-    u32 at_size = m_bGrenadeMode ? m_ammoTypes2.size() : m_ammoTypes.size();
+    const u32 at_size = m_bGrenadeMode ? m_ammoTypes2.size() : m_ammoTypes.size();
     if (unlimited_ammo() || at_size == 0)
     {
         info.fmj_ammo._set("--");
@@ -935,16 +935,22 @@ bool CWeaponMagazinedWGrenade::GetBriefInfo(II_BriefInfo& info)
         info.ap_ammo._set("");
         info.third_ammo._set("");
 
-        const u8 ammo_type = m_bGrenadeMode ? m_ammoType2 : m_ammoType;
-        xr_sprintf(int_str, "%d", m_bGrenadeMode ? GetAmmoCount2(ammo_type) : GetAmmoCount(ammo_type));
-
-        if (m_ammoType == 0)
+        if (at_size >= 1)
+        {
+            xr_sprintf(int_str, "%d", m_bGrenadeMode ? GetAmmoCount2(0) : GetAmmoCount(0));
             info.fmj_ammo._set(int_str);
-        else if (m_ammoType == 1)
+        }
+        if (at_size >= 2)
+        {
+            xr_sprintf(int_str, "%d", m_bGrenadeMode ? GetAmmoCount2(1) : GetAmmoCount(1));
             info.ap_ammo._set(int_str);
-        else
+        }
+        if (at_size >= 3)
+        {
+            xr_sprintf(int_str, "%d", m_bGrenadeMode ? GetAmmoCount2(2) : GetAmmoCount(2));
             info.third_ammo._set(int_str);
-        //-Alundaio
+        }
+		//-Alundaio
     }
 
     if (ae != 0 && m_magazine.size() != 0)

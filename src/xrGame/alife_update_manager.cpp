@@ -137,6 +137,13 @@ bool CALifeUpdateManager::change_level(NET_Packet& net_packet)
     if (m_changing_level)
         return (false);
 
+#ifdef ENGINE_LUA_ALIFE_UPDAGE_MANAGER_CALLBACKS
+    luabind::functor<void> funct;
+    ai().script_engine().functor("_G.CALifeUpdateManager__on_before_change_level", funct);
+    if (funct)
+        funct(&net_packet);
+#endif
+
     //	prepare_objects_for_save		();
     // we couldn't use prepare_objects_for_save since we need
     // get updates from client

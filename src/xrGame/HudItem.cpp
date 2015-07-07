@@ -48,6 +48,13 @@ void CHudItem::PlaySound(LPCSTR alias, const Fvector& position)
     m_sounds.PlaySound(alias, position, object().H_Root(), !!GetHUDmode());
 }
 
+//Alundaio: Play at index
+void CHudItem::PlaySound(pcstr alias, const Fvector& position, u8 index)
+{
+    m_sounds.PlaySound(alias, position, object().H_Root(), !!GetHUDmode(), false, index);
+}
+//-Alundaio
+
 void CHudItem::renderable_Render()
 {
     UpdateXForm();

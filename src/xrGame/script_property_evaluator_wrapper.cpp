@@ -44,8 +44,9 @@ bool CScriptPropertyEvaluatorWrapper::evaluate()
 #endif
     catch (...)
     {
+        //Alundaio: m_evaluator_name
         ai().script_engine().script_log(
-            LuaMessageType::Error, "SCRIPT RUNTIME ERROR : evaluator returns value with not a bool type!");
+            LuaMessageType::Error, "SCRIPT RUNTIME ERROR : evaluator [%s] returns value with not a bool type!", m_evaluator_name);
     }
     return (false);
 }

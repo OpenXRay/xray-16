@@ -368,7 +368,8 @@ void CScriptGameObject::stop_particles(LPCSTR pname, LPCSTR bone)
             LuaMessageType::Error, "Cant stop particles, bone [%s] is not visible now", bone);
 }
 
-//AVO: directly set entity health instead of going throuhg normal health property which operates on delta
+#ifdef GAME_OBJECT_TESTING_EXPORTS
+//AVO: directly set entity health instead of going through normal health property which operates on delta
 void CScriptGameObject::SetHealthEx(float hp)
 {
     CEntity* obj = smart_cast<CEntity*>(&object());
@@ -381,21 +382,21 @@ void CScriptGameObject::SetHealthEx(float hp)
 // AVO: functions for testing object class
 // Credits: KD
 //#include "Car.h"
-#include "helicopter.h"
+//#include "helicopter.h"
 #include "Actor.h"
 #include "CustomOutfit.h"
 //#include "CustomZone.h"
-#include "ai\Monsters\BaseMonster\base_monster.h"
-#include "medkit.h"
-#include "antirad.h"
+#include "ai/Monsters/BaseMonster/base_monster.h"
+//#include "medkit.h"
+//#include "antirad.h"
 #include "Scope.h"
 #include "Silencer.h"
-#include "Torch.h"
+//#include "Torch.h"
 #include "GrenadeLauncher.h"
 #include "searchlight.h"
 //#include "WeaponAmmo.h"
-#include "Grenade.h"
-#include "BottleItem.h"
+//#include "Grenade.h"
+//#include "BottleItem.h"
 #include "WeaponMagazinedWGrenade.h"
 
 // Xottab_DUTY: commented this macro, because of substituting it
@@ -410,12 +411,14 @@ bool A() const\
 }\
 */
 
+/*
 bool CScriptGameObject::isGameObject() const
 {
     auto l_tpEntity = smart_cast<CGameObject*>(&object());
     if (!l_tpEntity) return false;
     return true;
 }
+*/
 
 /*
 bool CScriptGameObject::isCar() const
@@ -426,12 +429,14 @@ bool CScriptGameObject::isCar() const
 }
 */
 
+/*
 bool CScriptGameObject::isHeli() const
 {
     auto l_tpEntity = smart_cast<CHelicopter*>(&object());
     if (!l_tpEntity) return false;
     return true;
 }
+*/
 
 /*
 bool CScriptGameObject::isHolderCustom() const
@@ -483,27 +488,32 @@ bool CScriptGameObject::isWeapon() const
     if (!l_tpEntity) return false;
     return true;
 }
-
+/*
 bool CScriptGameObject::isMedkit() const
 {
     auto l_tpEntity = smart_cast<CMedkit*>(&object());
     if (!l_tpEntity) return false;
     return true;
 }
+*/
 
+/*
 bool CScriptGameObject::isEatableItem() const
 {
     auto l_tpEntity = smart_cast<CEatableItem*>(&object());
     if (!l_tpEntity) return false;
     return true;
 }
+*/
 
+/*
 bool CScriptGameObject::isAntirad() const
 {
     auto l_tpEntity = smart_cast<CAntirad*>(&object());
     if (!l_tpEntity) return false;
     return true;
 }
+*/
 
 bool CScriptGameObject::isCustomOutfit() const
 {
@@ -568,26 +578,32 @@ bool CScriptGameObject::isMonster() const
     return true;
 }
 
+/*
 bool CScriptGameObject::isExplosive() const
 {
     auto l_tpEntity = smart_cast<CExplosive*>(&object());
     if (!l_tpEntity) return false;
     return true;
 }
+*/
 
+/*
 bool CScriptGameObject::isScriptZone() const
 {
     auto l_tpEntity = smart_cast<CScriptZone*>(&object());
     if (!l_tpEntity) return false;
     return true;
 }
+*/
 
+/*
 bool CScriptGameObject::isProjector() const
 {
     auto l_tpEntity = smart_cast<CProjector*>(&object());
     if (!l_tpEntity) return false;
     return true;
 }
+*/
 
 bool CScriptGameObject::isTrader() const
 {
@@ -603,12 +619,14 @@ bool CScriptGameObject::isHudItem() const
     return true;
 }
 
+/*
 bool CScriptGameObject::isFoodItem() const
 {
     auto l_tpEntity = smart_cast<CFoodItem*>(&object());
     if (!l_tpEntity) return false;
     return true;
 }
+*/
 
 bool CScriptGameObject::isArtefact() const
 {
@@ -624,40 +642,50 @@ bool CScriptGameObject::isAmmo() const
     return true;
 }
 
+/*
 bool CScriptGameObject::isMissile() const
 {
     auto l_tpEntity = smart_cast<CMissile*>(&object());
     if (!l_tpEntity) return false;
     return true;
 }
+*/
 
+/*
 bool CScriptGameObject::isPhysicsShellHolder() const
 {
     auto l_tpEntity = smart_cast<CPhysicsShellHolder*>(&object());
     if (!l_tpEntity) return false;
     return true;
 }
+*/
 
+/*
 bool CScriptGameObject::isGrenade() const
 {
     auto l_tpEntity = smart_cast<CGrenade*>(&object());
     if (!l_tpEntity) return false;
     return true;
 }
+*/
 
+/*
 bool CScriptGameObject::isBottleItem() const
 {
     auto l_tpEntity = smart_cast<CBottleItem*>(&object());
     if (!l_tpEntity) return false;
     return true;
 }
+*/
 
+/*
 bool CScriptGameObject::isTorch() const
 {
     auto l_tpEntity = smart_cast<CTorch*>(&object());
     if (!l_tpEntity) return false;
     return true;
 }
+*/
 
 bool CScriptGameObject::isWeaponGL() const
 {
@@ -672,4 +700,5 @@ bool CScriptGameObject::isInventoryBox() const
     if (!l_tpEntity) return false;
     return true;
 }
-//end AVO
+#endif
+//-AVO

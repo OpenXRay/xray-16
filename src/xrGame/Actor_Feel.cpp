@@ -146,7 +146,7 @@ void CActor::PickupModeUpdate()
 }
 
 #include "xrEngine/CameraBase.h"
-BOOL g_b_COD_PickUpMode = TRUE;
+BOOL g_b_COD_PickUpMode = TRUE; // XXX: allow to change this via console
 void CActor::PickupModeUpdate_COD()
 {
     if (Level().CurrentViewEntity() != this || !g_b_COD_PickUpMode)

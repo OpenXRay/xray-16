@@ -18,6 +18,7 @@ SCRIPT_EXPORT(CUIGameCustom, (), {
             .def("AddCustomStatic", &CUIGameCustom::AddCustomStatic)
             .def("RemoveCustomStatic", &CUIGameCustom::RemoveCustomStatic)
             .def("HideActorMenu", &CUIGameCustom::HideActorMenu)
+            .def("UpdateActorMenu", &CUIGameCustom::UpdateActorMenu) //Alundaio
             .def("HidePdaMenu", &CUIGameCustom::HidePdaMenu)
             .def("show_messages", &CUIGameCustom::ShowMessagesWindow)
             .def("hide_messages", &CUIGameCustom::HideMessagesWindow)
