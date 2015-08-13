@@ -218,14 +218,10 @@ void CUICellItem::UpdateConditionProgressBar()
 			CEatableItem* eitm = smart_cast<CEatableItem*>( itm );
 			if ( eitm )
 			{
-				Log("Name: ", eitm->m_name.c_str());
-				Log("Condition: ", cond );
 				u16 max_uses = eitm->GetMaxUses();
-				Log("Max uses: ", max_uses );
 				if ( max_uses > 1 )
 				{
 					u16 remaining_uses = eitm->GetRemainingUses();
-					Log("Remaining uses: ", remaining_uses );
 					if ( remaining_uses < 1 )
 					{
 						cond = 0.0f;
