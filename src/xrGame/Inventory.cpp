@@ -1,3 +1,8 @@
+////////////////////////////////////////////////////////////////////////////
+//	Modified by Axel DominatoR
+//	Last updated: 13/08/2015
+////////////////////////////////////////////////////////////////////////////
+
 #include "pch_script.h"
 #include "inventory.h"
 #include "actor.h"
@@ -1060,7 +1065,7 @@ bool CInventory::Eat(PIItem pIItem)
 	if(IsGameTypeSingle() && Actor()->m_inventory == this)
 		Actor()->callback(GameObject::eUseObject)((smart_cast<CGameObject*>(pIItem))->lua_game_object());
 
-	if(pItemToEat->Empty())
+	if (pItemToEat->CanDelete())
 	{
 		pIItem->SetDropManual(TRUE);
 		return		false;
