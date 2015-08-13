@@ -14,11 +14,14 @@
 #include "entity_alive.h"
 #include "EntityCondition.h"
 #include "InventoryOwner.h"
+#include "UIGameCustom.h"
 
 CEatableItem::CEatableItem()
 {
-    m_iPortionsNum = -1;
     m_physic_item = 0;
+    m_iMaxUses = 1;
+    m_iRemainingUses = 1;
+    m_bRemoveAfterUse = true;
 }
 
 CEatableItem::~CEatableItem() {}
@@ -32,14 +35,34 @@ void CEatableItem::Load(LPCSTR section)
 {
     inherited::Load(section);
 
-    m_iPortionsNum = pSettings->r_s32(section, "eat_portions_num");
-    VERIFY(m_iPortionsNum < 10000);
+    m_iRemainingUses = m_iMaxUses = READ_IF_EXISTS(pSettings, r_u16, section, "max_uses", 1);
+    m_bRemoveAfterUse = READ_IF_EXISTS(pSettings, r_bool, section, "remove_after_use", true);
+
+    if (IsUsingCondition())
+        SetCondition((float)m_iRemainingUses / (float)m_iMaxUses );
+}
+
+void CEatableItem::load(IReader& packet)
+{
+    inherited::load(packet);
+
+    m_iRemainingUses = packet.r_u16();
+}
+
+void CEatableItem::save(NET_Packet& packet)
+{
+    inherited::save(packet);
+
+    packet.w_u16(m_iRemainingUses);
 }
 
 BOOL CEatableItem::net_Spawn(CSE_Abstract* DC)
 {
     if (!inherited::net_Spawn(DC))
         return FALSE;
+
+    if (IsUsingCondition())
+        SetCondition((float)m_iRemainingUses / (float)m_iMaxUses);
 
     return TRUE;
 };
@@ -50,7 +73,7 @@ bool CEatableItem::Useful() const
         return false;
 
     //проверить не все ли еще съедено
-    if (m_iPortionsNum == 0)
+    if (m_iRemainingUses == 0)
         return false;
 
     return true;
@@ -108,10 +131,14 @@ bool CEatableItem::UseBy(CEntityAlive* entity_alive)
         Level().Send(tmp_packet);
     }
 
-    if (m_iPortionsNum > 0)
-        --m_iPortionsNum;
+    if (m_iRemainingUses > 0)
+        --m_iRemainingUses;
     else
-        m_iPortionsNum = 0;
+        m_iRemainingUses = 0;
+
+    SetCondition((float)m_iRemainingUses / (float)m_iMaxUses);
+    CurrentGameUI()->HideActorMenu();
+    CurrentGameUI()->ShowActorMenu();
 
     return true;
 }

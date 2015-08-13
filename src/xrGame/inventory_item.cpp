@@ -110,6 +110,9 @@ void CInventoryItem::Load(LPCSTR section)
     m_flags.set(FCanTrade, m_can_trade);
     m_flags.set(FIsQuestItem, READ_IF_EXISTS(pSettings, r_bool, section, "quest_item", FALSE));
 
+    // Added by Axel, to enable optional condition use on any item
+    m_flags.set(FUsingCondition, READ_IF_EXISTS(pSettings, r_bool, section, "use_condition", false));
+
     if (BaseSlot() != NO_ACTIVE_SLOT || Belt())
     {
         m_flags.set(FRuckDefault, pSettings->r_bool(section, "default_to_ruck"));
@@ -127,7 +130,7 @@ void CInventoryItem::ChangeCondition(float fDeltaCondition)
 
 void CInventoryItem::Hit(SHit* pHDS)
 {
-    if (!m_flags.test(FUsingCondition))
+    if (IsUsingCondition() == false)
         return;
 
     float hit_power = pHDS->damage();
