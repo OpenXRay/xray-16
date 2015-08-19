@@ -39,6 +39,8 @@
 #include "smart_cover.h"
 #include "smart_cover_description.h"
 #include "physics_shell_scripted.h"
+#include "CharacterPhysicsSupport.h" //Alundaio: For set_visual
+#include "damage_manager.h" //Alundaio: For set_visual
 
 class CScriptBinderObject;
 

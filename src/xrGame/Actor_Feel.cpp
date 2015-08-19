@@ -145,7 +145,7 @@ void CActor::PickupModeUpdate()
 }
 
 #include "../xrEngine/CameraBase.h"
-BOOL	g_b_COD_PickUpMode = TRUE;
+BOOL	g_b_COD_PickUpMode = FALSE; //Alundaio: Set FALSE, screw this magical call of duty item pickup shit
 void	CActor::PickupModeUpdate_COD	()
 {
 	if (Level().CurrentViewEntity() != this || !g_b_COD_PickUpMode) return;
