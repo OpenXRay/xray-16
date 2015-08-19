@@ -98,6 +98,8 @@ void CScriptGameObject::script_register(lua_State *L)
                 value("key_press",                  int(GameObject::eKeyPress)),
                 value("key_release",                int(GameObject::eKeyRelease)),
                 value("key_hold",                   int(GameObject::eKeyHold)),
+#endif
+#ifdef MOUSE_INPUT_CALLBACKS
                 value("mouse_move",                 int(GameObject::eMouseMove)),
                 value("mouse_wheel",                int(GameObject::eMouseWheel)),
 #endif

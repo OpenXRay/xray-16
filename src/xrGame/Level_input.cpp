@@ -48,7 +48,9 @@ void CLevel::IR_OnMouseWheel(int direction)
     if (g_bDisableAllInput) return;
 
     /* avo: script callback */
+#ifdef MOUSE_INPUT_CALLBACKS
     if (g_actor) g_actor->callback(GameObject::eMouseWheel)(direction);
+#endif
     /* avo: end */
 
     if (CurrentGameUI()->IR_UIOnMouseWheel(direction)) return;
@@ -84,7 +86,7 @@ void CLevel::IR_OnMouseMove(int dx, int dy)
 {
     if (g_bDisableAllInput)							return;
 
-#ifdef INPUT_CALLBACKS
+#ifdef MOUSE_INPUT_CALLBACKS
 /* avo: script callback */
     if (g_actor) g_actor->callback(GameObject::eMouseMove)(dx, dy);
     /* avo: end */
@@ -107,8 +109,10 @@ void CLevel::IR_OnMouseMove(int dx, int dy)
 extern bool g_block_pause;
 
 // Lain: added TEMP!!!
-extern float g_separate_factor;
-extern float g_separate_radius;
+#ifdef DEBUG
+	extern float g_separate_factor;
+	extern float g_separate_radius;
+#endif
 
 #include <luabind/functor.hpp>
 #include "script_engine.h"

@@ -45,6 +45,7 @@ void CBaseAction::init			(_object_type *object, LPCSTR action_name)
 //	if (xr_strlen(m_action_name))
 //		debug_log		(eActionStateConstructed);
 #endif
+	m_action_name = action_name; //alundaio
 }
 
 TEMPLATE_SPECIALIZATION

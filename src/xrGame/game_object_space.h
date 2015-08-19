@@ -60,6 +60,8 @@ namespace GameObject
         eKeyPress,
         eKeyRelease,
         eKeyHold,
+#endif
+#ifdef MOUSE_INPUT_CALLBACKS
         eMouseMove,
         eMouseWheel,
 #endif

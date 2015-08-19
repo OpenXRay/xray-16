@@ -92,18 +92,18 @@ void CWeaponMagazined::Load(LPCSTR section)
     inherited::Load(section);
 
     // Sounds
-    m_sounds.LoadSound(section, "snd_draw", "sndShow", false, m_eSoundShow);
-    m_sounds.LoadSound(section, "snd_holster", "sndHide", false, m_eSoundHide);
+    m_sounds.LoadSound(section, "snd_draw", "sndShow", true, m_eSoundShow);
+    m_sounds.LoadSound(section, "snd_holster", "sndHide", true, m_eSoundHide);
 
 	//Alundaio: LAYERED_SND_SHOOT
 #ifdef LAYERED_SND_SHOOT
-	m_layered_sounds.LoadSound(section, "snd_shoot", "sndShot", true, m_eSoundShot);
+	m_layered_sounds.LoadSound(section, "snd_shoot", "sndShot", false, m_eSoundShot);
 #else
-	m_sounds.LoadSound(section, "snd_shoot", "sndShot", true, m_eSoundShot);  //Alundaio: Set exclusive to true 
+	m_sounds.LoadSound(section, "snd_shoot", "sndShot", false, m_eSoundShot);
 #endif
 	//-Alundaio
 
-    m_sounds.LoadSound(section, "snd_empty", "sndEmptyClick", false, m_eSoundEmptyClick);
+    m_sounds.LoadSound(section, "snd_empty", "sndEmptyClick", true, m_eSoundEmptyClick);
     m_sounds.LoadSound(section, "snd_reload", "sndReload", true, m_eSoundReload);
 
 #ifdef NEW_SOUNDS //AVO: custom sounds go here
@@ -697,16 +697,17 @@ void CWeaponMagazined::switch2_Idle()
 #endif
 void CWeaponMagazined::switch2_Fire()
 {
-    CInventoryOwner* io = smart_cast<CInventoryOwner*>(H_Parent());
-    CInventoryItem* ii = smart_cast<CInventoryItem*>(this);
+	CInventoryOwner* io = smart_cast<CInventoryOwner*>(H_Parent());
+	if (!io)
+		return;
+
+	CInventoryItem* ii = smart_cast<CInventoryItem*>(this);
+	if (ii != io->inventory().ActiveItem())
+	{
+		Msg("WARNING: Not an active item, item %s, owner %s, active item %s", *cName(), *H_Parent()->cName(), io->inventory().ActiveItem() ? *io->inventory().ActiveItem()->object().cName() : "no_active_item");	
+		return;
+	}
 #ifdef DEBUG
-    if (!io)
-        return;
-    //VERIFY2					(io,make_string("no inventory owner, item %s",*cName()));
-
-    if (ii != io->inventory().ActiveItem())
-        Msg("! not an active item, item %s, owner %s, active item %s", *cName(), *H_Parent()->cName(), io->inventory().ActiveItem() ? *io->inventory().ActiveItem()->object().cName() : "no_active_item");
-
     if (!(io && (ii == io->inventory().ActiveItem())))
     {
         CAI_Stalker			*stalker = smart_cast<CAI_Stalker*>(H_Parent());
@@ -717,20 +718,7 @@ void CWeaponMagazined::switch2_Fire()
             stalker->planner().show_target_world_state();
         }
     }
-#else
-    if (!io)
-        return;
 #endif // DEBUG
-
-    //
-    //	VERIFY2(
-    //		io && (ii == io->inventory().ActiveItem()),
-    //		make_string(
-    //			"item[%s], parent[%s]",
-    //			*cName(),
-    //			H_Parent() ? *H_Parent()->cName() : "no_parent"
-    //		)
-    //	);
 
     m_bStopedAfterQueueFired = false;
     m_bFireSingleShot = true;

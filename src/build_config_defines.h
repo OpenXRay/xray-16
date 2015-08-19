@@ -3,8 +3,10 @@
 // CALLBACKS
 	//#define EXTENDED_ITEM_CALLBACKS						// (eItemToBelt, eItemToSlot, eItemToRuck)
 	#define EXTENDED_WEAPON_CALLBACKS						// (eOnWeaponZoomIn, eOnWeaponZoomOut, eOnWeaponJammed)
+	#define INVENTORY_UPGRADE_CALLBACKS						// calls lua function inventory_upgrades.effect_upgrade_item
 	#define ACTOR_BEFORE_DEATH_CALLBACK						// For extending the life of the actor to fake death or do other tasks that need to happen before actor is dead
-	#define INPUT_CALLBACKS									// (eKeyPress, eKeyRelease, eKeyHold, eMouseMove, eMouseWheel)
+	#define INPUT_CALLBACKS									// (eKeyPress, eKeyRelease, eKeyHold)
+	//#define MOUSE_INPUT_CALLBACKS							// (eMouseMove, eMouseWheel)
 	#define ENGINE_LUA_ALIFE_STORAGE_MANAGER_CALLBACKS		// calls lua functions from engine in a script named alife_storage_manager.script  (alife_storage_manager.CALifeStorageManager_save) and (alife_storage_manager.CALifeStorageManager_load)
 	#define ENGINE_LUA_ALIFE_UPDAGE_MANAGER_CALLBACKS		// calls lua function named on_before_change_level and on_after_new_game in _G.script when enabled
 //-CALLBACKS
@@ -35,13 +37,13 @@
 // TWEAKS:
 	//#define ACTOR_FEEL_GRENADE							// When undefined it disables the grenade HUD indicator for thrown grenades
 	//#define FP_DEATH										// first person death view (Note: It's fixed to position and does not follow corpse)
-	#define DEAD_BODY_COLLISION								// restore collision with dead bodies (thanks malandrinus) (edit by Alundaio: Only for Actor now)
-	//#define NEW_ANIMS										// use new animations. Please enclose any new animation addions with this define
+	//#define DEAD_BODY_COLLISION								// restore collision with dead bodies (thanks malandrinus) (Note: Collides with AI and they can get stuck)
+	#define NEW_ANIMS										// use new animations. Please enclose any new animation addions with this define
 	//#define DYNAMIC_SUN_MOVEMENT							// use dynamic sun movement. If this is not defined sun will move as configured in weather ltx files
 //-TWEAKS
 
 // SOUND:
-	//#define NEW_SOUNDS									// use new sounds. Please enclose any new sound addions with this define
+	#define NEW_SOUNDS									// use new sounds. Please enclose any new sound addions with this define
 	//#define LAYERED_SND_SHOOT								// see comment down below 
 //-SOUND
 
