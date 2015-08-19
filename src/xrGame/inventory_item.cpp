@@ -5,6 +5,9 @@
 //	Author		: Victor Reutsky, Yuri Dobronravin
 //	Description : Inventory item
 ////////////////////////////////////////////////////////////////////////////
+//	Modified by Axel DominatoR
+//	Last updated: 13/08/2015
+////////////////////////////////////////////////////////////////////////////
 
 //#include "stdafx.h"
 #include "pch_script.h"
@@ -114,6 +117,8 @@ void CInventoryItem::Load(LPCSTR section)
 	m_flags.set(FCanTrade,		READ_IF_EXISTS(pSettings, r_bool, section, "can_trade",	TRUE));
 	m_flags.set(FIsQuestItem,	READ_IF_EXISTS(pSettings, r_bool, section, "quest_item",FALSE));
 
+	// Added by Axel, to enable optional condition use on any item
+	m_flags.set( FUsingCondition, READ_IF_EXISTS( pSettings, r_bool, section, "use_condition", FALSE ));
 
 	if ( BaseSlot() != NO_ACTIVE_SLOT || Belt())
 	{
@@ -134,7 +139,7 @@ void  CInventoryItem::ChangeCondition(float fDeltaCondition)
 
 void	CInventoryItem::Hit					(SHit* pHDS)
 {
-	if( !m_flags.test(FUsingCondition) ) return;
+	if ( IsUsingCondition() == false ) return;
 
 	float hit_power = pHDS->damage();
 	hit_power *= GetHitImmunity(pHDS->hit_type);

@@ -1,3 +1,8 @@
+////////////////////////////////////////////////////////////////////////////
+//	Modified by Axel DominatoR
+//	Last updated: 13/08/2015
+////////////////////////////////////////////////////////////////////////////
+
 #include "stdafx.h"
 #include "ActorHelmet.h"
 #include "Actor.h"
@@ -55,6 +60,8 @@ void CHelmet::Load(LPCSTR section)
 	m_BonesProtectionSect			= READ_IF_EXISTS(pSettings, r_string, section, "bones_koeff_protection",  "" );
 	m_fShowNearestEnemiesDistance	= READ_IF_EXISTS(pSettings, r_float, section, "nearest_enemies_show_dist",  0.0f );
 
+	// Added by Axel, to enable optional condition use on any item
+	m_flags.set( FUsingCondition, READ_IF_EXISTS( pSettings, r_bool, section, "use_condition", TRUE ));
 }
 
 void CHelmet::ReloadBonesProtection()

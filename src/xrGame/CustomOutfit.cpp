@@ -1,3 +1,8 @@
+////////////////////////////////////////////////////////////////////////////
+//	Modified by Axel DominatoR
+//	Last updated: 13/08/2015
+////////////////////////////////////////////////////////////////////////////
+
 #include "stdafx.h"
 
 #include "customoutfit.h"
@@ -109,6 +114,9 @@ void CCustomOutfit::Load(LPCSTR section)
 
 	m_BonesProtectionSect	= READ_IF_EXISTS(pSettings, r_string, section, "bones_koeff_protection",  "" );
 	bIsHelmetAvaliable		= !!READ_IF_EXISTS(pSettings, r_bool, section, "helmet_avaliable", true);
+
+	// Added by Axel, to enable optional condition use on any item
+	m_flags.set( FUsingCondition, READ_IF_EXISTS( pSettings, r_bool, section, "use_condition", TRUE ));
 }
 
 void CCustomOutfit::ReloadBonesProtection()
