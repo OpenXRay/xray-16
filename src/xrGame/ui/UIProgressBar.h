@@ -32,6 +32,7 @@ protected:
 
 public:
     bool m_bUseColor;
+    bool m_bUseGradient;
     bool m_bNoLerp; //Alundaio: use only solid color with m_maxColor
     Fcolor m_minColor;
     Fcolor m_middleColor;

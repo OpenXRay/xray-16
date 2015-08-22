@@ -13,6 +13,8 @@
 #include "Weapon.h"
 #include "CustomOutfit.h"
 #include "ActorHelmet.h"
+#include "UIGameCustom.h"
+#include "UIActorMenu.h"
 
 CUICellItem* CUICellItem::m_mouse_selected_item = NULL;
 
@@ -145,6 +147,7 @@ bool CUICellItem::OnMouseAction(float x, float y, EUIMessages mouse_action)
     else if (mouse_action == WINDOW_LBUTTON_DB_CLICK)
     {
         GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_DB_CLICK, NULL);
+        CurrentGameUI()->GetActorMenu().SetCurrentConsumable(this);
         return true;
     }
     else if (mouse_action == WINDOW_RBUTTON_DOWN)
@@ -222,12 +225,13 @@ void CUICellItem::UpdateConditionProgressBar()
                     else if (max_uses > 8)
                         cond = (float)remaining_uses / (float)max_uses;
                     else
-                    {
                         cond = (float)remaining_uses * 0.125f - 0.0625f;
+
+                    if (max_uses < 8)
                         m_pConditionState->ShowBackground(false);
-                    }
 
                     m_pConditionState->m_bNoLerp = true;
+                    m_pConditionState->m_bUseGradient = false;
                 }
             }
 
