@@ -212,7 +212,7 @@ protected:
 	void						BindDragDropListEvents		(CUIDragDropListEx* lst);
 	
 	EDDListType					GetListType					(CUIDragDropListEx* l);
-	CUIDragDropListEx*			GetListByType				(EDDListType t);
+	//CUIDragDropListEx*			GetListByType				(EDDListType t); //Alundaio: Make public
 	CUIDragDropListEx*			GetSlotList					(u16 slot_idx);
 	bool						CanSetItemToList			(PIItem item, CUIDragDropListEx* l, u16& ret_slot);
 	
@@ -338,5 +338,7 @@ public:
 	void						UpdateConditionProgressBars	();
 
 	IC	UIHint*					get_hint_wnd				() { return m_hint_wnd; }
+
+	CUIDragDropListEx*			GetListByType(EDDListType t); //Alundaio: Make public
 
 }; // class CUIActorMenu

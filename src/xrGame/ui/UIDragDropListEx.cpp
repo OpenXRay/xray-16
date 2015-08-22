@@ -300,7 +300,6 @@ void CUIDragDropListEx::Compact()
 	}
 }
 
-
 void CUIDragDropListEx::Draw()
 {
 	inherited::Draw				();

@@ -25,7 +25,7 @@ CEatableItem::CEatableItem()
 
 	m_iMaxUses = 1;
 	m_iRemainingUses = 1;
-	m_bRemoveAfterUse = true;
+	m_bRemoveAfterUse = TRUE;
 }
 
 CEatableItem::~CEatableItem()
@@ -43,7 +43,7 @@ void CEatableItem::Load(LPCSTR section)
 	inherited::Load(section);
 
 	m_iRemainingUses = m_iMaxUses = READ_IF_EXISTS( pSettings, r_u16, section, "max_uses", 1 );
-	m_bRemoveAfterUse = READ_IF_EXISTS( pSettings, r_bool, section, "remove_after_use", TRUE );
+	m_bRemoveAfterUse = READ_IF_EXISTS(pSettings, r_bool, section, "remove_after_use", TRUE);
 
 	if ( IsUsingCondition())
 	{
@@ -148,8 +148,5 @@ bool CEatableItem::UseBy (CEntityAlive* entity_alive)
 	}
 
 	SetCondition(( float ) m_iRemainingUses / ( float ) m_iMaxUses );
-	CurrentGameUI()->HideActorMenu();
-	CurrentGameUI()->ShowActorMenu();
-
 	return true;
 }

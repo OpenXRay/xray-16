@@ -86,6 +86,7 @@ void CUIInventoryCellItem::SetIsHelper (bool is_helper)
 void CUIInventoryCellItem::Update()
 {
 	inherited::Update	();
+	inherited:UpdateConditionProgressBar(); //Alundaio
 	UpdateItemText();
 
 	u32 color = GetTextureColor();

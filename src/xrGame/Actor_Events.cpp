@@ -239,7 +239,7 @@ void CActor::OnEvent(NET_Packet& P, u16 type)
 				inventory().Ruck( iitem ); 
 				break;//2
 			case GEG_PLAYER_ITEM_EAT:	 
-				inventory().Eat( iitem ); 
+				inventory().Eat( iitem );
 				break;//2
 			}//switch
 
