@@ -116,7 +116,7 @@ void CCustomOutfit::Load(LPCSTR section)
 	bIsHelmetAvaliable		= !!READ_IF_EXISTS(pSettings, r_bool, section, "helmet_avaliable", true);
 
 	// Added by Axel, to enable optional condition use on any item
-	m_flags.set( FUsingCondition, READ_IF_EXISTS( pSettings, r_bool, section, "use_condition", TRUE ));
+	m_flags.set(FUsingCondition, READ_IF_EXISTS(pSettings, r_bool, section, "use_condition", TRUE));
 }
 
 void CCustomOutfit::ReloadBonesProtection()
