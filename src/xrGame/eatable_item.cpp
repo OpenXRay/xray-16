@@ -18,6 +18,7 @@
 #include "EntityCondition.h"
 #include "InventoryOwner.h"
 #include "UIGameCustom.h"
+#include "ui/UIActorMenu.h"
 
 CEatableItem::CEatableItem()
 {
@@ -43,7 +44,7 @@ void CEatableItem::Load(LPCSTR section)
 	inherited::Load(section);
 
 	m_iRemainingUses = m_iMaxUses = READ_IF_EXISTS( pSettings, r_u16, section, "max_uses", 1 );
-	m_bRemoveAfterUse = READ_IF_EXISTS(pSettings, r_bool, section, "remove_after_use", TRUE);
+	m_bRemoveAfterUse = READ_IF_EXISTS( pSettings, r_bool, section, "remove_after_use", TRUE );
 
 	if ( IsUsingCondition())
 	{
@@ -148,5 +149,8 @@ bool CEatableItem::UseBy (CEntityAlive* entity_alive)
 	}
 
 	SetCondition(( float ) m_iRemainingUses / ( float ) m_iMaxUses );
+
+	CurrentGameUI()->GetActorMenu().RefreshConsumableCells();
+
 	return true;
 }

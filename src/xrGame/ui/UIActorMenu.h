@@ -80,6 +80,7 @@ protected:
 	CUICellItem*				m_InfoCellItem;
 	u32							m_InfoCellItem_timer;
 	CUICellItem*				m_pCurrentCellItem;
+	CUICellItem* m_pCurrentConsumable;
 	CUICellItem*				m_upgrade_selected;
 	CUIPropertiesBox*			m_UIPropertiesBox;
 
@@ -212,7 +213,7 @@ protected:
 	void						BindDragDropListEvents		(CUIDragDropListEx* lst);
 	
 	EDDListType					GetListType					(CUIDragDropListEx* l);
-	//CUIDragDropListEx*			GetListByType				(EDDListType t); //Alundaio: Make public
+	CUIDragDropListEx*			GetListByType				(EDDListType t);
 	CUIDragDropListEx*			GetSlotList					(u16 slot_idx);
 	bool						CanSetItemToList			(PIItem item, CUIDragDropListEx* l, u16& ret_slot);
 	
@@ -339,6 +340,7 @@ public:
 
 	IC	UIHint*					get_hint_wnd				() { return m_hint_wnd; }
 
-	CUIDragDropListEx*			GetListByType(EDDListType t); //Alundaio: Make public
-
+	CUICellItem* GetCurrentConsumable(){ return m_pCurrentConsumable; };
+	void SetCurrentConsumable( CUICellItem* ci ){ m_pCurrentConsumable = ci; };
+	void RefreshConsumableCells();
 }; // class CUIActorMenu

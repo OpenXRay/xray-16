@@ -20,6 +20,9 @@
 #include "CustomOutfit.h"
 #include "ActorHelmet.h"
 
+#include "UIGameCustom.h"
+#include "UIActorMenu.h"
+
 CUICellItem* CUICellItem::m_mouse_selected_item = NULL;
 
 CUICellItem::CUICellItem()
@@ -132,34 +135,34 @@ void CUICellItem::Update()
 
 bool CUICellItem::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
-	if (mouse_action == WINDOW_LBUTTON_DOWN)
+	if ( mouse_action == WINDOW_LBUTTON_DOWN )
 	{
-		GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_LBUTTON_CLICK, NULL);
-		GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_SELECTED, NULL);
+		GetMessageTarget()->SendMessage( this, DRAG_DROP_ITEM_LBUTTON_CLICK, NULL );
+		GetMessageTarget()->SendMessage( this, DRAG_DROP_ITEM_SELECTED, NULL );
 		m_mouse_selected_item = this;
 		return false;
 	}
-	else if (mouse_action == WINDOW_MOUSE_MOVE)
+	else if ( mouse_action == WINDOW_MOUSE_MOVE )
 	{
-		if (pInput->iGetAsyncBtnState(0) && m_mouse_selected_item && m_mouse_selected_item == this)
+		if ( pInput->iGetAsyncBtnState(0) && m_mouse_selected_item && m_mouse_selected_item == this )
 		{
-			GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_DRAG, NULL);
+			GetMessageTarget()->SendMessage( this, DRAG_DROP_ITEM_DRAG, NULL );
 			return true;
 		}
 	}
-	else if (mouse_action == WINDOW_LBUTTON_DB_CLICK)
+	else if ( mouse_action == WINDOW_LBUTTON_DB_CLICK )
 	{
-		GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_DB_CLICK, NULL);
+		GetMessageTarget()->SendMessage( this, DRAG_DROP_ITEM_DB_CLICK, NULL );
+		CurrentGameUI()->GetActorMenu().SetCurrentConsumable( this );
 		return true;
 	}
-	else if (mouse_action == WINDOW_RBUTTON_DOWN)
+	else if ( mouse_action == WINDOW_RBUTTON_DOWN )
 	{
-		GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_RBUTTON_CLICK, NULL);
+		GetMessageTarget()->SendMessage( this, DRAG_DROP_ITEM_RBUTTON_CLICK, NULL );
 		return true;
 	}
-
+	
 	m_mouse_selected_item = NULL;
-
 	return false;
 };
 
@@ -169,6 +172,7 @@ bool CUICellItem::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 	{
 		if (GetAccelerator() == dik)
 		{
+			GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_DB_CLICK, NULL);
 			return		true;
 		}
 	}
@@ -212,7 +216,7 @@ void CUICellItem::UpdateConditionProgressBar()
 	{
 		PIItem itm = (PIItem)m_pData;
 		if ( itm->IsUsingCondition())
-		{ 
+		{
 			float cond = itm->GetCondition();
 
 			CEatableItem* eitm = smart_cast<CEatableItem*>( itm );
@@ -233,10 +237,14 @@ void CUICellItem::UpdateConditionProgressBar()
 					else
 					{
 						cond = (( float )remaining_uses * 0.125f ) - 0.0625f;
+					}
+
+					if ( max_uses < 8 )
+					{
 						m_pConditionState->ShowBackground( false );
 					}
 
-					m_pConditionState->m_bNoLerp = true;
+					m_pConditionState->m_bUseGradient = false;
 				}
 			}
 
