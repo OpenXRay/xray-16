@@ -224,7 +224,11 @@ protected:
     void BindDragDropListEvents(CUIDragDropListEx* lst);
 
     EDDListType GetListType(CUIDragDropListEx* l);
-    CUIDragDropListEx* GetListByType(EDDListType t);
+
+public:
+    CUIDragDropListEx* GetListByType(EDDListType t); //Alundaio: Make public
+
+protected:
     CUIDragDropListEx* GetSlotList(u16 slot_idx);
     bool CanSetItemToList(PIItem item, CUIDragDropListEx* l, u16& ret_slot);
 

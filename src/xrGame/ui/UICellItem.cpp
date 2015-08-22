@@ -227,7 +227,7 @@ void CUICellItem::UpdateConditionProgressBar()
                         m_pConditionState->ShowBackground(false);
                     }
 
-                    m_pConditionState->m_bUseColor = false;
+                    m_pConditionState->m_bNoLerp = true;
                 }
             }
 

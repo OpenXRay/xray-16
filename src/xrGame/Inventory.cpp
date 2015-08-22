@@ -1075,9 +1075,12 @@ bool CInventory::Eat(PIItem pIItem)
 
     if (pItemToEat->CanDelete())
     {
-        pIItem->SetDropManual(TRUE);
-        return false;
+        if (!pItemToEat->CanDelete())
+            return false;
+
+        pIItem->SetDropManual(true);
     }
+
     return true;
 }
 
