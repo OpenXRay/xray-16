@@ -1313,31 +1313,32 @@ void CUIActorMenu::MoveArtefactsToBag()
 void CUIActorMenu::RefreshConsumableCells()
 {
 	CUICellItem* ci = GetCurrentConsumable();
-	if ( ci )
+	if (!ci)
+		return;
+
+	if (ci->ChildsCount() > 0)
 	{
 		CEatableItem* eitm = smart_cast<CEatableItem*>(( CEatableItem* ) ci->m_pData );
-		if ( eitm )
+		if (eitm)
 		{
-			Fvector2 cp = GetUICursor().GetCursorPosition();
-			CUIDragDropListEx* invlist = GetListByType( iActorBag );
-
-			CUICellItem* parent = invlist->RemoveItem( ci, true );
-			u32 c = parent->ChildsCount();
-			if ( c > 0 )
+			CUIDragDropListEx* invlist = GetListByType(iActorBag);
+			
+			if (invlist->IsOwner(ci))
 			{
-				while ( parent->ChildsCount())
+				CUICellItem* parent = invlist->RemoveItem(ci, true);
+
+				if (parent->ChildsCount() > 0)
 				{
-					CUICellItem* child = parent->PopChild( NULL );
-					invlist->SetItem( child );
+					while (parent->ChildsCount())
+					{
+						CUICellItem* child = parent->PopChild(NULL);
+						invlist->SetItem(child);
+					}
 				}
-
-				invlist->SetItem( parent );
-			}
-			else
-			{
-				invlist->SetItem( parent );
+				invlist->SetItem(parent);
 			}
 		}
-		SetCurrentConsumable( NULL );
 	}
+
+	SetCurrentConsumable(NULL);
 }

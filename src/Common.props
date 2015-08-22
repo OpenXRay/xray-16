@@ -17,7 +17,11 @@
   <PropertyGroup>
     <IncludePath>E:\STALKER\X-Ray Source\x_ray_1602_VS13\xray-16\src\3rd party;$(IncludePath)</IncludePath>
   </PropertyGroup>
-  <ItemDefinitionGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <BuildMacro Include="xrBinRootDir">
       <Value>$(xrBinRootDir)</Value>
