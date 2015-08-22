@@ -39,7 +39,7 @@ public:
 	virtual	bool			UseBy						(CEntityAlive* npc);
 
 		bool Empty() const { return m_iRemainingUses == 0; };
-		bool CanDelete() const { return ( Empty() && ( m_bRemoveAfterUse == true )); };
+		bool CanDelete() const { return ( m_bRemoveAfterUse == true ); };
 		virtual u16 GetMaxUses() const { return m_iMaxUses; };
 		virtual u16 GetRemainingUses() const { return m_iRemainingUses; };
 };

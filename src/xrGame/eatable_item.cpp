@@ -18,6 +18,7 @@
 #include "EntityCondition.h"
 #include "InventoryOwner.h"
 #include "UIGameCustom.h"
+#include "ui/UIActorMenu.h"
 
 CEatableItem::CEatableItem()
 {
@@ -148,8 +149,8 @@ bool CEatableItem::UseBy (CEntityAlive* entity_alive)
 	}
 
 	SetCondition(( float ) m_iRemainingUses / ( float ) m_iMaxUses );
-	CurrentGameUI()->HideActorMenu();
-	CurrentGameUI()->ShowActorMenu();
+
+	CurrentGameUI()->GetActorMenu().RefreshConsumableCells();
 
 	return true;
 }
