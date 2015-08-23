@@ -138,8 +138,6 @@ bool CEatableItem::UseBy(CEntityAlive* entity_alive)
         m_iRemainingUses = 0;
 
     SetCondition((float)m_iRemainingUses / (float)m_iMaxUses);
-    if (IsUsingCondition())
-        CurrentGameUI()->GetActorMenu().RefreshConsumableCells();
 
     return true;
 }
