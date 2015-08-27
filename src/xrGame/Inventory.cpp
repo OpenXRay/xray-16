@@ -1070,8 +1070,17 @@ bool CInventory::Eat(PIItem pIItem)
         pItemToEat->object().cNameSect().c_str());
 #endif // MP_LOGGING
 
-    if (IsGameTypeSingle() && Actor()->m_inventory == this)
-        Actor()->callback(GameObject::eUseObject)((smart_cast<CGameObject*>(pIItem))->lua_game_object());
+    if (Actor()->m_inventory == this)
+    {
+        if (IsGameTypeSingle())
+            Actor()->callback(GameObject::eUseObject)(smart_cast<CGameObject*>(pIItem)->lua_game_object());
+
+        if (pItemToEat->IsUsingCondition() && pItemToEat->GetRemainingUses() < 1 && pItemToEat->CanDelete())
+            CurrentGameUI()->GetActorMenu().RefreshCurrentItemCell();
+
+        CurrentGameUI()->GetActorMenu().SetCurrentItem(nullptr);
+    }
+        
 
     if (pItemToEat->Empty())
     {
@@ -1080,9 +1089,6 @@ bool CInventory::Eat(PIItem pIItem)
 
         pIItem->SetDropManual(true);
     }
-
-    if (pItemToEat->IsUsingCondition() && Actor()->m_inventory == this)
-        CurrentGameUI()->GetActorMenu().RefreshConsumableCells();
 
     return true;
 }

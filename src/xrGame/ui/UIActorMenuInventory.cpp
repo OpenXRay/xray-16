@@ -719,7 +719,7 @@ bool CUIActorMenu::TryUseItem(CUICellItem* cell_itm)
         return false;
     }
 
-    cell_itm->UpdateConditionProgressBar(); //Alundaio
+    //cell_itm->UpdateConditionProgressBar(); //Alundaio
 
     u16 recipient = m_pActorInvOwner->object_id();
     if (item->parent_id() != recipient)
@@ -730,7 +730,7 @@ bool CUIActorMenu::TryUseItem(CUICellItem* cell_itm)
 
     SendEvent_Item_Eat(item, recipient);
     PlaySnd(eItemUse);
-    SetCurrentItem(NULL);
+    //SetCurrentItem(nullptr);
     return true;
 }
 
@@ -1037,41 +1037,59 @@ void CUIActorMenu::PropertiesBoxForAddon(PIItem item, bool& b_show)
 
 void CUIActorMenu::PropertiesBoxForUsing(PIItem item, bool& b_show)
 {
-    CMedkit* pMedkit = smart_cast<CMedkit*>(item);
-    CAntirad* pAntirad = smart_cast<CAntirad*>(item);
-    CEatableItem* pEatableItem = smart_cast<CEatableItem*>(item);
-    CBottleItem* pBottleItem = smart_cast<CBottleItem*>(item);
+    pcstr act_str = nullptr;
+    CGameObject* GO = smart_cast<CGameObject*>(item);
+    shared_str section_name = GO->cNameSect();
 
-    LPCSTR act_str = NULL;
-    if (pMedkit || pAntirad)
-    {
-        act_str = "st_use";
-    }
-    else if (pBottleItem)
-    {
-        act_str = "st_drink";
-    }
-    else if (pEatableItem)
-    {
-        IGameObject* pObj = smart_cast<IGameObject*>(item);
-        shared_str section_name = pObj->cNameSect();
-        if (!xr_strcmp(section_name, "vodka") || !(xr_strcmp(section_name, "energy_drink")))
-        {
-            act_str = "st_drink";
-        }
-        else if (!xr_strcmp(section_name, "bread") || !xr_strcmp(section_name, "kolbasa") ||
-            !xr_strcmp(section_name, "conserva"))
-        {
-            act_str = "st_eat";
-        }
-        else
-        {
-            act_str = "st_use";
-        }
-    }
+    //ability to set eat string from settings
+    act_str = READ_IF_EXISTS(pSettings, r_string, section_name, "default_use_text", 0);
     if (act_str)
     {
-        m_UIPropertiesBox->AddItem(act_str, NULL, INVENTORY_EAT_ACTION);
+        m_UIPropertiesBox->AddItem(act_str, nullptr, INVENTORY_EAT_ACTION);
+        b_show = true;
+    }
+    else
+    {
+        CMedkit* pMedkit = smart_cast<CMedkit*>(item);
+        CAntirad* pAntirad = smart_cast<CAntirad*>(item);
+        CEatableItem * pEatableItem = smart_cast<CEatableItem*>(item);
+        CBottleItem* pBottleItem = smart_cast<CBottleItem*>(item);
+
+        if (pMedkit || pAntirad)
+            act_str = "st_use";
+        else if (pBottleItem)
+            act_str = "st_drink";
+        else if (pEatableItem)
+        {
+            // XXX: Xottab_DUTY: remove this..
+            if (!xr_strcmp(section_name, "vodka") || !xr_strcmp(section_name, "energy_drink"))
+                act_str = "st_drink";
+            else if (!xr_strcmp(section_name, "bread") || !xr_strcmp(section_name, "kolbasa") || !xr_strcmp(
+                section_name, "conserva"))
+                act_str = "st_eat";
+            else
+                act_str = "st_use";
+        }
+        if (act_str)
+        {
+            m_UIPropertiesBox->AddItem(act_str, nullptr, INVENTORY_EAT_ACTION);
+            b_show = true;
+        }
+    }
+
+    //1st Custom Use action
+    act_str = READ_IF_EXISTS(pSettings, r_string, section_name, "use1_text", 0);
+    if (act_str)
+    {
+        m_UIPropertiesBox->AddItem(act_str, nullptr, INVENTORY_EAT2_ACTION);
+        b_show = true;
+    }
+
+    //2nd Custom Use action
+    act_str = READ_IF_EXISTS(pSettings, r_string, section_name, "use2_text", 0);
+    if (act_str)
+    {
+        m_UIPropertiesBox->AddItem(act_str, nullptr, INVENTORY_EAT3_ACTION);
         b_show = true;
     }
 }
@@ -1129,12 +1147,37 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
     case INVENTORY_TO_SLOT_ACTION: ToSlot(cell_item, true, item->BaseSlot()); break;
     case INVENTORY_TO_BELT_ACTION: ToBelt(cell_item, false); break;
     case INVENTORY_TO_BAG_ACTION: ToBag(cell_item, false); break;
-
-    case INVENTORY_EAT_ACTION:
-        CurrentGameUI()->GetActorMenu().SetCurrentConsumable(cell_item);
-        TryUseItem(cell_item);
+    case INVENTORY_EAT_ACTION: TryUseItem(cell_item); break;
+    case INVENTORY_EAT2_ACTION:
+    {
+        CGameObject* GO = smart_cast<CGameObject*>(item);
+        const pcstr functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use1_functor", 0);
+        if (functor_name)
+        {
+            luabind::functor<bool> funct1;
+            if (ai().script_engine().functor(functor_name, funct1))
+            {
+                if (funct1(GO->lua_game_object()))
+                    TryUseItem(cell_item);
+            }
+        }
         break;
-
+    }
+    case INVENTORY_EAT3_ACTION:
+    {
+        CGameObject* GO = smart_cast<CGameObject*>(item);
+        const pcstr functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use2_functor", 0);
+        if (functor_name)
+        {
+            luabind::functor<bool> funct2;
+            if (ai().script_engine().functor(functor_name, funct2))
+            {
+                if (funct2(GO->lua_game_object()))
+                    TryUseItem(cell_item);
+            }
+        }
+        break;
+    }
     case INVENTORY_DROP_ACTION:
     {
         void* d = m_UIPropertiesBox->GetClickedItem()->GetData();
@@ -1246,7 +1289,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
     }
     } // switch
 
-    SetCurrentItem(NULL);
+    //SetCurrentItem(nullptr);
     UpdateItemsPlace();
     UpdateConditionProgressBars();
 } // ProcessPropertiesBoxClicked
@@ -1297,35 +1340,29 @@ void CUIActorMenu::MoveArtefactsToBag()
     m_pInventoryBeltList->ClearAll(true);
 }
 
-void CUIActorMenu::RefreshConsumableCells()
+void CUIActorMenu::RefreshCurrentItemCell()
 {
-    CUICellItem* ci = GetCurrentConsumable();
+    CUICellItem* ci = CurrentItem();
     if (!ci)
         return;
 
     if (ci->ChildsCount() > 0)
     {
-        CEatableItem* eitm = smart_cast<CEatableItem*>((CEatableItem*)ci->m_pData);
-        if (eitm)
+        CUIDragDropListEx* invlist = GetListByType(iActorBag);
+
+        if (invlist->IsOwner(ci))
         {
-            CUIDragDropListEx* invlist = GetListByType(iActorBag);
+            CUICellItem* parent = invlist->RemoveItem(ci, true);
 
-            if (invlist->IsOwner(ci))
+            if (parent->ChildsCount() > 0)
             {
-                CUICellItem* parent = invlist->RemoveItem(ci, true);
-
-                if (parent->ChildsCount() > 0)
+                while (parent->ChildsCount())
                 {
-                    while (parent->ChildsCount())
-                    {
-                        CUICellItem* child = parent->PopChild(nullptr);
-                        invlist->SetItem(child);
-                    }
+                    CUICellItem* child = parent->PopChild(nullptr);
+                    invlist->SetItem(child);
                 }
-                invlist->SetItem(parent);
             }
+            invlist->SetItem(parent);
         }
     }
-
-    SetCurrentConsumable(nullptr);
 }

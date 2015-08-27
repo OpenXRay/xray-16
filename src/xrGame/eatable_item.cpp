@@ -36,25 +36,32 @@ void CEatableItem::Load(LPCSTR section)
 {
     inherited::Load(section);
 
-    m_iRemainingUses = m_iMaxUses = READ_IF_EXISTS(pSettings, r_u16, section, "max_uses", 1);
+    m_iRemainingUses = m_iMaxUses = READ_IF_EXISTS(pSettings, r_u8, section, "max_uses", 1);
     m_bRemoveAfterUse = READ_IF_EXISTS(pSettings, r_bool, section, "remove_after_use", true);
+    m_fWeightFull = m_weight;
+    m_fWeightEmpty = READ_IF_EXISTS(pSettings, r_float, section, "empty_weight", 0.0f);
 
     if (IsUsingCondition())
-        SetCondition((float)m_iRemainingUses / (float)m_iMaxUses );
+    {
+        if (m_iMaxUses > 0)
+            SetCondition(static_cast<float>(m_iRemainingUses / m_iMaxUses));
+        else
+            SetCondition(0.f);
+    }
 }
 
 void CEatableItem::load(IReader& packet)
 {
     inherited::load(packet);
 
-    m_iRemainingUses = packet.r_u16();
+    m_iRemainingUses = packet.r_u8();
 }
 
 void CEatableItem::save(NET_Packet& packet)
 {
     inherited::save(packet);
 
-    packet.w_u16(m_iRemainingUses);
+    packet.w_u8(m_iRemainingUses);
 }
 
 BOOL CEatableItem::net_Spawn(CSE_Abstract* DC)
@@ -63,7 +70,12 @@ BOOL CEatableItem::net_Spawn(CSE_Abstract* DC)
         return FALSE;
 
     if (IsUsingCondition())
-        SetCondition((float)m_iRemainingUses / (float)m_iMaxUses);
+    {
+        if (m_iMaxUses > 0)
+            SetCondition(static_cast<float>(m_iRemainingUses / m_iMaxUses));
+        else
+            SetCondition(0);
+    }
 
     return TRUE;
 };
@@ -74,8 +86,10 @@ bool CEatableItem::Useful() const
         return false;
 
     //проверить не все ли еще съедено
+    /*Alundaio: Commented out to prevent crash when placing items with 0 remaining uses inside inventory boxes
     if (m_iRemainingUses == 0)
         return false;
+    */
 
     return true;
 }
@@ -132,12 +146,37 @@ bool CEatableItem::UseBy(CEntityAlive* entity_alive)
         Level().Send(tmp_packet);
     }
 
-    if (m_iRemainingUses > 0)
-        --m_iRemainingUses;
-    else
-        m_iRemainingUses = 0;
+    // If uses 255, then skip the decrement for infinite usages
+    if (m_iRemainingUses != -1)
+    {
+        if (m_iRemainingUses > 0)
+            --m_iRemainingUses;
+        else
+            m_iRemainingUses = 0;
+    }
 
-    SetCondition((float)m_iRemainingUses / (float)m_iMaxUses);
+    if (IsUsingCondition())
+    {
+        if (m_iMaxUses > 0)
+            SetCondition(static_cast<float>(m_iRemainingUses / m_iMaxUses));
+        else
+            SetCondition(0.f);
+    }
 
     return true;
+}
+
+float CEatableItem::Weight() const
+{
+    float res = inherited::Weight();
+
+    if (IsUsingCondition())
+    {
+        const float net_weight = m_fWeightFull - m_fWeightEmpty;
+        const float use_weight = m_iMaxUses > 0 ? net_weight / m_iMaxUses : 0.f;
+
+        res = m_fWeightEmpty + m_iRemainingUses * use_weight;
+    }
+
+    return res;
 }
