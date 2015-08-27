@@ -6,6 +6,8 @@
 #include "gametype_chooser.h"
 #include "UIDialogHolder.h"
 #include "xrEngine/CustomHUD.h"
+#include "script_game_object.h"
+
 // refs
 class CUI;
 class CTeamBaseZone;
@@ -104,6 +106,7 @@ public:
     bool ShowActorMenu();
     void HideActorMenu();
 	void UpdateActorMenu(); //Alundaio
+	CScriptGameObject* CurrentItemAtCell(); //Alundaio
     bool ShowPdaMenu();
     void HidePdaMenu();
     void ShowMessagesWindow();

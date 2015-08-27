@@ -365,6 +365,10 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
 		.def("play_hud_motion", &CScriptGameObject::PlayHudMotion)
 		.def("switch_state", &CScriptGameObject::SwitchState)
 		.def("get_state", &CScriptGameObject::GetState)
+		// For EatableItem
+		.def("set_remaining_uses", &CScriptGameObject::SetRemainingUses)
+		.def("get_remaining_uses", &CScriptGameObject::GetRemainingUses)
+		.def("get_max_uses", &CScriptGameObject::GetMaxUses)
 		//Alundaio: END
 #endif
 #ifdef GAME_OBJECT_TESTING_EXPORTS

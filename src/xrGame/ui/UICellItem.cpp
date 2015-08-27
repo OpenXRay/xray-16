@@ -20,9 +20,6 @@
 #include "CustomOutfit.h"
 #include "ActorHelmet.h"
 
-#include "UIGameCustom.h"
-#include "UIActorMenu.h"
-
 CUICellItem* CUICellItem::m_mouse_selected_item = NULL;
 
 CUICellItem::CUICellItem()
@@ -153,7 +150,6 @@ bool CUICellItem::OnMouseAction(float x, float y, EUIMessages mouse_action)
 	else if ( mouse_action == WINDOW_LBUTTON_DB_CLICK )
 	{
 		GetMessageTarget()->SendMessage( this, DRAG_DROP_ITEM_DB_CLICK, NULL );
-		CurrentGameUI()->GetActorMenu().SetCurrentConsumable( this );
 		return true;
 	}
 	else if ( mouse_action == WINDOW_RBUTTON_DOWN )
@@ -206,7 +202,7 @@ CUIDragItem* CUICellItem::CreateDragItem()
 void CUICellItem::SetOwnerList(CUIDragDropListEx* p)	
 {
 	m_pParentList = p;
-	UpdateConditionProgressBar();
+	//UpdateConditionProgressBar();
 }
 
 void CUICellItem::UpdateConditionProgressBar()
@@ -215,20 +211,26 @@ void CUICellItem::UpdateConditionProgressBar()
 	if(m_pParentList && m_pParentList->GetConditionProgBarVisibility())
 	{
 		PIItem itm = (PIItem)m_pData;
-		if ( itm->IsUsingCondition())
+		if (itm && itm->IsUsingCondition())
 		{
 			float cond = itm->GetCondition();
-
 			CEatableItem* eitm = smart_cast<CEatableItem*>( itm );
 			if ( eitm )
 			{
-				u16 max_uses = eitm->GetMaxUses();
-				if ( max_uses > 1 )
+				u8 max_uses = eitm->GetMaxUses();
+
+				if (max_uses > 0)
 				{
-					u16 remaining_uses = eitm->GetRemainingUses();
+					u8 remaining_uses = eitm->GetRemainingUses();
+
+					if (max_uses < 8)
+					{
+						m_pConditionState->ShowBackground(false);
+					}
+
 					if ( remaining_uses < 1 )
 					{
-						cond = 0.0f;
+						cond = 0.f;
 					}
 					else if ( max_uses > 8 )
 					{
@@ -237,11 +239,6 @@ void CUICellItem::UpdateConditionProgressBar()
 					else
 					{
 						cond = (( float )remaining_uses * 0.125f ) - 0.0625f;
-					}
-
-					if ( max_uses < 8 )
-					{
-						m_pConditionState->ShowBackground( false );
 					}
 
 					m_pConditionState->m_bUseGradient = false;

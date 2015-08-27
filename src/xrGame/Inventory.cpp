@@ -1062,9 +1062,15 @@ bool CInventory::Eat(PIItem pIItem)
 	Msg( "--- Actor [%d] use or eat [%d][%s]", entity_alive->ID(), pItemToEat->object().ID(), pItemToEat->object().cNameSect().c_str() );
 #endif // MP_LOGGING
 
-	if (IsGameTypeSingle() && Actor()->m_inventory == this)
+	if (Actor()->m_inventory == this)
 	{
-		Actor()->callback(GameObject::eUseObject)((smart_cast<CGameObject*>(pIItem))->lua_game_object());
+		if (IsGameTypeSingle())
+			Actor()->callback(GameObject::eUseObject)((smart_cast<CGameObject*>(pIItem))->lua_game_object());
+
+		if (pItemToEat->IsUsingCondition() && pItemToEat->GetRemainingUses() < 1 && pItemToEat->CanDelete())
+			CurrentGameUI()->GetActorMenu().RefreshCurrentItemCell();
+		
+		CurrentGameUI()->GetActorMenu().SetCurrentItem(NULL);
 	}
 
 	if (pItemToEat->Empty())
@@ -1074,9 +1080,6 @@ bool CInventory::Eat(PIItem pIItem)
 
 		pIItem->SetDropManual(TRUE);
 	}
-
-	if (pItemToEat->IsUsingCondition() && Actor()->m_inventory == this)
-		CurrentGameUI()->GetActorMenu().RefreshConsumableCells();
 
 	return			true;
 }

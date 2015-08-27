@@ -17,9 +17,11 @@ private:
 protected:
 	CPhysicItem		*m_physic_item;
 
-		u16 m_iMaxUses;
-		u16 m_iRemainingUses;
+		u8 m_iMaxUses;
+		u8 m_iRemainingUses;
 		BOOL m_bRemoveAfterUse;
+		float m_fWeightFull;
+		float m_fWeightEmpty;
 
 public:
 							CEatableItem				();
@@ -40,6 +42,8 @@ public:
 
 		bool Empty() const { return m_iRemainingUses == 0; };
 		bool CanDelete() const { return m_bRemoveAfterUse==TRUE; };
-		virtual u16 GetMaxUses() const { return m_iMaxUses; };
-		virtual u16 GetRemainingUses() const { return m_iRemainingUses; };
+		u8 GetMaxUses() const { return m_iMaxUses; };
+		u8 GetRemainingUses() const { return m_iRemainingUses; };
+		void SetRemainingUses(u8 value) { if (value <= m_iMaxUses && value >= 0) m_iRemainingUses = value; };
+		virtual float Weight() const;
 };

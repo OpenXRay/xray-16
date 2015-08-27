@@ -160,6 +160,7 @@ bool CUIActorMenu::OnItemStartDrag(CUICellItem* itm)
 
 bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
 {
+	SetCurrentItem(itm);
 	InfoCurItem( NULL );
 	CUIDragDropListEx*	old_owner		= itm->OwnerList();
 	EDDListType t_old					= GetListType(old_owner);

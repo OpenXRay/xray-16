@@ -45,6 +45,7 @@
 #include "actor.h"
 #include "CharacterPhysicsSupport.h"
 #include "player_hud.h"
+#include "eatable_item.h"
 #endif
 //-Alundaio
 
@@ -1352,6 +1353,45 @@ void CScriptGameObject::ForceSetPosition(Fvector pos, bool bActivate)
 	}
 	else
 		ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "force_set_position: object %s has no physics shell!", *object().cName());
+}
+
+void CScriptGameObject::SetRemainingUses(u8 value)
+{
+	CInventoryItem* IItm = object().cast_inventory_item();
+	if (!IItm)
+		return;
+
+	CEatableItem* eItm = IItm->cast_eatable_item();
+	if (!eItm)
+		return;
+
+	eItm->SetRemainingUses(value);
+}
+
+u8 CScriptGameObject::GetRemainingUses()
+{
+	CInventoryItem* IItm = object().cast_inventory_item();
+	if (!IItm)
+		return 0;
+
+	CEatableItem* eItm = IItm->cast_eatable_item();
+	if (!eItm)
+		return 0;
+
+	return eItm->GetRemainingUses();
+}
+
+u8 CScriptGameObject::GetMaxUses()
+{
+	CInventoryItem* IItm = object().cast_inventory_item();
+	if (!IItm)
+		return 0;
+
+	CEatableItem* eItm = IItm->cast_eatable_item();
+	if (!eItm)
+		return 0;
+
+	return eItm->GetMaxUses();
 }
 #endif
 //-Alundaio
