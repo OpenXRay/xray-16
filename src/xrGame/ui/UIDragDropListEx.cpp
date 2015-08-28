@@ -4,6 +4,9 @@
 #include "Common/object_broker.h"
 #include "UICellItem.h"
 #include "UICursor.h"
+//Alundaio
+#include "Inventory.h"
+//-Alundaio
 
 CUIDragItem* CUIDragDropListEx::m_drag_item = NULL;
 
@@ -479,6 +482,9 @@ bool CUICellContainer::AddSimilar(CUICellItem* itm)
         return false;
 
     CUICellItem* i = FindSimilar(itm);
+    if (i == nullptr)
+        return false;
+
     R_ASSERT(i != itm);
     R_ASSERT(0 == itm->ChildsCount());
     if (i)
@@ -492,6 +498,7 @@ bool CUICellContainer::AddSimilar(CUICellItem* itm)
 
 CUICellItem* CUICellContainer::FindSimilar(CUICellItem* itm)
 {
+    // XXX: try to replace with range-based for
     for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
     {
 #ifdef DEBUG
@@ -499,7 +506,15 @@ CUICellItem* CUICellContainer::FindSimilar(CUICellItem* itm)
 #else
         CUICellItem* i = (CUICellItem*)(*it);
 #endif
-        R_ASSERT(i != itm);
+        //Alundaio: Don't stack equipped items
+        PIItem iitem = static_cast<PIItem>(i->m_pData);
+        if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
+            continue;
+
+        if (i == itm)
+            continue;
+
+        //R_ASSERT(i != itm);
         if (i->EqualTo(itm))
             return i;
     }
@@ -845,16 +860,22 @@ void CUICellContainer::Draw()
             if (!ui_cell.Empty())
             {
                 if (ui_cell.m_item->m_cur_mark)
-                {
                     select_mode = 2;
-                }
                 else if (ui_cell.m_item->m_selected)
-                {
                     select_mode = 1;
-                }
                 else if (ui_cell.m_item->m_select_armament)
-                {
                     select_mode = 3;
+                else
+                {
+                    //Alundaio: Highlight equipped items
+                    PIItem iitem = static_cast<PIItem>(ui_cell.m_item->m_pData);
+                    if (iitem)
+                    {
+                        u16 slot = iitem->BaseSlot();
+                        if (iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(slot) == iitem)
+                            select_mode = 3;
+                    }
+                    //-Alundaio
                 }
             }
 
