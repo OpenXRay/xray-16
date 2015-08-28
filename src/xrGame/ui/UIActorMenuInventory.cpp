@@ -388,7 +388,7 @@ void CUIActorMenu::DetachAddon(LPCSTR addon_name, PIItem itm)
 
 void CUIActorMenu::InitCellForSlot( u16 slot_idx )
 {
-	VERIFY( KNIFE_SLOT <= slot_idx && slot_idx <= LAST_SLOT );
+	//VERIFY( KNIFE_SLOT <= slot_idx && slot_idx <= LAST_SLOT );
 	PIItem item	= m_pActorInvOwner->inventory().ItemFromSlot(slot_idx);
 	if ( !item )
 	{
@@ -426,6 +426,15 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList)
 	InitCellForSlot				(GRENADE_SLOT);
 	InitCellForSlot				(HELMET_SLOT);
 
+	//Alundaio
+	if (!m_pActorInvOwner->inventory().SlotIsPersistent(KNIFE_SLOT))
+		InitCellForSlot				(KNIFE_SLOT);
+	if (!m_pActorInvOwner->inventory().SlotIsPersistent(BINOCULAR_SLOT))
+		InitCellForSlot				(BINOCULAR_SLOT);
+	if (!m_pActorInvOwner->inventory().SlotIsPersistent(ARTEFACT_SLOT))
+		InitCellForSlot				(ARTEFACT_SLOT);
+	//-Alundaio
+
 	curr_list					= m_pInventoryBeltList;
 	TIItemContainer::iterator itb = m_pActorInvOwner->inventory().m_belt.begin();
 	TIItemContainer::iterator ite = m_pActorInvOwner->inventory().m_belt.end();
@@ -453,8 +462,8 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList)
 
 		CUICellItem* itm = create_cell_item( *itb );
 		curr_list->SetItem(itm);
-		if ( m_currMenuMode == mmTrade && m_pPartnerInvOwner )
-			ColorizeItem( itm, !CanMoveToPartner( *itb ) );
+		if (m_currMenuMode == mmTrade && m_pPartnerInvOwner)
+			ColorizeItem(itm, !CanMoveToPartner(*itb));
 
 		//CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(*itb);
 		//if(outfit)
@@ -507,11 +516,13 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
 	{
 		CUIDragDropListEx* new_owner		= GetSlotList(slot_id);
 
+		//Alundaio
+		/*
 		if ( slot_id == GRENADE_SLOT || !new_owner )
 		{
 			return true; //fake, sorry (((
 		} 
-		else if(slot_id==OUTFIT_SLOT)
+		else*/ if(slot_id==OUTFIT_SLOT)
 		{
 			CCustomOutfit* pOutfit = smart_cast<CCustomOutfit*>(iitem);
 			if(pOutfit && !pOutfit->bIsHelmetAvaliable)
@@ -559,15 +570,24 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
 
 		PIItem	_iitem						= m_pActorInvOwner->inventory().ItemFromSlot(slot_id);
 		CUIDragDropListEx* slot_list		= GetSlotList(slot_id);
-		VERIFY								(slot_list->ItemsCount()==1);
+		if (!slot_list)
+			return false;
+		
+		CUIDragDropListEx* invlist = GetListByType(iActorBag);
+		if (invlist != slot_list)
+		{
+			if (!slot_list->ItemsCount() == 1)
+				return false;
 
-		CUICellItem* slot_cell				= slot_list->GetItemIdx(0);
-		VERIFY								(slot_cell && ((PIItem)slot_cell->m_pData)==_iitem);
+			CUICellItem* slot_cell = slot_list->GetItemIdx(0);
+			if (!(slot_cell && ((PIItem)slot_cell->m_pData) == _iitem))
+				return false;
 
-		bool result							= ToBag(slot_cell, false);
-		VERIFY								(result);
+			if (ToBag(slot_cell, false) == false)
+				return false;
+		}
 
-		result								= ToSlot(itm, false, slot_id);
+		bool result	= ToSlot(itm, false, slot_id);
 		if(b_own_item && result && slot_id==DETECTOR_SLOT)
 		{
 			CCustomDetector* det			= smart_cast<CCustomDetector*>(iitem);
@@ -706,6 +726,9 @@ CUIDragDropListEx* CUIActorMenu::GetSlotList(u16 slot_idx)
 			return m_pInventoryDetectorList;
 			break;
 
+		case ARTEFACT_SLOT:
+		case BINOCULAR_SLOT:
+		case KNIFE_SLOT:
 		case GRENADE_SLOT://fake
 			if ( m_currMenuMode == mmTrade )
 			{
@@ -869,7 +892,7 @@ void CUIActorMenu::PropertiesBoxForSlots( PIItem item, bool& b_show )
 
 	if (	!pOutfit && !pHelmet &&
 			cur_slot != NO_ACTIVE_SLOT &&
-			!inv.SlotIsPersistent(cur_slot) /*&& inv.CanPutInSlot(item, cur_slot)*/ )
+			!inv.SlotIsPersistent(cur_slot) && m_pActorInvOwner->inventory().ItemFromSlot(cur_slot) != item /*&& inv.CanPutInSlot(item, cur_slot)*/)
 	{
 		m_UIPropertiesBox->AddItem( "st_move_to_slot",  NULL, INVENTORY_TO_SLOT_ACTION );
 		b_show = true;
@@ -1444,15 +1467,13 @@ void CUIActorMenu::RefreshCurrentItemCell()
 		{
 			CUICellItem* parent = invlist->RemoveItem(ci, true);
 
-			if (parent->ChildsCount() > 0)
+			while (parent->ChildsCount())
 			{
-				while (parent->ChildsCount())
-				{
-					CUICellItem* child = parent->PopChild(NULL);
-					invlist->SetItem(child);
-				}
+				CUICellItem* child = parent->PopChild(NULL);
+				invlist->SetItem(child);
 			}
-			invlist->SetItem(parent);
+
+			invlist->SetItem(parent, GetUICursor().GetCursorPosition());
 		}
 	}
 }

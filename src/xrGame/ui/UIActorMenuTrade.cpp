@@ -541,11 +541,11 @@ void CUIActorMenu::DonateCurrentItem(CUICellItem* cell_item)
 	if (!item)
 		return;
 
-	invlist->RemoveItem(cell_item, false);
+	CUICellItem* itm = invlist->RemoveItem(cell_item, false);
 
 	m_partner_trade->TransferItem(item,true,true);
 
-	m_pTradePartnerList->SetItem(cell_item);
+	m_pTradePartnerList->SetItem(itm);
 
 	SetCurrentItem(NULL);
 	UpdateItemsPlace();
