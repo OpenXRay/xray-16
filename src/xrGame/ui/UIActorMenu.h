@@ -204,6 +204,7 @@ private:
     void PropertiesBoxForPlaying(PIItem item, bool& b_show);
     void PropertiesBoxForDrop(CUICellItem* cell_item, PIItem item, bool& b_show);
     void PropertiesBoxForRepair(PIItem item, bool& b_show);
+    void PropertiesBoxForDonate(PIItem item, bool& b_show); //Alundaio
 
 private:
     void clear_highlight_lists();
@@ -361,4 +362,5 @@ public:
     IC UIHint* get_hint_wnd() { return m_hint_wnd; }
 
     void RefreshCurrentItemCell();
+    void DonateCurrentItem(CUICellItem* cell_item); //Alundaio: Donate item via context menu while in trade menu
 }; // class CUIActorMenu
