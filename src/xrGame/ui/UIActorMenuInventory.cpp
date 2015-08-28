@@ -421,6 +421,8 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList)
         InitCellForSlot(BINOCULAR_SLOT);
     if (!m_pActorInvOwner->inventory().SlotIsPersistent(ARTEFACT_SLOT))
         InitCellForSlot(ARTEFACT_SLOT);
+    if (!m_pActorInvOwner->inventory().SlotIsPersistent(TORCH_SLOT))
+        InitCellForSlot(TORCH_SLOT); //Alundaio: TODO find out why this crash when you unequip
     //-Alundaio
 
     curr_list = m_pInventoryBeltList;
@@ -504,6 +506,9 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
         CUIDragDropListEx* new_owner = GetSlotList(slot_id);
 
         //Alundaio
+        if (!new_owner)
+            return true;
+
         /*if (slot_id == GRENADE_SLOT || !new_owner)
         {
             return true; // fake, sorry (((
@@ -526,6 +531,12 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
         VERIFY(result);
 
         CUICellItem* i = old_owner->RemoveItem(itm, (old_owner == new_owner));
+
+        while (i->ChildsCount())
+        {
+            CUICellItem* child = i->PopChild(nullptr);
+            old_owner->SetItem(child);
+        }
 
         new_owner->SetItem(i);
 
@@ -554,10 +565,11 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
         if (slot_id == INV_SLOT_3 && m_pActorInvOwner->inventory().CanPutInSlot(iitem, INV_SLOT_2))
             return ToSlot(itm, force_place, INV_SLOT_2);
 
-        PIItem _iitem = m_pActorInvOwner->inventory().ItemFromSlot(slot_id);
         CUIDragDropListEx* slot_list = GetSlotList(slot_id);
         if (!slot_list)
             return false;
+
+        const PIItem _iitem = m_pActorInvOwner->inventory().ItemFromSlot(slot_id);
 
         CUIDragDropListEx* invlist = GetListByType(iActorBag);
         if (invlist != slot_list)
@@ -571,6 +583,11 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
 
             if (ToBag(slot_cell, false) == false)
                 return false;
+        }
+        else
+        {
+            SendEvent_Item2Slot(iitem, m_pActorInvOwner->object_id(), slot_id);
+            SendEvent_ActivateSlot(slot_id, m_pActorInvOwner->object_id());
         }
 
         bool result = ToSlot(itm, false, slot_id);
