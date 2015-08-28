@@ -92,7 +92,7 @@ bool CEatableItem::Useful() const
 	if(!inherited::Useful()) return false;
 
 	//проверить не все ли еще съедено
-	//if ( m_iRemainingUses == 0 ) return false; //Alundaio: Commented out to prevent crash when placing items with 0 remaining uses inside inventory boxes
+	if ( m_iRemainingUses == 0 && CanDelete() ) return false;
 
 	return true;
 }

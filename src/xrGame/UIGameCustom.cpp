@@ -201,7 +201,7 @@ CScriptGameObject* CUIGameCustom::CurrentItemAtCell()
 	if (!IItm)
 		return (0);
 
-	CGameObject* GO = IItm->cast_game_object();
+	CGameObject* GO = smart_cast<CGameObject*>(IItm);
 
 	if (GO)
 		return GO->lua_game_object();
