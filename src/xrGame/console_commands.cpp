@@ -98,7 +98,7 @@ extern int		g_upgrades_log;
 extern float	g_smart_cover_animation_speed_factor;
 
 extern	BOOL	g_ai_use_old_vision;
-float			g_aim_predict_time = 0.44f;
+float			g_aim_predict_time = 0.40f;
 int				g_keypress_on_start = 1;
 
 ENGINE_API extern float	g_console_sensitive;
@@ -2308,9 +2308,10 @@ void CCC_RegisterCommands()
     extern BOOL g_ai_dbg_sight;
     CMD4(CCC_Integer, "ai_dbg_sight", &g_ai_dbg_sight, 0, 1);
 
-    extern BOOL g_ai_aim_use_smooth_aim;
-    CMD4(CCC_Integer, "ai_aim_use_smooth_aim", &g_ai_aim_use_smooth_aim, 0, 1);
 #endif // #ifdef DEBUG
+	//Alundaio: Scoped outside DEBUG
+	extern BOOL g_ai_aim_use_smooth_aim;
+	CMD4(CCC_Integer, "ai_aim_use_smooth_aim", &g_ai_aim_use_smooth_aim, 0, 1);
 
     extern float g_ai_aim_min_speed;
     CMD4(CCC_Float, "ai_aim_min_speed", &g_ai_aim_min_speed, 0.f, 10.f*PI);

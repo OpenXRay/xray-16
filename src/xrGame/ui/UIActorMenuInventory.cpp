@@ -433,6 +433,8 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList)
 		InitCellForSlot				(BINOCULAR_SLOT);
 	if (!m_pActorInvOwner->inventory().SlotIsPersistent(ARTEFACT_SLOT))
 		InitCellForSlot				(ARTEFACT_SLOT);
+	if (!m_pActorInvOwner->inventory().SlotIsPersistent(PDA_SLOT))
+		InitCellForSlot(PDA_SLOT);
 	if (!m_pActorInvOwner->inventory().SlotIsPersistent(TORCH_SLOT)) //Alundaio: TODO find out why this crash when you unequip
 		InitCellForSlot(TORCH_SLOT);
 	//-Alundaio
@@ -600,8 +602,26 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
 		}
 		else
 		{
-			SendEvent_Item2Slot(iitem, m_pActorInvOwner->object_id(), slot_id);
-			SendEvent_ActivateSlot(slot_id, m_pActorInvOwner->object_id());
+			//Alundaio: Since the player's inventory is being used as a slot we need to search for cell with matching m_pData
+			CUICellContainer* c = slot_list->GetContainer();
+			CUIWindow::WINDOW_LIST child_list = c->GetChildWndList();
+
+			for (WINDOW_LIST_it it = child_list.begin(); child_list.end() != it; ++it)
+			{
+				CUICellItem* i = (CUICellItem*)(*it);
+				PIItem	pitm = (PIItem)i->m_pData;
+				if (pitm == _iitem)
+				{
+					if (ToBag(i, false))
+					{
+						break;
+					}
+					else
+						return false;
+				}
+			}
+
+			return ToSlot(itm, false, slot_id);
 		}
 
 		bool result	= ToSlot(itm, false, slot_id);

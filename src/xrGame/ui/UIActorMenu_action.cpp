@@ -196,7 +196,11 @@ bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
 					break;
 				}
 				PIItem iitem_to_place = (PIItem)itm->m_pData;
-				if ( !ToSlot( itm, false, iitem_to_place->BaseSlot() ) )
+				if (!m_pActorInvOwner->inventory().SlotIsPersistent(iitem_to_place->BaseSlot()) && m_pActorInvOwner->inventory().ItemFromSlot(iitem_to_place->BaseSlot()) == iitem_to_place)
+				{
+					ToBag(itm, false);
+				}
+				else if ( !ToSlot( itm, false, iitem_to_place->BaseSlot() ) )
 				{
 					if ( !ToBelt( itm, false ) )
 					{

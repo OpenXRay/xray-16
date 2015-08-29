@@ -155,6 +155,10 @@ void CCustomDetector::OnAnimationEnd(u32 state)
 	case eShowing:
 		{
 			SwitchState					(eIdle);
+			if (IsUsingCondition() && m_fDecayRate > 0.f)
+			{
+				this->SetCondition(-m_fDecayRate);
+			}
 		} break;
 	case eHiding:
 		{
@@ -205,6 +209,7 @@ void CCustomDetector::Load(LPCSTR section)
 
 	m_fAfDetectRadius		= pSettings->r_float(section,"af_radius");
 	m_fAfVisRadius			= pSettings->r_float(section,"af_vis_radius");
+	m_fDecayRate = READ_IF_EXISTS(pSettings, r_float, section, "decay_rate", 0.f); //Alundaio
 	m_artefacts.load		(section, "af");
 
 	m_sounds.LoadSound( section, "snd_draw", "sndShow");
@@ -222,6 +227,10 @@ void CCustomDetector::shedule_Update(u32 dt)
 
 	Fvector						P; 
 	P.set						(H_Parent()->Position());
+
+	if (IsUsingCondition() && GetCondition() <= 0.01f)
+		return;
+
 	m_artefacts.feel_touch_update(P,m_fAfDetectRadius);
 }
 

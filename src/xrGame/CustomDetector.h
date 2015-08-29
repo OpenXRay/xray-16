@@ -162,6 +162,7 @@ protected:
 
 	bool			m_bWorking;
 	float			m_fAfVisRadius;
+	float			m_fDecayRate; //Alundaio
 
 	CAfList			m_artefacts;
 };
