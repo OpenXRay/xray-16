@@ -428,11 +428,11 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList)
 
 	//Alundaio
 	if (!m_pActorInvOwner->inventory().SlotIsPersistent(KNIFE_SLOT))
-		InitCellForSlot				(KNIFE_SLOT);
+		InitCellForSlot(KNIFE_SLOT);
 	if (!m_pActorInvOwner->inventory().SlotIsPersistent(BINOCULAR_SLOT))
-		InitCellForSlot				(BINOCULAR_SLOT);
+		InitCellForSlot(BINOCULAR_SLOT);
 	if (!m_pActorInvOwner->inventory().SlotIsPersistent(ARTEFACT_SLOT))
-		InitCellForSlot				(ARTEFACT_SLOT);
+		InitCellForSlot(ARTEFACT_SLOT);
 	if (!m_pActorInvOwner->inventory().SlotIsPersistent(PDA_SLOT))
 		InitCellForSlot(PDA_SLOT);
 	if (!m_pActorInvOwner->inventory().SlotIsPersistent(TORCH_SLOT)) //Alundaio: TODO find out why this crash when you unequip
@@ -763,6 +763,8 @@ CUIDragDropListEx* CUIActorMenu::GetSlotList(u16 slot_idx)
 			return m_pInventoryDetectorList;
 			break;
 
+		case PDA_SLOT:
+		case TORCH_SLOT:
 		case ARTEFACT_SLOT:
 		case BINOCULAR_SLOT:
 		case KNIFE_SLOT:
