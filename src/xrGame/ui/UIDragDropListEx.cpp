@@ -481,19 +481,20 @@ bool CUICellContainer::AddSimilar(CUICellItem* itm)
     if (!m_pParentDragDropList->IsGrouping())
         return false;
 
+    //Alundaio: Don't stack equipped items
+    const PIItem iitem = static_cast<PIItem>(itm->m_pData);
+    if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
+        return false;
+    //-Alundaio
+
     CUICellItem* i = FindSimilar(itm);
-    if (i == nullptr)
+    if (i == nullptr || i == itm || itm->ChildsCount() > 0)
         return false;
 
-    R_ASSERT(i != itm);
-    R_ASSERT(0 == itm->ChildsCount());
-    if (i)
-    {
-        i->PushChild(itm);
-        itm->SetOwnerList(m_pParentDragDropList);
-    }
+    i->PushChild(itm);
+    itm->SetOwnerList(m_pParentDragDropList);
 
-    return (i != NULL);
+    return true;
 }
 
 CUICellItem* CUICellContainer::FindSimilar(CUICellItem* itm)
@@ -510,11 +511,11 @@ CUICellItem* CUICellContainer::FindSimilar(CUICellItem* itm)
         PIItem iitem = static_cast<PIItem>(i->m_pData);
         if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
             continue;
+        //-Alundaio
 
         if (i == itm)
             continue;
 
-        //R_ASSERT(i != itm);
         if (i->EqualTo(itm))
             return i;
     }
@@ -869,12 +870,8 @@ void CUICellContainer::Draw()
                 {
                     //Alundaio: Highlight equipped items
                     PIItem iitem = static_cast<PIItem>(ui_cell.m_item->m_pData);
-                    if (iitem)
-                    {
-                        u16 slot = iitem->BaseSlot();
-                        if (iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(slot) == iitem)
-                            select_mode = 3;
-                    }
+                    if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
+                        select_mode = 3;
                     //-Alundaio
                 }
             }
