@@ -943,14 +943,17 @@ void CUIActorMenu::PropertiesBoxForSlots( PIItem item, bool& b_show )
 		b_show = true;
 	}
 
-	if (	item->Ruck() &&
-			inv.CanPutInRuck(item) &&
-			( cur_slot == NO_ACTIVE_SLOT || !inv.SlotIsPersistent(cur_slot) ) )
+	if (item->Ruck() &&	inv.CanPutInRuck(item) && (cur_slot == NO_ACTIVE_SLOT || !inv.SlotIsPersistent(cur_slot)))
 	{
 		if( !pOutfit )
 		{
-			if( !pHelmet )
-				m_UIPropertiesBox->AddItem( "st_move_to_bag",  NULL, INVENTORY_TO_BAG_ACTION );
+			if (!pHelmet)
+			{
+				if (m_currMenuMode == mmDeadBodySearch)
+					m_UIPropertiesBox->AddItem("st_move_to_bag", NULL, INVENTORY_TO_BAG_ACTION);
+				else 
+					m_UIPropertiesBox->AddItem("st_unequip", NULL, INVENTORY_TO_BAG_ACTION);
+			}
 			else
 				m_UIPropertiesBox->AddItem( "st_undress_helmet",  NULL, INVENTORY_TO_BAG_ACTION );
 		}

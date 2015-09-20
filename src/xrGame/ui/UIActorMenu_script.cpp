@@ -13,6 +13,7 @@
 #include "UICellItem.h"
 #include "../ai_space.h"
 #include "../../xrServerEntities/script_engine.h"
+#include "eatable_item.h"
 
 using namespace luabind;
 
@@ -28,6 +29,16 @@ void CUIActorMenu::TryRepairItem(CUIWindow* w, void* d)
 		return;
 	}
 	LPCSTR item_name = item->m_section_id.c_str();
+
+	CEatableItem* EItm = smart_cast<CEatableItem*>(item);
+	if (EItm)
+	{
+		bool allow_repair = !!READ_IF_EXISTS(pSettings, r_bool, item_name, "allow_repair", false);
+		if (!allow_repair)
+			return;
+	}
+
+
 	LPCSTR partner = m_pPartnerInvOwner->CharacterInfo().Profile().c_str();
 
 	luabind::functor<bool> funct;

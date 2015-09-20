@@ -62,3 +62,4 @@ IC	void	jitter(CBlender_Compile& C)
 	C.r_dx10Texture	("jitterMipped",	r2_jitter_mipped);
 	C.r_dx10Sampler	("smp_jitter");
 }
+//#pragma comment( lib, "dxguid.lib" )

@@ -117,10 +117,12 @@ void dxFontRender::OnRender(CGameFont &owner)
 //						tv			= ( l.y / owner.vTS.y ) + ( 0.5f / owner.vTS.y );
 						tu			= ( l.x / owner.vTS.x );
 						tv			= ( l.y / owner.vTS.y );
-#ifndef	USE_DX10
+#ifndef USE_DX10
+#	ifndef USE_DX11
 						//	Make half pixel offset for 1 to 1 mapping
 						tu			+=( 0.5f / owner.vTS.x );
 						tv			+=( 0.5f / owner.vTS.y );
+#	endif
 #endif	//	USE_DX10
 
 						v->set( X , Y2 , clr2 , tu , tv + owner.fTCHeight );						v++;
