@@ -871,7 +871,7 @@ void CUICellContainer::Draw()
                     //Alundaio: Highlight equipped items
                     PIItem iitem = static_cast<PIItem>(ui_cell.m_item->m_pData);
                     if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
-                        select_mode = 3;
+                        select_mode = 2;
                     //-Alundaio
                 }
             }

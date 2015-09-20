@@ -926,7 +926,12 @@ void CUIActorMenu::PropertiesBoxForSlots(PIItem item, bool& b_show)
         if (!pOutfit)
         {
             if (!pHelmet)
-                m_UIPropertiesBox->AddItem("st_move_to_bag", NULL, INVENTORY_TO_BAG_ACTION);
+            {
+                if (m_currMenuMode == mmDeadBodySearch)
+                    m_UIPropertiesBox->AddItem("st_move_to_bag", nullptr, INVENTORY_TO_BAG_ACTION);
+                else
+                    m_UIPropertiesBox->AddItem("st_unequip", nullptr, INVENTORY_TO_BAG_ACTION);
+            }
             else
                 m_UIPropertiesBox->AddItem("st_undress_helmet", NULL, INVENTORY_TO_BAG_ACTION);
         }
