@@ -33,6 +33,8 @@ float CSpaceRestrictor::Radius		() const
 	return							(CFORM()->getRadius());
 }
 
+BOOL g_ai_die_in_anomaly = 0; //Alundaio
+
 BOOL CSpaceRestrictor::net_Spawn	(CSE_Abstract* data)
 {
 	actual							(false);
@@ -67,7 +69,10 @@ BOOL CSpaceRestrictor::net_Spawn	(CSE_Abstract* data)
 	if (!result)
 		return						(FALSE);
 
-	spatial.type					&= ~STYPE_VISIBLEFORAI;
+	//Alundaio: Toggle npc die in anomaly via console command
+	if (g_ai_die_in_anomaly == 0)
+		spatial.type					&= ~STYPE_VISIBLEFORAI;
+	//-Alundaio
 
 	setEnabled						(FALSE);
 	setVisible						(FALSE);
