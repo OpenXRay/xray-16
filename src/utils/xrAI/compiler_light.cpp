@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "compiler.h"
 #include "xrCDB/Intersect.hpp"
-#include "xrThread.h"
+#include "utils/xrUtil/xrThread.hpp"
 #include <mmsystem.h>
 
 const int	LIGHT_Count			=2;
@@ -78,7 +78,7 @@ class	LightThread : public CThread
 {
 	u32	Nstart, Nend;
 public:
-	LightThread			(u32 ID, u32 _start, u32 _end) : CThread(ID)
+	LightThread			(u32 ID, u32 _start, u32 _end) : CThread(ID, clMsg)
 	{
 		Nstart	= _start;
 		Nend	= _end;

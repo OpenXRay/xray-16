@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "compiler.h"
 #include "xrCDB/Intersect.hpp"
-#include "xrThread.h"
+#include "utils/xrUtil/xrThread.hpp"
 #include <mmsystem.h>
 
 #include "quadtree.h"
@@ -238,7 +238,7 @@ class	CoverThread : public CThread
 	typedef float	Cover[4];
 
 public:
-	CoverThread			(u32 ID, u32 _start, u32 _end) : CThread(ID)
+	CoverThread			(u32 ID, u32 _start, u32 _end) : CThread(ID, clMsg)
 	{
 		Nstart	= _start;
 		Nend	= _end;
@@ -574,7 +574,7 @@ void	xrCover	(bool pure_covers)
 
 	// Start threads, wait, continue --- perform all the work
 	u32	start_time		= timeGetTime();
-	CThreadManager		Threads;
+	CThreadManager		Threads(Status, Progress);
 	u32	stride			= g_nodes.size()/NUM_THREADS;
 	u32	last			= g_nodes.size()-stride*(NUM_THREADS-1);
 	for (u32 thID=0; thID<NUM_THREADS; thID++) {

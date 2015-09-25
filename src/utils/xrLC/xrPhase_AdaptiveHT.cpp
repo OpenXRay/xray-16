@@ -8,7 +8,7 @@
 
 #include "../../xrcdb/xrcdb.h"
 #include "../../common/face_smoth_flags.h"
-#include "../xrLC_Light/xrThread.h"
+#include "utils/xrUtil/xrThread.hpp"
 
 const	float	aht_max_edge	= c_SS_maxsize/2.5f;	// 2.0f;			// 2 m
 //const	float	aht_min_edge	= .2f;					// 20 cm
@@ -126,7 +126,7 @@ public CThread
 	CDB::COLLIDER	DB;
 	
 public:
-	CPrecalcBaseHemiThread(u32 ID, u32 from, u32 to ): CThread(ID), _from( from ), _to( to )
+	CPrecalcBaseHemiThread(u32 ID, u32 from, u32 to ): CThread(ID, clMsg), _from( from ), _to( to )
 	{
 		R_ASSERT(from!=u32(-1));
 		R_ASSERT(to!=u32(-1));
@@ -155,7 +155,7 @@ virtual	void Execute()
 	}
 };
 
-CThreadManager	precalc_base_hemi;
+CThreadManager	precalc_base_hemi(Status, Progress);
 
 void CBuild::xrPhase_AdaptiveHT	()
 {

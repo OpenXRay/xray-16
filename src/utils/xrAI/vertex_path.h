@@ -9,18 +9,20 @@
 #pragma once
 
 template <bool	 bEuclidianHeuristics = true>
-struct CVertexPath {
-
+struct CVertexPath
+{
 #pragma pack(push,1)
 	template <template <typename _T> class T1>
-	struct DataStoragePath {
-		struct _vertex : public T1<_vertex> {
-		};
+	struct DataStoragePath
+    {
+		struct _vertex : public T1<_vertex>
+        {};
 	};
 #pragma pack(pop)
 
 	template <template <typename _T> class _vertex> 
-	class CDataStorage {
+	class CDataStorage
+    {
 	public:
 		typedef typename DataStoragePath<_vertex>::_vertex	CGraphVertex;
 		typedef	typename CGraphVertex::_index_type			_index_type;

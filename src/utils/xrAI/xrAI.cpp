@@ -23,6 +23,7 @@
 #pragma comment(lib,"xrcdb.LIB")
 #pragma comment(lib,"MagicFM.LIB")
 #pragma comment(lib,"xrCore.LIB")
+#pragma comment(lib, "xrUtil.lib")
 
 extern LPCSTR LEVEL_GRAPH_NAME;
 

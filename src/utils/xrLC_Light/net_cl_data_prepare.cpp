@@ -8,19 +8,19 @@
 #include "lcnet_task_manager.h"
 #include "xrlc_globaldata.h"
 #include "mu_light_net.h"
-#include "xrThread.h"
+#include "utils/xrUtil/xrThread.hpp"
 #include "../../xrcore/xrSyncronize.h"
 
 bool					global_compile_data_initialized = false;
 bool					base_global_compile_data_initialized = false;
-CThreadManager			cl_data_prepare;
+CThreadManager			cl_data_prepare(Status, Progress);
 xrCriticalSection		wait_lock;
 void		SetBaseGlobalCompileDataInitialized( );
 class NetCompileDetaPrepare	: public CThread
 {
 
 public:
-	NetCompileDetaPrepare	( ) : CThread( 0 )	{	thMessages	= FALSE;	}
+	NetCompileDetaPrepare	( ) : CThread(0, clMsg)	{	thMessages	= FALSE;	}
 private:
 	virtual void	Execute	()
 	{

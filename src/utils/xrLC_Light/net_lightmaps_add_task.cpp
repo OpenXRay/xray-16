@@ -4,7 +4,7 @@
 #include "lcnet_task_manager.h"
 #include "lcnet_execution_tasks_add.h"
 #include "xrlc_globaldata.h"
-#include "xrThread.h"
+#include "utils/xrUtil/xrThread.hpp"
 #include "xrdeflector.h"
 
 namespace lc_net

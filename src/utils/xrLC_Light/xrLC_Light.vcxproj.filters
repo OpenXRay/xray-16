@@ -80,9 +80,6 @@
     <ClInclude Include="xrLC_Light.h">
       <Filter>kernel</Filter>
     </ClInclude>
-    <ClInclude Include="xrThread.h">
-      <Filter>kernel</Filter>
-    </ClInclude>
     <ClInclude Include="hash2D.h">
       <Filter>Light</Filter>
     </ClInclude>
@@ -330,9 +327,6 @@
       <Filter>kernel</Filter>
     </ClCompile>
     <ClCompile Include="xrLC_Light.cpp">
-      <Filter>kernel</Filter>
-    </ClCompile>
-    <ClCompile Include="xrThread.cpp">
       <Filter>kernel</Filter>
     </ClCompile>
     <ClCompile Include="MeshStaic.cpp">

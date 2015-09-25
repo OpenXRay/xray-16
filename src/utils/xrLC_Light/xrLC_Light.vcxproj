@@ -236,7 +236,6 @@
     <ClInclude Include="xrLight_ImplicitRun.h" />
     <ClInclude Include="xrMU_Model.h" />
     <ClInclude Include="xrMU_Model_Reference.h" />
-    <ClInclude Include="xrThread.h" />
     <ClInclude Include="_d3d_extensions.h" />
   </ItemGroup>
   <ItemGroup>
@@ -359,7 +358,6 @@
     <ClCompile Include="xrMU_Model_Load.cpp" />
     <ClCompile Include="xrMU_Model_Reference.cpp" />
     <ClCompile Include="xrMU_Model_Reference_Calc_Lighting.cpp" />
-    <ClCompile Include="xrThread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

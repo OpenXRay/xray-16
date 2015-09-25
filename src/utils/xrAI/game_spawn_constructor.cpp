@@ -21,10 +21,11 @@ extern LPCSTR generate_temp_file_name			(LPCSTR header0, LPCSTR header1, string_
 
 #define NO_MULTITHREADING
 
-CGameSpawnConstructor::CGameSpawnConstructor	(LPCSTR name, LPCSTR output, LPCSTR start, bool no_separator_check)
+CGameSpawnConstructor::CGameSpawnConstructor	(LPCSTR name, LPCSTR output, LPCSTR start, bool no_separator_check) :
 #ifdef PROFILE_CRITICAL_SECTIONS
-	:m_critical_section(MUTEX_PROFILE_ID(CGameSpawnConstructor))
+	m_critical_section(MUTEX_PROFILE_ID(CGameSpawnConstructor)),
 #endif // PROFILE_CRITICAL_SECTIONS
+    m_thread_manager(Status, Progress)
 {
 	load_spawns						(name,no_separator_check);
 	process_spawns					();

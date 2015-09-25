@@ -5,6 +5,7 @@
 #pragma comment(lib,"xrCore.lib")
 #pragma comment(lib,"xrCDB.lib")
 #pragma comment(lib,"FreeImage.lib")
+#pragma comment(lib, "xrUtil.lib")
 #ifdef _MANAGED
 #pragma managed(push, off)
 #endif

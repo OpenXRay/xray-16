@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "xrLightVertex.h"
-#include "xrThread.h"
+#include "utils/xrUtil/xrThread.hpp"
 #include "xrface.h"
 #include "xrLC_GlobalData.h"
 #include "light_point.h"
@@ -109,7 +109,7 @@ bool GetTranslucency(const Vertex* V,float &v_trans )
 class CVertexLightThread : public CThread
 {
 public:
-	CVertexLightThread(u32 ID) : CThread(ID)
+	CVertexLightThread(u32 ID) : CThread(ID, clMsg)
 	{
 		thMessages	= FALSE;
 	}
@@ -159,7 +159,7 @@ void LightVertex	( bool net )
 	Status				("Calculating...");
 	if( !net )
 	{
-		CThreadManager		Threads;
+		CThreadManager		Threads(Status, Progress);
 		VLT.init			();
 		CTimer	start_time;	start_time.Start();				
 		for (u32 thID=0; thID<NUM_THREADS; thID++)	Threads.start(xr_new<CVertexLightThread>(thID));

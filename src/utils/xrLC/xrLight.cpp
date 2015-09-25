@@ -2,7 +2,7 @@
 #include "build.h"
 
 #include "../xrlc_light/xrdeflector.h"
-#include "../xrlc_light/xrThread.h"
+#include "utils/xrUtil/xrThread.hpp"
 #include "../xrLC_Light/xrLC_GlobalData.h"
 #include "../xrLC_Light/xrLightVertex.h"
 
@@ -26,7 +26,7 @@ private:
 	CDB::COLLIDER	DB;
 	base_lighting	LightsSelected;
 public:
-	CLMThread	(u32 ID) : CThread(ID)
+	CLMThread	(u32 ID) : CThread(ID, clMsg)
 	{
 		// thMonitor= TRUE;
 		thMessages	= FALSE;
@@ -90,7 +90,7 @@ for(u32 dit = 0; dit<lc_global_data()->g_deflectors().size(); dit++)
 
 		// Main process (4 threads)
 		Status			("Lighting...");
-		CThreadManager	threads;
+		CThreadManager	threads(Status, Progress);
 		const	u32	thNUM	= 6;
 		CTimer	start_time;	start_time.Start();				
 		for				(int L=0; L<thNUM; L++)	threads.start(xr_new<CLMThread> (L));

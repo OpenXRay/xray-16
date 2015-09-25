@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "xrlight_implicitrun.h"
-#include "xrThread.h"
+#include "utils/xrUtil/xrThread.hpp"
 #include "xrLight_Implicit.h"
 #include "xrlight_implicitdeflector.h"
 class ImplicitThread : public CThread
@@ -9,7 +9,7 @@ public:
 
 	ImplicitExecute		execute;
 	ImplicitThread		(u32 ID, ImplicitDeflector* _DATA, u32 _y_start, u32 _y_end) :
-	CThread (ID), execute( _y_start, _y_end )
+	CThread (ID, clMsg), execute( _y_start, _y_end )
 	{
 		
 	}
@@ -32,7 +32,7 @@ void	ImplicitThread ::	Execute	()
 void RunImplicitMultithread(ImplicitDeflector& defl)
 {
 		// Start threads
-		CThreadManager			tmanager;
+		CThreadManager			tmanager(Status, Progress);
 		u32	stride				= defl.Height()/NUM_THREADS;
 		for (u32 thID=0; thID<NUM_THREADS; thID++)
 			tmanager.start		(xr_new<ImplicitThread> (thID,&defl,thID*stride,thID*stride+stride));

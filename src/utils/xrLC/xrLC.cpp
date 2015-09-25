@@ -16,6 +16,7 @@
 #pragma comment(lib,"FreeImage.lib")
 #pragma comment(lib,"xrCore.lib")
 #pragma comment(lib,"xrLC_Light.lib")
+#pragma comment(lib, "xrUtil.lib")
 
 #define PROTECTED_BUILD
 

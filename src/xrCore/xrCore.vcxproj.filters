@@ -297,7 +297,6 @@
     <ClCompile Include="os_clipboard.cpp">
       <Filter>OS</Filter>
     </ClCompile>
-    <ClCompile Include="xrSyncronize.cpp" />
     <ClCompile Include="animation\Bone.cpp">
       <Filter>Animation</Filter>
     </ClCompile>
@@ -322,6 +321,7 @@
     <ClCompile Include="PostProcess\PostProcess.cpp">
       <Filter>PostProcess</Filter>
     </ClCompile>
+    <ClCompile Include="xrSyncronize.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -630,7 +630,6 @@
     <ClInclude Include="os_clipboard.h">
       <Filter>OS</Filter>
     </ClInclude>
-    <ClInclude Include="xrSyncronize.h" />
     <ClInclude Include="animation\Bone.hpp">
       <Filter>Animation</Filter>
     </ClInclude>
@@ -658,6 +657,7 @@
     <ClInclude Include="..\common\Util.hpp">
       <Filter>Kernel</Filter>
     </ClInclude>
+    <ClInclude Include="xrSyncronize.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">
