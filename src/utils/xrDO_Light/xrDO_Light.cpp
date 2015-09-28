@@ -12,7 +12,7 @@
 #pragma comment(lib,"xrCDB.lib")
 #pragma comment(lib,"xrCore.lib")
 #pragma comment(lib,"xrLC_Light.lib")
-#pragma comment(lib, "xrUtil.lib")
+#pragma comment(lib, "xrLCUtil.lib")
 
 ILevelCompilerLogger& Logger = LevelCompilerLoggerWindow();
 

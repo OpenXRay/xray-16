@@ -235,9 +235,6 @@
     <Filter Include="OpenAutomate">
       <UniqueIdentifier>{fe56b488-34f8-4632-9f5e-7805f761b338}</UniqueIdentifier>
     </Filter>
-    <Filter Include="My Amplifier Results">
-      <UniqueIdentifier>{6aec60dd-7590-4a0f-accf-2550c71f6aa4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game API\MaterialSystem">
       <UniqueIdentifier>{59004dc1-5e77-4968-8321-6290b1ab9d3a}</UniqueIdentifier>
     </Filter>
@@ -927,17 +924,6 @@
     <Image Include="stalker_cs.ico">
       <Filter>General\Resources</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="My Amplifier Results\r000hs\r000hs.ampl">
-      <Filter>My Amplifier Results</Filter>
-    </None>
-    <None Include="My Amplifier Results\r001hs\r001hs.ampl">
-      <Filter>My Amplifier Results</Filter>
-    </None>
-    <None Include="My Amplifier Results\r002cc\r002cc.ampl">
-      <Filter>My Amplifier Results</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ClientServer.txt" />

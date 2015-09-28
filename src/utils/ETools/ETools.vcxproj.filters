@@ -41,9 +41,6 @@
     <ClCompile Include="object_sliding.cpp">
       <Filter>VIPM</Filter>
     </ClCompile>
-    <ClCompile Include="optimize_vertex_order.cpp">
-      <Filter>VIPM</Filter>
-    </ClCompile>
     <ClCompile Include="PropSlimTools.cpp">
       <Filter>VIPM</Filter>
     </ClCompile>

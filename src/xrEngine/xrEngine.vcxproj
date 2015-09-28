@@ -707,11 +707,6 @@
     <Image Include="stalker_cs.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="My Amplifier Results\r000hs\r000hs.ampl" />
-    <None Include="My Amplifier Results\r001hs\r001hs.ampl" />
-    <None Include="My Amplifier Results\r002cc\r002cc.ampl" />
-  </ItemGroup>
-  <ItemGroup>
     <Text Include="ClientServer.txt" />
     <Text Include="Effects description.txt" />
     <Text Include="features.txt" />

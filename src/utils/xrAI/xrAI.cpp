@@ -23,7 +23,7 @@
 #pragma comment(lib,"xrcdb.LIB")
 #pragma comment(lib,"MagicFM.LIB")
 #pragma comment(lib,"xrCore.LIB")
-#pragma comment(lib, "xrUtil.lib")
+#pragma comment(lib, "xrLCUtil.lib")
 
 #include "utils/xrLCUtil/LevelCompilerLoggerWindow.hpp"
 #include "utils/xrLCUtil/cdecl_cast.hpp"

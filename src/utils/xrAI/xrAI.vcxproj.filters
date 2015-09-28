@@ -237,9 +237,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="_buildnodes_view.cpp">
-      <Filter>Compiler</Filter>
-    </ClCompile>
     <ClCompile Include="compiler.cpp">
       <Filter>Compiler</Filter>
     </ClCompile>
@@ -255,16 +252,7 @@
     <ClCompile Include="compiler_light.cpp">
       <Filter>Compiler</Filter>
     </ClCompile>
-    <ClCompile Include="compiler_link.cpp">
-      <Filter>Compiler</Filter>
-    </ClCompile>
     <ClCompile Include="compiler_load.cpp">
-      <Filter>Compiler</Filter>
-    </ClCompile>
-    <ClCompile Include="compiler_merge.cpp">
-      <Filter>Compiler</Filter>
-    </ClCompile>
-    <ClCompile Include="compiler_palettize_covers.cpp">
       <Filter>Compiler</Filter>
     </ClCompile>
     <ClCompile Include="compiler_save.cpp">
