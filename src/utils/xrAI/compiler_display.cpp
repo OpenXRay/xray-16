@@ -1,10 +1,6 @@
 #include "stdafx.h"
 #include "compiler.h"
-
-//-------------------------------------------------------------------------------------------------------
 #include "resource.h"
-
-extern HWND logWindow;
 
 int	dimX,dimZ;
 struct	Texel {
@@ -274,6 +270,7 @@ static BOOL CALLBACK disp_proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 void xrDisplay		()
 {
 	InternalRender	();
+    HWND logWindow = Logger.GetWindow();
 	DialogBox		(HINSTANCE(GetModuleHandle(0)),MAKEINTRESOURCE(IDD_NVIEW),logWindow,disp_proc);
 	xr_free			(texels);
 }

@@ -14,7 +14,7 @@ BOOL	f_valid		(float f)
 BOOL				SphereValid	(xr_vector<Fvector>& geom, Fsphere& test)
 {
 	if (!f_valid(test.P.x) || !f_valid(test.R))	{
-		clMsg	("*** Attention ***: invalid sphere: %f,%f,%f - %f",test.P.x,test.P.y,test.P.z,test.R);
+        Logger.clMsg("*** Attention ***: invalid sphere: %f,%f,%f - %f", test.P.x, test.P.y, test.P.z, test.R);
 	}
 
 	Fsphere	S	=	test;

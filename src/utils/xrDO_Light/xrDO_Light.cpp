@@ -1,25 +1,45 @@
-// xrAI.cpp : Defines the entry point for the application.
-//
-
 #include "stdafx.h"
 #include "process.h"
 
 #include "../xrlc_light/xrlc_light.h"
+#include "utils/xrLCUtil/LevelCompilerLoggerWindow.hpp"
+#include "utils/xrLCUtil/cdecl_cast.hpp"
+#include "utils/xrLCUtil/xrLCUtil.hpp"
 //#pragma comment(linker,"/STACK:0x800000,0x400000")
 
 #pragma comment(lib,"comctl32.lib")
-//#pragma comment(lib,"d3dx9.lib")
-//#pragma comment(lib,"IMAGEHLP.LIB")
 #pragma comment(lib,"winmm.LIB")
 #pragma comment(lib,"xrCDB.lib")
 #pragma comment(lib,"xrCore.lib")
 #pragma comment(lib,"xrLC_Light.lib")
-//#pragma comment(lib,"FreeImage.lib")
+#pragma comment(lib, "xrUtil.lib")
 
+ILevelCompilerLogger& Logger = LevelCompilerLoggerWindow();
 
+CThread::LogFunc ProxyMsg = cdecl_cast(
+    [&](const char *format, ...)
+    {
+        va_list args;
+        va_start(args, format);
+        Logger.clMsgV(format, args);
+        va_end(args);    
+    }
+);
 
-extern void logThread			(void *dummy);
-extern volatile BOOL bClose;
+CThreadManager::ReportStatusFunc ProxyStatus = cdecl_cast(
+    [&](const char *format, ...)
+    {
+        va_list args;
+        va_start(args, format);
+        Logger.StatusV(format, args);
+        va_end(args);    
+    }
+);
+
+CThreadManager::ReportProgressFunc ProxyProgress = cdecl_cast(
+    [&](float progress)
+    { Logger.Progress(progress); }
+);
 
 static const char* h_str = 
 	"The following keys are supported / required:\n"
@@ -34,7 +54,7 @@ void Help()
 
 void Startup(LPSTR     lpCmdLine)
 {
-	char cmd[512],name[256];
+	char cmd[512];
 //	BOOL bModifyOptions		= FALSE;
 	bool bNet				= false;
 	xr_strcpy(cmd,lpCmdLine);
@@ -43,19 +63,14 @@ void Startup(LPSTR     lpCmdLine)
 	if (strstr(cmd,"-f")==0)							{ Help(); return; }
 //	if (strstr(cmd,"-o"))								bModifyOptions = TRUE;
 	if ( strstr(cmd,"-net") )						
-														bNet = true;
-	// Give a LOG-thread a chance to startup
-	InitCommonControls	();
-	thread_spawn		(logThread,	"log-update", 1024*1024,0);
-	Sleep				(150);
-	
+		bNet = true;
 	// Load project
-	name[0]=0; sscanf	(strstr(cmd,"-f")+2,"%s",name);
-
-	extern  HWND logWindow;
+    char name[256];
+    *name = 0;
+    sscanf(strstr(cmd,"-f")+2,"%s",name);
 	string256			temp;
 	xr_sprintf			(temp, "%s - Detail Compiler", name);
-	SetWindowText		(logWindow, temp);
+    Logger.Initialize(temp);
 
 	//FS.update_path	(name,"$game_levels$",name);
 	FS.get_path			("$level$")->_set	(name);
@@ -66,14 +81,11 @@ void Startup(LPSTR     lpCmdLine)
 
 	// Show statistic
 	char	stats[256];
-	extern	std::string make_time(u32 sec);
 	xr_sprintf				(stats,"Time elapsed: %s",make_time((dwStartupTime.GetElapsed_ms())/1000).c_str());
 
 	if (!strstr(cmd,"-silent"))
-		MessageBox		(logWindow,stats,"Congratulation!",MB_OK|MB_ICONINFORMATION);
-
-	bClose				= TRUE;
-	Sleep				(500);
+        Logger.Success(stats);
+    Logger.Destroy();
 }
 
 int APIENTRY WinMain(HINSTANCE hInstance,

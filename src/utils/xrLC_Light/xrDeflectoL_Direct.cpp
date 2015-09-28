@@ -1,7 +1,7 @@
 #include "stdafx.h"
 //#include "build.h"
 //#include "std_classes.h"
-#include "utils/xrUtil/xrThread.hpp"
+#include "utils/xrLCUtil/xrThread.hpp"
 #include "xrdeflector.h"
 #include "xrlc_globaldata.h"
 #include "light_point.h"
@@ -118,14 +118,14 @@ void CDeflector::L_Direct	(CDB::COLLIDER* DB, base_lighting* LightsSelected, HAS
 								LightPoint	(DB, inlc_global_data()->RCAST_Model(), C, wP, wN, *LightsSelected, (inlc_global_data()->b_nosun()?LP_dont_sun:0)|LP_UseFaceDisable, F); //.
 								Fcount		+= 1;
 							} catch (...) {
-								clMsg("* ERROR (CDB). Recovered. ");
+                                Logger.clMsg("* ERROR (CDB). Recovered. ");
 							}
 							break;
 						}
 					}
 				} 
 			} catch (...) {
-				clMsg("* ERROR (Light). Recovered. ");
+                Logger.clMsg("* ERROR (Light). Recovered. ");
 			}
 			
 			if (Fcount) {
@@ -152,7 +152,7 @@ void CDeflector::L_Direct	(CDB::COLLIDER* DB, base_lighting* LightsSelected, HAS
 			L_Direct_Edge	(DB,LightsSelected, T.uv[2], T.uv[0], F->v[2]->P, F->v[0]->P, F->N, texel_size,F);
 		} catch (...)
 		{
-			clMsg("* ERROR (Edge). Recovered. ");
+            Logger.clMsg("* ERROR (Edge). Recovered. ");
 		}
 	}
 }

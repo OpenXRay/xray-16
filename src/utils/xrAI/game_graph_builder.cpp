@@ -36,19 +36,19 @@ CGameGraphBuilder::~CGameGraphBuilder		()
 
 void CGameGraphBuilder::create_graph		(const float &start, const float &amount)
 {
-	Progress				(start);
+    Logger.Progress(start);
 
 	VERIFY					(!m_graph);
 	m_graph					= xr_new<graph_type>();
 
 	m_graph_guid			= generate_guid();
 
-	Progress				(start + amount);
+    Logger.Progress(start + amount);
 }
 
 void CGameGraphBuilder::load_level_graph	(const float &start, const float &amount)
 {
-	Progress				(start);
+    Logger.Progress(start);
 
 	Msg						("Loading AI map");
 	
@@ -57,7 +57,7 @@ void CGameGraphBuilder::load_level_graph	(const float &start, const float &amoun
 	
 	Msg						("%d nodes loaded",level_graph().header().vertex_count());
 	
-	Progress				(start + amount);
+    Logger.Progress(start + amount);
 }
 
 void CGameGraphBuilder::load_graph_point	(NET_Packet &net_packet)
@@ -133,7 +133,7 @@ void CGameGraphBuilder::load_graph_point	(NET_Packet &net_packet)
 
 void CGameGraphBuilder::load_graph_points	(const float &start, const float &amount)
 {
-	Progress				(start);
+    Logger.Progress(start);
 
 	Msg						("Loading graph points");
 
@@ -157,7 +157,7 @@ void CGameGraphBuilder::load_graph_points	(const float &start, const float &amou
 
 	Msg						("%d graph points loaded",graph().vertices().size());
 
-	Progress				(start + amount);
+    Logger.Progress(start + amount);
 }
 
 template <typename T>
@@ -197,7 +197,7 @@ void CGameGraphBuilder::mark_vertices		(u32 level_vertex_id)
 
 void CGameGraphBuilder::fill_marks			(const float &start, const float &amount)
 {
-	Progress							(start);
+    Logger.Progress(start);
 
 	m_marks.assign						(level_graph().header().vertex_count(),false);
 	graph_type::const_vertex_iterator	I = graph().vertices().begin();
@@ -206,12 +206,12 @@ void CGameGraphBuilder::fill_marks			(const float &start, const float &amount)
 		mark_vertices					((*I).second->data().level_vertex_id());
 	m_marks.flip						();
 	
-	Progress							(start + amount);
+    Logger.Progress(start + amount);
 }
 
 void CGameGraphBuilder::fill_distances		(const float &start, const float &amount)
 {
-	Progress							(start);
+    Logger.Progress(start);
 
 	m_distances.resize					(graph().vertices().size());
 	{
@@ -226,12 +226,12 @@ void CGameGraphBuilder::fill_distances		(const float &start, const float &amount
 		}
 	}
 
-	Progress							(start + amount);
+    Logger.Progress(start + amount);
 }
 
 void CGameGraphBuilder::recursive_update	(const u32 &game_vertex_id, const float &start, const float &amount)
 {
-	Progress					(start);
+    Logger.Progress(start);
 
 	u32							level_vertex_id = graph().vertex(game_vertex_id)->data().level_vertex_id();
 	xr_vector<u32>				&distances = m_distances[game_vertex_id];
@@ -254,7 +254,7 @@ void CGameGraphBuilder::recursive_update	(const u32 &game_vertex_id, const float
 			float(level_graph().header().vertex_count())
 		);
 
-	Progress					(start);
+    Logger.Progress(start);
 	for ( ; !m_current_fringe.empty(); ) {
 		xr_vector<u32>::iterator			I = m_current_fringe.begin();
 		xr_vector<u32>::iterator			E = m_current_fringe.end();
@@ -296,15 +296,15 @@ void CGameGraphBuilder::recursive_update	(const u32 &game_vertex_id, const float
 		m_next_fringe.clear	();
 		++curr_dist;
 
-		Progress			(start + amount_i*float(total_count));
+        Logger.Progress(start + amount_i*float(total_count));
 	}
 
-	Progress				(start + amount);
+    Logger.Progress(start + amount);
 }
 
 void CGameGraphBuilder::iterate_distances	(const float &start, const float &amount)
 {
-	Progress							(start);
+    Logger.Progress(start);
 
 	m_results.assign					(level_graph().header().vertex_count(),0);
 	
@@ -318,12 +318,12 @@ void CGameGraphBuilder::iterate_distances	(const float &start, const float &amou
 		recursive_update				(i,start + amount_i*float(i),amount_i);
 	}
 
-	Progress							(start + amount);
+    Logger.Progress(start + amount);
 }
 
 void CGameGraphBuilder::save_cross_table	(const float &start, const float &amount)
 {
-	Progress							(start);
+    Logger.Progress(start);
 
 	Msg									("Saving cross table");
 
@@ -370,12 +370,12 @@ void CGameGraphBuilder::save_cross_table	(const float &start, const float &amoun
 	m_next_fringe.clear		();
 
 //	Msg						("CT:SAVE : %f",timer.GetElapsed_sec());
-	Progress				(start + amount);
+    Logger.Progress(start + amount);
 }
 
 void CGameGraphBuilder::build_cross_table	(const float &start, const float &amount)
 {
-	Progress				(start);
+    Logger.Progress(start);
 	
 	Msg						("Building cross table");
 
@@ -393,19 +393,19 @@ void CGameGraphBuilder::build_cross_table	(const float &start, const float &amou
 	load_cross_table		(start + 0.999986f*amount,0.000014f*amount);
 //	Msg						("CT : %f",timer.GetElapsed_sec());
 	
-	Progress				(start + amount);
+    Logger.Progress(start + amount);
 }
 
 void CGameGraphBuilder::load_cross_table	(const float &start, const float &amount)
 {
-	Progress				(start);
+    Logger.Progress(start);
 
 	Msg						("Loading cross table");
 
 	VERIFY					(!m_cross_table);
 	m_cross_table			= xr_new<CGameLevelCrossTable>(m_cross_table_name);
 
-	Progress				(start + amount);
+    Logger.Progress(start + amount);
 }
 
 void CGameGraphBuilder::fill_neighbours		(const u32 &game_vertex_id)
@@ -507,7 +507,7 @@ void CGameGraphBuilder::generate_edges		(const u32 &game_vertex_id)
 
 void CGameGraphBuilder::generate_edges		(const float &start, const float &amount)
 {
-	Progress				(start);
+    Logger.Progress(start);
 
 	Msg						("Generating edges");
 	
@@ -520,17 +520,17 @@ void CGameGraphBuilder::generate_edges		(const float &start, const float &amount
 
 	Msg						("%d edges built",graph().edge_count());
 
-	Progress				(start + amount);
+    Logger.Progress(start + amount);
 }
 
 void CGameGraphBuilder::connectivity_check	(const float &start, const float &amount)
 {
-	Progress				(start);
+    Logger.Progress(start);
 
 	Msg						("Checking graph connectivity");
 
 
-	Progress				(start + amount);
+    Logger.Progress(start + amount);
 }
 
 void CGameGraphBuilder::create_tripples		(const float &start, const float &amount)
@@ -604,7 +604,7 @@ void CGameGraphBuilder::process_tripple		(const TRIPPLE &tripple)
 
 void CGameGraphBuilder::optimize_graph		(const float &start, const float &amount)
 {
-	Progress					(start);
+    Logger.Progress(start);
 
 	Msg							("Optimizing graph");
 
@@ -619,12 +619,12 @@ void CGameGraphBuilder::optimize_graph		(const float &start, const float &amount
 
 	Msg							("edges after optimization : %d",graph().edge_count());
 
-	Progress					(start + amount);
+    Logger.Progress(start + amount);
 }
 
 void CGameGraphBuilder::save_graph			(const float &start, const float &amount)
 {
-	Progress				(start);
+    Logger.Progress(start);
 
 	Msg						("Saving graph");
 
@@ -689,12 +689,12 @@ void CGameGraphBuilder::save_graph			(const float &start, const float &amount)
 	writer.save_to				(m_graph_name);
 	Msg							("%d bytes saved",int(writer.size()));
 
-	Progress					(start + amount);
+    Logger.Progress(start + amount);
 }
 
 void CGameGraphBuilder::build_graph			(const float &start, const float &amount)
 {
-	Progress				(start);
+    Logger.Progress(start);
 
 	Msg						("Building graph");
 
@@ -702,14 +702,14 @@ void CGameGraphBuilder::build_graph			(const float &start, const float &amount)
 	timer.Start				();
 
 	m_graph_engine			= xr_new<CGraphEngine>(level_graph().header().vertex_count());
-	Progress				(start + 0.000000f*amount + amount*0.067204f);
+    Logger.Progress(start + 0.000000f*amount + amount*0.067204f);
 //	Msg						("BG : %f",timer.GetElapsed_sec());
 
 	generate_edges			(start + 0.067204f*amount, amount*0.922647f);
 //	Msg						("BG : %f",timer.GetElapsed_sec());
 
 	xr_delete				(m_graph_engine);
-	Progress				(start + 0.989851f*amount + amount*0.002150f);
+    Logger.Progress(start + 0.989851f*amount + amount*0.002150f);
 //	Msg						("BG : %f",timer.GetElapsed_sec());
 
 	connectivity_check		(start + 0.992001f*amount, amount*0.000030f);
@@ -719,7 +719,7 @@ void CGameGraphBuilder::build_graph			(const float &start, const float &amount)
 	save_graph				(start + 0.992485f*amount, amount*0.007515f);
 //	Msg						("BG : %f",timer.GetElapsed_sec());
 
-	Progress				(start + amount);
+    Logger.Progress(start + amount);
 }
 
 void CGameGraphBuilder::build_graph			(
@@ -728,7 +728,7 @@ void CGameGraphBuilder::build_graph			(
 		LPCSTR level_name
 	)
 {
-	Phase					("Building level game graph");
+    Logger.Phase("Building level game graph");
 	Msg						("level \"%s\"",level_name);
 
 	m_graph_name			= graph_name;

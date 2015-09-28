@@ -88,7 +88,7 @@ static void edge(Vertex* vE1, Vertex* vE2)
 
 void CBuild::CorrectTJunctions()
 {
-	Status					("Processing...");
+    Logger.Status("Processing...");
 	vecJunctions			= xr_new<xr_vector<record> > (); vecJunctions->reserve	(1024);
 	vecEdges				= xr_new<xr_vector<record> > (); vecEdges->reserve		(1024);
 
@@ -140,9 +140,9 @@ void CBuild::CorrectTJunctions()
 				}
 			}
 		}
-		Progress(float(I)/float(lc_global_data()->g_faces().size()));
+        Logger.Progress(float(I) / float(lc_global_data()->g_faces().size()));
 	}
-	clMsg("*** %d junctions and %d long edges found.",vecJunctions->size(),vecEdges->size());
+    Logger.clMsg("*** %d junctions and %d long edges found.", vecJunctions->size(), vecEdges->size());
 
 	xr_delete(vecJunctions);
 	xr_delete(vecEdges);

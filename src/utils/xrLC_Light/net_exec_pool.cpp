@@ -91,19 +91,19 @@ namespace lc_net
 		execution_factory.destroy( e );
 		_task_manager.progress( id );
 #ifdef	LOG_ALL_NET_TASKS
-		clMsg( "%s received task : %d", _name, id );
+        Logger.clMsg("%s received task : %d", _name, id);
 		
 		//Progress( float( tasks_completed )/float( size ) );
-		clMsg( "num task complited : %d , num task left %d  (task num %d)", l_completed, size - l_completed, size );
+        Logger.clMsg("num task complited : %d , num task left %d  (task num %d)", l_completed, size - l_completed, size);
 #endif		
 		R_ASSERT( l_completed <=  size );
 		if( l_completed == size )
 		{
 			string64 buf;
-			clLog	( " %s, calculation complited", _name );
+            Logger.clLog(" %s, calculation complited", _name);
 			//clMsg	("%f %s calculation seconds",start_time.GetElapsed_sec(), _name );
 
-			clLog	("%s %s calculation time",make_time( buf,start_time.GetElapsed_sec() ), _name );
+            Logger.clLog("%s %s calculation time", make_time(buf, start_time.GetElapsed_sec()), _name);
 			//Status	("%s %s calculation time",make_time( buf,start_time.GetElapsed_sec() ), _name );
 
 			//xr_sprintf( buf, "%s %s calculation time",make_time( buf,start_time.GetElapsed_sec() ), _name ); 
@@ -168,7 +168,7 @@ namespace lc_net
 		VERIFY( e != 0 );
 		write_task_caption( outStream, id, e->type() );
 #ifdef	LOG_ALL_NET_TASKS		
-		clMsg( " %s, send task : %d", _name, id );
+        Logger.clMsg(" %s, send task : %d", _name, id);
 		//
 #endif
 

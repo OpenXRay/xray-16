@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "../../xrEngine/xrlevel.h"
 
-#include "utils/xrUtil/xrThread.hpp"
+#include "utils/xrLCUtil/xrThread.hpp"
 
 #include "global_calculation_data.h"
 #include "lightthread.h"
@@ -14,7 +14,7 @@ void	xrLight			()
 	u32	range				= gl_data.slots_data.size_z();
 
 	// Start threads, wait, continue --- perform all the work
-	CThreadManager		Threads(Status, Progress);
+	CThreadManager		Threads(ProxyStatus, ProxyProgress);
 	CTimer				start_time;
 	u32	stride			= range/NUM_THREADS;
 	u32	last			= range-stride*	(NUM_THREADS-1);
@@ -30,10 +30,10 @@ void	xrLight			()
 
 void xrCompileDO( bool net )
 {
-	Phase		("Loading level...");
+    Logger.Phase("Loading level...");
 	gl_data.xrLoad	();
 
-	Phase		("Lighting nodes...");
+    Logger.Phase("Lighting nodes...");
 	if( net )
 		lc_net::xrNetDOLight();
 	else

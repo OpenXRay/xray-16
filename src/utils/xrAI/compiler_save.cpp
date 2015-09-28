@@ -149,7 +149,7 @@ void xrSaveNodes(LPCSTR N, LPCSTR out_name)
 	IWriter			*fs = FS.w_open(fName);
 
 	// Header
-	Status			("Saving header...");
+    Logger.Status("Saving header...");
 	hdrNODES		H;
 	H.version		= XRAI_CURRENT_VERSION;
 	H.count			= g_nodes.size();
@@ -163,7 +163,7 @@ void xrSaveNodes(LPCSTR N, LPCSTR out_name)
 //		fs->w		(&g_covers_palette[j],sizeof(g_covers_palette[j]));
 
 	// All nodes
-	Status			("Saving nodes...");
+    Logger.Status("Saving nodes...");
 	for (u32 i=0; i<g_nodes.size(); ++i) {
 		vertex			&N	= g_nodes[i];
 		NodeCompressed	NC;
@@ -177,7 +177,7 @@ void xrSaveNodes(LPCSTR N, LPCSTR out_name)
 
 	for (u32 i=0; i<g_nodes.size(); ++i) {
 		fs->w			(&compressed_nodes[i],sizeof(NodeCompressed));
-		Progress		(float(i)/float(g_nodes.size()));
+        Logger.Progress(float(i) / float(g_nodes.size()));
 	}
 	// Stats
 	u32	SizeTotal	= fs->tell();

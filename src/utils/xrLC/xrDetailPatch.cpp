@@ -59,7 +59,7 @@ IC bool sort_pred(const DetailPatch& P1, const DetailPatch& P2)
 
 void CBuild::LightPatches()
 {
-	Status("Raytracing...");
+	Logger.Status("Raytracing...");
 	for (u32 i=0; i<g_pathes.size(); i++)
 	{
 		Fcolor C,Lumel;
@@ -70,7 +70,7 @@ void CBuild::LightPatches()
 		if (0 == i%32)		Progress(float(i)/float(g_pathes.size()));
 	}
 
-	Status("Subdividing...");
+	Logger.Status("Subdividing...");
 	xr_vector<DetailPatch> one_subd;
 	while (!g_pathes.empty())
 	{

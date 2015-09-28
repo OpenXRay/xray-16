@@ -1,7 +1,7 @@
 #pragma once
-#include "xrUtil.hpp"
+#include "xrLCUtil.hpp"
 
-class XRUTIL_API CThread
+class XRLCUTIL_API CThread
 {
 public:
     using LogFunc = void(*)(const char *format, ...);
@@ -36,7 +36,7 @@ public:
     virtual     void    Execute ()  = 0;
 };
 
-class XRUTIL_API CThreadManager
+class XRLCUTIL_API CThreadManager
 {
 public:
     using ReportStatusFunc = void(*)(const char *format, ...);

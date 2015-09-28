@@ -236,7 +236,6 @@
     <ClInclude Include="Build.h" />
     <ClInclude Include="b_globals.h" />
     <ClInclude Include="cform_build.h" />
-    <ClInclude Include="cl_log.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="ELight_def.h" />
     <ClInclude Include="Image.h" />
@@ -252,7 +251,6 @@
     <ClInclude Include="NV_Library\VertexCache.h" />
     <ClInclude Include="OGF_Face.h" />
     <ClInclude Include="progmesh.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="Sector.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="std_classes.h" />
@@ -297,7 +295,6 @@
     <ClCompile Include="..\..\xrEngine\xrLoadSurface.cpp" />
     <ClCompile Include="Build.cpp" />
     <ClCompile Include="Build_Load.cpp" />
-    <ClCompile Include="cl_log.cpp" />
     <ClCompile Include="fmesh.cpp" />
     <ClCompile Include="Image.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -422,9 +419,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="resource.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,7 +2,7 @@
 #include "build.h"
 
 #include "../xrlc_light/xrdeflector.h"
-#include "utils/xrUtil/xrThread.hpp"
+#include "utils/xrLCUtil/xrThread.hpp"
 #include "../xrLC_Light/xrLC_GlobalData.h"
 #include "../xrLC_Light/xrLightVertex.h"
 
@@ -26,7 +26,7 @@ private:
 	CDB::COLLIDER	DB;
 	base_lighting	LightsSelected;
 public:
-	CLMThread	(u32 ID) : CThread(ID, clMsg)
+	CLMThread	(u32 ID) : CThread(ID, ProxyMsg)
 	{
 		// thMonitor= TRUE;
 		thMessages	= FALSE;
@@ -56,7 +56,7 @@ public:
 				D->Light	(&DB,&LightsSelected,H);
 			} catch (...)
 			{
-				clMsg("* ERROR: CLMThread::Execute - light");
+                Logger.clMsg("* ERROR: CLMThread::Execute - light");
 			}
 		}
 	}
@@ -89,19 +89,19 @@ for(u32 dit = 0; dit<lc_global_data()->g_deflectors().size(); dit++)
 		
 
 		// Main process (4 threads)
-		Status			("Lighting...");
-		CThreadManager	threads(Status, Progress);
+		Logger.Status			("Lighting...");
+		CThreadManager	threads(ProxyStatus, ProxyProgress);
 		const	u32	thNUM	= 6;
 		CTimer	start_time;	start_time.Start();				
 		for				(int L=0; L<thNUM; L++)	threads.start(xr_new<CLMThread> (L));
 		threads.wait	(500);
-		clMsg			("%f seconds",start_time.GetElapsed_sec());
+        Logger.clMsg("%f seconds", start_time.GetElapsed_sec());
 }
 
 void	CBuild::LMaps					()
 {
 		//****************************************** Lmaps
-	Phase			("LIGHT: LMaps...");
+    Logger.Phase("LIGHT: LMaps...");
 	//DeflectorsStats ();
 #ifndef NET_CMP
 	if(g_build_options.b_net_light)
@@ -127,7 +127,7 @@ void CBuild::Light()
 	//****************************************** Implicit
 	{
 		FPU::m64r		();
-		Phase			("LIGHT: Implicit...");
+        Logger.Phase("LIGHT: Implicit...");
 		mem_Compact		();
 		ImplicitLighting();
 	}
@@ -137,7 +137,7 @@ void CBuild::Light()
 
 	//****************************************** Vertex
 	FPU::m64r		();
-	Phase			("LIGHT: Vertex...");
+    Logger.Phase("LIGHT: Vertex...");
 	mem_Compact		();
 
 	LightVertex		();
@@ -154,7 +154,7 @@ void CBuild::Light()
 	//****************************************** Merge LMAPS
 	{
 		FPU::m64r		();
-		Phase			("LIGHT: Merging lightmaps...");
+        Logger.Phase("LIGHT: Merging lightmaps...");
 		mem_Compact		();
 
 		xrPhase_MergeLM	();

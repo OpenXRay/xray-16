@@ -20,12 +20,12 @@ namespace lc_net
 		Memory.mem_compact	();
 		//std::random_shuffle	(inlc_global_data()->g_deflectors().begin(),inlc_global_data()->g_deflectors().end());
 		std::sort( inlc_global_data()->g_deflectors().begin(),inlc_global_data()->g_deflectors().end(),cmp_weight );
-		clMsg( "create_lm_data_write:  start" );
+        Logger.clMsg("create_lm_data_write:  start");
 		IWriter * file = FS.w_open(path);
 		inlc_global_data()->write_lm_data( *file );
 		FS.w_close(file);
 		compress( path ); 
-		clMsg( "create_lm_data_write:  end" );
+        Logger.clMsg("create_lm_data_write:  end");
 		//inlc_global_data()->create_read_faces();
 		//inlc_global_data()->create_write_faces();
 	}

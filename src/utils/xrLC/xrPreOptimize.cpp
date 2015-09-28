@@ -57,13 +57,13 @@ void CBuild::PreOptimize()
 	}
 	
 	// 
-	Status("Processing...");
+    Logger.Status("Processing...");
 	g_bUnregister		= false;
 	for (int it = 0; it<(int)lc_global_data()->g_vertices().size(); it++)
 	{
 		if (0==(it%100000)) {
-			Progress(_sqrt(float(it)/float(lc_global_data()->g_vertices().size())));
-			Status	("Processing... (%d verts removed)",Vremoved);
+            Logger.Progress(_sqrt(float(it) / float(lc_global_data()->g_vertices().size())));
+            Logger.Status("Processing... (%d verts removed)", Vremoved);
 		}
 
 		if (it>=(int)lc_global_data()->g_vertices().size()) break;
@@ -116,7 +116,7 @@ void CBuild::PreOptimize()
 		}
 	}
 	
-	Status("Removing degenerated/duplicated faces...");
+    Logger.Status("Removing degenerated/duplicated faces...");
 	g_bUnregister	= false;
 	for (u32 it=0; it<lc_global_data()->g_faces().size(); it++)
 	{
@@ -129,7 +129,7 @@ void CBuild::PreOptimize()
 			// Check validity
 			F->Verify			( );
 		}
-		Progress	(float(it)/float(lc_global_data()->g_faces().size()));
+        Logger.Progress(float(it) / float(lc_global_data()->g_faces().size()));
 	}
 	if (InvalideFaces())	
 	{
@@ -137,7 +137,7 @@ void CBuild::PreOptimize()
 		Debug.fatal		(DEBUG_INFO,"* FATAL: %d invalid faces. Compilation aborted",InvalideFaces());
 	}
 
-	Status				("Adjacency check...");
+    Logger.Status("Adjacency check...");
 	g_bUnregister		= false;
 
 	for (u32 it = 0; it<lc_global_data()->g_vertices().size(); ++it)
@@ -149,7 +149,7 @@ void CBuild::PreOptimize()
 		}
 	}
 	
-	Status				("Cleanup...");
+    Logger.Status("Cleanup...");
 	lc_global_data()->g_vertices().erase	(std::remove(lc_global_data()->g_vertices().begin(),lc_global_data()->g_vertices().end(),(Vertex*)0),lc_global_data()->g_vertices().end());
 	lc_global_data()->g_faces().erase		(std::remove(lc_global_data()->g_faces().begin(),lc_global_data()->g_faces().end(),(Face*)0),lc_global_data()->g_faces().end());
 	{
@@ -161,8 +161,8 @@ void CBuild::PreOptimize()
 				}
 	}
 	mem_Compact			();
-	clMsg("%d vertices removed. (%d left)",Vcount-lc_global_data()->g_vertices().size(),lc_global_data()->g_vertices().size());
-	clMsg("%d faces removed. (%d left)",   Fcount-lc_global_data()->g_faces().size(),   lc_global_data()->g_faces().size());
+    Logger.clMsg("%d vertices removed. (%d left)", Vcount - lc_global_data()->g_vertices().size(), lc_global_data()->g_vertices().size());
+    Logger.clMsg("%d faces removed. (%d left)", Fcount - lc_global_data()->g_faces().size(), lc_global_data()->g_faces().size());
 	
 	// -------------------------------------------------------------
 	/*

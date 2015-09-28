@@ -20,7 +20,6 @@
 #define XR_EPROPS_API
 #include "../../xrCore/clsid.h"
 #include "defines.h"
-#include "cl_log.h"
 #include "../../xrcdb/xrCDB.h"
 #include "_d3d_extensions.h"
 
@@ -34,6 +33,15 @@
 #	include "smart_cast.h"
 #endif
 // TODO: reference additional headers your program requires here
+
+#include "utils/xrLCUtil/ILevelCompilerLogger.hpp"
+#include "utils/xrLCUtil/xrThread.hpp"
+#include "utils/xrLCUtil/cdecl_cast.hpp"
+
+extern ILevelCompilerLogger& Logger;
+extern CThread::LogFunc ProxyMsg;
+extern CThreadManager::ReportStatusFunc ProxyStatus;
+extern CThreadManager::ReportProgressFunc ProxyProgress;
 
 #define READ_IF_EXISTS(ltx,method,section,name,default_value)\
 	(ltx->line_exist(section,name)) ? ltx->method(section,name) : default_value

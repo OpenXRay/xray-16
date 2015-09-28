@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "xrLightVertex.h"
-#include "utils/xrUtil/xrThread.hpp"
+#include "utils/xrLCUtil/xrThread.hpp"
 #include "xrface.h"
 #include "xrLC_GlobalData.h"
 #include "light_point.h"
@@ -109,7 +109,7 @@ bool GetTranslucency(const Vertex* V,float &v_trans )
 class CVertexLightThread : public CThread
 {
 public:
-	CVertexLightThread(u32 ID) : CThread(ID, clMsg)
+	CVertexLightThread(u32 ID) : CThread(ID, ProxyMsg)
 	{
 		thMessages	= FALSE;
 	}
@@ -156,21 +156,21 @@ void LightVertex	( bool net )
 	g_trans				= xr_new<mapVert>	();
 
 	// Start threads, wait, continue --- perform all the work
-	Status				("Calculating...");
+    Logger.Status("Calculating...");
 	if( !net )
 	{
-		CThreadManager		Threads(Status, Progress);
+		CThreadManager		Threads(ProxyStatus, ProxyProgress);
 		VLT.init			();
 		CTimer	start_time;	start_time.Start();				
 		for (u32 thID=0; thID<NUM_THREADS; thID++)	Threads.start(xr_new<CVertexLightThread>(thID));
 		Threads.wait		();
-		clMsg				("%f seconds",start_time.GetElapsed_sec());
+        Logger.clMsg("%f seconds", start_time.GetElapsed_sec());
 	} else
 	{
 		lc_net::RunLightVertexNet();
 	}
 	// Process all groups
-	Status				("Transluenting...");
+    Logger.Status("Transluenting...");
 	for (mapVertIt it=g_trans->begin(); it!=g_trans->end(); it++)
 	{
 		// Unique
@@ -203,5 +203,5 @@ void LightVertex	( bool net )
 		}
 	}
 	xr_delete	(g_trans);
-	Status				("Wating...");
+    Logger.Status("Wating...");
 }

@@ -188,14 +188,14 @@ void CBuild::Run	(LPCSTR P)
 
 	//****************************************** Optimizing + checking for T-junctions
 	FPU::m64r					();
-	Phase						("Optimizing...");
+    Logger.Phase("Optimizing...");
 	mem_Compact					();
 	PreOptimize					();
 	CorrectTJunctions			();
 
 	//****************************************** HEMI-Tesselate
 	FPU::m64r					();
-	Phase						("Adaptive HT...");
+    Logger.Phase("Adaptive HT...");
 	mem_Compact					();
 #ifndef CFORM_ONLY
 	xrPhase_AdaptiveHT			();
@@ -203,7 +203,7 @@ void CBuild::Run	(LPCSTR P)
 
 	//****************************************** Building normals
 	FPU::m64r					();
-	Phase						("Building normals...");
+    Logger.Phase("Building normals...");
 	mem_Compact					();
 	CalcNormals					();
 	//SmoothVertColors			(5);
@@ -211,7 +211,7 @@ void CBuild::Run	(LPCSTR P)
 	//****************************************** Collision DB
 	//should be after normals, so that double-sided faces gets separated
 	FPU::m64r					();
-	Phase						("Building collision database...");
+    Logger.Phase("Building collision database...");
 	mem_Compact					();
 	BuildCForm					();
 
@@ -224,14 +224,14 @@ void CBuild::Run	(LPCSTR P)
 	//****************************************** T-Basis
 	{
 		FPU::m64r					();
-		Phase						("Building tangent-basis...");
+        Logger.Phase("Building tangent-basis...");
 		xrPhase_TangentBasis		();
 		mem_Compact					();
 	}
 
 	//****************************************** GLOBAL-RayCast model
 	FPU::m64r					();
-	Phase						("Building rcast-CFORM model...");
+    Logger.Phase("Building rcast-CFORM model...");
 	mem_Compact					();
 	Light_prepare				();
 	BuildRapid					(TRUE);
@@ -240,7 +240,7 @@ void CBuild::Run	(LPCSTR P)
 	if (g_build_options.b_radiosity)			
 	{
 		FPU::m64r					();
-		Phase						("Radiosity-Solver...");
+        Logger.Phase("Radiosity-Solver...");
 		mem_Compact					();
 		Light_prepare				();
 		xrPhase_Radiosity			();
@@ -248,7 +248,7 @@ void CBuild::Run	(LPCSTR P)
 
 	//****************************************** Starting MU
 	FPU::m64r					();
-	Phase						("LIGHT: Starting MU...");
+    Logger.Phase("LIGHT: Starting MU...");
 	mem_Compact					();
 	Light_prepare				();
 	if(g_build_options.b_net_light)
@@ -259,7 +259,7 @@ void CBuild::Run	(LPCSTR P)
 	StartMu						();
 	//****************************************** Resolve materials
 	FPU::m64r					();
-	Phase						("Resolving materials...");
+    Logger.Phase("Resolving materials...");
 	mem_Compact					();
 	xrPhase_ResolveMaterials	();
 	IsolateVertices				(TRUE);
@@ -267,7 +267,7 @@ void CBuild::Run	(LPCSTR P)
 	//****************************************** UV mapping
 	{
 		FPU::m64r					();
-		Phase						("Build UV mapping...");
+        Logger.Phase("Build UV mapping...");
 		mem_Compact					();
 		xrPhase_UVmap				();
 		IsolateVertices				(TRUE);
@@ -275,7 +275,7 @@ void CBuild::Run	(LPCSTR P)
 	
 	//****************************************** Subdivide geometry
 	FPU::m64r					();
-	Phase						("Subdividing geometry...");
+    Logger.Phase("Subdividing geometry...");
 	mem_Compact					();
 	xrPhase_Subdivide			();
 	//IsolateVertices				(TRUE);
@@ -301,19 +301,19 @@ void CBuild::	RunAfterLight			( IWriter* fs	)
 {
  	//****************************************** Merge geometry
 	FPU::m64r					();
-	Phase						("Merging geometry...");
+    Logger.Phase("Merging geometry...");
 	mem_Compact					();
 	xrPhase_MergeGeometry		();
 
 	//****************************************** Convert to OGF
 	FPU::m64r					();
-	Phase						("Converting to OGFs...");
+    Logger.Phase("Converting to OGFs...");
 	mem_Compact					();
 	Flex2OGF					();
 
 	//****************************************** Wait for MU
 	FPU::m64r					();
-	Phase						("LIGHT: Waiting for MU-thread...");
+    Logger.Phase("LIGHT: Waiting for MU-thread...");
 	mem_Compact					();
 	wait_mu_base				();
 
@@ -329,17 +329,17 @@ void CBuild::	RunAfterLight			( IWriter* fs	)
 
 	//****************************************** Export MU-models
 	FPU::m64r					();
-	Phase						("Converting MU-models to OGFs...");
+    Logger.Phase("Converting MU-models to OGFs...");
 	mem_Compact					();
 	{
 		u32 m;
-		Status			("MU : Models...");
+        Logger.Status("MU : Models...");
 		for (m=0; m<mu_models().size(); m++)	{
 			calc_ogf			(*mu_models()[m]);
 			export_geometry		(*mu_models()[m]);
 		}
 
-		Status			("MU : References...");
+        Logger.Status("MU : References...");
 		for (m=0; m<mu_refs().size(); m++)
 			export_ogf(*mu_refs()[m]);
 
@@ -348,19 +348,19 @@ void CBuild::	RunAfterLight			( IWriter* fs	)
 
 	//****************************************** Destroy RCast-model
 	FPU::m64r		();
-	Phase			("Destroying ray-trace model...");
+    Logger.Phase("Destroying ray-trace model...");
 	mem_Compact		();
 	lc_global_data()->destroy_rcmodel();
 
 	//****************************************** Build sectors
 	FPU::m64r		();
-	Phase			("Building sectors...");
+    Logger.Phase("Building sectors...");
 	mem_Compact		();
 	BuildSectors	();
 
 	//****************************************** Saving MISC stuff
 	FPU::m64r		();
-	Phase			("Saving...");
+    Logger.Phase("Saving...");
 	mem_Compact		();
 	SaveLights		(*fs);
 

@@ -13,13 +13,6 @@
     <Filter Include="Compiler\Kernel">
       <UniqueIdentifier>{d7047094-b5bb-4398-830d-7f17b82d8030}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Compiler\Kernel\Resource Files">
-      <UniqueIdentifier>{eccf6645-840a-4f81-9c2f-0e3b4a3c46ac}</UniqueIdentifier>
-      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
-    </Filter>
-    <Filter Include="Compiler\Kernel\Log">
-      <UniqueIdentifier>{872c595c-34a3-4664-b11c-50c4b97f2aed}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Compiler\Kernel\Generic">
       <UniqueIdentifier>{a4c402e3-d51e-4459-a697-a90c8a83326c}</UniqueIdentifier>
     </Filter>
@@ -239,6 +232,9 @@
     <Filter Include="ALife\guid_generator">
       <UniqueIdentifier>{fcaa304a-4e9c-4de0-9548-d6d730f309ed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{9d5968b1-6770-4ee6-832d-da35ba558eb9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="_buildnodes_view.cpp">
@@ -291,9 +287,6 @@
     </ClCompile>
     <ClCompile Include="xrAI.cpp">
       <Filter>Compiler\Kernel</Filter>
-    </ClCompile>
-    <ClCompile Include="cl_log.cpp">
-      <Filter>Compiler\Kernel\Log</Filter>
     </ClCompile>
     <ClCompile Include="cl_collector.cpp">
       <Filter>Compiler\Kernel\Generic\CDB</Filter>
@@ -449,12 +442,6 @@
     </ClInclude>
     <ClInclude Include="xrShaderTypes.h">
       <Filter>Compiler\Kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Compiler\Kernel\Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cl_log.h">
-      <Filter>Compiler\Kernel\Log</Filter>
     </ClInclude>
     <ClInclude Include="_d3d_extensions.h">
       <Filter>Compiler\Kernel\Generic</Filter>
@@ -906,10 +893,13 @@
     <ClInclude Include="guid_generator.h">
       <Filter>ALife\guid_generator</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
-      <Filter>Compiler\Kernel\Resource Files</Filter>
+      <Filter>Resources</Filter>
     </ResourceCompile>
   </ItemGroup>
 </Project>

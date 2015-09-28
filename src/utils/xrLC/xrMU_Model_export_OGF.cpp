@@ -7,7 +7,7 @@
 #include "build.h"
 #include "OGF_Face.h"
 
-#define	TRY(a) try { a; } catch (...) { clMsg("* E: %s", #a); }
+#define	TRY(a) try { a; } catch (...) { Logger.clMsg("* E: %s", #a); }
 
 void export_ogf( xrMU_Reference& mu_reference )
 {

@@ -4,7 +4,7 @@
 #include "OGF_Face.h"
 #include "build.h"
 
-#define	TRY(a) try { a; } catch (...) { clMsg("* E: %s", #a); }
+#define	TRY(a) try { a; } catch (...) { Logger.clMsg("* E: %s", #a); }
 
 void MModel_face2OGF_Vertices( const _face &FF, OGF_Vertex	V[3], const xrMU_Model &model )
 {
@@ -61,28 +61,37 @@ void calc_ogf( xrMU_Model &	mu_model )
 					R_ASSERT			(FF);
 					OGF_AddFace( *pOGF, *FF, mu_model ); 
 				}
-			} catch (...) {  clMsg("* ERROR: MU2OGF, model %s, *faces*",*(mu_model.m_name)); }
-		} catch (...)
-		{
-			clMsg("* ERROR: MU2OGF, 1st part, model %s",*(mu_model.m_name));
+			} catch (...) {
+                Logger.clMsg("* ERROR: MU2OGF, model %s, *faces*", *(mu_model.m_name));
+            }
+		} catch (...) {
+            Logger.clMsg("* ERROR: MU2OGF, 1st part, model %s", *(mu_model.m_name));
 		}
-
 		try {
 			pOGF->Optimize			();
-		} catch (...)	{ clMsg	("* ERROR: MU2OGF, [optimize], model %s",*(mu_model.m_name)); }
+		} catch (...) {
+            Logger.clMsg	("* ERROR: MU2OGF, [optimize], model %s",*(mu_model.m_name));
+        }
 		try {
 			pOGF->CalcBounds		();
-		} catch (...)	{ clMsg	("* ERROR: MU2OGF, [bounds], model %s",*(mu_model.m_name)); }
+		} catch (...) {
+            Logger.clMsg("* ERROR: MU2OGF, [bounds], model %s", *(mu_model.m_name));
+        }
 		try {
 			pOGF->CalculateTB		();
-		} catch (...)	{ clMsg	("* ERROR: MU2OGF, [calc_tb], model %s",*(mu_model.m_name)); }
+		} catch (...) {
+            Logger.clMsg("* ERROR: MU2OGF, [calc_tb], model %s", *(mu_model.m_name));
+        }
 		try {
 			pOGF->MakeProgressive	(c_PM_MetricLimit_mu);
-		} catch (...)	{ clMsg	("* ERROR: MU2OGF, [progressive], model %s",*(mu_model.m_name)); }
+		} catch (...) {
+            Logger.clMsg("* ERROR: MU2OGF, [progressive], model %s", *(mu_model.m_name));
+        }
 		try {
 			pOGF->Stripify			();
-		} catch (...)	{ clMsg	("* ERROR: MU2OGF, [stripify], model %s",*(mu_model.m_name)); }
-
+		} catch (...) {
+            Logger.clMsg("* ERROR: MU2OGF, [stripify], model %s", *(mu_model.m_name));
+        }
 		it->ogf		=	pOGF;
 	}
 }

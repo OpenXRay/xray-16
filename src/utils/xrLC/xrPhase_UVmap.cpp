@@ -43,14 +43,14 @@ void Detach(vecFace* S)
 void CBuild::xrPhase_UVmap()
 {
 	// Main loop
-	Status					("Processing...");
+    Logger.Status("Processing...");
 	lc_global_data()->g_deflectors().reserve	(64*1024);
 	float		p_cost	= 1.f / float(g_XSplit.size());
 	float		p_total	= 0.f;
 	vecFace		faces_affected;
 	for (int SP = 0; SP<int(g_XSplit.size()); SP++) 
 	{
-		Progress			(p_total+=p_cost);
+        Logger.Progress(p_total += p_cost);
 		
 		// ManOwaR, unsure:
 		// Call to IsolateVertices() looks useless here
@@ -119,7 +119,7 @@ void CBuild::xrPhase_UVmap()
 			}
 		}
 	}
-	clMsg("%d subdivisions...",g_XSplit.size());
+    Logger.clMsg("%d subdivisions...", g_XSplit.size());
 	err_save		();
 }
 
@@ -137,7 +137,7 @@ void CBuild::mem_CompactSubdivs()
 		g_XSplit[SP]		= xr_new<vecFace> ();
 		g_XSplit[SP]->assign(temp.begin(),temp.end());
 	}
-	clMsg		("%d ms for memory compacting...",dwT.GetElapsed_ms());
+    Logger.clMsg("%d ms for memory compacting...", dwT.GetElapsed_ms());
 }
 void CBuild::mem_Compact()
 {

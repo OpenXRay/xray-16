@@ -29,7 +29,7 @@ void			base_Face::CacheOpacity	()
 	if ( !flags.bOpaque && !(T.THM.HasSurface()) )	//(0==T.pSurface)//	pSurface was possible deleted
 	{
 		flags.bOpaque	= true;
-		clMsg			("Strange face detected... Has alpha without texture...");
+        Logger.clMsg("Strange face detected... Has alpha without texture...");
 	}
 }
 static bool do_not_add_to_vector_in_global_data = false;
@@ -106,7 +106,8 @@ Tvertex<DataVertex>::~Tvertex()
 			
 			//inlc_global_data()->g_vertices().erase(F);
 		}
-		else clMsg("* ERROR: Unregistered VERTEX destroyed");
+        else
+            Logger.clMsg("* ERROR: Unregistered VERTEX destroyed");
 	}
 }
 
@@ -160,7 +161,8 @@ Tface<DataVertex>::~Tface()
 			faces.pop_back();
 			//faces.erase(F);
 		}
-		else clMsg("* ERROR: Unregistered FACE destroyed");
+        else
+            Logger.clMsg("* ERROR: Unregistered FACE destroyed");
 	}
 	// Remove 'this' from adjacency info in vertices
 	for (int i=0; i<3; ++i)
@@ -176,13 +178,13 @@ void Face::	Failure		()
 {
 	dwInvalidFaces			++;
 
-	clMsg		("* ERROR: Invalid face. (A=%f,e0=%f,e1=%f,e2=%f)",
+    Logger.clMsg("* ERROR: Invalid face. (A=%f,e0=%f,e1=%f,e2=%f)",
 		CalcArea(),
 		v[0]->P.distance_to(v[1]->P),
 		v[0]->P.distance_to(v[2]->P),
 		v[1]->P.distance_to(v[2]->P)
 		);
-	clMsg		("*        v0[%f,%f,%f], v1[%f,%f,%f], v2[%f,%f,%f]",
+    Logger.clMsg("*        v0[%f,%f,%f], v1[%f,%f,%f], v2[%f,%f,%f]",
 		VPUSH(v[0]->P),
 		VPUSH(v[1]->P),
 		VPUSH(v[2]->P)

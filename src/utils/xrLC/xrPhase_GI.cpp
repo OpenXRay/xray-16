@@ -2,7 +2,7 @@
 #include "xrHemisphere.h"
 #include "build.h"
 
-#include "utils/xrUtil/xrThread.hpp"
+#include "utils/xrLCUtil/xrThread.hpp"
 #include "../xrLC_Light/xrLC_GlobalData.h"
 #include "../xrLC_Light/xrface.h"
 
@@ -83,7 +83,7 @@ static Fvector		GetPixel_7x7		(CDB::RESULT& rpinf)
 class CGI		: public CThread
 {
 public:
-	CGI			(u32 ID)	: CThread(ID, clMsg)	{	thMessages	= FALSE; }
+	CGI			(u32 ID)	: CThread(ID, ProxyMsg)	{	thMessages	= FALSE; }
 
 	virtual void	Execute	()
 	{
@@ -190,8 +190,8 @@ public:
 // test_radios
 void	CBuild::xrPhase_Radiosity	()
 {
-	CThreadManager			gi(Status, Progress);
-	Status					("Working...");
+	CThreadManager			gi(ProxyStatus, ProxyProgress);
+    Logger.Status("Working...");
 	task					= &(pBuild->L_static().rgb);
 	task_it					= 0;
 
@@ -228,7 +228,7 @@ void	CBuild::xrPhase_Radiosity	()
 	}
 
 	// info
-	clMsg				("old setup [%d], new setup[%d]",setup_old,setup_new);
-	clMsg				("old energy [%f], new energy[%f]",_energy_before,_energy_after);
+    Logger.clMsg("old setup [%d], new setup[%d]", setup_old, setup_new);
+    Logger.clMsg("old energy [%f], new energy[%f]", _energy_before, _energy_after);
 	FlushLog			();
 }

@@ -17,7 +17,7 @@ void CBuild::BuildHierrarhy()
 	for (; SizeLimit<=delimiter; SizeLimit*=2)
 	{
 		int iSize			= g_tree.size();
-		Status("Level #%d",iLevel);
+		Logger.Status("Level #%d",iLevel);
 
 		for (int I=0; I<iSize; I++)
 		{

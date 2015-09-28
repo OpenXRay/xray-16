@@ -268,7 +268,7 @@ void CBuild::xrPhase_MergeGeometry	()
 	// Initialize helper threads
 	InitMergeGmThreads();
 
-	Status("Processing...");
+    Logger.Status("Processing...");
 	validate_splits		();
 	for (u32 split=0; split<g_XSplit.size(); split++) {
 		vecFace&	subdiv	= *(g_XSplit[split]);
@@ -302,9 +302,9 @@ void CBuild::xrPhase_MergeGeometry	()
 			xr_delete		(g_XSplit[selected]);
 			g_XSplit.erase	(g_XSplit.begin()+selected);
 		}
-		Progress(_sqrt(_sqrt(float(split)/float(g_XSplit.size()))));
+        Logger.Progress(_sqrt(_sqrt(float(split) / float(g_XSplit.size()))));
 	}
-	clMsg("%d subdivisions.",g_XSplit.size());
+    Logger.clMsg("%d subdivisions.", g_XSplit.size());
 	validate_splits			();
 
 	// Destroy helper threads

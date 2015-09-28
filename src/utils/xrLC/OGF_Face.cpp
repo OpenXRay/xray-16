@@ -14,8 +14,8 @@ void set_status(char* N, int id, int f, int v)
 	string1024 status_str;
 
 	xr_sprintf	(status_str,"Model #%4d [F:%5d, V:%5d]: %s...",id,f,v,N);
-	Status	(status_str);
-	clMsg	(status_str);
+    Logger.Status(status_str);
+    Logger.clMsg(status_str);
 }
 
 BOOL OGF_Vertex::similar(OGF* ogf, OGF_Vertex& V)
@@ -58,7 +58,9 @@ u16 OGF::_BuildVertex	(OGF_Vertex& V1)
 		{
 			if (it->similar(this,V1)) return u16(it-data.vertices.begin());
 		}
-	} catch (...) { clMsg("* ERROR: OGF::_BuildVertex");	}
+    } catch (...) {
+        Logger.clMsg("* ERROR: OGF::_BuildVertex");
+    }
 
 	data.vertices.push_back	(V1);
 	return (u32)data.vertices.size()-1;
@@ -297,11 +299,11 @@ void OGF::MakeProgressive	(float metric_limit)
 						VR		= VIPM_Convert			(u32(25),1.f,1);
 		} catch (...)			{
 			progressive_clear	()		;
-			clMsg				("* mesh simplification failed: access violation");
+            Logger.clMsg("* mesh simplification failed: access violation");
 		}
 		if (0==VR)				{
 			progressive_clear	()		;
-			clMsg				("* mesh simplification failed");
+            Logger.clMsg("* mesh simplification failed");
 		}
 		while (VR && VR->swr_records.size()>0)	{
 			// test metric
@@ -311,10 +313,10 @@ void OGF::MakeProgressive	(float metric_limit)
 			float	_metric	=	float(_remove)/float(_full);
 			if		(_metric<metric_limit)		{
 				progressive_clear				()		;
-				clMsg	("* mesh simplified from [%4dv] to [%4dv], nf[%4d] ==> em[%0.2f]-discarded",_full,_simple,VR->indices.size()/3,metric_limit);
+                Logger.clMsg("* mesh simplified from [%4dv] to [%4dv], nf[%4d] ==> em[%0.2f]-discarded", _full, _simple, VR->indices.size() / 3, metric_limit);
 				break									;
 			} else {
-				clMsg	("* mesh simplified from [%4dv] to [%4dv], nf[%4d] ==> em[%0.2f]-accepted", _full,_simple,VR->indices.size()/3,metric_limit);
+                Logger.clMsg("* mesh simplified from [%4dv] to [%4dv], nf[%4d] ==> em[%0.2f]-accepted", _full, _simple, VR->indices.size() / 3, metric_limit);
 			}
 
 			// OK
@@ -351,10 +353,12 @@ void OGF::MakeProgressive	(float metric_limit)
 	if (progressive_test() && fast_path_data.vertices.size() && fast_path_data.faces.size())
 	{
 		// prepare progressive geom
-		VIPM_Init				();
-		Fvector2				zero; zero.set		(0,0);
-		for (u32 v_idx=0;  v_idx<fast_path_data.vertices.size(); v_idx++)	VIPM_AppendVertex	(fast_path_data.vertices[v_idx].P,	zero						);
-		for (u32 f_idx=0;  f_idx<fast_path_data.faces.size();    f_idx++)	VIPM_AppendFace		(fast_path_data.faces[f_idx].v[0],	fast_path_data.faces[f_idx].v[1],	fast_path_data.faces[f_idx].v[2]	);
+		VIPM_Init();
+		Fvector2 zero; zero.set(0,0);
+		for (u32 v_idx = 0; v_idx<fast_path_data.vertices.size(); v_idx++)
+            VIPM_AppendVertex	(fast_path_data.vertices[v_idx].P, zero);
+		for (u32 f_idx = 0; f_idx<fast_path_data.faces.size(); f_idx++)
+            VIPM_AppendFace(fast_path_data.faces[f_idx].v[0], fast_path_data.faces[f_idx].v[1], fast_path_data.faces[f_idx].v[2]);
 
 		VIPM_Result*	VR		= 0;
 		try						{
@@ -363,13 +367,13 @@ void OGF::MakeProgressive	(float metric_limit)
 			data.faces				= _saved_faces		;
 			data.vertices			= _saved_vertices	;
 			progressive_clear	()		;
-			clMsg				("* X-mesh simplification failed: access violation");
+            Logger.clMsg("* X-mesh simplification failed: access violation");
 		}
 		if (0==VR)				{
 			data.faces				= _saved_faces		;
 			data.vertices			= _saved_vertices	;
 			progressive_clear	()		;
-			clMsg				("* X-mesh simplification failed");
+            Logger.clMsg("* X-mesh simplification failed");
 		} else {
 			// Convert
 			/*
@@ -382,7 +386,7 @@ void OGF::MakeProgressive	(float metric_limit)
 			u32		_remove	=	VR->swr_records.size()	;
 			u32		_simple	=	_full - _remove			;
 			float	_metric	=	float(_remove)/float(_full);
-			clMsg	("X mesh simplified from [%4dv] to [%4dv], nf[%4d]",_full,_simple,VR ? VR->indices.size()/3 : 0);
+            Logger.clMsg("X mesh simplified from [%4dv] to [%4dv], nf[%4d]", _full, _simple, VR ? VR->indices.size() / 3 : 0);
 
 			// OK
 			vec_XV					vertices_saved;

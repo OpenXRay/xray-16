@@ -181,7 +181,7 @@ namespace	lc_net{
 		++tasks_completed;
 		l_completed = tasks_completed;
 		log_lock.Leave();
-		Progress(float(l_completed)/float(start));
+        Logger.Progress(float(l_completed) / float(start));
 	}
 
 //	void task_manager::release_user_thread_proc(void *_this )

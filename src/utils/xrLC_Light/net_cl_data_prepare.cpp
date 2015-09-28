@@ -8,19 +8,19 @@
 #include "lcnet_task_manager.h"
 #include "xrlc_globaldata.h"
 #include "mu_light_net.h"
-#include "utils/xrUtil/xrThread.hpp"
+#include "utils/xrLCUtil/xrThread.hpp"
 #include "../../xrcore/xrSyncronize.h"
 
 bool					global_compile_data_initialized = false;
 bool					base_global_compile_data_initialized = false;
-CThreadManager			cl_data_prepare(Status, Progress);
+CThreadManager			cl_data_prepare(ProxyStatus, ProxyProgress);
 xrCriticalSection		wait_lock;
 void		SetBaseGlobalCompileDataInitialized( );
 class NetCompileDetaPrepare	: public CThread
 {
 
 public:
-	NetCompileDetaPrepare	( ) : CThread(0, clMsg)	{	thMessages	= FALSE;	}
+	NetCompileDetaPrepare	( ) : CThread(0, ProxyMsg)	{	thMessages	= FALSE;	}
 private:
 	virtual void	Execute	()
 	{
@@ -77,19 +77,17 @@ void		SetBaseGlobalCompileDataInitialized( )
 }
 
 void		SetGlobalCompileDataInitialized( )
-{
-	
+{	
 	lc_net::globals().get<lc_net::gl_cl_data>().init();
-	clLog( "mem usage before collision model destroy: %u", Memory.mem_usage() );
+    Logger.clLog("mem usage before collision model destroy: %u", Memory.mem_usage());
 	inlc_global_data()->destroy_rcmodel	();
 	Memory.mem_compact();
-	clLog( "mem usage after collision model destroy: %u", Memory.mem_usage() );
-//	inlc_global_data()->clear_build_textures_surface();
+    Logger.clLog("mem usage after collision model destroy: %u", Memory.mem_usage());
+    // inlc_global_data()->clear_build_textures_surface();
 	wait_lock.Enter();
-		//cl_data_prepare.wait();
+	// cl_data_prepare.wait();
 	global_compile_data_initialized = true;
-	wait_lock.Leave();
-	
+	wait_lock.Leave();	
 }
 
 void		SartupNetTaskManager( )

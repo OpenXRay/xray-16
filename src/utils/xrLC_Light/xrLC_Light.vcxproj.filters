@@ -62,10 +62,6 @@
     <Filter Include="Light\LightVertex">
       <UniqueIdentifier>{0bca0dd1-6b87-4ce2-b545-24aa75ec817a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
-    </Filter>
     <Filter Include="do_light">
       <UniqueIdentifier>{e8c8b367-c88b-4e39-9be9-8897dc577f41}</UniqueIdentifier>
     </Filter>

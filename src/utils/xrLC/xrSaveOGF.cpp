@@ -57,7 +57,7 @@ static bool	remap_order		(u32 id0, u32 id1)
 
 static void	SaveGEOMs		(LPCSTR fn, VBContainer& vb, IBContainer& ib, SWIContainer& swi)
 {
-	Status				("Geometry '%s'...",	fn);
+	Logger.Status				("Geometry '%s'...",	fn);
 	// geometry
 	string_path					lfn		;
 	IWriter*					file	;
@@ -85,7 +85,7 @@ void CBuild::SaveTREE	(IWriter &fs)
 {
 	CMemoryWriter		MFS;
 
-	Status				("Geometry buffers...");
+	Logger.Status				("Geometry buffers...");
 	xr_vector<u32>		remap;
 	remap.reserve		(g_tree.size());
 	for (u32 rid=0; rid<g_tree.size(); rid++)	{
@@ -93,25 +93,25 @@ void CBuild::SaveTREE	(IWriter &fs)
 		if		(o)		remap.push_back(rid);
 	}
 	std::stable_sort	(remap.begin(),remap.end(),remap_order);
-	clMsg				("remap-size: %d / %d",remap.size(),g_tree.size());
+    Logger.clMsg("remap-size: %d / %d", remap.size(), g_tree.size());
 	for (u32 sid=0; sid<remap.size(); sid++)	{
 		u32				id	= remap[sid];
 		//clMsg			("%3d: subdiv: %d",sid,id);
 		g_tree[id]->PreSave	(id);
 	}
 
-	Status				("Visuals...");
+	Logger.Status				("Visuals...");
 	fs.open_chunk		(fsL_VISUALS);
 	for (xr_vector<OGF_Base*>::iterator it = g_tree.begin(); it!=g_tree.end(); it++)	{
 		u32			idx = u32(it-g_tree.begin());
 		MFS.open_chunk	(idx);
 		(*it)->Save		(MFS);
 		MFS.close_chunk	();
-		Progress		(float(idx)/float(g_tree.size()));
+        Logger.Progress(float(idx) / float(g_tree.size()));
 	}
 	fs.w				(MFS.pointer(),MFS.size());
 	fs.close_chunk		();
-	clMsg				("Average: %d verts/%d faces, 50(%2.1f), 100(%2.1f), 500(%2.1f), 1000(%2.1f), 5000(%2.1f)",
+    Logger.clMsg("Average: %d verts/%d faces, 50(%2.1f), 100(%2.1f), 500(%2.1f), 1000(%2.1f), 5000(%2.1f)",
 		g_batch_verts/g_batch_count,
 		g_batch_faces/g_batch_count,
 		100.f * float(g_batch_50)/float(g_batch_count),
@@ -125,7 +125,7 @@ void CBuild::SaveTREE	(IWriter &fs)
 	SaveGEOMs			("level.geom",	g_VB,g_IB,g_SWI);	// Normal
 	SaveGEOMs			("level.geomx",	x_VB,x_IB,x_SWI);	// Fast-Path
 
-	Status				("Shader table...");
+	Logger.Status				("Shader table...");
 	fs.open_chunk		(fsL_SHADERS);
 	fs.w_u32			(g_Shaders.size());
 	for (xr_vector<LPCSTR>::iterator T=g_Shaders.begin(); T!=g_Shaders.end(); T++)

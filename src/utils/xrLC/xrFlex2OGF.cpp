@@ -6,7 +6,7 @@
 #include "../xrlc_light/lightmap.h"
 #include "../xrlc_light/xrface.h"
 
-#define	TRY(a) try { a; } catch (...) { clMsg("* E: %s", #a); }
+#define	TRY(a) try { a; } catch (...) { Logger.clMsg("* E: %s", #a); }
 
 void CBuild::validate_splits			()
 {
@@ -14,7 +14,7 @@ void CBuild::validate_splits			()
 	{
 		u32 MODEL_ID		= u32(it-g_XSplit.begin())	;
 		if ((*it)->size() > c_SS_HighVertLimit*2)		{
-			clMsg	("! ERROR: subdiv #%d has more than %d faces (%d)",MODEL_ID,2*c_SS_HighVertLimit,(*it)->size());
+            Logger.clMsg("! ERROR: subdiv #%d has more than %d faces (%d)", MODEL_ID, 2 * c_SS_HighVertLimit, (*it)->size());
 		}
 	};
 }
@@ -121,36 +121,39 @@ void CBuild::Flex2OGF()
 						pOGF->textures.push_back(T);
 					}
 				}
-			} catch (...) {  clMsg("* ERROR: Flex2OGF, model# %d, *textures*",MODEL_ID); }
+			} catch (...) {
+                Logger.clMsg("* ERROR: Flex2OGF, model# %d, *textures*",MODEL_ID);
+            }
 			
 			// Collect faces & vertices
 			F->CacheOpacity	();
 			bool	_tc_	= !(F->flags.bOpaque);
 			try {
 				BuildOGFGeom( *pOGF, *(*it), _tc_ );
-			} catch (...) {  clMsg("* ERROR: Flex2OGF, model# %d, *faces*",MODEL_ID); }
+			} catch (...) {
+                Logger.clMsg("* ERROR: Flex2OGF, model# %d, *faces*", MODEL_ID);
+            }
 
-		} catch (...)
-		{
-			clMsg("* ERROR: Flex2OGF, 1st part, model# %d",MODEL_ID);
+		} catch (...) {
+            Logger.clMsg("* ERROR: Flex2OGF, 1st part, model# %d", MODEL_ID);
 		}
 		
 		try {
-			clMsg		("%3d: opt : v(%d)-f(%d)",	MODEL_ID,pOGF->data.vertices.size(),pOGF->data.faces.size());
+            Logger.clMsg("%3d: opt : v(%d)-f(%d)", MODEL_ID, pOGF->data.vertices.size(), pOGF->data.faces.size());
 			pOGF->Optimize						();
-			clMsg		("%3d: cb  : v(%d)-f(%d)",	MODEL_ID,pOGF->data.vertices.size(),pOGF->data.faces.size());
+            Logger.clMsg("%3d: cb  : v(%d)-f(%d)", MODEL_ID, pOGF->data.vertices.size(), pOGF->data.faces.size());
 			pOGF->CalcBounds					();
-			clMsg		("%3d: prog: v(%d)-f(%d)",	MODEL_ID,pOGF->data.vertices.size(),pOGF->data.faces.size());
+            Logger.clMsg("%3d: prog: v(%d)-f(%d)", MODEL_ID, pOGF->data.vertices.size(), pOGF->data.faces.size());
 			if (!g_build_options.b_noise) pOGF->MakeProgressive	(c_PM_MetricLimit_static);
-			clMsg		("%3d: strp: v(%d)-f(%d)",	MODEL_ID,pOGF->data.vertices.size(),pOGF->data.faces.size());
+            Logger.clMsg("%3d: strp: v(%d)-f(%d)", MODEL_ID, pOGF->data.vertices.size(), pOGF->data.faces.size());
 			pOGF->Stripify						();
-		} catch (...)	{
-			clMsg("* ERROR: Flex2OGF, 2nd part, model# %d",MODEL_ID);
+		} catch (...) {
+            Logger.clMsg("* ERROR: Flex2OGF, 2nd part, model# %d", MODEL_ID);
 		}
 		
 		g_tree.push_back	(pOGF);
 		xr_delete			(*it);
-		Progress			(p_total+=p_cost);
+        Logger.Progress(p_total += p_cost);
 	}
 	g_XSplit.clear	();
 }

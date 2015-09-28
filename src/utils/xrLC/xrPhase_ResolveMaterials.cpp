@@ -14,7 +14,7 @@ struct _counter
 void	CBuild::xrPhase_ResolveMaterials()
 {
 	// Count number of materials
-	Status		("Calculating materials/subdivs...");
+    Logger.Status("Calculating materials/subdivs...");
 	xr_vector<_counter>	counts;
 	{
 		counts.reserve		(256);
@@ -37,11 +37,11 @@ void	CBuild::xrPhase_ResolveMaterials()
 				C.dwCount		= 1;
 				counts.push_back(C);
 			}
-			Progress(float(F_it-lc_global_data()->g_faces().begin())/float(lc_global_data()->g_faces().size()));
+            Logger.Progress(float(F_it - lc_global_data()->g_faces().begin()) / float(lc_global_data()->g_faces().size()));
 		}
 	}
 	
-	Status				("Perfroming subdivisions...");
+    Logger.Status("Perfroming subdivisions...");
 	{
 		g_XSplit.reserve(64*1024);
 		g_XSplit.resize	(counts.size());
@@ -63,23 +63,23 @@ void	CBuild::xrPhase_ResolveMaterials()
 					g_XSplit[I]->push_back	(F);
 				}
 			}
-			Progress(float(F_it-lc_global_data()->g_faces().begin())/float(lc_global_data()->g_faces().size()));
+            Logger.Progress(float(F_it - lc_global_data()->g_faces().begin()) / float(lc_global_data()->g_faces().size()));
 		}
 	}
 
-	Status				("Removing empty subdivs...");
+    Logger.Status("Removing empty subdivs...");
 	{
 		for (int SP = 0; SP<int(g_XSplit.size()); SP++) 
 			if (g_XSplit[SP]->empty())	xr_delete(g_XSplit[SP]);
 		g_XSplit.erase(std::remove(g_XSplit.begin(),g_XSplit.end(),(vecFace*) NULL),g_XSplit.end());
 	}
 	
-	Status				("Detaching subdivs...");
+    Logger.Status("Detaching subdivs...");
 	{
 		for (u32 it=0; it<g_XSplit.size(); it++)
 		{
 			Detach(g_XSplit[it]);
 		}
 	}
-	clMsg				("%d subdivisions.",g_XSplit.size());
+    Logger.clMsg("%d subdivisions.", g_XSplit.size());
 }

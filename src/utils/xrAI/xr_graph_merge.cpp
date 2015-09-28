@@ -530,7 +530,7 @@ CGraphMerger::CGraphMerger(
 	)
 {
 	// load all the graphs
-	Phase("Processing level graphs");
+    Logger.Phase("Processing level graphs");
 	
 	CInifile *Ini = xr_new<CInifile>(INI_FILE);
 	if (!Ini->section_exist("levels"))
@@ -596,7 +596,7 @@ CGraphMerger::CGraphMerger(
 	
 	R_ASSERT(tpGraphs.size());
 	
-	Phase("Adding interconnection points");
+    Logger.Phase("Adding interconnection points");
 	{
 		GRAPH_P_PAIR_IT				I = tpGraphs.begin();
 		GRAPH_P_PAIR_IT				E = tpGraphs.end();
@@ -653,7 +653,7 @@ CGraphMerger::CGraphMerger(
 	///////////////////////////////////////////////////
 	
 	// save all the graphs
-	Phase("Saving graph being merged");
+    Logger.Phase("Saving graph being merged");
 	CMemoryWriter				F;
 	tGraphHeader.m_version		= XRAI_CURRENT_VERSION;
 	VERIFY						(dwOffset < (u32(1) << (8*sizeof(GameGraph::_GRAPH_ID))));
@@ -707,7 +707,7 @@ CGraphMerger::CGraphMerger(
 	F.save_to						(l_caFileName);
 
 	// free all the graphs
-	Phase("Freeing resources being allocated");
+    Logger.Phase("Freeing resources being allocated");
 	{
 		GRAPH_P_PAIR_IT				I = tpGraphs.begin();
 		GRAPH_P_PAIR_IT				E = tpGraphs.end();

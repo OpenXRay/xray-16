@@ -88,11 +88,11 @@ void CBuild::xrPhase_MergeLM()
 		VERIFY( lc_global_data() );
 		string512	phase_name;
 		xr_sprintf		(phase_name,"Building lightmap %d...", lc_global_data()->lightmaps().size());
-		Phase		(phase_name);
+        Logger.Phase(phase_name);
 
 		// Sort layer by similarity (state changes)
 		// + calc material area
-		Status		("Selection...");
+        Logger.Status("Selection...");
 		for (u32 it=0; it<materials().size(); it++) materials()[it].internal_max_area	= 0;
 		for (u32 it=0; it<Layer.size(); it++)	{
 			CDeflector*	D		= Layer[it];
@@ -101,7 +101,7 @@ void CBuild::xrPhase_MergeLM()
 		std::stable_sort(Layer.begin(),Layer.end(),sort_defl_complex);
 
 		// Select first deflectors which can fit
-		Status		("Selection...");
+        Logger.Status("Selection...");
 		u32 maxarea		= c_LMAP_size*c_LMAP_size*8;	// Max up to 8 lm selected
 		u32 curarea		= 0;
 		u32 merge_count	= 0;
@@ -113,7 +113,7 @@ void CBuild::xrPhase_MergeLM()
 		}
 
 		// Startup
-		Status		("Processing...");
+        Logger.Status("Processing...");
 		_InitSurface			();
 		CLightmap*	lmap		= xr_new<CLightmap> ();
 		VERIFY( lc_global_data() );
@@ -122,7 +122,8 @@ void CBuild::xrPhase_MergeLM()
 		// Process 
 		for (u32 it=0; it<merge_count; it++) 
 		{
-			if (0==(it%1024))	Status	("Process [%d/%d]...",it,merge_count);
+			if (0==(it%1024))
+                Logger.Status("Process [%d/%d]...",it,merge_count);
 			lm_layer&	L		= Layer[it]->layer;
 			L_rect		rT,rS; 
 			rS.a.set	(0,0);
@@ -143,26 +144,26 @@ void CBuild::xrPhase_MergeLM()
 				lmap->Capture		(Layer[it],rT.a.x,rT.a.y,rT.SizeX(),rT.SizeY(),bRotated);
 				Layer[it]->bMerged	= TRUE;
 			}
-			Progress(_sqrt(float(it)/float(merge_count)));
+            Logger.Progress(_sqrt(float(it) / float(merge_count)));
 		}
-		Progress	(1.f);
+        Logger.Progress(1.f);
 
 		// Remove merged lightmaps
-		Status			("Cleanup...");
+        Logger.Status("Cleanup...");
 		vecDeflIt last	= std::remove_if	(Layer.begin(),Layer.end(),pred_remove());
 		Layer.erase		(last,Layer.end());
 
 		// Save
-		Status			("Saving...");
+        Logger.Status("Saving...");
 		VERIFY			( pBuild );
 		lmap->Save		(pBuild->path);
 	}
 	VERIFY( lc_global_data() );
-	clMsg		( "%d lightmaps builded", lc_global_data()->lightmaps().size() );
+    Logger.clMsg("%d lightmaps builded", lc_global_data()->lightmaps().size());
 
 	// Cleanup deflectors
-	Progress	(1.f);
-	Status		("Destroying deflectors...");
+    Logger.Progress(1.f);
+    Logger.Status("Destroying deflectors...");
 	for (u32 it=0; it<lc_global_data()->g_deflectors().size(); it++)
 		xr_delete(lc_global_data()->g_deflectors()[it]);
 	lc_global_data()->g_deflectors().clear_and_free	();

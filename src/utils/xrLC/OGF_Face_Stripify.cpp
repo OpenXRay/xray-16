@@ -125,17 +125,17 @@ void OGF::Stripify		()
 		for(u32 i=0; i<temp_list.size(); i++)
 			data.vertices[i]=temp_list[permute[i]];
 	} catch (...)	{
-		clMsg		("ERROR: [slow-vert] Stripifying failed. Dump below.");
+        Logger.clMsg("ERROR: [slow-vert] Stripifying failed. Dump below.");
 		DumpFaces	();
 	}
 }
 
 void OGF::DumpFaces()
 {
-	clMsg	("normal:");
+    Logger.clMsg("normal:");
 	for (u32 i=0; i<data.faces.size(); i++)
-		clMsg("face #%4d: %4d %4d %4d",i,int(data.faces[i].v[0]),int(data.faces[i].v[1]),int(data.faces[i].v[2]));
-	clMsg	("fast:");
+        Logger.clMsg("face #%4d: %4d %4d %4d", i, int(data.faces[i].v[0]), int(data.faces[i].v[1]), int(data.faces[i].v[2]));
+    Logger.clMsg("fast:");
 	for (u32 i=0; i<fast_path_data.faces.size(); i++)
-		clMsg("face #%4d: %4d %4d %4d",i,int(fast_path_data.faces[i].v[0]),int(fast_path_data.faces[i].v[1]),int(fast_path_data.faces[i].v[2]));
+        Logger.clMsg("face #%4d: %4d %4d %4d", i, int(fast_path_data.faces[i].v[0]), int(fast_path_data.faces[i].v[1]), int(fast_path_data.faces[i].v[2]));
 }

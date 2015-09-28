@@ -25,13 +25,13 @@ namespace lc_net{
 		//Memory.mem_compact	();
 		//if(!write_faces)
 			//inlc_global_data()->create_write_faces();
-		clMsg( "gl_detail_cl_data:  start" );
+        Logger.clMsg("gl_detail_cl_data:  start");
 		
 		IWriter * file = FS.w_open(path);
 		gl_data.write( *file );
 		FS.w_close(file);
 		compress( path ); 
-		clMsg( "gl_detail_cl_data:  end" );
+        Logger.clMsg("gl_detail_cl_data:  end");
 
 	}
 	bool	net_global_data_impl<gl_detail_cl_data>::create_data( LPCSTR path  )

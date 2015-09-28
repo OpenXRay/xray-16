@@ -244,7 +244,6 @@
     <ClCompile Include="alife_artefact_order.cpp" />
     <ClCompile Include="buffer_vector.cpp" />
     <ClCompile Include="cl_collector.cpp" />
-    <ClCompile Include="cl_log.cpp" />
     <ClCompile Include="compiler.cpp">
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">AssemblyAndSourceCode</AssemblerOutput>
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AssemblyAndSourceCode</AssemblerOutput>
@@ -370,7 +369,6 @@
     <ClInclude Include="ChooseTypes.h" />
     <ClInclude Include="client_id.h" />
     <ClInclude Include="cl_collector.h" />
-    <ClInclude Include="cl_log.h" />
     <ClInclude Include="communicate.h" />
     <ClInclude Include="compiler.h" />
     <ClInclude Include="cover_point.h" />

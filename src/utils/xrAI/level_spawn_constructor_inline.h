@@ -9,7 +9,7 @@
 #pragma once
 
 IC	CLevelSpawnConstructor::CLevelSpawnConstructor			(const CGameGraph::SLevel &level, CGameSpawnConstructor *game_spawn_constructor, bool no_separator_check) :
-	CThread						(level.id(), clMsg)
+	CThread						(level.id(), ProxyMsg)
 {
 	m_level						= level;
 	m_game_spawn_constructor	= game_spawn_constructor;

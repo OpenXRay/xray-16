@@ -25,11 +25,39 @@
 #pragma comment(lib,"xrCore.LIB")
 #pragma comment(lib, "xrUtil.lib")
 
+#include "utils/xrLCUtil/LevelCompilerLoggerWindow.hpp"
+#include "utils/xrLCUtil/cdecl_cast.hpp"
+
+LevelCompilerLoggerWindow &Logger = LevelCompilerLoggerWindow();
+
+CThread::LogFunc ProxyMsg = cdecl_cast(
+    [&](const char *format, ...)
+    {
+        va_list args;
+        va_start(args, format);
+        Logger.clMsgV(format, args);
+        va_end(args);    
+    }
+);
+
+CThreadManager::ReportStatusFunc ProxyStatus = cdecl_cast(
+    [&](const char *format, ...)
+    {
+        va_list args;
+        va_start(args, format);
+        Logger.StatusV(format, args);
+        va_end(args);    
+    }
+);
+
+CThreadManager::ReportProgressFunc ProxyProgress = cdecl_cast(
+    [&](float progress)
+    { Logger.Progress(progress); }
+);
+
 extern LPCSTR LEVEL_GRAPH_NAME;
 
 extern void	xrCompiler			(LPCSTR name, bool draft_mode, bool pure_covers, LPCSTR out_name);
-extern void logThread			(void *dummy);
-extern volatile BOOL bClose;
 extern void test_smooth_path	(LPCSTR name);
 extern void test_hierarchy		(LPCSTR name);
 extern void	xrConvertMaps		();
@@ -53,8 +81,6 @@ void Help()
 {	MessageBox(0,h_str,"Command line options",MB_OK|MB_ICONINFORMATION); }
 
 string_path INI_FILE;
-
-extern  HWND logWindow;
 
 extern LPCSTR GAME_CONFIG;
 
@@ -147,26 +173,16 @@ void Startup(LPSTR     lpCmdLine)
 	if (strstr(cmd,"-?") || strstr(cmd,"-h"))			{ Help(); return; }
 	if ((strstr(cmd,"-f")==0) && (strstr(cmd,"-g")==0) && (strstr(cmd,"-m")==0) && (strstr(cmd,"-s")==0) && (strstr(cmd,"-t")==0) && (strstr(cmd,"-c")==0) && (strstr(cmd,"-verify")==0) && (strstr(cmd,"-patch")==0))	{ Help(); return; }
 	if (strstr(cmd,"-o"))								bModifyOptions = TRUE;
-
-	// Give a LOG-thread a chance to startup
-	InitCommonControls	();
-	Sleep				(150);
-	thread_spawn		(logThread,	"log-update", 1024*1024,0);
-	while				(!logWindow)	Sleep		(150);
-	
-	u32					dwStartupTime	= timeGetTime();
-	execute				(cmd);
+    Logger.Initialize("xrAI");	
+	u32 dwStartupTime	= timeGetTime();
+	execute(cmd);
 	// Show statistic
-	char				stats[256];
-	extern				std::string make_time(u32 sec);
-	extern				HWND logWindow;
-	u32					dwEndTime = timeGetTime();
-	xr_sprintf				(stats,"Time elapsed: %s",make_time((dwEndTime-dwStartupTime)/1000).c_str());
-	MessageBox			(logWindow,stats,"Congratulation!",MB_OK|MB_ICONINFORMATION);
-
-	bClose				= TRUE;
-	FlushLog			();
-	Sleep				(500);
+	char stats[256];
+	u32 dwEndTime = timeGetTime();
+	xr_sprintf(stats,"Time elapsed: %s",make_time((dwEndTime-dwStartupTime)/1000).c_str());
+    Logger.Success(stats);
+	FlushLog();
+    Logger.Destroy();
 }
 
 #include "factory_api.h"

@@ -32,7 +32,7 @@ void					vfRecurseUpdate(u32 dwStartNodeID, u32 percent, u32 iVertexCount)
 	g_tDistances->assign	(g_tDistances->size(),u32(-1));
 	curr_fringe.push_back	(dwStartNodeID);
 	u32						curr_dist = 0, total_count = 0;
-	Progress				(float(percent)/float(iVertexCount));
+    Logger.Progress(float(percent) / float(iVertexCount));
 	for (;!curr_fringe.empty();) {
 		xr_vector<u32>::iterator	I = curr_fringe.begin();
 		xr_vector<u32>::iterator	E = curr_fringe.end();
@@ -60,7 +60,7 @@ void					vfRecurseUpdate(u32 dwStartNodeID, u32 percent, u32 iVertexCount)
 		curr_fringe		= next_fringe;
 		next_fringe.clear();
 		++curr_dist;
-		Progress			(float(percent)/float(iVertexCount) + float(total_count)/(float(iVertexCount)*float(g_tMap->header().vertex_count())));
+        Logger.Progress(float(percent) / float(iVertexCount) + float(total_count) / (float(iVertexCount)*float(g_tMap->header().vertex_count())));
 	}
 }
 
@@ -95,13 +95,13 @@ CCrossTableBuilder::CCrossTableBuilder(LPCSTR caProjectName)
 	FILE_NAME			caFileName;
 	strconcat			(sizeof(caFileName),caFileName,caProjectName,GAME_LEVEL_GRAPH);
 	
-	Phase				("Loading level graph");
+    Logger.Phase("Loading level graph");
 	CGameGraph			tGraph(caFileName);
 	
-	Phase				("Loading AI map");
+    Logger.Phase("Loading AI map");
 	CLevelGraph			tMap(caProjectName);
 	
-	Phase				("Building dynamic objects");
+    Logger.Phase("Building dynamic objects");
 	FLOAT_VECTOR_VECTOR	tDistances;
 	int					iVertexCount	= tGraph.header().vertex_count();
 	R_ASSERT2			(iVertexCount > 0,"There are no graph points in the graph!");
@@ -127,8 +127,8 @@ CCrossTableBuilder::CCrossTableBuilder(LPCSTR caProjectName)
 		}
 	}
 	
-	Phase				("Building cross table");
-	Progress(0.f);
+    Logger.Phase("Building cross table");
+    Logger.Progress(0.f);
 	for (int i=0; i<iVertexCount; ++i) {
 		if (i)
 			for (int k=0; k<(int)tMap.header().vertex_count(); k++)
@@ -137,11 +137,11 @@ CCrossTableBuilder::CCrossTableBuilder(LPCSTR caProjectName)
 		g_tMap			= &tMap;
 		g_tMarks		= &tMarks;
 		vfRecurseUpdate(tGraph.vertex(i)->level_vertex_id(),i,iVertexCount);
-		Progress(float(i + 1)/float(iVertexCount));
+        Logger.Progress(float(i + 1) / float(iVertexCount));
 	}
-	Progress			(1.f);
+    Logger.Progress(1.f);
 	
-	Phase				("Saving cross table");
+    Logger.Phase("Saving cross table");
 	CMemoryWriter					tMemoryStream;
 	CGameLevelCrossTable::CHeader	tCrossTableHeader;
 	

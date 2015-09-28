@@ -124,7 +124,7 @@ void CSector::BuildHierrarhy	()
 		}
 	}
 	if (0==TreeRoot) {
-		clMsg("Can't build hierrarhy for sector #%d",SelfID);
+        Logger.clMsg("Can't build hierrarhy for sector #%d", SelfID);
 	}
 }
 

@@ -8,7 +8,7 @@
 
 #include "../../xrcdb/xrcdb.h"
 #include "../../common/face_smoth_flags.h"
-#include "utils/xrUtil/xrThread.hpp"
+#include "utils/xrLCUtil/xrThread.hpp"
 
 const	float	aht_max_edge	= c_SS_maxsize/2.5f;	// 2.0f;			// 2 m
 //const	float	aht_min_edge	= .2f;					// 20 cm
@@ -126,7 +126,7 @@ public CThread
 	CDB::COLLIDER	DB;
 	
 public:
-	CPrecalcBaseHemiThread(u32 ID, u32 from, u32 to ): CThread(ID, clMsg), _from( from ), _to( to )
+	CPrecalcBaseHemiThread(u32 ID, u32 from, u32 to ): CThread(ID, ProxyMsg), _from( from ), _to( to )
 	{
 		R_ASSERT(from!=u32(-1));
 		R_ASSERT(to!=u32(-1));
@@ -155,14 +155,14 @@ virtual	void Execute()
 	}
 };
 
-CThreadManager	precalc_base_hemi(Status, Progress);
+CThreadManager	precalc_base_hemi(ProxyStatus, ProxyProgress);
 
 void CBuild::xrPhase_AdaptiveHT	()
 {
 	CDB::COLLIDER	DB;
 	DB.ray_options	(0);
 
-	Status			("Tesselating...");
+    Logger.Status("Tesselating...");
 	if (1)
 	{
 		for (u32 fit=0; fit<lc_global_data()->g_faces().size(); fit++)	{		// clear split flag from all faces + calculate normals
@@ -174,7 +174,7 @@ void CBuild::xrPhase_AdaptiveHT	()
 	}
 
 	// Tesselate + calculate
-	Status			("Precalculating...");
+    Logger.Status("Precalculating...");
 	{
 		mem_Compact					();
 
@@ -184,7 +184,7 @@ void CBuild::xrPhase_AdaptiveHT	()
 
 		// Prepare
 		FPU::m64r					();
-		Status						("Precalculating : base hemisphere ...");
+        Logger.Status("Precalculating : base hemisphere ...");
 		mem_Compact					();
 		Light_prepare				();
 
@@ -225,7 +225,7 @@ void CBuild::xrPhase_AdaptiveHT	()
 	*/
 
 	//////////////////////////////////////////////////////////////////////////
-	Status				("Gathering lighting information...");
+    Logger.Status("Gathering lighting information...");
 	u_SmoothVertColors	(5);
 
 	//////////////////////////////////////////////////////////////////////////
@@ -389,7 +389,7 @@ void CBuild::u_Tesselate(tesscb_estimator* cb_E, tesscb_face* cb_F, tesscb_verte
 {
 	// main process
 	FPU::m64r					();
-	Status						("Tesselating...");
+    Logger.Status("Tesselating...");
 	g_bUnregister				= false;
 
 	u32		counter_create		= 0;
@@ -404,7 +404,7 @@ void CBuild::u_Tesselate(tesscb_estimator* cb_E, tesscb_face* cb_F, tesscb_verte
 		if( !check_and_destroy_splited( I ) )
 			continue;
 
-		Progress				(float(I)/float(lc_global_data()->g_faces().size()));
+        Logger.Progress(float(I) / float(lc_global_data()->g_faces().size()));
 		int max_id = -1;
 		if( !do_tesselate_face( *F, cb_E, max_id ) )
 			continue;
@@ -419,7 +419,7 @@ void CBuild::u_Tesselate(tesscb_estimator* cb_E, tesscb_face* cb_F, tesscb_verte
 				if (lc_global_data()->g_vertices()[I]->m_adjacents.empty())	
 					lc_global_data()->destroy_vertex	(lc_global_data()->g_vertices()[I]);
 
-			Status				("Working: %d verts created, %d(now) / %d(was) ...",counter_create,lc_global_data()->g_vertices().size(),cnt_verts);
+            Logger.Status("Working: %d verts created, %d(now) / %d(was) ...", counter_create, lc_global_data()->g_vertices().size(), cnt_verts);
 			FlushLog			();
 		}
 

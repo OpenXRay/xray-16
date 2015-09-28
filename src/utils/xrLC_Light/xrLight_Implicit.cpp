@@ -137,7 +137,7 @@ void	ImplicitExecute::	Execute	( net_task_callback *net_callback )
 					} 
 				} catch (...)
 				{
-					clMsg("* THREAD #%d: Access violation. Possibly recovered.");//,thID
+                    Logger.clMsg("* THREAD #%d: Access violation. Possibly recovered.");//,thID
 				}
 				if (Fcount) {
 					// Calculate lighting amount
@@ -193,14 +193,14 @@ void ImplicitLightingExec(BOOL b_net)
 	cl_globs.Allocate();
 	not_clear.clear();
 	// Sorting
-	Status("Sorting faces...");
+    Logger.Status("Sorting faces...");
 	for (vecFaceIt I=inlc_global_data()->g_faces().begin(); I!=inlc_global_data()->g_faces().end(); I++)
 	{
 		Face* F = *I;
 		if (F->pDeflector)				continue;
 		if (!F->hasImplicitLighting())	continue;
 		
-		Progress		(float(I-inlc_global_data()->g_faces().begin())/float(inlc_global_data()->g_faces().size()));
+        Logger.Progress(float(I - inlc_global_data()->g_faces().begin()) / float(inlc_global_data()->g_faces().size()));
 		b_material&		M	= inlc_global_data()->materials()[F->dwMaterial];
 		u32				Tid = M.surfidx;
 		b_BuildTexture*	T	= &(inlc_global_data()->textures()[Tid]);
@@ -224,12 +224,12 @@ void ImplicitLightingExec(BOOL b_net)
 	for (Implicit_it imp=calculator.begin(); imp!=calculator.end(); imp++)
 	{
 		ImplicitDeflector& defl = imp->second;
-		Status			("Lighting implicit map '%s'...",defl.texture->name);
-		Progress		(0);
+        Logger.Status("Lighting implicit map '%s'...", defl.texture->name);
+        Logger.Progress(0);
 		defl.Allocate	();
 		
 		// Setup cache
-		Progress					(0);
+        Logger.Progress(0);
 		cl_globs.Initialize( defl );
 		if(b_net)
 			lc_net::RunImplicitnet( defl, not_clear );
@@ -239,10 +239,10 @@ void ImplicitLightingExec(BOOL b_net)
 		defl.faces.clear_and_free();
 
 		// Expand
-		Status	("Processing lightmap...");
+        Logger.Status("Processing lightmap...");
 		for (u32 ref=254; ref>0; ref--)	if (!ApplyBorders(defl.lmap,ref)) break;
 
-		Status	("Mixing lighting with texture...");
+        Logger.Status("Mixing lighting with texture...");
 		{
 			b_BuildTexture& TEX		=	*defl.texture;
 			VERIFY					(TEX.pSurface);
@@ -263,7 +263,7 @@ void ImplicitLightingExec(BOOL b_net)
 		
 		
 		// base
-		Status	("Saving base...");
+        Logger.Status("Saving base...");
 		{
 			string_path				name, out_name;
 			sscanf					(strstr(Core.Params,"-f")+2,"%s",name);
@@ -271,7 +271,7 @@ void ImplicitLightingExec(BOOL b_net)
 			b_BuildTexture& TEX		=	*defl.texture;
 			strconcat				(sizeof(out_name),out_name,name,"\\",TEX.name,".dds");
 			FS.update_path			(out_name,"$game_levels$",out_name);
-			clMsg					("Saving texture '%s'...",out_name);
+            Logger.clMsg("Saving texture '%s'...", out_name);
 			VerifyPath				(out_name);
 			BYTE* raw_data			=	LPBYTE(TEX.pSurface);
 			u32	w					=	TEX.dwWidth;
@@ -286,7 +286,7 @@ void ImplicitLightingExec(BOOL b_net)
 		}
 
 		// lmap
-		Status	("Saving lmap...");
+        Logger.Status("Saving lmap...");
 		{
 			//xr_vector<u32>			packed;
 			//defl.lmap.Pack			(packed);
@@ -296,7 +296,7 @@ void ImplicitLightingExec(BOOL b_net)
 			b_BuildTexture& TEX		=	*defl.texture;
 			strconcat				(sizeof(out_name),out_name,name,"\\",TEX.name,"_lm.dds");
 			FS.update_path			(out_name,"$game_levels$",out_name);
-			clMsg					("Saving texture '%s'...",out_name);
+            Logger.clMsg("Saving texture '%s'...", out_name);
 			VerifyPath				(out_name);
 			BYTE* raw_data			= LPBYTE(&*packed.begin());
 			u32	w					= TEX.dwWidth;

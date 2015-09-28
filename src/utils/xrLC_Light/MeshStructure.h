@@ -307,14 +307,15 @@ struct remove_pred
 template<typename typeVertex>
 IC void isolate_vertices(BOOL bProgress, xr_vector<typeVertex*> &vertices )
 {
-	if (bProgress)		Status		("Isolating vertices...");
+    if (bProgress)
+        Logger.Status("Isolating vertices...");
 	//g_bUnregister		= false;
 	const u32 verts_old		= vertices.size();
 
 	for (int it=0; it<int(verts_old); ++it)	
 	{
 		if (bProgress)	
-			Progress	(float(it)/float(verts_old));
+            Logger.Progress(float(it) / float(verts_old));
 
 		if (vertices[it] && vertices[it]->m_adjacents.empty())
 			_destroy_vertex( vertices[it], false );
@@ -334,13 +335,13 @@ IC void isolate_vertices(BOOL bProgress, xr_vector<typeVertex*> &vertices )
 	Memory.mem_compact	();
 	
 	if (bProgress)	
-			Progress	(1.f);
+        Logger.Progress(1.f);
 
 	u32 verts_new		= vertices.size();
 	u32	_count			= verts_old-verts_new;
 	
 	if	(_count)		
-		clMsg	("::compact:: %d verts removed",_count);
+        Logger.clMsg("::compact:: %d verts removed", _count);
 }
 
 

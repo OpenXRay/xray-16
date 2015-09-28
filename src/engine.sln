@@ -135,7 +135,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xrPostprocessEditor", "edit
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrManagedApi", "editors\xrManagedApi\xrManagedApi.vcxproj", "{55B0E2CA-E27A-47FC-BC92-21ABDC1044F5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrUtil", "utils\xrUtil\xrUtil.vcxproj", "{B90BDC22-A891-4B33-B562-29D701F65DBD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrLCUtil", "utils\xrLCUtil\xrLCUtil.vcxproj", "{B90BDC22-A891-4B33-B562-29D701F65DBD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

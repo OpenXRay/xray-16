@@ -21,7 +21,7 @@ namespace lc_net{
 		//Memory.mem_compact	();
 		//if(!write_faces)
 			//inlc_global_data()->create_write_faces();
-		clMsg( "create_implicit_data_write:  start" );
+        Logger.clMsg("create_implicit_data_write:  start");
 		R_ASSERT(write_faces);
 
 		
@@ -30,7 +30,7 @@ namespace lc_net{
 		FS.w_close(file);
 		
 		compress( path ); 
-		clMsg( "create_implicit_data_write:  end" );
+        Logger.clMsg("create_implicit_data_write:  end");
 
 	}
 	bool	net_global_data_impl<gl_implicit_cl_data>::create_data( LPCSTR path  )

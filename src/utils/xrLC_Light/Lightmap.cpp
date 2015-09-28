@@ -120,10 +120,10 @@ void CLightmap::Save( LPCSTR path )
 {
 	static int		lmapNameID = 0; ++lmapNameID;
 
-	Phase			("Saving...");
+    Logger.Phase("Saving...");
 
 	// Borders correction
-	Status			("Borders...");
+    Logger.Status("Borders...");
 	for (u32 _y=0; _y<c_LMAP_size; _y++)
 	{
 		for (u32 _x=0; _x<c_LMAP_size; _x++)
@@ -134,9 +134,9 @@ void CLightmap::Save( LPCSTR path )
 	}
 	for (u32 ref=254; ref>(254-16); ref--) {
 		ApplyBorders	(lm,ref);
-		Progress		(1.f - float(ref)/float(254-16));
+        Logger.Progress(1.f - float(ref) / float(254 - 16));
 	}
-	Progress			(1.f);
+    Logger.Progress(1.f);
 
 	xr_vector<u32>			lm_packed;
 	lm.Pack					(lm_packed);
@@ -151,7 +151,7 @@ void CLightmap::Save( LPCSTR path )
 	lm.destroy					();
 	
 	// Saving			(DXT5.dds)
-	Status			("Compression base...");
+    Logger.Status("Compression base...");
 	{
 
 
@@ -171,7 +171,7 @@ void CLightmap::Save( LPCSTR path )
 		DXTCompress				(FN,raw_data,0,w,h,pitch,&fmt,4);
 	}
 	lm_packed.clear_and_free();
-	Status			("Compression hemi..."); //.
+    Logger.Status("Compression hemi..."); //.
 	{
 
 

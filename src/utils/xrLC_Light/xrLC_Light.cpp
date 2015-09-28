@@ -10,83 +10,6 @@
 #pragma managed(push, off)
 #endif
 
-i_lc_log *lc_log	= 0;
-
-void __cdecl	clLog( const char *format, ...)
-{
-	va_list		mark;
-	char buf	[4*256];
-	va_start	( mark, format );
-	vsprintf	( buf, format, mark );
-
-	if(!lc_log)
-	{
-		Msg( "clMsg: %s", buf );
-		return;
-	}
-
-	VERIFY			( lc_log );
-	lc_log->clLog	( buf );
-}
-void __cdecl clMsg( const char *format, ...)
-{
-	va_list		mark;
-	char buf	[4*256];
-	va_start	( mark, format );
-	vsprintf	( buf, format, mark );
-
-	if(!lc_log)
-	{
-		Msg( "clMsg: %s", buf );
-		return;
-	}
-
-	VERIFY			( lc_log );
-	lc_log->clMsg	( buf );
-}
-
-void __cdecl Status	(const char *format, ...)
-{
-	va_list				mark;
-	va_start			( mark, format );
-
-	char				status	[1024	]	="";
-	vsprintf			( status, format, mark );
-
-	if(!lc_log)
-	{
-		Msg( "Status: %s", status );
-		return;
-	}
-
-	//strconcat			( sizeof(status), status, "    | %s", status ); 
-	VERIFY				( lc_log );
-	lc_log->Status		(status);
-	
-}
-void Phase		( LPCSTR phase_name )
-{
-	if(!lc_log)
-	{
-		Msg( "Phase: %s", phase_name );
-		return;
-	}
-	
-	VERIFY				( lc_log );
-	lc_log->Phase		( phase_name );
-}
-void Progress	( const float F )
-{
-	if(!lc_log)
-	{
-		Msg( "Progress: %f", F );
-		return;
-	}
-
-	VERIFY				( lc_log );
-	lc_log->Progress		( F );
-}
-
 b_params	&g_params()
 {
 	VERIFY(inlc_global_data());
@@ -129,4 +52,3 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 #ifdef _MANAGED
 #pragma managed(pop)
 #endif
-

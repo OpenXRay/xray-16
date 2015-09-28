@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Russian resources
+// Russian (Russia) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
-#ifdef _WIN32
 LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
 #pragma code_page(1251)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -48,7 +46,7 @@ FONT 10, "Lucida Console", 400, 0, 0xCC
 BEGIN
     LISTBOX         IDC_LOG,0,0,345,253,NOT LBS_NOTIFY | LBS_NOINTEGRALHEIGHT | WS_VSCROLL
     CTEXT           "Starting...",IDC_STAGE,0,255,345,17,SS_CENTERIMAGE | SS_SUNKEN
-    CONTROL         "Progress1",IDC_PROGRESS,"msctls_progress32",0x1,0,309,311,14
+    CONTROL         "Progress1",IDC_PROGRESS,"msctls_progress32",PBS_SMOOTH,0,309,311,14
     GROUPBOX        "Stage information",IDC_STATIC,0,273,218,35
     LTEXT           "",IDC_INFO,5,281,207,22
     GROUPBOX        "Phase Timing",IDC_STATIC,220,274,125,34
@@ -73,7 +71,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_VERIFY, DIALOG
     BEGIN
@@ -99,18 +97,16 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Russian resources
+#endif    // Russian (Russia) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Ukrainian resources
+// Ukrainian (Ukraine) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_UKR)
-#ifdef _WIN32
 LANGUAGE LANG_UKRAINIAN, SUBLANG_DEFAULT
 #pragma code_page(1251)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -137,61 +133,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Ukrainian resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(1252)
-#endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_NVIEW DIALOG  0, 0, 780, 535
-STYLE DS_ABSALIGN | DS_SETFONT | DS_SETFOREGROUND | DS_NOFAILCREATE | DS_CENTER | WS_VISIBLE | WS_BORDER
-FONT 8, "MS Sans Serif"
-BEGIN
-    DEFPUSHBUTTON   "Close",IDOK,690,5,85,14,BS_FLAT
-    PUSHBUTTON      "View depth",ID_VIEW_NDEPTH,690,30,85,14,BS_FLAT
-    PUSHBUTTON      "View height",ID_VIEW_NHEIGHT,690,45,85,14,BS_FLAT
-    PUSHBUTTON      "View sectors",ID_VIEW_NSECTOR,690,75,85,14,BS_FLAT
-    PUSHBUTTON      "View normals",ID_VIEW_NNORMALS,690,60,85,14,BS_FLAT
-    PUSHBUTTON      "View lighting",ID_VIEW_NLIGHT,690,90,85,14,BS_FLAT
-    PUSHBUTTON      "View subdivisions",ID_VIEW_NSUBDIV,690,105,85,14,BS_FLAT
-    PUSHBUTTON      "View cover left",ID_VIEW_COVER1,690,135,85,14,BS_FLAT
-    PUSHBUTTON      "View cover forward",ID_VIEW_COVER2,690,150,85,14,BS_FLAT
-    PUSHBUTTON      "View cover right",ID_VIEW_COVER3,690,165,85,14,BS_FLAT
-    PUSHBUTTON      "View cover back",ID_VIEW_COVER4,690,180,85,14,BS_FLAT
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
-BEGIN
-    IDD_NVIEW, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 773
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 528
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-#endif    // English (U.S.) resources
+#endif    // Ukrainian (Ukraine) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -83,17 +83,17 @@ extern void SimplifyCFORM		(CDB::CollectorPacked& CL);
 void CBuild::BuildCForm	()
 {
 	// Collecting data
-	Phase		("CFORM: creating...");
+    Logger.Phase("CFORM: creating...");
 	vecFace*	cfFaces		= xr_new<vecFace>	();
 	vecVertex*	cfVertices	= xr_new<vecVertex>	();
 	{
 		xr_vector<bool>			cfVertexMarks;
 		cfVertexMarks.assign	(lc_global_data()->g_vertices().size(),false);
 
-		Status("Sorting...");
+        Logger.Status("Sorting...");
 		std::sort(lc_global_data()->g_vertices().begin(),lc_global_data()->g_vertices().end());
 
-		Status("Collecting faces...");
+        Logger.Status("Collecting faces...");
 		cfFaces->reserve	(lc_global_data()->g_faces().size());
 		for (vecFaceIt I=lc_global_data()->g_faces().begin(); I!=lc_global_data()->g_faces().end(); ++I)
 		{
@@ -112,7 +112,7 @@ void CBuild::BuildCForm	()
 			}
 		}
 
-		Status("Collecting vertices...");
+        Logger.Status("Collecting vertices...");
 		cfVertices->reserve	(lc_global_data()->g_vertices().size());
 		std::sort(cfFaces->begin(),cfFaces->end());
 		for (u32 V=0; V<lc_global_data()->g_vertices().size(); V++)
@@ -127,8 +127,8 @@ void CBuild::BuildCForm	()
 		BB.modify((*it)->P );
 
 	// CForm
-	Phase	("CFORM: collision model...");
-	Status	("Items to process: %d", cfFaces->size());
+    Logger.Phase("CFORM: collision model...");
+    Logger.Status("Items to process: %d", cfFaces->size());
 	p_total = 0;
 	p_cost  = 1.f/(cfFaces->size());
 
@@ -146,17 +146,17 @@ void CBuild::BuildCForm	()
 			T->v[0]->P, T->v[1]->P, T->v[2]->P,
 			T->dwMaterialGame, materials()[T->dwMaterial].sector, T->sm_group
 			);
-		Progress(p_total+=p_cost);		// progress
+        Logger.Progress(p_total += p_cost);		// progress
 	}
 	if (bCriticalErrCnt) {
 		err_save	();
-		clMsg		("MultipleEdges: %d faces",bCriticalErrCnt);
+        Logger.clMsg("MultipleEdges: %d faces", bCriticalErrCnt);
 	}
 	xr_delete		(cfFaces);
 	xr_delete		(cfVertices);
 
 	// Models
-	Status			("Models...");
+    Logger.Status("Models...");
 	for (u32 ref=0; ref<mu_refs().size(); ref++)
 		mu_refs()[ref]->export_cform_game(CL);
 
@@ -172,7 +172,7 @@ void CBuild::BuildCForm	()
 	// Saving
 	string_path		fn;
 	IWriter*		MFS	= FS.w_open	(strconcat(sizeof(fn),fn,pBuild->path,"level.cform"));
-	Status			("Saving...");
+    Logger.Status("Saving...");
 
 	// Header
 	hdrCFORM hdr;

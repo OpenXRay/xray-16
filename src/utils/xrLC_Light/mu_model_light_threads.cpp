@@ -13,13 +13,13 @@
 
 //#include "mu_model_face.h"
 
-#include "utils/xrUtil/xrThread.hpp"
+#include "utils/xrLCUtil/xrThread.hpp"
 #include "../../xrcore/xrSyncronize.h"
 
 
 
-CThreadManager			mu_base(Status, Progress);
-CThreadManager			mu_secondary(Status, Progress);
+CThreadManager			mu_base(ProxyStatus, ProxyProgress);
+CThreadManager			mu_secondary(ProxyStatus, ProxyProgress);
 #define		MU_THREADS	4
 // mu-light
 bool mu_models_local_calc_lightening = false;
@@ -48,7 +48,7 @@ class CMULight	: public CThread
 	u32			low;
 	u32			high;
 public:
-	CMULight	(u32 ID, u32 _low, u32 _high) : CThread(ID, clMsg)	{	thMessages	= FALSE; low=_low; high=_high;	}
+	CMULight	(u32 ID, u32 _low, u32 _high) : CThread(ID, ProxyMsg)	{	thMessages	= FALSE; low=_low; high=_high;	}
 
 	virtual void	Execute	()
 	{
@@ -71,7 +71,7 @@ public:
 class CMUThread : public CThread
 {
 public:
-	CMUThread	(u32 ID) : CThread(ID, clMsg)
+	CMUThread	(u32 ID) : CThread(ID, ProxyMsg)
 	{
 		thMessages	= FALSE;
 	}

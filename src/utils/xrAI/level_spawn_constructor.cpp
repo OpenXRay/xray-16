@@ -331,7 +331,7 @@ void CLevelSpawnConstructor::correct_objects					()
 		VERIFY				(level_graph().valid_vertex_id(m_spawns[i]->m_tNodeID));
 		if (m_spawns[i]->used_ai_locations() && !level_graph().inside(level_graph().vertex(m_spawns[i]->m_tNodeID),position)) {
 			Fvector			new_position = level_graph().vertex_position(m_spawns[i]->m_tNodeID);
-			clMsg			("[%s][%s][%s] : position changed from [%f][%f][%f] -> [%f][%f][%f]",*m_level.name(),*m_spawns[i]->s_name,m_spawns[i]->name_replace(),VPUSH(position),VPUSH(new_position));
+            Logger.clMsg("[%s][%s][%s] : position changed from [%f][%f][%f] -> [%f][%f][%f]", *m_level.name(), *m_spawns[i]->s_name, m_spawns[i]->name_replace(), VPUSH(position), VPUSH(new_position));
 			m_spawns[i]->o_Position	= new_position;
 		}
 		u32					dwBest = cross_table().vertex(m_spawns[i]->m_tNodeID).game_vertex_id();
@@ -566,7 +566,7 @@ void CLevelSpawnConstructor::fill_level_changers				()
 			}
 
 		if (!found) {
-			clMsg			("Graph point %s not found (level changer %s)",*level_changers()[i]->m_caLevelPointToChange,level_changers()[i]->name_replace());
+            Logger.clMsg("Graph point %s not found (level changer %s)", *level_changers()[i]->m_caLevelPointToChange, level_changers()[i]->name_replace());
 			VERIFY			(false);
 		}
 	}

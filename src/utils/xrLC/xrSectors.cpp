@@ -6,8 +6,8 @@ xr_vector<CSector*>	g_sectors;
 
 void CBuild::BuildSectors()
 {
-	Status("Determining sectors...");
-	Progress(0);
+    Logger.Status("Determining sectors...");
+    Logger.Progress(0);
 	u32 SectorMax=0;
 	for (u32 I=0; I<g_tree.size(); I++)
 		if (g_tree[I]->Sector>SectorMax) SectorMax=g_tree[I]->Sector;
@@ -16,24 +16,24 @@ void CBuild::BuildSectors()
 	u32 SectorCount = SectorMax+1; 
 	g_sectors.resize(SectorCount);
 	ZeroMemory(&*g_sectors.begin(),(u32)g_sectors.size()*sizeof(void*));
-	clMsg("%d sectors accepted.",SectorCount);
+    Logger.clMsg("%d sectors accepted.", SectorCount);
 
-	Status("Spatializing geometry...");
+    Logger.Status("Spatializing geometry...");
 	for (u32 I=0; I<g_tree.size(); I++)
 	{
 		u32 Sector = g_tree[I]->Sector;
 		if (0==g_sectors[Sector]) g_sectors[Sector] = xr_new<CSector> (Sector);
 	}
 
-	Status("Building hierrarhy...");
+    Logger.Status("Building hierrarhy...");
 	for (u32 I=0; I<g_sectors.size(); I++)
 	{
 		R_ASSERT(g_sectors[I]);
 		g_sectors[I]->BuildHierrarhy();
-		Progress(float(I)/float(g_sectors.size()));
+        Logger.Progress(float(I) / float(g_sectors.size()));
 	}
 
-	Status("Assigning portals, occluders, glows, lights...");
+    Logger.Status("Assigning portals, occluders, glows, lights...");
 	// portals
 	for (u32 I=0; I<portals.size(); I++)
 	{
@@ -70,7 +70,7 @@ void CBuild::BuildSectors()
 					g_sectors	[L.sectors[j]]->add_light(u16(I));
 				}
 			} else {
-				clMsg("Fuck!!! Light at position %f,%f,%f non associated!!!",
+                Logger.clMsg("Fuck!!! Light at position %f,%f,%f non associated!!!",
 					L.data.position.x,L.data.position.y,L.data.position.z
 					);
 			}
@@ -81,7 +81,7 @@ void CBuild::BuildSectors()
 void CBuild::SaveSectors(IWriter& fs)
 {
 	CMemoryWriter MFS;
-	Status("Processing...");
+    Logger.Status("Processing...");
 
 	// validate & save
 	for (u32 I=0; I<g_sectors.size(); I++)
@@ -90,7 +90,7 @@ void CBuild::SaveSectors(IWriter& fs)
 		g_sectors[I]->Validate();
 		g_sectors[I]->Save(MFS);
 		MFS.close_chunk();
-		Progress(float(I)/float(g_sectors.size()));
+        Logger.Progress(float(I) / float(g_sectors.size()));
 	}
 
 	fs.w_chunk(fsL_SECTORS,MFS.pointer(),MFS.size());

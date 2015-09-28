@@ -144,7 +144,7 @@ void CDeflector::OA_Export()
 	if (tN.magnitude()>EPS_S && _valid(tN))	normal.set(tN).normalize();
 	else
 	{
-		clMsg("* ERROR: Internal precision error in CDeflector::OA_Export");
+        Logger.clMsg("* ERROR: Internal precision error in CDeflector::OA_Export");
 		for (UVIt it = UVpolys.begin(); it!=UVpolys.end(); it++)
 		{
 			Face &fc = *((*it).owner);
@@ -324,7 +324,7 @@ void CDeflector::L_Calculate(CDB::COLLIDER* DB, base_lighting* LightsSelected, H
 		L_Direct		(DB,LightsSelected,H);
 	} catch (...)
 	{
-		clMsg("* ERROR: CDeflector::L_Calculate");
+        Logger.clMsg("* ERROR: CDeflector::L_Calculate");
 	}
 }
 
@@ -444,22 +444,20 @@ void DumpDeflctor( u32 id )
 {
 	VERIFY( inlc_global_data()->g_deflectors().size()>id );
 	const CDeflector &D = *inlc_global_data()->g_deflectors()[id];
-	clMsg( "deflector id: %d - faces num: %d ", id, D.UVpolys.size() );
-	
-
+    Logger.clMsg("deflector id: %d - faces num: %d ", id, D.UVpolys.size());
 }
 
 void DumpDeflctor( const CDeflector &D )
 {
-	clMsg( "lightmap size: %d ", D.layer.width * D.layer.height );
-	clMsg( "lightmap width/height : %d/%d", D.layer.width, D.layer.height  );
-	clMsg( "deflector - faces num: %d ", D.UVpolys.size() );
+    Logger.clMsg("lightmap size: %d ", D.layer.width * D.layer.height);
+    Logger.clMsg("lightmap width/height : %d/%d", D.layer.width, D.layer.height);
+    Logger.clMsg("deflector - faces num: %d ", D.UVpolys.size());
 }
 
 void DeflectorsStats ()
 {
 	u32 size =  inlc_global_data()->g_deflectors().size();
-	clMsg( "num deflectors: %d", size);
+    Logger.clMsg("num deflectors: %d", size);
 	for( u32 i = 0; i <size ; i++ )
 			DumpDeflctor( i ); 
 }

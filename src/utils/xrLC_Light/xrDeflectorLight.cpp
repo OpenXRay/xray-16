@@ -278,7 +278,7 @@ BOOL NEW_ApplyBorders	(lm_layer &lm, u32 ref)
 		//lm	= result;
 	} catch (...)
 	{
-		clMsg("* ERROR: ApplyBorders");
+        Logger.clMsg("* ERROR: ApplyBorders");
 	}
 	return bNeedContinue;
 }
@@ -322,7 +322,7 @@ BOOL OLD_ApplyBorders	(lm_layer &lm, u32 ref)
 		lm	= result;
 	} catch (...)
 	{
-		clMsg("* ERROR: ApplyBorders");
+        Logger.clMsg("* ERROR: ApplyBorders");
 	}
 	return bNeedContinue;
 }
@@ -385,7 +385,7 @@ float getLastRP_Scale(CDB::COLLIDER* DB, CDB::MODEL* MDL, R_Light& L, Face* skip
 #endif
 			if (0==T.pSurface)	{
 				F->flags.bOpaque	= true;
-				clMsg			("* ERROR: RAY-TRACE: Strange face detected... Has alpha without texture...");
+                Logger.clMsg("* ERROR: RAY-TRACE: Strange face detected... Has alpha without texture...");
 				return 0;
 			}
 
@@ -412,7 +412,7 @@ float getLastRP_Scale(CDB::COLLIDER* DB, CDB::MODEL* MDL, R_Light& L, Face* skip
 	} 
 	X_CATCH
 	{
-		clMsg("* ERROR: getLastRP_Scale");
+        Logger.clMsg("* ERROR: getLastRP_Scale");
 	}
 
 	return scale;
@@ -639,7 +639,7 @@ BOOL	__stdcall rms_test	(lm_layer& lm, u32 w, u32 h, u32 rms)
 		imf_Process	(&*pScaled_hemi.begin(),	w,			h,			&*pOriginal_hemi.begin(),	lm.width,lm.height,imf_lanczos3	);
 		imf_Process	(&*pRestored_hemi.begin(),	lm.width,	lm.height,	&*pScaled_hemi.begin(),		w,h,imf_filter					);
 	}catch (...){
-		clMsg	("* ERROR: imf_Process");
+        Logger.clMsg("* ERROR: imf_Process");
 		return	FALSE;
 	}
 
@@ -721,7 +721,7 @@ BOOL	compress_Zero		(lm_layer& lm, u32 rms)
 	u32				_count	= rms_average(lm,_c);
 
 	if (0==_count)	{
-		clMsg	("* ERROR: Lightmap not calculated (T:%d)");
+        Logger.clMsg("* ERROR: Lightmap not calculated (T:%d)");
 		return	FALSE;
 	} else		_c.scale(_count);
 
@@ -797,7 +797,7 @@ void CDeflector::Light(CDB::COLLIDER* DB, base_lighting* LightsSelected, HASH& H
 		bb.getsphere(Sphere.P,Sphere.R);
 	} catch (...)
 	{
-		clMsg("* ERROR: CDeflector::Light - sphere calc");
+        Logger.clMsg("* ERROR: CDeflector::Light - sphere calc");
 	}
 
 	// Convert lights to local form
@@ -823,7 +823,7 @@ void CDeflector::Light(CDB::COLLIDER* DB, base_lighting* LightsSelected, HASH& H
 		}
 	} catch (...)
 	{
-		clMsg("* ERROR: CDeflector::Light - Compression");
+        Logger.clMsg("* ERROR: CDeflector::Light - Compression");
 	}
 
 	// Expand with borders
@@ -890,7 +890,7 @@ void CDeflector::Light(CDB::COLLIDER* DB, base_lighting* LightsSelected, HASH& H
 	} catch (...)
 	{
 		
-		clMsg("* ERROR: CDeflector::Light - BorderExpansion");
+        Logger.clMsg("* ERROR: CDeflector::Light - BorderExpansion");
 
 	}
 }

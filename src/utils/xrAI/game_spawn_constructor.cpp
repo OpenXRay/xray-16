@@ -25,7 +25,7 @@ CGameSpawnConstructor::CGameSpawnConstructor	(LPCSTR name, LPCSTR output, LPCSTR
 #ifdef PROFILE_CRITICAL_SECTIONS
 	m_critical_section(MUTEX_PROFILE_ID(CGameSpawnConstructor)),
 #endif // PROFILE_CRITICAL_SECTIONS
-    m_thread_manager(Status, Progress)
+    m_thread_manager(ProxyStatus, ProxyProgress)
 {
 	load_spawns						(name,no_separator_check);
 	process_spawns					();

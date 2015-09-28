@@ -62,7 +62,7 @@ void	mem_Optimize	()
 
 void xrCompiler	(LPCSTR name, bool draft_mode, bool pure_covers, LPCSTR out_name)
 {
-	Phase		("Loading level...");
+    Logger.Phase("Loading level...");
 	xrLoad		(name,draft_mode);
 	mem_Optimize();
 
@@ -76,12 +76,12 @@ void xrCompiler	(LPCSTR name, bool draft_mode, bool pure_covers, LPCSTR out_name
 //	mem_Optimize();
 	
 	if (!draft_mode) {
-		Phase("Lighting nodes...");
+        Logger.Phase("Lighting nodes...");
 		xrLight		();
 		//	xrDisplay	();
 		mem_Optimize();
 
-		Phase("Calculating coverage...");
+        Logger.Phase("Calculating coverage...");
 		xrCover		(pure_covers);
 		mem_Optimize();
 	}
@@ -94,7 +94,7 @@ void xrCompiler	(LPCSTR name, bool draft_mode, bool pure_covers, LPCSTR out_name
 //	Phase("Visualizing nodes...");
 //	xrDisplay	();
 
-	Phase("Saving nodes...");
+    Logger.Phase("Saving nodes...");
 	xrSaveNodes	(name,out_name);
 	mem_Optimize();
 }

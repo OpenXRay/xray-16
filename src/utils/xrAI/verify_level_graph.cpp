@@ -68,18 +68,18 @@ bool verify_invalid_links	(const CLevelGraph &graph)
 void verify_level_graph	(LPCSTR name, bool verbose)
 {
 	Msg				("Verifying level %s",name);
-	Phase			("Verifying level graph");
-	Progress		(0.f);
+    Logger.Phase("Verifying level graph");
+    Logger.Progress(0.f);
 	CLevelGraph		*level_graph = xr_new<CLevelGraph>(name);
 	if (!level_graph->header().vertex_count()) {
-		Progress	(1.f);
+        Logger.Progress(1.f);
 		Msg			("Level graph is empty!");
 		xr_delete	(level_graph);
 		return;
 	}
 
 	if (!verify_invalid_links(*level_graph)) {
-		Progress	(1.f);
+        Logger.Progress(1.f);
 		Msg			("AI map is CORRUPTED : REGENERATE AI-MAP");
 		xr_delete	(level_graph);
 		return;
@@ -91,7 +91,7 @@ void verify_level_graph	(LPCSTR name, bool verbose)
 
 	xr_vector<u32>	single_links;
 	single_links.reserve(level_graph->header().vertex_count());
-	Progress		(0.05f);
+    Logger.Progress(0.05f);
 
 	for (u32 i=0, n=level_graph->header().vertex_count(); i<n; ++i) {
 		CLevelGraph::const_iterator	I, E;
@@ -103,11 +103,11 @@ void verify_level_graph	(LPCSTR name, bool verbose)
 				single_links.push_back	(neighbour_vertex_id);
 			}
 		}
-		Progress					(0.05f + 0.05f*float(i)/float(n));
+        Logger.Progress(0.05f + 0.05f*float(i) / float(n));
 	}
 
 	bool							no_single_links = single_links.empty();
-	Progress						(0.1f);
+    Logger.Progress(0.1f);
 	if (single_links.empty())
 		single_links.push_back		(0);
 
@@ -127,7 +127,7 @@ void verify_level_graph	(LPCSTR name, bool verbose)
 		Msg							("There are %d single linked nodes!",single_links.size());
 	}
 
-	Progress						(0.15f);
+    Logger.Progress(0.15f);
 	bool							valid = true;
 	xr_vector<u32>::const_iterator	I = single_links.begin();
 	xr_vector<u32>::const_iterator	E = single_links.end();
@@ -145,12 +145,12 @@ void verify_level_graph	(LPCSTR name, bool verbose)
 
 		if (!valid)
 			break;
-		Progress		(0.15f + 0.85f*float(i)/float(n));
+        Logger.Progress(0.15f + 0.85f*float(i) / float(n));
 	}
 
 	xr_free			(stack_storage);
 	xr_delete		(level_graph);
-	Progress		(1.f);
+    Logger.Progress(1.f);
 	if (valid)
 		Msg			("AI-map is valid!");
 

@@ -20,7 +20,6 @@
 #define XR_EPROPS_API
 #include "../../xrcore/clsid.h"
 #include "defines.h"
-#include "cl_log.h"
 #include "../../xrcdb/xrCDB.h"
 #include "_d3d_extensions.h"
 
@@ -29,6 +28,13 @@
 #include <sys/stat.h>
 #include <io.h>
 #include <stdio.h>
+#include "utils/xrLCUtil/LevelCompilerLoggerWindow.hpp"
+#include "utils/xrLCUtil/xrThread.hpp"
+
+extern LevelCompilerLoggerWindow &Logger;
+extern CThread::LogFunc ProxyMsg;
+extern CThreadManager::ReportStatusFunc ProxyStatus;
+extern CThreadManager::ReportProgressFunc ProxyProgress;
 
 #ifdef AI_COMPILER
 #	include "../../xrServerEntities/smart_cast.h"

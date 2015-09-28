@@ -32,7 +32,7 @@ static void	calc_normals( vecVertex &vertices, vecFace &faces )
 	float	p_cost  = 1.f/(Vcount);
 
 	// Clear temporary flag
-	Status			("Processing...");
+    Logger.Status("Processing...");
 	float sm_cos	= _cos(deg2rad(g_params().m_sm_angle));
 
 	for (vecFaceIt it = faces.begin(); it!=faces.end(); it++)
@@ -71,9 +71,9 @@ static void	calc_normals( vecVertex &vertices, vecFace &faces )
 
 			pNewVertex->normalFromAdj	();
 		}
-		Progress( p_total+=p_cost );
+        Logger.Progress(p_total += p_cost);
 	}
-	Progress		( 1.f );
+    Logger.Progress(1.f);
 
 	// Destroy unused vertices
 
@@ -83,7 +83,7 @@ static void	calc_normals( vecVertex &vertices, vecFace &faces )
 	for ( vecVertexIt it=vertices.begin(); it!=vertices.end(); it++ )
 		(*it)->normalFromAdj	();
 
-	clMsg	("%d vertices was duplicated 'cause of SM groups",vertices.size()-Vcount);
+    Logger.clMsg("%d vertices was duplicated 'cause of SM groups", vertices.size()-Vcount);
 
 	// Clear temporary flag
 	for ( vecFaceIt it = faces.begin(); it!=faces.end(); it++ )
