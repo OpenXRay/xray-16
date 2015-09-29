@@ -9,7 +9,7 @@
 #include "game_cl_capture_the_artefact.h"
 #include "game_cl_mp.h"
 
-#include "level.h"
+#include "Level.h"
 #include "actor.h"
 #include "artefact.h"
 #include "inventory.h"

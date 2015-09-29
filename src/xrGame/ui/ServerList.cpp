@@ -1,17 +1,16 @@
 #include "StdAfx.h"
 #include "ServerList.h"
 #include "UIXmlInit.h"
-#include "../string_table.h"
-#include "../../xrEngine/xr_ioconsole.h"
+#include "string_table.h"
+#include "xrEngine/xr_ioconsole.h"
 #include "UIEditBox.h"
 #include "UIMessageBoxEx.h"
 #include "UIMessageBox.h"
 #include "TeamInfo.h"
-#include "../MainMenu.h"
-#include "../login_manager.h"
-#include "../GameSpy/GameSpy_Full.h"
-#include "../GameSpy/GameSpy_Browser.h"
-
+#include "MainMenu.h"
+#include "login_manager.h"
+#include "GameSpy/GameSpy_Full.h"
+#include "GameSpy/GameSpy_Browser.h"
 
 LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
 CGameSpy_Browser* g_gs_browser = NULL;

@@ -7,7 +7,7 @@
 #pragma once
 
 #define _WIN32_WINNT 0x0500        
-#include "../../../xrCore/xrCore.h"
+#include "xrCore/xrCore.h"
 #include <assert.h>
 
 #pragma warning(push)

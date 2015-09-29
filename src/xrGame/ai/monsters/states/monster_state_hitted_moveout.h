@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../detail_path_manager.h"
+#include "detail_path_manager.h"
 
 template<typename _Object>
 class CStateMonsterHittedMoveOut : public CState<_Object> {

@@ -2,7 +2,7 @@
 #pragma hdrstop
 
 /*
-#include "../../xrCore/xr_resource.h"
+#include "xrCore/xr_resource.h"
 
 // res
 class	test_resource	: public xr_resource	{

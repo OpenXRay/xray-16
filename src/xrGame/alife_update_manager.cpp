@@ -16,9 +16,9 @@
 #include "alife_object_registry.h"
 #include "ef_storage.h"
 #include "xrserver.h"
-#include "level.h"
+#include "Level.h"
 #include "graph_engine.h"
-#include "../xrEngine/x_ray.h"
+#include "xrEngine/x_ray.h"
 #include "restriction_space.h"
 #include "profiler.h"
 #include "mt_config.h"
@@ -227,7 +227,7 @@ bool CALifeUpdateManager::change_level	(NET_Packet &net_packet)
 	return							(true);
 }
 
-#include "../xrEngine/igame_persistent.h"
+#include "xrEngine/igame_persistent.h"
 void CALifeUpdateManager::new_game			(LPCSTR save_name)
 {
 //	g_pGamePersistent->LoadTitle		("st_creating_new_game");

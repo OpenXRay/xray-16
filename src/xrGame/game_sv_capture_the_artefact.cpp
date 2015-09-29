@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "game_sv_capture_the_artefact.h"
 #include "xrserver_objects_alife_monsters.h"
-#include "level.h"
+#include "Level.h"
 #include "xrserver.h"
 #include "Inventory.h"
 #include "CustomZone.h"
-#include "../xrEngine/igame_persistent.h"
-#include "../xrEngine/CameraManager.h"
+#include "xrEngine/igame_persistent.h"
+#include "xrEngine/CameraManager.h"
 #include "Actor.h"
 #include "Artefact.h"
 #include "game_cl_base.h"
@@ -21,7 +21,7 @@
 #include "ui\UIBuyWndShared.h"
 #include "UIGameCTA.h"
 #include "string_table.h"
-#include "../xrEngine/xr_ioconsole.h"
+#include "xrEngine/xr_ioconsole.h"
 
 //-------------------------------------------------------------
 u32			g_sv_cta_dwInvincibleTime		=		5;	//5 seconds

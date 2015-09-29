@@ -10,7 +10,7 @@
 #define STALKER_MOVEMENT_MANAGER_SMART_COVER_H_INCLUDED
 
 #include "stalker_movement_manager_obstacles.h"
-#include "../include/xrrender/animation_motion.h"
+#include "Include/xrRender/animation_motion.h"
 
 class CCoverPoint;
 class CPropertyStorage;

@@ -3,7 +3,7 @@
 #include "UITextureMaster.h"
 #include "UIScrollBar.h"
 #include "uilistboxitem.h"
-#include "../string_table.h"
+#include "string_table.h"
 
 #define CB_HEIGHT 20.0f
 

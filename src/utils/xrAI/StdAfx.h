@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "../../xrCore/xrCore.h"
+#include "xrCore/xrCore.h"
 
 #pragma warning(disable:4995)
 #include <d3dx9.h>
@@ -18,9 +18,9 @@
 #define ENGINE_API
 #define ECORE_API
 #define XR_EPROPS_API
-#include "../../xrcore/clsid.h"
+#include "xrCore/clsid.h"
 #include "defines.h"
-#include "../../xrcdb/xrCDB.h"
+#include "xrCDB/xrCDB.h"
 #include "_d3d_extensions.h"
 
 #include <fcntl.h>
@@ -37,7 +37,7 @@ extern CThreadManager::ReportStatusFunc ProxyStatus;
 extern CThreadManager::ReportProgressFunc ProxyProgress;
 
 #ifdef AI_COMPILER
-#	include "../../xrServerEntities/smart_cast.h"
+#	include "xrServerEntities/smart_cast.h"
 #endif
 // TODO: reference additional headers your program requires here
 

@@ -8,7 +8,7 @@
 #include <d3dx9.h>
 #pragma warning(default:4995)
 #include "HW.h"
-#include "../../xrEngine/XR_IOConsole.h"
+#include "xrEngine/XR_IOConsole.h"
 
 #ifndef _EDITOR
 	void	fill_vid_mode_list			(CHW* _hw);
@@ -90,7 +90,7 @@ void CHW::Reset		(HWND hwnd)
 
 //xr_token*				vid_mode_token = NULL;
 //extern xr_token*		vid_mode_token;
-#include "../../Include/xrAPI/xrAPI.h"
+#include "Include/xrAPI/xrAPI.h"
 //xr_token*				vid_quality_token = NULL;
 
 void CHW::CreateD3D	()

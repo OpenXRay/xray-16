@@ -10,7 +10,7 @@
 #include "script_storage.h"
 #include "script_thread.h"
 #include <stdarg.h>
-#include "../xrCore/doug_lea_allocator.h"
+#include "xrCore/doug_lea_allocator.h"
 
 #ifndef DEBUG
 #	include "opt.lua.h"
@@ -81,7 +81,7 @@ static void *lua_alloc		(void *ud, void *ptr, size_t osize, size_t nsize) {
 }
 #else // USE_DL_ALLOCATOR
 
-#include "../xrCore/memory_allocator_options.h"
+#include "xrCore/memory_allocator_options.h"
 
 #ifdef USE_ARENA_ALLOCATOR
 static const u32			s_arena_size = 96*1024*1024;

@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////////////////
 // Effector controlling class
 ////////////////////////////////////////////////////////////////////////
-#include "../../../pp_effector_custom.h"
+#include "pp_effector_custom.h"
 
 class CPPEffectorPsyDogAura : public CPPEffectorCustom {
 	typedef CPPEffectorCustom inherited;

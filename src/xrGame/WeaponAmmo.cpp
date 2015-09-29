@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "weaponammo.h"
-#include "../xrphysics/PhysicsShell.h"
+#include "xrPhysics/PhysicsShell.h"
 #include "xrserver_objects_alife_items.h"
 #include "Actor_Flags.h"
 #include "inventory.h"
@@ -8,7 +8,7 @@
 #include "level_bullet_manager.h"
 #include "ai_space.h"
 #include "xrEngine/GameMtlLib.h"
-#include "level.h"
+#include "Level.h"
 #include "string_table.h"
 
 #define BULLET_MANAGER_SECTION "bullet_manager"

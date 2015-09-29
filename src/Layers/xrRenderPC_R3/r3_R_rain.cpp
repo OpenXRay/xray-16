@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "../../xrEngine/igame_persistent.h"
-#include "../../xrEngine/irenderable.h"
+#include "xrEngine/igame_persistent.h"
+#include "xrEngine/irenderable.h"
 #include "../xrRender/FBasicVisual.h"
 
 #include "r3_R_sun_support.h"

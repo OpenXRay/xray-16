@@ -11,7 +11,7 @@
 #include "inventoryowner.h"
 #include "gameobject.h"
 #include "ai_object_location.h"
-#include "level.h"
+#include "Level.h"
 
 static float min_deficit_factor = .3f;
 

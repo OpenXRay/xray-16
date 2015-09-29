@@ -2,7 +2,8 @@
 #include "GameSpy_GP.h"
 #include "account_manager.h"
 #include "login_manager.h"
-#include "../MainMenu.h"		//in case of fatal error, deleting profile class instance
+#include "MainMenu.h"
+//in case of fatal error, deleting profile class instance
 
 shared_str CGameSpy_GP::TryToTranslate(GPResult const & res)
 {

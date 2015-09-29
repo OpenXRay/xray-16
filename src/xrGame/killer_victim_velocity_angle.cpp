@@ -2,12 +2,12 @@
 #include "killer_victim_velocity_angle.h"
 #include "game_state_accumulator.h"
 #include "game_cl_base.h"
-#include "level.h"
+#include "Level.h"
 #include "ammunition_groups.h"
 #include "actor.h"
 #include "CharacterPhysicsSupport.h"
 #include "PHMovementControl.h"
-#include "../xrEngine/CameraBase.h"
+#include "xrEngine/CameraBase.h"
 
 namespace award_system
 {

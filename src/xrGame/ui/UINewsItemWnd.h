@@ -1,7 +1,7 @@
 #pragma once
-
 #include "UIWindow.h"
 #include "xrUIXmlParser.h"
+
 class CUIStatic;
 class CUITextWnd;
 struct GAME_NEWS_DATA;

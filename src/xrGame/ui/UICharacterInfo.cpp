@@ -3,11 +3,11 @@
 #include "UIInventoryUtilities.h"
 
 #include "uicharacterinfo.h"
-#include "../actor.h"
-#include "../level.h"
-#include "../../xrServerEntities/character_info.h"
-#include "../string_table.h"
-#include "../relation_registry.h"
+#include "Actor.h"
+#include "Level.h"
+#include "xrServerEntities/character_info.h"
+#include "string_table.h"
+#include "relation_registry.h"
 
 #include "xrUIXmlParser.h"
 #include "UIXmlInit.h"
@@ -16,11 +16,11 @@
 #include "UIScrollView.h"
 
 
-#include "../alife_simulator.h"
-#include "../ai_space.h"
-#include "../alife_object_registry.h"
-#include "../xrServer.h"
-#include "../../xrServerEntities/xrServer_Objects_ALife_Monsters.h"
+#include "alife_simulator.h"
+#include "ai_space.h"
+#include "alife_object_registry.h"
+#include "xrServer.h"
+#include "xrServerEntities/xrServer_Objects_ALife_Monsters.h"
 
 using namespace InventoryUtilities;
 

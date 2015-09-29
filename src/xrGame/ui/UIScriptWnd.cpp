@@ -1,8 +1,7 @@
 #include "pch_script.h"
 #include "UIScriptWnd.h"
 #include "object_broker.h"
-#include "../callback_info.h"
-
+#include "callback_info.h"
 
 CUIDialogWndEx::CUIDialogWndEx()
 {}

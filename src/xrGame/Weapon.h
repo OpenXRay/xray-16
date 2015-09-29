@@ -1,13 +1,13 @@
 #pragma once
 
-#include "../xrphysics/PhysicsShell.h"
+#include "xrPhysics/PhysicsShell.h"
 #include "weaponammo.h"
 #include "PHShellCreator.h"
 
 #include "ShootingObject.h"
 #include "hud_item_object.h"
 #include "Actor_Flags.h"
-#include "../Include/xrRender/KinematicsAnimated.h"
+#include "Include/xrRender/KinematicsAnimated.h"
 #include "firedeps.h"
 #include "game_cl_single.h"
 #include "first_bullet_controller.h"

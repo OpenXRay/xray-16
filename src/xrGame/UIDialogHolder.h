@@ -1,6 +1,6 @@
 #pragma once
-#include "../xrEngine/dedicated_server_only.h"
-#include "../xrEngine/no_single.h"
+#include "xrEngine/dedicated_server_only.h"
+#include "xrEngine/no_single.h"
 
 class CUIDialogWnd;
 class CUIWindow;

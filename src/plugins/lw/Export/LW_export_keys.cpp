@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "../../../xrCore/FileSystem.h"
-#include "../../../xrCore/FS.h"
+#include "xrCore/FileSystem.h"
+#include "xrCore/FS.h"
 #include "utils/LWO/envelope.h"
 #include "xrCore/Animation/Bone.hpp"
 #include "xrCore/Animation/Motion.hpp"

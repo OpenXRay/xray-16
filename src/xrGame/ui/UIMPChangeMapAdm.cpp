@@ -6,10 +6,10 @@
 #include "UIStatic.h"
 #include "UI3tButton.h"
 #include "UIDialogWnd.h"
-#include "../Level.h"
-#include "../../xrEngine/xr_ioconsole.h"
-#include "../UIGameCustom.h"
-#include "../string_table.h"
+#include "Level.h"
+#include "xrEngine/xr_ioconsole.h"
+#include "UIGameCustom.h"
+#include "string_table.h"
 
 CUIMpChangeMapAdm::CUIMpChangeMapAdm()
 {

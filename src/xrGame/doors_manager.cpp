@@ -24,7 +24,7 @@ manager::~manager					( )
 	VERIFY2					( m_doors.empty(), make_string("there are %d still registered doors", m_doors.size()) );
 }
 
-//#include "level.h"
+//#include "Level.h"
 //#include "script_game_object.h"
 //
 //void manager::check_bug_door		( ) const

@@ -3,7 +3,7 @@
 
 #include "GameSpy_FuncDefs.h"
 
-#include "../../xrGameSpy/GameSpy/GP/gp.h"
+#include "xrGameSpy/GameSpy/GP/gp.h"
 
 class CGameSpy_GP
 {

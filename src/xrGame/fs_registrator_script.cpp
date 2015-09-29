@@ -1,6 +1,6 @@
 #include "pch_script.h"
 #include "fs_registrator.h"
-#include "../xrcore/LocatorApi.h"
+#include "xrCore/LocatorApi.h"
 
 using namespace luabind;
 

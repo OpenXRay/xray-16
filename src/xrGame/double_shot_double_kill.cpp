@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "double_shot_double_kill.h"
 #include "game_base.h"
-#include "level.h"
+#include "Level.h"
 #include "game_state_accumulator.h"
 
 namespace award_system

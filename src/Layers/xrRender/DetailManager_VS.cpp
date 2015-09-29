@@ -7,8 +7,8 @@
 #	include "igame_persistent.h"
 #	include "environment.h"
 #else
-#	include "../../xrEngine/igame_persistent.h"
-#	include "../../xrEngine/environment.h"
+#	include "xrEngine/igame_persistent.h"
+#	include "xrEngine/environment.h"
 #endif
 
 #include "../xrRenderDX10/dx10BufferUtils.h"

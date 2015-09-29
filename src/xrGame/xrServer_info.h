@@ -2,7 +2,7 @@
 #define SERVER_INFO_UPLOADER
 
 #include <boost/noncopyable.hpp>
-#include "../xrCore/fastdelegate.h"
+#include "xrCore/fastdelegate.h"
 #include "file_transfer.h"
 
 typedef fastdelegate::FastDelegate<void (ClientID const &)>	svinfo_upload_complete_cb;

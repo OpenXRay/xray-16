@@ -1,6 +1,6 @@
 #pragma once
 #include "UIFrameWindow.h"
-#include "..\../xrServerEntities/associative_vector.h"
+#include "xrServerEntities/associative_vector.h"
 
 class CUIStatic;
 class CUITextWnd;

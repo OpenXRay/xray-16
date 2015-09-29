@@ -5,14 +5,13 @@
 #include "UI3tButton.h"
 #include "UIListBox.h"
 #include "UIListBoxItem.h"
-#include "../level.h"
-#include "../game_cl_teamdeathmatch.h"
-#include "../../xrEngine/xr_ioconsole.h"
+#include "Level.h"
+#include "game_cl_teamdeathmatch.h"
+#include "xrEngine/xr_ioconsole.h"
 #include "UIMapList.h"
-
 #include "object_broker.h"
-#include "../UIGameCustom.h"
-#include "../UIDialogHolder.h"
+#include "UIGameCustom.h"
+#include "UIDialogHolder.h"
 
 xr_token	game_types		[];
 
@@ -140,7 +139,7 @@ void CUIChangeMap::OnBtnOk()
 		HideDialog					();
 	}
 }
-#include "../string_table.h"
+#include "string_table.h"
 void CUIChangeMap::FillUpList()
 {
 	lst->Clear				();

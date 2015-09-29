@@ -1,7 +1,7 @@
 
 
 	#include <stdlib.h>
-    #include "../../xrcore/_types.h"
+    #include "xrCore/_types.h"
 	#undef FLT_MAX
 	#undef FLT_MIN
 	#include <stdio.h>

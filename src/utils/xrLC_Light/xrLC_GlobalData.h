@@ -1,15 +1,12 @@
 #pragma once
 
-#include "../shader_xrlc.h"
-#include "../../xrcore/xrPool.h"
-//#include "xrface.h"
+#include "utils/Shader_xrLC.h"
+#include "xrCore/xrPool.h"
 #include "xrfacedefs.h"
 #include "xrdeflectordefs.h"
 #include "b_build_texture.h"
 #include "base_lighting.h"
-#include "../../editors/LevelEditor/Engine/communicate.h"
-//#include "mu_model_face.h"
-//#include "mu_model_face_defs.h"
+#include "editors/LevelEditor/Engine/communicate.h"
 //struct _face;
 //struct _vertex;
 namespace CDB{

@@ -3,7 +3,7 @@
 #include "Actor.h"
 #include "inventory.h"
 #include "weapon.h"
-#include "level.h"
+#include "Level.h"
 
 float const CFireDispertionController::default_inertion = 5.91f;	//time to pass value of dispertion = 1
 

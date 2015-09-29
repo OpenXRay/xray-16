@@ -2,8 +2,8 @@
 
 #include	"ik_anim_state.h"
 
-//#include	"../Include/xrRender/KinematicsAnimated.h"
-#include	"../Include/xrRender/KinematicsAnimated.h"
+//#include	"Include/xrRender/KinematicsAnimated.h"
+#include	"Include/xrRender/KinematicsAnimated.h"
 #include "xrCore/Animation/Motion.hpp"
 
 IC bool is_in( const motion_marks::interval &i, float v )

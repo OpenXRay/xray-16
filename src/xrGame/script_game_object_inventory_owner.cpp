@@ -11,7 +11,7 @@
 #include "character_info.h"
 #include "gametask.h"
 #include "actor.h"
-#include "level.h"
+#include "Level.h"
 #include "date_time.h"
 #include "uigamesp.h"
 #include "restricted_object.h"

@@ -14,8 +14,8 @@ BOOL	exact_normalize					(Fvector3&	a);
 BOOL	exact_normalize					(float*		a);
 
 
-//#include "../xrLC_Light/xrFace.h"
-//#include "../xrLC_Light/xrDeflector.h"
+//#include "utils/xrLC_Light/xrFace.h"
+//#include "utils/xrLC_Light/xrDeflector.h"
 //#include "vbm.h"
 //#include "OGF_Face.h"
 

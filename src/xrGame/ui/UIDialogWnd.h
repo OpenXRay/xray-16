@@ -1,7 +1,7 @@
 #pragma once
-
 #include "uiwindow.h"
-#include "../UIDialogHolder.h"
+#include "UIDialogHolder.h"
+
 class CDialogHolder;
 
 class CUIDialogWnd : public CUIWindow  

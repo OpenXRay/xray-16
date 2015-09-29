@@ -9,10 +9,10 @@
 #include "pch_script.h"
 #include "base_client_classes.h"
 #include "base_client_classes_wrappers.h"
-#include "../xrEngine/feel_sound.h"
-//#include "../Include/xrRender/RenderVisual.h"
-#include "../Include/xrRender/RenderVisual.h"
-#include "../Include/xrRender/Kinematics.h"
+#include "xrEngine/feel_sound.h"
+//#include "Include/xrRender/RenderVisual.h"
+#include "Include/xrRender/RenderVisual.h"
+#include "Include/xrRender/Kinematics.h"
 #include "ai/stalker/ai_stalker.h"
 
 using namespace luabind;

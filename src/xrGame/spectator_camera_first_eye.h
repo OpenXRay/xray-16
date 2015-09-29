@@ -1,7 +1,7 @@
 #ifndef SPECTATOR_CAMERA_FIRST_EYE
 #define SPECTATOR_CAMERA_FIRST_EYE
 
-#include "../xrcore/ftimer.h"
+#include "xrCore/ftimer.h"
 #include "CameraFirstEye.h"
 
 class CSpectrCameraFirstEye : public CCameraFirstEye

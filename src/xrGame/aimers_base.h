@@ -9,7 +9,7 @@
 #ifndef AIMERS_BASE_H_INCLUDED
 #define AIMERS_BASE_H_INCLUDED
 
-#include "../include/xrrender/animation_motion.h"
+#include "Include/xrRender/animation_motion.h"
 #include <boost/noncopyable.hpp>
 
 class CGameObject;

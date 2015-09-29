@@ -11,7 +11,7 @@
 #define ENGINE_API 
 #define NO_XRC_STATS
 
-#include "../../xrCore/xrCore.h"
+#include "xrCore/xrCore.h"
 
 #pragma warning(push)
 #pragma warning(disable:4995)

@@ -1,5 +1,5 @@
 #pragma once
-#include "../state.h"
+#include "ai/Monsters/state.h"
 
 template<typename _Object>
 class CStateMonsterAttackMoveToHomePoint : public CState<_Object> {

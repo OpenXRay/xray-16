@@ -11,9 +11,9 @@
 #ifdef INGAME_EDITOR
 #include "editor_environment_suns_manager.hpp"
 #include "editor_environment_suns_sun.hpp"
-#include "../include/editor/ide.hpp"
-#include "../include/editor/property_holder.hpp"
-#include "../xrServerEntities/object_broker.h"
+#include "Include/editor/ide.hpp"
+#include "Include/editor/property_holder.hpp"
+#include "xrServerEntities/object_broker.h"
 #include "ide.hpp"
 #include "property_collection.hpp"
 #include "editor_environment_detail.hpp"

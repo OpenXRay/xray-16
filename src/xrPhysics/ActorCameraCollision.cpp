@@ -3,7 +3,7 @@
 //#include "Actor.h"
 #include "actorcameracollision.h"
 
-#include "../xrEngine/CameraBase.h"
+#include "xrEngine/CameraBase.h"
 #include "xrEngine/GameMtlLib.h"
 
 #include "phworld.h"

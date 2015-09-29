@@ -2,7 +2,7 @@
 
 #include "physics_world_scripted.h"
 
-#include "level.h"
+#include "Level.h"
 
 #include "PHCommander.h"
 

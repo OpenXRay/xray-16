@@ -4,7 +4,7 @@
 
 #include <boost/noncopyable.hpp>
 #include "mixed_delegate.h"
-#include "../xrGameSpy/GameSpy/GP/gp.h"
+#include "xrGameSpy/GameSpy/GP/gp.h"
 #include "account_manager.h"
 #include "script_export_space.h"
 #include "login_manager.h"

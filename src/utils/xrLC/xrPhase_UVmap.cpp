@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "build.h"
 
-#include "../xrLC_Light/xrDeflector.h"
-#include "../xrLC_Light/xrLC_GlobalData.h"
-#include "../xrLC_Light/xrface.h"
+#include "utils/xrLC_Light/xrDeflector.h"
+#include "utils/xrLC_Light/xrLC_GlobalData.h"
+#include "utils/xrLC_Light/xrface.h"
 
 
 

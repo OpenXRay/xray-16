@@ -21,8 +21,8 @@
 #include "UIHint.h"
 
 #include "UIInventoryUtilities.h"
-#include "../string_table.h"
-#include "../level.h"
+#include "string_table.h"
+#include "Level.h"
 
 
 UIMapLegend::UIMapLegend()

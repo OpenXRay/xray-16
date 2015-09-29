@@ -12,8 +12,8 @@
 
 #include "editor_environment_levels_manager.hpp"
 #include "editor_environment_weathers_manager.hpp"
-#include "../include/editor/property_holder.hpp"
-#include "../include/editor/ide.hpp"
+#include "Include/editor/property_holder.hpp"
+#include "Include/editor/ide.hpp"
 #include "ide.hpp"
 
 using editor::environment::levels::manager;

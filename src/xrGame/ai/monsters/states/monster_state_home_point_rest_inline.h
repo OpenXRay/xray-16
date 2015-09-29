@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../monster_home.h"
+#include "ai/Monsters/monster_home.h"
 
 #define TEMPLATE_SPECIALIZATION template <\
 	typename _Object\

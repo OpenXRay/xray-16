@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "xrMU_Model.h"
-#include "../shader_xrlc.h"
+#include "utils/Shader_xrLC.h"
 
 bool	cmp_face_material		(_face* f1, _face* f2)
 {

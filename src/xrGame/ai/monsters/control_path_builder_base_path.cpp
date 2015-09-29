@@ -1,13 +1,13 @@
 #include "stdafx.h"
-#include "control_path_builder_base.h"
-#include "../../cover_point.h"
-#include "../../cover_manager.h"
-#include "../../cover_evaluators.h"
-#include "BaseMonster/base_monster.h"
-#include "../../detail_path_manager.h"
-#include "../../level_location_selector.h"
-#include "../../level_path_manager.h"
-#include "../../ai_object_location.h"
+#include "ai/monsters/control_path_builder_base.h"
+#include "cover_point.h"
+#include "cover_manager.h"
+#include "cover_evaluators.h"
+#include "ai/Monsters/BaseMonster/base_monster.h"
+#include "detail_path_manager.h"
+#include "level_location_selector.h"
+#include "level_path_manager.h"
+#include "ai_object_location.h"
 
 const float		pmt_find_point_dist				= 30.f;
 const u32		pmt_find_random_pos_attempts	= 5;

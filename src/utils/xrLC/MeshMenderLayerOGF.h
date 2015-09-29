@@ -1,11 +1,11 @@
 #ifndef _MESH_MENDER_LAYER_OGF_H_
 #define _MESH_MENDER_LAYER_OGF_H_
 
-#include	"../../common/NvMender2003/nvMeshMender.h"
-#include	"../../common/NvMender2003/mender_input_output.h"
-#include	"../../common/NvMender2003/remove_isolated_verts.h"
+#include "common/NvMender2003/nvMeshMender.h"
+#include "common/NvMender2003/mender_input_output.h"
+#include "common/NvMender2003/remove_isolated_verts.h"
 
-#include	"OGF_Face.h"
+#include "OGF_Face.h"
 
 IC void	set_vertex( MeshMender::Vertex &out_vertex, const OGF_Vertex& in_vertex )
 {

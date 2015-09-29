@@ -5,7 +5,7 @@
 
 #pragma once
 #include "artefact.h"
-#include "../xrEngine/feel_touch.h"
+#include "xrEngine/feel_touch.h"
 
 #include "entity_alive.h"
 

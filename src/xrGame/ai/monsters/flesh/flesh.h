@@ -1,7 +1,7 @@
 #pragma once
-#include "../BaseMonster/base_monster.h"
-#include "../controlled_entity.h"
-#include "../../../../xrServerEntities/script_export_space.h"
+#include "ai/Monsters/BaseMonster/base_monster.h"
+#include "ai/Monsters/controlled_entity.h"
+#include "xrServerEntities/script_export_space.h"
 
 class CAI_Flesh : public CBaseMonster,
 				  public CControlledEntity<CAI_Flesh> {

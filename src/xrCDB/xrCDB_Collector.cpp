@@ -1,5 +1,5 @@
 #include "stdafx.h"
-//.#include "../xrCore/xrCore.h"
+//.#include "xrCore/xrCore.h"
 #pragma hdrstop
 
 #include "xrCDB.h"

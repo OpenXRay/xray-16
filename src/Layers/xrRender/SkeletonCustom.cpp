@@ -6,7 +6,7 @@
 #include	"SkeletonX.h"
 #include "xrCore/FMesh.hpp"
 #ifndef _EDITOR
-#include	"../../xrEngine/Render.h"
+#include	"xrEngine/Render.h"
 #endif
 int			psSkeletonUpdate	= 32;
 xrCriticalSection	UCalc_Mutex
@@ -16,9 +16,9 @@ xrCriticalSection	UCalc_Mutex
 ;
 
 #ifndef _EDITOR
-#include "../../xrServerEntities/smart_cast.h"
+#include "xrServerEntities/smart_cast.h"
 #else
-#include "../../Include/xrAPI/xrAPI.h"
+#include "Include/xrAPI/xrAPI.h"
 #endif
 
 //////////////////////////////////////////////////////////////////////

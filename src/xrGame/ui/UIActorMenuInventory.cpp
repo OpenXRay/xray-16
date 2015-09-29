@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "UIActorMenu.h"
-#include "../inventory.h"
-#include "../inventoryOwner.h"
+#include "Inventory.h"
+#include "inventoryOwner.h"
 #include "UIInventoryUtilities.h"
 #include "UIItemInfo.h"
-#include "../Level.h"
+#include "Level.h"
 #include "UICellItemFactory.h"
 #include "UIDragDropListEx.h"
 #include "UIDragDropReferenceList.h"
@@ -16,26 +16,23 @@
 #include "UIMainIngameWnd.h"
 #include "UIGameCustom.h"
 #include "eatable_item_object.h"
-
-#include "../silencer.h"
-#include "../scope.h"
-#include "../grenadelauncher.h"
-#include "../Artefact.h"
-#include "../eatable_item.h"
-#include "../BottleItem.h"
-#include "../WeaponMagazined.h"
-#include "../Medkit.h"
-#include "../Antirad.h"
-#include "../CustomOutfit.h"
-#include "../ActorHelmet.h"
-#include "../UICursor.h"
-#include "../MPPlayersBag.h"
-#include "../player_hud.h"
-#include "../CustomDetector.h"
-#include "../PDA.h"
-
-#include "../actor_defs.h"
-
+#include "Silencer.h"
+#include "Scope.h"
+#include "GrenadeLauncher.h"
+#include "Artefact.h"
+#include "eatable_item.h"
+#include "BottleItem.h"
+#include "WeaponMagazined.h"
+#include "Medkit.h"
+#include "Antirad.h"
+#include "CustomOutfit.h"
+#include "ActorHelmet.h"
+#include "UICursor.h"
+#include "MPPlayersBag.h"
+#include "player_hud.h"
+#include "CustomDetector.h"
+#include "PDA.h"
+#include "actor_defs.h"
 
 void move_item_from_to(u16 from_id, u16 to_id, u16 what_id);
 
@@ -963,7 +960,7 @@ void CUIActorMenu::PropertiesBoxForWeapon( CUICellItem* cell_item, PIItem item, 
 		}
 	}
 }
-#include "../string_table.h"
+#include "string_table.h"
 void CUIActorMenu::PropertiesBoxForAddon( PIItem item, bool& b_show )
 {
 	//присоединение аддонов к активному слоту (2 или 3)

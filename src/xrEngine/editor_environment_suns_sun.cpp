@@ -10,7 +10,7 @@
 
 #ifdef INGAME_EDITOR
 #include "editor_environment_suns_sun.hpp"
-#include "../include/editor/ide.hpp"
+#include "Include/editor/ide.hpp"
 #include "editor_environment_manager.hpp"
 #include "ide.hpp"
 #include "editor_environment_detail.hpp"

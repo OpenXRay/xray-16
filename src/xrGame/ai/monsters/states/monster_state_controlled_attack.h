@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../state.h"
+#include "ai/Monsters/state.h"
 #include "monster_state_attack.h"
 
 template<typename _Object>

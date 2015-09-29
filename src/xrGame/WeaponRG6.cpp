@@ -2,8 +2,8 @@
 #include "WeaponRG6.h"
 #include "entity.h"
 #include "explosiveRocket.h"
-#include "level.h"
-#include "../xrphysics/MathUtils.h"
+#include "Level.h"
+#include "xrPhysics/MathUtils.h"
 #include "actor.h"
 
 #ifdef DEBUG

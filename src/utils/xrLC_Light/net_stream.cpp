@@ -306,7 +306,7 @@ CReadMemoryBlock::	~CReadMemoryBlock	()
 	//Memory.mem_free( data );
 }
 
-#include "../../xrCore/FS_impl.h"
+#include "xrCore/FS_impl.h"
 u32 INetReader::find_chunk				(u32 ID, BOOL* bCompressed)
 {
 	R_ASSERT( false );

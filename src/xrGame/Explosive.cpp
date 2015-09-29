@@ -6,7 +6,7 @@
 
 #include "explosive.h"
 
-#include "../xrphysics/PhysicsShell.h"
+#include "xrPhysics/PhysicsShell.h"
 #include "entity.h"
 //#include "PSObject.h"
 #include "ParticlesObject.h"
@@ -16,25 +16,25 @@
 
 #include "actor.h"
 #include "actoreffector.h"
-#include "level.h"
+#include "Level.h"
 #include "level_bullet_manager.h"
 #include "xrmessages.h"
 #include "xrEngine/GameMtlLib.h"
 
 #ifdef DEBUG
-#	include "../xrEngine/StatGraph.h"
+#	include "xrEngine/StatGraph.h"
 #	include "PHDebug.h"
 #endif
 
 //#include "Physics.h"
-#include "../xrphysics/MathUtils.h"
-//#include "../xrphysics/phvalidevalues.h"
-#include "../xrphysics/iActivationShape.h"
-#include "../xrphysics/iphworld.h"
+#include "xrPhysics/MathUtils.h"
+//#include "xrPhysics/phvalidevalues.h"
+#include "xrPhysics/iActivationShape.h"
+#include "xrPhysics/iphworld.h"
 #include "game_base_space.h"
 #include "profiler.h"
 
-#include "../Include/xrRender/Kinematics.h"
+#include "Include/xrRender/Kinematics.h"
 #define EFFECTOR_RADIUS 30.f
 const u16	TEST_RAYS_PER_OBJECT=5;
 const u16	BLASTED_OBJ_PROCESSED_PER_FRAME=3;

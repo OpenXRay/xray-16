@@ -6,11 +6,10 @@
 
 #include "stdafx.h"
 #include "detail_slot_calculate.h"
-
 #include "xrCDB/Intersect.hpp"
 #include "base_lighting.h"
 #include "global_calculation_data.h"
-#include "../shader_xrlc.h"
+#include "utils/Shader_xrLC.h"
 
 enum
 {

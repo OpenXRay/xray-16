@@ -2,7 +2,7 @@
 #include "harvest_time.h"
 #include "kills_store.h"
 #include "game_base.h"
-#include "level.h"
+#include "Level.h"
 #include "game_state_accumulator.h"
 
 namespace award_system

@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "GameSpy_Full.h"
-
 #include "GameSpy_Available.h"
 #include "GameSpy_Patching.h"
 #include "GameSpy_HTTP.h"
@@ -8,9 +7,8 @@
 #include "GameSpy_GP.h"
 #include "GameSpy_SAKE.h"
 #include "GameSpy_ATLAS.h"
-#include "../MainMenu.h"
+#include "MainMenu.h"
 #include "object_broker.h"
-
 
 CGameSpy_Full::CGameSpy_Full()	
 {

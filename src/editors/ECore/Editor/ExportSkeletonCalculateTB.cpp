@@ -7,13 +7,13 @@
 
 #ifndef	_EDITOR
 //
-#include "../../xrEngine/defines.h"
+#include "xrEngine/defines.h"
 //
-#include "../../xrCore/xrCore.h"
+#include "xrCore/xrCore.h"
 
-#include "../../../Layers/xrRender/hwcaps.h"
-#include "../../../Layers/xrRender/hw.h"
-#include "../../../xrEngine/pure.h"
+#include "Layers/xrRender/hwcaps.h"
+#include "Layers/xrRender/hw.h"
+#include "xrEngine/pure.h"
 class CGameFont;
 #include "..\..\include\xrRender\drawutils.h"
 #include "..\..\Layers\xrRender\xrD3dDefs.h"

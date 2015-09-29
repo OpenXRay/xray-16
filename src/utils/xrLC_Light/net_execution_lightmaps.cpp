@@ -8,7 +8,7 @@
 #include "xrdeflector.h"
 
 #include "execute_statistics.h"
-#include "../../xrcore/ftimer.h"
+#include "xrCore/ftimer.h"
 
 namespace lc_net
 {

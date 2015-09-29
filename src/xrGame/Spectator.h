@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "../xrEngine/feel_touch.h"
-#include "../xrEngine/iinputreceiver.h"
+#include "xrEngine/feel_touch.h"
+#include "xrEngine/iinputreceiver.h"
 
 #include "entity.h"
 #include "actor_flags.h"

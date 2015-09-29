@@ -12,7 +12,7 @@
 #ifdef INGAME_EDITOR
 
 #include <boost/noncopyable.hpp>
-#include "../include/editor/property_holder.hpp"
+#include "Include/editor/property_holder.hpp"
 #include "property_collection_forward.hpp"
 
 namespace editor

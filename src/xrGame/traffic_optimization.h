@@ -1,8 +1,8 @@
 #ifndef TRAFFIC_OPTIMIZATION_INCLUDED
 #define TRAFFIC_OPTIMIZATION_INCLUDED
 
-#include "../xrCore/compression_ppmd_stream.h"
-#include "../xrCore/lzo_compressor.h"
+#include "xrCore/compression_ppmd_stream.h"
+#include "xrCore/lzo_compressor.h"
 
 namespace compression
 {

@@ -1,6 +1,6 @@
 #pragma once
 #include "UIDragDropListEx.h"
-#include "../../xrServerEntities/inventory_space.h"
+#include "xrServerEntities/inventory_space.h"
 class CInventoryOwner;
 
 class CUIDragDropReferenceList : public CUIDragDropListEx

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "build.h"
 #include "xrPhase_MergeLM_Rect.h"
-#include "../xrlc_light/xrdeflector.h"
+#include "utils/xrLC_Light/xrdeflector.h"
 
 #include <mmintrin.h>
 #include <emmintrin.h>

@@ -2,8 +2,8 @@
 
 #include "ActorEffector.h"
 #include "PostprocessAnimator.h"
-#include "../xrEngine/effectorPP.h"
-#include "../xrEngine/ObjectAnimator.h"
+#include "xrEngine/effectorPP.h"
+#include "xrEngine/ObjectAnimator.h"
 #include "object_broker.h"
 #include "actor.h"
 

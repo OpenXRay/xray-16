@@ -1,7 +1,7 @@
 #ifndef sh_atomicH
 #define sh_atomicH
 #pragma once
-#include "../../xrCore/xr_resource.h"
+#include "xrCore/xr_resource.h"
 #include "tss_def.h"
 
 #if defined(USE_DX10) || defined(USE_DX11)

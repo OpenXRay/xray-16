@@ -1,8 +1,7 @@
 #pragma once
+#include "xrXMLParser/xrXMLParser.h"
 
-#include "../../xrXMLParser/xrXMLParser.h"
-
-class CUIXml :public CXml
+class CUIXml : public CXml
 {
 	int						m_dbg_id;
 public:

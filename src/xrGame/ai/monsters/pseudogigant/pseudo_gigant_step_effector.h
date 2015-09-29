@@ -1,5 +1,5 @@
 #pragma once
-#include "../../../CameraEffector.h"
+#include "CameraEffector.h"
 
 class CPseudogigantStepEffector : public CEffectorCam {
 	typedef CEffectorCam inherited;	

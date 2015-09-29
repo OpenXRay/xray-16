@@ -3,7 +3,7 @@
 
 #include "xr_input.h"
 #include "IInputReceiver.h"
-#include "../include/editor/ide.hpp"
+#include "Include/editor/ide.hpp"
 
 #ifndef _EDITOR
 # include "xr_input_xinput.h"

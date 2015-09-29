@@ -3,9 +3,9 @@
 //#include "Level.h"
 #include "Geometry.h"
 #include "tri-colliderknoopc/dtricollidermath.h"
-//#include "../xrengine/IGame_Level.h"
+//#include "xrEngine/IGame_Level.h"
 #include "ode_redefine.h"
-#include "../xrcdb/xr_area.h"
+#include "xrCDB/xr_area.h"
 //#include "phworld.h"
 #pragma warning(disable:4995)
 #pragma warning(disable:4267)

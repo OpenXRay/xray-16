@@ -10,9 +10,9 @@
 #pragma warning(default:4995)
 
 #ifndef _EDITOR
-	#include	"../../xrEngine/Render.h"
+	#include	"xrEngine/Render.h"
 #else
-	#include "../../Include/xrAPI/xrAPI.h"
+	#include "Include/xrAPI/xrAPI.h"
 #endif
 
 #include "SkeletonX.h"

@@ -229,8 +229,8 @@ int			ps_r3_dyn_wet_surf_sm_res	= 256;				// 256
 float		ps_r2_gloss_factor			= 4.0f;
 //- Mad Max
 #ifndef _EDITOR
-#include	"../../xrEngine/xr_ioconsole.h"
-#include	"../../xrEngine/xr_ioc_cmd.h"
+#include	"xrEngine/xr_ioconsole.h"
+#include	"xrEngine/xr_ioc_cmd.h"
 
 #if defined(USE_DX10) || defined(USE_DX11)
 #include "../xrRenderDX10/StateManager/dx10SamplerStateCache.h"

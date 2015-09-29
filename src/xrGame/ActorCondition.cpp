@@ -3,7 +3,7 @@
 #include "actor.h"
 #include "actorEffector.h"
 #include "inventory.h"
-#include "level.h"
+#include "Level.h"
 #include "sleepeffector.h"
 #include "game_base_space.h"
 #include "autosave_manager.h"
@@ -392,7 +392,7 @@ void CActorCondition::AffectDamage_InjuriousMaterialAndMonstersInfluence()
 	}//while
 }
 
-#include "characterphysicssupport.h"
+#include "CharacterPhysicsSupport.h"
 float CActorCondition::GetInjuriousMaterialDamage()
 {
 	u16 mat_injurios = m_object->character_physics_support()->movement()->injurious_material_idx();

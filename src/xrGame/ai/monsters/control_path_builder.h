@@ -1,7 +1,6 @@
 #pragma once
-
 #include "control_combase.h"
-#include "../../movement_manager.h"
+#include "movement_manager.h"
 
 class CCustomMonster;
 class CControl_Manager;

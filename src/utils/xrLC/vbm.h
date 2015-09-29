@@ -1,7 +1,7 @@
 #pragma once
 
 #include	"xrCore/FMesh.hpp"
-#include	"../../xrcore/fs.h"
+#include	"xrCore/fs.h"
 
 static const	u32								c_VB_maxSize			= 4096*1024;	// bytes
 // Vertex containers

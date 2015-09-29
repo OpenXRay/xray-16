@@ -1609,7 +1609,6 @@
     <ClInclude Include="steering_behaviour_base.h" />
     <ClInclude Include="steering_behaviour_base_inline.h" />
     <ClInclude Include="steering_behaviour_cohesion.h" />
-    <ClInclude Include="steering_behaviour_manager.h" />
     <ClInclude Include="steering_behaviour_separation.h" />
     <ClInclude Include="step_manager.h" />
     <ClInclude Include="step_manager_defs.h" />
@@ -1654,8 +1653,6 @@
     <ClInclude Include="UITeamState.h" />
     <ClInclude Include="UIZoneMap.h" />
     <ClInclude Include="ui\ArtefactDetectorUI.h" />
-    <ClInclude Include="ui\FactionState.h" />
-    <ClInclude Include="ui\FactionState_inline.h" />
     <ClInclude Include="ui\KillMessageStruct.h" />
     <ClInclude Include="ui\map_hint.h" />
     <ClInclude Include="ui\MMSound.h" />
@@ -1696,7 +1693,6 @@
     <ClInclude Include="ui\UIEditBox.h" />
     <ClInclude Include="ui\UIEditBoxEx.h" />
     <ClInclude Include="ui\UIEditKeyBind.h" />
-    <ClInclude Include="ui\UIFactionWarWnd.h" />
     <ClInclude Include="ui\UIFixedScrollBar.h" />
     <ClInclude Include="ui\UIFrameLineWnd.h" />
     <ClInclude Include="ui\UIFrameWindow.h" />
@@ -1758,9 +1754,6 @@
     <ClInclude Include="ui\UIProgressShape.h" />
     <ClInclude Include="ui\UIPropertiesBox.h" />
     <ClInclude Include="ui\UIRadioButton.h" />
-    <CustomBuild Include="ui\UIRankFaction.h">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </CustomBuild>
     <ClInclude Include="ui\UIRankIndicator.h" />
     <ClInclude Include="ui\UIRankingWnd.h" />
     <ClInclude Include="ui\UIScriptWnd.h" />
@@ -1791,11 +1784,9 @@
     <ClInclude Include="ui\UITextureMaster.h" />
     <ClInclude Include="ui\UITextVote.h" />
     <ClInclude Include="ui\UITrackBar.h" />
-    <ClInclude Include="ui\UITrackButton.h" />
     <ClInclude Include="ui\UIVote.h" />
     <ClInclude Include="ui\UIVoteStatusWnd.h" />
     <ClInclude Include="ui\UIVotingCategory.h" />
-    <ClInclude Include="ui\UIWarState.h" />
     <ClInclude Include="ui\UIWindow.h" />
     <ClInclude Include="ui\UIWndCallback.h" />
     <ClInclude Include="ui\UIWpnParams.h" />
@@ -1833,6 +1824,7 @@
     <ClInclude Include="WeaponFORT.h" />
     <ClInclude Include="WeaponGroza.h" />
     <ClInclude Include="WeaponHPSA.h" />
+    <ClInclude Include="WeaponHUD.h" />
     <ClInclude Include="WeaponKnife.h" />
     <ClInclude Include="WeaponLR300.h" />
     <ClInclude Include="WeaponMagazined.h" />
@@ -3687,10 +3679,6 @@
     <ClCompile Include="UITeamState.cpp" />
     <ClCompile Include="UIZoneMap.cpp" />
     <ClCompile Include="ui\ArtefactDetectorUI.cpp" />
-    <ClCompile Include="ui\FactionState.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
     <ClCompile Include="ui\map_hint.cpp" />
     <ClCompile Include="ui\MMSound.cpp" />
     <ClCompile Include="ui\Restrictions.cpp" />
@@ -3762,10 +3750,6 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="ui\UIEditKeyBind.cpp" />
-    <ClCompile Include="ui\UIFactionWarWnd.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
     <ClCompile Include="ui\UIFixedScrollBar.cpp" />
     <ClCompile Include="ui\UIFrameLineWnd.cpp" />
     <ClCompile Include="ui\UIFrameWindow.cpp" />
@@ -3885,9 +3869,6 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="ui\UIRadioButton.cpp" />
-    <ClCompile Include="ui\UIRankFraction.cpp">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="ui\UIRankIndicator.cpp" />
     <ClCompile Include="ui\UIRankingWnd.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -3939,11 +3920,9 @@
     <ClCompile Include="ui\UITextureMaster.cpp" />
     <ClCompile Include="ui\UITextVote.cpp" />
     <ClCompile Include="ui\UITrackBar.cpp" />
-    <ClCompile Include="ui\UITrackButton.cpp" />
     <ClCompile Include="ui\UIVote.cpp" />
     <ClCompile Include="ui\UIVoteStatusWnd.cpp" />
     <ClCompile Include="ui\UIVotingCategory.cpp" />
-    <ClCompile Include="ui\UIWarState.cpp" />
     <ClCompile Include="ui\UIWindow.cpp" />
     <ClCompile Include="ui\UIWindow_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>

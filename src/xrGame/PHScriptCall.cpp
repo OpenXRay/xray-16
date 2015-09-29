@@ -5,7 +5,7 @@
 #include "PHCommander.h"
 
 
-#include "../xrEngine/xr_object.h"
+#include "xrEngine/xr_object.h"
 
 
 /*

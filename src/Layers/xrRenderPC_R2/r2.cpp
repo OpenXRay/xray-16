@@ -1,16 +1,16 @@
 #include "stdafx.h"
 #include "r2.h"
 #include "../xrRender/fbasicvisual.h"
-#include "../../xrEngine/xr_object.h"
-#include "../../xrEngine/CustomHUD.h"
-#include "../../xrEngine/igame_persistent.h"
-#include "../../xrEngine/environment.h"
+#include "xrEngine/xr_object.h"
+#include "xrEngine/CustomHUD.h"
+#include "xrEngine/igame_persistent.h"
+#include "xrEngine/environment.h"
 #include "../xrRender/SkeletonCustom.h"
 #include "../xrRender/LightTrack.h"
 #include "../xrRender/dxRenderDeviceRender.h"
 #include "../xrRender/dxWallMarkArray.h"
 #include "../xrRender/dxUIShader.h"
-//#include "../../xrServerEntities/smart_cast.h"
+//#include "xrServerEntities/smart_cast.h"
 
 CRender										RImplementation;
 
@@ -524,7 +524,7 @@ CRender::~CRender()
 {
 }
 
-#include "../../xrEngine/GameFont.h"
+#include "xrEngine/GameFont.h"
 void	CRender::Statistics	(CGameFont* _F)
 {
 	CGameFont&	F	= *_F;

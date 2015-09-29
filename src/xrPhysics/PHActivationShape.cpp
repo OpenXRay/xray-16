@@ -11,15 +11,15 @@
 #include "xrEngine/GameMtlLib.h"
 //#include "Level.h"
 #include "PHWorld.h"
-#include "../3rd party/ode/ode/src/util.h"
+#include "3rd party/ode/ode/src/util.h"
 
 #ifdef DEBUG
 #	include "debug_output.h"
 #endif // DEBUG
 
 #include "PHDynamicData.h"
-#include "../xrserverentities/PHSynchronize.h"
-#include "../xrserverentities/phnetstate.h"
+#include "xrServerEntities/PHSynchronize.h"
+#include "xrServerEntities/phnetstate.h"
 static	float max_depth			=0.f;
 static	float friction_factor	=0.f;
 static	const float cfm				=1.e-10f;

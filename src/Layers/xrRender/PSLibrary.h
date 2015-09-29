@@ -4,7 +4,7 @@
 #ifndef PSLibraryH
 #define PSLibraryH
 
-#include "../../include/xrRender/particles_systems_library_interface.hpp"
+#include "Include/xrRender/particles_systems_library_interface.hpp"
 
 namespace PS {
 	class CPEDef;

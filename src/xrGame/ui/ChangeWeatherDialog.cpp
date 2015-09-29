@@ -2,13 +2,13 @@
 #include "ChangeWeatherDialog.hpp"
 #include "UIXmlInit.h"
 #include "UI3tButton.h"
-#include "../game_cl_teamdeathmatch.h"
+#include "game_cl_teamdeathmatch.h"
 #include "UIKickPlayer.h"
 #include "UIChangeMap.h"
 #include <dinput.h>
 #include "xrEngine/XR_IOConsole.h"
 #include "UIMapList.h"
-#include "../UIGameCustom.h"
+#include "UIGameCustom.h"
 
 ButtonListDialog::ButtonListDialog()
 {

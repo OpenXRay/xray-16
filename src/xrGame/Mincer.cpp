@@ -4,7 +4,7 @@
 #include "PHDestroyable.h"
 #include "mincer.h"
 #include "xrmessages.h"
-#include "level.h"
+#include "Level.h"
 #include "CustomZone.h"
 #include "entity_alive.h"
 #include "PHDestroyableNotificate.h"

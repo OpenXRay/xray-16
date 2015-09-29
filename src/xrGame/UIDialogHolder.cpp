@@ -3,10 +3,10 @@
 #include "ui/UIDialogWnd.h"
 #include "UIGameCustom.h"
 #include "UICursor.h"
-#include "level.h"
+#include "Level.h"
 #include "actor.h"
 #include "xr_level_controller.h"
-#include "../xrEngine/CustomHud.h"
+#include "xrEngine/CustomHud.h"
 
 dlgItem::dlgItem(CUIWindow* pWnd)
 {

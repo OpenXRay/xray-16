@@ -4,10 +4,10 @@
 #include "UIStatic.h"
 #include "UIGameCustom.h"
 #include "UIXmlInit.h"
-#include "../game_cl_mp.h"
+#include "game_cl_mp.h"
 #include <dinput.h>
-#include "../level.h"
-#include "../string_table.h"
+#include "Level.h"
+#include "string_table.h"
 
 CUISpeechMenu::CUISpeechMenu(LPCSTR section_name)
 {

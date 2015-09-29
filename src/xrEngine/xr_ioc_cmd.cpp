@@ -11,7 +11,7 @@
 #include "xr_input.h"
 #include "CustomHUD.h"
 
-#include "../Include/xrRender/RenderDeviceRender.h"
+#include "Include/xrRender/RenderDeviceRender.h"
 
 #include "xr_object.h"
 

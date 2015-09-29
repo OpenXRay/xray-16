@@ -8,17 +8,17 @@
 
 #include "stdafx.h"
 #include "ai_stalker.h"
-#include "../../stalker_animation_manager.h"
-#include "../../script_entity_action.h"
-#include "../../torch.h"
-#include "../../inventory.h"
-#include "../../weapon.h"
-#include "../../weaponmagazined.h"
-#include "../../../Include/xrRender/Kinematics.h"
-#include "../../../xrServerEntities/script_engine.h"
-#include "../../sight_manager.h"
-#include "../../stalker_movement_manager_smart_cover.h"
-#include "../../ai_space.h"
+#include "stalker_animation_manager.h"
+#include "script_entity_action.h"
+#include "Torch.h"
+#include "Inventory.h"
+#include "Weapon.h"
+#include "WeaponMagazined.h"
+#include "Include/xrRender/Kinematics.h"
+#include "xrServerEntities/script_engine.h"
+#include "sight_manager.h"
+#include "stalker_movement_manager_smart_cover.h"
+#include "ai_space.h"
 
 CWeapon	*CAI_Stalker::GetCurrentWeapon() const
 {

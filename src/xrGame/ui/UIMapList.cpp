@@ -9,12 +9,10 @@
 #include "UIMapInfo.h"
 #include "UIComboBox.h"
 #include "UIListBoxItem.h"
-#include "../../xrEngine/xr_ioconsole.h"
-#include "../string_table.h"
-
+#include "xrEngine/xr_ioconsole.h"
+#include "string_table.h"
 #include "object_broker.h"
 #include "game_base.h"
-
 #include "ui/UICDkey.h"
 
 extern ENGINE_API string512		g_sLaunchOnExit_app;
@@ -243,7 +241,7 @@ const char* CUIMapList::GetCommandLine(LPCSTR player_name){
 
     return m_command.c_str();
 }
-#include "../UIGameCustom.h"
+#include "UIGameCustom.h"
 void CUIMapList::LoadMapList()
 {
     const auto& weathers = gMapListHelper.GetGameWeathers();

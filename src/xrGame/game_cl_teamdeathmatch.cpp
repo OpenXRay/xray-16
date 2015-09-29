@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "game_cl_teamdeathmatch.h"
 #include "xrMessages.h"
-#include "level.h"
+#include "Level.h"
 #include "UIGameTDM.h"
 #include "xr_level_controller.h"
 #include "map_manager.h"

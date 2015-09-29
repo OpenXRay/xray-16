@@ -2,7 +2,7 @@
 #include "UIWndCallback.h"
 #include "UIWindow.h"
 #include "object_broker.h"
-#include "../callback_info.h"
+#include "callback_info.h"
 
 bool event_comparer::operator ()(SCallbackInfo* i)
 {

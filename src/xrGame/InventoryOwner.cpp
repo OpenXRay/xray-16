@@ -10,7 +10,7 @@
 #include "script_game_object.h"
 #include "script_engine.h"
 #include "AI_PhraseDialogManager.h"
-#include "level.h"
+#include "Level.h"
 #include "game_base_space.h"
 #include "PhraseDialog.h"
 #include "xrserver.h"

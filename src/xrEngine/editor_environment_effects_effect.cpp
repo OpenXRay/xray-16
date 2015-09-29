@@ -11,7 +11,7 @@
 #ifdef INGAME_EDITOR
 
 #include "editor_environment_effects_effect.hpp"
-#include "../include/editor/property_holder.hpp"
+#include "Include/editor/property_holder.hpp"
 #include "editor_environment_manager.hpp"
 #include "ide.hpp"
 #include "editor_environment_effects_manager.hpp"

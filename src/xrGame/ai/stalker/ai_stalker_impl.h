@@ -7,13 +7,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-
-#include "../../level.h"
-#include "../../seniority_hierarchy_holder.h"
-#include "../../team_hierarchy_holder.h"
-#include "../../squad_hierarchy_holder.h"
-#include "../../group_hierarchy_holder.h"
-#include "../../effectorshot.h"
+#include "Level.h"
+#include "seniority_hierarchy_holder.h"
+#include "team_hierarchy_holder.h"
+#include "squad_hierarchy_holder.h"
+#include "group_hierarchy_holder.h"
+#include "EffectorShot.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "smart_cover_animation_selector.h"
 #include "smart_cover_animation_planner.h"

@@ -1,10 +1,10 @@
 #ifndef MONSTER_STATE_ATTACK_ON_RUN_INLINE_H
 #define MONSTER_STATE_ATTACK_ON_RUN_INLINE_H
 
-#include "../monster_velocity_space.h"
+#include "ai/monsters/monster_velocity_space.h"
 
-#include "../../../../xrCore/_vector3d_ext.h"
-#include "../../../level_graph.h"
+#include "xrCore/_vector3d_ext.h"
+#include "level_graph.h"
 
 #define TEMPLATE_SIGNATURE template <typename _Object>
 
@@ -96,8 +96,8 @@ bool   ATTACK_ON_RUN_STATE::check_control_start_conditions	(ControlCom::EControl
 	return true;
 }
 
-#include "../../../level_debug.h"
-#include "../../../debug_text_tree.h"
+#include "level_debug.h"
+#include "debug_text_tree.h"
 
 TEMPLATE_SIGNATURE
 void   ATTACK_ON_RUN_STATE::set_movement_phaze (phaze const new_phaze)
@@ -435,7 +435,7 @@ void   ATTACK_ON_RUN_STATE::select_prepare_fallback_target ()
 	m_target								=	ai().level_graph().vertex_position(m_target_vertex);
 }
 
-#include "../../../ai_debug_variables.h"
+#include "ai_debug_variables.h"
 
 TEMPLATE_SIGNATURE
 void   ATTACK_ON_RUN_STATE::update_try_min_time ()

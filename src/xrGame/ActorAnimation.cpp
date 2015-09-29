@@ -5,7 +5,7 @@
 #include "weapon.h"
 #include "inventory.h"
 #include "missile.h"
-#include "level.h"
+#include "Level.h"
 #ifdef DEBUG
 #include "PHDebug.h"
 #include "ui_base.h"
@@ -13,7 +13,7 @@
 #include "hit.h"
 #include "PHDestroyable.h"
 #include "Car.h"
-#include "../Include/xrRender/Kinematics.h"
+#include "Include/xrRender/Kinematics.h"
 #include "ai_object_location.h"
 #include "game_cl_base.h"
 #include "xrCore/Animation/Motion.hpp"

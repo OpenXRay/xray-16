@@ -8,10 +8,10 @@
 
 #include "pch_script.h"
 #include "ai_stalker.h"
-#include "../../stalker_decision_space.h"
+#include "stalker_decision_space.h"
 #include "ai_stalker_space.h"
-#include "../../script_game_object.h"
-#include "../../stalker_planner.h"
+#include "script_game_object.h"
+#include "stalker_planner.h"
 
 using namespace luabind;
 

@@ -1,12 +1,12 @@
     #include <stdio.h>
     #include <vector>
     #include <algorithm>
-    #include "../../xrcore/PPMd.h"
-    #include "../../xrcore/compression_ppmd_stream.h"
+    #include "xrCore/PPMd.h"
+    #include "xrCore/compression_ppmd_stream.h"
 
     #pragma warning( disable: 193 128 810 )
-    #include "../xrcompress/lzo/lzo1x.h"
-    #include "../xrcompress/lzo/lzo1y.h"
+    #include "utils/xrCompress/lzo/lzo1x.h"
+    #include "utils/xrCompress/lzo/lzo1y.h"
     #pragma warning( default: 193 128 810 )
 
 	extern compression::ppmd::stream*   trained_model;

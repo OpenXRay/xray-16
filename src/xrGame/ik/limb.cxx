@@ -30,12 +30,9 @@
 
  */
 
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <string.h>
 #include "stdafx.h"
 #include "limb.h"
-//#include "../ode_include.h"
+
 enum { SolvePosOnly = 1, SolvePosAndOrientation = 2 }; 
 
 //

@@ -13,8 +13,8 @@
 #include "camerafirsteye.h"
 #include "script_entity_action.h"
 #include "xr_level_controller.h"
-#include "../Include/xrRender/Kinematics.h"
-#include "level.h"
+#include "Include/xrRender/Kinematics.h"
+#include "Level.h"
 #include "CarWeapon.h"
 
 void	CCar::OnMouseMove(int dx, int dy)

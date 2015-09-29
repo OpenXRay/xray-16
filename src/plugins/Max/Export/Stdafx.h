@@ -11,7 +11,7 @@
 #pragma warning (disable:4995)
 #include "Max.h"
 
-#include "../../../xrCore/xrCore.h"
+#include "xrCore/xrCore.h"
 
 #undef _MIN
 #undef _MAX

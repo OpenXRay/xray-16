@@ -5,9 +5,9 @@
 #include "actoreffector.h"
 #include "Missile.h"
 #include "xrmessages.h"
-#include "level.h"
+#include "Level.h"
 #include "inventory.h"
-#include "../xrEngine/CameraBase.h"
+#include "xrEngine/CameraBase.h"
 #include "player_hud.h"
 #include "xrCore/Animation/SkeletonMotions.hpp"
 

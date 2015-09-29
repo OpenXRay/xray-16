@@ -8,10 +8,10 @@
 #include "tri-colliderKNoOPC\__aabb_tri.h"
 
 #include "phaicharacter.h"
-#include "../xrengine/device.h"
+#include "xrEngine/device.h"
 
 #ifdef DEBUG
-//#	include "../xrEngine/StatGraph.h"
+//#	include "xrEngine/StatGraph.h"
 #	include "debug_output.h"
 //#	include "level.h"
 //#	include "debug_renderer.h"

@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "../../xrEngine/igame_persistent.h"
-#include "../../xrEngine/environment.h"
+#include "xrEngine/igame_persistent.h"
+#include "xrEngine/environment.h"
 
 //////////////////////////////////////////////////////////////////////////
 // tables to calculate view-frustum bounds in world space

@@ -4,10 +4,10 @@
 #endif
 #include "PHObject.h"
 #include "PHInterpolation.h"
-#include "../xrserverentities/PHSynchronize.h"
+#include "xrServerEntities/PHSynchronize.h"
 #include "PHDisabling.h"
 
-#include "../xrEngine/iphysicsshell.h"
+#include "xrEngine/iphysicsshell.h"
 
 
 class IPhysicsShellHolder;

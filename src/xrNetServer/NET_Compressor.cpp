@@ -26,7 +26,7 @@
 #		define	ENCODE	rtc9_compress
 #		define	DECODE	rtc9_decompress
 #	else // NET_USE_LZO_COMPRESSION
-#		include "../xrCore/ppmd_compressor.h"
+#		include "xrCore/ppmd_compressor.h"
 #		define	ENCODE	ppmd_compress
 #		define	DECODE	ppmd_decompress
 #	endif // NET_USE_LZO_COMPRESSION

@@ -1,19 +1,15 @@
-
 #include "stdafx.h"
 #include "UICDkey.h"
 #include "UILines.h"
-#include "../../xrEngine/line_edit_control.h"
-#include "../MainMenu.h"
-
-#include "../../xrEngine/xr_IOConsole.h"
-#include "../RegistryFuncs.h"
-#include "../../xrGameSpy/xrGameSpy_MainDefs.h"
+#include "xrEngine/line_edit_control.h"
+#include "MainMenu.h"
+#include "xrEngine/xr_IOConsole.h"
+#include "RegistryFuncs.h"
+#include "xrGameSpy/xrGameSpy_MainDefs.h"
 #include "player_name_modifyer.h"
-
 #include "gamespy/GameSpy_GP.h"
-
 #include <dinput.h>
-#include "../xrCore/os_clipboard.h"
+#include "xrCore/os_clipboard.h"
 
 extern string64	gsCDKey;
 LPCSTR AddHyphens( LPCSTR c );

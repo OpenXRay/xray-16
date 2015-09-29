@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../../../ai_space.h"
-#include "../monster_cover_manager.h"
-#include "../../../cover_point.h"
-#include "../../../level.h"
-#include "../../../level_debug.h"
+#include "ai_space.h"
+#include "ai/monsters/monster_cover_manager.h"
+#include "cover_point.h"
+#include "Level.h"
+#include "level_debug.h"
 
 
 #define TEMPLATE_SPECIALIZATION template <\

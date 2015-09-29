@@ -1,7 +1,7 @@
 #ifndef PLAYER_AWARDS
 #define PLAYER_AWARDS
 
-#include "../xrServerEntities/associative_vector.h"
+#include "xrServerEntities/associative_vector.h"
 #include "mixed_delegate.h"
 #include "atlas_stalkercoppc_v1.h"
 #include "script_export_space.h"

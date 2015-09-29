@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "radioactivezone.h"
-#include "level.h"
+#include "Level.h"
 #include "xrmessages.h"
 #include "xrCore/Animation/Bone.hpp"
 #include "actor.h"
 #include "game_base_space.h"
 #include "Hit.h"
-#include "../xrengine/xr_collide_form.h"
+#include "xrEngine/xr_collide_form.h"
 
 CRadioactiveZone::CRadioactiveZone(void) 
 {}

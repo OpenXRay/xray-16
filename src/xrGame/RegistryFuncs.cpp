@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "RegistryFuncs.h"
-#include "../xrGameSpy/xrGameSpy_MainDefs.h"
+#include "xrGameSpy/xrGameSpy_MainDefs.h"
 
 #define REGISTRY_BASE	HKEY_LOCAL_MACHINE
 

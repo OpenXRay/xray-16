@@ -7,7 +7,6 @@
 
 #include "pch_script.h"
 #include "UIRankingWnd.h"
-
 #include "UIFixedScrollBar.h"
 #include "UIXmlInit.h"
 #include "UIProgressBar.h"
@@ -15,16 +14,14 @@
 #include "UIScrollView.h"
 #include "UIHelper.h"
 #include "UIInventoryUtilities.h"
-
-#include "../actor.h"
-#include "../ai_space.h"
-#include "../alife_simulator.h"
-
-#include "../../xrServerEntities/script_engine.h"
-#include "../character_community.h"
-#include "../character_reputation.h"
-#include "../relation_registry.h"
-#include "../string_table.h"
+#include "Actor.h"
+#include "ai_space.h"
+#include "alife_simulator.h"
+#include "xrServerEntities/script_engine.h"
+#include "character_community.h"
+#include "character_reputation.h"
+#include "relation_registry.h"
+#include "string_table.h"
 #include "UICharacterInfo.h"
 #include "ui_base.h"
 

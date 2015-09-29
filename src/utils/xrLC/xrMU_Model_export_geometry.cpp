@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "../xrLC_Light/xrMU_Model.h"
+#include "utils/xrLC_Light/xrMU_Model.h"
 #include "OGF_Face.h"
 
 const u32	max_tile	= 16;

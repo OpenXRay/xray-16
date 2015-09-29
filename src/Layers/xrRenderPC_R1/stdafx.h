@@ -5,7 +5,7 @@
 #pragma once
 
 #pragma warning(disable:4995)
-#include "../../xrEngine/stdafx.h"
+#include "xrEngine/stdafx.h"
 #pragma warning(disable:4995)
 #include <d3dx9.h>
 #pragma warning(default:4995)
@@ -28,16 +28,16 @@
 
 #include "../xrRender/resourcemanager.h"
 
-#include "../../xrEngine/vis_common.h"
-#include "../../xrEngine/render.h"
-#include "../../xrEngine/_d3d_extensions.h"
+#include "xrEngine/vis_common.h"
+#include "xrEngine/render.h"
+#include "xrEngine/_d3d_extensions.h"
 
 #ifndef _EDITOR
-#include "../../xrEngine/igame_level.h"
+#include "xrEngine/igame_level.h"
 
 #include "../xrRender/blenders\blender.h"
 #include "../xrRender/blenders\blender_clsid.h"
-#include "../../xrParticles/psystem.h"
+#include "xrParticles/psystem.h"
 #include "../xrRender/xrRender_console.h"
 #include "FStaticRender.h"
 #endif

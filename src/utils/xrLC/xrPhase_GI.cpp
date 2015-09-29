@@ -3,11 +3,11 @@
 #include "build.h"
 
 #include "utils/xrLCUtil/xrThread.hpp"
-#include "../xrLC_Light/xrLC_GlobalData.h"
-#include "../xrLC_Light/xrface.h"
+#include "utils/xrLC_Light/xrLC_GlobalData.h"
+#include "utils/xrLC_Light/xrface.h"
 
-#include "../../xrcore/xrSyncronize.h"
-#include "../../xrcdb/xrcdb.h"
+#include "xrCore/xrSyncronize.h"
+#include "xrCDB/xrCDB.h"
 
 
 #define	GI_THREADS		2

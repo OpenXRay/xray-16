@@ -2,7 +2,7 @@
 #define GAMESPY_PROFILE_STORE
 
 #include <boost/noncopyable.hpp>
-#include "../xrEngine/ISheduled.h"
+#include "xrEngine/ISheduled.h"
 #include "profile_data_types.h"
 #include "script_export_space.h"
 #include "queued_async_method.h"

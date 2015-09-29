@@ -2,7 +2,7 @@
 
 #include "UIDialogWnd.h"
 #include "UIWndCallback.h"
-#include "../../xrServerEntities/inventory_space.h"
+#include "xrServerEntities/inventory_space.h"
 #include "UIHint.h"
 
 class CUICharacterInfo;

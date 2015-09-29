@@ -197,7 +197,7 @@ bool CUIMpTradeWnd::TryToBuyItem(SBuyItemInfo* buy_itm, u32 buy_flags, SBuyItemI
 	}
 	return						true;
 }
-#include "../string_table.h"
+#include "string_table.h"
 bool CUIMpTradeWnd::CheckBuyPossibility(const shared_str& sect_name, u32 buy_flags, bool b_silent)
 {
 	string256					info_buffer;

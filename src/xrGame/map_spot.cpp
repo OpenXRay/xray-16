@@ -4,14 +4,14 @@
 
 #include "ui/UIXmlInit.h"
 #include "ui/UIMApWnd.h"
-#include "level.h"
+#include "Level.h"
 #include "ui/UIInventoryUtilities.h"
-#include "../xrEngine/xr_object.h"
+#include "xrEngine/xr_object.h"
 #include "object_broker.h"
 #include "ui/UITextureMaster.h"
 #include "ui/UIHelper.h"
 
-#include "../Include/xrRender/UIShader.h"
+#include "Include/xrRender/UIShader.h"
 #include "gametaskmanager.h"
 #include "gametask.h"
 

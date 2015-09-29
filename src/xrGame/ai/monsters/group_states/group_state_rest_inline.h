@@ -1,13 +1,12 @@
 #pragma once
-
-#include "../states/monster_state_rest_sleep.h"
-#include "../states/state_move_to_restrictor.h"
-#include "../ai_monster_squad.h"
-#include "../ai_monster_squad_manager.h"
-#include "../monster_home.h"
-#include "../anomaly_detector.h"
-#include "../states/monster_state_home_point_rest.h"
-#include "../states/monster_state_smart_terrain_task.h"
+#include "ai/Monsters/states/monster_state_rest_sleep.h"
+#include "ai/Monsters/states/state_move_to_restrictor.h"
+#include "ai/Monsters/ai_monster_squad.h"
+#include "ai/Monsters/ai_monster_squad_manager.h"
+#include "ai/Monsters/monster_home.h"
+#include "ai/Monsters/anomaly_detector.h"
+#include "ai/Monsters/states/monster_state_home_point_rest.h"
+#include "ai/Monsters/states/monster_state_smart_terrain_task.h"
 #include "group_state_rest_idle.h"
 #include "group_state_custom.h"
 

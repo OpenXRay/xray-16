@@ -1,10 +1,10 @@
 #ifndef	_MESH_MENDER_LAYER_ORDINARY_STATIC_H_
 #define	_MESH_MENDER_LAYER_ORDINARY_STATIC_H_
 
-#include	"../../common/NvMender2003/nvMeshMender.h"
-#include	"../../common/NvMender2003/mender_input_output.h"
+#include "common/NvMender2003/nvMeshMender.h"
+#include "common/NvMender2003/mender_input_output.h"
 
-#include	"../xrlc_light/xrFace.h"
+#include "utils/xrLC_Light/xrFace.h"
 
 IC void	set_vertex( MeshMender::Vertex &out_vertex, const Vertex& in_veretex, const Fvector2 Ftc )
 {

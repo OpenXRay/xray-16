@@ -9,7 +9,7 @@
 #include "stdafx.h"
 #include "actor_memory.h"
 #include "actor.h"
-#include "../xrEngine/camerabase.h"
+#include "xrEngine/camerabase.h"
 #include "gamepersistent.h"
 
 CActorMemory::CActorMemory					(CActor *actor) :

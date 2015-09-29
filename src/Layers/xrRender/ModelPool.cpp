@@ -4,7 +4,7 @@
 #include "ModelPool.h"
 
 #ifndef _EDITOR
-	#include "../../xrEngine/IGame_Persistent.h"
+	#include "xrEngine/IGame_Persistent.h"
     #include "xrCore/FMesh.hpp"
     #include "fhierrarhyvisual.h"
     #include "SkeletonAnimated.h"

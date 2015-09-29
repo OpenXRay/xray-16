@@ -12,7 +12,7 @@
 #include "UIFrameWindow.h"
 #include "UIXmlInit.h"
 #include "UIHelper.h"
-#include "../string_table.h"
+#include "string_table.h"
 
 UIHint::UIHint()
 {

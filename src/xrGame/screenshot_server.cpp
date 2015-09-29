@@ -5,7 +5,7 @@
 #include "xrServer.h"
 #include "game_sv_base.h"
 #include "game_cl_mp.h"
-#include "../xrCore/fastdelegate.h"
+#include "xrCore/fastdelegate.h"
 
 extern BOOL	g_sv_mp_save_proxy_screenshots;
 extern BOOL g_sv_mp_save_proxy_configs;

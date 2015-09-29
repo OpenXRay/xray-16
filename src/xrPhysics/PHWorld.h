@@ -5,7 +5,7 @@
 #include "IPHWorld.h"
 #include <boost/noncopyable.hpp>
 #include "physics_scripted.h"
-#include "../xrEngine/pure.h"
+#include "xrEngine/pure.h"
 // refs
 struct	SGameMtlPair;
 //class	CPHCommander;

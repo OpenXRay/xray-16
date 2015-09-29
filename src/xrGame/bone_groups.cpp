@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "bone_groups.h"
 #include "Actor.h"
-#include "../Include/xrRender/Kinematics.h"
+#include "Include/xrRender/Kinematics.h"
 
 namespace award_system
 {

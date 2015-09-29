@@ -14,7 +14,7 @@
 #include "script_binder_object.h"
 #include "script_game_object.h"
 #include "gameobject.h"
-#include "level.h"
+#include "Level.h"
 
 // comment next string when commiting
 //#define DBG_DISABLE_SCRIPTS

@@ -10,10 +10,10 @@
 class ENGINE_API IRender_DetailModel;
 class ENGINE_API CLAItem;
 
-#include "../Include/xrRender/FactoryPtr.h"
-#include "../Include/xrRender/LensFlareRender.h"
-#include "../Include/xrRender/ThunderboltDescRender.h"
-#include "../Include/xrRender/ThunderboltRender.h"
+#include "Include/xrRender/FactoryPtr.h"
+#include "Include/xrRender/LensFlareRender.h"
+#include "Include/xrRender/ThunderboltDescRender.h"
+#include "Include/xrRender/ThunderboltRender.h"
 
 #ifdef INGAME_EDITOR
 # define INGAME_EDITOR_VIRTUAL virtual

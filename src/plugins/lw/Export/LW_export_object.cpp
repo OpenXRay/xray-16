@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "../../../editors/ECore/Editor/editobject.h"
-#include "../../../xrCore/FileSystem.h"
-#include "../../../xrCore/FS.h"
+#include "../editors/ECore/Editor/editobject.h"
+#include "xrCore/FileSystem.h"
+#include "xrCore/FS.h"
 #include "xrCore/Animation/Bone.hpp"
 #include "Globals.hpp"
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../sound_player.h"
+#include "sound_player.h"
 
 #define TEMPLATE_SPECIALIZATION template <\
 	typename _Object\

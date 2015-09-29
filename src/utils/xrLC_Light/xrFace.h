@@ -1,12 +1,9 @@
 #pragma once
 
 
-#include "../shader_xrlc.h"
-//#include "r_light.h"
-
+#include "utils/Shader_xrLC.h"
 #include "tcf.h"
 #include "base_face.h"
-
 #include "MeshStructure.h"
 #include "serialize.h"
 

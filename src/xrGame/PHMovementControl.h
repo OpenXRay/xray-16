@@ -2,11 +2,11 @@
 #ifndef CPHMOVEMENT_CONTROL_H
 #define CPHMOVEMENT_CONTROL_H
 
-//#include "../xrphysics/PHCharacter.h"
-//#include "../xrphysics/MathUtils.h"
-#include "../xrphysics/physicsexternalcommon.h"
-#include "../xrphysics/mathutils.h"
-#include "../xrphysics/movementboxdynamicactivate.h"
+//#include "xrPhysics/PHCharacter.h"
+//#include "xrPhysics/MathUtils.h"
+#include "xrPhysics/physicsexternalcommon.h"
+#include "xrPhysics/mathutils.h"
+#include "xrPhysics/movementboxdynamicactivate.h"
 namespace ALife {
 	enum EHitType;
 };

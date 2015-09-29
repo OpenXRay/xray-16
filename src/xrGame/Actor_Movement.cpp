@@ -3,10 +3,10 @@
 #include "actor.h"
 #include "inventory.h"
 #include "weapon.h"
-#include "../xrEngine/CameraBase.h"
+#include "xrEngine/CameraBase.h"
 #include "xrMessages.h"
 
-#include "level.h"
+#include "Level.h"
 #include "UIGameCustom.h"
 #include "string_table.h"
 #include "actorcondition.h"

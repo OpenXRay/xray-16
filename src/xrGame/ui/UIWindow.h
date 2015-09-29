@@ -1,5 +1,5 @@
 #pragma once
-#include "../xr_level_controller.h"
+#include "xr_level_controller.h"
 class CUIWindow;
 
 struct _12b	{ DWORD _[3]; };
@@ -65,7 +65,7 @@ template<class _Ty, class _Other>	inline	bool operator!=(const uialloc<_Ty>&, co
 //////////////////////////////////////////////////////////////////////////
 
 #include "UIMessages.h"
-#include "../../xrServerEntities/script_export_space.h"
+#include "xrServerEntities/script_export_space.h"
 #include "uiabstract.h"
 
 

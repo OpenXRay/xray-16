@@ -2,7 +2,7 @@
 #define GamePersistentH
 #pragma once
 
-#include "../xrEngine/IGame_Persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 class CMainMenu;
 class CUICursor;
 class CParticlesObject;

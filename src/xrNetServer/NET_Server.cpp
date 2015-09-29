@@ -5,7 +5,7 @@
 #include <functional>
 
 #include "NET_Log.h"
-#include "../xrGameSpy/xrGameSpy_MainDefs.h"
+#include "xrGameSpy/xrGameSpy_MainDefs.h"
 
 #pragma warning(push)
 #pragma warning(disable:4995)

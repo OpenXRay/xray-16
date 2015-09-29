@@ -21,7 +21,7 @@
 #include "xrserver.h"
 #include "level_graph.h"
 #include "inventory_upgrade_manager.h"
-#include "level.h"
+#include "Level.h"
 
 #pragma warning(push)
 #pragma warning(disable:4995)

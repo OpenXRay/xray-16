@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "searchlight.h"
-#include "../xrEngine/LightAnimLibrary.h"
+#include "xrEngine/LightAnimLibrary.h"
 #include "script_entity_action.h"
 #include "xrServer_Objects_ALife.h"
-#include "../Include/xrRender/Kinematics.h"
+#include "Include/xrRender/Kinematics.h"
 #include "game_object_space.h"
 
 //////////////////////////////////////////////////////////////////////

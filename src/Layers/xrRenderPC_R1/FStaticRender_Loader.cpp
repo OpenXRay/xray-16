@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "../xrRender/fbasicvisual.h"
 #include "xrCore/FMesh.hpp"
-#include "../../xrEngine/xrLevel.h"
-#include "../../xrEngine/x_ray.h"
-#include "../../xrEngine/IGame_Persistent.h"
-#include "../../xrCore/stream_reader.h"
+#include "xrEngine/xrLevel.h"
+#include "xrEngine/x_ray.h"
+#include "xrEngine/IGame_Persistent.h"
+#include "xrCore/stream_reader.h"
 
 #include "../xrRender/dxRenderDeviceRender.h"
 

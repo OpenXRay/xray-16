@@ -9,7 +9,7 @@
 #include "stdafx.h"
 #include "attachment_owner.h"
 #include "attachable_item.h"
-#include "../Include/xrRender/Kinematics.h"
+#include "Include/xrRender/Kinematics.h"
 #include "inventory_item.h"
 #include "physicsshellholder.h"
 

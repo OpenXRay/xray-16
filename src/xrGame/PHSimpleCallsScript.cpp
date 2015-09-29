@@ -1,7 +1,7 @@
 #include "pch_script.h"
 
 #include "PHSimpleCalls.h"
-#include "../xrphysics/PhysicsShell.h"
+#include "xrPhysics/PhysicsShell.h"
 
 
 using namespace luabind;

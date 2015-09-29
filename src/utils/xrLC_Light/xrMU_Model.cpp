@@ -4,7 +4,7 @@
 #include "serialize.h"
 #include "mu_model_face.h"
 #include "vector_clear.h"
-#include "../../xrcore/xrPool.h"
+#include "xrCore/xrPool.h"
 
 xrMU_Model::xrMU_Model(): 
 m_lod_ID(u16(-1)),read_faces(0),read_vertices(0),write_faces(0), write_vertices(0)

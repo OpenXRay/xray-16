@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "xrMU_Model.h"
 #include "xrMU_Model_Reference.h"
+#include "xrCDB/xrCDB.h"
+#include "utils/Shader_xrLC.h"
 
-#include "../../xrcdb/xrcdb.h"
-#include "../shader_xrlc.h"
 void xrMU_Model::export_cform_rcast	(CDB::CollectorPacked& CL, Fmatrix& xform)
 {
 	for		(u32 fit=0; fit<m_faces.size(); fit++)	m_faces[fit]->flags.bProcessed = false;

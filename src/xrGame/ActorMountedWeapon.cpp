@@ -2,7 +2,7 @@
 #pragma hdrstop
 
 #include "actor.h"
-#include "../xrEngine/CameraBase.h"
+#include "xrEngine/CameraBase.h"
 #include "ActorEffector.h"
 #include "CharacterPhysicsSupport.h"
 

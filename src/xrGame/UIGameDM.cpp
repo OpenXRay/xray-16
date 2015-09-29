@@ -6,7 +6,7 @@
 #include "ui/UIPdaWnd.h"
 #include "ui/UIMapDesc.h"
 #include "ui/KillMessageStruct.h"
-#include "level.h"
+#include "Level.h"
 #include "game_cl_base.h"
 #include "Spectator.h"
 #include "Inventory.h"

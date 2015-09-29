@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "screenshot_manager.h"
-#include "level.h"
+#include "Level.h"
 #include "game_cl_mp.h"
 #include "xrCore/ppmd_compressor.h"
 #include "screenshots_writer.h"

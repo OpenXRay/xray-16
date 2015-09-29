@@ -2,14 +2,14 @@
 #ifdef DEBUG
 //#include "physics.h"
 //#include "MathUtils.h"
-#include "../xrEngine/StatGraph.h"
+#include "xrEngine/StatGraph.h"
 #include "PHDebug.h"
 //#include "physics.h"
-#include "../xrphysics/MathUtils.h"
+#include "xrPhysics/MathUtils.h"
 //#include "PHObject.h"
-#include "../xrphysics/ExtendedGeom.h"
-#include "../xrphysics/iphworld.h"
-#include "../xrphysics/physicsshell.h"
+#include "xrPhysics/ExtendedGeom.h"
+#include "xrPhysics/iphworld.h"
+#include "xrPhysics/physicsshell.h"
 
 
 #include "Level.h"
@@ -17,10 +17,10 @@
 #include "debug_renderer.h"
 #include "physicsshellholder.h"
 
-#include "../Include/xrRender/Kinematics.h"
-#include "../Include/xrRender/KinematicsAnimated.h"
+#include "Include/xrRender/Kinematics.h"
+#include "Include/xrRender/KinematicsAnimated.h"
 #include "xrCore/Animation/Bone.hpp"
-#include "../xrEngine/iphdebug.h"
+#include "xrEngine/iphdebug.h"
 //#include "phelement.h"
 #include "ui_base.h"
 

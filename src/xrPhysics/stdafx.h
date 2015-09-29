@@ -5,25 +5,25 @@
 #define ENGINE_API
 #define DLL_API		
 #define ECORE_API
-//#include "../xrEngine/stdafx.h"
+//#include "xrEngine/stdafx.h"
 
-#include "../xrCore/xrCore.h"
+#include "xrCore/xrCore.h"
 
-#include "../xrServerEntities/smart_cast.h"
-//#include "../xrEngine/pure.h"
-//#include "../xrEngine/engineapi.h"
-//#include "../xrEngine/eventapi.h"
+#include "xrServerEntities/smart_cast.h"
+//#include "xrEngine/pure.h"
+//#include "xrEngine/engineapi.h"
+//#include "xrEngine/eventapi.h"
 
 
-#include "../xrcdb/xrcdb.h"
-#include "../xrsound/sound.h"
-//#include "../xrengine/IGame_Level.h"
+#include "xrCDB/xrCDB.h"
+#include "xrSound/sound.h"
+//#include "xrEngine/IGame_Level.h"
 
 #pragma comment( lib, "xrCore.lib"	)
 
 #include "xrPhysics.h"
 
-#include "../include/xrapi/xrapi.h"
+#include "Include/xrAPI/xrapi.h"
 #ifdef	DEBUG
 #include "d3d9types.h"
 #endif

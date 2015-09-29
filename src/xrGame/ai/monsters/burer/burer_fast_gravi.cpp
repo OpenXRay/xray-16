@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "burer_fast_gravi.h"
 #include "burer.h"
-#include "../control_animation_base.h"
-#include "../control_direction_base.h"
-#include "../control_movement_base.h"
+#include "ai/monsters/control_animation_base.h"
+#include "ai/monsters/control_direction_base.h"
+#include "ai/monsters/control_movement_base.h"
 
 bool CBurerFastGravi::check_start_conditions()
 {

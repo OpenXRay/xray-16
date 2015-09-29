@@ -2,12 +2,12 @@
 #include "UIBoosterInfo.h"
 #include "UIStatic.h"
 #include "object_broker.h"
-#include "../EntityCondition.h"
-#include "..\actor.h"
-#include "../ActorCondition.h"
+#include "EntityCondition.h"
+#include "Actor.h"
+#include "ActorCondition.h"
 #include "UIXmlInit.h"
 #include "UIHelper.h"
-#include "../string_table.h"
+#include "string_table.h"
 
 CUIBoosterInfo::CUIBoosterInfo()
 {

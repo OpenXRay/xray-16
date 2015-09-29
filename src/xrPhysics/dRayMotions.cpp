@@ -4,13 +4,13 @@ struct dContactGeom;
 int dCollideCylRay(dxGeom *o1, dxGeom *o2, int flags,dContactGeom *contact, int skip);
 //#pragma warning(disable:4995)
 //#pragma warning(disable:4267)
-//#include "../3rd party/ode/ode/src/collision_kernel.h"
+//#include "3rd party/ode/ode/src/collision_kernel.h"
 //#pragma warning(default:4995)
 //#pragma warning(default:4267)
 
 #pragma warning(disable:4995)
 #pragma warning(disable:4267)
-#include "../3rd party/ode/ode/src/collision_std.h"
+#include "3rd party/ode/ode/src/collision_std.h"
 #pragma warning(default:4995)
 #pragma warning(default:4267)
 struct dxRayMotions

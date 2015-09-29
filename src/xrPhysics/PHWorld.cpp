@@ -15,14 +15,14 @@
 #endif
 //#include "PHCommander.h"
 //#include "PHSimpleCalls.h"
-#include "../xrserverentities/PHSynchronize.h"
-#include "../xrserverentities/phnetstate.h"
+#include "xrServerEntities/PHSynchronize.h"
+#include "xrServerEntities/phnetstate.h"
 #include "geometrybits.h"
 #include "console_vars.h"
-#include "../xrengine/device.h"
-#include "../xrengine/defines.h"
-#include "../xrcdb/xr_area.h"
-#include "../xrcore/fs_internal.h"
+#include "xrEngine/device.h"
+#include "xrEngine/defines.h"
+#include "xrCDB/xr_area.h"
+#include "xrCore/fs_internal.h"
 #ifdef	DEBUG
 //				void DBG_ObjAfterPhDataUpdate	( CPHObject *obj );
 //				void DBG_ObjBeforePhDataUpdate	( CPHObject *obj );

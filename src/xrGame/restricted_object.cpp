@@ -10,7 +10,7 @@
 #include "restricted_object.h"
 #include "space_restriction_manager.h"
 #include "xrServer_Objects_ALife_Monsters.h"
-#include "level.h"
+#include "Level.h"
 #include "ai_space.h"
 #include "level_graph.h"
 #include "space_restriction.h"

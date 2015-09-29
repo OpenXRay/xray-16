@@ -2,8 +2,7 @@
 #define CHIMERA_ATTACK_STATE_INLINE_H_INCLUDED
 
 #include "chimera_attack_state.h"
-
-#include "../../../debug_renderer.h"
+#include "debug_renderer.h"
 
 #ifdef DEBUG
 #define	DEBUG_STATE

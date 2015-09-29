@@ -1,16 +1,16 @@
 #include "stdafx.h"
 #include "build.h"
 
-#include "../xrlc_light/xrdeflector.h"
+#include "utils/xrLC_Light/xrdeflector.h"
 #include "utils/xrLCUtil/xrThread.hpp"
-#include "../xrLC_Light/xrLC_GlobalData.h"
-#include "../xrLC_Light/xrLightVertex.h"
+#include "utils/xrLC_Light/xrLC_GlobalData.h"
+#include "utils/xrLC_Light/xrLightVertex.h"
 
-#include "../../xrcore/xrSyncronize.h"
+#include "xrCore/xrSyncronize.h"
 #include "net.h"
-//#include "../xrLC_Light/net_task_manager.h"
-#include "../xrLC_Light/lcnet_task_manager.h"
-#include "../xrLC_Light/mu_model_light.h"
+//#include "utils/xrLC_Light/net_task_manager.h"
+#include "utils/xrLC_Light/lcnet_task_manager.h"
+#include "utils/xrLC_Light/mu_model_light.h"
 xrCriticalSection	task_CS
 #ifdef PROFILE_CRITICAL_SECTIONS
 	(MUTEX_PROFILE_ID(task_C_S))

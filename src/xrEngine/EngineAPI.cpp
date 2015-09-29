@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "EngineAPI.h"
-#include "../xrcdb/xrXRC.h"
+#include "xrCDB/xrXRC.h"
 
 #include "securom_api.h"
 

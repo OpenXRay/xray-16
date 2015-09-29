@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "../../xrEngine/xrlevel.h"
+#include "xrEngine/xrlevel.h"
 
 #include "utils/xrLCUtil/xrThread.hpp"
 

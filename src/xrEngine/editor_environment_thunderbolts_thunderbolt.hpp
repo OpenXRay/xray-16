@@ -12,7 +12,7 @@
 #ifdef INGAME_EDITOR
 
 #include <boost/noncopyable.hpp>
-#include "../include/editor/property_holder.hpp"
+#include "Include/editor/property_holder.hpp"
 #include "editor_environment_thunderbolts_gradient.hpp"
 #include "thunderbolt.h"
 

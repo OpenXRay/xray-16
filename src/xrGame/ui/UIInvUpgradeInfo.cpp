@@ -8,8 +8,8 @@
 
 #include "pch_script.h"
 #include "UIInvUpgradeInfo.h"
-#include "../string_table.h"
-#include "../Actor.h"
+#include "string_table.h"
+#include "Actor.h"
 
 #include "UIStatic.h"
 #include "UIXmlInit.h"

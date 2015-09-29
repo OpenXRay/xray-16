@@ -1,11 +1,11 @@
 #include "stdafx.h"
 
-#include "../xrLC_Light/net_task_manager.h"
+#include "utils/xrLC_Light/net_task_manager.h"
 
-#include "../xrLC_Light/lcnet_task_manager.h"
+#include "utils/xrLC_Light/lcnet_task_manager.h"
 
-#include "../xrLC_Light/lcnet_execution_tasks_add.h"
-#include "../xrLC_Light/net_exec_pool.h"
+#include "utils/xrLC_Light/lcnet_execution_tasks_add.h"
+#include "utils/xrLC_Light/net_exec_pool.h"
 void net_light ()
 {
   

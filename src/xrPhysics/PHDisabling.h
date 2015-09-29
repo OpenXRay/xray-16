@@ -3,7 +3,7 @@
 
 #include "DisablingParams.h"
 //#include "ode_include.h"
-#include "../3rd party/ode/include/ode/common.h"
+#include "3rd party/ode/include/ode/common.h"
 
 struct SDisableVector
 {

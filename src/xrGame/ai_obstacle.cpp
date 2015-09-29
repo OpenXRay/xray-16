@@ -11,7 +11,7 @@
 #include "ai_space.h"
 #include "level_graph.h"
 #include "GameObject.h"
-#include "../Include/xrRender/Kinematics.h"
+#include "Include/xrRender/Kinematics.h"
 #include <boost/crc.hpp>
 
 #include "xrCore/Animation/Bone.hpp"

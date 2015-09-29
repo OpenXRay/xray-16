@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../level.h"
+#include "Level.h"
 
 #define GOOD_DISTANCE_FOR_TELE	15.f
 #define MAX_TIME_CHECK_FAILURE	6000

@@ -1,15 +1,15 @@
 #pragma once
 
-#include "../states/state_move_to_point.h"
-#include "../states/state_look_point.h"
-#include "../states/state_custom_action.h"
-#include "../../../cover_point.h"
-#include "../monster_cover_manager.h"
-#include "../monster_home.h"
+#include "ai/Monsters/states/state_move_to_point.h"
+#include "ai/Monsters/states/state_look_point.h"
+#include "ai/Monsters/states/state_custom_action.h"
+#include "cover_point.h"
+#include "ai/monsters/monster_cover_manager.h"
+#include "ai/Monsters/monster_home.h"
 
-#include "../../../actor.h"
-#include "../../../actor_memory.h"
-#include "../../../visual_memory_manager.h"
+#include "Actor.h"
+#include "actor_memory.h"
+#include "visual_memory_manager.h"
 
 
 #define TEMPLATE_SPECIALIZATION template <\

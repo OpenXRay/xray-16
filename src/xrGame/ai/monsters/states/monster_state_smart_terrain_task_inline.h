@@ -1,10 +1,8 @@
 #pragma once
-
-#include "../../../alife_simulator.h"
-#include "../../../alife_object_registry.h"
-#include "../../../../xrServerEntities/xrserver_objects_alife_monsters.h"
-#include "../../../../xrServerEntities/alife_monster_brain.h"
-
+#include "alife_simulator.h"
+#include "alife_object_registry.h"
+#include "xrServerEntities/xrserver_objects_alife_monsters.h"
+#include "xrServerEntities/alife_monster_brain.h"
 #include "state_move_to_point.h"
 #include "state_custom_action.h"
 #include "monster_state_smart_terrain_task_graph_walk.h"

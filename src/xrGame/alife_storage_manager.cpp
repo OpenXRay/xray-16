@@ -16,11 +16,11 @@
 #include "alife_group_registry.h"
 #include "alife_registry_container.h"
 #include "xrserver.h"
-#include "level.h"
-#include "../xrEngine/x_ray.h"
+#include "Level.h"
+#include "xrEngine/x_ray.h"
 #include "saved_game_wrapper.h"
 #include "string_table.h"
-#include "../xrEngine/igame_persistent.h"
+#include "xrEngine/igame_persistent.h"
 #include "autosave_manager.h"
 
 XRCORE_API string_path g_bug_report_file;

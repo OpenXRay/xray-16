@@ -18,7 +18,7 @@
 #include "alife_spawn_registry.h"
 #include "alife_registry_container.h"
 #include "xrServer.h"
-#include "level.h"
+#include "Level.h"
 
 using namespace luabind;
 

@@ -6,7 +6,7 @@
 #include "physic_item.h"
 #include "static_cast_checked.hpp"
 #include "actoreffector.h"
-#include "../xrEngine/IGame_Persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 
 player_hud* g_player_hud = NULL;
 Fvector _ancor_pos;

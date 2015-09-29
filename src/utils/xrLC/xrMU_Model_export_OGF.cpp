@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
 
-#include "../xrLC_Light/xrMU_Model.h"
-#include "../xrLC_Light/xrMU_Model_Reference.h"
+#include "utils/xrLC_Light/xrMU_Model.h"
+#include "utils/xrLC_Light/xrMU_Model_Reference.h"
 
 #include "build.h"
 #include "OGF_Face.h"

@@ -18,7 +18,7 @@
 #include "level_graph.h"
 
 #ifdef DEBUG
-#	include "level.h"
+#	include "Level.h"
 #endif // DEBUG
 
 using namespace ALife;

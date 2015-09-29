@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "physics_shell_animated.h"
 
-#include	"../xrphysics/physicsshell.h"
+#include	"xrPhysics/physicsshell.h"
 
-#include	"../Include/xrRender/Kinematics.h"
+#include	"Include/xrRender/Kinematics.h"
 
 physics_shell_animated::physics_shell_animated( CPhysicsShellHolder* O, bool _update_velocity ): 
 update_velocity( _update_velocity )

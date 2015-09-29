@@ -2,8 +2,8 @@
 #include "build.h"
 #include "MxStdModel.h"
 #include "MxQSlim.h"
-#include "../../xrcdb/xrcdb.h"
-#include "../../common/face_smoth_flags.h"
+#include "xrCDB/xrCDB.h"
+#include "common/face_smoth_flags.h"
 
 #pragma comment (lib,"xrQSlim.lib")
 

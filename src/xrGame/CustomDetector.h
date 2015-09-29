@@ -1,6 +1,6 @@
 #pragma once
 #include "inventory_item_object.h"
-#include "../xrEngine/feel_touch.h"
+#include "xrEngine/feel_touch.h"
 #include "hudsound.h"
 #include "customzone.h"
 #include "artefact.h"

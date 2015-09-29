@@ -5,14 +5,9 @@
 #include "UIXmlInit.h"
 #include "UI3tButton.h"
 #include "UIEditboxEx.h"
-
-//#include "UIMapList.h"
-#include "../level.h"
-//#include "../game_cl_base.h"
-#include "../game_cl_teamdeathmatch.h"
-#include "../../xrEngine/xr_ioconsole.h"
-
-
+#include "Level.h"
+#include "game_cl_teamdeathmatch.h"
+#include "xrEngine/xr_ioconsole.h"
 
 CUITextVote::CUITextVote(){
 	bkgrnd = xr_new<CUIStatic>(); bkgrnd->SetAutoDelete(true);

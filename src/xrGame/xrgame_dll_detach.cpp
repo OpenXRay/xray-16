@@ -42,7 +42,7 @@ extern void CreateUIGeom							();
 extern void DestroyUIGeom							();
 extern void InitHudSoundSettings					();
 
-#include "../xrEngine/IGame_Persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 void init_game_globals()
 {
 	CreateUIGeom									();

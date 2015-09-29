@@ -2,7 +2,7 @@
 #include "ZoneCampfire.h"
 #include "ParticlesObject.h"
 #include "GamePersistent.h"
-#include "../xrEngine/LightAnimLibrary.h"
+#include "xrEngine/LightAnimLibrary.h"
 /*
 CZoneCampfire* g_zone = NULL;
 void turn_zone()

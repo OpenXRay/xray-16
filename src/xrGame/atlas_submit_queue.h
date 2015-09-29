@@ -2,7 +2,7 @@
 #define ATLAS_SUBMIT_QUEUE_INCLUDED
 
 #include <boost/noncopyable.hpp>
-#include "../xrCore/fastdelegate.h"
+#include "xrCore/fastdelegate.h"
 #include "profile_data_types.h"
 
 namespace gamespy_profile

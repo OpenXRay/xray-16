@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../control_direction_base.h"
-#include "../ai_monster_bones.h"
-#include "../../../ai_monster_space.h"
+#include "ai/monsters/control_direction_base.h"
+#include "ai/Monsters/ai_monster_bones.h"
+#include "ai_monster_space.h"
 
 
 class CController;

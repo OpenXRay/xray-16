@@ -8,7 +8,7 @@
 #include "configs_dumper.h"
 #include "configs_dump_verifyer.h"
 #include "screenshot_server.h"
-#include "../xrCore/fastdelegate.h"
+#include "xrCore/fastdelegate.h"
 
 class CUIWindow;
 class CUISpeechMenu;

@@ -1,15 +1,13 @@
 #include "stdafx.h"
 #include "chimera.h"
 #include "chimera_state_manager.h"
-//#include "../../../../Include/xrRender/KinematicsAnimated.h"
-#include "../../../detail_path_manager.h"
-#include "../monster_velocity_space.h"
-#include "../../../level.h"
-//#include "../../../PhysicsShell.h"
-#include "../../../sound_player.h"
-#include "../control_animation_base.h"
-#include "../control_movement_base.h"
-#include "../control_path_builder_base.h"
+#include "detail_path_manager.h"
+#include "ai/monsters/monster_velocity_space.h"
+#include "Level.h"
+#include "sound_player.h"
+#include "ai/monsters/control_animation_base.h"
+#include "ai/monsters/control_movement_base.h"
+#include "ai/monsters/control_path_builder_base.h"
 
 
 CChimera::CChimera ()

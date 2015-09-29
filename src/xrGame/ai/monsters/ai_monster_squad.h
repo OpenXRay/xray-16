@@ -1,7 +1,7 @@
 #pragma once 
 
 // Lain:
-#include "../../steering_behaviour.h"
+#include "steering_behaviour.h"
 
 class CEntity;
 class CEntityAlive;

@@ -4,7 +4,7 @@
 #define LightAnimLibraryH
 //---------------------------------------------------------------------------
 #ifdef _EDITOR
-#include "../xrEProps/FolderLib.h"
+#include "editors/xrEProps/FolderLib.h"
 #endif
 
 class ENGINE_API CLAItem

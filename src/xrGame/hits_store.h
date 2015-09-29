@@ -2,7 +2,7 @@
 #define HITS_STORE_INCLUDED
 
 #include "obsolete_queue.h"
-#include "../xrServerEntities/associative_vector.h"
+#include "xrServerEntities/associative_vector.h"
 
 namespace award_system
 {

@@ -1,7 +1,7 @@
 #ifndef __XR_COLLIDE_FORM_H__
 #define __XR_COLLIDE_FORM_H__
 
-#include "../xrcdb/xr_collide_defs.h"
+#include "xrCDB/xr_collide_defs.h"
 
 // refs
 class ENGINE_API CObject;

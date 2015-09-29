@@ -142,7 +142,7 @@ float CObjectAnimator::GetLength ()
 
 #ifdef _EDITOR
 
-#include "../ECORE/editor/d3dutils.h"
+#include "editors/ECore/Editor/d3dutils.h"
 #include "envelope.h"
 
 static FvectorVec path_points;

@@ -7,12 +7,12 @@
 #include "UI3tButton.h"
 #include "UITrackBar.h"
 #include "UIComboBox.h"
-#include "../Level.h"
-#include "../xrServer.h"
-#include "../game_cl_base.h"
-#include "../game_cl_mp.h"
-#include "../../xrEngine/xr_ioconsole.h"
-#include "../string_table.h"
+#include "Level.h"
+#include "xrServer.h"
+#include "game_cl_base.h"
+#include "game_cl_mp.h"
+#include "xrEngine/xr_ioconsole.h"
+#include "string_table.h"
 
 extern int g_sv_adm_menu_ping_limit;
 xr_token g_ban_times[] = {

@@ -10,7 +10,7 @@
 
 #ifdef INGAME_EDITOR
 #include "editor_environment_suns_flares.hpp"
-#include "../include/editor/property_holder.hpp"
+#include "Include/editor/property_holder.hpp"
 #include "property_collection.hpp"
 #include "editor_environment_suns_flare.hpp"
 #include "editor_environment_suns_manager.hpp"

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "level.h"
+#include "Level.h"
 #include "game_sv_capture_the_artefact.h"
 
 

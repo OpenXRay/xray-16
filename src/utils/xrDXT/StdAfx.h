@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "../../xrCore/xrCore.h"
+#include "xrCore/xrCore.h"
 #include <io.h>
 #include <fcntl.h>
 #include <sys/stat.h>

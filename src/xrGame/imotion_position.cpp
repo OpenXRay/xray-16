@@ -2,11 +2,11 @@
 
 #include "imotion_position.h"
 
-#include "../xrphysics/physicsshell.h"
-#include "../xrphysics/MathUtils.h"
-#include "../xrphysics/extendedgeom.h"
+#include "xrPhysics/physicsshell.h"
+#include "xrPhysics/MathUtils.h"
+#include "xrPhysics/extendedgeom.h"
 
-#include "../Include/xrRender/Kinematics.h"
+#include "Include/xrRender/Kinematics.h"
 #include <boost/noncopyable.hpp>
 ///////////////////////////////////////////////////////////////////////////////////////
 #include "physicsshellholder.h"

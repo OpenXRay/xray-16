@@ -19,7 +19,7 @@
 #include "../xrRender/LightTrack.h"
 #include "../xrRender/r_sun_cascades.h"
 
-#include "../../xrEngine/irenderable.h"
+#include "xrEngine/irenderable.h"
 #include "xrCore/FMesh.hpp"
 
 class dxRender_Visual;

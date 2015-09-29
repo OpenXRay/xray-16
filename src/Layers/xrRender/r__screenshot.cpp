@@ -1,9 +1,9 @@
 #include "stdafx.h"
-//#include "../../xrEngine/xr_effgamma.h"
+//#include "xrEngine/xr_effgamma.h"
 #include "xr_effgamma.h"
 #include "dxRenderDeviceRender.h"
 #include "../xrRender/tga.h"
-#include "../../xrEngine/xrImage_Resampler.h"
+#include "xrEngine/xrImage_Resampler.h"
 
 #if defined(USE_DX10) || defined(USE_DX11)
 #include "d3dx10tex.h"

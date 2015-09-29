@@ -11,7 +11,7 @@
 
 #ifdef INGAME_EDITOR
 
-#include "../include/editor/ide.hpp"
+#include "Include/editor/ide.hpp"
 
 namespace editor
 {

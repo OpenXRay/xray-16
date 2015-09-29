@@ -4,7 +4,7 @@
 #include "Inventory.h"
 #include "Torch.h"
 #include "BoneProtections.h"
-#include "../Include/xrRender/Kinematics.h"
+#include "Include/xrRender/Kinematics.h"
 //#include "CustomOutfit.h"
 
 CHelmet::CHelmet()

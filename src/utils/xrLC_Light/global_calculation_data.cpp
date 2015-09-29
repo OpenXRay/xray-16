@@ -1,14 +1,9 @@
 #include "stdafx.h"
-
 #include "global_calculation_data.h"
-
-#include "../shader_xrlc.h"
+#include "utils/Shader_xrLC.h"
 #include "serialize.h"
 
 global_claculation_data	gl_data;
-
-
-
 
 template <class T>
 void transfer(const char *name, xr_vector<T> &dest, IReader& F, u32 chunk)
@@ -26,10 +21,6 @@ void transfer(const char *name, xr_vector<T> &dest, IReader& F, u32 chunk)
 
 extern u32*		Surface_Load	(char* name, u32& w, u32& h);
 extern void		Surface_Init	();
-
-// 
-
-
 
 void global_claculation_data::xrLoad()
 {

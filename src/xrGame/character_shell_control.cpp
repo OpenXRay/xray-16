@@ -2,14 +2,14 @@
 
 #include "character_shell_control.h"
 
-#include "../Include/xrRender/Kinematics.h"
+#include "Include/xrRender/Kinematics.h"
 #include "xrCore/Animation/Bone.hpp"
 
 //#include "Physics.h"
-#include "../xrphysics/ExtendedGeom.h"
-#include "../xrphysics/PhysicsShell.h"
+#include "xrPhysics/ExtendedGeom.h"
+#include "xrPhysics/PhysicsShell.h"
 //#include "hit.h"
-#include "level.h"
+#include "Level.h"
 #include "CustomZone.h"
 
 #ifdef DEBUG

@@ -3,13 +3,13 @@
 
 #include <lua/library_linkage.h>
 
-#include	"../../xrEngine/Render.h"
+#include	"xrEngine/Render.h"
 #include	"ResourceManager.h"
 #include	"tss.h"
 #include	"blenders\blender.h"
 #include	"blenders\blender_recorder.h"
-#include	"../../xrEngine/ai_script_space.h"
-#include	"../../xrEngine/ai_script_lua_extension.h"
+#include	"xrEngine/ai_script_space.h"
+#include	"xrEngine/ai_script_lua_extension.h"
 #include	"luabind/return_reference_to_policy.hpp"
 
 #include	"dxRenderDeviceRender.h"
@@ -112,7 +112,7 @@ static void *lua_alloc_dl	(void *ud, void *ptr, size_t osize, size_t nsize) {
 }
 #else // USE_DL_ALLOCATOR
 
-#include "../../xrCore/memory_allocator_options.h"
+#include "xrCore/memory_allocator_options.h"
 
 #ifdef USE_ARENA_ALLOCATOR
 	static const u32	s_arena_size = 8*1024*1024;

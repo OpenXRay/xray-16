@@ -3,8 +3,8 @@
 #include "map_spot.h"
 #include "map_manager.h"
 
-#include "level.h"
-#include "../xrEngine/xr_object.h"
+#include "Level.h"
+#include "xrEngine/xr_object.h"
 #include "ai_space.h"
 #include "game_graph.h"
 #include "xrServer.h"

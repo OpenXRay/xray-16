@@ -11,7 +11,7 @@
 #include "smart_cover_detail.h"
 #include "ai_space.h"
 #include "script_engine.h"
-#include "../xrServerEntities/object_broker.h"
+#include "xrServerEntities/object_broker.h"
 
 using smart_cover::detail::parse_table;
 using smart_cover::detail::parse_string;

@@ -28,7 +28,7 @@
 #include "radioactivezone.h"
 #include "alife_simulator.h"
 #include "alife_object_registry.h"
-#include "../xrServerEntities/xrServer_Objects_ALife_Monsters.h"
+#include "xrServerEntities/xrServer_Objects_ALife_Monsters.h"
 
 using namespace StalkerSpace;
 using namespace StalkerDecisionSpace;

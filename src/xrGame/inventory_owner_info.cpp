@@ -12,7 +12,7 @@
 #include "alife_simulator.h"
 #include "alife_registry_container.h"
 #include "script_game_object.h"
-#include "level.h"
+#include "Level.h"
 #include "infoportion.h"
 #include "alife_registry_wrappers.h"
 #include "script_callback_ex.h"

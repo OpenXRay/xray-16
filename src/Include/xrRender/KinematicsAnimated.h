@@ -4,7 +4,7 @@
 
 #include "xrCore/Animation/SkeletonMotions.hpp"
 #include "animation_blend.h"
-#include "../../layers/xrrender/KinematicAnimatedDefs.h"
+#include "Layers/xrrender/KinematicAnimatedDefs.h"
 
 class	 IKinematics;
 class    CBlend;

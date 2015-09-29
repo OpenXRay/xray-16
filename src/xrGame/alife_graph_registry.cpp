@@ -8,7 +8,7 @@
 
 #include "stdafx.h"
 #include "alife_graph_registry.h"
-#include "../xrEngine/x_ray.h"
+#include "xrEngine/x_ray.h"
 
 using namespace ALife;
 

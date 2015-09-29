@@ -10,7 +10,7 @@
 #include <windows.h>
 #pragma hdrstop
 #include "PPMT_SA.hpp"
-#include "../../xrcore/_types.h"
+#include "xrCore/_types.h"
 
 const int MAX_O=8;
 const int UP_FREQ=5, INT_BITS=7, PERIOD_BITS=7, TOT_BITS=INT_BITS+PERIOD_BITS,

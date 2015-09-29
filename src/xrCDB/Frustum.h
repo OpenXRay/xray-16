@@ -9,7 +9,7 @@
 
 //#pragma once
 
-#include "../xrcore/fixedvector.h"
+#include "xrCore/fixedvector.h"
 
 #pragma pack(push,4)
 

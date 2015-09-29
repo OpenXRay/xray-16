@@ -1,8 +1,7 @@
 #pragma once
-
 #include "UIWindow.h"
 #include "UIDoubleProgressBar.h"
-#include "..\..\xrServerEntities\alife_space.h"
+#include "xrServerEntities/alife_space.h"
 
 class CCustomOutfit;
 class CHelmet;

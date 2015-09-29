@@ -14,7 +14,7 @@ bool		IsGameTypeSingle();
 #include "xrUIXmlParser.h"
 #include "UIXmlInit.h"
 #include "UIInventoryUtilities.h"
-#include "../game_news.h"
+#include "game_news.h"
 #include "UIPdaMsgListItem.h"
 
 CUIMessagesWindow::CUIMessagesWindow()

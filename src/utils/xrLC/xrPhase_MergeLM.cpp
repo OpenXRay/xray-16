@@ -3,9 +3,9 @@
 #include "build.h"
 
 #include "xrPhase_MergeLM_Rect.h"
-#include "../xrlc_light/xrdeflector.h"
-#include "../xrlc_light/xrlc_globaldata.h"
-#include "../xrlc_light/lightmap.h"
+#include "utils/xrLC_Light/xrdeflector.h"
+#include "utils/xrLC_Light/xrlc_globaldata.h"
+#include "utils/xrLC_Light/lightmap.h"
 // Surface access
 extern void _InitSurface	();
 extern BOOL _rect_place		(L_rect &r, lm_layer*		D);
@@ -191,9 +191,9 @@ void CBuild::xrPhase_MergeLM()
 #include "build.h"
 
 #include "xrPhase_MergeLM_Rect.h"
-#include "../xrlc_light/xrdeflector.h"
-#include "../xrlc_light/xrlc_globaldata.h"
-#include "../xrlc_light/lightmap.h"
+#include "utils/xrLC_Light/xrdeflector.h"
+#include "utils/xrLC_Light/xrlc_globaldata.h"
+#include "utils/xrLC_Light/lightmap.h"
 // Surface access
 extern void _InitSurface	();
 extern BOOL _rect_place		(L_rect &r, lm_layer*		D);

@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "actor_mp_client.h"
 #include "actorcondition.h"
-#include "../xrEngine/CameraBase.h"
-#include "../xrEngine/CameraManager.h"
+#include "xrEngine/CameraBase.h"
+#include "xrEngine/CameraManager.h"
 
 #include "game_cl_base.h"
 #include "ui/UIActorMenu.h"

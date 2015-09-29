@@ -1,7 +1,7 @@
 #ifndef _STD_CLSID_
 #define _STD_CLSID_
 
-#include "../../xrcore/clsid.h"
+#include "xrCore/clsid.h"
 
 //***** Standart extension classes
 #define CLSID_HUDMANAGER		MK_CLSID('H','U','D','_','M','N','G','R')

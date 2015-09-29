@@ -8,7 +8,7 @@
 
 #define ENGINE_API 
 #define _WIN32_WINNT 0x0500        
-#include "../../../xrCore/xrCore.h"
+#include "xrCore/xrCore.h"
 
 #pragma warning(push)
 #pragma warning(disable:4995)

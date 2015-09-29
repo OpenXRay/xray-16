@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "controller_direction.h"
 #include "controller.h"
-#include "../../../game_object_space.h"
+#include "game_object_space.h"
 
 const float	_pmt_head_bone_limit	= PI_DIV_6;
 const float	_pmt_torso_bone_limit	= PI_DIV_3;

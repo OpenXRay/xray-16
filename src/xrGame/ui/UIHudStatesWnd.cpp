@@ -1,14 +1,12 @@
 #include "stdafx.h"
 #include "UIHudStatesWnd.h"
-
-#include "../Actor.h"
-#include "../ActorCondition.h"
-#include "../EntityCondition.h"
-#include "../CustomOutfit.h"
-#include "../ActorHelmet.h"
-#include "../inventory.h"
-#include "../RadioactiveZone.h"
-
+#include "Actor.h"
+#include "ActorCondition.h"
+#include "EntityCondition.h"
+#include "CustomOutfit.h"
+#include "ActorHelmet.h"
+#include "Inventory.h"
+#include "RadioactiveZone.h"
 #include "UIStatic.h"
 #include "UIProgressBar.h"
 #include "UIProgressShape.h"
@@ -17,8 +15,8 @@
 #include "ui_arrow.h"
 #include "UIInventoryUtilities.h"
 #include "CustomDetector.h"
-#include "../ai/monsters/basemonster/base_monster.h"
-#include "../PDA.h"
+#include "ai/Monsters/BaseMonster/base_monster.h"
+#include "PDA.h"
 #include "WeaponMagazinedWGrenade.h"
 
 CUIHudStatesWnd::CUIHudStatesWnd()

@@ -14,25 +14,23 @@
 #include "UIStatic.h"
 #include "UIXmlInit.h"
 #include "object_broker.h"
-
 #include "UIHelper.h"
 #include "ui_arrow.h"
 #include "UIHudStatesWnd.h"
-
-#include "../Level.h"
-#include "../location_manager.h"
-#include "../player_hud.h"
+#include "Level.h"
+#include "location_manager.h"
+#include "player_hud.h"
 #include "UIMainIngameWnd.h"
-#include "../UIGameCustom.h"
+#include "UIGameCustom.h"
+#include "Actor.h"
+#include "ActorCondition.h"
+#include "EntityCondition.h"
+#include "CustomOutfit.h"
+#include "ActorHelmet.h"
+#include "Inventory.h"
+#include "Artefact.h"
+#include "string_table.h"
 
-#include "../Actor.h"
-#include "../ActorCondition.h"
-#include "../EntityCondition.h"
-#include "../CustomOutfit.h"
-#include "../ActorHelmet.h"
-#include "../Inventory.h"
-#include "../Artefact.h"
-#include "../string_table.h"
 ui_actor_state_wnd::ui_actor_state_wnd()
 {
 }

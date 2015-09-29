@@ -1,7 +1,7 @@
 #include "xrlc_lightstab.h"
-#include "../xrlc_light/net_light.h"
+#include "utils/xrLC_Light/net_light.h"
 
-#include "../xrlc_light/lightstab_interface.h"
+#include "utils/xrLC_Light/lightstab_interface.h"
 
 #pragma comment(lib,"xrLC_Light.lib")
 

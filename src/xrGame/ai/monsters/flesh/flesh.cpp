@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "flesh.h"
-#include "../../../ai_space.h"
+#include "ai_space.h"
 #include "flesh_state_manager.h"
-#include "../monster_velocity_space.h"
-#include "../control_animation_base.h"
-#include "../control_movement_base.h"
+#include "ai/monsters/monster_velocity_space.h"
+#include "ai/monsters/control_animation_base.h"
+#include "ai/monsters/control_movement_base.h"
 
 
 CAI_Flesh::CAI_Flesh()

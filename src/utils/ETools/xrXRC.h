@@ -6,7 +6,7 @@
 #define AFX_XRXRC_H__9AA25268_621F_4FCA_BD75_AF2E9822B8E3__INCLUDED_
 #pragma once
 
-#include "../../xrCDB/xrCDB.h"
+#include "xrCDB/xrCDB.h"
 
 class ENGINE_API xrXRC
 {

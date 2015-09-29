@@ -8,10 +8,10 @@
 
 #include "stdafx.h"
 #include "base_monster.h"
-#include "../../../../Include/xrRender/KinematicsAnimated.h"
-#include "../../../sound_player.h"
-#include "../../../ai_monster_space.h"
-#include "../control_animation_base.h"
+#include "Include/xrRender/KinematicsAnimated.h"
+#include "sound_player.h"
+#include "ai_monster_space.h"
+#include "ai/Monsters/control_animation_base.h"
 
 // Установка анимации
 void CBaseMonster::SelectAnimation(const Fvector &/**_view/**/, const Fvector &/**_move/**/, float /**speed/**/)

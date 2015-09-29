@@ -2,12 +2,12 @@
 #include "igame_level.h"
 
 #include "xr_object.h"
-#include "../xrcdb/xr_area.h"
+#include "xrCDB/xr_area.h"
 #include "render.h"
 #include "xrLevel.h"
 //#include "fbasicvisual.h"
-#include "../Include/xrRender/RenderVisual.h"
-#include "../Include/xrRender/Kinematics.h"
+#include "Include/xrRender/RenderVisual.h"
+#include "Include/xrRender/Kinematics.h"
 
 #include "x_ray.h"
 #include "GameFont.h"

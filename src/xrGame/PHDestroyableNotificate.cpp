@@ -5,7 +5,7 @@
 #include "PHDestroyable.h"
 #include "Level.h"
 #include "xrServer_Object_Base.h"
-#include "../xrEngine/xr_object.h"
+#include "xrEngine/xr_object.h"
 #include "PhysicsShellHolder.h"
 #include "xrServer_Objects.h"
 void CPHDestroyableNotificate::spawn_notificate(CSE_Abstract* so)

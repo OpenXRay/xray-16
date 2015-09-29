@@ -18,10 +18,10 @@
 #include "game_cl_base.h"
 #include "Actor.h"
 #include "string_table.h"
-#include "../Include/xrRender/Kinematics.h"
+#include "Include/xrRender/Kinematics.h"
 #include "ai_object_location.h"
 #include "object_broker.h"
-#include "../xrEngine/igame_persistent.h"
+#include "xrEngine/igame_persistent.h"
 
 
 #ifdef DEBUG

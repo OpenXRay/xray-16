@@ -3,7 +3,7 @@
 #include "fhierrarhyvisual.h"
 #include "SkeletonCustom.h"
 #include "xrCore/FMesh.hpp"
-#include "../../xrEngine/irenderable.h"
+#include "xrEngine/irenderable.h"
 
 #include "flod.h"
 #include "particlegroup.h"

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UICellCustomItems.h"
 #include "UIInventoryUtilities.h"
-#include "../Weapon.h"
+#include "Weapon.h"
 #include "UIDragDropListEx.h"
 #include "UIProgressBar.h"
 
@@ -193,7 +193,7 @@ CUIWeaponCellItem::CUIWeaponCellItem(CWeapon* itm)
 		m_addon_offset[eLauncher].set(object()->GetGrenadeLauncherX(), object()->GetGrenadeLauncherY());
 }
 
-#include "../xrServerEntities/object_broker.h"
+#include "xrServerEntities/object_broker.h"
 CUIWeaponCellItem::~CUIWeaponCellItem()
 {
 }

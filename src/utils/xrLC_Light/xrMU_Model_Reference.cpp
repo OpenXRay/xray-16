@@ -1,13 +1,9 @@
 #include "stdafx.h"
-
 #include "xrMU_Model_Reference.h"
 #include "xrLC_GlobalData.h"
 #include "xrMU_Model.h"
-
-
-
-#include "../../xrcdb/xrcdb.h"
-#include "../shader_xrlc.h"
+#include "xrCDB/xrCDB.h"
+#include "utils/Shader_xrLC.h"
 #include "xrface.h"
 #include "serialize.h"
 

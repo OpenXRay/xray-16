@@ -10,7 +10,7 @@
 
 #ifdef INGAME_EDITOR
 #include "editor_environment_suns_gradient.hpp"
-#include "../include/editor/property_holder.hpp"
+#include "Include/editor/property_holder.hpp"
 #include "editor_environment_suns_manager.hpp"
 #include "editor_environment_manager.hpp"
 #include "editor_environment_detail.hpp"

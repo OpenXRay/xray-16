@@ -2,7 +2,7 @@
 #include "inventory.h"
 #include "weapon.h"
 #include "actor.h"
-#include "../xrCore/xr_ini.h"
+#include "xrCore/xr_ini.h"
 
 static u32 const ammo_to_cost_map_koef = 3;
 class next_weapon_searcher

@@ -2,7 +2,7 @@
 #include "actor.h"
 #include "UIGameSP.h"
 #include "PDA.h"
-#include "level.h"
+#include "Level.h"
 #include "string_table.h"
 #include "PhraseDialog.h"
 #include "character_info.h"

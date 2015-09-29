@@ -3,7 +3,7 @@
 #include "xrMessages.h"
 #include "UIGameDM.h"
 #include "Spectator.h"
-#include "level.h"
+#include "Level.h"
 #include "xr_level_controller.h"
 #include "actor.h"
 #include "ui/UIMainIngameWnd.h"

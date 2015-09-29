@@ -15,8 +15,8 @@
 //#include "objectdump.h"
 #include "phvalide.h"
 
-#include "../Include/xrRender/Kinematics.h"
-#include "../xrengine/xr_object.h"
+#include "Include/xrRender/Kinematics.h"
+#include "xrEngine/xr_object.h"
 #include "xrCore/Animation/Bone.hpp"
 
 extern CPHWorld			*ph_world;

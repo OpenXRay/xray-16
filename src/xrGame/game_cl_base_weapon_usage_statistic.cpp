@@ -8,7 +8,7 @@
 #include "ExplosiveItem.h"
 #include "xrServer.h"
 #include "game_cl_base_weapon_usage_statistic.h"
-#include "../Include/xrRender/Kinematics.h"
+#include "Include/xrRender/Kinematics.h"
 #include "game_cl_mp.h"
 #include <boost/noncopyable.hpp>
 

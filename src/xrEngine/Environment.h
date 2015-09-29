@@ -20,8 +20,8 @@ class CLensFlareDescriptor;
 
 #define DAY_LENGTH 86400.f
 
-#include "../Include/xrRender/FactoryPtr.h"
-#include "../Include/xrRender/EnvironmentRender.h"
+#include "Include/xrRender/FactoryPtr.h"
+#include "Include/xrRender/EnvironmentRender.h"
 
 #ifdef INGAME_EDITOR
 # define INGAME_EDITOR_VIRTUAL virtual

@@ -1,14 +1,13 @@
 #pragma once
-#include "../BaseMonster/base_monster.h"
-#include "../anim_triple.h"
-#include "../../../../xrServerEntities/script_export_space.h"
-#include "../controlled_actor.h"
+#include "ai/monsters/BaseMonster/base_monster.h"
+#include "ai/monsters/anim_triple.h"
+#include "xrServerEntities/script_export_space.h"
+#include "ai/monsters/controlled_actor.h"
 
 class CControllerAnimation;
 class CControllerDirection;
 class SndShockEffector;
 class CControllerPsyHit;
-class CControllerAura;
 
 class CController : public CBaseMonster,
 					public CControlledActor 

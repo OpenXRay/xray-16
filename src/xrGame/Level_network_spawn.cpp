@@ -1,14 +1,14 @@
 #include "pch_script.h"
 #include "xrServer_Objects_ALife_All.h"
-#include "level.h"
+#include "Level.h"
 #include "game_cl_base.h"
 #include "net_queue.h"
 #include "ai_space.h"
 #include "game_level_cross_table.h"
 #include "level_graph.h"
 #include "client_spawn_manager.h"
-#include "../xrEngine/xr_object.h"
-#include "../xrEngine/IGame_Persistent.h"
+#include "xrEngine/xr_object.h"
+#include "xrEngine/IGame_Persistent.h"
 
 void CLevel::cl_Process_Spawn(NET_Packet& P)
 {

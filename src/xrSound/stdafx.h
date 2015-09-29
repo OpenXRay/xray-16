@@ -6,7 +6,7 @@
 #define stdafxH
 #pragma once
 
-#include "../xrCore/xrCore.h"
+#include "xrCore/xrCore.h"
 
 // mmsystem.h
 #define MMNOSOUND
@@ -27,12 +27,12 @@
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 
-#include "../xrCDB/xrCDB.h"
+#include "xrCDB/xrCDB.h"
 #include "sound.h"
 
 #define ENGINE_API
 
-#include "../xrcore/xr_resource.h"
+#include "xrCore/xr_resource.h"
 
 #ifdef _EDITOR    
 # 	include "ETools.h"

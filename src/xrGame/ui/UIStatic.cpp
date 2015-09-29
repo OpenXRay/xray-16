@@ -2,11 +2,11 @@
 #include "uistatic.h"
 #include "UIXmlInit.h"
 #include "UITextureMaster.h"
-#include "../../xrEngine/LightAnimLibrary.h"
+#include "xrEngine/LightAnimLibrary.h"
 #include "uilines.h"
-#include "../ui_base.h"
+#include "ui_base.h"
 
-#include "../Include/xrRender/UIRender.h"
+#include "Include/xrRender/UIRender.h"
 
 #include "UIBtnHint.h"
 #include "UICursor.h"
@@ -101,7 +101,7 @@ void CUIStatic::DrawText()
 		g_statHint->Draw_();
 }
 
-#include "../../Include/xrRender/UIShader.h"
+#include "Include/xrRender/UIShader.h"
 
 void CUIStatic::DrawTexture()
 {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../state.h"
-#include "../../../ai_debug.h"
+#include "ai/Monsters/state.h"
+#include "ai_debug.h"
 
 template<typename _Object>
 class	CStateGroupAttack : public CState<_Object> 

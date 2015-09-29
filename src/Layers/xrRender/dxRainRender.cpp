@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dxRainRender.h"
 
-#include "../../xrEngine/Rain.h"
+#include "xrEngine/Rain.h"
 
 //	Warning: duplicated in rain.cpp
 static const int	max_desired_items	= 2500;
@@ -46,7 +46,7 @@ void dxRainRender::Copy(IRainRender &_in)
 	*this = *(dxRainRender*)&_in;
 }
 
-#include "../../xrEngine/iGame_persistent.h"
+#include "xrEngine/iGame_persistent.h"
 
 void dxRainRender::Render(CEffect_Rain &owner)
 {

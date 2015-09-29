@@ -1,9 +1,8 @@
 #include "stdafx.h"
 #include "ai_monster_squad.h"
-#include "../../entity.h"
-#include "../../entity_alive.h"
-#include "../../memory_manager.h"
-
+#include "Entity.h"
+#include "entity_alive.h"
+#include "memory_manager.h"
 #include "basemonster/base_monster.h"
 
 CMonsterSquad::CMonsterSquad() : leader(0), m_home_danger_end_tick(0), m_home_danger_mode_time(8000)

@@ -1,22 +1,19 @@
 #include "stdafx.h"
-#include "pseudodog.h"
-#include "pseudodog_state_manager.h"
-
-#include "../control_animation_base.h"
-#include "../control_direction_base.h"
-#include "../control_movement_base.h"
-#include "../control_path_builder_base.h"
-
-#include "../../../actor.h"
-#include "../../stalker/ai_stalker.h"
-#include "../states/monster_state_rest.h"
-#include "../states/monster_state_attack.h"
-#include "../states/monster_state_panic.h"
-#include "../states/monster_state_eat.h"
-#include "../states/monster_state_hear_int_sound.h"
-#include "../states/monster_state_hear_danger_sound.h"
-#include "../states/monster_state_hitted.h"
-
+#include "ai/Monsters/Pseudodog/pseudodog.h"
+#include "ai/Monsters/Pseudodog/pseudodog_state_manager.h"
+#include "ai/monsters/control_animation_base.h"
+#include "ai/monsters/control_direction_base.h"
+#include "ai/monsters/control_movement_base.h"
+#include "ai/monsters/control_path_builder_base.h"
+#include "Actor.h"
+#include "ai/stalker/ai_stalker.h"
+#include "ai/Monsters/states/monster_state_rest.h"
+#include "ai/Monsters/states/monster_state_attack.h"
+#include "ai/Monsters/states/monster_state_panic.h"
+#include "ai/Monsters/states/monster_state_eat.h"
+#include "ai/Monsters/states/monster_state_hear_int_sound.h"
+#include "ai/Monsters/states/monster_state_hear_danger_sound.h"
+#include "ai/Monsters/states/monster_state_hitted.h"
 
 CStateManagerPseudodog::CStateManagerPseudodog(CAI_PseudoDog *monster) : inherited(monster)
 {

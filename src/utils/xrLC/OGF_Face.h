@@ -8,9 +8,9 @@
 #include "utils/ETools/PropSlimTools.h"
 #include "vbm.h"
 
-#include "../xrlc_light/xruvpoint.h"
-#include "../xrlc_light/base_basis.h"
-#include "../xrlc_light/base_color.h"
+#include "utils/xrLC_Light/xruvpoint.h"
+#include "utils/xrLC_Light/base_basis.h"
+#include "utils/xrLC_Light/base_color.h"
 
 struct OGF_Texture
 {

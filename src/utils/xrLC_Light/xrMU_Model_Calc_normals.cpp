@@ -4,7 +4,7 @@
 #include "calculate_normals.h"
 #include "xrMU_Model.h"
 
-#include "../../xrcore/xrPool.h"
+#include "xrCore/xrPool.h"
 
 //#include "build.h"
 

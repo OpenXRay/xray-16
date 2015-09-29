@@ -1,14 +1,14 @@
 #include "stdafx.h"
 #include "climableobject.h "
-#include "../xrphysics/IPHStaticGeomShell.h"
+#include "xrPhysics/IPHStaticGeomShell.h"
 #include "xrServer_Objects_ALife.h"
-#include "../xrphysics/PHCharacter.h"
-#include "../xrphysics/MathUtils.h"
-#include "../xrphysics/extendedgeom.h"
+#include "xrPhysics/PHCharacter.h"
+#include "xrPhysics/MathUtils.h"
+#include "xrPhysics/extendedgeom.h"
 #include "xrEngine/GameMtlLib.h"
 #ifdef DEBUG
 #	include "debug_renderer.h"
-#	include "level.h"
+#	include "Level.h"
 #	include "PHDebug.h"
 #endif
 

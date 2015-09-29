@@ -9,7 +9,7 @@
 #include "xrlc_globaldata.h"
 #include "xrface.h"
 #include "light_point.h"
-#include "../../xrcdb/xrCDB.h"
+#include "xrCDB/xrCDB.h"
 extern XRLC_LIGHT_API void		LightPoint		(CDB::COLLIDER* DB, CDB::MODEL* MDL, base_color_c &C, Fvector &P, Fvector &N, base_lighting& lights, u32 flags, Face* skip);
 void	g_trans_register	(Vertex* V);
 namespace lc_net

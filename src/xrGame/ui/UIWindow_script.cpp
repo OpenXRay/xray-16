@@ -4,7 +4,7 @@
 #include "UIFrameLineWnd.h"
 #include "UIDialogWnd.h"
 #include "UIDialogHolder.h"
-#include "../GamePersistent.h"
+#include "GamePersistent.h"
 #include "UILabel.h"
 #include "UIMMShniaga.h"
 #include "UITextureMaster.h"

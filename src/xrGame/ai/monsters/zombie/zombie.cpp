@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #include "zombie.h"
 #include "zombie_state_manager.h"
-#include "../../../profiler.h"
-#include "../../../../Include/xrRender/KinematicsAnimated.h"
-#include "../../../entitycondition.h"
-#include "../monster_velocity_space.h"
+#include "profiler.h"
+#include "Include/xrRender/KinematicsAnimated.h"
+#include "EntityCondition.h"
+#include "ai/monsters/monster_velocity_space.h"
 
-#include "../control_animation_base.h"
-#include "../control_movement_base.h"
+#include "ai/monsters/control_animation_base.h"
+#include "ai/monsters/control_movement_base.h"
 
 #ifdef _DEBUG
 #include <dinput.h>

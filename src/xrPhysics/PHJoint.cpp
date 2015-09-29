@@ -5,7 +5,7 @@
 #include "PHJointDestroyInfo.h"
 ///////////////////////////////////////////////////////////////
 ///#pragma warning(disable:4995)
-////#include "../xrEngine/ode/src/collision_kernel.h"
+////#include "xrEngine/ode/src/collision_kernel.h"
 //#include <../ode/src/joint.h>
 //#include <../ode/src/objects.h>
 

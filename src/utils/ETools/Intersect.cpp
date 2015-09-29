@@ -2,7 +2,7 @@
 
 #include "etools.h"
 
-#include "../../include/xrrender/kinematics.h"
+#include "Include/xrRender/kinematics.h"
 #define ECORE_API 
 #include "xrCore/Animation/Bone.hpp"
 

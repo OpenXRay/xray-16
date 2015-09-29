@@ -1,5 +1,4 @@
 #include "StdAfx.h"
-
 #include "UIKickPlayer.h"
 #include "UIVotingCategory.h"
 #include "UIXmlInit.h"
@@ -8,10 +7,10 @@
 #include "UIListBoxItem.h"
 #include "UISpinNum.h"
 #include "UIGameCustom.h"
-#include "../level.h"
-#include "../game_cl_base.h"
-#include "../game_cl_teamdeathmatch.h"
-#include "../../xrEngine/xr_ioconsole.h"
+#include "Level.h"
+#include "game_cl_base.h"
+#include "game_cl_teamdeathmatch.h"
+#include "xrEngine/xr_ioconsole.h"
 
 CUIKickPlayer::CUIKickPlayer()
 {

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "level_debug.h"
-#include "../xrEngine/xr_object.h"
-#include "level.h"
+#include "xrEngine/xr_object.h"
+#include "Level.h"
 
 #ifdef DEBUG
 #	include "debug_renderer.h"

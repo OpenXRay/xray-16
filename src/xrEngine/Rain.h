@@ -6,13 +6,13 @@
 #define RainH
 #pragma once
 
-#include "../xrcdb/xr_collide_defs.h"
+#include "xrCDB/xr_collide_defs.h"
 
 //refs
 class ENGINE_API IRender_DetailModel;
 
-#include "../Include/xrRender/FactoryPtr.h"
-#include "../Include/xrRender/RainRender.h"
+#include "Include/xrRender/FactoryPtr.h"
+#include "Include/xrRender/RainRender.h"
 //
 class ENGINE_API CEffect_Rain
 {

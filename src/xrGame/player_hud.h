@@ -1,8 +1,8 @@
 #pragma once
 #include "firedeps.h"
 
-#include "../Include/xrRender/Kinematics.h"
-#include "../Include/xrRender/KinematicsAnimated.h"
+#include "Include/xrRender/Kinematics.h"
+#include "Include/xrRender/KinematicsAnimated.h"
 #include "actor_defs.h"
 
 class player_hud;

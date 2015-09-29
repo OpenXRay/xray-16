@@ -9,8 +9,8 @@ class CGameSpy_Full;
 
 class demo_info_loader;
 
-#include "../xrEngine/IInputReceiver.h"
-#include "../xrEngine/IGame_Persistent.h"
+#include "xrEngine/IInputReceiver.h"
+#include "xrEngine/IGame_Persistent.h"
 #include "UIDialogHolder.h"
 #include "ui/UIWndCallback.h"
 #include "ui_base.h"

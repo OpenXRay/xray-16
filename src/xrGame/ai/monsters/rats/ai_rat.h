@@ -7,14 +7,13 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-
-#include "../../../CustomMonster.h"
-#include "../../../eatable_item.h"
-#include "../../../seniority_hierarchy_holder.h"
-#include "../../../team_hierarchy_holder.h"
-#include "../../../squad_hierarchy_holder.h"
-#include "../../../group_hierarchy_holder.h"
-#include "../../../../xrServerEntities/game_graph_space.h"
+#include "CustomMonster.h"
+#include "eatable_item.h"
+#include "seniority_hierarchy_holder.h"
+#include "team_hierarchy_holder.h"
+#include "squad_hierarchy_holder.h"
+#include "group_hierarchy_holder.h"
+#include "xrServerEntities/game_graph_space.h"
 
 class CBlend;
 class CPatrolPath;

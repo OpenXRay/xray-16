@@ -1,6 +1,5 @@
 #include "stdafx.h"
-
-#include "../xrLC_Light/xrMU_Model.h"
+#include "utils/xrLC_Light/xrMU_Model.h"
 #include "OGF_Face.h"
 #include "build.h"
 
@@ -15,8 +14,8 @@ void MModel_face2OGF_Vertices( const _face &FF, OGF_Vertex	V[3], const xrMU_Mode
 		V[k].P			= _V->P;
 		V[k].N			= _V->N; 
 		V[k].Color		= model.color[id];
-		V[k].T.set		(0,0,0);	//.
-		V[k].B.set		(0,0,0);	//.
+		V[k].T.set		(0,0,0);
+		V[k].B.set		(0,0,0);
 		V[k].UV.push_back(FF.tc[k]);
 	}
 }

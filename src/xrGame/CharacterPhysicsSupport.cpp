@@ -9,18 +9,18 @@
 
 
 
-#include "../Include/xrRender/KinematicsAnimated.h"
+#include "Include/xrRender/KinematicsAnimated.h"
 
 
 
-#include "../xrphysics/PhysicsShell.h"
-#include "../xrphysics/iActivationShape.h"
-//#include "../xrphysics/Extendedgeom.h"
-#include "../xrphysics/geometry.h"
-//#include "../xrphysics/phdynamicdata.h"
-#include "../xrphysics/IPHCapture.h"
-//#include "../xrphysics/ICollideValidator.h"
-#include "../xrphysics/IPHWorld.h"
+#include "xrPhysics/PhysicsShell.h"
+#include "xrPhysics/iActivationShape.h"
+//#include "xrPhysics/Extendedgeom.h"
+#include "xrPhysics/geometry.h"
+//#include "xrPhysics/phdynamicdata.h"
+#include "xrPhysics/IPHCapture.h"
+//#include "xrPhysics/ICollideValidator.h"
+#include "xrPhysics/IPHWorld.h"
 
 //#include "Physics.h"
 
@@ -45,7 +45,7 @@
 extern	BOOL death_anim_debug;
 #endif // DEBUG
 
-#include "../xrEngine/device.h"
+#include "xrEngine/device.h"
 
 #define USE_SMART_HITS
 #define USE_IK

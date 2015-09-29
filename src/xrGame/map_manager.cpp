@@ -2,7 +2,7 @@
 #include "map_manager.h"
 #include "alife_registry_wrappers.h"
 #include "inventoryowner.h"
-#include "level.h"
+#include "Level.h"
 #include "actor.h"
 #include "relation_registry.h"
 #include "GameObject.h"

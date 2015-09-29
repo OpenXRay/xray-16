@@ -11,7 +11,7 @@
 
 #include "pure.h"
 //#include "hw.h"
-#include "../xrcore/ftimer.h"
+#include "xrCore/ftimer.h"
 #include "stats.h"
 //#include "shader.h"
 //#include "R_Backend.h"
@@ -20,11 +20,11 @@
 
 #define DEVICE_RESET_PRECACHE_FRAME_COUNT 10
 
-#include "../Include/xrRender/FactoryPtr.h"
-#include "../Include/xrRender/RenderDeviceRender.h"
+#include "Include/xrRender/FactoryPtr.h"
+#include "Include/xrRender/RenderDeviceRender.h"
 
 #ifdef INGAME_EDITOR
-# include "../Include/editor/interfaces.hpp"
+# include "Include/editor/interfaces.hpp"
 #endif // #ifdef INGAME_EDITOR
 
 class engine_impl;

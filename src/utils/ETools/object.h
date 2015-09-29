@@ -59,7 +59,7 @@ struct MyTri
 #define MESHPT_APP_DEFINED		MyPt	mypt;
 
 
-#include "../../xrcore/xrCore.h"
+#include "xrCore/xrCore.h"
 
 #include "mesh.h"
 #include "MxQMetric.h"

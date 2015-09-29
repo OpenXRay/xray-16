@@ -11,7 +11,7 @@
 
 #include "dedicated_server_only.h"
 #include "no_single.h"
-#include "../xrNetServer/NET_AuthCheck.h"
+#include "xrNetServer/NET_AuthCheck.h"
 
 #include "xr_input.h"
 #include "xr_ioconsole.h"
@@ -20,7 +20,7 @@
 #include "GameFont.h"
 #include "resource.h"
 #include "LightAnimLibrary.h"
-#include "../xrcdb/ispatial.h"
+#include "xrCDB/ispatial.h"
 #include "CopyProtection.h"
 #include "Text_Console.h"
 #include <process.h>
@@ -65,7 +65,7 @@ static int start_year = 1999; // 1999
 
 #ifndef DEDICATED_SERVER
 
-#include "../xrGameSpy/gamespy/md5c.c"
+#include "xrGameSpy/gamespy/md5c.c"
 #include <ctype.h>
 
 #define DEFAULT_MODULE_HASH "3CAABCFCFF6F3A810019C6A72180F166"

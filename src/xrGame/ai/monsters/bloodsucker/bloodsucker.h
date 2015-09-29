@@ -1,13 +1,11 @@
 #pragma once
-
-#include "../BaseMonster/base_monster.h"
-#include "../ai_monster_bones.h"
-#include "../controlled_entity.h"
-#include "../controlled_actor.h"
-#include "../anim_triple.h"
-#include "../../../../xrServerEntities/script_export_space.h"
+#include "ai/Monsters/BaseMonster/base_monster.h"
+#include "ai/Monsters/ai_monster_bones.h"
+#include "ai/Monsters/controlled_entity.h"
+#include "ai/Monsters/controlled_actor.h"
+#include "ai/Monsters/anim_triple.h"
+#include "xrServerEntities/script_export_space.h"
 #include "bloodsucker_alien.h"
-
 
 class CAI_Bloodsucker : public CBaseMonster, 
 						public CControlledActor {

@@ -3,7 +3,7 @@
 #include "dedicated_server_only.h"
 
 #ifdef INGAME_EDITOR
-# include "../include/editor/ide.hpp"
+# include "Include/editor/ide.hpp"
 # include "engine_impl.hpp"
 #endif // #ifdef INGAME_EDITOR
 

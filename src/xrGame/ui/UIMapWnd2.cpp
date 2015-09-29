@@ -2,7 +2,6 @@
 #include "UIMapWnd.h"
 #include "UIMap.h"
 #include "UIXmlInit.h"
-
 #include "UI3tButton.h"
 #include "UIHelper.h"
 #include "UITaskWnd.h"

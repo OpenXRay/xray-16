@@ -3,7 +3,7 @@
 
 #include "event_conditions_collection.h" //for event_action_delegate_t
 #include "game_cl_base_weapon_usage_statistic.h"
-#include "../xrServerEntities/associative_vector.h"
+#include "xrServerEntities/associative_vector.h"
 #include "game_events_handler.h"
 
 namespace award_system

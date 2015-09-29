@@ -3,7 +3,7 @@
 #include "UIScrollView.h"
 #include "UIXmlInit.h"
 #include "UIStatic.h"
-#include "../string_table.h"
+#include "string_table.h"
 
 CUIMapInfo::CUIMapInfo(){
 	m_view = xr_new<CUIScrollView>();	

@@ -7,7 +7,7 @@
 #define ETOOLS_API __declspec( dllimport )
 #endif
 
-#include "../../xrCDB/xrCDB.h"
+#include "xrCDB/xrCDB.h"
 class IKinematics;
 extern "C" {
 	// fast functions

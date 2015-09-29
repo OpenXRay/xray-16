@@ -6,7 +6,7 @@
 //#include "Physics.h"
 
 #ifdef DEBUG
-#	include "../xrEngine/StatGraph.h"
+#	include "xrEngine/StatGraph.h"
 #	include "PHDebug.h"
 #endif // DEBUG
 
@@ -21,8 +21,8 @@
 #include "script_entity_action.h"
 #include "inventory.h"
 #include "xrserver_objects_alife_items.h"
-#include "../Include/xrRender/Kinematics.h"
-#include "level.h"
+#include "Include/xrRender/Kinematics.h"
+#include "Level.h"
 #include "ui/UIMainIngameWnd.h"
 #include "CarWeapon.h"
 #include "game_object_space.h"
@@ -30,7 +30,7 @@
 //#include "PHActivationShape.h"
 #include "CharacterPhysicsSupport.h"
 #include "car_memory.h"
-#include "../xrphysics/IPHWorld.h"
+#include "xrPhysics/IPHWorld.h"
 BONE_P_MAP CCar::bone_map=BONE_P_MAP();
 
 //extern CPHWorld*	ph_world;

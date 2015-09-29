@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "../xrCore/xrCore.h"
+#include "xrCore/xrCore.h"
 
 #pragma warning(push)
 #pragma warning(disable:4995)

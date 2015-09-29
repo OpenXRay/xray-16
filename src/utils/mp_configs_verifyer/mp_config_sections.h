@@ -1,8 +1,8 @@
 #ifndef MP_CONFIG_SECTIONS_INCLUDED
 #define MP_CONFIG_SECTIONS_INCLUDED
 
-#include "../../xrCore/xrCore.h"
-#include "../../xrCore/LocatorAPI.h"
+#include "xrCore/xrCore.h"
+#include "xrCore/LocatorAPI.h"
 //#include "anticheat_dumpable_object.h"
 
 class CGameObject;

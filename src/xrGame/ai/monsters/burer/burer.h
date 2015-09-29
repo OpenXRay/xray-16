@@ -1,9 +1,9 @@
 #pragma once
-#include "../BaseMonster/base_monster.h"
-#include "../telekinesis.h"
-#include "../anim_triple.h"
-#include "../scanning_ability.h"
-#include "../../../../xrServerEntities/script_export_space.h"
+#include "ai/Monsters/BaseMonster/base_monster.h"
+#include "ai/Monsters/telekinesis.h"
+#include "ai/Monsters/anim_triple.h"
+#include "ai/Monsters/scanning_ability.h"
+#include "xrServerEntities/script_export_space.h"
 
 class CCharacterPhysicsSupport;
 class CBurerFastGravi;

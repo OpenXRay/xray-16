@@ -12,31 +12,26 @@
 
 #include "xrUIXmlParser.h"
 #include "UIXmlInit.h"
-#include "../string_table.h"
-
-#include "../actor.h"
-#include "../../xrServerEntities/script_process.h"
-#include "../inventory.h"
-
+#include "string_table.h"
+#include "Actor.h"
+#include "xrServerEntities/script_process.h"
+#include "Inventory.h"
 #include "ai_space.h"
 #include "alife_simulator.h"
 #include "inventory_upgrade_manager.h"
 #include "inventory_upgrade.h"
 #include "inventory_upgrade_property.h"
-
 #include "UIInventoryUtilities.h"
 #include "UIActorMenu.h"
 #include "UIItemInfo.h"
 #include "UIFrameLineWnd.h"
 #include "UI3tButton.h"
 #include "UIHelper.h"
-#include "../ui_defs.h"
-#include "../Weapon.h"
-#include "../WeaponRPG7.h"
-#include "../CustomOutfit.h"
-#include "../ActorHelmet.h"
-
-// -----
+#include "ui_defs.h"
+#include "Weapon.h"
+#include "WeaponRPG7.h"
+#include "CustomOutfit.h"
+#include "ActorHelmet.h"
 
 const LPCSTR g_inventory_upgrade_xml = "inventory_upgrade.xml";
 

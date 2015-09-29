@@ -5,7 +5,7 @@
 #ifdef DEBUG
 //#include "phworld.h"
 //extern CPHWorld	*ph_world;
-#include "../xrphysics/IPHWorld.h"
+#include "xrPhysics/IPHWorld.h"
 #endif
 
 CPHCall::CPHCall(CPHCondition* condition,CPHAction* action)	

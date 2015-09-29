@@ -13,8 +13,8 @@
 #include "game_cl_mp.h"
 #include "reward_event_generator.h"
 
-#include "../Include/xrRender/UIRender.h"
-#include "../Include/xrRender/Kinematics.h"
+#include "Include/xrRender/UIRender.h"
+#include "Include/xrRender/Kinematics.h"
 
 #ifdef DEBUG
 #	include "debug_renderer.h"

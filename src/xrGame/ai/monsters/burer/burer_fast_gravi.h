@@ -1,5 +1,5 @@
 #pragma once
-#include "../control_combase.h"
+#include "ai/Monsters/control_combase.h"
 
 class CBurerFastGravi : public CControl_ComCustom<> {
 	typedef CControl_ComCustom<> inherited;

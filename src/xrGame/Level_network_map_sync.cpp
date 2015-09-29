@@ -1,10 +1,10 @@
 #include "stdafx.h"
-#include "level.h"
+#include "Level.h"
 #include "xrServerMapSync.h"
-#include "../xrCore/stream_reader.h"
+#include "xrCore/stream_reader.h"
 #include "MainMenu.h"
 #include "string_table.h"
-#include "../xrEngine/xr_ioconsole.h"
+#include "xrEngine/xr_ioconsole.h"
 
 static const u32 r_buffer_size = 131072;	//128 Kb
 void CLevel::CalculateLevelCrc32()

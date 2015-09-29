@@ -5,7 +5,7 @@
 
 // Lain: added
 #ifdef DEBUG
-#include "../../debug_text_tree.h"
+#include "debug_text_tree.h"
 #endif
 
 enum EActiveComAction {

@@ -10,7 +10,7 @@
 #include "client_spawn_manager.h" 
 #include "ai_space.h" 
 #include "script_engine.h" 
-#include "level.h"
+#include "Level.h"
 #include "gameobject.h"
 #include "script_game_object.h"
 

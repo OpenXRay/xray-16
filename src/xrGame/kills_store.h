@@ -3,7 +3,7 @@
 
 #include "obsolete_queue.h"
 #include "game_base_kill_type.h"
-#include "../xrServerEntities/associative_vector.h"
+#include "xrServerEntities/associative_vector.h"
 
 namespace award_system
 {

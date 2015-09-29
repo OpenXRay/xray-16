@@ -11,7 +11,7 @@
 
 #pragma pack(push,4)
 #include "xrServer_Space.h"
-#	include "../xrCDB/xrCDB.h"
+#include "xrCDB/xrCDB.h"
 #include "ShapeData.h"
 #include "gametype_chooser.h"
 
@@ -19,22 +19,15 @@ class NET_Packet;
 class CDUInterface;
 
 #ifndef _EDITOR
-    #ifndef XRGAME_EXPORTS
-		#include "../xrSound/Sound.h"
-    #endif
+#ifndef XRGAME_EXPORTS
+#include "xrSound/Sound.h"
+#endif
 #endif
 
 #include "xrEProps.h"
-
-#ifndef XRGAME_EXPORTS
-	#include "..\..\Include\xrRender\DrawUtils.h"
-#else
-	#include "..\Include\xrRender\DrawUtils.h"
-#endif
+#include "Include\xrRender\DrawUtils.h"
 #pragma warning(push)
 #pragma warning(disable:4005)
-
-
 
 class ISE_Shape{
 public:

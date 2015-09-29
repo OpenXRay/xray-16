@@ -2,7 +2,7 @@
 #define ExportSkeletonH
 
 #include "utils/ETools/PropSlimTools.h"
-//#include "../../../Layers/xrRender/SkeletonCustom.h"
+//#include "Layers/xrRender/SkeletonCustom.h"
 #include "EditMesh.h"
 //---------------------------------------------------------------------------
 const int clpSMX = 28, clpSMY=16, clpSMZ=28;

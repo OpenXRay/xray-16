@@ -5,7 +5,7 @@
 
 #include "stdafx.h"
 #include "BlackDrops.h"
-#include "../xrphysics/PhysicsShell.h"
+#include "xrPhysics/PhysicsShell.h"
 
 
 CBlackDrops::CBlackDrops(void) 

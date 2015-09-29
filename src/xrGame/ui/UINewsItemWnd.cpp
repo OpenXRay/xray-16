@@ -2,8 +2,8 @@
 #include "UINewsItemWnd.h"
 #include "UIXmlInit.h"
 #include "UIStatic.h"
-#include "../game_news.h"
-#include "../date_time.h"
+#include "game_news.h"
+#include "date_time.h"
 #include "UIInventoryUtilities.h"
 #include "UIHelper.h"
 

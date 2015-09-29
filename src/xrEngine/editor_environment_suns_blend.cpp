@@ -10,7 +10,7 @@
 
 #ifdef INGAME_EDITOR
 #include "editor_environment_suns_blend.hpp"
-#include "../include/editor/property_holder.hpp"
+#include "Include/editor/property_holder.hpp"
 
 using editor::environment::suns::blend;
 using editor::environment::suns::manager;

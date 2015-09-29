@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../anti_aim_ability.h"
+#include "ai/monsters/anti_aim_ability.h"
 
 template <class Object>
 CStateBurerAntiAim<Object>::CStateBurerAntiAim (Object *obj) : inherited(obj)

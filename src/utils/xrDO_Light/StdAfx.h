@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "../../xrCore/xrCore.h"
+#include "xrCore/xrCore.h"
 
 #pragma warning(disable:4995)
 #include <d3dx9.h>
@@ -18,9 +18,9 @@
 #define ENGINE_API
 #define ECORE_API
 #define XR_EPROPS_API
-#include "../../xrCore/clsid.h"
+#include "xrCore/clsid.h"
 #include "defines.h"
-#include "../../xrcdb/xrCDB.h"
+#include "xrCDB/xrCDB.h"
 #include "_d3d_extensions.h"
 
 #include <fcntl.h>

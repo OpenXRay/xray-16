@@ -21,7 +21,7 @@
 #include "profiler.h"
 #include "client_spawn_manager.h"
 #include "memory_manager.h"
-#include "../xrEngine/IGame_Persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 
 #ifndef MASTER_GOLD
 #	include "actor.h"

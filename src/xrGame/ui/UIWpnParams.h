@@ -6,7 +6,7 @@
 class CUIXml;
 class CInventoryItem;
 
-#include "../../xrServerEntities/script_export_space.h"
+#include "xrServerEntities/script_export_space.h"
 
 struct SLuaWpnParams;
 

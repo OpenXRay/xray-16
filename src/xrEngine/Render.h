@@ -1,15 +1,15 @@
 #ifndef _RENDER_H_
 #define _RENDER_H_
 
-#include "../xrCDB/frustum.h"
+#include "xrCDB/frustum.h"
 #include "vis_common.h"
 //#include "IRenderDetailModel.h"
 
-#include "../Include/xrAPI/xrAPI.h"
-#include "../Include/xrRender/FactoryPtr.h"
+#include "Include/xrAPI/xrAPI.h"
+#include "Include/xrRender/FactoryPtr.h"
 class IUIShader;
 typedef FactoryPtr<IUIShader> wm_shader;
-//#include "../Include/xrRender/WallMarkArray.h"
+//#include "Include/xrRender/WallMarkArray.h"
 
 #ifdef _EDITOR
 //. #error you cant include this file in borland

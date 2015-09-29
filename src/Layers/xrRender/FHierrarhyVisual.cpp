@@ -8,9 +8,9 @@
 #include "FHierrarhyVisual.h"
 #include "xrCore/FMesh.hpp"
 #ifndef _EDITOR
-#include "../../xrEngine/render.h"
+#include "xrEngine/render.h"
 #else
-#include "../../Include/xrAPI/xrAPI.h"
+#include "Include/xrAPI/xrAPI.h"
 #endif
 
 //////////////////////////////////////////////////////////////////////

@@ -1,27 +1,12 @@
-// Build.h: interface for the CBuild class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_BUILD_H__C7D43EBA_1C15_4FF4_A3ED_E89F6D759F58__INCLUDED_)
-#define AFX_BUILD_H__C7D43EBA_1C15_4FF4_A3ED_E89F6D759F58__INCLUDED_
 #pragma once
-
-//#include "../../editors/LevelEditor/Engine/communicate.h"
-
-#include "../../xrcore/fs.h"
-//.#include "../../xrEngine/xrLevel.h"
-
-#include "../shader_xrlc.h"
-//#include "xrMU_Model.h"
-
-struct		 STextureParams;
+#include "xrCore/FS.h"
+#include "utils/Shader_xrLC.h"
+struct STextureParams;
 #pragma comment(lib,"dxt.lib")
 extern "C" bool __declspec(dllimport) __stdcall DXTCompress(LPCSTR out_name, u8* raw_data, u8* normal_map, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);
 
-//#include "../xrLC_Light/xrLC_GlobalData.h"
-//#include "../xrLC_Light/xrface.h"
-#include "../xrLC_Light/b_build_texture.h"
-#include "../xrLC_Light/xrfacedefs.h"
+#include "utils/xrLC_Light/b_build_texture.h"
+#include "utils/xrLC_Light/xrfacedefs.h"
 
 class xrLC_GlobalData;
 class xrMU_Model;
@@ -29,8 +14,6 @@ class xrMU_Reference;
 extern "C" XRLC_LIGHT_API xrLC_GlobalData*	lc_global_data();
 //////////////////////////////////////////////////////////////////////////
 // tesselator callbacks
-
-
 
 typedef	int		tesscb_estimator	( const Face* F );	// -1 = none, 0,1,2 = edge-number
 typedef void	tesscb_face			(Face*		F);	// new face
@@ -123,7 +106,5 @@ public:
 	~CBuild	();
 };
 
-extern CBuild*		pBuild;			;
-extern vec2Face		g_XSplit		;
-
-#endif // !defined(AFX_BUILD_H__C7D43EBA_1C15_4FF4_A3ED_E89F6D759F58__INCLUDED_)
+extern CBuild* pBuild;;
+extern vec2Face g_XSplit;

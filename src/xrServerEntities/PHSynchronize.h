@@ -1,7 +1,7 @@
 #ifndef PH_SYNCHRONIZE_H
 #define PH_SYNCHRONIZE_H
 
-#include "../xrserverentities/PHNetState.h"
+#include "xrServerEntities/PHNetState.h"
 
 class NET_Packet;
 

@@ -8,7 +8,7 @@
 #include "mu_model_face.h"
 #include "xrmu_model.h"
 #include "xrmu_model_reference.h"
-#include "../../xrcdb/xrcdb.h"
+#include "xrCDB/xrCDB.h"
 
 bool g_using_smooth_groups = true;
 bool g_smooth_groups_by_faces = false;

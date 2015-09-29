@@ -9,7 +9,7 @@
 #include "inventory.h"
 #include "weapon.h"
 #include "map_manager.h"
-#include "level.h"
+#include "Level.h"
 #include "CharacterPhysicsSupport.h"
 #include "EffectorShot.h"
 #include "WeaponMagazined.h"

@@ -1,6 +1,6 @@
 #pragma once
 #include "CustomDetector.h"
-#include "level.h"
+#include "Level.h"
 
 class CUIArtefactDetectorElite;
 

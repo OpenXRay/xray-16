@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "control_animation_base.h"
 #include "BaseMonster/base_monster.h"
-#include "../../detail_path_manager.h"
+#include "detail_path_manager.h"
 #include "monster_velocity_space.h"
 
 void CControlAnimationBase::accel_init()

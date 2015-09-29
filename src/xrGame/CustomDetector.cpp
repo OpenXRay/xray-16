@@ -3,7 +3,7 @@
 #include "ui/ArtefactDetectorUI.h"
 #include "hudmanager.h"
 #include "inventory.h"
-#include "level.h"
+#include "Level.h"
 #include "map_manager.h"
 #include "ActorEffector.h"
 #include "actor.h"

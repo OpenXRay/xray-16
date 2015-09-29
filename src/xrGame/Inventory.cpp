@@ -12,7 +12,7 @@
 #include "script_engine.h"
 #include "xrmessages.h"
 #include "xr_level_controller.h"
-#include "level.h"
+#include "Level.h"
 #include "ai_space.h"
 #include "entitycondition.h"
 #include "game_base_space.h"

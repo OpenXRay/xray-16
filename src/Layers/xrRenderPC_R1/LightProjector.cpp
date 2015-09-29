@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "LightProjector.h"
-#include "../../include/xrRender/RenderVisual.h"
-#include "../../xrEngine/xr_object.h"
+#include "Include/xrRender/RenderVisual.h"
+#include "xrEngine/xr_object.h"
 #include "../xrRender/lighttrack.h"
 
 #ifndef _EDITOR

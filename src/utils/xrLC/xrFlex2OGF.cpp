@@ -2,9 +2,8 @@
 #include "build.h"
 #include "OGF_Face.h"
 #include "vbm.h"
-//#include "std_classes.h"
-#include "../xrlc_light/lightmap.h"
-#include "../xrlc_light/xrface.h"
+#include "utils/xrLC_Light/lightmap.h"
+#include "utils/xrLC_Light/xrface.h"
 
 #define	TRY(a) try { a; } catch (...) { Logger.clMsg("* E: %s", #a); }
 

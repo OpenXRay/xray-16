@@ -28,7 +28,7 @@
 // Windows Header Files:
 #include <windows.h>
 */
-//#include "../../xrCore/xrCore.h"
+//#include "xrCore/xrCore.h"
 //#define COLLECT_EXECUTION_STATS
 
 #pragma warning (disable:4661)

@@ -5,12 +5,12 @@
 
 #include "build.h"
 
-#include "../xrLC_Light/xrLC_GlobalData.h"
-#include "../xrLC_Light/xrface.h"
+#include "utils/xrLC_Light/xrLC_GlobalData.h"
+#include "utils/xrLC_Light/xrface.h"
 
 
-#include "../xrLC_Light/xrMU_Model.h"
-#include "../xrLC_Light/xrMU_Model_Reference.h"
+#include "utils/xrLC_Light/xrMU_Model.h"
+#include "utils/xrLC_Light/xrMU_Model_Reference.h"
 
 
 extern u32	version;

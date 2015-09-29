@@ -14,7 +14,7 @@
 #include "squad_hierarchy_holder.h"
 #include "group_hierarchy_holder.h"
 #include "customzone.h"
-#include "../Include/xrRender/Kinematics.h"
+#include "Include/xrRender/Kinematics.h"
 #include "detail_path_manager.h"
 #include "memory_manager.h"
 #include "visual_memory_manager.h"
@@ -28,7 +28,7 @@
 #include "movement_manager.h"
 #include "entitycondition.h"
 #include "sound_player.h"
-#include "level.h"
+#include "Level.h"
 #include "level_debug.h"
 #include "material_manager.h"
 #include "sound_user_data_visitor.h"
@@ -36,7 +36,7 @@
 #include "PHMovementControl.h"
 #include "profiler.h"
 #include "date_time.h"
-#include "characterphysicssupport.h"
+#include "CharacterPhysicsSupport.h"
 #include "ai/monsters/snork/snork.h"
 #include "ai/monsters/burer/burer.h"
 #include "GamePersistent.h"
@@ -48,10 +48,10 @@
 #include "level_path_manager.h"
 
 // Lain: added
-#include "../xrEngine/IGame_Level.h"
-#include "../xrCore/_vector3d_ext.h"
+#include "xrEngine/IGame_Level.h"
+#include "xrCore/_vector3d_ext.h"
 #include "debug_text_tree.h"
-#include "../xrPhysics/IPHWorld.h"
+#include "xrPhysics/IPHWorld.h"
 
 #ifdef DEBUG
 #	include "debug_renderer.h"

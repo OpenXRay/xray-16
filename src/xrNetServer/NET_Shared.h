@@ -9,7 +9,7 @@
     #endif
 #endif
 
-#include "../xrCore/net_utils.h"
+#include "xrCore/net_utils.h"
 #include <dplay/dplay8.h>
 #include "net_messages.h"
 

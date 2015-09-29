@@ -18,7 +18,7 @@
 #include "ai/stalker/ai_stalker.h"
 #include "inventory.h"
 #include "torch.h"
-#include "../Include/xrRender/Kinematics.h"
+#include "Include/xrRender/Kinematics.h"
 #include "memory_manager.h"
 #include "enemy_manager.h"
 #include "ai_object_location.h"

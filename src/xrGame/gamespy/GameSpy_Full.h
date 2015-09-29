@@ -9,7 +9,7 @@ class CGameSpy_SAKE;
 class CGameSpy_ATLAS;
 
 #include "GameSpy_FuncDefs.h"
-//#include "../../xrGameSpy/GameSpy/common/gsCore.h"
+//#include "xrGameSpy/GameSpy/common/gsCore.h"
 typedef unsigned int gsi_time;  // must be 32 bits - sorry for copying :(
 
 class CGameSpy_Full

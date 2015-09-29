@@ -2,8 +2,8 @@
 #include "UIMpTradeWnd.h"
 #include "UIDragDropListEx.h"
 #include "UICellItem.h"
-#include "../weaponmagazinedwgrenade.h"
-#include "../../xrEngine/xr_input.h"
+#include "WeaponMagazinedWGrenade.h"
+#include "xrEngine/xr_input.h"
 #include "UIMpItemsStoreWnd.h"
 
 void CUIMpTradeWnd::OnBtnPistolAmmoClicked(CUIWindow* w, void* d)

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "activatingcharcollisiondelay.h"
-#include "characterphysicssupport.h"
+#include "CharacterPhysicsSupport.h"
 #include "phmovementcontrol.h"
 #ifdef	DEBUG
 #include "phdebug.h"

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "xrServer_info.h"
-#include "level.h"
+#include "Level.h"
 #include "xrserver.h"
 
 #define SERVER_LOGO_FN	"server_logo.jpg"

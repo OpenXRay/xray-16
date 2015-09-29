@@ -8,20 +8,20 @@
 #include "stdafx.h"
 #include "cta_game_artefact_activation.h"
 
-#include "../xrphysics/PhysicsShell.h"
+#include "xrPhysics/PhysicsShell.h"
 #include "PhysicsShellHolder.h"
 #include "game_cl_base.h"
 
-#include "../Include/xrRender/Kinematics.h"
-#include "../Include/xrRender/KinematicsAnimated.h"
+#include "Include/xrRender/Kinematics.h"
+#include "Include/xrRender/KinematicsAnimated.h"
 
 #include "inventory.h"
-#include "level.h"
+#include "Level.h"
 #include "ai_object_location.h"
 #include "xrServer_Objects_ALife_Monsters.h"
-#include "../xrphysics/iphworld.h"
+#include "xrPhysics/iphworld.h"
 #include "restriction_space.h"
-#include "../xrEngine/IGame_Persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 
 CtaArtefactActivation::CtaArtefactActivation(CArtefact* af, u32 owner_id) :
 	SArtefactActivation(af, owner_id)

@@ -1,13 +1,8 @@
 #include "stdafx.h"
-
-
-//#include "build.h"
 #include "xrMU_Model.h"
-//#include "xrLC_GlobalData.h"
 #include "light_point.h"
-//#include "xrDeflector.h"
-#include "../../xrcdb/xrcdb.h"
-#include "../shader_xrlc.h"
+#include "xrCDB/xrCDB.h"
+#include "utils/Shader_xrLC.h"
 #include "mu_model_face.h"
 #include "xrface.h"
 #include "xrLC_GlobalData.h"

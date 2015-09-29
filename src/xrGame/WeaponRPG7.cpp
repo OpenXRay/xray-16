@@ -3,7 +3,7 @@
 #include "xrserver_objects_alife_items.h"
 #include "explosiverocket.h"
 #include "entity.h"
-#include "level.h"
+#include "Level.h"
 #include "player_hud.h"
 #include "hudmanager.h"
 

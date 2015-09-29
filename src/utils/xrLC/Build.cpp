@@ -1,21 +1,12 @@
-// Build.cpp: implementation of the CBuild class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
-
 #include "build.h"
+#include "utils/xrLC_Light/xrMU_Model.h"
+#include "utils/xrLC_Light/xrLC_GlobalData.h"
+#include "utils/xrLC_Light/xrface.h"
+#include "utils/xrLC_Light/mu_model_light.h"
+#include "utils/xrLC_Light/net_cl_data_prepare.h"
+#include "utils/xrLC_Light/serialize.h"
 
-#include "../xrLC_Light/xrMU_Model.h"
-
-
-
-#include "../xrLC_Light/xrLC_GlobalData.h"
-#include "../xrLC_Light/xrface.h"
-#include "../xrLC_Light/mu_model_light.h"
-#include "../xrLC_Light/net_cl_data_prepare.h"
-#include "../xrLC_Light/serialize.h"
-//#include "../xrLC_Light/lcnet_task_manager.h"
 void	calc_ogf		( xrMU_Model &	mu_model );
 void	export_geometry	( xrMU_Model &	mu_model );
 
@@ -39,9 +30,6 @@ void	CBuild::CheckBeforeSave( u32 stage )
 	R_ASSERT( b_g_XSplit_empty );
 	bool b_IsOGFContainersEmpty = IsOGFContainersEmpty();
 	R_ASSERT( b_IsOGFContainersEmpty );
-	
-	
-	
 }
 
 void	CBuild::TempSave( u32 stage )

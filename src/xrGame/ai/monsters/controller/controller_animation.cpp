@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "controller_animation.h"
 #include "controller.h"
-#include "../../../detail_path_manager.h"
-#include "../../../level.h"
-#include "../control_direction_base.h"
-#include "../control_path_builder_base.h"
+#include "detail_path_manager.h"
+#include "Level.h"
+#include "ai/monsters/control_direction_base.h"
+#include "ai/monsters/control_path_builder_base.h"
 #include "controller_direction.h"
-#include "../monster_velocity_space.h"
+#include "ai/monsters/monster_velocity_space.h"
 
 const float	_pmt_psy_attack_time  = 0.5f;
 

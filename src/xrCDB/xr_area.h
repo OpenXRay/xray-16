@@ -9,8 +9,8 @@ class 	ISpatial;
 class 	ICollisionForm;
 class 	CObject;
 
-#include "../Include/xrRender/FactoryPtr.h"
-#include "../Include/xrRender/ObjectSpaceRender.h"
+#include "Include/xrRender/FactoryPtr.h"
+#include "Include/xrRender/ObjectSpaceRender.h"
 #include "xrXRC.h"
 
 #include "xrcdb.h"

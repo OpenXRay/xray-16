@@ -4,8 +4,8 @@
 // refs
 class ENGINE_API CGameFont;
 
-#include "../Include/xrRender/FactoryPtr.h"
-#include "../Include/xrRender/ApplicationRender.h"
+#include "Include/xrRender/FactoryPtr.h"
+#include "Include/xrRender/ApplicationRender.h"
 
 // definition
 class ENGINE_API CApplication :

@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
 #include "build.h"
-#include "../xrLC_Light/xrLC_GlobalData.h"
-#include "../xrLC_Light/xrface.h"
+#include "utils/xrLC_Light/xrLC_GlobalData.h"
+#include "utils/xrLC_Light/xrface.h"
 
 const int	 HDIM_X = 56;
 const int	 HDIM_Y = 24;

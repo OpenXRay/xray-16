@@ -2,7 +2,7 @@
 #include "player_state_avenger.h"
 #include "kills_store.h"
 #include "game_cl_base.h"
-#include "level.h"
+#include "Level.h"
 #include "game_state_accumulator.h"
 
 namespace award_system

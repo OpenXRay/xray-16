@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../ActorEffector.h"
+#include "ActorEffector.h"
 
 //////////////////////////////////////////////////////////////////////////
 // CMonsterEffector

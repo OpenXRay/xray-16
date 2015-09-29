@@ -1,8 +1,8 @@
 #include "pch_script.h"
 #include "uigamesp.h"
 #include "actor.h"
-#include "level.h"
-#include "../xrEngine/xr_input.h"
+#include "Level.h"
+#include "xrEngine/xr_input.h"
 
 #ifdef DEBUG
 #include "attachable_item.h"
@@ -11,7 +11,7 @@
 #include "game_cl_Single.h"
 #include "xr_level_controller.h"
 #include "actorcondition.h"
-#include "../xrEngine/xr_ioconsole.h"
+#include "xrEngine/xr_ioconsole.h"
 #include "object_broker.h"
 #include "GameTaskManager.h"
 #include "GameTask.h"

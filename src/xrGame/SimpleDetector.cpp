@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "simpledetector.h"
 #include "ui/ArtefactDetectorUI.h"
-#include "../Include/xrRender/Kinematics.h"
-#include "../xrEngine/LightAnimLibrary.h"
+#include "Include/xrRender/Kinematics.h"
+#include "xrEngine/LightAnimLibrary.h"
 #include "player_hud.h"
 
 CSimpleDetector::CSimpleDetector(void)

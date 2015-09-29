@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "actor_mp_client.h"
 #include "inventory.h"
-#include "level.h"
+#include "Level.h"
 #include "GamePersistent.h"
 #include "game_cl_base.h"
-#include "../xrEngine/camerabase.h"
+#include "xrEngine/camerabase.h"
 //#include "Physics.h"
-#include "../xrphysics/phvalide.h"
+#include "xrPhysics/phvalide.h"
 
 void CActorMP::net_Import	( NET_Packet &P)
 {

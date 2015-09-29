@@ -11,7 +11,7 @@
 
 #ifdef INGAME_EDITOR
 
-#include "../include/editor/engine.hpp"
+#include "Include/editor/engine.hpp"
 
 class IInputReceiver;
 

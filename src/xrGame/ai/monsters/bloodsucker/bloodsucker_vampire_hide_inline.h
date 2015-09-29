@@ -1,5 +1,5 @@
 #pragma once
-#include "../states/state_hide_from_point.h"
+#include "ai/Monsters/states/state_hide_from_point.h"
 #include "bloodsucker_predator.h"
 
 #define TEMPLATE_SPECIALIZATION template <\

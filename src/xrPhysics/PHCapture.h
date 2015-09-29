@@ -7,7 +7,7 @@
 //#include "gameobject.h"
 //#include "physicsshellholder.h"
 #include "phisland.h"
-#include "../3rd party/ode/include/ode/common.h"
+#include "3rd party/ode/include/ode/common.h"
 #include "iphcapture.h"
 class	IPhysicsShellHolder;
 class	CPHCharacter;

@@ -22,7 +22,7 @@
 #include "UIHelper.h"
 #include "UIProgressBar.h"
 #include "ui_base.h"
-#include "../string_table.h"
+#include "string_table.h"
 
 CUIActorMenu::CUIActorMenu()
 {

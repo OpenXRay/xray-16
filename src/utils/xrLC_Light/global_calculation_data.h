@@ -1,12 +1,10 @@
-#ifndef __GLOBAL_CALCULATION_DATA_H__
-#define __GLOBAL_CALCULATION_DATA_H__
-
-#include "../../editors/LevelEditor/Engine/communicate.h"
+#pragma once
+#include "editors/LevelEditor/Engine/communicate.h"
 #include "base_lighting.h"
 #include "global_slots_data.h"
 #include "b_build_texture.h"
 #include "global_slots_data.h"
-#include "../../xrcdb/xrcdb.h"
+#include "xrCDB/xrCDB.h"
 class Shader_xrLC_LIB;
 //-----------------------------------------------------------------
 struct global_claculation_data
@@ -32,5 +30,3 @@ struct global_claculation_data
 	void	xrLoad						( );
 };
 extern global_claculation_data	gl_data;
-//-----------------------------------------------------------------
-#endif //__GLOBAL_CALCULATION_DATA_H__

@@ -7,7 +7,7 @@
 #pragma once
 
 #include "alife_space.h"
-#include "../xrEngine/render.h"
+#include "xrEngine/render.h"
 #include "anticheat_dumpable_object.h"
 
 class CCartridge;

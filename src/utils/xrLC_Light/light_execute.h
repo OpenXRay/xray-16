@@ -2,7 +2,7 @@
  
 #include "xrdeflectordefs.h"
 #include "base_lighting.h"
-#include "../../xrcdb/xrcdb.h"
+#include "xrCDB/xrCDB.h"
 
 
 

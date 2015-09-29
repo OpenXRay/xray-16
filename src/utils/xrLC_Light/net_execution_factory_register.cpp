@@ -4,7 +4,7 @@
 #include "net_all_executions.h"
 
 #include "net_execution_globals.h"
-#include "../../xrcore/xrPool.h"
+#include "xrCore/xrPool.h"
 namespace lc_net{
 
 

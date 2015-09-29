@@ -3,18 +3,18 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "../../xrEngine/igame_persistent.h"
-#include "../../xrEngine/environment.h"
+#include "xrEngine/igame_persistent.h"
+#include "xrEngine/environment.h"
 #include "../xrRender/fbasicvisual.h"
-#include "../../xrEngine/CustomHUD.h"
-#include "../../xrEngine/xr_object.h"
+#include "xrEngine/CustomHUD.h"
+#include "xrEngine/xr_object.h"
 #include "xrCore/FMesh.hpp"
 #include "../xrRender/SkeletonCustom.h"
 #include "../xrRender/lighttrack.h"
 #include "../xrRender/dxRenderDeviceRender.h"
 #include "../xrRender/dxWallMarkArray.h"
 #include "../xrRender/dxUIShader.h"
-//#include "../../xrServerEntities/smart_cast.h"
+//#include "xrServerEntities/smart_cast.h"
 
 #ifndef _EDITOR
 #include "../../xrCPU_Pipe/ttapi.h"
@@ -262,7 +262,7 @@ void					CRender::add_Occluder			(Fbox2&	bb_screenspace	)
 	HOM.occlude				(bb_screenspace);
 }
 
-#include "../../xrEngine/PS_instance.h"
+#include "xrEngine/PS_instance.h"
 void					CRender::set_Object				(IRenderable*		O )	
 {
 	VERIFY					(g_bRendering);
@@ -645,7 +645,7 @@ void	CRender::ApplyBlur4		(FVF::TL4uv* pv, u32 w, u32 h, float k)
 	pv->p.set(float(_w+EPS),EPS,			EPS,1.f); pv->color=_c; pv->uv[0].set(p1.x-kw,p0.y-kh);pv->uv[1].set(p1.x+kw,p0.y+kh);pv->uv[2].set(p1.x+kw,p0.y-kh);pv->uv[3].set(p1.x-kw,p0.y+kh);pv++;
 }
 
-#include "../../xrEngine/GameFont.h"
+#include "xrEngine/GameFont.h"
 void	CRender::Statistics	(CGameFont* _F)
 {
 	CGameFont&	F	= *_F;

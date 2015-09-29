@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "GameSpy_HTTP.h"
 #include "GameSpy_Base_Defs.h"
-#include "../MainMenu.h"
+#include "MainMenu.h"
 
 CGameSpy_HTTP::CGameSpy_HTTP()
 {

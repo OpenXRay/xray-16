@@ -1,15 +1,12 @@
 #include "StdAfx.h"
-#include "../../xrEngine/xr_ioconsole.h"
-#include "../../xrEngine/xr_ioc_cmd.h"
+#include "xrEngine/xr_ioconsole.h"
+#include "xrEngine/xr_ioc_cmd.h"
 #include "UIOptConCom.h"
-#include "../../xrcore/xrCore.h"
-//#include "game_base_space.h"
+#include "xrCore/xrCore.h"
 #include "gametype_chooser.h"
-#include "../RegistryFuncs.h"
-#include "../../xrGameSpy/xrGameSpy_MainDefs.h"
-
+#include "RegistryFuncs.h"
+#include "xrGameSpy/xrGameSpy_MainDefs.h"
 #include "gamespy/GameSpy_GP.h"
-
 #include "ui/UICDkey.h"
 
 xr_token g_GameModes	[] = {

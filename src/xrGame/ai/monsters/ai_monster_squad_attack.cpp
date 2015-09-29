@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "ai_monster_squad.h"
-#include "../../entity.h"
-#include "../../entity_alive.h"
-#include "../monsters/basemonster/base_monster.h "
+#include "Entity.h"
+#include "entity_alive.h"
+#include "BaseMonster/base_monster.h"
 #include "monster_home.h"
 
 void CMonsterSquad::ProcessAttack()

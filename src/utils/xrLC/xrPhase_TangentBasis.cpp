@@ -2,7 +2,7 @@
 #include	"build.h"
 
 #include	"MeshMenderLayerOrdinaryStatic.h"
-#include	"../xrLC_Light/xrLC_GlobalData.h"
+#include	"utils/xrLC_Light/xrLC_GlobalData.h"
 
 static u32 find_same_vertex( const xr_vector<u32> &m, const Fvector2	&Ftc, const xr_vector< MeshMender::Vertex > &theVerts )
 {

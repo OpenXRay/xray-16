@@ -1,15 +1,12 @@
 #pragma once
-
-
 #include "limb.h"
-#include "ikfoot.h"
-
-#include "../../include/xrrender/KinematicsAnimated.h"
-#include "../ik_anim_state.h"
-#include "../ik_calculate_data.h"
-#include "../ik_limb_state.h"
-#include "../ik_collide_data.h"
-#include "../ik_limb_state_predict.h"
+#include "IKFoot.h"
+#include "Include/xrRender/KinematicsAnimated.h"
+#include "ik_anim_state.h"
+#include "ik_calculate_data.h"
+#include "ik_limb_state.h"
+#include "ik_collide_data.h"
+#include "ik_limb_state_predict.h"
 
 class	IKinematics	;
 class	CDB::TRI	;

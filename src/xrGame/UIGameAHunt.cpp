@@ -2,7 +2,7 @@
 #include "UIGameAHunt.h"
 
 #include "team_base_zone.h"
-#include "level.h"
+#include "Level.h"
 #include "game_cl_ArtefactHunt.h"
 #include "ui/UIStatic.h"
 #include "ui/UIXmlInit.h"

@@ -7,7 +7,7 @@
 #include "gamespy/GameSpy_ATLAS.h"
 #include "gamespy/GameSpy_Patching.h"
 #include "RegistryFuncs.h"
-#include "../xrGameSpy/xrGameSpy_MainDefs.h"
+#include "xrGameSpy/xrGameSpy_MainDefs.h"
 #include "player_name_modifyer.h"
 #include "ui/UICDkey.h"
 #include "secure_messaging.h"

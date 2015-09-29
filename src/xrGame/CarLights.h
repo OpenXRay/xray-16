@@ -2,7 +2,7 @@
 #define CAR_LIGHTS_H
 #pragma once
 
-#include "../xrEngine/Render.h"
+#include "xrEngine/Render.h"
 
 class CCarLights;
 class CCar;

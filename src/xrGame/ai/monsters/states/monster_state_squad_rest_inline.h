@@ -1,11 +1,10 @@
 #pragma once
-
-#include "../../../ai_space.h"
-#include "../../../level_graph.h"
-#include "../../../ai_object_location.h"
+#include "ai_space.h"
+#include "level_graph.h"
+#include "ai_object_location.h"
 #include "state_custom_action.h"
 #include "state_move_to_point.h"
-#include "../../../restricted_object.h"
+#include "restricted_object.h"
 
 #define TEMPLATE_SPECIALIZATION template <\
 	typename _Object\

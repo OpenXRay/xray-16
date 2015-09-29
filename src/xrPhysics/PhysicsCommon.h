@@ -4,7 +4,7 @@
 #include "DisablingParams.h"
 #include "physicsexternalcommon.h"
 //#include "ode_include.h"
-//#include "../3rd party/ode/include/ode/common.h"
+//#include "3rd party/ode/include/ode/common.h"
 
 extern	XRPHYSICS_API	const float	default_l_limit					;
 extern	XRPHYSICS_API	const float	default_w_limit					;

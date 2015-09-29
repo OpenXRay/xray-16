@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "../../Include/xrApi/xrAPI.h"
+#include "Include/xrAPI/xrAPI.h"
 
 XRAPI_API IRender_interface*	Render = NULL;
 XRAPI_API IRenderFactory*	RenderFactory = NULL;

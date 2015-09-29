@@ -14,7 +14,7 @@
 //#include "mu_model_face.h"
 
 #include "utils/xrLCUtil/xrThread.hpp"
-#include "../../xrcore/xrSyncronize.h"
+#include "xrCore/xrSyncronize.h"
 
 
 

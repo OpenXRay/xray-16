@@ -2,12 +2,12 @@
 #include <dinput.h>
 #include "UISpawnWnd.h"
 #include "UIXmlInit.h"
-#include "../level.h"
-#include "../game_cl_teamdeathmatch.h"
+#include "Level.h"
+#include "game_cl_teamdeathmatch.h"
 #include "UIStatix.h"
 #include "UIScrollView.h"
 #include "UI3tButton.h"
-#include "../xr_level_controller.h"
+#include "xr_level_controller.h"
 #include "uicursor.h"
 #include "uigamecustom.h"
 

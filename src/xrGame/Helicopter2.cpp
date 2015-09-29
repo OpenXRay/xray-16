@@ -1,15 +1,15 @@
 #include "pch_script.h"
 #include "helicopter.h"
-//#include "level.h"
+//#include "Level.h"
 #include "script_game_object.h"
 //#include "game_object_space.h"
-#include "../Include/xrRender/Kinematics.h"
-#include "../xrEngine/LightAnimLibrary.h"
-//#include "../xrphysics/PhysicsShell.h"
+#include "Include/xrRender/Kinematics.h"
+#include "xrEngine/LightAnimLibrary.h"
+//#include "xrPhysics/PhysicsShell.h"
 #include "script_callback_ex.h"
 #include "ai/stalker/ai_stalker.h"
 #include "CustomZone.h"
-#include "../xrphysics/MathUtils.h"
+#include "xrPhysics/MathUtils.h"
 
 #include "actor.h"
 #include "physics_game.h"
@@ -263,7 +263,7 @@ void CHelicopter::PHHit(SHit &H)
 #include "team_hierarchy_holder.h"
 #include "squad_hierarchy_holder.h"
 
-#include "../xrphysics/extendedgeom.h"
+#include "xrPhysics/extendedgeom.h"
 void CollisionCallbackDead(bool& do_colide,bool bo1,dContact& c,SGameMtl* material_1,SGameMtl* material_2)
 {	
 	do_colide=true; 

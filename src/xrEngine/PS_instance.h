@@ -1,7 +1,7 @@
 #ifndef _CPS_Instance_H_
 #define _CPS_Instance_H_
 
-#include "../xrcdb/ispatial.h"
+#include "xrCDB/ispatial.h"
 #include "isheduled.h"
 #include "irenderable.h"
 

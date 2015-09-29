@@ -2,12 +2,12 @@
 #include "hudtarget.h"
 #include "xrEngine/GameMtlLib.h"
 
-#include "../xrEngine/Environment.h"
-#include "../xrEngine/CustomHUD.h"
+#include "xrEngine/Environment.h"
+#include "xrEngine/CustomHUD.h"
 #include "Entity.h"
-#include "level.h"
+#include "Level.h"
 #include "game_cl_base.h"
-#include "../xrEngine/igame_persistent.h"
+#include "xrEngine/igame_persistent.h"
 
 #include "ui_base.h"
 #include "InventoryOwner.h"

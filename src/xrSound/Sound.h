@@ -2,7 +2,7 @@
 #define SoundH
 #pragma once
 
-//#include "../include/xrapi/xrapi.h"
+//#include "Include/xrAPI/xrapi.h"
 
 #ifdef XRSOUND_EXPORTS
 	#define XRSOUND_API __declspec(dllexport)

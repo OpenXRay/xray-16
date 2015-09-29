@@ -10,13 +10,13 @@
 #include "actor.h"
 #include "xrServer_Objects.h"
 #include "game_cl_base.h"
-#include "level.h"
+#include "Level.h"
 #include "xr_level_controller.h"
 #include "seniority_hierarchy_holder.h"
 #include "team_hierarchy_holder.h"
 #include "squad_hierarchy_holder.h"
 #include "group_hierarchy_holder.h"
-#include "../xrEngine/CameraManager.h"
+#include "xrEngine/CameraManager.h"
 #include "Inventory.h"
 #include "huditem.h"
 #include "game_cl_mp.h"
@@ -500,7 +500,7 @@ BOOL			CSpectator::net_Spawn				( CSE_Abstract*	DC )
 	return TRUE;
 };
 
-#include "../xrEngine/IGame_Persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 void			CSpectator::net_Destroy	()
 {
 	inherited::net_Destroy	();

@@ -2,7 +2,7 @@
 #include "build.h"
 #include "ogf_face.h"
 //#include "std_classes.h"
-#include "../../xrcore/fs.h"
+#include "xrCore/fs.h"
 #include "xrCore/FMesh.hpp"
 #include "xrOcclusion.h"
 

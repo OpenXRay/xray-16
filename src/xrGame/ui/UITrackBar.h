@@ -4,11 +4,9 @@
 #include "UI_IB_Static.h"
 
 class CUI3tButton;
-class CUITrackButton;
 
 class CUITrackBar : public CUI_IB_FrameLineWnd, public CUIOptionsItem 
 {
-	friend class CUITrackButton;
 public:
 					CUITrackBar				();
 	// CUIOptionsItem

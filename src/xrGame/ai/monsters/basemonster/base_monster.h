@@ -1,30 +1,23 @@
 #pragma once
 
-#include "../../../CustomMonster.h"
-
-#include "../monster_enemy_memory.h"
-#include "../monster_corpse_memory.h"
-#include "../monster_sound_memory.h"
-#include "../monster_hit_memory.h"
-
-#include "../monster_enemy_manager.h"
-#include "../monster_corpse_manager.h"
-
-#include "../../../step_manager.h"
-#include "../monster_event_manager.h"
-#include "../melee_checker.h"
-#include "../monster_morale.h"
-
-#include "../control_manager.h"
-#include "../control_sequencer.h"
-
-#include "../ai_monster_utils.h"
-
-#include "../control_manager_custom.h"
-#include "../ai_monster_shared_data.h"
-#include "../monster_sound_defs.h"
-
-#include "../monster_aura.h"
+#include "CustomMonster.h"
+#include "ai/Monsters/monster_enemy_memory.h"
+#include "ai/Monsters/monster_corpse_memory.h"
+#include "ai/Monsters/monster_sound_memory.h"
+#include "ai/Monsters/monster_hit_memory.h"
+#include "ai/Monsters/monster_enemy_manager.h"
+#include "ai/Monsters/monster_corpse_manager.h"
+#include "step_manager.h"
+#include "ai/Monsters/monster_event_manager.h"
+#include "ai/Monsters/melee_checker.h"
+#include "ai/Monsters/monster_morale.h"
+#include "ai/Monsters/control_manager.h"
+#include "ai/Monsters/control_sequencer.h"
+#include "ai/Monsters/ai_monster_utils.h"
+#include "ai/Monsters/control_manager_custom.h"
+#include "ai/Monsters/ai_monster_shared_data.h"
+#include "ai/Monsters/monster_sound_defs.h"
+#include "ai/Monsters/monster_aura.h"
 
 class CCharacterPhysicsSupport;
 class CMonsterCorpseCoverEvaluator;
@@ -628,7 +621,7 @@ public:
 // CBaseMonster's  debug template functions
 //-------------------------------------------------------------------
 
-#include "../../../ai_debug_variables.h"
+#include "ai_debug_variables.h"
 
 #ifdef DEBUG
 template <class Type>

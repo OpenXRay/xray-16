@@ -1,7 +1,7 @@
 #pragma once
 
-//#include "../states/monster_state_rest_idle.h"
-#include "../states/state_custom_action.h"
+//#include "ai/Monsters/states/monster_state_rest_idle.h"
+#include "ai/Monsters/states/state_custom_action.h"
 
 #define TEMPLATE_SPECIALIZATION template <\
 	typename _Object\

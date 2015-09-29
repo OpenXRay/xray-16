@@ -1,9 +1,9 @@
 #ifndef MONSTER_STATE_ATTACK_ON_RUN_H
 #define MONSTER_STATE_ATTACK_ON_RUN_H
 
-#include "../state.h"
+#include "ai/Monsters/state.h"
 
-#include "../../weighted_random.h"
+#include "ai/weighted_random.h"
 
 inline
 TTime   current_time () { return Device.dwTimeGlobal; }

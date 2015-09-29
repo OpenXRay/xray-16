@@ -9,9 +9,9 @@
 #ifndef PROPERTY_COLLECTION_HPP_INCLUDED
 #define PROPERTY_COLLECTION_HPP_INCLUDED
 
-#include "../include/editor/property_holder.hpp"
+#include "Include/editor/property_holder.hpp"
 #include <boost/noncopyable.hpp>
-#include "../xrServerEntities/object_broker.h"
+#include "xrServerEntities/object_broker.h"
 
 template <typename container_type, typename holder_type>
 class property_collection :

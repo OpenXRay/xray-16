@@ -11,7 +11,7 @@
 #include "attachable_item.h"
 #include "inventoryowner.h"
 #include "inventory.h"
-#include "../xrEngine/xr_input.h"
+#include "xrEngine/xr_input.h"
 #include "ui_base.h"
 
 #ifdef DEBUG

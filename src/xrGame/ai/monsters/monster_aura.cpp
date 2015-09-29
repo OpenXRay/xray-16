@@ -1,9 +1,8 @@
 #include "stdafx.h"
 #include "monster_aura.h"
 #include "basemonster/base_monster.h"
-#include "../../Actor.h"
-#include "../../ActorEffector.h"
-//#include "../../HudSound.h"
+#include "Actor.h"
+#include "ActorEffector.h"
 
 namespace detail
 {

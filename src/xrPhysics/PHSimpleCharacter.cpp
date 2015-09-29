@@ -3,7 +3,7 @@
 #include "PHDynamicData.h"
 #include "ExtendedGeom.h"
 #include "xrCDB/Intersect.hpp"
-#include "../xrEngine/xr_object_list.h"
+#include "xrEngine/xr_object_list.h"
 #include "tri-colliderKNoOPC\__aabb_tri.h"
 #include "PHSimpleCharacter.h"
 #include "PHContactBodyEffector.h"
@@ -16,7 +16,7 @@
 #include "xrEngine/GameMtlLib.h"
 //#include "gameobject.h"
 #include "iphysicsshellholder.h"
-#include "../Include/xrRender/Kinematics.h"
+#include "Include/xrRender/Kinematics.h"
 #include "PHSimpleCharacterInline.h"
 #include "DamageSource.h"
 #include "PHCollideValidator.h"
@@ -27,7 +27,7 @@
 //#include "phvalide.h"
 
 #include "xrCore/Animation/Bone.hpp"
-#include "../xrengine/xr_object.h"
+#include "xrEngine/xr_object.h"
 #include "ph_valid_ode.h"
 
 IC		bool	PhOutOfBoundaries			(const Fvector& v)

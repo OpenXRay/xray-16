@@ -6,10 +6,8 @@
 #include "UIChangeMap.h"
 #include "ChangeWeatherDialog.hpp"
 #include "UIGameCustom.h"
-
-#include "../game_cl_teamdeathmatch.h"
-#include "../game_sv_mp_vote_flags.h"
-
+#include "game_cl_teamdeathmatch.h"
+#include "game_sv_mp_vote_flags.h"
 
 CUIVotingCategory::CUIVotingCategory()
 {
@@ -105,7 +103,7 @@ bool CUIVotingCategory::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 	return false;
 }
 
-#include "../../xrEngine/xr_ioconsole.h"
+#include "xrEngine/xr_ioconsole.h"
 
 void CUIVotingCategory::OnBtn(int i)
 {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "uiwindow.h"
-#include "../../xrEngine/LightAnimLibrary.h"
+#include "xrEngine/LightAnimLibrary.h"
 
 class CLAItem;
 

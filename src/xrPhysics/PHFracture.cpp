@@ -5,13 +5,13 @@
 #include "PHShell.h"
 #include "console_vars.h"
 
-#include "../Include/xrRender/Kinematics.h"
+#include "Include/xrRender/Kinematics.h"
 #include "ph_valid_ode.h"
 #include "xrCore/Animation/Bone.hpp"
 
 #pragma warning(disable:4995)
 #pragma warning(disable:4267)
-#include "../3rd party/ode/ode/src/joint.h"
+#include "3rd party/ode/ode/src/joint.h"
 #pragma warning(default:4995)
 #pragma warning(default:4267)
 extern	class CPHWorld	*ph_world;

@@ -16,8 +16,8 @@
 # define _WIN32_WINNT 0x0550
 #endif // #ifdef INGAME_EDITOR
 
-#include "../xrCore/xrCore.h"
-#include "../Include/xrAPI/xrAPI.h"
+#include "xrCore/xrCore.h"
+#include "Include/xrAPI/xrAPI.h"
 
 #ifdef _DEBUG
 # define D3D_DEBUG_INFO
@@ -50,14 +50,14 @@
 #include "engine.h"
 #include "defines.h"
 #ifndef NO_XRLOG
-#include "../xrcore/log.h"
+#include "xrCore/log.h"
 #endif
 #include "device.h"
-#include "../xrcore/fs.h"
+#include "xrCore/fs.h"
 
-#include "../xrcdb/xrXRC.h"
+#include "xrCDB/xrXRC.h"
 
-#include "../xrSound/sound.h"
+#include "xrSound/sound.h"
 
 extern ENGINE_API CInifile* pGameIni;
 

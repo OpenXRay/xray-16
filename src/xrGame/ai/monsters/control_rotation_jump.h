@@ -1,6 +1,6 @@
 #pragma once
 #include "control_combase.h"
-#include "../../../Include/xrRender/KinematicsAnimated.h"
+#include "Include/xrRender/KinematicsAnimated.h"
 
 struct SControlRotationJumpData : public ControlCom::IComData {
 	MotionID		anim_stop_ls,anim_run_ls;

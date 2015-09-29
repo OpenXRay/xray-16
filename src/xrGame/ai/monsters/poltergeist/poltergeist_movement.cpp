@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "poltergeist_movement.h"
 #include "poltergeist.h"
-#include "../../../detail_path_manager.h"
+#include "detail_path_manager.h"
 
 void CPoltergeisMovementManager::move_along_path(CPHMovementControl *movement_control, Fvector &dest_position, float time_delta)
 {

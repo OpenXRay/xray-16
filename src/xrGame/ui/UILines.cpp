@@ -11,7 +11,7 @@
 #include "UILines.h"
 #include "UIXmlInit.h"
 #include "uilinestd.h"
-#include "../string_table.h"
+#include "string_table.h"
 
 
 CUILines::CUILines()

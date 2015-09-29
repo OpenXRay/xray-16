@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "game_cl_artefacthunt.h"
 #include "xrMessages.h"
-#include "level.h"
+#include "Level.h"
 #include "UIGameAHunt.h"
 #include "map_manager.h"
 #include "LevelGameDef.h"
@@ -32,7 +32,7 @@
 #define MESSAGE_MENUS	"ahunt_messages_menu"
 
 #include "game_cl_artefacthunt_snd_msg.h"
-#include "../xrEngine/IGame_Persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 
 #include "reward_event_generator.h"
 

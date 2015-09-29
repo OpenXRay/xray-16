@@ -1,6 +1,6 @@
 #pragma once
 #include "physicsshellholder.h"
-#include "../xrphysics/iclimableobject.h"
+#include "xrPhysics/iclimableobject.h"
 class IPHStaticGeomShell;
 class CPHCharacter;
 struct dContact;

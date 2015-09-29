@@ -1,7 +1,7 @@
 #pragma once
 
 #include "control_combase.h"
-#include "../../../Include/xrRender/KinematicsAnimated.h"
+#include "Include/xrRender/KinematicsAnimated.h"
 
 struct SAnimationSequencerData : public ControlCom::IComData {
 	xr_vector<MotionID>	motions;

@@ -8,11 +8,11 @@
 
 #include "stdafx.h"
 #include "base_monster.h"
-#include "../corpse_cover.h"
-#include "../../../cover_manager.h"
-#include "../../../cover_point.h"
-#include "../../../ai_space.h"
-#include "../control_direction_base.h"
+#include "ai/Monsters/corpse_cover.h"
+#include "cover_manager.h"
+#include "cover_point.h"
+#include "ai_space.h"
+#include "ai/Monsters/control_direction_base.h"
 
 // каждый монстр может по-разному реализвать эту функ (e.g. кровосос с поворотом головы и т.п.)
 void CBaseMonster::LookPosition(Fvector to_point, float angular_speed)

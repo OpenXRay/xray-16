@@ -1,19 +1,13 @@
 #ifndef FILETRANSFER
 #define FILETRANSFER
-
 #include "associative_vector.h"
-#include "..\xrEngine\StatGraph.h"
+#include "xrEngine/StatGraph.h"
 #include "filetransfer_node.h"
 #include "filereceiver_node.h"
-
 
 //this module is an implementation of file transfering ...
 namespace file_transfer
 {
-
-
-
-
 class server_site
 {
 public:

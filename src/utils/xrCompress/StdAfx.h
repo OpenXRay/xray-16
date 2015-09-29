@@ -2,7 +2,7 @@
 
 //. #define MOD_COMPRESS
 
-#include "../../xrcore/xrCore.h"
+#include "xrCore/xrCore.h"
 
 #include "lzo\lzo1x.h"
 #include <mmsystem.h>

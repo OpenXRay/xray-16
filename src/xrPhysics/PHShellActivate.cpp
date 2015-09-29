@@ -9,13 +9,13 @@
 //#include "Level.h"
 #include "iphysicsshellholder.h"
 #include "PhysicsShellAnimator.h"
-#include "../Include/xrRender/Kinematics.h"
+#include "Include/xrRender/Kinematics.h"
 
 ///////////////////////////////////////////////////////////////
 ///#pragma warning(disable:4995)
-//#include "../3rd party/ode/ode/src/collision_kernel.h"
-//#include "../3rd party/ode/ode/src/joint.h"
-//#include "../3rd party/ode/ode/src/objects.h"
+//#include "3rd party/ode/ode/src/collision_kernel.h"
+//#include "3rd party/ode/ode/src/joint.h"
+//#include "3rd party/ode/ode/src/objects.h"
 
 //#pragma warning(default:4995)
 ///////////////////////////////////////////////////////////////////

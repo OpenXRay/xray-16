@@ -2,13 +2,13 @@
 #include "entity_alive.h"
 #include "inventoryowner.h"
 #include "inventory.h"
-#include "../xrphysics/physicsshell.h"
+#include "xrPhysics/physicsshell.h"
 #include "xrEngine/GameMtlLib.h"
 #include "phmovementcontrol.h"
 #include "wound.h"
 #include "xrmessages.h"
-#include "level.h"
-#include "../Include/xrRender/Kinematics.h"
+#include "Level.h"
+#include "Include/xrRender/Kinematics.h"
 #include "relation_registry.h"
 #include "monster_community.h"
 #include "entitycondition.h"
@@ -772,7 +772,7 @@ void	CEntityAlive::	destroy_anim_mov_ctrl( )
 		cs->on_destroy_anim_mov_ctrl( );
 }
 
-#include "../xrEngine/xr_collide_form.h"
+#include "xrEngine/xr_collide_form.h"
 
 struct element_predicate {
 	inline bool	operator( )							(CCF_Skeleton::SElement const& element, u16 element_id ) const

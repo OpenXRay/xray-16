@@ -28,7 +28,7 @@ void CAI_PhraseDialogManager::ReceivePhrase (DIALOG_SHARED_PTR& phrase_dialog)
 	CPhraseDialogManager::ReceivePhrase(phrase_dialog);
 }
 #include "uigamesp.h"
-#include "level.h"
+#include "Level.h"
 #include "ui/UItalkWnd.h"
 
 void CAI_PhraseDialogManager::AnswerPhrase (DIALOG_SHARED_PTR& phrase_dialog)

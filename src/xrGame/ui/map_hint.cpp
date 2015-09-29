@@ -2,13 +2,13 @@
 #include "map_hint.h"
 #include "UIStatic.h"
 #include "UIXmlInit.h"
-#include "../map_location.h"
-#include "../map_spot.h"
-#include "../actor.h"
-#include "../gametaskmanager.h"
-#include "../gametask.h"
+#include "map_location.h"
+#include "map_spot.h"
+#include "Actor.h"
+#include "GametaskManager.h"
+#include "GameTask.h"
 #include "UIInventoryUtilities.h"
-#include "../string_table.h"
+#include "string_table.h"
 
 CUIStatic* init_static_field(CUIXml& uiXml, LPCSTR path, LPCSTR path2)
 {

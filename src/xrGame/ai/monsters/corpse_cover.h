@@ -1,6 +1,5 @@
 #pragma once
-
-#include "../../cover_evaluators.h"
+#include "cover_evaluators.h"
 
 class CMonsterCorpseCoverEvaluator: public CCoverEvaluatorBase {
 protected:

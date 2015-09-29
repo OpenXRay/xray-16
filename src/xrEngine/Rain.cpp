@@ -10,7 +10,7 @@
 #else
 #include "render.h"
 #include "igame_level.h"
-#include "../xrcdb/xr_area.h"
+#include "xrCDB/xr_area.h"
 #include "xr_object.h"
 #endif
 

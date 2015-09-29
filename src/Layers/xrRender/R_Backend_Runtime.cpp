@@ -6,7 +6,7 @@
 #include <d3dx9.h>
 #pragma warning(pop)
 
-#include "../../xrCDB/frustum.h"
+#include "xrCDB/frustum.h"
 
 #if defined(USE_DX10) || defined(USE_DX11)
 #include "../xrRenderDX10/StateManager/dx10StateManager.h"

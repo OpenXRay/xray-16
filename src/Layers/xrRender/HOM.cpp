@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "HOM.h"
 #include "occRasterizer.h"
-#include "../../xrEngine/GameFont.h"
+#include "xrEngine/GameFont.h"
 
 #include "dxRenderDeviceRender.h"
  

@@ -6,7 +6,7 @@
 #include ".\uicheckbutton.h"
 #include "UIXmlInit.h"
 #include "UIHint.h"
-#include "../../xrEngine/xr_input.h"	
+#include "xrEngine/xr_input.h"	
 
 CUICheckButton::CUICheckButton()
 {	

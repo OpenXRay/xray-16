@@ -21,12 +21,12 @@
 #endif
 
 //#include "D3DUtils.h"
-#include "../xrcore/xrCore.h"
+#include "xrCore/xrCore.h"
 
-#include "../Include/xrRender/EnvironmentRender.h"
-#include "../Include/xrRender/LensFlareRender.h"
-#include "../Include/xrRender/RainRender.h"
-#include "../Include/xrRender/ThunderboltRender.h"
+#include "Include/xrRender/EnvironmentRender.h"
+#include "Include/xrRender/LensFlareRender.h"
+#include "Include/xrRender/RainRender.h"
+#include "Include/xrRender/ThunderboltRender.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

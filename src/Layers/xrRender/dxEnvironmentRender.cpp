@@ -3,10 +3,10 @@
 
 #include "dxRenderDeviceRender.h"
 
-#include "../../xrEngine/environment.h"
-#include "../../Layers/xrRender/ResourceManager.h"
+#include "xrEngine/environment.h"
+#include "Layers/xrRender/ResourceManager.h"
 
-#include "../../xrEngine/xr_efflensflare.h"
+#include "xrEngine/xr_efflensflare.h"
 
 
 //////////////////////////////////////////////////////////////////////////

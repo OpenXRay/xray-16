@@ -1,6 +1,6 @@
 #pragma once
 #include "UIWindow.h"
-#include "../EntityCondition.h"
+#include "EntityCondition.h"
 
 class CUIXml;
 class CUIStatic;
