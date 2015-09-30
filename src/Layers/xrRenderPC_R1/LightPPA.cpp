@@ -4,9 +4,9 @@
 
 #include "stdafx.h"
 #include "LightPPA.h"
-#include "xrEngine/igame_persistent.h"
-#include "xrEngine/environment.h"
-#include "../xrRender/fbasicvisual.h"
+#include "xrEngine/IGame_Persistent.h"
+#include "xrEngine/Environment.h"
+#include "Layers/xrRender/FBasicVisual.h"
 #include "xrEngine/CustomHUD.h"
 
 const u32	MAX_POLYGONS			=	1024*8;

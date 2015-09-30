@@ -1,12 +1,11 @@
 #include "stdafx.h"
-#include "../xrRender/fbasicvisual.h"
+#include "Layers/xrRender/FBasicVisual.h"
 #include "xrCore/FMesh.hpp"
 #include "xrEngine/xrLevel.h"
 #include "xrEngine/x_ray.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/stream_reader.h"
-
-#include "../xrRender/dxRenderDeviceRender.h"
+#include "Layers/xrRender/dxRenderDeviceRender.h"
 
 #pragma warning(push)
 #pragma warning(disable:4995)

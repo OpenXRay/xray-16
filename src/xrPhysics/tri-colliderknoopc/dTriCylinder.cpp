@@ -1,14 +1,11 @@
 #include "stdafx.h"
 #include "dTriColliderCommon.h"
-#include "../dCylinder/dCylinder.h"
+#include "xrPhysics/dCylinder/dCylinder.h"
 #include "dTriCylinder.h"
-#include "../MathUtils.h"
+#include "xrPhysics/MathUtils.h"
 #include "dcTrilistCollider.h"
-#include "../phworld.h"
+#include "xrPhysics/PHWorld.h"
 #include "xrCDB/xr_area.h"
-//////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////
 
 /*(lp+t*lv-cp)^2=r^2 => t1,t2 =>O1=lp+t1*lv;O2=lp+t2*lv */
 //O1,O2 seems to be sphere line intersections

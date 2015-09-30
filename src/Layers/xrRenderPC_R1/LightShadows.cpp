@@ -1,16 +1,11 @@
-// LightShadows.cpp: implementation of the CLightShadows class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include "LightShadows.h"
-#include "../xrRender/LightTrack.h"
+#include "Layers/xrRender/LightTrack.h"
 #include "xrEngine/xr_object.h"
-#include "../xrRender/fbasicvisual.h"
+#include "Layers/xrRender/FBasicVisual.h"
 #include "xrEngine/CustomHUD.h"
-
 #ifndef _EDITOR
-#include "../../xrCPU_Pipe/ttapi.h"
+#include "xrCPU_Pipe/ttapi.h"
 #endif
 
 const	float		S_distance		= 48;

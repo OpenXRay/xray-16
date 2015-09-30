@@ -1,12 +1,8 @@
 #ifndef D_TRI_COLLIDER_COMMON
 #define D_TRI_COLLIDER_COMMON
-
-
-//#include "../ode_include.h"
 #include "3rd party/ode/include/ode/common.h"
-#include "../ExtendedGeom.h"
+#include "xrPhysics/ExtendedGeom.h"
 #include "dTriColliderMath.h"
-
 
 extern xr_vector< flags8 >			gl_cl_tries_state	;
 

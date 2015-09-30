@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "../xrRender/du_sphere.h"
+#include "Layers/xrRender/du_sphere.h"
 
 /*
 Fvector du_sphere_vertices[DU_SPHERE_NUMVERTEX]=

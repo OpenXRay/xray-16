@@ -3,7 +3,7 @@
 #pragma once
 
 #include "dx103DFluidData.h"
-#include "../../xrRender/FBasicVisual.h"
+#include "Layers/xrRender/FBasicVisual.h"
 
 class dx103DFluidVolume : public dxRender_Visual
 {

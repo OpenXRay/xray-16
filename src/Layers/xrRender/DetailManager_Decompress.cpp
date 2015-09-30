@@ -1,13 +1,11 @@
 #include "stdafx.h"
 #pragma hdrstop
-
 #include "DetailManager.h"
 #include "xrCDB/Intersect.hpp"
-
 #ifdef _EDITOR
-#	include "scene.h"
-#	include "sceneobject.h"
-#	include "../utils/ETools/ETools.h"
+#include "scene.h"
+#include "sceneobject.h"
+#include "utils/ETools/ETools.h"
 #endif
 
 //--------------------------------------------------- Decompression

@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "dx103DFluidGrid.h"
-
-#include "../dx10BufferUtils.h"
+#include "Layers/xrRenderDX10/dx10BufferUtils.h"
 
 struct VS_INPUT_FLUIDSIM_STRUCT
 {   

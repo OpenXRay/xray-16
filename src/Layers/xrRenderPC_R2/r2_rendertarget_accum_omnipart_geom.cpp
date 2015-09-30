@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "../xrRender/du_sphere_part.h"
+#include "Layers/xrRender/du_sphere_part.h"
 
 void CRenderTarget::accum_omnip_geom_create		()
 {

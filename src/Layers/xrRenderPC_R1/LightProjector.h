@@ -6,7 +6,7 @@
 #define AFX_LIGHTPRJ_H__CFA216D9_CACB_4515_9FBE_7C531649168F__INCLUDED_
 #pragma once
 
-#include "../xrRender/r__dsgraph_types.h"
+#include "Layers/xrRender/r__dsgraph_types.h"
 
 class CLightProjector		: public pureAppActivate
 {

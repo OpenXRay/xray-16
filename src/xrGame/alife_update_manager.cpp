@@ -227,7 +227,7 @@ bool CALifeUpdateManager::change_level	(NET_Packet &net_packet)
 	return							(true);
 }
 
-#include "xrEngine/igame_persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 void CALifeUpdateManager::new_game			(LPCSTR save_name)
 {
 //	g_pGamePersistent->LoadTitle		("st_creating_new_game");

@@ -1,11 +1,8 @@
 #include "stdafx.h"
 #include "dx103DFluidRenderer.h"
-
 #include "dx103DFluidBlenders.h"
-
-#include "../dx10BufferUtils.h"
-#include "../../xrRender/dxRenderDeviceRender.h"
-
+#include "Layers/xrRenderDX10/dx10BufferUtils.h"
+#include "Layers/xrRender/dxRenderDeviceRender.h"
 #include "dx103DFluidData.h"
 
 struct VsInput

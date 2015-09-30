@@ -5,7 +5,7 @@
 #include "xrserver.h"
 #include "Inventory.h"
 #include "CustomZone.h"
-#include "xrEngine/igame_persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 #include "Actor.h"
 #include "game_cl_base.h"
 #include "xr_level_controller.h"

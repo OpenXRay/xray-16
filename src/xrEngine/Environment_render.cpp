@@ -10,7 +10,7 @@
 #include "thunderbolt.h"
 
 #ifndef _EDITOR
-# include "igame_level.h"
+# include "IGame_Level.h"
 #endif
 /*
 //////////////////////////////////////////////////////////////////////////

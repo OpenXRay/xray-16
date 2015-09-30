@@ -4,7 +4,7 @@
 #include "IGame_Persistent.h"
 
 #ifndef _EDITOR
-#include "environment.h"
+#include "Environment.h"
 # include "x_ray.h"
 # include "IGame_Level.h"
 # include "XR_IOConsole.h"

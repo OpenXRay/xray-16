@@ -3,8 +3,8 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "xrEngine/igame_persistent.h"
-#include "xrEngine/environment.h"
+#include "xrEngine/IGame_Persistent.h"
+#include "xrEngine/Environment.h"
 #include "xrEngine/x_ray.h"
 #include "xrEngine/GameFont.h"
 #include "GlowManager.h"

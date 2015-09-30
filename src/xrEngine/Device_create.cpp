@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-//#include "resourcemanager.h"
+//#include "ResourceManager.h"
 #include "Include/xrRender/DrawUtils.h"
 //#include "xr_effgamma.h"
 #include "render.h"

@@ -1,10 +1,10 @@
-#ifndef		D_TRI_BOX_H
-#define		D_TRI_BOX_H
-
+#ifndef D_TRI_BOX_H
+#define D_TRI_BOX_H
 #include "TriPrimitiveCollideClassDef.h"
-#include "../ode_include.h"
-#include "../MathUtilsOde.h"
+#include "xrPhysics/ode_include.h"
+#include "xrPhysics/MathUtilsOde.h"
 #include "dcTriListCollider.h"
+
 struct Triangle;
 struct dxBox {
 	dVector3 side;	// side lengths (x,y,z)

@@ -8,7 +8,7 @@
 #include "xrserver_objects_alife_monsters.h"
 #include "actor.h"
 #include "xrEngine/XR_IOConsole.h"
-#include "xrEngine/igame_persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 #include "date_time.h"
 #include "game_cl_base.h"
 #include "Spectator.h"

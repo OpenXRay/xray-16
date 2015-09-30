@@ -5,14 +5,11 @@
 #include <d3dx9.h>
 #pragma warning(default:4995)
 
-#include "../xrRender/ResourceManager.h"
-
+#include "Layers/xrRender/ResourceManager.h"
 #include "xrCore/xrPool.h"
-#include "../xrRender/r_constants.h"
-
-#include "../xrRender/dxRenderDeviceRender.h"
-
-#include "../xrRenderDX10/dx10ConstantBuffer.h"
+#include "Layers/xrRender/r_constants.h"
+#include "Layers/xrRender/dxRenderDeviceRender.h"
+#include "Layers/xrRenderDX10/dx10ConstantBuffer.h"
 
 IC bool	p_sort		(ref_constant C1, ref_constant C2)
 {

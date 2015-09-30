@@ -8,10 +8,10 @@
 #include "sh_rt.h"
 
 #if defined(USE_DX10) || defined(USE_DX11)
-#include "../xrRenderDX10/dx10R_Backend_Runtime.h"
-#include "../xrRenderDX10/StateManager/dx10State.h"
+#include "Layers/xrRenderDX10/dx10R_Backend_Runtime.h"
+#include "Layers/xrRenderDX10/StateManager/dx10State.h"
 #else	//	USE_DX10
-#include "../xrRenderDX9/dx9R_Backend_Runtime.h"
+#include "Layers/xrRenderDX9/dx9R_Backend_Runtime.h"
 #endif	//	USE_DX10
 
 IC void		R_xforms::set_c_w			(R_constant* C)		{	c_w		= C;	RCache.set_c(C,m_w);	};

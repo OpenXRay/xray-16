@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "../xrRender/ResourceManager.h"
+#include "Layers/xrRender/ResourceManager.h"
 
 #ifndef _EDITOR
 #include "xrEngine/render.h"
@@ -10,7 +10,7 @@
 #include "xrEngine/tntQAVI.h"
 #include "xrEngine/xrTheora_Surface.h"
 
-#include "../xrRender/dxRenderDeviceRender.h"
+#include "Layers/xrRender/dxRenderDeviceRender.h"
 
 #include "StateManager/dx10ShaderResourceStateCache.h"
 

@@ -1,13 +1,13 @@
 #include "stdafx.h"
-#include "igame_level.h"
+#include "IGame_Level.h"
 
 //#include "xr_effgamma.h"
 #include "x_ray.h"
 #include "xr_ioconsole.h"
 #include "xr_ioc_cmd.h"
-//#include "fbasicvisual.h"
+//#include "FBasicVisual.h"
 #include "cameramanager.h"
-#include "environment.h"
+#include "Environment.h"
 #include "xr_input.h"
 #include "CustomHUD.h"
 

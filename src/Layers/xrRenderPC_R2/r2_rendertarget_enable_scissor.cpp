@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "xrCDB/Intersect.hpp"
-#include "../xrRender/du_cone.h"
+#include "Layers/xrRender/du_cone.h"
 
 //extern Fvector du_cone_vertices			[DU_CONE_NUMVERTEX];
 

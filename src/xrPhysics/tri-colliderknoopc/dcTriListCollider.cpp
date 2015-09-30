@@ -1,14 +1,11 @@
 // Do NOT build this file seperately. It is included in dTriList.cpp automatically.
-
-
 #include "xrCDB/Intersect.hpp"
 #include "dTriCollideK.h"
 #include "dSortTriPrimitive.h"
-#include "../dCylinder/dCylinder.h"
-#include "../MathUtils.h"
-//#include "../level.h"
+#include "xrPhysics/dCylinder/dCylinder.h"
+#include "xrPhysics/MathUtils.h"
 #ifdef	DEBUG
-#include "../debug_output.h"
+#include "xrPhysics/debug_output.h"
 #endif
 
 dcTriListCollider::dcTriListCollider(dxGeom* Geometry)

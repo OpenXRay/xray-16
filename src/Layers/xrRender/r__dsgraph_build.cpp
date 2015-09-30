@@ -1,11 +1,11 @@
 #include "stdafx.h"
 
-#include "fhierrarhyvisual.h"
+#include "FHierrarhyVisual.h"
 #include "SkeletonCustom.h"
 #include "xrCore/FMesh.hpp"
 #include "xrEngine/irenderable.h"
 
-#include "flod.h"
+#include "FLOD.h"
 #include "particlegroup.h"
 #include "FTreeVisual.h"
 

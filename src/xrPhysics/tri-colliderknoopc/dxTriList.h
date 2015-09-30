@@ -1,13 +1,6 @@
-//#include "stdafx.h"
 #ifndef __DXTRILIST_INCLUDED__
-
 #define __DXTRILIST_INCLUDED__
-
-
-//#include "../ode_include.h"
 #include "3rd party/ode/include/ode/common.h"
-
-
 
 struct dcVector3{
 

@@ -8,11 +8,11 @@
 #include "xrEngine/xr_object.h"
 
 #ifdef _EDITOR
-#	include "igame_persistent.h"
-#	include "environment.h"
+#	include "IGame_Persistent.h"
+#	include "Environment.h"
 #else
-#	include "xrEngine/igame_persistent.h"
-#	include "xrEngine/environment.h"
+#	include "xrEngine/IGame_Persistent.h"
+#	include "xrEngine/Environment.h"
 #endif
 
 //////////////////////////////////////////////////////////////////////

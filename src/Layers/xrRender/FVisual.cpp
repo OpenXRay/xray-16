@@ -1,7 +1,3 @@
-// FVisual.cpp: implementation of the FVisual class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #pragma hdrstop
 
@@ -10,9 +6,8 @@
 #pragma warning(default:4995)
 
 #include "xrCore/FMesh.hpp"
-#include "fvisual.h"
-
-#include "../xrRenderDX10/dx10BufferUtils.h"
+#include "FVisual.h"
+#include "Layers/xrRenderDX10/dx10BufferUtils.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

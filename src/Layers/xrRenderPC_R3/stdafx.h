@@ -19,9 +19,8 @@
 #include <D3Dx10core.h>
 #include <D3DCompiler.h>
 
-#include "../xrRender/xrD3DDefs.h"
-
-#include "../xrRender/Debug/dxPixEventWrapper.h"
+#include "Layers/xrRender/xrD3DDefs.h"
+#include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 
 #define		R_R1	1
 #define		R_R2	2
@@ -29,23 +28,19 @@
 #define		R_R4	4
 #define		RENDER	R_R3
 
-
 #include "xrParticles/psystem.h"
-
-#include "../xrRender/HW.h"
-#include "../xrRender/Shader.h"
-#include "../xrRender/R_Backend.h"
-#include "../xrRender/R_Backend_Runtime.h"
-
-#include "../xrRender/resourcemanager.h"
-
+#include "Layers/xrRender/HW.h"
+#include "Layers/xrRender/Shader.h"
+#include "Layers/xrRender/R_Backend.h"
+#include "Layers/xrRender/R_Backend_Runtime.h"
+#include "Layers/xrRender/ResourceManager.h"
 #include "xrEngine/vis_common.h"
 #include "xrEngine/render.h"
 #include "xrEngine/_d3d_extensions.h"
-#include "xrEngine/igame_level.h"
-#include "../xrRender/blenders\blender.h"
-#include "../xrRender/blenders\blender_clsid.h"
-#include "../xrRender/xrRender_console.h"
+#include "xrEngine/IGame_Level.h"
+#include "Layers/xrRender/blenders\blender.h"
+#include "Layers/xrRender/blenders\blender_clsid.h"
+#include "Layers/xrRender/xrRender_console.h"
 #include "r3.h"
 
 IC	void	jitter(CBlender_Compile& C)

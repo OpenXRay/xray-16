@@ -2,7 +2,7 @@
 #include "dx10ConstantBuffer.h"
 
 #include "dx10BufferUtils.h"
-#include "../xrRender/dxRenderDeviceRender.h"
+#include "Layers/xrRender/dxRenderDeviceRender.h"
 
 dx10ConstantBuffer::~dx10ConstantBuffer()
 {

@@ -5,7 +5,7 @@
 #include "GameSpy/GameSpy_GCD_Client.h"
 
 
-#include "xrEngine/igame_persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 void						CLevel::OnGameSpyChallenge			(NET_Packet* P)
 {
 #ifndef MASTER_GOLD

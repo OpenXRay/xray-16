@@ -1,19 +1,17 @@
 #include "stdafx.h"
 #include "dx103DFluidObstacles.h"
-
-#include "../../xrRender/dxRenderDeviceRender.h"
+#include "Layers/xrRender/dxRenderDeviceRender.h"
 #include "xrEngine/xr_object.h"
 #include "xrEngine/IPhysicsShell.h"
 #include "xrEngine/IObjectPhysicsCollision.h"
 #include "xrEngine/IPhysicsGeometry.h"
-
 #include "dx103DFluidBlenders.h"
 #include "dx103DFluidData.h"
 #include "dx103DFluidGrid.h"
 
 /*
 #ifdef	DEBUG
-#include "../../xrRender/dxDebugRender.h"
+#include "Layers/xrRender/dxDebugRender.h"
 #endif
 
 static void draw_obb		( const Fmatrix &matrix, const u32 &color )

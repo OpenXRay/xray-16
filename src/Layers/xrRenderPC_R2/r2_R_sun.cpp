@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "xrEngine/igame_persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/irenderable.h"
-#include "../xrRender/FBasicVisual.h"
+#include "Layers/xrRender/FBasicVisual.h"
 
 const	float	tweak_COP_initial_offs			= 1200.f	;
 const	float	tweak_ortho_xform_initial_offs	= 1000.f	;	//. ?

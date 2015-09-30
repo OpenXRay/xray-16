@@ -1,20 +1,16 @@
 #pragma once
-
-#include "../xrRender/r__dsgraph_structure.h"
-
-#include "../xrRender/PSLibrary.h"
-
-#include "../xrRender/hom.h"
-#include "../xrRender/detailmanager.h"
-#include "glowmanager.h"
-#include "../xrRender/wallmarksengine.h"
-#include "fstaticrender_rendertarget.h"
-#include "../xrRender/modelpool.h"
-
-#include "lightShadows.h"
-#include "lightProjector.h"
-#include "lightPPA.h"
-#include "../xrRender/light_DB.h"
+#include "Layers/xrRender/r__dsgraph_structure.h"
+#include "Layers/xrRender/PSLibrary.h"
+#include "Layers/xrRender/HOM.h"
+#include "Layers/xrRender/DetailManager.h"
+#include "GlowManager.h"
+#include "Layers/xrRender/WallmarksEngine.h"
+#include "FStaticRender_RenderTarget.h"
+#include "Layers/xrRender/modelpool.h"
+#include "LightShadows.h"
+#include "LightProjector.h"
+#include "LightPPA.h"
+#include "Layers/xrRender/light_DB.h"
 #include "xrCore/FMesh.hpp"
 
 class dxRender_Visual;

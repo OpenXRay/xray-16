@@ -1,10 +1,9 @@
 #include "stdafx.h"
-#include "xrEngine/igame_persistent.h"
-#include "../xrRender/FBasicVisual.h"
+#include "xrEngine/IGame_Persistent.h"
+#include "Layers/xrRender/FBasicVisual.h"
 #include "xrEngine/customhud.h"
 #include "xrEngine/xr_object.h"
-
-#include "../xrRender/QueryHelper.h"
+#include "Layers/xrRender/QueryHelper.h"
 
 IC	bool	pred_sp_sort	(ISpatial*	_1, ISpatial* _2)
 {

@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "igame_level.h"
-#include "igame_persistent.h"
+#include "IGame_Level.h"
+#include "IGame_Persistent.h"
 
 #include "x_ray.h"
 #include "std_classes.h"
@@ -28,7 +28,7 @@ IGame_Level::IGame_Level()
     Device.DumpResourcesMemoryUsage();
 }
 
-//#include "resourcemanager.h"
+//#include "ResourceManager.h"
 
 IGame_Level::~IGame_Level()
 {

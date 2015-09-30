@@ -9,7 +9,7 @@
 #include "xrEngine/LightAnimLibrary.h"
 #include "Level.h"
 #include "game_cl_base.h"
-#include "xrEngine/igame_persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/xr_collide_form.h"
 #include "artefact.h"
 #include "ai_object_location.h"

@@ -3,24 +3,21 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "xrEngine/igame_persistent.h"
-#include "xrEngine/environment.h"
-#include "../xrRender/fbasicvisual.h"
+#include "xrEngine/IGame_Persistent.h"
+#include "xrEngine/Environment.h"
+#include "Layers/xrRender/FBasicVisual.h"
 #include "xrEngine/CustomHUD.h"
 #include "xrEngine/xr_object.h"
 #include "xrCore/FMesh.hpp"
-#include "../xrRender/SkeletonCustom.h"
-#include "../xrRender/lighttrack.h"
-#include "../xrRender/dxRenderDeviceRender.h"
-#include "../xrRender/dxWallMarkArray.h"
-#include "../xrRender/dxUIShader.h"
-//#include "xrServerEntities/smart_cast.h"
-
+#include "Layers/xrRender/SkeletonCustom.h"
+#include "Layers/xrRender/lighttrack.h"
+#include "Layers/xrRender/dxRenderDeviceRender.h"
+#include "Layers/xrRender/dxWallMarkArray.h"
+#include "Layers/xrRender/dxUIShader.h"
 #ifndef _EDITOR
-#include "../../xrCPU_Pipe/ttapi.h"
+#include "xrCPU_Pipe/ttapi.h"
 #endif
 
- 
 using	namespace		R_dsgraph;
 
 CRender													RImplementation;

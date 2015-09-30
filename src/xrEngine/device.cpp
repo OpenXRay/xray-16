@@ -26,7 +26,7 @@
 #endif // #ifdef INGAME_EDITOR
 
 #include "xrSash.h"
-#include "igame_persistent.h"
+#include "IGame_Persistent.h"
 
 #pragma comment( lib, "d3dx9.lib" )
 
@@ -206,7 +206,7 @@ void mt_Thread(void* ptr)
     }
 }
 
-#include "igame_level.h"
+#include "IGame_Level.h"
 void CRenderDevice::PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input)
 {
     if (m_pRender->GetForceGPU_REF()) amount = 0;

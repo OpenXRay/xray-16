@@ -1,8 +1,7 @@
 #ifndef	dx10StateCacheImpl_included
 #define	dx10StateCacheImpl_included
 #pragma once
-
-#include "../dx10StateUtils.h"
+#include "Layers/xrRenderDX10/dx10StateUtils.h"
 
 using dx10StateUtils::operator==;
 

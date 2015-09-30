@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "xrCore/FMesh.hpp"
-#include "flod.h"
+#include "FLOD.h"
 
 struct _hw 
 {

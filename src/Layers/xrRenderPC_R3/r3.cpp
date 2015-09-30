@@ -1,18 +1,16 @@
 #include "stdafx.h"
 #include "r3.h"
-#include "../xrRender/fbasicvisual.h"
+#include "Layers/xrRender/FBasicVisual.h"
 #include "xrEngine/xr_object.h"
 #include "xrEngine/CustomHUD.h"
-#include "xrEngine/igame_persistent.h"
-#include "xrEngine/environment.h"
-#include "../xrRender/SkeletonCustom.h"
-#include "../xrRender/LightTrack.h"
-#include "../xrRender/dxRenderDeviceRender.h"
-#include "../xrRender/dxWallMarkArray.h"
-#include "../xrRender/dxUIShader.h"
-
-#include "..\xrRenderDX10\3DFluid\dx103DFluidManager.h"
-
+#include "xrEngine/IGame_Persistent.h"
+#include "xrEngine/Environment.h"
+#include "Layers/xrRender/SkeletonCustom.h"
+#include "Layers/xrRender/LightTrack.h"
+#include "Layers/xrRender/dxRenderDeviceRender.h"
+#include "Layers/xrRender/dxWallMarkArray.h"
+#include "Layers/xrRender/dxUIShader.h"
+#include "Layers/xrRenderDX10/3DFluid/dx103DFluidManager.h"
 #include "D3DX10Core.h"
 
 CRender										RImplementation;

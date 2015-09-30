@@ -1,16 +1,11 @@
-//----------------------------------------------------
-// file: PSLibrary.cpp
-//----------------------------------------------------
 #include "stdafx.h"
 #pragma hdrstop
-
 #include "PSLibrary.h"
 #include "ParticleEffect.h"
 #include "ParticleGroup.h"
-
 #ifdef _EDITOR
-#	include "ParticleEffectActions.h"
-#include "../ECore/Editor/ui_main.h"
+#include "ParticleEffectActions.h"
+#include "editors/ECore/Editor/ui_main.h"
 #endif
 
 #define _game_data_			"$game_data$"

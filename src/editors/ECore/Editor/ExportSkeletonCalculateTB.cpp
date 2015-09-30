@@ -1,43 +1,29 @@
-
-//----------------------------------------------------
-// file: ExportSkeleton.cpp
-//----------------------------------------------------
 #include "stdafx.h"
 #pragma hdrstop
 
 #ifndef	_EDITOR
-//
 #include "xrEngine/defines.h"
-//
 #include "xrCore/xrCore.h"
-
 #include "Layers/xrRender/hwcaps.h"
 #include "Layers/xrRender/hw.h"
 #include "xrEngine/pure.h"
 class CGameFont;
-#include "..\..\include\xrRender\drawutils.h"
-#include "..\..\Layers\xrRender\xrD3dDefs.h"
-#include "..\..\Layers\xrRender\shader.h"
-#include "..\..\Layers\xrRender\R_Backend.h"
-
+#include "Include/xrRender/drawutils.h"
+#include "Layers/xrRender/xrD3dDefs.h"
+#include "Layers/xrRender/Shader.h"
+#include "Layers/xrRender/R_Backend.h"
 #include "xrCore/FMesh.hpp"
-#include "..\..\xrEngine\_d3d_extensions.h"
-#include "..\..\xrEngine\properties.h"
-
-//
-
+#include "xrEngine/_d3d_extensions.h"
+#include "xrEngine/Properties.h"
 
 DEFINE_VECTOR(FVF::L,FLvertexVec,FLvertexIt);
 DEFINE_VECTOR(FVF::TL,FTLvertexVec,FTLvertexIt);
 DEFINE_VECTOR(FVF::LIT,FLITvertexVec,FLITvertexIt);
 DEFINE_VECTOR(shared_str,RStrVec,RStrVecIt);
-
 #endif
 
-
 #include "ExportSkeleton.h"
-
-#include "../engine/nvMeshMender.h"
+#include "editors/ECore/engine/nvMeshMender.h"
 /*
 void CExportSkeleton::SSplit::CalculateTB()
 {
@@ -185,10 +171,10 @@ void CExportSkeleton::SSplit::CalculateTB()
 ///////////////////////////////////////////////////////////////////////////////////////////////////// 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-#include "../../common/nvMender2003/nvmeshmender.h"
-#include "../../common/NvMender2003/nvMeshMender.h"
-#include "../../common/NvMender2003/mender_input_output.h"
-#include "../../common/NvMender2003/remove_isolated_verts.h"
+#include "common/nvMender2003/nvmeshmender.h"
+#include "common/NvMender2003/nvMeshMender.h"
+#include "common/NvMender2003/mender_input_output.h"
+#include "common/NvMender2003/remove_isolated_verts.h"
 
 void 	CExportSkeleton::SSplit::OptimizeTextureCoordinates()
 {

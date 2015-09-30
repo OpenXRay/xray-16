@@ -2,7 +2,7 @@
 #ifndef ParticleGroupH
 #define ParticleGroupH
 
-#include "../xrRender/dxParticleCustom.h"
+#include "Layers/xrRender/dxParticleCustom.h"
 
 namespace PS
 {

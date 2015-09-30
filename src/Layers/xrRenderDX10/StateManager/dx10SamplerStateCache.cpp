@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "dx10SamplerStateCache.h"
-
-#include "../dx10StateUtils.h"
+#include "Layers/xrRenderDX10/dx10StateUtils.h"
 
 using dx10StateUtils::operator==;
 

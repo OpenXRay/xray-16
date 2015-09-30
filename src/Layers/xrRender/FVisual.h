@@ -6,9 +6,9 @@
 #pragma once
 
 #ifdef _EDITOR
-#	include "fbasicvisual.h"
+#	include "FBasicVisual.h"
 #else
-#	include "fbasicvisual.h"
+#	include "FBasicVisual.h"
 #endif
 
 class	Fvisual					: public		dxRender_Visual, public IRender_Mesh

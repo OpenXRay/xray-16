@@ -13,7 +13,7 @@
 #include "patrol_path_storage.h"
 #include "xrServer.h"
 #include "client_spawn_manager.h"
-#include "xrEngine/igame_persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 #include "game_cl_base.h"
 #include "UIGameCustom.h"
 #include "UI/UIDialogWnd.h"

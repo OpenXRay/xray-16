@@ -20,7 +20,7 @@
 #include "xrEngine/x_ray.h"
 #include "saved_game_wrapper.h"
 #include "string_table.h"
-#include "xrEngine/igame_persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 #include "autosave_manager.h"
 
 XRCORE_API string_path g_bug_report_file;

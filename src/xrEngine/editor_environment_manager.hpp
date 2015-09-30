@@ -11,7 +11,7 @@
 
 #ifdef INGAME_EDITOR
 
-#include "environment.h"
+#include "Environment.h"
 
 namespace editor
 {

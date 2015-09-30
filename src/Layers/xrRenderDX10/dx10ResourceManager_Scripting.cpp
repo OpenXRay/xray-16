@@ -2,10 +2,10 @@
 #pragma hdrstop
 
 #include	"xrEngine/Render.h"
-#include	"../xrRender/ResourceManager.h"
-#include	"../xrRender/tss.h"
-#include	"../xrRender/blenders/blender.h"
-#include	"../xrRender/blenders/blender_recorder.h"
+#include	"Layers/xrRender/ResourceManager.h"
+#include	"Layers/xrRender/tss.h"
+#include	"Layers/xrRender/blenders/blender.h"
+#include	"Layers/xrRender/blenders/blender_recorder.h"
 //	adopt_compiler don't have = operator And it can't have = operator
 #pragma warning( push )
 #pragma warning( disable : 4512)
@@ -14,7 +14,7 @@
 #include	"xrEngine/ai_script_lua_extension.h"
 #include	"luabind/return_reference_to_policy.hpp"
 
-#include	"../xrRender/dxRenderDeviceRender.h"
+#include	"Layers/xrRender/dxRenderDeviceRender.h"
 
 using namespace				luabind;
 

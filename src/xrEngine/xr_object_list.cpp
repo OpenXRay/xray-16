@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "igame_level.h"
-#include "igame_persistent.h"
+#include "IGame_Level.h"
+#include "IGame_Persistent.h"
 
 #include "xrSheduler.h"
 #include "xr_object_list.h"

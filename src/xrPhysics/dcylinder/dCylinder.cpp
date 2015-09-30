@@ -1,8 +1,6 @@
 #include "stdafx.h"
-
 #include "dCylinder.h"
-
-#include "../ode_include.h"
+#include "xrPhysics/ode_include.h"
 
 // given a pointer `p' to a dContactGeom, return the dContactGeom at
 // p + skip bytes.

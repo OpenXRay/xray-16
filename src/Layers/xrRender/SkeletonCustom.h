@@ -2,7 +2,7 @@
 #ifndef SkeletonCustomH
 #define SkeletonCustomH
 
-#include		"fhierrarhyvisual.h"
+#include		"FHierrarhyVisual.h"
 #include "xrCore/Animation/Bone.hpp"
 #include		"Include/xrRender/Kinematics.h"
 

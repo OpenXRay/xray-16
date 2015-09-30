@@ -14,7 +14,7 @@
 
 #include "xr_input.h"
 
-//#include "resourcemanager.h"
+//#include "ResourceManager.h"
 
 #ifndef _EDITOR
 #include "IGame_Level.h"

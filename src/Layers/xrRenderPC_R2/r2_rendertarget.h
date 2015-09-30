@@ -1,6 +1,5 @@
 #pragma once
-
-#include "../xrRender/ColorMapManager.h"
+#include "Layers/xrRender/ColorMapManager.h"
 
 class light;
 

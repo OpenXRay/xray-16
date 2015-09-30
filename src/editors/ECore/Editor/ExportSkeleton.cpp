@@ -6,24 +6,16 @@
 #include "EditObject.h"
 #include "EditMesh.h"
 #include "xrCore/FMesh.hpp"
-
 #include "xrEngine/std_classes.h"
 #include "xrCore/Animation/Bone.hpp"
 #include "xrCore/Animation/SkeletonMotions.hpp"
 #include "xrCore/Animation/Motion.hpp"
-
-//#include "library.h"
-
-#include "MgcCont3DBox.h"         
-#include "MgcCont3DMinBox.h"         
-
+#include "MgcCont3DBox.h"
+#include "MgcCont3DMinBox.h"
 #ifdef _EDITOR
 #include "ui_main.h"
 #include "ui_toolscustom.h"
-
 #endif
-//#include "Layers/xrRender/SkeletonAnimated.h"
-
 
 ECORE_API BOOL g_force16BitTransformQuant = FALSE;
 ECORE_API float g_EpsSkelPositionDelta = EPS_L;
@@ -479,9 +471,9 @@ CExportSkeleton::CExportSkeleton(CEditableObject* object)
 	m_Source=object;
 }
 //----------------------------------------------------
-#include "../WildMagic/WmlMath.h"
-#include "../WildMagic/WmlContMinBox3.h"
-#include "../WildMagic/WmlContBox3.h"
+#include "editors/ECore/WildMagic/WmlMath.h"
+#include "editors/ECore/WildMagic/WmlContMinBox3.h"
+#include "editors/ECore/WildMagic/WmlContBox3.h"
 
 extern BOOL RAPIDMinBox(Fobb& B, Fvector* vertices, u32 v_count);
 void ComputeOBB_RAPID	(Fobb &B, FvectorVec& V, u32 t_cnt)

@@ -1,7 +1,3 @@
-// SkeletonX.cpp: implementation of the CSkeletonX class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #pragma hdrstop
 
@@ -10,12 +6,10 @@
 #pragma warning(default:4995)
 
 #include "xrCore/FMesh.hpp"
-#include "../../xrCPU_Pipe/xrCPU_Pipe.h"
+#include "xrCPU_Pipe/xrCPU_Pipe.h"
 #include "FSkinned.h"
 #include "SkeletonX.h"
-
-#include "../xrRenderDX10/dx10BufferUtils.h"
-
+#include "Layers/xrRenderDX10/dx10BufferUtils.h"
 #include "xrEngine/EnnumerateVertices.h"
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

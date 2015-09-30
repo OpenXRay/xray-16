@@ -1,7 +1,3 @@
-// Texture.cpp: implementation of the CTexture class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #pragma hdrstop
 
@@ -10,11 +6,7 @@
 #pragma warning(default:4995)
 
 #include <D3DX10Tex.h>
-
-#include "../xrRender/dxRenderDeviceRender.h"
-
-// #include "std_classes.h"
-// #include "xr_avi.h"
+#include "Layers/xrRender/dxRenderDeviceRender.h"
 
 void fix_texture_name(LPSTR fn)
 {

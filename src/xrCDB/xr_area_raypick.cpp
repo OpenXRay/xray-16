@@ -5,7 +5,7 @@
 #include "xrEngine/xr_object.h"
 #include "Intersect.hpp"
 #include "d3d9types.h"
-//#include "igame_level.h"
+//#include "IGame_Level.h"
 //#include "x_ray.h"
 //#include "GameFont.h"
 #ifdef	DEBUG

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "../xrRender/r_constants_cache.h"
+#include "Layers/xrRender/r_constants_cache.h"
 
 dx10ConstantBuffer& R_constants::GetCBuffer(R_constant* C, BufferType BType)
 {

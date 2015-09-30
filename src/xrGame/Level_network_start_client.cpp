@@ -3,7 +3,7 @@
 //#include "Physics.h"
 #include "Level.h"
 #include "xrEngine/x_ray.h"
-#include "xrEngine/igame_persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 
 #include "ai_space.h"
 #include "game_cl_base.h"

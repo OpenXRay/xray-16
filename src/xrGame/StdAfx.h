@@ -20,6 +20,6 @@
 
 #include "xrEngine/gamefont.h"
 #include "xrEngine/xr_object.h"
-#include "xrEngine/igame_level.h"
+#include "xrEngine/IGame_Level.h"
 #include "xrPhysics/xrphysics.h"
 #include "xrServerEntities/smart_cast.h"

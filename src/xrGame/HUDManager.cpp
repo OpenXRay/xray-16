@@ -2,7 +2,7 @@
 #include "HUDManager.h"
 #include "hudtarget.h"
 #include "actor.h"
-#include "xrEngine/igame_level.h"
+#include "xrEngine/IGame_Level.h"
 #include "xrEngine/xr_input.h"
 #include "GamePersistent.h"
 #include "MainMenu.h"

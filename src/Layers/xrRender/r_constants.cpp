@@ -6,11 +6,9 @@
 #pragma warning(default:4995)
 
 #include "ResourceManager.h"
-
 #include "xrCore/xrPool.h"
 #include "r_constants.h"
-
-#include "../xrRender/dxRenderDeviceRender.h"
+#include "Layers/xrRender/dxRenderDeviceRender.h"
 
 // pool
 //.static	poolSS<R_constant,512>			g_constant_allocator;

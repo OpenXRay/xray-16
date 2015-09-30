@@ -3,9 +3,8 @@
 #pragma once
 #include "xrCore/xr_resource.h"
 #include "tss_def.h"
-
 #if defined(USE_DX10) || defined(USE_DX11)
-#include "../xrRenderDX10/StateManager/dx10State.h"
+#include "Layers/xrRenderDX10/StateManager/dx10State.h"
 #endif	//	USE_DX10
 
 #pragma pack(push,4)

@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "../xrRender/ResourceManager.h"
-#include "../xrRender/blenders/Blender_Recorder.h"
-#include "../xrRender/blenders/Blender.h"
+#include "Layers/xrRender/ResourceManager.h"
+#include "Layers/xrRender/blenders/Blender_Recorder.h"
+#include "Layers/xrRender/blenders/Blender.h"
 
-#include "../xrRender/dxRenderDeviceRender.h"
+#include "Layers/xrRender/dxRenderDeviceRender.h"
 
-#include "../xrRender/tss.h"
+#include "Layers/xrRender/tss.h"
 
 void fix_texture_name(LPSTR fn);
 

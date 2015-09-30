@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "dx10StateManager.h"
-
-#include "../dx10StateUtils.h"
+#include "Layers/xrRenderDX10/dx10StateUtils.h"
 #include "dx10StateCache.h"
 
 dx10StateManager	StateManager;

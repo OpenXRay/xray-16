@@ -4,13 +4,13 @@
 #include "dTriColliderCommon.h"
 #include "dTriColliderMath.h"
 #include "__aabb_tri.h"
-#include "../MathUtils.h"
-#include "../console_vars.h"
-#include "../phworld.h"
+#include "xrPhysics/MathUtils.h"
+#include "xrPhysics/console_vars.h"
+#include "xrPhysics/PHWorld.h"
 #include "xrCDB/xr_area.h"
 #include "xrEngine/GameMtlLib.h"
 #ifdef DEBUG
-#include "../debug_output.h"
+#include "xrPhysics/debug_output.h"
 #endif
 
 IC bool negative_tri_set_ignored_by_positive_tri(const Triangle &neg_tri, const Triangle &pos_tri, const Fvector*	 V_array )

@@ -14,7 +14,7 @@
 #include <boost/noncopyable.hpp>
 #include "Include/editor/property_holder.hpp"
 #include "property_collection_forward.hpp"
-#include "environment.h"
+#include "Environment.h"
 
 namespace editor
 {

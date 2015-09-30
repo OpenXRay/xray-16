@@ -1,8 +1,7 @@
 #include "stdafx.h"
-#include "xrEngine/igame_persistent.h"
+#include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/irenderable.h"
-#include "../xrRender/FBasicVisual.h"
-
+#include "Layers/xrRender/FBasicVisual.h"
 #include "r3_R_sun_support.h"
 
 const	float	tweak_rain_COP_initial_offs			= 1200.f;

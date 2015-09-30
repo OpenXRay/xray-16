@@ -6,7 +6,6 @@
 #include "HOM.h"
 #include "occRasterizer.h"
 #include "xrEngine/GameFont.h"
-
 #include "dxRenderDeviceRender.h"
  
 float	psOSSR		= .001f;

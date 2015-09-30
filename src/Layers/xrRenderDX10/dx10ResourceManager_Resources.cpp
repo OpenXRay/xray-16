@@ -11,15 +11,13 @@
 
 #include <D3DX10Core.h>
 
-#include "../xrRender/ResourceManager.h"
-#include "../xrRender/tss.h"
-#include "../xrRender/blenders/blender.h"
-#include "../xrRender/blenders/blender_recorder.h"
-
-#include "../xrRenderDX10/dx10BufferUtils.h"
-#include "../xrRenderDX10/dx10ConstantBuffer.h"
-
-#include "../xrRender/ShaderResourceTraits.h"
+#include "Layers/xrRender/ResourceManager.h"
+#include "Layers/xrRender/tss.h"
+#include "Layers/xrRender/blenders/blender.h"
+#include "Layers/xrRender/blenders/blender_recorder.h"
+#include "Layers/xrRenderDX10/dx10BufferUtils.h"
+#include "Layers/xrRenderDX10/dx10ConstantBuffer.h"
+#include "Layers/xrRender/ShaderResourceTraits.h"
 
 #ifdef USE_DX11
 	SHS*	CResourceManager::_CreateHS			(LPCSTR Name)

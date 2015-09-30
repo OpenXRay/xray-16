@@ -1,16 +1,12 @@
-//---------------------------------------------------------------------------
 #ifndef ParticleEffectH
 #define ParticleEffectH
-//---------------------------------------------------------------------------
-
 #include "ParticleEffectDef.h"
-
 #ifdef _EDITOR
-#	include "Layers/xrRender/FBasicVisual.h"
-#	include "Layers/xrRender/dxParticleCustom.h"
+#include "Layers/xrRender/FBasicVisual.h"
+#include "Layers/xrRender/dxParticleCustom.h"
 #else // _EDITOR
-#	include "../xrRender/FBasicVisual.h"
-#	include "../xrRender/dxParticleCustom.h"
+#include "Layers/xrRender/FBasicVisual.h"
+#include "Layers/xrRender/dxParticleCustom.h"
 #endif // _EDITOR
 
 namespace PS
