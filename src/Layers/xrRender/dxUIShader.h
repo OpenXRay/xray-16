@@ -2,7 +2,7 @@
 #define	dxUIShader_included
 #pragma once
 
-#include "..\..\Include\xrRender\UIShader.h"
+#include "Include/xrRender/UIShader.h"
 
 class dxUIShader : public IUIShader
 {

@@ -6,7 +6,7 @@
 //#include "SkeletonAnimated.h"
 #include "FMesh.hpp"
 #include "Motion.hpp"
-#include "..\Include\xrRender\Kinematics.h"
+#include "Include/xrRender/Kinematics.h"
 
 motions_container* g_pMotionsContainer = 0;
 

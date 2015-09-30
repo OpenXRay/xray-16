@@ -2,8 +2,8 @@
 #pragma hdrstop
 
 #include "maTranslator.h"
-#include "..\..\..\editors\Ecore\editor\EditObject.h"
-#include "..\..\..\editors\Ecore\editor\EditMesh.h"
+#include "editors/ECore/Editor/EditObject.h"
+#include "editors/ECore/Editor/EditMesh.h"
 #include "smoth_flags.h"
 //-----------------------------------------------------------------------------------------
 BOOL CEditableObject::ParseMAMaterial(CSurface* dest, SXRShaderData& d)

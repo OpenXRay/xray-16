@@ -4,10 +4,10 @@
 #pragma hdrstop
 
 #include "MeshExpUtility.h"
-#include "..\..\xrCore/FileSystem.h"
+#include "xrCore/FileSystem.h"
 #include "MeshExpUtility.rh"
-#include "..\..\..\editors\ECore\Editor\EditObject.h"
-#include "..\..\..\editors\ECore\Editor\EditMesh.h"
+#include "editors/ECore/Editor/EditObject.h"
+#include "editors/ECore/Editor/EditMesh.h"
 //-------------------------------------------------------------------
 //  Dialog Handler for Utility
 

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "camera_exporter.h"
-#include "..\..\..\editors\Ecore\editor\EditObject.h"
+#include "editors/ECore/Editor/EditObject.h"
 
 
 

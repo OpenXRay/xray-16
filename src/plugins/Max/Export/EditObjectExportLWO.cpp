@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "..\..\..\editors\ECore\Editor\EditObject.h"
-#include "..\..\..\editors\ECore\Editor\EditMesh.h"
+#include "editors/ECore/Editor/EditObject.h"
+#include "editors/ECore/Editor/EditMesh.h"
 #include "FS2.h"
 
 int FindLPCSTR(LPCSTRVec& vec, LPCSTR key){

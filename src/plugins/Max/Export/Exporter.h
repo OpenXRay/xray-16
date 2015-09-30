@@ -1,8 +1,8 @@
 #pragma once
 
-#include "..\..\Shared\helper.h"
-#include "..\..\Shared\bonedef.h"
-#include "..\..\Shared\face.h"
+#include "plugins/Shared/Helper.h"
+#include "plugins/Shared/bonedef.h"
+#include "plugins/Shared/Face.h"
 
 DEFINE_VECTOR(INode*,INodeVec,INodeIt);
 

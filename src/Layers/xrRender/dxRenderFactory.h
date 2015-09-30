@@ -2,7 +2,7 @@
 #define dxRenderFactory_included
 #pragma once
 
-#include "..\..\Include\xrRender\RenderFactory.h"
+#include "Include/xrRender/RenderFactory.h"
 
 #define RENDER_FACTORY_DECLARE(Class) \
 	virtual I##Class* Create##Class(); \

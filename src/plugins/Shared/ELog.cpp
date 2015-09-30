@@ -37,7 +37,7 @@
 	}
 #endif
 #ifdef _MAX_EXPORT
-	#include "..\Max\Export\NetDeviceLog.h"
+	#include "plugins/Max/Export/NetDeviceLog.h"
 	void ELogCallback(LPCSTR txt)
 	{
  		if (0!=txt[0]){

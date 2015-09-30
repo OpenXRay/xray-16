@@ -2,9 +2,9 @@
 #define dxEnvironmentRender_included
 #pragma once
 
-#include "..\..\Include\xrRender\EnvironmentRender.h"
+#include "Include/xrRender/EnvironmentRender.h"
+#include "blenders/Blender.h"
 
-#include "blenders\blender.h"
 class CBlender_skybox		: public IBlender  
 {
 public:

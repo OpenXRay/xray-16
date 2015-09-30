@@ -7,13 +7,11 @@
 //#include "..\..\Shared\EditMesh.h"
 //#include "..\..\Shared\EditObject.h"
 
-#include "..\..\..\editors\ECore\Editor\EditMesh.h"
-#include "..\..\..\editors\ECore\Editor\EditObject.h"
-
+#include "editors/ECore/Editor/EditMesh.h"
+#include "editors/ECore/Editor/EditObject.h"
 #include "MeshExpUtility.h"
-
 #include "Exporter.h"
-#include "..\..\Shared\GameMaterial.h"
+#include "plugins/Shared/GameMaterial.h"
 //----------------------------------------------------
 void CEditableMesh::FlipFaces(){
 	VERIFY(m_Faces);

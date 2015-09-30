@@ -2,7 +2,7 @@
 #define _LW_SHADER_H_
 #pragma once
 
-#include "..\lw_shared\LW_ShaderDef.h"
+#include "plugins/lw/lw_shared/LW_ShaderDef.h"
 
 typedef char sh_name[64];
 

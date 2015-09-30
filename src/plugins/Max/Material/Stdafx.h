@@ -67,7 +67,7 @@ DEFINE_VECTOR(AnsiString,AStringVec,AStringIt);
 //#include "clsid.h"
 //#include "Engine.h"
 //#include "Properties.h"
-#include "..\..\Shared\ELog.h"
+#include "plugins/Shared/ELog.h"
 
 #define THROW R_ASSERT(0)
 

@@ -2,7 +2,7 @@
 #define dxApplicationRender_included
 #pragma once
 
-#include "..\..\Include\xrRender\ApplicationRender.h"
+#include "Include/xrRender/ApplicationRender.h"
 
 class dxApplicationRender : public IApplicationRender
 {

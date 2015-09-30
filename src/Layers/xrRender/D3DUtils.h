@@ -4,7 +4,7 @@
 
 #ifndef D3DUtilsH
 #define D3DUtilsH
-#include "..\..\Include\xrRender\DrawUtils.h"
+#include "Include/xrRender/DrawUtils.h"
 //----------------------------------------------------
 
 #ifdef _EDITOR

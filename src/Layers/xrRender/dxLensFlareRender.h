@@ -2,7 +2,7 @@
 #define dxLensFlareRender_included
 #pragma once
 
-#include "..\..\Include\xrRender\LensFlareRender.h"
+#include "Include/xrRender/LensFlareRender.h"
 
 class dxFlareRender : public IFlareRender
 {

@@ -5,11 +5,10 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "..\ResourceManager.h"
+#include "Layers/xrRender/ResourceManager.h"
 #include "Blender_Recorder.h"
 #include "Blender.h"
-
-#include "..\dxRenderDeviceRender.h"
+#include "Layers/xrRender/dxRenderDeviceRender.h"
 
 static int ParseName(LPCSTR N)
 {

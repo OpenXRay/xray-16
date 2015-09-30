@@ -72,7 +72,7 @@ typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
 
 #pragma warning(push)
 #pragma warning(disable:4995)
-#include "..\..\Shared\ELog.h"
+#include "plugins/Shared/ELog.h"
 #include <d3d9types.h>
 #include <time.h>
 #include <string>

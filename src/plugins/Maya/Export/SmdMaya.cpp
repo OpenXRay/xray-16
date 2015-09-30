@@ -1,8 +1,8 @@
 #include "stdafx.h" 
 
 #include "SmdMaya.h"
-#include "..\..\..\editors\Ecore\editor\EditObject.h"
-#include "..\..\..\editors\Ecore\editor\EditMesh.h"
+#include "editors/ECore/Editor/EditObject.h"
+#include "editors/ECore/Editor/EditMesh.h"
 #include "xrCore/Animation/Motion.hpp"
 #include "xrCore/Animation/Envelope.hpp"
 #include "smoth_flags.h"

@@ -5,8 +5,8 @@
 
 #include "Exporter.h"
 #include "MeshExpUtility.h"
-#include "..\..\..\editors\ECore\Editor\EditObject.h"
-#include "..\..\..\editors\ECore\Editor\EditMesh.h"
+#include "editors/ECore/Editor/EditObject.h"
+#include "editors/ECore/Editor/EditMesh.h"
 #include "xrCore/Animation/Bone.hpp"
 #include "xrCore/Animation/Motion.hpp"
 #include "xrCore/Animation/Envelope.hpp"

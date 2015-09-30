@@ -31,7 +31,7 @@
 
 #include <maya/MFnStringData.h>
 #include <maya/MFnNumericAttribute.h>
-#include "..\..\Shared\BlenderListLoader.h"
+#include "plugins/Shared/BlenderListLoader.h"
 using namespace std;
 /////////////////////////////////
 // Plugin Lambert Shader Class //

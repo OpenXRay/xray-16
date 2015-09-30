@@ -2,7 +2,7 @@
 #define dxConsoleRender_included
 #pragma once
 
-#include "..\..\Include\xrRender\ConsoleRender.h"
+#include "Include/xrRender/ConsoleRender.h"
 
 class dxConsoleRender : public IConsoleRender
 {

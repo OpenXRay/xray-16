@@ -7,7 +7,7 @@
 #include "stdafx.h"
 #include "CSCompiler.h"
 #include "ComputeShader.h"
-#include "..\xrRender\dxRenderDeviceRender.h"
+#include "Layers/xrRender/dxRenderDeviceRender.h"
 
 CSCompiler::CSCompiler(ComputeShader& target):
 	m_Target(target), m_cs(0)

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "..\..\Shared\BoneDef.h"
+#include "plugins/Shared/BoneDef.h"
 #include "Exporter.h"
 #include "MeshExpUtility.h"
 

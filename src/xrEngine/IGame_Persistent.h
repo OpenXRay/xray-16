@@ -2,7 +2,7 @@
 #define IGame_PersistentH
 #pragma once
 
-#include "..\xrServerEntities\gametype_chooser.h"
+#include "xrServerEntities/gametype_chooser.h"
 #ifndef _EDITOR
 #include "Environment.h"
 #include "IGame_ObjectPool.h"

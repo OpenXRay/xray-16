@@ -76,7 +76,7 @@ typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
 
 #pragma warning(push)
 #pragma warning(disable:4995)
-#	include "..\..\Shared\ELog.h"
+#include "plugins/Shared/ELog.h"
 #pragma warning(pop)
 
 #include "xrCore/Animation/Bone.hpp"

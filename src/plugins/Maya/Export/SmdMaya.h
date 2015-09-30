@@ -1,7 +1,7 @@
 #ifndef SmdMayaH
 #define SmdMayaH
 
-#include "..\..\..\editors\Ecore\editor\EditMesh.H"
+#include "editors/ECore/Editor/EditMesh.H"
 #include "ExportDefines.H"
 #include "SmdBone.h"
 #include "SmdTriangle.h"

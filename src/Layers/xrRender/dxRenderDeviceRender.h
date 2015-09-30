@@ -10,7 +10,7 @@
 
 #ifndef _EDITOR
 
-#include "..\..\Include\xrRender\RenderDeviceRender.h"
+#include "Include/xrRender/RenderDeviceRender.h"
 #include "xr_effgamma.h"
 
 class CResourceManager;

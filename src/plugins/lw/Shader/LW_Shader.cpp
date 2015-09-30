@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "LW_Shader.h"
-#include "..\..\Shared\BlenderListLoader.h"
+#include "plugins/Shared/BlenderListLoader.h"
 
 extern "C" { EShaderList ENShaders; EShaderList LCShaders; EShaderList GameMtls;}
 

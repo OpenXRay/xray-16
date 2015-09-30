@@ -2,7 +2,7 @@
 #define dxRainRender_included
 #pragma once
 
-#include "..\..\Include\xrRender\RainRender.h"
+#include "Include/xrRender/RainRender.h"
 
 class dxRainRender : public IRainRender
 {
