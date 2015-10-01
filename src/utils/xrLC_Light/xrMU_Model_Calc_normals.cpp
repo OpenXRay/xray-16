@@ -1,12 +1,12 @@
 #include "stdafx.h"
-//#include "build.h"
+
 #include "mu_model_face.h"
 #include "calculate_normals.h"
 #include "xrMU_Model.h"
 
 #include "xrCore/xrPool.h"
 
-//#include "build.h"
+
 
 poolSS<_vertex,8*1024>	&mu_vertices_pool();
 

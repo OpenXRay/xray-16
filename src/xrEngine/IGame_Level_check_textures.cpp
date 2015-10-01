@@ -1,5 +1,5 @@
 #include "stdafx.h"
-//#include "ResourceManager.h"
+
 #include "IGame_Level.h"
 
 void IGame_Level::LL_CheckTextures()

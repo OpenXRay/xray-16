@@ -5,7 +5,7 @@
 
 #include "IGame_Persistent.h"
 #include "Environment.h"
-//#include "SkeletonCustom.h"
+
 // Instead of SkeletonCustom:
 #include "xrCore/Animation/Bone.hpp"
 #include "Include/xrRender/Kinematics.h"

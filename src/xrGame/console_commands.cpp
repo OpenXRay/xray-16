@@ -23,7 +23,7 @@
 #include "script_process.h"
 #include "xrServer_Objects.h"
 #include "ui/UIMainIngameWnd.h"
-//#include "xrPhysics/PhysicsGamePars.h"
+
 #include "xrPhysics/iphworld.h"
 #include "string_table.h"
 #include "autosave_manager.h"
@@ -40,7 +40,7 @@
 #include "MainMenu.h"
 #include "saved_game_wrapper.h"
 #include "level_graph.h"
-//#include "xrEngine/ResourceManager.h"
+
 #include "xrEngine/doug_lea_memory_allocator.h"
 #include "cameralook.h"
 #include "character_hit_animations_params.h"

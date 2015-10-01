@@ -22,7 +22,7 @@
    documentation and/or software.  
  */
 
-//#include "global.h"
+
 #include "md5.h"
 #include <stdio.h>
 #include <string.h>

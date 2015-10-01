@@ -1,4 +1,4 @@
-//#include "stdafx.h"
+
 #ifndef __DCTRILISTCOLLIDER_INCLUDED__
 #define __DCTRILISTCOLLIDER_INCLUDED__
 #include "dcTriangle.h"

@@ -10,7 +10,7 @@
 #ifndef objectH
 #define objectH
 
-//#include "quad.h"
+
 
 // Incremented by the draw routs. Display + zero whenever you want.
 extern int g_iMaxNumTrisDrawn;
@@ -23,7 +23,7 @@ class MeshPt;
 class MeshEdge;
 class MeshTri;
 
-//#include "D3dx8core.h"
+
 
 struct MyPt
 {

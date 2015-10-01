@@ -5,7 +5,7 @@
 #include "xrCDB/xr_area.h"
 #include "render.h"
 #include "xrLevel.h"
-//#include "FBasicVisual.h"
+
 #include "Include/xrRender/RenderVisual.h"
 #include "Include/xrRender/Kinematics.h"
 
@@ -64,7 +64,7 @@ void CObject::cNameSect_set(shared_str N)
 {
     NameSection = N;
 }
-//#include "SkeletonCustom.h"
+
 void CObject::cNameVisual_set(shared_str N)
 {
     // check if equal

@@ -28,7 +28,7 @@ IGame_Level::IGame_Level()
     Device.DumpResourcesMemoryUsage();
 }
 
-//#include "ResourceManager.h"
+
 
 IGame_Level::~IGame_Level()
 {

@@ -38,7 +38,7 @@
 #include "ai_space.h"
 #include "trade.h"
 #include "inventory.h"
-//#include "Physics.h"
+
 #include "Level.h"
 #include "GamePersistent.h"
 #include "game_cl_base.h"
@@ -47,7 +47,7 @@
 #include "string_table.h"
 #include "usablescriptobject.h"
 #include "xrCDB/Intersect.hpp"
-//#include "ExtendedGeom.h"
+
 #include "alife_registry_wrappers.h"
 #include "Include/xrRender/Kinematics.h"
 #include "artefact.h"

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-//#include "Actor.h"
+
 #include "actorcameracollision.h"
 
 #include "xrEngine/CameraBase.h"
@@ -12,9 +12,9 @@
 #include "matrix_utils.h"
 #include "iphysicsshellholder.h"
 
-//#include "ai/stalker/ai_stalker.h"
+
 #include "GeometryBits.h"
-//#include "characterphysicssupport.h"
+
 #ifdef DEBUG
 #	include	"debug_output.h"
 #endif

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "configs_dump_verifyer.h"
 #include "configs_common.h"
-//#include "configs_dumper.h"
+
 char const * cd_info_secion			= "config_dump_info";
 char const * cd_player_name_key		= "player_name";
 char const * cd_player_digest_key	= "player_digest";

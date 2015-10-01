@@ -19,7 +19,7 @@
 #include "stalker_danger_planner.h"
 #include "stalker_alife_actions.h"
 #include "stalker_combat_planner.h"
-//#include "stalker_combat_planner_new.h"
+
 
 //#define GOAP_DEBUG
 

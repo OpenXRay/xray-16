@@ -17,10 +17,10 @@
 
 #include "character_info.h"
 #include "specific_character.h"
-//#include "character_community.h"
-//#include "monster_community.h"
-//#include "character_rank.h"
-//#include "character_reputation.h"
+
+
+
+
 
 #include <lua/library_linkage.h>
 #include <luabind/library_linkage.h>
@@ -52,7 +52,7 @@ extern "C" {
 void setup_luabind_allocator		();
 
 //#define TRIVIAL_ENCRYPTOR_DECODER
-//#include UP(xrEngine/trivial_encryptor.h)
+
 
 BOOL APIENTRY DllMain		(HANDLE module_handle, DWORD call_reason, LPVOID reserved)
 {

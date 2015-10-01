@@ -3,7 +3,7 @@
 
 #include <math.h>
 
-//#include "tntTimer.h"
+
 #include "vfw.h"
 #include "mmsystem.h"
 

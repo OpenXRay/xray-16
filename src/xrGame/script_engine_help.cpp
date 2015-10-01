@@ -11,9 +11,9 @@
 #ifdef DEBUG
 
 #ifndef BOOST_NO_STRINGSTREAM
-//#	include <sstream>
+
 #else
-//#	include <strstream>
+
 #endif
 
 xr_string to_string					(luabind::object const& o)

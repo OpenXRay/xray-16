@@ -8,7 +8,7 @@
 
 #include "xrCore/xrSyncronize.h"
 #include "net.h"
-//#include "utils/xrLC_Light/net_task_manager.h"
+
 #include "utils/xrLC_Light/lcnet_task_manager.h"
 #include "utils/xrLC_Light/mu_model_light.h"
 xrCriticalSection	task_CS

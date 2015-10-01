@@ -11,7 +11,7 @@
 //
 //  Todo:
 //      Allow user to specify IP to send debug output to (remote log for PS2)
-//#include "nonport.h"
+
 #include <stdarg.h>
 
 #if defined(__LANGUAGE_C_PLUS_PLUS)||defined(__cplusplus)||defined(c_plusplus)

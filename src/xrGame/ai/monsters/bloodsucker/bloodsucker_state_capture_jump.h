@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ai/Monsters/state.h"
-//#include "EntityCondition.h"
+
 
 template<typename _Object>
 class	CStateCaptureJumpBloodsucker : public CState<_Object> {

@@ -25,7 +25,7 @@
 #pragma warning(push)
 #pragma warning(disable:4005)
 
-//#include "alife_abstract_registry.h"
+
 
 template <typename _index_type, typename _data_type>
 class CALifeAbstractRegistry;

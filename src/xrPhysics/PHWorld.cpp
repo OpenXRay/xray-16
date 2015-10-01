@@ -3,18 +3,18 @@
 #include "PHWorld.h"
 #include "tri-colliderknoopc/dTriList.h"
 #include "PhysicsCommon.h"
-//#include "Level.h"
+
 #include "ExtendedGeom.h"
 #include "draymotions.h"
 #include "PHCollideValidator.h"
 #include "xrEngine/GameMtlLib.h"
-//#include "PhysicsGamePars.h"
+
 #include "params.h"
 #ifdef    DEBUG
 #	include "debug_output.h"
 #endif
-//#include "PHCommander.h"
-//#include "PHSimpleCalls.h"
+
+
 #include "xrServerEntities/PHSynchronize.h"
 #include "xrServerEntities/phnetstate.h"
 #include "geometrybits.h"

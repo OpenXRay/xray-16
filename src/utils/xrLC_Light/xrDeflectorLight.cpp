@@ -1,10 +1,10 @@
 #include "stdafx.h"
 
 #include "xrdeflector.h"
-//#include "build.h"
+
 #include "xrCDB/Intersect.hpp"
 #include "xrlc_globaldata.h"
-//#include "std_classes.h"
+
 #include "xrImage_Resampler.h"
 #include "light_point.h"
 #include "xrface.h"

@@ -3,7 +3,7 @@
 
 #include "phsimplecalls.h"
 #ifdef DEBUG
-//#include "phworld.h"
+
 //extern CPHWorld	*ph_world;
 #include "xrPhysics/IPHWorld.h"
 #endif

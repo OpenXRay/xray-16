@@ -19,7 +19,7 @@
 #include "platform.h"
 #include <vorbis/vorbisenc.h>
 #include "encode.h"
-//#include "i18n.h"
+
 
 #define READSIZE 1024
 #define _(a) a

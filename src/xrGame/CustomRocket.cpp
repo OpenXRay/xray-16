@@ -14,9 +14,9 @@
 #include "Level.h"
 #include "xrMessages.h"
 #include "xrEngine/GameMtlLib.h"
-//#include "tri-colliderknoopc/dTriList.h"
+
 #include "Include/xrRender/RenderVisual.h"
-//#include "CalculateTriangle.h"
+
 #include "actor.h"
 #ifdef DEBUG
 #include "PHDebug.h"

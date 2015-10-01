@@ -24,7 +24,7 @@
 #ifndef LUABIND_CLASS_REP_HPP_INCLUDED
 #define LUABIND_CLASS_REP_HPP_INCLUDED
 
-//#include <cstdlib>
+
 
 #include <boost/limits.hpp>
 #include <boost/preprocessor/repetition/enum_params_with_a_default.hpp>

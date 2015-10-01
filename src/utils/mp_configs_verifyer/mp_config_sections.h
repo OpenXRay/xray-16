@@ -3,7 +3,7 @@
 
 #include "xrCore/xrCore.h"
 #include "xrCore/LocatorAPI.h"
-//#include "anticheat_dumpable_object.h"
+
 
 class CGameObject;
 class IAnticheatDumpable;

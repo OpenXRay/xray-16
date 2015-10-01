@@ -90,9 +90,9 @@ How to use MeshMender:
 #pragma warning( disable : 4100)
 
 #include <d3dx9.h>
-//#include <map>
-//#include <set>
-//#include <vector>
+
+
+
 
 
 class MeshMender

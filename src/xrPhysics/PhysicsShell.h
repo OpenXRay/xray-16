@@ -6,7 +6,7 @@
 #include "PhysicsCommon.h"
 #include "icollidevalidator.h"
 #include "xrServerEntities/alife_space.h"
-//#include "script_export_space.h"
+
 #include "xrEngine/iphysicsshell.h"
 #include "iphysics_scripted.h"
 class CPhysicsJoint;

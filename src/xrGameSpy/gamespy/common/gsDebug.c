@@ -2,8 +2,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include "gsCommon.h"
 #include "gsDebug.h"
-//#include <stdio.h>
-//#include <stdarg.h>
+
+
 
 
 // THIS FILE ONLY INCLUDED WHEN USING GAMESPY DEBUG FUNCTIONS

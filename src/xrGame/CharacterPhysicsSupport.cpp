@@ -15,14 +15,14 @@
 
 #include "xrPhysics/PhysicsShell.h"
 #include "xrPhysics/iActivationShape.h"
-//#include "xrPhysics/Extendedgeom.h"
+
 #include "xrPhysics/geometry.h"
-//#include "xrPhysics/phdynamicdata.h"
+
 #include "xrPhysics/IPHCapture.h"
-//#include "xrPhysics/ICollideValidator.h"
+
 #include "xrPhysics/IPHWorld.h"
 
-//#include "Physics.h"
+
 
 
 #include "IKLimbsController.h"

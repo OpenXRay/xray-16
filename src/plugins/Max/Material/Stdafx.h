@@ -64,9 +64,9 @@ typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
 #define AnsiString string
 DEFINE_VECTOR(AnsiString,AStringVec,AStringIt);
 
-//#include "clsid.h"
-//#include "Engine.h"
-//#include "Properties.h"
+
+
+
 #include "plugins/Shared/ELog.h"
 
 #define THROW R_ASSERT(0)

@@ -2,8 +2,8 @@
 #ifndef CPHMOVEMENT_CONTROL_H
 #define CPHMOVEMENT_CONTROL_H
 
-//#include "xrPhysics/PHCharacter.h"
-//#include "xrPhysics/MathUtils.h"
+
+
 #include "xrPhysics/physicsexternalcommon.h"
 #include "xrPhysics/mathutils.h"
 #include "xrPhysics/movementboxdynamicactivate.h"

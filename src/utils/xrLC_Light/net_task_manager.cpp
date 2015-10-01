@@ -8,7 +8,7 @@
 #include "net_stream.h"
 #include "xrLC_GlobalData.h"
 #include "xrDeflector.h"
-//#include "net.h"
+
 void compress( LPCSTR f_in_out );
 
 #ifdef NET_CMP

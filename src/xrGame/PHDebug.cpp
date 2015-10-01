@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #ifdef DEBUG
-//#include "physics.h"
-//#include "MathUtils.h"
+
+
 #include "xrEngine/StatGraph.h"
 #include "PHDebug.h"
-//#include "physics.h"
+
 #include "xrPhysics/MathUtils.h"
-//#include "PHObject.h"
+
 #include "xrPhysics/ExtendedGeom.h"
 #include "xrPhysics/iphworld.h"
 #include "xrPhysics/physicsshell.h"
@@ -21,7 +21,7 @@
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "xrCore/Animation/Bone.hpp"
 #include "xrEngine/iphdebug.h"
-//#include "phelement.h"
+
 #include "ui_base.h"
 
 Flags32		ph_dbg_draw_mask						;

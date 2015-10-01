@@ -10,10 +10,10 @@
 #include <io.h>
 #include <fcntl.h>
 #include <sys\stat.h>
-//#include "commdlg.h"
+
 
 #include <Shlobj.h>
-//#include "OSDialog.h"
+
 //#pragma comment(lib, "OSDialogB.lib")
 
 int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam,

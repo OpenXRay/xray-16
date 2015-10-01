@@ -3,7 +3,7 @@
 #include "xrPhysics/physicsshell.h"
 #include "entity_alive.h"
 #include "PHMovementControl.h"
-//#include "PhWorld.h"
+
 #include "CharacterPhysicsSupport.h"
 //extern CPHWorld	*ph_world;
 #include "xrPhysics/IPHWorld.h"

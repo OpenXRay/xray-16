@@ -9,7 +9,7 @@
 #pragma once
 
 #include "alife_simulator_base.h"
-//#include "game_graph_space.h"
+
 
 class CALifeCombatManager : public virtual CALifeSimulatorBase, CRandom {
 /**

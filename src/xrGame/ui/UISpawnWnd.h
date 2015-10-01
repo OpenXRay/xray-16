@@ -1,8 +1,8 @@
 #pragma once
 
 #include "UIDialogWnd.h"
-//#include "UIFrameWindow.h"
-//#include "UIButton.h"
+
+
 
 class CUIStatix;
 class CUIStatic;

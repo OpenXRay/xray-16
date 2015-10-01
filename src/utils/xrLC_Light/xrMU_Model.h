@@ -2,11 +2,11 @@
 #define XRMU_MODEL_H
 
 #include "mu_model_face.h"
-//#include "mu_model_face_defs.h"
+
 #include "serialize.h"
 
 
-//#include "cl_collector.h"
+
 namespace	CDB
 {
 	class	MODEL;

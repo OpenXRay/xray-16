@@ -11,7 +11,7 @@
 #include "xrServer_script_macroses.h"
 
 //#ifdef XRGAME_EXPORTS
-//#	include "alife_smart_terrain_task.h"
+
 //#endif
 
 using namespace luabind;

@@ -22,7 +22,7 @@ namespace WallmarksEngine {
 	};
 }
 
-// #include "xr_effsun.h"
+
 
 const float W_DIST_FADE		= 15.f;
 const float	W_DIST_FADE_SQR	= W_DIST_FADE*W_DIST_FADE;

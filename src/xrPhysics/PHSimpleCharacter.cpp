@@ -7,24 +7,24 @@
 #include "tri-colliderKNoOPC\__aabb_tri.h"
 #include "PHSimpleCharacter.h"
 #include "PHContactBodyEffector.h"
-//#include "ui/uistatic.h"
+
 #include "SpaceUtils.h"
-//#include "PhysicsGamePars.h"
+
 #include "params.h"
 #include "MathUtils.h" 
-//#include "level.h"
+
 #include "xrEngine/GameMtlLib.h"
-//#include "gameobject.h"
+
 #include "iphysicsshellholder.h"
 #include "Include/xrRender/Kinematics.h"
 #include "PHSimpleCharacterInline.h"
 #include "DamageSource.h"
 #include "PHCollideValidator.h"
 #include "CalculateTriangle.h"
-//#include "game_base_space.h"
+
 #include "geometry.h"
 
-//#include "phvalide.h"
+
 
 #include "xrCore/Animation/Bone.hpp"
 #include "xrEngine/xr_object.h"
@@ -35,7 +35,7 @@ IC		bool	PhOutOfBoundaries			(const Fvector& v)
 	return v.y < phBoundaries.y1;
 }
 //#ifdef DEBUG
-//#	include "debug_renderer.h"
+
 //#endif
 
 const float LOSE_CONTROL_DISTANCE=0.5f; //fly distance to lose control

@@ -9,7 +9,7 @@
 #include "lcnet_task_manager.h"
 #include "net_exec_pool.h"
 
-//#include "light_point.h"
+
 bool GetTranslucency(const Vertex* V,float &v_trans );
 u32		vertises_has_lighting = u32(-1);
 u32 CalcAllTranslucency()

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "xrMU_Model.h"
-//#include "build.h"
+
 #include "xrCore/xrPool.h"
 poolSS<_face,8*1024>	&mu_faces_pool();
 poolSS<_vertex,8*1024>	&mu_vertices_pool();

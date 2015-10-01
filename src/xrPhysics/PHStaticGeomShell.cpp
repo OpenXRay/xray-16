@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "PHStaticGeomShell.h"
 #include "SpaceUtils.h"
-//#include "GameObject.h"
+
 #include "IPhysicsShellHolder.h"
 #include "phcharacter.h"
 #include "iclimableobject.h"
@@ -11,7 +11,7 @@
 #include "xrEngine/xr_object.h"
 #include "xrCore/Animation/Bone.hpp"
 
-//#include "game_object_space.h"
+
 
 void CPHStaticGeomShell::get_spatial_params()
 {

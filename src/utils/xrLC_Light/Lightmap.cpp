@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-//#include "build.h"
+
 #include "Lightmap.h"
 #include "xrDeflector.h"
 #include "xrDXTC.h"

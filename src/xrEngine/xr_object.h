@@ -3,7 +3,7 @@
 
 #include "xrCDB/ispatial.h"
 #include "isheduled.h"
-//#include "iinputreceiver.h"
+
 #include "irenderable.h"
 #include "icollidable.h"
 #include "engineapi.h"

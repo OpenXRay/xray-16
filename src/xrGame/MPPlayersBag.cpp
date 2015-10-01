@@ -2,7 +2,7 @@
 
 #include "MPPlayersBag.h"
 #include "Level.h"
-//#include "xrMessages.h"
+
 #include "game_base_space.h"
 
 #define BAG_REMOVE_TIME		60000

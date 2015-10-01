@@ -7,7 +7,7 @@
 
 //#	define TRIVIAL_ENCRYPTOR_ENCODER
 //#	define TRIVIAL_ENCRYPTOR_DECODER
-//#	include "xrEngine/trivial_encryptor.h"
+
 //#	undef TRIVIAL_ENCRYPTOR_ENCODER
 //#	undef TRIVIAL_ENCRYPTOR_DECODER
 

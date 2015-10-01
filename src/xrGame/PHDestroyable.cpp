@@ -13,8 +13,8 @@
 #include "ai_object_location.h"
 #include "ai_space.h"
 #include "game_graph.h"
-//#include "PHCollideValidator.h"
-//#include "PHShell.h"
+
+
 #include "xrPhysics/MathUtils.h"
 #ifdef DEBUG
 #include "xrPhysics/IPHWorld.h"

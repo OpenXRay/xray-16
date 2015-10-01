@@ -13,8 +13,8 @@
 #include "dxRenderDeviceRender.h"
 #endif
 
-// #include "std_classes.h"
-// #include "xr_avi.h"
+
+
 
 void fix_texture_name(LPSTR fn)
 {

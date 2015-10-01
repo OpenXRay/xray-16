@@ -87,7 +87,7 @@
 		// Bulk-of-the-work
 		#include "OPC_Settings.h"
 		#include "OPC_Common.h"
-//		#include "OPC_TreeBuilders.h"
+
 		#include "OPC_AABBTree.h"
 		#include "OPC_OptimizedTree.h"
 		#include "OPC_Model.h"

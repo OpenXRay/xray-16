@@ -73,7 +73,7 @@
 #endif
 #endif
 
-// #include <exception>
+
 // using std::exception;
 
 #include <stdio.h>
@@ -82,7 +82,7 @@
 #include <math.h>
 #include <string.h>
 #include <typeinfo.h>
-//#include <process.h>
+
 
 #ifndef DEBUG
 #ifdef _DEBUG

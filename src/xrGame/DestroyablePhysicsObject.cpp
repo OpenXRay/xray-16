@@ -15,7 +15,7 @@
 #include "xrPhysics/PhysicsShell.h"
 #ifdef DEBUG
 #include "xrPhysics/IPHWorld.h"
-//#include "PHWorld.h"
+
 //extern CPHWorld			*ph_world;
 #endif
 CDestroyablePhysicsObject ::CDestroyablePhysicsObject()

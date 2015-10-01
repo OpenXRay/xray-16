@@ -40,7 +40,7 @@ IC bool		InterpolateAndDither(float* alpha255,	u32 x, u32 y, u32 sx, u32 sy, u32
 
 #ifndef _EDITOR
 #ifdef	DEBUG
-//#include "Include/xrRender/DebugRender.h"
+
 #include "dxDebugRender.h"
 static void draw_obb		( const Fmatrix &matrix, const u32 &color )
 {

@@ -5,7 +5,7 @@
 #include "customzone.h"
 #include "artefact.h"
 #include "ai_sounds.h"
-//#include "ui/ArtefactDetectorUI.h"
+
 
 class CCustomZone;
 class CInventoryOwner;

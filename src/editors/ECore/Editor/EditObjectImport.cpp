@@ -6,7 +6,7 @@
 #pragma hdrstop
 
 #include "EditObject.h"
-//#include "lwo2.h"
+
 #include "LW_SHADERDEF.h"
 #include "EditMesh.h"
 

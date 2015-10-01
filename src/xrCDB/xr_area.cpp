@@ -1,13 +1,13 @@
 #include "stdafx.h"
-//#include "IGame_Level.h"
+
 
 #include "xr_area.h"
 #include "xrEngine/xr_object.h"
 #include "xrEngine/xrLevel.h"
 #include "xrEngine/xr_collide_form.h"
-//#include "xrSound/sound.h"
-//#include "x_ray.h"
-//#include "GameFont.h"
+
+
+
 
 
 using namespace	collide;

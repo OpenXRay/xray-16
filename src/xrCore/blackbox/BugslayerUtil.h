@@ -73,7 +73,7 @@ DEC '99 - Many updates for the book.
 //////////////////////////////////////////////////////////////////////*/
 // Include the headers that do the memory dumping and validation
 // routines.
-//#include "MemDumperValidator.h"
+
 
 // The CrashHandler routines.
 #include "CrashHandler.h"
@@ -82,7 +82,7 @@ DEC '99 - Many updates for the book.
 #include "DiagAssert.h"
 
 // The memory stress routines.
-//#include "MemStress.h"
+
 
 
 /*//////////////////////////////////////////////////////////////////////

@@ -4,8 +4,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-//#include "..\..\Shared\EditMesh.h"
-//#include "..\..\Shared\EditObject.h"
+
+
 
 #include "editors/ECore/Editor/EditMesh.h"
 #include "editors/ECore/Editor/EditObject.h"

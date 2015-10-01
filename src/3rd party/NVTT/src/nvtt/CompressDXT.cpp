@@ -36,7 +36,7 @@
 
 // squish
 #include "squish/colourset.h"
-//#include "squish/clusterfit.h"
+
 #include "squish/fastclusterfit.h"
 #include "squish/weightedclusterfit.h"
 
@@ -51,7 +51,7 @@
 #include "atitc/ATI_Compress.h"
 #endif
 
-//#include <time.h>
+
 
 using namespace nv;
 using namespace nvtt;

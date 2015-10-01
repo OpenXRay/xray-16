@@ -15,7 +15,7 @@
  */
 
 #include <malloc.h> // alloca
-//#include <string.h>
+
 
 static int vsscanf(const char * buffer, const char * format, va_list argPtr)
 {

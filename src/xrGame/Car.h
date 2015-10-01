@@ -3,12 +3,12 @@
 //#if 0
 
 #include "entity.h"
-//#include "xrPhysics/PHDynamicData.h"
+
 #include "xrPhysics/PhysicsShell.h"
 #include "xrPhysics/phupdateobject.h"
 #include "script_entity.h"
 #include "CarLights.h"
-//#include "phobject.h"
+
 #include "holder_custom.h"
 #include "PHSkeleton.h"
 #include "DamagableItem.h"

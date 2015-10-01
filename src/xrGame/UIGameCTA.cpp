@@ -20,7 +20,7 @@
 #include "xr_level_controller.h"
 
 #include "object_broker.h"
-//#include "clsid_game.h"
+
 #include "weaponknife.h"
 
 #include "ui/UISkinSelector.h"

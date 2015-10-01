@@ -8,7 +8,7 @@
 
 #include "xrPhysics/PhysicsShell.h"
 #include "entity.h"
-//#include "PSObject.h"
+
 #include "ParticlesObject.h"
 
 //для вызова статических функций поражения осколками
@@ -26,9 +26,9 @@
 #	include "PHDebug.h"
 #endif
 
-//#include "Physics.h"
+
 #include "xrPhysics/MathUtils.h"
-//#include "xrPhysics/phvalidevalues.h"
+
 #include "xrPhysics/iActivationShape.h"
 #include "xrPhysics/iphworld.h"
 #include "game_base_space.h"

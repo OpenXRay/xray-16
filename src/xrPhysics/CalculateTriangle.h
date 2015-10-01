@@ -1,12 +1,12 @@
 #include "ExtendedGeom.h"
 #include "MathUtils.h"
-//#include "Level.h"
+
 #include "Geometry.h"
 #include "tri-colliderknoopc/dtricollidermath.h"
-//#include "xrEngine/IGame_Level.h"
+
 #include "ode_redefine.h"
 #include "xrCDB/xr_area.h"
-//#include "phworld.h"
+
 #pragma warning(disable:4995)
 #pragma warning(disable:4267)
 ICF void GetNormal(CDB::TRI*XTri,Fvector &n, const Fvector* V_array )

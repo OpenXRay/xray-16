@@ -4,7 +4,7 @@
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "Include/xrRender/Kinematics.h"
 #include "PHDynamicData.h"
-//#include "game_object_space.h"
+
 #include "IPhysicsShellHolder.h"
 #include "xrCore/Animation/Bone.hpp"
 

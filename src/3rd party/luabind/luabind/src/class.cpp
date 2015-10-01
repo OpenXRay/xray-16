@@ -28,7 +28,7 @@
 #include <luabind/class.hpp>
 
 #include <cstring>
-//#include <iostream>
+
 
 namespace luabind { namespace detail {
     

@@ -20,9 +20,9 @@
 #elif defined(_PS2)
 	#include "ps2/gsThreadPs2.c"
 #elif defined(_PS3)
-//  #include "ps3/gsThreadPS3.c"
+
 #elif defined(_PSP)
-//  #include "psp/gsThreadPSP.c"
+
 #elif defined(_REVOLUTION)
 	#include "revolution/gsThreadRevoulution.c"
 #else

@@ -487,7 +487,7 @@ MAX_RELEASE_CHECK_RATE   default: 255 unless not HAVE_MMAP
 #	undef DEBUG
 #endif // #ifdef DEBUG
 
-//#include <xray/macro_platform.h>
+
 #define USE_DL_PREFIX
 #define MSPACES 1
 #define USE_OUT_OF_MEMORY_HANDLER

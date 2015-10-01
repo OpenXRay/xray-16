@@ -4,12 +4,12 @@
 #include "Physics.h"
 #include "ExtendedGeom.h"
 #include "PHCapture.h"
-//#include "Entity.h"
-//#include "inventory_item.h"
+
+
 #include "Include/xrRender/Kinematics.h"
-//#include "Actor.h"
-//#include "Inventory.h"
-//#include "CaptureBoneCallback.h"
+
+
+
 #include "iphysicsshellholder.h"
 #include "xrCore/Animation/Bone.hpp"
 #include "xrEngine/device.h"

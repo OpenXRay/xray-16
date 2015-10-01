@@ -14,7 +14,7 @@
 
 #include "platform.h"
 #include "encode.h"
-//#include "i18n.h"
+
 #include <stdlib.h>
 #include <ctype.h>
 #if defined(_WIN32) || defined(__EMX__) || defined(__WATCOMC__)

@@ -1,6 +1,6 @@
 #pragma once
 #include "hxgrid/Interface/IAgent.h"
-//#include "hxgrid/Interface/IGenericStream.h"
+
 
 
 class XRLC_LIGHT_API byte_count

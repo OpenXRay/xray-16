@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
-//#include "ResourceManager.h"
+
 #include "Include/xrRender/DrawUtils.h"
-//#include "xr_effgamma.h"
+
 #include "render.h"
 #include "dedicated_server_only.h"
 #include "xrCDB/xrxrc.h"

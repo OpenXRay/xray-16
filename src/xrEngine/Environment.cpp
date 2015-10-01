@@ -14,13 +14,13 @@
 
 #include "xr_input.h"
 
-//#include "ResourceManager.h"
+
 
 #ifndef _EDITOR
 #include "IGame_Level.h"
 #endif
 
-//#include "D3DUtils.h"
+
 #include "xrCore/xrCore.h"
 
 #include "Include/xrRender/EnvironmentRender.h"

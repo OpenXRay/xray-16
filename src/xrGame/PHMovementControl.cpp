@@ -4,12 +4,12 @@
 #include "xrCDB/Intersect.hpp"
 #include "xrServerEntities/alife_space.h"
 
-//#include "entity.h"
-//#include "PHDynamicData.h"
-//#include "Physics.h"
 
-//#include "PHAICharacter.h"
-//#include "PHActorCharacter.h"
+
+
+
+
+
 
 #include "xrPhysics/phCharacter.h"
 #include "xrPhysics/IPHCapture.h"
@@ -20,7 +20,7 @@
 #include "xrPhysics/phvalide.h"
 #include "xrPhysics/physicsshell.h"
 #include "xrPhysics/iphworld.h"
-//#include "xrServerEntities/ai_space.h"
+
 #include "detail_path_manager.h"
 #include "xrEngine/GameMtlLib.h"
 #include "xrEngine/xr_object.h"
@@ -31,7 +31,7 @@
 #include "phdebug.h"
 #endif
 
-//#include	"Include/xrRender/KinematicsAnimated.h"
+
 #include "Include/xrRender/Kinematics.h"
 
 #define GROUND_FRICTION	10.0f

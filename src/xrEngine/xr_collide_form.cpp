@@ -8,7 +8,7 @@
 #include "xrCore/FMesh.hpp"
 #include "xrCDB/Frustum.h"
 
-//#include "skeletoncustom.h"
+
 #include "Include/xrRender/Kinematics.h"
 #include "xrCore/Animation/Bone.hpp"
 #ifdef DEBUG

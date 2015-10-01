@@ -26,7 +26,7 @@
 #ifndef SQUISH_SIMD_3DNOW_H
 #define SQUISH_SIMD_3DNOW_H
 
-//#include <xmmintrin.h>
+
 #include <mm3dnow.h>
 #include <cassert>
 

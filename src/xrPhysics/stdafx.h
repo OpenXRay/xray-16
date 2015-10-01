@@ -5,19 +5,19 @@
 #define ENGINE_API
 #define DLL_API		
 #define ECORE_API
-//#include "xrEngine/stdafx.h"
+
 
 #include "xrCore/xrCore.h"
 
 #include "xrServerEntities/smart_cast.h"
-//#include "xrEngine/pure.h"
-//#include "xrEngine/engineapi.h"
-//#include "xrEngine/eventapi.h"
+
+
+
 
 
 #include "xrCDB/xrCDB.h"
 #include "xrSound/sound.h"
-//#include "xrEngine/IGame_Level.h"
+
 
 #pragma comment( lib, "xrCore.lib"	)
 

@@ -8,7 +8,7 @@
 #pragma once
 #include "UIWindow.h"
 #include "UIWndCallback.h"
-//#include "UIRankFaction.h"
+
 #include "UIAchievements.h"
 
 class CUIStatic;

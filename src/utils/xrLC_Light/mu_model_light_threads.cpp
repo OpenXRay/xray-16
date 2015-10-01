@@ -11,7 +11,7 @@
 #include "mu_model_light.h"
 #include "mu_light_net.h"
 
-//#include "mu_model_face.h"
+
 
 #include "utils/xrLCUtil/xrThread.hpp"
 #include "xrCore/xrSyncronize.h"

@@ -1,6 +1,6 @@
 #include "stdafx.h"
-//#include "build.h"
-//#include "std_classes.h"
+
+
 #include "utils/xrLCUtil/xrThread.hpp"
 #include "xrdeflector.h"
 #include "xrlc_globaldata.h"

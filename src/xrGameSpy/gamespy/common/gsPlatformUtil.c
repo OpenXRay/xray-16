@@ -1662,7 +1662,7 @@ static const char * GOAGetUniqueID_Internal(void)
 
 #include <net/if_dl.h>
 // Removed due to updated sony libraries,  Saad Nader
-//#include <net/if_types.h>
+
 #include <net/if_ether.h>
 
 static const char * GetMAC(void)

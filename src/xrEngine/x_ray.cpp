@@ -657,7 +657,7 @@ BOOL IsOutOfVirtualMemory()
 //XRCORE_API DUMMY_STUFF *g_temporary_stuff;
 
 //#define TRIVIAL_ENCRYPTOR_DECODER
-//#include "trivial_encryptor.h"
+
 
 //#define RUSSIAN_BUILD
 

@@ -5,7 +5,7 @@
 #include "xrCore/Animation/Motion.hpp"
 #ifdef _EDITOR
 #	include "xrServerEntities/PropertiesListTypes.h"
-//	#include "PropertiesListHelper.h"
+
 #	include "xrCore/MaterialLib/GameMtlLib.h"
 #	include "pick_defs.h"
 #endif

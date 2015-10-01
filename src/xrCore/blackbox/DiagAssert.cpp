@@ -8,7 +8,7 @@ Copyright (c) 1997-2000 John Robbins -- All rights reserved.
 #include "DiagAssert.h"
 
 // The project internal header file.
-//#include "Internal.h"
+
 
 // STL will not compile at /W4 /WX.  Not good.
 #ifndef _DEBUG

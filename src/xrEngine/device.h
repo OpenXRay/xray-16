@@ -10,11 +10,11 @@
 //class ENGINE_API CGammaControl;
 
 #include "pure.h"
-//#include "hw.h"
+
 #include "xrCore/ftimer.h"
 #include "stats.h"
-//#include "shader.h"
-//#include "R_Backend.h"
+
+
 
 #define VIEWPORT_NEAR 0.2f
 

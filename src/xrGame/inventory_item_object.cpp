@@ -6,7 +6,7 @@
 //	Description : Inventory item object implementation
 ////////////////////////////////////////////////////////////////////////////
 
-//#include "stdafx.h"
+
 #include "pch_script.h"
 #include "inventory_item_object.h"
 

@@ -6,8 +6,8 @@
 #include "Physics.h"
 #include "ExtendedGeom.h"
 
-//#include "entity_alive.h"
-//#include "phmovementcontrol.h"
+
+
 #include "Include/xrRender/Kinematics.h"
 #include "iphysicsshellholder.h"
 #include "xrCore/Animation/Bone.hpp"
@@ -15,7 +15,7 @@
 #include "mathutilsode.h"
 #include "phelement.h"
 
-//#include "characterphysicssupport.h"
+
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
 IPHCapture	*phcapture_create(CPHCharacter *ch, IPhysicsShellHolder* object, NearestToPointCallback* cb /*=0*/ )

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "screenshots_common.h"
 #include "screenshots_reader.h"
-//#include "screenshots_writer.h" //for writer::info_max_size
+
 
 char const * ss_info_secion			= "screenshot_info";
 char const * ss_player_name_key		= "player_name";

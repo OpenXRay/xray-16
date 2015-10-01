@@ -8,7 +8,7 @@
 #include "xrmessages.h"
 #include "Include/xrRender/Kinematics.h"
 #include "Include/xrRender/KinematicsAnimated.h"
-//#include "PHWorld.h"
+
 CTeleWhirlwind ::CTeleWhirlwind () 
 {
 	m_owner_object=NULL;

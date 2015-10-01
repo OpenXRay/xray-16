@@ -3,7 +3,7 @@
 #include "xrCore/Animation/Bone.hpp"
 
 #include "PHJoint.h"
-//#include "PHElement.h"
+
 
 static const Fvector 	X 			= { 1, 0, 0 };
 static const Fvector 	Y 			= { 0, 1, 0 };

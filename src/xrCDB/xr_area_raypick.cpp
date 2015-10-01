@@ -5,9 +5,9 @@
 #include "xrEngine/xr_object.h"
 #include "Intersect.hpp"
 #include "d3d9types.h"
-//#include "IGame_Level.h"
-//#include "x_ray.h"
-//#include "GameFont.h"
+
+
+
 #ifdef	DEBUG
 static BOOL _cdb_bDebug = false;
 extern XRCDB_API BOOL *cdb_bDebug = &_cdb_bDebug;

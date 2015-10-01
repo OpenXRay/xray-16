@@ -8,7 +8,7 @@
 
 #ifndef XRAY_ALIFE_SPACE
 #define XRAY_ALIFE_SPACE
-//#include "xrCore/_std_extensions.h"
+
 
 // ALife objects, events and tasks
 #define ALIFE_VERSION				0x0006
