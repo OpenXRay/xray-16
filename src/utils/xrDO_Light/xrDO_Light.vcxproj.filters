@@ -4,22 +4,10 @@
     <Filter Include="Kernel">
       <UniqueIdentifier>{b29b8dd4-9ba8-4204-a99d-bdf18bdb8b47}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Kernel\Generic">
-      <UniqueIdentifier>{52b2e43c-206f-4587-88fb-7eb7c9c3ec68}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Kernel\CDB">
-      <UniqueIdentifier>{cb3862d8-630a-4488-a806-7327a1fdb68d}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="defines.h">
-      <Filter>Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="StdAfx.h">
       <Filter>Kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="std_classes.h">
-      <Filter>Kernel\Generic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

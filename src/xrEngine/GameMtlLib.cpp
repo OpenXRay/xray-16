@@ -3,7 +3,7 @@
 #pragma hdrstop
 
 #include "GameMtlLib.h"
-#include "Include/FSMacros.hpp"
+#include "Common/FSMacros.hpp"
 
 CGameMtlLibrary GMLib;
 //CSound_manager_interface* Sound = NULL;

@@ -243,7 +243,6 @@
     <ClCompile Include="..\..\xrServerEntities\xrServer_Object_Base.cpp" />
     <ClCompile Include="alife_artefact_order.cpp" />
     <ClCompile Include="buffer_vector.cpp" />
-    <ClCompile Include="cl_collector.cpp" />
     <ClCompile Include="compiler.cpp">
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">AssemblyAndSourceCode</AssemblerOutput>
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AssemblyAndSourceCode</AssemblerOutput>
@@ -347,7 +346,6 @@
     <ClInclude Include="builder_allocator_constructor_inline.h" />
     <ClInclude Include="ChooseTypes.h" />
     <ClInclude Include="client_id.h" />
-    <ClInclude Include="cl_collector.h" />
     <ClInclude Include="communicate.h" />
     <ClInclude Include="compiler.h" />
     <ClInclude Include="cover_point.h" />
@@ -361,14 +359,12 @@
     <ClInclude Include="data_storage_double_linked_list_inline.h" />
     <ClInclude Include="data_storage_single_linked_list.h" />
     <ClInclude Include="data_storage_single_linked_list_inline.h" />
-    <ClInclude Include="defines.h" />
     <ClInclude Include="dijkstra.h" />
     <ClInclude Include="dijkstra_inline.h" />
     <ClInclude Include="edge_path.h" />
     <ClInclude Include="edge_path_inline.h" />
     <ClInclude Include="ETextureParams.h" />
     <ClInclude Include="factory_api.h" />
-    <ClInclude Include="FTimer.h" />
     <ClInclude Include="game_graph.h" />
     <ClInclude Include="game_graph_builder.h" />
     <ClInclude Include="game_graph_builder_inline.h" />
@@ -396,7 +392,6 @@
     <ClInclude Include="level_graph_vertex_inline.h" />
     <ClInclude Include="level_spawn_constructor.h" />
     <ClInclude Include="level_spawn_constructor_inline.h" />
-    <ClInclude Include="light.h" />
     <ClInclude Include="manager_builder_allocator_constructor.h" />
     <ClInclude Include="manager_builder_allocator_constructor_inline.h" />
     <ClInclude Include="motion_simulator.h" />
@@ -444,7 +439,6 @@
     <ClInclude Include="spawn_constructor_space.h" />
     <ClInclude Include="spawn_patcher.h" />
     <ClInclude Include="StdAfx.h" />
-    <ClInclude Include="std_classes.h" />
     <ClInclude Include="vertex_allocator_fixed.h" />
     <ClInclude Include="vertex_allocator_fixed_inline.h" />
     <ClInclude Include="vertex_manager_fixed.h" />

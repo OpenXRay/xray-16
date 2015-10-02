@@ -7,7 +7,7 @@
 #define ECORE_API				// fake, to enable sharing with editors
 #define XR_EPROPS_API
 #include "xrCore/clsid.h"
-#include "defines.h"
+
 #include "utils/xrLCUtil/ILevelCompilerLogger.hpp"
 #include "utils/xrLCUtil/xrThread.hpp"
 #include "utils/xrLCUtil/cdecl_cast.hpp"

@@ -212,9 +212,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="defines.h" />
     <ClInclude Include="StdAfx.h" />
-    <ClInclude Include="std_classes.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StdAfx.cpp">

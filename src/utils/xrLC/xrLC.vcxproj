@@ -235,7 +235,6 @@
     <ClInclude Include="ArbitraryList.h" />
     <ClInclude Include="Build.h" />
     <ClInclude Include="b_globals.h" />
-    <ClInclude Include="defines.h" />
     <ClInclude Include="ELight_def.h" />
     <ClInclude Include="MeshMenderLayerOGF.h" />
     <ClInclude Include="MeshMenderLayerOrdinaryStatic.h" />

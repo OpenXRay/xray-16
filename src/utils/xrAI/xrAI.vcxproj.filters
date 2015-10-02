@@ -13,12 +13,6 @@
     <Filter Include="Compiler\Kernel">
       <UniqueIdentifier>{d7047094-b5bb-4398-830d-7f17b82d8030}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Compiler\Kernel\Generic">
-      <UniqueIdentifier>{a4c402e3-d51e-4459-a697-a90c8a83326c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Compiler\Kernel\Generic\CDB">
-      <UniqueIdentifier>{603dd521-961a-4462-88bc-e692a9417ddc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Compiler\Kernel\Random32">
       <UniqueIdentifier>{1e4ce8af-06dd-4be3-877a-082bbb1fac8a}</UniqueIdentifier>
     </Filter>
@@ -273,9 +267,6 @@
     <ClCompile Include="xrAI.cpp">
       <Filter>Compiler\Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="cl_collector.cpp">
-      <Filter>Compiler\Kernel\Generic\CDB</Filter>
-    </ClCompile>
     <ClCompile Include="random32.cpp">
       <Filter>Compiler\Kernel\Random32</Filter>
     </ClCompile>
@@ -410,9 +401,6 @@
     <ClInclude Include="communicate.h">
       <Filter>Compiler\Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="defines.h">
-      <Filter>Compiler\Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="factory_api.h">
       <Filter>Compiler\Kernel</Filter>
     </ClInclude>
@@ -424,18 +412,6 @@
     </ClInclude>
     <ClInclude Include="xrShaderTypes.h">
       <Filter>Compiler\Kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="FTimer.h">
-      <Filter>Compiler\Kernel\Generic</Filter>
-    </ClInclude>
-    <ClInclude Include="light.h">
-      <Filter>Compiler\Kernel\Generic</Filter>
-    </ClInclude>
-    <ClInclude Include="std_classes.h">
-      <Filter>Compiler\Kernel\Generic</Filter>
-    </ClInclude>
-    <ClInclude Include="cl_collector.h">
-      <Filter>Compiler\Kernel\Generic\CDB</Filter>
     </ClInclude>
     <ClInclude Include="random32.h">
       <Filter>Compiler\Kernel\Random32</Filter>

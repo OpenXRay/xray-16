@@ -1,14 +1,10 @@
-#ifndef DefinesH
-#define DefinesH
+#pragma once
 
 #ifdef DEBUG
 ENGINE_API extern BOOL bDebug;
 #else
 #define bDebug 0
 #endif
-
-#define _RELEASE(x) { if(x) { (x)->Release(); (x)=NULL; } }
-#define _SHOW_REF(msg, x) { if(x) { x->AddRef(); Log(msg,u32(x->Release()));}}
 
 // textures
 ENGINE_API extern int psTextureLOD;
@@ -50,6 +46,4 @@ ENGINE_API extern u32 psCurrentVidMode[];
 ENGINE_API extern u32 psCurrentBPP;
 ENGINE_API extern Flags32 psDeviceFlags;
 
-#include "Include/FSMacros.hpp"
-
-#endif
+#include "Common/FSMacros.hpp"

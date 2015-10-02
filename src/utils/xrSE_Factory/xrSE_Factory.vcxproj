@@ -310,7 +310,6 @@
     <ClInclude Include="alife_artefact_order.h" />
     <ClInclude Include="ChooseTypes.h" />
     <ClInclude Include="client_id.h" />
-    <ClInclude Include="defines.h" />
     <ClInclude Include="NET_Compressor.h" />
     <ClInclude Include="NET_utils.h" />
     <ClInclude Include="script_debugger_utils.h" />

@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "math.h"
 #include "build.h"
+#include "Common/FSMacros.hpp"
 #include "utils/xrLC_Light/xrLC_GlobalData.h"
 #include "utils/xrLCUtil/LevelCompilerLoggerWindow.hpp"
 

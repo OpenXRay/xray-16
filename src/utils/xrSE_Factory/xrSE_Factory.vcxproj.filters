@@ -189,9 +189,6 @@
     <ClInclude Include="..\..\xrServerEntities\FastDelegate.h">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="defines.h">
-      <Filter>Common</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\restriction_space.h">
       <Filter>Common\AComponents\SpaceRestrictionManager</Filter>
     </ClInclude>
