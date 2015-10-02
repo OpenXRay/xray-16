@@ -27,9 +27,6 @@
     <ClInclude Include="NVI_Image.h">
       <Filter>NormalMap</Filter>
     </ClInclude>
-    <ClInclude Include="tga.h">
-      <Filter>NormalMap</Filter>
-    </ClInclude>
     <ClInclude Include="dds.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="dds\ConvertColor.h" />
@@ -58,9 +55,6 @@
       <Filter>NormalMap</Filter>
     </ClCompile>
     <ClCompile Include="NVI_Image.cpp">
-      <Filter>NormalMap</Filter>
-    </ClCompile>
-    <ClCompile Include="tga.cpp">
       <Filter>NormalMap</Filter>
     </ClCompile>
     <ClCompile Include="StdAfx.cpp" />

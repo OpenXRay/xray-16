@@ -270,9 +270,6 @@
     <ClCompile Include="StdAfx.cpp">
       <Filter>Compiler\Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="tga.cpp">
-      <Filter>Compiler\Kernel</Filter>
-    </ClCompile>
     <ClCompile Include="xrAI.cpp">
       <Filter>Compiler\Kernel</Filter>
     </ClCompile>
@@ -420,9 +417,6 @@
       <Filter>Compiler\Kernel</Filter>
     </ClInclude>
     <ClInclude Include="StdAfx.h">
-      <Filter>Compiler\Kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="tga.h">
       <Filter>Compiler\Kernel</Filter>
     </ClInclude>
     <ClInclude Include="xrAI.h">

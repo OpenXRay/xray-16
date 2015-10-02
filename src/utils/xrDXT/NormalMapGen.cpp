@@ -3,9 +3,14 @@
 #include "NV_Common.h"
 #include "NVI_Convolution.h"
 #include "NVI_Image.h"
-#include "tga.h"
 
 using namespace xray_nvi;
+
+#ifdef XR_DXT_DBG_BUMP_STAGES_DIR
+#include "xrCore/Media/Image.hpp"
+using namespace XRay::Media;
+#pragma comment(lib, "xrCore.lib")
+#endif
 
 enum KernelType
 {
@@ -567,7 +572,8 @@ int DXTCompressBump(LPCSTR out_name, u8* T_height_gloss, u8* T_normal_map,
     // stage 0
     pitch = w*4;
 #ifdef XR_DXT_DBG_BUMP_STAGES_DIR
-    tga_save(XR_DXT_DBG_BUMP_STAGES_DIR"\\0-height-gloss.tga", w, h, T_height_gloss, true);
+    Image().Create(w, h, T_height_gloss, ImageFormat::RGBA8).SaveTGA(
+        XR_DXT_DBG_BUMP_STAGES_DIR"\\0-height-gloss.tga", true);
 #endif
     if (T_normal_map)
     {
@@ -580,14 +586,16 @@ int DXTCompressBump(LPCSTR out_name, u8* T_height_gloss, u8* T_normal_map,
     }
     u8* T_normal_1 = pSrc->GetImageDataPointer();
 #ifdef XR_DXT_DBG_BUMP_STAGES_DIR
-    tga_save(XR_DXT_DBG_BUMP_STAGES_DIR"\\1-normal_1.tga", w, h, T_normal_1, true);
+    Image().Create(w, h, T_normal_1, ImageFormat::RGBA8).SaveTGA(
+        XR_DXT_DBG_BUMP_STAGES_DIR"\\1-normal_1.tga", true);
 #endif
     gloss_power = 0.0f;
     // T_height_gloss.a (gloss) -> T_normal_1 + reverse of channels
     TW_Iterate_1OP(w, h, pitch, T_normal_1, T_height_gloss, it_gloss_rev);
     gloss_power /= float(w*h);
 #ifdef XR_DXT_DBG_BUMP_STAGES_DIR
-    tga_save(XR_DXT_DBG_BUMP_STAGES_DIR"\\2-normal_1.tga", w, h, T_normal_1, true);
+    Image().Create(w, h, T_normal_1, ImageFormat::RGBA8).SaveTGA(
+        XR_DXT_DBG_BUMP_STAGES_DIR"\\2-normal_1.tga", true);
 #endif
     STextureParams fmt0;
     fmt0.flags.assign(STextureParams::flGenerateMipMaps);
@@ -605,13 +613,15 @@ int DXTCompressBump(LPCSTR out_name, u8* T_height_gloss, u8* T_normal_map,
             img->Decompress();
             u8* T_normal_1U = img->GetDecompDataPointer();
         #ifdef XR_DXT_DBG_BUMP_STAGES_DIR
-            tga_save(XR_DXT_DBG_BUMP_STAGES_DIR"\\3-normal_1U.tga", w, h, T_normal_1U, true);
+            Image().Create(w, h, T_normal_1U, TGAImageFormat::RGBA8).SaveTGA(
+                XR_DXT_DBG_BUMP_STAGES_DIR"\\3-normal_1U.tga", true);
         #endif
             // Calculate difference
             u8*	T_normal_1D = (u8*)calloc(w * h, sizeof(u32));
             TW_Iterate_2OP(w, h, pitch, T_normal_1D, T_normal_1, T_normal_1U, it_difference);
         #ifdef XR_DXT_DBG_BUMP_STAGES_DIR
-            tga_save(XR_DXT_DBG_BUMP_STAGES_DIR"\\4-normal_1D.tga", w, h, T_normal_1D, true);
+            Image().Create(w, h, T_normal_1D, ImageFormat::RGBA8).SaveTGA(
+                XR_DXT_DBG_BUMP_STAGES_DIR"\\4-normal_1D.tga", true);
         #endif
             // Rescale by virtual height
             float h_scale = powf(fmt->bump_virtual_height / 0.05f, 0.75f); // move towards 1.0f
@@ -679,7 +689,8 @@ int DXTCompressBump(LPCSTR out_name, u8* T_height_gloss, u8* T_normal_map,
             // Reverse channels back + transfer heightmap
             TW_Iterate_1OP(w, h, pitch, T_normal_1D, T_height_pf, it_height_rev);
         #ifdef XR_DXT_DBG_BUMP_STAGES_DIR
-            tga_save(XR_DXT_DBG_BUMP_STAGES_DIR"\\5-normal_1D.tga", w, h, T_normal_1D, true);
+            Image().Create(w, h, T_normal_1D, ImageFormat::RGBA8).SaveTGA(
+                XR_DXT_DBG_BUMP_STAGES_DIR"\\5-normal_1D.tga", true);
         #endif
             // Compress
             STextureParams fmt0;

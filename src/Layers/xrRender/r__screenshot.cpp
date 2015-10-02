@@ -1,11 +1,13 @@
 #include "stdafx.h"
 #include "xr_effgamma.h"
 #include "dxRenderDeviceRender.h"
-#include "Layers/xrRender/tga.h"
+#include "xrCore/Media/Image.hpp"
 #include "xrEngine/xrImage_Resampler.h"
 #if defined(USE_DX10) || defined(USE_DX11)
 #include "d3dx10tex.h"
 #endif	//	USE_DX10
+
+using namespace XRay::Media;
 
 #define	GAMESAVE_SIZE	128
 
@@ -395,9 +397,6 @@ void CRender::ScreenshotImpl	(ScreenshotMode mode, LPCSTR name, CMemoryWriter* m
 				VERIFY				(name);
 				strconcat			(sizeof(buf), buf, name, ".tga");
 				IWriter*		fs	= FS.w_open	("$screenshots$",buf); R_ASSERT(fs);
-				TGAdesc				p;
-				p.format			= IMG_24B;
-
 				//	TODO: DX10: This is totally incorrect but mimics 
 				//	original behavior. Fix later.
 				hr					= pFB->LockRect(&D,0,D3DLOCK_NOSYSLOCK);
@@ -406,16 +405,13 @@ void CRender::ScreenshotImpl	(ScreenshotMode mode, LPCSTR name, CMemoryWriter* m
 				if(hr!=D3D_OK)		goto _end_;
 
 				// save
-				u32* data			= (u32*)xr_malloc(Device.dwHeight*Device.dwHeight*4);
-				imf_Process			(data,Device.dwHeight,Device.dwHeight,(u32*)D.pBits,Device.dwWidth,Device.dwHeight,imf_lanczos3);
-				p.scanlenght		= Device.dwHeight*4;
-				p.width				= Device.dwHeight;
-				p.height			= Device.dwHeight;
-				p.data				= data;
-				p.maketga			(*fs);
-				xr_free				(data);
-
-				FS.w_close			(fs);
+				u32* data = (u32*)xr_malloc(Device.dwHeight*Device.dwHeight*4);
+				imf_Process(data,Device.dwHeight,Device.dwHeight,(u32*)D.pBits,Device.dwWidth,Device.dwHeight,imf_lanczos3);
+                Image img;
+                img.Create(u16(Device.dwHeight), u16(Device.dwHeight), data, ImageFormat::RGBA8);
+                img.SaveTGA(*fs, true);
+				xr_free(data);
+				FS.w_close(fs);
 			}
 			break;
 	}

@@ -283,7 +283,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="tga.cpp" />
     <ClCompile Include="verify_level_graph.cpp" />
     <ClCompile Include="xrAI.cpp" />
     <ClCompile Include="xrCrossTable.cpp" />
@@ -446,7 +445,6 @@
     <ClInclude Include="spawn_patcher.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="std_classes.h" />
-    <ClInclude Include="tga.h" />
     <ClInclude Include="vertex_allocator_fixed.h" />
     <ClInclude Include="vertex_allocator_fixed_inline.h" />
     <ClInclude Include="vertex_manager_fixed.h" />

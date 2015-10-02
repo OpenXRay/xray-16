@@ -496,7 +496,6 @@
     <ClCompile Include="..\xrRender\SkeletonX.cpp" />
     <ClCompile Include="..\xrRender\stats_manager.cpp" />
     <ClCompile Include="..\xrRender\TextureDescrManager.cpp" />
-    <ClCompile Include="..\xrRender\tga.cpp" />
     <ClCompile Include="..\xrRender\tss_def.cpp" />
     <ClCompile Include="..\xrRender\uber_deffer.cpp" />
     <ClCompile Include="..\xrRender\Utils\dxHashHelper.cpp" />

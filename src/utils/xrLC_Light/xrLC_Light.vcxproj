@@ -216,7 +216,6 @@
     <ClInclude Include="serialize.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="tcf.h" />
-    <ClInclude Include="tga.h" />
     <ClInclude Include="uv_tri.h" />
     <ClInclude Include="vector_clear.h" />
     <ClInclude Include="xrDeflector.h" />
@@ -331,7 +330,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="tcf.cpp" />
-    <ClCompile Include="tga.cpp" />
     <ClCompile Include="uv_tri.cpp" />
     <ClCompile Include="xrDeflectoL_Direct.cpp" />
     <ClCompile Include="xrDeflector.cpp" />

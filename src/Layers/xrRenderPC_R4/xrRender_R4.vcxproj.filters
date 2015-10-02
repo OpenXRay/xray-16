@@ -806,9 +806,6 @@
     <ClCompile Include="..\xrRender\r__screenshot.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\tga.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\DetailManager.cpp">
       <Filter>Details</Filter>
     </ClCompile>

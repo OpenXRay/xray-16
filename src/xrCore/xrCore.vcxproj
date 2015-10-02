@@ -306,6 +306,7 @@
     <ClCompile Include="log.cpp" />
     <ClCompile Include="LzHuf.cpp" />
     <ClCompile Include="lzo_compressor.cpp" />
+    <ClCompile Include="Media\Image.cpp" />
     <ClCompile Include="memory_allocation_stats.cpp" />
     <ClCompile Include="memory_monitor.cpp" />
     <ClCompile Include="memory_usage.cpp" />
@@ -433,6 +434,7 @@
     <ClInclude Include="log.h" />
     <ClInclude Include="lzhuf.h" />
     <ClInclude Include="lzo_compressor.h" />
+    <ClInclude Include="Media\Image.hpp" />
     <ClInclude Include="memory_allocator_options.h" />
     <ClInclude Include="memory_monitor.h" />
     <ClInclude Include="net_utils.h" />

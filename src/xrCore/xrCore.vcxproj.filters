@@ -94,6 +94,9 @@
     <Filter Include="PostProcess">
       <UniqueIdentifier>{bbc600e5-2e74-4d2b-b7b7-d73c23290817}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Media">
+      <UniqueIdentifier>{97c8b6af-45c1-4106-8633-71fbab6f3aed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -316,6 +319,9 @@
       <Filter>PostProcess</Filter>
     </ClCompile>
     <ClCompile Include="xrSyncronize.cpp" />
+    <ClCompile Include="Media\Image.cpp">
+      <Filter>Media</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -652,6 +658,9 @@
       <Filter>Kernel</Filter>
     </ClInclude>
     <ClInclude Include="xrSyncronize.h" />
+    <ClInclude Include="Media\Image.hpp">
+      <Filter>Media</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">

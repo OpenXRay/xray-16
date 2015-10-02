@@ -277,9 +277,6 @@
     <ClInclude Include="tcf.h">
       <Filter>Light\Textures</Filter>
     </ClInclude>
-    <ClInclude Include="tga.h">
-      <Filter>Light\Textures</Filter>
-    </ClInclude>
     <ClInclude Include="base_lighting.h">
       <Filter>Light\Lights</Filter>
     </ClInclude>
@@ -527,9 +524,6 @@
       <Filter>Light\Textures</Filter>
     </ClCompile>
     <ClCompile Include="tcf.cpp">
-      <Filter>Light\Textures</Filter>
-    </ClCompile>
-    <ClCompile Include="tga.cpp">
       <Filter>Light\Textures</Filter>
     </ClCompile>
     <ClCompile Include="base_lighting.cpp">

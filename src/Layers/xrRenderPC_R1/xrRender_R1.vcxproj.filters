@@ -641,9 +641,6 @@
     <ClCompile Include="..\xrRender\Texture.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\tga.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\ColorMapManager.cpp">
       <Filter>Core\ColorMap</Filter>
     </ClCompile>

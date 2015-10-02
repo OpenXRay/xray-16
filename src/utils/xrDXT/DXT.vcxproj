@@ -243,7 +243,6 @@
     <ClInclude Include="NV_Common.h" />
     <ClInclude Include="NVI_Convolution.h" />
     <ClInclude Include="NVI_Image.h" />
-    <ClInclude Include="tga.h" />
     <ClInclude Include="dds.h" />
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
@@ -262,7 +261,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="tga.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)3rd party\NVTT\NVTT.vcxproj">
