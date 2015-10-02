@@ -41,7 +41,7 @@ void	xrNetDOLight()
 	u32 end = 0;
 	u32 task_slots_number = 0;
 	const u32 max_task_slots_number = 100;
-	const u32 slots_count = gl_data.slots_data.header().slots_count();
+	const u32 slot_count = gl_data.slots_data.header().slot_count();
 	do{
 		
 		int x, z;
@@ -50,7 +50,7 @@ void	xrNetDOLight()
 		if( gl_data.slots_data.calculate_ignore( x, z ) )
 			continue;
 		++task_slots_number;
-		if( task_slots_number == max_task_slots_number || end == slots_count )
+		if( task_slots_number == max_task_slots_number || end == slot_count )
 		{
 			tnet_execution_base< et_detail_light > *el = lc_net::execution_factory.create<et_detail_light>();
 			el->implementation( ).construct( start, end );
@@ -58,7 +58,7 @@ void	xrNetDOLight()
 			start = end;
 			task_slots_number = 0;
 		}
-	}while( end != slots_count );
+	}while( end != slot_count );
 
 //////////////////////////////////////////////////////////////////////////
 	get_task_manager().run("Net Detail Lighting");

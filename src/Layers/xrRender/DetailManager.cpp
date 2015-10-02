@@ -121,8 +121,8 @@ void CDetailManager::Load		()
 
 	// Header
 	dtFS->r_chunk_safe	(0,&dtH,sizeof(dtH));
-	R_ASSERT			(dtH.version == DETAIL_VERSION);
-	u32 m_count			= dtH.object_count;
+	R_ASSERT			(dtH.version() == DETAIL_VERSION);
+	u32 m_count			= dtH.object_count();
 
 	// Models
 	IReader* m_fs		= dtFS->open_chunk(1);

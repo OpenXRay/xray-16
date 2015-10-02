@@ -160,7 +160,6 @@
     <ClInclude Include="base_lighting.h" />
     <ClInclude Include="b_build_texture.h" />
     <ClInclude Include="calculate_normals.h" />
-    <ClInclude Include="DetailFormat.h" />
     <ClInclude Include="detail_net_global_data.h" />
     <ClInclude Include="detail_slot_calculate.h" />
     <ClInclude Include="ETextureParams.h" />

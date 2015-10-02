@@ -51,7 +51,7 @@ void global_slots_data::write( IWriter	&w ) const
 {
 	
 	w_pod( w, dtH );
-	const u32 buffer_size = sizeof( DetailSlot ) * dtH.slots_count();
+	const u32 buffer_size = sizeof( DetailSlot ) * dtH.slot_count();
 	w.w( dtS, buffer_size );
 	recalculation_data.write( w );
 }
@@ -61,7 +61,7 @@ void global_slots_data::read( INetReader &r  )
 	
 	r_pod( r, dtH );
 	R_ASSERT( !dtS );
-	const u32 buffer_size = sizeof( DetailSlot ) * dtH.slots_count();
+	const u32 buffer_size = sizeof( DetailSlot ) * dtH.slot_count();
 	dtS = ( DetailSlot* )xr_malloc( buffer_size );
 	R_ASSERT(dtS);
 	r.r( dtS, buffer_size );
@@ -78,7 +78,7 @@ void global_slots_data::process_all_pallete()
 	R_ASSERT( header( ).version() != u32(-1) );
 	R_ASSERT( header( ).x_size() != u32(-1) );
 	R_ASSERT( header( ).z_size() != u32(-1) );
-	for ( u32 i=0; i < header().slots_count(); ++i )
+	for ( u32 i=0; i < header().slot_count(); ++i )
 	{
 		
 		DetailSlot& DS = get_slot( i );

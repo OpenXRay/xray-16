@@ -198,11 +198,11 @@ void	CDetailManager::cache_Update	(int v_x, int v_z, Fvector& view, int limit)
 
 DetailSlot&	CDetailManager::QueryDB(int sx, int sz)
 {
-	int db_x = sx+dtH.offs_x;
-	int db_z = sz+dtH.offs_z;
-	if ((db_x>=0) && (db_x<int(dtH.size_x)) && (db_z>=0) && (db_z<int(dtH.size_z)))
+	int db_x = sx+dtH.x_offs();
+	int db_z = sz+dtH.z_offs();
+	if ((db_x>=0) && (db_x<int(dtH.x_size())) && (db_z>=0) && (db_z<int(dtH.z_size())))
 	{
-		u32 linear_id				= db_z*dtH.size_x + db_x;
+		u32 linear_id				= db_z*dtH.x_size() + db_x;
 		return dtSlots				[linear_id];
 	} else {
 		// Empty slot

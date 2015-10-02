@@ -1,7 +1,7 @@
 #ifndef __GLOBAL_SLOTS_DATA_H__
 #define __GLOBAL_SLOTS_DATA_H__
 
-#include "detailformat.h"
+#include "Layers/xrRender/DetailFormat.h"
 #include "recalculation.h"
 class INetReader;
 class IWriter;
@@ -61,12 +61,12 @@ public:
 	
 	IC const DetailSlot&	get_slot( u32 idx ) const
 	{
-		VERIFY( idx< dtH.slots_count() );
+		VERIFY( idx< dtH.slot_count() );
 		return dtS[idx];
 	}
 	IC  DetailSlot&	get_slot( u32 idx )
 	{
-		VERIFY( idx< dtH.slots_count() );
+		VERIFY( idx< dtH.slot_count() );
 		return dtS[idx];
 	}
 

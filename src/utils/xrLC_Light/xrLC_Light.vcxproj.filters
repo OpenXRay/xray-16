@@ -292,9 +292,6 @@
     <ClInclude Include="detail_slot_calculate.h">
       <Filter>do_light</Filter>
     </ClInclude>
-    <ClInclude Include="DetailFormat.h">
-      <Filter>do_light</Filter>
-    </ClInclude>
     <ClInclude Include="global_calculation_data.h">
       <Filter>do_light</Filter>
     </ClInclude>

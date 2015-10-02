@@ -1,7 +1,7 @@
 #ifndef __RECALCULATION_PARAMS_H__
 #define __RECALCULATION_PARAMS_H__
 
-#include	"detailformat.h"
+#include "Layers/xrRender/DetailFormat.h"
 class INetReader;
 class CVirtualFileRW;
 class recalculation
@@ -41,7 +41,7 @@ IC	bool	skip_slot		( int x, int z ) const
 
 IC void set_slot_calculated( u32 idx )
 {
-	VERIFY( idx< dtH.slots_count() );
+	VERIFY( idx< dtH.slot_count() );
 	slots_flags[idx] = u8(1);
 }
 

@@ -38,7 +38,7 @@ void recalculation::setup_recalculationflags_file( u32 check_sum )
 	IWriter	*W	= FS.w_open	(		"$level$", "recalculation_data_slots.details" );
 	W->w_chunk( 0, &check_sum, sizeof( check_sum ) );
 	//u32 buff_size = dtH.slot_index( dtH.x_size(), dtH.z_size() ) * sizeof( slots_flags[0] );
-	u32 buff_size = dtH.slots_count( ) * sizeof( slots_flags[0] );
+	u32 buff_size = dtH.slot_count( ) * sizeof( slots_flags[0] );
 	void* buff = _alloca( buff_size );
 	Memory.mem_fill( buff, 0, buff_size );
 	W->w_chunk( 1, buff, buff_size );
@@ -115,10 +115,10 @@ void	recalculation::read( INetReader &r )
 	R_ASSERT(dtH.x_size()!=u32(-1));
 	R_ASSERT(dtH.z_size()!=u32(-1));
 	
-	u32 buff_size = dtH.slots_count( ) * sizeof( slots_flags[0] );
+	u32 buff_size = dtH.slot_count( ) * sizeof( slots_flags[0] );
 	slots_flags = (u8*)xr_malloc( buff_size );
 
-	r.r( slots_flags, dtH.slots_count() );
+	r.r( slots_flags, dtH.slot_count() );
 	r_pod( r, calculation_rect );
 	
 	r_pod( r, recalculate );
@@ -127,7 +127,7 @@ void	recalculation::read( INetReader &r )
 }
 void	recalculation::write( IWriter	&w ) const 
 {
-	u32 buff_size = dtH.slots_count( ) * sizeof( slots_flags[0] );
+	u32 buff_size = dtH.slot_count( ) * sizeof( slots_flags[0] );
 	w.w( slots_flags, buff_size );
 	w_pod( w, calculation_rect );
 	
