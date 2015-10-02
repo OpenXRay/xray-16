@@ -21,7 +21,7 @@
 #include "xrCore/clsid.h"
 #include "defines.h"
 #include "xrCDB/xrCDB.h"
-#include "_d3d_extensions.h"
+#include "Common/_d3d_extensions.h"
 
 #include <fcntl.h>
 #include <sys/types.h>

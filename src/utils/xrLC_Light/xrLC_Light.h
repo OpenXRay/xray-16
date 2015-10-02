@@ -15,7 +15,7 @@
 #include <sys\stat.h>
 #pragma warning(default:4995)
 
-#include "_d3d_extensions.h"
+#include "Common/_d3d_extensions.h"
 #include "editors/LevelEditor/Engine/communicate.h"
 
 static const int    edge2idx3   [3][3]  = { {0,1,2},    {1,2,0},    {2,0,1} };

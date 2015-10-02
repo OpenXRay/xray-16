@@ -394,6 +394,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\Util.hpp" />
+    <ClInclude Include="..\common\_d3d_extensions.h" />
     <ClInclude Include="animation\Bone.hpp" />
     <ClInclude Include="Animation\Envelope.hpp" />
     <ClInclude Include="Animation\Motion.hpp" />

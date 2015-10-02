@@ -23,7 +23,7 @@
 #include "Layers/xrRender/ResourceManager.h"
 #include "xrEngine/vis_common.h"
 #include "xrEngine/Render.h"
-#include "xrEngine/_d3d_extensions.h"
+#include "Common/_d3d_extensions.h"
 #ifndef _EDITOR
 #include "xrEngine/IGame_Level.h"
 #include "Layers/xrRender/blenders\Blender.h"

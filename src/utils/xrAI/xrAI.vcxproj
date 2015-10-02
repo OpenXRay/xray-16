@@ -457,7 +457,6 @@
     <ClInclude Include="xrCrossTable.h" />
     <ClInclude Include="xrShaderTypes.h" />
     <ClInclude Include="xr_graph_merge.h" />
-    <ClInclude Include="_d3d_extensions.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />

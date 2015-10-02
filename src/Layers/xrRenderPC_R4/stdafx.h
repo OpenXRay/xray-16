@@ -39,7 +39,7 @@
 
 #include "xrEngine/vis_common.h"
 #include "xrEngine/render.h"
-#include "xrEngine/_d3d_extensions.h"
+#include "Common/_d3d_extensions.h"
 #include "xrEngine/IGame_Level.h"
 #include "Layers/xrRender/blenders\blender.h"
 #include "Layers/xrRender/blenders\blender_clsid.h"

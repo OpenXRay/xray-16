@@ -215,7 +215,6 @@
     <ClInclude Include="defines.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="std_classes.h" />
-    <ClInclude Include="_d3d_extensions.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StdAfx.cpp">

@@ -425,9 +425,6 @@
     <ClInclude Include="xrShaderTypes.h">
       <Filter>Compiler\Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="_d3d_extensions.h">
-      <Filter>Compiler\Kernel\Generic</Filter>
-    </ClInclude>
     <ClInclude Include="FTimer.h">
       <Filter>Compiler\Kernel\Generic</Filter>
     </ClInclude>

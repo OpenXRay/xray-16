@@ -97,6 +97,9 @@
     <Filter Include="Media">
       <UniqueIdentifier>{97c8b6af-45c1-4106-8633-71fbab6f3aed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Kernel\Common">
+      <UniqueIdentifier>{1e238830-d5c2-4e3e-94fe-df1a110b24a5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -654,12 +657,15 @@
     <ClInclude Include="PostProcess\PostProcess.hpp">
       <Filter>PostProcess</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\Util.hpp">
-      <Filter>Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="xrSyncronize.h" />
     <ClInclude Include="Media\Image.hpp">
       <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\Util.hpp">
+      <Filter>Kernel\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\_d3d_extensions.h">
+      <Filter>Kernel\Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

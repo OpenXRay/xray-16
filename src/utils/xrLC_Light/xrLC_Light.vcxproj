@@ -235,7 +235,6 @@
     <ClInclude Include="xrLight_ImplicitRun.h" />
     <ClInclude Include="xrMU_Model.h" />
     <ClInclude Include="xrMU_Model_Reference.h" />
-    <ClInclude Include="_d3d_extensions.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(xrSdkDir)include\hxgrid\Interface\hxGridInterface.cpp">

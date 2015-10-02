@@ -12,9 +12,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="_d3d_extensions.h">
-      <Filter>Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="defines.h">
       <Filter>Kernel</Filter>
     </ClInclude>

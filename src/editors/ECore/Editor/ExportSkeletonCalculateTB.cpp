@@ -13,7 +13,7 @@ class CGameFont;
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/R_Backend.h"
 #include "xrCore/FMesh.hpp"
-#include "xrEngine/_d3d_extensions.h"
+#include "Common/_d3d_extensions.h"
 #include "xrEngine/Properties.h"
 
 DEFINE_VECTOR(FVF::L,FLvertexVec,FLvertexIt);
