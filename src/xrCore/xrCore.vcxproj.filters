@@ -667,6 +667,9 @@
     <ClInclude Include="..\common\_d3d_extensions.h">
       <Filter>Kernel\Common</Filter>
     </ClInclude>
+    <ClInclude Include="cdecl_cast.hpp">
+      <Filter>Kernel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">

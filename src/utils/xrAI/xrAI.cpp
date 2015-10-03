@@ -26,7 +26,7 @@
 #pragma comment(lib, "xrLCUtil.lib")
 
 #include "utils/xrLCUtil/LevelCompilerLoggerWindow.hpp"
-#include "utils/xrLCUtil/cdecl_cast.hpp"
+#include "xrCore/cdecl_cast.hpp"
 
 LevelCompilerLoggerWindow &Logger = LevelCompilerLoggerWindow();
 

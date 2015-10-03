@@ -186,7 +186,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cdecl_cast.hpp" />
     <ClInclude Include="ILevelCompilerLogger.hpp" />
     <ClInclude Include="LevelCompilerLoggerConsole.hpp" />
     <ClInclude Include="LevelCompilerLoggerWindow.hpp" />

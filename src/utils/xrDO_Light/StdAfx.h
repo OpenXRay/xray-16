@@ -35,7 +35,7 @@
 
 #include "utils/xrLCUtil/ILevelCompilerLogger.hpp"
 #include "utils/xrLCUtil/xrThread.hpp"
-#include "utils/xrLCUtil/cdecl_cast.hpp"
+#include "xrCore/cdecl_cast.hpp"
 
 extern ILevelCompilerLogger& Logger;
 extern CThread::LogFunc ProxyMsg;

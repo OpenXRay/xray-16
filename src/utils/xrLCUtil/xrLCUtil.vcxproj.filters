@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="xrUtil.cpp">
-      <Filter>Kernel</Filter>
-    </ClCompile>
     <ClCompile Include="xrThread.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
@@ -30,11 +27,9 @@
     <ClCompile Include="LevelCompilerLoggerConsole.cpp">
       <Filter>Log</Filter>
     </ClCompile>
+    <ClCompile Include="xrLCUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="xrUtil.hpp">
-      <Filter>Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="xrThread.hpp">
       <Filter>Threading</Filter>
     </ClInclude>
@@ -53,9 +48,7 @@
     <ClInclude Include="LevelCompilerLoggerConsole.hpp">
       <Filter>Log</Filter>
     </ClInclude>
-    <ClInclude Include="cdecl_cast.hpp">
-      <Filter>Kernel</Filter>
-    </ClInclude>
+    <ClInclude Include="xrLCUtil.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">

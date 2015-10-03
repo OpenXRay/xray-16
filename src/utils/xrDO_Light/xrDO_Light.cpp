@@ -3,7 +3,7 @@
 
 #include "utils/xrLC_Light/xrlc_light.h"
 #include "utils/xrLCUtil/LevelCompilerLoggerWindow.hpp"
-#include "utils/xrLCUtil/cdecl_cast.hpp"
+#include "xrCore/cdecl_cast.hpp"
 #include "utils/xrLCUtil/xrLCUtil.hpp"
 //#pragma comment(linker,"/STACK:0x800000,0x400000")
 
