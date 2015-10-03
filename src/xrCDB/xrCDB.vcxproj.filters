@@ -12,9 +12,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cl_raypick.cpp">
-      <Filter>Kernel</Filter>
-    </ClCompile>
     <ClCompile Include="Frustum.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
