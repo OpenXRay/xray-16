@@ -143,9 +143,6 @@
     <ClInclude Include="..\..\editors\ECore\Editor\ELog.h">
       <Filter>Shared Files\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="Export\lwo2.h">
-      <Filter>Export</Filter>
-    </ClInclude>
     <ClInclude Include="Export\resource.h">
       <Filter>Export</Filter>
     </ClInclude>

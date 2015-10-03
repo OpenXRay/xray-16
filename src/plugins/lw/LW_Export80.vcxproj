@@ -315,7 +315,6 @@
     <ClInclude Include="..\..\utils\LWO\StdAfx.h" />
     <ClInclude Include="Export\Util.hpp" />
     <ClInclude Include="Export\Globals.hpp" />
-    <ClInclude Include="Export\lwo2.h" />
     <ClInclude Include="Export\resource.h" />
     <ClInclude Include="Export\scenscan\objectdb.h" />
     <ClInclude Include="Export\scenscan\scenscan.h" />

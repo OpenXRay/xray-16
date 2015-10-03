@@ -12,7 +12,9 @@ Ernie Wright  17 Sep 00
 
 /* chunk and subchunk IDs */
 
+#ifndef LWID_
 #define LWID_(a,b,c,d) (((a)<<24)|((b)<<16)|((c)<<8)|(d))
+#endif 
 
 #define ID_FORM  LWID_('F','O','R','M')
 #define ID_LWO2  LWID_('L','W','O','2')
@@ -157,6 +159,18 @@ Ernie Wright  17 Sep 00
 #define ID_SHDR  LWID_('S','H','D','R')
 #define ID_DATA  LWID_('D','A','T','A')
 
+/*
+ * VMAPs are identifed by an extensible set of ID codes.  Some common
+ * ones are included here.
+ */
+#define ID_PICK  LWID_('P','I','C','K')
+#define ID_WGHT  LWID_('W','G','H','T')
+#define ID_MNVW  LWID_('M','N','V','W')
+#define ID_TXUV  LWID_('T','X','U','V')
+#define ID_MORF  LWID_('M','O','R','F')
+#define ID_SPOT  LWID_('S','P','O','T')
+#define ID_RGB   LWID_('R','G','B',' ')
+#define ID_RGBA  LWID_('R','G','B','A')
 
 /* generic linked list */
 
@@ -381,7 +395,6 @@ typedef struct st_lwCParam {
 
 
 /* surfaces */
-
 typedef struct st_lwGlow {
    short          enabled;
    short          type;
@@ -432,7 +445,6 @@ typedef struct st_lwSurface {
 
 
 /* vertex maps */
-
 typedef struct st_lwVMap {
    struct st_lwVMap *next, *prev;
    char          *name;
@@ -452,7 +464,6 @@ typedef struct st_lwVMapPt {
 
 
 /* points and polygons */
-
 typedef struct st_lwPoint {
    float          pos[ 3 ];
    int            npols;               /* number of polygons sharing the point */
