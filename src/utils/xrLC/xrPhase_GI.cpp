@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "xrHemisphere.h"
 #include "build.h"
 
 #include "utils/xrLCUtil/xrThread.hpp"

@@ -1,13 +1,6 @@
 #pragma once
-
-//.#include "communicate.h"
-
-#include "progmesh.h"
-#include "xrSpherical.h"
-
 #include "utils/ETools/PropSlimTools.h"
 #include "vbm.h"
-
 #include "utils/xrLC_Light/xruvpoint.h"
 #include "utils/xrLC_Light/base_basis.h"
 #include "utils/xrLC_Light/base_color.h"

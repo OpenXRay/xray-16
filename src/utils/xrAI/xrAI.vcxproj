@@ -383,8 +383,6 @@
     <ClInclude Include="graph_vertex.h" />
     <ClInclude Include="graph_vertex_inline.h" />
     <ClInclude Include="guid_generator.h" />
-    <ClInclude Include="intrusive_ptr.h" />
-    <ClInclude Include="intrusive_ptr_inline.h" />
     <ClInclude Include="LevelGameDef.h" />
     <ClInclude Include="level_graph.h" />
     <ClInclude Include="level_graph_inline.h" />

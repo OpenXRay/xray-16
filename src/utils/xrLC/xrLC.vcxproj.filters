@@ -51,22 +51,7 @@
     <ClInclude Include="MeshMenderLayerOrdinaryStatic.h">
       <Filter>External</Filter>
     </ClInclude>
-    <ClInclude Include="progmesh.h">
-      <Filter>External</Filter>
-    </ClInclude>
     <ClInclude Include="std_classes.h">
-      <Filter>External</Filter>
-    </ClInclude>
-    <ClInclude Include="xrDXTC.h">
-      <Filter>External</Filter>
-    </ClInclude>
-    <ClInclude Include="xrHemisphere.h">
-      <Filter>External</Filter>
-    </ClInclude>
-    <ClInclude Include="xrOcclusion.h">
-      <Filter>External</Filter>
-    </ClInclude>
-    <ClInclude Include="xrSpherical.h">
       <Filter>External</Filter>
     </ClInclude>
     <ClInclude Include="NV_Library\NvTriStrip.h">

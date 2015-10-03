@@ -247,17 +247,12 @@
     <ClInclude Include="NV_Library\NvTriStripObjects.h" />
     <ClInclude Include="NV_Library\VertexCache.h" />
     <ClInclude Include="OGF_Face.h" />
-    <ClInclude Include="progmesh.h" />
     <ClInclude Include="Sector.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="std_classes.h" />
     <ClInclude Include="vbm.h" />
-    <ClInclude Include="xrDXTC.h" />
     <ClInclude Include="xrGameMaterials.h" />
-    <ClInclude Include="xrHemisphere.h" />
-    <ClInclude Include="xrOcclusion.h" />
     <ClInclude Include="xrPhase_MergeLM_Rect.h" />
-    <ClInclude Include="xrSpherical.h" />
     <ClInclude Include="_rect.h" />
   </ItemGroup>
   <ItemGroup>

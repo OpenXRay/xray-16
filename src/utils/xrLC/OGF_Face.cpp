@@ -1,11 +1,8 @@
 #include "stdafx.h"
 #include "build.h"
 #include "ogf_face.h"
-
 #include "xrCore/fs.h"
 #include "xrCore/FMesh.hpp"
-#include "xrOcclusion.h"
-
 
 using namespace std;
 

@@ -181,9 +181,6 @@
     <Filter Include="ALife\Shared\Common">
       <UniqueIdentifier>{9f4c9b4e-64b7-478f-9b0b-82b9ee2006f4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ALife\Shared\IntrusivePtr">
-      <UniqueIdentifier>{bc89c94d-d51a-4222-98a6-3f47a3efbea8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ALife\Shared\associative_vector">
       <UniqueIdentifier>{0833e5b2-2a6d-42d4-9280-a75f241cfe07}</UniqueIdentifier>
     </Filter>
@@ -778,12 +775,6 @@
     </ClInclude>
     <ClInclude Include="profiler.h">
       <Filter>ALife\Shared\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="intrusive_ptr.h">
-      <Filter>ALife\Shared\IntrusivePtr</Filter>
-    </ClInclude>
-    <ClInclude Include="intrusive_ptr_inline.h">
-      <Filter>ALife\Shared\IntrusivePtr</Filter>
     </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\associative_vector.h">
       <Filter>ALife\Shared\associative_vector</Filter>
