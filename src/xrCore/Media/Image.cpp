@@ -2,6 +2,7 @@
 #include "Image.hpp"
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <io.h>
 
 using namespace XRay::Media;
 
