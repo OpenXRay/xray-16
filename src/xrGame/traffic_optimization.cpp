@@ -33,7 +33,7 @@ void deinit_ppmd_trained_stream	(ppmd_trained_stream* & src)
 void init_lzo	(u8* & dest_wm, u8* & wm_buffer, lzo_dictionary_buffer & dest_dict)
 {
 	lzo_initialize();
-	wm_buffer	= static_cast<u8*>(xr_malloc(LZO1X_999_MEM_COMPRESS+16));
+	wm_buffer	= static_cast<u8*>(xr_malloc(lzo_get_workmem_size()+16));
 	// buffer must be alligned to 16 bytes
     dest_wm		= (u8*)(size_t(wm_buffer + 16) & ~0xf);
 

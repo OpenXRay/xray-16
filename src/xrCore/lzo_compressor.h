@@ -1,23 +1,12 @@
-#ifndef LZO_COMPRESSOR_INCLUDED
-#define LZO_COMPRESSOR_INCLUDED
+#pragma once
+#include "xrCore/xrCore.h"
 
-#include "rt_lzo1x.h"
+XRCORE_API int lzo_compress_dict(const void *input, u32 inputSize, void *output, u32 &outputSize,
+    void *workMem, const void *dict, u32 dictSize);
 
-XRCORE_API int lzo_compress_dict(
-    const lzo_bytep in, lzo_uint in_len,
-    lzo_bytep out, lzo_uintp out_len,
-    lzo_voidp wrkmem,
-    const lzo_bytep dict, lzo_uint dict_len);
-
-XRCORE_API int lzo_decompress_dict(
-    const lzo_bytep in, lzo_uint in_len,
-    lzo_bytep out, lzo_uintp out_len,
-    lzo_voidp wrkmem /* NOT USED */,
-    const lzo_bytep dict, lzo_uint dict_len);
+XRCORE_API int lzo_decompress_dict(const void *input, u32 inputSize, void *output, u32 &outputSize,
+    void *workMem, const void *dict, u32 dict_len);
 
 XRCORE_API int lzo_initialize();
 
-
-
-
-#endif //#ifndef LZO_COMPRESSOR_INCLUDED
+XRCORE_API u32 lzo_get_workmem_size();

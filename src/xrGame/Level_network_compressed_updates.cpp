@@ -30,7 +30,7 @@ void CLevel::ProcessCompressedUpdate(NET_Packet& P, u8 const compress_type)
 				P.B.data + P.r_tell(),
 				next_size,
 				uncompressed_packet.B.data,
-				(lzo_uint*)&uncompressed_packet.B.count,
+				uncompressed_packet.B.count,
 				m_lzo_working_memory,
 				m_lzo_dictionary.data,
 				m_lzo_dictionary.size

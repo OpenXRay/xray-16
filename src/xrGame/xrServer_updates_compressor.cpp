@@ -216,7 +216,7 @@ void server_updates_compressor::flush_accumulative_buffer()
 				m_acc_buff.B.data,
 				m_acc_buff.B.count,
 				m_compress_buf.B.data,
-				(lzo_uint*)&m_compress_buf.B.count,
+				m_compress_buf.B.count,
 				m_lzo_working_memory,
 				m_lzo_dictionary.data, m_lzo_dictionary.size
 			);

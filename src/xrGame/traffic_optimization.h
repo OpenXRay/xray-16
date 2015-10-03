@@ -20,9 +20,9 @@ void deinit_ppmd_trained_stream	(ppmd_trained_stream* & src);
 
 struct lzo_dictionary_buffer
 {
-	lzo_bytep	data;
-	lzo_uint	size;
-}; //struct lzo_dictionary_buffer
+	u8 *data;
+	u32	size;
+};
 
 void init_lzo	(u8* & dest_wm, u8* & wm_buffer, lzo_dictionary_buffer & dest_dict);
 void deinit_lzo	(u8* & src_wm_buffer, lzo_dictionary_buffer & src_dict);
