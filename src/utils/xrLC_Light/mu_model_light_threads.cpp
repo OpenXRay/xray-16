@@ -14,7 +14,7 @@
 
 
 #include "utils/xrLCUtil/xrThread.hpp"
-#include "xrCore/xrSyncronize.h"
+#include "xrCore/Threading/xrSyncronize.h"
 
 
 

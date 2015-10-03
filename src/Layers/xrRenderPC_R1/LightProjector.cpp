@@ -9,7 +9,7 @@
 #include "Layers/xrRender/LightTrack.h"
 
 #ifndef _EDITOR
-#include "xrCPU_Pipe/ttapi.h"
+#include "xrCore/Threading/ttapi.h"
 #endif
 
 

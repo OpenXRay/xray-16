@@ -5,7 +5,7 @@
 #include "utils/xrLC_Light/xrLC_GlobalData.h"
 #include "utils/xrLC_Light/xrface.h"
 
-#include "xrCore/xrSyncronize.h"
+#include "xrCore/Threading/xrSyncronize.h"
 #include "xrCDB/xrCDB.h"
 
 

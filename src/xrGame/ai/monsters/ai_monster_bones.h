@@ -1,5 +1,6 @@
-
 #pragma once
+
+class CBoneInstance;
 
 #define AXIS_X	(1 << 0)
 #define AXIS_Y	(1 << 1)

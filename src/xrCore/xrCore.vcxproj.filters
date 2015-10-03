@@ -100,6 +100,9 @@
     <Filter Include="Kernel\Common">
       <UniqueIdentifier>{1e238830-d5c2-4e3e-94fe-df1a110b24a5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Threading">
+      <UniqueIdentifier>{863949aa-f421-4a48-be3e-5150fe475b84}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -321,9 +324,26 @@
     <ClCompile Include="PostProcess\PostProcess.cpp">
       <Filter>PostProcess</Filter>
     </ClCompile>
-    <ClCompile Include="xrSyncronize.cpp" />
     <ClCompile Include="Media\Image.cpp">
       <Filter>Media</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\ttapi.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\xrSyncronize.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\PLC_SSE.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Skin4W_MT.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\SkinXW_SSE.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\MathUtil.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -657,7 +677,6 @@
     <ClInclude Include="PostProcess\PostProcess.hpp">
       <Filter>PostProcess</Filter>
     </ClInclude>
-    <ClInclude Include="xrSyncronize.h" />
     <ClInclude Include="Media\Image.hpp">
       <Filter>Media</Filter>
     </ClInclude>
@@ -669,6 +688,24 @@
     </ClInclude>
     <ClInclude Include="cdecl_cast.hpp">
       <Filter>Kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\ttapi.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\xrSyncronize.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\PLC_SSE.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Skin4W_MT.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\SkinXW_SSE.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\MathUtil.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

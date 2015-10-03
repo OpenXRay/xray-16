@@ -1634,8 +1634,7 @@ extern void	noise3Init();
 #ifndef _EDITOR
 
 #include <xmmintrin.h>
-#include "xrCPU_Pipe/ttapi.h"
-#pragma comment(lib,"xrCPU_Pipe.lib")
+#include "xrCore/Threading/ttapi.h"
 
 __forceinline __m128 _mm_load_fvector( const Fvector& v )
 {
@@ -1774,7 +1773,7 @@ void PATurbulence::Execute(ParticleEffect *effect, const float dt, float& tm_max
 	if ( ! p_cnt )
 		return;
 
-	u32 nWorkers = ttapi_GetWorkersCount();
+	u32 nWorkers = ttapi_GetWorkerCount();
 
 	if ( p_cnt < nWorkers * 20 )
 		nWorkers = 1;
@@ -1805,7 +1804,7 @@ void PATurbulence::Execute(ParticleEffect *effect, const float dt, float& tm_max
 		ttapi_AddWorker( PATurbulenceExecuteStream , (LPVOID) &tesParams[i] );
 	}
 
-	ttapi_RunAllWorkers();
+	ttapi_Run();
 
 }
 

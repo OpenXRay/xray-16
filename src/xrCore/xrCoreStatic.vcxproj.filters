@@ -82,6 +82,15 @@
     <Filter Include="PostProcess">
       <UniqueIdentifier>{90109cda-1ebf-485f-bfd5-42442150fa12}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Threading">
+      <UniqueIdentifier>{858cbfe3-ebe9-4773-96e7-25af5e39b12f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OS">
+      <UniqueIdentifier>{a627771e-7b78-4ba7-9df1-30adb4cfe747}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Media">
+      <UniqueIdentifier>{fa415d9c-b2e6-466f-b26b-c9472c639219}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -255,8 +264,6 @@
     <ClCompile Include="string_concatenations.cpp">
       <Filter>string_concatenations</Filter>
     </ClCompile>
-    <ClCompile Include="os_clipboard.cpp" />
-    <ClCompile Include="xrSyncronize.cpp" />
     <ClCompile Include="animation\Bone.cpp">
       <Filter>Animation</Filter>
     </ClCompile>
@@ -280,6 +287,30 @@
     </ClCompile>
     <ClCompile Include="PostProcess\PostProcess.cpp">
       <Filter>PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="os_clipboard.cpp">
+      <Filter>OS</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\ttapi.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\xrSyncronize.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\MathUtil.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\PLC_SSE.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Skin4W_MT.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\SkinXW_SSE.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Media\Image.cpp">
+      <Filter>Media</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -556,8 +587,6 @@
     <ClInclude Include="string_concatenations_inline.h">
       <Filter>string_concatenations</Filter>
     </ClInclude>
-    <ClInclude Include="os_clipboard.h" />
-    <ClInclude Include="xrSyncronize.h" />
     <ClInclude Include="animation\Bone.hpp">
       <Filter>Animation</Filter>
     </ClInclude>
@@ -584,6 +613,30 @@
     </ClInclude>
     <ClInclude Include="..\common\Util.hpp">
       <Filter>Kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="os_clipboard.h">
+      <Filter>OS</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\ttapi.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\xrSyncronize.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\MathUtil.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\PLC_SSE.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Skin4W_MT.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\SkinXW_SSE.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\Image.hpp">
+      <Filter>Media</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

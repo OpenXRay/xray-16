@@ -6,7 +6,7 @@
 #include "utils/xrLC_Light/xrLC_GlobalData.h"
 #include "utils/xrLC_Light/xrLightVertex.h"
 
-#include "xrCore/xrSyncronize.h"
+#include "xrCore/Threading/xrSyncronize.h"
 #include "net.h"
 
 #include "utils/xrLC_Light/lcnet_task_manager.h"

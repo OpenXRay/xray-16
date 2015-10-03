@@ -9,7 +9,7 @@
 #include "xrlc_globaldata.h"
 #include "mu_light_net.h"
 #include "utils/xrLCUtil/xrThread.hpp"
-#include "xrCore/xrSyncronize.h"
+#include "xrCore/Threading/xrSyncronize.h"
 
 bool					global_compile_data_initialized = false;
 bool					base_global_compile_data_initialized = false;

@@ -183,7 +183,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="animation\Bone.cpp" />
+    <ClCompile Include="Animation\Bone.cpp" />
     <ClCompile Include="Animation\Envelope.cpp" />
     <ClCompile Include="Animation\interp.cpp" />
     <ClCompile Include="Animation\Motion.cpp" />
@@ -306,6 +306,10 @@
     <ClCompile Include="log.cpp" />
     <ClCompile Include="LzHuf.cpp" />
     <ClCompile Include="lzo_compressor.cpp" />
+    <ClCompile Include="Math\PLC_SSE.cpp" />
+    <ClCompile Include="Math\Skin4W_MT.cpp" />
+    <ClCompile Include="Math\SkinXW_SSE.cpp" />
+    <ClCompile Include="Math\MathUtil.cpp" />
     <ClCompile Include="Media\Image.cpp" />
     <ClCompile Include="memory_allocation_stats.cpp" />
     <ClCompile Include="memory_monitor.cpp" />
@@ -361,6 +365,8 @@
     </ClCompile>
     <ClCompile Include="stream_reader.cpp" />
     <ClCompile Include="string_concatenations.cpp" />
+    <ClCompile Include="Threading\ttapi.cpp" />
+    <ClCompile Include="Threading\xrSyncronize.cpp" />
     <ClCompile Include="xrCore.cpp" />
     <ClCompile Include="xrDebugNew.cpp" />
     <ClCompile Include="xrMemory.cpp" />
@@ -383,7 +389,6 @@
     <ClCompile Include="xrMemory_subst_msvc.cpp" />
     <ClCompile Include="xrsharedmem.cpp" />
     <ClCompile Include="xrstring.cpp" />
-    <ClCompile Include="xrSyncronize.cpp" />
     <ClCompile Include="Xr_ini.cpp" />
     <ClCompile Include="xr_shared.cpp" />
     <ClCompile Include="xr_trims.cpp" />
@@ -395,7 +400,7 @@
   <ItemGroup>
     <ClInclude Include="..\common\Util.hpp" />
     <ClInclude Include="..\common\_d3d_extensions.h" />
-    <ClInclude Include="animation\Bone.hpp" />
+    <ClInclude Include="Animation\Bone.hpp" />
     <ClInclude Include="Animation\Envelope.hpp" />
     <ClInclude Include="Animation\Motion.hpp" />
     <ClInclude Include="Animation\SkeletonMotionDefs.hpp" />
@@ -436,6 +441,10 @@
     <ClInclude Include="log.h" />
     <ClInclude Include="lzhuf.h" />
     <ClInclude Include="lzo_compressor.h" />
+    <ClInclude Include="Math\PLC_SSE.hpp" />
+    <ClInclude Include="Math\Skin4W_MT.hpp" />
+    <ClInclude Include="Math\SkinXW_SSE.hpp" />
+    <ClInclude Include="Math\MathUtil.hpp" />
     <ClInclude Include="Media\Image.hpp" />
     <ClInclude Include="memory_allocator_options.h" />
     <ClInclude Include="memory_monitor.h" />
@@ -464,6 +473,8 @@
     <ClInclude Include="string_concatenations.h" />
     <ClInclude Include="string_concatenations_inline.h" />
     <ClInclude Include="SubAlloc.hpp" />
+    <ClInclude Include="Threading\ttapi.h" />
+    <ClInclude Include="Threading\xrSyncronize.h" />
     <ClInclude Include="vector.h" />
     <ClInclude Include="xrCore.h" />
     <ClInclude Include="xrCore_platform.h" />
@@ -479,7 +490,6 @@
     <ClInclude Include="xrPool.h" />
     <ClInclude Include="xrsharedmem.h" />
     <ClInclude Include="xrstring.h" />
-    <ClInclude Include="xrSyncronize.h" />
     <ClInclude Include="xr_ini.h" />
     <ClInclude Include="xr_resource.h" />
     <ClInclude Include="xr_shared.h" />

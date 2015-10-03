@@ -6,6 +6,8 @@
 #include <mmsystem.h>
 #include <objbase.h>
 #include "xrCore.h"
+#include "Threading/ttapi.h"
+#include "Math/MathUtil.hpp"
 
 #pragma comment(lib,"winmm.lib")
 
@@ -78,14 +80,16 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
 
         // Mathematics & PSI detection
         CPU::Detect();
-
+        
         Memory._initialize(strstr(Params, "-mem_debug") ? TRUE : FALSE);
 
         DUMP_PHASE;
 
         InitLog();
         _initialize_cpu();
-
+        R_ASSERT(CPU::ID.feature&_CPU_FEATURE_SSE);
+        ttapi_Init(CPU::ID);
+        XRay::Math::Initialize();
         // Debug._initialize ();
 
         rtc_initialize();
@@ -136,6 +140,7 @@ void xrCore::_destroy()
     --init_counter;
     if (0 == init_counter)
     {
+        ttapi_Done();
         FS._destroy();
         EFS._destroy();
         xr_delete(xr_FS);

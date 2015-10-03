@@ -9,6 +9,7 @@ class CAdvancedDetector;
 class CEliteDetector;
 class CUIXml;
 class CLAItem;
+class CBoneInstance;
 
 class CUIArtefactDetectorBase
 {

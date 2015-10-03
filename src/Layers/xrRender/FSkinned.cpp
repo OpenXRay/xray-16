@@ -6,7 +6,6 @@
 #pragma warning(default:4995)
 
 #include "xrCore/FMesh.hpp"
-#include "xrCPU_Pipe/xrCPU_Pipe.h"
 #include "FSkinned.h"
 #include "SkeletonX.h"
 #include "Layers/xrRenderDX10/dx10BufferUtils.h"

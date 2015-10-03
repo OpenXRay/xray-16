@@ -15,6 +15,7 @@
 class CGameObject;
 class IKinematics;
 class IKinematicsAnimated;
+class CBoneInstance;
 
 namespace aimers {
 

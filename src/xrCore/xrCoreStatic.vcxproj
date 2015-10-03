@@ -277,6 +277,11 @@
     <ClCompile Include="LocatorAPI_defs.cpp" />
     <ClCompile Include="log.cpp" />
     <ClCompile Include="LzHuf.cpp" />
+    <ClCompile Include="Math\MathUtil.cpp" />
+    <ClCompile Include="Math\PLC_SSE.cpp" />
+    <ClCompile Include="Math\Skin4W_MT.cpp" />
+    <ClCompile Include="Math\SkinXW_SSE.cpp" />
+    <ClCompile Include="Media\Image.cpp" />
     <ClCompile Include="memory_allocation_stats.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">true</ExcludedFromBuild>
@@ -318,6 +323,8 @@
     </ClCompile>
     <ClCompile Include="stream_reader.cpp" />
     <ClCompile Include="string_concatenations.cpp" />
+    <ClCompile Include="Threading\ttapi.cpp" />
+    <ClCompile Include="Threading\xrSyncronize.cpp" />
     <ClCompile Include="xrCore.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">Create</PrecompiledHeader>
@@ -344,7 +351,6 @@
     <ClCompile Include="xrMemory_subst_msvc.cpp" />
     <ClCompile Include="xrsharedmem.cpp" />
     <ClCompile Include="xrstring.cpp" />
-    <ClCompile Include="xrSyncronize.cpp" />
     <ClCompile Include="Xr_ini.cpp" />
     <ClCompile Include="xr_shared.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -393,6 +399,11 @@
     <ClInclude Include="LocatorAPI_defs.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="lzhuf.h" />
+    <ClInclude Include="Math\MathUtil.hpp" />
+    <ClInclude Include="Math\PLC_SSE.hpp" />
+    <ClInclude Include="Math\Skin4W_MT.hpp" />
+    <ClInclude Include="Math\SkinXW_SSE.hpp" />
+    <ClInclude Include="Media\Image.hpp" />
     <ClInclude Include="memory_monitor.h" />
     <ClInclude Include="os_clipboard.h" />
     <ClInclude Include="PostProcess\PostProcess.hpp" />
@@ -417,6 +428,8 @@
     <ClInclude Include="string_concatenations.h" />
     <ClInclude Include="string_concatenations_inline.h" />
     <ClInclude Include="SubAlloc.hpp" />
+    <ClInclude Include="Threading\ttapi.h" />
+    <ClInclude Include="Threading\xrSyncronize.h" />
     <ClInclude Include="vector.h" />
     <ClInclude Include="xrCore.h" />
     <ClInclude Include="xrCore_platform.h" />
@@ -432,7 +445,6 @@
     <ClInclude Include="xrPool.h" />
     <ClInclude Include="xrsharedmem.h" />
     <ClInclude Include="xrstring.h" />
-    <ClInclude Include="xrSyncronize.h" />
     <ClInclude Include="xr_ini.h" />
     <ClInclude Include="xr_resource.h" />
     <ClInclude Include="xr_shared.h" />

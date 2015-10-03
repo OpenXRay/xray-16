@@ -1,19 +1,31 @@
-// Engine.h: interface for the CEngine class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_ENGINE_H__22802DD7_D7EB_4234_9781_E237657471AC__INCLUDED_)
-#define AFX_ENGINE_H__22802DD7_D7EB_4234_9781_E237657471AC__INCLUDED_
 #pragma once
+
+// you must define ENGINE_BUILD then building the engine itself
+// and not define it if you are about to build DLL
+
+// XXX: move all *_API macros to XRayConfig.hpp
+#ifndef ENGINE_API
+#ifndef NO_ENGINE_API
+#ifdef ENGINE_BUILD
+#define DLL_API __declspec(dllimport)
+#define ENGINE_API __declspec(dllexport)
+#else
+#undef DLL_API
+#define DLL_API __declspec(dllexport)
+#define ENGINE_API __declspec(dllimport)
+#endif
+#else
+#define ENGINE_API
+#define DLL_API
+#endif // !NO_ENGINE_API
+#endif // !ENGINE_API
 
 #include "engineAPI.h"
 #include "eventAPI.h"
-#include "xrCPU_Pipe/xrCPU_Pipe.h"
 #include "xrSheduler.h"
 
 class ENGINE_API CEngine
 {
-    HMODULE hPSGP;
 public:
     BENCH_SEC_SCRAMBLEMEMBER1
     // DLL api stuff
@@ -28,7 +40,4 @@ public:
     ~CEngine();
 };
 
-ENGINE_API extern xrDispatchTable PSGP;
 ENGINE_API extern CEngine Engine;
-
-#endif // !defined(AFX_ENGINE_H__22802DD7_D7EB_4234_9781_E237657471AC__INCLUDED_)

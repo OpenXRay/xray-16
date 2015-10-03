@@ -1,10 +1,9 @@
 #ifndef _RENDER_H_
 #define _RENDER_H_
 
+#include "xrEngine/Engine.h"
 #include "xrCDB/frustum.h"
 #include "vis_common.h"
-
-
 #include "Include/xrAPI/xrAPI.h"
 #include "Include/xrRender/FactoryPtr.h"
 class IUIShader;

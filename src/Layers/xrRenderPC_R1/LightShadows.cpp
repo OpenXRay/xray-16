@@ -5,8 +5,10 @@
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrEngine/CustomHUD.h"
 #ifndef _EDITOR
-#include "xrCPU_Pipe/ttapi.h"
+#include "xrCore/Threading/ttapi.h"
 #endif
+#include "xrCore/Math/MathUtil.hpp"
+using namespace XRay::Math;
 
 const	float		S_distance		= 48;
 const	float		S_distance2		= S_distance*S_distance;
@@ -513,7 +515,7 @@ void CLightShadows::render	()
 			*/
 			int	c0,c1,c2;
 
-			PSGP.PLC_calc3(c0,c1,c2,Device,v,TT.N,S.L,Le,S.C);
+			PLCCalc(c0, c1, c2, Device.vCameraPosition, v, TT.N, S.L, Le, S.C);
 
 			if (c0>S_clip && c1>S_clip && c2>S_clip)		continue;	
 			clamp		(c0,S_ambient,255);
