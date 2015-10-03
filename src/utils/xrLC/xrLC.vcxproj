@@ -226,12 +226,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\common\face_smoth_flags.h" />
-    <ClInclude Include="..\..\common\itterate_adjacents.h" />
     <ClInclude Include="..\..\common\NvMender2003\convert.h" />
     <ClInclude Include="..\..\common\NvMender2003\mender_input_output.h" />
     <ClInclude Include="..\..\common\NvMender2003\NVMeshMender.h" />
     <ClInclude Include="..\..\common\NvMender2003\remove_isolated_verts.h" />
     <ClInclude Include="..\Shader_xrLC.h" />
+    <ClInclude Include="..\xrLC_Light\itterate_adjacents.h" />
     <ClInclude Include="ArbitraryList.h" />
     <ClInclude Include="Build.h" />
     <ClInclude Include="b_globals.h" />

@@ -2,7 +2,7 @@
 #define __CALCULATE_NORMALS_H__
 
 #include "itterate_adjacents_static.h"
-#include "common/itterate_adjacents.h"
+#include "itterate_adjacents.h"
 
 template	<typename typeVertex>
 class calculate_normals

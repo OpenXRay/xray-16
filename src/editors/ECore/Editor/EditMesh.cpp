@@ -4,7 +4,7 @@
 #include "EditMesh.h"
 #include "EditObject.h"
 #include "xrCore/Animation/Bone.hpp"
-#include "common/itterate_adjacents.h"
+#include "utils/xrLC_Light/itterate_adjacents.h"
 #include "itterate_adjacents_dynamic.h"
 #ifdef _EDITOR
 #include "ETools.h"

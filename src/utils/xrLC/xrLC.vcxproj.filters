@@ -114,9 +114,6 @@
     <ClInclude Include="..\..\common\face_smoth_flags.h">
       <Filter>%2a%2a%2a COMPILER %2a%2a%2a</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\common\itterate_adjacents.h">
-      <Filter>%2a%2a%2a COMPILER %2a%2a%2a</Filter>
-    </ClInclude>
     <ClInclude Include="Sector.h">
       <Filter>%2a%2a%2a COMPILER %2a%2a%2a</Filter>
     </ClInclude>
@@ -139,6 +136,9 @@
       <Filter>%2a%2a%2a COMPILER %2a%2a%2a\net</Filter>
     </ClInclude>
     <ClInclude Include="xrGameMaterials.h" />
+    <ClInclude Include="..\xrLC_Light\itterate_adjacents.h">
+      <Filter>%2a%2a%2a COMPILER %2a%2a%2a</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StdAfx.cpp">
