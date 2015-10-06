@@ -1,7 +1,7 @@
 #ifndef AWARD_SYSTEM_INCLUDED
 #define AWARD_SYSTEM_INCLUDED
 
-#include "xrServerEntities/associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 #include <boost/noncopyable.hpp>
 #include "profile_data_types.h"
 #include "xrGameSpy/GameSpy/sake/sake.h"

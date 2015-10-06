@@ -82,7 +82,7 @@ public:
 											 u32_binary_function*	func,
 											 u32 right_arg);
 private:
-	typedef associative_vector<enum_accumulative_player_values, player_state_param*>	accumulative_values_collection_t;
+	typedef AssociativeVector<enum_accumulative_player_values, player_state_param*>	accumulative_values_collection_t;
 
 	//average_values_collection_t			m_average_values;
 	accumulative_values_collection_t	m_accumulative_values;

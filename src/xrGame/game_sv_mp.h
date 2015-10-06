@@ -179,7 +179,7 @@ public:
 
 				struct async_statistics_collector
 				{
-					typedef associative_vector<ClientID, bool> responses_t;
+					typedef AssociativeVector<ClientID, bool> responses_t;
 					responses_t async_responses;
 					void operator()(IClient* client);
 					bool all_ready() const;

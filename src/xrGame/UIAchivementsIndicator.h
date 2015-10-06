@@ -3,7 +3,7 @@
 
 #include "ui/UIStatic.h"
 #include "ui/KillMessageStruct.h"
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 
 class CUIXml;
 class CUIGameLog;

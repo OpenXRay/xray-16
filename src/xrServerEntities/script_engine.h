@@ -11,7 +11,7 @@
 #include "script_storage.h"
 #include "script_export_space.h"
 #include "script_space_forward.h"
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 
 extern "C" {
 	#include <lua/lua.h>
@@ -44,7 +44,7 @@ class CScriptEngine : public CScriptStorage {
 public:
 	typedef CScriptStorage											inherited;
 	typedef ScriptEngine::EScriptProcessors							EScriptProcessors;
-	typedef associative_vector<EScriptProcessors,CScriptProcess*>	CScriptProcessStorage;
+	typedef AssociativeVector<EScriptProcessors,CScriptProcess*>	CScriptProcessStorage;
 
 private:
 	bool						m_reload_modules;

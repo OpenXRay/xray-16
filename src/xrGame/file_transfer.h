@@ -1,6 +1,6 @@
 #ifndef FILETRANSFER
 #define FILETRANSFER
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 #include "xrEngine/StatGraph.h"
 #include "filetransfer_node.h"
 #include "filereceiver_node.h"
@@ -13,8 +13,8 @@ class server_site
 public:
 	typedef std::pair<ClientID, ClientID> dst_src_pair_t;
 private:
-	typedef associative_vector<dst_src_pair_t, filetransfer_node*> transfer_sessions_t;
-	typedef associative_vector<ClientID, filereceiver_node*> receiving_sessions_t;
+	typedef AssociativeVector<dst_src_pair_t, filetransfer_node*> transfer_sessions_t;
+	typedef AssociativeVector<ClientID, filereceiver_node*> receiving_sessions_t;
 
 	transfer_sessions_t		m_transfers;
 	receiving_sessions_t	m_receivers;
@@ -70,7 +70,7 @@ public:
 class client_site
 {
 	filetransfer_node*		m_transfering;
-	typedef associative_vector<ClientID, filereceiver_node*> receiving_sessions_t;
+	typedef AssociativeVector<ClientID, filereceiver_node*> receiving_sessions_t;
 	receiving_sessions_t	m_receivers;
 	void stop_receiving_sessions(buffer_vector<ClientID> const & tsessions);
 #ifdef DEBUG

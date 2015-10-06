@@ -91,6 +91,12 @@
     <Filter Include="Media">
       <UniqueIdentifier>{fa415d9c-b2e6-466f-b26b-c9472c639219}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Containers">
+      <UniqueIdentifier>{9315a107-070f-4430-b3ba-96144d698c79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Text">
+      <UniqueIdentifier>{36b70269-aa0e-4038-b5a9-7aa6e4c0a082}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -311,6 +317,9 @@
     </ClCompile>
     <ClCompile Include="Media\Image.cpp">
       <Filter>Media</Filter>
+    </ClCompile>
+    <ClCompile Include="Text\MbHelpers.cpp">
+      <Filter>Text</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -637,6 +646,21 @@
     </ClInclude>
     <ClInclude Include="Media\Image.hpp">
       <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\associative_vector.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\associative_vector_compare_predicate.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\associative_vector_compare_predicate_inline.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\associative_vector_inline.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Text\MbHelpers.h">
+      <Filter>Text</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

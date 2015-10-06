@@ -103,6 +103,12 @@
     <Filter Include="Threading">
       <UniqueIdentifier>{863949aa-f421-4a48-be3e-5150fe475b84}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Containers">
+      <UniqueIdentifier>{6626992d-4b6b-4686-b8cc-ffe3120a9005}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Text">
+      <UniqueIdentifier>{fa47a672-0ff4-40c9-a4b8-07909d056fd5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -344,6 +350,9 @@
     </ClCompile>
     <ClCompile Include="Math\MathUtil.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Text\MbHelpers.cpp">
+      <Filter>Text</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -706,6 +715,15 @@
     </ClInclude>
     <ClInclude Include="Math\MathUtil.hpp">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\AssociativeVectorComparer.hpp">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\AssociativeVector.hpp">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Text\MbHelpers.h">
+      <Filter>Text</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

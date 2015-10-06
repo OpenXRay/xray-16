@@ -3,7 +3,7 @@
 
 #include "xrCore/fastdelegate.h"
 #include "xrCore/net_utils.h"
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 
 #define FILTERS_COUNT 32
 
@@ -43,7 +43,7 @@ private:
 		void import(NET_Packet& packet);
 	};
 	void dbg_print_msg(NET_Packet & packet, msg_type_subtype_t const & msg_type);
-	typedef associative_vector<msg_type_subtype_t, msg_type_subtype_func_t>	filters_map_t;
+	typedef AssociativeVector<msg_type_subtype_t, msg_type_subtype_func_t>	filters_map_t;
 	
 	filters_map_t	m_filters;
 	IWriter*		m_msg_log_file;

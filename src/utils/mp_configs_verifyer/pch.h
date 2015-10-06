@@ -10,6 +10,6 @@
 #include <stdio.h>
 #include <conio.h>
 #include "xrServerEntities/object_broker.h"
-#include "xrServerEntities/associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 
 #endif // #define PCH_H_INCLUDED

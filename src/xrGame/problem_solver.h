@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 
 template <
 	typename _operator_condition,
@@ -73,7 +73,7 @@ public:
 	};
 	typedef xr_vector<SOperator>											OPERATOR_VECTOR;
 	typedef typename OPERATOR_VECTOR::const_iterator						const_iterator;
-	typedef associative_vector<_condition_type,_condition_evaluator_ptr>	EVALUATORS;
+	typedef AssociativeVector<_condition_type,_condition_evaluator_ptr>	EVALUATORS;
 
 protected:
 	OPERATOR_VECTOR				m_operators;

@@ -10,7 +10,7 @@
 #include "xrEngine/feel_sound.h"
 #include "xrEngine/feel_touch.h"
 #include "Include/xrRender/Kinematics.h"
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 #include "trajectories.h"
 
 
@@ -282,7 +282,7 @@ public:
 public:
 	typedef u32											CriticalWoundType;
 private:
-	typedef associative_vector<u16,CriticalWoundType>	BODY_PART;
+	typedef AssociativeVector<u16,CriticalWoundType>	BODY_PART;
 
 protected:
 	u32								m_last_hit_time;

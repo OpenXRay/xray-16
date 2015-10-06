@@ -127,7 +127,7 @@ private:
 		u16								m_victim_id;
 		u16								m_shots_count;
 	};//struct	victim_bone_data
-	typedef associative_vector<u16, u16>						victims_hits_count_t;
+	typedef AssociativeVector<u16, u16>						victims_hits_count_t;
 	typedef buffer_vector<std::pair<victim_bone_data, float> >	victims_shapes_list_t;
 
 	spartial_base_t					m_spartial_query_res;

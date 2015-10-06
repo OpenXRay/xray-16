@@ -12,7 +12,7 @@
 #endif
 
 
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 #include "restrictions.h"
 
 struct string_lex_less
@@ -28,7 +28,7 @@ class CItemMgr
 		u8			slot_idx;
 		u32			cost[_RANK_COUNT];
 	};
-	typedef associative_vector<shared_str, _i, string_lex_less>	COST_MAP;
+	typedef AssociativeVector<shared_str, _i, string_lex_less>	COST_MAP;
 	typedef COST_MAP::iterator												COST_MAP_IT;
 	typedef COST_MAP::const_iterator										COST_MAP_CIT;
 	COST_MAP				m_items;

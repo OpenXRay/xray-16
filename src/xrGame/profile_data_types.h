@@ -1,7 +1,7 @@
 #ifndef PLAYER_AWARDS
 #define PLAYER_AWARDS
 
-#include "xrServerEntities/associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 #include "mixed_delegate.h"
 #include "atlas_stalkercoppc_v1.h"
 #include "script_export_space.h"
@@ -63,7 +63,7 @@ struct award_data
 	u32		m_last_reward_date;
 };
 
-typedef associative_vector<enum_awards_t, award_data>	all_awards_t;
+typedef AssociativeVector<enum_awards_t, award_data>	all_awards_t;
 
 char const *			get_award_name				(enum_awards_t award);
 extern u16				get_award_id_key			(enum_awards_t award);
@@ -93,7 +93,7 @@ u16						get_best_score_id_stat		(enum_best_score_type bst);
 enum_best_score_type	get_best_score_type_by_sname(char const * stat_name);
 
 
-typedef associative_vector<enum_best_score_type, s32> all_best_scores_t;
+typedef AssociativeVector<enum_best_score_type, s32> all_best_scores_t;
 
 typedef mixed_delegate<void (bool, char const *), store_operation_cb_tag>	store_operation_cb;
 

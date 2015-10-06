@@ -1,6 +1,6 @@
 #pragma once
 #include "UIFrameWindow.h"
-#include "xrServerEntities/associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 
 class CUIStatic;
 class CUITextWnd;
@@ -13,7 +13,7 @@ class CUIMapLocationHint :public CUIFrameWindow
 	typedef CUIFrameWindow inherited;
 
 	CUIWindow*			m_owner;
-	associative_vector<shared_str, CUIStatic*>		m_info;
+	AssociativeVector<shared_str, CUIStatic*>		m_info;
 	void				SetInfoMode					(u8 mode);
 public:
 					CUIMapLocationHint	():m_owner(NULL){};

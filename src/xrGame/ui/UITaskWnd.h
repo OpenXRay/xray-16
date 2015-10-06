@@ -1,7 +1,7 @@
 #pragma once
 #include "UIWindow.h"
 #include "UIWndCallback.h"
-#include "xrServerEntities/associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 #include "GameTaskDefs.h"
 #include "UICheckButton.h"
 
@@ -99,7 +99,7 @@ class CUITaskItem : public CUIWindow
 private:
 	typedef CUIWindow			inherited;
 
-	associative_vector<shared_str, CUIStatic*>			m_info;
+	AssociativeVector<shared_str, CUIStatic*>			m_info;
 	CGameTask*											m_owner;
 public:
 								CUITaskItem				();

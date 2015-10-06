@@ -2,12 +2,12 @@
 #define DEMO_INFO_LOADER
 
 #include "DemoInfo.h"
-#include "xrServerEntities/associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 
 class demo_info_loader
 {
 private:
-	typedef associative_vector<shared_str, demo_info*> demo_info_cache_t;
+	typedef AssociativeVector<shared_str, demo_info*> demo_info_cache_t;
 	demo_info_cache_t	m_demo_info_cache;
 
 	demo_info*				load_demofile		(LPCSTR demo_file_name);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 
 #define MIN_LEGS_COUNT	1
 #define MAX_LEGS_COUNT	4 
@@ -17,7 +17,7 @@ struct SStepParam {
 };
 
 //DEFINE_MAP(MotionID, SStepParam, STEPS_MAP, STEPS_MAP_IT);
-typedef associative_vector<MotionID, SStepParam>	STEPS_MAP;
+typedef AssociativeVector<MotionID, SStepParam>	STEPS_MAP;
 typedef STEPS_MAP::iterator							STEPS_MAP_IT;
 
 struct SStepInfo {

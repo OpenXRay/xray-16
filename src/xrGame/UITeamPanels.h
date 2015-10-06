@@ -17,7 +17,7 @@ private:
 	bool					need_update_players;
 	bool					need_update_panels;
 	// this is only the pointers so it can be dereferenced in UIPlayerItem constructor
-	typedef associative_vector<shared_str, UITeamState*> TTeamsMap;
+	typedef AssociativeVector<shared_str, UITeamState*> TTeamsMap;
 
 	TTeamsMap myPanels;
 	void UpdateExistingPlayers();

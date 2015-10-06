@@ -23,7 +23,7 @@ public:
 	virtual void		OnPlayerSpawned				(game_PlayerState const * ps);
 protected:
 	//data of the vector is u32 - kill time
-	associative_vector<shared_str, u32>		m_victims;
+	AssociativeVector<shared_str, u32>		m_victims;
 }; //class black_list
 
 ADD_ACCUMULATIVE_STATE(acpv_black_list, black_list);

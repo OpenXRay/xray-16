@@ -1,7 +1,7 @@
 #ifndef REWARD_MANAGER_INCLUDED
 #define REWARD_MANAGER_INCLUDED
 
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 
 class game_cl_mp;
 
@@ -28,7 +28,7 @@ private:
 		u32			m_process_time;
 	};//struct reward_descriptor
 
-	typedef		associative_vector<u32, reward_descriptor*>	rewards_map_t;
+	typedef		AssociativeVector<u32, reward_descriptor*>	rewards_map_t;
 	typedef		xr_deque<u32>								reward_tasks_queue_t;
 	
 	u32						m_reward_process_time;

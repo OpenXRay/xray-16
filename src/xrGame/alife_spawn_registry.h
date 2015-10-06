@@ -25,7 +25,7 @@ public:
 
 public:
 	typedef xr_vector<ALife::_SPAWN_ID>												SPAWN_IDS;
-	typedef associative_vector<ALife::_SPAWN_STORY_ID,ALife::_OBJECT_ID>			SPAWN_STORY_IDS;
+	typedef AssociativeVector<ALife::_SPAWN_STORY_ID,ALife::_OBJECT_ID>			SPAWN_STORY_IDS;
 
 private:
 	CALifeSpawnHeader						m_header;

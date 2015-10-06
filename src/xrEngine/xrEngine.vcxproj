@@ -508,7 +508,6 @@
     <ClInclude Include="LightAnimLibrary.h" />
     <ClInclude Include="line_editor.h" />
     <ClInclude Include="line_edit_control.h" />
-    <ClInclude Include="MbHelpers.h" />
     <ClInclude Include="mp_logging.h" />
     <ClInclude Include="no_single.h" />
     <ClInclude Include="ObjectAnimator.h" />
@@ -653,7 +652,6 @@
     <ClCompile Include="line_editor.cpp" />
     <ClCompile Include="line_edit_control.cpp" />
     <ClCompile Include="mailSlot.cpp" />
-    <ClCompile Include="MbHelpers.cpp" />
     <ClCompile Include="ObjectAnimator.cpp" />
     <ClCompile Include="ObjectDump.cpp" />
     <ClCompile Include="perlin.cpp" />

@@ -3,7 +3,7 @@
 
 #include "obsolete_queue.h"
 #include "game_base_kill_type.h"
-#include "xrServerEntities/associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 
 namespace award_system
 {
@@ -27,7 +27,7 @@ public:
 	static unsigned int const max_kills_count = 10;
 	typedef obsolete_queue<buffer_vector<kill>, max_kills_count>				kills_t;
 	//key: (initiator, victim)
-	typedef associative_vector<std::pair<shared_str, shared_str>, kills_t*>		kills_map_t;
+	typedef AssociativeVector<std::pair<shared_str, shared_str>, kills_t*>		kills_map_t;
 
 	void		add_kill		(shared_str const & killer,
 								 shared_str const & victim,

@@ -8,14 +8,14 @@
 
 #pragma once
 
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 
 class CStalkerVelocityCollection;
 
 class CStalkerVelocityHolder {
 public:
 	typedef CStalkerVelocityCollection					COLLECTION;
-	typedef associative_vector<shared_str,COLLECTION*>	COLLECTIONS;
+	typedef AssociativeVector<shared_str,COLLECTION*>	COLLECTIONS;
 
 private:
 	COLLECTIONS					m_collections;

@@ -12,7 +12,7 @@
 #include "smart_cover_detail.h"
 #include "script_space_forward.h"
 #include "ai_monster_space.h"
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 #include "debug_make_final.hpp"
 
 namespace smart_cover{
@@ -33,7 +33,7 @@ private:
 
 public:
 	typedef xr_vector<shared_str>												Animations;
-	typedef associative_vector<shared_str, Animations*, animation_predicate>	AnimationList;
+	typedef AssociativeVector<shared_str, Animations*, animation_predicate>	AnimationList;
 
 private:
 	AnimationList			m_animations;

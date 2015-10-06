@@ -12,7 +12,7 @@
 #include "xrServer_Objects_ALife.h"
 #include "xrServer_Objects_ALife_Items.h"
 #include "character_info_defs.h"
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 #include "alife_movement_manager_holder.h"
 
 class CALifeMonsterBrain;
@@ -538,7 +538,7 @@ public:
 
 public:
 	typedef CSE_ALifeMonsterAbstract						MEMBER;
-	typedef associative_vector<ALife::_OBJECT_ID,MEMBER*>	MEMBERS;
+	typedef AssociativeVector<ALife::_OBJECT_ID,MEMBER*>	MEMBERS;
 
 private:
 	MEMBERS							m_members;

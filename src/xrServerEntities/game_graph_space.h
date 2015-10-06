@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 
 #ifdef XRGAME_EXPORTS
 #	include "xrEngine/xrLevel.h"
@@ -70,7 +70,7 @@ namespace GameGraph {
 		friend class CGameGraph;
 	};
 
-	typedef associative_vector<_LEVEL_ID,SLevel>		LEVEL_MAP;
+	typedef AssociativeVector<_LEVEL_ID,SLevel>		LEVEL_MAP;
 
 #pragma pack(push,1)
 #ifdef AI_COMPILER

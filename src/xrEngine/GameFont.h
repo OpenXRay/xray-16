@@ -2,8 +2,7 @@
 #define GameFontH
 #pragma once
 
-#include "MbHelpers.h"
-
+#include "xrCore/Text/MbHelpers.h"
 #include "Include/xrRender/FontRender.h"
 
 class ENGINE_API CGameFont

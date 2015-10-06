@@ -145,7 +145,7 @@ private:
 		buyMenuPlayerReadyToSpawn		= 2		// this value set in RespawnDeadPlayers
 	};
 
-	typedef associative_vector<xrClientData const *, buyMenuPlayerState> TBuyMenuPlayerStates;
+	typedef AssociativeVector<xrClientData const *, buyMenuPlayerState> TBuyMenuPlayerStates;
 	TBuyMenuPlayerStates				m_buyMenuPlayerStates;
 	virtual void OnPlayerOpenBuyMenu(xrClientData const * pclient);				//this method invokes only if player dead
 	virtual void OnPlayerCloseBuyMenu(xrClientData const * pclient);			//if client state buyMenuPlayerReadyToSpawn respawn player
@@ -187,7 +187,7 @@ private:
 	bool teams_swaped;
 
 
-	typedef associative_vector<ClientID, u32> InvincibilityTimeouts;
+	typedef AssociativeVector<ClientID, u32> InvincibilityTimeouts;
 	InvincibilityTimeouts m_invTimeouts;
 	void ResetTimeoutInvincibility(u32 currentTime);
 	bool ResetInvincibility(ClientID const clientId);

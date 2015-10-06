@@ -8,7 +8,7 @@
 #include "game_cl_base.h"
 #include "string_table.h"
 #include "Level.h"
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 
 class CUIStatic;
 
@@ -19,9 +19,9 @@ class UITeamHeader : public CUIWindow
 private:
 	typedef	CUIWindow									inherited;
 	
-	typedef associative_vector<shared_str, CUIStatic*>		FieldsStatics;
-	typedef associative_vector<shared_str, CUIStatic*>		ColumnsStatics;
-	typedef associative_vector<shared_str, STRING_VALUE>	TranslatedStrings;
+	typedef AssociativeVector<shared_str, CUIStatic*>		FieldsStatics;
+	typedef AssociativeVector<shared_str, CUIStatic*>		ColumnsStatics;
+	typedef AssociativeVector<shared_str, STRING_VALUE>	TranslatedStrings;
 	
 	FieldsStatics				m_field_fillers;
 	ColumnsStatics				m_columns_statics;

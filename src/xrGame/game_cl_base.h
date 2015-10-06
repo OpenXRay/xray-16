@@ -28,7 +28,7 @@ protected:
 	bool								m_bServerControlHits;	
 
 public:
-	typedef associative_vector<ClientID,game_PlayerState*>	PLAYERS_MAP;
+	typedef AssociativeVector<ClientID,game_PlayerState*>	PLAYERS_MAP;
 	typedef PLAYERS_MAP::iterator							PLAYERS_MAP_IT;
 	typedef PLAYERS_MAP::const_iterator						PLAYERS_MAP_CIT;
 

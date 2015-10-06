@@ -402,9 +402,6 @@
     <ClInclude Include="GameFont.h">
       <Filter>Render\Font output</Filter>
     </ClInclude>
-    <ClInclude Include="MbHelpers.h">
-      <Filter>Render\Font output</Filter>
-    </ClInclude>
     <ClInclude Include="WaveForm.h">
       <Filter>Render\Execution &amp; 3D\Shaders</Filter>
     </ClInclude>
@@ -708,9 +705,6 @@
       <Filter>Render\Lighting</Filter>
     </ClCompile>
     <ClCompile Include="GameFont.cpp">
-      <Filter>Render\Font output</Filter>
-    </ClCompile>
-    <ClCompile Include="MbHelpers.cpp">
       <Filter>Render\Font output</Filter>
     </ClCompile>
     <ClCompile Include="tntQAVI.cpp">

@@ -10,7 +10,7 @@
 
 #include "restricted_object.h"
 #include "detail_path_manager_space.h"
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 
 using namespace DetailPathManager;
 
@@ -70,7 +70,7 @@ private:
 
 public:
 	typedef
-		associative_vector<
+		AssociativeVector<
 			u32,
 			STravelParams
 		>										VELOCITIES;

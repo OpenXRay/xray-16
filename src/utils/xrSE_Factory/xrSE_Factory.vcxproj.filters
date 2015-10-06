@@ -40,9 +40,6 @@
     <Filter Include="Common\SmartCast">
       <UniqueIdentifier>{ea79b7ec-1151-459a-a904-83c9d5bfdd2a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Common\associative_vector">
-      <UniqueIdentifier>{d137ef10-7858-429e-9d83-c9adca7a8920}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scripts">
       <UniqueIdentifier>{beab8f12-fdda-4d4c-bff0-faf824bb05d7}</UniqueIdentifier>
     </Filter>
@@ -275,18 +272,6 @@
     </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\smart_cast_impl2.h">
       <Filter>Common\SmartCast</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\associative_vector.h">
-      <Filter>Common\associative_vector</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\associative_vector_compare_predicate.h">
-      <Filter>Common\associative_vector</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\associative_vector_compare_predicate_inline.h">
-      <Filter>Common\associative_vector</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\associative_vector_inline.h">
-      <Filter>Common\associative_vector</Filter>
     </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\script_export_macroses.h">
       <Filter>Scripts</Filter>

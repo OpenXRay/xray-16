@@ -23,7 +23,7 @@ public:
 	virtual void		OnPlayerSpawned				(game_PlayerState const * ps);
 protected:
 			void		feel_my_team_players		(game_PlayerState const * of_player, buffer_vector<shared_str> & dest);
-	typedef	associative_vector<shared_str, u32>		player_spawn_times_t;
+	typedef	AssociativeVector<shared_str, u32>		player_spawn_times_t;
 	player_spawn_times_t	m_player_spawns;
 	u32						m_aveng_count;
 }; //class player_state_avenger

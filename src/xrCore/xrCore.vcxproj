@@ -365,6 +365,7 @@
     </ClCompile>
     <ClCompile Include="stream_reader.cpp" />
     <ClCompile Include="string_concatenations.cpp" />
+    <ClCompile Include="Text\MbHelpers.cpp" />
     <ClCompile Include="Threading\ttapi.cpp" />
     <ClCompile Include="Threading\xrSyncronize.cpp" />
     <ClCompile Include="xrCore.cpp" />
@@ -420,6 +421,8 @@
     <ClInclude Include="Coder.hpp" />
     <ClInclude Include="compression_ppmd_stream.h" />
     <ClInclude Include="compression_ppmd_stream_inline.h" />
+    <ClInclude Include="Containers\AssociativeVector.hpp" />
+    <ClInclude Include="Containers\AssociativeVectorComparer.hpp" />
     <ClInclude Include="cpuid.h" />
     <ClInclude Include="doug_lea_allocator.h" />
     <ClInclude Include="dump_string.h" />
@@ -473,6 +476,7 @@
     <ClInclude Include="string_concatenations.h" />
     <ClInclude Include="string_concatenations_inline.h" />
     <ClInclude Include="SubAlloc.hpp" />
+    <ClInclude Include="Text\MbHelpers.h" />
     <ClInclude Include="Threading\ttapi.h" />
     <ClInclude Include="Threading\xrSyncronize.h" />
     <ClInclude Include="vector.h" />

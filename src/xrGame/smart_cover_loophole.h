@@ -11,7 +11,7 @@
 #include <boost/noncopyable.hpp>
 #include "smart_cover_detail.h"
 #include "script_space_forward.h"
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 #include "graph_abstract.h"
 #include "smart_cover_action.h"
 
@@ -33,7 +33,7 @@ private:
 		}
 };
 public:
-	typedef associative_vector<shared_str, action*, action_predicate>	ActionList;
+	typedef AssociativeVector<shared_str, action*, action_predicate>	ActionList;
 	typedef xr_vector<shared_str>										TransitionData;
 	typedef smart_cover::action::Animations								Animations;
 	typedef CGraphAbstract<

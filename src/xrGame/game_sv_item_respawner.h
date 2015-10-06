@@ -1,7 +1,7 @@
 #pragma once
 #include "game_base.h"
 #include "xrServer_Object_Base.h"
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 
 class xrServer;
 
@@ -33,7 +33,7 @@ private:
 
 	typedef xr_vector<section_item>							section_items;
 	typedef section_items::iterator							section_items_iter;
-	typedef associative_vector<shared_str, section_items*>	respawn_sections_map;
+	typedef AssociativeVector<shared_str, section_items*>	respawn_sections_map;
 	typedef respawn_sections_map::iterator					respawn_section_iter;
 
 

@@ -2,7 +2,7 @@
 #define HITS_STORE_INCLUDED
 
 #include "obsolete_queue.h"
-#include "xrServerEntities/associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 
 namespace award_system
 {
@@ -26,7 +26,7 @@ public:
 	static unsigned int const max_hits_count	= 10;
 	typedef obsolete_queue<buffer_vector<bullet_hit>, max_hits_count>				bullet_hits_t;
 	//key: (initiator, victim)
-	typedef associative_vector<std::pair<shared_str, shared_str>, bullet_hits_t*>	bullet_hits_map_t;
+	typedef AssociativeVector<std::pair<shared_str, shared_str>, bullet_hits_t*>	bullet_hits_map_t;
 
 	void		add_hit			(shared_str const & hitter,
 								 shared_str const & victim,

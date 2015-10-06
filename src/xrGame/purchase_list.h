@@ -8,14 +8,14 @@
 
 #pragma once
 
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 
 class CInventoryOwner;
 class CGameObject;
 
 class CPurchaseList {
 public:
-	typedef associative_vector<shared_str,float>	DEFICITS;
+	typedef AssociativeVector<shared_str,float>	DEFICITS;
 
 private:
 	DEFICITS				m_deficits;

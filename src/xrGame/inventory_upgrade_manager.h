@@ -10,7 +10,7 @@
 #define INVENTORY_UPGRADE_MANAGER_H_INCLUDED
 
 #include <boost/noncopyable.hpp>
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 #include "inventory_item_object.h"
 
 #include "inventory_upgrade_base.h"
@@ -37,12 +37,12 @@ struct shared_str_predicate
 class Manager :	private boost::noncopyable
 {
 public:
-	typedef associative_vector<shared_str, Property*, shared_str_predicate>  Properties_type;
+	typedef AssociativeVector<shared_str, Property*, shared_str_predicate>  Properties_type;
 
 private:
-	typedef associative_vector<shared_str, Root*,     shared_str_predicate>  Roots_type;
-	typedef associative_vector<shared_str, Group*,    shared_str_predicate>  Groups_type;
-	typedef associative_vector<shared_str, Upgrade*,  shared_str_predicate>  Upgrades_type;
+	typedef AssociativeVector<shared_str, Root*,     shared_str_predicate>  Roots_type;
+	typedef AssociativeVector<shared_str, Group*,    shared_str_predicate>  Groups_type;
+	typedef AssociativeVector<shared_str, Upgrade*,  shared_str_predicate>  Upgrades_type;
 
 public:
 						Manager			();

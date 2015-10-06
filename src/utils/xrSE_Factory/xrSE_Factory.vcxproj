@@ -204,10 +204,6 @@
     <ClInclude Include="..\..\xrServerEntities\alife_monster_brain_inline.h" />
     <ClInclude Include="..\..\xrServerEntities\alife_movement_manager_holder.h" />
     <ClInclude Include="..\..\xrServerEntities\alife_space.h" />
-    <ClInclude Include="..\..\xrServerEntities\associative_vector.h" />
-    <ClInclude Include="..\..\xrServerEntities\associative_vector_compare_predicate.h" />
-    <ClInclude Include="..\..\xrServerEntities\associative_vector_compare_predicate_inline.h" />
-    <ClInclude Include="..\..\xrServerEntities\associative_vector_inline.h" />
     <ClInclude Include="..\..\xrServerEntities\character_info.h" />
     <ClInclude Include="..\..\xrServerEntities\character_info_defs.h" />
     <ClInclude Include="..\..\xrServerEntities\clsid_game.h" />

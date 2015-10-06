@@ -3,7 +3,7 @@
 
 #include "event_conditions_collection.h" //for event_action_delegate_t
 #include "game_cl_base_weapon_usage_statistic.h"
-#include "xrServerEntities/associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 #include "game_events_handler.h"
 
 namespace award_system
@@ -35,7 +35,7 @@ public:
 	virtual void	OnRoundEnd					();
 	virtual void	OnRoundStart				();
 private:
-	typedef associative_vector<u32, reward_event_handler*>	handlers_store_t;
+	typedef AssociativeVector<u32, reward_event_handler*>	handlers_store_t;
 
 	handlers_store_t					m_events_store;
 	event_action_delegate_t				m_reward_action;

@@ -10,7 +10,7 @@
 #define RAT_STATE_MANAGER_H_INCLUDED
 
 #include <boost/noncopyable.hpp>
-#include "associative_vector.h"
+#include "xrCore/Containers/AssociativeVector.hpp"
 
 class rat_state_base;
 class CAI_Rat;
@@ -18,7 +18,7 @@ class CAI_Rat;
 class rat_state_manager : private boost::noncopyable {
 private:
 	typedef	u32													state_id_type;
-	typedef associative_vector<state_id_type, rat_state_base*>	States;
+	typedef AssociativeVector<state_id_type, rat_state_base*>	States;
 	typedef xr_stack<state_id_type>								Stack;
 
 private:
