@@ -136,9 +136,6 @@
     <Filter Include="RenderRef\Execution &amp; 3D\Device">
       <UniqueIdentifier>{43966447-6d34-46c3-956d-adaa49b48525}</UniqueIdentifier>
     </Filter>
-    <Filter Include="RenderRef\doug_lea_memory_allocator">
-      <UniqueIdentifier>{6c14caad-1705-4fbf-87b0-9ad1d734d338}</UniqueIdentifier>
-    </Filter>
     <Filter Include="editor">
       <UniqueIdentifier>{94169f02-9d9d-46d0-9fdf-58f636a57c46}</UniqueIdentifier>
     </Filter>
@@ -477,9 +474,6 @@
     <ClInclude Include="Stats.h">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
     </ClInclude>
-    <ClInclude Include="doug_lea_memory_allocator.h">
-      <Filter>RenderRef\doug_lea_memory_allocator</Filter>
-    </ClInclude>
     <ClInclude Include="engine_impl.hpp">
       <Filter>editor\engine_impl</Filter>
     </ClInclude>
@@ -805,9 +799,6 @@
     </ClCompile>
     <ClCompile Include="Stats.cpp">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
-    </ClCompile>
-    <ClCompile Include="doug_lea_memory_allocator.c">
-      <Filter>RenderRef\doug_lea_memory_allocator</Filter>
     </ClCompile>
     <ClCompile Include="engine_impl.cpp">
       <Filter>editor\engine_impl</Filter>
