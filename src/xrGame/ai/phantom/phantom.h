@@ -87,4 +87,6 @@ public:
     virtual bool IsVisibleForZones() { return false; }
     virtual BOOL UsedAI_Locations() { return false; }
     virtual CEntity* cast_entity() { return this; }
+
+    void SetEnemy(IGameObject* enemy) { m_enemy = enemy; } //Alundaio
 };

@@ -477,6 +477,10 @@ public:
     CScriptGameObject* GetCurrentOutfit() const;
     float GetCurrentOutfitProtection(int hit_type);
 
+    bool IsOnBelt(CScriptGameObject* obj) const;
+    CScriptGameObject* ItemOnBelt(u32 item_id) const;  
+    u32 BeltSize() const;  
+
     void deadbody_closed(bool status);
     bool deadbody_closed_status();
     void deadbody_can_take(bool status);
@@ -870,6 +874,36 @@ public:
     void SetRemainingUses(u8 value);
     u8 GetRemainingUses();
     u8 GetMaxUses();
+
+    //Phantom
+    void PhantomSetEnemy(CScriptGameObject*);
+    //Actor
+    float GetActorMaxWeight() const;
+    void SetActorMaxWeight(float max_weight);
+
+    float GetActorMaxWalkWeight() const;
+    void SetActorMaxWalkWeight(float max_walk_weight);
+
+    float GetAdditionalMaxWeight() const;
+    void SetAdditionalMaxWeight(float add_max_weight);
+
+    float GetAdditionalMaxWalkWeight() const;
+    void SetAdditionalMaxWalkWeight(float add_max_walk_weight);
+
+    float GetTotalWeight() const;
+    float Weight() const;
+
+    float GetActorJumpSpeed() const;
+    void SetActorJumpSpeed(float jump_speed);
+
+    float GetActorSprintKoef() const;
+    void SetActorSprintKoef(float sprint_koef);
+
+    float GetActorRunCoef() const;
+    void SetActorRunCoef(float run_coef);
+
+    float GetActorRunBackCoef() const;
+    void SetActorRunBackCoef(float run_back_coef);  
     //-Alundaio
 #endif // GAME_OBJECT_EXTENDED_EXPORTS
     doors::door* m_door;

@@ -1115,6 +1115,7 @@
     <ClInclude Include="rat_state_base_inline.h" />
     <ClInclude Include="rat_state_manager.h" />
     <ClInclude Include="rat_state_manager_inline.h" />
+    <ClInclude Include="raypick.h" />
     <ClInclude Include="refreshable_obstacles_query.h" />
     <ClInclude Include="refreshable_obstacles_query_inline.h" />
     <ClInclude Include="RegistryFuncs.h" />
@@ -2831,6 +2832,7 @@
     <ClCompile Include="rat_states.cpp" />
     <ClCompile Include="rat_state_base.cpp" />
     <ClCompile Include="rat_state_manager.cpp" />
+    <ClCompile Include="raypick.cpp" />
     <ClCompile Include="RegistryFuncs.cpp" />
     <ClCompile Include="relation_registry.cpp" />
     <ClCompile Include="relation_registry_actions.cpp">

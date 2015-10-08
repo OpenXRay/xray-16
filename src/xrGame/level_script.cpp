@@ -38,6 +38,8 @@
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "HUDManager.h"
+#include "raypick.h"
+#include "xrCDB/xr_collide_defs.h"
 
 using namespace luabind;
 using namespace luabind::policy;
@@ -649,6 +651,27 @@ void set_active_cam(u8 mode)
 #endif
 //-Alundaio
 
+// KD: raypick	
+bool ray_pick(const Fvector& start, const Fvector& dir, float range,
+              collide::rq_target tgt, script_rq_result& script_R,
+              CScriptGameObject* ignore_object)
+{
+    collide::rq_result R;
+    IGameObject* ignore = nullptr;
+    if (ignore_object)
+        ignore = smart_cast<IGameObject*>(&(ignore_object->object()));
+    if (Level().ObjectSpace.RayPick(start, dir, range, tgt, R, ignore))
+    {
+        script_R.set(R);
+        return true;
+    }
+    return false;
+}
+
+// XXX nitrocaster: one can export enum like class, without defining dummy type
+template<typename T>
+struct EnumCallbackType {};
+
 IC static void CLevel_Export(lua_State* luaState)
 {
     class_<CEnvDescriptor>("CEnvDescriptor")
@@ -731,10 +754,44 @@ IC static void CLevel_Export(lua_State* luaState)
 
         def("vertex_id", &vertex_id),
 
-        def("game_id", &GameID)],
+        def("game_id", &GameID),
+        def("ray_pick", &ray_pick)],
 
         module(luaState, "actor_stats")[def("add_points", &add_actor_points),
             def("add_points_str", &add_actor_points_str), def("get_points", &get_actor_points)];
+
+    module(luaState)
+    [
+        class_<CRayPick>("ray_pick")
+        .def(constructor<>())
+        .def(constructor<Fvector&, Fvector&, float, collide::rq_target, CScriptGameObject*>())
+        .def("set_position", &CRayPick::set_position)
+        .def("set_direction", &CRayPick::set_direction)
+        .def("set_range", &CRayPick::set_range)
+        .def("set_flags", &CRayPick::set_flags)
+        .def("set_ignore_object", &CRayPick::set_ignore_object)
+        .def("query", &CRayPick::query)
+        .def("get_result", &CRayPick::get_result)
+        .def("get_object", &CRayPick::get_object)
+        .def("get_distance", &CRayPick::get_distance)
+        .def("get_element", &CRayPick::get_element),
+        class_<script_rq_result>("rq_result")
+        .def_readonly("object", &script_rq_result::O)
+        .def_readonly("range", &script_rq_result::range)
+        .def_readonly("element", &script_rq_result::element)
+        .def(constructor<>()),
+        class_<EnumCallbackType<collide::rq_target>>("rq_target")
+        .enum_("targets")
+        [
+            value("rqtNone", int(collide::rqtNone)),
+            value("rqtObject", int(collide::rqtObject)),
+            value("rqtStatic", int(collide::rqtStatic)),
+            value("rqtShape", int(collide::rqtShape)),
+            value("rqtObstacle", int(collide::rqtObstacle)),
+            value("rqtBoth", int(collide::rqtBoth)),
+            value("rqtDyn", int(collide::rqtDyn))
+        ]
+    ];
 
     module(luaState)[def("command_line", &command_line), def("IsGameTypeSingle", &IsGameTypeSingle),
         def("IsDynamicMusic", &IsDynamicMusic), def("render_get_dx_level", &render_get_dx_level),

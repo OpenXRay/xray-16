@@ -6655,6 +6655,9 @@
     <ClInclude Include="WeaponCustomPistolAuto.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
     </ClInclude>
+    <ClInclude Include="raypick.h">
+      <Filter>Core\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -10167,6 +10170,9 @@
     </ClCompile>
     <ClCompile Include="WeaponCustomPistolAuto.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
+    </ClCompile>
+    <ClCompile Include="raypick.cpp">
+      <Filter>Core\Common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

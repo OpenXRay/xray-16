@@ -385,9 +385,10 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("set_remaining_uses", &CScriptGameObject::SetRemainingUses)
         .def("get_remaining_uses", &CScriptGameObject::GetRemainingUses)
         .def("get_max_uses", &CScriptGameObject::GetMaxUses)
+        // Phantom
+        .def("phantom_set_enemy", &CScriptGameObject::PhantomSetEnemy)
 #endif
         //-Alundaio
-            
 
         //AVO: additional functions
         #ifdef GAME_OBJECT_TESTING_EXPORTS
@@ -429,6 +430,29 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         //.def("is_torch", &CScriptGameObject::isTorch)
         .def("is_weapon_gl", &CScriptGameObject::isWeaponGL)
         .def("is_inventory_box", &CScriptGameObject::isInventoryBox)
+        .def("is_on_belt", &CScriptGameObject::IsOnBelt)
+        .def("item_on_belt", &CScriptGameObject::ItemOnBelt)
+        .def("belt_count", &CScriptGameObject::BeltSize)
+
+        .def("get_actor_max_weight", &CScriptGameObject::GetActorMaxWeight)
+        .def("set_actor_max_weight", &CScriptGameObject::SetActorMaxWeight)
+        .def("get_actor_max_walk_weight", &CScriptGameObject::GetActorMaxWalkWeight)
+        .def("set_actor_max_walk_weight", &CScriptGameObject::SetActorMaxWalkWeight)
+        .def("get_additional_max_weight", &CScriptGameObject::GetAdditionalMaxWeight)
+        .def("set_additional_max_weight", &CScriptGameObject::SetAdditionalMaxWeight)
+        .def("get_additional_max_walk_weight", &CScriptGameObject::GetAdditionalMaxWalkWeight)
+        .def("set_additional_max_walk_weight", &CScriptGameObject::SetAdditionalMaxWalkWeight)
+        .def("get_total_weight", &CScriptGameObject::GetTotalWeight)
+        .def("weight", &CScriptGameObject::Weight)
+
+        .def("get_actor_jump_speed", &CScriptGameObject::GetActorJumpSpeed)
+        .def("set_actor_jump_speed", &CScriptGameObject::SetActorJumpSpeed)
+        .def("get_actor_sprint_koef", &CScriptGameObject::GetActorSprintKoef)
+        .def("set_actor_sprint_koef", &CScriptGameObject::SetActorSprintKoef)
+        .def("get_actor_run_coef", &CScriptGameObject::GetActorRunCoef)
+        .def("set_actor_run_coef", &CScriptGameObject::SetActorRunCoef)
+        .def("get_actor_runback_coef", &CScriptGameObject::GetActorRunBackCoef)
+        .def("set_actor_runback_coef", &CScriptGameObject::SetActorRunBackCoef)
 #endif // GAME_OBJECT_TESTING_EXPORTS
         //-AVO
 

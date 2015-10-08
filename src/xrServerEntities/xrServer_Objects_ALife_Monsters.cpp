@@ -894,7 +894,7 @@ void CSE_ALifeCreatureAbstract::STATE_Write(NET_Packet& tNetPacket)
     save_data(m_dynamic_out_restrictions, tNetPacket);
     save_data(m_dynamic_in_restrictions, tNetPacket);
     tNetPacket.w_u16(get_killer_id());
-    R_ASSERT(!(get_health() > 0.0f && get_killer_id() != u16(-1)));
+    //R_ASSERT(!(get_health() > 0.0f && get_killer_id() != u16(-1)));
     tNetPacket.w_u64(m_game_death_time);
 }
 

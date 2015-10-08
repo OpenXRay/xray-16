@@ -408,6 +408,7 @@ protected:
 
     BOOL m_bJumpKeyPressed;
 
+public:
     float m_fWalkAccel;
     float m_fJumpSpeed;
     float m_fRunFactor;
@@ -464,6 +465,13 @@ protected:
     float m_fDispCrouchFactor;
     // crouch+no acceleration
     float m_fDispCrouchNoAccelFactor;
+
+    Fvector m_vMissileOffset;
+
+public:
+    // Получение, и запись смещения для гранат
+    Fvector GetMissileOffset() const;
+    void SetMissileOffset(const Fvector& vNewOffset);
 
 protected:
     //косточки используемые при стрельбе
@@ -743,6 +751,26 @@ private:
     bool m_disabled_hitmarks;
     bool m_inventory_disabled;
     // static CPhysicsShell		*actor_camera_shell;
+
+    IC u32 get_state() const
+    {
+        return this->mstate_real;
+    }
+
+    IC void set_state(u32 state)
+    {
+        mstate_real = state;
+    }
+
+    IC u32 get_state_wishful() const
+    {
+        return this->mstate_wishful;
+    }
+
+    IC void set_state_wishful(u32 state)
+    {
+        mstate_wishful = state;
+    }
 };
 
 extern bool isActorAccelerated(u32 mstate, bool ZoomMode);

@@ -41,6 +41,7 @@
 #include "physics_shell_scripted.h"
 #include "CharacterPhysicsSupport.h" //Alundaio: For set_visual
 #include "damage_manager.h" //Alundaio: For set_visual
+#include "ai/phantom/phantom.h"
 
 class CScriptBinderObject;
 
@@ -595,3 +596,16 @@ pcstr CScriptGameObject::get_smart_cover_description() const
 
 void CScriptGameObject::set_visual_name(LPCSTR visual) { object().cNameVisual_set(visual); }
 LPCSTR CScriptGameObject::get_visual_name() const { return object().cNameVisual().c_str(); }
+
+void CScriptGameObject::PhantomSetEnemy(CScriptGameObject* enemy)
+{
+    CPhantom* phant = smart_cast<CPhantom*>(&object());
+    if (!phant)
+        return;
+
+    IGameObject* obj = smart_cast<IGameObject*>(enemy);
+    if (!obj)
+        return;
+    
+    phant->SetEnemy(obj);
+}

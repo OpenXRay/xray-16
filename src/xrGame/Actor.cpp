@@ -1833,6 +1833,16 @@ void CActor::SetShotRndSeed(s32 Seed)
         m_ShotRndSeed = s32(Level().timeServer_Async());
 };
 
+Fvector CActor::GetMissileOffset() const
+{
+    return m_vMissileOffset;
+}
+
+void CActor::SetMissileOffset(const Fvector& vNewOffset)
+{
+    m_vMissileOffset.set(vNewOffset);
+}
+
 void CActor::spawn_supplies()
 {
     inherited::spawn_supplies();
