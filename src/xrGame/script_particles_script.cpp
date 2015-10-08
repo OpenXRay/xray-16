@@ -27,7 +27,10 @@ void CScriptParticles::script_register(lua_State *L)
 			.def("looped",						&CScriptParticles::IsLooped)
 
 			.def("move_to",						&CScriptParticles::MoveTo)
+      		.def("set_direction",				&CScriptParticles::SetDirection)
+	    	.def("set_orientation",				&CScriptParticles::SetOrientation)
 
+	    	.def("last_position",				&CScriptParticles::LastPosition)	
 			.def("load_path",					&CScriptParticles::LoadPath)
 			.def("start_path",					&CScriptParticles::StartPath)
 			.def("stop_path",					&CScriptParticles::StopPath)

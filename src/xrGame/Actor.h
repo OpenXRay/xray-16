@@ -423,6 +423,7 @@ protected:
 
     BOOL					m_bJumpKeyPressed;
 
+public:
     float					m_fWalkAccel;
     float					m_fJumpSpeed;
     float					m_fRunFactor;
@@ -480,7 +481,11 @@ protected:
     float								m_fDispCrouchFactor;
     //crouch+no acceleration
     float								m_fDispCrouchNoAccelFactor;
-
+	Fvector								m_vMissileOffset;
+public:
+	// ѕолучение, и запись смещени€ дл€ гранат
+	Fvector								GetMissileOffset	() const;
+	void								SetMissileOffset	(const Fvector &vNewOffset);
 protected:
     //косточки используемые при стрельбе
     int									m_r_hand;
@@ -763,6 +768,26 @@ private:
     bool					m_inventory_disabled;
 //static CPhysicsShell		*actor_camera_shell;
 
+			IC u32 get_state() const
+			{
+				return this->mstate_real;
+			}
+
+			IC void set_state(u32 state)
+			{
+				mstate_real = state;
+			}
+
+			IC u32 get_state_wishful() const
+			{
+				return this->mstate_wishful;
+			}
+
+			IC void set_state_wishful(u32 state)
+			{
+				mstate_wishful = state;
+			}
+      
 DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 add_to_type_list(CActor)

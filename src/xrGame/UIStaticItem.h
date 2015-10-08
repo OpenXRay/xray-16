@@ -38,6 +38,10 @@ public:
 
 	IC void			SetTextureColor			(u32 clr)					{dwColor= clr;}
 	IC u32			GetTextureColor			() const					{return dwColor;}
+	IC void			SetColor		(u32 clr)					{dwColor= clr;}
+	IC void			SetColor		(Fcolor clr)				{dwColor= clr.get();}
+	IC u32			GetColor		() const					{return dwColor;}
+	IC u32&			GetColorRef		()							{return dwColor;}  
 	ui_shader&		GetShader				()							{return hShader;}
 
 public:

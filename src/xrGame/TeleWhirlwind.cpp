@@ -56,11 +56,12 @@ void CTeleWhirlwind::set_throw_power(float throw_pow)
 void CTeleWhirlwind::draw_out_impact(Fvector& dir,float& val)
 {
 	VERIFY2(m_saved_impacts.size(),"NO IMPACTS ADDED!");
-
+  if (0==m_saved_impacts.size()) return;
 	dir.set(m_saved_impacts[0].force);
 	val=dir.magnitude();
-	if(!fis_zero(val))dir.mul(1.f/val);
-	m_saved_impacts.erase(m_saved_impacts.begin());
+	//if(!fis_zero(val))dir.mul(1.f/val);
+	//m_saved_impacts.erase(m_saved_impacts.begin());
+  m_saved_impacts.erase(m_saved_impacts.begin()); //swartz
 }
 
 static bool RemovePred(CTelekineticObject *tele_object)

@@ -1689,5 +1689,233 @@ void CScriptGameObject::IterateInstalledUpgrades(luabind::functor<void> functor)
 		functor((*ib).c_str(), object().lua_game_object());
 	}
 }
+
+
+#include "inventory_item_impl.h"
+#include "inventory_item.h"
+#include "inventory.h"
+#include "xrserver_objects_alife_items.h"
+#include "./xrServerEntities/inventory_space.h"
+CScriptGameObject *CScriptGameObject::ItemOnBelt	(u32 item_id) const
+{
+	CInventoryOwner	*inventory_owner = smart_cast<CInventoryOwner*>(&object());
+	if (!inventory_owner) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CInventoryOwner : cannot access class member item_on_belt!");
+		return		(0);
+	}
+
+	TIItemContainer *belt = &(inventory_owner->inventory().m_belt);
+	if (belt->size() < item_id) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"item_on_belt: item id outside belt!");
+		return		(0);
+	}
+
+	CInventoryItem	*result = belt->at(item_id);
+	return			(result ? result->object().lua_game_object() : 0);
+}
+
+
+bool CScriptGameObject::IsOnBelt	(CScriptGameObject *obj) const
+	{
+	CInventoryItem	*inventory_item = smart_cast<CInventoryItem*>(&(obj->object()));
+	if (!inventory_item) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CInventoryItem : cannot access class member is_on_belt!");
+		return		(0);
+	}
+
+	CInventoryOwner	*inventory_owner = smart_cast<CInventoryOwner*>(&object());
+	if (!inventory_owner) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CInventoryOwner : cannot access class member is_on_belt!");
+		return		(0);
+	}
+
+	return inventory_owner->inventory().InBelt(inventory_item);
+}
+
+u32 CScriptGameObject::BeltSize	() const
+{
+	CInventoryOwner	*inventory_owner = smart_cast<CInventoryOwner*>(&object());
+	if (!inventory_owner) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CInventoryOwner : cannot access class member move_to_belt!");
+		return (0);
+	}
+
+	return inventory_owner->inventory().m_belt.size();
+}
+
+float CScriptGameObject::GetActorMaxWeight() const
+{
+	CActor* pActor = smart_cast<CActor*>(&object());
+	if(!pActor) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CActor : cannot access class member GetActorMaxWeight!");
+		return			(false);
+	}
+	return				(pActor->inventory().GetMaxWeight());
+}
+void CScriptGameObject::SetActorMaxWeight(float max_weight)
+{
+	CActor* pActor = smart_cast<CActor*>(&object());
+	if(!pActor) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CActor : cannot access class member SetActorMaxWeight!");
+		return;
+	}
+	pActor->inventory().SetMaxWeight(max_weight);
+}
+// получить и задать максимальный вес при котором можно ходить
+float CScriptGameObject::GetActorMaxWalkWeight() const
+{
+	CActor* pActor = smart_cast<CActor*>(&object());
+	if(!pActor) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CActor : cannot access class member GetActorMaxWalkWeight!");
+		return			(false);
+	}
+	return				(pActor->conditions().m_MaxWalkWeight);
+}
+void CScriptGameObject::SetActorMaxWalkWeight(float max_walk_weight)
+{
+	CActor* pActor = smart_cast<CActor*>(&object());
+	if(!pActor) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CActor : cannot access class member SetActorMaxWalkWeight!");
+		return;
+	}
+	pActor->conditions().m_MaxWalkWeight = max_walk_weight;
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+// получить и задать доп. вес для костюма
+float CScriptGameObject::GetAdditionalMaxWeight() const
+{
+	CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
+	if(!outfit) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CCustomOutfit : cannot access class member GetAdditionalMaxWeight!");
+		return			(false);
+	}
+	return				(outfit->m_additional_weight2);
+}
+float CScriptGameObject::GetAdditionalMaxWalkWeight() const
+{
+	CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
+	if(!outfit) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CCustomOutfit : cannot access class member GetAdditionalMaxWalkWeight!");
+		return			(false);
+	}
+	return				(outfit->m_additional_weight);
+}
+void CScriptGameObject::SetAdditionalMaxWeight(float add_max_weight)
+{
+	CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
+	if(!outfit) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CCustomOutfit : cannot access class member SetAdditionalMaxWeight!");
+		return;
+	}
+	outfit->m_additional_weight2 = add_max_weight;
+}
+void CScriptGameObject::SetAdditionalMaxWalkWeight(float add_max_walk_weight)
+{
+	CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
+	if(!outfit) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CCustomOutfit : cannot access class member SetAdditionalMaxWalkWeight!");
+		return;
+	}
+	outfit->m_additional_weight = add_max_walk_weight;
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+// получить суммарный вес инвентаря
+float CScriptGameObject::GetTotalWeight() const
+{
+	CInventoryOwner	*inventory_owner = smart_cast<CInventoryOwner*>(&object());
+	if (!inventory_owner) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CInventoryOwner : cannot access class member GetTotalWeight!");
+		return			(false);
+	}
+	return				(inventory_owner->inventory().TotalWeight());
+}
+// получить вес предмета
+float CScriptGameObject::Weight() const
+{
+	CInventoryItem		*inventory_item = smart_cast<CInventoryItem*>(&object());
+	if (!inventory_item) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CSciptEntity : cannot access class member Weight!");
+		return			(false);
+	}
+	return				(inventory_item->Weight());
+}
+
+float CScriptGameObject::GetActorJumpSpeed() const
+{
+	CActor* pActor = smart_cast<CActor*>(&object());
+	if(!pActor) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CActor : cannot access class member GetActorJumpSpeed!");
+		return			(false);
+	}
+	return				(pActor->m_fJumpSpeed);
+}
+
+void CScriptGameObject::SetActorJumpSpeed(float jump_speed)
+{
+	CActor* pActor = smart_cast<CActor*>(&object());
+	if(!pActor) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CActor : cannot access class member SetActorJumpSpeed!");
+		return;
+	}
+	pActor->m_fJumpSpeed = jump_speed;
+  //character_physics_support()->movement()->SetJumpUpVelocity(m_fJumpSpeed);  
+}
+
+float CScriptGameObject::GetActorSprintKoef() const
+{
+	CActor* pActor = smart_cast<CActor*>(&object());
+	if(!pActor) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CActor : cannot access class member GetActorJumpSpeed!");
+		return			(false);
+	}
+	return				(pActor->m_fSprintFactor);
+}
+void CScriptGameObject::SetActorSprintKoef(float sprint_koef)
+{
+	CActor* pActor = smart_cast<CActor*>(&object());
+	if(!pActor) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CActor : cannot access class member SetActorJumpSpeed!");
+		return;
+	}
+	pActor->m_fSprintFactor = sprint_koef;
+}
+
+float CScriptGameObject::GetActorRunCoef() const
+{
+	CActor* pActor = smart_cast<CActor*>(&object());
+	if(!pActor) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CActor : cannot access class member GetActorJumpSpeed!");
+		return			(false);
+	}
+	return				(pActor->m_fRunFactor);
+}
+void CScriptGameObject::SetActorRunCoef(float run_coef)
+{
+	CActor* pActor = smart_cast<CActor*>(&object());
+	if(!pActor) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CActor : cannot access class member SetActorJumpSpeed!");
+		return;
+	}
+	pActor->m_fRunFactor = run_coef;
+}
+
+float CScriptGameObject::GetActorRunBackCoef() const
+{
+	CActor* pActor = smart_cast<CActor*>(&object());
+	if(!pActor) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CActor : cannot access class member GetActorJumpSpeed!");
+		return			(false);
+	}
+	return				(pActor->m_fRunBackFactor);
+}
+void CScriptGameObject::SetActorRunBackCoef(float run_back_coef)
+{
+	CActor* pActor = smart_cast<CActor*>(&object());
+	if(!pActor) {
+		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"CActor : cannot access class member SetActorJumpSpeed!");
+		return;
+	}
+	pActor->m_fRunBackFactor = run_back_coef;
+}
 #endif
 //Alundaio: END

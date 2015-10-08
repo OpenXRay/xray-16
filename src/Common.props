@@ -21,6 +21,9 @@
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
+    <Link>
+      <LargeAddressAware>true</LargeAddressAware>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <BuildMacro Include="xrBinRootDir">
