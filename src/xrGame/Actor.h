@@ -651,7 +651,7 @@ protected:
         Fvector							m_AutoPickUp_AABB_Offset;
 
         void							Check_for_AutoPickUp			();
-        void							SelectBestWeapon				(CObject* O);
+		void							SelectBestWeapon(CObject* O);
 public:
         void							SetWeaponHideState				(u16 State, bool bSet);
 private://IPhysicsShellHolder

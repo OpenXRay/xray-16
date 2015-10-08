@@ -47,6 +47,7 @@
 #include "doors_door.h"
 #include "Torch.h"
 #include "physicobject.h"
+#include "customoutfit.h"
 //Alundaio
 #include "inventory_upgrade_manager.h"
 #include "inventory_upgrade_root.h"

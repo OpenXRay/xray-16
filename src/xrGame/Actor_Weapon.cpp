@@ -25,35 +25,17 @@ static const float VEL_A_MAX	= 10.f;
 //возвращает текуший разброс стрельбы (в радианах)с учетом движения
 float CActor::GetWeaponAccuracy() const
 {
-  CEntity::SEntityState state;
-  if (g_State(state))
-  {
 	CWeapon* W	= smart_cast<CWeapon*>(inventory().ActiveItem());
-    int buckShot = 0;
-
-    if (W != NULL)
-    {
-      if (!W->m_magazine.empty())
-      {
-        buckShot = W->m_magazine.back().param_s.buckShot;
-      }
-      else
-      {
-        CWeaponAmmo *pAmmo = (W->m_pCurrentAmmo != NULL) ? W->m_pCurrentAmmo : smart_cast<CWeaponAmmo*>(W->m_pInventory->GetAny(W->m_ammoTypes[W->m_ammoType].c_str()));
-        buckShot = (pAmmo != NULL) ? pAmmo->cartridge_param.buckShot : 0;
-      }
-    }
-
-    if (buckShot > 1)
-      return 0.0;
-
-    float dispersion = m_fDispBase * GetWeaponParam(W, Get_PDM_Base(), 1.0f);
 	
 	if ( IsZoomAimingMode() && W && !GetWeaponParam(W, IsRotatingToZoom(), false) )
 	{
 		return m_fDispAim;
 	}
+	float dispersion = m_fDispBase*GetWeaponParam(W, Get_PDM_Base(), 1.0f);
 
+	CEntity::SEntityState state;
+	if ( g_State(state) )
+	{
 		//fAVelocity = angle velocity
 		dispersion *= ( 1.0f + (state.fAVelocity/VEL_A_MAX) * m_fDispVelFactor * GetWeaponParam(W, Get_PDM_Vel_F(), 1.0f) );
 		//fVelocity = linear velocity
@@ -73,8 +55,8 @@ float CActor::GetWeaponAccuracy() const
 				dispersion *= ( 1.0f + m_fDispCrouchNoAccelFactor * GetWeaponParam(W, Get_PDM_Crouch_NA(), 1.0f) );
 			}
 		}
-    return dispersion;
 	}
+	return dispersion;
 }
 
 
@@ -137,7 +119,7 @@ static	u16 BestWeaponSlots [] = {
 	GRENADE_SLOT	,		// 3
 	KNIFE_SLOT		,		// 0
 };
-void CActor::SelectBestWeapon	(CObject* O)
+void CActor::SelectBestWeapon(CObject* O)
 {
 	if (!O) return;
 	if ( IsGameTypeSingle() ) return;

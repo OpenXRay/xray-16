@@ -11039,6 +11039,9 @@
     <ClCompile Include="WeaponRevolver.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
     </ClCompile>
+    <ClCompile Include="raypick.cpp">
+      <Filter>Core\Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ai\monsters\chimera\chimera_attack_state.h">
