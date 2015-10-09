@@ -152,6 +152,13 @@ LPCSTR get_file_age_str(CLocatorAPI* fs, LPCSTR nm)
 	return asctime( newtime );
 }
 
+static const CLocatorAPI::file *ExistS(CLocatorAPI *fs, const char *path, const char *name)
+{
+    string_path temp;
+    fs->update_path(temp, path, name);
+    return fs->GetFileDesc(temp);
+}
+
 #pragma optimize("s",on)
 void fs_registrator::script_register(lua_State *L)
 {
@@ -231,6 +238,7 @@ void fs_registrator::script_register(lua_State *L)
 			.def("file_length",							&CLocatorAPI::file_length)
 			.def("file_copy",							&CLocatorAPI::file_copy)
 
+            .def("exist", &ExistS)
 			.def("exist", (FileStatus (CLocatorAPI::*)(LPCSTR, FSType))(&CLocatorAPI::exist))
 			.def("exist", (FileStatus (CLocatorAPI::*)(LPCSTR, LPCSTR, FSType))(&CLocatorAPI::exist))
 
