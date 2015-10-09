@@ -222,6 +222,7 @@ protected:
 	float				m_fMinWoundSize;
 	bool				m_bIsBleeding;		//есть кровотечение
 
+
 	//части хита, затрачиваемые на уменьшение здоровья и силы
 	float				m_fHealthHitPart;
 	float				m_fPowerHitPart;
