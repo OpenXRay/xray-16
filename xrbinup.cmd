@@ -48,7 +48,6 @@ set cp_tool=cp
 %cp_tool% %src%\%cfg_long%\xrAPI.dll %dst%\xrAPI.dll
 %cp_tool% %src%\%cfg_long%\xrCore.dll %dst%\xrCore.dll
 %cp_tool% %src%\%cfg_long%\xrCDB.dll %dst%\xrCDB.dll
-%cp_tool% %src%\%cfg_long%\xrCPU_Pipe.dll %dst%\xrCPU_Pipe.dll
 %cp_tool% %src%\%cfg_long%\xrSound.dll %dst%\xrSound.dll
 %cp_tool% %src%\%cfg_long%\xrParticles.dll %dst%\xrParticles.dll
 %cp_tool% %src%\%cfg_long%\xrPhysics.dll %dst%\xrPhysics.dll
