@@ -14,7 +14,7 @@
 
 
 #include "utils/xrLCUtil/xrThread.hpp"
-#include "xrCore/Threading/xrSyncronize.h"
+#include "xrCore/Threading/Lock.hpp"
 
 
 
@@ -23,7 +23,7 @@ CThreadManager			mu_secondary(ProxyStatus, ProxyProgress);
 #define		MU_THREADS	4
 // mu-light
 bool mu_models_local_calc_lightening = false;
-xrCriticalSection		mu_models_local_calc_lightening_wait_lock;
+Lock		mu_models_local_calc_lightening_wait_lock;
 void WaitMuModelsLocalCalcLightening()
 {
 	for(;;)

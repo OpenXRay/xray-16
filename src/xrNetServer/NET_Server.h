@@ -163,7 +163,7 @@ protected:
 	NET_Compressor			net_Compressor;
 
 	PlayersMonitor			net_players;
-	//xrCriticalSection		csPlayers;
+	//Lock		csPlayers;
 	//xr_vector<IClient*>	net_Players;
 	//xr_vector<IClient*>	net_Players_disconnected;
 	IClient*				SV_Client;
@@ -175,7 +175,7 @@ protected:
 	ip_filter						m_ip_filter;
 
 	// 
-	xrCriticalSection		csMessage;
+	Lock		csMessage;
 
 	void					client_link_aborted	(ClientID ID);
 	void					client_link_aborted	(IClient* C);

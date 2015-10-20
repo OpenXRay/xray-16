@@ -42,8 +42,8 @@ bool	global_data_file_path(LPCSTR name, IAgent* agent, DWORD sessionId, string_p
 		//net_global_data_impl<gl_type>	impl;
 		
 
-		xrCriticalSection	create_data_lock;
-		xrCriticalSection	ref_lock;
+		Lock	create_data_lock;
+		Lock	ref_lock;
 		u32					_id;
 		u32					_use_count;
 		bool				_clear;

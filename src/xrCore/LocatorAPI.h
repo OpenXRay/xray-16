@@ -90,7 +90,7 @@ private:
     files_set m_files;
     BOOL bNoRecurse;
 
-    xrCriticalSection m_auth_lock;
+    Lock m_auth_lock;
     u64 m_auth_code;
 
     const file* RegisterExternal(const char* name);

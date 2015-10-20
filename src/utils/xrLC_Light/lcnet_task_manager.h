@@ -29,9 +29,9 @@ namespace	lc_net
 		DWORD						session_id;
 		u32							tasks_completed;
 		bool						_release;
-		xrCriticalSection			pool_lock;
-		xrCriticalSection			log_lock;
-		xrCriticalSection			init_lock;
+		Lock			pool_lock;
+		Lock			log_lock;
+		Lock			init_lock;
 	private:
 		void			send_task			( IGridUser& user, u32 id  );
 		void			receive_result		( IGenericStream* inStream );

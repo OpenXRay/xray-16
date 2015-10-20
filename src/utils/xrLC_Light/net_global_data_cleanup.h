@@ -10,7 +10,7 @@ namespace lc_net
 		
 		u32						id_state	;				
 		xr_vector<u32>			vec_cleanup	;
-		xrCriticalSection		lock;
+		Lock		lock;
 		friend					void  data_cleanup_callback( const char* dataDesc, IGenericStream** stream );
 	public:
 				global_data_cleanup		(  );

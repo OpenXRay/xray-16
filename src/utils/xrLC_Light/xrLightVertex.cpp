@@ -10,7 +10,7 @@
 typedef	xr_multimap<float,vecVertex>	mapVert;
 typedef	mapVert::iterator				mapVertIt;
 mapVert*								g_trans;
-xrCriticalSection						g_trans_CS
+Lock						g_trans_CS
 #ifdef PROFILE_CRITICAL_SECTIONS
 	(MUTEX_PROFILE_ID(g_trans_CS))
 #endif // PROFILE_CRITICAL_SECTIONS
@@ -63,7 +63,7 @@ void	g_trans_register	(Vertex* V)
 const u32				VLT_END		= u32(-1);
 class CVertexLightTasker
 {
-	xrCriticalSection	cs;
+	Lock	cs;
 	volatile u32		index;	
 public:
 	CVertexLightTasker	() : index(0)

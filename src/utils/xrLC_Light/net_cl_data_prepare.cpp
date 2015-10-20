@@ -9,12 +9,12 @@
 #include "xrlc_globaldata.h"
 #include "mu_light_net.h"
 #include "utils/xrLCUtil/xrThread.hpp"
-#include "xrCore/Threading/xrSyncronize.h"
+#include "xrCore/Threading/Lock.hpp"
 
 bool					global_compile_data_initialized = false;
 bool					base_global_compile_data_initialized = false;
 CThreadManager			cl_data_prepare(ProxyStatus, ProxyProgress);
-xrCriticalSection		wait_lock;
+Lock		wait_lock;
 void		SetBaseGlobalCompileDataInitialized( );
 class NetCompileDetaPrepare	: public CThread
 {

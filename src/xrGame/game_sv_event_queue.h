@@ -10,7 +10,7 @@ struct GameEvent
 
 class  GameEventQueue
 {
-	xrCriticalSection		cs;
+	Lock		cs;
 	xr_deque<GameEvent*>	ready;
 	xr_vector<GameEvent*>	unused;
 	xr_set<ClientID>		m_blocked_clients;

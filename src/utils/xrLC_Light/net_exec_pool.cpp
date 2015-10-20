@@ -150,7 +150,7 @@ namespace lc_net
 		return *this;
 	}
 	void __cdecl Finalize(IGenericStream* outStream);
-	xrCriticalSection run_task_lock;
+	Lock run_task_lock;
 	void	exec_pool::send_task( IGridUser& user, IGenericStream* Stream, u8 pool_id, u32 id  )
 	{
 		

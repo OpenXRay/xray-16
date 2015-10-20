@@ -7,7 +7,7 @@ struct ip_address;
 
 class XRNETSERVER_API INetQueue
 {
-	xrCriticalSection		cs;
+	Lock		cs;
 	xr_deque<NET_Packet*>	ready;
 	xr_vector<NET_Packet*>	unused;
 public:
@@ -51,7 +51,7 @@ protected:
 	IDirectPlay8Address*	net_Address_device;
 	IDirectPlay8Address*	net_Address_server;
 		
-	xrCriticalSection		net_csEnumeration;
+	Lock		net_csEnumeration;
 	xr_vector<HOST_NODE>	net_Hosts;
 
 	NET_Compressor			net_Compressor;

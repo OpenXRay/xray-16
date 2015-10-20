@@ -13,7 +13,7 @@ private:
     HWND hwTime = 0;
     HWND hwPText = 0;
     HWND hwPhaseTime = 0;
-    xrCriticalSection csLog
+    Lock csLog
 #ifdef PROFILE_CRITICAL_SECTIONS
         (MUTEX_PROFILE_ID(csLog))
 #endif

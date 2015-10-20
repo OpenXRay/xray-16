@@ -366,8 +366,9 @@
     <ClCompile Include="stream_reader.cpp" />
     <ClCompile Include="string_concatenations.cpp" />
     <ClCompile Include="Text\MbHelpers.cpp" />
+    <ClCompile Include="Threading\Event.cpp" />
     <ClCompile Include="Threading\ttapi.cpp" />
-    <ClCompile Include="Threading\xrSyncronize.cpp" />
+    <ClCompile Include="Threading\Lock.cpp" />
     <ClCompile Include="xrCore.cpp" />
     <ClCompile Include="xrDebugNew.cpp" />
     <ClCompile Include="xrMemory.cpp" />
@@ -477,8 +478,9 @@
     <ClInclude Include="string_concatenations_inline.h" />
     <ClInclude Include="SubAlloc.hpp" />
     <ClInclude Include="Text\MbHelpers.h" />
+    <ClInclude Include="Threading\Event.hpp" />
     <ClInclude Include="Threading\ttapi.h" />
-    <ClInclude Include="Threading\xrSyncronize.h" />
+    <ClInclude Include="Threading\Lock.hpp" />
     <ClInclude Include="vector.h" />
     <ClInclude Include="xrCore.h" />
     <ClInclude Include="xrCore_platform.h" />

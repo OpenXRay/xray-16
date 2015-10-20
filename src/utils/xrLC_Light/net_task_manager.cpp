@@ -69,7 +69,7 @@ get_net_task_manager()->receive( r );
 
 }
 
-static xrCriticalSection send_receive_data_lock;
+static Lock send_receive_data_lock;
 class INetFileBuffWriter;
 static INetFileBuffWriter *gl_data_write = 0;
 static CVirtualFileRW *g_net_data = 0;

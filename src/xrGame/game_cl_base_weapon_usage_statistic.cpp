@@ -14,9 +14,9 @@
 
 class statistic_sync_quard : private boost::noncopyable
 {
-	xrCriticalSection & m_mutex;
+	Lock & m_mutex;
 public:
-	statistic_sync_quard(xrCriticalSection & mutex) :
+	statistic_sync_quard(Lock & mutex) :
 		m_mutex(mutex)
 	{
 		m_mutex.Enter();

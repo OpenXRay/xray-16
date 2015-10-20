@@ -39,7 +39,7 @@ private:
 	Fmatrix					m_xform;
 	Fmatrix					m_xform_01;
 
-	xrCriticalSection		MT;
+	Lock		MT;
 	volatile u32			MT_frame_rendered;
     HOMStatistics stats;
 

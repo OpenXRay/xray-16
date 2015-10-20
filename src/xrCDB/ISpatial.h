@@ -186,7 +186,7 @@ public:
         }
     };
 private:
-	xrCriticalSection				cs;
+	Lock				cs;
 
 	poolSS< ISpatial_NODE, 128 >	allocator;
 

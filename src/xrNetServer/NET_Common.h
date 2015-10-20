@@ -72,7 +72,7 @@ private:
 
     Buffer              _buf;
     Buffer              _gbuf;
-    xrCriticalSection   _buf_cs;
+    Lock   _buf_cs;
 };
 
 

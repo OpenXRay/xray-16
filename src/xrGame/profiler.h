@@ -62,7 +62,7 @@ protected:
 	PORTIONS			m_portions;
 	TIMERS				m_timers;
 	bool				m_actual;
-	xrCriticalSection	m_section;
+	Lock	m_section;
 	u32					m_call_count;
 
 protected:

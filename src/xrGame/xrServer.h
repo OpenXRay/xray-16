@@ -125,7 +125,7 @@ private:
 		}
 	};
 
-	xrCriticalSection			DelayedPackestCS;
+	Lock			DelayedPackestCS;
 	xr_deque<DelayedPacket>		m_aDelayedPackets;
 	void						ProceedDelayedPackets	();
 	void						AddDelayedPacket		(NET_Packet& Packet, ClientID Sender);

@@ -16,7 +16,7 @@ private:
 	string1024  m_cFileName;
 	u32			m_dwStartTime;
 
-	xrCriticalSection		m_cs;
+	Lock		m_cs;
 	
 	xr_vector<SLogPacket>	m_aLogPackets;
 

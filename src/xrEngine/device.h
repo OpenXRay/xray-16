@@ -244,8 +244,8 @@ public:
     }
 
     // Multi-threading
-    xrCriticalSection mt_csEnter;
-    xrCriticalSection mt_csLeave;
+    Lock mt_csEnter;
+    Lock mt_csLeave;
     volatile BOOL mt_bMustExit;
 
     ICF void remove_from_seq_parallel(const fastdelegate::FastDelegate0<>& delegate)

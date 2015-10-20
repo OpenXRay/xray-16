@@ -122,7 +122,7 @@ void setup_reader(IReader* _r, _open_file& _of)
 template <typename T>
 void _register_open_file(T* _r, LPCSTR _fname)
 {
-    xrCriticalSection _lock;
+    Lock _lock;
     _lock.Enter();
 
     shared_str f = _fname;
@@ -138,7 +138,7 @@ void _register_open_file(T* _r, LPCSTR _fname)
 template <typename T>
 void _unregister_open_file(T* _r)
 {
-    xrCriticalSection _lock;
+    Lock _lock;
     _lock.Enter();
 
     xr_vector<_open_file>::iterator it = std::find_if(g_open_files.begin(), g_open_files.end(), eq_pointer<T>(_r));

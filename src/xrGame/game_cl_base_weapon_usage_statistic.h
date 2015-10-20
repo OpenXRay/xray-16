@@ -259,7 +259,7 @@ struct WeaponUsageStatistic {
 	void				WriteLtx					(CInifile& ini);
 
 private:
-	xrCriticalSection	m_mutex;
+	Lock	m_mutex;
 };
 
 struct Bullet_Check_Respond_True

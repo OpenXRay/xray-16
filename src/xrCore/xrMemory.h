@@ -45,7 +45,7 @@ public:
 
 #ifdef DEBUG_MEMORY_MANAGER
     BOOL debug_mode;
-    xrCriticalSection debug_cs;
+    Lock debug_cs;
     std::vector<mdbg> debug_info;
     u32 debug_info_update;
     u32 stat_strcmp ;

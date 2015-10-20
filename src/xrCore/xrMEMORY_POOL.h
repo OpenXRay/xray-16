@@ -10,7 +10,7 @@ class MEMPOOL
     friend class xrMemory;
 #endif // DEBUG_MEMORY_MANAGER
 private:
-    xrCriticalSection cs;
+    Lock cs;
     u32 s_sector; // large-memory sector size
     u32 s_element; // element size, for example 32
     u32 s_count; // element count = [s_sector/s_element]

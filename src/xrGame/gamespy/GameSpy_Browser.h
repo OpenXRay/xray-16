@@ -83,7 +83,7 @@ private:
 	bool	m_bTryingToConnectToMasterServer;
 	bool	m_bShowCMSErr;
 
-	xrCriticalSection			m_refresh_lock		;
+	Lock			m_refresh_lock		;
 
 public:
 	CGameSpy_Browser();

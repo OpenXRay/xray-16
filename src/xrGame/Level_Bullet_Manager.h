@@ -135,7 +135,7 @@ protected:
 	RStringVec				m_ExplodeParticles	;
 
 	//список пуль наход€щихс€ в данный момент на уровне
-//.	xrCriticalSection		m_Lock				;
+//.	Lock		m_Lock				;
 
 	BulletVec				m_Bullets			;	// working set, locked
 	BulletVec				m_BulletsRendered	;	// copy for rendering

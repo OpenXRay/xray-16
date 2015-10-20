@@ -11,7 +11,7 @@ class PlayersMonitor
 {
 private:
 	typedef xr_vector<IClient*>	players_collection_t;
-	xrCriticalSection			csPlayers;
+	Lock			csPlayers;
 	players_collection_t		net_Players;
 	players_collection_t		net_Players_disconnected;
 	bool						now_iterating_in_net_players;

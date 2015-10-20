@@ -68,7 +68,7 @@ DEFINE_VECTOR(CPHCall*,PHCALL_STORAGE,PHCALL_I);
 class CPHCommander:
 	public IPHWorldUpdateCallbck
 {
-	xrCriticalSection	lock;
+	Lock	lock;
 	PHCALL_STORAGE	m_calls;
 	PHCALL_STORAGE	m_calls_as_add_buffer;
 	PHCALL_STORAGE	m_calls_as_remove_buffer;

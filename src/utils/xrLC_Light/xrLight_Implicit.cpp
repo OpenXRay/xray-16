@@ -156,7 +156,7 @@ void ImplicitLighting(BOOL b_net)
 	thread_spawn	(ImplicitLightingTreadNetExec,"worker-thread",1024*1024,0);
 
 }
-xrCriticalSection implicit_net_lock;
+Lock implicit_net_lock;
 void XRLC_LIGHT_API ImplicitNetWait()
 {
 	implicit_net_lock.Enter();

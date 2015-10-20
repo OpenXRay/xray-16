@@ -62,7 +62,7 @@ namespace CDB
 			S_forcedword		= u32(-1)
 		};
 	private:
-		xrCriticalSection		cs;
+		Lock		cs;
 		Opcode::OPCODE_Model*	tree;
 		u32						status;		// 0=ready, 1=init, 2=building
 
@@ -86,7 +86,7 @@ namespace CDB
 			if (S_READY!=status)
 			{
 				Log						("! WARNING: syncronized CDB::query");
-				xrCriticalSection*	C	= (xrCriticalSection*) &cs;
+				Lock*	C	= (Lock*) &cs;
 				C->Enter				();
 				C->Leave				();
 			}

@@ -39,7 +39,7 @@ private:
 	CDB::Collector		sml_collector;
 	xr_vector<u32>		sml_adjacency;
 
-	xrCriticalSection	lock;
+	Lock	lock;
 private:
 	wm_slot*			FindSlot				(ref_shader shader);
 	wm_slot*			AppendSlot				(ref_shader shader);

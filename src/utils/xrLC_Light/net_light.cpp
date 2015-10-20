@@ -13,7 +13,7 @@
 //==============================================================================
 
 
-static xrCriticalSection	block;
+static Lock	block;
 LPCSTR dataDesc  = "global_data";
 
 xr_vector<u32>	net_pool;

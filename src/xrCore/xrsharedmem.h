@@ -45,7 +45,7 @@ class XRCORE_API smem_container
 {
 private:
     typedef xr_vector<smem_value*> cdb;
-    xrCriticalSection cs;
+    Lock cs;
     cdb container;
 public:
     smem_value* dock(u32 dwCRC, u32 dwLength, void* ptr);

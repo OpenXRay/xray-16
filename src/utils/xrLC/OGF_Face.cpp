@@ -256,7 +256,7 @@ void OGF::Optimize	()
 
 
 // Make Progressive
-xrCriticalSection			progressive_cs
+Lock			progressive_cs
 #ifdef PROFILE_CRITICAL_SECTIONS
 	(MUTEX_PROFILE_ID(progressive_cs))
 #endif // PROFILE_CRITICAL_SECTIONS

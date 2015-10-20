@@ -214,7 +214,7 @@
 #include "vector.h"
 
 #include "clsid.h"
-#include "Threading/xrSyncronize.h"
+#include "Threading/Lock.hpp"
 #include "xrMemory.h"
 #include "xrDebug.h"
 

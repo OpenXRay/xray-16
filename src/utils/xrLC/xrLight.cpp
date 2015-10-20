@@ -6,12 +6,12 @@
 #include "utils/xrLC_Light/xrLC_GlobalData.h"
 #include "utils/xrLC_Light/xrLightVertex.h"
 
-#include "xrCore/Threading/xrSyncronize.h"
+#include "xrCore/Threading/Lock.hpp"
 #include "net.h"
 
 #include "utils/xrLC_Light/lcnet_task_manager.h"
 #include "utils/xrLC_Light/mu_model_light.h"
-xrCriticalSection	task_CS
+Lock	task_CS
 #ifdef PROFILE_CRITICAL_SECTIONS
 	(MUTEX_PROFILE_ID(task_C_S))
 #endif // PROFILE_CRITICAL_SECTIONS

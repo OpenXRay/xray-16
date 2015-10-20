@@ -1,6 +1,6 @@
 #pragma once
 
-#include "xrCore/Threading/xrSyncronize.h"
+#include "xrCore/Threading/Lock.hpp"
 
 class ENGINE_API CEvent;
 typedef CEvent* EVENT;
@@ -23,7 +23,7 @@ class ENGINE_API CEventAPI
 private:
     xr_vector<EVENT> Events;
     xr_vector<Deferred> Events_Deferred;
-    xrCriticalSection CS;
+    Lock CS;
 public:
 #ifdef PROFILE_CRITICAL_SECTIONS
     CEventAPI () : CS(MUTEX_PROFILE_ID(CEventAPI)) {}

@@ -2,11 +2,11 @@
 #define AFX_NET_COMPRESSOR_H__21E1ED1C_BF92_4BF0_94A8_18A27486EBFD__INCLUDED_
 #pragma once
 
-#include "xrCore/Threading/xrSyncronize.h"
+#include "xrCore/Threading/Lock.hpp"
 
 class	XRNETSERVER_API  NET_Compressor
 {
-	xrCriticalSection		CS;
+	Lock		CS;
 
 	struct SCompressorStats
 	{
