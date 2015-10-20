@@ -54,7 +54,7 @@ void CSheduler::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
     font.OutNext("Sheduler update: %2.2fms, %2.1f%%", stats.Update.result, percentage);
     font.OutNext("Sheduler load:   %2.2fms", stats.Load);
     if (alert && stats.Update.result>3.0f)
-        alert->Print(font, "Update     > 3ms: %3.1f", stats.Update.result);
+        alert->Print(font, "Update    > 3ms:  %3.1f", stats.Update.result);
     stats.FrameStart();
 }
 

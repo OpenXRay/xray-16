@@ -292,7 +292,7 @@ void CPHWorld::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
     font.OutNext("- collider:  %2.2fms", stats.Collision.result);
     font.OutNext("- solver:    %2.2fms, %d", stats.Core.result, stats.Core.count);
     if (alert && stats.MovCollision.result>5.0f)
-        alert->Print(font, "Physics    > 5ms: %3.1f", stats.MovCollision.result);
+        alert->Print(font, "Physics   > 5ms:  %3.1f", stats.MovCollision.result);
 }
 
 
