@@ -5,9 +5,10 @@
 #include "xrEngine/CustomHUD.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
+#include "xrEngine/GameFont.h"
+#include "xrEngine/PerformanceAlert.hpp"
 #include "Layers/xrRender/SkeletonCustom.h"
 #include "Layers/xrRender/LightTrack.h"
-#include "Layers/xrRender/dxRenderDeviceRender.h"
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
 
@@ -258,10 +259,10 @@ void					CRender::create					()
 	}
 
 	// constants
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup	("parallax",	&binder_parallax);
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup	("water_intensity",	&binder_water_intensity);
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup	("sun_shafts_intensity",	&binder_sun_shafts_intensity);
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup	("pos_decompression_params",	&binder_pos_decompress_params);
+    Resources->RegisterConstantSetup("parallax",	&binder_parallax);
+    Resources->RegisterConstantSetup("water_intensity",	&binder_water_intensity);
+    Resources->RegisterConstantSetup("sun_shafts_intensity",	&binder_sun_shafts_intensity);
+    Resources->RegisterConstantSetup("pos_decompression_params",	&binder_pos_decompress_params);
 
 	c_lmaterial					= "L_material";
 	c_sbase						= "s_base";
@@ -523,26 +524,20 @@ CRender::~CRender()
 {
 }
 
-#include "xrEngine/GameFont.h"
-void	CRender::Statistics	(CGameFont* _F)
+void CRender::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
 {
-	CGameFont&	F	= *_F;
-	F.OutNext	(" **** LT:%2d,LV:%2d **** ",stats.l_total,stats.l_visible		);	stats.l_visible = 0;
-	F.OutNext	("    S(%2d)   | (%2d)NS   ",stats.l_shadowed,stats.l_unshadowed);
-	F.OutNext	("smap use[%2d], merge[%2d], finalclip[%2d]",stats.s_used,stats.s_merged-stats.s_used,stats.s_finalclip);
-	stats.s_used = 0; stats.s_merged = 0; stats.s_finalclip = 0;
-	F.OutSkip	();
-	F.OutNext	(" **** Occ-Q(%03.1f) **** ",100.f*f32(stats.o_culled)/f32(stats.o_queries?stats.o_queries:1));
-	F.OutNext	(" total  : %2d",	stats.o_queries	);	stats.o_queries = 0;
-	F.OutNext	(" culled : %2d",	stats.o_culled	);	stats.o_culled	= 0;
-	F.OutSkip	();
-	u32	ict		= stats.ic_total + stats.ic_culled;
-	F.OutNext	(" **** iCULL(%03.1f) **** ",100.f*f32(stats.ic_culled)/f32(ict?ict:1));
-	F.OutNext	(" visible: %2d",	stats.ic_total	);	stats.ic_total	= 0;
-	F.OutNext	(" culled : %2d",	stats.ic_culled	);	stats.ic_culled	= 0;
-#ifdef DEBUG
-	HOM.stats	();
-#endif
+    D3DXRenderBase::DumpStatistics(font, alert);
+    Stats.FrameEnd();
+    font.OutNext(" **** LT:%2d,LV:%2d", Stats.l_total, Stats.l_visible);
+    font.OutNext("    S(%2d)   | (%2d)NS   ", Stats.l_shadowed, Stats.l_unshadowed);
+    font.OutNext("smap use[%2d], merge[%2d], finalclip[%2d]", Stats.s_used, Stats.s_merged - Stats.s_used, Stats.s_finalclip);
+    font.OutSkip();
+    u32	ict = Stats.ic_total + Stats.ic_culled;
+    font.OutNext(" **** iCULL(%03.1f)", 100.f*f32(Stats.ic_culled) / f32(ict ? ict : 1));
+    font.OutNext(" visible: %2d", Stats.ic_total);
+    font.OutNext(" culled : %2d", Stats.ic_culled);
+    Stats.FrameStart();
+    HOM.DumpStatistics(font, alert);
 }
 
 /////////

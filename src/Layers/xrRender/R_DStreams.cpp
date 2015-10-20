@@ -2,7 +2,6 @@
 #pragma hdrstop
 #include "ResourceManager.h"
 #include "R_DStreams.h"
-#include "Layers/xrRender/dxRenderDeviceRender.h"
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -12,8 +11,7 @@ int		rsDIB_Size			= 512;
 
 void _VertexStream::Create	()
 {
-	//dxRenderDeviceRender::Instance().Resources->Evict		();
-	DEV->Evict();
+    RImplementation.Resources->Evict();
 
 	mSize					= rsDVB_Size*1024;
 #if defined(USE_DX10) || defined(USE_DX11)
@@ -165,7 +163,7 @@ void _VertexStream::_clear()
 void	_IndexStream::Create	()
 {
 	//dxRenderDeviceRender::Instance().Resources->Evict		();
-	DEV->Evict();
+    RImplementation.Resources->Evict();
 
 	mSize					= rsDIB_Size*1024;
 

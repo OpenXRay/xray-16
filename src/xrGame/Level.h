@@ -56,6 +56,44 @@ class CLevel :
     public IGame_Level,
     public IPureClient
 {
+public:
+    struct AIStatistics
+    {
+        CStatTimer Think; // thinking
+        CStatTimer Range; // query: range
+        CStatTimer Path; // query: path
+        CStatTimer Node; // query: node
+        CStatTimer Vis; // visibility detection - total
+        CStatTimer VisQuery; // visibility detection - portal traversal and frustum culling
+        CStatTimer VisRayTests; // visibility detection - ray casting
+
+        AIStatistics() {
+            FrameStart();
+        }
+
+        void FrameStart()
+        {
+            Think.FrameStart();
+            Range.FrameStart();
+            Path.FrameStart();
+            Node.FrameStart();
+            Vis.FrameStart();
+            VisQuery.FrameStart();
+            VisRayTests.FrameStart();
+        }
+
+        void FrameEnd()
+        {
+            Think.FrameEnd();
+            Range.FrameEnd();
+            Path.FrameEnd();
+            Node.FrameEnd();
+            Vis.FrameEnd();
+            VisQuery.FrameEnd();
+            VisRayTests.FrameEnd();
+        }
+    };
+    AIStatistics AIStats;
 #include "Level_network_Demo.h"
     void ClearAllObjects();
 private:
@@ -89,11 +127,41 @@ protected:
     CStatGraph* pStatGraphR = nullptr;
     u32 m_dwRPC; // ReceivedPacketsCount
     u32 m_dwRPS; // ReceivedPacketsSize
+private:
+    struct ClientStatistics
+    {
+        CStatTimer ClientSend;
+        CStatTimer ClientRecv;
+        CStatTimer ClientCompressor;
+        // dbg stats
+        CStatTimer ClientSendInternal;
+        CStatTimer BulletManagerCommit;
+
+        ClientStatistics() { FrameStart(); }
+
+        void FrameStart()
+        {
+            ClientSend.FrameStart();            
+            ClientRecv.FrameStart();
+            ClientCompressor.FrameStart();
+            ClientSendInternal.FrameStart();
+            BulletManagerCommit.FrameStart();
+        }
+
+        void FrameEnd()
+        {
+            ClientSend.FrameEnd();           
+            ClientRecv.FrameEnd();
+            ClientCompressor.FrameEnd();
+            ClientSendInternal.FrameEnd();
+            BulletManagerCommit.FrameEnd();
+        }
+    };
+    ClientStatistics stats;
 public:
 #ifdef DEBUG
     CLevelDebug* m_level_debug = nullptr;
 #endif
-public:
     // Network
     u32 GetInterpolationSteps();
     void SetInterpolationSteps(u32 InterpSteps);
@@ -214,8 +282,9 @@ public:
     virtual void Load_GameSpecific_CFORM(CDB::TRI* T, u32 count);
     // Events
     virtual void OnEvent(EVENT E, u64 P1, u64 P2);
-    virtual void _BCL OnFrame(void);
+    virtual void  OnFrame(void);
     virtual void OnRender();
+    virtual void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) override;
     virtual	shared_str OpenDemoFile(const char* demo_file_name);
     virtual void net_StartPlayDemo();
     void cl_Process_Event(u16 dest, u16 type, NET_Packet& P);

@@ -8,10 +8,11 @@
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrEngine/CustomHUD.h"
 #include "xrEngine/xr_object.h"
+#include "xrEngine/GameFont.h"
+#include "xrEngine/PerformanceAlert.hpp"
 #include "xrCore/FMesh.hpp"
 #include "Layers/xrRender/SkeletonCustom.h"
 #include "Layers/xrRender/lighttrack.h"
-#include "Layers/xrRender/dxRenderDeviceRender.h"
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
 #ifndef _EDITOR
@@ -59,9 +60,9 @@ void					CRender::create					()
 	Device.seqFrame.Add	(this,REG_PRIORITY_HIGH+0x12345678);
 
 	// c-setup
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup("L_dynamic_pos",		&r1_dlight_binder_PR);
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup("L_dynamic_color",	&r1_dlight_binder_color);
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup("L_dynamic_xform",	&r1_dlight_binder_xform);
+    Resources->RegisterConstantSetup("L_dynamic_pos", &r1_dlight_binder_PR);
+    Resources->RegisterConstantSetup("L_dynamic_color",	&r1_dlight_binder_color);
+    Resources->RegisterConstantSetup("L_dynamic_xform",	&r1_dlight_binder_xform);
 
 	// distortion
 	u32		v_dev	= CAP_VERSION(HW.Caps.raster_major, HW.Caps.raster_minor);
@@ -343,7 +344,7 @@ void CRender::Calculate				()
 		TAL_SCOPED_TASK_NAMED( "CRender::Calculate()" );
 	#endif // _GPA_ENABLED
 
-	Device.Statistic->RenderCALC.Begin();
+	BasicStats.Culling.Begin();
 
 	// Transfer to global space to avoid deep pointer access
 	IRender_Target* T				=	getTarget	();
@@ -473,7 +474,13 @@ void CRender::Calculate				()
 							// It may be an glow
 							CGlow*		glow				= dynamic_cast<CGlow*>(spatial);
 							VERIFY							(glow);
+#ifdef DEBUG
+                            BasicStats.Glows.Begin();
+#endif
 							L_Glows->add					(glow);
+#ifdef DEBUG
+                            BasicStats.Glows.End();
+#endif
 						} else {
 							// Occlusiond
 							vis_data&		v_orig			= renderable->renderable.visual->getVisData();
@@ -517,24 +524,20 @@ void CRender::Calculate				()
 		}
 
 		// Calculate miscelaneous stuff
-		L_Shadows->calculate								();
-		L_Projector->calculate								();
+        BasicStats.ShadowsCalc.Begin();
+		L_Shadows->calculate();
+        BasicStats.ShadowsCalc.End();
+        BasicStats.Projectors.Begin();
+		L_Projector->calculate();
+        BasicStats.Projectors.End();
 	}
 	else
 	{
-		set_Object											(0);
-		/*
-		g_pGameLevel->pHUD->Render_First					();	
-		g_pGameLevel->pHUD->Render_Last						();	
-
-		// Calculate miscelaneous stuff
-		L_Shadows->calculate								();
-		L_Projector->calculate								();
-		*/
+		set_Object(0);
 	}
 
 	// End calc
-	Device.Statistic->RenderCALC.End	();
+    BasicStats.Culling.End();
 }
 
 void	CRender::rmNear		()
@@ -570,7 +573,7 @@ void	CRender::Render		()
 	}
 
 	g_r											= 1;
-	Device.Statistic->RenderDUMP.Begin();
+    BasicStats.Primitives.Begin();
 	// Begin
 	Target->Begin								();
 	o.vis_intersect								= FALSE			;
@@ -595,13 +598,19 @@ void	CRender::Render		()
 	o.vis_intersect								= FALSE			;
 	phase										= PHASE_NORMAL	;
 	r_pmask										(true,true);	// enable priority "0" and "1"
-	if(L_Shadows)L_Shadows->render				();				// ... and shadows
+    BasicStats.ShadowsRender.Begin();
+	if (L_Shadows)
+        L_Shadows->render				();				// ... and shadows
+    BasicStats.ShadowsRender.End();
 	r_dsgraph_render_lods						(false,true);	// lods - FB
 	r_dsgraph_render_graph						(1);			// normal level, secondary priority
 	L_Dynamic->render							(1);			// addititional light sources, secondary priority
 	PortalTraverser.fade_render					();				// faded-portals
 	r_dsgraph_render_sorted						();				// strict-sorted geoms
-	if(L_Glows)L_Glows->Render					();				// glows
+    BasicStats.Glows.Begin();
+	if (L_Glows)
+        L_Glows->Render(); // glows
+    BasicStats.Glows.End();
 	g_pGamePersistent->Environment().RenderFlares	();				// lens-flares
 	g_pGamePersistent->Environment().RenderLast	();				// rain/thunder-bolts
 
@@ -621,7 +630,7 @@ void	CRender::Render		()
 	if (L_Projector) L_Projector->finalize		();
 
 	// HUD
-	Device.Statistic->RenderDUMP.End	();
+    BasicStats.Primitives.End();
 }
 
 void	CRender::ApplyBlur4		(FVF::TL4uv* pv, u32 w, u32 h, float k)
@@ -642,17 +651,10 @@ void	CRender::ApplyBlur4		(FVF::TL4uv* pv, u32 w, u32 h, float k)
 	pv->p.set(float(_w+EPS),EPS,			EPS,1.f); pv->color=_c; pv->uv[0].set(p1.x-kw,p0.y-kh);pv->uv[1].set(p1.x+kw,p0.y+kh);pv->uv[2].set(p1.x+kw,p0.y-kh);pv->uv[3].set(p1.x-kw,p0.y+kh);pv++;
 }
 
-#include "xrEngine/GameFont.h"
-void	CRender::Statistics	(CGameFont* _F)
+void CRender::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
 {
-	CGameFont&	F	= *_F;
-	F.OutNext	(" **** Occ-Q(%03.1f) **** ",100.f*f32(stats.o_culled)/f32(stats.o_queries?stats.o_queries:1));
-	F.OutNext	(" total  : %2d",	stats.o_queries	);	stats.o_queries = 0;
-	F.OutNext	(" culled : %2d",	stats.o_culled	);	stats.o_culled	= 0;
-	F.OutSkip	();
-#ifdef DEBUG
-	HOM.stats	();
-#endif
+    D3DXRenderBase::DumpStatistics(font, alert);
+    HOM.DumpStatistics(font, alert);
 }
 
 #pragma comment(lib,"d3dx9.lib")

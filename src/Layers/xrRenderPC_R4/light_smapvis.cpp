@@ -45,7 +45,7 @@ void	smapvis::end		()
 	// Gather stats
 	u32	ts,td;
 	RImplementation.get_Counters	(ts,td);
-	RImplementation.stats.ic_total	+=	ts;
+	RImplementation.Stats.ic_total	+=	ts;
 	RImplementation.set_Feedback	(0,0);
 
 	switch	(state)			{
@@ -107,7 +107,7 @@ void	smapvis::resetoccq	()
 
 void	smapvis::mark				()
 {
-	RImplementation.stats.ic_culled	+= invisible.size	();
+	RImplementation.Stats.ic_culled	+= invisible.size	();
 	u32		marker			= RImplementation.marker + 1;	// we are called befor marker increment
 	for		(u32 it=0; it<invisible.size(); it++)
 		invisible[it]->vis.marker	= marker;				// this effectively disables processing

@@ -8,7 +8,6 @@
 #include "Layers/xrRender/ResourceManager.h"
 #include "Blender_Recorder.h"
 #include "Blender.h"
-#include "Layers/xrRender/dxRenderDeviceRender.h"
 
 static int ParseName(LPCSTR N)
 {
@@ -58,8 +57,7 @@ void	CBlender_Compile::_cpp_Compile	(ShaderElement* _SH)
 			if (id>=int(lst.size()))	Debug.fatal(DEBUG_INFO,"Not enought textures for shader. Base texture: '%s'.",*lst[0]);
 			base	=	*lst [id];
 		}
-//.		if (!dxRenderDeviceRender::Instance().Resources->_GetDetailTexture(base,detail_texture,detail_scaler))	bDetail	= FALSE;
-		if (!DEV->m_textures_description.GetDetailTexture(base,detail_texture,detail_scaler))	bDetail	= FALSE;
+		if (!RImplementation.Resources->m_textures_description.GetDetailTexture(base,detail_texture,detail_scaler))	bDetail	= FALSE;
 	} 
 	else 
 	{
@@ -96,7 +94,7 @@ void	CBlender_Compile::_cpp_Compile	(ShaderElement* _SH)
 
 	if(bDetail)
 	{
-		DEV->m_textures_description.GetTextureUsage(base, bDetail_Diffuse, bDetail_Bump);
+        RImplementation.Resources->m_textures_description.GetTextureUsage(base, bDetail_Diffuse, bDetail_Bump);
 
 #ifndef _EDITOR
 #if RENDER!=R_R1
@@ -111,7 +109,7 @@ void	CBlender_Compile::_cpp_Compile	(ShaderElement* _SH)
 
 	}
 
-	bUseSteepParallax = DEV->m_textures_description.UseSteepParallax(base) 
+    bUseSteepParallax = RImplementation.Resources->m_textures_description.UseSteepParallax(base)
 		&& BT->canUseSteepParallax();
 /*
 	if (DEV->m_textures_description.UseSteepParallax(base))
@@ -166,32 +164,32 @@ void	CBlender_Compile::PassEnd			()
 
 	SPass	proto;
 	// Create pass
-	proto.state		= DEV->_CreateState		(RS.GetContainer());
-	proto.ps		= DEV->_CreatePS			(pass_ps);
-	proto.vs		= DEV->_CreateVS			(pass_vs);
+	proto.state		= RImplementation.Resources->_CreateState		(RS.GetContainer());
+	proto.ps		= RImplementation.Resources->_CreatePS			(pass_ps);
+	proto.vs		= RImplementation.Resources->_CreateVS			(pass_vs);
 	ctable.merge	(&proto.ps->constants);
 	ctable.merge	(&proto.vs->constants);
 #if defined(USE_DX10) || defined(USE_DX11)
-	proto.gs		= DEV->_CreateGS			(pass_gs);
+	proto.gs		= RImplementation.Resources->_CreateGS			(pass_gs);
 	ctable.merge	(&proto.gs->constants);
 #	ifdef	USE_DX11
-	proto.hs		= DEV->_CreateHS			(pass_hs);
+    proto.hs		= RImplementation.Resources->_CreateHS			(pass_hs);
 	ctable.merge	(&proto.hs->constants);
-	proto.ds		= DEV->_CreateDS			(pass_ds);
+    proto.ds		= RImplementation.Resources->_CreateDS			(pass_ds);
 	ctable.merge	(&proto.ds->constants);
-	proto.cs		= DEV->_CreateCS			(pass_cs);
+    proto.cs		= RImplementation.Resources->_CreateCS			(pass_cs);
 	ctable.merge	(&proto.cs->constants);
 #	endif
 #endif	//	USE_DX10
 	SetMapping				();
-	proto.constants	= DEV->_CreateConstantTable(ctable);
-	proto.T 		= DEV->_CreateTextureList	(passTextures);
+	proto.constants	= RImplementation.Resources->_CreateConstantTable(ctable);
+	proto.T 		= RImplementation.Resources->_CreateTextureList	(passTextures);
 #ifdef _EDITOR
-	proto.M			= DEV->_CreateMatrixList	(passMatrices);
+    proto.M			= RImplementation.Resources->_CreateMatrixList	(passMatrices);
 #endif
-	proto.C			= DEV->_CreateConstantList	(passConstants);
+    proto.C = RImplementation.Resources->_CreateConstantList(passConstants);
 
-	ref_pass	_pass_		= DEV->_CreatePass			(proto);
+    ref_pass	_pass_ = RImplementation.Resources->_CreatePass(proto);
 	SH->passes.push_back	(_pass_);
 }
 
@@ -315,7 +313,7 @@ void	CBlender_Compile::Stage_Texture	(LPCSTR name, u32 ,	u32	 fmin, u32 fmip, u3
 		if (id>=int(lst.size()))	Debug.fatal(DEBUG_INFO,"Not enought textures for shader. Base texture: '%s'.",*lst[0]);
 		N = *lst [id];
 	}
-	passTextures.push_back	(mk_pair( Stage(),ref_texture( DEV->_CreateTexture(N))));
+    passTextures.push_back(mk_pair(Stage(), ref_texture(RImplementation.Resources->_CreateTexture(N))));
 //	i_Address				(Stage(),address);
 	i_Filter				(Stage(),fmin,fmip,fmag);
 }
@@ -324,7 +322,7 @@ void	CBlender_Compile::Stage_Matrix		(LPCSTR name, int iChannel)
 {
 	sh_list& lst	= L_matrices; 
 	int id			= ParseName(name);
-	CMatrix*	M	= DEV->_CreateMatrix	((id>=0)?*lst[id]:name);
+    CMatrix*	M = RImplementation.Resources->_CreateMatrix((id >= 0) ? *lst[id] : name);
 	passMatrices.push_back(M);
 
 	// Setup transform pipeline
@@ -347,5 +345,5 @@ void	CBlender_Compile::Stage_Constant	(LPCSTR name)
 {
 	sh_list& lst= L_constants;
 	int id		= ParseName(name);
-	passConstants.push_back	(DEV->_CreateConstant((id>=0)?*lst[id]:name));
+    passConstants.push_back(RImplementation.Resources->_CreateConstant((id >= 0) ? *lst[id] : name));
 }

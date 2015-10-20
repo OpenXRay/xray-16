@@ -20,6 +20,7 @@
 
 
 #pragma comment( lib, "xrCore.lib"	)
+#pragma comment(lib, "xrEngine.lib")
 
 #include "xrPhysics.h"
 

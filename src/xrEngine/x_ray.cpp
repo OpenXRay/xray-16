@@ -163,12 +163,10 @@ void compute_build_id()
 //////////////////////////////////////////////////////////////////////////
 struct _SoundProcessor : public pureFrame
 {
-    virtual void _BCL OnFrame()
+    virtual void  OnFrame()
     {
         //Msg ("------------- sound: %d [%3.2f,%3.2f,%3.2f]",u32(Device.dwFrame),VPUSH(Device.vCameraPosition));
-        Device.Statistic->Sound.Begin();
         ::Sound->update(Device.vCameraPosition, Device.vCameraDirection, Device.vCameraTop);
-        Device.Statistic->Sound.End();
     }
 } SoundProcessor;
 
@@ -330,12 +328,10 @@ void slowdownthread(void*)
     // Sleep (30*1000);
     for (;;)
     {
-        if (Device.Statistic->fFPS < 30) Sleep(1);
-        if (Device.mt_bMustExit) return;
-        if (0 == pSettings) return;
-        if (0 == Console) return;
-        if (0 == pInput) return;
-        if (0 == pApp) return;
+        if (Device.GetStats().fFPS < 30)
+            Sleep(1);
+        if (Device.mt_bMustExit || !pSettings || !Console || !pInput || !pApp)
+            return;
     }
 }
 void CheckPrivilegySlowdown()
@@ -377,8 +373,8 @@ void Startup()
     LALib.OnCreate();
     pApp = xr_new<CApplication>();
     g_pGamePersistent = (IGame_Persistent*)NEW_INSTANCE(CLSID_GAME_PERSISTANT);
-    g_SpatialSpace = xr_new<ISpatial_DB>();
-    g_SpatialSpacePhysic = xr_new<ISpatial_DB>();
+    g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
+    g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
 
     // Destroy LOGO
     DestroyWindow(logoWindow);

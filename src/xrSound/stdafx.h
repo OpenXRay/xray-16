@@ -30,7 +30,7 @@
 #include "xrCDB/xrCDB.h"
 #include "sound.h"
 
-#define ENGINE_API
+#undef ENGINE_API
 
 #include "xrCore/xr_resource.h"
 

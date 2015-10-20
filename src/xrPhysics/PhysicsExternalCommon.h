@@ -1,6 +1,7 @@
 #ifndef	_PHYSICS_EXTERNAL_COMMON_
 #define _PHYSICS_EXTERNAL_COMMON_
 #pragma once
+#include "xrPhysics/xrPhysics.h"
 struct dContactGeom;
 struct dContact;
 struct SGameMtl;
@@ -11,7 +12,7 @@ typedef void 	ContactCallbackFun(CDB::TRI* T,dContactGeom* c);
 typedef	void	ObjectContactCallbackFun(bool& do_colide,bool bo1,dContact& c,SGameMtl* material_1,SGameMtl* material_2);
 
 
-typedef void	_BCL	BoneCallbackFun(CBoneInstance* B);
+typedef void		BoneCallbackFun(CBoneInstance* B);
 
 
 

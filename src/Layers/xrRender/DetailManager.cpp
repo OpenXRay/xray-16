@@ -203,7 +203,7 @@ void CDetailManager::UpdateVisibleM()
 
 	// Initialize 'vis' and 'cache'
 	// Collect objects for rendering
-	RDEVICE.Statistic->RenderDUMP_DT_VIS.Begin	();
+    RImplementation.BasicStats.DetailVisibility.Begin();
 	for (int _mz=0; _mz<dm_cache1_line; _mz++){
 		for (int _mx=0; _mx<dm_cache1_line; _mx++){
 			CacheSlot1& MS		= cache_level1[_mz][_mx];
@@ -307,7 +307,7 @@ void CDetailManager::UpdateVisibleM()
 			}
 		}
 	}
-	RDEVICE.Statistic->RenderDUMP_DT_VIS.End	();
+    RImplementation.BasicStats.DetailVisibility.End();
 }
 
 void CDetailManager::Render	()
@@ -320,7 +320,7 @@ void CDetailManager::Render	()
 	// MT
 	MT_SYNC					();
 
-	RDEVICE.Statistic->RenderDUMP_DT_Render.Begin	();
+    RImplementation.BasicStats.DetailRender.Begin();
 
 #ifndef _EDITOR
 	float factor			= g_pGamePersistent->Environment().wind_strength_factor;
@@ -334,7 +334,7 @@ void CDetailManager::Render	()
 	if (UseVS())			hw_Render	();
 	else					soft_Render	();
 	RCache.set_CullMode		(CULL_CCW);
-	RDEVICE.Statistic->RenderDUMP_DT_Render.End	();
+    RImplementation.BasicStats.DetailRender.End();
 	m_frame_rendered		= RDEVICE.dwFrame;
 }
 
@@ -355,9 +355,9 @@ void __stdcall	CDetailManager::MT_CALC		()
 			int s_x	= iFloor			(EYE.x/dm_slot_size+.5f);
 			int s_z	= iFloor			(EYE.z/dm_slot_size+.5f);
 
-			RDEVICE.Statistic->RenderDUMP_DT_Cache.Begin	();
+            RImplementation.BasicStats.DetailCache.Begin();
 			cache_Update				(s_x,s_z,EYE,dm_max_decompress);
-			RDEVICE.Statistic->RenderDUMP_DT_Cache.End	();
+            RImplementation.BasicStats.DetailCache.End();
 
 			UpdateVisibleM				();
 			m_frame_calc				= RDEVICE.dwFrame;

@@ -13,8 +13,6 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 
-#include "dxRenderDeviceRender.h"
-
 // matrices
 #define	BIND_DECLARE(xf)	\
 class cl_xform_##xf	: public R_constant_setup {	virtual void setup (R_constant* C) { RCache.xforms.set_c_##xf (C); } }; \
@@ -369,9 +367,9 @@ void	CBlender_Compile::SetMapping	()
 		r_Constant			("dt_params",		detail_scaler);
 
 	// other common
-	for (u32 it=0; it<DEV->v_constant_setup.size(); it++)
+    for (u32 it = 0; it<RImplementation.Resources->v_constant_setup.size(); it++)
 	{
-		std::pair<shared_str,R_constant_setup*>	cs	= DEV->v_constant_setup[it];
+        std::pair<shared_str, R_constant_setup*>	cs = RImplementation.Resources->v_constant_setup[it];
 		r_Constant			(*cs.first,cs.second);
 	}
 }

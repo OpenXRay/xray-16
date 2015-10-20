@@ -44,7 +44,7 @@ void CLevel::remove_objects	()
 
 		if (OnClient())
 			ClearAllObjects			();
-
+        // XXX: why does one need to do this 20 times?
 		for (int i=0; i<20; ++i) 
 		{
 			snd_Events.clear		();
@@ -224,9 +224,9 @@ void CLevel::ClientSend()
 
 		if (P.B.count>2)
 		{
-			Device.Statistic->TEST3.Begin();
-				Send	(P, net_flags(FALSE));
-			Device.Statistic->TEST3.End();
+            stats.ClientSendInternal.Begin();
+            Send	(P, net_flags(FALSE));
+            stats.ClientSendInternal.End();
 		}else
 			break;
 	}
@@ -312,21 +312,18 @@ void CLevel::net_Update	()
 {
 	if(game_configured){
 		// If we have enought bandwidth - replicate client data on to server
-		Device.Statistic->netClient2.Begin	();
+        stats.ClientSend.Begin();
 		ClientSend					();
-		Device.Statistic->netClient2.End		();
+        stats.ClientSend.End();
 	}
 	// If server - perform server-update
-	if (Server && OnServer())	{
-		Device.Statistic->netServer.Begin();
-		Server->Update					();
-		Device.Statistic->netServer.End	();
-	}
+    if (Server && OnServer())
+        Server->Update();
 }
 
 struct _NetworkProcessor	: public pureFrame
 {
-	virtual void	_BCL OnFrame	( )
+	virtual void	 OnFrame	( )
 	{
 		if (g_pGameLevel && !Device.Paused() )	g_pGameLevel->net_Update();
 	}

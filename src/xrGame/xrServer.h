@@ -150,6 +150,15 @@ private:
 private:
 	id_generator_type					m_tID_Generator;
 	secure_messaging::seed_generator	m_seed_generator;
+    struct ServerStatistics
+    {
+        CStatTimer Update;
+
+        ServerStatistics() { FrameStart(); }
+        void FrameStart() { Update.FrameStart(); }
+        void FrameEnd() { Update.FrameEnd(); }
+    };
+    ServerStatistics stats;
 
 protected:
 	void					Server_Client_Check				(IClient* CL);
@@ -283,6 +292,7 @@ public:
 			bool			verify_entities		() const;
 			void			verify_entity		(const CSE_Abstract *entity) const;
 #endif
+    void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert);
 };
 
 

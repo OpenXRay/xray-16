@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Layers/xrRender/r__dsgraph_structure.h"
+#include "Layers/xrRender/D3DXRenderBase.h"
 #include "Layers/xrRender/r__occlusion.h"
 
 #include "Layers/xrRender/PSLibrary.h"
@@ -25,7 +25,7 @@
 class dxRender_Visual;
 
 // definition
-class CRender	:	public R_dsgraph_structure
+class CRender	:	public D3DXRenderBase
 {
 public:
 	enum
@@ -110,14 +110,37 @@ public:
 		u32		forceskinw			: 1;
 		float	forcegloss_v		;
 	}			o;
-	struct		_stats		{
-		u32		l_total,	l_visible;
-		u32		l_shadowed,	l_unshadowed;
-		s32		s_used,		s_merged,	s_finalclip;
-		u32		o_queries,	o_culled;
-		u32		ic_total,	ic_culled;
-	}			stats;
+	struct RenderR4Statistics
+    {
+        u32 l_total;
+        u32 l_visible;
+        u32 l_shadowed;
+        u32 l_unshadowed;
+        s32 s_used;
+        s32 s_merged;
+        s32 s_finalclip;
+        u32 ic_total;
+        u32 ic_culled;
+
+        RenderR4Statistics() { FrameStart(); }
+
+        void FrameStart()
+        {
+            l_total = 0;
+            l_visible = 0;
+            l_shadowed = 0;
+            l_unshadowed = 0;
+            s_used = 0;
+            s_merged = 0;
+            s_finalclip = 0;
+            ic_total = 0;
+            ic_culled = 0;
+        }
+
+        void FrameEnd() {}
+	};
 public:
+    RenderR4Statistics Stats;
 	// Sector detection and visibility
 	CSector*													pLastSector;
 	Fvector														vLastCameraPos;
@@ -250,7 +273,7 @@ public:
 
 public:
 	// feature level
-	virtual	GenerationLevel			get_generation			()	{ return IRender_interface::GENERATION_R2; }
+	virtual	GenerationLevel			get_generation			()	{ return IRender::GENERATION_R2; }
 
 	virtual bool					is_sun_static			()	{ return o.sunstatic;}
 	virtual DWORD					get_dx_level			()	{ return HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1?0x000A0001:0x000A0000; }
@@ -275,7 +298,7 @@ public:
 		void*&							result);
 
 	// Information
-	virtual void					Statistics					(CGameFont* F);
+    virtual void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) override;
 	virtual LPCSTR					getShaderPath				()									{ return "r3\\";	}
 	virtual ref_shader				getShader					(int id);
 	virtual IRender_Sector*			getSector					(int id);
@@ -335,7 +358,7 @@ public:
 	virtual void					Screenshot					(ScreenshotMode mode, CMemoryWriter& memory_writer);
 	virtual void					ScreenshotAsyncBegin		();
 	virtual void					ScreenshotAsyncEnd			(CMemoryWriter& memory_writer);
-	virtual void		_BCL		OnFrame						();
+	virtual void				OnFrame						();
 
 	// Render mode
 	virtual void					rmNear						();

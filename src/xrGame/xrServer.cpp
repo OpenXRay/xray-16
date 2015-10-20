@@ -14,7 +14,9 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "string_table.h"
 #include "object_broker.h"
-
+#include "xrEngine/Engine.h"
+#include "xrEngine/GameFont.h"
+#include "xrEngine/PerformanceAlert.hpp"
 #include "xrEngine/XR_IOConsole.h"
 #include "ui/UIInventoryUtilities.h"
 #include "file_transfer.h"
@@ -210,7 +212,7 @@ void xrServer::Update	()
 {
 	if (Level().IsDemoPlayStarted() || Level().IsDemoPlayFinished())
 		return;								//diabling server when demo is playing
-
+    stats.Update.Begin();
 	NET_Packet		Packet;
 
 	VERIFY						(verify_entities());
@@ -255,6 +257,7 @@ void xrServer::Update	()
 	{
 		UpdateBannedList();
 	}
+    stats.Update.End();
 }
 
 void _stdcall xrServer::SendGameUpdateTo(IClient* client)
@@ -371,7 +374,7 @@ void xrServer::SendUpdatesToAll()
 }
 
 xr_vector<shared_str>	_tmp_log;
-void console_log_cb(LPCSTR text)
+void console_log_cb(void *context, const char *text)
 {
 	_tmp_log.push_back	(text);
 }
@@ -404,7 +407,7 @@ u32 xrServer::OnDelayedMessage	(NET_Packet& P, ClientID sender)			// Non-Zero me
 				string1024			buff;
 				P.r_stringZ			(buff);
 				Msg("* Radmin [%s] is running command: %s", CL->ps->getName(), buff);
-				SetLogCB			(console_log_cb);
+                SetLogCB(LogCallback(console_log_cb, nullptr));
 				_tmp_log.clear		();
 				LPSTR		result_command;
 				string64	tmp_number_str;
@@ -934,6 +937,17 @@ void xrServer::verify_entity				(const CSE_Abstract *entity) const
 }
 
 #endif // DEBUG
+
+void xrServer::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+{
+    stats.FrameEnd();
+    font.OutNext("Server:");
+    font.OutNext("- update: %2.2fms, %d", stats.Update.result, stats.Update.count);
+    m_updator.CompressStats.FrameEnd();
+    font.OutNext("- compress: %2.2fms", m_updator.CompressStats.result);
+    m_updator.CompressStats.FrameStart();
+    stats.FrameStart();
+}
 
 shared_str xrServer::level_name				(const shared_str &server_options) const
 {

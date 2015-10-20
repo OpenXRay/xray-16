@@ -6,7 +6,6 @@
 #include "occRasterizer.h"
 
 #if DEBUG 
-#include "dxRenderDeviceRender.h"
 #include "xrRender_console.h"
 #endif
 
@@ -177,7 +176,7 @@ void occRasterizer::on_dbg_render()
 			// draw wire
 			Device.SetNearer(TRUE);
 
-			RCache.set_Shader	(dxRenderDeviceRender::Instance().m_SelectionShader);
+			RCache.set_Shader	(RImplementation.m_SelectionShader);
 			RCache.dbg_DrawOBB( Transform, tmp.radius, D3DCOLOR_XRGB(u32(255*pow(tmp.z,20.f)),u32(255*(1-pow(tmp.z,20.f))),0) );
 			Device.SetNearer(FALSE);
 		}

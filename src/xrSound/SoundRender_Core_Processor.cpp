@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #pragma hdrstop
-
+#include "xrEngine/Engine.h"
+#include "xrEngine/GameFont.h"
+#include "xrEngine/PerformanceAlert.hpp"
 #include "xrCDB/Intersect.hpp"
 #include "SoundRender_Core.h"
 #include "SoundRender_Emitter.h"
@@ -20,8 +22,8 @@ CSoundRender_Emitter*	CSoundRender_Core::i_play(ref_sound* S, BOOL _loop, float 
 void CSoundRender_Core::update	( const Fvector& P, const Fvector& D, const Fvector& N )
 {
 	u32 it;
-
 	if (0==bReady)				return;
+    Stats.Update.Begin();
     bLocked						= TRUE;
 	float new_tm				= Timer.GetElapsed_sec();
 	fTimer_Delta				= new_tm-fTimer_Value;
@@ -127,6 +129,7 @@ void CSoundRender_Core::update	( const Fvector& P, const Fvector& D, const Fvect
 	update_events					();
 
     bLocked							= FALSE;
+    Stats.Update.End();
 }
 
 static	u32	g_saved_event_count		= 0;
@@ -179,6 +182,16 @@ void	CSoundRender_Core::statistic			(CSound_stats*  dest, CSound_stats_ext*  ext
 	}
 }
 
+void CSoundRender_Core::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+{
+    Stats.FrameEnd();
+    CSound_stats sndStat;
+    statistic(&sndStat, nullptr);
+    font.OutNext("*** SOUND: %2.2fms", Stats.Update.result);
+    font.OutNext("  TGT/SIM/E: %d/%d/%d", sndStat._rendered, sndStat._simulated, sndStat._events);
+    font.OutNext("  HIT/MISS:  %d/%d", sndStat._cache_hits, sndStat._cache_misses);
+    Stats.FrameStart();
+}
 
 
 float CSoundRender_Core::get_occlusion_to( const Fvector& hear_pt, const Fvector& snd_pt, float dispersion )

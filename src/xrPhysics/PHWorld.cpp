@@ -8,6 +8,9 @@
 #include "draymotions.h"
 #include "PHCollideValidator.h"
 #include "xrEngine/GameMtlLib.h"
+#include "xrEngine/Device.h"
+#include "xrEngine/GameFont.h"
+#include "xrEngine/PerformanceAlert.hpp"
 
 #include "params.h"
 #ifdef    DEBUG
@@ -64,8 +67,8 @@ CObjectSpace* __stdcall create_object_space()
 	//CFileReader* fr =	xr_new<CFileReader>("D:/STALKER/resources/gamedata/levels/stohe_selo/level.cform");
 	CFileReader* fr =	xr_new<CFileReader>("ActorEditorLevel.cform");
 	CObjectSpace* os = xr_new<CObjectSpace>();
-	g_SpatialSpace				= xr_new<ISpatial_DB>	();
-	g_SpatialSpacePhysic		= xr_new<ISpatial_DB>	();
+    g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
+    g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
 	os->Load( fr, 0 );
 	//xr_delete(fr);
 	return os;
@@ -73,8 +76,8 @@ CObjectSpace* __stdcall create_object_space()
 CObjectSpace*	__stdcall	mesh_create_object_space(Fvector* verts, CDB::TRI* tris, const hdrCFORM &H, CDB::build_callback build_callback)
 {
 	CObjectSpace* os = xr_new<CObjectSpace>();
-	g_SpatialSpace				= xr_new<ISpatial_DB>	();
-	g_SpatialSpacePhysic		= xr_new<ISpatial_DB>	();
+    g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
+    g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
 	os->Create( verts, tris, H, build_callback );
 	return os;
 }
@@ -179,14 +182,6 @@ void CPHWorld::Create( bool mt, CObjectSpace * os, CObjectList *lo, CRenderDevic
 	m_object_space = os;
 	m_level_objects = lo;
 	m_device = dv;
-	//if (psDeviceFlags.test(mtPhysics))	Device.seqFrameMT.Add	(this,REG_PRIORITY_HIGH);
-	//else								Device.seqFrame.Add		(this,REG_PRIORITY_LOW);
-
-	//if ( mt )	
-	//	Device().seqFrameMT.Add	(this,REG_PRIORITY_HIGH);
-	//else								
-	//	Device().seqFrame.Add		(this,REG_PRIORITY_LOW);
-
 	Device().AddSeqFrame( this, mt );
 
 	//m_commander							=xr_new<CPHCommander>();
@@ -253,9 +248,6 @@ void CPHWorld::Destroy()
 	dCloseODE();
 	dCylinderClassUser=-1;
 	dRayMotionsClassUser=-1;
-
-//	Device().seqFrameMT.Remove	(this);
-//	Device().seqFrame.Remove		(this);
 	Device().RemoveSeqFrame( this );
 	b_exist=false;
 }
@@ -269,6 +261,7 @@ void CPHWorld::SetGravity(float g)
 
 void CPHWorld::OnFrame()
 {
+    stats.FrameStart();
 	// Msg									("------------- physics: %d / %d",u32(Device.dwFrame),u32(m_steps_num));
 	//просчитать полет пуль
 	/*
@@ -280,14 +273,28 @@ void CPHWorld::OnFrame()
 	//DBG_DrawFrameStart();
 	//DBG_DrawStatBeforeFrameStep();
 #endif
-	Device().StatPhysics()->Physics.Begin		();
-	FrameStep							(Device().fTimeDelta);
-	Device().StatPhysics()->Physics.End		();
+    stats.MovCollision.Begin();
+	FrameStep(Device().fTimeDelta);
+    stats.MovCollision.End();
 #ifdef DEBUG
 	//DBG_DrawStatAfterFrameStep();
 
 #endif
+    stats.FrameEnd();
 }
+
+void CPHWorld::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+{
+    stats.FrameEnd();
+    float engineTotal = Device().GetStats().EngineTotal.result;
+    float percentage = 100.0f*stats.MovCollision.result/engineTotal;
+    font.OutNext("Physics:     %2.2fms, %2.1f%%", stats.MovCollision.result, percentage);
+    font.OutNext("- collider:  %2.2fms", stats.Collision.result);
+    font.OutNext("- solver:    %2.2fms, %d", stats.Core.result, stats.Core.count);
+    if (alert && stats.MovCollision.result>5.0f)
+        alert->Print(font, "Physics    > 5ms: %3.1f", stats.MovCollision.result);
+}
+
 
 //////////////////////////////////////////////////////////////////////////////
 //static dReal frame_time=0.f;
@@ -319,7 +326,7 @@ void CPHWorld::Step()
 
 	++m_steps_num;
 	++m_steps_short_num;
-	Device().StatPhysics()->ph_collision.Begin	();
+    stats.Collision.Begin();
 
 
 	for(i_object=m_objects.begin();m_objects.end() != i_object;)
@@ -337,7 +344,7 @@ void CPHWorld::Step()
 
 
 
-	Device().StatPhysics()->ph_collision.End	();
+    stats.Collision.End();
 
 #ifdef DEBUG
 	for(i_object=m_objects.begin();m_objects.end() != i_object;)
@@ -372,7 +379,7 @@ void CPHWorld::Step()
 		obj->PhTune(fixed_step);
 	}
 
-	Device().StatPhysics()->ph_core.Begin		();
+    stats.Core.Begin();
 
 #ifdef DEBUG
 	debug_output().dbg_bodies_num()=0;
@@ -410,7 +417,7 @@ void CPHWorld::Step()
 #endif
 	}
 
-	Device().StatPhysics()->ph_core.End		();
+    stats.Core.End();
 
 
 

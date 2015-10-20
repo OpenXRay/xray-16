@@ -24,7 +24,7 @@ public:
 
 	virtual void		SetClGame				(game_cl_GameState* g);
 	virtual bool		IR_UIOnKeyboardPress	(int dik);
-	virtual void _BCL	OnFrame					();
+	virtual void 	OnFrame					();
 
 	void				StartTalk				(bool disable_break);
 	void				StartTrade				(CInventoryOwner* pActorInv, CInventoryOwner* pOtherOwner);

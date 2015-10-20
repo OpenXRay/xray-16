@@ -1,13 +1,14 @@
 #include "stdafx.h"
+#include "Render.h"
 
 void CRenderDevice::overdrawBegin()
 {
     VERIFY(0);
-    m_pRender->overdrawBegin();
+    Render->overdrawBegin();
 }
 
 void CRenderDevice::overdrawEnd()
 {
     VERIFY(0);
-    m_pRender->overdrawEnd();
+    Render->overdrawEnd();
 }

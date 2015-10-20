@@ -6,7 +6,7 @@
 void CRenderTarget::accum_spot	(light* L)
 {
 	phase_accumulator				();
-	RImplementation.stats.l_visible	++;
+	RImplementation.Stats.l_visible	++;
 
 	// *** assume accumulator already setup ***
 	// *****************************	Mask by stencil		*************************************

@@ -4,6 +4,8 @@
 #include "xr_input.h"
 #include "IInputReceiver.h"
 #include "Include/editor/ide.hpp"
+#include "GameFont.h"
+#include "PerformanceAlert.hpp"
 
 #ifndef _EDITOR
 # include "xr_input_xinput.h"
@@ -159,6 +161,12 @@ HRESULT CInput::CreateInputDevice(LPDIRECTINPUTDEVICE8* device, GUID guidDevice,
 }
 
 //-----------------------------------------------------------------------
+
+void CInput::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+{
+    font.OutNext("Input:       %2.2fms", pInput->GetStats().FrameTime.result);
+}
+
 
 void CInput::SetAllAcquire(BOOL bAcquire)
 {
@@ -589,11 +597,13 @@ void CInput::OnAppDeactivate(void)
 
 void CInput::OnFrame(void)
 {
-    RDEVICE.Statistic->Input.Begin();
+    stats.FrameStart();
+    stats.FrameTime.Begin();
     dwCurTime = RDEVICE.TimerAsync_MMT();
     if (pKeyboard) KeyUpdate();
     if (pMouse) MouseUpdate();
-    RDEVICE.Statistic->Input.End();
+    stats.FrameTime.End();
+    stats.FrameEnd();
 }
 
 IInputReceiver* CInput::CurrentIR()

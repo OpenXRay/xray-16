@@ -7,7 +7,6 @@
 #include "stdafx.h"
 #include "CSCompiler.h"
 #include "ComputeShader.h"
-#include "Layers/xrRender/dxRenderDeviceRender.h"
 
 CSCompiler::CSCompiler(ComputeShader& target):
 	m_Target(target), m_cs(0)
@@ -173,7 +172,7 @@ void CSCompiler::end()
 
 	//Samplers create by us, thou they should not be AddRef'ed
 
-	m_Target.Construct(m_cs, DEV->_CreateConstantTable(m_constants), m_Samplers, m_Textures, m_Outputs);
+    m_Target.Construct(m_cs, RImplementation.Resources->_CreateConstantTable(m_constants), m_Samplers, m_Textures, m_Outputs);
 }
 
 void CSCompiler::compile(const char* name)

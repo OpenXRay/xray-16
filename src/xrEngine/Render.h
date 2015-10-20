@@ -1,5 +1,4 @@
-#ifndef _RENDER_H_
-#define _RENDER_H_
+#pragma once
 
 #include "xrEngine/Engine.h"
 #include "xrCDB/frustum.h"
@@ -8,25 +7,14 @@
 #include "Include/xrRender/FactoryPtr.h"
 class IUIShader;
 typedef FactoryPtr<IUIShader> wm_shader;
-
-
-#ifdef _EDITOR
-//. #error you cant include this file in borland
-#endif
 // refs
 class ENGINE_API IRenderable;
-//class ENGINE_API IRenderVisual;
-
-//class ENGINE_API IBlender;
-//class ENGINE_API CSkeletonWallmark;
-//class ENGINE_API CKinematics;
 struct ENGINE_API FSlideWindowItem;
 
 // Igor
 class IRenderVisual;
 class IKinematics;
 class CGameFont;
-//class IRenderDetailModel;
 
 #ifndef _EDITOR
 extern const float fLightSmoothFactor;
@@ -156,9 +144,14 @@ public:
     virtual ~IRender_Target() {};
 };
 
-//////////////////////////////////////////////////////////////////////////
-// definition (Renderer)
-class ENGINE_API IRender_interface
+enum class DeviceState
+{
+    Normal = 0,
+    Lost,
+    NeedReset
+};
+
+class ENGINE_API IRender
 {
 public:
     enum GenerationLevel
@@ -169,6 +162,7 @@ public:
         GENERATION_DX90 = 90,
         GENERATION_forcedword = u32(-1)
     };
+    
     enum ScreenshotMode
     {
         SM_NORMAL = 0, // jpeg, name ignored
@@ -178,6 +172,82 @@ public:
         SM_FOR_MPSENDING = 4,
         SM_forcedword = u32(-1)
     };
+
+    struct RenderStatistics
+    {
+        CStatTimer Culling; // portal traversal, frustum culling, entities "renderable_Render"
+        CStatTimer Animation; // skeleton calculation
+        CStatTimer Primitives; // actual primitive rendering
+        CStatTimer Wait; // ...waiting something back (queries results, etc.)
+        CStatTimer WaitS; // ...frame-limit sync
+        CStatTimer RenderTargets; // ...render-targets
+        CStatTimer Skinning; // ...skinning        
+        CStatTimer DetailVisibility; // ...details visibility detection
+        CStatTimer DetailRender;// ...details rendering
+        CStatTimer DetailCache;// ...details slot cache access
+        u32 DetailCount;// ...number of DT-elements
+        CStatTimer Wallmarks; // ...wallmark sorting, rendering
+        u32 StaticWMCount;// ...number of static wallmark
+        u32 DynamicWMCount;// ...number of dynamic wallmark
+        u32 WMTriCount;// ...number of wallmark tri
+        CStatTimer HUD; // ...hud rendering
+        CStatTimer Glows; // ...glows vis-testing,sorting,render
+        CStatTimer Lights; // ...d-lights building/rendering
+        CStatTimer Projectors; // ...projectors building
+        CStatTimer ShadowsCalc; // ...shadows building
+        CStatTimer ShadowsRender; // ...shadows render
+        u32 OcclusionQueries;
+        u32 OcclusionCulled;
+
+        void FrameStart()
+        {
+            Culling.FrameStart();
+            Animation.FrameStart();
+            Primitives.FrameStart();
+            Wait.FrameStart();
+            WaitS.FrameStart();
+            RenderTargets.FrameStart();
+            Skinning.FrameStart();
+            DetailVisibility.FrameStart();
+            DetailRender.FrameStart();
+            DetailCache.FrameStart();
+            DetailCount = 0;
+            Wallmarks.FrameStart();
+            StaticWMCount = 0;
+            DynamicWMCount = 0;
+            WMTriCount = 0;
+            HUD.FrameStart();
+            Glows.FrameStart();
+            Lights.FrameStart();
+            Projectors.FrameStart();
+            ShadowsCalc.FrameStart();
+            ShadowsRender.FrameStart();
+            OcclusionQueries = 0;
+            OcclusionCulled = 0;
+        }
+
+        void FrameEnd()
+        {
+            Culling.FrameEnd();
+            Animation.FrameEnd();
+            Primitives.FrameEnd();
+            Wait.FrameEnd();
+            WaitS.FrameEnd();
+            RenderTargets.FrameEnd();
+            Skinning.FrameEnd();
+            DetailVisibility.FrameEnd();
+            DetailRender.FrameEnd();
+            DetailCache.FrameEnd();
+            Wallmarks.FrameEnd();
+            HUD.FrameEnd();
+            Glows.FrameEnd();
+            Lights.FrameEnd();
+            Projectors.FrameEnd();
+            ShadowsCalc.FrameEnd();
+            ShadowsRender.FrameEnd();
+        }
+    };
+    
 public:
     // options
     s32 m_skinning;
@@ -204,23 +274,16 @@ public:
     BENCH_SEC_SCRAMBLEVTBL1
     BENCH_SEC_SCRAMBLEVTBL3
 
-    virtual void level_Load(IReader*) = 0;
+    virtual void level_Load(IReader *fs) = 0;
     virtual void level_Unload() = 0;
 
     //virtual IDirect3DBaseTexture9* texture_load (LPCSTR fname, u32& msize) = 0;
     void shader_option_skinning(s32 mode) { m_skinning = mode; }
-    virtual HRESULT shader_compile(
-        LPCSTR name,
-        DWORD const* pSrcData,
-        UINT SrcDataLen,
-        LPCSTR pFunctionName,
-        LPCSTR pTarget,
-        DWORD Flags,
-        void*& result
-    ) = 0;
+    virtual HRESULT shader_compile(LPCSTR name, const DWORD *pSrcData, UINT SrcDataLen,
+        LPCSTR pFunctionName, LPCSTR pTarget, DWORD Flags, void *&result) = 0;
 
     // Information
-    virtual void Statistics(CGameFont* F) {};
+    virtual void DumpStatistics(CGameFont &font, class PerformanceAlert *alert) = 0;
 
     virtual LPCSTR getShaderPath() = 0;
     // virtual ref_shader getShader (int id) = 0;
@@ -298,11 +361,54 @@ public:
     virtual u32 memory_usage() = 0;
 
     // Constructor/destructor
-    virtual ~IRender_interface();
+    virtual ~IRender() {}
 protected:
     virtual void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer) = 0;
+    // XXX: remove comment
+    /// ===================== NEW MEMBERS ===================================
+public:
+    // XXX: used? check and delete if not used
+    virtual void	Copy(IRender &_in) = 0;
+
+    //	Gamma correction functions
+    virtual void	setGamma(float fGamma) = 0;
+    virtual void	setBrightness(float fGamma) = 0;
+    virtual void	setContrast(float fGamma) = 0;
+    virtual void	updateGamma() = 0;
+
+    //	Destroy
+    virtual void	OnDeviceDestroy(bool bKeepTextures) = 0;
+    virtual void	ValidateHW() = 0;
+    virtual void	DestroyHW() = 0;
+    virtual void	Reset(HWND hWnd, u32 &dwWidth, u32 &dwHeight, float &fWidth_2, float &fHeight_2) = 0;
+    //	Init
+    virtual void	SetupStates() = 0;
+    virtual void	OnDeviceCreate(LPCSTR shName) = 0;
+    virtual void	Create(HWND hWnd, u32 &dwWidth, u32 &dwHeight, float &fWidth_2, float &fHeight_2, bool) = 0;
+    virtual void	SetupGPU(bool bForceGPU_SW, bool bForceGPU_NonPure, bool bForceGPU_REF) = 0;
+    //	Overdraw
+    virtual void	overdrawBegin() = 0;
+    virtual void	overdrawEnd() = 0;
+
+    //	Resources control
+    virtual void	DeferredLoad(bool E) = 0;
+    virtual void	ResourcesDeferredUpload() = 0;
+    virtual void	ResourcesGetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u32& c_lmaps) = 0;
+    virtual void	ResourcesDestroyNecessaryTextures() = 0;
+    virtual void	ResourcesStoreNecessaryTextures() = 0;
+    virtual void	ResourcesDumpMemoryUsage() = 0;
+
+    //	HWSupport
+    virtual bool	HWSupportsShaderYUV2RGB() = 0;
+
+    //	Device state
+    virtual DeviceState GetDeviceState() = 0;
+    virtual bool	GetForceGPU_REF() = 0;
+    virtual u32		GetCacheStatPolys() = 0;
+    virtual void	Begin() = 0;
+    virtual void	Clear() = 0;
+    virtual void	End() = 0;
+    virtual void	ClearTarget() = 0;
+    virtual void	SetCacheXform(Fmatrix &mView, Fmatrix &mProject) = 0;
+    virtual void	OnAssetsChanged() = 0;
 };
-
-//extern ENGINE_API IRender_interface* Render;
-
-#endif

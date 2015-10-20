@@ -15,13 +15,11 @@ class dxRenderFactory : public IRenderFactory
 	RENDER_FACTORY_DECLARE(UIShader)
 	RENDER_FACTORY_DECLARE(StatGraphRender)
 	RENDER_FACTORY_DECLARE(ConsoleRender)
-	RENDER_FACTORY_DECLARE(RenderDeviceRender)
 #	ifdef DEBUG
 		RENDER_FACTORY_DECLARE(ObjectSpaceRender)
 #	endif // DEBUG
 	RENDER_FACTORY_DECLARE(ApplicationRender)
 	RENDER_FACTORY_DECLARE(WallMarkArray)
-	RENDER_FACTORY_DECLARE(StatsRender)
 #endif // _EDITOR
 
 #ifndef _EDITOR	

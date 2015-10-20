@@ -181,7 +181,7 @@ public:
 	void							Load			();
 	void							Unload			();
 	void							Render			();
-
+    
 	/// MT stuff
 	xrCriticalSection				MT;
 	volatile u32					m_frame_calc;

@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "xr_effgamma.h"
-#include "dxRenderDeviceRender.h"
 #include "xrCore/Media/Image.hpp"
 #include "xrEngine/xrImage_Resampler.h"
 #if defined(USE_DX10) || defined(USE_DX11)
@@ -50,7 +49,7 @@ void CRender::ScreenshotImpl	(ScreenshotMode mode, LPCSTR name, CMemoryWriter* m
 	// Save
 	switch (mode)	
 	{
-		case IRender_interface::SM_FOR_GAMESAVE:
+		case IRender::SM_FOR_GAMESAVE:
 			{
 				ID3DTexture2D		*pSrcSmallTexture;
 	
@@ -99,7 +98,7 @@ void CRender::ScreenshotImpl	(ScreenshotMode mode, LPCSTR name, CMemoryWriter* m
 				_RELEASE			(pSrcSmallTexture);
 			}
 			break;
-		case IRender_interface::SM_FOR_MPSENDING:
+		case IRender::SM_FOR_MPSENDING:
 			{
 				
 				ID3DTexture2D		*pSrcSmallTexture;
@@ -155,7 +154,7 @@ void CRender::ScreenshotImpl	(ScreenshotMode mode, LPCSTR name, CMemoryWriter* m
 				
 			}
 			break;
-		case IRender_interface::SM_NORMAL:
+		case IRender::SM_NORMAL:
 			{
 				string64			t_stemp;
 				string_path			buf;
@@ -188,8 +187,8 @@ void CRender::ScreenshotImpl	(ScreenshotMode mode, LPCSTR name, CMemoryWriter* m
 				}
 			}
 			break;
-		case IRender_interface::SM_FOR_LEVELMAP:
-		case IRender_interface::SM_FOR_CUBEMAP:
+		case IRender::SM_FOR_LEVELMAP:
+		case IRender::SM_FOR_CUBEMAP:
 			{
 				VERIFY(!"CRender::Screenshot. This screenshot type is not supported for DX10.");
 				/*
@@ -294,7 +293,7 @@ void CRender::ScreenshotImpl	(ScreenshotMode mode, LPCSTR name, CMemoryWriter* m
 
 	// Save
 	switch (mode)	{
-		case IRender_interface::SM_FOR_GAMESAVE:
+		case IRender::SM_FOR_GAMESAVE:
 			{
 				// texture
 				ID3DTexture2D*	texture	= NULL;
@@ -327,7 +326,7 @@ void CRender::ScreenshotImpl	(ScreenshotMode mode, LPCSTR name, CMemoryWriter* m
 				_RELEASE			(texture);
 			}
 			break;
-		case IRender_interface::SM_FOR_MPSENDING:
+		case IRender::SM_FOR_MPSENDING:
 			{
 				// texture
 				ID3DTexture2D*	texture	= NULL;
@@ -367,7 +366,7 @@ void CRender::ScreenshotImpl	(ScreenshotMode mode, LPCSTR name, CMemoryWriter* m
 				_RELEASE			(texture);
 
 			}break;
-		case IRender_interface::SM_NORMAL:
+		case IRender::SM_NORMAL:
 			{
 				string64			t_stemp;
 				string_path			buf;
@@ -389,8 +388,8 @@ void CRender::ScreenshotImpl	(ScreenshotMode mode, LPCSTR name, CMemoryWriter* m
 				}
 			}
 			break;
-		case IRender_interface::SM_FOR_LEVELMAP:
-		case IRender_interface::SM_FOR_CUBEMAP:
+		case IRender::SM_FOR_LEVELMAP:
+		case IRender::SM_FOR_CUBEMAP:
 			{
 //				string64			t_stemp;
 				string_path			buf;

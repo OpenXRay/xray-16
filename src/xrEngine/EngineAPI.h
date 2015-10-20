@@ -7,6 +7,7 @@
 #if !defined(AFX_ENGINEAPI_H__CF21372B_C8B8_4891_82FC_D872C84E1DD4__INCLUDED_)
 #define AFX_ENGINEAPI_H__CF21372B_C8B8_4891_82FC_D872C84E1DD4__INCLUDED_
 #pragma once
+#include "xrEngine/Engine.h"
 
 // Abstract 'Pure' class for DLL interface
 class ENGINE_API DLL_Pure
@@ -40,7 +41,7 @@ private:
     HMODULE hTuner;
 public:
     BENCH_SEC_SCRAMBLEMEMBER1
-        Factory_Create* pCreate;
+    Factory_Create* pCreate;
     Factory_Destroy* pDestroy;
     BOOL tune_enabled;
     VTPause* tune_pause;

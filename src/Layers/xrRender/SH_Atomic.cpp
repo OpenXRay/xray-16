@@ -4,8 +4,6 @@
 #include "sh_atomic.h"
 #include "ResourceManager.h"
 
-#include "dxRenderDeviceRender.h"
-
 // Atomic
 //SVS::~SVS								()			{	_RELEASE(vs);		dxRenderDeviceRender::Instance().Resources->_DeleteVS			(this);	}
 //SPS::~SPS								()			{	_RELEASE(ps);		dxRenderDeviceRender::Instance().Resources->_DeletePS			(this);	}
@@ -26,7 +24,7 @@ SVS::SVS() :
 
 SVS::~SVS()
 {
-	DEV->_DeleteVS(this);
+    RImplementation.Resources->_DeleteVS(this);
 #if defined(USE_DX10) || defined(USE_DX11)
 	//_RELEASE(signature);
 	//	Now it is release automatically
@@ -37,34 +35,42 @@ SVS::~SVS()
 
 ///////////////////////////////////////////////////////////////////////
 //	SPS
-SPS::~SPS								()			{	_RELEASE(ps);		DEV->_DeletePS			(this);	}
+SPS::~SPS()
+{
+    _RELEASE(ps);
+    RImplementation.Resources->_DeletePS(this);
+}
 
 #if defined(USE_DX10) || defined(USE_DX11)
 ///////////////////////////////////////////////////////////////////////
 //	SGS
-SGS::~SGS								()			{	_RELEASE(gs);		DEV->_DeleteGS			(this);	}
+SGS::~SGS								()			{	_RELEASE(gs);		RImplementation.Resources->_DeleteGS			(this);	}
 
 #	ifdef USE_DX11
-SHS::~SHS								()			{	_RELEASE(sh);		DEV->_DeleteHS			(this);	}
-SDS::~SDS								()			{	_RELEASE(sh);		DEV->_DeleteDS			(this);	}
-SCS::~SCS								()			{	_RELEASE(sh);		DEV->_DeleteCS			(this);	}
+SHS::~SHS								()			{	_RELEASE(sh);		RImplementation.Resources->_DeleteHS			(this);	}
+SDS::~SDS								()			{	_RELEASE(sh);		RImplementation.Resources->_DeleteDS			(this);	}
+SCS::~SCS								()			{	_RELEASE(sh);		RImplementation.Resources->_DeleteCS			(this);	}
 #	endif
 
 ///////////////////////////////////////////////////////////////////////
 //	SInputSignature
 SInputSignature::SInputSignature(ID3DBlob* pBlob)	{ VERIFY(pBlob); signature=pBlob; signature->AddRef();};
-SInputSignature::~SInputSignature		()			{	_RELEASE(signature); DEV->_DeleteInputSignature(this); }
+SInputSignature::~SInputSignature		()			{	_RELEASE(signature); RImplementation.Resources->_DeleteInputSignature(this); }
 #endif	//	USE_DX10
 
 ///////////////////////////////////////////////////////////////////////
 //	SState
-SState::~SState							()			{	_RELEASE(state);	DEV->_DeleteState		(this);	}
+SState::~SState()
+{
+    _RELEASE(state);
+    RImplementation.Resources->_DeleteState(this);
+}
 
 ///////////////////////////////////////////////////////////////////////
 //	SDeclaration
 SDeclaration::~SDeclaration()
 {	
-	DEV->_DeleteDecl(this);	
+    RImplementation.Resources->_DeleteDecl(this);	
 #if defined(USE_DX10) || defined(USE_DX11)
 	xr_map<ID3DBlob*, ID3DInputLayout*>::iterator iLayout;
 	iLayout = vs_to_layout.begin();

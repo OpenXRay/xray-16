@@ -23,6 +23,23 @@ class ENGINE_API IGame_Persistent :
     public pureFrame
 {
 public:
+    struct ParticleStatistics
+    {
+        u32 Starting;
+        u32 Active;
+        u32 Destroying;
+
+        ParticleStatistics() { FrameStart(); }
+
+        void FrameStart()
+        {
+            Starting = 0;
+            Active = 0;
+            Destroying = 0;
+        }
+
+        void FrameEnd() {}
+    };
     union params
     {
         struct
@@ -72,6 +89,10 @@ public:
 #endif
     IMainMenu* m_pMainMenu;
 
+    ParticleStatistics stats;
+
+    const ParticleStatistics& GetStats() { return stats; }
+
 
     virtual bool OnRenderPPUI_query() { return FALSE; }; // should return true if we want to have second function called
     virtual void OnRenderPPUI_main() {};
@@ -81,7 +102,7 @@ public:
     virtual void OnAppEnd();
     virtual void OnAppActivate();
     virtual void OnAppDeactivate();
-    virtual void _BCL OnFrame();
+    virtual void OnFrame();
 
     // вызывается только когда изменяется тип игры
     virtual void OnGameStart();
@@ -110,12 +131,7 @@ public:
     virtual ~IGame_Persistent();
 
     ICF u32 GameType() { return m_game_params.m_e_game_type; };
-    virtual void Statistics(CGameFont* F)
-#ifndef _EDITOR
-        = 0;
-#else
-    {}
-#endif
+    virtual void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert);
     virtual void LoadTitle(bool change_tip = false, shared_str map_name = "") {}
     virtual bool CanBePaused() { return true; }
 };

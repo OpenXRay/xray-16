@@ -9,7 +9,7 @@ void CLevel::ProcessCompressedUpdate(NET_Packet& P, u8 const compress_type)
 	NET_Packet	uncompressed_packet;
 	u16 next_size;
 	P.r_u16(next_size);
-	Device.Statistic->netClientCompressor.Begin();
+    stats.ClientCompressor.Begin();
 	while (next_size)
 	{
 		if (compress_type & eto_ppmd_compression)
@@ -48,7 +48,7 @@ void CLevel::ProcessCompressedUpdate(NET_Packet& P, u8 const compress_type)
 		Objects.net_Import(&uncompressed_packet);
 		P.r_u16(next_size);
 	}
-	Device.Statistic->netClientCompressor.End();
+    stats.ClientCompressor.End();
 
 	if (OnClient()) UpdateDeltaUpd(timeServer());
 	IClientStatistic pStat = Level().GetStatistic();

@@ -8,29 +8,43 @@
 
 #include "xrCDB.h"
 
-#ifdef	DEBUG
-extern	XRCDB_API	CStatTimer	*cdb_clRAY;				// total: ray-testing
-extern	XRCDB_API	CStatTimer	*cdb_clBOX;				// total: box query
-extern	XRCDB_API	CStatTimer	*cdb_clFRUSTUM;			// total: frustum query
-#endif
-
 class XRCDB_API xrXRC  
 {
 	CDB::COLLIDER	CL;
 public:
+    struct ColliderStatistics
+    {
+        CStatTimer RayQuery; // total: ray-testing
+        CStatTimer BoxQuery; // total: box query
+        CStatTimer FrustumQuery; // total: frustum query
+
+        ColliderStatistics() { FrameStart(); }
+
+        void FrameStart()
+        {
+            RayQuery.FrameStart();
+            BoxQuery.FrameStart();
+            FrustumQuery.FrameStart();
+        }
+
+        void FrameEnd()
+        {
+            RayQuery.FrameEnd();
+            BoxQuery.FrameEnd();
+            FrustumQuery.FrameEnd();
+        }
+    };
+    ColliderStatistics Stats;
+
 	IC void			ray_options		(u32 f)		
 	{ 
 		CL.ray_options(f); 
 	}
 	IC void			ray_query		(const CDB::MODEL *m_def, const Fvector& r_start,  const Fvector& r_dir, float r_range = 10000.f)
 	{
-#ifdef DEBUG
-		cdb_clRAY->Begin();
-#endif
+        Stats.RayQuery.Begin();
 		CL.ray_query(m_def,r_start,r_dir,r_range);
-#ifdef DEBUG
-		cdb_clRAY->End	();
-#endif
+        Stats.RayQuery.End();
 	}
 	
 	IC void			box_options		(u32 f)	
@@ -39,13 +53,9 @@ public:
 	}
 	IC void			box_query		(const CDB::MODEL *m_def, const Fvector& b_center, const Fvector& b_dim)
 	{
-#ifdef DEBUG
-		cdb_clBOX->Begin();
-#endif
+        Stats.BoxQuery.Begin();
 		CL.box_query(m_def,b_center,b_dim);
-#ifdef DEBUG
-		cdb_clBOX->End	();
-#endif
+        Stats.BoxQuery.End();
 	}
 	
 	IC void			frustum_options	(u32 f)
@@ -54,13 +64,9 @@ public:
 	}
 	IC void			frustum_query	(const CDB::MODEL *m_def, const CFrustum& F)
 	{
-#ifdef DEBUG
-		cdb_clFRUSTUM->Begin();
-#endif
+        Stats.FrustumQuery.Begin();
 		CL.frustum_query(m_def,F);
-#ifdef DEBUG
-		cdb_clFRUSTUM->End	();
-#endif
+        Stats.FrustumQuery.End();
 	}
 	
 	IC CDB::RESULT*	r_begin			()	{	return CL.r_begin();		};

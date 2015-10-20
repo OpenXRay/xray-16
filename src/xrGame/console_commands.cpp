@@ -41,7 +41,6 @@
 #include "saved_game_wrapper.h"
 #include "level_graph.h"
 
-#include "xrEngine/doug_lea_memory_allocator.h"
 #include "cameralook.h"
 #include "character_hit_animations_params.h"
 #include "inventory_upgrade_manager.h"
@@ -164,10 +163,7 @@ static void full_memory_stats	( )
 	int		_eco_smem		= (int)g_pSharedMemoryContainer->stat_economy	();
 	u32		m_base=0,c_base=0,m_lmaps=0,c_lmaps=0;
 
-
-	//if (Device.Resources)	Device.Resources->_GetMemoryUsage	(m_base,c_base,m_lmaps,c_lmaps);
-	//	Resource check moved to m_pRender
-	if (Device.m_pRender) Device.m_pRender->ResourcesGetMemoryUsage(m_base,c_base,m_lmaps,c_lmaps);
+	Render->ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
 
 	log_vminfo	();
 
@@ -581,7 +577,7 @@ public:
 #ifdef DEBUG
 		timer.Start				();
 #endif
-		MainMenu()->Screenshot		(IRender_interface::SM_FOR_GAMESAVE,S1);
+		MainMenu()->Screenshot		(IRender::SM_FOR_GAMESAVE,S1);
 
 #ifdef DEBUG
 		Msg						("Screenshot overhead : %f milliseconds",timer.GetElapsed_sec()*1000.f);

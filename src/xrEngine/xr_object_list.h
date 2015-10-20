@@ -7,20 +7,38 @@ class NET_Packet;
 
 class ENGINE_API CObjectList
 {
+public:
+    struct ObjectUpdateStatistics
+    {
+    public:
+        CStatTimer Update;
+        u32 Updated;
+        u32 Crows;
+        u32 Active;
+        u32 Total;
+
+        IC void FrameStart()
+        {
+            Update.FrameStart();
+            Updated = 0;
+            Crows = 0;
+            Active = 0;
+            Total = 0;
+        }
+
+        IC void FrameEnd()
+        { Update.FrameEnd(); }
+    };
 private:
-    // data
-    //. xr_map<u32,CObject*> map_NETID;
     CObject* map_NETID[0xffff];
-
-private:
     typedef xr_vector<CObject*> Objects;
-
-private:
     Objects destroy_queue;
     Objects objects_active;
     Objects objects_sleeping;
     Objects m_crows[2];
     u32 m_owner_thread_id;
+    ObjectUpdateStatistics stats;
+    u32 statsFrame;
 
 public:
     typedef fastdelegate::FastDelegate1<CObject*> RELCASE_CALLBACK;
@@ -38,6 +56,12 @@ public:
     void relcase_unregister(int*);
 
 public:
+    const ObjectUpdateStatistics &GetStats()
+    {
+        stats.FrameEnd();
+        return stats;
+    }
+    void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert);
     // methods
     CObjectList();
     ~CObjectList();
@@ -51,8 +75,9 @@ public:
 
     CObject* Create(LPCSTR name);
     void Destroy(CObject* O);
-
+private:
     void SingleUpdate(CObject* O);
+public:
     void Update(bool bForce);
 
     void net_Register(CObject* O);

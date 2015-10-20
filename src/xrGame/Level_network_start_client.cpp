@@ -209,12 +209,9 @@ bool	CLevel::net_start_client5				()
 		// Textures
 		if	(!g_dedicated_server)
 		{
-//			g_pGamePersistent->LoadTitle		("st_loading_textures");
 			g_pGamePersistent->LoadTitle		();
-			//Device.Resources->DeferredLoad	(FALSE);
-			Device.m_pRender->DeferredLoad		(FALSE);
-			//Device.Resources->DeferredUpload	();
-			Device.m_pRender->ResourcesDeferredUpload();
+			Render->DeferredLoad(FALSE);
+			Render->ResourcesDeferredUpload();
 			LL_CheckTextures					();
 		}
 		sended_request_connection_data	= FALSE;

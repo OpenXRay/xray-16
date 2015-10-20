@@ -2,6 +2,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 #pragma once
+#include "xrEngine/Render.h"
 
 namespace WallmarksEngine {
 	struct wm_slot;

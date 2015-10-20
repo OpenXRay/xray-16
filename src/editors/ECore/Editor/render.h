@@ -24,7 +24,8 @@ public:
 	virtual u32			get_height			()				{ return EDevice.dwHeight;	}
 };
 
-class IRender_interface{
+class IRender
+{
 public:
 	enum GenerationLevel
 	{
@@ -38,7 +39,7 @@ public:
 	virtual	GenerationLevel	get_generation			()=0;
 };
 
-class	ECORE_API CRender: public IRender_interface
+class	ECORE_API CRender: public IRender
 {
     CRenderTarget*			Target;
     Fmatrix					current_matrix;

@@ -141,9 +141,6 @@ void CEngineAPI::Initialize(void)
         R_ASSERT(hRender);
         g_current_renderer = 1;
     }
-
-    Device.ConnectToRender();
-
     // game
     {
         LPCSTR g_name = "xrGame.dll";

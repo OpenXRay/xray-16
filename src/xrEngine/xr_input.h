@@ -41,6 +41,13 @@ public:
         DIDEVICEINSTANCE deviceInfo;
         DIDEVICEOBJECTINSTANCE objectInfo;
     };
+    struct InputStatistics
+    {
+        CStatTimer FrameTime;
+
+        void FrameStart() { FrameTime.FrameStart(); }
+        void FrameEnd() { FrameTime.FrameEnd(); }
+    };
 private:
     BENCH_SEC_SCRAMBLEMEMBER1
     LPDIRECTINPUT8 pDI; // The DInput object
@@ -65,11 +72,15 @@ private:
     void MouseUpdate();
     void KeyUpdate();
 
+    InputStatistics stats;
+
 public:
     sxr_mouse mouse_property;
     sxr_key key_property;
     u32 dwCurTime;
 
+    const InputStatistics &GetStats() const { return stats; }
+    void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert);
     void SetAllAcquire(BOOL bAcquire = TRUE);
     void SetMouseAcquire(BOOL bAcquire);
     void SetKBDAcquire(BOOL bAcquire);
@@ -83,7 +94,7 @@ public:
     CInput(BOOL bExclusive = true, int deviceForInit = default_key);
     ~CInput();
 
-    virtual void _BCL OnFrame(void);
+    virtual void  OnFrame(void);
     virtual void OnAppActivate(void);
     virtual void OnAppDeactivate(void);
 

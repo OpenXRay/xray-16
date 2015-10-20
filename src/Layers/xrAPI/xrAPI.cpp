@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "Include/xrAPI/xrAPI.h"
 
-XRAPI_API IRender_interface*	Render = NULL;
+XRAPI_API IRender*	Render = NULL;
 XRAPI_API IRenderFactory*	RenderFactory = NULL;
 XRAPI_API CDUInterface*	DU = NULL;
 XRAPI_API xr_token*	vid_mode_token = NULL;

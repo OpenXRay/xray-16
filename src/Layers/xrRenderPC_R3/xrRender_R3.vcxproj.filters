@@ -124,9 +124,6 @@
     <Filter Include="Interfase implementations\EnvironmentRender">
       <UniqueIdentifier>{f1500a5c-32bd-4d7a-9ceb-16ca2b319fc0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interfase implementations\RenderDeviceRender">
-      <UniqueIdentifier>{3c9da1db-8b49-47f5-8bdd-dc83ea6fb412}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Interfase implementations\ConsoleRender">
       <UniqueIdentifier>{54d58225-d0c1-47ee-941f-11ffb96119a1}</UniqueIdentifier>
     </Filter>
@@ -144,9 +141,6 @@
     </Filter>
     <Filter Include="Interfase implementations\ThunderboltDescRender">
       <UniqueIdentifier>{89c6e368-8f64-4916-a880-b1d61e6e0fec}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interfase implementations\StatsRender">
-      <UniqueIdentifier>{ba443be2-cf20-4fc5-b94a-4de351348a04}</UniqueIdentifier>
     </Filter>
     <Filter Include="Interfase implementations\Debug">
       <UniqueIdentifier>{e82b0202-da93-4e60-aafe-242c5f8ca164}</UniqueIdentifier>
@@ -585,12 +579,6 @@
     <ClInclude Include="..\..\Include\xrRender\EnvironmentRender.h">
       <Filter>Interfase implementations\EnvironmentRender</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\dxRenderDeviceRender.h">
-      <Filter>Interfase implementations\RenderDeviceRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\xrRender\RenderDeviceRender.h">
-      <Filter>Interfase implementations\RenderDeviceRender</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Include\xrRender\ConsoleRender.h">
       <Filter>Interfase implementations\ConsoleRender</Filter>
     </ClInclude>
@@ -626,12 +614,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Include\xrRender\ThunderboltDescRender.h">
       <Filter>Interfase implementations\ThunderboltDescRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrRender\dxStatsRender.h">
-      <Filter>Interfase implementations\StatsRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\xrRender\StatsRender.h">
-      <Filter>Interfase implementations\StatsRender</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Include\xrRender\DebugShader.h">
       <Filter>Interfase implementations\Debug</Filter>
@@ -1220,9 +1202,6 @@
     <ClCompile Include="..\xrRender\dxEnvironmentRender.cpp">
       <Filter>Interfase implementations\EnvironmentRender</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\dxRenderDeviceRender.cpp">
-      <Filter>Interfase implementations\RenderDeviceRender</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\dxConsoleRender.cpp">
       <Filter>Interfase implementations\ConsoleRender</Filter>
     </ClCompile>
@@ -1240,9 +1219,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\dxThunderboltDescRender.cpp">
       <Filter>Interfase implementations\ThunderboltDescRender</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\dxStatsRender.cpp">
-      <Filter>Interfase implementations\StatsRender</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\dxDebugRender.cpp">
       <Filter>Interfase implementations\Debug\DebugRender</Filter>

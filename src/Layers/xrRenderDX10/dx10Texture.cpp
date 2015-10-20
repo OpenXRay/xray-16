@@ -6,7 +6,6 @@
 #pragma warning(default:4995)
 
 #include <D3DX10Tex.h>
-#include "Layers/xrRender/dxRenderDeviceRender.h"
 
 void fix_texture_name(LPSTR fn)
 {

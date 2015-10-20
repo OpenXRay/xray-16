@@ -34,7 +34,7 @@ IGame_Level::~IGame_Level()
 {
     if (strstr(Core.Params, "-nes_texture_storing"))
         //Device.Resources->StoreNecessaryTextures();
-        Device.m_pRender->ResourcesStoreNecessaryTextures();
+        Render->ResourcesStoreNecessaryTextures();
     xr_delete(pLevel);
 
     // Render-level unload
@@ -50,8 +50,8 @@ IGame_Level::~IGame_Level()
     Device.DumpResourcesMemoryUsage();
 
     u32 m_base = 0, c_base = 0, m_lmaps = 0, c_lmaps = 0;
-    if (Device.m_pRender)
-        Device.m_pRender->ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
+    if (Render)
+        Render->ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
 
     Msg("* [ D3D ]: textures[%d K]", (m_base + m_lmaps) / 1024);
 
@@ -59,6 +59,7 @@ IGame_Level::~IGame_Level()
 
 void IGame_Level::net_Stop()
 {
+    // XXX: why update 6 times?
     for (int i = 0; i < 6; i++)
         Objects.Update(false);
     // Destroy all objects
@@ -206,6 +207,10 @@ void IGame_Level::OnFrame()
         }
     }
 }
+
+void IGame_Level::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+{ Objects.DumpStatistics(font, alert); }
+
 // ==================================================================================================
 
 void CServerInfo::AddItem(LPCSTR name_, LPCSTR value_, u32 color_)

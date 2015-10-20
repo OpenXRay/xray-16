@@ -2,9 +2,6 @@
 #pragma hdrstop
 
 #include "Layers/xrRender/ResourceManager.h"
-
-#include "Layers/xrRender/dxRenderDeviceRender.h"
-
 #include "dx10TextureUtils.h"
 
 CRT::CRT			()
@@ -24,7 +21,7 @@ CRT::~CRT			()
 	destroy			();
 
 	// release external reference
-	DEV->_DeleteRT	(this);
+    RImplementation.Resources->_DeleteRT(this);
 }
 
 #ifdef USE_DX11
@@ -103,7 +100,7 @@ void CRT::create	(LPCSTR Name, u32 w, u32 h,	D3DFORMAT f, u32 SampleCount )
 		//return;
 
 	// Try to create texture/surface
-	DEV->Evict				();
+    RImplementation.Resources->Evict();
 	//_hr = HW.pDevice->CreateTexture		(w, h, 1, usage, f, D3DPOOL_DEFAULT, &pSurface,NULL);
 	//if (FAILED(_hr) || (0==pSurface))	return;
 	// Create the render target texture
@@ -184,7 +181,7 @@ void CRT::create	(LPCSTR Name, u32 w, u32 h,	D3DFORMAT f, u32 SampleCount )
     }
 #endif
 
-	pTexture	= DEV->_CreateTexture	(Name);
+    pTexture = RImplementation.Resources->_CreateTexture(Name);
 	pTexture->surface_set(pSurface);
 }
 
@@ -215,12 +212,12 @@ void CRT::reset_end		()
 #ifdef USE_DX11
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool useUAV )
 {
-	_set			(DEV->_CreateRT(Name,w,h,f, SampleCount, useUAV ));
+    _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, useUAV));
 }
 #else
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
 {
-	_set			(DEV->_CreateRT(Name,w,h,f, SampleCount));
+    _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount));
 }
 #endif
 

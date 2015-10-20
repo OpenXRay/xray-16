@@ -193,11 +193,9 @@
     <ClInclude Include="..\..\Include\xrRender\ParticleCustom.h" />
     <ClInclude Include="..\..\Include\xrRender\RainRender.h" />
     <ClInclude Include="..\..\Include\xrRender\RenderDetailModel.h" />
-    <ClInclude Include="..\..\Include\xrRender\RenderDeviceRender.h" />
     <ClInclude Include="..\..\Include\xrRender\RenderFactory.h" />
     <ClInclude Include="..\..\Include\xrRender\RenderVisual.h" />
     <ClInclude Include="..\..\Include\xrRender\StatGraphRender.h" />
-    <ClInclude Include="..\..\Include\xrRender\StatsRender.h" />
     <ClInclude Include="..\..\Include\xrRender\ThunderboltDescRender.h" />
     <ClInclude Include="..\..\Include\xrRender\ThunderboltRender.h" />
     <ClInclude Include="..\..\Include\xrRender\UIRender.h" />
@@ -222,6 +220,7 @@
     <ClInclude Include="..\xrRender\Blender_tree.h" />
     <ClInclude Include="..\xrRender\ColorMapManager.h" />
     <ClInclude Include="..\xrRender\D3DUtils.h" />
+    <ClInclude Include="..\xrRender\D3DXRenderBase.h" />
     <ClInclude Include="..\xrRender\DetailFormat.h" />
     <ClInclude Include="..\xrRender\DetailManager.h" />
     <ClInclude Include="..\xrRender\DetailModel.h" />
@@ -239,10 +238,8 @@
     <ClInclude Include="..\xrRender\dxObjectSpaceRender.h" />
     <ClInclude Include="..\xrRender\dxParticleCustom.h" />
     <ClInclude Include="..\xrRender\dxRainRender.h" />
-    <ClInclude Include="..\xrRender\dxRenderDeviceRender.h" />
     <ClInclude Include="..\xrRender\dxRenderFactory.h" />
     <ClInclude Include="..\xrRender\dxStatGraphRender.h" />
-    <ClInclude Include="..\xrRender\dxStatsRender.h" />
     <ClInclude Include="..\xrRender\dxThunderboltDescRender.h" />
     <ClInclude Include="..\xrRender\dxThunderboltRender.h" />
     <ClInclude Include="..\xrRender\dxUIRender.h" />
@@ -285,7 +282,6 @@
     <ClInclude Include="..\xrRender\r_constants_cache.h" />
     <ClInclude Include="..\xrRender\R_DStreams.h" />
     <ClInclude Include="..\xrRender\r_sun_cascades.h" />
-    <ClInclude Include="..\xrRender\r__dsgraph_structure.h" />
     <ClInclude Include="..\xrRender\r__dsgraph_types.h" />
     <ClInclude Include="..\xrRender\r__occlusion.h" />
     <ClInclude Include="..\xrRender\r__pixel_calculator.h" />
@@ -375,10 +371,8 @@
     <ClCompile Include="..\xrRender\dxObjectSpaceRender.cpp" />
     <ClCompile Include="..\xrRender\dxParticleCustom.cpp" />
     <ClCompile Include="..\xrRender\dxRainRender.cpp" />
-    <ClCompile Include="..\xrRender\dxRenderDeviceRender.cpp" />
     <ClCompile Include="..\xrRender\dxRenderFactory.cpp" />
     <ClCompile Include="..\xrRender\dxStatGraphRender.cpp" />
-    <ClCompile Include="..\xrRender\dxStatsRender.cpp" />
     <ClCompile Include="..\xrRender\dxThunderboltDescRender.cpp" />
     <ClCompile Include="..\xrRender\dxThunderboltRender.cpp" />
     <ClCompile Include="..\xrRender\dxUIRender.cpp" />

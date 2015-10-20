@@ -12,15 +12,12 @@
 	#include "dxRainRender.h"
 	#include "dxLensFlareRender.h"
 	#include "dxEnvironmentRender.h"
-
-	#include "dxRenderDeviceRender.h"
 	#include "dxObjectSpaceRender.h"
 #endif // _EDITOR
 
 #include "dxFontRender.h"
 #include "dxApplicationRender.h"
 #include "dxWallMarkArray.h"
-#include "dxStatsRender.h"
 #include "dxUISequenceVideoItem.h"
 #include "dxUIShader.h"
 
@@ -43,13 +40,11 @@ dxRenderFactory RenderFactoryImpl;
 	RENDER_FACTORY_IMPLEMENT(UIShader)
 	RENDER_FACTORY_IMPLEMENT(StatGraphRender)
 	RENDER_FACTORY_IMPLEMENT(ConsoleRender)
-	RENDER_FACTORY_IMPLEMENT(RenderDeviceRender)
 #	ifdef DEBUG
 		RENDER_FACTORY_IMPLEMENT(ObjectSpaceRender)
 #	endif // DEBUG
 	RENDER_FACTORY_IMPLEMENT(ApplicationRender)
 	RENDER_FACTORY_IMPLEMENT(WallMarkArray)
-	RENDER_FACTORY_IMPLEMENT(StatsRender)
 #endif // _EDITOR
 
 #ifndef _EDITOR

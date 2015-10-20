@@ -80,7 +80,7 @@ void	CRender::render_lights	(light_Package& LP)
 	{
 		// if (has_spot_shadowed)
 		xr_vector<light*>	L_spot_s;
-		stats.s_used		++;
+		Stats.s_used		++;
 
 		// generate spot shadowmap
 		Target->phase_smap_spot_clear	();
@@ -105,7 +105,7 @@ void	CRender::render_lights	(light_Package& LP)
 			bool	bNormal							= mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
 			bool	bSpecial						= mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
 			if ( bNormal || bSpecial)	{
-				stats.s_merged						++;
+				Stats.s_merged						++;
 				L_spot_s.push_back					(L);
 				Target->phase_smap_spot				(L);
 				RCache.set_xform_world				(Fidentity);
@@ -122,7 +122,7 @@ void	CRender::render_lights	(light_Package& LP)
 					r_dsgraph_render_sorted				( );			// strict-sorted geoms
 				}
 			} else {
-				stats.s_finalclip					++;
+				Stats.s_finalclip					++;
 			}
 			L->svis.end								();
 			r_pmask									(true,false);

@@ -11,8 +11,6 @@
 #include "xr_input.h"
 #include "CustomHUD.h"
 
-#include "Include/xrRender/RenderDeviceRender.h"
-
 #include "xr_object.h"
 
 xr_token* vid_quality_token = NULL;
@@ -484,14 +482,10 @@ public:
     virtual void Execute(LPCSTR args)
     {
         CCC_Float::Execute(args);
-        //Device.Gamma.Gamma (ps_gamma);
-        Device.m_pRender->setGamma(ps_gamma);
-        //Device.Gamma.Brightness (ps_brightness);
-        Device.m_pRender->setBrightness(ps_brightness);
-        //Device.Gamma.Contrast (ps_contrast);
-        Device.m_pRender->setContrast(ps_contrast);
-        //Device.Gamma.Update ();
-        Device.m_pRender->updateGamma();
+        Render->setGamma(ps_gamma);
+        Render->setBrightness(ps_brightness);
+        Render->setContrast(ps_contrast);
+        Render->updateGamma();
     }
 };
 

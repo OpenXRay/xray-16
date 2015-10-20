@@ -118,9 +118,6 @@
     <Filter Include="Interfase implementations\EnvironmentRender">
       <UniqueIdentifier>{ccd599e3-f117-4ddd-af5a-dc6d299fb889}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interfase implementations\RenderDeviceRender">
-      <UniqueIdentifier>{0c1c35a4-f4cd-4890-9856-0366479e2bcf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Interfase implementations\ConsoleRender">
       <UniqueIdentifier>{331a9ab4-feca-4f1d-8d94-1c1ca1d5639f}</UniqueIdentifier>
     </Filter>
@@ -138,9 +135,6 @@
     </Filter>
     <Filter Include="Interfase implementations\ThunderboltDescRender">
       <UniqueIdentifier>{22595237-844c-4760-8674-9e23f6e7899d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interfase implementations\StatsRender">
-      <UniqueIdentifier>{1e333518-6243-49fb-91d8-64d033c9365c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Interfase implementations\Debug">
       <UniqueIdentifier>{45cad128-d7a5-4099-bcbb-2d79b3553af7}</UniqueIdentifier>
@@ -178,9 +172,6 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="r2_types.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrRender\r__dsgraph_structure.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\r__dsgraph_types.h">
@@ -552,12 +543,6 @@
     <ClInclude Include="..\..\Include\xrRender\EnvironmentRender.h">
       <Filter>Interfase implementations\EnvironmentRender</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\dxRenderDeviceRender.h">
-      <Filter>Interfase implementations\RenderDeviceRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\xrRender\RenderDeviceRender.h">
-      <Filter>Interfase implementations\RenderDeviceRender</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Include\xrRender\ConsoleRender.h">
       <Filter>Interfase implementations\ConsoleRender</Filter>
     </ClInclude>
@@ -594,12 +579,6 @@
     <ClInclude Include="..\..\Include\xrRender\ThunderboltDescRender.h">
       <Filter>Interfase implementations\ThunderboltDescRender</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\dxStatsRender.h">
-      <Filter>Interfase implementations\StatsRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\xrRender\StatsRender.h">
-      <Filter>Interfase implementations\StatsRender</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Include\xrRender\DebugShader.h">
       <Filter>Interfase implementations\Debug</Filter>
     </ClInclude>
@@ -632,6 +611,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\light.h">
       <Filter>Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\D3DXRenderBase.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1094,9 +1076,6 @@
     <ClCompile Include="..\xrRender\dxEnvironmentRender.cpp">
       <Filter>Interfase implementations\EnvironmentRender</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\dxRenderDeviceRender.cpp">
-      <Filter>Interfase implementations\RenderDeviceRender</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\dxConsoleRender.cpp">
       <Filter>Interfase implementations\ConsoleRender</Filter>
     </ClCompile>
@@ -1114,9 +1093,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\dxThunderboltDescRender.cpp">
       <Filter>Interfase implementations\ThunderboltDescRender</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\dxStatsRender.cpp">
-      <Filter>Interfase implementations\StatsRender</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\dxDebugRender.cpp">
       <Filter>Interfase implementations\Debug\DebugRender</Filter>

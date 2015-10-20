@@ -175,7 +175,7 @@ void LogWinErr(const char* msg, long err_code)
     Msg("%s: %s", msg, Debug.error2string(err_code));
 }
 
-LogCallback SetLogCB(LogCallback cb)
+LogCallback SetLogCB(const LogCallback &cb)
 {
     LogCallback result = LogCB;
     LogCB = cb;

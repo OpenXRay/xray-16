@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "xrSheduler.h"
 #include "xr_object.h"
+#include "GameFont.h"
+#include "PerformanceAlert.hpp"
 
 //#define DEBUG_SCHEDULER
 
@@ -43,6 +45,17 @@ void CSheduler::Destroy()
     Items.clear();
     ItemsProcessed.clear();
     Registration.clear();
+}
+
+void CSheduler::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+{
+    stats.FrameEnd();
+    float percentage = 100.f*stats.Update.result / Device.GetStats().EngineTotal.result;
+    font.OutNext("Sheduler update: %2.2fms, %2.1f%%", stats.Update.result, percentage);
+    font.OutNext("Sheduler load:   %2.2fms", stats.Load);
+    if (alert && stats.Update.result>3.0f)
+        alert->Print(font, "Update     > 3ms: %3.1f", stats.Update.result);
+    stats.FrameStart();
 }
 
 void CSheduler::internal_Registration()
@@ -439,9 +452,8 @@ SwitchToFiber (fiber_main);
 */
 void CSheduler::Update()
 {
-    R_ASSERT(Device.Statistic);
     // Initialize
-    Device.Statistic->Sheduler.Begin();
+    stats.Update.Begin();
     cycles_start = CPU::QPC();
     cycles_limit = CPU::qpc_freq * u64(iCeil(psShedulerCurrent)) / 1000i64 + cycles_start;
     internal_Registration();
@@ -486,10 +498,10 @@ void CSheduler::Update()
 #endif // DEBUG_SCHEDULER
     clamp(psShedulerTarget, 3.f, 66.f);
     psShedulerCurrent = 0.9f*psShedulerCurrent + 0.1f*psShedulerTarget;
-    Device.Statistic->fShedulerLoad = psShedulerCurrent;
+    stats.Load = psShedulerCurrent;
 
     // Finalize
     g_bSheduleInProgress = FALSE;
     internal_Registration();
-    Device.Statistic->Sheduler.End();
+    stats.Update.End();
 }

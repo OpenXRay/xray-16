@@ -513,7 +513,7 @@ IC	size_t				CurrentTransmission					(){return m_current_transmission_num;}
 
 	bool					HUDview						( ) { return IsFocused(); }
 
-	static void	_BCL		cb_Steer					(CBoneInstance* B);
+	static void			cb_Steer					(CBoneInstance* B);
 	virtual	void			Hit							(SHit* pHDS);
 	virtual void			Die							(CObject* who);
 	virtual void PHHit									(SHit &H);

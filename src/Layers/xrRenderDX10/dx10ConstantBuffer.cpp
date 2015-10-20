@@ -2,11 +2,10 @@
 #include "dx10ConstantBuffer.h"
 
 #include "dx10BufferUtils.h"
-#include "Layers/xrRender/dxRenderDeviceRender.h"
 
 dx10ConstantBuffer::~dx10ConstantBuffer()
 {
-	DEV->_DeleteConstantBuffer(this);
+    RImplementation.Resources->_DeleteConstantBuffer(this);
 //	Flush();
 	_RELEASE(m_pBuffer);
 	xr_free(m_pBufferData);

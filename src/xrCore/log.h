@@ -14,8 +14,20 @@ void XRCORE_API Log(LPCSTR msg, const Fvector& dop);
 void XRCORE_API Log(LPCSTR msg, const Fmatrix& dop);
 void XRCORE_API LogWinErr(LPCSTR msg, long err_code);
 
-typedef void(*LogCallback) (LPCSTR string);
-LogCallback XRCORE_API SetLogCB(LogCallback cb);
+struct LogCallback
+{
+    typedef void(*Func)(void *context, const char *s);
+    Func Log;
+    void *Context;
+
+    LogCallback() : Log(nullptr), Context(nullptr) {}
+    LogCallback(nullptr_t) : Log(nullptr), Context(nullptr) {}
+    LogCallback(Func log, void *ctx) : Log(log), Context(ctx) {}
+    void operator()(const char *s) { Log(Context, s); }
+    operator bool() const { return !!Log; }
+};
+
+LogCallback XRCORE_API SetLogCB(const LogCallback &cb);
 void XRCORE_API CreateLog(BOOL no_log = FALSE);
 void InitLog();
 void CloseLog();

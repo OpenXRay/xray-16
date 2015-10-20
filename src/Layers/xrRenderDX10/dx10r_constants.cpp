@@ -8,7 +8,6 @@
 #include "Layers/xrRender/ResourceManager.h"
 #include "xrCore/xrPool.h"
 #include "Layers/xrRender/r_constants.h"
-#include "Layers/xrRender/dxRenderDeviceRender.h"
 #include "Layers/xrRenderDX10/dx10ConstantBuffer.h"
 
 IC bool	p_sort		(ref_constant C1, ref_constant C2)
@@ -387,7 +386,7 @@ BOOL	R_constant_table::parse	(void* _desc, u32 destination)
 					? CB_BufferVertexShader : CB_BufferGeometryShader;*/
 
 				parseConstants(pTable,updatedDest);
-				ref_cbuffer	tempBuffer = dxRenderDeviceRender::Instance().Resources->_CreateConstantBuffer(pTable);
+				ref_cbuffer	tempBuffer = RImplementation.Resources->_CreateConstantBuffer(pTable);
 				m_CBTable.push_back(cb_table_record(uiBufferIndex, tempBuffer));
 			}
 		}

@@ -77,7 +77,7 @@ void CAutosaveManager::shedule_Update		(u32 dt)
 	xr_strcat					(temp,sizeof(temp),".dds");
 	FS.update_path				(S1,"$game_saves$",temp);
 
-	MainMenu()->Screenshot		(IRender_interface::SM_FOR_GAMESAVE,S1);
+	MainMenu()->Screenshot		(IRender::SM_FOR_GAMESAVE,S1);
 
 	SetFileAttributes			( S1, FILE_ATTRIBUTE_HIDDEN );
 	

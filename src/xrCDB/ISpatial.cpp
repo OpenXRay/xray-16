@@ -1,14 +1,14 @@
-
 #include "stdafx.h"
-
-#include "ispatial.h"
-#include "xrEngine/render.h"
-
+#include "ISpatial.h"
+#include "xrEngine/Engine.h"
+#include "xrEngine/Render.h"
 #ifdef DEBUG
 #include "xrEngine/xr_object.h"
 #include "xrEngine/PS_Instance.h"
 #endif
-
+#include "xrEngine/Device.h"
+#include "xrEngine/GameFont.h"
+#include "xrEngine/PerformanceAlert.hpp"
 
 ISpatial_DB*		g_SpatialSpace			= NULL;
 ISpatial_DB*		g_SpatialSpacePhysic	= NULL;
@@ -128,7 +128,7 @@ void			ISpatial_NODE::_insert			(ISpatial* S)
 {	
 	S->spatial.node_ptr			=	this;
 	items.push_back					(S);
-	S->spatial.space->stat_objects	++;
+	S->spatial.space->Stats.ObjectCount++;
 }
 
 void			ISpatial_NODE::_remove			(ISpatial* S)			
@@ -137,19 +137,18 @@ void			ISpatial_NODE::_remove			(ISpatial* S)
 	xr_vector<ISpatial*>::iterator	it = std::find(items.begin(),items.end(),S);
 	VERIFY				(it!=items.end());
 	items.erase			(it);
-	S->spatial.space->stat_objects	--;
+	S->spatial.space->Stats.ObjectCount--;
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-ISpatial_DB::ISpatial_DB()
+ISpatial_DB::ISpatial_DB(const char *name)
 #ifdef PROFILE_CRITICAL_SECTIONS
 	:cs(MUTEX_PROFILE_ID(ISpatial_DB))
 #endif // PROFILE_CRITICAL_SECTIONS
 {
 	m_root					= NULL;
-	stat_nodes				= 0;
-	stat_objects			= 0;
+    xr_strcpy(Name, name);
 }
 
 ISpatial_DB::~ISpatial_DB()
@@ -163,6 +162,7 @@ ISpatial_DB::~ISpatial_DB()
 		allocator.destroy		(allocator_pool.back());
 		allocator_pool.pop_back	();
 	}
+
 }
 
 void			ISpatial_DB::initialize(Fbox& BB)
@@ -186,7 +186,7 @@ void			ISpatial_DB::initialize(Fbox& BB)
 }
 ISpatial_NODE*	ISpatial_DB::_node_create		()
 {
-	stat_nodes	++;
+	Stats.NodeCount++;
 	if (allocator_pool.empty())			return allocator.create();
 	else								
 	{
@@ -198,7 +198,7 @@ ISpatial_NODE*	ISpatial_DB::_node_create		()
 void			ISpatial_DB::_node_destroy(ISpatial_NODE* &P)
 {
 	VERIFY						(P->_empty());
-	stat_nodes					--;
+	Stats.NodeCount--;
 	allocator_pool.push_back	(P);
 	P							= NULL;
 }
@@ -255,7 +255,7 @@ void			ISpatial_DB::insert		(ISpatial* S)
 {
 	cs.Enter			();
 #ifdef DEBUG
-	stat_insert.Begin	();
+	Stats.Insert.Begin();
 
 	BOOL		bValid	= _valid(S->spatial.sphere.R) && _valid(S->spatial.sphere.P);
 	if (!bValid)	
@@ -284,7 +284,7 @@ void			ISpatial_DB::insert		(ISpatial* S)
 		S->spatial.node_radius		=	m_bounds;
 	}
 #ifdef DEBUG
-	stat_insert.End		();
+	Stats.Insert.End();
 #endif
 	cs.Leave			();
 }
@@ -315,7 +315,7 @@ void			ISpatial_DB::remove		(ISpatial* S)
 {
 	cs.Enter			();
 #ifdef DEBUG
-	stat_remove.Begin	();
+	Stats.Remove.Begin();
 #endif
 	ISpatial_NODE* N	= S->spatial.node_ptr;
 	N->_remove			(S);
@@ -324,7 +324,7 @@ void			ISpatial_DB::remove		(ISpatial* S)
 	if (N->_empty())	_remove(N->parent,N);
 
 #ifdef DEBUG
-	stat_remove.End		();
+	Stats.Remove.End();
 #endif
 	cs.Leave			();
 }

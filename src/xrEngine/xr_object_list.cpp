@@ -10,6 +10,8 @@
 #include "xrCore/net_utils.h"
 
 #include "CustomHUD.h"
+#include "GameFont.h"
+#include "PerformanceAlert.hpp"
 
 class fClassEQ
 {
@@ -22,9 +24,21 @@ public:
 BOOL debug_destroy = TRUE;
 #endif
 
+void CObjectList::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+{
+    stats.FrameEnd();
+    float engineTotal = Device.GetStats().EngineTotal.result;
+    float percentage = 100.0f * stats.Update.result / engineTotal;
+    font.OutNext("uClients:    %2.2fms, %2.1f%%, crow(%d)/active(%d)/total(%d)", stats.Update.result,
+        percentage, stats.Crows, stats.Active, stats.Total);
+    if (alert && stats.Update.result>3.0f)
+        font.OutNext("UpdateCL   > 3ms: %3.1f", stats.Update.result);
+}
+
 CObjectList::CObjectList() :
     m_owner_thread_id(GetCurrentThreadId())
 {
+    statsFrame = u32(-1);
     ZeroMemory(map_NETID, 0xffff * sizeof(CObject*));
 }
 
@@ -115,8 +129,7 @@ void CObjectList::SingleUpdate(CObject* O)
 
     if (O->H_Parent())
         SingleUpdate(O->H_Parent());
-
-    Device.Statistic->UpdateClient_updated++;
+    stats.Updated++;
     O->dwFrame_UpdateCL = Device.dwFrame;
 
     // Msg ("[%d][0x%08x]IAmNotACrowAnyMore (CObjectList::SingleUpdate)", Device.dwFrame, dynamic_cast<void*>(O));
@@ -191,13 +204,18 @@ void CObjectList::clear_crow_vec(Objects& o)
 
 void CObjectList::Update(bool bForce)
 {
+    if (statsFrame != Device.dwFrame)
+    {
+        statsFrame = Device.dwFrame;
+        stats.FrameStart();
+    }
     if (!Device.Paused() || bForce)
     {
         // Clients
         if (Device.fTimeDelta>EPS_S || bForce)
         {
             // Select Crow-Mode
-            Device.Statistic->UpdateClient_updated = 0;
+            stats.Updated = 0;
 
             Objects& crows = m_crows[0];
 
@@ -228,7 +246,7 @@ void CObjectList::Update(bool bForce)
 # endif // ifdef DEBUG
 #endif
 
-            Device.Statistic->UpdateClient_crows = crows.size();
+            stats.Crows = crows.size();
             Objects* workload = 0;
             if (!psDeviceFlags.test(rsDisableObjectsAsCrows))
                 workload = &crows;
@@ -238,9 +256,9 @@ void CObjectList::Update(bool bForce)
                 clear_crow_vec(crows);
             }
 
-            Device.Statistic->UpdateClient.Begin();
-            Device.Statistic->UpdateClient_active = objects_active.size();
-            Device.Statistic->UpdateClient_total = objects_active.size() + objects_sleeping.size();
+            stats.Update.Begin();
+            stats.Active = objects_active.size();
+            stats.Total = objects_active.size() + objects_sleeping.size();
 
             u32 const objects_count = workload->size();
             CObject** objects = (CObject**)_alloca(objects_count*sizeof(CObject*));
@@ -259,7 +277,7 @@ void CObjectList::Update(bool bForce)
             for (CObject** i = b; i != e; ++i)
                 SingleUpdate(*i);
 
-            Device.Statistic->UpdateClient.End();
+            stats.Update.End();
         }
     }
 

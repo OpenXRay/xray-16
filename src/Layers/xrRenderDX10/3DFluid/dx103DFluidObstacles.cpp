@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "dx103DFluidObstacles.h"
-#include "Layers/xrRender/dxRenderDeviceRender.h"
 #include "xrEngine/xr_object.h"
 #include "xrEngine/IPhysicsShell.h"
 #include "xrEngine/IObjectPhysicsCollision.h"

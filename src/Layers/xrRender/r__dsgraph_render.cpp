@@ -258,11 +258,11 @@ void		sort_tlist_mat
 	}
 }
 
-void R_dsgraph_structure::r_dsgraph_render_graph	(u32	_priority, bool _clear)
+void D3DXRenderBase::r_dsgraph_render_graph	(u32	_priority, bool _clear)
 {
 
 	//PIX_EVENT(r_dsgraph_render_graph);
-	Device.Statistic->RenderDUMP.Begin		();
+	BasicStats.Primitives.Begin();
 
 	// **************************************************** NORMAL
 	// Perform sorting based on ScreenSpaceArea
@@ -453,12 +453,12 @@ void R_dsgraph_structure::r_dsgraph_render_graph	(u32	_priority, bool _clear)
 		if(_clear) vs.clear		();
 	}
 
-	Device.Statistic->RenderDUMP.End	();
+    BasicStats.Primitives.End();
 }
 
 //////////////////////////////////////////////////////////////////////////
 // HUD render
-void R_dsgraph_structure::r_dsgraph_render_hud	()
+void D3DXRenderBase::r_dsgraph_render_hud	()
 {
 	extern ENGINE_API float		psHUD_FOV;
 	
@@ -520,7 +520,7 @@ void R_dsgraph_structure::r_dsgraph_render_hud	()
 	RCache.set_xform_project	(Device.mProject);
 }
 
-void R_dsgraph_structure::r_dsgraph_render_hud_ui()
+void D3DXRenderBase::r_dsgraph_render_hud_ui()
 {
 	VERIFY(g_hud && g_hud->RenderActiveItemUIQuery());
 
@@ -571,7 +571,7 @@ void R_dsgraph_structure::r_dsgraph_render_hud_ui()
 
 //////////////////////////////////////////////////////////////////////////
 // strict-sorted render
-void	R_dsgraph_structure::r_dsgraph_render_sorted	()
+void	D3DXRenderBase::r_dsgraph_render_sorted	()
 {
 	// Sorted (back to front)
 	mapSorted.traverseRL	(sorted_L1);
@@ -580,7 +580,7 @@ void	R_dsgraph_structure::r_dsgraph_render_sorted	()
 
 //////////////////////////////////////////////////////////////////////////
 // strict-sorted render
-void	R_dsgraph_structure::r_dsgraph_render_emissive	()
+void	D3DXRenderBase::r_dsgraph_render_emissive	()
 {
 #if	RENDER!=R_R1
 	// Sorted (back to front)
@@ -619,7 +619,7 @@ void	R_dsgraph_structure::r_dsgraph_render_emissive	()
 
 //////////////////////////////////////////////////////////////////////////
 // strict-sorted render
-void	R_dsgraph_structure::r_dsgraph_render_wmarks	()
+void	D3DXRenderBase::r_dsgraph_render_wmarks	()
 {
 #if	RENDER!=R_R1
 	// Sorted (back to front)
@@ -630,7 +630,7 @@ void	R_dsgraph_structure::r_dsgraph_render_wmarks	()
 
 //////////////////////////////////////////////////////////////////////////
 // strict-sorted render
-void	R_dsgraph_structure::r_dsgraph_render_distort	()
+void	D3DXRenderBase::r_dsgraph_render_distort	()
 {
 	// Sorted (back to front)
 	mapDistort.traverseRL	(sorted_L1);
@@ -639,7 +639,7 @@ void	R_dsgraph_structure::r_dsgraph_render_distort	()
 
 //////////////////////////////////////////////////////////////////////////
 // sub-space rendering - shortcut to render with frustum extracted from matrix
-void	R_dsgraph_structure::r_dsgraph_render_subspace	(IRender_Sector* _sector, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
+void	D3DXRenderBase::r_dsgraph_render_subspace	(IRender_Sector* _sector, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
 {
 	CFrustum	temp;
 	temp.CreateFromMatrix			(mCombined,	FRUSTUM_P_ALL &(~FRUSTUM_P_NEAR));
@@ -647,7 +647,7 @@ void	R_dsgraph_structure::r_dsgraph_render_subspace	(IRender_Sector* _sector, Fm
 }
 
 // sub-space rendering - main procedure
-void	R_dsgraph_structure::r_dsgraph_render_subspace	(IRender_Sector* _sector, CFrustum* _frustum, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
+void	D3DXRenderBase::r_dsgraph_render_subspace	(IRender_Sector* _sector, CFrustum* _frustum, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
 {
 	VERIFY							(_sector);
 	RImplementation.marker			++;			// !!! critical here
@@ -727,7 +727,7 @@ void	R_dsgraph_structure::r_dsgraph_render_subspace	(IRender_Sector* _sector, CF
 #include "xrCore/FMesh.hpp"
 #include "FLOD.h"
 
-void	R_dsgraph_structure::r_dsgraph_render_R1_box	(IRender_Sector* _S, Fbox& BB, int sh)
+void	D3DXRenderBase::r_dsgraph_render_R1_box	(IRender_Sector* _S, Fbox& BB, int sh)
 {
 	CSector*	S			= (CSector*)_S;
 	lstVisuals.clear		();

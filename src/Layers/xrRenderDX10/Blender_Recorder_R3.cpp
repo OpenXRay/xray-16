@@ -4,9 +4,6 @@
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/blenders/Blender_Recorder.h"
 #include "Layers/xrRender/blenders/Blender.h"
-
-#include "Layers/xrRender/dxRenderDeviceRender.h"
-
 #include "Layers/xrRender/tss.h"
 
 void fix_texture_name(LPSTR fn);
@@ -57,7 +54,7 @@ void CBlender_Compile::r_dx10Texture(LPCSTR ResourceName,	LPCSTR texture)
 	R_ASSERT				(C->type == RC_dx10texture);
 	u32 stage				= C->samp.index;
 
-	passTextures.push_back	(mk_pair(stage, ref_texture(DEV->_CreateTexture(TexName))));
+	passTextures.push_back	(mk_pair(stage, ref_texture(RImplementation.Resources->_CreateTexture(TexName))));
 }
 
 void CBlender_Compile::i_dx10Address(u32 s, u32 address)
@@ -197,15 +194,15 @@ void	CBlender_Compile::r_Pass		(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, B
 	PassSET_LightFog		(FALSE,bFog);
 
 	// Create shaders
-	SPS* ps	= DEV->_CreatePS(_ps);
-	SVS* vs	= DEV->_CreateVS(_vs);
-	SGS* gs	= DEV->_CreateGS(_gs);
+	SPS* ps	= RImplementation.Resources->_CreatePS(_ps);
+	SVS* vs	= RImplementation.Resources->_CreateVS(_vs);
+	SGS* gs	= RImplementation.Resources->_CreateGS(_gs);
 	dest.ps	= ps;
 	dest.vs	= vs;
 	dest.gs	= gs;
 #ifdef USE_DX11
-	dest.hs = DEV->_CreateHS("null");
-	dest.ds = DEV->_CreateDS("null");
+    dest.hs = RImplementation.Resources->_CreateHS("null");
+    dest.ds = RImplementation.Resources->_CreateDS("null");
 #endif
 	ctable.merge			(&ps->constants);
 	ctable.merge			(&vs->constants);
@@ -223,8 +220,8 @@ void CBlender_Compile::r_TessPass(LPCSTR vs, LPCSTR hs, LPCSTR ds, LPCSTR gs, LP
 {
 	r_Pass(vs, gs, ps, bFog, bZtest, bZwrite, bABlend, abSRC, abDST, aTest, aRef);
 
-	dest.hs = DEV->_CreateHS(hs);
-	dest.ds = DEV->_CreateDS(ds);
+    dest.hs = RImplementation.Resources->_CreateHS(hs);
+    dest.ds = RImplementation.Resources->_CreateDS(ds);
 
 	ctable.merge(&dest.hs->constants);
 	ctable.merge(&dest.ds->constants);
@@ -232,7 +229,7 @@ void CBlender_Compile::r_TessPass(LPCSTR vs, LPCSTR hs, LPCSTR ds, LPCSTR gs, LP
 
 void CBlender_Compile::r_ComputePass(LPCSTR cs)
 {
-	dest.cs = DEV->_CreateCS(cs);
+    dest.cs = RImplementation.Resources->_CreateCS(cs);
 
 	ctable.merge(&dest.cs->constants);
 }
@@ -241,11 +238,10 @@ void CBlender_Compile::r_ComputePass(LPCSTR cs)
 void	CBlender_Compile::r_End			()
 {
 	SetMapping				();
-	dest.constants			= DEV->_CreateConstantTable(ctable);
-	dest.state				= DEV->_CreateState		(RS.GetContainer());
-	dest.T					= DEV->_CreateTextureList	(passTextures);
+	dest.constants			= RImplementation.Resources->_CreateConstantTable(ctable);
+	dest.state				= RImplementation.Resources->_CreateState		(RS.GetContainer());
+	dest.T					= RImplementation.Resources->_CreateTextureList	(passTextures);
 	dest.C					= 0;
 	ref_matrix_list			temp(0);
-	SH->passes.push_back	(DEV->_CreatePass(dest));
-	//SH->passes.push_back	(DEV->_CreatePass(dest.state,dest.ps,dest.vs,dest.gs,dest.constants,dest.T,temp,dest.C));
+	SH->passes.push_back	(RImplementation.Resources->_CreatePass(dest));
 }

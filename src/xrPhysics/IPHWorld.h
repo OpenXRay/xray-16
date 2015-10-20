@@ -14,7 +14,30 @@ protected:
 class IPHWorld:
 	public iphysics_scripted_class
 {
-	public:
+public:
+    struct PHWorldStatistics
+    {
+        CStatTimer Collision; // collision
+        CStatTimer Core; // integrate
+        CStatTimer MovCollision; // movement+collision
+
+        PHWorldStatistics() { FrameStart(); }
+
+        void FrameStart()
+        {
+            Collision.FrameStart();
+            Core.FrameStart();
+            MovCollision.FrameStart();
+        }
+
+        void FrameEnd()
+        {
+            Collision.FrameEnd();
+            Core.FrameEnd();
+            MovCollision.FrameEnd();
+        }
+    };
+
 	virtual								~IPHWorld						()									{}
 	virtual  float						Gravity							()									= 0;
 	virtual  void						SetGravity						( float	g )							= 0;
@@ -32,6 +55,8 @@ class IPHWorld:
 	virtual  void						set_default_character_contact_shotmark(ContactCallbackFun	*f)		= 0;
 	virtual  void						set_step_time_callback			(PhysicsStepTimeCallback* cb)		= 0;
 	virtual  void						set_update_callback				( IPHWorldUpdateCallbck* cb)		= 0;
+    virtual const PHWorldStatistics &GetStats() = 0;
+    virtual void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) = 0;
 #ifdef DEBUG
 	virtual  u16						ObjectsNumber					()									= 0;
 	virtual  u16						UpdateObjectsNumber				()									= 0;

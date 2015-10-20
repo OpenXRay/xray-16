@@ -36,6 +36,8 @@ class CPHWorld	:	public	pureFrame,
 					, public pureRender
 					#endif
 {
+private:
+    PHWorldStatistics stats;
 	double						m_start_time												;
 	u32							m_delay														;
 	u32							m_previous_delay											;
@@ -130,7 +132,9 @@ ContactCallbackFun				*default_character_contact_shotmark()						{ return m_defa
 #ifdef DEBUG
 	virtual void 				OnRender						()							;
 #endif
-	virtual void	_BCL		OnFrame							()							;
+	virtual void			OnFrame							()							;
+    virtual const PHWorldStatistics &GetStats() override { return stats; }
+    virtual void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) override;
 private:
 	void						StepNumIterations				( int num_it )				;
 	iphysics_scripted			&get_scripted					()							{ return *this; }

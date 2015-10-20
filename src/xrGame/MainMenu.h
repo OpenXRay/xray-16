@@ -159,13 +159,13 @@ public:
 	void			OnRenderPPUI_PP					();
 
 	virtual void			OnRender						();
-	virtual void	_BCL	OnFrame							(void);
+	virtual void		OnFrame							(void);
 
 	virtual bool	UseIndicators					()						{return false;}
 
 	void			OnDeviceCreate					();
 
-	void			Screenshot						(IRender_interface::ScreenshotMode mode=IRender_interface::SM_NORMAL, LPCSTR name = 0);
+	void			Screenshot						(IRender::ScreenshotMode mode=IRender::SM_NORMAL, LPCSTR name = 0);
 	void			RegisterPPDraw					(CUIWindow* w);
 	void			UnregisterPPDraw				(CUIWindow* w);
 

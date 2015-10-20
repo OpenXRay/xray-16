@@ -5,8 +5,6 @@
 #include "blenders\Blender_Recorder.h"
 #include "blenders\Blender.h"
 
-#include "dxRenderDeviceRender.h"
-
 void fix_texture_name(LPSTR fn);
 
 void	CBlender_Compile::r_Pass		(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BOOL bZwrite,	BOOL bABlend, D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
@@ -24,17 +22,17 @@ void	CBlender_Compile::r_Pass		(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, 
 	PassSET_LightFog		(FALSE,bFog);
 
 	// Create shaders
-	SPS* ps					= DEV->_CreatePS			(_ps);
-	SVS* vs					= DEV->_CreateVS			(_vs);
+    SPS* ps = RImplementation.Resources->_CreatePS(_ps);
+    SVS* vs = RImplementation.Resources->_CreateVS(_vs);
 	dest.ps					= ps;
 	dest.vs					= vs;
 #if defined(USE_DX10) || defined(USE_DX11)
-	SGS* gs					= DEV->_CreateGS			("null");
+	SGS* gs					= RImplementation.Resources->_CreateGS			("null");
 	dest.gs					= gs;
 #	ifdef USE_DX11
-	dest.hs = DEV->_CreateHS("null");
-	dest.ds = DEV->_CreateDS("null");
-	dest.cs = DEV->_CreateCS("null");
+    dest.hs = RImplementation.Resources->_CreateHS("null");
+    dest.ds = RImplementation.Resources->_CreateDS("null");
+    dest.cs = RImplementation.Resources->_CreateCS("null");
 #	endif
 #endif	//	USE_DX10
 	ctable.merge			(&ps->constants);
@@ -90,7 +88,7 @@ u32		CBlender_Compile::i_Sampler		(LPCSTR _name)
 }
 void	CBlender_Compile::i_Texture		(u32 s, LPCSTR name)
 {
-	if (name)	passTextures.push_back	(mk_pair(s, ref_texture(DEV->_CreateTexture(name))));
+    if (name)	passTextures.push_back(mk_pair(s, ref_texture(RImplementation.Resources->_CreateTexture(name))));
 }
 void	CBlender_Compile::i_Projective	(u32 s, bool b)
 {
@@ -169,13 +167,13 @@ void	CBlender_Compile::r_Sampler_clw	(LPCSTR name, LPCSTR texture, bool b_ps1x_P
 void	CBlender_Compile::r_End			()
 {
 	SetMapping				();
-	dest.constants			= DEV->_CreateConstantTable(ctable);
-	dest.state				= DEV->_CreateState		(RS.GetContainer());
-	dest.T					= DEV->_CreateTextureList	(passTextures);
+	dest.constants			= RImplementation.Resources->_CreateConstantTable(ctable);
+	dest.state				= RImplementation.Resources->_CreateState		(RS.GetContainer());
+	dest.T					= RImplementation.Resources->_CreateTextureList	(passTextures);
 	dest.C					= 0;
 #ifdef _EDITOR
 	dest.M					= 0;
 #endif
-	SH->passes.push_back(DEV->_CreatePass(dest));
+    SH->passes.push_back(RImplementation.Resources->_CreatePass(dest));
 }
 #endif	//	USE_DX10

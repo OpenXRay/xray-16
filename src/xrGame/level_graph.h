@@ -58,7 +58,10 @@ private:
 	u32						m_column_length;
 	u32						m_max_x;
 	u32						m_max_z;
-
+public:
+#ifndef AI_COMPILER
+    mutable CStatTimer NodeTime;
+#endif
 private:
 			u32		vertex						(const Fvector &position) const;
 			u32		guess_vertex_id				(u32 const &current_vertex_id, Fvector const &position) const;
@@ -198,7 +201,10 @@ public:
 	IC		void	set_invalid_vertex			(u32 &vertex_id, CVertex **vertex = NULL) const;
 	IC		const u32 vertex_id					(const CLevelGraph::CVertex *vertex) const;
 			u32		vertex_id					(const Fvector &position) const;
-			u32		vertex						(u32 current_vertex_id, const Fvector &position) const;
+private:
+    IC u32 VertexInternal(u32 current_vertex_id, const Fvector &position) const;
+public:
+    u32		vertex(u32 current_vertex_id, const Fvector &position) const;
 			void	choose_point				(const Fvector &start_point, const Fvector &finish_point, const SContour &contour, int vertex_id, Fvector &temp_point, int &saved_index) const;
 	IC		bool	check_vertex_in_direction	(u32 start_vertex_id, const Fvector &start_position, u32 finish_vertex_id) const;
 	IC		u32		check_position_in_direction (u32 start_vertex_id, const Fvector &start_position, const Fvector &finish_position) const;

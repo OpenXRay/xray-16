@@ -69,12 +69,12 @@ public:
 
     void Initialize(LPCSTR shader, LPCSTR texture);
 
-    IC void SetColor(u32 C) { dwCurrentColor = C; };
-
+    IC void SetColor(u32 C) { dwCurrentColor = C; }
+    u32 GetColor() const { return dwCurrentColor; }
     IC void SetHeightI(float S);
     IC void SetHeight(float S);
 
-    IC float GetHeight() { return fCurrentHeight; };
+    IC float GetHeight() const { return fCurrentHeight; };
     IC void SetInterval(float x, float y) { vInterval.set(x, y); };
     IC void SetInterval(const Fvector2& v) { vInterval.set(v); };
     IC void SetAligment(EAligment aligment) { eCurrentAlignment = aligment; }
@@ -88,6 +88,7 @@ public:
 
     void OutSetI(float x, float y);
     void OutSet(float x, float y);
+    Fvector2 GetPosition() const { return {fCurrentX, fCurrentY}; }
 
     void MasterOut(BOOL bCheckDevice, BOOL bUseCoords, BOOL bScaleCoords, BOOL bUseSkip,
         float _x, float _y, float _skip, LPCSTR fmt, va_list p);
@@ -100,7 +101,6 @@ public:
     void OutI(float _x, float _y, LPCSTR fmt, ...);
     void Out(float _x, float _y, LPCSTR fmt, ...);
     void OutNext(LPCSTR fmt, ...);
-
     void OutSkip(float val = 1.f);
 
     void OnRender();

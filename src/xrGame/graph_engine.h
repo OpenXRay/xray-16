@@ -101,6 +101,7 @@ public:
 #ifndef AI_COMPILER
 	CSolverAlgorithm		*m_solver_algorithm;
 	CStringAlgorithm		*m_string_algorithm;
+    CStatTimer PathTimer;
 #endif // AI_COMPILER
 
 public:

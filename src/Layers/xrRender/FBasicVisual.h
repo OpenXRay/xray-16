@@ -45,7 +45,7 @@ public:
 #endif
 #ifdef DEBUG
 	shared_str					dbg_name	;
-	virtual shared_str	_BCL	getDebugName() { return dbg_name; }
+	virtual shared_str		getDebugName() { return dbg_name; }
 #endif
 public:
 	// Common data for rendering
@@ -64,7 +64,7 @@ public:
 //	virtual	CKinematicsAnimated*dcast_PKinematicsAnimated	()				{ return 0;	}
 //	virtual IParticleCustom*	dcast_ParticleCustom		()				{ return 0;	}
 
-	virtual vis_data&	_BCL	getVisData() { return vis;}
+	virtual vis_data&		getVisData() { return vis;}
 	virtual u32					getType()	 { return Type;}
 
 	dxRender_Visual				();

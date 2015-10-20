@@ -3,7 +3,7 @@
 void CRenderTarget::accum_reflected		(light* L)
 {
 	phase_accumulator				();
-	RImplementation.stats.l_visible	++;
+    RImplementation.Stats.l_visible++;
 
 	// *** assume accumulator setted up ***
 	// *****************************	Mask by stencil		*************************************

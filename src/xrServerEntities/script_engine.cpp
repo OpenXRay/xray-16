@@ -37,7 +37,7 @@
 void jit_command(lua_State*, LPCSTR);
 
 #if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
-static void log_callback			(LPCSTR message)
+static void log_callback(void *context, const char *message)
 {
 	if (s_old_log_callback)
 		s_old_log_callback			(message);
@@ -81,7 +81,7 @@ static void initialize_lua_studio	( lua_State* state, cs::lua_studio::world*& wo
 	world							= s_create_world( *engine, false, false );
 	VERIFY							(world);
 
-	s_old_log_callback				= SetLogCB(&log_callback);
+	s_old_log_callback				= SetLogCB(LogCallback(log_callback, nullptr));
 
 	jit_command						(state, "debug=2");
 	jit_command						(state, "off");

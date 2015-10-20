@@ -511,6 +511,7 @@
     <ClInclude Include="no_single.h" />
     <ClInclude Include="ObjectAnimator.h" />
     <ClInclude Include="ObjectDump.h" />
+    <ClInclude Include="PerformanceAlert.hpp" />
     <ClInclude Include="perlin.h" />
     <ClInclude Include="Properties.h" />
     <ClInclude Include="property_collection.hpp" />
@@ -633,6 +634,7 @@
     <ClCompile Include="mailSlot.cpp" />
     <ClCompile Include="ObjectAnimator.cpp" />
     <ClCompile Include="ObjectDump.cpp" />
+    <ClCompile Include="PerformanceAlert.cpp" />
     <ClCompile Include="perlin.cpp" />
     <ClCompile Include="phdebug.cpp" />
     <ClCompile Include="PS_instance.cpp" />

@@ -4,6 +4,7 @@
 #pragma once
 
 #include "xrEngine/IGame_Persistent.h"
+#include "xrEngine/Render.h"
 
 class occTri;
 
@@ -13,19 +14,34 @@ class CHOM
 #endif
 {
 private:
+    struct HOMStatistics
+    {
+        CStatTimer Total;
+        u32 FrustumTriangleCount;
+        u32 VisibleTriangleCount;
+
+        HOMStatistics() { FrameStart(); }
+
+        void FrameStart()
+        {
+            Total.FrameStart();
+            FrustumTriangleCount = 0;
+            VisibleTriangleCount = 0;
+        }
+
+        void FrameEnd() { Total.FrameEnd(); }
+    };
+    
 	xrXRC					xrc;
 	CDB::MODEL*				m_pModel;
 	occTri*					m_pTris;
 	BOOL					bEnabled;
 	Fmatrix					m_xform;
 	Fmatrix					m_xform_01;
-#ifdef DEBUG
-	u32						tris_in_frame_visible	;
-	u32						tris_in_frame			;
-#endif
 
 	xrCriticalSection		MT;
 	volatile u32			MT_frame_rendered;
+    HOMStatistics stats;
 
 	void					Render_DB	(CFrustum&	base);
 public:
@@ -55,8 +71,8 @@ public:
 	CHOM	();
 	~CHOM	();
 
+    void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert);
 #ifdef DEBUG
 	virtual void			OnRender	();
-			void			stats		();
 #endif
 };

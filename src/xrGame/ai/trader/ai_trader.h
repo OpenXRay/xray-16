@@ -85,7 +85,7 @@ public:
 	virtual void			reinit					();
 	virtual void			reload					(LPCSTR section);
 
-static	void	_BCL		BoneCallback			(CBoneInstance *B);
+static	void			BoneCallback			(CBoneInstance *B);
 
 	void			LookAtActor				(CBoneInstance *B);
 

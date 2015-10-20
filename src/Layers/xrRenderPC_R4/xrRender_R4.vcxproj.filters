@@ -145,9 +145,6 @@
     <Filter Include="Interfase implementations\ThunderboltDescRender">
       <UniqueIdentifier>{9c69c7b1-4704-4e22-80a4-d2d0c38499f7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interfase implementations\StatsRender">
-      <UniqueIdentifier>{4f45bd86-fce6-4266-b545-03ff9a7e6be1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Interfase implementations\Debug">
       <UniqueIdentifier>{d078ed97-038b-475e-ac53-531218973aaa}</UniqueIdentifier>
     </Filter>
@@ -603,12 +600,6 @@
     <ClInclude Include="..\..\Include\xrRender\EnvironmentRender.h">
       <Filter>Interfase implementations\EnvironmentRender</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\dxRenderDeviceRender.h">
-      <Filter>Interfase implementations\RenderDeviceRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\xrRender\RenderDeviceRender.h">
-      <Filter>Interfase implementations\RenderDeviceRender</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Include\xrRender\ConsoleRender.h">
       <Filter>Interfase implementations\ConsoleRender</Filter>
     </ClInclude>
@@ -644,12 +635,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Include\xrRender\ThunderboltDescRender.h">
       <Filter>Interfase implementations\ThunderboltDescRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrRender\dxStatsRender.h">
-      <Filter>Interfase implementations\StatsRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\xrRender\StatsRender.h">
-      <Filter>Interfase implementations\StatsRender</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Include\xrRender\DebugShader.h">
       <Filter>Interfase implementations\Debug</Filter>
@@ -1253,9 +1238,6 @@
     <ClCompile Include="..\xrRender\dxEnvironmentRender.cpp">
       <Filter>Interfase implementations\EnvironmentRender</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\dxRenderDeviceRender.cpp">
-      <Filter>Interfase implementations\RenderDeviceRender</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\dxConsoleRender.cpp">
       <Filter>Interfase implementations\ConsoleRender</Filter>
     </ClCompile>
@@ -1273,9 +1255,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\dxThunderboltDescRender.cpp">
       <Filter>Interfase implementations\ThunderboltDescRender</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\dxStatsRender.cpp">
-      <Filter>Interfase implementations\StatsRender</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\dxDebugRender.cpp">
       <Filter>Interfase implementations\Debug\DebugRender</Filter>

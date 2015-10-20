@@ -32,6 +32,8 @@ private:
 class server_updates_compressor
 {
 public:
+    CStatTimer CompressStats;
+
 	server_updates_compressor	();
 	~server_updates_compressor	();
 

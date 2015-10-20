@@ -23,7 +23,6 @@
 #include "LightAnimLibrary.h"
 #include "editor_environment_weathers_time.hpp"
 #include "Include/xrRender/particles_systems_library_interface.hpp"
-#include "Include/xrRender/RenderDeviceRender.h"
 #include "editor_environment_ambients_ambient.hpp"
 #include "xr_efflensflare.h"
 

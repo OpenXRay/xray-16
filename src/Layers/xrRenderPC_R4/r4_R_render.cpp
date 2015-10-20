@@ -243,7 +243,7 @@ void CRender::Render		()
 	if (ps_r2_ls_flags.test(R2FLAG_ZFILL))		
 	{
 		PIX_EVENT(DEFER_Z_FILL);
-		Device.Statistic->RenderCALC.Begin			();
+        RImplementation.BasicStats.Culling.Begin();
 		float		z_distance	= ps_r2_zfill		;
 		Fmatrix		m_zfill, m_project				;
 		m_project.build_projection	(
@@ -256,7 +256,7 @@ void CRender::Render		()
 		phase										= PHASE_SMAP;
 		render_main									(m_zfill,false)	;
 		r_pmask										(true,false);	// disable priority "1"
-		Device.Statistic->RenderCALC.End				( )			;
+        RImplementation.BasicStats.Culling.End();
 
 		// flush
 		Target->phase_scene_prepare					();
@@ -271,7 +271,7 @@ void CRender::Render		()
 
 	//*******
 	// Sync point
-	Device.Statistic->RenderDUMP_Wait_S.Begin	();
+    RImplementation.BasicStats.WaitS.Begin();
 	if (1)
 	{
 		CTimer	T;							T.Start	();
@@ -287,14 +287,14 @@ void CRender::Render		()
 			}
 		}
 	}
-	Device.Statistic->RenderDUMP_Wait_S.End		();
+    RImplementation.BasicStats.WaitS.End();
 	q_sync_count								= (q_sync_count+1)%HW.Caps.iGPUNum;
 	//CHK_DX										(q_sync_point[q_sync_count]->Issue(D3DISSUE_END));
 	CHK_DX										(EndQuery(q_sync_point[q_sync_count]));
 
 	//******* Main calc - DEFERRER RENDERER
 	// Main calc
-	Device.Statistic->RenderCALC.Begin			();
+    RImplementation.BasicStats.Culling.Begin();
 	r_pmask										(true,false,true);	// enable priority "0",+ capture wmarks
 	if (bSUN)									set_Recorder	(&main_coarse_structure);
 	else										set_Recorder	(NULL);
@@ -302,7 +302,7 @@ void CRender::Render		()
 	render_main									(Device.mFullTransform,true);
 	set_Recorder								(NULL);
 	r_pmask										(true,false);	// disable priority "1"
-	Device.Statistic->RenderCALC.End			();
+    RImplementation.BasicStats.Culling.End();
 
 	BOOL	split_the_scene_to_minimize_wait		= FALSE;
 	if (ps_r2_ls_flags.test(R2FLAG_EXP_SPLIT_SCENE))	split_the_scene_to_minimize_wait=TRUE;
@@ -341,9 +341,9 @@ void CRender::Render		()
 		light_Package&	LP	= Lights.package;
 
 		// stats
-		stats.l_shadowed	= LP.v_shadowed.size();
-		stats.l_unshadowed	= LP.v_point.size() + LP.v_spot.size();
-		stats.l_total		= stats.l_shadowed + stats.l_unshadowed;
+		Stats.l_shadowed	= LP.v_shadowed.size();
+		Stats.l_unshadowed	= LP.v_point.size() + LP.v_spot.size();
+		Stats.l_total		= Stats.l_shadowed + Stats.l_unshadowed;
 
 		// perform tests
 		count				= _max	(count,LP.v_point.size());
@@ -454,7 +454,7 @@ void CRender::Render		()
 	if (bSUN)	
 	{
 		PIX_EVENT(DEFER_SUN);
-		RImplementation.stats.l_visible		++;
+		RImplementation.Stats.l_visible		++;
 		if( !ps_r2_ls_flags_ext.is(R2FLAGEXT_SUN_OLD))
 			render_sun_cascades					();
 		else

@@ -9,13 +9,6 @@
 #include <d3dx9.h>
 #pragma warning(default:4995)
 
-#ifndef _EDITOR
-#include "dxRenderDeviceRender.h"
-#endif
-
-
-
-
 void fix_texture_name(LPSTR fn)
 {
 	LPSTR _ext = strext(fn);
@@ -569,7 +562,7 @@ _BUMP_from_base:
 		// 
 		string256			fnameB;
 		strconcat			(sizeof(fnameB),fnameB,"$user$",fname,"_bumpX");
-		ref_texture			t_temp			= dxRenderDeviceRender::Instance().Resources->_CreateTexture	(fnameB);
+		ref_texture			t_temp			= Resources->_CreateTexture	(fnameB);
 		t_temp->surface_set	(T_normal_2C	);
 		_RELEASE			(T_normal_2C	);	// texture should keep reference to it by itself
 #endif

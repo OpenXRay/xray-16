@@ -9,9 +9,7 @@
 	#pragma comment(lib,"xrCoreB.lib")
 #else
 	#pragma comment(lib,"xrCore.lib")
-
 	#pragma comment(lib,"xrApi.lib")
-
 #endif
 
 #pragma comment(lib,"winmm.lib")

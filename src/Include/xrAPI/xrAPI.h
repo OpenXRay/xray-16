@@ -11,8 +11,8 @@
 
 
 #ifndef _EDITOR
-class IRender_interface;
-extern XRAPI_API IRender_interface*	Render;
+class IRender;
+extern XRAPI_API IRender*	Render;
 
 class IRenderFactory;
 extern XRAPI_API IRenderFactory*	RenderFactory;

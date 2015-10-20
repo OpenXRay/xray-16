@@ -431,9 +431,9 @@ void CLevel::OnFrame()
     else
         psDeviceFlags.set(rsDisableObjectsAsCrows, false);
     // commit events from bullet manager from prev-frame
-    Device.Statistic->TEST0.Begin();
+    stats.BulletManagerCommit.Begin();
     BulletManager().CommitEvents();
-    Device.Statistic->TEST0.End();
+    stats.BulletManagerCommit.End();
     // Client receive
     if (net_isDisconnected())
     {
@@ -449,9 +449,9 @@ void CLevel::OnFrame()
     }
     else
     {
-        Device.Statistic->netClient1.Begin();
+        stats.ClientRecv.Begin();
         ClientReceive();
-        Device.Statistic->netClient1.End();
+        stats.ClientRecv.End();
     }
     ProcessGameEvents();
     if (m_bNeed_CrPr)
@@ -566,9 +566,9 @@ void CLevel::OnFrame()
         ai().script_engine().script_process(ScriptEngine::eScriptProcessorLevel)->update();
     m_ph_commander->update();
     m_ph_commander_scripts->update();
-    Device.Statistic->TEST0.Begin();
+    stats.BulletManagerCommit.Begin();
     BulletManager().CommitRenderSet();
-    Device.Statistic->TEST0.End();
+    stats.BulletManagerCommit.End();
     // update static sounds
     if (!g_dedicated_server)
     {
@@ -762,6 +762,30 @@ void CLevel::OnEvent(EVENT E, u64 P1, u64 /**P2/**/)
         // sscanf((char*)P1,"%d,%f",&id,&s);
         // Environment->set_EnvMode(id,s);
     }
+}
+
+void CLevel::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+{
+    inherited::DumpStatistics(font, alert);
+    stats.FrameEnd();
+    font.OutNext("Client:");
+    font.OutNext("- receive:  %2.2fms, %d", stats.ClientRecv.result, stats.ClientRecv.count);
+    font.OutNext("- send:     %2.2fms, %d", stats.ClientSend.result, stats.ClientSend.count);
+    font.OutNext("- compress: %2.2fms", stats.ClientCompressor.result);
+    font.OutNext("- int send: %2.2fms, %d", stats.ClientSendInternal.result, stats.ClientSendInternal.count);
+    font.OutNext("- bmcommit: %2.2fms, %d", stats.BulletManagerCommit.result, stats.BulletManagerCommit.count);
+    stats.FrameStart();
+    if (Server)
+        Server->DumpStatistics(font, alert);
+    AIStats.FrameEnd();
+    font.OutNext("AI think:  %2.2fms, %d", AIStats.Think.result, AIStats.Think.count);
+    font.OutNext("- range:   %2.2fms, %d", AIStats.Range.result, AIStats.Range.count);
+    font.OutNext("- path:    %2.2fms, %d", AIStats.Path.result, AIStats.Path.count);
+    font.OutNext("- node:    %2.2fms, %d", AIStats.Node.result, AIStats.Node.count);
+    font.OutNext("AI vision: %2.2fms, %d", AIStats.Vis.result, AIStats.Vis.count);
+    font.OutNext("- query:   %2.2fms", AIStats.VisQuery.result);
+    font.OutNext("- rayCast: %2.2fms", AIStats.VisRayTests.result);
+    AIStats.FrameStart();
 }
 
 void CLevel::AddObject_To_Objects4CrPr(CGameObject* pObj)

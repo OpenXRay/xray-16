@@ -3,8 +3,6 @@
 
 #include "ResourceManager.h"
 
-#include "dxRenderDeviceRender.h"
-
 CRT::CRT			()
 {
 	pSurface		= NULL;
@@ -18,7 +16,7 @@ CRT::~CRT			()
 	destroy			();
 
 	// release external reference
-	DEV->_DeleteRT	(this);
+    RImplementation.Resources->_DeleteRT(this);
 }
 
 void CRT::create	(LPCSTR Name, u32 w, u32 h,	D3DFORMAT f, u32 SampleCount )
@@ -70,7 +68,7 @@ void CRT::create	(LPCSTR Name, u32 w, u32 h,	D3DFORMAT f, u32 SampleCount )
 	if (FAILED(_hr))					return;
 
 	// Try to create texture/surface
-	DEV->Evict				();
+    RImplementation.Resources->Evict();
 	_hr = HW.pDevice->CreateTexture		(w, h, 1, usage, f, D3DPOOL_DEFAULT, &pSurface,NULL);
 	HW.stats_manager.increment_stats_rtarget	( pSurface );
 
@@ -81,7 +79,7 @@ void CRT::create	(LPCSTR Name, u32 w, u32 h,	D3DFORMAT f, u32 SampleCount )
 	Msg			("* created RT(%s), %dx%d",Name,w,h);
 #endif // DEBUG
 	R_CHK		(pSurface->GetSurfaceLevel	(0,&pRT));
-	pTexture	= DEV->_CreateTexture	(Name);
+    pTexture = RImplementation.Resources->_CreateTexture(Name);
 	pTexture->surface_set	(pSurface);
 }
 
@@ -107,7 +105,7 @@ void CRT::reset_end		()
 }
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount )
 {
-	_set			(DEV->_CreateRT(Name,w,h,f));
+    _set(RImplementation.Resources->_CreateRT(Name, w, h, f));
 }
 
 

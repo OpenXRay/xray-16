@@ -29,7 +29,7 @@ private:
 	bool				stopped;
 	float				blend_linear_speed;
 	float				blend_angular_speed;
-	static void	_BCL	RootBoneCallback				( CBoneInstance* B );
+	static void		RootBoneCallback				( CBoneInstance* B );
 	void				deinitialize					();
 	void				BlendDestroy					( CBlend& blend );
 public:		

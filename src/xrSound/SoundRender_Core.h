@@ -9,6 +9,18 @@
 
 class CSoundRender_Core					: public CSound_manager_interface
 {
+protected:
+    struct SoundStatistics
+    {
+        CStatTimer Update; // total time taken by sound subsystem (accurate only in single-threaded mode)
+
+        SoundStatistics() { FrameStart(); }
+
+        void FrameStart() { Update.FrameStart(); }
+
+        void FrameEnd() { Update.FrameEnd(); }
+    };
+private:
     volatile BOOL						bLocked;
 protected:
 	virtual void						_create_data			( ref_sound_data& S, LPCSTR fName,	esound_type sound_type, int game_type); 
@@ -18,6 +30,8 @@ protected:
 
 	CSoundRender_Environment			e_current;
 	CSoundRender_Environment			e_target;
+    SoundStatistics Stats;
+
 public:
 	typedef	std::pair<ref_sound_data_ptr,float>	event;                                               
 	xr_vector<event>					s_events;
@@ -90,6 +104,7 @@ public:
 	virtual void						update					( const Fvector& P, const Fvector& D, const Fvector& N );
 	virtual void						update_events			( );
 	virtual void						statistic				( CSound_stats*  dest, CSound_stats_ext*  ext );
+    virtual void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) override;
 
 	// listener
 //	virtual const Fvector&				listener_position		( )=0;

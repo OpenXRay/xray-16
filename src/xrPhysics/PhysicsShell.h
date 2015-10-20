@@ -65,7 +65,7 @@ public:
 	virtual		void			Activate								(const Fmatrix& form,bool disable=false)																				= 0;
 	virtual	const	Fmatrix		&XFORM									()const																													{ return mXFORM; }
 	virtual		void			get_xform								( Fmatrix& form ) const	{ form.set( XFORM() ); }
-	virtual		void	_BCL	InterpolateGlobalTransform				(Fmatrix* m)																											= 0;
+	virtual		void		InterpolateGlobalTransform				(Fmatrix* m)																											= 0;
 //	virtual		void			GetGlobalTransformDynamic				(Fmatrix* m) const																										= 0;
 	virtual		void			InterpolateGlobalPosition				(Fvector* v)																											= 0;
 
@@ -92,7 +92,7 @@ public:
 	virtual		void			applyImpulse							(const Fvector& dir, float val)																							= 0;
 	virtual		void			setTorque								(const Fvector& torque)																									= 0;
 	virtual		void			setForce								(const Fvector& force)																									= 0;
-	virtual		void	_BCL	applyGravityAccel						(const Fvector& accel)																									= 0;
+	virtual		void		applyGravityAccel						(const Fvector& accel)																									= 0;
 	virtual		void			SetAirResistance						(float linear=default_k_l, float angular=default_k_w)																	= 0;
 	virtual		void			GetAirResistance						(float	&linear, float &angular)																						= 0;
 	virtual		void			set_DynamicLimits						(float l_limit=default_l_limit,float w_limit=default_w_limit)															= 0;
@@ -182,7 +182,7 @@ public:
 	virtual		bool							isFixed									()																													= 0;
 ////////////////////////////////////////////////////////////////IPhysicsElement////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	virtual	const	Fmatrix						&XFORM									()							const																					{ return CPhysicsBase::XFORM(); }
-	//virtual		void		_BCL				CalculateBoneTransform					( Fmatrix &bone_transform )const																= 0;
+	//virtual		void						CalculateBoneTransform					( Fmatrix &bone_transform )const																= 0;
 	virtual		void							GetPointVel								( Fvector	 &res_vel, const Fvector & point ) const																= 0;
 //	virtual			void						get_LinearVel							( Fvector& velocity )		const																					{ get_LinearVel( velocity ); }
 //	virtual			void						get_AngularVel							( Fvector& velocity )		const																					{ get_AngularVel( velocity ); }
@@ -383,7 +383,7 @@ virtual				void						GetGlobalTransformDynamic					(Fmatrix* m) 																
 	virtual			void						build_FromKinematics						(IKinematics* K,BONE_P_MAP* p_geting_map=NULL)												= 0;
 	virtual			void						preBuild_FromKinematics						(IKinematics* K,BONE_P_MAP* p_geting_map=NULL)												= 0;
 	virtual			void						Build										(bool disable=false)																		= 0;
-	virtual			void		_BCL			ActivatingBonePoses							(IKinematics &K)																			= 0;
+	virtual			void					ActivatingBonePoses							(IKinematics &K)																			= 0;
 	virtual			void						SetMaxAABBRadius							(float size)																				 {};
 
 	virtual			void						AddTracedGeom								(u16 element=0,u16 geom=0)																	= 0;

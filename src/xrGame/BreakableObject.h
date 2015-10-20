@@ -64,7 +64,7 @@ private:
 	void			CheckHitBreak		(float power,ALife::EHitType hit_type);
 	void			ProcessDamage		();
 	void			SendDestroy			();
-	void	_BCL		enable_notificate	();
+	void			enable_notificate	();
 //	static 	void	ObjectContactCallback(bool& /**do_colide/**/,bool bo1,dContact& c,SGameMtl * /*material_1*/,SGameMtl * /*material_2*/);
 private:
 	virtual ICollisionDamageReceiver	*PHCollisionDamageReceiver	()								{return (this);}

@@ -999,7 +999,7 @@ void CAI_Stalker::shedule_Update		( u32 DT )
 		// here is monster AI call
 		VERIFY							(_valid(Position()));
 		m_fTimeUpdateDelta				= dt;
-		Device.Statistic->AI_Think.Begin	();
+        Level().AIStats.Think.Begin();
 		if (GetScriptControl())
 			ProcessScripts				();
 		else
@@ -1008,7 +1008,7 @@ void CAI_Stalker::shedule_Update		( u32 DT )
 #endif
 				Think					();
 		m_dwLastUpdateTime				= Device.dwTimeGlobal;
-		Device.Statistic->AI_Think.End	();
+        Level().AIStats.Think.End();
 		VERIFY							(_valid(Position()));
 
 		// Look and action streams

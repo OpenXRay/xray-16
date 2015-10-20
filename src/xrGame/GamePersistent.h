@@ -70,14 +70,14 @@ public:
 	virtual	void		OnGameStart				();
 	virtual void		OnGameEnd				();
 
-	virtual void	_BCL	OnFrame					();
+	virtual void		OnFrame					();
 	virtual void			OnEvent					(EVENT E, u64 P1, u64 P2);
 
 	virtual void		UpdateGameType			();
 
 	virtual void		RegisterModel			(IRenderVisual* V);
 	virtual	float		MtlTransparent			(u32 mtl_idx);
-	virtual	void		Statistics				(CGameFont* F);
+    virtual	void		DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) override;
 
 	virtual bool		OnRenderPPUI_query		();
 	virtual void		OnRenderPPUI_main		();

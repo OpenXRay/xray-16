@@ -1,8 +1,5 @@
 #include "stdafx.h"
 #include "dxEnvironmentRender.h"
-
-#include "dxRenderDeviceRender.h"
-
 #include "xrEngine/Environment.h"
 #include "Layers/xrRender/ResourceManager.h"
 
@@ -165,15 +162,15 @@ void dxEnvDescriptorRender::OnDeviceDestroy()
 
 dxEnvironmentRender::dxEnvironmentRender()
 {
-	tsky0	= DEV->_CreateTexture("$user$sky0");
-	tsky1	= DEV->_CreateTexture("$user$sky1");
+	tsky0	= RImplementation.Resources->_CreateTexture("$user$sky0");
+	tsky1	= RImplementation.Resources->_CreateTexture("$user$sky1");
 }
 
 void dxEnvironmentRender::OnFrame(CEnvironment &env)
 {
 	dxEnvDescriptorMixerRender &mixRen = *(dxEnvDescriptorMixerRender*)&*env.CurrentEnv->m_pDescriptorMixer;
 
-	if (::Render->get_generation()==IRender_interface::GENERATION_R2){
+	if (::Render->get_generation()==IRender::GENERATION_R2){
 		//. very very ugly hack
 		if (HW.Caps.raster_major >= 3 && HW.Caps.geometry.bVTF){
 			// tonemapping in VS
@@ -216,7 +213,7 @@ void dxEnvironmentRender::OnFrame(CEnvironment &env)
 
 void dxEnvironmentRender::OnLoad()
 {
-	tonemap	= DEV->_CreateTexture("$user$tonemap");	//. hack
+    tonemap = RImplementation.Resources->_CreateTexture("$user$tonemap");	//. hack
 }
 
 void dxEnvironmentRender::OnUnload()

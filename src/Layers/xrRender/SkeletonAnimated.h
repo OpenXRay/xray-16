@@ -171,8 +171,8 @@ public:
 	virtual void				Release			();
 	virtual void				Spawn			();
 	virtual	IKinematicsAnimated*dcast_PKinematicsAnimated() { return this;	}
-	virtual IRenderVisual*	_BCL	dcast_RenderVisual		() { return this; }
-	virtual IKinematics*	_BCL 	dcast_PKinematics		()  { return this; }
+	virtual IRenderVisual*		dcast_RenderVisual		() { return this; }
+	virtual IKinematics*	 	dcast_PKinematics		()  { return this; }
 
 	virtual						~CKinematicsAnimated	();
 								CKinematicsAnimated		();

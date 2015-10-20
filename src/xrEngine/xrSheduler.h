@@ -25,6 +25,22 @@ private:
         BOOL RT;
         ISheduled* Object;
     };
+    
+    struct SchedulerStatistics
+    {
+        float Load;
+        CStatTimer Update;
+
+        SchedulerStatistics() { FrameStart(); }
+
+        void FrameStart()
+        {
+            Load = 0.0f;
+            Update.FrameStart();
+        }
+
+        void FrameEnd() { Update.FrameEnd(); }
+    };
 private:
     xr_vector<Item> ItemsRT;
     xr_vector<Item> Items;
@@ -32,6 +48,7 @@ private:
     xr_vector<ItemReg> Registration;
     ISheduled* m_current_step_obj;
     bool m_processing_now;
+    SchedulerStatistics stats;
 
     IC void Push(Item& I);
     IC void Pop();
@@ -59,6 +76,12 @@ public:
 
     void Initialize();
     void Destroy();
+    void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert);
+    const CStatTimer &GetUpdateTime()
+    {
+        stats.FrameEnd();
+        return stats.Update;
+    }
 };
 
 #endif // XRSHEDULER_H_INCLUDED

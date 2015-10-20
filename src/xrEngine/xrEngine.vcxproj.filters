@@ -573,6 +573,9 @@
     <ClInclude Include="GameMtlLib.h">
       <Filter>Game API\MaterialSystem</Filter>
     </ClInclude>
+    <ClInclude Include="PerformanceAlert.hpp">
+      <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">
@@ -892,6 +895,9 @@
     </ClCompile>
     <ClCompile Include="GameMtlLib_Engine.cpp">
       <Filter>Game API\MaterialSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="PerformanceAlert.cpp">
+      <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -29,6 +29,8 @@
 #include "xrserver_objects_alife_monsters.h"
 #include "xrServerEntities/xrServer_Object_Base.h"
 #include "UI/UIGameTutorial.h"
+#include "xrEngine/GameFont.h"
+#include "xrEngine/PerformanceAlert.hpp"
 
 #ifndef MASTER_GOLD
 #	include "custommonster.h"
@@ -735,12 +737,13 @@ void CGamePersistent::OnEvent(EVENT E, u64 P1, u64 P2)
 	}
 }
 
-void CGamePersistent::Statistics	(CGameFont* F)
+void CGamePersistent::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
 {
+    IGame_Persistent::DumpStatistics(font, alert);
 #ifdef DEBUG
 #	ifndef _EDITOR
 		m_last_stats_frame		= m_frame_counter;
-		profiler().show_stats	(F,!!psAI_Flags.test(aiStats));
+		profiler().show_stats(&font,!!psAI_Flags.test(aiStats));
 #	endif
 #endif
 }

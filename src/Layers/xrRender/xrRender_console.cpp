@@ -2,7 +2,6 @@
 #pragma		hdrstop
 
 #include	"xrRender_console.h"
-#include	"dxRenderDeviceRender.h"
 
 u32			ps_Preset				=	2	;
 xr_token							qpreset_token							[ ]={
@@ -323,7 +322,7 @@ public:
 		string_path	name;	name[0]=0;
 		sscanf		(args,"%s",	name);
 		LPCSTR		image	= xr_strlen(name)?name:0;
-		::Render->Screenshot(IRender_interface::SM_NORMAL,image);
+		::Render->Screenshot(IRender::SM_NORMAL,image);
 	}
 };
 
@@ -440,7 +439,7 @@ public		:
 		u32 m_lmaps = 0; 
 		u32 c_lmaps = 0;
 
-		dxRenderDeviceRender::Instance().ResourcesGetMemoryUsage( m_base, c_base, m_lmaps, c_lmaps );
+		RImplementation.ResourcesGetMemoryUsage( m_base, c_base, m_lmaps, c_lmaps );
 
 		Msg		("memory usage  mb \t \t video    \t managed      \t system \n" );
 
@@ -625,7 +624,7 @@ public:
 	CCC_DumpResources(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
 	virtual void Execute(LPCSTR args) {
 		RImplementation.Models->dump();
-		dxRenderDeviceRender::Instance().Resources->Dump(false);
+		RImplementation.Resources->Dump(false);
 	}
 };
 

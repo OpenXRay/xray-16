@@ -7,7 +7,6 @@
 #include "xrEngine/x_ray.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/stream_reader.h"
-#include "Layers/xrRender/dxRenderDeviceRender.h"
 
 #pragma warning(push)
 #pragma warning(disable:4995)
@@ -21,7 +20,7 @@ void CRender::level_Load(IReader* fs)
 
 	// Begin
 	pApp->LoadBegin					();
-	dxRenderDeviceRender::Instance().Resources->DeferredLoad	(TRUE);
+    Resources->DeferredLoad	(TRUE);
 	IReader*						chunk;
 
 	// Shaders
@@ -42,7 +41,7 @@ void CRender::level_Load(IReader* fs)
 			LPSTR			delim	= strchr(n_sh,'/');
 			*delim					= 0;
 			xr_strcpy					(n_tlist,delim+1);
-			Shaders[i]				= dxRenderDeviceRender::Instance().Resources->Create(n_sh,n_tlist);
+			Shaders[i]				= Resources->Create(n_sh,n_tlist);
 		}
 		chunk->close();
 	}
@@ -197,7 +196,7 @@ void CRender::level_Unload()
 void CRender::LoadBuffers		(CStreamReader *base_fs,	BOOL _alternative)
 {
 	R_ASSERT2					(base_fs,"Could not load geometry. File not found.");
-	dxRenderDeviceRender::Instance().Resources->Evict		();
+    Resources->Evict		();
 	u32	dwUsage					= D3DUSAGE_WRITEONLY;
 
 	xr_vector<VertexDeclarator>				&_DC	= _alternative?xDC:nDC;

@@ -287,11 +287,11 @@ public:
 	// callback на анимации модели актера
 	void					SetCallbacks		();
 	void					ResetCallbacks		();
-	static void		_BCL	Spin0Callback		(CBoneInstance*);
-	static void		_BCL	Spin1Callback		(CBoneInstance*);
-	static void		_BCL	ShoulderCallback	(CBoneInstance*);
-	static void		_BCL	HeadCallback		(CBoneInstance*);
-	static void		_BCL	VehicleHeadCallback	(CBoneInstance*);
+	static void			Spin0Callback		(CBoneInstance*);
+	static void			Spin1Callback		(CBoneInstance*);
+	static void			ShoulderCallback	(CBoneInstance*);
+	static void			HeadCallback		(CBoneInstance*);
+	static void			VehicleHeadCallback	(CBoneInstance*);
 
 	virtual const SRotation	Orientation			()	const	{ return r_torso; };
 	SRotation				&Orientation		()			 { return r_torso; };
@@ -634,7 +634,7 @@ public:
 		void							SetWeaponHideState				(u16 State, bool bSet);
 private://IPhysicsShellHolder
 
-virtual	 void	_BCL	HideAllWeapons					( bool v ){ SetWeaponHideState(INV_STATE_BLOCK_ALL,v); }	
+virtual	 void		HideAllWeapons					( bool v ){ SetWeaponHideState(INV_STATE_BLOCK_ALL,v); }	
 
 public:
 		void							SetCantRunState					(bool bSet);

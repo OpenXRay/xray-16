@@ -323,7 +323,7 @@ ICF void BeginStream(ref_geom hGeom, u32& w_offset, FVF::LIT*& w_verts, FVF::LIT
 	w_start					= w_verts;
 }
 
-ICF void FlushStream(ref_geom hGeom, ref_shader shader, u32& w_offset, FVF::LIT*& w_verts, FVF::LIT*& w_start, BOOL bSuppressCull)
+ICF u32 FlushStream(ref_geom hGeom, ref_shader shader, u32& w_offset, FVF::LIT*& w_verts, FVF::LIT*& w_start, BOOL bSuppressCull)
 {
 	u32 w_count					= u32(w_verts-w_start);
 	RCache.Vertex.Unlock		(w_count,hGeom->vb_stride);
@@ -334,8 +334,8 @@ ICF void FlushStream(ref_geom hGeom, ref_shader shader, u32& w_offset, FVF::LIT*
 		if (bSuppressCull)		RCache.set_CullMode (CULL_NONE);
 		RCache.Render			(D3DPT_TRIANGLELIST,w_offset,w_count/3);
 		if (bSuppressCull)		RCache.set_CullMode	(CULL_CCW);
-		Device.Statistic->RenderDUMP_WMT_Count += w_count/3;
 	}
+    return w_count/3;
 }
 
 void CWallmarksEngine::Render()
@@ -353,10 +353,10 @@ void CWallmarksEngine::Render()
 	Device.mView.build_camera_dir	(mViewPos,Device.vCameraDirection,Device.vCameraTop);
 	RCache.set_xform_view		(Device.mView);
 
-	Device.Statistic->RenderDUMP_WM.Begin	();
-	Device.Statistic->RenderDUMP_WMS_Count	= 0;
-	Device.Statistic->RenderDUMP_WMD_Count	= 0;
-	Device.Statistic->RenderDUMP_WMT_Count	= 0;
+	RImplementation.BasicStats.Wallmarks.Begin();
+	RImplementation.BasicStats.StaticWMCount = 0;
+	RImplementation.BasicStats.DynamicWMCount = 0;
+	RImplementation.BasicStats.WMTriCount = 0;
 
 	float	ssaCLIP				= r_ssaDISCARD/4;
 
@@ -371,13 +371,14 @@ void CWallmarksEngine::Render()
 		for (StaticWMVecIt w_it=slot->static_items.begin(); w_it!=slot->static_items.end(); ){
 			static_wallmark* W	= *w_it;
 			if (RImplementation.ViewBase.testSphere_dirty(W->bounds.P,W->bounds.R)){
-				Device.Statistic->RenderDUMP_WMS_Count++;
+                RImplementation.BasicStats.StaticWMCount++;
 				float dst	= Device.vCameraPosition.distance_to_sqr(W->bounds.P);
 				float ssa	= W->bounds.R * W->bounds.R / dst;
 				if (ssa>=ssaCLIP)	{
 					u32 w_count		= u32(w_verts-w_start);
-					if ((w_count+W->verts.size())>=(MAX_TRIS*3)){
-						FlushStream	(hGeom,slot->shader,w_offset,w_verts,w_start,FALSE);
+					if ((w_count+W->verts.size())>=(MAX_TRIS*3))
+                    {
+                        RImplementation.BasicStats.WMTriCount += FlushStream(hGeom, slot->shader, w_offset, w_verts, w_start, FALSE);
 						BeginStream	(hGeom,w_offset,w_verts,w_start);
 					}
 					static_wm_render	(W,w_verts);
@@ -395,7 +396,7 @@ void CWallmarksEngine::Render()
 			}
 		}
 		// Flush stream
-		FlushStream				(hGeom,slot->shader,w_offset,w_verts,w_start,FALSE);	//. remove line if !(suppress cull needed)
+        RImplementation.BasicStats.WMTriCount += FlushStream(hGeom, slot->shader, w_offset, w_verts, w_start, FALSE);	//. remove line if !(suppress cull needed)
 		BeginStream				(hGeom,w_offset,w_verts,w_start);
 
 		// dynamic wallmarks
@@ -416,11 +417,13 @@ void CWallmarksEngine::Render()
 
 			float dst	= Device.vCameraPosition.distance_to_sqr(W->m_Bounds.P);
 			float ssa	= W->m_Bounds.R * W->m_Bounds.R / dst;
-			if (ssa>=ssaCLIP){
-				Device.Statistic->RenderDUMP_WMD_Count++;
+			if (ssa>=ssaCLIP)
+            {
+                RImplementation.BasicStats.DynamicWMCount++;
 				u32 w_count		= u32(w_verts-w_start);
-				if ((w_count+W->VCount())>=(MAX_TRIS*3)){
-					FlushStream	(hGeom,slot->shader,w_offset,w_verts,w_start,TRUE);
+				if ((w_count+W->VCount())>=(MAX_TRIS*3))
+                {
+                    RImplementation.BasicStats.WMTriCount += FlushStream(hGeom, slot->shader, w_offset, w_verts, w_start, TRUE);
 					BeginStream	(hGeom,w_offset,w_verts,w_start);
 				}
 
@@ -439,14 +442,14 @@ void CWallmarksEngine::Render()
 		}
 		slot->skeleton_items.clear();
 		// Flush stream
-		FlushStream				(hGeom,slot->shader,w_offset,w_verts,w_start,TRUE);
+        RImplementation.BasicStats.WMTriCount += FlushStream(hGeom, slot->shader, w_offset, w_verts, w_start, TRUE);
 	}
 
 	lock.Leave();				// Physics may add wallmarks in parallel with rendering
 
 	// Level-wmarks
 	RImplementation.r_dsgraph_render_wmarks	();
-	Device.Statistic->RenderDUMP_WM.End		();
+    RImplementation.BasicStats.Wallmarks.End();
 
 	// Projection
 	Device.mView				= mSavedView;

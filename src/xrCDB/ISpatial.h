@@ -150,6 +150,41 @@ public:
 //////////////////////////////////////////////////////////////////////////
 class XRCDB_API	ISpatial_DB
 {
+public:
+    struct SpatialDBStatistics
+    {
+        u32 NodeCount;
+        u32 ObjectCount;
+#ifdef DEBUG
+        CStatTimer Insert; // debug only
+        CStatTimer Remove; // debug only
+#endif
+        CStatTimer Query;
+
+        SpatialDBStatistics()
+        {
+            NodeCount = ObjectCount = 0;
+            FrameStart();
+        }
+
+        void FrameStart()
+        {
+#ifdef DEBUG
+            Insert.FrameStart();
+            Remove.FrameStart();
+#endif
+            Query.FrameStart();
+        }
+
+        void FrameEnd()
+        {
+#ifdef DEBUG
+            Insert.FrameEnd();
+            Remove.FrameEnd();
+#endif
+            Query.FrameEnd();
+        }
+    };
 private:
 	xrCriticalSection				cs;
 
@@ -158,15 +193,15 @@ private:
 	xr_vector<ISpatial_NODE*>		allocator_pool;
 	ISpatial*						rt_insert_object;
 public:
+    char Name[64];
 	ISpatial_NODE*					m_root;
 	Fvector							m_center;
 	float							m_bounds;
 	xr_vector<ISpatial*>*			q_result;
-	u32								stat_nodes;
-	u32								stat_objects;
-	CStatTimer						stat_insert;
-	CStatTimer						stat_remove;
+    SpatialDBStatistics Stats;
 private:
+    friend class ISpatial_NODE;
+    
 	IC u32							_octant			(u32 x, u32 y, u32 z)			{	return z*4 + y*2 + x;	}
 	IC u32							_octant			(Fvector& base, Fvector& rel)
 	{
@@ -183,7 +218,7 @@ private:
 	void							_insert			(ISpatial_NODE* N, Fvector& n_center, float n_radius);
 	void							_remove			(ISpatial_NODE* N, ISpatial_NODE* N_sub);
 public:
-	ISpatial_DB();
+	ISpatial_DB(const char *name);
 	~ISpatial_DB();
 
 	// managing

@@ -103,7 +103,7 @@ public:
 	virtual		void		Draw					();
 
 	virtual		void			OnRender				();
-	virtual		void	_BCL	OnFrame					();
+	virtual		void		OnFrame					();
 
 		CUICellItem*		ParentItem				()							{return m_pParent;}
 				void		SetBackList				(CUIDragDropListEx*l);

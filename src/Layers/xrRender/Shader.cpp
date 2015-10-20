@@ -7,37 +7,33 @@
 
 #include "Shader.h"
 #include "ResourceManager.h"
-
-#include "dxRenderDeviceRender.h"
-
-
 //
-STextureList::~STextureList				()			{	DEV->_DeleteTextureList	(this);			}
-SMatrixList::~SMatrixList				()			{	DEV->_DeleteMatrixList		(this);			}
-SConstantList::~SConstantList			()			{	DEV->_DeleteConstantList	(this);			}
-SPass::~SPass							()			{	DEV->_DeletePass			(this);			}
-ShaderElement::~ShaderElement			()			{	DEV->_DeleteElement		(this);			}
-SGeometry::~SGeometry					()			{	DEV->DeleteGeom			(this);			}
-Shader::~Shader							()			{	DEV->Delete				(this);			}
-																							 
+STextureList::~STextureList() { RImplementation.Resources->_DeleteTextureList(this); }
+SMatrixList::~SMatrixList() { RImplementation.Resources->_DeleteMatrixList(this); }
+SConstantList::~SConstantList() { RImplementation.Resources->_DeleteConstantList(this); }
+SPass::~SPass() { RImplementation.Resources->_DeletePass(this); }
+ShaderElement::~ShaderElement() { RImplementation.Resources->_DeleteElement(this); }
+SGeometry::~SGeometry() { RImplementation.Resources->DeleteGeom(this); }
+Shader::~Shader() { RImplementation.Resources->Delete(this); }
+																			 
 //////////////////////////////////////////////////////////////////////////					 
 void	resptrcode_shader::create		(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
 {
-	_set(DEV->Create		(s_shader,s_textures,s_constants,s_matrices));
+    _set(RImplementation.Resources->Create(s_shader, s_textures, s_constants, s_matrices));
 }
 void	resptrcode_shader::create		(IBlender* B, LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
 {
-	_set(DEV->Create		(B,s_shader,s_textures,s_constants,s_matrices));
+    _set(RImplementation.Resources->Create(B, s_shader, s_textures, s_constants, s_matrices));
 }
 
 //////////////////////////////////////////////////////////////////////////
 void	resptrcode_geom::create			(u32 FVF , ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
 {
-	_set(DEV->CreateGeom		(FVF,vb,ib));
+    _set(RImplementation.Resources->CreateGeom(FVF, vb, ib));
 }
 void	resptrcode_geom::create			(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
 {
-	_set(DEV->CreateGeom		(decl,vb,ib));
+    _set(RImplementation.Resources->CreateGeom(decl, vb, ib));
 }
 
 //////////////////////////////////////////////////////////////////////

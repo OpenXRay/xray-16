@@ -3,7 +3,7 @@
 void CRenderTarget::accum_point		(light* L)
 {
 	phase_accumulator				();
-	RImplementation.stats.l_visible	++;
+    RImplementation.Stats.l_visible++;
 
 	ref_shader		shader			= L->s_point;
 	if (!shader)	shader			= s_accum_point;

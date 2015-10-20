@@ -6,7 +6,7 @@
 #include "HOM.h"
 #include "occRasterizer.h"
 #include "xrEngine/GameFont.h"
-#include "dxRenderDeviceRender.h"
+#include "xrEngine/PerformanceAlert.hpp"
  
 float	psOSSR		= .001f;
 
@@ -183,10 +183,8 @@ void CHOM::Render_DB			(CFrustum& base)
 	clip.CreateFromMatrix		(Device.mFullTransform,FRUSTUM_P_NEAR);
 	sPoly						src,dst;
 	u32		_frame				= Device.dwFrame	;
-#ifdef DEBUG
-	tris_in_frame				= xrc.r_count();
-	tris_in_frame_visible		= 0;
-#endif
+    stats.FrustumTriangleCount = xrc.r_count();
+    stats.VisibleTriangleCount = 0;
 
 	// Perfrom selection, sorting, culling
 	for (; it!=end; it++)
@@ -210,9 +208,7 @@ void CHOM::Render_DB			(CFrustum& base)
 		if (0==P)		{ T.skip=next; continue; }
 
 		// XForm and Rasterize
-#ifdef DEBUG
-		tris_in_frame_visible	++;
-#endif
+        stats.VisibleTriangleCount++;
 		u32		pixels			= 0;
 		int		limit			= int(P->size())-1;
 		for (int v=1; v<limit; v++)	{
@@ -229,12 +225,12 @@ void CHOM::Render		(CFrustum& base)
 {
 	if (!bEnabled)		return;
 	
-	Device.Statistic->RenderCALC_HOM.Begin	();
+	stats.Total.Begin();
 	Raster.clear		();
 	Render_DB			(base);
 	Raster.propagade	();
 	MT_frame_rendered	= Device.dwFrame;
-	Device.Statistic->RenderCALC_HOM.End	();
+    stats.Total.End();
 }
 
 ICF	BOOL	xform_b0	(Fvector2& min, Fvector2& max, float& minz, Fmatrix& X, float _x, float _y, float _z)
@@ -289,7 +285,7 @@ BOOL CHOM::visible		(vis_data& vis)
 {
 	if (Device.dwFrame<vis.hom_frame)	return TRUE;				// not at this time :)
 	if (!bEnabled)						return TRUE;				// return - everything visible
-	
+    stats.Total.Begin();
 	// Now, the test time comes
 	// 0. The object was hidden, and we must prove that each frame	- test		| frame-old, tested-new, hom_res = false;
 	// 1. The object was visible, but we must to re-check it		- test		| frame-new, tested-???, hom_res = true;
@@ -297,9 +293,7 @@ BOOL CHOM::visible		(vis_data& vis)
 	u32 frame_current	= Device.dwFrame;
 	// u32	frame_prev		= frame_current-1;
 
-#ifdef DEBUG
-	Device.Statistic->RenderCALC_HOM.Begin	();
-#endif
+
 	BOOL result			= _visible			(vis.box,m_xform_01);
 	u32  delay			= 1;
 	if (result)
@@ -311,10 +305,7 @@ BOOL CHOM::visible		(vis_data& vis)
 	}
 	vis.hom_frame			= frame_current + delay;
 	vis.hom_tested			= frame_current	;
-#ifdef DEBUG
-	Device.Statistic->RenderCALC_HOM.End	();
-#endif
-
+    stats.Total.End();
 	return result;
 }
 
@@ -340,6 +331,15 @@ void CHOM::Disable		()
 void CHOM::Enable		()
 {
 	bEnabled			= m_pModel?TRUE:FALSE;
+}
+
+void CHOM::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+{
+    stats.FrameEnd();
+    auto modelTris = m_pModel ? m_pModel->get_tris_count() : 0;
+    font.OutNext(" **** HOM: %2.2fms (%d) visible[%2d] frustum[%2d] total[%2d]",
+        stats.Total.result, stats.Total.count, stats.VisibleTriangleCount, stats.FrustumTriangleCount, modelTris);
+    stats.FrameStart();
 }
 
 #ifdef DEBUG
@@ -368,7 +368,7 @@ void CHOM::OnRender	()
 			RCache.set_xform_world(Fidentity);
 			// draw solid
 			Device.SetNearer(TRUE);
-			RCache.set_Shader	(dxRenderDeviceRender::Instance().m_SelectionShader);
+			RCache.set_Shader	(RImplementation.m_SelectionShader);
 			RCache.dbg_Draw		(D3DPT_TRIANGLELIST,&*poly.begin(),poly.size()/3);
 			Device.SetNearer(FALSE);
 			// draw wire
@@ -377,7 +377,7 @@ void CHOM::OnRender	()
 			}else{
 				Device.SetNearer(TRUE);
 			}
-			RCache.set_Shader	(dxRenderDeviceRender::Instance().m_SelectionShader);
+			RCache.set_Shader	(RImplementation.m_SelectionShader);
 			RCache.dbg_Draw		(D3DPT_LINELIST,&*line.begin(),line.size()/2);
 			if (bDebug){
 				RImplementation.rmNormal();
@@ -385,16 +385,6 @@ void CHOM::OnRender	()
 				Device.SetNearer(FALSE);
 			}
 		}
-	}
-}
-void CHOM::stats()
-{
-	if (m_pModel){
-		CGameFont& F		= *Device.Statistic->Font();
-		F.OutNext			(" **** HOM-occ ****");
-		F.OutNext			("  visible:  %2d", tris_in_frame_visible);
-		F.OutNext			("  frustum:  %2d", tris_in_frame);
-		F.OutNext			("    total:  %2d", m_pModel->get_tris_count());
 	}
 }
 #endif

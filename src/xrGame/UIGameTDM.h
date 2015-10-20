@@ -41,7 +41,7 @@ public:
 			void		SetBuyMsgCaption		(LPCSTR str);
 	virtual void		SetFraglimit			(int local_frags, int fraglimit);
 	virtual void		Render					();
-	virtual void _BCL	OnFrame					();
+	virtual void 	OnFrame					();
 	
 	virtual	bool		IR_UIOnKeyboardPress	(int dik);
 	virtual bool		IR_UIOnKeyboardRelease	(int dik);

@@ -14,34 +14,47 @@
 #include "xrCore/ftimer.h"
 #include "stats.h"
 
-
-
 #define VIEWPORT_NEAR 0.2f
 
 #define DEVICE_RESET_PRECACHE_FRAME_COUNT 10
 
 #include "Include/xrRender/FactoryPtr.h"
-#include "Include/xrRender/RenderDeviceRender.h"
+#include "Render.h"
 
 #ifdef INGAME_EDITOR
 # include "Include/editor/interfaces.hpp"
-#endif // #ifdef INGAME_EDITOR
+#endif
 
 class engine_impl;
 
 #pragma pack(push,4)
 
-class IRenderDevice
+class ENGINE_API IRenderDevice
 {
 public:
-    virtual CStatsPhysics* _BCL StatPhysics() = 0;
-    virtual void _BCL AddSeqFrame(pureFrame* f, bool mt) = 0;
-    virtual void _BCL RemoveSeqFrame(pureFrame* f) = 0;
+    struct RenderDeviceStatictics
+    {
+        CStatTimer RenderTotal; // pureRender
+        CStatTimer EngineTotal; // pureFrame
+        float fFPS, fRFPS, fTPS; // FPS, RenderFPS, TPS
+
+        RenderDeviceStatictics()
+        {
+            fFPS = 30.f;
+            fRFPS = 30.f;
+            fTPS = 0;
+        }
+    };
+
+    virtual ~IRenderDevice() {}
+    virtual void  AddSeqFrame(pureFrame* f, bool mt) = 0;
+    virtual void  RemoveSeqFrame(pureFrame* f) = 0;
+    virtual const RenderDeviceStatictics &GetStats() const = 0;
+    virtual void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) = 0;
 };
 
 class ENGINE_API CRenderDeviceData
 {
-
 public:
     u32 dwWidth;
     u32 dwHeight;
@@ -95,15 +108,15 @@ public:
     CRegistrator <pureScreenResolutionChanged> seqResolutionChanged;
 
     HWND m_hWnd;
-    // CStats* Statistic;
-
 };
 
 class ENGINE_API CRenderDeviceBase :
     public IRenderDevice,
     public CRenderDeviceData
 {
-public:
+protected:
+    CStats* Statistic; // XXX: remove (global stats)
+    CRenderDeviceBase() { Statistic = nullptr; }
 };
 
 #pragma pack(pop)
@@ -115,11 +128,8 @@ private:
     u32 m_dwWindowStyle;
     RECT m_rcWindowBounds;
     RECT m_rcWindowClient;
-
-    //u32 Timer_MM_Delta;
-    //CTimer_paused Timer;
-    //CTimer_paused TimerGlobal;
     CTimer TimerMM;
+    RenderDeviceStatictics stats;
 
     void _Create(LPCSTR shName);
     void _Destroy(BOOL bKeepTextures);
@@ -140,9 +150,7 @@ public:
 public:
     //ref_shader m_WireShader;
     //ref_shader m_SelectionShader;
-
-    IRenderDeviceRender* m_pRender;
-
+    
     BOOL m_bNearer;
     void SetNearer(BOOL enabled)
     {
@@ -156,65 +164,34 @@ public:
             m_bNearer = FALSE;
             mProject._43 += EPS_L;
         }
-        m_pRender->SetCacheXform(mView, mProject);
+        Render->SetCacheXform(mView, mProject);
         //R_ASSERT(0);
         // TODO: re-implement set projection
         //RCache.set_xform_project (mProject);
     }
 
-    void DumpResourcesMemoryUsage() { m_pRender->ResourcesDumpMemoryUsage(); }
+    void DumpResourcesMemoryUsage() { Render->ResourcesDumpMemoryUsage(); }
 public:
-    // Registrators
-    //CRegistrator <pureRender > seqRender;
-    // CRegistrator <pureAppActivate > seqAppActivate;
-    // CRegistrator <pureAppDeactivate > seqAppDeactivate;
-    // CRegistrator <pureAppStart > seqAppStart;
-    // CRegistrator <pureAppEnd > seqAppEnd;
-    //CRegistrator <pureFrame > seqFrame;
     CRegistrator <pureFrame > seqFrameMT;
     CRegistrator <pureDeviceReset > seqDeviceReset;
     xr_vector <fastdelegate::FastDelegate0<> > seqParallel;
-
-    // Dependent classes
-    //CResourceManager* Resources;
-
-    CStats* Statistic;
-
-    // Engine flow-control
-    //float fTimeDelta;
-    //float fTimeGlobal;
-    //u32 dwTimeDelta;
-    //u32 dwTimeGlobal;
-    //u32 dwTimeContinual;
-
-    // Cameras & projection
-    //Fvector vCameraPosition;
-    //Fvector vCameraDirection;
-    //Fvector vCameraTop;
-    //Fvector vCameraRight;
-
-    //Fmatrix mView;
-    //Fmatrix mProject;
-    //Fmatrix mFullTransform;
-
+    
     Fmatrix mInvFullTransform;
 
-    //float fFOV;
-    //float fASPECT;
-
     CRenderDevice()
-        :
-        m_pRender(0)
+        : m_dwWindowStyle(0)
 #ifdef INGAME_EDITOR
-        , m_editor_module(0),
+        ,
+        m_editor_module(0),
         m_editor_initialize(0),
         m_editor_finalize(0),
         m_editor(0),
         m_engine(0)
 #endif // #ifdef INGAME_EDITOR
 #ifdef PROFILE_CRITICAL_SECTIONS
-        ,mt_csEnter(MUTEX_PROFILE_ID(CRenderDevice::mt_csEnter))
-        ,mt_csLeave(MUTEX_PROFILE_ID(CRenderDevice::mt_csLeave))
+        ,
+        mt_csEnter(MUTEX_PROFILE_ID(CRenderDevice::mt_csEnter)),
+        mt_csLeave(MUTEX_PROFILE_ID(CRenderDevice::mt_csLeave))
 #endif // #ifdef PROFILE_CRITICAL_SECTIONS
     {
         m_hWnd = NULL;
@@ -244,7 +221,6 @@ public:
     u32 TimerAsync_MMT() { return TimerMM.GetElapsed_ms() + Timer_MM_Delta; }
 
     // Creation & Destroying
-    void ConnectToRender();
     void Create(void);
     void Run(void);
     void Destroy(void);
@@ -252,7 +228,8 @@ public:
 
     void Initialize(void);
     void ShutDown(void);
-
+    virtual const RenderDeviceStatictics &GetStats() const override { return stats; }
+    virtual void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) override;
 public:
     void time_factor(const float& time_factor)
     {
@@ -282,15 +259,16 @@ public:
             seqParallel.erase(I);
     }
 
+private:
+    void CalcFrameStats();
 public:
     void xr_stdcall on_idle();
     bool xr_stdcall on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result);
 
 private:
     void message_loop();
-    virtual void _BCL AddSeqFrame(pureFrame* f, bool mt);
-    virtual void _BCL RemoveSeqFrame(pureFrame* f);
-    virtual CStatsPhysics* _BCL StatPhysics() { return Statistic; }
+    virtual void  AddSeqFrame(pureFrame* f, bool mt);
+    virtual void  RemoveSeqFrame(pureFrame* f);
 #ifdef INGAME_EDITOR
 public:
     IC editor::ide* editor() const { return m_editor; }

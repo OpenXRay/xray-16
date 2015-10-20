@@ -305,9 +305,12 @@ void CGameFont::MasterOut(
 }
 
 #define MASTER_OUT(CHECK_DEVICE,USE_COORDS,SCALE_COORDS,USE_SKIP,X,Y,SKIP,FMT) \
- { va_list p; va_start ( p , fmt ); \
- MasterOut( CHECK_DEVICE , USE_COORDS , SCALE_COORDS , USE_SKIP , X , Y , SKIP , FMT, p ); \
- va_end( p ); }
+{ \
+    va_list p; \
+    va_start ( p , fmt ); \
+    MasterOut( CHECK_DEVICE , USE_COORDS , SCALE_COORDS , USE_SKIP , X , Y , SKIP , FMT, p ); \
+    va_end( p ); \
+}
 
 void __cdecl CGameFont::OutI(float _x, float _y, LPCSTR fmt, ...)
 {
@@ -323,7 +326,6 @@ void __cdecl CGameFont::OutNext(LPCSTR fmt, ...)
 {
     MASTER_OUT(TRUE, FALSE, FALSE, TRUE, 0.0f, 0.0f, 1.0f, fmt);
 };
-
 
 void CGameFont::OutSkip(float val)
 {

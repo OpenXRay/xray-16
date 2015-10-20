@@ -2,6 +2,8 @@
 #pragma hdrstop
 
 #include "IGame_Persistent.h"
+#include "GameFont.h"
+#include "PerformanceAlert.hpp"
 
 #ifndef _EDITOR
 #include "Environment.h"
@@ -151,8 +153,7 @@ void IGame_Persistent::Prefetch()
     ObjectPool.prefetch();
     Log("Loading models...");
     Render->models_Prefetch();
-    //Device.Resources->DeferredUpload ();
-    Device.m_pRender->ResourcesDeferredUpload();
+    Render->ResourcesDeferredUpload();
 
     p_time = 1000.f*Device.GetTimerGlobal()->GetElapsed_sec() - p_time;
     u32 p_mem = Memory.mem_usage() - mem_0;
@@ -174,15 +175,12 @@ void IGame_Persistent::OnGameEnd()
 void IGame_Persistent::OnFrame()
 {
 #ifndef _EDITOR
-
     if (!Device.Paused() || Device.dwPrecacheFrame)
         Environment().OnFrame();
 
-
-    Device.Statistic->Particles_starting = ps_needtoplay.size();
-    Device.Statistic->Particles_active = ps_active.size();
-    Device.Statistic->Particles_destroy = ps_destroy.size();
-
+    stats.Starting = ps_needtoplay.size();
+    stats.Active = ps_active.size();
+    stats.Destroying = ps_destroy.size();
     // Play req particle systems
     while (ps_needtoplay.size())
     {
@@ -203,7 +201,7 @@ void IGame_Persistent::OnFrame()
         }
         ps_destroy.pop_back();
         psi->PSI_internal_delete();
-    }
+    }    
 #endif
 }
 
@@ -253,6 +251,14 @@ void IGame_Persistent::destroy_particles(const bool& all_particles)
 void IGame_Persistent::OnAssetsChanged()
 {
 #ifndef _EDITOR
-    Device.m_pRender->OnAssetsChanged(); //Resources->m_textures_description.Load();
+    Render->OnAssetsChanged(); 
 #endif
+}
+
+void IGame_Persistent::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+{
+    // XXX: move to particle engine
+    stats.FrameEnd();
+    font.OutNext("Particles: starting[%d] active[%d] destroying[%d]", stats.Starting, stats.Active, stats.Destroying);
+    stats.FrameStart();
 }
