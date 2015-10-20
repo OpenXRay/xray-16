@@ -121,30 +121,24 @@ void CRenderDevice::End(void)
 #endif
 #endif // !DEDICATED_SERVER
 }
-static volatile u32 mt_Thread_marker = 0x12345678;
-void mt_Thread(void* ptr)
+
+void CRenderDevice::SecondaryThreadProc(void *context)
 {
+    auto &device = *static_cast<CRenderDevice*>(context);
     while (true)
     {
-        // waiting for Device permission to execute
-        Device.mt_csEnter.Enter();
-        if (Device.mt_bMustExit)
+        device.syncProcessFrame.Wait();
+        if (device.mt_bMustExit)
         {
-            Device.mt_bMustExit = FALSE; // Important!!!
-            Device.mt_csEnter.Leave(); // Important!!!
+            device.mt_bMustExit = FALSE;
+            device.syncThreadExit.Set();
             return;
         }
-        mt_Thread_marker = Device.dwFrame;
-        for (u32 pit = 0; pit < Device.seqParallel.size(); pit++)
-            Device.seqParallel[pit]();
-        Device.seqParallel.clear_not_free();
-        Device.seqFrameMT.Process(rp_Frame);
-        // now we give control to device - signals that we are ended our work
-        Device.mt_csEnter.Leave();
-        // waits for device signal to continue - to start again
-        Device.mt_csLeave.Enter();
-        // returns sync signal to device
-        Device.mt_csLeave.Leave();
+        for (u32 pit = 0; pit < device.seqParallel.size(); pit++)
+            device.seqParallel[pit]();
+        device.seqParallel.clear_not_free();
+        device.seqFrameMT.Process(rp_Frame);
+        device.syncFrameDone.Set();
     }
 }
 
@@ -242,11 +236,7 @@ void CRenderDevice::on_idle()
     mFullTransform_saved = mFullTransform;
     mView_saved = mView;
     mProject_saved = mProject;
-    // *** Resume threads
-    // Capture end point - thread must run only ONE cycle
-    // Release start point - allow thread to run
-    mt_csLeave.Enter(); // prevent secondary thread to proceed with the next frame
-    mt_csEnter.Leave(); // allow secondary thread to do its work
+    syncProcessFrame.Set(); // allow secondary thread to do its job
     Sleep(0);
 
 #ifndef DEDICATED_SERVER
@@ -266,19 +256,7 @@ void CRenderDevice::on_idle()
     renderTotalReal.FrameEnd();
     stats.RenderTotal.accum = renderTotalReal.accum;
 #endif // #ifndef DEDICATED_SERVER
-    // *** Suspend threads
-    // Capture startup point
-    // Release end point - allow thread to wait for startup point
-    mt_csEnter.Enter(); // wait for secondary thread to finish its work
-    mt_csLeave.Leave(); // allow secondary thread to wait for its work in the next frame
-    // Ensure, that second thread gets chance to execute anyway
-    if (dwFrame!=mt_Thread_marker)
-    {
-        for (u32 pit = 0; pit < Device.seqParallel.size(); pit++)
-            Device.seqParallel[pit]();
-        Device.seqParallel.clear_not_free();
-        seqFrameMT.Process(rp_Frame);
-    }
+    syncFrameDone.Wait(); // wait until secondary thread finish its job
 #ifdef DEDICATED_SERVER
     u32 FrameEndTime = TimerGlobal.GetElapsed_ms();
     u32 FrameTime = (FrameEndTime - FrameStartTime);
@@ -338,9 +316,8 @@ void CRenderDevice::Run()
         Timer_MM_Delta = time_system - time_local;
     }
     // Start all threads
-    mt_csEnter.Enter();
     mt_bMustExit = FALSE;
-    thread_spawn(mt_Thread, "X-RAY Secondary thread", 0, 0);
+    thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
     // Message cycle
     seqAppStart.Process(rp_AppStart);
     Render->ClearTarget();
@@ -348,7 +325,8 @@ void CRenderDevice::Run()
     seqAppEnd.Process(rp_AppEnd);
     // Stop Balance-Thread
     mt_bMustExit = TRUE;
-    mt_csEnter.Leave();
+    syncProcessFrame.Set();
+    syncThreadExit.Wait();
     while (mt_bMustExit)
         Sleep(0);
 }
