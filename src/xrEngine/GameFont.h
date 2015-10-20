@@ -101,6 +101,7 @@ public:
     void OutI(float _x, float _y, LPCSTR fmt, ...);
     void Out(float _x, float _y, LPCSTR fmt, ...);
     void OutNext(LPCSTR fmt, ...);
+    void OutNextVA(const char *format, va_list args);
     void OutSkip(float val = 1.f);
 
     void OnRender();

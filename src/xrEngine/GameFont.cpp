@@ -327,6 +327,9 @@ void __cdecl CGameFont::OutNext(LPCSTR fmt, ...)
     MASTER_OUT(TRUE, FALSE, FALSE, TRUE, 0.0f, 0.0f, 1.0f, fmt);
 };
 
+void CGameFont::OutNextVA(const char *format, va_list args)
+{ MasterOut(TRUE, FALSE, FALSE, TRUE, 0.0f, 0.0f, 1.0f, format, args); }
+
 void CGameFont::OutSkip(float val)
 {
     fCurrentY += val*CurrentHeight_();
