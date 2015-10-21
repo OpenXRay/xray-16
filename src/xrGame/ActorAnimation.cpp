@@ -622,20 +622,7 @@ void CActor::g_SetAnimation( u32 mstate_rl )
 #ifdef DEBUG
 	if ((Level().CurrentControlEntity() == this) && g_ShowAnimationInfo) {
 		string128 buf;
-		xr_strcpy(buf,"");
-		if (isActorAccelerated(mstate_rl, IsZoomAimingMode()))		xr_strcat(buf,"Accel ");
-		if (mstate_rl&mcCrouch)		xr_strcat(buf,"Crouch ");
-		if (mstate_rl&mcFwd)		xr_strcat(buf,"Fwd ");
-		if (mstate_rl&mcBack)		xr_strcat(buf,"Back ");
-		if (mstate_rl&mcLStrafe)	xr_strcat(buf,"LStrafe ");
-		if (mstate_rl&mcRStrafe)	xr_strcat(buf,"RStrafe ");
-		if (mstate_rl&mcJump)		xr_strcat(buf,"Jump ");
-		if (mstate_rl&mcFall)		xr_strcat(buf,"Fall ");
-		if (mstate_rl&mcTurn)		xr_strcat(buf,"Turn ");
-		if (mstate_rl&mcLanding)	xr_strcat(buf,"Landing ");
-		if (mstate_rl&mcLLookout)	xr_strcat(buf,"LLookout ");
-		if (mstate_rl&mcRLookout)	xr_strcat(buf,"RLookout ");
-		if (m_bJumpKeyPressed)		xr_strcat(buf,"+Jumping ");
+        ConvState(mstate_rl, &buf);
 		UI().Font().pFontStat->OutNext	("MSTATE:     [%s]",buf);
 /*
 		switch (m_PhysicMovementControl->Environment())
