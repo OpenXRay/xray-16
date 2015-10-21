@@ -25,7 +25,6 @@ public:
     virtual void OnRender();
     void OnDeviceCreate(void);
     void OnDeviceDestroy(void);
-    IC CGameFont* Font() { return statsFont; }
 
 private:
     void FilteredLog(const char *s);
