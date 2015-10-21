@@ -112,10 +112,8 @@ void CStats::Show()
         return;
     auto &font = *statsFont;
     auto engineTotal = Device.GetStats().EngineTotal.result;
-    const float fontBaseSize = 0.01f;
-    PerformanceAlert alertInstance(fontBaseSize, {300, 300});
+    PerformanceAlert alertInstance(font.GetHeight(), {300, 300});
     auto alertPtr = g_bDisableRedText ? nullptr : &alertInstance;
-    font.SetHeightI(fontBaseSize);
     if (vtune.enabled())
     {
         float sz = font.GetHeight();
@@ -147,7 +145,6 @@ void CStats::Show()
         if (physics_world())
             physics_world()->DumpStatistics(font, alertPtr);
         font.OutSkip();
-        font.SetHeightI(fontBaseSize);
         font.OutSet(200, 0);
         Render->DumpStatistics(font, alertPtr);
         font.OutSkip();
@@ -180,7 +177,6 @@ void CStats::Show()
     {
         font.SetColor(color_rgba(255, 16, 16, 191));
         font.OutSet(200, 0);
-        font.SetHeightI(fontBaseSize);
         for (u32 it = (u32)_max(int(0), (int)errors.size() - g_ErrorLineCount); it < errors.size(); it++)
             font.OutNext("%s", errors[it].c_str());
         font.OnRender();
