@@ -102,29 +102,16 @@ static void DumpColliderStatistics(CGameFont &font, PerformanceAlert *alert)
 
 void CStats::Show()
 {
-    {
-        float mem_count = float(Memory.stat_calls);
-        if (mem_count > fMem_calls)
-            fMem_calls = mem_count;
-        else
-            fMem_calls = 0.9f*fMem_calls + 0.1f*mem_count;
-        Memory.stat_calls = 0;
-    }
+    float memCalls = float(Memory.stat_calls);
+    if (memCalls > fMem_calls)
+        fMem_calls = memCalls;
+    else
+        fMem_calls = 0.9f*fMem_calls + 0.1f*memCalls;
+    Memory.stat_calls = 0;
     if (g_dedicated_server)
         return;
     auto &font = *statsFont;
     auto engineTotal = Device.GetStats().EngineTotal.result;
-    int frm = 2000;
-    div_t ddd = div(Device.dwFrame, frm);
-    if (ddd.rem<frm/2.0f)
-    {
-        font.SetColor(0xFFFFFFFF);
-        font.OutSet(0, 0);
-        font.OutNext(*eval_line_1);
-        font.OutNext(*eval_line_2);
-        font.OutNext(*eval_line_3);
-        font.OnRender();
-    }
     const float fontBaseSize = 0.01f;
     PerformanceAlert alertInstance(fontBaseSize, {300, 300});
     auto alertPtr = g_bDisableRedText ? nullptr : &alertInstance;
@@ -169,21 +156,14 @@ void CStats::Show()
         pInput->DumpStatistics(font, alertPtr);        
         font.OutSkip();
 #ifdef DEBUG_MEMORY_MANAGER
-        font.OutSkip();
         font.OutNext("str: cmp[%3d], dock[%3d], qpc[%3d]", Memory.stat_strcmp, Memory.stat_strdock, CPU::qpc_counter);
         Memory.stat_strcmp = 0;
         Memory.stat_strdock = 0;
         CPU::qpc_counter = 0;
-#else // DEBUG_MEMORY_MANAGER
-        font.OutSkip();
+#else
         font.OutNext("qpc[%3d]", CPU::qpc_counter);
         CPU::qpc_counter = 0;
-#endif // DEBUG_MEMORY_MANAGER
-        font.OutSkip();
-        // process pureStats
-        font.OutSet(400, 0);
-        font.SetHeightI(fontBaseSize);
-        seqStats.Process(rp_Stats);
+#endif
         font.OnRender();
     }
     if (psDeviceFlags.test(rsCameraPos))
@@ -196,19 +176,13 @@ void CStats::Show()
         font.OnRender();
     }
 #ifdef DEBUG
-    // Show errors
     if (!g_bDisableRedText && errors.size())
     {
         font.SetColor(color_rgba(255, 16, 16, 191));
         font.OutSet(200, 0);
         font.SetHeightI(fontBaseSize);
-#if 0
-        for (u32 it = 0; it < errors.size(); it++)
-            font.OutNext("%s", errors[it].c_str());
-#else
         for (u32 it = (u32)_max(int(0), (int)errors.size() - g_ErrorLineCount); it < errors.size(); it++)
             font.OutNext("%s", errors[it].c_str());
-#endif
         font.OnRender();
     }
 #endif
@@ -216,23 +190,10 @@ void CStats::Show()
 
 void CStats::OnDeviceCreate()
 {
-    g_bDisableRedText = strstr(Core.Params, "-xclsx") ? TRUE : FALSE;
-
-    // if (!strstr(Core.Params, "-dedicated"))
+    g_bDisableRedText = !!strstr(Core.Params, "-xclsx");
 #ifndef DEDICATED_SERVER
     statsFont = xr_new<CGameFont>("stat_font", CGameFont::fsDeviceIndependent);
 #endif
-
-    if (!pSettings->section_exist("evaluation")
-            || !pSettings->line_exist("evaluation", "line1")
-            || !pSettings->line_exist("evaluation", "line2")
-            || !pSettings->line_exist("evaluation", "line3"))
-        FATAL("");
-
-    eval_line_1 = pSettings->r_string_wb("evaluation", "line1");
-    eval_line_2 = pSettings->r_string_wb("evaluation", "line2");
-    eval_line_3 = pSettings->r_string_wb("evaluation", "line3");
-    //
 #ifdef DEBUG
     if (!g_bDisableRedText)
     {

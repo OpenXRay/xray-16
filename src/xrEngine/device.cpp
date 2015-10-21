@@ -248,8 +248,7 @@ void CRenderDevice::on_idle()
     {
         seqRender.Process(rp_Render);        
         CalcFrameStats();
-        if (psDeviceFlags.test(rsCameraPos) || psDeviceFlags.test(rsStatistic) || Statistic->errors.size())
-            Statistic->Show();        
+        Statistic->Show();        
         End(); // Present goes here
     }
     renderTotalReal.End();

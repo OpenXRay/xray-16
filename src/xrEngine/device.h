@@ -116,7 +116,7 @@ class ENGINE_API CRenderDeviceBase :
     public CRenderDeviceData
 {
 protected:
-    CStats* Statistic; // XXX: remove (global stats)
+    CStats* Statistic;
     CRenderDeviceBase() { Statistic = nullptr; }
 };
 

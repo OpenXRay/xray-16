@@ -12,28 +12,23 @@ DECLARE_MESSAGE(Stats);
 
 class ENGINE_API CStats : public pureRender
 {
-public:
+private:
     CGameFont *statsFont;
     float fMem_calls;
-    u32 dwMem_calls;
-    shared_str eval_line_1;
-    shared_str eval_line_2;
-    shared_str eval_line_3;
+    xr_vector<shared_str> errors;
+
+public:
+    CStats();
+    ~CStats();
 
     void Show(void);
     virtual void OnRender();
     void OnDeviceCreate(void);
     void OnDeviceDestroy(void);
+    IC CGameFont* Font() { return statsFont; }
+
 private:
     void FilteredLog(const char *s);
-public:
-    xr_vector <shared_str> errors;
-    CRegistrator <pureStats> seqStats; // XXX: not used
-public:
-    CStats();
-    ~CStats();
-
-    IC CGameFont* Font() { return statsFont; }
 };
 
 enum
