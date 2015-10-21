@@ -29,10 +29,12 @@ void CObjectList::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
     stats.FrameEnd();
     float engineTotal = Device.GetStats().EngineTotal.result;
     float percentage = 100.0f * stats.Update.result / engineTotal;
-    font.OutNext("uClients:    %2.2fms, %2.1f%%, crow(%d)/active(%d)/total(%d)", stats.Update.result,
-        percentage, stats.Crows, stats.Active, stats.Total);
+    font.OutNext("Objects:      %2.2fms, %2.1f%%", stats.Update.result, percentage);
+    font.OutNext("- crow:       %d", stats.Crows);
+    font.OutNext("- active:     %d", stats.Active);
+    font.OutNext("- total:      %d", stats.Total);
     if (alert && stats.Update.result>3.0f)
-        alert->Print(font, "UpdateCL   > 3ms: %3.1f", stats.Update.result);
+        alert->Print(font, "UpdateCL  > 3ms:  %3.1f", stats.Update.result);
 }
 
 CObjectList::CObjectList() :

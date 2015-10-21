@@ -1092,51 +1092,52 @@ void D3DXRenderBase::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
     BasicStats.FrameEnd();
     auto renderTotal = Device.GetStats().RenderTotal.result;
 #define PPP(a) (100.f*float(a)/renderTotal)
-    font.OutNext("*** RENDER:  %2.2fms", renderTotal);
-    font.OutNext(" Calc:       %2.2fms, %2.1f%%", BasicStats.Culling.result, PPP(BasicStats.Culling.result));
-    font.OutNext(" Skeletons:  %2.2fms, %d", BasicStats.Animation.result, BasicStats.Animation.count);
-    font.OutNext(" Primitives: %2.2fms, %2.1f%%", BasicStats.Primitives.result, PPP(BasicStats.Primitives.result));
-    font.OutNext(" Wait-L:     %2.2fms", BasicStats.Wait.result);
-    font.OutNext(" Wait-S:     %2.2fms", BasicStats.WaitS.result);
-    font.OutNext(" Skinning:   %2.2fms", BasicStats.Skinning.result);
-    font.OutNext(" DT_Vis/Cnt: %2.2fms/%d", BasicStats.DetailVisibility.result, BasicStats.DetailCount);
-    font.OutNext(" DT_Render:  %2.2fms", BasicStats.DetailRender.result);
-    font.OutNext(" DT_Cache:   %2.2fms", BasicStats.DetailCache.result);
-    font.OutNext(" Wallmarks:  %2.2fms, %d/%d - %d", BasicStats.Wallmarks.result, BasicStats.StaticWMCount,
+    font.OutNext("*** RENDER:   %2.2fms", renderTotal);
+    font.OutNext("Calc:         %2.2fms, %2.1f%%", BasicStats.Culling.result, PPP(BasicStats.Culling.result));
+    font.OutNext("Skeletons:    %2.2fms, %d", BasicStats.Animation.result, BasicStats.Animation.count);
+    font.OutNext("Primitives:   %2.2fms, %2.1f%%", BasicStats.Primitives.result, PPP(BasicStats.Primitives.result));
+    font.OutNext("Wait-L:       %2.2fms", BasicStats.Wait.result);
+    font.OutNext("Wait-S:       %2.2fms", BasicStats.WaitS.result);
+    font.OutNext("Skinning:     %2.2fms", BasicStats.Skinning.result);
+    font.OutNext("DT_Vis/Cnt:   %2.2fms/%d", BasicStats.DetailVisibility.result, BasicStats.DetailCount);
+    font.OutNext("DT_Render:    %2.2fms", BasicStats.DetailRender.result);
+    font.OutNext("DT_Cache:     %2.2fms", BasicStats.DetailCache.result);
+    font.OutNext("Wallmarks:    %2.2fms, %d/%d - %d", BasicStats.Wallmarks.result, BasicStats.StaticWMCount,
         BasicStats.DynamicWMCount, BasicStats.WMTriCount);
-    font.OutNext(" Glows:      %2.2fms", BasicStats.Glows.result);
-    font.OutNext(" Lights:     %2.2fms, %d", BasicStats.Lights.result, BasicStats.Lights.count);
-    font.OutNext(" RT:         %2.2fms, %d", BasicStats.RenderTargets.result, BasicStats.RenderTargets.count);
-    font.OutNext(" HUD:        %2.2fms", BasicStats.HUD.result);
-    font.OutNext(" P_calc:     %2.2fms", BasicStats.Projectors.result);
-    font.OutNext(" S_calc:     %2.2fms", BasicStats.ShadowsCalc.result);
-    font.OutNext(" S_render:   %2.2fms, %d", BasicStats.ShadowsRender.result, BasicStats.ShadowsRender.count);
-    font.OutNext(" Occ-q (%03.1f, %2d/%2d)",
-        100.f*f32(BasicStats.OcclusionCulled) / f32(_min(1, BasicStats.OcclusionQueries)),
-        BasicStats.OcclusionCulled, BasicStats.OcclusionQueries);
+    font.OutNext("Glows:        %2.2fms", BasicStats.Glows.result);
+    font.OutNext("Lights:       %2.2fms, %d", BasicStats.Lights.result, BasicStats.Lights.count);
+    font.OutNext("RT:           %2.2fms, %d", BasicStats.RenderTargets.result, BasicStats.RenderTargets.count);
+    font.OutNext("HUD:          %2.2fms", BasicStats.HUD.result);
+    font.OutNext("P_calc:       %2.2fms", BasicStats.Projectors.result);
+    font.OutNext("S_calc:       %2.2fms", BasicStats.ShadowsCalc.result);
+    font.OutNext("S_render:     %2.2fms, %d", BasicStats.ShadowsRender.result, BasicStats.ShadowsRender.count);
+    u32 occQs = BasicStats.OcclusionQueries ? BasicStats.OcclusionQueries : 1;
+    font.OutNext("Occ-query:    %03.1f", 100.f*f32(BasicStats.OcclusionCulled)/occQs);
+    font.OutNext("- queries:    %u", BasicStats.OcclusionQueries);
+    font.OutNext("- culled:     %u", BasicStats.OcclusionCulled);
 #undef PPP
     font.OutSkip();
     const auto &rcstats = RCache.stat;
-    font.OutNext("VERT:      %d/%d", rcstats.verts, rcstats.calls ? rcstats.verts / rcstats.calls : 0);
-    font.OutNext("POLY:      %d/%d", rcstats.polys, rcstats.calls ? rcstats.polys / rcstats.calls : 0);
-    font.OutNext("DIP/DP:    %d", rcstats.calls);
+    font.OutNext("Vertices:     %d/%d", rcstats.verts, rcstats.calls ? rcstats.verts/rcstats.calls : 0);
+    font.OutNext("Polygons:     %d/%d", rcstats.polys, rcstats.calls ? rcstats.polys/rcstats.calls : 0);
+    font.OutNext("DIP/DP:       %d", rcstats.calls);
 #ifdef DEBUG
-    font.OutNext("SH/T/M/C:  %d/%d/%d/%d", rcstats.states, rcstats.textures, rcstats.matrices, rcstats.constants);
-    font.OutNext("RT/PS/VS:  %d/%d/%d", rcstats.target_rt, rcstats.ps, rcstats.vs);
-    font.OutNext("DCL/VB/IB: %d/%d/%d", rcstats.decl, rcstats.vb, rcstats.ib);
+    font.OutNext("SH/T/M/C:     %d/%d/%d/%d", rcstats.states, rcstats.textures, rcstats.matrices, rcstats.constants);
+    font.OutNext("RT/PS/VS:     %d/%d/%d", rcstats.target_rt, rcstats.ps, rcstats.vs);
+    font.OutNext("DECL/VB/IB:   %d/%d/%d", rcstats.decl, rcstats.vb, rcstats.ib);
 #endif
-    font.OutNext("xforms:    %d", rcstats.xforms);
-    font.OutNext("static:    %3.1f/%d", rcstats.r.s_static.verts / 1024.f, rcstats.r.s_static.dips);
-    font.OutNext("flora:     %3.1f/%d", rcstats.r.s_flora.verts / 1024.f, rcstats.r.s_flora.dips);
-    font.OutNext("- lods:    %3.1f/%d", rcstats.r.s_flora_lods.verts / 1024.f, rcstats.r.s_flora_lods.dips);
-    font.OutNext("dynamic:   %3.1f/%d", rcstats.r.s_dynamic.verts / 1024.f, rcstats.r.s_dynamic.dips);
-    font.OutNext("- sw:      %3.1f/%d", rcstats.r.s_dynamic_sw.verts / 1024.f, rcstats.r.s_dynamic_sw.dips);
-    font.OutNext("- inst:    %3.1f/%d", rcstats.r.s_dynamic_inst.verts / 1024.f, rcstats.r.s_dynamic_inst.dips);
-    font.OutNext("- 1B:      %3.1f/%d", rcstats.r.s_dynamic_1B.verts / 1024.f, rcstats.r.s_dynamic_1B.dips);
-    font.OutNext("- 2B:      %3.1f/%d", rcstats.r.s_dynamic_2B.verts / 1024.f, rcstats.r.s_dynamic_2B.dips);
-    font.OutNext("- 3B:      %3.1f/%d", rcstats.r.s_dynamic_3B.verts / 1024.f, rcstats.r.s_dynamic_3B.dips);
-    font.OutNext("- 4B:      %3.1f/%d", rcstats.r.s_dynamic_4B.verts / 1024.f, rcstats.r.s_dynamic_4B.dips);
-    font.OutNext("details:   %3.1f/%d", rcstats.r.s_details.verts / 1024.f, rcstats.r.s_details.dips);
+    font.OutNext("XForms:       %d", rcstats.xforms);
+    font.OutNext("Static:       %3.1f/%d", rcstats.r.s_static.verts/1024.f, rcstats.r.s_static.dips);
+    font.OutNext("Flora:        %3.1f/%d", rcstats.r.s_flora.verts/1024.f, rcstats.r.s_flora.dips);
+    font.OutNext("- lods:       %3.1f/%d", rcstats.r.s_flora_lods.verts/1024.f, rcstats.r.s_flora_lods.dips);
+    font.OutNext("Dynamic:      %3.1f/%d", rcstats.r.s_dynamic.verts/1024.f, rcstats.r.s_dynamic.dips);
+    font.OutNext("- sw:         %3.1f/%d", rcstats.r.s_dynamic_sw.verts/1024.f, rcstats.r.s_dynamic_sw.dips);
+    font.OutNext("- inst:       %3.1f/%d", rcstats.r.s_dynamic_inst.verts/1024.f, rcstats.r.s_dynamic_inst.dips);
+    font.OutNext("- 1B:         %3.1f/%d", rcstats.r.s_dynamic_1B.verts/1024.f, rcstats.r.s_dynamic_1B.dips);
+    font.OutNext("- 2B:         %3.1f/%d", rcstats.r.s_dynamic_2B.verts/1024.f, rcstats.r.s_dynamic_2B.dips);
+    font.OutNext("- 3B:         %3.1f/%d", rcstats.r.s_dynamic_3B.verts/1024.f, rcstats.r.s_dynamic_3B.dips);
+    font.OutNext("- 4B:         %3.1f/%d", rcstats.r.s_dynamic_4B.verts/1024.f, rcstats.r.s_dynamic_4B.dips);
+    font.OutNext("Details:      %3.1f/%d", rcstats.r.s_details.verts/1024.f, rcstats.r.s_details.dips);
     if (alert)
     {
         if (rcstats.verts>500000)

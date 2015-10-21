@@ -675,14 +675,19 @@ void CRender::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
 {
     D3DXRenderBase::DumpStatistics(font, alert);
     Stats.FrameEnd();
-    font.OutNext(" **** LT:%2d,LV:%2d", Stats.l_total, Stats.l_visible);
-    font.OutNext("    S(%2d)   | (%2d)NS   ", Stats.l_shadowed, Stats.l_unshadowed);
-    font.OutNext("smap use[%2d], merge[%2d], finalclip[%2d]", Stats.s_used, Stats.s_merged - Stats.s_used, Stats.s_finalclip);
-    font.OutSkip();
+    font.OutNext("Lights:");
+    font.OutNext("- total:      %u", Stats.l_total);
+    font.OutNext("- visible:    %u", Stats.l_visible);
+    font.OutNext("- shadowed:   %u", Stats.l_shadowed);
+    font.OutNext("- unshadowed: %u", Stats.l_unshadowed);
+    font.OutNext("Shadow maps:");
+    font.OutNext("- used:       %d", Stats.s_used);
+    font.OutNext("- merged:     %d", Stats.s_merged-Stats.s_used);
+    font.OutNext("- finalclip:  %d", Stats.s_finalclip);
     u32	ict = Stats.ic_total + Stats.ic_culled;
-    font.OutNext(" **** iCULL(%03.1f)", 100.f*f32(Stats.ic_culled) / f32(ict ? ict : 1));
-    font.OutNext(" visible: %2d", Stats.ic_total);
-    font.OutNext(" culled : %2d", Stats.ic_culled);
+    font.OutNext("ICULL:        %03.1f", 100.f*f32(Stats.ic_culled) / f32(ict ? ict : 1));
+    font.OutNext("- visible:    %u", Stats.ic_total);
+    font.OutNext("- culled:     %u", Stats.ic_culled);
     Stats.FrameStart();
     HOM.DumpStatistics(font, alert);
 }

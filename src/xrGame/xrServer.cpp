@@ -942,9 +942,9 @@ void xrServer::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
 {
     stats.FrameEnd();
     font.OutNext("Server:");
-    font.OutNext("- update: %2.2fms, %d", stats.Update.result, stats.Update.count);
+    font.OutNext("- update:     %2.2fms, %d", stats.Update.result, stats.Update.count);
     m_updator.CompressStats.FrameEnd();
-    font.OutNext("- compress: %2.2fms", m_updator.CompressStats.result);
+    font.OutNext("- compress:   %2.2fms", m_updator.CompressStats.result);
     m_updator.CompressStats.FrameStart();
     stats.FrameStart();
 }

@@ -72,9 +72,9 @@ PROTECT_API void CRenderDevice::Initialize()
 
 void CRenderDevice::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
 {
-    font.OutNext("*** ENGINE:  %2.2fms", stats.EngineTotal.result);
-    font.OutNext("- FPS/RFPS:  %3.1f/%3.1f", stats.fFPS, stats.fRFPS);
-    font.OutNext("- TPS:       %2.2f M", stats.fTPS);
+    font.OutNext("*** ENGINE:   %2.2fms", stats.EngineTotal.result);
+    font.OutNext("FPS/RFPS:     %3.1f/%3.1f", stats.fFPS, stats.fRFPS);
+    font.OutNext("TPS:          %2.2f M", stats.fTPS);
     if (alert && stats.fFPS<30)
         alert->Print(font, "FPS       < 30:   %3.1f", stats.fFPS);
 }

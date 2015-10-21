@@ -336,9 +336,10 @@ void CHOM::Enable		()
 void CHOM::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
 {
     stats.FrameEnd();
-    auto modelTris = m_pModel ? m_pModel->get_tris_count() : 0;
-    font.OutNext(" **** HOM: %2.2fms (%d) visible[%2d] frustum[%2d] total[%2d]",
-        stats.Total.result, stats.Total.count, stats.VisibleTriangleCount, stats.FrustumTriangleCount, modelTris);
+    font.OutNext("HOM:          %2.2fms, %u", stats.Total.result, stats.Total.count);
+    font.OutNext("- visible:    %u", stats.VisibleTriangleCount);
+    font.OutNext("- frustum:    %u", stats.FrustumTriangleCount);
+    font.OutNext("- total:      %d", m_pModel ? m_pModel->get_tris_count() : 0);
     stats.FrameStart();
 }
 

@@ -288,9 +288,9 @@ void CPHWorld::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
     stats.FrameEnd();
     float engineTotal = Device().GetStats().EngineTotal.result;
     float percentage = 100.0f*stats.MovCollision.result/engineTotal;
-    font.OutNext("Physics:     %2.2fms, %2.1f%%", stats.MovCollision.result, percentage);
-    font.OutNext("- collider:  %2.2fms", stats.Collision.result);
-    font.OutNext("- solver:    %2.2fms, %d", stats.Core.result, stats.Core.count);
+    font.OutNext("Physics:      %2.2fms, %2.1f%%", stats.MovCollision.result, percentage);
+    font.OutNext("- collider:   %2.2fms", stats.Collision.result);
+    font.OutNext("- solver:     %2.2fms, %d", stats.Core.result, stats.Core.count);
     if (alert && stats.MovCollision.result>5.0f)
         alert->Print(font, "Physics   > 5ms:  %3.1f", stats.MovCollision.result);
 }

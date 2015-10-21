@@ -77,10 +77,11 @@ static void DumpSpatialStatistics(CGameFont &font, PerformanceAlert *alert, ISpa
     auto &stats = db.Stats;
     stats.FrameEnd();
 #define PPP(a) (100.f*float(a)/engineTotal)
-    font.OutNext("%s: %.2fms, %u", db.Name, stats.Query.result, stats.Query.count);
-    font.OutNext("- nodes/objects: %u/%u", stats.NodeCount, stats.ObjectCount);
-    font.OutNext("- insert: %.2fms, %2.1f%%", stats.Insert.result, PPP(stats.Insert.result));
-    font.OutNext("- remove: %.2fms, %2.1f%%", stats.Remove.result, PPP(stats.Remove.result));
+    font.OutNext("%s:", db.Name);
+    font.OutNext("- query:      %.2fms, %u", stats.Query.result, stats.Query.count);
+    font.OutNext("- nodes/obj:  %u/%u", stats.NodeCount, stats.ObjectCount);
+    font.OutNext("- insert:     %.2fms, %2.1f%%", stats.Insert.result, PPP(stats.Insert.result));
+    font.OutNext("- remove:     %.2fms, %2.1f%%", stats.Remove.result, PPP(stats.Remove.result));
 #undef PPP
     stats.FrameStart();
 #endif
@@ -94,9 +95,10 @@ static void DumpColliderStatistics(CGameFont &font, PerformanceAlert *alert)
     static float boxPs = 0;
     rayPs = 0.99f*rayPs + 0.01f*(stats.RayQuery.count/stats.RayQuery.result);
     boxPs = 0.99f*boxPs + 0.01f*(stats.BoxQuery.count/stats.BoxQuery.result);
-    font.OutNext("XRC ray query:     %2.2fms, %d, %2.0fK", stats.RayQuery.result, stats.RayQuery.count, rayPs);
-    font.OutNext("XRC box query:     %2.2fms, %d, %2.0fK", stats.BoxQuery.result, stats.BoxQuery.count, boxPs);
-    font.OutNext("XRC frustum query: %2.2fms, %d", stats.FrustumQuery.result, stats.FrustumQuery.count);
+    font.OutNext("XRC:");
+    font.OutNext("- ray:        %2.2fms, %d, %2.0fK", stats.RayQuery.result, stats.RayQuery.count, rayPs);
+    font.OutNext("- box:        %2.2fms, %d, %2.0fK", stats.BoxQuery.result, stats.BoxQuery.count, boxPs);
+    font.OutNext("- frustum:    %2.2fms, %d", stats.FrustumQuery.result, stats.FrustumQuery.count);
     stats.FrameStart();
 }
 
@@ -130,11 +132,10 @@ void CStats::Show()
         font.SetColor(0xFFFFFFFF);
         font.OutSet(0, 0);
 #if defined(FS_DEBUG)
-        font.OutNext("mapped:      %d", g_file_mapped_memory);
+        font.OutNext("Mapped:       %d", g_file_mapped_memory);
 #endif
-        font.OutSkip();
         Device.DumpStatistics(font, alertPtr);
-        font.OutNext("Memory:      %2.2fa", fMem_calls);
+        font.OutNext("Memory:       %2.2f", fMem_calls);
         if (g_pGameLevel)
             g_pGameLevel->DumpStatistics(font, alertPtr);
         Engine.Sheduler.DumpStatistics(font, alertPtr);
@@ -144,7 +145,6 @@ void CStats::Show()
         DumpColliderStatistics(font, alertPtr);
         if (physics_world())
             physics_world()->DumpStatistics(font, alertPtr);
-        font.OutSkip();
         font.OutSet(200, 0);
         Render->DumpStatistics(font, alertPtr);
         font.OutSkip();
@@ -158,7 +158,7 @@ void CStats::Show()
         Memory.stat_strdock = 0;
         CPU::qpc_counter = 0;
 #else
-        font.OutNext("qpc[%3d]", CPU::qpc_counter);
+        font.OutNext("QPC: %u", CPU::qpc_counter);
         CPU::qpc_counter = 0;
 #endif
         font.OnRender();
@@ -176,7 +176,7 @@ void CStats::Show()
     if (!g_bDisableRedText && errors.size())
     {
         font.SetColor(color_rgba(255, 16, 16, 191));
-        font.OutSet(200, 0);
+        font.OutSet(400, 0);
         for (u32 it = (u32)_max(int(0), (int)errors.size() - g_ErrorLineCount); it < errors.size(); it++)
             font.OutNext("%s", errors[it].c_str());
         font.OnRender();
