@@ -259,6 +259,9 @@ void IGame_Persistent::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
 {
     // XXX: move to particle engine
     stats.FrameEnd();
-    font.OutNext("Particles: starting[%d] active[%d] destroying[%d]", stats.Starting, stats.Active, stats.Destroying);
+    font.OutNext("Particles:");
+    font.OutNext("- starting:   %u", stats.Starting);
+    font.OutNext("- active:     %u", stats.Active);
+    font.OutNext("- destroying: %u", stats.Destroying);
     stats.FrameStart();
 }
