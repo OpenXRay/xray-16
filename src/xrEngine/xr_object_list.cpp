@@ -32,7 +32,7 @@ void CObjectList::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
     font.OutNext("uClients:    %2.2fms, %2.1f%%, crow(%d)/active(%d)/total(%d)", stats.Update.result,
         percentage, stats.Crows, stats.Active, stats.Total);
     if (alert && stats.Update.result>3.0f)
-        font.OutNext("UpdateCL   > 3ms: %3.1f", stats.Update.result);
+        alert->Print(font, "UpdateCL   > 3ms: %3.1f", stats.Update.result);
 }
 
 CObjectList::CObjectList() :
