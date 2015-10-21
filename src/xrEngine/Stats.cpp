@@ -212,7 +212,6 @@ void CStats::Show()
         font.OnRender();
     }
 #endif
-    // XXX: call FrameStart in pureFrame::OnFrame()
 }
 
 void CStats::OnDeviceCreate()

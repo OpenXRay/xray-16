@@ -362,12 +362,11 @@ public:
 
     // Constructor/destructor
     virtual ~IRender() {}
+
 protected:
     virtual void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer) = 0;
-    // XXX: remove comment
-    /// ===================== NEW MEMBERS ===================================
+
 public:
-    // XXX: used? check and delete if not used
     virtual void	Copy(IRender &_in) = 0;
 
     //	Gamma correction functions

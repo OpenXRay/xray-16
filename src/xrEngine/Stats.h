@@ -16,49 +16,6 @@ public:
     CGameFont *statsFont;
     float fMem_calls;
     u32 dwMem_calls;
-    //CStatTimer EngineTotal;
-    //float fShedulerLoad;
-    //CStatTimer Scheduler;    
-    //CStatTimer Sound; // total time taken by sound subsystem (accurate only in single-threaded mode)
-    //CStatTimer Input; // total time taken by input subsystem (accurate only in single-threaded mode)
-    //struct ParticleStatistics
-    //{
-    //    u32 Starting;
-    //    u32 Active;
-    //    u32 Destroying;
-    //} Particles;
-    //struct {
-    //    CStatTimer Collision; // collision
-    //    CStatTimer Core; // integrate
-    //    CStatTimer MovCollision; // movement+collision
-    //} Physics;
-    //struct {
-    //    CStatTimer Think; // thinking
-    //    CStatTimer Range; // query: range
-    //    CStatTimer Path; // query: path
-    //    CStatTimer Node; // query: node
-    //    CStatTimer Vis; // visibility detection - total
-    //    CStatTimer VisQuery; // visibility detection - portal traversal and frustum culling
-    //    CStatTimer VisRayTests; // visibility detection - ray casting
-    //} AI;
-    // IRender::Stats
-    //CStatTimer clRAY; // total: ray-testing
-    //CStatTimer clBOX; // total: box query
-    //CStatTimer clFRUSTUM; // total: frustum query
-    //struct {
-    //    CStatTimer ClientSend;
-    //    CStatTimer ClientRecv;
-    //    CStatTimer ServerUpdate;
-    //    CStatTimer ClientCompressor;
-    //    CStatTimer ServerCompressor;
-    //} Net;
-    //struct {
-    //    CStatTimer Test0; // debug counter
-    //    CStatTimer Test1; // debug counter
-    //    CStatTimer Test2; // debug counter
-    //    CStatTimer Test3; // debug counter
-    //} Dbg;
-
     shared_str eval_line_1;
     shared_str eval_line_2;
     shared_str eval_line_3;
