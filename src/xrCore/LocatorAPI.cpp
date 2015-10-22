@@ -1466,11 +1466,13 @@ CLocatorAPI::files_it CLocatorAPI::file_find_it(LPCSTR fname)
     return (I);
 }
 
-BOOL CLocatorAPI::dir_delete(LPCSTR path, LPCSTR nm, BOOL remove_files)
+BOOL CLocatorAPI::dir_delete(LPCSTR initial, LPCSTR nm, BOOL remove_files)
 {
     string_path fpath;
-    if (path&&path[0]) update_path(fpath, path, nm);
-    else xr_strcpy(fpath, sizeof(fpath), nm);
+    if (initial&&initial[0])
+        update_path(fpath, initial, nm);
+    else
+        xr_strcpy(fpath, sizeof(fpath), nm);
 
     files_set folders;
     files_it I;

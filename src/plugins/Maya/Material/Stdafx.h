@@ -8,6 +8,7 @@
 
 #define _WIN32_WINNT 0x0500        
 #include "xrCore/xrCore.h"
+#pragma comment(lib, "xrCore.lib")
 #include <assert.h>
 
 #pragma warning(push)

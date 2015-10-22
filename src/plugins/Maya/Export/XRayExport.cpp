@@ -47,9 +47,8 @@ void uninitialize(void*)
 MStatus initializePlugin( MObject obj )
 {
 	INIT_OBJ = obj;
-	Core._initialize("XRayMayaPlugin",ELogCallback,FALSE);
+	Core._initialize("XRayMayaPlugin", LogCallback(ELogCallback, nullptr), FALSE, nullptr, true);
 	FS._initialize	(CLocatorAPI::flScanAppRoot,NULL,"xray_path.ltx");
-	R_ASSERT2(0!=Memory.mem_fill,"Incorrect xrCore.dll version.");
 
 	MFnPlugin plugin( obj, "GSC Game World", "1.00", "Any");
 

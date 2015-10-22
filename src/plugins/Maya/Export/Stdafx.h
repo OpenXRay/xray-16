@@ -9,12 +9,14 @@
 #define ENGINE_API 
 #define _WIN32_WINNT 0x0500        
 #include "xrCore/xrCore.h"
+#pragma comment(lib, "xrCore.lib")
 
 #pragma warning(push)
 #pragma warning(disable:4995)
 #include <assert.h>
 
 #define REQUIRE_IOSTREAM
+#define _BCL
 #include <maya/MPxLocatorNode.h>
 #include <maya/MFnTransform.h>
 #include <maya/MEulerRotation.h>

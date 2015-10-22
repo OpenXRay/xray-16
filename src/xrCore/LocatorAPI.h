@@ -1,9 +1,3 @@
-// LocatorAPI.h: interface for the CLocatorAPI class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#ifndef LocatorAPIH
-#define LocatorAPIH
 #pragma once
 
 #pragma warning(push)
@@ -212,6 +206,4 @@ public:
 
 extern XRCORE_API CLocatorAPI* xr_FS;
 #define FS (*xr_FS)
-
-#endif // LocatorAPIH
 

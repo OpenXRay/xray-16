@@ -8,7 +8,9 @@
 #pragma once
 
 #include "xrCore/xrCore.h"
+#pragma comment(lib, "xrCore.lib")
 
+#define _BCL
 #define ENGINE_API 
 
 enum TMsgDlgType { mtWarning, mtError, mtInformation, mtConfirmation, mtCustom };

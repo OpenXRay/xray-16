@@ -23,7 +23,7 @@
 #ifdef _LW_EXPORT
 	#include <lwhost.h>
 	extern "C" LWMessageFuncs	*g_msg;
-	void ELogCallback(LPCSTR txt)
+	void ELogCallback(void *context, LPCSTR txt)
 	{
 		if (0==txt[0])	return;
 		bool bDlg 		= ('#'==txt[0])||((0!=txt[1])&&('#'==txt[1]));
@@ -38,7 +38,7 @@
 #endif
 #ifdef _MAX_EXPORT
 	#include "NetDeviceLog.h"
-	void ELogCallback(LPCSTR txt)
+    void ELogCallback(void *context, LPCSTR txt)
 	{
  		if (0!=txt[0]){
 			if (txt[0]=='!')EConsole.print(mtError,txt+1);
@@ -47,7 +47,7 @@
 	}
 #endif
 #ifdef _MAYA_PLUGIN
-	void ELogCallback(LPCSTR txt)
+    void ELogCallback(void *context, LPCSTR txt)
 	{
  		if (0!=txt[0]){
 			if (txt[0]=='!')std::cerr << "XR-Error: " << txt+1 << "\n";

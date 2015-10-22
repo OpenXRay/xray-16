@@ -83,7 +83,6 @@
 #include <string.h>
 #include <typeinfo.h>
 
-
 #ifndef DEBUG
 #ifdef _DEBUG
 #define DEBUG
@@ -91,14 +90,6 @@
 #ifdef MIXED
 #define DEBUG
 #endif
-#endif
-
-#ifdef XRCORE_STATIC
-# define NO_FS_SCAN
-#endif
-
-#ifdef _EDITOR
-# define NO_FS_SCAN
 #endif
 
 // inline control - redefine to use compiler's heuristics ONLY
@@ -200,14 +191,10 @@
 #pragma warning (disable : 4100 ) // unreferenced formal parameter
 
 // Our headers
-#ifdef XRCORE_STATIC
-# define XRCORE_API
+#ifdef XRCORE_EXPORTS
+#define XRCORE_API __declspec(dllexport)
 #else
-# ifdef XRCORE_EXPORTS
-# define XRCORE_API __declspec(dllexport)
-# else
-# define XRCORE_API __declspec(dllimport)
-# endif
+#define XRCORE_API __declspec(dllimport)
 #endif
 
 #include "xrDebug.h"
@@ -308,9 +295,9 @@ public:
     string64 CompName;
     char* Params;
     DWORD dwFrame;
-
+    bool PluginMode;
 public:
-    void _initialize(LPCSTR ApplicationName, LogCallback cb = 0, BOOL init_fs = TRUE, LPCSTR fs_fname = 0);
+    void _initialize(LPCSTR ApplicationName, LogCallback cb = 0, BOOL init_fs = TRUE, LPCSTR fs_fname = 0, bool plugin = false);
     void _destroy();
 };
 

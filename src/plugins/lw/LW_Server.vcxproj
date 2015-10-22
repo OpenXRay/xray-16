@@ -113,12 +113,6 @@
     <ClCompile Include="Server\startup.c" />
     <ClCompile Include="Server\username.c" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)xrCore\xrCoreStatic.vcxproj">
-      <Project>{f1066eac-ee25-4c7a-9023-5957a6f7ba27}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

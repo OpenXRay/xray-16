@@ -99,7 +99,7 @@ extern "C" {
 	//-----------------------------------------------------------------------------------------
 	void __cdecl SaveObject(GlobalFunc *global)
 	{
-		Core._initialize("XRayPlugin",ELogCallback,FALSE);
+		Core._initialize("XRayPlugin", LogCallback(ELogCallback, nullptr), FALSE, nullptr, true);
 		FS._initialize	(CLocatorAPI::flScanAppRoot,NULL,"xray_path.ltx");
 
 		// get bone ID
