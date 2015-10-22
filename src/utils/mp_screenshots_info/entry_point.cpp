@@ -10,7 +10,7 @@ void print_format()
 	printf("Format: mp_screenshots_info.exe [screenshot_file_name]\n");
 };
 
-void xrcore_log_cb(LPCSTR log_string)
+void xrcore_log_cb(void *context, LPCSTR log_string)
 {
 	printf("%s\n", log_string);
 };
@@ -80,7 +80,7 @@ int main(int argc, char ** argv)
 		return EXIT_FAILURE;
 	}
 	printf					("Initializing core...\n");
-	Core._initialize		("mp_screenshots_info", xrcore_log_cb, TRUE, "fsgame4mpu.ltx");
+	Core._initialize		("mp_screenshots_info", LogCallback(xrcore_log_cb, nullptr), TRUE, "fsgame4mpu.ltx");
 	crypto::xr_crypto_init	();
 
 #ifdef DEBUG

@@ -17,7 +17,7 @@ void print_format()
 	printf(help_msg);
 };
 
-void xrcore_log_cb(LPCSTR log_string)
+void xrcore_log_cb(void *context, LPCSTR log_string)
 {
 	printf("%s\n", log_string);
 };
@@ -163,7 +163,7 @@ void run_configs_verifyer_server()
 
 void initialize_core()
 {
-	Core._initialize		("mp_configs_info", xrcore_log_cb, TRUE, "fsgame4mpu.ltx");
+	Core._initialize		("mp_configs_info", LogCallback(xrcore_log_cb, nullptr), TRUE, "fsgame4mpu.ltx");
 	crypto::xr_crypto_init	();
 
 	string_path					fname; 
