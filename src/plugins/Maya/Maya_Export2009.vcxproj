@@ -85,7 +85,7 @@
     <Link>
       <AdditionalOptions>/MACHINE:I386 /export:initializePlugin /export:uninitializePlugin
  %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;Foundation.lib;OpenMaya.lib;OpenMayaAnim.lib;xrcorestatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;Foundation.lib;OpenMaya.lib;OpenMayaAnim.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)xrayMaya_export.mll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(XRAY_16X_LIBS)maya/ver-2009/lib;$(XRAY_16X_LIBS)BugTrap\Bin;$(xrLibDir);$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -127,7 +127,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 /export:initializePlugin /export:uninitializePlugin %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;Foundation.lib;OpenMaya.lib;OpenMayaAnim.lib;xrcorestatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;Foundation.lib;OpenMaya.lib;OpenMayaAnim.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)xrayMaya_export.mll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(XRAY_16X_LIBS)maya/ver-2009/lib;$(XRAY_16X_LIBS)BugTrap\Bin;$(xrLibDir);$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -265,6 +265,11 @@
     <None Include="..\..\editors\ECore\WildMagic\WmlVector2.inl" />
     <None Include="..\..\editors\ECore\WildMagic\WmlVector3.inl" />
     <None Include="..\..\editors\ECore\WildMagic\WmlVector4.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
+      <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

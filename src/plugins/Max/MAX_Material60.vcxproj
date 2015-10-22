@@ -65,7 +65,7 @@
       <AdditionalOptions>/LD %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(SolutionDir);$(XRAY_16X_LIBS)3dsmax/ver-6.0/include;$(XRAY_16X_LIBS)3dsmax/ver-6.0/cssdk/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>DEBUG;WIN32;_WINDOWS;_USRDLL;_MAX_MATERIAL;_MAX_PLUGIN;XRCORE_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DEBUG;WIN32;_WINDOWS;_USRDLL;_MAX_MATERIAL;_MAX_PLUGIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -85,7 +85,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>Winmm.lib;comctl32.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;manipsys.lib;paramblk2.lib;xrcorestatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;comctl32.lib;bmm.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;manipsys.lib;paramblk2.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)xray_material.dlt</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(XRAY_16X_LIBS)BugTrap\Bin;$(XRAY_16X_LIBS)3dsmax/ver-6.0/lib;$(xrLibDir);$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -109,7 +109,7 @@
       <AdditionalOptions>/LD %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>$(SolutionDir);$(XRAY_16X_LIBS)3dsmax/ver-6.0/include;$(XRAY_16X_LIBS)3dsmax/ver-6.0/cssdk/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_MAX_MATERIAL;_MAX_PLUGIN;XRCORE_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_MAX_MATERIAL;_MAX_PLUGIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling />
@@ -131,7 +131,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>Winmm.lib;comctl32.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;manipsys.lib;paramblk2.lib;xrcorestatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;comctl32.lib;core.lib;geom.lib;gfx.lib;mesh.lib;maxutil.lib;maxscrpt.lib;manipsys.lib;paramblk2.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)xray_material.dlt</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(XRAY_16X_LIBS)BugTrap\Bin;$(XRAY_16X_LIBS)3dsmax/ver-6.0/lib;$(xrLibDir);$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -177,9 +177,8 @@
     <Image Include="Material\dmtlmsk.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)xrCore\xrCoreStatic.vcxproj">
-      <Project>{f1066eac-ee25-4c7a-9023-5957a6f7ba27}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
+      <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

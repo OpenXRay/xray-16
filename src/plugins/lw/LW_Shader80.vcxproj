@@ -65,7 +65,7 @@
     <ClCompile>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>$(SolutionDir);$(XRAY_16X_LIBS)lightwave/ver-8.0/include;$(XRAY_16X_LIBS)lightwave/ver-8.0/include/lwsdk;../Shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;_X86_;_WIN32;WIN32;_WINDOWS;_USRDLL;_LW_PLUGIN;_LW_SHADER;XRCORE_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_X86_;_WIN32;WIN32;_WINDOWS;_USRDLL;_LW_PLUGIN;_LW_SHADER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling />
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -86,7 +86,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;lw_server.lib;xrcorestatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;lw_server.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)xray_shader.p</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(XRAY_16X_LIBS)BugTrap\Bin;$(xrLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -105,7 +105,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(SolutionDir);$(XRAY_16X_LIBS)lightwave/ver-8.0/include;$(XRAY_16X_LIBS)lightwave/ver-8.0/include/lwsdk;../Shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>DEBUG;_X86_;WIN32;_WINDOWS;_USRDLL;_EXPORT;_LW_SHADER;XRCORE_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DEBUG;_X86_;WIN32;_WINDOWS;_USRDLL;_EXPORT;_LW_SHADER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -129,7 +129,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;lw_server.lib;xrcorestatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;lw_server.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)xray_shader.p</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(XRAY_16X_LIBS)BugTrap\Bin;$(xrLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -176,9 +176,8 @@
     <ClInclude Include="shader\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)xrCore\xrCoreStatic.vcxproj">
-      <Project>{f1066eac-ee25-4c7a-9023-5957a6f7ba27}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
+      <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>
     <ProjectReference Include="LW_Server.vcxproj">
       <Project>{6ba3121a-acbc-4685-9246-4549ca1efffd}</Project>

@@ -7,7 +7,7 @@ extern "C" { EShaderList ENShaders; EShaderList LCShaders; EShaderList GameMtls;
 extern "C" {
 	void __cdecl LoadShaders()
 	{
-		Core._initialize("XRayPlugin",0,FALSE);
+		Core._initialize("XRayPlugin", 0, FALSE, nullptr, true);
 		FS._initialize	(CLocatorAPI::flScanAppRoot,NULL,"xray_path.ltx");
 		LPSTRVec lst;
 		ENShaders.count=LoadBlenderList(lst);

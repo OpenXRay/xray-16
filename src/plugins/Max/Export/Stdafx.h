@@ -12,6 +12,8 @@
 #include "Max.h"
 
 #include "xrCore/xrCore.h"
+#pragma comment(lib, "xrCore.lib")
+#define _BCL
 
 #undef _MIN
 #undef _MAX
