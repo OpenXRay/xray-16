@@ -1,24 +1,17 @@
-//---------------------------------------------------------------------------
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "GameMtlLib.h"
 
 #ifndef GM_NON_GAME
 
-void DestroySounds(SoundVec& lst)
+static void DestroySounds(SoundVec &lst)
 {
     for (SoundIt it = lst.begin(); lst.end() != it; ++it)
         it->destroy();
 }
 
-void DestroyPSs(PSVec& lst)
-{
-    // for (PSIt it=lst.begin(); lst.end() != it; ++it)
-    // Device.Resources->Delete(*it);
-}
+static void DestroyPSs(PSVec &lst) {}
 
-void CreateSounds(SoundVec& lst, LPCSTR buf)
+static void CreateSounds(SoundVec& lst, LPCSTR buf)
 {
     string128 tmp;
     int cnt = _GetItemCount(buf);
@@ -28,7 +21,7 @@ void CreateSounds(SoundVec& lst, LPCSTR buf)
         lst[k].create(_GetItem(buf, k, tmp), st_Effect, sg_SourceType);
 }
 
-void CreateMarks(IWallMarkArray* pMarks, LPCSTR buf)
+static void CreateMarks(IWallMarkArray *pMarks, LPCSTR buf)
 {
     string256 tmp;
     int cnt = _GetItemCount(buf);
@@ -37,8 +30,7 @@ void CreateMarks(IWallMarkArray* pMarks, LPCSTR buf)
         pMarks->AppendMark(_GetItem(buf, k, tmp));
 }
 
-
-void CreatePSs(PSVec& lst, LPCSTR buf)
+static void CreatePSs(PSVec &lst, LPCSTR buf)
 {
     string256 tmp;
     int cnt = _GetItemCount(buf);
@@ -56,9 +48,6 @@ SGameMtlPair::~SGameMtlPair()
     DestroySounds(StepSounds);
     DestroySounds(CollideSounds);
     DestroyPSs(CollideParticles);
-    // DestroyMarks (CollideMarks);
-    //RenderFactory->DestroyGameMtlPair(m_pCollideMarks);
-    //m_pCollideMarks->
 #endif
 }
 
@@ -110,6 +99,6 @@ void SGameMtlPair::Load(IReader& fs)
 #ifdef GM_NON_GAME
     CollideMarks = *buf ? *buf : "";
 #else
-    CreateMarks(&*m_pCollideMarks, *buf);
+    CreateMarks(&*CollideMarks, *buf);
 #endif
 }

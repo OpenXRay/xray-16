@@ -223,52 +223,23 @@ void play_particles(float vel_cret, dxGeomUserData* data,  const dContactGeom* c
 template<class Pars>
 void  TContactShotMark(CDB::TRI* T,dContactGeom* c)
 {
-	
-	
-	//dBodyID b=dGeomGetBody(c->g1);
-	//dxGeomUserData* data =0;
-	//bool b_invert_normal=false;
-	//if(!b) 
-	//{
-	//	b=dGeomGetBody(c->g2);
-	//	data=dGeomGetUserData(c->g2);
-	//	b_invert_normal=true;
-	//}
-	//else
-	//{
-	//	data=dGeomGetUserData(c->g1);
-	//}
-	//if(!b) 
-	//	return;
-
-	//dVector3 vel;
-	//dMass m;
-	//dBodyGetMass(b,&m);
-	//dBodyGetPointVel(b,c->pos[0],c->pos[1],c->pos[2],vel);
-	//float vel_cret=_abs(dDOT(vel,c->normal))* _sqrt(m.mass);
 	dxGeomUserData* data	=0;
 	float vel_cret			=0;
 	bool b_invert_normal	=false;
 	if(!ContactShotMarkGetEffectPars( c, data, vel_cret, b_invert_normal ))
 		return;
-	//float vel_cret= GetVelCret(c);
-
 	Fvector to_camera;to_camera.sub(cast_fv(c->pos),Device.vCameraPosition);
 	float square_cam_dist=to_camera.square_magnitude();
 	if(data)
 	{
-		SGameMtlPair* mtl_pair		= GMLib.GetMaterialPair(T->material,data->material);
+        SGameMtlPair* mtl_pair = GMLib.GetMaterialPairByIndices(T->material, data->material);
 		if(mtl_pair)
 		{
-			//if(vel_cret>Pars::vel_cret_wallmark && !mtl_pair->CollideMarks.empty())
-			if(vel_cret>Pars::vel_cret_wallmark && !mtl_pair->m_pCollideMarks->empty())
+			if(vel_cret>Pars::vel_cret_wallmark && !mtl_pair->CollideMarks->empty())
 			{
-				//ref_shader pWallmarkShader = mtl_pair->CollideMarks[::Random.randI(0,mtl_pair->CollideMarks.size())];
-				wm_shader WallmarkShader = mtl_pair->m_pCollideMarks->GenerateWallmark();
-				//ref_shader pWallmarkShader = mtl_pair->CollideMarks[::Random.randI(0,mtl_pair->CollideMarks.size())];
+				wm_shader WallmarkShader = mtl_pair->CollideMarks->GenerateWallmark();
 				Level().ph_commander().add_call(xr_new<CPHOnesCondition>(),xr_new<CPHWallMarksCall>( *((Fvector*)c->pos),T,WallmarkShader));
 			}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			if(square_cam_dist<SQUARE_SOUND_EFFECT_DIST)
 			{
 			
@@ -281,7 +252,8 @@ void  TContactShotMark(CDB::TRI* T,dContactGeom* c)
 						if(!mtl_pair->CollideSounds.empty())
 						{
 							float volume=collide_volume_min+vel_cret*(collide_volume_max-collide_volume_min)/(_sqrt(mass_limit)*default_l_limit-Pars::vel_cret_sound);
-							GET_RANDOM(mtl_pair->CollideSounds).play_no_feedback(0,0,0,((Fvector*)c->pos),&volume);
+                            ref_sound &randSound = mtl_pair->CollideSounds[Random.randI(mtl_pair->CollideSounds.size())];
+							randSound.play_no_feedback(0,0,0,((Fvector*)c->pos),&volume);
 						}
 					}
 				}
@@ -293,9 +265,6 @@ void  TContactShotMark(CDB::TRI* T,dContactGeom* c)
 					}
 				}
 			}
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			if( square_cam_dist<SQUARE_PARTICLE_EFFECT_DIST && !mtl_pair->CollideParticles.empty() )
 			{
 				SGameMtl* static_mtl =  GMLib.GetMaterialByIdx(T->material);

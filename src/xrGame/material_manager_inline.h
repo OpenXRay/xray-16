@@ -21,5 +21,5 @@ IC	u16	CMaterialManager::self_material_idx		() const
 IC SGameMtlPair	*CMaterialManager::get_current_pair()
 {
 	m_movement_control->update_last_material	();
-	return GMLib.GetMaterialPair(m_my_material_idx,m_last_material_idx);
+    return GMLib.GetMaterialPairByIndices(m_my_material_idx, m_last_material_idx);
 }
