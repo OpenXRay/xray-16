@@ -324,8 +324,9 @@
     <ClCompile Include="stream_reader.cpp" />
     <ClCompile Include="string_concatenations.cpp" />
     <ClCompile Include="Text\MbHelpers.cpp" />
+    <ClCompile Include="Threading\Event.cpp" />
+    <ClCompile Include="Threading\Lock.cpp" />
     <ClCompile Include="Threading\ttapi.cpp" />
-    <ClCompile Include="Threading\xrSyncronize.cpp" />
     <ClCompile Include="xrCore.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">Create</PrecompiledHeader>
@@ -434,8 +435,9 @@
     <ClInclude Include="string_concatenations_inline.h" />
     <ClInclude Include="SubAlloc.hpp" />
     <ClInclude Include="Text\MbHelpers.h" />
+    <ClInclude Include="Threading\Event.hpp" />
+    <ClInclude Include="Threading\Lock.hpp" />
     <ClInclude Include="Threading\ttapi.h" />
-    <ClInclude Include="Threading\xrSyncronize.h" />
     <ClInclude Include="vector.h" />
     <ClInclude Include="xrCore.h" />
     <ClInclude Include="xrCore_platform.h" />

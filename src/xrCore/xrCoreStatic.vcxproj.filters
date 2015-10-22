@@ -300,9 +300,6 @@
     <ClCompile Include="Threading\ttapi.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
-    <ClCompile Include="Threading\xrSyncronize.cpp">
-      <Filter>Threading</Filter>
-    </ClCompile>
     <ClCompile Include="Math\MathUtil.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -320,6 +317,12 @@
     </ClCompile>
     <ClCompile Include="Text\MbHelpers.cpp">
       <Filter>Text</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\Event.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\Lock.cpp">
+      <Filter>Threading</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -629,9 +632,6 @@
     <ClInclude Include="Threading\ttapi.h">
       <Filter>Threading</Filter>
     </ClInclude>
-    <ClInclude Include="Threading\xrSyncronize.h">
-      <Filter>Threading</Filter>
-    </ClInclude>
     <ClInclude Include="Math\MathUtil.hpp">
       <Filter>Math</Filter>
     </ClInclude>
@@ -661,6 +661,12 @@
     </ClInclude>
     <ClInclude Include="Text\MbHelpers.h">
       <Filter>Text</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\Event.hpp">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\Lock.hpp">
+      <Filter>Threading</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
