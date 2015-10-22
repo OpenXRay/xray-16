@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Kernel">
+      <UniqueIdentifier>{322ee2eb-e5e9-490a-810f-46254b9b50be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{fb8c96c5-9a29-455b-b78f-51e273ba1918}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lua_studio">
+      <UniqueIdentifier>{819f1bf6-0c8c-4293-8342-a4d2082a8c5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Process">
+      <UniqueIdentifier>{a2caf05a-bbad-4a57-9616-08cfb386c806}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Storage">
+      <UniqueIdentifier>{bcafa8c7-ceb2-47c8-99bf-3929a2df6169}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Thread">
+      <UniqueIdentifier>{c4540462-a2a5-4389-9d5a-7ef60cc6e443}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{3b6026d9-80e2-485e-a2f0-cdffcae7e22b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.hpp">
+      <Filter>Kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="xrScriptEngine.hpp">
+      <Filter>Kernel</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp">
+      <Filter>Kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="xrScriptEngine.cpp">
+      <Filter>Kernel</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

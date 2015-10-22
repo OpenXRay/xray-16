@@ -4,6 +4,39 @@
     <Filter Include="Kernel">
       <UniqueIdentifier>{322ee2eb-e5e9-490a-810f-46254b9b50be}</UniqueIdentifier>
     </Filter>
+    <Filter Include="AI">
+      <UniqueIdentifier>{ead4ed3c-483a-4897-9a67-86aee65993a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Space">
+      <UniqueIdentifier>{eb5bf024-7c70-4fb8-a36f-dab9d4f49934}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Sound">
+      <UniqueIdentifier>{f2a8f6d9-3cd0-4632-8581-de07014634a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation">
+      <UniqueIdentifier>{d9e337c6-7d29-410e-8e17-5d9846fdb40c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Monsters">
+      <UniqueIdentifier>{d9b3a029-b867-49ed-9a0a-77a5df273816}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Life">
+      <UniqueIdentifier>{9ae1eb7a-5b47-4a29-9051-7a2b431b76b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Group">
+      <UniqueIdentifier>{8202bea5-dd0d-44a0-bde7-71b5d24a890d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Eval">
+      <UniqueIdentifier>{1adf8660-aa3a-4fa8-8081-3b4e004c6cb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Debug">
+      <UniqueIdentifier>{79c65283-544c-4ba7-bce5-ffb1883aeab7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Cover">
+      <UniqueIdentifier>{75958997-701a-4933-8d49-37f1b2e39e76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Components">
+      <UniqueIdentifier>{511278d6-d14c-4c32-8f26-cfebab343732}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="xrAICore.hpp">
