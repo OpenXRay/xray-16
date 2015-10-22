@@ -3,7 +3,9 @@
 #include "Common/FSMacros.hpp"
 
 CGameMtlLibrary GMLib;
+#ifdef _EDITOR
 CGameMtlLibrary *PGMLib = nullptr;
+#endif
 
 #ifdef DEBUG
 const char *SGameMtlPair::dbg_Name()
@@ -63,7 +65,9 @@ CGameMtlLibrary::CGameMtlLibrary()
 {
     material_index = 0;
     material_pair_index = 0;
+#ifdef _EDITOR
     PGMLib = &GMLib;
+#endif
 }
 
 void CGameMtlLibrary::Load()
