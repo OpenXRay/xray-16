@@ -1,24 +1,20 @@
-//---------------------------------------------------------------------------
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "GameMtlLib.h"
 #include "Common/FSMacros.hpp"
 
 CGameMtlLibrary GMLib;
-//CSound_manager_interface* Sound = NULL;
-#ifdef _EDITOR
-CGameMtlLibrary* PGMLib = NULL;
-#endif
-CGameMtlLibrary::CGameMtlLibrary()
+CGameMtlLibrary *PGMLib = nullptr;
+
+#ifdef DEBUG
+const char *SGameMtlPair::dbg_Name()
 {
-    material_index = 0;
-    material_pair_index = 0;
-#ifndef _EDITOR
-    material_count = 0;
-#endif
-    PGMLib = &GMLib;
+    static string256 nm;
+    SGameMtl* M0 = GMLib.GetMaterialByID(GetMtl0());
+    SGameMtl* M1 = GMLib.GetMaterialByID(GetMtl1());
+    xr_sprintf(nm, sizeof(nm), "Pair: %s - %s", *M0->m_Name, *M1->m_Name);
+    return nm;
 }
+#endif
 
 void SGameMtl::Load(IReader& fs)
 {
@@ -61,6 +57,13 @@ void SGameMtl::Load(IReader& fs)
 
     if (fs.find_chunk(GAMEMTL_CHUNK_DENSITY))
         fDensityFactor = fs.r_float();
+}
+
+CGameMtlLibrary::CGameMtlLibrary()
+{
+    material_index = 0;
+    material_pair_index = 0;
+    PGMLib = &GMLib;
 }
 
 void CGameMtlLibrary::Load()
@@ -119,38 +122,14 @@ void CGameMtlLibrary::Load()
         }
         OBJ->close();
     }
-
-#ifndef _EDITOR
-    material_count = (u32)materials.size();
-    material_pairs_rt.resize(material_count*material_count, 0);
-    for (GameMtlPairIt p_it = material_pairs.begin(); material_pairs.end() != p_it; ++p_it)
+    u32 mtlCount = materials.size();
+    material_pairs_rt.resize(mtlCount*mtlCount, 0);
+    for (auto &mtlPair : material_pairs)
     {
-        SGameMtlPair* S = *p_it;
-        int idx0 = GetMaterialIdx(S->mtl0)*material_count + GetMaterialIdx(S->mtl1);
-        int idx1 = GetMaterialIdx(S->mtl1)*material_count + GetMaterialIdx(S->mtl0);
-        material_pairs_rt[idx0] = S;
-        material_pairs_rt[idx1] = S;
+        int idx0 = GetMaterialIdx(mtlPair->mtl0)*mtlCount + GetMaterialIdx(mtlPair->mtl1);
+        int idx1 = GetMaterialIdx(mtlPair->mtl1)*mtlCount + GetMaterialIdx(mtlPair->mtl0);
+        material_pairs_rt[idx0] = mtlPair;
+        material_pairs_rt[idx1] = mtlPair;
     }
-#endif
-
-    /*
-     for (GameMtlPairIt p_it=material_pairs.begin(); material_pairs.end() != p_it; ++p_it){
-     SGameMtlPair* S = *p_it;
-     for (int k=0; k<S->StepSounds.size(); k++){
-     Msg("%40s - 0x%x", S->StepSounds[k].handle->file_name(), S->StepSounds[k].g_type);
-     }
-     }
-     */
     FS.r_close (F);
 }
-
-#ifdef DEBUG
-LPCSTR SGameMtlPair::dbg_Name()
-{
-    static string256 nm;
-    SGameMtl* M0 = GMLib.GetMaterialByID(GetMtl0());
-    SGameMtl* M1 = GMLib.GetMaterialByID(GetMtl1());
-    xr_sprintf(nm, sizeof(nm), "Pair: %s - %s", *M0->m_Name, *M1->m_Name);
-    return nm;
-}
-#endif

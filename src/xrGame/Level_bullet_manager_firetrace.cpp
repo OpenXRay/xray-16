@@ -152,7 +152,7 @@ BOOL CBulletManager::test_callback(const collide::ray_defs& rd, CObject* object,
 
 void CBulletManager::FireShotmark (SBullet* bullet, const Fvector& vDir, const Fvector &vEnd, collide::rq_result& R, u16 target_material, const Fvector& vNormal, bool ShowMark)
 {
-	SGameMtlPair* mtl_pair	= GMLib.GetMaterialPair(bullet->bullet_material_idx, target_material);
+    SGameMtlPair* mtl_pair = GMLib.GetMaterialPairByIndices(bullet->bullet_material_idx, target_material);
 	Fvector particle_dir	= vNormal;
 
 	if (R.O)
@@ -164,7 +164,7 @@ void CBulletManager::FireShotmark (SBullet* bullet, const Fvector& vDir, const F
 		//на текущем актере отметок не ставим
 		if(Level().CurrentEntity() && Level().CurrentEntity()->ID() == R.O->ID()) return;
 
-		if (mtl_pair && !mtl_pair->m_pCollideMarks->empty() && ShowMark)
+		if (mtl_pair && !mtl_pair->CollideMarks->empty() && ShowMark)
 		{
 			//добавить отметку на материале
 			Fvector p;
@@ -172,7 +172,7 @@ void CBulletManager::FireShotmark (SBullet* bullet, const Fvector& vDir, const F
 			if(!g_dedicated_server)
 				::Render->add_SkeletonWallmark	(	&R.O->renderable.xform, 
 													PKinematics(R.O->Visual()), 
-													&*mtl_pair->m_pCollideMarks,
+													&*mtl_pair->CollideMarks,
 													p, 
 													bullet->dir, 
 													bullet->wallmark_size);
@@ -185,10 +185,10 @@ void CBulletManager::FireShotmark (SBullet* bullet, const Fvector& vDir, const F
 		Fvector*	pVerts	= Level().ObjectSpace.GetStaticVerts();
 		CDB::TRI*	pTri	= Level().ObjectSpace.GetStaticTris()+R.element;
 
-		if (mtl_pair && !mtl_pair->m_pCollideMarks->empty() && ShowMark)
+		if (mtl_pair && !mtl_pair->CollideMarks->empty() && ShowMark)
 		{
 			//добавить отметку на материале
-			::Render->add_StaticWallmark	(&*mtl_pair->m_pCollideMarks, vEnd, bullet->wallmark_size, pTri, pVerts);
+			::Render->add_StaticWallmark	(&*mtl_pair->CollideMarks, vEnd, bullet->wallmark_size, pTri, pVerts);
 		}
 	}
 

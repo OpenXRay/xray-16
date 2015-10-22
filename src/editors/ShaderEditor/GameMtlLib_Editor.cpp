@@ -51,18 +51,26 @@ void SGameMtl::FillProp		(PropItemVec& items, ListItem* owner)
     PHelper().CreateFloat			(items,	"Factors\\Density Factor",					&fDensityFactor, 0.0f, 1000.0f, 1.0f, 1);
 }
 
-void CGameMtlLibrary::CopyMtlPairs(SGameMtl* from, SGameMtl* to)
+SGameMtlPair::SGameMtlPair(const SGameMtlPair &src)
 {
-    for (GameMtlIt m1_it=materials.begin(); m1_it!=materials.end(); ++m1_it)
+    OwnProps = src.OwnProps;
+    ID_parent = src.ID_parent;
+    BreakingSounds = src.BreakingSounds;
+    StepSounds = src.StepSounds;
+    CollideSounds = src.CollideSounds;
+    CollideParticles = src.CollideParticles;
+    CollideMarks = src.CollideMarks;
+}
+
+void CGameMtlLibrary::CopyMtlPairs(SGameMtl *src, SGameMtl *dst)
+{
+    for (auto &mtl : materials)
     {
-        SGameMtl* M1 				= *m1_it;
-        SGameMtlPair* p_from		= GetMaterialPair(from->GetID(), M1->GetID());
-        SGameMtlPair* p_to			= GetMaterialPair(to->GetID(), M1->GetID());
-
-        if(p_from && p_to)
-        	p_to->CopyFrom(p_from);
+        SGameMtlPair *srcPair = GetMaterialPair(src->GetID(), mtl->GetID());
+        SGameMtlPair *dstPair = GetMaterialPair(dst->GetID(), mtl->GetID());
+        if (srcPair && dstPair)
+            new (dstPair)SGameMtlPair(*srcPair);
     }
-
 }
 
 BOOL CGameMtlLibrary::UpdateMtlPairs(SGameMtl* src)
@@ -126,6 +134,43 @@ void CGameMtlLibrary::RemoveMaterial(LPCSTR name)
 //------------------------------------------------------------------------------
 // material pair routines
 //------------------------------------------------------------------------------
+
+static IC bool ValidateParent(const SGameMtlPair *who, const SGameMtlPair *parent)
+{
+    if (!parent)
+        return true;
+    if (who == parent)
+        return false;
+    return ValidateParent(who, parent->m_Owner->GetMaterialPair(parent->GetParent()));
+}
+
+bool SGameMtlPair::SetParent(int parentId)
+{
+    int ID_parent_save = ID_parent;
+    ID_parent = parentId;
+    for (GameMtlPairIt it = m_Owner->FirstMaterialPair(); it != m_Owner->LastMaterialPair(); it++)
+    {
+        if (!ValidateParent(*it, m_Owner->GetMaterialPair((*it)->GetParent())))
+        {
+            ID_parent = ID_parent_save;
+            return false;
+        }
+    }
+    // all right
+    if (GAMEMTL_NONE_ID == ID_parent)
+        OwnProps.one();
+    else
+    {
+        OwnProps.zero();
+        OwnProps.set(flBreakingSounds, BreakingSounds.size());
+        OwnProps.set(flStepSounds, StepSounds.size());
+        OwnProps.set(flCollideSounds, CollideSounds.size());
+        OwnProps.set(flCollideParticles, CollideParticles.size());
+        OwnProps.set(flCollideMarks, CollideMarks.size());
+    }
+    return true;
+}
+
 void __fastcall SGameMtlPair::OnFlagChange(PropValue* sender)
 {
 	bool bChecked = sender->Owner()->m_Flags.is(PropItem::flCBChecked);
@@ -153,38 +198,6 @@ IC SGameMtlPair* GetLastParentValue(SGameMtlPair* who, u32 flag)
 	if (!who)					return 0;
 	if ((GAMEMTL_NONE_ID==who->GetParent())||(who->OwnProps.is(flag))) return who;
     else						return GetLastParentValue(who->m_Owner->GetMaterialPair(who->GetParent()),flag);
-}
-
-IC BOOL ValidateParent(SGameMtlPair* who, SGameMtlPair* parent)
-{
-	if (!parent)				return TRUE;
-	if (who==parent)			return FALSE;
-    else						return ValidateParent(who,parent->m_Owner->GetMaterialPair(parent->GetParent()));
-}
-
-BOOL SGameMtlPair::SetParent(int parent)
-{
-	int ID_parent_save 			= ID_parent;
-	ID_parent					= parent;
-
-    for (GameMtlPairIt it=m_Owner->FirstMaterialPair(); it!=m_Owner->LastMaterialPair(); it++){
-    	if (!ValidateParent(*it,m_Owner->GetMaterialPair((*it)->GetParent()))){
-			ID_parent			= ID_parent_save;
-        	return FALSE;
-        }
-    }
-    // all right
-    if (GAMEMTL_NONE_ID==ID_parent){
-        OwnProps.one	();
-    }else{
-        OwnProps.zero	();
-        OwnProps.set	(flBreakingSounds,	BreakingSounds.size());
-        OwnProps.set	(flStepSounds,		StepSounds.size());
-        OwnProps.set	(flCollideSounds,	CollideSounds.size());
-        OwnProps.set	(flCollideParticles,CollideParticles.size());
-        OwnProps.set	(flCollideMarks,	CollideMarks.size());
-    }
-    return TRUE;
 }
 
 void __fastcall SGameMtlPair::FillChooseMtl(ChooseItemVec& items, void* param)

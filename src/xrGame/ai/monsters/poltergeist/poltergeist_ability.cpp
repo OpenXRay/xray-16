@@ -140,12 +140,15 @@ void CPoltergeist::StrangeSounds(const Fvector &position)
 
 				// Получить пару материалов
 				CDB::TRI*	pTri	= Level().ObjectSpace.GetStaticTris() + l_rq.element;
-				SGameMtlPair* mtl_pair = GMLib.GetMaterialPair(material().self_material_idx(),pTri->material);
+                SGameMtlPair* mtl_pair = GMLib.GetMaterialPairByIndices(material().self_material_idx(), pTri->material);
 				if (!mtl_pair) continue;
 
 				// Играть звук
 				if (!mtl_pair->CollideSounds.empty()) {
-					CLONE_MTL_SOUND(m_strange_sound, mtl_pair, CollideSounds);
+                    // CLONE_MTL_SOUND(m_strange_sound, mtl_pair, CollideSounds);
+					VERIFY2(!mtl_pair->CollideSounds.empty(), mtl_pair->dbg_Name());
+                    ref_sound &randSound = mtl_pair->CollideSounds[Random.randI(mtl_pair->CollideSounds.size())];
+                    m_strange_sound.clone(randSound, st_Effect, sg_SourceType);
 					Fvector pos;
 					pos.mad(position, dir, ((l_rq.range - 0.1f > 0) ? l_rq.range - 0.1f  : l_rq.range));
 					m_strange_sound.play_at_pos(this,pos);
