@@ -25,11 +25,14 @@ o get rid of any borland specific code
     - ParticleEditor
     o PPEditor
 - Modules
-  * subdivide xrGame into multiple modules (so changed code could be compiled faster)
+  * subdivide xrGame into multiple modules
+    * xrScriptEngine
+    - xrAI
   + merge xrCPU_Pipe into xrCore
   c merge xrAPI into xrCore
   - merge xrXMLParser into xrCore
   - merge crypto into xrCore
+  + delete xrCoreStatic, plugins should use xrCore
 - 3rd party libraries
   - decouple/update ODE
     - dig through current ODE and analyze changes that were made by GSC
@@ -59,11 +62,14 @@ o get rid of any borland specific code
     - alpha transparency works improperly - objects like steelworks and meshes quickly lose details and become
       invisible when camera moves away (r1 looks better)
     - R1: incorrect sun path
-    - make saturation dependent on exposure (see ArmA series)
-    - improve night vision
+    - glow material doesn't cast shadows (causes artifacts on actor shadow)
+    - no actor shadow in R2/R3/R4 (works in R1)
+    - big world shadow appears and disappears depending on the sun direction
   - physics
     - falling actor can continue being in falling state under specific conditions
     + small bullet manager time factor leads to crash
+  - gameplay
+    - ammo switching
   - plugins
     - update plugins for new 3DS Max versions
 - improvements
@@ -71,7 +77,9 @@ o get rid of any borland specific code
     * review and refactor code
     - fix log messages format (normally, the 'color' character should be followed by a space)
     - add registry entries (player name, cdkey, etc) if not exist
-    - glow material doesn't cast shadows (causes artefacts on actor shadow)
+    - x86_64 support
+    - better multithreading
+    - 'stuttering' problem (likely due to old luajit)
   - UI
     - close sleep dialog by ESC key
   - multiplayer
@@ -85,8 +93,9 @@ o get rid of any borland specific code
       - remove topmost startup logo window
       - Linux support
   - xrCore
-    - get rid of old blackbox code
-    - refactor xrDebug
+    - debug
+      - get rid of old BlackBox code
+      - hide all process windows on crash
     - logger
       - don't keep log in std::vector, write to log file immediately
       - tweak CConsole to use new logger
@@ -95,11 +104,36 @@ o get rid of any borland specific code
     - FXAA
     - SMAA
     - PCSS (or some other alternative)
-    - glow material doesn't cast shadows (causes artefacts on actor shadow)
+    - precompiled shaders should be recompiled once sources are updated
+    - wallmark normal/bump mapping
+    - ideas to consider
+      - improve night vision
+      - make saturation dependent on exposure (see ArmA series)
+      - re-enable fov and hud_fov console commands
+      - grass shadows
+      - particle shadows
+      - SSAO/HDAO improvements
+      - add grass draw distance to render settings
+      - 3D shell casings
+      - allow .seq files to be given a stop frame/point (animated blood puddles underneath bodies)
+      - DirectX 12
+      - remove old R1
+  - sound
+    - occlusion
+  - physics
+    - ideas to consider
+      - vegetation collision
+  - editors
+    - level editor
+      - visible level-loaded decals and the ability to see decals that aren't just 'wallmarkblend' type
+      - undo function performance
   - AI
     - NPCs don't react to enemies shooting around until see them or get shot
   - xrLC
     - try to optimize memory requirements (use disk cache for intermediate data?)
+  - gameplay
+    - ideas to consider
+      - stealth mechanics
 
 STALKER_2010: Andrew Boyarshin
 * detach/update LuaJIT
