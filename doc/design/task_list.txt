@@ -16,18 +16,18 @@ nitrocaster: Pavel Kovalenko
 - get the entire solution compiled with ForceConformanceInForLoopScope=false
 - get rid of atimgpu, use amd ags instead (will also eliminate LNK4098)
 - scan solution with PVS-Studio and fix found bugs
-* get rid of any borland specific code
-  * write new or use existing controls instead of ones from VCL/ElPack/AlexMX
-  * adopt/rewrite editors
+o get rid of any borland specific code
+  o write new or use existing controls instead of ones from VCL/ElPack/AlexMX
+  o adopt/rewrite editors
     - LevelEditor
     - ActorEditor
     - ShaderEditor
     - ParticleEditor
-    * PPEditor
+    o PPEditor
 - Modules
-  - subdivide xrGame into multiple modules (so changed code could be compiled faster)
-  - merge xrCPU_Pipe into xrCore
-  - merge xrAPI into xrCore
+  * subdivide xrGame into multiple modules (so changed code could be compiled faster)
+  + merge xrCPU_Pipe into xrCore
+  c merge xrAPI into xrCore
   - merge xrXMLParser into xrCore
   - merge crypto into xrCore
 - 3rd party libraries
@@ -43,6 +43,7 @@ nitrocaster: Pavel Kovalenko
 - bugs/issues
   - generic
     - (bytes_need<=mSize) && vl_Count
+    + primary/secondary thread syncronization does not work properly
   - UI
     c clip cursor in windowed mode with enabled input capture
     - dragging music volume slider doesn't make any effect until one presses 'Apply' button
@@ -62,13 +63,15 @@ nitrocaster: Pavel Kovalenko
     - improve night vision
   - physics
     - falling actor can continue being in falling state under specific conditions
+    + small bullet manager time factor leads to crash
   - plugins
     - update plugins for new 3DS Max versions
 - improvements
   - common/unsorted
-    - review and refactor code
+    * review and refactor code
     - fix log messages format (normally, the 'color' character should be followed by a space)
     - add registry entries (player name, cdkey, etc) if not exist
+    - glow material doesn't cast shadows (causes artefacts on actor shadow)
   - UI
     - close sleep dialog by ESC key
   - multiplayer
@@ -88,11 +91,13 @@ nitrocaster: Pavel Kovalenko
       - don't keep log in std::vector, write to log file immediately
       - tweak CConsole to use new logger
   - render
+    - debug render is extremely slow, have to be optimized
     - FXAA
     - SMAA
     - PCSS (or some other alternative)
     - glow material doesn't cast shadows (causes artefacts on actor shadow)
-  - consider disabling accel when falling (more realistic)
+  - AI
+    - NPCs don't react to enemies shooting around until see them or get shot
   - xrLC
     - try to optimize memory requirements (use disk cache for intermediate data?)
 
