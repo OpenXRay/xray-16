@@ -2,6 +2,7 @@
 #include "Scope.h"
 #include "Silencer.h"
 #include "GrenadeLauncher.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 CScope::CScope	()
 {
@@ -13,10 +14,9 @@ CScope::~CScope	()
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScope::script_register	(lua_State *L)
+SCRIPT_EXPORT(CScope, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScope,CGameObject>("CScope")
 			.def(constructor<>()),
@@ -27,4 +27,4 @@ void CScope::script_register	(lua_State *L)
 		class_<CGrenadeLauncher,CGameObject>("CGrenadeLauncher")
 			.def(constructor<>())
 	];
-}
+});

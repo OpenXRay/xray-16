@@ -35,7 +35,7 @@ u32     version     = 0;
 ILevelCompilerLogger& Logger = LevelCompilerLoggerWindow();
 
 CThread::LogFunc ProxyMsg = cdecl_cast(
-    [&](const char *format, ...)
+    [](const char *format, ...)
     {
         va_list args;
         va_start(args, format);
@@ -45,7 +45,7 @@ CThread::LogFunc ProxyMsg = cdecl_cast(
 );
 
 CThreadManager::ReportStatusFunc ProxyStatus = cdecl_cast(
-    [&](const char *format, ...)
+    [](const char *format, ...)
     {
         va_list args;
         va_start(args, format);
@@ -55,7 +55,7 @@ CThreadManager::ReportStatusFunc ProxyStatus = cdecl_cast(
 );
 
 CThreadManager::ReportProgressFunc ProxyProgress = cdecl_cast(
-    [&](float progress)
+    [](float progress)
     { Logger.Progress(progress); }
 );
 

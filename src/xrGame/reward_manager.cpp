@@ -4,7 +4,7 @@
 #include "UIGameMP.h"
 #include "reward_snd_messages.h"
 #include "HUDManager.h"
-#include "xrServerEntities/object_broker.h"
+#include "Common/object_broker.h"
 
 namespace award_system
 {

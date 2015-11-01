@@ -54,13 +54,13 @@ IC void FillSprite_Circle      (const Fvector& pos, const float width, const flo
 
 	//	TODO: return code back to indexed rendering since we use quads
 	//	Tri 1
-	UIRender->PushPoint(d.x+pos.x, d.y+pos.y, d.z+pos.z, color, t_crcl.min.x, t_crcl.max.y);		// 0.f,1.f);
-	UIRender->PushPoint(a.x+pos.x, a.y+pos.y, a.z+pos.z, color, t_crcl.min.x, t_crcl.min.y);		// 0.f,0.f);
-	UIRender->PushPoint(c.x+pos.x, c.y+pos.y, c.z+pos.z, color, t_crcl.max.x, t_crcl.max.y);		// 1.f,1.f);
+	GlobalEnv.UIRender->PushPoint(d.x+pos.x, d.y+pos.y, d.z+pos.z, color, t_crcl.min.x, t_crcl.max.y);		// 0.f,1.f);
+	GlobalEnv.UIRender->PushPoint(a.x+pos.x, a.y+pos.y, a.z+pos.z, color, t_crcl.min.x, t_crcl.min.y);		// 0.f,0.f);
+	GlobalEnv.UIRender->PushPoint(c.x+pos.x, c.y+pos.y, c.z+pos.z, color, t_crcl.max.x, t_crcl.max.y);		// 1.f,1.f);
 	//	Tri 2																					
-	UIRender->PushPoint(c.x+pos.x, c.y+pos.y, c.z+pos.z, color, t_crcl.max.x, t_crcl.max.y);	// 1.f,1.f);
-	UIRender->PushPoint(a.x+pos.x, a.y+pos.y, a.z+pos.z, color, t_crcl.min.x, t_crcl.min.y);	// 0.f,0.f);
-	UIRender->PushPoint(b.x+pos.x, b.y+pos.y, b.z+pos.z, color, t_crcl.max.x, t_crcl.min.y);	// 1.f,0.f);
+	GlobalEnv.UIRender->PushPoint(c.x+pos.x, c.y+pos.y, c.z+pos.z, color, t_crcl.max.x, t_crcl.max.y);	// 1.f,1.f);
+	GlobalEnv.UIRender->PushPoint(a.x+pos.x, a.y+pos.y, a.z+pos.z, color, t_crcl.min.x, t_crcl.min.y);	// 0.f,0.f);
+	GlobalEnv.UIRender->PushPoint(b.x+pos.x, b.y+pos.y, b.z+pos.z, color, t_crcl.max.x, t_crcl.min.y);	// 1.f,0.f);
 
 	//pv->set         (d.x+pos.x,d.y+pos.y,d.z+pos.z, color, 0.f,1.f);        pv++;
 	//pv->set         (a.x+pos.x,a.y+pos.y,a.z+pos.z, color, 0.f,0.f);        pv++;
@@ -96,13 +96,13 @@ IC void FillSprite_Line	(const Fvector& pos, const Fvector& dir, const float wid
 
 	//	TODO: return code back to indexed rendering since we use quads
 	//	Tri 1
-	UIRender->PushPoint(d.x+pos.x, d.y+pos.y, d.z+pos.z, color, t_tracer.min.x, t_tracer.max.y);
-	UIRender->PushPoint(a.x+pos.x, a.y+pos.y, a.z+pos.z, color, t_tracer.min.x, t_tracer.min.y);
-	UIRender->PushPoint(c.x+pos.x, c.y+pos.y, c.z+pos.z, color, t_tracer.max.x, t_tracer.max.y);
+	GlobalEnv.UIRender->PushPoint(d.x+pos.x, d.y+pos.y, d.z+pos.z, color, t_tracer.min.x, t_tracer.max.y);
+	GlobalEnv.UIRender->PushPoint(a.x+pos.x, a.y+pos.y, a.z+pos.z, color, t_tracer.min.x, t_tracer.min.y);
+	GlobalEnv.UIRender->PushPoint(c.x+pos.x, c.y+pos.y, c.z+pos.z, color, t_tracer.max.x, t_tracer.max.y);
 	//	Tri 2																					
-	UIRender->PushPoint(c.x+pos.x, c.y+pos.y, c.z+pos.z, color, t_tracer.max.x, t_tracer.max.y);
-	UIRender->PushPoint(a.x+pos.x, a.y+pos.y, a.z+pos.z, color, t_tracer.min.x, t_tracer.min.y);
-	UIRender->PushPoint(b.x+pos.x, b.y+pos.y, b.z+pos.z, color, t_tracer.max.x, t_tracer.min.y);
+	GlobalEnv.UIRender->PushPoint(c.x+pos.x, c.y+pos.y, c.z+pos.z, color, t_tracer.max.x, t_tracer.max.y);
+	GlobalEnv.UIRender->PushPoint(a.x+pos.x, a.y+pos.y, a.z+pos.z, color, t_tracer.min.x, t_tracer.min.y);
+	GlobalEnv.UIRender->PushPoint(b.x+pos.x, b.y+pos.y, b.z+pos.z, color, t_tracer.max.x, t_tracer.min.y);
 
 
     //pv->set         (d.x+pos.x,d.y+pos.y,d.z+pos.z, color, 0.f,1.f);        pv++;
@@ -120,7 +120,7 @@ void  CTracer::Render	(const Fvector& pos,
 						 float speed,
 						 bool bActor)
 {
-	if (::Render->ViewBase.testSphere_dirty((Fvector&)center,length*.5f) )
+	if (GlobalEnv.Render->ViewBase.testSphere_dirty((Fvector&)center,length*.5f) )
 	{
 		R_ASSERT (colorID < m_aColors.size() );
 		

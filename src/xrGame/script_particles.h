@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "script_export_space.h"
 #include "particlesobject.h"
 
 // refs
@@ -52,11 +51,6 @@ public:
 	void						StartPath			(bool looped);
 	void						StopPath			();
 	void						PausePath			(bool val);
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CScriptParticles)
-#undef script_type_list
-#define script_type_list save_type_list(CScriptParticles)
 
 #include "script_particles_inline.h"

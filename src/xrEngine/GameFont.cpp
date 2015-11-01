@@ -15,7 +15,7 @@ ENGINE_API Fvector2 g_current_font_scale = {1.0f, 1.0f};
 
 CGameFont::CGameFont(LPCSTR section, u32 flags)
 {
-    pFontRender = RenderFactory->CreateFontRender();
+    pFontRender = GlobalEnv.RenderFactory->CreateFontRender();
     fCurrentHeight = 0.0f;
     fXStep = 0.0f;
     fYStep = 0.0f;
@@ -35,7 +35,7 @@ CGameFont::CGameFont(LPCSTR section, u32 flags)
 
 CGameFont::CGameFont(LPCSTR shader, LPCSTR texture, u32 flags)
 {
-    pFontRender = RenderFactory->CreateFontRender();
+    pFontRender = GlobalEnv.RenderFactory->CreateFontRender();
     fCurrentHeight = 0.0f;
     fXStep = 0.0f;
     fYStep = 0.0f;
@@ -179,11 +179,11 @@ CGameFont::~CGameFont()
         xr_free(TCMap);
 
     // Shading
-    RenderFactory->DestroyFontRender(pFontRender);
+    GlobalEnv.RenderFactory->DestroyFontRender(pFontRender);
 }
 
-#define DI2PX(x) float(iFloor((x+1)*float(::Render->getTarget()->get_width())*0.5f))
-#define DI2PY(y) float(iFloor((y+1)*float(::Render->getTarget()->get_height())*0.5f))
+#define DI2PX(x) float(iFloor((x+1)*float(GlobalEnv.Render->getTarget()->get_width())*0.5f))
+#define DI2PY(y) float(iFloor((y+1)*float(GlobalEnv.Render->getTarget()->get_height())*0.5f))
 
 void CGameFont::OutSet(float x, float y)
 {
@@ -211,7 +211,7 @@ u16 CGameFont::GetCutLengthPos(float fTargetWidth, const char* pszText)
 {
     VERIFY(pszText);
 
-    wide_char wsStr[MAX_MB_CHARS], wsPos[MAX_MB_CHARS];
+    wchar_t wsStr[MAX_MB_CHARS], wsPos[MAX_MB_CHARS];
     float fCurWidth = 0.0f, fDelta = 0.0f;
 
     u16 len = mbhMulti2Wide(wsStr, wsPos, MAX_MB_CHARS, pszText);
@@ -237,7 +237,7 @@ u16 CGameFont::SplitByWidth(u16* puBuffer, u16 uBufferSize, float fTargetWidth, 
 {
     VERIFY(puBuffer && uBufferSize && pszText);
 
-    wide_char wsStr[MAX_MB_CHARS], wsPos[MAX_MB_CHARS];
+    wchar_t wsStr[MAX_MB_CHARS], wsPos[MAX_MB_CHARS];
     float fCurWidth = 0.0f, fDelta = 0.0f;
     u16 nLines = 0;
 
@@ -347,7 +347,7 @@ float CGameFont::SizeOf_(LPCSTR s)
 
     if (IsMultibyte())
     {
-        wide_char wsStr[MAX_MB_CHARS];
+        wchar_t wsStr[MAX_MB_CHARS];
 
         mbhMulti2Wide(wsStr, NULL, MAX_MB_CHARS, s);
 
@@ -363,7 +363,7 @@ float CGameFont::SizeOf_(LPCSTR s)
     return (X*vInterval.x);
 }
 
-float CGameFont::SizeOf_(const wide_char* wsStr)
+float CGameFont::SizeOf_(const wchar_t* wsStr)
 {
     if (!(wsStr && wsStr[0]))
         return 0;

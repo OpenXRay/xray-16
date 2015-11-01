@@ -10,7 +10,7 @@
 
 #include "action_management_config.h"
 #include "property_storage.h"
-#include "script_export_space.h"
+
 #include "operator_abstract.h"
 #include "alife_space.h"
 
@@ -18,7 +18,7 @@ class CScriptGameObject;
 
 template <typename _object_type>
 class CActionBase : public GraphEngineSpace::CWorldOperator {
-protected:
+public:
 	typedef GraphEngineSpace::CWorldOperator			inherited;
 	typedef GraphEngineSpace::CWorldProperty			COperatorCondition;
 	typedef GraphEngineSpace::_solver_condition_type	_condition_type;
@@ -78,12 +78,8 @@ public:
 
 	virtual	void				save				(NET_Packet &packet) {}
 	virtual	void				load				(IReader &packet) {}
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 typedef CActionBase<CScriptGameObject> CScriptActionBase;
-add_to_type_list(CScriptActionBase)
-#undef script_type_list
-#define script_type_list save_type_list(CScriptActionBase)
 
 #include "action_base_inline.h"
+

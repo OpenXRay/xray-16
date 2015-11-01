@@ -151,7 +151,7 @@ void CProfiler::clear				()
 #endif // PROFILE_CRITICAL_SECTIONS
 }
 
-void CProfiler::show_stats			(CGameFont *game_font, bool show)
+void CProfiler::show_stats			(IGameFont &font, bool show)
 {
 	if (!show) {
 #ifdef PROFILE_CRITICAL_SECTIONS
@@ -227,11 +227,11 @@ void CProfiler::show_stats			(CGameFont *game_font, bool show)
 
 		float					average = (*I).second.m_count ? (*I).second.m_total_time/float((*I).second.m_count) : 0.f;
 		if (average >= (*I).second.m_time)
-			game_font->SetColor	(color_xrgb(127,127,127));
+			font.SetColor	(color_xrgb(127,127,127));
 		else
-			game_font->SetColor	(color_xrgb(255,255,255));
+			font.SetColor	(color_xrgb(255,255,255));
 
-		game_font->OutNext		(
+		font.OutNext		(
 //			"%s.. %8.3f %8.3f %8.3f %8.3f %8.3f %8d %12.3f",
 			"%s%c%c %8.3f %8.3f %8.3f %6.1f %8d %12.3f",
 			*(*I).second.m_name,
@@ -247,7 +247,7 @@ void CProfiler::show_stats			(CGameFont *game_font, bool show)
 		);
 	}
 
-	game_font->SetColor			(color_xrgb(255,255,255));
+	font.SetColor			(color_xrgb(255,255,255));
 }
 
 void CProfiler::add_profile_portion	(const CProfileResultPortion &profile_portion)

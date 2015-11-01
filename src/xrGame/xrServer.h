@@ -292,7 +292,7 @@ public:
 			bool			verify_entities		() const;
 			void			verify_entity		(const CSE_Abstract *entity) const;
 #endif
-    void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert);
+    void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert);
 };
 
 

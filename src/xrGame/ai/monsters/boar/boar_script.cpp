@@ -1,14 +1,14 @@
 #include "pch_script.h"
 #include "boar.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CAI_Boar::script_register(lua_State *L)
+SCRIPT_EXPORT(CAI_Boar, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CAI_Boar,CGameObject>("CAI_Boar")
 			.def(constructor<>())
 	];
-}
+});

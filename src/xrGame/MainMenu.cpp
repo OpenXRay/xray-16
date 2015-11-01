@@ -26,7 +26,7 @@
 #include <shellapi.h>
 #pragma comment(lib, "shell32.lib")
 
-#include "object_broker.h"
+#include "Common/object_broker.h"
 
 #include "account_manager.h"
 #include "login_manager.h"
@@ -346,7 +346,7 @@ void	CMainMenu::IR_OnKeyboardPress(int dik)
 		return;
 	}
 	if (DIK_F12 == dik){
-		Render->Screenshot();
+        GlobalEnv.Render->Screenshot();
 		return;
 	}
 
@@ -388,9 +388,9 @@ void CMainMenu::OnRender	()
 		return;
 
 	if(g_pGameLevel)
-		Render->Calculate			();
+        GlobalEnv.Render->Calculate			();
 
-	Render->Render				();
+    GlobalEnv.Render->Render				();
 	if(!OnRenderPPUI_query())
 	{
 		DoRenderDialogs();
@@ -455,7 +455,7 @@ void CMainMenu::OnFrame()
 	if(m_Flags.test(flGameSaveScreenshot) && Device.dwFrame > m_screenshotFrame  )
 	{
 		m_Flags.set					(flGameSaveScreenshot,FALSE);
-		::Render->Screenshot		(IRender::SM_FOR_GAMESAVE, m_screenshot_name);
+		GlobalEnv.Render->Screenshot		(IRender::SM_FOR_GAMESAVE, m_screenshot_name);
 		
 		if(g_pGameLevel && m_Flags.test(flActive))
 		{
@@ -494,7 +494,7 @@ void CMainMenu::Screenshot(IRender::ScreenshotMode mode, LPCSTR name)
 {
 	if(mode != IRender::SM_FOR_GAMESAVE)
 	{
-		::Render->Screenshot		(mode,name);
+		GlobalEnv.Render->Screenshot		(mode,name);
 	}else{
 		m_Flags.set					(flGameSaveScreenshot, TRUE);
 		xr_strcpy(m_screenshot_name,name);

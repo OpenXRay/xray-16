@@ -7,7 +7,7 @@
 
 #include "pch_script.h"
 #include "smart_cover_loophole.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "smart_cover_object.h"
 
 using smart_cover::loophole;

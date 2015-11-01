@@ -9,7 +9,7 @@
 #include "line_edit_control.h"
 
 #include "xrCore/os_clipboard.h"
-#include "xrServerEntities/object_broker.h"
+#include "Common/object_broker.h"
 #include "xr_input.h"
 
 #include "edit_actions.h"

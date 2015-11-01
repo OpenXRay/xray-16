@@ -4,27 +4,20 @@
 #include "IGame_Persistent.h"
 #include "xr_IOConsole.h"
 
-void CRenderDevice::_Destroy(BOOL bKeepTextures)
-{
-    DU->OnDeviceDestroy();
-    // before destroy
-    b_is_Ready = FALSE;
-    Statistic->OnDeviceDestroy();
-    Render->destroy();
-    Render->OnDeviceDestroy(!!bKeepTextures);
-    Memory.mem_compact();
-}
-
 void CRenderDevice::Destroy(void)
 {
     if (!b_is_Ready)
         return;
     Log("Destroying Direct3D...");
     ShowCursor(TRUE);
-    Render->ValidateHW();
-    _Destroy(FALSE);
-    // real destroy
-    Render->DestroyHW();
+    GlobalEnv.Render->ValidateHW();
+    GlobalEnv.DU->OnDeviceDestroy();
+    b_is_Ready = FALSE;
+    Statistic->OnDeviceDestroy();
+    GlobalEnv.Render->destroy();
+    GlobalEnv.Render->OnDeviceDestroy(false);
+    Memory.mem_compact();
+    GlobalEnv.Render->DestroyHW();
     seqRender.R.clear();
     seqAppActivate.R.clear();
     seqAppDeactivate.R.clear();
@@ -34,7 +27,6 @@ void CRenderDevice::Destroy(void)
     seqFrameMT.R.clear();
     seqDeviceReset.R.clear();
     seqParallel.clear();
-    // RenderFactory->DestroyRenderDeviceRender(Render); // XXX: verify & delete
     xr_delete(Statistic);
 }
 
@@ -48,7 +40,7 @@ void CRenderDevice::Reset(bool precache)
     u32 dwHeight_before = dwHeight;
     ShowCursor(TRUE);
     u32 tm_start = TimerAsync();
-    Render->Reset(m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
+    GlobalEnv.Render->Reset(m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
     if (g_pGamePersistent)
         g_pGamePersistent->Environment().bNeed_re_create_env = TRUE;
     _SetupStates();

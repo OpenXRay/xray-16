@@ -8,7 +8,7 @@
 
 #include "stdafx.h"
 #include "script_ini_file.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "ai_space.h"
 #include "object_factory.h"
 

@@ -10,7 +10,7 @@
 #include "xrServer_Objects_ALife.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "game_base_space.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "restriction_space.h"
 
 
@@ -28,7 +28,7 @@
 
 #ifdef XRSE_FACTORY_EXPORTS
 #	include "ai_space.h"
-#	include "script_engine.h"
+#	include "xrScriptEngine/script_engine.hpp"
 #	pragma warning(push)
 #	pragma warning(disable:4995)
 #		include <luabind/luabind.hpp>
@@ -1561,8 +1561,8 @@ bool CSE_ALifeObjectHangingLamp::match_configuration() const
 	R_ASSERT3(flags.test(flR1) || flags.test(flR2),"no renderer type set for hanging-lamp ",name_replace());
 #ifdef XRGAME_EXPORTS
 	return						(
-		(flags.test(flR1) && (::Render->get_generation() == IRender::GENERATION_R1)) ||
-		(flags.test(flR2) && (::Render->get_generation() == IRender::GENERATION_R2))
+		(flags.test(flR1) && (GlobalEnv.Render->get_generation() == IRender::GENERATION_R1)) ||
+		(flags.test(flR2) && (GlobalEnv.Render->get_generation() == IRender::GENERATION_R2))
 	);
 #else
 	return						(true);

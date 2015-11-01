@@ -34,11 +34,11 @@ IGame_Level::~IGame_Level()
 {
     if (strstr(Core.Params, "-nes_texture_storing"))
         //Device.Resources->StoreNecessaryTextures();
-        Render->ResourcesStoreNecessaryTextures();
+        GlobalEnv.Render->ResourcesStoreNecessaryTextures();
     xr_delete(pLevel);
 
     // Render-level unload
-    Render->level_Unload();
+    GlobalEnv.Render->level_Unload();
     xr_delete(m_pCameras);
     // Unregister
     Device.seqRender.Remove(this);
@@ -50,8 +50,8 @@ IGame_Level::~IGame_Level()
     Device.DumpResourcesMemoryUsage();
 
     u32 m_base = 0, c_base = 0, m_lmaps = 0, c_lmaps = 0;
-    if (Render)
-        Render->ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
+    if (GlobalEnv.Render)
+        GlobalEnv.Render->ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
 
     Msg("* [ D3D ]: textures[%d K]", (m_base + m_lmaps) / 1024);
 
@@ -118,7 +118,7 @@ bool IGame_Level::Load(u32 dwNum)
         g_hud = (CCustomHUD*)NEW_INSTANCE(CLSID_HUDMANAGER);
 
     // Render-level Load
-    Render->level_Load(LL_Stream);
+    GlobalEnv.Render->level_Load(LL_Stream);
     // tscreate.FrameEnd ();
     // Msg ("* S-CREATE: %f ms, %d times",tscreate.result,tscreate.count);
 
@@ -164,8 +164,8 @@ void IGame_Level::OnRender()
     // Level render, only when no client output required
     if (!g_dedicated_server)
     {
-        Render->Calculate ();
-        Render->Render ();
+        GlobalEnv.Render->Calculate ();
+        GlobalEnv.Render->Render ();
     }
     else
     {
@@ -208,7 +208,7 @@ void IGame_Level::OnFrame()
     }
 }
 
-void IGame_Level::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+void IGame_Level::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
 { Objects.DumpStatistics(font, alert); }
 
 // ==================================================================================================

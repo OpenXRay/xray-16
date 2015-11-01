@@ -1,5 +1,6 @@
 #include "pch_script.h"
 #include "weapongroza.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 CWeaponGroza::CWeaponGroza() :CWeaponMagazinedWGrenade(SOUND_TYPE_WEAPON_SUBMACHINEGUN) 
 {}
@@ -9,12 +10,11 @@ CWeaponGroza::~CWeaponGroza()
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CWeaponGroza::script_register	(lua_State *L)
+SCRIPT_EXPORT(CWeaponGroza, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CWeaponGroza,CGameObject>("CWeaponGroza")
 			.def(constructor<>())
 	];
-}
+});

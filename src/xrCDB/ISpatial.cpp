@@ -110,7 +110,7 @@ void	ISpatial::spatial_move	()
 
 void	ISpatial::spatial_updatesector_internal()
 {
-	IRender_Sector*		S				=	::Render->detectSector(spatial_sector_point());
+    IRender_Sector*		S = GlobalEnv.Render->detectSector(spatial_sector_point());
 	spatial.type						&=	~STYPEFLAG_INVALIDSECTOR;
 	if (S)				spatial.sector	=	S;
 }

@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
-#include "script_reader.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -33,10 +33,9 @@ void r_fvector3(IReader *self, Fvector *arg0)
 	self->r_fvector3(*arg0);
 }
 
-#pragma optimize("s",on)
-void CScriptReader::script_register(lua_State *L)
+SCRIPT_EXPORT(IReader, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<IReader>("reader")
 			.def("r_seek",			&IReader::seek			)
@@ -72,4 +71,4 @@ void CScriptReader::script_register(lua_State *L)
 			.def("r_advance",		&IReader::advance		)
 			.def("r_eof",			&r_eof					)
 	];
-}
+});

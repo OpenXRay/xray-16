@@ -2,14 +2,13 @@
 
 #include "xrPhysics/iphysics_scripted.h"
 #include "xrPhysics/physicsshell.h"
-#include "script_export_space.h"
+
 
 class CPhysicsShell;
 class cphysics_element_scripted;
 class cphysics_joint_scripted;
 
-class cphysics_shell_scripted:
-public cphysics_game_scripted<CPhysicsShell>
+class cphysics_shell_scripted : public cphysics_game_scripted<CPhysicsShell>
 {
 public:
 	cphysics_shell_scripted(CPhysicsShell* imp ):cphysics_game_scripted<CPhysicsShell>(imp){}
@@ -35,9 +34,4 @@ public:
 	bool	isBreakable			( )							{ return physics_impl(). isBreakable( ); }
 	void	get_LinearVel		(Fvector& velocity) const	{ physics_impl().get_LinearVel( velocity ); }
 	void	get_AngularVel		(Fvector& velocity)	const	{ physics_impl().get_AngularVel( velocity ); }
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-
-add_to_type_list(cphysics_shell_scripted)
-#undef script_type_list
-#define script_type_list save_type_list(cphysics_shell_scripted)

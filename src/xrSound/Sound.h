@@ -279,7 +279,7 @@ public:
 
 	virtual void					update					( const Fvector& P, const Fvector& D, const Fvector& N)									= 0;
 	virtual void					statistic				( CSound_stats*  s0, CSound_stats_ext* s1 )												= 0;
-    virtual void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) = 0;
+    virtual void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert) = 0;
 
 	virtual float					get_occlusion_to		( const Fvector& hear_pt, const Fvector& snd_pt, float dispersion=0.2f)					= 0;
 

@@ -8,7 +8,7 @@
 
 #include "Level.h"
 #include "actor.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "script_callback_ex.h"
 #include "script_game_object.h"
 #include "ai_space.h"
@@ -16,7 +16,7 @@
 #include "alife_simulator.h"
 #include "alife_story_registry.h"
 #include "game_object_space.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "ui/uitexturemaster.h"
 
 

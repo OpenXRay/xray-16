@@ -37,7 +37,7 @@ void CHUDCrosshair::SetDispersion	(float disp)
 	Device.mProject.transform	(r,R);
 
 	Fvector2		scr_size;
-	scr_size.set	(float(::Render->getTarget()->get_width()), float(::Render->getTarget()->get_height()));
+	scr_size.set	(float(GlobalEnv.Render->getTarget()->get_width()), float(GlobalEnv.Render->getTarget()->get_height()));
 	float radius_pixels		= _abs(r.x)*scr_size.x/2.0f;
 	target_radius		= radius_pixels; 
 }
@@ -50,7 +50,7 @@ void CHUDCrosshair::SetFirstBulletDispertion(float fbdisp)
 	Device.mProject.transform	(r,R);
 
 	Fvector2		scr_size;
-	scr_size.set	(float(::Render->getTarget()->get_width()), float(::Render->getTarget()->get_height()));
+	scr_size.set	(float(GlobalEnv.Render->getTarget()->get_width()), float(GlobalEnv.Render->getTarget()->get_height()));
 	fb_radius		= _abs(r.x)*scr_size.x/2.0f;
 }
 
@@ -61,10 +61,10 @@ void CHUDCrosshair::OnRenderFirstBulletDispertion()
 	VERIFY			(g_bRendering);
 	Fvector2		center;
 	Fvector2		scr_size;
-	scr_size.set	(float(::Render->getTarget()->get_width()), float(::Render->getTarget()->get_height()));
+	scr_size.set	(float(GlobalEnv.Render->getTarget()->get_width()), float(GlobalEnv.Render->getTarget()->get_height()));
 	center.set		(scr_size.x/2.0f, scr_size.y/2.0f);
 
-	UIRender->StartPrimitive		(10, IUIRender::ptLineList, UI().m_currentPointType);
+    GlobalEnv.UIRender->StartPrimitive		(10, IUIRender::ptLineList, UI().m_currentPointType);
 
 	u32	fb_cross_color				= color_rgba(255, 0, 0, 255); //red
 	
@@ -82,26 +82,26 @@ void CHUDCrosshair::OnRenderFirstBulletDispertion()
 	float y_max						= x_max;
 
 	// 0
-	UIRender->PushPoint(center.x,			center.y + y_min,	0, fb_cross_color, 0,0);
-	UIRender->PushPoint(center.x,			center.y + y_max,	0, fb_cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x,			center.y + y_min,	0, fb_cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x,			center.y + y_max,	0, fb_cross_color, 0,0);
 	// 1
-	UIRender->PushPoint(center.x,			center.y - y_min,	0, fb_cross_color, 0,0);
-	UIRender->PushPoint(center.x,			center.y - y_max,	0, fb_cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x,			center.y - y_min,	0, fb_cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x,			center.y - y_max,	0, fb_cross_color, 0,0);
 	// 2
-	UIRender->PushPoint(center.x + x_min,	center.y,			0, fb_cross_color, 0,0);
-	UIRender->PushPoint(center.x + x_max,	center.y,			0, fb_cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x + x_min,	center.y,			0, fb_cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x + x_max,	center.y,			0, fb_cross_color, 0,0);
 	// 3
-	UIRender->PushPoint(center.x - x_min,	center.y,			0, fb_cross_color, 0,0);
-	UIRender->PushPoint(center.x - x_max,	center.y,			0, fb_cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x - x_min,	center.y,			0, fb_cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x - x_max,	center.y,			0, fb_cross_color, 0,0);
 	
 	// point
-	UIRender->PushPoint(center.x-0.5f,		center.y,			0, fb_cross_color, 0,0);
-	UIRender->PushPoint(center.x+0.5f,		center.y,			0, fb_cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x-0.5f,		center.y,			0, fb_cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x+0.5f,		center.y,			0, fb_cross_color, 0,0);
 
 
 	// render	
-	UIRender->SetShader						(*hShader);
-	UIRender->FlushPrimitive				();
+	GlobalEnv.UIRender->SetShader						(*hShader);
+	GlobalEnv.UIRender->FlushPrimitive				();
 }
 #endif
 
@@ -111,10 +111,10 @@ void CHUDCrosshair::OnRender ()
 	VERIFY			(g_bRendering);
 	Fvector2		center;
 	Fvector2		scr_size;
-	scr_size.set	(float(::Render->getTarget()->get_width()), float(::Render->getTarget()->get_height()));
+	scr_size.set	(float(GlobalEnv.Render->getTarget()->get_width()), float(GlobalEnv.Render->getTarget()->get_height()));
 	center.set		(scr_size.x/2.0f, scr_size.y/2.0f);
 
-	UIRender->StartPrimitive		(10, IUIRender::ptLineList, UI().m_currentPointType);
+    GlobalEnv.UIRender->StartPrimitive		(10, IUIRender::ptLineList, UI().m_currentPointType);
 	
 
 	float cross_length					= cross_length_perc*scr_size.x;
@@ -130,26 +130,26 @@ void CHUDCrosshair::OnRender ()
 	float y_max							= x_max;
 
 	// 0
-	UIRender->PushPoint(center.x,			center.y + y_min,	0, cross_color, 0,0);
-	UIRender->PushPoint(center.x,			center.y + y_max,	0, cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x,			center.y + y_min,	0, cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x,			center.y + y_max,	0, cross_color, 0,0);
 	// 1
-	UIRender->PushPoint(center.x,			center.y - y_min,	0, cross_color, 0,0);
-	UIRender->PushPoint(center.x,			center.y - y_max,	0, cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x,			center.y - y_min,	0, cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x,			center.y - y_max,	0, cross_color, 0,0);
 	// 2
-	UIRender->PushPoint(center.x + x_min,	center.y,			0, cross_color, 0,0);
-	UIRender->PushPoint(center.x + x_max,	center.y,			0, cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x + x_min,	center.y,			0, cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x + x_max,	center.y,			0, cross_color, 0,0);
 	// 3
-	UIRender->PushPoint(center.x - x_min,	center.y,			0, cross_color, 0,0);
-	UIRender->PushPoint(center.x - x_max,	center.y,			0, cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x - x_min,	center.y,			0, cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x - x_max,	center.y,			0, cross_color, 0,0);
 	
 	// point
-	UIRender->PushPoint(center.x-0.5f,		center.y,			0, cross_color, 0,0);
-	UIRender->PushPoint(center.x+0.5f,		center.y,			0, cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x-0.5f,		center.y,			0, cross_color, 0,0);
+	GlobalEnv.UIRender->PushPoint(center.x+0.5f,		center.y,			0, cross_color, 0,0);
 
 
 	// render	
-	UIRender->SetShader(*hShader);
-	UIRender->FlushPrimitive		();
+    GlobalEnv.UIRender->SetShader(*hShader);
+    GlobalEnv.UIRender->FlushPrimitive		();
 
 
 	if(!fsimilar(target_radius,radius))

@@ -10,13 +10,13 @@
 #include "pch_script.h"
 #include "UIComboBox.h"
 #include "UIListBoxItem.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CUIComboBox::script_register(lua_State *L)
+SCRIPT_EXPORT(CUIComboBox, (CUIWindow),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CUIComboBox, CUIWindow>("CUIComboBox")
 		.def(						constructor<>())
@@ -31,6 +31,5 @@ void CUIComboBox::script_register(lua_State *L)
 		.def("SetText",				&CUIComboBox::SetText)
 		.def("ClearList",			&CUIComboBox::ClearList)
 		.def("SetCurrentOptValue",	&CUIComboBox::SetCurrentOptValue)
-
 	];
-}
+});

@@ -8,13 +8,13 @@
 
 #include "pch_script.h"
 #include "script_particles.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptParticles::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptParticles, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptParticles>("particles_object")
 			.def(								constructor<LPCSTR>())
@@ -33,4 +33,4 @@ void CScriptParticles::script_register(lua_State *L)
 			.def("stop_path",					&CScriptParticles::StopPath)
 			.def("pause_path",					&CScriptParticles::PausePath)
 	];
-}
+});

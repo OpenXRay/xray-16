@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "object_interfaces.h"
-#include "object_broker.h"
+#include "Common/object_interfaces.h"
+#include "Common/object_broker.h"
 
 template <typename _index_type, typename _data_type>
 class CALifeAbstractRegistry : public IPureSerializeObject<IReader,IWriter> {

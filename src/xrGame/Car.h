@@ -501,10 +501,10 @@ IC	size_t				CurrentTransmission					(){return m_current_transmission_num;}
 	void UpdateExhausts									();
 	void ClearExhausts									();
 	void UpdateFuel										(float time_delta);
-	float AddFuel										(float ammount); //ammount - fuel to load, ret - fuel loaded
+    float AddFuel										(float ammount); //ammount - fuel to load, ret - fuel loaded
+public:
 	void CarExplode										();
-	////////////////////////////////////////////		////////
-
+private:
 	void					OnCameraChange				(int type);
 
 
@@ -632,13 +632,4 @@ private:
 
 private:
 	car_memory	*m_memory;
-
-public:
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CCar)
-#undef script_type_list
-#define script_type_list save_type_list(CCar)
-
-//#endif // #if 0
-

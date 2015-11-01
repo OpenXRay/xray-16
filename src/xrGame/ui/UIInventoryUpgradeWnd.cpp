@@ -7,14 +7,14 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "UIInventoryUpgradeWnd.h"
 
 #include "xrUIXmlParser.h"
 #include "UIXmlInit.h"
 #include "string_table.h"
 #include "Actor.h"
-#include "xrServerEntities/script_process.h"
+#include "xrScriptEngine/script_process.hpp"
 #include "Inventory.h"
 #include "ai_space.h"
 #include "alife_simulator.h"

@@ -120,7 +120,7 @@ public:
         LPCSTR pFunctionName, LPCSTR pTarget, DWORD Flags, void *&result) override;
 
 	// Information
-    virtual void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) override;
+    virtual void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert) override;
     virtual LPCSTR getShaderPath() override { return "r1\\"; }
     virtual ref_shader getShader(int id);
     virtual IRender_Sector *getSector(int id) override;

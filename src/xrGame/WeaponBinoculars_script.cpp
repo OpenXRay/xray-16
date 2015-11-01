@@ -1,13 +1,14 @@
 #include "pch_script.h"
 #include "weaponbinoculars.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-void CWeaponBinoculars::script_register	(lua_State *L)
+SCRIPT_EXPORT(CWeaponBinoculars, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CWeaponBinoculars,CGameObject>("CWeaponBinoculars")
 			.def(constructor<>())
 	];
-}
+});

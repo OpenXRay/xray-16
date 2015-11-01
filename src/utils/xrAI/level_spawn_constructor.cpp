@@ -19,7 +19,7 @@
 #include "game_spawn_constructor.h"
 #include "patrol_path_storage.h"
 #include "space_restrictor_wrapper.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "restriction_space.h"
 
 #define IGNORE_ZERO_SPAWN_POSITIONS

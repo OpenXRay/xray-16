@@ -96,7 +96,7 @@ public:
 
     virtual void OnFrame(void);
     virtual void OnRender(void);
-    virtual void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert);
+    virtual void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert);
 
     virtual shared_str OpenDemoFile(const char* demo_file_name) = 0;
     virtual void net_StartPlayDemo() = 0;

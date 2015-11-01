@@ -3,7 +3,7 @@
 #include "ai/Monsters/controlled_entity.h"
 #include "ai/Monsters/ai_monster_bones.h"
 #include "ai/Monsters/anim_triple.h"
-#include "xrServerEntities/script_export_space.h"
+
 
 #define FAKE_DEATH_TYPES_COUNT	4
 
@@ -57,11 +57,4 @@ public:
 #ifdef _DEBUG
 	virtual void	debug_on_key			(int key);
 #endif
-
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-
-add_to_type_list(CZombie)
-#undef script_type_list
-#define script_type_list save_type_list(CZombie)

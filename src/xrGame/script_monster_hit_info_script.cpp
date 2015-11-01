@@ -3,15 +3,15 @@
 #include "script_game_object.h"
 #include "ai_monster_space.h"
 #include "AI/Monsters/monster_sound_defs.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
 struct CMonsterSpace {};
 
-#pragma optimize("s",on)
-void CScriptMonsterHitInfo::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptMonsterHitInfo, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptMonsterHitInfo>("MonsterHitInfo")
 			.def_readwrite("who",				&CScriptMonsterHitInfo::who)
@@ -32,4 +32,4 @@ void CScriptMonsterHitInfo::script_register(lua_State *L)
 				value("head_anim_kind",			MonsterSpace::eHeadAnimKind)
 			]
 	];
-}
+});

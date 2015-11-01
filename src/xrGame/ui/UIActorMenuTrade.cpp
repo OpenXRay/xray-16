@@ -19,7 +19,7 @@
 #include "string_table.h"
 #include "ai/monsters/BaseMonster/base_monster.h"
 #include "ai_space.h"
-#include "xrServerEntities/script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "UIGameSP.h"
 #include "UITalkWnd.h"
 

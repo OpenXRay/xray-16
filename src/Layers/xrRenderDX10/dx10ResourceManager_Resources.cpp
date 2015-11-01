@@ -133,11 +133,11 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 {
 	string_path			name;
 	xr_strcpy				(name,_name);
-	if (0 == ::Render->m_skinning)	xr_strcat(name,"_0");
-	if (1 == ::Render->m_skinning)	xr_strcat(name,"_1");
-	if (2 == ::Render->m_skinning)	xr_strcat(name,"_2");
-	if (3 == ::Render->m_skinning)	xr_strcat(name,"_3");
-	if (4 == ::Render->m_skinning)	xr_strcat(name,"_4");
+	if (0 == GlobalEnv.Render->m_skinning)	xr_strcat(name,"_0");
+	if (1 == GlobalEnv.Render->m_skinning)	xr_strcat(name,"_1");
+	if (2 == GlobalEnv.Render->m_skinning)	xr_strcat(name,"_2");
+	if (3 == GlobalEnv.Render->m_skinning)	xr_strcat(name,"_3");
+	if (4 == GlobalEnv.Render->m_skinning)	xr_strcat(name,"_4");
 	LPSTR N				= LPSTR		(name);
 	map_VS::iterator I	= m_vs.find	(N);
 	if (I!=m_vs.end())	return I->second;
@@ -161,7 +161,7 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 		}
 
 		string_path					cname;
-		strconcat					(sizeof(cname),cname,::Render->getShaderPath(),/*_name*/shName,".vs");
+		strconcat					(sizeof(cname),cname,GlobalEnv.Render->getShaderPath(),/*_name*/shName,".vs");
 		FS.update_path				(cname,	"$game_shaders$", cname);
 		//		LPCSTR						target		= NULL;
 
@@ -173,7 +173,7 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 			string1024			tmp;
 			xr_sprintf			(tmp, "DX10: %s is missing. Replace with stub_default.vs", cname);
 			Msg					(tmp);
-			strconcat			(sizeof(cname), cname,::Render->getShaderPath(),"stub_default",".vs");
+			strconcat			(sizeof(cname), cname,GlobalEnv.Render->getShaderPath(),"stub_default",".vs");
 			FS.update_path		(cname,	"$game_shaders$", cname);
 			file				= FS.r_open(cname);
 		}
@@ -192,7 +192,7 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 		if (strstr(data, "main_vs_1_1"))	{ c_target = "vs_1_1"; c_entry = "main_vs_1_1";	}
 		if (strstr(data, "main_vs_2_0"))	{ c_target = "vs_2_0"; c_entry = "main_vs_2_0";	}
 
-		HRESULT	const _hr		= ::Render->shader_compile(name,(DWORD const*)data,size, c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_vs );
+		HRESULT	const _hr		= GlobalEnv.Render->shader_compile(name,(DWORD const*)data,size, c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_vs );
 
 		VERIFY(SUCCEEDED(_hr));
 
@@ -235,14 +235,14 @@ SPS*	CResourceManager::_CreatePS			(LPCSTR _name)
 {
 	string_path			name;
 	xr_strcpy				(name,_name);
-	if (0 == ::Render->m_MSAASample)	xr_strcat(name,"_0");
-	if (1 == ::Render->m_MSAASample)	xr_strcat(name,"_1");
-	if (2 == ::Render->m_MSAASample)	xr_strcat(name,"_2");
-	if (3 == ::Render->m_MSAASample)	xr_strcat(name,"_3");
-	if (4 == ::Render->m_MSAASample)	xr_strcat(name,"_4");
-	if (5 == ::Render->m_MSAASample)	xr_strcat(name,"_5");
-	if (6 == ::Render->m_MSAASample)	xr_strcat(name,"_6");
-	if (7 == ::Render->m_MSAASample)	xr_strcat(name,"_7");
+	if (0 == GlobalEnv.Render->m_MSAASample)	xr_strcat(name,"_0");
+	if (1 == GlobalEnv.Render->m_MSAASample)	xr_strcat(name,"_1");
+	if (2 == GlobalEnv.Render->m_MSAASample)	xr_strcat(name,"_2");
+	if (3 == GlobalEnv.Render->m_MSAASample)	xr_strcat(name,"_3");
+	if (4 == GlobalEnv.Render->m_MSAASample)	xr_strcat(name,"_4");
+	if (5 == GlobalEnv.Render->m_MSAASample)	xr_strcat(name,"_5");
+	if (6 == GlobalEnv.Render->m_MSAASample)	xr_strcat(name,"_6");
+	if (7 == GlobalEnv.Render->m_MSAASample)	xr_strcat(name,"_7");
 	LPSTR N				= LPSTR(name);
 	map_PS::iterator I	= m_ps.find	(N);
 	if (I!=m_ps.end())	return		I->second;
@@ -264,7 +264,7 @@ SPS*	CResourceManager::_CreatePS			(LPCSTR _name)
 
 		// Open file
 		string_path					cname;
-		strconcat					(sizeof(cname), cname,::Render->getShaderPath(),/*_name*/shName,".ps");
+		strconcat					(sizeof(cname), cname,GlobalEnv.Render->getShaderPath(),/*_name*/shName,".ps");
 		FS.update_path				(cname,	"$game_shaders$", cname);
 
 		// duplicate and zero-terminate
@@ -277,7 +277,7 @@ SPS*	CResourceManager::_CreatePS			(LPCSTR _name)
 			//Memory.mem_compact();
 			xr_sprintf				(tmp, "DX10: %s is missing. Replace with stub_default.ps", cname);
 			Msg					(tmp);
-			strconcat					(sizeof(cname), cname,::Render->getShaderPath(),"stub_default",".ps");
+			strconcat					(sizeof(cname), cname,GlobalEnv.Render->getShaderPath(),"stub_default",".ps");
 			FS.update_path				(cname,	"$game_shaders$", cname);
 			R		= FS.r_open(cname);
 		}
@@ -299,7 +299,7 @@ SPS*	CResourceManager::_CreatePS			(LPCSTR _name)
 		if (strstr(data,"main_ps_1_4"))			{ c_target = "ps_1_4"; c_entry = "main_ps_1_4";	}
 		if (strstr(data,"main_ps_2_0"))			{ c_target = "ps_2_0"; c_entry = "main_ps_2_0";	}
 
-		HRESULT	const _hr		= ::Render->shader_compile(name,(DWORD const*)data,size, c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_ps );
+		HRESULT	const _hr		= GlobalEnv.Render->shader_compile(name,(DWORD const*)data,size, c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_ps );
 		
 		VERIFY(SUCCEEDED(_hr));
 
@@ -342,7 +342,7 @@ SGS*	CResourceManager::_CreateGS			(LPCSTR name)
 
 		// Open file
 		string_path					cname;
-		strconcat					(sizeof(cname), cname,::Render->getShaderPath(),name,".gs");
+		strconcat					(sizeof(cname), cname,GlobalEnv.Render->getShaderPath(),name,".gs");
 		FS.update_path				(cname,	"$game_shaders$", cname);
 
 		// duplicate and zero-terminate
@@ -355,7 +355,7 @@ SGS*	CResourceManager::_CreateGS			(LPCSTR name)
 			//Memory.mem_compact();
 			xr_sprintf				(tmp, "DX10: %s is missing. Replace with stub_default.gs", cname);
 			Msg					(tmp);
-			strconcat					(sizeof(cname), cname,::Render->getShaderPath(),"stub_default",".gs");
+			strconcat					(sizeof(cname), cname,GlobalEnv.Render->getShaderPath(),"stub_default",".gs");
 			FS.update_path				(cname,	"$game_shaders$", cname);
 			R		= FS.r_open(cname);
 		}
@@ -366,7 +366,7 @@ SGS*	CResourceManager::_CreateGS			(LPCSTR name)
 		LPCSTR						c_target	= "gs_4_0";
 		LPCSTR						c_entry		= "main";
 
-		HRESULT	const _hr		= ::Render->shader_compile(name,(DWORD const*)file->pointer(),file->length(), c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_gs );
+		HRESULT	const _hr		= GlobalEnv.Render->shader_compile(name,(DWORD const*)file->pointer(),file->length(), c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_gs );
 
 		VERIFY(SUCCEEDED(_hr));
 

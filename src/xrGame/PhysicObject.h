@@ -4,7 +4,6 @@
 #include "physicsshellholder.h"
 #include "physicsskeletonobject.h"
 #include "PHSkeleton.h"
-#include "script_export_space.h"
 #include "animation_script_callback.h"
 #include "xrserver_objects_alife.h"
 
@@ -62,7 +61,8 @@ private:
 			void	CreateBody			(CSE_ALifeObjectPhysic	*po)													;
 			void	CreateSkeleton		(CSE_ALifeObjectPhysic	*po)													;
 			void	AddElement			(CPhysicsElement* root_e, int id)												;
-private:
+            void						create_collision_model();
+public:
 			void						run_anim_forward				();
 			void						run_anim_back					();
 			void						stop_anim						();
@@ -70,10 +70,8 @@ private:
 			void						stop_bones_sound				();
 			float						anim_time_get					();
 			void						anim_time_set					( float time );
-			void						create_collision_model			( );
 			void						set_door_ignore_dynamics		( );
 			void						unset_door_ignore_dynamics		( );
-public:
 			bool						get_door_vectors				( Fvector& closed, Fvector& open ) const;
 public:
 			CPhysicObject(void);
@@ -131,9 +129,4 @@ protected:
 	Flags16								m_flags;
 	bool								m_just_after_spawn;
 	bool								m_activated;
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CPhysicObject)
-#undef script_type_list
-#define script_type_list save_type_list(CPhysicObject)

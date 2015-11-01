@@ -1,7 +1,7 @@
 #pragma once
 
 #include "uiwindow.h"
-#include "xrServerEntities/script_export_space.h"
+
 #include "UIOptionsItem.h"
 
 class CUITabButton;
@@ -70,6 +70,4 @@ protected:
 
 	bool				m_bAcceleratorsEnable;
 	shared_str			m_opt_backup_value;
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

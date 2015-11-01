@@ -1,6 +1,7 @@
 #include "pch_script.h"
 #include "helicopter.h"
 #include "script_game_object.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 int CHelicopter::GetMovementState()
 {
@@ -19,10 +20,9 @@ int CHelicopter::GetBodyState()
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CHelicopter::script_register(lua_State *L)
+SCRIPT_EXPORT(CHelicopter, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CHelicopter,CGameObject>("CHelicopter")
 			.def(constructor<>())
@@ -114,4 +114,4 @@ void CHelicopter::script_register(lua_State *L)
 //				.def_readwrite("", &CHelicopter::)
 
 		];
-}
+});

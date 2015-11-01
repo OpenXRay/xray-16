@@ -11,7 +11,7 @@
 #include "game_graph_space.h"
 #include "xrserver_space.h"
 #include "alife_space.h"
-#include "script_export_space.h"
+
 
 class CSE_ALifeOnlineOfflineGroup;
 class CALifeMonsterMovementManager;
@@ -45,11 +45,6 @@ public:
 public:
 	IC		object_type				&object				() const;
 	IC		movement_manager_type	&movement			() const;
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CALifeOnlineOfflineGroupBrain)
-#undef script_type_list
-#define script_type_list save_type_list(CALifeOnlineOfflineGroupBrain)
 
 #include "alife_online_offline_group_brain_inline.h"

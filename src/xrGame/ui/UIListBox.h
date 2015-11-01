@@ -49,8 +49,4 @@ protected:
 	shared_str		m_selection_texture;
 
 	bool			m_bImmediateSelection;
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CUIListBox)
-#undef script_type_list
-#define script_type_list save_type_list(CUIListBox)

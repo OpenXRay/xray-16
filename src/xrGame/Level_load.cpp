@@ -2,9 +2,8 @@
 #include "LevelGameDef.h"
 #include "ai_space.h"
 #include "ParticlesObject.h"
-#include "script_process.h"
-#include "script_engine.h"
-#include "script_engine_space.h"
+#include "xrScriptEngine/script_process.hpp"
+#include "xrScriptEngine/script_engine.hpp"
 #include "Level.h"
 #include "game_cl_base.h"
 #include "xrEngine/x_ray.h"
@@ -139,12 +138,12 @@ bool CLevel::Load_GameSpecific_After()
 
 	if (!g_dedicated_server) {
 		// loading scripts
-		ai().script_engine().remove_script_process(ScriptEngine::eScriptProcessorLevel);
+		ai().script_engine().remove_script_process(ScriptProcessor::Level);
 
 		if (pLevel->section_exist("level_scripts") && pLevel->line_exist("level_scripts","script"))
-			ai().script_engine().add_script_process(ScriptEngine::eScriptProcessorLevel,xr_new<CScriptProcess>("level",pLevel->r_string("level_scripts","script")));
+			ai().script_engine().add_script_process(ScriptProcessor::Level,xr_new<CScriptProcess>("level",pLevel->r_string("level_scripts","script")));
 		else
-			ai().script_engine().add_script_process(ScriptEngine::eScriptProcessorLevel,xr_new<CScriptProcess>("level",""));
+			ai().script_engine().add_script_process(ScriptProcessor::Level,xr_new<CScriptProcess>("level",""));
 	}
 		
 	BlockCheatLoad();

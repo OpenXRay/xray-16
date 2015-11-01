@@ -15,9 +15,8 @@
 #include "ShootingObject.h"
 #include "GameTaskManager.h"
 #include "Level_Bullet_Manager.h"
-#include "script_process.h"
-#include "script_engine.h"
-#include "script_engine_space.h"
+#include "xrScriptEngine/script_process.hpp"
+#include "xrScriptEngine/script_engine.hpp"
 #include "team_base_zone.h"
 #include "infoportion.h"
 #include "patrol_path_storage.h"
@@ -148,7 +147,7 @@ CLevel::~CLevel()
     xr_delete(m_debug_renderer);
 #endif
     if (!g_dedicated_server)
-        ai().script_engine().remove_script_process(ScriptEngine::eScriptProcessorLevel);
+        ai().script_engine().remove_script_process(ScriptProcessor::Level);
     xr_delete(game);
     xr_delete(game_events);
     xr_delete(m_pBulletManager);
@@ -563,7 +562,7 @@ void CLevel::OnFrame()
     g_pGamePersistent->Environment().SetGameTime(GetEnvironmentGameDayTimeSec(),
         game->GetEnvironmentGameTimeFactor());
     if (!g_dedicated_server)
-        ai().script_engine().script_process(ScriptEngine::eScriptProcessorLevel)->update();
+        ai().script_engine().script_process(ScriptProcessor::Level)->update();
     m_ph_commander->update();
     m_ph_commander_scripts->update();
     stats.BulletManagerCommit.Begin();
@@ -764,7 +763,7 @@ void CLevel::OnEvent(EVENT E, u64 P1, u64 /**P2/**/)
     }
 }
 
-void CLevel::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+void CLevel::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
 {
     inherited::DumpStatistics(font, alert);
     stats.FrameEnd();

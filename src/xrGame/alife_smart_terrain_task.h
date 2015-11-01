@@ -9,7 +9,7 @@
 #pragma once
 
 #include "game_graph_space.h"
-#include "script_export_space.h"
+
 
 class CPatrolPoint;
 
@@ -43,11 +43,6 @@ public:
 			GameGraph::_GRAPH_ID	game_vertex_id			() const;
 			u32						level_vertex_id			() const;
 			Fvector					position				() const;
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CALifeSmartTerrainTask)
-#undef script_type_list
-#define script_type_list save_type_list(CALifeSmartTerrainTask)
 
 #include "alife_smart_terrain_task_inline.h"

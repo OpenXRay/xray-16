@@ -16,7 +16,7 @@
 #include "ui_defs.h"
 
 #include "step_manager.h"
-#include "script_export_space.h"
+
 
 using namespace ACTOR_DEFS;
 
@@ -745,12 +745,7 @@ private:
 	bool					m_disabled_hitmarks;
 	bool					m_inventory_disabled;
 //static CPhysicsShell		*actor_camera_shell;
-
-DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CActor)
-#undef script_type_list
-#define script_type_list save_type_list(CActor)
 
 extern bool		isActorAccelerated			(u32 mstate, bool ZoomMode);
 

@@ -137,9 +137,9 @@ void	CBlender_combine_msaa::Compile(CBlender_Compile& C)
    IBlender::Compile		(C);
 
    if( Name )
-      ::Render->m_MSAASample = atoi( Definition );
+      GlobalEnv.Render->m_MSAASample = atoi( Definition );
    else
-      ::Render->m_MSAASample = -1;
+      GlobalEnv.Render->m_MSAASample = -1;
 
    switch (C.iElement)
    {
@@ -257,5 +257,5 @@ void	CBlender_combine_msaa::Compile(CBlender_Compile& C)
    case 5:	// post-processing
       break;
    }
-   ::Render->m_MSAASample = -1;
+   GlobalEnv.Render->m_MSAASample = -1;
 }    

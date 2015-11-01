@@ -20,7 +20,6 @@
 
 
 #pragma comment( lib, "xrCore.lib"	)
-#pragma comment(lib, "xrEngine.lib")
 
 #include "xrPhysics.h"
 
@@ -36,6 +35,6 @@
 class CGameMtlLibrary;
 IC CGameMtlLibrary &GMLibrary()
 {
-	VERIFY(PGMLib);
-	return *PGMLib;
+    VERIFY(GlobalEnv.PGMLib);
+    return *GlobalEnv.PGMLib;
 }

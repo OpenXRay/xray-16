@@ -10,7 +10,7 @@
 
 #include <boost/noncopyable.hpp>
 #include "smart_cover_detail.h"
-#include "script_space_forward.h"
+#include "xrScriptEngine/script_space_forward.hpp"
 #include "ai_monster_space.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
 #include "debug_make_final.hpp"

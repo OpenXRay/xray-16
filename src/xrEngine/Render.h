@@ -14,7 +14,8 @@ struct ENGINE_API FSlideWindowItem;
 // Igor
 class IRenderVisual;
 class IKinematics;
-class CGameFont;
+class IGameFont;
+class IPerformanceAlert;
 
 #ifndef _EDITOR
 extern const float fLightSmoothFactor;
@@ -283,7 +284,7 @@ public:
         LPCSTR pFunctionName, LPCSTR pTarget, DWORD Flags, void *&result) = 0;
 
     // Information
-    virtual void DumpStatistics(CGameFont &font, class PerformanceAlert *alert) = 0;
+    virtual void DumpStatistics(IGameFont &font, IPerformanceAlert *alert) = 0;
 
     virtual LPCSTR getShaderPath() = 0;
     // virtual ref_shader getShader (int id) = 0;

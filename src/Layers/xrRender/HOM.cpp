@@ -333,7 +333,7 @@ void CHOM::Enable		()
 	bEnabled			= m_pModel?TRUE:FALSE;
 }
 
-void CHOM::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+void CHOM::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
 {
     stats.FrameEnd();
     font.OutNext("HOM:          %2.2fms, %u", stats.Total.result, stats.Total.count);

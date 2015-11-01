@@ -8,6 +8,7 @@
 
 #include "pch_script.h"
 #include "patrol_path_params.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -17,10 +18,9 @@ Fvector CPatrolPathParams__point(const CPatrolPathParams *self, u32 index)
 	return	(self->point(index));
 }
 
-#pragma optimize("s",on)
-void CPatrolPathParams::script_register(lua_State *L)
+SCRIPT_EXPORT(CPatrolPathParams, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CPatrolPathParams>("patrol")
 			.enum_("start")
@@ -54,4 +54,4 @@ void CPatrolPathParams::script_register(lua_State *L)
 			.def("flags",						&CPatrolPathParams::flags)
 			.def("terminal",					&CPatrolPathParams::terminal)
 	];
-}
+});

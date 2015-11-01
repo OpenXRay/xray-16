@@ -3,7 +3,6 @@
 #include "xrEngine/IGame_Level.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrNetServer/NET_Client.h"
-#include "script_export_space.h"
 #include "xrEngine/StatGraph.h"
 #include "xrMessages.h"
 #include "alife_space.h"
@@ -284,7 +283,7 @@ public:
     virtual void OnEvent(EVENT E, u64 P1, u64 P2);
     virtual void  OnFrame(void);
     virtual void OnRender();
-    virtual void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) override;
+    virtual void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert) override;
     virtual	shared_str OpenDemoFile(const char* demo_file_name);
     virtual void net_StartPlayDemo();
     void cl_Process_Event(u16 dest, u16 type, NET_Packet& P);
@@ -394,12 +393,7 @@ public:
     u8* m_lzo_working_buffer = nullptr;
     void init_compression();
     void deinit_compression();
-    DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-
-add_to_type_list(CLevel)
-#undef script_type_list
-#define script_type_list save_type_list(CLevel)
 
 // XXX nitrocaster: should not cast to inherited
 IC CLevel& Level() { return *(CLevel*)g_pGameLevel; }

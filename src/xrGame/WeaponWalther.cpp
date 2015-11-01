@@ -1,5 +1,6 @@
 #include "pch_script.h"
 #include "weaponwalther.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 CWeaponWalther::CWeaponWalther(void)
 {}
@@ -9,12 +10,11 @@ CWeaponWalther::~CWeaponWalther(void)
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CWeaponWalther::script_register	(lua_State *L)
+SCRIPT_EXPORT(CWeaponWalther, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CWeaponWalther,CGameObject>("CWeaponWalther")
 			.def(constructor<>())
 	];
-}
+});

@@ -71,7 +71,7 @@ CStats::~CStats()
 }
 
 
-static void DumpSpatialStatistics(CGameFont &font, PerformanceAlert *alert, ISpatial_DB &db, float engineTotal)
+static void DumpSpatialStatistics(CGameFont &font, IPerformanceAlert *alert, ISpatial_DB &db, float engineTotal)
 {
 #ifdef DEBUG
     auto &stats = db.Stats;
@@ -87,7 +87,7 @@ static void DumpSpatialStatistics(CGameFont &font, PerformanceAlert *alert, ISpa
 #endif
 }
 
-static void DumpColliderStatistics(CGameFont &font, PerformanceAlert *alert)
+static void DumpColliderStatistics(CGameFont &font, IPerformanceAlert *alert)
 {
     auto &stats = XRC.Stats;
     stats.FrameEnd();
@@ -146,7 +146,7 @@ void CStats::Show()
         if (physics_world())
             physics_world()->DumpStatistics(font, alertPtr);
         font.OutSet(200, 0);
-        Render->DumpStatistics(font, alertPtr);
+        GlobalEnv.Render->DumpStatistics(font, alertPtr);
         font.OutSkip();
         Sound->DumpStatistics(font, alertPtr);
         font.OutSkip();
@@ -230,18 +230,18 @@ void CStats::OnRender()
             const CSound_stats_ext::SItem& item = *_I;
             if (item._3D)
             {
-                DU->DrawCross(item.params.position, 0.5f, 0xFF0000FF, true);
+                GlobalEnv.DU->DrawCross(item.params.position, 0.5f, 0xFF0000FF, true);
                 if (g_stats_flags.is(st_sound_min_dist))
-                    DU->DrawSphere(Fidentity, item.params.position, item.params.min_distance, 0x400000FF, 0xFF0000FF, true, true);
+                    GlobalEnv.DU->DrawSphere(Fidentity, item.params.position, item.params.min_distance, 0x400000FF, 0xFF0000FF, true, true);
                 if (g_stats_flags.is(st_sound_max_dist))
-                    DU->DrawSphere(Fidentity, item.params.position, item.params.max_distance, 0x4000FF00, 0xFF008000, true, true);
+                    GlobalEnv.DU->DrawSphere(Fidentity, item.params.position, item.params.max_distance, 0x4000FF00, 0xFF008000, true, true);
 
                 xr_string out_txt = (out_txt.size() && g_stats_flags.is(st_sound_info_name)) ? item.name.c_str() : "";
 
                 if (item.game_object)
                 {
                     if (g_stats_flags.is(st_sound_ai_dist))
-                        DU->DrawSphere(Fidentity, item.params.position, item.params.max_ai_distance, 0x80FF0000, 0xFF800000, true, true);
+                        GlobalEnv.DU->DrawSphere(Fidentity, item.params.position, item.params.max_ai_distance, 0x80FF0000, 0xFF800000, true, true);
                     if (g_stats_flags.is(st_sound_info_object))
                     {
                         out_txt += " (";
@@ -250,7 +250,7 @@ void CStats::OnRender()
                     }
                 }
                 if (g_stats_flags.is_any(st_sound_info_name | st_sound_info_object) && item.name.size())
-                    DU->OutText(item.params.position, out_txt.c_str(), 0xFFFFFFFF, 0xFF000000);
+                    GlobalEnv.DU->OutText(item.params.position, out_txt.c_str(), 0xFFFFFFFF, 0xFF000000);
             }
         }
     }

@@ -13,7 +13,7 @@
 #include "game_base_space.h"
 #include "Actor.h"
 #include "ai_space.h"
-#include "xrServerEntities/script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "Include/xrRender/UIShader.h"
 
 #define BUY_MENU_TEXTURE "ui\\ui_mp_buy_menu"

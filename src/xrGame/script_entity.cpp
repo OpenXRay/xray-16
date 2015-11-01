@@ -16,7 +16,7 @@
 #include "weapon.h"
 #include "ParticlesObject.h"
 #include "script_game_object.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "movement_manager_space.h"
 #include "detail_path_manager.h"
 #include "patrol_path_manager.h"
@@ -109,7 +109,7 @@ void CScriptEntity::SetScriptControl(const bool bScriptControl, shared_str caSci
 				)
 			)
 		)) {
-		ai().script_engine().script_log(eLuaMessageTypeError,"Invalid sequence of taking an entity under script control");
+		ai().script_engine().script_log(LuaMessageType::Error,"Invalid sequence of taking an entity under script control");
 		return;
 	}
 
@@ -263,10 +263,10 @@ void CScriptEntity::ProcessScripts()
 		vfFinishAction(l_tpEntityAction);
 
 #ifdef DEBUG
-		if (psAI_Flags.is(aiLua))
+        if (g_LuaDebug.test(1))
 			Msg("Entity Action removed!!!");
 #endif
-		if (true /*psAI_Flags.is(aiLua)*/ )
+		if (true /*g_LuaDebug.test(1)*/ )
 		{
 			object().callback(GameObject::eActionTypeRemoved)(object().lua_game_object(),u32(eActionTypeRemoved));
 		}
@@ -278,7 +278,7 @@ void CScriptEntity::ProcessScripts()
 	if (m_tpActionQueue.empty()) {
 #ifdef DEBUG
 		if (empty_queue)
-			ai().script_engine().script_log	(ScriptStorage::eLuaMessageTypeInfo,"Object %s has an empty script queue!",*object().cName());
+			ai().script_engine().script_log	(LuaMessageType::Info,"Object %s has an empty script queue!",*object().cName());
 #endif
 		return;
 	}
@@ -444,7 +444,7 @@ bool CScriptEntity::bfAssignMovement(CScriptEntityAction *tpEntityAction)
 	}
 	
 	if (!m_monster) {
-		ai().script_engine().script_log(eLuaMessageTypeError,"Cannot assign a movement action not to a monster!");
+		ai().script_engine().script_log(LuaMessageType::Error,"Cannot assign a movement action not to a monster!");
 		return				(true);
 	}
 
@@ -535,7 +535,7 @@ LPCSTR CScriptEntity::GetPatrolPathName()
 {
 #ifdef DEBUG
 	if (!GetScriptControl()) {
-		ai().script_engine().script_log(eLuaMessageTypeError,"Object %s is not under script control while you are trying to get patrol path name!",*m_object->cName());
+		ai().script_engine().script_log(LuaMessageType::Error,"Object %s is not under script control while you are trying to get patrol path name!",*m_object->cName());
 		return "";
 	}
 #endif

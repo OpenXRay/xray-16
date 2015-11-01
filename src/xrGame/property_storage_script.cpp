@@ -8,17 +8,17 @@
 
 #include "pch_script.h"
 #include "property_storage.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CPropertyStorage::script_register(lua_State *L)
+SCRIPT_EXPORT(CPropertyStorage, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CPropertyStorage>("property_storage")
 			.def(								constructor<>())
 			.def("set_property",				&CPropertyStorage::set_property)
 			.def("property",					&CPropertyStorage::property)
 	];
-}
+});

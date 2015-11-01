@@ -1,5 +1,3 @@
-#ifndef	xrApi_included
-#define xrApi_included
 #pragma once
 
 #ifdef XRAPI_EXPORTS
@@ -8,53 +6,31 @@
 #define XRAPI_API __declspec(dllimport)
 #endif
 
-
-
-#ifndef _EDITOR
 class IRender;
-extern XRAPI_API IRender*	Render;
-
 class IRenderFactory;
-extern XRAPI_API IRenderFactory*	RenderFactory;
-
+class IDebugRender;
 class CDUInterface;
-extern XRAPI_API CDUInterface*	DU;
-
 struct xr_token;
-extern XRAPI_API xr_token*	vid_mode_token;
-
 class IUIRender;
-extern XRAPI_API IUIRender*	UIRender;
-
-
-#ifndef	_EDITOR
 class CGameMtlLibrary;
-extern XRAPI_API CGameMtlLibrary *			PGMLib;
-#endif
+class CRender;
+class CScriptEngine;
 
-#ifdef DEBUG
-	class IDebugRender;
-	extern XRAPI_API IDebugRender*	DRender;
-#endif // DEBUG
-
-#else
-	class	CRender;
-    extern ENGINE_API CRender*	Render;
-
-   class IRenderFactory;
-    extern ENGINE_API IRenderFactory*	RenderFactory;
-#endif
-/*
-// This class is exported from the xrAPI.dll
-class XRAPI_API CxrAPI {
+class XRAPI_API EngineGlobalEnvironment
+{
 public:
-	CxrAPI(void);
-	// TODO: add your methods here.
+#ifdef _EDITOR
+    CRender* Render;
+#else
+    IRender* Render;
+    IDebugRender* DRender;
+    CDUInterface* DU;
+    xr_token* vid_mode_token;
+    IUIRender* UIRender;
+    CGameMtlLibrary* PGMLib;
+#endif
+    IRenderFactory* RenderFactory;
+    CScriptEngine* ScriptEngine;
 };
 
-extern XRAPI_API int nxrAPI;
-
-XRAPI_API int fnxrAPI(void);
-*/
-
-#endif	//	xrApi_included
+extern XRAPI_API EngineGlobalEnvironment GlobalEnv;

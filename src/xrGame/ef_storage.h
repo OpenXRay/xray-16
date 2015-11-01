@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "script_export_space.h"
-
 #define AI_MAX_EVALUATION_FUNCTION_COUNT	128
 
 class CGameObject;
@@ -204,10 +202,6 @@ public:
 	IC		void							alife_evaluation(bool value);
 	IC		CNonALifeParams					&non_alife		();
 	IC		CALifeParams					&alife			();
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CEF_Storage)
-#undef script_type_list
-#define script_type_list save_type_list(CEF_Storage)
 
 #include "ef_storage_inline.h"

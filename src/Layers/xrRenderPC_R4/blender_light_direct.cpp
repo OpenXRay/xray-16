@@ -160,9 +160,9 @@ void	CBlender_accum_direct_msaa::Compile(CBlender_Compile& C)
 	IBlender::Compile		(C);
 
    if( Name )
-      ::Render->m_MSAASample = atoi( Definition );
+      GlobalEnv.Render->m_MSAASample = atoi( Definition );
    else
-      ::Render->m_MSAASample = -1;
+      GlobalEnv.Render->m_MSAASample = -1;
 
 //	BOOL	b_HW_smap		= RImplementation.o.HW_smap;
 //	BOOL	b_HW_PCF		= RImplementation.o.HW_smap_PCF;
@@ -293,7 +293,7 @@ void	CBlender_accum_direct_msaa::Compile(CBlender_Compile& C)
 		break;
 
 	}
-   ::Render->m_MSAASample = -1;
+   GlobalEnv.Render->m_MSAASample = -1;
 }
 
 CBlender_accum_direct_volumetric_msaa::CBlender_accum_direct_volumetric_msaa	()	{		Name = 0; Definition = 0; description.CLS		= 0;	}
@@ -305,9 +305,9 @@ void	CBlender_accum_direct_volumetric_msaa::Compile(CBlender_Compile& C)
 	IBlender::Compile		(C);
 
    if( Name )
-      ::Render->m_MSAASample = atoi( Definition );
+      GlobalEnv.Render->m_MSAASample = atoi( Definition );
    else
-      ::Render->m_MSAASample = -1;
+      GlobalEnv.Render->m_MSAASample = -1;
 
 	//	BOOL	b_HW_smap		= RImplementation.o.HW_smap;
 	//	BOOL	b_HW_PCF		= RImplementation.o.HW_smap_PCF;
@@ -329,7 +329,7 @@ void	CBlender_accum_direct_volumetric_msaa::Compile(CBlender_Compile& C)
          C.r_End				();
 			break;
 		}
-   ::Render->m_MSAASample = -1;
+   GlobalEnv.Render->m_MSAASample = -1;
 }
 
 CBlender_accum_direct_volumetric_sun_msaa::CBlender_accum_direct_volumetric_sun_msaa	()	{		Name = 0; Definition = 0; description.CLS		= 0;	}
@@ -341,9 +341,9 @@ void	CBlender_accum_direct_volumetric_sun_msaa::Compile(CBlender_Compile& C)
 	IBlender::Compile		(C);
 
    if( Name )
-      ::Render->m_MSAASample = atoi( Definition );
+      GlobalEnv.Render->m_MSAASample = atoi( Definition );
    else
-      ::Render->m_MSAASample = -1;
+      GlobalEnv.Render->m_MSAASample = -1;
 
 	switch (C.iElement)
 		{
@@ -358,6 +358,6 @@ void	CBlender_accum_direct_volumetric_sun_msaa::Compile(CBlender_Compile& C)
          C.r_End				();
 			break;
 		}
-   ::Render->m_MSAASample = -1;
+   GlobalEnv.Render->m_MSAASample = -1;
 }
 

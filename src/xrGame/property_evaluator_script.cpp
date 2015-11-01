@@ -10,13 +10,13 @@
 #include "script_property_evaluator_wrapper.h"
 #include "script_game_object.h"
 #include "property_evaluator_const.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CPropertyEvaluator<CScriptGameObject>::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptPropertyEvaluator, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptPropertyEvaluator,CScriptPropertyEvaluatorWrapper>("property_evaluator")
 			.def_readonly("object",				&CScriptPropertyEvaluator::m_object)
@@ -30,4 +30,4 @@ void CPropertyEvaluator<CScriptGameObject>::script_register(lua_State *L)
 		class_<CPropertyEvaluatorConst<CScriptGameObject>, CScriptPropertyEvaluator>("property_evaluator_const")
 			.def(								constructor<CPropertyEvaluatorConst<CScriptGameObject>::_value_type>())
 	];
-}
+});

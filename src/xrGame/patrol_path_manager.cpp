@@ -12,7 +12,7 @@
 #include "script_game_object.h"
 #include "restricted_object.h"
 #include "ai_space.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "ai_object_location.h"
 #include "script_entity_space.h"
 #include "script_callback_ex.h"
@@ -331,7 +331,7 @@ u32 CPatrolPathManager::get_next_point(u32 prev_point_index)
 shared_str	CPatrolPathManager::path_name	() const
 {
 	if (!m_path) {
-		ai().script_engine().script_log(eLuaMessageTypeError,"Path not specified (object %s)!",*m_game_object->cName());
+		ai().script_engine().script_log(LuaMessageType::Error,"Path not specified (object %s)!",*m_game_object->cName());
 		return				("");
 	}
 	VERIFY					(m_path);
@@ -341,12 +341,12 @@ shared_str	CPatrolPathManager::path_name	() const
 void CPatrolPathManager::set_previous_point	(int point_index)
 {
 	if (!m_path) {
-		ai().script_engine().script_log(eLuaMessageTypeError,"Path not specified (object %s)!",*m_game_object->cName());
+		ai().script_engine().script_log(LuaMessageType::Error,"Path not specified (object %s)!",*m_game_object->cName());
 		return;
 	}
 	
 	if (!m_path->vertex(point_index)) {
-		ai().script_engine().script_log(eLuaMessageTypeError,"Start point violates path bounds %s (object %s)!",*m_path_name,*m_game_object->cName());
+		ai().script_engine().script_log(LuaMessageType::Error,"Start point violates path bounds %s (object %s)!",*m_path_name,*m_game_object->cName());
 		return;
 	}
 	VERIFY					(m_path);
@@ -357,11 +357,11 @@ void CPatrolPathManager::set_previous_point	(int point_index)
 void CPatrolPathManager::set_start_point	(int point_index)
 {
 	if (!m_path) {
-		ai().script_engine().script_log(eLuaMessageTypeError,"Path not specified (object %s)!",*m_game_object->cName());
+		ai().script_engine().script_log(LuaMessageType::Error,"Path not specified (object %s)!",*m_game_object->cName());
 		return;
 	}
 	if (!m_path->vertex(point_index)) {
-		ai().script_engine().script_log(eLuaMessageTypeError,"Start point violates path bounds %s (object %s)!",*m_path_name,*m_game_object->cName());
+		ai().script_engine().script_log(LuaMessageType::Error,"Start point violates path bounds %s (object %s)!",*m_path_name,*m_game_object->cName());
 		return;
 	}
 	VERIFY					(m_path);

@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "script_export_space.h"
 #include "script_movement_action.h"
 #include "script_watch_action.h"
 #include "script_animation_action.h"
@@ -66,11 +65,6 @@ public:
 	IC		const CScriptObjectAction		&object		();
 	IC		const CScriptActionCondition	&cond		();
 	IC		void							*data		();
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CScriptEntityAction)
-#undef script_type_list
-#define script_type_list save_type_list(CScriptEntityAction)
 
 #include "script_entity_action_inline.h"

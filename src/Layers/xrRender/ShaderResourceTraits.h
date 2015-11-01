@@ -99,7 +99,7 @@
 
 			// Open file
 			string_path					cname;
-			strconcat					(sizeof(cname), cname,::Render->getShaderPath(),/*name*/shName, ShaderTypeTraits<T>::GetShaderExt());
+			strconcat					(sizeof(cname), cname,GlobalEnv.Render->getShaderPath(),/*name*/shName, ShaderTypeTraits<T>::GetShaderExt());
 			FS.update_path				(cname,	"$game_shaders$", cname);
 
 			// duplicate and zero-terminate
@@ -111,7 +111,7 @@
 			LPCSTR						c_entry		= "main";
 
 			// Compile
-			HRESULT	const _hr			= ::Render->shader_compile(name,(DWORD const*)file->pointer(),file->length(), c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)sh );
+			HRESULT	const _hr			= GlobalEnv.Render->shader_compile(name,(DWORD const*)file->pointer(),file->length(), c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)sh );
 
 			FS.r_close					( file );
 

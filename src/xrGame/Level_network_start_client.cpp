@@ -210,8 +210,8 @@ bool	CLevel::net_start_client5				()
 		if	(!g_dedicated_server)
 		{
 			g_pGamePersistent->LoadTitle		();
-			Render->DeferredLoad(FALSE);
-			Render->ResourcesDeferredUpload();
+			GlobalEnv.Render->DeferredLoad(FALSE);
+			GlobalEnv.Render->ResourcesDeferredUpload();
 			LL_CheckTextures					();
 		}
 		sended_request_connection_data	= FALSE;

@@ -1,7 +1,7 @@
 #pragma once
 #include "UILanimController.h"
 #include "UIStaticItem.h"
-#include "xrServerEntities/script_export_space.h"
+
 #include "UILines.h"
 
 class CUIFrameWindow;
@@ -104,8 +104,6 @@ protected:
 public:
 	CUILines*		TextItemControl						();
 	shared_str		m_stat_hint_text;
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
 class CUITextWnd :public CUIWindow, public CUILightAnimColorConrollerImpl

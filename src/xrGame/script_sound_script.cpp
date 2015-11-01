@@ -9,13 +9,13 @@
 #include "pch_script.h"
 #include "script_sound.h"
 #include "script_game_object.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptSound::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptSound, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CSound_params>("sound_params")
 			.def_readwrite("position",			&CSound_params::position)
@@ -52,4 +52,4 @@ void CScriptSound::script_register(lua_State *L)
 			.def("length",						&CScriptSound::Length)
 			.def("attach_tail",					&CScriptSound::AttachTail)
 	];
-}
+});

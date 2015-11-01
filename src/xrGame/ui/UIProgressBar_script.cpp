@@ -1,12 +1,12 @@
 #include "pch_script.h"
 #include "UIProgressBar.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CUIProgressBar::script_register(lua_State *L)
+SCRIPT_EXPORT(CUIProgressBar, (CUIWindow),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CUIProgressBar, CUIWindow>("CUIProgressBar")
 		.def(						constructor<>())
@@ -15,6 +15,5 @@ void CUIProgressBar::script_register(lua_State *L)
 
 		.def("GetRange_min",			&CUIProgressBar::GetRange_min)
 		.def("GetRange_max",			&CUIProgressBar::GetRange_max)
-
 	];
-}
+});

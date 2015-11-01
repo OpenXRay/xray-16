@@ -9,6 +9,7 @@
 #include "pch_script.h"
 #include "script_effector.h"
 #include "script_effector_wrapper.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -27,10 +28,9 @@ void remove_effector(CScriptEffector *self)
 	self->Remove	();
 }
 
-#pragma optimize("s",on)
-void CScriptEffector::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptEffector, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<SPPInfo::SDuality>("duality")
 			.def_readwrite("h",					&SPPInfo::SDuality::h)
@@ -72,4 +72,4 @@ void CScriptEffector::script_register(lua_State *L)
 			.def("finish",						&remove_effector,	adopt(_1))
 			.def("process",	 					&CScriptEffector::process,	&CScriptEffectorWrapper::process_static)
 	];
-}
+});

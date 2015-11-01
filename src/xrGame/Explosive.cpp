@@ -73,7 +73,7 @@ CExplosive::CExplosive(void)
 
 void CExplosive::LightCreate()
 {
-	m_pLight				= ::Render->light_create();
+	m_pLight				= GlobalEnv.Render->light_create();
 	m_pLight->set_shadow	(true);
 }
 

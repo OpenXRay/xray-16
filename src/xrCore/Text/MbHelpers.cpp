@@ -15,11 +15,11 @@
 
 #ifdef MB_DUMB_CONVERSION
 
-u16 mbhMulti2WideDumb(wide_char *WideStr, wide_char *WidePos, u16 WideStrSize, const char *MultiStr)
+u16 mbhMulti2WideDumb(wchar_t *WideStr, wchar_t *WidePos, u16 WideStrSize, const char *MultiStr)
 {
     u16 spos = 0, dpos = 0;
-    wide_char b1;
-    wide_char wc = 0;
+    wchar_t b1;
+    wchar_t wc = 0;
     VERIFY(MultiStr);
     if (!MultiStr[0])
         return 0;
@@ -51,12 +51,12 @@ u16 mbhMulti2WideDumb(wide_char *WideStr, wide_char *WidePos, u16 WideStrSize, c
 
 #endif // MB_DUMB_CONVERSION
 
-u16 mbhMulti2Wide(wide_char *WideStr, wide_char *WidePos, u16 WideStrSize, const char *MultiStr)
+u16 mbhMulti2Wide(wchar_t *WideStr, wchar_t *WidePos, u16 WideStrSize, const char *MultiStr)
 {
     u16 spos = 0;
     u16 dpos = 0;
-    wide_char b1, b2, b3;
-    wide_char wc = 0;
+    wchar_t b1, b2, b3;
+    wchar_t wc = 0;
     VERIFY(MultiStr);
     if (!MultiStr[0])
         return 0;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ai/Monsters/BaseMonster/base_monster.h"
-#include "xrServerEntities/script_export_space.h"
+
 
 class CAI_PseudoDog : public CBaseMonster {
 	typedef		CBaseMonster	inherited;
@@ -45,10 +45,4 @@ private:
 #ifdef _DEBUG	
 	virtual void	debug_on_key		(int key);
 #endif
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-
-add_to_type_list(CAI_PseudoDog)
-#undef script_type_list
-#define script_type_list save_type_list(CAI_PseudoDog)

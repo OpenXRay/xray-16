@@ -65,7 +65,6 @@ template<class _Ty, class _Other>	inline	bool operator!=(const uialloc<_Ty>&, co
 //////////////////////////////////////////////////////////////////////////
 
 #include "UIMessages.h"
-#include "xrServerEntities/script_export_space.h"
 #include "uiabstract.h"
 
 
@@ -218,9 +217,6 @@ protected:
 #ifdef DEBUG
 	int m_dbg_id;
 #endif
-
-public:
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
 bool fit_in_rect(CUIWindow* w, Frect const& vis_rect, float border = 0.0f, float dx16pos = 0.0f );

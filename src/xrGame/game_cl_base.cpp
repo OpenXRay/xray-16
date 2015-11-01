@@ -3,7 +3,7 @@
 #include "Level.h"
 #include "GamePersistent.h"
 #include "UIGameCustom.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "xr_Level_controller.h"
 #include "ui/UIMainIngameWnd.h"
 #include "UI/UIGameTutorial.h"

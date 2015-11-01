@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "object_interfaces.h"
+#include "Common/object_interfaces.h"
 
 struct SArtefactOrder : 
 	public IPureSerializeObject<IReader,IWriter>,

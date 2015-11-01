@@ -7,17 +7,17 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
-#include "script_sound_type.h"
 #include "ai_sounds.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptSoundType::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptSoundType, (),
 {
-	module(L)
+    class CScriptSoundType {};
+    module(luaState)
 	[
-		class_<enum_exporter<ESoundTypes> >("snd_type")
+        class_<CScriptSoundType>("snd_type")
 			.enum_("sound_types")
 			[
 				value("no_sound",				int(SOUND_TYPE_NO_SOUND					)),
@@ -68,4 +68,4 @@ void CScriptSoundType::script_register(lua_State *L)
 				value("world_ambient",			int(SOUND_TYPE_WORLD_AMBIENT			))
 			]
 	];
-}
+});

@@ -9,11 +9,9 @@
 #include "UIMMShniaga.h"
 #include "UITextureMaster.h"
 #include "UIScrollView.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
-CFontManager& mngr(){
-	return UI().Font();
-}
-
+CFontManager& mngr() { return UI().Font(); }
 // hud font
 CGameFont* GetFontSmall()
 {return mngr().pFontStat;}
@@ -38,7 +36,6 @@ CGameFont* GetFontGraffiti50Russian()
 CGameFont* GetFontLetterica25()
 {return mngr().pFontLetterica25;}
 
-
 int GetARGB(u16 a, u16 r, u16 g, u16 b)
 {return color_argb(a,r,g,b);}
 
@@ -46,11 +43,12 @@ const Fvector2* get_wnd_pos(CUIWindow* w)
 {
 	return &w->GetWndPos();
 }
+
 using namespace luabind;
-#pragma optimize("s",on)
-void CUIWindow::script_register(lua_State *L)
+
+SCRIPT_EXPORT(CUIWindow, (),
 {
-	module(L)
+    module(luaState)
 	[
 		def("GetARGB",					&GetARGB),
 		def("GetFontSmall",				&GetFontSmall),
@@ -86,56 +84,96 @@ void CUIWindow::script_register(lua_State *L)
 		.def("WindowName",				&CUIWindow::WindowName_script)
 		.def("SetWindowName",			&CUIWindow::SetWindowName)
 		.def("SetPPMode",				&CUIWindow::SetPPMode)
-		.def("ResetPPMode",				&CUIWindow::ResetPPMode),
+		.def("ResetPPMode",				&CUIWindow::ResetPPMode)
+    ];
+});
 
-		class_<CDialogHolder>("CDialogHolder")
-		.def("AddDialogToRender",		&CDialogHolder::AddDialogToRender)
-		.def("RemoveDialogToRender",	&CDialogHolder::RemoveDialogToRender),
+SCRIPT_EXPORT(CDialogHolder, (),
+{
+    module(luaState)
+    [
+        class_<CDialogHolder>("CDialogHolder")
+        .def("AddDialogToRender",		&CDialogHolder::AddDialogToRender)
+        .def("RemoveDialogToRender",	&CDialogHolder::RemoveDialogToRender)
+    ];
+});
 
-		class_<CUIDialogWnd, CUIWindow>("CUIDialogWnd")
-		.def("ShowDialog",				&CUIDialogWnd::ShowDialog)
-		.def("HideDialog",				&CUIDialogWnd::HideDialog)
-		.def("GetHolder",				&CUIDialogWnd::GetHolder),
+SCRIPT_EXPORT(CUIDialogWnd, (CUIWindow),
+{
+    module(luaState)
+    [
+        class_<CUIDialogWnd, CUIWindow>("CUIDialogWnd")
+        .def("ShowDialog",				&CUIDialogWnd::ShowDialog)
+        .def("HideDialog",				&CUIDialogWnd::HideDialog)
+        .def("GetHolder",				&CUIDialogWnd::GetHolder)
+    ];
+});
 
-		class_<CUIFrameWindow, CUIWindow>("CUIFrameWindow")
-		.def(							constructor<>())
-		.def("SetWidth",				&CUIFrameWindow::SetWidth)
-		.def("SetHeight",				&CUIFrameWindow::SetHeight)
-		.def("SetColor",				&CUIFrameWindow::SetTextureColor),
+SCRIPT_EXPORT(CUIFrameWindow, (CUIWindow),
+{
+    module(luaState)
+    [
+        class_<CUIFrameWindow, CUIWindow>("CUIFrameWindow")
+        .def(constructor<>())
+        .def("SetWidth",				&CUIFrameWindow::SetWidth)
+        .def("SetHeight",				&CUIFrameWindow::SetHeight)
+        .def("SetColor",				&CUIFrameWindow::SetTextureColor)
+    ];
+});
 
-		class_<CUIFrameLineWnd, CUIWindow>("CUIFrameLineWnd")
-		.def(							constructor<>())
-		.def("SetWidth",				&CUIFrameLineWnd::SetWidth)
-		.def("SetHeight",				&CUIFrameLineWnd::SetHeight)
-		.def("SetColor",				&CUIFrameLineWnd::SetTextureColor),
+SCRIPT_EXPORT(CUIFrameLineWnd, (CUIWindow),
+{
+    module(luaState)
+    [
+        class_<CUIFrameLineWnd, CUIWindow>("CUIFrameLineWnd")
+        .def(constructor<>())
+        .def("SetWidth",				&CUIFrameLineWnd::SetWidth)
+        .def("SetHeight",				&CUIFrameLineWnd::SetHeight)
+        .def("SetColor",				&CUIFrameLineWnd::SetTextureColor)
+    ];
+});
 
-		class_<CUIMMShniaga, CUIWindow>("CUIMMShniaga")
-		.enum_("enum_page_id")
-		[
-			value("epi_main",				CUIMMShniaga::epi_main),
-			value("epi_new_game",			CUIMMShniaga::epi_new_game),
-			value("epi_new_network_game",	CUIMMShniaga::epi_new_network_game)
-		]
-		.def("SetVisibleMagnifier",			&CUIMMShniaga::SetVisibleMagnifier)
-		.def("SetPage",						&CUIMMShniaga::SetPage)
-		.def("ShowPage",					&CUIMMShniaga::ShowPage),
-		
-		
+SCRIPT_EXPORT(CUIMMShniaga, (CUIWindow),
+{
+    module(luaState)
+    [
+        class_<CUIMMShniaga, CUIWindow>("CUIMMShniaga")
+        .enum_("enum_page_id")
+        [
+            value("epi_main",				CUIMMShniaga::epi_main),
+            value("epi_new_game",			CUIMMShniaga::epi_new_game),
+            value("epi_new_network_game",	CUIMMShniaga::epi_new_network_game)
+        ]
+        .def("SetVisibleMagnifier",			&CUIMMShniaga::SetVisibleMagnifier)
+        .def("SetPage",						&CUIMMShniaga::SetPage)
+        .def("ShowPage",					&CUIMMShniaga::ShowPage)
+    ];
+});
 
+SCRIPT_EXPORT(CUIScrollView, (CUIWindow),
+{
+    module(luaState)
+    [
+        class_<CUIScrollView, CUIWindow>("CUIScrollView")
+        .def(constructor<>())
+        .def("AddWindow",				&CUIScrollView::AddWindow)
+        .def("RemoveWindow",			&CUIScrollView::RemoveWindow)
+        .def("Clear",					&CUIScrollView::Clear)
+        .def("ScrollToBegin",			&CUIScrollView::ScrollToBegin)
+        .def("ScrollToEnd",				&CUIScrollView::ScrollToEnd)
+        .def("GetMinScrollPos",			&CUIScrollView::GetMinScrollPos)
+        .def("GetMaxScrollPos",			&CUIScrollView::GetMaxScrollPos)
+        .def("GetCurrentScrollPos",		&CUIScrollView::GetCurrentScrollPos)
+        .def("SetScrollPos",			&CUIScrollView::SetScrollPos)
+    ];
+});
 
-		class_<CUIScrollView, CUIWindow>("CUIScrollView")
-		.def(							constructor<>())
-		.def("AddWindow",				&CUIScrollView::AddWindow)
-		.def("RemoveWindow",			&CUIScrollView::RemoveWindow)
-		.def("Clear",					&CUIScrollView::Clear)
-		.def("ScrollToBegin",			&CUIScrollView::ScrollToBegin)
-		.def("ScrollToEnd",				&CUIScrollView::ScrollToEnd)
-		.def("GetMinScrollPos",			&CUIScrollView::GetMinScrollPos)
-		.def("GetMaxScrollPos",			&CUIScrollView::GetMaxScrollPos)
-		.def("GetCurrentScrollPos",		&CUIScrollView::GetCurrentScrollPos)
-		.def("SetScrollPos",			&CUIScrollView::SetScrollPos),
-
-		class_<enum_exporter<EUIMessages> >("ui_events")
+SCRIPT_EXPORT(EnumUIMessages, (),
+{
+    class EnumUIMessages {};
+    module(luaState)
+    [
+        class_<EnumUIMessages>("ui_events")
 			.enum_("events")
 			[
 	// CUIWindow
@@ -192,4 +230,4 @@ void CUIWindow::script_register(lua_State *L)
 				value("MAIN_MENU_RELOADED",				int(MAIN_MENU_RELOADED))
 			]
 	];
-}
+});

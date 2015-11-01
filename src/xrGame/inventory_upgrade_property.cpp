@@ -8,7 +8,7 @@
 
 #include "pch_script.h"
 #include "ai_space.h"
-#include "xrServerEntities/script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "string_table.h"
 
 #include "inventory_upgrade_property.h"

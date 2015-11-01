@@ -3,6 +3,10 @@
 #include "UIGameSP.h"
 #include "actor.h"
 #include "clsid_game.h"
+#include "ai_space.h"
+#include "alife_simulator.h"
+#include "alife_time_manager.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -43,9 +47,6 @@ void game_cl_Single::OnDifficultyChanged()
 	Actor()->OnDifficultyChanged();
 }
 
-#include "ai_space.h"
-#include "alife_simulator.h"
-#include "alife_time_manager.h"
 ALife::_TIME_ID game_cl_Single::GetGameTime		()
 {
 	if (ai().get_alife() && ai().alife().initialized())
@@ -99,12 +100,12 @@ void game_cl_Single::SetEnvironmentGameTimeFactor		(const float fTimeFactor)
 		inherited::SetEnvironmentGameTimeFactor(fTimeFactor);
 }
 
-#pragma optimize("s",on)
-void CScriptGameDifficulty::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptGameDifficulty, (),
 {
-	module(L)
+    class CScriptGameDifficulty {};
+	module(luaState)
 		[
-			class_<enum_exporter<ESingleGameDifficulty> >("game_difficulty")
+            class_<CScriptGameDifficulty>("game_difficulty")
 			.enum_("game_difficulty")
 			[
 				value("novice",				int(egdNovice			)),
@@ -113,4 +114,4 @@ void CScriptGameDifficulty::script_register(lua_State *L)
 				value("master",				int(egdMaster			))
 			]
 		];
-}
+});

@@ -12,21 +12,25 @@
 
 #include "object_factory.h"
 #include "ai_space.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "object_item_script.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 void CObjectFactory::register_script_class	(LPCSTR client_class, LPCSTR server_class, LPCSTR clsid, LPCSTR script_clsid)
 {
+#ifdef CONFIG_OBJECT_FACTORY_LOG_REGISTER
+    Msg("* CObjectFactory: registering script class '%s'", clsid);
+#endif
 #ifndef NO_XR_GAME
 	luabind::object				client;
 	if (!ai().script_engine().function_object(client_class,client,LUA_TUSERDATA)) {
-		ai().script_engine().script_log	(eLuaMessageTypeError,"Cannot register class %s",client_class);
+		ai().script_engine().script_log	(LuaMessageType::Error,"Cannot register class %s",client_class);
 		return;
 	}
 #endif
 	luabind::object				server;
 	if (!ai().script_engine().function_object(server_class,server,LUA_TUSERDATA)) {
-		ai().script_engine().script_log	(eLuaMessageTypeError,"Cannot register class %s",server_class);
+		ai().script_engine().script_log	(LuaMessageType::Error,"Cannot register class %s",server_class);
 		return;
 	}
 	
@@ -44,9 +48,12 @@ void CObjectFactory::register_script_class	(LPCSTR client_class, LPCSTR server_c
 
 void CObjectFactory::register_script_class			(LPCSTR unknown_class, LPCSTR clsid, LPCSTR script_clsid)
 {
+#ifdef CONFIG_OBJECT_FACTORY_LOG_REGISTER
+    Msg("* CObjectFactory: registering script class '%s'", clsid);
+#endif
 	luabind::object				creator;
 	if (!ai().script_engine().function_object(unknown_class,creator,LUA_TUSERDATA)) {
-		ai().script_engine().script_log	(eLuaMessageTypeError,"Cannot register class %s",unknown_class);
+		ai().script_engine().script_log	(LuaMessageType::Error,"Cannot register class %s",unknown_class);
 		return;
 	}
 	add							(
@@ -91,15 +98,14 @@ void CObjectFactory::register_script	() const
 	luabind::module				(ai().script_engine().lua())[instance];
 }
 
-#pragma optimize("s",on)
-void CObjectFactory::script_register(lua_State *L)
+SCRIPT_EXPORT(CObjectFactory, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CObjectFactory>("object_factory")
 			.def("register",	(void (CObjectFactory::*)(LPCSTR,LPCSTR,LPCSTR,LPCSTR))(&CObjectFactory::register_script_class))
 			.def("register",	(void (CObjectFactory::*)(LPCSTR,LPCSTR,LPCSTR))(&CObjectFactory::register_script_class))
 	];
-}
+});
 
 #endif // #ifndef DEDICATED_SERVER_ONLY

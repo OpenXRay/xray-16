@@ -157,7 +157,7 @@ void CUISleepStatic::InitTextureEx(LPCSTR tex_name, LPCSTR sh_name)
 {
 	inherited::InitTextureEx(tex_name, sh_name);
 
-	LPCSTR res_shname = UIRender->UpdateShaderName(tex_name, sh_name);
+	LPCSTR res_shname = GlobalEnv.UIRender->UpdateShaderName(tex_name, sh_name);
 	CUITextureMaster::InitTexture(tex_name, &m_UIStaticItem2, res_shname);
 
 	Fvector2 p = GetWndPos();

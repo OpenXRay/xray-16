@@ -13,20 +13,19 @@
 #include "UIFrameLineWnd.h"
 #include "UIProgressBar.h"
 #include "UITabControl.h"
-
 #include "uiscriptwnd_script.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
 extern export_class &script_register_ui_window1(export_class &);
 extern export_class &script_register_ui_window2(export_class &);
 
-#pragma optimize("s",on)
-void CUIDialogWndEx::script_register(lua_State *L)
+SCRIPT_EXPORT(CUIDialogWndEx, (),
 {
 	export_class				instance("CUIScriptWnd");
 
-	module(L)
+	module(luaState)
 	[
 		script_register_ui_window2(
 			script_register_ui_window1(
@@ -35,16 +34,13 @@ void CUIDialogWndEx::script_register(lua_State *L)
 		)
 		.def("Load",			&BaseType::Load)
 	];
-}
+});
 
 export_class &script_register_ui_window1(export_class &instance)
 {
 	instance
 		.def(					constructor<>())
-
 		.def("AddCallback",		(void(BaseType::*)(LPCSTR, s16, const luabind::functor<void>&, const luabind::object&))&BaseType::AddCallback)
-
-		.def("Register",		(void (BaseType::*)(CUIWindow*,LPCSTR))&BaseType::Register)
-
-	;return	(instance);
+		.def("Register",		(void (BaseType::*)(CUIWindow*,LPCSTR))&BaseType::Register);
+    return	(instance);
 }

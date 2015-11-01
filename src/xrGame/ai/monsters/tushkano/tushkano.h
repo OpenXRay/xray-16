@@ -1,7 +1,7 @@
 #pragma once
 #include "ai/Monsters/BaseMonster/base_monster.h"
 #include "ai/Monsters/controlled_entity.h"
-#include "xrServerEntities/script_export_space.h"
+
 
 class CTushkano :	public CBaseMonster,
 					public CControlledEntity<CTushkano> {
@@ -17,11 +17,4 @@ public:
 	virtual void	Load				(LPCSTR section);
 	virtual void	CheckSpecParams		(u32 spec_params);
 	virtual	char*	get_monster_class_name () { return "tushkano"; }
-
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-
-add_to_type_list(CTushkano)
-#undef script_type_list
-#define script_type_list save_type_list(CTushkano)

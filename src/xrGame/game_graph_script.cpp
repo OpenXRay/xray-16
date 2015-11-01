@@ -9,6 +9,7 @@
 #include "pch_script.h"
 #include "game_graph.h"
 #include "ai_space.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -50,10 +51,10 @@ GameGraph::LEVEL_MAP const& get_levels	( CGameGraph const* graph )
 	return				graph->header().levels();
 }
 
-#pragma optimize("s",on)
-void CGameGraph::script_register		(lua_State *L)
+SCRIPT_EXPORT(CGameGraph, (),
 {
-	module(L)
+    typedef CGameGraph::CVertex CVertex;
+	module(luaState)
 	[
 		class_< GameGraph::LEVEL_MAP::value_type >( "GameGraph__LEVEL_MAP__value_type" )
 		.def_readonly("id", 	&GameGraph::LEVEL_MAP::value_type::first )
@@ -69,10 +70,10 @@ void CGameGraph::script_register		(lua_State *L)
 			.def("vertex_id",		&CGameGraph::vertex_id)
 			.def("levels",			&get_levels, return_stl_iterator),
 
-		class_<CVertex>("GameGraph__CVertex")
+            class_<CVertex>("GameGraph__CVertex")
 			.def("level_point",		&CVertex__level_point)
 			.def("game_point",		&CVertex__game_point)
 			.def("level_id",		&CVertex::level_id)
 			.def("level_vertex_id",	&CVertex::level_vertex_id)
 	];
-}
+});

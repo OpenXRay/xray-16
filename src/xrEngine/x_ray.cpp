@@ -29,6 +29,7 @@
 #include "xrSash.h"
 
 #include "securom_api.h"
+#include "xrScriptEngine/script_engine.hpp"
 
 //---------------------------------------------------------------------
 ENGINE_API CInifile* pGameIni = NULL;
@@ -189,9 +190,18 @@ ENGINE_API string_path g_sLaunchWorkingFolder;
 void InitEngine()
 {
     Engine.Initialize();
-    while (!g_bIntroFinished) Sleep(100);
+    while (!g_bIntroFinished)
+        Sleep(100);
     Device.Initialize();
     CheckCopyProtection();
+}
+
+static void InitEngineExt()
+{
+    Engine.External.Initialize();
+    // once all libraries got loaded, instantiate and initialize script engine
+    GlobalEnv.ScriptEngine = xr_new<CScriptEngine>();
+    GlobalEnv.ScriptEngine->init();
 }
 
 struct path_excluder_predicate
@@ -313,6 +323,9 @@ void destroyConsole()
 
 void destroyEngine()
 {
+    // destroy script engine before detaching libraries because lua GC calls
+    // destructors from these libraries
+    xr_delete(GlobalEnv.ScriptEngine);
     Device.Destroy();
     Engine.Destroy();
 }
@@ -405,10 +418,9 @@ void Startup()
         destroyConsole();
     else
         Console->Destroy();
-
-    destroySound();
-
+    
     destroyEngine();
+    destroySound();
 }
 
 static BOOL CALLBACK logDlgProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
@@ -835,13 +847,11 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 
         FPU::m24r();
         InitEngine();
-
         InitInput();
-
         InitConsole();
-
         Engine.External.CreateRendererList();
-
+        Msg("command line %s", lpCmdLine);
+        
         LPCSTR benchName = "-batch_benchmark ";
         if (strstr(lpCmdLine, benchName))
         {
@@ -851,8 +861,6 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
             doBenchmark(b_name);
             return 0;
         }
-
-        Msg("command line %s", lpCmdLine);
         LPCSTR sashName = "-openautomate ";
         if (strstr(lpCmdLine, sashName))
         {
@@ -864,14 +872,13 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
             g_SASH.MainLoop();
             return 0;
         }
-
         if (strstr(lpCmdLine, "-launcher"))
         {
             int l_res = doLauncher();
             if (l_res != 0)
                 return 0;
-        };
-
+        }
+        
 #ifndef DEDICATED_SERVER
         if (strstr(Core.Params, "-r2a"))
             Console->Execute("renderer renderer_r2a");
@@ -886,10 +893,7 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 #else
         Console->Execute("renderer renderer_r1");
 #endif
-        //. InitInput ( );
-        Engine.External.Initialize();
-        Console->Execute("stat_memory");
-
+        InitEngineExt(); // load xrRender, xrGame and ScriptEngine
         Startup();
         Core._destroy();
 

@@ -27,7 +27,7 @@ SArtefactActivation::SArtefactActivation(CArtefact* af,u32 owner_id)
 {
 	m_af			= af;
 	Load			();
-	m_light			= ::Render->light_create();
+	m_light			= GlobalEnv.Render->light_create();
 	m_light->set_shadow(true);
 	m_owner_id		= owner_id;
 	m_in_process	= false;

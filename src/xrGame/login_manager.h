@@ -6,7 +6,7 @@
 #include "mixed_delegate.h"
 #include "xrGameSpy/GameSpy/GP/gp.h"
 #include "account_manager.h"
-#include "script_export_space.h"
+
 #include "login_manager.h"
 #include "queued_async_method.h"
 
@@ -43,7 +43,6 @@ struct profile
 	bool const			online			() const { return m_online; };
 	GPProfile const		profile_id		() const { return m_profile_id; };
 	//copy constructor is valid
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };//struct profile
 
 //typedef fastdelegate::FastDelegate<void (profile const *, shared_str const &)>	login_operation_cb;
@@ -143,27 +142,11 @@ private:
 	static void	__cdecl			setunick_cb			(GPConnection * connection,
 													 void * arg,
 													 void * param);
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 }; //class login_manager
-
 } //namespace gamespy_gp
 
 typedef gamespy_gp::profile				gamespy_gp_profile;
 typedef gamespy_gp::login_operation_cb	gamespy_gp_login_operation_cb;
 typedef gamespy_gp::login_manager		gamespy_gp_login_manager;
-
-add_to_type_list(gamespy_gp_profile)
-#undef script_type_list
-#define script_type_list save_type_list(gamespy_gp_profile)
-
-add_to_type_list(gamespy_gp_login_operation_cb)
-#undef script_type_list
-#define script_type_list save_type_list(gamespy_gp_login_operation_cb)
-
-add_to_type_list(gamespy_gp_login_manager)
-#undef script_type_list
-#define script_type_list save_type_list(gamespy_gp_login_manager)
-
-
 
 #endif //#ifndef LOGIN_MANAGER

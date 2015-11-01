@@ -9,13 +9,14 @@
 #include "pch_script.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "xrServer_script_macroses.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CSE_ALifeCreatureActor::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeCreatureActor, (CSE_ALifeCreatureAbstract, CSE_ALifeTraderAbstract, CSE_PHSkeleton),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_creature3(
 			CSE_ALifeCreatureActor,
 			"cse_alife_creature_actor",
@@ -24,11 +25,12 @@ void CSE_ALifeCreatureActor::script_register(lua_State *L)
 			CSE_PHSkeleton
 		)
 	];
-}
+});
 
-void CSE_ALifeTorridZone::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeTorridZone, (CSE_ALifeCustomZone, CSE_Motion),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_dynamic_alife2(
 			CSE_ALifeTorridZone,
 			"cse_torrid_zone",
@@ -36,11 +38,12 @@ void CSE_ALifeTorridZone::script_register(lua_State *L)
 			CSE_Motion
 			)
 	];
-}
+});
 
-void CSE_ALifeZoneVisual::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeZoneVisual, (CSE_ALifeAnomalousZone, CSE_Visual),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_dynamic_alife2(
 			CSE_ALifeZoneVisual,
 			"cse_zone_visual",
@@ -48,27 +51,29 @@ void CSE_ALifeZoneVisual::script_register(lua_State *L)
 			CSE_Visual
 			)
 	];
-}
+});
 
-void CSE_ALifeCreaturePhantom::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeCreaturePhantom, (CSE_ALifeCreatureAbstract),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_creature1(
 			CSE_ALifeCreaturePhantom,
 			"cse_alife_creature_phantom",
 			CSE_ALifeCreatureAbstract
 			)
 	];
-}
+});
 
 static SRotation* CSE_ALifeCreatureAbstract__o_torso	(CSE_ALifeCreatureAbstract* self)
 {
 	return	(&self->o_torso);
 }
 
-void CSE_ALifeCreatureAbstract::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeCreatureAbstract, (CSE_ALifeDynamicObjectVisual),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_creature1(
 			CSE_ALifeCreatureAbstract,
 			"cse_alife_creature_abstract",
@@ -81,14 +86,15 @@ void CSE_ALifeCreatureAbstract::script_register(lua_State *L)
 		.def_readwrite("group",&CSE_ALifeCreatureAbstract::s_group)
 		.def("o_torso",&CSE_ALifeCreatureAbstract__o_torso)
 	];
-}
+});
 
-void CSE_ALifeOnlineOfflineGroup::script_register(lua_State *L)
+static void CSE_ALifeOnlineOfflineGroup_Export(lua_State *luaState)
 {
-	module(L)[
-		class_< MEMBERS::value_type >( "MEMBERS__value_type" )
-			.def_readonly("id", 	&MEMBERS::value_type::first )
-			.def_readonly("object",	&MEMBERS::value_type::second ),
+	module(luaState)
+    [
+        class_< CSE_ALifeOnlineOfflineGroup::MEMBERS::value_type >("MEMBERS__value_type")
+			.def_readonly("id", 	&CSE_ALifeOnlineOfflineGroup::MEMBERS::value_type::first )
+			.def_readonly("object",	&CSE_ALifeOnlineOfflineGroup::MEMBERS::value_type::second ),
 
 		luabind_class_online_offline_group2(
 			CSE_ALifeOnlineOfflineGroup,
@@ -105,6 +111,9 @@ void CSE_ALifeOnlineOfflineGroup::script_register(lua_State *L)
 		.def("add_location_type",	&CSE_ALifeOnlineOfflineGroup::add_location_type)
 		.def("clear_location_types",&CSE_ALifeOnlineOfflineGroup::clear_location_types)
 		.def("force_change_position",&CSE_ALifeOnlineOfflineGroup::force_change_position)
-#endif //#ifdef XRGAME_EXPORTS
+#endif
 	];
 }
+
+SCRIPT_EXPORT_FUNC(CSE_ALifeOnlineOfflineGroup, (CSE_ALifeDynamicObject, CSE_ALifeSchedulable),
+    CSE_ALifeOnlineOfflineGroup_Export);

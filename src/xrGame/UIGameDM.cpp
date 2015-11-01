@@ -21,7 +21,7 @@
 #include "ui/UIActorMenu.h"
 #include "ui/UIHelper.h"
 #include "UITeamPanels.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 
 #define MSGS_OFFS 510
 

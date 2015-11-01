@@ -76,7 +76,7 @@ public:
 
     void Initialize();
     void Destroy();
-    void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert);
+    void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert);
     const CStatTimer &GetUpdateTime()
     {
         stats.FrameEnd();

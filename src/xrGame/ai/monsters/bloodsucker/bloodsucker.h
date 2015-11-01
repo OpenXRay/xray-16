@@ -4,7 +4,7 @@
 #include "ai/Monsters/controlled_entity.h"
 #include "ai/Monsters/controlled_actor.h"
 #include "ai/Monsters/anim_triple.h"
-#include "xrServerEntities/script_export_space.h"
+
 #include "bloodsucker_alien.h"
 
 class CAI_Bloodsucker : public CBaseMonster, 
@@ -232,10 +232,4 @@ public:
 	int				m_sufficient_hits_before_vampire_random;
 	virtual void	on_attack_on_run_hit	();
 	bool			done_enough_hits_before_vampire ();
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-
-add_to_type_list(CAI_Bloodsucker)
-#undef script_type_list
-#define script_type_list save_type_list(CAI_Bloodsucker)

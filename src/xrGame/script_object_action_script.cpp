@@ -9,13 +9,13 @@
 #include "pch_script.h"
 #include "script_object_action.h"
 #include "script_game_object.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptObjectAction::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptObjectAction, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptObjectAction>("object")
 			.enum_("state")
@@ -52,4 +52,4 @@ void CScriptObjectAction::script_register(lua_State *L)
 			.def("object",						(void (CScriptObjectAction::*)(CScriptGameObject*))(&CScriptObjectAction::SetObject))
 			.def("completed",					(bool (CScriptObjectAction::*)())(&CScriptObjectAction::completed))
 	];
-}
+});

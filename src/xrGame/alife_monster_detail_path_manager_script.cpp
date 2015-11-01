@@ -9,13 +9,13 @@
 #include "pch_script.h"
 #include "alife_monster_detail_path_manager.h"
 #include "alife_smart_terrain_task.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CALifeMonsterDetailPathManager::script_register	(lua_State *L)
+SCRIPT_EXPORT(CALifeMonsterDetailPathManager, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CALifeMonsterDetailPathManager>("CALifeMonsterDetailPathManager")
 			.def("target",		(void (CALifeMonsterDetailPathManager::*)(const GameGraph::_GRAPH_ID &, const u32 &, const Fvector &))(&CALifeMonsterDetailPathManager::target))
@@ -27,4 +27,4 @@ void CALifeMonsterDetailPathManager::script_register	(lua_State *L)
 			.def("actual",		&CALifeMonsterDetailPathManager::actual)
 			.def("failed",		&CALifeMonsterDetailPathManager::failed)
 	];
-}
+});

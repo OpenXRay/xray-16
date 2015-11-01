@@ -109,9 +109,6 @@
     <Filter Include="Engine\Core">
       <UniqueIdentifier>{d0fc2a3a-c3e4-41ca-8027-79e04f61f8ba}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Core\Scripting">
-      <UniqueIdentifier>{9d074bc1-c26f-402e-8cc3-8608d7e96906}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Noise">
       <UniqueIdentifier>{c44904b6-e19d-4e72-8ae6-c895d9d483e4}</UniqueIdentifier>
     </Filter>
@@ -444,15 +441,6 @@
     <ClInclude Include="EventAPI.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="ai_script_lua_extension.h">
-      <Filter>Engine\Core\Scripting</Filter>
-    </ClInclude>
-    <ClInclude Include="ai_script_lua_space.h">
-      <Filter>Engine\Core\Scripting</Filter>
-    </ClInclude>
-    <ClInclude Include="ai_script_space.h">
-      <Filter>Engine\Core\Scripting</Filter>
-    </ClInclude>
     <ClInclude Include="perlin.h">
       <Filter>Engine\Noise</Filter>
     </ClInclude>
@@ -575,6 +563,12 @@
     </ClInclude>
     <ClInclude Include="PerformanceAlert.hpp">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="IPerformanceAlert.hpp">
+      <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="IGameFont.hpp">
+      <Filter>Render\Font output</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -754,15 +748,6 @@
     </ClCompile>
     <ClCompile Include="mailSlot.cpp">
       <Filter>Engine\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="_scripting.cpp">
-      <Filter>Engine\Core\Scripting</Filter>
-    </ClCompile>
-    <ClCompile Include="ai_script_lua_debug.cpp">
-      <Filter>Engine\Core\Scripting</Filter>
-    </ClCompile>
-    <ClCompile Include="ai_script_lua_extension.cpp">
-      <Filter>Engine\Core\Scripting</Filter>
     </ClCompile>
     <ClCompile Include="perlin.cpp">
       <Filter>Engine\Noise</Filter>

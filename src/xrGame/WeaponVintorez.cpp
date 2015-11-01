@@ -1,5 +1,6 @@
 #include "pch_script.h"
 #include "weaponvintorez.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 CWeaponVintorez::CWeaponVintorez(void) : CWeaponMagazined(SOUND_TYPE_WEAPON_SNIPERRIFLE)
 {}
@@ -9,12 +10,11 @@ CWeaponVintorez::~CWeaponVintorez(void)
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CWeaponVintorez::script_register	(lua_State *L)
+SCRIPT_EXPORT(CWeaponVintorez, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CWeaponVintorez,CGameObject>("CWeaponVintorez")
 			.def(constructor<>())
 	];
-}
+});

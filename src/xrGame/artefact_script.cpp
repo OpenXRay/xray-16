@@ -14,13 +14,13 @@
 #include "RustyHairArtifact.h"
 #include "GalantineArtifact.h"
 #include "cta_game_artefact.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CArtefact::script_register(lua_State *L)
+SCRIPT_EXPORT(CArtefact, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CArtefact			,CGameObject>("CArtefact")
 		.def(						constructor<>() )
@@ -41,4 +41,4 @@ void CArtefact::script_register(lua_State *L)
 		class_<CGalantineArtefact	,CArtefact>("CGalantineArtefact").def	(constructor<>()),
 		class_<CGraviArtefact		,CArtefact>("CGraviArtefact").def		(constructor<>())
 	];
-}
+});

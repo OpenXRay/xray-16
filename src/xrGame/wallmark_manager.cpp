@@ -39,7 +39,7 @@ void CWalmarkManager::AddWallmark(const Fvector& dir, const Fvector& start_pos,
 
 		if (!wallmarks_vector.empty())
 		{		
-			::Render->add_StaticWallmark(&wallmarks_vector, end_point, wallmark_size, pTri, pVerts);
+			GlobalEnv.Render->add_StaticWallmark(&wallmarks_vector, end_point, wallmark_size, pTri, pVerts);
 		}
 
 		/*
@@ -49,7 +49,7 @@ void CWalmarkManager::AddWallmark(const Fvector& dir, const Fvector& start_pos,
 		if (pWallmarkShader)
 		{
 			//добавить отметку на материале
-			::Render->add_StaticWallmark(*pWallmarkShader, end_point, wallmark_size, pTri, pVerts);
+			GlobalEnv.Render->add_StaticWallmark(*pWallmarkShader, end_point, wallmark_size, pTri, pVerts);
 		}
 		*/
 	}
@@ -177,7 +177,7 @@ void CWalmarkManager::StartWorkflow()
 
 		if(dist <= m_trace_dist )
 		{
-			::Render->add_StaticWallmark(&*m_wallmarks, end_point, m_wallmark_size, _t, V_array);
+			GlobalEnv.Render->add_StaticWallmark(&*m_wallmarks, end_point, m_wallmark_size, _t, V_array);
 			++wm_count;
 		}else
 			++_not_dist;

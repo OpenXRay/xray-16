@@ -8,7 +8,7 @@
 
 #include "stdafx.h"
 #include "space_restriction_holder.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "space_restrictor.h"
 #include "space_restriction_bridge.h"
 #include "space_restriction_shape.h"

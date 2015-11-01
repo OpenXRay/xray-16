@@ -8,14 +8,14 @@
 
 #include "pch_script.h"
 #include "alife_human_brain.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CALifeHumanBrain::script_register	(lua_State *L)
+SCRIPT_EXPORT(CALifeHumanBrain, (CALifeMonsterBrain),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CALifeHumanBrain,CALifeMonsterBrain>("CALifeHumanBrain")
 	];
-}
+});

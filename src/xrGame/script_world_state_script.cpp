@@ -9,13 +9,13 @@
 #include "pch_script.h"
 #include "script_world_state.h"
 #include "condition_state.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptWorldStateWrapper::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptWorldState, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptWorldState>("world_state")
 			.def(								constructor<>())
@@ -28,4 +28,4 @@ void CScriptWorldStateWrapper::script_register(lua_State *L)
 			.def(const_self < CScriptWorldState())
 			.def(const_self == CScriptWorldState())
 	];
-}
+});

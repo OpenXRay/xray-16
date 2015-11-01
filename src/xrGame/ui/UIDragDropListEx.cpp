@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UIDragDropListEx.h"
 #include "UIScrollBar.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "UICellItem.h"
 #include "UICursor.h"
 
@@ -894,7 +894,7 @@ void CUICellContainer::Draw()
 
 	// fill cell buffer
 	u32 max_prim_cnt = ((tgt_cells.width()+1)*(tgt_cells.height()+1)*6);
-	UIRender->StartPrimitive	(max_prim_cnt, IUIRender::ptTriList, UI().m_currentPointType);
+    GlobalEnv.UIRender->StartPrimitive	(max_prim_cnt, IUIRender::ptTriList, UI().m_currentPointType);
 
 //	u32 cell_i = 0;
 	for ( int x = 0; x <= tgt_cells.width(); ++x )
@@ -937,7 +937,7 @@ void CUICellContainer::Draw()
 				//pv->set			(iFloor(drawLT.x + p.x*(f_len.x) + f_len.x*x)-0.5f, 
 				//				 iFloor(drawLT.y + p.y*(f_len.y) + f_len.y*y)-0.5f, 
 				//				 0xFFFFFFFF,tp.x+uv.x,tp.y+uv.y);
-				UIRender->PushPoint(iFloor( rect_offset.x + p.x*(f_len.x) )-0.5f, 
+                GlobalEnv.UIRender->PushPoint(iFloor( rect_offset.x + p.x*(f_len.x) )-0.5f,
 									iFloor( rect_offset.y + p.y*(f_len.y) )-0.5f,
 									0,
 									m_pParentDragDropList->back_color,
@@ -947,8 +947,8 @@ void CUICellContainer::Draw()
 	}// for x
 	UI().PushScissor					(clientArea);
 
-	UIRender->SetShader( *hShader );
-	UIRender->FlushPrimitive();
+	GlobalEnv.UIRender->SetShader( *hShader );
+	GlobalEnv.UIRender->FlushPrimitive();
 
 	//draw shown items in range
 	if ( m_cells_to_draw.size() )

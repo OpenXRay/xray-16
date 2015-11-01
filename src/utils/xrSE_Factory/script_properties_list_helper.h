@@ -13,7 +13,7 @@
 #	include "xrSound/Sound.h"
 #endif
 #include "xrEProps.h"
-#include "script_export_space.h"
+
 #include "script_space.h"
 #include "script_rtoken_list.h"
 
@@ -129,9 +129,5 @@ public:
 			VectorValue* 		CreateAngle3	    (PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR name, float mn, float mx, float inc);
 			VectorValue* 		CreateAngle3	    (PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR name, float mn, float mx, float inc, int decim);
 //			RTextValue* 		CreateName		    (PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR name, ListItem* owner);
-//			RTextValue* 		CreateNameCB		(PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR name, TOnDrawTextEvent=0, RTextValue::TOnBeforeEditEvent=0, RTextValue::TOnAfterEditEvent=0);
-			DECLARE_SCRIPT_REGISTER_FUNCTION
+//			RTextValue* 		CreateNameCB		(PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR name, TOnDrawTextEvent=0, RTextValue::TOnBeforeEditEvent=0, RTextValue::TOnAfterEditEvent=0
 };
-add_to_type_list(CScriptPropertiesListHelper)
-#undef script_type_list
-#define script_type_list save_type_list(CScriptPropertiesListHelper)

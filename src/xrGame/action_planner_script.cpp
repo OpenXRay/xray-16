@@ -10,6 +10,7 @@
 #include "script_action_planner_wrapper.h"
 #include "script_game_object.h"
 #include "action_base.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -28,10 +29,9 @@ CScriptActionPlanner *cast_planner(CScriptActionBase *action)
 	return	(smart_cast<CScriptActionPlanner*>(action));
 }
 
-#pragma optimize("s",on)
-void CScriptActionPlanner::script_register(lua_State *L)
+IC static void CScriptActionPlanner_Export(lua_State *luaState)
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptActionPlanner,CScriptActionPlannerWrapper>("action_planner")
 			.def_readonly("object",				&CScriptActionPlanner::m_object)
@@ -58,3 +58,5 @@ void CScriptActionPlanner::script_register(lua_State *L)
 		,def("cast_planner",					&cast_planner)
 	];
 }
+
+SCRIPT_EXPORT_FUNC(CScriptActionPlanner, (), CScriptActionPlanner_Export);

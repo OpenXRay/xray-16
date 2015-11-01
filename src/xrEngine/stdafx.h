@@ -47,17 +47,15 @@ extern ENGINE_API CInifile* pGameIni;
 #pragma comment( lib, "xrCore.lib" )
 #pragma comment( lib, "xrCDB.lib" )
 #pragma comment( lib, "xrSound.lib" )
-
-#include "lua/library_linkage.h"
-#include "luabind/library_linkage.h"
-
+#pragma comment(lib, "xrScriptEngine.lib")
 #pragma comment( lib, "xrAPI.lib" )
-
 #pragma comment( lib, "winmm.lib" )
-
 #pragma comment( lib, "d3d9.lib" )
 #pragma comment( lib, "dinput8.lib" )
 #pragma comment( lib, "dxguid.lib" )
+
+#include "lua/library_linkage.h"
+#include "luabind/library_linkage.h"
 
 #ifndef DEBUG
 # define LUABIND_NO_ERROR_CHECKING

@@ -8,7 +8,7 @@
 
 #include "stdafx.h"
 #include "sound_collection_storage.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 
 CSoundCollectionStorage	*g_sound_collection_storage = 0;
 

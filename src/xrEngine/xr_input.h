@@ -80,7 +80,7 @@ public:
     u32 dwCurTime;
 
     const InputStatistics &GetStats() const { return stats; }
-    void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert);
+    void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert);
     void SetAllAcquire(BOOL bAcquire = TRUE);
     void SetMouseAcquire(BOOL bAcquire);
     void SetKBDAcquire(BOOL bAcquire);

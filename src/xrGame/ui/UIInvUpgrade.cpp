@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "string_table.h"
 
 #include "UIInvUpgrade.h"

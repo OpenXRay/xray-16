@@ -76,18 +76,6 @@
     <Filter Include="Scripts\ScriptEngine">
       <UniqueIdentifier>{4c7050eb-fc7e-4c68-b492-185a6b05fc08}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scripts\ScriptStorage">
-      <UniqueIdentifier>{8e595454-f4ff-4bb9-9706-af4264db9895}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scripts\ScriptProcess">
-      <UniqueIdentifier>{9d703f01-ab96-4bab-8516-84cca3441bf8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scripts\ScriptThread">
-      <UniqueIdentifier>{a3e604b6-6c22-47a2-bf6e-2030b10df3a9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scripts\ScriptThread\ScriptStackTracker">
-      <UniqueIdentifier>{956f171e-71c8-4ea9-957e-0964e0983131}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scripts\ScriptDebugger">
       <UniqueIdentifier>{8eab73bc-759b-4987-a1ac-0e6111512d31}</UniqueIdentifier>
     </Filter>
@@ -273,18 +261,6 @@
     <ClInclude Include="..\..\xrServerEntities\smart_cast_impl2.h">
       <Filter>Common\SmartCast</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_export_macroses.h">
-      <Filter>Scripts</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_export_space.h">
-      <Filter>Scripts</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_space_forward.h">
-      <Filter>Scripts</Filter>
-    </ClInclude>
-    <ClInclude Include="script_space.h">
-      <Filter>Scripts</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\script_fmatrix.h">
       <Filter>Scripts\ScriptClasses\ScriptFmatrix</Filter>
     </ClInclude>
@@ -323,51 +299,6 @@
     </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\script_reader.h">
       <Filter>Scripts\ScriptClasses\ScriptReader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_engine.h">
-      <Filter>Scripts\ScriptEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_engine_export.h">
-      <Filter>Scripts\ScriptEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_engine_inline.h">
-      <Filter>Scripts\ScriptEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_engine_space.h">
-      <Filter>Scripts\ScriptEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_storage.h">
-      <Filter>Scripts\ScriptStorage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_storage_inline.h">
-      <Filter>Scripts\ScriptStorage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_storage_space.h">
-      <Filter>Scripts\ScriptStorage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\opt.lua.h">
-      <Filter>Scripts\ScriptStorage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\opt_inline.lua.h">
-      <Filter>Scripts\ScriptStorage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_process.h">
-      <Filter>Scripts\ScriptProcess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_process_inline.h">
-      <Filter>Scripts\ScriptProcess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_thread.h">
-      <Filter>Scripts\ScriptThread</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_thread_inline.h">
-      <Filter>Scripts\ScriptThread</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_stack_tracker.h">
-      <Filter>Scripts\ScriptThread\ScriptStackTracker</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_stack_tracker_inline.h">
-      <Filter>Scripts\ScriptThread\ScriptStackTracker</Filter>
     </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\mslotutils.h">
       <Filter>Scripts\ScriptDebugger</Filter>
@@ -543,6 +474,15 @@
     <ClInclude Include="..\..\xrServerEntities\alife_movement_manager_holder.h">
       <Filter>ServerStuff\ServerEntities\movement_manager_holder</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\xrServerEntities\script_export.hpp">
+      <Filter>Scripts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xrServerEntities\script_export_macroses.h">
+      <Filter>Scripts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xrServerEntities\script_export_space.h">
+      <Filter>Scripts</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\xrServerEntities\pch_script.cpp">
@@ -611,26 +551,8 @@
     <ClCompile Include="..\..\xrServerEntities\script_reader_script.cpp">
       <Filter>Scripts\ScriptClasses\ScriptReader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\script_engine.cpp">
-      <Filter>Scripts\ScriptEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\script_engine_export.cpp">
-      <Filter>Scripts\ScriptEngine</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\xrServerEntities\script_engine_script.cpp">
       <Filter>Scripts\ScriptEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\script_storage.cpp">
-      <Filter>Scripts\ScriptStorage</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\script_process.cpp">
-      <Filter>Scripts\ScriptProcess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\script_thread.cpp">
-      <Filter>Scripts\ScriptThread</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\script_stack_tracker.cpp">
-      <Filter>Scripts\ScriptThread\ScriptStackTracker</Filter>
     </ClCompile>
     <ClCompile Include="..\..\xrServerEntities\script_callStack.cpp">
       <Filter>Scripts\ScriptDebugger</Filter>
@@ -751,6 +673,9 @@
     </ClCompile>
     <ClCompile Include="..\..\xrServerEntities\xrServer_Objects_Alife_Smartcovers_script.cpp">
       <Filter>ServerStuff\ServerEntities\objects_alife_smartcover</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\xrServerEntities\script_export.cpp">
+      <Filter>Scripts</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

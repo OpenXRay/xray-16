@@ -2,7 +2,7 @@
 
 #include "alife_space.h"
 
-#include "object_interfaces.h"
+#include "Common/object_interfaces.h"
 
 struct ARTICLE_DATA : public IPureSerializeObject<IReader,IWriter>
 {

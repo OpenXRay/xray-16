@@ -9,7 +9,7 @@
 #pragma once
 
 #include "xrServer_Objects_Abstract.h"
-#include "object_interfaces.h"
+#include "Common/object_interfaces.h"
 #include "script_value_container.h"
 #include "alife_space.h"
 #include "xrCore/client_id.h"
@@ -44,8 +44,6 @@ SERVER_ENTITY_DECLARE_BEGIN(CPureServerObject,IPureServerObject)
 	virtual void					load(NET_Packet	&tNetPacket);
 	virtual void					save(NET_Packet	&tNetPacket);
 };
-add_to_type_list(CPureServerObject)
-#define script_type_list save_type_list(CPureServerObject)
 
 SERVER_ENTITY_DECLARE_BEGIN3(CSE_Abstract,ISE_Abstract,CPureServerObject,CScriptValueContainer)
 public:
@@ -166,7 +164,5 @@ public:
 	virtual CSE_ALifeOnlineOfflineGroup	*cast_online_offline_group	() {return 0;};
 	virtual CSE_ALifeItemPDA			*cast_item_pda				() {return 0;};
 };
-add_to_type_list(CSE_Abstract)
-#define script_type_list save_type_list(CSE_Abstract)
 
 #pragma warning(pop)

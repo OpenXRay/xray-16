@@ -2,11 +2,11 @@
 
 #include "xrPhysics/iphysics_scripted.h"
 #include "xrPhysics/physicsshell.h"
-#include "script_export_space.h"
+
 class cphysics_element_scripted;
 class CPhysicsJoint;
-class cphysics_joint_scripted:
-public cphysics_game_scripted<CPhysicsJoint>
+
+class cphysics_joint_scripted: public cphysics_game_scripted<CPhysicsJoint>
 {
 public:
 	cphysics_joint_scripted(CPhysicsJoint* imp ):cphysics_game_scripted<CPhysicsJoint>(imp){}
@@ -43,13 +43,4 @@ void 					GetLimits					(float& lo_limit,float& hi_limit,int axis_num)					  	{ 
 void 					GetAxisDirDynamic			(int num,Fvector& axis)											  	{ physics_impl().GetAxisDirDynamic( num, axis ); }
 void 					GetAnchorDynamic			(Fvector& anchor)													{ physics_impl().GetAnchorDynamic( anchor ); }
 bool					isBreakable					( )																	{ return physics_impl(). isBreakable( ); }
-
-
-
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-
-add_to_type_list(cphysics_joint_scripted)
-#undef script_type_list
-#define script_type_list save_type_list(cphysics_joint_scripted)

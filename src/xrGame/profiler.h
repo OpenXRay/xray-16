@@ -72,7 +72,7 @@ protected:
 public:
 						CProfiler			();
 						~CProfiler			();
-			void		show_stats			(CGameFont *game_font, bool show);
+			void		show_stats			(IGameFont &font, bool show);
 			void		clear				();
 			void		add_profile_portion	(const CProfileResultPortion &profile_portion);
 };

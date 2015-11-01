@@ -9,7 +9,6 @@
 #pragma once
 
 #include "game_graph_space.h"
-#include "script_export_space.h"
 #include "game_level_cross_table.h"
 
 class CGameGraph {
@@ -73,10 +72,6 @@ public:
 	IC		_GRAPH_ID				vertex_id				(const CVertex *vertex) const;
 	IC		void					set_current_level		(u32 level_id);
 	IC		const _GRAPH_ID			&current_level_vertex	() const;
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CGameGraph)
-#undef script_type_list
-#define script_type_list save_type_list(CGameGraph)
 
 #include "game_graph_inline.h"

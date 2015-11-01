@@ -186,9 +186,9 @@ void CParticleGroup::SItem::Clear()
     GetVisuals		(visuals);
     for (VisualVecIt it=visuals.begin(); it!=visuals.end(); it++)
 	{
-	    //::Render->model_Delete(*it);
+	    //GlobalEnv.Render->model_Delete(*it);
 		IRenderVisual *pVisual = smart_cast<IRenderVisual*>(*it);
-		::Render->model_Delete(pVisual);
+		GlobalEnv.Render->model_Delete(pVisual);
 		*it = 0;
 	}
 
@@ -272,16 +272,16 @@ void CParticleGroup::SItem::Stop(BOOL def_stop)
 	{
         for (it=_children_related.begin(); it!=_children_related.end(); it++)	
 		{
-			//::Render->model_Delete(*it);
+			//GlobalEnv.Render->model_Delete(*it);
 			IRenderVisual *pVisual = smart_cast<IRenderVisual*>(*it);
-			::Render->model_Delete(pVisual);
+			GlobalEnv.Render->model_Delete(pVisual);
 			*it = 0;
 		}
         for (it=_children_free.begin(); it!=_children_free.end(); it++)			
 		{
-			//::Render->model_Delete(*it);
+			//GlobalEnv.Render->model_Delete(*it);
 			IRenderVisual *pVisual = smart_cast<IRenderVisual*>(*it);
-			::Render->model_Delete(pVisual);
+			GlobalEnv.Render->model_Delete(pVisual);
 			*it = 0;
 		}
         _children_related.clear();
@@ -383,9 +383,9 @@ void CParticleGroup::SItem::OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& 
                     if (E->vis.box.is_valid()) box.merge	(E->vis.box);
                 }else{
                 	rem_cnt++	;
-					//::Render->model_Delete(*it);
+					//GlobalEnv.Render->model_Delete(*it);
 					IRenderVisual *pVisual = smart_cast<IRenderVisual*>(*it);
-					::Render->model_Delete(pVisual);
+					GlobalEnv.Render->model_Delete(pVisual);
 					*it = 0;                    
                 }
             }

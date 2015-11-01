@@ -15,7 +15,7 @@
 #include "Weapon.h"
 #include "WeaponMagazined.h"
 #include "Include/xrRender/Kinematics.h"
-#include "xrServerEntities/script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "sight_manager.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "ai_space.h"
@@ -222,7 +222,7 @@ bool CAI_Stalker::bfAssignObject(CScriptEntityAction *tpEntityAction)
 					l_tObjectAction.m_bCompleted = true;
 			}
 			else
-				ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError,"cannot reload active item because it is not selected!");
+				ai().script_engine().script_log(LuaMessageType::Error,"cannot reload active item because it is not selected!");
 
 //			if (inventory().ActiveItem()) {
 //				inventory().Action(kWPN_FIRE,	CMD_STOP);
@@ -232,7 +232,7 @@ bool CAI_Stalker::bfAssignObject(CScriptEntityAction *tpEntityAction)
 //					l_tObjectAction.m_bCompleted = true;
 //			}
 //			else
-//				ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError,"cannot reload active item because it is not selected!");
+//				ai().script_engine().script_log(LuaMessageType::Error,"cannot reload active item because it is not selected!");
 			break;
 		}
 		case eObjectActionActivate : {
@@ -269,7 +269,7 @@ bool CAI_Stalker::bfAssignObject(CScriptEntityAction *tpEntityAction)
 		}
 		case eObjectActionTake : {
 			if (inventory().GetItemFromInventory(*l_tObjectAction.m_tpObject->cName())) {
-				ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError,"item is already in the inventory!");
+				ai().script_engine().script_log(LuaMessageType::Error,"item is already in the inventory!");
 				return	((l_tObjectAction.m_bCompleted = true) == false);
 			}
 			feel_touch_new(l_tObjectAction.m_tpObject);
@@ -278,7 +278,7 @@ bool CAI_Stalker::bfAssignObject(CScriptEntityAction *tpEntityAction)
 		}
 		case eObjectActionDrop : {
 			if (!inventory().GetItemFromInventory(*l_tObjectAction.m_tpObject->cName())) {
-				ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError,"item is not in the inventory!");
+				ai().script_engine().script_log(LuaMessageType::Error,"item is not in the inventory!");
 				return	((l_tObjectAction.m_bCompleted = true) == false);
 			}
 			DropItemSendMessage(l_tObjectAction.m_tpObject);

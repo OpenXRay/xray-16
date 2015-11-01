@@ -70,7 +70,7 @@ PROTECT_API void CRenderDevice::Initialize()
     GetClientRect(m_hWnd, &m_rcWindowClient);
 }
 
-void CRenderDevice::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+void CRenderDevice::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
 {
     font.OutNext("*** ENGINE:   %2.2fms", stats.EngineTotal.result);
     font.OutNext("FPS/RFPS:     %3.1f/%3.1f", stats.fFPS, stats.fRFPS);

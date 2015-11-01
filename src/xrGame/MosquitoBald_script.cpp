@@ -2,13 +2,13 @@
 #include "MosquitoBald.h"
 #include "ZoneCampfire.h"
 #include "TorridZone.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CMosquitoBald::script_register	(lua_State *L)
+SCRIPT_EXPORT(CMosquitoBald, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[	
 		class_<CTorridZone,CGameObject>("CTorridZone")
 			.def(constructor<>()),
@@ -20,4 +20,4 @@ void CMosquitoBald::script_register	(lua_State *L)
 			.def("turn_off",			&CZoneCampfire::turn_off_script)
 			.def("is_on",				&CZoneCampfire::is_on)
 	];
-}
+});

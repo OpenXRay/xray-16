@@ -9,6 +9,7 @@
 #include "pch_script.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "xrServer_script_macroses.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -17,25 +18,24 @@ LPCSTR profile_name_script (CSE_ALifeTraderAbstract* ta)
 	return *ta->character_profile();
 }
 
-#pragma optimize("s",on)
-void CSE_ALifeTraderAbstract::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeTraderAbstract, (),
 {
-	module(L)[
+	module(luaState)
+    [
 		class_<CSE_ALifeTraderAbstract>
 			("cse_alife_trader_abstract")
 //			.def(		constructor<LPCSTR>())
-#ifdef XRGAME_EXPORTS
-			.def("community",		&CommunityName)
+			.def("community",		&CSE_ALifeTraderAbstract::CommunityName)
 			.def("profile_name",	&profile_name_script)
-			.def("rank",			&Rank)
-			.def("reputation",		&Reputation)
-#endif // XRGAME_EXPORTS
+			.def("rank",			&CSE_ALifeTraderAbstract::Rank)
+			.def("reputation",		&CSE_ALifeTraderAbstract::Reputation)
 	];
-}
+});
 
-void CSE_ALifeTrader::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeTrader, (CSE_ALifeDynamicObjectVisual, CSE_ALifeTraderAbstract),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_dynamic_alife2(
 			CSE_ALifeTrader,
 			"cse_alife_trader",
@@ -43,11 +43,12 @@ void CSE_ALifeTrader::script_register(lua_State *L)
 			CSE_ALifeTraderAbstract
 		)
 	];
-}
+});
 
-void CSE_ALifeCustomZone::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeCustomZone, (CSE_ALifeDynamicObject, CSE_Shape),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_dynamic_alife2(
 			CSE_ALifeCustomZone,
 			"cse_custom_zone",
@@ -55,25 +56,24 @@ void CSE_ALifeCustomZone::script_register(lua_State *L)
 			CSE_Shape
 		)
 	];
-}
+});
 
-void CSE_ALifeAnomalousZone::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeAnomalousZone, (CSE_ALifeCustomZone),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_dynamic_alife1(
 			CSE_ALifeAnomalousZone,
 			"cse_anomalous_zone",
 			CSE_ALifeCustomZone
 		)
-#ifdef XRGAME_EXPORTS
-//.		.def("spawn_artefacts",	&CSE_ALifeAnomalousZone::spawn_artefacts)
-#endif
 	];
-}
+});
 
-void CSE_ALifeMonsterRat::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeMonsterRat, (CSE_ALifeMonsterAbstract, CSE_ALifeInventoryItem),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_monster2(
 			CSE_ALifeMonsterRat,
 			"cse_alife_monster_rat",
@@ -81,4 +81,4 @@ void CSE_ALifeMonsterRat::script_register(lua_State *L)
 			CSE_ALifeInventoryItem
 		)
 	];
-}
+});

@@ -77,7 +77,7 @@ void CObject::cNameVisual_set(shared_str N)
         IRenderVisual* old_v = renderable.visual;
 
         NameVisual = N;
-        renderable.visual = Render->model_Create(*N);
+        renderable.visual = GlobalEnv.Render->model_Create(*N);
 
         IKinematics* old_k = old_v ? old_v->dcast_PKinematics() : NULL;
         IKinematics* new_k = renderable.visual->dcast_PKinematics();
@@ -94,11 +94,11 @@ void CObject::cNameVisual_set(shared_str N)
             new_k->SetUpdateCallbackParam(old_k->GetUpdateCallbackParam());
         }
 
-        ::Render->model_Delete(old_v);
+        GlobalEnv.Render->model_Delete(old_v);
     }
     else
     {
-        ::Render->model_Delete(renderable.visual);
+        GlobalEnv.Render->model_Delete(renderable.visual);
         NameVisual = 0;
     }
     OnChangeVisual();

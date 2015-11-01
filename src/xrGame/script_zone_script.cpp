@@ -9,24 +9,25 @@
 #include "pch_script.h"
 #include "script_zone.h"
 #include "smart_zone.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptZone::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptZone, (DLL_Pure),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptZone,DLL_Pure>("ce_script_zone")
 			.def(constructor<>())
 	];
-}
+});
 
-void CSmartZone::script_register(lua_State *L)
+SCRIPT_EXPORT(CSmartZone, (DLL_Pure),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CSmartZone,DLL_Pure>("ce_smart_zone")
 			.def(constructor<>())
 	];
-}
+});

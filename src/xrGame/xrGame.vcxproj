@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -21,20 +21,20 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -255,8 +255,6 @@
     <ClInclude Include="..\xrServerEntities\inventory_space.h" />
     <ClInclude Include="..\xrServerEntities\ItemListTypes.h" />
     <ClInclude Include="..\xrServerEntities\LevelGameDef.h" />
-    <ClInclude Include="..\xrServerEntities\lua_studio.h" />
-    <ClInclude Include="..\xrServerEntities\mslotutils.h" />
     <ClInclude Include="..\xrServerEntities\object_broker.h" />
     <ClInclude Include="..\xrServerEntities\object_cloner.h" />
     <ClInclude Include="..\xrServerEntities\object_comparer.h" />
@@ -280,37 +278,10 @@
     <ClInclude Include="..\xrServerEntities\PHNetState.h" />
     <ClInclude Include="..\xrServerEntities\PropertiesListTypes.h" />
     <ClInclude Include="..\xrServerEntities\restriction_space.h" />
-    <ClInclude Include="..\xrServerEntities\script_callStack.h" />
-    <ClInclude Include="..\xrServerEntities\script_debugger.h" />
-    <ClInclude Include="..\xrServerEntities\script_debugger_messages.h" />
-    <ClInclude Include="..\xrServerEntities\script_debugger_threads.h" />
-    <ClInclude Include="..\xrServerEntities\script_engine.h" />
-    <ClInclude Include="..\xrServerEntities\script_engine_inline.h" />
-    <ClInclude Include="..\xrServerEntities\script_engine_space.h" />
-    <ClInclude Include="..\xrServerEntities\script_export_macroses.h" />
-    <ClInclude Include="..\xrServerEntities\script_export_space.h" />
-    <ClInclude Include="..\xrServerEntities\script_fcolor.h" />
-    <ClInclude Include="..\xrServerEntities\script_flags.h" />
-    <ClInclude Include="..\xrServerEntities\script_fmatrix.h" />
-    <ClInclude Include="..\xrServerEntities\script_fvector.h" />
     <ClInclude Include="..\xrServerEntities\script_ini_file.h" />
     <ClInclude Include="..\xrServerEntities\script_ini_file_inline.h" />
-    <ClInclude Include="..\xrServerEntities\script_lua_helper.h" />
-    <ClInclude Include="..\xrServerEntities\script_net_packet.h" />
-    <ClInclude Include="..\xrServerEntities\script_process.h" />
-    <ClInclude Include="..\xrServerEntities\script_process_inline.h" />
-    <ClInclude Include="..\xrServerEntities\script_reader.h" />
     <ClInclude Include="..\xrServerEntities\script_rtoken_list.h" />
     <ClInclude Include="..\xrServerEntities\script_rtoken_list_inline.h" />
-    <ClInclude Include="..\xrServerEntities\script_sound_type.h" />
-    <ClInclude Include="..\xrServerEntities\script_space_forward.h" />
-    <ClInclude Include="..\xrServerEntities\script_stack_tracker.h" />
-    <ClInclude Include="..\xrServerEntities\script_stack_tracker_inline.h" />
-    <ClInclude Include="..\xrServerEntities\script_storage.h" />
-    <ClInclude Include="..\xrServerEntities\script_storage_inline.h" />
-    <ClInclude Include="..\xrServerEntities\script_storage_space.h" />
-    <ClInclude Include="..\xrServerEntities\script_thread.h" />
-    <ClInclude Include="..\xrServerEntities\script_thread_inline.h" />
     <ClInclude Include="..\xrServerEntities\script_token_list.h" />
     <ClInclude Include="..\xrServerEntities\script_token_list_inline.h" />
     <ClInclude Include="..\xrServerEntities\script_value_container.h" />
@@ -869,7 +840,6 @@
     <ClInclude Include="configs_common.h" />
     <ClInclude Include="configs_dumper.h" />
     <ClInclude Include="configs_dump_verifyer.h" />
-    <ClInclude Include="console_registrator.h" />
     <ClInclude Include="controller_state_panic_inline.h" />
     <ClInclude Include="control_action.h" />
     <ClInclude Include="control_action_inline.h" />
@@ -982,7 +952,6 @@
     <ClInclude Include="flare.h" />
     <ClInclude Include="FoodItem.h" />
     <ClInclude Include="FryupZone.h" />
-    <ClInclude Include="fs_registrator.h" />
     <ClInclude Include="GalantineArtifact.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GamePersistent.h" />
@@ -1138,7 +1107,6 @@
     <ClInclude Include="inventory_upgrade_root_inline.h" />
     <ClInclude Include="invincible_fury.h" />
     <ClInclude Include="item_manager.h" />
-    <ClInclude Include="key_binding_registrator.h" />
     <ClInclude Include="killer_victim_velocity_angle.h" />
     <ClInclude Include="kills_store.h" />
     <ClInclude Include="kills_store_inline.h" />
@@ -1285,7 +1253,6 @@
     <ClInclude Include="PhraseDialog.h" />
     <ClInclude Include="PhraseDialogDefs.h" />
     <ClInclude Include="PhraseDialogManager.h" />
-    <ClInclude Include="PhraseDialog_script.h" />
     <ClInclude Include="PhraseScript.h" />
     <ClInclude Include="PHReqComparer.h" />
     <ClInclude Include="PHScriptCall.h" />
@@ -1421,7 +1388,6 @@
     <ClInclude Include="script_game_object_impl.h" />
     <ClInclude Include="script_hit.h" />
     <ClInclude Include="script_hit_inline.h" />
-    <ClInclude Include="script_lanim.h" />
     <ClInclude Include="script_monster_action.h" />
     <ClInclude Include="script_monster_action_inline.h" />
     <ClInclude Include="script_monster_hit_info.h" />
@@ -1436,13 +1402,11 @@
     <ClInclude Include="script_particle_action_inline.h" />
     <ClInclude Include="script_property_evaluator_wrapper.h" />
     <ClInclude Include="script_property_evaluator_wrapper_inline.h" />
-    <ClInclude Include="script_render_device.h" />
     <ClInclude Include="script_sound.h" />
     <ClInclude Include="script_sound_action.h" />
     <ClInclude Include="script_sound_action_inline.h" />
     <ClInclude Include="script_sound_info.h" />
     <ClInclude Include="script_sound_inline.h" />
-    <ClInclude Include="script_ui_registrator.h" />
     <ClInclude Include="script_watch_action.h" />
     <ClInclude Include="script_watch_action_inline.h" />
     <ClInclude Include="script_world_property.h" />
@@ -1873,10 +1837,6 @@
     <ClCompile Include="..\xrServerEntities\character_info.cpp" />
     <ClCompile Include="..\xrServerEntities\gametype_chooser.cpp" />
     <ClCompile Include="..\xrServerEntities\LevelGameDef.cpp" />
-    <ClCompile Include="..\xrServerEntities\lua_studio.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
     <ClCompile Include="..\xrServerEntities\object_factory.cpp" />
     <ClCompile Include="..\xrServerEntities\object_factory_register.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -1896,21 +1856,6 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\PHNetState.cpp" />
-    <ClCompile Include="..\xrServerEntities\script_callStack.cpp" />
-    <ClCompile Include="..\xrServerEntities\script_debugger.cpp" />
-    <ClCompile Include="..\xrServerEntities\script_debugger_threads.cpp" />
-    <ClCompile Include="..\xrServerEntities\script_engine.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\script_engine_export.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\script_engine_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_fcolor_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -1932,15 +1877,7 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="..\xrServerEntities\script_lua_helper.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_net_packet_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\script_process.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
@@ -1953,18 +1890,6 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_sound_type_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\script_stack_tracker.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\script_storage.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\script_thread.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
@@ -3236,10 +3161,6 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="script_engine_help.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
     <ClCompile Include="script_entity.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -4150,6 +4071,9 @@
     <ProjectReference Include="$(SolutionDir)xrXMLParser\xrXMLParser.vcxproj">
       <Project>{94a1c366-3d19-48e6-8170-4adc2e70df98}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\xrScriptEngine\xrScriptEngine.vcxproj">
+      <Project>{132c62de-de85-4978-9675-c78ed4da46f0}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

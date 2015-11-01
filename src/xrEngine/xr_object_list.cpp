@@ -24,7 +24,7 @@ public:
 BOOL debug_destroy = TRUE;
 #endif
 
-void CObjectList::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+void CObjectList::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
 {
     stats.FrameEnd();
     float engineTotal = Device.GetStats().EngineTotal.result;

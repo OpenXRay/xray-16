@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "cdkey_ban_list.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 
 cdkey_ban_list::cdkey_ban_list()
 {

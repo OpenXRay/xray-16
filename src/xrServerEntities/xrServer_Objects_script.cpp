@@ -11,6 +11,7 @@
 #include "phnetstate.h"
 #include "xrServer_script_macroses.h"
 #include "script_ini_file.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -78,10 +79,10 @@ struct CWrapperBase : public T, public luabind::wrap_base {
 
 };
 
-#pragma optimize("s",on)
-void CPureServerObject::script_register(lua_State *L)
+SCRIPT_EXPORT(CPureServerObject, (),
 {
-	module(L)[
+	module(luaState)
+    [
 		class_<IPureLoadableObject<IReader> >
 			("ipure_alife_load_object"),
 		class_<IPureSavableObject<IWriter> >
@@ -94,13 +95,14 @@ void CPureServerObject::script_register(lua_State *L)
 			("cpure_server_object")
 //			.def(		constructor<>())
 	];
-}
+});
 
-void CSE_Abstract::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_Abstract, (CPureServerObject),
 {
 	typedef CWrapperBase<CSE_Abstract> WrapType;
 	typedef CSE_Abstract BaseType;
-	module(L)[
+	module(luaState)
+    [
 		class_<CSE_Abstract,WrapType,CPureServerObject>	("cse_abstract")
 			.def_readonly	("id",				&BaseType::ID)
 			.def_readonly	("parent_id",		&BaseType::ID_Parent)
@@ -117,55 +119,60 @@ void CSE_Abstract::script_register(lua_State *L)
 			.def			("UPDATE_Write",	&BaseType::UPDATE_Write, &WrapType::UPDATE_Write_static)
 //			.def(		constructor<LPCSTR>())
 	];
-}
+});
 
-void CSE_Shape::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_Shape, (),
 {
-	module(L)[
+	module(luaState)
+    [
 		class_<CSE_Shape>
 			("cse_shape")
 //			.def(		constructor<>())
 	];
-}
+});
 
-void CSE_Visual::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_Visual, (),
 {
-	module(L)[
+	module(luaState)
+    [
 		class_<CSE_Visual>
 			("cse_visual")
 //			.def(		constructor<>())
 //			.def(		constructor<LPCSTR>())
 	];
-}
+});
 
-void CSE_Motion::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_Motion, (),
 {
-	module(L)[
+	module(luaState)
+    [
 		class_<CSE_Motion>
 			("cse_motion")
 //			.def(		constructor<>())
 //			.def(		constructor<LPCSTR>())
 	];
-}
+});
 
-void CSE_Spectator::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_Spectator, (CSE_Abstract),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_abstract1(
 			CSE_Spectator,
 			"cse_spectator",
 			CSE_Abstract
 		)
 	];
-}
+});
 
-void CSE_Temporary::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_Temporary, (CSE_Abstract),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_abstract1(
 			CSE_Temporary,
 			"cse_temporary",
 			CSE_Abstract
 		)
 	];
-}
+});

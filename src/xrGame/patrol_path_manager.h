@@ -9,7 +9,7 @@
 #pragma once
 
 #include "Level.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "patrol_path_storage.h"
 #include "patrol_path.h"
 #include "patrol_path_manager_space.h"

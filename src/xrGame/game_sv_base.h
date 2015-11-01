@@ -2,7 +2,7 @@
 
 #include "game_base.h"
 #include "alife_space.h"
-#include "script_export_space.h"
+
 #include "xrCore/client_id.h"
 #include "game_sv_base_console_vars.h"
 #include "game_sv_event_queue.h"

@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "EngineAPI.h"
 #include "xrCDB/xrXRC.h"
-
+#include "xrScriptEngine/script_engine.hpp"
 #include "securom_api.h"
 
 extern xr_token* vid_quality_token;
@@ -45,7 +45,7 @@ CEngineAPI::~CEngineAPI()
 extern u32 renderer_value; //con cmd
 ENGINE_API int g_current_renderer = 0;
 
-ENGINE_API bool is_enough_address_space_available()
+bool is_enough_address_space_available()
 {
     SYSTEM_INFO system_info;
 
@@ -175,7 +175,7 @@ void CEngineAPI::Initialize(void)
 void CEngineAPI::Destroy(void)
 {
     if (hGame) { FreeLibrary(hGame); hGame = 0; }
-    if (hRender) { FreeLibrary(hRender); hRender = 0; }
+    if (hRender) { FreeLibrary(hRender); hRender = 0; }    
     pCreate = 0;
     pDestroy = 0;
     Engine.Event._destroy();

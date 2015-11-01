@@ -9,7 +9,6 @@
 #pragma once
 
 #include "script_abstract_action.h"
-#include "script_export_space.h"
 #include "ai_monster_space.h"
 
 class CScriptGameObject;
@@ -25,11 +24,6 @@ public:
 	IC				CScriptMonsterAction	(MonsterSpace::EScriptMonsterGlobalAction action, CScriptGameObject *tObj);
 	virtual			~CScriptMonsterAction	();
 			void	SetObject				(CScriptGameObject *tObj);
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CScriptMonsterAction)
-#undef script_type_list
-#define script_type_list save_type_list(CScriptMonsterAction)
 
 #include "script_monster_action_inline.h"

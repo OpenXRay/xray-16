@@ -170,7 +170,7 @@ void	CKinematics::Load(const char* N, IReader *data, u32 dwFlags)
 			string_path		lod_name;
 			LD->r_string	(lod_name, sizeof(lod_name));
 //.         strconcat		(sizeof(name_load),name_load, short_name, ":lod:", lod_name.c_str());
-            m_lod 			= (dxRender_Visual*) ::Render->model_CreateChild(lod_name, NULL);
+            m_lod 			= (dxRender_Visual*) GlobalEnv.Render->model_CreateChild(lod_name, NULL);
 
 			if ( CKinematics* lod_kinematics = dynamic_cast<CKinematics*>(m_lod) )
 			{
@@ -181,7 +181,7 @@ void	CKinematics::Load(const char* N, IReader *data, u32 dwFlags)
 //.			VERIFY2			(m_lod->Type==MT_HIERRARHY || m_lod->Type==MT_PROGRESSIVE || m_lod->Type==MT_NORMAL,lod_name.c_str());
 /*
 			strconcat		(name_load, short_name, ":lod:1");
-            m_lod 			= ::Render->model_CreateChild(name_load,LD);
+            m_lod 			= GlobalEnv.Render->model_CreateChild(name_load,LD);
 			VERIFY			(m_lod->Type==MT_SKELETON_GEOMDEF_PM || m_lod->Type==MT_SKELETON_GEOMDEF_ST);
 */
         }
@@ -381,7 +381,7 @@ void CKinematics::Copy(dxRender_Visual *P)
 
 	CalculateBones_Invalidate	();
 
-    m_lod 	   = (pFrom->m_lod)?(dxRender_Visual*)::Render->model_Duplicate	(pFrom->m_lod):0;
+    m_lod 	   = (pFrom->m_lod)?(dxRender_Visual*)GlobalEnv.Render->model_Duplicate	(pFrom->m_lod):0;
 }
 
 void CKinematics::CalculateBones_Invalidate	()
@@ -668,8 +668,8 @@ void CKinematics::CalculateWallmarks()
 			float w	= (RDEVICE.fTimeGlobal-wm->TimeStart())/LIFE_TIME;
 			if (w<1.f){
 				// append wm to WallmarkEngine
-				if (::Render->ViewBase.testSphere_dirty(wm->m_Bounds.P,wm->m_Bounds.R))
-					//::Render->add_SkeletonWallmark	(wm);
+				if (GlobalEnv.Render->ViewBase.testSphere_dirty(wm->m_Bounds.P,wm->m_Bounds.R))
+					//GlobalEnv.Render->add_SkeletonWallmark	(wm);
 					::RImplementation.add_SkeletonWallmark	(wm);
 			}else{
 				// remove wallmark				

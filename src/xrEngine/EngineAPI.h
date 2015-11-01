@@ -60,6 +60,8 @@ public:
     ~CEngineAPI();
 };
 
+ENGINE_API bool is_enough_address_space_available();
+
 #define NEW_INSTANCE(a) Engine.External.pCreate(a)
 #define DEL_INSTANCE(a) { Engine.External.pDestroy(a); a=NULL; }
 

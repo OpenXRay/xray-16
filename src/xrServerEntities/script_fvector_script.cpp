@@ -7,14 +7,13 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
-#include "script_fvector.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptFvector::script_register(lua_State *L)
+SCRIPT_EXPORT(Fvector, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<Fvector>("vector")
 			.def_readwrite("x",					&Fvector::x)
@@ -87,21 +86,39 @@ void CScriptFvector::script_register(lua_State *L)
 			.def("getP",						&Fvector::getP)
 
 			.def("reflect",						&Fvector::reflect,																										return_reference_to(_1))
-			.def("slide",						&Fvector::slide,																										return_reference_to(_1)),
+			.def("slide",						&Fvector::slide,																										return_reference_to(_1))
 //			.def("generate_orthonormal_basis",	&Fvector::generate_orthonormal_basis),
+    ];
+});
 
-		class_<Fvector2>("vector2")
-			.def_readwrite("x",					&Fvector2::x)
-			.def_readwrite("y",					&Fvector2::y)
-			.def(								constructor<>())
-			.def("set",							(Fvector2 & (Fvector2::*)(float,float))(&Fvector2::set),																return_reference_to(_1))
-			.def("set",							(Fvector2 & (Fvector2::*)(const Fvector2 &))(&Fvector2::set),																return_reference_to(_1)),
+SCRIPT_EXPORT(Fvector2, (),
+{
+    module(luaState)
+    [
+        class_<Fvector2>("vector2")
+            .def_readwrite("x",					&Fvector2::x)
+            .def_readwrite("y",					&Fvector2::y)
+            .def(constructor<>())
+            .def("set",							(Fvector2 & (Fvector2::*)(float,float))(&Fvector2::set),																return_reference_to(_1))
+            .def("set",							(Fvector2 & (Fvector2::*)(const Fvector2 &))(&Fvector2::set),																return_reference_to(_1))
+    ];
+});
 
-		class_<Fbox>("Fbox")
-			.def_readwrite("min",				&Fbox::min)
-			.def_readwrite("max",				&Fbox::max)
-			.def(								constructor<>()),
+SCRIPT_EXPORT(Fbox, (),
+{
+    module(luaState)
+    [
+        class_<Fbox>("Fbox")
+            .def_readwrite("min",				&Fbox::min)
+            .def_readwrite("max",				&Fbox::max)
+            .def(constructor<>())
+    ];
+});
 
+SCRIPT_EXPORT(Frect, (),
+{
+    module(luaState)
+    [
 		class_<Frect>("Frect")
 			.def(								constructor<>())
 			.def("set",							(Frect & (Frect::*)(float,float,float,float))(&Frect::set),																return_reference_to(_1))
@@ -113,4 +130,4 @@ void CScriptFvector::script_register(lua_State *L)
 			.def_readwrite("y2",				&Frect::y2)
 
 	];
-}
+});

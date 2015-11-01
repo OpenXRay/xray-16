@@ -3,7 +3,7 @@
 #include "UIWindow.h"
 #include "UIStatic.h"
 #include "UIXmlInit.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "xrEngine/xr_input.h"
 #include "xr_level_controller.h"
 
@@ -158,7 +158,7 @@ void CUISequenceVideoItem::OnRender()
 {
 	if (!m_texture->HasTexture() && m_wnd->GetShader() && m_wnd->GetShader()->inited())
 	{
-		UIRender->SetShader(*m_wnd->GetShader());
+        GlobalEnv.UIRender->SetShader(*m_wnd->GetShader());
 		m_texture->CaptureTexture();
 		m_texture->video_Stop();
 	}

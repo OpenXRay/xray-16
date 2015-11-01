@@ -8,11 +8,11 @@
 #define FACTORY_PTR_INSTANCIATE(Class) \
 	inline void FactoryPtr<I##Class>::CreateObject(void) \
 { \
-	m_pObject = RenderFactory->Create##Class(); \
+	m_pObject = GlobalEnv.RenderFactory->Create##Class(); \
 } \
 	inline void FactoryPtr<I##Class>::DestroyObject(void) \
 { \
-	RenderFactory->Destroy##Class(m_pObject); \
+	GlobalEnv.RenderFactory->Destroy##Class(m_pObject); \
 	m_pObject = NULL; \
 }
 	

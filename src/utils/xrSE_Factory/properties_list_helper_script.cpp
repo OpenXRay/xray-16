@@ -10,8 +10,9 @@
 #include "script_space.h"
 #include "script_properties_list_helper.h"
 #include "ai_space.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "script_token_list.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -54,14 +55,15 @@ IPropHelper &PHelper()
 CScriptPropertiesListHelper *properties_helper()
 {
 	if (!g_property_list_helper)
-		ai().script_engine().script_log	(ScriptStorage::eLuaMessageTypeError,"Editor is not started, therefore prop_helper cannot be accessed!");
+		ai().script_engine().script_log	(LuaMessageType::Error,"Editor is not started, therefore prop_helper cannot be accessed!");
 
 	return								(g_property_list_helper);
 }
 
-void CScriptPropertiesListHelper::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptPropertiesListHelper, (),
 {
-	module(L) [
+	module(luaState)
+    [
 		class_<PropValue>	("prop_value"),
 		class_<PropItemVec>	("prop_item_vec"),
 		class_<CaptionValue>("caption_value"),
@@ -226,4 +228,4 @@ void CScriptPropertiesListHelper::script_register(lua_State *L)
 
 		,def("properties_helper",	&properties_helper)
 	];
-}
+});

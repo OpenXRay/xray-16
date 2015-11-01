@@ -27,6 +27,7 @@
 
 #include "xrSash.h"
 #include "IGame_Persistent.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 #pragma comment( lib, "d3dx9.lib" )
 
@@ -42,7 +43,7 @@ ref_light precache_light = 0;
 BOOL CRenderDevice::Begin()
 {
 #ifndef DEDICATED_SERVER
-    switch (Render->GetDeviceState())
+    switch (GlobalEnv.Render->GetDeviceState())
     {
     case DeviceState::Normal:
         break;
@@ -58,7 +59,7 @@ BOOL CRenderDevice::Begin()
     default:
         R_ASSERT(0);
     }
-    Render->Begin();
+    GlobalEnv.Render->Begin();
     FPU::m24r();
     g_bRendering = TRUE;
 #endif
@@ -66,7 +67,7 @@ BOOL CRenderDevice::Begin()
 }
 
 void CRenderDevice::Clear()
-{ Render->Clear(); }
+{ GlobalEnv.Render->Clear(); }
 
 extern void CheckPrivilegySlowdown();
 
@@ -85,14 +86,14 @@ void CRenderDevice::End(void)
 #ifdef INGAME_EDITOR
             load_finished = true;
 #endif
-            Render->updateGamma();
+            GlobalEnv.Render->updateGamma();
             if (precache_light)
             {
                 precache_light->set_active(false);
                 precache_light.destroy();
             }
             ::Sound->set_master_volume(1.f);
-            Render->ResourcesDestroyNecessaryTextures();
+            GlobalEnv.Render->ResourcesDestroyNecessaryTextures();
             Memory.mem_compact();
             Msg("* MEMORY USAGE: %d K", Memory.mem_usage() / 1024);
             Msg("* End of synchronization A[%d] R[%d]", b_is_Active, b_is_Ready);
@@ -114,7 +115,7 @@ void CRenderDevice::End(void)
     // Present goes here, so call OA Frame end.
     if (g_SASH.IsBenchmarkRunning())
         g_SASH.DisplayFrame(Device.fTimeGlobal);
-    Render->End();
+    GlobalEnv.Render->End();
 #ifdef INGAME_EDITOR
     if (load_finished && m_editor)
         m_editor->on_load_finished();
@@ -148,13 +149,13 @@ void CRenderDevice::PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_use
 #ifdef DEDICATED_SERVER
     amount = 0;
 #else
-    if (Render->GetForceGPU_REF())
+    if (GlobalEnv.Render->GetForceGPU_REF())
         amount = 0;
 #endif
     dwPrecacheFrame = dwPrecacheTotal = amount;
     if (amount && !precache_light && g_pGameLevel && g_loading_events.empty())
     {
-        precache_light = Render->light_create();
+        precache_light = GlobalEnv.Render->light_create();
         precache_light->set_shadow(false);
         precache_light->set_position(vCameraPosition);
         precache_light->set_color(255, 255, 255);
@@ -182,7 +183,7 @@ void CRenderDevice::CalcFrameStats()
         stats.fFPS = fInv*stats.fFPS + fOne*fps;
         if (stats.RenderTotal.result > EPS_S)
         {
-            u32 renderedPolys = Render->GetCacheStatPolys();
+            u32 renderedPolys = GlobalEnv.Render->GetCacheStatPolys();
             stats.fTPS = fInv*stats.fTPS + fOne*float(renderedPolys) / (stats.RenderTotal.result*1000.f);
             stats.fRFPS = fInv*stats.fRFPS + fOne*1000.f / stats.RenderTotal.result;
         }
@@ -230,7 +231,7 @@ void CRenderDevice::on_idle()
     }
     // Matrices
     mFullTransform.mul(mProject, mView);
-    Render->SetCacheXform(mView, mProject);
+    GlobalEnv.Render->SetCacheXform(mView, mProject);
     D3DXMatrixInverse((D3DXMATRIX*)&mInvFullTransform, 0, (D3DXMATRIX*)&mFullTransform);
     vCameraPosition_saved = vCameraPosition;
     mFullTransform_saved = mFullTransform;
@@ -319,7 +320,7 @@ void CRenderDevice::Run()
     thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
     // Message cycle
     seqAppStart.Process(rp_AppStart);
-    Render->ClearTarget();
+    GlobalEnv.Render->ClearTarget();
     message_loop();
     seqAppEnd.Process(rp_AppEnd);
     // Stop Balance-Thread
@@ -482,6 +483,18 @@ void CRenderDevice::RemoveSeqFrame(pureFrame* f)
     seqFrameMT.Remove(f);
     seqFrame.Remove(f);
 }
+
+CRenderDevice *get_device() { return &Device; }
+u32	script_time_global() { return Device.dwTimeGlobal; }
+u32	script_time_global_async() { return Device.TimerAsync_MMT(); }
+
+SCRIPT_EXPORT(Device, (),
+{
+    luabind::function(luaState, "time_global", script_time_global);
+    luabind::function(luaState, "time_global_async", script_time_global_async);
+    luabind::function(luaState, "device", get_device);
+    luabind::function(luaState, "is_enough_address_space_available", is_enough_address_space_available);
+});
 
 CLoadScreenRenderer::CLoadScreenRenderer()
     :b_registered(false)

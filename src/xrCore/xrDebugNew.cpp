@@ -3,9 +3,7 @@
 
 #include "xrdebug.h"
 #include "os_clipboard.h"
-
-#include <sal.h>
-#include <dxerr.h>
+#include "Debug/dxerr.h"
 
 #pragma warning(push)
 #pragma warning(disable:4995)
@@ -31,12 +29,6 @@ static BOOL bException = FALSE;
 
 #ifndef USE_BUG_TRAP
 # include <exception>
-#endif
-
-#ifndef _M_AMD64
-# ifndef __BORLANDC__
-# pragma comment(lib,"dxerr.lib")
-# endif
 #endif
 
 #include <dbghelp.h> // MiniDump flags
@@ -269,7 +261,7 @@ LPCSTR xrDebug::error2string(long code)
 
 #ifdef _M_AMD64
 #else
-    result = DXGetErrorDescription(code);
+    DXGetErrorDescription(code, desc_storage, sizeof(desc_storage));
 #endif
     if (0 == result)
     {
@@ -728,10 +720,6 @@ void xrDebug::_initialize (const bool& dedicated)
     // ::SetUnhandledExceptionFilter (UnhandledFilter); // exception handler to all "unhandled" exceptions
 }
 #else
-typedef int(__cdecl* _PNH)(size_t);
-_CRTIMP int __cdecl _set_new_mode(int);
-_CRTIMP _PNH __cdecl _set_new_handler(_PNH);
-
 #ifndef USE_BUG_TRAP
 void _terminate ()
 {

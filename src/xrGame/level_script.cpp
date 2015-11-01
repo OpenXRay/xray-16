@@ -22,7 +22,7 @@
 #include "level_graph.h"
 #include "PHCommander.h"
 #include "PHScriptCall.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "game_cl_single.h"
 #include "game_sv_single.h"
 #include "map_manager.h"
@@ -36,6 +36,7 @@
 #include "ui/UIInventoryUtilities.h"
 #include "alife_object_registry.h"
 #include "xrServer_Objects_ALife_Monsters.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -68,7 +69,7 @@ CScriptGameObject *tpfGetActor()
 {
 	static bool first_time = true;
 	if (first_time)
-		ai().script_engine().script_log(eLuaMessageTypeError,"Do not use level.actor function!");
+		ai().script_engine().script_log(LuaMessageType::Error,"Do not use level.actor function!");
 	first_time = false;
 	
 	CActor *l_tpActor = smart_cast<CActor*>(Level().CurrentEntity());
@@ -82,7 +83,7 @@ CScriptGameObject *get_object_by_name(LPCSTR caObjectName)
 {
 	static bool first_time = true;
 	if (first_time)
-		ai().script_engine().script_log(eLuaMessageTypeError,"Do not use level.object function!");
+		ai().script_engine().script_log(LuaMessageType::Error,"Do not use level.object function!");
 	first_time = false;
 	
 	CGameObject		*l_tpGameObject	= smart_cast<CGameObject*>(Level().Objects.FindObjectByName(caObjectName));
@@ -652,7 +653,7 @@ int g_get_general_goodwill_between ( u16 from, u16 to)
 	CSE_ALifeTraderAbstract* to_obj		= smart_cast<CSE_ALifeTraderAbstract*>(ai().alife().objects().object(to));
 
 	if (!from_obj||!to_obj){
-		ai().script_engine().script_log		(ScriptStorage::eLuaMessageTypeError,"RELATION_REGISTRY::get_general_goodwill_between  : cannot convert obj to CSE_ALifeTraderAbstract!");
+		ai().script_engine().script_log		(LuaMessageType::Error,"RELATION_REGISTRY::get_general_goodwill_between  : cannot convert obj to CSE_ALifeTraderAbstract!");
 		return (0);
 	}	
 	CHARACTER_GOODWILL community_to_obj_goodwill		= RELATION_REGISTRY().GetCommunityGoodwill	(from_obj->Community(), to					);
@@ -668,7 +669,7 @@ u32 vertex_id	(Fvector position)
 
 u32 render_get_dx_level()
 {
-	return ::Render->get_dx_level();
+	return GlobalEnv.Render->get_dx_level();
 }
 
 CUISequencer* g_tutorial = NULL;
@@ -704,10 +705,7 @@ bool has_active_tutotial()
 	return (g_tutorial!=NULL);
 }
 
-
-
-#pragma optimize("s",on)
-void CLevel::script_register(lua_State *L)
+IC static void CLevel_Export(lua_State *luaState)
 {
 	class_<CEnvDescriptor>("CEnvDescriptor")
 		.def_readonly("fog_density",			&CEnvDescriptor::fog_density)
@@ -716,7 +714,7 @@ void CLevel::script_register(lua_State *L)
 	class_<CEnvironment>("CEnvironment")
 		.def("current",							current_environment);
 
-	module(L,"level")
+	module(luaState, "level")
 	[
 		// obsolete\deprecated
 		def("object_by_id",						get_object_by_id),
@@ -807,14 +805,14 @@ void CLevel::script_register(lua_State *L)
 		def("game_id",							&GameID)
 	],
 	
-	module(L,"actor_stats")
+	module(luaState,"actor_stats")
 	[
 		def("add_points",						&add_actor_points),
 		def("add_points_str",					&add_actor_points_str),
 		def("get_points",						&get_actor_points)
 	];
 
-	module(L)
+	module(luaState)
 	[
 		def("command_line",						&command_line),
 		def("IsGameTypeSingle",					&IsGameTypeSingle),
@@ -823,7 +821,7 @@ void CLevel::script_register(lua_State *L)
 		def("IsImportantSave",					&IsImportantSave)
 	];
 
-	module(L,"relation_registry")
+	module(luaState,"relation_registry")
 	[
 		def("community_goodwill",				&g_community_goodwill),
 		def("set_community_goodwill",			&g_set_community_goodwill),
@@ -833,7 +831,7 @@ void CLevel::script_register(lua_State *L)
 		def("set_community_relation",			&g_set_community_relation),
 		def("get_general_goodwill_between",		&g_get_general_goodwill_between)
 	];
-	module(L,"game")
+	module(luaState,"game")
 	[
 	class_< xrTime >("CTime")
 		.enum_("date_format")
@@ -881,4 +879,6 @@ void CLevel::script_register(lua_State *L)
 	def("translate_string",		&translate_string)
 
 	];
-}
+};
+
+SCRIPT_EXPORT_FUNC(CLevel, (), CLevel_Export);

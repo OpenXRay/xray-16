@@ -8,7 +8,7 @@
 
 #include "stdafx.h"
 #include "alife_monster_brain.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 
 #ifdef XRGAME_EXPORTS

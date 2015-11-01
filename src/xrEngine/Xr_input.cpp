@@ -162,7 +162,7 @@ HRESULT CInput::CreateInputDevice(LPDIRECTINPUTDEVICE8* device, GUID guidDevice,
 
 //-----------------------------------------------------------------------
 
-void CInput::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+void CInput::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
 {
     font.OutNext("*** INPUT:    %2.2fms", pInput->GetStats().FrameTime.result);
 }

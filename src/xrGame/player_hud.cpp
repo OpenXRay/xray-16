@@ -213,8 +213,8 @@ bool  attachable_hud_item::need_renderable()
 
 void attachable_hud_item::render()
 {
-	::Render->set_Transform		(&m_item_transform);
-	::Render->add_Visual		(m_model->dcast_RenderVisual());
+	GlobalEnv.Render->set_Transform		(&m_item_transform);
+	GlobalEnv.Render->add_Visual		(m_model->dcast_RenderVisual());
 	debug_draw_firedeps			();
 	m_parent_hud_item->render_hud_mode();
 }
@@ -296,7 +296,7 @@ void hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
 attachable_hud_item::~attachable_hud_item()
 {
 	IRenderVisual* v			= m_model->dcast_RenderVisual();
-	::Render->model_Delete		(v);
+	GlobalEnv.Render->model_Delete		(v);
 	m_model						= NULL;
 }
 
@@ -306,7 +306,7 @@ void attachable_hud_item::load(const shared_str& sect_name)
 
 	// Visual
 	const shared_str& visual_name = pSettings->r_string(sect_name, "item_visual");
-	m_model						 = smart_cast<IKinematics*>(::Render->model_Create(visual_name.c_str()));
+	m_model						 = smart_cast<IKinematics*>(GlobalEnv.Render->model_Create(visual_name.c_str()));
 
 	m_attach_place_idx			= pSettings->r_u16(sect_name, "attach_place_idx");
 	m_measures.load				(sect_name, m_model);
@@ -409,7 +409,7 @@ player_hud::player_hud()
 player_hud::~player_hud()
 {
 	IRenderVisual* v			= m_model->dcast_RenderVisual();
-	::Render->model_Delete		(v);
+	GlobalEnv.Render->model_Delete		(v);
 	m_model						= NULL;
 
 	xr_vector<attachable_hud_item*>::iterator it	= m_pool.begin();
@@ -429,12 +429,12 @@ void player_hud::load(const shared_str& player_hud_sect)
 	if(m_model)
 	{
 		IRenderVisual* v			= m_model->dcast_RenderVisual();
-		::Render->model_Delete		(v);
+		GlobalEnv.Render->model_Delete		(v);
 	}
 
 	m_sect_name					= player_hud_sect;
 	const shared_str& model_name= pSettings->r_string(player_hud_sect, "visual");
-	m_model						= smart_cast<IKinematicsAnimated*>(::Render->model_Create(model_name.c_str()));
+	m_model						= smart_cast<IKinematicsAnimated*>(GlobalEnv.Render->model_Create(model_name.c_str()));
 
 	CInifile::Sect& _sect		= pSettings->r_section(player_hud_sect);
 	CInifile::SectCIt _b		= _sect.Data.begin();
@@ -495,8 +495,8 @@ void player_hud::render_hud()
 
 	if(!b_r0 && !b_r1)									return;
 
-	::Render->set_Transform		(&m_transform);
-	::Render->add_Visual		(m_model->dcast_RenderVisual());
+	GlobalEnv.Render->set_Transform		(&m_transform);
+	GlobalEnv.Render->add_Visual		(m_model->dcast_RenderVisual());
 	
 	if(m_attached_items[0])
 		m_attached_items[0]->render();

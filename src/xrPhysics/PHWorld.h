@@ -134,17 +134,13 @@ ContactCallbackFun				*default_character_contact_shotmark()						{ return m_defa
 #endif
 	virtual void			OnFrame							()							;
     virtual const PHWorldStatistics &GetStats() override { return stats; }
-    virtual void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) override;
+    virtual void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert) override;
 private:
 	void						StepNumIterations				( int num_it )				;
 	iphysics_scripted			&get_scripted					()							{ return *this; }
 	void						set_step_time_callback			(PhysicsStepTimeCallback* cb ){ physics_step_time_callback = cb; }
 	void						set_update_callback				( IPHWorldUpdateCallbck* cb ){ VERIFY( cb ); m_update_callback	= cb; }
-//	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-//add_to_type_list(CPHWorld)
-//#undef script_type_list
-//#define script_type_list save_type_list(CPHWorld)
 extern CPHWorld	*ph_world					;
 IC CPHWorld&	inl_ph_world		()
 {

@@ -9,7 +9,7 @@
 #include "gameobject.h"
 #include "physicsshellholder.h"
 #include "PHSkeleton.h"
-#include "script_export_space.h"
+
 // refs
 class CLAItem;
 class CPhysicsElement;
@@ -70,10 +70,6 @@ public:
 
 	virtual void	Center			(Fvector& C)	const;
 	virtual float	Radius			()				const;
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CHangingLamp)
-#undef script_type_list
-#define script_type_list save_type_list(CHangingLamp)
 
 #endif //HangingLampH

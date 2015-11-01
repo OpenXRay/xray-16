@@ -4,7 +4,7 @@
 #include "Level.h"
 #include "game_base_space.h"
 #include "ai_space.h"
-#include "xrServerEntities/script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "inventory_item_object.h"
 #include "UIInventoryUtilities.h"
 #include "Weapon.h"

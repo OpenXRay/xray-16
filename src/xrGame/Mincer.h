@@ -11,7 +11,6 @@
 #include "gravizone.h"
 #include "telewhirlwind.h"
 #include "PhysicsShellHolder.h"
-#include "script_export_space.h"
 #include "PHDestroyable.h"
 
 class CMincer :	
@@ -46,9 +45,4 @@ public:
 	virtual void	Center						(Fvector& C) const;
 	virtual	void	NotificateDestroy			(CPHDestroyableNotificate *dn);
 	virtual float	BlowoutRadiusPercent		(CPhysicsShellHolder* GO);
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CMincer)
-#undef script_type_list
-#define script_type_list save_type_list(CMincer)

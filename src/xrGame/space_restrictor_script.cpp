@@ -1,14 +1,14 @@
 #include "pch_script.h"
 #include "space_restrictor.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CSpaceRestrictor::script_register(lua_State *L)
+SCRIPT_EXPORT(CSpaceRestrictor, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CSpaceRestrictor,CGameObject>("CSpaceRestrictor")
 			.def(constructor<>())
 	];
-}
+});

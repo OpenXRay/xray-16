@@ -9,7 +9,7 @@
 #include "pch_script.h"
 #include "client_spawn_manager.h" 
 #include "ai_space.h" 
-#include "script_engine.h" 
+#include "xrScriptEngine/script_engine.hpp" 
 #include "Level.h"
 #include "gameobject.h"
 #include "script_game_object.h"
@@ -69,7 +69,7 @@ void CClientSpawnManager::remove			(REQUESTED_REGISTRY &registry, ALife::_OBJECT
 {
 	REQUESTED_REGISTRY::iterator	I = registry.find(requested_id);
 	if (I == registry.end()) {
-		ai().script_engine().script_log	(eLuaMessageTypeError,"There is no spawn callback on object with id %d from object with id %d!",requesting_id,requested_id);
+		ai().script_engine().script_log	(LuaMessageType::Error,"There is no spawn callback on object with id %d from object with id %d!",requesting_id,requested_id);
 		return;
 	}
 
@@ -80,7 +80,7 @@ void CClientSpawnManager::remove			(ALife::_OBJECT_ID requesting_id, ALife::_OBJ
 {
 	REQUEST_REGISTRY::iterator		I = m_registry.find(requesting_id);
 	if (I == m_registry.end()) {
-		ai().script_engine().script_log	(eLuaMessageTypeError,"There is no spawn callback on object with id %d from object with id %d!",requesting_id,requested_id);
+		ai().script_engine().script_log	(LuaMessageType::Error,"There is no spawn callback on object with id %d from object with id %d!",requesting_id,requested_id);
 		return;
 	}
 

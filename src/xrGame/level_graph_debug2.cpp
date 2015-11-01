@@ -80,7 +80,7 @@ void CLevelGraph::draw_nodes	()
 	Fvector	DUP;		DUP.set(0,1,0);
 
 	//RCache.set_Shader	(sh_debug);
-	DRender->SetShader(sh_debug);
+    GlobalEnv.DRender->SetShader(sh_debug);
 
 	F->SetColor			(color_rgba(255,255,255,255));
 
@@ -116,7 +116,7 @@ void CLevelGraph::draw_nodes	()
 		if (Device.vCameraPosition.distance_to(PC)>30) continue;
 
 		float			sr	= header().cell_size();
-		if (::Render->ViewBase.testSphere_dirty(PC,sr)) {
+		if (GlobalEnv.Render->ViewBase.testSphere_dirty(PC,sr)) {
 			
 			u32	LL = 255;
 			
@@ -145,8 +145,8 @@ void CLevelGraph::draw_nodes	()
 			v.set(PC.x-st,PC.y,PC.z+st);	PL.intersectRayPoint(v,DUP,v4);	v4.mad(v4,PL.n,tt);	// minX,maxZ
 
 			// render quad
-			DRender->dbg_DrawTRI(Fidentity,v3,v2,v1,CT);
-			DRender->dbg_DrawTRI(Fidentity,v1,v4,v3,CT);
+			GlobalEnv.DRender->dbg_DrawTRI(Fidentity,v3,v2,v1,CT);
+			GlobalEnv.DRender->dbg_DrawTRI(Fidentity,v1,v4,v3,CT);
 			//RCache.dbg_DrawTRI	(Fidentity,v3,v2,v1,CT);
 			//RCache.dbg_DrawTRI	(Fidentity,v1,v4,v3,CT);
 

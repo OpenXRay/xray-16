@@ -3,7 +3,7 @@
 #include "PHCommander.h"
 #include "PHReqComparer.h"
 #include "alife_space.h"
-#include "script_export_space.h"
+
 class CPhysicsShell;
 class CPHCallOnStepCondition:
 	public CPHCondition
@@ -24,12 +24,7 @@ IC						void				set_step					(u64 step)									{m_step=step;}
 #endif
 private:				
 IC						bool				time_out					()				const						;
-DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-
-add_to_type_list(CPHCallOnStepCondition)
-#undef script_type_list
-#define script_type_list save_type_list(CPHCallOnStepCondition)
 
 class CPHExpireOnStepCondition:
 	public CPHCallOnStepCondition
@@ -38,12 +33,7 @@ class CPHExpireOnStepCondition:
 public:
 									
 	virtual				bool				is_true						()											{return true;}
-DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-
-add_to_type_list( CPHExpireOnStepCondition)
-#undef script_type_list
-#define script_type_list save_type_list( CPHExpireOnStepCondition)
 
 class CPHShellBasedAction:
 	public	CPHAction
@@ -72,11 +62,7 @@ public:
 #ifdef	DEBUG
 		const			Fvector				&force					()const  { return	m_force;	}
 #endif
-DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list( CPHConstForceAction)
-#undef script_type_list
-#define script_type_list save_type_list( CPHConstForceAction)
 
 class CPHReqComparerHasShell	:
 	public CPHReqComparerV

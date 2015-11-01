@@ -9,22 +9,24 @@
 #include "pch_script.h"
 #include "xrServer_Objects_ALife_Items.h"
 #include "xrServer_script_macroses.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CSE_ALifeInventoryItem::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeInventoryItem, (),
 {
-	module(L)[
+	module(luaState)
+    [
 		class_<CSE_ALifeInventoryItem>
 			("cse_alife_inventory_item")
 //			.def(		constructor<LPCSTR>())
 	];
-}
+});
 
-void CSE_ALifeItem::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeItem, (CSE_ALifeDynamicObjectVisual, CSE_ALifeInventoryItem),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_item2(
 //		luabind_class_abstract2(
 			CSE_ALifeItem,
@@ -33,82 +35,89 @@ void CSE_ALifeItem::script_register(lua_State *L)
 			CSE_ALifeInventoryItem
 		)
 	];
-}
+});
 
-void CSE_ALifeItemTorch::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeItemTorch, (CSE_ALifeItem),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_item1(
 			CSE_ALifeItemTorch,
 			"cse_alife_item_torch",
 			CSE_ALifeItem
 		)
 	];
-}
+});
 
-void CSE_ALifeItemAmmo::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeItemAmmo, (CSE_ALifeItem),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_item1(
 			CSE_ALifeItemAmmo,
 			"cse_alife_item_ammo",
 			CSE_ALifeItem
 		)
 	];
-}
+});
 
-void CSE_ALifeItemWeapon::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeItemWeapon, (CSE_ALifeItem),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_item1(
 			CSE_ALifeItemWeapon,
 			"cse_alife_item_weapon",
 			CSE_ALifeItem
 		)
-		.def("clone_addons",						&CSE_ALifeItemWeapon::clone_addons)
+		.def("clone_addons", &CSE_ALifeItemWeapon::clone_addons)
 	];
-}
+});
 
-void CSE_ALifeItemWeaponShotGun::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeItemWeaponShotGun, (CSE_ALifeItemWeapon),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_item1(
 			CSE_ALifeItemWeaponShotGun,
 			"cse_alife_item_weapon_shotgun",
 			CSE_ALifeItemWeapon
 			)
 	];
-}
+});
 
-void CSE_ALifeItemWeaponAutoShotGun::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeItemWeaponAutoShotGun, (CSE_ALifeItemWeapon),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_item1(
 			CSE_ALifeItemWeaponAutoShotGun,
 			"cse_alife_item_weapon_auto_shotgun",
 			CSE_ALifeItemWeapon
 			)
 	];
-}
+});
 
-void CSE_ALifeItemDetector::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeItemDetector, (CSE_ALifeItem),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_item1(
 			CSE_ALifeItemDetector,
 			"cse_alife_item_detector",
 			CSE_ALifeItem
 		)
 	];
-}
+});
 
-void CSE_ALifeItemArtefact::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeItemArtefact, (CSE_ALifeItem),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_item1(
 			CSE_ALifeItemArtefact,
 			"cse_alife_item_artefact",
 			CSE_ALifeItem
 		)
 	];
-}
+});

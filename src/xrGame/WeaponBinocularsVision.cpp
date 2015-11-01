@@ -7,7 +7,7 @@
 #include "actor.h"
 #include "actor_memory.h"
 #include "relation_registry.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 
 #include "game_base_space.h"
 #include "Level.h"

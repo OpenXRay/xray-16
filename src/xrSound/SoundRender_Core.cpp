@@ -21,7 +21,7 @@ float	psSoundVFactor			= 1.0f;
 
 float	psSoundVMusic			= 1.f;
 int		psSoundCacheSizeMB		= 32;
-
+// XXX: move to GlobalEnv
 CSoundRender_Core*				SoundRender = 0;
 CSound_manager_interface*		Sound		= 0;
 

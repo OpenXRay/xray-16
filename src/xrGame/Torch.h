@@ -2,7 +2,7 @@
 
 #include "inventory_item_object.h"
 #include "hudsound.h"
-#include "script_export_space.h"
+
 
 class CLAItem;
 class CNightVisionEffector;
@@ -83,8 +83,6 @@ public:
 
 	virtual void	afterDetach				();
 	virtual void	renderable_Render		();
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
 class CNightVisionEffector
@@ -105,7 +103,3 @@ public:
 	void		OnDisabled	(CActor* pA, bool play_sound=true);
 	void		PlaySounds	(EPlaySounds which);
 };
-
-add_to_type_list(CTorch)
-#undef script_type_list
-#define script_type_list save_type_list(CTorch)

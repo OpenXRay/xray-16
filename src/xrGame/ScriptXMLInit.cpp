@@ -20,6 +20,7 @@
 #include "ui\UIMMShniaga.h"
 #include "ui\UIScrollView.h"
 #include "ui\UIProgressBar.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -249,9 +250,9 @@ CUIEditBox* CScriptXmlInit::InitMPPlayerName(LPCSTR path, CUIWindow* parent)
 	return							pWnd;	
 }
 
-#pragma optimize("s",on)
-void CScriptXmlInit::script_register(lua_State *L){
-	module(L)
+SCRIPT_EXPORT(CScriptXmlInit, (),
+{
+	module(luaState)
 	[
 		class_<CScriptXmlInit>			("CScriptXmlInit")
 		.def(							constructor<>())
@@ -283,5 +284,4 @@ void CScriptXmlInit::script_register(lua_State *L){
 		.def("InitListBox",				&CScriptXmlInit::InitListBox)
 		.def("InitProgressBar",			&CScriptXmlInit::InitProgressBar)
 	];
-
-}
+});

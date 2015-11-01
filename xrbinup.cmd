@@ -52,6 +52,8 @@ set cp_tool=cp
 %cp_tool% %src%\%cfg_long%\xrParticles.dll %dst%\xrParticles.dll
 %cp_tool% %src%\%cfg_long%\xrPhysics.dll %dst%\xrPhysics.dll
 %cp_tool% %src%\%cfg_long%\xrD3D9-Null.dll %dst%\xrD3D9-Null.dll
+%cp_tool% %src%\%cfg_long%\xrAICore.dll %dst%\xrAICore.dll
+%cp_tool% %src%\%cfg_long%\xrScriptEngine.dll %dst%\xrScriptEngine.dll
 %cp_tool% %src%\%cfg_long%\xrGame.dll %dst%\xrGame.dll
 %cp_tool% %src%\%cfg_long%\xrGameSpy.dll %dst%\xrGameSpy.dll
 %cp_tool% %src%\%cfg_long%\xrNetServer.dll %dst%\xrNetServer.dll

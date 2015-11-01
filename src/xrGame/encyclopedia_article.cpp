@@ -8,7 +8,7 @@
 #include "ui/xrUIXmlParser.h"
 #include "ui/UIXmlInit.h"
 #include "ui/UIInventoryUtilities.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "Include/xrRender/UIShader.h"
 
 using namespace InventoryUtilities;

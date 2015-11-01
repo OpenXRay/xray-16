@@ -1,5 +1,6 @@
 #include "pch_script.h"
 #include "WeaponPM.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 CWeaponPM::CWeaponPM() : CWeaponPistol()
 {}
@@ -9,12 +10,11 @@ CWeaponPM::~CWeaponPM()
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CWeaponPM::script_register	(lua_State *L)
+SCRIPT_EXPORT(CWeaponPM, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CWeaponPM,CGameObject>("CWeaponPM")
 			.def(constructor<>())
 	];
-}
+});

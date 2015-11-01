@@ -26,7 +26,7 @@ FHierrarhyVisual::~FHierrarhyVisual()
 {
 	if (!bDontDelete) {
 		for (u32 i=0; i<children.size(); i++)	
-			::Render->model_Delete((IRenderVisual *&)children[i]);
+			GlobalEnv.Render->model_Delete((IRenderVisual *&)children[i]);
 	}
 	children.clear();
 }
@@ -52,7 +52,7 @@ void FHierrarhyVisual::Load(const char* N, IReader *data, u32 dwFlags)
 			THROW;
 #else
 			u32 ID	= data->r_u32();
-			children[i]	= (dxRender_Visual*)::Render->getVisual(ID);
+			children[i]	= (dxRender_Visual*)GlobalEnv.Render->getVisual(ID);
 #endif
 		}
 		bDontDelete = TRUE;
@@ -70,7 +70,7 @@ void FHierrarhyVisual::Load(const char* N, IReader *data, u32 dwFlags)
 					xr_strcpy				(short_name,N);
 					if (strext(short_name)) *strext(short_name)=0;
 					strconcat			(sizeof(name_load),name_load,short_name,":",itoa(count,num,10));
-					children.push_back	((dxRender_Visual*)::Render->model_CreateChild(name_load,O));
+					children.push_back	((dxRender_Visual*)GlobalEnv.Render->model_CreateChild(name_load,O));
                     O->close			();
                     O = OBJ->open_chunk	(count);
                 }
@@ -94,7 +94,7 @@ void	FHierrarhyVisual::Copy(dxRender_Visual *pSrc)
 	children.clear	();
 	children.reserve(pFrom->children.size());
 	for (u32 i=0; i<pFrom->children.size(); i++) {
-		dxRender_Visual *p = (dxRender_Visual*) ::Render->model_Duplicate	(pFrom->children[i]);
+		dxRender_Visual *p = (dxRender_Visual*) GlobalEnv.Render->model_Duplicate	(pFrom->children[i]);
 		children.push_back(p);
 	}
 	bDontDelete = FALSE;

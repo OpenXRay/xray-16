@@ -1,14 +1,14 @@
 #include "pch_script.h"
 #include "zombie.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CZombie::script_register(lua_State *L)
+SCRIPT_EXPORT(CZombie, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CZombie,CGameObject>("CZombie")
 			.def(constructor<>())
 	];
-}
+});

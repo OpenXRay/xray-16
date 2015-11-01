@@ -3,7 +3,8 @@
 #include "Layers/xrRender/dxUIRender.h"
 #include "Layers/xrRender/dxDebugRender.h"
 
-#pragma comment(lib,"xrEngine.lib")
+#pragma comment(lib, "xrEngine.lib")
+#pragma comment(lib, "xrScriptEngine.lib")
 
 BOOL APIENTRY DllMain( HANDLE hModule, 
                        DWORD  ul_reason_for_call, 
@@ -13,13 +14,13 @@ BOOL APIENTRY DllMain( HANDLE hModule,
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
-		::Render							= &RImplementation;
-		::RenderFactory				= &RenderFactoryImpl;
-		::DU						= &DUImpl;
-		//::vid_mode_token			= inited by HW;
-		UIRender					= &UIRenderImpl;
+		GlobalEnv.Render = &RImplementation;
+        GlobalEnv.RenderFactory = &RenderFactoryImpl;
+        GlobalEnv.DU = &DUImpl;
+		//GlobalEnv.vid_mode_token			= inited by HW;
+        GlobalEnv.UIRender = &UIRenderImpl;
 #ifdef DEBUG
-		DRender						= &DebugRenderImpl;
+        GlobalEnv.DRender = &DebugRenderImpl;
 #endif // DEBUG
 		xrRender_initconsole				();
 		break;

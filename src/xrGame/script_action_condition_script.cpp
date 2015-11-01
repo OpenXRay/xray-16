@@ -8,13 +8,13 @@
 
 #include "pch_script.h"
 #include "script_action_condition.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptActionCondition::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptActionCondition, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptActionCondition>("cond")
 			.enum_("cond")
@@ -31,4 +31,4 @@ void CScriptActionCondition::script_register(lua_State *L)
 			.def(					constructor<u32>())
 			.def(					constructor<u32,double>())
 	];
-}
+});

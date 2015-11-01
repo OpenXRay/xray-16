@@ -100,7 +100,7 @@ void dbg_draw_frustum		(float FOV, float _FAR, float A, Fvector &P, Fvector &D, 
 
 void object::OnRender		()
 {
-	DRender->OnFrameEnd				();
+    GlobalEnv.DRender->OnFrameEnd				();
 	Fvector							l_half; l_half.set(.5f, .5f, .5f);
 	Fmatrix							l_ball, l_box;
 	u32								Color = D3DCOLOR_XRGB(0,255,0);

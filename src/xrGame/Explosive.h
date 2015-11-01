@@ -8,10 +8,10 @@
 #include "xrEngine/feel_touch.h"
 #include "inventory_item.h"
 #include "ai_sounds.h"
-#include "script_export_space.h"
 #include "xrPhysics/DamageSource.h"
 #include "wallmark_manager.h"
 #include "ParticlesObject.h"
+
 class IRender_Light;
 DEFINE_VECTOR(CPhysicsShellHolder*,BLASTED_OBJECTS_V,BLASTED_OBJECTS_I);
 class CExplosive : 
@@ -30,10 +30,7 @@ public:
 	virtual void 				net_Destroy		();
 	virtual void				net_Relcase		(CObject* O);
 	virtual void 				UpdateCL();
-
-private:
 	virtual void 				Explode();
-public:
 	virtual void 				ExplodeParams	(const Fvector& pos, const Fvector& dir);
 
 	static float 				ExplosionEffect	(collide::rq_results& storage,CExplosive*exp_obj,CPhysicsShellHolder*blasted_obj,  const Fvector &expl_centre, const float expl_radius);
@@ -161,12 +158,7 @@ protected:
 	struct {
 		shared_str				effect_sect_name;
 	} effector;
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-
-add_to_type_list(CExplosive)
-#undef script_type_list
-#define script_type_list save_type_list(CExplosive)
 
 IC void random_point_in_object_box(Fvector &out_pos,CObject* obj)
 {

@@ -11,7 +11,7 @@
 #include "ai_space.h"
 #include "alife_object_registry.h"
 #include "alife_story_registry.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "restriction_space.h"
 #include "alife_graph_registry.h"
@@ -19,6 +19,7 @@
 #include "alife_registry_container.h"
 #include "xrServer.h"
 #include "Level.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -319,10 +320,9 @@ bool dont_has_info								(const CALifeSimulator *self, const ALife::_OBJECT_ID 
 //	THROW								(self);
 //}
 
-#pragma optimize("s",on)
-void CALifeSimulator::script_register			(lua_State *L)
+SCRIPT_EXPORT(CALifeSimulator, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CALifeSimulator>("alife_simulator")
 			.def("valid_object_id",			&valid_object_id)
@@ -356,7 +356,7 @@ void CALifeSimulator::script_register			(lua_State *L)
 
 		,def("alife",						&alife)
 	];
-
+    class CALifeSimulatorExporter1 {};
 	{
 		if (story_ids.empty())
 			generate_story_ids	(
@@ -369,16 +369,16 @@ void CALifeSimulator::script_register			(lua_State *L)
 				"Duplicated story id description!"
 			);
 
-		luabind::class_<class_exporter<CALifeSimulator> >	instance("story_ids");
+        luabind::class_<CALifeSimulatorExporter1>	instance("story_ids");
 
 		STORY_PAIRS::const_iterator	I = story_ids.begin();
 		STORY_PAIRS::const_iterator	E = story_ids.end();
 		for ( ; I != E; ++I)
 			instance.enum_		("_story_ids")[luabind::value(*(*I).first,(*I).second)];
 
-		luabind::module			(L)[instance];
+		luabind::module			(luaState)[instance];
 	}
-
+    class CALifeSimulatorExporter2 {};
 	{
 		if (spawn_story_ids.empty())
 			generate_story_ids	(
@@ -391,16 +391,16 @@ void CALifeSimulator::script_register			(lua_State *L)
 				"Duplicated spawn story id description!"
 			);
 
-		luabind::class_<class_exporter<class_exporter<CALifeSimulator> > >	instance("spawn_story_ids");
+        luabind::class_<CALifeSimulatorExporter2>	instance("spawn_story_ids");
 
 		SPAWN_STORY_PAIRS::const_iterator	I = spawn_story_ids.begin();
 		SPAWN_STORY_PAIRS::const_iterator	E = spawn_story_ids.end();
 		for ( ; I != E; ++I)
 			instance.enum_		("_spawn_story_ids")[luabind::value(*(*I).first,(*I).second)];
 
-		luabind::module			(L)[instance];
+		luabind::module			(luaState)[instance];
 	}
-}
+});
 
 #if 0//def DEBUG
 struct dummy {

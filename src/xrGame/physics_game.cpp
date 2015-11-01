@@ -147,7 +147,7 @@ public:
 	virtual void 			run								()
 	{
 		//добавить отметку на материале
-		::Render->add_StaticWallmark(pWallmarkShader,pos, 
+		GlobalEnv.Render->add_StaticWallmark(pWallmarkShader,pos, 
 			0.09f, T,
 			Level().ObjectSpace.GetStaticVerts());
 	};

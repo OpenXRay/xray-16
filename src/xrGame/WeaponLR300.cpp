@@ -1,5 +1,6 @@
 #include "pch_script.h"
 #include "WeaponLR300.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 CWeaponLR300::CWeaponLR300		() : CWeaponMagazined(SOUND_TYPE_WEAPON_SUBMACHINEGUN)
 {}
@@ -9,12 +10,11 @@ CWeaponLR300::~CWeaponLR300		()
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CWeaponLR300::script_register	(lua_State *L)
+SCRIPT_EXPORT(CWeaponLR300, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CWeaponLR300,CGameObject>("CWeaponLR300")
 			.def(constructor<>())
 	];
-}
+});

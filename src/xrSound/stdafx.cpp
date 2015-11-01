@@ -21,6 +21,4 @@
 #	pragma comment(lib,	"xrCDB.lib"			)
 #	pragma comment(lib,	"dsound.lib" 		)
 #	pragma comment(lib,	"xrapi.lib" 		)
-#pragma comment(lib, "xrEngine.lib")
 #endif
-

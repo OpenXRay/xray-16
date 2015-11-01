@@ -1,6 +1,6 @@
 #pragma once
 #include "ai/Monsters/BaseMonster/base_monster.h"
-#include "xrServerEntities/script_export_space.h"
+
 
 class CChimera : public CBaseMonster 
 {
@@ -40,12 +40,4 @@ private:
 
 public:
 	attack_params const&	get_attack_params			() const { return m_attack_params; }
-
-
-	
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-
-add_to_type_list(CChimera)
-#undef script_type_list
-#define script_type_list save_type_list(CChimera)

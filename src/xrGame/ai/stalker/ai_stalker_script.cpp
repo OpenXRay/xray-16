@@ -12,13 +12,13 @@
 #include "ai_stalker_space.h"
 #include "script_game_object.h"
 #include "stalker_planner.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CAI_Stalker::script_register(lua_State *L)
+SCRIPT_EXPORT(CStalkerPlanner, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CStalkerPlanner>("stalker_ids")
 			.enum_("properties")
@@ -164,9 +164,15 @@ void CAI_Stalker::script_register(lua_State *L)
 				luabind::value("sound_enemy_killed_or_wounded",				StalkerSpace::eStalkerSoundMaskEnemyKilledOrWounded),
 
 				luabind::value("sound_script",								StalkerSpace::eStalkerSoundScript)
-			],
-		
+			]
+    ];
+});
+
+SCRIPT_EXPORT(CAI_Stalker, (CGameObject),
+{
+    module(luaState)
+    [
 		class_<CAI_Stalker,CGameObject>("CAI_Stalker")
 			.def(constructor<>())
 	];
-}
+});

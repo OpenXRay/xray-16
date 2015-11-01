@@ -13,7 +13,7 @@
 #include "Inventory.h"
 #include "inventory_item.h"
 #include "InventoryBox.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "UIInventoryUtilities.h"
 #include "game_cl_base.h"
 #include "UICursor.h"

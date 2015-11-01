@@ -4,7 +4,7 @@
 #include "uiframewindow.h"
 #include "uilistbox.h"
 
-#include "xrServerEntities/script_export_space.h"
+
 
 class CUIPropertiesBox:
 	public CUIFrameWindow,
@@ -49,6 +49,4 @@ private:
 	Frect				m_last_show_rect;
 	CUIPropertiesBox*	m_parent_sub_menu;					//warning !!! dubling pointers to the same object !!!
 	CUIWindow*			m_item_sub_menu_initiator;			//fills in ShowSubMenu
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

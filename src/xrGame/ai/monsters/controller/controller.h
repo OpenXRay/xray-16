@@ -1,7 +1,7 @@
 #pragma once
 #include "ai/monsters/BaseMonster/base_monster.h"
 #include "ai/monsters/anim_triple.h"
-#include "xrServerEntities/script_export_space.h"
+
 #include "ai/monsters/controlled_actor.h"
 
 class CControllerAnimation;
@@ -180,10 +180,4 @@ private:
 
 public:
 	virtual bool					run_home_point_when_enemy_inaccessible () const { return false; }
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-
-add_to_type_list(CController)
-#undef script_type_list
-#define script_type_list save_type_list(CController)
-

@@ -150,8 +150,8 @@ BOOL CTheoraSurface::Load(const char* fname)
         //u32 v_need = CAP_VERSION(2,0);
         //bShaderYUV2RGB = (v_dev>=v_need);
 #ifndef _EDITOR
-        R_ASSERT(Render);
-        bShaderYUV2RGB = Render->HWSupportsShaderYUV2RGB();
+        R_ASSERT(GlobalEnv.Render);
+        bShaderYUV2RGB = GlobalEnv.Render->HWSupportsShaderYUV2RGB();
 #else // _EDITOR
         bShaderYUV2RGB = false;
 #endif // _EDITOR

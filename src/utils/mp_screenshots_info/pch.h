@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 #include <conio.h>
-#include "xrServerEntities/object_broker.h"
+#include "Common/object_broker.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
 
 #endif // #define PCH_H_INCLUDED

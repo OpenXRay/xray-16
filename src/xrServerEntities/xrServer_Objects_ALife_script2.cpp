@@ -9,24 +9,26 @@
 #include "pch_script.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "xrServer_script_macroses.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CSE_ALifeObjectProjector::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeObjectProjector, (CSE_ALifeDynamicObjectVisual),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_dynamic_alife1(
 			CSE_ALifeObjectProjector,
 			"cse_alife_object_projector",
 			CSE_ALifeDynamicObjectVisual
 		)
 	];
-}
+});
 
-void CSE_ALifeHelicopter::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeHelicopter, (CSE_ALifeDynamicObjectVisual, CSE_Motion, CSE_PHSkeleton),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_dynamic_alife3(
 			CSE_ALifeHelicopter,
 			"cse_alife_helicopter",
@@ -35,11 +37,12 @@ void CSE_ALifeHelicopter::script_register(lua_State *L)
 			CSE_PHSkeleton
 		)
 	];
-}
+});
 
-void CSE_ALifeCar::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeCar, (CSE_ALifeDynamicObjectVisual, CSE_PHSkeleton),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_dynamic_alife2(
 			CSE_ALifeCar,
 			"cse_alife_car",
@@ -47,22 +50,24 @@ void CSE_ALifeCar::script_register(lua_State *L)
 			CSE_PHSkeleton
 		)
 	];
-}
+});
 
-void CSE_ALifeObjectBreakable::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeObjectBreakable, (CSE_ALifeDynamicObjectVisual),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_dynamic_alife1(
 			CSE_ALifeObjectBreakable,
 			"cse_alife_object_breakable",
 			CSE_ALifeDynamicObjectVisual
 		)
 	];
-}
+});
 
-void CSE_ALifeObjectClimable::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeObjectClimable, (CSE_Shape, CSE_Abstract),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_abstract2(
 			CSE_ALifeObjectClimable,
 			"cse_alife_object_climable",
@@ -70,27 +75,28 @@ void CSE_ALifeObjectClimable::script_register(lua_State *L)
 			CSE_Abstract
 			)
 	];
-}
+});
 
-void CSE_ALifeMountedWeapon::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeMountedWeapon, (CSE_ALifeDynamicObjectVisual),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_dynamic_alife1(
 			CSE_ALifeMountedWeapon,
 			"cse_alife_mounted_weapon",
 			CSE_ALifeDynamicObjectVisual
 		)
 	];
-}
+});
 
-void CSE_ALifeTeamBaseZone::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeTeamBaseZone, (CSE_ALifeSpaceRestrictor),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_dynamic_alife1(
 			CSE_ALifeTeamBaseZone,
 			"cse_alife_team_base_zone",
 			CSE_ALifeSpaceRestrictor
 		)
 	];
-}
-
+});

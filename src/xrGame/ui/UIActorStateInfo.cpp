@@ -13,7 +13,7 @@
 #include "UIFrameWindow.h"
 #include "UIStatic.h"
 #include "UIXmlInit.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "UIHelper.h"
 #include "ui_arrow.h"
 #include "UIHudStatesWnd.h"

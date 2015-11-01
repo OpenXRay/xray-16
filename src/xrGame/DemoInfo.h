@@ -2,7 +2,7 @@
 #define DEMOINFO_H
 
 #include <boost/noncopyable.hpp>
-#include "script_export_space.h"
+
 
 class CStreamReader;
 class IWriter;
@@ -42,13 +42,7 @@ public:
 	u8	const 			get_rank		() const { return m_rank; };
 
 	static	u32	const			demo_info_max_size;
-	
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 }; //class demo_player_info
-
-add_to_type_list(demo_player_info)
-#undef script_type_list
-#define script_type_list save_type_list(demo_player_info)
 
 class demo_info : private boost::noncopyable
 {
@@ -83,12 +77,6 @@ public:
 	demo_player_info const *	get_player			(u32 player_index)				const;
 
 	static	u32 const			max_demo_info_size;
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 }; //class DemoInfo
-
-add_to_type_list(demo_info)
-#undef script_type_list
-#define script_type_list save_type_list(demo_info)
-
 
 #endif //#ifndef DEMOINFO_H

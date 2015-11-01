@@ -1,8 +1,6 @@
 #include "pch_script.h"
 
-#include "script_ui_registrator.h"
 #include "MainMenu.h"
-
 #include "UIGameCustom.h"
 #include "UI/UIScriptWnd.h"
 #include "UI/UIButton.h"
@@ -15,37 +13,19 @@
 #include "ui/UIOptionsManagerScript.h"
 #include "ui/UIMapInfo.h"
 #include "ScriptXmlInit.h"
-
 #include "login_manager.h"
 #include "account_manager.h"
 #include "profile_store.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
 CMainMenu*	MainMenu();
 
-#pragma optimize("s",on)
-void UIRegistrator::script_register(lua_State *L)
+SCRIPT_EXPORT(UIRegistrator, (),
 {
-	CUIWindow::script_register(L);
-	CUIStatic::script_register(L);
-	CUIButton::script_register(L);
-	CUIProgressBar::script_register(L);
-	CUIComboBox::script_register(L);
-	CUIEditBox::script_register(L);
-	CUITabControl::script_register(L);
-	CUIMessageBox::script_register(L);
-	CUIListBox::script_register(L);
-	CUIDialogWndEx::script_register(L);
-	CUIPropertiesBox::script_register(L);
-	CUIOptionsManagerScript::script_register(L);
-	CUIMapInfo::script_register(L);
-	CScriptXmlInit::script_register(L);
-	CUIGameCustom::script_register(L);
-
-	module(L)
+	module(luaState)
 	[
-
 		class_<CGameFont>("CGameFont")
 			.enum_("EAligment")
 			[
@@ -74,8 +54,8 @@ void UIRegistrator::script_register(lua_State *L)
 			.def("GetProfileStore",			&CMainMenu::GetProfileStore)
 	];
 
-	module(L,"main_menu")
+	module(luaState, "main_menu")
 	[
 		def("get_main_menu",				&MainMenu)
 	];
-}
+});

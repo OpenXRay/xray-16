@@ -39,7 +39,7 @@ const Fvector &CPatrolPathParams::point	(u32 index) const
 	VERIFY				(m_path);
 	VERIFY				(!m_path->vertices().empty());
 	if (!m_path->vertex(index)) {
-		ai().script_engine().script_log(eLuaMessageTypeError,"Can't get information about patrol point number %d in the patrol way %s",index,*m_path_name);
+		ai().script_engine().script_log(LuaMessageType::Error,"Can't get information about patrol point number %d in the patrol way %s",index,*m_path_name);
 		index			= (*m_path->vertices().begin()).second->vertex_id();
 	}
 	VERIFY				(m_path->vertex(index));

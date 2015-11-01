@@ -9,7 +9,7 @@
 #include "MainMenu.h"
 #include "space_restriction_manager.h"
 #include "ai_space.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "stalker_animation_data_storage.h"
 #include "client_spawn_manager.h"
 #include "seniority_hierarchy_holder.h"
@@ -87,10 +87,10 @@ void CLevel::remove_objects	()
 
 	stalker_animation_data_storage().clear		();
 	
-	VERIFY										(Render);
-	Render->models_Clear						(FALSE);
+	VERIFY										(GlobalEnv.Render);
+    GlobalEnv.Render->models_Clear						(FALSE);
 	
-	Render->clear_static_wallmarks				();
+    GlobalEnv.Render->clear_static_wallmarks				();
 
 #ifdef DEBUG
 	if(!g_dedicated_server)

@@ -7,14 +7,13 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
-#include "script_fcolor.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptFcolor::script_register(lua_State *L)
+SCRIPT_EXPORT(Fcolor, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<Fcolor>("fcolor")
 			.def_readwrite("r",					&Fcolor::r)
@@ -26,4 +25,4 @@ void CScriptFcolor::script_register(lua_State *L)
 			.def("set",							(Fcolor & (Fcolor::*)(const Fcolor &))(&Fcolor::set),																return_reference_to(_1))
 			.def("set",							(Fcolor & (Fcolor::*)(u32))(&Fcolor::set),																			return_reference_to(_1))
 	];
-}
+});

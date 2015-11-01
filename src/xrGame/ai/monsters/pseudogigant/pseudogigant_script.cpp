@@ -1,14 +1,14 @@
 #include "pch_script.h"
 #include "pseudo_gigant.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CPseudoGigant::script_register(lua_State *L)
+SCRIPT_EXPORT(CPseudoGigant, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CPseudoGigant,CGameObject>("CPseudoGigant")
 			.def(constructor<>())
 	];
-}
+});

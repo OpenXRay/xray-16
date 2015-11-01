@@ -1,66 +1,54 @@
 #pragma once
 
 #include "xrCore/fixedmap.h"
+#include "Layers/xrRender/RenderAllocator.hpp"
 
-//#ifndef USE_MEMORY_MONITOR
-#	define USE_DOUG_LEA_ALLOCATOR_FOR_RENDER
-//#endif // USE_MEMORY_MONITOR
+template <class T>
+class doug_lea_alloc {
+public:
+	typedef	size_t		size_type;
+	typedef ptrdiff_t	difference_type;
+	typedef T*			pointer;
+	typedef const T*	const_pointer;
+	typedef T&			reference;
+	typedef const T&	const_reference;
+	typedef T			value_type;
 
-#ifdef USE_DOUG_LEA_ALLOCATOR_FOR_RENDER
-#	include	"xrCore/doug_lea_allocator.h"
-	extern doug_lea_allocator	g_render_lua_allocator;
+public:
+	template<class _Other>	
+	struct rebind			{	typedef doug_lea_alloc<_Other> other;	};
+public:
+							pointer					address			(reference _Val) const					{	return (&_Val);	}
+							const_pointer			address			(const_reference _Val) const			{	return (&_Val);	}
+													doug_lea_alloc	()										{	}
+													doug_lea_alloc	(const doug_lea_alloc<T>&)				{	}
+	template<class _Other>							doug_lea_alloc	(const doug_lea_alloc<_Other>&)			{	}
+	template<class _Other>	doug_lea_alloc<T>&		operator=		(const doug_lea_alloc<_Other>&)			{	return (*this);	}
+							pointer					allocate		(size_type n, const void* p=0) const	{	return (T*)g_render_allocator.malloc_impl(sizeof(T)*(u32)n);	}
+							void					deallocate		(pointer p, size_type n) const			{	g_render_allocator.free_impl	((void*&)p);				}
+							void					deallocate		(void* p, size_type n) const			{	g_render_allocator.free_impl	(p);				}
+							char*					__charalloc		(size_type n)							{	return (char*)allocate(n); }
+							void					construct		(pointer p, const T& _Val)				{	std::_Construct(p, _Val);	}
+							void					destroy			(pointer p)								{	std::_Destroy(p);			}
+							size_type				max_size		() const								{	size_type _Count = (size_type)(-1) / sizeof (T);	return (0 < _Count ? _Count : 1);	}
+};
 
-	template <class T>
-	class doug_lea_alloc {
-	public:
-		typedef	size_t		size_type;
-		typedef ptrdiff_t	difference_type;
-		typedef T*			pointer;
-		typedef const T*	const_pointer;
-		typedef T&			reference;
-		typedef const T&	const_reference;
-		typedef T			value_type;
+template<class _Ty,	class _Other>	inline	bool operator==(const doug_lea_alloc<_Ty>&, const doug_lea_alloc<_Other>&)		{	return (true);							}
+template<class _Ty, class _Other>	inline	bool operator!=(const doug_lea_alloc<_Ty>&, const doug_lea_alloc<_Other>&)		{	return (false);							}
 
-	public:
-		template<class _Other>	
-		struct rebind			{	typedef doug_lea_alloc<_Other> other;	};
-	public:
-								pointer					address			(reference _Val) const					{	return (&_Val);	}
-								const_pointer			address			(const_reference _Val) const			{	return (&_Val);	}
-														doug_lea_alloc	()										{	}
-														doug_lea_alloc	(const doug_lea_alloc<T>&)				{	}
-		template<class _Other>							doug_lea_alloc	(const doug_lea_alloc<_Other>&)			{	}
-		template<class _Other>	doug_lea_alloc<T>&		operator=		(const doug_lea_alloc<_Other>&)			{	return (*this);	}
-								pointer					allocate		(size_type n, const void* p=0) const	{	return (T*)g_render_lua_allocator.malloc_impl(sizeof(T)*(u32)n);	}
-								void					deallocate		(pointer p, size_type n) const			{	g_render_lua_allocator.free_impl	((void*&)p);				}
-								void					deallocate		(void* p, size_type n) const			{	g_render_lua_allocator.free_impl	(p);				}
-								char*					__charalloc		(size_type n)							{	return (char*)allocate(n); }
-								void					construct		(pointer p, const T& _Val)				{	std::_Construct(p, _Val);	}
-								void					destroy			(pointer p)								{	std::_Destroy(p);			}
-								size_type				max_size		() const								{	size_type _Count = (size_type)(-1) / sizeof (T);	return (0 < _Count ? _Count : 1);	}
+struct doug_lea_allocator_wrapper {
+	template <typename T>
+	struct helper {
+		typedef doug_lea_alloc<T>	result;
 	};
 
-	template<class _Ty,	class _Other>	inline	bool operator==(const doug_lea_alloc<_Ty>&, const doug_lea_alloc<_Other>&)		{	return (true);							}
-	template<class _Ty, class _Other>	inline	bool operator!=(const doug_lea_alloc<_Ty>&, const doug_lea_alloc<_Other>&)		{	return (false);							}
+	static	void	*alloc		(const u32 &n)	{	return g_render_allocator.malloc_impl((u32)n);	}
+	template <typename T>
+	static	void	dealloc		(T *&p)			{	g_render_allocator.free_impl((void*&)p);	}
+};
 
-	struct doug_lea_allocator_wrapper {
-		template <typename T>
-		struct helper {
-			typedef doug_lea_alloc<T>	result;
-		};
-
-		static	void	*alloc		(const u32 &n)	{	return g_render_lua_allocator.malloc_impl((u32)n);	}
-		template <typename T>
-		static	void	dealloc		(T *&p)			{	g_render_lua_allocator.free_impl((void*&)p);	}
-	};
-
-#	define render_alloc				doug_lea_alloc
-	typedef doug_lea_allocator_wrapper	render_allocator;
-
-#else // USE_DOUG_LEA_ALLOCATOR_FOR_RENDER
-#	define render_alloc				xalloc
-	typedef xr_allocator			render_allocator;
-#endif // USE_DOUG_LEA_ALLOCATOR_FOR_RENDER
+#define render_alloc doug_lea_alloc
+typedef doug_lea_allocator_wrapper	render_allocator;
 
 class dxRender_Visual;
 

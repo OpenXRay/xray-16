@@ -171,7 +171,7 @@ void ui_core::PushScissor(const Frect& r_tgt, bool overlapped)
 	r.x2 				= iFloor(result.x2+0.5f);
 	r.y1 				= iFloor(result.y1);
 	r.y2 				= iFloor(result.y2+0.5f);
-	UIRender->SetScissor(&r);
+    GlobalEnv.UIRender->SetScissor(&r);
 }
 
 void ui_core::PopScissor()
@@ -183,7 +183,7 @@ void ui_core::PopScissor()
 	m_Scissors.pop		();
 	
 	if(m_Scissors.empty())
-		UIRender->SetScissor(NULL);
+        GlobalEnv.UIRender->SetScissor(NULL);
 	else{
 		const Frect& top= m_Scissors.top();
 		Irect tgt;
@@ -192,7 +192,7 @@ void ui_core::PopScissor()
 		tgt.rb.x 		= iFloor(ClientToScreenScaledX(top.rb.x));
 		tgt.rb.y 		= iFloor(ClientToScreenScaledY(top.rb.y));
 
-		UIRender->SetScissor(&tgt);
+        GlobalEnv.UIRender->SetScissor(&tgt);
 	}
 }
 
@@ -226,17 +226,17 @@ void ui_core::pp_start()
 {
 	m_bPostprocess		= true;
 
-	m_pp_scale_.set	( float(::Render->getTarget()->get_width())/float(UI_BASE_WIDTH),	float(::Render->getTarget()->get_height())/float(UI_BASE_HEIGHT) );
+	m_pp_scale_.set	( float(GlobalEnv.Render->getTarget()->get_width())/float(UI_BASE_WIDTH),	float(GlobalEnv.Render->getTarget()->get_height())/float(UI_BASE_HEIGHT) );
 	m_2DFrustumPP.CreateFromRect(Frect().set(	0.0f,
 												0.0f,
-												float(::Render->getTarget()->get_width()),
-												float(::Render->getTarget()->get_height())
+												float(GlobalEnv.Render->getTarget()->get_width()),
+												float(GlobalEnv.Render->getTarget()->get_height())
 												));
 
 	m_current_scale			= &m_pp_scale_;
 	
-	g_current_font_scale.set(	float(::Render->getTarget()->get_width())/float(Device.dwWidth),	
-								float(::Render->getTarget()->get_height())/float(Device.dwHeight) );
+	g_current_font_scale.set(	float(GlobalEnv.Render->getTarget()->get_width())/float(Device.dwWidth),	
+								float(GlobalEnv.Render->getTarget()->get_height())/float(Device.dwHeight) );
 
 }
 

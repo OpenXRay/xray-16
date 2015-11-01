@@ -9,13 +9,14 @@
 #include "pch_script.h"
 #include "xrServer_Objects_ALife.h"
 #include "xrServer_script_macroses.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CSE_ALifeSchedulable::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeSchedulable, (),
 {
-	module(L)[
+	module(luaState)
+    [
 		class_<IPureSchedulableObject>
 			("ipure_schedulable_object"),
 //			.def(		constructor<>()),
@@ -24,22 +25,24 @@ void CSE_ALifeSchedulable::script_register(lua_State *L)
 			("cse_alife_schedulable")
 //			.def(		constructor<LPCSTR>())
 	];
-}
+});
 
-void CSE_ALifeGraphPoint::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeGraphPoint, (CSE_Abstract),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_abstract1(
 			CSE_ALifeGraphPoint,
 			"cse_alife_graph_point",
 			CSE_Abstract
 		)
 	];
-}
+});
 
-void CSE_ALifeObject::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeObject, (CSE_Abstract),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_alife1(
 			CSE_ALifeObject,
 			"cse_alife_object",
@@ -57,31 +60,34 @@ void CSE_ALifeObject::script_register(lua_State *L)
 		.def_readonly	("m_game_vertex_id",	&CSE_ALifeObject::m_tGraphID)
 		.def_readonly	("m_story_id",			&CSE_ALifeObject::m_story_id)
 	];
-}
+});
 
-void CSE_ALifeGroupAbstract::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeGroupAbstract, (),
 {
-	module(L)[
+	module(luaState)
+    [
 		class_<CSE_ALifeGroupAbstract>
 			("cse_alife_group_abstract")
 //			.def(		constructor<LPCSTR>())
 	];
-}
+});
 
-void CSE_ALifeDynamicObject::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeDynamicObject, (CSE_ALifeObject),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_dynamic_alife1(
 			CSE_ALifeDynamicObject,
 			"cse_alife_dynamic_object",
 			CSE_ALifeObject
 		)
 	];
-}
+});
 
-void CSE_ALifeDynamicObjectVisual::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeDynamicObjectVisual, (CSE_ALifeDynamicObject, CSE_Visual),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_dynamic_alife2(
 			CSE_ALifeDynamicObjectVisual,
 			"cse_alife_dynamic_object_visual",
@@ -89,11 +95,12 @@ void CSE_ALifeDynamicObjectVisual::script_register(lua_State *L)
 			CSE_Visual
 		)
 	];
-}
+});
 
-void CSE_ALifePHSkeletonObject::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifePHSkeletonObject, (CSE_ALifeDynamicObjectVisual, CSE_PHSkeleton),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_dynamic_alife2(
 			CSE_ALifePHSkeletonObject,
 			"cse_alife_ph_skeleton_object",
@@ -101,11 +108,12 @@ void CSE_ALifePHSkeletonObject::script_register(lua_State *L)
 			CSE_PHSkeleton
 		)
 	];
-}
+});
 
-void CSE_ALifeSpaceRestrictor::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeSpaceRestrictor, (CSE_ALifeDynamicObject, CSE_Shape),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_dynamic_alife2(
 			CSE_ALifeSpaceRestrictor,
 			"cse_alife_space_restrictor",
@@ -113,26 +121,28 @@ void CSE_ALifeSpaceRestrictor::script_register(lua_State *L)
 			CSE_Shape
 		)
 	];
-}
+});
 
-void CSE_ALifeLevelChanger::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeLevelChanger, (CSE_ALifeSpaceRestrictor),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_dynamic_alife1(
 			CSE_ALifeLevelChanger,
 			"cse_alife_level_changer",
 			CSE_ALifeSpaceRestrictor
 		)
 	];
-}
+});
 
-void CSE_ALifeInventoryBox::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_ALifeInventoryBox, (CSE_ALifeDynamicObjectVisual),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_dynamic_alife1(
 			CSE_ALifeInventoryBox,
 			"cse_alife_inventory_box",
 			CSE_ALifeDynamicObjectVisual
 			)
 	];
-}
+});

@@ -8,16 +8,15 @@
 
 #include "pch_script.h"
 #include "script_binder_object.h"
-#include "script_export_space.h"
 #include "script_binder_object_wrapper.h"
 #include "xrServer_Objects_ALife.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptBinderObject::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptBinderObject, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptBinderObject,CScriptBinderObjectWrapper>("object_binder")
 			.def_readonly("object",				&CScriptBinderObject::m_object)
@@ -34,4 +33,4 @@ void CScriptBinderObject::script_register(lua_State *L)
 			.def("net_save_relevant",			&CScriptBinderObject::net_SaveRelevant,	&CScriptBinderObjectWrapper::net_SaveRelevant_static)
 			.def("net_Relcase",					&CScriptBinderObject::net_Relcase,		&CScriptBinderObjectWrapper::net_Relcase_static)
 	];
-}
+});

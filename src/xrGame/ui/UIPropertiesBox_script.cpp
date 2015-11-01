@@ -1,12 +1,12 @@
 #include "pch_script.h"
 #include "UIPropertiesBox.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CUIPropertiesBox::script_register(lua_State *L)
+SCRIPT_EXPORT(CUIPropertiesBox, (CUIFrameWindow),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CUIPropertiesBox,CUIFrameWindow>("CUIPropertiesBox")
 		.def(					constructor<>())
@@ -20,4 +20,4 @@ void CUIPropertiesBox::script_register(lua_State *L)
 		.def("AddItem",				&CUIPropertiesBox::AddItem_script)
 //		.def("",					&CUIPropertiesBox::)
 	];
-}
+});

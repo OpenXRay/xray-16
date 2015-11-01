@@ -7,6 +7,7 @@
 #include "BottleItem.h"
 #include "ExplosiveItem.h"
 #include "InventoryBox.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 CF1::CF1(void) {
 }
@@ -16,10 +17,9 @@ CF1::~CF1(void) {
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CF1::script_register	(lua_State *L)
+SCRIPT_EXPORT(CF1, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CF1,CGameObject>("CF1")
 			.def(constructor<>()),
@@ -39,4 +39,4 @@ void CF1::script_register	(lua_State *L)
 		class_<CExplosiveItem,CGameObject>("CExplosiveItem")
 			.def(constructor<>())
 	];
-}
+});

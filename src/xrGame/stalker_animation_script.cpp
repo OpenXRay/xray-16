@@ -9,7 +9,7 @@
 #include "pch_script.h"
 #include "stalker_animation_manager.h"
 #include "ai/stalker/ai_stalker.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "game_object_space.h"
 #include "script_callback_ex.h"
 #include "ai_space.h"
@@ -52,7 +52,7 @@ void CStalkerAnimationManager::add_script_animation	(LPCSTR animation, bool hand
 {
 	const MotionID					&motion = m_skeleton_animated->ID_Cycle_Safe(animation);
 	if (!motion) {
-		ai().script_engine().script_log(eLuaMessageTypeError,"There is no animation %s (object %s)!",animation,*object().cName());
+		ai().script_engine().script_log(LuaMessageType::Error,"There is no animation %s (object %s)!",animation,*object().cName());
 		return;
 	}
 
@@ -74,7 +74,7 @@ void CStalkerAnimationManager::add_script_animation	(LPCSTR animation, bool hand
 {
 	const MotionID					&motion = m_skeleton_animated->ID_Cycle_Safe(animation);
 	if (!motion) {
-		ai().script_engine().script_log(eLuaMessageTypeError,"There is no animation %s (object %s)!",animation,*object().cName());
+		ai().script_engine().script_log(LuaMessageType::Error,"There is no animation %s (object %s)!",animation,*object().cName());
 		return;
 	}
 

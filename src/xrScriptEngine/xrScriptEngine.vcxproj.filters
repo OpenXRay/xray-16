@@ -7,20 +7,26 @@
     <Filter Include="Debug">
       <UniqueIdentifier>{fb8c96c5-9a29-455b-b78f-51e273ba1918}</UniqueIdentifier>
     </Filter>
-    <Filter Include="lua_studio">
-      <UniqueIdentifier>{819f1bf6-0c8c-4293-8342-a4d2082a8c5d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Process">
       <UniqueIdentifier>{a2caf05a-bbad-4a57-9616-08cfb386c806}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Storage">
-      <UniqueIdentifier>{bcafa8c7-ceb2-47c8-99bf-3929a2df6169}</UniqueIdentifier>
     </Filter>
     <Filter Include="Thread">
       <UniqueIdentifier>{c4540462-a2a5-4389-9d5a-7ef60cc6e443}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine">
       <UniqueIdentifier>{3b6026d9-80e2-485e-a2f0-cdffcae7e22b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Thread\StackTracker">
+      <UniqueIdentifier>{746511e5-f924-4d48-85fb-30744933e495}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Export">
+      <UniqueIdentifier>{afd2335b-e4c8-4f08-9607-fd545b1123d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LuaStudio">
+      <UniqueIdentifier>{819f1bf6-0c8c-4293-8342-a4d2082a8c5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LuaStudio\Backend">
+      <UniqueIdentifier>{48cb416c-d090-4ae9-b4e3-56abea843d93}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -30,6 +36,87 @@
     <ClInclude Include="xrScriptEngine.hpp">
       <Filter>Kernel</Filter>
     </ClInclude>
+    <ClInclude Include="mslotutils.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="script_lua_helper.hpp">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="script_debugger_threads.hpp">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="script_debugger_messages.hpp">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="script_debugger.hpp">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="script_callStack.hpp">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="script_engine.hpp">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="script_engine_inline.hpp">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="script_space_forward.hpp">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="script_process.hpp">
+      <Filter>Process</Filter>
+    </ClInclude>
+    <ClInclude Include="script_thread.hpp">
+      <Filter>Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="script_stack_tracker.hpp">
+      <Filter>Thread\StackTracker</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugMacros.hpp">
+      <Filter>Kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="opt.lua.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="opt_inline.lua.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptEngineConfig.hpp">
+      <Filter>Kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptExporter.hpp">
+      <Filter>Export</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptExportMacros.hpp">
+      <Filter>Export</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptEngineScript.hpp">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaStudio\LuaStudio.hpp">
+      <Filter>LuaStudio</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaStudio\Backend\LibraryLinkage.hpp">
+      <Filter>LuaStudio\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaStudio\Backend\World.hpp">
+      <Filter>LuaStudio\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaStudio\Backend\Engine.hpp">
+      <Filter>LuaStudio\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaStudio\Backend\Backend.hpp">
+      <Filter>LuaStudio\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaStudio\Backend\Interfaces.hpp">
+      <Filter>LuaStudio\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaStudio\Config.hpp">
+      <Filter>LuaStudio</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaStudio\Defines.hpp">
+      <Filter>LuaStudio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -37,6 +124,39 @@
     </ClCompile>
     <ClCompile Include="xrScriptEngine.cpp">
       <Filter>Kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="script_engine.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="script_callStack.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="script_debugger.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="script_debugger_threads.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="script_lua_helper.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="script_process.cpp">
+      <Filter>Process</Filter>
+    </ClCompile>
+    <ClCompile Include="script_stack_tracker.cpp">
+      <Filter>Thread\StackTracker</Filter>
+    </ClCompile>
+    <ClCompile Include="script_thread.cpp">
+      <Filter>Thread</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptExporter.cpp">
+      <Filter>Export</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptEngineScript.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaStudio\LuaStudio.cpp">
+      <Filter>LuaStudio</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -14,7 +14,7 @@
 #include "factory_api.h"
 #include "xrCrossTable.h"
 #include "level_graph.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "xr_graph_merge.h"
 #include "spawn_constructor_space.h"
 #include "guid_generator.h"

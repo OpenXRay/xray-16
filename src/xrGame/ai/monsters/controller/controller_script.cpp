@@ -1,14 +1,14 @@
 #include "pch_script.h"
 #include "controller.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CController::script_register(lua_State *L)
+SCRIPT_EXPORT(CController, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CController,CGameObject>("CController")
 			.def(constructor<>())
 	];
-}
+});

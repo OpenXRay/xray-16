@@ -10,13 +10,13 @@
 #include "script_watch_action.h"
 #include "script_game_object.h"
 #include "sight_manager_space.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptWatchAction::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptWatchAction, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptWatchAction>("look")
 			.enum_("look")
@@ -45,4 +45,4 @@ void CScriptWatchAction::script_register(lua_State *L)
 			.def("bone",						&CScriptWatchAction::SetWatchBone)
 			.def("completed",					(bool (CScriptWatchAction::*)())(&CScriptWatchAction::completed))
 	];
-}
+});

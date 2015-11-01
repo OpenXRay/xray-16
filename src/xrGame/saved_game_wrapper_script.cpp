@@ -11,6 +11,7 @@
 #include "ai_space.h"
 #include "game_graph.h"
 #include "xr_time.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -19,10 +20,9 @@ xrTime CSavedGameWrapper__game_time		(const CSavedGameWrapper *self)
 	return			(xrTime(self->game_time()));
 }
 
-#pragma optimize("s",on)
-void CSavedGameWrapper::script_register	(lua_State *L)
+SCRIPT_EXPORT(CSavedGameWrapper, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CSavedGameWrapper>("CSavedGameWrapper")
 			.def(constructor<LPCSTR>())
@@ -31,6 +31,6 @@ void CSavedGameWrapper::script_register	(lua_State *L)
 			.def("level_name",		&CSavedGameWrapper::level_name)
 			.def("actor_health",	&CSavedGameWrapper::actor_health),
 
-		def("valid_saved_game",		(bool (*)(LPCSTR))(&valid_saved_game))
+		def("valid_saved_game",		(bool (*)(LPCSTR))(&CSavedGameWrapper::valid_saved_game))
 	];
-}
+});

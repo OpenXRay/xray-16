@@ -17,18 +17,7 @@ void CRenderDevice::_SetupStates()
     vCameraDirection.set(0, 0, 1);
     vCameraTop.set(0, 1, 0);
     vCameraRight.set(1, 0, 0);
-    Render->SetupStates();
-}
-
-void CRenderDevice::_Create(LPCSTR shName)
-{
-    Memory.mem_compact();
-    // after creation
-    b_is_Ready = TRUE;
-    _SetupStates();
-    Render->OnDeviceCreate(shName);
-    Statistic->OnDeviceCreate();
-    dwFrame = 0;
+    GlobalEnv.Render->SetupStates();
 }
 
 PROTECT_API void CRenderDevice::Create()
@@ -37,17 +26,10 @@ PROTECT_API void CRenderDevice::Create()
     if (b_is_Ready)
         return; // prevent double call
     Statistic = xr_new<CStats>();
-    // XXX: delete
-//#ifdef DEBUG
-    //cdb_clRAY = &Statistic->clRAY; // total: ray-testing
-    //cdb_clBOX = &Statistic->clBOX; // total: box query
-    //cdb_clFRUSTUM = &Statistic->clFRUSTUM; // total: frustum query
-    //cdb_bDebug = &bDebug;
-//#endif
     bool gpuSW = !!strstr(Core.Params, "-gpu_sw");
     bool gpuNonPure = !!strstr(Core.Params, "-gpu_nopure");
     bool gpuRef = !!strstr(Core.Params, "-gpu_ref");
-    Render->SetupGPU(gpuSW, gpuNonPure, gpuRef);
+    GlobalEnv.Render->SetupGPU(gpuSW, gpuNonPure, gpuRef);
     Log("Starting RENDER device...");
 #ifdef _EDITOR
     psCurrentVidMode[0] = dwWidth;
@@ -60,10 +42,15 @@ PROTECT_API void CRenderDevice::Create()
 #else
     bool noEd = true;
 #endif
-    Render->Create(m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2, noEd);
+    GlobalEnv.Render->Create(m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2, noEd);
+    Memory.mem_compact();
+    b_is_Ready = TRUE;
+    _SetupStates();
     string_path fname;
     FS.update_path(fname, "$game_data$", "shaders.xr");
-    _Create(fname);
+    GlobalEnv.Render->OnDeviceCreate(fname);
+    Statistic->OnDeviceCreate();
+    dwFrame = 0;
     PreCache(0, false, false);
     SECUROM_MARKER_SECURITY_OFF(4);
 }

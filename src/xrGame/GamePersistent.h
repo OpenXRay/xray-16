@@ -77,7 +77,7 @@ public:
 
 	virtual void		RegisterModel			(IRenderVisual* V);
 	virtual	float		MtlTransparent			(u32 mtl_idx);
-    virtual	void		DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) override;
+    virtual	void		DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert) override;
 
 	virtual bool		OnRenderPPUI_query		();
 	virtual void		OnRenderPPUI_main		();

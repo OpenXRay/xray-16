@@ -2,7 +2,7 @@
 #include "ai/Monsters/BaseMonster/base_monster.h"
 #include "ai/Monsters/telekinesis.h"
 #include "ai/Monsters/energy_holder.h"
-#include "xrServerEntities/script_export_space.h"
+
 
 class CPhysicsShellHolder;
 class CStateManagerPoltergeist;
@@ -149,13 +149,7 @@ public:
 	
 
 			friend class CPolterFlame;
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-
-add_to_type_list(CPoltergeist)
-#undef script_type_list
-#define script_type_list save_type_list(CPoltergeist)
-
 
 //////////////////////////////////////////////////////////////////////////
 // Interface
@@ -332,4 +326,3 @@ private:
 
 			bool	trace_object					(CObject *obj, const Fvector &target);
 };
-

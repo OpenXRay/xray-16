@@ -140,7 +140,7 @@ void dxRainRender::Render(CEffect_Rain &owner)
 		sC.mul			(.5f);
 		sR				= sC.magnitude();
 		sC.add			(pos_trail);
-		if (!::Render->ViewBase.testSphere_dirty(sC,sR))	continue;
+		if (!GlobalEnv.Render->ViewBase.testSphere_dirty(sC,sR))	continue;
 
 		static Fvector2 UV[2][4]={
 			{{0,1},{0,0},{1,1},{1,0}},
@@ -203,7 +203,7 @@ void dxRainRender::Render(CEffect_Rain &owner)
 			}
 
 			// Render
-			if (::Render->ViewBase.testSphere_dirty(P->bounds.P, P->bounds.R))
+			if (GlobalEnv.Render->ViewBase.testSphere_dirty(P->bounds.P, P->bounds.R))
 			{
 				// Build matrix
 				float scale			=	P->time / particles_time;

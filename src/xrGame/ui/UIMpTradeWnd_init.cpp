@@ -10,7 +10,7 @@
 #include "UIHelper.h"
 #include "UIBuyWeaponTab.h"
 
-#include "object_broker.h"
+#include "Common/object_broker.h"
 
 
 LPCSTR _list_names[]= {

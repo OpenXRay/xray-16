@@ -9,13 +9,13 @@
 #include "pch_script.h"
 #include "script_world_property.h"
 #include "operator_abstract.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptWorldPropertyWrapper::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptWorldProperty, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptWorldProperty>("world_property")
 			.def(								constructor<CScriptWorldProperty::_condition_type, CScriptWorldProperty::_value_type>())
@@ -24,4 +24,4 @@ void CScriptWorldPropertyWrapper::script_register(lua_State *L)
 			.def(const_self < other<CScriptWorldProperty>())
 			.def(const_self == other<CScriptWorldProperty>())
 	];
-}
+});

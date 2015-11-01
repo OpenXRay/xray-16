@@ -9,13 +9,13 @@
 #include "pch_script.h"
 #include "script_hit.h"
 #include "script_game_object.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptHit::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptHit, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptHit>("hit")
 			.enum_("hit_type")
@@ -41,4 +41,4 @@ void CScriptHit::script_register(lua_State *L)
 			.def(								constructor<const CScriptHit *>())
 			.def("bone",						&CScriptHit::set_bone_name)
 	];
-}
+});

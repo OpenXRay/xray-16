@@ -56,7 +56,7 @@ public:
 	virtual  void						set_step_time_callback			(PhysicsStepTimeCallback* cb)		= 0;
 	virtual  void						set_update_callback				( IPHWorldUpdateCallbck* cb)		= 0;
     virtual const PHWorldStatistics &GetStats() = 0;
-    virtual void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) = 0;
+    virtual void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert) = 0;
 #ifdef DEBUG
 	virtual  u16						ObjectsNumber					()									= 0;
 	virtual  u16						UpdateObjectsNumber				()									= 0;

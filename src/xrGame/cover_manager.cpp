@@ -11,7 +11,7 @@
 #include "cover_manager.h"
 #include "ai_space.h"
 #include "cover_point.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "smart_cover.h"
 #include "smart_cover_loophole.h"
 #include "smart_cover_storage.h"

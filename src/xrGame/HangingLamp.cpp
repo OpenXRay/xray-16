@@ -4,14 +4,14 @@
 #include "xrEngine/xr_collide_form.h"
 #include "xrPhysics/PhysicsShell.h"
 #include "xrPhysics/MathUtils.h"
-
 #include "xrserver_objects_alife.h"
-
 #include "Include/xrRender/Kinematics.h"
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "game_object_space.h"
 #include "script_callback_ex.h"
 #include "script_game_object.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -101,7 +101,7 @@ BOOL CHangingLamp::net_Spawn(CSE_Abstract* DC)
 	clr.set					(lamp->color);						clr.a = 1.f;
 	clr.mul_rgb				(fBrightness);
 
-	light_render			= ::Render->light_create();
+	light_render			= GlobalEnv.Render->light_create();
 	light_render->set_shadow(!!lamp->flags.is(CSE_ALifeObjectHangingLamp::flCastShadow));
 	light_render->set_volumetric(!!lamp->flags.is(CSE_ALifeObjectHangingLamp::flVolumetric));
 	light_render->set_type	(lamp->flags.is(CSE_ALifeObjectHangingLamp::flTypeSpot)?IRender_Light::SPOT:IRender_Light::POINT);
@@ -115,7 +115,7 @@ BOOL CHangingLamp::net_Spawn(CSE_Abstract* DC)
 	light_render->set_volumetric_distance(lamp->m_volumetric_distance);	
 
 	if (lamp->glow_texture.size())	{
-		glow_render				= ::Render->glow_create();
+		glow_render				= GlobalEnv.Render->glow_create();
 		glow_render->set_texture(*lamp->glow_texture);
 		glow_render->set_color	(clr);
 		glow_render->set_radius	(lamp->glow_radius);
@@ -123,7 +123,7 @@ BOOL CHangingLamp::net_Spawn(CSE_Abstract* DC)
 
 	if (lamp->flags.is(CSE_ALifeObjectHangingLamp::flPointAmbient)){
 		ambient_power			= lamp->m_ambient_power;
-		light_ambient			= ::Render->light_create();
+		light_ambient			= GlobalEnv.Render->light_create();
 		light_ambient->set_type	(IRender_Light::POINT);
 		light_ambient->set_shadow(false);
 		clr.mul_rgb				(ambient_power);
@@ -400,14 +400,13 @@ BOOL CHangingLamp::UsedAI_Locations()
 	return					(FALSE);
 }
 
-#pragma optimize("s",on)
-void CHangingLamp::script_register(lua_State *L)
+SCRIPT_EXPORT(CHangingLamp, (CGameObject),
 {
-	luabind::module(L)
+	luabind::module(luaState)
 	[
 		luabind::class_<CHangingLamp,CGameObject>("hanging_lamp")
 			.def(luabind::constructor<>())
 			.def("turn_on",		&CHangingLamp::TurnOn)
 			.def("turn_off",	&CHangingLamp::TurnOff)
 	];
-}
+});

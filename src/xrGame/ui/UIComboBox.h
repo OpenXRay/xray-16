@@ -52,6 +52,7 @@ protected:
 			void		OnListItemSelect		();
 	virtual void		Update					();
 	virtual void		Draw					();
+public:
 			void		ClearList				();
 
 			u32			GetSize					();
@@ -73,7 +74,4 @@ public:
 	CUIListBox			m_list_box;
 	void				SetTextColor			(u32 color)			{m_textColor[0] = color;};
 	void				SetTextColorD			(u32 color)			{m_textColor[1] = color;};
-
-protected:	
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

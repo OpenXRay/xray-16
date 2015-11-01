@@ -10,8 +10,7 @@
 #include "xrCore/Animation/Bone.hpp"
 #include "Include/xrRender/Kinematics.h"
 #include "xrCDB/Intersect.hpp"
-
-#include "xrServerEntities/object_broker.h"
+#include "Common/object_broker.h"
 
 #ifdef _EDITOR
 #include "ui_toolscustom.h"

@@ -11,7 +11,7 @@
 #include "UIListBoxItem.h"
 #include "xrEngine/xr_ioconsole.h"
 #include "string_table.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "game_base.h"
 #include "ui/UICDkey.h"
 

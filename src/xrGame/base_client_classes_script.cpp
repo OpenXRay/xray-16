@@ -10,28 +10,27 @@
 #include "base_client_classes.h"
 #include "base_client_classes_wrappers.h"
 #include "xrEngine/feel_sound.h"
-
 #include "Include/xrRender/RenderVisual.h"
 #include "Include/xrRender/Kinematics.h"
 #include "ai/stalker/ai_stalker.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void DLL_PureScript::script_register	(lua_State *L)
+SCRIPT_EXPORT(DLL_Pure, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<DLL_Pure,CDLL_PureWrapper>("DLL_Pure")
 			.def(constructor<>())
 			.def("_construct",&DLL_Pure::_construct,&CDLL_PureWrapper::_construct_static)
 	];
-}
+});
 
 /*
-void ISpatialScript::script_register	(lua_State *L)
+SCRIPT_EXPORT(ISpatial, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<ISpatial,CISpatialWrapper>("ISpatial")
 			.def(constructor<>())
@@ -44,23 +43,23 @@ void ISpatialScript::script_register	(lua_State *L)
 			.def("dcast_Renderable",	&ISpatial::dcast_Renderable,	&CISpatialWrapper::dcast_Renderable_static)
 			.def("dcast_Light",			&ISpatial::dcast_Light,			&CISpatialWrapper::dcast_Light_static)
 	];
-}
+});
 */
 
-void ISheduledScript::script_register	(lua_State *L)
+SCRIPT_EXPORT(ISheduled, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<ISheduled,CISheduledWrapper>("ISheduled")
 //			.def(constructor<>())
 //			.def("shedule_Scale",		&ISheduled::shedule_Scale,		&CISheduledWrapper::shedule_Scale_static)
 //			.def("shedule_Update",		&ISheduled::shedule_Update,		&CISheduledWrapper::shedule_Update_static)
 	];
-}
+});
 
-void IRenderableScript::script_register	(lua_State *L)
+SCRIPT_EXPORT(IRenderable, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<IRenderable,CIRenderableWrapper>("IRenderable")
 //			.def(constructor<>())
@@ -68,20 +67,20 @@ void IRenderableScript::script_register	(lua_State *L)
 //			.def("renderable_ShadowGenerate",&IRenderable::renderable_ShadowGenerate,&CIRenderableWrapper::renderable_ShadowGenerate_static)
 //			.def("renderable_ShadowReceive",&IRenderable::renderable_ShadowReceive,&CIRenderableWrapper::renderable_ShadowReceive_static)
 	];
-}
+});
 
-void ICollidableScript::script_register	(lua_State *L)
+SCRIPT_EXPORT(ICollidable, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<ICollidable>("ICollidable")
 			.def(constructor<>())
 	];
-}
+});
 
-void CObjectScript::script_register		(lua_State *L)
+SCRIPT_EXPORT(CGameObject, (DLL_Pure, ISheduled, ICollidable, IRenderable),
 {
-	module(L)
+	module(luaState)
 	[
 //		class_<CObject,bases<DLL_Pure,ISheduled,ICollidable,IRenderable>,CObjectWrapper>("CObject")
 //			.def(constructor<>())
@@ -148,57 +147,57 @@ void CObjectScript::script_register		(lua_State *L)
 
 //		,class_<CAI_Stalker,CCustomMonster>("CAI_Stalker")
 	];
-}
+});
 
-void IRender_VisualScript::script_register		(lua_State *L)
+SCRIPT_EXPORT(IRenderVisual, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<IRenderVisual>("IRender_Visual")
 //			.def(constructor<>())
 			.def("dcast_PKinematicsAnimated",&IRenderVisual::dcast_PKinematicsAnimated)
 	];
-}
+});
 
 void IKinematicsAnimated_PlayCycle(IKinematicsAnimated* sa, LPCSTR anim)
 {
 	sa->PlayCycle(anim);
 }
 
-void IKinematicsAnimatedScript::script_register		(lua_State *L)
+SCRIPT_EXPORT(IKinematicsAnimated, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<IKinematicsAnimated>("IKinematicsAnimated")
 			.def("PlayCycle",		&IKinematicsAnimated_PlayCycle)
 	];
-}
+});
 
-void CBlendScript::script_register		(lua_State *L)
+SCRIPT_EXPORT(CBlend, (),
 {
-	module(L)
-		[
-			class_<CBlend>("CBlend")
-			//			.def(constructor<>())
-		];
-}
+	module(luaState)
+	[
+		class_<CBlend>("CBlend")
+		//			.def(constructor<>())
+	];
+});
 
 /*
-void IKinematicsScript::script_register		(lua_State *L)
+SCRIPT_EXPORT(IKinematics, (FHierrarhyVisual),
 {
-	module(L)
-		[
-			class_<IKinematics, FHierrarhyVisual>("IKinematics")
-			//			.def(constructor<>())
-		];
-}
+	module(luaState)
+	[
+		class_<IKinematics, FHierrarhyVisual>("IKinematics")
+		//			.def(constructor<>())
+	];
+});
 
-void FHierrarhyVisualScript::script_register		(lua_State *L)
+SCRIPT_EXPORT(FHierrarhyVisual, (IRenderVisual),
 {
-	module(L)
-		[
-			class_<FHierrarhyVisual, IRenderVisual>("FHierrarhyVisual")
-			//			.def(constructor<>())
-		];
-}
+	module(luaState)
+	[
+		class_<FHierrarhyVisual, IRenderVisual>("FHierrarhyVisual")
+		//			.def(constructor<>())
+	];
+});
 */

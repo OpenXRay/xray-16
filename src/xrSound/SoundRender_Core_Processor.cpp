@@ -182,7 +182,7 @@ void	CSoundRender_Core::statistic			(CSound_stats*  dest, CSound_stats_ext*  ext
 	}
 }
 
-void CSoundRender_Core::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+void CSoundRender_Core::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
 {
     Stats.FrameEnd();
     CSound_stats sndStat;

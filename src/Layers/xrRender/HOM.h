@@ -71,7 +71,7 @@ public:
 	CHOM	();
 	~CHOM	();
 
-    void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert);
+    void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert);
 #ifdef DEBUG
 	virtual void			OnRender	();
 #endif

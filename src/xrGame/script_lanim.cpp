@@ -7,9 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
-#include "script_lanim.h"
 #include "xrEngine/LightAnimLibrary.h"
-
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -36,15 +35,14 @@ public:
 	}
 };
 
-#pragma optimize("s",on)
-void lanim_registrator::script_register(lua_State *L)
+SCRIPT_EXPORT(lanim_wrapper, (),
 {
-	module(L)
-		[
-			class_<lanim_wrapper>("color_animator")
-			.def(					constructor<LPCSTR>())
-			.def("load",			&lanim_wrapper::load)
-			.def("calculate",		&lanim_wrapper::calculate)
-			.def("length",			&lanim_wrapper::length)
-		];
-}
+	module(luaState)
+	[
+		class_<lanim_wrapper>("color_animator")
+		.def(					constructor<LPCSTR>())
+		.def("load",			&lanim_wrapper::load)
+		.def("calculate",		&lanim_wrapper::calculate)
+		.def("length",			&lanim_wrapper::length)
+	];
+});

@@ -51,7 +51,7 @@ public:
     virtual void  AddSeqFrame(pureFrame* f, bool mt) = 0;
     virtual void  RemoveSeqFrame(pureFrame* f) = 0;
     virtual const RenderDeviceStatictics &GetStats() const = 0;
-    virtual void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) = 0;
+    virtual void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert) = 0;
 };
 
 class ENGINE_API CRenderDeviceData
@@ -132,8 +132,6 @@ private:
     CTimer TimerMM;
     RenderDeviceStatictics stats;
 
-    void _Create(LPCSTR shName);
-    void _Destroy(BOOL bKeepTextures);
     void _SetupStates();
 public:
     // HWND m_hWnd;
@@ -165,13 +163,13 @@ public:
             m_bNearer = FALSE;
             mProject._43 += EPS_L;
         }
-        Render->SetCacheXform(mView, mProject);
+        GlobalEnv.Render->SetCacheXform(mView, mProject);
         //R_ASSERT(0);
         // TODO: re-implement set projection
         //RCache.set_xform_project (mProject);
     }
 
-    void DumpResourcesMemoryUsage() { Render->ResourcesDumpMemoryUsage(); }
+    void DumpResourcesMemoryUsage() { GlobalEnv.Render->ResourcesDumpMemoryUsage(); }
 public:
     CRegistrator <pureFrame > seqFrameMT;
     CRegistrator <pureDeviceReset > seqDeviceReset;
@@ -232,7 +230,7 @@ public:
     void Initialize(void);
     void ShutDown(void);
     virtual const RenderDeviceStatictics &GetStats() const override { return stats; }
-    virtual void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) override;
+    virtual void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert) override;
 public:
     void time_factor(const float& time_factor)
     {

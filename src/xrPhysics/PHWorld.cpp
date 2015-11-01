@@ -83,7 +83,7 @@ CObjectSpace*	__stdcall	mesh_create_object_space(Fvector* verts, CDB::TRI* tris,
 }
 void			__stdcall	set_mtl_lib(CGameMtlLibrary * l)
 {
-	PGMLib = l;
+	GlobalEnv.PGMLib = l;
 }
 void __stdcall destroy_object_space(CObjectSpace* &os)
 {
@@ -283,7 +283,7 @@ void CPHWorld::OnFrame()
     stats.FrameEnd();
 }
 
-void CPHWorld::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+void CPHWorld::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
 {
     stats.FrameEnd();
     float engineTotal = Device().GetStats().EngineTotal.result;

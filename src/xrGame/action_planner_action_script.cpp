@@ -9,13 +9,13 @@
 #include "pch_script.h"
 #include "script_action_planner_action_wrapper.h"
 #include "script_game_object.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CActionPlannerAction<CScriptGameObject>::script_register(lua_State *L)
+IC static void CScriptActionPlannerAction_Export(lua_State *luaState)
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptActionPlannerAction,CScriptActionPlannerActionWrapper,bases<CScriptActionPlanner,CScriptActionBase> >("planner_action")
 			.def(								constructor<>())
@@ -31,3 +31,6 @@ void CActionPlannerAction<CScriptGameObject>::script_register(lua_State *L)
 			.def("weight",						&CScriptActionPlannerAction::weight,		&CScriptActionPlannerActionWrapper::weight_static)
 	];
 }
+
+SCRIPT_EXPORT_FUNC(CScriptActionPlannerAction, (CScriptActionPlanner, CScriptActionBase),
+    CScriptActionPlannerAction_Export);

@@ -10,7 +10,7 @@
 
 #include "action_base.h"
 #include "action_planner.h"
-#include "script_export_space.h"
+
 
 class CScriptGameObject;
 
@@ -48,12 +48,7 @@ public:
 
 	virtual	void		save					(NET_Packet &packet) {inherited_planner::save(packet); inherited_action::save(packet);}
 	virtual	void		load					(IReader &packet)	 {inherited_planner::load(packet); inherited_action::load(packet);}
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 typedef CActionPlannerAction<CScriptGameObject> CScriptActionPlannerAction;
-add_to_type_list(CScriptActionPlannerAction)
-#undef script_type_list
-#define script_type_list save_type_list(CScriptActionPlannerAction)
 
 #include "action_planner_action_inline.h"

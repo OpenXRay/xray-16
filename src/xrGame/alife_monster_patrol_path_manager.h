@@ -9,7 +9,7 @@
 #pragma once
 
 #include "game_graph_space.h"
-#include "script_export_space.h"
+
 
 class CMovementManagerHolder;
 class CPatrolPath;
@@ -70,11 +70,6 @@ public:
 			const _GRAPH_ID			&target_game_vertex_id		() const;
 			const u32				&target_level_vertex_id		() const;
 			const Fvector			&target_position			() const;
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CALifeMonsterPatrolPathManager)
-#undef script_type_list
-#define script_type_list save_type_list(CALifeMonsterPatrolPathManager)
 
 #include "alife_monster_patrol_path_manager_inline.h"

@@ -425,7 +425,7 @@ public:
     {
         xr_sprintf(S, sizeof(S), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]);
     }
-    virtual xr_token* GetToken() { return vid_mode_token; }
+    virtual xr_token* GetToken() { return GlobalEnv.vid_mode_token; }
     virtual void Info(TInfo& I)
     {
         xr_strcpy(I, sizeof(I), "change screen resolution WxH");
@@ -482,10 +482,10 @@ public:
     virtual void Execute(LPCSTR args)
     {
         CCC_Float::Execute(args);
-        Render->setGamma(ps_gamma);
-        Render->setBrightness(ps_brightness);
-        Render->setContrast(ps_contrast);
-        Render->updateGamma();
+        GlobalEnv.Render->setGamma(ps_gamma);
+        GlobalEnv.Render->setBrightness(ps_brightness);
+        GlobalEnv.Render->setContrast(ps_contrast);
+        GlobalEnv.Render->updateGamma();
     }
 };
 

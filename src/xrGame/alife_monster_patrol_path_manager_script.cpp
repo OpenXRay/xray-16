@@ -8,6 +8,7 @@
 
 #include "pch_script.h"
 #include "alife_monster_patrol_path_manager.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -17,10 +18,11 @@ Fvector CALifeMonsterPatrolPathManager__target_position	(CALifeMonsterPatrolPath
 	return	(self->target_position());
 }
 
-#pragma optimize("s",on)
-void CALifeMonsterPatrolPathManager::script_register	(lua_State *L)
+SCRIPT_EXPORT(CALifeMonsterPatrolPathManager, (),
 {
-	module(L)
+    typedef PatrolPathManager::EPatrolStartType EPatrolStartType;
+    typedef PatrolPathManager::EPatrolRouteType EPatrolRouteType;
+	module(luaState)
 	[
 		class_<CALifeMonsterPatrolPathManager>("CALifeMonsterPatrolPathManager")
 			.def("path",					(void (CALifeMonsterPatrolPathManager::*)(LPCSTR))(&CALifeMonsterPatrolPathManager::path))
@@ -37,4 +39,4 @@ void CALifeMonsterPatrolPathManager::script_register	(lua_State *L)
 			.def("target_level_vertex_id",	&CALifeMonsterPatrolPathManager::target_level_vertex_id)
 			.def("target_position",			&CALifeMonsterPatrolPathManager__target_position)
 	];
-}
+});

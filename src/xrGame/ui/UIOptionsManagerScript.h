@@ -1,6 +1,6 @@
 
 #pragma once
-#include "xrServerEntities/script_export_space.h"
+
 
 class CUIOptionsManagerScript 
 {
@@ -13,5 +13,4 @@ public:
 	void 		SendMessage2Group		(LPCSTR group, LPCSTR message);
 	bool 		NeedSystemRestart		();
 	bool 		NeedVidRestart			();
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

@@ -11,7 +11,6 @@
 
 #include "gameobject.h"
 #include <boost/noncopyable.hpp>
-#include "script_export_space.h"
 
 namespace smart_cover {
 	class cover;
@@ -51,17 +50,11 @@ public:
 	IC		float const&enter_min_enemy_distance		() const;
 	IC		float const&exit_min_enemy_distance			() const;
 	IC		cover const&cover							() const;
-
-public:
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
 } // namespace smart_cover
 
 typedef smart_cover::object	smart_cover__object;
-add_to_type_list(smart_cover__object)
-#undef script_type_list
-#define script_type_list save_type_list(smart_cover__object)
 
 #include "smart_cover_object_inline.h"
 

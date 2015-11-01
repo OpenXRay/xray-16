@@ -98,6 +98,7 @@
     <ProjectReference Include="..\xrManagedApi\xrManagedApi.vcxproj">
       <Project>{55b0e2ca-e27a-47fc-bc92-21abdc1044f5}</Project>
       <Name>xrManagedApi</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

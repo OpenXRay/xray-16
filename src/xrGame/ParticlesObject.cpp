@@ -30,7 +30,7 @@ void CParticlesObject::Init	(LPCSTR p_name, IRender_Sector* S, BOOL bAutoRemove)
 	if(!g_dedicated_server)
 	{
 		// create visual
-		renderable.visual		= Render->model_CreateParticles(p_name);
+		renderable.visual		= GlobalEnv.Render->model_CreateParticles(p_name);
 		VERIFY					(renderable.visual);
 		IParticleCustom* V		= smart_cast<IParticleCustom*>(renderable.visual);  VERIFY(V);
 		time_limit				= V->GetTimeLimit();
@@ -249,8 +249,8 @@ void CParticlesObject::renderable_Render	()
 		dwLastTime			= Device.dwTimeGlobal;
 	}
 
-	::Render->set_Transform	(&renderable.xform);
-	::Render->add_Visual	(renderable.visual);
+	GlobalEnv.Render->set_Transform	(&renderable.xform);
+	GlobalEnv.Render->add_Visual	(renderable.visual);
 }
 
 bool CParticlesObject::IsAutoRemove			()

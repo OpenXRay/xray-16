@@ -1,8 +1,7 @@
 #pragma once
 
 #include "UIDialogWnd.h"
-#include "xrServerEntities/script_space_forward.h"
-#include "xrServerEntities/script_export_space.h"
+#include "xrScriptEngine/script_space_forward.hpp"
 
 struct SCallbackInfo;
 
@@ -16,10 +15,8 @@ private:
 			CALLBACKS			m_callbacks;
 	virtual void				SendMessage			(CUIWindow* pWnd, s16 msg, void* pData = NULL);
 			SCallbackInfo*		NewCallback			();
-protected:
-			bool				Load				(LPCSTR xml_name);
-
 public:
+			bool				Load				(LPCSTR xml_name);
 			void				Register			(CUIWindow* pChild);
 			void				Register			(CUIWindow* pChild, LPCSTR name);
 								CUIDialogWndEx		();
@@ -33,5 +30,4 @@ public:
 template<typename T>
 IC	T*	GetControl(LPCSTR name);
 */
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

@@ -11,7 +11,7 @@
 #include "object_handler.h"
 #include "AI_PhraseDialogManager.h"
 #include "step_manager.h"
-#include "xrServerEntities/script_export_space.h"
+
 
 #ifdef DEBUG
 	template <typename _object_type>
@@ -835,12 +835,6 @@ public:
 
 private:
 	ignored_touched_objects_type		m_ignored_touched_objects;
-
-public:
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CAI_Stalker)
-#undef script_type_list
-#define script_type_list save_type_list(CAI_Stalker)
 
 #include "ai_stalker_inline.h"

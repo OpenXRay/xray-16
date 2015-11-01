@@ -4,7 +4,7 @@
 #include "gameobject.h"
 #include "ai_debug.h"
 #include "ai_space.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "script_game_object.h"
 #include "actor.h"
 
@@ -217,7 +217,7 @@ void CPhraseDialog::Load(shared_str dialog_id)
 	inherited_shared::load_shared(m_DialogId, NULL);
 }
 
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "ai_space.h"
 
 void CPhraseDialog::load_shared	(LPCSTR)

@@ -16,7 +16,7 @@
 #include "Artefact.h"
 #include "xrServer.h"
 #include "relation_registry.h"
-#include "xrServerEntities/object_broker.h"
+#include "Common/object_broker.h"
 #include "sound_player.h"
 #include "Level.h"
 #include "script_callback_ex.h"

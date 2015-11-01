@@ -1,6 +1,6 @@
 #include "pch_script.h"
-#include "PhraseDialog_script.h"
 #include "PhraseDialog.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -29,11 +29,9 @@ void CDialogScriptHelper::AddDisableInfo	(LPCSTR str)
 	m_DisableInfo.push_back	(str);
 }
 
-
-#pragma optimize("s",on)
-void CPhraseDialogExporter::script_register(lua_State *L)
+SCRIPT_EXPORT(CPhraseDialogExporter, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CPhrase>("CPhrase")
 		.def("GetPhraseScript",		&CPhrase::GetScriptHelper),
@@ -50,4 +48,4 @@ void CPhraseDialogExporter::script_register(lua_State *L)
 		.def("AddDisableInfo",		&CDialogScriptHelper::AddDisableInfo)
 		.def("SetScriptText",		&CDialogScriptHelper::SetScriptText)
 	];
-}
+});

@@ -1,8 +1,8 @@
 #pragma once
 #include "PHReqComparer.h"
 #include "phcommander.h"
-#include "script_engine.h"
-#include "script_space_forward.h"
+#include "xrScriptEngine/script_engine.hpp"
+#include "xrScriptEngine/script_space_forward.hpp"
 #include "script_callback_ex.h"
 //template<>
 //IC bool compare_safe(const functor<>& f1,const functor<>& f2)

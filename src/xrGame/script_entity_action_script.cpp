@@ -8,13 +8,13 @@
 
 #include "pch_script.h"
 #include "script_entity_action.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptEntityAction::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptEntityAction, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptEntityAction>("entity_action")
 			.def(								constructor<>())
@@ -37,4 +37,4 @@ void CScriptEntityAction::script_register(lua_State *L)
 			.def("all",							(bool (CScriptEntityAction::*)())(&CScriptEntityAction::CheckIfActionCompleted))
 			.def("completed",					(bool (CScriptEntityAction::*)())(&CScriptEntityAction::CheckIfActionCompleted))
 	];
-}
+});

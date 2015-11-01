@@ -1,7 +1,7 @@
 #pragma once
 
-#include "script_export_space.h"
-#include "object_interfaces.h"
+
+#include "Common/object_interfaces.h"
 #include "inventory_space.h"
 #include "gametype_chooser.h"
 #include "UIDialogHolder.h"
@@ -125,7 +125,6 @@ public:
     void UpdatePda();
     void update_fake_indicators(u8 type, float power);
     void enable_fake_indicators(bool enable);
-    DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
 extern CUIGameCustom* CurrentGameUI();

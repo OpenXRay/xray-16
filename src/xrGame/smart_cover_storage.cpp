@@ -8,7 +8,7 @@
 #include "pch_script.h"
 #include "smart_cover_storage.h"
 #include "smart_cover_description.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 
 static u32 const time_to_delete		= 300000;
 

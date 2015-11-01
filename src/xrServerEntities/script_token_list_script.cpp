@@ -8,13 +8,13 @@
 
 #include "pch_script.h"
 #include "script_token_list.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptTokenList::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptTokenList, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<xr_token>("token")
 			.def(					constructor<>())
@@ -29,4 +29,4 @@ void CScriptTokenList::script_register(lua_State *L)
 			.def("id",				&CScriptTokenList::id)
 			.def("name",			&CScriptTokenList::name)
 	];
-}
+});

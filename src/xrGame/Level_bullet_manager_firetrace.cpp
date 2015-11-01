@@ -170,7 +170,7 @@ void CBulletManager::FireShotmark (SBullet* bullet, const Fvector& vDir, const F
 			Fvector p;
 			p.mad(bullet->bullet_pos,bullet->dir,R.range-0.01f);
 			if(!g_dedicated_server)
-				::Render->add_SkeletonWallmark	(	&R.O->renderable.xform, 
+				GlobalEnv.Render->add_SkeletonWallmark	(	&R.O->renderable.xform, 
 													PKinematics(R.O->Visual()), 
 													&*mtl_pair->CollideMarks,
 													p, 
@@ -188,7 +188,7 @@ void CBulletManager::FireShotmark (SBullet* bullet, const Fvector& vDir, const F
 		if (mtl_pair && !mtl_pair->CollideMarks->empty() && ShowMark)
 		{
 			//добавить отметку на материале
-			::Render->add_StaticWallmark	(&*mtl_pair->CollideMarks, vEnd, bullet->wallmark_size, pTri, pVerts);
+			GlobalEnv.Render->add_StaticWallmark	(&*mtl_pair->CollideMarks, vEnd, bullet->wallmark_size, pTri, pVerts);
 		}
 	}
 

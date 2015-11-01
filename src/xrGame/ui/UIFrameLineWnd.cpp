@@ -63,21 +63,21 @@ void draw_rect(Fvector2 LTp, Fvector2 RBp, Fvector2 LTt, Fvector2 RBt, u32 clr, 
 	LTt.div					(ts);
 	RBt.div					(ts);
 
-	UIRender->PushPoint(LTp.x, LTp.y,	0, clr, LTt.x, LTt.y);
-	UIRender->PushPoint(RBp.x, RBp.y,	0, clr, RBt.x, RBt.y);
-	UIRender->PushPoint(LTp.x, RBp.y,	0, clr, LTt.x, RBt.y);
+	GlobalEnv.UIRender->PushPoint(LTp.x, LTp.y,	0, clr, LTt.x, LTt.y);
+	GlobalEnv.UIRender->PushPoint(RBp.x, RBp.y,	0, clr, RBt.x, RBt.y);
+	GlobalEnv.UIRender->PushPoint(LTp.x, RBp.y,	0, clr, LTt.x, RBt.y);
 
-	UIRender->PushPoint(LTp.x, LTp.y,	0, clr, LTt.x, LTt.y);
-	UIRender->PushPoint(RBp.x, LTp.y,	0, clr, RBt.x, LTt.y);
-	UIRender->PushPoint(RBp.x, RBp.y,	0, clr, RBt.x, RBt.y);
+	GlobalEnv.UIRender->PushPoint(LTp.x, LTp.y,	0, clr, LTt.x, LTt.y);
+	GlobalEnv.UIRender->PushPoint(RBp.x, LTp.y,	0, clr, RBt.x, LTt.y);
+    GlobalEnv.UIRender->PushPoint(RBp.x, RBp.y,	0, clr, RBt.x, RBt.y);
 }
 
 void CUIFrameLineWnd::DrawElements()
 {
-	UIRender->SetShader			(*m_shader);
+    GlobalEnv.UIRender->SetShader			(*m_shader);
 
 	Fvector2					ts;
-	UIRender->GetActiveTextureResolution(ts);
+    GlobalEnv.UIRender->GetActiveTextureResolution(ts);
 
 	Frect						rect;
 	GetAbsoluteRect				(rect);
@@ -104,7 +104,7 @@ void CUIFrameLineWnd::DrawElements()
 			prim_count				+= 6* iCeil(back_len / m_tex_rect[flBack].height());
 	}
 
-	UIRender->StartPrimitive	(prim_count, IUIRender::ptTriList, UI().m_currentPointType);
+    GlobalEnv.UIRender->StartPrimitive	(prim_count, IUIRender::ptTriList, UI().m_currentPointType);
 
 	for(int i=0; i<flMax; ++i)
 	{
@@ -118,7 +118,7 @@ void CUIFrameLineWnd::DrawElements()
 			++counter;
 		};
 	}
-	UIRender->FlushPrimitive		();
+    GlobalEnv.UIRender->FlushPrimitive		();
 }
 
 

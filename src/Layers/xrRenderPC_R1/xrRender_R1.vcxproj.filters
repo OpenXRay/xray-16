@@ -61,9 +61,6 @@
     <Filter Include="Interfase implementations\EnvironmentRender">
       <UniqueIdentifier>{3bd0be1c-3d2a-4d1c-b6ba-edb4ac3ad03f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interfase implementations\RenderDeviceRender">
-      <UniqueIdentifier>{d485b26a-42cf-409f-9974-698ae7ae1d54}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Interfase implementations\ConsoleRender">
       <UniqueIdentifier>{ee175dd1-7446-4350-a884-6b9f28ea53ef}</UniqueIdentifier>
     </Filter>
@@ -582,6 +579,9 @@
     <ClInclude Include="..\xrRender\D3DXRenderBase.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\RenderAllocator.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -854,12 +854,6 @@
     <ClCompile Include="..\xrRenderDX9\dx9r_constants_cache.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources\dx9_R_shader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\xrEngine\ai_script_lua_debug.cpp">
-      <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrEngine\ai_script_lua_extension.cpp">
-      <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\ETextureParams.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClCompile>
@@ -973,6 +967,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\ParticleGroup.cpp">
       <Filter>Models\Visuals</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\RenderAllocator.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

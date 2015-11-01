@@ -1,6 +1,6 @@
 
 #pragma once
-#include "object_interfaces.h"
+#include "Common/object_interfaces.h"
 #include "alife_space.h"
 #include "game_graph_space.h"
 

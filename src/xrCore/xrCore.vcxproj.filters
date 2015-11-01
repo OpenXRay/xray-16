@@ -109,6 +109,15 @@
     <Filter Include="Text">
       <UniqueIdentifier>{fa47a672-0ff4-40c9-a4b8-07909d056fd5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{9e03a958-95eb-41db-927e-3dc4834d0470}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\Object">
+      <UniqueIdentifier>{5b11c640-0d99-4c08-9a86-35a7ad752ac0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debug core\DxErr">
+      <UniqueIdentifier>{0a558484-bd93-4e59-90eb-227898f999f9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -356,6 +365,9 @@
     </ClCompile>
     <ClCompile Include="Threading\Event.cpp">
       <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\dxerr.cpp">
+      <Filter>Debug core\DxErr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -731,6 +743,39 @@
     <ClInclude Include="Threading\Event.hpp">
       <Filter>Threading</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\object_type_traits.h">
+      <Filter>Common\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\object_broker.h">
+      <Filter>Common\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\object_cloner.h">
+      <Filter>Common\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\object_comparer.h">
+      <Filter>Common\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\object_destroyer.h">
+      <Filter>Common\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\object_interfaces.h">
+      <Filter>Common\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\object_loader.h">
+      <Filter>Common\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\object_saver.h">
+      <Filter>Common\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug\dxerr.h">
+      <Filter>Debug core\DxErr</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug\DXGetErrorDescription.inl">
+      <Filter>Debug core\DxErr</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug\DXGetErrorString.inl">
+      <Filter>Debug core\DxErr</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">
@@ -741,5 +786,10 @@
     <CustomBuild Include="FileSystem.h">
       <Filter>FS</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Debug\DXTrace.inl">
+      <Filter>Debug core\DxErr</Filter>
+    </None>
   </ItemGroup>
 </Project>

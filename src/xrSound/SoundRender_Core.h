@@ -104,7 +104,7 @@ public:
 	virtual void						update					( const Fvector& P, const Fvector& D, const Fvector& N );
 	virtual void						update_events			( );
 	virtual void						statistic				( CSound_stats*  dest, CSound_stats_ext*  ext );
-    virtual void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) override;
+    virtual void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert) override;
 
 	// listener
 //	virtual const Fvector&				listener_position		( )=0;

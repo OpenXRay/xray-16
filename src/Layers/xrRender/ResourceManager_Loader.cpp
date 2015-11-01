@@ -41,11 +41,6 @@ void	CResourceManager::OnDeviceDestroy(BOOL )
 		xr_delete	(_t->second.cs);
 	}
 	m_td.clear		();
-
-	// scripting
-#ifndef _EDITOR
-	LS_Unload				();
-#endif
 }
 
 void	CResourceManager::OnDeviceCreate	(IReader* F)

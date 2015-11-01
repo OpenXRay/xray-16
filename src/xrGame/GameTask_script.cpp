@@ -1,14 +1,15 @@
 #include "pch_script.h"
 #include "GameTask.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CGameTask::script_register(lua_State *L)
+SCRIPT_EXPORT(CGameTask, (),
 {
-	module(L)
+    class EnumTaskState {};
+    module(luaState)
 		[
-			class_<enum_exporter<ETaskState> >("task")
+            class_<EnumTaskState>("task")
 				.enum_("task_state")
 				[
 					value("fail",					int(eTaskStateFail)),
@@ -54,4 +55,4 @@ void CGameTask::script_register(lua_State *L)
 				.def("remove_map_locations",				&CGameTask::RemoveMapLocations			)
 				.def("change_map_location",					&CGameTask::ChangeMapLocation			)
 		];
-}
+});

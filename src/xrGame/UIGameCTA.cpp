@@ -19,7 +19,7 @@
 #include "WeaponKnife.h"
 #include "xr_level_controller.h"
 
-#include "object_broker.h"
+#include "Common/object_broker.h"
 
 #include "weaponknife.h"
 

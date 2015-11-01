@@ -92,7 +92,7 @@ extern float g_separate_factor;
 extern float g_separate_radius;
 
 #include <luabind/functor.hpp>
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "ai_space.h"
 
 void CLevel::IR_OnKeyboardPress	(int key)
@@ -132,7 +132,7 @@ void CLevel::IR_OnKeyboardPress	(int key)
 	switch ( _curr ) 
 	{
 	case kSCREENSHOT:
-		Render->Screenshot();
+        GlobalEnv.Render->Screenshot();
 		return;
 		break;
 
@@ -295,7 +295,7 @@ void CLevel::IR_OnKeyboardPress	(int key)
 	}
 	case DIK_BACK:
 		if (GameID() == eGameIDSingle)
-			DRender->NextSceneMode();
+            GlobalEnv.DRender->NextSceneMode();
 			//HW.Caps.SceneMode			= (HW.Caps.SceneMode+1)%3;
 		return;
 

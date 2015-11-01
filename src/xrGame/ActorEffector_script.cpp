@@ -1,6 +1,6 @@
 #include "pch_script.h"
 #include "ai_space.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "ActorEffector.h"
 #include "xrEngine/ObjectAnimator.h"
 

@@ -1,6 +1,6 @@
 #include "pch_script.h"
-#include "console_registrator.h"
 #include "xrEngine/xr_ioconsole.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -33,10 +33,9 @@ void execute_console_command_deferred	(CConsole* c, LPCSTR string_to_execute)
 	Engine.Event.Defer	("KERNEL:console", size_t(xr_strdup(string_to_execute)) );
 }
 
-#pragma optimize("s",on)
-void console_registrator::script_register(lua_State *L)
+SCRIPT_EXPORT(CConsole, (),
 {
-	module(L)
+	module(luaState)
 	[
 		def("get_console",					&console),
 
@@ -53,4 +52,4 @@ void console_registrator::script_register(lua_State *L)
 			.def("get_token",				&CConsole::GetToken)
 			.def("execute_deferred",		&execute_console_command_deferred)
 	];
-}
+});

@@ -11,7 +11,7 @@
 #include "script_game_object.h"
 #include "gameobject.h"
 #include "ai_space.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 
 CScriptSound::CScriptSound				(LPCSTR caSoundName, ESoundTypes sound_type)
 {
@@ -21,7 +21,7 @@ CScriptSound::CScriptSound				(LPCSTR caSoundName, ESoundTypes sound_type)
 	if (FS.exist(l_caFileName,"$game_sounds$",caSoundName,".ogg"))
 		m_sound.create		(caSoundName,st_Effect,sound_type);
 	else
-		ai().script_engine().script_log	(ScriptStorage::eLuaMessageTypeError,"File not found \"%s\"!",l_caFileName);
+		ai().script_engine().script_log	(LuaMessageType::Error,"File not found \"%s\"!",l_caFileName);
 }
 
 CScriptSound::~CScriptSound		()
@@ -37,7 +37,7 @@ Fvector CScriptSound::GetPosition() const
 	if (l_tpSoundParams)
 		return			(l_tpSoundParams->position);
 	else {
-		ai().script_engine().script_log	(ScriptStorage::eLuaMessageTypeError,"Sound was not launched, can't get position!");
+		ai().script_engine().script_log	(LuaMessageType::Error,"Sound was not launched, can't get position!");
 		return			(Fvector().set(0,0,0));
 	}
 }

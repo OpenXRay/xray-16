@@ -4,7 +4,7 @@
 #include "UIMPServerAdm.h"
 #include "UIMPChangeMapAdm.h"
 #include "UIXmlInit.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "UITabControl.h"
 #include "UIStatic.h"
 #include "UI3tButton.h"

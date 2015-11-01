@@ -10,7 +10,6 @@
 
 #include "alife_space.h"
 #include "game_graph_space.h"
-#include "script_export_space.h"
 
 class CSavedGameWrapper {
 public:
@@ -33,10 +32,6 @@ public:
 	inline	const _LEVEL_ID	&level_id			() const;
 	inline	LPCSTR			level_name			() const;
 	inline	const float		&actor_health		() const;
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CSavedGameWrapper)
-#undef script_type_list
-#define script_type_list save_type_list(CSavedGameWrapper)
 
 #include "saved_game_wrapper_inline.h"

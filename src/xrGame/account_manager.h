@@ -4,7 +4,7 @@
 #include <boost/noncopyable.hpp>
 #include "mixed_delegate.h"
 #include "GameSpy/GameSpy_FuncDefs.h"
-#include "script_export_space.h"
+
 #include "queued_async_method.h"
 
 class CGameSpy_GP;
@@ -175,10 +175,7 @@ private:
 	/*static void __cdecl			profiles_cb		(GPConnection * connection,
 												 void * arg,
 												 void * param);*/
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 }; //class account_manager
-
-
 } //namespace gamespy_gp
 
 typedef gamespy_gp::account_manager			gamespy_gp_account_manager;
@@ -186,26 +183,5 @@ typedef gamespy_gp::suggest_nicks_cb		gamespy_gp_suggest_nicks_cb;
 typedef gamespy_gp::account_operation_cb	gamespy_gp_account_operation_cb;
 typedef gamespy_gp::account_profiles_cb		gamespy_gp_account_profiles_cb;
 typedef gamespy_gp::found_email_cb			gamespy_gp_found_email_cb;
-
-add_to_type_list(gamespy_gp_suggest_nicks_cb)
-#undef script_type_list
-#define script_type_list save_type_list(gamespy_gp_suggest_nicks_cb)
-
-add_to_type_list(gamespy_gp_account_operation_cb)
-#undef script_type_list
-#define script_type_list save_type_list(gamespy_gp_account_operation_cb)
-
-add_to_type_list(gamespy_gp_account_profiles_cb)
-#undef script_type_list
-#define script_type_list save_type_list(gamespy_gp_account_profiles_cb)
-
-add_to_type_list(gamespy_gp_found_email_cb)
-#undef script_type_list
-#define script_type_list save_type_list(gamespy_gp_found_email_cb)
-
-add_to_type_list(gamespy_gp_account_manager)
-#undef script_type_list
-#define script_type_list save_type_list(gamespy_gp_account_manager)
-
 
 #endif //#ifndef ACCOUNT_MANAGER

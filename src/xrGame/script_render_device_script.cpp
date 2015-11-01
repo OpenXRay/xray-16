@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
-#include "script_render_device.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -33,10 +33,9 @@ u32 time_global(const CRenderDevice *self)
 	return		(self->dwTimeGlobal);
 }
 
-#pragma optimize("s",on)
-void CScriptRenderDevice::script_register(lua_State *L)
+SCRIPT_EXPORT(CRenderDevice, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CRenderDevice>("render_device")
 			.def_readonly("width",					&CRenderDevice::dwWidth)
@@ -59,4 +58,4 @@ void CScriptRenderDevice::script_register(lua_State *L)
 			.def("pause",							&set_device_paused),
 			def("app_ready",						&is_app_ready)
 	];
-}
+});

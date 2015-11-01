@@ -8,9 +8,9 @@
 
 #include "stdafx.h"
 #include "alife_registry_container.h"
-#include "object_interfaces.h"
+#include "Common/object_interfaces.h"
 #include "alife_space.h"
-#include "object_type_traits.h"
+#include "Common/object_type_traits.h"
 
 template <typename T1, typename _T2, typename Head>
 struct CRegistryHelperLoad {

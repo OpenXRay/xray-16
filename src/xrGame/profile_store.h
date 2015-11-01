@@ -4,7 +4,7 @@
 #include <boost/noncopyable.hpp>
 #include "xrEngine/ISheduled.h"
 #include "profile_data_types.h"
-#include "script_export_space.h"
+
 #include "queued_async_method.h"
 #include "gsc_dsigned_ltx.h"
 #include "best_scores_store.h"
@@ -97,16 +97,9 @@ private:
 													 void * inputData,
 													 void * outputData,
 													 void * userData);
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };//class profile_store
-
 } //namespace gamespy_profile
 
 typedef gamespy_profile::profile_store	gamespy_profile_profile_store;
-
-add_to_type_list(gamespy_profile_profile_store)
-#undef script_type_list
-#define script_type_list save_type_list(gamespy_profile_profile_store)
 
 #endif //#ifndef GAMESPY_PROFILE_STORE

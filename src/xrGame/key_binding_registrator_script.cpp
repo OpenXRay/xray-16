@@ -1,22 +1,20 @@
 #include "pch_script.h"
 #include <dinput.h>
-#include "key_binding_registrator.h"
 #include "xr_level_controller.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-int dik_to_bind(int dik){
-	return get_binded_action(dik);
-}
+static int dik_to_bind(int dik) { return get_binded_action(dik); }
 
-#pragma optimize("s",on)
-void key_binding_registrator::script_register(lua_State *L)
+SCRIPT_EXPORT(KeyBindings, (),
 {
-	module(L)
+    class EnumGameActions {};
+    class KeyBindingRegistrator {};
+	module(luaState)
 	[
 		def("dik_to_bind",		&dik_to_bind),
-
-		class_<enum_exporter<EGameActions> >("key_bindings")
+        class_<EnumGameActions>("key_bindings")
 			.enum_("commands")
 			[
 				value("kFWD",						int(kFWD)),
@@ -62,7 +60,7 @@ void key_binding_registrator::script_register(lua_State *L)
 				value("kSKIN",						int(kSKIN)),
 				value("kTEAM",						int(kTEAM))
 			],
-		class_<key_binding_registrator >("DIK_keys")
+            class_<KeyBindingRegistrator>("DIK_keys")
 			.enum_("dik_keys")
 			[
 				value("DIK_ESCAPE",						int(DIK_ESCAPE		)),
@@ -190,8 +188,7 @@ void key_binding_registrator::script_register(lua_State *L)
 				value("MOUSE_1",						int(MOUSE_1			)),
 				value("MOUSE_3",						int(MOUSE_3			)),
 				value("DIK_RETURN",						int(DIK_RETURN		)),
-				value("DIK_NUMPADENTER",				int(DIK_NUMPADENTER	))
-				
+				value("DIK_NUMPADENTER",				int(DIK_NUMPADENTER	))				
 			]
 	];
-}
+});

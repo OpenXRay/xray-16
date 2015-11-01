@@ -1087,7 +1087,7 @@ void  D3DXRenderBase::OnAssetsChanged()
 	Resources->m_textures_description.Load();
 }
 
-void D3DXRenderBase::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+void D3DXRenderBase::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
 {
     BasicStats.FrameEnd();
     auto renderTotal = Device.GetStats().RenderTotal.result;

@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
-#include "script_net_packet.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -42,19 +42,23 @@ ClientID r_clientID(NET_Packet *self)
 
 extern u16	script_server_object_version	();
 
-#pragma optimize("s",on)
-void CScriptNetPacket::script_register(lua_State *L)
+SCRIPT_EXPORT(ClientID, (),
 {
-	module(L)
-	[
-		def("script_server_object_version", &script_server_object_version),
-		
-		class_<ClientID>("ClientID")
+    module(luaState)
+    [
+        class_<ClientID>("ClientID")
 			.def(					constructor<>()				)
 			.def("value",			&ClientID::value			)
 			.def("set",				&ClientID::set				)
-			.def(self == other<ClientID>()),
+			.def(self == other<ClientID>())
+    ];
+});
 
+SCRIPT_EXPORT(NET_Packet, (),
+{
+	module(luaState)
+	[
+		def("script_server_object_version", &script_server_object_version),
 		class_<NET_Packet>("net_packet")
 			.def(					constructor<>()				)
 			.def("w_begin",			&NET_Packet::w_begin		)
@@ -121,6 +125,5 @@ void CScriptNetPacket::script_register(lua_State *L)
 			.def("r_elapsed",		&NET_Packet::r_elapsed		)
 			.def("r_advance",		&NET_Packet::r_advance		)
 			.def("r_eof",			&r_eof						)
-
 	];
-}
+});

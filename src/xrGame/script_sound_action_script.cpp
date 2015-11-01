@@ -8,13 +8,13 @@
 
 #include "pch_script.h"
 #include "script_sound_action.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptSoundAction::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptSoundAction, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptSoundAction>("sound")
 			.enum_("type")
@@ -58,4 +58,4 @@ void CScriptSoundAction::script_register(lua_State *L)
 			.def("set_angles",					&CScriptSoundAction::SetAngles)
 			.def("completed",					(bool (CScriptSoundAction::*)())(&CScriptSoundAction::completed))
 	];
-}
+});

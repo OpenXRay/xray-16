@@ -58,7 +58,7 @@ void dxFontRender::OnRender(CGameFont &owner)
 		u32 last		= i+count;
 		for (; i<last; i++) {
 			CGameFont::String		&PS	= owner.strings[i];
-			wide_char wsStr[ MAX_MB_CHARS ];
+			wchar_t wsStr[ MAX_MB_CHARS ];
 
 			int	len	= owner.IsMultibyte() ? 
 				mbhMulti2Wide( wsStr , NULL , MAX_MB_CHARS , PS.string ) :

@@ -1,5 +1,5 @@
 #pragma once
-#include "object_interfaces.h"
+#include "Common/object_interfaces.h"
 #include "map_location_defs.h"
 
 class CMapLocationWrapper;

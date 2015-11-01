@@ -184,7 +184,7 @@ void CSCompiler::compile(const char* name)
 	}
 
 	string_path					cname;
-	strconcat					(sizeof(cname),cname,::Render->getShaderPath(),name,".cs");
+	strconcat					(sizeof(cname),cname,GlobalEnv.Render->getShaderPath(),name,".cs");
 	FS.update_path				(cname,	"$game_shaders$", cname);
 
 	IReader* file				= FS.r_open(cname);
@@ -194,7 +194,7 @@ void CSCompiler::compile(const char* name)
 	LPCSTR						c_target	= "cs_5_0";
 	LPCSTR						c_entry		= "main";
 
-	HRESULT	const _hr			= ::Render->shader_compile(name,(DWORD const*)file->pointer(),file->length(), c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)m_cs );
+	HRESULT	const _hr			= GlobalEnv.Render->shader_compile(name,(DWORD const*)file->pointer(),file->length(), c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)m_cs );
 
 	FS.r_close					( file );
 

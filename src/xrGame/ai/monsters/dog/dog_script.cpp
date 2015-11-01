@@ -1,14 +1,14 @@
 #include "pch_script.h"
 #include "dog.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CAI_Dog::script_register(lua_State *L)
+SCRIPT_EXPORT(CAI_Dog, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CAI_Dog,CGameObject>("CAI_Dog")
 			.def(constructor<>())
 	];
-}
+});

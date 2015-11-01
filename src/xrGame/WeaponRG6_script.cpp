@@ -1,14 +1,14 @@
 #include "pch_script.h"
 #include "WeaponRG6.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CWeaponRG6::script_register	(lua_State *L)
+SCRIPT_EXPORT(CWeaponRG6, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CWeaponRG6,CGameObject>("CWeaponRG6")
 			.def(constructor<>())
 	];
-}
+});

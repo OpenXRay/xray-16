@@ -1,7 +1,6 @@
 #pragma once
 
 #include "weaponcustompistol.h"
-#include "script_export_space.h"
 
 class CWeaponShotgun :	public CWeaponCustomPistol
 {
@@ -39,9 +38,4 @@ protected:
 	ESoundTypes		m_eSoundOpen;
 	ESoundTypes		m_eSoundAddCartridge;
 	ESoundTypes		m_eSoundClose;
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CWeaponShotgun)
-#undef script_type_list
-#define script_type_list save_type_list(CWeaponShotgun)

@@ -10,7 +10,7 @@
 #define INVENTORY_UPGRADE_BASE_H_INCLUDED
 
 #include <boost/noncopyable.hpp>
-#include "object_broker.h"
+#include "Common/object_broker.h"
 
 class CInventoryItem;
 

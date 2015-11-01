@@ -1,5 +1,6 @@
 #include "pch_script.h"
 #include "weaponusp45.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 CWeaponUSP45::CWeaponUSP45()
 {}
@@ -9,12 +10,11 @@ CWeaponUSP45::~CWeaponUSP45()
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CWeaponUSP45::script_register	(lua_State *L)
+SCRIPT_EXPORT(CWeaponUSP45, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CWeaponUSP45,CGameObject>("CWeaponUSP45")
 			.def(constructor<>())
 	];
-}
+});

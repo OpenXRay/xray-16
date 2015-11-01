@@ -10,7 +10,7 @@
 
 #include "specific_character.h"
 #include "alife_registry_wrappers.h"
-#include "xrServerEntities/script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 
 
 CPda::CPda(void)						

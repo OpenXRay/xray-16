@@ -1,5 +1,6 @@
 #include "pch_script.h"
 #include "weaponsvu.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 CWeaponSVU::CWeaponSVU(void)
 {}
@@ -9,12 +10,11 @@ CWeaponSVU::~CWeaponSVU(void)
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CWeaponSVU::script_register	(lua_State *L)
+SCRIPT_EXPORT(CWeaponSVU, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CWeaponSVU,CGameObject>("CWeaponSVU")
 			.def(constructor<>())
 	];
-}
+});

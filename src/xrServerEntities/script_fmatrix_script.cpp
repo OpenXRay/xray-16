@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
-#include "script_fmatrix.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 void get_matrix_hpb(Fmatrix* self, float* h, float* p, float* b)
@@ -19,10 +19,9 @@ void matrix_transform (Fmatrix* self, Fvector* v)
 	self->transform (*v);
 }
 
-#pragma optimize("s",on)
-void CScriptFmatrix::script_register(lua_State *L)
+SCRIPT_EXPORT(Fmatrix, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<Fmatrix>("matrix")
 			.def_readwrite("i",					&Fmatrix::i)
@@ -103,4 +102,4 @@ void CScriptFmatrix::script_register(lua_State *L)
 //			.def("getXYZi",						(void	   (Fmatrix::*)(Fvector &) const)(&Fmatrix::getXYZi),																						out_value(_2))
 //			.def("getXYZi",						(void	   (Fmatrix::*)(float &, float &, float &) const)(&Fmatrix::getXYZi))
 	];
-}
+});

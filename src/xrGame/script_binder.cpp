@@ -8,7 +8,7 @@
 
 #include "pch_script.h"
 #include "ai_space.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "script_binder.h"
 #include "xrServer_Objects_ALife.h"
 #include "script_binder_object.h"
@@ -87,7 +87,7 @@ void CScriptBinder::reload			(LPCSTR section)
 	
 	luabind::functor<void>	lua_function;
 	if (!ai().script_engine().functor(pSettings->r_string(section,"script_binding"),lua_function)) {
-		ai().script_engine().script_log	(ScriptStorage::eLuaMessageTypeError,"function %s is not loaded!",pSettings->r_string(section,"script_binding"));
+		ai().script_engine().script_log	(LuaMessageType::Error,"function %s is not loaded!",pSettings->r_string(section,"script_binding"));
 		return;
 	}
 	

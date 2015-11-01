@@ -47,7 +47,7 @@ void CSheduler::Destroy()
     Registration.clear();
 }
 
-void CSheduler::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+void CSheduler::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
 {
     stats.FrameEnd();
     float percentage = 100.f*stats.Update.result / Device.GetStats().EngineTotal.result;

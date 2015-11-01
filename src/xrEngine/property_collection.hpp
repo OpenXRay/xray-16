@@ -11,7 +11,7 @@
 
 #include "Include/editor/property_holder.hpp"
 #include <boost/noncopyable.hpp>
-#include "xrServerEntities/object_broker.h"
+#include "Common/object_broker.h"
 
 template <typename container_type, typename holder_type>
 class property_collection :

@@ -255,7 +255,7 @@ public:
 		void*&							result);
 
 	// Information
-	virtual void					DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) override;
+	virtual void					DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert) override;
 	virtual LPCSTR					getShaderPath				()									{ return "r2\\";	}
 	virtual ref_shader				getShader					(int id);
 	virtual IRender_Sector*			getSector					(int id);

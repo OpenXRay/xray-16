@@ -3,13 +3,13 @@
 #include "Car.h"
 #include "CarWeapon.h"
 #include "script_game_object.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CCar::script_register(lua_State *L)
+SCRIPT_EXPORT(CCar, (CGameObject, CHolderCustom),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CCar,bases<CGameObject,CHolderCustom> >("CCar")
 			.enum_("wpn_action")
@@ -36,4 +36,4 @@ void CCar::script_register(lua_State *L)
 		.def("CarExplode",		&CCar::CarExplode)
 		.def(constructor<>())
 	];
-}
+});

@@ -201,7 +201,7 @@ void CBreakableObject::net_Destroy()
 	xr_delete(collidable.model);
 	Init();
 	//Visual()->vis.box.set(m_saved_box);
-	Render->model_Delete(renderable.visual,TRUE);
+    GlobalEnv.Render->model_Delete(renderable.visual,TRUE);
 	cNameVisual_set("");
 
 }

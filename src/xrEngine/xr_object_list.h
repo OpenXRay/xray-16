@@ -61,7 +61,7 @@ public:
         stats.FrameEnd();
         return stats;
     }
-    void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert);
+    void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert);
     // methods
     CObjectList();
     ~CObjectList();

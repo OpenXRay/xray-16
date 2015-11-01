@@ -40,7 +40,7 @@
 #include "Actor.h"
 #include "ai_object_location.h"
 #include "ai_space.h"
-#include "xrServerEntities/script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "ai/Monsters/anti_aim_ability.h"
 
 // Lain: added 

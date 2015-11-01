@@ -26,9 +26,7 @@ ICF u32 get_pool(size_t size)
     return pid;
 }
 
-#ifdef PURE_ALLOC
 static bool g_use_pure_alloc = false;
-#endif
 
 #ifdef DEBUG_MEMORY_NAME
 void *xrMemory::mem_alloc(size_t size, const char *_name)
@@ -37,7 +35,6 @@ void *xrMemory::mem_alloc(size_t size)
 #endif
 {
     stat_calls++;
-#ifdef PURE_ALLOC
     static bool g_use_pure_alloc_initialized = false;
     if (!g_use_pure_alloc_initialized)
     {
@@ -52,8 +49,6 @@ void *xrMemory::mem_alloc(size_t size)
 #endif
         return result;
     }
-#endif
-
 #ifdef DEBUG_MEMORY_MANAGER
     if (mem_initialized)
         debug_cs.Enter();
@@ -108,13 +103,11 @@ void xrMemory::mem_free(void *P)
 #ifdef USE_MEMORY_MONITOR
     memory_monitor::monitor_free(P);
 #endif
-#ifdef PURE_ALLOC
     if (g_use_pure_alloc)
     {
         free(P);
         return;
     }
-#endif
 #ifdef DEBUG_MEMORY_MANAGER
     if (g_globalCheckAddr==P)
         __asm int 3;
@@ -151,7 +144,6 @@ void* xrMemory::mem_realloc(void* P, size_t size)
 #endif
 {
     stat_calls++;
-#ifdef PURE_ALLOC
     if (g_use_pure_alloc)
     {
         void* result = realloc(P, size);
@@ -161,7 +153,6 @@ void* xrMemory::mem_realloc(void* P, size_t size)
 #endif
         return result;
     }
-#endif
     if (!P)
     {
 #ifdef DEBUG_MEMORY_NAME
@@ -231,7 +222,7 @@ void* xrMemory::mem_realloc(void* P, size_t size)
         mem_free(p_old);
         _ptr = p_new;
     }
-    else if (p_mode==1)
+    else if (p_mode==2)
     {
         // relocate into another mmgr(pooled) from real
         void *p_old = P;

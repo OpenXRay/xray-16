@@ -10,7 +10,7 @@ namespace ManagedApi
 namespace Core
 {
 
-static void LogCallbackWrapper(const char* msg)
+static void LogCallbackWrapper(void* context, const char* msg)
 {
     if (!Core::ManagedLogCallback)
         return;
@@ -25,10 +25,10 @@ void Core::Initialize(String^ appName, LogCallback^ logCallback, bool initFs, St
     if (fsFileName)
     {
         std::string fsFileNameC = msclr::interop::marshal_as<std::string>(fsFileName);
-        ::Core._initialize(appNameC.c_str(), LogCallbackWrapper, initFs, fsFileNameC.c_str());
+        ::Core._initialize(appNameC.c_str(), ::LogCallback(LogCallbackWrapper, nullptr), initFs, fsFileNameC.c_str());
     }
     else
-        ::Core._initialize(appNameC.c_str(), LogCallbackWrapper, initFs, nullptr);
+        ::Core._initialize(appNameC.c_str(), ::LogCallback(LogCallbackWrapper, nullptr), initFs, nullptr);
 }
 
 void Core::Initialize(String^ appName, LogCallback^ logCallback, bool initFs)

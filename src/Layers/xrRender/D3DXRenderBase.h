@@ -180,21 +180,9 @@ public:
 	void r_dsgraph_render_subspace(IRender_Sector *_sector, CFrustum *_frustum, Fmatrix &mCombined, Fvector &_cop, BOOL _dynamic, BOOL _precise_portals = FALSE);
 	void r_dsgraph_render_subspace(IRender_Sector *_sector, Fmatrix &mCombined, Fvector &_cop, BOOL _dynamic, BOOL _precise_portals = FALSE);
 	void r_dsgraph_render_R1_box(IRender_Sector *_sector, Fbox &_bb, int _element);
+	virtual u32 memory_usage() override { return g_render_allocator.get_allocated_size(); }
 
-	virtual u32 memory_usage() override
-	{
-#ifdef USE_DOUG_LEA_ALLOCATOR_FOR_RENDER
-		return g_render_lua_allocator.get_allocated_size();
-#else
-		return 0;
-#endif
-	}
-
-    // ============================ NEW MEMBERS ============================================
-public:
-    
     virtual void Copy(IRender &_in) override;
-
     //	Gamma correction functions
     virtual void setGamma(float fGamma) override;
     virtual void setBrightness(float fGamma) override;
@@ -232,7 +220,7 @@ public:
     virtual void ClearTarget() override;
     virtual void SetCacheXform(Fmatrix &mView, Fmatrix &mProject) override;
     virtual void OnAssetsChanged() override;
-    virtual void DumpStatistics(class CGameFont &font, class PerformanceAlert *alert) override;
+    virtual void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert) override;
 
 public:
     CResourceManager *Resources;

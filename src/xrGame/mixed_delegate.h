@@ -3,7 +3,6 @@
 
 #include "xrCore/fastdelegate.h"
 #include "pch_script.h"
-#include "script_export_space.h"
 #include "script_callback_ex.h"
 #include "mixed_delegate_unique_tags.h"
 
@@ -23,12 +22,8 @@ public:
 	typedef		luabind::object									lua_object_type;
 	typedef		luabind::functor<R>								lua_function_type;
 		
-	mixed_delegate()
-	{
-	};
-	~mixed_delegate()
-	{
-	}
+	mixed_delegate() {}
+	~mixed_delegate() {}
 	
 	template<class ThisRef, class ClassType>
 	mixed_delegate(ThisRef* ptr_this, R (xr_stdcall ClassType::*func_ptr)(Param1, Param2)) :
@@ -101,21 +96,6 @@ public:
 private:
 	fastdelegate_type	m_cpp_delegate;
 	lua_delegate_type	m_lua_delegate;
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };//class mixed_delegate
-
-
-#define DEFINE_MIXED_DELEGATE_SCRIPT(type, name_str) \
-	void type::script_register(lua_State *L)\
-	{\
-		module(L)\
-		[\
-			class_<type>(name_str)\
-				.def(						constructor<>())\
-				.def(						constructor<type::lua_object_type, type::lua_function_type>())\
-				.def("bind",				&type::bind)\
-				.def("clear",				&type::clear)\
-		];\
-	};
 
 #endif //#ifndef MIXED_DELEGATE_INCLUDED

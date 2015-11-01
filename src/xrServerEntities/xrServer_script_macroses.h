@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "script_export_macroses.h"
+#include "xrScriptEngine/ScriptExportMacros.hpp"
 #include "xrEProps.h"
 #include "ai_space.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "luabind/error.hpp"
 #ifdef XRGAME_EXPORTS
 #include "alife_smart_terrain_task.h"

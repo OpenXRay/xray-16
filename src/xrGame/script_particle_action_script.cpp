@@ -8,13 +8,13 @@
 
 #include "pch_script.h"
 #include "script_particle_action.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptParticleAction::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptParticleAction, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptParticleAction>("particle")
 			.def(					constructor<>())
@@ -30,4 +30,4 @@ void CScriptParticleAction::script_register(lua_State *L)
 			.def("set_velocity",	&CScriptParticleAction::SetVelocity)
 			.def("completed",		(bool (CScriptParticleAction::*)())(&CScriptParticleAction::completed))
 	];
-}
+});

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "script_space_forward.h"
+#include "xrScriptEngine/script_space_forward.hpp"
 
 class CGameObject;
 

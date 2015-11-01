@@ -1,6 +1,6 @@
 #pragma once
 
-#include "script_export_space.h"
+
 #include "ui\xrUIXmlParser.h"
 
 class CUIWindow;
@@ -63,6 +63,4 @@ public:
 	CUIProgressBar*		InitProgressBar(LPCSTR path, CUIWindow* parent);
 protected:
 	CUIXml	m_xml;
-public:
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

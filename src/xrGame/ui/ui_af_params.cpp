@@ -3,7 +3,7 @@
 #include "UIStatic.h"
 #include "Actor.h"
 #include "ActorCondition.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "UIXmlInit.h"
 #include "UIHelper.h"
 #include "string_table.h"

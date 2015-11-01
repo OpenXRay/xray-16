@@ -6,13 +6,13 @@
 #include "UISpinNum.h"
 #include "UISpinText.h"
 #include "UITrackBar.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CUIButton::script_register(lua_State *L)
+SCRIPT_EXPORT(CUIButton, (CUIStatic, CUIWindow),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CUIButton, CUIStatic>("CUIButton")
 		.def(							constructor<>())
@@ -51,4 +51,4 @@ void CUIButton::script_register(lua_State *L)
 		.def("SetOptFBounds",			&CUITrackBar::SetOptFBounds)
 		.def("SetCurrentValue",			&CUITrackBar::SetCurrentOptValue)
 	];
-}
+});

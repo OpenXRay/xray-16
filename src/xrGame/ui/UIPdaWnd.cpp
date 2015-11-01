@@ -14,7 +14,7 @@
 #include "UITabControl.h"
 #include "UIMapWnd.h"
 #include "UIFrameLineWnd.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "UIMessagesWindow.h"
 #include "UIMainIngameWnd.h"
 #include "UITabButton.h"

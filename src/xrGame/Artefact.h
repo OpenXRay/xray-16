@@ -3,7 +3,6 @@
 #include "hud_item_object.h"
 #include "hit_immunity.h"
 #include "xrPhysics/PHUpdateObject.h"
-#include "script_export_space.h"
 #include "patrol_path.h"
 
 class SArtefactActivation;
@@ -113,8 +112,6 @@ public:
 		o_fastmode			= FALSE	;
 		//processing_deactivate		();
 	}
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
 struct SArtefactDetectorsSupport
@@ -135,8 +132,3 @@ struct SArtefactDetectorsSupport
 	void	UpdateOnFrame					();
 	void	Blink							();
 };
-
-add_to_type_list(CArtefact)
-#undef script_type_list
-#define script_type_list save_type_list(CArtefact)
-

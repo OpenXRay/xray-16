@@ -1,6 +1,6 @@
 #include "pch_script.h"
-#include "fs_registrator.h"
 #include "xrCore/LocatorApi.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -159,10 +159,9 @@ static const CLocatorAPI::file *ExistS(CLocatorAPI *fs, const char *path, const 
     return fs->GetFileDesc(temp);
 }
 
-#pragma optimize("s",on)
-void fs_registrator::script_register(lua_State *L)
+SCRIPT_EXPORT(fs_registrator, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<FS_item>("FS_item")
 			.def("NameFull",							&FS_item::NameFull)
@@ -258,4 +257,4 @@ void fs_registrator::script_register(lua_State *L)
 
 		def("getFS",									getFS)
 	];
-}
+});

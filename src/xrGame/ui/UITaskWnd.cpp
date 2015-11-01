@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UITaskWnd.h"
 #include "UIMapWnd.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "UIXmlInit.h"
 #include "UIStatic.h"
 #include "UI3tButton.h"

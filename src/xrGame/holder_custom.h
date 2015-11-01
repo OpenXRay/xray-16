@@ -1,9 +1,5 @@
 #pragma once
 
-
-
-#include "script_export_space.h"
-
 class CInventory;
 class CGameObject;
 class CCameraBase;
@@ -43,9 +39,4 @@ public:
 	virtual void			Action				(u16 id, u32 flags)				{};
 	virtual void			SetParam			(int id, Fvector2 val)			{};
 	virtual void			SetParam			(int id, Fvector val)			{};
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-
-add_to_type_list(CHolderCustom)
-#undef script_type_list
-#define script_type_list save_type_list(CHolderCustom)

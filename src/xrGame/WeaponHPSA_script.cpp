@@ -1,14 +1,14 @@
 #include "pch_script.h"
 #include "WeaponHPSA.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CWeaponHPSA::script_register	(lua_State *L)
+SCRIPT_EXPORT(CWeaponHPSA, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CWeaponHPSA,CGameObject>("CWeaponHPSA")
 			.def(constructor<>())
 	];
-}
+});

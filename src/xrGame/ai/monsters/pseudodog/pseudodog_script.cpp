@@ -1,33 +1,33 @@
 #include "pch_script.h"
 #include "pseudodog.h"
 #include "psy_dog.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CAI_PseudoDog::script_register(lua_State *L)
+SCRIPT_EXPORT(CAI_PseudoDog, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CAI_PseudoDog,CGameObject>("CAI_PseudoDog")
 			.def(constructor<>())
 	];
-}
+});
 
-void CPsyDog::script_register(lua_State *L)
+SCRIPT_EXPORT(CPsyDog, (CGameObject),
 {
-	module(L)
-		[
-			class_<CPsyDog,CGameObject>("CPsyDog")
-			.def(constructor<>())
-		];
-}
+	module(luaState)
+	[
+		class_<CPsyDog,CGameObject>("CPsyDog")
+		.def(constructor<>())
+	];
+});
 
-void CPsyDogPhantom::script_register(lua_State *L)
+SCRIPT_EXPORT(CPsyDogPhantom, (CGameObject),
 {
-	module(L)
-		[
-			class_<CPsyDogPhantom,CGameObject>("CPsyDogPhantom")
-			.def(constructor<>())
-		];
-}
+	module(luaState)
+	[
+		class_<CPsyDogPhantom,CGameObject>("CPsyDogPhantom")
+		.def(constructor<>())
+	];
+});

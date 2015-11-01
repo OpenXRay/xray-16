@@ -14,13 +14,13 @@
 #include "ai_monster_space.h"
 #include "patrol_path_params.h"
 #include "patrol_path.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptMovementAction::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptMovementAction, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptMovementAction>("move")
 			.enum_("body")
@@ -106,4 +106,4 @@ void CScriptMovementAction::script_register(lua_State *L)
 			.def("input",						&CScriptMovementAction::SetInputKeys)
 			.def("completed",					(bool (CScriptMovementAction::*)())(&CScriptMovementAction::completed))
 	];
-}
+});

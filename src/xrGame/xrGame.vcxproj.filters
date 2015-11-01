@@ -1294,156 +1294,6 @@
     <Filter Include="AI\ANavigation\PatrolPaths\PatrolPoint">
       <UniqueIdentifier>{91c62445-f1c7-433c-8357-601bb648a304}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\AScript">
-      <UniqueIdentifier>{a9b8b2df-53f4-44fe-9d2e-53437a47ef06}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses">
-      <UniqueIdentifier>{ab1b2732-d901-4a34-ba14-eaf215d9bd6d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptActions">
-      <UniqueIdentifier>{3d8308a5-ac58-4e08-a1cc-ca0e763e9921}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptActions\script_abstract_action">
-      <UniqueIdentifier>{251d0077-fc45-4557-a17b-b1cba147d3bb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptActions\script_movement_action">
-      <UniqueIdentifier>{3bfcef06-2951-4770-b8f8-7da939e04774}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptActions\script_movement_action\patrol_path_params">
-      <UniqueIdentifier>{e68bd57b-aa85-46ce-bfd2-d782d0a85fd9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptActions\script_watch_action">
-      <UniqueIdentifier>{48d2be0b-ebb9-4323-9345-3f4a70275b99}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptActions\acript_animation_action">
-      <UniqueIdentifier>{7d83d161-06b3-456b-bb50-be44b9915168}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptActions\script_sound_action">
-      <UniqueIdentifier>{1be6d4c4-0e6e-4e1a-b1c7-7ed4e68384fa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptActions\script_particle_action">
-      <UniqueIdentifier>{5c04816f-e505-4d16-b184-c819c17099d7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptActions\script_particle_action\particle_params">
-      <UniqueIdentifier>{47d0f137-4162-45a8-9763-802300c2410d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptActions\script_object_action">
-      <UniqueIdentifier>{5dec8d37-3b81-41a4-b7bf-7bdd51b628a8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptActions\script_action_condition">
-      <UniqueIdentifier>{16a51dd6-f34f-4255-95e2-d0958dca3e6b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptActions\script_monster_action">
-      <UniqueIdentifier>{bd3b4c03-1af1-4699-bce3-1dab9065ec0e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptActions\script_entity_action">
-      <UniqueIdentifier>{9e2b3df0-6d4d-4c6f-8a59-6ea0efd53476}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptBinderObject">
-      <UniqueIdentifier>{cdc0951f-8ea4-4a9e-8526-182827c7b4a6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptBinderObject\ScriptBinderObjectWrapper">
-      <UniqueIdentifier>{d17ebdb5-acc6-40ae-b7cb-b505ec822251}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptEffector">
-      <UniqueIdentifier>{76509089-e819-4d12-958e-e740b52eb252}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptEffector\ScriptEffectorWrapper">
-      <UniqueIdentifier>{5c85889d-fcd3-473d-9eb5-47278d9718fb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptFlags">
-      <UniqueIdentifier>{dc9f3113-e23a-4976-b485-0aba1ade4607}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptFmatrix">
-      <UniqueIdentifier>{3aa7c66b-8e42-4282-af28-2c736fd8ad6a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptFvector">
-      <UniqueIdentifier>{086230ee-3b5b-4ce0-824e-c6ce63f31cb2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptGameObject">
-      <UniqueIdentifier>{92dc1221-f98f-4173-892d-018be5f4ec47}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptHit">
-      <UniqueIdentifier>{b849c527-cb4b-4bb2-b5fc-b589ee6dcfc9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptIniFile">
-      <UniqueIdentifier>{fba7eff3-e4f4-4af7-af9c-60606e4cc739}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptIniFile\ScriptTokenList">
-      <UniqueIdentifier>{495a8b4a-47ea-4f9d-81a6-0011827bad9d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptIniFile\ScriptRTokenList">
-      <UniqueIdentifier>{46422650-536c-4c7b-8b32-74c6dff4cf2f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptMonsterHitInfo">
-      <UniqueIdentifier>{8141ae6c-a732-4695-b119-4b7a6b786ce9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptNetPacket">
-      <UniqueIdentifier>{809e504b-a9aa-414d-9340-974bf409d048}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptRenderDevice">
-      <UniqueIdentifier>{078eb1f4-96f0-4ca0-b580-a649b7d8ecdb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptSoundInfo">
-      <UniqueIdentifier>{0db7dc10-e1ad-4a8d-a173-8831662a2508}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptSoundType">
-      <UniqueIdentifier>{246a7da2-6c1f-4bb8-9583-284e9ab2bf5a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\UI">
-      <UniqueIdentifier>{b08ee833-e28c-4687-b6b5-0907349836ab}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\KeyBindings">
-      <UniqueIdentifier>{2be23629-93c7-4bb0-997f-7c681c5a0f1d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptReader">
-      <UniqueIdentifier>{cfbfa419-543b-48f1-80e6-2082a84c6ecf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptFS">
-      <UniqueIdentifier>{ef5a4212-e157-425e-b5d5-87e90474397d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\Console">
-      <UniqueIdentifier>{e256099f-7f69-49b3-900a-087c7fde9645}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\BaseClientClasses">
-      <UniqueIdentifier>{9902c3e6-be5f-44b6-b539-cca3243e5e07}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptCallbackEx">
-      <UniqueIdentifier>{c030db0f-190c-4415-a003-bf69d21c43cc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptLAnim">
-      <UniqueIdentifier>{0b7f91ec-8546-438f-9598-b42cc9f39725}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptFcolor">
-      <UniqueIdentifier>{735fa48e-0a26-4a28-993c-166e47ac4a79}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptParticles">
-      <UniqueIdentifier>{968203fb-dd38-4db7-9ccd-db4d09ac9b72}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\ScriptSound">
-      <UniqueIdentifier>{7461340c-f13a-4ba4-a432-e8aeca7393cf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptDebugger">
-      <UniqueIdentifier>{a1df39ed-f84f-4b5e-9aa6-7310378e3614}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptEngine">
-      <UniqueIdentifier>{c64d88d0-2cc0-440e-bed2-367ebd29671c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptProcess">
-      <UniqueIdentifier>{2bfb6ae4-1fec-4054-bc45-5a6ed56f73ed}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptStorage">
-      <UniqueIdentifier>{8ce0ad22-cee7-419e-b54c-65da67769b68}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptThread">
-      <UniqueIdentifier>{0126fd57-f558-4910-ad5e-f63e20a12940}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptThread\ScriptStackTracker">
-      <UniqueIdentifier>{2f517721-a4fd-4e92-aee2-7c703d7b2abe}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\lua_studio">
-      <UniqueIdentifier>{91189d3e-089f-4e5c-a9f4-b41fb1136e69}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AI\ASound">
       <UniqueIdentifier>{a568c889-96b8-41c7-9bee-0d4f24d1a47e}</UniqueIdentifier>
     </Filter>
@@ -2484,6 +2334,132 @@
     </Filter>
     <Filter Include="Physics\scripts">
       <UniqueIdentifier>{66d4d9cb-fbc2-4e9a-8483-4eb5c1738ed9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses">
+      <UniqueIdentifier>{ab1b2732-d901-4a34-ba14-eaf215d9bd6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptActions">
+      <UniqueIdentifier>{3d8308a5-ac58-4e08-a1cc-ca0e763e9921}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptActions\script_abstract_action">
+      <UniqueIdentifier>{251d0077-fc45-4557-a17b-b1cba147d3bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptActions\script_movement_action">
+      <UniqueIdentifier>{3bfcef06-2951-4770-b8f8-7da939e04774}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptActions\script_movement_action\patrol_path_params">
+      <UniqueIdentifier>{e68bd57b-aa85-46ce-bfd2-d782d0a85fd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptActions\script_watch_action">
+      <UniqueIdentifier>{48d2be0b-ebb9-4323-9345-3f4a70275b99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptActions\acript_animation_action">
+      <UniqueIdentifier>{7d83d161-06b3-456b-bb50-be44b9915168}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptActions\script_sound_action">
+      <UniqueIdentifier>{1be6d4c4-0e6e-4e1a-b1c7-7ed4e68384fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptActions\script_particle_action">
+      <UniqueIdentifier>{5c04816f-e505-4d16-b184-c819c17099d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptActions\script_particle_action\particle_params">
+      <UniqueIdentifier>{47d0f137-4162-45a8-9763-802300c2410d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptActions\script_object_action">
+      <UniqueIdentifier>{5dec8d37-3b81-41a4-b7bf-7bdd51b628a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptActions\script_action_condition">
+      <UniqueIdentifier>{16a51dd6-f34f-4255-95e2-d0958dca3e6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptActions\script_monster_action">
+      <UniqueIdentifier>{bd3b4c03-1af1-4699-bce3-1dab9065ec0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptActions\script_entity_action">
+      <UniqueIdentifier>{9e2b3df0-6d4d-4c6f-8a59-6ea0efd53476}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptBinderObject">
+      <UniqueIdentifier>{cdc0951f-8ea4-4a9e-8526-182827c7b4a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptBinderObject\ScriptBinderObjectWrapper">
+      <UniqueIdentifier>{d17ebdb5-acc6-40ae-b7cb-b505ec822251}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptEffector">
+      <UniqueIdentifier>{76509089-e819-4d12-958e-e740b52eb252}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptEffector\ScriptEffectorWrapper">
+      <UniqueIdentifier>{5c85889d-fcd3-473d-9eb5-47278d9718fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptFlags">
+      <UniqueIdentifier>{dc9f3113-e23a-4976-b485-0aba1ade4607}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptFmatrix">
+      <UniqueIdentifier>{3aa7c66b-8e42-4282-af28-2c736fd8ad6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptFvector">
+      <UniqueIdentifier>{086230ee-3b5b-4ce0-824e-c6ce63f31cb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptGameObject">
+      <UniqueIdentifier>{92dc1221-f98f-4173-892d-018be5f4ec47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptHit">
+      <UniqueIdentifier>{b849c527-cb4b-4bb2-b5fc-b589ee6dcfc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptIniFile">
+      <UniqueIdentifier>{fba7eff3-e4f4-4af7-af9c-60606e4cc739}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptIniFile\ScriptTokenList">
+      <UniqueIdentifier>{495a8b4a-47ea-4f9d-81a6-0011827bad9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptIniFile\ScriptRTokenList">
+      <UniqueIdentifier>{46422650-536c-4c7b-8b32-74c6dff4cf2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptMonsterHitInfo">
+      <UniqueIdentifier>{8141ae6c-a732-4695-b119-4b7a6b786ce9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptNetPacket">
+      <UniqueIdentifier>{809e504b-a9aa-414d-9340-974bf409d048}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptRenderDevice">
+      <UniqueIdentifier>{078eb1f4-96f0-4ca0-b580-a649b7d8ecdb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptSoundInfo">
+      <UniqueIdentifier>{0db7dc10-e1ad-4a8d-a173-8831662a2508}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptSoundType">
+      <UniqueIdentifier>{246a7da2-6c1f-4bb8-9583-284e9ab2bf5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\UI">
+      <UniqueIdentifier>{b08ee833-e28c-4687-b6b5-0907349836ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\KeyBindings">
+      <UniqueIdentifier>{2be23629-93c7-4bb0-997f-7c681c5a0f1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptReader">
+      <UniqueIdentifier>{cfbfa419-543b-48f1-80e6-2082a84c6ecf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptFS">
+      <UniqueIdentifier>{ef5a4212-e157-425e-b5d5-87e90474397d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\Console">
+      <UniqueIdentifier>{e256099f-7f69-49b3-900a-087c7fde9645}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\BaseClientClasses">
+      <UniqueIdentifier>{9902c3e6-be5f-44b6-b539-cca3243e5e07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptCallbackEx">
+      <UniqueIdentifier>{c030db0f-190c-4415-a003-bf69d21c43cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptLAnim">
+      <UniqueIdentifier>{0b7f91ec-8546-438f-9598-b42cc9f39725}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptFcolor">
+      <UniqueIdentifier>{735fa48e-0a26-4a28-993c-166e47ac4a79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptParticles">
+      <UniqueIdentifier>{968203fb-dd38-4db7-9ccd-db4d09ac9b72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\ScriptClasses\ScriptSound">
+      <UniqueIdentifier>{7461340c-f13a-4ba4-a432-e8aeca7393cf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -4971,275 +4947,170 @@
     <ClInclude Include="patrol_point_inline.h">
       <Filter>AI\ANavigation\PatrolPaths\PatrolPoint</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_export_macroses.h">
-      <Filter>AI\AScript</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_export_space.h">
-      <Filter>AI\AScript</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_space_forward.h">
-      <Filter>AI\AScript</Filter>
-    </ClInclude>
     <ClInclude Include="script_bind_macroses.h">
-      <Filter>AI\AScript\ScriptClasses</Filter>
+      <Filter>AI\ScriptClasses</Filter>
     </ClInclude>
     <ClInclude Include="script_abstract_action.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_abstract_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_abstract_action</Filter>
     </ClInclude>
     <ClInclude Include="script_abstract_action_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_abstract_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_abstract_action</Filter>
     </ClInclude>
     <ClInclude Include="script_movement_action.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_movement_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_movement_action</Filter>
     </ClInclude>
     <ClInclude Include="script_movement_action_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_movement_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_movement_action</Filter>
     </ClInclude>
     <ClInclude Include="patrol_path_params.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_movement_action\patrol_path_params</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_movement_action\patrol_path_params</Filter>
     </ClInclude>
     <ClInclude Include="patrol_path_params_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_movement_action\patrol_path_params</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_movement_action\patrol_path_params</Filter>
     </ClInclude>
     <ClInclude Include="script_watch_action.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_watch_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_watch_action</Filter>
     </ClInclude>
     <ClInclude Include="script_watch_action_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_watch_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_watch_action</Filter>
     </ClInclude>
     <ClInclude Include="script_animation_action.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\acript_animation_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\acript_animation_action</Filter>
     </ClInclude>
     <ClInclude Include="script_animation_action_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\acript_animation_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\acript_animation_action</Filter>
     </ClInclude>
     <ClInclude Include="script_sound_action.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_sound_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_sound_action</Filter>
     </ClInclude>
     <ClInclude Include="script_sound_action_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_sound_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_sound_action</Filter>
     </ClInclude>
     <ClInclude Include="script_particle_action.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_particle_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_particle_action</Filter>
     </ClInclude>
     <ClInclude Include="script_particle_action_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_particle_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_particle_action</Filter>
     </ClInclude>
     <ClInclude Include="particle_params.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_particle_action\particle_params</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_particle_action\particle_params</Filter>
     </ClInclude>
     <ClInclude Include="particle_params_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_particle_action\particle_params</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_particle_action\particle_params</Filter>
     </ClInclude>
     <ClInclude Include="script_object_action.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_object_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_object_action</Filter>
     </ClInclude>
     <ClInclude Include="script_object_action_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_object_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_object_action</Filter>
     </ClInclude>
     <ClInclude Include="script_action_condition.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_action_condition</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_action_condition</Filter>
     </ClInclude>
     <ClInclude Include="script_action_condition_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_action_condition</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_action_condition</Filter>
     </ClInclude>
     <ClInclude Include="script_monster_action.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_monster_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_monster_action</Filter>
     </ClInclude>
     <ClInclude Include="script_monster_action_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_monster_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_monster_action</Filter>
     </ClInclude>
     <ClInclude Include="script_entity_action.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_entity_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_entity_action</Filter>
     </ClInclude>
     <ClInclude Include="script_entity_action_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_entity_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_entity_action</Filter>
     </ClInclude>
     <ClInclude Include="script_binder_object.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptBinderObject</Filter>
+      <Filter>AI\ScriptClasses\ScriptBinderObject</Filter>
     </ClInclude>
     <ClInclude Include="script_binder_object_wrapper.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptBinderObject\ScriptBinderObjectWrapper</Filter>
+      <Filter>AI\ScriptClasses\ScriptBinderObject\ScriptBinderObjectWrapper</Filter>
     </ClInclude>
     <ClInclude Include="script_effector.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptEffector</Filter>
+      <Filter>AI\ScriptClasses\ScriptEffector</Filter>
     </ClInclude>
     <ClInclude Include="script_effector_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptEffector</Filter>
+      <Filter>AI\ScriptClasses\ScriptEffector</Filter>
     </ClInclude>
     <ClInclude Include="script_effector_wrapper.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptEffector\ScriptEffectorWrapper</Filter>
+      <Filter>AI\ScriptClasses\ScriptEffector\ScriptEffectorWrapper</Filter>
     </ClInclude>
     <ClInclude Include="script_effector_wrapper_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptEffector\ScriptEffectorWrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_flags.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptFlags</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_fmatrix.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptFmatrix</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_fvector.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptFvector</Filter>
+      <Filter>AI\ScriptClasses\ScriptEffector\ScriptEffectorWrapper</Filter>
     </ClInclude>
     <ClInclude Include="script_game_object.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptGameObject</Filter>
+      <Filter>AI\ScriptClasses\ScriptGameObject</Filter>
     </ClInclude>
     <ClInclude Include="script_game_object_impl.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptGameObject</Filter>
+      <Filter>AI\ScriptClasses\ScriptGameObject</Filter>
     </ClInclude>
     <ClInclude Include="script_hit.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptHit</Filter>
+      <Filter>AI\ScriptClasses\ScriptHit</Filter>
     </ClInclude>
     <ClInclude Include="script_hit_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptHit</Filter>
+      <Filter>AI\ScriptClasses\ScriptHit</Filter>
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\script_ini_file.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptIniFile</Filter>
+      <Filter>AI\ScriptClasses\ScriptIniFile</Filter>
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\script_ini_file_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptIniFile</Filter>
+      <Filter>AI\ScriptClasses\ScriptIniFile</Filter>
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\script_token_list.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptIniFile\ScriptTokenList</Filter>
+      <Filter>AI\ScriptClasses\ScriptIniFile\ScriptTokenList</Filter>
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\script_token_list_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptIniFile\ScriptTokenList</Filter>
+      <Filter>AI\ScriptClasses\ScriptIniFile\ScriptTokenList</Filter>
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\script_rtoken_list.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptIniFile\ScriptRTokenList</Filter>
+      <Filter>AI\ScriptClasses\ScriptIniFile\ScriptRTokenList</Filter>
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\script_rtoken_list_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptIniFile\ScriptRTokenList</Filter>
+      <Filter>AI\ScriptClasses\ScriptIniFile\ScriptRTokenList</Filter>
     </ClInclude>
     <ClInclude Include="script_monster_hit_info.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptMonsterHitInfo</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_net_packet.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptNetPacket</Filter>
-    </ClInclude>
-    <ClInclude Include="script_render_device.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptRenderDevice</Filter>
+      <Filter>AI\ScriptClasses\ScriptMonsterHitInfo</Filter>
     </ClInclude>
     <ClInclude Include="script_sound_info.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptSoundInfo</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_sound_type.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptSoundType</Filter>
-    </ClInclude>
-    <ClInclude Include="script_ui_registrator.h">
-      <Filter>AI\AScript\ScriptClasses\UI</Filter>
+      <Filter>AI\ScriptClasses\ScriptSoundInfo</Filter>
     </ClInclude>
     <ClInclude Include="ScriptXMLInit.h">
-      <Filter>AI\AScript\ScriptClasses\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="key_binding_registrator.h">
-      <Filter>AI\AScript\ScriptClasses\KeyBindings</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_reader.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptReader</Filter>
-    </ClInclude>
-    <ClInclude Include="fs_registrator.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptFS</Filter>
-    </ClInclude>
-    <ClInclude Include="console_registrator.h">
-      <Filter>AI\AScript\ScriptClasses\Console</Filter>
+      <Filter>AI\ScriptClasses\UI</Filter>
     </ClInclude>
     <ClInclude Include="base_client_classes.h">
-      <Filter>AI\AScript\ScriptClasses\BaseClientClasses</Filter>
+      <Filter>AI\ScriptClasses\BaseClientClasses</Filter>
     </ClInclude>
     <ClInclude Include="base_client_classes_wrappers.h">
-      <Filter>AI\AScript\ScriptClasses\BaseClientClasses</Filter>
+      <Filter>AI\ScriptClasses\BaseClientClasses</Filter>
     </ClInclude>
     <ClInclude Include="script_callback_ex.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptCallbackEx</Filter>
+      <Filter>AI\ScriptClasses\ScriptCallbackEx</Filter>
     </ClInclude>
     <ClInclude Include="script_callback_ex_generators.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptCallbackEx</Filter>
+      <Filter>AI\ScriptClasses\ScriptCallbackEx</Filter>
     </ClInclude>
     <ClInclude Include="script_callback_ex_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptCallbackEx</Filter>
+      <Filter>AI\ScriptClasses\ScriptCallbackEx</Filter>
     </ClInclude>
     <ClInclude Include="script_callback_ex_nonvoid.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptCallbackEx</Filter>
+      <Filter>AI\ScriptClasses\ScriptCallbackEx</Filter>
     </ClInclude>
     <ClInclude Include="script_callback_ex_void.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptCallbackEx</Filter>
-    </ClInclude>
-    <ClInclude Include="script_lanim.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptLAnim</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_fcolor.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptFcolor</Filter>
+      <Filter>AI\ScriptClasses\ScriptCallbackEx</Filter>
     </ClInclude>
     <ClInclude Include="script_particles.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptParticles</Filter>
+      <Filter>AI\ScriptClasses\ScriptParticles</Filter>
     </ClInclude>
     <ClInclude Include="script_particles_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptParticles</Filter>
+      <Filter>AI\ScriptClasses\ScriptParticles</Filter>
     </ClInclude>
     <ClInclude Include="script_sound.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptSound</Filter>
+      <Filter>AI\ScriptClasses\ScriptSound</Filter>
     </ClInclude>
     <ClInclude Include="script_sound_inline.h">
-      <Filter>AI\AScript\ScriptClasses\ScriptSound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\mslotutils.h">
-      <Filter>AI\AScript\ScriptDebugger</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_callStack.h">
-      <Filter>AI\AScript\ScriptDebugger</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_debugger.h">
-      <Filter>AI\AScript\ScriptDebugger</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_debugger_messages.h">
-      <Filter>AI\AScript\ScriptDebugger</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_debugger_threads.h">
-      <Filter>AI\AScript\ScriptDebugger</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_lua_helper.h">
-      <Filter>AI\AScript\ScriptDebugger</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_engine.h">
-      <Filter>AI\AScript\ScriptEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_engine_inline.h">
-      <Filter>AI\AScript\ScriptEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_engine_space.h">
-      <Filter>AI\AScript\ScriptEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_process.h">
-      <Filter>AI\AScript\ScriptProcess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_process_inline.h">
-      <Filter>AI\AScript\ScriptProcess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_storage.h">
-      <Filter>AI\AScript\ScriptStorage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_storage_inline.h">
-      <Filter>AI\AScript\ScriptStorage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_storage_space.h">
-      <Filter>AI\AScript\ScriptStorage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_thread.h">
-      <Filter>AI\AScript\ScriptThread</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_thread_inline.h">
-      <Filter>AI\AScript\ScriptThread</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_stack_tracker.h">
-      <Filter>AI\AScript\ScriptThread\ScriptStackTracker</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\script_stack_tracker_inline.h">
-      <Filter>AI\AScript\ScriptThread\ScriptStackTracker</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\lua_studio.h">
-      <Filter>AI\AScript\lua_studio</Filter>
+      <Filter>AI\ScriptClasses\ScriptSound</Filter>
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\ai_sounds.h">
       <Filter>AI\ASound</Filter>
@@ -5560,9 +5431,6 @@
       <Filter>Core\Client\Objects\tasks_info_dialogs\dialogs</Filter>
     </ClInclude>
     <ClInclude Include="PhraseDialog.h">
-      <Filter>Core\Client\Objects\tasks_info_dialogs\dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="PhraseDialog_script.h">
       <Filter>Core\Client\Objects\tasks_info_dialogs\dialogs</Filter>
     </ClInclude>
     <ClInclude Include="PhraseDialogDefs.h">
@@ -8532,253 +8400,214 @@
       <Filter>AI\ANavigation\PatrolPaths\PatrolPoint</Filter>
     </ClCompile>
     <ClCompile Include="script_abstract_action.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_abstract_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_abstract_action</Filter>
     </ClCompile>
     <ClCompile Include="script_movement_action.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_movement_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_movement_action</Filter>
     </ClCompile>
     <ClCompile Include="script_movement_action_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_movement_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_movement_action</Filter>
     </ClCompile>
     <ClCompile Include="patrol_path_params.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_movement_action\patrol_path_params</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_movement_action\patrol_path_params</Filter>
     </ClCompile>
     <ClCompile Include="patrol_path_params_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_movement_action\patrol_path_params</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_movement_action\patrol_path_params</Filter>
     </ClCompile>
     <ClCompile Include="script_watch_action.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_watch_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_watch_action</Filter>
     </ClCompile>
     <ClCompile Include="script_watch_action_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_watch_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_watch_action</Filter>
     </ClCompile>
     <ClCompile Include="script_animation_action.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\acript_animation_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\acript_animation_action</Filter>
     </ClCompile>
     <ClCompile Include="script_animation_action_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\acript_animation_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\acript_animation_action</Filter>
     </ClCompile>
     <ClCompile Include="script_sound_action.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_sound_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_sound_action</Filter>
     </ClCompile>
     <ClCompile Include="script_sound_action_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_sound_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_sound_action</Filter>
     </ClCompile>
     <ClCompile Include="script_particle_action.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_particle_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_particle_action</Filter>
     </ClCompile>
     <ClCompile Include="script_particle_action_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_particle_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_particle_action</Filter>
     </ClCompile>
     <ClCompile Include="particle_params.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_particle_action\particle_params</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_particle_action\particle_params</Filter>
     </ClCompile>
     <ClCompile Include="particle_params_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_particle_action\particle_params</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_particle_action\particle_params</Filter>
     </ClCompile>
     <ClCompile Include="script_object_action.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_object_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_object_action</Filter>
     </ClCompile>
     <ClCompile Include="script_object_action_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_object_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_object_action</Filter>
     </ClCompile>
     <ClCompile Include="script_action_condition.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_action_condition</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_action_condition</Filter>
     </ClCompile>
     <ClCompile Include="script_action_condition_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_action_condition</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_action_condition</Filter>
     </ClCompile>
     <ClCompile Include="script_monster_action.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_monster_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_monster_action</Filter>
     </ClCompile>
     <ClCompile Include="script_monster_action_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_monster_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_monster_action</Filter>
     </ClCompile>
     <ClCompile Include="script_entity_action.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_entity_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_entity_action</Filter>
     </ClCompile>
     <ClCompile Include="script_entity_action_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptActions\script_entity_action</Filter>
+      <Filter>AI\ScriptClasses\ScriptActions\script_entity_action</Filter>
     </ClCompile>
     <ClCompile Include="script_binder_object.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptBinderObject</Filter>
+      <Filter>AI\ScriptClasses\ScriptBinderObject</Filter>
     </ClCompile>
     <ClCompile Include="script_binder_object_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptBinderObject</Filter>
+      <Filter>AI\ScriptClasses\ScriptBinderObject</Filter>
     </ClCompile>
     <ClCompile Include="script_binder_object_wrapper.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptBinderObject\ScriptBinderObjectWrapper</Filter>
+      <Filter>AI\ScriptClasses\ScriptBinderObject\ScriptBinderObjectWrapper</Filter>
     </ClCompile>
     <ClCompile Include="script_effector.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptEffector</Filter>
+      <Filter>AI\ScriptClasses\ScriptEffector</Filter>
     </ClCompile>
     <ClCompile Include="script_effector_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptEffector</Filter>
+      <Filter>AI\ScriptClasses\ScriptEffector</Filter>
     </ClCompile>
     <ClCompile Include="script_effector_wrapper.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptEffector\ScriptEffectorWrapper</Filter>
+      <Filter>AI\ScriptClasses\ScriptEffector\ScriptEffectorWrapper</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_flags_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptFlags</Filter>
+      <Filter>AI\ScriptClasses\ScriptFlags</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_fmatrix_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptFmatrix</Filter>
+      <Filter>AI\ScriptClasses\ScriptFmatrix</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_fvector_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptFvector</Filter>
+      <Filter>AI\ScriptClasses\ScriptFvector</Filter>
     </ClCompile>
     <ClCompile Include="script_game_object.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptGameObject</Filter>
+      <Filter>AI\ScriptClasses\ScriptGameObject</Filter>
     </ClCompile>
     <ClCompile Include="script_game_object2.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptGameObject</Filter>
+      <Filter>AI\ScriptClasses\ScriptGameObject</Filter>
     </ClCompile>
     <ClCompile Include="script_game_object3.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptGameObject</Filter>
+      <Filter>AI\ScriptClasses\ScriptGameObject</Filter>
     </ClCompile>
     <ClCompile Include="script_game_object4.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptGameObject</Filter>
+      <Filter>AI\ScriptClasses\ScriptGameObject</Filter>
     </ClCompile>
     <ClCompile Include="script_game_object_inventory_owner.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptGameObject</Filter>
+      <Filter>AI\ScriptClasses\ScriptGameObject</Filter>
     </ClCompile>
     <ClCompile Include="script_game_object_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptGameObject</Filter>
+      <Filter>AI\ScriptClasses\ScriptGameObject</Filter>
     </ClCompile>
     <ClCompile Include="script_game_object_script2.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptGameObject</Filter>
+      <Filter>AI\ScriptClasses\ScriptGameObject</Filter>
     </ClCompile>
     <ClCompile Include="script_game_object_script3.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptGameObject</Filter>
+      <Filter>AI\ScriptClasses\ScriptGameObject</Filter>
     </ClCompile>
     <ClCompile Include="script_game_object_script_trader.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptGameObject</Filter>
+      <Filter>AI\ScriptClasses\ScriptGameObject</Filter>
     </ClCompile>
     <ClCompile Include="script_game_object_smart_covers.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptGameObject</Filter>
+      <Filter>AI\ScriptClasses\ScriptGameObject</Filter>
     </ClCompile>
     <ClCompile Include="script_game_object_trader.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptGameObject</Filter>
+      <Filter>AI\ScriptClasses\ScriptGameObject</Filter>
     </ClCompile>
     <ClCompile Include="script_game_object_use.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptGameObject</Filter>
+      <Filter>AI\ScriptClasses\ScriptGameObject</Filter>
     </ClCompile>
     <ClCompile Include="script_game_object_use2.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptGameObject</Filter>
+      <Filter>AI\ScriptClasses\ScriptGameObject</Filter>
     </ClCompile>
     <ClCompile Include="script_hit.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptHit</Filter>
+      <Filter>AI\ScriptClasses\ScriptHit</Filter>
     </ClCompile>
     <ClCompile Include="script_hit_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptHit</Filter>
+      <Filter>AI\ScriptClasses\ScriptHit</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_ini_file.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptIniFile</Filter>
+      <Filter>AI\ScriptClasses\ScriptIniFile</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_ini_file_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptIniFile</Filter>
+      <Filter>AI\ScriptClasses\ScriptIniFile</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_token_list.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptIniFile\ScriptTokenList</Filter>
+      <Filter>AI\ScriptClasses\ScriptIniFile\ScriptTokenList</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_token_list_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptIniFile\ScriptTokenList</Filter>
+      <Filter>AI\ScriptClasses\ScriptIniFile\ScriptTokenList</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_rtoken_list_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptIniFile\ScriptRTokenList</Filter>
+      <Filter>AI\ScriptClasses\ScriptIniFile\ScriptRTokenList</Filter>
     </ClCompile>
     <ClCompile Include="script_monster_hit_info_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptMonsterHitInfo</Filter>
+      <Filter>AI\ScriptClasses\ScriptMonsterHitInfo</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_net_packet_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptNetPacket</Filter>
+      <Filter>AI\ScriptClasses\ScriptNetPacket</Filter>
     </ClCompile>
     <ClCompile Include="script_render_device_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptRenderDevice</Filter>
+      <Filter>AI\ScriptClasses\ScriptRenderDevice</Filter>
     </ClCompile>
     <ClCompile Include="script_sound_info_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptSoundInfo</Filter>
+      <Filter>AI\ScriptClasses\ScriptSoundInfo</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_sound_type_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptSoundType</Filter>
+      <Filter>AI\ScriptClasses\ScriptSoundType</Filter>
     </ClCompile>
     <ClCompile Include="ScriptXMLInit.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI</Filter>
+      <Filter>AI\ScriptClasses\UI</Filter>
     </ClCompile>
     <ClCompile Include="ui_export_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI</Filter>
+      <Filter>AI\ScriptClasses\UI</Filter>
     </ClCompile>
     <ClCompile Include="key_binding_registrator_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\KeyBindings</Filter>
+      <Filter>AI\ScriptClasses\KeyBindings</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_reader_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptReader</Filter>
+      <Filter>AI\ScriptClasses\ScriptReader</Filter>
     </ClCompile>
     <ClCompile Include="fs_registrator_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptFS</Filter>
+      <Filter>AI\ScriptClasses\ScriptFS</Filter>
     </ClCompile>
     <ClCompile Include="console_registrator_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\Console</Filter>
+      <Filter>AI\ScriptClasses\Console</Filter>
     </ClCompile>
     <ClCompile Include="base_client_classes_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\BaseClientClasses</Filter>
+      <Filter>AI\ScriptClasses\BaseClientClasses</Filter>
     </ClCompile>
     <ClCompile Include="script_lanim.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptLAnim</Filter>
+      <Filter>AI\ScriptClasses\ScriptLAnim</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_fcolor_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptFcolor</Filter>
+      <Filter>AI\ScriptClasses\ScriptFcolor</Filter>
     </ClCompile>
     <ClCompile Include="script_particles.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptParticles</Filter>
+      <Filter>AI\ScriptClasses\ScriptParticles</Filter>
     </ClCompile>
     <ClCompile Include="script_particles_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptParticles</Filter>
+      <Filter>AI\ScriptClasses\ScriptParticles</Filter>
     </ClCompile>
     <ClCompile Include="script_sound.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptSound</Filter>
+      <Filter>AI\ScriptClasses\ScriptSound</Filter>
     </ClCompile>
     <ClCompile Include="script_sound_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptSound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\script_callStack.cpp">
-      <Filter>AI\AScript\ScriptDebugger</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\script_debugger.cpp">
-      <Filter>AI\AScript\ScriptDebugger</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\script_debugger_threads.cpp">
-      <Filter>AI\AScript\ScriptDebugger</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\script_lua_helper.cpp">
-      <Filter>AI\AScript\ScriptDebugger</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\script_engine.cpp">
-      <Filter>AI\AScript\ScriptEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\script_engine_export.cpp">
-      <Filter>AI\AScript\ScriptEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="script_engine_help.cpp">
-      <Filter>AI\AScript\ScriptEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\script_engine_script.cpp">
-      <Filter>AI\AScript\ScriptEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\script_process.cpp">
-      <Filter>AI\AScript\ScriptProcess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\script_storage.cpp">
-      <Filter>AI\AScript\ScriptStorage</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\script_thread.cpp">
-      <Filter>AI\AScript\ScriptThread</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\script_stack_tracker.cpp">
-      <Filter>AI\AScript\ScriptThread\ScriptStackTracker</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\lua_studio.cpp">
-      <Filter>AI\AScript\lua_studio</Filter>
+      <Filter>AI\ScriptClasses\ScriptSound</Filter>
     </ClCompile>
     <ClCompile Include="ai_sounds.cpp">
       <Filter>AI\ASound</Filter>

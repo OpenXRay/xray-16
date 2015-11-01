@@ -19,7 +19,7 @@
 #include "editor_environment_weathers_manager.hpp"
 #include "editor_environment_detail.hpp"
 #include "ide.hpp"
-#include "xrServerEntities/object_broker.h"
+#include "Common/object_broker.h"
 #include "LightAnimLibrary.h"
 #include "editor_environment_weathers_time.hpp"
 #include "Include/xrRender/particles_systems_library_interface.hpp"

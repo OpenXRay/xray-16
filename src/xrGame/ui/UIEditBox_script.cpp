@@ -1,21 +1,20 @@
 #include "pch_script.h"
 #include "UIEditBox.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CUIEditBox::script_register(lua_State *L)
+SCRIPT_EXPORT(CUIEditBox, (CUIWindow),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CUICustomEdit, CUIWindow>("CUICustomEdit")
 		.def("SetText",				&CUICustomEdit::SetText)
 		.def("GetText",				&CUICustomEdit::GetText)
 		.def("CaptureFocus",		&CUICustomEdit::CaptureFocus)
-		.def("SetNextFocusCapturer",&CUICustomEdit::SetNextFocusCapturer),		
-
+		.def("SetNextFocusCapturer",&CUICustomEdit::SetNextFocusCapturer),
 		class_<CUIEditBox, CUICustomEdit>("CUIEditBox")
 		.def(						constructor<>())
 		.def("InitTexture",			&CUIEditBox::InitTexture)
 	];
-}
+});

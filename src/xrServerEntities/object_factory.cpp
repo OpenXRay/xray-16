@@ -8,7 +8,7 @@
 
 #include "stdafx.h"
 #include "object_factory.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 
 CObjectFactory *g_object_factory = 0;
 

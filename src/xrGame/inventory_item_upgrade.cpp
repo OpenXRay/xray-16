@@ -11,7 +11,7 @@
 #include "inventory_item_impl.h"
 
 #include "ai_object_location.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 
 #include "ai_space.h"
 #include "alife_simulator.h"

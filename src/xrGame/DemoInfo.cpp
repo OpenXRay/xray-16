@@ -4,7 +4,8 @@
 #include "Level.h"
 #include "DemoInfo.h"
 #include "xrCore/stream_reader.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
 
@@ -185,13 +186,11 @@ demo_player_info const * demo_info::get_player(u32 player_index) const
 	return m_players[player_index];
 }
 
-
 using namespace luabind;
 
-#pragma optimize("s",on)
-void demo_player_info::script_register(lua_State *L)
+SCRIPT_EXPORT(demo_player_info, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<demo_player_info>("demo_player_info")
 			.def("get_name",		&demo_player_info::get_name)
@@ -202,11 +201,11 @@ void demo_player_info::script_register(lua_State *L)
 			.def("get_team",		&demo_player_info::get_team)
 			.def("get_rank",		&demo_player_info::get_rank)
 	];
-}
+});
 
-void demo_info::script_register(lua_State *L)
+SCRIPT_EXPORT(demo_info, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<demo_info>("demo_info")
 			.def("get_map_name",		&demo_info::get_map_name)
@@ -217,4 +216,4 @@ void demo_info::script_register(lua_State *L)
 			.def("get_players_count",	&demo_info::get_players_count)
 			.def("get_player",			&demo_info::get_player)
 	];
-}
+});

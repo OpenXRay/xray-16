@@ -7,7 +7,7 @@
 #include "xrMessages.h"
 #include "xrserver.h"
 #include "Level.h"
-#include "script_debugger.h"
+#include "xrScriptEngine/script_debugger.hpp"
 #include "ai_debug.h"
 #include "alife_simulator.h"
 #include "game_cl_base.h"
@@ -18,12 +18,10 @@
 #include "actor.h"
 #include "Actor_Flags.h"
 #include "customzone.h"
-#include "script_engine.h"
-#include "script_engine_space.h"
-#include "script_process.h"
+#include "xrScriptEngine/script_engine.hpp"
+#include "xrScriptEngine/script_process.hpp"
 #include "xrServer_Objects.h"
 #include "ui/UIMainIngameWnd.h"
-
 #include "xrPhysics/iphworld.h"
 #include "string_table.h"
 #include "autosave_manager.h"
@@ -138,16 +136,6 @@ enum E_COMMON_FLAGS{
 
 CUIOptConCom g_OptConCom;
 
-#ifndef PURE_ALLOC
-//#	ifndef USE_MEMORY_MONITOR
-#		define SEVERAL_ALLOCATORS
-//#	endif // USE_MEMORY_MONITOR
-#endif // PURE_ALLOC
-
-#ifdef SEVERAL_ALLOCATORS
-	extern		u32 game_lua_memory_usage	();
-#endif // SEVERAL_ALLOCATORS
-
 typedef void (*full_memory_stats_callback_type) ( );
 XRCORE_API full_memory_stats_callback_type g_full_memory_stats_callback;
 
@@ -155,32 +143,26 @@ static void full_memory_stats	( )
 {
 	Memory.mem_compact		();
 	size_t	_process_heap	= ::Memory.mem_usage();
-#ifdef SEVERAL_ALLOCATORS
-	u32		_game_lua		= game_lua_memory_usage();
-	u32		_render			= ::Render->memory_usage();
-#endif // SEVERAL_ALLOCATORS
+#ifndef PURE_ALLOC
+	u32		_game_lua		= CScriptEngine::GetMemoryUsage();
+	u32		_render			= GlobalEnv.Render->memory_usage();
+#endif
 	int		_eco_strings	= (int)g_pStringContainer->stat_economy			();
 	int		_eco_smem		= (int)g_pSharedMemoryContainer->stat_economy	();
 	u32		m_base=0,c_base=0,m_lmaps=0,c_lmaps=0;
-
-	Render->ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
-
+    GlobalEnv.Render->ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
 	log_vminfo	();
-
 	Msg		("* [ D3D ]: textures[%d K]", (m_base+m_lmaps)/1024);
-
-#ifndef SEVERAL_ALLOCATORS
+#ifdef PURE_ALLOC
 	Msg		("* [x-ray]: process heap[%u K]",_process_heap/1024);
-#else // SEVERAL_ALLOCATORS
+#else
 	Msg		("* [x-ray]: process heap[%u K], game lua[%d K], render[%d K]",_process_heap/1024,_game_lua/1024,_render/1024);
-#endif // SEVERAL_ALLOCATORS
-
+#endif
 	Msg		("* [x-ray]: economy: strings[%d K], smem[%d K]",_eco_strings/1024,_eco_smem);
-
 #ifdef FS_DEBUG
 	Msg		("* [x-ray]: file mapping: memory[%d K], count[%d]",g_file_mapped_memory/1024,g_file_mapped_count);
 	dump_file_mappings	();
-#endif // DEBUG
+#endif
 }
 
 class CCC_MemStats : public IConsole_Command
@@ -1136,14 +1118,11 @@ public:
 };
 
 #ifdef DEBUG
-extern void print_help(lua_State *L);
 
 struct CCC_LuaHelp : public IConsole_Command {
 	CCC_LuaHelp(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
 
-	virtual void Execute(LPCSTR args) {
-		print_help(ai().script_engine().lua());
-	}
+	virtual void Execute(LPCSTR args) { GlobalEnv.ScriptEngine->PrintHelp(); }
 };
 
 struct CCC_ShowSmartCastStats : public IConsole_Command {
@@ -1242,8 +1221,8 @@ public:
 			P->m_Flags.set	(FS_Path::flNeedRescan,TRUE);
 			FS.rescan_pathes();
 			// run script
-			if (ai().script_engine().script_process(ScriptEngine::eScriptProcessorLevel))
-				ai().script_engine().script_process(ScriptEngine::eScriptProcessorLevel)->add_script(args,false,true);
+			if (ai().script_engine().script_process(ScriptProcessor::Level))
+				ai().script_engine().script_process(ScriptProcessor::Level)->add_script(args,false,true);
 		}
 	}
 
@@ -1269,8 +1248,8 @@ public:
 		if (!xr_strlen(args))
 			Log("* Specify string to run!");
 		else {
-			if (ai().script_engine().script_process(ScriptEngine::eScriptProcessorLevel)) {
-				ai().script_engine().script_process(ScriptEngine::eScriptProcessorLevel)->add_script(args,true,true);
+			if (ai().script_engine().script_process(ScriptProcessor::Level)) {
+				ai().script_engine().script_process(ScriptProcessor::Level)->add_script(args,true,true);
 				return;
 			}
 
@@ -1589,10 +1568,10 @@ public:
 			return;
 		}
 
-		IRenderVisual			*visual = Render->model_Create(arguments);
+		IRenderVisual			*visual = GlobalEnv.Render->model_Create(arguments);
 		IKinematics				*kinematics = smart_cast<IKinematics*>(visual);
 		if (!kinematics) {
-			Render->model_Delete(visual);
+            GlobalEnv.Render->model_Delete(visual);
 			Msg					("! Invalid visual type \"%s\" (not a IKinematics)",arguments);
 			return;
 		}
@@ -1601,7 +1580,7 @@ public:
 		for (u16 i=0, n=kinematics->LL_BoneCount(); i<n; ++i)
 			Msg					("%s",*kinematics->LL_GetData(i).name);
 		
-		Render->model_Delete	(visual);
+        GlobalEnv.Render->model_Delete(visual);
 	}
 };
 
@@ -1863,7 +1842,7 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"ai_use_smart_covers",			&psAI_Flags,			aiUseSmartCovers);
 	CMD3(CCC_Mask,				"ai_use_smart_covers_animation_slots", &psAI_Flags,		(u32)aiUseSmartCoversAnimationSlot);
 	CMD4(CCC_Float,				"ai_smart_factor",				&g_smart_cover_factor,	0.f, 1000000.f);
-	CMD3(CCC_Mask,				"ai_dbg_lua",					&psAI_Flags,			aiLua);
+	CMD3(CCC_Mask,				"lua_debug",					&g_LuaDebug, 1);
 #endif // MASTER_GOLD
 
 #ifdef DEBUG
@@ -1893,8 +1872,8 @@ void CCC_RegisterCommands()
 	CMD3(CCC_Mask,				"ai_draw_game_graph_objects",		&psAI_Flags,	aiDrawGameGraphObjects		);
 	CMD3(CCC_Mask,				"ai_draw_game_graph_real_pos",		&psAI_Flags,	aiDrawGameGraphRealPos		);
 	
-
-	CMD3(CCC_Mask,				"ai_nil_object_access",	&psAI_Flags,	aiNilObjectAccess);
+    // XXX: register from script engine
+	//CMD3(CCC_Mask,				"lua_nil_object_access",	&psAI_Flags,	aiNilObjectAccess);
 
 	CMD3(CCC_Mask,				"ai_draw_visibility_rays",	&psAI_Flags,	aiDrawVisibilityRays);
 	CMD3(CCC_Mask,				"ai_animation_stats",		&psAI_Flags,	aiAnimationStats);

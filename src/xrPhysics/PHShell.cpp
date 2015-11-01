@@ -1003,7 +1003,7 @@ void CPHShell::EnabledCallbacks(BOOL val)
 
 
 template< typename T>
-void for_each_bone_id( IKinematics &K, T op )
+void for_each_bone_id( IKinematics &K, T &op )
 {
     u16 bn =  K.LL_BoneCount();
     for(u16 i = 0; i < bn; ++i )

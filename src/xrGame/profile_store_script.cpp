@@ -1,16 +1,13 @@
 #include "stdafx.h"
 #include "profile_store.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
+using namespace gamespy_profile;
 
-#pragma optimize("s",on)
-
-namespace gamespy_profile
+SCRIPT_EXPORT(profile_store, (),
 {
-
-void profile_store::script_register	(lua_State *L)
-{
-	module(L)
+	module(luaState)
 	[
 		class_<profile_store>("profile_store")
 			.def("load_current_profile",		&profile_store::load_current_profile)
@@ -35,7 +32,4 @@ void profile_store::script_register	(lua_State *L)
 				value("bst_score_types_count",		int(bst_score_types_count))
 			]
 	];
-}; 
-
-
-} //namespace gamespy_profile
+});

@@ -13,7 +13,7 @@
 #include "ai_space.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "string_table.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "xrEngine/Engine.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
@@ -938,7 +938,7 @@ void xrServer::verify_entity				(const CSE_Abstract *entity) const
 
 #endif // DEBUG
 
-void xrServer::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+void xrServer::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
 {
     stats.FrameEnd();
     font.OutNext("Server:");

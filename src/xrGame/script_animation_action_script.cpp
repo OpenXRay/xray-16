@@ -8,13 +8,13 @@
 
 #include "pch_script.h"
 #include "script_animation_action.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptAnimationAction::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptAnimationAction, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptAnimationAction>("anim")
 			.enum_("type")
@@ -49,4 +49,4 @@ void CScriptAnimationAction::script_register(lua_State *L)
 			.def("type",						&CScriptAnimationAction::SetMentalState)
 			.def("completed",					(bool (CScriptAnimationAction::*)())(&CScriptAnimationAction::completed))
 	];
-}
+});

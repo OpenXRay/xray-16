@@ -1,6 +1,6 @@
 #include "pch_script.h"
 #include "PhraseScript.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "ai_space.h"
 #include "gameobject.h"
 #include "script_game_object.h"

@@ -2,7 +2,7 @@
 #include "PerformanceAlert.hpp"
 #include "xrEngine/GameFont.h"
 
-void PerformanceAlert::Print(CGameFont &font, const char *format, ...)
+void PerformanceAlert::Print(IGameFont &font, const char *format, ...)
 {
     u32 refColor = font.GetColor();
     Fvector2 refPos = font.GetPosition();

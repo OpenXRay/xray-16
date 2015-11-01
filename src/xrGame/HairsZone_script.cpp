@@ -1,14 +1,14 @@
 #include "pch_script.h"
 #include "HairsZone.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CHairsZone::script_register	(lua_State *L)
+SCRIPT_EXPORT(CHairsZone, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CHairsZone,CGameObject>("CHairsZone")
 			.def(constructor<>())
 	];
-}
+});

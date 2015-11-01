@@ -1,14 +1,14 @@
 #include "pch_script.h"
 #include "tushkano.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CTushkano::script_register(lua_State *L)
+SCRIPT_EXPORT(CTushkano, (CGameObject),
 {
-	module(L)
-		[
-			class_<CTushkano,CGameObject>("CTushkano")
-			.def(constructor<>())
-		];
-}
+	module(luaState)
+	[
+		class_<CTushkano,CGameObject>("CTushkano")
+		.def(constructor<>())
+	];
+});

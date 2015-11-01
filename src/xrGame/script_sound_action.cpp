@@ -9,7 +9,7 @@
 #include "stdafx.h"
 #include "script_sound_action.h"
 #include "ai_space.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 
 CScriptSoundAction::~CScriptSoundAction	()
 {
@@ -26,7 +26,7 @@ void CScriptSoundAction::SetSound			(LPCSTR caSoundToPlay)
 		m_bCompleted	= false;
 	}
 	else {
-		ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeError,"File not found \"%s\"!",l_caFileName);
+		ai().script_engine().script_log			(LuaMessageType::Error,"File not found \"%s\"!",l_caFileName);
 		m_bStartedToPlay= true;
 		m_bCompleted	= true;
 	}

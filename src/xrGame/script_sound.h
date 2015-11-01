@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "script_export_space.h"
 #include "ai_sounds.h"
 
 class CScriptGameObject;
@@ -46,11 +45,6 @@ public:
 	IC		const float			GetMaxDistance		() const;
 	IC		const float			GetVolume			() const;
 	IC		bool				IsPlaying			() const;
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CScriptSound)
-#undef script_type_list
-#define script_type_list save_type_list(CScriptSound)
 
 #include "script_sound_inline.h"

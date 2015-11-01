@@ -1,7 +1,8 @@
 #ifndef xrCoreH
 #define xrCoreH
 #pragma once
-
+// XXX: upgrade std hash structures
+#define _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
 #ifndef DEBUG
 # define MASTER_GOLD
 #endif // DEBUG

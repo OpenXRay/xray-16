@@ -6,10 +6,8 @@
 #include "entity.h"
 #include "phskeleton.h"
 #include "hit_immunity.h"
-#include "script_export_space.h"
 #include "memory_manager.h"
 #include "HudSound.h"
-
 #include "patrol_path.h"
 #include "PHDestroyable.h"
 #include "Explosive.h"
@@ -230,12 +228,15 @@ protected:
 	shared_str						m_smoke_particle;
 	CParticlesObject*				m_pParticle;
 	Fmatrix							m_particleXFORM;
-
+public:
 	void							StartFlame					();
+protected:
 	void							UpdateHeliParticles			();
+public:
 	void							DieHelicopter				();
 	void							TurnLighting				(bool bOn);
 	void							TurnEngineSound				(bool bOn);
+protected:
 	//explosive
 	virtual void					OnAfterExplosion			(){};
 	virtual void					GetRayExplosionSourcePos	(Fvector &pos){random_point_in_object_box(pos,this);}
@@ -351,9 +352,4 @@ public:
 public:
 	virtual void			OnRender						();
 #endif
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CHelicopter)
-#undef script_type_list
-#define script_type_list save_type_list(CHelicopter)

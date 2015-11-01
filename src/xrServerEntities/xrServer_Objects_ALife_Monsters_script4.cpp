@@ -13,6 +13,7 @@
 #ifdef XRGAME_EXPORTS
 #include "relation_registry.h"
 #endif // #ifdef XRGAME_EXPORTS
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -77,14 +78,12 @@ void ForceSetGoodwill(CSE_ALifeMonsterAbstract *self, int goodwill, ALife::_OBJE
 {
 	RELATION_REGISTRY().ForceSetGoodwill(self->ID, pWhoToSet, goodwill);
 }
-
-
-
 #endif // #ifdef XRGAME_EXPORTS
-#pragma optimize("s",on)
-void CSE_ALifeMonsterAbstract::script_register(lua_State *L)
+
+static void CSE_ALifeMonsterAbstract_Export(lua_State *luaState)
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_monster2(
 			CSE_ALifeMonsterAbstract,
 			"cse_alife_monster_abstract",
@@ -106,15 +105,18 @@ void CSE_ALifeMonsterAbstract::script_register(lua_State *L)
 		.def("current_level_travel_speed",		&current_level_travel_speed2)		
 		.def("kill",							&CSE_ALifeMonsterAbstract::kill)
 		.def("has_detector",					&CSE_ALifeMonsterAbstract::has_detector)
-
 		.def("force_set_goodwill",				&ForceSetGoodwill)
-#endif // #ifdef XRGAME_EXPORTS
+#endif
 	];
 }
 
-void CSE_ALifeHumanAbstract::script_register(lua_State *L)
+SCRIPT_EXPORT_FUNC(CSE_ALifeMonsterAbstract, (CSE_ALifeCreatureAbstract, CSE_ALifeSchedulable),
+    CSE_ALifeMonsterAbstract_Export);
+
+static void CSE_ALifeHumanAbstract_Export(lua_State *luaState)
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_monster2(
 			CSE_ALifeHumanAbstract,
 			"cse_alife_human_abstract",
@@ -125,18 +127,21 @@ void CSE_ALifeHumanAbstract::script_register(lua_State *L)
 #ifdef XRGAME_EXPORTS
 		.def("rank",				&CSE_ALifeTraderAbstract::Rank)
 		.def("set_rank",			&CSE_ALifeTraderAbstract::SetRank)
-
 #endif
 	];
 }
 
-void CSE_ALifePsyDogPhantom::script_register(lua_State *L)
+SCRIPT_EXPORT_FUNC(CSE_ALifeHumanAbstract, (CSE_ALifeTraderAbstract, CSE_ALifeMonsterAbstract),
+    CSE_ALifeHumanAbstract_Export);
+
+SCRIPT_EXPORT(CSE_ALifePsyDogPhantom, (CSE_ALifeMonsterBase),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_monster1(
 			CSE_ALifePsyDogPhantom,
 			"cse_alife_psydog_phantom",
 			CSE_ALifeMonsterBase
 			)
 	];
-}
+});

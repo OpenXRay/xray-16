@@ -39,7 +39,7 @@ CTexture::CTexture		()
 	m_material			= 1.0f;
 	bind				= fastdelegate::FastDelegate1<u32>(this,&CTexture::apply_load);
 }
-
+// XXX: render scripts should call this destructor before resource manager gets destroyed
 CTexture::~CTexture()
 {
 	Unload				();

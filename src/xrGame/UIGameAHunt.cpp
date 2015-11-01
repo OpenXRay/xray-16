@@ -11,7 +11,7 @@
 #include "ui/UIRankIndicator.h"
 #include "ui/UIHelper.h"
 #include "UITeamPanels.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 
 #define TEAM_PANELS_AHUNT_XML_NAME "ui_team_panels_ahunt.xml"
 

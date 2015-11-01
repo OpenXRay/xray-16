@@ -86,10 +86,10 @@ void CUIFrameWindow::Draw()
 
 void CUIFrameWindow::DrawElements()
 {
-	UIRender->SetShader			(*m_shader);
+    GlobalEnv.UIRender->SetShader			(*m_shader);
 
 	Fvector2					ts;
-	UIRender->GetActiveTextureResolution(ts);
+    GlobalEnv.UIRender->GetActiveTextureResolution(ts);
 
 	Frect						rect;
 	GetAbsoluteRect				(rect);
@@ -118,7 +118,7 @@ void CUIFrameWindow::DrawElements()
 
 	rect_count					*= 6;
 	
-	UIRender->StartPrimitive	(rect_count, IUIRender::ptTriList, UI().m_currentPointType);
+    GlobalEnv.UIRender->StartPrimitive	(rect_count, IUIRender::ptTriList, UI().m_currentPointType);
 
 	Fvector2 LTt, RBt;
 	Fvector2 LTp, RBp;
@@ -181,7 +181,7 @@ void CUIFrameWindow::DrawElements()
 		draw_tile_rect			(tmp, fmBK, ts);
 	}
 
-	UIRender->FlushPrimitive	();
+    GlobalEnv.UIRender->FlushPrimitive	();
 }
 
 bool CUIFrameWindow::get_points(Frect const& r, int i, Fvector2& LTp, Fvector2& RBp, Fvector2& LTt, Fvector2& RBt)

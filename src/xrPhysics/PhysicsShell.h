@@ -189,13 +189,7 @@ public:
 	virtual			void						get_Box									( Fvector&	sz, Fvector& c )const																					{ return	CPhysicsBase::get_Box( sz, c ); }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	virtual										~CPhysicsElement						()																													{};
-//	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-
-//add_to_type_list(CPhysicsElement)
-//#undef script_type_list
-//#define script_type_list save_type_list(CPhysicsElement)
-
 
 XRPHYSICS_API float NonElasticCollisionEnergy( CPhysicsElement *e1, CPhysicsElement *e2, const Fvector &norm);// norm - from 2 to 1
 
@@ -279,11 +273,8 @@ public:
 	virtual		bool					IsHingeJoint				()																				=0;
 	virtual		void 					SetForce					(const float force,const int axis_num=-1)										=0;
 	virtual		void 					SetVelocity					(const float velocity=0.f,const int axis_num=-1)								=0;
-//	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-//add_to_type_list(CPhysicsJoint)
-//#undef script_type_list
-//#define script_type_list save_type_list(CPhysicsJoint)
+
 // ABSTRACT: 
 class CPHIsland;
 class CPhysicsShellAnimator;
@@ -407,11 +398,7 @@ virtual				void						GetGlobalTransformDynamic					(Fmatrix* m) 																
 	virtual			void						SetPrefereExactIntegration					()																							= 0;
 	virtual										~CPhysicsShell								()																							;
 	//build_FromKinematics		in returns elements  & joint pointers according bone IDs;
-//	DECLARE_SCRIPT_REGISTER_FUNCTION
 	};
-//add_to_type_list(CPhysicsShell)
-//#undef script_type_list
-//#define script_type_list save_type_list(CPhysicsShell)
 
 struct dContact;
 struct SGameMtl;

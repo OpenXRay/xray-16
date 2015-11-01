@@ -6,7 +6,6 @@
 
 #ifndef _EDITOR
 	#include <nvapi.h>
-	#include "ATI/atimgpud.h"
 #endif
 
 namespace
@@ -71,8 +70,9 @@ u32 GetNVGpuNum()
 
 u32 GetATIGpuNum()
 {
-	int iGpuNum = AtiMultiGPUAdapters();
-	//int iGpuNum = 1;
+    // XXX: use AMD AGS
+	//int iGpuNum = AtiMultiGPUAdapters();
+	int iGpuNum = 1;
 
 	if (iGpuNum>1)
 	{

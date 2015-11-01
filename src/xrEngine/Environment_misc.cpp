@@ -7,7 +7,7 @@
 #include "rain.h"
 
 #include "IGame_Level.h"
-#include "xrServerEntities/object_broker.h"
+#include "Common/object_broker.h"
 #include "xrServerEntities/LevelGameDef.h"
 
 #include "securom_api.h"

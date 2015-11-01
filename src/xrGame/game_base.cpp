@@ -1,7 +1,7 @@
 #include "pch_script.h"
 #include "game_base.h"
 #include "ai_space.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "Level.h"
 #include "xrMessages.h"
 

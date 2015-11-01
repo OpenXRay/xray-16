@@ -8,13 +8,13 @@
 
 #include "pch_script.h"
 #include "script_rtoken_list.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CScriptRTokenList::script_register(lua_State *L)
+SCRIPT_EXPORT(CScriptRTokenList, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CScriptRTokenList>("rtoken_list")
 			.def(					constructor<>())
@@ -24,4 +24,4 @@ void CScriptRTokenList::script_register(lua_State *L)
 			.def("count",			&CScriptRTokenList::size)
 			.def("get",				&CScriptRTokenList::get)
 	];
-}
+});

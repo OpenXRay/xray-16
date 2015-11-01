@@ -8,15 +8,15 @@
 
 #include "pch_script.h"
 #include "ai/crow/ai_crow.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CAI_Crow::script_register(lua_State *L)
+SCRIPT_EXPORT(CAI_Crow, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CAI_Crow,CGameObject>("CAI_Crow")
 			.def(constructor<>())
 	];
-}
+});

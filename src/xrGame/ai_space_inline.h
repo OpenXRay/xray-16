@@ -58,11 +58,11 @@ IC	const CCoverManager			&CAI_Space::cover_manager			() const
 	VERIFY					(m_cover_manager);
 	return					(*m_cover_manager);
 }
-
+// XXX: [ai] delete
 IC	CScriptEngine				&CAI_Space::script_engine			() const
 {
-	VERIFY					(m_script_engine);
-	return					(*m_script_engine);
+	VERIFY					(GlobalEnv.ScriptEngine);
+	return					(*GlobalEnv.ScriptEngine);
 }
 
 IC	const CPatrolPathStorage &CAI_Space::patrol_paths				() const

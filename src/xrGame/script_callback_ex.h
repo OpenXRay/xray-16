@@ -9,7 +9,7 @@
 #pragma once
 
 #include "ai_space.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 
 IC	bool compare_safe(const luabind::object &o1 , const luabind::object &o2)
 {

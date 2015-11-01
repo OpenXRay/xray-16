@@ -4,7 +4,7 @@
 #	include "ui/xrUIXmlParser.h"
 #else // XRGAME_EXPORTS
 #	include "xrUIXmlParser.h"
-#	include "object_broker.h"
+#	include "Common/object_broker.h"
 #endif // XRGAME_EXPORTS
 
 

@@ -5,16 +5,13 @@
 #include "hit_immunity.h"
 #include "damage_manager.h"
 #include "DestroyablePhysicsObject.h"
-
-
-
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CPhysicObject::script_register(lua_State *L)
+SCRIPT_EXPORT(CPhysicObject, (CGameObject),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CDestroyablePhysicsObject,CGameObject>("CDestroyablePhysicsObject")
 			.def(constructor<>()),
@@ -29,6 +26,5 @@ void CPhysicObject::script_register(lua_State *L)
 			.def("stop_bones_sound",				&CPhysicObject::stop_bones_sound)
 			.def("set_door_ignore_dynamics",		&CPhysicObject::set_door_ignore_dynamics)
 			.def("unset_door_ignore_dynamics",		&CPhysicObject::unset_door_ignore_dynamics)
-
 	];
-}
+});

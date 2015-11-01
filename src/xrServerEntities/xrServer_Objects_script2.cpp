@@ -1,21 +1,23 @@
 #include "pch_script.h"
 #include "xrServer_Objects.h"
 #include "xrServer_script_macroses.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CSE_PHSkeleton::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_PHSkeleton, (),
 {
-	module(L)[
+	module(luaState)
+    [
 		class_<CSE_PHSkeleton>
 			("cse_ph_skeleton")
 	];
-}
+});
 
-void CSE_AbstractVisual::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_AbstractVisual, (CSE_Visual, CSE_Abstract),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_abstract2(
 			CSE_AbstractVisual,
 			"CSE_AbstractVisual",
@@ -24,17 +26,18 @@ void CSE_AbstractVisual::script_register(lua_State *L)
 			)
 		.def	("getStartupAnimation",		&CSE_AbstractVisual::getStartupAnimation)
 	];
-}
+});
 
 /**
-void CSE_SpawnGroup::script_register(lua_State *L)
+SCRIPT_EXPORT(CSE_SpawnGroup, (CSE_Abstract),
 {
-	module(L)[
+	module(luaState)
+    [
 		luabind_class_abstract1(
 			CSE_SpawnGroup,
 			"cse_event",
 			CSE_Abstract
 		)
 	];
-}
+});
 /**/

@@ -2,11 +2,10 @@
 #include "xrCore/xrCore.h"
 
 #define MAX_MB_CHARS 4096
-typedef u16 wide_char;
 
-XRCORE_API u16 mbhMulti2Wide(wide_char *WideStr, wide_char *WidePos, u16 WideStrSize, const char *MultiStr);
+XRCORE_API u16 mbhMulti2Wide(wchar_t *WideStr, wchar_t *WidePos, u16 WideStrSize, const char *MultiStr);
 
-IC bool IsNeedSpaceCharacter(wide_char wc)
+IC bool IsNeedSpaceCharacter(wchar_t wc)
 {
     return (
         (wc == 0x0020) ||
@@ -23,7 +22,7 @@ IC bool IsNeedSpaceCharacter(wide_char wc)
         (wc == 0x3001));
 }
 
-IC bool IsBadStartCharacter(wide_char wc)
+IC bool IsBadStartCharacter(wchar_t wc)
 {
     return (
         IsNeedSpaceCharacter(wc) ||
@@ -38,7 +37,7 @@ IC bool IsBadStartCharacter(wide_char wc)
         (wc == 0xFF09));
 }
 
-IC bool IsBadEndCharacter(wide_char wc)
+IC bool IsBadEndCharacter(wchar_t wc)
 {
     return (
         (wc == 0x0028) ||
@@ -46,7 +45,7 @@ IC bool IsBadEndCharacter(wide_char wc)
         (wc == 0x4E00));
 }
 
-IC bool IsAlphaCharacter(wide_char wc)
+IC bool IsAlphaCharacter(wchar_t wc)
 {
     return (
         ((wc >= 0x0030) && (wc <= 0x0039)) ||

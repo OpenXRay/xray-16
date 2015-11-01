@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "script_export_space.h"
 #include "patrol_path_manager_space.h"
 #include "game_graph_space.h"
 
@@ -36,11 +35,6 @@ public:
 			bool					flag				(u32 index, u8 flag_index) const;
 			Flags32					flags				(u32 index) const;
 			bool					terminal			(u32 index) const;
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-add_to_type_list(CPatrolPathParams)
-#undef script_type_list
-#define script_type_list save_type_list(CPatrolPathParams)
 
 #include "patrol_path_params_inline.h"

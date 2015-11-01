@@ -11,7 +11,7 @@
 #include "restriction_space.h"
 #include "space_restriction_manager.h"
 #include "space_restriction_bridge.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 
 const u32 time_to_delete = 300000;
 

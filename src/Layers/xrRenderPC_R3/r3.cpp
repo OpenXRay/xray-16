@@ -657,7 +657,7 @@ CRender::~CRender()
 {
 }
 
-void CRender::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+void CRender::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
 {
     D3DXRenderBase::DumpStatistics(font, alert);
     Stats.FrameEnd();
@@ -843,7 +843,7 @@ public:
 	HRESULT __stdcall	Open	(D3D10_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes)
 	{
 		string_path				pname;
-		strconcat				(sizeof(pname),pname,::Render->getShaderPath(),pFileName);
+		strconcat				(sizeof(pname),pname,GlobalEnv.Render->getShaderPath(),pFileName);
 		IReader*		R		= FS.r_open	("$game_shaders$",pname);
 		if (0==R)				{
 			// possibly in shared directory or somewhere else - open directly

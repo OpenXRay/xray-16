@@ -9,7 +9,7 @@
 #include "ui/UIActorMenu.h"
 
 #include "eatable_item.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "xrmessages.h"
 #include "xr_level_controller.h"
 #include "Level.h"
@@ -1167,7 +1167,7 @@ CInventoryItem	*CInventory::tpfGetObjectByIndex(int iIndex)
                 return	(*l_it);
 	}
 	else {
-		ai().script_engine().script_log	(ScriptStorage::eLuaMessageTypeError,"invalid inventory index!");
+		ai().script_engine().script_log	(LuaMessageType::Error,"invalid inventory index!");
 		return	(0);
 	}
 	R_ASSERT	(false);

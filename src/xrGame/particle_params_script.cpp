@@ -8,13 +8,13 @@
 
 #include "pch_script.h"
 #include "particle_params.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void CParticleParams::script_register(lua_State *L)
+SCRIPT_EXPORT(CParticleParams, (),
 {
-	module(L)
+	module(luaState)
 	[
 		class_<CParticleParams>("particle_params")
 			.def(								constructor<>())
@@ -22,4 +22,4 @@ void CParticleParams::script_register(lua_State *L)
 			.def(								constructor<const Fvector &,const Fvector &>())
 			.def(								constructor<const Fvector &,const Fvector &,const Fvector &>())
 	];
-}
+});

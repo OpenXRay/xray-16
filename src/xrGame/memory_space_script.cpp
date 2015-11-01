@@ -12,6 +12,7 @@
 #include "gameobject.h"
 #include "entity_alive.h"
 #include "danger_object.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
@@ -53,10 +54,9 @@ Fvector CDangerObject__position	(const CDangerObject *self)
 	return				(self->position());
 }
 
-#pragma optimize("s",on)
-void CMemoryInfo::script_register(lua_State *L)
+IC static void CMemoryInfo_Export(lua_State *luaState)
 {
-	module(L)
+	module(luaState)
 	[
 #if 1//def USE_ORIENTATION
 		class_<SRotation>("rotation")
@@ -154,3 +154,5 @@ void CMemoryInfo::script_register(lua_State *L)
 			.def("dependent_object",		&CDangerObject_dependent_object)
 	];
 }
+
+SCRIPT_EXPORT_FUNC(CMemoryInfo, (), CMemoryInfo_Export);

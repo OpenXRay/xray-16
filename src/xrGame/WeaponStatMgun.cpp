@@ -3,7 +3,7 @@
 #include "Include/xrRender/Kinematics.h"
 #include "xrPhysics/PhysicsShell.h"
 #include "weaponAmmo.h"
-#include "object_broker.h"
+#include "Common/object_broker.h"
 #include "ai_sounds.h"
 #include "actor.h"
 #include "actorEffector.h"

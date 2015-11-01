@@ -22,7 +22,7 @@
 
 #include "xrEngine/xrSASH.h"
 #include "ai_space.h"
-#include "xrServerEntities/script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 
 #include "holder_custom.h"
 #include "game_cl_base.h"
@@ -737,13 +737,13 @@ void CGamePersistent::OnEvent(EVENT E, u64 P1, u64 P2)
 	}
 }
 
-void CGamePersistent::DumpStatistics(CGameFont &font, PerformanceAlert *alert)
+void CGamePersistent::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
 {
     IGame_Persistent::DumpStatistics(font, alert);
 #ifdef DEBUG
 #	ifndef _EDITOR
 		m_last_stats_frame		= m_frame_counter;
-		profiler().show_stats(&font,!!psAI_Flags.test(aiStats));
+		profiler().show_stats(font,!!psAI_Flags.test(aiStats));
 #	endif
 #endif
 }

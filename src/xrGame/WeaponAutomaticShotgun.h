@@ -1,7 +1,7 @@
 #pragma once
 #include "WeaponMagazined.h"
 #include "WeaponShotgun.h"
-#include "script_export_space.h"
+
 
 class CWeaponAutomaticShotgun :	public CWeaponMagazined
 {
@@ -38,6 +38,4 @@ protected:
 	ESoundTypes		m_eSoundOpen;
 	ESoundTypes		m_eSoundAddCartridge;
 	ESoundTypes		m_eSoundClose;
-
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };

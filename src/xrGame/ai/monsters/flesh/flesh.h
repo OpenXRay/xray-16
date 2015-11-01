@@ -1,7 +1,7 @@
 #pragma once
 #include "ai/Monsters/BaseMonster/base_monster.h"
 #include "ai/Monsters/controlled_entity.h"
-#include "xrServerEntities/script_export_space.h"
+
 
 class CAI_Flesh : public CBaseMonster,
 				  public CControlledEntity<CAI_Flesh> {
@@ -26,11 +26,4 @@ public:
 private:
 	bool	ConeSphereIntersection	(Fvector ConeVertex, float ConeAngle, Fvector ConeDir, 
 									Fvector SphereCenter, float SphereRadius);
-	
-	DECLARE_SCRIPT_REGISTER_FUNCTION
 };
-
-add_to_type_list(CAI_Flesh)
-#undef script_type_list
-#define script_type_list save_type_list(CAI_Flesh)
-

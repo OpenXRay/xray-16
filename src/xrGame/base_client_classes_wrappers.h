@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "script_export_space.h"
+
 #include "base_client_classes.h"
 #include "xrEngine/engineapi.h"
 #include "xrCDB/ispatial.h"
@@ -18,7 +18,7 @@
 #include "xrEngine/xr_object.h"
 #include "entity.h"
 #include "ai_space.h"
-#include "script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include <loki/typelist.h>
 #include <loki/hierarchygenerators.h>
 #include "xrServer_Object_Base.h"
@@ -149,7 +149,7 @@ public:
 
 /*	static float			shedule_Scale_static	(base *self)
 	{
-		ai().script_engine().script_log(eLuaMessageTypeError,"You are trying to call a pure virtual function ISheduled::shedule_Scale!\nReturning default value 1000.0");
+		ai().script_engine().script_log(LuaMessageType::Error,"You are trying to call a pure virtual function ISheduled::shedule_Scale!\nReturning default value 1000.0");
 		return	(1000.f);
 	}
 */
@@ -182,7 +182,7 @@ public:
 
 	static	void	renderable_Render_static		(IRenderable *self)
 	{
-		ai().script_engine().script_log(eLuaMessageTypeError,"You are trying to call a pure virtual function IRenderable::renderable_Render!");
+		ai().script_engine().script_log(LuaMessageType::Error,"You are trying to call a pure virtual function IRenderable::renderable_Render!");
 	}
 
 	virtual	BOOL	renderable_ShadowGenerate		()
@@ -309,7 +309,7 @@ public:
 
 	static	void			HitSignal_static	(CEntity *self, float P, Fvector &local_dir,	CObject* who, s16 element)
 	{
-		ai().script_engine().script_log(eLuaMessageTypeError,"You are trying to call a pure virtual function CEntity::HitSignal!");
+		ai().script_engine().script_log(LuaMessageType::Error,"You are trying to call a pure virtual function CEntity::HitSignal!");
 	}
 
 	virtual void			HitImpulse			(float P, Fvector &vWorldDir, 	Fvector& vLocalDir)
@@ -319,6 +319,6 @@ public:
 
 	static	void			HitImpulse_static	(float P, Fvector &vWorldDir, 	Fvector& vLocalDir)
 	{
-		ai().script_engine().script_log(eLuaMessageTypeError,"You are trying to call a pure virtual function CEntity::HitImpulse!");
+		ai().script_engine().script_log(LuaMessageType::Error,"You are trying to call a pure virtual function CEntity::HitImpulse!");
 	}
 };

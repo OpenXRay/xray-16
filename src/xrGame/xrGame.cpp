@@ -17,6 +17,7 @@
 
 //#pragma comment(lib,"ode.lib")
 #pragma comment(lib,"xrEngine.lib")
+#pragma comment(lib, "xrScriptEngine.lib")
 
 extern "C" {
 	DLL_API DLL_Pure*	__cdecl xrFactory_Create		(CLASS_ID clsid)
@@ -37,7 +38,6 @@ extern "C" {
 };
 
 void CCC_RegisterCommands	();
-void setup_luabind_allocator();
 
 BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
 {
@@ -47,8 +47,6 @@ BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
 			CCC_RegisterCommands();
 			// keyboard binding
 			CCC_RegisterInput	();
-
-			setup_luabind_allocator	();
 #ifdef DEBUG
 			g_profiler			= xr_new<CProfiler>();
 #endif

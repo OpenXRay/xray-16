@@ -8,14 +8,15 @@
 
 #include "pch_script.h"
 #include "smart_cover.h"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-#pragma optimize("s",on)
-void smart_cover::object::script_register	(lua_State *L)
+SCRIPT_EXPORT(smart_cover_object, (CGameObject),
 {
-	module(L) [
+	module(luaState)
+    [
 		class_<smart_cover::object,CGameObject>("smart_cover_object")
 			.def(constructor<>())
 	];
-}
+});
