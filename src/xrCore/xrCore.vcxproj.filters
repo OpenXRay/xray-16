@@ -109,6 +109,9 @@
     <Filter Include="Text">
       <UniqueIdentifier>{fa47a672-0ff4-40c9-a4b8-07909d056fd5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="crypto">
+      <UniqueIdentifier>{1e9ce706-ec0b-44e0-8028-f66e1f5dd8ca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -356,6 +359,15 @@
     </ClCompile>
     <ClCompile Include="Threading\Event.cpp">
       <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\crypto.cpp">
+      <Filter>crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\xr_dsa.cpp">
+      <Filter>crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\xr_sha.cpp">
+      <Filter>crypto</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -730,6 +742,18 @@
     </ClInclude>
     <ClInclude Include="Threading\Event.hpp">
       <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\crypto.h">
+      <Filter>crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\crypto_api_def.h">
+      <Filter>crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\xr_dsa.h">
+      <Filter>crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\xr_sha.h">
+      <Filter>crypto</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

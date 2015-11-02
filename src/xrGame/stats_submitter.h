@@ -5,7 +5,7 @@
 #include "gamespy/GameSpy_ATLAS.h"
 #include "profile_data_types.h"
 #include "gsc_dsigned_ltx.h"
-#include "3rd party/crypto/crypto.h"
+#include "xrCore/crypto/crypto.h"
 
 class CGameSpy_Full;
 
