@@ -1903,15 +1903,6 @@
     <Filter Include="Core\Common\StringTable">
       <UniqueIdentifier>{22979b2b-2fb5-4c33-8c62-9462ec6ec171}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Common\associative_vector">
-      <UniqueIdentifier>{99acbde7-55c7-4c04-9c29-98f1cb2ce85f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Common\associative_vector\vector">
-      <UniqueIdentifier>{6d170a96-0537-41dd-b233-04c143b48a2f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Common\associative_vector\compare">
-      <UniqueIdentifier>{fb37b8a3-993a-45e7-b78a-35770f617bbb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Common\Registry">
       <UniqueIdentifier>{9465b693-0ca7-42b5-bd72-821076494f14}</UniqueIdentifier>
     </Filter>
@@ -6059,18 +6050,6 @@
     </ClInclude>
     <ClInclude Include="string_table_defs.h">
       <Filter>Core\Common\StringTable</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\associative_vector.h">
-      <Filter>Core\Common\associative_vector\vector</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\associative_vector_inline.h">
-      <Filter>Core\Common\associative_vector\vector</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\associative_vector_compare_predicate.h">
-      <Filter>Core\Common\associative_vector\compare</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\associative_vector_compare_predicate_inline.h">
-      <Filter>Core\Common\associative_vector\compare</Filter>
     </ClInclude>
     <ClInclude Include="RegistryFuncs.h">
       <Filter>Core\Common\Registry</Filter>
