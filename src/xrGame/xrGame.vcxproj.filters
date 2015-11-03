@@ -6087,12 +6087,6 @@
     <ClInclude Include="secure_messaging.h">
       <Filter>Core\Common\NET Shared\SecureMessages</Filter>
     </ClInclude>
-    <ClInclude Include="xr_dsa_signer.h">
-      <Filter>Core\Common\NET Shared\SecureMessages</Filter>
-    </ClInclude>
-    <ClInclude Include="xr_dsa_verifyer.h">
-      <Filter>Core\Common\NET Shared\SecureMessages</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrServerEntities\object_broker.h">
       <Filter>Core\Common\ObjectBroker</Filter>
     </ClInclude>
@@ -9705,12 +9699,6 @@
       <Filter>Core\Common\NET Shared</Filter>
     </ClCompile>
     <ClCompile Include="secure_messaging.cpp">
-      <Filter>Core\Common\NET Shared\SecureMessages</Filter>
-    </ClCompile>
-    <ClCompile Include="xr_dsa_signer.cpp">
-      <Filter>Core\Common\NET Shared\SecureMessages</Filter>
-    </ClCompile>
-    <ClCompile Include="xr_dsa_verifyer.cpp">
       <Filter>Core\Common\NET Shared\SecureMessages</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\object_factory.cpp">

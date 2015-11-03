@@ -1,7 +1,8 @@
 #ifndef XR_DSA_VERIFYER_INCLUDED
 #define XR_DSA_VERIFYER_INCLUDED
 
-#include "xrCore/crypto/crypto.h"
+#include "crypto.h"
+#include "xr_sha.h"
 
 class xr_dsa_verifyer
 {

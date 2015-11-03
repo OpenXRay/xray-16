@@ -96,7 +96,7 @@
     </ClCompile>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(DXSDK_DIR)Lib\x86;$(XRAY_16X_LIBS)BugTrap\Bin;$(xrLibDir);$(XRAY_16X_LIBS)openssl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(DXSDK_DIR)Lib\x86;$(XRAY_16X_LIBS)BugTrap\Bin;$(xrLibDir);$(XRAY_16X_LIBS)openssl\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <MapExports>false</MapExports>
       <SubSystem>Windows</SubSystem>
@@ -134,7 +134,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(DXSDK_DIR)Lib\x86;$(XRAY_16X_LIBS)BugTrap\Bin;$(xrLibDir);$(XRAY_16X_LIBS)openssl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(DXSDK_DIR)Lib\x86;$(XRAY_16X_LIBS)BugTrap\Bin;$(xrLibDir);$(XRAY_16X_LIBS)openssl\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>NotSet</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
@@ -294,6 +294,8 @@
     <ClCompile Include="crc32.cpp" />
     <ClCompile Include="crypto\crypto.cpp" />
     <ClCompile Include="crypto\xr_dsa.cpp" />
+    <ClCompile Include="crypto\xr_dsa_signer.cpp" />
+    <ClCompile Include="crypto\xr_dsa_verifyer.cpp" />
     <ClCompile Include="crypto\xr_sha.cpp" />
     <ClCompile Include="doug_lea_allocator.cpp" />
     <ClCompile Include="dump_string.cpp" />
@@ -429,8 +431,9 @@
     <ClInclude Include="Containers\AssociativeVectorComparer.hpp" />
     <ClInclude Include="cpuid.h" />
     <ClInclude Include="crypto\crypto.h" />
-    <ClInclude Include="crypto\crypto_api_def.h" />
     <ClInclude Include="crypto\xr_dsa.h" />
+    <ClInclude Include="crypto\xr_dsa_signer.h" />
+    <ClInclude Include="crypto\xr_dsa_verifyer.h" />
     <ClInclude Include="crypto\xr_sha.h" />
     <ClInclude Include="doug_lea_allocator.h" />
     <ClInclude Include="dump_string.h" />
