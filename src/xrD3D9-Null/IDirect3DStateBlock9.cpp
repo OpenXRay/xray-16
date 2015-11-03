@@ -19,16 +19,16 @@ HRESULT			xrIDirect3DStateBlock9::QueryInterface( REFIID riid, void** ppvObj)
 	{
 		*ppvObj = this;
 		AddRef();
-		return HRESULT_Proc(NOERROR);
+		return NOERROR;
 	}
-	return HRESULT_Proc(E_NOINTERFACE);
+	return E_NOINTERFACE;
 }
 
 ULONG			xrIDirect3DStateBlock9::AddRef() 
 {
 	APIDEBUG("xrIDirect3DStateBlock9::AddRef");
 	m_refCount++;
-	return ULONG_Proc(m_refCount);
+	return m_refCount;
 }
 
 ULONG			xrIDirect3DStateBlock9::Release()
@@ -38,9 +38,9 @@ ULONG			xrIDirect3DStateBlock9::Release()
 	if (m_refCount < 0)
 	{
 		delete this;
-		return ULONG_Proc(-1);
+		return -1;
 	}
-	return ULONG_Proc(m_refCount);
+	return m_refCount;
 }
 
 /*** IDirect3DResource9 methods ***/
@@ -49,8 +49,8 @@ HRESULT			__stdcall	xrIDirect3DStateBlock9::GetDevice		( IDirect3DDevice9** ppDe
 	APIDEBUG("xrIDirect3DStateBlock9::GetDevice");
 	m_pIDirect3DDevice9->AddRef();
 	*ppDevice = m_pIDirect3DDevice9;
-	return HRESULT_Proc(S_OK);
+	return S_OK;
 };
 
-HRESULT			__stdcall	xrIDirect3DStateBlock9::Capture() { APIDEBUG("xrIDirect3DStateBlock9::Capture"); return HRESULT_Proc(S_OK); };
-HRESULT			__stdcall	xrIDirect3DStateBlock9::Apply() { APIDEBUG("xrIDirect3DStateBlock9::Apply"); return HRESULT_Proc(S_OK);};
+HRESULT			__stdcall	xrIDirect3DStateBlock9::Capture() { APIDEBUG("xrIDirect3DStateBlock9::Capture"); return S_OK; };
+HRESULT			__stdcall	xrIDirect3DStateBlock9::Apply() { APIDEBUG("xrIDirect3DStateBlock9::Apply"); return S_OK;};
