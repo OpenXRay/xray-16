@@ -163,11 +163,9 @@ namespace smart_cover {
 void CCoverManager::remove_nearby_covers	(smart_cover::cover const &cover, smart_cover::object const &object) const
 {
 	m_nearest.clear			();
-	typedef smart_cover::description::Loopholes::const_iterator const_iterator;
-	const_iterator			I = cover.loopholes().begin();
-	const_iterator			E = cover.loopholes().end();
-	for ( ; I != E; ++I ) {
-		Fvector				position = cover.fov_position(**I);
+	for (const smart_cover::loophole *loophole : cover.loopholes())
+    {
+		Fvector				position = cover.fov_position(*loophole);
 		m_covers->nearest	(position, object.Radius() + 1.f, m_nearest);
 
 		m_nearest.erase(

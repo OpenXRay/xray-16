@@ -154,8 +154,8 @@
 
 			enum { 
 				value = 
-					is_class<T1>::result && 
-					is_class<T2>::result && 
+					std::is_class<T1>::value && 
+					std::is_class<T2>::value && 
 					!is_same<T1,T2>::value &&
 					sizeof(detail::yes) == sizeof(select((T2*)(0)))
 			};

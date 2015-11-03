@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include <type_traits>
 
 template <class M, typename P>
 struct CLoader {
@@ -16,7 +17,7 @@ struct CLoader {
 		template <bool a>
 		IC	static void load_data(T &data, M &stream, const P &p)
 		{
-			STATIC_CHECK				(!is_polymorphic<T>::result,Cannot_load_polymorphic_classes_as_binary_data);
+			STATIC_CHECK				(!std::is_polymorphic<T>::value,Cannot_load_polymorphic_classes_as_binary_data);
 			stream.r					(&data,sizeof(T));
 		}
 

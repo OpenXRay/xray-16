@@ -26,9 +26,8 @@ struct loophole_data {
 	u32							m_level_vertex_id;
 };
 
-class cover : 
+class cover final : 
 	public  CCoverPoint,
-	private debug::make_final<cover>, 
 	private boost::noncopyable 
 {
 public:

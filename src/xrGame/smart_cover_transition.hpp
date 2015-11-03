@@ -7,8 +7,7 @@
 
 #ifndef SMART_COVER_TRANSITION_HPP_INCLUDED
 #define SMART_COVER_TRANSITION_HPP_INCLUDED
-
-#include "debug_make_final.hpp"
+#include <boost/noncopyable.hpp>
 
 namespace MonsterSpace {
 	enum EBodyState;
@@ -19,11 +18,8 @@ namespace transitions {
 
 class animation_action;
 
-class action :
-	private debug::make_final<action>,
-	private boost::noncopyable 
+class action final : private boost::noncopyable
 {
-
 public:
 	typedef xr_vector<animation_action *> Animations;
 

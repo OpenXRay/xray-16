@@ -16,9 +16,8 @@ class CAI_Rat;
 
 namespace steering_behaviour {
 
-class cohesion :
+class cohesion final :
 	public base,
-	private debug::make_final<cohesion>,
 	private boost::noncopyable 
 {
 public:

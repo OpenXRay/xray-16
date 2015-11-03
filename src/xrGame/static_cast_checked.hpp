@@ -61,9 +61,9 @@ inline destination_type static_cast_checked	(source_type const & source)
 		source_type const &,
 		destination_type
 	>::check<
-		is_polymorphic<
+		std::is_polymorphic<
 			pure_source_type
-		>::result
+		>::value
 	>				(source);
 
 	return			(static_cast<destination_type>(source));
@@ -79,9 +79,9 @@ inline destination_type static_cast_checked	(source_type & source)
 		source_type &,
 		destination_type
 	>::check<
-		is_polymorphic<
+		std::is_polymorphic<
 			pure_source_type
-		>::result
+		>::value
 	>				(source);
 
 	return			(static_cast<destination_type>(source));

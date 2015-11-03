@@ -16,9 +16,8 @@ class CAI_Rat;
 
 namespace steering_behaviour {
 
-class alignment : 
-	public base,
-	private debug::make_final<alignment>,
+class alignment final :
+    public base,
 	private boost::noncopyable 
 {
 public:

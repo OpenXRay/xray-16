@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include <type_traits>
 
 template <class M, typename P>
 struct CSaver {
@@ -16,7 +17,7 @@ struct CSaver {
 		template <bool a>
 		IC	static void save_data(const T &data, M &stream, const P &p)
 		{
-			STATIC_CHECK				(!is_polymorphic<T>::result,Cannot_save_polymorphic_classes_as_binary_data);
+			STATIC_CHECK				(!std::is_polymorphic<T>::value,Cannot_save_polymorphic_classes_as_binary_data);
 			stream.w					(&data,sizeof(T));
 		}
 

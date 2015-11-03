@@ -16,9 +16,8 @@ class CAI_Rat;
 
 namespace steering_behaviour {
 
-class separation :
+class separation final :
 	public base,
-	private debug::make_final<separation>,
 	private boost::noncopyable 
 {
 public:

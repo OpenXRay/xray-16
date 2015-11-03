@@ -479,9 +479,6 @@
     <ClInclude Include="_stl_extensions.h">
       <Filter>Math\Extensions</Filter>
     </ClInclude>
-    <ClInclude Include="_type_traits.h">
-      <Filter>Math\Extensions</Filter>
-    </ClInclude>
     <ClInclude Include="clsid.h">
       <Filter>Math\Extensions</Filter>
     </ClInclude>

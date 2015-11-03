@@ -13,13 +13,10 @@
 #include "xrScriptEngine/script_space_forward.hpp"
 #include "ai_monster_space.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
-#include "debug_make_final.hpp"
 
 namespace smart_cover{
 
-class action :
-	private debug::make_final<action>,
-	private boost::noncopyable
+class action final : private boost::noncopyable
 {
 private:
 	class animation_predicate {

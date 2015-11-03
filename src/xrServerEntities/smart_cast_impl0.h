@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "xrCore/_type_traits.h"
 #include "object_type_traits.h"
 
 namespace SmartDynamicCast {

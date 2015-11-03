@@ -880,7 +880,6 @@
     <ClInclude Include="data_storage_single_linked_list_inline.h" />
     <ClInclude Include="date_time.h" />
     <ClInclude Include="death_anims.h" />
-    <ClInclude Include="debug_make_final.hpp" />
     <ClInclude Include="debug_renderer.h" />
     <ClInclude Include="debug_renderer_inline.h" />
     <ClInclude Include="debug_text_tree.h" />
@@ -2508,9 +2507,6 @@
     <ClCompile Include="dbg_draw_frustum.cpp" />
     <ClCompile Include="death_anims.cpp" />
     <ClCompile Include="death_anims_predicates.cpp" />
-    <ClCompile Include="debug_make_final_test.cpp">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="debug_renderer.cpp" />
     <ClCompile Include="debug_text_tree.cpp" />
     <ClCompile Include="DelayedActionFuse.cpp" />
