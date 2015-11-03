@@ -165,14 +165,15 @@ Highflex: Alex M
   
 Swartz27: Matthew Swartz
 - Fix blurred text on R4
-- Fix issue #24
+- Fix issue #24: Fix overloaded particle system
 - Fix sun path not following weather configs in R2-R4
 - Add actor shadow to R2-R4
 - Add grass shadows (r2_sun_details) to R2-R4
 - Add zoom and reload DOF which is read from the weapon configs if present
 - Add "sunmask"/cloud shadows shaders for R3&R4
-  - Disable loading of pre-compiled shaders on R3/R4 to allow for loading of new/modifed shaders
+  o Disable loading of pre-compiled shaders on R3/R4 to allow for loading of new/modifed shaders
   - Add a console command to turn cloud shadows on or off (requires restart)
 - Add soft shadows shader to R2 (original author: cj ayho)
 - Add console command for enabling manual reloading on weapons
 ? Remove R1 renderer and all references to it
+- Increase vertex buffer size from 1024+512 to 4096
