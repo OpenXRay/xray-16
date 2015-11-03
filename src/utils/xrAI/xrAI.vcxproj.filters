@@ -377,9 +377,6 @@
     <ClInclude Include="..\Shader_xrLC.h">
       <Filter>Compiler</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\xr_3da\xrLevel.h">
-      <Filter>Compiler</Filter>
-    </ClInclude>
     <ClInclude Include="quadtree.h">
       <Filter>Compiler\quad_tree</Filter>
     </ClInclude>

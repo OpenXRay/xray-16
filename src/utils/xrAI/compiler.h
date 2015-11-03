@@ -3,7 +3,7 @@
 #pragma comment(lib,"FreeImage.lib")
 
 #include "xrCDB/xrCDB.h"
-#include "xrEngine/xrLevel.h"
+#include "Common/LevelStructure.hpp"
 #include "AIMapExport.h"
 #include "utils/Shader_xrLC.h"
 #include "editors/LevelEditor/Engine/communicate.h"

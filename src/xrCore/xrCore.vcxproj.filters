@@ -773,6 +773,12 @@
     <ClInclude Include="Debug\DXGetErrorString.inl">
       <Filter>Debug core\DxErr</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\GUID.hpp">
+      <Filter>Kernel\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\LevelStructure.hpp">
+      <Filter>Kernel\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">

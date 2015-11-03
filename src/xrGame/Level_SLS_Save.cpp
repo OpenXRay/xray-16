@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "xrEngine/xrLevel.h"
+#include "Common/LevelStructure.hpp"
 #include "Level.h"
 #include "xrserver.h"
 

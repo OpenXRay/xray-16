@@ -337,7 +337,6 @@
     <ClInclude Include="..\..\xrServerEntities\xrServer_Objects_ALife_Monsters.h" />
     <ClInclude Include="..\..\xrServerEntities\xrServer_Object_Base.h" />
     <ClInclude Include="..\..\xrServerEntities\xrServer_Space.h" />
-    <ClInclude Include="..\..\xr_3da\xrLevel.h" />
     <ClInclude Include="AIMapExport.h" />
     <ClInclude Include="alife_artefact_order.h" />
     <ClInclude Include="a_star.h" />

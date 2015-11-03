@@ -535,7 +535,6 @@
     <ClInclude Include="WaveForm.h" />
     <ClInclude Include="xrHemisphere.h" />
     <ClInclude Include="xrImage_Resampler.h" />
-    <ClInclude Include="xrLevel.h" />
     <ClInclude Include="xrSASH.h" />
     <ClInclude Include="xrSheduler.h" />
     <ClInclude Include="xrTheora_Stream.h" />

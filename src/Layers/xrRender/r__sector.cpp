@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "r__sector.h"
-#include "xrEngine/xrLevel.h"
+#include "Common/LevelStructure.hpp"
 #include "xrEngine/xr_object.h"
 #include "FBasicVisual.h"
 #include "xrEngine/IGame_Persistent.h"

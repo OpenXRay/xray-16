@@ -5,7 +5,7 @@
 #define ESceneAIMapToolsH
 
 #include "ESceneCustomMTools.H"
-#include "xrLevel.H"
+#include "Common/LevelStructure.hpp"
 #include "ESceneAIMapTools_Export.H"
 
 // refs

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrCore/FMesh.hpp"
-#include "xrEngine/xrLevel.h"
+#include "Common/LevelStructure.hpp"
 #include "xrEngine/x_ray.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/stream_reader.h"

@@ -11,7 +11,7 @@
 
 #include "ESceneCustomMTools.h"
 #include "ESceneCustomOTools.h"
-#include "xrLevel.h"
+#include "Common/LevelStructure.hpp"
 #include "../ECore/Editor/pick_defs.h"
 //refs
 struct FSChunkDef;

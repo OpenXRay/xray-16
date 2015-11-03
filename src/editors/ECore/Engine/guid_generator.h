@@ -10,7 +10,7 @@
 #define guid_generatorH
 #pragma once
 
-#include "xrLevel.h"
+#include "Common/LevelStructure.hpp"
 
 ENGINE_API extern xrGUID generate_guid();
 

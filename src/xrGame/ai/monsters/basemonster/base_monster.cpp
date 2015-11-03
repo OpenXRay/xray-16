@@ -45,7 +45,7 @@
 
 // Lain: added 
 #include "level_debug.h"
-#include "xrEngine/xrLevel.h"
+#include "Common/LevelStructure.hpp"
 #ifdef DEBUG
 #include "debug_text_tree.h"
 #endif

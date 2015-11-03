@@ -1,6 +1,5 @@
 #include "stdafx.h"
-#include "xrEngine/xrlevel.h"
-
+#include "Common/LevelStructure.hpp"
 #include "utils/xrLCUtil/xrThread.hpp"
 
 #include "global_calculation_data.h"

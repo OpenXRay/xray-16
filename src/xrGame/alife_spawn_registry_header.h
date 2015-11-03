@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "xrEngine/xrLevel.h"
+#include "Common/LevelStructure.hpp"
 
 class CALifeSpawnHeader {
 protected:

@@ -7,7 +7,7 @@
 #include "customHUD.h"
 #include "render.h"
 #include "gamefont.h"
-#include "xrLevel.h"
+#include "Common/LevelStructure.hpp"
 #include "CameraManager.h"
 #include "xr_object.h"
 #include "feel_sound.h"

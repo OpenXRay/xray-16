@@ -13,7 +13,7 @@
 #include "sector.h"
 #include "groupobject.h"
 #include "portal.h"
-#include "xrLevel.h"
+#include "Common/LevelStructure.hpp"
 #include "../ECore/Editor/ui_main.h"
 #include "ui_leveltools.h"
 #include "xrHemisphere.h"

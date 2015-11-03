@@ -303,9 +303,6 @@
     <ClInclude Include="IGame_Level.h">
       <Filter>Game API</Filter>
     </ClInclude>
-    <ClInclude Include="xrLevel.h">
-      <Filter>Game API</Filter>
-    </ClInclude>
     <ClInclude Include="IGame_ObjectPool.h">
       <Filter>Game API\Objects</Filter>
     </ClInclude>

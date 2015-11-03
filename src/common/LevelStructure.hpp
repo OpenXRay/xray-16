@@ -1,37 +1,6 @@
-#ifndef xrLevelH
-#define xrLevelH
-
 #pragma once
 
-struct xrGUID
-{
-    u64 g[2];
-
-    ICF bool operator== (const xrGUID& o) const
-    {
-        return ((g[0] == o.g[0]) && (g[1] == o.g[1]));
-    }
-
-    ICF bool operator!= (const xrGUID& o) const
-    {
-        return !(*this == o);
-    }
-    ICF void LoadLTX(CInifile& ini, LPCSTR section, LPCSTR name)
-    {
-        string128 buff;
-
-        g[0] = ini.r_u64(section, strconcat(sizeof(buff), buff, name, "_g0"));
-        g[1] = ini.r_u64(section, strconcat(sizeof(buff), buff, name, "_g1"));
-    }
-
-    ICF void SaveLTX(CInifile& ini, LPCSTR section, LPCSTR name)
-    {
-        string128 buff;
-
-        ini.w_u64(section, strconcat(sizeof(buff), buff, name, "_g0"), g[0]);
-        ini.w_u64(section, strconcat(sizeof(buff), buff, name, "_g1"), g[1]);
-    }
-};
+#include "Common/GUID.hpp"
 
 enum fsL_Chunks
 {
@@ -47,28 +16,30 @@ enum fsL_Chunks
     fsL_SWIS = 11, //* - collapse info, usually for trees
     fsL_forcedword = 0xFFFFFFFF
 };
+
 enum fsESectorChunks
 {
     fsP_Portals = 1, // - portal polygons
-    fsP_Root, // - geometry root
+    fsP_Root = 2, // - geometry root
     fsP_forcedword = u32(-1)
 };
+
 enum fsSLS_Chunks
 {
     fsSLS_Description = 1, // Name of level
-    fsSLS_ServerState,
+    fsSLS_ServerState = 2,
     fsSLS_forcedword = u32(-1)
 };
 
 enum EBuildQuality
 {
     ebqDraft = 0,
-    ebqHigh,
-    ebqCustom,
+    ebqHigh = 1,
+    ebqCustom = 2,
     ebq_force_u16 = u16(-1)
 };
 
-#pragma pack(push,8)
+#pragma pack(push, 8)
 struct hdrLEVEL
 {
     u16 XRLC_version;
@@ -94,7 +65,7 @@ struct hdrNODES
 };
 #pragma pack(pop)
 
-#pragma pack(push,1)
+#pragma pack(push, 1)
 #pragma pack(1)
 #ifndef _EDITOR
 class NodePosition
@@ -102,7 +73,9 @@ class NodePosition
     u8 data[5];
 
     ICF void xz(u32 value) { CopyMemory(data, &value, 3); }
-    ICF void y(u16 value) { CopyMemory(data + 3, &value, 2); }
+
+    ICF void y(u16 value) { CopyMemory(data+3, &value, 2); }
+
 public:
     ICF u32 xz() const
     {
@@ -130,47 +103,37 @@ struct NodeCompressed
 {
 public:
     u8 data[12];
-private:
 
+private:
     ICF void link(u8 link_index, u32 value)
     {
         value &= 0x007fffff;
         switch (link_index)
         {
         case 0:
-        {
-            value |= (*(u32*)data) & 0xff800000;
+            value |= *(u32*)data & 0xff800000;
             CopyMemory(data, &value, sizeof(u32));
             break;
-        }
         case 1:
-        {
             value <<= 7;
-            value |= (*(u32*)(data + 2)) & 0xc000007f;
-            CopyMemory(data + 2, &value, sizeof(u32));
+            value |= *(u32*)(data+2) & 0xc000007f;
+            CopyMemory(data+2, &value, sizeof(u32));
             break;
-        }
         case 2:
-        {
             value <<= 6;
-            value |= (*(u32*)(data + 5)) & 0xe000003f;
-            CopyMemory(data + 5, &value, sizeof(u32));
+            value |= *(u32*)(data+5) & 0xe000003f;
+            CopyMemory(data+5, &value, sizeof(u32));
             break;
-        }
         case 3:
-        {
             value <<= 5;
-            value |= (*(u32*)(data + 8)) & 0xf000001f;
-            CopyMemory(data + 8, &value, sizeof(u32));
+            value |= *(u32*)(data+8) & 0xf000001f;
+            CopyMemory(data+8, &value, sizeof(u32));
             break;
-        }
         }
     }
 
     ICF void light(u8 value)
-    {
-        data[10] |= value << 4;
-    }
+    { data[10] |= value << 4; }
 
 public:
     struct SCover
@@ -184,19 +147,14 @@ public:
         {
             switch (index)
             {
-            case 0:
-                return(cover0);
-            case 1:
-                return(cover1);
-            case 2:
-                return(cover2);
-            case 3:
-                return(cover3);
-            default:
-                NODEFAULT;
+            case 0: return cover0;
+            case 1: return cover1;
+            case 2: return cover2;
+            case 3: return cover3;
+            default: NODEFAULT;
             }
 #ifdef DEBUG
-            return (u8(-1));
+            return u8(-1);
 #endif
         }
     };
@@ -239,47 +197,37 @@ struct NodeCompressed6
 {
 public:
     u8 data[11];
-private:
 
+private:
     ICF void link(u8 link_index, u32 value)
     {
         value &= 0x001fffff;
         switch (link_index)
         {
-        case 0 :
-        {
-            value |= (*(u32*)data) & 0xffe00000;
+        case 0:
+            value |= *(u32*)data & 0xffe00000;
             CopyMemory(data, &value, sizeof(u32));
             break;
-        }
-        case 1 :
-        {
+        case 1:
             value <<= 5;
-            value |= (*(u32*)(data + 2)) & 0xfc00001f;
-            CopyMemory(data + 2, &value, sizeof(u32));
+            value |= *(u32*)(data+2) & 0xfc00001f;
+            CopyMemory(data+2, &value, sizeof(u32));
             break;
-        }
-        case 2 :
-        {
+        case 2:
             value <<= 2;
-            value |= (*(u32*)(data + 5)) & 0xff800003;
-            CopyMemory(data + 5, &value, sizeof(u32));
+            value |= *(u32*)(data+5) & 0xff800003;
+            CopyMemory(data+5, &value, sizeof(u32));
             break;
-        }
-        case 3 :
-        {
+        case 3:
             value <<= 7;
-            value |= (*(u32*)(data + 7)) & 0xf000007f;
-            CopyMemory(data + 7, &value, sizeof(u32));
+            value |= *(u32*)(data+7) & 0xf000007f;
+            CopyMemory(data+7, &value, sizeof(u32));
             break;
-        }
         }
     }
 
     ICF void light(u8 value)
-    {
-        data[10] |= value << 4;
-    }
+    { data[10] |= value << 4; }
 
 public:
     u16 cover0 : 4;
@@ -293,44 +241,32 @@ public:
     {
         switch (index)
         {
-        case 0 :
-            return ((*(u32*)data) & 0x001fffff);
-        case 1 :
-            return (((*(u32*)(data + 2)) >> 5) & 0x001fffff);
-        case 2 :
-            return (((*(u32*)(data + 5)) >> 2) & 0x001fffff);
-        case 3 :
-            return (((*(u32*)(data + 7)) >> 7) & 0x001fffff);
-        default :
-            NODEFAULT;
+        case 0: return *(u32*)data & 0x001fffff;
+        case 1: return (*(u32*)(data+2) >> 5) & 0x001fffff;
+        case 2: return (*(u32*)(data+5) >> 2) & 0x001fffff;
+        case 3: return (*(u32*)(data+7) >> 7) & 0x001fffff;
+        default: NODEFAULT;
         }
 #ifdef DEBUG
-        return (0);
+        return 0;
 #endif
     }
 
     ICF u8 light() const
-    {
-        return (data[10] >> 4);
-    }
+    { return data[10] >> 4; }
 
     ICF u16 cover(u8 index) const
     {
         switch (index)
         {
-        case 0 :
-            return(cover0);
-        case 1 :
-            return(cover1);
-        case 2 :
-            return(cover2);
-        case 3 :
-            return(cover3);
-        default :
-            NODEFAULT;
+        case 0: return cover0;
+        case 1: return cover1;
+        case 2: return cover2;
+        case 3: return cover3;
+        default: NODEFAULT;
         }
 #ifdef DEBUG
-        return (u8(-1));
+        return u8(-1);
 #endif
     }
 
@@ -346,16 +282,14 @@ struct SNodePositionOld
     u16 y;
     s16 z;
 };
-#pragma pack (pop)
+#pragma pack(pop)
 
 #ifdef _EDITOR
 typedef SNodePositionOld NodePosition;
 #endif
 
-const u32 XRCL_CURRENT_VERSION = 18; //17; // input
+const u32 XRCL_CURRENT_VERSION = 18; // input
 const u32 XRCL_PRODUCTION_VERSION = 14; // output
 const u32 CFORM_CURRENT_VERSION = 4;
 const u32 MAX_NODE_BIT_COUNT = 23;
 const u32 XRAI_CURRENT_VERSION = 10;
-
-#endif // xrLevelH

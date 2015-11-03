@@ -6,7 +6,7 @@
 #include "ESound_Source.h"
 #include "ESound_Environment.h"
 #include "du_box.h"
-#include "xrLevel.h"
+#include "Common/LevelStructure.hpp"
 
 CLevelSoundManager*& LSndLib=(CLevelSoundManager*)SndLib;
 

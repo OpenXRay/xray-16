@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "Common/_d3d_extensions.h"
-#include "xrEngine/xrLevel.h"
+#include "Common/LevelStructure.hpp"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 #include "utils/xrLC_Light/R_light.h"

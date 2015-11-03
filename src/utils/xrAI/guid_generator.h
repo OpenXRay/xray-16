@@ -10,8 +10,8 @@
 #define guid_generatorH
 #pragma once
 
-#include "xrEngine/xrLevel.h"
-
+#include "Common/LevelStructure.hpp"
+// XXX: move to xrCore
 ENGINE_API extern xrGUID generate_guid();
 ENGINE_API extern LPCSTR generate_guid(const xrGUID &guid, LPSTR buffer, const u32 &buffer_size);
 

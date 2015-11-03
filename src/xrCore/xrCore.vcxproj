@@ -401,6 +401,8 @@
     <ClCompile Include="_std_extensions.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\GUID.hpp" />
+    <ClInclude Include="..\common\LevelStructure.hpp" />
     <ClInclude Include="..\common\object_broker.h" />
     <ClInclude Include="..\common\object_cloner.h" />
     <ClInclude Include="..\common\object_comparer.h" />
