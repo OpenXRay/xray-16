@@ -187,11 +187,6 @@ public:
         m_editor(0),
         m_engine(0)
 #endif // #ifdef INGAME_EDITOR
-#ifdef PROFILE_CRITICAL_SECTIONS
-        ,
-        mt_csEnter(MUTEX_PROFILE_ID(CRenderDevice::mt_csEnter)),
-        mt_csLeave(MUTEX_PROFILE_ID(CRenderDevice::mt_csLeave))
-#endif // #ifdef PROFILE_CRITICAL_SECTIONS
     {
         m_hWnd = NULL;
         b_is_Active = FALSE;
