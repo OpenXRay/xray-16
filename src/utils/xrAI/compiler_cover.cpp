@@ -25,33 +25,6 @@ typedef xr_vector<CCoverPoint*>	COVERS;
 // -------------------------------- Ray pick
 typedef Fvector	RayCache[3];
 
-/*
-IC bool RayPick(CDB::COLLIDER* DB, Fvector& P, Fvector& D, float r, RayCache& C)
-{
-	// 1. Check cached polygon
-	float _u,_v,range;
-	if (CDB::TestRayTri(P,D,&C[0],_u,_v,range,true)) 
-	{
-		if (range>0 && range<r) return true;
-	}
-
-	// 2. Polygon doesn't pick - real database query
-	try { DB->ray_query	(&Level,P,D,r); } catch (...) { Msg("* ERROR: Failed to trace ray"); }
-	if (0==DB->r_count()) {
-		return false;
-	} else {
-		// cache polygon
-		CDB::RESULT&	rp	= *DB->r_begin();
-//		CDB::TRI&		T	= 
-			Level.get_tris()[rp.id];
-		C[0].set		(rp.verts[0]);
-		C[1].set		(rp.verts[1]);
-		C[2].set		(rp.verts[2]);
-		return true;
-	}
-}
-*/
-
 IC float getLastRP_Scale(CDB::COLLIDER* DB, RayCache& C)
 {
 	u32	tris_count		= DB->r_count();
@@ -64,8 +37,7 @@ IC float getLastRP_Scale(CDB::COLLIDER* DB, RayCache& C)
 		{
 			CDB::RESULT& rpinf = DB->r_begin()[I];
 			// Access to texture
-//			CDB::TRI& clT								= 
-				Level.get_tris()	[rpinf.id];
+			Level.get_tris()	[rpinf.id];
 			b_rc_face& F								= g_rc_faces		[rpinf.id];
 
 			if (F.dwMaterial >= g_materials.size())
@@ -115,7 +87,6 @@ IC float getLastRP_Scale(CDB::COLLIDER* DB, RayCache& C)
 	return scale;
 }
 
-// IC bool RayPick(CDB::COLLIDER* DB, Fvector& P, Fvector& D, float r, RayCache& C)	//, Face* skip)
 IC float rayTrace	(CDB::COLLIDER* DB, Fvector& P, Fvector& D, float R, RayCache& C)
 {
 	R_ASSERT	(DB);
@@ -136,7 +107,6 @@ IC float rayTrace	(CDB::COLLIDER* DB, Fvector& P, Fvector& D, float R, RayCache&
 	} else {
 		return getLastRP_Scale(DB,C);
 	}
-//	return 0;
 }
 
 IC int	calcSphereSector(Fvector& dir)
@@ -577,11 +547,8 @@ void	xrCover	(bool pure_covers)
 	CThreadManager		Threads(ProxyStatus, ProxyProgress);
 	u32	stride			= g_nodes.size()/NUM_THREADS;
 	u32	last			= g_nodes.size()-stride*(NUM_THREADS-1);
-	for (u32 thID=0; thID<NUM_THREADS; thID++) {
+	for (u32 thID=0; thID<NUM_THREADS; thID++)
 		Threads.start(xr_new<CoverThread>(thID,thID*stride,thID*stride+((thID==(NUM_THREADS-1))?last:stride)));
-//		CoverThread(thID,thID*stride,thID*stride+((thID==(NUM_THREADS-1))?last:stride)).Execute();
-//		Threads.wait		();
-	}
 	Threads.wait			();
 	Msg("%d seconds elapsed.",(timeGetTime()-start_time)/1000);
 

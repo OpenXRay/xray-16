@@ -241,24 +241,16 @@
     <ClCompile Include="..\..\xrServerEntities\xrServer_Objects_ALife_Items.cpp" />
     <ClCompile Include="..\..\xrServerEntities\xrServer_Objects_ALife_Monsters.cpp" />
     <ClCompile Include="..\..\xrServerEntities\xrServer_Object_Base.cpp" />
-    <ClCompile Include="alife_artefact_order.cpp" />
-    <ClCompile Include="buffer_vector.cpp" />
     <ClCompile Include="compiler.cpp">
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">AssemblyAndSourceCode</AssemblerOutput>
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
-    <ClCompile Include="compiler_build.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="compiler_cover.cpp" />
-    <ClCompile Include="compiler_display.cpp" />
-    <ClCompile Include="compiler_light.cpp" />
     <ClCompile Include="compiler_load.cpp" />
     <ClCompile Include="compiler_save.cpp">
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">AssemblyAndSourceCode</AssemblerOutput>
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
-    <ClCompile Include="compiler_smooth.cpp" />
     <ClCompile Include="game_graph_builder.cpp" />
     <ClCompile Include="game_spawn_constructor.cpp" />
     <ClCompile Include="guid_generator.cpp">
@@ -269,7 +261,6 @@
     <ClCompile Include="level_graph.cpp" />
     <ClCompile Include="level_graph_vertex.cpp" />
     <ClCompile Include="level_spawn_constructor.cpp" />
-    <ClCompile Include="motion_simulator.cpp" />
     <ClCompile Include="patrol_path.cpp" />
     <ClCompile Include="patrol_path_storage.cpp" />
     <ClCompile Include="patrol_point.cpp" />
@@ -293,32 +284,17 @@
     <ClInclude Include="..\..\xrServerEntities\alife_monster_brain.h" />
     <ClInclude Include="..\..\xrServerEntities\alife_monster_brain_inline.h" />
     <ClInclude Include="..\..\xrServerEntities\alife_space.h" />
-    <ClInclude Include="..\..\xrServerEntities\associative_vector.h" />
-    <ClInclude Include="..\..\xrServerEntities\associative_vector_compare_predicate.h" />
-    <ClInclude Include="..\..\xrServerEntities\associative_vector_compare_predicate_inline.h" />
-    <ClInclude Include="..\..\xrServerEntities\associative_vector_inline.h" />
     <ClInclude Include="..\..\xrServerEntities\character_info_defs.h" />
     <ClInclude Include="..\..\xrServerEntities\clsid_game.h" />
-    <ClInclude Include="..\..\xrServerEntities\DrawUtils.h" />
-    <ClInclude Include="..\..\xrServerEntities\FastDelegate.h" />
     <ClInclude Include="..\..\xrServerEntities\game_base_space.h" />
     <ClInclude Include="..\..\xrServerEntities\game_graph_space.h" />
     <ClInclude Include="..\..\xrServerEntities\InfoPortionDefs.h" />
     <ClInclude Include="..\..\xrServerEntities\inventory_space.h" />
     <ClInclude Include="..\..\xrServerEntities\ItemListTypes.h" />
-    <ClInclude Include="..\..\xrServerEntities\object_broker.h" />
-    <ClInclude Include="..\..\xrServerEntities\object_cloner.h" />
-    <ClInclude Include="..\..\xrServerEntities\object_comparer.h" />
-    <ClInclude Include="..\..\xrServerEntities\object_destroyer.h" />
-    <ClInclude Include="..\..\xrServerEntities\object_interfaces.h" />
-    <ClInclude Include="..\..\xrServerEntities\object_loader.h" />
-    <ClInclude Include="..\..\xrServerEntities\object_saver.h" />
-    <ClInclude Include="..\..\xrServerEntities\object_type_traits.h" />
     <ClInclude Include="..\..\xrServerEntities\PHNetState.h" />
     <ClInclude Include="..\..\xrServerEntities\PHSynchronize.h" />
     <ClInclude Include="..\..\xrServerEntities\PropertiesListTypes.h" />
     <ClInclude Include="..\..\xrServerEntities\restriction_space.h" />
-    <ClInclude Include="..\..\xrServerEntities\script_export_space.h" />
     <ClInclude Include="..\..\xrServerEntities\script_value_container.h" />
     <ClInclude Include="..\..\xrServerEntities\script_value_container_impl.h" />
     <ClInclude Include="..\..\xrServerEntities\ShapeData.h" />
@@ -338,14 +314,10 @@
     <ClInclude Include="..\..\xrServerEntities\xrServer_Object_Base.h" />
     <ClInclude Include="..\..\xrServerEntities\xrServer_Space.h" />
     <ClInclude Include="AIMapExport.h" />
-    <ClInclude Include="alife_artefact_order.h" />
     <ClInclude Include="a_star.h" />
     <ClInclude Include="a_star_inline.h" />
     <ClInclude Include="builder_allocator_constructor.h" />
     <ClInclude Include="builder_allocator_constructor_inline.h" />
-    <ClInclude Include="ChooseTypes.h" />
-    <ClInclude Include="client_id.h" />
-    <ClInclude Include="communicate.h" />
     <ClInclude Include="compiler.h" />
     <ClInclude Include="cover_point.h" />
     <ClInclude Include="cover_point_inline.h" />
@@ -391,9 +363,6 @@
     <ClInclude Include="level_spawn_constructor_inline.h" />
     <ClInclude Include="manager_builder_allocator_constructor.h" />
     <ClInclude Include="manager_builder_allocator_constructor_inline.h" />
-    <ClInclude Include="motion_simulator.h" />
-    <ClInclude Include="NET_Compressor.h" />
-    <ClInclude Include="NET_utils.h" />
     <ClInclude Include="path_manager.h" />
     <ClInclude Include="path_manager_game.h" />
     <ClInclude Include="path_manager_game_inline.h" />
@@ -430,7 +399,6 @@
     <ClInclude Include="server_entity_wrapper.h" />
     <ClInclude Include="server_entity_wrapper_inline.h" />
     <ClInclude Include="..\Shader_xrLC.h" />
-    <ClInclude Include="Sound.h" />
     <ClInclude Include="space_restrictor_wrapper.h" />
     <ClInclude Include="space_restrictor_wrapper_inline.h" />
     <ClInclude Include="spawn_constructor_space.h" />

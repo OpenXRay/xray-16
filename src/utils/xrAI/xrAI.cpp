@@ -64,7 +64,6 @@ extern void xrConvertMaps       ();
 extern void test_goap           ();
 extern void smart_cover         (LPCSTR name);
 extern void verify_level_graph  (LPCSTR name, bool verbose);
-//extern void connectivity_test (LPCSTR);
 extern void compare_graphs      (LPCSTR level_name);
 extern void test_levels         ();
 
@@ -192,8 +191,6 @@ void Startup(LPSTR     lpCmdLine)
 Factory_Create  *create_entity  = 0;
 Factory_Destroy *destroy_entity = 0;
 
-void buffer_vector_test     ();
-
 int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
                      LPSTR     lpCmdLine,
@@ -201,9 +198,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 {
     Debug._initialize       (false);
     Core._initialize        ("xrai",0);
-
-    buffer_vector_test      ();
-
     HMODULE                 hFactory;
     LPCSTR                  g_name  = "xrSE_Factory.dll";
     Log                     ("Loading DLL:",g_name);

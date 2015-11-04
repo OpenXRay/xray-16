@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "compiler.h"
-//.#include "communicate.h"
 #include "levelgamedef.h"
 #include "level_graph.h"
 #include "AIMapExport.h"
@@ -138,15 +137,11 @@ void xrLoad(LPCSTR name, bool draft_mode)
 					} else {
 						xr_strcat		(N,".thm");
 						IReader* THM	= FS.r_open("$game_textures$",N);
-//						if (!THM)		continue;
-						
 						R_ASSERT2		(THM,	N);
 
 						// version
 						u32 version				= 0;
 						R_ASSERT				(THM->r_chunk(THM_CHUNK_VERSION,&version));
-						// if( version!=THM_CURRENT_VERSION )	FATAL	("Unsupported version of THM file.");
-
 						// analyze thumbnail information
 						R_ASSERT(THM->find_chunk(THM_CHUNK_TEXTUREPARAM));
 						THM->r                  (&BT.THM.fmt,sizeof(STextureParams::ETFormat));
@@ -188,21 +183,6 @@ void xrLoad(LPCSTR name, bool draft_mode)
 			}
 		}
 	}
-	
-//	// Load emitters
-//	{
-//		strconcat			(N,name,"level.game");
-//		IReader				*F = FS.r_open(N);
-//		IReader				*O = 0;
-//		if (0!=(O = F->open_chunk	(AIPOINT_CHUNK))) {
-//			for (int id=0; O->find_chunk(id); id++) {
-//				Emitters.push_back(Fvector());
-//				O->r_fvector3	(Emitters.back());
-//			}
-//			O->close();
-//		}
-//	}
-//
 	// Load lights
 	{
 		strconcat				(sizeof(N),N,name,"build.prj");
@@ -259,11 +239,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
 			}
 			F->close		();
 		}
-	}
-
-	// Init params
-//	g_params.Init		();
-	
+	}	
 	// Load initial map from the Level Editor
 	{
 		string_path			file_name;

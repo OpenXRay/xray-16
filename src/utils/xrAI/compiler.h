@@ -50,16 +50,6 @@ struct vertex					// definition of "patch" or "node"
 };
 
 DEF_VECTOR(DWORDs,u32);
-//struct NodeMerged
-//{
-//	DWORDs		neighbours;	// list of neighbours
-//	DWORDs		contains;	// while merging - contains list of elementar nodes
-//	Fplane		plane;
-//	Fvector		P;			// min
-//	WORD		sector;
-//	BYTE		light;
-//	float		cover[4];
-//};
 
 #include "level_graph.h"
 
@@ -89,7 +79,6 @@ struct SCover {
 };
 
 DEF_VECTOR(Nodes,vertex			);
-//DEF_VECTOR(Merged,NodeMerged	);
 DEF_VECTOR(Vectors,Fvector		);
 DEF_VECTOR(Marks,BYTE			);
 DEF_VECTOR(Lights,R_Light		);
@@ -102,7 +91,6 @@ extern	SAIParams			g_params;
 extern	CDB::MODEL			Level;
 extern	CDB::COLLIDER		XRC;
 extern	Fbox				LevelBB;
-//extern	Vectors				Emitters;
 
 struct b_BuildTexture : public b_texture
 {
@@ -137,14 +125,7 @@ extern xr_vector<b_rc_face>			g_rc_faces		;
 
 // phases
 void	xrLoad			(LPCSTR name, bool draft_mode);
-//void	xrBuildNodes	();
-void	xrSmoothNodes	();
-void	xrLight			();
 void	xrCover			(bool pure_covers);
-void	xrMerge			();
-void	xrConvertAndLink();
-void	xrDisplay		();
-//void	xrPalettizeCovers();
 void	xrSaveNodes		(LPCSTR name, LPCSTR out_name);
 
 // constants
