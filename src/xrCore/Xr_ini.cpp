@@ -25,9 +25,6 @@ bool item_pred(const CInifile::Item& x, LPCSTR val)
     else return xr_strcmp(*x.first, val) < 0;
 }
 
-//------------------------------------------------------------------------------
-//Тело функций Inifile
-//------------------------------------------------------------------------------
 XRCORE_API BOOL _parse(LPSTR dest, LPCSTR src)
 {
     BOOL bInsideSTR = false;
