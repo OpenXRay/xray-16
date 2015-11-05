@@ -382,6 +382,6 @@ typedef _box3<double> Dbox;
 typedef _box3<double> Dbox3;
 
 template <class T>
-BOOL _valid(const _box3<T>& c) { return _valid(min) && _valid(max); }
+BOOL _valid(const _box3<T>& c) { return _valid(c.min) && _valid(c.max); }
 
 #endif
