@@ -792,7 +792,7 @@ static void invalid_parameter_handler(
     string4096 function_;
     string4096 file_;
     size_t converted_chars = 0;
-    // errno_t err =
+    // int err =
     if (expression)
         wcstombs_s(
             &converted_chars,
