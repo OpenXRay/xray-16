@@ -7,7 +7,8 @@ LPSTR _TrimLeft(LPSTR str)
     while (*p && (u8(*p) <= u8(' '))) p++;
     if (p != str)
     {
-        for (LPSTR t = str; *p; t++, p++) *t = *p;
+        LPSTR t = str;
+        for (; *p; t++, p++) *t = *p;
         *t = 0;
     }
     return str;
@@ -427,7 +428,7 @@ xr_string& _Trim(xr_string& str)
 LPCSTR _CopyVal(LPCSTR src, xr_string& dst, char separator)
 {
     LPCSTR p;
-    ptrdiff_t n;
+    std::ptrdiff_t n;
     p = strchr(src, separator);
     n = (p > 0) ? (p - src) : xr_strlen(src);
     dst = src;
