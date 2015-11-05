@@ -37,8 +37,6 @@ template <typename object_type, typename base_type = intrusive_base>
 class intrusive_ptr
 {
 private:
-    typedef base_type base_type;
-    typedef object_type object_type;
     typedef intrusive_ptr<object_type, base_type> self_type;
     typedef const object_type* (intrusive_ptr::*unspecified_bool_type) () const;
 
