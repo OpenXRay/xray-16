@@ -400,7 +400,7 @@ void ShrinkModel(int MaxSize)
     for (int k=0; ;k++) {
         printf("b: %6.2f, ",b);             SizeOfModel=1+(nc=1)+2*256;
         for (int i=MaxOrder;i > 0;i--)      MaxContext->cutOff(0,i,b);
-        printf("SizeOfModel: %7d bytes, nc: %7d\n",SizeOfModel,nc);
+        printf("SizeOfModel: %7lu bytes, nc: %7lu\n",SizeOfModel,nc);
         if (MaxSize >= (int)SizeOfModel)         break;
         s0=s1;                              b0=b1;
         s1=SizeOfModel;                     b1=b;
