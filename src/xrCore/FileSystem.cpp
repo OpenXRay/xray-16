@@ -217,7 +217,7 @@ bool EFS_Utils::GetOpenNameInternal(LPCSTR initial, LPSTR buffer, int sz_buf, bo
             xr_strcpy(buffer, sz_buf, fns);
         }
     }
-    strlwr(buffer);
+    xr_strlwr(buffer);
     return bRes;
 }
 
@@ -282,7 +282,7 @@ bool EFS_Utils::GetSaveName(LPCSTR initial, string_path& buffer, LPCSTR offset, 
             break;
         }
     }
-    strlwr(buffer);
+    xr_strlwr(buffer);
     return bRes;
 }
 //----------------------------------------------------
