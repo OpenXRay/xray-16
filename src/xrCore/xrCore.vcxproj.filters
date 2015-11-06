@@ -118,6 +118,9 @@
     <Filter Include="Debug core\DxErr">
       <UniqueIdentifier>{0a558484-bd93-4e59-90eb-227898f999f9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="crypto">
+      <UniqueIdentifier>{c56e1246-919c-4516-ad31-b9d3b4dadbc4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -368,6 +371,15 @@
     </ClCompile>
     <ClCompile Include="Debug\dxerr.cpp">
       <Filter>Debug core\DxErr</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\crypto.cpp">
+      <Filter>crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\xr_dsa.cpp">
+      <Filter>crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\xr_sha.cpp">
+      <Filter>crypto</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -778,6 +790,18 @@
     </ClInclude>
     <ClInclude Include="..\common\LevelStructure.hpp">
       <Filter>Kernel\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\crypto.h">
+      <Filter>crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\crypto_api_def.h">
+      <Filter>crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\xr_dsa.h">
+      <Filter>crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\xr_sha.h">
+      <Filter>crypto</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

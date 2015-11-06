@@ -3,7 +3,6 @@
 #include "screenshots_reader.h"
 
 #pragma comment(lib, "xrCore.lib")
-#pragma comment(lib, "crypto.lib")
 
 void print_format()
 {
