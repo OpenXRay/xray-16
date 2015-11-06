@@ -1,9 +1,11 @@
 #pragma once
 
+#include "xrCore/Platform.h"
+
 #ifdef XRSCRIPTENGINE_EXPORTS
-#define XRSCRIPTENGINE_API __declspec(dllexport)
+#define XRSCRIPTENGINE_API XR_EXPORT
 #else
-#define XRSCRIPTENGINE_API __declspec(dllimport)
+#define XRSCRIPTENGINE_API XR_IMPORT
 #endif
 
 #pragma warning(disable:4244)

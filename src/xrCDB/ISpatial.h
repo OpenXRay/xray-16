@@ -2,6 +2,7 @@
 #define XRENGINE_ISPATIAL_H_INCLUDED
 
 //#pragma once
+#include "xrCore/Platform.h"
 #include "xrCore/xrPool.h"
 #include "xr_collide_defs.h"
 
@@ -144,7 +145,7 @@ public:
 //template <class T, int granularity>
 //class	poolSS;
 #ifndef	DLL_API
-#	define DLL_API					__declspec(dllimport)
+#	define DLL_API					XR_IMPORT
 #endif // #ifndef	DLL_API
 
 //////////////////////////////////////////////////////////////////////////

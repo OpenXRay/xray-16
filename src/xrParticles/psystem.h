@@ -2,10 +2,12 @@
 #define PSystemH
 #pragma once
 
+#include "xrCore/Platform.h"
+
 #ifdef XR_PARTICLES_EXPORTS
-	#define PARTICLES_API __declspec(dllexport)
+	#define PARTICLES_API XR_EXPORT
 #else
-	#define PARTICLES_API __declspec(dllimport)
+	#define PARTICLES_API XR_IMPORT
 	#ifdef _EDITOR
 		#pragma comment(lib,"x:\\xrParticlesB.lib")
 	#else

@@ -520,6 +520,8 @@ static inline void UpdateModel( PPM_CONTEXT* MinContext)
         }
     }
     
+    PPM_CONTEXT *Successor = 0;
+
     if( !OrderFall && FSuccessor) 
     {
         FoundState->Successor=CreateSuccessors(TRUE,p,MinContext);
@@ -531,7 +533,7 @@ static inline void UpdateModel( PPM_CONTEXT* MinContext)
 
     *pText++ = FSymbol;                     
 
-    PPM_CONTEXT*    Successor = (PPM_CONTEXT*) pText;
+    Successor = (PPM_CONTEXT*) pText;
     
     if (pText >= UnitsStart)                
         goto RESTART_MODEL;

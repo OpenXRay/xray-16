@@ -2,6 +2,8 @@
 #define _VECTOR4_H
 #pragma once
 
+#include "Platform.h"
+
 template <class T>
 struct _vector4
 {
@@ -63,9 +65,9 @@ typedef _vector4<float> Fvector4;
 typedef _vector4<double> Dvector4;
 typedef _vector4<s32> Ivector4;
 #ifndef __BORLANDC__
-typedef __declspec(align(16)) _vector4<float> Fvector4a;
-typedef __declspec(align(16)) _vector4<double> Dvector4a;
-typedef __declspec(align(16)) _vector4<s32> Ivector4a;
+typedef ALIGN(16) _vector4<float> Fvector4a;
+typedef ALIGN(16) _vector4<double> Dvector4a;
+typedef ALIGN(16) _vector4<s32> Ivector4a;
 #endif
 
 template <class T>

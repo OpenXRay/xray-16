@@ -1,3 +1,5 @@
+#include "xrCore/Platform.h"
+
 // The following ifdef block is the standard way of creating macros which make exporting 
 // from a DLL simpler. All files within this DLL are compiled with the XRGAMESPY_EXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
@@ -5,9 +7,9 @@
 // XRGAMESPY_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 #ifdef XRGAMESPY_EXPORTS
-#define XRGAMESPY_API __declspec(dllexport)
+#define XRGAMESPY_API XR_EXPORT
 #else
-#define XRGAMESPY_API __declspec(dllimport)
+#define XRGAMESPY_API XR_IMPORT
 #endif
 /*
 // This class is exported from the xrGameSpy.dll

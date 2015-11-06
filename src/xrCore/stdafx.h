@@ -9,7 +9,7 @@
 #pragma warning (disable:4661)
 
 #include "xrCore.h"
-#include "xrCore_platform.h"
+#include "Platform.h"
 #include "Common/Util.hpp"
 //.#include "Include/xrAPI/xrAPI.h"
 #endif

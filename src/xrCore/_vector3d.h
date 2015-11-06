@@ -1,10 +1,7 @@
 #ifndef __V3D__
 #define __V3D__
 
-// Inline call
-#ifndef IC
-#define IC __forceinline
-#endif
+#include "Platform.h"
 
 template <class T>
 struct _vector3

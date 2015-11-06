@@ -1,5 +1,7 @@
 #pragma once
 
+#include "xrCore/Platform.h"
+
 #define QRCDKEY_INTEGRATION
 #define SB_ICMP_SUPPORT
 
@@ -51,7 +53,7 @@
 
 #ifndef XRGAMESPY_API
 	#ifdef XRGAMESPY_EXPORTS
-		#define XRGAMESPY_API				__declspec(dllexport)
+		#define XRGAMESPY_API				XR_EXPORT
 	#endif
 #endif
 

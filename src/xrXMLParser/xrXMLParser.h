@@ -2,11 +2,12 @@
 #define xrXMLParserH
 #pragma once
 
+#include "xrCore/Platform.h"
 
 #ifdef XRXMLPARSER_EXPORTS
-	#define XRXMLPARSER_API __declspec(dllexport)
+	#define XRXMLPARSER_API XR_EXPORT
 #else
-	#define XRXMLPARSER_API __declspec(dllimport)
+	#define XRXMLPARSER_API XR_IMPORT
 	#pragma comment			(lib,"xrXMLParser.lib")
 #endif
 

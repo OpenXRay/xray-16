@@ -189,6 +189,11 @@ IC u32 xr_strlen(const char* S)
     return (u32)strlen(S);
 }
 
+IC char* xr_strupr(char *S)
+{
+    return _strupr(S);
+}
+
 IC char* xr_strlwr(char* S)
 {
     return strlwr(S);
@@ -206,12 +211,12 @@ IC int xr_strcmp(const char* S1, const char* S2)
 #ifndef _EDITOR
 #ifndef MASTER_GOLD
 
-inline errno_t xr_strcpy(LPSTR destination, size_t const destination_size, LPCSTR source)
+inline int xr_strcpy(LPSTR destination, size_t const destination_size, LPCSTR source)
 {
     return strcpy_s(destination, destination_size, source);
 }
 
-inline errno_t xr_strcat(LPSTR destination, size_t const buffer_size, LPCSTR source)
+inline int xr_strcat(LPSTR destination, size_t const buffer_size, LPCSTR source)
 {
     return strcat_s(destination, buffer_size, source);
 }
@@ -232,12 +237,12 @@ inline int __cdecl xr_sprintf(char(&destination)[count], LPCSTR format_string, .
 }
 #else // #ifndef MASTER_GOLD
 
-inline errno_t xr_strcpy(LPSTR destination, size_t const destination_size, LPCSTR source)
+inline int xr_strcpy(LPSTR destination, size_t const destination_size, LPCSTR source)
 {
     return strncpy_s(destination, destination_size, source, destination_size);
 }
 
-inline errno_t xr_strcat(LPSTR destination, size_t const buffer_size, LPCSTR source)
+inline int xr_strcat(LPSTR destination, size_t const buffer_size, LPCSTR source)
 {
     size_t const destination_length = xr_strlen(destination);
     LPSTR i = destination + destination_length;
@@ -271,13 +276,13 @@ inline int __cdecl xr_sprintf(char(&destination)[count], LPCSTR format_string, .
 # pragma deprecated( strcpy, strcpy_s, sprintf, sprintf_s, strcat, strcat_s )
 
 template <int count>
-inline errno_t xr_strcpy(char(&destination)[count], LPCSTR source)
+inline int xr_strcpy(char(&destination)[count], LPCSTR source)
 {
     return xr_strcpy(destination, count, source);
 }
 
 template <int count>
-inline errno_t xr_strcat(char(&destination)[count], LPCSTR source)
+inline int xr_strcat(char(&destination)[count], LPCSTR source)
 {
     return xr_strcat(destination, count, source);
 }

@@ -1,10 +1,12 @@
 #ifndef XRSE_FACTORY_IMPORT_EXPORTH
 #define XRSE_FACTORY_IMPORT_EXPORTH
 
+#include "xrCore/Platform.h"
+
 #ifdef XRSE_FACTORY_EXPORTS
-#	define FACTORY_API __declspec(dllexport)
+#	define FACTORY_API XR_EXPORT
 #else
-#	define FACTORY_API __declspec(dllimport)
+#	define FACTORY_API XR_IMPORT
 #endif
 
 extern "C" {

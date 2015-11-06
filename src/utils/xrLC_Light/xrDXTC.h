@@ -1,9 +1,11 @@
 #pragma once
 
+#include "xrCore/Platform.h"
+
 #ifdef XRDXTC_EXPORTS
-#define DXTC_API __declspec(dllexport)
+#define DXTC_API XR_EXPORT
 #else
-#define DXTC_API __declspec(dllimport)
+#define DXTC_API XR_IMPORT
 #endif
 
 enum eDXTC

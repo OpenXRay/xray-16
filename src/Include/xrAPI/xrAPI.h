@@ -1,9 +1,11 @@
 #pragma once
 
+#include "xrCore/Platform.h"
+
 #ifdef XRAPI_EXPORTS
-#define XRAPI_API __declspec(dllexport)
+#define XRAPI_API XR_EXPORT
 #else
-#define XRAPI_API __declspec(dllimport)
+#define XRAPI_API XR_IMPORT
 #endif
 
 class IRender;
