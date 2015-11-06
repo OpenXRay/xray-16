@@ -189,6 +189,11 @@ IC u32 xr_strlen(const char* S)
     return (u32)strlen(S);
 }
 
+IC char* xr_strupr(char *S)
+{
+    return _strupr(S);
+}
+
 IC char* xr_strlwr(char* S)
 {
     return strlwr(S);
