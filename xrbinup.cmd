@@ -62,9 +62,8 @@ set cp_tool=cp
 %cp_tool% %src%\%cfg_long%\xrRender_R3.dll %dst%\xrRender_R3.dll
 %cp_tool% %src%\%cfg_long%\xrRender_R4.dll %dst%\xrRender_R4.dll
 %cp_tool% %src%\%cfg_long%\xrXMLParser.dll %dst%\xrXMLParser.dll
-rem crypto and CxImage are compiled as DLLs only in debug configuration
+rem CxImage is compiled as DLLs only in debug configuration
 if defined dbg (
-  %cp_tool% %src%\%cfg_long%\crypto.dll %dst%\crypto.dll
   %cp_tool% %src%\%cfg_long%\CxImage.dll %dst%\CxImage.dll
 )
 %cp_tool% %src%\%cfg_long%\Lua.JIT.1.1.4.dll %dst%\Lua.JIT.1.1.4.dll
