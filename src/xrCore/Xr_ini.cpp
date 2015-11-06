@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "fs_internal.h"
-
 XRCORE_API CInifile const* pSettings = NULL;
 XRCORE_API CInifile const* pSettingsAuth = NULL;
 
