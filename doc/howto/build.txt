@@ -62,3 +62,5 @@ Setup:
   set dst="E:\Program Files (x86)\GSC World Publishing\STALKER-COP"
   call xrbinup.cmd %dst% %src% dbg
   endlocal
+
+XXX nitrocaster: add script for copying/renaming/soft linking
