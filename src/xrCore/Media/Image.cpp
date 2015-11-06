@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "Image.hpp"
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <io.h>
+
+#include <cstdio>
 
 using namespace XRay::Media;
 
@@ -18,11 +17,11 @@ Image &Image::Create(u16 width, u16 height, void *data, ImageFormat format)
 
 void Image::SaveTGA(const char *name, ImageFormat format, bool align)
 {
-    int fd = _open(name, O_CREAT|O_WRONLY|O_BINARY, S_IREAD|S_IWRITE);
+    FILE *file = std::fopen( name, "wb");
     auto writerFunc = [&](void *data, u32 dataSize)
-    { _write(fd, data, dataSize); };
+    { std::fwrite(data, dataSize, 1, file); };
     SaveTGA(writerFunc, format, align);
-    _close(fd);
+    std::fclose(file);
 }
 
 void Image::SaveTGA(IWriter& writer, bool align)
