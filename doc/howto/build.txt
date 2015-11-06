@@ -7,6 +7,8 @@ defined by XRAY_16X_LIBS environment variable. It can be set with following comm
   $ setx XRAY_16X_LIBS E:\dev\ /M
 
 To build X-Ray Engine you'll need following libraries:
+* OpenSSL: https://www.openssl.org/source
+  - Prebuilt binaries can be downloaded here: https://slproweb.com/products/Win32OpenSSL.html
 * OpenAutomate: https://developer.nvidia.com/openautomate
 * NVAPI: https://developer.nvidia.com/nvapi
 * libjpeg: http://sourceforge.net/projects/libjpeg
@@ -46,6 +48,9 @@ Setup:
   - Copy BugTrap.dll from %XRAY_16X_LIBS%BugTrap\Bin
 - For _bin_dbg:
   - Copy BugTrapD.dll from %XRAY_16X_LIBS%BugTrap\Bin and rename it to BugTrap.dll
+- Copy following files from %XRAY_16X_LIBS%OpenSSL\bin to _bin_dbg, _bin_mix and _bin_rel:
+  - libeay32.dll
+  - ssleay32.dll
 - Create soft link to /gamedata in the game installation directory:
   $ mklink /D <game installation directory>\gamedata <xray-16 repository root>\res\gamedata  
 - After successful build use xrbinup.cmd to update game binaries:
