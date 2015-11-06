@@ -1,7 +1,7 @@
 #ifndef XR_DSA_SIGNER_INCLUDED
 #define XR_DSA_SIGNER_INCLUDED
 
-#include "3rd party/crypto/crypto.h"
+#include "xrCore/crypto/crypto.h"
 
 typedef fastdelegate::FastDelegate1< long >	sha_process_yielder;
 
