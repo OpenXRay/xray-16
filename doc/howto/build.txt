@@ -28,7 +28,7 @@ To build X-Ray Engine you'll need following libraries:
     (for DirectPlay GUIDs)
 
 You can download all these libraries (except Windows/DirectX SDK) with compiled binaries here:
-https://dl.dropboxusercontent.com/u/63973281/dev/xray/xray-16-libraries.7z
+https://dl.dropboxusercontent.com/u/63973281/dev/xray/xray-16-libraries.zip
 
 Setup:
 ------
