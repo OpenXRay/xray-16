@@ -1,6 +1,8 @@
 #ifndef XRCDB_H
 #define XRCDB_H
 
+#include "xrCore/Platform.h"
+
 //#pragma once
 // The following ifdef block is the standard way of creating macros which make exporting
 // from a DLL simpler. All files within this DLL are compiled with the XRCDB_EXPORTS
@@ -8,10 +10,11 @@
 // that uses this DLL. This way any other project whose source files include this file see
 // XRCDB_API functions as being imported from a DLL, wheras this DLL sees symbols
 // defined with this macro as being exported.
+
 #ifdef XRCDB_EXPORTS
-#define XRCDB_API __declspec(dllexport)
+# define XRCDB_API XR_EXPORT
 #else
-#define XRCDB_API __declspec(dllimport)
+# define XRCDB_API XR_IMPORT
 #endif
 #ifdef M_VISUAL
 #define ALIGN(a) __declspec(align(a))

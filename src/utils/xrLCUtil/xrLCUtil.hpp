@@ -4,10 +4,12 @@
 #pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "comctl32.lib")
 
+#include "xrCore/Platform.h"
+
 #ifdef XRLCUTIL_EXPORTS
-#define XRLCUTIL_API __declspec(dllexport)
+#define XRLCUTIL_API XR_EXPORT
 #else
-#define XRLCUTIL_API __declspec(dllimport)
+#define XRLCUTIL_API XR_IMPORT
 #endif
 
 XRLCUTIL_API std::string make_time(u32 sec);

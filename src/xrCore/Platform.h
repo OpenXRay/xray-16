@@ -16,6 +16,9 @@
 # define _WIN32_WINNT 0x0501
 #endif
 
+#define XR_EXPORT __declspec(dllexport)
+#define XR_IMPORT __declspec(dllimport)
+
 #ifdef __BORLANDC__
 #include <vcl.h>
 #include <mmsystem.h>

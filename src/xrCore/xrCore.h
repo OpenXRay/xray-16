@@ -193,9 +193,9 @@
 
 // Our headers
 #ifdef XRCORE_EXPORTS
-#define XRCORE_API __declspec(dllexport)
+#define XRCORE_API XR_EXPORT
 #else
-#define XRCORE_API __declspec(dllimport)
+#define XRCORE_API XR_IMPORT
 #endif
 
 #include "xrDebug.h"

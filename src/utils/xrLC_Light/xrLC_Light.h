@@ -1,10 +1,11 @@
 #pragma once
 
+#include "xrCore/Platform.h"
 #include "xrCore/xrCore.h"
 #ifdef XRLC_LIGHT_EXPORTS
-#   define XRLC_LIGHT_API __declspec(dllexport)
+#   define XRLC_LIGHT_API XR_EXPORT
 #else
-#   define XRLC_LIGHT_API __declspec(dllimport)
+#   define XRLC_LIGHT_API XR_IMPORT
 #endif
 
 #pragma warning(disable:4995)
