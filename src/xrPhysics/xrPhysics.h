@@ -1,9 +1,11 @@
 #pragma once
 
+#include "xrCore/Platform.h"
+
 #ifdef XRPHYSICS_EXPORTS
-#define XRPHYSICS_API __declspec(dllexport)
+#define XRPHYSICS_API XR_EXPORT
 #else
-#define XRPHYSICS_API __declspec(dllimport)
+#define XRPHYSICS_API XR_IMPORT
 	#ifndef	_EDITOR
 		#pragma comment( lib, "xrPhysics.lib"	)
 	#else

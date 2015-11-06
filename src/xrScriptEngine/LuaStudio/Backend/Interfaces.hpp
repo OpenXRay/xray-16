@@ -8,12 +8,14 @@
 
 #pragma once
 
+#include "xrCore/Platform.h"
+
 #include "xrScriptEngine/LuaStudio/Config.hpp"
 
 #define CS_LUA_STUDIO_BACKEND_CALL __stdcall
 
 #ifndef CS_LUA_STUDIO_BACKEND_API
-#define CS_LUA_STUDIO_BACKEND_API __declspec(dllimport)
+#define CS_LUA_STUDIO_BACKEND_API XR_IMPORT
 #endif
 
 #define CS_LUA_STUDIO_BACKEND_FILE_NAME	CS_LIBRARY_NAME(lua_studio_backend, dll)

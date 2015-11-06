@@ -1,6 +1,8 @@
 #ifndef FS_IMPL_H_INCLUDED
 #define FS_IMPL_H_INCLUDED
 
+#include "Platform.h"
+
 // 1: default
 // 1.5: check next chunk first heuristics
 // 2: vector population heuristics
@@ -37,9 +39,9 @@ struct find_chunk_counter
 };
 
 #ifdef INCLUDE_FROM_ENGINE
-extern __declspec(dllimport) find_chunk_counter g_find_chunk_counter;
+extern XR_IMPORT find_chunk_counter g_find_chunk_counter;
 #else //INCLUDE_FROM_ENGINE
-extern __declspec(dllexport) find_chunk_counter g_find_chunk_counter;
+extern XR_EXPORT find_chunk_counter g_find_chunk_counter;
 #endif //INCLUDE_FROM_ENGINE
 
 extern bool g_initialize_cpu_called;

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "fs_internal.h"
+#include "FileSystem.h"
 
 XRCORE_API CInifile const* pSettings = NULL;
 XRCORE_API CInifile const* pSettingsAuth = NULL;
@@ -27,9 +27,6 @@ bool item_pred(const CInifile::Item& x, LPCSTR val)
     else return xr_strcmp(*x.first, val) < 0;
 }
 
-//------------------------------------------------------------------------------
-//Тело функций Inifile
-//------------------------------------------------------------------------------
 XRCORE_API BOOL _parse(LPSTR dest, LPCSTR src)
 {
     BOOL bInsideSTR = false;
@@ -139,15 +136,13 @@ CInifile::CInifile(LPCSTR szFileName,
 
     if (bLoad)
     {
-        string_path path, folder;
-        _splitpath(m_file_name, path, folder, 0, 0);
-        xr_strcat(path, sizeof(path), folder);
+        const xr_string path = EFS_Utils::ExtractFilePath(m_file_name);
         IReader* R = FS.r_open(szFileName);
         if (R)
         {
             if (sect_count)
                 DATA.reserve(sect_count);
-            Load(R, path
+            Load(R, path.c_str()
 #ifndef _EDITOR
                  , allow_include_func
 #endif
@@ -255,17 +250,16 @@ void CInifile::Load(IReader* F, LPCSTR path
             R_ASSERT(path&&path[0]);
             if (_GetItem(str, 1, inc_name, '"'))
             {
-                string_path fn, inc_path, folder;
+                string_path fn;
                 strconcat(sizeof(fn), fn, path, inc_name);
-                _splitpath(fn, inc_path, folder, 0, 0);
-                xr_strcat(inc_path, sizeof(inc_path), folder);
+                const xr_string inc_path = EFS_Utils::ExtractFilePath(fn);
 #ifndef _EDITOR
                 if (!allow_include_func || allow_include_func(fn))
 #endif
                 {
                     IReader* I = FS.r_open(fn);
                     R_ASSERT3(I, "Can't find include file:", inc_name);
-                    Load(I, inc_path
+                    Load(I, inc_path.c_str()
 #ifndef _EDITOR
                          , allow_include_func
 #endif
@@ -317,7 +311,7 @@ void CInifile::Load(IReader* F, LPCSTR path
                 }
             }
             *strchr(str, ']') = 0;
-            Current->Name = strlwr(str + 1);
+            Current->Name = xr_strlwr(str + 1);
         }
         else // name = value
         {
@@ -500,7 +494,7 @@ CInifile::Sect& CInifile::r_section(LPCSTR S)const
 {
     char section[256];
     xr_strcpy(section, sizeof(section), S);
-    strlwr(section);
+    xr_strlwr(section);
     RootCIt I = std::lower_bound(DATA.begin(), DATA.end(), section, sect_pred);
     if (!(I != DATA.end() && xr_strcmp(*(*I)->Name, section) == 0))
     {
@@ -682,9 +676,9 @@ BOOL CInifile::r_bool(LPCSTR S, LPCSTR L)const
         )
     );
     char B[8];
-    strncpy_s(B, sizeof(B), C, 7);
+    xr_strcpy(B, 7, C);
     B[7] = 0;
-    strlwr(B);
+    xr_strlwr(B);
     return IsBOOL(B);
 }
 
@@ -732,7 +726,7 @@ void CInifile::w_string(LPCSTR S, LPCSTR L, LPCSTR V, LPCSTR comment)
     // section
     string256 sect;
     _parse(sect, S);
-    _strlwr(sect);
+    xr_strlwr(sect);
 
     if (!section_exist(sect))
     {

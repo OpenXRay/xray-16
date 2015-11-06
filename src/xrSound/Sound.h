@@ -2,12 +2,12 @@
 #define SoundH
 #pragma once
 
-
+#include "xrCore/Platform.h"
 
 #ifdef XRSOUND_EXPORTS
-	#define XRSOUND_API __declspec(dllexport)
+	#define XRSOUND_API XR_EXPORT
 #else
-	#define XRSOUND_API __declspec(dllimport)
+	#define XRSOUND_API XR_IMPORT
 #endif
 
 #ifdef __BORLANDC__

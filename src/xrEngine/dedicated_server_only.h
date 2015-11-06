@@ -1,12 +1,14 @@
 #ifndef DEDICATED_SERVER_ONLY_H_INCLUDED
 #define DEDICATED_SERVER_ONLY_H_INCLUDED
 
+#include "xrCore/Platform.h"
+
 //#define DEDICATED_SERVER_ONLY
 
 #ifdef DEDICATED_SERVER_ONLY
 # define PROTECT_API
 #else// #ifdef DEDICATED_SERVER_ONLY
-# define PROTECT_API __declspec(dllexport)
+# define PROTECT_API XR_EXPORT
 #endif // #ifdef DEDICATED_SERVER_ONLY
 
 #ifdef BENCHMARK_BUILD

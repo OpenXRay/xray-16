@@ -14,7 +14,7 @@ static const float S_distance2 = S_distance*S_distance;
 static const float S_fade = 4.5;
 static const float S_fade2 = S_fade*S_fade;
 
-static __forceinline float PLC_energy_SSE(const Fvector &p, const Fvector &n, const light *L, float e)
+static ICF float PLC_energy_SSE(const Fvector &p, const Fvector &n, const light *L, float e)
 {
     Fvector lDir;
     if (L->flags.type==IRender_Light::DIRECT)
@@ -47,7 +47,7 @@ static __forceinline float PLC_energy_SSE(const Fvector &p, const Fvector &n, co
     }
 }
 
-static __forceinline int iCeil_SSE(float x)
+static ICF int iCeil_SSE(float x)
 { return _mm_cvt_ss2si(_mm_set_ss(x)); }
 
 void PLCCalc_SSE(int &c0, int &c1, int &c2, const Fvector &camPos, const Fvector *ps, const Fvector &n,

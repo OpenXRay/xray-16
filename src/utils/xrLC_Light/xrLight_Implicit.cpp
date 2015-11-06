@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "xrCore/Platform.h"
+
 #include "xrlight_implicit.h"
 #include "xrLight_ImplicitDeflector.h"
 #include "xrlight_implicitrun.h"
@@ -11,7 +13,7 @@
 #include "net_task_callback.h"
 #include "xrCDB/xrCDB.h"
 
-extern "C" bool __declspec(dllimport) __stdcall DXTCompress(LPCSTR out_name, u8* raw_data, u8* normal_map, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);
+extern "C" bool XR_IMPORT __stdcall DXTCompress(LPCSTR out_name, u8* raw_data, u8* normal_map, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);
 
 DEF_MAP(Implicit,u32,ImplicitDeflector);
 

@@ -1,8 +1,10 @@
 #pragma once
 
+#include "xrCore/Platform.h"
+
 extern "C" {
-	typedef __declspec(dllimport)  ISE_Abstract*	__stdcall Factory_Create	(LPCSTR section);
-	typedef __declspec(dllimport)  void				__stdcall Factory_Destroy	(ISE_Abstract *&);
+	typedef XR_IMPORT  ISE_Abstract*	__stdcall Factory_Create	(LPCSTR section);
+	typedef XR_IMPORT  void				__stdcall Factory_Destroy	(ISE_Abstract *&);
 };
 
 extern Factory_Create	*create_entity;

@@ -106,7 +106,7 @@ bool file_handle_internal(LPCSTR file_name, u32& size, int& hFile)
     return (true);
 }
 #else // EDITOR
-static errno_t open_internal(LPCSTR fn, int& handle)
+static int open_internal(LPCSTR fn, int& handle)
 {
     return (
         _sopen_s(

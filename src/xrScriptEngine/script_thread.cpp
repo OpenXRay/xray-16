@@ -11,6 +11,8 @@
 #include "script_engine.hpp"
 #include "Include/xrAPI/xrAPI.h"
 
+// #include "xrCore/Platform.h"
+
 extern "C"
 {
 #include "lua/lua.h"
@@ -35,7 +37,7 @@ const LPCSTR main_function = "console_command_run_string_main_thread_function";
 //		Msg("%2d : %s",-i-1,lua_typename(L, lua_type(L, -i-1)));
 //}
 
-//extern "C" __declspec(dllimport) lua_State *lua_newcthread(lua_State *OL, int cstacksize);
+//extern "C" XR_IMPORT lua_State *lua_newcthread(lua_State *OL, int cstacksize);
 
 CScriptThread::CScriptThread(LPCSTR caNamespaceName, bool do_string, bool reload)
 {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "xrCore/Platform.h"
+
 // you must define ENGINE_BUILD then building the engine itself
 // and not define it if you are about to build DLL
 
@@ -7,12 +9,12 @@
 #ifndef ENGINE_API
 #ifndef NO_ENGINE_API
 #ifdef ENGINE_BUILD
-#define DLL_API __declspec(dllimport)
-#define ENGINE_API __declspec(dllexport)
+#define DLL_API XR_IMPORT
+#define ENGINE_API XR_EXPORT
 #else
 #undef DLL_API
-#define DLL_API __declspec(dllexport)
-#define ENGINE_API __declspec(dllimport)
+#define DLL_API XR_EXPORT
+#define ENGINE_API XR_IMPORT
 #endif
 #else
 #define ENGINE_API

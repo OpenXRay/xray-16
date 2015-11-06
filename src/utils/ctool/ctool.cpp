@@ -344,7 +344,7 @@ _BuildDictionary( const char* bins_file, const char* dst_name="" )
                               : 1;*/
             
 			unsigned int n   = 0;
-			unsigned int cnt = unsigned int((lzo_dict_max_size*info.weight) / info.size);
+			unsigned int cnt = (unsigned int)((lzo_dict_max_size*info.weight) / info.size);
            
             for( unsigned p=0,n=0; p<cnt; ++p,++n )
             {
