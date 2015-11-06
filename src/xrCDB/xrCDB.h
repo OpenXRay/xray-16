@@ -16,11 +16,6 @@
 #else
 # define XRCDB_API XR_IMPORT
 #endif
-#ifdef M_VISUAL
-#define ALIGN(a) __declspec(align(a))
-#else
-#define ALIGN(a)
-#endif
 
 // forward declarations
 class CFrustum;
