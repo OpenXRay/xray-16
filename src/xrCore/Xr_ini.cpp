@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#include "FileSystem.h"
+
 XRCORE_API CInifile const* pSettings = NULL;
 XRCORE_API CInifile const* pSettingsAuth = NULL;
 
@@ -134,15 +136,13 @@ CInifile::CInifile(LPCSTR szFileName,
 
     if (bLoad)
     {
-        string_path path, folder;
-        _splitpath(m_file_name, path, folder, 0, 0);
-        xr_strcat(path, sizeof(path), folder);
+        const xr_string path = EFS_Utils::ExtractFilePath(m_file_name);
         IReader* R = FS.r_open(szFileName);
         if (R)
         {
             if (sect_count)
                 DATA.reserve(sect_count);
-            Load(R, path
+            Load(R, path.c_str()
 #ifndef _EDITOR
                  , allow_include_func
 #endif
@@ -250,17 +250,16 @@ void CInifile::Load(IReader* F, LPCSTR path
             R_ASSERT(path&&path[0]);
             if (_GetItem(str, 1, inc_name, '"'))
             {
-                string_path fn, inc_path, folder;
+                string_path fn;
                 strconcat(sizeof(fn), fn, path, inc_name);
-                _splitpath(fn, inc_path, folder, 0, 0);
-                xr_strcat(inc_path, sizeof(inc_path), folder);
+                const xr_string inc_path = EFS_Utils::ExtractFilePath(fn);
 #ifndef _EDITOR
                 if (!allow_include_func || allow_include_func(fn))
 #endif
                 {
                     IReader* I = FS.r_open(fn);
                     R_ASSERT3(I, "Can't find include file:", inc_name);
-                    Load(I, inc_path
+                    Load(I, inc_path.c_str()
 #ifndef _EDITOR
                          , allow_include_func
 #endif
