@@ -317,7 +317,7 @@ void CInifile::Load(IReader* F, LPCSTR path
                 }
             }
             *strchr(str, ']') = 0;
-            Current->Name = strlwr(str + 1);
+            Current->Name = xr_strlwr(str + 1);
         }
         else // name = value
         {
@@ -500,7 +500,7 @@ CInifile::Sect& CInifile::r_section(LPCSTR S)const
 {
     char section[256];
     xr_strcpy(section, sizeof(section), S);
-    strlwr(section);
+    xr_strlwr(section);
     RootCIt I = std::lower_bound(DATA.begin(), DATA.end(), section, sect_pred);
     if (!(I != DATA.end() && xr_strcmp(*(*I)->Name, section) == 0))
     {
@@ -684,7 +684,7 @@ BOOL CInifile::r_bool(LPCSTR S, LPCSTR L)const
     char B[8];
     strncpy_s(B, sizeof(B), C, 7);
     B[7] = 0;
-    strlwr(B);
+    xr_strlwr(B);
     return IsBOOL(B);
 }
 
@@ -732,7 +732,7 @@ void CInifile::w_string(LPCSTR S, LPCSTR L, LPCSTR V, LPCSTR comment)
     // section
     string256 sect;
     _parse(sect, S);
-    _strlwr(sect);
+    xr_strlwr(sect);
 
     if (!section_exist(sect))
     {
