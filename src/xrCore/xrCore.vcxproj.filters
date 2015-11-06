@@ -383,7 +383,7 @@
     <ClInclude Include="xrCore.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="xrCore_platform.h">
+    <ClInclude Include="Platform.h">
       <Filter>Kernel</Filter>
     </ClInclude>
     <ClInclude Include="_bitwise.h">

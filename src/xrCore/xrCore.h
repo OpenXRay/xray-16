@@ -52,7 +52,7 @@
 #error Please enable multi-threaded library...
 #endif
 
-# include "xrCore_platform.h"
+# include "Platform.h"
 
 /*
 // stl-config

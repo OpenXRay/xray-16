@@ -498,7 +498,7 @@
     <ClInclude Include="Threading\Lock.hpp" />
     <ClInclude Include="vector.h" />
     <ClInclude Include="xrCore.h" />
-    <ClInclude Include="xrCore_platform.h" />
+    <ClInclude Include="Platform.h" />
     <ClInclude Include="xrDebug.h" />
     <ClInclude Include="xrDebug_macros.h" />
     <ClInclude Include="xrMemory.h" />
