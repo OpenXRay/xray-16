@@ -680,7 +680,7 @@ BOOL CInifile::r_bool(LPCSTR S, LPCSTR L)const
         )
     );
     char B[8];
-    strncpy_s(B, sizeof(B), C, 7);
+    xr_strcpy(B, 7, C);
     B[7] = 0;
     xr_strlwr(B);
     return IsBOOL(B);
