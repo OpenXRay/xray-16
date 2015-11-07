@@ -4,7 +4,7 @@
 #include "xrCore/xrCore.h"
 #include "xrCore/LocatorAPI.h"
 #include "xrCore/ppmd_compressor.h"
-#include "xrCore/crypto/crypto.h"
+#include "xrCore/Crypto/crypto.h"
 
 
 #include <stdio.h>

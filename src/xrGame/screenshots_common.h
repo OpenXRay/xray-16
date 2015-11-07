@@ -1,7 +1,7 @@
 #ifndef SCREENSHOTS_COMMON_INCLUDED
 #define SCREENSHOTS_COMMON_INCLUDED
 
-#include "xrCore/crypto/crypto.h"
+#include "xrCore/Crypto/crypto.h"
 
 namespace screenshots
 {
