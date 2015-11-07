@@ -4,7 +4,7 @@
 
 #include "Common/object_interfaces.h"
 
-struct ARTICLE_DATA : public IPureSerializeObject<IReader,IWriter>
+struct ARTICLE_DATA : public ISerializable
 {
 	enum EArticleType {eEncyclopediaArticle, eJournalArticle, eTaskArticle, eInfoArticle};
 

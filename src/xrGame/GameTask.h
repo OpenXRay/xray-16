@@ -10,7 +10,7 @@ class CGameTask;
 
 typedef xr_vector<luabind::functor<bool> > task_state_functors;
 
-class SScriptTaskHelper: public IPureSerializeObject<IReader,IWriter>
+class SScriptTaskHelper: public ISerializable
 {
 public:
 	xr_vector<shared_str>					m_s_complete_lua_functions;

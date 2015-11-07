@@ -2,7 +2,7 @@
 #include "alife_abstract_registry.h"
 
 class CMapLocation;
-struct SLocationKey : public IPureSerializeObject<IReader,IWriter>,public IPureDestroyableObject {
+struct SLocationKey : public ISerializable, public IPureDestroyableObject {
 	shared_str		spot_type;
 	u16				object_id;
 	CMapLocation*	location;

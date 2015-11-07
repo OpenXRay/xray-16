@@ -83,13 +83,9 @@ SCRIPT_EXPORT(CPureServerObject, (),
 {
 	module(luaState)
     [
-		class_<IPureLoadableObject<IReader> >
-			("ipure_alife_load_object"),
-		class_<IPureSavableObject<IWriter> >
-			("ipure_alife_save_object"),
-		class_<IPureSerializeObject<IReader,IWriter>,bases<IPureLoadableObject<IReader>,IPureSavableObject<IWriter> > >
-			("ipure_alife_load_save_object"),
-		class_<IPureServerObject,IPureSerializeObject<IReader,IWriter> >
+		class_<ISerializable>
+			("iserializable"),
+		class_<IPureServerObject,ISerializable >
 			("ipure_server_object"),
 		class_<CPureServerObject,IPureServerObject>
 			("cpure_server_object")

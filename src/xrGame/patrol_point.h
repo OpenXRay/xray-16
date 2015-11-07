@@ -16,7 +16,8 @@ class CGameGraph;
 #include "Common/object_interfaces.h"
 #include "game_graph_space.h"
 
-class CPatrolPoint : public IPureSerializeObject<IReader,IWriter> {
+class CPatrolPoint : public ISerializable
+{
 protected:
 	shared_str							m_name;
 	Fvector								m_position;

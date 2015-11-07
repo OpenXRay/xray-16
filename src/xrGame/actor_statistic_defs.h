@@ -4,7 +4,7 @@
 extern xr_token actor_stats_token[];
 
 
-struct SStatDetailBData: public IPureSerializeObject<IReader,IWriter>
+struct SStatDetailBData: public ISerializable
 {
 	shared_str				key;
 	s32						int_count;
@@ -18,7 +18,7 @@ struct SStatDetailBData: public IPureSerializeObject<IReader,IWriter>
 
 typedef xr_vector<SStatDetailBData>	vStatDetailData;
 
-struct SStatSectionData: public IPureSerializeObject<IReader,IWriter>
+struct SStatSectionData: public ISerializable
 {
 	shared_str				key;
 	vStatDetailData			data;

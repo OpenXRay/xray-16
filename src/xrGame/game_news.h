@@ -7,7 +7,7 @@
 #define DEFAULT_NEWS_SHOW_TIME	5000
 
 
-struct GAME_NEWS_DATA : public IPureSerializeObject<IReader,IWriter>
+struct GAME_NEWS_DATA : public ISerializable
 {	
 	enum eNewsType
 	{

@@ -12,7 +12,8 @@
 
 class CSE_Abstract;
 
-class CServerEntityWrapper : public IPureSerializeObject<IReader,IWriter> {
+class CServerEntityWrapper : public ISerializable
+{
 private:
 	CSE_Abstract			*m_object;
 

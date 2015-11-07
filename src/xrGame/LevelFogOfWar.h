@@ -10,7 +10,7 @@
 class CUICustomMap;
 class CFogOfWarWrapper;
 
-class CLevelFogOfWar: public IPureSerializeObject<IReader,IWriter>, public CUIWindow
+class CLevelFogOfWar: public ISerializable, public CUIWindow
 {
 public:
 	ref_shader			hShader;

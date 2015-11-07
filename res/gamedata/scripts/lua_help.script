@@ -1275,13 +1275,7 @@ C++ class property_evaluator_const : property_evaluator {
 
 };
 
-C++ class ipure_alife_load_object {
-};
-
-C++ class ipure_alife_save_object {
-};
-
-C++ class ipure_alife_load_save_object : ipure_alife_load_object,ipure_alife_save_object {
+C++ class iserializable {
 };
 
 C++ class Fbox {

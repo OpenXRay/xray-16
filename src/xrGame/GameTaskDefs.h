@@ -21,7 +21,7 @@ enum ETaskType{
 extern shared_str	g_active_task_id;
 class CGameTask;
 
-struct SGameTaskKey : public IPureSerializeObject<IReader,IWriter>,public IPureDestroyableObject 
+struct SGameTaskKey : public ISerializable, public IPureDestroyableObject
 {
 	shared_str		task_id;
 	CGameTask*		game_task;
