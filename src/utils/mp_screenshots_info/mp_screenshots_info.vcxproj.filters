@@ -13,8 +13,6 @@
     <ClCompile Include="screenshots_common.cpp" />
     <ClCompile Include="screenshots_reader.cpp" />
     <ClCompile Include="screenshots_writer.cpp" />
-    <ClCompile Include="xr_dsa_signer.cpp" />
-    <ClCompile Include="xr_dsa_verifyer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -22,10 +20,8 @@
     </ClInclude>
     <ClInclude Include="screenshots_common.h" />
     <ClInclude Include="screenshots_reader.h" />
-    <ClInclude Include="xr_dsa_verifyer.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="screenshots_writer.h" />
-    <CustomBuild Include="xr_dsa_signer.h" />
   </ItemGroup>
 </Project>

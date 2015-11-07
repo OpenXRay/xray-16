@@ -100,14 +100,12 @@
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="xr_dsa_verifyer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="configs_common.h" />
     <ClInclude Include="configs_dump_verifyer.h" />
     <ClInclude Include="mp_config_sections.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="xr_dsa_verifyer.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">

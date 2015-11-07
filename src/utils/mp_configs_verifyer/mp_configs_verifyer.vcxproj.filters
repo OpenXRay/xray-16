@@ -13,7 +13,6 @@
     <ClCompile Include="configs_dump_verifyer.cpp" />
     <ClCompile Include="entry_point.cpp" />
     <ClCompile Include="mp_config_sections.cpp" />
-    <ClCompile Include="xr_dsa_verifyer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -22,6 +21,5 @@
     <ClInclude Include="configs_common.h" />
     <ClInclude Include="configs_dump_verifyer.h" />
     <ClInclude Include="mp_config_sections.h" />
-    <ClInclude Include="xr_dsa_verifyer.h" />
   </ItemGroup>
 </Project>

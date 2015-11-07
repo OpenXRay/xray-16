@@ -2,8 +2,8 @@
 #define GSC_DSINGNED_LTX_INCLUDED
 
 #include "xrCore/fastdelegate.h"
-#include "xr_dsa_signer.h"
-#include "xr_dsa_verifyer.h"
+#include "xrCore/crypto/xr_dsa_signer.h"
+#include "xrCore/crypto/xr_dsa_verifyer.h"
 
 class gsc_dsigned_ltx_writer : private xr_dsa_signer
 {
