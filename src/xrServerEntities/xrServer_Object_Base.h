@@ -37,7 +37,10 @@ class CSE_ALifeItemPDA;
 #pragma warning(push)
 #pragma warning(disable:4005)
 
-SERVER_ENTITY_DECLARE_BEGIN(CPureServerObject,IPureServerObject)
+class CPureServerObject : public IPureServerObject
+{
+    using inherited = IPureServerObject;
+public:
 	virtual							~CPureServerObject(){}
 	virtual void					load(IReader	&tFileStream);
 	virtual void					save(IWriter	&tMemoryStream);
@@ -45,7 +48,14 @@ SERVER_ENTITY_DECLARE_BEGIN(CPureServerObject,IPureServerObject)
 	virtual void					save(NET_Packet	&tNetPacket);
 };
 
-SERVER_ENTITY_DECLARE_BEGIN3(CSE_Abstract,ISE_Abstract,CPureServerObject,CScriptValueContainer)
+class CSE_Abstract :
+    public ISE_Abstract,
+    public CPureServerObject,
+    public CScriptValueContainer
+{
+    using inherited1 = ISE_Abstract;
+    using inherited2 = CPureServerObject;
+    using inherited3 = CScriptValueContainer;
 public:
 	enum ESpawnFlags {
 		flSpawnEnabled				= u32(1 << 0),

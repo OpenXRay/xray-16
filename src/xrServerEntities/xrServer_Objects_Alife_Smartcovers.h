@@ -16,7 +16,12 @@
 
 class CSE_ALifeDynamicObject;
 
-SERVER_ENTITY_DECLARE_BEGIN2(CSE_SmartCover,CSE_ALifeDynamicObject,CSE_Shape)
+class CSE_SmartCover :
+    public CSE_ALifeDynamicObject,
+    public CSE_Shape
+{
+    using inherited1 = CSE_ALifeDynamicObject;
+    using inherited2 = CSE_Shape;
 public:
     struct SSCDrawHelper{
         shared_str      string_identifier;
@@ -77,6 +82,12 @@ private:
     void                    set_enterable           (shared_str const &id);
     void                    fill_visuals            ();
     void                    load_draw_data          ();
-SERVER_ENTITY_DECLARE_END
+public:
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 #pragma warning(pop)
 #endif

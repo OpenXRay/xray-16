@@ -51,7 +51,10 @@ struct  SFillPropData
 	void							dec						();
 };
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeSchedulable,IPureSchedulableObject)
+class CSE_ALifeSchedulable : public IPureSchedulableObject
+{
+    using inherited = IPureSchedulableObject;
+public:
 	CSE_ALifeItemWeapon				*m_tpCurrentBestWeapon;
 	CSE_ALifeDynamicObject			*m_tpBestDetector;
 	u64								m_schedule_counter;
@@ -84,7 +87,9 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeSchedulable,IPureSchedulableObject)
 #endif
 };
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeGraphPoint,CSE_Abstract)
+class CSE_ALifeGraphPoint : public CSE_Abstract
+{
+    using inherited = CSE_Abstract;
 public:
 	shared_str						m_caConnectionLevelName;
 	shared_str						m_caConnectionPointName;
@@ -97,9 +102,20 @@ public:
 #ifndef XRGAME_EXPORTS
 	virtual void 		__stdcall	on_render				(CDUInterface* du, ISE_AbstractLEOwner* owner, bool bSelected, const Fmatrix& parent,int priority, bool strictB2F);
 #endif
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeObject,CSE_Abstract,CRandom)
+class CSE_ALifeObject :
+    public CSE_Abstract,
+    public CRandom
+{
+    using inherited1 = CSE_Abstract;
+    using inherited2 = CRandom;
+public:
 	enum {
 		flUseSwitches		= u32(1) << 0,
 		flSwitchOnline		= u32(1) << 1,
@@ -117,7 +133,7 @@ SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeObject,CSE_Abstract,CRandom)
 	};
 
 public:
-	typedef CSE_Abstract inherited;
+    using inherited = CSE_Abstract;
 	GameGraph::_GRAPH_ID			m_tGraphID;
 	float							m_fDistance;
 	bool							m_bOnline;
@@ -158,9 +174,16 @@ public:
 	virtual Fvector					draw_level_position	() const;
 	virtual	bool					keep_saved_data_anyway	() const;
 #endif
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN0(CSE_ALifeGroupAbstract)
+class CSE_ALifeGroupAbstract
+{
+public:
 	ALife::OBJECT_VECTOR			m_tpMembers;
 	bool							m_bCreateSpawnPositions;
 	u16								m_wCount;
@@ -181,11 +204,19 @@ SERVER_ENTITY_DECLARE_BEGIN0(CSE_ALifeGroupAbstract)
 	virtual	void					switch_offline			();
 	virtual	bool					redundant				() const;
 #endif
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-template<class __A> class CSE_ALifeGroupTemplate : public __A, public CSE_ALifeGroupAbstract {
-	typedef __A					inherited1;
-	typedef CSE_ALifeGroupAbstract inherited2;
+template<class __A>
+class CSE_ALifeGroupTemplate :
+    public __A, public CSE_ALifeGroupAbstract
+{
+    using inherited1 = __A;
+    using inherited2 = CSE_ALifeGroupAbstract;
 public:
 									CSE_ALifeGroupTemplate(LPCSTR caSection) : __A(pSettings->line_exist(caSection,"monster_section") ? pSettings->r_string(caSection,"monster_section") : caSection), CSE_ALifeGroupAbstract(caSection)
 	{
@@ -287,7 +318,10 @@ public:
 #endif
 };
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeDynamicObject,CSE_ALifeObject)
+class CSE_ALifeDynamicObject : public CSE_ALifeObject
+{
+    using inherited = CSE_ALifeObject;
+public:
 	ALife::_TIME_ID					m_tTimeID;
 	u64								m_switch_counter;
 	
@@ -312,15 +346,37 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeDynamicObject,CSE_ALifeObject)
 	virtual void					on_failed_switch_online	();
 #endif
 	virtual CSE_ALifeDynamicObject	*cast_alife_dynamic_object	() {return this;}
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeDynamicObjectVisual,CSE_ALifeDynamicObject,CSE_Visual)
+class CSE_ALifeDynamicObjectVisual :
+    public CSE_ALifeDynamicObject,
+    public CSE_Visual
+{
+    using inherited1 = CSE_ALifeDynamicObject;
+    using inherited2 = CSE_Visual;
+public:
 									CSE_ALifeDynamicObjectVisual(LPCSTR caSection);
 	virtual							~CSE_ALifeDynamicObjectVisual();
 	virtual CSE_Visual* __stdcall	visual					();
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifePHSkeletonObject,CSE_ALifeDynamicObjectVisual,CSE_PHSkeleton)
+class CSE_ALifePHSkeletonObject :
+    public CSE_ALifeDynamicObjectVisual,
+    public CSE_PHSkeleton
+{
+    using inherited1 = CSE_ALifeDynamicObjectVisual;
+    using inherited2 = CSE_PHSkeleton;
+public:
 									CSE_ALifePHSkeletonObject(LPCSTR caSection);
 	virtual							~CSE_ALifePHSkeletonObject();
 	virtual bool					can_save				() const;
@@ -328,9 +384,20 @@ SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifePHSkeletonObject,CSE_ALifeDynamicObjectVis
 	virtual	void					load					(NET_Packet &tNetPacket);
 	virtual CSE_Abstract			*cast_abstract			() {return this;}
 public:
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeSpaceRestrictor,CSE_ALifeDynamicObject,CSE_Shape)
+class CSE_ALifeSpaceRestrictor :
+    public CSE_ALifeDynamicObject,
+    public CSE_Shape
+{
+    using inherited1 = CSE_ALifeDynamicObject;
+    using inherited2 = CSE_Shape;
+public:
 	u8								m_space_restrictor_type;
 
 									CSE_ALifeSpaceRestrictor	(LPCSTR caSection);
@@ -338,9 +405,17 @@ SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeSpaceRestrictor,CSE_ALifeDynamicObject,CSE
 	virtual ISE_Shape*  __stdcall	shape						();
 	virtual bool					can_switch_offline			() const;
 	virtual bool					used_ai_locations			() const;
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeLevelChanger,CSE_ALifeSpaceRestrictor)
+class CSE_ALifeLevelChanger : public CSE_ALifeSpaceRestrictor
+{
+    using inherited = CSE_ALifeSpaceRestrictor;
+public:
 	GameGraph::_GRAPH_ID			m_tNextGraphID;
 	u32								m_dwNextNodeID;
 	Fvector							m_tNextPosition;
@@ -351,9 +426,20 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeLevelChanger,CSE_ALifeSpaceRestrictor)
 
 									CSE_ALifeLevelChanger		(LPCSTR caSection);
 	virtual							~CSE_ALifeLevelChanger		();
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeSmartZone,CSE_ALifeSpaceRestrictor,CSE_ALifeSchedulable)
+class CSE_ALifeSmartZone :
+    public CSE_ALifeSpaceRestrictor,
+    public CSE_ALifeSchedulable
+{
+    using inherited1 = CSE_ALifeSpaceRestrictor;
+    using inherited2 = CSE_ALifeSchedulable;
+public:
 									CSE_ALifeSmartZone			(LPCSTR caSection);
 	virtual							~CSE_ALifeSmartZone			();
 	virtual CSE_Abstract			*base						();
@@ -378,9 +464,20 @@ SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeSmartZone,CSE_ALifeSpaceRestrictor,CSE_ALi
 	virtual void					unregister_npc				(CSE_ALifeMonsterAbstract *object) {};
 	virtual	CALifeSmartTerrainTask	*task						(CSE_ALifeMonsterAbstract *object) {return 0;};
 #endif
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeObjectPhysic,CSE_ALifeDynamicObjectVisual,CSE_PHSkeleton)
+class CSE_ALifeObjectPhysic :
+    public CSE_ALifeDynamicObjectVisual,
+    public CSE_PHSkeleton
+{
+    using inherited1 = CSE_ALifeDynamicObjectVisual;
+    using inherited2 = CSE_PHSkeleton;
+public:
 	u32 							type;
 	f32 							mass;
     shared_str 						fixed_bones;
@@ -424,9 +521,20 @@ public:
 	
 	virtual BOOL					Net_Relevant			();
 
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeObjectHangingLamp,CSE_ALifeDynamicObjectVisual,CSE_PHSkeleton)
+class CSE_ALifeObjectHangingLamp :
+    public CSE_ALifeDynamicObjectVisual,
+    public CSE_PHSkeleton
+{
+    using inherited1 = CSE_ALifeDynamicObjectVisual;
+    using inherited2 = CSE_PHSkeleton;
+public:
 
     void __stdcall 					OnChangeFlag	(PropValue* sender);
     enum{
@@ -479,15 +587,36 @@ SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeObjectHangingLamp,CSE_ALifeDynamicObjectVi
 	virtual void 		__stdcall	on_render					(CDUInterface* du, ISE_AbstractLEOwner* owner, bool bSelected, const Fmatrix& parent,int priority, bool strictB2F);
 #endif // #ifndef XRGAME_EXPORTS
 	virtual CSE_Abstract			*cast_abstract				() {return this;}
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeObjectProjector,CSE_ALifeDynamicObjectVisual)
+class CSE_ALifeObjectProjector : public CSE_ALifeDynamicObjectVisual
+{
+    using inherited = CSE_ALifeDynamicObjectVisual;
+public:
 									CSE_ALifeObjectProjector	(LPCSTR caSection);
 	virtual							~CSE_ALifeObjectProjector	();
 	virtual bool					used_ai_locations	() const;
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN3(CSE_ALifeHelicopter,CSE_ALifeDynamicObjectVisual,CSE_Motion,CSE_PHSkeleton)
+class CSE_ALifeHelicopter :
+    public CSE_ALifeDynamicObjectVisual,
+    public CSE_Motion,
+    public CSE_PHSkeleton
+{
+    using inherited1 = CSE_ALifeDynamicObjectVisual;
+    using inherited2 = CSE_Motion;
+    using inherited3 = CSE_PHSkeleton;
+public:
 	shared_str							engine_sound;
 									CSE_ALifeHelicopter			(LPCSTR caSection);
 	virtual							~CSE_ALifeHelicopter		();
@@ -497,9 +626,20 @@ SERVER_ENTITY_DECLARE_BEGIN3(CSE_ALifeHelicopter,CSE_ALifeDynamicObjectVisual,CS
 	virtual CSE_Motion*	__stdcall	motion						();
 	virtual CSE_Abstract			*cast_abstract			() {return this;}
 
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeCar,CSE_ALifeDynamicObjectVisual,CSE_PHSkeleton)
+class CSE_ALifeCar :
+    public CSE_ALifeDynamicObjectVisual,
+    public CSE_PHSkeleton
+{
+    using inherited1 = CSE_ALifeDynamicObjectVisual;
+    using inherited2 = CSE_PHSkeleton;
+public:
 	struct SDoorState				
 	{
 		void read	(NET_Packet& P);
@@ -525,17 +665,37 @@ SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeCar,CSE_ALifeDynamicObjectVisual,CSE_PHSke
 protected:
 	virtual void					data_load				(NET_Packet &tNetPacket);
 	virtual void					data_save				(NET_Packet &tNetPacket);
-SERVER_ENTITY_DECLARE_END
+public:
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeObjectBreakable,CSE_ALifeDynamicObjectVisual)
+class CSE_ALifeObjectBreakable : public CSE_ALifeDynamicObjectVisual
+{
+    typedef CSE_ALifeDynamicObjectVisual inherited;
+public:
     float							m_health;
 									CSE_ALifeObjectBreakable	(LPCSTR caSection);
 	virtual							~CSE_ALifeObjectBreakable	();
 	virtual bool					used_ai_locations	() const;
 	virtual bool					can_switch_offline	() const;
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeObjectClimable,CSE_Shape,CSE_ALifeDynamicObject)
+class CSE_ALifeObjectClimable :
+    public CSE_Shape,
+    public CSE_ALifeDynamicObject
+{
+    using inherited1 = CSE_Shape;
+    using inherited2 = CSE_ALifeDynamicObject;
+public:
 CSE_ALifeObjectClimable	(LPCSTR caSection);
 shared_str						material;
 virtual							~CSE_ALifeObjectClimable	();
@@ -546,30 +706,62 @@ virtual ISE_Shape*  __stdcall	shape				();
 #ifndef XRGAME_EXPORTS
 virtual	void		__stdcall	set_additional_info	(void* info);
 #endif
-SERVER_ENTITY_DECLARE_END
+virtual void UPDATE_Read(NET_Packet& P);
+virtual void UPDATE_Write(NET_Packet& P);
+virtual void STATE_Read(NET_Packet& P, u16 size);
+virtual void STATE_Write(NET_Packet& P);
+SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeMountedWeapon,CSE_ALifeDynamicObjectVisual)
+class CSE_ALifeMountedWeapon : public CSE_ALifeDynamicObjectVisual
+{
+    using inherited = CSE_ALifeDynamicObjectVisual;
+public:
 									CSE_ALifeMountedWeapon	(LPCSTR caSection);
 	virtual							~CSE_ALifeMountedWeapon	();
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeStationaryMgun,CSE_ALifeDynamicObjectVisual)
+class CSE_ALifeStationaryMgun : public CSE_ALifeDynamicObjectVisual
+{
+    using inherited = CSE_ALifeDynamicObjectVisual;
+public:
 	bool							m_bWorking;
 	Fvector							m_destEnemyDir;
 
 									CSE_ALifeStationaryMgun	(LPCSTR caSection);
 	virtual							~CSE_ALifeStationaryMgun	();
 	
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeTeamBaseZone,CSE_ALifeSpaceRestrictor)
+class CSE_ALifeTeamBaseZone : public CSE_ALifeSpaceRestrictor
+{
+    using inherited = CSE_ALifeSpaceRestrictor;
+public:
 									CSE_ALifeTeamBaseZone	(LPCSTR caSection);
 	virtual							~CSE_ALifeTeamBaseZone	();
 
 	u8								m_team;
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeInventoryBox,CSE_ALifeDynamicObjectVisual)
+class CSE_ALifeInventoryBox : public CSE_ALifeDynamicObjectVisual
+{
+    using inherited = CSE_ALifeDynamicObjectVisual;
+public:
 	bool				m_can_take;
 	bool				m_closed;
 	shared_str			m_tip_text;
@@ -580,7 +772,12 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeInventoryBox,CSE_ALifeDynamicObjectVisual)
 	virtual void		add_offline				(const xr_vector<ALife::_OBJECT_ID> &saved_children, const bool &update_registries);
 	virtual void		add_online				(const bool &update_registries);
 #endif
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
 #pragma warning(pop)
 

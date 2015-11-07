@@ -21,7 +21,8 @@
 
 class CSE_ALifeItemAmmo;
 
-SERVER_ENTITY_DECLARE_BEGIN0(CSE_ALifeInventoryItem)
+class CSE_ALifeInventoryItem
+{
 public:
 	enum {
 		inventory_item_state_enabled	= u8(1) << 0,
@@ -84,9 +85,20 @@ public:
 	u8								m_u8NumItems;
 	SPHNetState						State;
 	///////////////////////////////////
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeItem,CSE_ALifeDynamicObjectVisual,CSE_ALifeInventoryItem)
+class CSE_ALifeItem :
+    public CSE_ALifeDynamicObjectVisual,
+    public CSE_ALifeInventoryItem
+{
+    using inherited1 = CSE_ALifeDynamicObjectVisual;
+    using inherited2 = CSE_ALifeInventoryItem;
+public:
 	bool							m_physics_disabled;
 
 									CSE_ALifeItem	(LPCSTR caSection);
@@ -98,10 +110,17 @@ SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeItem,CSE_ALifeDynamicObjectVisual,CSE_ALif
 	virtual CSE_ALifeInventoryItem	*cast_inventory_item	() {return this;};
 	virtual BOOL					Net_Relevant			();
 	virtual void					OnEvent					(NET_Packet &tNetPacket, u16 type, u32 time, ClientID sender );
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemTorch,CSE_ALifeItem)
-//флаги
+class CSE_ALifeItemTorch : public CSE_ALifeItem
+{
+    typedef CSE_ALifeItem inherited;
+public:
 	enum EStats{
 		eTorchActive				= (1<<0),
 		eNightVisionActive			= (1<<1),
@@ -113,10 +132,17 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemTorch,CSE_ALifeItem)
 									CSE_ALifeItemTorch	(LPCSTR caSection);
     virtual							~CSE_ALifeItemTorch	();
 	virtual BOOL					Net_Relevant			();
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_END
-
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemAmmo,CSE_ALifeItem)
+class CSE_ALifeItemAmmo : public CSE_ALifeItem
+{
+    using inherited = CSE_ALifeItem;
+public:
 	u16								a_elapsed;
 	u16								m_boxSize;
 
@@ -125,10 +151,17 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemAmmo,CSE_ALifeItem)
 	virtual CSE_ALifeItemAmmo		*cast_item_ammo		()  {return this;};
 	virtual bool					can_switch_online	() const;
 	virtual bool					can_switch_offline	() const;
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeapon,CSE_ALifeItem)
-
+class CSE_ALifeItemWeapon : public CSE_ALifeItem
+{
+    using inherited = CSE_ALifeItem;
+public:
 	typedef	ALife::EWeaponAddonStatus	EWeaponAddonStatus;
 	
 	//текущее состояние аддонов
@@ -191,55 +224,111 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeapon,CSE_ALifeItem)
 	virtual BOOL					Net_Relevant		();
 
 	virtual CSE_ALifeItemWeapon		*cast_item_weapon	() {return this;}
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeaponMagazined,CSE_ALifeItemWeapon)
+class CSE_ALifeItemWeaponMagazined : public CSE_ALifeItemWeapon
+{
+    typedef CSE_ALifeItemWeapon inherited;
+public:
 u8			m_u8CurFireMode;
 CSE_ALifeItemWeaponMagazined(LPCSTR caSection);
 virtual							~CSE_ALifeItemWeaponMagazined();
 
 virtual CSE_ALifeItemWeapon		*cast_item_weapon	() {return this;}
-SERVER_ENTITY_DECLARE_END
+virtual void UPDATE_Read(NET_Packet& P);
+virtual void UPDATE_Write(NET_Packet& P);
+virtual void STATE_Read(NET_Packet& P, u16 size);
+virtual void STATE_Write(NET_Packet& P);
+SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeaponMagazinedWGL, CSE_ALifeItemWeaponMagazined)
+class CSE_ALifeItemWeaponMagazinedWGL : public CSE_ALifeItemWeaponMagazined
+{
+    using inherited = CSE_ALifeItemWeaponMagazined;
+public:
 bool			m_bGrenadeMode;
 CSE_ALifeItemWeaponMagazinedWGL(LPCSTR caSection);
 virtual							~CSE_ALifeItemWeaponMagazinedWGL();
 
 virtual CSE_ALifeItemWeapon		*cast_item_weapon	() {return this;}
-SERVER_ENTITY_DECLARE_END
+virtual void UPDATE_Read(NET_Packet& P);
+virtual void UPDATE_Write(NET_Packet& P);
+virtual void STATE_Read(NET_Packet& P, u16 size);
+virtual void STATE_Write(NET_Packet& P);
+SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeaponShotGun,CSE_ALifeItemWeaponMagazined)
+class CSE_ALifeItemWeaponShotGun : public CSE_ALifeItemWeaponMagazined
+{
+    using inherited = CSE_ALifeItemWeaponMagazined;
+public:
 	xr_vector<u8>				m_AmmoIDs;
 								CSE_ALifeItemWeaponShotGun(LPCSTR caSection);
 virtual							~CSE_ALifeItemWeaponShotGun();
 
 virtual CSE_ALifeItemWeapon		*cast_item_weapon	() {return this;}
-SERVER_ENTITY_DECLARE_END
+virtual void UPDATE_Read(NET_Packet& P);
+virtual void UPDATE_Write(NET_Packet& P);
+virtual void STATE_Read(NET_Packet& P, u16 size);
+virtual void STATE_Write(NET_Packet& P);
+SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeaponAutoShotGun,CSE_ALifeItemWeaponShotGun)
+class CSE_ALifeItemWeaponAutoShotGun : public CSE_ALifeItemWeaponShotGun
+{
+    using inherited = CSE_ALifeItemWeaponShotGun;
+public:
 								CSE_ALifeItemWeaponAutoShotGun(LPCSTR caSection);
 virtual							~CSE_ALifeItemWeaponAutoShotGun();
 
 virtual CSE_ALifeItemWeapon		*cast_item_weapon	() {return this;}
-SERVER_ENTITY_DECLARE_END
+virtual void UPDATE_Read(NET_Packet& P);
+virtual void UPDATE_Write(NET_Packet& P);
+virtual void STATE_Read(NET_Packet& P, u16 size);
+virtual void STATE_Write(NET_Packet& P);
+SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemDetector,CSE_ALifeItem)
+class CSE_ALifeItemDetector : public CSE_ALifeItem
+{
+    using inherited = CSE_ALifeItem;
+public:
 	u32								m_ef_detector_type;
 									CSE_ALifeItemDetector(LPCSTR caSection);
 	virtual							~CSE_ALifeItemDetector();
 	virtual u32						ef_detector_type() const;
 	virtual CSE_ALifeItemDetector	*cast_item_detector		() {return this;}
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemArtefact,CSE_ALifeItem)
+class CSE_ALifeItemArtefact : public CSE_ALifeItem
+{
+    using inherited = CSE_ALifeItem;
+public:
 	float							m_fAnomalyValue;
 									CSE_ALifeItemArtefact	(LPCSTR caSection);
 	virtual							~CSE_ALifeItemArtefact	();
 	virtual BOOL					Net_Relevant			();
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemPDA,CSE_ALifeItem)
+class CSE_ALifeItemPDA : public CSE_ALifeItem
+{
+    using inherited = CSE_ALifeItem;
+public:
 	u16								m_original_owner;
 	shared_str						m_specific_character;
 	shared_str						m_info_portion;
@@ -247,48 +336,101 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemPDA,CSE_ALifeItem)
 									CSE_ALifeItemPDA(LPCSTR caSection);
 	virtual							~CSE_ALifeItemPDA();
 	virtual CSE_ALifeItemPDA		*cast_item_pda				() {return this;};
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemDocument,CSE_ALifeItem)
+class CSE_ALifeItemDocument : public CSE_ALifeItem
+{
+    using inherited = CSE_ALifeItem;
+public:
 	shared_str							m_wDoc;
 									CSE_ALifeItemDocument(LPCSTR caSection);
 	virtual							~CSE_ALifeItemDocument();
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemGrenade,CSE_ALifeItem)
+class CSE_ALifeItemGrenade : public CSE_ALifeItem
+{
+    using inherited = CSE_ALifeItem;
+public:
 	u32								m_ef_weapon_type;
 									CSE_ALifeItemGrenade	(LPCSTR caSection);
 	virtual							~CSE_ALifeItemGrenade	();
 	virtual u32						ef_weapon_type			() const;
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemExplosive,CSE_ALifeItem)
+class CSE_ALifeItemExplosive : public CSE_ALifeItem
+{
+    using inherited = CSE_ALifeItem;
+public:
 									CSE_ALifeItemExplosive(LPCSTR caSection);
 	virtual							~CSE_ALifeItemExplosive();
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemBolt,CSE_ALifeItem)
+class CSE_ALifeItemBolt : public CSE_ALifeItem
+{
+    using inherited = CSE_ALifeItem;
+public:
 	u32								m_ef_weapon_type;
 									CSE_ALifeItemBolt	(LPCSTR caSection);
 	virtual							~CSE_ALifeItemBolt	();
 	virtual bool					can_save			() const;
 	virtual bool					used_ai_locations	() const;
 	virtual u32						ef_weapon_type		() const;
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemCustomOutfit,CSE_ALifeItem)
+class CSE_ALifeItemCustomOutfit : public CSE_ALifeItem
+{
+    using inherited = CSE_ALifeItem;
+public:
 	u32								m_ef_equipment_type;
 									CSE_ALifeItemCustomOutfit	(LPCSTR caSection);
 	virtual							~CSE_ALifeItemCustomOutfit	();
 	virtual u32						ef_equipment_type			() const;
 	virtual BOOL					Net_Relevant				();
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemHelmet,CSE_ALifeItem)
+class CSE_ALifeItemHelmet : public CSE_ALifeItem
+{
+    using inherited = CSE_ALifeItem;
+public:
 									CSE_ALifeItemHelmet	(LPCSTR caSection);
 	virtual							~CSE_ALifeItemHelmet	();
 	virtual BOOL					Net_Relevant			();
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
 #pragma warning(pop)
 

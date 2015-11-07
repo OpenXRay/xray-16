@@ -34,7 +34,9 @@ public:
 	virtual void __stdcall			assign_shapes			(CShapeData::shape_def* shapes, u32 cnt)=0;
 };
 
-SERVER_ENTITY_DECLARE_BEGIN0(CSE_Visual)
+class CSE_Visual
+{
+public:
     void __stdcall					OnChangeVisual			(PropValue* sender);  
     void __stdcall					OnChangeAnim			(PropValue* sender);  
 
@@ -61,7 +63,9 @@ public:
 	virtual CSE_Visual* __stdcall	visual					() = 0;
 };
 
-SERVER_ENTITY_DECLARE_BEGIN0(CSE_Motion)
+class CSE_Motion
+{
+public:
 	void __stdcall	OnChangeMotion	(PropValue* sender);  
 public:
 	shared_str						motion_name;

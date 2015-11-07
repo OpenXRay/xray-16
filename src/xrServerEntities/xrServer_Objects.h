@@ -165,7 +165,12 @@
 //------------------------------------------------------------------------------
 #define SPAWN_VERSION	u16(128)
 
-SERVER_ENTITY_DECLARE_BEGIN2(CSE_Shape,ISE_Shape,CShapeData)
+class CSE_Shape :
+    public ISE_Shape,
+    public CShapeData
+{
+    using inherited1 = ISE_Shape;
+    using inherited2 = CShapeData;
 public:
 	void							cform_read		(NET_Packet& P);
 	void							cform_write		(NET_Packet& P);
@@ -175,19 +180,38 @@ public:
 	virtual void __stdcall			assign_shapes	(CShapeData::shape_def* shapes, u32 cnt);
 };
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_Spectator,CSE_Abstract)
+class CSE_Spectator :
+    public CSE_Abstract
+{
+    using inherited = CSE_Abstract;
+public:
 									CSE_Spectator	(LPCSTR caSection);
 	virtual							~CSE_Spectator	();
 	virtual u8						g_team			();
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read (NET_Packet& P);
+    virtual void UPDATE_Write (NET_Packet& P);
+    virtual void STATE_Read (NET_Packet& P, u16 size);
+    virtual void STATE_Write (NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_Temporary,CSE_Abstract)
+class CSE_Temporary : public CSE_Abstract
+{
+    using inherited = CSE_Abstract;
+public:
 	u32								m_tNodeID;
 									CSE_Temporary	(LPCSTR caSection);
 	virtual							~CSE_Temporary	();
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN0(CSE_PHSkeleton)
+class CSE_PHSkeleton
+{
+public:
 								CSE_PHSkeleton(LPCSTR caSection);
 virtual							~CSE_PHSkeleton();
 
@@ -209,17 +233,31 @@ protected:
 	virtual void					data_load				(NET_Packet &tNetPacket);
 	virtual void					data_save				(NET_Packet &tNetPacket);
 public:
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
-SERVER_ENTITY_DECLARE_BEGIN2(CSE_AbstractVisual,CSE_Abstract,CSE_Visual)
-	typedef CSE_Abstract			inherited1;
-	typedef CSE_Visual				inherited2;
+class CSE_AbstractVisual :
+    public CSE_Abstract,
+    public CSE_Visual
+{
+public:
+    using inherited1 = CSE_Abstract;
+    using inherited2 = CSE_Visual;
 
 	CSE_AbstractVisual										(LPCSTR caSection);
 	virtual	~CSE_AbstractVisual								();
 	virtual CSE_Visual* __stdcall	visual					();
 	LPCSTR							getStartupAnimation		();
-SERVER_ENTITY_DECLARE_END
+    virtual void UPDATE_Read(NET_Packet& P);
+    virtual void UPDATE_Write(NET_Packet& P);
+    virtual void STATE_Read(NET_Packet& P, u16 size);
+    virtual void STATE_Write(NET_Packet& P);
+    SERVER_ENTITY_EDITOR_METHODS
+};
 
 #ifndef AI_COMPILER
 extern CSE_Abstract	*F_entity_Create	(LPCSTR caSection);
