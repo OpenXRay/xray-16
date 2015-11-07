@@ -91,9 +91,6 @@
     <Filter Include="ServerStuff\Common\ALifeStuff">
       <UniqueIdentifier>{4da732a1-c35b-463c-ae4e-1a7f34342895}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ServerStuff\Common\ALifeStuff\artefact_order">
-      <UniqueIdentifier>{7883e08e-b35a-4e46-aca0-9b399ef2d10f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ServerStuff\Common\ALifeStuff\human_brain">
       <UniqueIdentifier>{6cfe3fa5-ca94-4752-88a7-b3cf7bf27441}</UniqueIdentifier>
     </Filter>
@@ -332,9 +329,6 @@
     </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\game_graph_space.h">
       <Filter>ServerStuff\Common\ALifeStuff</Filter>
-    </ClInclude>
-    <ClInclude Include="alife_artefact_order.h">
-      <Filter>ServerStuff\Common\ALifeStuff\artefact_order</Filter>
     </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\alife_human_brain.h">
       <Filter>ServerStuff\Common\ALifeStuff\human_brain</Filter>
@@ -577,9 +571,6 @@
     </ClCompile>
     <ClCompile Include="..\..\xrServerEntities\alife_space.cpp">
       <Filter>ServerStuff\Common\ALifeStuff</Filter>
-    </ClCompile>
-    <ClCompile Include="alife_artefact_order.cpp">
-      <Filter>ServerStuff\Common\ALifeStuff\artefact_order</Filter>
     </ClCompile>
     <ClCompile Include="..\..\xrServerEntities\alife_human_brain.cpp">
       <Filter>ServerStuff\Common\ALifeStuff\human_brain</Filter>

@@ -288,7 +288,6 @@
     <ClInclude Include="..\..\xrServerEntities\xrServer_Space.h" />
     <ClInclude Include="ai_space.h" />
     <ClInclude Include="ai_space_inline.h" />
-    <ClInclude Include="alife_artefact_order.h" />
     <ClInclude Include="ChooseTypes.h" />
     <ClInclude Include="client_id.h" />
     <ClInclude Include="NET_Compressor.h" />
@@ -584,7 +583,6 @@
     </ClCompile>
     <ClCompile Include="..\..\xrServerEntities\xrServer_Object_Base.cpp" />
     <ClCompile Include="ai_space.cpp" />
-    <ClCompile Include="alife_artefact_order.cpp" />
     <ClCompile Include="properties_list_helper_script.cpp" />
     <ClCompile Include="script_debugger_utils.cpp" />
     <ClCompile Include="script_file.cpp" />
