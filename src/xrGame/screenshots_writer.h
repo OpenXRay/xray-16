@@ -1,7 +1,7 @@
 #ifndef SCREENSHOT_WRITER_INCLUDED
 #define SCREENSHOT_WRITER_INCLUDED
 
-#include "xr_dsa_signer.h"
+#include "xrCore/crypto/xr_dsa_signer.h"
 
 namespace screenshots
 {

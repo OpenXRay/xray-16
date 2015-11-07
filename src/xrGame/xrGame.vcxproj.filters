@@ -4710,9 +4710,6 @@
     <ClInclude Include="game_graph_inline.h">
       <Filter>AI\ANavigation\GameGraph</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrServerEntities\game_graph_space.h">
-      <Filter>AI\ANavigation\GameGraph</Filter>
-    </ClInclude>
     <ClInclude Include="game_level_cross_table.h">
       <Filter>AI\ANavigation\GameLevelCrossTable</Filter>
     </ClInclude>
@@ -5941,12 +5938,6 @@
       <Filter>Core\Common\NET Shared</Filter>
     </ClInclude>
     <ClInclude Include="secure_messaging.h">
-      <Filter>Core\Common\NET Shared\SecureMessages</Filter>
-    </ClInclude>
-    <ClInclude Include="xr_dsa_signer.h">
-      <Filter>Core\Common\NET Shared\SecureMessages</Filter>
-    </ClInclude>
-    <ClInclude Include="xr_dsa_verifyer.h">
       <Filter>Core\Common\NET Shared\SecureMessages</Filter>
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\object_broker.h">
@@ -7188,6 +7179,7 @@
     <ClInclude Include="WeaponHUD.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons</Filter>
     </ClInclude>
+    <ClInclude Include="game_graph_space.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9507,12 +9499,6 @@
       <Filter>Core\Common\NET Shared</Filter>
     </ClCompile>
     <ClCompile Include="secure_messaging.cpp">
-      <Filter>Core\Common\NET Shared\SecureMessages</Filter>
-    </ClCompile>
-    <ClCompile Include="xr_dsa_signer.cpp">
-      <Filter>Core\Common\NET Shared\SecureMessages</Filter>
-    </ClCompile>
-    <ClCompile Include="xr_dsa_verifyer.cpp">
       <Filter>Core\Common\NET Shared\SecureMessages</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\object_factory.cpp">

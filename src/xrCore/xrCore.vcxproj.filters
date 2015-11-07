@@ -381,6 +381,12 @@
     <ClCompile Include="Crypto\xr_sha.cpp">
       <Filter>Crypto</Filter>
     </ClCompile>
+    <ClCompile Include="crypto\xr_dsa_signer.cpp">
+      <Filter>Crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\xr_dsa_verifyer.cpp">
+      <Filter>Crypto</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -802,6 +808,12 @@
     </ClInclude>
     <ClInclude Include="crypto\xr_sha.h">
       <Filter>crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\xr_dsa_signer.h">
+      <Filter>Crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\xr_dsa_verifyer.h">
+      <Filter>Crypto</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -109,10 +109,6 @@
     <ClCompile Include="screenshots_writer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="xr_dsa_signer.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="xr_dsa_verifyer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -121,10 +117,6 @@
     <CustomBuild Include="screenshots_writer.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
-    <CustomBuild Include="xr_dsa_signer.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </CustomBuild>
-    <ClInclude Include="xr_dsa_verifyer.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">

@@ -1,7 +1,9 @@
 #ifndef XR_DSA_VERIFYER_INCLUDED
 #define XR_DSA_VERIFYER_INCLUDED
 
-class xr_dsa_verifyer
+#include "crypto.h"
+
+class CRYPTO_API xr_dsa_verifyer
 {
 public:
 	xr_dsa_verifyer				(u8 const p_number[crypto::xr_dsa::public_key_length],
@@ -11,9 +13,10 @@ public:
 
 	~xr_dsa_verifyer			();
 
-	bool	verify				(u8 const * data,
-								 u32 data_size,
-								 shared_str const & dsign);
+	bool			verify				(u8 const * data,
+										 u32 data_size,
+										 shared_str const & dsign);
+	u8 const*		get_sha_checksum	() const { return m_sha.pointer(); };
 protected:
 	crypto::xr_dsa::public_key_t	m_public_key;
 private:

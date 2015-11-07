@@ -1811,8 +1811,6 @@
     <ClInclude Include="xrServer_info.h" />
     <ClInclude Include="xrServer_svclient_validation.h" />
     <ClInclude Include="xrServer_updates_compressor.h" />
-    <ClInclude Include="xr_dsa_signer.h" />
-    <ClInclude Include="xr_dsa_verifyer.h" />
     <ClInclude Include="xr_level_controller.h" />
     <ClInclude Include="xr_time.h" />
     <ClInclude Include="ZoneCampfire.h" />
@@ -4014,8 +4012,6 @@
     <ClCompile Include="xrServer_sls_clear.cpp" />
     <ClCompile Include="xrServer_svclient_validation.cpp" />
     <ClCompile Include="xrServer_updates_compressor.cpp" />
-    <ClCompile Include="xr_dsa_signer.cpp" />
-    <ClCompile Include="xr_dsa_verifyer.cpp" />
     <ClCompile Include="xr_level_controller.cpp" />
     <ClCompile Include="xr_time.cpp" />
     <ClCompile Include="ZoneCampfire.cpp" />
