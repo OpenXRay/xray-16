@@ -215,7 +215,7 @@ void CLevelGraph::draw_stalkers		(const int &vertex_id)
 			break;
 		}
 		
-		if (temp.x > 1.f) {
+		if (temp.y > 1.f) {
 			show_text			= false;
 			break;
 		}
@@ -323,7 +323,7 @@ void CLevelGraph::draw_stalkers		(const int &vertex_id)
 		if (temp.y < -1.f)
 			continue;
 		
-		if (temp.x > 1.f)
+		if (temp.y > 1.f)
 			continue;
 
 		font.SetHeightI			(.05f/_sqrt(temp.w));
@@ -381,7 +381,7 @@ void CLevelGraph::draw_objects		(const int &vertex_id)
 			break;
 		}
 		
-		if (temp.x > 1.f) {
+		if (temp.y > 1.f) {
 			show_text			= false;
 			break;
 		}
@@ -487,7 +487,7 @@ void CLevelGraph::draw_objects		(const int &vertex_id)
 		if (temp.y < -1.f)
 			continue;
 		
-		if (temp.x > 1.f)
+		if (temp.y > 1.f)
 			continue;
 
 		font.SetHeightI			(.05f/_sqrt(temp.w));
