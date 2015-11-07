@@ -1,7 +1,7 @@
 #ifndef SCREENSHOT_READER_INCLUDED
 #define SCREENSHOT_READER_INCLUDED
 
-#include "xrCore/crypto/xr_dsa_verifyer.h"
+#include "xrCore/Crypto/xr_dsa_verifyer.h"
 
 namespace screenshots
 {
