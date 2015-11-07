@@ -9,8 +9,8 @@
 #include "stdafx.h"
 #include "space_restrictor_wrapper.h"
 #include "xrServer_Objects_ALife.h"
-#include "level_graph.h"
-#include "graph_engine.h"
+#include "xrGame/level_graph.h"
+#include "xrGame/graph_engine.h"
 
 IC	Fvector construct_position		(CLevelGraph &level_graph,u32 level_vertex_id, float x, float z)
 {

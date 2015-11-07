@@ -4,8 +4,8 @@
 #include "utils/xrLCUtil/xrThread.hpp"
 #include <mmsystem.h>
 
-#include "quadtree.h"
-#include "cover_point.h"
+#include "xrGame/quadtree.h"
+#include "xrGame/cover_point.h"
 #include "Common/object_broker.h"
 
 Shader_xrLC_LIB*				g_shaders_xrlc	;

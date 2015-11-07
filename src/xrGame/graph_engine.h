@@ -25,6 +25,7 @@
 #	include "operator_abstract.h"
 #endif // AI_COMPILER
 
+#ifndef AI_COMPILER
 namespace hash_fixed_vertex_manager {
 	
 IC	u32 to_u32	(GraphEngineSpace::CWorldState const &other)
@@ -33,6 +34,7 @@ IC	u32 to_u32	(GraphEngineSpace::CWorldState const &other)
 }
 
 } // namespace hash_fixed_vertex_manager
+#endif
 
 using namespace GraphEngineSpace;
 

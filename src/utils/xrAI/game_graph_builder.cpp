@@ -8,15 +8,15 @@
 
 #include "stdafx.h"
 #include "game_graph_builder.h"
-#include "level_graph.h"
-#include "graph_abstract.h"
+#include "xrGame/level_graph.h"
+#include "xrGame/graph_abstract.h"
 #include "xrMessages.h"
 #include "xrServer_Objects_ALife.h"
 #include "factory_api.h"
-#include "game_level_cross_table.h"
+#include "xrGame/game_level_cross_table.h"
 #include "xrCrossTable.h"
 #include "guid_generator.h"
-#include "graph_engine.h"
+#include "xrGame/graph_engine.h"
 
 CGameGraphBuilder::CGameGraphBuilder		()
 {

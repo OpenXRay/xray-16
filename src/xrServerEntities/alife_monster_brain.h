@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "game_graph_space.h"
+#include "xrGame/game_graph_space.h"
 #include "xrserver_space.h"
 #include "alife_space.h"
 

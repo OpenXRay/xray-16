@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "level_graph.h"
+#include "xrGame/level_graph.h"
 
 CLevelGraph::CVertex	**stack_storage;
 

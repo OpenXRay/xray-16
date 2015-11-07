@@ -237,13 +237,10 @@
     <ClCompile Include="xrAI.cpp">
       <Filter>Compiler\Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="random32.cpp">
-      <Filter>Compiler\Kernel\Random32</Filter>
-    </ClCompile>
-    <ClCompile Include="level_graph.cpp">
+    <ClCompile Include="..\..\xrGame\level_graph.cpp">
       <Filter>ALife\search\graphs\level_graph</Filter>
     </ClCompile>
-    <ClCompile Include="level_graph_vertex.cpp">
+    <ClCompile Include="..\..\xrGame\level_graph_vertex.cpp">
       <Filter>ALife\search\graphs\level_graph</Filter>
     </ClCompile>
     <ClCompile Include="xrCrossTable.cpp">
@@ -306,15 +303,6 @@
     <ClCompile Include="server_entity_wrapper.cpp">
       <Filter>ALife\Spawn\server_entity_wrapper</Filter>
     </ClCompile>
-    <ClCompile Include="patrol_path.cpp">
-      <Filter>ALife\Spawn\patrol_paths\patrol_path</Filter>
-    </ClCompile>
-    <ClCompile Include="patrol_path_storage.cpp">
-      <Filter>ALife\Spawn\patrol_paths\patrol_path_storage</Filter>
-    </ClCompile>
-    <ClCompile Include="patrol_point.cpp">
-      <Filter>ALife\Spawn\patrol_paths\patrol_point</Filter>
-    </ClCompile>
     <ClCompile Include="spawn_patcher.cpp">
       <Filter>ALife\Spawn\spawn_patcher</Filter>
     </ClCompile>
@@ -323,6 +311,12 @@
     </ClCompile>
     <ClCompile Include="guid_generator.cpp">
       <Filter>ALife\guid_generator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\xrGame\patrol_path.cpp" />
+    <ClCompile Include="..\..\xrGame\patrol_path_storage.cpp" />
+    <ClCompile Include="..\..\xrGame\patrol_point.cpp" />
+    <ClCompile Include="..\..\xrGame\random32.cpp">
+      <Filter>Compiler\Kernel\Random32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -365,205 +359,202 @@
     <ClInclude Include="xrShaderTypes.h">
       <Filter>Compiler\Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="random32.h">
-      <Filter>Compiler\Kernel\Random32</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager.h">
+    <ClInclude Include="..\..\xrGame\path_manager.h">
       <Filter>ALife\search\path_managers</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_game.h">
+    <ClInclude Include="..\..\xrGame\path_manager_game.h">
       <Filter>ALife\search\path_managers\path_manager_game</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_game_inline.h">
+    <ClInclude Include="..\..\xrGame\path_manager_game_inline.h">
       <Filter>ALife\search\path_managers\path_manager_game</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_game_vertex_type.h">
+    <ClInclude Include="..\..\xrGame\path_manager_game_vertex_type.h">
       <Filter>ALife\search\path_managers\path_manager_game\path_manager_game_vertex_type</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_game_vertex_type_inline.h">
+    <ClInclude Include="..\..\xrGame\path_manager_game_vertex_type_inline.h">
       <Filter>ALife\search\path_managers\path_manager_game\path_manager_game_vertex_type</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_game_level.h">
+    <ClInclude Include="..\..\xrGame\path_manager_game_level.h">
       <Filter>ALife\search\path_managers\path_manager_game\path_manager_game_level</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_game_level_inline.h">
+    <ClInclude Include="..\..\xrGame\path_manager_game_level_inline.h">
       <Filter>ALife\search\path_managers\path_manager_game\path_manager_game_level</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_generic.h">
+    <ClInclude Include="..\..\xrGame\path_manager_generic.h">
       <Filter>ALife\search\path_managers\path_manager_generic</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_generic_inline.h">
+    <ClInclude Include="..\..\xrGame\path_manager_generic_inline.h">
       <Filter>ALife\search\path_managers\path_manager_generic</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_level.h">
+    <ClInclude Include="..\..\xrGame\path_manager_level.h">
       <Filter>ALife\search\path_managers\path_manager_level</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_level_inline.h">
+    <ClInclude Include="..\..\xrGame\path_manager_level_inline.h">
       <Filter>ALife\search\path_managers\path_manager_level</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_level_evaluator.h">
+    <ClInclude Include="..\..\xrGame\path_manager_level_evaluator.h">
       <Filter>ALife\search\path_managers\path_manager_level\path_manager_level_evaluator</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_level_evaluator_inline.h">
+    <ClInclude Include="..\..\xrGame\path_manager_level_evaluator_inline.h">
       <Filter>ALife\search\path_managers\path_manager_level\path_manager_level_evaluator</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_level_flooder.h">
+    <ClInclude Include="..\..\xrGame\path_manager_level_flooder.h">
       <Filter>ALife\search\path_managers\path_manager_level\path_manager_level_flooder</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_level_flooder_inline.h">
+    <ClInclude Include="..\..\xrGame\path_manager_level_flooder_inline.h">
       <Filter>ALife\search\path_managers\path_manager_level\path_manager_level_flooder</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_level_straight_line.h">
+    <ClInclude Include="..\..\xrGame\path_manager_level_straight_line.h">
       <Filter>ALife\search\path_managers\path_manager_level\path_manager_level_straight_line</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_level_straight_line_inline.h">
+    <ClInclude Include="..\..\xrGame\path_manager_level_straight_line_inline.h">
       <Filter>ALife\search\path_managers\path_manager_level\path_manager_level_straight_line</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_params.h">
+    <ClInclude Include="..\..\xrGame\path_manager_params.h">
       <Filter>ALife\search\path_managers\path_manager_params</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_params_flooder.h">
+    <ClInclude Include="..\..\xrGame\path_manager_params_flooder.h">
       <Filter>ALife\search\path_managers\path_manager_params</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_params_game_level.h">
+    <ClInclude Include="..\..\xrGame\path_manager_params_game_level.h">
       <Filter>ALife\search\path_managers\path_manager_params</Filter>
     </ClInclude>
-    <ClInclude Include="path_manager_params_straight_line.h">
+    <ClInclude Include="..\..\xrGame\path_manager_params_straight_line.h">
       <Filter>ALife\search\path_managers\path_manager_params</Filter>
     </ClInclude>
-    <ClInclude Include="a_star.h">
+    <ClInclude Include="..\..\xrGame\a_star.h">
       <Filter>ALife\search\algorithms\A%2a</Filter>
     </ClInclude>
-    <ClInclude Include="a_star_inline.h">
+    <ClInclude Include="..\..\xrGame\a_star_inline.h">
       <Filter>ALife\search\algorithms\A%2a</Filter>
     </ClInclude>
-    <ClInclude Include="dijkstra.h">
+    <ClInclude Include="..\..\xrGame\dijkstra.h">
       <Filter>ALife\search\algorithms\Dijkstra</Filter>
     </ClInclude>
-    <ClInclude Include="dijkstra_inline.h">
+    <ClInclude Include="..\..\xrGame\dijkstra_inline.h">
       <Filter>ALife\search\algorithms\Dijkstra</Filter>
     </ClInclude>
-    <ClInclude Include="data_storage_binary_heap.h">
+    <ClInclude Include="..\..\xrGame\data_storage_binary_heap.h">
       <Filter>ALife\search\data_storages\algorithms\priority_queues\binary_heap</Filter>
     </ClInclude>
-    <ClInclude Include="data_storage_binary_heap_inline.h">
+    <ClInclude Include="..\..\xrGame\data_storage_binary_heap_inline.h">
       <Filter>ALife\search\data_storages\algorithms\priority_queues\binary_heap</Filter>
     </ClInclude>
-    <ClInclude Include="data_storage_bucket_list.h">
+    <ClInclude Include="..\..\xrGame\data_storage_bucket_list.h">
       <Filter>ALife\search\data_storages\algorithms\lists\bucket_list</Filter>
     </ClInclude>
-    <ClInclude Include="data_storage_bucket_list_inline.h">
+    <ClInclude Include="..\..\xrGame\data_storage_bucket_list_inline.h">
       <Filter>ALife\search\data_storages\algorithms\lists\bucket_list</Filter>
     </ClInclude>
-    <ClInclude Include="data_storage_double_linked_list.h">
+    <ClInclude Include="..\..\xrGame\data_storage_double_linked_list.h">
       <Filter>ALife\search\data_storages\algorithms\lists\double_linked_list</Filter>
     </ClInclude>
-    <ClInclude Include="data_storage_double_linked_list_inline.h">
+    <ClInclude Include="..\..\xrGame\data_storage_double_linked_list_inline.h">
       <Filter>ALife\search\data_storages\algorithms\lists\double_linked_list</Filter>
     </ClInclude>
-    <ClInclude Include="data_storage_single_linked_list.h">
+    <ClInclude Include="..\..\xrGame\data_storage_single_linked_list.h">
       <Filter>ALife\search\data_storages\algorithms\lists\single_linked_list</Filter>
     </ClInclude>
-    <ClInclude Include="data_storage_single_linked_list_inline.h">
+    <ClInclude Include="..\..\xrGame\data_storage_single_linked_list_inline.h">
       <Filter>ALife\search\data_storages\algorithms\lists\single_linked_list</Filter>
     </ClInclude>
-    <ClInclude Include="data_storage_constructor.h">
+    <ClInclude Include="..\..\xrGame\data_storage_constructor.h">
       <Filter>ALife\search\data_storages\data_storage_constructors</Filter>
     </ClInclude>
-    <ClInclude Include="builder_allocator_constructor.h">
+    <ClInclude Include="..\..\xrGame\builder_allocator_constructor.h">
       <Filter>ALife\search\data_storages\data_storage_constructors\builder_allocator</Filter>
     </ClInclude>
-    <ClInclude Include="builder_allocator_constructor_inline.h">
+    <ClInclude Include="..\..\xrGame\builder_allocator_constructor_inline.h">
       <Filter>ALife\search\data_storages\data_storage_constructors\builder_allocator</Filter>
     </ClInclude>
-    <ClInclude Include="manager_builder_allocator_constructor.h">
+    <ClInclude Include="..\..\xrGame\manager_builder_allocator_constructor.h">
       <Filter>ALife\search\data_storages\data_storage_constructors\manager_builder_allocator</Filter>
     </ClInclude>
-    <ClInclude Include="manager_builder_allocator_constructor_inline.h">
+    <ClInclude Include="..\..\xrGame\manager_builder_allocator_constructor_inline.h">
       <Filter>ALife\search\data_storages\data_storage_constructors\manager_builder_allocator</Filter>
     </ClInclude>
-    <ClInclude Include="edge_path.h">
+    <ClInclude Include="..\..\xrGame\edge_path.h">
       <Filter>ALife\search\data_storages\path_builders\edge_path</Filter>
     </ClInclude>
-    <ClInclude Include="edge_path_inline.h">
+    <ClInclude Include="..\..\xrGame\edge_path_inline.h">
       <Filter>ALife\search\data_storages\path_builders\edge_path</Filter>
     </ClInclude>
-    <ClInclude Include="vertex_path.h">
+    <ClInclude Include="..\..\xrGame\vertex_path.h">
       <Filter>ALife\search\data_storages\path_builders\vertex_path</Filter>
     </ClInclude>
-    <ClInclude Include="vertex_path_inline.h">
+    <ClInclude Include="..\..\xrGame\vertex_path_inline.h">
       <Filter>ALife\search\data_storages\path_builders\vertex_path</Filter>
     </ClInclude>
-    <ClInclude Include="vertex_allocator_fixed.h">
+    <ClInclude Include="..\..\xrGame\vertex_allocator_fixed.h">
       <Filter>ALife\search\data_storages\vertex_allocators\fixed</Filter>
     </ClInclude>
-    <ClInclude Include="vertex_allocator_fixed_inline.h">
+    <ClInclude Include="..\..\xrGame\vertex_allocator_fixed_inline.h">
       <Filter>ALife\search\data_storages\vertex_allocators\fixed</Filter>
     </ClInclude>
-    <ClInclude Include="vertex_manager_fixed.h">
+    <ClInclude Include="..\..\xrGame\vertex_manager_fixed.h">
       <Filter>ALife\search\data_storages\vertex_managers\fixed</Filter>
     </ClInclude>
-    <ClInclude Include="vertex_manager_fixed_inline.h">
+    <ClInclude Include="..\..\xrGame\vertex_manager_fixed_inline.h">
       <Filter>ALife\search\data_storages\vertex_managers\fixed</Filter>
     </ClInclude>
-    <ClInclude Include="vertex_manager_hash_fixed.h">
+    <ClInclude Include="..\..\xrGame\vertex_manager_hash_fixed.h">
       <Filter>ALife\search\data_storages\vertex_managers\hash_fixed</Filter>
     </ClInclude>
-    <ClInclude Include="vertex_manager_hash_fixed_inline.h">
+    <ClInclude Include="..\..\xrGame\vertex_manager_hash_fixed_inline.h">
       <Filter>ALife\search\data_storages\vertex_managers\hash_fixed</Filter>
     </ClInclude>
-    <ClInclude Include="graph_abstract.h">
+    <ClInclude Include="..\..\xrGame\graph_abstract.h">
       <Filter>ALife\search\graphs\abstract_graph</Filter>
     </ClInclude>
-    <ClInclude Include="graph_abstract_inline.h">
+    <ClInclude Include="..\..\xrGame\graph_abstract_inline.h">
       <Filter>ALife\search\graphs\abstract_graph</Filter>
     </ClInclude>
-    <ClInclude Include="graph_edge.h">
+    <ClInclude Include="..\..\xrGame\graph_edge.h">
       <Filter>ALife\search\graphs\abstract_graph\graph_edge</Filter>
     </ClInclude>
-    <ClInclude Include="graph_edge_inline.h">
+    <ClInclude Include="..\..\xrGame\graph_edge_inline.h">
       <Filter>ALife\search\graphs\abstract_graph\graph_edge</Filter>
     </ClInclude>
-    <ClInclude Include="graph_vertex.h">
+    <ClInclude Include="..\..\xrGame\graph_vertex.h">
       <Filter>ALife\search\graphs\abstract_graph\graph_vertex</Filter>
     </ClInclude>
-    <ClInclude Include="graph_vertex_inline.h">
+    <ClInclude Include="..\..\xrGame\graph_vertex_inline.h">
       <Filter>ALife\search\graphs\abstract_graph\graph_vertex</Filter>
     </ClInclude>
-    <ClInclude Include="game_level_cross_table.h">
+    <ClInclude Include="..\..\xrGame\game_level_cross_table.h">
       <Filter>ALife\search\graphs\cross_table</Filter>
     </ClInclude>
-    <ClInclude Include="game_level_cross_table_inline.h">
+    <ClInclude Include="..\..\xrGame\game_level_cross_table_inline.h">
       <Filter>ALife\search\graphs\cross_table</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\game_graph_space.h">
+    <ClInclude Include="..\..\xrGame\game_graph_space.h">
       <Filter>ALife\search\graphs\game_graph</Filter>
     </ClInclude>
-    <ClInclude Include="game_graph.h">
+    <ClInclude Include="..\..\xrGame\game_graph.h">
       <Filter>ALife\search\graphs\game_graph</Filter>
     </ClInclude>
-    <ClInclude Include="game_graph_inline.h">
+    <ClInclude Include="..\..\xrGame\game_graph_inline.h">
       <Filter>ALife\search\graphs\game_graph</Filter>
     </ClInclude>
-    <ClInclude Include="level_graph.h">
+    <ClInclude Include="..\..\xrGame\level_graph.h">
       <Filter>ALife\search\graphs\level_graph</Filter>
     </ClInclude>
-    <ClInclude Include="level_graph_inline.h">
+    <ClInclude Include="..\..\xrGame\level_graph_inline.h">
       <Filter>ALife\search\graphs\level_graph</Filter>
     </ClInclude>
-    <ClInclude Include="level_graph_space.h">
+    <ClInclude Include="..\..\xrGame\level_graph_space.h">
       <Filter>ALife\search\graphs\level_graph</Filter>
     </ClInclude>
-    <ClInclude Include="level_graph_vertex_inline.h">
+    <ClInclude Include="..\..\xrGame\level_graph_vertex_inline.h">
       <Filter>ALife\search\graphs\level_graph</Filter>
     </ClInclude>
-    <ClInclude Include="graph_engine.h">
+    <ClInclude Include="..\..\xrGame\graph_engine.h">
       <Filter>ALife\search\graph_engine</Filter>
     </ClInclude>
-    <ClInclude Include="graph_engine_inline.h">
+    <ClInclude Include="..\..\xrGame\graph_engine_inline.h">
       <Filter>ALife\search\graph_engine</Filter>
     </ClInclude>
-    <ClInclude Include="graph_engine_space.h">
+    <ClInclude Include="..\..\xrGame\graph_engine_space.h">
       <Filter>ALife\search\graph_engine</Filter>
     </ClInclude>
     <ClInclude Include="xrCrossTable.h">
@@ -710,22 +701,22 @@
     <ClInclude Include="server_entity_wrapper_inline.h">
       <Filter>ALife\Spawn\server_entity_wrapper</Filter>
     </ClInclude>
-    <ClInclude Include="patrol_path.h">
+    <ClInclude Include="..\..\xrGame\patrol_path.h">
       <Filter>ALife\Spawn\patrol_paths\patrol_path</Filter>
     </ClInclude>
-    <ClInclude Include="patrol_path_inline.h">
+    <ClInclude Include="..\..\xrGame\patrol_path_inline.h">
       <Filter>ALife\Spawn\patrol_paths\patrol_path</Filter>
     </ClInclude>
-    <ClInclude Include="patrol_path_storage.h">
+    <ClInclude Include="..\..\xrGame\patrol_path_storage.h">
       <Filter>ALife\Spawn\patrol_paths\patrol_path_storage</Filter>
     </ClInclude>
-    <ClInclude Include="patrol_path_storage_inline.h">
+    <ClInclude Include="..\..\xrGame\patrol_path_storage_inline.h">
       <Filter>ALife\Spawn\patrol_paths\patrol_path_storage</Filter>
     </ClInclude>
-    <ClInclude Include="patrol_point.h">
+    <ClInclude Include="..\..\xrGame\patrol_point.h">
       <Filter>ALife\Spawn\patrol_paths\patrol_point</Filter>
     </ClInclude>
-    <ClInclude Include="patrol_point_inline.h">
+    <ClInclude Include="..\..\xrGame\patrol_point_inline.h">
       <Filter>ALife\Spawn\patrol_paths\patrol_point</Filter>
     </ClInclude>
     <ClInclude Include="spawn_patcher.h">
@@ -736,6 +727,9 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xrGame\random32.h">
+      <Filter>Compiler\Kernel\Random32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

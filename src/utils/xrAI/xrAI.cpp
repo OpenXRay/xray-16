@@ -186,7 +186,7 @@ void Startup(LPSTR     lpCmdLine)
 
 #include "factory_api.h"
 
-#include "quadtree.h"
+#include "xrGame/quadtree.h"
 
 Factory_Create  *create_entity  = 0;
 Factory_Destroy *destroy_entity = 0;

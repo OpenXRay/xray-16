@@ -246,7 +246,7 @@
     <ClInclude Include="..\xrServerEntities\clsid_game.h" />
     <ClInclude Include="..\xrServerEntities\gametype_chooser.h" />
     <ClInclude Include="..\xrServerEntities\game_base_space.h" />
-    <ClInclude Include="..\xrServerEntities\game_graph_space.h" />
+    <ClInclude Include="game_graph_space.h" />
     <ClInclude Include="..\xrServerEntities\InfoPortionDefs.h" />
     <ClInclude Include="..\xrServerEntities\inventory_space.h" />
     <ClInclude Include="..\xrServerEntities\ItemListTypes.h" />

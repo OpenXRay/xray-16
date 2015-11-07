@@ -13,7 +13,7 @@
 #include "xrServer_Objects_ALife_All.h"
 #include "factory_api.h"
 #include "xrCrossTable.h"
-#include "level_graph.h"
+#include "xrGame/level_graph.h"
 #include "Common/object_broker.h"
 #include "xr_graph_merge.h"
 #include "spawn_constructor_space.h"

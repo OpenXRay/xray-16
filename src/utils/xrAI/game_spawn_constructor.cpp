@@ -13,8 +13,8 @@
 #include "xrServer_Objects_ALife_All.h"
 #include "xrai.h"
 #include "server_entity_wrapper.h"
-#include "graph_engine.h"
-#include "patrol_path_storage.h"
+#include "xrGame/graph_engine.h"
+#include "xrGame/patrol_path_storage.h"
 
 extern LPCSTR GAME_CONFIG;
 extern LPCSTR generate_temp_file_name			(LPCSTR header0, LPCSTR header1, string_path& buffer);
