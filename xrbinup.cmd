@@ -48,12 +48,11 @@ set cp_tool=cp
 %cp_tool% %src%\%cfg_long%\xrAPI.dll %dst%\xrAPI.dll
 %cp_tool% %src%\%cfg_long%\xrCore.dll %dst%\xrCore.dll
 %cp_tool% %src%\%cfg_long%\xrCDB.dll %dst%\xrCDB.dll
+%cp_tool% %src%\%cfg_long%\xrCPU_Pipe.dll %dst%\xrCPU_Pipe.dll
 %cp_tool% %src%\%cfg_long%\xrSound.dll %dst%\xrSound.dll
 %cp_tool% %src%\%cfg_long%\xrParticles.dll %dst%\xrParticles.dll
 %cp_tool% %src%\%cfg_long%\xrPhysics.dll %dst%\xrPhysics.dll
 %cp_tool% %src%\%cfg_long%\xrD3D9-Null.dll %dst%\xrD3D9-Null.dll
-%cp_tool% %src%\%cfg_long%\xrAICore.dll %dst%\xrAICore.dll
-%cp_tool% %src%\%cfg_long%\xrScriptEngine.dll %dst%\xrScriptEngine.dll
 %cp_tool% %src%\%cfg_long%\xrGame.dll %dst%\xrGame.dll
 %cp_tool% %src%\%cfg_long%\xrGameSpy.dll %dst%\xrGameSpy.dll
 %cp_tool% %src%\%cfg_long%\xrNetServer.dll %dst%\xrNetServer.dll
@@ -62,8 +61,9 @@ set cp_tool=cp
 %cp_tool% %src%\%cfg_long%\xrRender_R3.dll %dst%\xrRender_R3.dll
 %cp_tool% %src%\%cfg_long%\xrRender_R4.dll %dst%\xrRender_R4.dll
 %cp_tool% %src%\%cfg_long%\xrXMLParser.dll %dst%\xrXMLParser.dll
-rem CxImage is compiled as DLLs only in debug configuration
+rem crypto and CxImage are compiled as DLLs only in debug configuration
 if defined dbg (
+  %cp_tool% %src%\%cfg_long%\crypto.dll %dst%\crypto.dll
   %cp_tool% %src%\%cfg_long%\CxImage.dll %dst%\CxImage.dll
 )
 %cp_tool% %src%\%cfg_long%\Lua.JIT.1.1.4.dll %dst%\Lua.JIT.1.1.4.dll
@@ -72,10 +72,6 @@ if defined dbg (
 %cp_tool% %src%\%cfg_long%\OpenAL32.dll %dst%\OpenAL32.dll
 %cp_tool% %src%\%cfg_long%\OpenAL32.dll %dst%\dedicated\OpenAL32.dll
 %cp_tool% %src%\%cfg_long%_Dedicated\dedicated\xrEngine.exe %dst%\dedicated\xrEngine.exe
-%cp_tool% %src%\%cfg_long%\xrWeatherEditor.dll %dst%\xrWeatherEditor.dll
-%cp_tool% %src%\%cfg_long%\xrManagedApi.dll %dst%\xrManagedApi.dll
-%cp_tool% %src%\%cfg_long%\xrSdkControls.dll %dst%\xrSdkControls.dll
-%cp_tool% %src%\%cfg_long%\xrPostprocessEditor.exe %dst%\xrPostprocessEditor.exe
 
 :ret
 endlocal
