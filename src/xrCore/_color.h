@@ -18,7 +18,7 @@ ICF u32 color_get_R(u32 rgba) { return (((rgba) >> 16) & 0xff); }
 ICF u32 color_get_G(u32 rgba) { return (((rgba) >> 8) & 0xff); }
 ICF u32 color_get_B(u32 rgba) { return ((rgba)& 0xff); }
 ICF u32 color_get_A(u32 rgba) { return ((rgba) >> 24); }
-ICF u32 subst_alpha(u32 rgba, u32 a) { return rgba&~color_rgba(0, 0, 0, 0xff) | color_rgba(0, 0, 0, a); }
+ICF u32 subst_alpha(u32 rgba, u32 a) { return (rgba & ~color_rgba(0, 0, 0, 0xff)) | color_rgba(0, 0, 0, a); }
 ICF u32 bgr2rgb(u32 bgr) { return color_rgba(color_get_B(bgr), color_get_G(bgr), color_get_R(bgr), 0); }
 ICF u32 rgb2bgr(u32 rgb) { return bgr2rgb(rgb); }
 
