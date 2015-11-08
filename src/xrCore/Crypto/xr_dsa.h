@@ -1,7 +1,6 @@
 #ifndef XR_DSA_INCLUDED
 #define XR_DSA_INCLUDED
 
-#include "crypto_api_def.h"
 #include "xrCore/xrCore.h"
 
 struct dsa_st;
@@ -9,7 +8,7 @@ struct dsa_st;
 namespace crypto
 {
 
-class CRYPTO_API xr_dsa
+class XRCORE_API xr_dsa
 {
 public:
 	static int const key_bit_length			= 1024;

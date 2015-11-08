@@ -442,7 +442,6 @@
     <ClInclude Include="Containers\AssociativeVectorComparer.hpp" />
     <ClInclude Include="cpuid.h" />
     <ClInclude Include="Crypto\crypto.h" />
-    <ClInclude Include="Crypto\crypto_api_def.h" />
     <ClInclude Include="Crypto\xr_dsa.h" />
     <ClInclude Include="Crypto\xr_dsa_signer.h" />
     <ClInclude Include="Crypto\xr_dsa_verifyer.h" />

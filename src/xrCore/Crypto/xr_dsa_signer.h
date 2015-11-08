@@ -5,7 +5,7 @@
 
 typedef fastdelegate::FastDelegate1< long >	sha_process_yielder;
 
-class CRYPTO_API xr_dsa_signer
+class XRCORE_API xr_dsa_signer
 {
 public:
 						xr_dsa_signer			(u8 const p_number[crypto::xr_dsa::public_key_length],
@@ -28,6 +28,6 @@ private:
 	
 }; //xr_dsa_signer
 
-CRYPTO_API char const * current_time(string64 & dest_time);
+XRCORE_API char const * current_time(string64 & dest_time);
 
 #endif //#ifndef XR_DSA_SIGNER_INCLUDED

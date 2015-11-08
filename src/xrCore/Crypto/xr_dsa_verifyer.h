@@ -3,7 +3,7 @@
 
 #include "crypto.h"
 
-class CRYPTO_API xr_dsa_verifyer
+class XRCORE_API xr_dsa_verifyer
 {
 public:
 	xr_dsa_verifyer				(u8 const p_number[crypto::xr_dsa::public_key_length],

@@ -8,7 +8,7 @@
 namespace crypto
 {
 
-CRYPTO_API	void		xr_crypto_init			();
+XRCORE_API	void		xr_crypto_init			();
 
 } //namespace crypto
 

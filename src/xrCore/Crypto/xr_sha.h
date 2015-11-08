@@ -1,7 +1,6 @@
 #ifndef XR_SHA_INCLUDED
 #define XR_SHA_INCLUDED
 
-#include "crypto_api_def.h"
 #include "xrCore/xrCore.h"
 
 struct SHAstate_st;
@@ -9,7 +8,7 @@ struct SHAstate_st;
 namespace crypto
 {
 
-class CRYPTO_API xr_sha256
+class XRCORE_API xr_sha256
 {
 public:
 	static u32 const digest_length	= 20; //SHA_DIGEST_LENGTH

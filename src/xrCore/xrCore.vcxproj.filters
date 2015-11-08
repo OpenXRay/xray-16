@@ -800,9 +800,6 @@
     <ClInclude Include="Crypto\crypto.h">
       <Filter>Crypto</Filter>
     </ClInclude>
-    <ClInclude Include="Crypto\crypto_api_def.h">
-      <Filter>Crypto</Filter>
-    </ClInclude>
     <ClInclude Include="Crypto\xr_dsa.h">
       <Filter>Crypto</Filter>
     </ClInclude>

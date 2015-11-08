@@ -15,7 +15,7 @@ static void unsafe_xr_free(void* ptr)
 
 static unsigned char rnd_seed[] = "S.T.A.L.K.E.R. 4ever Rulezz !!!";
 
-CRYPTO_API	void		xr_crypto_init	()
+XRCORE_API	void		xr_crypto_init	()
 {
 	string256 random_string;
 	xr_sprintf					(random_string, "%I64d_%s", CPU::QPC(), rnd_seed);
