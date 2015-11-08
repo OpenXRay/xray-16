@@ -119,9 +119,9 @@ public:
     };
 
     virtual ~IServerEntity() = 0;
-
+    // XXX: move to implementation
     Flags32                         m_editor_flags;
-    virtual void set_editor_flag(u32 mask) = 0;
+    void set_editor_flag(u32 mask) { m_editor_flags.set(mask, TRUE); }
 
 public:
     virtual void        __stdcall   Spawn_Write             (NET_Packet &tNetPacket, BOOL bLocal) = 0;
@@ -147,7 +147,6 @@ public:
 };
 
 IC IServerEntity::~IServerEntity() {}
-IC void IServerEntity::set_editor_flag(u32 mask) { m_editor_flags.set(mask, TRUE); }
 
 #pragma warning(pop)
 
