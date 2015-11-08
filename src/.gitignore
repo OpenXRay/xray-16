@@ -6,6 +6,7 @@ ipch/
 *.sdf
 *.opensdf
 *.user
+*.VC.opendb
 
 # Visual Studio profiler
 *.psess
