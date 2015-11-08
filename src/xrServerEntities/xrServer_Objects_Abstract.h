@@ -121,7 +121,7 @@ public:
     virtual ~ISE_Abstract() = 0;
 
 	Flags32							m_editor_flags;
-	IC	void						set_editor_flag			(u32 mask)	{m_editor_flags.set	(mask,TRUE);}
+    virtual void set_editor_flag(u32 mask) = 0;
 
 public:
 	virtual void		__stdcall	Spawn_Write				(NET_Packet &tNetPacket, BOOL bLocal) = 0;
@@ -147,6 +147,7 @@ public:
 };
 
 IC ISE_Abstract::~ISE_Abstract() {}
+IC void ISE_Abstract::set_editor_flag(u32 mask) { m_editor_flags.set(mask, TRUE); }
 
 #pragma warning(pop)
 
