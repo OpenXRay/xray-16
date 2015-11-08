@@ -90,7 +90,9 @@ public:
 	virtual CSE_Motion* __stdcall	motion					() = 0;
 };
 
-struct ISE_AbstractLEOwner {
+class ISE_AbstractLEOwner
+{
+public:
     virtual ~ISE_AbstractLEOwner() = 0;
 	virtual void		__stdcall	get_bone_xform			(LPCSTR name, Fmatrix& xform) = 0;
 };
@@ -98,13 +100,15 @@ struct ISE_AbstractLEOwner {
 IC ISE_AbstractLEOwner::~ISE_AbstractLEOwner() {}
 
 #pragma pack(push,1)
-struct visual_data {
+class visual_data
+{
+public:
 	Fmatrix		matrix;
 	CSE_Visual	*visual;
-}; // struct visual_data
+};
 #pragma pack(pop)
 
-struct ISE_Abstract {
+class ISE_Abstract {
 public:
 	enum {
 		flUpdateProperties			= u32(1 << 0),

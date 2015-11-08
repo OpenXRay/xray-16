@@ -15,7 +15,7 @@
 #	include "factory_api.h"
 #endif
 
-struct ISE_Abstract;
+class ISE_Abstract;
 
 CServerEntityWrapper::~CServerEntityWrapper	()
 {
