@@ -138,7 +138,7 @@ public:
     virtual Fvector&    __stdcall   angle                   ();
     virtual Flags16&    __stdcall   flags                   ();
     virtual CSE_Visual* __stdcall   visual                  ();
-    virtual ISE_Shape*  __stdcall   shape                   ();
+    virtual IServerEntityShape*  __stdcall   shape                   ();
     virtual CSE_Motion* __stdcall   motion                  ();
     virtual bool        __stdcall   validate                ();
     //

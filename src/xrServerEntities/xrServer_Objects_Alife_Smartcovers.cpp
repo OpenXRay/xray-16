@@ -89,7 +89,7 @@ CSE_SmartCover::~CSE_SmartCover ()
 #endif // XRSE_FACTORY_EXPORTS
 }
 
-ISE_Shape* CSE_SmartCover::shape()
+IServerEntityShape* CSE_SmartCover::shape()
 {
     return                      (this);
 }

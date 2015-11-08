@@ -367,7 +367,7 @@ bool CSpawnPoint::SSpawnData::ExportGame(SExportStreams* F, CSpawnPoint* owner)
     m_Data->angle().set         (owner->PRotation);
 
     // export cform (if needed)
-    ISE_Shape* cform            = m_Data->shape();
+    IServerEntityShape* cform            = m_Data->shape();
 // SHAPE
     if (cform&&!(owner->m_AttachedObject&&(owner->m_AttachedObject->ClassID==OBJCLASS_SHAPE))){
         ELog.DlgMsg             (mtError,"Spawn Point: '%s' must contain attached shape.",owner->Name);

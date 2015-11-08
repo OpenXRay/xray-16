@@ -837,7 +837,7 @@ bool CSE_ALifeSpaceRestrictor::used_ai_locations	() const
 	return						(false);
 }
 
-ISE_Shape* CSE_ALifeSpaceRestrictor::shape		()
+IServerEntityShape* CSE_ALifeSpaceRestrictor::shape		()
 {
 	return						(this);
 }
@@ -1960,7 +1960,7 @@ CSE_ALifeObjectClimable::~CSE_ALifeObjectClimable	()
 {
 }
 
-ISE_Shape* CSE_ALifeObjectClimable::shape					()
+IServerEntityShape* CSE_ALifeObjectClimable::shape					()
 {
 	return						(this);
 }

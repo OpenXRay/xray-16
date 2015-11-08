@@ -166,17 +166,17 @@
 #define SPAWN_VERSION	u16(128)
 
 class CSE_Shape :
-    public ISE_Shape,
+    public IServerEntityShape,
     public CShapeData
 {
-    using inherited1 = ISE_Shape;
+    using inherited1 = IServerEntityShape;
     using inherited2 = CShapeData;
 public:
 	void							cform_read		(NET_Packet& P);
 	void							cform_write		(NET_Packet& P);
 									CSE_Shape		();
 	virtual							~CSE_Shape		();
-	virtual ISE_Shape*  __stdcall	shape			() = 0;
+	virtual IServerEntityShape*  __stdcall	shape			() = 0;
 	virtual void __stdcall			assign_shapes	(CShapeData::shape_def* shapes, u32 cnt);
 };
 

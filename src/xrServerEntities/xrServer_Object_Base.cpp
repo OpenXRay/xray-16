@@ -166,7 +166,7 @@ CSE_Visual* CSE_Abstract::visual			()
 	return						(0);
 }
 
-ISE_Shape*  CSE_Abstract::shape				()
+IServerEntityShape*  CSE_Abstract::shape				()
 {
 	return						(0);
 }

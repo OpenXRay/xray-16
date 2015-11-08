@@ -29,14 +29,14 @@ class CDUInterface;
 #pragma warning(push)
 #pragma warning(disable:4005)
 
-class ISE_Shape
+class IServerEntityShape
 {
 public:
-    virtual ~ISE_Shape() = 0;
+    virtual ~IServerEntityShape() = 0;
     virtual void __stdcall          assign_shapes           (CShapeData::shape_def* shapes, u32 cnt)=0;
 };
 
-IC ISE_Shape::~ISE_Shape() {}
+IC IServerEntityShape::~IServerEntityShape() {}
 
 class CSE_Visual
 {
@@ -140,7 +140,7 @@ public:
     virtual Fvector&    __stdcall   position                () = 0;
     virtual Fvector&    __stdcall   angle                   () = 0;
     virtual Flags16&    __stdcall   flags                   () = 0;
-    virtual ISE_Shape*  __stdcall   shape                   () = 0;
+    virtual IServerEntityShape*  __stdcall   shape                   () = 0;
     virtual CSE_Visual* __stdcall   visual                  () = 0;
     virtual CSE_Motion* __stdcall   motion                  () = 0;
     virtual bool        __stdcall   validate                () = 0;

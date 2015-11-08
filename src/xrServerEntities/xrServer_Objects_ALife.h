@@ -402,7 +402,7 @@ public:
 
 									CSE_ALifeSpaceRestrictor	(LPCSTR caSection);
 	virtual							~CSE_ALifeSpaceRestrictor	();
-	virtual ISE_Shape*  __stdcall	shape						();
+	virtual IServerEntityShape*  __stdcall	shape						();
 	virtual bool					can_switch_offline			() const;
 	virtual bool					used_ai_locations			() const;
     virtual void UPDATE_Read(NET_Packet& P);
@@ -701,7 +701,7 @@ shared_str						material;
 virtual							~CSE_ALifeObjectClimable	();
 virtual bool					used_ai_locations	() const;
 virtual bool					can_switch_offline	() const;
-virtual ISE_Shape*  __stdcall	shape				();
+virtual IServerEntityShape*  __stdcall	shape				();
 
 #ifndef XRGAME_EXPORTS
 virtual	void		__stdcall	set_additional_info	(void* info);
