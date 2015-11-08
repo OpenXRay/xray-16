@@ -265,7 +265,7 @@ void CSE_ALifeTraderAbstract::OnChangeProfile(PropValue* sender)
 #ifndef AI_COMPILER
     specific_character();
 #endif
-    base()->set_editor_flag     (ISE_Abstract::flVisualChange);
+    base()->set_editor_flag     (IServerEntity::flVisualChange);
 }
 
 #ifndef AI_COMPILER
@@ -924,7 +924,7 @@ void CSE_ALifeZoneVisual::FillProps(LPCSTR pref, PropItemVec& values)
 {
     inherited1::FillProps       (pref, values);
     inherited2::FillProps       (pref, values);
-    ISE_Abstract* abstract      = smart_cast<ISE_Abstract*>(this); VERIFY(abstract);
+    IServerEntity* abstract      = smart_cast<IServerEntity*>(this); VERIFY(abstract);
     PHelper().CreateChoose(values,  PrepareKey(pref,abstract->name(),"Attack animation"),   &attack_animation, smSkeletonAnims,0,(void*)*visual_name);
 }
 #endif // #ifndef XRGAME_EXPORTS

@@ -4,14 +4,14 @@
 #include "xrCore/Platform.h"
 
 #ifdef XRSE_FACTORY_EXPORTS
-#	define FACTORY_API XR_EXPORT
+#   define FACTORY_API XR_EXPORT
 #else
-#	define FACTORY_API XR_IMPORT
+#   define FACTORY_API XR_IMPORT
 #endif
 
 extern "C" {
-	FACTORY_API ISE_Abstract* __stdcall create_entity	(LPCSTR section);
-	FACTORY_API void		  __stdcall destroy_entity	(ISE_Abstract *&);
+    FACTORY_API IServerEntity* __stdcall create_entity  (LPCSTR section);
+    FACTORY_API void          __stdcall destroy_entity  (IServerEntity *&);
 };
 
 #endif
