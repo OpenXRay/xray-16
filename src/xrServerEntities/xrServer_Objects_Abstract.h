@@ -90,14 +90,14 @@ public:
     virtual CSE_Motion* __stdcall   motion                  () = 0;
 };
 
-class ISE_AbstractLEOwner
+class IServerEntityLEOwner
 {
 public:
-    virtual ~ISE_AbstractLEOwner() = 0;
+    virtual ~IServerEntityLEOwner() = 0;
     virtual void        __stdcall   get_bone_xform          (LPCSTR name, Fmatrix& xform) = 0;
 };
 
-IC ISE_AbstractLEOwner::~ISE_AbstractLEOwner() {}
+IC IServerEntityLEOwner::~IServerEntityLEOwner() {}
 
 #pragma pack(push,1)
 class visual_data
@@ -128,7 +128,7 @@ public:
     virtual BOOL        __stdcall   Spawn_Read              (NET_Packet &tNetPacket) = 0;
 #ifndef XRGAME_EXPORTS
     virtual void        __stdcall   FillProp                (LPCSTR pref, PropItemVec &items) = 0;
-    virtual void        __stdcall   on_render               (CDUInterface* du, ISE_AbstractLEOwner* owner, bool bSelected, const Fmatrix& parent,int priority, bool strictB2F) = 0;
+    virtual void        __stdcall   on_render               (CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected, const Fmatrix& parent,int priority, bool strictB2F) = 0;
     virtual visual_data*__stdcall   visual_collection       () const = 0;
     virtual u32         __stdcall   visual_collection_size  () const = 0;
     virtual void        __stdcall   set_additional_info     (void* info) = 0;

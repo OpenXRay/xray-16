@@ -52,7 +52,7 @@ public:
                         CLE_Motion      (CSE_Motion* src);
         virtual         ~CLE_Motion     ();
     };
-    struct SSpawnData: public ISE_AbstractLEOwner
+    struct SSpawnData: public IServerEntityLEOwner
     {
         CLASS_ID        m_ClassID;
         shared_str      m_Profile;

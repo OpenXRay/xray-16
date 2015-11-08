@@ -118,7 +118,7 @@ public:
 #ifndef XRGAME_EXPORTS
     virtual void                    FillProps               (LPCSTR pref, PropItemVec &items);
     virtual void        __stdcall   FillProp                (LPCSTR pref, PropItemVec &items);
-    virtual void        __stdcall   on_render               (CDUInterface* du, ISE_AbstractLEOwner* owner, bool bSelected, const Fmatrix& parent,int priority, bool strictB2F){} 
+    virtual void        __stdcall   on_render               (CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected, const Fmatrix& parent,int priority, bool strictB2F){} 
     virtual visual_data*__stdcall   visual_collection       () const { return 0; }
     virtual u32         __stdcall   visual_collection_size  () const { return 0; }
     virtual void        __stdcall   set_additional_info     (void* info) {};
