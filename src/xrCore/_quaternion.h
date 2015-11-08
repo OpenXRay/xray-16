@@ -140,7 +140,7 @@
 #define QEPSILON    0.00001f
 
 template <class T>
-struct XRCORE_API _quaternion
+struct _quaternion
 {
 public:
     typedef T    TYPE;
