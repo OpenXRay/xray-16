@@ -39,7 +39,7 @@ void object_shift::	dbg_draw			( const Fmatrix	&current_pos, const extrapolation
 		DBG_DrawLine(
 			v0,
 			v1, 
-			D3DCOLOR_XRGB( 0, 255, 0 ) );
+			color_xrgb( 0, 255, 0 ) );
 	}
 	
 	float	start_shift = current + delta_shift( time_passed );
@@ -47,7 +47,7 @@ void object_shift::	dbg_draw			( const Fmatrix	&current_pos, const extrapolation
 	DBG_DrawLine(
 		Fvector().add( p0, Fvector().set( 0, start_shift, 0 ) )	,
 		Fvector().add( p1, Fvector().set( 0, end_shift, 0 ) ),
-			D3DCOLOR_XRGB( 255, 0, 0 ) );
+			color_xrgb( 255, 0, 0 ) );
 }
 #endif
 

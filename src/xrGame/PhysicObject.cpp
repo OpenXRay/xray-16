@@ -794,12 +794,12 @@ void CPhysicObject::PH_A_CrPr		()
 		Fvector c,r,p;
 		bb.get_CD(c,r );
 		XFORM().transform_tiny(p,c);
-		DBG_DrawAABB( p, r,D3DCOLOR_XRGB(255, 0, 0));
+		DBG_DrawAABB( p, r,color_xrgb(255, 0, 0));
 		//PPhysicsShell()->XFORM().transform_tiny(c);
 		Fmatrix mm;
 		PPhysicsShell()->GetGlobalTransformDynamic(&mm);
 		mm.transform_tiny(p,c);
-		DBG_DrawAABB( p, r,D3DCOLOR_XRGB(0, 255, 0));
+		DBG_DrawAABB( p, r,color_xrgb(0, 255, 0));
 		DBG_ClosedCashedDraw	(50000);
 #endif
 		spatial_move();
@@ -960,10 +960,10 @@ if(dbg_draw_doors)
 	const Fvector pos = start_pos.c.add( Fvector().set(0,0.2f,0) );
 	const Fvector pos1 = start_pos.c.add( Fvector().set(0,0.3f,0) );
 
-	DBG_DrawLine( pos, Fvector( ).add( pos, open ), D3DCOLOR_XRGB( 0, 255, 0 ) );
-	DBG_DrawLine( pos, Fvector( ).add( pos, closed ), D3DCOLOR_XRGB( 255, 0, 0 ) );
+	DBG_DrawLine( pos, Fvector( ).add( pos, open ), color_xrgb( 0, 255, 0 ) );
+	DBG_DrawLine( pos, Fvector( ).add( pos, closed ), color_xrgb( 255, 0, 0 ) );
 
-	DBG_DrawLine( pos1, Fvector( ).add( pos1, det_vector ), D3DCOLOR_XRGB( 255, 255, 0 ) );
+	DBG_DrawLine( pos1, Fvector( ).add( pos1, det_vector ), color_xrgb( 255, 255, 0 ) );
 }
 #endif
 	//DBG_ClosedCashedDraw( 50000000 );

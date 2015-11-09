@@ -750,8 +750,8 @@ CBaseMonster::SDebugInfo CController::show_debug_info()
 
 		enemy_pos.y += 1.0f;
 	
-		DBG().level_info(this).add_item(my_pos,	new_pos, D3DCOLOR_XRGB(0,255,255));
-		DBG().level_info(this).add_item(enemy_pos, new_pos, D3DCOLOR_XRGB(0,255,255));
+		DBG().level_info(this).add_item(my_pos,	new_pos, color_xrgb(0,255,255));
+		DBG().level_info(this).add_item(enemy_pos, new_pos, color_xrgb(0,255,255));
 	}
 
 	return CBaseMonster::SDebugInfo();

@@ -97,7 +97,7 @@ public:
 
 	CFunctionGraph						( )																																								;
 	~CFunctionGraph						( )																																								;
-	void	Init						( type_function fun, float x0, float x1, int l, int t, int w, int h, int points_num=500, u32 color=D3DCOLOR_XRGB( 0, 255, 0 ), u32 bk_color=D3DCOLOR_XRGB( 255, 255, 255 ) )	;
+	void	Init						( type_function fun, float x0, float x1, int l, int t, int w, int h, int points_num=500, u32 color=color_xrgb( 0, 255, 0 ), u32 bk_color=color_xrgb( 255, 255, 255 ) )	;
 	void	Clear						( )																																								;
 	bool	IsActive					( )																																								;
 	void	AddMarker					( CStatGraph::EStyle Style, float pos, u32 Color )																												;

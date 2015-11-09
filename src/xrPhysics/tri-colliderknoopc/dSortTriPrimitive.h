@@ -135,7 +135,7 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide (
 
 #ifdef DEBUG
 	if(debug_output().ph_dbg_draw_mask().test(phDbgDrawTriTestAABB))
-		debug_output().DBG_DrawAABB(cast_fv(p),AABB,D3DCOLOR_XRGB(0,0,255));
+		debug_output().DBG_DrawAABB(cast_fv(p),AABB,color_xrgb(0,0,255));
 #endif
 
 
@@ -165,7 +165,7 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide (
 
 #ifdef DEBUG
 		if(debug_output().ph_dbg_draw_mask().test(phDbgDrawSavedTries))
-			debug_output().DBG_DrawTri(neg_tri.T,V_array,D3DCOLOR_XRGB(255,0,0));
+			debug_output().DBG_DrawTri(neg_tri.T,V_array,color_xrgb(255,0,0));
 #endif
 
 	}
@@ -185,7 +185,7 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide (
 
 #ifdef DEBUG
 		if(debug_output().ph_dbg_draw_mask().test(phDbgDrawSavedTries))
-			debug_output().DBG_DrawTri(b_neg_tri.T,V_array,D3DCOLOR_XRGB(0,0,255));
+			debug_output().DBG_DrawTri(b_neg_tri.T,V_array,color_xrgb(0,0,255));
 #endif
 
 		}
@@ -206,7 +206,7 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide (
 																continue;
 #ifdef DEBUG
 		if(debug_output().ph_dbg_draw_mask().test(phDBgDrawIntersectedTries))
-										debug_output().DBG_DrawTri(T,V_array,D3DCOLOR_XRGB(0,255,0));
+										debug_output().DBG_DrawTri(T,V_array,color_xrgb(0,255,0));
 		debug_output().dbg_tries_num()++;
 #endif
 		Triangle	tri;	
@@ -214,7 +214,7 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide (
 		if(tri.dist<0.f){
 #ifdef DEBUG
 			if(debug_output().ph_dbg_draw_mask().test(phDBgDrawNegativeTries))
-				debug_output().DBG_DrawTri(T,V_array,D3DCOLOR_XRGB(0,0,255));
+				debug_output().DBG_DrawTri(T,V_array,color_xrgb(0,0,255));
 #endif
 			float last_pos_dist=dDOT(last_pos,tri.norm)- tri.pos ;
 			if((!(last_pos_dist<0.f))||b_pushing)
@@ -222,7 +222,7 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide (
 				{
 #ifdef DEBUG
 					if(debug_output().ph_dbg_draw_mask().test(phDBgDrawTriesChangesSign))
-						debug_output().DBG_DrawTri(T,V_array,D3DCOLOR_XRGB(0,255,0));
+						debug_output().DBG_DrawTri(T,V_array,color_xrgb(0,255,0));
 #endif
 					SGameMtl* material=GMLibrary().GetMaterialByIdx(T->material);
 					VERIFY( material );
@@ -240,13 +240,13 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide (
 						{
 #ifdef DEBUG
 							if(debug_output().ph_dbg_draw_mask().test(phDbgDrawTriTrace))
-								debug_output().DBG_DrawLine(cast_fv(last_pos),cast_fv(p),D3DCOLOR_XRGB(255,0,255));
+								debug_output().DBG_DrawLine(cast_fv(last_pos),cast_fv(p),color_xrgb(255,0,255));
 #endif
 							dVector3 tri_point;
 							PlanePoint(tri,last_pos,p,last_pos_dist,tri_point);
 #ifdef DEBUG
 							if(debug_output().ph_dbg_draw_mask().test(phDbgDrawTriPoint))
-								debug_output().DBG_DrawPoint(cast_fv(tri_point),0.01f,D3DCOLOR_XRGB(255,0,255));
+								debug_output().DBG_DrawPoint(cast_fv(tri_point),0.01f,color_xrgb(255,0,255));
 #endif
 							bool was_intersect = intersect;
 							intersect=intersect||TriContainPoint(	
@@ -262,7 +262,7 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide (
 							{
 								dVectorSet( last_pos, tri_point );
 								debug_output().DBG_OpenCashedDraw( );
-								debug_output().DBG_DrawPoint( cast_fv(tri_point), 0.01f, D3DCOLOR_XRGB(255,0,255) );
+								debug_output().DBG_DrawPoint( cast_fv(tri_point), 0.01f, color_xrgb(255,0,255) );
 								debug_output().DBG_ClosedCashedDraw( 1000000 );
 							}
 #endif
@@ -312,7 +312,7 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide (
 		else{
 #ifdef DEBUG
 			if(debug_output().ph_dbg_draw_mask().test(phDBgDrawPositiveTries))
-				debug_output().DBG_DrawTri(T,V_array,D3DCOLOR_XRGB(255,0,0));
+				debug_output().DBG_DrawTri(T,V_array,color_xrgb(255,0,0));
 #endif	
 				if(ret>flags-10) 
 							continue;

@@ -37,23 +37,23 @@ void CCar::DbgCreatePlots()
 	e_state_drive=drive;
 //////////////////////////////
 	int y_pos=0,y_w=100;
-	m_dbg_power_rpm.Init(CFunctionGraph::type_function(this,&CCar::Parabola),m_min_rpm,m_max_rpm,0,y_pos,500,y_w,1000,D3DCOLOR_XRGB(0,0,255));
-	m_dbg_power_rpm.AddMarker(CStatGraph::stVert, 0, D3DCOLOR_XRGB(255, 0, 0));
-	m_dbg_power_rpm.AddMarker(CStatGraph::stHor, 0, D3DCOLOR_XRGB(0, 0, 255));
-	m_dbg_power_rpm.AddMarker(CStatGraph::stVert,0,D3DCOLOR_XRGB(0, 0, 0));
+	m_dbg_power_rpm.Init(CFunctionGraph::type_function(this,&CCar::Parabola),m_min_rpm,m_max_rpm,0,y_pos,500,y_w,1000,color_xrgb(0,0,255));
+	m_dbg_power_rpm.AddMarker(CStatGraph::stVert, 0, color_xrgb(255, 0, 0));
+	m_dbg_power_rpm.AddMarker(CStatGraph::stHor, 0, color_xrgb(0, 0, 255));
+	m_dbg_power_rpm.AddMarker(CStatGraph::stVert,0,color_xrgb(0, 0, 0));
 
-	m_dbg_power_rpm.AddMarker(CStatGraph::stVert,0,D3DCOLOR_XRGB(127, 0, 0));
-	m_dbg_power_rpm.AddMarker(CStatGraph::stVert,0,D3DCOLOR_XRGB(0, 0, 127));
+	m_dbg_power_rpm.AddMarker(CStatGraph::stVert,0,color_xrgb(127, 0, 0));
+	m_dbg_power_rpm.AddMarker(CStatGraph::stVert,0,color_xrgb(0, 0, 127));
 	
 	y_pos+=y_w+10;
 
 	m_dbg_torque_rpm.Init(CFunctionGraph::type_function(this,&CCar::TorqueRpmFun),m_min_rpm,m_max_rpm,0,y_pos,500,y_w,1000);
-	m_dbg_torque_rpm.AddMarker(CStatGraph::stVert, 0, D3DCOLOR_XRGB(255, 0, 0));
-	m_dbg_torque_rpm.AddMarker(CStatGraph::stHor, 0, D3DCOLOR_XRGB(0, 255,0));
-	m_dbg_torque_rpm.AddMarker(CStatGraph::stVert,0,D3DCOLOR_XRGB(0, 0, 0));
+	m_dbg_torque_rpm.AddMarker(CStatGraph::stVert, 0, color_xrgb(255, 0, 0));
+	m_dbg_torque_rpm.AddMarker(CStatGraph::stHor, 0, color_xrgb(0, 255,0));
+	m_dbg_torque_rpm.AddMarker(CStatGraph::stVert,0,color_xrgb(0, 0, 0));
 
-	m_dbg_torque_rpm.AddMarker(CStatGraph::stVert,0,D3DCOLOR_XRGB(127, 0, 0));
-	m_dbg_torque_rpm.AddMarker(CStatGraph::stVert,0,D3DCOLOR_XRGB(0, 0, 127));
+	m_dbg_torque_rpm.AddMarker(CStatGraph::stVert,0,color_xrgb(127, 0, 0));
+	m_dbg_torque_rpm.AddMarker(CStatGraph::stVert,0,color_xrgb(0, 0, 127));
 
 	y_pos+=y_w+10;
 
@@ -63,16 +63,16 @@ void CCar::DbgCreatePlots()
 		for(;i<e;i++)
 		{
 			float r=4*m_dbg_torque_rpm.ResolutionX();
-			m_dbg_torque_rpm.AddMarker(CStatGraph::stVert,(*i)[1]+r,D3DCOLOR_XRGB(255,255,0));
-			m_dbg_torque_rpm.AddMarker(CStatGraph::stVert,(*i)[2]+r,D3DCOLOR_XRGB(0,255,255));
+			m_dbg_torque_rpm.AddMarker(CStatGraph::stVert,(*i)[1]+r,color_xrgb(255,255,0));
+			m_dbg_torque_rpm.AddMarker(CStatGraph::stVert,(*i)[2]+r,color_xrgb(0,255,255));
 			r=4*m_dbg_power_rpm.ResolutionX();
-			m_dbg_power_rpm.AddMarker(CStatGraph::stVert,(*i)[1]+r,D3DCOLOR_XRGB(255,255,0));
-			m_dbg_power_rpm.AddMarker(CStatGraph::stVert,(*i)[2]+r,D3DCOLOR_XRGB(0,255,255));
+			m_dbg_power_rpm.AddMarker(CStatGraph::stVert,(*i)[1]+r,color_xrgb(255,255,0));
+			m_dbg_power_rpm.AddMarker(CStatGraph::stVert,(*i)[2]+r,color_xrgb(0,255,255));
 		}
 	}
 	//--------------------------------------
 	m_dbg_dynamic_plot	=xr_new<CStatGraph>();
-	m_dbg_dynamic_plot	->SetRect(0,y_pos,500,y_w,D3DCOLOR_XRGB(255,255,255),D3DCOLOR_XRGB(255,255,255));
+	m_dbg_dynamic_plot	->SetRect(0,y_pos,500,y_w,color_xrgb(255,255,255),color_xrgb(255,255,255));
 	m_dbg_dynamic_plot	->SetMinMax(Parabola(m_min_rpm),m_max_power,1000);
 	m_dbg_dynamic_plot	->AppendSubGraph(CStatGraph::stCurve);
 	torq_pow_max_ratio  =Parabola(m_torque_rpm)/m_torque_rpm	/m_max_power;
@@ -80,12 +80,12 @@ void CCar::DbgCreatePlots()
 	m_dbg_dynamic_plot	->AppendSubGraph(CStatGraph::stCurve);
 	rpm_pow_max_ratio   =m_max_rpm								/m_max_power;
 	//--------------------------------------
-	m_dbg_dynamic_plot	->AddMarker(CStatGraph::stHor, 0, D3DCOLOR_XRGB(255, 0, 0));
+	m_dbg_dynamic_plot	->AddMarker(CStatGraph::stHor, 0, color_xrgb(255, 0, 0));
 	xr_vector<Fvector>::iterator i=m_gear_ratious.begin()+1,e=m_gear_ratious.end();
 	for(;i<e;i++)
 	{
-	m_dbg_dynamic_plot	->AddMarker(CStatGraph::stHor, (*i)[1]/rpm_pow_max_ratio,D3DCOLOR_XRGB(127, 0, 0));
-	m_dbg_dynamic_plot	->AddMarker(CStatGraph::stHor, (*i)[2]/rpm_pow_max_ratio,D3DCOLOR_XRGB(0, 0, 127));
+	m_dbg_dynamic_plot	->AddMarker(CStatGraph::stHor, (*i)[1]/rpm_pow_max_ratio,color_xrgb(127, 0, 0));
+	m_dbg_dynamic_plot	->AddMarker(CStatGraph::stHor, (*i)[2]/rpm_pow_max_ratio,color_xrgb(0, 0, 127));
 	}
 //////////////////////////////
 	e_state_drive=state;
@@ -116,7 +116,7 @@ void CCar::DbgUbdateCl()
 			UI().Font().pFontStat->SetColor		(color_rgba(0xff,0xff,0xff,0xff))												;
 			UI().Font().pFontStat->OutSet			(120,530)																		;
 			UI().Font().pFontStat->OutNext		(s)																				;
-			UI().Font().pFontStat->SetColor		(D3DCOLOR_XRGB(255,!b_transmission_switching*255,!b_transmission_switching*255));
+			UI().Font().pFontStat->SetColor		(color_xrgb(255,!b_transmission_switching*255,!b_transmission_switching*255));
 			UI().Font().pFontStat->OutNext		("Transmission num:      [%d]",m_current_transmission_num)						;
 			UI().Font().pFontStat->SetColor		(color_rgba(0xff,0xff,0xff,0xff))												;	
 			UI().Font().pFontStat->OutNext		("gear ratio:			  [%3.2f]",m_current_gear_ratio)						;
@@ -127,31 +127,31 @@ void CCar::DbgUbdateCl()
 			UI().Font().pFontStat->OutNext		("fuel:      [%3.2f]",m_fuel)													;
 			if(b_clutch)
 			{
-				UI().Font().pFontStat->SetColor		(D3DCOLOR_XRGB(0,255,0))														;
+				UI().Font().pFontStat->SetColor		(color_xrgb(0,255,0))														;
 				UI().Font().pFontStat->OutNext		("CLUTCH")																		;
 				UI().Font().pFontStat->SetColor		(color_rgba(0xff,0xff,0xff,0xff))												;
 			}
 			if(b_engine_on)
 			{
-				UI().Font().pFontStat->SetColor		(D3DCOLOR_XRGB(0,255,0))														;
+				UI().Font().pFontStat->SetColor		(color_xrgb(0,255,0))														;
 				UI().Font().pFontStat->OutNext		("ENGINE ON")																		;
 				UI().Font().pFontStat->SetColor		(color_rgba(0xff,0xff,0xff,0xff))												;
 			}
 			if(b_stalling)
 			{
-				UI().Font().pFontStat->SetColor		(D3DCOLOR_XRGB(255,0,0))														;
+				UI().Font().pFontStat->SetColor		(color_xrgb(255,0,0))														;
 				UI().Font().pFontStat->OutNext		("STALLING")																		;
 				UI().Font().pFontStat->SetColor		(color_rgba(0xff,0xff,0xff,0xff))												;
 			}
 			if(b_starting)
 			{
-				UI().Font().pFontStat->SetColor		(D3DCOLOR_XRGB(255,0,0))														;
+				UI().Font().pFontStat->SetColor		(color_xrgb(255,0,0))														;
 				UI().Font().pFontStat->OutNext		("STARTER")																		;
 				UI().Font().pFontStat->SetColor		(color_rgba(0xff,0xff,0xff,0xff))												;
 			}
 			if(b_breaks)
 			{
-				UI().Font().pFontStat->SetColor		(D3DCOLOR_XRGB(255,0,0))														;
+				UI().Font().pFontStat->SetColor		(color_xrgb(255,0,0))														;
 				UI().Font().pFontStat->OutNext		("BREAKS")																		;
 				UI().Font().pFontStat->SetColor		(color_rgba(0xff,0xff,0xff,0xff))												;
 			}
@@ -162,9 +162,9 @@ void CCar::DbgUbdateCl()
 		if(ph_dbg_draw_mask.test(phDbgDrawCarPlots)&&b_plots)
 		{
 			float cur_torque=EngineCurTorque();
-			m_dbg_dynamic_plot->AppendItem(m_current_engine_power,D3DCOLOR_XRGB(0,0,255));
-			m_dbg_dynamic_plot->AppendItem(cur_torque/torq_pow_max_ratio,D3DCOLOR_XRGB(0,255,0),1);
-			m_dbg_dynamic_plot->AppendItem(m_current_rpm/rpm_pow_max_ratio,D3DCOLOR_XRGB(255,0,0),2);
+			m_dbg_dynamic_plot->AppendItem(m_current_engine_power,color_xrgb(0,0,255));
+			m_dbg_dynamic_plot->AppendItem(cur_torque/torq_pow_max_ratio,color_xrgb(0,255,0),1);
+			m_dbg_dynamic_plot->AppendItem(m_current_rpm/rpm_pow_max_ratio,color_xrgb(255,0,0),2);
 
 			m_dbg_dynamic_plot->UpdateMarkerPos(0,m_current_rpm/rpm_pow_max_ratio);
 

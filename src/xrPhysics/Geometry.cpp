@@ -753,7 +753,7 @@ void	CODEGeom::	dbg_draw			( float scale, u32 color, Flags32 flags )const
 	Fmatrix m;
 	get_xform( m );
 	debug_output().DBG_DrawMatrix( m, 0.02f );
-	debug_output().DBG_DrawPoint( m.c, 0.001f, D3DCOLOR_XRGB(0, 255, 255 ) );
+	debug_output().DBG_DrawPoint( m.c, 0.001f, color_xrgb(0, 255, 255 ) );
 }
 
 

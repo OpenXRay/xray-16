@@ -194,13 +194,13 @@ void attachable_hud_item::debug_draw_firedeps()
 		setup_firedeps		(fd);
 		
 		if(hud_adj_mode==5||bForce)
-			render.draw_aabb(fd.vLastFP,0.005f,0.005f,0.005f,D3DCOLOR_XRGB(255,0,0));
+			render.draw_aabb(fd.vLastFP,0.005f,0.005f,0.005f,color_xrgb(255,0,0));
 
 		if(hud_adj_mode==6)
-			render.draw_aabb(fd.vLastFP2,0.005f,0.005f,0.005f,D3DCOLOR_XRGB(0,0,255));
+			render.draw_aabb(fd.vLastFP2,0.005f,0.005f,0.005f,color_xrgb(0,0,255));
 
 		if(hud_adj_mode==7)
-			render.draw_aabb(fd.vLastSP,0.005f,0.005f,0.005f,D3DCOLOR_XRGB(0,255,0));
+			render.draw_aabb(fd.vLastSP,0.005f,0.005f,0.005f,color_xrgb(0,255,0));
 	}
 #endif // DEBUG
 }

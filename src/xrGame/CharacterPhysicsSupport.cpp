@@ -590,7 +590,7 @@ void dbg_draw_geoms(xr_vector<CODEGeom*>& m_weapon_geoms)
 	{
 		CODEGeom *g  =(*ii);
 
-		g->dbg_draw( 0.01f, D3DCOLOR_XRGB( 0, 255, 100 ), Flags32() );
+		g->dbg_draw( 0.01f, color_xrgb( 0, 255, 100 ), Flags32() );
 	}
 }
 #endif
@@ -888,13 +888,13 @@ void		CCharacterPhysicsSupport::on_child_shell_activate	( CPhysicsShellHolder* o
 	VERIFY(obj->PPhysicsShell());
 #if	0
 //	DBG_OpenCashedDraw();
-	//m_pPhysicsShell->dbg_draw_geometry( 0.2f, D3DCOLOR_XRGB( 255, 100, 0 ) );
-	m_pPhysicsShell->dbg_draw_velocity( 0.01f, D3DCOLOR_XRGB( 100, 255, 0 ) );
-	m_pPhysicsShell->dbg_draw_force( 0.1f, D3DCOLOR_XRGB( 100, 0, 255 ) );
+	//m_pPhysicsShell->dbg_draw_geometry( 0.2f, color_xrgb( 255, 100, 0 ) );
+	m_pPhysicsShell->dbg_draw_velocity( 0.01f, color_xrgb( 100, 255, 0 ) );
+	m_pPhysicsShell->dbg_draw_force( 0.1f, color_xrgb( 100, 0, 255 ) );
 	DBG_ClosedCashedDraw( 50000 );
 #endif
 	//DBG_OpenCashedDraw();
-	//obj->PPhysicsShell()->dbg_draw_geometry( 0.2f, D3DCOLOR_XRGB( 255, 100, 0 ) );
+	//obj->PPhysicsShell()->dbg_draw_geometry( 0.2f, color_xrgb( 255, 100, 0 ) );
 	
 	RemoveActiveWeaponCollision	();
 
@@ -931,7 +931,7 @@ void	CCharacterPhysicsSupport::	RemoveActiveWeaponCollision		()
 	{
 		CODEGeom *g  =(*ii);
 
-		//g->dbg_draw( 0.01f, D3DCOLOR_XRGB( 0, 0, 255 ), Flags32() );
+		//g->dbg_draw( 0.01f, color_xrgb( 0, 0, 255 ), Flags32() );
 
 		m_weapon_attach_bone->remove_geom( g );
 		g->destroy();
@@ -939,7 +939,7 @@ void	CCharacterPhysicsSupport::	RemoveActiveWeaponCollision		()
 	}
 
 
-	//m_active_item_obj->PPhysicsShell()->dbg_draw_geometry( 0.2f, D3DCOLOR_XRGB( 255, 0, 100 ) );
+	//m_active_item_obj->PPhysicsShell()->dbg_draw_geometry( 0.2f, color_xrgb( 255, 0, 100 ) );
 	
 	Fvector a_vel, l_vel;
 	const Fvector& mc = root->mass_Center();
@@ -1045,11 +1045,11 @@ void	CCharacterPhysicsSupport::	AddActiveWeaponCollision		()
 	for( ;ii!=ee; ++ii )
 	{
 		CODEGeom *g  =(*ii);
-		//g->dbg_draw( 0.01f, D3DCOLOR_XRGB( 255, 0, 0 ), Flags32() );
+		//g->dbg_draw( 0.01f, color_xrgb( 255, 0, 0 ), Flags32() );
 		weapon_element->remove_geom( g );
 		g->set_bone_id( weapon_attach_bone->m_SelfID );
 		weapon_attach_bone->add_geom( g );
-		//g->dbg_draw( 0.01f, D3DCOLOR_XRGB( 0, 255, 0 ), Flags32() );
+		//g->dbg_draw( 0.01f, color_xrgb( 0, 255, 0 ), Flags32() );
 	}
 	m_weapon_attach_bone = weapon_attach_bone;
 	m_active_item_obj	= &(active_weapon_item->object());
@@ -1057,7 +1057,7 @@ void	CCharacterPhysicsSupport::	AddActiveWeaponCollision		()
 
 	destroy_physics_shell( weapon_shell );
 
-	//m_pPhysicsShell->dbg_draw_geometry( 1, D3DCOLOR_XRGB( 0, 0, 255 ) );
+	//m_pPhysicsShell->dbg_draw_geometry( 1, color_xrgb( 0, 0, 255 ) );
 	//DBG_ClosedCashedDraw( 50000 );
 }
 
@@ -1182,7 +1182,7 @@ void	CCharacterPhysicsSupport::	EndActivateFreeShell			( CObject* who, const Fve
 if( dbg_draw_ragdoll_spawn )
 {
 	DBG_OpenCashedDraw();
-	m_pPhysicsShell->dbg_draw_geometry( 0.2f, D3DCOLOR_XRGB( 255, 100, 0 ) );
+	m_pPhysicsShell->dbg_draw_geometry( 0.2f, color_xrgb( 255, 100, 0 ) );
 	DBG_ClosedCashedDraw( 50000 );
 }
 #endif
@@ -1194,7 +1194,7 @@ if( dbg_draw_ragdoll_spawn )
 if( dbg_draw_ragdoll_spawn )
 {
 	DBG_OpenCashedDraw();
-	m_pPhysicsShell->dbg_draw_geometry( 0.2f, D3DCOLOR_XRGB( 255, 0, 100 ) );
+	m_pPhysicsShell->dbg_draw_geometry( 0.2f, color_xrgb( 255, 0, 100 ) );
 	DBG_ClosedCashedDraw( 50000 );
 }
 #endif
@@ -1205,7 +1205,7 @@ if( dbg_draw_ragdoll_spawn )
 if( dbg_draw_ragdoll_spawn )
 {
 	DBG_OpenCashedDraw();
-	m_pPhysicsShell->dbg_draw_geometry( 0.2f, D3DCOLOR_XRGB( 100, 255, 100 ) );
+	m_pPhysicsShell->dbg_draw_geometry( 0.2f, color_xrgb( 100, 255, 100 ) );
 	DBG_ClosedCashedDraw( 50000 );
 }
 #endif
@@ -1374,17 +1374,17 @@ void	CCharacterPhysicsSupport::FlyTo(const	Fvector &disp)
 			m_pPhysicsShell->set_LinearVel(vel);
 #if	0
 	DBG_OpenCashedDraw();
-	//m_pPhysicsShell->dbg_draw_geometry( 0.2f, D3DCOLOR_XRGB( 255, 100, 0 ) );
-	m_pPhysicsShell->dbg_draw_velocity( 0.01f, D3DCOLOR_XRGB( 0, 255, 0 ) );
-	m_pPhysicsShell->dbg_draw_force( 0.1f, D3DCOLOR_XRGB( 0, 0, 255 ) );
+	//m_pPhysicsShell->dbg_draw_geometry( 0.2f, color_xrgb( 255, 100, 0 ) );
+	m_pPhysicsShell->dbg_draw_velocity( 0.01f, color_xrgb( 0, 255, 0 ) );
+	m_pPhysicsShell->dbg_draw_force( 0.1f, color_xrgb( 0, 0, 255 ) );
 //	DBG_ClosedCashedDraw( 50000 );
 #endif
 			physics_world()->Step();
 #if	0
 //	DBG_OpenCashedDraw();
-	//m_pPhysicsShell->dbg_draw_geometry( 0.2f, D3DCOLOR_XRGB( 255, 100, 0 ) );
-	m_pPhysicsShell->dbg_draw_velocity( 0.01f, D3DCOLOR_XRGB( 100, 255, 0 ) );
-	m_pPhysicsShell->dbg_draw_force( 0.1f, D3DCOLOR_XRGB( 100, 0, 255 ) );
+	//m_pPhysicsShell->dbg_draw_geometry( 0.2f, color_xrgb( 255, 100, 0 ) );
+	m_pPhysicsShell->dbg_draw_velocity( 0.01f, color_xrgb( 100, 255, 0 ) );
+	m_pPhysicsShell->dbg_draw_force( 0.1f, color_xrgb( 100, 0, 255 ) );
 	DBG_ClosedCashedDraw( 50000 );
 #endif
 		}

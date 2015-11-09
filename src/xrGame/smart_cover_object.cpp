@@ -103,7 +103,7 @@ void object::OnRender		()
     GlobalEnv.DRender->OnFrameEnd				();
 	Fvector							l_half; l_half.set(.5f, .5f, .5f);
 	Fmatrix							l_ball, l_box;
-	u32								Color = D3DCOLOR_XRGB(0,255,0);
+	u32								Color = color_xrgb(0,255,0);
 
 	typedef xr_vector<CCF_Shape::shape_def>	Shapes;
 	Shapes							&l_shapes = ((CCF_Shape*)CFORM())->Shapes();

@@ -100,12 +100,12 @@ void CWeaponRG6::FireStart ()
 				Fvector res[2];
 /*#ifdef		DEBUG
 				DBG_OpenCashedDraw();
-				DBG_DrawLine(p1,Fvector().add(p1,d),D3DCOLOR_XRGB(255,0,0));
+				DBG_DrawLine(p1,Fvector().add(p1,d),color_xrgb(255,0,0));
 #endif*/
 				u8 canfire0 = TransferenceAndThrowVelToThrowDir(Transference, CRocketLauncher::m_fLaunchSpeed, EffectiveGravity(), res);
 /*#ifdef DEBUG
-				if(canfire0>0)DBG_DrawLine(p1,Fvector().add(p1,res[0]),D3DCOLOR_XRGB(0,255,0));
-				if(canfire0>1)DBG_DrawLine(p1,Fvector().add(p1,res[1]),D3DCOLOR_XRGB(0,0,255));
+				if(canfire0>0)DBG_DrawLine(p1,Fvector().add(p1,res[0]),color_xrgb(0,255,0));
+				if(canfire0>1)DBG_DrawLine(p1,Fvector().add(p1,res[1]),color_xrgb(0,0,255));
 				DBG_ClosedCashedDraw(30000);
 #endif*/
 				if (canfire0 != 0)

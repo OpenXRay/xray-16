@@ -191,8 +191,8 @@ void	CPHDisablingTranslational::UpdateL1()
 	const	dReal	*position			=	dBodyGetPosition(body)									;
 	const	dReal	*velocity			=	dBodyGetLinearVel(body)									;
 #if	0
-	DBG_DrawLine( cast_fv( position ), Fvector().add(cast_fv( position ),m_mean_velocity.sum), D3DCOLOR_XRGB( 255, 0, 0 )   );
-	DBG_DrawLine( cast_fv( position ), Fvector().add(cast_fv( position ),m_mean_acceleration.sum), D3DCOLOR_XRGB( 0, 0, 255 )  );
+	DBG_DrawLine( cast_fv( position ), Fvector().add(cast_fv( position ),m_mean_velocity.sum), color_xrgb( 255, 0, 0 )   );
+	DBG_DrawLine( cast_fv( position ), Fvector().add(cast_fv( position ),m_mean_acceleration.sum), color_xrgb( 0, 0, 255 )  );
 #endif
 	CPHDisablingBase::UpdateValues(* (Fvector*) position,* (Fvector*) velocity);
 	//float			velocity_param		=	m_mean_velocity		.Update(* (Fvector*) position)		;

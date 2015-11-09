@@ -59,7 +59,7 @@ bool activating_character_delay::do_position_correct()
 		Fmatrix m = obj->XFORM();
 		m.c = sv_pos;
 		DBG_DrawMatrix( m, 0.5f );
-		DBG_DrawLine( obj->Position(), m.c, D3DCOLOR_XRGB( 255, 255, 255 ) );
+		DBG_DrawLine( obj->Position(), m.c, color_xrgb( 255, 255, 255 ) );
 		DBG_ClosedCashedDraw(50000);
 	}
 #endif

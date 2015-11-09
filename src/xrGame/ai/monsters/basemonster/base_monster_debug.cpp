@@ -47,8 +47,8 @@ CBaseMonster::SDebugInfo CBaseMonster::show_debug_info()
 
 	string256	text;
 
-	u32			color			= D3DCOLOR_XRGB(0,255,0);
-	u32			delimiter_color	= D3DCOLOR_XRGB(0,0,255);
+	u32			color			= color_xrgb(0,255,0);
+	u32			delimiter_color	= color_xrgb(0,0,255);
 
 	DBG().text(this).clear	 ();
 	DBG().text(this).add_item("---------------------------------------", x, y+=delta_y, delimiter_color);
@@ -287,11 +287,11 @@ void CBaseMonster::debug_fsm()
 	DBG().object_info(this,this).remove_item (u32(1));
 	DBG().object_info(this,this).remove_item (u32(2));
 
-	DBG().object_info(this,this).add_item	 (*cName(), D3DCOLOR_XRGB(255,0,0), 0);
-	DBG().object_info(this,this).add_item	 (st, D3DCOLOR_XRGB(255,0,0), 1);
+	DBG().object_info(this,this).add_item	 (*cName(), color_xrgb(255,0,0), 0);
+	DBG().object_info(this,this).add_item	 (st, color_xrgb(255,0,0), 1);
 	
 	xr_sprintf(st, "Team[%u]Squad[%u]Group[%u]", g_Team(), g_Squad(), g_Group());
-	DBG().object_info(this,this).add_item	 (st, D3DCOLOR_XRGB(255,0,0), 2);
+	DBG().object_info(this,this).add_item	 (st, color_xrgb(255,0,0), 2);
 
 	CEntityAlive *entity = smart_cast<CEntityAlive *>(Level().CurrentEntity());
 	if (entity && entity->character_physics_support()->movement()) {

@@ -147,7 +147,7 @@ bool check_actor_visibility (const Fvector trace_from,
 	Fvector trace_dir;
 	trace_dir.sub(trace_to, trace_from);
 
-	//DBG().level_info(this).add_item	(trace_from,trace_to,D3DCOLOR_XRGB(0,150,150));
+	//DBG().level_info(this).add_item	(trace_from,trace_to,color_xrgb(0,150,150));
 
 
 	collide::rq_result l_rq;

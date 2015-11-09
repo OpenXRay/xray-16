@@ -34,10 +34,10 @@ void dxObjectSpaceRender::dbgRender()
 		Fobb&		obb		= q_debug.boxes[i];
 		Fmatrix		X,S,R;
 		obb.xform_get(X);
-		RCache.dbg_DrawOBB(X,obb.m_halfsize,D3DCOLOR_XRGB(255,0,0));
+		RCache.dbg_DrawOBB(X,obb.m_halfsize,color_xrgb(255,0,0));
 		S.scale		(obb.m_halfsize);
 		R.mul		(X,S);
-		RCache.dbg_DrawEllipse(R,D3DCOLOR_XRGB(0,0,255));
+		RCache.dbg_DrawEllipse(R,color_xrgb(0,0,255));
 	}
 	q_debug.boxes.clear();
 

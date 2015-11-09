@@ -210,7 +210,7 @@ static void dbg_draw_state_end( CPhysicsShell *shell )
 	{
 		DBG_OpenCashedDraw();
 		shell->dbg_draw_velocity( dbg_imotion_draw_velocity_scale, D3DCOLOR_ARGB( 100 ,255, 0, 0 ) );
-		//shell->dbg_draw_force( 0.01, D3DCOLOR_XRGB( 0, 0, 255 ) );
+		//shell->dbg_draw_force( 0.01, color_xrgb( 0, 0, 255 ) );
 		DBG_ClosedCashedDraw( 50000 );
 	}
 	if(dbg_imotion_collide_debug)
@@ -387,7 +387,7 @@ void collide_anim_dbg_draw( CPhysicsShell	*shell, float dt )
 	{
 		shell->AnimToVelocityState( dt, default_l_limit * 10, default_w_limit * 10 );
 		DBG_OpenCashedDraw();
-		shell->dbg_draw_velocity( dbg_imotion_draw_velocity_scale, D3DCOLOR_XRGB( 0, 255, 0 ) );
+		shell->dbg_draw_velocity( dbg_imotion_draw_velocity_scale, color_xrgb( 0, 255, 0 ) );
 		DBG_ClosedCashedDraw( 50000 );
 	}
 	if( dbg_imotion_draw_skeleton )

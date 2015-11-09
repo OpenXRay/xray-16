@@ -472,7 +472,7 @@ void	CActor::Hit(SHit* pHDS)
 	if(ph_dbg_draw_mask.test(phDbgCharacterControl)) {
 		DBG_OpenCashedDraw();
 		Fvector to;to.add(Position(),Fvector().mul(HDS.dir,HDS.phys_impulse()));
-		DBG_DrawLine(Position(),to,D3DCOLOR_XRGB(124,124,0));
+		DBG_DrawLine(Position(),to,color_xrgb(124,124,0));
 		DBG_ClosedCashedDraw(500);
 	}
 #endif // DEBUG

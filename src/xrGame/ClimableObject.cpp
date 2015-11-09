@@ -349,22 +349,22 @@ void CClimableObject ::OnRender()
 
 	Fmatrix form;m_box.xform_get(form);
 	//form.mulA(XFORM());
-	Level().debug_renderer().draw_obb(XFORM(),m_box.m_halfsize,D3DCOLOR_XRGB(0,0,255));
+	Level().debug_renderer().draw_obb(XFORM(),m_box.m_halfsize,color_xrgb(0,0,255));
 	Fvector p1,p2,d;
 	d.set(m_axis);
 	p1.add(XFORM().c,d);
 	p2.sub(XFORM().c,d);
-	Level().debug_renderer().draw_line(Fidentity,p1,p2,D3DCOLOR_XRGB(255,0,0));
+	Level().debug_renderer().draw_line(Fidentity,p1,p2,color_xrgb(255,0,0));
 
 	d.set(m_side);
 	p1.add(XFORM().c,d);
 	p2.sub(XFORM().c,d);
-	Level().debug_renderer().draw_line(Fidentity,p1,p2,D3DCOLOR_XRGB(255,0,0));
+	Level().debug_renderer().draw_line(Fidentity,p1,p2,color_xrgb(255,0,0));
 
 	d.set(m_norm);
 	d.mul(10.f);
 	p1.add(XFORM().c,d);
 	p2.set(XFORM().c);
-	Level().debug_renderer().draw_line(Fidentity,p1,p2,D3DCOLOR_XRGB(0,255,0));
+	Level().debug_renderer().draw_line(Fidentity,p1,p2,color_xrgb(0,255,0));
 }
 #endif

@@ -96,7 +96,7 @@ void CPHObject::Collide()
 				if(debug_output().ph_dbg_draw_mask().test(phDbgDrawRayMotions))
 				{
 					debug_output().DBG_OpenCashedDraw();
-					debug_output().DBG_DrawLine(*from,Fvector().add(*from,Fvector().mul(dir,magnitude)),D3DCOLOR_XRGB(0,255,0));
+					debug_output().DBG_DrawLine(*from,Fvector().add(*from,Fvector().mul(dir,magnitude)),color_xrgb(0,255,0));
 					debug_output().DBG_ClosedCashedDraw(30000);
 				}
 

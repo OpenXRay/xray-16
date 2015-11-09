@@ -111,7 +111,7 @@ void CCoverEvaluator::initialize(const Fvector &start_position)
 void CCoverEvaluator::evaluate_cover(const CCoverPoint *cover_point, float weight)
 {
 #ifdef DEBUG
-	//DBG().level_info(this).add_item(cover_point->position(), D3DCOLOR_XRGB(0,255,0));
+	//DBG().level_info(this).add_item(cover_point->position(), color_xrgb(0,255,0));
 #endif
 	CMonsterSquad *squad = monster_squad().get_squad(m_object);
 	if (squad->is_locked_cover(cover_point->level_vertex_id())) return;

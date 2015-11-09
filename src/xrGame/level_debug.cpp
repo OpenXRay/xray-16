@@ -63,7 +63,7 @@ void   CLevelDebug::draw_debug_text ()
 		{
 			debug::draw_text_tree	(*actor_view, 2, x_start, y_start, 
 									 m_texttree_offs, column_size, 80, 
-									 D3DCOLOR_XRGB(0,255,0), D3DCOLOR_XRGB(255,255,0));
+									 color_xrgb(0,255,0), color_xrgb(255,255,0));
 		}
 		return;
 	}
@@ -72,21 +72,21 @@ void   CLevelDebug::draw_debug_text ()
 	{
 		debug::draw_text_tree(*m_p_texttree->find_node("General"), 2, x_start, y_start, 
 								 m_texttree_offs, column_size, 80, 
-								 D3DCOLOR_XRGB(0,255,0), D3DCOLOR_XRGB(255,255,0));
+								 color_xrgb(0,255,0), color_xrgb(255,255,0));
 	}
 
 	if ( m_p_texttree->find_node("Brain") )
 	{
 		debug::draw_text_tree(*m_p_texttree->find_node("Brain"), 2, x_start*2+column_size, y_start, 
 								 m_texttree_offs, column_size, 80, 
-								 D3DCOLOR_XRGB(0,255,0), D3DCOLOR_XRGB(255,255,0));
+								 color_xrgb(0,255,0), color_xrgb(255,255,0));
 	}
 
 	if ( m_p_texttree->find_node("Controllers") )
 	{
 		debug::draw_text_tree(*m_p_texttree->find_node("Controllers"), 2, x_start*3+column_size*2, y_start, 
 								 m_texttree_offs, column_size, 80, 
-								 D3DCOLOR_XRGB(0,255,0), D3DCOLOR_XRGB(255,255,0));
+								 color_xrgb(0,255,0), color_xrgb(255,255,0));
 	}
 }
 

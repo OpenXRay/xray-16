@@ -879,12 +879,12 @@ void CInventoryItem::PH_A_CrPr		()
 		Fvector c,r,p;
 		bb.get_CD(c,r );
 		XFORM().transform_tiny(p,c);
-		DBG_DrawAABB( p, r,D3DCOLOR_XRGB(255, 0, 0));
+		DBG_DrawAABB( p, r,color_xrgb(255, 0, 0));
 		//PPhysicsShell()->XFORM().transform_tiny(c);
 		Fmatrix mm;
 		PPhysicsShell()->GetGlobalTransformDynamic(&mm);
 		mm.transform_tiny(p,c);
-		DBG_DrawAABB( p, r,D3DCOLOR_XRGB(0, 255, 0));
+		DBG_DrawAABB( p, r,color_xrgb(0, 255, 0));
 		DBG_ClosedCashedDraw	(50000);
 #endif
 		object().spatial_move();

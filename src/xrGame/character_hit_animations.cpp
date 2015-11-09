@@ -114,7 +114,7 @@ void character_hit_animation_controller::PlayHitMotion( const Fvector &dir, cons
 	if( ph_dbg_draw_mask1.test( phDbgHitAnims ) )
 	{
 		DBG_OpenCashedDraw();
-		DBG_DrawLine( m.c, Fvector( ).sub( m.c, Fvector( ).mul( dir, 1.5 ) ), D3DCOLOR_XRGB( 255, 0, 255 ) );
+		DBG_DrawLine( m.c, Fvector( ).sub( m.c, Fvector( ).mul( dir, 1.5 ) ), color_xrgb( 255, 0, 255 ) );
 		DBG_ClosedCashedDraw( 1000 );
 	}
 #endif

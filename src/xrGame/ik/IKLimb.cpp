@@ -275,7 +275,7 @@ void	CIKLimb::Solve( SCalculateData& cd )
 	{
 		Fvector dbg_pos;
 		cd.m_obj->transform_tiny(dbg_pos, pos);
-		DBG_DrawPoint( dbg_pos, 0.02f, D3DCOLOR_XRGB( 255, 255 , 255 ) );
+		DBG_DrawPoint( dbg_pos, 0.02f, color_xrgb( 255, 255 , 255 ) );
 	}
 #endif
 	Fmatrix ihip;
@@ -294,7 +294,7 @@ if( ph_dbg_draw_mask.test( phDbgDrawIKGoal ) )
 		Fvector dbg_pos; m_foot.ToePosition( dbg_pos );
 		Kinematics()->LL_GetBoneInstance(m_bones[m_foot.ref_bone()]).mTransform.transform_tiny( dbg_pos );
 		cd.m_obj->transform_tiny( dbg_pos );
-		DBG_DrawPoint( dbg_pos, 0.02f, D3DCOLOR_XRGB( 255, 255 , 0 ) );
+		DBG_DrawPoint( dbg_pos, 0.02f, color_xrgb( 255, 255 , 0 ) );
 	}
 #endif
 }
@@ -586,7 +586,7 @@ bool	CIKLimb::blend_collide( ik_goal_matrix &m, const SCalculateData& cd,  const
 		{
 			Fvector l_toe; m_foot.ToePosition( l_toe );
 			Fvector	v; fm.transform_tiny( v, l_toe );
-			DBG_DrawPoint( v, 0.1, D3DCOLOR_XRGB( 0, (ik_goal_matrix::cl_free == m0.collide_state()) * 255 ,(ik_goal_matrix::cl_aligned == m0.collide_state()) * 255 ) );
+			DBG_DrawPoint( v, 0.1, color_xrgb( 0, (ik_goal_matrix::cl_free == m0.collide_state()) * 255 ,(ik_goal_matrix::cl_aligned == m0.collide_state()) * 255 ) );
 		}
 #endif
 		return ret;
@@ -614,7 +614,7 @@ bool	CIKLimb::blend_collide( ik_goal_matrix &m, const SCalculateData& cd,  const
 		m_foot.GetFootStepMatrix( m, fm, collide_data, true, true );
 #ifdef IK_DBG_DRAW_BLEND_COLLIDE
 		Fvector	v; fm.transform_tiny( v, l_toe );
-		DBG_DrawPoint( v, 0.1, D3DCOLOR_XRGB( 0, (ik_goal_matrix::cl_free == m0.collide_state()) * 255 ,(ik_goal_matrix::cl_aligned == m0.collide_state()) * 255 ) );
+		DBG_DrawPoint( v, 0.1, color_xrgb( 0, (ik_goal_matrix::cl_free == m0.collide_state()) * 255 ,(ik_goal_matrix::cl_aligned == m0.collide_state()) * 255 ) );
 #endif
 		return ret;
 	}
@@ -631,7 +631,7 @@ bool	CIKLimb::blend_collide( ik_goal_matrix &m, const SCalculateData& cd,  const
 			m = r;
 #ifdef IK_DBG_DRAW_BLEND_COLLIDE
 			Fvector	v; r.get().transform_tiny( v, l_toe );
-			DBG_DrawPoint( v, 0.1, D3DCOLOR_XRGB( (!collided) * 255, 255 , 255 ) );
+			DBG_DrawPoint( v, 0.1, color_xrgb( (!collided) * 255, 255 , 255 ) );
 #endif
 			return ret;
 		} 
@@ -640,7 +640,7 @@ bool	CIKLimb::blend_collide( ik_goal_matrix &m, const SCalculateData& cd,  const
 			//NR
 #ifdef IK_DBG_DRAW_BLEND_COLLIDE
 		Fvector	v; r.get().transform_tiny( v, l_toe );
-		DBG_DrawPoint( v, 0.1, D3DCOLOR_XRGB( 255, 0 , 0 ) );
+		DBG_DrawPoint( v, 0.1, color_xrgb( 255, 0 , 0 ) );
 #endif
 			m = r;
 			return false;
@@ -659,7 +659,7 @@ bool	CIKLimb::blend_collide( ik_goal_matrix &m, const SCalculateData& cd,  const
 		{
 #ifdef DEBUG
 		Fvector	v; r.get().transform_tiny( v, l_toe );
-		DBG_DrawPoint( v, 0.1, D3DCOLOR_XRGB( 255, 255 , 0 ) );
+		DBG_DrawPoint( v, 0.1, color_xrgb( 255, 255 , 0 ) );
 #endif
 			m = r;
 			return ret;
@@ -668,7 +668,7 @@ bool	CIKLimb::blend_collide( ik_goal_matrix &m, const SCalculateData& cd,  const
 		{
 #ifdef DEBUG
 		Fvector	v; r.get().transform_tiny( v, l_toe );
-		DBG_DrawPoint( v, 0.1, D3DCOLOR_XRGB( 255, 0 , 0 ) );
+		DBG_DrawPoint( v, 0.1, color_xrgb( 255, 0 , 0 ) );
 #endif
 			//NR
 			m = r;
@@ -686,7 +686,7 @@ bool	CIKLimb::blend_collide( ik_goal_matrix &m, const SCalculateData& cd,  const
 
 #ifdef IK_DBG_DRAW_BLEND_COLLIDE
 		Fvector	v; r.get().transform_tiny( v, l_toe );
-		DBG_DrawPoint( v, 0.1, D3DCOLOR_XRGB( 255, 0 , 255 ) );
+		DBG_DrawPoint( v, 0.1, color_xrgb( 255, 0 , 255 ) );
 #endif
 
 		m = r;
@@ -822,7 +822,7 @@ void CIKLimb::DBGDrawSetNewGoal	( SCalculateData& cd, const SIKCollideData &cld 
 		if( cd.state.foot_step && state_valide( sv_state ) )
 		{
 			DBG_DrawMatrix( cd.state.collide_pos.get(), 1.0f, 100 );
-			DBG_DrawPoint ( cd.state.collide_pos.get().c, 0.1, D3DCOLOR_XRGB( 0, 255 , 255 ) );
+			DBG_DrawPoint ( cd.state.collide_pos.get().c, 0.1, color_xrgb( 0, 255 , 255 ) );
 		}
 
 		if( ph_dbg_draw_mask1.test(phDbgDrawIKBlending) && cd.state.blending )
@@ -838,15 +838,15 @@ void CIKLimb::DBGDrawSetNewGoal	( SCalculateData& cd, const SIKCollideData &cld 
 			sv_state.goal( m ).get().transform_tiny( a0, l_toe );
 			Fvector a1;
 			sv_state.goal( m ).get().transform_tiny( a1, l_toe );
-			DBG_DrawLine( a0, a1, D3DCOLOR_XRGB( c, 0, c ) );
+			DBG_DrawLine( a0, a1, color_xrgb( c, 0, c ) );
 			Fvector a2;
 			cd.state.goal.get().transform_tiny( a2, l_toe );
-			DBG_DrawLine( a1, a2, D3DCOLOR_XRGB( 0, c , 0 ) );
+			DBG_DrawLine( a1, a2, color_xrgb( 0, c , 0 ) );
 /*
 			Fvector a3; sv_state_DBR.goal.transform_tiny( a3, l_toe );
-			DBG_DrawLine( a3, a0, D3DCOLOR_XRGB( c, c , 0 ) );
+			DBG_DrawLine( a3, a0, color_xrgb( c, c , 0 ) );
 			if( Fvector( ).sub( a3, a0 ).magnitude() > 0.1f )
-					DBG_DrawLine( a3, a0, D3DCOLOR_XRGB( c, 0 , 0 ) );
+					DBG_DrawLine( a3, a0, color_xrgb( c, 0 , 0 ) );
 */
 			if( cd.state.count > -1 )
 			{
@@ -937,7 +937,7 @@ IC void	CIKLimb::GetPickDir( Fvector &v, SCalculateData& cd ) const
 	{
 		Fvector p ; m_foot.ToePosition( p );
 		cd.state.anim_pos.transform_tiny( p );
-		DBG_DrawLine( p, Fvector().add( p, Fvector( ).mul( cd.state.pick, 1 ) ), D3DCOLOR_XRGB( 255, 0, 255 ) );
+		DBG_DrawLine( p, Fvector().add( p, Fvector( ).mul( cd.state.pick, 1 ) ), color_xrgb( 255, 0, 255 ) );
 	}
 #endif
 */
@@ -1106,9 +1106,9 @@ void	CIKLimb::step_predict( CGameObject *O, const CBlend *b, ik_limb_state_predi
 #ifdef DEBUG
 if( ph_dbg_draw_mask1.test( phDbgDrawIKPredict ) )
 {
-	DBG_DrawPoint( gl_cl_goal.get().c, 0.03f, D3DCOLOR_XRGB( 255, 0, 0 ) );
-	DBG_DrawPoint( gl_goal.c, 0.03f, D3DCOLOR_XRGB( 0, 0, 255 ) );
-	DBG_DrawLine( gl_cl_goal.get().c, gl_goal.c, D3DCOLOR_XRGB( 0, 255, 0 ) );
+	DBG_DrawPoint( gl_cl_goal.get().c, 0.03f, color_xrgb( 255, 0, 0 ) );
+	DBG_DrawPoint( gl_goal.c, 0.03f, color_xrgb( 0, 0, 255 ) );
+	DBG_DrawLine( gl_cl_goal.get().c, gl_goal.c, color_xrgb( 0, 255, 0 ) );
 	DBG_DrawMatrix( gl_cl_goal.get(), 0.3f );
 	DBG_DrawMatrix( gl_goal, 0.5f, 155 );
 
@@ -1144,10 +1144,10 @@ Matrix &CIKLimb::Goal			( Matrix &gl, const Fmatrix &xm, const SCalculateData& c
 		if( cd.do_collide )
 		{
 			ik_goal_matrix m;
-			DBG_DrawLine( sv_state.goal( m ).get().c, DBGG.c, D3DCOLOR_XRGB( 255, 0, 255 ) );
+			DBG_DrawLine( sv_state.goal( m ).get().c, DBGG.c, color_xrgb( 255, 0, 255 ) );
 
-			DBG_DrawPoint( sv_state.goal( m ).get().c, 0.05, D3DCOLOR_XRGB( 255, 255, 255 ) );
-			DBG_DrawPoint( DBGG.c, 0.04,D3DCOLOR_XRGB(0, 255 ,0 ) );
+			DBG_DrawPoint( sv_state.goal( m ).get().c, 0.05, color_xrgb( 255, 255, 255 ) );
+			DBG_DrawPoint( DBGG.c, 0.04,color_xrgb(0, 255 ,0 ) );
 			Fvector ch; ch.sub( DBGG.c, sv_state.goal( m ).get().c );
 			if( ch.magnitude( ) > 0.5f )
 			{
@@ -1197,7 +1197,7 @@ void CIKLimb::CalculateBones( SCalculateData &cd )
 void	DBG_DrawRotationLimitsY( const Fmatrix &start, float ang, float l, float h )
 {
 #ifdef DEBUG
-	DBG_DrawRotationY( start, ang - EPS, ang + EPS, 0.15f, D3DCOLOR_XRGB( 0, 255, 0 ), false, 1 );
+	DBG_DrawRotationY( start, ang - EPS, ang + EPS, 0.15f, color_xrgb( 0, 255, 0 ), false, 1 );
 	DBG_DrawRotationY( start, l, h, 0.15f, D3DCOLOR_ARGB( 50, 0, 250, 0 ), true );
 #endif // DEBUG
 }
@@ -1205,7 +1205,7 @@ void	DBG_DrawRotationLimitsY( const Fmatrix &start, float ang, float l, float h 
 void	DBG_DrawRotationLimitsZ( const Fmatrix &start, float ang, float l, float h )
 {
 #ifdef DEBUG
-	DBG_DrawRotationZ( start, ang - EPS, ang + EPS, 0.15f, D3DCOLOR_XRGB( 0, 0, 255 ), false, 1 );
+	DBG_DrawRotationZ( start, ang - EPS, ang + EPS, 0.15f, color_xrgb( 0, 0, 255 ), false, 1 );
 	DBG_DrawRotationZ( start, l, h, 0.15f, D3DCOLOR_ARGB( 50, 0, 0, 250 ), true );
 #endif // DEBUG
 }
@@ -1213,7 +1213,7 @@ void	DBG_DrawRotationLimitsZ( const Fmatrix &start, float ang, float l, float h 
 void	DBG_DrawRotationLimitsX( const Fmatrix &start, float ang, float l, float h )
 {
 #ifdef DEBUG
-	DBG_DrawRotationX( start, ang + EPS, ang - EPS, 0.15f, D3DCOLOR_XRGB( 255, 0, 0 ), false, 1 );
+	DBG_DrawRotationX( start, ang + EPS, ang - EPS, 0.15f, color_xrgb( 255, 0, 0 ), false, 1 );
 	DBG_DrawRotationX( start, l, h, 0.15f, D3DCOLOR_ARGB( 50, 255, 0, 0 ), true );
 #endif // DEBUG
 }

@@ -225,7 +225,7 @@ bool	CPHActivationShape::	Activate							(const Fvector need_size,u16 steps,floa
 		Fmatrix M;
 		PHDynamicData::DMXPStoFMX(dBodyGetRotation(m_body),dBodyGetPosition(m_body),M);
 		Fvector v;dGeomBoxGetLengths(m_geom,cast_fp(v));v.mul(0.5f);
-		debug_output().DBG_DrawOBB(M,v,D3DCOLOR_XRGB(0,255,0));
+		debug_output().DBG_DrawOBB(M,v,color_xrgb(0,255,0));
 	}
 #endif
 	VERIFY(m_geom&&m_body);
@@ -313,7 +313,7 @@ bool	CPHActivationShape::	Activate							(const Fvector need_size,u16 steps,floa
 		Fmatrix M;
 		PHDynamicData::DMXPStoFMX(dBodyGetRotation(m_body),dBodyGetPosition(m_body),M);
 		Fvector v;v.set(need_size);v.mul(0.5f);
-		debug_output().DBG_DrawOBB(M,v,D3DCOLOR_XRGB(0,255,255));
+		debug_output().DBG_DrawOBB(M,v,color_xrgb(0,255,255));
 		debug_output().DBG_ClosedCashedDraw(30000);
 	}
 #endif

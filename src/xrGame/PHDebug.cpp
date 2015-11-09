@@ -72,7 +72,7 @@ struct SPHObjDBGDraw:public SPHDBGDrawAbsract
 	}
 	void render		( )
 	{
-			Level().debug_renderer().draw_aabb(AABB_center,AABB.x,AABB.y,AABB.z,D3DCOLOR_XRGB(255,0,0));
+			Level().debug_renderer().draw_aabb(AABB_center,AABB.x,AABB.y,AABB.z,color_xrgb(255,0,0));
 	}
 	Fvector AABB;
 	Fvector AABB_center;
@@ -109,12 +109,12 @@ struct SPHContactDBGDraw :public SPHDBGDrawAbsract
 	void render		( )
 	{
 			//bool is_cyl= (geomClass==dCylinderClassUser);
-			Level().debug_renderer().draw_aabb			(pos,.01f,.01f,.01f,D3DCOLOR_XRGB(255*is_cyl,0,255*!is_cyl));
+			Level().debug_renderer().draw_aabb			(pos,.01f,.01f,.01f,color_xrgb(255*is_cyl,0,255*!is_cyl));
 			Fvector dir;
 			dir.set(norm);
 			dir.mul(depth*100.f);
 			dir.add(pos);
-			Level().debug_renderer().draw_line(Fidentity,pos,dir,D3DCOLOR_XRGB(255*is_cyl,0,255*!is_cyl));
+			Level().debug_renderer().draw_line(Fidentity,pos,dir,color_xrgb(255*is_cyl,0,255*!is_cyl));
 	}
 };
 
@@ -209,11 +209,11 @@ void DBG_DrawLine ( const Fvector& p0, const Fvector& p1, u32 c )
 void DBG_DrawMatrix( const Fmatrix &m, float size, u8 a/* = 255*/ )
 {
 	Fvector to;to.add( m.c,Fvector( ).mul( m.i, size ) );
-	DBG_DrawPHAbstruct( xr_new<SPHDBGDrawLine>( m.c, to, D3DCOLOR_XRGB(a, 0, 0 ) ) );
+	DBG_DrawPHAbstruct( xr_new<SPHDBGDrawLine>( m.c, to, color_xrgb(a, 0, 0 ) ) );
 	to.add(m.c,Fvector( ).mul( m.j, size ) );
-	DBG_DrawPHAbstruct( xr_new<SPHDBGDrawLine>( m.c, to, D3DCOLOR_XRGB(0, a, 0 ) ) );
+	DBG_DrawPHAbstruct( xr_new<SPHDBGDrawLine>( m.c, to, color_xrgb(0, a, 0 ) ) );
 	to.add(m.c,Fvector( ).mul( m.k, size ) );
-	DBG_DrawPHAbstruct( xr_new<SPHDBGDrawLine>( m.c, to, D3DCOLOR_XRGB(0, 0, a ) ) );
+	DBG_DrawPHAbstruct( xr_new<SPHDBGDrawLine>( m.c, to, color_xrgb(0, 0, a ) ) );
 }
 
 template<int>
@@ -676,8 +676,8 @@ void CFunctionGraph::Init(type_function fun,float x0,float x1,int l, int t, int 
 		m_stat_graph->AppendItem(val,color);
 
 	}
-	//m_stat_graph->AddMarker(CStatGraph::stVert, 0, D3DCOLOR_XRGB(255, 0, 0));
-	//m_stat_graph->AddMarker(CStatGraph::stHor, 0, D3DCOLOR_XRGB(255, 0, 0));
+	//m_stat_graph->AddMarker(CStatGraph::stVert, 0, color_xrgb(255, 0, 0));
+	//m_stat_graph->AddMarker(CStatGraph::stHor, 0, color_xrgb(255, 0, 0));
 }
 
 void CFunctionGraph::AddMarker(CStatGraph::EStyle Style, float pos, u32 Color)
@@ -870,11 +870,11 @@ void	DBG_DrawBones( const Fmatrix &xform,  IKinematics *K )
 		if( BI_NONE != bp )
 		{
 			CBoneInstance	&pbi = K->LL_GetBoneInstance( bp );
-			DBG_DrawLine( Fmatrix().mul_43( xform, bone_pos ).c, Fmatrix().mul_43( xform, pbi.mTransform ).c, D3DCOLOR_XRGB( 255, 255, 0 ) );
+			DBG_DrawLine( Fmatrix().mul_43( xform, bone_pos ).c, Fmatrix().mul_43( xform, pbi.mTransform ).c, color_xrgb( 255, 255, 0 ) );
 		}
 	}
 	DBG_DrawMatrix( xform, 1 );
-	DBG_DrawPoint( xform.c, 0.1, D3DCOLOR_XRGB( 255, 125, 125 ) );
+	DBG_DrawPoint( xform.c, 0.1, color_xrgb( 255, 125, 125 ) );
 
 }
 void	DBG_DrawBones( CObject &O )
@@ -903,7 +903,7 @@ void	DBG_PhysBones( CObject &O )
 		DBG_DrawMatrix( e->XFORM(), 0.1f );//Fmatrix().mul_43( O.XFORM(),e->XFORM())
 		CPhysicsElement* pE = ( e )->parent_element();
 		if( pE )
-			DBG_DrawLine( e->XFORM().c, pE->XFORM().c, D3DCOLOR_XRGB( 255, 100, 0 ) );
+			DBG_DrawLine( e->XFORM().c, pE->XFORM().c, color_xrgb( 255, 100, 0 ) );
 		
 	}
 
@@ -928,14 +928,14 @@ void	DBG_DrawBind( CObject &O )
 		if( BI_NONE != bp )
 		{
 			
-			DBG_DrawLine( Fmatrix().mul_43( O.XFORM(), binds[i] ).c, Fmatrix().mul_43( O.XFORM(),  binds[bp] ).c, D3DCOLOR_XRGB( 0, 255, 255 ) );
+			DBG_DrawLine( Fmatrix().mul_43( O.XFORM(), binds[i] ).c, Fmatrix().mul_43( O.XFORM(),  binds[bp] ).c, color_xrgb( 0, 255, 255 ) );
 		}
 	}
 
 	
 	u16 bip01_bi = K->LL_BoneID( "bip01" );
 	if( bip01_bi != BI_NONE )
-		DBG_DrawPoint( Fmatrix().mul_43( O.XFORM(), binds[bip01_bi] ).c, 0.1, D3DCOLOR_XRGB( 255, 255, 255 ) );
+		DBG_DrawPoint( Fmatrix().mul_43( O.XFORM(), binds[bip01_bi] ).c, 0.1, color_xrgb( 255, 255, 255 ) );
 }
 
 
@@ -999,10 +999,10 @@ void DBG_ObjBeforeStep			( CPHObject *obj )
 	if( is_trace_obj(obj) )
 	{
 		DBG_OpenCashedDraw();
-		//dbg_draw_velocity	( 0.1f, D3DCOLOR_XRGB( 255, 0, 0 ) ); 
+		//dbg_draw_velocity	( 0.1f, color_xrgb( 255, 0, 0 ) ); 
 		if(obj->ref_object()->ObjectPPhysicsShell())
 		{
-			obj->ref_object()->ObjectPPhysicsShell()->dbg_draw_force		( 0.1f, D3DCOLOR_XRGB( 0, 0, 255 ) ); 
+			obj->ref_object()->ObjectPPhysicsShell()->dbg_draw_force		( 0.1f, color_xrgb( 0, 0, 255 ) ); 
 			Fmatrix form = Fidentity;
 			obj->ref_object()->ObjectPPhysicsShell()->GetGlobalTransformDynamic( &form );
 			dbg_trace_prev_pos.set( form.c );
@@ -1018,9 +1018,9 @@ void DBG_ObjAfterStep			( CPHObject *obj )
 		
 		if(obj->ref_object()->ObjectPPhysicsShell())
 		{
-			obj->ref_object()->ObjectPPhysicsShell()->dbg_draw_velocity	( 0.1f, D3DCOLOR_XRGB( 255, 0, 0 ) );
+			obj->ref_object()->ObjectPPhysicsShell()->dbg_draw_velocity	( 0.1f, color_xrgb( 255, 0, 0 ) );
 		}
-		//dbg_draw_force		( 0.1f, D3DCOLOR_XRGB( 0, 0, 255 ) ); 
+		//dbg_draw_force		( 0.1f, color_xrgb( 0, 0, 255 ) ); 
 		
 	}
 }
@@ -1037,7 +1037,7 @@ void DBG_ObjAfterPhDataUpdate	( CPHObject *obj )
 		{
 			Fmatrix form = Fidentity;
 			obj->ref_object()->ObjectPPhysicsShell()->GetGlobalTransformDynamic( &form );
-			DBG_DrawLine( dbg_trace_prev_pos, form.c,  D3DCOLOR_XRGB( 255, 0, 0 )  );
+			DBG_DrawLine( dbg_trace_prev_pos, form.c,  color_xrgb( 255, 0, 0 )  );
 		}
 		DBG_ClosedCashedDraw( 50000 );
 	

@@ -208,10 +208,10 @@ bool Pick( ik_pick_result &r, const ik_pick_query &q , CObject* ignore_object)
 	{
 		CDB::TRI	*tri	= Level( ).ObjectSpace.GetStaticTris( ) + R.element;
 		Fvector p = q.pos();p.add( Fvector( ).mul( q.dir(), range ) );
-		DBG_DrawLine(pos,p,D3DCOLOR_XRGB( 255, 0, 0 ) );
+		DBG_DrawLine(pos,p,color_xrgb( 255, 0, 0 ) );
 		if( tri )
 		{
-			DBG_DrawTri( tri,Level( ).ObjectSpace.GetStaticVerts( ), D3DCOLOR_XRGB( 255, 0, 0 ) );
+			DBG_DrawTri( tri,Level( ).ObjectSpace.GetStaticVerts( ), color_xrgb( 255, 0, 0 ) );
 		}
 	}
 #endif
@@ -278,9 +278,9 @@ void ik_foot_collider::collide( SIKCollideData &cld, const ik_foot_geom &foot_ge
 #ifdef DEBUG
 	if( ph_dbg_draw_mask1.test( phDbgDrawIKCollision ) )
 	{
-		DBG_DrawPoint( pos_toe, 0.01, D3DCOLOR_XRGB( 255, 0, 0));
+		DBG_DrawPoint( pos_toe, 0.01, color_xrgb( 255, 0, 0));
 		if(cld.collided)
-			DBG_DrawPoint( r_toe.position, 0.01, D3DCOLOR_XRGB( 0, 0, 255));
+			DBG_DrawPoint( r_toe.position, 0.01, color_xrgb( 0, 0, 255));
 	}
 #endif
 
@@ -325,10 +325,10 @@ void ik_foot_collider::collide( SIKCollideData &cld, const ik_foot_geom &foot_ge
 #ifdef DEBUG
 			if( ph_dbg_draw_mask1.test( phDbgDrawIKCollision ) )
 			{
-				DBG_DrawPoint( pos_toe, 0.01, D3DCOLOR_XRGB( 255, 0, 0));
+				DBG_DrawPoint( pos_toe, 0.01, color_xrgb( 255, 0, 0));
 				if(cld.collided)
 				{
-					 DBG_DrawTri( r_toe.position, r_heel.position, r_side.position, D3DCOLOR_XRGB( 0, 0, 255), false );
+					 DBG_DrawTri( r_toe.position, r_heel.position, r_side.position, color_xrgb( 0, 0, 255), false );
 				}
 			}
 #endif
@@ -395,7 +395,7 @@ void ik_foot_collider::collide( SIKCollideData &cld, const ik_foot_geom &foot_ge
 		//			Fplane plane;
 		//			tri_plane( r_toe.position, r_hill.position , r_foot.position, plane );
 
-		//			DBG_DrawTri(r_toe.position, r_hill.position, r_foot.position , D3DCOLOR_XRGB( 255, 255, 255 ), false  );
+		//			DBG_DrawTri(r_toe.position, r_hill.position, r_foot.position , color_xrgb( 255, 255, 255 ), false  );
 		//		
 		//			if( plane.n.dotproduct( r_hill.p.n ) < 0.f )
 		//			{

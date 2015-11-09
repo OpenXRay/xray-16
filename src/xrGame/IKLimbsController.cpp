@@ -295,7 +295,7 @@ void CIKLimbsController::Calculate( )
 		Fvector toe;
 		cd[j].m_limb->dbg_ik_foot().ToePosition( toe );
 		m.transform_tiny( toe );
-		DBG_DrawLine( toe, Fvector().add( toe, Fvector().set( 0, -_object_shift.shift(), 0 ) ), D3DCOLOR_XRGB( 255, 0, 0 )  );
+		DBG_DrawLine( toe, Fvector().add( toe, Fvector().set( 0, -_object_shift.shift(), 0 ) ), color_xrgb( 255, 0, 0 )  );
 	}
 #endif
 	}

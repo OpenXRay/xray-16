@@ -61,8 +61,8 @@ const u32	g_clWhite					= 0xffffffff;
 
 #define		SHOW_INFO_SPEED				0.5f
 #define		HIDE_INFO_SPEED				10.f
-#define		C_ON_ENEMY					D3DCOLOR_XRGB(0xff,0,0)
-#define		C_DEFAULT					D3DCOLOR_XRGB(0xff,0xff,0xff)
+#define		C_ON_ENEMY					color_xrgb(0xff,0,0)
+#define		C_DEFAULT					color_xrgb(0xff,0xff,0xff)
 
 #define				MAININGAME_XML				"maingame.xml"
 

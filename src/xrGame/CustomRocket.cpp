@@ -259,7 +259,7 @@ void CCustomRocket::ObjectContactCallback(bool& do_colide,bool bo1,dContact& c ,
 						corrected_pos=true;
 //.	DBG_OpenCashedDraw();
 //.	const Fvector*	 V_array	= Level().ObjectSpace.GetStaticVerts();
-//.	DBG_DrawTri(neg_tri.T, V_array, D3DCOLOR_XRGB(255,255,0));
+//.	DBG_DrawTri(neg_tri.T, V_array, color_xrgb(255,255,0));
 //.	DBG_ClosedCashedDraw(50000);
 #endif
 					}
@@ -267,7 +267,7 @@ void CCustomRocket::ObjectContactCallback(bool& do_colide,bool bo1,dContact& c ,
 			}
 #ifdef DEBUG
 			if(ph_dbg_draw_mask.test(phDbgDrawExplosionPos))
-				DBG_DrawPoint(l_pos,0.05f,D3DCOLOR_XRGB(255,255,(!corrected_pos)*255));
+				DBG_DrawPoint(l_pos,0.05f,color_xrgb(255,255,(!corrected_pos)*255));
 #endif
 			
 			l_this->Contact(l_pos, vUp);

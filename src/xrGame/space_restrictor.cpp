@@ -222,9 +222,9 @@ void CSpaceRestrictor::OnRender	()
 	u32 Color = 0;
 	CCustomZone	*custom_zone = smart_cast<CCustomZone*>(this);
 	if (custom_zone && custom_zone->IsEnabled())
-		Color = D3DCOLOR_XRGB(0,255,255);
+		Color = color_xrgb(0,255,255);
 	else
-		Color = D3DCOLOR_XRGB(255,0,0);
+		Color = color_xrgb(255,0,0);
 
 	
 	for(l_pShape = l_shapes.begin(); l_shapes.end() != l_pShape; ++l_pShape) 

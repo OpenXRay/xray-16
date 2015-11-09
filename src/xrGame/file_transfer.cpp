@@ -643,7 +643,7 @@ void client_site::dbg_init_statgraph()
 	CGameFont* F = UI().Font().pFontDI;
 	F->SetHeightI(0.015f);
 	F->OutSet	(360.f, 700.f);
-	F->SetColor	(D3DCOLOR_XRGB(0,255,0));
+	F->SetColor	(color_xrgb(0,255,0));
 	F->OutNext("%d", (int)data_max_chunk_size);
 	F->OutSet	(360.f, 760.f);
 	F->OutNext("%d", (int)data_min_chunk_size);

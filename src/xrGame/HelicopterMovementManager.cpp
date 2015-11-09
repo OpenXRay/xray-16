@@ -457,7 +457,7 @@ void CHelicopter::OnRender()
 	CPatrolPath::const_vertex_iterator e = m_movement.currPatrolPath->vertices().end();
 	for ( ; b != e; ++b) {
 		Fvector p = (*b).second->data().position();
-		Level().debug_renderer().draw_aabb  (p,0.1f,0.1f,0.1f,D3DCOLOR_XRGB(0,255,0));
+		Level().debug_renderer().draw_aabb  (p,0.1f,0.1f,0.1f,color_xrgb(0,255,0));
 	}
 */
 /*
@@ -481,12 +481,12 @@ void CHelicopter::OnRender()
 	xr_vector<Fvector>::iterator it = round_points.begin();
 	xr_vector<Fvector>::iterator it_e = round_points.end();
 	for(;it!=it_e;++it){
-		Level().debug_renderer().draw_aabb  ((*it),0.1f,0.1f,0.1f,D3DCOLOR_XRGB(0,255,0));
+		Level().debug_renderer().draw_aabb  ((*it),0.1f,0.1f,0.1f,color_xrgb(0,255,0));
 	}
 */
-/*	Level().debug_renderer().draw_line(Fidentity,m_heli->m_right_rocket_bone_xform.c, m_heli->m_data.m_destEnemyPos,D3DCOLOR_XRGB(0,255,0));
+/*	Level().debug_renderer().draw_line(Fidentity,m_heli->m_right_rocket_bone_xform.c, m_heli->m_data.m_destEnemyPos,color_xrgb(0,255,0));
 
-	Level().debug_renderer().draw_line(Fidentity,m_heli->XFORM().c,m_heli->m_data.m_destEnemyPos,D3DCOLOR_XRGB(255,0,0));
+	Level().debug_renderer().draw_line(Fidentity,m_heli->XFORM().c,m_heli->m_data.m_destEnemyPos,color_xrgb(255,0,0));
 	return;
 */
 

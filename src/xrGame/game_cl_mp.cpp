@@ -1858,7 +1858,7 @@ void game_cl_mp::draw_all_active_binder_states()
 	CGameFont* F = UI().Font().pFontDI;
 	F->SetHeightI	(0.015f);
 	F->OutSetI		(0.1f,0.2f);
-	F->SetColor		(D3DCOLOR_XRGB(0,255,0));
+	F->SetColor		(color_xrgb(0,255,0));
 	
 	for (u32 i = 0; i < MAX_PLAYERS_COUNT; ++i)
 	{
@@ -1872,7 +1872,7 @@ void game_cl_mp::draw_all_active_binder_states()
 			);
 		}
 	}
-	F->SetColor		(D3DCOLOR_XRGB(255,0,0));
+	F->SetColor		(color_xrgb(255,0,0));
 	for (cheaters_collection_t::iterator i = m_detected_cheaters.begin(),
 		ie = m_detected_cheaters.end(); i != ie; ++i)
 	{

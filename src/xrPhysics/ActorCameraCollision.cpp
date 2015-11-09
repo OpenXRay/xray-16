@@ -343,13 +343,13 @@ void	collide_camera( CCameraBase & camera, float _viewport_near, IPhysicsShellHo
 	if( dbg_draw_camera_collision )
 	{
 		debug_output().DBG_DrawMatrix( Fmatrix().translate( xform.c ), 1 );
-		shell->dbg_draw_geometry( 1, D3DCOLOR_XRGB(0, 0, 255 ) );
+		shell->dbg_draw_geometry( 1, color_xrgb(0, 0, 255 ) );
 	}
 #endif
 	do_collide_and_move( xform, l_actor, shell, roote );
 #ifdef	DEBUG
 	if( dbg_draw_camera_collision )
-		shell->dbg_draw_geometry( 1, D3DCOLOR_XRGB(0, 255, 0 ) );
+		shell->dbg_draw_geometry( 1, color_xrgb(0, 255, 0 ) );
 #endif
 	roote->GetGlobalPositionDynamic( &camera.vPosition );
 	camera.vPosition.mad( camera.Direction(), -_viewport_near/2.f );

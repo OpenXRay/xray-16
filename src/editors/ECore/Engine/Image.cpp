@@ -281,7 +281,7 @@ bool CImage::LoadTGA(LPCSTR name)
 //				u32 R = RGBA_GETRED	(pixel)/2;
 //				u32 G = RGBA_GETGREEN	(pixel)/2;
 //				u32 B = RGBA_GETBLUE	(pixel)/2;
-//				*ptr++ = D3DCOLOR_XRGB(R,G,B);
+//				*ptr++ = color_xrgb(R,G,B);
 			}
 		}
 	}

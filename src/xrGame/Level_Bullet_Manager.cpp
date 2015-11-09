@@ -934,12 +934,12 @@ void CBulletManager::Render	()
 		BulletPoints::const_iterator	e = m_bullet_points.end();
 		for ( ; i != e; i+=2) {
 			sphere.c					= *i;
-			renderer.draw_ellipse		(sphere, D3DCOLOR_XRGB(255, 0, 0));
+			renderer.draw_ellipse		(sphere, color_xrgb(255, 0, 0));
 
-			renderer.draw_line			(Fidentity, *i, *(i + 1), D3DCOLOR_XRGB(0, 255, 0));
+			renderer.draw_line			(Fidentity, *i, *(i + 1), color_xrgb(0, 255, 0));
 
 			sphere.c					= *(i + 1);
-			renderer.draw_ellipse		(sphere, D3DCOLOR_XRGB(255, 0, 0));
+			renderer.draw_ellipse		(sphere, color_xrgb(255, 0, 0));
 		}
 
 		if (m_bullet_points.size() > 32768)
