@@ -21,7 +21,7 @@ public:
     };
 
 public:
-    virtual ~IGameFont() {}
+    virtual ~IGameFont() = 0;
 
     virtual void Initialize(LPCSTR shader, LPCSTR texture) = 0;
     virtual void SetColor(u32 C) = 0;
@@ -53,3 +53,5 @@ public:
     virtual void OnRender() = 0;
     virtual void Clear() = 0;
 };
+
+IC IGameFont::~IGameFont() {}
