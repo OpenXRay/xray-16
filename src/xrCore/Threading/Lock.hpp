@@ -1,7 +1,10 @@
 #pragma once
 #include "xrCore/xrCore.h"
 
-#ifdef CONFIG_PROFILE_LOCKS
+#include <mutex>
+#include <atomic>
+
+#ifdef CONFIG_PROFILE_LOCKS.
 typedef void(*add_profile_portion_callback) (LPCSTR id, const u64& time);
 void XRCORE_API set_add_profile_portion(add_profile_portion_callback callback);
 
@@ -15,26 +18,40 @@ void XRCORE_API set_add_profile_portion(add_profile_portion_callback callback);
 
 class XRCORE_API Lock
 {
-private:
-    friend class AutoLock;
-    CRITICAL_SECTION cs;
-#ifdef CONFIG_PROFILE_LOCKS
-    const char *id;
-#endif
-
 public:
 #ifdef CONFIG_PROFILE_LOCKS
-    Lock(const char *id);
+    Lock(const char *id) : isLocked(false), id(id) { }
 #else
-    Lock();
+    Lock() : isLocked(false) { }
 #endif
-    ~Lock();
 
     Lock(const Lock &) = delete;
     Lock operator=(const Lock &) = delete;
 
+#ifdef CONFIG_PROFILE_LOCKS
     void Enter();
-    bool TryEnter();
-    void Leave();
-    bool IsLocked() const;
+#else
+    void Enter() { return mutex.lock(); isLocked = true; }
+#endif
+
+    bool TryEnter()
+    {
+        bool locked = mutex.try_lock();
+        if (locked)
+        {
+            isLocked = true;
+        }
+        return locked;
+    }
+
+    void Leave() { return mutex.unlock(); isLocked = false; }
+
+    bool IsLocked() const { return isLocked; }
+
+private:
+    std::mutex mutex;
+    std::atomic_bool isLocked;
+#ifdef CONFIG_PROFILE_LOCKS
+    const char *id;
+#endif
 };
