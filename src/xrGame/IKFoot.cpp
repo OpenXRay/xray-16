@@ -374,7 +374,7 @@ bool CIKFoot::GetFootStepMatrix( ik_goal_matrix &m, const Fmatrix &g_anim, const
 #ifdef DEBUG
 	if(ph_dbg_draw_mask.test( phDbgDrawIKGoal ))
 	{
-		DBG_DrawPoint( global_point, 0.03f, D3DCOLOR_RGBA( 255, 0, 0, 255 ) );
+		DBG_DrawPoint( global_point, 0.03f, color_rgba( 255, 0, 0, 255 ) );
 	}
 	if(!fsimilar( _abs( DET( g_anim ) - 1.f ), _abs( DET( m.get() ) - 1.f ), 0.001f ) )
 		Msg("scale g_anim: %f scale m: %f ",  DET( g_anim ) ,  DET( m.get() ) );

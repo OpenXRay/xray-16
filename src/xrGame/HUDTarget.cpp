@@ -23,12 +23,12 @@
 #include <ai/monsters/poltergeist/poltergeist.h>
 
 
-u32 C_ON_ENEMY		D3DCOLOR_RGBA(0xff,0,0,0x80);
-u32 C_ON_NEUTRAL	D3DCOLOR_RGBA(0xff,0xff,0x80,0x80);
-u32 C_ON_FRIEND		D3DCOLOR_RGBA(0,0xff,0,0x80);
+u32 C_ON_ENEMY		color_rgba(0xff,0,0,0x80);
+u32 C_ON_NEUTRAL	color_rgba(0xff,0xff,0x80,0x80);
+u32 C_ON_FRIEND		color_rgba(0,0xff,0,0x80);
 
 
-#define C_DEFAULT	D3DCOLOR_RGBA(0xff,0xff,0xff,0x80)
+#define C_DEFAULT	color_rgba(0xff,0xff,0xff,0x80)
 #define C_SIZE		0.025f
 #define NEAR_LIM	0.5f
 

@@ -966,7 +966,7 @@ void CAI_Stalker::dbg_draw_vision	()
 	string64					out_text;
 	xr_sprintf						(out_text,"%.2f",object ? object->m_value : 0.f);
 
-	UI().Font().pFontMedium->SetColor	(D3DCOLOR_RGBA(255,0,0,95));
+	UI().Font().pFontMedium->SetColor	(color_rgba(255,0,0,95));
 	UI().Font().pFontMedium->OutSet	(x,y);
 	UI().Font().pFontMedium->OutNext	(out_text);
 }
