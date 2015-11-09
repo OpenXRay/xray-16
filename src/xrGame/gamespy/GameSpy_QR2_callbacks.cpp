@@ -19,11 +19,11 @@ void __cdecl callback_serverkey(int keyid, qr2_buffer_t outbuf, void *userdata)
 	if (!pQR2) return;
 
 	
-
-	game_sv_mp* gmMP = smart_cast<game_sv_mp*>(pServer->game);
-	game_sv_Deathmatch* gmDM = smart_cast<game_sv_Deathmatch*>(pServer->game);
-	game_sv_TeamDeathmatch* gmTDM = smart_cast<game_sv_TeamDeathmatch*>(pServer->game);
-	game_sv_ArtefactHunt* gmAhunt = smart_cast<game_sv_ArtefactHunt*>(pServer->game);
+    IServerGameState *gameState = pServer->GetGameState();
+	game_sv_mp* gmMP = smart_cast<game_sv_mp*>(gameState);
+	game_sv_Deathmatch* gmDM = smart_cast<game_sv_Deathmatch*>(gameState);
+	game_sv_TeamDeathmatch* gmTDM = smart_cast<game_sv_TeamDeathmatch*>(gameState);
+	game_sv_ArtefactHunt* gmAhunt = smart_cast<game_sv_ArtefactHunt*>(gameState);
 
 	LPCSTR time_str = InventoryUtilities::GetTimeAsString( Device.dwTimeGlobal, InventoryUtilities::etpTimeToSecondsAndDay ).c_str();
 
@@ -37,7 +37,7 @@ void __cdecl callback_serverkey(int keyid, qr2_buffer_t outbuf, void *userdata)
 	case NUMPLAYERS_KEY:	pQR2->BufferAdd_Int(outbuf, pServer->GetPlayersCount()); break;
 	case MAXPLAYERS_KEY:	pQR2->BufferAdd_Int(outbuf, pServer->m_iMaxPlayers); break;
 	case SERVER_UP_TIME_KEY:pQR2->BufferAdd(outbuf, time_str); break;
-	case GAMETYPE_KEY:		ADD_KEY_VAL(pServer->game, pQR2, BufferAdd, outbuf, type_name()); break; //		pQR2->BufferAdd(outbuf, pServer->game->type_name()); break;
+	case GAMETYPE_KEY:		ADD_KEY_VAL(gameState, pQR2, BufferAdd, outbuf, type_name()); break; //		pQR2->BufferAdd(outbuf, gameState->type_name()); break;
 	case GAMEMODE_KEY:		pQR2->BufferAdd(outbuf, "openplaying"); break;
 	case PASSWORD_KEY:
 		if ( 0 == *(pServer->Password) )
@@ -64,7 +64,7 @@ void __cdecl callback_serverkey(int keyid, qr2_buffer_t outbuf, void *userdata)
 	case HOSTPORT_KEY:		pQR2->BufferAdd_Int(outbuf, pServer->GetPort()); break;
 
 	case DEDICATED_KEY:		pQR2->BufferAdd_Int(outbuf, pServer->IsDedicated());		break;
-	case GAMETYPE_NAME_KEY: ADD_KEY_VAL(pServer->game, pQR2, BufferAdd_Int, outbuf, Type()); break; //pQR2->BufferAdd_Int(outbuf, pServer->game->Type()); break;
+	case GAMETYPE_NAME_KEY: ADD_KEY_VAL(gameState, pQR2, BufferAdd_Int, outbuf, Type()); break; //pQR2->BufferAdd_Int(outbuf, gameState->Type()); break;
 	case NUMTEAMS_KEY:		ADD_KEY_VAL(gmMP, pQR2, BufferAdd_Int, outbuf, GetNumTeams()); break; //pQR2->BufferAdd_Int(outbuf, gmMP->GetNumTeams()); break;		
 	case G_MAX_PING_KEY:	pQR2->BufferAdd_Int(outbuf, g_sv_dwMaxClientPing); break;
 	//------- game ---------//	
@@ -158,7 +158,7 @@ void __cdecl callback_playerkey(int keyid, int index, qr2_buffer_t outbuf, void 
 	case TEAM__KEY:		pQR2->BufferAdd_Int(outbuf, pCD->ps->team); break;
 	case P_SPECTATOR__KEY: pQR2->BufferAdd_Int(outbuf, pCD->ps->testFlag(GAME_PLAYER_FLAG_SPECTATOR)); break;
 	case P_ARTEFACTS__KEY: 
-		if (pServer->game->Type() == eGameIDArtefactHunt || pServer->game->Type() == eGameIDCaptureTheArtefact) 
+		if (pServer->GetGameState()->Type() == eGameIDArtefactHunt || pServer->GetGameState()->Type() == eGameIDCaptureTheArtefact) 
 			pQR2->BufferAdd_Int(outbuf, pCD->ps->af_count); break;
 			break;
 	default:
@@ -176,7 +176,7 @@ void __cdecl callback_teamkey(int keyid, int index, qr2_buffer_t outbuf, void *u
 	CGameSpy_QR2* pQR2 = pServer->QR2();
 	if (!pQR2) return;
 
-	game_sv_Deathmatch* gmDM = smart_cast<game_sv_Deathmatch*>(pServer->game);
+	game_sv_Deathmatch* gmDM = smart_cast<game_sv_Deathmatch*>(pServer->GetGameState());
 	if (!gmDM || u32(index) >= gmDM->GetNumTeams()) return;
 
 	switch (keyid)
@@ -284,8 +284,8 @@ int __cdecl callback_count(qr2_key_type keytype, void *userdata)
 		}break;
 	case key_team:
 		{
-			if (!pServer->game) return 0;
-			switch (pServer->game->Type()) {
+			if (!pServer->GetGameState()) return 0;
+			switch (pServer->GetGameState()->Type()) {
 				case eGameIDDominationZone:
 				case eGameIDDeathmatch:
 					return 1;

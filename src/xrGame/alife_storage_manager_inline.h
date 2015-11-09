@@ -8,7 +8,7 @@
 
 #pragma once
 
-IC	CALifeStorageManager::CALifeStorageManager			(xrServer *server, LPCSTR section) :
+IC	CALifeStorageManager::CALifeStorageManager			(IPureServer *server, LPCSTR section) :
 	inherited	(server,section)
 {
 	m_section				= section;

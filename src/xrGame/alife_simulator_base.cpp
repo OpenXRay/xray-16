@@ -30,7 +30,7 @@
 
 using namespace ALife;
 
-CALifeSimulatorBase::CALifeSimulatorBase	(xrServer *server, LPCSTR section)
+CALifeSimulatorBase::CALifeSimulatorBase	(IPureServer *server, LPCSTR section)
 {
 	m_server					= server;
 	m_initialized				= false;

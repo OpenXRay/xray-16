@@ -133,7 +133,33 @@ enum ETeam
 
 #pragma pack(pop)
 
-class	game_GameState : public DLL_Pure
+class IGameState
+{
+public:
+    virtual ~IGameState() = 0;
+    virtual EGameIDs Type() const = 0;
+    virtual u16 Phase() const = 0;
+    virtual s32 Round() const = 0;
+    virtual u32 StartTime() const = 0;
+    virtual void Create(shared_str &options) = 0;
+    virtual const char *type_name() const = 0;
+    virtual game_PlayerState* createPlayerState(NET_Packet *accountInfo) = 0;
+    virtual ALife::_TIME_ID GetStartGameTime() = 0;
+    virtual ALife::_TIME_ID GetGameTime() = 0;
+    virtual float GetGameTimeFactor() = 0;
+    virtual void SetGameTimeFactor(const float value) = 0;
+    virtual ALife::_TIME_ID GetEnvironmentGameTime() = 0;
+    virtual float GetEnvironmentGameTimeFactor() = 0;
+    virtual void SetEnvironmentGameTimeFactor(const float value) = 0;
+    virtual void SetGameTimeFactor(ALife::_TIME_ID gameTime, const float timeFactor) = 0;
+    virtual void SetEnvironmentGameTimeFactor(ALife::_TIME_ID gameTime, const float timeFactor) = 0;
+};
+
+IC IGameState::~IGameState() {}
+
+class	game_GameState :
+    public DLL_Pure,
+    public virtual IGameState
 {
 protected:
 	EGameIDs						m_type;
@@ -150,15 +176,27 @@ protected:
 public:
 									game_GameState			();
 	virtual							~game_GameState			()								{}
-	IC			EGameIDs const&		Type					() const						{return m_type;};
-				u16					Phase					() const						{return m_phase;};
-				s32					Round					() const						{return m_round;};
-				u32					StartTime				() const						{return m_start_time;};
-	virtual		void				Create					(shared_str& options)				{};
-	virtual		LPCSTR				type_name				() const						{return "base game";};
-//for scripting enhancement
-	static		CLASS_ID			getCLASS_ID				(LPCSTR game_type_name, bool bServer);
-	virtual		game_PlayerState*	createPlayerState		(NET_Packet* account_info)		{return xr_new<game_PlayerState>(account_info); };
+    // IGameState
+	virtual EGameIDs Type() const override { return m_type; }
+	virtual u16 Phase() const override { return m_phase; }
+	virtual s32 Round() const override { return m_round; }
+	virtual u32 StartTime() const override { return m_start_time; }
+    virtual void Create(shared_str &options) override {}
+	virtual const char *type_name() const override { return "base game"; }
+	virtual game_PlayerState *createPlayerState(NET_Packet *accountInfo) override
+    { return xr_new<game_PlayerState>(accountInfo); }
+    virtual ALife::_TIME_ID GetStartGameTime() override;
+	virtual ALife::_TIME_ID GetGameTime() override;
+	virtual float GetGameTimeFactor() override;				
+	virtual void SetGameTimeFactor(const float value) override;
+	virtual ALife::_TIME_ID GetEnvironmentGameTime() override;
+	virtual float GetEnvironmentGameTimeFactor() override;
+	virtual void SetEnvironmentGameTimeFactor(const float value) override;
+    virtual void SetGameTimeFactor(ALife::_TIME_ID GameTime, const float fTimeFactor) override;
+    virtual void SetEnvironmentGameTimeFactor(ALife::_TIME_ID GameTime, const float fTimeFactor) override;
+    // ~IGameState
+    //for scripting enhancement
+    static		CLASS_ID			getCLASS_ID(LPCSTR game_type_name, bool bServer);
 
 //moved from game_sv_base (time routines)
 private:
@@ -170,18 +208,4 @@ private:
 	u64								m_qwEStartProcessorTime;
 	u64								m_qwEStartGameTime;
 	float							m_fETimeFactor;
-	//-------------------------------------------------------
-public:
-
-	virtual		ALife::_TIME_ID		GetStartGameTime		();
-	virtual		ALife::_TIME_ID		GetGameTime				();	
-	virtual		float				GetGameTimeFactor		();	
-				void				SetGameTimeFactor		(ALife::_TIME_ID GameTime, const float fTimeFactor);
-	virtual		void				SetGameTimeFactor		(const float fTimeFactor);
-	
-
-	virtual		ALife::_TIME_ID		GetEnvironmentGameTime	();
-	virtual		float				GetEnvironmentGameTimeFactor		();
-				void				SetEnvironmentGameTimeFactor		(ALife::_TIME_ID GameTime, const float fTimeFactor);
-	virtual		void				SetEnvironmentGameTimeFactor		(const float fTimeFactor);
 };

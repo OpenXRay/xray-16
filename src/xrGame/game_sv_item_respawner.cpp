@@ -105,7 +105,7 @@ void item_respawn_manager::check_to_spawn(CSE_Abstract* item)
 CSE_Abstract* item_respawn_manager::make_respawn_entity(shared_str const & section_name, u8 addons, u16 count_of_ammo)
 {
 	R_ASSERT(m_server);
-	R_ASSERT(m_server->game);
+	R_ASSERT(m_server->GetGameState());
 	CSE_Abstract*			temp_entity = F_entity_Create(section_name.c_str());
 	R_ASSERT2(temp_entity, make_string("failed to create entity [%s]",
 		section_name.c_str()).c_str());

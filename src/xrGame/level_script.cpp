@@ -165,7 +165,7 @@ void set_time_factor(float time_factor)
 		return;
 #endif // #ifdef INGAME_EDITOR
 
-	Level().Server->game->SetGameTimeFactor(time_factor);
+	Level().Server->GetGameState()->SetGameTimeFactor(time_factor);
 }
 
 float get_time_factor()
@@ -207,7 +207,7 @@ u32 get_time_minutes()
 
 void change_game_time(u32 days, u32 hours, u32 mins)
 {
-	game_sv_Single	*tpGame = smart_cast<game_sv_Single *>(Level().Server->game);
+	game_sv_Single	*tpGame = smart_cast<game_sv_Single *>(Level().Server->GetGameState());
 	if(tpGame && ai().get_alife())
 	{
 		u32 value		= days*86400+hours*3600+mins*60;

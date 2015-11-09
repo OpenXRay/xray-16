@@ -26,7 +26,7 @@ private:
 			void	load					(void *buffer, const u32 &buffer_size, LPCSTR file_name);
 
 public:
-	IC				CALifeStorageManager	(xrServer *server, LPCSTR section);
+	IC				CALifeStorageManager	(IPureServer *server, LPCSTR section);
 	virtual			~CALifeStorageManager	();
 			bool	load					(LPCSTR	save_name = 0);
 			void	save					(LPCSTR	save_name = 0, bool update_name = true);

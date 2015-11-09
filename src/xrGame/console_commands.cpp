@@ -316,7 +316,7 @@ public:
 	CCC_ALifeProcessTime(LPCSTR N) : IConsole_Command(N)  { };
 	virtual void Execute(LPCSTR args) {
 		if ((GameID() == eGameIDSingle)  &&ai().get_alife()) {
-			game_sv_Single	*tpGame = smart_cast<game_sv_Single *>(Level().Server->game);
+			game_sv_Single	*tpGame = smart_cast<game_sv_Single *>(Level().Server->GetGameState());
 			VERIFY			(tpGame);
 			int id1 = 0;
 			sscanf(args ,"%d",&id1);
@@ -337,7 +337,7 @@ public:
 	CCC_ALifeObjectsPerUpdate(LPCSTR N) : IConsole_Command(N)  { };
 	virtual void Execute(LPCSTR args) {
 		if ((GameID() == eGameIDSingle)  &&ai().get_alife()) {
-			game_sv_Single	*tpGame = smart_cast<game_sv_Single *>(Level().Server->game);
+			game_sv_Single	*tpGame = smart_cast<game_sv_Single *>(Level().Server->GetGameState());
 			VERIFY			(tpGame);
 			int id1 = 0;
 			sscanf(args ,"%d",&id1);
@@ -353,7 +353,7 @@ public:
 	CCC_ALifeSwitchFactor(LPCSTR N) : IConsole_Command(N)  { };
 	virtual void Execute(LPCSTR args) {
 		if ((GameID() == eGameIDSingle)  &&ai().get_alife()) {
-			game_sv_Single	*tpGame = smart_cast<game_sv_Single *>(Level().Server->game);
+			game_sv_Single	*tpGame = smart_cast<game_sv_Single *>(Level().Server->GetGameState());
 			VERIFY			(tpGame);
 			float id1 = 0;
 			sscanf(args ,"%f",&id1);
@@ -1358,7 +1358,7 @@ struct CCC_StartTimeSingle : public IConsole_Command {
 		if (!Level().Server)
 			return;
 
-		if (!Level().Server->game)
+		if (!Level().Server->GetGameState())
 			return;
 
 		Level().SetGameTimeFactor(g_qwStartGameTime,g_fTimeFactor);
@@ -1385,7 +1385,7 @@ struct CCC_TimeFactorSingle : public CCC_Float {
 		if (!Level().Server)
 			return;
 
-		if (!Level().Server->game)
+		if (!Level().Server->GetGameState())
 			return;
 
 		Level().SetGameTimeFactor(g_fTimeFactor);

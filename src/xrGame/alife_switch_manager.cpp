@@ -24,9 +24,9 @@
 using namespace ALife;
 
 struct remove_non_savable_predicate {
-	xrServer			*m_server;
+	IPureServer			*m_server;
 
-	IC		 remove_non_savable_predicate(xrServer *server)
+	IC		 remove_non_savable_predicate(IPureServer *server)
 	{
 		VERIFY			(server);
 		m_server		= server;
@@ -34,7 +34,7 @@ struct remove_non_savable_predicate {
 
 	IC	bool operator()	(const ALife::_OBJECT_ID &id) const
 	{
-		CSE_Abstract	*object = m_server->game->get_entity_from_eid(id);
+		CSE_Abstract	*object = m_server->GetGameState()->get_entity_from_eid(id);
 		VERIFY			(object);
 		CSE_ALifeObject	*alife_object = smart_cast<CSE_ALifeObject*>(object);
 		VERIFY			(alife_object);

@@ -1149,9 +1149,11 @@ void game_sv_GameState::on_death	(CSE_Abstract *e_dest, CSE_Abstract *e_src)
 //  [7/5/2005]
 #ifdef DEBUG
 extern	Flags32	dbg_net_Draw_Flags;
+#endif
 
 void		game_sv_GameState::OnRender				()
 {
+#ifdef DEBUG
 	/*Fmatrix T; T.identity();
 	Fvector V0, V1;
 	u32 TeamColors[TEAM_COUNT] = {D3DCOLOR_XRGB(255, 0, 0), D3DCOLOR_XRGB(0, 255, 0), D3DCOLOR_XRGB(0, 0, 255), D3DCOLOR_XRGB(255, 255, 0)};
@@ -1227,8 +1229,9 @@ void		game_sv_GameState::OnRender				()
 		};
 
 	}*/
-};
 #endif
+};
+
 //  [7/5/2005]
 
 BOOL	game_sv_GameState::IsVotingEnabled			()	{return g_sv_base_iVotingEnabled != 0;};

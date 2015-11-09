@@ -30,7 +30,7 @@ CSE_ALifeTraderAbstract* ch_info_get_from_id (u16 id)
 	{
 		return	smart_cast<CSE_ALifeTraderAbstract*>(ai().alife().objects().object(id));
 	}else{
-		return	smart_cast<CSE_ALifeTraderAbstract*>(Level().Server->game->get_entity_from_eid(id));
+		return	smart_cast<CSE_ALifeTraderAbstract*>(Level().Server->GetGameState()->get_entity_from_eid(id));
 	}
 }
 

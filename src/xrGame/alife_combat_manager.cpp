@@ -38,7 +38,7 @@ void print_time(LPCSTR S, _TIME_ID tTimeID)
 }
 
 /**/
-CALifeCombatManager::CALifeCombatManager	(xrServer *server, LPCSTR section) :
+CALifeCombatManager::CALifeCombatManager	(IPureServer *server, LPCSTR section) :
 	CALifeSimulatorBase	(server,section)
 {
 /**

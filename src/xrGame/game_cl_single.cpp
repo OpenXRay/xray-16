@@ -73,7 +73,7 @@ float game_cl_Single::GetGameTimeFactor		()
 
 void game_cl_Single::SetGameTimeFactor(const float fTimeFactor)
 {
-	Level().Server->game->SetGameTimeFactor(fTimeFactor);
+	Level().Server->GetGameState()->SetGameTimeFactor(fTimeFactor);
 }
 
 ALife::_TIME_ID game_cl_Single::GetEnvironmentGameTime	()
@@ -95,7 +95,7 @@ float game_cl_Single::GetEnvironmentGameTimeFactor		()
 void game_cl_Single::SetEnvironmentGameTimeFactor		(const float fTimeFactor)
 {
 	if (ai().get_alife() && ai().alife().initialized())
-		Level().Server->game->SetGameTimeFactor(fTimeFactor);
+		Level().Server->GetGameState()->SetGameTimeFactor(fTimeFactor);
 	else
 		inherited::SetEnvironmentGameTimeFactor(fTimeFactor);
 }

@@ -161,11 +161,13 @@ private:
     ServerStatistics stats;
 
 protected:
+    game_sv_GameState *game;
+
 	void					Server_Client_Check				(IClient* CL);
 	void					PerformCheckClientsForMaxPing	();
-public:
-	game_sv_GameState*		game;
 
+public:
+    virtual IServerGameState *GetGameState() override { return game; }
 	void					Export_game_type		(IClient* CL);
 	void					Perform_game_export		();
 	BOOL					PerformRP				(CSE_Abstract* E);
@@ -175,11 +177,11 @@ public:
 	{
 		m_tID_Generator		= id_generator_type();
 	}
-	IC u16					PerformIDgen			(u16 ID)
+	virtual u16 PerformIDgen(u16 ID) override
 	{
 		return				(m_tID_Generator.tfGetID(ID));
 	}
-	IC void					FreeID					(u16 ID, u32 time)
+	virtual void FreeID(u16 ID, u32 time) override
 	{
 		return				(m_tID_Generator.vfFreeID(ID, time));
 	}
@@ -187,9 +189,9 @@ public:
 	void					Perform_connect_spawn	(CSE_Abstract* E, xrClientData* to, NET_Packet& P);
 	void					Perform_transfer		(NET_Packet &PR, NET_Packet &PT, CSE_Abstract* what, CSE_Abstract* from, CSE_Abstract* to);
 	void					Perform_reject			(CSE_Abstract* what, CSE_Abstract* from, int delta);
-	void					Perform_destroy			(CSE_Abstract* tpSE_Abstract, u32 mode);
+	virtual void Perform_destroy(CSE_Abstract* tpSE_Abstract, u32 mode) override;
 
-	CSE_Abstract*			Process_spawn			(NET_Packet& P, ClientID sender, BOOL bSpawnWithClientsMainEntityAsParent=FALSE, CSE_Abstract* tpExistedEntity=0);
+	virtual CSE_Abstract *Process_spawn(NET_Packet& P, ClientID sender, BOOL bSpawnWithClientsMainEntityAsParent=FALSE, CSE_Abstract* tpExistedEntity=0) override;
 	void					Process_update			(NET_Packet& P, ClientID sender);
 	void					Process_save			(NET_Packet& P, ClientID sender);
 	void					Process_event			(NET_Packet& P, ClientID sender);
@@ -253,8 +255,8 @@ public:
 	virtual void			client_Destroy		(IClient* C);					// destroy client info
 
 	// utilities
-	CSE_Abstract*			entity_Create		(LPCSTR name);
-	void					entity_Destroy		(CSE_Abstract *&P);
+	virtual CSE_Abstract*			entity_Create		(LPCSTR name) override;
+	virtual void					entity_Destroy		(CSE_Abstract *&P) override;
 	u32						GetEntitiesNum		()			{ return entities.size(); };
 	CSE_Abstract*			GetEntity			(u32 Num);
 	u32 const				GetLastUpdatesSize	() const { return m_last_updates_size; };

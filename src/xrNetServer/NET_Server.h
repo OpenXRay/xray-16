@@ -142,7 +142,9 @@ struct ClientIdSearchPredicate
 };
 
 
+class CSE_Abstract;
 class CServerInfo;
+class IServerGameState;
 
 class XRNETSERVER_API 
 IPureServer
@@ -284,6 +286,16 @@ public:
 
 	const shared_str&		GetConnectOptions	() const {return connect_options;}
 
+    virtual IServerGameState *GetGameState() = 0;
+    virtual u16 PerformIDgen(u16 ID) = 0;
+    virtual void FreeID(u16 ID, u32 time) = 0;
+
+    virtual CSE_Abstract *entity_Create(LPCSTR name) = 0;
+    virtual void entity_Destroy(CSE_Abstract *&entity) = 0;
+
+    virtual void Perform_destroy(CSE_Abstract *entity, u32 mode) = 0;
+    virtual CSE_Abstract *Process_spawn(NET_Packet &packet, ClientID sender, BOOL mainEntityAsParent = FALSE,
+        CSE_Abstract* currentEntity = nullptr) = 0;
 
 private:
 #ifdef DEBUG

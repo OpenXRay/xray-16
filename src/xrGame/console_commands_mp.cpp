@@ -125,8 +125,8 @@ public:
 		if (!OnServer())			return;
 		if(Level().Server)
 		{
-			Level().Server->game->round_end_reason = eRoundEnd_GameRestarted;
-			Level().Server->game->OnRoundEnd();
+			Level().Server->GetGameState()->SetRoundResult(eRoundEnd_GameRestarted);
+			Level().Server->GetGameState()->OnRoundEnd();
 		}
 	}
 	virtual void	Info	(TInfo& I){xr_strcpy(I,"restart game");}
@@ -141,8 +141,8 @@ public:
 									return;
 		if(Level().Server)
 		{
-			Level().Server->game->round_end_reason = eRoundEnd_GameRestartedFast;
-			Level().Server->game->OnRoundEnd();
+			Level().Server->GetGameState()->SetRoundResult(eRoundEnd_GameRestartedFast);
+			Level().Server->GetGameState()->OnRoundEnd();
 		}
 	}
 	virtual void	Info			(TInfo& I) {xr_strcpy(I,"restart game fast");}
@@ -397,7 +397,7 @@ public:
 					CCC_KickPlayerByID	(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = false; };
 	virtual void	Execute				(LPCSTR args) 
 	{
-		if (!g_pGameLevel || !Level().Server || !Level().Server->game) return;
+		if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState()) return;
 		
 		u32 len	= xr_strlen(args);
 		if ((len == 0) || (len >= 128))		//one digit and raid:%u
@@ -485,7 +485,7 @@ public:
 	CCC_MakeScreenshot (LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
 	virtual void	Execute		(LPCSTR args_) 
 	{
-		if (!g_pGameLevel || !Level().Server || !Level().Server->game) return;
+		if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState()) return;
 		u32 len	= xr_strlen(args_);
 		if ((len == 0) || (len >= 256))		//two digits and raid:%u
 			return;
@@ -532,7 +532,7 @@ public:
 	CCC_MakeConfigDump(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
 	virtual void	Execute		(LPCSTR args_) 
 	{
-		if (!g_pGameLevel || !Level().Server || !Level().Server->game) return;
+		if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState()) return;
 		u32 len	= xr_strlen(args_);
 		if ((len == 0) || (len >= 256))		//two digits and raid:%u
 			return;
@@ -886,8 +886,8 @@ public:
 	CCC_BanPlayerByCDKEY (LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
 	virtual void	Execute		(LPCSTR args_) 
 	{
-		if (!g_pGameLevel || !Level().Server || !Level().Server->game) return;
-		game_sv_mp*	tmp_sv_game = smart_cast<game_sv_mp*>(Level().Server->game);
+		if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState()) return;
+		game_sv_mp*	tmp_sv_game = smart_cast<game_sv_mp*>(Level().Server->GetGameState());
 		if (!tmp_sv_game) return;
 
 		u32 len	= xr_strlen(args_);
@@ -951,8 +951,8 @@ public:
 	CCC_BanPlayerByCDKEYDirectly (LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
 	virtual void	Execute		(LPCSTR args_) 
 	{
-		if (!g_pGameLevel || !Level().Server || !Level().Server->game) return;
-		game_sv_mp*	tmp_sv_game = smart_cast<game_sv_mp*>(Level().Server->game);
+		if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState()) return;
+		game_sv_mp*	tmp_sv_game = smart_cast<game_sv_mp*>(Level().Server->GetGameState());
 		if (!tmp_sv_game) return;
 
 		u32 len	= xr_strlen(args_);
@@ -987,8 +987,8 @@ public:
 	CCC_UnBanPlayerByIndex(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
 	virtual void	Execute		(LPCSTR args_) 
 	{
-		if (!g_pGameLevel || !Level().Server || !Level().Server->game) return;
-		game_sv_mp*	tmp_sv_game = smart_cast<game_sv_mp*>(Level().Server->game);
+		if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState()) return;
+		game_sv_mp*	tmp_sv_game = smart_cast<game_sv_mp*>(Level().Server->GetGameState());
 		if (!tmp_sv_game) return;
 		u32 len	= xr_strlen(args_);
 		if ((len == 0) || (len >= 64))		//one digit and raid:%u
@@ -1028,7 +1028,7 @@ public:
 					CCC_BanPlayerByName	(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = false; };
 	virtual void	Execute				(LPCSTR args_) 
 	{
-		if (!g_pGameLevel || !Level().Server || !Level().Server->game) return;
+		if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState()) return;
 		string4096				buff;
 		xr_strcpy					(buff, args_);
 		u32 len					= xr_strlen(buff);
@@ -1164,9 +1164,9 @@ public:
 					CCC_ListPlayers	(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
 	virtual void	Execute			(LPCSTR args) 
 	{
-		if (!g_pGameLevel || !Level().Server || !Level().Server->game) return;
+		if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState()) return;
 
-		u32	cnt = Level().Server->game->get_players_count();
+		u32	cnt = Level().Server->GetGameState()->get_players_count();
 		Msg("- Total Players : %d", cnt);
 		Msg("- ----player list begin-----");
 		struct PlayersEnumerator
@@ -1287,8 +1287,8 @@ public:
 					CCC_ListPlayers_Banned	(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
 	virtual void	Execute					(LPCSTR args) 
 	{
-		if (!g_pGameLevel || !Level().Server || !Level().Server->game) return;
-		game_sv_mp*	tmp_sv_game = smart_cast<game_sv_mp*>(Level().Server->game);
+		if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState()) return;
+		game_sv_mp*	tmp_sv_game = smart_cast<game_sv_mp*>(Level().Server->GetGameState());
 		if (!tmp_sv_game) return;
 		string512 tmp_dest;
 		string512 filter_dest = "";
@@ -1395,9 +1395,9 @@ public:
 
 	virtual void	fill_tips(vecTips& tips, u32 mode)
 	{
-		if ( g_pGameLevel && Level().Server && OnServer() && Level().Server->game )
+		if ( g_pGameLevel && Level().Server && OnServer() && Level().Server->GetGameState())
 		{
-			EGameIDs type = Level().Server->game->Type();
+			EGameIDs type = Level().Server->GetGameState()->Type();
 			TStatus  str;
 			xr_sprintf( str, sizeof(str), "%s  (current game type)  [dm,tdm,ah,cta]", GameTypeToString( type, true ) );
 			tips.push_back( str );
@@ -1429,7 +1429,7 @@ public:
 		);
 
 		string1024		argsNew;
-		xr_sprintf		(argsNew, "%s %s %s", LevelName, LevelVersion, Level().Server->game->type_name());
+		xr_sprintf		(argsNew, "%s %s %s", LevelName, LevelVersion, Level().Server->GetGameState()->type_name());
 
 		CCC_ChangeLevelGameType::Execute((LPCSTR)argsNew);
 	};
@@ -1442,7 +1442,7 @@ public:
 	CCC_AddMap(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = false; };
 	virtual void Execute(LPCSTR args) 
 	{
-		if (!g_pGameLevel || !Level().Server || !Level().Server->game) return;
+		if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState()) return;
 
 		string512	MapName, MapVer;
 		LPCSTR c	= strstr(args, "/ver=");
@@ -1454,7 +1454,7 @@ public:
 			xr_strcpy	(MapVer, sizeof(MapVer), c+5);
 		}
 
-		Level().Server->game->MapRotation_AddMap(MapName, MapVer);
+		Level().Server->GetGameState()->MapRotation_AddMap(MapName, MapVer);
 	};
 
 	virtual void	Info	(TInfo& I)		
@@ -1468,8 +1468,8 @@ public:
 					CCC_ListMaps	(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
 	virtual void	Execute			(LPCSTR args) 
 	{
-		if (!g_pGameLevel || !Level().Server || !Level().Server->game) return;
-		Level().Server->game->MapRotation_ListMaps();
+		if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState()) return;
+		Level().Server->GetGameState()->MapRotation_ListMaps();
 	};
 
 	virtual void	Info	(TInfo& I){xr_strcpy(I,"List maps in map rotation list"); }
@@ -1482,7 +1482,7 @@ public:
 	{
 		if (!OnServer())	return;
 
-		Level().Server->game->OnNextMap();
+		Level().Server->GetGameState()->OnNextMap();
 	};
 
 	virtual void	Info	(TInfo& I){xr_strcpy(I,"Switch to Next Map in map rotation list"); }
@@ -1495,7 +1495,7 @@ public:
 	{
 		if (!OnServer())	return;
 
-		Level().Server->game->OnPrevMap();
+		Level().Server->GetGameState()->OnPrevMap();
 	};
 
 	virtual void	Info	(TInfo& I)	{xr_strcpy(I,"Switch to Previous Map in map rotation list"); }
@@ -1508,7 +1508,7 @@ public:
 	{
 		if (!OnServer())		return;
 
-		game_sv_Deathmatch* gameDM = smart_cast<game_sv_Deathmatch *>(Level().Server->game);
+		game_sv_Deathmatch* gameDM = smart_cast<game_sv_Deathmatch *>(Level().Server->GetGameState());
 		if (!gameDM) return;
 
 		gameDM->StartAnomalies( atol(args) );
@@ -1565,25 +1565,25 @@ public:
 			return;
 		}
 
-		if (!Level().Server->game->IsVotingEnabled())
+		if (!Level().Server->GetGameState()->IsVotingEnabled())
 		{
 			Msg("! Voting is disabled by server!");
 			return;
 		}
 
-		if (!Level().Server->game->IsVotingActive())
+		if (!Level().Server->GetGameState()->IsVotingActive())
 		{
 			Msg("! Currently there is no active voting!");
 			return;
 		}
 
-		if (Level().Server->game->Phase() != GAME_PHASE_INPROGRESS)
+		if (Level().Server->GetGameState()->Phase() != GAME_PHASE_INPROGRESS)
 		{
 			Msg("! Voting is allowed only when game is in progress!");
 			return;
 		};
 
-		Level().Server->game->OnVoteStop();
+		Level().Server->GetGameState()->OnVoteStop();
 	};
 
 	virtual void	Info	(TInfo& I)	{xr_strcpy(I,"Stops Current Voting"); };
@@ -1675,12 +1675,12 @@ public:
 		if (!Level().Server)
 			return;
 
-		if (!Level().Server->game)
+		if (!Level().Server->GetGameState())
 			return;
 
-		float eFactor = Level().Server->game->GetEnvironmentGameTimeFactor();
-		Level().Server->game->SetEnvironmentGameTimeFactor(NewTime,eFactor);
-		Level().Server->game->SetGameTimeFactor(NewTime,g_fTimeFactor);
+		float eFactor = Level().Server->GetGameState()->GetEnvironmentGameTimeFactor();
+		Level().Server->GetGameState()->SetEnvironmentGameTimeFactor(NewTime,eFactor);
+		Level().Server->GetGameState()->SetGameTimeFactor(NewTime,g_fTimeFactor);
 	}
 };
 class CCC_SetWeather : public IConsole_Command {
@@ -1706,7 +1706,7 @@ public:
 	virtual void	Execute				(LPCSTR args) {
 		if (!Level().Server)
 			return;
-		game_sv_mp* sv_game = smart_cast<game_sv_mp*>(Level().Server->game);
+		game_sv_mp* sv_game = smart_cast<game_sv_mp*>(Level().Server->GetGameState());
 		if (!sv_game)
 		{
 			Msg("! Server multiplayer game instance not present");
@@ -1732,7 +1732,7 @@ public:
 		if (!OnServer())						return;
 		if (GameID() != eGameIDArtefactHunt)		return;
 
-		game_sv_ArtefactHunt* g = smart_cast<game_sv_ArtefactHunt*>(Level().Server->game);
+		game_sv_ArtefactHunt* g = smart_cast<game_sv_ArtefactHunt*>(Level().Server->GetGameState());
 		g->MoveAllAlivePlayers();
 	}
 };
@@ -1760,7 +1760,7 @@ public:
 	{
 		if (!OnServer())	return;
 
-		game_sv_mp* pGameMP		= smart_cast<game_sv_Deathmatch *>(Level().Server->game);
+		game_sv_mp* pGameMP		= smart_cast<game_sv_Deathmatch *>(Level().Server->GetGameState());
 		if (!pGameMP)		return;
 
 		string512			Team = "";
@@ -1801,9 +1801,9 @@ public:
 	  {
 		  CCC_Integer::Execute(args);
 
-		  if (!g_pGameLevel || !Level().Server || !Level().Server->game) return;
+		  if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState()) return;
 
-		  Level().Server->game->signal_Syncronize();
+		  Level().Server->GetGameState()->signal_Syncronize();
 	  }
 };
 
@@ -1814,8 +1814,8 @@ public:
 	  virtual void	Execute	(LPCSTR args)
 	  {
 		  CCC_Float::Execute(args);
-		  if (!g_pGameLevel || !Level().Server || !Level().Server->game) return;
-		  Level().Server->game->signal_Syncronize();
+		  if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState()) return;
+		  Level().Server->GetGameState()->signal_Syncronize();
 	  }
 };
 class CCC_RadminCmd: public IConsole_Command
@@ -1870,10 +1870,10 @@ public:
 					CCC_SwapTeams(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
 	virtual void	Execute(LPCSTR args) {
 		if (!OnServer()) return;
-		if(Level().Server && Level().Server->game) 
+		if(Level().Server && Level().Server->GetGameState())
 		{
-			game_sv_TeamDeathmatch* tdmGame = smart_cast<game_sv_TeamDeathmatch*>(Level().Server->game);
-			game_sv_CaptureTheArtefact* ctaGame = smart_cast<game_sv_CaptureTheArtefact*>(Level().Server->game);
+			game_sv_TeamDeathmatch* tdmGame = smart_cast<game_sv_TeamDeathmatch*>(Level().Server->GetGameState());
+			game_sv_CaptureTheArtefact* ctaGame = smart_cast<game_sv_CaptureTheArtefact*>(Level().Server->GetGameState());
 			if (tdmGame)
 			{
 				BOOL old_team_swap = g_sv_tdm_bAutoTeamSwap;
@@ -1888,8 +1888,8 @@ public:
 				Msg("! Current game type not support team swapping");
 				return;
 			}
-			Level().Server->game->round_end_reason = eRoundEnd_GameRestartedFast;
-			Level().Server->game->OnRoundEnd();
+			Level().Server->GetGameState()->SetRoundResult(eRoundEnd_GameRestartedFast);
+			Level().Server->GetGameState()->OnRoundEnd();
 		}
 	}
 	virtual void	Info	(TInfo& I){xr_strcpy(I,"swap teams for artefacthunt game"); }
@@ -1900,7 +1900,7 @@ public:
 					CCC_SvStatus(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
 	virtual void	Execute(LPCSTR args) {
 		if (!OnServer()) return;
-		if(Level().Server && Level().Server->game) 
+		if(Level().Server && Level().Server->GetGameState())
 		{
 			Console->Execute		("cfg_load all_server_settings");
 		}
@@ -1913,9 +1913,9 @@ public:
 					CCC_SvChat(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = false; };
 	virtual void	Execute(LPCSTR args) {
 		if (!OnServer())	return;
-		if(Level().Server && Level().Server->game) 
+		if(Level().Server && Level().Server->GetGameState())
 		{
-			game_sv_mp* game = smart_cast<game_sv_mp*>(Level().Server->game);
+			game_sv_mp* game = smart_cast<game_sv_mp*>(Level().Server->GetGameState());
 			if ( game )
 			{
 				LPSTR msg;
@@ -1935,9 +1935,9 @@ public:
 					CCC_MpStatistics(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
 	virtual void	Execute(LPCSTR args) {
 		if (!OnServer()) return;
-		if(Level().Server && Level().Server->game) 
+		if(Level().Server && Level().Server->GetGameState())
 		{
-			Level().Server->game->DumpOnlineStatistic	();
+			Level().Server->GetGameState()->DumpOnlineStatistic	();
 		}
 	}
 	virtual void	Info	(TInfo& I){xr_strcpy(I,"Shows current server settings"); }

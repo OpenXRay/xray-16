@@ -487,7 +487,7 @@ void CBaseMonster::settings_overrides()
 void CBaseMonster::on_before_sell	(CInventoryItem *item)
 {
 	// since there can be only single item in the monster inventory
-	CSE_Abstract					*object	= Level().Server->game->get_entity_from_eid(item->object().ID()); 
+	CSE_Abstract					*object	= Level().Server->GetGameState()->get_entity_from_eid(item->object().ID());
 	VERIFY							(object);
 	CSE_ALifeObject					*alife_object = smart_cast<CSE_ALifeObject*>(object);
 	if (alife_object)

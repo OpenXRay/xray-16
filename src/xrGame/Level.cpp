@@ -677,7 +677,7 @@ void CLevel::OnRender()
             }
         }
         //  [7/5/2005]
-        if (Server && Server->game) Server->game->OnRender();
+        if (Server && Server->GetGameState()) Server->GetGameState()->OnRender();
         //  [7/5/2005]
         ObjectSpace.dbgRender();
         UI().Font().pFontStat->OutSet(170, 630);

@@ -28,6 +28,27 @@
 #include "danger_object.h"
 #include "smart_cover_object.h"
 
+// XXX nitrocaster: workaround for avoiding the following unresolved externals (VS2015 Update 1 RC)
+// luabind::detail::enum_converter<lua_to_cpp>::apply<PatrolPathManager::EPatrolRouteType>
+// luabind::detail::enum_converter<lua_to_cpp>::apply<PatrolPathManager::EPatrolStartType>
+namespace luabind
+{
+namespace detail
+{
+using namespace PatrolPathManager;
+
+    template<>
+    EPatrolRouteType enum_converter<lua_to_cpp>::apply<EPatrolRouteType>(
+        lua_State* L, by_value<EPatrolRouteType>, int index)
+    { return static_cast<EPatrolRouteType>(static_cast<int>(lua_tonumber(L, index))); }
+
+    template<>
+    EPatrolStartType enum_converter<lua_to_cpp>::apply<EPatrolStartType>(
+        lua_State* L, by_value<EPatrolStartType>, int index)
+    { return static_cast<EPatrolStartType>(static_cast<int>(lua_tonumber(L, index))); }
+}
+}
+
 using namespace luabind;
 
 extern CScriptActionPlanner *script_action_planner(CScriptGameObject *obj);

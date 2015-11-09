@@ -71,7 +71,7 @@ protected:
 #endif
 /**/
 public:
-						CALifeCommunicationManager		(xrServer *server, LPCSTR section);
+						CALifeCommunicationManager		(IPureServer *server, LPCSTR section);
 /**
 	virtual				~CALifeCommunicationManager		();
 			void		communicate_with_customer		(CSE_ALifeHumanAbstract		*tpALifeHumanAbstract,		CSE_ALifeTrader			*tpALifeTrader);

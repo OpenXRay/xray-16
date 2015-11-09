@@ -235,9 +235,9 @@ void CLevel::SimulateServerUpdate()
 
 void CLevel::SpawnDemoSpectator()
 {
-	R_ASSERT(Server && Server->game);
+	R_ASSERT(Server && Server->GetGameState());
 	m_current_spectator = NULL;
-	game_sv_mp*	tmp_sv_game		= smart_cast<game_sv_mp*>(Server->game);
+	game_sv_mp*	tmp_sv_game		= smart_cast<game_sv_mp*>(Server->GetGameState());
 	game_cl_mp*	mp_cl_game		= smart_cast<game_cl_mp*>(Level().game);
 
 	CSE_Spectator* specentity = smart_cast<CSE_Spectator*>(
