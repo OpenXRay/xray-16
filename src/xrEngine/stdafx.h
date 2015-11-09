@@ -19,14 +19,6 @@
 #include "xrCore/xrCore.h"
 #include "Include/xrAPI/xrAPI.h"
 
-#ifdef _DEBUG
-# define D3D_DEBUG_INFO
-#endif
-
-#pragma warning(disable:4995)
-#include <d3d9.h>
-#pragma warning(default:4995)
-
 #define ECORE_API
 
 // Our headers
@@ -50,7 +42,6 @@ extern ENGINE_API CInifile* pGameIni;
 #pragma comment(lib, "xrScriptEngine.lib")
 #pragma comment( lib, "xrAPI.lib" )
 #pragma comment( lib, "winmm.lib" )
-#pragma comment( lib, "d3d9.lib" )
 #pragma comment( lib, "dinput8.lib" )
 #pragma comment( lib, "dxguid.lib" )
 

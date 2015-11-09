@@ -4,6 +4,10 @@
 
 #pragma once
 
+#ifdef _DEBUG
+#      define D3D_DEBUG_INFO
+#endif
+
 #pragma warning(disable:4995)
 #include "xrEngine/stdafx.h"
 #pragma warning(disable:4995)
@@ -13,6 +17,8 @@
 #pragma warning( 4 : 4018 )
 #pragma warning( 4 : 4244 )
 #pragma warning(disable:4237)
+
+#pragma comment( lib, "d3d9.lib" )
 
 #include <D3D11.h>
 #include <D3Dx11core.h>

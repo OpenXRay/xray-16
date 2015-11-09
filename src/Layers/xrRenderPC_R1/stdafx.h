@@ -1,12 +1,20 @@
 #pragma once
+
+#ifdef _DEBUG
+#      define D3D_DEBUG_INFO
+#endif
+
 #pragma warning(disable:4995)
 #include "xrEngine/stdafx.h"
 #pragma warning(disable:4995)
+#include <d3d9.h>
 #include <d3dx9.h>
 #pragma warning(default:4995)
 #pragma warning(disable:4714)
 #pragma warning( 4 : 4018 )
 #pragma warning( 4 : 4244 )
+
+#pragma comment( lib, "d3d9.lib" )
 
 #include "Layers/xrRender/xrD3DDefs.h"
 #include "Layers/xrRender/HW.h"
