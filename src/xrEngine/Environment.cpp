@@ -469,17 +469,6 @@ void CEnvironment::SelectEnvs(float gt)
     }
 }
 
-int get_ref_count(IUnknown* ii)
-{
-    if (ii)
-    {
-        ii->AddRef();
-        return ii->Release();
-    }
-    else
-        return 0;
-}
-
 void CEnvironment::lerp(float& current_weight)
 {
     if (bWFX && (wfx_time <= 0.f)) StopWFX();
