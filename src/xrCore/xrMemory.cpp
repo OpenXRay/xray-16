@@ -37,9 +37,9 @@ XRCORE_API void dump_phase()
 
 xrMemory::xrMemory()
 #ifdef DEBUG_MEMORY_MANAGER
-# ifdef PROFILE_CRITICAL_SECTIONS
+# ifdef CONFIG_PROFILE_LOCKS
     :debug_cs(MUTEX_PROFILE_ID(xrMemory))
-# endif // PROFILE_CRITICAL_SECTIONS
+# endif // CONFIG_PROFILE_LOCKS
 #endif // DEBUG_MEMORY_MANAGER
 {
 #ifdef DEBUG_MEMORY_MANAGER

@@ -10,9 +10,9 @@
 #endif
 int			psSkeletonUpdate	= 32;
 Lock	UCalc_Mutex
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 	(MUTEX_PROFILE_ID(UCalc_Mutex))
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
 ;
 
 #ifndef _EDITOR

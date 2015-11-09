@@ -103,16 +103,16 @@ void SBullet::Init(const Fvector& position,
 
 
 CBulletManager::CBulletManager()
-#if 0//def PROFILE_CRITICAL_SECTIONS
+#if 0//def CONFIG_PROFILE_LOCKS
 	: m_Lock(MUTEX_PROFILE_ID(CBulletManager))
 #	ifdef DEBUG
 		,m_thread_id(GetCurrentThreadId())
 #	endif // #ifdef DEBUG
-#else // #ifdef PROFILE_CRITICAL_SECTIONS
+#else // #ifdef CONFIG_PROFILE_LOCKS
 #	ifdef DEBUG
 		: m_thread_id(GetCurrentThreadId())
 #	endif // #ifdef DEBUG
-#endif // #ifdef PROFILE_CRITICAL_SECTIONS
+#endif // #ifdef CONFIG_PROFILE_LOCKS
 {
 	m_Bullets.clear			();
 	m_Bullets.reserve		(100);

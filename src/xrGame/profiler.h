@@ -17,9 +17,9 @@
 #ifdef USE_PROFILER
 #	include "ai_debug.h"
 
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 	extern void add_profile_portion(LPCSTR id, const u64 &time);
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
 
 #pragma pack(push,4)
 struct CProfileResultPortion {

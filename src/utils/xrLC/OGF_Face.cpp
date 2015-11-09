@@ -257,9 +257,9 @@ void OGF::Optimize	()
 
 // Make Progressive
 Lock			progressive_cs
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 	(MUTEX_PROFILE_ID(progressive_cs))
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
 ;
 void OGF::MakeProgressive	(float metric_limit)
 {

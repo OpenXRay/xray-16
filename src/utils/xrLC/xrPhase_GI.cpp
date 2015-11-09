@@ -18,9 +18,9 @@ const	u32				gi_maxlevel			= 4;
 //////////////////////////////////////////////////////////////////////////
 static xr_vector<R_Light>*		task;
 Lock		task_cs
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 	(MUTEX_PROFILE_ID(task_cs))
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
 ;
 static u32						task_it;
 

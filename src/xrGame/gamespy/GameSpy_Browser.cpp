@@ -14,9 +14,9 @@ void __cdecl SBCallback(ServerBrowser sb, SBCallbackReason reason, SBServer serv
 EGameIDs ParseStringToGameType(LPCSTR str);
 
 CGameSpy_Browser::CGameSpy_Browser()
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 	:m_refresh_lock(MUTEX_PROFILE_ID(CGameSpy_Browser::m_refresh_lock))
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
 
 {
 	//-------------------------
@@ -37,9 +37,9 @@ CGameSpy_Browser::CGameSpy_Browser()
 };
 
 CGameSpy_Browser::CGameSpy_Browser(HMODULE hGameSpyDLL)
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 	:m_refresh_lock(MUTEX_PROFILE_ID(CGameSpy_Browser::m_refresh_lock))
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
 
 {
 	//-------------------------

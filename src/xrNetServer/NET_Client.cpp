@@ -121,9 +121,9 @@ void	dump_URL	(LPCSTR p, IDirectPlay8Address* A)
 
 // 
 INetQueue::INetQueue()		
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 	:cs(MUTEX_PROFILE_ID(INetQueue))
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
 {
 	unused.reserve	(128);
 	for (int i=0; i<16; i++)
@@ -341,9 +341,9 @@ IPureClient::_Recieve( const void* data, u32 data_size, u32 /*param*/ )
 //==============================================================================
 
 IPureClient::IPureClient	(CTimer* timer): net_Statistic(timer)
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 	,net_csEnumeration(MUTEX_PROFILE_ID(IPureClient::net_csEnumeration))
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
 {
 	NET						= NULL;
 	net_Address_server		= NULL;

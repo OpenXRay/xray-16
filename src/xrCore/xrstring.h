@@ -50,9 +50,9 @@ public:
     void dump(IWriter* W);
     void verify();
     u32 stat_economy();
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
     str_container ():cs(MUTEX_PROFILE_ID(str_container)) {}
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
 };
 XRCORE_API extern str_container* g_pStringContainer;
 

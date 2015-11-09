@@ -4,9 +4,9 @@
 
 // 
 GameEventQueue::GameEventQueue()		
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 	:cs(MUTEX_PROFILE_ID(GameEventQueue))
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
 {
 	unused.reserve	(128);
 	for (int i=0; i<16; i++)

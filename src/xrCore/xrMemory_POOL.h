@@ -23,9 +23,9 @@ private:
 public:
     void _initialize(u32 _element, u32 _sector, u32 _header);
 
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
     ICF MEMPOOL() : cs(MUTEX_PROFILE_ID(memory_pool)) {}
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
 
     ICF u32 get_block_count() { return block_count; }
     ICF u32 get_element() { return s_element; }

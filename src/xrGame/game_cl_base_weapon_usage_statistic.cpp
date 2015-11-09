@@ -404,9 +404,9 @@ void Player_Statistic::net_load(NET_Packet* P)
 };
 
 WeaponUsageStatistic::WeaponUsageStatistic()
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 	: m_mutex(MUTEX_PROFILE_ID(WeaponUsageStatistic)){}
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
 {
 	Clear						();
 	m_dwUpdateTimeDelta			= 30000; //30 seconds

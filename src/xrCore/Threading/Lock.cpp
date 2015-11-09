@@ -2,7 +2,7 @@
 #include "Lock.hpp"
 #include <windows.h>
 
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 static add_profile_portion_callback add_profile_portion = 0;
 void set_add_profile_portion(add_profile_portion_callback callback)
 {
@@ -32,9 +32,9 @@ struct profiler
         (*add_profile_portion)(m_timer_id, time - m_time);
     }
 };
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
 
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 Lock::Lock(const char *id) : id(id)
 #else
 Lock::Lock()
@@ -49,14 +49,14 @@ extern void OutputDebugStackTrace(const char *header);
 
 void Lock::Enter()
 {
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 # if 0//def DEBUG
     static bool show_call_stack = false;
     if (show_call_stack)
         OutputDebugStackTrace("----------------------------------------------------");
 # endif // DEBUG
     profiler temp(id);
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
     EnterCriticalSection(&cs);
 }
 

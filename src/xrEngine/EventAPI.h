@@ -25,9 +25,9 @@ private:
     xr_vector<Deferred> Events_Deferred;
     Lock CS;
 public:
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
     CEventAPI () : CS(MUTEX_PROFILE_ID(CEventAPI)) {}
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
     EVENT Create(const char* N);
     void Destroy(EVENT& E);
 

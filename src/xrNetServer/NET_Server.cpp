@@ -209,10 +209,10 @@ IPureServer::_Recieve( const void* data, u32 data_size, u32 param )
 
 IPureServer::IPureServer	(CTimer* timer, BOOL	Dedicated)
 	:	m_bDedicated(Dedicated)
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 	,csPlayers(MUTEX_PROFILE_ID(IPureServer::csPlayers))
 	,csMessage(MUTEX_PROFILE_ID(IPureServer::csMessage))
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
 {
 	device_timer			= timer;
 	stats.clear				();

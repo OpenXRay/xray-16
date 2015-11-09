@@ -37,9 +37,9 @@ BOOL APIENTRY DllMain( HANDLE hModule,
 
 // Model building
 MODEL::MODEL	()
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 	:cs(MUTEX_PROFILE_ID(MODEL))
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
 {
 	tree		= 0;
 	tris		= 0;

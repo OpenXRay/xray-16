@@ -12,11 +12,11 @@ extern BOOL LogExecCB = TRUE;
 static string_path logFName = "engine.log";
 static string_path log_file_name = "engine.log";
 static BOOL no_log = TRUE;
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 static Lock logCS(MUTEX_PROFILE_ID(log));
-#else // PROFILE_CRITICAL_SECTIONS
+#else // CONFIG_PROFILE_LOCKS
 static Lock logCS;
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
 xr_vector<shared_str>* LogFile = NULL;
 static LogCallback LogCB = 0;
 

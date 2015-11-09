@@ -22,9 +22,9 @@ extern LPCSTR generate_temp_file_name			(LPCSTR header0, LPCSTR header1, string_
 #define NO_MULTITHREADING
 
 CGameSpawnConstructor::CGameSpawnConstructor	(LPCSTR name, LPCSTR output, LPCSTR start, bool no_separator_check) :
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 	m_critical_section(MUTEX_PROFILE_ID(CGameSpawnConstructor)),
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
     m_thread_manager(ProxyStatus, ProxyProgress)
 {
 	load_spawns						(name,no_separator_check);

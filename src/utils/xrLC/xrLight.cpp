@@ -12,9 +12,9 @@
 #include "utils/xrLC_Light/lcnet_task_manager.h"
 #include "utils/xrLC_Light/mu_model_light.h"
 Lock	task_CS
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 	(MUTEX_PROFILE_ID(task_C_S))
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
 ;
 
 xr_vector<int>		task_pool;

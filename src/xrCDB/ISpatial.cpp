@@ -143,9 +143,9 @@ void			ISpatial_NODE::_remove			(ISpatial* S)
 //////////////////////////////////////////////////////////////////////////
 
 ISpatial_DB::ISpatial_DB(const char *name)
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
 	:cs(MUTEX_PROFILE_ID(ISpatial_DB))
-#endif // PROFILE_CRITICAL_SECTIONS
+#endif // CONFIG_PROFILE_LOCKS
 {
 	m_root					= NULL;
     xr_strcpy(Name, name);

@@ -14,7 +14,7 @@ private:
     HWND hwPText = 0;
     HWND hwPhaseTime = 0;
     Lock csLog
-#ifdef PROFILE_CRITICAL_SECTIONS
+#ifdef CONFIG_PROFILE_LOCKS
         (MUTEX_PROFILE_ID(csLog))
 #endif
     ;
