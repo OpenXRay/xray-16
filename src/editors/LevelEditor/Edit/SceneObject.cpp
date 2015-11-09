@@ -131,7 +131,7 @@ void CSceneObject::RenderBlink()
     if (m_iBlinkTime>0){
         if (m_iBlinkTime>(int)EDevice.dwTimeGlobal){
         	int alpha = iFloor(sqrtf(float(m_iBlinkTime-EDevice.dwTimeGlobal)/BLINK_TIME)*64);
-			m_pReference->RenderSelection(_Transform(),0, m_BlinkSurf, D3DCOLOR_ARGB(alpha,255,255,255));
+			m_pReference->RenderSelection(_Transform(),0, m_BlinkSurf, color_argb(alpha,255,255,255));
             UI->RedrawScene	();
         }else{
             m_iBlinkTime 	= 0;

@@ -617,7 +617,7 @@ void CCharacterPhysicsSupport::in_UpdateCL( )
 				DBG_PhysBones( m_EntityAlife );
 
 	if( dbg_draw_character_physics && m_pPhysicsShell )
-				m_pPhysicsShell->dbg_draw_geometry( 0.2f, D3DCOLOR_ARGB( 100 ,255, 0, 0 ) );
+				m_pPhysicsShell->dbg_draw_geometry( 0.2f, color_argb( 100 ,255, 0, 0 ) );
 #endif
 	update_animation_collision();
 	m_character_shell_control.CalculateTimeDelta( );

@@ -46,7 +46,7 @@ BOOL CCF_DynamicMesh::_RayQuery(const collide::ray_defs& Q, collide::rq_results&
             if (res)
             {
                 ph_debug_render->open_cashed_draw();
-                ph_debug_render->draw_tri(br.tri[0], br.tri[1], br.tri[2], D3DCOLOR_ARGB(50, 255, 0, 0), 0);
+                ph_debug_render->draw_tri(br.tri[0], br.tri[1], br.tri[2], color_argb(50, 255, 0, 0), 0);
                 ph_debug_render->close_cashed_draw(50000);
             }
 #endif
