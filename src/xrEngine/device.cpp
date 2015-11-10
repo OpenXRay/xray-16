@@ -9,8 +9,6 @@
 #define MMNOMIXER
 #define MMNOJOY
 #include <mmsystem.h>
-// d3dx9.h
-#include <d3dx9.h>
 #pragma warning(default:4995)
 
 #include "x_ray.h"
@@ -28,8 +26,6 @@
 #include "xrSash.h"
 #include "IGame_Persistent.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
-
-#pragma comment( lib, "d3dx9.lib" )
 
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
@@ -232,7 +228,7 @@ void CRenderDevice::on_idle()
     // Matrices
     mFullTransform.mul(mProject, mView);
     GlobalEnv.Render->SetCacheXform(mView, mProject);
-    D3DXMatrixInverse((D3DXMATRIX*)&mInvFullTransform, 0, (D3DXMATRIX*)&mFullTransform);
+    mInvFullTransform.invert(mFullTransform);
     vCameraPosition_saved = vCameraPosition;
     mFullTransform_saved = mFullTransform;
     mView_saved = mView;
