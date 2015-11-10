@@ -251,15 +251,10 @@
     <ClInclude Include="..\xrServerEntities\inventory_space.h" />
     <ClInclude Include="..\xrServerEntities\ItemListTypes.h" />
     <ClInclude Include="..\xrServerEntities\LevelGameDef.h" />
-    <ClInclude Include="..\xrServerEntities\object_broker.h" />
-    <ClInclude Include="..\xrServerEntities\object_cloner.h" />
-    <ClInclude Include="..\xrServerEntities\object_comparer.h" />
-    <ClInclude Include="..\xrServerEntities\object_destroyer.h" />
     <ClInclude Include="..\xrServerEntities\object_factory.h" />
     <ClInclude Include="..\xrServerEntities\object_factory_impl.h" />
     <ClInclude Include="..\xrServerEntities\object_factory_inline.h" />
     <ClInclude Include="..\xrServerEntities\object_factory_space.h" />
-    <ClInclude Include="..\xrServerEntities\object_interfaces.h" />
     <ClInclude Include="..\xrServerEntities\object_item_abstract.h" />
     <ClInclude Include="..\xrServerEntities\object_item_abstract_inline.h" />
     <ClInclude Include="..\xrServerEntities\object_item_client_server.h" />
@@ -267,9 +262,6 @@
     <ClInclude Include="..\xrServerEntities\object_item_script.h" />
     <ClInclude Include="..\xrServerEntities\object_item_single.h" />
     <ClInclude Include="..\xrServerEntities\object_item_single_inline.h" />
-    <ClInclude Include="..\xrServerEntities\object_loader.h" />
-    <ClInclude Include="..\xrServerEntities\object_saver.h" />
-    <ClInclude Include="..\xrServerEntities\object_type_traits.h" />
     <ClInclude Include="..\xrServerEntities\pch_script.h" />
     <ClInclude Include="..\xrServerEntities\PHNetState.h" />
     <ClInclude Include="..\xrServerEntities\PropertiesListTypes.h" />
