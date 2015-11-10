@@ -12,10 +12,6 @@
 #include "xrHemisphere.h"
 #include "perlin.h"
 
-#include "xr_input.h"
-
-
-
 #ifndef _EDITOR
 #include "IGame_Level.h"
 #endif
