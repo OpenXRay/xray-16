@@ -2454,9 +2454,6 @@
     <ClInclude Include="damage_manager.h">
       <Filter>AI\AComponents\DamageManager</Filter>
     </ClInclude>
-    <ClInclude Include="damage_manager_inline.h">
-      <Filter>AI\AComponents\DamageManager</Filter>
-    </ClInclude>
     <ClInclude Include="DamageSource.h">
       <Filter>AI\AComponents\DamageManager</Filter>
     </ClInclude>

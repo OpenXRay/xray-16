@@ -28,5 +28,3 @@ private:
 			// init default params
 			void		init_bones		(LPCSTR section, CInifile const * ini);
 };
-
-#include "damage_manager_inline.h"
