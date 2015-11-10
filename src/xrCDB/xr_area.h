@@ -23,7 +23,7 @@ class	XRCDB_API						CObjectSpace
 {
 private:
 	// Debug
-	Lock					Lock;
+	Lock					lock;
 	CDB::MODEL							Static;
 	Fbox								m_BoundingVolume;
 	xrXRC								xrc;				// MT: dangerous
