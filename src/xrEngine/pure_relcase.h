@@ -10,7 +10,7 @@ public:
     pure_relcase(void (xr_stdcall class_type::* function_to_bind)(CObject*))
     {
         R_ASSERT(g_pGameLevel);
-        class_type* self = static_cast<class_type*>(this);
+        class_type* self = reinterpret_cast<class_type*>(this);
         g_pGameLevel->Objects.relcase_register(
             CObjectList::RELCASE_CALLBACK(
                 self,
