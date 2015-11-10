@@ -6,7 +6,7 @@
 #include "PHIsland.h"
 typedef u32	CLClassBits;
 typedef u32	CLBits;
-class ISpatial;
+class SpatialBase;
 DEFINE_VECTOR(ISpatial*,qResultVec,qResultIt)
 class CPHObject;
 class CPHUpdateObject;
@@ -18,7 +18,7 @@ typedef void CollideCallback(CPHObject* obj1,CPHObject* obj2, dGeomID o1, dGeomI
 class IPhysicsShellHolder;
 #endif
 class CPHObject :
-	public ISpatial 
+	public SpatialBase
 {
 #ifdef DEBUG
 	friend struct SPHObjDBGDraw;

@@ -6,7 +6,7 @@
 #include "irenderable.h"
 
 class ENGINE_API CPS_Instance :
-    public ISpatial,
+    public SpatialBase,
     public ISheduled,
     public IRenderable
 {

@@ -9,7 +9,7 @@
 #include "xrCDB/ispatial.h"
 #include "xrCDB/xr_collide_defs.h"
 
-class CGlow				: public IRender_Glow, public ISpatial
+class CGlow				: public IRender_Glow, public SpatialBase
 {
 public:
 	struct {

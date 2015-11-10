@@ -11,7 +11,7 @@
 #endif
 extern CPHWorld* ph_world;
 
-CPHObject::CPHObject	()	: ISpatial(g_SpatialSpacePhysic)
+CPHObject::CPHObject	()	: SpatialBase(g_SpatialSpacePhysic)
 {
 	m_flags.flags	=	0;
 	spatial.type	|=	STYPE_PHYSIC;
@@ -71,7 +71,7 @@ void CPHObject::check_recently_deactivated()
 void CPHObject::spatial_move()
 {
 	get_spatial_params();
-	ISpatial::spatial_move();
+    SpatialBase::spatial_move();
 	m_flags.set(st_dirty,TRUE);
 }
 
@@ -206,17 +206,17 @@ void CPHObject::UnFreezeContent()
 void CPHObject::spatial_register()
 {
 	get_spatial_params();
-	ISpatial::spatial_register();
+    SpatialBase::spatial_register();
 	m_flags.set(st_dirty,TRUE);
 }
 
 void CPHObject::collision_disable()
 {
-	ISpatial::spatial_unregister();
+    SpatialBase::spatial_unregister();
 }
 void CPHObject::collision_enable()
 {
-	ISpatial::spatial_register();
+    SpatialBase::spatial_register();
 }
 
 void CPHObject::Freeze()

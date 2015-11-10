@@ -157,7 +157,7 @@ const Fbox& CObject::BoundingBox() const { VERIFY2(renderable.visual, *cName());
 // Purpose :
 //----------------------------------------------------------------------
 CObject::CObject() :
-    ISpatial(g_SpatialSpace),
+    SpatialBase(g_SpatialSpace),
     dwFrame_AsCrow(u32(-1))
 {
     // Transform
@@ -363,19 +363,19 @@ void CObject::spatial_register()
 {
     Center(spatial.sphere.P);
     spatial.sphere.R = Radius();
-    ISpatial::spatial_register();
+    SpatialBase::spatial_register();
 }
 
 void CObject::spatial_unregister()
 {
-    ISpatial::spatial_unregister();
+    SpatialBase::spatial_unregister();
 }
 
 void CObject::spatial_move()
 {
     Center(spatial.sphere.P);
     spatial.sphere.R = Radius();
-    ISpatial::spatial_move();
+    SpatialBase::spatial_move();
 }
 
 CObject::SavedPosition CObject::ps_Element(u32 ID) const

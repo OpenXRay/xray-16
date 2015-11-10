@@ -114,8 +114,8 @@ void CAI_Crow::Load( LPCSTR section )
 	//////////////////////////////////////////////////////////////////////////
 	ISpatial*			self = smart_cast<ISpatial*> (this);
 	if (self) {
-		self->spatial.type &=~STYPE_VISIBLEFORAI;
-		self->spatial.type &=~STYPE_REACTTOSOUND;
+		self->GetSpatialData().type &=~STYPE_VISIBLEFORAI;
+		self->GetSpatialData().type &=~STYPE_REACTTOSOUND;
 	}
 	//////////////////////////////////////////////////////////////////////////
 
@@ -178,7 +178,7 @@ void CAI_Crow::switch2_DeathDead()
 {
 	// AI need to pickup this
 	ISpatial*		self				=	smart_cast<ISpatial*> (this);
-	if (self)		self->spatial.type	|=	STYPE_VISIBLEFORAI;	
+	if (self)		self->GetSpatialData().type	|=	STYPE_VISIBLEFORAI;
 	//
 	smart_cast<IKinematicsAnimated*>(Visual())->PlayCycle	(m_Anims.m_death_dead.GetRandom());
 }

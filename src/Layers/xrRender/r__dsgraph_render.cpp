@@ -700,13 +700,13 @@ void	D3DXRenderBase::r_dsgraph_render_subspace	(IRender_Sector* _sector, CFrustu
 		for (u32 o_it=0; o_it<lstRenderables.size(); o_it++)
 		{
 			ISpatial*	spatial		= lstRenderables[o_it];
-			CSector*	sector		= (CSector*)spatial->spatial.sector;
+			CSector*	sector		= (CSector*)spatial->GetSpatialData().sector;
 			if	(0==sector)										continue;	// disassociated from S/P structure
 			if	(PortalTraverser.i_marker != sector->r_marker)	continue;	// inactive (untouched) sector
 			for (u32 v_it=0; v_it<sector->r_frustums.size(); v_it++)
 			{
 				set_Frustum			(&(sector->r_frustums[v_it]));
-				if (!View->testSphere_dirty(spatial->spatial.sphere.P,spatial->spatial.sphere.R))	continue;
+				if (!View->testSphere_dirty(spatial->GetSpatialData().sphere.P,spatial->GetSpatialData().sphere.R))	continue;
 
 				// renderable
 				IRenderable*	renderable		= spatial->dcast_Renderable	();

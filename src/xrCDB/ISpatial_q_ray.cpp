@@ -246,8 +246,8 @@ public:
 		for (; _it!=_end; _it++)
 		{
 			ISpatial*		S	= *_it;
-			if (mask!=(S->spatial.type&mask))	continue;
-			Fsphere&		sS	= S->spatial.sphere;
+			if (mask!=(S->GetSpatialData().type&mask))	continue;
+			Fsphere&		sS	= S->GetSpatialData().sphere;
 			int				quantity;
 			float			afT[2];
 			Fsphere::ERP_Result	result	= sS.intersect(ray.pos,ray.fwd_dir,range,quantity,afT);

@@ -34,10 +34,10 @@ public:
 		for (; _it!=_end; _it++)
 		{
 			ISpatial*		S	= *_it;
-			if (0==(S->spatial.type&mask))	continue;
+			if (0==(S->GetSpatialData().type&mask))	continue;
 
-			Fvector&		sC		= S->spatial.sphere.P;
-			float			sR		= S->spatial.sphere.R;
+			Fvector&		sC		= S->GetSpatialData().sphere.P;
+			float			sR		= S->GetSpatialData().sphere.R;
 			Fbox			sB;		sB.set	(sC.x-sR, sC.y-sR, sC.z-sR, sC.x+sR, sC.y+sR, sC.z+sR);
 			if (!sB.intersect(box))	continue;
 

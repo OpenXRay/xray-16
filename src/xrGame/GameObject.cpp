@@ -88,7 +88,7 @@ void CGameObject::Load(LPCSTR section)
 	if (self)	{
 		// #pragma todo("to Dima: All objects are visible for AI ???")
 		// self->spatial.type	|=	STYPE_VISIBLEFORAI;	
-		self->spatial.type	&= ~STYPE_REACTTOSOUND;
+		self->GetSpatialData().type	&= ~STYPE_REACTTOSOUND;
 	}
 }
 
@@ -265,7 +265,7 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 		cNameVisual_set				(visual_name(E));
 		if (visual->flags.test(CSE_Visual::flObstacle)) {
 			ISpatial				*self = smart_cast<ISpatial*>(this);
-			self->spatial.type		|=	STYPE_OBSTACLE;
+			self->GetSpatialData().type		|=	STYPE_OBSTACLE;
 		}
 	}
 

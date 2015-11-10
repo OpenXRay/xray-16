@@ -71,42 +71,67 @@ class 				ISpatial_DB;
 namespace Feel { class Sound; }
 class 				IRenderable;
 class 				IRender_Light;
-class XRCDB_API				ISpatial
+
+class SpatialData
 {
 public:
-	struct	_spatial
-	{
-		u32						type;
-		Fsphere					sphere;
-		Fvector					node_center;	// Cached node center for TBV optimization
-		float					node_radius;	// Cached node bounds for TBV optimization
-		ISpatial_NODE*			node_ptr;		// Cached parent node for "empty-members" optimization
-		IRender_Sector*			sector;
-		ISpatial_DB*			space;			// allow different spaces
+    u32 type = 0; // STYPE_
+    Fsphere sphere;
+    Fvector node_center; // Cached node center for TBV optimization
+    float node_radius; // Cached node bounds for TBV optimization
+    ISpatial_NODE *node_ptr; // Cached parent node for "empty-members" optimization
+    IRender_Sector *sector;
+    ISpatial_DB *space; // allow different spaces
+};
 
-		_spatial() : type(0)	{}				// safe way to enhure type is zero before any contstructors takes place
-	}							spatial;
+class ISpatial
+{
 public:
-	BOOL						spatial_inside		()			;
-				void			spatial_updatesector_internal()	;
+    virtual ~ISpatial() = 0;
+    virtual SpatialData &GetSpatialData() = 0;
+    virtual bool spatial_inside() = 0;
+    virtual void spatial_register() = 0;
+    virtual void spatial_unregister() = 0;
+    virtual void spatial_move() = 0;
+    virtual Fvector spatial_sector_point() = 0;
+    virtual void spatial_updatesector() = 0;
+    virtual CObject *dcast_CObject() = 0;
+	virtual Feel::Sound *dcast_FeelSound() = 0;
+	virtual IRenderable *dcast_Renderable() = 0;
+	virtual IRender_Light *dcast_Light() = 0;
+};
+
+inline ISpatial::~ISpatial() {}
+
+class XRCDB_API	SpatialBase : public ISpatial
+{
 public:
-	virtual		void			spatial_register	()	;
-	virtual		void			spatial_unregister	()	;
+    SpatialData spatial;
+
+private:
+    void spatial_updatesector_internal();
+
+public:
+    virtual SpatialData &GetSpatialData() override final { return spatial; }
+	virtual bool spatial_inside() override final;
+	virtual void spatial_register() override;
+	virtual void spatial_unregister() override;
 	BENCH_SEC_SCRAMBLEVTBL2
-	virtual		void			spatial_move		()	;
-	virtual		Fvector			spatial_sector_point()	{ return spatial.sphere.P; }
-	ICF			void			spatial_updatesector()	{
+	virtual void spatial_move() override;
+	virtual Fvector spatial_sector_point() override { return spatial.sphere.P; }
+    virtual void spatial_updatesector() override final
+    {
 		if (0== (spatial.type&STYPEFLAG_INVALIDSECTOR))	return;
 		spatial_updatesector_internal				()	;
-	};
+	}
 
-	virtual		CObject*		dcast_CObject		()	{ return 0;	}
-	virtual		Feel::Sound*	dcast_FeelSound		()	{ return 0;	}
-	virtual		IRenderable*	dcast_Renderable	()	{ return 0;	}
-	virtual		IRender_Light*	dcast_Light			()	{ return 0; }
+	virtual CObject *dcast_CObject() override { return 0; }
+	virtual Feel::Sound *dcast_FeelSound() override { return 0; }
+	virtual IRenderable *dcast_Renderable()	override { return 0; }
+	virtual IRender_Light *dcast_Light() override { return 0; }
 
-				ISpatial		(ISpatial_DB* space	);
-	virtual		~ISpatial		();
+    SpatialBase(ISpatial_DB *space);
+	virtual ~SpatialBase();
 };
 
 //////////////////////////////////////////////////////////////////////////

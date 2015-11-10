@@ -28,7 +28,7 @@ xr_pure_interface IObjectPhysicsCollision;
 #pragma pack(push,4)
 class ENGINE_API CObject :
     public DLL_Pure,
-    public ISpatial,
+    public SpatialBase,
     public ISheduled,
     public IRenderable,
     public CollidableBase
@@ -124,7 +124,7 @@ public:
     virtual float Radius() const;
     virtual const Fbox& BoundingBox() const;
 
-    IC IRender_Sector* Sector() { return H_Root()->spatial.sector; }
+    IC IRender_Sector* Sector() { return H_Root()->GetSpatialData().sector; }
     IC IRender_ObjectSpecific* ROS() { return renderable_ROS(); }
     virtual BOOL renderable_ShadowGenerate() { return TRUE; }
     virtual BOOL renderable_ShadowReceive() { return TRUE; }

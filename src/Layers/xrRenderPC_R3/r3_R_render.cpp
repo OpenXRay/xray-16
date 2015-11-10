@@ -7,8 +7,8 @@
 
 IC	bool	pred_sp_sort	(ISpatial*	_1, ISpatial* _2)
 {
-	float	d1		= _1->spatial.sphere.P.distance_to_sqr	(Device.vCameraPosition);
-	float	d2		= _2->spatial.sphere.P.distance_to_sqr	(Device.vCameraPosition);
+	float	d1		= _1->GetSpatialData().sphere.P.distance_to_sqr	(Device.vCameraPosition);
+	float	d2		= _2->GetSpatialData().sphere.P.distance_to_sqr	(Device.vCameraPosition);
 	return	d1<d2	;
 }
 
@@ -88,10 +88,10 @@ void CRender::render_main	(Fmatrix&	m_ViewProjection, bool _fportals)
 		for (u32 o_it=0; o_it<lstRenderables.size(); o_it++)
 		{
 			ISpatial*	spatial		= lstRenderables[o_it];		spatial->spatial_updatesector	();
-			CSector*	sector		= (CSector*)spatial->spatial.sector;
+			CSector*	sector		= (CSector*)spatial->GetSpatialData().sector;
 			if	(0==sector)										continue;	// disassociated from S/P structure
 
-			if (spatial->spatial.type & STYPE_LIGHTSOURCE)		{
+			if (spatial->GetSpatialData().type & STYPE_LIGHTSOURCE)		{
 				// lightsource
 				light*			L				= (light*)	(spatial->dcast_Light());
 				VERIFY							(L);
@@ -106,9 +106,9 @@ void CRender::render_main	(Fmatrix&	m_ViewProjection, bool _fportals)
 			if	(PortalTraverser.i_marker != sector->r_marker)	continue;	// inactive (untouched) sector
 			for (u32 v_it=0; v_it<sector->r_frustums.size(); v_it++)	{
 				CFrustum&	view	= sector->r_frustums[v_it];
-				if (!view.testSphere_dirty(spatial->spatial.sphere.P,spatial->spatial.sphere.R))	continue;
+				if (!view.testSphere_dirty(spatial->GetSpatialData().sphere.P,spatial->GetSpatialData().sphere.R))	continue;
 
-				if (spatial->spatial.type & STYPE_RENDERABLE)
+				if (spatial->GetSpatialData().type & STYPE_RENDERABLE)
 				{
 					// renderable
 					IRenderable*	renderable		= spatial->dcast_Renderable	();

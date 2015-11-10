@@ -17,7 +17,7 @@
 
 
 //////////////////////////////////////////////////////////////////////
-CGlow::CGlow		()		: ISpatial(g_SpatialSpace)
+CGlow::CGlow		()		: SpatialBase(g_SpatialSpace)
 {
 	flags.bActive	= false;
 	position.set	(0,0,0);
@@ -77,7 +77,7 @@ void	CGlow::set_color		(float r, float g, float b)	{
 void	CGlow::spatial_move		()
 {
 	spatial.sphere.set			(position,radius);
-	ISpatial::spatial_move		();
+	SpatialBase::spatial_move		();
 }
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

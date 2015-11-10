@@ -333,8 +333,8 @@ extern float		r_ssaHZBvsTEX;
 
 ICF bool			pred_sp_sort		(ISpatial* _1, ISpatial* _2)
 {
-	float	d1		= _1->spatial.sphere.P.distance_to_sqr(Device.vCameraPosition);
-	float	d2		= _2->spatial.sphere.P.distance_to_sqr(Device.vCameraPosition);
+	float	d1		= _1->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
+	float	d2		= _2->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
 	return	d1<d2;
 }
 
@@ -454,20 +454,20 @@ void CRender::Calculate				()
 			for (u32 o_it=0; o_it<lstRenderables.size(); o_it++)
 			{
 				ISpatial*	spatial		= lstRenderables[o_it];		spatial->spatial_updatesector	();
-				CSector*	sector		= (CSector*)spatial->spatial.sector	;
+				CSector*	sector		= (CSector*)spatial->GetSpatialData().sector	;
 				if	(0==sector)										
 					continue;	// disassociated from S/P structure
 
 				// Filter only not light spatial
-				if	(PortalTraverser.i_marker != sector->r_marker && (spatial->spatial.type & STYPE_RENDERABLE) )	continue;	// inactive (untouched) sector
+				if	(PortalTraverser.i_marker != sector->r_marker && (spatial->GetSpatialData().type & STYPE_RENDERABLE) )	continue;	// inactive (untouched) sector
 
-				if (spatial->spatial.type & STYPE_RENDERABLE)
+				if (spatial->GetSpatialData().type & STYPE_RENDERABLE)
 				{
 					for (u32 v_it=0; v_it<sector->r_frustums.size(); v_it++)
 					{
 						set_Frustum			(&(sector->r_frustums[v_it]));
 
-						if (!View->testSphere_dirty(spatial->spatial.sphere.P,spatial->spatial.sphere.R) /*&& (spatial->spatial.type & STYPE_RENDERABLE)*/)	continue;
+						if (!View->testSphere_dirty(spatial->GetSpatialData().sphere.P,spatial->GetSpatialData().sphere.R) /*&& (spatial->spatial.type & STYPE_RENDERABLE)*/)	continue;
 						// renderable
 						IRenderable*	renderable		= spatial->dcast_Renderable	();
 						if (0==renderable)	{
@@ -508,9 +508,9 @@ void CRender::Calculate				()
 				} 
 				else
 				{
-					if ( ViewBase.testSphere_dirty(spatial->spatial.sphere.P,spatial->spatial.sphere.R) )
+					if ( ViewBase.testSphere_dirty(spatial->GetSpatialData().sphere.P,spatial->GetSpatialData().sphere.R) )
 					{
-						VERIFY								(spatial->spatial.type & STYPE_LIGHTSOURCE);
+						VERIFY								(spatial->GetSpatialData().type & STYPE_LIGHTSOURCE);
 						// lightsource
 						light*			L					= (light*)	spatial->dcast_Light	();
 						VERIFY								(L);

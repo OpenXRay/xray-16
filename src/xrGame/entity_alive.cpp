@@ -323,7 +323,7 @@ void CEntityAlive::Die	(CObject* who)
 
 	// disable react to sound
 	ISpatial* self	= smart_cast<ISpatial*> (this);
-	if (self)		self->spatial.type &=~STYPE_REACTTOSOUND;
+	if (self)		self->GetSpatialData().type &=~STYPE_REACTTOSOUND;
 	if(character_physics_support())
 		character_physics_support()->in_Die();
 }

@@ -26,7 +26,7 @@ Fvector	c_spatial_offset	[8]	=
 };
 
 //////////////////////////////////////////////////////////////////////////
-ISpatial::ISpatial			(ISpatial_DB* space)
+SpatialBase::SpatialBase(ISpatial_DB* space)
 {
 	spatial.sphere.P.set	(0,0,0);
 	spatial.sphere.R		= 0;
@@ -36,11 +36,11 @@ ISpatial::ISpatial			(ISpatial_DB* space)
 	spatial.sector			= NULL;
 	spatial.space			= space;
 }
-ISpatial::~ISpatial			(void)
+SpatialBase::~SpatialBase(void)
 {
 	spatial_unregister		();
 }
-BOOL	ISpatial::spatial_inside()
+bool SpatialBase::spatial_inside()
 {
 	float	dr	= -(- spatial.node_radius + spatial.sphere.R);
 	if (spatial.sphere.P.x < spatial.node_center.x - dr)	return FALSE;
@@ -54,17 +54,17 @@ BOOL	ISpatial::spatial_inside()
 
 BOOL	verify_sp	(ISpatial* sp, Fvector& node_center, float node_radius)
 {
-	float	dr	= -(- node_radius + sp->spatial.sphere.R);
-	if (sp->spatial.sphere.P.x < node_center.x - dr)	return FALSE;
-	if (sp->spatial.sphere.P.x > node_center.x + dr)	return FALSE;
-	if (sp->spatial.sphere.P.y < node_center.y - dr)	return FALSE;
-	if (sp->spatial.sphere.P.y > node_center.y + dr)	return FALSE;
-	if (sp->spatial.sphere.P.z < node_center.z - dr)	return FALSE;
-	if (sp->spatial.sphere.P.z > node_center.z + dr)	return FALSE;
+	float	dr	= -(- node_radius + sp->GetSpatialData().sphere.R);
+	if (sp->GetSpatialData().sphere.P.x < node_center.x - dr)	return FALSE;
+	if (sp->GetSpatialData().sphere.P.x > node_center.x + dr)	return FALSE;
+	if (sp->GetSpatialData().sphere.P.y < node_center.y - dr)	return FALSE;
+	if (sp->GetSpatialData().sphere.P.y > node_center.y + dr)	return FALSE;
+	if (sp->GetSpatialData().sphere.P.z < node_center.z - dr)	return FALSE;
+	if (sp->GetSpatialData().sphere.P.z > node_center.z + dr)	return FALSE;
 	return TRUE;
 }
 
-void	ISpatial::spatial_register	()
+void	SpatialBase::spatial_register	()
 {
 	spatial.type			|=	STYPEFLAG_INVALIDSECTOR;
 	if (spatial.node_ptr)
@@ -78,7 +78,7 @@ void	ISpatial::spatial_register	()
 	}
 }
 
-void	ISpatial::spatial_unregister()
+void	SpatialBase::spatial_unregister()
 {
 	if (spatial.node_ptr)
 	{
@@ -91,7 +91,7 @@ void	ISpatial::spatial_unregister()
 	}
 }
 
-void	ISpatial::spatial_move	()
+void	SpatialBase::spatial_move	()
 {
 	if (spatial.node_ptr)
 	{
@@ -108,7 +108,7 @@ void	ISpatial::spatial_move	()
 	}
 }
 
-void	ISpatial::spatial_updatesector_internal()
+void	SpatialBase::spatial_updatesector_internal()
 {
     IRender_Sector*		S = GlobalEnv.Render->detectSector(spatial_sector_point());
 	spatial.type						&=	~STYPEFLAG_INVALIDSECTOR;
@@ -126,18 +126,18 @@ void			ISpatial_NODE::_init			(ISpatial_NODE* _parent)
 
 void			ISpatial_NODE::_insert			(ISpatial* S)			
 {	
-	S->spatial.node_ptr			=	this;
+	S->GetSpatialData().node_ptr			=	this;
 	items.push_back					(S);
-	S->spatial.space->Stats.ObjectCount++;
+	S->GetSpatialData().space->Stats.ObjectCount++;
 }
 
 void			ISpatial_NODE::_remove			(ISpatial* S)			
 {	
-	S->spatial.node_ptr			=	NULL;
+	S->GetSpatialData().node_ptr			=	NULL;
 	xr_vector<ISpatial*>::iterator	it = std::find(items.begin(),items.end(),S);
 	VERIFY				(it!=items.end());
 	items.erase			(it);
-	S->spatial.space->Stats.ObjectCount--;
+	S->GetSpatialData().space->Stats.ObjectCount--;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -215,18 +215,18 @@ void			ISpatial_DB::_insert	(ISpatial_NODE* N, Fvector& n_C, float n_R)
 	{
 		// this is leaf node
 		N->_insert									(rt_insert_object);
-		rt_insert_object->spatial.node_center.set	(n_C);
-		rt_insert_object->spatial.node_radius		= n_vR;		// vR
+		rt_insert_object->GetSpatialData().node_center.set	(n_C);
+		rt_insert_object->GetSpatialData().node_radius		= n_vR;		// vR
 		return;
 	}
 
 	// we have to check if it can be putted further down
-	float	s_R			= rt_insert_object->spatial.sphere.R;	// spatial bounds
+	float	s_R			= rt_insert_object->GetSpatialData().sphere.R;	// spatial bounds
 	float	c_R			= n_R/2;								// children bounds
 	if (s_R<c_R)
 	{
 		// object can be pushed further down - select "octant", calc node position
-		Fvector&	s_C					=	rt_insert_object->spatial.sphere.P;
+		Fvector&	s_C					=	rt_insert_object->GetSpatialData().sphere.P;
 		u32			octant				=	_octant	(n_C,s_C);
 		Fvector		c_C;				c_C.mad	(n_C,c_spatial_offset[octant],c_R);
 		VERIFY			(octant == _octant(n_C,c_C));				// check table assosiations
@@ -246,8 +246,8 @@ void			ISpatial_DB::_insert	(ISpatial_NODE* N, Fvector& n_C, float n_R)
 	{
 		// we have to "own" this object (potentially it can be putted down sometimes...)
 		N->_insert									(rt_insert_object);
-		rt_insert_object->spatial.node_center.set	(n_C);
-		rt_insert_object->spatial.node_radius		= n_vR;
+		rt_insert_object->GetSpatialData().node_center.set	(n_C);
+		rt_insert_object->GetSpatialData().node_radius		= n_vR;
 	}
 }
 
@@ -257,15 +257,15 @@ void			ISpatial_DB::insert		(ISpatial* S)
 #ifdef DEBUG
 	Stats.Insert.Begin();
 
-	BOOL		bValid	= _valid(S->spatial.sphere.R) && _valid(S->spatial.sphere.P);
+	BOOL		bValid	= _valid(S->GetSpatialData().sphere.R) && _valid(S->GetSpatialData().sphere.P);
 	if (!bValid)	
 	{
 		CObject*	O	= dynamic_cast<CObject*>(S);
 		if	(O)			Debug.fatal(DEBUG_INFO,"Invalid OBJECT position or radius (%s)",O->cName().c_str());
 		else			{
 			CPS_Instance* P = dynamic_cast<CPS_Instance*>(S);
-			if (P)		Debug.fatal(DEBUG_INFO,"Invalid PS spatial position{%3.2f,%3.2f,%3.2f} or radius{%3.2f}",VPUSH(S->spatial.sphere.P),S->spatial.sphere.R);
-			else		Debug.fatal(DEBUG_INFO,"Invalid OTHER spatial position{%3.2f,%3.2f,%3.2f} or radius{%3.2f}",VPUSH(S->spatial.sphere.P),S->spatial.sphere.R);
+			if (P)		Debug.fatal(DEBUG_INFO,"Invalid PS spatial position{%3.2f,%3.2f,%3.2f} or radius{%3.2f}",VPUSH(S->GetSpatialData().sphere.P),S->GetSpatialData().sphere.R);
+			else		Debug.fatal(DEBUG_INFO,"Invalid OTHER spatial position{%3.2f,%3.2f,%3.2f} or radius{%3.2f}",VPUSH(S->GetSpatialData().sphere.P),S->GetSpatialData().sphere.R);
 		}
 	}
 #endif
@@ -280,8 +280,8 @@ void			ISpatial_DB::insert		(ISpatial* S)
 		// Object outside our DB, put it into root node and hack bounds
 		// Object will reinsert itself until fits into "real", "controlled" space
 		m_root->_insert				(S);
-		S->spatial.node_center.set	(m_center);
-		S->spatial.node_radius		=	m_bounds;
+		S->GetSpatialData().node_center.set	(m_center);
+		S->GetSpatialData().node_radius		=	m_bounds;
 	}
 #ifdef DEBUG
 	Stats.Insert.End();
@@ -317,7 +317,7 @@ void			ISpatial_DB::remove		(ISpatial* S)
 #ifdef DEBUG
 	Stats.Remove.Begin();
 #endif
-	ISpatial_NODE* N	= S->spatial.node_ptr;
+	ISpatial_NODE* N	= S->GetSpatialData().node_ptr;
 	N->_remove			(S);
 
 	// Recurse

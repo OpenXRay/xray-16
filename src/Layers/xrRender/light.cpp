@@ -4,7 +4,7 @@
 static const float	SQRT2		=	1.4142135623730950488016887242097f;
 static const float	RSQRTDIV2	=	0.70710678118654752440084436210485f;
 
-light::light		(void)	: ISpatial(g_SpatialSpace)
+light::light		(void)	: SpatialBase(g_SpatialSpace)
 {
 	spatial.type	= STYPE_LIGHTSOURCE;
 	flags.type		= POINT;
@@ -192,7 +192,7 @@ void	light::spatial_move			()
 	}
 
 	// update spatial DB
-	ISpatial::spatial_move			();
+    SpatialBase::spatial_move			();
 
 #if (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
 	if (flags.bActive) gi_generate	();

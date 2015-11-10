@@ -9,7 +9,7 @@ IRenderable::IRenderable()
     renderable.pROS = NULL;
     renderable.pROS_Allowed = TRUE;
     ISpatial* self = dynamic_cast<ISpatial*> (this);
-    if (self) self->spatial.type |= STYPE_RENDERABLE;
+    if (self) self->GetSpatialData().type |= STYPE_RENDERABLE;
 }
 
 extern ENGINE_API BOOL g_bRendering;

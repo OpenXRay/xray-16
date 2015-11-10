@@ -286,8 +286,8 @@ void CActor::Load	(LPCSTR section )
 	//////////////////////////////////////////////////////////////////////////
 	ISpatial*		self			=	smart_cast<ISpatial*> (this);
 	if (self)	{
-		self->spatial.type	|=	STYPE_VISIBLEFORAI;
-		self->spatial.type	&= ~STYPE_REACTTOSOUND;
+		self->GetSpatialData().type	|=	STYPE_VISIBLEFORAI;
+		self->GetSpatialData().type	&= ~STYPE_REACTTOSOUND;
 	}
 	//////////////////////////////////////////////////////////////////////////
 

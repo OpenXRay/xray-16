@@ -7,7 +7,7 @@ CollidableBase::CollidableBase()
 {
     CForm = nullptr;
     ISpatial* self = dynamic_cast<ISpatial*> (this);
-    if (self) self->spatial.type |= STYPE_COLLIDEABLE;
+    if (self) self->GetSpatialData().type |= STYPE_COLLIDEABLE;
 };
 CollidableBase::~CollidableBase()
 {
