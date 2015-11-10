@@ -4,7 +4,7 @@
 #include <mutex>
 #include <atomic>
 
-#ifdef CONFIG_PROFILE_LOCKS.
+#ifdef CONFIG_PROFILE_LOCKS
 typedef void(*add_profile_portion_callback) (LPCSTR id, const u64& time);
 void XRCORE_API set_add_profile_portion(add_profile_portion_callback callback);
 
