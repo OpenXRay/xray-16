@@ -846,7 +846,6 @@
     <ClInclude Include="CustomRocket.h" />
     <ClInclude Include="CustomZone.h" />
     <ClInclude Include="DamagableItem.h" />
-    <ClInclude Include="DamageSource.h" />
     <ClInclude Include="damage_manager.h" />
     <ClInclude Include="danger_cover_location.h" />
     <ClInclude Include="danger_cover_location_inline.h" />
