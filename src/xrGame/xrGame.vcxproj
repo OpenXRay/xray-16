@@ -803,7 +803,7 @@
     <ClInclude Include="callback_info.h" />
     <ClInclude Include="CameraEffector.h" />
     <ClInclude Include="CameraFirstEye.h" />
-    <ClInclude Include="cameralook.h" />
+    <ClInclude Include="CameraLook.h" />
     <ClInclude Include="CameraRecoil.h" />
     <ClInclude Include="CaptureBoneCallback.h" />
     <ClInclude Include="Car.h" />
@@ -2418,7 +2418,7 @@
     <ClCompile Include="BreakableObject.cpp" />
     <ClCompile Include="CameraEffector.cpp" />
     <ClCompile Include="CameraFirstEye.cpp" />
-    <ClCompile Include="cameralook.cpp" />
+    <ClCompile Include="CameraLook.cpp" />
     <ClCompile Include="Car.cpp" />
     <ClCompile Include="CarCameras.cpp" />
     <ClCompile Include="CarDamageParticles.cpp" />

@@ -5106,7 +5106,7 @@
     <ClInclude Include="CameraFirstEye.h">
       <Filter>Core\Client\Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="cameralook.h">
+    <ClInclude Include="CameraLook.h">
       <Filter>Core\Client\Cameras</Filter>
     </ClInclude>
     <ClInclude Include="ActorEffector.h">
@@ -8556,7 +8556,7 @@
     <ClCompile Include="CameraFirstEye.cpp">
       <Filter>Core\Client\Cameras</Filter>
     </ClCompile>
-    <ClCompile Include="cameralook.cpp">
+    <ClCompile Include="CameraLook.cpp">
       <Filter>Core\Client\Cameras</Filter>
     </ClCompile>
     <ClCompile Include="ActorEffector.cpp">
