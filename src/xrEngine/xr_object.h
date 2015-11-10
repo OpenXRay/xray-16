@@ -22,6 +22,7 @@ class CSE_Abstract;
 //-----------------------------------------------------------------------------------------------------------
 // CObject
 //-----------------------------------------------------------------------------------------------------------
+
 class IPhysicsShell;
 xr_pure_interface IObjectPhysicsCollision;
 #pragma pack(push,4)
@@ -30,7 +31,7 @@ class ENGINE_API CObject :
     public ISpatial,
     public ISheduled,
     public IRenderable,
-    public ICollidable
+    public CollidableBase
 {
 public:
     struct SavedPosition
@@ -130,7 +131,6 @@ public:
 
     // Accessors and converters
     ICF IRenderVisual* Visual() const { return renderable.visual; }
-    ICF ICollisionForm* CFORM() const { return collidable.model; }
     virtual CObject* dcast_CObject() { return this; }
     virtual IRenderable* dcast_Renderable() { return this; }
     virtual void OnChangeVisual() { }

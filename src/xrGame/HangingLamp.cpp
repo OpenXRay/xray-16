@@ -89,13 +89,13 @@ BOOL CHangingLamp::net_Spawn(CSE_Abstract* DC)
 	// set bone id
 //	CInifile* pUserData		= K->LL_UserData(); 
 //	R_ASSERT3				(pUserData,"Empty HangingLamp user data!",lamp->get_visual());
-	xr_delete(collidable.model);
+	xr_delete(CForm);
 	if (Visual()){
 		IKinematics* K		= smart_cast<IKinematics*>(Visual());
 		R_ASSERT			(Visual()&&smart_cast<IKinematics*>(Visual()));
 		light_bone			= K->LL_BoneID	(*lamp->light_main_bone);	VERIFY(light_bone!=BI_NONE);
 		ambient_bone		= K->LL_BoneID	(*lamp->light_ambient_bone);VERIFY(ambient_bone!=BI_NONE);
-		collidable.model	= xr_new<CCF_Skeleton>				(this);
+        CForm = xr_new<CCF_Skeleton>				(this);
 	}
 	fBrightness				= lamp->brightness;
 	clr.set					(lamp->color);						clr.a = 1.f;
@@ -154,7 +154,7 @@ BOOL CHangingLamp::net_Spawn(CSE_Abstract* DC)
 	}
 	
 	setVisible					((BOOL)!!Visual());
-	setEnabled					((BOOL)!!collidable.model);
+	setEnabled					((BOOL)!!CForm);
 
 	return						(TRUE);
 }

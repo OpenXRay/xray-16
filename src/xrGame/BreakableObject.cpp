@@ -43,8 +43,8 @@ BOOL CBreakableObject::net_Spawn(CSE_Abstract* DC)
 	CSE_ALifeObjectBreakable *obj	= smart_cast<CSE_ALifeObjectBreakable*>(e);
 	R_ASSERT				(obj);
 	inherited::net_Spawn	(DC);
-	VERIFY(!collidable.model);
-	collidable.model = xr_new<CCF_Skeleton>(this);
+	VERIFY(!CForm);
+	CForm = xr_new<CCF_Skeleton>(this);
 	// set bone id
 	R_ASSERT				(Visual()&&smart_cast<IKinematics*>(Visual()));
 //	IKinematics* K			= smart_cast<IKinematics*>(Visual());
@@ -198,7 +198,7 @@ void CBreakableObject::net_Destroy()
 	
 	m_pPhysicsShell=NULL;
 	inherited::net_Destroy();
-	xr_delete(collidable.model);
+	xr_delete(CForm);
 	Init();
 	//Visual()->vis.box.set(m_saved_box);
     GlobalEnv.Render->model_Delete(renderable.visual,TRUE);

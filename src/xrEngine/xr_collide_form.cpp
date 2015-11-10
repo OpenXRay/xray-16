@@ -487,9 +487,9 @@ BOOL CCF_Shape::Contact(CObject* O)
         O->Center(S.P);
         S.R = O->Radius();
     }
-    else if (O->CFORM())
+    else if (O->GetCForm())
     {
-        S = O->CFORM()->getSphere();
+        S = O->GetCForm()->getSphere();
         O->XFORM().transform_tiny(S.P);
     }
     else return FALSE;

@@ -25,12 +25,12 @@ CSpaceRestrictor::~CSpaceRestrictor	()
 
 void CSpaceRestrictor::Center		(Fvector& C) const
 {
-	XFORM().transform_tiny			(C,CFORM()->getSphere().P);
+	XFORM().transform_tiny			(C, GetCForm()->getSphere().P);
 }
 
 float CSpaceRestrictor::Radius		() const
 {
-	return							(CFORM()->getRadius());
+	return							(GetCForm()->getRadius());
 }
 
 BOOL CSpaceRestrictor::net_Spawn	(CSE_Abstract* data)
@@ -44,7 +44,7 @@ BOOL CSpaceRestrictor::net_Spawn	(CSE_Abstract* data)
 	m_space_restrictor_type			= se_shape->m_space_restrictor_type;
 
 	CCF_Shape						*shape = xr_new<CCF_Shape>(this);
-	collidable.model				= shape;
+    SetCForm(shape);
 
 	for (u32 i=0; i < se_shape->shapes.size(); ++i) {
 		CShapeData::shape_def		&S = se_shape->shapes[i];
@@ -123,7 +123,7 @@ void CSpaceRestrictor::prepare			() const
 	m_spheres.resize				(0);
 	m_boxes.resize					(0);
 
-	const CCF_Shape					*shape = (const CCF_Shape*)collidable.model;
+	const CCF_Shape					*shape = (const CCF_Shape*)GetCForm();
 
 	typedef xr_vector<CCF_Shape::shape_def> SHAPES;
 
@@ -216,7 +216,7 @@ void CSpaceRestrictor::OnRender	()
     GlobalEnv.DRender->OnFrameEnd();
 	Fvector l_half; l_half.set(.5f, .5f, .5f);
 	Fmatrix l_ball, l_box;
-	xr_vector<CCF_Shape::shape_def> &l_shapes = ((CCF_Shape*)CFORM())->Shapes();
+	xr_vector<CCF_Shape::shape_def> &l_shapes = ((CCF_Shape*)GetCForm())->Shapes();
 	xr_vector<CCF_Shape::shape_def>::iterator l_pShape;
 	
 	u32 Color = 0;

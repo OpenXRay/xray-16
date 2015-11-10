@@ -74,7 +74,6 @@ SCRIPT_EXPORT(ICollidable, (),
 	module(luaState)
 	[
 		class_<ICollidable>("ICollidable")
-			.def(constructor<>())
 	];
 });
 

@@ -37,7 +37,7 @@ void CRadioactiveZone::Affect(SZoneObjectInfo* O)
 	clamp					(O->f_time_affected, tg-(one*3), tg);
 
 	Fvector					pos; 
-	XFORM().transform_tiny	(pos,CFORM()->getSphere().P);
+	XFORM().transform_tiny	(pos, GetCForm()->getSphere().P);
 
 	Fvector dir				={0,0,0}; 
 	float power				= Power(O->object->Position().distance_to(pos),nearest_shape_radius(O));
@@ -94,7 +94,7 @@ bool CRadioactiveZone::feel_touch_contact(CObject* O)
 	CActor* A = smart_cast<CActor*>(O);
 	if ( A )
 	{ 
-		if (!((CCF_Shape*)CFORM())->Contact(O))		return	false;
+		if (!((CCF_Shape*)GetCForm())->Contact(O))		return	false;
 		return										A->feel_touch_on_contact(this);
 	}else
 		return										false;
@@ -106,7 +106,7 @@ void CRadioactiveZone::UpdateWorkload					(u32	dt)
 	{	
 		OBJECT_INFO_VEC_IT it;
 		Fvector pos; 
-		XFORM().transform_tiny(pos,CFORM()->getSphere().P);
+		XFORM().transform_tiny(pos, GetCForm()->getSphere().P);
 		for(it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it) 
 		{
 			if( !(*it).object->getDestroy() && smart_cast<CActor*>((*it).object))
@@ -142,7 +142,7 @@ void CRadioactiveZone::UpdateWorkload					(u32	dt)
 
 float CRadioactiveZone::nearest_shape_radius(SZoneObjectInfo* O)
 {
-	CCF_Shape* Sh		= (CCF_Shape*)CFORM();
+	CCF_Shape* Sh		= (CCF_Shape*)GetCForm();
 
 	if(Sh->Shapes().size()==1)
 	{

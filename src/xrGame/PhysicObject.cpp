@@ -90,7 +90,7 @@ if(dbg_draw_doors)
 }
 void CPhysicObject::create_collision_model			( )
 {
-	xr_delete( collidable.model );
+	xr_delete(CForm);
 	
 	VERIFY( Visual() );
 	IKinematics *K = Visual()->dcast_PKinematics	();
@@ -99,11 +99,11 @@ void CPhysicObject::create_collision_model			( )
 	CInifile* ini = K->LL_UserData();
 	if( ini && ini->section_exist( "collide" ) && ini->line_exist("collide", "mesh" ) && ini->r_bool("collide", "mesh" ) )
 	{
-		collidable.model = xr_new<CCF_DynamicMesh>( this );
+        CForm = xr_new<CCF_DynamicMesh>( this );
 		return;
 	}
 
-	collidable.model = xr_new<CCF_Skeleton>(this);
+    CForm = xr_new<CCF_Skeleton>(this);
 
 	/*
 	switch(m_type) {

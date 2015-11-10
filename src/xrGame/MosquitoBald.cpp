@@ -54,7 +54,7 @@ void CMosquitoBald::Affect(SZoneObjectInfo* O)
 	if(O->zone_ignore) return;
 
 	Fvector P; 
-	XFORM().transform_tiny(P,CFORM()->getSphere().P);
+	XFORM().transform_tiny(P, GetCForm()->getSphere().P);
 
 	Fvector hit_dir; 
 	hit_dir.set(	::Random.randF(-.5f,.5f), 
@@ -97,7 +97,7 @@ void CMosquitoBald::UpdateSecondaryHit()
 
 			if((&(*it))->zone_ignore) return;
 			Fvector P; 
-			XFORM().transform_tiny(P,CFORM()->getSphere().P);
+			XFORM().transform_tiny(P, GetCForm()->getSphere().P);
 
 			Fvector hit_dir; 
 			hit_dir.set(	::Random.randF(-.5f,.5f), 

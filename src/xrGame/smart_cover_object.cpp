@@ -37,7 +37,7 @@ BOOL object::net_Spawn		(CSE_Abstract *server_entity)
 		Msg							("! smart cover %s has no description", smart_cover->name_replace());
 
 	CCF_Shape						*shape = xr_new<CCF_Shape>(this);
-	collidable.model				= shape;
+    SetCForm(shape);
 
 	typedef CShapeData::ShapeVec	ShapeVec;
 	ShapeVec::iterator				I = smart_cover->shapes.begin();
@@ -77,12 +77,12 @@ BOOL object::net_Spawn		(CSE_Abstract *server_entity)
 
 void object::Center			(Fvector &result) const
 {
-	XFORM().transform_tiny			(result,CFORM()->getSphere().P);
+	XFORM().transform_tiny			(result, GetCForm()->getSphere().P);
 }
 
 float object::Radius		() const
 {
-	return							(CFORM()->getRadius());
+	return							(GetCForm()->getRadius());
 }
 
 void object::UpdateCL		()
@@ -106,7 +106,7 @@ void object::OnRender		()
 	u32								Color = color_xrgb(0,255,0);
 
 	typedef xr_vector<CCF_Shape::shape_def>	Shapes;
-	Shapes							&l_shapes = ((CCF_Shape*)CFORM())->Shapes();
+	Shapes							&l_shapes = ((CCF_Shape*)GetCForm())->Shapes();
 	Shapes::iterator				l_pShape;
 	CDebugRenderer					&renderer = Level().debug_renderer();
 	for (l_pShape = l_shapes.begin(); l_shapes.end() != l_pShape; ++l_pShape) {
@@ -152,7 +152,7 @@ void object::OnRender		()
 
 bool object::inside			(Fvector const &position) const
 {
-	CCF_Shape						*shape = static_cast<CCF_Shape*>(collidable.model);
+	CCF_Shape						*shape = static_cast<CCF_Shape*>(GetCForm());
 	VERIFY							(shape);
 
 	typedef xr_vector<CCF_Shape::shape_def>	Shapes;

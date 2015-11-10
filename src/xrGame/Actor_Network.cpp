@@ -1477,7 +1477,7 @@ void	CActor::OnRender_Network()
 					Level().debug_renderer().draw_obb(BoneMatrix, BoneOBB.m_halfsize, color_rgba(0, 255, 0, 255));
 				};
 				*/
-				CCF_Skeleton* Skeleton = smart_cast<CCF_Skeleton*>(collidable.model);
+				CCF_Skeleton* Skeleton = smart_cast<CCF_Skeleton*>(CForm);
 				if (Skeleton){
 					Skeleton->_dbg_refresh();
 

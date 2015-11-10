@@ -47,7 +47,7 @@ BOOL CBulletManager::test_callback(const collide::ray_defs& rd, CObject* object,
 	if (object){
 		CEntity*	entity			= smart_cast<CEntity*>(object);
 		if (entity&&entity->g_Alive()&&(entity->ID()!=bullet->parent_id)){
-			ICollisionForm*	cform	= entity->collidable.model;
+			ICollisionForm*	cform	= entity->GetCForm();
 			if ((NULL!=cform) && (cftObject==cform->Type())){
 				CActor* actor		= smart_cast<CActor*>(entity);
 				CAI_Stalker* stalker= smart_cast<CAI_Stalker*>(entity);
@@ -357,7 +357,7 @@ bool CBulletManager::ObjectHit( SBullet_Hit* hit_res, SBullet* bullet, const Fve
 	if ( R.O )
 	{
 		//вернуть нормаль по которой играть партиклы
-		CCF_Skeleton* skeleton = smart_cast<CCF_Skeleton*>(R.O->CFORM());
+		CCF_Skeleton* skeleton = smart_cast<CCF_Skeleton*>(R.O->GetCForm());
 		if ( skeleton )
 		{
 			Fvector			e_center;

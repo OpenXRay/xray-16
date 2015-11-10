@@ -48,9 +48,9 @@ BOOL CObjectSpace::_RayTest	( const Fvector &start, const Fvector &dir, float ra
 			ISpatial*	spatial			= r_spatial[o_it];
 			CObject*	collidable		= spatial->dcast_CObject	();
 			if (collidable && (collidable!=ignore_object))	{
-				ECollisionFormType tp	= collidable->collidable.model->Type();
-				if ((tgt&(rqtObject|rqtObstacle))&&(tp==cftObject)&&collidable->collidable.model->_RayQuery(Q,r_temp))	return TRUE;
-				if ((tgt&rqtShape)&&(tp==cftShape)&&collidable->collidable.model->_RayQuery(Q,r_temp))		return TRUE;
+				ECollisionFormType tp	= collidable->GetCForm()->Type();
+				if ((tgt&(rqtObject|rqtObstacle))&&(tp==cftObject)&&collidable->GetCForm()->_RayQuery(Q,r_temp))	return TRUE;
+				if ((tgt&rqtShape)&&(tp==cftShape)&&collidable->GetCForm()->_RayQuery(Q,r_temp))		return TRUE;
 			}
 		}
 	}
@@ -128,11 +128,11 @@ BOOL CObjectSpace::_RayPick	( const Fvector &start, const Fvector &dir, float ra
 			CObject*	collidable		= spatial->dcast_CObject();
 			if			(0==collidable)				continue;
 			if			(collidable==ignore_object)	continue;
-			ECollisionFormType tp		= collidable->collidable.model->Type();
+			ECollisionFormType tp		= collidable->GetCForm()->Type();
 			if (((tgt&(rqtObject|rqtObstacle))&&(tp==cftObject))||((tgt&rqtShape)&&(tp==cftShape))){
 				u32		C	= color_xrgb	(64,64,64);
 				Q.range		= R.range;
-				if (collidable->collidable.model->_RayQuery(Q,r_temp)){
+				if (collidable->GetCForm()->_RayQuery(Q,r_temp)){
 					C				= color_xrgb(128,128,196);
 					R.set_if_less	(r_temp.r_begin());
 				}
@@ -191,8 +191,8 @@ BOOL CObjectSpace::_RayQuery2	(collide::rq_results& r_dest, const collide::ray_d
 			CObject*	collidable		= r_spatial[o_it]->dcast_CObject();
 			if			(0==collidable)				continue;
 			if			(collidable==ignore_object)	continue;
-			ICollisionForm*	cform		= collidable->collidable.model;
-			ECollisionFormType tp		= collidable->collidable.model->Type();
+			ICollisionForm*	cform		= collidable->GetCForm();
+			ECollisionFormType tp		= cform->Type();
 			if (((R.tgt&(rqtObject|rqtObstacle))&&(tp==cftObject))||((R.tgt&rqtShape)&&(tp==cftShape))){
 				if (tb&&!tb(R,collidable,user_data))continue;
 				cform->_RayQuery(R,r_temp);
@@ -258,8 +258,8 @@ BOOL CObjectSpace::_RayQuery3	(collide::rq_results& r_dest, const collide::ray_d
 				CObject*	collidable		= r_spatial[o_it]->dcast_CObject();
 				if			(0==collidable)				continue;
 				if			(collidable==ignore_object)	continue;
-				ICollisionForm*	cform		= collidable->collidable.model;
-				ECollisionFormType tp		= collidable->collidable.model->Type();
+				ICollisionForm*	cform		= collidable->GetCForm();
+				ECollisionFormType tp		= cform->Type();
 				if (((R.tgt&(rqtObject|rqtObstacle))&&(tp==cftObject))||((R.tgt&rqtShape)&&(tp==cftShape))){
 					if (tb&&!tb(d_rd,collidable,user_data))continue;
 					u32 r_cnt				= r_temp.r_count();
@@ -345,8 +345,8 @@ BOOL CObjectSpace::_RayQuery	(collide::rq_results& r_dest, const collide::ray_de
 					CObject*	collidable		= r_spatial[o_it]->dcast_CObject();
 					if			(0==collidable)				continue;
 					if			(collidable==ignore_object)	continue;
-					ICollisionForm*	cform		= collidable->collidable.model;
-					ECollisionFormType tp		= collidable->collidable.model->Type();
+					ICollisionForm*	cform		= collidable->GetCForm();
+					ECollisionFormType tp		= cform->Type();
 					if (((R.tgt&(rqtObject|rqtObstacle))&&(tp==cftObject))||((R.tgt&rqtShape)&&(tp==cftShape))){
 						if (tb&&!tb(d_rd,collidable,user_data))continue;
 						cform->_RayQuery(d_rd,r_temp);

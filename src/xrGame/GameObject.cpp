@@ -649,7 +649,7 @@ void CGameObject::spatial_move	()
 #ifdef DEBUG
 void			CGameObject::dbg_DrawSkeleton	()
 {
-	CCF_Skeleton* Skeleton = smart_cast<CCF_Skeleton*>(collidable.model);
+	CCF_Skeleton* Skeleton = smart_cast<CCF_Skeleton*>(CForm);
 	if (!Skeleton) return;
 	Skeleton->_dbg_refresh();
 

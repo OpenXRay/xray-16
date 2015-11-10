@@ -516,7 +516,7 @@ u16	CPhysicsShellHolder::ObjectID()const
 }
 ICollisionForm* CPhysicsShellHolder::ObjectCollisionModel()
 {
-	return collidable.model;
+	return CForm; // XXX: use ICollidable::GetCForm() instead
 }
 
 IKinematics	*CPhysicsShellHolder::ObjectKinematics()

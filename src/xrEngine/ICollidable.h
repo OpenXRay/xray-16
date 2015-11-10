@@ -2,14 +2,25 @@
 
 class ENGINE_API ICollisionForm;
 
-class ENGINE_API ICollidable
+class ICollidable
 {
 public:
-    struct
-    {
-        ICollisionForm* model;
-    } collidable;
+    virtual ~ICollidable() = 0;
+    virtual void SetCForm(ICollisionForm *cform) = 0;
+    virtual ICollisionForm *GetCForm() const = 0;
+};
+
+inline ICollidable::~ICollidable() {}
+
+class ENGINE_API CollidableBase : public ICollidable
+{
 public:
-    ICollidable();
-    virtual ~ICollidable();
+    CollidableBase();
+    virtual ~CollidableBase();
+
+    virtual void SetCForm(ICollisionForm *cform) override { CForm = cform; }
+    virtual ICollisionForm *GetCForm() const override { return CForm; }
+
+protected:
+    ICollisionForm *CForm;
 };

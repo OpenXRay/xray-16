@@ -496,7 +496,7 @@ void CCustomZone::shedule_Update(u32 dt)
 
 	if (IsEnabled())
 	{
-		const Fsphere& s		= CFORM()->getSphere();
+		const Fsphere& s		= GetCForm()->getSphere();
 		Fvector					P;
 		XFORM().transform_tiny	(P,s.P);
 
@@ -633,7 +633,7 @@ bool CCustomZone::feel_touch_contact(CObject* O)
     if (!object || !object->IsVisibleForZones())
 		return		(FALSE);
 
-	if (!((CCF_Shape*)CFORM())->Contact(O))
+	if (!((CCF_Shape*)GetCForm())->Contact(O))
 		return		(FALSE);
 
 	return			(object->feel_touch_on_contact(this));
@@ -828,7 +828,7 @@ void CCustomZone::PlayEntranceParticles(CGameObject* pObject)
 void CCustomZone::PlayBoltEntranceParticles()
 {
 
-	CCF_Shape* Sh		= (CCF_Shape*)CFORM();
+	CCF_Shape* Sh		= (CCF_Shape*)GetCForm();
 	const Fmatrix& XF	= XFORM();
 	Fmatrix				PXF;
 	xr_vector<CCF_Shape::shape_def>& Shapes = Sh->Shapes();
@@ -1410,11 +1410,11 @@ BOOL CCustomZone::AlwaysTheCrow()
 
 void CCustomZone::CalcDistanceTo(const Fvector& P, float& dist, float& radius)
 {
-	R_ASSERT			(CFORM()->Type()==cftShape);
-	CCF_Shape* Sh		= (CCF_Shape*)CFORM();
+	R_ASSERT			(GetCForm()->Type()==cftShape);
+	CCF_Shape* Sh		= (CCF_Shape*)GetCForm();
 
 	dist				= P.distance_to(Position());
-	float sr			= CFORM()->getSphere().R;
+	float sr			= GetCForm()->getSphere().R;
 	//quick test
 	if(Sh->Shapes().size()==1)
 	{

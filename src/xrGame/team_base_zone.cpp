@@ -37,18 +37,18 @@ void CTeamBaseZone::reinit			()
 
 void CTeamBaseZone::Center			(Fvector &C) const
 {
-	XFORM().transform_tiny	(C,CFORM()->getSphere().P);
+	XFORM().transform_tiny	(C, GetCForm()->getSphere().P);
 }
 
 float CTeamBaseZone::Radius			() const
 {
-	return						(CFORM()->getRadius());
+	return						(GetCForm()->getRadius());
 }
 
 BOOL CTeamBaseZone::net_Spawn	(CSE_Abstract* DC) 
 {
 	CCF_Shape					*l_pShape = xr_new<CCF_Shape>(this);
-	collidable.model			= l_pShape;
+    SetCForm(l_pShape);
 
 	CSE_Abstract				*l_tpAbstract = (CSE_Abstract*)(DC);
 	CSE_ALifeTeamBaseZone		*l_tpALifeScriptZone = smart_cast<CSE_ALifeTeamBaseZone*>(l_tpAbstract);
@@ -76,7 +76,7 @@ BOOL CTeamBaseZone::net_Spawn	(CSE_Abstract* DC)
 	if (bOk) {
 		l_pShape->ComputeBounds	();
 		Fvector					P;
-		XFORM().transform_tiny	(P,CFORM()->getSphere().P);
+		XFORM().transform_tiny	(P, GetCForm()->getSphere().P);
 		setEnabled				(TRUE);
 	}
 
@@ -103,7 +103,7 @@ void CTeamBaseZone::shedule_Update(u32 dt)
 {
 	inherited::shedule_Update	(dt);
 	
-	const Fsphere				&s = CFORM()->getSphere();
+	const Fsphere				&s = GetCForm()->getSphere();
 	Fvector						P;
 	XFORM().transform_tiny		(P,s.P);
 	feel_touch_update			(P,s.R);
@@ -140,7 +140,7 @@ bool CTeamBaseZone::feel_touch_contact	(CObject* O)
 {
 	CActor*	pActor = smart_cast<CActor*>(O);
 	if (!pActor) return (false);
-	return ((CCF_Shape*)CFORM())->Contact(O);
+	return ((CCF_Shape*)GetCForm())->Contact(O);
 }
 
 #ifdef DEBUG
@@ -152,7 +152,7 @@ void CTeamBaseZone::OnRender()
 //	RCache.OnFrameEnd();
 	Fvector l_half; l_half.set(.5f, .5f, .5f);
 	Fmatrix l_ball, l_box;
-	xr_vector<CCF_Shape::shape_def> &l_shapes = ((CCF_Shape*)CFORM())->Shapes();
+	xr_vector<CCF_Shape::shape_def> &l_shapes = ((CCF_Shape*)GetCForm())->Shapes();
 	xr_vector<CCF_Shape::shape_def>::iterator l_pShape;
 	
 	for(l_pShape = l_shapes.begin(); l_shapes.end() != l_pShape; ++l_pShape) 

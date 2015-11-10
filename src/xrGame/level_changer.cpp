@@ -28,12 +28,12 @@ CLevelChanger::~CLevelChanger	()
 
 void CLevelChanger::Center		(Fvector& C) const
 {
-	XFORM().transform_tiny		(C,CFORM()->getSphere().P);
+	XFORM().transform_tiny		(C, GetCForm()->getSphere().P);
 }
 
 float CLevelChanger::Radius		() const
 {
-	return CFORM()->getRadius	();
+	return GetCForm()->getRadius	();
 }
 
 void CLevelChanger::net_Destroy	() 
@@ -51,7 +51,7 @@ BOOL CLevelChanger::net_Spawn	(CSE_Abstract* DC)
 	m_b_enabled					= true;
 	m_invite_str				= DEF_INVITATION;
 	CCF_Shape *l_pShape			= xr_new<CCF_Shape>(this);
-	collidable.model			= l_pShape;
+    SetCForm(l_pShape);
 	
 	CSE_Abstract				*l_tpAbstract = (CSE_Abstract*)(DC);
 	CSE_ALifeLevelChanger		*l_tpALifeLevelChanger = smart_cast<CSE_ALifeLevelChanger*>(l_tpAbstract);
@@ -89,7 +89,7 @@ BOOL CLevelChanger::net_Spawn	(CSE_Abstract* DC)
 	if (bOk) {
 		l_pShape->ComputeBounds	();
 		Fvector					P;
-		XFORM().transform_tiny	(P,CFORM()->getSphere().P);
+		XFORM().transform_tiny	(P, GetCForm()->getSphere().P);
 		setEnabled				(TRUE);
 	}
 	g_lchangers.push_back		(this);
@@ -100,7 +100,7 @@ void CLevelChanger::shedule_Update(u32 dt)
 {
 	inherited::shedule_Update	(dt);
 
-	const Fsphere				&s = CFORM()->getSphere();
+	const Fsphere				&s = GetCForm()->getSphere();
 	Fvector						P;
 	XFORM().transform_tiny		(P,s.P);
 	feel_touch_update			(P,s.R);
@@ -164,7 +164,7 @@ bool CLevelChanger::get_reject_pos(Fvector& p, Fvector& r)
 
 bool CLevelChanger::feel_touch_contact	(CObject *object)
 {
-	bool bRes	= (((CCF_Shape*)CFORM())->Contact(object));
+	bool bRes	= (((CCF_Shape*)GetCForm())->Contact(object));
 	bRes		= bRes && smart_cast<CActor*>(object) && smart_cast<CActor*>(object)->g_Alive();
 	return		bRes;
 }

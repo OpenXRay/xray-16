@@ -567,7 +567,7 @@ void CWeaponKnife::fill_shapes_list(CEntityAlive const * entity,
 	if (!entity)
 		return;
 
-	CCF_Skeleton*	tmp_skeleton = smart_cast<CCF_Skeleton*>(entity->CFORM());
+	CCF_Skeleton*	tmp_skeleton = smart_cast<CCF_Skeleton*>(entity->GetCForm());
 	if (!tmp_skeleton)
 		return;
 
