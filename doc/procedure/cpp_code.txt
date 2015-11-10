@@ -16,22 +16,60 @@ Indentation is always one shift-width (4):
 
 Open and close brackets of a section should be on the same level:
  BAD
-    if (lastErr == ERROR_SUCCESS) {
+    if (lastErr==ERROR_SUCCESS) {
         *buffer = 0;
         return;
     }
 
  GOOD
-    if (lastErr == ERROR_SUCCESS)
+    if (lastErr==ERROR_SUCCESS)
     {
         *buffer = 0;
         return;
     }
 
+Access modifiers are indented like goto labels - at the class level
+indentation:
+ BAD
+    class ObjectComparer
+    {
+    public:
+        ObjectComparer();
+        int Compare(const Object &a, const Object &b);
+        private: int InternalCompare(const Object &a, const Object &b);
+    };
+ GOOD
+    class ObjectComparer
+    {
+    public:
+        ObjectComparer();
+        int Compare(const Object &a, const Object &b);
+    private:
+        int InternalCompare(const Object &a, const Object &b);
+    };
+
+Namespace content should not be indented:
+ BAD:
+    namespace XRay
+    {
+        namespace Math
+        {
+            #define PI 3.14159265359
+        }
+    }
+ GOOD
+    namespace XRay
+    {
+    namespace Math
+    {
+    #define PI 3.14159265359
+    }
+    }
+
 When breaking up a long line, it should continue with one shift-width for
 indentation:
  BAD
-    if (lineLength > 1 && (screenSize.Vertical < bufferSize.Vertical
+    if (lineLength>1 && (screenSize.Vertical<bufferSize.Vertical
                           || explicitLines))
     {
         printf("this is a test section that will show how to handle "
@@ -41,7 +79,7 @@ indentation:
                        "Button Name" );
     }
  GOOD
-    if (lineLength > 1 && (screenSize.Vertical < bufferSize.Vertical
+    if (lineLength>1 && (screenSize.Vertical<bufferSize.Vertical
         || explicitLines))
     {
         printf("this is a test section that will show how to handle "
@@ -55,56 +93,56 @@ brackets same thing goes when the then/loop part is more than one line:
     if (!ErrorAfterDialog)
         MessageBox(NULL, "Fatal error occured\n\n"
             "Press OK to abort program execution", "Fatal error",
-            MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+            MB_OK|MB_ICONERROR|MB_SYSTEMMODAL);
  GOOD
     if (!ErrorAfterDialog)
     {
         MessageBox(NULL, "Fatal error occured\n\n"
             "Press OK to abort program execution", "Fatal error",
-            MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+            MB_OK|MB_ICONERROR|MB_SYSTEMMODAL);
     }
 
 Function prototypes should be spaced like function calls:
  BAD
-    void xrDebug::Backend(const char* reason,
-                          const char* expression,
-                          const char* arg0,
-                          const char* arg1,
-                          const char* file,
-                          int line,
-                          const char* function,
-                          bool& ignoreAlways);
+    void Debug::Backend(const char *reason,
+                        const char *expression,
+                        const char *arg0,
+                        const char *arg1,
+                        const char *file,
+                        int line,
+                        const char *function,
+                        bool &ignoreAlways);
     {
         // function code
     }
  BAD
-    static void Backend(const char* reason, const char* expression, const
-        char* arg0, const char* arg1, const char* file, int line, const char*
-        function, bool& ignoreAlways);
+    void Debug::Backend(const char *reason, const char *expression, const
+        char *arg0, const char *arg1, const char *file, int line, const char *
+        function, bool &ignoreAlways);
  GOOD
     // declaration
-    static void Backend(const char* reason, const char* expression,
-        const char* arg0, const char* arg1, const char* file, int line,
-        const char* function, bool& ignoreAlways);
+    static void Backend(const char *reason, const char *expression,
+        const char *arg0, const char *arg1, const char *file, int line,
+        const char *function, bool &ignoreAlways);
 
     // implementation
-    void xrDebug::Backend(const char* reason, const char* expression,
-        const char* arg0, const char* arg1, const char* file, int line,
-        const char* function, bool& ignoreAlways)
+    void Debug::Backend(const char *reason, const char *expression,
+        const char *arg0, const char *arg1, const char *file, int line,
+        const char *function, bool &ignoreAlways)
     {
         // function code
     }
 
     // if you need to comment parameters
-    void xrDebug::Backend(
-        const char* reason, // error reason
-        const char* expression, // failed expression
-        const char* arg0, // first argument
-        const char* arg1, // second argument
-        const char* file,
+    void Debug::Backend(
+        const char *reason, // error reason
+        const char *expression, // failed expression
+        const char *arg0, // first argument
+        const char *arg1, // second argument
+        const char *file,
         int line,
-        const char* function,
-        bool& ignoreAlways) // ignore errors of this type
+        const char *function,
+        bool &ignoreAlways) // ignore errors of this type
     {
         // function code
     }
@@ -138,7 +176,7 @@ if the case is one line, then one space after ':':
         break;
     case IDC_LIGHT_SIZE:
     {
-        auto r = hud->GetSlider(IDC_LIGHT_SIZE)->GetValue() * 0.01f;
+        auto r = hud->GetSlider(IDC_LIGHT_SIZE)->GetValue()*0.01f;
         app->spotLightObj->SetLightRadius(r);
         break;
     }
@@ -163,11 +201,11 @@ one space after comma:
 
 One space after reserved words before the opening parenthesis:
  BAD
-    if(OnDialog)    
+    if(OnDialog)
  GOOD
     if (OnDialog)
 
-'then' part of if statement should be in a separete line.
+'then' part of if statement should be in a separate line.
 Reason: allows to debug the if and see when it is run.
  BAD
     if (OnDialog) OnDialog(true);
@@ -207,10 +245,10 @@ after them:
 
 Don't use unneeded parentheses in expressions:
  BAD
-    if ((a != b) || (c != d))
+    if ((a!=b) || (c!=d))
         ...
  GOOD
-    if (a != b || c != d)
+    if (a!=b || c!=d)
         ...
 
 Don't call return at the end of a function returning void:
@@ -240,19 +278,21 @@ class/struct/enum definitions, initializations should open { at the next line:
         int Width;
         int Height;
     };
+ GOOD (no members)
+    struct Dummy {};
  BAD
     Size size = {
-        16,
-        42
+        LayoutHelper::AdjustLength(Clamp(length, 0, 1024)),
+        LayoutHelper::CalculatePreferredHeight(length, scaleFactor.y)
     };
  GOOD
     Size size =
     {
-        16,
-        42
+        LayoutHelper::AdjustLength(Clamp(length, 0, 1024)),
+        LayoutHelper::CalculatePreferredHeight(length, scaleFactor.y)
     };
  GOOD (initialization fits in a single line)
-    Size size = {16, 42};
+    Size size = {1024, 16};
 
 Prefer C++ comments to C comments:
  GOOD
@@ -300,19 +340,19 @@ Common sense should come into play when deciding whether to use for or while
 loops:
  BAD
     int i = 0;
-    while (i < 10)
+    while (i<10)
     {
          i++;
          ...
     }
  GOOD
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i<10; i++)
         ...
  BAD
     for (ptr = ptr->next; ptr; ptr = ptr->next)
         ...
  GOOD
-    while ((ptr = ptr->next))
+    while (ptr = ptr->next, ptr)
        ...
 
 In for and while loops without a statement, statement separator should be in
@@ -323,7 +363,7 @@ the same line.
  GOOD
    for (i = 0; Test(i); i++);
 
-Put one space before and after an assignment:
+Put one space before and after an assignment operator:
  BAD
     int a=0;
     x= x+1;
@@ -335,9 +375,9 @@ Put one space before and after an assignment:
 
 Don't put a space before a statement separator, put one after it:
  BAD
-    for (i = 0 ;i < 10 ;i--, j *= 2) ;
+    for (i = 0 ;i<10 ;i--, j *= 2) ;
  GOOD
-    for (i = 0; i < 10; i--, j *= 2);
+    for (i = 0; i<10; i--, j *= 2);
 
 Don't put a space after increment and decrement. Increment after the value,
 not before.
@@ -348,17 +388,30 @@ not before.
     i--;
     j++;
 
-Put one space before and after comparison operators:
+Trivial > >= < <= == != expressions should not have spaces around them.
+Examples: a, array[i].var[j], sizeof(Foo), x+1
+Pointers (->) are not counted as trivial expressions for > >= < <=, since it's
+hard to read x->y>z, while its easy to read x->y==z.
  BAD
-    if (i==0)
-       return;
-    if (j>0)
-       i = 1;
+    if (x > 5)
  GOOD
-    if (i == 0)
-       return;
-    if (j > 0)
-       i = 1;
+    if (x>5)
+ BAD
+    if (x+1>5)
+ GOOD
+    if (x+1 > 5)
+ BAD
+    if (f(x, y) > g(y, z))
+ GOOD
+    if (f(x, y)>g(y, z))
+ BAD
+    if (x->y == 5)
+ GOOD
+    if (x->y==5)
+ BAD
+    if (x->y>=5)
+ GOOD
+    if (x->y >= 5)
 
 Don't increment, set or change value of variable inside a function call:
  BAD
@@ -381,59 +434,78 @@ Don't increment, set or change value of variable inside a function call:
 In for loops, when there is a function that gets the next element, it should
 be done once (inside the step condition):
  BAD:
-    for (int i = 0, ch = GetChar(); ch == '\r'; ch = GetChar(), i++)
+    for (int i = 0, ch = GetChar(); ch=='\r'; ch = GetChar(), i++)
         HandleResult(ch);
  GOOD:
-    for (int i = 0; (ch = GetChar()) == '\r'; i++)
+    for (int i = 0; (ch = GetChar())=='\r'; i++)
         HandleResult(ch);
 
-When assigning in a truth value (if/for/while) - use brackets. This eliminates
-compilation warnings:
+When assigning in a truth value (if/for/while), use the following pattern in
+order to eliminate compiler warnings:
  BAD:
     for (int i = 0; ch = GetChar(); i++)
         HandleResult(ch);
     if (x = ComputeNum())
         return x;
  GOOD:
-    for (int i = 0; (ch = GetChar()); i++)
+    for (int i = 0; ch = GetChar(), ch; i++)
         HandleResult(ch);
-    if ((x = ComputeNum()))
+    if (x = ComputeNum(), x)
         return x;
 
 In string initialization and null termination, you must use 0:
  BAD:
     string[0] = '\0';
-    if (string[3] == '\0')
+    if (string[3]=='\0')
     {
     }
 
  GOOD:
-    string[0] = 0;
-    if (string[3] == 0)
+    *string = 0;
+    if (!string[3])
     {
     }
 
 Naming conventions:
 - Do choose easily readable identifier names. For example, a variable named
   horizontalAlignment is more readable in English than alignmentHorizontal.
-- Do not use underscores.
 - Do not use Hungarian notation except in two cases:
   - UI-related code, i.e. btnOpen, lblMessage, chkRecursive, cbGameType
   - Interface classes: IClient, IGameLevel, IGamePersistent, etc
 
 Casing styles:
 - class/struct/enum: PascalCase
-  - Math primitives can be in lowercase: vector2f, angle3f, matrix44f
-  - Using declarations of primitive types can be in lowercase: uint, int16, uint64
+  - Math primitives can be in lowercase:
+    vector2f, angle3f, matrix44f
+  - Using declarations of primitive types can be in lowercase:
+    uint, int16, uint64
 - Functions: PascalCase
 - Public and protected fields: PascalCase
-  - Math primitives can use lowercase: vector2f.x, angle3f.yaw, matrix44f.m03
+  - Math primitives can use lowercase:
+    vector2f.x, angle3f.yaw, matrix44f.m03
 - Private fields: camelCase
 - Local variables: camelCase
 - Global variables: PascalCase
 - Namespaces: PascalCase
 
-When overriding virtual function, use override specifier on function declaration.
+Don't put inline qualifier on a function defined within a class definition -
+such function is inline according to the standard.
+
+When defining an interface class, declare destructor as pure virtual and add
+its empty inline implementation after the class definition:
+ GOOD
+    class IServer
+    {
+    public:
+        virtual ~IServer() = 0;
+    };
+    
+    inline IServer::~IServer() {}
+
+Do not mark interface classes with linkage attributes.
+
+When overriding virtual function, use override specifier on function
+declaration.
  BAD
     class Server : public IServer
     {
@@ -453,20 +525,20 @@ Checking function return values:
 Functions that return bool or a pointer will be checked without
 comparing, if they return true or false.
  BAD
-    if (strstr(args, " -h") != nullptr)
+    if (strstr(args, " -h")!=nullptr)
         PrintHelp();
  GOOD
     if (strstr(args, " -h"))
         PrintHelp();
  BAD
-    if (IsUpdateRequired() == true)
+    if (IsUpdateRequired()==true)
         Update();
  GOOD
     if (IsUpdateRequired())
         Update();
  BAD
     cl = GetClient(id);
-    if (cl == nullptr)
+    if (cl==nullptr)
         return nullptr;
  GOOD
     cl = GetClient(id);
@@ -474,7 +546,7 @@ comparing, if they return true or false.
         return nullptr;
  BAD
     cl = GetClient(id);
-    if (cl != nullptr)
+    if (cl!=nullptr)
         Disconnect(cl);
  GOOD
     cl = GetClient(id);
@@ -493,10 +565,7 @@ When possible, prefer inline functions to macros:
     #define RAD2DEG(angle) ((angle)*180/PI)
  GOOD
     template <typename T>
-    T RadiansToDegrees(T angle)
-    {
-        return angle*180/PI;
-    }
+    T RadiansToDegrees(T angle) { return angle*180/PI; }
 
 Macro names should normally be all upper case, with normal spacing as rest of
 code:
@@ -510,8 +579,8 @@ code:
     #define RAD2DEG(angle) \
         ((angle)*180/PI)
 
-Macros that are more than one statement long should be encapsulated by
-do-while(false). This enables using them inside if-else statements:
+Common use macros that are more than one statement long should be encapsulated
+by do...while(false). This enables using them inside if...else statements:
  Example usage:
     if (condition)
         DO_A_AND_B;
@@ -550,7 +619,7 @@ order so the caller is below the callee.
         Callee();
     }
 
-Prefer data types from Common.hpp over OS specific data types:
+Prefer portable data types from Common.hpp over OS specific data types:
  BAD
     BYTE b;
     DWORD w;
@@ -769,13 +838,36 @@ Only separate the last line, if it is meant to never be surpassed.
         Invalid = 0xFF
     };
 
-Put the pointer and reference before the identifier:
+Put the pointer and reference next to the identifier:
  BAD
-    IClient *GetServerClient();
-    void BanAddress(const IPAddress &ip);
- GOOD
     IClient* GetServerClient();
     void BanAddress(const IPAddress& ip);
+ GOOD
+    IClient *GetServerClient();
+    void BanAddress(const IPAddress &ip);
+
+Put static/const/volatile/mutable before the type:
+ BAD
+    int const static z;
+    bool volatile exit;
+    int static Log(char const *s);
+    bool mutable lastState;
+    char const* const* name;
+ GOOD
+    static const int z;
+    volatile bool exit;
+    static int Log(char const *s);
+    mutable bool lastState;
+    const char *const *name;
+
+Use stack allocation for local variables of constant size. Use dynamic
+allocation only when needed.
+ BAD
+    ConnectionParams *cp = new ConnectionParams();
+    ...
+    delete cp;
+ GOOD
+    ConnectionParams cp;
 
 Operator delete also handles nullptr, so no need for 'if ()' before it:
  BAD (if str can be null):
@@ -789,19 +881,19 @@ and opened again on the next line. Words should have the space after them on
 the same line.
  BAD
     Log("Hello world, this is a long string that we want to print and \
-is more than 80 chars long so we need to split it");
+is more than 120 chars long so we need to split it");
  BAD
     Log("Hello world, this is a long string that we want to print"
-        " and is more than 80 chars long so we need to split it");
+        " and is more than 120 chars long so we need to split it");
  GOOD
     Log("Hello world, this is a long string that we want to print "
-        "and is more than 80 chars long so we need to split it");
+        "and is more than 120 chars long so we need to split it");
 
 Functions that accept zero parameters should be defined without void:
  BAD
-    IClient* GetServerClient(void);
+    IClient *GetServerClient(void);
  GOOD
-    IClient* GetServerClient();
+    IClient *GetServerClient();
 
 Trivial + - * / expressions should not have spaces around them:
  BAD
@@ -824,25 +916,24 @@ Trivial + - * / expressions should not have spaces around them:
 Don't put empty lines between code inside functions. If you want to separate
 code fragments, put a comment line.
  BAD
-    for (auto& item : items)
+    for (auto &item : items)
         storage.push_back(item);
     
-    if (storage.size() == 0)
+    if (!storage.size())
         Log("! ERROR: No items found");
  GOOD
-    for (auto& item : items)
+    for (auto &item : items)
         storage.push_back(item);
     // check if there's no items
-    if (storage.size() == 0)
+    if (!storage.size())
         Log("! ERROR: No items found");
 
-Module Foo in Engine/Bar/Foo.cpp & Foo.hpp.
+Class Foo in src/Bar/Foo.cpp & Foo.hpp.
 All files should follow this exact example.
-Unless using precompiled headers, #include "Common.hpp" must be first in
+Unless using precompiled headers, #include "Config.hpp" must be first in
 the *.cpp file to make sure the features configuration affect all the rest of
-the files. If using precompiled headers, #include "Common.hpp" must be first
-in the precompiled header file (e.g. stdafx.hpp) and must not be included in
-*.cpp file.
+the files. If using precompiled headers, #include "Config.hpp" must appear
+immediately after the precompiled header file (e.g. stdafx.hpp).
 Header files must be self contained, i.e. they must be able to compile
 without relying on another include line to come before them.
 Therefore #include "Foo.hpp" must be immediately after to make sure Foo.hpp
@@ -851,14 +942,14 @@ compiles standalone without any dependency on includes before it.
     Foo.hpp template
     ------------------------------
     #pragma once
-    #include "Common.hpp"
+    #include "Config.hpp"
     ... Put here minimal includes required by Foo.hpp ...
     
     ... Put here your declarations ...
     
     Foo.cpp template
     ------------------------------
-    #include "Common.hpp"
+    #include "Config.hpp"
     #include "Foo.hpp"
     ... Put here minimal includes required by Foo.cpp ...
     
@@ -868,13 +959,13 @@ compiles standalone without any dependency on includes before it.
     stdafx.hpp template
     ------------------------------
     #pragma once
-    #include "Common.hpp"
+    #include "Config.hpp"
     ... Put here additional includes ...
     
     Foo.hpp template
     ------------------------------
     #pragma once
-    #include "Common.hpp"
+    #include "Config.hpp"
     ... Put here minimal includes required by Foo.hpp ...
     
     ... Put here your declarations ...
@@ -882,6 +973,7 @@ compiles standalone without any dependency on includes before it.
     Foo.cpp template
     ------------------------------
     #include "stdafx.hpp"
+    #include "Config.hpp"
     #include "Foo.hpp"
     ... Put here minimal includes required by Foo.cpp ...
     
@@ -893,14 +985,14 @@ Use #include "PathToFoo/Foo.hpp" for headers in other directories, where
 PathToFoo is relative to root engine directory.
 Use #include <Foo.hpp> for external system files.
  BAD
-    #include <Common.hpp>
+    #include <Config.hpp>
     #include <xrCore/xrCore.hpp>
     #include "IReader.hpp"
     #include "algorithm"
  GOOD
-    #include "Common.hpp"
-    #include "xrCore.hpp" // we are in Engine/xrCore directory
-    #include "IO/IReader.hpp" // from Engine/xrCore/IO/IReader.hpp
+    #include "Config.hpp"
+    #include "xrCore.hpp" // we are in src/xrCore directory
+    #include "IO/IReader.hpp" // from src/xrCore/IO/IReader.hpp
     #include <algorithm>
 
 Comments of XXX should be <keywords>: <comment>. Multiple names should be
