@@ -2,7 +2,7 @@
 #pragma hdrstop
 
 #include "xrCDB.h"
-#include "frustum.h"
+#include "Frustum.h"
 
 using namespace CDB;
 using namespace Opcode;

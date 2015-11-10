@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "xr_area.h"
-#include "ispatial.h"
+#include "ISpatial.h"
 #include "xrEngine/xr_collide_form.h"
 #include "xrEngine/xr_object.h"
 #include "Intersect.hpp"

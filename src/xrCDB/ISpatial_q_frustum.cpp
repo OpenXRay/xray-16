@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "ISpatial.h"
-#include "frustum.h"
+#include "Frustum.h"
 
 extern Fvector	c_spatial_offset[8];
 
