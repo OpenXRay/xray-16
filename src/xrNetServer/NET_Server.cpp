@@ -582,7 +582,7 @@ void	IPureServer::Flush_Clients_Buffers	()
 	{
 		static void FlushBuffer(IClient* client)
 		{
-			client->MultipacketSender::FlushSendBuffer(0);
+			client->FlushSendBuffer(0);
 		}
 	};
 	
@@ -596,7 +596,7 @@ void	IPureServer::SendTo_Buf(ClientID id, void* data, u32 size, u32 dwFlags, u32
 	IClient* tmp_client = net_players.GetFoundClient(
 		ClientIdSearchPredicate(id));
 	VERIFY(tmp_client);
-	tmp_client->MultipacketSender::SendPacket(data, size, dwFlags, dwTimeout);
+	tmp_client->SendPacket(data, size, dwFlags, dwTimeout);
 }
 
 

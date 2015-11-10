@@ -78,6 +78,10 @@ public:
 	
     IPureServer*        server;
 
+public:
+    using MultipacketSender::SendPacket;
+    using MultipacketSender::FlushSendBuffer;
+
 private:
 
     virtual void    _SendTo_LL( const void* data, u32 size, u32 flags, u32 timeout );
