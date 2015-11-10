@@ -284,11 +284,7 @@ void CGameFont::MasterOut(
     rs.c = dwCurrentColor;
     rs.height = fCurrentHeight;
     rs.align = eCurrentAlignment;
-#ifndef _EDITOR
-    int vs_sz = vsprintf_s(rs.string, fmt, p);
-#else
-    int vs_sz = vsprintf(rs.string, fmt, p);
-#endif
+    int vs_sz = xr_sprintf(rs.string, fmt, p);
     //VERIFY( ( vs_sz != -1 ) && ( rs.string[ vs_sz ] == '\0' ) );
 
     rs.string[sizeof(rs.string) - 1] = 0;
