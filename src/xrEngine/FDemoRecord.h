@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "iinputreceiver.h"
-#include "effector.h"
+#include "IInputReceiver.h"
+#include "Effector.h"
 
 class ENGINE_API CDemoRecord :
     public CEffectorCam,

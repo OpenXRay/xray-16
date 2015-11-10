@@ -8,7 +8,7 @@
 #include "Include/xrRender/Kinematics.h"
 
 #ifdef DEBUG
-#include "iphdebug.h"
+#include "IPHdebug.h"
 #endif
 
 BOOL CCF_DynamicMesh::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)

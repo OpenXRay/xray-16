@@ -4,13 +4,13 @@
 
 #include "stdafx.h"
 #include "IGame_Level.h"
-#include "fdemoplay.h"
-#include "xr_ioconsole.h"
+#include "FDemoPlay.h"
+#include "XR_IOConsole.h"
 #include "xrCore/Animation/Motion.hpp"
 #include "Render.h"
 #include "CameraManager.h"
 
-#include "xrSash.h"
+#include "xrSASH.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

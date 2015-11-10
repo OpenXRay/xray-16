@@ -1,12 +1,12 @@
 #ifndef __XR_OBJECT_H__
 #define __XR_OBJECT_H__
 
-#include "xrCDB/ispatial.h"
-#include "isheduled.h"
+#include "xrCDB/ISpatial.h"
+#include "ISheduled.h"
 
-#include "irenderable.h"
-#include "icollidable.h"
-#include "engineapi.h"
+#include "IRenderable.h"
+#include "ICollidable.h"
+#include "EngineAPI.h"
 #include "device.h"
 // refs
 //class ENGINE_API IRender_Visual;

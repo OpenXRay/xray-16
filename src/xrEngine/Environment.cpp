@@ -2,12 +2,12 @@
 #pragma hdrstop
 
 #ifndef _EDITOR
-#include "render.h"
+#include "Render.h"
 #endif
 
 #include "Environment.h"
 #include "xr_efflensflare.h"
-#include "rain.h"
+#include "Rain.h"
 #include "thunderbolt.h"
 #include "xrHemisphere.h"
 #include "perlin.h"

@@ -4,13 +4,13 @@
 
 #include "x_ray.h"
 #include "std_classes.h"
-#include "customHUD.h"
-#include "render.h"
-#include "gamefont.h"
+#include "CustomHUD.h"
+#include "Render.h"
+#include "GameFont.h"
 #include "Common/LevelStructure.hpp"
 #include "CameraManager.h"
 #include "xr_object.h"
-#include "feel_sound.h"
+#include "Feel_Sound.h"
 
 #include "securom_api.h"
 

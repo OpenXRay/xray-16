@@ -2,7 +2,7 @@
 #pragma hdrstop
 
 #include "xr_input.h"
-#include "iinputreceiver.h"
+#include "IInputReceiver.h"
 
 void IInputReceiver::IR_Capture(void)
 {

@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "ps_instance.h"
+#include "PS_instance.h"
 #include "IGame_Persistent.h"
 
 CPS_Instance::CPS_Instance(bool destroy_on_game_load) :

@@ -13,8 +13,8 @@
 #include "EffectorPP.h"
 
 #include "x_ray.h"
-#include "gamefont.h"
-#include "render.h"
+#include "GameFont.h"
+#include "Render.h"
 
 float psCamInert = 0.f;
 float psCamSlideInert = 0.25f;

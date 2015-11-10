@@ -7,7 +7,7 @@
 
 /*
 #include "CameraBase.h"
-#include "iinputreceiver.h"
+#include "IInputReceiver.h"
 
 class ENGINE_API CCameraDebug :
 public CCameraBase,

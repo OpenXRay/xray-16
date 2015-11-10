@@ -4,7 +4,7 @@
 #include "Environment.h"
 #include "xr_efflensflare.h"
 #include "thunderbolt.h"
-#include "rain.h"
+#include "Rain.h"
 
 #include "IGame_Level.h"
 #include "Common/object_broker.h"

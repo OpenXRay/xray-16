@@ -1,7 +1,7 @@
 #pragma once
 
 #include "xrEngine/Engine.h"
-#include "xrCDB/frustum.h"
+#include "xrCDB/Frustum.h"
 #include "vis_common.h"
 #include "Include/xrAPI/xrAPI.h"
 #include "Include/xrRender/FactoryPtr.h"

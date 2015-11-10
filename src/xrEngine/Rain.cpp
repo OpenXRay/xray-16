@@ -8,7 +8,7 @@
 #ifdef _EDITOR
 #include "ui_toolscustom.h"
 #else
-#include "render.h"
+#include "Render.h"
 #include "IGame_Level.h"
 #include "xrCDB/xr_area.h"
 #include "xr_object.h"

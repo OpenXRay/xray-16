@@ -10,7 +10,7 @@
 
 #ifdef INGAME_EDITOR
 #include "engine_impl.hpp"
-#include "xr_ioconsole.h"
+#include "XR_IOConsole.h"
 #include "xr_input.h"
 #include "IGame_Persistent.h"
 #include "IGame_Level.h"

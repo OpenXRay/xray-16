@@ -14,19 +14,19 @@
 #include "xrNetServer/NET_AuthCheck.h"
 
 #include "xr_input.h"
-#include "xr_ioconsole.h"
+#include "XR_IOConsole.h"
 #include "x_ray.h"
 #include "std_classes.h"
 #include "GameFont.h"
 #include "resource.h"
 #include "LightAnimLibrary.h"
-#include "xrCDB/ispatial.h"
+#include "xrCDB/ISpatial.h"
 #include "CopyProtection.h"
 #include "Text_Console.h"
 #include <process.h>
 #include <locale.h>
 
-#include "xrSash.h"
+#include "xrSASH.h"
 
 #include "securom_api.h"
 #include "xrScriptEngine/script_engine.hpp"

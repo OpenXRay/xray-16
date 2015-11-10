@@ -5,7 +5,7 @@
 #include "xrCDB/ISpatial.h"
 #include "IGame_Persistent.h"
 #include "IGame_Level.h"
-#include "render.h"
+#include "Render.h"
 #include "xr_object.h"
 
 #include "Include/xrRender/DrawUtils.h"

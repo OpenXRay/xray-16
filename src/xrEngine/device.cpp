@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "xrCDB/frustum.h"
+#include "xrCDB/Frustum.h"
 
 #pragma warning(disable:4995)
 // mmsystem.h
@@ -12,7 +12,7 @@
 #pragma warning(default:4995)
 
 #include "x_ray.h"
-#include "render.h"
+#include "Render.h"
 
 // must be defined before include of FS_impl.h
 #define INCLUDE_FROM_ENGINE
@@ -23,7 +23,7 @@
 # include "engine_impl.hpp"
 #endif // #ifdef INGAME_EDITOR
 
-#include "xrSash.h"
+#include "xrSASH.h"
 #include "IGame_Persistent.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 

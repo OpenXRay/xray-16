@@ -2,9 +2,9 @@
 #pragma once
 
 #ifndef _EDITOR
-#include "render.h"
+#include "Render.h"
 #endif
-#include "Thunderbolt.h"
+#include "thunderbolt.h"
 #include "IGame_Persistent.h"
 #include "LightAnimLibrary.h"
 

@@ -3,10 +3,10 @@
 
 #include "Environment.h"
 #ifndef _EDITOR
-#include "render.h"
+#include "Render.h"
 #endif
 #include "xr_efflensflare.h"
-#include "rain.h"
+#include "Rain.h"
 #include "thunderbolt.h"
 
 #ifndef _EDITOR
