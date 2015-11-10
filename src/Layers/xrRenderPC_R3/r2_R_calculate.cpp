@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "xrEngine/customhud.h"
+#include "xrEngine/CustomHUD.h"
 
 float				g_fSCREEN		;
 

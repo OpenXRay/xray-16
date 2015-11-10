@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "Layers/xrRender/FBasicVisual.h"
-#include "xrEngine/customhud.h"
+#include "xrEngine/CustomHUD.h"
 #include "xrEngine/xr_object.h"
 
 #include "Layers/xrRender/QueryHelper.h"

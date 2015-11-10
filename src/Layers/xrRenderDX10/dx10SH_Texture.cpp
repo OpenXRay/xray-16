@@ -4,7 +4,7 @@
 #include "Layers/xrRender/ResourceManager.h"
 
 #ifndef _EDITOR
-#include "xrEngine/render.h"
+#include "xrEngine/Render.h"
 #endif
 
 #include "xrEngine/tntQAVI.h"

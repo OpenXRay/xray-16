@@ -6,7 +6,7 @@
 #pragma hdrstop
 
 #ifndef _EDITOR
-#	include "xrEngine/render.h"
+#	include "xrEngine/Render.h"
 #endif // #ifndef _EDITOR
 
 #include "FBasicVisual.h"

@@ -42,7 +42,7 @@
 #include "Layers/xrRender/R_Backend_Runtime.h"
 #include "Layers/xrRender/ResourceManager.h"
 #include "xrEngine/vis_common.h"
-#include "xrEngine/render.h"
+#include "xrEngine/Render.h"
 #include "Common/_d3d_extensions.h"
 #include "xrEngine/IGame_Level.h"
 #include "Layers/xrRender/blenders\blender.h"

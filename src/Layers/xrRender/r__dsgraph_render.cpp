@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
-#include "xrEngine/render.h"
-#include "xrEngine/irenderable.h"
+#include "xrEngine/Render.h"
+#include "xrEngine/IRenderable.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 #include "xrEngine/CustomHUD.h"
