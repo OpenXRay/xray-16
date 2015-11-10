@@ -58,14 +58,6 @@ static const unsigned   MaxMultipacketSize          = 32768;
 
 XRNETSERVER_API int     psNET_GuaranteedPacketMode  = NET_GUARANTEEDPACKET_DEFAULT;
 
-
-//------------------------------------------------------------------------------
-
-MultipacketSender::MultipacketSender()
-{
-}
-
-
 //------------------------------------------------------------------------------
 
 void

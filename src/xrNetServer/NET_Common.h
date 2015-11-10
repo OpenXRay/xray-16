@@ -42,7 +42,6 @@ class XRNETSERVER_API
 MultipacketSender
 {
 public:
-                    MultipacketSender();
     virtual         ~MultipacketSender() {}
 
 protected:
