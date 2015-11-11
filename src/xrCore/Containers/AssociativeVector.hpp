@@ -119,8 +119,8 @@ IC	_associative_vector::AssociativeVector(const key_compare &predicate) :
 TEMPLATE_SPECIALIZATION
 template <typename TIterator>
 IC	_associative_vector::AssociativeVector(TIterator first, TIterator last,
-    const key_compare &predicate = key_compare(), const allocator_type &allocator = allocator_type()) :
-	inherited(first,last), TComparer(predicate)
+    const key_compare &predicate, const allocator_type &allocator) :
+        inherited(first,last), TComparer(predicate)
 { std::sort(begin(), end(), static_cast<TComparer&>(*this)); }
 
 TEMPLATE_SPECIALIZATION
