@@ -1,2 +1,0 @@
-
-//#define NO_SINGLE

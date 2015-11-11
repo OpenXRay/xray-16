@@ -1,5 +1,4 @@
 #pragma once
-#include "xrEngine/no_single.h"
 
 class CUIDialogWnd;
 class CUIWindow;
