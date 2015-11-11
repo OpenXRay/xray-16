@@ -112,7 +112,7 @@ void CALifeUpdateManager::update			()
 
 void CALifeUpdateManager::shedule_Update	(u32 dt)
 {
-	ISheduled::shedule_Update		(dt);
+    ScheduledBase::shedule_Update		(dt);
 
 	if (!initialized())
 		return;

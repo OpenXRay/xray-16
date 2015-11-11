@@ -85,8 +85,8 @@ void CSpectator::UpdateCL()
 		{
 #ifdef DEBUG
 			m_pActorToLookAt->dbg_update_cl			= 0;
-			m_pActorToLookAt->dbg_update_shedule	= 0;
-			Game().dbg_update_shedule				= 0;
+			m_pActorToLookAt->GetSchedulerData().dbg_update_shedule	= 0;
+			Game().GetSchedulerData().dbg_update_shedule				= 0;
 #endif
 			Device.dwTimeDelta					= 0;
 			m_pActorToLookAt->UpdateCL();
@@ -94,8 +94,8 @@ void CSpectator::UpdateCL()
 			Game().shedule_Update				(0);
 #ifdef DEBUG
 			m_pActorToLookAt->dbg_update_cl			= 0;
-			m_pActorToLookAt->dbg_update_shedule	= 0;
-			Game().dbg_update_shedule				= 0;
+			m_pActorToLookAt->GetSchedulerData().dbg_update_shedule	= 0;
+			Game().GetSchedulerData().dbg_update_shedule				= 0;
 #endif
 		}
 	}
@@ -352,14 +352,14 @@ void CSpectator::FirstEye_ToPlayer(CObject* pObject)
 	{
 #ifdef DEBUG
 		pOldActor->dbg_update_cl		= 0;
-		pOldActor->dbg_update_shedule	= 0;
+		pOldActor->GetSchedulerData().dbg_update_shedule	= 0;
 #endif
 		Device.dwTimeDelta				= 0;
 		pOldActor->UpdateCL				();
 		pOldActor->shedule_Update		(0);
 #ifdef DEBUG
 		pOldActor->dbg_update_cl		= 0;
-		pOldActor->dbg_update_shedule	= 0;
+		pOldActor->GetSchedulerData().dbg_update_shedule	= 0;
 #endif
 	}
 };

@@ -16,11 +16,11 @@ class CEntity;
 class CVisualMemoryManager;
 
 class vision_client :
-	public ISheduled,
+	public ScheduledBase,
 	public Feel::Vision
 {
 private:
-	typedef ISheduled				inherited;
+	typedef ScheduledBase				inherited;
 
 private:
 	CEntity							*m_object;

@@ -18,7 +18,7 @@ struct SZoneMapEntityData{
 
 struct WeaponUsageStatistic;
 
-class	game_cl_GameState	: public game_GameState, public ISheduled
+class	game_cl_GameState	: public game_GameState, public ScheduledBase
 {
 	typedef game_GameState	inherited;
 	shared_str							m_game_type_name;

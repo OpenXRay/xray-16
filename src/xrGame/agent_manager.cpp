@@ -103,7 +103,7 @@ void CAgentManager::shedule_Update		(u32 time_delta)
 {
 	START_PROFILE("Agent_Manager")
 
-	ISheduled::shedule_Update	(time_delta);
+	ScheduledBase::shedule_Update	(time_delta);
 
 	update_impl					();
 

@@ -3,7 +3,7 @@
 
 #define RESULT_WIDTH	640
 #define RESULT_HEIGHT	480
-class screenshot_manager : public ISheduled
+class screenshot_manager : public ScheduledBase
 {
 public:
 	enum ss_manager_state_mask_t

@@ -8,9 +8,9 @@
 
 #pragma once
 
-class CAutosaveManager : public ISheduled {
+class CAutosaveManager : public ScheduledBase {
 private:
-	typedef ISheduled	inherited;
+	typedef ScheduledBase	inherited;
 
 private:
 	u32		m_autosave_interval;

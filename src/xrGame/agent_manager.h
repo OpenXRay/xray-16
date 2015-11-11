@@ -19,7 +19,7 @@ class CAgentManagerPlanner;
 //#define USE_SCHEDULER_IN_AGENT_MANAGER
 
 #ifdef USE_SCHEDULER_IN_AGENT_MANAGER
-	class CAgentManager : public ISheduled {
+	class CAgentManager : public ScheduledBase {
 #else // USE_SCHEDULER_IN_AGENT_MANAGER
 	class CAgentManager {
 #endif // USE_SCHEDULER_IN_AGENT_MANAGER

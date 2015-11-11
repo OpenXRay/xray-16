@@ -29,7 +29,7 @@ xr_pure_interface IObjectPhysicsCollision;
 class ENGINE_API CObject :
     public DLL_Pure,
     public SpatialBase,
-    public ISheduled,
+    public ScheduledBase,
     public IRenderable,
     public CollidableBase
 {

@@ -19,7 +19,7 @@ namespace gamespy_profile
 {
 
 class stats_submitter :
-	public ISheduled,
+	public ScheduledBase,
 	private boost::noncopyable
 {
 public:

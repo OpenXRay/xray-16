@@ -7,7 +7,7 @@
 
 class ENGINE_API CPS_Instance :
     public SpatialBase,
-    public ISheduled,
+    public ScheduledBase,
     public IRenderable
 {
     friend class IGame_Persistent;

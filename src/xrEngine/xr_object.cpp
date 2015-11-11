@@ -170,7 +170,7 @@ CObject::CObject() :
     NameVisual = NULL;
 
 #ifdef DEBUG
-    dbg_update_shedule = u32(-1) / 2;
+    shedule.dbg_update_shedule = u32(-1) / 2;
     dbg_update_cl = u32(-1) / 2;
 #endif
 }
@@ -347,7 +347,7 @@ void CObject::shedule_Update(u32 T)
 {
     // consistency check
     // Msg ("-SUB-:[%x][%s] CObject::shedule_Update",dynamic_cast<void*>(this),*cName());
-    ISheduled::shedule_Update(T);
+    ScheduledBase::shedule_Update(T);
     spatial_update(base_spu_epsP * 1, base_spu_epsR * 1);
 
     // Always make me crow on shedule-update

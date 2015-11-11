@@ -22,7 +22,7 @@ class awards_store;
 class best_scores_store;
 
 class profile_store : 
-	public ISheduled,
+	public ScheduledBase,
 	private boost::noncopyable
 {
 public:

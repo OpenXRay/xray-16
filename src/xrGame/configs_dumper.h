@@ -22,7 +22,7 @@ private:
 	void	feel_private_dsa_key	();
 };
 
-class configs_dumper : public ISheduled
+class configs_dumper : public ScheduledBase
 {
 public:
 	typedef fastdelegate::FastDelegate3<u8 const*, u32, u32, void>	complete_callback_t;

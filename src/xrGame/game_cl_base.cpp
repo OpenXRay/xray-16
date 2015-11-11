@@ -330,7 +330,7 @@ ClientID game_cl_GameState::GetClientIDByOrderID	(u32 idx)
 
 void game_cl_GameState::shedule_Update		(u32 dt)
 {
-	ISheduled::shedule_Update	(dt);
+    ScheduledBase::shedule_Update	(dt);
 
 	if(!m_game_ui_custom)
 	{

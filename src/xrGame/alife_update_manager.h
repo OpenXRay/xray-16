@@ -20,7 +20,7 @@ class CALifeUpdateManager :
 	public CALifeSwitchManager,
 	public CALifeSurgeManager,
 	public CALifeStorageManager,
-	public ISheduled
+	public ScheduledBase
 {
 private:
 	bool				m_first_time;
