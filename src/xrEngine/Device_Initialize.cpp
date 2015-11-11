@@ -32,7 +32,7 @@ void CRenderDevice::initialize_editor()
 }
 #endif // #ifdef INGAME_EDITOR
 
-PROTECT_API void CRenderDevice::Initialize()
+void CRenderDevice::Initialize()
 {
     Log("Initializing Engine...");
     TimerGlobal.Start();

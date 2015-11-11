@@ -24,7 +24,7 @@ CEngine::~CEngine()
 
 extern void msCreate(LPCSTR name);
 
-PROTECT_API void CEngine::Initialize(void)
+void CEngine::Initialize(void)
 {
     Engine.Sheduler.Initialize();
 #ifdef DEBUG

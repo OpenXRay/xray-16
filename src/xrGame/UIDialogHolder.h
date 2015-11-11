@@ -22,7 +22,7 @@ public:
 	Flags8			m_flags;
 };
 
-class PROTECT_API CDialogHolder :public pureFrame
+class CDialogHolder :public pureFrame
 {
 	//dialogs
 	xr_vector<recvItem>										m_input_receivers;

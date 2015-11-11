@@ -27,8 +27,6 @@
 #include <locale.h>
 
 #include "xrSASH.h"
-
-#include "securom_api.h"
 #include "xrScriptEngine/script_engine.hpp"
 
 //---------------------------------------------------------------------
@@ -72,10 +70,8 @@ static int start_year = 1999; // 1999
 #define DEFAULT_MODULE_HASH "3CAABCFCFF6F3A810019C6A72180F166"
 static char szEngineHash[33] = DEFAULT_MODULE_HASH;
 
-PROTECT_API char* ComputeModuleHash(char* pszHash)
+char* ComputeModuleHash(char* pszHash)
 {
-    SECUROM_MARKER_HIGH_SECURITY_ON(3)
-
     char szModuleFileName[MAX_PATH];
     HANDLE hModuleHandle = NULL, hFileMapping = NULL;
     LPVOID lpvMapping = NULL;
@@ -122,9 +118,6 @@ PROTECT_API char* ComputeModuleHash(char* pszHash)
     UnmapViewOfFile(lpvMapping);
     CloseHandle(hFileMapping);
     CloseHandle(hModuleHandle);
-
-    SECUROM_MARKER_HIGH_SECURITY_OFF(3)
-
     return pszHash;
 }
 #endif // DEDICATED_SERVER
@@ -220,7 +213,7 @@ struct path_excluder_predicate
     xr_auth_strings_t const* m_ignore;
 };
 
-PROTECT_API void InitSettings()
+void InitSettings()
 {
 #ifndef DEDICATED_SERVER
     Msg("EH: %s\n", ComputeModuleHash(szEngineHash));
@@ -254,10 +247,8 @@ PROTECT_API void InitSettings()
     pGameIni = xr_new<CInifile>(fname, TRUE);
     CHECK_OR_EXIT(0 != pGameIni->section_count(), make_string("Cannot find file %s.\nReinstalling application may fix this problem.", fname));
 }
-PROTECT_API void InitConsole()
+void InitConsole()
 {
-    SECUROM_MARKER_SECURITY_ON(5)
-
 #ifdef DEDICATED_SERVER
     {
         Console = xr_new<CTextConsole>();
@@ -277,11 +268,9 @@ PROTECT_API void InitConsole()
         sscanf(strstr(Core.Params, "-ltx ") + 5, "%[^ ] ", c_name);
         xr_strcpy(Console->ConfigFile, c_name);
     }
-
-    SECUROM_MARKER_SECURITY_OFF(5)
 }
 
-PROTECT_API void InitInput()
+void InitInput()
 {
     BOOL bCaptureInput = !strstr(Core.Params, "-i");
 
@@ -292,12 +281,12 @@ void destroyInput()
     xr_delete(pInput);
 }
 
-PROTECT_API void InitSound1()
+void InitSound1()
 {
     CSound_manager_interface::_create(0);
 }
 
-PROTECT_API void InitSound2()
+void InitSound2()
 {
     CSound_manager_interface::_create(1);
 }
@@ -621,9 +610,6 @@ BOOL IsOutOfVirtualMemory()
 {
 #define VIRT_ERROR_SIZE 256
 #define VIRT_MESSAGE_SIZE 512
-
-    SECUROM_MARKER_HIGH_SECURITY_ON(1)
-
     MEMORYSTATUSEX statex;
     DWORD dwPageFileInMB = 0;
     DWORD dwPhysMemInMB = 0;
@@ -653,9 +639,6 @@ BOOL IsOutOfVirtualMemory()
         return 0;
 
     MessageBox(NULL, pszMessage, pszError, MB_OK | MB_ICONHAND);
-
-    SECUROM_MARKER_HIGH_SECURITY_OFF(1)
-
     return 1;
 }
 
@@ -1242,7 +1225,7 @@ void CApplication::destroy_loading_shaders()
 
 //u32 calc_progress_color(u32, u32, int, int);
 
-PROTECT_API void CApplication::LoadDraw()
+void CApplication::LoadDraw()
 {
     if (g_appLoaded) return;
     Device.dwFrame += 1;
@@ -1318,8 +1301,6 @@ void CApplication::Level_Append(LPCSTR folder)
 
 void CApplication::Level_Scan()
 {
-    SECUROM_MARKER_PERFORMANCE_ON(8)
-
     for (u32 i = 0; i < Levels.size(); i++)
     {
         xr_free(Levels[i].folder);
@@ -1335,8 +1316,6 @@ void CApplication::Level_Scan()
         Level_Append((*folder)[i]);
 
     FS.file_list_close(folder);
-
-    SECUROM_MARKER_PERFORMANCE_OFF(8)
 }
 
 void gen_logo_name(string_path& dest, LPCSTR level_name, int num)
@@ -1354,8 +1333,6 @@ void gen_logo_name(string_path& dest, LPCSTR level_name, int num)
 
 void CApplication::Level_Set(u32 L)
 {
-    SECUROM_MARKER_PERFORMANCE_ON(9)
-
     if (L >= Levels.size()) return;
     FS.get_path("$level$")->_set(Levels[L].folder);
 
@@ -1389,16 +1366,11 @@ void CApplication::Level_Set(u32 L)
         m_pRender->setLevelLogo(path);
 
     CheckCopyProtection();
-
-    SECUROM_MARKER_PERFORMANCE_OFF(9)
 }
 
 int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
 {
     int result = -1;
-
-    SECUROM_MARKER_SECURITY_ON(7)
-
     CLocatorAPI::archives_it it = FS.m_archives.begin();
     CLocatorAPI::archives_it it_e = FS.m_archives.end();
     bool arch_res = false;
@@ -1437,9 +1409,6 @@ int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
 
     if (arch_res)
         g_pGamePersistent->OnAssetsChanged();
-
-    SECUROM_MARKER_SECURITY_OFF(7)
-
     return result;
 }
 
