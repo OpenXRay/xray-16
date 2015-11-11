@@ -688,11 +688,6 @@ void foo()
 
 ENGINE_API bool g_dedicated_server = false;
 
-#ifndef DEDICATED_SERVER
-// forward declaration for Parental Control checks
-BOOL IsPCAccessAllowed();
-#endif // DEDICATED_SERVER
-
 int APIENTRY WinMain_impl(HINSTANCE hInstance,
                           HINSTANCE hPrevInstance,
                           char* lpCmdLine,
@@ -735,14 +730,6 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
     // Check for virtual memory
     if ((strstr(lpCmdLine, "--skipmemcheck") == NULL) && IsOutOfVirtualMemory())
         return 0;
-
-    // Parental Control for Vista and upper
-    if (!IsPCAccessAllowed())
-    {
-        MessageBox(NULL, "Access restricted", "Parental Control", MB_OK | MB_ICONERROR);
-        return 1;
-    }
-
     // Check for another instance
 #ifdef NO_MULTI_INSTANCES
 #define STALKER_PRESENCE_MUTEX "Local\\STALKER-COP"
@@ -1439,57 +1426,6 @@ void CApplication::LoadAllArchives()
         g_pGamePersistent->OnAssetsChanged();
     }
 }
-
-#ifndef DEDICATED_SERVER
-// Parential control for Vista and upper
-typedef BOOL(*PCCPROC)(CHAR*);
-
-BOOL IsPCAccessAllowed()
-{
-    CHAR szPCtrlChk[MAX_PATH], szGDF[MAX_PATH], *pszLastSlash;
-    HINSTANCE hPCtrlChk = NULL;
-    PCCPROC pctrlchk = NULL;
-    BOOL bAllowed = TRUE;
-
-    if (!GetModuleFileName(NULL, szPCtrlChk, MAX_PATH))
-        return TRUE;
-
-    if ((pszLastSlash = strrchr(szPCtrlChk, '\\')) == NULL)
-        return TRUE;
-
-    *pszLastSlash = '\0';
-
-    strcpy_s(szGDF, szPCtrlChk);
-
-    strcat_s(szPCtrlChk, "\\pctrlchk.dll");
-    if (GetFileAttributes(szPCtrlChk) == INVALID_FILE_ATTRIBUTES)
-        return TRUE;
-
-    if ((pszLastSlash = strrchr(szGDF, '\\')) == NULL)
-        return TRUE;
-
-    *pszLastSlash = '\0';
-
-    strcat_s(szGDF, "\\Stalker-COP.exe");
-    if (GetFileAttributes(szGDF) == INVALID_FILE_ATTRIBUTES)
-        return TRUE;
-
-    if ((hPCtrlChk = LoadLibrary(szPCtrlChk)) == NULL)
-        return TRUE;
-
-    if ((pctrlchk = (PCCPROC)GetProcAddress(hPCtrlChk, "pctrlchk")) == NULL)
-    {
-        FreeLibrary(hPCtrlChk);
-        return TRUE;
-    }
-
-    bAllowed = pctrlchk(szGDF);
-
-    FreeLibrary(hPCtrlChk);
-
-    return bAllowed;
-}
-#endif // DEDICATED_SERVER
 
 //launcher stuff----------------------------
 extern "C" {
