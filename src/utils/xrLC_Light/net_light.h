@@ -1,5 +1,5 @@
 #pragma once
-
+#include <Unknwn.h>
 #include "hxgrid/Interface/IAgent.h"
 //interface IGenericStream;
 __interface net_task_interface
