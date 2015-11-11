@@ -49,7 +49,7 @@ public:
     bool IsLocked() const { return isLocked; }
 
 private:
-    std::mutex mutex;
+    std::recursive_mutex mutex;
     std::atomic_bool isLocked;
 #ifdef CONFIG_PROFILE_LOCKS
     const char *id;
