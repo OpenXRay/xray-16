@@ -5,24 +5,41 @@
 
 //////////////////////////////////////////////////////////////////////////
 // definition ("Renderable")
-class ENGINE_API IRenderable
+
+class RenderData
 {
 public:
-    struct
-    {
-        Fmatrix xform;
-        IRenderVisual* visual;
-        IRender_ObjectSpecific* pROS;
-        BOOL pROS_Allowed;
-    } renderable;
+    Fmatrix xform;
+    IRenderVisual *visual;
+    IRender_ObjectSpecific *pROS;
+    BOOL pROS_Allowed;
+};
+
+class IRenderable
+{
 public:
-    IRenderable();
-    virtual ~IRenderable();
-    IRender_ObjectSpecific* renderable_ROS();
+    virtual ~IRenderable() = 0;
+    virtual RenderData &GetRenderData() = 0;
+    virtual void renderable_Render() = 0;
+    virtual IRender_ObjectSpecific *renderable_ROS() = 0;
+    virtual BOOL renderable_ShadowGenerate() = 0;
+    virtual BOOL renderable_ShadowReceive() = 0;
+};
+
+inline IRenderable::~IRenderable() {}
+
+class ENGINE_API RenderableBase : public IRenderable
+{
+public:
+    RenderData renderable;
+public:
+    RenderableBase();
+    virtual ~RenderableBase();
+    virtual RenderData &GetRenderData() override final { return renderable; }
+    virtual IRender_ObjectSpecific *renderable_ROS() override final;
     BENCH_SEC_SCRAMBLEVTBL2
-        virtual void renderable_Render() = 0;
-    virtual BOOL renderable_ShadowGenerate() { return FALSE; };
-    virtual BOOL renderable_ShadowReceive() { return FALSE; };
+    virtual BOOL renderable_ShadowGenerate() override { return FALSE; }
+    virtual BOOL renderable_ShadowReceive() override { return FALSE; }
 };
 
 #endif // IRENDERABLE_H_INCLUDED

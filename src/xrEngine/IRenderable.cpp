@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "xrCDB/ISpatial.h"
 #include "IRenderable.h"
-
-IRenderable::IRenderable()
+// XXX: rename this file to RenderableBase.cpp
+RenderableBase::RenderableBase()
 {
     renderable.xform.identity();
     renderable.visual = NULL;
@@ -13,7 +13,7 @@ IRenderable::IRenderable()
 }
 
 extern ENGINE_API BOOL g_bRendering;
-IRenderable::~IRenderable()
+RenderableBase::~RenderableBase()
 {
     VERIFY(!g_bRendering);
     GlobalEnv.Render->model_Delete(renderable.visual);
@@ -22,7 +22,7 @@ IRenderable::~IRenderable()
     renderable.pROS = NULL;
 }
 
-IRender_ObjectSpecific* IRenderable::renderable_ROS()
+IRender_ObjectSpecific* RenderableBase::renderable_ROS()
 {
     if (0 == renderable.pROS && renderable.pROS_Allowed) renderable.pROS = GlobalEnv.Render->ros_create(this);
     return renderable.pROS;

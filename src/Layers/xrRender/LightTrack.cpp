@@ -179,15 +179,15 @@ void	CROS_impl::update	(IRenderable* O)
 	if					(dwFrame==Device.dwFrame)			return;
 	dwFrame				= Device.dwFrame;
 	if					(0==O)								return;
-	if					(0==O->renderable.visual)			return;
+	if					(0==O->GetRenderData().visual)			return;
 	VERIFY				(dynamic_cast<CROS_impl*>			(O->renderable_ROS()));
 	//float	dt			=	Device.fTimeDelta;
 
 	CObject*	_object	= dynamic_cast<CObject*>	(O);
 
 	// select sample, randomize position inside object
-	vis_data &vis = O->renderable.visual->getVisData();
-	Fvector	position;	O->renderable.xform.transform_tiny	(position,vis.sphere.P);
+	vis_data &vis = O->GetRenderData().visual->getVisData();
+	Fvector	position;	O->GetRenderData().xform.transform_tiny	(position,vis.sphere.P);
 	position.y			+=  .3f * vis.sphere.R;
 	Fvector	direction;	direction.random_dir();
 //.			position.mad(direction,0.25f*radius);
@@ -292,15 +292,15 @@ static const s32 s_iUTIdleMax = 2000;
 void 	CROS_impl::smart_update(IRenderable* O)
 {
 	if (!O) return;
-	if (0==O->renderable.visual) return;
+	if (0==O->GetRenderData().visual) return;
 
 	--ticks_to_update;
 
 	//	Acquire current position
 	Fvector	position;
 	VERIFY(dynamic_cast<CROS_impl*>	(O->renderable_ROS()));
-	vis_data &vis = O->renderable.visual->getVisData();
-	O->renderable.xform.transform_tiny( position, vis.sphere.P );
+	vis_data &vis = O->GetRenderData().visual->getVisData();
+	O->GetRenderData().xform.transform_tiny( position, vis.sphere.P );
 
 	if ( ticks_to_update <= 0)
 	{
@@ -422,7 +422,7 @@ void CROS_impl::prepare_lights(Fvector& position, IRenderable* O)
 	CObject*	_object	= dynamic_cast<CObject*>	(O);
 	float	dt			=	Device.fTimeDelta;
 
-	vis_data &vis = O->renderable.visual->getVisData();
+	vis_data &vis = O->GetRenderData().visual->getVisData();
 	float	radius;		radius	= vis.sphere.R;
 	// light-tracing
 	BOOL	bTraceLights	= MODE & IRender_ObjectSpecific::TRACE_LIGHTS;

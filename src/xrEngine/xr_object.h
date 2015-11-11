@@ -30,7 +30,7 @@ class ENGINE_API CObject :
     public DLL_Pure,
     public SpatialBase,
     public ScheduledBase,
-    public IRenderable,
+    public RenderableBase,
     public CollidableBase
 {
 public:

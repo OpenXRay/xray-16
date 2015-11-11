@@ -114,9 +114,9 @@ void CRender::render_main	(Fmatrix&	m_ViewProjection, bool _fportals)
 
 					// Occlusion
 					//	casting is faster then using getVis method
-					vis_data&		v_orig			= ((dxRender_Visual*)renderable->renderable.visual)->vis;
+					vis_data&		v_orig			= ((dxRender_Visual*)renderable->GetRenderData().visual)->vis;
 					vis_data		v_copy			= v_orig;
-					v_copy.box.xform				(renderable->renderable.xform);
+					v_copy.box.xform				(renderable->GetRenderData().xform);
 					BOOL			bVisible		= HOM.visible(v_copy);
 					v_orig.marker					= v_copy.marker;
 					v_orig.accept_frame				= v_copy.accept_frame;

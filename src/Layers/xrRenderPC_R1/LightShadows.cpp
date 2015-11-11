@@ -93,8 +93,8 @@ void CLightShadows::set_object	(IRenderable* O)
 			return;
 		}
 
-		const vis_data	&vis = O->renderable.visual->getVisData();
-		Fvector		C;	O->renderable.xform.transform_tiny		(C,vis.sphere.P);
+		const vis_data	&vis = O->GetRenderData().visual->getVisData();
+		Fvector		C;	O->GetRenderData().xform.transform_tiny		(C,vis.sphere.P);
 		float		R				= vis.sphere.R;
 		float		D				= C.distance_to(Device.vCameraPosition)+R;
 					// D=0 -> P=0; 
@@ -196,7 +196,7 @@ void CLightShadows::calculate	()
 					if (_dist>EPS_L)		break;
 					Lpos.y					+=	.01f;	//. hack to avoid light-in-the-center-of-object
 				}
-				float		_R		=	C.O->renderable.visual->getVisData().sphere.R+0.1f;
+				float		_R		=	C.O->GetRenderData().visual->getVisData().sphere.R+0.1f;
 				//Msg	("* o-r: %f",_R);
 				if (_dist<_R)		{
 					Fvector			Ldir;
@@ -210,7 +210,7 @@ void CLightShadows::calculate	()
 			// calculate projection-matrix
 			Fmatrix		mProject,mProjectR;
 			float		p_dist	=	C.C.distance_to(Lpos);
-			float		p_R		=	C.O->renderable.visual->getVisData().sphere.R;
+			float		p_R		=	C.O->GetRenderData().visual->getVisData().sphere.R;
 			float		p_hat	=	p_R/p_dist;
 			float		p_asp	=	1.f;
 			float		p_near	=	p_dist-p_R-eps;									
@@ -425,7 +425,7 @@ void CLightShadows::render	()
 				// Everything, OK. Check if info is still relevant...
 				CI		= &*CI_ptr;
 				bValid	= TRUE;
-				if (!CI->Op.similar(CI->O->renderable.xform.c))	bValid = FALSE;
+				if (!CI->Op.similar(CI->O->GetRenderData().xform.c))	bValid = FALSE;
 				else if (!CI->Lp.similar(CI->L->position))		bValid = FALSE;
 			}
 		}
@@ -484,7 +484,7 @@ void CLightShadows::render	()
 
 			// Remember params which builded cache item
 			CI->O					= S.O;
-			CI->Op					= CI->O->renderable.xform.c;
+			CI->Op					= CI->O->GetRenderData().xform.c;
 			CI->L					= S.L;
 			CI->Lp					= CI->L->position;
 			CI->tcnt				= tess.size();

@@ -267,7 +267,7 @@ void					CRender::set_Object				(IRenderable*		O )
 	val_pObject				= O;		// NULL is OK, trust me :)
 	if (val_pObject)		{
 		VERIFY(dynamic_cast<CObject*>(O)||dynamic_cast<CPS_Instance*>(O));
-		if (O->renderable.pROS) { VERIFY(dynamic_cast<CROS_impl*>(O->renderable.pROS)); }
+		if (O->GetRenderData().pROS) { VERIFY(dynamic_cast<CROS_impl*>(O->GetRenderData().pROS)); }
 	}
 	if (PHASE_NORMAL==phase)	{
 		if (L_Shadows)
@@ -287,9 +287,9 @@ void					CRender::apply_object			(IRenderable*		O )
 {
 	if (0==O)			return	;
 	if (PHASE_NORMAL==phase	&& O->renderable_ROS())		{
-		CROS_impl& LT		= *((CROS_impl*)O->renderable.pROS);
+		CROS_impl& LT		= *((CROS_impl*)O->GetRenderData().pROS);
 		VERIFY(dynamic_cast<CObject*>(O)||dynamic_cast<CPS_Instance*>(O));
-		VERIFY(dynamic_cast<CROS_impl*>(O->renderable.pROS));
+		VERIFY(dynamic_cast<CROS_impl*>(O->GetRenderData().pROS));
 		float o_hemi		= 0.5f*LT.get_hemi						();
 		float o_sun			= 0.5f*LT.get_sun						();
 		RCache.set_c		(c_ldynamic_props,o_sun,o_sun,o_sun,o_hemi);
@@ -483,9 +483,9 @@ void CRender::Calculate				()
 #endif
 						} else {
 							// Occlusiond
-							vis_data&		v_orig			= renderable->renderable.visual->getVisData();
+							vis_data&		v_orig			= renderable->GetRenderData().visual->getVisData();
 							vis_data		v_copy			= v_orig;
-							v_copy.box.xform				(renderable->renderable.xform);
+							v_copy.box.xform				(renderable->GetRenderData().xform);
 							BOOL			bVisible		= HOM.visible(v_copy);
 							v_orig.accept_frame				= v_copy.accept_frame;
 							v_orig.marker					= v_copy.marker;
