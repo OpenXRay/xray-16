@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "Engine.h"
-#include "dedicated_server_only.h"
 
 CEngine Engine;
 

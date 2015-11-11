@@ -7,9 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
-
-#ifndef DEDICATED_SERVER_ONLY
-
 #include "object_factory.h"
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
@@ -107,5 +104,3 @@ SCRIPT_EXPORT(CObjectFactory, (),
 			.def("register",	(void (CObjectFactory::*)(LPCSTR,LPCSTR,LPCSTR))(&CObjectFactory::register_script_class))
 	];
 });
-
-#endif // #ifndef DEDICATED_SERVER_ONLY

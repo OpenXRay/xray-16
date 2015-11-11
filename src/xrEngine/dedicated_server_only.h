@@ -1,8 +1,0 @@
-#ifndef DEDICATED_SERVER_ONLY_H_INCLUDED
-#define DEDICATED_SERVER_ONLY_H_INCLUDED
-
-#include "xrCore/Platform.h"
-
-//#define DEDICATED_SERVER_ONLY
-
-#endif // #ifndef DEDICATED_SERVER_ONLY_H_INCLUDED

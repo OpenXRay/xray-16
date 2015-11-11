@@ -8,8 +8,6 @@
 #include "stdafx.h"
 #include "IGame_Level.h"
 #include "IGame_Persistent.h"
-
-#include "dedicated_server_only.h"
 #include "no_single.h"
 #include "xrNetServer/NET_AuthCheck.h"
 

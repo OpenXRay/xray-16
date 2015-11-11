@@ -1,5 +1,4 @@
 #pragma once
-#include "xrEngine/dedicated_server_only.h"
 #include "xrEngine/no_single.h"
 
 class CUIDialogWnd;

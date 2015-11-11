@@ -1,7 +1,5 @@
 #include "stdafx.h"
 #include "resource.h"
-#include "dedicated_server_only.h"
-
 #ifdef INGAME_EDITOR
 # include "Include/editor/ide.hpp"
 # include "engine_impl.hpp"

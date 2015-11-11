@@ -444,7 +444,6 @@
     <ClInclude Include="cf_dynamic_mesh.h" />
     <ClInclude Include="CopyProtection.h" />
     <ClInclude Include="CustomHUD.h" />
-    <ClInclude Include="dedicated_server_only.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="device.h" />
     <ClInclude Include="editor_environment_ambients_ambient.hpp" />

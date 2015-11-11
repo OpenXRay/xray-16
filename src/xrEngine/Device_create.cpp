@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "Include/xrRender/DrawUtils.h"
 #include "Render.h"
-#include "dedicated_server_only.h"
 #include "xrCDB/xrXRC.h"
 
 extern XRCDB_API BOOL* cdb_bDebug;
