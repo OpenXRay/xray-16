@@ -469,9 +469,10 @@ In string initialization and null termination, you must use 0:
 Naming conventions:
 - Do choose easily readable identifier names. For example, a variable named
   horizontalAlignment is more readable in English than alignmentHorizontal.
-- Do not use Hungarian notation except in two cases:
+- Do not use Hungarian notation except in the following cases:
   - UI-related code, i.e. btnOpen, lblMessage, chkRecursive, cbGameType
   - Interface classes: IClient, IGameLevel, IGamePersistent, etc
+  - Template type arguments: TBase, TResult
 
 Casing styles:
 - class/struct/enum: PascalCase
@@ -994,6 +995,19 @@ Use #include <Foo.hpp> for external system files.
     #include "xrCore.hpp" // we are in src/xrCore directory
     #include "IO/IReader.hpp" // from src/xrCore/IO/IReader.hpp
     #include <algorithm>
+
+Free function used in one CPP file:
+  should be implemented static, and a declaration in the CPP file should only
+  be added if used before implementation.
+Free function used out of the CPP file (global):
+  should be declared in the HPP file.
+class/struct used in one CPP file:
+  should be declared inside the CPP file.
+A pointer is needed out of the CPP file:
+  a forward declaration should be in the HPP file, and the definition should
+  be in the C file.
+class/struct members are needed out of the CPP file:
+  declare it in the HPP file.
 
 Comments of XXX should be <keywords>: <comment>. Multiple names should be
 separated with a '/':
