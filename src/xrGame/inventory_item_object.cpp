@@ -19,7 +19,7 @@ CInventoryItemObject::~CInventoryItemObject	()
 {
 }
 
-DLL_Pure *CInventoryItemObject::_construct	()
+IFactoryObject *CInventoryItemObject::_construct	()
 {
 	CInventoryItem::_construct	();
 	CPhysicItem::_construct		();

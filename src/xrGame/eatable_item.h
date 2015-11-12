@@ -15,7 +15,7 @@ protected:
 public:
 							CEatableItem				();
 	virtual					~CEatableItem				();
-	virtual	DLL_Pure*		_construct					();
+	virtual	IFactoryObject*		_construct					();
 	virtual CEatableItem	*cast_eatable_item			()	{return this;}
 
 	virtual void			Load						(LPCSTR section);

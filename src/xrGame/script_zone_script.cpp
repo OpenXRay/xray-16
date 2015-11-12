@@ -14,20 +14,20 @@
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CScriptZone, (DLL_Pure),
+SCRIPT_EXPORT(CScriptZone, (IFactoryObject),
 {
 	module(luaState)
 	[
-		class_<CScriptZone,DLL_Pure>("ce_script_zone")
+		class_<CScriptZone,IFactoryObject>("ce_script_zone")
 			.def(constructor<>())
 	];
 });
 
-SCRIPT_EXPORT(CSmartZone, (DLL_Pure),
+SCRIPT_EXPORT(CSmartZone, (IFactoryObject),
 {
 	module(luaState)
 	[
-		class_<CSmartZone,DLL_Pure>("ce_smart_zone")
+		class_<CSmartZone,IFactoryObject>("ce_smart_zone")
 			.def(constructor<>())
 	];
 });

@@ -983,7 +983,7 @@ const MonsterSpace::SBoneRotation &CCustomMonster::head_orientation	() const
 	return					(movement().m_body);
 }
 
-DLL_Pure *CCustomMonster::_construct()
+IFactoryObject *CCustomMonster::_construct()
 {
 	m_memory_manager			= create_memory_manager();
 	m_movement_manager			= create_movement_manager();

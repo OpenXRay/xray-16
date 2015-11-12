@@ -685,7 +685,7 @@ BOOL CAI_Rat::renderable_ShadowGenerate	()
 	return FALSE;
 }
 
-DLL_Pure *CAI_Rat::_construct			()
+IFactoryObject *CAI_Rat::_construct			()
 {
 	CCustomMonster::_construct	();
 	CEatableItem::_construct	();

@@ -46,7 +46,7 @@ public:
 	virtual CParticlesPlayer*			cast_particles_player	()						{return this;}
 	virtual CScriptEntity*				cast_script_entity		()						{return this;}
 
-	virtual DLL_Pure	*_construct		();
+	virtual IFactoryObject	*_construct		();
 	virtual void		Load			( LPCSTR section );
 	virtual BOOL		net_Spawn		( CSE_Abstract* DC );
 	virtual void		net_Export		(NET_Packet& P);

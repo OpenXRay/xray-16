@@ -149,7 +149,7 @@ bool CDestroyablePhysicsObject::CanRemoveObject()
 {
 	return !CParticlesPlayer::IsPlaying()&& !m_destroy_sound._feedback();//&& sound!
 }
-DLL_Pure	*CDestroyablePhysicsObject::_construct()
+IFactoryObject	*CDestroyablePhysicsObject::_construct()
 {
 	
 	CDamageManager::_construct();

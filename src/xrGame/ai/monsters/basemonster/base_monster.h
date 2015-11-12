@@ -85,7 +85,7 @@ public:
 	// must be called at the end of most derived's Load
 	virtual void			PostLoad						(LPCSTR section);
 
-	virtual DLL_Pure		*_construct						();
+	virtual IFactoryObject		*_construct						();
 
 	virtual BOOL			net_Spawn						(CSE_Abstract* DC);
 	virtual void			net_Destroy						();

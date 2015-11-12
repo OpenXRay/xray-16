@@ -49,7 +49,7 @@ void CScriptEntity::init()
 	ResetScriptData						();
 }
 
-DLL_Pure *CScriptEntity::_construct		()
+IFactoryObject *CScriptEntity::_construct		()
 {
 	m_object	= smart_cast<CGameObject*>(this);
 	VERIFY		(m_object);

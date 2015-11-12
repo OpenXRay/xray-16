@@ -17,7 +17,7 @@ CEatableItemObject::~CEatableItemObject	()
 {
 }
 
-DLL_Pure *CEatableItemObject::_construct	()
+IFactoryObject *CEatableItemObject::_construct	()
 {
 	CEatableItem::_construct	();
 	CPhysicItem::_construct		();

@@ -646,7 +646,7 @@ float CEntityAlive::g_Radiation	()	const
 }
 
 
-DLL_Pure *CEntityAlive::_construct	()
+IFactoryObject *CEntityAlive::_construct	()
 {
 	inherited::_construct	();
 	if(character_physics_support())m_material_manager		= xr_new<CMaterialManager>(this,character_physics_support()->movement());

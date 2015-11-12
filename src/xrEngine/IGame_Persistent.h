@@ -14,7 +14,7 @@ class ENGINE_API CPS_Instance;
 //-----------------------------------------------------------------------------------------------------------
 class ENGINE_API IGame_Persistent :
 #ifndef _EDITOR
-    public DLL_Pure,
+    public FactoryObjectBase,
 #endif
     public pureAppStart,
     public pureAppEnd,

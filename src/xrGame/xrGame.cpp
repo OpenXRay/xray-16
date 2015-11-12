@@ -20,18 +20,19 @@
 #pragma comment(lib, "xrScriptEngine.lib")
 
 extern "C" {
-	DLL_API DLL_Pure*	__cdecl xrFactory_Create		(CLASS_ID clsid)
+	DLL_API IFactoryObject*	__cdecl xrFactory_Create		(CLASS_ID clsid)
 	{
-		DLL_Pure			*object = object_factory().client_object(clsid);
+        IFactoryObject			*object = object_factory().client_object(clsid);
 #ifdef DEBUG
 		if (!object)
 			return			(0);
 #endif
-		object->CLS_ID		= clsid;
+        // XXX nitrocaster XRFACTORY: set clsid during factory initialization
+		object->GetClassId() = clsid;
 		return				(object);
 	}
 
-	DLL_API void		__cdecl	xrFactory_Destroy		(DLL_Pure* O)
+	DLL_API void		__cdecl	xrFactory_Destroy		(IFactoryObject* O)
 	{
 		xr_delete			(O);
 	}

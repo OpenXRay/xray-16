@@ -5,7 +5,7 @@
 
 struct SCallbackInfo;
 
-class CUIDialogWndEx :public CUIDialogWnd, public DLL_Pure
+class CUIDialogWndEx :public CUIDialogWnd, public FactoryObjectBase
 {
 typedef CUIDialogWnd				inherited;
 typedef xr_vector<SCallbackInfo*>	CALLBACKS;

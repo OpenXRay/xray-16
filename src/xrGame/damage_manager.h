@@ -17,7 +17,7 @@ protected:
 public:
 						CDamageManager	();
 	virtual				~CDamageManager	();
-	virtual	DLL_Pure	*_construct		();
+	virtual	IFactoryObject	*_construct		();
 	virtual	void		reload			(LPCSTR section, CInifile const * ini);
 	virtual	void		reload			(LPCSTR section, LPCSTR sub_section, CInifile const * ini);
 	

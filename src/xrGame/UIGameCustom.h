@@ -76,7 +76,7 @@ private:
 extern CMapListHelper gMapListHelper;
 
 class CUIGameCustom :
-    public DLL_Pure,
+    public FactoryObjectBase,
     public CDialogHolder
 {
 protected:

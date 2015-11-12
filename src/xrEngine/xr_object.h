@@ -27,7 +27,7 @@ class IPhysicsShell;
 xr_pure_interface IObjectPhysicsCollision;
 #pragma pack(push,4)
 class ENGINE_API CObject :
-    public DLL_Pure,
+    public FactoryObjectBase,
     public SpatialBase,
     public ScheduledBase,
     public RenderableBase,

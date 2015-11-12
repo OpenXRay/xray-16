@@ -17,7 +17,7 @@ CScriptObject::~CScriptObject			()
 {
 }
 
-DLL_Pure *CScriptObject::_construct		()
+IFactoryObject *CScriptObject::_construct		()
 {
 	CGameObject::_construct			();
 	CScriptEntity::_construct		();

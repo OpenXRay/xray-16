@@ -1190,7 +1190,7 @@ CMemoryManager *CAI_Stalker::create_memory_manager		()
 	return	(xr_new<CMemoryManager>(this,create_sound_visitor()));
 }
 
-DLL_Pure *CAI_Stalker::_construct			()
+IFactoryObject *CAI_Stalker::_construct			()
 {
 #ifdef DEBUG_MEMORY_MANAGER
 	u32									start = 0;

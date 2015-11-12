@@ -12,7 +12,7 @@ protected: //чтоб нельзя было вызвать на прямую
 	virtual				~CHudItemObject		();
 
 public:
-	virtual	DLL_Pure	*_construct			();
+	virtual	IFactoryObject	*_construct			();
 
 public:
 	virtual CHudItem	*cast_hud_item		()	{return this;}

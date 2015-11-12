@@ -59,7 +59,7 @@ void CHelicopter::init()
 	SetfHealth					(1.0f);
 }
 
-DLL_Pure* CHelicopter::_construct()
+IFactoryObject* CHelicopter::_construct()
 {
 	CEntity::_construct	();
 	init				();

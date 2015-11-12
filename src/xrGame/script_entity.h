@@ -78,7 +78,7 @@ public:
 	virtual void				shedule_Update			(u32				DT);
 	virtual void				UpdateCL				();
 	virtual CScriptEntity*		cast_script_entity		()	{return this;}
-	virtual DLL_Pure			*_construct				();
+	virtual IFactoryObject			*_construct				();
 
 public:
 			const Fmatrix		GetUpdatedMatrix		(shared_str caBoneName, const Fvector &tPositionOffset, const Fvector &tAngleOffset);

@@ -36,24 +36,27 @@ struct heritage {
 	typedef typename Loki::GenLinearHierarchy<pure_tl,linear_registrator>::LinBase	result;
 };
 
-template <typename base, typename luabind_base = Loki::EmptyType>
-class DLL_PureWrapper : public heritage<base,luabind_base>::result {
+template <typename base>
+class FactoryObjectWrapperTpl : public heritage<base, luabind::wrap_base>::result {
 public:
-	IC					DLL_PureWrapper		() {};
-	virtual				~DLL_PureWrapper	() {};
+	IC					FactoryObjectWrapperTpl() {};
+	virtual				~FactoryObjectWrapperTpl() {};
 
-	virtual	DLL_Pure*	_construct			()
+	virtual	IFactoryObject*	_construct			()
 	{
-		return			(call_member<DLL_Pure*>(this,"_construct"));
+		return			(call_member<IFactoryObject*>(this,"_construct"));
 	}
 
-	static	DLL_Pure*	_construct_static	(base *self)
+	static	IFactoryObject*	_construct_static	(base *self)
 	{
 		return			(self->base::_construct());
 	}
+private:
+    // not exported
+    virtual	CLASS_ID &GetClassId() override { return call_member<CLASS_ID&>(this, "GetClassId"); }
 };
 
-typedef DLL_PureWrapper<DLL_Pure,luabind::wrap_base> CDLL_PureWrapper;
+typedef FactoryObjectWrapperTpl<IFactoryObject> FactoryObjectWrapper;
 
 /*	
 template <typename base, typename luabind_base = Loki::EmptyType>
@@ -209,7 +212,7 @@ public:
 
 typedef IRenderableWrapper<IRenderable,luabind::wrap_base> CIRenderableWrapper;
 
-//typedef DLL_PureWrapper<CObject,luabind::wrap_base> CObjectDLL_Pure;
+//typedef FactoryObjectWrapperTpl<CObject,luabind::wrap_base> CObjectDLL_Pure;
 //typedef ISpatialWrapper<CObjectDLL_Pure>			CObjectISpatial;
 //typedef ISheduledWrapper<CObjectDLL_Pure>			CObjectISheduled;
 //typedef IRenderableWrapper<CObjectISheduled>		CObjectIRenderable;
@@ -246,9 +249,9 @@ typedef IRenderableWrapper<IRenderable,luabind::wrap_base> CIRenderableWrapper;
 //};
 
 
-typedef DLL_PureWrapper<CGameObject,luabind::wrap_base> CGameObjectDLL_Pure;
-//typedef ISpatialWrapper<CGameObjectDLL_Pure>				CGameObjectISpatial;
-typedef ISheduledWrapper<CGameObjectDLL_Pure>				CGameObjectISheduled;
+typedef FactoryObjectWrapperTpl<CGameObject> CGameObjectIFactoryObject;
+//typedef ISpatialWrapper<CGameObjectIFactoryObject>				CGameObjectISpatial;
+typedef ISheduledWrapper<CGameObjectIFactoryObject>				CGameObjectISheduled;
 typedef IRenderableWrapper<CGameObjectISheduled>			CGameObjectIRenderable;
 
 class CGameObjectWrapper : public CGameObjectIRenderable {

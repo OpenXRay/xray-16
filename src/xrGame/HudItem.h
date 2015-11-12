@@ -49,7 +49,7 @@ class CHudItem :public CHUDState
 protected:
 							CHudItem			();
 	virtual					~CHudItem			();
-	virtual DLL_Pure*		_construct			();
+	virtual IFactoryObject*		_construct			();
 	
 	Flags16					m_huditem_flags;
 	enum{

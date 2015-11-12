@@ -29,7 +29,7 @@ public:
 	virtual				~CStepManager			();
 
 	// init on construction
-	virtual DLL_Pure	*_construct				();
+	virtual IFactoryObject	*_construct				();
 	virtual	void		reload					(LPCSTR section);
 	
 	// call on set animation

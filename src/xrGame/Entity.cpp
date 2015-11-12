@@ -312,7 +312,7 @@ void CEntity::set_ready_to_save	()
 {
 }
 
-DLL_Pure *CEntity::_construct	()
+IFactoryObject *CEntity::_construct	()
 {
 	inherited::_construct		();
 	CDamageManager::_construct	();

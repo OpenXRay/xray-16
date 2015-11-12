@@ -48,12 +48,12 @@ CInventoryOwner::CInventoryOwner			()
 	m_play_show_hide_reload_sounds	= true;
 }
 
-DLL_Pure *CInventoryOwner::_construct		()
+IFactoryObject *CInventoryOwner::_construct		()
 {
 	m_trade_parameters			= 0;
 	m_purchase_list				= 0;
 
-	return						(smart_cast<DLL_Pure*>(this));
+	return						(smart_cast<IFactoryObject*>(this));
 }
 
 CInventoryOwner::~CInventoryOwner			() 

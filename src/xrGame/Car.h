@@ -539,7 +539,7 @@ public:
 	bool					Use							(const Fvector& pos,const Fvector& dir,const Fvector& foot_pos);
 	u16						DriverAnimationType 		();
 	// Core events
-	virtual DLL_Pure		*_construct					();
+	virtual IFactoryObject		*_construct					();
 	virtual void			Load						( LPCSTR section );
 	virtual BOOL			net_Spawn					( CSE_Abstract* DC );
 	virtual void			net_Destroy					();

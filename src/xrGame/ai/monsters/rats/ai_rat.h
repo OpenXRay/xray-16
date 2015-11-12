@@ -342,7 +342,7 @@ public:
 public:
 								CAI_Rat					();
 	virtual						~CAI_Rat				();
-	virtual DLL_Pure			*_construct				();
+	virtual IFactoryObject			*_construct				();
 
 public:
 	virtual CGameObject*		cast_game_object			()  {return this;};

@@ -140,7 +140,7 @@ public:
 
 public:
 
-	virtual DLL_Pure	*_construct				();
+	virtual IFactoryObject	*_construct				();
 	virtual BOOL		net_Spawn				( CSE_Abstract* DC);
 	virtual void		Die						( CObject* who);
 

@@ -7,8 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+// XXX: delete/review
 /*
-class DLL_Pure;
+class IFactoryObject;
 class ISpatial;
 class ISheduled;
 class IRenderable;

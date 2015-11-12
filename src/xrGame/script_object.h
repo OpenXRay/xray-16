@@ -18,7 +18,7 @@ class CScriptObject :
 public:
 								CScriptObject			();
 	virtual						~CScriptObject			();
-	virtual DLL_Pure			*_construct				();
+	virtual IFactoryObject			*_construct				();
 	virtual	void				reinit					();
 	virtual BOOL				net_Spawn				(CSE_Abstract* DC);
 	virtual void				net_Destroy				();

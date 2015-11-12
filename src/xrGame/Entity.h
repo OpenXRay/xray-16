@@ -55,7 +55,7 @@ public:
 	// General
 	CEntity					();
 	virtual ~CEntity		();
-	virtual DLL_Pure		*_construct				();
+	virtual IFactoryObject		*_construct				();
 	virtual CEntity*		cast_entity			()						{return this;}
 public:
 

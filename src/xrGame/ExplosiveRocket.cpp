@@ -18,7 +18,7 @@ CExplosiveRocket::~CExplosiveRocket()
 {
 }
 
-DLL_Pure *CExplosiveRocket::_construct	()
+IFactoryObject *CExplosiveRocket::_construct	()
 {
 	CCustomRocket::_construct	();
 	CInventoryItem::_construct	();

@@ -343,7 +343,7 @@ public:
 	int						GetHuntState					();
 	int						GetBodyState					();
 
-	virtual DLL_Pure		*_construct						();
+	virtual IFactoryObject		*_construct						();
 	float					GetSafeAltitude					()				{return m_movement.GetSafeAltitude();};
 	float					GetHeliHealth					() const		{return inherited::GetfHealth();}
 	float					SetHeliHealth					(float value)	{return inherited::SetfHealth(value);}

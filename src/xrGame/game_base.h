@@ -158,7 +158,7 @@ public:
 IC IGameState::~IGameState() {}
 
 class	game_GameState :
-    public DLL_Pure,
+    public FactoryObjectBase,
     public virtual IGameState
 {
 protected:

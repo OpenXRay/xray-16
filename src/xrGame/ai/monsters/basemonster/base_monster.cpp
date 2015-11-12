@@ -736,7 +736,7 @@ CMovementManager *CBaseMonster::create_movement_manager	()
 	return			(m_movement_manager);
 }
 
-DLL_Pure *CBaseMonster::_construct	()
+IFactoryObject *CBaseMonster::_construct	()
 {
 	create_base_controls			();
 

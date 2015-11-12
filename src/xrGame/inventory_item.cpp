@@ -1372,7 +1372,7 @@ void CInventoryItem::OnRender()
 }
 #endif
 
-DLL_Pure *CInventoryItem::_construct	()
+IFactoryObject *CInventoryItem::_construct	()
 {
 	m_object	= smart_cast<CPhysicsShellHolder*>(this);
 	VERIFY		(m_object);

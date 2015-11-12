@@ -23,7 +23,7 @@ public:
 					CAI_PseudoDog		();
 	virtual			~CAI_PseudoDog		();	
 
-	virtual DLL_Pure	*_construct		();
+	virtual IFactoryObject	*_construct		();
 
 	virtual void	Load				(LPCSTR section);
 

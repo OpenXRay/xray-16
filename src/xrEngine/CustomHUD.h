@@ -18,7 +18,7 @@ class ENGINE_API IRender_Visual;
 class CUI;
 
 class ENGINE_API CCustomHUD :
-    public DLL_Pure,
+    public FactoryObjectBase,
     public IEventReceiver,
     public pureScreenResolutionChanged
 {

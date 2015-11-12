@@ -276,7 +276,7 @@ bool CMainMenu::ReloadUI()
 			m_startDialog->HideDialog		();
 		CleanInternals						();
 	}
-	DLL_Pure* dlg = NEW_INSTANCE(TEXT2CLSID("MAIN_MNU"));
+	IFactoryObject* dlg = NEW_INSTANCE(TEXT2CLSID("MAIN_MNU"));
 	if(!dlg) 
 	{
 		m_Flags.set				(flActive|flNeedChangeCapture,FALSE);

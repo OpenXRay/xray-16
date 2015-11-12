@@ -1934,7 +1934,7 @@ IC void CCar::fill_doors_map(LPCSTR S,xr_map<u16,SDoor>& doors)
 	}
 }
 
-DLL_Pure *CCar::_construct			()
+IFactoryObject *CCar::_construct			()
 {
 	inherited::_construct		();
 	CScriptEntity::_construct	();

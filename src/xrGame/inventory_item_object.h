@@ -18,7 +18,7 @@ class CInventoryItemObject :
 public:
 							CInventoryItemObject	();
 	virtual					~CInventoryItemObject	();
-	virtual DLL_Pure		*_construct				();
+	virtual IFactoryObject		*_construct				();
 
 public:
 	virtual CPhysicsShellHolder*cast_physics_shell_holder	()	{return this;}

@@ -12,10 +12,10 @@
 #include "UICellCustomItems.h"
 
 extern "C"
-DLL_Pure*	__cdecl xrFactory_Create		(CLASS_ID clsid);
+IFactoryObject*	__cdecl xrFactory_Create		(CLASS_ID clsid);
 
 extern "C"
-void	__cdecl xrFactory_Destroy		(DLL_Pure* O);
+void	__cdecl xrFactory_Destroy		(IFactoryObject* O);
 
 CUICellItem*	create_cell_item(CInventoryItem* itm);
 
@@ -96,7 +96,7 @@ CInventoryItem* CUIMpTradeWnd::CreateItem_internal(const shared_str& name_sect)
 {
 	CLASS_ID	class_id		= pSettings->r_clsid(name_sect,"class");
 
-	DLL_Pure					*dll_pure = xrFactory_Create(class_id);
+    IFactoryObject					*dll_pure = xrFactory_Create(class_id);
 	VERIFY						(dll_pure);
 	CInventoryItem*				pIItem = smart_cast<CInventoryItem*>(dll_pure);
 	pIItem->object().Load		(name_sect.c_str());

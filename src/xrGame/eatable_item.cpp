@@ -25,7 +25,7 @@ CEatableItem::~CEatableItem()
 {
 }
 
-DLL_Pure *CEatableItem::_construct	()
+IFactoryObject *CEatableItem::_construct	()
 {
 	m_physic_item	= smart_cast<CPhysicItem*>(this);
 	return			(inherited::_construct());

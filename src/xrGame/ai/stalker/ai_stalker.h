@@ -383,7 +383,7 @@ protected:
 
 public:
 	IC		stalker_movement_manager_smart_cover		&movement						() const;
-	virtual DLL_Pure					*_construct						();
+	virtual IFactoryObject					*_construct						();
 
 private:
 	IC		bool						frame_check						(u32 &frame);

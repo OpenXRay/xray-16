@@ -235,7 +235,7 @@ public:
 #endif
 
 public:
-	virtual DLL_Pure*			_construct					();
+	virtual IFactoryObject*			_construct					();
 	IC	CPhysicsShellHolder&	object						() const{ VERIFY		(m_object); return		(*m_object);}
 	u16							object_id					() const;
 	u16							parent_id					() const;

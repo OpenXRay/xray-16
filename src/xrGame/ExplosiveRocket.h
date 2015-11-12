@@ -20,7 +20,7 @@ private:
 public:
 	CExplosiveRocket(void);
 	virtual ~CExplosiveRocket(void);
-	virtual DLL_Pure	*_construct	();
+	virtual IFactoryObject	*_construct	();
 public:
 	virtual CExplosive					*cast_explosive			()						{return this;}
 	virtual CInventoryItem				*cast_inventory_item	()						{return this;}

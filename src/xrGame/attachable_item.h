@@ -26,7 +26,7 @@ private:
 public:
 	IC							CAttachableItem			();
 	virtual						~CAttachableItem		();
-	virtual	DLL_Pure			*_construct				();
+	virtual	IFactoryObject			*_construct				();
 	virtual CAttachableItem		*cast_attachable_item	()	{return this;}
 	virtual	void				reload					(LPCSTR section);
 	virtual void				OnH_A_Chield			();

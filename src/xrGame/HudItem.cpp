@@ -21,7 +21,7 @@ CHudItem::CHudItem()
 	m_started_rnd_anim_idx		= u8(-1);
 }
 
-DLL_Pure *CHudItem::_construct	()
+IFactoryObject *CHudItem::_construct	()
 {
 	m_object			= smart_cast<CPhysicItem*>(this);
 	VERIFY				(m_object);

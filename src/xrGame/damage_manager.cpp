@@ -21,7 +21,7 @@ CDamageManager::~CDamageManager			()
 {
 }
 
-DLL_Pure *CDamageManager::_construct	()
+IFactoryObject *CDamageManager::_construct	()
 {
 	m_object				= smart_cast<CObject*>(this);
 	VERIFY					(m_object);

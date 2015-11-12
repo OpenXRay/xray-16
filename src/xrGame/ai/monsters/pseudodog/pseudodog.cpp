@@ -26,7 +26,7 @@ CAI_PseudoDog::CAI_PseudoDog()
 	com_man().add_ability(ControlCom::eControlRotationJump);
 }
 
-DLL_Pure *CAI_PseudoDog::_construct()
+IFactoryObject *CAI_PseudoDog::_construct()
 {
 	inherited::_construct			();
 	StateMan = create_state_manager	();

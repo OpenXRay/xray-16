@@ -9,7 +9,7 @@ CHudItemObject::~CHudItemObject			()
 {
 }
 
-DLL_Pure *CHudItemObject::_construct	()
+IFactoryObject *CHudItemObject::_construct	()
 {
 	CInventoryItemObject::_construct();
 	CHudItem::_construct		();

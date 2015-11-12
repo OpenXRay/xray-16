@@ -363,7 +363,7 @@ ALife::ERelationType  CAI_Trader::tfGetRelationType	(const CEntityAlive *tpEntit
 		return inherited::tfGetRelationType(tpEntityAlive);
 }
 
-DLL_Pure *CAI_Trader::_construct	()
+IFactoryObject *CAI_Trader::_construct	()
 {
 	m_sound_player				= xr_new<CSoundPlayer>(this);
 	

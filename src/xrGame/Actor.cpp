@@ -1859,7 +1859,7 @@ CEntityConditionSimple *CActor::create_entity_condition	(CEntityConditionSimple*
 	return		(inherited::create_entity_condition(m_entity_condition));
 }
 
-DLL_Pure *CActor::_construct			()
+IFactoryObject *CActor::_construct			()
 {
 	m_pPhysics_support				=	xr_new<CCharacterPhysicsSupport>(CCharacterPhysicsSupport::etActor,this);
 	CEntityAlive::_construct		();
