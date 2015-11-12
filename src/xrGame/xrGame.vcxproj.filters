@@ -5055,9 +5055,6 @@
     <ClInclude Include="ScriptXMLInit.h">
       <Filter>ScriptClasses\UI</Filter>
     </ClInclude>
-    <ClInclude Include="base_client_classes.h">
-      <Filter>ScriptClasses\BaseClientClasses</Filter>
-    </ClInclude>
     <ClInclude Include="base_client_classes_wrappers.h">
       <Filter>ScriptClasses\BaseClientClasses</Filter>
     </ClInclude>

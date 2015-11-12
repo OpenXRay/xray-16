@@ -8,8 +8,6 @@
 
 #pragma once
 
-
-#include "base_client_classes.h"
 #include "xrEngine/engineapi.h"
 #include "xrCDB/ispatial.h"
 #include "xrEngine/isheduled.h"

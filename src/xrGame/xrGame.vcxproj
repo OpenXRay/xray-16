@@ -785,7 +785,6 @@
     <ClInclude Include="awards_store.h" />
     <ClInclude Include="a_star.h" />
     <ClInclude Include="a_star_inline.h" />
-    <ClInclude Include="base_client_classes.h" />
     <ClInclude Include="base_client_classes_wrappers.h" />
     <ClInclude Include="BastArtifact.h" />
     <ClInclude Include="best_scores_helper.h" />
