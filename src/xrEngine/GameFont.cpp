@@ -285,7 +285,7 @@ void CGameFont::MasterOut(
     rs.c = dwCurrentColor;
     rs.height = fCurrentHeight;
     rs.align = eCurrentAlignment;
-    int vs_sz = xr_sprintf(rs.string, fmt, p);
+    int vs_sz = vsnprintf(rs.string, sizeof(rs.string), fmt, p);
     //VERIFY( ( vs_sz != -1 ) && ( rs.string[ vs_sz ] == '\0' ) );
 
     rs.string[sizeof(rs.string) - 1] = 0;
