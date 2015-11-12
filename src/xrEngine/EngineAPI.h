@@ -20,8 +20,6 @@ public:
 inline IFactoryObject::~IFactoryObject() {}
 inline IFactoryObject *IFactoryObject::_construct() { return this; }
 
-using DLL_Pure = IFactoryObject;
-
 class ENGINE_API FactoryObjectBase : public IFactoryObject
 {
 public:
@@ -36,8 +34,8 @@ public:
 
 // Class creation/destroying interface
 extern "C" {
-    typedef DLL_API DLL_Pure* __cdecl Factory_Create(CLASS_ID CLS_ID);
-    typedef DLL_API void __cdecl Factory_Destroy(DLL_Pure* O);
+    typedef DLL_API IFactoryObject* __cdecl Factory_Create(CLASS_ID CLS_ID);
+    typedef DLL_API void __cdecl Factory_Destroy(IFactoryObject* O);
 };
 
 // Tuning interface
