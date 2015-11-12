@@ -17,6 +17,7 @@ const float lr_granularity = 0.1f; // assume similar positions
 
 class ENGINE_API Vision : private pure_relcase
 {
+    friend class pure_relcase;
 private:
     xr_vector<CObject*> seen;
     xr_vector<CObject*> query;
