@@ -75,7 +75,7 @@ void CLocatorAPI::auth_runtime(void* params)
                 continue;
 
             // test for important
-            for (s = 0; s < _o->important.size(); s++)
+            for (u32 s = 0; s < _o->important.size(); s++)
             {
                 if ((f.size_real != 0) && strstr(f.name, _o->important[s].c_str()))
                 {
