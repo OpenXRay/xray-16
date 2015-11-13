@@ -3,7 +3,7 @@
 #include "xrScriptEngine/script_space_forward.hpp"
 
 class CGameObject;
-
+// XXX: merge into CGameObject
 class CUsableScriptObject
 {
 public:

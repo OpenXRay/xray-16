@@ -25,6 +25,7 @@ class CSE_Abstract;
 
 class IPhysicsShell;
 xr_pure_interface IObjectPhysicsCollision;
+// XXX: merge into CGameObject
 #pragma pack(push,4)
 class ENGINE_API CObject :
     public FactoryObjectBase,

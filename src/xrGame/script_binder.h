@@ -11,7 +11,7 @@
 class CSE_Abstract;
 class CScriptBinderObject;
 class NET_Packet;
-
+// XXX: Merge into CGameObject
 class CScriptBinder {
 protected:
 	CScriptBinderObject			*m_object;
