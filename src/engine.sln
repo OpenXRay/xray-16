@@ -100,6 +100,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua.JIT.1.1.4", "3rd party\luajit\lua.JIT.1.1.4.vcxproj", "{F6C4F74A-152C-4612-9E3B-D02346234855}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrLC_Light", "utils\xrLC_Light\xrLC_Light.vcxproj", "{EFB76D6F-0092-439C-A783-C0BE10BD17C9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B90BDC22-A891-4B33-B562-29D701F65DBD} = {B90BDC22-A891-4B33-B562-29D701F65DBD}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrLC_LightStab", "utils\xrLC_LightStab\xrLC_LightStab.vcxproj", "{EC924B9B-4991-4931-8623-E1DB9AE005CA}"
 EndProject
