@@ -10,12 +10,12 @@
 #include "script_binder_object.h"
 #include "script_game_object.h"
 
-CScriptBinderObject::CScriptBinderObject	(CScriptGameObject *object)
+ScriptObjectBinder::ScriptObjectBinder(CScriptGameObject *object)
 {
 	m_object		= object;
 }
 
-CScriptBinderObject::~CScriptBinderObject	()
+ScriptObjectBinder::~ScriptObjectBinder()
 {
 #ifdef DEBUG
 	if (m_object)
@@ -23,48 +23,48 @@ CScriptBinderObject::~CScriptBinderObject	()
 #endif
 }
 
-void CScriptBinderObject::reinit			()
+void ScriptObjectBinder::reinit			()
 {
 }
 
-void CScriptBinderObject::reload			(LPCSTR section)
+void ScriptObjectBinder::reload			(LPCSTR section)
 {
 }
 
-bool CScriptBinderObject::net_Spawn			(SpawnType DC)
+bool ScriptObjectBinder::net_Spawn			(SpawnType DC)
 {
 	return			(true);
 }
 
-void CScriptBinderObject::net_Destroy		()
+void ScriptObjectBinder::net_Destroy		()
 {
 }
 
-void CScriptBinderObject::net_Import		(NET_Packet *net_packet)
+void ScriptObjectBinder::net_Import		(NET_Packet *net_packet)
 {
 }
 
-void CScriptBinderObject::net_Export		(NET_Packet *net_packet)
+void ScriptObjectBinder::net_Export		(NET_Packet *net_packet)
 {
 }
 
-void CScriptBinderObject::shedule_Update	(u32 time_delta)
+void ScriptObjectBinder::shedule_Update	(u32 time_delta)
 {
 }
 
-void CScriptBinderObject::save				(NET_Packet *output_packet)
+void ScriptObjectBinder::save				(NET_Packet *output_packet)
 {
 }
 
-void CScriptBinderObject::load				(IReader	*input_packet)
+void ScriptObjectBinder::load				(IReader	*input_packet)
 {
 }
 
-bool CScriptBinderObject::net_SaveRelevant	()
+bool ScriptObjectBinder::net_SaveRelevant	()
 {
 	return		(false);
 }
 
-void CScriptBinderObject::net_Relcase		(CScriptGameObject *object)
+void ScriptObjectBinder::net_Relcase		(CScriptGameObject *object)
 {
 }

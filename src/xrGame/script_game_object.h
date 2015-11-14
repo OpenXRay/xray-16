@@ -72,7 +72,7 @@ class CScriptEntityAction;
 class CScriptTask;
 class CScriptSoundInfo;
 class CScriptMonsterHitInfo;
-class CScriptBinderObject;
+class ScriptObjectBinder;
 class CCoverPoint;
 class CScriptIniFile;
 class cphysics_shell_scripted;
@@ -466,7 +466,7 @@ public:
 			CScriptGameObject		*GetCorpse		() const;
 			CScriptSoundInfo		GetSoundInfo	();
 			CScriptMonsterHitInfo	GetMonsterHitInfo();
-			void					bind_object		(CScriptBinderObject *object);
+			void					bind_object		(ScriptObjectBinder *object);
 			CScriptGameObject		*GetCurrentOutfit() const;
 			float					GetCurrentOutfitProtection(int hit_type);
 			
@@ -537,7 +537,7 @@ public:
 			void				clear_animations		();
 			int					animation_count			() const;
 			int					animation_slot			() const;
-			CScriptBinderObject	*binded_object			();
+            ScriptObjectBinder	*binded_object			();
 			void				set_previous_point		(int point_index);
 			void				set_start_point			(int point_index);
 			u32					get_current_patrol_point_index();

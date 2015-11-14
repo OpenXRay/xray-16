@@ -160,7 +160,7 @@ void CScriptBinder::net_Destroy		()
 	xr_delete				(m_object);
 }
 
-void CScriptBinder::set_object		(CScriptBinderObject *object)
+void CScriptBinder::set_object		(ScriptObjectBinder *object)
 {
 	if (IsGameTypeSingle()) {
 		VERIFY2				(!m_object,"Cannot bind to the object twice!");

@@ -9,12 +9,12 @@
 #pragma once
 
 class CSE_Abstract;
-class CScriptBinderObject;
+class ScriptObjectBinder;
 class NET_Packet;
 // XXX: Merge into CGameObject
 class CScriptBinder {
 protected:
-	CScriptBinderObject			*m_object;
+    ScriptObjectBinder			*m_object;
 
 public:
 								CScriptBinder	();
@@ -30,8 +30,8 @@ public:
 	virtual void				load			(IReader &input_packet);
 	virtual BOOL				net_SaveRelevant();
 	virtual void				net_Relcase		(CObject *object);
-			void				set_object		(CScriptBinderObject *object);
-	IC		CScriptBinderObject	*object			();
+			void				set_object		(ScriptObjectBinder *object);
+	IC		ScriptObjectBinder	*object			();
 };
 
 #include "script_binder_inline.h"

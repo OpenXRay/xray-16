@@ -12,14 +12,15 @@ class CSE_ALifeObject;
 class CScriptGameObject;
 class NET_Packet;
 
-class CScriptBinderObject {
+class ScriptObjectBinder
+{
 public:
 	typedef CSE_ALifeObject*	SpawnType;
 	CScriptGameObject			*m_object;
 
 public:
-						CScriptBinderObject	(CScriptGameObject *object);
-	virtual				~CScriptBinderObject();
+    ScriptObjectBinder(CScriptGameObject *object);
+	virtual				~ScriptObjectBinder();
 	virtual void		reinit				();
 	virtual void		reload				(LPCSTR section);
 	virtual bool		net_Spawn			(SpawnType DC);
