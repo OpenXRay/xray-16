@@ -47,7 +47,7 @@ extern MagicBox3 MagicMinBox (int iQuantity, const Fvector* akPoint);
 
 ENGINE_API bool g_dedicated_server;
 
-CGameObject::CGameObject		()
+CGameObject::CGameObject		() : scriptBinder(this)
 {
     // CUsableScriptObject init
     m_bNonscriptUsable = true;

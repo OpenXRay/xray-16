@@ -19,8 +19,9 @@
 // comment next string when commiting
 //#define DBG_DISABLE_SCRIPTS
 
-CScriptBinder::CScriptBinder		()
+CScriptBinder::CScriptBinder		(CGameObject *owner)
 {
+    this->owner = owner;
 	init					();
 }
 
@@ -87,10 +88,8 @@ void CScriptBinder::reload			(LPCSTR section)
 		return;
 	}
 	
-	CGameObject				*game_object = smart_cast<CGameObject*>(this);
-
 	try {
-		lua_function		(game_object ? game_object->lua_game_object() : 0);
+		lua_function		(owner->lua_game_object());
 	}
 	catch(...) {
 		clear				();
@@ -148,7 +147,7 @@ void CScriptBinder::net_Destroy		()
 {
 	if (m_object) {
 #ifdef _DEBUG
-		Msg						("* Core object %s is UNbinded from the script object",smart_cast<CGameObject*>(this) ? *smart_cast<CGameObject*>(this)->cName() : "");
+		Msg						("* Core object %s is UNbinded from the script object", owner->cName());
 #endif // _DEBUG
 		try {
 			m_object->net_Destroy	();
@@ -165,7 +164,7 @@ void CScriptBinder::set_object		(CScriptBinderObject *object)
 	if (IsGameTypeSingle()) {
 		VERIFY2				(!m_object,"Cannot bind to the object twice!");
 #ifdef _DEBUG
-		Msg					("* Core object %s is binded with the script object",smart_cast<CGameObject*>(this) ? *smart_cast<CGameObject*>(this)->cName() : "");
+		Msg					("* Core object %s is binded with the script object", owner->cName());
 #endif // _DEBUG
 		m_object			= object;
 	} else {
