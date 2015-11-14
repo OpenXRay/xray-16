@@ -14,6 +14,7 @@ class CScriptThread;
 
 class XRSCRIPTENGINE_API CScriptProcess
 {
+    friend class CScriptEngine;
 public:
     typedef xr_vector<CScriptThread*> SCRIPT_REGISTRY;
 
@@ -45,6 +46,7 @@ public:
     typedef xr_vector<CScriptToRun> SCRIPTS_TO_RUN;
 
 protected:
+    CScriptEngine *scriptEngine;
     SCRIPT_REGISTRY m_scripts;
     SCRIPTS_TO_RUN m_scripts_to_run;
     shared_str m_name;
@@ -53,8 +55,9 @@ protected:
 protected:
     void run_scripts();
 
+private:
+    CScriptProcess(CScriptEngine *scriptEngine, shared_str name, shared_str scripts);
 public:
-    CScriptProcess(shared_str name, shared_str scripts);
     virtual ~CScriptProcess();
     void update();
     void add_script(LPCSTR script_name, bool string, bool reload);

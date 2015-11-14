@@ -9,12 +9,12 @@
 u32 CDbgScriptThreads::Fill()
 {
     u32 res = 0;
-    if (!GlobalEnv.ScriptEngine)
+    if (!scriptEngine)
         return res;
-    CScriptProcess* sp = GlobalEnv.ScriptEngine->script_process(ScriptProcessor::Game);
+    CScriptProcess* sp = scriptEngine->script_process(ScriptProcessor::Game);
 	if (sp)
 		res += FillFrom(sp);	
-    sp = GlobalEnv.ScriptEngine->script_process(ScriptProcessor::Level);
+    sp = scriptEngine->script_process(ScriptProcessor::Level);
 	if (sp)
 		res += FillFrom(sp);
 	return res;

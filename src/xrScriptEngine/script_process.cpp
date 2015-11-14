@@ -13,10 +13,11 @@
 #include "common/object_broker.h"
 #include "Include/xrAPI/xrAPI.h"
 
-string4096 g_ca_stdout;
+string4096 g_ca_stdout; // XXX: allocate dynamically for each CScriptEngine instance
 
-CScriptProcess::CScriptProcess(shared_str name, shared_str scripts)
+CScriptProcess::CScriptProcess(CScriptEngine *scriptEngine, shared_str name, shared_str scripts)
 {
+    this->scriptEngine = scriptEngine;
     m_name = name;
 #ifdef DEBUG
     Msg("* Initializing %s script process", *m_name);
@@ -41,7 +42,7 @@ void CScriptProcess::run_scripts()
         S = xr_strdup(I);
         m_scripts_to_run.pop_back();
 
-        CScriptThread *script = xr_new<CScriptThread>(S, do_string, reload);
+        CScriptThread *script = scriptEngine->CreateScriptThread(S, do_string, reload);
         xr_free(S);
 
         if (script->active())
@@ -75,14 +76,14 @@ void CScriptProcess::update()
     if (g_ca_stdout[0])
     {
         fputc(0,stderr);
-        GlobalEnv.ScriptEngine->script_log(LuaMessageType::Info, "%s", g_ca_stdout);
+        scriptEngine->script_log(LuaMessageType::Info, "%s", g_ca_stdout);
         fflush(stderr);
     }
 #if defined(DEBUG)
     try
     {
 #pragma todo ("Dima cant find this function 'lua_setgcthreshold' ")
-        lua_gc(GlobalEnv.ScriptEngine->lua(), LUA_GCSTEP, 0);
+        lua_gc(scriptEngine->lua(), LUA_GCSTEP, 0);
     } catch (...) {        
     }
 #endif

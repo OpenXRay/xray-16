@@ -55,7 +55,7 @@ public:
     void UnPrepareLua(lua_State *l, int idx);
     BOOL PrepareLuaBind();
 
-    CScriptDebugger();
+    CScriptDebugger(CScriptEngine *scriptEngine);
     virtual ~CScriptDebugger();
 
     void Go();
@@ -85,6 +85,7 @@ protected:
     bool TranslateIdeMessage(CMailSlotMsg *);
     void SendMessageToIde(CMailSlotMsg &);
 
+    CScriptEngine *scriptEngine;
     CDbgScriptThreads *m_threads;
     CDbgLuaHelper *m_lua;
     CScriptCallStack *m_callStack;

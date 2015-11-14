@@ -190,7 +190,7 @@ static void InitEngineExt()
     Engine.External.Initialize();
     // once all libraries got loaded, instantiate and initialize script engine
     GlobalEnv.ScriptEngine = xr_new<CScriptEngine>();
-    GlobalEnv.ScriptEngine->init();
+    GlobalEnv.ScriptEngine->init(XRay::ScriptExporter::Export);
 }
 
 struct path_excluder_predicate

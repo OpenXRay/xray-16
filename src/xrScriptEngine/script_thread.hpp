@@ -13,6 +13,8 @@
 #include "script_stack_tracker.hpp"
 #endif
 
+#define LUABIND_HAS_BUGS_WITH_LUA_THREADS
+
 struct lua_State;
 
 #ifdef DEBUG
@@ -21,19 +23,17 @@ class XRSCRIPTENGINE_API CScriptThread : public CScriptStackTracker
 class XRSCRIPTENGINE_API CScriptThread
 #endif
 {
+    friend class CScriptEngine;
 private:
+    CScriptEngine *scriptEngine;
     shared_str m_script_name;
     int m_thread_reference;
     bool m_active;
     lua_State *m_virtual_machine;
 
-#ifdef DEBUG
-protected:
-    static void lua_hook_call(lua_State *L, lua_Debug *dbg);
-#endif
-
+private:
+    CScriptThread(CScriptEngine *scriptEngine, LPCSTR caNamespaceName, bool do_string = false, bool reload = false);
 public:
-    CScriptThread(LPCSTR caNamespaceName, bool do_string = false, bool reload = false);
     virtual ~CScriptThread();
     bool update();
     bool active() const { return m_active; }

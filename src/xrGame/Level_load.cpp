@@ -138,12 +138,14 @@ bool CLevel::Load_GameSpecific_After()
 
 	if (!g_dedicated_server) {
 		// loading scripts
-		ai().script_engine().remove_script_process(ScriptProcessor::Level);
-
+        auto &scriptEngine = ai().script_engine();
+        scriptEngine.remove_script_process(ScriptProcessor::Level);
+        shared_str scripts;
 		if (pLevel->section_exist("level_scripts") && pLevel->line_exist("level_scripts","script"))
-			ai().script_engine().add_script_process(ScriptProcessor::Level,xr_new<CScriptProcess>("level",pLevel->r_string("level_scripts","script")));
+            scripts = pLevel->r_string("level_scripts","script");
 		else
-			ai().script_engine().add_script_process(ScriptProcessor::Level,xr_new<CScriptProcess>("level",""));
+            scripts = "";
+        scriptEngine.add_script_process(ScriptProcessor::Level, scriptEngine.CreateScriptProcess("level", scripts));
 	}
 		
 	BlockCheatLoad();

@@ -117,9 +117,10 @@ LRESULT CScriptDebugger::DebugMessage(UINT nMsg, WPARAM wParam, LPARAM lParam)
 
 BOOL CScriptDebugger::Active() { return m_bIdePresent; }
 
-CScriptDebugger::CScriptDebugger()
+CScriptDebugger::CScriptDebugger(CScriptEngine *scriptEngine)
 {
-    m_threads = xr_new<CDbgScriptThreads>(this);
+    this->scriptEngine = scriptEngine;
+    m_threads = xr_new<CDbgScriptThreads>(scriptEngine, this);
     m_callStack = xr_new<CScriptCallStack>(this);
     m_lua = xr_new<CDbgLuaHelper>(this);
     ZeroMemory(m_curr_connected_mslot,sizeof(m_curr_connected_mslot));

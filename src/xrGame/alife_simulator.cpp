@@ -36,7 +36,7 @@ void restart_all                ()
     destroy_lua_wpn_params      ();
     MainMenu()->DestroyInternal (true);
     xr_delete                   (g_object_factory);
-    ai().script_engine().init   ();
+    ai().script_engine().init   (XRay::ScriptExporter::Export); // XXX: reset node 'done' flags before export
 
 #ifdef DEBUG
     ai().moving_objects().clear ();

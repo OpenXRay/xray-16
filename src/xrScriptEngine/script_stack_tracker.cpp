@@ -11,8 +11,9 @@
 #include "script_engine.hpp"
 #include "Include/xrAPI/xrAPI.h"
 
-CScriptStackTracker::CScriptStackTracker()
+CScriptStackTracker::CScriptStackTracker(CScriptEngine *scriptEngine)
 {
+    this->scriptEngine = scriptEngine;
     m_current_stack_level = 0;
     for (int i = 0; i<max_stack_size; i++)
         m_stack[i] = xr_new<lua_Debug>();
@@ -68,14 +69,14 @@ void CScriptStackTracker::print_stack(lua_State *L)
         lua_Debug l_tDebugInfo = *m_stack[j];
         if (!l_tDebugInfo.name)
         {
-            GlobalEnv.ScriptEngine->script_log(LuaMessageType::Error, "%2d : [%s] %s(%d) : %s",
+            scriptEngine->script_log(LuaMessageType::Error, "%2d : [%s] %s(%d) : %s",
                 k, l_tDebugInfo.what, l_tDebugInfo.short_src, l_tDebugInfo.currentline, "");
         }
         else if (!xr_strcmp(l_tDebugInfo.what, "C"))
-            GlobalEnv.ScriptEngine->script_log(LuaMessageType::Error, "%2d : [C  ] %s", k, l_tDebugInfo.name);
+            scriptEngine->script_log(LuaMessageType::Error, "%2d : [C  ] %s", k, l_tDebugInfo.name);
         else
         {
-            GlobalEnv.ScriptEngine->script_log(LuaMessageType::Error, "%2d : [%s] %s(%d) : %s",
+            scriptEngine->script_log(LuaMessageType::Error, "%2d : [%s] %s(%d) : %s",
                 k, l_tDebugInfo.what, l_tDebugInfo.short_src, l_tDebugInfo.currentline, l_tDebugInfo.name);
         }
     }

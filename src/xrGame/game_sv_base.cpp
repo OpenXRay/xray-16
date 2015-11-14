@@ -440,18 +440,22 @@ void game_sv_GameState::Create					(shared_str &options)
 	if (!g_dedicated_server)
 	{
 		// loading scripts
-		ai().script_engine().remove_script_process(ScriptProcessor::Game);
+        auto &scriptEngine = ai().script_engine();
+        scriptEngine.remove_script_process(ScriptProcessor::Game);
 		string_path					S;
 		FS.update_path				(S,"$game_config$","script.ltx");
 		CInifile					*l_tpIniFile = xr_new<CInifile>(S);
 		R_ASSERT					(l_tpIniFile);
 
-		if( l_tpIniFile->section_exist( type_name() ) )
-			if (l_tpIniFile->r_string(type_name(),"script"))
-				ai().script_engine().add_script_process(ScriptProcessor::Game,xr_new<CScriptProcess>("game",l_tpIniFile->r_string(type_name(),"script")));
-			else
-				ai().script_engine().add_script_process(ScriptProcessor::Game,xr_new<CScriptProcess>("game",""));
-
+        if (l_tpIniFile->section_exist(type_name()))
+        {
+            shared_str scripts;
+            if (l_tpIniFile->r_string(type_name(), "script"))
+                scripts = l_tpIniFile->r_string(type_name(), "script");
+            else
+                scripts = "";
+            scriptEngine.add_script_process(ScriptProcessor::Game, scriptEngine.CreateScriptProcess("game", scripts));
+        }
 		xr_delete					(l_tpIniFile);
 	}
 
