@@ -48,9 +48,7 @@ class IKinematics;
 template <typename _return_type>
 class CScriptCallbackEx;
 
-class CGameObject : 
-	public CObject,
-	public CScriptBinder
+class CGameObject : public CObject
 {
 private:
 	typedef CObject inherited;
@@ -62,6 +60,7 @@ private:
 	ALife::_STORY_ID				m_story_id;
 	animation_movement_controller	*m_anim_mov_ctrl;
 protected:
+    CScriptBinder scriptBinder;
 	//время удаления объекта
 	bool					m_bObjectRemoved;
 public:
@@ -318,6 +317,9 @@ public:
     //можно ли использовать объект стандартным (не скриптовым) образом
     bool nonscript_usable();
     void set_nonscript_usable(bool usable);
+    
+    ScriptObjectBinder *GetScriptObjectBinder() { return scriptBinder.object(); }
+    void SetScriptObjectBinder(ScriptObjectBinder *object) { scriptBinder.set_object(object); }
 };
 
 #endif // !defined(AFX_GAMEOBJECT_H__3DA72D03_C759_4688_AEBB_89FA812AA873__INCLUDED_)
