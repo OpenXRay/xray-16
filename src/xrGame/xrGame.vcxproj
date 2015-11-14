@@ -1745,7 +1745,6 @@
     <ClInclude Include="ui\xrUIXmlParser.h" />
     <ClInclude Include="ui_base.h" />
     <ClInclude Include="ui_defs.h" />
-    <ClInclude Include="UsableScriptObject.h" />
     <ClInclude Include="vertex_allocator_fixed.h" />
     <ClInclude Include="vertex_allocator_fixed_inline.h" />
     <ClInclude Include="vertex_manager_fixed.h" />
@@ -3843,10 +3842,6 @@
     <ClCompile Include="ui\xrUIXmlParser.cpp" />
     <ClCompile Include="ui_base.cpp" />
     <ClCompile Include="ui_export_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="UsableScriptObject.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>

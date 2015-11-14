@@ -9,7 +9,7 @@
 #include "xrEngine/xr_object.h"
 #include "xrServer_Space.h"
 #include "alife_space.h"
-#include "UsableScriptObject.h"
+#include "xrScriptEngine/script_space_forward.hpp"
 #include "script_binder.h"
 #include "Hit.h"
 #include "game_object_space.h"
@@ -49,11 +49,13 @@ template <typename _return_type>
 class CScriptCallbackEx;
 
 class CGameObject : 
-	public CObject, 
-	public CUsableScriptObject,
+	public CObject,
 	public CScriptBinder
 {
+private:
 	typedef CObject inherited;
+    shared_str m_sTipText;
+    bool m_bNonscriptUsable;
 	bool							m_spawned;
 	Flags32							m_server_flags;
 	CAI_ObjectLocation				*m_ai_location;
@@ -91,7 +93,6 @@ public:
 
 public:
 	virtual bool						feel_touch_on_contact	(CObject *)					{return TRUE;}
-	virtual bool						use						(CGameObject* who_use)		{return CUsableScriptObject::use(who_use);};
 
 public:
 	CInifile				*m_ini_file;
@@ -308,6 +309,15 @@ public:
 	}
 
 	virtual void			on_matrix_change	(const Fmatrix &previous);
+    // UsableScriptObject functions
+    virtual bool use(CGameObject* who_use);
+    //строчка по€вл€юща€с€ при наведении на объект (если NULL, то нет)
+    virtual LPCSTR tip_text();
+    void set_tip_text(LPCSTR new_text);
+    virtual void set_tip_text_default();
+    //можно ли использовать объект стандартным (не скриптовым) образом
+    bool nonscript_usable();
+    void set_nonscript_usable(bool usable);
 };
 
 #endif // !defined(AFX_GAMEOBJECT_H__3DA72D03_C759_4688_AEBB_89FA812AA873__INCLUDED_)

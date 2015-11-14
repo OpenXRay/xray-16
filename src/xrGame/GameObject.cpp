@@ -32,6 +32,12 @@
 #include "magic_box3.h"
 #include "animation_movement_controller.h"
 #include "xrEngine/xr_collide_form.h"
+#include "script_game_object.h"
+#include "script_callback_ex.h"
+#include "game_object_space.h"
+#include "doors_door.h"
+#include "doors.h"
+
 extern MagicBox3 MagicMinBox (int iQuantity, const Fvector* akPoint);
 
 #pragma warning(push)
@@ -48,6 +54,10 @@ ENGINE_API bool g_dedicated_server;
 
 CGameObject::CGameObject		()
 {
+    // CUsableScriptObject init
+    m_bNonscriptUsable = true;
+    set_tip_text_default();
+    // ~
 	m_ai_obstacle				= 0;
 
 	init						();
@@ -1145,3 +1155,28 @@ void CGameObject::OnRender			()
 	}
 }
 #endif // DEBUG
+
+using namespace luabind; // XXX: is it required here?
+
+bool CGameObject::use(CGameObject* who_use)
+{
+    VERIFY(who_use);
+    CScriptGameObject *obj = lua_game_object();
+    if (obj && obj->m_door)
+    {
+        if (obj->m_door->is_blocked(doors::door_state_open) || obj->m_door->is_blocked(doors::door_state_closed))
+            return false;
+    }
+    callback(GameObject::eUseObject)(obj, who_use->lua_game_object());
+    return true;
+}
+
+LPCSTR CGameObject::tip_text() { return *m_sTipText; }
+
+void CGameObject::set_tip_text(LPCSTR new_text) { m_sTipText = new_text; }
+
+void CGameObject::set_tip_text_default() { m_sTipText = NULL; }
+
+bool CGameObject::nonscript_usable() { return m_bNonscriptUsable; }
+
+void CGameObject::set_nonscript_usable(bool usable) { m_bNonscriptUsable = usable; }
