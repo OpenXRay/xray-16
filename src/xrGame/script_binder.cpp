@@ -69,10 +69,6 @@ void CScriptBinder::reinit			()
 #endif // DEBUG_MEMORY_MANAGER
 }
 
-void CScriptBinder::Load			(LPCSTR section)
-{
-}
-
 void CScriptBinder::reload			(LPCSTR section)
 {
 #ifdef DEBUG_MEMORY_MANAGER
