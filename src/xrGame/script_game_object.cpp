@@ -40,7 +40,7 @@
 #include "smart_cover_description.h"
 #include "physics_shell_scripted.h"
 
-class ScriptObjectBinder;
+class CScriptBinderObject;
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -257,14 +257,14 @@ bool CScriptGameObject::CheckObjectVisibility(const CScriptGameObject *tpLuaGame
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
-ScriptObjectBinder	*CScriptGameObject::binded_object	()
+CScriptBinderObject	*CScriptGameObject::binded_object	()
 {
-	return									(object().GetScriptObjectBinder());
+	return									(object().GetScriptBinderObject());
 }
 
-void CScriptGameObject::bind_object			(ScriptObjectBinder *game_object)
+void CScriptGameObject::bind_object			(CScriptBinderObject *game_object)
 {
-	object().SetScriptObjectBinder(game_object);
+	object().SetScriptBinderObject(game_object);
 }
 
 void CScriptGameObject::set_previous_point	(int point_index)

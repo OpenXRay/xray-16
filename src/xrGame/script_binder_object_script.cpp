@@ -14,23 +14,23 @@
 
 using namespace luabind;
 
-SCRIPT_EXPORT(ScriptObjectBinder, (),
+SCRIPT_EXPORT(CScriptBinderObject, (),
 {
 	module(luaState)
 	[
-		class_<ScriptObjectBinder,ScriptObjectBinderWrapper>("object_binder")
-			.def_readonly("object",				&ScriptObjectBinder::m_object)
+		class_<CScriptBinderObject,CScriptBinderObjectWrapper>("object_binder")
+			.def_readonly("object",				&CScriptBinderObject::m_object)
 			.def(								constructor<CScriptGameObject*>())
-			.def("reinit",						&ScriptObjectBinder::reinit,			&ScriptObjectBinderWrapper::reinit_static)
-			.def("reload",						&ScriptObjectBinder::reload,			&ScriptObjectBinderWrapper::reload_static)
-			.def("net_spawn",					&ScriptObjectBinder::net_Spawn,		&ScriptObjectBinderWrapper::net_Spawn_static)
-			.def("net_destroy",					&ScriptObjectBinder::net_Destroy,		&ScriptObjectBinderWrapper::net_Destroy_static)
-			.def("net_import",					&ScriptObjectBinder::net_Import,		&ScriptObjectBinderWrapper::net_Import_static)
-			.def("net_export",					&ScriptObjectBinder::net_Export,		&ScriptObjectBinderWrapper::net_Export_static)
-			.def("update",						&ScriptObjectBinder::shedule_Update,	&ScriptObjectBinderWrapper::shedule_Update_static)
-			.def("save",						&ScriptObjectBinder::save,				&ScriptObjectBinderWrapper::save_static)
-			.def("load",						&ScriptObjectBinder::load,				&ScriptObjectBinderWrapper::load_static)
-			.def("net_save_relevant",			&ScriptObjectBinder::net_SaveRelevant,	&ScriptObjectBinderWrapper::net_SaveRelevant_static)
-			.def("net_Relcase",					&ScriptObjectBinder::net_Relcase,		&ScriptObjectBinderWrapper::net_Relcase_static)
+			.def("reinit",						&CScriptBinderObject::reinit,			&CScriptBinderObjectWrapper::reinit_static)
+			.def("reload",						&CScriptBinderObject::reload,			&CScriptBinderObjectWrapper::reload_static)
+			.def("net_spawn",					&CScriptBinderObject::net_Spawn,		&CScriptBinderObjectWrapper::net_Spawn_static)
+			.def("net_destroy",					&CScriptBinderObject::net_Destroy,		&CScriptBinderObjectWrapper::net_Destroy_static)
+			.def("net_import",					&CScriptBinderObject::net_Import,		&CScriptBinderObjectWrapper::net_Import_static)
+			.def("net_export",					&CScriptBinderObject::net_Export,		&CScriptBinderObjectWrapper::net_Export_static)
+			.def("update",						&CScriptBinderObject::shedule_Update,	&CScriptBinderObjectWrapper::shedule_Update_static)
+			.def("save",						&CScriptBinderObject::save,				&CScriptBinderObjectWrapper::save_static)
+			.def("load",						&CScriptBinderObject::load,				&CScriptBinderObjectWrapper::load_static)
+			.def("net_save_relevant",			&CScriptBinderObject::net_SaveRelevant,	&CScriptBinderObjectWrapper::net_SaveRelevant_static)
+			.def("net_Relcase",					&CScriptBinderObject::net_Relcase,		&CScriptBinderObjectWrapper::net_Relcase_static)
 	];
 });

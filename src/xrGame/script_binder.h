@@ -9,12 +9,12 @@
 #pragma once
 
 class CSE_Abstract;
-class ScriptObjectBinder;
+class CScriptBinderObject;
 class NET_Packet;
 
 class CScriptBinder {
 protected:
-    ScriptObjectBinder			*m_object;
+	CScriptBinderObject			*m_object;
 
 public:
 								CScriptBinder	();
@@ -30,8 +30,8 @@ public:
 	virtual void				load			(IReader &input_packet);
 	virtual BOOL				net_SaveRelevant();
 	virtual void				net_Relcase		(CObject *object);
-			void				set_object		(ScriptObjectBinder *object);
-	IC		ScriptObjectBinder	*object			();
+			void				set_object		(CScriptBinderObject *object);
+	IC		CScriptBinderObject	*object			();
 };
 
 #include "script_binder_inline.h"

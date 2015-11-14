@@ -318,8 +318,8 @@ public:
     bool nonscript_usable();
     void set_nonscript_usable(bool usable);
     
-    ScriptObjectBinder *GetScriptObjectBinder() { return scriptBinder.object(); }
-    void SetScriptObjectBinder(ScriptObjectBinder *object) { scriptBinder.set_object(object); }
+    CScriptBinderObject *GetScriptBinderObject() { return scriptBinder.object(); }
+    void SetScriptBinderObject(CScriptBinderObject *object) { scriptBinder.set_object(object); }
 };
 
 #endif // !defined(AFX_GAMEOBJECT_H__3DA72D03_C759_4688_AEBB_89FA812AA873__INCLUDED_)
