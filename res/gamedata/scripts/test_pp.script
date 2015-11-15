@@ -1,4 +1,0 @@
-function main()
-	level.add_pp_effector("test.ppe", 666, true)
---	level.remove_pp_effector(666)
-end
