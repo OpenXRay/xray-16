@@ -87,10 +87,10 @@ void Surface_Init()
 BOOL Surface_Detect(string_path& F, LPSTR N)
 {
     FS.update_path(F, "$game_textures$", strconcat(sizeof(F), F, N, ".dds"));
-    int h = _open(F, O_RDONLY | O_BINARY);
-    if (h > 0)
+    FILE *file = fopen(F, "rb");
+    if (file)
     {
-        _close(h);
+        fclose(file);
         return (TRUE);
     }
 
