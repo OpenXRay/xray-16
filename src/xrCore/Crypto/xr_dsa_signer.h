@@ -28,6 +28,6 @@ private:
 	
 }; //xr_dsa_signer
 
-XRCORE_API char const * current_time(string64 & dest_time);
+XRCORE_API char *current_time(string64 &dest_time);
 
 #endif //#ifndef XR_DSA_SIGNER_INCLUDED
