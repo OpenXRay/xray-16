@@ -1,9 +1,0 @@
-function _printf(fmt,...) 
-	log(string.format(fmt,...))	
-end
-
-function collect_info(npc, type)
-	collectgarbage("collect")
-	collectgarbage("collect")
-	_printf("MEMUSAGE [%s]->[%s] %d Kb",npc:name(), type, collectgarbage("count"))
-end

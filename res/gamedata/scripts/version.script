@@ -1,1 +1,0 @@
-isLua51	= (nil ~= _VERSION) and (string.find(_VERSION,"Lua 5.1",1,true) ~= nil)
