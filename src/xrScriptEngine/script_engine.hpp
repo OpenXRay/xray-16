@@ -143,7 +143,7 @@ public:
     using ExporterFunc = XRay::ScriptExporter::Node::ExporterFunc;
     CScriptEngine();
     virtual ~CScriptEngine();
-    void init(ExporterFunc exporterFunc);
+    void init(ExporterFunc exporterFunc, bool loadGlobalNamespace);
     virtual void unload();
     static int lua_panic(lua_State *L);
     static void lua_error(lua_State *L);

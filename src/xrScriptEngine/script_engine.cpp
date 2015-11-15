@@ -1021,7 +1021,7 @@ void CScriptEngine::setup_auto_load()
     // lua_settop(lua(), 0);
 }
 
-void CScriptEngine::init(ExporterFunc exporterFunc)
+void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
 {
 #ifdef USE_LUA_STUDIO
     bool lua_studio_connected = !!m_lua_studio_world;
@@ -1056,10 +1056,13 @@ void CScriptEngine::init(ExporterFunc exporterFunc)
 #endif
         lua_sethook(lua(), CScriptEngine::lua_hook_call, LUA_MASKLINE|LUA_MASKCALL|LUA_MASKRET, 0);
 #endif
-    bool save = m_reload_modules;
-    m_reload_modules = true;
-    process_file_if_exists(GlobalNamespace, false);
-    m_reload_modules = save;
+    if (loadGlobalNamespace)
+    {
+        bool save = m_reload_modules;
+        m_reload_modules = true;
+        process_file_if_exists(GlobalNamespace, false);
+        m_reload_modules = save;
+    }
     m_stack_level = lua_gettop(lua());
     setvbuf(stderr, g_ca_stdout, _IOFBF, sizeof(g_ca_stdout));
 }

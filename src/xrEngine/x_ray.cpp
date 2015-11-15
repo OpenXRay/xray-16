@@ -24,7 +24,6 @@
 #include <locale.h>
 
 #include "xrSASH.h"
-#include "xrScriptEngine/script_engine.hpp"
 
 //---------------------------------------------------------------------
 ENGINE_API CInifile* pGameIni = NULL;
@@ -188,9 +187,6 @@ void InitEngine()
 static void InitEngineExt()
 {
     Engine.External.Initialize();
-    // once all libraries got loaded, instantiate and initialize script engine
-    GlobalEnv.ScriptEngine = xr_new<CScriptEngine>();
-    GlobalEnv.ScriptEngine->init(XRay::ScriptExporter::Export);
 }
 
 struct path_excluder_predicate
@@ -308,9 +304,6 @@ void destroyConsole()
 
 void destroyEngine()
 {
-    // destroy script engine before detaching libraries because lua GC calls
-    // destructors from these libraries
-    xr_delete(GlobalEnv.ScriptEngine);
     Device.Destroy();
     Engine.Destroy();
 }
@@ -811,7 +804,7 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 #else
         Console->Execute("renderer renderer_r1");
 #endif
-        InitEngineExt(); // load xrRender, xrGame and ScriptEngine
+        InitEngineExt(); // load xrRender and xrGame
         Startup();
         Core._destroy();
 
