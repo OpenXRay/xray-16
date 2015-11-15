@@ -48,8 +48,8 @@ public:
 
     void Leave()
     {
+        mutex.unlock();
         isLocked = false;
-        mutex.unlock();        
     }
 
     bool IsLocked() const { return isLocked; }
