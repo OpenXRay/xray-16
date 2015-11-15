@@ -34,7 +34,7 @@ public:
     void Enter()
     {
         mutex.lock();
-        ++lockCounter;
+        lockCounter++;
     }
 #endif
 
@@ -42,14 +42,14 @@ public:
     {
         bool locked = mutex.try_lock();
         if (locked)
-            ++lockCounter;
+            lockCounter++;
         return locked;
     }
 
     void Leave()
     {
         mutex.unlock();
-        --lockCounter;
+        lockCounter--;
     }
 
     bool IsLocked() const { return lockCounter; }
