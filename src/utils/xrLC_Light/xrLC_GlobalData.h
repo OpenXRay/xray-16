@@ -157,9 +157,9 @@ static LPCSTR gl_data_net_file_name = "tmp_global_data";
 
 
 #ifdef _DEBUG
-static LPCSTR libraries = "XRLC_LightStab,XRLC_Light,xrCore,xrCDB,xrAPI,DXT,BugTrap,BugTrapD,FreeImage,msvcr80.dll,Microsoft.VC80.CRT.manifest";
+static LPCSTR libraries = "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,xrAPI.dll,DXT.dll,BugTrap.dll,BugTrapD.dll,FreeImage.dll,msvcr80.dll,Microsoft.VC80.CRT.manifest";
 #else
-static LPCSTR libraries = "XRLC_LightStab,XRLC_Light,xrCore,xrCDB,xrAPI,DXT,BugTrap,FreeImage,msvcr80.dll,Microsoft.VC80.CRT.manifest";
+static LPCSTR libraries = "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,xrAPI.dll,DXT.dll,BugTrap.dll,FreeImage.dll,msvcr80.dll,Microsoft.VC80.CRT.manifest";
 #endif
 //#define NET_CMP
 //#define LOAD_GL_DATA

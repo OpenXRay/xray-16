@@ -121,9 +121,9 @@ void	net_task_menager::run()
 }
 
 #ifdef _DEBUG
-LPCSTR libraries = "XRLC_LightStab,XRLC_Light,xrCore,xrCDB,DXT,BugTrapD,msvcr80.dll,Microsoft.VC80.CRT.manifest";
+LPCSTR libraries = "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,DXT.dll,BugTrapD.dll,msvcr80.dll,Microsoft.VC80.CRT.manifest";
 #else
-LPCSTR libraries = "XRLC_LightStab,XRLC_Light,xrCore,xrCDB,DXT,BugTrap,msvcr80.dll,Microsoft.VC80.CRT.manifest";
+LPCSTR libraries = "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,DXT.dll,BugTrap.dll,msvcr80.dll,Microsoft.VC80.CRT.manifest";
 #endif
 
 void net_task_menager::send( IGridUser& user, u32 id )
