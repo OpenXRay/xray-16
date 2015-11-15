@@ -217,9 +217,9 @@ void	net_task_manager::run()
 
 
 //#ifdef _DEBUG
-//LPCSTR libraries = "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,DXT.dll,BugTrapD.dll,msvcr80.dll,Microsoft.VC80.CRT.manifest,tmp_global_data0,tmp_global_data1,tmp_global_data2,tmp_global_data3,tmp_global_data4,tmp_global_data5";
+//LPCSTR libraries = "XRLC_LightStab,XRLC_Light,xrCore,xrCDB,DXT,BugTrapD,msvcr80.dll,Microsoft.VC80.CRT.manifest,tmp_global_data0,tmp_global_data1,tmp_global_data2,tmp_global_data3,tmp_global_data4,tmp_global_data5";
 //#else
-//LPCSTR libraries = "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,DXT.dll,BugTrap.dll,msvcr80.dll,Microsoft.VC80.CRT.manifest,tmp_global_data0,tmp_global_data1,tmp_global_data2,tmp_global_data3,tmp_global_data4,tmp_global_data5";
+//LPCSTR libraries = "XRLC_LightStab,XRLC_Light,xrCore,xrCDB,DXT,BugTrap,msvcr80.dll,Microsoft.VC80.CRT.manifest,tmp_global_data0,tmp_global_data1,tmp_global_data2,tmp_global_data3,tmp_global_data4,tmp_global_data5";
 //#endif
 
 void send_lightmap_task(IGridUser& user, u32 deflector_id)

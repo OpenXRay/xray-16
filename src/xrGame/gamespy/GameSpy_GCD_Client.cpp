@@ -8,7 +8,7 @@ CGameSpy_GCD_Client::CGameSpy_GCD_Client()
 {
 	m_hGameSpyDLL = NULL;
 
-	LPCSTR			g_name	= "xrGameSpy.dll";
+	LPCSTR			g_name	= "xrGameSpy";
 	Log				("Loading DLL:",g_name);
 	m_hGameSpyDLL			= LoadLibrary	(g_name);
 	if (0==m_hGameSpyDLL)	R_CHK			(GetLastError());
