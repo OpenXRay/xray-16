@@ -25,30 +25,22 @@ LPCSTR alife_section = "alife";
 
 extern void destroy_lua_wpn_params  ();
 
-void restart_all                ()
-{
-    // XXX: delete this -or- let render use separate script engine instance
-    
-    // don't reinitialize script engine because it it's used by render
-    if (true || strstr(Core.Params,"-keep_lua"))
-        return;
-
-    destroy_lua_wpn_params      ();
-    MainMenu()->DestroyInternal (true);
-    xr_delete                   (g_object_factory);
-    ai().script_engine().init   ();
-
-#ifdef DEBUG
-    ai().moving_objects().clear ();
-#endif // DEBUG
-}
-
 CALifeSimulator::CALifeSimulator        (IPureServer *server, shared_str *command_line) :
     CALifeUpdateManager         (server,alife_section),
     CALifeInteractionManager    (server,alife_section),
     CALifeSimulatorBase         (server,alife_section)
 {
-    restart_all                 ();
+    // XXX: why do we need to reinitialize script engine?
+    if (!strstr(Core.Params, "-keep_lua"))
+    {
+        destroy_lua_wpn_params();
+        MainMenu()->DestroyInternal(true);
+        xr_delete(g_object_factory);
+        ai().SetupScriptEngine();
+#ifdef DEBUG
+        ai().moving_objects().clear();
+#endif // DEBUG
+    }
 
     ai().set_alife              (this);
 

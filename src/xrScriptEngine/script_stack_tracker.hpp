@@ -13,6 +13,7 @@
 
 struct lua_Debug;
 struct lua_State;
+class CScriptEngine;
 
 class XRSCRIPTENGINE_API CScriptStackTracker
 {
@@ -23,11 +24,12 @@ protected:
     };
 
 protected:
+    CScriptEngine *scriptEngine;
     lua_Debug *m_stack[max_stack_size];
     int m_current_stack_level;
 
 public:
-    CScriptStackTracker();
+    CScriptStackTracker(CScriptEngine *scriptEngine);
     virtual ~CScriptStackTracker();
     void script_hook(lua_State *L, lua_Debug *dbg);
     void print_stack(lua_State *L);

@@ -32,12 +32,13 @@
 #include "magic_box3.h"
 #include "animation_movement_controller.h"
 #include "xrEngine/xr_collide_form.h"
-extern MagicBox3 MagicMinBox (int iQuantity, const Fvector* akPoint);
+#include "script_game_object.h"
+#include "script_callback_ex.h"
+#include "game_object_space.h"
+#include "doors_door.h"
+#include "doors.h"
 
-#pragma warning(push)
-#pragma warning(disable:4995)
-#include <malloc.h>
-#pragma warning(pop)
+extern MagicBox3 MagicMinBox (int iQuantity, const Fvector* akPoint);
 
 #ifdef DEBUG
 #	include "debug_renderer.h"
@@ -46,8 +47,12 @@ extern MagicBox3 MagicMinBox (int iQuantity, const Fvector* akPoint);
 
 ENGINE_API bool g_dedicated_server;
 
-CGameObject::CGameObject		()
+CGameObject::CGameObject		() : scriptBinder(this)
 {
+    // CUsableScriptObject init
+    m_bNonscriptUsable = true;
+    set_tip_text_default();
+    // ~
 	m_ai_obstacle				= 0;
 
 	init						();
@@ -148,7 +153,7 @@ void CGameObject::net_Destroy	()
 
 //.	Parent									= 0;
 
-	CScriptBinder::net_Destroy				();
+    scriptBinder.net_Destroy				();
 
 	xr_delete								(m_lua_game_object);
 	m_spawned								= false;
@@ -343,11 +348,11 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 
 	reload						(*cNameSect());
 	if(!g_dedicated_server)
-		CScriptBinder::reload	(*cNameSect());
+        scriptBinder.reload	(*cNameSect());
 	
 	reinit						();
 	if(!g_dedicated_server)
-		CScriptBinder::reinit	();
+        scriptBinder.reinit	();
 #ifdef DEBUG
 	if(ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject)&&stricmp(PH_DBG_ObjectTrackName(),*cName())==0)
 	{
@@ -411,7 +416,7 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 	{
 		Msg("CGameObject::net_Spawn obj %s Before CScriptBinder::net_Spawn %f,%f,%f",PH_DBG_ObjectTrackName(),Position().x,Position().y,Position().z);
 	}
-	BOOL ret =CScriptBinder::net_Spawn(DC);
+	BOOL ret = scriptBinder.net_Spawn(DC);
 #else
 	return						(CScriptBinder::net_Spawn(DC));
 #endif
@@ -440,7 +445,7 @@ void CGameObject::net_Save		(NET_Packet &net_packet)
 
 #endif
 
-	CScriptBinder::save			(net_packet);
+    scriptBinder.save			(net_packet);
 
 #ifdef DEBUG	
 
@@ -467,7 +472,7 @@ void CGameObject::net_Load		(IReader &ireader)
 
 #endif
 
-	CScriptBinder::load		(ireader);
+    scriptBinder.load		(ireader);
 
 
 #ifdef DEBUG	
@@ -835,12 +840,12 @@ void CGameObject::shedule_Update	(u32 dt)
 	inherited::shedule_Update	(dt);
 	
 	if(!g_dedicated_server)
-		CScriptBinder::shedule_Update(dt);
+        scriptBinder.shedule_Update(dt);
 }
 
 BOOL CGameObject::net_SaveRelevant	()
 {
-	return	(CScriptBinder::net_SaveRelevant());
+	return scriptBinder.net_SaveRelevant();
 }
 
 //игровое имя объекта
@@ -898,7 +903,7 @@ void CGameObject::net_Relcase			(CObject* O)
 {
 	inherited::net_Relcase		(O);
 	if(!g_dedicated_server)
-		CScriptBinder::net_Relcase	(O);
+        scriptBinder.net_Relcase	(O);
 }
 
 CGameObject::CScriptCallbackExVoid &CGameObject::callback(GameObject::ECallbackType type) const
@@ -1145,3 +1150,28 @@ void CGameObject::OnRender			()
 	}
 }
 #endif // DEBUG
+
+using namespace luabind; // XXX: is it required here?
+
+bool CGameObject::use(CGameObject* who_use)
+{
+    VERIFY(who_use);
+    CScriptGameObject *obj = lua_game_object();
+    if (obj && obj->m_door)
+    {
+        if (obj->m_door->is_blocked(doors::door_state_open) || obj->m_door->is_blocked(doors::door_state_closed))
+            return false;
+    }
+    callback(GameObject::eUseObject)(obj, who_use->lua_game_object());
+    return true;
+}
+
+LPCSTR CGameObject::tip_text() { return *m_sTipText; }
+
+void CGameObject::set_tip_text(LPCSTR new_text) { m_sTipText = new_text; }
+
+void CGameObject::set_tip_text_default() { m_sTipText = NULL; }
+
+bool CGameObject::nonscript_usable() { return m_bNonscriptUsable; }
+
+void CGameObject::set_nonscript_usable(bool usable) { m_bNonscriptUsable = usable; }

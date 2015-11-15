@@ -277,15 +277,6 @@ struct	DumbClipper
 	}
 };
 
-template <class _Tp>
-inline const _Tp& min(const _Tp& __a, const _Tp& __b) {
-	return __b < __a ? __b : __a;
-}
-template <class _Tp>
-inline const _Tp& max(const _Tp& __a, const _Tp& __b) {
-	return  __a < __b ? __b : __a;
-}
-
 xr_vector<Fbox,render_alloc<Fbox> >	s_casters;
 
 D3DXVECTOR2 BuildTSMProjectionMatrix_caster_depth_bounds(D3DXMATRIX& lightSpaceBasis)

@@ -110,3 +110,9 @@ void ScriptExporter::Export(lua_State *luaState)
     for (auto node = Node::GetFirst(); node; node = node->GetNext())
         node->Export(luaState);
 }
+
+void ScriptExporter::Reset()
+{
+    for (auto node = Node::GetFirst(); node; node = node->GetNext())
+        node->Reset();
+}

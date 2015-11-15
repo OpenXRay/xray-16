@@ -11,7 +11,7 @@ public:
 };
 
 inline ICollidable::~ICollidable() {}
-
+// XXX: merge into CObject
 class ENGINE_API CollidableBase : public ICollidable
 {
 public:

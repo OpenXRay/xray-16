@@ -9,6 +9,7 @@
 #include	"shader.h"
 #include	"tss_def.h"
 #include	"TextureDescrManager.h"
+#include "xrScriptEngine/script_engine.hpp"
 // refs
 struct		lua_State;
 
@@ -87,8 +88,10 @@ public:
 //.	CInifile*											m_textures_description;
 	xr_vector<std::pair<shared_str,R_constant_setup*> >	v_constant_setup;
 	BOOL												bDeferredLoad;
+    CScriptEngine ScriptEngine;
 private:
 	void							LS_Load				();
+    void LS_Unload();
 public:
 	// Miscelaneous
 	void							_ParseList			(sh_list& dest, LPCSTR names);

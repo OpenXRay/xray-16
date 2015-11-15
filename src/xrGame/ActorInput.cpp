@@ -17,7 +17,6 @@
 #include "Level.h"
 #include "game_cl_base.h"
 #include "xr_level_controller.h"
-#include "UsableScriptObject.h"
 #include "actorcondition.h"
 #include "actor_input_handler.h"
 #include "string_table.h"

@@ -29,6 +29,7 @@ public:
         Node(const char *id, size_t depCount, const char *const *deps, ExporterFunc exporterFunc);
 
         void Export(lua_State *luaState);
+        void Reset() { done = false; }
         const char *GetId() const { return id; }
         size_t GetDependencyCount() const { return depCount; }
         const char *const *GetDependencyIds() const { return deps; }
@@ -45,6 +46,7 @@ public:
 
     ScriptExporter() = delete;
     static void Export(lua_State *luaState);
+    static void Reset();
 };
 }
 

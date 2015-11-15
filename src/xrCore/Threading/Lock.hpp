@@ -20,9 +20,9 @@ class XRCORE_API Lock
 {
 public:
 #ifdef CONFIG_PROFILE_LOCKS
-    Lock(const char *id) : isLocked(false), id(id) { }
+    Lock(const char *id) : isLocked(false), id(id) {}
 #else
-    Lock() : isLocked(false) { }
+    Lock() : isLocked(false) {}
 #endif
 
     Lock(const Lock &) = delete;
@@ -31,20 +31,26 @@ public:
 #ifdef CONFIG_PROFILE_LOCKS
     void Enter();
 #else
-    void Enter() { return mutex.lock(); isLocked = true; }
+    void Enter()
+    {
+        mutex.lock();
+        isLocked = true;
+    }
 #endif
 
     bool TryEnter()
     {
         bool locked = mutex.try_lock();
         if (locked)
-        {
             isLocked = true;
-        }
         return locked;
     }
 
-    void Leave() { return mutex.unlock(); isLocked = false; }
+    void Leave()
+    {
+        mutex.unlock();
+        isLocked = false;
+    }
 
     bool IsLocked() const { return isLocked; }
 

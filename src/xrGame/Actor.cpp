@@ -45,7 +45,6 @@
 #include "game_cl_single.h"
 #include "xrmessages.h"
 #include "string_table.h"
-#include "usablescriptobject.h"
 #include "xrCDB/Intersect.hpp"
 
 #include "alife_registry_wrappers.h"
@@ -1299,7 +1298,7 @@ void CActor::shedule_Update	(u32 DT)
 		m_pObjectWeLookingAt			= smart_cast<CGameObject*>(RQ.O);
 		
 		CGameObject						*game_object = smart_cast<CGameObject*>(RQ.O);
-		m_pUsableObject					= smart_cast<CUsableScriptObject*>(game_object);
+		m_pUsableObject					= game_object;
 		m_pInvBoxWeLookingAt			= smart_cast<CInventoryBox*>(game_object);
 		m_pPersonWeLookingAt			= smart_cast<CInventoryOwner*>(game_object);
 		m_pVehicleWeLookingAt			= smart_cast<CHolderCustom*>(game_object);

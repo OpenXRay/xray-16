@@ -10,11 +10,16 @@ struct lua_State;
 class XRSCRIPTENGINE_API CDbgScriptThreads
 {
 private:
+    CScriptEngine *scriptEngine;
     xr_vector<SScriptThread> m_threads;
 public:
     CScriptDebugger *m_debugger;
 
-    CDbgScriptThreads(CScriptDebugger *d) { m_debugger = nullptr; }
+    CDbgScriptThreads(CScriptEngine *scriptEngine, CScriptDebugger *debugger)
+    {
+        this->scriptEngine = scriptEngine;
+        m_debugger = debugger;
+    }
     ~CDbgScriptThreads() {};
     u32 FillFrom(CScriptProcess *);
     u32 Fill();

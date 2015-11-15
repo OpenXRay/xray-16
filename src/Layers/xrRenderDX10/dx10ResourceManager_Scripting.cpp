@@ -121,120 +121,126 @@ public:
 // export
 void	CResourceManager::LS_Load			()
 {
-	module(GlobalEnv.ScriptEngine->lua())
-	[
-		class_<adopt_dx10options>("_dx10options")
-		.def("dx10_msaa_alphatest_atoc",	&adopt_dx10options::_dx10_msaa_alphatest_atoc		)
-		//.def("",					&adopt_dx10options::_dx10Options		),	// returns options-object
-		,
+    auto exporterFunc = [](lua_State *luaState)
+    {
+	    module(luaState)
+	    [
+		    class_<adopt_dx10options>("_dx10options")
+		    .def("dx10_msaa_alphatest_atoc",	&adopt_dx10options::_dx10_msaa_alphatest_atoc		)
+		    //.def("",					&adopt_dx10options::_dx10Options		),	// returns options-object
+		    ,
 
 
-		class_<adopt_dx10sampler>("_dx10sampler")
-		//.def("texture",						&adopt_sampler::_texture		,return_reference_to(_1))
-		//.def("project",						&adopt_sampler::_projective		,return_reference_to(_1))
-		//.def("clamp",						&adopt_sampler::_clamp			,return_reference_to(_1))
-		//.def("wrap",						&adopt_sampler::_wrap			,return_reference_to(_1))
-		//.def("mirror",						&adopt_sampler::_mirror			,return_reference_to(_1))
-		//.def("f_anisotropic",				&adopt_sampler::_f_anisotropic	,return_reference_to(_1))
-		//.def("f_trilinear",					&adopt_sampler::_f_trilinear	,return_reference_to(_1))
-		//.def("f_bilinear",					&adopt_sampler::_f_bilinear		,return_reference_to(_1))
-		//.def("f_linear",					&adopt_sampler::_f_linear		,return_reference_to(_1))
-		//.def("f_none",						&adopt_sampler::_f_none			,return_reference_to(_1))
-		//.def("fmin_none",					&adopt_sampler::_fmin_none		,return_reference_to(_1))
-		//.def("fmin_point",					&adopt_sampler::_fmin_point		,return_reference_to(_1))
-		//.def("fmin_linear",					&adopt_sampler::_fmin_linear	,return_reference_to(_1))
-		//.def("fmin_aniso",					&adopt_sampler::_fmin_aniso		,return_reference_to(_1))
-		//.def("fmip_none",					&adopt_sampler::_fmip_none		,return_reference_to(_1))
-		//.def("fmip_point",					&adopt_sampler::_fmip_point		,return_reference_to(_1))
-		//.def("fmip_linear",					&adopt_sampler::_fmip_linear	,return_reference_to(_1))
-		//.def("fmag_none",					&adopt_sampler::_fmag_none		,return_reference_to(_1))
-		//.def("fmag_point",					&adopt_sampler::_fmag_point		,return_reference_to(_1))
-		//.def("fmag_linear",					&adopt_sampler::_fmag_linear	,return_reference_to(_1))
-		,
+		    class_<adopt_dx10sampler>("_dx10sampler")
+		    //.def("texture",						&adopt_sampler::_texture		,return_reference_to(_1))
+		    //.def("project",						&adopt_sampler::_projective		,return_reference_to(_1))
+		    //.def("clamp",						&adopt_sampler::_clamp			,return_reference_to(_1))
+		    //.def("wrap",						&adopt_sampler::_wrap			,return_reference_to(_1))
+		    //.def("mirror",						&adopt_sampler::_mirror			,return_reference_to(_1))
+		    //.def("f_anisotropic",				&adopt_sampler::_f_anisotropic	,return_reference_to(_1))
+		    //.def("f_trilinear",					&adopt_sampler::_f_trilinear	,return_reference_to(_1))
+		    //.def("f_bilinear",					&adopt_sampler::_f_bilinear		,return_reference_to(_1))
+		    //.def("f_linear",					&adopt_sampler::_f_linear		,return_reference_to(_1))
+		    //.def("f_none",						&adopt_sampler::_f_none			,return_reference_to(_1))
+		    //.def("fmin_none",					&adopt_sampler::_fmin_none		,return_reference_to(_1))
+		    //.def("fmin_point",					&adopt_sampler::_fmin_point		,return_reference_to(_1))
+		    //.def("fmin_linear",					&adopt_sampler::_fmin_linear	,return_reference_to(_1))
+		    //.def("fmin_aniso",					&adopt_sampler::_fmin_aniso		,return_reference_to(_1))
+		    //.def("fmip_none",					&adopt_sampler::_fmip_none		,return_reference_to(_1))
+		    //.def("fmip_point",					&adopt_sampler::_fmip_point		,return_reference_to(_1))
+		    //.def("fmip_linear",					&adopt_sampler::_fmip_linear	,return_reference_to(_1))
+		    //.def("fmag_none",					&adopt_sampler::_fmag_none		,return_reference_to(_1))
+		    //.def("fmag_point",					&adopt_sampler::_fmag_point		,return_reference_to(_1))
+		    //.def("fmag_linear",					&adopt_sampler::_fmag_linear	,return_reference_to(_1))
+		    ,
 
-		class_<adopt_compiler>("_compiler")
-			.def(								constructor<const adopt_compiler&>())
-			.def("begin",						&adopt_compiler::_pass			,return_reference_to(_1))
-			.def("begin",						&adopt_compiler::_passgs		,return_reference_to(_1))
-			.def("sorting",						&adopt_compiler::_options		,return_reference_to(_1))
-			.def("emissive",					&adopt_compiler::_o_emissive	,return_reference_to(_1))
-			.def("distort",						&adopt_compiler::_o_distort		,return_reference_to(_1))
-			.def("wmark",						&adopt_compiler::_o_wmark		,return_reference_to(_1))
-			.def("fog",							&adopt_compiler::_fog			,return_reference_to(_1))
-			.def("zb",							&adopt_compiler::_ZB			,return_reference_to(_1))
-			.def("blend",						&adopt_compiler::_blend			,return_reference_to(_1))
-			.def("aref",						&adopt_compiler::_aref			,return_reference_to(_1))
-			//	For compatibility only
-			.def("dx10color_write_enable",		&adopt_compiler::_dx10color_write_enable,return_reference_to(_1))
-			.def("color_write_enable",			&adopt_compiler::_dx10color_write_enable,return_reference_to(_1))
-			.def("dx10texture",					&adopt_compiler::_dx10texture	,return_reference_to(_1))
-			.def("dx10stencil",					&adopt_compiler::_dx10Stencil	,return_reference_to(_1))
-			.def("dx10stencil_ref",				&adopt_compiler::_dx10StencilRef,return_reference_to(_1))
-			.def("dx10atoc",					&adopt_compiler::_dx10ATOC		,return_reference_to(_1))
-			.def("dx10zfunc",					&adopt_compiler::_dx10ZFunc		,return_reference_to(_1))			
+		    class_<adopt_compiler>("_compiler")
+			    .def(								constructor<const adopt_compiler&>())
+			    .def("begin",						&adopt_compiler::_pass			,return_reference_to(_1))
+			    .def("begin",						&adopt_compiler::_passgs		,return_reference_to(_1))
+			    .def("sorting",						&adopt_compiler::_options		,return_reference_to(_1))
+			    .def("emissive",					&adopt_compiler::_o_emissive	,return_reference_to(_1))
+			    .def("distort",						&adopt_compiler::_o_distort		,return_reference_to(_1))
+			    .def("wmark",						&adopt_compiler::_o_wmark		,return_reference_to(_1))
+			    .def("fog",							&adopt_compiler::_fog			,return_reference_to(_1))
+			    .def("zb",							&adopt_compiler::_ZB			,return_reference_to(_1))
+			    .def("blend",						&adopt_compiler::_blend			,return_reference_to(_1))
+			    .def("aref",						&adopt_compiler::_aref			,return_reference_to(_1))
+			    //	For compatibility only
+			    .def("dx10color_write_enable",		&adopt_compiler::_dx10color_write_enable,return_reference_to(_1))
+			    .def("color_write_enable",			&adopt_compiler::_dx10color_write_enable,return_reference_to(_1))
+			    .def("dx10texture",					&adopt_compiler::_dx10texture	,return_reference_to(_1))
+			    .def("dx10stencil",					&adopt_compiler::_dx10Stencil	,return_reference_to(_1))
+			    .def("dx10stencil_ref",				&adopt_compiler::_dx10StencilRef,return_reference_to(_1))
+			    .def("dx10atoc",					&adopt_compiler::_dx10ATOC		,return_reference_to(_1))
+			    .def("dx10zfunc",					&adopt_compiler::_dx10ZFunc		,return_reference_to(_1))			
 
-			.def("dx10sampler",					&adopt_compiler::_dx10sampler		)	// returns sampler-object
-			.def("dx10Options",					&adopt_compiler::_dx10Options		),	// returns options-object			
+			    .def("dx10sampler",					&adopt_compiler::_dx10sampler		)	// returns sampler-object
+			    .def("dx10Options",					&adopt_compiler::_dx10Options		),	// returns options-object
 
 
-		class_<adopt_blend>("blend")
-			.enum_("blend")
-			[
-				value("zero",					int(D3DBLEND_ZERO)),
-				value("one",					int(D3DBLEND_ONE)),
-				value("srccolor",				int(D3DBLEND_SRCCOLOR)),
-				value("invsrccolor",			int(D3DBLEND_INVSRCCOLOR)),
-				value("srcalpha",				int(D3DBLEND_SRCALPHA)),
-				value("invsrcalpha",			int(D3DBLEND_INVSRCALPHA)),
-				value("destalpha",				int(D3DBLEND_DESTALPHA)),
-				value("invdestalpha",			int(D3DBLEND_INVDESTALPHA)),
-				value("destcolor",				int(D3DBLEND_DESTCOLOR)),
-				value("invdestcolor",			int(D3DBLEND_INVDESTCOLOR)),
-				value("srcalphasat",			int(D3DBLEND_SRCALPHASAT))
-			],
+		    class_<adopt_blend>("blend")
+			    .enum_("blend")
+			    [
+				    value("zero",					int(D3DBLEND_ZERO)),
+				    value("one",					int(D3DBLEND_ONE)),
+				    value("srccolor",				int(D3DBLEND_SRCCOLOR)),
+				    value("invsrccolor",			int(D3DBLEND_INVSRCCOLOR)),
+				    value("srcalpha",				int(D3DBLEND_SRCALPHA)),
+				    value("invsrcalpha",			int(D3DBLEND_INVSRCALPHA)),
+				    value("destalpha",				int(D3DBLEND_DESTALPHA)),
+				    value("invdestalpha",			int(D3DBLEND_INVDESTALPHA)),
+				    value("destcolor",				int(D3DBLEND_DESTCOLOR)),
+				    value("invdestcolor",			int(D3DBLEND_INVDESTCOLOR)),
+				    value("srcalphasat",			int(D3DBLEND_SRCALPHASAT))
+			    ],
 
-		class_<adopt_cmp_func>("cmp_func")
-			.enum_("cmp_func")
-			[
-				value("never",					int(D3DCMP_NEVER)),
-				value("less",					int(D3DCMP_LESS)),
-				value("equal",					int(D3DCMP_EQUAL)),
-				value("lessequal",				int(D3DCMP_LESSEQUAL)),
-				value("greater",				int(D3DCMP_GREATER)),
-				value("notequal",				int(D3DCMP_NOTEQUAL)),
-				value("greaterequal",			int(D3DCMP_GREATEREQUAL)),
-				value("always",					int(D3DCMP_ALWAYS))
-			],
+		    class_<adopt_cmp_func>("cmp_func")
+			    .enum_("cmp_func")
+			    [
+				    value("never",					int(D3DCMP_NEVER)),
+				    value("less",					int(D3DCMP_LESS)),
+				    value("equal",					int(D3DCMP_EQUAL)),
+				    value("lessequal",				int(D3DCMP_LESSEQUAL)),
+				    value("greater",				int(D3DCMP_GREATER)),
+				    value("notequal",				int(D3DCMP_NOTEQUAL)),
+				    value("greaterequal",			int(D3DCMP_GREATEREQUAL)),
+				    value("always",					int(D3DCMP_ALWAYS))
+			    ],
 
-		class_<adopt_stencil_op>("stencil_op")
-			.enum_("stencil_op")
-			[
-				value("keep",					int(D3DSTENCILOP_KEEP)),
-				value("zero",					int(D3DSTENCILOP_ZERO)),
-				value("replace",				int(D3DSTENCILOP_REPLACE)),
-				value("incrsat",				int(D3DSTENCILOP_INCRSAT)),
-				value("decrsat",				int(D3DSTENCILOP_DECRSAT)),
-				value("invert",					int(D3DSTENCILOP_INVERT)),
-				value("incr",					int(D3DSTENCILOP_INCR)),
-				value("decr",					int(D3DSTENCILOP_DECR))
-			]
-	];
-
+		    class_<adopt_stencil_op>("stencil_op")
+			    .enum_("stencil_op")
+			    [
+				    value("keep",					int(D3DSTENCILOP_KEEP)),
+				    value("zero",					int(D3DSTENCILOP_ZERO)),
+				    value("replace",				int(D3DSTENCILOP_REPLACE)),
+				    value("incrsat",				int(D3DSTENCILOP_INCRSAT)),
+				    value("decrsat",				int(D3DSTENCILOP_DECRSAT)),
+				    value("invert",					int(D3DSTENCILOP_INVERT)),
+				    value("incr",					int(D3DSTENCILOP_INCR)),
+				    value("decr",					int(D3DSTENCILOP_DECR))
+			    ]
+	    ];
+    };
+    ScriptEngine.init(exporterFunc, false);
 	// load shaders
-	xr_vector<char*>*	folder			= FS.file_list_open	("$game_shaders$",GlobalEnv.Render->getShaderPath(),FS_ListFiles|FS_RootOnly);
+    const char *shaderPath = RImplementation.getShaderPath();
+	xr_vector<char*>*	folder			= FS.file_list_open	("$game_shaders$", shaderPath, FS_ListFiles|FS_RootOnly);
 	VERIFY								(folder);
 	for (u32 it=0; it<folder->size(); it++)	{
 		string_path						namesp,fn;
 		xr_strcpy							(namesp,(*folder)[it]);
 		if	(0==strext(namesp) || 0!=xr_strcmp(strext(namesp),".s"))	continue;
 		*strext	(namesp)=0;
-		if		(0==namesp[0])			xr_strcpy	(namesp, GlobalEnv.ScriptEngine->GlobalNamespace);
-		strconcat						(sizeof(fn),fn,GlobalEnv.Render->getShaderPath(),(*folder)[it]);
+		if		(0==namesp[0])			xr_strcpy	(namesp, ScriptEngine.GlobalNamespace);
+		strconcat						(sizeof(fn), fn, shaderPath, (*folder)[it]);
 		FS.update_path					(fn,"$game_shaders$",fn);
-        GlobalEnv.ScriptEngine->load_file_into_namespace(fn, namesp);
+        ScriptEngine.load_file_into_namespace(fn, namesp);
 	}
 	FS.file_list_close			(folder);
 }
+
+void CResourceManager::LS_Unload() { ScriptEngine.unload(); }
 
 BOOL	CResourceManager::_lua_HasShader	(LPCSTR s_shader)
 {
@@ -243,10 +249,10 @@ BOOL	CResourceManager::_lua_HasShader	(LPCSTR s_shader)
 		undercorated[i]=('\\'==s_shader[i])?'_':s_shader[i];
 
 #ifdef _EDITOR
-	return GlobalEnv.ScriptEngine->object(undercorated,"editor",LUA_TFUNCTION);
+	return ScriptEngine.object(undercorated,"editor",LUA_TFUNCTION);
 #else
-	return	GlobalEnv.ScriptEngine->object(undercorated,"normal",LUA_TFUNCTION)		||
-            GlobalEnv.ScriptEngine->object(undercorated,"l_special",LUA_TFUNCTION);
+	return	ScriptEngine.object(undercorated,"normal",LUA_TFUNCTION)		||
+            ScriptEngine.object(undercorated,"l_special",LUA_TFUNCTION);
 #endif
 }
 
@@ -272,39 +278,33 @@ Shader*	CResourceManager::_lua_Create		(LPCSTR d_shader, LPCSTR s_textures)
 	C.detail_scaler		= NULL;
 
 	// Compile element	(LOD0 - HQ)
-	if (GlobalEnv.ScriptEngine->object(s_shader,"normal_hq",LUA_TFUNCTION))
+	if (ScriptEngine.object(s_shader,"normal_hq",LUA_TFUNCTION))
 	{
 		// Analyze possibility to detail this shader
 		C.iElement			= 0;
-//.		C.bDetail			= RImplementation.Resources->_GetDetailTexture(*C.L_textures[0],C.detail_texture,C.detail_scaler);
-		//C.bDetail			= RImplementation.Resources->m_textures_description.GetDetailTexture(C.L_textures[0],C.detail_texture,C.detail_scaler);
-		C.bDetail			= RImplementation.Resources->m_textures_description.GetDetailTexture(C.L_textures[0],C.detail_texture,C.detail_scaler);
+		C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
 
 		if (C.bDetail)		S.E[0]	= C._lua_Compile(s_shader,"normal_hq");
 		else				S.E[0]	= C._lua_Compile(s_shader,"normal");
 	} else {
-		if (GlobalEnv.ScriptEngine->object(s_shader,"normal",LUA_TFUNCTION))
+		if (ScriptEngine.object(s_shader,"normal",LUA_TFUNCTION))
 		{
 			C.iElement			= 0;
-//.			C.bDetail			= RImplementation.Resources->_GetDetailTexture(*C.L_textures[0],C.detail_texture,C.detail_scaler);
-			//C.bDetail			= RImplementation.Resources->m_textures_description.GetDetailTexture(C.L_textures[0],C.detail_texture,C.detail_scaler);
-			C.bDetail			= RImplementation.Resources->m_textures_description.GetDetailTexture(C.L_textures[0],C.detail_texture,C.detail_scaler);
+			C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
 			S.E[0]				= C._lua_Compile(s_shader,"normal");
 		}
 	}
 
 	// Compile element	(LOD1)
-	if (GlobalEnv.ScriptEngine->object(s_shader,"normal",LUA_TFUNCTION))
+	if (ScriptEngine.object(s_shader,"normal",LUA_TFUNCTION))
 	{
 		C.iElement			= 1;
-//.		C.bDetail			= RImplementation.Resources->_GetDetailTexture(*C.L_textures[0],C.detail_texture,C.detail_scaler);
-		//C.bDetail			= RImplementation.Resources->m_textures_description.GetDetailTexture(C.L_textures[0],C.detail_texture,C.detail_scaler);
-		C.bDetail			= RImplementation.Resources->m_textures_description.GetDetailTexture(C.L_textures[0],C.detail_texture,C.detail_scaler);
+		C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
 		S.E[1]				= C._lua_Compile(s_shader,"normal");
 	}
 
 	// Compile element
-	if (GlobalEnv.ScriptEngine->object(s_shader,"l_point",LUA_TFUNCTION))
+	if (ScriptEngine.object(s_shader,"l_point",LUA_TFUNCTION))
 	{
 		C.iElement			= 2;
 		C.bDetail			= FALSE;
@@ -312,7 +312,7 @@ Shader*	CResourceManager::_lua_Create		(LPCSTR d_shader, LPCSTR s_textures)
 	}
 
 	// Compile element
-	if (GlobalEnv.ScriptEngine->object(s_shader,"l_spot",LUA_TFUNCTION))
+	if (ScriptEngine.object(s_shader,"l_spot",LUA_TFUNCTION))
 	{
 		C.iElement			= 3;
 		C.bDetail			= FALSE;
@@ -320,7 +320,7 @@ Shader*	CResourceManager::_lua_Create		(LPCSTR d_shader, LPCSTR s_textures)
 	}
 
 	// Compile element
-	if (GlobalEnv.ScriptEngine->object(s_shader,"l_special",LUA_TFUNCTION))
+	if (ScriptEngine.object(s_shader,"l_special",LUA_TFUNCTION))
 	{
 		C.iElement			= 4;
 		C.bDetail			= FALSE;
@@ -348,7 +348,7 @@ ShaderElement*		CBlender_Compile::_lua_Compile	(LPCSTR namesp, LPCSTR name)
 	LPCSTR				t_0		= *L_textures[0]			? *L_textures[0] : "null";
 	LPCSTR				t_1		= (L_textures.size() > 1)	? *L_textures[1] : "null";
 	LPCSTR				t_d		= detail_texture			? detail_texture : "null" ;
-	object				shader	= GlobalEnv.ScriptEngine->name_space(namesp);
+	object				shader	= RImplementation.Resources->ScriptEngine.name_space(namesp);
 	functor<void>		element	= object_cast<functor<void> >(shader[name]);
 	bool				bFirstPass = false;
 	adopt_compiler		ac		= adopt_compiler(this, bFirstPass);

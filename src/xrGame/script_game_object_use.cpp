@@ -1,7 +1,6 @@
 #include "pch_script.h"
 #include "script_game_object.h"
 #include "script_game_object_impl.h"
-#include "UsableScriptObject.h"
 #include "GameObject.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "stalker_planner.h"
@@ -20,29 +19,13 @@
 #include "doors_manager.h"
 
 void CScriptGameObject::SetTipText (LPCSTR tip_text)
-{
-	CUsableScriptObject	*l_tpUseableScriptObject = smart_cast<CUsableScriptObject*>(&object());
-	if (!l_tpUseableScriptObject)
-		ai().script_engine().script_log			(LuaMessageType::Error,"SetTipText. Reason: the object is not usable");
-	else l_tpUseableScriptObject->set_tip_text(tip_text);
-}
+{ object().set_tip_text(tip_text); }
 
 void CScriptGameObject::SetTipTextDefault ()
-{
-	CUsableScriptObject	*l_tpUseableScriptObject = smart_cast<CUsableScriptObject*>(&object());
-	if (!l_tpUseableScriptObject)
-		ai().script_engine().script_log			(LuaMessageType::Error,"SetTipTextDefault . Reason: the object is not usable");
-	else l_tpUseableScriptObject->set_tip_text_default();
-}
+{ object().set_tip_text_default(); }
 
 void CScriptGameObject::SetNonscriptUsable(bool nonscript_usable)
-{
-	CUsableScriptObject	*l_tpUseableScriptObject = smart_cast<CUsableScriptObject*>(&object());
-	if (!l_tpUseableScriptObject)
-		ai().script_engine().script_log			(LuaMessageType::Error,"SetNonscriptUsable . Reason: the object is not usable");
-	else l_tpUseableScriptObject->set_nonscript_usable(nonscript_usable);
-}
-
+{ object().set_nonscript_usable(nonscript_usable); }
 
 Fvector CScriptGameObject::GetCurrentDirection()
 {

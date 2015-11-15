@@ -56,6 +56,7 @@ public:
                                         CAI_Space               ();
     virtual                             ~CAI_Space              ();
             void                        init                    ();
+            void SetupScriptEngine();
     IC      CGameGraph                  &game_graph             () const;
     IC      CGameGraph                  *get_game_graph         () const;
     IC      CLevelGraph                 &level_graph            () const;

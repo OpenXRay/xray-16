@@ -11,18 +11,18 @@
 class CSE_Abstract;
 class CScriptBinderObject;
 class NET_Packet;
+class CGameObject;
 
 class CScriptBinder {
 protected:
 	CScriptBinderObject			*m_object;
-
+    CGameObject *owner;
 public:
-								CScriptBinder	();
+								CScriptBinder	(CGameObject *owner);
 	virtual						~CScriptBinder	();
 			void				init			();
 			void				clear			();
 	virtual void				reinit			();
-	virtual void				Load			(LPCSTR section);
 	virtual void				reload			(LPCSTR section);
 	virtual BOOL				net_Spawn		(CSE_Abstract* DC);
 	virtual void				net_Destroy		();

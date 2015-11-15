@@ -9,10 +9,10 @@
 #pragma once
 #include "xrCore/xrCore.h"
 #include "xrScriptEngine/xrScriptEngine.hpp"
+#include "xrScriptEngine/ScriptExporter.hpp"
 #include "script_space_forward.hpp"
 
 struct lua_State;
-class CScriptThread;
 
 #ifndef MASTER_GOLD
 #define USE_DEBUGGER
@@ -71,12 +71,15 @@ public:
     static const char *const GlobalNamespace;
 
 private:
+    static Lock stateMapLock;
+    static xr_hash_map<lua_State*, CScriptEngine*> *stateMap;
     lua_State *m_virtual_machine;
     CScriptThread *m_current_thread;
     bool m_reload_modules;
     string128 m_last_no_file;
     u32 m_last_no_file_length;
     static string4096 g_ca_stdout;
+    bool logReenterability = false;
 
 protected:
     CScriptProcessStorage m_script_processes;
@@ -99,11 +102,14 @@ public:
 #endif
 
 private:
+    static CScriptEngine *GetInstance(lua_State *state);
+    static bool RegisterState(lua_State *state, CScriptEngine *scriptEngine);
+    static bool UnregisterState(lua_State *state);
     bool no_file_exists(LPCSTR file_name, u32 string_length);
     void add_no_file(LPCSTR file_name, u32 string_length);
 
 protected:
-    static int vscript_log(LuaMessageType luaMessageType, LPCSTR caFormat, va_list marker);
+    int vscript_log(LuaMessageType luaMessageType, LPCSTR caFormat, va_list marker);
     bool parse_namespace(LPCSTR caNamespaceName, LPSTR b, u32 b_size, LPSTR c, u32 c_size);
     bool do_file(LPCSTR caScriptName, LPCSTR caNameSpaceName);
     void reinit();
@@ -124,22 +130,25 @@ public:
     bool object(LPCSTR caNamespaceName, LPCSTR caIdentifier, int type);
     luabind::object name_space(LPCSTR namespace_name);
     int error_log(LPCSTR caFormat, ...);
-    static int __cdecl script_log(LuaMessageType message, LPCSTR caFormat, ...);
+    int script_log(LuaMessageType message, LPCSTR caFormat, ...);
     static bool print_output(lua_State *L, LPCSTR caScriptName, int iErrorCode = 0);
+private:
     static void print_error(lua_State *L, int iErrorCode);
-    virtual void on_error(lua_State *state);
+public:
+    static void on_error(lua_State *state);
 #ifdef DEBUG
     void flush_log();
     void print_stack();
 #endif
-
+    using ExporterFunc = XRay::ScriptExporter::Node::ExporterFunc;
     CScriptEngine();
     virtual ~CScriptEngine();
-    void init();
+    void init(ExporterFunc exporterFunc, bool loadGlobalNamespace);
     virtual void unload();
     static int lua_panic(lua_State *L);
     static void lua_error(lua_State *L);
     static int lua_pcall_failed(lua_State *L);
+    static void lua_cast_failed(lua_State *L, LUABIND_TYPE_INFO info);
 #ifdef DEBUG
     static void lua_hook_call(lua_State *L, lua_Debug *dbg);
 #endif
@@ -148,6 +157,7 @@ public:
     IC CScriptProcess *script_process(const ScriptProcessor &process_id) const;
     IC void add_script_process(const ScriptProcessor &process_id, CScriptProcess *script_process);
     void remove_script_process(const ScriptProcessor &process_id);
+    static int auto_load(lua_State *L);
     void setup_auto_load();
     bool process_file_if_exists(LPCSTR file_name, bool warn_if_not_exist);
     bool process_file(LPCSTR file_name);
@@ -170,6 +180,14 @@ public:
     void collect_all_garbage();
     static u32 GetMemoryUsage();
     void PrintHelp();
+
+    void initialize_lua_studio(lua_State *state, cs::lua_studio::world *&world, lua_studio_engine *&engine);
+    void finalize_lua_studio(lua_State *state, cs::lua_studio::world *&world, lua_studio_engine *&engine);
+
+    CScriptProcess *CreateScriptProcess(shared_str name, shared_str scripts);
+    CScriptThread *CreateScriptThread(LPCSTR caNamespaceName, bool do_string = false, bool reload = false);
+    // This function is called from CScriptThread destructor
+    void DestroyScriptThread(const CScriptThread *thread);
 };
 
 #include "script_engine_inline.hpp"

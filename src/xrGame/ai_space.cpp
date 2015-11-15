@@ -58,14 +58,15 @@ void CAI_Space::init                ()
 
     VERIFY                  (!m_moving_objects);
     m_moving_objects        = xr_new<::moving_objects>();
-    RegisterScriptClasses();
-    object_factory().register_script();
-    LoadCommonScripts();
+    VERIFY(!GlobalEnv.ScriptEngine);
+    GlobalEnv.ScriptEngine = xr_new<CScriptEngine>();    
+    SetupScriptEngine();
 }
 
 CAI_Space::~CAI_Space               ()
 {
     unload                  ();
+    xr_delete(GlobalEnv.ScriptEngine); // XXX: wrapped into try..catch(...) in vanilla source
     xr_delete               (m_doors_manager);
     xr_delete               (m_moving_objects);
     xr_delete               (m_patrol_path_storage);
@@ -134,6 +135,15 @@ void CAI_Space::LoadCommonScripts()
     }
     xr_delete(l_tpIniFile);
 #endif
+}
+
+void CAI_Space::SetupScriptEngine()
+{
+    XRay::ScriptExporter::Reset(); // mark all nodes as undone
+    GlobalEnv.ScriptEngine->init(XRay::ScriptExporter::Export, true);
+    RegisterScriptClasses();
+    object_factory().register_script();
+    LoadCommonScripts();
 }
 
 void CAI_Space::load                (LPCSTR level_name)

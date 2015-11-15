@@ -259,12 +259,12 @@ bool CScriptGameObject::CheckObjectVisibility(const CScriptGameObject *tpLuaGame
 
 CScriptBinderObject	*CScriptGameObject::binded_object	()
 {
-	return									(object().object());
+	return									(object().GetScriptBinderObject());
 }
 
 void CScriptGameObject::bind_object			(CScriptBinderObject *game_object)
 {
-	object().set_object	(game_object);
+	object().SetScriptBinderObject(game_object);
 }
 
 void CScriptGameObject::set_previous_point	(int point_index)

@@ -1441,9 +1441,6 @@
     <Filter Include="Core\Client\Objects\base\GameObject\ai_obstacle\min_obb\minimize_1d">
       <UniqueIdentifier>{6e738219-6120-4544-9960-51e6ab859a31}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Client\Objects\base\UsableScriptObject">
-      <UniqueIdentifier>{8a502c49-2bbc-471c-ba4a-cbcfbfef0abc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Client\Objects\physics">
       <UniqueIdentifier>{421c3654-638f-4303-81fe-9613dca1a8c7}</UniqueIdentifier>
     </Filter>
@@ -5334,9 +5331,6 @@
     <ClInclude Include="magic_minimize_1d_inline.h">
       <Filter>Core\Client\Objects\base\GameObject\ai_obstacle\min_obb\minimize_1d</Filter>
     </ClInclude>
-    <ClInclude Include="UsableScriptObject.h">
-      <Filter>Core\Client\Objects\base\UsableScriptObject</Filter>
-    </ClInclude>
     <ClInclude Include="PHSkeleton.h">
       <Filter>Core\Client\Objects\physics\PHSkeleton</Filter>
     </ClInclude>
@@ -8834,9 +8828,6 @@
     </ClCompile>
     <ClCompile Include="magic_minimize_1d.cpp">
       <Filter>Core\Client\Objects\base\GameObject\ai_obstacle\min_obb\minimize_1d</Filter>
-    </ClCompile>
-    <ClCompile Include="UsableScriptObject.cpp">
-      <Filter>Core\Client\Objects\base\UsableScriptObject</Filter>
     </ClCompile>
     <ClCompile Include="PHSkeleton.cpp">
       <Filter>Core\Client\Objects\physics\PHSkeleton</Filter>
