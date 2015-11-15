@@ -31,7 +31,11 @@ public:
 #ifdef CONFIG_PROFILE_LOCKS
     void Enter();
 #else
-    void Enter() { return mutex.lock(); isLocked = true; }
+    void Enter()
+    {
+        mutex.lock();
+        isLocked = true;
+    }
 #endif
 
     bool TryEnter()
@@ -44,7 +48,11 @@ public:
         return locked;
     }
 
-    void Leave() { return mutex.unlock(); isLocked = false; }
+    void Leave()
+    {
+        isLocked = false;
+        mutex.unlock();        
+    }
 
     bool IsLocked() const { return isLocked; }
 
