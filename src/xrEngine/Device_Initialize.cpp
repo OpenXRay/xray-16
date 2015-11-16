@@ -12,10 +12,10 @@ extern LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 #ifdef INGAME_EDITOR
 void CRenderDevice::initialize_editor()
 {
-    m_editor_module = LoadLibrary("xrWeatherEditor.dll");
+    m_editor_module = LoadLibrary("xrWeatherEditor");
     if (!m_editor_module)
     {
-        Msg("! cannot load library \"xrWeatherEditor.dll\"");
+        Msg("! cannot load library \"xrWeatherEditor\"");
         return;
     }
     m_editor_initialize = (initialize_function_ptr)GetProcAddress(m_editor_module, "initialize");

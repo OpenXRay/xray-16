@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24627.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utils", "utils", "{89F6A7EE-3BBE-45D3-A8A8-5D9366CD987B}"
 EndProject
@@ -31,6 +31,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LWO", "utils\LWO\LWO.vcxproj", "{A6EBBBBB-5FEF-4C20-8460-DFAB11734DED}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrAI", "utils\xrAI\xrAI.vcxproj", "{EA5932F3-02FE-4AD3-89E8-7072DC465D25}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B90BDC22-A891-4B33-B562-29D701F65DBD} = {B90BDC22-A891-4B33-B562-29D701F65DBD}
+		{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5} = {A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}
+		{A0F7D1FB-59A7-4717-A7E4-96F37E91998E} = {A0F7D1FB-59A7-4717-A7E4-96F37E91998E}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrCompress", "utils\xrCompress\xrCompress.vcxproj", "{EF76867B-6EB8-4DC0-A1D6-E964FAD6FC7B}"
 EndProject
@@ -46,6 +51,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrLC", "utils\xrLC\xrLC.vcxproj", "{A4ABD75E-825B-4D09-B3B2-2709682E40C8}"
 	ProjectSection(ProjectDependencies) = postProject
 		{EFB76D6F-0092-439C-A783-C0BE10BD17C9} = {EFB76D6F-0092-439C-A783-C0BE10BD17C9}
+		{65CBB9D0-FBC6-41A4-8316-F5E9B5D7FB33} = {65CBB9D0-FBC6-41A4-8316-F5E9B5D7FB33}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrQSlim", "utils\xrQSlim\xrQSlim.vcxproj", "{F1836CE2-59EF-4189-8B9C-D103A511CB27}"
@@ -55,6 +61,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrCDB", "xrCDB\xrCDB.vcxproj", "{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrCore", "xrCore\xrCore.vcxproj", "{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8} = {1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrGame", "xrGame\xrGame.vcxproj", "{200652A6-043E-4634-8837-87983B3BD5E0}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -94,6 +103,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R3", "Layers\xrRenderPC_R3\xrRender_R3.vcxproj", "{3F383D3C-FCD8-4170-990B-EB4833F09248}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrEngine", "xrEngine\xrEngine.vcxproj", "{2578C6D8-660D-48AE-9322-7422F8664F06}"
+	ProjectSection(ProjectDependencies) = postProject
+		{98D24A3D-7666-4C11-9D6E-B10393CE8CBA} = {98D24A3D-7666-4C11-9D6E-B10393CE8CBA}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "luabind.beta7-devel.rc4", "3rd party\luabind\luabind.beta7-devel.rc4.vcxproj", "{CC52E0B3-CC35-4934-9302-035B748F3F2C}"
 EndProject
@@ -102,6 +114,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrLC_Light", "utils\xrLC_Light\xrLC_Light.vcxproj", "{EFB76D6F-0092-439C-A783-C0BE10BD17C9}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B90BDC22-A891-4B33-B562-29D701F65DBD} = {B90BDC22-A891-4B33-B562-29D701F65DBD}
+		{EBF9B543-0830-4866-9B48-DC0740E87E8A} = {EBF9B543-0830-4866-9B48-DC0740E87E8A}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrLC_LightStab", "utils\xrLC_LightStab\xrLC_LightStab.vcxproj", "{EC924B9B-4991-4931-8623-E1DB9AE005CA}"
@@ -185,8 +198,8 @@ Global
 		{566551F4-4EF1-4CB4-A131-F982E7606907}.Mixed_Dedicated|Mixed Platforms.ActiveCfg = Release|Win32
 		{566551F4-4EF1-4CB4-A131-F982E7606907}.Mixed_Dedicated|Mixed Platforms.Build.0 = Release|Win32
 		{566551F4-4EF1-4CB4-A131-F982E7606907}.Mixed_Dedicated|Win32.ActiveCfg = Release|Win32
-		{566551F4-4EF1-4CB4-A131-F982E7606907}.Mixed|Mixed Platforms.ActiveCfg = Release|Win32
-		{566551F4-4EF1-4CB4-A131-F982E7606907}.Mixed|Mixed Platforms.Build.0 = Release|Win32
+		{566551F4-4EF1-4CB4-A131-F982E7606907}.Mixed|Mixed Platforms.ActiveCfg = Mixed|Win32
+		{566551F4-4EF1-4CB4-A131-F982E7606907}.Mixed|Mixed Platforms.Build.0 = Mixed|Win32
 		{566551F4-4EF1-4CB4-A131-F982E7606907}.Mixed|Win32.ActiveCfg = Release|Win32
 		{566551F4-4EF1-4CB4-A131-F982E7606907}.Mixed|Win32.Build.0 = Release|Win32
 		{566551F4-4EF1-4CB4-A131-F982E7606907}.Release_Dedicated|Mixed Platforms.ActiveCfg = Release|Win32
@@ -832,8 +845,8 @@ Global
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.Mixed_Dedicated|Mixed Platforms.ActiveCfg = Release|Win32
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.Mixed_Dedicated|Mixed Platforms.Build.0 = Release|Win32
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.Mixed_Dedicated|Win32.ActiveCfg = Debug|Win32
-		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.Mixed|Mixed Platforms.ActiveCfg = Release|Win32
-		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.Mixed|Mixed Platforms.Build.0 = Release|Win32
+		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.Mixed|Mixed Platforms.ActiveCfg = Mixed|Win32
+		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.Mixed|Mixed Platforms.Build.0 = Mixed|Win32
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.Mixed|Win32.ActiveCfg = Debug|Win32
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.Mixed|Win32.Build.0 = Debug|Win32
 		{1DAEC516-E52C-4A3C-A4DA-AE3553E6E0F8}.Release_Dedicated|Mixed Platforms.ActiveCfg = Release|Win32
@@ -898,8 +911,8 @@ Global
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.Mixed_Dedicated|Mixed Platforms.ActiveCfg = Release|Win32
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.Mixed_Dedicated|Mixed Platforms.Build.0 = Release|Win32
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.Mixed_Dedicated|Win32.ActiveCfg = Debug|Win32
-		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.Mixed|Mixed Platforms.ActiveCfg = Release|Win32
-		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.Mixed|Mixed Platforms.Build.0 = Release|Win32
+		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.Mixed|Mixed Platforms.ActiveCfg = Mixed|Win32
+		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.Mixed|Mixed Platforms.Build.0 = Mixed|Win32
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.Mixed|Win32.ActiveCfg = Debug|Win32
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.Mixed|Win32.Build.0 = Debug|Win32
 		{CC52E0B3-CC35-4934-9302-035B748F3F2C}.Release_Dedicated|Mixed Platforms.ActiveCfg = Release|Win32
@@ -919,8 +932,8 @@ Global
 		{F6C4F74A-152C-4612-9E3B-D02346234855}.Mixed_Dedicated|Mixed Platforms.ActiveCfg = Release|Win32
 		{F6C4F74A-152C-4612-9E3B-D02346234855}.Mixed_Dedicated|Mixed Platforms.Build.0 = Release|Win32
 		{F6C4F74A-152C-4612-9E3B-D02346234855}.Mixed_Dedicated|Win32.ActiveCfg = Debug|Win32
-		{F6C4F74A-152C-4612-9E3B-D02346234855}.Mixed|Mixed Platforms.ActiveCfg = Release|Win32
-		{F6C4F74A-152C-4612-9E3B-D02346234855}.Mixed|Mixed Platforms.Build.0 = Release|Win32
+		{F6C4F74A-152C-4612-9E3B-D02346234855}.Mixed|Mixed Platforms.ActiveCfg = Mixed|Win32
+		{F6C4F74A-152C-4612-9E3B-D02346234855}.Mixed|Mixed Platforms.Build.0 = Mixed|Win32
 		{F6C4F74A-152C-4612-9E3B-D02346234855}.Mixed|Win32.ActiveCfg = Debug|Win32
 		{F6C4F74A-152C-4612-9E3B-D02346234855}.Mixed|Win32.Build.0 = Debug|Win32
 		{F6C4F74A-152C-4612-9E3B-D02346234855}.Release_Dedicated|Mixed Platforms.ActiveCfg = Release|Win32

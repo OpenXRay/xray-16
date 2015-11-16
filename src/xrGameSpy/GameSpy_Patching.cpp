@@ -19,7 +19,7 @@ CGameSpy_Patching::~CGameSpy_Patching()
 };
 void	CGameSpy_Patching::LoadGameSpy()
 {
-	LPCSTR			g_name	= "xrGameSpy.dll";
+	LPCSTR			g_name	= "xrGameSpy";
 	Log				("Loading DLL:",g_name);
 	hGameSpyDLL			= LoadLibrary	(g_name);
 	if (0==hGameSpyDLL)	R_CHK			(GetLastError());
