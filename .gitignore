@@ -9,3 +9,6 @@ intermediate/
 intermediate_plugs/
 lib/
 *.aps
+
+# exclude all third-party libraries
+src/3rd party
