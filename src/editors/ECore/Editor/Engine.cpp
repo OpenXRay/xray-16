@@ -51,8 +51,8 @@ void CEngine::Initialize(void)
 #ifdef _EDITOR
 	// Bind PSGP
 	ZeroMemory				(&PSGP,sizeof(PSGP));
-	hPSGP		            = LoadLibrary("xrCPU_Pipe.dll");
-	R_ASSERT2	            (hPSGP,"Can't find 'xrCPU_Pipe.dll'");
+	hPSGP		            = LoadLibrary("xrCPU_Pipe");
+	R_ASSERT2	            (hPSGP,"Can't find 'xrCPU_Pipe'");
 
 	xrBinder* bindCPU	    = (xrBinder*)GetProcAddress(hPSGP,"xrBind_PSGP");	R_ASSERT(bindCPU);
 	bindCPU		            (&PSGP, CPU::ID.feature /*& CPU::ID.os_support*/);

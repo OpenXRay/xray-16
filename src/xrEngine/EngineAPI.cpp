@@ -55,9 +55,9 @@ bool is_enough_address_space_available()
 
 void CEngineAPI::InitializeNotDedicated()
 {
-    LPCSTR r2_name = "xrRender_R2.dll";
-    LPCSTR r3_name = "xrRender_R3.dll";
-    LPCSTR r4_name = "xrRender_R4.dll";
+    LPCSTR r2_name = "xrRender_R2";
+    LPCSTR r3_name = "xrRender_R3";
+    LPCSTR r4_name = "xrRender_R4";
 
     if (psDeviceFlags.test(rsR4))
     {
@@ -110,7 +110,7 @@ void CEngineAPI::Initialize(void)
 {
     //////////////////////////////////////////////////////////////////////////
     // render
-    LPCSTR r1_name = "xrRender_R1.dll";
+    LPCSTR r1_name = "xrRender_R1";
 
 #ifndef DEDICATED_SERVER
     InitializeNotDedicated();
@@ -132,7 +132,7 @@ void CEngineAPI::Initialize(void)
     }
     // game
     {
-        LPCSTR g_name = "xrGame.dll";
+        LPCSTR g_name = "xrGame";
         Log("Loading DLL:", g_name);
         hGame = LoadLibrary(g_name);
         if (0 == hGame) R_CHK(GetLastError());
@@ -148,7 +148,7 @@ void CEngineAPI::Initialize(void)
     tune_enabled = FALSE;
     if (strstr(Core.Params, "-tune"))
     {
-        LPCSTR g_name = "vTuneAPI.dll";
+        LPCSTR g_name = "vTuneAPI";
         Log("Loading DLL:", g_name);
         hTuner = LoadLibrary(g_name);
         if (0 == hTuner) R_CHK(GetLastError());
@@ -197,9 +197,9 @@ void CEngineAPI::CreateRendererList()
     bool bSupports_r3 = false;
     bool bSupports_r4 = false;
 
-    LPCSTR r2_name = "xrRender_R2.dll";
-    LPCSTR r3_name = "xrRender_R3.dll";
-    LPCSTR r4_name = "xrRender_R4.dll";
+    LPCSTR r2_name = "xrRender_R2";
+    LPCSTR r3_name = "xrRender_R3";
+    LPCSTR r4_name = "xrRender_R4";
 
     if (strstr(Core.Params, "-perfhud_hack"))
     {
