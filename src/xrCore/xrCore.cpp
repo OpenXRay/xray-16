@@ -46,7 +46,7 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
         string_path fn, dr, di;
 
         // application path
-        GetModuleFileName(GetModuleHandle(MODULE_NAME), fn, sizeof(fn));
+        GetModuleFileName(GetModuleHandle("xrCore"), fn, sizeof(fn));
         _splitpath(fn, dr, di, 0, 0);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
 #ifndef _EDITOR

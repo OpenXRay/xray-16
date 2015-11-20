@@ -12,7 +12,7 @@
 #include "EditLibrary.h"
 
 static HMODULE hXRSE_FACTORY = 0;
-static LPCSTR xrse_factory_library	= "xrSE_Factory.dll";
+static LPCSTR xrse_factory_library	= "xrSE_Factory";
 static LPCSTR create_entity_func 	= "_create_entity@4";
 static LPCSTR destroy_entity_func 	= "_destroy_entity@4";
 Tcreate_entity 	create_entity;
