@@ -5,10 +5,24 @@
 #include "glUIShader.h"
 #include "glRenderDeviceRender.h"
 
-CRender		RImplementation;
+CRender										RImplementation;
 
-extern ENGINE_API BOOL r2_sun_static;
-extern ENGINE_API BOOL r2_advanced_pp;	//	advanced post process and effects
+//////////////////////////////////////////////////////////////////////////
+class CGlow : public IRender_Glow
+{
+public:
+	bool				bActive;
+public:
+	CGlow() : bActive(false) { }
+	virtual void					set_active(bool b) { bActive = b; }
+	virtual bool					get_active() { return bActive; }
+	virtual void					set_position(const Fvector& P) { }
+	virtual void					set_direction(const Fvector& D) { }
+	virtual void					set_radius(float R) { }
+	virtual void					set_texture(LPCSTR name) { }
+	virtual void					set_color(const Fcolor& C) { }
+	virtual void					set_color(float r, float g, float b) { }
+};
 
 float		r_dtex_range = 50.f;
 //////////////////////////////////////////////////////////////////////////

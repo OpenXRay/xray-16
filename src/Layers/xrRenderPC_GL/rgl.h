@@ -1,29 +1,27 @@
 #pragma once
 
-#include "../xrRender/r__dsgraph_structure.h"
-#include "../xrRender/r__occlusion.h"
+#include "Layers/xrRender/D3DXRenderBase.h"
+#include "Layers/xrRender/r__occlusion.h"
 
-#include "../xrRender/PSLibrary.h"
+#include "Layers/xrRender/PSLibrary.h"
 
 #include "r2_types.h"
 #include "gl_rendertarget.h"
-#include "glRenderDeviceRender.h"
 
-#include "../xrRender/hom.h"
-#include "../xrRender/detailmanager.h"
-#include "../xrRender/modelpool.h"
-#include "../xrRender/wallmarksengine.h"
+#include "Layers/xrRender/hom.h"
+#include "Layers/xrRender/detailmanager.h"
+#include "Layers/xrRender/modelpool.h"
+#include "Layers/xrRender/wallmarksengine.h"
 
 #include "smap_allocator.h"
-#include "../xrRender/light_db.h"
-#include "../xrRender/light_render_direct.h"
-#include "../xrRender/LightTrack.h"
+#include "Layers/xrRender/light_db.h"
+#include "Layers/xrRender/light_render_direct.h"
+#include "Layers/xrRender/LightTrack.h"
 
-#include "../xrRender/SkeletonCustom.h"
-#include "../../xrEngine/irenderable.h"
-#include "../../xrEngine/fmesh.h"
+#include "xrEngine/IRenderable.h"
+#include "xrCore/FMesh.hpp"
 
-#define HW RImplementation
+class dxRender_Visual;
 
 class CGlow : public IRender_Glow
 {
