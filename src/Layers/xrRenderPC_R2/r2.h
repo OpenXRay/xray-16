@@ -10,7 +10,7 @@
 #include "Layers/xrRender/wallmarksengine.h"
 #include "smap_allocator.h"
 #include "Layers/xrRender/light_db.h"
-#include "light_render_direct.h"
+#include "Layers/xrRender/light_render_direct.h"
 #include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/r_sun_cascades.h"
 #include "xrEngine/IRenderable.h"
