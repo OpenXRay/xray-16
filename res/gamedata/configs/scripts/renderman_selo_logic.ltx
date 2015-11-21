@@ -1,8 +1,0 @@
-[logic]
-active = sr_idle
-
-[sr_idle]
-on_info =  sr_idle@2 %=set_counter(renderman_selo_counter:0)%
-
-[sr_idle@2]
-on_info = {=actor_in_zone(renderman_selo_sr)} %+renderman_selo_combat_ignore% , %-renderman_selo_combat_ignore%

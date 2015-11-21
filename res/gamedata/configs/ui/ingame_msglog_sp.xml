@@ -1,5 +1,0 @@
-﻿<?xml version='1.0' encoding="UTF-8"?>
-<_window x="0" y="0" w="640" h="480" r="227" g="121" b="222" texture="1">
-	<!-- PDA Message List-->
-	<list x="15" y="465" width="525" height="220" item_height = "70"></list>
-</window>
