@@ -42,13 +42,10 @@ shared_str const xr_dsa_signer::sign_mt(u8 const * data,
 	return m_dsa.sign		(m_private_key, m_sha.pointer(), m_sha.digest_length);
 }
 
-char const * current_time(string64 & dest_time)
+char *current_time(string64 &dest_time)
 {
-	time_t		tmp_curr_time;
-	
-	dest_time[0]	= 0;
-	_time64			(&tmp_curr_time);
-	tm* tmp_tm		= _localtime64(&tmp_curr_time);
+	const time_t tmp_curr_time = std::time(nullptr);
+	tm *tmp_tm = std::localtime(&tmp_curr_time);
 
 	xr_sprintf(dest_time, sizeof(dest_time),
 		"%02d.%02d.%d_%02d:%02d:%02d",

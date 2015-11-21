@@ -20,9 +20,9 @@ class XRCORE_API Lock
 {
 public:
 #ifdef CONFIG_PROFILE_LOCKS
-    Lock(const char *id) : isLocked(false), id(id) {}
+    Lock(const char *id) : lockCounter(0), id(id) {}
 #else
-    Lock() : isLocked(false) {}
+    Lock() : lockCounter(0) {}
 #endif
 
     Lock(const Lock &) = delete;
@@ -34,7 +34,7 @@ public:
     void Enter()
     {
         mutex.lock();
-        isLocked = true;
+        lockCounter++;
     }
 #endif
 
@@ -42,21 +42,21 @@ public:
     {
         bool locked = mutex.try_lock();
         if (locked)
-            isLocked = true;
+            lockCounter++;
         return locked;
     }
 
     void Leave()
     {
         mutex.unlock();
-        isLocked = false;
+        lockCounter--;
     }
 
-    bool IsLocked() const { return isLocked; }
+    bool IsLocked() const { return lockCounter; }
 
 private:
     std::recursive_mutex mutex;
-    std::atomic_bool isLocked;
+    std::atomic_int lockCounter;
 #ifdef CONFIG_PROFILE_LOCKS
     const char *id;
 #endif
