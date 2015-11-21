@@ -12,12 +12,7 @@
 #pragma warning( 4 : 4244 )
 #pragma warning(disable:4237)
 
-#define GLEW_STATIC
-#include <gl\glew.h>
-#include <gl\GL.h>
-#include <gl\GLU.h>
-#include <gl\glext.h>
-#include <gl\wglext.h>
+#include <glbinding\gl\gl.h>
 
 // TODO: Get rid of D3D types.
 #include <d3d9types.h>

@@ -1,0 +1,1410 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="glbinding\source\glbinding\source\callbacks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\AbstractFunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\AbstractValue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_list.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\ProcAddress.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\ContextHandle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\ContextInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Value.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Version.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Version_ValidVersions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Meta.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_getStringByBitfield.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_BitfieldsByString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_BooleansByString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_EnumsByString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_ExtensionsByFunctionString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_ExtensionsByString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_FunctionStringsByExtension.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_ReqVersionsByExtension.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_StringsByBitfield.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_StringsByBoolean.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_StringsByEnum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_StringsByExtension.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\logging.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\types.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_a.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_b.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_c.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_e.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_f.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_g.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_h.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_i.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_j.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_k.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_l.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_m.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_n.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_o.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_p.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_q.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_r.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_s.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_t.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_u.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_v.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_w.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_x.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_y.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_z.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_a.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_b.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_c.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_d.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_e.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_f.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_g.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_h.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_i.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_j.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_k.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_l.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_m.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_n.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_o.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_p.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_q.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_r.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_s.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_t.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_u.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_v.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_w.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_x.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_y.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_z.cpp">
+      <Filter>Source Files\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\glbinding_api.h">
+      <Filter>Header Files (API)</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\callbacks.h">
+      <Filter>Header Files (API)</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\nogl.h">
+      <Filter>Header Files (API)</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl\bitfield.h">
+      <Filter>Header Files (API)\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl\boolean.h">
+      <Filter>Header Files (API)\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl\enum.h">
+      <Filter>Header Files (API)\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl\extension.h">
+      <Filter>Header Files (API)\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl\functions.h">
+      <Filter>Header Files (API)\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl\types.h">
+      <Filter>Header Files (API)\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl\values.h">
+      <Filter>Header Files (API)\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\AbstractFunction.h">
+      <Filter>Header Files (API)</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\AbstractValue.h">
+      <Filter>Header Files (API)</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\Function.h">
+      <Filter>Header Files (API)</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\Function.hpp">
+      <Filter>Header Files (API)</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\Binding.h">
+      <Filter>Header Files (API)</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\Meta.h">
+      <Filter>Header Files (API)</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\ProcAddress.h">
+      <Filter>Header Files (API)</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\ContextHandle.h">
+      <Filter>Header Files (API)</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\ContextInfo.h">
+      <Filter>Header Files (API)</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\Value.h">
+      <Filter>Header Files (API)</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\Value.hpp">
+      <Filter>Header Files (API)</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\Version.h">
+      <Filter>Header Files (API)</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\SharedBitfield.h">
+      <Filter>Header Files (API)</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\SharedBitfield.hpp">
+      <Filter>Header Files (API)</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\logging.h">
+      <Filter>Header Files (API)</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl\gl.h">
+      <Filter>Header Files (API)\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10\bitfield.h">
+      <Filter>Header Files (API)\gl10</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10\boolean.h">
+      <Filter>Header Files (API)\gl10</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10\enum.h">
+      <Filter>Header Files (API)\gl10</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10\functions.h">
+      <Filter>Header Files (API)\gl10</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10\gl.h">
+      <Filter>Header Files (API)\gl10</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10\types.h">
+      <Filter>Header Files (API)\gl10</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10\values.h">
+      <Filter>Header Files (API)\gl10</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10ext\bitfield.h">
+      <Filter>Header Files (API)\gl10ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10ext\boolean.h">
+      <Filter>Header Files (API)\gl10ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10ext\enum.h">
+      <Filter>Header Files (API)\gl10ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10ext\functions.h">
+      <Filter>Header Files (API)\gl10ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10ext\gl.h">
+      <Filter>Header Files (API)\gl10ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10ext\types.h">
+      <Filter>Header Files (API)\gl10ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10ext\values.h">
+      <Filter>Header Files (API)\gl10ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11\bitfield.h">
+      <Filter>Header Files (API)\gl11</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11\boolean.h">
+      <Filter>Header Files (API)\gl11</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11\enum.h">
+      <Filter>Header Files (API)\gl11</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11\functions.h">
+      <Filter>Header Files (API)\gl11</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11\gl.h">
+      <Filter>Header Files (API)\gl11</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11\types.h">
+      <Filter>Header Files (API)\gl11</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11\values.h">
+      <Filter>Header Files (API)\gl11</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11ext\bitfield.h">
+      <Filter>Header Files (API)\gl11ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11ext\boolean.h">
+      <Filter>Header Files (API)\gl11ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11ext\enum.h">
+      <Filter>Header Files (API)\gl11ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11ext\functions.h">
+      <Filter>Header Files (API)\gl11ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11ext\gl.h">
+      <Filter>Header Files (API)\gl11ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11ext\types.h">
+      <Filter>Header Files (API)\gl11ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11ext\values.h">
+      <Filter>Header Files (API)\gl11ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12\bitfield.h">
+      <Filter>Header Files (API)\gl12</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12\boolean.h">
+      <Filter>Header Files (API)\gl12</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12\enum.h">
+      <Filter>Header Files (API)\gl12</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12\functions.h">
+      <Filter>Header Files (API)\gl12</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12\gl.h">
+      <Filter>Header Files (API)\gl12</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12\types.h">
+      <Filter>Header Files (API)\gl12</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12\values.h">
+      <Filter>Header Files (API)\gl12</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12ext\bitfield.h">
+      <Filter>Header Files (API)\gl12ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12ext\boolean.h">
+      <Filter>Header Files (API)\gl12ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12ext\enum.h">
+      <Filter>Header Files (API)\gl12ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12ext\functions.h">
+      <Filter>Header Files (API)\gl12ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12ext\gl.h">
+      <Filter>Header Files (API)\gl12ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12ext\types.h">
+      <Filter>Header Files (API)\gl12ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12ext\values.h">
+      <Filter>Header Files (API)\gl12ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13\bitfield.h">
+      <Filter>Header Files (API)\gl13</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13\boolean.h">
+      <Filter>Header Files (API)\gl13</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13\enum.h">
+      <Filter>Header Files (API)\gl13</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13\functions.h">
+      <Filter>Header Files (API)\gl13</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13\gl.h">
+      <Filter>Header Files (API)\gl13</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13\types.h">
+      <Filter>Header Files (API)\gl13</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13\values.h">
+      <Filter>Header Files (API)\gl13</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13ext\bitfield.h">
+      <Filter>Header Files (API)\gl13ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13ext\boolean.h">
+      <Filter>Header Files (API)\gl13ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13ext\enum.h">
+      <Filter>Header Files (API)\gl13ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13ext\functions.h">
+      <Filter>Header Files (API)\gl13ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13ext\gl.h">
+      <Filter>Header Files (API)\gl13ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13ext\types.h">
+      <Filter>Header Files (API)\gl13ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13ext\values.h">
+      <Filter>Header Files (API)\gl13ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14\bitfield.h">
+      <Filter>Header Files (API)\gl14</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14\boolean.h">
+      <Filter>Header Files (API)\gl14</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14\enum.h">
+      <Filter>Header Files (API)\gl14</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14\functions.h">
+      <Filter>Header Files (API)\gl14</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14\gl.h">
+      <Filter>Header Files (API)\gl14</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14\types.h">
+      <Filter>Header Files (API)\gl14</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14\values.h">
+      <Filter>Header Files (API)\gl14</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14ext\bitfield.h">
+      <Filter>Header Files (API)\gl14ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14ext\boolean.h">
+      <Filter>Header Files (API)\gl14ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14ext\enum.h">
+      <Filter>Header Files (API)\gl14ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14ext\functions.h">
+      <Filter>Header Files (API)\gl14ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14ext\gl.h">
+      <Filter>Header Files (API)\gl14ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14ext\types.h">
+      <Filter>Header Files (API)\gl14ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14ext\values.h">
+      <Filter>Header Files (API)\gl14ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15\bitfield.h">
+      <Filter>Header Files (API)\gl15</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15\boolean.h">
+      <Filter>Header Files (API)\gl15</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15\enum.h">
+      <Filter>Header Files (API)\gl15</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15\functions.h">
+      <Filter>Header Files (API)\gl15</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15\gl.h">
+      <Filter>Header Files (API)\gl15</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15\types.h">
+      <Filter>Header Files (API)\gl15</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15\values.h">
+      <Filter>Header Files (API)\gl15</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15ext\bitfield.h">
+      <Filter>Header Files (API)\gl15ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15ext\boolean.h">
+      <Filter>Header Files (API)\gl15ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15ext\enum.h">
+      <Filter>Header Files (API)\gl15ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15ext\functions.h">
+      <Filter>Header Files (API)\gl15ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15ext\gl.h">
+      <Filter>Header Files (API)\gl15ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15ext\types.h">
+      <Filter>Header Files (API)\gl15ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15ext\values.h">
+      <Filter>Header Files (API)\gl15ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20\bitfield.h">
+      <Filter>Header Files (API)\gl20</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20\boolean.h">
+      <Filter>Header Files (API)\gl20</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20\enum.h">
+      <Filter>Header Files (API)\gl20</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20\functions.h">
+      <Filter>Header Files (API)\gl20</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20\gl.h">
+      <Filter>Header Files (API)\gl20</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20\types.h">
+      <Filter>Header Files (API)\gl20</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20\values.h">
+      <Filter>Header Files (API)\gl20</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20ext\bitfield.h">
+      <Filter>Header Files (API)\gl20ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20ext\boolean.h">
+      <Filter>Header Files (API)\gl20ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20ext\enum.h">
+      <Filter>Header Files (API)\gl20ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20ext\functions.h">
+      <Filter>Header Files (API)\gl20ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20ext\gl.h">
+      <Filter>Header Files (API)\gl20ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20ext\types.h">
+      <Filter>Header Files (API)\gl20ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20ext\values.h">
+      <Filter>Header Files (API)\gl20ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21\bitfield.h">
+      <Filter>Header Files (API)\gl21</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21\boolean.h">
+      <Filter>Header Files (API)\gl21</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21\enum.h">
+      <Filter>Header Files (API)\gl21</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21\functions.h">
+      <Filter>Header Files (API)\gl21</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21\gl.h">
+      <Filter>Header Files (API)\gl21</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21\types.h">
+      <Filter>Header Files (API)\gl21</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21\values.h">
+      <Filter>Header Files (API)\gl21</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21ext\bitfield.h">
+      <Filter>Header Files (API)\gl21ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21ext\boolean.h">
+      <Filter>Header Files (API)\gl21ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21ext\enum.h">
+      <Filter>Header Files (API)\gl21ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21ext\functions.h">
+      <Filter>Header Files (API)\gl21ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21ext\gl.h">
+      <Filter>Header Files (API)\gl21ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21ext\types.h">
+      <Filter>Header Files (API)\gl21ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21ext\values.h">
+      <Filter>Header Files (API)\gl21ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30\bitfield.h">
+      <Filter>Header Files (API)\gl30</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30\boolean.h">
+      <Filter>Header Files (API)\gl30</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30\enum.h">
+      <Filter>Header Files (API)\gl30</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30\functions.h">
+      <Filter>Header Files (API)\gl30</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30\gl.h">
+      <Filter>Header Files (API)\gl30</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30\types.h">
+      <Filter>Header Files (API)\gl30</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30\values.h">
+      <Filter>Header Files (API)\gl30</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30ext\bitfield.h">
+      <Filter>Header Files (API)\gl30ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30ext\boolean.h">
+      <Filter>Header Files (API)\gl30ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30ext\enum.h">
+      <Filter>Header Files (API)\gl30ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30ext\functions.h">
+      <Filter>Header Files (API)\gl30ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30ext\gl.h">
+      <Filter>Header Files (API)\gl30ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30ext\types.h">
+      <Filter>Header Files (API)\gl30ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30ext\values.h">
+      <Filter>Header Files (API)\gl30ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31\bitfield.h">
+      <Filter>Header Files (API)\gl31</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31\boolean.h">
+      <Filter>Header Files (API)\gl31</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31\enum.h">
+      <Filter>Header Files (API)\gl31</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31\functions.h">
+      <Filter>Header Files (API)\gl31</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31\gl.h">
+      <Filter>Header Files (API)\gl31</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31\types.h">
+      <Filter>Header Files (API)\gl31</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31\values.h">
+      <Filter>Header Files (API)\gl31</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31ext\bitfield.h">
+      <Filter>Header Files (API)\gl31ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31ext\boolean.h">
+      <Filter>Header Files (API)\gl31ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31ext\enum.h">
+      <Filter>Header Files (API)\gl31ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31ext\functions.h">
+      <Filter>Header Files (API)\gl31ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31ext\gl.h">
+      <Filter>Header Files (API)\gl31ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31ext\types.h">
+      <Filter>Header Files (API)\gl31ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31ext\values.h">
+      <Filter>Header Files (API)\gl31ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32\bitfield.h">
+      <Filter>Header Files (API)\gl32</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32\boolean.h">
+      <Filter>Header Files (API)\gl32</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32\enum.h">
+      <Filter>Header Files (API)\gl32</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32\functions.h">
+      <Filter>Header Files (API)\gl32</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32\gl.h">
+      <Filter>Header Files (API)\gl32</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32\types.h">
+      <Filter>Header Files (API)\gl32</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32\values.h">
+      <Filter>Header Files (API)\gl32</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32core\bitfield.h">
+      <Filter>Header Files (API)\gl32core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32core\boolean.h">
+      <Filter>Header Files (API)\gl32core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32core\enum.h">
+      <Filter>Header Files (API)\gl32core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32core\functions.h">
+      <Filter>Header Files (API)\gl32core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32core\gl.h">
+      <Filter>Header Files (API)\gl32core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32core\types.h">
+      <Filter>Header Files (API)\gl32core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32core\values.h">
+      <Filter>Header Files (API)\gl32core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32ext\bitfield.h">
+      <Filter>Header Files (API)\gl32ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32ext\boolean.h">
+      <Filter>Header Files (API)\gl32ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32ext\enum.h">
+      <Filter>Header Files (API)\gl32ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32ext\functions.h">
+      <Filter>Header Files (API)\gl32ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32ext\gl.h">
+      <Filter>Header Files (API)\gl32ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32ext\types.h">
+      <Filter>Header Files (API)\gl32ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32ext\values.h">
+      <Filter>Header Files (API)\gl32ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33\bitfield.h">
+      <Filter>Header Files (API)\gl33</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33\boolean.h">
+      <Filter>Header Files (API)\gl33</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33\enum.h">
+      <Filter>Header Files (API)\gl33</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33\functions.h">
+      <Filter>Header Files (API)\gl33</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33\gl.h">
+      <Filter>Header Files (API)\gl33</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33\types.h">
+      <Filter>Header Files (API)\gl33</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33\values.h">
+      <Filter>Header Files (API)\gl33</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33core\bitfield.h">
+      <Filter>Header Files (API)\gl33core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33core\boolean.h">
+      <Filter>Header Files (API)\gl33core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33core\enum.h">
+      <Filter>Header Files (API)\gl33core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33core\functions.h">
+      <Filter>Header Files (API)\gl33core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33core\gl.h">
+      <Filter>Header Files (API)\gl33core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33core\types.h">
+      <Filter>Header Files (API)\gl33core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33core\values.h">
+      <Filter>Header Files (API)\gl33core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33ext\bitfield.h">
+      <Filter>Header Files (API)\gl33ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33ext\boolean.h">
+      <Filter>Header Files (API)\gl33ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33ext\enum.h">
+      <Filter>Header Files (API)\gl33ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33ext\functions.h">
+      <Filter>Header Files (API)\gl33ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33ext\gl.h">
+      <Filter>Header Files (API)\gl33ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33ext\types.h">
+      <Filter>Header Files (API)\gl33ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33ext\values.h">
+      <Filter>Header Files (API)\gl33ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40\bitfield.h">
+      <Filter>Header Files (API)\gl40</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40\boolean.h">
+      <Filter>Header Files (API)\gl40</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40\enum.h">
+      <Filter>Header Files (API)\gl40</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40\functions.h">
+      <Filter>Header Files (API)\gl40</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40\gl.h">
+      <Filter>Header Files (API)\gl40</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40\types.h">
+      <Filter>Header Files (API)\gl40</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40\values.h">
+      <Filter>Header Files (API)\gl40</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40core\bitfield.h">
+      <Filter>Header Files (API)\gl40core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40core\boolean.h">
+      <Filter>Header Files (API)\gl40core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40core\enum.h">
+      <Filter>Header Files (API)\gl40core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40core\functions.h">
+      <Filter>Header Files (API)\gl40core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40core\gl.h">
+      <Filter>Header Files (API)\gl40core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40core\types.h">
+      <Filter>Header Files (API)\gl40core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40core\values.h">
+      <Filter>Header Files (API)\gl40core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40ext\bitfield.h">
+      <Filter>Header Files (API)\gl40ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40ext\boolean.h">
+      <Filter>Header Files (API)\gl40ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40ext\enum.h">
+      <Filter>Header Files (API)\gl40ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40ext\functions.h">
+      <Filter>Header Files (API)\gl40ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40ext\gl.h">
+      <Filter>Header Files (API)\gl40ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40ext\types.h">
+      <Filter>Header Files (API)\gl40ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40ext\values.h">
+      <Filter>Header Files (API)\gl40ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41\bitfield.h">
+      <Filter>Header Files (API)\gl41</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41\boolean.h">
+      <Filter>Header Files (API)\gl41</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41\enum.h">
+      <Filter>Header Files (API)\gl41</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41\functions.h">
+      <Filter>Header Files (API)\gl41</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41\gl.h">
+      <Filter>Header Files (API)\gl41</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41\types.h">
+      <Filter>Header Files (API)\gl41</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41\values.h">
+      <Filter>Header Files (API)\gl41</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41core\bitfield.h">
+      <Filter>Header Files (API)\gl41core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41core\boolean.h">
+      <Filter>Header Files (API)\gl41core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41core\enum.h">
+      <Filter>Header Files (API)\gl41core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41core\functions.h">
+      <Filter>Header Files (API)\gl41core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41core\gl.h">
+      <Filter>Header Files (API)\gl41core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41core\types.h">
+      <Filter>Header Files (API)\gl41core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41core\values.h">
+      <Filter>Header Files (API)\gl41core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41ext\bitfield.h">
+      <Filter>Header Files (API)\gl41ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41ext\boolean.h">
+      <Filter>Header Files (API)\gl41ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41ext\enum.h">
+      <Filter>Header Files (API)\gl41ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41ext\functions.h">
+      <Filter>Header Files (API)\gl41ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41ext\gl.h">
+      <Filter>Header Files (API)\gl41ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41ext\types.h">
+      <Filter>Header Files (API)\gl41ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41ext\values.h">
+      <Filter>Header Files (API)\gl41ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42\bitfield.h">
+      <Filter>Header Files (API)\gl42</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42\boolean.h">
+      <Filter>Header Files (API)\gl42</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42\enum.h">
+      <Filter>Header Files (API)\gl42</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42\functions.h">
+      <Filter>Header Files (API)\gl42</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42\gl.h">
+      <Filter>Header Files (API)\gl42</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42\types.h">
+      <Filter>Header Files (API)\gl42</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42\values.h">
+      <Filter>Header Files (API)\gl42</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42core\bitfield.h">
+      <Filter>Header Files (API)\gl42core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42core\boolean.h">
+      <Filter>Header Files (API)\gl42core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42core\enum.h">
+      <Filter>Header Files (API)\gl42core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42core\functions.h">
+      <Filter>Header Files (API)\gl42core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42core\gl.h">
+      <Filter>Header Files (API)\gl42core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42core\types.h">
+      <Filter>Header Files (API)\gl42core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42core\values.h">
+      <Filter>Header Files (API)\gl42core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42ext\bitfield.h">
+      <Filter>Header Files (API)\gl42ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42ext\boolean.h">
+      <Filter>Header Files (API)\gl42ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42ext\enum.h">
+      <Filter>Header Files (API)\gl42ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42ext\functions.h">
+      <Filter>Header Files (API)\gl42ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42ext\gl.h">
+      <Filter>Header Files (API)\gl42ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42ext\types.h">
+      <Filter>Header Files (API)\gl42ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42ext\values.h">
+      <Filter>Header Files (API)\gl42ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43\bitfield.h">
+      <Filter>Header Files (API)\gl43</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43\boolean.h">
+      <Filter>Header Files (API)\gl43</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43\enum.h">
+      <Filter>Header Files (API)\gl43</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43\functions.h">
+      <Filter>Header Files (API)\gl43</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43\gl.h">
+      <Filter>Header Files (API)\gl43</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43\types.h">
+      <Filter>Header Files (API)\gl43</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43\values.h">
+      <Filter>Header Files (API)\gl43</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43core\bitfield.h">
+      <Filter>Header Files (API)\gl43core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43core\boolean.h">
+      <Filter>Header Files (API)\gl43core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43core\enum.h">
+      <Filter>Header Files (API)\gl43core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43core\functions.h">
+      <Filter>Header Files (API)\gl43core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43core\gl.h">
+      <Filter>Header Files (API)\gl43core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43core\types.h">
+      <Filter>Header Files (API)\gl43core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43core\values.h">
+      <Filter>Header Files (API)\gl43core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43ext\bitfield.h">
+      <Filter>Header Files (API)\gl43ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43ext\boolean.h">
+      <Filter>Header Files (API)\gl43ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43ext\enum.h">
+      <Filter>Header Files (API)\gl43ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43ext\functions.h">
+      <Filter>Header Files (API)\gl43ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43ext\gl.h">
+      <Filter>Header Files (API)\gl43ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43ext\types.h">
+      <Filter>Header Files (API)\gl43ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43ext\values.h">
+      <Filter>Header Files (API)\gl43ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44\bitfield.h">
+      <Filter>Header Files (API)\gl44</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44\boolean.h">
+      <Filter>Header Files (API)\gl44</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44\enum.h">
+      <Filter>Header Files (API)\gl44</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44\functions.h">
+      <Filter>Header Files (API)\gl44</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44\gl.h">
+      <Filter>Header Files (API)\gl44</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44\types.h">
+      <Filter>Header Files (API)\gl44</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44\values.h">
+      <Filter>Header Files (API)\gl44</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44core\bitfield.h">
+      <Filter>Header Files (API)\gl44core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44core\boolean.h">
+      <Filter>Header Files (API)\gl44core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44core\enum.h">
+      <Filter>Header Files (API)\gl44core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44core\functions.h">
+      <Filter>Header Files (API)\gl44core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44core\gl.h">
+      <Filter>Header Files (API)\gl44core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44core\types.h">
+      <Filter>Header Files (API)\gl44core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44core\values.h">
+      <Filter>Header Files (API)\gl44core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44ext\bitfield.h">
+      <Filter>Header Files (API)\gl44ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44ext\boolean.h">
+      <Filter>Header Files (API)\gl44ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44ext\enum.h">
+      <Filter>Header Files (API)\gl44ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44ext\functions.h">
+      <Filter>Header Files (API)\gl44ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44ext\gl.h">
+      <Filter>Header Files (API)\gl44ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44ext\types.h">
+      <Filter>Header Files (API)\gl44ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44ext\values.h">
+      <Filter>Header Files (API)\gl44ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45\bitfield.h">
+      <Filter>Header Files (API)\gl45</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45\boolean.h">
+      <Filter>Header Files (API)\gl45</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45\enum.h">
+      <Filter>Header Files (API)\gl45</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45\functions.h">
+      <Filter>Header Files (API)\gl45</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45\gl.h">
+      <Filter>Header Files (API)\gl45</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45\types.h">
+      <Filter>Header Files (API)\gl45</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45\values.h">
+      <Filter>Header Files (API)\gl45</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45core\bitfield.h">
+      <Filter>Header Files (API)\gl45core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45core\boolean.h">
+      <Filter>Header Files (API)\gl45core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45core\enum.h">
+      <Filter>Header Files (API)\gl45core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45core\functions.h">
+      <Filter>Header Files (API)\gl45core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45core\gl.h">
+      <Filter>Header Files (API)\gl45core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45core\types.h">
+      <Filter>Header Files (API)\gl45core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45core\values.h">
+      <Filter>Header Files (API)\gl45core</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45ext\bitfield.h">
+      <Filter>Header Files (API)\gl45ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45ext\boolean.h">
+      <Filter>Header Files (API)\gl45ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45ext\enum.h">
+      <Filter>Header Files (API)\gl45ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45ext\functions.h">
+      <Filter>Header Files (API)\gl45ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45ext\gl.h">
+      <Filter>Header Files (API)\gl45ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45ext\types.h">
+      <Filter>Header Files (API)\gl45ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45ext\values.h">
+      <Filter>Header Files (API)\gl45ext</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\source\callbacks_private.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\source\Meta_Maps.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\source\RingBuffer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\source\RingBuffer.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="glbinding\source\glbinding\source\Binding_pch.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="glbinding\source\glbinding\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{63D0BCF8-46D3-3493-A2B8-38DF82F5AC5A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)">
+      <UniqueIdentifier>{A89A8EDD-B8B9-3F74-B9F2-368B4C85B3ED}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gl">
+      <UniqueIdentifier>{6A916586-EA55-364C-A0DC-3C9D976617FC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl">
+      <UniqueIdentifier>{E0789C8F-9921-38D7-ABF6-103A579BC1E3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl10">
+      <UniqueIdentifier>{F97D5688-FF40-3E28-AE7F-E5B1DE7856AB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl10ext">
+      <UniqueIdentifier>{EE2BF693-FBFB-338A-8C05-21F76728724E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl11">
+      <UniqueIdentifier>{A2F21D83-5A01-3FFC-90AB-386A11F461C3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl11ext">
+      <UniqueIdentifier>{C0BD8E74-B296-37F9-B7C9-DCC23ED3C41A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl12">
+      <UniqueIdentifier>{2E789433-FCED-38B3-A807-A8F4F4C0D539}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl12ext">
+      <UniqueIdentifier>{DFBB24DD-9FE3-360B-8CF2-8DE0E187BAD5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl13">
+      <UniqueIdentifier>{FEF7CD92-9831-3E78-9B67-C61582E11ED5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl13ext">
+      <UniqueIdentifier>{FC8B45A6-5948-3A4D-8965-3C30AF1DF835}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl14">
+      <UniqueIdentifier>{65B98323-A8B2-313D-A163-68420636999E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl14ext">
+      <UniqueIdentifier>{EC50DB49-6B51-33B8-AFA1-D68CF872C27E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl15">
+      <UniqueIdentifier>{07211041-B247-35E7-A951-4BD68E09371D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl15ext">
+      <UniqueIdentifier>{9009444E-AFA3-3747-8120-3159B6244B02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl20">
+      <UniqueIdentifier>{1D545A84-A9AE-3600-BB31-5C3ADA9375DD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl20ext">
+      <UniqueIdentifier>{895F2B05-2AF0-30FF-B426-76F5EEB19081}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl21">
+      <UniqueIdentifier>{1E5BA164-3CBF-3612-80C2-1EDA0F1C4F5C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl21ext">
+      <UniqueIdentifier>{58896962-E6F1-306D-8369-3BFACDE6B757}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl30">
+      <UniqueIdentifier>{8440196A-4280-3462-84AF-605A6C78F9CA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl30ext">
+      <UniqueIdentifier>{A32D6BD0-E26E-3AC7-87C5-EE9A664FFFD2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl31">
+      <UniqueIdentifier>{196A7ECE-0653-34AE-8BBC-2FADC579DAAC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl31ext">
+      <UniqueIdentifier>{F6D5A381-8101-3F35-B263-43610256116F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl32">
+      <UniqueIdentifier>{1F4F9605-926A-31F2-B183-F5601ED45946}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl32core">
+      <UniqueIdentifier>{B061009F-9F02-3670-90D6-DD4D346D45E3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl32ext">
+      <UniqueIdentifier>{3E057F57-C87F-39C9-A4A7-41E103C77602}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl33">
+      <UniqueIdentifier>{265D9694-FCB8-3610-BC01-5681DDE79B06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl33core">
+      <UniqueIdentifier>{B89E399C-14CF-38DD-94DE-91CABBDFE3BB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl33ext">
+      <UniqueIdentifier>{1D90C97F-8DCD-3614-8A96-BD28FE526AB9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl40">
+      <UniqueIdentifier>{45F95D8C-5CC0-3521-91D2-85DEFE226F0B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl40core">
+      <UniqueIdentifier>{47589724-9AF5-35B7-B5E1-85D18C80FEAC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl40ext">
+      <UniqueIdentifier>{D217533E-CF03-3045-A301-6C38B9E0C1DB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl41">
+      <UniqueIdentifier>{AAB96A2C-B0A6-3640-B68C-5BD8B0E7D703}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl41core">
+      <UniqueIdentifier>{44A66CAF-7011-3567-AB67-5B42C6BE4912}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl41ext">
+      <UniqueIdentifier>{6204A0C0-F52D-331C-82A3-E1F1376F121C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl42">
+      <UniqueIdentifier>{258E4F37-B7FD-3AD7-9B3E-496F859105B3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl42core">
+      <UniqueIdentifier>{015631AC-DE9A-33C4-B589-A772F218C517}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl42ext">
+      <UniqueIdentifier>{11FE43DC-4BA0-3C8B-A1CE-C64A577D77DA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl43">
+      <UniqueIdentifier>{7036754F-3D65-3A43-8255-BDD9359FD7B5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl43core">
+      <UniqueIdentifier>{A9B87A50-B7F2-3825-A58F-FD102E6B0BEF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl43ext">
+      <UniqueIdentifier>{05F39130-2397-3FFE-9492-C4A7D20DBD0B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl44">
+      <UniqueIdentifier>{30B2AB9D-A486-3B0C-B80B-D713E5FCF230}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl44core">
+      <UniqueIdentifier>{8819A527-9960-3E03-92E3-5D11ED9F2B1B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl44ext">
+      <UniqueIdentifier>{C0752801-C449-3427-83FA-D2F97F4F5C69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl45">
+      <UniqueIdentifier>{F8B681F9-21ED-30DE-9AD6-3865EE416555}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl45core">
+      <UniqueIdentifier>{AE540B4E-474F-341A-AC3F-AD998F6F9244}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files (API)\gl45ext">
+      <UniqueIdentifier>{1FF8BAF1-FDB9-36A6-9AE9-7B4677B1B761}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

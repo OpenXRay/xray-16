@@ -1,0 +1,850 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{AA714987-A9EB-3322-B3C6-EE1BD242CEC6}</ProjectGUID>
+    <WindowsTargetPlatformVersion>10.0.10150.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>glbinding</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(xrBinDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(xrBinDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
+    <OutDir>$(xrBinDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>glbinding\source\glbinding\include;cmake\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4251;4267</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SmallerTypeCheck>true</SmallerTypeCheck>
+      <StringPooling>false</StringPooling>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;GLBINDING_STATIC;EXTENSIVE_META;WIN32;UNICODE;_UNICODE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_DEBUG;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;GLBINDING_STATIC;EXTENSIVE_META;WIN32;UNICODE;_UNICODE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_DEBUG;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>glbinding\source\glbinding\include;cmake\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>glbinding\source\glbinding\include;cmake\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions> /machine:X86 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>glbinding\source\glbinding\include;cmake\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4251;4267</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Full</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level4</WarningLevel>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;GLBINDING_STATIC;EXTENSIVE_META;WIN32;UNICODE;_UNICODE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;NDEBUG;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;GLBINDING_STATIC;EXTENSIVE_META;WIN32;UNICODE;_UNICODE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;NDEBUG;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>glbinding\source\glbinding\include;cmake\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>glbinding\source\glbinding\include;cmake\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions> /machine:X86 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\glbinding_api.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\callbacks.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\nogl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl\extension.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\AbstractFunction.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\AbstractValue.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\Function.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\Function.hpp" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\Binding.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\Meta.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\ProcAddress.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\ContextHandle.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\ContextInfo.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\Value.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\Value.hpp" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\Version.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\SharedBitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\SharedBitfield.hpp" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\logging.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10ext\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10ext\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10ext\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10ext\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10ext\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10ext\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl10ext\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11ext\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11ext\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11ext\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11ext\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11ext\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11ext\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl11ext\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12ext\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12ext\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12ext\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12ext\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12ext\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12ext\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl12ext\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13ext\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13ext\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13ext\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13ext\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13ext\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13ext\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl13ext\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14ext\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14ext\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14ext\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14ext\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14ext\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14ext\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl14ext\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15ext\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15ext\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15ext\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15ext\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15ext\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15ext\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl15ext\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20ext\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20ext\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20ext\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20ext\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20ext\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20ext\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl20ext\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21ext\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21ext\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21ext\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21ext\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21ext\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21ext\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl21ext\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30ext\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30ext\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30ext\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30ext\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30ext\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30ext\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl30ext\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31ext\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31ext\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31ext\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31ext\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31ext\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31ext\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl31ext\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32core\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32core\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32core\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32core\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32core\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32core\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32core\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32ext\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32ext\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32ext\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32ext\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32ext\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32ext\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl32ext\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33core\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33core\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33core\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33core\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33core\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33core\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33core\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33ext\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33ext\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33ext\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33ext\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33ext\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33ext\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl33ext\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40core\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40core\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40core\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40core\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40core\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40core\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40core\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40ext\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40ext\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40ext\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40ext\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40ext\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40ext\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl40ext\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41core\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41core\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41core\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41core\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41core\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41core\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41core\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41ext\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41ext\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41ext\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41ext\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41ext\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41ext\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl41ext\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42core\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42core\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42core\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42core\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42core\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42core\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42core\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42ext\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42ext\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42ext\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42ext\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42ext\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42ext\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl42ext\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43core\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43core\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43core\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43core\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43core\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43core\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43core\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43ext\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43ext\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43ext\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43ext\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43ext\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43ext\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl43ext\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44core\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44core\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44core\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44core\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44core\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44core\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44core\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44ext\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44ext\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44ext\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44ext\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44ext\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44ext\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl44ext\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45core\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45core\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45core\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45core\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45core\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45core\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45core\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45ext\bitfield.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45ext\boolean.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45ext\enum.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45ext\functions.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45ext\gl.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45ext\types.h" />
+    <ClInclude Include="glbinding\source\glbinding\include\glbinding\gl45ext\values.h" />
+    <ClInclude Include="glbinding\source\glbinding\source\callbacks_private.h" />
+    <ClInclude Include="glbinding\source\glbinding\source\Meta_Maps.h" />
+    <ClInclude Include="glbinding\source\glbinding\source\RingBuffer.h" />
+    <ClInclude Include="glbinding\source\glbinding\source\RingBuffer.hpp" />
+    <ClInclude Include="glbinding\source\glbinding\source\Binding_pch.h" />
+    <ClCompile Include="glbinding\source\glbinding\source\callbacks.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\AbstractFunction.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\AbstractValue.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Binding.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_list.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\ProcAddress.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\ContextHandle.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\ContextInfo.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Value.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Version.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Version_ValidVersions.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_getStringByBitfield.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_BitfieldsByString.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_BooleansByString.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_EnumsByString.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_ExtensionsByFunctionString.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_ExtensionsByString.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_FunctionStringsByExtension.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_ReqVersionsByExtension.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_StringsByBitfield.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_StringsByBoolean.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_StringsByEnum.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_StringsByExtension.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\logging.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\gl\types.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_a.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_b.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_c.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_d.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_e.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_f.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_g.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_h.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_i.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_j.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_k.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_l.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_m.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_n.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_o.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_p.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_q.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_r.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_s.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_t.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_u.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_v.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_w.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_x.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_y.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects_z.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_a.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_b.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_c.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_d.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_e.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_f.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_g.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_h.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_i.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_j.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_k.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_l.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_m.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_n.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_o.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_p.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_q.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_r.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_s.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_t.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_u.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_v.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_w.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_x.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_y.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions_z.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Binding_pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
