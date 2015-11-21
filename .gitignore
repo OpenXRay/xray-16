@@ -9,3 +9,19 @@ intermediate/
 intermediate_plugs/
 lib/
 *.aps
+
+# exclude all third-party libraries
+src/Externals/3dsmax
+src/Externals/BugTrap
+src/Externals/FreeImage
+src/Externals/jpeg
+src/Externals/libogg-1.1.4
+src/Externals/libtheora-1.1.1
+src/Externals/libvorbis-1.2.3
+src/Externals/lightwave
+src/Externals/MagicSoftware
+src/Externals/maya
+src/Externals/nvapi
+src/Externals/OpenAutomate
+src/Externals/OpenSSL
+src/Externals/zlib
