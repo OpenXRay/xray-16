@@ -100,80 +100,74 @@
     <Filter Include="Debug">
       <UniqueIdentifier>{8c65afaf-80f3-4696-9919-73c851754961}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interface implementations">
-      <UniqueIdentifier>{25f1ea9c-d5c1-4075-923e-951b0fa6e6a7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\RenderFactory">
-      <UniqueIdentifier>{24815e1d-3066-4fd1-97c0-7b32d3364fd1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\LensFlare">
-      <UniqueIdentifier>{fc30762e-c5ad-4274-8a8d-46e99881455e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\FactoryPtr">
-      <UniqueIdentifier>{4b7685a7-0fdc-4a10-9bdf-1f9b57f8a01e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\ApplicationRender">
-      <UniqueIdentifier>{0c371c34-8b52-45e5-8c4c-f582d12be245}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\RainRender">
-      <UniqueIdentifier>{1f7c26c8-fca2-4170-b9bf-367a5d89d4a5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\ThunderboltRender">
-      <UniqueIdentifier>{ba78afbf-110a-482f-b44e-da7b1bd7da04}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\EnvironmentRender">
-      <UniqueIdentifier>{b5b51ab2-f315-499d-aec0-4054c51b45b6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\RenderDeviceRender">
-      <UniqueIdentifier>{219d4613-57a6-4929-9730-bf813f130ac9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\ConsoleRender">
-      <UniqueIdentifier>{ff98203c-286a-491e-b114-680b278e8c53}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\ObjectSpaceRender">
-      <UniqueIdentifier>{3b54aaa6-3ffb-4e31-b34b-eadea13eed14}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\FontRender">
-      <UniqueIdentifier>{c7742606-2801-4837-803f-f2761f664603}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\WallMarkArray">
-      <UniqueIdentifier>{17958c5c-650a-4b55-9aee-f52d8239deb0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\StatGraphRender">
-      <UniqueIdentifier>{d37cd508-f760-4ce5-96aa-7951619d63c5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\ThunderboltDescRender">
-      <UniqueIdentifier>{5e0e07b7-fbaa-4814-af4b-6873f02a4430}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\StatsRender">
-      <UniqueIdentifier>{b253cb14-0c8c-4aa7-9341-c56fe542ce84}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\Debug">
-      <UniqueIdentifier>{2b5eb554-65e1-43bb-9086-68c3d460b1de}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\Debug\DebugRender">
-      <UniqueIdentifier>{2d3299ef-3c81-42e4-a4a7-864cb311777e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\UI">
-      <UniqueIdentifier>{78baea28-4b83-4c9d-9a86-d5d29b7d1ff7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\UI\UIRender">
-      <UniqueIdentifier>{3ef93fac-90de-479d-95ab-12589c8fc6c0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\UI\UIShader">
-      <UniqueIdentifier>{8a886ec3-491c-4017-859d-ca1fe9e4a8f6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\UI\UISequenceVideoItem">
-      <UniqueIdentifier>{06d9c749-eea7-49a1-bd52-6a2884c2b0cf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface implementations\MSAARender">
-      <UniqueIdentifier>{96eff257-a076-4325-ad62-ab5e7f57e2c1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Refactored\Execution &amp; 3D\Shaders\Resources\gl_R_shader">
       <UniqueIdentifier>{b78c2548-3b66-4839-8a06-b767341298c7}</UniqueIdentifier>
     </Filter>
     <Filter Include="dx9 to gl Utils">
       <UniqueIdentifier>{04c686d7-5f48-4735-9157-6b854b4eef34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations">
+      <UniqueIdentifier>{4e51ef7b-aea4-4bf5-98fe-db455495d8d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\RenderFactory">
+      <UniqueIdentifier>{04a8fda6-3646-4b44-8a3a-e726125049e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\LensFlare">
+      <UniqueIdentifier>{ad52f4f0-42b7-433c-aa06-6ab50307a016}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\FactoryPtr">
+      <UniqueIdentifier>{bd83057b-fe05-4671-9dcb-e52c5866614f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\ApplicationRender">
+      <UniqueIdentifier>{544c43d2-59ee-4924-bde9-d59a3641f526}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\RainRender">
+      <UniqueIdentifier>{f58d239e-7b11-475e-bf30-1957df1291cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\ThunderboltRender">
+      <UniqueIdentifier>{dbe02b4d-7ef7-4105-b69b-7f1c3148ee6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\EnvironmentRender">
+      <UniqueIdentifier>{01a1d6b3-0ba8-4ae8-a34c-a30dacbe41d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\ConsoleRender">
+      <UniqueIdentifier>{8ac2634b-748b-434a-95fd-fec0f0cea30f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\ObjectSpaceRender">
+      <UniqueIdentifier>{951b65e2-6ff3-47c2-b296-11fdedddf026}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\FontRender">
+      <UniqueIdentifier>{a7e92e40-fa9c-4f8a-817b-80cdcbcd60c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\WallMarkArray">
+      <UniqueIdentifier>{85ff2380-90de-45f1-a40e-b4de9c6cb3d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\StatGraphRender">
+      <UniqueIdentifier>{1be85d8b-65f6-4c69-b5e0-36d7d55ce09e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\ThunderboltDescRender">
+      <UniqueIdentifier>{b32a25a9-6a84-4d70-8b35-0c6ccb11a4c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\Debug">
+      <UniqueIdentifier>{98549a15-f51a-45df-94cf-e70f65dc1710}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\Debug\DebugRender">
+      <UniqueIdentifier>{edade213-ea95-434b-b390-eef302ff0656}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\UI">
+      <UniqueIdentifier>{c4675448-392c-4b22-96af-69c2b4234ed3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\UI\UIRender">
+      <UniqueIdentifier>{10302e2e-2647-4258-809e-e2da7adc48ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\UI\UIShader">
+      <UniqueIdentifier>{ef2c2dd3-ee9c-4443-82ea-ea858f535a93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\UI\UISequenceVideoItem">
+      <UniqueIdentifier>{db5c1b3c-e054-4fac-8997-8b2f61df5efc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\MSAARender">
+      <UniqueIdentifier>{b5644c37-6f04-44e4-8343-56fec645ad53}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -189,23 +183,8 @@
     <ClCompile Include="GLUtils.cpp">
       <Filter>Refactored\Execution &amp; 3D\DebugDraw</Filter>
     </ClCompile>
-    <ClCompile Include="glRenderFactory.cpp">
-      <Filter>Interface implementations\RenderFactory</Filter>
-    </ClCompile>
-    <ClCompile Include="glRenderDeviceRender.cpp">
-      <Filter>Interface implementations\RenderDeviceRender</Filter>
-    </ClCompile>
-    <ClCompile Include="glDebugRender.cpp">
-      <Filter>Interface implementations\Debug\DebugRender</Filter>
-    </ClCompile>
-    <ClCompile Include="glUIRender.cpp">
-      <Filter>Interface implementations\UI\UIRender</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\PSLibrary.cpp">
       <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="glEnvironmentRender.cpp">
-      <Filter>Interface implementations\EnvironmentRender</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FBasicVisual.cpp">
       <Filter>Refactored\Execution &amp; 3D\Visuals</Filter>
@@ -363,33 +342,6 @@
     <ClCompile Include="..\..\xrEngine\ai_script_lua_debug.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClCompile>
-    <ClCompile Include="glUIShader.cpp">
-      <Filter>Interface implementations\UI\UIShader</Filter>
-    </ClCompile>
-    <ClCompile Include="glStatsRender.cpp">
-      <Filter>Interface implementations\StatsRender</Filter>
-    </ClCompile>
-    <ClCompile Include="glApplicationRender.cpp">
-      <Filter>Interface implementations\ApplicationRender</Filter>
-    </ClCompile>
-    <ClCompile Include="glFontRender.cpp">
-      <Filter>Interface implementations\FontRender</Filter>
-    </ClCompile>
-    <ClCompile Include="glWallMarkArray.cpp">
-      <Filter>Interface implementations\WallMarkArray</Filter>
-    </ClCompile>
-    <ClCompile Include="glThunderboltRender.cpp">
-      <Filter>Interface implementations\ThunderboltRender</Filter>
-    </ClCompile>
-    <ClCompile Include="glThunderboltDescRender.cpp">
-      <Filter>Interface implementations\ThunderboltDescRender</Filter>
-    </ClCompile>
-    <ClCompile Include="glLensFlareRender.cpp">
-      <Filter>Interface implementations\LensFlare</Filter>
-    </ClCompile>
-    <ClCompile Include="glRainRender.cpp">
-      <Filter>Interface implementations\RainRender</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\DetailManager.cpp">
       <Filter>Details</Filter>
     </ClCompile>
@@ -443,9 +395,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRenderGL\glStateUtils.cpp">
       <Filter>dx9 to gl Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="glUISequenceVideoItem.cpp">
-      <Filter>Interface implementations\UI\UISequenceVideoItem</Filter>
     </ClCompile>
     <ClCompile Include="glr_constants.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
@@ -573,9 +522,6 @@
     <ClCompile Include="..\xrRender\FProgressive.cpp">
       <Filter>Models\Visuals</Filter>
     </ClCompile>
-    <ClCompile Include="glObjectSpaceRender.cpp">
-      <Filter>Interface implementations\ObjectSpaceRender</Filter>
-    </ClCompile>
     <ClCompile Include="gl_loader.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -657,6 +603,54 @@
     <ClCompile Include="..\xrRenderGL\glHW.cpp">
       <Filter>Refactored\HW</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRender\dxRenderFactory.cpp">
+      <Filter>Interface implementations\RenderFactory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxLensFlareRender.cpp">
+      <Filter>Interface implementations\LensFlare</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxApplicationRender.cpp">
+      <Filter>Interface implementations\ApplicationRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxRainRender.cpp">
+      <Filter>Interface implementations\RainRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxThunderboltRender.cpp">
+      <Filter>Interface implementations\ThunderboltRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxEnvironmentRender.cpp">
+      <Filter>Interface implementations\EnvironmentRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxConsoleRender.cpp">
+      <Filter>Interface implementations\ConsoleRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxObjectSpaceRender.cpp">
+      <Filter>Interface implementations\ObjectSpaceRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxFontRender.cpp">
+      <Filter>Interface implementations\FontRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxWallMarkArray.cpp">
+      <Filter>Interface implementations\WallMarkArray</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxStatGraphRender.cpp">
+      <Filter>Interface implementations\StatGraphRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxThunderboltDescRender.cpp">
+      <Filter>Interface implementations\ThunderboltDescRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxDebugRender.cpp">
+      <Filter>Interface implementations\Debug\DebugRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxUIRender.cpp">
+      <Filter>Interface implementations\UI\UIRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxUIShader.cpp">
+      <Filter>Interface implementations\UI\UIShader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxUISequenceVideoItem.cpp">
+      <Filter>Interface implementations\UI\UISequenceVideoItem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -671,38 +665,8 @@
     <ClInclude Include="GLUtils.h">
       <Filter>Refactored\Execution &amp; 3D\DebugDraw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\xrRender\RenderFactory.h">
-      <Filter>Interface implementations\RenderFactory</Filter>
-    </ClInclude>
-    <ClInclude Include="glRenderFactory.h">
-      <Filter>Interface implementations\RenderFactory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\xrRender\UIRender.h">
-      <Filter>Interface implementations\UI\UIRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\xrRender\DebugRender.h">
-      <Filter>Interface implementations\Debug\DebugRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\xrRender\RenderDeviceRender.h">
-      <Filter>Interface implementations\RenderDeviceRender</Filter>
-    </ClInclude>
-    <ClInclude Include="glRenderDeviceRender.h">
-      <Filter>Interface implementations\RenderDeviceRender</Filter>
-    </ClInclude>
-    <ClInclude Include="glDebugRender.h">
-      <Filter>Interface implementations\Debug\DebugRender</Filter>
-    </ClInclude>
-    <ClInclude Include="glUIRender.h">
-      <Filter>Interface implementations\UI\UIRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\xrRender\EnvironmentRender.h">
-      <Filter>Interface implementations\EnvironmentRender</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\PSLibrary.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="glEnvironmentRender.h">
-      <Filter>Interface implementations\EnvironmentRender</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\FBasicVisual.h">
       <Filter>Refactored\Execution &amp; 3D\Visuals</Filter>
@@ -869,60 +833,6 @@
     <ClInclude Include="..\xrRenderGL\glr_constants_cache.h">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources\gl_R_shader</Filter>
     </ClInclude>
-    <ClInclude Include="glUIShader.h">
-      <Filter>Interface implementations\UI\UIShader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\xrRender\UIShader.h">
-      <Filter>Interface implementations\UI\UIShader</Filter>
-    </ClInclude>
-    <ClInclude Include="glStatsRender.h">
-      <Filter>Interface implementations\StatsRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\xrRender\StatsRender.h">
-      <Filter>Interface implementations\StatsRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\xrRender\ApplicationRender.h">
-      <Filter>Interface implementations\ApplicationRender</Filter>
-    </ClInclude>
-    <ClInclude Include="glApplicationRender.h">
-      <Filter>Interface implementations\ApplicationRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\xrRender\FontRender.h">
-      <Filter>Interface implementations\FontRender</Filter>
-    </ClInclude>
-    <ClInclude Include="glFontRender.h">
-      <Filter>Interface implementations\FontRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\xrRender\WallMarkArray.h">
-      <Filter>Interface implementations\WallMarkArray</Filter>
-    </ClInclude>
-    <ClInclude Include="glWallMarkArray.h">
-      <Filter>Interface implementations\WallMarkArray</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\xrRender\ThunderboltRender.h">
-      <Filter>Interface implementations\ThunderboltRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\xrRender\ThunderboltDescRender.h">
-      <Filter>Interface implementations\ThunderboltDescRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\xrRender\LensFlareRender.h">
-      <Filter>Interface implementations\LensFlare</Filter>
-    </ClInclude>
-    <ClInclude Include="glThunderboltRender.h">
-      <Filter>Interface implementations\ThunderboltRender</Filter>
-    </ClInclude>
-    <ClInclude Include="glThunderboltDescRender.h">
-      <Filter>Interface implementations\ThunderboltDescRender</Filter>
-    </ClInclude>
-    <ClInclude Include="glLensFlareRender.h">
-      <Filter>Interface implementations\LensFlare</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\xrRender\RainRender.h">
-      <Filter>Interface implementations\RainRender</Filter>
-    </ClInclude>
-    <ClInclude Include="glRainRender.h">
-      <Filter>Interface implementations\RainRender</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\DetailManager.h">
       <Filter>Details</Filter>
     </ClInclude>
@@ -947,14 +857,8 @@
     <ClInclude Include="rgl.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\xrRender\UISequenceVideoItem.h">
-      <Filter>Interface implementations\UI\UISequenceVideoItem</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRenderGL\glStateUtils.h">
       <Filter>dx9 to gl Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="glUISequenceVideoItem.h">
-      <Filter>Interface implementations\UI\UISequenceVideoItem</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\QueryHelper.h">
       <Filter>Core</Filter>
@@ -1058,12 +962,6 @@
     <ClInclude Include="..\xrRender\FProgressive.h">
       <Filter>Models\Visuals</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\xrRender\ObjectSpaceRender.h">
-      <Filter>Interface implementations\ObjectSpaceRender</Filter>
-    </ClInclude>
-    <ClInclude Include="glObjectSpaceRender.h">
-      <Filter>Interface implementations\ObjectSpaceRender</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRenderGL\glState.h">
       <Filter>StateManager</Filter>
     </ClInclude>
@@ -1081,6 +979,108 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\HW.h">
       <Filter>Refactored\HW</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\RenderFactory.h">
+      <Filter>Interface implementations\RenderFactory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxRenderFactory.h">
+      <Filter>Interface implementations\RenderFactory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\LensFlareRender.h">
+      <Filter>Interface implementations\LensFlare</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxLensFlareRender.h">
+      <Filter>Interface implementations\LensFlare</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\FactoryPtr.h">
+      <Filter>Interface implementations\FactoryPtr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\ApplicationRender.h">
+      <Filter>Interface implementations\ApplicationRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxApplicationRender.h">
+      <Filter>Interface implementations\ApplicationRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\RainRender.h">
+      <Filter>Interface implementations\RainRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxRainRender.h">
+      <Filter>Interface implementations\RainRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\ThunderboltRender.h">
+      <Filter>Interface implementations\ThunderboltRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxThunderboltRender.h">
+      <Filter>Interface implementations\ThunderboltRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\EnvironmentRender.h">
+      <Filter>Interface implementations\EnvironmentRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxEnvironmentRender.h">
+      <Filter>Interface implementations\EnvironmentRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\ConsoleRender.h">
+      <Filter>Interface implementations\ConsoleRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxConsoleRender.h">
+      <Filter>Interface implementations\ConsoleRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\ObjectSpaceRender.h">
+      <Filter>Interface implementations\ObjectSpaceRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxObjectSpaceRender.h">
+      <Filter>Interface implementations\ObjectSpaceRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\FontRender.h">
+      <Filter>Interface implementations\FontRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxFontRender.h">
+      <Filter>Interface implementations\FontRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h">
+      <Filter>Interface implementations\WallMarkArray</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxWallMarkArray.h">
+      <Filter>Interface implementations\WallMarkArray</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\StatGraphRender.h">
+      <Filter>Interface implementations\StatGraphRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxStatGraphRender.h">
+      <Filter>Interface implementations\StatGraphRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\ThunderboltDescRender.h">
+      <Filter>Interface implementations\ThunderboltDescRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxThunderboltDescRender.h">
+      <Filter>Interface implementations\ThunderboltDescRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\DebugShader.h">
+      <Filter>Interface implementations\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\DebugRender.h">
+      <Filter>Interface implementations\Debug\DebugRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxDebugRender.h">
+      <Filter>Interface implementations\Debug\DebugRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\UIRender.h">
+      <Filter>Interface implementations\UI\UIRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxUIRender.h">
+      <Filter>Interface implementations\UI\UIRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\UIShader.h">
+      <Filter>Interface implementations\UI\UIShader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxUIShader.h">
+      <Filter>Interface implementations\UI\UIShader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\UISequenceVideoItem.h">
+      <Filter>Interface implementations\UI\UISequenceVideoItem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxUISequenceVideoItem.h">
+      <Filter>Interface implementations\UI\UISequenceVideoItem</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
