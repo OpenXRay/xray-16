@@ -13,9 +13,9 @@
 ///////////////////////////////////////////////////////////////
 #pragma warning(disable:4995)
 #pragma warning(disable:4267)
-#include "3rd party/ode/ode/src/collision_kernel.h"
-#include "3rd party/ode/ode/src/joint.h"
-#include "3rd party/ode/ode/src/objects.h"
+#include "ODE/ode/src/collision_kernel.h"
+#include "ODE/ode/src/joint.h"
+#include "ODE/ode/src/objects.h"
 #pragma warning(default:4267)
 #pragma warning(default:4995)
 

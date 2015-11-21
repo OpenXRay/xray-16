@@ -1,6 +1,6 @@
 
 
-#include "3rd party/ode/include/ode/common.h"
+#include "ODE/include/ode/common.h"
 
 /* Class ID */
 
