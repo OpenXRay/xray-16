@@ -1,11 +1,12 @@
 // xrRender_GL.cpp : Defines the entry point for the DLL application.
 //
 #include "stdafx.h"
-#include "glRenderFactory.h"
-#include "glUIRender.h"
-#include "glDebugRender.h"
+#include "Layers/xrRender/dxRenderFactory.h"
+#include "Layers/xrRender/dxUIRender.h"
+#include "Layers/xrRender/dxDebugRender.h"
 
-#pragma comment(lib,"xrEngine.lib")
+#pragma comment(lib, "xrEngine.lib")
+#pragma comment(lib, "xrScriptEngine.lib")
 
 BOOL APIENTRY DllMain( HANDLE hModule, 
                        DWORD  ul_reason_for_call, 
@@ -17,13 +18,13 @@ BOOL APIENTRY DllMain( HANDLE hModule,
 	case DLL_PROCESS_ATTACH	:
 		//	Can't call CreateDXGIFactory from DllMain
 		//if (!xrRender_test_hw())	return FALSE;
-		::Render					= &RImplementation;
-		::RenderFactory				= &RenderFactoryImpl;
-		::DU						= &DUImpl;
-		//::vid_mode_token			= filled by glRenderDeviceRender
-		UIRender					= &UIRenderImpl;
+		GlobalEnv.Render					= &RImplementation;
+		GlobalEnv.RenderFactory				= &RenderFactoryImpl;
+		GlobalEnv.DU						= &DUImpl;
+		//GlobalEnv.vid_mode_token			= inited by HW;
+        GlobalEnv.UIRender					= &UIRenderImpl;
 #ifdef DEBUG
-		DRender						= &DebugRenderImpl;
+        GlobalEnv.DRender						= &DebugRenderImpl;
 #endif	//	DEBUG
 		xrRender_initconsole		();
 		break	;

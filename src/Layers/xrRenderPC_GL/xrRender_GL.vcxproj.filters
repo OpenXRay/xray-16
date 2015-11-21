@@ -654,6 +654,9 @@
     <ClCompile Include="..\xrRender\doug_lea_memory_allocator.c">
       <Filter>Core\memory</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRenderGL\glHW.cpp">
+      <Filter>Refactored\HW</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -1075,6 +1078,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\doug_lea_memory_allocator.h">
       <Filter>Core\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\HW.h">
+      <Filter>Refactored\HW</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
