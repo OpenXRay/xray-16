@@ -125,6 +125,10 @@ void CHW::CreateDevice( HWND hWnd, bool move_window )
 	CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
 #endif // DEBUG
 
+	// Clip control ensures compatibility with D3D device coordinates.
+	// TODO: Fix these differences in the blenders/shaders.
+	CHK_GL(glClipControl(GL_UPPER_LEFT, GL_ZERO_TO_ONE));
+
 #ifndef _EDITOR
 	updateWindowProps							(m_hWnd);
 	fill_vid_mode_list							(this);
