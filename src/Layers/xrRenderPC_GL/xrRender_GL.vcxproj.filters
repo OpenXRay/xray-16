@@ -7,9 +7,6 @@
     <Filter Include="Core">
       <UniqueIdentifier>{53cb24d7-0c59-4f77-bcca-6f082e40124a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\memory">
-      <UniqueIdentifier>{146e9dbb-6558-447e-92f5-28b6b851e62e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Details">
       <UniqueIdentifier>{9cc9c9a1-1877-43a6-8427-7268cdf2e452}</UniqueIdentifier>
     </Filter>
@@ -221,9 +218,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\TextureDescrManager.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
-    </ClCompile>
-    <ClCompile Include="glTexture.cpp">
-      <Filter>Core\memory</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\ETextureParams.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
@@ -597,9 +591,6 @@
     <ClCompile Include="..\xrRender\Light_Render_Direct.cpp">
       <Filter>Lights</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\doug_lea_memory_allocator.c">
-      <Filter>Core\memory</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRenderGL\glHW.cpp">
       <Filter>Refactored\HW</Filter>
     </ClCompile>
@@ -650,6 +641,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\dxUISequenceVideoItem.cpp">
       <Filter>Interface implementations\UI\UISequenceVideoItem</Filter>
+    </ClCompile>
+    <ClCompile Include="glTexture.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -863,9 +857,6 @@
     <ClInclude Include="..\xrRender\QueryHelper.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\r__dsgraph_structure.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\r__dsgraph_types.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -974,9 +965,6 @@
     <ClInclude Include="..\xrRender\Light_Render_Direct.h">
       <Filter>Lights</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\doug_lea_memory_allocator.h">
-      <Filter>Core\memory</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\HW.h">
       <Filter>Refactored\HW</Filter>
     </ClInclude>
@@ -1081,6 +1069,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\dxUISequenceVideoItem.h">
       <Filter>Interface implementations\UI\UISequenceVideoItem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\D3DXRenderBase.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
