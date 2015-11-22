@@ -308,7 +308,7 @@ void CRender::render_sun				()
 	// calculate view-frustum bounds in world space
 	Fmatrix	ex_project, ex_full, ex_full_inverse;
 	{
-		float _far_	= min(OLES_SUN_LIMIT_27_01_07, g_pGamePersistent->Environment().CurrentEnv->far_plane);
+		float _far_	= std::min(OLES_SUN_LIMIT_27_01_07, g_pGamePersistent->Environment().CurrentEnv->far_plane);
 		//ex_project.build_projection	(deg2rad(Device.fFOV/* *Device.fASPECT*/),Device.fASPECT,ps_r2_sun_near,_far_);	
 		ex_project.build_projection	(deg2rad(Device.fFOV/* *Device.fASPECT*/),Device.fASPECT,VIEWPORT_NEAR,_far_);
 		//VIEWPORT_NEAR
@@ -478,8 +478,8 @@ void CRender::render_sun				()
 		//  all shadow casters are in front of the near plane.
 		D3DXVECTOR2	depthbounds = BuildTSMProjectionMatrix_caster_depth_bounds	(lightSpaceBasis);
 
-		float min_z = min( depthbounds.x, frustumBox.minPt.z );
-		float max_z = max( depthbounds.y, frustumBox.maxPt.z );
+		float min_z = std::min( depthbounds.x, frustumBox.minPt.z );
+		float max_z = std::max( depthbounds.y, frustumBox.maxPt.z );
 
 		if ( min_z <= 1.f )	//?
 		{
@@ -537,8 +537,8 @@ void CRender::render_sun				()
 
 		BoundingBox frustumAABB2D( frustumPnts, sizeof(frustumPnts)/sizeof(D3DXVECTOR3) );
 
-		float x_scale = max( _abs(frustumAABB2D.maxPt.x), _abs(frustumAABB2D.minPt.x) );
-		float y_scale = max( _abs(frustumAABB2D.maxPt.y), _abs(frustumAABB2D.minPt.y) );
+		float x_scale = std::max( _abs(frustumAABB2D.maxPt.x), _abs(frustumAABB2D.minPt.x) );
+		float y_scale = std::max( _abs(frustumAABB2D.maxPt.y), _abs(frustumAABB2D.minPt.y) );
 		x_scale = 1.f/x_scale;
 		y_scale = 1.f/y_scale;
 
@@ -576,8 +576,8 @@ void CRender::render_sun				()
 			float x_dist = tmp.x - projectionPtQ.x;
 			if ( !(ALMOST_ZERO(tmp.y) || ALMOST_ZERO(x_dist)))
 			{
-				max_slope = max(max_slope, tmp.y/x_dist);
-				min_slope = min(min_slope, tmp.y/x_dist);
+				max_slope = std::max(max_slope, tmp.y/x_dist);
+				min_slope = std::min(min_slope, tmp.y/x_dist);
 			}
 		}
 
