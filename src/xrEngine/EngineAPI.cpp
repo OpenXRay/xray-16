@@ -55,9 +55,23 @@ bool is_enough_address_space_available()
 
 void CEngineAPI::InitializeNotDedicated()
 {
+    LPCSTR gl_name = "xrRender_GL";
     LPCSTR r2_name = "xrRender_R2";
     LPCSTR r3_name = "xrRender_R3";
     LPCSTR r4_name = "xrRender_R4";
+
+    if (psDeviceFlags.test(rsGL))
+    {
+        // try to initialize GL
+        Log("Loading DLL:", gl_name);
+        hRender = LoadLibrary(gl_name);
+        if (0 == hRender)
+        {
+            // try to load R1
+            Msg("! ...Failed - incompatible hardware.");
+            psDeviceFlags.set(rsR2, TRUE);
+        }
+    }
 
     if (psDeviceFlags.test(rsR4))
     {
@@ -192,17 +206,20 @@ void CEngineAPI::CreateRendererList()
 #else
     // TODO: ask renderers if they are supported!
     if (vid_quality_token != NULL) return;
+    bool bSupports_gl = false;
     bool bSupports_r2 = false;
     bool bSupports_r2_5 = false;
     bool bSupports_r3 = false;
     bool bSupports_r4 = false;
 
+    LPCSTR gl_name = "xrRender_GL";
     LPCSTR r2_name = "xrRender_R2";
     LPCSTR r3_name = "xrRender_R3";
     LPCSTR r4_name = "xrRender_R4";
 
     if (strstr(Core.Params, "-perfhud_hack"))
     {
+        bSupports_gl = true;
         bSupports_r2 = true;
         bSupports_r2_5 = true;
         bSupports_r3 = true;
@@ -249,6 +266,15 @@ void CEngineAPI::CreateRendererList()
             SupportsDX11Rendering* test_dx11_rendering = (SupportsDX11Rendering*)GetProcAddress(hRender, "SupportsDX11Rendering");
             R_ASSERT(test_dx11_rendering);
             bSupports_r4 = test_dx11_rendering();
+            FreeLibrary(hRender);
+        }
+
+        // try to initialize GL
+        Log("Loading DLL:", gl_name);
+        hRender = LoadLibrary(gl_name);
+        if (hRender)
+        {
+            bSupports_gl = true;
             FreeLibrary(hRender);
         }
     }
@@ -310,6 +336,10 @@ void CEngineAPI::CreateRendererList()
         if (bBreakLoop) break;
         _tmp.back() = xr_strdup(val);
     }
+
+    if (bSupports_gl)
+        _tmp.push_back("renderer_gl");
+
     u32 _cnt = _tmp.size() + 1;
     vid_quality_token = xr_alloc<xr_token>(_cnt);
 
