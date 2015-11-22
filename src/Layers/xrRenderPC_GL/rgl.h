@@ -23,73 +23,60 @@
 
 class dxRender_Visual;
 
-class CGlow : public IRender_Glow
-{
-public:
-	bool				bActive;
-public:
-	CGlow() : bActive(false)		{ }
-	virtual void					set_active(bool b)					{ bActive = b; }
-	virtual bool					get_active()							{ return bActive; }
-	virtual void					set_position(const Fvector& P)			{ }
-	virtual void					set_direction(const Fvector& D)			{ }
-	virtual void					set_radius(float R)					{ }
-	virtual void					set_texture(LPCSTR name)				{ }
-	virtual void					set_color(const Fcolor& C)			{ }
-	virtual void					set_color(float r, float g, float b)	{ }
-};
-
-class CRender	:	public R_dsgraph_structure
+class CRender	:	public D3DXRenderBase
 {
 public:
 	enum
 	{
-		PHASE_NORMAL = 0,	// E[0]
-		PHASE_SMAP = 1,	// E[1]
+		PHASE_NORMAL	= 0,	// E[0]
+		PHASE_SMAP		= 1,	// E[1]
 	};
 
+public:
 	struct		_options	{
-		u32		bug : 1;
+		u32		bug					: 1;
 
-		u32		ssao_blur_on : 1;
-		u32		ssao_opt_data : 1;
-		u32		ssao_half_data : 1;
-		u32		ssao_hbao : 1;
-		u32		ssao_hdao : 1;
+		u32		ssao_blur_on		: 1;
+		u32		ssao_opt_data		: 1;
+		u32		ssao_half_data		: 1;
+		u32		ssao_hbao			: 1;
+		u32		ssao_hdao			: 1;
+		u32		hbao_vectorized		: 1;
 
-		u32		smapsize : 16;
-		u32		depth16 : 1;
-		u32		mrt : 1;
-		u32		mrtmixdepth : 1;
-		u32		fp16_filter : 1;
-		u32		fp16_blend : 1;
-		u32		albedo_wo : 1;						// work-around albedo on less capable HW
-		u32		HW_smap : 1;
-		u32		HW_smap_PCF : 1;
-		u32		HW_smap_FETCH4 : 1;
+		u32		smapsize			: 16;
+		u32		depth16				: 1;
+		u32		mrt					: 1;
+		u32		mrtmixdepth			: 1;
+		u32		fp16_filter			: 1;
+		u32		fp16_blend			: 1;
+		u32		albedo_wo			: 1;						// work-around albedo on less capable HW
+		u32		HW_smap				: 1;
+		u32		HW_smap_PCF			: 1;
+		u32		HW_smap_FETCH4		: 1;
 
-		u32		HW_smap_FORMAT : 32;
+		u32		HW_smap_FORMAT		: 32;
 
-		u32		nvstencil : 1;
-		u32		nvdbt : 1;
+		u32		nvstencil			: 1;
+		u32		nvdbt				: 1;
 
-		u32		nullrt : 1;
+		u32		nullrt				: 1;
 
-		u32		distortion : 1;
-		u32		distortion_enabled : 1;
-		u32		mblur : 1;
+		u32		distortion			: 1;
+		u32		distortion_enabled	: 1;
+		u32		mblur				: 1;
 
-		u32		sunfilter : 1;
-		u32		sunstatic : 1;
-		u32		sjitter : 1;
-		u32		noshadows : 1;
-		u32		Tshadows : 1;						// transluent shadows
-		u32		disasm : 1;
-		u32		advancedpp : 1;	//	advanced post process (DOF, SSAO, volumetrics, etc.)
+		u32		sunfilter			: 1;
+		u32		sunstatic			: 1;
+		u32		sjitter				: 1;
+		u32		noshadows			: 1;
+		u32		Tshadows			: 1;						// transluent shadows
+		u32		disasm				: 1;
+		u32		advancedpp			: 1;	//	advanced post process (DOF, SSAO, volumetrics, etc.)
+		u32		volumetricfog		: 1;
 
-		u32		forcegloss : 1;
-		u32		forceskinw : 1;
-		float	forcegloss_v;
+		u32		forcegloss			: 1;
+		u32		forceskinw			: 1;
+		float	forcegloss_v		;
 	}			o;
 	struct		_stats		{
 		u32		l_total, l_visible;
@@ -142,11 +129,6 @@ public:
 	float							o_sun;
 	GLsync							q_sync_point[CHWCaps::MAX_GPUS];
 	u32								q_sync_count;
-
-	// HW Support
-	GLuint							pBaseZB;
-	CHWCaps							Caps;
-	glRenderDeviceRender*			pDevice;
 
 private:
 	// Loading / Unloading
@@ -236,10 +218,10 @@ public:
 
 public:
 	// feature level
-	virtual	GenerationLevel			get_generation() { return IRender_interface::GENERATION_R2; };
+	virtual	GenerationLevel			get_generation() { return IRender::GENERATION_R2; };
 
 	virtual bool					is_sun_static() { return o.sunstatic; };
-	virtual DWORD					get_dx_level() { return 0x00000000; };
+	virtual DWORD					get_dx_level() { return 0x00090000; };
 
 	// Loading / Unloading
 	virtual	void					create();
