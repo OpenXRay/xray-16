@@ -72,11 +72,22 @@ struct ECORE_API	R_constant_load
 	u16						index;		// linear index (pixel)
 	u16						cls;		// element class
 
+#ifdef USE_OGL
+	GLuint					location;
+	GLuint					program;
+
+	R_constant_load() : index(u16(-1)), cls(u16(-1)), location(0), program(0) {};
+#else
 	R_constant_load() : index(u16(-1)), cls(u16(-1)) {};
+#endif // USE_OGL
 
 	IC BOOL					equal		(R_constant_load& C)
 	{
-		return (index==C.index) && (cls == C.cls);
+#ifdef USE_OGL
+		return (index == C.index) && (cls == C.cls) && (location == C.location) && (program == C.program);
+#else
+		return (index == C.index) && (cls == C.cls);
+#endif // USE_OGL
 	}
 };
 

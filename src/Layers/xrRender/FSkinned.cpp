@@ -376,7 +376,7 @@ void CSkeletonX_PM::Load(const char* N, IReader *data, u32 dwFlags)
 	void*	_verts_					= data->pointer	();
 	inherited1::Load				(N,data,dwFlags|VLOAD_NOVERTICES);
 	GlobalEnv.Render->shader_option_skinning(-1);
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	_DuplicateIndices(N, data);
 #endif	//	USE_DX10
 	vBase							= 0;
@@ -388,14 +388,14 @@ void CSkeletonX_ST::Load(const char* N, IReader *data, u32 dwFlags)
 	void*	_verts_					= data->pointer	();
 	inherited1::Load				(N,data,dwFlags|VLOAD_NOVERTICES);
 	GlobalEnv.Render->shader_option_skinning(-1);
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	_DuplicateIndices(N, data);
 #endif	//	USE_DX10
 	vBase							= 0;
 	_Load_hw						(*this,_verts_);
 }
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 
 void CSkeletonX_ext::_Load_hw	(Fvisual& V, void *	_verts_)
 {

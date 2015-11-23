@@ -794,7 +794,7 @@ void D3DXRenderBase::DestroyHW()
 
 void  D3DXRenderBase::Reset(HWND hWnd, u32 &dwWidth, u32 &dwHeight, float &fWidth_2, float &fHeight_2)
 {
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(USE_OGL)
 	_SHOW_REF("*ref -CRenderDevice::ResetTotal: DeviceREF:",HW.pDevice);
 #endif // DEBUG	
 
@@ -802,7 +802,10 @@ void  D3DXRenderBase::Reset(HWND hWnd, u32 &dwWidth, u32 &dwHeight, float &fWidt
 	Memory.mem_compact		();
 	HW.Reset				(hWnd);
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_OGL)
+	dwWidth					= psCurrentVidMode[0];
+	dwHeight				= psCurrentVidMode[1];
+#elif defined(USE_DX10) || defined(USE_DX11)
 	dwWidth					= HW.m_ChainDesc.BufferDesc.Width;
 	dwHeight				= HW.m_ChainDesc.BufferDesc.Height;
 #else	//	USE_DX10
@@ -814,7 +817,7 @@ void  D3DXRenderBase::Reset(HWND hWnd, u32 &dwWidth, u32 &dwHeight, float &fWidt
 	fHeight_2				= float(dwHeight/2);
 	Resources->reset_end	();
 
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(USE_OGL)
 	_SHOW_REF("*ref +CRenderDevice::ResetTotal: DeviceREF:",HW.pDevice);
 #endif // DEBUG
 }
@@ -822,7 +825,7 @@ void  D3DXRenderBase::Reset(HWND hWnd, u32 &dwWidth, u32 &dwHeight, float &fWidt
 void D3DXRenderBase::SetupStates()
 {
     HW.Caps.Update();
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     //	TODO: DX10: Implement Resetting of render states into default mode
     //VERIFY(!"D3DXRenderBase::SetupStates not implemented.");
 #else	//	USE_DX10
@@ -887,7 +890,10 @@ void D3DXRenderBase::Create(HWND hWnd, u32 &dwWidth, u32 &dwHeight,
     float &fWidth_2, float &fHeight_2, bool move_window)
 {
 	HW.CreateDevice(hWnd, move_window);
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_OGL)
+	dwWidth = psCurrentVidMode[0];
+	dwHeight = psCurrentVidMode[1];
+#elif defined(USE_DX10) || defined(USE_DX11)
 	dwWidth = HW.m_ChainDesc.BufferDesc.Width;
 	dwHeight = HW.m_ChainDesc.BufferDesc.Height;
 #else
@@ -908,7 +914,7 @@ void D3DXRenderBase::SetupGPU(bool bForceGPU_SW, bool bForceGPU_NonPure, bool bF
 
 void D3DXRenderBase::overdrawBegin()
 {
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	//	TODO: DX10: Implement overdrawBegin
 	VERIFY(!"D3DXRenderBase::overdrawBegin not implemented.");
 #else
@@ -930,7 +936,7 @@ void D3DXRenderBase::overdrawBegin()
 
 void D3DXRenderBase::overdrawEnd()
 {
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	// TODO: DX10: Implement overdrawEnd
 	VERIFY(!"D3DXRenderBase::overdrawBegin not implemented.");
 #else
@@ -983,7 +989,7 @@ void D3DXRenderBase::ResourcesDumpMemoryUsage()
 DeviceState D3DXRenderBase::GetDeviceState()
 {
 	HW.Validate();
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	//	TODO: DX10: Implement GetDeviceState
 	//	TODO: DX10: Implement DXGI_PRESENT_TEST testing
 	//VERIFY(!"D3DXRenderBase::overdrawBegin not implemented.");
@@ -1010,7 +1016,7 @@ u32 D3DXRenderBase::GetCacheStatPolys()
 
 void D3DXRenderBase::Begin()
 {
-#if !defined(USE_DX10) && !defined(USE_DX11)
+#if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
 	CHK_DX(HW.pDevice->BeginScene());
 #endif
 	RCache.OnFrameBegin();
@@ -1045,7 +1051,9 @@ void D3DXRenderBase::End()
 	RCache.OnFrameEnd();
 	Memory.dbg_check();
 	DoAsyncScreenshot();
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_OGL)
+	SwapBuffers(HW.m_hDC);
+#elif defined(USE_DX10) || defined(USE_DX11)
 	HW.m_pSwapChain->Present(0, 0);
 #else
 	CHK_DX(HW.pDevice->EndScene());

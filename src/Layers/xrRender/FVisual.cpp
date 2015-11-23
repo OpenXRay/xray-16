@@ -20,8 +20,10 @@ Fvisual::Fvisual()  : dxRender_Visual()
 
 Fvisual::~Fvisual()
 {
+#ifndef USE_OGL
  	HW.stats_manager.decrement_stats_vb	(p_rm_Vertices);
  	HW.stats_manager.decrement_stats_ib	(p_rm_Indices);
+#endif // !USE_OGL
 	xr_delete	(m_fast);
 }
 

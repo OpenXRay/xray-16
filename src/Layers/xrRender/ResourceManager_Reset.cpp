@@ -15,7 +15,11 @@ void	CResourceManager::reset_begin			()
 
 	// destroy state-blocks
 	for (u32 _it=0; _it<v_states.size(); _it++)
+#ifdef USE_OGL
+		v_states[_it]->state.Release();
+#else
 		_RELEASE(v_states[_it]->state);
+#endif // USE_OGL
 
 	// destroy RTs
 	for (map_RTIt rt_it=m_rtargets.begin(); rt_it!=m_rtargets.end(); rt_it++)
@@ -24,9 +28,13 @@ void	CResourceManager::reset_begin			()
 //	DX10 cut 		rtc_it->second->reset_begin();
 
 	// destroy DStreams
- 	RCache.old_QuadIB					= RCache.QuadIB;
-	HW.stats_manager.decrement_stats_ib	(RCache.QuadIB);
- 	_RELEASE							(RCache.QuadIB);
+ 	RCache.old_QuadIB = RCache.QuadIB;
+#ifdef USE_OGL
+	glDeleteBuffers(1, &RCache.QuadIB);
+#else
+	HW.stats_manager.decrement_stats_ib(RCache.QuadIB);
+	_RELEASE(RCache.QuadIB);
+#endif // USE_OGL
 
 	RCache.Index.reset_begin	();
 	RCache.Vertex.reset_begin	();
@@ -86,7 +94,9 @@ void	CResourceManager::reset_end				()
 	// create state-blocks
 	{
 		for (u32 _it=0; _it<v_states.size(); _it++)
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_OGL)
+			v_states[_it]->state_code.record(v_states[_it]->state);
+#elif defined(USE_DX10) || defined(USE_DX11)
 			v_states[_it]->state = ID3DState::Create(v_states[_it]->state_code);
 #else	//	USE_DX10
 			v_states[_it]->state = v_states[_it]->state_code.record();
