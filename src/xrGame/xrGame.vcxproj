@@ -1358,10 +1358,6 @@
     <ClInclude Include="script_binder_object_wrapper.h" />
     <ClInclude Include="script_bind_macroses.h" />
     <ClInclude Include="script_callback_ex.h" />
-    <ClInclude Include="script_callback_ex_generators.h" />
-    <ClInclude Include="script_callback_ex_inline.h" />
-    <ClInclude Include="script_callback_ex_nonvoid.h" />
-    <ClInclude Include="script_callback_ex_void.h" />
     <ClInclude Include="script_effector.h" />
     <ClInclude Include="script_effector_inline.h" />
     <ClInclude Include="script_effector_wrapper.h" />
