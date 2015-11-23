@@ -65,7 +65,7 @@ CGameMtlLibrary::CGameMtlLibrary()
 {
     material_index = 0;
     material_pair_index = 0;
-#ifndef _EDITOR
+#if !defined(_EDITOR) && !defined(GM_NON_GAME)
     GlobalEnv.PGMLib = &GMLib;
 #endif
 }
