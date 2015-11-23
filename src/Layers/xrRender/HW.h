@@ -58,7 +58,10 @@ public:
 #if defined(USE_OGL)
 public:
 	CHW*					pDevice;
+	GLuint					pBaseRT;
 	GLuint					pBaseZB;
+	GLuint					pFB;
+	GLuint					pPP;
 
 	CHWCaps					Caps;
 
@@ -128,6 +131,12 @@ public:
 	virtual	void	OnAppActivate();
 	virtual void	OnAppDeactivate();
 #endif
+#ifdef USE_OGL
+	// TODO: OGL: Implement this into a compatibility layer?
+	void ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[4]);
+	void ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT Depth, UINT8 Stencil);
+#endif // USE_OGL
+
 
 private:
 	bool					m_move_window;

@@ -38,7 +38,10 @@ CHW::CHW() :
 	m_hRC(NULL),
 	pDevice(this),
 	m_move_window(true),
-	pBaseZB(0)
+	pBaseRT(0),
+	pBaseZB(0),
+	pPP(0),
+	pFB(0)
 {
 }
 
@@ -129,6 +132,9 @@ void CHW::CreateDevice( HWND hWnd, bool move_window )
 	// TODO: Fix these differences in the blenders/shaders.
 	CHK_GL(glClipControl(GL_UPPER_LEFT, GL_ZERO_TO_ONE));
 
+	//	Create render target and depth-stencil views here
+	UpdateViews();
+
 #ifndef _EDITOR
 	updateWindowProps							(m_hWnd);
 	fill_vid_mode_list							(this);
@@ -168,7 +174,11 @@ void CHW::Reset (HWND hwnd)
 {
 	BOOL	bWindowed		= !psDeviceFlags.is	(rsFullscreen);
 
-	CHK_GL(glDeleteTextures(1, &HW.pBaseZB));
+	CHK_GL(glDeleteProgramPipelines(1, &pPP));
+	CHK_GL(glDeleteFramebuffers(1, &pFB));
+
+	CHK_GL(glDeleteTextures(1, &pBaseRT));
+	CHK_GL(glDeleteTextures(1, &pBaseZB));
 
 	UpdateViews();
 
@@ -322,9 +332,57 @@ void fill_vid_mode_list()
 
 void CHW::UpdateViews()
 {
-	// Create an staging depth buffer used for post-processing
+	// Create the program pipeline used for rendering with shaders
+	glGenProgramPipelines(1, &pPP);
+	CHK_GL(glBindProgramPipeline(pPP));
+
+	// Create the framebuffer
+	glGenFramebuffers(1, &pFB);
+	CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, pFB));
+
+	// Create a render target view
+	// We reserve a texture name to represent GL_BACK
+	glGenTextures(1, &HW.pBaseRT);
+
+	// Create Depth/stencil buffer
 	glGenTextures(1, &HW.pBaseZB);
 	CHK_GL(glBindTexture(GL_TEXTURE_2D, HW.pBaseZB));
 	CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, Device.dwWidth, Device.dwHeight));
+}
+
+
+void CHW::ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[4])
+{
+	// TODO: OGL: Bind the RT to a clear frame buffer.
+	glPushAttrib(GL_COLOR_BUFFER_BIT);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	glClearColor(ColorRGBA[0], ColorRGBA[1], ColorRGBA[2], ColorRGBA[3]);
+	CHK_GL(glClear(GL_COLOR_BUFFER_BIT));
+	glPopAttrib();
+}
+
+void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT Depth, UINT8 Stencil)
+{
+	// TODO: OGL: Bind the DS to a clear frame buffer.
+	u32 mask = 0;
+	if (ClearFlags & D3D_CLEAR_DEPTH)
+		mask |= (u32)GL_DEPTH_BUFFER_BIT;
+	if (ClearFlags & D3D_CLEAR_STENCIL)
+		mask |= (u32)GL_STENCIL_BUFFER_BIT;
+
+
+	glPushAttrib((AttribMask)mask);
+	if (ClearFlags & D3DCLEAR_ZBUFFER)
+	{
+		glDepthMask(GL_TRUE);
+		glClearDepthf(Depth);
+	}
+	if (ClearFlags & D3DCLEAR_STENCIL)
+	{
+		glStencilMask(~0);
+		glClearStencil(Stencil);
+	}
+	CHK_GL(glClear((ClearBufferMask)mask));
+	glPopAttrib();
 }
 #endif

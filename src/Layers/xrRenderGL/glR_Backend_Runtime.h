@@ -4,29 +4,11 @@
 
 #include "glStateUtils.h"
 
-IC	GLuint CBackend::get_FB()
-{
-	return pFB;
-}
-
 IC void		CBackend::set_xform(u32 ID, const Fmatrix& M)
 {
 	stat.xforms++;
 	//	TODO: OGL: Implement CBackend::set_xform
 	//VERIFY(!"Implement CBackend::set_xform");
-}
-
-IC void	CBackend::set_FB(GLuint FB)
-{
-	if (FB != pFB)
-	{
-		PGO(Msg("PGO:set_FB"));
-		pFB = FB;
-		CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, pFB));
-
-		// Clear cached attachments
-		pRT[0] = pRT[1] = pRT[2] = pRT[3] = pZB = NULL;
-	}
 }
 
 IC void CBackend::set_RT(GLuint RT, u32 ID)
@@ -76,7 +58,7 @@ ICF void CBackend::set_PS(GLuint _ps, LPCSTR _n)
 		PGO(Msg("PGO:Pshader:%d,%s", _ps, _n ? _n : name));
 		stat.ps++;
 		ps = _ps;
-		CHK_GL(glUseProgramStages(pp, GL_FRAGMENT_SHADER_BIT, ps));
+		CHK_GL(glUseProgramStages(HW.pPP, GL_FRAGMENT_SHADER_BIT, ps));
 #ifdef DEBUG
 		ps_name = _n;
 #endif
@@ -92,7 +74,7 @@ ICF void CBackend::set_VS(GLuint _vs, LPCSTR _n)
 		PGO(Msg("PGO:Vshader:%d,%s", _vs, _n ? _n : name));
 		stat.vs++;
 		vs = _vs;
-		CHK_GL(glUseProgramStages(pp, GL_VERTEX_SHADER_BIT, vs));
+		CHK_GL(glUseProgramStages(HW.pPP, GL_VERTEX_SHADER_BIT, vs));
 #ifdef DEBUG
 		vs_name = _n;
 #endif
@@ -179,7 +161,6 @@ ICF void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV,
 	stat.verts += countV;
 	stat.polys += PC;
 	constants.flush();
-	CHK_GL(glBindProgramPipeline(pp));
 	CHK_GL(glDrawElementsBaseVertex(Topology, iIndexCount, GL_UNSIGNED_SHORT, (void*)(startI * sizeof(GLushort)), baseV));
 	PGO(Msg("PGO:DIP:%dv/%df", countV, PC));
 }
@@ -193,7 +174,6 @@ ICF void CBackend::Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC)
 	stat.verts += iIndexCount;
 	stat.polys += PC;
 	constants.flush();
-	CHK_GL(glBindProgramPipeline(pp));
 	CHK_GL(glDrawArrays(Topology, startV, iIndexCount));
 	PGO(Msg("PGO:DIP:%dv/%df", iIndexCount, PC));
 }

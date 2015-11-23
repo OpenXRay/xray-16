@@ -161,10 +161,6 @@ void CBackend::OnDeviceCreate	()
 #if defined(USE_DX10) || defined(USE_DX11)
 	//CreateConstantBuffers();
 #endif	//	USE_DX10
-#ifdef USE_OGL
-	// Create the program pipeline used for rendering with shaders
-	glGenProgramPipelines(1, &pp);
-#endif // USE_OGL
 
 	CreateQuadIB		();
 
@@ -193,9 +189,6 @@ void CBackend::OnDeviceDestroy()
 #if defined(USE_DX10) || defined(USE_DX11)
 	//DestroyConstantBuffers();
 #endif	//	USE_DX10
-#ifdef USE_OGL
-	glDeleteProgramPipelines(1, &pp);
-#endif // USE_OGL
 }
 
 #if defined(USE_DX10) || defined(USE_DX11)

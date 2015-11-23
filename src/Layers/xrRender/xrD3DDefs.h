@@ -3,10 +3,17 @@
 #pragma once
 
 #if defined(USE_OGL)
-using namespace gl;
-class glState;
+
 // TODO: Get rid of D3D types.
 #include <d3d9types.h>
+
+using namespace gl;
+class glState;
+
+typedef enum D3D_CLEAR_FLAG {
+	D3D_CLEAR_DEPTH = 0x1L,
+	D3D_CLEAR_STENCIL = 0x2L
+} D3D_CLEAR_FLAG;
 
 #define DX10_ONLY(expr)			do {} while (0)
 
