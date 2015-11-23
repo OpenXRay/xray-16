@@ -11,7 +11,7 @@ struct TextureFormatPairs
 
 TextureFormatPairs	TextureFormatList[] = 
 {
-	{ D3DFMT_UNKNOWN,		NULL },
+	{ D3DFMT_UNKNOWN,		GL_NONE },
 		//D3DFMT_R8G8B8 Not available 
 	{ D3DFMT_A8R8G8B8,		GL_RGBA8 },	// Not available 
 		//D3DFMT_X8R8G8B8 Not available 
@@ -107,6 +107,6 @@ GLenum	ConvertTextureFormat(D3DFORMAT dx9FMT)
 	}
 
 	VERIFY(!"ConvertTextureFormat didn't find appropriate gl texture format!");
-	return NULL;
+	return GL_NONE;
 }
 }

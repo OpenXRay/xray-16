@@ -2,11 +2,13 @@
 #pragma hdrstop
 
 #include "../xrRender/r_constants.h"
-
-void cl_sampler::setup(R_constant* C)
+static class cl_sampler : public R_constant_setup
 {
-	CHK_GL(glProgramUniform1i(C->samp.program, C->samp.location, C->samp.index));
-}
+	virtual void setup(R_constant* C)
+	{
+		CHK_GL(glProgramUniform1i(C->samp.program, C->samp.location, C->samp.index));
+	}
+}	binder_sampler;
 
 IC bool	p_sort(ref_constant C1, ref_constant C2)
 {
@@ -109,7 +111,7 @@ BOOL	R_constant_table::parse(void* _desc, u16 destination)
 					C->name = name;
 					C->destination = RC_dest_sampler;
 					C->type = RC_sampler;
-					C->handler = &sampler_binder;
+					C->handler = &binder_sampler;
 					R_constant_load& L = C->samp;
 					L.index = r_stage++;
 					L.cls = RC_sampler;
@@ -120,7 +122,7 @@ BOOL	R_constant_table::parse(void* _desc, u16 destination)
 				else {
 					R_ASSERT(C->destination == RC_dest_sampler);
 					R_ASSERT(C->type == RC_sampler);
-					R_ASSERT(C->handler == &sampler_binder);
+					R_ASSERT(C->handler == &binder_sampler);
 					R_constant_load& L = C->samp;
 					R_ASSERT(L.index == r_stage);
 					R_ASSERT(L.cls == RC_sampler);

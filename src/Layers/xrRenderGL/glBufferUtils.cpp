@@ -24,7 +24,7 @@ void	CreateIndexBuffer(GLuint* pBuffer, const void* pData, UINT DataSize, bool b
 	return CreateBuffer(pBuffer, pData, DataSize, bImmutable, true);
 }
 
-GLenum	VertexSizeList[] =
+GLsizei	VertexSizeList[] =
 {
 	1,	// D3DDECLTYPE_FLOAT1
 	2,	// D3DDECLTYPE_FLOAT2
@@ -66,7 +66,7 @@ GLenum	VertexTypeList[] =
 	GL_HALF_FLOAT		// D3DDECLTYPE_FLOAT16_4
 };
 
-GLenum	VertexNormalizedList[] =
+GLboolean	VertexNormalizedList[] =
 {
 	GL_FALSE,	// D3DDECLTYPE_FLOAT1
 	GL_FALSE,	// D3DDECLTYPE_FLOAT2
@@ -87,7 +87,7 @@ GLenum	VertexNormalizedList[] =
 	GL_FALSE	// D3DDECLTYPE_FLOAT16_4
 };
 
-GLenum	VertexTypeSizeList[] =
+GLsizei	VertexTypeSizeList[] =
 {
 	sizeof(GLfloat),	// D3DDECLTYPE_FLOAT1
 	sizeof(GLfloat),	// D3DDECLTYPE_FLOAT2

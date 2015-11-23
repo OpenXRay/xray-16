@@ -62,7 +62,7 @@ u16 du_cone_faces[DU_CONE_NUMFACES*3]=
 
 void CRenderTarget::accum_spot_geom_create	()
 {
-	u32	dwUsage = GL_STATIC_DRAW;
+	GLenum	dwUsage = GL_STATIC_DRAW;
 
 	// vertices
 	{

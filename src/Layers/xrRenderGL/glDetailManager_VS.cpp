@@ -1,10 +1,8 @@
 #include "stdafx.h"
-#include "../xrRender/DetailManager.h"
-
-#include "../../xrEngine/igame_persistent.h"
-#include "../../xrEngine/environment.h"
-
-#include "../xrRenderGL/glBufferUtils.h"
+#include "Layers/xrRender/DetailManager.h"
+#include "xrEngine/IGame_Persistent.h"
+#include "xrEngine/Environment.h"
+#include "Layers/xrRenderGL/glBufferUtils.h"
 
 const int			quant = 16384;
 const int			c_hdr = 10;
@@ -101,7 +99,7 @@ void CDetailManager::hw_Render_dump(const Fvector4 &consts, const Fvector4 &wave
 	static shared_str strArray("array");
 	static shared_str strXForm("xform");
 
-	Device.Statistic->RenderDUMP_DT_Count	= 0;
+	RImplementation.BasicStats.DetailCount = 0;
 
 	// Matrices and offsets
 	u32		vOffset	=	0;
@@ -180,7 +178,7 @@ void CDetailManager::hw_Render_dump(const Fvector4 &consts, const Fvector4 &wave
 						dwBatch	++;
 						if (dwBatch == hw_BatchSize)	{
 							// flush
-							Device.Statistic->RenderDUMP_DT_Count					+=	dwBatch;
+							RImplementation.BasicStats.DetailCount += dwBatch;
 							u32 dwCNT_verts			= dwBatch * Object.number_vertices;
 							u32 dwCNT_prims			= (dwBatch * Object.number_indices)/3;
 							//RCache.get_ConstantCache_Vertex().b_dirty				=	TRUE;
@@ -206,7 +204,7 @@ void CDetailManager::hw_Render_dump(const Fvector4 &consts, const Fvector4 &wave
 				// flush if nessecary
 				if (dwBatch)
 				{
-					Device.Statistic->RenderDUMP_DT_Count	+= dwBatch;
+					RImplementation.BasicStats.DetailCount += dwBatch;
 					u32 dwCNT_verts			= dwBatch * Object.number_vertices;
 					u32 dwCNT_prims			= (dwBatch * Object.number_indices)/3;
 					//RCache.get_ConstantCache_Vertex().b_dirty				=	TRUE;

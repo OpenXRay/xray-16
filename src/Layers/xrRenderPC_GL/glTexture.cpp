@@ -126,7 +126,7 @@ _DDS:
 
 			glGenTextures(1, &pTexture);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, pTexture);
-			CHK_GL(glTexStorage2D(GL_TEXTURE_CUBE_MAP, mip_cnt, fmt.Internal, dwWidth, dwHeight));
+			CHK_GL(glTexStorage2D(GL_TEXTURE_CUBE_MAP, mip_cnt, (GLenum)fmt.Internal, dwWidth, dwHeight));
 
 			for (size_t face = 0; face < Texture.faces(); face++)
 			{
@@ -135,11 +135,11 @@ _DDS:
 					if (gli::is_compressed(Texture.format()))
 					{
 						CHK_GL(glCompressedTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, i, 0, 0, Texture.dimensions(i).x, Texture.dimensions(i).y,
-							fmt.Internal, Texture.size(i), Texture.data(0, face, i)));
+							(GLenum)fmt.Internal, Texture.size(i), Texture.data(0, face, i)));
 					}
 					else {
 						CHK_GL(glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, i, 0, 0, Texture.dimensions(i).x, Texture.dimensions(i).y,
-							fmt.External, fmt.Type, Texture.data(0, face, i)));
+							(GLenum)fmt.External, (GLenum)fmt.Type, Texture.data(0, face, i)));
 					}
 				}
 			}
@@ -165,17 +165,17 @@ _DDS:
 
 			glGenTextures(1, &pTexture);
 			glBindTexture(GL_TEXTURE_2D, pTexture);
-			CHK_GL(glTexStorage2D(GL_TEXTURE_2D, mip_cnt, fmt.Internal, dwWidth, dwHeight));
+			CHK_GL(glTexStorage2D(GL_TEXTURE_2D, mip_cnt, (GLenum)fmt.Internal, dwWidth, dwHeight));
 			for (size_t i = 0; i < mip_cnt; i++)
 			{
 				if (gli::is_compressed(Texture.format()))
 				{
 					CHK_GL(glCompressedTexSubImage2D(GL_TEXTURE_2D, i, 0, 0, Texture.dimensions(i).x, Texture.dimensions(i).y,
-						fmt.Internal, Texture.size(i), Texture.data(0, 0, i)));
+						(GLenum)fmt.Internal, Texture.size(i), Texture.data(0, 0, i)));
 				}
 				else {
 					CHK_GL(glTexSubImage2D(GL_TEXTURE_2D, i, 0, 0, Texture.dimensions(i).x, Texture.dimensions(i).y,
-						fmt.External, fmt.Type, Texture.data(0, 0, i)));
+						(GLenum)fmt.External, (GLenum)fmt.Type, Texture.data(0, 0, i)));
 				}
 			}
 			FS.r_close(S);

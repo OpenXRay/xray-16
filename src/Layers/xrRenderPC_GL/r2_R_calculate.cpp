@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "../../xrEngine/customhud.h"
+#include "xrEngine/CustomHUD.h"
 
 float				g_fSCREEN;
 
@@ -45,7 +45,7 @@ void CRender::Calculate()
 		Fvector box_radius; box_radius.set(eps, eps, eps);
 		Sectors_xrc.box_options(CDB::OPT_FULL_TEST);
 		Sectors_xrc.box_query(rmPortals, Device.vCameraPosition, box_radius);
-		for (int K = 0; K<Sectors_xrc.r_count(); K++)	{
+		for (int K = 0; K<Sectors_xrc.r_count(); K++) {
 			CPortal*	pPortal = (CPortal*)Portals[rmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];
 			pPortal->bDualRender = TRUE;
 		}
@@ -57,12 +57,12 @@ void CRender::Calculate()
 	// Check if we touch some light even trough portal
 	lstRenderables.clear();
 	g_SpatialSpace->q_sphere(lstRenderables, 0, STYPE_LIGHTSOURCE, Device.vCameraPosition, EPS_L);
-	for (u32 _it = 0; _it<lstRenderables.size(); _it++)	{
+	for (u32 _it = 0; _it<lstRenderables.size(); _it++) {
 		ISpatial*	spatial = lstRenderables[_it];		spatial->spatial_updatesector();
-		CSector*	sector = (CSector*)spatial->spatial.sector;
+		CSector*	sector = (CSector*)spatial->GetSpatialData().sector;
 		if (0 == sector)										continue;	// disassociated from S/P structure
 
-		VERIFY(spatial->spatial.type & STYPE_LIGHTSOURCE);
+		VERIFY(spatial->GetSpatialData().type & STYPE_LIGHTSOURCE);
 		// lightsource
 		light*			L = (light*)(spatial->dcast_Light());
 		VERIFY(L);

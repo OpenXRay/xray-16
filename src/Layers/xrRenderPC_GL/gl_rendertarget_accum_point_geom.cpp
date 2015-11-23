@@ -285,7 +285,7 @@ u16 du_sphere_faces[DU_SPHERE_NUMFACES*3]={
 
 void CRenderTarget::accum_point_geom_create()
 {
-	u32	dwUsage				= GL_STATIC_DRAW;
+	GLenum	dwUsage				= GL_STATIC_DRAW;
 
 	// vertices
 	{

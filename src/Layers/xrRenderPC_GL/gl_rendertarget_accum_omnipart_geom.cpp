@@ -3,7 +3,7 @@
 
 void CRenderTarget::accum_omnip_geom_create		()
 {
-	u32	dwUsage				= GL_STATIC_DRAW;
+	GLenum	dwUsage				= GL_STATIC_DRAW;
 
 	// vertices
 	{

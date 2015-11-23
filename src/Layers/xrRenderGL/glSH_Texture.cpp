@@ -10,15 +10,13 @@
 #include "../../xrEngine/tntQAVI.h"
 #include "../../xrEngine/xrTheora_Surface.h"
 
-#include "glRenderDeviceRender.h"
-
 #define		PRIORITY_HIGH	12
 #define		PRIORITY_NORMAL	8
 #define		PRIORITY_LOW	4
 
 void resptrcode_texture::create(LPCSTR _name)
 {
-	_set(DEV->_CreateTexture(_name));
+	_set(RImplementation.Resources->_CreateTexture(_name));
 }
 
 
@@ -45,9 +43,8 @@ CTexture::CTexture		()
 CTexture::~CTexture()
 {
 	Unload				();
-
 	// release external reference
-	DEV->_DeleteTexture	(this);
+    RImplementation.Resources->_DeleteTexture(this);
 }
 
 void					CTexture::surface_set	(GLenum target, GLuint surf )
@@ -134,8 +131,8 @@ void CTexture::apply_normal(u32 dwStage)	{
 
 void CTexture::Preload	()
 {
-	m_bumpmap = DEV->m_textures_description.GetBumpName(cName);
-	m_material = DEV->m_textures_description.GetMaterial(cName);
+    m_bumpmap = RImplementation.Resources->m_textures_description.GetBumpName(cName);
+    m_material = RImplementation.Resources->m_textures_description.GetMaterial(cName);
 }
 
 void CTexture::Load		()
