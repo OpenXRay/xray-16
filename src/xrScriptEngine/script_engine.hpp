@@ -10,7 +10,8 @@
 #include "xrCore/xrCore.h"
 #include "xrScriptEngine/xrScriptEngine.hpp"
 #include "xrScriptEngine/ScriptExporter.hpp"
-#include "script_space_forward.hpp"
+#include "xrScriptEngine/script_space_forward.hpp"
+#include "xrScriptEngine/Functor.hpp"
 
 struct lua_State;
 
@@ -148,7 +149,9 @@ public:
     static int lua_panic(lua_State *L);
     static void lua_error(lua_State *L);
     static int lua_pcall_failed(lua_State *L);
+#if !XRAY_EXCEPTIONS
     static void lua_cast_failed(lua_State *L, LUABIND_TYPE_INFO info);
+#endif
 #ifdef DEBUG
     static void lua_hook_call(lua_State *L, lua_Debug *dbg);
 #endif

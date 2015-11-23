@@ -143,29 +143,34 @@ IC profile_timer_script operator+(const profile_timer_script &portion0, const pr
     return result;
 }
 
+std::ostream& operator<<(std::ostream& os, const profile_timer_script& pt)
+{
+    return os << pt.time();
+}
+
 SCRIPT_EXPORT(CScriptEngine, (),
 {
     module(luaState)
     [
         class_<profile_timer_script>("profile_timer")
-        .def(constructor<>())
-        .def(constructor<profile_timer_script&>())
-        .def(const_self+profile_timer_script())
-        .def(const_self<profile_timer_script())
-        .def(tostring(self))
-        .def("start", &profile_timer_script::start)
-        .def("stop", &profile_timer_script::stop)
-        .def("time", &profile_timer_script::time)
+            .def(constructor<>())
+            .def(constructor<profile_timer_script&>())
+            .def(const_self+profile_timer_script())
+            .def(const_self<profile_timer_script())
+            .def(tostring(self))
+            .def("start", &profile_timer_script::start)
+            .def("stop", &profile_timer_script::stop)
+            .def("time", &profile_timer_script::time),
+        def("log", &LuaLog),
+        def("error_log", &ErrorLog),
+        def("flush", &FlushLogs),
+        def("prefetch", &prefetch_module),
+        def("verify_if_thread_is_running", &verify_if_thread_is_running),
+        def("editor", &is_editor),
+        def("bit_and", &bit_and),
+        def("bit_or", &bit_or),
+        def("bit_xor", &bit_xor),
+        def("bit_not", &bit_not),
+        def("user_name", &user_name)
     ];
-    function(luaState, "log", LuaLog);
-    function(luaState, "error_log", ErrorLog);
-    function(luaState, "flush", FlushLogs);
-    function(luaState, "prefetch", prefetch_module);
-    function(luaState, "verify_if_thread_is_running", verify_if_thread_is_running);
-    function(luaState, "editor", is_editor);
-    function(luaState, "bit_and", bit_and);
-    function(luaState, "bit_or", bit_or);
-    function(luaState, "bit_xor", bit_xor);
-    function(luaState, "bit_not", bit_not);
-    function(luaState, "user_name", user_name);
 });

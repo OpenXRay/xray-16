@@ -91,7 +91,6 @@ extern bool g_block_pause;
 extern float g_separate_factor;
 extern float g_separate_radius;
 
-#include <luabind/functor.hpp>
 #include "xrScriptEngine/script_engine.hpp"
 #include "ai_space.h"
 

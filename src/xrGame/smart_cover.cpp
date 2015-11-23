@@ -53,9 +53,8 @@ cover::cover					(
 	Loopholes::const_iterator	I = m_description->loopholes().begin();
 	Loopholes::const_iterator	E = m_description->loopholes().end();
 	for ( ; I != E; ++I) {
-		luabind::object::iterator	i = loopholes_availability.begin( );
-		luabind::object::iterator	e = loopholes_availability.end( );
-		for ( ; i != e; ++i ) {
+		for (luabind::iterator i(loopholes_availability), e; i!=e; ++i)
+        {
 			LPCSTR const loophole_id= luabind::object_cast< LPCSTR >( i.key( ) );
 			if ( xr_strcmp( loophole_id, (*I)->id( ) ) )
 				continue;

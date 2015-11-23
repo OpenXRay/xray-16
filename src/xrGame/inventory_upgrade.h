@@ -10,6 +10,7 @@
 #define INVENTORY_UPGRADE_H_INCLUDED
 
 #include "inventory_upgrade_base.h"
+#include "xrScriptEngine/script_engine.hpp"
 
 namespace inventory
 {
@@ -18,7 +19,7 @@ namespace upgrade
 
 namespace detail
 {
-
+// XXX: rewrite using variadic templates
 template <typename return_type>
 struct functor_base
 {

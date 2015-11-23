@@ -2,7 +2,8 @@
 #include "encyclopedia_article_defs.h"
 #include "GameTaskDefs.h"
 struct lua_State;
-#include "luabind/functor.hpp"
+// XXX: include "xrScriptEngine/script_space_forward.hpp" into Functor.hpp, define functor
+#include "xrScriptEngine/Functor.hpp"
 
 class CGameTaskManager;
 class CMapLocation;

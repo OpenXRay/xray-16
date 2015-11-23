@@ -800,7 +800,7 @@ void CAI_Stalker::update_object_handler	()
 		}
 #ifdef DEBUG
 		catch (luabind::cast_failed &message) {
-			Msg						("! Expression \"%s\" from luabind::object to %s",message.what(),message.info()->name());
+			Msg						("! Expression \"%s\" from luabind::object to %s",message.what(),message.info().name());
 			throw;
 		}
 #endif
@@ -1091,7 +1091,7 @@ void CAI_Stalker::Think			()
 //		}
 #ifdef DEBUG
 //		catch (luabind::cast_failed &message) {
-//			Msg						("! Expression \"%s\" from luabind::object to %s",message.what(),message.info()->name());
+//			Msg						("! Expression \"%s\" from luabind::object to %s",message.what(),message.info().name());
 			//throw;
 //		}
 #endif
@@ -1122,7 +1122,7 @@ void CAI_Stalker::Think			()
 //	}
 #if 0//def DEBUG
 	catch (luabind::cast_failed &message) {
-		Msg						("! Expression \"%s\" from luabind::object to %s",message.what(),message.info()->name());
+		Msg						("! Expression \"%s\" from luabind::object to %s",message.what(),message.info().name());
 		movement().initialize	();
 		movement().update		(update_delta);
 		throw;

@@ -486,10 +486,14 @@ u32	script_time_global_async() { return Device.TimerAsync_MMT(); }
 
 SCRIPT_EXPORT(Device, (),
 {
-    luabind::function(luaState, "time_global", script_time_global);
-    luabind::function(luaState, "time_global_async", script_time_global_async);
-    luabind::function(luaState, "device", get_device);
-    luabind::function(luaState, "is_enough_address_space_available", is_enough_address_space_available);
+    using namespace luabind;
+    module(luaState)
+    [
+        def("time_global", &script_time_global),
+        def("time_global_async", &script_time_global_async),
+        def("device", &get_device),
+        def("is_enough_address_space_available", &is_enough_address_space_available)
+    ];
 });
 
 CLoadScreenRenderer::CLoadScreenRenderer()

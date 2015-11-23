@@ -16,20 +16,20 @@
 
 extern "C"
 {
-#include <lua/lua.h>
-#include <lua/lualib.h>
-#include <lua/lauxlib.h>
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 }
 
 #pragma warning(disable:4458) // declaration of 'x' hides class member
 #pragma warning(disable:4459) // declaration of 'x' hides global declaration
 #pragma warning(disable:4913) // user defined binary operator 'x' exists but no overload could convert all operands
 #pragma warning(disable:4297) // function assumed not to throw exception but does
-
+// XXX: define LUABIND_DYNAMIC_LINK in engine config header
+#include <luabind/luabind_memory.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/class.hpp>
 #include <luabind/object.hpp>
-#include <luabind/functor.hpp>
 #include <luabind/operator.hpp>
 #include <luabind/adopt_policy.hpp>
 #include <luabind/return_reference_to_policy.hpp>

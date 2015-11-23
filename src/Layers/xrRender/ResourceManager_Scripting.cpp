@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include <lua/library_linkage.h>
-
 #include "xrEngine/Render.h"
 #include "ResourceManager.h"
 #include "tss.h"
@@ -264,7 +262,7 @@ ShaderElement*		CBlender_Compile::_lua_Compile	(LPCSTR namesp, LPCSTR name)
 	LPCSTR				t_1		= (L_textures.size() > 1)	? *L_textures[1] : "null";
 	LPCSTR				t_d		= detail_texture			? detail_texture : "null" ;
 	object				shader	= RImplementation.Resources->ScriptEngine.name_space(namesp);
-	functor<void>		element	= object_cast<functor<void> >(shader[name]);
+	functor<void> element = shader[name];
 	adopt_compiler		ac		= adopt_compiler(this);
 	element						(ac,t_0,t_1,t_d);
 	r_End				();

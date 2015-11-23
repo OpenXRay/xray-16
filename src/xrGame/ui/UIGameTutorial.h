@@ -1,5 +1,6 @@
 #pragma once
 #include "xr_level_controller.h"
+#include <xrScriptEngine/Functor.hpp>
 
 class CUIWindow;
 class CUIStatic;

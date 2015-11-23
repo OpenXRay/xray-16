@@ -50,13 +50,6 @@ IC bool CScriptEngine::functor(LPCSTR function_to_call, luabind::functor<TResult
     luabind::object object;
     if (!function_object(function_to_call, object))
         return false;
-    try
-    {
-        lua_function = luabind::object_cast<luabind::functor<TResult>>(object);
-    }
-    catch (...)
-    {
-        return false;
-    }
+    lua_function = object;
     return true;
 }

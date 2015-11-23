@@ -187,7 +187,7 @@ void CCoverManager::remove_nearby_covers	(smart_cover::cover const &cover, smart
 	}
 }
 
-CCoverManager::Cover const *CCoverManager::add_smart_cover	(LPCSTR table_name, smart_cover::object const &object, bool const &is_combat_cover, bool const &can_fire, luabind::object const &loopholes) const
+CCoverManager::Cover const *CCoverManager::add_smart_cover	(LPCSTR table_name, smart_cover::object const &object, bool const &is_combat_cover, bool const &can_fire, luabind::adl::object const &loopholes) const
 {
 	Cover					*smart_cover = 
 		xr_new<Cover>(
