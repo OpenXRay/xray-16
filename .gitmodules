@@ -1,0 +1,3 @@
+[submodule "src/Externals/luabind"]
+	path = src/Externals/luabind
+	url = git@github.com:OpenXRay/luabind.git
