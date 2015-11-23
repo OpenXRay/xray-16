@@ -36,9 +36,8 @@ Setup:
 - Install patch 1.6.02 (only for russian locale, worldwide release should have it included):
   http://cop.stalker-game.ru/?page=patches#2
 - Download and unpack archive with libraries
-- Create _bin_dbg, _bin_mix and _bin_rel folders in the game installation directory
-  (Debug, Mixed and Release binaries)
-- Inside each of these folders create Win32 folder (hereinafter '_bin_xxx\Win32' is referred to as 'xbin')
+- Create _bin_dbg_Win32, _bin_mix_Win32 and _bin_rel_Win32 folders in the game installation directory
+  (Debug, Mixed and Release binaries for 32-bit Windows). Hereinafter '_bin_xxx_Win32' is referred to as 'xbin'.
 - Copy following files from bin to xbin:
   - dbghelp.dll
   - eax.dll

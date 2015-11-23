@@ -22,24 +22,33 @@ if not exist %2 (
 )
 set platform=%3
 if %platform%==Win32 (
-) else if %platform%==Win64 (
-) else (
-  echo invalid platform: %platform%
-  goto ret
+  goto platform_ok
 )
+if %platform%==Win64 (
+  goto platform_ok
+)
+echo invalid platform: %platform%
+goto ret
 
+:platform_ok
 set cfg=%4
 if %cfg%==Debug (
   set dst=%1\_bin_dbg
-) else if %cfg%==Mixed (
-  set dst=%1\_bin_mix
-) else if %cfg%==Release (
-  set dst=%1\_bin_rel
-) else (
-  echo invalid configuration: %cfg%
-  goto ret
+  goto cfg_ok
 )
-set dst=%dst%\%platform%
+if %cfg%==Mixed (
+  set dst=%1\_bin_mix
+  goto cfg_ok
+)
+if %cfg%==Release (
+  set dst=%1\_bin_rel
+  goto cfg_ok
+)
+echo invalid configuration: %cfg%
+goto ret
+
+:cfg_ok
+set dst=%dst%_%platform%
 set src=%2\bin\%platform%\%cfg%
 
 set cp_tool=cp
