@@ -10,7 +10,7 @@ glState::glState()
 
 	m_pDepthStencilState.DepthEnable		= TRUE;
 	m_pDepthStencilState.DepthFunc			= D3DCMP_LESSEQUAL;
-	m_pDepthStencilState.DepthWriteMask		= GL_TRUE;
+	m_pDepthStencilState.DepthWriteMask		= TRUE;
 	m_pDepthStencilState.StencilEnable		= TRUE;
 	m_pDepthStencilState.StencilFailOp		= D3DSTENCILOP_KEEP;
 	m_pDepthStencilState.StencilDepthFailOp = D3DSTENCILOP_KEEP;
@@ -60,7 +60,7 @@ void glState::Apply()
 		m_pDepthStencilState.StencilDepthFailOp
 		);*/
 
-	CHK_GL(glDepthMask(m_pDepthStencilState.DepthWriteMask));
+	CHK_GL(glDepthMask(m_pDepthStencilState.DepthWriteMask ? GL_TRUE : GL_FALSE));
 
 	if (m_pBlendState.BlendEnable)
 		glEnable(GL_BLEND);
@@ -104,7 +104,7 @@ void glState::UpdateRenderState(u32 name, u32 value)
 			break;
 
 		case D3DRS_ZWRITEENABLE:
-			m_pDepthStencilState.DepthWriteMask = value ? GL_TRUE : GL_FALSE;
+			m_pDepthStencilState.DepthWriteMask = value ? TRUE : FALSE;
 			break;
 
 		case D3DRS_ZFUNC:
@@ -196,7 +196,7 @@ void glState::UpdateSamplerState(u32 stage, u32 name, u32 value)
 	if (stage < 0 || CTexture::mtMaxCombinedShaderTextures < stage)
 		return;
 
-	GLint currentFilter = GL_NEAREST;
+	GLint currentFilter = (GLint)GL_NEAREST;
 
 	if (m_samplerArray[stage] == NULL)
 		glGenSamplers (1, &m_samplerArray[stage]);
@@ -240,7 +240,7 @@ void glState::UpdateSamplerState(u32 stage, u32 name, u32 value)
 			break;
 		default:
 			// Assume this is an OpenGL sampler parameter
-			CHK_GL(glSamplerParameteri(m_samplerArray[stage], name, value));
+			CHK_GL(glSamplerParameteri(m_samplerArray[stage], (GLenum)name, value));
 			break;
 	}
 }

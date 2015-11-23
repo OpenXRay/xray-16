@@ -193,7 +193,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic	(dxRender_Visual *pVisual, Fvector
 #else
 		mapMatrixCS::TNode*			Ncs		= Nps->val.insert	(pass.constants._get());
 #endif
-		mapMatrixStates::TNode*		Nstate	= Ncs->val.insert	(pass.state->state);
+		mapMatrixStates::TNode*		Nstate	= Ncs->val.insert	(&*pass.state);
 		mapMatrixTextures::TNode*	Ntex	= Nstate->val.insert(pass.T._get());
 		mapMatrixItems&				items	= Ntex->val;
 		items.push_back						(item);
@@ -354,7 +354,7 @@ void D3DXRenderBase::r_dsgraph_insert_static	(dxRender_Visual *pVisual)
 #else
 		mapNormalCS::TNode*			Ncs		= Nps->val.insert	(pass.constants._get());
 #endif
-		mapNormalStates::TNode*		Nstate	= Ncs->val.insert	(pass.state->state);
+		mapNormalStates::TNode*		Nstate	= Ncs->val.insert	(&*pass.state);
 		mapNormalTextures::TNode*	Ntex	= Nstate->val.insert(pass.T._get());
 		mapNormalItems&				items	= Ntex->val;
 		_NormalItem					item	= {SSA,pVisual};

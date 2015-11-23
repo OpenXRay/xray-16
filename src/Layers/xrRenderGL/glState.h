@@ -10,8 +10,8 @@ typedef struct
 typedef struct
 {
 	BOOL DepthEnable;
-	GLboolean DepthWriteMask;
-	GLenum DepthFunc;
+	BOOL DepthWriteMask;
+	D3DCMPFUNC DepthFunc;
 	BOOL StencilEnable;
 	UINT StencilMask;
 	UINT StencilWriteMask;

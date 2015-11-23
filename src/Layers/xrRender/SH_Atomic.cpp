@@ -28,7 +28,11 @@ SVS::~SVS()
 	//_RELEASE(signature);
 	//	Now it is release automatically
 #endif	//	USE_DX10
+#ifdef USE_OGL
+	CHK_GL(glDeleteProgram(vs));
+#else
 	_RELEASE(vs);
+#endif // USE_OGL
 }
 
 
@@ -36,7 +40,11 @@ SVS::~SVS()
 //	SPS
 SPS::~SPS()
 {
-    _RELEASE(ps);
+#ifdef USE_OGL
+	CHK_GL(glDeleteProgram(ps));
+#else
+	_RELEASE(ps);
+#endif // USE_OGL
     RImplementation.Resources->_DeletePS(this);
 }
 
@@ -81,7 +89,9 @@ SInputSignature::~SInputSignature		()
 //	SState
 SState::~SState()
 {
-    _RELEASE(state);
+#ifndef USE_OGL
+	_RELEASE(state);
+#endif // !USE_OGL
     RImplementation.Resources->_DeleteState(this);
 }
 
@@ -100,6 +110,10 @@ SDeclaration::~SDeclaration()
 	}
 #else	//	USE_DX10
 	//	Release vertex layout
+#ifdef USE_OGL
+	glDeleteBuffers(1, &dcl);
+#else
 	_RELEASE(dcl);
+#endif // USE_OGL
 #endif	//	USE_DX10
 }

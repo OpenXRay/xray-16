@@ -136,31 +136,31 @@ GLenum ConvertBlendOp(u32 Op)
 	}
 }
 
-GLenum	ConvertTextureAddressMode(u32 Mode)
+GLint	ConvertTextureAddressMode(u32 Mode)
 {
 	switch (Mode)
 	{
 	case D3DTADDRESS_WRAP:
-		return GL_REPEAT;
+		return (GLint)GL_REPEAT;
 	case D3DTADDRESS_MIRROR:
-		return GL_MIRRORED_REPEAT;
+		return (GLint)GL_MIRRORED_REPEAT;
 	case D3DTADDRESS_CLAMP:
-		return GL_CLAMP_TO_EDGE;
+		return (GLint)GL_CLAMP_TO_EDGE;
 	case D3DTADDRESS_BORDER:
-		return GL_CLAMP_TO_BORDER;
+		return (GLint)GL_CLAMP_TO_BORDER;
 	//case D3DTADDRESS_MIRRORONCE:
 	//	return ;
 	default:
 		VERIFY(!"ConvertTextureAddressMode can't convert argument!");
-		return GL_CLAMP_TO_EDGE;
+		return (GLint)GL_CLAMP_TO_EDGE;
 	}
 }
 
-GLenum  ConvertTextureFilter(u32 dxFilter, u32 glFilter, bool MipMap)
+GLint  ConvertTextureFilter(u32 dxFilter, GLint glFilter, bool MipMap)
 {
-	const int FilterLinear = 0x01;
-	const int MipFilterLinear = 0x02;
-	const int MipFilterEnable = 0x100;
+	const u32 FilterLinear = 0x01;
+	const u32 MipFilterLinear = 0x02;
+	const u32 MipFilterEnable = 0x100;
 
 	switch (dxFilter)
 	{

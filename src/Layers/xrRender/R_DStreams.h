@@ -2,21 +2,37 @@
 #define r_DStreamsH
 #pragma once
 
+#ifdef USE_OGL
+enum
+{
+	LOCKFLAGS_FLUSH		= (u32)BufferAccessMask::GL_MAP_WRITE_BIT | (u32)BufferAccessMask::GL_MAP_INVALIDATE_BUFFER_BIT,
+	LOCKFLAGS_APPEND	= (u32)BufferAccessMask::GL_MAP_WRITE_BIT // TODO: Implement buffer object appending using glBufferSubData
+};
+#else
 enum
 {
 	LOCKFLAGS_FLUSH		= D3DLOCK_DISCARD,
 	LOCKFLAGS_APPEND	= D3DLOCK_NOOVERWRITE
 };
+#endif // USE_OGL
 
 class  ECORE_API _VertexStream
 {
 private :
-	ID3DVertexBuffer*		pVB;
+#ifdef USE_OGL
+	GLuint						pVB;
+#else
+	ID3DVertexBuffer*			pVB;
+#endif // USE_OGL
 	u32							mSize;			// size in bytes
 	u32							mPosition;		// position in bytes
 	u32							mDiscardID;		// ID of discard - usually for caching
 public:
-	ID3DVertexBuffer*		old_pVB;
+#ifdef USE_OGL
+	GLuint						old_pVB;
+#else
+	ID3DVertexBuffer*			old_pVB;
+#endif // USE_OGL
 #ifdef DEBUG
 	u32							dbg_lock;
 #endif
@@ -28,7 +44,11 @@ public:
 	void						reset_begin		();
 	void						reset_end		();
 
-	IC ID3DVertexBuffer*	Buffer()		{ return pVB;			}
+#ifdef USE_OGL
+	IC GLuint					Buffer() { return pVB; }
+#else
+	IC ID3DVertexBuffer*		Buffer() { return pVB; }
+#endif // USE_OGL
 	IC u32						DiscardID()		{ return mDiscardID;	}
 	IC void						Flush()			{ mPosition=mSize;		}
 
@@ -43,12 +63,20 @@ public:
 class  ECORE_API _IndexStream
 {
 private :
-	ID3DIndexBuffer*		pIB;
+#ifdef USE_OGL
+	GLuint						pIB;
+#else
+	ID3DIndexBuffer*			pIB;
+#endif // USE_OGL
 	u32							mSize;		// real size (usually mCount, aligned on 512b boundary)
 	u32							mPosition;
 	u32							mDiscardID;
 public:
-	ID3DIndexBuffer*		old_pIB;
+#ifdef USE_OGL
+	GLuint						old_pIB;
+#else
+	ID3DIndexBuffer*			old_pIB;
+#endif // USE_OGL
 private:
 	void						_clear	()
 	{
@@ -63,7 +91,11 @@ public:
 	void						reset_begin		();
 	void						reset_end		();
 
-	IC ID3DIndexBuffer*	Buffer()		{ return pIB;			}
+#ifdef USE_OGL
+	IC GLuint					Buffer() { return pIB; }
+#else
+	IC ID3DIndexBuffer*			Buffer() { return pIB; }
+#endif // USE_OGL
 	IC u32						DiscardID()		{ return mDiscardID;	}
 	void						Flush()			{ mPosition=mSize;		}
 

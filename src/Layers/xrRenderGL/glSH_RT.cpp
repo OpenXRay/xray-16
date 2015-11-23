@@ -2,14 +2,11 @@
 #pragma hdrstop
 
 #include "../xrRender/ResourceManager.h"
-
-#include "glRenderDeviceRender.h"
-
 #include "glTextureUtils.h"
 
 CRT::CRT			()
 {
-	pSurface		= NULL;
+	pRT				= NULL;
 	dwWidth			= 0;
 	dwHeight		= 0;
 	fmt				= D3DFMT_UNKNOWN;
@@ -19,12 +16,12 @@ CRT::~CRT			()
 	destroy			();
 
 	// release external reference
-	DEV->_DeleteRT	(this);
+	RImplementation.Resources->_DeleteRT	(this);
 }
 
 void CRT::create	(LPCSTR Name, u32 w, u32 h,	D3DFORMAT f, u32 SampleCount )
 {
-	if (pSurface)	return;
+	if (pRT)	return;
 
 	R_ASSERT(Name && Name[0] && w && h);
 	_order = CPU::GetCLK();	//Device.GetTimerGlobal()->GetElapsed_clk();
@@ -44,14 +41,14 @@ void CRT::create	(LPCSTR Name, u32 w, u32 h,	D3DFORMAT f, u32 SampleCount )
 	if (w>max_width)		return;
 	if (h>max_height)		return;
 
-	DEV->Evict();
+	RImplementation.Resources->Evict();
 
-	glGenTextures(1, &pSurface);
-	CHK_GL(glBindTexture(GL_TEXTURE_2D, pSurface));
+	glGenTextures(1, &pRT);
+	CHK_GL(glBindTexture(GL_TEXTURE_2D, pRT));
 	CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, glTextureUtils::ConvertTextureFormat(fmt), w, h));
 
-	pTexture	= DEV->_CreateTexture	(Name);
-	pTexture->surface_set(GL_TEXTURE_2D, pSurface);
+	pTexture	= RImplementation.Resources->_CreateTexture	(Name);
+	pTexture->surface_set(GL_TEXTURE_2D, pRT);
 }
 
 void CRT::destroy		()
@@ -60,7 +57,7 @@ void CRT::destroy		()
 		pTexture->surface_set(GL_TEXTURE_2D, 0);
 		pTexture = NULL;
 	}
-	CHK_GL(glDeleteTextures(1, &pSurface));
+	CHK_GL(glDeleteTextures(1, &pRT));
 }
 void CRT::reset_begin	()
 {
@@ -72,5 +69,5 @@ void CRT::reset_end		()
 }
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
 {
-	_set			(DEV->_CreateRT(Name,w,h,f));
+	_set			(RImplementation.Resources->_CreateRT(Name,w,h,f));
 }

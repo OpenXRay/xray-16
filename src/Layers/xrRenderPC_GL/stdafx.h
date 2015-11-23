@@ -14,17 +14,13 @@
 
 #include <glbinding/gl/gl.h>
 
-// TODO: Get rid of D3D types.
-#include <d3d9types.h>
-
 #include "Layers/xrRender/xrD3DDefs.h"
-
-#include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 
 #define		R_GL	0
 #define		R_R1	1
 #define		R_R2	2
 #define		R_R3	3
+#define		R_R4	4
 #define		RENDER	R_GL
 
 #include "xrParticles/psystem.h"
@@ -53,5 +49,3 @@ IC	void	jitter(CBlender_Compile& C)
 	C.r_Sampler("jitter3", JITTER(3), true, D3DTADDRESS_WRAP, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT);
 	C.r_Sampler("jitter4", JITTER(4), true, D3DTADDRESS_WRAP, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT);
 }
-
-using namespace gl;

@@ -4,14 +4,14 @@
 #include "hwcaps.h"
 #include "hw.h"
 
-#ifndef _EDITOR
+#if !defined(_EDITOR) && !defined(USE_OGL)
 	#include <nvapi.h>
 #endif
 
 namespace
 {
 
-#ifndef _EDITOR
+#if !defined(_EDITOR) && !defined(USE_OGL)
 u32 GetNVGpuNum()
 {
 	NvLogicalGpuHandle  logicalGPUs[NVAPI_MAX_LOGICAL_GPUS];
@@ -108,7 +108,7 @@ u32 GetGpuNum()
 #endif
 }
 
-#if !defined(USE_DX10) && !defined(USE_DX11)
+#if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
 void CHWCaps::Update()
 {
 	D3DCAPS9					caps;
@@ -266,7 +266,11 @@ void CHWCaps::Update()
 	dwMaxStencilValue=(1<<8)-1;
 
 	// DEV INFO
-
+#ifdef USE_OGL
+	// TODO: OGL: SLI/Crossfire support.
+	iGPUNum = 1;
+#else
 	iGPUNum = GetGpuNum();
+#endif // !USE_OGL
 }
 #endif	//	USE_DX10

@@ -2,7 +2,12 @@
 #define	glR_Backend_Runtime_included
 #pragma once
 
-#include "../xrRenderGL/glStateUtils.h"
+#include "glStateUtils.h"
+
+IC	GLuint CBackend::get_FB()
+{
+	return pFB;
+}
 
 IC void		CBackend::set_xform(u32 ID, const Fmatrix& M)
 {
@@ -55,7 +60,7 @@ ICF void CBackend::set_Format(SDeclaration* _decl)
 		stat.decl++;
 #endif
 		decl = _decl;
-		CHK_GL(glBindVertexArray(_decl->vao));
+		CHK_GL(glBindVertexArray(_decl->dcl));
 
 		// Clear cached index buffer
 		ib = 0;
@@ -125,7 +130,7 @@ IC GLenum TranslateTopology(D3DPRIMITIVETYPE T)
 {
 	static GLenum translateTable[] =
 	{
-		NULL,					//	None
+		GL_NONE,				//	None
 		GL_POINTS,				//	D3DPT_POINTLIST = 1,
 		GL_LINES,				//	D3DPT_LINELIST = 2,
 		GL_LINE_STRIP,			//	D3DPT_LINESTRIP = 3,
@@ -268,10 +273,10 @@ IC void	CBackend::set_ColorWriteEnable(u32 _mask)
 	if (colorwrite_mask != _mask)		{
 		colorwrite_mask = _mask;
 		CHK_GL(glColorMask(
-			_mask & D3DCOLORWRITEENABLE_RED,
-			_mask & D3DCOLORWRITEENABLE_GREEN,
-			_mask & D3DCOLORWRITEENABLE_BLUE,
-			_mask & D3DCOLORWRITEENABLE_ALPHA));
+			(_mask & D3DCOLORWRITEENABLE_RED)	? GL_TRUE : GL_FALSE,
+			(_mask & D3DCOLORWRITEENABLE_GREEN)	? GL_TRUE : GL_FALSE,
+			(_mask & D3DCOLORWRITEENABLE_BLUE)	? GL_TRUE : GL_FALSE,
+			(_mask & D3DCOLORWRITEENABLE_ALPHA)	? GL_TRUE : GL_FALSE));
 	}
 }
 

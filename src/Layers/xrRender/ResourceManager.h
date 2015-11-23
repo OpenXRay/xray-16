@@ -210,8 +210,13 @@ public:
 	void			Delete					(const Shader*		S	);
 	void			RegisterConstantSetup	(LPCSTR name,		R_constant_setup* s)	{	v_constant_setup.push_back(mk_pair(shared_str(name),s));	}
 
+#ifdef USE_OGL
+	SGeometry*		CreateGeom				(D3DVERTEXELEMENT9* decl, GLuint vb, GLuint ib);
+	SGeometry*		CreateGeom				(u32 FVF				, GLuint vb, GLuint ib);
+#else
 	SGeometry*		CreateGeom				(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
 	SGeometry*		CreateGeom				(u32 FVF				, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
+#endif // USE_OGL
 	void			DeleteGeom				(const SGeometry* VS		);
 	void			DeferredLoad			(BOOL E)					{ bDeferredLoad=E;	}
 	void			DeferredUpload			();

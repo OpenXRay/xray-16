@@ -2,7 +2,15 @@
 #define	xrD3DDefs_included
 #pragma once
 
-#if defined(USE_DX11) || defined(USE_DX10)
+#if defined(USE_OGL)
+using namespace gl;
+class glState;
+// TODO: Get rid of D3D types.
+#include <d3d9types.h>
+
+#define DX10_ONLY(expr)			do {} while (0)
+
+#elif defined(USE_DX11) || defined(USE_DX10)
 #include "Layers/xrRenderDX10/DXCommonTypes.h"
 #else	//	USE_DX10
 

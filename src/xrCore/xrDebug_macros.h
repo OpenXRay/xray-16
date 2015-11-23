@@ -54,6 +54,7 @@
 # define VERIFY3(expr, e2, e3) do {} while (0)
 # define VERIFY4(expr, e2, e3, e4)do {} while (0)
 # define CHK_DX(a) a
+# define CHK_GL(a) a
 # endif // DEBUG
 //---------------------------------------------------------------------------------------------
 // FIXMEs / TODOs / NOTE macros

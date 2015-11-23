@@ -36,15 +36,10 @@ void	light::vis_prepare			()
 	if (ps_r2_ls_flags.test(R2FLAG_EXP_DONT_TEST_UNSHADOWED) && !flags.bShadow)	skiptest=true;
 	if (ps_r2_ls_flags.test(R2FLAG_EXP_DONT_TEST_SHADOWED) && flags.bShadow)	skiptest=true;
 
-	//	TODO: DX10: Remove this pessimization
-	//skiptest	= true;
-
 	if (skiptest || Device.vCameraPosition.distance_to(spatial.sphere.P)<=(spatial.sphere.R*1.01f+safe_area))	{	// small error
 		vis.visible		=	true;
 		vis.pending		=	false;
 		vis.frame2test	=	frame	+ ::Random.randI(delay_small_min,delay_small_max);
-		//	TODO: DX10: Remove this pessimisation
-		//vis.frame2test	=	frame	+ 1;
 		return;
 	}
 
@@ -79,14 +74,9 @@ void	light::vis_update			()
 	//Log					("",fragments);
 	vis.visible			= (fragments > cullfragments);
 	vis.pending			= false;
-	if (vis.visible)	
-	{
+	if (vis.visible)	{
 		vis.frame2test	=	frame	+ ::Random.randI(delay_large_min,delay_large_max);
-		//	TODO: DX10: Remove this pessimisation
-		//vis.frame2test	=	frame	+ 1;
-	} 
-	else 
-	{
+	} else {
 		vis.frame2test	=	frame	+ 1; 
 	}
 }

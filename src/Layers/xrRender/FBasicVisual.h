@@ -19,12 +19,20 @@ struct					IRender_Mesh
 	ref_geom					rm_geom;
 
 	// verts
-	ID3DVertexBuffer*		p_rm_Vertices;
+#ifdef USE_OGL
+	GLuint						p_rm_Vertices;
+#else
+	ID3DVertexBuffer*			p_rm_Vertices;
+#endif // USE_OGL
 	u32							vBase;
 	u32							vCount;
 
 	// indices
-	ID3DIndexBuffer*		p_rm_Indices;
+#ifdef USE_OGL
+	GLuint						p_rm_Indices;
+#else
+	ID3DIndexBuffer*			p_rm_Indices;
+#endif // USE_OGL
 	u32							iBase;
 	u32							iCount;
 	u32							dwPrimitives;

@@ -8,7 +8,7 @@
 
 #include "hwcaps.h"
 
-#ifndef _MAYA_EXPORT
+#if !defined(_MAYA_EXPORT) && !defined(USE_OGL)
 #include "stats_manager.h"
 #endif
 
@@ -116,7 +116,7 @@ public:
 	D3DPRESENT_PARAMETERS	DevPP;
 #endif
 
-#ifndef _MAYA_EXPORT
+#if !defined(_MAYA_EXPORT) && !defined(USE_OGL)
 	stats_manager			stats_manager;
 #endif
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)

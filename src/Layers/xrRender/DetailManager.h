@@ -141,8 +141,13 @@ public:
 	// Hardware processor
 	ref_geom						hw_Geom;
 	u32								hw_BatchSize;
-	ID3DVertexBuffer*			hw_VB;
-	ID3DIndexBuffer*			hw_IB;
+#ifdef USE_OGL
+	GLuint							hw_VB;
+	GLuint							hw_IB;
+#else
+	ID3DVertexBuffer*				hw_VB;
+	ID3DIndexBuffer*				hw_IB;
+#endif // USE_OGL
 	ref_constant					hwc_consts;
 	ref_constant					hwc_wave;
 	ref_constant					hwc_wind;
@@ -155,7 +160,7 @@ public:
 	void							hw_Load_Shaders	();
 	void							hw_Unload		();
 	void							hw_Render		();
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	void							hw_Render_dump	(const Fvector4 &consts, const Fvector4 &wave, const Fvector4 &wind, u32 var_id, u32 lod_id);
 #else	//	USE_DX10
 	void							hw_Render_dump	(ref_constant array, u32 var_id, u32 lod_id, u32 c_base);
