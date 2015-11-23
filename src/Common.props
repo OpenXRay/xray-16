@@ -22,8 +22,16 @@
     <xrIntDir>$(SolutionDir)..\intermediate\$(xrPlatform)\$(Configuration)\</xrIntDir>
     <xrSdkDir>$(SolutionDir)..\sdk\</xrSdkDir>
   </PropertyGroup>
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(ConfigurationType)'=='Application'">
     <OutDir>$(xrBinDir)</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(ConfigurationType)'=='DynamicLibrary'">
+    <OutDir>$(xrBinDir)</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(ConfigurationType)'=='StaticLibrary'">
+    <OutDir>$(xrLibDir)</OutDir>
+  </PropertyGroup>
+  <PropertyGroup>
     <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
