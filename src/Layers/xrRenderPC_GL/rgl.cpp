@@ -923,7 +923,7 @@ HRESULT	CRender::shader_compile(
 		CHK_GL(glDetachShader(program, shader));
 		CHK_GL(glGetProgramiv(program, GL_LINK_STATUS, (GLint*)&status));
 
-		if (status == GL_TRUE)
+		if (status == GL_FALSE)
 		{
 			GLint length;
 			CHK_GL(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length));
@@ -944,7 +944,10 @@ HRESULT	CRender::shader_compile(
 		Log("! ", name);
 		if (_pErrorMsgs)
 			Log("! error: ", _pErrorMsgs);
+
+		return S_FALSE;
 	}
 
 	CHK_GL(glDeleteShader(shader));
+	return S_OK;
 }
