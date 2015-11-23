@@ -1,13 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='Win32'">
+    <xrPlatform>Win32</xrPlatform>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='x86'">
+    <xrPlatform>Win32</xrPlatform>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='x64'">
+    <xrPlatform>Win64</xrPlatform>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(xrPlatform)'==''">
+    <xrPlatform>$(Platform)</xrPlatform>
+  </PropertyGroup>
   <PropertyGroup Label="UserMacros">
     <xrBinRootDir>$(SolutionDir)..\bin\</xrBinRootDir>
     <xrLibRootDir>$(SolutionDir)..\lib\</xrLibRootDir>
-    <xrBinDir>$(SolutionDir)..\bin\$(Configuration)\</xrBinDir>
-    <xrPlugBinDir>$(SolutionDir)..\bin\$(Configuration)\plugins\</xrPlugBinDir>
-    <xrLibDir>$(SolutionDir)..\lib\$(Configuration)\</xrLibDir>
-    <xrIntDir>$(SolutionDir)..\intermediate\$(Configuration)\</xrIntDir>
+    <xrBinDir>$(SolutionDir)..\bin\$(xrPlatform)\$(Configuration)\</xrBinDir>
+    <xrPlugBinDir>$(SolutionDir)..\bin\$(xrPlatform)\$(Configuration)\plugins\</xrPlugBinDir>
+    <xrLibDir>$(SolutionDir)..\lib\$(xrPlatform)\$(Configuration)\</xrLibDir>
+    <xrIntDir>$(SolutionDir)..\intermediate\$(xrPlatform)\$(Configuration)\</xrIntDir>
     <xrSdkDir>$(SolutionDir)..\sdk\</xrSdkDir>
   </PropertyGroup>
   <PropertyGroup>
