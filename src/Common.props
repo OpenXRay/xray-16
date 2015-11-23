@@ -3,40 +3,28 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
     <xrBinRootDir>$(SolutionDir)..\bin\</xrBinRootDir>
-    <xrBinPlugRootDir>$(SolutionDir)..\bin_plugs\</xrBinPlugRootDir>
     <xrLibRootDir>$(SolutionDir)..\lib\</xrLibRootDir>
     <xrBinDir>$(SolutionDir)..\bin\$(Configuration)\</xrBinDir>
-    <xrBinPlugDir>$(SolutionDir)..\bin_plugs\$(Configuration)\</xrBinPlugDir>
+    <xrPlugBinDir>$(SolutionDir)..\bin\$(Configuration)\plugins\</xrPlugBinDir>
     <xrLibDir>$(SolutionDir)..\lib\$(Configuration)\</xrLibDir>
     <xrIntDir>$(SolutionDir)..\intermediate\$(Configuration)\</xrIntDir>
     <xrSdkDir>$(SolutionDir)..\sdk\</xrSdkDir>
   </PropertyGroup>
-  <PropertyGroup />
-  <ItemDefinitionGroup />
-  <ItemGroup>
-      <BuildMacro Include="xrBinRootDir">
-      <Value>$(xrBinRootDir)</Value>
-    </BuildMacro>
-    <BuildMacro Include="xrBinPlugRootDir">
-      <Value>$(xrBinPlugRootDir)</Value>
-    </BuildMacro>
-    <BuildMacro Include="xrLibRootDir">
-      <Value>$(xrLibRootDir)</Value>
-    </BuildMacro>
-    <BuildMacro Include="xrBinDir">
-      <Value>$(xrBinDir)</Value>
-    </BuildMacro>
-    <BuildMacro Include="xrBinPlugDir">
-      <Value>$(xrBinPlugDir)</Value>
-    </BuildMacro>
-    <BuildMacro Include="xrLibDir">
-      <Value>$(xrLibDir)</Value>
-    </BuildMacro>
-    <BuildMacro Include="xrIntDir">
-      <Value>$(xrIntDir)</Value>
-    </BuildMacro>
-    <BuildMacro Include="xrSdkDir">
-      <Value>$(xrSdkDir)</Value>
-    </BuildMacro>
-  </ItemGroup>
+  <PropertyGroup>
+    <OutDir>$(xrBinDir)</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(xrSdkDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <OutputFile>$(xrLibDir)$(TargetName).lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
 </Project>
