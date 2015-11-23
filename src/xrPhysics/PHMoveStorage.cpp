@@ -2,7 +2,7 @@
 #include "phmovestorage.h"
 #pragma warning(disable:4995)
 #pragma warning(disable:4267)
-#include "3rd party/ode/ode/src/collision_kernel.h"
+#include "Externals/ode/ode/src/collision_kernel.h"
 #pragma warning(default:4995)
 #pragma warning(default:4267)
 struct dxGeomTransform : public dxGeom {

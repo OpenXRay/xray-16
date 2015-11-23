@@ -11,7 +11,7 @@
 #include "xrEngine/GameMtlLib.h"
 
 #include "PHWorld.h"
-#include "3rd party/ode/ode/src/util.h"
+#include "Externals/ode/ode/src/util.h"
 
 #ifdef DEBUG
 #	include "debug_output.h"

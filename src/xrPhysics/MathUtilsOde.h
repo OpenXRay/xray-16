@@ -2,13 +2,13 @@
 
 #pragma warning(disable:4995)
 #pragma warning(disable:4267)
-#include "3rd party/ode/include/ode/common.h"
-#include "3rd party/ode/include/ode/odemath.h"
-#include "3rd party/ode/include/ode/objects.h"
-#include "3rd party/ode/include/ode/rotation.h"
-#include "3rd party/ode/include/ode/compatibility.h"
-#include "3rd party/ode/include/ode/collision.h"
-#include "3rd party/ode/include/ode/matrix.h"
+#include "Externals/ode/include/ode/common.h"
+#include "Externals/ode/include/ode/odemath.h"
+#include "Externals/ode/include/ode/objects.h"
+#include "Externals/ode/include/ode/rotation.h"
+#include "Externals/ode/include/ode/compatibility.h"
+#include "Externals/ode/include/ode/collision.h"
+#include "Externals/ode/include/ode/matrix.h"
 
 #include "mathutils.h"
 #include "ode_redefine.h"
