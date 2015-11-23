@@ -67,7 +67,7 @@ if %cfg%==Debug (
   %cp_tool% %src%\CxImage.dll %dst%\CxImage.dll
 )
 %cp_tool% %src%\LuaJIT.dll %dst%\LuaJIT.dll
-%cp_tool% %src%\LuaBind.dll %dst%\LuaBind.dll
+%cp_tool% %src%\luabind.dll %dst%\luabind.dll
 %cp_tool% %src%\ODE.dll %dst%\ODE.dll
 %cp_tool% %src%\OpenAL32.dll %dst%\OpenAL32.dll
 %cp_tool% %src%\OpenAL32.dll %dst%\dedicated\OpenAL32.dll
