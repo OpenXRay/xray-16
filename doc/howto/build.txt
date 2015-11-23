@@ -2,9 +2,8 @@ TITLE: X-Ray 1.6 build and setup instructions
 
 Build:
 ------
-By default, all libraries mentioned below (except Windows/DirectX SDK) are assumed to be in the directory
-defined by XRAY_16X_LIBS environment variable. It can be set with following command (run as administrator):
-  $ setx XRAY_16X_LIBS E:\dev\ /M
+By default, all libraries mentioned below (except Windows/DirectX SDK) are assumed to be in
+the src\Externals directory.
 
 To build X-Ray Engine you'll need following libraries:
 * OpenSSL: https://www.openssl.org/source
@@ -45,10 +44,10 @@ Setup:
   - eax.dll
   - wrap_oal.dll
 - For _bin_rel and _bin_mix:
-  - Copy BugTrap.dll from %XRAY_16X_LIBS%BugTrap\Bin
+  - Copy BugTrap.dll from src\Externals\BugTrap\Bin
 - For _bin_dbg:
-  - Copy BugTrapD.dll from %XRAY_16X_LIBS%BugTrap\Bin and rename it to BugTrap.dll
-- Copy following files from %XRAY_16X_LIBS%OpenSSL\bin to _bin_dbg, _bin_mix and _bin_rel:
+  - Copy BugTrapD.dll from src\Externals\BugTrap\Bin and rename it to BugTrap.dll
+- Copy following files from src\Externals\OpenSSL\bin to _bin_dbg, _bin_mix and _bin_rel:
   - libeay32.dll
   - ssleay32.dll
 - Create soft link to /gamedata in the game installation directory:

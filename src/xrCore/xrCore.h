@@ -102,7 +102,6 @@
 #endif
 
 #include <time.h>
-#define MODULE_NAME "xrCore.dll"
 
 // Warnings
 #pragma warning (disable : 4251 ) // object needs DLL interface

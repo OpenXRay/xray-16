@@ -128,6 +128,17 @@ function sleep_dialog:OnMessageBoxOk()
 	db.actor:give_info_portion("tutorial_sleep")
 	disable_info("sleep_active")
 end
+
+function sleep_dialog:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+		if dik == DIK_keys.DIK_ESCAPE then
+			self:HideDialog()
+			db.actor:give_info_portion("tutorial_sleep")
+			disable_info("sleep_active")
+		end
+	end
+end
 --------------------------------------------------------------------------------
 function dream_callback()
 	level.add_cam_effector("camera_effects\\sleep.anm", 10, false, "ui_sleep_dialog.dream_callback2")

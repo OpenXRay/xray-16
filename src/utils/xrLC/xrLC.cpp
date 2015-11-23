@@ -139,7 +139,7 @@ void Startup(LPSTR     lpCmdLine)
     if (bModifyOptions)     
     {
         Logger.Phase("Project options...");
-        HMODULE     L = LoadLibrary     ("xrLC_Options.dll");
+        HMODULE     L = LoadLibrary     ("xrLC_Options");
         void*       P = GetProcAddress  (L,"_frmScenePropertiesRun");
         R_ASSERT    (P);
         xrOptions*  O = (xrOptions*)P;

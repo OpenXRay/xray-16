@@ -199,7 +199,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     Debug._initialize       (false);
     Core._initialize        ("xrai",0);
     HMODULE                 hFactory;
-    LPCSTR                  g_name  = "xrSE_Factory.dll";
+    LPCSTR                  g_name  = "xrSE_Factory";
     Log                     ("Loading DLL:",g_name);
     hFactory                = LoadLibrary   (g_name);
     if (0==hFactory)        R_CHK           (GetLastError());
