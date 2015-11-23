@@ -34,7 +34,7 @@ static BOOL bException = FALSE;
 #include <dbghelp.h> // MiniDump flags
 
 #ifdef USE_BUG_TRAP
-# include <BugTrap/source/BugTrap.h> // for BugTrap functionality
+# include <BugTrap/source/Client/BugTrap.h> // for BugTrap functionality
 #ifndef __BORLANDC__
 # pragma comment(lib,"BugTrap.lib") // Link to ANSI DLL
 #else
