@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "ModuleLookup.hpp"
 
 #define WIN32_LEAN_AND_MEAN
