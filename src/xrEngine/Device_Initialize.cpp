@@ -7,20 +7,22 @@
 #include "GameFont.h"
 #include "PerformanceAlert.hpp"
 
+#include "xrCore/ModuleLookup.hpp"
+
 extern LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 #ifdef INGAME_EDITOR
 void CRenderDevice::initialize_editor()
 {
-    m_editor_module = LoadLibrary("xrWeatherEditor");
+    m_editor_module = XRay::LoadLibrary("xrWeatherEditor");
     if (!m_editor_module)
     {
         Msg("! cannot load library \"xrWeatherEditor\"");
         return;
     }
-    m_editor_initialize = (initialize_function_ptr)GetProcAddress(m_editor_module, "initialize");
+    m_editor_initialize = (initialize_function_ptr)XRay::GetProcAddress(m_editor_module, "initialize");
     VERIFY(m_editor_initialize);
-    m_editor_finalize = (finalize_function_ptr)GetProcAddress(m_editor_module, "finalize");
+    m_editor_finalize = (finalize_function_ptr)XRay::GetProcAddress(m_editor_module, "finalize");
     VERIFY(m_editor_finalize);
     m_engine = xr_new<engine_impl>();
     m_editor_initialize(m_editor, m_engine);
