@@ -201,9 +201,6 @@
     <ClCompile Include="..\xrRender\ParticleGroup.cpp">
       <Filter>Models\Visuals</Filter>
     </ClCompile>
-    <ClCompile Include="GL_DStreams.cpp">
-      <Filter>Refactored\Backend</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\ResourceManager.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClCompile>
@@ -638,6 +635,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\D3DUtils.cpp">
       <Filter>Refactored\Execution &amp; 3D\DebugDraw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\R_DStreams.cpp">
+      <Filter>Refactored\Backend</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

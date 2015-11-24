@@ -249,6 +249,7 @@
     <ClCompile Include="..\xrRender\Light_Render_Direct.cpp" />
     <ClCompile Include="..\xrRender\Light_Render_Direct_ComputeXFS.cpp" />
     <ClCompile Include="..\xrRender\ModelPool.cpp" />
+    <ClCompile Include="..\xrRender\R_DStreams.cpp" />
     <ClCompile Include="..\xrRender\Shader.cpp" />
     <ClCompile Include="blender_bloom_build.cpp" />
     <ClCompile Include="blender_combine.cpp" />
@@ -357,7 +358,6 @@
     <ClCompile Include="glResourceManager_Scripting.cpp" />
     <ClCompile Include="glr_constants.cpp" />
     <ClCompile Include="glTexture.cpp" />
-    <ClCompile Include="GL_DStreams.cpp" />
     <ClCompile Include="gl_R_render.cpp" />
     <ClCompile Include="r2_R_calculate.cpp" />
     <ClCompile Include="gl_rendertarget.cpp" />
