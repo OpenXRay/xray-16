@@ -284,7 +284,7 @@ public:
 	virtual	void					level_Load					(IReader*);
 	virtual void					level_Unload				();
 
-	GLuint							texture_load				(LPCSTR	fname, u32& msize, bool bStaging = false);
+	GLuint							texture_load				(LPCSTR	fname, u32& msize, GLenum& ret_desc);
 	virtual HRESULT					shader_compile				(
 		LPCSTR							name,
 		DWORD const*					pSrcData,
