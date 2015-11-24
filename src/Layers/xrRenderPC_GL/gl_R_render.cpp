@@ -14,7 +14,7 @@ IC	bool	pred_sp_sort	(ISpatial*	_1, ISpatial* _2)
 
 void CRender::render_main	(Fmatrix&	m_ViewProjection, bool _fportals)
 {
-//	PIX_EVENT(render_main);
+	PIX_EVENT(render_main);
 //	Msg						("---begin");
 	marker					++;
 
@@ -145,7 +145,7 @@ void CRender::render_main	(Fmatrix&	m_ViewProjection, bool _fportals)
 
 void CRender::render_menu	()
 {
-//	PIX_EVENT(render_menu);
+	PIX_EVENT(render_menu);
 	//	Globals
 	RCache.set_CullMode				(CULL_CCW);
 	RCache.set_Stencil				(FALSE);
@@ -192,7 +192,7 @@ void CRender::render_menu	()
 extern u32 g_r;
 void CRender::Render		()
 {
-//	PIX_EVENT(CRender_Render);
+	PIX_EVENT(CRender_Render);
 
 	g_r						= 1;
 	VERIFY					(0==mapDistort.size());
@@ -241,7 +241,7 @@ void CRender::Render		()
 	//******* Z-prefill calc - DEFERRER RENDERER
 	if (ps_r2_ls_flags.test(R2FLAG_ZFILL))		
 	{
-//		PIX_EVENT(DEFER_Z_FILL);
+		PIX_EVENT(DEFER_Z_FILL);
 		BasicStats.Culling.Begin			();
 		float		z_distance	= ps_r2_zfill		;
 		Fmatrix		m_zfill, m_project				;
@@ -311,7 +311,7 @@ void CRender::Render		()
 	//******* Main render :: PART-0	-- first
 	if (!split_the_scene_to_minimize_wait)
 	{
-//		PIX_EVENT(DEFER_PART0_NO_SPLIT);
+		PIX_EVENT(DEFER_PART0_NO_SPLIT);
 		// level, DO NOT SPLIT
 		Target->phase_scene_begin				();
 		r_dsgraph_render_hud					();
@@ -322,7 +322,7 @@ void CRender::Render		()
 	} 
 	else 
 	{
-//		PIX_EVENT(DEFER_PART0_SPLIT);
+		PIX_EVENT(DEFER_PART0_SPLIT);
 		// level, SPLIT
 		Target->phase_scene_begin				();
 		r_dsgraph_render_graph					(0);
@@ -336,7 +336,7 @@ void CRender::Render		()
    if( RImplementation.o.dx10_msaa )
       RCache.set_ZB( RImplementation.Target->rt_MSAADepth->pZRT );
 	{
-//		PIX_EVENT(DEFER_TEST_LIGHT_VIS);
+		PIX_EVENT(DEFER_TEST_LIGHT_VIS);
 		// perform tests
 		u32	count			= 0;
 		light_Package&	LP	= Lights.package;
@@ -377,7 +377,7 @@ void CRender::Render		()
    //******* Main render :: PART-1 (second)
 	if (split_the_scene_to_minimize_wait)	
 	{
-//		PIX_EVENT(DEFER_PART1_SPLIT);
+		PIX_EVENT(DEFER_PART1_SPLIT);
 		// skybox can be drawn here
 		if (0)
 		{
@@ -415,7 +415,7 @@ void CRender::Render		()
 	// Wall marks
 	if(Wallmarks)	
 	{
-//		PIX_EVENT(DEFER_WALLMARKS);
+		PIX_EVENT(DEFER_WALLMARKS);
 		Target->phase_wallmarks					();
 		g_r										= 0;
 		Wallmarks->Render						();				// wallmarks has priority as normal geometry
@@ -423,7 +423,7 @@ void CRender::Render		()
 
 	// Update incremental shadowmap-visibility solver
 	{
-//		PIX_EVENT(DEFER_FLUSH_OCCLUSION);
+		PIX_EVENT(DEFER_FLUSH_OCCLUSION);
 		u32 it=0;
 		for (it=0; it<Lights_LastFrame.size(); it++)	{
 			if (0==Lights_LastFrame[it])	continue	;
@@ -440,21 +440,21 @@ void CRender::Render		()
 	// full screen pass to mark msaa-edge pixels in highest stencil bit
 	if( RImplementation.o.dx10_msaa )
 	{
-//	   PIX_EVENT( MARK_MSAA_EDGES );
+	   PIX_EVENT( MARK_MSAA_EDGES );
 	   Target->mark_msaa_edges();
 	}
 
 	//	TODO: DX10: Implement DX10 rain.
 	if (ps_r2_ls_flags.test(R3FLAG_DYN_WET_SURF))
 	{
-//		PIX_EVENT(DEFER_RAIN);
+		PIX_EVENT(DEFER_RAIN);
 		render_rain();
 	}
 
 	// Directional light - fucking sun
 	if (bSUN)	
 	{
-//		PIX_EVENT(DEFER_SUN);
+		PIX_EVENT(DEFER_SUN);
 		RImplementation.Stats.l_visible		++;
 		if( !ps_r2_ls_flags_ext.is(R2FLAGEXT_SUN_OLD))
 			render_sun_cascades					();
@@ -468,7 +468,7 @@ void CRender::Render		()
 	}
 
 	{
-//		PIX_EVENT(DEFER_SELF_ILLUM);
+		PIX_EVENT(DEFER_SELF_ILLUM);
 		Target->phase_accumulator			();
 		// Render emissive geometry, stencil - write 0x0 at pixel pos
 		RCache.set_xform_project			(Device.mProject); 
@@ -486,7 +486,7 @@ void CRender::Render		()
 
 	// Lighting, non dependant on OCCQ
 	{
-//		PIX_EVENT(DEFER_LIGHT_NO_OCCQ);
+		PIX_EVENT(DEFER_LIGHT_NO_OCCQ);
 		Target->phase_accumulator				();
 		HOM.Disable								();
 		render_lights							(LP_normal);
@@ -494,13 +494,13 @@ void CRender::Render		()
 
 	// Lighting, dependant on OCCQ
 	{
-//		PIX_EVENT(DEFER_LIGHT_OCCQ);
+		PIX_EVENT(DEFER_LIGHT_OCCQ);
 		render_lights							(LP_pending);
 	}
 
 	// Postprocess
 	{
-//		PIX_EVENT(DEFER_LIGHT_COMBINE);
+		PIX_EVENT(DEFER_LIGHT_COMBINE);
 		Target->phase_combine					();
 	}
 

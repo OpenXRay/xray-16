@@ -15,6 +15,7 @@
 #include <glbinding/gl/gl.h>
 
 #include "Layers/xrRender/xrD3DDefs.h"
+#include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 
 #define		R_GL	0
 #define		R_R1	1
