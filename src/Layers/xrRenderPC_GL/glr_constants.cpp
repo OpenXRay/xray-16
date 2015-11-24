@@ -16,7 +16,7 @@ IC bool	p_sort(ref_constant C1, ref_constant C2)
 }
 
 // TODO: OGL: Use constant buffers like DX10.
-BOOL	R_constant_table::parse(void* _desc, u16 destination)
+BOOL	R_constant_table::parse(void* _desc, u32 destination)
 {
 	GLuint program = *(GLuint*)_desc;
 
