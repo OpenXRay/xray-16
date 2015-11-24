@@ -21,8 +21,10 @@ public:
 			void				Register			(CUIWindow* pChild, LPCSTR name);
 								CUIDialogWndEx		();
 	virtual						~CUIDialogWndEx		();
+    // XXX: declaration without implementation
 			void				AddCallback			(LPCSTR control_id, s16 event, const luabind::functor<void> &lua_function);
 			void				AddCallback			(LPCSTR control_id, s16 event, const luabind::functor<void> &functor, const luabind::object &object);
+    void AddCallback(const char *controlId, s16 event, const luabind::object &functor, const luabind::object &object);
 	virtual void				Update				();
 	virtual bool				OnKeyboardAction			(int dik, EUIMessages keyboard_action);
 	virtual bool				Dispatch			(int cmd, int param)				{return true;}
