@@ -182,7 +182,8 @@ void CScriptCallbackEx<void>::operator()(Args &&...args) const
                     VERIFY(m_object.is_valid());
                     luabind::call_function<void>(m_functor, m_object, std::forward<Args>(args)...);
                 }
-                luabind::call_function<void>(m_functor, std::forward<Args>(args)...);
+                else
+                    luabind::call_function<void>(m_functor, std::forward<Args>(args)...);
             }
         }
         process_error catch(std::exception &)
@@ -212,7 +213,8 @@ void CScriptCallbackEx<void>::operator()(Args &&...args)
                     VERIFY(m_object.is_valid());
                     luabind::call_function<void>(m_functor, m_object, std::forward<Args>(args)...);
                 }
-                luabind::call_function<void>(m_functor, std::forward<Args>(args)...);
+                else
+                    luabind::call_function<void>(m_functor, std::forward<Args>(args)...);
             }
         }
         process_error catch (std::exception &)
