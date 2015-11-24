@@ -177,9 +177,6 @@
     <ClCompile Include="..\xrRender\xrRender_console.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="GLUtils.cpp">
-      <Filter>Refactored\Execution &amp; 3D\DebugDraw</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\PSLibrary.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -639,6 +636,9 @@
     <ClCompile Include="glTexture.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRender\D3DUtils.cpp">
+      <Filter>Refactored\Execution &amp; 3D\DebugDraw</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -648,9 +648,6 @@
       <Filter>Kernel</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\xrRender\DrawUtils.h">
-      <Filter>Refactored\Execution &amp; 3D\DebugDraw</Filter>
-    </ClInclude>
-    <ClInclude Include="GLUtils.h">
       <Filter>Refactored\Execution &amp; 3D\DebugDraw</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\PSLibrary.h">
@@ -1066,6 +1063,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\D3DXRenderBase.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\D3DUtils.h">
+      <Filter>Refactored\Execution &amp; 3D\DebugDraw</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -211,6 +211,7 @@
     <ClCompile Include="..\xrRenderGL\glState.cpp" />
     <ClCompile Include="..\xrRenderGL\glStateUtils.cpp" />
     <ClCompile Include="..\xrRenderGL\glTextureUtils.cpp" />
+    <ClCompile Include="..\xrRender\D3DUtils.cpp" />
     <ClCompile Include="..\xrRender\DetailManager_VS.cpp" />
     <ClCompile Include="..\xrRender\du_box.cpp" />
     <ClCompile Include="..\xrRender\du_cone.cpp" />
@@ -356,7 +357,6 @@
     <ClCompile Include="glResourceManager_Scripting.cpp" />
     <ClCompile Include="glr_constants.cpp" />
     <ClCompile Include="glTexture.cpp" />
-    <ClCompile Include="GLUtils.cpp" />
     <ClCompile Include="GL_DStreams.cpp" />
     <ClCompile Include="gl_R_render.cpp" />
     <ClCompile Include="r2_R_calculate.cpp" />
@@ -402,6 +402,7 @@
     <ClInclude Include="..\xrRenderGL\glState.h" />
     <ClInclude Include="..\xrRenderGL\glStateUtils.h" />
     <ClInclude Include="..\xrRenderGL\glTextureUtils.h" />
+    <ClInclude Include="..\xrRender\D3DUtils.h" />
     <ClInclude Include="..\xrRender\D3DXRenderBase.h" />
     <ClInclude Include="..\xrRender\du_box.h" />
     <ClInclude Include="..\xrRender\du_cone.h" />
@@ -508,7 +509,6 @@
     <ClInclude Include="..\xrRender\uber_deffer.h" />
     <ClInclude Include="..\xrRender\WallmarksEngine.h" />
     <ClInclude Include="..\xrRender\xrRender_console.h" />
-    <ClInclude Include="GLUtils.h" />
     <ClInclude Include="gl_rendertarget_wallmarks.h" />
     <ClInclude Include="r2_types.h" />
     <ClInclude Include="gl_rendertarget.h" />
