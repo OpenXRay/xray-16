@@ -376,6 +376,7 @@
     <ClCompile Include="Threading\ttapi.cpp" />
     <ClCompile Include="Threading\Lock.cpp" />
     <ClCompile Include="xrCore.cpp" />
+    <ClCompile Include="ModuleLookup.cpp" />
     <ClCompile Include="xrDebugNew.cpp" />
     <ClCompile Include="xrMemory.cpp" />
     <ClCompile Include="xrMemory_align.cpp" />
@@ -508,6 +509,7 @@
     <ClInclude Include="Threading\Lock.hpp" />
     <ClInclude Include="vector.h" />
     <ClInclude Include="xrCore.h" />
+    <ClInclude Include="ModuleLookup.hpp" />
     <ClInclude Include="Platform.h" />
     <ClInclude Include="xrDebug.h" />
     <ClInclude Include="xrDebug_macros.h" />

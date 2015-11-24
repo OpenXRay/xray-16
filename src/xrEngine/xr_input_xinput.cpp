@@ -3,6 +3,7 @@
 #include "xr_input_xinput.h"
 #include <xinput.h>
 
+#include "xrCore/ModuleLookup.hpp"
 
 DXUT_GAMEPAD g_GamePads[DXUT_MAX_CONTROLLERS];
 
@@ -20,11 +21,11 @@ static LPXINPUTGETSTATE s_pXInputGetState = NULL;
 static LPXINPUTGETCAPABILITIES s_pXInputGetCapabilities = NULL;
 if( NULL == s_pXInputGetState || NULL == s_pXInputGetCapabilities )
 {
-HINSTANCE hInst = LoadLibrary( XINPUT_DLL );
+HINSTANCE hInst = XRay::LoadLibrary( XINPUT_DLL );
 if( hInst )
 {
-s_pXInputGetState = (LPXINPUTGETSTATE)GetProcAddress( hInst, "XInputGetState" );
-s_pXInputGetCapabilities = (LPXINPUTGETCAPABILITIES)GetProcAddress( hInst, "XInputGetCapabilities" );
+s_pXInputGetState = (LPXINPUTGETSTATE)XRay::GetProcAddress( hInst, "XInputGetState" );
+s_pXInputGetCapabilities = (LPXINPUTGETCAPABILITIES)XRay::GetProcAddress( hInst, "XInputGetCapabilities" );
 }
 }
 if( s_pXInputGetState == NULL )
@@ -114,9 +115,9 @@ void set_vibration (u16 s1, u16 s2)
 static LPXINPUTSETSTATE s_pXInputSetState = NULL;
 if( NULL == s_pXInputSetState )
 {
-HINSTANCE hInst = LoadLibrary( XINPUT_DLL );
+HINSTANCE hInst = XRay::LoadLibrary( XINPUT_DLL );
 if( hInst )
-s_pXInputSetState = (LPXINPUTSETSTATE)GetProcAddress( hInst, "XInputSetState" );
+s_pXInputSetState = (LPXINPUTSETSTATE)XRay::GetProcAddress( hInst, "XInputSetState" );
 }
 
 
