@@ -363,9 +363,6 @@
     <ClCompile Include="..\xrRender\R_Backend_Runtime.cpp">
       <Filter>Refactored\Backend</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\dxRenderVisual.cpp">
-      <Filter>Refactored\Execution &amp; 3D\Visuals</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\dxParticleCustom.cpp">
       <Filter>Refactored\Execution &amp; 3D\Visuals</Filter>
     </ClCompile>
@@ -439,9 +436,6 @@
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\SkeletonX.cpp">
-      <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\skinw.cpp">
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\HWCaps.cpp">
@@ -839,9 +833,6 @@
     <ClInclude Include="..\xrRender\occRasterizer.h">
       <Filter>Visibility\HOM Occlusion</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\dxRenderVisual.h">
-      <Filter>Refactored\Execution &amp; 3D\Visuals</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\dxParticleCustom.h">
       <Filter>Refactored\Execution &amp; 3D\Visuals</Filter>
     </ClInclude>
@@ -886,9 +877,6 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\light.h">
       <Filter>Lights</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrRender\skinw.h">
-      <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\Animation.h">
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>

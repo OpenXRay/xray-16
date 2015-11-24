@@ -308,7 +308,6 @@
     <ClCompile Include="..\xrRender\DetailManager_soft.cpp" />
     <ClCompile Include="..\xrRender\DetailModel.cpp" />
     <ClCompile Include="..\xrRender\dxParticleCustom.cpp" />
-    <ClCompile Include="..\xrRender\dxRenderVisual.cpp" />
     <ClCompile Include="..\xrRender\ETextureParams.cpp" />
     <ClCompile Include="..\xrRender\FBasicVisual.cpp" />
     <ClCompile Include="..\xrRender\FHierrarhyVisual.cpp" />
@@ -350,7 +349,6 @@
     <ClCompile Include="..\xrRender\SkeletonCustom.cpp" />
     <ClCompile Include="..\xrRender\SkeletonRigid.cpp" />
     <ClCompile Include="..\xrRender\SkeletonX.cpp" />
-    <ClCompile Include="..\xrRender\skinw.cpp" />
     <ClCompile Include="..\xrRender\TextureDescrManager.cpp" />
     <ClCompile Include="..\xrRender\tss_def.cpp" />
     <ClCompile Include="..\xrRender\uber_deffer.cpp" />
@@ -465,7 +463,6 @@
     <ClInclude Include="..\xrRender\DetailManager.h" />
     <ClInclude Include="..\xrRender\DetailModel.h" />
     <ClInclude Include="..\xrRender\dxParticleCustom.h" />
-    <ClInclude Include="..\xrRender\dxRenderVisual.h" />
     <ClInclude Include="..\xrRender\ETextureParams.h" />
     <ClInclude Include="..\xrRender\FBasicVisual.h" />
     <ClInclude Include="..\xrRender\FHierrarhyVisual.h" />
@@ -505,7 +502,6 @@
     <ClInclude Include="..\xrRender\SkeletonAnimated.h" />
     <ClInclude Include="..\xrRender\SkeletonCustom.h" />
     <ClInclude Include="..\xrRender\SkeletonX.h" />
-    <ClInclude Include="..\xrRender\skinw.h" />
     <ClInclude Include="..\xrRender\TextureDescrManager.h" />
     <ClInclude Include="..\xrRender\tss.h" />
     <ClInclude Include="..\xrRender\tss_def.h" />
