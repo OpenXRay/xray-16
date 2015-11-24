@@ -650,9 +650,9 @@ luabind::object CScriptEngine::name_space(LPCSTR namespace_name)
             return lua_namespace;
         LPSTR I = strchr(S, '.');
         if (!I)
-            return lua_namespace[S];
+            return lua_namespace[(const char*)S];
         *I = 0;
-        lua_namespace = lua_namespace[S];
+        lua_namespace = lua_namespace[(const char*)S];
         S = I + 1;
     }
 }
@@ -1044,6 +1044,8 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
     }
 #endif
     luabind::open(lua());
+    // XXX: temporary workaround to preserve backwards compatibility with game scripts
+    luabind::disable_super_deprecation();
     setup_callbacks();
     if (exporterFunc)
         exporterFunc(lua());
