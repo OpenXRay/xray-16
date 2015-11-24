@@ -89,7 +89,7 @@ struct	  ECORE_API		SPass			: public xr_resource_flagged									{
 	ref_state							state;		// Generic state, like Z-Buffering, samplers, etc
 	ref_ps								ps;			// may be NULL = FFP, in that case "state" must contain TSS setup
 	ref_vs								vs;			// may be NULL = FFP, in that case "state" must contain RS setup, *and* FVF-compatible declaration must be used
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	ref_gs								gs;			// may be NULL = don't use geometry shader at all
 #	ifdef USE_DX11
 	ref_hs								hs;			// may be NULL = don't use hull shader at all

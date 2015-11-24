@@ -10,7 +10,7 @@ class  CTheoraSurface;
 class  ECORE_API CTexture : public xr_resource_named
 {
 public:
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	enum	MaxTextures
 	{
 		//	Actually these values are 128

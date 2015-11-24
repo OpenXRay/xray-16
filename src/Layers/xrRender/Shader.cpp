@@ -59,7 +59,7 @@ BOOL SPass::equal(const SPass& other)
 	if (state		!= other.state)		return FALSE;
 	if (ps			!= other.ps)			return FALSE;
 	if (vs			!= other.vs)			return FALSE;
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	if (gs			!= other.gs)			return FALSE;
 #	ifdef USE_DX11
 	if (hs			!= other.hs)			return FALSE;

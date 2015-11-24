@@ -54,11 +54,15 @@ struct ECORE_API SPS : public xr_resource_named
 };
 typedef	resptr_core<SPS,resptr_base<SPS> > ref_ps;
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SGS : public xr_resource_named
 {
+#ifdef USE_OGL
+	GLuint								gs;
+#else
 	ID3DGeometryShader*					gs;
+#endif // USE_OGL
 	R_constant_table					constants;
 	~SGS			();
 };

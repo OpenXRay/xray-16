@@ -173,7 +173,7 @@ private:
 	CTexture*						textures_ps	[CTexture::mtMaxPixelShaderTextures];	// stages
 	//CTexture*						textures_vs	[5	];	// dmap + 4 vs
 	CTexture*						textures_vs	[CTexture::mtMaxVertexShaderTextures];	// 4 vs
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	CTexture*						textures_gs	[CTexture::mtMaxGeometryShaderTextures];	// 4 vs
 #	ifdef USE_DX11
 	CTexture*						textures_hs	[CTexture::mtMaxHullShaderTextures];	// 4 vs
@@ -295,8 +295,12 @@ public:
 #endif // USE_OGL
 	ICF void						set_PS				(ref_ps& _ps)						{ set_PS(_ps->ps,_ps->cName.c_str());				}
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#ifdef USE_OGL
+	ICF void						set_GS				(GLuint _gs, LPCSTR _n=0);
+#else
 	ICF void						set_GS				(ID3DGeometryShader* _gs, LPCSTR _n=0);
+#endif // USE_OGL
 	ICF void						set_GS				(ref_gs& _gs)						{ set_GS(_gs->gs,_gs->cName.c_str());				}
 
 #	ifdef USE_DX11

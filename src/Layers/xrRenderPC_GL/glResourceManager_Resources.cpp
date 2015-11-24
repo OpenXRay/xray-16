@@ -68,23 +68,24 @@ void		CResourceManager::_DeleteState		(const SState* state)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-SPass*		CResourceManager::_CreatePass			(ref_state& _state, ref_ps& _ps, ref_vs& _vs, ref_ctable& _ctable, ref_texture_list& _T, ref_matrix_list& _M, ref_constant_list& _C)
+SPass*		CResourceManager::_CreatePass			(const SPass& proto)
 {
 	for (u32 it=0; it<v_passes.size(); it++)
-		if (v_passes[it]->equal(_state,_ps,_vs,_ctable,_T,_M,_C))
+		if (v_passes[it]->equal(proto))
 			return v_passes[it];
-
-	SPass*	P				= new SPass();
-	P->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
-	P->state				=	_state;
-	P->ps					=	_ps;
-	P->vs					=	_vs;
-	P->constants			=	_ctable;
-	P->T					=	_T;
+	
+	SPass*	P					=	xr_new<SPass>();
+	P->dwFlags					|=	xr_resource_flagged::RF_REGISTERED;
+	P->state					=	proto.state;
+	P->ps						=	proto.ps;
+	P->vs						=	proto.vs;
+	P->gs						=	proto.gs;
+	P->constants				=	proto.constants;
+	P->T						=	proto.T;
 #ifdef _EDITOR
-	P->M					=	_M;
+	P->M						=	proto.M;
 #endif
-	P->C					=	_C;
+	P->C						=	proto.C;
 
 	v_passes.push_back			(P);
 	return v_passes.back();
@@ -117,10 +118,10 @@ SDeclaration*	CResourceManager::_CreateDecl	(u32 FVF)
 	}
 
 	SDeclaration* D = new SDeclaration();
-	glGenVertexArrays(1, &D->vao);
+	glGenVertexArrays(1, &D->dcl);
 
 	D->FVF = FVF;
-	glBufferUtils::ConvertVertexDeclaration(FVF, D->vao);
+	glBufferUtils::ConvertVertexDeclaration(FVF, D->dcl);
 	D->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 	v_declarations.push_back(D);
 
@@ -137,12 +138,12 @@ SDeclaration*	CResourceManager::_CreateDecl(D3DVERTEXELEMENT9* dcl)
 	}
 
 	SDeclaration* D = new SDeclaration();
-	glGenVertexArrays(1, &D->vao);
+	glGenVertexArrays(1, &D->dcl);
 
 	D->FVF = 0;
 	u32 dcl_size = glBufferUtils::GetDeclLength(dcl) + 1;
 	D->dcl_code.assign(dcl, dcl + dcl_size);
-	glBufferUtils::ConvertVertexDeclaration(dcl, D->vao);
+	glBufferUtils::ConvertVertexDeclaration(dcl, D->dcl);
 	D->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 	v_declarations.push_back(D);
 
@@ -160,63 +161,68 @@ void		CResourceManager::_DeleteDecl		(const SDeclaration* dcl)
 SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 {
 	string_path			name;
-	strcpy_s(name, _name);
-	if (0 == ::Render->m_skinning)	strcat(name, "_0");
-	if (1 == ::Render->m_skinning)	strcat(name, "_1");
-	if (2 == ::Render->m_skinning)	strcat(name, "_2");
-	if (3 == ::Render->m_skinning)	strcat(name, "_3");
-	if (4 == ::Render->m_skinning)	strcat(name, "_4");
-	LPSTR N = LPSTR(name);
-	map_VS::iterator I = m_vs.find(N);
-	if (I != m_vs.end())	return I->second;
+	xr_strcpy				(name,_name);
+	if (0 == GlobalEnv.Render->m_skinning)	xr_strcat(name,"_0");
+	if (1 == GlobalEnv.Render->m_skinning)	xr_strcat(name,"_1");
+	if (2 == GlobalEnv.Render->m_skinning)	xr_strcat(name,"_2");
+	if (3 == GlobalEnv.Render->m_skinning)	xr_strcat(name,"_3");
+	if (4 == GlobalEnv.Render->m_skinning)	xr_strcat(name,"_4");
+	LPSTR N				= LPSTR		(name);
+	map_VS::iterator I	= m_vs.find	(N);
+	if (I!=m_vs.end())	return I->second;
 	else
 	{
-		SVS*	_vs = new SVS();
-		_vs->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-		m_vs.insert(mk_pair(_vs->set_name(name), _vs));
+		SVS*	_vs					= xr_new<SVS>	();
+		_vs->dwFlags				|= xr_resource_flagged::RF_REGISTERED;
+		m_vs.insert					(mk_pair(_vs->set_name(name),_vs));
 		//_vs->vs				= NULL;
 		//_vs->signature		= NULL;
 		VERIFY(strcmpi(name, "null") != 0);
 
-		GLchar*					pErrorBuf = NULL;
-		string_path					cname;
-		strconcat(sizeof(cname), cname, ::Render->getShaderPath(), _name, ".vs");
-		FS.update_path(cname, "$game_shaders$", cname);
-		//		LPCSTR						target		= NULL;
+		string_path					shName;
+		{
+			const char*	pchr = strchr(_name, '(');
+			ptrdiff_t	size = pchr?pchr-_name:xr_strlen(_name);
+			strncpy(shName, _name, size);
+			shName[size] = 0;
+		}
 
-		IReader*					fs = FS.r_open(cname);
+		string_path					cname;
+		strconcat					(sizeof(cname),cname,GlobalEnv.Render->getShaderPath(),/*_name*/shName,".vs");
+		FS.update_path				(cname,	"$game_shaders$", cname);
+		//		LPCSTR						target		= NULL;
+		
+		// duplicate and zero-terminate
+		IReader* file			= FS.r_open(cname);
 		//	TODO: OGL: HACK: Implement all shaders. Remove this for PS
-		if (!fs)
+		if (!file)
 		{
 			string1024			tmp;
-			sprintf(tmp, "OGL: %s is missing. Replace with stub_default.vs", cname);
-			Msg(tmp);
-			strconcat(sizeof(cname), cname, ::Render->getShaderPath(), "stub_default", ".vs");
-			FS.update_path(cname, "$game_shaders$", cname);
-			fs = FS.r_open(cname);
+			xr_sprintf			(tmp, "DX10: %s is missing. Replace with stub_default.vs", cname);
+			Msg					(tmp);
+			strconcat			(sizeof(cname), cname,GlobalEnv.Render->getShaderPath(),"stub_default",".vs");
+			FS.update_path		(cname,	"$game_shaders$", cname);
+			file				= FS.r_open(cname);
 		}
-		R_ASSERT3(fs, "shader file doesnt exist", cname);
+		u32	const size			= file->length();
+		char* const data		= (LPSTR)_alloca(size + 1);
+		CopyMemory				( data, file->pointer(), size );
+		data[size]				= 0;
+		FS.r_close				( file );
 
-		// vertex
-		R_ASSERT2(fs, cname);
+		// Select target
 		_vs->vs = glCreateShader(GL_VERTEX_SHADER);
-		GLenum _result = ::Render->shader_compile(name, LPCSTR(fs->pointer()), fs->length(), NULL, NULL, NULL, NULL, 0, &_vs->vs, &pErrorBuf, NULL);
-		FS.r_close(fs);
+		void* _result = &_vs->vs;
+		HRESULT	const _hr		= GlobalEnv.Render->shader_compile(name,(DWORD const*)data,size, NULL, NULL, NULL, _result );
 
-		if (_result == GL_TRUE)
-		{
-			//	Parse constant, texture, sampler binding
-			_vs->constants.parse(&_vs->vs, RC_dest_vertex);
-		}
-		else
-		{
-			VERIFY(pErrorBuf);
-			Log("! VS: ", _name);
-			Log("! error: ", pErrorBuf);
-		}
-		R_ASSERT2(_result, pErrorBuf);
-		xr_free(pErrorBuf);
-		return		_vs;
+		VERIFY(SUCCEEDED(_hr));
+
+		CHECK_OR_EXIT			(
+			!FAILED(_hr),
+			make_string("Your video card doesn't meet game requirements.\n\nTry to lower game settings.")
+		);
+
+		return					_vs;
 	}
 }
 
@@ -237,77 +243,70 @@ SPS*	CResourceManager::_CreatePS			(LPCSTR _name)
 {
 	string_path			name;
 	strcpy_s(name, _name);
-	if (0 == ::Render->m_MSAASample)	strcat(name, "_0");
-	if (1 == ::Render->m_MSAASample)	strcat(name, "_1");
-	if (2 == ::Render->m_MSAASample)	strcat(name, "_2");
-	if (3 == ::Render->m_MSAASample)	strcat(name, "_3");
-	if (4 == ::Render->m_MSAASample)	strcat(name, "_4");
-	if (5 == ::Render->m_MSAASample)	strcat(name, "_5");
-	if (6 == ::Render->m_MSAASample)	strcat(name, "_6");
-	if (7 == ::Render->m_MSAASample)	strcat(name, "_7");
-	LPSTR N = LPSTR(name);
-	map_PS::iterator I = m_ps.find(N);
+	if (0 == GlobalEnv.Render->m_MSAASample)	strcat(name, "_0");
+	if (1 == GlobalEnv.Render->m_MSAASample)	strcat(name, "_1");
+	if (2 == GlobalEnv.Render->m_MSAASample)	strcat(name, "_2");
+	if (3 == GlobalEnv.Render->m_MSAASample)	strcat(name, "_3");
+	if (4 == GlobalEnv.Render->m_MSAASample)	strcat(name, "_4");
+	if (5 == GlobalEnv.Render->m_MSAASample)	strcat(name, "_5");
+	if (6 == GlobalEnv.Render->m_MSAASample)	strcat(name, "_6");
+	if (7 == GlobalEnv.Render->m_MSAASample)	strcat(name, "_7");
+	LPSTR N				= LPSTR(name);
+	map_PS::iterator I	= m_ps.find	(N);
 	if (I != m_ps.end())	return		I->second;
 	else
 	{
-		SPS*	_ps = new SPS();
-		_ps->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-		m_ps.insert(mk_pair(_ps->set_name(name), _ps));
+		SPS*	_ps					=	xr_new<SPS>	();
+		_ps->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
+		m_ps.insert					(mk_pair(_ps->set_name(name),_ps));
 		VERIFY(strcmpi(name, "null") != 0);
 
+		string_path					shName;
+		const char*	pchr = strchr(_name, '(');
+		ptrdiff_t	strSize = pchr?pchr-_name:xr_strlen(_name);
+		strncpy(shName, _name, strSize );
+		shName[strSize] = 0;
+		
 		// Open file
 		string_path					cname;
-		strconcat(sizeof(cname), cname, ::Render->getShaderPath(), _name, ".ps");
-		FS.update_path(cname, "$game_shaders$", cname);
+		strconcat					(sizeof(cname), cname,GlobalEnv.Render->getShaderPath(),/*_name*/shName,".ps");
+		FS.update_path				(cname,	"$game_shaders$", cname);
 
 		// duplicate and zero-terminate
-		IReader*		R = FS.r_open(cname);
+		IReader*		R		= FS.r_open(cname);
 		//	TODO: DX10: HACK: Implement all shaders. Remove this for PS
 		if (!R)
 		{
 			string1024			tmp;
 			//	TODO: HACK: Test failure
 			//Memory.mem_compact();
-			sprintf(tmp, "OGL: %s is missing. Replace with stub_default.ps", cname);
-			Msg(tmp);
-			strconcat(sizeof(cname), cname, ::Render->getShaderPath(), "stub_default", ".ps");
-			FS.update_path(cname, "$game_shaders$", cname);
-			R = FS.r_open(cname);
+			xr_sprintf				(tmp, "OGL: %s is missing. Replace with stub_default.ps", cname);
+			Msg					(tmp);
+			strconcat					(sizeof(cname), cname,GlobalEnv.Render->getShaderPath(),"stub_default",".ps");
+			FS.update_path				(cname,	"$game_shaders$", cname);
+			R		= FS.r_open(cname);
 		}
-		R_ASSERT2(R, cname);
-		u32				size = R->length();
-		char*			data = xr_alloc<char>(size + 1);
-		CopyMemory(data, R->pointer(), size);
-		data[size] = 0;
-		FS.r_close(R);
 
-		// Compile
-		GLchar* pErrorBuf = NULL;
+		IReader* file			= FS.r_open(cname);
+		R_ASSERT2				( file, cname );
+		u32	const size			= file->length();
+		char* const data		= (LPSTR)_alloca(size + 1);
+		CopyMemory				( data, file->pointer(), size );
+		data[size]				= 0;
+		FS.r_close				( file );
+
+		// Select target
 		_ps->ps = glCreateShader(GL_FRAGMENT_SHADER);
-		GLenum _result = ::Render->shader_compile(name, data, size, NULL, NULL, NULL, NULL, 0, &_ps->ps, &pErrorBuf, NULL);
-		xr_free(data);
+		void* _result = &_ps->ps;
+		HRESULT	const _hr		= GlobalEnv.Render->shader_compile(name,(DWORD const*)data,size, NULL, NULL, NULL, _result);
 
-		if (_result == GL_TRUE)
-		{
-			//	Parse constant, texture, sampler binding
-			_ps->constants.parse(&_ps->ps, RC_dest_pixel);
-		}
-		else
-		{
-			VERIFY(pErrorBuf);
-			Log("! PS: ", _name);
-			Msg("error is %s", pErrorBuf);
-		}
-		R_ASSERT2(_result, pErrorBuf);
-		xr_free(pErrorBuf);
-
-		if (_result == GL_FALSE)
-			Msg("Can't compile shader %s", _name);
+		VERIFY(SUCCEEDED(_hr));
 
 		CHECK_OR_EXIT(
-			_result != GL_FALSE,
-			make_string("Your video card doesn't meet game requirements\n\nPixel Shaders v1.1 or higher required")
+			!FAILED(_hr),
+			make_string("Your video card doesn't meet game requirements.\n\nTry to lower game settings.")
 			);
+
 		return			_ps;
 	}
 }
@@ -321,6 +320,70 @@ void	CResourceManager::_DeletePS			(const SPS* ps)
 		return;
 	}
 	Msg	("! ERROR: Failed to find compiled pixel-shader '%s'",*ps->cName);
+}
+
+//--------------------------------------------------------------------------------------------------------------
+SGS*	CResourceManager::_CreateGS			(LPCSTR name)
+{
+	LPSTR N				= LPSTR(name);
+	map_GS::iterator I	= m_gs.find	(N);
+	if (I!=m_gs.end())	return		I->second;
+	else
+	{
+		SGS*	_gs					=	xr_new<SGS>	();
+		_gs->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
+		m_gs.insert					(mk_pair(_gs->set_name(name),_gs));
+		VERIFY(strcmpi(name, "null") != 0);
+
+		// Open file
+		string_path					cname;
+		strconcat					(sizeof(cname), cname,GlobalEnv.Render->getShaderPath(),name,".gs");
+		FS.update_path				(cname,	"$game_shaders$", cname);
+
+		// duplicate and zero-terminate
+		IReader*		R		= FS.r_open(cname);
+		//	TODO: DX10: HACK: Implement all shaders. Remove this for PS
+		if (!R)
+		{
+			string1024			tmp;
+			//	TODO: HACK: Test failure
+			//Memory.mem_compact();
+			xr_sprintf				(tmp, "OGL: %s is missing. Replace with stub_default.gs", cname);
+			Msg					(tmp);
+			strconcat					(sizeof(cname), cname,GlobalEnv.Render->getShaderPath(),"stub_default",".gs");
+			FS.update_path				(cname,	"$game_shaders$", cname);
+			R		= FS.r_open(cname);
+		}
+		IReader* file			= FS.r_open(cname);
+		R_ASSERT2				( file, cname );
+
+		// Select target
+		_gs->gs = glCreateShader(GL_GEOMETRY_SHADER);
+		void* _result = &_gs->gs;
+		HRESULT	const _hr		= GlobalEnv.Render->shader_compile(name,(DWORD const*)file->pointer(),file->length(), NULL, NULL, NULL, _result );
+
+		VERIFY(SUCCEEDED(_hr));
+
+		FS.r_close				( file );
+
+		CHECK_OR_EXIT			(
+			!FAILED(_hr),
+			make_string("Your video card doesn't meet game requirements.\n\nTry to lower game settings.")
+		);
+
+		return					_gs;
+	}
+}
+void	CResourceManager::_DeleteGS			(const SGS* gs)
+{
+	if (0==(gs->dwFlags&xr_resource_flagged::RF_REGISTERED))	return;
+	LPSTR N				= LPSTR		(*gs->cName);
+	map_GS::iterator I	= m_gs.find	(N);
+	if (I!=m_gs.end())	{
+		m_gs.erase(I);
+		return;
+	}
+	Msg	("! ERROR: Failed to find compiled geometry shader '%s'",*gs->cName);
 }
 
 R_constant_table*	CResourceManager::_CreateConstantTable	(R_constant_table& C)

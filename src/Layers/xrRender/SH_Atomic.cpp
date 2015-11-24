@@ -48,12 +48,16 @@ SPS::~SPS()
     RImplementation.Resources->_DeletePS(this);
 }
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 ///////////////////////////////////////////////////////////////////////
 //	SGS
 SGS::~SGS								()
 {
-    _RELEASE(gs);
+#ifdef USE_OGL
+	CHK_GL(glDeleteProgram(gs));
+#else
+	_RELEASE(gs);
+#endif // USE_OGL
     RImplementation.Resources->_DeleteGS(this);
 }
 
@@ -74,7 +78,9 @@ SCS::~SCS								()
     RImplementation.Resources->_DeleteCS(this);
 }
 #	endif
+#endif	//	USE_DX10
 
+#if defined(USE_DX10) || defined(USE_DX11)
 ///////////////////////////////////////////////////////////////////////
 //	SInputSignature
 SInputSignature::SInputSignature(ID3DBlob* pBlob)	{ VERIFY(pBlob); signature=pBlob; signature->AddRef();};
