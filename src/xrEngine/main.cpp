@@ -866,7 +866,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 extern CRenderDevice Device;
 
 static CTimer phase_timer;
-ENGINE_API BOOL g_appLoaded = FALSE;
 
 void doBenchmark(LPCSTR name)
 {

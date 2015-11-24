@@ -20,7 +20,6 @@
 
 //---------------------------------------------------------------------
 
-extern ENGINE_API BOOL g_appLoaded;
 extern CRenderDevice Device;
 
 #ifdef MASTER_GOLD
@@ -92,6 +91,7 @@ void _InitializeFont(CGameFont*& F, LPCSTR section, u32 flags)
 
 CApplication::CApplication()
 {
+    loaded = false;
     ll_dwReference = 0;
 
     max_load_stage = 0;
@@ -247,8 +247,7 @@ void CApplication::LoadBegin()
     ll_dwReference++;
     if (1 == ll_dwReference)
     {
-
-        g_appLoaded = FALSE;
+        loaded = false;
 
 #ifndef DEDICATED_SERVER
         _InitializeFont(pFontSystem, "ui_font_letterica18_russian", 0);
@@ -270,7 +269,7 @@ void CApplication::LoadEnd()
         Msg("* phase time: %d ms", phase_timer.GetElapsed_ms());
         Msg("* phase cmem: %d K", Memory.mem_usage() / 1024);
         Console->Execute("stat_memory");
-        g_appLoaded = TRUE;
+        loaded = true;
         // DUMP_PHASE;
     }
 }
@@ -285,7 +284,9 @@ void CApplication::destroy_loading_shaders()
 
 void CApplication::LoadDraw()
 {
-    if (g_appLoaded) return;
+    if (loaded)
+        return;
+
     Device.dwFrame += 1;
 
 
