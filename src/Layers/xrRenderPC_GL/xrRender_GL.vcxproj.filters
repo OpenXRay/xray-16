@@ -166,6 +166,9 @@
     <Filter Include="Interface implementations\MSAARender">
       <UniqueIdentifier>{b5644c37-6f04-44e4-8343-56fec645ad53}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core_Target\ColorMap">
+      <UniqueIdentifier>{7fdc926e-8c7d-4cba-a662-332feb1aada8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -633,6 +636,12 @@
     <ClCompile Include="glTexture.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRender\ColorMapManager.cpp">
+      <Filter>Core_Target\ColorMap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX10\Blender_Recorder_R3.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\Blender</Filter>
+    </ClCompile>
     <ClCompile Include="..\xrRender\D3DUtils.cpp">
       <Filter>Refactored\Execution &amp; 3D\DebugDraw</Filter>
     </ClCompile>
@@ -1063,6 +1072,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\D3DXRenderBase.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\ColorMapManager.h">
+      <Filter>Core_Target\ColorMap</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\D3DUtils.h">
       <Filter>Refactored\Execution &amp; 3D\DebugDraw</Filter>
