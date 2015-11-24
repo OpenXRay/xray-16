@@ -17,9 +17,14 @@
 //////////////////////////////////////////////////////////////////////
 
 IRender_Mesh::~IRender_Mesh()		
-{ 
-	_RELEASE(p_rm_Vertices); 
-	_RELEASE(p_rm_Indices);		
+{
+#ifdef USE_OGL
+	GLuint buffers[] = { p_rm_Vertices, p_rm_Indices };
+	glDeleteBuffers(2, buffers);
+#else
+	_RELEASE(p_rm_Vertices);
+	_RELEASE(p_rm_Indices);
+#endif // USE_OGL
 }
 
 dxRender_Visual::dxRender_Visual		()
