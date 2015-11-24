@@ -1,15 +1,31 @@
 #include "stdafx.h"
 
+static void set_viewport(ID3D10Device *dev, u32 w, u32 h)
+{
+	static D3D10_VIEWPORT viewport[1] =
+	{
+		0, 0, (UINT)w, (UINT)h, 0.f, 1.f
+	};
+	dev->RSSetViewports(1, viewport);
+}
+
 void CRenderTarget::phase_ssao	()
 {
 	u32	Offset	= 0;
 
-	u_setrt(rt_ssao_temp, NULL, NULL, NULL);		// No need for ZBuffer at all
-	u32		clr4clear = color_rgba(0, 0, 0, 0);	// 0x00
-	CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET, clr4clear, 1.0f, 0L));
+	FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+	HW.pDevice->ClearRenderTargetView(rt_ssao_temp->pRT, ColorRGBA);
 	
 	// low/hi RTs
-	u_setrt				( rt_ssao_temp,0,0,0/*HW.pBaseZB*/ );
+	if( !RImplementation.o.dx10_msaa )
+	{
+		u_setrt				( rt_ssao_temp,0,0,0/*HW.pBaseZB*/ );
+	}
+	else
+	{
+		u_setrt				( rt_ssao_temp, 0, 0, 0/*RImplementation.Target->rt_MSAADepth->pZRT*/ );
+	}
+
 	RCache.set_Stencil	(FALSE);
 
 	/*RCache.set_Stencil					(TRUE,D3DCMP_LESSEQUAL,0x01,0xff,0x00);	// stencil should be >= 1
@@ -33,17 +49,17 @@ void CRenderTarget::phase_ssao	()
 	float	scale_X				= float(Device.dwWidth)	* 0.5f / float(TEX_jitter);
 	float	scale_Y				= float(Device.dwHeight) * 0.5f / float(TEX_jitter);
 
-	float _w = float(Device.dwWidth) * 0.5f;
-	float _h = float(Device.dwHeight) * 0.5f;
+	u32 _w = Device.dwWidth/2;
+	u32 _h = Device.dwHeight/2;
 
-	glViewport(0, 0, _w, _h);
+	set_viewport(HW.pDevice, _w, _h);
 
 	// Fill vertex buffer
 	FVF::TL* pv					= (FVF::TL*)	RCache.Vertex.Lock	(4,g_combine->vb_stride,Offset);
-	pv->set						( -1,  1, 0, 0, 0,		0,	0		);	pv++;
-	pv->set						( -1, -1, 0, 1, 0,		0,	scale_Y	);	pv++;
-	pv->set						(  1,  1, 1, 0, 0, scale_X,	0		);	pv++;
-	pv->set						(  1, -1, 1, 1, 0, scale_X,	scale_Y	);	pv++;
+	pv->set						( -1,  1, 0, 1, 0,		0,	scale_Y	);	pv++;
+	pv->set						( -1, -1, 0, 0, 0,		0,		  0	);	pv++;
+	pv->set						(  1,  1, 1, 1, 0, scale_X,	scale_Y	);	pv++;
+	pv->set						(  1, -1, 1, 0, 0, scale_X,		  0	);	pv++;
 	RCache.Vertex.Unlock		(4,g_combine->vb_stride);
 
 	// Draw
@@ -53,12 +69,37 @@ void CRenderTarget::phase_ssao	()
 	RCache.set_c				("m_v2w",			m_v2w	);
 	RCache.set_c				("ssao_noise_tile_factor",	fSSAONoise	);
 	RCache.set_c				("ssao_kernel_size",		fSSAOKernelSize	);
-	RCache.set_c				("resolution", _w, _h, 1.0f / _w, 1.0f / _h	);
+	RCache.set_c				("resolution", float(_w), float(_h), 1.0f / float(_w), 1.0f / float(_h) );
 
 
-	RCache.Render				(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
+	if( !RImplementation.o.dx10_msaa )
+		RCache.Render				(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
+	else
+	{
+		RCache.Render				(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
+		/*RCache.set_Stencil( TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0 );
+		RCache.Render		( D3DPT_TRIANGLELIST,Offset,0,4,0,2);
+		if( RImplementation.o.dx10_msaa_opt )
+		{
+			RCache.set_Element( s_ssao_msaa[0]->E[0]	);
+			RCache.set_Stencil( TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0 );
+			RCache.Render	  ( D3DPT_TRIANGLELIST,Offset,0,4,0,2);
+		}
+		else
+		{
+			for( u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i )
+			{
+				RCache.set_Element			( s_ssao_msaa[i]->E[0]	);
+				StateManager.SetSampleMask	( u32(1) << i  );
+				RCache.set_Stencil			( TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0 );
+				RCache.Render				( D3DPT_TRIANGLELIST,Offset,0,4,0,2);
+			}
+			StateManager.SetSampleMask( 0xffffffff );
+		}*/
+		//RCache.set_Stencil( FALSE, D3DCMP_EQUAL, 0x01, 0xff, 0 );
+	}  
 
-	glViewport(0, 0, float(Device.dwWidth), float(Device.dwHeight));
+	set_viewport(HW.pDevice, Device.dwWidth, Device.dwHeight);
 
 	RCache.set_Stencil	(FALSE);
 }
@@ -75,18 +116,15 @@ void CRenderTarget::phase_downsamp	()
 	//Fvector2	p0,p1;
 	u32			Offset = 0;
 
-	// Targets
-	u_setrt				( rt_half_depth,0,0,0/*HW.pBaseZB*/ );
-
-	u32		clr4clear = color_rgba(0, 0, 0, 0);	// 0x00
-	CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET, clr4clear, 1.0f, 0L));
-
+    u_setrt( rt_half_depth,0,0,0/*HW.pBaseZB*/ );
+   	FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    HW.pContext->ClearRenderTargetView(rt_half_depth->pRT, ColorRGBA);
 	u32 w = Device.dwWidth;
 	u32 h = Device.dwHeight;
 
 	if (RImplementation.o.ssao_half_data)
 	{
-		glViewport(0, 0, float(Device.dwWidth) * 0.5f, float(Device.dwHeight) * 0.5f);
+		set_viewport(HW.pDevice, Device.dwWidth/2, Device.dwHeight/2);
 		w /= 2;
 		h /= 2;
 	}
@@ -102,10 +140,10 @@ void CRenderTarget::phase_downsamp	()
 
 		// Fill vertex buffer
 		FVF::TL* pv					= (FVF::TL*)	RCache.Vertex.Lock	(4,g_combine->vb_stride,Offset);
-		pv->set						( -1,  1, 0, 0, 0,		0,	0		);	pv++;
-		pv->set						( -1, -1, 0, 1, 0,		0,	scale_Y	);	pv++;
-		pv->set						(  1,  1, 1, 0, 0, scale_X,	0		);	pv++;
-		pv->set						(  1, -1, 1, 1, 0, scale_X,	scale_Y	);	pv++;
+		pv->set						( -1,  1, 0, 1, 0,		0,	scale_Y	);	pv++;
+		pv->set						( -1, -1, 0, 0, 0,		0,		  0	);	pv++;
+		pv->set						(  1,  1, 1, 1, 0, scale_X,	scale_Y	);	pv++;
+		pv->set						(  1, -1, 1, 0, 0, scale_X,		  0	);	pv++;
 		RCache.Vertex.Unlock		(4,g_combine->vb_stride);
 
 		// Draw
@@ -117,5 +155,5 @@ void CRenderTarget::phase_downsamp	()
 	}
 
 	if (RImplementation.o.ssao_half_data)
-		glViewport(0, 0, float(Device.dwWidth), float(Device.dwHeight));
+		set_viewport(HW.pDevice, Device.dwWidth, Device.dwHeight);
 }
