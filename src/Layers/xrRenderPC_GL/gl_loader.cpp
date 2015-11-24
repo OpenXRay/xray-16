@@ -1,18 +1,14 @@
 #include "stdafx.h"
 #include "rgl.h"
-#include "../xrRender/ResourceManager.h"
-#include "../xrRender/fbasicvisual.h"
-#include "../../xrEngine/fmesh.h"
-#include "../../xrEngine/xrLevel.h"
-#include "../../xrEngine/x_ray.h"
-#include "../../xrEngine/IGame_Persistent.h"
-#include "../../xrCore/stream_reader.h"
-
-#include "../xrRenderPC_GL/glRenderDeviceRender.h"
-
-#include "../xrRenderGL/glBufferUtils.h"
-
-#include "../xrRender/FHierrarhyVisual.h"
+#include "Layers/xrRender/ResourceManager.h"
+#include "Layers/xrRender/FBasicVisual.h"
+#include "xrCore/FMesh.hpp"
+#include "Common/LevelStructure.hpp"
+#include "xrEngine/x_ray.h"
+#include "xrEngine/IGame_Persistent.h"
+#include "xrCore/stream_reader.h"
+#include "Layers/xrRenderGL/glBufferUtils.h"
+#include "Layers/xrRender/FHierrarhyVisual.h"
 
 #pragma warning(push)
 #pragma warning(disable:4995)
@@ -26,11 +22,12 @@ void CRender::level_Load(IReader* fs)
 
 	// Begin
 	pApp->LoadBegin					();
-	glRenderDeviceRender::Instance().Resources->DeferredLoad	(TRUE);
+    Resources->DeferredLoad	(TRUE);
 	IReader*						chunk;
 
 	// Shaders
-	g_pGamePersistent->LoadTitle		("st_loading_shaders");
+//	g_pGamePersistent->LoadTitle		("st_loading_shaders");
+	g_pGamePersistent->LoadTitle		();
 	{
 		chunk = fs->open_chunk		(fsL_SHADERS);
 		R_ASSERT2					(chunk,"Level doesn't builded correctly.");
@@ -42,22 +39,23 @@ void CRender::level_Load(IReader* fs)
 			LPCSTR			n		= LPCSTR(chunk->pointer());
 			chunk->skip_stringZ		();
 			if (0==n[0])			continue;
-			strcpy_s					(n_sh,n);
+			xr_strcpy					(n_sh,n);
 			LPSTR			delim	= strchr(n_sh,'/');
 			*delim					= 0;
-			strcpy_s					(n_tlist,delim+1);
-			Shaders[i]				= glRenderDeviceRender::Instance().Resources->Create(n_sh,n_tlist);
+			xr_strcpy					(n_tlist,delim+1);
+			Shaders[i]				= Resources->Create(n_sh,n_tlist);
 		}
 		chunk->close();
 	}
 
 	// Components
-	Wallmarks					= new CWallmarksEngine();
-	Details						= new CDetailManager();
+	Wallmarks					= xr_new<CWallmarksEngine>	();
+	Details						= xr_new<CDetailManager>	();
 
 	if	(!g_dedicated_server)	{
 		// VB,IB,SWI
-		g_pGamePersistent->LoadTitle("st_loading_geometry");
+//		g_pGamePersistent->LoadTitle("st_loading_geometry");
+		g_pGamePersistent->LoadTitle();
 		{
 			CStreamReader			*geom = FS.rs_open("$level$","level.geom");
 			R_ASSERT2				(geom, "level.geom");
@@ -75,23 +73,22 @@ void CRender::level_Load(IReader* fs)
 		}
 
 		// Visuals
-		g_pGamePersistent->LoadTitle("st_loading_spatial_db");
+//		g_pGamePersistent->LoadTitle("st_loading_spatial_db");
+		g_pGamePersistent->LoadTitle();
 		chunk						= fs->open_chunk(fsL_VISUALS);
 		LoadVisuals					(chunk);
 		chunk->close				();
 
 		// Details
-		g_pGamePersistent->LoadTitle("st_loading_details");
+//		g_pGamePersistent->LoadTitle("st_loading_details");
+		g_pGamePersistent->LoadTitle();
 		Details->Load				();
 	}
 
 	// Sectors
-	g_pGamePersistent->LoadTitle("st_loading_sectors_portals");
+//	g_pGamePersistent->LoadTitle("st_loading_sectors_portals");
+	g_pGamePersistent->LoadTitle();
 	LoadSectors					(fs);
-
-	// 3D Fluid
-	// TODO: OGL: Implement 3D Fluid simulation
-	//Load3DFluid					();
 
 	// HOM
 	HOM.Load					();
@@ -174,7 +171,7 @@ void CRender::level_Unload()
 void CRender::LoadBuffers		(CStreamReader *base_fs,	BOOL _alternative)
 {
 	R_ASSERT2					(base_fs,"Could not load geometry. File not found.");
-	glRenderDeviceRender::Instance().Resources->Evict		();
+	Resources->Evict		();
 //	u32	dwUsage					= D3DUSAGE_WRITEONLY;
 
 	xr_vector<VertexDeclarator>	&_DC = _alternative?xDC:nDC;
@@ -298,7 +295,7 @@ void CRender::LoadSectors(IReader* fs)
 	u32 count = size/sizeof(b_portal);
 	Portals.resize	(count);
 	for (u32 c=0; c<count; c++)
-		Portals[c]	= new CPortal();
+		Portals[c]	= xr_new<CPortal> ();
 
 	// load sectors
 	IReader* S = fs->open_chunk(fsL_SECTORS);
@@ -307,7 +304,7 @@ void CRender::LoadSectors(IReader* fs)
 		IReader* P = S->open_chunk(i);
 		if (0==P) break;
 
-		CSector* __S		= new CSector();
+		CSector* __S		= xr_new<CSector> ();
 		__S->load			(*P);
 		Sectors.push_back	(__S);
 
@@ -344,7 +341,7 @@ void CRender::LoadSectors(IReader* fs)
 		}
 
 		// build portal model
-		rmPortals = new CDB::MODEL();
+		rmPortals = xr_new<CDB::MODEL> ();
 		rmPortals->build	(CL.getV(),int(CL.getVS()),CL.getT(),int(CL.getTS()));
 	} else {
 		rmPortals = 0;
