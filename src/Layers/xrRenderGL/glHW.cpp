@@ -37,6 +37,7 @@ CHW::CHW() :
 	m_hDC(NULL),
 	m_hRC(NULL),
 	pDevice(this),
+	pContext(this),
 	m_move_window(true),
 	pBaseRT(0),
 	pBaseZB(0),

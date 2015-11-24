@@ -58,6 +58,7 @@ public:
 #if defined(USE_OGL)
 public:
 	CHW*					pDevice;
+	CHW*					pContext;
 	GLuint					pBaseRT;
 	GLuint					pBaseZB;
 	GLuint					pFB;
