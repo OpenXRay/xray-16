@@ -91,7 +91,7 @@ void	uber_deffer	(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BO
 	}
 
 	// Uber-construct
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 #	ifdef USE_DX11
 	if (bump && hq && RImplementation.o.dx11_enable_tessellation && C.TessMethod!=0)
 	{

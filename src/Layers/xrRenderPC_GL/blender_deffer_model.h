@@ -16,4 +16,7 @@ public:
 
 	CBlender_deffer_model();
 	virtual ~CBlender_deffer_model();
+
+private:
+	xrP_TOKEN	oTessellation;
 };

@@ -169,6 +169,9 @@
     <Filter Include="Core_Target\ColorMap">
       <UniqueIdentifier>{7fdc926e-8c7d-4cba-a662-332feb1aada8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shading templates\DX10 Rain">
+      <UniqueIdentifier>{07d880a0-66f9-4c25-a538-c4076b2cf662}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -642,6 +645,12 @@
     <ClCompile Include="..\xrRender\R_DStreams.cpp">
       <Filter>Refactored\Backend</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.cpp">
+      <Filter>Shading templates\DX10 Rain</Filter>
+    </ClCompile>
+    <ClCompile Include="glMinMaxSMBlender.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -1066,6 +1075,12 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\D3DUtils.h">
       <Filter>Refactored\Execution &amp; 3D\DebugDraw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.h">
+      <Filter>Shading templates\DX10 Rain</Filter>
+    </ClInclude>
+    <ClInclude Include="glMinMaxSMBlender.h">
+      <Filter>Shading templates</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
