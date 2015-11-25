@@ -65,6 +65,23 @@ ICF void CBackend::set_PS(GLuint _ps, LPCSTR _n)
 	}
 }
 
+ICF void CBackend::set_GS(GLuint _gs, LPCSTR _n)
+{
+	if (gs != _gs)
+	{
+		string_path name;
+		PGO(glGetObjectLabel(GL_PROGRAM, _ps, sizeof(name), nullptr, name));
+		PGO(Msg("PGO:Gshader:%d,%s", _ps, _n ? _n : name));
+		//	TODO: OGL: Get statistics for G Shader change
+		//stat.gs			++;
+		gs = _gs;
+		CHK_GL(glUseProgramStages(HW.pPP, GL_GEOMETRY_SHADER_BIT, gs));
+#ifdef DEBUG
+		gs_name = _n;
+#endif
+	}
+}
+
 ICF void CBackend::set_VS(GLuint _vs, LPCSTR _n)
 {
 	if (vs != _vs)

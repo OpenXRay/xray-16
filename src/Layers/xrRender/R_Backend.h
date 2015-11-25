@@ -124,6 +124,7 @@ private:
 	SState*							state;
 	GLuint							ps;
 	GLuint							vs;
+	GLuint							gs;
 #else
 	ID3DState*						state;
 	ID3DPixelShader*				ps;
@@ -141,7 +142,7 @@ private:
 #ifdef DEBUG
 	LPCSTR							ps_name;
 	LPCSTR							vs_name;
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	LPCSTR							gs_name;
 #	ifdef USE_DX11
 	LPCSTR							hs_name;
