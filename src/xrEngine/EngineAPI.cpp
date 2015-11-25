@@ -219,7 +219,6 @@ void CEngineAPI::CreateRendererList()
             SupportsAdvancedRendering* test_rendering = (SupportsAdvancedRendering*)GetProcAddress(hRender, "SupportsAdvancedRendering");
             R_ASSERT(test_rendering);
             bSupports_r2_5 = test_rendering();
-            FreeLibrary(hRender);
         }
 
         // try to initialize R3
@@ -234,7 +233,6 @@ void CEngineAPI::CreateRendererList()
             SupportsDX10Rendering* test_dx10_rendering = (SupportsDX10Rendering*)GetProcAddress(hRender, "SupportsDX10Rendering");
             R_ASSERT(test_dx10_rendering);
             bSupports_r3 = test_dx10_rendering();
-            FreeLibrary(hRender);
         }
 
         // try to initialize R4
@@ -249,7 +247,6 @@ void CEngineAPI::CreateRendererList()
             SupportsDX11Rendering* test_dx11_rendering = (SupportsDX11Rendering*)GetProcAddress(hRender, "SupportsDX11Rendering");
             R_ASSERT(test_dx11_rendering);
             bSupports_r4 = test_dx11_rendering();
-            FreeLibrary(hRender);
         }
     }
 
