@@ -33,7 +33,7 @@ void	CBlender_Editor_Wire::Load	( IReader& fs, u16 version	)
 void CBlender_Editor_Wire::Compile	(CBlender_Compile& C)
 {
 	IBlender::Compile		(C);
-#if !defined(USE_DX10) && !defined(USE_DX11)
+#if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
 	if (C.bEditor)	
 	{
 		C.PassBegin		();

@@ -288,7 +288,7 @@ void	CBlender_Compile::StageSET_Alpha	(u32 a1, u32 op, u32 a2)
 {
 	RS.SetAlpha	(Stage(),a1,op,a2);
 }
-#if !defined(USE_DX10) && !defined(USE_DX11)
+#if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
 void	CBlender_Compile::StageSET_TMC		(LPCSTR T, LPCSTR M, LPCSTR C, int UVW_channel)
 {
 	Stage_Texture		(T);
