@@ -22,8 +22,17 @@ void CStatTimer::FrameEnd()
     else result = 0.99f*result + 0.01f*_time;
 }
 
-XRCORE_API pauseMngr g_pauseMngr;
+XRCORE_API pauseMngr *g_pauseMngr()
+{
+    static pauseMngr *manager = nullptr;
 
+    if (!manager)
+    {
+        manager = new pauseMngr();
+    }
+
+    return manager;
+}
 
 pauseMngr::pauseMngr() :m_paused(FALSE)
 {

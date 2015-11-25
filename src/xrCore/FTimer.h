@@ -16,7 +16,7 @@ public:
     void UnRegister(CTimer_paused* t);
 };
 
-extern XRCORE_API pauseMngr g_pauseMngr;
+extern XRCORE_API pauseMngr *g_pauseMngr();
 
 class XRCORE_API CTimerBase
 {
@@ -161,8 +161,8 @@ public:
 class XRCORE_API CTimer_paused : public CTimer_paused_ex
 {
 public:
-    CTimer_paused() { g_pauseMngr.Register(this); }
-    virtual ~CTimer_paused() { g_pauseMngr.UnRegister(this); }
+    CTimer_paused() { g_pauseMngr()->Register(this); }
+    virtual ~CTimer_paused() { g_pauseMngr()->UnRegister(this); }
 };
 
 extern XRCORE_API BOOL g_bEnableStatGather;
