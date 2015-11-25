@@ -38,7 +38,13 @@ IC void MouseRayFromPoint	( Fvector& direction, int x, int y, Fmatrix& m_CamMat 
 #define SM_FOR_SEND_WIDTH 640
 #define SM_FOR_SEND_HEIGHT 480
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_OGL)
+void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
+{
+	// TODO: OGL: Implement screenshot feature.
+}
+
+#elif defined(USE_DX10) || defined(USE_DX11)
 void CRender::ScreenshotImpl	(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
 {
 	ID3DResource		*pSrcTexture;

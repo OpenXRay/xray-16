@@ -205,6 +205,7 @@
   <ItemGroup>
     <ClCompile Include="..\xrRenderDX10\Blender_Recorder_R3.cpp" />
     <ClCompile Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.cpp" />
+    <ClCompile Include="..\xrRenderDX10\dx10MinMaxSMBlender.cpp" />
     <ClCompile Include="..\xrRenderGL\glHW.cpp" />
     <ClCompile Include="..\xrRenderGL\glBufferUtils.cpp" />
     <ClCompile Include="..\xrRenderGL\glDetailManager_VS.cpp" />
@@ -254,6 +255,7 @@
     <ClCompile Include="..\xrRender\Light_Render_Direct_ComputeXFS.cpp" />
     <ClCompile Include="..\xrRender\ModelPool.cpp" />
     <ClCompile Include="..\xrRender\R_DStreams.cpp" />
+    <ClCompile Include="..\xrRender\r__screenshot.cpp" />
     <ClCompile Include="..\xrRender\Shader.cpp" />
     <ClCompile Include="blender_bloom_build.cpp" />
     <ClCompile Include="blender_combine.cpp" />
@@ -268,7 +270,6 @@
     <ClCompile Include="blender_light_spot.cpp" />
     <ClCompile Include="blender_luminance.cpp" />
     <ClCompile Include="blender_ssao.cpp" />
-    <ClCompile Include="glMinMaxSMBlender.cpp" />
     <ClCompile Include="gl_loader.cpp" />
     <ClCompile Include="gl_rendertarget_accum_direct.cpp" />
     <ClCompile Include="gl_rendertarget_accum_omnipart_geom.cpp" />
@@ -404,6 +405,7 @@
     <ClInclude Include="..\..\Include\xrRender\UIShader.h" />
     <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h" />
     <ClInclude Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.h" />
+    <ClInclude Include="..\xrRenderDX10\dx10MinMaxSMBlender.h" />
     <ClInclude Include="..\xrRenderGL\glBufferUtils.h" />
     <ClInclude Include="..\xrRenderGL\glR_Backend_Runtime.h" />
     <ClInclude Include="..\xrRenderGL\glr_constants_cache.h" />
@@ -517,7 +519,6 @@
     <ClInclude Include="..\xrRender\uber_deffer.h" />
     <ClInclude Include="..\xrRender\WallmarksEngine.h" />
     <ClInclude Include="..\xrRender\xrRender_console.h" />
-    <ClInclude Include="glMinMaxSMBlender.h" />
     <ClInclude Include="gl_rendertarget_wallmarks.h" />
     <ClInclude Include="r2_types.h" />
     <ClInclude Include="gl_rendertarget.h" />

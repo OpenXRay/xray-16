@@ -660,11 +660,14 @@
     <ClCompile Include="gl_rendertarget_phase_ssao.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="glMinMaxSMBlender.cpp">
-      <Filter>Shading templates</Filter>
+    <ClCompile Include="..\xrRender\r__screenshot.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\Debug\dxPixEventWrapper.cpp">
       <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX10\dx10MinMaxSMBlender.cpp">
+      <Filter>Shading templates</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1094,11 +1097,11 @@
     <ClInclude Include="gl_rendertarget_wallmarks.h">
       <Filter>Core_Target</Filter>
     </ClInclude>
-    <ClInclude Include="glMinMaxSMBlender.h">
-      <Filter>Shading templates</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\Debug\dxPixEventWrapper.h">
       <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRenderDX10\dx10MinMaxSMBlender.h">
+      <Filter>Shading templates</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

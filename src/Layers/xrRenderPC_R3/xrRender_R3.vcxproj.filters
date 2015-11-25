@@ -309,9 +309,6 @@
     <ClInclude Include="blender_ssao.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="dx10MinMaxSMBlender.h">
-      <Filter>Shading templates</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\uber_deffer.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
@@ -705,6 +702,9 @@
     <ClInclude Include="..\xrRender\D3DXRenderBase.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRenderDX10\dx10MinMaxSMBlender.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -885,9 +885,6 @@
       <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="blender_ssao.cpp">
-      <Filter>Shading templates</Filter>
-    </ClCompile>
-    <ClCompile Include="dx10MinMaxSMBlender.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\uber_deffer.cpp">
@@ -1282,6 +1279,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\RenderAllocator.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX10\dx10MinMaxSMBlender.cpp">
+      <Filter>Shading templates</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
