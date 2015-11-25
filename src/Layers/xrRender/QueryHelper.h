@@ -87,6 +87,12 @@ IC HRESULT EndQuery( ID3DQuery *pQuery)
 	return S_OK;
 }
 
+IC HRESULT ReleaseQuery(ID3DQuery* pQuery)
+{
+	_RELEASE(pQuery);
+	return S_OK;
+}
+
 #elif defined(USE_DX10)
 
 IC HRESULT CreateQuery ( ID3DQuery **ppQuery)
@@ -115,6 +121,12 @@ IC HRESULT EndQuery( ID3DQuery *pQuery)
 	return S_OK;
 }
 
+IC HRESULT ReleaseQuery(ID3DQuery* pQuery)
+{
+	_RELEASE(pQuery);
+	return S_OK;
+}
+
 #else	//	USE_DX10
 
 IC HRESULT CreateQuery ( ID3DQuery **ppQuery)
@@ -135,6 +147,12 @@ IC HRESULT BeginQuery( ID3DQuery *pQuery)
 IC HRESULT EndQuery( ID3DQuery *pQuery)
 {
 	return pQuery->Issue( D3DISSUE_END);
+}
+
+IC HRESULT ReleaseQuery(ID3DQuery* pQuery)
+{
+	_RELEASE(pQuery);
+	return S_OK;
 }
 
 #endif	//	USE_DX10
