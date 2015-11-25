@@ -10,7 +10,7 @@ HMODULE LoadLibrary(const char *libraryFileName, bool log)
 {
     if (log)
         Log("Loading DLL:", libraryFileName);
-    return ::LoadLibrary(libraryFileName);
+    return ::LoadLibraryA(libraryFileName);
 }
 
 void UnloadLibrary(HMODULE libraryHandle)
