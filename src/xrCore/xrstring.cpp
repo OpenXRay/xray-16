@@ -5,7 +5,7 @@
 
 #include "FS_impl.h"
 
-XRCORE_API extern str_container* g_pStringContainer = NULL;
+XRCORE_API str_container* g_pStringContainer = NULL;
 
 #if 1
 
