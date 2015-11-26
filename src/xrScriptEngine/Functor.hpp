@@ -50,4 +50,12 @@ struct default_converter<functor<T>> : native_converter_base<functor<T>>
     void to(lua_State *luaState, const functor<T> &func)
     { func.push(luaState); }
 };
+
+template<typename T>
+struct default_converter<const functor<T>> : default_converter<functor<T>>
+{};
+
+template<typename T>
+struct default_converter<const functor<T> &> : default_converter<functor<T>>
+{};
 }
