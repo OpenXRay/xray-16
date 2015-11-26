@@ -42,6 +42,7 @@ IC void MouseRayFromPoint	( Fvector& direction, int x, int y, Fmatrix& m_CamMat 
 void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
 {
 	// TODO: OGL: Implement screenshot feature.
+	VERIFY(!"CRender::ScreenshotImpl not implemented.");
 }
 
 #elif defined(USE_DX10) || defined(USE_DX11)
@@ -448,7 +449,15 @@ void CRender::ScreenshotAsyncBegin()
 	m_bMakeAsyncSS = true;
 }
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_OGL)
+
+void CRender::ScreenshotAsyncEnd(CMemoryWriter &memory_writer)
+{
+	// TODO: OGL: Implement screenshot feature.
+	VERIFY(!"CRender::ScreenshotAsyncEnd not implemented.");
+}
+
+#elif defined(USE_DX10) || defined(USE_DX11)
 
 void CRender::ScreenshotAsyncEnd(CMemoryWriter &memory_writer)
 {
