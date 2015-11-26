@@ -15,6 +15,7 @@
 #include "UITabControl.h"
 #include "uiscriptwnd_script.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "xrScriptEngine/Functor.hpp"
 
 using namespace luabind;
 
