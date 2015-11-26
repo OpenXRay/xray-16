@@ -94,6 +94,7 @@ namespace	R_dsgraph
 #ifdef USE_OGL
 	typedef	GLuint						vs_type;
 	typedef	GLuint						ps_type;
+	typedef	GLuint						gs_type;
 #else
 	#if defined(USE_DX10) || defined(USE_DX11)	//	DX10 needs shader signature to propperly bind deometry to shader
 		typedef	SVS*					vs_type;
@@ -127,7 +128,7 @@ namespace	R_dsgraph
 #else
 	struct	mapNormalPS			: public	FixedMAP<ps_type, mapNormalCS,render_allocator>						{	float	ssa;	};
 #endif	//	USE_DX11
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	struct	mapNormalGS			: public	FixedMAP<gs_type, mapNormalPS,render_allocator>						{	float	ssa;	};
 	struct	mapNormalVS			: public	FixedMAP<vs_type, mapNormalGS,render_allocator>						{	};
 #else	//	USE_DX10
@@ -153,7 +154,7 @@ namespace	R_dsgraph
 #else
 	struct	mapMatrixPS			: public	FixedMAP<ps_type, mapMatrixCS,render_allocator>						{	float	ssa;	};
 #endif	//	USE_DX11
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	struct	mapMatrixGS			: public	FixedMAP<gs_type, mapMatrixPS,render_allocator>						{	float	ssa;	};
 	struct	mapMatrixVS			: public	FixedMAP<vs_type, mapMatrixGS,render_allocator>						{	};
 #else	//	USE_DX10

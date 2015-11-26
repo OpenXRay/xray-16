@@ -161,7 +161,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic	(dxRender_Visual *pVisual, Fvector
 		
 
 #ifdef USE_RESOURCE_DEBUGGER
-	#if defined(USE_DX10) || defined(USE_DX11)
+	#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 		mapMatrixVS::TNode*			Nvs		= map.insert		(pass.vs);
 		mapMatrixGS::TNode*			Ngs		= Nvs->val.insert	(pass.gs);
 		mapMatrixPS::TNode*			Nps		= Ngs->val.insert	(pass.ps);
@@ -170,7 +170,11 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic	(dxRender_Visual *pVisual, Fvector
 		mapMatrixPS::TNode*			Nps		= Nvs->val.insert	(pass.ps);
 	#endif	//	USE_DX10
 #else
-	#if defined(USE_DX10) || defined(USE_DX11)
+	#if defined(USE_OGL)
+		mapMatrixVS::TNode*			Nvs		= map.insert		(pass.vs->vs);
+		mapMatrixGS::TNode*			Ngs		= Nvs->val.insert	(pass.gs->gs);
+		mapMatrixPS::TNode*			Nps		= Ngs->val.insert	(pass.ps->ps);
+	#elif defined(USE_DX10) || defined(USE_DX11)
 		mapMatrixVS::TNode*			Nvs		= map.insert		(&*pass.vs);
 		mapMatrixGS::TNode*			Ngs		= Nvs->val.insert	(pass.gs->gs);
 		mapMatrixPS::TNode*			Nps		= Ngs->val.insert	(pass.ps->ps);
@@ -207,11 +211,11 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic	(dxRender_Visual *pVisual, Fvector
 #else
 		if (SSA>Nps->val.ssa)		{ Nps->val.ssa = SSA;
 #endif
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 		if (SSA>Ngs->val.ssa)		{ Ngs->val.ssa = SSA;
 #endif	//	USE_DX10
 		if (SSA>Nvs->val.ssa)		{ Nvs->val.ssa = SSA;
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 		} } } } } }
 #else	//	USE_DX10
 		} } } } }
@@ -322,7 +326,7 @@ void D3DXRenderBase::r_dsgraph_insert_static	(dxRender_Visual *pVisual)
 //#endif
 
 #ifdef USE_RESOURCE_DEBUGGER
-#	if defined(USE_DX10) || defined(USE_DX11)
+#	if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 		mapNormalVS::TNode*			Nvs		= map.insert		(pass.vs);
 		mapNormalGS::TNode*			Ngs		= Nvs->val.insert	(pass.gs);
 		mapNormalPS::TNode*			Nps		= Ngs->val.insert	(pass.ps);
@@ -331,7 +335,11 @@ void D3DXRenderBase::r_dsgraph_insert_static	(dxRender_Visual *pVisual)
 		mapNormalPS::TNode*			Nps		= Nvs->val.insert	(pass.ps);
 #	endif	//	USE_DX10
 #else // USE_RESOURCE_DEBUGGER
-#	if defined(USE_DX10) || defined(USE_DX11)
+#	if defined(USE_OGL)
+		mapNormalVS::TNode*			Nvs		= map.insert		(pass.vs->vs);
+		mapNormalGS::TNode*			Ngs		= Nvs->val.insert	(pass.gs->gs);
+		mapNormalPS::TNode*			Nps		= Ngs->val.insert	(pass.ps->ps);
+#	elif defined(USE_DX10) || defined(USE_DX11)
 		mapNormalVS::TNode*			Nvs		= map.insert		(&*pass.vs);
 		mapNormalGS::TNode*			Ngs		= Nvs->val.insert	(pass.gs->gs);
 		mapNormalPS::TNode*			Nps		= Ngs->val.insert	(pass.ps->ps);
@@ -764,16 +772,32 @@ void D3DXRenderBase::Copy(IRender &_in)
 { *this = *(D3DXRenderBase*)&_in; }
 
 void D3DXRenderBase::setGamma(float fGamma)
-{ m_Gamma.Gamma(fGamma); }
+{
+#ifndef USE_OGL
+	m_Gamma.Gamma(fGamma);
+#endif // !USE_OGL
+}
 
 void D3DXRenderBase::setBrightness(float fGamma)
-{ m_Gamma.Brightness(fGamma); }
+{
+#ifndef USE_OGL
+	m_Gamma.Brightness(fGamma);
+#endif // !USE_OGL
+}
 
 void D3DXRenderBase::setContrast(float fGamma)
-{ m_Gamma.Contrast(fGamma); }
+{
+#ifndef USE_OGL
+	m_Gamma.Contrast(fGamma);
+#endif // !USE_OGL
+}
 
 void D3DXRenderBase::updateGamma()
-{ m_Gamma.Update(); }
+{
+#ifndef USE_OGL
+	m_Gamma.Update();
+#endif // !USE_OGL
+}
 
 void D3DXRenderBase::OnDeviceDestroy(bool bKeepTextures)
 {
@@ -875,7 +899,9 @@ void D3DXRenderBase::OnDeviceCreate(const char *shName)
 {
 	// Signal everyone - device created
 	RCache.OnDeviceCreate();
+#ifndef USE_OGL
 	m_Gamma.Update();
+#endif // !USE_OGL
 	Resources->OnDeviceCreate(shName);
 	create();
 	if (!g_dedicated_server)
