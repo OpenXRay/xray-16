@@ -131,7 +131,7 @@ IC HRESULT ReleaseQuery(ID3DQuery* pQuery)
 
 IC HRESULT CreateQuery ( ID3DQuery **ppQuery)
 {
-	return HW.pDevice->CreateQuery(D3D_QUERY_OCCLUSION, ppQuery);
+	return HW.pDevice->CreateQuery(D3DQUERYTYPE_OCCLUSION, ppQuery);
 }
 
 IC HRESULT GetData( ID3DQuery *pQuery, void *pData, UINT DataSize )
