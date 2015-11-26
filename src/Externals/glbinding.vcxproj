@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGUID>{AA714987-A9EB-3322-B3C6-EE1BD242CEC6}</ProjectGUID>
-    <WindowsTargetPlatformVersion>10.0.10150.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
     <Keyword>Win32Proj</Keyword>
     <Platform>Win32</Platform>
     <ProjectName>glbinding</ProjectName>
@@ -21,14 +21,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
-    <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -53,13 +53,13 @@
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(xrBinDir)</OutDir>
+    <OutDir>$(xrLibDir)</OutDir>
     <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(xrBinDir)</OutDir>
+    <OutDir>$(xrLibDir)</OutDir>
     <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
@@ -137,7 +137,8 @@
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;GLBINDING_STATIC;STRINGS_BY_GL;WIN32;UNICODE;_UNICODE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;NDEBUG;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;GLBINDING_STATIC;STRINGS_BY_GL;WIN32;UNICODE;_UNICODE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;NDEBUG;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -494,32 +495,32 @@
     <ClInclude Include="glbinding\source\glbinding\source\Meta_Maps.h" />
     <ClInclude Include="glbinding\source\glbinding\source\RingBuffer.h" />
     <ClInclude Include="glbinding\source\glbinding\source\RingBuffer.hpp" />
-    <ClCompile Include="glbinding\source\glbinding\source\callbacks.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\AbstractFunction.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\AbstractValue.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\Binding.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\ProcAddress.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\ContextHandle.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\ContextInfo.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\Value.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\Version.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\Version_ValidVersions.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\Meta.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\Meta_BitfieldsByString.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\Meta_BooleansByString.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\Meta_EnumsByString.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\Meta_ExtensionsByFunctionString.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\Meta_ExtensionsByString.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\Meta_FunctionStringsByExtension.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\Meta_ReqVersionsByExtension.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\Meta_StringsByBitfield.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\Meta_StringsByBoolean.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\Meta_StringsByEnum.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\Meta_StringsByExtension.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\logging.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\gl\functions.cpp"  />
-    <ClCompile Include="glbinding\source\glbinding\source\gl\types.cpp"  />
+    <ClCompile Include="glbinding\source\glbinding\source\callbacks.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\AbstractFunction.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\AbstractValue.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Binding.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Binding_objects.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\ProcAddress.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\ContextHandle.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\ContextInfo.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Value.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Version.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Version_ValidVersions.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_BitfieldsByString.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_BooleansByString.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_EnumsByString.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_ExtensionsByFunctionString.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_ExtensionsByString.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_FunctionStringsByExtension.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_ReqVersionsByExtension.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_StringsByBitfield.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_StringsByBoolean.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_StringsByEnum.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\Meta_StringsByExtension.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\logging.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\gl\functions.cpp" />
+    <ClCompile Include="glbinding\source\glbinding\source\gl\types.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

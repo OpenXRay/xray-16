@@ -285,7 +285,7 @@ void free_vid_mode_list()
 	GlobalEnv.vid_mode_token = NULL;
 }
 
-void fill_vid_mode_list()
+void fill_vid_mode_list(CHW* _hw)
 {
 	if (GlobalEnv.vid_mode_token != NULL)		return;
 	xr_vector<LPCSTR>	_tmp;
