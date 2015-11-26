@@ -268,21 +268,7 @@ void CRenderTarget::draw_rain( light &RainSetup )
 			}
 			else
 			{
-				for( u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i )
-				{
-					RCache.set_Element			( s_rain_msaa[i]->E[0]);
-					RCache.set_c				("Ldynamic_dir",		L_dir.x,L_dir.y,L_dir.z,0		);
-					RCache.set_c				("WorldX",				W_dirX.x,W_dirX.y,W_dirX.z,0		);
-					RCache.set_c				("WorldZ",				W_dirZ.x,W_dirZ.y,W_dirZ.z,0		);
-					RCache.set_c				("m_shadow",			m_shadow						);
-					RCache.set_c				("m_sunmask",			m_clouds_shadow					);
-					RCache.set_c				("RainDensity",			fRainFactor, 0, 0, 0			);
-					StateManager.SetSampleMask ( u32(1) << i );
-					RCache.set_CullMode(CULL_NONE	);
-					RCache.set_Stencil         ( TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0  );
-					RCache.Render					( D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-				}
-				StateManager.SetSampleMask( 0xffffffff );
+				VERIFY(!"Only optimized MSAA is supported in OpenGL");
 			}
 		}
 
@@ -331,15 +317,7 @@ void CRenderTarget::draw_rain( light &RainSetup )
 			}
 			else
 			{
-				for( u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++ i )
-				{
-					RCache.set_Element			(s_rain_msaa[i]->E[1]);
-					StateManager.SetSampleMask ( u32(1) << i );
-					RCache.set_Stencil         ( TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0 );
-					RCache.set_CullMode(CULL_NONE	);
-					RCache.Render					(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-				}
-				StateManager.SetSampleMask( 0xffffffff );
+				VERIFY(!"Only optimized MSAA is supported in OpenGL");
 			}
 		}
 
@@ -376,14 +354,7 @@ void CRenderTarget::draw_rain( light &RainSetup )
 			}
 			else 
 			{
-				for( u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i )
-				{
-					RCache.set_Element		   (s_rain_msaa[i]->E[2]);
-					RCache.set_Stencil         ( TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0 );
-					StateManager.SetSampleMask ( u32(1) << i );
-					RCache.Render					(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-				}
-				StateManager.SetSampleMask( 0xffffffff );
+				VERIFY(!"Only optimized MSAA is supported in OpenGL");
 			}
 		}
 

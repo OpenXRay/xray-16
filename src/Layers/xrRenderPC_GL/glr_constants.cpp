@@ -101,6 +101,7 @@ BOOL	R_constant_table::parse(void* _desc, u32 destination)
 		case GL_SAMPLER_3D:
 		case GL_SAMPLER_CUBE:
 		case GL_SAMPLER_2D_SHADOW:
+		case GL_SAMPLER_2D_MULTISAMPLE:
 			{
 				// ***Register sampler***
 				// We have determined all valuable info, search if constant already created

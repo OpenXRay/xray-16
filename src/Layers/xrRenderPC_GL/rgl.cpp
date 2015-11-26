@@ -252,20 +252,15 @@ void					CRender::create					()
 		o.ssao_opt_data = true;
 	}
 
-	/* TODO: OGL: Implement DX10-level features
-	o.dx10_sm4_1		= ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
-	o.dx10_sm4_1		= o.dx10_sm4_1 && ( HW.pDevice1 != 0 );
+	o.dx10_sm4_1		= true;
 
 	//	MSAA option dependencies
 	o.dx10_msaa			= !!ps_r3_msaa;
 	o.dx10_msaa_samples = (1 << ps_r3_msaa);
 
-	o.dx10_msaa_opt		= ps_r2_ls_flags.test(R3FLAG_MSAA_OPT);
-	o.dx10_msaa_opt		= o.dx10_msaa_opt && o.dx10_msaa && ( HW.pDevice1 != 0 );
+	o.dx10_msaa_opt		= o.dx10_msaa;
 
-	//o.dx10_msaa_hybrid	= ps_r2_ls_flags.test(R3FLAG_MSAA_HYBRID);
-	o.dx10_msaa_hybrid	= ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
-	o.dx10_msaa_hybrid	&= !o.dx10_msaa_opt && o.dx10_msaa && ( HW.pDevice1 != 0) ;
+	o.dx10_msaa_hybrid	= false;
 
 	//	Allow alpha test MSAA for DX10.0
 
@@ -323,7 +318,7 @@ void					CRender::create					()
 				o.dx10_minmax_sm_screenarea_threshold = 1280*1024;
 			}
 		}
-	}*/
+	}
 
 	// constants
 	RImplementation.Resources->RegisterConstantSetup("parallax",	&binder_parallax);

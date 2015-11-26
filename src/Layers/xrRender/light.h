@@ -51,11 +51,11 @@ public:
 	ref_shader		s_point;
 	ref_shader		s_volumetric;
 
-#if (RENDER==R_R3) || (RENDER==R_R4)
+#if (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 	ref_shader		s_spot_msaa[8];
 	ref_shader		s_point_msaa[8];
 	ref_shader		s_volumetric_msaa[8];
-#endif	//	(RENDER==R_R3) || (RENDER==R_R4)
+#endif	//	(RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 
 	u32				m_xform_frame;
 	Fmatrix			m_xform;

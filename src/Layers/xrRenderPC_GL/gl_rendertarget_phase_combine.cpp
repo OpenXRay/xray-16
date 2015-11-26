@@ -24,9 +24,8 @@ void CRenderTarget::DoAsyncScreenshot()
 
 
 		//HW.pDevice->CopyResource( t_ss_async, pTex );
-		ID3D10Texture2D*	pBuffer;
-		hr = HW.m_pSwapChain->GetBuffer( 0, __uuidof( ID3D10Texture2D ), (LPVOID*)&pBuffer );
-		HW.pDevice->CopyResource( t_ss_async, pBuffer );
+		glBindTexture(GL_TEXTURE_2D, t_ss_async);
+		CHK_GL(glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 0, 0, Device.dwWidth, Device.dwHeight, 0));
 		
 
 		RImplementation.m_bMakeAsyncSS = false;
@@ -47,8 +46,8 @@ void	CRenderTarget::phase_combine	()
 	//*** exposure-pipeline
 	u32			gpu_id	= Device.dwFrame%HW.Caps.iGPUNum;
 	{
-		t_LUM_src->surface_set		(rt_LUM_pool[gpu_id*2+0]->pSurface);
-		t_LUM_dest->surface_set		(rt_LUM_pool[gpu_id*2+1]->pSurface);
+		t_LUM_src->surface_set		(GL_TEXTURE_2D, rt_LUM_pool[gpu_id*2+0]->pRT);
+		t_LUM_dest->surface_set		(GL_TEXTURE_2D, rt_LUM_pool[gpu_id*2+1]->pRT);
 	}
 
     if (RImplementation.o.ssao_hdao )
@@ -203,10 +202,10 @@ void	CRenderTarget::phase_combine	()
 		dxEnvDescriptorMixerRender &envdescren = *(dxEnvDescriptorMixerRender*)(&*envdesc.m_pDescriptorMixer);
 
 		// Setup textures
-		ID3DBaseTexture*	e0	= _menu_pp?0:envdescren.sky_r_textures_env[0].second->surface_get();
-		ID3DBaseTexture*	e1	= _menu_pp?0:envdescren.sky_r_textures_env[1].second->surface_get();
-		t_envmap_0->surface_set		(e0);	_RELEASE(e0);
-		t_envmap_1->surface_set		(e1);	_RELEASE(e1);
+		GLuint	e0	= _menu_pp?0:envdescren.sky_r_textures_env[0].second->surface_get();
+		GLuint	e1	= _menu_pp?0:envdescren.sky_r_textures_env[1].second->surface_get();
+		t_envmap_0->surface_set		(GL_TEXTURE_CUBE_MAP, e0);
+		t_envmap_1->surface_set		(GL_TEXTURE_CUBE_MAP, e1);
 	
 		// Draw
 		RCache.set_Element			(s_combine->E[0]	);
@@ -239,14 +238,7 @@ void	CRenderTarget::phase_combine	()
          }
          else
          {
-            for( u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i )
-            {
-               RCache.set_Element		   ( s_combine_msaa[i]->E[0]	);
-               StateManager.SetSampleMask ( u32(1) << i  );
-               RCache.set_Stencil         ( TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0 );
-               RCache.Render				   ( D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-            }
-            StateManager.SetSampleMask( 0xffffffff );
+			 VERIFY(!"Only optimized MSAA is supported in OpenGL");
          }
          RCache.set_Stencil( FALSE, D3DCMP_EQUAL, 0x01, 0xff, 0 );
       }  
@@ -276,12 +268,19 @@ void	CRenderTarget::phase_combine	()
 	// Perform blooming filter and distortion if needed
 	RCache.set_Stencil	(FALSE);
 
-   if( RImplementation.o.dx10_msaa )
-   {
-      // we need to resolve rt_Generic_1 into rt_Generic_1_r
-      HW.pDevice->ResolveSubresource( rt_Generic_1->pTexture->surface_get(), 0, rt_Generic_1_r->pTexture->surface_get(), 0, DXGI_FORMAT_R8G8B8A8_UNORM );
-      HW.pDevice->ResolveSubresource( rt_Generic_0->pTexture->surface_get(), 0, rt_Generic_0_r->pTexture->surface_get(), 0, DXGI_FORMAT_R8G8B8A8_UNORM );
-   }
+	if( RImplementation.o.dx10_msaa )
+	{
+		glReadBuffer(GL_COLOR_ATTACHMENT0);
+		glDrawBuffer(GL_COLOR_ATTACHMENT1);
+
+		// we need to resolve rt_Generic_1_r into rt_Generic_1
+		u_setrt(rt_Generic_1_r, rt_Generic_1, 0, RImplementation.Target->rt_MSAADepth->pZRT);
+		CHK_GL(glBlitFramebuffer(0, 0, Device.dwWidth, Device.dwHeight, 0, 0, Device.dwWidth, Device.dwHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST));
+
+		// we need to resolve rt_Generic_0_r into rt_Generic_0
+		u_setrt(rt_Generic_0_r, rt_Generic_0, 0, RImplementation.Target->rt_MSAADepth->pZRT);
+		CHK_GL(glBlitFramebuffer(0, 0, Device.dwWidth, Device.dwHeight, 0, 0, Device.dwWidth, Device.dwHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST));
+	}
 
    // for msaa we need a resolved color buffer - Holger
 	phase_bloom			( );												// HDR RT invalidated here
@@ -429,8 +428,8 @@ void	CRenderTarget::phase_combine	()
 	//*** exposure-pipeline-clear
 	{
 		std::swap					(rt_LUM_pool[gpu_id*2+0],rt_LUM_pool[gpu_id*2+1]);
-		t_LUM_src->surface_set		(NULL);
-		t_LUM_dest->surface_set		(NULL);
+		t_LUM_src->surface_set		(GL_TEXTURE_2D, NULL);
+		t_LUM_dest->surface_set		(GL_TEXTURE_2D, NULL);
 	}
 
 #ifdef DEBUG

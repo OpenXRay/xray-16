@@ -18,6 +18,7 @@ IC void CBackend::set_RT(GLuint RT, u32 ID)
 		PGO(Msg("PGO:setRT"));
 		stat.target_rt++;
 		pRT[ID] = RT;
+		// TODO: OGL: Implement support for multi-sampled render targets
 		CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ID, GL_TEXTURE_2D, RT, 0));
 	}
 }
@@ -29,6 +30,7 @@ IC void	CBackend::set_ZB(GLuint ZB)
 		PGO(Msg("PGO:setZB"));
 		stat.target_zb++;
 		pZB = ZB;
+		// TODO: OGL: Implement support for multi-sampled render targets
 		CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, ZB, 0));
 	}
 }

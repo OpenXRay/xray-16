@@ -20,6 +20,8 @@ public:
 public:
 #ifdef USE_OGL
 	GLuint					pRT;
+	GLuint					pZRT;
+	GLenum					target;
 #else
 	ID3DTexture2D*			pSurface;
 	ID3DRenderTargetView*	pRT;

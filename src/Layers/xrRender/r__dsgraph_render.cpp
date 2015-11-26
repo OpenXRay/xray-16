@@ -542,7 +542,7 @@ void D3DXRenderBase::r_dsgraph_render_hud_ui()
 	const ref_rt	rt_null;
 	RCache.set_RT(0,	1);
 	RCache.set_RT(0,	2);
-#if	(RENDER==R_R3) || (RENDER==R_R4)
+#if	(RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 	if( !RImplementation.o.dx10_msaa )
 	{
 		if (RImplementation.o.albedo_wo)	RImplementation.Target->u_setrt		(RImplementation.Target->rt_Accumulator,	rt_null,	rt_null,	HW.pBaseZB);

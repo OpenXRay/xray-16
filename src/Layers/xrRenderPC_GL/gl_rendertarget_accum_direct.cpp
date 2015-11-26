@@ -108,15 +108,7 @@ void CRenderTarget::accum_direct		(u32 sub_phase)
 			}
 			else 
 			{
-				for( u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i )
-				{
-					RCache.set_Element		   (s_accum_mask_msaa[i]->E[SE_MASK_DIRECT]);		// masker
-					RCache.set_CullMode		   (CULL_NONE	);
-					RCache.set_Stencil			(TRUE,D3DCMP_EQUAL,dwLightMarkerID|0x80,0x81,0x7f,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
-					StateManager.SetSampleMask ( u32(1)<<i );
-					RCache.Render					(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-				}
-				StateManager.SetSampleMask( 0xffffffff );
+				VERIFY(!"Only optimized MSAA is supported in OpenGL");
 			}
 			RCache.set_Stencil		(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0x01,0xff,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
 		} 
@@ -260,39 +252,31 @@ void CRenderTarget::accum_direct		(u32 sub_phase)
 //		}
 
 		// setup stencil
-      if( ! RImplementation.o.dx10_msaa )
-      {
-		   RCache.set_Stencil	(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0xff,0x00);
-		   RCache.Render			(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-      }
-      else 
-      {
-         // per pixel
-		   RCache.set_Stencil	(TRUE,D3DCMP_EQUAL,dwLightMarkerID,0xff,0x00);
-		   RCache.Render			(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-   		
-         // per sample
-         if( RImplementation.o.dx10_msaa_opt )
-         {
-		      RCache.set_Element	(s_accum_direct_msaa[0]->E[uiElementIndex]);
-            RCache.set_Stencil	(TRUE,D3DCMP_EQUAL,dwLightMarkerID|0x80,0xff,0x00);
-	         RCache.set_CullMode	(CULL_NONE	);
-		      RCache.Render			(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-         }
-         else
-         {
-		      for( u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i )
-		      {
-			      RCache.set_Element			(s_accum_direct_msaa[i]->E[uiElementIndex]);
-               RCache.set_Stencil	      (TRUE,D3DCMP_EQUAL,dwLightMarkerID|0x80,0xff,0x00);
-	            RCache.set_CullMode		   (CULL_NONE	);
-               StateManager.SetSampleMask ( u32(1) << i  );
-               RCache.Render					(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-		      }
-		      StateManager.SetSampleMask	( 0xffffffff );
-         }
-		   RCache.set_Stencil	(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0xff,0x00);
-      }
+		if( ! RImplementation.o.dx10_msaa )
+		{
+			RCache.set_Stencil	(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0xff,0x00);
+			RCache.Render			(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
+		}
+		else
+		{
+			// per pixel
+			RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
+			RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+
+			// per sample
+			if (RImplementation.o.dx10_msaa_opt)
+			{
+				RCache.set_Element(s_accum_direct_msaa[0]->E[uiElementIndex]);
+				RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
+				RCache.set_CullMode(CULL_NONE);
+				RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+			}
+			else
+			{
+				VERIFY(!"Only optimized MSAA is supported in OpenGL");
+			}
+			RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
+		}
 
 		// Fetch4 : disable
 //		if (RImplementation.o.HW_smap_FETCH4)	{
@@ -393,15 +377,7 @@ void CRenderTarget::accum_direct_cascade	( u32 sub_phase, Fmatrix& xform, Fmatri
 			}
 			else 
 			{
-				for( u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i )
-				{
-					RCache.set_Element		   (s_accum_mask_msaa[i]->E[SE_MASK_DIRECT]);		// masker
-					RCache.set_CullMode		   (CULL_NONE	);
-					RCache.set_Stencil			(TRUE,D3DCMP_EQUAL,dwLightMarkerID|0x80,0x81,0x7f,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
-					StateManager.SetSampleMask ( u32(1)<<i );
-					RCache.Render					(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-				}
-				StateManager.SetSampleMask( 0xffffffff );
+				VERIFY(!"Only optimized MSAA is supported in OpenGL");
 			}
 			RCache.set_Stencil		(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0x01,0xff,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
 		} 
@@ -641,24 +617,7 @@ void CRenderTarget::accum_direct_cascade	( u32 sub_phase, Fmatrix& xform, Fmatri
 			}
 			else
 			{
-				for( u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i )
-				{
-					RCache.set_Element			(s_accum_direct_msaa[i]->E[uiElementIndex]);
-
-					if( (SE_SUN_NEAR==sub_phase || SE_SUN_MIDDLE==sub_phase) )
-						RCache.set_ZFunc(D3DCMP_GREATEREQUAL);
-					else
-						if( !ps_r2_ls_flags_ext.is(R2FLAGEXT_SUN_ZCULLING))
-							RCache.set_ZFunc(D3DCMP_ALWAYS);
-						else
-							RCache.set_ZFunc(D3DCMP_LESS);
-
-					RCache.set_Stencil	      (TRUE,D3DCMP_EQUAL,dwLightMarkerID|0x80,0xff,st_mask, D3DSTENCILOP_KEEP, st_pass, D3DSTENCILOP_KEEP);
-					RCache.set_CullMode		   (CULL_NONE	);
-					StateManager.SetSampleMask ( u32(1) << i  );
-					RCache.Render					(D3DPT_TRIANGLELIST,Offset,0,8,0,16);
-				}
-				StateManager.SetSampleMask	( 0xffffffff );
+				VERIFY(!"Only optimized MSAA is supported in OpenGL");
 			}
 			RCache.set_Stencil	(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0xff,0x00);
 		}
@@ -716,37 +675,30 @@ void CRenderTarget::accum_direct_blend	()
 		RCache.Vertex.Unlock		(4,g_combine_2UV->vb_stride);
 		RCache.set_Geometry			(g_combine_2UV);
 		RCache.set_Element			(s_accum_mask->E[SE_MASK_ACCUM_2D]	);
-      if( ! RImplementation.o.dx10_msaa )
-      {
-		   RCache.set_Stencil			(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0xff,0x00);
-		   RCache.Render					(D3DPT_TRIANGLELIST,Offset,0,4,0,2	);
-      }
-      else 
-      {
-		   // per pixel
-		   RCache.set_Stencil			(TRUE,D3DCMP_EQUAL,dwLightMarkerID,0xff,0x00);
-		   RCache.Render					(D3DPT_TRIANGLELIST,Offset,0,4,0,2	);
-   		
-		   // per sample
-         if( RImplementation.o.dx10_msaa_opt )
-         {
-		      RCache.set_Element			(s_accum_mask_msaa[0]->E[SE_MASK_ACCUM_2D]	);
-            RCache.set_Stencil			(TRUE,D3DCMP_EQUAL,dwLightMarkerID|0x80,0xff,0x00);
-            RCache.Render					(D3DPT_TRIANGLELIST,Offset,0,4,0,2	);
-         }
-         else // checked Holger
-         {
-		      for( u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i )
-		      {
-			      RCache.set_Element		   (s_accum_mask_msaa[i]->E[SE_MASK_ACCUM_2D]	);
-               RCache.set_Stencil			(TRUE,D3DCMP_EQUAL,dwLightMarkerID|0x80,0xff,0x00);
-               StateManager.SetSampleMask ( u32(1) << i );
-               RCache.Render					(D3DPT_TRIANGLELIST,Offset,0,4,0,2	);
-		      }
-		      StateManager.SetSampleMask( 0xffffffff );
-         }
-		   RCache.set_Stencil			(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0xff,0x00);
-      }
+		if (!RImplementation.o.dx10_msaa)
+		{
+			RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
+			RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+		}
+		else
+		{
+			// per pixel
+			RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
+			RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+
+			// per sample
+			if (RImplementation.o.dx10_msaa_opt)
+			{
+				RCache.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_ACCUM_2D]);
+				RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
+				RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+			}
+			else // checked Holger
+			{
+				VERIFY(!"Only optimized MSAA is supported in OpenGL");
+			}
+			RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
+		}
 	}
 	//dwLightMarkerID				+= 2;
 	increment_light_marker();
@@ -814,39 +766,31 @@ void CRenderTarget::accum_direct_f		(u32 sub_phase)
 		// if (stencil>=1 && aref_pass)	stencil = light_id
 		//	Done in blender!
 		//RCache.set_ColorWriteEnable	(FALSE		);
-      if( ! RImplementation.o.dx10_msaa )
-      {
-		   RCache.set_Stencil	(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0x01,0xff,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
-		   RCache.Render			(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-      }
-      else 
-      {
-		   // per pixel
-		   RCache.set_Stencil	(TRUE,D3DCMP_EQUAL,dwLightMarkerID,0x81,0x7f,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
-		   RCache.Render			(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-   		
-		   // per sample
-         if( RImplementation.o.dx10_msaa_opt )
-         {
-		      RCache.set_Element	(s_accum_mask_msaa[0]->E[SE_MASK_DIRECT]);		// masker
-            RCache.set_Stencil	(TRUE,D3DCMP_LESS,dwLightMarkerID,0x81,0x7f,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
-	         RCache.set_CullMode	(CULL_NONE	);
-            RCache.Render			(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-         }
-         else 
-         {
-		      for( u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i )
-		      {
-			      RCache.set_Element		   (s_accum_mask_msaa[i]->E[SE_MASK_DIRECT]);		// masker
-               RCache.set_Stencil	      (TRUE,D3DCMP_LESS,dwLightMarkerID,0x81,0x7f,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
-	            RCache.set_CullMode	      (CULL_NONE	);
-               StateManager.SetSampleMask ( u32(1) << i );
-               RCache.Render					(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-		      }
-		      StateManager.SetSampleMask( 0xffffffff );
-         }	
-		   RCache.set_Stencil	(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0x01,0xff,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
-      }
+		if (!RImplementation.o.dx10_msaa)
+		{
+			RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0xff, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
+			RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+		}
+		else
+		{
+			// per pixel
+			RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0x81, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
+			RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+
+			// per sample
+			if (RImplementation.o.dx10_msaa_opt)
+			{
+				RCache.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_DIRECT]);		// masker
+				RCache.set_Stencil(TRUE, D3DCMP_LESS, dwLightMarkerID, 0x81, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
+				RCache.set_CullMode(CULL_NONE);
+				RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+			}
+			else
+			{
+				VERIFY(!"Only optimized MSAA is supported in OpenGL");
+			}
+			RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0xff, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
+		}
 	}
 
 	// recalculate d_Z, to perform depth-clipping
@@ -925,40 +869,32 @@ void CRenderTarget::accum_direct_f		(u32 sub_phase)
 		RCache.set_c				("Ldynamic_color",		L_clr.x,L_clr.y,L_clr.z,L_spec	);
 		RCache.set_c				("m_shadow",			m_shadow						);
 
-      if( ! RImplementation.o.dx10_msaa )
-      {
-		   // setup stencil
-		   RCache.set_Stencil	(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0xff,0x00);
-		   RCache.Render			(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-      }
-      else
-      {
-		   // per pixel
-		   RCache.set_Stencil	(TRUE,D3DCMP_EQUAL,dwLightMarkerID,0xff,0x00);
-		   RCache.Render			(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-   		
-         // per sample // checked Holger
-         if( RImplementation.o.dx10_msaa_opt )
-         {
-		      RCache.set_Element	(s_accum_direct_msaa[0]->E[sub_phase]);
-	         RCache.set_CullMode	(CULL_NONE	);
-            RCache.set_Stencil	(TRUE,D3DCMP_LESS,dwLightMarkerID|0x80,0xff,0x00);
-		      RCache.Render			(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-         }
-         else
-         {
-		      for( u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i )
-		      {
-			      RCache.set_Element	      (s_accum_direct_msaa[i]->E[sub_phase]);
-	            RCache.set_CullMode	      (CULL_NONE	);
-               RCache.set_Stencil	      (TRUE,D3DCMP_LESS,dwLightMarkerID|0x80,0xff,0x00);
-               StateManager.SetSampleMask ( u32(1)<< i );
-			      RCache.Render				   (D3DPT_TRIANGLELIST,Offset,0,4,0,2);			
-		      }
-		      StateManager.SetSampleMask( 0xffffffff );
-         }
-		   RCache.set_Stencil	(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0xff,0x00);
-      }
+		if( ! RImplementation.o.dx10_msaa )
+		{
+			// setup stencil
+			RCache.set_Stencil	(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0xff,0x00);
+			RCache.Render			(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
+		}
+		else
+		{
+			// per pixel
+			RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
+			RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+
+			// per sample // checked Holger
+			if (RImplementation.o.dx10_msaa_opt)
+			{
+				RCache.set_Element(s_accum_direct_msaa[0]->E[sub_phase]);
+				RCache.set_CullMode(CULL_NONE);
+				RCache.set_Stencil(TRUE, D3DCMP_LESS, dwLightMarkerID | 0x80, 0xff, 0x00);
+				RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+			}
+			else
+			{
+				VERIFY(!"Only optimized MSAA is supported in OpenGL");
+			}
+			RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
+		}
 
 		//	Igor: draw volumetric here
 		//accum_direct_volumetric	(sub_phase, Offset);
@@ -1043,40 +979,32 @@ void CRenderTarget::accum_direct_lum	()
 		RCache.set_c				("Ldynamic_dir",		L_dir.x,L_dir.y,L_dir.z,0		);
 		RCache.set_c				("Ldynamic_color",		L_clr.x,L_clr.y,L_clr.z,L_spec	);
 
-      if( ! RImplementation.o.dx10_msaa )
-      {
-		   // setup stencil
-		   RCache.set_Stencil	(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0xff,0x00);
-	   	RCache.Render			(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-      }
-      else	
-      {
-		   // per pixel
-		   RCache.set_Stencil	(TRUE,D3DCMP_EQUAL,dwLightMarkerID,0xff,0x00);
-		   RCache.Render			(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-   		
-		   // per sample
-         if( RImplementation.o.dx10_msaa_opt )
-         {
-		      RCache.set_Element	(s_accum_direct_msaa[0]->E[SE_SUN_LUMINANCE]);
-            RCache.set_Stencil	(TRUE,D3DCMP_EQUAL,dwLightMarkerID|0x80,0xff,0x00);
-	         RCache.set_CullMode	(CULL_NONE	);
-            RCache.Render			(D3DPT_TRIANGLELIST,Offset,0,4,0,2);
-         }
-         else
-         {
-	         for( u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i )
-	         {
-		         RCache.set_Element	      (s_accum_direct_msaa[i]->E[SE_SUN_LUMINANCE]);
-               StateManager.SetSampleMask ( u32(1) << i );
-               RCache.set_Stencil	      (TRUE,D3DCMP_EQUAL,dwLightMarkerID|0x80,0xff,0x00);
-	            RCache.set_CullMode	      (CULL_NONE	);
-               RCache.Render				   (D3DPT_TRIANGLELIST,Offset,0,4,0,2);	
-	         }
-	         StateManager.SetSampleMask( 0xffffffff );
-         }
-	      RCache.set_Stencil	(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0xff,0x00);
-      }
+		if (!RImplementation.o.dx10_msaa)
+		{
+			// setup stencil
+			RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
+			RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+		}
+		else
+		{
+			// per pixel
+			RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
+			RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+
+			// per sample
+			if (RImplementation.o.dx10_msaa_opt)
+			{
+				RCache.set_Element(s_accum_direct_msaa[0]->E[SE_SUN_LUMINANCE]);
+				RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
+				RCache.set_CullMode(CULL_NONE);
+				RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+			}
+			else
+			{
+				VERIFY(!"Only optimized MSAA is supported in OpenGL");
+			}
+			RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
+		}
 }
 
 void CRenderTarget::accum_direct_volumetric	(u32 sub_phase, const u32 Offset, const Fmatrix &mShadow)
