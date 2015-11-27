@@ -85,7 +85,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <SmallerTypeCheck>true</SmallerTypeCheck>
       <StringPooling>false</StringPooling>
@@ -93,7 +93,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <TreatWarningAsError>true</TreatWarningAsError>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;GLBINDING_STATIC;STRINGS_BY_GL;WIN32;UNICODE;_UNICODE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_DEBUG;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;DEBUG;_WINDOWS;GLBINDING_STATIC;STRINGS_BY_GL;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
@@ -135,7 +135,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <WarningLevel>Level4</WarningLevel>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;GLBINDING_STATIC;STRINGS_BY_GL;WIN32;UNICODE;_UNICODE;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;NDEBUG;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;GLBINDING_STATIC;STRINGS_BY_GL;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
