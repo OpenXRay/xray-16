@@ -20,7 +20,7 @@ SCRIPT_EXPORT(CStalkerPlanner, (CScriptActionPlanner),
 {
 	module(luaState)
 	[
-		class_<CStalkerPlanner, CScriptActionPlanner>("stalker_ids") // CScriptActionPlanner
+		class_<CStalkerPlanner, CScriptActionPlanner>("stalker_ids")
 			.enum_("properties")
 			[
 				luabind::value("property_alive",							StalkerDecisionSpace::eWorldPropertyAlive),
