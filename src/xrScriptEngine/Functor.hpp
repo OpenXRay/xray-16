@@ -42,10 +42,14 @@ template<typename T>
 struct default_converter<functor<T>> : native_converter_base<functor<T>>
 {
     static int compute_score(lua_State *luaState, int index)
-    { return lua_type(luaState, index)==LUA_TFUNCTION ? 0 : -1; }
+    { return lua_isfunction(luaState, index) || lua_isnil(luaState, index) ? 0 : -1; }
 
     functor<T> from(lua_State *luaState, int index)
-    { return object(from_stack(luaState, index)); }
+    {
+        if (lua_isnil(luaState, index))
+            return functor<T>();
+        return object(from_stack(luaState, index));
+    }
 
     void to(lua_State *luaState, const functor<T> &func)
     { func.push(luaState); }
