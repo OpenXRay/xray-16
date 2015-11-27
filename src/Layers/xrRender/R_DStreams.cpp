@@ -46,7 +46,8 @@ void _VertexStream::Create	()
 void _VertexStream::Destroy	()
 {
 #ifdef USE_OGL
-	glDeleteBuffers(1, &pVB);
+	if (pVB)
+		glDeleteBuffers(1, &pVB);
 #else
 	HW.stats_manager.decrement_stats_vb(pVB);
 	_RELEASE(pVB);
@@ -217,7 +218,8 @@ void	_IndexStream::Create	()
 void	_IndexStream::Destroy()
 {
 #ifdef USE_OGL
-	glDeleteBuffers(1, &pIB);
+	if (pIB)
+		glDeleteBuffers(1, &pIB);
 #else
 	HW.stats_manager.decrement_stats_ib(pIB);
 	_RELEASE(pIB);
