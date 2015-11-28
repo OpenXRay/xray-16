@@ -907,18 +907,18 @@ HRESULT	CRender::shader_compile(
 		xr_free(*it);
 
 	// Get the compilation result
-	GLboolean status;
-	CHK_GL(glGetShaderiv(shader, GL_COMPILE_STATUS, (GLint*)&status));
+	GLint status;
+	CHK_GL(glGetShaderiv(shader, GL_COMPILE_STATUS, &status));
 
 	// Link program if compilation succeeded
 	GLchar* _pErrorMsgs = NULL;
-	if (status == GL_TRUE) {
+	if ((GLboolean)status == GL_TRUE) {
 		CHK_GL(glAttachShader(program, shader));
 		CHK_GL(glLinkProgram(program));
 		CHK_GL(glDetachShader(program, shader));
-		CHK_GL(glGetProgramiv(program, GL_LINK_STATUS, (GLint*)&status));
+		CHK_GL(glGetProgramiv(program, GL_LINK_STATUS, &status));
 
-		if (status == GL_FALSE)
+		if ((GLboolean)status == GL_FALSE)
 		{
 			GLint length;
 			CHK_GL(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length));
@@ -934,7 +934,7 @@ HRESULT	CRender::shader_compile(
 		CHK_GL(glGetShaderInfoLog(shader, length, nullptr, _pErrorMsgs));
 	}
 
-	if (status == GL_FALSE) {
+	if ((GLboolean)status == GL_FALSE) {
 		Msg("! shader compilation failed");
 		Log("! ", name);
 		if (_pErrorMsgs)
