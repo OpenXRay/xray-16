@@ -281,7 +281,7 @@ public:
 	IC	void						set_Shader			(ref_shader& S, u32 pass=0)			{ set_Shader(&*S,pass);			}
 
 	ICF	void						set_States			(SState* _state);
-	ICF	void						set_States			(ref_state& _state)					{ set_States(_state);	}
+	ICF	void						set_States			(ref_state& _state)					{ set_States(&*_state);	}
 
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	ICF  void						set_Format			(SDeclaration* _decl);
