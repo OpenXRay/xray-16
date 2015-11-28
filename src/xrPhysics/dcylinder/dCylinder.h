@@ -4,7 +4,7 @@
 
 
 
-#include "3rd party/ode/include/ode/common.h"
+#include "include/ode/common.h"
 
 struct dxCylinder;
 extern int dCylinderClassUser;

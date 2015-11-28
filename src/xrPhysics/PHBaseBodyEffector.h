@@ -2,7 +2,7 @@
 #define PH_BASE_BODY_EFFECTOR_H
 
 
-#include "3rd party/ode/include/ode/common.h"
+#include "include/ode/common.h"
 class CPHBaseBodyEffector 
 {
 protected:
