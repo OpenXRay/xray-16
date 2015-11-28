@@ -333,7 +333,10 @@ SGS*	CResourceManager::_CreateGS			(LPCSTR name)
 		SGS*	_gs					=	xr_new<SGS>	();
 		_gs->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
 		m_gs.insert					(mk_pair(_gs->set_name(name),_gs));
-		VERIFY(strcmpi(name, "null") != 0);
+		if (0==stricmp(name,"null"))	{
+			_gs->gs				= NULL;
+			return _gs;
+		}
 
 		// Open file
 		string_path					cname;
