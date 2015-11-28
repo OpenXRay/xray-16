@@ -20,3 +20,7 @@
 *.PDF	 diff=astextplain
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
+
+# Shaders are plain text
+*.vs	 diff=astextplain
+*.ps	 diff=astextplain

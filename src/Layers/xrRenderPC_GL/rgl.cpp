@@ -914,6 +914,7 @@ HRESULT	CRender::shader_compile(
 	GLchar* _pErrorMsgs = NULL;
 	if ((GLboolean)status == GL_TRUE) {
 		CHK_GL(glAttachShader(program, shader));
+		CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
 		CHK_GL(glLinkProgram(program));
 		CHK_GL(glDetachShader(program, shader));
 		CHK_GL(glGetProgramiv(program, GL_LINK_STATUS, &status));
