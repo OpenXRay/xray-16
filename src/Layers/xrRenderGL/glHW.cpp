@@ -348,7 +348,7 @@ void CHW::UpdateViews()
 	// Create Depth/stencil buffer
 	glGenTextures(1, &HW.pBaseZB);
 	CHK_GL(glBindTexture(GL_TEXTURE_2D, HW.pBaseZB));
-	CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, Device.dwWidth, Device.dwHeight));
+	CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, psCurrentVidMode[0], psCurrentVidMode[1]));
 }
 
 
