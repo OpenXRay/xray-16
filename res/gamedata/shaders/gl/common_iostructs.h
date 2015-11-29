@@ -1,6 +1,8 @@
 #ifndef	common_iostructs_h_included
 #define	common_iostructs_h_included
 
+#include "shared\common.h"
+
 ////////////////////////////////////////////////////////////////
 //	This file contains io structs:
 //	v_name	:	input for vertex shader.
