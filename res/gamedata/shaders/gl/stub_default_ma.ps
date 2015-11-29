@@ -7,7 +7,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 // Pixel
 
-float4 main ( p_TL I ) // SV_Target
+float4 _main ( p_TL I ) // SV_Target
 {
 	float4 res = tex2D( s_base, I.Tex0 );
 //	res.rgb		= lerp( I.Color.rgb, res.rgb, I.Color.a);

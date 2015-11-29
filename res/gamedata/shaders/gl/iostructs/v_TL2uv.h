@@ -15,9 +15,9 @@ v2p_TL2uv _main ( v_TL2uv I );
 void main()
 {
 	v_TL2uv		I;
-	I.P			= v_TL_P;
-	I.Tex0		= v_TL_Tex0;
-	I.Tex1		= v_TL_Tex1;
+	I.P			= v_TL2uv_P;
+	I.Tex0		= v_TL2uv_Tex0;
+	I.Tex1		= v_TL2uv_Tex1;
 	I.Color 	= v_TL2uv_Color;
 
 	v2p_TL2uv O 	= _main (I);
