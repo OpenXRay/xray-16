@@ -21,6 +21,7 @@ void	CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
 	dwHeight = _1->dwHeight;
 	GLuint cnt = 0;
 	GLenum buffers[3] = { GL_NONE };
+	RCache.set_FB(HW.pFB);
 	if (_1)
 	{
 		buffers[cnt++] = GL_COLOR_ATTACHMENT0;
@@ -50,6 +51,7 @@ void	CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, GLuint zb)
 	dwHeight = _1->dwHeight;
 	GLuint cnt = 0;
 	GLenum buffers[2] = { GL_NONE };
+	RCache.set_FB(HW.pFB);
 	if (_1)
 	{
 		buffers[cnt++] = GL_COLOR_ATTACHMENT0;
@@ -73,20 +75,24 @@ void	CRenderTarget::u_setrt(u32 W, u32 H, GLuint _1, GLuint _2, GLuint _3, GLuin
 	dwHeight = H;
 	GLuint cnt = 0;
 	GLenum buffers[3] = { GL_NONE };
-	if (_1 == HW.pBaseRT) buffers[cnt++] = GL_BACK;
-	else if (_1)
+	if (_1 == HW.pBaseRT)
+	{
+		RCache.set_FB();
+		return;
+	}
+
+	RCache.set_FB(HW.pFB);
+	if (_1)
 	{
 		buffers[cnt++] = GL_COLOR_ATTACHMENT0;
 		RCache.set_RT(_1, 0);
 	}
-	if (_2 == HW.pBaseRT) buffers[cnt++] = GL_BACK;
-	else if (_2)
+	if (_2)
 	{
 		buffers[cnt++] = GL_COLOR_ATTACHMENT1;
 		RCache.set_RT(_2, 1);
 	}
-	if (_3 == HW.pBaseRT) buffers[cnt++] = GL_BACK;
-	else if (_3)
+	if (_3)
 	{
 		buffers[cnt++] = GL_COLOR_ATTACHMENT2;
 		RCache.set_RT(_3, 2);
@@ -815,7 +821,7 @@ CRenderTarget::CRenderTarget		()
 				//	Autogen mipmaps
 				glGenTextures(1, &t_noise_surf_mipped);
 				CHK_GL(glBindTexture(GL_TEXTURE_2D, t_noise_surf_mipped));
-				CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 0, GL_RGBA8, TEX_jitter, TEX_jitter));
+				CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, TEX_jitter, TEX_jitter));
 				t_noise_mipped = RImplementation.Resources->_CreateTexture(r2_jitter_mipped);
 				t_noise_mipped->surface_set(GL_TEXTURE_2D, t_noise_surf_mipped);
 

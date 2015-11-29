@@ -11,6 +11,21 @@ IC void		CBackend::set_xform(u32 ID, const Fmatrix& M)
 	//VERIFY(!"Implement CBackend::set_xform");
 }
 
+IC	GLuint CBackend::get_FB()
+{
+	return pFB;
+}
+
+IC void	CBackend::set_FB(GLuint FB)
+{
+	if (FB != pFB)
+	{
+		PGO(Msg("PGO:set_FB"));
+		pFB = FB;
+		CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, pFB));
+	}
+}
+
 IC void CBackend::set_RT(GLuint RT, u32 ID)
 {
 	if (RT != pRT[ID])

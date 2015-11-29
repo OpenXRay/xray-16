@@ -93,6 +93,7 @@ public:
 private:
 	// Render-targets
 #ifdef USE_OGL
+	GLuint							pFB;
 	GLuint							pRT[4];
 	GLuint							pZB;
 #else
@@ -252,8 +253,10 @@ public:
 	IC	const Fmatrix&				get_xform_project	();
 
 #ifdef USE_OGL
+	IC	void						set_FB				(GLuint FB=0);
 	IC	void						set_RT				(GLuint RT, u32 ID=0);
 	IC	void						set_ZB				(GLuint ZB);
+	IC	GLuint						get_FB				();
 	IC	GLuint						get_RT				(u32 ID=0);
 	IC	GLuint						get_ZB				();
 #else
