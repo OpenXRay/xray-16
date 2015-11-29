@@ -177,6 +177,7 @@ void CHW::Reset (HWND hwnd)
 
 	CHK_GL(glDeleteProgramPipelines(1, &pPP));
 	CHK_GL(glDeleteFramebuffers(1, &pFB));
+	CHK_GL(glDeleteFramebuffers(1, &pCFB));
 
 	CHK_GL(glDeleteTextures(1, &pBaseRT));
 	CHK_GL(glDeleteTextures(1, &pBaseZB));
@@ -337,9 +338,12 @@ void CHW::UpdateViews()
 	glGenProgramPipelines(1, &pPP);
 	CHK_GL(glBindProgramPipeline(pPP));
 
-	// Create the framebuffer
+	// Create the default framebuffer
 	glGenFramebuffers(1, &pFB);
 	CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, pFB));
+
+	// Create the clear framebuffer
+	glGenFramebuffers(1, &pCFB);
 
 	// Create a render target view
 	// We reserve a texture name to represent GL_BACK
@@ -354,7 +358,14 @@ void CHW::UpdateViews()
 
 void CHW::ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[4])
 {
-	// TODO: OGL: Bind the RT to a clear frame buffer.
+	if (pRenderTargetView == 0)
+		return;
+
+	// Bind the clear framebuffer and attach the render target
+	RCache.set_FB(pCFB);
+	CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pRenderTargetView, 0));
+
+	// Clear the color buffer without affecting the global state
 	glPushAttrib(GL_COLOR_BUFFER_BIT);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glClearColor(ColorRGBA[0], ColorRGBA[1], ColorRGBA[2], ColorRGBA[3]);
@@ -364,7 +375,13 @@ void CHW::ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[
 
 void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT Depth, UINT8 Stencil)
 {
-	// TODO: OGL: Bind the DS to a clear frame buffer.
+	if (pDepthStencilView == 0)
+		return;
+
+	// Bind the clear framebuffer and attach the render target
+	RCache.set_FB(pCFB);
+	CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, pDepthStencilView, 0));
+
 	u32 mask = 0;
 	if (ClearFlags & D3D_CLEAR_DEPTH)
 		mask |= (u32)GL_DEPTH_BUFFER_BIT;

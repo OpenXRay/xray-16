@@ -61,8 +61,9 @@ public:
 	CHW*					pContext;
 	GLuint					pBaseRT;
 	GLuint					pBaseZB;
-	GLuint					pFB;
 	GLuint					pPP;
+	GLuint					pFB;
+	GLuint					pCFB;
 
 	CHWCaps					Caps;
 
