@@ -945,7 +945,7 @@ HRESULT	CRender::shader_compile(
 		if (_pErrorMsgs)
 			Log("! error: ", _pErrorMsgs);
 
-		return S_FALSE;
+		return E_FAIL;
 	}
 
 	CHK_GL(glDeleteShader(shader));
