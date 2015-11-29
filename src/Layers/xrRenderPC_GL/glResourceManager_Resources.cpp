@@ -217,6 +217,13 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 
 		VERIFY(SUCCEEDED(_hr));
 
+		//	Parse constant, texture, sampler binding
+		if (SUCCEEDED(_hr))
+		{
+			//	Let constant table parse it's data
+			_vs->constants.parse(_result, RC_dest_vertex);
+		}
+
 		CHECK_OR_EXIT			(
 			!FAILED(_hr),
 			make_string("Your video card doesn't meet game requirements.\n\nTry to lower game settings.")
@@ -302,6 +309,13 @@ SPS*	CResourceManager::_CreatePS			(LPCSTR _name)
 
 		VERIFY(SUCCEEDED(_hr));
 
+		//	Parse constant, texture, sampler binding
+		if (SUCCEEDED(_hr))
+		{
+			//	Let constant table parse it's data
+			_ps->constants.parse(_result, RC_dest_pixel);
+		}
+
 		CHECK_OR_EXIT(
 			!FAILED(_hr),
 			make_string("Your video card doesn't meet game requirements.\n\nTry to lower game settings.")
@@ -366,6 +380,13 @@ SGS*	CResourceManager::_CreateGS			(LPCSTR name)
 		HRESULT	const _hr		= GlobalEnv.Render->shader_compile(name,(DWORD const*)file->pointer(),file->length(), NULL, NULL, NULL, _result );
 
 		VERIFY(SUCCEEDED(_hr));
+
+		//	Parse constant, texture, sampler binding
+		if (SUCCEEDED(_hr))
+		{
+			//	Let constant table parse it's data
+			_gs->constants.parse(_result, RC_dest_geometry);
+		}
 
 		FS.r_close				( file );
 
