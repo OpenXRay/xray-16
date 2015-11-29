@@ -627,6 +627,7 @@ static inline bool match_shader_id		( LPCSTR const debug_shader_id, LPCSTR const
 
 static inline void load_includes(LPCSTR pSrcData, UINT SrcDataLen, xr_vector<char*>& source, xr_vector<char*>& includes)
 {
+	// Copy source file data into a null-terminated buffer
 	char* srcData = xr_alloc<char>(SrcDataLen + 2);
 	memcpy(srcData, pSrcData, SrcDataLen);
 	srcData[SrcDataLen] = '\n';
@@ -658,6 +659,8 @@ static inline void load_includes(LPCSTR pSrcData, UINT SrcDataLen, xr_vector<cha
 
 		// Add next source, skip quotation
 		str++;
+		// TODO: OGL: Include string index in line directive
+		source.push_back("#line 2\n");
 		source.push_back(str);
 	}
 }
