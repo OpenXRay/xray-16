@@ -184,6 +184,7 @@ void					CRender::create					()
 	o.HW_smap_FETCH4	= FALSE;
 	o.HW_smap			= true;
 	o.HW_smap_PCF		= o.HW_smap;
+	o.HW_smap_FORMAT	= D3DFMT_D24X8;
 
 	o.fp16_filter		= true;
 	o.fp16_blend		= true;
