@@ -99,14 +99,17 @@ public:
 	ICF void				set		(R_constant* C, const Fmatrix& A)		{
 		if (C->destination&RC_dest_pixel)		{ set(C, C->ps, A); }
 		if (C->destination&RC_dest_vertex)		{ set(C, C->vs, A); }
+		if (C->destination&RC_dest_geometry)		{ set(C, C->gs, A); }
 	}
 	ICF void				set		(R_constant* C, const Fvector4& A)		{
 		if (C->destination&RC_dest_pixel)		{ set(C, C->ps, A); }
 		if (C->destination&RC_dest_vertex)		{ set(C, C->vs, A); }
+		if (C->destination&RC_dest_geometry)		{ set(C, C->gs, A); }
 	}
 	ICF void				set		(R_constant* C, float x, float y, float z, float w)	{
 		if (C->destination&RC_dest_pixel)		{ set(C, C->ps, x, y, z, w); }
 		if (C->destination&RC_dest_vertex)		{ set(C, C->vs, x, y, z, w); }
+		if (C->destination&RC_dest_geometry)		{ set(C, C->gs, x, y, z, w); }
 	}
 
 	// scalars, non-array versions
@@ -114,11 +117,13 @@ public:
 	{
 		if (C->destination&RC_dest_pixel)		{ set(C, C->ps, A); }
 		if (C->destination&RC_dest_vertex)		{ set(C, C->vs, A); }
+		if (C->destination&RC_dest_geometry)		{ set(C, C->gs, A); }
 	}
 	ICF	void				set(R_constant* C, int A)
 	{
 		if (C->destination&RC_dest_pixel)		{ set(C, C->ps, A); }
 		if (C->destination&RC_dest_vertex)		{ set(C, C->vs, A); }
+		if (C->destination&RC_dest_geometry)		{ set(C, C->gs, A); }
 	}
 
 	// fp, array versions
@@ -126,6 +131,7 @@ public:
 		R_constant_load L;
 		if (C->destination&RC_dest_pixel)		{ L = C->ps; }
 		if (C->destination&RC_dest_vertex)		{ L = C->vs; }
+		if (C->destination&RC_dest_geometry)		{ L = C->gs; }
 		L.location += e;
 		set(C, L, A);
 	}
@@ -133,6 +139,7 @@ public:
 		R_constant_load L;
 		if (C->destination&RC_dest_pixel)		{ L = C->ps; }
 		if (C->destination&RC_dest_vertex)		{ L = C->vs; }
+		if (C->destination&RC_dest_geometry)		{ L = C->gs; }
 		L.location += e;
 		set(C, L, A);
 	}
@@ -140,6 +147,7 @@ public:
 		R_constant_load L;
 		if (C->destination&RC_dest_pixel)		{ L = C->ps; }
 		if (C->destination&RC_dest_vertex)		{ L = C->vs; }
+		if (C->destination&RC_dest_geometry)		{ L = C->gs; }
 		L.location += e;
 		set(C, L, x, y, z, w);
 
