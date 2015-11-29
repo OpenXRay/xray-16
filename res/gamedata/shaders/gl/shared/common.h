@@ -42,7 +42,6 @@ void	sincos(float x, out float s, out float c) { s = sin(x); c = cos(x); }
 #define tex2Dlod(s,t)	textureLod(s,t.xy,t.w)
 #define tex3D		texture
 #define texCUBE 	texture
-#define samplerCUBE	samplerCube
 
 // Semantics assignment, maximum 16 slots
 #define COLOR		0
