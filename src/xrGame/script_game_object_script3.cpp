@@ -104,7 +104,7 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
 		.def("base_out_restrictions",		&CScriptGameObject::base_out_restrictions)
 		.def("accessible",					&CScriptGameObject::accessible_position)
 		.def("accessible",					&CScriptGameObject::accessible_vertex_id)
-		.def("accessible_nearest",			&CScriptGameObject::accessible_nearest, out_value(_3))
+		.def("accessible_nearest",			&CScriptGameObject::accessible_nearest)
 
 		//////////////////////////////////////////////////////////////////////////
 		.def("enable_attachable_item",		&CScriptGameObject::enable_attachable_item)
