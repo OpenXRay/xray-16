@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -18,14 +18,14 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <CLRSupport>true</CLRSupport>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <CLRSupport>true</CLRSupport>
   </PropertyGroup>
@@ -132,7 +132,22 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="ChoseForm.cpp" />
+    <ClCompile Include="ColorPicker.cpp" />
+    <ClCompile Include="FolderLib.cpp" />
+    <ClCompile Include="GameTypeForm.cpp" />
+    <ClCompile Include="ItemDialog.cpp" />
+    <ClCompile Include="ItemList.cpp" />
+    <ClCompile Include="ItemListHelper.cpp" />
+    <ClCompile Include="ItemListTypes.cpp" />
+    <ClCompile Include="NumericVector.cpp" />
+    <ClCompile Include="PropertiesList.cpp" />
+    <ClCompile Include="PropertiesListHelper.cpp" />
+    <ClCompile Include="PropertiesListTypes.cpp" />
+    <ClCompile Include="ShaderFunction.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="TextForm.cpp" />
+    <ClCompile Include="xrEProps.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
@@ -141,7 +156,24 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.hpp" />
+    <ClInclude Include="ChoseForm.h" />
+    <ClInclude Include="ColorPicker.h" />
+    <ClInclude Include="Defines.h" />
+    <ClInclude Include="EditorChooseEvents.h" />
+    <ClInclude Include="FolderLib.h" />
+    <ClInclude Include="GameTypeForm.h" />
+    <ClInclude Include="ItemDialog.h" />
+    <ClInclude Include="ItemList.h" />
+    <ClInclude Include="ItemListHelper.h" />
+    <ClInclude Include="NumericVector.h" />
+    <ClInclude Include="PropertiesList.h" />
+    <ClInclude Include="ShaderFunction.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TextForm.h" />
+    <ClInclude Include="WaveForm.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="xrEProps.res" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
