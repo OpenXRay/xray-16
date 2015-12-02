@@ -5,11 +5,8 @@ function l_special  (shader, t_base, t_second, t_detail)
       : zb        (true,false)
       : fog       (false)
       : distort   (true)
---  shader:sampler  ("s_base")      :texture  (t_base)
---  shader:sampler  ("s_distort")   :texture  ("pfx\\pfx_dist_glass")
-	shader: dx10texture ("s_base", t_base)
-	shader: dx10texture ("s_distort", "pfx\\pfx_dist_glass") --:texture  (t_base) -- ("pfx\\pfx_dist_glass2")
-	shader: dx10sampler ("smp_linear")
+	shader:sampler  ("s_base")      :texture  (t_base)
+	shader:sampler  ("s_distort")   :texture  ("pfx\\pfx_dist_glass")
 end
 
 --[[
@@ -36,11 +33,6 @@ function normal   (shader, t_base, t_second, t_detail)
       : blend     (true,blend.srcalpha,blend.invsrcalpha)
       : aref      (true,0)
       : sorting   (3,true)
---  shader:sampler  ("s_base")       :texture    (t_base)
---  shader:sampler  ("s_env")        :texture    ("sky\\sky_5_cube") : clamp()
-	shader: dx10texture ("s_base", t_base)
-	shader:	dx10texture ("s_env", "sky\\sky_5_cube")
-
-	shader: dx10sampler ("smp_base")
-	shader: dx10sampler ("smp_rtlinear")
+	shader:sampler  ("s_base")       :texture    (t_base)
+	shader:sampler  ("s_env")        :texture    ("sky\\sky_5_cube") : clamp()
 end

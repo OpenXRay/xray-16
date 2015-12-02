@@ -5,7 +5,5 @@ function normal		(shader, t_base, t_second, t_detail)
 			:zb 		(true,false)
 			:sorting	(3, true)
 			:blend		(true,blend.srcalpha,blend.invsrcalpha)
---	TODO: DX10: Setup samplers
---	shader	:sampler	("s_tonemap")   :texture	("$user$tonemap")
-	shader:dx10texture	("s_tonemap", "$user$tonemap")
+	shader	:sampler	("s_tonemap")   :texture	("$user$tonemap")
 end

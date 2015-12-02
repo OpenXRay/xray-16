@@ -15,23 +15,13 @@ function normal                (shader, t_base, t_second, t_detail)
 			:zb			(true,false)
 			:distort	(true)
 			:fog		(true)
---  shader:sampler        ("s_base")       :texture  (tex_base)
---  shader:sampler        ("s_nmap")       :texture  (tex_nmap)
---  shader:sampler        ("s_env0")       :texture  (tex_env0)   : clamp()
---  shader:sampler        ("s_env1")       :texture  (tex_env1)   : clamp()
---  shader:sampler        ("s_position")       :texture  ("$user$position")
+	shader:sampler        ("s_base")       :texture  (tex_base)
+	shader:sampler        ("s_nmap")       :texture  (tex_nmap)
+	shader:sampler        ("s_env0")       :texture  (tex_env0)   : clamp()
+	shader:sampler        ("s_env1")       :texture  (tex_env1)   : clamp()
+	shader:sampler        ("s_position")       :texture  ("$user$position")
 
-	shader:dx10texture	("s_base",		tex_base)
-	shader:dx10texture	("s_nmap",		tex_nmap)
-	shader:dx10texture	("s_env0",		tex_env0)
-	shader:dx10texture	("s_env1",		tex_env1)
-	shader:dx10texture	("s_position",	"$user$position")
-
-	shader:dx10texture	("s_leaves",	tex_leaves)
-
-	shader:dx10sampler	("smp_base")
-	shader:dx10sampler	("smp_nofilter")
-	shader:dx10sampler	("smp_rtlinear")
+	shader:sampler        ("s_leaves")     :texture  (tex_leaves)
 end
 
 function l_special        (shader, t_base, t_second, t_detail)
@@ -44,14 +34,7 @@ function l_special        (shader, t_base, t_second, t_detail)
 
 	shader: dx10color_write_enable( true, true, true, false)
 
---  shader:sampler        ("s_base")       :texture  (tex_base)
---  shader:sampler        ("s_distort")    :texture  (tex_dist)
---  shader:sampler        ("s_position")       :texture  ("$user$position")
-
-	shader:dx10texture	("s_base",		tex_base)
-	shader:dx10texture	("s_distort",	tex_dist)
-	shader:dx10texture	("s_position",	"$user$position")
-
-	shader:dx10sampler	("smp_base")
-	shader:dx10sampler	("smp_nofilter")	
+	shader:sampler        ("s_base")       :texture  (tex_base)
+	shader:sampler        ("s_distort")    :texture  (tex_dist)
+	shader:sampler        ("s_position")       :texture  ("$user$position")
 end
