@@ -102,7 +102,7 @@ public:
 	void				StageEnd			();
 
 	// R1/R2-compiler	[programmable]
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX10) || defined(USE_DX11)
 	void				i_dx10Address		(u32 s, u32		address);
 	void				i_dx10Filter_Min	(u32 s, u32		f);
 	void				i_dx10Filter_Mip	(u32 s, u32		f);
@@ -134,7 +134,9 @@ public:
 	void				r_Stencil(BOOL Enable, u32 Func=D3DCMP_ALWAYS, u32 Mask=0x00, u32 WriteMask=0x00, u32 Fail=D3DSTENCILOP_KEEP, u32 Pass=D3DSTENCILOP_KEEP, u32 ZFail=D3DSTENCILOP_KEEP);
 	void				r_StencilRef(u32 Ref);
 	void				r_CullMode(D3DCULL Mode);
-	
+#endif	//	USE_DX10
+
+#if defined(USE_DX10) || defined(USE_DX11)
 	void				r_dx10Texture(LPCSTR ResourceName,	LPCSTR texture);
 	void				r_dx10Texture(LPCSTR ResourceName,	shared_str texture) { return r_dx10Texture(ResourceName, texture.c_str());};
 	u32					r_dx10Sampler(LPCSTR ResourceName);
@@ -147,6 +149,12 @@ public:
 	void				r_Sampler_clf		(LPCSTR name,	LPCSTR texture,		bool b_ps1x_ProjectiveDivide=false);
 	void				r_Sampler_clw		(LPCSTR name,	LPCSTR texture,		bool b_ps1x_ProjectiveDivide=false);
 #endif	//	USE_DX10
+
+#ifdef USE_OGL
+	void				i_Comparison(u32 s, u32		func);
+	void				r_Sampler_cmp(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide = false);
+#endif // USE_OGL
+	
 	void				r_ColorWriteEnable( bool cR=true, bool cG=true, bool cB=true, bool cA=true);
 	void				r_End				();
 

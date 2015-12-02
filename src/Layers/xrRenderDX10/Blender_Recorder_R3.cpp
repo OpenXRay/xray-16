@@ -18,7 +18,6 @@ void CBlender_Compile::r_Stencil(BOOL Enable, u32 Func, u32 Mask, u32 WriteMask,
 	RS.SetRS(	D3DRS_STENCILFAIL,		Fail);
 	RS.SetRS(	D3DRS_STENCILPASS,		Pass);
 	RS.SetRS(	D3DRS_STENCILZFAIL,		ZFail);
-#ifndef USE_OGL
 	//	Since we never really support different options for
 	//	CW/CCW stencil use it to mimic DX9 behaviour for 
 	//	single-sided stencil
@@ -26,7 +25,6 @@ void CBlender_Compile::r_Stencil(BOOL Enable, u32 Func, u32 Mask, u32 WriteMask,
 	RS.SetRS(	D3DRS_CCW_STENCILFAIL,		Fail);
 	RS.SetRS(	D3DRS_CCW_STENCILPASS,		Pass);
 	RS.SetRS(	D3DRS_CCW_STENCILZFAIL,		ZFail);
-#endif // !USE_OGL
 }
 
 void CBlender_Compile::r_StencilRef(u32 Ref)

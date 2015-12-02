@@ -579,9 +579,6 @@
     <ClCompile Include="..\xrRender\ColorMapManager.cpp">
       <Filter>Core_Target\ColorMap</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX10\Blender_Recorder_R3.cpp">
-      <Filter>Refactored\Execution &amp; 3D\Shaders\Blender</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\D3DUtils.cpp">
       <Filter>Refactored\Execution &amp; 3D\DebugDraw</Filter>
     </ClCompile>
@@ -680,6 +677,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRenderDX10\MSAA\dx10MSAABlender.cpp">
       <Filter>Interface implementations\MSAARender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderGL\Blender_Recorder_GL.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\Blender</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

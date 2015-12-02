@@ -66,7 +66,7 @@ void CBlender_Compile::r_ColorWriteEnable( bool cR, bool cG, bool cB, bool cA)
 	RS.SetRS( D3DRS_COLORWRITEENABLE3, Mask);
 }
 
-#if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
+#if !defined(USE_DX10) && !defined(USE_DX11)
 u32		CBlender_Compile::i_Sampler		(LPCSTR _name)
 {
 	//

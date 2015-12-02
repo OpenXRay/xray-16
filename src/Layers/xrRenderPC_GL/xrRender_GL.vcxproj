@@ -204,10 +204,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\xrRenderDX10\Blender_Recorder_R3.cpp" />
     <ClCompile Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.cpp" />
     <ClCompile Include="..\xrRenderDX10\dx10MinMaxSMBlender.cpp" />
     <ClCompile Include="..\xrRenderDX10\MSAA\dx10MSAABlender.cpp" />
+    <ClCompile Include="..\xrRenderGL\Blender_Recorder_GL.cpp" />
     <ClCompile Include="..\xrRenderGL\glHW.cpp" />
     <ClCompile Include="..\xrRenderGL\glBufferUtils.cpp" />
     <ClCompile Include="..\xrRenderGL\glDetailManager_VS.cpp" />
