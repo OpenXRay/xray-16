@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Sourse Files">
+    <Filter Include="Source Files">
       <UniqueIdentifier>{4b107126-daf8-4e83-8c10-927a98db0fa2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
@@ -13,52 +13,52 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="color.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="float_constructor.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="float_param.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Postprocess.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="single_param.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="effect.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="newdialog.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NoiseFGen.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NoiseGen.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="spline.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="std.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Unit6.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Unit7.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Unit8.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Unit9.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
