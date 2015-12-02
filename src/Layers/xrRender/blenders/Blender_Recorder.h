@@ -92,7 +92,7 @@ public:
 	void				StageSET_Color		(u32 a1, u32 op, u32 a2);
 	void				StageSET_Color3		(u32 a1, u32 op, u32 a2, u32 a3);
 	void				StageSET_Alpha		(u32 a1, u32 op, u32 a2);
-#if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
+#if !defined(USE_DX10) && !defined(USE_DX11)
 	void				StageSET_TMC		(LPCSTR T, LPCSTR M, LPCSTR C, int UVW_channel);
 	void				Stage_Texture		(LPCSTR name, u32 address=D3DTADDRESS_WRAP,	u32	 fmin=D3DTEXF_LINEAR, u32 fmip=D3DTEXF_LINEAR,	u32 fmag=D3DTEXF_LINEAR);
 	void				StageTemplate_LMAP0	();

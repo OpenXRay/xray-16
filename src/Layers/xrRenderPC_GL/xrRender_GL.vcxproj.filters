@@ -169,7 +169,7 @@
     <Filter Include="Core_Target\ColorMap">
       <UniqueIdentifier>{7fdc926e-8c7d-4cba-a662-332feb1aada8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shading templates\DX10 Rain">
+    <Filter Include="Shading templates\GL Rain">
       <UniqueIdentifier>{07d880a0-66f9-4c25-a538-c4076b2cf662}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -585,9 +585,6 @@
     <ClCompile Include="..\xrRender\R_DStreams.cpp">
       <Filter>Refactored\Backend</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.cpp">
-      <Filter>Shading templates\DX10 Rain</Filter>
-    </ClCompile>
     <ClCompile Include="gl_rendertarget_accum_direct.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
@@ -663,9 +660,6 @@
     <ClCompile Include="..\xrRender\Debug\dxPixEventWrapper.cpp">
       <Filter>Debug</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX10\dx10MinMaxSMBlender.cpp">
-      <Filter>Shading templates</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\RenderAllocator.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -675,11 +669,17 @@
     <ClCompile Include="r3_R_sun_support.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX10\MSAA\dx10MSAABlender.cpp">
-      <Filter>Interface implementations\MSAARender</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRenderGL\Blender_Recorder_GL.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Blender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderGL\GL Rain\glRainBlender.cpp">
+      <Filter>Shading templates\GL Rain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderGL\glMinMaxSMBlender.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderGL\MSAA\glMSAABlender.cpp">
+      <Filter>Interface implementations\MSAARender</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1103,17 +1103,11 @@
     <ClInclude Include="..\xrRender\D3DUtils.h">
       <Filter>Refactored\Execution &amp; 3D\DebugDraw</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.h">
-      <Filter>Shading templates\DX10 Rain</Filter>
-    </ClInclude>
     <ClInclude Include="gl_rendertarget_wallmarks.h">
       <Filter>Core_Target</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\Debug\dxPixEventWrapper.h">
       <Filter>Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrRenderDX10\dx10MinMaxSMBlender.h">
-      <Filter>Shading templates</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\RenderAllocator.hpp">
       <Filter>Core</Filter>
@@ -1124,7 +1118,13 @@
     <ClInclude Include="r3_R_sun_support.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX10\MSAA\dx10MSAABlender.h">
+    <ClInclude Include="..\xrRenderGL\GL Rain\glRainBlender.h">
+      <Filter>Shading templates\GL Rain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRenderGL\glMinMaxSMBlender.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRenderGL\MSAA\glMSAABlender.h">
       <Filter>Interface implementations\MSAARender</Filter>
     </ClInclude>
   </ItemGroup>

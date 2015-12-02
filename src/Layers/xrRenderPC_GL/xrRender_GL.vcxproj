@@ -204,18 +204,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.cpp" />
-    <ClCompile Include="..\xrRenderDX10\dx10MinMaxSMBlender.cpp" />
-    <ClCompile Include="..\xrRenderDX10\MSAA\dx10MSAABlender.cpp" />
     <ClCompile Include="..\xrRenderGL\Blender_Recorder_GL.cpp" />
+    <ClCompile Include="..\xrRenderGL\GL Rain\glRainBlender.cpp" />
     <ClCompile Include="..\xrRenderGL\glHW.cpp" />
     <ClCompile Include="..\xrRenderGL\glBufferUtils.cpp" />
     <ClCompile Include="..\xrRenderGL\glDetailManager_VS.cpp" />
+    <ClCompile Include="..\xrRenderGL\glMinMaxSMBlender.cpp" />
     <ClCompile Include="..\xrRenderGL\glSH_RT.cpp" />
     <ClCompile Include="..\xrRenderGL\glSH_Texture.cpp" />
     <ClCompile Include="..\xrRenderGL\glState.cpp" />
     <ClCompile Include="..\xrRenderGL\glStateUtils.cpp" />
     <ClCompile Include="..\xrRenderGL\glTextureUtils.cpp" />
+    <ClCompile Include="..\xrRenderGL\MSAA\glMSAABlender.cpp" />
     <ClCompile Include="..\xrRender\ColorMapManager.cpp" />
     <ClCompile Include="..\xrRender\D3DUtils.cpp" />
     <ClCompile Include="..\xrRender\Debug\dxPixEventWrapper.cpp" />
@@ -409,15 +409,15 @@
     <ClInclude Include="..\..\Include\xrRender\UISequenceVideoItem.h" />
     <ClInclude Include="..\..\Include\xrRender\UIShader.h" />
     <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h" />
-    <ClInclude Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.h" />
-    <ClInclude Include="..\xrRenderDX10\dx10MinMaxSMBlender.h" />
-    <ClInclude Include="..\xrRenderDX10\MSAA\dx10MSAABlender.h" />
+    <ClInclude Include="..\xrRenderGL\GL Rain\glRainBlender.h" />
     <ClInclude Include="..\xrRenderGL\glBufferUtils.h" />
+    <ClInclude Include="..\xrRenderGL\glMinMaxSMBlender.h" />
     <ClInclude Include="..\xrRenderGL\glR_Backend_Runtime.h" />
     <ClInclude Include="..\xrRenderGL\glr_constants_cache.h" />
     <ClInclude Include="..\xrRenderGL\glState.h" />
     <ClInclude Include="..\xrRenderGL\glStateUtils.h" />
     <ClInclude Include="..\xrRenderGL\glTextureUtils.h" />
+    <ClInclude Include="..\xrRenderGL\MSAA\glMSAABlender.h" />
     <ClInclude Include="..\xrRender\ColorMapManager.h" />
     <ClInclude Include="..\xrRender\D3DUtils.h" />
     <ClInclude Include="..\xrRender\D3DXRenderBase.h" />
