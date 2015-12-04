@@ -2,36 +2,46 @@
 #ifndef SoundManager_LEH
 #define SoundManager_LEH
 
-#include "../ECore/Editor/SoundManager.h"
+#include "editors/ECore/Editor/SoundManager.h"
 
 // refs
 class ESoundThumbnail;
 
-class CLevelSoundManager: public CSoundManager{
-	typedef CSoundManager inherited;
-	bool		bNeedRefreshEnvGeom;
-    void		RealRefreshEnvGeometry();
-	void 		MakeGameSound		(ESoundThumbnail* THM, LPCSTR src_name, LPCSTR game_name);
+class CLevelSoundManager: public CSoundManager
+{
+    typedef CSoundManager inherited;
+    bool bNeedRefreshEnvGeom;
+    void RealRefreshEnvGeometry();
+    void MakeGameSound(ESoundThumbnail *THM, LPCSTR src_name, LPCSTR game_name);
 public:
-				CLevelSoundManager	(){bNeedRefreshEnvGeom = false;}
-				~CLevelSoundManager	(){;}
+    CLevelSoundManager()
+    {
+        bNeedRefreshEnvGeom = false;
+    }
 
-    virtual void OnFrame			();
+    ~CLevelSoundManager() { }
 
-    void		RefreshEnvLibrary	();
-    void		RefreshEnvGeometry	(){bNeedRefreshEnvGeom = true;}
+    virtual void OnFrame();
 
-//    bool 		MakeEnvGeometry		(CMemoryWriter& F, bool bErrMsg=false);
+    void RefreshEnvLibrary();
 
-    bool		Validate			();
+    void RefreshEnvGeometry()
+    {
+        bNeedRefreshEnvGeom = true;
+    }
 
-    void		MuteSounds			(BOOL bVal);
+    //        bool MakeEnvGeometry(CMemoryWriter& F, bool bErrMsg=false);
 
-    void 		RefreshSounds		(bool bSync);
+    bool Validate();
 
-    AnsiString	UpdateFileName		(AnsiString& fn);
+    void MuteSounds(BOOL bVal);
+
+    void RefreshSounds(bool bSync);
+
+    AnsiString UpdateFileName(AnsiString &fn);
 };
 
-extern CLevelSoundManager*& LSndLib;
+extern CLevelSoundManager *&LSndLib;
 //---------------------------------------------------------------------------
 #endif
+

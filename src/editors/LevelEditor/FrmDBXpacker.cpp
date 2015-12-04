@@ -14,169 +14,176 @@
 #pragma link "MXCtrls"
 #pragma resource "*.dfm"
 
-TDB_packer* TDB_packer::m_form = NULL;
+TDB_packer *TDB_packer::m_form = NULL;
 
 //---------------------------------------------------------------------------
-__fastcall TDB_packer::TDB_packer(TComponent* Owner)
-        : TForm(Owner)
+__fastcall TDB_packer::TDB_packer(TComponent *Owner)
+    : TForm(Owner)
 {
-	m_cfgFileName 	= "mod_pack.ltx";
-    _load_			(m_cfgFileName);
+    m_cfgFileName = "mod_pack.ltx";
+    _load_(m_cfgFileName);
 }
+
 //---------------------------------------------------------------------------
 void __fastcall TDB_packer::ActivatePacker()
 {
-    if(!m_form)
+    if (!m_form)
     {
-         m_form             = xr_new<TDB_packer>((TComponent*)0);
+        m_form = xr_new<TDB_packer>((TComponent*)0);
     }
-    m_form->prepare			();
-    m_form->ShowModal       ();
+    m_form->prepare();
+    m_form->ShowModal();
 }
 
 void __fastcall TDB_packer::prepare()
 {
-	string_path 				_curr_path;
-    GetCurrentDirectory			(sizeof(_curr_path), _curr_path);
-    FS_Path* pth = FS.get_path	("$game_data$");
-    u32 sz 						= xr_strlen(_curr_path);
-    string16					tmp;
-    tmp[0]						= 0;
+    string_path _curr_path;
+    GetCurrentDirectory(sizeof(_curr_path), _curr_path);
+    FS_Path *pth = FS.get_path("$game_data$");
+    u32 sz = xr_strlen(_curr_path);
+    string16 tmp;
+    tmp[0] = 0;
 
-    if(_curr_path[sz-1] !='\\')
-		strcpy(tmp,"\\");
+    if (_curr_path[sz-1]!='\\')
+        strcpy(tmp, "\\");
 
-    strconcat					(sizeof(m_root_folder),m_root_folder, _curr_path, tmp, pth->m_Path);
-        
+    strconcat(sizeof(m_root_folder), m_root_folder, _curr_path, tmp, pth->m_Path);
+
     Log(m_root_folder);
-   shellTree->CustomRootFolder 	= m_root_folder;
+    shellTree->CustomRootFolder = m_root_folder;
     Log(m_root_folder);
-   shellTree->RootFolder 		= sfoCustom;
+    shellTree->RootFolder = sfoCustom;
     Log(m_root_folder);
 }
 
 void __fastcall TDB_packer::btnSaveClick(TObject *Sender)
 {
-   	CInifile ini						(m_cfgFileName.c_str(), FALSE, FALSE, TRUE);
+    CInifile ini(m_cfgFileName.c_str(), FALSE, FALSE, TRUE);
 
-   	for(int i=0; i<lbIncludeFolders->Items->Count; ++i)
+    for (int i = 0; i<lbIncludeFolders->Items->Count; ++i)
     {
-    	AnsiString astr = lbIncludeFolders->Items->Strings[i];
-    	ini.w_bool("include_folders",astr.c_str(), TRUE);
+        AnsiString astr = lbIncludeFolders->Items->Strings[i];
+        ini.w_bool("include_folders", astr.c_str(), TRUE);
     }
 
-   	for(int j=0; j<lbIncludeFiles->Items->Count; ++j)
+    for (int j = 0; j<lbIncludeFiles->Items->Count; ++j)
     {
-    	AnsiString astr = lbIncludeFiles->Items->Strings[j];
-    	ini.w_bool("include_files",astr.c_str(), TRUE);
+        AnsiString astr = lbIncludeFiles->Items->Strings[j];
+        ini.w_bool("include_files", astr.c_str(), TRUE);
     }
-
 }
 
-void TDB_packer::_load_(const xr_string& fname)
+void TDB_packer::_load_(const xr_string &fname)
 {
-    	lbIncludeFolders->Items->Clear		();
-    	lbIncludeFiles->Items->Clear		();
+    lbIncludeFolders->Items->Clear();
+    lbIncludeFiles->Items->Clear();
 
-     	CInifile ini						(fname.c_str());
+    CInifile ini(fname.c_str());
 
-        if(ini.section_exist("include_folders"))
+    if (ini.section_exist("include_folders"))
+    {
+        CInifile::Sect S = ini.r_section("include_folders");
+        CInifile::SectCIt it = S.Data.begin();
+        CInifile::SectCIt it_e = S.Data.end();
+        for (; it!=it_e; ++it)
         {
-           CInifile::Sect S 		= ini.r_section("include_folders");
-           CInifile::SectCIt it 		= S.Data.begin();
-           CInifile::SectCIt it_e 	= S.Data.end();
-           for( ;it!=it_e; ++it)
-           {
-           		WideString 					ws;
-                ws 							= (*it).first.c_str();
-               lbIncludeFolders->Items->Add	(ws);
-           }
+            WideString ws;
+            ws = (*it).first.c_str();
+            lbIncludeFolders->Items->Add(ws);
         }
-        if(ini.section_exist("include_files"))
+    }
+    if (ini.section_exist("include_files"))
+    {
+        CInifile::Sect S = ini.r_section("include_files");
+        CInifile::SectCIt it = S.Data.begin();
+        CInifile::SectCIt it_e = S.Data.end();
+        for (; it!=it_e; ++it)
         {
-           CInifile::Sect S 		= ini.r_section("include_files");
-           CInifile::SectCIt it 	= S.Data.begin();
-           CInifile::SectCIt it_e 	= S.Data.end();
-           for( ;it!=it_e; ++it)
-           {
-           		WideString 					ws;
-                ws 							= (*it).first.c_str();
-               lbIncludeFiles->Items->Add	(ws);
-           }
+            WideString ws;
+            ws = (*it).first.c_str();
+            lbIncludeFiles->Items->Add(ws);
         }
-        Caption	=	fname.c_str();
+    }
+    Caption = fname.c_str();
 }
 
 void __fastcall TDB_packer::btnLoadClick(TObject *Sender)
 {
-    if( EFS.GetOpenName("$fs_root$", m_cfgFileName, false, NULL, 0) )
+    if (EFS.GetOpenName("$fs_root$", m_cfgFileName, false, NULL, 0))
     {
-    	_load_(m_cfgFileName);
+        _load_(m_cfgFileName);
     }
 }
-void remove_item_from_lb(TElListBox* lb)
+
+void remove_item_from_lb(TElListBox *lb)
 {
-bool b = true;
-    while(b)
+    bool b = true;
+    while (b)
     {
-    	b = false;
-    	for(int i=0; i<lb->Items->Count; ++i)
+        b = false;
+        for (int i = 0; i<lb->Items->Count; ++i)
         {
-			if( lb->Selected[i] )
+            if (lb->Selected[i])
             {
-	            lb->Items->Delete(i);
+                lb->Items->Delete(i);
                 b = true;
                 break;
             }
         }
-     }
+    }
 }
 
 void __fastcall TDB_packer::ExtBtn2Click(TObject *Sender)
 {
-	remove_item_from_lb(lbIncludeFolders);
+    remove_item_from_lb(lbIncludeFolders);
 }
+
 //---------------------------------------------------------------------------
 
 void __fastcall TDB_packer::ExtBtn4Click(TObject *Sender)
 {
-	remove_item_from_lb(lbIncludeFiles);
+    remove_item_from_lb(lbIncludeFiles);
 }
+
 //---------------------------------------------------------------------------
 
 
 void __fastcall TDB_packer::ExtBtn1Click(TObject *Sender)
 {
-	TElShellTreeItem* itm = shellTree->ItemFocused;
-    if(itm->IsFolder)
+    TElShellTreeItem *itm = shellTree->ItemFocused;
+    if (itm->IsFolder)
     {
-        AnsiString str				= itm->FullName;
-        int root_len 				= xr_strlen(m_root_folder);
-        int len						= str.Length();
-    	lbIncludeFolders->Items->Add( str.SubString(root_len+1,len-root_len) );
+        AnsiString str = itm->FullName;
+        int root_len = xr_strlen(m_root_folder);
+        int len = str.Length();
+        lbIncludeFolders->Items->Add(str.SubString(root_len+1, len-root_len));
     }
 }
+
 //---------------------------------------------------------------------------
 
 void __fastcall TDB_packer::ExtBtn3Click(TObject *Sender)
 {
-	TElShellTreeItem* itm = shellTree->ItemFocused;
-    if(!itm->IsFolder)
+    TElShellTreeItem *itm = shellTree->ItemFocused;
+    if (!itm->IsFolder)
     {
-        AnsiString str				= itm->FullName;
-        int root_len 				= xr_strlen(m_root_folder);
-        int len						= str.Length();
-    	lbIncludeFiles->Items->Add( str.SubString(root_len+1,len-root_len) );
+        AnsiString str = itm->FullName;
+        int root_len = xr_strlen(m_root_folder);
+        int len = str.Length();
+        lbIncludeFiles->Items->Add(str.SubString(root_len+1, len-root_len));
     }
 }
+
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 
 void __fastcall TDB_packer::ExtBtn5Click(TObject *Sender)
 {
-	btnSaveClick((TObject*)0);
-	spawnl(P_WAIT, "compress_dbx.bat", "compress_dbx.bat", m_cfgFileName.c_str());
+    btnSaveClick((TObject*)0);
+    spawnl(P_WAIT, "compress_dbx.bat", "compress_dbx.bat", m_cfgFileName.c_str());
 }
+
 //---------------------------------------------------------------------------
+
 
