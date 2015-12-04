@@ -60,17 +60,18 @@
 
 //----------------------------------------------------
 CLog ELog;
+
 //----------------------------------------------------
 
-int CLog::DlgMsg (TMsgDlgType mt, TMsgDlgButtons btn, LPCSTR _Format, ...)
+int CLog::DlgMsg(TMsgDlgType mt, TMsgDlgButtons btn, LPCSTR _Format, ...)
 {
     in_use = true;
-	char buf[4096];
-	va_list l;
-	va_start( l, _Format );
-	vsprintf( buf, _Format, l );
+    char buf[4096];
+    va_list l;
+    va_start(l, _Format);
+    vsprintf(buf, _Format, l);
 
-	int res=0;
+    int res = 0;
 #ifdef _EDITOR 
     ExecCommand(COMMAND_RENDER_FOCUS);
 
@@ -107,15 +108,15 @@ int CLog::DlgMsg (TMsgDlgType mt, TMsgDlgButtons btn, LPCSTR _Format, ...)
 }
 
 
-int CLog::DlgMsg (TMsgDlgType mt, LPCSTR _Format, ...)
+int CLog::DlgMsg(TMsgDlgType mt, LPCSTR _Format, ...)
 {
     in_use = true;
-	char buf[4096];
-	va_list l;
-	va_start( l, _Format );
-	vsprintf( buf, _Format, l );
+    char buf[4096];
+    va_list l;
+    va_start(l, _Format);
+    vsprintf(buf, _Format, l);
 
-    int res=0;
+    int res = 0;
 #ifdef _EDITOR
     ExecCommand(COMMAND_RENDER_FOCUS);
 
@@ -146,19 +147,19 @@ int CLog::DlgMsg (TMsgDlgType mt, LPCSTR _Format, ...)
 	}
 #endif
 
-    Msg(mt,buf);
+    Msg(mt, buf);
 
     in_use = false;
-    
+
     return res;
 }
 
 void CLog::Msg(TMsgDlgType mt, LPCSTR _Format, ...)
 {
-	char buf[4096];
-	va_list l;
-	va_start( l, _Format );
-	vsprintf( buf, _Format, l );
+    char buf[4096];
+    va_list l;
+    va_start(l, _Format);
+    vsprintf(buf, _Format, l);
 
 #ifdef _EDITOR
     TfrmLog::AddMessage(mt,AnsiString(buf));
@@ -172,8 +173,11 @@ void CLog::Msg(TMsgDlgType mt, LPCSTR _Format, ...)
 	}
 #endif
 
-	::LogExecCB = FALSE;
-    ::Msg		(buf);
-	::LogExecCB	= TRUE;
+    ::LogExecCB = FALSE;
+    ::Msg(buf);
+    ::LogExecCB = TRUE;
 }
+
 //----------------------------------------------------
+
+

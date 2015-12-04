@@ -10,15 +10,16 @@
 #include "LW_SHADERDEF.h"
 #include "EditMesh.h"
 
-extern "C" {
-#include "utils/LWO/lwo2.h"
-};
+extern "C"
+{
+#include "utils/LWO/lwo2.h" };
 
 #ifdef _EDITOR
-	#include "ResourceManager.h"
-    
-	extern "C" __declspec(dllimport) lwObject* LWOImportObject(char* filename);
-	extern "C" __declspec(dllimport) void LWOCloseFile(lwObject* object);
+#include "Layers/xrRender/ResourceManager.h"
+
+#include "xrCore/Platform.h"
+extern "C" XR_IMPORT lwObject* LWOImportObject(char* filename);
+extern "C" XR_IMPORT void LWOCloseFile(lwObject* object);
 #endif
 
 #ifdef _LW_EXPORT
@@ -81,7 +82,7 @@ bool CEditableObject::ImportLWO(const char* fn, bool optimize)
             gmName = "default";
         }
 #endif
-        // fill texture layers
+    // fill texture layers
         u32 textureCount = 0;
         for (st_lwTexture* Itx = lwSurf->color.tex; Itx; Itx = Itx->next)
         {
@@ -97,7 +98,7 @@ bool CEditableObject::ImportLWO(const char* fn, bool optimize)
             }
             if (cidx != -1)
             {
-                // get textures
+    // get textures
                 for (st_lwClip* lwClip = lwObj->clip; lwClip; lwClip = lwClip->next)
                 {
                     if (cidx == lwClip->index && lwClip->type == ID_STIL)
@@ -115,7 +116,7 @@ bool CEditableObject::ImportLWO(const char* fn, bool optimize)
                 string256 textureName;
                 _splitpath(tname, nullptr, nullptr, textureName, nullptr);
                 surf->SetTexture(EFS.AppendFolderToName(textureName, 256, 1, true));
-                // get vmap refs
+    // get vmap refs
                 surf->SetVMap(Itx->param.imap.vmap_name);
             }
         }
@@ -148,13 +149,13 @@ bool CEditableObject::ImportLWO(const char* fn, bool optimize)
         mesh->SetName(lwLayer->name ? lwLayer->name : "");
         auto bbox = lwLayer->bbox;
         mesh->m_Box.set(bbox[0], bbox[1], bbox[2], bbox[3], bbox[4], bbox[5]);
-        // parse mesh(lwo-layer) data
+    // parse mesh(lwo-layer) data
         if (lwLayer->nvmaps == 0)
         {
             ELog.DlgMsg(mtError, "Import LWO: Mesh layer must contain UV map!");
             goto importFailed;
         }
-        // XXX nitrocaster: incompatible with multithreaded import
+    // XXX nitrocaster: incompatible with multithreaded import
         static xr_map<void*, int> vmIndices;
         vmIndices.clear();
         int vmIndex = 0;
@@ -172,7 +173,7 @@ bool CEditableObject::ImportLWO(const char* fn, bool optimize)
                 mesh->m_VMaps.push_back(new st_VMap(lwVmap->name, vmtUV, !!lwVmap->perpoly));
                 st_VMap* vmap = mesh->m_VMaps.back();
                 vmap->copyfrom(*lwVmap->val, lwVmap->nverts);
-                // flip uv
+    // flip uv
                 for (int uvIndex = 0; uvIndex < vmap->size(); uvIndex++)
                 {
                     Fvector2& uv = vmap->getUV(uvIndex);
@@ -202,7 +203,7 @@ bool CEditableObject::ImportLWO(const char* fn, bool optimize)
             case ID_RGBA: ELog.Msg(mtError, "Found 'RGBA' VMAP. Import failed."); goto importFailed;
             }
         }
-        // points
+    // points
         mesh->m_VertCount = lwLayer->point.count;
         mesh->m_Vertices = xr_alloc<Fvector>(mesh->m_VertCount);
         for (int i = 0; i < lwLayer->point.count; i++)
@@ -211,7 +212,7 @@ bool CEditableObject::ImportLWO(const char* fn, bool optimize)
             Fvector& vertex = mesh->m_Vertices[i];
             vertex.set(lwPoint.pos);
         }
-        // polygons
+    // polygons
         mesh->m_FaceCount = lwLayer->polygon.count;
         mesh->m_Faces = xr_alloc<st_Face>(mesh->m_FaceCount);
         mesh->m_SmoothGroups = xr_alloc<u32>(mesh->m_FaceCount);
@@ -235,7 +236,7 @@ bool CEditableObject::ImportLWO(const char* fn, bool optimize)
                 mesh->m_VMRefs.push_back(st_VMapPtLst());
                 st_VMapPtLst& vmPointList = mesh->m_VMRefs.back();
                 faceVert.vmref = mesh->m_VMRefs.size()-1;
-                // parse uv-map                        
+    // parse uv-map                        
                 st_lwPoint& lwPoint = lwLayer->point.pt[faceVert.pindex];
                 if (lwFaceVert.nvmaps == 0 && lwPoint.nvmaps == 0)
                 {
@@ -244,7 +245,7 @@ bool CEditableObject::ImportLWO(const char* fn, bool optimize)
                 }
                 xr_vector<st_VMapPt> vmPoints;
                 AStringVec names;
-                // process polys
+    // process polys
                 for (int j = 0; j < lwFaceVert.nvmaps; j++)
                 {
                     if (lwFaceVert.vm[j].vmap->type != ID_TXUV)
@@ -255,7 +256,7 @@ bool CEditableObject::ImportLWO(const char* fn, bool optimize)
                     names.push_back(lwFaceVert.vm[j].vmap->name);
                     pt.index = lwFaceVert.vm[j].index;
                 }
-                // process points
+    // process points
                 for (int j = 0; j < lwPoint.nvmaps; j++)
                 {
                     if (lwPoint.vm[j].vmap->type != ID_TXUV)
@@ -270,7 +271,7 @@ bool CEditableObject::ImportLWO(const char* fn, bool optimize)
                 auto cmpFunc = [](const st_VMapPt& a, const st_VMapPt& b)
                 { return a.vmap_index < b.vmap_index; };
                 std::sort(vmPoints.begin(), vmPoints.end(), cmpFunc);
-                // parse weight-map
+    // parse weight-map
                 for (int j = 0; j < lwPoint.nvmaps; j++)
                 {
                     if (lwPoint.vm[j].vmap->type != ID_WGHT)
@@ -284,7 +285,7 @@ bool CEditableObject::ImportLWO(const char* fn, bool optimize)
                 vmPointList.pts = xr_alloc<st_VMapPt>(vmPointList.count);
                 memcpy(vmPointList.pts, &*vmPoints.begin(), vmPointList.count*sizeof(st_VMapPt));
             }
-            // lwPoly.surf->alpha_mode stores reviously saved surface id
+    // lwPoly.surf->alpha_mode stores reviously saved surface id
             surfIds[i] = lwPoly.surf->alpha_mode;
         }
         for (u32 polyId = 0; polyId < mesh->GetFCount(); polyId++)
@@ -311,3 +312,4 @@ importFailed:
     return result;
 }
 #endif
+

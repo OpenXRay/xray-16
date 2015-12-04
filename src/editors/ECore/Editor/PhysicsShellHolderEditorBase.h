@@ -1,7 +1,7 @@
 #ifndef	_PHYSICS_SHELL_HOLDER_EDITOR_BASE_
 #define	_PHYSICS_SHELL_HOLDER_EDITOR_BASE_
 
-#include "../../../xrphysics/iphysicsshellholder.h"
+#include "xrPhysics/IPhysicsShellHolder.h"
 
 class ECORE_API CPhysicsShellHolderEditorBase: public IPhysicsShellHolder
 {

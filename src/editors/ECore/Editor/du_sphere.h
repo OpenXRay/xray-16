@@ -13,3 +13,4 @@ extern ECORE_API Fvector du_sphere_verticesl[];
 extern ECORE_API WORD du_sphere_lines[];
 
 #endif
+
