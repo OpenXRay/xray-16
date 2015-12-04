@@ -3,124 +3,154 @@
 <PROJECT>
   <MACROS>
     <VERSION value="BCB.06.00"/>
-    <PROJECT value="$(OUTPUT_BINARIES_DIR)\LevelEditor.exe"/>
-    <OBJFILES value="x:\intermediate_ed\le\LevelEditor.obj x:\intermediate_ed\le\BottomBar.obj 
-      x:\intermediate_ed\le\main.obj x:\intermediate_ed\le\TopBar.obj 
-      x:\intermediate_ed\le\stdafx.obj x:\intermediate_ed\le\DOOneColor.obj 
-      x:\intermediate_ed\le\DOShuffle.obj x:\intermediate_ed\le\EditLibrary.obj 
-      x:\intermediate_ed\le\EditLightAnim.obj 
-      x:\intermediate_ed\le\FrameAIMap.obj x:\intermediate_ed\le\FrameDetObj.obj 
-      x:\intermediate_ed\le\FrameGroup.obj x:\intermediate_ed\le\FrameLight.obj 
-      x:\intermediate_ed\le\FrameObject.obj 
-      x:\intermediate_ed\le\FramePortal.obj x:\intermediate_ed\le\FramePS.obj 
-      x:\intermediate_ed\le\FrameSector.obj x:\intermediate_ed\le\FrameShape.obj 
-      x:\intermediate_ed\le\FrameSpawn.obj 
-      x:\intermediate_ed\le\FrameWayPoint.obj x:\intermediate_ed\le\LeftBar.obj 
-      x:\intermediate_ed\le\ObjectList.obj 
-      x:\intermediate_ed\le\previewimage.obj x:\intermediate_ed\le\PropertiesEObject.obj 
-      x:\intermediate_ed\le\Splash.obj x:\intermediate_ed\le\UI_LevelTools.obj 
-      x:\intermediate_ed\le\UI_LevelMain.obj x:\intermediate_ed\le\WayPoint.obj 
-      x:\intermediate_ed\le\ESceneAIMapTools_Export.obj 
-      x:\intermediate_ed\le\Builder.obj x:\intermediate_ed\le\BuilderCF.obj 
-      x:\intermediate_ed\le\BuilderCore.obj 
-      x:\intermediate_ed\le\BuilderGame.obj x:\intermediate_ed\le\BuilderLTX.obj 
-      x:\intermediate_ed\le\BuilderOGF.obj 
-      x:\intermediate_ed\le\BuilderRemote.obj x:\intermediate_ed\le\Cursor3D.obj 
-      x:\intermediate_ed\le\Custom2DProjector.obj 
-      x:\intermediate_ed\le\ESceneDOTools.obj 
-      x:\intermediate_ed\le\EditObjectExportLWO.obj 
-      x:\intermediate_ed\le\ELight.obj 
-      x:\intermediate_ed\le\EParticlesObject.obj x:\intermediate_ed\le\ESceneAIMapTools.obj 
-      x:\intermediate_ed\le\ESceneAIMapTools_Controls.obj 
-      x:\intermediate_ed\le\ESceneAIMapTools_Generate.obj 
-      x:\intermediate_ed\le\ESceneAIMapTools_MotionSimulator.obj 
-      x:\intermediate_ed\le\ESceneAIMapTools_Pick.obj 
-      x:\intermediate_ed\le\ESceneAIMapTools_Render.obj 
-      x:\intermediate_ed\le\ESceneCustomMTools.obj 
-      x:\intermediate_ed\le\ESceneCustomMToolsControls.obj 
-      x:\intermediate_ed\le\ESceneCustomOTools.obj 
-      x:\intermediate_ed\le\ESceneCustomOToolsIO.obj 
-      x:\intermediate_ed\le\ESceneDummyTools.obj 
-      x:\intermediate_ed\le\ESceneGlowTools.obj 
-      x:\intermediate_ed\le\ESceneGroupTools.obj 
-      x:\intermediate_ed\le\ESceneLightTools.obj 
-      x:\intermediate_ed\le\ESceneLightToolsIO.obj 
-      x:\intermediate_ed\le\ESceneObjectTools.obj 
-      x:\intermediate_ed\le\EScenePortalTools.obj 
-      x:\intermediate_ed\le\EScenePSTools.obj 
-      x:\intermediate_ed\le\ESceneSectorTools.obj 
-      x:\intermediate_ed\le\ESceneShapeTools.obj 
-      x:\intermediate_ed\le\ESceneSoundEnvTools.obj 
-      x:\intermediate_ed\le\ESceneSoundSrcTools.obj 
-      x:\intermediate_ed\le\ESceneSpawnTools.obj 
-      x:\intermediate_ed\le\ESceneWayTools.obj x:\intermediate_ed\le\EShape.obj 
-      x:\intermediate_ed\le\ESound_Environment.obj 
-      x:\intermediate_ed\le\ESound_Source.obj x:\intermediate_ed\le\FS2.obj 
-      x:\intermediate_ed\le\glow.obj x:\intermediate_ed\le\GroupObject.obj 
-      x:\intermediate_ed\le\portal.obj x:\intermediate_ed\le\portalutils.obj 
-      x:\intermediate_ed\le\scene.obj x:\intermediate_ed\le\Scene_Tools.obj 
-      x:\intermediate_ed\le\SceneIO.obj x:\intermediate_ed\le\SceneObject.obj 
-      x:\intermediate_ed\le\SceneObjectIO.obj 
-      x:\intermediate_ed\le\ScenePick.obj x:\intermediate_ed\le\SceneRender.obj 
-      x:\intermediate_ed\le\SceneSelection.obj 
-      x:\intermediate_ed\le\SceneSnap.obj 
-      x:\intermediate_ed\le\SceneSummaryInfo.obj 
-      x:\intermediate_ed\le\SceneUndo.obj x:\intermediate_ed\le\SceneUtil.obj 
-      x:\intermediate_ed\le\sector.obj x:\intermediate_ed\le\SoundManager_LE.obj 
-      x:\intermediate_ed\le\SpawnPoint.obj 
-      x:\intermediate_ed\le\ESceneAIMapControls.obj 
-      x:\intermediate_ed\le\ESceneControlsCustom.obj 
-      x:\intermediate_ed\le\ESceneObjectControls.obj 
-      x:\intermediate_ed\le\EScenePortalControls.obj 
-      x:\intermediate_ed\le\EScenePSControls.obj 
-      x:\intermediate_ed\le\ESceneSectorControls.obj 
-      x:\intermediate_ed\le\ESceneShapeControls.obj 
-      x:\intermediate_ed\le\ESceneSpawnControls.obj 
-      x:\intermediate_ed\le\ESceneWayControls.obj 
-      x:\intermediate_ed\le\ESceneGlowToolsIO.obj 
-      x:\intermediate_ed\le\EScenePortalToolsIO.obj 
-      x:\intermediate_ed\le\ESceneSectorToolsIO.obj 
-      x:\intermediate_ed\le\ESceneSpawnToolsIO.obj 
-      x:\intermediate_ed\le\ESceneObjectToolsIO.obj 
-      x:\intermediate_ed\le\EScenePSToolsIO.obj 
-      x:\intermediate_ed\le\ESceneShapeToolsIO.obj 
-      x:\intermediate_ed\le\ESceneSoundEnvToolsIO.obj 
-      x:\intermediate_ed\le\ESceneSoundSrcToolsIO.obj 
-      x:\intermediate_ed\le\ESceneWayToolsIO.obj 
-      x:\intermediate_ed\le\ESceneGroupToolsIO.obj 
-      x:\intermediate_ed\le\ESceneDOTools_Pick.obj 
-      x:\intermediate_ed\le\ESceneDOTools_Controls.obj 
-      x:\intermediate_ed\le\ESceneDOTools_Generate.obj 
-      x:\intermediate_ed\le\ObjectAnimator.obj 
-      x:\intermediate_ed\le\ELight_props.obj x:\intermediate_ed\le\ELight_IO.obj 
-      x:\intermediate_ed\le\ESceneObjectToolsExportBreakable.obj 
-      x:\intermediate_ed\le\LevelGameDef.obj 
-      x:\intermediate_ed\le\ESceneWallmarkTools.obj 
-      x:\intermediate_ed\le\ESceneWallmarkControls.obj 
-      x:\intermediate_ed\le\GeometryPartExtractor.obj 
-      x:\intermediate_ed\le\BuilderLODs.obj 
-      x:\intermediate_ed\le\ESceneGroupControls.obj 
-      x:\intermediate_ed\le\CustomObjectLE.obj 
-      x:\intermediate_ed\le\CustomObject.obj 
-      x:\intermediate_ed\le\CustomObjectAnimation.obj 
-      x:\intermediate_ed\le\LevelPreferences.obj 
-      x:\intermediate_ed\le\FrmDBXpacker.obj 
-      x:\intermediate_ed\le\DetailManager.obj 
-      x:\intermediate_ed\le\DetailManager_Decompress.obj 
-      x:\intermediate_ed\le\iniStreamImpl.obj 
-      x:\intermediate_ed\le\DetailManager_soft.obj 
-      x:\intermediate_ed\le\DetailManager_CACHE.obj 
-      x:\intermediate_ed\le\DetailManager_VS.obj 
-      x:\intermediate_ed\le\ESceneFogVolumeTools.obj 
-      x:\intermediate_ed\le\RightForm.obj x:\intermediate_ed\le\FrameFogVol.obj 
-      x:\intermediate_ed\le\gametype_chooser.obj 
-      x:\intermediate_ed\le\GroupObjectUtils.obj 
-      x:\intermediate_ed\le\AppendObjectInfoForm.obj 
-      x:\intermediate_ed\le\LEClipEditor.obj x:\intermediate_ed\le\LEPhysics.obj 
-      x:\intermediate_ed\le\MgcConvexHull2D.obj 
-      x:\intermediate_ed\le\MgcAppr3DPlaneFit.obj 
-      x:\intermediate_ed\le\MgcEigen.obj x:\intermediate_ed\le\MgcVector2.obj 
-      x:\intermediate_ed\le\MgcVector3.obj x:\intermediate_ed\le\stats_manager.obj"/>
+    <PROJECT value="..\..\..\bin\editors\LevelEditor.exe"/>
+    <OBJFILES value="..\..\..\intermediate\editors\LevelEditor\LevelEditor.obj 
+      ..\..\..\intermediate\editors\LevelEditor\BottomBar.obj 
+      ..\..\..\intermediate\editors\LevelEditor\main.obj 
+      ..\..\..\intermediate\editors\LevelEditor\TopBar.obj 
+      ..\..\..\intermediate\editors\LevelEditor\stdafx.obj 
+      ..\..\..\intermediate\editors\LevelEditor\DOOneColor.obj 
+      ..\..\..\intermediate\editors\LevelEditor\DOShuffle.obj 
+      ..\..\..\intermediate\editors\LevelEditor\EditLibrary.obj 
+      ..\..\..\intermediate\editors\LevelEditor\EditLightAnim.obj 
+      ..\..\..\intermediate\editors\LevelEditor\FrameAIMap.obj 
+      ..\..\..\intermediate\editors\LevelEditor\FrameDetObj.obj 
+      ..\..\..\intermediate\editors\LevelEditor\FrameGroup.obj 
+      ..\..\..\intermediate\editors\LevelEditor\FrameLight.obj 
+      ..\..\..\intermediate\editors\LevelEditor\FrameObject.obj 
+      ..\..\..\intermediate\editors\LevelEditor\FramePortal.obj 
+      ..\..\..\intermediate\editors\LevelEditor\FramePS.obj 
+      ..\..\..\intermediate\editors\LevelEditor\FrameSector.obj 
+      ..\..\..\intermediate\editors\LevelEditor\FrameShape.obj 
+      ..\..\..\intermediate\editors\LevelEditor\FrameSpawn.obj 
+      ..\..\..\intermediate\editors\LevelEditor\FrameWayPoint.obj 
+      ..\..\..\intermediate\editors\LevelEditor\LeftBar.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ObjectList.obj 
+      ..\..\..\intermediate\editors\LevelEditor\previewimage.obj 
+      ..\..\..\intermediate\editors\LevelEditor\PropertiesEObject.obj 
+      ..\..\..\intermediate\editors\LevelEditor\Splash.obj 
+      ..\..\..\intermediate\editors\LevelEditor\UI_LevelTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\UI_LevelMain.obj 
+      ..\..\..\intermediate\editors\LevelEditor\WayPoint.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneAIMapTools_Export.obj 
+      ..\..\..\intermediate\editors\LevelEditor\Builder.obj 
+      ..\..\..\intermediate\editors\LevelEditor\BuilderCF.obj 
+      ..\..\..\intermediate\editors\LevelEditor\BuilderCore.obj 
+      ..\..\..\intermediate\editors\LevelEditor\BuilderGame.obj 
+      ..\..\..\intermediate\editors\LevelEditor\BuilderLTX.obj 
+      ..\..\..\intermediate\editors\LevelEditor\BuilderOGF.obj 
+      ..\..\..\intermediate\editors\LevelEditor\BuilderRemote.obj 
+      ..\..\..\intermediate\editors\LevelEditor\Cursor3D.obj 
+      ..\..\..\intermediate\editors\LevelEditor\Custom2DProjector.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneDOTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\EditObjectExportLWO.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ELight.obj 
+      ..\..\..\intermediate\editors\LevelEditor\EParticlesObject.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneAIMapTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneAIMapTools_Controls.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneAIMapTools_Generate.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneAIMapTools_MotionSimulator.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneAIMapTools_Pick.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneAIMapTools_Render.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneCustomMTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneCustomMToolsControls.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneCustomOTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneCustomOToolsIO.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneDummyTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneGlowTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneGroupTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneLightTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneLightToolsIO.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneObjectTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\EScenePortalTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\EScenePSTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneSectorTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneShapeTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneSoundEnvTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneSoundSrcTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneSpawnTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneWayTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\EShape.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESound_Environment.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESound_Source.obj 
+      ..\..\..\intermediate\editors\LevelEditor\FS2.obj 
+      ..\..\..\intermediate\editors\LevelEditor\glow.obj 
+      ..\..\..\intermediate\editors\LevelEditor\GroupObject.obj 
+      ..\..\..\intermediate\editors\LevelEditor\portal.obj 
+      ..\..\..\intermediate\editors\LevelEditor\portalutils.obj 
+      ..\..\..\intermediate\editors\LevelEditor\scene.obj 
+      ..\..\..\intermediate\editors\LevelEditor\Scene_Tools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\SceneIO.obj 
+      ..\..\..\intermediate\editors\LevelEditor\SceneObject.obj 
+      ..\..\..\intermediate\editors\LevelEditor\SceneObjectIO.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ScenePick.obj 
+      ..\..\..\intermediate\editors\LevelEditor\SceneRender.obj 
+      ..\..\..\intermediate\editors\LevelEditor\SceneSelection.obj 
+      ..\..\..\intermediate\editors\LevelEditor\SceneSnap.obj 
+      ..\..\..\intermediate\editors\LevelEditor\SceneSummaryInfo.obj 
+      ..\..\..\intermediate\editors\LevelEditor\SceneUndo.obj 
+      ..\..\..\intermediate\editors\LevelEditor\SceneUtil.obj 
+      ..\..\..\intermediate\editors\LevelEditor\sector.obj 
+      ..\..\..\intermediate\editors\LevelEditor\SoundManager_LE.obj 
+      ..\..\..\intermediate\editors\LevelEditor\SpawnPoint.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneAIMapControls.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneControlsCustom.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneObjectControls.obj 
+      ..\..\..\intermediate\editors\LevelEditor\EScenePortalControls.obj 
+      ..\..\..\intermediate\editors\LevelEditor\EScenePSControls.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneSectorControls.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneShapeControls.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneSpawnControls.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneWayControls.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneGlowToolsIO.obj 
+      ..\..\..\intermediate\editors\LevelEditor\EScenePortalToolsIO.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneSectorToolsIO.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneSpawnToolsIO.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneObjectToolsIO.obj 
+      ..\..\..\intermediate\editors\LevelEditor\EScenePSToolsIO.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneShapeToolsIO.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneSoundEnvToolsIO.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneSoundSrcToolsIO.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneWayToolsIO.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneGroupToolsIO.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneDOTools_Pick.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneDOTools_Controls.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneDOTools_Generate.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ObjectAnimator.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ELight_props.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ELight_IO.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneObjectToolsExportBreakable.obj 
+      ..\..\..\intermediate\editors\LevelEditor\LevelGameDef.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneWallmarkTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneWallmarkControls.obj 
+      ..\..\..\intermediate\editors\LevelEditor\GeometryPartExtractor.obj 
+      ..\..\..\intermediate\editors\LevelEditor\BuilderLODs.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneGroupControls.obj 
+      ..\..\..\intermediate\editors\LevelEditor\CustomObjectLE.obj 
+      ..\..\..\intermediate\editors\LevelEditor\CustomObject.obj 
+      ..\..\..\intermediate\editors\LevelEditor\CustomObjectAnimation.obj 
+      ..\..\..\intermediate\editors\LevelEditor\LevelPreferences.obj 
+      ..\..\..\intermediate\editors\LevelEditor\FrmDBXpacker.obj 
+      ..\..\..\intermediate\editors\LevelEditor\DetailManager.obj 
+      ..\..\..\intermediate\editors\LevelEditor\DetailManager_Decompress.obj 
+      ..\..\..\intermediate\editors\LevelEditor\iniStreamImpl.obj 
+      ..\..\..\intermediate\editors\LevelEditor\DetailManager_soft.obj 
+      ..\..\..\intermediate\editors\LevelEditor\DetailManager_CACHE.obj 
+      ..\..\..\intermediate\editors\LevelEditor\DetailManager_VS.obj 
+      ..\..\..\intermediate\editors\LevelEditor\ESceneFogVolumeTools.obj 
+      ..\..\..\intermediate\editors\LevelEditor\RightForm.obj 
+      ..\..\..\intermediate\editors\LevelEditor\FrameFogVol.obj 
+      ..\..\..\intermediate\editors\LevelEditor\gametype_chooser.obj 
+      ..\..\..\intermediate\editors\LevelEditor\GroupObjectUtils.obj 
+      ..\..\..\intermediate\editors\LevelEditor\AppendObjectInfoForm.obj 
+      ..\..\..\intermediate\editors\LevelEditor\LEClipEditor.obj 
+      ..\..\..\intermediate\editors\LevelEditor\LEPhysics.obj 
+      ..\..\..\intermediate\editors\LevelEditor\MgcConvexHull2D.obj 
+      ..\..\..\intermediate\editors\LevelEditor\MgcAppr3DPlaneFit.obj 
+      ..\..\..\intermediate\editors\LevelEditor\MgcEigen.obj 
+      ..\..\..\intermediate\editors\LevelEditor\MgcVector2.obj 
+      ..\..\..\intermediate\editors\LevelEditor\MgcVector3.obj 
+      ..\..\..\intermediate\editors\LevelEditor\stats_manager.obj"/>
     <RESFILES value="LevelEditor.res resource.res"/>
     <IDLFILES value=""/>
     <IDLGENFILES value=""/>
@@ -136,7 +166,7 @@
     <LIBRARIES value="editor.lib"/>
     <SPARELIBS value="rtl.lib vcl.lib bcbsmp.lib vclx.lib editor.lib elpackB6.lib"/>
     <PACKAGES value="rtl.bpi vcl.bpi vclx.bpi bcbsmp.bpi elpackB6.bpi elpproB6.bpi"/>
-    <PATHCPP value=".;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;..\..\xrEngine;Edit;Edit;Edit;..\..\xrServerEntities;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;Edit;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;Edit;..\..\xrServerEntities;Edit;Edit;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Approximation3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Numerics;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\Layers\xrRender"/>
+    <PATHCPP value=".;Edit;..\..\xrEngine;..\..\xrServerEntities;..\..\Layers\xrRender;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Approximation3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Numerics;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
@@ -146,32 +176,34 @@
     <USERDEFINES value="_EDITOR;_LEVEL_EDITOR;_DEBUG"/>
     <SYSDEFINES value="NO_STRICT;_RTLDLL;USEPACKAGES"/>
     <MAINSOURCE value="LevelEditor.cpp"/>
-    <INCLUDEPATH value="..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Numerics;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Approximation3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment2D;..\..;..\..\xrServerEntities;..\..\Layers\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;$(MAGIC_SW_DIR);$(ETOOLS_DIR)"/>
+    <INCLUDEPATH value="..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Numerics;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Approximation3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment2D;..\..;..\..\xrServerEntities;..\..\Layers\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;..\..\..\sdk\components\AlexMX;..\..\..\sdk\components\ElPack\Code;..\..\..\sdk\components\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;$(MAGIC_SW_DIR);$(ETOOLS_DIR)"/>
     <LIBPATH value="..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Numerics;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Approximation3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment2D;..\..;..\..\Layers\xrRender;..\..\xrServerEntities;..\..\xrEngine;Edit;..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;$(OUT_LIB_DIR)"/>
     <WARNINGS value="-w8092 -w8090 -w8089 -w8087 -wprc -wucp -wstv -wstu -wsig -wpin -w-par 
       -wnod -wnak -w-8027 -w-8026 -wdef -wcln -wbbf -wasm -wamp -wamb"/>
     <OTHERFILES value=""/>
   </MACROS>
   <OPTIONS>
-    <IDLCFLAGS value="-src_suffix cpp -D_EDITOR -D_LEVEL_EDITOR -D_DEBUG 
-      -I..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D 
+    <IDLCFLAGS value="-I..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D 
       -I..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D 
       -I..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Numerics 
       -I..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Approximation3D 
       -I..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment2D 
       -I..\.. -I..\..\xrServerEntities -I..\..\Layers\xrRender 
       -I$(DXSDK_DIR)\Include -IEdit -IEngine -I$(BCB)\Projects 
-      -I$(BCB)\include\vcl -I$(BCB)\include -I$(COMPONENTS)\alexmx 
-      -I$(COMPONENTS)\ElPack\Code -I$(COMPONENTS)\ElPack\Code\Source 
-      -I$(CORE_DIR) -I../../xrEngine -I$(MAGIC_SW_DIR) -I$(ETOOLS_DIR)"/>
+      -I$(BCB)\include\vcl -I$(BCB)\include -I..\..\..\sdk\components\AlexMX 
+      -I..\..\..\sdk\components\ElPack\Code 
+      -I..\..\..\sdk\components\ElPack\Code\Source -I$(CORE_DIR) 
+      -I../../xrEngine -I$(MAGIC_SW_DIR) -I$(ETOOLS_DIR) -src_suffix cpp 
+      -D_EDITOR -D_LEVEL_EDITOR -D_DEBUG"/>
     <CFLAG1 value="-Od -H=pch.csm -Hc -Q -Vms -Vx -Ve -xf -xp -VF -ff -X- -r- -ps -a4 -6 -b- 
       -k -y -v -vi- -He -c -tW -tWM"/>
-    <PFLAGS value="-N2x:\intermediate_ed\le -N0x:\intermediate_ed\le -$Y+ -$W -$R -$Q -$O- 
-      -$A8 -v -JPHNE -M"/>
+    <PFLAGS value="-N2..\..\..\intermediate\editors\LevelEditor 
+      -N0..\..\..\intermediate\editors\LevelEditor -$Y+ -$W -$R -$Q -$O- -$A8 -v 
+      -JPHNE -M"/>
     <RFLAGS value=""/>
     <AFLAGS value="/mx /w2 /zi"/>
-    <LFLAGS value="-lx:\stalker_addon\libraries -Ix:\intermediate_ed\le -D&quot;&quot; -aa -Tpe -GD -x 
-      -Gn -v"/>
+    <LFLAGS value="-l..\..\..\lib\editors -I..\..\..\intermediate\editors\LevelEditor -D&quot;&quot; 
+      -aa -Tpe -GD -x -Gn -v"/>
     <OTHERFILES value=""/>
   </OPTIONS>
   <LINKER>
@@ -349,7 +381,7 @@ AutoIncBuild=1
 MajorVer=1
 MinorVer=0
 Release=2
-Build=156
+Build=157
 Debug=1
 PreRelease=0
 Special=0
@@ -361,7 +393,7 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=
 FileDescription=
-FileVersion=1.0.2.156
+FileVersion=1.0.2.157
 InternalName=
 LegalCopyright=
 LegalTrademarks=
@@ -371,41 +403,46 @@ ProductVersion=1.0.0.0
 Comments=
 
 [HistoryLists\hlIncludePath]
-Count=12
-Item0=..\..;..\..\xrServerEntities;..\..\Layers\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;$(MAGIC_SW_DIR);$(ETOOLS_DIR)
-Item1=$(VC_INCLUDE);..\..;..\..\xrServerEntities;..\..\Layers\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;$(MAGIC_SW_DIR);$(ETOOLS_DIR)
-Item2=..\..;..\..\xrServerEntities;..\..\Layers\xrRender;..\..\xrEngine\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrRender;$(MAGIC_SW_DIR);$(ETOOLS_DIR)
-Item3=..\..\xrServerEntities;..\..\Layers\xrRender;..\..\xrEngine\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrRender;$(MAGIC_SW_DIR);$(ETOOLS_DIR)
-Item4=..\..\xrEngine\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrRender;$(MAGIC_SW_DIR);$(ETOOLS_DIR)
-Item5=..\..\xrEngine\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrRender;$(MAGIC_SW_DIR)
-Item6=$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrRender;$(MAGIC_SW_DIR)
-Item7=$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrEngine/xrRender;$(MAGIC_SW_DIR)
-Item8=$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrEngine/xrRender
-Item9=Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(DXSDK_DIR)\Include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrEngine/xrRender
-Item10=Edit;H:\RAD\Borland\CBuilder6\Projects;&quot;R:\SDK\Microsoft DirectX 9.0 SDK (April 2005)\Include&quot;Edit;Engine;r:\borland\components6\alexmx;$(BCB)\include;$(BCB)\include\vcl;R:\SDK\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\ElPack\Code;R:\Borland\Components6\ElPack\Code\Source;P:\xrCore;..\ECore;..\ECore\Editor;..\ECore\Engine;..\ECore\Engine\blenders;..\ECore\Engine\visuals;..\xrEProps;P:\xrSound
-Item11=H:\RAD\Borland\CBuilder6\Projects;R:\SDK\Microsoft DirectX 9.0 SDK (April 2005)\Include;Engine\Game;Edit;Engine;r:\borland\components6\alexmx;$(BCB)\include;$(BCB)\include\vcl;R:\SDK\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\ElPack\Code;R:\Borland\Components6\ElPack\Code\Source;P:\xrCore;..\ECore;..\ECore\Editor;..\ECore\Engine;..\ECore\Engine\blenders;..\ECore\Engine\visuals;..\xrEProps;P:\xrSound
+Count=15
+Item0=..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Numerics;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Approximation3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment2D;..\..\;..\..\xrServerEntities;..\..\Layers\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;..\..\..\sdk\components\AlexMX;..\..\..\sdk\components\ElPack\Code;..\..\..\sdk\components\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;$(MAGIC_SW_DIR);$(ETOOLS_DIR)
+Item1=..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Numerics;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Approximation3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment2D;..\..;..\..\xrServerEntities;..\..\Layers\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;..\..\..\sdk\components\AlexMX;..\..\..\sdk\components\ElPack\Code;..\..\..\sdk\components\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;$(MAGIC_SW_DIR);$(ETOOLS_DIR)
+Item2=..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Numerics;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Approximation3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment2D;..\..;..\..\xrServerEntities;..\..\Layers\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;$(MAGIC_SW_DIR);$(ETOOLS_DIR)
+Item3=..\..;..\..\xrServerEntities;..\..\Layers\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;$(MAGIC_SW_DIR);$(ETOOLS_DIR)
+Item4=$(VC_INCLUDE);..\..;..\..\xrServerEntities;..\..\Layers\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;$(MAGIC_SW_DIR);$(ETOOLS_DIR)
+Item5=..\..;..\..\xrServerEntities;..\..\Layers\xrRender;..\..\xrEngine\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrRender;$(MAGIC_SW_DIR);$(ETOOLS_DIR)
+Item6=..\..\xrServerEntities;..\..\Layers\xrRender;..\..\xrEngine\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrRender;$(MAGIC_SW_DIR);$(ETOOLS_DIR)
+Item7=..\..\xrEngine\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrRender;$(MAGIC_SW_DIR);$(ETOOLS_DIR)
+Item8=..\..\xrEngine\xrRender;$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrRender;$(MAGIC_SW_DIR)
+Item9=$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrRender;$(MAGIC_SW_DIR)
+Item10=$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrEngine/xrRender;$(MAGIC_SW_DIR)
+Item11=$(DXSDK_DIR)\Include;Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrEngine/xrRender
+Item12=Edit;Engine;$(BCB)\Projects;$(BCB)\include\vcl;$(BCB)\include;$(DXSDK_DIR)\Include;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;$(CORE_DIR);../../xrEngine;../../xrEngine/xrRender
+Item13=Edit;H:\RAD\Borland\CBuilder6\Projects;&quot;R:\SDK\Microsoft DirectX 9.0 SDK (April 2005)\Include&quot;Edit;Engine;r:\borland\components6\alexmx;$(BCB)\include;$(BCB)\include\vcl;R:\SDK\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\ElPack\Code;R:\Borland\Components6\ElPack\Code\Source;P:\xrCore;..\ECore;..\ECore\Editor;..\ECore\Engine;..\ECore\Engine\blenders;..\ECore\Engine\visuals;..\xrEProps;P:\xrSound
+Item14=H:\RAD\Borland\CBuilder6\Projects;R:\SDK\Microsoft DirectX 9.0 SDK (April 2005)\Include;Engine\Game;Edit;Engine;r:\borland\components6\alexmx;$(BCB)\include;$(BCB)\include\vcl;R:\SDK\MagicFM_Borland\Sdk\Include;R:\Borland\Components6\ElPack\Code;R:\Borland\Components6\ElPack\Code\Source;P:\xrCore;..\ECore;..\ECore\Editor;..\ECore\Engine;..\ECore\Engine\blenders;..\ECore\Engine\visuals;..\xrEProps;P:\xrSound
 
 [HistoryLists\hlLibraryPath]
-Count=14
-Item0=..\..;..\..\Layers\xrRender;..\..\xrServerEntities;..\..\xrEngine;Edit;..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;$(OUT_LIB_DIR)
-Item1=..\..;..\..\Layers\xrRender;..\..\xrServerEntities;..\..\xrEngine;Edit;..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source
-Item2=..\..;..\..\Layers\xrRender;..\..\xrServerEntities;..\..\xrEngine;Edit;..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries;X:\libraries
-Item3=..\..\Layers\xrRender;..\..\xrServerEntities;..\..\xrEngine;Edit;..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries;X:\libraries
-Item4=..\..\Layers\xrRender;..\..\xrServerEntities;..\..\xrEngine;Edit;..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries
-Item5=..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries
-Item6=..\..\xrServerEntities;..\..\Layers\xrRender;..\..\..\SDK\components\ElPack\Code;..\..\xrEngine\xrRender;..\..\xrRender;..\..\xrEngine;Edit;Engine;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries
-Item7=..\..\xrEngine\xrRender;..\..\xrRender;..\..\xrEngine;Edit;Engine;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries
-Item8=..\..\xrRender;..\..\xrEngine;Edit;Engine;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries
-Item9=..\..\xrEngine\xrRender;..\..\xrEngine;Edit;Engine;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;x:\libraries
-Item10=Edit;Engine;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;x:\libraries
-Item11=$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;x:\libraries
-Item12=H:\RAD\Borland\CBuilder6\Projects;Edit;Engine;C:\Rad\Borland\CBuilder6\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;r:\borland\components6\alexmx;R:\Borland\Components6\ElPack\Code;R:\Borland\Components6\ElPack\Code\Source;..\lib\dx;..\lib;x:\;..\ECore;..\ECore\Editor
-Item13=H:\RAD\Borland\CBuilder6\Projects;Engine\Game;Edit;Engine;C:\Rad\Borland\CBuilder6\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;r:\borland\components6\alexmx;R:\Borland\Components6\ElPack\Code;R:\Borland\Components6\ElPack\Code\Source;..\lib\dx;..\lib;x:\;..\ECore;..\ECore\Editor
+Count=15
+Item0=..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Numerics;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Approximation3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment2D;..\..;..\..\Layers\xrRender;..\..\xrServerEntities;..\..\xrEngine;Edit;..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;$(OUT_LIB_DIR)
+Item1=..\..;..\..\Layers\xrRender;..\..\xrServerEntities;..\..\xrEngine;Edit;..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;$(OUT_LIB_DIR)
+Item2=..\..;..\..\Layers\xrRender;..\..\xrServerEntities;..\..\xrEngine;Edit;..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source
+Item3=..\..;..\..\Layers\xrRender;..\..\xrServerEntities;..\..\xrEngine;Edit;..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries;X:\libraries
+Item4=..\..\Layers\xrRender;..\..\xrServerEntities;..\..\xrEngine;Edit;..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries;X:\libraries
+Item5=..\..\Layers\xrRender;..\..\xrServerEntities;..\..\xrEngine;Edit;..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries
+Item6=..\..\..\SDK\components\ElPack\Code;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries
+Item7=..\..\xrServerEntities;..\..\Layers\xrRender;..\..\..\SDK\components\ElPack\Code;..\..\xrEngine\xrRender;..\..\xrRender;..\..\xrEngine;Edit;Engine;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries
+Item8=..\..\xrEngine\xrRender;..\..\xrRender;..\..\xrEngine;Edit;Engine;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries
+Item9=..\..\xrRender;..\..\xrEngine;Edit;Engine;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;X:\stalker_addon\libraries
+Item10=..\..\xrEngine\xrRender;..\..\xrEngine;Edit;Engine;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;x:\libraries
+Item11=Edit;Engine;$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;x:\libraries
+Item12=$(BCB)\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\alexmx;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\ElPack\Code\Source;x:\libraries
+Item13=H:\RAD\Borland\CBuilder6\Projects;Edit;Engine;C:\Rad\Borland\CBuilder6\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;r:\borland\components6\alexmx;R:\Borland\Components6\ElPack\Code;R:\Borland\Components6\ElPack\Code\Source;..\lib\dx;..\lib;x:\;..\ECore;..\ECore\Editor
+Item14=H:\RAD\Borland\CBuilder6\Projects;Engine\Game;Edit;Engine;C:\Rad\Borland\CBuilder6\Projects;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;r:\borland\components6\alexmx;R:\Borland\Components6\ElPack\Code;R:\Borland\Components6\ElPack\Code\Source;..\lib\dx;..\lib;x:\;..\ECore;..\ECore\Editor
 
 [HistoryLists\hlDebugSourcePath]
-Count=2
-Item0=X:\stalker_addon\sources\engine\editors\ECore\Editor\
-Item1=c:\rad\borland\cbuilder5\source\vcl;R:\Borland\Components6\AlexMX\
+Count=3
+Item0=..\ECore\Editor\
+Item1=X:\stalker_addon\sources\engine\editors\ECore\Editor\
+Item2=c:\rad\borland\cbuilder5\source\vcl;R:\Borland\Components6\AlexMX\
 
 [HistoryLists\hlConditionals]
 Count=2
@@ -413,28 +450,31 @@ Item0=_EDITOR;_LEVEL_EDITOR;_DEBUG
 Item1=_EDITOR;_LEVEL_EDITOR
 
 [HistoryLists\hlIntOutputDir]
-Count=3
-Item0=x:\intermediate_ed\le
-Item1=$(OUTPUT_INTERMEDIATE_DIR)\le
-Item2=intermediate
+Count=4
+Item0=..\..\..\intermediate\editors\LevelEditor
+Item1=x:\intermediate_ed\le
+Item2=$(OUTPUT_INTERMEDIATE_DIR)\le
+Item3=intermediate
 
 [HistoryLists\hlFinalOutputDir]
-Count=5
-Item0=$(OUTPUT_BINARIES_DIR)\
-Item1=x:\stalker_addon\binaries\
-Item2=x:\binaries\
-Item3=x:\binaries
-Item4=x:\
+Count=6
+Item0=..\..\..\bin\editors\
+Item1=$(OUTPUT_BINARIES_DIR)\
+Item2=x:\stalker_addon\binaries\
+Item3=x:\binaries\
+Item4=x:\binaries
+Item5=x:\
 
 [HistoryLists\hIBPIOutputDir]
-Count=4
-Item0=x:\stalker_addon\libraries
-Item1=$(OUTPUT_LIBRARIES_DIR)
-Item2=$(OUTPUT_LIBRARIES_DIR)\
-Item3=x:\libraries
+Count=5
+Item0=..\..\..\lib\editors
+Item1=x:\stalker_addon\libraries
+Item2=$(OUTPUT_LIBRARIES_DIR)
+Item3=$(OUTPUT_LIBRARIES_DIR)\
+Item4=x:\libraries
 
 [Debugging]
-DebugSourceDirs=X:\stalker_addon\sources\engine\editors\ECore\Editor\
+DebugSourceDirs=..\ECore\Editor\
 
 [Parameters]
 RunParams=-wf x:\stalker_addon\resources -editor
