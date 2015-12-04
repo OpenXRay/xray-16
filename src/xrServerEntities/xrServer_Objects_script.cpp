@@ -99,7 +99,7 @@ SCRIPT_EXPORT(CSE_Abstract, (CPureServerObject),
 	typedef CSE_Abstract BaseType;
 	module(luaState)
     [
-		class_<CSE_Abstract,WrapType,CPureServerObject>	("cse_abstract")
+		class_<CSE_Abstract, CPureServerObject, default_holder, WrapType>("cse_abstract")
 			.def_readonly	("id",				&BaseType::ID)
 			.def_readonly	("parent_id",		&BaseType::ID_Parent)
 			.def_readonly	("script_version",	&BaseType::m_script_version)

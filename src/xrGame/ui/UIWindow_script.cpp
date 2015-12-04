@@ -45,6 +45,7 @@ const Fvector2* get_wnd_pos(CUIWindow* w)
 }
 
 using namespace luabind;
+using namespace luabind::policy;
 
 SCRIPT_EXPORT(CUIWindow, (),
 {
@@ -64,7 +65,7 @@ SCRIPT_EXPORT(CUIWindow, (),
 
 		class_<CUIWindow>("CUIWindow")
 		.def(							constructor<>())
-		.def("AttachChild",				&CUIWindow::AttachChild, adopt(_2))
+		.def("AttachChild",				&CUIWindow::AttachChild, adopt<2>())
 		.def("DetachChild",				&CUIWindow::DetachChild)
 		.def("SetAutoDelete",			&CUIWindow::SetAutoDelete)
 		.def("IsAutoDelete",			&CUIWindow::IsAutoDelete)

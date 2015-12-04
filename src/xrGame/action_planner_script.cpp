@@ -13,6 +13,7 @@
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
+using namespace luabind::policy;
 
 void set_goal_world_state(CScriptActionPlanner *action_planner, CScriptActionPlanner::CState *world_state)
 {
@@ -33,17 +34,17 @@ IC static void CScriptActionPlanner_Export(lua_State *luaState)
 {
 	module(luaState)
 	[
-		class_<CScriptActionPlanner,CScriptActionPlannerWrapper>("action_planner")
+		class_<CScriptActionPlanner, no_bases, default_holder, CScriptActionPlannerWrapper>("action_planner")
 			.def_readonly("object",				&CScriptActionPlanner::m_object)
 			.def_readonly("storage",			&CScriptActionPlanner::m_storage)
 			.def(								constructor<>())
 			.def("actual",						&get_actual)
 			.def("setup",						&CScriptActionPlanner::setup,	&CScriptActionPlannerWrapper::setup_static)
 			.def("update",						&CScriptActionPlanner::update,	&CScriptActionPlannerWrapper::update_static)
-			.def("add_action",					&CScriptActionPlanner::add_operator,adopt(_3))
+			.def("add_action",					&CScriptActionPlanner::add_operator, adopt<3>())
 			.def("remove_action",				(void (CScriptActionPlanner::*)(const CScriptActionPlanner::_edge_type &))(&CScriptActionPlanner::remove_operator))
 			.def("action",						&CScriptActionPlanner::action)
-			.def("add_evaluator",				&CScriptActionPlanner::add_evaluator,adopt(_3))
+			.def("add_evaluator",				&CScriptActionPlanner::add_evaluator, adopt<3>())
 			.def("remove_evaluator",			(void (CScriptActionPlanner::*)(const CScriptActionPlanner::_condition_type &))(&CScriptActionPlanner::remove_evaluator))
 			.def("evaluator",					&CScriptActionPlanner::evaluator)
 			.def("current_action_id",			&CScriptActionPlanner::current_action_id)

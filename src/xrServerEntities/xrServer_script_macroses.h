@@ -435,9 +435,9 @@ struct CWrapperAbstractItem : public T, public luabind::wrap_base {
 	DEFINE_LUABIND_CLASS_WRAPPER_2(a,CWrapperAbstractMonster<a>,b,c,d) \
 	luabind_virtual_Monster(a,CWrapperAbstractMonster<a>)
 
-#define luabind_class_item2(a,b,c,d) \
-	DEFINE_LUABIND_CLASS_WRAPPER_2(a,CWrapperAbstractItem<a>,b,c,d) \
-	luabind_virtual_Item(a,CWrapperAbstractItem<a>)
+#define luabind_class_item2(classType, className, base1, base2) \
+	DEFINE_LUABIND_CLASS_WRAPPER_2(classType, CWrapperAbstractItem<classType>, className, base1, base2) \
+	luabind_virtual_Item(classType, CWrapperAbstractItem<classType>)
 
 //////////////////////////////////////////////////////////////////////////
 // 3

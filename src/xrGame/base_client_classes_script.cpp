@@ -21,7 +21,7 @@ SCRIPT_EXPORT(IFactoryObject, (),
 	module(luaState)
 	[
         // 'DLL_Pure' is preserved to maintain backward compatibility with mod scripts
-		class_<IFactoryObject,FactoryObjectWrapper>("DLL_Pure")
+		class_<IFactoryObject, no_bases, default_holder, FactoryObjectWrapper>("DLL_Pure")
 			.def(constructor<>())
 			.def("_construct",&IFactoryObject::_construct,&FactoryObjectWrapper::_construct_static)
 	];
@@ -32,7 +32,7 @@ SCRIPT_EXPORT(ISpatial, (),
 {
 	module(luaState)
 	[
-		class_<ISpatial,CISpatialWrapper>("ISpatial")
+		class_<ISpatial, no_bases, default_holder, CISpatialWrapper>("ISpatial")
 			.def(constructor<>())
 			.def("spatial_register",	&ISpatial::spatial_register,	&CISpatialWrapper::spatial_register_static)
 			.def("spatial_unregister",	&ISpatial::spatial_unregister,	&CISpatialWrapper::spatial_unregister_static)
@@ -50,7 +50,7 @@ SCRIPT_EXPORT(ISheduled, (),
 {
 	module(luaState)
 	[
-		class_<ISheduled,CISheduledWrapper>("ISheduled")
+		class_<ISheduled, no_bases, default_holder, CISheduledWrapper>("ISheduled")
 //			.def(constructor<>())
 //			.def("shedule_Scale",		&ISheduled::shedule_Scale,		&CISheduledWrapper::shedule_Scale_static)
 //			.def("shedule_Update",		&ISheduled::shedule_Update,		&CISheduledWrapper::shedule_Update_static)
@@ -61,7 +61,7 @@ SCRIPT_EXPORT(IRenderable, (),
 {
 	module(luaState)
 	[
-		class_<IRenderable,CIRenderableWrapper>("IRenderable")
+		class_<IRenderable, no_bases, default_holder, CIRenderableWrapper>("IRenderable")
 //			.def(constructor<>())
 //			.def("renderable_Render",&IRenderable::renderable_Render,&CIRenderableWrapper::renderable_Render_static)
 //			.def("renderable_ShadowGenerate",&IRenderable::renderable_ShadowGenerate,&CIRenderableWrapper::renderable_ShadowGenerate_static)
@@ -100,7 +100,7 @@ SCRIPT_EXPORT(CGameObject, (IFactoryObject, ISheduled, ICollidable, IRenderable)
 //			.def("renderable_ShadowReceive",&CObject::renderable_ShadowReceive,&CObjectWrapper::renderable_ShadowReceive_static)
 //			.def("Visual",					&CObject::Visual)
 
-		class_<CGameObject,bases<IFactoryObject,ISheduled,ICollidable,IRenderable>,CGameObjectWrapper>("CGameObject")
+		class_<CGameObject,bases<IFactoryObject,ISheduled,ICollidable,IRenderable>, default_holder, CGameObjectWrapper>("CGameObject")
 			.def(constructor<>())
 			.def("_construct",			&CGameObject::_construct,&CGameObjectWrapper::_construct_static)
 			.def("Visual",				&CGameObject::Visual)

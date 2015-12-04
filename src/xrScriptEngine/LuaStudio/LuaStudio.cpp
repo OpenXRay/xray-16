@@ -458,18 +458,13 @@ void engine::push_class_base(lua_State *state, const char *id)
 {
     class_rep *rep = static_cast<class_rep*>(lua_touserdata(state, -1));
     VERIFY(rep);
-    typedef class_rep::base_info base_info;
-    typedef vector_class<base_info> Bases;
-    Bases const &bases = rep->bases();
-    Bases::const_iterator I = bases.begin();
-    Bases::const_iterator E = bases.end();
-    for (; I != E; ++I)
+    for (const auto &baseInfo : rep->bases())
     {
-        pcstr name = (*I).base->name();
+        pcstr name = baseInfo.base->name();
         if (sz_cmp(id, name))
             continue;
         lua_pop_value(state, 1);
-        lua_pushlightuserdata(state, (*I).base);
+        lua_pushlightuserdata(state, baseInfo.base);
         return;
     }
     NODEFAULT;

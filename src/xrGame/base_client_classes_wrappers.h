@@ -51,7 +51,11 @@ public:
 	}
 private:
     // not exported
-    virtual	CLASS_ID &GetClassId() override { return call_member<CLASS_ID&>(this, "GetClassId"); }
+    virtual	CLASS_ID &GetClassId() override
+    {
+        static CLASS_ID id = -1;
+        return id;
+    }
 };
 
 typedef FactoryObjectWrapperTpl<IFactoryObject> FactoryObjectWrapper;

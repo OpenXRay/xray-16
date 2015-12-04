@@ -27,4 +27,5 @@ struct CWrapperBase : public T, public luabind::wrap_base {
 typedef CWrapperBase<CUIDialogWndEx> WrapType;
 typedef CUIDialogWndEx BaseType;
 
-typedef luabind::class_<CUIDialogWndEx, WrapType, luabind::bases<CUIDialogWnd, IFactoryObject> > export_class;
+typedef luabind::class_<CUIDialogWndEx, luabind::bases<CUIDialogWnd, IFactoryObject>,
+    luabind::default_holder, WrapType> export_class;

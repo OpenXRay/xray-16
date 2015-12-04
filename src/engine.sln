@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24627.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utils", "utils", "{89F6A7EE-3BBE-45D3-A8A8-5D9366CD987B}"
 EndProject
@@ -1110,14 +1110,14 @@ Global
 		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Debug|Win32.Build.0 = Debug|Win32
 		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Debug|x64.ActiveCfg = Debug|x64
 		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Debug|x64.Build.0 = Debug|x64
-		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Mixed_Dedicated|Win32.ActiveCfg = Release|Win32
-		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Mixed_Dedicated|Win32.Build.0 = Release|Win32
-		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Mixed_Dedicated|x64.ActiveCfg = Release|x64
-		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Mixed_Dedicated|x64.Build.0 = Release|x64
+		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Mixed_Dedicated|Win32.ActiveCfg = Mixed|Win32
+		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Mixed_Dedicated|Win32.Build.0 = Mixed|Win32
+		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Mixed_Dedicated|x64.ActiveCfg = Mixed|x64
+		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Mixed_Dedicated|x64.Build.0 = Mixed|x64
 		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Mixed|Win32.ActiveCfg = Mixed|Win32
 		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Mixed|Win32.Build.0 = Mixed|Win32
-		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Mixed|x64.ActiveCfg = Release|x64
-		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Mixed|x64.Build.0 = Release|x64
+		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Mixed|x64.ActiveCfg = Mixed|x64
+		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Mixed|x64.Build.0 = Mixed|x64
 		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Release_Dedicated|Win32.ActiveCfg = Release|Win32
 		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Release_Dedicated|Win32.Build.0 = Release|Win32
 		{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}.Release_Dedicated|x64.ActiveCfg = Release|x64

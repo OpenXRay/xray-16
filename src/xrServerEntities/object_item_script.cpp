@@ -15,9 +15,10 @@
 
 ObjectFactory::CLIENT_BASE_CLASS *CObjectItemScript::client_object	() const
 {
+    using namespace luabind::policy;
 	ObjectFactory::CLIENT_SCRIPT_BASE_CLASS	*object;
 	try {
-		object	= luabind::object_cast<ObjectFactory::CLIENT_SCRIPT_BASE_CLASS*>(m_client_creator(),luabind::adopt(luabind::result));
+		object	= luabind::object_cast<ObjectFactory::CLIENT_SCRIPT_BASE_CLASS*>(m_client_creator(), adopt<0>());
 	}
 	catch(...) {
 		return	(0);
@@ -30,6 +31,7 @@ ObjectFactory::CLIENT_BASE_CLASS *CObjectItemScript::client_object	() const
 
 ObjectFactory::SERVER_BASE_CLASS *CObjectItemScript::server_object	(LPCSTR section) const
 {
+    using namespace luabind::policy;
 	typedef ObjectFactory::SERVER_SCRIPT_BASE_CLASS		SERVER_SCRIPT_BASE_CLASS;
 	typedef ObjectFactory::SERVER_BASE_CLASS			SERVER_BASE_CLASS;
 	SERVER_SCRIPT_BASE_CLASS	*object;
@@ -47,7 +49,7 @@ ObjectFactory::SERVER_BASE_CLASS *CObjectItemScript::server_object	(LPCSTR secti
 			Msg			("Exception raised while creating server object from section [%s]",section);
 			return		(0);
 		}
-		object			= luabind::object_cast<ObjectFactory::SERVER_SCRIPT_BASE_CLASS*>(*instance,luabind::adopt(luabind::result));
+		object			= luabind::object_cast<ObjectFactory::SERVER_SCRIPT_BASE_CLASS*>(*instance, adopt<0>());
 		xr_delete		(instance);
 	}
 	catch(std::exception e) {

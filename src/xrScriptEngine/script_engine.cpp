@@ -22,7 +22,6 @@
 #endif
 #include <stdarg.h>
 #include <boost/noncopyable.hpp>
-#include <luabind/luabind_memory.hpp>
 
 Flags32 g_LuaDebug;
 
@@ -971,7 +970,10 @@ void CScriptEngine::setup_callbacks()
         luabind::set_error_callback(CScriptEngine::lua_error);
 #endif
 #ifndef MASTER_GOLD
-        luabind::set_pcall_callback(CScriptEngine::lua_pcall_failed);
+        luabind::set_pcall_callback([](lua_State *L)
+        {
+            lua_pushcfunction(L, CScriptEngine::lua_pcall_failed);
+        });
 #endif
     }
 #if !XRAY_EXCEPTIONS 

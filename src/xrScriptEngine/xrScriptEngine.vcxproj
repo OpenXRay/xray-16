@@ -216,9 +216,6 @@
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\Externals\luabind\src\luabind.vcxproj">
-      <Project>{ccd4afae-aa10-42c6-a452-fdee497ccdf1}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DebugMacros.hpp" />

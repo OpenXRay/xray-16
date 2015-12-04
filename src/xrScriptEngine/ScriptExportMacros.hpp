@@ -20,20 +20,20 @@
 #define DEFINE_LUA_WRAPPER_FOOTER(cls)													\
 	};
 
-#define DEFINE_LUABIND_CLASS_WRAPPER_0(a,b,c) \
-	luabind::class_<a,b >(c)
+#define DEFINE_LUABIND_CLASS_WRAPPER_0(type, wrapper, name) \
+	luabind::class_<type, luabind::no_bases, luabind::default_holder, wrapper>(name)
 
-#define DEFINE_LUABIND_CLASS_WRAPPER_1(a,b,c,d) \
-	luabind::class_<a,b,d >(c)
+#define DEFINE_LUABIND_CLASS_WRAPPER_1(type, wrapper, name, base1) \
+	luabind::class_<type, base1, luabind::default_holder, wrapper>(name)
 
-#define DEFINE_LUABIND_CLASS_WRAPPER_2(a,b,c,d,e) \
-	luabind::class_<a,b,bases<d,e > >(c)
+#define DEFINE_LUABIND_CLASS_WRAPPER_2(type, wrapper, name, base1, base2) \
+	luabind::class_<type, bases<base1, base2>, luabind::default_holder, wrapper>(name)
 
-#define DEFINE_LUABIND_CLASS_WRAPPER_3(a,b,c,d,e,f) \
-	luabind::class_<a,b,bases<d,e,f > >(c)
+#define DEFINE_LUABIND_CLASS_WRAPPER_3(type, wrapper, name, base1, base2, base3) \
+	luabind::class_<type, bases<base1, base2, base3>, luabind::default_holder, wrapper>(name)
 
-#define DEFINE_LUABIND_CLASS_WRAPPER_4(a,b,c,d,e,f,g) \
-	luabind::class_<a,b,bases<d,e,f,g > >(c)
+#define DEFINE_LUABIND_CLASS_WRAPPER_4(type, wrapper, name, base1, base2, base3, base4) \
+	luabind::class_<type, bases<base1, base2, base3, base4>, luabind::default_holder, wrapper>(name)
 
 #define DEFINE_LUABIND_VIRTUAL_FUNCTION(a,b,c) \
 	.def(#c, &a::c, &b::c##_static)
