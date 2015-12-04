@@ -52,7 +52,7 @@ public:
         lockCounter--;
     }
 
-    bool IsLocked() const { return lockCounter; }
+    bool IsLocked() const { return !!lockCounter; }
 
 private:
     std::recursive_mutex mutex;
