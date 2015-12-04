@@ -4,15 +4,15 @@
   <MACROS>
     <VERSION value="BCB.06.00"/>
     <PROJECT value="..\..\..\bin\editors\Postprocess.exe"/>
-    <OBJFILES value="..\..\..\intermediate\editors\PPEditor\\Postprocess.obj 
-      ..\..\..\intermediate\editors\PPEditor\\main.obj 
-      ..\..\..\intermediate\editors\PPEditor\\interp.obj 
-      ..\..\..\intermediate\editors\PPEditor\\float_param.obj 
-      ..\..\..\intermediate\editors\PPEditor\\float_constructor.obj 
-      ..\..\..\intermediate\editors\PPEditor\\color.obj 
-      ..\..\..\intermediate\editors\PPEditor\\single_param.obj 
-      ..\..\..\intermediate\editors\PPEditor\\Envelope.obj 
-      ..\..\..\intermediate\editors\PPEditor\\PostprocessAnimator.obj"/>
+    <OBJFILES value="..\..\..\intermediate\editors\PPEditor\Postprocess.obj 
+      ..\..\..\intermediate\editors\PPEditor\main.obj 
+      ..\..\..\intermediate\editors\PPEditor\interp.obj 
+      ..\..\..\intermediate\editors\PPEditor\float_param.obj 
+      ..\..\..\intermediate\editors\PPEditor\float_constructor.obj 
+      ..\..\..\intermediate\editors\PPEditor\color.obj 
+      ..\..\..\intermediate\editors\PPEditor\single_param.obj 
+      ..\..\..\intermediate\editors\PPEditor\Envelope.obj 
+      ..\..\..\intermediate\editors\PPEditor\PostprocessAnimator.obj"/>
     <RESFILES value="Postprocess.res"/>
     <IDLFILES value=""/>
     <IDLGENFILES value=""/>

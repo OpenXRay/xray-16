@@ -107,5 +107,6 @@
     <ClInclude Include="Unit9.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="stdafx.h" />
   </ItemGroup>
 </Project>

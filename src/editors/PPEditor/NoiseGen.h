@@ -10,11 +10,12 @@
 #include <ExtCtrls.hpp>
 #include <Mask.hpp>
 #include <Dialogs.hpp>
+
 //---------------------------------------------------------------------------
 class TNGen : public TForm
 {
-__published:	// IDE-managed Components
-    TGroupBox *GroupBox1;
+    __published: // IDE-managed Components
+    TGroupBox*GroupBox1;
     TMultiObjSpinEdit *FR;
     TMultiObjSpinEdit *FG;
     TMultiObjSpinEdit *FB;
@@ -41,11 +42,13 @@ __published:	// IDE-managed Components
     void __fastcall FColorClick(TObject *Sender);
     void __fastcall SColorClick(TObject *Sender);
     void __fastcall Button1Click(TObject *Sender);
-private:	// User declarations
-public:		// User declarations
-    __fastcall TNGen(TComponent* Owner);
+private: // User declarations
+public: // User declarations
+    __fastcall TNGen(TComponent *Owner);
 };
+
 //---------------------------------------------------------------------------
-extern PACKAGE TNGen *NGen;
+extern PACKAGE TNGen * NGen;
 //---------------------------------------------------------------------------
 #endif
+
