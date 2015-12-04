@@ -38,6 +38,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir);$(ProjectDir);$(xrSdkDir)include;$(DXSDK_DIR)Include;$(SolutionDir)Externals\luajit\src;$(SolutionDir)Externals\luabind;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4251;4275</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
