@@ -7,9 +7,11 @@
 #pragma link "MXCtrls"
 #pragma resource "*.dfm"
 TfrmSplash *frmSplash;
+
 //---------------------------------------------------------------------------
-__fastcall TfrmSplash::TfrmSplash(TComponent* Owner)
-    : TForm(Owner)
-{
-}
+__fastcall TfrmSplash::TfrmSplash(TComponent *Owner)
+    : TForm(Owner) {}
+
 //---------------------------------------------------------------------------
+
+
