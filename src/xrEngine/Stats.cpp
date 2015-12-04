@@ -71,7 +71,7 @@ CStats::~CStats()
 }
 
 
-static void DumpSpatialStatistics(CGameFont &font, IPerformanceAlert *alert, ISpatial_DB &db, float engineTotal)
+static void DumpSpatialStatistics(IGameFont &font, IPerformanceAlert *alert, ISpatial_DB &db, float engineTotal)
 {
 #ifdef DEBUG
     auto &stats = db.Stats;
@@ -87,7 +87,7 @@ static void DumpSpatialStatistics(CGameFont &font, IPerformanceAlert *alert, ISp
 #endif
 }
 
-static void DumpColliderStatistics(CGameFont &font, IPerformanceAlert *alert)
+static void DumpColliderStatistics(IGameFont &font, IPerformanceAlert *alert)
 {
     auto &stats = XRC.Stats;
     stats.FrameEnd();
