@@ -2,7 +2,7 @@
 #ifndef ItemListHelperH
 #define ItemListHelperH
 
-#include "ItemListTypes.h"
+#include "xrServerEntities/ItemListTypes.h"
 #include "FolderLib.h"
 
 //---------------------------------------------------------------------------

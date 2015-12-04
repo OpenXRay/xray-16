@@ -2,7 +2,7 @@
 #pragma hdrstop
 
 #include "GameTypeForm.h"
-#include "../../xrServerEntities/gametype_chooser.h"
+#include "xrServerEntities/gametype_chooser.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma link "ExtBtn"

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "../../xrServerEntities/PropertiesListTypes.h"
+#include "xrServerEntities/PropertiesListTypes.h"
 #include "MxShortcut.hpp"
 //------------------------------------------------------------------------------
             
