@@ -4,13 +4,13 @@
 
 #ifdef _PARTICLE_EDITOR
 
-#include "../xrEProps/ChoseForm.h"
-#include "..\..\Layers\xrRender\ParticleEffect.h"
+#include "editors/xrEProps/ChoseForm.h"
+#include "Layers/xrRender/ParticleEffect.h"
 #include "ParticleEffectActions.h"
-#include "../../xrServerEntities/PropertiesListHelper.h"
-#include "ui_particletools.h"
+#include "xrServerEntities/PropertiesListHelper.h"
+#include "UI_ParticleTools.h"
 #include "ui_main.h"
-#include "../xrEProps/FolderLib.h"
+#include "editors/xrEProps/FolderLib.h"
              
 BOOL PS::CPEDef::Equal(const CPEDef* pe)
 {
@@ -219,15 +219,15 @@ void PS::CPEDef::FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner)
     R->OnAfterEditEvent.bind				(this,&PS::CPEDef::NameOnAfterEdit);
 
 
-    // max particles
+// max particles
     PHelper().CreateS32		(items,PrepareKey				(pref,"Max Particles"),					&m_MaxParticles,  0, 100000);
 //    P->OnChangeEvent		= OnFlagChange;
-	// time limit
+// time limit
     P=PHelper().CreateFlag32(items,PrepareKey				(pref,"Time Limit"),		  			&m_Flags, dfTimeLimit);
     P->OnChangeEvent.bind	(this,&PS::CPEDef::OnFlagChange);
     if (m_Flags.is(dfTimeLimit))
 	    PHelper().CreateFloat	(items,PrepareKey			(pref,"Time Limit\\Value (sec)"),		&m_fTimeLimit,  0, 10000.f);
-	// sprite
+// sprite
     P=PHelper().CreateFlag32(items,PrepareKey				(pref,"Sprite"),		 	   			&m_Flags, dfSprite);
     P->OnChangeEvent.bind	(this,&PS::CPEDef::OnFlagChange);
     if (m_Flags.is(dfSprite)){
@@ -235,7 +235,7 @@ void PS::CPEDef::FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner)
         P->OnChangeEvent.bind	(this,&PS::CPEDef::OnShaderChange);
 	    P=PHelper().CreateChoose(items,PrepareKey			(pref,"Sprite\\Shader"), 	   			&m_ShaderName,	smEShader);
         P->OnChangeEvent.bind	(this,&PS::CPEDef::OnShaderChange);
-    	// frame
+// frame
         P=PHelper().CreateFlag32(items,PrepareKey			(pref,"Sprite\\Culling"),			 	&m_Flags, dfCulling);
         P->OnChangeEvent.bind	(this,&PS::CPEDef::OnFlagChange);
         if (m_Flags.is(CPEDef::dfCulling))
@@ -248,7 +248,7 @@ void PS::CPEDef::FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner)
             P=PHelper().CreateFloat(items,PrepareKey		(pref,"Sprite\\Frame\\Size U (0..1)"),	&m_Frame.m_fTexSize.x, EPS_S,1.f,0.001f,8);
             P->OnChangeEvent.bind	(this,&PS::CPEDef::OnFrameResize);
             PHelper().CreateFloat	(items,PrepareKey	   	(pref,"Sprite\\Frame\\Size V (0..1)"),	&m_Frame.m_fTexSize.y, EPS_S,1.f,0.001f,8);
-	        // animate
+// animate
             P=PHelper().CreateFlag32(items,PrepareKey		(pref,"Sprite\\Animated"),				&m_Flags, dfAnimated);
             P->OnChangeEvent.bind	(this,&PS::CPEDef::OnFlagChange);
             if (m_Flags.is(dfAnimated)){
@@ -257,7 +257,7 @@ void PS::CPEDef::FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner)
             }
         }
     }
-	// align to path
+// align to path
     P=PHelper().CreateFlag32(items,PrepareKey	(pref,"Movement\\Align To Path"), 					&m_Flags, dfAlignToPath);
     P->OnChangeEvent.bind	(this,&PS::CPEDef::OnFlagChange);
     if (m_Flags.is(dfAlignToPath)){
@@ -265,12 +265,12 @@ void PS::CPEDef::FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner)
 	    PHelper().CreateFlag32(items,PrepareKey	(pref,"Movement\\Align To Path\\Default World Align"), &m_Flags, dfWorldAlign);
     	PHelper().CreateAngle3(items,PrepareKey	(pref,"Movement\\Align To Path\\Default Rotate"),	&m_APDefaultRotation);
     }
-	// velocity scale                                                           
+// velocity scale                                                           
     P=PHelper().CreateFlag32(items,PrepareKey	(pref,"Movement\\Velocity Scale"),					&m_Flags, dfVelocityScale);
     P->OnChangeEvent.bind	(this,&PS::CPEDef::OnFlagChange);
     if (m_Flags.is(dfVelocityScale))
     	PHelper().CreateVector(items,PrepareKey	(pref,"Movement\\Velocity Scale\\Value"),			&m_VelocityScale, -1000.f, 1000.f);
-	// collision
+// collision
     P=PHelper().CreateFlag32(items,PrepareKey	(pref,"Movement\\Collision"),						&m_Flags, dfCollision);
     P->OnChangeEvent.bind	(this,&PS::CPEDef::OnFlagChange);
     FloatValue*	V 			= 0;
@@ -287,7 +287,7 @@ void PS::CPEDef::FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner)
         V->OnAfterEditEvent.bind	(this,&PS::CPEDef::CollisionCutoffOnAfterEdit);
         V->Owner()->OnDrawTextEvent.bind(this,&PS::CPEDef::CollisionCutoffOnDraw);
     }
-    // actions
+// actions
 	B=::PHelper().CreateButton(items,PrepareKey(pref,"Actions\\Edit"),"Append",ButtonValue::flFirstOnly);
     B->OnBtnClickEvent.bind	(this,&PS::CPEDef::OnActionsClick);
 	for (EPAVecIt s_it=m_EActionList.begin(); s_it!=m_EActionList.end(); s_it++)
