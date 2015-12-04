@@ -55,11 +55,11 @@ public:
 	virtual	void				reinit				();
 	virtual	void				reload				(LPCSTR section);
 	virtual void				update				();
-			void				remove_links		(CObject *object);
+			void				remove_links		(IGameObject *object);
 
 public:
 			void				add					(const CEntityAlive	*who);
-			void				add					(float amount, const Fvector &local_direction, const CObject *who, s16 element);
+			void				add					(float amount, const Fvector &local_direction, const IGameObject *who, s16 element);
 			void				add					(const CHitObject &hit_object);
 
 public:
@@ -73,13 +73,13 @@ public:
 	IC		u32 const &			last_hit_time			() const;
 
 public:
-			void				enable				(const CObject *object, bool enable);
+			void				enable				(const IGameObject *object, bool enable);
 			CCustomMonster		&object				() const;
 
 public:
 			void				save				(NET_Packet &packet) const;
 			void				load				(IReader &packet);
-			void				on_requested_spawn	(CObject *object);
+			void				on_requested_spawn	(IGameObject *object);
 
 private:
 			void				clear_delayed_objects	();

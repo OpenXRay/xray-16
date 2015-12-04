@@ -109,8 +109,8 @@ public:
 	virtual		bool				IsEnemy					(CEntityAlive* ea1, CEntityAlive* ea2)	{return false;};
 	virtual		bool				PlayerCanSprint			(CActor* pActor) {return true;};
 
-	virtual		void				OnSpawn					(CObject* pObj)	{};
-	virtual		void				OnDestroy				(CObject* pObj)	{};
+	virtual		void				OnSpawn					(IGameObject* pObj)	{};
+	virtual		void				OnDestroy				(IGameObject* pObj)	{};
 
 	virtual		void				OnPlayerFlagsChanged	(game_PlayerState* ps)	{};
 	virtual		void				OnNewPlayerConnected	(ClientID const & newClient) {};

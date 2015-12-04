@@ -68,6 +68,6 @@ void CAgentManagerPlanner::add_actions		()
 	add_operator			(eOperatorReactOnDanger,			action);
 }
 
-void CAgentManagerPlanner::remove_links		(CObject *object)
+void CAgentManagerPlanner::remove_links		(IGameObject *object)
 {
 }

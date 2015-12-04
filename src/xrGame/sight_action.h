@@ -24,7 +24,7 @@ public:
 	typedef MemorySpace::CMemoryInfo	CMemoryInfo;
 
 protected:
-	xr_vector<CObject*>	objects;
+	xr_vector<IGameObject*>	objects;
 	ESightType			m_sight_type;
 	bool				m_torso_look;
 	bool				m_path;
@@ -81,7 +81,7 @@ public:
 	IC		void		set_object_to_look			(const CGameObject *object_to_look);
 	IC		void		set_memory_object			(const CMemoryInfo *object_to_look);
 	IC		bool		operator==					(const CSightAction &sight_action) const;
-			void		remove_links				(CObject *object);
+			void		remove_links				(IGameObject *object);
 			bool		change_body_speed			() const;
 			float		body_speed					() const;
 			bool		change_head_speed			() const;

@@ -547,8 +547,8 @@ void	CActor::Hit(SHit* pHDS)
 			!g_dedicated_server && 
 			(HDS.hit_type == ALife::eHitTypeFireWound) )
 	{
-		CObject* pLastHitter			= Level().Objects.net_Find(m_iLastHitterID);
-		CObject* pLastHittingWeapon		= Level().Objects.net_Find(m_iLastHittingWeaponID);
+		IGameObject* pLastHitter			= Level().Objects.net_Find(m_iLastHitterID);
+		IGameObject* pLastHittingWeapon		= Level().Objects.net_Find(m_iLastHittingWeaponID);
 		HitSector						(pLastHitter, pLastHittingWeapon);
 	}
 
@@ -629,7 +629,7 @@ void	CActor::Hit(SHit* pHDS)
 
 void CActor::HitMark	(float P, 
 						 Fvector dir,			
-						 CObject* who_object, 
+						 IGameObject* who_object, 
 						 s16 element, 
 						 Fvector position_in_bone_space, 
 						 float impulse,  
@@ -696,7 +696,7 @@ void CActor::HitMark	(float P,
 	}//if hit_type
 }
 
-void CActor::HitSignal(float perc, Fvector& vLocalDir, CObject* who, s16 element)
+void CActor::HitSignal(float perc, Fvector& vLocalDir, IGameObject* who, s16 element)
 {
 	if (g_Alive()) 
 	{
@@ -719,7 +719,7 @@ void CActor::HitSignal(float perc, Fvector& vLocalDir, CObject* who, s16 element
 	}
 }
 void start_tutorial(LPCSTR name);
-void CActor::Die	(CObject* who)
+void CActor::Die	(IGameObject* who)
 {
 #ifdef DEBUG
 	Msg("--- Actor [%s] dies !", this->Name());
@@ -950,7 +950,7 @@ void CActor::UpdateCL	()
 
 	if(m_feel_touch_characters>0)
 	{
-		for(xr_vector<CObject*>::iterator it = feel_touch.begin(); it != feel_touch.end(); it++)
+		for(xr_vector<IGameObject*>::iterator it = feel_touch.begin(); it != feel_touch.end(); it++)
 		{
 			CPhysicsShellHolder	*sh = smart_cast<CPhysicsShellHolder*>(*it);
 			if(sh&&sh->character_physics_support())

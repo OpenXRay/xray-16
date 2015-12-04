@@ -92,9 +92,9 @@ public:
 	virtual void						stop_emitters			( );
 	virtual int							pause_emitters			( bool val );
 
-	virtual void						play					( ref_sound& S, CObject* O,								u32 flags=0, float delay=0.f);
-	virtual void						play_at_pos				( ref_sound& S, CObject* O,		const Fvector &pos,		u32 flags=0, float delay=0.f);
-	virtual void						play_no_feedback		( ref_sound& S, CObject* O,	u32 flags=0, float delay=0.f, Fvector* pos=0, float* vol=0, float* freq=0, Fvector2* range=0);
+	virtual void						play					( ref_sound& S, IGameObject* O,								u32 flags=0, float delay=0.f);
+	virtual void						play_at_pos				( ref_sound& S, IGameObject* O,		const Fvector &pos,		u32 flags=0, float delay=0.f);
+	virtual void						play_no_feedback		( ref_sound& S, IGameObject* O,	u32 flags=0, float delay=0.f, Fvector* pos=0, float* vol=0, float* freq=0, Fvector2* range=0);
 	virtual void						set_master_volume		( float			f )=0;
 	virtual void						set_geometry_env		( IReader*		I );
 	virtual void						set_geometry_som		( IReader*		I );
@@ -132,7 +132,7 @@ public:
 	BOOL								i_allow_play			( CSoundRender_Emitter* E	);
     virtual BOOL						i_locked 				(){return bLocked;}
 
-	virtual void						object_relcase			( CObject* obj );
+	virtual void						object_relcase			( IGameObject* obj );
 
 	virtual float						get_occlusion_to		( const Fvector& hear_pt, const Fvector& snd_pt, float dispersion=0.2f );
 	float								get_occlusion			( Fvector& P, float R, Fvector* occ );

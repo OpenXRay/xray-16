@@ -15,7 +15,7 @@ class CBurer :  public CBaseMonster,
     typedef     CBaseMonster                inherited;
 
 private:
-    xr_vector<CObject*> m_nearest;
+    xr_vector<IGameObject*> m_nearest;
 
 public:
     static      bool    can_scan;
@@ -133,11 +133,11 @@ public:
     virtual void    PostLoad            (LPCSTR section);
 
     virtual void    net_Destroy         ();
-    virtual void    net_Relcase         (CObject *O);
+    virtual void    net_Relcase         (IGameObject *O);
     virtual void    shedule_Update      (u32 dt);
     virtual void    UpdateCL            ();
     virtual void    Hit                 (SHit* pHDS);
-    virtual void    Die                 (CObject* who);
+    virtual void    Die                 (IGameObject* who);
             void    ProcessTurn         ();
     virtual void    CheckSpecParams     (u32 spec_params);
 

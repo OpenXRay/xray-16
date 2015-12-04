@@ -288,7 +288,7 @@ bool game_sv_ArtefactHunt::assign_rp_tmp(	game_PlayerState* ps_who,
 				return;
 			if (tmp_ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
 				return;
-			CObject* tmp_player	= Level().Objects.net_Find(tmp_ps->GameID);
+			IGameObject* tmp_player	= Level().Objects.net_Find(tmp_ps->GameID);
 			if (!tmp_player) 
 				return;
 
@@ -426,7 +426,7 @@ struct RemoveBlockedRPointPredicate : public std::unary_function<RPoint*, bool>
 			rp->bBlocked = false;
 			return true;
 		}
-		CObject* pPlayer = Level().Objects.net_Find(rp->BlockedByID);
+		IGameObject* pPlayer = Level().Objects.net_Find(rp->BlockedByID);
 		if (!pPlayer || 
 			(rp->P.distance_to(pPlayer->Position()) <= 0.4f))
 		{
@@ -457,7 +457,7 @@ void	game_sv_ArtefactHunt::CheckRPUnblock			()
 			rpointsBlocked.erase	(rpointsBlocked.begin()+b);
 			continue;
 		};
-		CObject* pPlayer = Level().Objects.net_Find(pRP->BlockedByID);
+		IGameObject* pPlayer = Level().Objects.net_Find(pRP->BlockedByID);
 		if (!pPlayer || pRP->P.distance_to(pPlayer->Position())<=0.4f)
 		{
 			pRP->bBlocked = false;

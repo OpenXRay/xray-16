@@ -12,6 +12,7 @@
 #include "CustomHUD.h"
 
 #include "xr_object.h"
+#include "xr_object_list.h"
 
 xr_token* vid_quality_token = NULL;
 

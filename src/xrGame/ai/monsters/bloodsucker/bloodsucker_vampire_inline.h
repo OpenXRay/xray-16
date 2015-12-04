@@ -160,7 +160,7 @@ void CStateBloodsuckerVampireAbstract::setup_substates()
 }
 
 TEMPLATE_SPECIALIZATION
-void CStateBloodsuckerVampireAbstract::remove_links	(CObject* object)
+void CStateBloodsuckerVampireAbstract::remove_links	(IGameObject* object)
 {
 	if (enemy == object)
 		enemy					= 0;

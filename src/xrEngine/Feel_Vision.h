@@ -5,7 +5,7 @@
 #include "pure_relcase.h"
 
 class IRender_Sector;
-class CObject;
+class IGameObject;
 class ISpatial;
 
 namespace Feel
@@ -19,18 +19,18 @@ class ENGINE_API Vision : private pure_relcase
 {
     friend class pure_relcase;
 private:
-    xr_vector<CObject*> seen;
-    xr_vector<CObject*> query;
-    xr_vector<CObject*> diff;
+    xr_vector<IGameObject*> seen;
+    xr_vector<IGameObject*> query;
+    xr_vector<IGameObject*> diff;
     collide::rq_results RQR;
     xr_vector<ISpatial*> r_spatial;
-    CObject const* m_owner;
+    IGameObject const* m_owner;
 
-    void o_new(CObject* E);
-    void o_delete(CObject* E);
+    void o_new(IGameObject* E);
+    void o_delete(IGameObject* E);
     void o_trace(Fvector& P, float dt, float vis_threshold);
 public:
-    Vision(CObject const* owner);
+    Vision(IGameObject const* owner);
     virtual ~Vision();
     struct feel_visible_Item
     {
@@ -39,7 +39,7 @@ public:
         Fvector cp_LR_src;
         Fvector cp_LR_dst;
         Fvector cp_LAST; // last point found to be visible
-        CObject* O;
+        IGameObject* O;
         float fuzzy; // note range: (-1[no]..1[yes])
         float Cache_vis;
         u16 bone_id;
@@ -48,15 +48,15 @@ public:
 public:
     void feel_vision_clear();
     void feel_vision_query(Fmatrix& mFull, Fvector& P);
-    void feel_vision_update(CObject* parent, Fvector& P, float dt, float vis_threshold);
-    void __stdcall feel_vision_relcase(CObject* object);
-    void feel_vision_get(xr_vector<CObject*>& R)
+    void feel_vision_update(IGameObject* parent, Fvector& P, float dt, float vis_threshold);
+    void __stdcall feel_vision_relcase(IGameObject* object);
+    void feel_vision_get(xr_vector<IGameObject*>& R)
     {
         R.clear();
         xr_vector<feel_visible_Item>::iterator I = feel_visible.begin(), E = feel_visible.end();
         for (; I != E; I++) if (positive(I->fuzzy)) R.push_back(I->O);
     }
-    Fvector feel_vision_get_vispoint(CObject* _O)
+    Fvector feel_vision_get_vispoint(IGameObject* _O)
     {
         xr_vector<feel_visible_Item>::iterator I = feel_visible.begin(), E = feel_visible.end();
         for (; I != E; I++) if (_O == I->O)
@@ -67,7 +67,7 @@ public:
         VERIFY2(0, "There is no such object in the potentially visible list");
         return Fvector().set(flt_max, flt_max, flt_max);
     }
-    virtual bool feel_vision_isRelevant(CObject* O) = 0;
-    virtual float feel_vision_mtl_transp(CObject* O, u32 element) = 0;
+    virtual bool feel_vision_isRelevant(IGameObject* O) = 0;
+    virtual float feel_vision_mtl_transp(IGameObject* O, u32 element) = 0;
 };
 };

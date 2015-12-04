@@ -49,7 +49,7 @@ public:
 			void			update				();
 			void			distribute_enemies	();
 	IC		ENEMIES			&enemies			();
-			void			remove_links		(CObject *object);
+			void			remove_links		(IGameObject *object);
 
 private:
 			void			wounded_processor	(const CEntityAlive *object, const ALife::_OBJECT_ID &wounded_processor_id);

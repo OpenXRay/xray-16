@@ -73,7 +73,7 @@ void reward_event_generator::OnBullet_Fire(u16 sender, u16 sender_weapon_id, con
 	m_event_handlers->OnBullet_Fire	(sender, sender_weapon_id, position, direction);
 }
 
-void reward_event_generator::OnBullet_Hit(CObject const * hitter, CObject const * victim, CObject* weapon, u16 const bone)
+void reward_event_generator::OnBullet_Hit(IGameObject const * hitter, IGameObject const * victim, IGameObject* weapon, u16 const bone)
 {
 	m_state_accum->OnBullet_Hit				(hitter, victim, weapon, bone);
 	m_event_handlers->OnBullet_Hit			(hitter, victim, weapon, bone);

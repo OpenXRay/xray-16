@@ -101,7 +101,7 @@ void CLevel::RestartPlayDemo()
 		VERIFY(g_pGameLevel);
 		VERIFY(m_current_spectator);
 		g_pGameLevel->Cameras().dbg_upd_frame	= 0;
-		m_current_spectator->dbg_update_cl		= 0;
+		m_current_spectator->SetDbgUpdateFrame(0);
 #endif
 		StopPlayDemo	();
 	}
@@ -255,7 +255,7 @@ void CLevel::SpawnDemoSpectator()
 	F_entity_Destroy				(specentity);
 }
 
-void CLevel::SetDemoSpectator(CObject* spectator)
+void CLevel::SetDemoSpectator(IGameObject* spectator)
 {
 	R_ASSERT2	(smart_cast<CSpectator*>(spectator),
 		"tried to set not an spectator object to demo spectator");
@@ -370,7 +370,7 @@ void __stdcall CLevel::MSpawnsCatchCallback(u32 message, u32 subtype, NET_Packet
 	tmp_msg_filter->remove_filter(M_SPAWN, fake_sub_msg);
 }
 
-CObject* CLevel::GetDemoSpectator()	
+IGameObject* CLevel::GetDemoSpectator()	
 { 
 	return smart_cast<CGameObject*>(m_current_spectator); 
 };

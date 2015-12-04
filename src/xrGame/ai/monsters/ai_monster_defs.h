@@ -490,12 +490,12 @@ DEFINE_MAP(const CEntityAlive *,SMonsterCorpse,CORPSE_MAP, CORPSE_MAP_IT);
 
 
 struct SMonsterHit {
-	CObject		*object;
+	IGameObject		*object;
 	TTime		time;
 	EHitSide	side;
 	Fvector		position;
 
-	bool	operator==(const CObject *obj) {
+	bool	operator==(const IGameObject *obj) {
 		return (object == obj);
 	}
 };

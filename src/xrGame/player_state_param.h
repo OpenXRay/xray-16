@@ -21,7 +21,7 @@ public:
 
 	virtual void		OnWeapon_Fire				(u16 sender, u16 sender_weapon_id) {};
 	virtual	void		OnBullet_Fire				(u16 sender, u16 sender_weapon_id, const Fvector& position, const Fvector& direction) {};
-	virtual void		OnBullet_Hit				(CObject const * hitter, CObject const * victim, CObject const * weapon, u16 const bone) {};
+	virtual void		OnBullet_Hit				(IGameObject const * hitter, IGameObject const * victim, IGameObject const * weapon, u16 const bone) {};
 	virtual void		OnArtefactSpawned			() {};
 	virtual void		OnPlayerTakeArtefact		(game_PlayerState const * ps) {};
 	virtual void		OnPlayerDropArtefact		(game_PlayerState const * ps) {};

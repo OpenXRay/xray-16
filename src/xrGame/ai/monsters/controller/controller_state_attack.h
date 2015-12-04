@@ -20,7 +20,7 @@ public:
 	virtual void		execute					();
 	virtual void		setup_substates			();
 	virtual void		check_force_state		();
-	virtual void		remove_links			(CObject * ) {}
+	virtual void		remove_links			(IGameObject * ) {}
 			bool		check_home_point		();
 };
 

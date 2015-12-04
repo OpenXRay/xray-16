@@ -46,6 +46,6 @@ IC	CAI_Stalker &CControlAction::object	() const
 	return				(*m_object);
 }
 
-IC	void CControlAction::remove_links	(CObject *object)
+IC	void CControlAction::remove_links	(IGameObject *object)
 {
 }

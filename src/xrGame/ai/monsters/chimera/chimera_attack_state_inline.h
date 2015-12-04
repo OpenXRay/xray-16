@@ -107,7 +107,7 @@ bool   ChimeraAttackState<Object>::check_if_jump_possible (Fvector const& target
 	if ( !ai().level_graph().valid_vertex_position(target) )
 		return									false;
 
-	if ( object->com_man().get_jump_control()->jump_intersect_geometry(target, (CObject*)object->EnemyMan.get_enemy()) )
+	if ( object->com_man().get_jump_control()->jump_intersect_geometry(target, (IGameObject*)object->EnemyMan.get_enemy()) )
 		return									false;
 
 	return										true;

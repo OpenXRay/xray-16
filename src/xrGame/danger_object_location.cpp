@@ -20,7 +20,7 @@ bool CDangerObjectLocation::useful				() const
 	return		(true);
 }
 
-bool CDangerObjectLocation::operator==			(const CObject *object) const
+bool CDangerObjectLocation::operator==			(const IGameObject *object) const
 {
 	return		(m_object->ID() == object->ID());
 }

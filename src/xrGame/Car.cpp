@@ -518,7 +518,7 @@ void	CCar::OnHUDDraw				(CCustomHUD* /**hud*/)
 #endif
 }
 
-//void CCar::Hit(float P,Fvector &dir,CObject * who,s16 element,Fvector p_in_object_space, float impulse, ALife::EHitType hit_type)
+//void CCar::Hit(float P,Fvector &dir,IGameObject * who,s16 element,Fvector p_in_object_space, float impulse, ALife::EHitType hit_type)
 void	CCar::Hit							(SHit* pHDS)
 {
 
@@ -1688,7 +1688,7 @@ void CCar::OnEvent(NET_Packet& P, u16 type)
 	case GE_OWNERSHIP_TAKE:
 		{
 			P.r_u16		(id);
-			CObject* O	= Level().Objects.net_Find	(id);
+			IGameObject* O	= Level().Objects.net_Find	(id);
 			if( GetInventory()->CanTakeItem(smart_cast<CInventoryItem*>(O)) ) 
 			{
 				O->H_SetParent(this);
@@ -1706,7 +1706,7 @@ void CCar::OnEvent(NET_Packet& P, u16 type)
 	case GE_OWNERSHIP_REJECT:
 		{
 			P.r_u16		(id);
-			CObject* O	= Level().Objects.net_Find	(id);
+			IGameObject* O	= Level().Objects.net_Find	(id);
 
 			bool just_before_destroy		= !P.r_eof() && P.r_u8();
 			O->SetTmpPreDestroy				(just_before_destroy);
@@ -1969,7 +1969,7 @@ void CCar::GetRayExplosionSourcePos(Fvector &pos)
 {
 	random_point_in_object_box(pos,this);
 }
-void CCar::net_Relcase(CObject* O)
+void CCar::net_Relcase(IGameObject* O)
 {
 	CExplosive::net_Relcase(O);
 	inherited::net_Relcase(O);
@@ -2019,7 +2019,7 @@ u32			CCar::ExplodeTime					()
 	else return 0;
 }
 
-void	CCar::		Die					(CObject* who)
+void	CCar::		Die					(IGameObject* who)
 {
 	inherited::Die(who);
 	CarExplode();

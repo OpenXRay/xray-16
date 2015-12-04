@@ -74,7 +74,7 @@ CInventoryItem::~CInventoryItem()
 							(std::find(	m_pInventory->m_all.begin(),m_pInventory->m_all.end(), this)==m_pInventory->m_all.end()) );
 	if(!B_GOOD)
 	{
-		CObject* p	= object().H_Parent();
+		IGameObject* p	= object().H_Parent();
 		Msg("inventory ptr is [%s]",m_pInventory?"not-null":"null");
 		if(p)
 			Msg("parent name is [%s]",p->cName().c_str());

@@ -77,7 +77,7 @@ struct SRP
 		return obj==O;
 	}
 };
-void CBlackGraviArtefact::net_Relcase(CObject* O)
+void CBlackGraviArtefact::net_Relcase(IGameObject* O)
 {
 	inherited::net_Relcase(O);
 	//for vector
@@ -116,7 +116,7 @@ void CBlackGraviArtefact::UpdateCLChild()
 }
 
 //void CBlackGraviArtefact::Hit(float P, Fvector &dir,
-//						CObject* who, s16 element,
+//						IGameObject* who, s16 element,
 //						Fvector position_in_object_space,
 //						float impulse,
 //						ALife::EHitType hit_type)
@@ -134,7 +134,7 @@ void	CBlackGraviArtefact::Hit					(SHit* pHDS)
 	inherited::Hit(&HDS);
 }
 
-void CBlackGraviArtefact::feel_touch_new(CObject* O) 
+void CBlackGraviArtefact::feel_touch_new(IGameObject* O) 
 {
 	CPhysicsShellHolder* pGameObject = smart_cast<CPhysicsShellHolder*>(O);
 	CArtefact* pArtefact = smart_cast<CArtefact*>(O);
@@ -145,9 +145,9 @@ void CBlackGraviArtefact::feel_touch_new(CObject* O)
 	}
 }
 
-void CBlackGraviArtefact::feel_touch_delete(CObject* O) 
+void CBlackGraviArtefact::feel_touch_delete(IGameObject* O) 
 {
-	CGameObject* pGameObject = static_cast<CGameObject*>(O);
+	CGameObject* pGameObject = smart_cast<CGameObject*>(O);
 	CArtefact* pArtefact = smart_cast<CArtefact*>(O);
 
 	if(pGameObject && !pArtefact)
@@ -158,9 +158,9 @@ void CBlackGraviArtefact::feel_touch_delete(CObject* O)
 	}
 }
 
-bool CBlackGraviArtefact::feel_touch_contact(CObject* O) 
+bool CBlackGraviArtefact::feel_touch_contact(IGameObject* O) 
 {
-	CGameObject* pGameObject = static_cast<CGameObject*>(O);
+	CGameObject* pGameObject = smart_cast<CGameObject*>(O);
 
 	if(pGameObject)
 		return true;

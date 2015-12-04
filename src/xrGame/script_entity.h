@@ -104,7 +104,7 @@ public:
 	virtual	bool				bfAssignObject			(CScriptEntityAction		*tpEntityAction);
 	virtual bool				bfAssignMonsterAction	(CScriptEntityAction		*tpEntityAction);
 
-	virtual void				sound_callback			(const CObject *object, int sound_type, const Fvector &position, float sound_power);
+	virtual void				sound_callback			(const IGameObject *object, int sound_type, const Fvector &position, float sound_power);
 
 	virtual LPCSTR				GetPatrolPathName		();
 			bool				bfScriptAnimation		();

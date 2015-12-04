@@ -203,7 +203,7 @@ void CBastArtefact::UpdateCLChild()
 
 
 //void CBastArtefact::Hit(float P, Fvector &dir,	
-//						CObject* who, s16 element,
+//						IGameObject* who, s16 element,
 //						Fvector position_in_object_space, 
 //						float impulse, 
 //						ALife::EHitType hit_type)
@@ -238,7 +238,7 @@ bool CBastArtefact::Useful() const
 
 }
 
-void CBastArtefact::feel_touch_new(CObject* O) 
+void CBastArtefact::feel_touch_new(IGameObject* O) 
 {
 	CEntityAlive* pEntityAlive = smart_cast<CEntityAlive*>(O);
 
@@ -248,7 +248,7 @@ void CBastArtefact::feel_touch_new(CObject* O)
 	}
 }
 
-void CBastArtefact::feel_touch_delete(CObject* O) 
+void CBastArtefact::feel_touch_delete(IGameObject* O) 
 {
 	CEntityAlive* pEntityAlive = smart_cast<CEntityAlive*>(O);
 
@@ -260,7 +260,7 @@ void CBastArtefact::feel_touch_delete(CObject* O)
 	}
 }
 
-bool CBastArtefact::feel_touch_contact(CObject* O) 
+bool CBastArtefact::feel_touch_contact(IGameObject* O) 
 {
 	CEntityAlive* pEntityAlive = smart_cast<CEntityAlive*>(O);
 

@@ -236,7 +236,7 @@ ENEMIES_MAP_IT CMonsterEnemyMemory::find_best_enemy()
 	return it;
 }
 
-void CMonsterEnemyMemory::remove_links(CObject *O)
+void CMonsterEnemyMemory::remove_links(IGameObject *O)
 {
 	if ( monster )
 	{

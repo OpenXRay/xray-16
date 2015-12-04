@@ -125,7 +125,7 @@ void CAI_Rat::reload					(LPCSTR	section)
 	sound().add		(pSettings->r_string(section,"sound_eat"),		100, SOUND_TYPE_MONSTER_EATING	,	3, u32(eRatSoundMaskEat),		eRatSoundEat,		head_bone_name);
 }
 
-void CAI_Rat::Die(CObject* who)
+void CAI_Rat::Die(IGameObject* who)
 {
 	inherited::Die(who);
 
@@ -516,7 +516,7 @@ void CAI_Rat::UpdatePositionAnimation()
 		SelectAnimation		(XFORM().k,Fvector().set(1,0,0),m_fSpeed);
 }
 
-//void CAI_Rat::Hit(float P,Fvector &dir,CObject*who,s16 element,Fvector p_in_object_space,float impulse, ALife::EHitType hit_type /*= ALife::eHitTypeWound*/)
+//void CAI_Rat::Hit(float P,Fvector &dir,IGameObject*who,s16 element,Fvector p_in_object_space,float impulse, ALife::EHitType hit_type /*= ALife::eHitTypeWound*/)
 void		CAI_Rat::Hit									(SHit* pHDS)
 {
 //	inherited::Hit				(P,dir,who,element,p_in_object_space,impulse, hit_type);
@@ -533,7 +533,7 @@ void		CAI_Rat::Hit									(SHit* pHDS)
 	}
 }
 
-void CAI_Rat::feel_touch_new(CObject* O)
+void CAI_Rat::feel_touch_new(IGameObject* O)
 {
 }
 
@@ -651,7 +651,7 @@ void CAI_Rat::activate_physic_shell	()
 
 void CAI_Rat::on_activate_physic_shell	()
 {
-	CObject						*object = smart_cast<CObject*>(H_Parent());
+	IGameObject						*object = smart_cast<IGameObject*>(H_Parent());
 	R_ASSERT					(object);
 	XFORM().set					(object->XFORM());
 	inherited::activate_physic_shell();

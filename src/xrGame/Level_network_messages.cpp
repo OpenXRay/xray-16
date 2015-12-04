@@ -238,7 +238,7 @@ void CLevel::ClientReceive()
 					break;
 				}*/
 				P->r_u16		(ID);
-				CObject*	O	= Objects.net_Find		(ID);
+				IGameObject*	O	= Objects.net_Find		(ID);
 				if (0 == O)		break;
 				O->net_ImportInput(*P);
 			}break;

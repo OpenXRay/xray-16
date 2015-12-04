@@ -23,7 +23,7 @@ CDamageManager::~CDamageManager			()
 
 IFactoryObject *CDamageManager::_construct	()
 {
-	m_object				= smart_cast<CObject*>(this);
+	m_object				= smart_cast<IGameObject*>(this);
 	VERIFY					(m_object);
 	return					(m_object);
 }

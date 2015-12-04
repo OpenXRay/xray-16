@@ -63,7 +63,7 @@ IC	const bool &CStalkerAnimationScript::local_animation			() const
 	return						(m_local_animation);
 }
 
-IC	Fmatrix const& CStalkerAnimationScript::transform				(CObject const& object) const
+IC	Fmatrix const& CStalkerAnimationScript::transform				(IGameObject const& object) const
 {
 	if (m_transform_ptr)
 		return					(*m_transform_ptr);

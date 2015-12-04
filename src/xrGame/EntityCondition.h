@@ -101,7 +101,7 @@ public:
 
 	virtual void			LoadCondition			(LPCSTR section);
 	virtual void			LoadTwoHitsDeathParams	(LPCSTR section);
-	virtual void			remove_links			(const CObject *object);
+	virtual void			remove_links			(const IGameObject *object);
 
 	virtual void			save					(NET_Packet &output_packet);
 	virtual void			load					(IReader &input_packet);
@@ -144,7 +144,7 @@ public:
 	//скорость потери крови из всех открытых ран 
 	float					BleedingSpeed			();
 
-	CObject*				GetWhoHitLastTime		() {return m_pWho;}
+	IGameObject*				GetWhoHitLastTime		() {return m_pWho;}
 	u16						GetWhoHitLastTimeID		() {return m_iWhoID;}
 
 	CWound*					AddWound				(float hit_power, ALife::EHitType hit_type, u16 element);
@@ -250,7 +250,7 @@ protected:
 	u64					m_iLastTimeCalled;
 	float				m_fDeltaTime;
 	//кто нанес последний хит
-	CObject*			m_pWho;
+	IGameObject*			m_pWho;
 	u16					m_iWhoID;
 
 	//для передачи параметров из DamageManager

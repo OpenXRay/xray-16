@@ -4,7 +4,7 @@
 
 #include "xrcdb.h"
 
-class CObject;
+class IGameObject;
 namespace collide 
 {
 	struct			tri {
@@ -81,10 +81,10 @@ namespace collide
 	};
 	struct			rq_result 
 	{
-		CObject*	O;				// if NULL - static
+        IGameObject*	O;				// if NULL - static
 		float		range;			// range to intersection
 		int			element;		// номер кости/номер треугольника
-		IC rq_result& set		(CObject* _O, float _range, int _element)
+		IC rq_result& set		(IGameObject* _O, float _range, int _element)
 		{
 			O		= _O;
 			range	= _range;
@@ -93,7 +93,7 @@ namespace collide
 		}
 		IC BOOL		set_if_less	(CDB::RESULT*	I){if (I->range<range){ set(0,I->range,I->id);			return TRUE;}else return FALSE;}
 		IC BOOL		set_if_less	(rq_result*		R){if (R->range<range){ set(R->O,R->range,R->element);	return TRUE;}else return FALSE;}
-		IC BOOL		set_if_less	(CObject* _who, float _range, int _element)	{ if (_range<range) { set(_who,_range,_element); return TRUE;}else return FALSE;}
+		IC BOOL		set_if_less	(IGameObject* _who, float _range, int _element)	{ if (_range<range) { set(_who,_range,_element); return TRUE;}else return FALSE;}
 		IC BOOL		valid		() {return (element>=0);}
 	};
 	DEFINE_VECTOR	(rq_result,rqVec,rqIt);
@@ -104,7 +104,7 @@ namespace collide
 		rqVec		results;
 		static bool	r_sort_pred		(const rq_result& a, const rq_result& b)	{	return a.range<b.range;}
 	public:
-		IC BOOL		append_result	(CObject* _who, float _range, int _element, BOOL bNearest)
+		IC BOOL		append_result	(IGameObject* _who, float _range, int _element, BOOL bNearest)
 		{
 			if (bNearest&&!results.empty()){
 				rq_result& R		= results.back();
@@ -137,6 +137,6 @@ namespace collide
 
 	};
 	typedef  BOOL		rq_callback 	(rq_result& result, LPVOID user_data);
-	typedef  BOOL		test_callback 	(const ray_defs& rd, CObject* object, LPVOID user_data);
+	typedef  BOOL		test_callback 	(const ray_defs& rd, IGameObject* object, LPVOID user_data);
 };
 #endif

@@ -47,8 +47,8 @@ private:
 			void			add_operators			(CWeapon		*weapon);
 			void			add_evaluators			(CMissile		*missile);
 			void			add_operators			(CMissile		*missile);
-			void			remove_evaluators		(CObject		*object);
-			void			remove_operators		(CObject		*object);
+			void			remove_evaluators		(IGameObject		*object);
+			void			remove_operators		(IGameObject		*object);
 			void			init_storage			();
 	IC	EWorldProperties	object_property			(EObjectAction object_action) const;
 #ifdef LOG_ACTION
@@ -59,7 +59,7 @@ public:
 
 public:
 	IC		_condition_type	uid						(const u32 id1, const u32 id0) const;
-	IC		bool			object_action			(_condition_type action_id, CObject *object);
+	IC		bool			object_action			(_condition_type action_id, IGameObject *object);
 	IC		u16				current_action_object_id() const;
 	IC		u32				current_action_state_id	() const;
 	IC		u16				action_object_id		(_condition_type action_id) const;

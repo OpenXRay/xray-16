@@ -405,7 +405,7 @@ void CShootingObject::RenderLight()
 	}
 }
 
-bool CShootingObject::SendHitAllowed		(CObject* pUser)
+bool CShootingObject::SendHitAllowed		(IGameObject* pUser)
 {
 	if (Game().IsServerControlHits())
 		return OnServer();

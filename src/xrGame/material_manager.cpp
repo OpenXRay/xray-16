@@ -14,7 +14,7 @@
 #include "CharacterPhysicsSupport.h"
 #include "Include/xrRender/Kinematics.h"
 
-CMaterialManager::CMaterialManager	(CObject *object, CPHMovementControl *movement_control)
+CMaterialManager::CMaterialManager	(IGameObject *object, CPHMovementControl *movement_control)
 {
 	VERIFY					(object);
 	m_object				= object;

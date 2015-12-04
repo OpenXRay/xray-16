@@ -575,9 +575,9 @@ IC		void	CCharacterPhysicsSupport::						UpdateDeathAnims				()
 	}
 }
 #ifdef DEBUG
-void	DBG_PhysBones( CObject &O );
-void	DBG_DrawBones( CObject &O );
-void	DBG_DrawBind ( CObject &O );
+void	DBG_PhysBones( IGameObject &O );
+void	DBG_DrawBones( IGameObject &O );
+void	DBG_DrawBind ( IGameObject &O );
 BOOL dbg_draw_character_bones			=false;
 BOOL dbg_draw_character_physics			=false;
 BOOL dbg_draw_character_binds			=false;
@@ -859,7 +859,7 @@ void CCharacterPhysicsSupport::update_animation_collision		( )
 #ifdef	DEBUG
 BOOL dbg_draw_ragdoll_spawn = FALSE;
 #endif
-void CCharacterPhysicsSupport::ActivateShell			( CObject* who )
+void CCharacterPhysicsSupport::ActivateShell			( IGameObject* who )
 {
 	R_ASSERT( _valid(m_EntityAlife.Position( )) );
 	Fvector start;start.set( m_EntityAlife.Position( ) );
@@ -1061,7 +1061,7 @@ void	CCharacterPhysicsSupport::	AddActiveWeaponCollision		()
 	//DBG_ClosedCashedDraw( 50000 );
 }
 
-void	CCharacterPhysicsSupport::	CreateShell						( CObject* who, Fvector& dp, Fvector & velocity  )
+void	CCharacterPhysicsSupport::	CreateShell						( IGameObject* who, Fvector& dp, Fvector & velocity  )
 {
 	xr_delete( m_collision_activating_delay );
 	xr_delete( m_interactive_animation );
@@ -1174,7 +1174,7 @@ void	CCharacterPhysicsSupport::	CreateShell						( CObject* who, Fvector& dp, Fv
 	m_pPhysicsShell->SetIgnoreSmall();
 	AddActiveWeaponCollision();
 }
-void	CCharacterPhysicsSupport::	EndActivateFreeShell			( CObject* who, const Fvector& inital_entity_position, const Fvector& dp, const Fvector & velocity )
+void	CCharacterPhysicsSupport::	EndActivateFreeShell			( IGameObject* who, const Fvector& inital_entity_position, const Fvector& dp, const Fvector & velocity )
 {
 	VERIFY ( m_pPhysicsShell );
 	VERIFY( m_eState==esDead );
@@ -1329,7 +1329,7 @@ void CCharacterPhysicsSupport::DestroyIKController()
 	xr_delete(m_ik_controller);
 }
 
-void		 CCharacterPhysicsSupport::in_NetRelcase(CObject* O)																													
+void		 CCharacterPhysicsSupport::in_NetRelcase(IGameObject* O)																													
 {
 	m_PhysicMovementControl->NetRelcase( O );
 

@@ -95,7 +95,7 @@ debug::text_tree&   CLevelDebug::get_text_tree ()
 	return *m_p_texttree;
 }
 
-CLevelDebug::CObjectInfo &CLevelDebug::object_info(CObject *obj, LPCSTR class_name)
+CLevelDebug::CObjectInfo &CLevelDebug::object_info(IGameObject *obj, LPCSTR class_name)
 {
 	OBJECT_INFO_MAP_IT	obj_it = m_objects_info.find(obj);
 	if (obj_it != m_objects_info.end()) {
@@ -338,7 +338,7 @@ void CLevelDebug::CLevelInfo::draw_info()
 	process				(pred);	
 }
 
-void CLevelDebug::on_destroy_object(CObject *obj)
+void CLevelDebug::on_destroy_object(IGameObject *obj)
 {
 	// handle all of the objects
 	for (OBJECT_INFO_MAP_IT it = m_objects_info.begin(); it != m_objects_info.end(); ++it) {

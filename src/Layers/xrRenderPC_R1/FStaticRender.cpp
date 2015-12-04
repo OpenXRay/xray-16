@@ -266,7 +266,7 @@ void					CRender::set_Object				(IRenderable*		O )
 	VERIFY					(g_bRendering);
 	val_pObject				= O;		// NULL is OK, trust me :)
 	if (val_pObject)		{
-		VERIFY(dynamic_cast<CObject*>(O)||dynamic_cast<CPS_Instance*>(O));
+		VERIFY(dynamic_cast<IGameObject*>(O)||dynamic_cast<CPS_Instance*>(O));
 		if (O->GetRenderData().pROS) { VERIFY(dynamic_cast<CROS_impl*>(O->GetRenderData().pROS)); }
 	}
 	if (PHASE_NORMAL==phase)	{
@@ -288,7 +288,7 @@ void					CRender::apply_object			(IRenderable*		O )
 	if (0==O)			return	;
 	if (PHASE_NORMAL==phase	&& O->renderable_ROS())		{
 		CROS_impl& LT		= *((CROS_impl*)O->GetRenderData().pROS);
-		VERIFY(dynamic_cast<CObject*>(O)||dynamic_cast<CPS_Instance*>(O));
+		VERIFY(dynamic_cast<IGameObject*>(O)||dynamic_cast<CPS_Instance*>(O));
 		VERIFY(dynamic_cast<CROS_impl*>(O->GetRenderData().pROS));
 		float o_hemi		= 0.5f*LT.get_hemi						();
 		float o_sun			= 0.5f*LT.get_sun						();
@@ -445,7 +445,7 @@ void CRender::Calculate				()
 				if (lstRenderables.size())		uID_LTRACK	= uLastLTRACK%lstRenderables.size();
 
 				// update light-vis for current entity / actor
-				CObject*	O					= g_pGameLevel->CurrentViewEntity();
+				IGameObject*	O					= g_pGameLevel->CurrentViewEntity();
 				if (O)		{
 					CROS_impl*	R					= (CROS_impl*) O->ROS();
 					if (R)		R->update			(O);

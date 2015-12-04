@@ -123,17 +123,17 @@ public:
 class CPHScriptGameObjectCondition :
 	public CPHScriptObjectConditionN
 {
-	CObject* m_obj;
+	IGameObject* m_obj;
 	bool	 b_obsolete;
 public:
-	CPHScriptGameObjectCondition( const luabind::object &object,const luabind::functor<bool> &functor,CObject* gobj):
+	CPHScriptGameObjectCondition( const luabind::object &object,const luabind::functor<bool> &functor,IGameObject* gobj):
 	CPHScriptObjectConditionN(object,functor)
 	{
 		m_obj=gobj;
 		b_obsolete=false;
 	}
 	virtual bool 			is_true							()											{b_obsolete=CPHScriptObjectConditionN::is_true();return b_obsolete;}
-	virtual bool			compare							(const	CObject* v)			const			{return m_obj->ID()==v->ID();}
+	virtual bool			compare							(const	IGameObject* v)			const			{return m_obj->ID()==v->ID();}
 	virtual bool			compare							(const	CPHReqComparerV* v)	const			{return v->compare(this);}
 	virtual bool			obsolete						()							const			{return b_obsolete;}
 };
@@ -141,15 +141,15 @@ public:
 class CPHScriptGameObjectAction :
 	public CPHScriptObjectActionN
 {
-	CObject* m_obj;
+	IGameObject* m_obj;
 public:
-	CPHScriptGameObjectAction( const luabind::object &object,const luabind::functor<void> &functor,CObject* gobj):
+	CPHScriptGameObjectAction( const luabind::object &object,const luabind::functor<void> &functor,IGameObject* gobj):
 	CPHScriptObjectActionN(object,functor)
 	{
 		m_obj=gobj;
 	}
 	virtual bool			compare							(const	CPHReqComparerV* v)	const			{return v->compare(this);}
-	virtual bool			compare							(const	CObject* v)			const			{return m_obj->ID()==v->ID();}
+	virtual bool			compare							(const	IGameObject* v)			const			{return m_obj->ID()==v->ID();}
 };
 
 class CPHSriptReqObjComparer :
@@ -171,10 +171,10 @@ public:
 class CPHSriptReqGObjComparer :
 	public CPHReqComparerV
 {
-	CObject				*m_object;
+	IGameObject				*m_object;
 
 public:
-	CPHSriptReqGObjComparer	(CObject* object)			{m_object= object;}
+	CPHSriptReqGObjComparer	(IGameObject* object)			{m_object= object;}
 	virtual		bool		compare					(const	CPHScriptGameObjectAction* v)	const	{return v->compare(m_object);}
 	virtual		bool		compare					(const	CPHScriptGameObjectCondition* v)const	{return v->compare(m_object);}
 };

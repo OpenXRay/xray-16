@@ -173,7 +173,7 @@ class	type_motion2: public type_motion
 		if( H.initiator() !=  Level().CurrentControlEntity())
 		return false;
 		
-		CObject* O = Level().Objects.net_Find( H.weaponID );
+		IGameObject* O = Level().Objects.net_Find( H.weaponID );
 		if(!O)
 			return false;
 		//static_cast<CGameObject*>(O)->cast_weapon()
@@ -215,7 +215,7 @@ class	type_motion3: public type_motion
 
 bool is_snipper( u16 weaponID )
 {
-	CObject* O = Level().Objects.net_Find( weaponID );
+	IGameObject* O = Level().Objects.net_Find( weaponID );
 	if(!O)
 		return false;
 	CWeaponMagazined* WM = smart_cast<CWeaponMagazined*>( O );
@@ -296,7 +296,7 @@ class	type_motion6: public type_motion
 			return true;
 		}
 
-		CObject* O = Level().Objects.net_Find( H.weaponID );
+		IGameObject* O = Level().Objects.net_Find( H.weaponID );
 		if(!O)
 		{
 			m = MotionID();

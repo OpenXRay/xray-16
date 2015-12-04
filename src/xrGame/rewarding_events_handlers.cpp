@@ -50,7 +50,7 @@ void rewarding_event_handlers::OnBullet_Fire(u16 sender, u16 sender_weapon_id, c
 		m_null_hanlder->OnBullet_Fire(sender, sender_weapon_id, position, direction);
 }
 
-void rewarding_event_handlers::OnBullet_Hit		(CObject const * hitter, CObject const * victim, CObject const * weapon, u16 const bone)
+void rewarding_event_handlers::OnBullet_Hit		(IGameObject const * hitter, IGameObject const * victim, IGameObject const * weapon, u16 const bone)
 {
 	for (handlers_store_t::iterator i = m_events_store.begin(),
 		ie = m_events_store.end(); i != ie; ++i)

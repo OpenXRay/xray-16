@@ -18,21 +18,21 @@ public:
 
 	// -----------------------------------------------------
 	bool				is_hit					() {return !m_hits.empty();}
-	bool				is_hit					(CObject *pO);
+	bool				is_hit					(IGameObject *pO);
 
 	// Lain: added
 	int                 get_num_hits            () {return m_hits.size(); }
 
-	void				add_hit					(CObject *who, EHitSide side);
+	void				add_hit					(IGameObject *who, EHitSide side);
 	
 	Fvector				get_last_hit_dir		();
 	TTime				get_last_hit_time		();
-	CObject				*get_last_hit_object	();
+	IGameObject				*get_last_hit_object	();
 	Fvector				get_last_hit_position	();
 	
 	void				clear					() {m_hits.clear();}
 
-	void				remove_hit_info			(const CObject *obj);
+	void				remove_hit_info			(const IGameObject *obj);
 
 private:
 	void				remove_non_actual		();

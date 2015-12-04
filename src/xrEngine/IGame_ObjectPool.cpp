@@ -3,6 +3,7 @@
 #include "IGame_Persistent.h"
 #include "IGame_ObjectPool.h"
 #include "xr_object.h"
+#include "xrServerEntities/smart_cast.h"
 
 IGame_ObjectPool::IGame_ObjectPool(void)
 {
@@ -29,7 +30,7 @@ void IGame_ObjectPool::prefetch()
         const CInifile::Item& item = *I;
         CLASS_ID CLS = pSettings->r_clsid(item.first.c_str(), "class");
         p_count++;
-        CObject* pObject = (CObject*)NEW_INSTANCE(CLS);
+        IGameObject* pObject = smart_cast<IGameObject*>(NEW_INSTANCE(CLS));
         pObject->Load(item.first.c_str());
         VERIFY2(pObject->cNameSect().c_str(), item.first.c_str());
         m_PrefetchObjects.push_back(pObject);
@@ -49,16 +50,16 @@ void IGame_ObjectPool::clear()
     m_PrefetchObjects.clear();
 }
 
-CObject* IGame_ObjectPool::create(LPCSTR name)
+IGameObject* IGame_ObjectPool::create(LPCSTR name)
 {
     CLASS_ID CLS = pSettings->r_clsid(name, "class");
-    CObject* O = (CObject*)NEW_INSTANCE(CLS);
+    IGameObject* O = smart_cast<IGameObject*>(NEW_INSTANCE(CLS));
     O->cNameSect_set(name);
     O->Load(name);
     return O;
 }
 
-void IGame_ObjectPool::destroy(CObject* O)
+void IGame_ObjectPool::destroy(IGameObject* O)
 {
     xr_delete(O);
 }
@@ -85,7 +86,7 @@ count += (count==0)?1:0;
 R_ASSERT2 ((count>0) && (count<=128), "Too many objects for prefetching");
 p_count += count;
 for (int c=0; c<count; c++){
-CObject* pObject= (CObject*) NEW_INSTANCE(CLS);
+IGameObject* pObject= (IGameObject*) NEW_INSTANCE(CLS);
 pObject->Load (item.first.c_str());
 VERIFY2 (pObject->cNameSect().c_str(),item.first.c_str());
 map_POOL.insert (mk_pair(pObject->cNameSect(),pObject));
@@ -113,27 +114,27 @@ xr_delete (it->second);
 map_POOL.clear();
 }
 
-CObject* IGame_ObjectPool::create ( LPCSTR name )
+IGameObject* IGame_ObjectPool::create ( LPCSTR name )
 {
 string256 l_name;
 POOL_IT it = map_POOL.find (shared_str(strlwr(xr_strcpy(l_name,name))));
 if (it!=map_POOL.end())
 {
 // Instance found
-CObject* O = it->second;
+IGameObject* O = it->second;
 map_POOL.erase (it);
 return O;
 } else {
 // Create and load _new instance
 // Msg ("! Uncached loading '%s'...",name);
 CLASS_ID CLS = pSettings->r_clsid (name,"class");
-CObject* O = (CObject*) NEW_INSTANCE (CLS);
+IGameObject* O = (IGameObject*) NEW_INSTANCE (CLS);
 O->Load (name);
 return O;
 }
 }
 
-void IGame_ObjectPool::destroy ( CObject* O )
+void IGame_ObjectPool::destroy ( IGameObject* O )
 {
 map_POOL.insert (mk_pair(O->cNameSect(),O));
 }

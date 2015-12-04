@@ -326,7 +326,7 @@ void CAI_Stalker::Hit(SHit* pHDS)
 	inherited::Hit					( &HDS );
 }
 
-void CAI_Stalker::HitSignal				(float amount, Fvector& vLocalDir, CObject* who, s16 element)
+void CAI_Stalker::HitSignal				(float amount, Fvector& vLocalDir, IGameObject* who, s16 element)
 {
 }
 
@@ -698,8 +698,8 @@ bool CAI_Stalker::undetected_anomaly	()
 
 bool CAI_Stalker::inside_anomaly		()
 {
-	xr_vector<CObject*>::const_iterator	I = feel_touch.begin();
-	xr_vector<CObject*>::const_iterator	E = feel_touch.end();
+	xr_vector<IGameObject*>::const_iterator	I = feel_touch.begin();
+	xr_vector<IGameObject*>::const_iterator	E = feel_touch.end();
 	for ( ; I != E; ++I) {
 		CCustomZone			*zone = smart_cast<CCustomZone*>(*I);
 		if ( zone && (zone->restrictor_type() != RestrictionSpace::eRestrictorTypeNone) ) {
@@ -819,7 +819,7 @@ void CAI_Stalker::on_weapon_hide			(CWeapon *weapon)
 {
 }
 
-void CAI_Stalker::notify_on_wounded_or_killed	(CObject *object)
+void CAI_Stalker::notify_on_wounded_or_killed	(IGameObject *object)
 {
 	CAI_Stalker							*stalker = smart_cast<CAI_Stalker*>(object);
 	if (!stalker)
@@ -845,7 +845,7 @@ void CAI_Stalker::notify_on_wounded_or_killed	()
 	if (last_hit_object_id == ALife::_OBJECT_ID(-1))
 		return;
 
-	CObject								*object = Level().Objects.net_Find(last_hit_object_id);
+	IGameObject								*object = Level().Objects.net_Find(last_hit_object_id);
 	if (!object)
 		return;
 
@@ -928,7 +928,7 @@ void CAI_Stalker::compute_throw_miss		( u32 const vertex_id )
 	}
 }
 
-void CAI_Stalker::throw_target_impl			(const Fvector &position, CObject *throw_ignore_object )
+void CAI_Stalker::throw_target_impl			(const Fvector &position, IGameObject *throw_ignore_object )
 {
 	float					distance_to_sqr = position.distance_to_sqr(m_throw_target_position);
 	m_throw_actual			= m_throw_actual && (distance_to_sqr < _sqr(.1f));
@@ -936,12 +936,12 @@ void CAI_Stalker::throw_target_impl			(const Fvector &position, CObject *throw_i
 	m_throw_ignore_object	= throw_ignore_object;
 }
 
-void CAI_Stalker::throw_target				(const Fvector &position, CObject *throw_ignore_object )
+void CAI_Stalker::throw_target				(const Fvector &position, IGameObject *throw_ignore_object )
 {
 	throw_target_impl		( position, throw_ignore_object );
 }
 
-void CAI_Stalker::throw_target				(const Fvector &position, u32 const vertex_id, CObject *throw_ignore_object )
+void CAI_Stalker::throw_target				(const Fvector &position, u32 const vertex_id, IGameObject *throw_ignore_object )
 {
 	throw_target_impl		( position, throw_ignore_object );
 	compute_throw_miss		( vertex_id );

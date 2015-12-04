@@ -8,7 +8,7 @@
 #include "xrPhysics/PhysicsShell.h"
 
 
-CBlackDrops::CBlackDrops(void) 
+CBlackDrops::CBlackDrops(void)
 {
 }
 

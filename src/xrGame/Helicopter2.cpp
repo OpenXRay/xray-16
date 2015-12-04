@@ -14,7 +14,7 @@
 #include "actor.h"
 #include "physics_game.h"
 
-bool CHelicopter::isObjectVisible			(CObject* O)
+bool CHelicopter::isObjectVisible			(IGameObject* O)
 {
 	Fvector					dir_to_object;
 	Fvector					to_point;
@@ -345,7 +345,7 @@ void SHeliEnemy::Update()
 		case eEnemyPoint:
 			break;
 		case eEnemyEntity:{
-				CObject* O = Level().Objects.net_Find(destEnemyID);
+				IGameObject* O = Level().Objects.net_Find(destEnemyID);
 				if(O)	O->Center( destEnemyPos );
 				else	type = eEnemyNone;
 			}break;

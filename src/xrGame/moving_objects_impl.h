@@ -16,7 +16,7 @@ static const u32   inertia_time_ms			= 500;
 static const float additional_radius		= 2.f;
 static const float max_linear_velocity		= 10.f;
 
-IC	bool moving_objects::collided			(const CObject *object, const Fvector &position, const float &radius) const
+IC	bool moving_objects::collided			(const IGameObject *object, const Fvector &position, const float &radius) const
 {
 	return	(object->Position().distance_to(position) <= (object->Radius() + radius));
 }

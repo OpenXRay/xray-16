@@ -62,7 +62,7 @@ bool ignore_static_tri( int tri )
 	return ignore_tri( *triangle );
 }
 
-IC bool ignore_object( CObject	*O )
+IC bool ignore_object( IGameObject	*O )
 {
 	VERIFY( O );
 	if( static_cast<CGameObject*>( O )->cast_entity_alive() /*&& static_cast<CGameObject*>( O )->cast_entity_alive()->g_Alive() */)
@@ -177,7 +177,7 @@ IC bool get_plane( ik_pick_result &r,  Fvector &next_pos, float &next_range, con
 		return get_plane_dynamic( r, next_pos, next_range, R, pick_dist, pos, pick_v );
 }
 
-bool Pick( ik_pick_result &r, const ik_pick_query &q , CObject* ignore_object)
+bool Pick( ik_pick_result &r, const ik_pick_query &q , IGameObject* ignore_object)
 {
 	VERIFY( q.is_valid() );
 

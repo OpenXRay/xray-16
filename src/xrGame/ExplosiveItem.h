@@ -26,7 +26,7 @@ public:
 	virtual void				net_Destroy				()											;
 	virtual void				net_Export				(NET_Packet& P)								{CInventoryItemObject::net_Export(P);}
 	virtual void				net_Import				(NET_Packet& P)								{CInventoryItemObject::net_Import(P);}
-	virtual void				net_Relcase				(CObject* O )								;
+	virtual void				net_Relcase				(IGameObject* O )								;
 	virtual CGameObject			*cast_game_object		()											{return this;}
 	virtual CExplosive*			cast_explosive			()											{return this;}
 	virtual IDamageSource*		cast_IDamageSource		()											{return CExplosive::cast_IDamageSource();}

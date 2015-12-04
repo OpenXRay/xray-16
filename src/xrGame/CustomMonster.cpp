@@ -565,7 +565,7 @@ void CCustomMonster::UpdatePositionAnimation()
 	STOP_PROFILE
 }
 
-BOOL CCustomMonster::feel_visible_isRelevant (CObject* O)
+BOOL CCustomMonster::feel_visible_isRelevant (IGameObject* O)
 {
 	CEntityAlive* E = smart_cast<CEntityAlive*>		(O);
 	if (0==E)								return FALSE;
@@ -680,11 +680,11 @@ void CCustomMonster::UpdateCamera()
 	g_pGameLevel->Cameras().Update(eye_matrix.c,eye_matrix.k,eye_matrix.j,new_fov,.75f,new_range,0);
 }
 
-void CCustomMonster::HitSignal(float /**perc/**/, Fvector& /**vLocalDir/**/, CObject* /**who/**/)
+void CCustomMonster::HitSignal(float /**perc/**/, Fvector& /**vLocalDir/**/, IGameObject* /**who/**/)
 {
 }
 
-void CCustomMonster::Die	(CObject* who)
+void CCustomMonster::Die	(IGameObject* who)
 {
 	inherited::Die			(who);
 	//Level().RemoveMapLocationByID(this->ID());
@@ -786,7 +786,7 @@ void CCustomMonster::Exec_Action(float /**dt/**/)
 {
 }
 
-//void CCustomMonster::Hit(float P, Fvector &dir,CObject* who, s16 element,Fvector position_in_object_space, float impulse, ALife::EHitType hit_type)
+//void CCustomMonster::Hit(float P, Fvector &dir,IGameObject* who, s16 element,Fvector position_in_object_space, float impulse, ALife::EHitType hit_type)
 void			CCustomMonster::Hit					(SHit* pHDS)
 {
 	if (!invulnerable())
@@ -859,7 +859,7 @@ void CCustomMonster::PitchCorrection()
 
 }
 
-bool CCustomMonster::feel_touch_on_contact	(CObject *O)
+bool CCustomMonster::feel_touch_on_contact	(IGameObject *O)
 {
 	CCustomZone	*custom_zone = smart_cast<CCustomZone*>(O);
 	if (!custom_zone)
@@ -874,7 +874,7 @@ bool CCustomMonster::feel_touch_on_contact	(CObject *O)
 	return		(false);
 }
 
-bool CCustomMonster::feel_touch_contact		(CObject *O)
+bool CCustomMonster::feel_touch_contact		(IGameObject *O)
 {
 	CCustomZone	*custom_zone = smart_cast<CCustomZone*>(O);
 	if (!custom_zone)
@@ -904,17 +904,17 @@ void CCustomMonster::load_killer_clsids(LPCSTR section)
 		m_killer_clsids.push_back	(TEXT2CLSID(_GetItem(killers,i,temp)));
 }
 
-bool CCustomMonster::is_special_killer(CObject *obj)
+bool CCustomMonster::is_special_killer(IGameObject *obj)
 {
-	return (obj && (std::find(m_killer_clsids.begin(),m_killer_clsids.end(),obj->CLS_ID) != m_killer_clsids.end()));  
+	return (obj && (std::find(m_killer_clsids.begin(),m_killer_clsids.end(),obj->GetClassId()) != m_killer_clsids.end()));  
 }
 
-float CCustomMonster::feel_vision_mtl_transp(CObject* O, u32 element)
+float CCustomMonster::feel_vision_mtl_transp(IGameObject* O, u32 element)
 {
 	return	(memory().visual().feel_vision_mtl_transp(O,element));
 }
 
-void CCustomMonster::feel_sound_new	(CObject* who, int type, CSound_UserDataPtr user_data, const Fvector &position, float power)
+void CCustomMonster::feel_sound_new	(IGameObject* who, int type, CSound_UserDataPtr user_data, const Fvector &position, float power)
 {
 	// Lain: added
 	if (!g_Alive())
@@ -995,7 +995,7 @@ IFactoryObject *CCustomMonster::_construct()
 	return						(this);
 }
 
-void CCustomMonster::net_Relcase	(CObject *object)
+void CCustomMonster::net_Relcase	(IGameObject *object)
 {
 	inherited::net_Relcase		(object);
 	memory().remove_links		(object);
@@ -1099,7 +1099,7 @@ bool CCustomMonster::update_critical_wounded	(const u16 &bone_id, const float &p
 #ifdef DEBUG
 
 extern void dbg_draw_frustum (float FOV, float _FAR, float A, Fvector &P, Fvector &D, Fvector &U);
-void draw_visiblity_rays	(CCustomMonster *self, const CObject *object, collide::rq_results& rq_storage);
+void draw_visiblity_rays	(CCustomMonster *self, const IGameObject *object, collide::rq_results& rq_storage);
 
 void CCustomMonster::OnRender()
 {

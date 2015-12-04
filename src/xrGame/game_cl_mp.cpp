@@ -182,7 +182,7 @@ bool game_cl_mp::OnKeyboardPress(int key)
 	{
 		bool b_need_to_send_ready = false;
 
-		CObject* curr = Level().CurrentControlEntity();
+		IGameObject* curr = Level().CurrentControlEntity();
 		if (!curr) return(false);
 
 		bool is_actor		= !!smart_cast<CActor*>(curr);
@@ -822,8 +822,8 @@ void game_cl_mp::OnPlayerKilled			(NET_Packet& P)
 	if (m_reward_generator)
 		m_reward_generator->OnPlayerKilled(KillerID, KilledID, WeaponID, std::make_pair(KillType, SpecialKill));
 	//-----------------------------------------------------------
-	CObject* pOKiller = Level().Objects.net_Find(KillerID);
-	CObject* pWeapon = Level().Objects.net_Find(WeaponID);
+	IGameObject* pOKiller = Level().Objects.net_Find(KillerID);
+	IGameObject* pWeapon = Level().Objects.net_Find(WeaponID);
 
 	game_PlayerState* pPlayer = GetPlayerByGameID(KilledID);
 	if (!pPlayer)
@@ -1069,7 +1069,7 @@ void	game_cl_mp::OnPlayerChangeName		(NET_Packet& P)
 	if(CurrentGameUI()) CurrentGameUI()->CommonMessageOut(resStr);
 	Msg( NewName );
 	//-------------------------------------------
-	CObject* pObj = Level().Objects.net_Find(ObjID);
+	IGameObject* pObj = Level().Objects.net_Find(ObjID);
 	if (pObj)
 	{
 		pObj->cName_set(NewName);
@@ -1265,7 +1265,7 @@ void	game_cl_mp::OnEventMoneyChanged			(NET_Packet& P)
 
 void	game_cl_mp::OnSpectatorSelect		()
 {
-	CObject *l_pObj = Level().CurrentEntity();
+	IGameObject *l_pObj = Level().CurrentEntity();
 
 	CGameObject *l_pPlayer = smart_cast<CGameObject*>(l_pObj);
 	if(!l_pPlayer) return;
@@ -1923,7 +1923,7 @@ void game_cl_mp::extract_server_info(u8* data_ptr, u32 data_size)
 
 void game_cl_mp::AddRewardTask(u32 const award_id)
 {
-	CObject* tmp_view_entity = Level().CurrentViewEntity();
+	IGameObject* tmp_view_entity = Level().CurrentViewEntity();
 	if ((tmp_view_entity && local_player) &&
 		(tmp_view_entity->ID() == local_player->GameID))
 	{

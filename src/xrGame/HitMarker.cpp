@@ -133,7 +133,7 @@ void CHitMarker::Update_GrenadeView( Fvector& pos_actor )
 
 }
 
-void CHitMarker::net_Relcase( CObject* obj )
+void CHitMarker::net_Relcase( IGameObject* obj )
 {
 	u16 remove_id = obj->ID();
 

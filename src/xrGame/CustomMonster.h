@@ -114,8 +114,8 @@ public:
 	u32						NET_Time;				// server time of last update
 //------------------------------
 
-	virtual bool		feel_touch_on_contact	(CObject *);
-	virtual bool		feel_touch_contact		(CObject *);
+	virtual bool		feel_touch_on_contact	(IGameObject *);
+	virtual bool		feel_touch_contact		(IGameObject *);
 	// utils
 	void				mk_orientation			( Fvector& dir, Fmatrix& mR );
 	void				mk_rotation				( Fvector& dir, SRotation &R);
@@ -142,9 +142,9 @@ public:
 
 	virtual IFactoryObject	*_construct				();
 	virtual BOOL		net_Spawn				( CSE_Abstract* DC);
-	virtual void		Die						( CObject* who);
+	virtual void		Die						( IGameObject* who);
 
-	virtual void		HitSignal				( float P,	Fvector& vLocalDir, CObject* who);
+	virtual void		HitSignal				( float P,	Fvector& vLocalDir, IGameObject* who);
 	virtual void		g_WeaponBones			(int &/**L/**/, int &/**R1/**/, int &/**R2/**/) {};
 	virtual void		shedule_Update					( u32		DT		);
 	virtual void		UpdateCL				( );
@@ -152,7 +152,7 @@ public:
 	// Network
 	virtual void		net_Export				(NET_Packet& P);				// export to server
 	virtual void		net_Import				(NET_Packet& P);				// import from server
-	virtual void		net_Relcase				(CObject*	 O);
+	virtual void		net_Relcase				(IGameObject*	 O);
 
 	virtual void		SelectAnimation			( const Fvector& _view, const Fvector& _move, float speed ) = 0;
 
@@ -175,8 +175,8 @@ public:
 	virtual	float				ffGetRange				()	const								{return eye_range;}
 			void				set_fov					(float new_fov);
 			void				set_range				(float new_range);
-//	virtual	void				feel_touch_new			(CObject	*O);
-	virtual BOOL				feel_visible_isRelevant	(CObject		*O);
+//	virtual	void				feel_touch_new			(IGameObject	*O);
+	virtual BOOL				feel_visible_isRelevant	(IGameObject		*O);
 	virtual	Feel::Sound*		dcast_FeelSound			()			{ return this;	}
 	virtual	void				Hit						(SHit* pHDS);
 
@@ -215,11 +215,11 @@ public:
 	virtual CScriptEntity*		cast_script_entity		()	{return this;}
 
 			void				load_killer_clsids		(LPCSTR section);
-			bool				is_special_killer		(CObject *obj);
+			bool				is_special_killer		(IGameObject *obj);
 
 	IC		CMemoryManager		&memory					() const;
-	virtual float				feel_vision_mtl_transp	(CObject* O, u32 element);
-	virtual	void				feel_sound_new			(CObject* who, int type, CSound_UserDataPtr user_data, const Fvector &Position, float power);
+	virtual float				feel_vision_mtl_transp	(IGameObject* O, u32 element);
+	virtual	void				feel_sound_new			(IGameObject* who, int type, CSound_UserDataPtr user_data, const Fvector &Position, float power);
 
 	virtual bool				useful					(const CItemManager *manager, const CGameObject *object) const;
 	virtual float				evaluate				(const CItemManager *manager, const CGameObject *object) const;

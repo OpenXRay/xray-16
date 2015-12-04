@@ -19,7 +19,7 @@ CParticlesPlayer::SParticlesInfo* CParticlesPlayer::SBoneInfo::FindParticles(con
 		if (it->ps && it->ps->Name()==ps_name) return &(*it);
 	return 0;
 }
-CParticlesPlayer::SParticlesInfo* CParticlesPlayer::SBoneInfo::AppendParticles(CObject* object, const shared_str& ps_name)
+CParticlesPlayer::SParticlesInfo* CParticlesPlayer::SBoneInfo::AppendParticles(IGameObject* object, const shared_str& ps_name)
 {
 	SParticlesInfo* pi	= FindParticles(ps_name);
 	if (pi)				return pi;
@@ -139,7 +139,7 @@ void CParticlesPlayer::StartParticles(const shared_str& particles_name, u16 bone
 	VERIFY(fis_zero(xform.c.magnitude()));
 	R_ASSERT(*particles_name);
 	
-	CObject* object					= m_self_object;
+	IGameObject* object					= m_self_object;
 	VERIFY(object);
 
 	SBoneInfo* pBoneInfo			=  get_nearest_bone_info(smart_cast<IKinematics*>(object->Visual()),bone_num);
@@ -163,7 +163,7 @@ void CParticlesPlayer::StartParticles(const shared_str& particles_name, u16 bone
 
 void CParticlesPlayer::StartParticles(const shared_str& ps_name, const Fmatrix& xform, u16 sender_id, int life_time, bool auto_stop)
 {
-	CObject* object					= m_self_object;
+	IGameObject* object					= m_self_object;
 	VERIFY(object);
 	for(BoneInfoVecIt it = m_Bones.begin(); it!=m_Bones.end(); it++){
 		
@@ -243,7 +243,7 @@ void CParticlesPlayer::UpdateParticles()
 	if	(!m_bActiveBones)	return;
 	m_bActiveBones			= false;
 
-    CObject* object			= m_self_object;
+    IGameObject* object			= m_self_object;
 	VERIFY	(object);
 
 	for(BoneInfoVecIt b_it=m_Bones.begin(); b_it!=m_Bones.end(); b_it++){
@@ -281,7 +281,7 @@ void CParticlesPlayer::UpdateParticles()
 }
 
 
-void CParticlesPlayer::GetBonePos	(CObject* pObject, u16 bone_id, const Fvector& offset, Fvector& result)
+void CParticlesPlayer::GetBonePos	(IGameObject* pObject, u16 bone_id, const Fvector& offset, Fvector& result)
 {
 	VERIFY(pObject);
 	IKinematics* pKinematics = smart_cast<IKinematics*>(pObject->Visual()); VERIFY(pKinematics);
@@ -292,7 +292,7 @@ void CParticlesPlayer::GetBonePos	(CObject* pObject, u16 bone_id, const Fvector&
 	pObject->XFORM().transform_tiny(result);
 }
 
-void CParticlesPlayer::MakeXFORM	(CObject* pObject, u16 bone_id, const Fvector& dir, const Fvector& offset, Fmatrix& result)
+void CParticlesPlayer::MakeXFORM	(IGameObject* pObject, u16 bone_id, const Fvector& dir, const Fvector& offset, Fmatrix& result)
 {
 	generate_orthonormal_basis(dir,result);
 	GetBonePos(pObject, bone_id, offset, result.c);
@@ -312,7 +312,7 @@ u16 CParticlesPlayer::GetNearestBone	(IKinematics* K, u16 bone_id)
 void CParticlesPlayer::net_SpawnParticles	()
 {
 	VERIFY				(!m_self_object);
-	m_self_object		= smart_cast<CObject*>(this);
+	m_self_object		= smart_cast<IGameObject*>(this);
 	VERIFY				(m_self_object);
 
 }

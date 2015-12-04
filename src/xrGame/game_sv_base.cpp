@@ -1182,7 +1182,7 @@ void		game_sv_GameState::OnRender				()
 					game_PlayerState* PS		=	get_it			(p_it);
 					if (!PS) continue;
 					if (PS->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) continue;
-					CObject* pPlayer = Level().Objects.net_Find(PS->GameID);
+					IGameObject* pPlayer = Level().Objects.net_Find(PS->GameID);
 					if (!pPlayer) continue;
 
 					if (rp.P.distance_to(pPlayer->Position())<=0.4f)
@@ -1222,7 +1222,7 @@ void		game_sv_GameState::OnRender				()
 			game_PlayerState* PS		=	get_it			(p_it);
 			if (!PS) continue;
 			if (PS->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) continue;
-			CObject* pPlayer = Level().Objects.net_Find(PS->GameID);
+			IGameObject* pPlayer = Level().Objects.net_Find(PS->GameID);
 			if (!pPlayer) continue;
 
 			float r = .4f;

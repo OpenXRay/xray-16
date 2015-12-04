@@ -11,7 +11,7 @@
 #include "action_planner.h"
 
 class CAgentManager;
-class CObject;
+class IGameObject;
 
 class CAgentManagerPlanner : public CActionPlanner<CAgentManager> {
 private:
@@ -21,5 +21,5 @@ public:
 	virtual void		setup				(CAgentManager *object);
 			void		add_evaluators		();
 			void		add_actions			();
-			void		remove_links		(CObject *object);
+			void		remove_links		(IGameObject *object);
 };

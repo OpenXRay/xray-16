@@ -119,7 +119,7 @@ static	u16 BestWeaponSlots [] = {
 	GRENADE_SLOT	,		// 3
 	KNIFE_SLOT		,		// 0
 };
-void CActor::SelectBestWeapon	(CObject* O)
+void CActor::SelectBestWeapon	(IGameObject* O)
 {
 	if (!O) return;
 	if ( IsGameTypeSingle() ) return;
@@ -178,7 +178,7 @@ void CActor::SelectBestWeapon	(CObject* O)
 #define ENEMY_HIT_SPOT	"mp_hit_sector_location"
 BOOL	g_bShowHitSectors	= TRUE;
 
-void	CActor::HitSector(CObject* who, CObject* weapon)
+void	CActor::HitSector(IGameObject* who, IGameObject* weapon)
 {
 	if (!g_bShowHitSectors) return;
 	if (!g_Alive()) return;

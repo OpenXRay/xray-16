@@ -20,7 +20,7 @@
 extern Flags32 psAI_Flags;
 #endif // DEBUG
 
-bool CAI_Stalker::feel_vision_isRelevant(CObject* O)
+bool CAI_Stalker::feel_vision_isRelevant(IGameObject* O)
 {
 	if (!g_Alive())
 		return		false;
@@ -56,7 +56,7 @@ bool CAI_Stalker::bfCheckForNodeVisibility(u32 dwNodeID, bool bIfRayPick)
 	return							(memory().visual().visible(dwNodeID,movement().m_head.current.yaw,ffGetFov()));
 }
 
-bool CAI_Stalker::feel_touch_contact	(CObject *O)
+bool CAI_Stalker::feel_touch_contact	(IGameObject *O)
 {
 	if ( !m_take_items_enabled && smart_cast<CInventoryItem*>(O) )
 		return						(false);
@@ -74,17 +74,17 @@ bool CAI_Stalker::feel_touch_contact	(CObject *O)
 	return							(game_object->feel_touch_on_contact(this));
 }
 
-bool CAI_Stalker::feel_touch_on_contact	(CObject *O)
+bool CAI_Stalker::feel_touch_on_contact	(IGameObject *O)
 {
 	VERIFY							(O != this);
 
-	if ((O->spatial.type | STYPE_VISIBLEFORAI) != O->spatial.type)
+	if ((O->GetSpatialData().type | STYPE_VISIBLEFORAI) != O->GetSpatialData().type)
         return	(false);
 
 	return		(inherited::feel_touch_on_contact(O));
 }
 
-void CAI_Stalker::feel_touch_delete		(CObject* O)
+void CAI_Stalker::feel_touch_delete		(IGameObject* O)
 {
 	ignored_touched_objects_type::iterator	i = std::find(m_ignored_touched_objects.begin(), m_ignored_touched_objects.end(), O);
 	if ( i == m_ignored_touched_objects.end() )

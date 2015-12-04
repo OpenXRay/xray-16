@@ -124,10 +124,10 @@ public:
 	virtual void	g_fireParams				(const CHudItem* /**pHudItem/**/, Fvector& /**P/**/, Fvector& /**D/**/)	{};
 	virtual void	g_WeaponBones				(int &/**L/**/, int &/**R1/**/, int &/**R2/**/)	{};
 
-	virtual void	HitSignal					(float	HitAmount,	Fvector& local_dir, CObject* who, s16 element);
+	virtual void	HitSignal					(float	HitAmount,	Fvector& local_dir, IGameObject* who, s16 element);
 	virtual void	HitImpulse					(float	amount,		Fvector& vWorldDir, Fvector& vLocalDir);
 	virtual	void	Hit							(SHit* pHDS);
-	virtual void	Die							(CObject* who);
+	virtual void	Die							(IGameObject* who);
 	virtual	float	ffGetFov					() const {return 150.f;	}
 	virtual	float	ffGetRange					() const {return 30.f;	}
 

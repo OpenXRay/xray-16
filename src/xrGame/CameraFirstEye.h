@@ -10,7 +10,7 @@ class CCameraFirstEye : public CCameraBase
 	bool			lookat_active;
 	void			UpdateLookat	();
 public:
-					CCameraFirstEye	( CObject* p, u32 flags=0);
+					CCameraFirstEye	( IGameObject* p, u32 flags=0);
 	virtual			~CCameraFirstEye( );
 
 	virtual void	Load			(LPCSTR section);

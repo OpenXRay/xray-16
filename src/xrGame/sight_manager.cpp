@@ -261,7 +261,7 @@ void CSightManager::update			()
 	STOP_PROFILE
 }
 
-void CSightManager::remove_links					(CObject *object)
+void CSightManager::remove_links					(IGameObject *object)
 {
 	setup_actions::iterator	I = actions().begin();
 	setup_actions::iterator	E = actions().end();

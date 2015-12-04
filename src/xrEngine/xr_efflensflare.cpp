@@ -197,8 +197,7 @@ IC BOOL material_callback(collide::rq_result& result, LPVOID params)
     if (result.O)
     {
         vis = 0.f;
-        //CKinematics*K=PKinematics(result.O->renderable.visual);
-        IKinematics* K = PKinematics(result.O->renderable.visual);
+        IKinematics* K = PKinematics(result.O->GetRenderData().visual);
         if (K && (result.element > 0))
             vis = g_pGamePersistent->MtlTransparent(K->LL_GetData(u16(result.element)).game_mtl_idx);
     }
@@ -377,7 +376,7 @@ void CLensFlare::OnFrame(shared_str id)
     vecSx.mul(vecX, fScale);
     vecSy.mul(vecY, fScale);
 
-    CObject* o_main = g_pGameLevel->CurrentViewEntity();
+    IGameObject* o_main = g_pGameLevel->CurrentViewEntity();
     R_ASSERT(_valid(vSunDir));
     STranspParam TP(&m_ray_cache[0], Device.vCameraPosition, vSunDir, 1000.f, EPS_L);
 
@@ -426,7 +425,7 @@ void CLensFlare::OnFrame(shared_str id)
     blend_lerp(fBlend, fVisResult, BLEND_DEC_SPEED, Device.fTimeDelta);
 
     /*
-    CObject* o_main = g_pGameLevel->CurrentViewEntity();
+    IGameObject* o_main = g_pGameLevel->CurrentViewEntity();
     STranspParam TP (&m_ray_cache,Device.vCameraPosition,vSunDir,1000.f,EPS_L);
     collide::ray_defs RD (TP.P,TP.D,TP.f,CDB::OPT_CULL,collide::rqtBoth);
     if (m_ray_cache.result&&m_ray_cache.similar(TP.P,TP.D,TP.f)){
@@ -447,7 +446,7 @@ void CLensFlare::OnFrame(shared_str id)
     blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
     */
     /*
-     CObject* o_main = g_pGameLevel->CurrentViewEntity();
+     IGameObject* o_main = g_pGameLevel->CurrentViewEntity();
      STranspParam TP (this,Device.vCameraPosition,vSunDir,1000.f,EPS_L);
      collide::ray_defs RD (TP.P,TP.D,TP.f,CDB::OPT_CULL,collide::rqtBoth);
      if (m_ray_cache.result&&m_ray_cache.similar(TP.P,TP.D,TP.f)){

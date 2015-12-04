@@ -88,7 +88,7 @@ void CObjectSpace::BoxQuery	(collide::rq_results& r_dest, const Fbox& B, const F
 		for (u32 o_it=0; o_it<r_spatial.size(); o_it++)
 		{
 			ISpatial*	spatial						= r_spatial[o_it];
-			CObject*	collidable					= spatial->dcast_CObject	();
+			IGameObject*	collidable					= spatial->dcast_GameObject	();
 			if			(0==collidable)				continue;
 			collidable->collidable.model->_BoxQuery	(B,M,flags);
 		}

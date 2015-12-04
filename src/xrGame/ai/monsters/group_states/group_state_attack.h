@@ -15,7 +15,7 @@ public:
 	virtual void		setup_substates		();
 	virtual	void		critical_finalize	();
 	virtual	void		finalize		    ();
-	virtual void		remove_links		(CObject* object);
+	virtual void		remove_links		(IGameObject* object);
 
 protected:
 	typedef CState<_Object>		inherited;

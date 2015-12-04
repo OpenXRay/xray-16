@@ -46,7 +46,7 @@ public:
 	ItemsMap								m_ItemInfos;
 
 protected:
-	virtual void 	feel_touch_new		(CObject* O)
+	virtual void 	feel_touch_new		(IGameObject* O)
 	{
 		K* pK							= smart_cast<K*>(O);
 		R_ASSERT						(pK);
@@ -55,7 +55,7 @@ protected:
 		m_ItemInfos[pK].snd_time		= 0.0f;
 		m_ItemInfos[pK].curr_ref		= &(it->second);
 	}
-	virtual void 	feel_touch_delete	(CObject* O)
+	virtual void 	feel_touch_delete	(IGameObject* O)
 	{
 		K* pK							= smart_cast<K*>(O);
 		R_ASSERT						(pK);
@@ -103,7 +103,7 @@ public:
 class CAfList  :public CDetectList<CArtefact>
 {
 protected:
-	virtual bool 	feel_touch_contact	(CObject* O);
+	virtual bool 	feel_touch_contact	(IGameObject* O);
 public:
 					CAfList		():m_af_rank(0){}
 	int				m_af_rank;
@@ -169,7 +169,7 @@ protected:
 class CZoneList : public CDetectList<CCustomZone>
 {
 protected:
-	virtual bool	feel_touch_contact( CObject* O );
+	virtual bool	feel_touch_contact( IGameObject* O );
 public:
 					CZoneList();
 	virtual			~CZoneList();

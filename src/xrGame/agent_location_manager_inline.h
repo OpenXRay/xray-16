@@ -9,9 +9,9 @@
 #pragma once
 
 struct CRemoveDangerObject {
-	const CObject				*m_object;
+	const IGameObject				*m_object;
 
-	IC			CRemoveDangerObject	(const CObject *object)
+	IC			CRemoveDangerObject	(const IGameObject *object)
 	{
 		m_object				= object;
 	}
@@ -39,7 +39,7 @@ IC	void CAgentLocationManager::clear			()
 	m_danger_locations.clear	();
 }
 
-IC	CAgentLocationManager::CDangerLocationPtr CAgentLocationManager::location	(const CObject *object)
+IC	CAgentLocationManager::CDangerLocationPtr CAgentLocationManager::location	(const IGameObject *object)
 {
 	LOCATIONS::iterator			I = std::find_if(m_danger_locations.begin(),m_danger_locations.end(),CRemoveDangerObject(object));
 	if (I != m_danger_locations.end())

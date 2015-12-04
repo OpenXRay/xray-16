@@ -14,7 +14,7 @@
 #else // #ifdef XRGAME_EXPORTS
 #	define SERVER_ENTITY_EDITOR_METHODS
 #endif // #ifndef XRGAME_EXPORTS
-
+// XXX: move to core/math
 struct	SRotation
 {
 	float  yaw, pitch, roll;

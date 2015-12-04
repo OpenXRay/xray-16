@@ -60,8 +60,8 @@
 //
 //void CSnorkJump::try_to_jump(u32 velocity_mask)
 //{
-//	//CObject *target = const_cast<CEntityAlive *>(m_object->EnemyMan.get_enemy());
-//	CObject *target = Level().CurrentEntity();
+//	//IGameObject *target = const_cast<CEntityAlive *>(m_object->EnemyMan.get_enemy());
+//	IGameObject *target = Level().CurrentEntity();
 //	if (!target) return;
 //	 
 //	m_specific_jump		= false;

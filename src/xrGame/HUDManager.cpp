@@ -164,7 +164,7 @@ void CHUDManager::Render_First()
 {
 	if (!psHUD_Flags.is(HUD_WEAPON|HUD_WEAPON_RT|HUD_WEAPON_RT2|HUD_DRAW_RT2))return;
 	if (0==pUIGame)					return;
-	CObject*	O					= g_pGameLevel->CurrentViewEntity();
+	IGameObject*	O					= g_pGameLevel->CurrentViewEntity();
 	if (0==O)						return;
 	CActor*		A					= smart_cast<CActor*> (O);
 	if (!A)							return;
@@ -179,7 +179,7 @@ void CHUDManager::Render_First()
 
 bool need_render_hud()
 {
-	CObject*	O					= g_pGameLevel ? g_pGameLevel->CurrentViewEntity() : NULL;
+	IGameObject*	O					= g_pGameLevel ? g_pGameLevel->CurrentViewEntity() : NULL;
 	if (0==O)						
 		return false;
 
@@ -200,7 +200,7 @@ void CHUDManager::Render_Last()
 
 	if(!need_render_hud())			return;
 
-	CObject*	O					= g_pGameLevel->CurrentViewEntity();
+	IGameObject*	O					= g_pGameLevel->CurrentViewEntity();
 	// hud itself
 	GlobalEnv.Render->set_HUD				(TRUE);
 	GlobalEnv.Render->set_Object			(O->H_Root());
@@ -361,7 +361,7 @@ void CHUDManager::OnConnected()
 		Device.seqFrame.Add	(pUIGame,REG_PRIORITY_LOW-1000);
 }
 
-void CHUDManager::net_Relcase( CObject* obj )
+void CHUDManager::net_Relcase( IGameObject* obj )
 {
 	HitMarker.net_Relcase		( obj );
 	

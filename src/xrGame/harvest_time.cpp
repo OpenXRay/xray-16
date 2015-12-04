@@ -77,7 +77,7 @@ void harvest_time::OnPlayerKilled(u16 killer_id,
 	if (killer_id != tmp_local_player->GameID)
 		return;
 		
-	CObject* victim_obj = Level().Objects.net_Find(target_id);
+	IGameObject* victim_obj = Level().Objects.net_Find(target_id);
 	if (!victim_obj)
 		return;
 

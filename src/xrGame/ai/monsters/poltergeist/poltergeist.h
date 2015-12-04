@@ -60,7 +60,7 @@ public:
 
 	virtual BOOL	net_Spawn			(CSE_Abstract* DC);
 	virtual void	net_Destroy			();
-	virtual void	net_Relcase			(CObject *O);
+	virtual void	net_Relcase			(IGameObject *O);
 
 	virtual void	UpdateCL			();
 	virtual	void	shedule_Update		(u32 dt);
@@ -68,7 +68,7 @@ public:
 			void	set_actor_ignore	(bool const actor_ignore) { m_actor_ignore = actor_ignore; }
 			bool	get_actor_ignore	() const { return m_actor_ignore; }
 
-	virtual void	Die					(CObject* who);
+	virtual void	Die					(IGameObject* who);
 
 	virtual CMovementManager *create_movement_manager();
 	
@@ -242,7 +242,7 @@ class CPolterFlame : public CPolterSpecialAbility {
 
 public:
 	struct SFlameElement {
-		const CObject		*target_object;
+		const IGameObject		*target_object;
 		Fvector				position;
 		Fvector				target_dir;
 		u32					time_started;
@@ -268,8 +268,8 @@ public:
 
 private:
 			void	select_state				(SFlameElement *elem, EFlameState state);
-			bool	get_valid_flame_position	(const CObject *target_object, Fvector &res_pos);
-			void	create_flame				(const CObject *target_object);
+			bool	get_valid_flame_position	(const IGameObject *target_object, Fvector &res_pos);
+			void	create_flame				(const IGameObject *target_object);
 };
 
 
@@ -279,7 +279,7 @@ private:
 class CPolterTele : public CPolterSpecialAbility {
 	typedef CPolterSpecialAbility inherited;
 
-	xr_vector<CObject*>	m_nearest;
+	xr_vector<IGameObject*>	m_nearest;
 
 	// external params
 	float				m_pmt_radius;
@@ -320,9 +320,9 @@ public:
 	virtual void	update_frame					();
 
 private:
-			void	tele_find_objects				(xr_vector<CObject*> &objects, const Fvector &pos);
+			void	tele_find_objects				(xr_vector<IGameObject*> &objects, const Fvector &pos);
 			bool	tele_raise_objects				();
 			void	tele_fire_objects				();
 
-			bool	trace_object					(CObject *obj, const Fvector &target);
+			bool	trace_object					(IGameObject *obj, const Fvector &target);
 };

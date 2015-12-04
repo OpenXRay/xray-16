@@ -178,7 +178,7 @@ public:
 				~CLevelDebug		();
 
 	template<class T>
-	CObjectInfo &object_info		(CObject *obj, T typed_class) {
+	CObjectInfo &object_info		(IGameObject *obj, T typed_class) {
 		return object_info(obj, typeid((*typed_class)).name());	
 	}
 
@@ -210,12 +210,12 @@ public:
 
 	debug::text_tree&  get_text_tree ();
 
-	void		on_destroy_object	(CObject *obj);
+	void		on_destroy_object	(IGameObject *obj);
 
 private:
 	void		free_mem			();
 	
-	CObjectInfo &object_info		(CObject *obj, LPCSTR class_name);
+	CObjectInfo &object_info		(IGameObject *obj, LPCSTR class_name);
 	CTextInfo	&text				(void *class_ptr, LPCSTR class_name);
 	CLevelInfo	&level_info			(void *class_ptr, LPCSTR class_name);
 
@@ -234,7 +234,7 @@ private:
 	};
 
 	DEFINE_MAP			(LPCSTR,	CObjectInfo*,	CLASS_INFO_MAP,		CLASS_INFO_MAP_IT);	
-	DEFINE_MAP			(CObject*,	CLASS_INFO_MAP,	OBJECT_INFO_MAP,	OBJECT_INFO_MAP_IT);
+	DEFINE_MAP			(IGameObject*,	CLASS_INFO_MAP,	OBJECT_INFO_MAP,	OBJECT_INFO_MAP_IT);
 	DEFINE_MAP			(SKey,		CTextInfo*,		TEXT_INFO_MAP,		TEXT_INFO_MAP_IT);
 	DEFINE_MAP			(SKey,		CLevelInfo*,	LEVEL_INFO_MAP,		LEVEL_INFO_MAP_IT);
 	

@@ -27,7 +27,7 @@ public:
 
 			void				OnWeapon_Fire				(u16 sender, u16 sender_weapon_id);
 			void				OnBullet_Fire				(u16 sender, u16 sender_weapon_id, const Fvector& position, const Fvector& direction);
-			void				OnBullet_Hit				(CObject const * hitter, CObject const * victim, CObject* weapon, u16 const bone);
+			void				OnBullet_Hit				(IGameObject const * hitter, IGameObject const * victim, IGameObject* weapon, u16 const bone);
 			void				OnArtefactSpawned			();
 			void				OnPlayerTakeArtefact		(game_PlayerState const * ps);
 			void				OnPlayerDropArtefact		(game_PlayerState const * ps);

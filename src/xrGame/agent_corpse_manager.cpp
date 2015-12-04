@@ -23,8 +23,8 @@ struct CRemoveMemberCorpsesPredicate {
 };
 
 struct CRemoveOfflineCorpsesPredicate {
-	CObject		*m_object;
-	IC		 CRemoveOfflineCorpsesPredicate	(CObject *object)
+	IGameObject		*m_object;
+	IC		 CRemoveOfflineCorpsesPredicate	(IGameObject *object)
 	{
 		VERIFY		(object);
 		m_object	= object;
@@ -103,7 +103,7 @@ void CAgentCorpseManager::react_on_member_death			()
 	}
 }
 
-void CAgentCorpseManager::remove_links	(CObject *object)
+void CAgentCorpseManager::remove_links	(IGameObject *object)
 {
 	m_corpses.erase				(
 		std::remove_if(

@@ -91,11 +91,11 @@ private:
 	u32								m_dwSM_SwitchDelta;
 	u32								m_dwSM_LastSwitchTime;
 	u32								m_dwSM_CurViewEntity;
-	CObject	*						m_pSM_CurViewEntity;
+	IGameObject	*						m_pSM_CurViewEntity;
 	//static const float			spectr_cam_inert_value;
 	//float							prev_cam_inert_value;
 	void							SM_SwitchOnNextActivePlayer			();
-	void							SM_SwitchOnPlayer		(CObject* pNewObject);
+	void							SM_SwitchOnPlayer		(IGameObject* pNewObject);
 	void							SM_CheckViewSwitching();
 
 	void	LoadAnomalySet();

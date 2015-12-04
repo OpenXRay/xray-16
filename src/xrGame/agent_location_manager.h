@@ -14,7 +14,7 @@ class CAI_Stalker;
 class CCoverPoint;
 class CAgentManager;
 class CDangerLocation;
-class CObject;
+class IGameObject;
 
 class CAgentLocationManager {
 public:
@@ -33,14 +33,14 @@ protected:
 public:
 	IC							CAgentLocationManager	(CAgentManager *object);
 	IC		CDangerLocationPtr	location				(const Fvector &position);
-	IC		CDangerLocationPtr	location				(const CObject *object);
+	IC		CDangerLocationPtr	location				(const IGameObject *object);
 	IC		void				clear					();
 			void				update					();
 			void				add						(CDangerLocationPtr location);
 			float				danger					(const CCoverPoint *cover, CAI_Stalker *member) const;
 			bool				suitable				(CAI_Stalker *object, const CCoverPoint *location, bool use_enemy_info) const;
 			void				make_suitable			(CAI_Stalker *object, const CCoverPoint *location) const;
-			void				remove_links			(CObject *object);
+			void				remove_links			(IGameObject *object);
 	IC		const LOCATIONS		&locations				() const;
 };
 

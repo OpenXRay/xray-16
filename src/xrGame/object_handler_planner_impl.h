@@ -14,7 +14,7 @@ IC	CObjectHandlerPlanner::_condition_type CObjectHandlerPlanner::uid(const u32 i
 	return				((id0 << 16) | id1);
 }
 
-IC	bool CObjectHandlerPlanner::object_action	(u32 action_id, CObject *object)
+IC	bool CObjectHandlerPlanner::object_action	(u32 action_id, IGameObject *object)
 {
 	return				((action_id >> 16) == object->ID());
 }

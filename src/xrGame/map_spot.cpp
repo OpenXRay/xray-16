@@ -223,7 +223,7 @@ void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
 
 void CMiniMapSpot::Draw()
 {
-	CObject* O = Level().CurrentViewEntity();
+	IGameObject* O = Level().CurrentViewEntity();
 	if(O&&m_icon_above->inited()&&m_icon_below->inited()){
 		float ml_y = MapLocation()->GetLastPosition().y;
 		float d = O->Position().y-ml_y;

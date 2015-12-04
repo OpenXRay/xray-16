@@ -149,7 +149,7 @@ void CMemoryManager::update			(float time_delta)
 	STOP_PROFILE
 }
 
-void CMemoryManager::enable			(const CObject *object, bool enable)
+void CMemoryManager::enable			(const IGameObject *object, bool enable)
 {
 	visual().enable		(object,enable);
 	sound().enable		(object,enable);
@@ -186,7 +186,7 @@ void CMemoryManager::update			(const xr_vector<T> &objects, bool add_enemies)
 	}
 }
 
-CMemoryInfo CMemoryManager::memory(const CObject *object) const
+CMemoryInfo CMemoryManager::memory(const IGameObject *object) const
 {
 	CMemoryInfo						result;
 	if (!this->object().g_Alive())
@@ -231,7 +231,7 @@ CMemoryInfo CMemoryManager::memory(const CObject *object) const
 	return		(result);
 }
 
-u32 CMemoryManager::memory_time(const CObject *object) const
+u32 CMemoryManager::memory_time(const IGameObject *object) const
 {
 	u32					result = 0;
 	if (!this->object().g_Alive())
@@ -261,7 +261,7 @@ u32 CMemoryManager::memory_time(const CObject *object) const
 	return				(result);
 }
 
-Fvector CMemoryManager::memory_position	(const CObject *object) const
+Fvector CMemoryManager::memory_position	(const IGameObject *object) const
 {
 	u32					time = 0;
 	Fvector				result = Fvector().set(0.f,0.f,0.f);
@@ -298,7 +298,7 @@ Fvector CMemoryManager::memory_position	(const CObject *object) const
 	return				(result);
 }
 
-void CMemoryManager::remove_links	(CObject *object)
+void CMemoryManager::remove_links	(IGameObject *object)
 {
 	if (m_object->g_Alive()) {
 		visual().remove_links	(object);
@@ -357,7 +357,7 @@ void CMemoryManager::load							(IReader &packet)
 
 // we do this due to the limitation of client spawn manager
 // should be revisited from the acrhitectural point of view
-void CMemoryManager::on_requested_spawn				(CObject *object)
+void CMemoryManager::on_requested_spawn				(IGameObject *object)
 {
 	visual().on_requested_spawn	(object);
 	sound().on_requested_spawn	(object);

@@ -772,7 +772,7 @@ void stalker_movement_manager_base::set_level_dest_vertex	(u32 const& level_vert
 	m_target.cover_id					("");
 }
 
-void stalker_movement_manager_base::remove_links			(CObject *object)
+void stalker_movement_manager_base::remove_links			(IGameObject *object)
 {
 	m_last_query_object					= 0;
 }

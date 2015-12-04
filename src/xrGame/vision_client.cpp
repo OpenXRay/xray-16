@@ -110,7 +110,7 @@ bool vision_client::shedule_Needed				()
 	return						(true);
 }
 
-float vision_client::feel_vision_mtl_transp		(CObject* O, u32 element)
+float vision_client::feel_vision_mtl_transp		(IGameObject* O, u32 element)
 {
 	return						(visual().feel_vision_mtl_transp(O,element));
 }
@@ -125,7 +125,7 @@ void vision_client::reload						(LPCSTR section)
 	visual().reload				(section);
 }
 
-void vision_client::remove_links				(CObject *object)
+void vision_client::remove_links				(IGameObject *object)
 {
 	visual().remove_links		(object);
 }

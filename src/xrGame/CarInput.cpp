@@ -228,7 +228,7 @@ bool CCar::isObjectVisible			(CScriptGameObject* O_)
 			Msg("Attempt to call CCar::isObjectVisible method wihth passed NULL parameter");
 			return false;
 		}
-		CObject* O = &O_->object();
+		IGameObject* O = &O_->object();
 		Fvector dir_to_object;
 		Fvector to_point;
 		O->Center(to_point);

@@ -14,7 +14,7 @@ IC	CDangerObject::CDangerObject											(
 	u32 time,
 	const EDangerType &type,
 	const EDangerPerceiveType &perceive_type,
-	const CObject *dependent_object
+	const IGameObject *dependent_object
 )
 {
 	m_object			= object;
@@ -50,7 +50,7 @@ IC	CDangerObject::EDangerPerceiveType CDangerObject::perceive_type			() const
 	return				(m_perceive_type);
 }
 
-IC	const CObject *CDangerObject::dependent_object							() const
+IC	const IGameObject *CDangerObject::dependent_object							() const
 {
 	return				(m_dependent_object);
 }

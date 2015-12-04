@@ -669,12 +669,12 @@ void CMissile::activate_physic_shell()
 	kinematics->CalculateBones_Invalidate();
 	kinematics->CalculateBones			(TRUE);
 }
-void	CMissile::net_Relcase(CObject* O)
+void	CMissile::net_Relcase(IGameObject* O)
 {
 	inherited::net_Relcase(O);
 	if(PPhysicsShell()&&PPhysicsShell()->isActive())
 	{
-		if(O==smart_cast<CObject*>((CPhysicsShellHolder*)PPhysicsShell()->get_CallbackData()))
+		if(O==smart_cast<IGameObject*>((CPhysicsShellHolder*)PPhysicsShell()->get_CallbackData()))
 		{
 			PPhysicsShell()->remove_ObjectContactCallback(ExitContactCallback);
 			PPhysicsShell()->set_CallbackData(NULL);

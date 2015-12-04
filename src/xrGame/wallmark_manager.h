@@ -9,7 +9,7 @@ private:
 	FactoryPtr<IWallMarkArray>		m_wallmarks;
 	Fvector							m_pos;
 public:
-	CObject*						m_owner;
+	IGameObject*						m_owner;
 				CWalmarkManager		()																																					;
 				~CWalmarkManager	()																																					;
 		void	Load				(LPCSTR section)																																	;

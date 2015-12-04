@@ -17,7 +17,7 @@ public:
 	
 	virtual BOOL 			net_Spawn							(CSE_Abstract* DC);
 	virtual void 			net_Destroy							();
-	virtual void 			net_Relcase							(CObject* O );
+	virtual void 			net_Relcase							(IGameObject* O );
 
 	virtual void 			OnH_B_Independent					(bool just_before_destroy);
 	virtual void 			OnH_A_Independent					();

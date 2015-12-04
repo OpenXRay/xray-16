@@ -22,8 +22,8 @@ extern	u32 			dbg_islands_num							;
 extern	u32 			dbg_contacts_num						;
 extern	float			dbg_vel_collid_damage_to_display		;
 extern	LPCSTR			dbg_trace_object						;
-class	CObject													;
-extern	CObject			*trace_object							;
+class	IGameObject													;
+extern	IGameObject			*trace_object							;
 #ifdef DRAW_CONTACTS
 
 
@@ -68,9 +68,9 @@ void DBG_DrawRotationZ( const Fmatrix &m, float ang0, float ang1, float size, u3
 void _cdecl DBG_OutText( LPCSTR s,... );
 void DBG_TextOutSet( float x, float y );
 void DBG_TextSetColor( u32 color );
-void DBG_DrawBind( CObject &O );
-void DBG_PhysBones( CObject &O );
-void DBG_DrawBones( CObject &O );
+void DBG_DrawBind( IGameObject &O );
+void DBG_PhysBones( IGameObject &O );
+void DBG_DrawBones( IGameObject &O );
 void DBG_DrawFrameStart( );
 void PH_DBG_Render( );
 void PH_DBG_Clear( );
@@ -79,7 +79,7 @@ LPCSTR PH_DBG_ObjectTrackName( );
 
 
 /////////////////////////////////////////////////
-void DBG_PH_NetRelcase( CObject* obj );
+void DBG_PH_NetRelcase( IGameObject* obj );
 
 
 struct CFunctionGraph

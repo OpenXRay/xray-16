@@ -60,7 +60,7 @@ public:
 	IC		u32					last_enemy_time		() const;
 	IC		const CEntityAlive	*last_enemy			() const;
 	IC		USEFULE_CALLBACK	&useful_callback	();
-			void				remove_links		(CObject *object);
+			void				remove_links		(IGameObject *object);
 
 public:
 			void				ignore_monster_threshold			(const float &ignore_monster_threshold);

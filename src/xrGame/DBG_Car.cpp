@@ -17,7 +17,7 @@ void CCar::InitDebug()
 }
 void CCar::DbgSheduleUpdate()
 {
-	if(ph_dbg_draw_mask.test(phDbgDrawCarPlots)&&m_pPhysicsShell&&OwnerActor()&&static_cast<CObject*>(Owner())==Level().CurrentViewEntity())
+	if(ph_dbg_draw_mask.test(phDbgDrawCarPlots)&&m_pPhysicsShell&&OwnerActor()&&static_cast<IGameObject*>(Owner())==Level().CurrentViewEntity())
 	{
  		DbgCreatePlots();
 	}
@@ -105,7 +105,7 @@ void CCar::DBgClearPlots()
 void CCar::DbgUbdateCl()
 {
 	
-	if(m_pPhysicsShell&&OwnerActor()&&static_cast<CObject*>(Owner())==Level().CurrentViewEntity())
+	if(m_pPhysicsShell&&OwnerActor()&&static_cast<IGameObject*>(Owner())==Level().CurrentViewEntity())
 	{	
 		if(ph_dbg_draw_mask.test(phDbgDrawCarDynamics))
 		{

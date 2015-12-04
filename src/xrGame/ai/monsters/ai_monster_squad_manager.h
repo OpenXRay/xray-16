@@ -30,7 +30,7 @@ public:
 
 	void			update					(CEntity *entity);
 
-	void			remove_links			(CObject *O);
+	void			remove_links			(IGameObject *O);
 };
 
 

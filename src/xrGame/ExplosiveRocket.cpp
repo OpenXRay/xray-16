@@ -180,7 +180,7 @@ bool CExplosiveRocket::Useful					() const
 {
 	return			(inherited::Useful());
 }
-void CExplosiveRocket::net_Relcase(CObject* O )
+void CExplosiveRocket::net_Relcase(IGameObject* O )
 {
 	CExplosive::net_Relcase(O);
 	inherited::net_Relcase(O);

@@ -19,20 +19,20 @@
 
 #define PICKUP_INFO_COLOR 0xFFDDDDDD
 
-void CActor::feel_touch_new				(CObject* O)
+void CActor::feel_touch_new				(IGameObject* O)
 {
 	CPhysicsShellHolder* sh=smart_cast<CPhysicsShellHolder*>(O);
 	if(sh&&sh->character_physics_support()) m_feel_touch_characters++;
 
 }
 
-void CActor::feel_touch_delete	(CObject* O)
+void CActor::feel_touch_delete	(IGameObject* O)
 {
 	CPhysicsShellHolder* sh=smart_cast<CPhysicsShellHolder*>(O);
 	if(sh&&sh->character_physics_support()) m_feel_touch_characters--;
 }
 
-bool CActor::feel_touch_contact		(CObject *O)
+bool CActor::feel_touch_contact		(IGameObject *O)
 {
 	CInventoryItem	*item = smart_cast<CInventoryItem*>(O);
 	CInventoryOwner	*inventory_owner = smart_cast<CInventoryOwner*>(O);
@@ -50,7 +50,7 @@ bool CActor::feel_touch_contact		(CObject *O)
 	return		(false);
 }
 
-bool CActor::feel_touch_on_contact	(CObject *O)
+bool CActor::feel_touch_on_contact	(IGameObject *O)
 {
 	CCustomZone	*custom_zone = smart_cast<CCustomZone*>(O);
 	if (!custom_zone)
@@ -75,7 +75,7 @@ ICF static BOOL info_trace_callback(collide::rq_result& result, LPVOID params)
 			return			TRUE;
 		}else
 		{ //check obstacle flag
-			if(result.O->spatial.type&STYPE_OBSTACLE)
+			if(result.O->GetSpatialData().type&STYPE_OBSTACLE)
 				bOverlaped			= TRUE;
 
 			return			TRUE;
@@ -91,7 +91,7 @@ ICF static BOOL info_trace_callback(collide::rq_result& result, LPVOID params)
 	return				FALSE;
 }
 
-BOOL CActor::CanPickItem(const CFrustum& frustum, const Fvector& from, CObject* item)
+BOOL CActor::CanPickItem(const CFrustum& frustum, const Fvector& from, IGameObject* item)
 {
 	if(!item->getVisible())
 		return FALSE;
@@ -136,7 +136,7 @@ void CActor::PickupModeUpdate()
 	CFrustum frustum;
 	frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB|FRUSTUM_P_FAR);
 
-	for(xr_vector<CObject*>::iterator it = feel_touch.begin(); it != feel_touch.end(); it++)
+	for(xr_vector<IGameObject*>::iterator it = feel_touch.begin(); it != feel_touch.end(); it++)
 	{
 		if (CanPickItem(frustum, Device.vCameraPosition, *it)) 
 			PickupInfoDraw(*it);
@@ -167,17 +167,17 @@ void	CActor::PickupModeUpdate_COD	()
 	for (u32 o_it=0; o_it<ISpatialResult.size(); o_it++)
 	{
 		ISpatial*		spatial	= ISpatialResult[o_it];
-		CInventoryItem*	pIItem	= smart_cast<CInventoryItem*> (spatial->dcast_CObject        ());
+		CInventoryItem*	pIItem	= smart_cast<CInventoryItem*> (spatial->dcast_GameObject        ());
 
 		if (0 == pIItem)											continue;
 		if (pIItem->object().H_Parent() != NULL)					continue;
 		if (!pIItem->CanTake())										continue;
 		if ( smart_cast<CExplosiveRocket*>( &pIItem->object() ) )	continue;
 
-		CGrenade*	pGrenade	= smart_cast<CGrenade*> (spatial->dcast_CObject        ());
+		CGrenade*	pGrenade	= smart_cast<CGrenade*> (spatial->dcast_GameObject        ());
 		if (pGrenade && !pGrenade->Useful())						continue;
 
-		CMissile*	pMissile	= smart_cast<CMissile*> (spatial->dcast_CObject        ());
+		CMissile*	pMissile	= smart_cast<CMissile*> (spatial->dcast_GameObject        ());
 		if (pMissile && !pMissile->Useful())						continue;
 		
 		Fvector A, B, tmp; 
@@ -247,11 +247,11 @@ void	CActor::Check_for_AutoPickUp()
 	for (u32 o_it=0; o_it<ISpatialResult.size(); o_it++)
 	{
 		ISpatial*		spatial	= ISpatialResult[o_it];
-		CInventoryItem*	pIItem	= smart_cast<CInventoryItem*> (spatial->dcast_CObject());
+		CInventoryItem*	pIItem	= smart_cast<CInventoryItem*> (spatial->dcast_GameObject());
 
 		if (0 == pIItem)														continue;
 		if (!pIItem->CanTake())													continue;
-		if (Level().m_feel_deny.is_object_denied(spatial->dcast_CObject()) )	continue;
+		if (Level().m_feel_deny.is_object_denied(spatial->dcast_GameObject()) )	continue;
 
 
 		CGrenade*	pGrenade	= smart_cast<CGrenade*> (pIItem);
@@ -274,7 +274,7 @@ void	CActor::Check_for_AutoPickUp()
 }
 
 
-void CActor::PickupInfoDraw(CObject* object)
+void CActor::PickupInfoDraw(IGameObject* object)
 {
 	LPCSTR draw_str = NULL;
 	
@@ -302,7 +302,7 @@ void CActor::PickupInfoDraw(CObject* object)
 	UI().Font().pFontLetterica16Russian->Out			(x,y,draw_str);
 }
 
-void CActor::feel_sound_new(CObject* who, int type, CSound_UserDataPtr user_data, const Fvector& Position, float power)
+void CActor::feel_sound_new(IGameObject* who, int type, CSound_UserDataPtr user_data, const Fvector& Position, float power)
 {
 	if(who == this)
 		m_snd_noise = _max(m_snd_noise, power);
@@ -321,8 +321,8 @@ void CActor::Feel_Grenade_Update( float rad )
 	q_nearest.clear_not_free();
 	g_pGameLevel->ObjectSpace.GetNearest( q_nearest, pos_actor, rad, NULL );
 
-	xr_vector<CObject*>::iterator	it_b = q_nearest.begin();
-	xr_vector<CObject*>::iterator	it_e = q_nearest.end();
+	xr_vector<IGameObject*>::iterator	it_b = q_nearest.begin();
+	xr_vector<IGameObject*>::iterator	it_e = q_nearest.end();
 
 	// select only grenade
 	for ( ; it_b != it_e; ++it_b )

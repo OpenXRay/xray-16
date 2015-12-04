@@ -80,6 +80,6 @@ public:
 	const CEntityAlive *get_script_enemy			() {return m_script_enemy;}
 	void				script_enemy				();
 	void				script_enemy				(const CEntityAlive &enemy);
-	void				remove_links				(CObject* O);
+	void				remove_links				(IGameObject* O);
 };
 

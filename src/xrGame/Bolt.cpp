@@ -16,7 +16,7 @@ CBolt::~CBolt(void)
 void CBolt::OnH_A_Chield() 
 {
 	inherited::OnH_A_Chield();
-	CObject* o= H_Parent()->H_Parent();
+	IGameObject* o= H_Parent()->H_Parent();
 	if(o)SetInitiator(o->ID());
 	
 }

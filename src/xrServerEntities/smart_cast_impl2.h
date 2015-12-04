@@ -16,7 +16,7 @@
 
 #ifdef XRGAME_EXPORTS
 	template <> 
-	CGameObject* SmartDynamicCast::smart_cast<CGameObject,CObject>(CObject *p)
+	CGameObject* SmartDynamicCast::smart_cast<CGameObject,IGameObject>(IGameObject *p)
 	{
 		return static_cast<CGameObject*>(p);
 	}

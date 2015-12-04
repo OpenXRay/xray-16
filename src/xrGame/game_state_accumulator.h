@@ -32,7 +32,7 @@ public:
 	void		init_bone_groups			(CActor* first_spawned_actor);
 
 	u16					get_object_id				(u16 item_object_id);
-	u16					get_object_id				(CObject const * obj);
+	u16					get_object_id				(IGameObject const * obj);
 	bool				is_item_in_group			(u16 item_id, ammunition_group::enum_group_id gid);
 	bool				is_bone_in_group			(u16 bone_id, bone_group::enum_group_id gid);
 	u16					get_armor_of_player			(game_PlayerState* player);
@@ -50,7 +50,7 @@ public:
 
 	virtual void		OnWeapon_Fire				(u16 sender, u16 sender_weapon_id);
 	virtual	void		OnBullet_Fire				(u16 sender, u16 sender_weapon_id, const Fvector& position, const Fvector& direction);
-	virtual void		OnBullet_Hit				(CObject const * hitter, CObject const * victim, CObject const * weapon, u16 const bone);
+	virtual void		OnBullet_Hit				(IGameObject const * hitter, IGameObject const * victim, IGameObject const * weapon, u16 const bone);
 	virtual void		OnArtefactSpawned			();
 	virtual void		OnPlayerTakeArtefact		(game_PlayerState const * ps);
 	virtual void		OnPlayerDropArtefact		(game_PlayerState const * ps);

@@ -9,7 +9,7 @@
 namespace Feel
 {
 
-Vision::Vision(CObject const* owner) :
+Vision::Vision(IGameObject const* owner) :
 pure_relcase(&Vision::feel_vision_relcase),
 m_owner(owner)
 {
@@ -42,7 +42,7 @@ IC BOOL feel_vision_callback(collide::rq_result& result, LPVOID params)
     }
     return (fp->vis > fp->vis_threshold);
 }
-void Vision::o_new(CObject* O)
+void Vision::o_new(IGameObject* O)
 {
     feel_visible.push_back(feel_visible_Item());
     feel_visible_Item& I = feel_visible.back();
@@ -55,7 +55,7 @@ void Vision::o_new(CObject* O)
     I.cp_LP = O->get_new_local_point_on_mesh(I.bone_id);
     I.cp_LAST = O->get_last_local_point_on_mesh(I.cp_LP, I.bone_id);
 }
-void Vision::o_delete(CObject* O)
+void Vision::o_delete(IGameObject* O)
 {
     xr_vector<feel_visible_Item>::iterator I = feel_visible.begin(), TE = feel_visible.end();
     for (; I != TE; I++)
@@ -74,9 +74,9 @@ void Vision::feel_vision_clear()
     feel_visible.clear();
 }
 
-void Vision::feel_vision_relcase(CObject* object)
+void Vision::feel_vision_relcase(IGameObject* object)
 {
-    xr_vector<CObject*>::iterator Io;
+    xr_vector<IGameObject*>::iterator Io;
     Io = std::find(seen.begin(), seen.end(), object);
     if (Io != seen.end()) seen.erase(Io);
     Io = std::find(query.begin(), query.end(), object);
@@ -107,28 +107,28 @@ void Vision::feel_vision_query(Fmatrix& mFull, Fvector& P)
     for (u32 o_it = 0; o_it < r_spatial.size(); o_it++)
     {
         ISpatial* spatial = r_spatial[o_it];
-        CObject* object = spatial->dcast_CObject();
+        IGameObject* object = spatial->dcast_GameObject();
         if (object && feel_vision_isRelevant(object)) seen.push_back(object);
     }
     if (seen.size()>1)
     {
         std::sort(seen.begin(), seen.end());
-        xr_vector<CObject*>::iterator end = std::unique(seen.begin(), seen.end());
+        xr_vector<IGameObject*>::iterator end = std::unique(seen.begin(), seen.end());
         if (end != seen.end()) seen.erase(end, seen.end());
     }
 }
 
-void Vision::feel_vision_update(CObject* parent, Fvector& P, float dt, float vis_threshold)
+void Vision::feel_vision_update(IGameObject* parent, Fvector& P, float dt, float vis_threshold)
 {
     // B-A = objects, that become visible
     if (!seen.empty())
     {
-        xr_vector<CObject*>::iterator E = std::remove(seen.begin(), seen.end(), parent);
+        xr_vector<IGameObject*>::iterator E = std::remove(seen.begin(), seen.end(), parent);
         seen.resize(E - seen.begin());
 
         {
             diff.resize(_max(seen.size(), query.size()));
-            xr_vector<CObject*>::iterator E = std::set_difference(
+            xr_vector<IGameObject*>::iterator E = std::set_difference(
                 seen.begin(), seen.end(),
                 query.begin(), query.end(),
                 diff.begin());
@@ -142,7 +142,7 @@ void Vision::feel_vision_update(CObject* parent, Fvector& P, float dt, float vis
     if (!query.empty())
     {
         diff.resize(_max(seen.size(), query.size()));
-        xr_vector<CObject*>::iterator E = std::set_difference(
+        xr_vector<IGameObject*>::iterator E = std::set_difference(
             query.begin(), query.end(),
             seen.begin(), seen.end(),
             diff.begin());
@@ -238,7 +238,7 @@ void Vision::o_trace(Fvector& P, float dt, float vis_threshold)
                 if (*i == I->O)
                     continue;
 
-                CObject const* object = (*i)->dcast_CObject();
+                IGameObject const* object = (*i)->dcast_GameObject();
                 RQR.r_clear();
                 if (object && object->GetCForm() && !object->GetCForm()->_RayQuery(RD, RQR))
                     continue;

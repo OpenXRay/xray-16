@@ -30,7 +30,7 @@ bool		draw_frame=0;
 
 //LPCSTR	dbg_trace_object_name					=NULL;
 string64 s_dbg_trace_obj_name					="none";
-CObject	 *trace_object							= NULL;
+IGameObject	 *trace_object							= NULL;
 u32	 	dbg_bodies_num							=0;
 u32	 	dbg_joints_num							=0;
 u32	 	dbg_islands_num							=0;
@@ -877,7 +877,7 @@ void	DBG_DrawBones( const Fmatrix &xform,  IKinematics *K )
 	DBG_DrawPoint( xform.c, 0.1, color_xrgb( 255, 125, 125 ) );
 
 }
-void	DBG_DrawBones( CObject &O )
+void	DBG_DrawBones( IGameObject &O )
 {
 	IKinematics *K = smart_cast<IKinematics*> ( O.Visual() );
 
@@ -887,7 +887,7 @@ void	DBG_DrawBones( CObject &O )
 	VERIFY( K );
 	DBG_DrawBones(O.XFORM(), K );
 }
-void	DBG_PhysBones( CObject &O )
+void	DBG_PhysBones( IGameObject &O )
 {
 
 	CPhysicsShellHolder	*sh = smart_cast<CPhysicsShellHolder*>(&O);
@@ -909,7 +909,7 @@ void	DBG_PhysBones( CObject &O )
 
 }
 
-void	DBG_DrawBind( CObject &O )
+void	DBG_DrawBind( IGameObject &O )
 {
 	IKinematics *K = smart_cast<IKinematics*> ( O.Visual() );
 
@@ -962,7 +962,7 @@ public:
 
 } ph_debug_render_impl;
 
-void DBG_PH_NetRelcase( CObject* obj )
+void DBG_PH_NetRelcase( IGameObject* obj )
 {
 	if( trace_object == obj )
 		trace_object = NULL;
@@ -970,7 +970,7 @@ void DBG_PH_NetRelcase( CObject* obj )
 
 bool is_trace_obj( CPHObject *obj )
 {
-	return trace_object && smart_cast<CObject*>(obj->ref_object()) == trace_object;
+	return trace_object && smart_cast<IGameObject*>(obj->ref_object()) == trace_object;
 }
 
 
@@ -1125,9 +1125,9 @@ virtual	void _cdecl DBG_OutText( LPCSTR s,... )
 }
 //virtual	void DBG_TextOutSet( float x, float y )									=0;
 //virtual	void DBG_TextSetColor( u32 color )										=0;
-//virtual	void DBG_DrawBind( CObject &O )											=0;
-//virtual	void DBG_PhysBones( CObject &O )										=0;
-//virtual	void DBG_DrawBones( CObject &O )										=0;
+//virtual	void DBG_DrawBind( IGameObject &O )											=0;
+//virtual	void DBG_PhysBones( IGameObject &O )										=0;
+//virtual	void DBG_DrawBones( IGameObject &O )										=0;
 virtual	void DBG_DrawFrameStart( )
 {
 	::DBG_DrawFrameStart( );

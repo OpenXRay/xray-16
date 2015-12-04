@@ -16,7 +16,7 @@ class CScriptGameObject;
 class CScriptMonsterAction : public CScriptAbstractAction {
 public: 
 	MonsterSpace::EScriptMonsterGlobalAction	m_tAction;
-	CObject										*m_tObject;
+	IGameObject										*m_tObject;
 
 public:
 	IC				CScriptMonsterAction	();

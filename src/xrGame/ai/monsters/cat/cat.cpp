@@ -102,7 +102,7 @@ void CCat::reinit()
 
 void CCat::try_to_jump()
 {
-	CObject *target = const_cast<CEntityAlive *>(EnemyMan.get_enemy());
+	IGameObject *target = const_cast<CEntityAlive *>(EnemyMan.get_enemy());
 	if (!target || !EnemyMan.see_enemy_now()) return;
 }
 

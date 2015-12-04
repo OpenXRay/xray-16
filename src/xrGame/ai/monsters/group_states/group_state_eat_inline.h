@@ -340,7 +340,7 @@ bool CStateGroupEatAbstract::hungry()
 }
 
 TEMPLATE_SPECIALIZATION
-void CStateGroupEatAbstract::remove_links	(CObject* object)
+void CStateGroupEatAbstract::remove_links	(IGameObject* object)
 {
 	if (corpse == object)
 		corpse	= 0;

@@ -18,7 +18,7 @@ public:
 	virtual void	initialize						();
 	virtual void	reselect_state					();
 	virtual void	setup_substates					();
-	virtual void	remove_links					(CObject* object) { inherited::remove_links(object);}
+	virtual void	remove_links					(IGameObject* object) { inherited::remove_links(object);}
 };
 
 #include "group_state_hear_danger_sound_inline.h"

@@ -366,7 +366,7 @@ void CPoltergeist::net_Destroy()
 	ability()->on_destroy();
 }
 
-void CPoltergeist::Die(CObject* who)
+void CPoltergeist::Die(IGameObject* who)
 {
 // 	if (m_tele) {
 // 		if (state_invisible) {
@@ -441,7 +441,7 @@ CMovementManager *CPoltergeist::create_movement_manager	()
 }
 
 
-void CPoltergeist::net_Relcase(CObject *O)
+void CPoltergeist::net_Relcase(IGameObject *O)
 {
 	inherited::net_Relcase		(O);
 	CTelekinesis::remove_links	(O);

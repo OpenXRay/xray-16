@@ -48,8 +48,8 @@ class ENGINE_API IGame_Level :
 {
 protected:
     // Network interface
-    CObject* pCurrentEntity;
-    CObject* pCurrentViewEntity;
+    IGameObject* pCurrentEntity;
+    IGameObject* pCurrentViewEntity;
 
     // Static sounds
     xr_vector<ref_sound> Sounds_Random;
@@ -102,10 +102,10 @@ public:
     virtual void net_StartPlayDemo() = 0;
 
     // Main interface
-    CObject* CurrentEntity(void) const { return pCurrentEntity; }
-    CObject* CurrentViewEntity(void) const { return pCurrentViewEntity; }
-    void SetEntity(CObject* O);// { pCurrentEntity=pCurrentViewEntity=O; }
-    void SetViewEntity(CObject* O);// { pCurrentViewEntity=O; }
+    IGameObject* CurrentEntity(void) const { return pCurrentEntity; }
+    IGameObject* CurrentViewEntity(void) const { return pCurrentViewEntity; }
+    void SetEntity(IGameObject* O);// { pCurrentEntity=pCurrentViewEntity=O; }
+    void SetViewEntity(IGameObject* O);// { pCurrentViewEntity=O; }
 
     void SoundEvent_Register(ref_sound_data_ptr S, float range);
     void SoundEvent_Dispatch();

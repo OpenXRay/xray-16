@@ -129,7 +129,7 @@ void CScanningAbilityAbstract::frame_update(u32 dt)
 
 
 TEMPLATE_SPECIALIZATION
-float CScanningAbilityAbstract::get_velocity(CObject *obj)
+float CScanningAbilityAbstract::get_velocity(IGameObject *obj)
 {
 	CActor *actor = smart_cast<CActor *>(obj);
 	return (actor->character_physics_support()->movement()->GetVelocityActual()); 

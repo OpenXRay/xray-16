@@ -1007,7 +1007,7 @@ public:
 		_GetItem(args,0,param1,' ');
 		_GetItem(args,1,param2,' ');
 
-		CObject			*obj = Level().Objects.FindObjectByName(param1);
+		IGameObject			*obj = Level().Objects.FindObjectByName(param1);
 		CBaseMonster	*monster = smart_cast<CBaseMonster *>(obj);
 		if (!monster)	return;
 		
@@ -1032,7 +1032,7 @@ public:
 			}
 			ph_dbg_draw_mask1.set(ph_m1_DbgTrackObject,TRUE);
 			PH_DBG_SetTrackObject();
-			//CObject* O= Level().Objects.FindObjectByName(args);
+			//IGameObject* O= Level().Objects.FindObjectByName(args);
 			//if(O)
 			//{
 			//	PH_DBG_SetTrackObject(*(O->cName()));
@@ -1483,7 +1483,7 @@ public		:
 			return;
 		};
 
-		CObject* obj			= Level().CurrentViewEntity();	VERIFY(obj);
+		IGameObject* obj			= Level().CurrentViewEntity();	VERIFY(obj);
 		shared_str ssss			= args;
 
 		CAttachmentOwner* owner = smart_cast<CAttachmentOwner*>(obj);

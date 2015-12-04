@@ -69,7 +69,7 @@ void CMonsterCorpseManager::reinit()
 	time_last_seen	= 0;
 }
 
-void   CMonsterCorpseManager::remove_links (CObject* O)
+void   CMonsterCorpseManager::remove_links (IGameObject* O)
 {
 	if ( corpse == O )
 	{

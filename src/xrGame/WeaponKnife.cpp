@@ -142,7 +142,7 @@ void CWeaponKnife::OnStateSwitch	(u32 S)
 
 void CWeaponKnife::KnifeStrike(const Fvector& pos, const Fvector& dir)
 {
-	CObject* real_victim = TryPick(pos, dir, m_hit_dist);
+	IGameObject* real_victim = TryPick(pos, dir, m_hit_dist);
 	if (real_victim)
 	{
 		float new_khit = m_eHitType == m_eHitType_1 ? 
@@ -670,7 +670,7 @@ void CWeaponKnife::create_victims_list(spartial_base_t spartial_result,
 	for (spartial_base_t::const_iterator i = spartial_result.begin(),
 		ie = spartial_result.end(); i != ie; ++i)
 	{
-		CObject* tmp_obj = (*i)->dcast_CObject();
+		IGameObject* tmp_obj = (*i)->dcast_GameObject();
 		VERIFY(tmp_obj);
 		if (!tmp_obj)
 			continue;
@@ -823,7 +823,7 @@ BOOL CWeaponKnife::RayQueryCallback(collide::rq_result& result, LPVOID this_ptr)
 	return TRUE;
 }
 
-CObject* CWeaponKnife::TryPick(Fvector const & start_pos, Fvector const & dir, float const dist)
+IGameObject* CWeaponKnife::TryPick(Fvector const & start_pos, Fvector const & dir, float const dist)
 {
 	collide::ray_defs		tmp_rdefs(start_pos, dir, dist, CDB::OPT_FULL_TEST, collide::rqtObject);
 	m_ray_query_results.r_clear();
@@ -862,7 +862,7 @@ CWeaponKnife::victim_filter::victim_filter(victim_filter const & copy) :
 
 bool CWeaponKnife::victim_filter::operator()(spartial_base_t::value_type const & left) const
 {
-	CObject* const tmp_obj = left->dcast_CObject();
+	IGameObject* const tmp_obj = left->dcast_GameObject();
 	VERIFY			(tmp_obj);
 	if (!tmp_obj)
 		return true;
@@ -912,7 +912,7 @@ CWeaponKnife::best_victim_selector::best_victim_selector(
 void CWeaponKnife::best_victim_selector::operator()(
 	spartial_base_t::value_type const & left)
 {
-	CObject* const tmp_obj = left->dcast_CObject();
+	IGameObject* const tmp_obj = left->dcast_GameObject();
 	VERIFY			(tmp_obj);
 	if (!tmp_obj)
 		return;

@@ -80,7 +80,7 @@ void CLightProjector::set_object    (IRenderable* O)
             else                    {
                 spatial->spatial_updatesector   ();
                 if (0==spatial->GetSpatialData().sector) {
-                    CObject*        obj = dynamic_cast<CObject*>(O);
+                    IGameObject*        obj = dynamic_cast<IGameObject*>(O);
                     if (obj)        Msg ("! Invalid object '%s' position. Outside of sector structure.",obj->cName().c_str());
                     current         = 0;
                 }
@@ -218,7 +218,7 @@ void CLightProjector::calculate ()
         v.sub       (v_Cs,v_C);;
 #ifdef DEBUG
         if ((v.x*v.x+v.y*v.y+v.z*v.z)<=flt_zero)    {
-            CObject* OO = dynamic_cast<CObject*>(R.O);
+            IGameObject* OO = dynamic_cast<IGameObject*>(R.O);
             Msg("Object[%s] Visual[%s] has invalid position. ",*OO->cName(),*OO->cNameVisual());
             Fvector cc;
             OO->Center(cc);

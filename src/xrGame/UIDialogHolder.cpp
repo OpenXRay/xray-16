@@ -271,7 +271,7 @@ bool CDialogHolder::IR_UIOnKeyboardPress(int dik)
 
 	if( !TIR->StopAnyMove() && g_pGameLevel )
 	{
-		CObject* O = Level().CurrentEntity();
+		IGameObject* O = Level().CurrentEntity();
 		if( O ){
 			IInputReceiver*		IR	= smart_cast<IInputReceiver*>( smart_cast<CGameObject*>(O) );
 			if (IR)
@@ -307,7 +307,7 @@ bool CDialogHolder::IR_UIOnKeyboardRelease(int dik)
 
 	if( !TIR->StopAnyMove() && g_pGameLevel )
 	{
-		CObject* O = Level().CurrentEntity();
+		IGameObject* O = Level().CurrentEntity();
 		if( O )
 		{
 			IInputReceiver*		IR	= smart_cast<IInputReceiver*>( smart_cast<CGameObject*>(O) );
@@ -330,7 +330,7 @@ bool CDialogHolder::IR_UIOnKeyboardHold(int dik)
 
 	if(!TIR->StopAnyMove() && g_pGameLevel )
 	{
-		CObject* O = Level().CurrentEntity();
+		IGameObject* O = Level().CurrentEntity();
 		if(O)
 		{
 			IInputReceiver*	IR	= smart_cast<IInputReceiver*>( smart_cast<CGameObject*>(O) );
@@ -367,7 +367,7 @@ bool CDialogHolder::IR_UIOnMouseMove(int dx, int dy)
 	}else 
 	if(!TIR->StopAnyMove() && g_pGameLevel )
 	{
-		CObject* O				= Level().CurrentEntity();
+		IGameObject* O				= Level().CurrentEntity();
 		if(O)
 		{
 			IInputReceiver*	IR	= smart_cast<IInputReceiver*>( smart_cast<CGameObject*>(O) );

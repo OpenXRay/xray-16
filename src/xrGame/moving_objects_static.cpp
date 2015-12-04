@@ -104,7 +104,7 @@ public:
 	{
 	}
 	
-	IC	bool	operator()		(const CObject *object) const
+	IC	bool	operator()		(const IGameObject *object) const
 	{
 		if (m_object->ignored(object))
 			return			(true);

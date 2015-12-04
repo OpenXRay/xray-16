@@ -757,7 +757,7 @@ void CActor::net_Destroy	()
 		destroy_physics_shell( actor_camera_shell );
 }
 
-void CActor::net_Relcase	(CObject* O)
+void CActor::net_Relcase	(IGameObject* O)
 {
 	
  	VERIFY(O);
@@ -1767,7 +1767,7 @@ BOOL CActor::net_SaveRelevant()
 }
 
 
-void				CActor::SetHitInfo				(CObject* who, CObject* weapon, s16 element, Fvector Pos, Fvector Dir)
+void				CActor::SetHitInfo				(IGameObject* who, IGameObject* weapon, s16 element, Fvector Pos, Fvector Dir)
 {
 	m_iLastHitterID = (who!= NULL) ? who->ID() : u16(-1);
 	m_iLastHittingWeaponID = (weapon != NULL) ? weapon->ID() : u16(-1);
@@ -1805,8 +1805,8 @@ void				CActor::OnCriticalHitHealthLoss			()
 {
 	if (GameID() == eGameIDSingle || !OnServer()) return;
 
-	CObject* pLastHitter = Level().Objects.net_Find(m_iLastHitterID);
-	CObject* pLastHittingWeapon = Level().Objects.net_Find(m_iLastHittingWeaponID);
+	IGameObject* pLastHitter = Level().Objects.net_Find(m_iLastHitterID);
+	IGameObject* pLastHittingWeapon = Level().Objects.net_Find(m_iLastHittingWeaponID);
 
 #ifdef DEBUG
 	Msg("%s killed by hit from %s %s", 

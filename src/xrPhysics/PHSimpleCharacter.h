@@ -155,7 +155,7 @@ private:
 	virtual		void			 	HitDir							(Fvector& dir)const	{return m_collision_damage_info.HitDir(dir);}
 	virtual		const Fvector&	 	HitPos							()const				{return m_collision_damage_info.HitPos();}
 	virtual		u16				 	DamageInitiatorID				()const				;
-	virtual		CObject			 	*DamageInitiator				()const				;
+	virtual		IGameObject			 	*DamageInitiator				()const				;
 	virtual		ALife::EHitType	 	HitType							()const				{return m_collision_damage_info.m_hit_type; };
 	virtual		void				SetInitiated					();
 	virtual		bool				IsInitiated						()const				;

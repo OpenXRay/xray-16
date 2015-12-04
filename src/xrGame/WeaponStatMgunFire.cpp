@@ -73,7 +73,7 @@ void CWeaponStatMgun::OnShot()
 	StartSmokeParticles		(m_fire_pos, zero_vel);
 	OnShellDrop				(m_fire_pos, zero_vel);
 
-	bool b_hud_mode =		(Level().CurrentEntity() == smart_cast<CObject*>(Owner()));
+	bool b_hud_mode =		(Level().CurrentEntity() == smart_cast<IGameObject*>(Owner()));
 	m_sounds.PlaySound		("sndShot", m_fire_pos, Owner(), b_hud_mode);
 
 	AddShotEffector			();

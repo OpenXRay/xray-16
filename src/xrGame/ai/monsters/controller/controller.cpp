@@ -469,7 +469,7 @@ void CController::shedule_Update(u32 dt)
 	test_covers();
 }
 
-void CController::Die(CObject* who)
+void CController::Die(IGameObject* who)
 {
 	inherited::Die(who);
 	FreeFromControl();
@@ -484,7 +484,7 @@ void CController::net_Destroy()
 	FreeFromControl		();
 }
 
-void CController::net_Relcase(CObject *O)
+void CController::net_Relcase(IGameObject *O)
 {
 	inherited::net_Relcase(O);
 }

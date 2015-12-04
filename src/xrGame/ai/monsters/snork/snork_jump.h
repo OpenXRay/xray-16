@@ -10,7 +10,7 @@ class CSnorkJump {
 	float	m_cur_dist;
 	bool	m_specific_jump;
 
-	CObject *m_target_object;
+	IGameObject *m_target_object;
 	u32		m_velocity_mask;
 
 public:

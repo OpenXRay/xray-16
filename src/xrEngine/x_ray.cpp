@@ -24,6 +24,7 @@
 #include <locale.h>
 
 #include "xrSASH.h"
+#include "xrServerEntities/smart_cast.h"
 
 //---------------------------------------------------------------------
 ENGINE_API CInifile* pGameIni = NULL;
@@ -363,7 +364,8 @@ void Startup()
     //#endif
     LALib.OnCreate();
     pApp = xr_new<CApplication>();
-    g_pGamePersistent = (IGame_Persistent*)NEW_INSTANCE(CLSID_GAME_PERSISTANT);
+    g_pGamePersistent = smart_cast<IGame_Persistent*>(NEW_INSTANCE(CLSID_GAME_PERSISTANT));
+    VERIFY(g_pGamePersistent);
     g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
     g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
 
@@ -1027,7 +1029,8 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
         //-----------------------------------------------------------
         g_pGamePersistent->PreStart(op_server);
         //-----------------------------------------------------------
-        g_pGameLevel = (IGame_Level*)NEW_INSTANCE(CLSID_GAME_LEVEL);
+        g_pGameLevel = smart_cast<IGame_Level*>(NEW_INSTANCE(CLSID_GAME_LEVEL));
+        VERIFY(g_pGameLevel);
         pApp->LoadBegin();
         g_pGamePersistent->Start(op_server);
         g_pGameLevel->net_Start(op_server, op_client);
@@ -1074,7 +1077,8 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
         Console->Hide();
         Device.Reset(false);
 
-        g_pGameLevel = (IGame_Level*)NEW_INSTANCE(CLSID_GAME_LEVEL);
+        g_pGameLevel = smart_cast<IGame_Level*>(NEW_INSTANCE(CLSID_GAME_LEVEL));
+        VERIFY(g_pGameLevel);
         shared_str server_options = g_pGameLevel->OpenDemoFile(demo_file);
 
         //-----------------------------------------------------------

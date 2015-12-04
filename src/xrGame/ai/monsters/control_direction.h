@@ -42,7 +42,7 @@ public:
 	
 	// services
 			bool	is_face_target		(const Fvector &position,	float eps_angle);
-			bool	is_face_target		(const CObject *obj,		float eps_angle);
+			bool	is_face_target		(const IGameObject *obj,		float eps_angle);
 
 			bool	is_from_right		(const Fvector &position);
 			bool	is_from_right		(float yaw);

@@ -129,7 +129,7 @@ void CStalkerActionGatherItems::initialize	()
 	else
 		object().CObjectHandler::set_goal		(eObjectActionIdle,object().inventory().ActiveItem());
 
-	CObject const* const selected							= object().memory().item().selected();
+	IGameObject const* const selected							= object().memory().item().selected();
 
 	typedef CAI_Stalker::ignored_touched_objects_type		ignored_touched_objects_type;
 	ignored_touched_objects_type& ignored_touched_objects	= m_object->ignored_touched_objects();

@@ -33,7 +33,7 @@ public:
 		virtual void	reinit				();
 		virtual void	reload				(LPCSTR section);
 		virtual void	net_Destroy			();
-		virtual void	Die					(CObject* who);
+		virtual void	Die					(IGameObject* who);
 
 		virtual void	Think				();
 //				void	on_phantom_appear	();
@@ -86,7 +86,7 @@ public:
 	virtual	void	Hit					(SHit* pHDS);
 
 	virtual void	net_Destroy			();
-	virtual void	Die					(CObject* who);
+	virtual void	Die					(IGameObject* who);
 
 			void	destroy_from_parent	();
 private:

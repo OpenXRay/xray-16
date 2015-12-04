@@ -6,7 +6,7 @@ private:
     BOOL m_DemoSaveStarted = false;
     u32 m_StartGlobalTime;
     // XXX nitrocaster: why not CurrentControlEntity* ?
-    CObject* m_current_spectator = nullptr; // in real, this is CurrentControlEntity 
+    IGameObject* m_current_spectator = nullptr; // in real, this is CurrentControlEntity 
     message_filter* m_msg_filter = nullptr;
     demoplay_control* m_demoplay_control = nullptr;
 public:
@@ -28,8 +28,8 @@ public:
     };
 #pragma pack(pop)
 
-    void SetDemoSpectator(CObject* spectator);
-    CObject* GetDemoSpectator();
+    void SetDemoSpectator(IGameObject* spectator);
+    IGameObject* GetDemoSpectator();
     void PrepareToSaveDemo();
     void SaveDemoInfo();
     inline demo_info* GetDemoInfo() const { return m_demo_info; }

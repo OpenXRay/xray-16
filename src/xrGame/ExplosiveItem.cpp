@@ -31,7 +31,7 @@ void CExplosiveItem::net_Destroy()
 	CExplosive::net_Destroy();
 }
 
-//void CExplosiveItem::Hit(float P, Fvector &dir,	CObject* who, s16 element,
+//void CExplosiveItem::Hit(float P, Fvector &dir,	IGameObject* who, s16 element,
 //						Fvector position_in_object_space, float impulse, 
 //						ALife::EHitType hit_type)
 void	CExplosiveItem::Hit					(SHit* pHDS)
@@ -87,7 +87,7 @@ void CExplosiveItem::renderable_Render()
 {
 	inherited::renderable_Render();
 }
-void CExplosiveItem::net_Relcase(CObject* O )
+void CExplosiveItem::net_Relcase(IGameObject* O )
 {
 	CExplosive::net_Relcase(O);
 	inherited::net_Relcase(O);

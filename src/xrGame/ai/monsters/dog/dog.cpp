@@ -394,7 +394,7 @@ u32 CAI_Dog::get_attack_rebuild_time ()
 	return 100 + u32(25*dist);
 }
 
-bool  CAI_Dog::can_use_agressive_jump (const CObject* enemy) 
+bool  CAI_Dog::can_use_agressive_jump (const IGameObject* enemy) 
 {
 	float delta_y = 0.8f;
 	if ( enemy == Actor() )

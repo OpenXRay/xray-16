@@ -816,7 +816,7 @@ void game_cl_CaptureTheArtefact::UpdateMapLocations()
 }
 
 
-void game_cl_CaptureTheArtefact::OnSpawn(CObject* pObj)
+void game_cl_CaptureTheArtefact::OnSpawn(IGameObject* pObj)
 {
 	inherited::OnSpawn(pObj);
 	
@@ -884,7 +884,7 @@ void game_cl_CaptureTheArtefact::OnSpawn(CObject* pObj)
 
 void game_cl_CaptureTheArtefact::SetInvinciblePlayer(u16 const gameId, bool const invincible)
 {
-	CObject* pObject	= Level().Objects.net_Find	(gameId);
+	IGameObject* pObject	= Level().Objects.net_Find	(gameId);
 	
 	if (!pObject)
 		return;
@@ -1109,7 +1109,7 @@ bool game_cl_CaptureTheArtefact::NeedToSendReady_Spectator(int key, game_PlayerS
 
 void game_cl_CaptureTheArtefact::OnBuySpawnMenu_Ok		()
 {
-	CObject*		curr = Level().CurrentEntity();
+	IGameObject*		curr = Level().CurrentEntity();
 	if (!curr)
 		return;
 
@@ -1571,7 +1571,7 @@ void game_cl_CaptureTheArtefact::OnRender()
 			if (ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
 				continue;
 
-			CObject* pObject = Level().Objects.net_Find(id);
+			IGameObject* pObject = Level().Objects.net_Find(id);
 			if (!pObject)
 				continue;
 

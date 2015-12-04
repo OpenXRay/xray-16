@@ -82,7 +82,7 @@ void CAgentMemberManager::update				()
 {
 }
 
-void CAgentMemberManager::remove_links			(CObject *object)
+void CAgentMemberManager::remove_links			(IGameObject *object)
 {
 	MEMBER_STORAGE::iterator	I = m_members.begin();
 	MEMBER_STORAGE::iterator	E = m_members.end();

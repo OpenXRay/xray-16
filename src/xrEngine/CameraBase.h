@@ -9,12 +9,12 @@
 #include "CameraDefs.h"
 #include "device.h"
 // refs
-class CObject;
+class IGameObject;
 
 class ENGINE_API CCameraBase
 {
 protected:
-    CObject* parent;
+    IGameObject* parent;
 
 public:
     BOOL bClampYaw, bClampPitch, bClampRoll;
@@ -47,10 +47,10 @@ public:
 
     int tag;
 public:
-    CCameraBase(CObject* p, u32 flags);
+    CCameraBase(IGameObject* p, u32 flags);
     virtual ~CCameraBase();
     virtual void Load(LPCSTR section);
-    void SetParent(CObject* p) { parent = p; VERIFY(p); }
+    void SetParent(IGameObject* p) { parent = p; VERIFY(p); }
     virtual void OnActivate(CCameraBase* old_cam) { ; }
     virtual void OnDeactivate() { ; }
     virtual void Move(int cmd, float val = 0, float factor = 1.0f) { ; }

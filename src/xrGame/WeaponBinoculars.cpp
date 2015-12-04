@@ -157,7 +157,7 @@ bool CWeaponBinoculars::GetBriefInfo( II_BriefInfo& info )
 	return true;
 }
 
-void CWeaponBinoculars::net_Relcase	(CObject *object)
+void CWeaponBinoculars::net_Relcase	(IGameObject *object)
 {
 	if (!m_binoc_vision)
 		return;

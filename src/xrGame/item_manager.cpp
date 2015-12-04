@@ -122,7 +122,7 @@ void CItemManager::update			()
 	STOP_PROFILE
 }
 
-void CItemManager::remove_links		(CObject *object)
+void CItemManager::remove_links		(IGameObject *object)
 {
 	// since we use no members in CGameObject during search,
 	// we just use the pinter itself, we can just statically cast object

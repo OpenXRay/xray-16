@@ -30,7 +30,7 @@ public:
 	virtual void				save			(NET_Packet &output_packet);
 	virtual void				load			(IReader &input_packet);
 	virtual BOOL				net_SaveRelevant();
-	virtual void				net_Relcase		(CObject *object);
+	virtual void				net_Relcase		(IGameObject *object);
 			void				set_object		(CScriptBinderObject *object);
 	IC		CScriptBinderObject	*object			();
 };

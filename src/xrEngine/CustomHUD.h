@@ -41,7 +41,7 @@ public:
     virtual void OnConnected() = 0;
     virtual void RenderActiveItemUI() = 0;
     virtual bool RenderActiveItemUIQuery() = 0;
-    virtual void net_Relcase(CObject* object) = 0;
+    virtual void net_Relcase(IGameObject* object) = 0;
 };
 
 extern ENGINE_API CCustomHUD* g_hud;

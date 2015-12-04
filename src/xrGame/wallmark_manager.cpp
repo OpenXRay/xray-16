@@ -58,7 +58,7 @@ void CWalmarkManager::AddWallmark(const Fvector& dir, const Fvector& start_pos,
 /*
 void CWalmarkManager::PlaceWallmark(const Fvector& dir, const Fvector& start_pos, 
 									  float trace_dist, float wallmark_size,
-									  SHADER_VECTOR& wallmarks_vector,CObject* ignore_obj)
+									  SHADER_VECTOR& wallmarks_vector,IGameObject* ignore_obj)
 {
 	collide::rq_result	result;
 	BOOL				reach_wall = 

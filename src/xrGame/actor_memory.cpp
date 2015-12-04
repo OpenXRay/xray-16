@@ -22,7 +22,7 @@ CActorMemory::CActorMemory					(CActor *actor) :
 	VERIFY			(m_actor);
 }
 
-bool CActorMemory::feel_vision_isRelevant	(CObject* O)
+bool CActorMemory::feel_vision_isRelevant	(IGameObject* O)
 {
 	CEntityAlive	*entity_alive = smart_cast<CEntityAlive*>(O);
 	if (!entity_alive)

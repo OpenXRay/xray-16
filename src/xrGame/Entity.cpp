@@ -58,7 +58,7 @@ void CEntity::OnEvent		(NET_Packet& P, u16 type)
 			u32				cl;
 			P.r_u16			(id);
 			P.r_u32			(cl);
-			CObject			*who = Level().Objects.net_Find	(id);
+			IGameObject			*who = Level().Objects.net_Find	(id);
 			if (who && !IsGameTypeSingle())
 			{
 				if (this!=who)	/*if(bDebug) */ Msg( "%s killed by %s ...", cName().c_str(), who->cName().c_str() );
@@ -70,7 +70,7 @@ void CEntity::OnEvent		(NET_Packet& P, u16 type)
 	}
 }
 
-void CEntity::Die(CObject* who)
+void CEntity::Die(IGameObject* who)
 {
 	if (!AlreadyDie()) set_death_time();
 	set_ready_to_save	();
@@ -100,7 +100,7 @@ float CEntity::CalcCondition(float hit)
 
 
 
-//void CEntity::Hit			(float perc, Fvector &dir, CObject* who, s16 element,Fvector position_in_object_space, float impulse, ALife::EHitType hit_type) 
+//void CEntity::Hit			(float perc, Fvector &dir, IGameObject* who, s16 element,Fvector position_in_object_space, float impulse, ALife::EHitType hit_type) 
 void	CEntity::Hit		(SHit* pHDS)
 {
 
@@ -251,10 +251,10 @@ void CEntity::KillEntity(u16 whoID)
 		if (m_killer_id != ALife::_OBJECT_ID(-1)) {
 			Msg			("! Entity [%s][%s] already has killer with id %d, but new killer id arrived - %d",*cNameSect(),*cName(),m_killer_id,whoID);
 
-			CObject		*old_killer = Level().Objects.net_Find(m_killer_id);
+			IGameObject		*old_killer = Level().Objects.net_Find(m_killer_id);
 			Msg			("! Old killer is %s",old_killer ? *old_killer->cName() : "unknown");
 
-			CObject		*new_killer = Level().Objects.net_Find(whoID);
+			IGameObject		*new_killer = Level().Objects.net_Find(whoID);
 			Msg			("! New killer is %s",new_killer ? *new_killer->cName() : "unknown");
 
 			VERIFY		(m_killer_id == ALife::_OBJECT_ID(-1));
@@ -280,7 +280,7 @@ void CEntity::KillEntity(u16 whoID)
 	}
 };
 
-//void CEntity::KillEntity(CObject* who)
+//void CEntity::KillEntity(IGameObject* who)
 //{
 //	VERIFY			(who);
 //	if (who) KillEntity(who->ID());	

@@ -16,7 +16,7 @@ public:
 	virtual 			~CState					(); 
 
 	virtual	void		reinit					();
-	virtual void		remove_links			(CObject* object) = 0;
+	virtual void		remove_links			(IGameObject* object) = 0;
 
 	virtual void		initialize				();
 	virtual void 		execute					();

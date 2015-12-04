@@ -63,7 +63,7 @@ public:
 	MonsterSpace::EBodyState					m_tBodyState;
 	MonsterSpace::EMovementType					m_tMovementType;
 	DetailPathManager::EDetailPathType			m_tPathType;
-	CObject										*m_tpObjectToGo;
+	IGameObject										*m_tpObjectToGo;
 	const CPatrolPath							*m_path;
 	PatrolPathManager::EPatrolStartType			m_tPatrolPathStart;
 	PatrolPathManager::EPatrolRouteType			m_tPatrolPathStop;

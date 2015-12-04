@@ -1431,7 +1431,7 @@ u16 CPHSimpleCharacter::RetriveContactBone()
 	collide::ray_defs	Q(m_collision_damage_info.HitPos(), dir, m_radius, CDB::OPT_ONLYNEAREST|CDB::OPT_CULL,collide::rqtBoth);  // CDB::OPT_ONLYFIRST CDB::OPT_ONLYNEAREST
 	RQR.r_clear			();
 	u16 contact_bone	=	0;
-//	CObject* object		=	smart_cast<CObject*>(m_phys_ref_object);
+//	IGameObject* object		=	smart_cast<IGameObject*>(m_phys_ref_object);
 	//VERIFY	(object)	;
 	VERIFY							(!fis_zero(Q.dir.square_magnitude()));
 	if (inl_ph_world().ObjectSpace().RayQuery(RQR,m_phys_ref_object->ObjectCollisionModel(),Q))	{
@@ -1744,7 +1744,7 @@ u16 CPHSimpleCharacter::DamageInitiatorID()const
 		IPhysicsShellHolder* object = 0;
 		if( m_collision_damage_info.m_obj_id != u16(-1) )
 		{
-			CObject	* obj = inl_ph_world().LevelObjects().net_Find(m_collision_damage_info.m_obj_id);
+			IGameObject	* obj = inl_ph_world().LevelObjects().net_Find(m_collision_damage_info.m_obj_id);
 			VERIFY(!obj|| smart_cast<IPhysicsShellHolder*>(obj) );
 			object=smart_cast<IPhysicsShellHolder*>(obj);
 		}
@@ -1759,15 +1759,15 @@ u16 CPHSimpleCharacter::DamageInitiatorID()const
 	return ret;
 }
 
-CObject* CPHSimpleCharacter::DamageInitiator() const
+IGameObject* CPHSimpleCharacter::DamageInitiator() const
 {
 	VERIFY(m_phys_ref_object);
 	if( m_collision_damage_info.m_dmc_type==SCollisionDamageInfo::ctStatic ) 
-		return smart_cast<CObject*> (m_phys_ref_object);
+		return smart_cast<IGameObject*> (m_phys_ref_object);
 	u16 initiator_id=DamageInitiatorID();
 	VERIFY(initiator_id!=u16(-1));
 	if(initiator_id==m_phys_ref_object->ObjectID())
-		return smart_cast<CObject*> (m_phys_ref_object);
+		return smart_cast<IGameObject*> (m_phys_ref_object);
 	else
 	{
 		return inl_ph_world	().LevelObjects().net_Find(initiator_id);
@@ -1965,7 +1965,7 @@ IC bool valide_res( u16& res_material_idx, const collide::rq_result	&R )
 	return true;
 }
 
-bool PickMaterial( u16& res_material_idx, const Fvector &pos_, const Fvector &dir_,float range_, CObject* ignore_object )
+bool PickMaterial( u16& res_material_idx, const Fvector &pos_, const Fvector &dir_,float range_, IGameObject* ignore_object )
 {
 	Fvector pos = pos_; pos.y+=EPS_L;
 	Fvector dir = dir_;
@@ -2000,8 +2000,8 @@ void	CPHSimpleCharacter::update_last_material()
 		return;
 	}
 	u16 new_material;
-	VERIFY(!PhysicsRefObject() || smart_cast<CObject*>( PhysicsRefObject() ) );
-	if( PickMaterial( new_material, pos, Fvector().set( 0, -1, 0 ), material_pick_dist + material_pick_upset, smart_cast<CObject*>( PhysicsRefObject() ) ) )
+	VERIFY(!PhysicsRefObject() || smart_cast<IGameObject*>( PhysicsRefObject() ) );
+	if( PickMaterial( new_material, pos, Fvector().set( 0, -1, 0 ), material_pick_dist + material_pick_upset, smart_cast<IGameObject*>( PhysicsRefObject() ) ) )
 	{
 		m_last_picked_material = new_material; 
 		*p_lastMaterialIDX = new_material;

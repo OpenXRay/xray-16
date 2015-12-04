@@ -124,7 +124,7 @@ CScriptMovementAction::~CScriptMovementAction	()
 void CScriptMovementAction::SetObjectToGo		(CScriptGameObject *tpObjectToGo)
 {
 	if (tpObjectToGo)
-		m_tpObjectToGo	= tpObjectToGo->operator CObject*();
+		m_tpObjectToGo	= tpObjectToGo->operator IGameObject*();
 	else
 		m_tpObjectToGo	= 0;
 	m_tGoalType			= eGoalTypeObject;

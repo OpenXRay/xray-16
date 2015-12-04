@@ -28,7 +28,7 @@ public:
 
 inline IRenderable::~IRenderable() {}
 
-class ENGINE_API RenderableBase : public IRenderable
+class ENGINE_API RenderableBase : public virtual IRenderable
 {
 public:
     RenderData renderable;

@@ -109,7 +109,7 @@ void CLevelChanger::shedule_Update(u32 dt)
 }
 #include "patrol_path.h"
 #include "patrol_path_storage.h"
-void CLevelChanger::feel_touch_new	(CObject *tpObject)
+void CLevelChanger::feel_touch_new	(IGameObject *tpObject)
 {
 	CActor*			l_tpActor = smart_cast<CActor*>(tpObject);
 	VERIFY			(l_tpActor);
@@ -162,7 +162,7 @@ bool CLevelChanger::get_reject_pos(Fvector& p, Fvector& r)
 		return false;
 }
 
-bool CLevelChanger::feel_touch_contact	(CObject *object)
+bool CLevelChanger::feel_touch_contact	(IGameObject *object)
 {
 	bool bRes	= (((CCF_Shape*)GetCForm())->Contact(object));
 	bRes		= bRes && smart_cast<CActor*>(object) && smart_cast<CActor*>(object)->g_Alive();
@@ -172,8 +172,8 @@ bool CLevelChanger::feel_touch_contact	(CObject *object)
 void CLevelChanger::update_actor_invitation()
 {
 	if(m_bSilentMode)						return;
-	xr_vector<CObject*>::iterator it		= feel_touch.begin();
-	xr_vector<CObject*>::iterator it_e		= feel_touch.end();
+	xr_vector<IGameObject*>::iterator it		= feel_touch.begin();
+	xr_vector<IGameObject*>::iterator it_e		= feel_touch.end();
 
 	for(;it!=it_e;++it){
 		CActor*			l_tpActor = smart_cast<CActor*>(*it);

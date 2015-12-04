@@ -186,15 +186,15 @@ private:
     bool m_bIn_CrPr = false;
     xr_vector<CGameObject*> pObjects4CrPr;
     xr_vector<CGameObject*> pActors4CrPr;
-    CObject* pCurrentControlEntity = nullptr;
+    IGameObject* pCurrentControlEntity = nullptr;
     xrServer::EConnect m_connect_server_err = xrServer::ErrNoError;
 
 public:
     void AddObject_To_Objects4CrPr(CGameObject* pObj);
     void AddActor_To_Actors4CrPr(CGameObject* pActor);
     void RemoveObject_From_4CrPr(CGameObject* pObj);
-    CObject* CurrentControlEntity() const { return pCurrentControlEntity; }
-    void SetControlEntity(CObject* O) { pCurrentControlEntity = O; }
+    IGameObject* CurrentControlEntity() const { return pCurrentControlEntity; }
+    void SetControlEntity(IGameObject* O) { pCurrentControlEntity = O; }
 
 private:
     void make_NetCorrectionPrediction();

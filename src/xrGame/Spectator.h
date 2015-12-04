@@ -44,7 +44,7 @@ private:
 	CActor*					m_pActorToLookAt;
 	bool					SelectNextPlayerToLook	(bool const search_next);
 
-	void					FirstEye_ToPlayer		(CObject* pObject);
+	void					FirstEye_ToPlayer		(IGameObject* pObject);
 
 	static const float		cam_inert_value;
 	float					prev_cam_inert_value;
@@ -69,7 +69,7 @@ public:
 	virtual CGameObject*	cast_game_object		()						{return this;}
 	virtual IInputReceiver*	cast_input_receiver		()						{return this;}
 
-	virtual void			net_Relcase				(CObject *O);
+	virtual void			net_Relcase				(IGameObject *O);
 			void			GetSpectatorString		(string1024& pStr);
 
 			

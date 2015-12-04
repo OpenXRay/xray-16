@@ -150,7 +150,7 @@ bool CControlDirection::is_face_target(const Fvector &position, float eps_angle)
 	return true;
 }
 
-bool CControlDirection::is_face_target(const CObject *obj, float eps_angle) 
+bool CControlDirection::is_face_target(const IGameObject *obj, float eps_angle) 
 {
 	return is_face_target(obj->Position(), eps_angle);
 }

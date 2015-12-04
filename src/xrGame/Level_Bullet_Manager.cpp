@@ -177,7 +177,7 @@ void CBulletManager::PlayExplodePS( const Fmatrix& xf )
 	GamePersistent().ps_needtoplay.push_back(ps);
 }
 
-void CBulletManager::PlayWhineSound(SBullet* bullet, CObject* object, const Fvector& pos)
+void CBulletManager::PlayWhineSound(SBullet* bullet, IGameObject* object, const Fvector& pos)
 {
 	if (m_WhineSounds.empty())						return;
 	if (bullet->m_whine_snd._feedback() != NULL)	return;

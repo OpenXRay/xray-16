@@ -6,7 +6,7 @@
 #include "xr_level_controller.h"
 #include "actor.h"
 
-CCameraLook::CCameraLook(CObject* p, u32 flags ) 
+CCameraLook::CCameraLook(IGameObject* p, u32 flags ) 
 :CCameraBase(p, flags)
 {
 }
@@ -106,10 +106,10 @@ void CCameraLook2::Update(Fvector& point, Fvector&)
 
 			for (; v_it!=vVisibles.end(); ++v_it)
 			{
-				const CObject*	_object_			= (*v_it).m_object;
+				const IGameObject*	_object_			= (*v_it).m_object;
 				if (!Actor()->memory().visual().visible_now(smart_cast<const CGameObject*>(_object_)))	continue;
 
-				CObject* object_ = const_cast<CObject*>(_object_);
+				IGameObject* object_ = const_cast<IGameObject*>(_object_);
 				
 
 				CEntityAlive*	EA					= smart_cast<CEntityAlive*>(object_);

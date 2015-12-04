@@ -100,7 +100,7 @@ BOOL CEffect_Rain::RayPick(const Fvector& s, const Fvector& d, float& range, col
     Tools->RayPick (s,d,range);
 #else
     collide::rq_result RQ;
-    CObject* E = g_pGameLevel->CurrentViewEntity();
+    IGameObject* E = g_pGameLevel->CurrentViewEntity();
     bRes = g_pGameLevel->ObjectSpace.RayPick(s, d, range, tgt, RQ, E);
     if (bRes) range = RQ.range;
 #endif
@@ -138,7 +138,7 @@ void CEffect_Rain::OnFrame()
     float factor = g_pGamePersistent->Environment().CurrentEnv->rain_density;
     static float hemi_factor = 0.f;
 #ifndef _EDITOR
-    CObject* E = g_pGameLevel->CurrentViewEntity();
+    IGameObject* E = g_pGameLevel->CurrentViewEntity();
     if (E&&E->renderable_ROS())
     {
         // hemi_factor = 1.f-2.0f*(0.3f-_min(_min(1.f,E->renderable_ROS()->get_luminocity_hemi()),0.3f));

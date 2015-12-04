@@ -91,7 +91,7 @@ bool CStateGroupEatingAbstract::check_completion()
 }
 
 TEMPLATE_SPECIALIZATION
-void CStateGroupEatingAbstract::remove_links(CObject* object)
+void CStateGroupEatingAbstract::remove_links(IGameObject* object)
 {
 	if (corpse == object)
 		corpse	= 0;

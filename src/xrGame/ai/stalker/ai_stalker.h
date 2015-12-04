@@ -185,7 +185,7 @@ public:
 	virtual void						net_Destroy							();
 	virtual void						net_Save							(NET_Packet& P);
 	virtual	BOOL						net_SaveRelevant					();
-	virtual void						net_Relcase							(CObject*	 O);
+	virtual void						net_Relcase							(IGameObject*	 O);
 
 	//save/load server serialization
 	virtual void						save								(NET_Packet &output_packet);
@@ -199,18 +199,18 @@ public:
 
 	virtual void						g_WeaponBones						(int &L, int &R1, int &R2);
 	virtual void						g_fireParams						(const CHudItem* pHudItem, Fvector& P, Fvector& D);
-	virtual void						HitSignal							(float P,	Fvector& vLocalDir, CObject* who, s16 element);
-	virtual void						Die									(CObject* who);
+	virtual void						HitSignal							(float P,	Fvector& vLocalDir, IGameObject* who, s16 element);
+	virtual void						Die									(IGameObject* who);
 
 	virtual void						OnEvent								(NET_Packet& P, u16 type);
-	virtual void						feel_touch_new						(CObject* O);
-	virtual void						feel_touch_delete					(CObject* O);
-			void						on_ownership_reject					( CObject*O, bool just_before_destroy );
+	virtual void						feel_touch_new						(IGameObject* O);
+	virtual void						feel_touch_delete					(IGameObject* O);
+			void						on_ownership_reject					( IGameObject*O, bool just_before_destroy );
 	virtual void						renderable_Render					();
 	virtual void						Exec_Look							(float dt);
 	virtual	void						Hit									(SHit* pHDS);
 	virtual	void						PHHit								(SHit &H);
-	virtual bool						feel_vision_isRelevant				(CObject* who);
+	virtual bool						feel_vision_isRelevant				(IGameObject* who);
 	virtual float						Radius								() const;
 #ifdef DEBUG
 	virtual void						OnHUDDraw							(CCustomHUD* hud);
@@ -246,7 +246,7 @@ public:
 	virtual void						PHFreeze				()			{return inherited ::PHFreeze();}
 
 	// miscellanious functions
-			void						DropItemSendMessage		(CObject *O);
+			void						DropItemSendMessage		(IGameObject *O);
 			bool						bfCheckForNodeVisibility(u32 dwNodeID, bool bIfRyPick = false);
 	virtual	ALife::ERelationType 		tfGetRelationType		(const CEntityAlive *tpEntityAlive) const;
 	virtual const SRotation				Orientation				() const;
@@ -302,8 +302,8 @@ public:
 			bool						fire_make_sense			();
 			
 	virtual LPCSTR						Name					() const;
-	virtual bool						feel_touch_contact		(CObject* O);
-	virtual bool						feel_touch_on_contact	(CObject* O);
+	virtual bool						feel_touch_contact		(IGameObject* O);
+	virtual bool						feel_touch_on_contact	(IGameObject* O);
 
 	//флаги, какие действия совершал актер по отношению к сталкеру
 	//(помог, атаковал и т.д.)
@@ -673,7 +673,7 @@ private:
 	Fvector								m_computed_object_direction;
 	// target parameters
 	Fvector								m_throw_target_position;
-	CObject								*m_throw_ignore_object;
+	IGameObject								*m_throw_ignore_object;
 	// computed
 	Fvector								m_throw_position;
 	Fvector								m_throw_velocity;
@@ -708,15 +708,15 @@ private:
 											const Fvector &gravity
 										);
 			void						check_throw_trajectory				(const float &throw_time);
-			void						throw_target_impl					(const Fvector &position, CObject *throw_ignore_object );
+			void						throw_target_impl					(const Fvector &position, IGameObject *throw_ignore_object );
 			void						compute_throw_miss					( u32 const vertex_id );
 
 public:
 	virtual	bool						use_default_throw_force				();
 	virtual	float						missile_throw_force					(); 
 	virtual	bool						use_throw_randomness				();
-			void						throw_target						(const Fvector &position, CObject *throw_ignore_object );
-			void						throw_target						(const Fvector &position, u32 const vertex_id, CObject *throw_ignore_object );
+			void						throw_target						(const Fvector &position, IGameObject *throw_ignore_object );
+			void						throw_target						(const Fvector &position, u32 const vertex_id, IGameObject *throw_ignore_object );
 	IC		const Fvector				&throw_target						() const;
 			void						update_throw_params					(); 
 			void						on_throw_completed					();
@@ -752,7 +752,7 @@ private:
 			bool						can_cry_enemy_is_wounded					() const;
 			void						on_critical_wound_initiator					(const CAI_Stalker *critically_wounded);
 			void						on_enemy_wounded_or_killed					(const CAI_Stalker *wounded_or_killed);
-			void						notify_on_wounded_or_killed					(CObject *object);
+			void						notify_on_wounded_or_killed					(IGameObject *object);
 			void						notify_on_wounded_or_killed					();
 			void	xr_stdcall			remove_critical_hit							();
 //////////////////////////////////////////////////////////////////////////
@@ -829,9 +829,9 @@ public:
 	bool								can_fire_right_now							( );
 
 public:
-	typedef xr_vector<CObject*>			ignored_touched_objects_type;
+	typedef xr_vector<IGameObject*>			ignored_touched_objects_type;
 	inline	ignored_touched_objects_type& ignored_touched_objects					() { return m_ignored_touched_objects; }
-			void						generate_take_event							( CObject const* const object ) const;
+			void						generate_take_event							( IGameObject const* const object ) const;
 
 private:
 	ignored_touched_objects_type		m_ignored_touched_objects;

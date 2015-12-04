@@ -254,7 +254,7 @@ void CPhantom::UpdateCL()
 	if (m_TgtState!=m_CurState)	SwitchToState_internal(m_TgtState);
 }
 //---------------------------------------------------------------------
-//void CPhantom::Hit	(float P, Fvector &dir, CObject* who, s16 element,Fvector p_in_object_space, float impulse, ALife::EHitType hit_type)
+//void CPhantom::Hit	(float P, Fvector &dir, IGameObject* who, s16 element,Fvector p_in_object_space, float impulse, ALife::EHitType hit_type)
 void	CPhantom::Hit							(SHit* pHDS)
 {
 	if (m_TgtState==stFly)	SwitchToState(stShoot);
@@ -299,7 +299,7 @@ void CPhantom::UpdatePosition(const Fvector& tgt_pos)
 	Position().mad	(prev_pos,cur_dir,fSpeed*Device.fTimeDelta);
 }
 
-void CPhantom::PsyHit(const CObject *object, float value) 
+void CPhantom::PsyHit(const IGameObject *object, float value) 
 {
 	NET_Packet			P;
 	SHit				HS;

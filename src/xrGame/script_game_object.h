@@ -143,7 +143,7 @@ public:
 
 							CScriptGameObject		(CGameObject *tpGameObject);
 	virtual					~CScriptGameObject		();
-							operator CObject*		();
+							operator IGameObject*		();
 
 	IC		CGameObject			&object				() const;
 			CScriptGameObject	*Parent				() const;

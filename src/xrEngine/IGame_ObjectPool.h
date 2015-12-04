@@ -1,7 +1,7 @@
 #pragma once
 
 // refs
-class ENGINE_API CObject;
+class ENGINE_API IGameObject;
 
 //-----------------------------------------------------------------------------------------------------------
 class ENGINE_API IGame_ObjectPool
@@ -13,20 +13,20 @@ class ENGINE_API IGame_ObjectPool
     IC bool operator()(const shared_str& x, const shared_str& y) const
     { return xr_strcmp(x,y)<0; }
     };
-    typedef xr_multimap<shared_str,CObject*,str_pred> POOL;
+    typedef xr_multimap<shared_str,IGameObject*,str_pred> POOL;
     typedef POOL::iterator POOL_IT;
     private:
     POOL map_POOL;
     */
-    typedef xr_vector<CObject*> ObjectVec;
+    typedef xr_vector<IGameObject*> ObjectVec;
     typedef ObjectVec::iterator ObjectVecIt;
     ObjectVec m_PrefetchObjects;
 public:
     void prefetch();
     void clear();
 
-    CObject* create(LPCSTR name);
-    void destroy(CObject* O);
+    IGameObject* create(LPCSTR name);
+    void destroy(IGameObject* O);
 
     IGame_ObjectPool();
     virtual ~IGame_ObjectPool();

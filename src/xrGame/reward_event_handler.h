@@ -18,7 +18,7 @@ public:
 	~reward_event_handler	() {};
 	virtual bool			OnWeapon_Fire				(u16 sender, u16 sender_weapon_id) = 0;
 	virtual	bool			OnBullet_Fire				(u16 sender, u16 sender_weapon_id, const Fvector& position, const Fvector& direction) = 0;
-	virtual bool			OnBullet_Hit				(CObject const * hitter, CObject const * victim, CObject const * weapon, u16 const bone) = 0;
+	virtual bool			OnBullet_Hit				(IGameObject const * hitter, IGameObject const * victim, IGameObject const * weapon, u16 const bone) = 0;
 	virtual bool			OnArtefactSpawned			() = 0;
 	virtual bool			OnPlayerTakeArtefact		(game_PlayerState const * ps) = 0;
 	virtual bool			OnPlayerDropArtefact		(game_PlayerState const * ps) = 0;

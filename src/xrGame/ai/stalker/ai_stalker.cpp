@@ -462,7 +462,7 @@ void CAI_Stalker::reload			(LPCSTR section)
 	m_power_fx_factor				= pSettings->r_float(section,"power_fx_factor");
 }
 
-void CAI_Stalker::Die				(CObject* who)
+void CAI_Stalker::Die				(IGameObject* who)
 {
 	movement().on_death				( );
 
@@ -1161,7 +1161,7 @@ const MonsterSpace::SBoneRotation &CAI_Stalker::head_orientation	() const
 	return		(movement().head_orientation());
 }
 
-void CAI_Stalker::net_Relcase				(CObject*	 O)
+void CAI_Stalker::net_Relcase				(IGameObject*	 O)
 {
 	inherited::net_Relcase				(O);
 

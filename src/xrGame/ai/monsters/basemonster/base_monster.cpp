@@ -394,7 +394,7 @@ void CBaseMonster::shedule_Update(u32 dt)
 //////////////////////////////////////////////////////////////////////
 
 
-void CBaseMonster::Die(CObject* who)
+void CBaseMonster::Die(IGameObject* who)
 {
 	if (StateMan) StateMan->critical_finalize();
 
@@ -599,12 +599,12 @@ void CBaseMonster::set_state_sound(u32 type, bool once)
 	m_prev_sound_type	= type;
 }
 
-bool CBaseMonster::feel_touch_on_contact	(CObject *O)
+bool CBaseMonster::feel_touch_on_contact	(IGameObject *O)
 {
 	return		(inherited::feel_touch_on_contact(O));
 }
 
-bool CBaseMonster::feel_touch_contact(CObject *O)
+bool CBaseMonster::feel_touch_contact(IGameObject *O)
 {
 	m_anomaly_detector->on_contact(O);
 	return inherited::feel_touch_contact(O);
@@ -754,7 +754,7 @@ IFactoryObject *CBaseMonster::_construct	()
 	return						(this);
 }
 
-void CBaseMonster::net_Relcase(CObject *O)
+void CBaseMonster::net_Relcase(IGameObject *O)
 {
 	inherited::net_Relcase(O);
 
@@ -884,7 +884,7 @@ void CBaseMonster::OnEvent(NET_Packet& P, u16 type)
 	{
 	case GE_KILL_SOMEONE:
 		P.r_u16		(id);
-		CObject* O	= Level().Objects.net_Find	(id);
+		IGameObject* O	= Level().Objects.net_Find	(id);
 
 		if (O)  {
 			CEntity *pEntity = smart_cast<CEntity*>(O);

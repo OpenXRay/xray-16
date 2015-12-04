@@ -20,7 +20,7 @@ struct HUD_SOUND_ITEM
 
 	static void		PlaySound		(	HUD_SOUND_ITEM& snd,
 										const Fvector& position,
-										const CObject* parent,
+										const IGameObject* parent,
 										bool hud_mode,
 										bool looped = false,
 										u8 index=u8(-1));
@@ -63,7 +63,7 @@ public:
 								~HUD_SOUND_COLLECTION();
 	void						PlaySound		(	LPCSTR alias, 
 													const Fvector& position,
-													const CObject* parent,
+													const IGameObject* parent,
 													bool hud_mode,
 													bool looped = false,
 													u8 index=u8(-1));

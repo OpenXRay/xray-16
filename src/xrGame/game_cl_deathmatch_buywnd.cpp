@@ -27,7 +27,7 @@ s16	game_cl_Deathmatch::GetBuyMenuItemIndex		(u8 Addons, u8 ItemID)
 void game_cl_Deathmatch::OnBuyMenu_Ok	()
 {
 	if (!m_bBuyEnabled) return;
-	CObject *l_pObj = Level().CurrentEntity();
+	IGameObject *l_pObj = Level().CurrentEntity();
 
 	CGameObject *l_pPlayer = smart_cast<CGameObject*>(l_pObj);
 	if(!l_pPlayer) return;

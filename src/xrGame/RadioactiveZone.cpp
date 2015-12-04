@@ -75,7 +75,7 @@ void CRadioactiveZone::Affect(SZoneObjectInfo* O)
 	}//while
 }
 
-void CRadioactiveZone::feel_touch_new					(CObject* O	)
+void CRadioactiveZone::feel_touch_new					(IGameObject* O	)
 {
 	inherited::feel_touch_new(O);
 	if (GameID() != eGameIDSingle)
@@ -88,7 +88,7 @@ void CRadioactiveZone::feel_touch_new					(CObject* O	)
 };
 
 #include "actor.h"
-bool CRadioactiveZone::feel_touch_contact(CObject* O)
+bool CRadioactiveZone::feel_touch_contact(IGameObject* O)
 {
 
 	CActor* A = smart_cast<CActor*>(O);

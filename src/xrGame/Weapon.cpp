@@ -1807,14 +1807,14 @@ float CWeapon::GetConditionToShow	() const
 
 BOOL CWeapon::ParentMayHaveAimBullet	()
 {
-	CObject* O=H_Parent();
+	IGameObject* O=H_Parent();
 	CEntityAlive* EA=smart_cast<CEntityAlive*>(O);
 	return EA->cast_actor()!=0;
 }
 
 BOOL CWeapon::ParentIsActor	()
 {
-	CObject* O			= H_Parent();
+	IGameObject* O			= H_Parent();
 	if (!O)
 		return FALSE;
 

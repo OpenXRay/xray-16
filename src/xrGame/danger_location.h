@@ -10,7 +10,7 @@
 
 #include "memory_space.h"
 
-class CObject;
+class IGameObject;
 
 class CDangerLocation : public intrusive_base {
 public:
@@ -25,7 +25,7 @@ public:
 
 public:
 	IC		bool			operator==	(const Fvector &position) const;
-	virtual	bool			operator==	(const CObject *object) const;
+	virtual	bool			operator==	(const IGameObject *object) const;
 	virtual bool			useful		() const;
 	virtual const Fvector	&position	() const = 0;
 	IC		const flags		&mask		() const;

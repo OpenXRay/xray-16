@@ -17,9 +17,9 @@
 #include "Common/object_broker.h"
 
 struct CDangerPredicate {
-	const CObject	*m_object;
+	const IGameObject	*m_object;
 
-	IC			CDangerPredicate	(const CObject *object)
+	IC			CDangerPredicate	(const IGameObject *object)
 	{
 		m_object			= object;
 	}
@@ -129,7 +129,7 @@ void CDangerManager::update			()
 	STOP_PROFILE
 }
 
-void CDangerManager::remove_links	(const CObject *object)
+void CDangerManager::remove_links	(const IGameObject *object)
 {
 	if (m_selected && (m_selected->object() == object))
 		m_selected			= 0;

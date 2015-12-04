@@ -80,7 +80,7 @@ void HUD_SOUND_ITEM::DestroySound(HUD_SOUND_ITEM& hud_snd)
 
 void HUD_SOUND_ITEM::PlaySound(	HUD_SOUND_ITEM&		hud_snd,
 								const Fvector&	position,
-								const CObject*	parent,
+								const IGameObject*	parent,
 								bool			b_hud_mode,
 								bool			looped,
 								u8 index)
@@ -100,7 +100,7 @@ void HUD_SOUND_ITEM::PlaySound(	HUD_SOUND_ITEM&		hud_snd,
 	hud_snd.m_activeSnd = &hud_snd.sounds[ index ];
 	
 
-	hud_snd.m_activeSnd->snd.play_at_pos(	const_cast<CObject*>(parent),
+	hud_snd.m_activeSnd->snd.play_at_pos(	const_cast<IGameObject*>(parent),
 											flags&sm_2D?Fvector().set(0,0,0):position,
 											flags,
 											hud_snd.m_activeSnd->delay);
@@ -145,7 +145,7 @@ HUD_SOUND_ITEM* HUD_SOUND_COLLECTION::FindSoundItem(LPCSTR alias, bool b_assert)
 
 void HUD_SOUND_COLLECTION::PlaySound(	LPCSTR alias, 
 										const Fvector& position,
-										const CObject* parent,
+										const IGameObject* parent,
 										bool hud_mode,
 										bool looped,
 										u8 index)

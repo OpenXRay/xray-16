@@ -11,9 +11,9 @@ public:
 
 	virtual void Load					(LPCSTR section);
 	virtual void Affect					(SZoneObjectInfo* O);
-	virtual	void feel_touch_new			(CObject* O	);
+	virtual	void feel_touch_new			(IGameObject* O	);
 	virtual	void UpdateWorkload			(u32	dt	);				// related to fast-mode optimizations
-	virtual	bool feel_touch_contact		(CObject* O	);
+	virtual	bool feel_touch_contact		(IGameObject* O	);
 			float nearest_shape_radius	(SZoneObjectInfo* O);
 
 protected:

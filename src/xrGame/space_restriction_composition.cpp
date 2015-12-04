@@ -219,7 +219,7 @@ void CSpaceRestrictionComposition::check_restrictor_type()
 	if (!ai().get_alife())
 		return;
 
-	CObject							*object = Level().Objects.FindObjectByName(m_space_restrictors);
+	IGameObject							*object = Level().Objects.FindObjectByName(m_space_restrictors);
 	if (!object)
 		return;
 

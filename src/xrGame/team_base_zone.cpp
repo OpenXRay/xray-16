@@ -109,7 +109,7 @@ void CTeamBaseZone::shedule_Update(u32 dt)
 	feel_touch_update			(P,s.R);
 }
 
-void CTeamBaseZone::feel_touch_new	(CObject *tpObject)
+void CTeamBaseZone::feel_touch_new	(IGameObject *tpObject)
 {
 	if(OnServer() && smart_cast<CActor*>(tpObject))
 	{
@@ -123,7 +123,7 @@ void CTeamBaseZone::feel_touch_new	(CObject *tpObject)
 	};
 }
 
-void CTeamBaseZone::feel_touch_delete	(CObject *tpObject)
+void CTeamBaseZone::feel_touch_delete	(IGameObject *tpObject)
 {
 	if(OnServer() && smart_cast<CActor*>(tpObject))
 	{
@@ -136,7 +136,7 @@ void CTeamBaseZone::feel_touch_delete	(CObject *tpObject)
 	};
 }
 
-bool CTeamBaseZone::feel_touch_contact	(CObject* O)
+bool CTeamBaseZone::feel_touch_contact	(IGameObject* O)
 {
 	CActor*	pActor = smart_cast<CActor*>(O);
 	if (!pActor) return (false);

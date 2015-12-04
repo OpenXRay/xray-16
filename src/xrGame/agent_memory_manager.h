@@ -37,7 +37,7 @@ protected:
 public:
 	IC						CAgentMemoryManager	(CAgentManager *object);
 			void			update				();
-			void			remove_links		(CObject *object);
+			void			remove_links		(IGameObject *object);
 
 public:
 	IC		void			set_squad_objects	(VISIBLES *objects);
@@ -58,7 +58,7 @@ public:
 	IC		void			update_memory_masks	(const squad_mask_type &mask, T &objects);
 	IC		void			update_memory_mask	(const squad_mask_type &mask, squad_mask_type &current);
 			void			update_memory_masks	(const squad_mask_type &mask);
-			void			object_information	(const CObject *object, u32 &level_time, Fvector &position);
+			void			object_information	(const IGameObject *object, u32 &level_time, Fvector &position);
 };
 
 #include "agent_memory_manager_inline.h"

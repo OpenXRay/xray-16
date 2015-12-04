@@ -131,7 +131,7 @@ void CStalkerActionReachWounded::execute					()
 		return;
 	}
 
-//	CObject									*processor = Level().Objects.net_Find(processor_id);
+//	IGameObject									*processor = Level().Objects.net_Find(processor_id);
 //	if (processor && processor->Position().distance_to_sqr(object().Position()) < _sqr(3.f)) {
 //		object().movement().set_movement_type	(eMovementTypeStand);
 //		return;

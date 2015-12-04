@@ -1056,7 +1056,7 @@ void CUIActorMenu::PropertiesBoxForUsing( PIItem item, bool& b_show )
 	}
 	else if ( pEatableItem )
 	{
-		CObject*	pObj			= smart_cast<CObject*>		(item);
+		IGameObject*	pObj			= smart_cast<IGameObject*>		(item);
 		shared_str	section_name	= pObj->cNameSect();
 		if ( !xr_strcmp(section_name,"vodka") || !(xr_strcmp(section_name,"energy_drink")) )
 		{

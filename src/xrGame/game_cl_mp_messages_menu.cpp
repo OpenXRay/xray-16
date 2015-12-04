@@ -184,7 +184,7 @@ void				game_cl_mp::OnSpeechMessage			(NET_Packet& P)
 	}
 	else
 	{
-		CObject* pObj = Level().Objects.net_Find(ps->GameID);
+		IGameObject* pObj = Level().Objects.net_Find(ps->GameID);
 		if (pObj)
 		{
 			pMSound->mSound_Voice.play_at_pos(pObj, pObj->Position());

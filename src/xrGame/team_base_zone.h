@@ -27,9 +27,9 @@ public:
 	virtual float	Radius				() const;
 
 	virtual void	shedule_Update		(u32 dt);
-	virtual void	feel_touch_new		(CObject* O);
-	virtual void	feel_touch_delete	(CObject* O);
-	virtual bool	feel_touch_contact	(CObject* O);
+	virtual void	feel_touch_new		(IGameObject* O);
+	virtual void	feel_touch_delete	(IGameObject* O);
+	virtual bool	feel_touch_contact	(IGameObject* O);
 
 	virtual u8		GetZoneTeam			()	{ return m_Team; };
 #ifdef DEBUG

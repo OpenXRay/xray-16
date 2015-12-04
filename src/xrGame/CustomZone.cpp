@@ -566,7 +566,7 @@ void CCustomZone::CheckForAwaking()
 		SwitchZoneState(eZoneStateAwaking);
 }
 
-void CCustomZone::feel_touch_new	(CObject* O) 
+void CCustomZone::feel_touch_new	(IGameObject* O) 
 {
 //	if(smart_cast<CActor*>(O) && O == Level().CurrentEntity())
 //					m_pLocalActor	= smart_cast<CActor*>(O);
@@ -604,7 +604,7 @@ void CCustomZone::feel_touch_new	(CObject* O)
 	}
 };
 
-void CCustomZone::feel_touch_delete(CObject* O) 
+void CCustomZone::feel_touch_delete(IGameObject* O) 
 {
 	CGameObject* pGameObject =smart_cast<CGameObject*>(O);
 	if(!pGameObject->getDestroy())
@@ -620,7 +620,7 @@ void CCustomZone::feel_touch_delete(CObject* O)
 	}
 }
 
-bool CCustomZone::feel_touch_contact(CObject* O) 
+bool CCustomZone::feel_touch_contact(IGameObject* O) 
 {
 	if (smart_cast<CCustomZone*>(O))				return FALSE;
 	if (smart_cast<CBreakableObject*>(O))			return FALSE;
@@ -1270,7 +1270,7 @@ void CCustomZone::CreateHit	(	u16 id_to,
 	};
 }
 
-void CCustomZone::net_Relcase(CObject* O)
+void CCustomZone::net_Relcase(IGameObject* O)
 {
 	CGameObject* GO				= smart_cast<CGameObject*>(O);
 	OBJECT_INFO_VEC_IT it		= std::find(m_ObjectInfoMap.begin(),m_ObjectInfoMap.end(), GO);
@@ -1391,7 +1391,7 @@ void CCustomZone::GoEnabledState()
 		u_EventSend		(P);
 }
 
-bool CCustomZone::feel_touch_on_contact	(CObject *O)
+bool CCustomZone::feel_touch_on_contact	(IGameObject *O)
 {
 	if ((spatial.type | STYPE_VISIBLEFORAI) != spatial.type)
 		return			(false);

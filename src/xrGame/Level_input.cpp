@@ -330,9 +330,9 @@ void CLevel::IR_OnKeyboardPress	(int key)
 					}
 				}
 			if (bOk) {
-				CObject *tpObject = CurrentEntity();
-				CObject *__I = Objects.o_get_by_iterator(i);
-				CObject **I = &__I;
+				IGameObject *tpObject = CurrentEntity();
+				IGameObject *__I = Objects.o_get_by_iterator(i);
+				IGameObject **I = &__I;
 				
 				SetEntity(*I);
 				if (tpObject != *I)
@@ -438,7 +438,7 @@ void CLevel::IR_OnKeyboardPress	(int key)
 
 
 	#ifdef _DEBUG
-		CObject *obj = Level().Objects.FindObjectByName("monster");
+		IGameObject *obj = Level().Objects.FindObjectByName("monster");
 		if (obj) {
 			CBaseMonster *monster = smart_cast<CBaseMonster *>(obj);
 			if (monster) 

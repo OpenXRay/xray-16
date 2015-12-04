@@ -63,7 +63,7 @@ public:
 			void					update				();
 #endif // USE_SCHEDULER_IN_AGENT_MANAGER
 			shared_str				cName				() const;
-			void					remove_links		(CObject *object);
+			void					remove_links		(IGameObject *object);
 
 public:
 	IC		CAgentCorpseManager		&corpse				() const;

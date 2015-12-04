@@ -422,7 +422,7 @@ void CAI_Rat::select_next_home_position	()
 
 bool CAI_Rat::can_stand_in_position()
 {
-	xr_vector<CObject*>					tpNearestList								; 
+	xr_vector<IGameObject*>					tpNearestList								; 
 	//float m_radius = Radius();
 	Level().ObjectSpace.GetNearest		(tpNearestList, Position(), 0.2f, this)	; 
 	if (tpNearestList.empty())
@@ -435,8 +435,8 @@ bool CAI_Rat::can_stand_in_position()
 	M.c									= C2;
 	MagicBox3							box(M,d);
 
-	xr_vector<CObject*>::iterator		I = tpNearestList.begin();
-	xr_vector<CObject*>::iterator		E = tpNearestList.end();
+	xr_vector<IGameObject*>::iterator		I = tpNearestList.begin();
+	xr_vector<IGameObject*>::iterator		E = tpNearestList.end();
 	for ( ; I != E; ++I) {
 		if (!smart_cast<CAI_Rat*>(*I))
 			continue;
@@ -454,9 +454,9 @@ bool CAI_Rat::can_stand_in_position()
 
 bool CAI_Rat::can_stand_here	()
 {
-	xr_vector<CObject*>					tpNearestList								; 
+	xr_vector<IGameObject*>					tpNearestList								; 
 	Level().ObjectSpace.GetNearest		(tpNearestList, Position(),Radius(),this)	; 
-	//xr_vector<CObject*>				&tpNearestList = Level().ObjectSpace.q_nearest; 
+	//xr_vector<IGameObject*>				&tpNearestList = Level().ObjectSpace.q_nearest; 
 	if (tpNearestList.empty())
 		return							(true);
 
@@ -467,8 +467,8 @@ bool CAI_Rat::can_stand_here	()
 	M.c									= C2;
 	MagicBox3							box(M,d);
 
-	xr_vector<CObject*>::iterator		I = tpNearestList.begin();
-	xr_vector<CObject*>::iterator		E = tpNearestList.end();
+	xr_vector<IGameObject*>::iterator		I = tpNearestList.begin();
+	xr_vector<IGameObject*>::iterator		E = tpNearestList.end();
 	for ( ; I != E; ++I) {
 		if (!smart_cast<CAI_Rat*>(*I))
 			continue;

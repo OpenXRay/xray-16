@@ -74,7 +74,7 @@ void CAgentManager::remove_components	()
 	xr_delete					(m_brain);
 }
 
-void CAgentManager::remove_links		(CObject *object)
+void CAgentManager::remove_links		(IGameObject *object)
 {
 	corpse().remove_links		(object);
 	enemy().remove_links		(object);
