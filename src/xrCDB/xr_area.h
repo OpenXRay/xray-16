@@ -83,6 +83,7 @@ public:
 	void								dbgRender			();
 	//ref_shader							dbgGetShader		()	{ return sh_debug;	}
 #endif
+    void DumpStatistics(IGameFont &font, IPerformanceAlert *alert);
 };
 
 

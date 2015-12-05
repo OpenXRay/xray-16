@@ -317,7 +317,7 @@ IC		void			gm_SetNearer		(BOOL bNearer)
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 CRender::CRender	()
-:m_bFirstFrameAfterReset(false)
+:m_bFirstFrameAfterReset(false), Sectors_xrc("render")
 {
 }
 
@@ -655,6 +655,7 @@ void CRender::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
 {
     D3DXRenderBase::DumpStatistics(font, alert);
     HOM.DumpStatistics(font, alert);
+    Sectors_xrc.DumpStatistics(font, alert);
 }
 
 #pragma comment(lib,"d3dx9.lib")

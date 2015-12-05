@@ -7,16 +7,21 @@
 //#pragma once
 
 #include "xrCDB.h"
+class IGameFont;
+class IPerformanceAlert;
 
 class XRCDB_API xrXRC  
 {
 	CDB::COLLIDER	CL;
+    const char *name;
 public:
     struct ColliderStatistics
     {
         CStatTimer RayQuery; // total: ray-testing
         CStatTimer BoxQuery; // total: box query
         CStatTimer FrustumQuery; // total: frustum query
+        float RayPs = 0;
+        float BoxPs = 0;
 
         ColliderStatistics() { FrameStart(); }
 
@@ -32,6 +37,14 @@ public:
             RayQuery.FrameEnd();
             BoxQuery.FrameEnd();
             FrustumQuery.FrameEnd();
+            float newRayPs = RayQuery.count/RayQuery.result;
+            if (std::isnan(newRayPs))
+                newRayPs = 0;
+            RayPs = 0.99f*RayPs + 0.01f*newRayPs;
+            float newBoxPs = BoxQuery.count/BoxQuery.result;
+            if (std::isnan(newBoxPs))
+                newBoxPs = 0;
+            BoxPs = 0.99f*BoxPs + 0.01f*newBoxPs;
         }
     };
     ColliderStatistics Stats;
@@ -76,8 +89,9 @@ public:
 	IC void			r_clear			()	{	CL.r_clear();				};
 	IC void			r_clear_compact	()	{	CL.r_clear_compact();		};
 	
-	xrXRC();
-	~xrXRC();
+    void DumpStatistics(IGameFont &font, IPerformanceAlert *alert);
+
+    xrXRC(const char *name = "<unknown>") : name(name) {}
 };
 XRCDB_API extern xrXRC XRC;
 

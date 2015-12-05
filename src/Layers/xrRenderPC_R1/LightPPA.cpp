@@ -333,8 +333,8 @@ void CLightR_Manager::add			(light* L)
 	}
 	VERIFY							(L->spatial.sector);
 }
-
-CLightR_Manager::CLightR_Manager	()
+// XXX stats: add to statistics
+CLightR_Manager::CLightR_Manager	() : xrc("LightR_Manager")
 {
 }
 

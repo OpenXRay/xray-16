@@ -45,10 +45,11 @@ CWallmarksEngine::wm_slot* CWallmarksEngine::AppendSlot	(ref_shader shader)
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CWallmarksEngine::CWallmarksEngine	()
+CWallmarksEngine::CWallmarksEngine	() :
 #ifdef CONFIG_PROFILE_LOCKS
-	:lock(MUTEX_PROFILE_ID(CWallmarksEngine))
+	lock(MUTEX_PROFILE_ID(CWallmarksEngine)),
 #endif // CONFIG_PROFILE_LOCKS
+    xrc("wallmarks") // XXX stats: add to statistics
 {
 	static_pool.reserve		(256);
 	marks.reserve			(256);

@@ -15,7 +15,7 @@ using namespace	collide;
 // Purpose	: stores space slots
 //----------------------------------------------------------------------
 CObjectSpace::CObjectSpace	( ):
-	xrc()
+	xrc("object space")
 #ifdef CONFIG_PROFILE_LOCKS
 	,Lock(MUTEX_PROFILE_ID(CObjectSpace::Lock))
 #endif // CONFIG_PROFILE_LOCKS
@@ -166,3 +166,6 @@ void CObjectSpace::dbgRender()
 }
 */
 #endif
+// XXX stats: add to statistics
+void CObjectSpace::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
+{ xrc.DumpStatistics(font, alert); }
