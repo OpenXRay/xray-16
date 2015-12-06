@@ -1,3 +1,6 @@
+// XXX: don't use strcpy_s/wcscpy_s functions
+#pragma warning(push)
+#pragma warning(disable:4995) // strcpy_s marked as deprecated
 if ( !count )
     return;
 
@@ -444,3 +447,4 @@ switch (hr)
 // -------------------------------------------------------------
     CHK_ERR(XAPO_E_FORMAT_UNSUPPORTED, "Requested audio format unsupported.")
 }
+#pragma warning(pop)
