@@ -33,7 +33,7 @@ IC void CScriptEngine::parse_script_namespace(LPCSTR function_to_call, LPSTR nam
         if (!I)
             break;
     }
-    xr_strcpy(name_space, namespace_size, "_G");
+    xr_strcpy(name_space, namespace_size, GlobalNamespace);
     if (!J)
         xr_strcpy(function, function_size, function_to_call);
     else
