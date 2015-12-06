@@ -31,7 +31,7 @@ void ESceneFogVolumeTool::RemoveControls()
 
 void ESceneFogVolumeTool::Clear(bool bSpecific)
 {
-	inherited::Clear	(bSpecific);
+	inherited::Clear(bSpecific);
     m_group_counter		= 0;
 }
 
@@ -61,7 +61,7 @@ bool ESceneFogVolumeTool::LoadStream(IReader& F)
 void ESceneFogVolumeTool::SaveStream(IWriter& F)
 {
 	inherited::SaveStream(F);
-	F.w_chunk		(TOOL_CHUNK_VERSION,(u16*)&FOG_VOL_TOOLS_VERSION,sizeof(FOG_VOL_TOOLS_VERSION));
+	F.w_chunk	(TOOL_CHUNK_VERSION,(u16*)&FOG_VOL_TOOLS_VERSION,sizeof(FOG_VOL_TOOLS_VERSION));
 }
 
 bool ESceneFogVolumeTool::LoadSelection(IReader& F)
@@ -79,7 +79,7 @@ bool ESceneFogVolumeTool::LoadSelection(IReader& F)
 
 void ESceneFogVolumeTool::SaveSelection(IWriter& F)
 {
-	F.w_chunk		(TOOL_CHUNK_VERSION,(u16*)&FOG_VOL_TOOLS_VERSION,sizeof(FOG_VOL_TOOLS_VERSION));
+	F.w_chunk	(TOOL_CHUNK_VERSION,(u16*)&FOG_VOL_TOOLS_VERSION,sizeof(FOG_VOL_TOOLS_VERSION));
 
 	inherited::SaveSelection(F);
 }
@@ -100,8 +100,8 @@ bool ESceneFogVolumeTool::LoadLTX(CInifile& ini)
 
 void ESceneFogVolumeTool::SaveLTX(CInifile& ini, int id)
 {
-	inherited::SaveLTX	(ini, id);
-	ini.w_u32		("main", "version", FOG_VOL_TOOLS_VERSION);
+	inherited::SaveLTX(ini, id);
+	ini.w_u32	("main", "version", FOG_VOL_TOOLS_VERSION);
 }
 
 void ESceneFogVolumeTool::GroupSelected()
@@ -169,8 +169,8 @@ void EFogVolume::Construct(LPVOID data)
     m_volumeType			=  fvEmitter;
     m_group_id				= u32(-1);
     m_volume_profile		= "environment\\fog\\default.ltx";
-	add_box					(Fidentity);
-	SetDrawColor			(0x205050FF, 0xFF202020);
+	add_box				(Fidentity);
+	SetDrawColor		(0x205050FF, 0xFF202020);
 }
 
 EFogVolume::~EFogVolume()
@@ -186,7 +186,7 @@ bool EFogVolume::LoadLTX(CInifile& ini, LPCSTR sect_name)
 {
 	u32 version 				= ini.r_u32(sect_name, "version");
 
-	inherited::LoadLTX			(ini, sect_name);
+	inherited::LoadLTX		(ini, sect_name);
 
     if(version>0)
     {
@@ -196,28 +196,28 @@ bool EFogVolume::LoadLTX(CInifile& ini, LPCSTR sect_name)
     if(version>1 && m_volumeType==fvEmitter)
     	m_volume_profile		= ini.r_string(sect_name,"profile");
         
-	OnChangeEnvs				(NULL);
+	OnChangeEnvs			(NULL);
 
 	return 						true;
 }
 
 void EFogVolume::SaveLTX(CInifile& ini, LPCSTR sect_name)
 {
-	inherited::SaveLTX	(ini, sect_name);
+	inherited::SaveLTX(ini, sect_name);
 
-	ini.w_u32		(sect_name, "version", FOG_VOL_VERSION);
-    ini.w_u8		(sect_name, "folume_type", m_volumeType);
-    ini.w_u32		(sect_name, "group_id", m_group_id);
+	ini.w_u32	(sect_name, "version", FOG_VOL_VERSION);
+    ini.w_u8	(sect_name, "folume_type", m_volumeType);
+    ini.w_u32	(sect_name, "group_id", m_group_id);
 
     if(m_volumeType==fvEmitter)
-    	ini.w_string	(sect_name, "profile", m_volume_profile.c_str());
+    	ini.w_string(sect_name, "profile", m_volume_profile.c_str());
 }
 
 bool EFogVolume::LoadStream(IReader& F)
 {
 	u16 version 	= 0;
 
-    R_ASSERT		(F.r_chunk(OBJ_CHUNK_VERSION,&version));
+    R_ASSERT	(F.r_chunk(OBJ_CHUNK_VERSION,&version));
 
 	inherited::LoadStream(F);
 
@@ -227,36 +227,36 @@ bool EFogVolume::LoadStream(IReader& F)
         m_group_id                  = F.r_u32();
     }
     if(version>1 && m_volumeType==fvEmitter)
-		F.r_stringZ					(m_volume_profile);
+		F.r_stringZ				(m_volume_profile);
 
-	OnChangeEnvs					(NULL);
+	OnChangeEnvs				(NULL);
     return true;
 }
 
 void EFogVolume::SaveStream(IWriter& F)
 {
-	inherited::SaveStream	(F);
+	inherited::SaveStream(F);
 
-	F.open_chunk	(OBJ_CHUNK_VERSION);
-	F.w_u16			(FOG_VOL_VERSION);
-	F.close_chunk	();
+	F.open_chunk(OBJ_CHUNK_VERSION);
+	F.w_u16		(FOG_VOL_VERSION);
+	F.close_chunk();
 
-	F.open_chunk	(OBJ_CHUNK_DATA);
-	F.w_u8			(m_volumeType);
-	F.w_u32			(m_group_id);
+	F.open_chunk(OBJ_CHUNK_DATA);
+	F.w_u8		(m_volumeType);
+	F.w_u32		(m_group_id);
     if(m_volumeType==fvEmitter)
-		F.w_stringZ		(m_volume_profile.c_str());
+		F.w_stringZ	(m_volume_profile.c_str());
 
-	F.close_chunk	();
+	F.close_chunk();
 }
 
-void EFogVolume::OnChangeEnvs	(PropValue* prop)
+void EFogVolume::OnChangeEnvs(PropValue* prop)
 {
 	if(m_volumeType == fvEmitter)
-		SetDrawColor			(0x205050FF, 0xFF202020);
+		SetDrawColor		(0x205050FF, 0xFF202020);
      else
 	if(m_volumeType == fvOcclusion)
-		SetDrawColor			(0x2050A050, 0xFF202020);
+		SetDrawColor		(0x2050A050, 0xFF202020);
 
     ((ESceneFogVolumeTool*)ParentTool)->RegisterGroup(m_group_id);
 
@@ -265,20 +265,20 @@ void EFogVolume::OnChangeEnvs	(PropValue* prop)
 
 void EFogVolume::FillProp(LPCSTR pref, PropItemVec& values)
 {
-	inherited::FillProp			(pref, values);
+	inherited::FillProp		(pref, values);
 
 	PropValue* P;
-    P=PHelper().CreateToken8	(values, PrepareKey(pref,"VolumeType"),	&m_volumeType, fog_vol_type);
-    P->OnChangeEvent.bind		(this,&EFogVolume::OnChangeEnvs);
+    P=PHelper().CreateToken8(values, PrepareKey(pref,"VolumeType"),	&m_volumeType, fog_vol_type);
+    P->OnChangeEvent.bind	(this,&EFogVolume::OnChangeEnvs);
 
     if(m_volumeType==fvEmitter)
-    	P=PHelper().CreateRText	(values, PrepareKey(pref,"profile (ltx)"),	&m_volume_profile);
+    	P=PHelper().CreateRText(values, PrepareKey(pref,"profile (ltx)"),	&m_volume_profile);
 }
 //----------------------------------------------------
 
 bool EFogVolume::GetSummaryInfo(SSceneSummary* inf)
 {
-	inherited::GetSummaryInfo	(inf);
+	inherited::GetSummaryInfo(inf);
 	return true;
 }
 
@@ -292,6 +292,6 @@ void EFogVolume::Select(int flag)
 	inherited::Select(flag);
 
     if(Selected())
-    	((ESceneFogVolumeTool*)ParentTool)->Selected(this);
+    ((ESceneFogVolumeTool*)ParentTool)->Selected(this);
 }
 

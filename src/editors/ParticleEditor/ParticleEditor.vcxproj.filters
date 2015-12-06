@@ -4,7 +4,7 @@
     <Filter Include="Header Files">
       <UniqueIdentifier>{8da7d59b-5d35-461d-97b7-be4ed3a53514}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sourse Files">
+    <Filter Include="Source Files">
       <UniqueIdentifier>{0c4f66eb-44e1-4e1e-8d6c-179a6b593c9b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Other">
@@ -55,58 +55,58 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BottomBar.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ItemPropFormUnit.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LeftBar.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="noise.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ObjectAnimator.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ParticleEditor.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ParticleEffectActionsImpl.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ParticleEffectEditor.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ParticleEffectParser.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ParticleGroupEditor.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PSLibraryEditor.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Splash.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StatGraph.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TopBar.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UI_ParticleMain.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UI_ParticleTools.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UI_ParticleToolsProps.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\xrEngine\ObjectAnimator.cpp">
       <Filter>Other</Filter>
@@ -117,5 +117,6 @@
     <ClCompile Include="..\..\xrEngine\StatGraph.cpp">
       <Filter>Other</Filter>
     </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
 </Project>

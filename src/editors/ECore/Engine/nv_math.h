@@ -19,9 +19,10 @@ Comments:
 #include "nv_mathdecl.h"
 #endif // _nv_mathdecl_h_
 
+
 #include <assert.h>
 
-typedef f32						nv_scalar;
+typedef f32 nv_scalar;
 
 #define nv_zero					nv_scalar(0)
 #define nv_zero_5				nv_scalar(0.5)
@@ -42,7 +43,8 @@ typedef f32						nv_scalar;
 #define nv_big_eps				nv_scalar(10e-6)
 #define nv_small_eps			nv_scalar(10e-2)
 
-template<class _T>				struct vec3t;
+template<class _T>
+struct vec3t;
 struct vec2;
 struct vec4;
 
@@ -50,4 +52,7 @@ struct vec4;
 #include "nv_algebra.h"
 #endif // _nv_algebra_h_
 
+
 #endif //_nv_math_h_
+
+

@@ -47,6 +47,7 @@
     <ClInclude Include="NoiseGen.h" />
     <ClInclude Include="single_param.h" />
     <ClInclude Include="spline.h" />
+	<ClInclude Include="stdafx.h" />
     <ClInclude Include="Unit6.h" />
     <ClInclude Include="Unit7.h" />
     <ClInclude Include="Unit8.h" />

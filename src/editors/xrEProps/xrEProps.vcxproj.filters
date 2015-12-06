@@ -4,49 +4,49 @@
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="ChoseForm.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ColorPicker.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FolderLib.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GameTypeForm.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ItemDialog.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ItemList.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ItemListHelper.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ItemListTypes.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NumericVector.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PropertiesList.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PropertiesListHelper.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PropertiesListTypes.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ShaderFunction.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TextForm.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="xrEProps.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -98,7 +98,7 @@
     <Filter Include="Header Files">
       <UniqueIdentifier>{50486bfa-36dd-444a-97ff-3085cfb2a95d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sourse Files">
+    <Filter Include="Source Files">
       <UniqueIdentifier>{23fbccf4-abd0-49ce-b6e5-6eb563ebe033}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

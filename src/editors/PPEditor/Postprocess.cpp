@@ -24,16 +24,17 @@ USEFORM("float_constructor.cpp", frmConstructor);
 USEFORM("color.cpp", AddColorForm);
 USEFORM("single_param.cpp", AddFloatForm);
 //---------------------------------------------------------------------------
-FILE                        *g_LogFileHandle            =       NULL;
+FILE *g_LogFileHandle = NULL;
+
 //---------------------------------------------------------------------------
 
 
 //---------------------------------------------------------------------------
-void    log_callback    (LPCSTR lpString)
+void log_callback(LPCSTR lpString)
 {
     if (!g_LogFileHandle)
-       return;
-    fprintf (g_LogFileHandle, "%s\n", lpString);
+        return;
+    fprintf(g_LogFileHandle, "%s\n", lpString);
 }
 
 
@@ -41,33 +42,34 @@ WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
     try
     {
-        g_LogFileHandle = fopen ("postprocess.log", "wt");
-         Core._initialize ("Postprocess editor", log_callback, FALSE);
-         FS._initialize (CLocatorAPI::flScanAppRoot, 0, 0);
-         
-         Application->Initialize();
-         Application->CreateForm(__classid(TMainForm), &MainForm);
-		Application->Run();
-         Core._destroy();
-         fclose (g_LogFileHandle);
-    }
-    catch (Exception &exception)
+        g_LogFileHandle = fopen("postprocess.log", "wt");
+        Core._initialize("Postprocess editor", log_callback, FALSE);
+        FS._initialize(CLocatorAPI::flScanAppRoot, 0, 0);
+
+        Application->Initialize();
+        Application->CreateForm(__classid(TMainForm), &MainForm);
+        Application->Run();
+        Core._destroy();
+        fclose(g_LogFileHandle);
+    } catch (Exception &exception)
     {
-        fclose (g_LogFileHandle);
-         Application->ShowException(&exception);
+        fclose(g_LogFileHandle);
+        Application->ShowException(&exception);
     }
     catch (...)
     {
-         try
-         {
-             throw Exception("");
-         }
-         catch (Exception &exception)
-         {
-            fclose (g_LogFileHandle);
-             Application->ShowException(&exception);
-         }
+        try
+        {
+            throw Exception("");
+        } catch (Exception &exception)
+        {
+            fclose(g_LogFileHandle);
+            Application->ShowException(&exception);
+        }
     }
     return 0;
 }
+
 //---------------------------------------------------------------------------
+
+

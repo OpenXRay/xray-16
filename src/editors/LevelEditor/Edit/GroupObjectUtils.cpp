@@ -2,7 +2,7 @@
 #pragma hdrstop
 
 #include "GroupObject.h"
-#include "../../ecore/editor/D3DUtils.h"
+#include "editors/ECore/Editor/D3DUtils.h"
 
 static const float EMPTY_GROUP_SIZE = 0.5f;
 

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Sourse Files">
+    <Filter Include="Source Files">
       <UniqueIdentifier>{616336c3-6a56-4dfa-8a68-d598fa32370d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
@@ -14,55 +14,55 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BottomBar.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GameMtlLib_Editor.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="leftbar.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ShaderEditor.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SHCompilerTools.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SHCompilerToolsProperties.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SHEngineTools.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SHEngineToolsProperties.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SHGameMtlPairTools.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SHGameMtlTools.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SHSoundEnvTools.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SHToolsInterface.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Splash.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TopBar.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ui_shadermain.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UI_shadertools.cpp">
-      <Filter>Sourse Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>

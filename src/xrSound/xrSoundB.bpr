@@ -3,27 +3,28 @@
 <PROJECT>
   <MACROS>
     <VERSION value="BCB.06.00"/>
-    <PROJECT value="$(OUTPUT_BINARIES_DIR)\xrSoundB.dll"/>
-    <OBJFILES value="x:\intermediate_ed\sound\SoundRender_Core.obj 
-      x:\intermediate_ed\sound\SoundRender_Core_Processor.obj 
-      x:\intermediate_ed\sound\SoundRender_Core_SourceManager.obj 
-      x:\intermediate_ed\sound\SoundRender_Core_StartStop.obj 
-      x:\intermediate_ed\sound\SoundRender_Emitter.obj 
-      x:\intermediate_ed\sound\SoundRender_Emitter_FSM.obj 
-      x:\intermediate_ed\sound\SoundRender_Emitter_StartStop.obj 
-      x:\intermediate_ed\sound\SoundRender_Emitter_streamer.obj 
-      x:\intermediate_ed\sound\SoundRender_Environment.obj 
-      x:\intermediate_ed\sound\soundrender_source.obj 
-      x:\intermediate_ed\sound\SoundRender_Source_loader.obj 
-      x:\intermediate_ed\sound\SoundRender_Target.obj 
-      x:\intermediate_ed\sound\stdafx.obj x:\intermediate_ed\sound\guids.obj 
-      x:\intermediate_ed\sound\SoundRender_Cache.obj 
-      x:\intermediate_ed\sound\SoundRender_TargetA.obj 
-      x:\intermediate_ed\sound\SoundRender_CoreA.obj 
-      x:\intermediate_ed\sound\sound.obj 
-      x:\intermediate_ed\sound\SoundRender_TargetD.obj 
-      x:\intermediate_ed\sound\SoundRender_CoreD.obj 
-      x:\intermediate_ed\sound\OpenALDeviceList.obj"/>
+    <PROJECT value="..\..\bin\editors\xrSoundB.dll"/>
+    <OBJFILES value="..\..\intermediate\editors\xrSoundB\SoundRender_Core.obj 
+      ..\..\intermediate\editors\xrSoundB\SoundRender_Core_Processor.obj 
+      ..\..\intermediate\editors\xrSoundB\SoundRender_Core_SourceManager.obj 
+      ..\..\intermediate\editors\xrSoundB\SoundRender_Core_StartStop.obj 
+      ..\..\intermediate\editors\xrSoundB\SoundRender_Emitter.obj 
+      ..\..\intermediate\editors\xrSoundB\SoundRender_Emitter_FSM.obj 
+      ..\..\intermediate\editors\xrSoundB\SoundRender_Emitter_StartStop.obj 
+      ..\..\intermediate\editors\xrSoundB\SoundRender_Emitter_streamer.obj 
+      ..\..\intermediate\editors\xrSoundB\SoundRender_Environment.obj 
+      ..\..\intermediate\editors\xrSoundB\soundrender_source.obj 
+      ..\..\intermediate\editors\xrSoundB\SoundRender_Source_loader.obj 
+      ..\..\intermediate\editors\xrSoundB\SoundRender_Target.obj 
+      ..\..\intermediate\editors\xrSoundB\stdafx.obj 
+      ..\..\intermediate\editors\xrSoundB\guids.obj 
+      ..\..\intermediate\editors\xrSoundB\SoundRender_Cache.obj 
+      ..\..\intermediate\editors\xrSoundB\SoundRender_TargetA.obj 
+      ..\..\intermediate\editors\xrSoundB\SoundRender_CoreA.obj 
+      ..\..\intermediate\editors\xrSoundB\sound.obj 
+      ..\..\intermediate\editors\xrSoundB\SoundRender_TargetD.obj 
+      ..\..\intermediate\editors\xrSoundB\SoundRender_CoreD.obj 
+      ..\..\intermediate\editors\xrSoundB\OpenALDeviceList.obj"/>
     <RESFILES value=""/>
     <IDLFILES value=""/>
     <IDLGENFILES value=""/>
@@ -54,11 +55,11 @@
       -D_EDITOR -D_XRSOUNDB -DXRSOUND_EXPORTS -D_DEBUG -boa"/>
     <CFLAG1 value="-WD -Od -H=pch.csm -Hc -Q -Vx -Ve -xf -xp -VF -ff -X- -r- -ps -a4 -6 -b- 
       -k -y -v -vi- -tWD -tWM -c"/>
-    <PFLAGS value="-N2x:\intermediate_ed\sound -N0x:\intermediate_ed\sound -$Y+ -$W -$O- -$A8 
-      -v -JPHNE -M"/>
+    <PFLAGS value="-N2..\..\intermediate\editors\xrSoundB 
+      -N0..\..\intermediate\editors\xrSoundB -$Y+ -$W -$O- -$A8 -v -JPHNE -M"/>
     <RFLAGS value=""/>
     <AFLAGS value="/mu /w2 /zi"/>
-    <LFLAGS value="-lx:\stalker_addon\libraries -Ix:\intermediate_ed\sound -D&quot;&quot; -aa -Tpd -x 
+    <LFLAGS value="-l..\..\lib\editors -I..\..\intermediate\editors\xrSoundB -D&quot;&quot; -aa -Tpd -x 
       -Gi -v"/>
     <OTHERFILES value=""/>
   </OPTIONS>
@@ -202,35 +203,38 @@ Item1=_EDITOR;_XRSOUNDB;XRSOUND_EXPORTS
 Item2=_XRSOUNDB;XRSOUND_EXPORTS;_DEBUG
 
 [HistoryLists\hlIntOutputDir]
-Count=7
-Item0=x:\intermediate_ed\sound
-Item1=$(OUTPUT_INTERMEDIATE_DIR)\sound
-Item2=$(OUTPUT_INTERMEDIATE_DIR)
-Item3=$(OUTPUT_INTERMEDIATE_DIR)\
-Item4=Intermediate
-Item5=XRLC_Intermediate
-Item6=xrLC_Options
+Count=8
+Item0=..\..\intermediate\editors\xrSoundB
+Item1=x:\intermediate_ed\sound
+Item2=$(OUTPUT_INTERMEDIATE_DIR)\sound
+Item3=$(OUTPUT_INTERMEDIATE_DIR)
+Item4=$(OUTPUT_INTERMEDIATE_DIR)\
+Item5=Intermediate
+Item6=XRLC_Intermediate
+Item7=xrLC_Options
 
 [HistoryLists\hlFinalOutputDir]
-Count=10
-Item0=$(OUTPUT_BINARIES_DIR)\
-Item1=x:\stalker_addon\binaries\
-Item2=x:\binaries\
-Item3=x:\binaries
-Item4=x:\
-Item5=x:\build\
-Item6=x:\xrCoreB.dll\
-Item7=x:\xrCoreB.dll
-Item8=!run\
-Item9=!run
+Count=11
+Item0=..\..\bin\editors\
+Item1=$(OUTPUT_BINARIES_DIR)\
+Item2=x:\stalker_addon\binaries\
+Item3=x:\binaries\
+Item4=x:\binaries
+Item5=x:\
+Item6=x:\build\
+Item7=x:\xrCoreB.dll\
+Item8=x:\xrCoreB.dll
+Item9=!run\
+Item10=!run
 
 [HistoryLists\hIBPIOutputDir]
-Count=5
-Item0=x:\stalker_addon\libraries
-Item1=$(OUT_LIB_DIR)
-Item2=$(OUTPUT_LIBRARIES_DIR)
-Item3=$(OUTPUT_LIBRARIES_DIR)\
-Item4=x:\libraries
+Count=6
+Item0=..\..\lib\editors\
+Item1=x:\stalker_addon\libraries
+Item2=$(OUT_LIB_DIR)
+Item3=$(OUTPUT_LIBRARIES_DIR)
+Item4=$(OUTPUT_LIBRARIES_DIR)\
+Item5=x:\libraries
 
 [Debugging]
 DebugSourceDirs=$(BCB)\source\vcl

@@ -17,7 +17,7 @@
 #include "ElTreeAdvEdit.hpp"
 #include <Mask.hpp>
 
-#include "../../xrServerEntities/PropertiesListHelper.h"
+#include "xrServerEntities/PropertiesListHelper.h"
 #include "RenderWindow.hpp"
 #include "MxShortcut.hpp"
 #include "ExtBtn.hpp"

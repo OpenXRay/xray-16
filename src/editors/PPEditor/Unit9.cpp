@@ -8,12 +8,14 @@
 #pragma package(smart_init)
 #pragma resource "*.dfm"
 TForm9 *Form9;
+
 //---------------------------------------------------------------------------
-__fastcall TForm9::TForm9(TComponent* Owner)
+__fastcall TForm9::TForm9(TComponent *Owner)
     : TForm(Owner)
 {
     ClientHeight = Panel1->Height;
-    
 }
+
 //---------------------------------------------------------------------------
+
 

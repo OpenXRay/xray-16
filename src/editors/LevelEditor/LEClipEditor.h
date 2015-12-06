@@ -15,7 +15,7 @@
 #include <Menus.hpp>
 #include <StdCtrls.hpp>
 #include "multi_edit.hpp"
-#include "../xrEProps/PropertiesList.h"
+#include "editors/xrEProps/PropertiesList.h"
 #include "motion.h"
 #include "ElTrackBar.hpp"
 #include "SkeletonAnimated.h"
@@ -159,66 +159,66 @@ protected:
     TMxLabel* 				m_LB[4];
     CKinematicsAnimated* 	m_RenderObject;
     
-	DEFINE_VECTOR		(CAnimationClip*,AnimClipVec,AnimClipIt);
+	DEFINE_VECTOR	(CAnimationClip*,AnimClipVec,AnimClipIt);
     AnimClipVec			clips;
     CAnimationClip*		sel_clip; 
     u32					play_clip;
     TProperties*		m_ClipProps;
     TItemList*			m_ClipList;
 
-    void				PlayAnimation	(CAnimationClip* clip);
+    void				PlayAnimation(CAnimationClip* clip);
     
-	void 				RemoveAllClips	();
-	void 				LoadClips		();
-	void 				SaveClips		();
-	void 				InsertClip		();
-	void 				AppendClip		();
-	void				RemoveClip		(CAnimationClip* clip);
-    void				SelectClip		(CAnimationClip* clip);
+	void 				RemoveAllClips();
+	void 				LoadClips	();
+	void 				SaveClips	();
+	void 				InsertClip	();
+	void 				AppendClip	();
+	void				RemoveClip	(CAnimationClip* clip);
+    void				SelectClip	(CAnimationClip* clip);
 
-    CAnimationClip*		FindClip		(float t);
-    CAnimationClip*		FindClip		(int x);
+    CAnimationClip*		FindClip	(float t);
+    CAnimationClip*		FindClip	(int x);
     
     void				RealRepaintClips();
-    void				RepaintClips	(bool bForced=false){m_RTFlags.set(flRT_RepaintClips,TRUE); if(bForced) RealRepaintClips(); }
+    void				RepaintClips(bool bForced=false){m_RTFlags.set(flRT_RepaintClips,TRUE); if(bForced) RealRepaintClips(); }
 	void 				RealUpdateProperties();
     void				UpdateProperties(bool bForced=false){m_RTFlags.set(flRT_UpdateProperties,TRUE); if(bForced) RealUpdateProperties(); }
-	void 				RealUpdateClips	();
-    void				UpdateClips		(bool bForced=false, bool bRepaint=true){m_RTFlags.set(flRT_UpdateClips,TRUE); m_RTFlags.set(flRT_RepaintClips,bRepaint); if(bForced) RealUpdateClips(); }
+	void 				RealUpdateClips();
+    void				UpdateClips	(bool bForced=false, bool bRepaint=true){m_RTFlags.set(flRT_UpdateClips,TRUE); m_RTFlags.set(flRT_RepaintClips,bRepaint); if(bForced) RealUpdateClips(); }
 
-    void				Clear			();
+    void				Clear		();
                
-	void __stdcall  	OnZoomChange		(PropValue* V);
-    void __stdcall  	OnNameChange		(PropValue* V);
-    void __stdcall  	OnClipLengthChange	(PropValue* V);
+	void __stdcall  	OnZoomChange	(PropValue* V);
+    void __stdcall  	OnNameChange	(PropValue* V);
+    void __stdcall  	OnClipLengthChange(PropValue* V);
 
-    void __stdcall  	OnClipItemFocused	(ListItemsVec& items);
+    void __stdcall  	OnClipItemFocused(ListItemsVec& items);
 public:
     float				m_CurrentPlayTime;
     float				m_TotalLength;
     float				m_Zoom;
 
-    void				Play			(BOOL bLoop);
-    void				Stop			();
+    void				Play		(BOOL bLoop);
+    void				Stop		();
 public:		// User declarations
-	__fastcall 			TClipMaker		(TComponent* Owner);
+	__fastcall 			TClipMaker	(TComponent* Owner);
 
-    static TClipMaker*	CreateForm		();
-    static void			DestroyForm		(TClipMaker* form);
+    static TClipMaker*	CreateForm	();
+    static void			DestroyForm	(TClipMaker* form);
 
-    void				ShowEditor		(CKinematicsAnimated* O);
-    void				HideEditor		();
+    void				ShowEditor	(CKinematicsAnimated* O);
+    void				HideEditor	();
 
-	virtual void		OnFrame			(void);
+	virtual void		OnFrame		(void);
     TItemList*			m_ObjectItems;
 };
 
 struct AnimClipItem
 {
     MotionID		mid;
-    AnimClipItem	(){}
-	void			clear			()			{mid.invalidate();}
-	bool			valid			() const	{return mid.valid();}
+    AnimClipItem(){}
+	void			clear		()			{mid.invalidate();}
+	bool			valid		() const	{return mid.valid();}
 };
 
 class CAnimationClip
@@ -232,21 +232,21 @@ public:
     s32				idx;
     TClipMaker* 	owner;
 public:
-                    CAnimationClip	(LPCSTR name, TClipMaker* owner);
-                    CAnimationClip	(TClipMaker* owner);
-                    ~CAnimationClip	();
-    float			Length			() const {return length;}
-    const float&	StartTime		() const {return start_time;}
+                    CAnimationClip(LPCSTR name, TClipMaker* owner);
+                    CAnimationClip(TClipMaker* owner);
+                    ~CAnimationClip();
+    float			Length		() const {return length;}
+    const float&	StartTime	() const {return start_time;}
 
-    int				PWidthUI		(){return Length()*owner->m_Zoom;}
-    int				PLeftUI			(){return StartTime()*owner->m_Zoom;}
-    int				PRightUI		(){return PLeftUI()+PWidthUI();}
+    int				PWidthUI	(){return Length()*owner->m_Zoom;}
+    int				PLeftUI		(){return StartTime()*owner->m_Zoom;}
+    int				PRightUI	(){return PLeftUI()+PWidthUI();}
 
 public:
-	void			Save			(IWriter& F){R_ASSERT(0);}
-	bool			Load			(IReader& F){R_ASSERT(0);return true;}
+	void			Save		(IWriter& F){R_ASSERT(0);}
+	bool			Load		(IReader& F){R_ASSERT(0);return true;}
     
-    void			SetCycle		(MotionID mid, u16 part_id, u8 part_count);
+    void			SetCycle	(MotionID mid, u16 part_id, u8 part_count);
 };
 extern TClipMaker* g_clip_maker;
 #endif

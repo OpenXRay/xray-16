@@ -5,14 +5,15 @@
 #ifndef ELogH
 #define ELogH
 
-class ECORE_API CLog{
-public:
-	bool 		in_use;
-public:
-				CLog	(){in_use=false;}
-	void 		Msg   	(TMsgDlgType mt, LPCSTR _Format, ...);
-	int 		DlgMsg 	(TMsgDlgType mt, LPCSTR _Format, ...);
-	int 		DlgMsg 	(TMsgDlgType mt, TMsgDlgButtons btn, LPCSTR _Format, ...);
+class ECORE_API CLog
+{
+    public:
+    bool in_use;
+    public:
+    CLog(){in_use = false;}
+    void Msg(TMsgDlgType mt, LPCSTR _Format, ...);
+    int DlgMsg(TMsgDlgType mt, LPCSTR _Format, ...);
+    int DlgMsg(TMsgDlgType mt, TMsgDlgButtons btn, LPCSTR _Format, ...);
 };
 
 void ECORE_API ELogCallback(void *context, LPCSTR txt);

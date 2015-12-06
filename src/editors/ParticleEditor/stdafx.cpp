@@ -4,7 +4,7 @@
 // external dependencies
 
 #ifndef _ECOREB
-#	pragma comment(lib,"xrECoreB.lib")
+#pragma comment(lib,"xrECoreB.lib")
 #endif
 
 #pragma comment(lib,"xrEPropsB.lib")

@@ -11,3 +11,4 @@ extern ECORE_API Fvector du_cone_vertices[];
 extern ECORE_API WORD du_cone_faces[];
 extern ECORE_API WORD du_cone_lines[];
 #endif
+

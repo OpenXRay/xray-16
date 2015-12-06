@@ -2,7 +2,7 @@
 #pragma hdrstop
 
 #include "FolderLib.h"
-#include "../../xrServerEntities/PropertiesListHelper.h"
+#include "xrServerEntities/PropertiesListHelper.h"
 
 //---------------------------------------------------------------------------
 #pragma package(smart_init)

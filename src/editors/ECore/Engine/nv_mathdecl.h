@@ -17,15 +17,17 @@ Comments:
 #define _nv_mathdecl_h_
 
 #ifdef NV_MATH_DLL
-
-    #ifdef NV_MATH_EXPORTS
-        #define DECLSPEC_NV_MATH __declspec(dllexport)
-    #else
-        #define DECLSPEC_NV_MATH __declspec(dllimport)
-    #endif
-
+#include "xrCore/Platform.h"
+#ifdef NV_MATH_EXPORTS
+        #define DECLSPEC_NV_MATH XR_EXPORT
 #else
-    #define DECLSPEC_NV_MATH
+        #define DECLSPEC_NV_MATH XR_IMPORT
 #endif
 
-#endif  // _nv_mathdecl_h_
+#else
+#define DECLSPEC_NV_MATH
+#endif
+
+#endif // _nv_mathdecl_h_
+
+

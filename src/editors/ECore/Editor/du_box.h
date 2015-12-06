@@ -14,3 +14,4 @@ extern ECORE_API WORD du_box_lines[];
 
 extern ECORE_API Fvector du_box_vertices2[];
 #endif
+
