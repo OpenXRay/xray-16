@@ -23,25 +23,21 @@ CScriptProcess *CScriptEngine::script_process(const ScriptProcessor &process_id)
     return nullptr;
 }
 
-IC void CScriptEngine::parse_script_namespace(LPCSTR function_to_call, LPSTR name_space,
-    u32 const namespace_size, LPSTR function, u32 const function_size)
+IC void CScriptEngine::parse_script_namespace(const char *name, char *ns, u32 nsSize, char *func, u32 funcSize)
 {
-    LPCSTR I = function_to_call, J = nullptr;
-    for (; ; J = I , ++I)
+    auto p = strrchr(name, '.');
+    if (!p)
     {
-        I = strchr(I, '.');
-        if (!I)
-            break;
+        xr_strcpy(ns, nsSize, GlobalNamespace);
+        p = name-1;
     }
-    xr_strcpy(name_space, namespace_size, GlobalNamespace);
-    if (!J)
-        xr_strcpy(function, function_size, function_to_call);
     else
     {
-        CopyMemory (name_space,function_to_call, u32(J - function_to_call)*sizeof(char)) ;
-        name_space[u32(J - function_to_call)] = 0;
-        xr_strcpy(function, function_size, J + 1);
+        VERIFY(u32(p-name+1)<=nsSize);
+        strncpy(ns, name, p-name);
+        ns[p-name] = 0;
     }
+    xr_strcpy(func, funcSize, p+1);
 }
 
 template<typename TResult>

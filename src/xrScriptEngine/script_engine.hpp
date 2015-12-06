@@ -166,7 +166,7 @@ public:
     bool process_file(LPCSTR file_name);
     bool process_file(LPCSTR file_name, bool reload_modules);
     bool function_object(LPCSTR function_to_call, luabind::object &object, int type = LUA_TFUNCTION);
-    IC void parse_script_namespace(LPCSTR function_to_call, LPSTR name_space, u32 const namespace_size, LPSTR function, u32 const function_size);
+    IC void parse_script_namespace(const char *name, char *ns, u32 nsSize, char *func, u32 funcSize);
     template<typename TResult>
     IC bool functor(LPCSTR function_to_call, luabind::functor<TResult> &lua_function);
 #ifdef USE_DEBUGGER
