@@ -57,9 +57,6 @@
     <ClInclude Include="script_engine.hpp">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="script_engine_inline.hpp">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="script_space_forward.hpp">
       <Filter>Engine</Filter>
     </ClInclude>

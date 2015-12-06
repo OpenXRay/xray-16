@@ -157,8 +157,8 @@ public:
 #endif
     void setup_callbacks();
     bool load_file(const char *scriptName, const char *namespaceName);
-    IC CScriptProcess *script_process(const ScriptProcessor &process_id) const;
-    IC void add_script_process(const ScriptProcessor &process_id, CScriptProcess *script_process);
+    CScriptProcess *script_process(const ScriptProcessor &process_id) const;
+    void add_script_process(const ScriptProcessor &process_id, CScriptProcess *script_process);
     void remove_script_process(const ScriptProcessor &process_id);
     static int auto_load(lua_State *L);
     void setup_auto_load();
@@ -166,7 +166,7 @@ public:
     bool process_file(LPCSTR file_name);
     bool process_file(LPCSTR file_name, bool reload_modules);
     bool function_object(LPCSTR function_to_call, luabind::object &object, int type = LUA_TFUNCTION);
-    IC void parse_script_namespace(const char *name, char *ns, u32 nsSize, char *func, u32 funcSize);
+    void parse_script_namespace(const char *name, char *ns, u32 nsSize, char *func, u32 funcSize);
     template<typename TResult>
     IC bool functor(LPCSTR function_to_call, luabind::functor<TResult> &lua_function);
 #ifdef USE_DEBUGGER
@@ -193,4 +193,12 @@ public:
     void DestroyScriptThread(const CScriptThread *thread);
 };
 
-#include "script_engine_inline.hpp"
+template<typename TResult>
+IC bool CScriptEngine::functor(LPCSTR function_to_call, luabind::functor<TResult> &lua_function)
+{
+    luabind::object object;
+    if (!function_object(function_to_call, object))
+        return false;
+    lua_function = object;
+    return true;
+}

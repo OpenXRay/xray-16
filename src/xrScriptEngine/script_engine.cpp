@@ -1167,6 +1167,37 @@ bool CScriptEngine::function_object(LPCSTR function_to_call, luabind::object &ob
     return true;
 }
 
+void CScriptEngine::add_script_process(const ScriptProcessor &process_id, CScriptProcess *script_process)
+{
+    VERIFY(m_script_processes.find(process_id)==m_script_processes.end());
+    m_script_processes.insert(std::make_pair(process_id, script_process));
+}
+
+CScriptProcess *CScriptEngine::script_process(const ScriptProcessor &process_id) const
+{
+    auto it = m_script_processes.find(process_id);
+    if (it!=m_script_processes.end())
+        return it->second;
+    return nullptr;
+}
+
+void CScriptEngine::parse_script_namespace(const char *name, char *ns, u32 nsSize, char *func, u32 funcSize)
+{
+    auto p = strrchr(name, '.');
+    if (!p)
+    {
+        xr_strcpy(ns, nsSize, GlobalNamespace);
+        p = name-1;
+    }
+    else
+    {
+        VERIFY(p-name+1<=nsSize);
+        strncpy(ns, name, p-name);
+        ns[p-name] = 0;
+    }
+    xr_strcpy(func, funcSize, p+1);
+}
+
 #if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
 void CScriptEngine::stopDebugger()
 {
