@@ -296,11 +296,11 @@ void CEngineAPI::CreateRendererList()
             if (!bSupports_r2_5)
                 bBreakLoop = true;
             break;
-        case 4: //"renderer_r_dx10"
+        case 5: //"renderer_r_dx10"
             if (!bSupports_r3)
                 bBreakLoop = true;
             break;
-        case 5: //"renderer_r_dx11"
+        case 6: //"renderer_r_dx11"
             if (!bSupports_r4)
                 bBreakLoop = true;
             break;
@@ -327,18 +327,18 @@ void CEngineAPI::CreateRendererList()
             val = "renderer_r2.5";
             break;
         case 4:
+            val = "renderer_gl";
+            break;
+        case 5:
             val = "renderer_r3";
             break; // -)
-        case 5:
+        case 6:
             val = "renderer_r4";
             break; // -)
         }
         if (bBreakLoop) break;
         _tmp.back() = xr_strdup(val);
     }
-
-    if (bSupports_gl)
-        _tmp.push_back("renderer_gl");
 
     u32 _cnt = _tmp.size() + 1;
     vid_quality_token = xr_alloc<xr_token>(_cnt);
