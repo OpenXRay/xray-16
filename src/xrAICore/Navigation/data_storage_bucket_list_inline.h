@@ -96,29 +96,37 @@ IC	u32	 CBucketList::compute_bucket_id	(CGraphVertex &vertex) const
 TEMPLATE_SPECIALIZATION
 IC	void CBucketList::verify_buckets	() const
 {
-//		for (u32 i=0; i<bucket_count; ++i) {
-//			CGraphVertex	*j = m_buckets[i], *k;
-//			if (!j || (indexes[j->index()].m_path_id != current_path_id()) || (indexes[j->index()].vertex != j))
-//				continue;
-//			u32			count = 0, count1 = 0;
-//			for ( ; j; k=j,j=j->next(), ++count) {
-//				VERIFY	(indexes[j->index()].m_path_id == current_path_id());
-//				VERIFY	(compute_bucket_id(*j) == i);
-//				VERIFY	(!j->prev() || (j == j->prev()->next()));
-//				VERIFY	(!j->next() || (j == j->next()->prev()));
-//				VERIFY	(!j->next() || (j != j->next()));
-//				VERIFY	(!j->prev() || (j != j->prev()));
-//			}
-//			for ( ; k; k=k->prev(), ++count1) {
-//				VERIFY	(indexes[k->index()].m_path_id == current_path_id());
-//				VERIFY	(compute_bucket_id(*k) == i);
-//				VERIFY	(!k->prev() || (k == k->prev()->next()));
-//				VERIFY	(!k->next() || (k == k->next()->prev()));
-//				VERIFY	(!k->next() || (k != k->next()));
-//				VERIFY	(!k->prev() || (k != k->prev()));
-//			}
-//			VERIFY		(count == count1);
-//		}
+#if 0
+    for (u32 i = 0; i<bucket_count; i++)
+    {
+        CGraphVertex *j = m_buckets[i], *k;
+        if (!j)
+            continue;
+        auto index = indexes[j->index()];
+        if (index.m_path_id!=current_path_id() || index.vertex!=j)
+            continue;
+        u32 count1 = 0, count2 = 0;
+        for (; j; k = j, j = j->next(), count1++)
+        {
+            VERIFY(indexes[j->index()].m_path_id==current_path_id());
+            VERIFY(compute_bucket_id(*j)==i);
+            VERIFY(!j->prev() || j==j->prev()->next());
+            VERIFY(!j->next() || j==j->next()->prev());
+            VERIFY(!j->next() || j!=j->next());
+            VERIFY(!j->prev() || j!=j->prev());
+        }
+        for (; k; k = k->prev(), count2++)
+        {
+            VERIFY(indexes[k->index()].m_path_id==current_path_id());
+            VERIFY(compute_bucket_id(*k)==i);
+            VERIFY(!k->prev() || k==k->prev()->next());
+            VERIFY(!k->next() || k==k->next()->prev());
+            VERIFY(!k->next() || k!=k->next());
+            VERIFY(!k->prev() || k!=k->prev());
+        }
+        VERIFY(count1==count2);
+    }
+#endif
 }
 
 TEMPLATE_SPECIALIZATION
