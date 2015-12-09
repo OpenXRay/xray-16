@@ -32,7 +32,7 @@
 #include "game_path_manager.h"
 #include "detail_path_manager.h"
 #include "sight_manager.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "EntityCondition.h"
 #include "ai/ai_monsters_misc.h"
 #include "agent_manager.h"

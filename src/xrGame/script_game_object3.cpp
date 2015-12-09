@@ -377,7 +377,7 @@ void CScriptGameObject::set_actor_relation_flags (Flags32 flags)
 	stalker->m_actor_relation_flags = flags;
 }
 
-void CScriptGameObject::set_patrol_path		(LPCSTR path_name, const PatrolPathManager::EPatrolStartType patrol_start_type, const PatrolPathManager::EPatrolRouteType patrol_route_type, bool random)
+void CScriptGameObject::set_patrol_path		(LPCSTR path_name, const EPatrolStartType patrol_start_type, const EPatrolRouteType patrol_route_type, bool random)
 {
 	CAI_Stalker					*stalker = smart_cast<CAI_Stalker*>(&object());
 	if (!stalker)

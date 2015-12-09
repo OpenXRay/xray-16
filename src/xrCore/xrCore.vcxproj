@@ -455,6 +455,7 @@
     <ClInclude Include="lzhuf.h" />
     <ClInclude Include="lzo_compressor.h" />
     <ClInclude Include="Math\PLC_SSE.hpp" />
+    <ClInclude Include="Math\Random32.hpp" />
     <ClInclude Include="Math\Skin4W_MT.hpp" />
     <ClInclude Include="Math\SkinXW_SSE.hpp" />
     <ClInclude Include="Math\MathUtil.hpp" />

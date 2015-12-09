@@ -11,7 +11,7 @@
 #include "patrol_path_manager.h"
 #include "level_path_manager.h"
 #include "detail_path_manager.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "custommonster.h"
 #include "level_path_builder.h"
 #include "detail_path_builder.h"

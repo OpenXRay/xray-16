@@ -26,6 +26,7 @@ class CGameObject;
 class CAutosaveManager;
 class CPHCommander;
 class CLevelDebug;
+class LevelGraphDebugRender;
 class CLevelSoundManager;
 class CGameTaskManager;
 class CZoneList;
@@ -108,6 +109,7 @@ protected:
     CClientSpawnManager* m_client_spawn_manager = nullptr;
     CAutosaveManager* m_autosave_manager = nullptr;
 #ifdef DEBUG
+    LevelGraphDebugRender *levelGraphDebugRender = nullptr;
     CDebugRenderer* m_debug_renderer = nullptr;
 #endif
     CPHCommander* m_ph_commander = nullptr;
@@ -393,6 +395,7 @@ public:
     u8* m_lzo_working_buffer = nullptr;
     void init_compression();
     void deinit_compression();
+    LevelGraphDebugRender *GetLevelGraphDebugRender() const { return levelGraphDebugRender; }
 };
 
 // XXX nitrocaster: should not cast to inherited

@@ -11,7 +11,7 @@
 #include "GameObject.h"
 #include "ai_obstacle.h"
 #include "ai_space.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 
 #pragma warning(push)
 #pragma warning(disable:4995)

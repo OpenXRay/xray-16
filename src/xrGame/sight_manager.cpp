@@ -10,7 +10,7 @@
 #include "sight_manager.h"
 #include "ai/stalker/ai_stalker.h"
 #include "stalker_movement_manager_smart_cover.h"
-#include "profiler.h"
+#include "xrEngine/profiler.h"
 #include "aimers_weapon.h"
 #include "aimers_bone.h"
 #include "stalker_animation_manager.h"

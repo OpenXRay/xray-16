@@ -13,7 +13,7 @@
 #include "debug_renderer.h"
 #include "ai_space.h"
 #include "cover_manager.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "smart_cover.h"
 #include "smart_cover_description.h"
 #include "smart_cover_loophole.h"

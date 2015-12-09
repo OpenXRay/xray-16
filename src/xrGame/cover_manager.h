@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "profiler.h"
+#include "xrEngine/profiler.h"
 #include "quadtree.h"
 
 class CCoverPoint;

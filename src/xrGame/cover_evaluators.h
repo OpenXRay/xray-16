@@ -9,7 +9,7 @@
 #pragma once
 
 #include "restricted_object.h"
-#include "game_graph_space.h"
+#include "xrAICore/Navigation/game_graph_space.h"
 
 //////////////////////////////////////////////////////////////////////////
 // CCoverEvaluatorBase

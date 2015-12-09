@@ -4,7 +4,7 @@
 #include "memory_manager.h"
 #include "visual_memory_manager.h"
 #include "item_manager.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 
 CMonsterCorpseMemory::CMonsterCorpseMemory()
 {

@@ -464,6 +464,8 @@
     <ClInclude Include="ObjectDump.h" />
     <ClInclude Include="PerformanceAlert.hpp" />
     <ClInclude Include="perlin.h" />
+    <ClInclude Include="profiler.h" />
+    <ClInclude Include="profiler_inline.h" />
     <ClInclude Include="Properties.h" />
     <ClInclude Include="property_collection.hpp" />
     <ClInclude Include="property_collection_forward.hpp" />
@@ -585,6 +587,7 @@
     <ClCompile Include="PerformanceAlert.cpp" />
     <ClCompile Include="perlin.cpp" />
     <ClCompile Include="phdebug.cpp" />
+    <ClCompile Include="profiler.cpp" />
     <ClCompile Include="PS_instance.cpp" />
     <ClCompile Include="pure.cpp" />
     <ClCompile Include="pure_relcase.cpp" />

@@ -16,7 +16,7 @@
 #include "eatable_item_object.h" 
 #include "Missile.h"
 #include "game_cl_base_weapon_usage_statistic.h"
-#include "LevelGameDef.h"
+#include "Common/LevelGameDef.h"
 #include "clsid_game.h"
 #include "ui\UIBuyWndShared.h"
 #include "UIGameCTA.h"

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "LevelGameDef.h"
+#include "Common/LevelGameDef.h"
 #include "xrScriptEngine/script_process.hpp"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "xrScriptEngine/script_engine.hpp"

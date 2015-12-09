@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "xrGame/game_graph.h"
+#include "xrAICore/Navigation/game_graph.h"
 
 class CSE_ALifeLevelChanger;
 

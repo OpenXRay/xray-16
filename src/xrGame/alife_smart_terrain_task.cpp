@@ -9,12 +9,12 @@
 #include "stdafx.h"
 #include "alife_smart_terrain_task.h"
 #include "ai_space.h"
-#include "patrol_path_storage.h"
-#include "patrol_path.h"
-#include "patrol_point.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_point.h"
 
-#include "level_graph.h"
-#include "game_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
+#include "xrAICore/Navigation/game_graph.h"
 
 void CALifeSmartTerrainTask::setup_patrol_point				(const shared_str &patrol_path_name, const u32 &patrol_point_index)
 {

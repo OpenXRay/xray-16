@@ -8,7 +8,7 @@
 
 #include "stdafx.h"
 #include "alife_spawn_registry.h"
-#include "random32.h"
+#include "Random.hpp"
 
 IC	bool CALifeSpawnRegistry::enabled_spawn		(CSE_Abstract &abstract) const
 {

@@ -18,7 +18,7 @@
 #include "movement_manager_space.h"
 #include "detail_path_manager_space.h"
 #include "entitycondition.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "stalker_velocity_holder.h"
 #include "stalker_velocity_collection.h"
 #include "stalker_animation_manager.h"

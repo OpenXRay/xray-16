@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "xrGame/level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 
 CLevelGraph::CVertex	**stack_storage;
 

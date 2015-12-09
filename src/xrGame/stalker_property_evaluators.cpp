@@ -31,9 +31,9 @@
 #include "agent_enemy_manager.h"
 #include "agent_member_manager.h"
 #include "cover_point.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "cover_point.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "stalker_animation_manager.h"
 #include "weapon.h"
 

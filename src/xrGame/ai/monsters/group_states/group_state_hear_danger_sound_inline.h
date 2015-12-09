@@ -3,7 +3,7 @@
 #include "ai/Monsters/states/monster_state_home_point_danger.h"
 #include "ai/Monsters/ai_monster_squad.h"
 #include "Entity.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 
 #define TEMPLATE_SPECIALIZATION template <\
 	typename _Object\

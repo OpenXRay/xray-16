@@ -9,7 +9,7 @@
 #pragma once
 
 #include "abstract_location_selector.h"
-#include "game_graph.h"
+#include "xrAICore/Navigation/game_graph.h"
 #include "location_manager.h"
 
 enum ESelectionType {

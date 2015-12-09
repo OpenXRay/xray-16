@@ -12,10 +12,10 @@
 #include "actor.h"
 #include "xrserver_objects_alife.h"
 #include "Level.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "ai_space.h"
-#include "level_graph.h"
-#include "game_level_cross_table.h"
+#include "xrAICore/Navigation/level_graph.h"
+#include "xrAICore/Navigation/game_level_cross_table.h"
 
 #include "UIGameSP.h"
 #include "xrEngine/xr_collide_form.h"
@@ -107,8 +107,8 @@ void CLevelChanger::shedule_Update(u32 dt)
 
 	update_actor_invitation		();
 }
-#include "patrol_path.h"
-#include "patrol_path_storage.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"
 void CLevelChanger::feel_touch_new	(IGameObject *tpObject)
 {
 	CActor*			l_tpActor = smart_cast<CActor*>(tpObject);

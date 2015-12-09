@@ -91,13 +91,13 @@ IC	void CScriptMovementAction::SetSpeed			(float fSpeed)
 	m_bCompleted		= false;
 }
 
-IC	void CScriptMovementAction::SetPatrolStart		(PatrolPathManager::EPatrolStartType tPatrolPathStart)
+IC	void CScriptMovementAction::SetPatrolStart		(EPatrolStartType tPatrolPathStart)
 {
 	m_tPatrolPathStart	= tPatrolPathStart;
 	m_bCompleted		= false;
 }
 
-IC	void CScriptMovementAction::SetPatrolStop		(PatrolPathManager::EPatrolRouteType tPatrolPathStop)
+IC	void CScriptMovementAction::SetPatrolStop		(EPatrolRouteType tPatrolPathStop)
 {
 	m_tPatrolPathStop	= tPatrolPathStop;
 	m_bCompleted		= false;

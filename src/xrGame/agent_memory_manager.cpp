@@ -10,8 +10,8 @@
 #include "agent_memory_manager.h"
 #include "agent_manager.h"
 #include "agent_member_manager.h"
-#include "ai_object_location.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/ai_object_location.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "entity_alive.h"
 #include "memory_space_impl.h"
 

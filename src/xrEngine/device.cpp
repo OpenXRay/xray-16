@@ -202,7 +202,7 @@ void CRenderDevice::on_idle()
     u32 FrameStartTime = TimerGlobal.GetElapsed_ms();
 #endif
     if (psDeviceFlags.test(rsStatistic))
-        g_bEnableStatGather = TRUE;
+        g_bEnableStatGather = TRUE; // XXX: why not use either rsStatistic or g_bEnableStatGather?
     else g_bEnableStatGather = FALSE;
     if (g_loading_events.size())
     {

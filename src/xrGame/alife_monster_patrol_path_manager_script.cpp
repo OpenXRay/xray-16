@@ -20,8 +20,6 @@ Fvector CALifeMonsterPatrolPathManager__target_position	(CALifeMonsterPatrolPath
 
 SCRIPT_EXPORT(CALifeMonsterPatrolPathManager, (),
 {
-    typedef PatrolPathManager::EPatrolStartType EPatrolStartType;
-    typedef PatrolPathManager::EPatrolRouteType EPatrolRouteType;
 	module(luaState)
 	[
 		class_<CALifeMonsterPatrolPathManager>("CALifeMonsterPatrolPathManager")

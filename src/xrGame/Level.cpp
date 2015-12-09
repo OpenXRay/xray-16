@@ -19,7 +19,7 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "team_base_zone.h"
 #include "infoportion.h"
-#include "patrol_path_storage.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"
 #include "date_time.h"
 #include "space_restriction_manager.h"
 #include "seniority_hierarchy_holder.h"
@@ -27,7 +27,7 @@
 #include "client_spawn_manager.h"
 #include "autosave_manager.h"
 #include "ClimableObject.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "mt_config.h"
 #include "phcommander.h"
 #include "map_manager.h"
@@ -56,6 +56,7 @@
 #include "PhysicObject.h"
 #include "PHDebug.h"
 #include "debug_text_tree.h"
+#include "LevelGraphDebugRender.hpp"
 #endif
 
 ENGINE_API bool g_dedicated_server;
@@ -94,6 +95,7 @@ CLevel::CLevel() :
         m_autosave_manager = xr_new<CAutosaveManager>();
 #ifdef DEBUG
         m_debug_renderer = xr_new<CDebugRenderer>();
+        levelGraphDebugRender = xr_new<LevelGraphDebugRender>();
         m_level_debug = xr_new<CLevelDebug>();
 #endif
     }
@@ -144,6 +146,7 @@ CLevel::~CLevel()
     xr_delete(m_client_spawn_manager);
     xr_delete(m_autosave_manager);
 #ifdef DEBUG
+    xr_delete(levelGraphDebugRender);
     xr_delete(m_debug_renderer);
 #endif
     if (!g_dedicated_server)
@@ -628,7 +631,7 @@ void CLevel::OnRender()
 #endif
 #ifdef DEBUG
     if (ai().get_level_graph())
-        ai().level_graph().render();
+        levelGraphDebugRender->Render(ai().game_graph(), ai().level_graph());
 #ifdef DEBUG_PRECISE_PATH
     test_precise_path();
 #endif

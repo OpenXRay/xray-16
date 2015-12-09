@@ -12,7 +12,7 @@
 #include "smart_cover_detail.h"
 #include "xrScriptEngine/script_space_forward.hpp"
 #include "xrCore/Containers/AssociativeVector.hpp"
-#include "graph_abstract.h"
+#include "xrAICore/Navigation/graph_abstract.h"
 #include "smart_cover_action.h"
 
 namespace smart_cover {

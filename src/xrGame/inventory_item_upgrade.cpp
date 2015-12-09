@@ -10,7 +10,7 @@
 #include "inventory_item.h"
 #include "inventory_item_impl.h"
 
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "Common/object_broker.h"
 
 #include "ai_space.h"

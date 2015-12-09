@@ -13,7 +13,7 @@
 #include "xrServer_Objects_ALife_All.h"
 #include "factory_api.h"
 #include "xrCrossTable.h"
-#include "xrGame/level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "Common/object_broker.h"
 #include "xr_graph_merge.h"
 #include "spawn_constructor_space.h"
@@ -22,7 +22,6 @@
 #include <direct.h>
 
 extern LPCSTR GAME_CONFIG;
-extern LPCSTR LEVEL_GRAPH_NAME;
 
 using namespace SpawnConstructorSpace;
 using namespace ALife;

@@ -18,7 +18,7 @@
 #include "enemy_manager.h"
 #include "sight_manager.h"
 #include "memory_space.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "visual_memory_manager.h"
 #include "script_game_object.h"
 #include "restricted_object.h"

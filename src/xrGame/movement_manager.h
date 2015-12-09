@@ -9,8 +9,8 @@
 #pragma once
 
 #include "ai_monster_space.h"
-#include "graph_engine_space.h"
-#include "game_graph_space.h"
+#include "xrAICore/Navigation/graph_engine_space.h"
+#include "xrAICore/Navigation/game_graph_space.h"
 #include <boost/noncopyable.hpp>
 
 namespace MovementManager {

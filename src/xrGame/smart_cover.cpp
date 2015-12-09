@@ -9,11 +9,11 @@
 #include "smart_cover.h"
 #include "smart_cover_storage.h"
 #include "smart_cover_object.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "smart_cover_action.h"
 #include "ai_space.h"
-#include "level_graph.h"
-#include "graph_engine.h"
+#include "xrAICore/Navigation/level_graph.h"
+#include "xrAICore/Navigation/graph_engine.h"
 
 namespace hash_fixed_vertex_manager {
 	

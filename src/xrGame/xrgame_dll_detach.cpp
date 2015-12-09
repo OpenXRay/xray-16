@@ -21,7 +21,7 @@
 #include "character_rank.h"
 #include "character_reputation.h"
 
-#include "profiler.h"
+#include "xrEngine/profiler.h"
 
 #include "sound_collection_storage.h"
 #include "relation_registry.h"
@@ -118,7 +118,8 @@ void clean_game_globals()
 	xr_delete										(g_sound_collection_storage);
 	
 #ifdef DEBUG
-	xr_delete										(g_profiler);
+    // XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
+	//xr_delete										(g_profiler);
 	release_smart_cast_stats						();
 #endif
 

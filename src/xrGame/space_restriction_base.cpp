@@ -9,7 +9,7 @@
 #include "stdafx.h"
 #include "space_restriction_base.h"
 #include "ai_space.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 
 #define DEFAULT_RADIUS EPS_L
 

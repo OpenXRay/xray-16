@@ -21,8 +21,8 @@
 #include "ai/Monsters/control_animation_base.h"
 #include "UIGameCustom.h"
 #include "UI/UIStatic.h"
-#include "ai_object_location.h"
-#include "profiler.h"
+#include "xrAICore/Navigation/ai_object_location.h"
+#include "xrEngine/profiler.h"
 #include "ActorEffector.h"
 #include "xrEngine/CameraBase.h"
 

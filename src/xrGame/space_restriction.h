@@ -25,9 +25,7 @@ private:
 	typedef CSpaceRestrictionAbstract	inherited;
 
 	friend struct CRemoveMergedFreeInRestrictions;
-#ifdef DEBUG
-	friend class CLevelGraph;
-#endif
+    friend class LevelGraphDebugRender;
 private:
 	typedef SpaceRestrictionHolder::CBaseRestrictionPtr CBaseRestrictionPtr;
 

@@ -67,7 +67,7 @@
 
 #include "Include/xrRender/UIRender.h"
 
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "ui/uiMotionIcon.h"
 #include "ui/UIActorMenu.h"
 #include "ActorHelmet.h"

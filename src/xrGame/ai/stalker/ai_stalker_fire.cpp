@@ -40,7 +40,7 @@
 #include "BoneProtections.h"
 #include "RadioactiveZone.h"
 #include "restricted_object.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "Missile.h"
 #include "xrPhysics/iphworld.h"
 #include "stalker_animation_names.h"

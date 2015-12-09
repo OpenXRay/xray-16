@@ -8,7 +8,8 @@
 
 #pragma once
 
-#include "problem_solver.h"
+#include "xrAICore/Components/problem_solver.h"
+#include "xrAICore/Navigation/graph_engine.h"
 #include "action_base.h"
 #include "property_evaluator.h"
 #include "property_storage.h"

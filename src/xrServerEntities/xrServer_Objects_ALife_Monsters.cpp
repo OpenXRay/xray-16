@@ -23,7 +23,7 @@
 #ifdef XRGAME_EXPORTS
 #   include "alife_time_manager.h"
 #   include "ef_storage.h"
-#   include "game_graph.h"
+#   include "xrAICore/Navigation/game_graph.h"
 #   include "ai_space.h"
 #   include "alife_group_registry.h"
 #   include "alife_simulator.h"

@@ -10,7 +10,7 @@
 
 #include "safe_map_iterator.h"
 #include "xrServer_Objects_ALife.h"
-#include "game_graph.h"
+#include "xrAICore/Navigation/game_graph.h"
 #include "ai_debug.h"
 
 //#define FULL_LEVEL_UPDATE

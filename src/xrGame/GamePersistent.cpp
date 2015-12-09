@@ -4,7 +4,7 @@
 #include "xrEngine/xr_ioconsole.h"
 #include "xrEngine/GameMtlLib.h"
 #include "Include/xrRender/Kinematics.h"
-#include "profiler.h"
+#include "xrEngine/profiler.h"
 #include "MainMenu.h"
 #include "UICursor.h"
 #include "game_base_space.h"
@@ -685,8 +685,9 @@ void CGamePersistent::OnFrame	()
 	}
 
 #ifdef DEBUG
-	if ((m_last_stats_frame + 1) < m_frame_counter)
-		profiler().clear		();
+    // XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
+	//if ((m_last_stats_frame + 1) < m_frame_counter)
+	//	profiler().clear		();
 #endif
 	UpdateDof();
 }
@@ -743,7 +744,8 @@ void CGamePersistent::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
 #ifdef DEBUG
 #	ifndef _EDITOR
 		m_last_stats_frame		= m_frame_counter;
-		profiler().show_stats(font,!!psAI_Flags.test(aiStats));
+        // XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
+		//profiler().show_stats(font,!!psAI_Flags.test(aiStats));
 #	endif
 #endif
 }

@@ -51,7 +51,7 @@ struct vertex					// definition of "patch" or "node"
 
 DEF_VECTOR(DWORDs,u32);
 
-#include "xrGame/level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 
 void	Compress	(CLevelGraph::CVertex& Dest, vertex& Src);
 

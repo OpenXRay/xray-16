@@ -11,9 +11,9 @@
 #include "ai/Monsters/ai_monster_squad_manager.h"
 #include "CharacterPhysicsSupport.h"
 
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "ai_space.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "Actor.h"
 
 #ifdef _DEBUG

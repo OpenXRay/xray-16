@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "ai_monster_utils.h"
 #include "Entity.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "ai_space.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "Include/xrRender/Kinematics.h"
 #include "basemonster/base_monster.h"
 // проверить, находится ли объект entity на ноде

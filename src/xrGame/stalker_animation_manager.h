@@ -11,7 +11,7 @@
 #include "stalker_animation_pair.h"
 #include "stalker_animation_script.h"
 #include "ai_monster_space.h"
-#include "graph_engine_space.h"
+#include "xrAICore/Navigation/graph_engine_space.h"
 
 class CMotionDef;
 class CBlend;

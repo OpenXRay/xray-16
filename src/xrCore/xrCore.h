@@ -64,6 +64,7 @@
 */
 
 // *** try to minimize code bloat of STLport
+// XXX: delete this
 #ifdef __BORLANDC__
 #else
 #ifdef XRCORE_EXPORTS // no exceptions, export allocator and common stuff
@@ -246,6 +247,7 @@ public:
     char* Params;
     DWORD dwFrame;
     bool PluginMode;
+
 public:
     void _initialize(LPCSTR ApplicationName, LogCallback cb = 0, BOOL init_fs = TRUE, LPCSTR fs_fname = 0, bool plugin = false);
     void _destroy();

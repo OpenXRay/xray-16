@@ -3,9 +3,9 @@
 #include "BaseMonster/base_monster.h"
 #include "control_manager.h"
 #include "detail_path_manager.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "ai_space.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "detail_path_manager_space.h"
 
 void CControlDirection::reinit()

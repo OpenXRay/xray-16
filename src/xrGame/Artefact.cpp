@@ -9,7 +9,7 @@
 
 #include "inventory.h"
 #include "Level.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "xrPhysics/iphworld.h"
 #include "restriction_space.h"
@@ -18,8 +18,8 @@
 #include "artefact_activation.h"
 
 #include "ai_space.h"
-#include "patrol_path.h"
-#include "patrol_path_storage.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"
 
 #define	FASTMODE_DISTANCE (50.f)	//distance to camera from sphere, when zone switches to fast update sequence
 

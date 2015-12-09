@@ -3,7 +3,7 @@
 #include "xrserver_objects_alife_monsters.h"
 #include "xrserver.h"
 #include "Level.h"
-#include "LevelGameDef.h"
+#include "Common/LevelGameDef.h"
 #include "Actor.h"
 #include "game_cl_base.h"
 #include "Inventory.h"

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "profiler.h"
+#include "xrEngine/profiler.h"
 
 #define TEMPLATE_SPECIALIZATION template <\
 	typename _Graph,\

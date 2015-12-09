@@ -15,7 +15,7 @@
 #include "agent_member_manager.h"
 #include "agent_memory_manager.h"
 #include "agent_manager_planner.h"
-#include "profiler.h"
+#include "xrEngine/profiler.h"
 
 CAgentManager::CAgentManager			()
 {

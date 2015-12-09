@@ -13,11 +13,11 @@
 #include "restricted_object.h"
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "script_entity_space.h"
 #include "script_callback_ex.h"
 #include "game_object_space.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 
 #if 1//def DEBUG
 #	include "space_restriction_manager.h"

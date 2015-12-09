@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "random32.h"
+#include "Random.hpp"
 #include "ai_sounds.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
 

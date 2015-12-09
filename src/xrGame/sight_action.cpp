@@ -10,7 +10,7 @@
 #include "sight_action.h"
 #include "ai/stalker/ai_stalker.h"
 #include "sight_manager.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "inventory.h"
 

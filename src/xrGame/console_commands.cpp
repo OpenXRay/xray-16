@@ -37,7 +37,7 @@
 #include "GameTask.h"
 #include "MainMenu.h"
 #include "saved_game_wrapper.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 
 #include "cameralook.h"
 #include "character_hit_animations_params.h"
@@ -51,7 +51,8 @@
 #ifdef DEBUG
 #	include "PHDebug.h"
 #	include "ui/UIDebugFonts.h" 
-#	include "game_graph.h"
+#	include "xrAICore/Navigation/game_graph.h"
+#include "LevelGraphDebugRender.hpp"
 #	include "CharacterPhysicsSupport.h"
 #endif // DEBUG
 
@@ -783,7 +784,7 @@ public:
 		if (!ai().get_level_graph())
 			return;
 
-		ai().level_graph().setup_current_level	(-1);
+		Level().GetLevelGraphDebugRender()->SetupCurrentLevel(-1);
 	}
 };
 
@@ -799,9 +800,7 @@ public:
 		if (!ai().get_level_graph())
 			return;
 
-		ai().level_graph().setup_current_level	(
-			ai().level_graph().level_id()
-		);
+        Level().GetLevelGraphDebugRender()->SetupCurrentLevel(ai().level_graph().level_id());
 	}
 };
 
@@ -817,7 +816,7 @@ public:
 			return;
 
 		if (!*args) {
-			ai().level_graph().setup_current_level	(-1);
+            Level().GetLevelGraphDebugRender()->SetupCurrentLevel(-1);
 			return;
 		}
 
@@ -827,7 +826,7 @@ public:
 			return;
 		}
 
-		ai().level_graph().setup_current_level	(level->id());
+        Level().GetLevelGraphDebugRender()->SetupCurrentLevel(level->id());
 	}
 };
 
@@ -1162,7 +1161,7 @@ public:
 #endif
 
 #ifndef MASTER_GOLD
-#	include "game_graph.h"
+#	include "xrAICore/Navigation/game_graph.h"
 struct CCC_JumpToLevel : public IConsole_Command {
 	CCC_JumpToLevel(LPCSTR N) : IConsole_Command(N)  {};
 

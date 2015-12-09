@@ -19,9 +19,9 @@
 #include "agent_manager.h"
 #include "agent_member_manager.h"
 #include "memory_space_impl.h"
-#include "ai_object_location.h"
-#include "level_graph.h"
-#include "profiler.h"
+#include "xrAICore/Navigation/ai_object_location.h"
+#include "xrAICore/Navigation/level_graph.h"
+#include "xrEngine/profiler.h"
 #include "agent_enemy_manager.h"
 #include "script_game_object.h"
 

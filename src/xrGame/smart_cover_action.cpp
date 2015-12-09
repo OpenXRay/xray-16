@@ -9,7 +9,7 @@
 #include "smart_cover_action.h"
 #include "ai_monster_space.h"
 #include "ai_space.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "Common/object_broker.h"
 
 using smart_cover::detail::parse_string;

@@ -9,7 +9,7 @@
 #pragma once
 
 #include "inventoryowner.h"
-#include "graph_engine_space.h"
+#include "xrAICore/Navigation/graph_engine_space.h"
 
 namespace MonsterSpace {
 	enum EObjectAction;

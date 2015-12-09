@@ -12,8 +12,8 @@
 #include "ai/monsters/control_path_builder_base.h"
 #include "monster_velocity_space.h"
 #include "ai_space.h"
-#include "level_graph.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/level_graph.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "CharacterPhysicsSupport.h"
 #ifdef DEBUG
 #include "level_debug.h"

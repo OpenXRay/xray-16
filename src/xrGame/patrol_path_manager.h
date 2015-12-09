@@ -10,9 +10,8 @@
 
 #include "Level.h"
 #include "xrScriptEngine/script_engine.hpp"
-#include "patrol_path_storage.h"
-#include "patrol_path.h"
-#include "patrol_path_manager_space.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path.h"
 #include "script_callback_ex.h"
 
 template <typename _return_type>
@@ -20,8 +19,6 @@ class CScriptCallbackEx;
 
 class CRestrictedObject;
 class CGameObject;
-
-using namespace PatrolPathManager;
 
 class CPatrolPathManager {
 private:

@@ -13,7 +13,7 @@
 
 #include "xr_time.h"
 #include "character_info_defs.h"
-#include "game_graph_space.h"
+#include "xrAICore/Navigation/game_graph_space.h"
 #include "game_location_selector.h"
 
 enum EPdaMsg;
@@ -31,10 +31,8 @@ namespace doors { class door; }
 class NET_Packet;
 class CGameTask;
 
-namespace PatrolPathManager { 
-	enum EPatrolStartType;
-	enum EPatrolRouteType;
-};
+enum EPatrolStartType;
+enum EPatrolRouteType;
 
 namespace MemorySpace {
 	struct CMemoryInfo;
@@ -526,7 +524,7 @@ public:
 			void				set_desired_position	(const Fvector *desired_position);
 			void				set_desired_direction	();
 			void				set_desired_direction	(const Fvector *desired_direction);
-			void				set_patrol_path			(LPCSTR path_name, const PatrolPathManager::EPatrolStartType patrol_start_type, const PatrolPathManager::EPatrolRouteType patrol_route_type, bool random);
+			void				set_patrol_path			(LPCSTR path_name, const EPatrolStartType patrol_start_type, const EPatrolRouteType patrol_route_type, bool random);
 			void				inactualize_patrol_path	();
 			void				set_dest_level_vertex_id(u32 level_vertex_id);
 			void				set_dest_game_vertex_id	(GameGraph::_GRAPH_ID game_vertex_id);

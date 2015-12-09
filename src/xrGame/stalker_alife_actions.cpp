@@ -18,7 +18,7 @@
 #include "memory_manager.h"
 #include "item_manager.h"
 #include "sight_manager.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "patrol_path_manager.h"
 #include "sound_player.h"
@@ -71,7 +71,7 @@ void CStalkerActionNoALife::initialize	()
 	object().movement().set_nearest_accessible_position();
 	object().sight().setup						(CSightAction(SightManager::eSightTypeCurrentDirection));
 	object().CObjectHandler::set_goal			(eObjectActionFire1,object().inventory().ItemFromSlot(INV_SLOT_2),0,1,2500,3000);
-//	object().movement().patrol().set_path		("way_0000",PatrolPathManager::ePatrolStartTypeNearest);
+//	object().movement().patrol().set_path		("way_0000",ePatrolStartTypeNearest);
 #endif
 }
 

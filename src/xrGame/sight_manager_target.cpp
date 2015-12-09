@@ -10,7 +10,7 @@
 #include "sight_manager.h"
 #include "ai/stalker/ai_stalker.h"
 #include "stalker_movement_manager_smart_cover.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "ai_space.h"
 #include "ai/stalker/ai_stalker_space.h"
 #include "detail_path_manager.h"

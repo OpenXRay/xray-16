@@ -288,6 +288,8 @@ struct SNodePositionOld
 typedef SNodePositionOld NodePosition;
 #endif
 
+const char LEVEL_GRAPH_NAME[] = "level.ai";
+
 const u32 XRCL_CURRENT_VERSION = 18; // input
 const u32 XRCL_PRODUCTION_VERSION = 14; // output
 const u32 CFORM_CURRENT_VERSION = 4;

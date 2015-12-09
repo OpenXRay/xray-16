@@ -8,7 +8,7 @@
 #include "hit_immunity.h"
 #include "memory_manager.h"
 #include "HudSound.h"
-#include "patrol_path.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path.h"
 #include "PHDestroyable.h"
 #include "Explosive.h"
 

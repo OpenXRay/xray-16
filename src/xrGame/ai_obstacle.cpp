@@ -9,7 +9,7 @@
 #include "stdafx.h"
 #include "ai_obstacle.h"
 #include "ai_space.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "GameObject.h"
 #include "Include/xrRender/Kinematics.h"
 #include <boost/crc.hpp>

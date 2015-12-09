@@ -6,7 +6,7 @@
 #include "level_path_manager.h"
 #include "detail_path_manager.h"
 #include "level_location_selector.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 
 const u32 pmt_global_failed_duration = 3000;
 

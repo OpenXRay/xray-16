@@ -229,11 +229,9 @@
     <ClInclude Include="..\xrServerEntities\clsid_game.h" />
     <ClInclude Include="..\xrServerEntities\gametype_chooser.h" />
     <ClInclude Include="..\xrServerEntities\game_base_space.h" />
-    <ClInclude Include="game_graph_space.h" />
     <ClInclude Include="..\xrServerEntities\InfoPortionDefs.h" />
     <ClInclude Include="..\xrServerEntities\inventory_space.h" />
     <ClInclude Include="..\xrServerEntities\ItemListTypes.h" />
-    <ClInclude Include="..\xrServerEntities\LevelGameDef.h" />
     <ClInclude Include="..\xrServerEntities\object_factory.h" />
     <ClInclude Include="..\xrServerEntities\object_factory_impl.h" />
     <ClInclude Include="..\xrServerEntities\object_factory_inline.h" />
@@ -678,9 +676,6 @@
     <ClInclude Include="ai_debug.h" />
     <ClInclude Include="ai_debug_variables.h" />
     <ClInclude Include="ai_monster_space.h" />
-    <ClInclude Include="ai_object_location.h" />
-    <ClInclude Include="ai_object_location_impl.h" />
-    <ClInclude Include="ai_object_location_inline.h" />
     <ClInclude Include="ai_obstacle.h" />
     <ClInclude Include="ai_obstacle_inline.h" />
     <ClInclude Include="AI_PhraseDialogManager.h" />
@@ -766,8 +761,6 @@
     <ClInclude Include="autosave_manager.h" />
     <ClInclude Include="autosave_manager_inline.h" />
     <ClInclude Include="awards_store.h" />
-    <ClInclude Include="a_star.h" />
-    <ClInclude Include="a_star_inline.h" />
     <ClInclude Include="base_client_classes_wrappers.h" />
     <ClInclude Include="BastArtifact.h" />
     <ClInclude Include="best_scores_helper.h" />
@@ -780,8 +773,6 @@
     <ClInclude Include="bone_groups.h" />
     <ClInclude Include="BottleItem.h" />
     <ClInclude Include="BreakableObject.h" />
-    <ClInclude Include="builder_allocator_constructor.h" />
-    <ClInclude Include="builder_allocator_constructor_inline.h" />
     <ClInclude Include="callback_info.h" />
     <ClInclude Include="CameraEffector.h" />
     <ClInclude Include="CameraFirstEye.h" />
@@ -805,8 +796,6 @@
     <ClInclude Include="client_spawn_manager_inline.h" />
     <ClInclude Include="ClimableObject.h" />
     <ClInclude Include="command_switch_counter.h" />
-    <ClInclude Include="condition_state.h" />
-    <ClInclude Include="condition_state_inline.h" />
     <ClInclude Include="configs_common.h" />
     <ClInclude Include="configs_dumper.h" />
     <ClInclude Include="configs_dump_verifyer.h" />
@@ -841,15 +830,6 @@
     <ClInclude Include="danger_object_inline.h" />
     <ClInclude Include="danger_object_location.h" />
     <ClInclude Include="danger_object_location_inline.h" />
-    <ClInclude Include="data_storage_binary_heap.h" />
-    <ClInclude Include="data_storage_binary_heap_inline.h" />
-    <ClInclude Include="data_storage_bucket_list.h" />
-    <ClInclude Include="data_storage_bucket_list_inline.h" />
-    <ClInclude Include="data_storage_constructor.h" />
-    <ClInclude Include="data_storage_double_linked_list.h" />
-    <ClInclude Include="data_storage_double_linked_list_inline.h" />
-    <ClInclude Include="data_storage_single_linked_list.h" />
-    <ClInclude Include="data_storage_single_linked_list_inline.h" />
     <ClInclude Include="date_time.h" />
     <ClInclude Include="death_anims.h" />
     <ClInclude Include="debug_renderer.h" />
@@ -865,8 +845,6 @@
     <ClInclude Include="detail_path_manager.h" />
     <ClInclude Include="detail_path_manager_inline.h" />
     <ClInclude Include="detail_path_manager_space.h" />
-    <ClInclude Include="dijkstra.h" />
-    <ClInclude Include="dijkstra_inline.h" />
     <ClInclude Include="doors.h" />
     <ClInclude Include="doors_actor.h" />
     <ClInclude Include="doors_door.h" />
@@ -878,8 +856,6 @@
     <ClInclude Include="dynamic_obstacles_avoider_inline.h" />
     <ClInclude Include="eatable_item.h" />
     <ClInclude Include="eatable_item_object.h" />
-    <ClInclude Include="edge_path.h" />
-    <ClInclude Include="edge_path_inline.h" />
     <ClInclude Include="EffectorBobbing.h" />
     <ClInclude Include="EffectorFall.h" />
     <ClInclude Include="EffectorShot.h" />
@@ -961,10 +937,6 @@
     <ClInclude Include="game_cl_teamdeathmatch.h" />
     <ClInclude Include="game_cl_teamdeathmatch_snd_messages.h" />
     <ClInclude Include="game_events_handler.h" />
-    <ClInclude Include="game_graph.h" />
-    <ClInclude Include="game_graph_inline.h" />
-    <ClInclude Include="game_level_cross_table.h" />
-    <ClInclude Include="game_level_cross_table_inline.h" />
     <ClInclude Include="game_location_selector.h" />
     <ClInclude Include="game_location_selector_inline.h" />
     <ClInclude Include="game_news.h" />
@@ -986,15 +958,6 @@
     <ClInclude Include="game_sv_single.h" />
     <ClInclude Include="game_sv_teamdeathmatch.h" />
     <ClInclude Include="GlobalFeelTouch.hpp" />
-    <CustomBuild Include="graph_abstract.h" />
-    <CustomBuild Include="graph_abstract_inline.h" />
-    <ClInclude Include="graph_edge.h" />
-    <ClInclude Include="graph_edge_inline.h" />
-    <ClInclude Include="graph_engine.h" />
-    <ClInclude Include="graph_engine_inline.h" />
-    <ClInclude Include="graph_engine_space.h" />
-    <ClInclude Include="graph_vertex.h" />
-    <ClInclude Include="graph_vertex_inline.h" />
     <ClInclude Include="GraviArtifact.h" />
     <ClInclude Include="GraviZone.h" />
     <ClInclude Include="Grenade.h" />
@@ -1078,13 +1041,10 @@
     <ClInclude Include="kills_store.h" />
     <ClInclude Include="kills_store_inline.h" />
     <ClInclude Include="Level.h" />
+    <ClInclude Include="LevelGraphDebugRender.hpp" />
     <ClInclude Include="Level_Bullet_Manager.h" />
     <ClInclude Include="level_changer.h" />
     <ClInclude Include="level_debug.h" />
-    <ClInclude Include="level_graph.h" />
-    <ClInclude Include="level_graph_inline.h" />
-    <ClInclude Include="level_graph_space.h" />
-    <ClInclude Include="level_graph_vertex_inline.h" />
     <ClInclude Include="level_location_selector.h" />
     <ClInclude Include="level_location_selector_inline.h" />
     <ClInclude Include="Level_network_Demo.h" />
@@ -1103,8 +1063,6 @@
     <ClInclude Include="magic_minimize_nd.h" />
     <ClInclude Include="magic_minimize_nd_inline.h" />
     <ClInclude Include="MainMenu.h" />
-    <ClInclude Include="manager_builder_allocator_constructor.h" />
-    <ClInclude Include="manager_builder_allocator_constructor_inline.h" />
     <ClInclude Include="map_location.h" />
     <ClInclude Include="map_location_defs.h" />
     <ClInclude Include="map_manager.h" />
@@ -1163,50 +1121,12 @@
     <ClInclude Include="obsolete_queue_inline.h" />
     <ClInclude Include="obstacles_query.h" />
     <ClInclude Include="obstacles_query_inline.h" />
-    <ClInclude Include="operator_abstract.h" />
-    <ClInclude Include="operator_abstract_inline.h" />
-    <ClInclude Include="operator_condition.h" />
-    <ClInclude Include="operator_condition_inline.h" />
     <ClInclude Include="ParticlesObject.h" />
     <ClInclude Include="ParticlesPlayer.h" />
     <ClInclude Include="particle_params.h" />
     <ClInclude Include="particle_params_inline.h" />
-    <ClInclude Include="path_manager.h" />
-    <ClInclude Include="path_manager_game.h" />
-    <ClInclude Include="path_manager_game_inline.h" />
-    <ClInclude Include="path_manager_game_level.h" />
-    <ClInclude Include="path_manager_game_level_inline.h" />
-    <ClInclude Include="path_manager_game_vertex.h" />
-    <ClInclude Include="path_manager_game_vertex_inline.h" />
-    <ClInclude Include="path_manager_generic.h" />
-    <ClInclude Include="path_manager_generic_inline.h" />
-    <ClInclude Include="path_manager_level.h" />
-    <ClInclude Include="path_manager_level_flooder.h" />
-    <ClInclude Include="path_manager_level_flooder_inline.h" />
-    <ClInclude Include="path_manager_level_inline.h" />
-    <ClInclude Include="path_manager_level_nearest_vertex.h" />
-    <ClInclude Include="path_manager_level_nearest_vertex_inline.h" />
-    <ClInclude Include="path_manager_level_straight_line.h" />
-    <ClInclude Include="path_manager_level_straight_line_inline.h" />
-    <ClInclude Include="path_manager_params.h" />
-    <ClInclude Include="path_manager_params_flooder.h" />
-    <ClInclude Include="path_manager_params_game_level.h" />
-    <ClInclude Include="path_manager_params_game_vertex.h" />
-    <ClInclude Include="path_manager_params_nearest_vertex.h" />
-    <ClInclude Include="path_manager_params_straight_line.h" />
-    <ClInclude Include="path_manager_solver.h" />
-    <ClInclude Include="path_manager_solver_inline.h" />
-    <ClInclude Include="patrol_path.h" />
-    <ClInclude Include="patrol_path_inline.h" />
     <ClInclude Include="patrol_path_manager.h" />
     <ClInclude Include="patrol_path_manager_inline.h" />
-    <ClInclude Include="patrol_path_manager_space.h" />
-    <ClInclude Include="patrol_path_params.h" />
-    <ClInclude Include="patrol_path_params_inline.h" />
-    <ClInclude Include="patrol_path_storage.h" />
-    <ClInclude Include="patrol_path_storage_inline.h" />
-    <ClInclude Include="patrol_point.h" />
-    <ClInclude Include="patrol_point_inline.h" />
     <ClInclude Include="PDA.h" />
     <ClInclude Include="PdaMsg.h" />
     <ClInclude Include="pda_space.h" />
@@ -1265,10 +1185,6 @@
     <ClInclude Include="PostprocessAnimator.h" />
     <ClInclude Include="pp_effector_custom.h" />
     <ClInclude Include="pp_effector_distance.h" />
-    <ClInclude Include="problem_solver.h" />
-    <ClInclude Include="problem_solver_inline.h" />
-    <ClInclude Include="profiler.h" />
-    <ClInclude Include="profiler_inline.h" />
     <ClInclude Include="profile_data_types.h" />
     <ClInclude Include="profile_store.h" />
     <ClInclude Include="property_evaluator.h" />
@@ -1285,7 +1201,7 @@
     <ClInclude Include="quadtree_inline.h" />
     <ClInclude Include="queued_async_method.h" />
     <ClInclude Include="RadioactiveZone.h" />
-    <ClInclude Include="random32.h" />
+    <ClInclude Include="Random.hpp" />
     <ClInclude Include="rat_states.h" />
     <ClInclude Include="rat_state_base.h" />
     <ClInclude Include="rat_state_base_inline.h" />
@@ -1372,9 +1288,6 @@
     <ClInclude Include="script_sound_inline.h" />
     <ClInclude Include="script_watch_action.h" />
     <ClInclude Include="script_watch_action_inline.h" />
-    <ClInclude Include="script_world_property.h" />
-    <ClInclude Include="script_world_property_inline.h" />
-    <ClInclude Include="script_world_state.h" />
     <ClInclude Include="script_zone.h" />
     <ClInclude Include="searchlight.h" />
     <ClInclude Include="secure_messaging.h" />
@@ -1724,14 +1637,6 @@
     <ClInclude Include="ui\xrUIXmlParser.h" />
     <ClInclude Include="ui_base.h" />
     <ClInclude Include="ui_defs.h" />
-    <ClInclude Include="vertex_allocator_fixed.h" />
-    <ClInclude Include="vertex_allocator_fixed_inline.h" />
-    <ClInclude Include="vertex_manager_fixed.h" />
-    <ClInclude Include="vertex_manager_fixed_inline.h" />
-    <ClInclude Include="vertex_manager_hash_fixed.h" />
-    <ClInclude Include="vertex_manager_hash_fixed_inline.h" />
-    <ClInclude Include="vertex_path.h" />
-    <ClInclude Include="vertex_path_inline.h" />
     <ClInclude Include="vision_client.h" />
     <ClInclude Include="vision_client_inline.h" />
     <ClInclude Include="visual_memory_manager.h" />
@@ -1796,7 +1701,6 @@
     <ClCompile Include="..\xrServerEntities\alife_space.cpp" />
     <ClCompile Include="..\xrServerEntities\character_info.cpp" />
     <ClCompile Include="..\xrServerEntities\gametype_chooser.cpp" />
-    <ClCompile Include="..\xrServerEntities\LevelGameDef.cpp" />
     <ClCompile Include="..\xrServerEntities\object_factory.cpp" />
     <ClCompile Include="..\xrServerEntities\object_factory_register.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -2616,10 +2520,6 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="game_cl_teamdeathmatch.cpp" />
-    <ClCompile Include="game_graph_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
     <ClCompile Include="game_news.cpp" />
     <ClCompile Include="game_state_accumulator.cpp" />
     <ClCompile Include="game_state_accumulator_state_register.cpp" />
@@ -2791,13 +2691,7 @@
     <ClCompile Include="level_changer.cpp" />
     <ClCompile Include="level_debug.cpp" />
     <ClCompile Include="Level_GameSpy_Funcs.cpp" />
-    <ClCompile Include="level_graph.cpp" />
-    <ClCompile Include="level_graph_debug.cpp" />
-    <ClCompile Include="level_graph_debug2.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="level_graph_vertex.cpp" />
+    <ClCompile Include="LevelGraphDebugRender.cpp" />
     <ClCompile Include="Level_input.cpp" />
     <ClCompile Include="Level_load.cpp" />
     <ClCompile Include="level_map_locations.cpp">
@@ -2904,21 +2798,10 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="patrol_path.cpp" />
     <ClCompile Include="patrol_path_manager.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="patrol_path_params.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="patrol_path_params_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="patrol_path_storage.cpp" />
-    <ClCompile Include="patrol_point.cpp" />
     <ClCompile Include="PDA.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -3015,9 +2898,6 @@
     <ClCompile Include="PostprocessAnimator.cpp" />
     <ClCompile Include="pp_effector_custom.cpp" />
     <ClCompile Include="pp_effector_distance.cpp" />
-    <ClCompile Include="profiler.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="profile_data_types.cpp" />
     <ClCompile Include="profile_data_types_script.cpp" />
     <ClCompile Include="profile_store.cpp" />
@@ -3032,7 +2912,7 @@
     </ClCompile>
     <ClCompile Include="purchase_list.cpp" />
     <ClCompile Include="RadioactiveZone.cpp" />
-    <ClCompile Include="random32.cpp" />
+    <ClCompile Include="Random.cpp" />
     <ClCompile Include="rat_states.cpp" />
     <ClCompile Include="rat_state_base.cpp" />
     <ClCompile Include="rat_state_manager.cpp" />
@@ -3242,14 +3122,6 @@
     </ClCompile>
     <ClCompile Include="script_watch_action.cpp" />
     <ClCompile Include="script_watch_action_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="script_world_property_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="script_world_state_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>

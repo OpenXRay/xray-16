@@ -9,9 +9,9 @@
 #include "stdafx.h"
 #include "space_restriction_shape.h"
 #include "ai_space.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "space_restrictor.h"
-#include "graph_engine.h"
+#include "xrAICore/Navigation/graph_engine.h"
 
 struct CBorderMergePredicate {
 	CSpaceRestrictionShape			*m_restriction;

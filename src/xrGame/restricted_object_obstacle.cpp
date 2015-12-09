@@ -9,7 +9,7 @@
 #include "stdafx.h"
 #include "restricted_object_obstacle.h"
 #include "ai_space.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "obstacles_query.h"
 
 typedef obstacles_query::AREA	AREA;
