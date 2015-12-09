@@ -662,7 +662,6 @@ void LevelGraphDebugRender::DrawNodes()
             pvDecompress(vNorm, it->plane());
             PL.build(vertexPos, vNorm);
             // create vertices
-#if 0
             auto createVertex = [&](Fplane &pl, const Fvector &v)
             {
                 const Fvector up = {0, 1, 0};
@@ -675,15 +674,6 @@ void LevelGraphDebugRender::DrawNodes()
             Fvector v2 = createVertex(PL, {vertexPos.x+st, vertexPos.y, vertexPos.z-st}); // maxX, minZ
             Fvector v3 = createVertex(PL, {vertexPos.x+st, vertexPos.y, vertexPos.z+st}); // maxX, maxZ
             Fvector v4 = createVertex(PL, {vertexPos.x-st, vertexPos.y, vertexPos.z+st}); // minX, maxZ
-#else
-            Fvector v, v1, v2, v3, v4;
-            const Fvector up = {0, 1, 0};
-            Fvector PC = vertexPos;
-            v.set(PC.x - st, PC.y, PC.z - st);	PL.intersectRayPoint(v, up, v1);	v1.mad(v1, PL.n, tt);	// minX,minZ
-            v.set(PC.x + st, PC.y, PC.z - st);	PL.intersectRayPoint(v, up, v2);	v2.mad(v2, PL.n, tt);	// maxX,minZ
-            v.set(PC.x + st, PC.y, PC.z + st);	PL.intersectRayPoint(v, up, v3);	v3.mad(v3, PL.n, tt);	// maxX,maxZ
-            v.set(PC.x - st, PC.y, PC.z + st);	PL.intersectRayPoint(v, up, v4);	v4.mad(v4, PL.n, tt);	// minX,maxZ
-#endif
             // render quad
             GlobalEnv.DRender->dbg_DrawTRI(Fidentity, v3, v2, v1, colorT);
             GlobalEnv.DRender->dbg_DrawTRI(Fidentity, v1, v4, v3, colorT);
