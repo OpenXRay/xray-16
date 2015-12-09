@@ -21,6 +21,7 @@ TEMPLATE_SPECIALIZATION
 IC	CDoubleLinkedList::CDataStorage			(const u32 vertex_count, const _dist_type _max_distance = _dist_type(u32(-1))) :
 	inherited				(vertex_count)
 {
+    m_max_distance			= _max_distance;
 	m_switch_factor			= _dist_type(1);
 }
 
@@ -33,13 +34,24 @@ TEMPLATE_SPECIALIZATION
 IC	void CDoubleLinkedList::init			()
 {
 	inherited::init			();
+	ZeroMemory				(m_list_data,2*sizeof(CGraphVertex));
+	m_list_head				= m_list_data;
+	m_list_tail				= m_list_data + 1;
+	m_list_head->next()		= m_list_tail;
+	m_list_tail->f()		= m_max_distance;
 	m_list_tail->prev()		= m_list_head;
+}
+
+TEMPLATE_SPECIALIZATION
+IC	bool CDoubleLinkedList::is_opened_empty		() const
+{
+	return					(m_list_head->next() == m_list_tail);
 }
 
 TEMPLATE_SPECIALIZATION
 IC	void CDoubleLinkedList::add_opened		(CGraphVertex &vertex)
 {
-	inherited_base::add_opened	(vertex);
+	inherited::add_opened	(vertex);
 	if (!sorted) {
 		m_list_head->next()->prev()	= &vertex;
 		vertex.next()				= m_list_head->next();
@@ -106,7 +118,14 @@ IC	void CDoubleLinkedList::remove_best_opened	()
 {
 	VERIFY					(!is_opened_empty());
 	m_list_head->next()->next()->prev()	= m_list_head;
-	inherited::remove_best_opened();
+	m_list_head->next()		= m_list_head->next()->next();
+}
+
+TEMPLATE_SPECIALIZATION
+IC	void CDoubleLinkedList::add_best_closed		()
+{
+	VERIFY					(!is_opened_empty());
+	inherited::add_closed	(*m_list_head->next());
 }
 
 TEMPLATE_SPECIALIZATION

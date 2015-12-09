@@ -52,9 +52,7 @@ public:
 		_vertex_manager,
 		_data_storage_base,
 		_vertex_allocator,
-		_Vertex,
-		CBuilderAllocatorConstructor,
-        CManagerBuilderAllocatorConstructor
+		_Vertex
 	> CDataStorage;
 
 protected:

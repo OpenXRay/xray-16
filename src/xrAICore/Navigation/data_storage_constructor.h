@@ -18,44 +18,14 @@ template <
 	typename _manager, 
 	typename _builder, 
 	typename _allocator,
-	template <typename _T> class _vertex = CEmptyClassTemplate,
-	template <
-		typename _1,
-		typename _2
-	>
-	class	 _builder_allocator_constructor = CBuilderAllocatorConstructor,
-	template <
-		typename _1, 
-		typename _2,
-		typename _3,
-		template <
-			typename _1,
-			typename _2
-		>
-		class	 _4
-	>
-	class	 _manager_builder_allocator_constructor = CManagerBuilderAllocatorConstructor
+	template <typename _T> class _vertex = CEmptyClassTemplate
 >
 struct CDataStorageConstructor : 
     public _algorithm::template CDataStorage<
-		_manager_builder_allocator_constructor<
-			_manager,
-			_builder,
-			_allocator,
-			_builder_allocator_constructor
-		>,
-		_vertex
-	>
+    CManagerBuilderAllocatorConstructor<_manager, _builder, _allocator>, _vertex>
 {
     typedef typename _algorithm::template CDataStorage<
-		_manager_builder_allocator_constructor<
-			_manager,
-			_builder,
-			_allocator,
-			_builder_allocator_constructor
-		>,
-		_vertex
-	> inherited; 
+		CManagerBuilderAllocatorConstructor<_manager, _builder, _allocator>, _vertex> inherited; 
 
 	typedef typename inherited::CGraphVertex	CGraphVertex;
 	typedef typename CGraphVertex::_index_type	_index_type;

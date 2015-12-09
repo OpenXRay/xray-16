@@ -12,12 +12,7 @@
 	template<\
 		typename _manager,\
 		typename _builder,\
-		typename _allocator,\
-		template <\
-			typename _builder,\
-			typename _allocator\
-		>\
-		class	 _builder_allocator_constructor\
+		typename _allocator\
 	>\
 	template <\
 		template <typename T> class _vertex,\
@@ -28,8 +23,7 @@
 	CManagerBuilderAllocatorConstructor<\
 		_manager,\
 		_builder,\
-		_allocator,\
-		_builder_allocator_constructor\
+		_allocator\
 	>::CDataStorage<_vertex,_index_vertex>
 
 TEMPLATE_SPECIALIZATION

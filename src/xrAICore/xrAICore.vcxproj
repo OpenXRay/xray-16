@@ -270,8 +270,6 @@
     <ClInclude Include="Navigation\data_storage_constructor.h" />
     <ClInclude Include="Navigation\data_storage_double_linked_list.h" />
     <ClInclude Include="Navigation\data_storage_double_linked_list_inline.h" />
-    <ClInclude Include="Navigation\data_storage_single_linked_list.h" />
-    <ClInclude Include="Navigation\data_storage_single_linked_list_inline.h" />
     <ClInclude Include="Navigation\dijkstra.h" />
     <ClInclude Include="Navigation\dijkstra_inline.h" />
     <ClInclude Include="Navigation\edge_path.h" />

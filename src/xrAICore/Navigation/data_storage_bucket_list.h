@@ -37,7 +37,7 @@ struct CDataStorageBucketList {
 			_data_storage,
 			BucketList<_vertex>::_vertex
 		>											inherited;
-		typedef typename inherited::inherited_base	inherited_base;
+		typedef typename inherited::inherited	inherited_base;
 		typedef typename inherited::CGraphVertex	CGraphVertex;
 		typedef typename CGraphVertex::_dist_type	_dist_type;
 		typedef typename CGraphVertex::_index_type	_index_type;
