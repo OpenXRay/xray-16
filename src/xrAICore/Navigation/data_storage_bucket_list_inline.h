@@ -26,6 +26,8 @@ TEMPLATE_SPECIALIZATION
 IC	CBucketList::CDataStorage			(const u32 vertex_count) :
 		inherited(vertex_count)
 {
+    m_max_distance			= _dist_type(-1);
+	m_switch_factor			= _dist_type(1);
 	m_min_bucket_value		= _dist_type(0);
 	m_max_bucket_value		= _dist_type(1000);
 	ZeroMemory				(m_buckets,bucket_count*sizeof(CGraphVertex*));
@@ -40,6 +42,12 @@ TEMPLATE_SPECIALIZATION
 IC	void CBucketList::init				()
 {
 	inherited::init			();
+	ZeroMemory				(m_list_data,2*sizeof(CGraphVertex));
+	m_list_head				= m_list_data;
+	m_list_tail				= m_list_data + 1;
+	m_list_head->next()		= m_list_tail;
+	m_list_tail->f()		= m_max_distance;
+	m_list_tail->prev()		= m_list_head;
 	m_min_bucket_id			= bucket_count;
 	if (clear_buckets)
 		ZeroMemory			(m_buckets,bucket_count*sizeof(CGraphVertex*));
@@ -49,7 +57,15 @@ TEMPLATE_SPECIALIZATION
 IC	void CBucketList::add_best_closed	()
 {
 	VERIFY					(!is_opened_empty());
-	inherited_base::add_closed	(*m_buckets[m_min_bucket_id]);
+	inherited::add_closed	(*m_buckets[m_min_bucket_id]);
+}
+
+TEMPLATE_SPECIALIZATION
+IC	void CBucketList::set_switch_factor	(const _dist_type _switch_factor)
+{
+	if (!sorted)
+		NODEFAULT;
+	m_switch_factor			= _switch_factor;
 }
 
 TEMPLATE_SPECIALIZATION
@@ -175,7 +191,7 @@ TEMPLATE_SPECIALIZATION
 IC	void CBucketList::add_opened		(CGraphVertex &vertex)
 {
 //	ai().m_visited_nodes.push_back	(vertex.index());
-	inherited_base::add_opened	(vertex);
+	inherited::add_opened	(vertex);
 	add_to_bucket				(vertex,compute_bucket_id(vertex));
 	verify_buckets				();
 }

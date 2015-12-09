@@ -219,12 +219,6 @@
     <ClInclude Include="Navigation\data_storage_bucket_list_inline.h">
       <Filter>AI\Navigation\Pathfinding\DataStorages\PriorityQueues</Filter>
     </ClInclude>
-    <ClInclude Include="Navigation\data_storage_double_linked_list.h">
-      <Filter>AI\Navigation\Pathfinding\DataStorages\PriorityQueues</Filter>
-    </ClInclude>
-    <ClInclude Include="Navigation\data_storage_double_linked_list_inline.h">
-      <Filter>AI\Navigation\Pathfinding\DataStorages\PriorityQueues</Filter>
-    </ClInclude>
     <ClInclude Include="Navigation\vertex_allocator_fixed.h">
       <Filter>AI\Navigation\Pathfinding\DataStorages\VertexAllocators</Filter>
     </ClInclude>

@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "xrAICore/Navigation/data_storage_double_linked_list.h"
-
 template <
 	typename	_path_id_type,
 	typename	_bucket_id_type,
@@ -19,11 +17,17 @@ template <
 struct CDataStorageBucketList {
 
 	template <template <typename _T> class T1>
-	struct BucketList {
+	struct BucketList
+    {
 		template<typename T2>
-		struct _vertex : public T1<T2> {
-			_path_id_type	m_path_id;
-			_bucket_id_type	m_bucket_id;
+		struct _vertex : public T1<T2>
+        {
+            T2 *_next;
+			T2 *_prev;
+            _path_id_type m_path_id;
+            _bucket_id_type m_bucket_id;
+            T2 *&next() { return _next; }
+			T2 *&prev() { return _prev; }
 		};
 	};
 
@@ -31,18 +35,20 @@ struct CDataStorageBucketList {
 		typename _data_storage,
 		template <typename _T> class _vertex = CEmptyClassTemplate
 	>
-	class CDataStorage : public CDataStorageDoubleLinkedList<false>::CDataStorage<_data_storage,BucketList<_vertex>::_vertex> {
+	class CDataStorage : public _data_storage::template CDataStorage<BucketList<_vertex>::_vertex>
+    {
 	public:
-		typedef typename CDataStorageDoubleLinkedList<false>::CDataStorage<
-			_data_storage,
-			BucketList<_vertex>::_vertex
-		>											inherited;
-		typedef typename inherited::inherited	inherited_base;
-		typedef typename inherited::CGraphVertex	CGraphVertex;
-		typedef typename CGraphVertex::_dist_type	_dist_type;
-		typedef typename CGraphVertex::_index_type	_index_type;
+        typedef typename _data_storage::template CDataStorage<BucketList<_vertex>::_vertex> inherited;
+        typedef typename inherited::CGraphVertex	CGraphVertex;
+        typedef typename CGraphVertex::_dist_type	_dist_type;
+        typedef typename CGraphVertex::_index_type	_index_type;
 
 	protected:
+        _dist_type m_max_distance;
+        CGraphVertex m_list_data[2];
+        CGraphVertex *m_list_head;
+        CGraphVertex *m_list_tail;
+        _dist_type m_switch_factor;
 		_dist_type				m_min_bucket_value;
 		_dist_type				m_max_bucket_value;
 		CGraphVertex			*m_buckets[bucket_count];
@@ -53,6 +59,7 @@ struct CDataStorageBucketList {
 		virtual					~CDataStorage		();
 		IC		void			init				();
 		IC		void			add_best_closed		();
+        IC		void			set_switch_factor   (const _dist_type _switch_factor);
 		IC		bool			is_opened_empty		();
 		IC		u32				compute_bucket_id	(CGraphVertex &vertex) const;
 		IC		void			verify_buckets		() const;
