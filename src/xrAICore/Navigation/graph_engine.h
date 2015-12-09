@@ -73,9 +73,9 @@ public:
 
 #ifndef AI_COMPILER
 	CSolverAlgorithm *m_solver_algorithm;
-	CStringAlgorithm *m_string_algorithm;
-    CStatTimer PathTimer;
+	CStringAlgorithm *m_string_algorithm;    
 #endif
+    CStatTimer PathTimer;
 
 public:
 	inline CGraphEngine(u32 max_vertex_count);
