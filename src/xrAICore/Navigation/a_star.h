@@ -46,46 +46,6 @@ template <
 	bool	 euclidian_heuristics = true,
 	typename _data_storage_base = CVertexPath<euclidian_heuristics>,
 	template <typename _T> class _vertex = CEmptyClassTemplate,
-	template <
-		typename _1,
-		typename _2
-	>
-	class	 _builder_allocator_constructor = CBuilderAllocatorConstructor,
-	template <
-		typename _1, 
-		typename _2,
-		typename _3,
-		template <
-			typename _1,
-			typename _2
-		>
-		class	 _4
-	>
-	class	 _manager_builder_allocator_constructor = CManagerBuilderAllocatorConstructor,
-	template <
-		typename _algorithm, 
-		typename _manager, 
-		typename _builder, 
-		typename _allocator,
-		template <typename _T> class _vertex,
-		template <
-			typename _1,
-			typename _2
-		>
-		class	 _builder_allocator_constructor = CBuilderAllocatorConstructor,
-		template <
-			typename _1, 
-			typename _2,
-			typename _3,
-			template <
-				typename _1,
-				typename _2
-			>
-			class	 _4
-		>
-		class	 _manager_builder_allocator_constructor = CManagerBuilderAllocatorConstructor
-	>
-	class _data_storage_constructor = CDataStorageConstructor,
 	typename _iteration_type = u32
 > class CAStar : public CDijkstra <
 		_dist_type,
@@ -95,9 +55,6 @@ template <
 		euclidian_heuristics,
 		_data_storage_base,
 		AStar::_Vertex<_dist_type,_vertex>::_vertex,
-		_builder_allocator_constructor,
-		_manager_builder_allocator_constructor,
-		_data_storage_constructor,
 		_iteration_type
 	>
 {
@@ -110,9 +67,6 @@ protected:
 		euclidian_heuristics,
 		_data_storage_base,
 		AStar::_Vertex<_dist_type,_vertex>::_vertex,
-		_builder_allocator_constructor,
-		_manager_builder_allocator_constructor,
-		_data_storage_constructor,
 		_iteration_type
 	>											inherited;
 	typedef typename CDataStorage::CGraphVertex CGraphVertex;
