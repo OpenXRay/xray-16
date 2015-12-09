@@ -198,7 +198,7 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 		if (!file)
 		{
 			string1024			tmp;
-			xr_sprintf			(tmp, "DX10: %s is missing. Replace with stub_default.vs", cname);
+			xr_sprintf			(tmp, "OGL: %s is missing. Replace with stub_default.vs", cname);
 			Msg					(tmp);
 			strconcat			(sizeof(cname), cname,GlobalEnv.Render->getShaderPath(),"stub_default",".vs");
 			FS.update_path		(cname,	"$game_shaders$", cname);
