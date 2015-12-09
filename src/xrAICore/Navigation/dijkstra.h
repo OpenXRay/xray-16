@@ -48,10 +48,10 @@ public:
 
 
 	typedef CDataStorageConstructor<
-		_priority_queue,
-		_vertex_manager,
-		_data_storage_base,
-		_vertex_allocator,
+		_priority_queue, // algorithm
+		_vertex_manager, // manager
+		_data_storage_base, // builder
+		_vertex_allocator, // allocator
 		_Vertex
 	> CDataStorage;
 

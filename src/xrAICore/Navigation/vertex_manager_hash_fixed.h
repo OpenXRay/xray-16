@@ -47,16 +47,16 @@ struct CVertexManagerHashFixed {
 	};
 
 	template <
+        typename _builder,
+        typename _allocator,
 		template <typename _T> class _vertex = CEmptyClassTemplate,
-		template <typename _T1, typename _T2> class _index_vertex = CEmptyClassTemplate2,
-		typename _data_storage = CBuilderAllocatorConstructor
+		template <typename _T1, typename _T2> class _index_vertex = CEmptyClassTemplate2
 	> 
-    class CDataStorage : public _data_storage::template CDataStorage<VertexManager<_vertex>::_vertex> {
+    class CDataStorage : public BuilderAllocatorDataStorage<VertexManager<_vertex>::_vertex, _builder, _allocator>
+    {
 	public:
-        typedef typename _data_storage::template CDataStorage<
-			VertexManager<
-				_vertex
-			>::_vertex
+        typedef BuilderAllocatorDataStorage<
+			VertexManager<_vertex>::_vertex, _builder, _allocator
 		>												inherited;
 		typedef typename inherited::CGraphVertex		CGraphVertex;
 		typedef typename CGraphVertex::_index_type		_index_type;

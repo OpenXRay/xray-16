@@ -14,13 +14,13 @@ template <typename T1, typename T2> class CEmptyClassTemplate2	{};
 #include "xrAICore/Navigation/manager_builder_allocator_constructor.h"
 
 template <
-	typename _algorithm, 
-	typename _manager, 
-	typename _builder, 
-	typename _allocator,
+	typename _algorithm, // CDataStorageBucketList|CDataStorageBinaryHeap
+	typename _manager, // CVertexManagerFixed|CVertexManagerHashFixed
+	typename _builder, // CEdgePath|CVertexPath
+	typename _allocator, // CVertexAllocatorFixed
 	template <typename _T> class _vertex = CEmptyClassTemplate
 >
-struct CDataStorageConstructor : 
+struct CDataStorageConstructor : // CDataStorageBucketList::CDataStorage<CManagerBuilderAllocatorConstructor<manager, path, allocator> >
     public _algorithm::template CDataStorage<
     CManagerBuilderAllocatorConstructor<_manager, _builder, _allocator>, _vertex>
 {
