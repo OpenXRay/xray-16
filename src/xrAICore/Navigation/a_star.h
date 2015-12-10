@@ -12,16 +12,13 @@
 #include "xrAICore/Navigation/data_storage_constructor.h"
 #include "xrAICore/Navigation/dijkstra.h"
 
-namespace AStar
-{
-template<typename _dist_type>
-struct ByDistType
+template<typename _dist_type, typename TVertexData>
+struct AStarVertexData
 {
 	template<typename TCompoundVertex>
-	struct VertexData :
-        Dijkstra::template ByDistType<_dist_type>::template VertexData<TCompoundVertex>
+	struct VertexData : TVertexData::template VertexData<TCompoundVertex>
     {
-		typedef _dist_type _dist_type;
+        typedef _dist_type _dist_type;
 
 		_dist_type _g;
 		_dist_type _h;
@@ -30,26 +27,25 @@ struct ByDistType
 		_dist_type &h() { return _h; }
 	};
 };
-}
 
 template <
 	typename _dist_type,
 	typename _priority_queue, 
 	typename _vertex_manager, 
 	typename _vertex_allocator,
-    typename TCompoundVertex = EmptyVertexData,
 	bool	 euclidian_heuristics = true,
 	typename _data_storage_base = CVertexPath<euclidian_heuristics>,
-	typename _iteration_type = u32
+	typename _iteration_type = u32,
+    typename TVertexData = EmptyVertexData
 > class CAStar : public CDijkstra<
 		_dist_type,
 		_priority_queue,
 		_vertex_manager,
 		_vertex_allocator,
-        TCompoundVertex,
 		euclidian_heuristics,
 		_data_storage_base,
-		_iteration_type
+		_iteration_type,
+        AStarVertexData<_dist_type, TVertexData>
 	>
 {
 protected:
@@ -58,12 +54,12 @@ protected:
 		_priority_queue,
 		_vertex_manager,
 		_vertex_allocator,
-        TCompoundVertex,
 		euclidian_heuristics,
 		_data_storage_base,
-		_iteration_type
+		_iteration_type,
+        AStarVertexData<_dist_type, TVertexData>
 	> inherited;
-	typedef TCompoundVertex CGraphVertex;
+	typedef typename inherited::CGraphVertex CGraphVertex;
 	typedef typename CGraphVertex::_dist_type _dist_type;
 	typedef typename CGraphVertex::_index_type _index_type;
 

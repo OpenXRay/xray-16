@@ -55,45 +55,33 @@ public:
 	using CStringVertexAllocator = CVertexAllocatorFixed<1024>;
 #endif
     using AlgorithmStorage = CVertexPath<true>;
-    using AlgorithmVertexData = AStar::template ByDistType<_dist_type>;
-    using AlgorithmVertex = CompoundVertex<AlgorithmVertexData,
-        CPriorityQueue, CVertexManager, CVertexAllocator, AlgorithmStorage>;
-	using CAlgorithm = CAStar<
+    using CAlgorithm = CAStar<
         _dist_type,
         CPriorityQueue,
         CVertexManager,
         CVertexAllocator,
-        AlgorithmVertex,
         true,
         AlgorithmStorage>;
 	
 #ifndef AI_COMPILER
     using SolverAlgorithmStorage = CEdgePath<_solver_edge_type, true>;
-    using SolverAlgorithmVertexData = AStar::template ByDistType<_solver_dist_type>;
-    using SolverAlgorithmVertex = CompoundVertex<SolverAlgorithmVertexData,
-        CSolverPriorityQueue, CSolverVertexManager, CSolverVertexAllocator, SolverAlgorithmStorage>;
 	using CSolverAlgorithm = CAStar<
 		_solver_dist_type,
 		CSolverPriorityQueue,
 		CSolverVertexManager,
 		CSolverVertexAllocator,
-        SolverAlgorithmVertex,
 		true,
         SolverAlgorithmStorage>;
 
     using _string_dist_type = float;
     using StringAlgorithmStorage = AlgorithmStorage;
-    using StringAlgorithmVertexData = AStar::template ByDistType<_string_dist_type>;
-    using StringAlgorithmVertex = CompoundVertex<StringAlgorithmVertexData,
-        CStringPriorityQueue, CStringVertexManager, CStringVertexAllocator, StringAlgorithmStorage>;
 	using CStringAlgorithm = CAStar<
         _string_dist_type,
         CStringPriorityQueue,
         CStringVertexManager,
         CStringVertexAllocator,
-        StringAlgorithmVertex,
         true,
-        AlgorithmStorage>;
+        StringAlgorithmStorage>;
 #endif // AI_COMPILER
 
 	CAlgorithm *m_algorithm;

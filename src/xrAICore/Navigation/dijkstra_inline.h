@@ -14,10 +14,10 @@
 		typename _priority_queue,\
 		typename _vertex_manager,\
 		typename _vertex_allocator,\
-        typename TCompoundVertex,\
 		bool	 euclidian_heuristics,\
 		typename _data_storage_base,\
-		typename _iteration_type\
+		typename _iteration_type,\
+        typename TVertexData\
 	>
 
 #define CSDijkstra CDijkstra<\
@@ -25,10 +25,10 @@
 	_priority_queue,\
 	_vertex_manager,\
 	_vertex_allocator,\
-    TCompoundVertex,\
 	euclidian_heuristics,\
 	_data_storage_base,\
-	_iteration_type\
+	_iteration_type,\
+    TVertexData\
 >
 
 TEMPLATE_SPECIALIZATION

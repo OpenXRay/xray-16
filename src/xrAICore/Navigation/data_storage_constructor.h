@@ -9,7 +9,11 @@
 #pragma once
 
 struct EmptyVertexData
-{};
+{
+    template<typename TCompoundVertex> // result mixin type
+    struct VertexData
+    {};
+};
 
 template<typename... Components>
 struct CompoundVertex : Components::template VertexData<CompoundVertex<Components...>>...
