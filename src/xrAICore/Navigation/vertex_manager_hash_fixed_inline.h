@@ -26,8 +26,9 @@
 
 TEMPLATE_SPECIALIZATION
 IC	CHashFixedVertexManager::CDataStorage		(const u32 vertex_count) :
-	inherited				(vertex_count),
-	m_current_path_id		(_path_id_type(0))
+    CDataStorageBase(vertex_count),
+    CDataStorageAllocator(),
+	m_current_path_id(_path_id_type(0))
 {
 	u32						memory_usage = 0;
 	u32						byte_count;
@@ -53,7 +54,8 @@ CHashFixedVertexManager::~CDataStorage		()
 TEMPLATE_SPECIALIZATION
 IC	void CHashFixedVertexManager::init		()
 {
-	inherited::init			();
+    CDataStorageBase::init();
+    CDataStorageAllocator::init();
 	++m_current_path_id;
 	m_vertex_count			= 0;
 	if (!m_current_path_id) {

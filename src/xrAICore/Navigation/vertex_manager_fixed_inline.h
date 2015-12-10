@@ -25,7 +25,8 @@
 
 TEMPLATE_SPECIALIZATION
 IC	CFixedVertexManager::CDataStorage		(const u32 vertex_count) :
-	inherited				(vertex_count)
+    CDataStorageBase(vertex_count),
+    CDataStorageAllocator()
 {
 	m_current_path_id		= _path_id_type(0);
 	m_max_node_count		= vertex_count;
@@ -48,7 +49,8 @@ CFixedVertexManager::~CDataStorage		()
 TEMPLATE_SPECIALIZATION
 IC	void CFixedVertexManager::init		()
 {
-	inherited::init			();
+    CDataStorageBase::init();
+    CDataStorageAllocator::init();
 	++m_current_path_id;
 	if (!m_current_path_id) {
 		ZeroMemory			(m_indexes,(m_max_node_count)*sizeof(CGraphIndexVertex));

@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "xrAICore/Navigation/builder_allocator_constructor.h"
-
 template <
 	typename _manager, 
 	typename _builder, // CVertexPath
@@ -30,7 +28,7 @@ struct CManagerBuilderAllocatorConstructor {
 	{
 	public:
 	    typedef typename _manager::template CDataStorage<_builder, _allocator, _vertex, _index_vertex> inherited;
-		typedef typename inherited::inherited		inherited_allocator;
+		typedef typename inherited::CDataStorageAllocator inherited_allocator;
 		typedef typename inherited::CGraphVertex	CGraphVertex;
 		typedef typename CGraphVertex::_index_type	_index_type;
 

@@ -261,7 +261,6 @@
     <ClInclude Include="Navigation\ai_object_location_inline.h" />
     <ClInclude Include="Navigation\a_star.h" />
     <ClInclude Include="Navigation\a_star_inline.h" />
-    <ClInclude Include="Navigation\builder_allocator_constructor.h" />
     <ClInclude Include="Navigation\data_storage_binary_heap.h" />
     <ClInclude Include="Navigation\data_storage_binary_heap_inline.h" />
     <ClInclude Include="Navigation\data_storage_bucket_list.h" />
