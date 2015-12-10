@@ -15,7 +15,7 @@
 #define CVertexPathBuilder CVertexPath<EuclidianHeuristics>::CDataStorage<TCompoundVertex>
 
 TEMPLATE_SPECIALIZATION
-inline CVertexPathBuilder::CDataStorage(const u32 vertex_count)
+inline CVertexPathBuilder::CDataStorage(const u32 /*vertex_count*/)
 {}
 
 TEMPLATE_SPECIALIZATION
@@ -36,19 +36,19 @@ inline void CVertexPathBuilder::assign_parent(Vertex &neighbour, Vertex *parent,
 { assign_parent(neighbour, parent); }
 
 TEMPLATE_SPECIALIZATION
-inline void CVertexPathBuilder::update_successors(Vertex &tpNeighbour)
+inline void CVertexPathBuilder::update_successors(Vertex &/*tpNeighbour*/)
 { NODEFAULT; }
 
 TEMPLATE_SPECIALIZATION
 inline void CVertexPathBuilder::get_node_path(xr_vector<Index> &path, Vertex *best)
 {
     Vertex *t1 = best, *t2 = best->back();
-    for (u32 i = 1; t2; t1 = t2, t2 = t2->back(), i++);	
-    path.resize(i);	
+    for (u32 i = 1; t2; t1 = t2, t2 = t2->back(), i++);
+    path.resize(i);
     t1 = best;
     path[--i] = best->index();
-    t2 = t1->back();	
-    auto it = path.rbegin();	
+    t2 = t1->back();
+    auto it = path.rbegin();
     for (it++; t2; t2 = t2->back(), it++)
         *it = t2->index();
 }

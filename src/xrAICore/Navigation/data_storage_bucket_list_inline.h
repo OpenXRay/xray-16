@@ -217,7 +217,7 @@ inline void CBucketList::add_opened(Vertex &vertex)
 }
 
 TEMPLATE_SPECIALIZATION
-inline void CBucketList::decrease_opened(Vertex &vertex, const Distance value)
+inline void CBucketList::decrease_opened(Vertex &vertex, const Distance /*value*/)
 {
     VERIFY(!is_opened_empty());
     u32 node_bucket_id = compute_bucket_id(vertex);
