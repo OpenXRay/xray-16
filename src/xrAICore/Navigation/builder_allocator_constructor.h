@@ -20,17 +20,19 @@ class BuilderAllocatorDataStorage :
 public:
     typedef typename _path_builder::template CDataStorage<_vertex>	CDataStorageBase;
     typedef typename _vertex_allocator::template CDataStorage<
-        typename _path_builder::template CDataStorage<
-			_vertex
-		>::CGraphVertex
-	>												CDataStorageAllocator;
+        typename _path_builder::template CDataStorage<_vertex>::CGraphVertex> CDataStorageAllocator;
 	typedef typename CDataStorageBase::CGraphVertex CGraphVertex;
 	typedef typename CGraphVertex::_index_type		_index_type;
 
 public:
-	IC							BuilderAllocatorDataStorage(const u32 vertex_count);
-	virtual						~BuilderAllocatorDataStorage();
-	IC		void				init			();
+    BuilderAllocatorDataStorage(const u32 vertex_count) :
+        CDataStorageBase(vertex_count),
+        CDataStorageAllocator()
+    {}
+    virtual ~BuilderAllocatorDataStorage() {}
+    void init()
+    {
+        CDataStorageBase::init();
+        CDataStorageAllocator::init();
+    }
 };
-
-#include "xrAICore/Navigation/builder_allocator_constructor_inline.h"

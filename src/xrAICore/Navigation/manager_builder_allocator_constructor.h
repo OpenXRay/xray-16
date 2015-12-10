@@ -35,11 +35,12 @@ struct CManagerBuilderAllocatorConstructor {
 		typedef typename CGraphVertex::_index_type	_index_type;
 
 	public:
-		IC							CDataStorage	(const u32 vertex_count);
-		virtual						~CDataStorage	();
-		IC		void				init			();
-		IC		CGraphVertex		&create_vertex	(const _index_type &vertex_id);
+        CDataStorage(const u32 vertex_count) :
+            inherited(vertex_count)
+        {}
+        virtual ~CDataStorage() {}
+        void init() { inherited::init(); }
+        CGraphVertex &create_vertex(const _index_type &vertex_id)
+        { return inherited::create_vertex(inherited_allocator::create_vertex(), vertex_id); }
 	};
 };
-
-#include "xrAICore/Navigation/manager_builder_allocator_constructor_inline.h"

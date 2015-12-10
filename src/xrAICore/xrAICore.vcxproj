@@ -262,7 +262,6 @@
     <ClInclude Include="Navigation\a_star.h" />
     <ClInclude Include="Navigation\a_star_inline.h" />
     <ClInclude Include="Navigation\builder_allocator_constructor.h" />
-    <ClInclude Include="Navigation\builder_allocator_constructor_inline.h" />
     <ClInclude Include="Navigation\data_storage_binary_heap.h" />
     <ClInclude Include="Navigation\data_storage_binary_heap_inline.h" />
     <ClInclude Include="Navigation\data_storage_bucket_list.h" />
@@ -291,7 +290,6 @@
     <ClInclude Include="Navigation\level_graph_space.h" />
     <ClInclude Include="Navigation\level_graph_vertex_inline.h" />
     <ClInclude Include="Navigation\manager_builder_allocator_constructor.h" />
-    <ClInclude Include="Navigation\manager_builder_allocator_constructor_inline.h" />
     <ClInclude Include="Navigation\PathManagers\path_manager.h" />
     <ClInclude Include="Navigation\PathManagers\path_manager_game.h" />
     <ClInclude Include="Navigation\PathManagers\path_manager_game_inline.h" />

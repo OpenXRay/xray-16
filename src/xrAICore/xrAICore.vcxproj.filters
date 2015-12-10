@@ -183,16 +183,10 @@
     <ClInclude Include="Navigation\builder_allocator_constructor.h">
       <Filter>AI\Navigation\Pathfinding\DataStorages\Constructors</Filter>
     </ClInclude>
-    <ClInclude Include="Navigation\builder_allocator_constructor_inline.h">
-      <Filter>AI\Navigation\Pathfinding\DataStorages\Constructors</Filter>
-    </ClInclude>
     <ClInclude Include="Navigation\data_storage_constructor.h">
       <Filter>AI\Navigation\Pathfinding\DataStorages\Constructors</Filter>
     </ClInclude>
     <ClInclude Include="Navigation\manager_builder_allocator_constructor.h">
-      <Filter>AI\Navigation\Pathfinding\DataStorages\Constructors</Filter>
-    </ClInclude>
-    <ClInclude Include="Navigation\manager_builder_allocator_constructor_inline.h">
       <Filter>AI\Navigation\Pathfinding\DataStorages\Constructors</Filter>
     </ClInclude>
     <ClInclude Include="Navigation\edge_path.h">

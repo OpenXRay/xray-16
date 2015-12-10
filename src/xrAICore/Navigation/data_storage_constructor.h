@@ -18,7 +18,7 @@ template <
 	typename _manager, // CVertexManagerFixed|CVertexManagerHashFixed
 	typename _builder, // CEdgePath|CVertexPath
 	typename _allocator, // CVertexAllocatorFixed
-	template <typename _T> class _vertex = CEmptyClassTemplate
+	template <typename _T> class _vertex = CEmptyClassTemplate // _Vertex
 >
 struct CDataStorageConstructor : // CDataStorageBucketList::CDataStorage<CManagerBuilderAllocatorConstructor<manager, path, allocator> >
     public _algorithm::template CDataStorage<
