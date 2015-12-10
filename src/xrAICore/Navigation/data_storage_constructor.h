@@ -18,14 +18,13 @@ template <
 >
 struct CManagerBuilderAllocatorConstructor {
 	template <
-		template <typename T> class _vertex = CEmptyClassTemplate,
-		template <typename T1, typename T2> class _index_vertex = CEmptyClassTemplate2
+		template <typename T> class _vertex = CEmptyClassTemplate
 	>
 	class CDataStorage : 
-	    public _manager::template CDataStorage<_builder, _allocator, _vertex, _index_vertex>
+	    public _manager::template CDataStorage<_builder, _allocator, _vertex>
 	{
 	public:
-	    typedef typename _manager::template CDataStorage<_builder, _allocator, _vertex, _index_vertex> inherited;
+	    typedef typename _manager::template CDataStorage<_builder, _allocator, _vertex> inherited;
 		typedef typename inherited::CDataStorageAllocator inherited_allocator;
 		typedef typename inherited::CGraphVertex	CGraphVertex;
 		typedef typename CGraphVertex::_index_type	_index_type;

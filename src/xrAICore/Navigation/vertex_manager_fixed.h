@@ -38,8 +38,7 @@ struct CVertexManagerFixed {
 	template <
         typename _builder,
         typename _allocator,
-		template <typename _T> class _vertex = CEmptyClassTemplate,
-		template <typename _T1, typename _T2> class _index_vertex = CEmptyClassTemplate2
+		template <typename _T> class _vertex = CEmptyClassTemplate
 	> 
     class CDataStorage :
         public _builder::template CDataStorage<VertexManager<_vertex>::_vertex>,
@@ -51,11 +50,11 @@ struct CVertexManagerFixed {
             typename _builder::template CDataStorage<VertexManager<_vertex>::_vertex>::CGraphVertex> CDataStorageAllocator;
 		typedef typename CDataStorageBase::CGraphVertex CGraphVertex;
 		typedef typename CGraphVertex::_index_type _index_type;
-        //using inherited = CDataStorageAllocator;
 
 #pragma pack(push,1)
 		template <typename _path_id_type>
-		struct SGraphIndexVertex : public _index_vertex<CGraphVertex,SGraphIndexVertex<_path_id_type> > {
+		struct SGraphIndexVertex
+        {
 			_path_id_type	m_path_id;
 			CGraphVertex	*m_vertex;
 		};
