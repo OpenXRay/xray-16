@@ -1,55 +1,40 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: vertex_allocator_fixed_inline.h
-//	Created 	: 21.03.2002
-//  Modified 	: 27.02.2004
-//	Author		: Dmitriy Iassenev
-//	Description : Fixed vertex allocator inline functions
+//  Module      : vertex_allocator_fixed_inline.h
+//  Created     : 21.03.2002
+//  Modified    : 27.02.2004
+//  Author      : Dmitriy Iassenev
+//  Description : Fixed vertex allocator inline functions
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION \
-	template<u32 reserved_vertex_count>\
-	template<typename TCompoundVertex>
+#define TEMPLATE_SPECIALIZATION\
+    template<u32 ReserveSize>\
+    template<typename TCompoundVertex>
 
-#define CFixedVertexAllocator	CVertexAllocatorFixed<reserved_vertex_count>::CDataStorage<TCompoundVertex>
-
-TEMPLATE_SPECIALIZATION
-IC	CFixedVertexAllocator::CDataStorage					()
-{
-	u32						memory_usage = 0;
-	u32						byte_count;
-
-	byte_count				= (reserved_vertex_count)*sizeof(CGraphVertex);
-//	m_vertices				= xr_alloc<CGraphVertex>(reserved_vertex_count);
-//	ZeroMemory				(m_vertices,byte_count);
-	m_vertices.resize		(reserved_vertex_count);
-	memory_usage			+= byte_count;
-}
+#define CFixedVertexAllocator CVertexAllocatorFixed<ReserveSize>::CDataStorage<TCompoundVertex>
 
 TEMPLATE_SPECIALIZATION
-CFixedVertexAllocator::~CDataStorage					()
-{
-//	xr_free					(m_vertices);
-}
+inline CFixedVertexAllocator::CDataStorage()
+{ m_vertices.resize(ReserveSize); }
 
 TEMPLATE_SPECIALIZATION
-IC	void CFixedVertexAllocator::init					()
-{
-	m_vertex_count			= 0;
-}
+inline CFixedVertexAllocator::~CDataStorage()
+{}
 
 TEMPLATE_SPECIALIZATION
-IC	u32  CFixedVertexAllocator::get_visited_node_count	() const
-{
-	return					(m_vertex_count);
-}
+inline void CFixedVertexAllocator::init()
+{ m_vertex_count = 0; }
 
 TEMPLATE_SPECIALIZATION
-IC	typename CFixedVertexAllocator::CGraphVertex &CFixedVertexAllocator::create_vertex		()
+inline u32  CFixedVertexAllocator::get_visited_node_count() const
+{ return m_vertex_count; }
+
+TEMPLATE_SPECIALIZATION
+inline typename CFixedVertexAllocator::Vertex &CFixedVertexAllocator::create_vertex()
 {
-	VERIFY					(m_vertex_count < reserved_vertex_count - 1);
-	return					(*(m_vertices.begin() + m_vertex_count++));
+    VERIFY(m_vertex_count<ReserveSize-1);
+    return *(m_vertices.begin()+m_vertex_count++);
 }
 
 #undef TEMPLATE_SPECIALIZATION

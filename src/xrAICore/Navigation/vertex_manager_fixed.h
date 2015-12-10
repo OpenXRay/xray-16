@@ -1,76 +1,73 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: vertex_manager_fixed.h
-//	Created 	: 21.03.2002
-//  Modified 	: 01.03.2004
-//	Author		: Dmitriy Iassenev
-//	Description : Fixed vertex manager
+//  Module      : vertex_manager_fixed.h
+//  Created     : 21.03.2002
+//  Modified    : 01.03.2004
+//  Author      : Dmitriy Iassenev
+//  Description : Fixed vertex manager
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
 template <
-	typename _path_id_type,
-	typename _index_type,
-	u8 mask
+    typename TPathId,
+    typename TIndex,
+    u8 Mask
 >
 struct CVertexManagerFixed
 {
     template<typename TCompoundVertex>
-	struct VertexData
+    struct VertexData
     {
-		typedef _index_type _index_type;
-		_index_type _index : 8*sizeof(_index_type)-mask;
-		_index_type _opened : mask;
+        using Index = TIndex;
+        Index _index : 8*sizeof(Index)-Mask;
+        Index _opened : Mask;
 
-		_index_type index() const { return _index; }
-		_index_type opened() const { return	_opened; }
-	};
+        Index index() const { return _index; }
+        Index opened() const { return _opened; }
+    };
 
-	template <
-        typename _builder,
-        typename _allocator,
+    template <
+        typename TPathBuilder,
+        typename TVertexAllocator,
         typename TCompoundVertex
-	> 
+    >
     class CDataStorage :
-        public _builder::template CDataStorage<TCompoundVertex>,
-        public _allocator::template CDataStorage<TCompoundVertex>
+        public TPathBuilder::template CDataStorage<TCompoundVertex>,
+        public TVertexAllocator::template CDataStorage<TCompoundVertex>
     {
-	public:
-        typedef typename _builder::template CDataStorage<TCompoundVertex> CDataStorageBase;
-        typedef typename _allocator::template CDataStorage<TCompoundVertex> CDataStorageAllocator;
-		typedef TCompoundVertex CGraphVertex;
-		typedef typename CGraphVertex::_index_type _index_type;
+    public:
+        using CDataStorageBase = typename TPathBuilder::template CDataStorage<TCompoundVertex>;
+        using CDataStorageAllocator = typename TVertexAllocator::template CDataStorage<TCompoundVertex>;
+        using Vertex = TCompoundVertex;
+        using Index = TIndex;
+        using PathId = TPathId;
 
-#pragma pack(push,1)
-		template <typename _path_id_type>
-		struct SGraphIndexVertex
+#pragma pack(push, 1)
+        struct IndexVertex
         {
-			_path_id_type	m_path_id;
-			CGraphVertex	*m_vertex;
-		};
+            PathId m_path_id;
+            Vertex *m_vertex;
+        };
 #pragma pack(pop)
 
-		typedef _path_id_type							_path_id_type;
-		typedef SGraphIndexVertex<_path_id_type>		CGraphIndexVertex;
+    protected:
+        PathId m_current_path_id;
+        u32 m_max_node_count;
+        IndexVertex *m_indexes;
 
-	protected:
-		_path_id_type			m_current_path_id;
-		u32						m_max_node_count;
-		CGraphIndexVertex		*m_indexes;
-
-	public:
-		IC						CDataStorage	(const u32 vertex_count);
-		virtual					~CDataStorage	();
-		IC		void			init			();
-		IC		bool			is_opened		(const CGraphVertex &vertex) const;
-		IC		bool			is_visited		(const _index_type &vertex_id) const;
-		IC		bool			is_closed		(const CGraphVertex &vertex) const;
-		IC		CGraphVertex	&get_node		(const _index_type &vertex_id) const;
-		IC		CGraphVertex	&create_vertex	(CGraphVertex &vertex, const _index_type &vertex_id);
-		IC		void			add_opened		(CGraphVertex &vertex);
-		IC		void			add_closed		(CGraphVertex &vertex);
-		IC		_path_id_type	current_path_id	() const;
-	};
+    public:
+        inline CDataStorage(const u32 vertex_count);
+        inline virtual ~CDataStorage();
+        inline void init();
+        inline bool is_opened(const Vertex &vertex) const;
+        inline bool is_visited(const Index &vertex_id) const;
+        inline bool is_closed(const Vertex &vertex) const;
+        inline Vertex &get_node(const Index &vertex_id) const;
+        inline Vertex &create_vertex(Vertex &vertex, const Index &vertex_id);
+        inline void add_opened(Vertex &vertex);
+        inline void add_closed(Vertex &vertex);
+        inline PathId current_path_id() const;
+    };
 };
 
 #include "vertex_manager_fixed_inline.h"

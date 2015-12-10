@@ -1,70 +1,56 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: vertex_path_inline.h
-//	Created 	: 21.03.2002
-//  Modified 	: 02.03.2004
-//	Author		: Dmitriy Iassenev
-//	Description : Vertex path class inline functions
+//  Module      : vertex_path_inline.h
+//  Created     : 21.03.2002
+//  Modified    : 02.03.2004
+//  Author      : Dmitriy Iassenev
+//  Description : Vertex path class inline functions
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION \
-	template<bool bEuclidianHeuristics>\
-	template<typename TCompoundVertex> 
+#define TEMPLATE_SPECIALIZATION\
+    template <bool EuclidianHeuristics>\
+    template <typename TCompoundVertex>
 
-
-#define CVertexPathBuilder		CVertexPath<bEuclidianHeuristics>::CDataStorage<TCompoundVertex>
-
-TEMPLATE_SPECIALIZATION
-IC	CVertexPathBuilder::CDataStorage			(const u32 vertex_count)
-{
-}
+#define CVertexPathBuilder CVertexPath<EuclidianHeuristics>::CDataStorage<TCompoundVertex>
 
 TEMPLATE_SPECIALIZATION
-CVertexPathBuilder::~CDataStorage				()
-{
-}
+inline CVertexPathBuilder::CDataStorage(const u32 vertex_count)
+{}
 
 TEMPLATE_SPECIALIZATION
-IC	void CVertexPathBuilder::init				()
-{
-}
+inline CVertexPathBuilder::~CDataStorage()
+{}
 
 TEMPLATE_SPECIALIZATION
-IC	void CVertexPathBuilder::assign_parent	(CGraphVertex	&neighbour, CGraphVertex *parent)
-{
-	neighbour.back()		= parent;
-}
+inline void CVertexPathBuilder::init()
+{}
+
+TEMPLATE_SPECIALIZATION
+inline void CVertexPathBuilder::assign_parent(Vertex &neighbour, Vertex *parent)
+{ neighbour.back() = parent; }
 
 TEMPLATE_SPECIALIZATION
 template <typename T>
-IC	void CVertexPathBuilder::assign_parent	(CGraphVertex	&neighbour, CGraphVertex *parent, const T&)
-{
-	assign_parent			(neighbour,parent);
-}
+inline void CVertexPathBuilder::assign_parent(Vertex &neighbour, Vertex *parent, const T&)
+{ assign_parent(neighbour, parent); }
 
 TEMPLATE_SPECIALIZATION
-IC	void CVertexPathBuilder::update_successors(CGraphVertex &tpNeighbour)
-{
-	NODEFAULT;
-}
+inline void CVertexPathBuilder::update_successors(Vertex &tpNeighbour)
+{ NODEFAULT; }
 
 TEMPLATE_SPECIALIZATION
-IC	void CVertexPathBuilder::get_node_path	(xr_vector<_index_type> &path, CGraphVertex *best)
+inline void CVertexPathBuilder::get_node_path(xr_vector<Index> &path, Vertex *best)
 {
-	CGraphVertex			*t1 = best, *t2 = best->back();
-	for (u32 i=1; t2; t1 = t2, t2 = t2->back(), ++i) ;
-
-	path.resize				(i);
-
-	t1						= best;
-	path[--i]				= best->index();
-	t2						= t1->back();
-
-	xr_vector<_index_type>::reverse_iterator	I = path.rbegin();
-	xr_vector<_index_type>::reverse_iterator	E = path.rend();
-	for (++I ; t2; t2 = t2->back(), ++I)
-		*I = t2->index();
+    Vertex *t1 = best, *t2 = best->back();
+    for (u32 i = 1; t2; t1 = t2, t2 = t2->back(), i++);	
+    path.resize(i);	
+    t1 = best;
+    path[--i] = best->index();
+    t2 = t1->back();	
+    auto it = path.rbegin();	
+    for (it++; t2; t2 = t2->back(), it++)
+        *it = t2->index();
 }
 
 #undef TEMPLATE_SPECIALIZATION

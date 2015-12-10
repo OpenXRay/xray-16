@@ -1,39 +1,39 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: vertex_allocator_fixed.h
-//	Created 	: 21.03.2002
-//  Modified 	: 27.02.2004
-//	Author		: Dmitriy Iassenev
-//	Description : Fixed vertex allocator
+//  Module      : vertex_allocator_fixed.h
+//  Created     : 21.03.2002
+//  Modified    : 27.02.2004
+//  Author      : Dmitriy Iassenev
+//  Description : Fixed vertex allocator
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-template <u32 reserved_vertex_count>
+template <u32 ReserveSize>
 struct CVertexAllocatorFixed
 {
     template<typename TCompoundVertex>
     struct VertexData
     {};
 
-	template <typename TCompoundVertex>
-	class CDataStorage
+    template <typename TCompoundVertex>
+    class CDataStorage
     {
-	public:
-		typedef TCompoundVertex CGraphVertex;
-		typedef typename CGraphVertex::_index_type _index_type;
-		typedef xr_vector<CGraphVertex> VERTICES;
+    public:
+        using Vertex = TCompoundVertex;
+        using Index = typename Vertex::Index;
+        using VertexContainer = xr_vector<Vertex>;
 
-	protected:
-		u32							m_vertex_count;
-		VERTICES					m_vertices;
+    protected:
+        u32 m_vertex_count;
+        VertexContainer m_vertices;
 
-	public:
-		IC							CDataStorage			();
-		virtual						~CDataStorage			();
-		IC		void				init					();
-		IC		u32					get_visited_node_count	() const;
-		IC		CGraphVertex		&create_vertex			();
-	};
+    public:
+        inline CDataStorage();
+        inline virtual ~CDataStorage();
+        inline void init();
+        inline u32 get_visited_node_count() const;
+        inline Vertex &create_vertex();
+    };
 };
 
 #include "vertex_allocator_fixed_inline.h"

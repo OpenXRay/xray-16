@@ -1,84 +1,82 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: vertex_manager_hash_fixed.h
-//	Created 	: 21.03.2002
-//  Modified 	: 05.03.2004
-//	Author		: Dmitriy Iassenev
-//	Description : Hash fixed vertex manager
+//  Module      : vertex_manager_hash_fixed.h
+//  Created     : 21.03.2002
+//  Modified    : 05.03.2004
+//  Author      : Dmitriy Iassenev
+//  Description : Hash fixed vertex manager
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
 template <
-	typename _path_id_type,
-	typename _index_type,
-	u32		 hash_size,
-	u32		 fix_size
+    typename TPathId,
+    typename TIndex,
+    u32 HashSize,
+    u32 FixSize
 >
 struct CVertexManagerHashFixed
 {
-	template<typename TCompoundVertex>
-	struct VertexData
+    template<typename TCompoundVertex>
+    struct VertexData
     {
-		typedef _index_type _index_type;
-		_index_type _index;
-		bool _opened;
+        using Index = TIndex;
 
-		const _index_type &index() const { return _index; }
-		_index_type &index() { return _index; }
-		bool &opened() { return _opened; }
+        Index _index;
+        bool _opened;
+
+        const Index &index() const { return _index; }
+        Index &index() { return _index; }
+        bool &opened() { return _opened; }
         bool opened() const { return _opened; }
-	};
+    };
 
-	template <
-        typename _builder,
-        typename _allocator,
-		typename TCompoundVertex
-	> 
+    template <
+        typename TPathBuilder,
+        typename TVertexAllocator,
+        typename TCompoundVertex
+    > 
     class CDataStorage :
-        public _builder::template CDataStorage<TCompoundVertex>,
-        public _allocator::template CDataStorage<TCompoundVertex>
+        public TPathBuilder::template CDataStorage<TCompoundVertex>,
+        public TVertexAllocator::template CDataStorage<TCompoundVertex>
     {
-	public:
-        typedef typename _builder::template CDataStorage<TCompoundVertex> CDataStorageBase;
-        typedef typename _allocator::template CDataStorage<TCompoundVertex> CDataStorageAllocator;
-		typedef typename TCompoundVertex CGraphVertex;
-		typedef typename CGraphVertex::_index_type _index_type;
+    public:
+        using CDataStorageBase = typename TPathBuilder::template CDataStorage<TCompoundVertex>;
+        using CDataStorageAllocator = typename TVertexAllocator::template CDataStorage<TCompoundVertex>;
+        using Vertex = TCompoundVertex;
+        using Index = TIndex;
+        using PathId = TPathId;
 
-#pragma pack(push,1)
-		template <typename _path_id_type>
-		struct SGraphIndexVertex
+#pragma pack(push, 1)
+        struct IndexVertex
         {
-			CGraphVertex		*m_vertex;
-			SGraphIndexVertex	*m_next;
-			SGraphIndexVertex	*m_prev;
-			u32					m_hash;
-			_path_id_type		m_path_id;
-		};
+            Vertex *m_vertex;
+            IndexVertex *m_next;
+            IndexVertex *m_prev;
+            u32 m_hash;
+            PathId m_path_id;
+        };
 #pragma pack(pop)
 
-		typedef _path_id_type							_path_id_type;
-		typedef SGraphIndexVertex<_path_id_type>		CGraphIndexVertex;
+    protected:
+        PathId m_current_path_id;
+        IndexVertex *m_vertices;
+        IndexVertex **m_hash;
+        u32 m_vertex_count;
 
-	protected:
-		_path_id_type			m_current_path_id;
-		CGraphIndexVertex		*m_vertices;
-		CGraphIndexVertex		**m_hash;
-		u32						m_vertex_count;
-
-	public:
-		IC						CDataStorage	(const u32 vertex_count);
-		virtual					~CDataStorage	();
-		IC		void			init			();
-		IC		bool			is_opened		(const CGraphVertex &vertex) const;
-		IC		bool			is_visited		(const _index_type &vertex_id) const;
-		IC		bool			is_closed		(const CGraphVertex &vertex) const;
-		IC		CGraphVertex	&get_node		(const _index_type &vertex_id) const;
-		IC		CGraphVertex	&create_vertex	(CGraphVertex &vertex, const _index_type &vertex_id);
-		IC		void			add_opened		(CGraphVertex &vertex);
-		IC		void			add_closed		(CGraphVertex &vertex);
-		IC		_path_id_type	current_path_id	() const;
-		IC		u32				hash_index		(const _index_type &vertex_id) const;
-	};
+    public:
+        inline CDataStorage(const u32 vertex_count);
+        inline virtual ~CDataStorage();
+        inline void init();
+        inline bool is_opened(const Vertex &vertex) const;
+        inline bool is_visited(const Index &vertex_id) const;
+        inline bool is_closed(const Vertex &vertex) const;
+        inline Vertex &get_node(const Index &vertex_id) const;
+        inline Vertex &create_vertex(Vertex &vertex, const Index &vertex_id);
+        inline void add_opened(Vertex &vertex);
+        inline void add_closed(Vertex &vertex);
+        inline PathId current_path_id() const;
+        inline u32 hash_index(const Index &vertex_id) const;
+    };
 };
 
 #include "vertex_manager_hash_fixed_inline.h"
