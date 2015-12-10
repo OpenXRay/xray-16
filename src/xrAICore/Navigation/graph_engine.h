@@ -36,10 +36,6 @@ using namespace GraphEngineSpace;
 class CGraphEngine
 {
 public:
-    template<typename... Components>
-    struct CompoundVertex : Components::template VertexData<CompoundVertex<Components...>>...
-    {};
-
 #ifndef AI_COMPILER
 	using CSolverPriorityQueue = CDataStorageBinaryHeap;
 	using CStringPriorityQueue = CDataStorageBinaryHeap;

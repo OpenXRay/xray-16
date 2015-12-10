@@ -27,12 +27,12 @@ struct CDataStorageBucketList
         TCompoundVertex *&prev() { return _prev; }
 	};
 
-	template<typename _data_storage, typename TCompoundVertex>
-	class CDataStorage : public _data_storage::template CDataStorage<TCompoundVertex>
+	template<typename TManagerDataStorage>
+	class CDataStorage : public TManagerDataStorage
     {
 	public:
-        typedef typename _data_storage::template CDataStorage<TCompoundVertex> inherited;
-        typedef TCompoundVertex CGraphVertex;
+        typedef TManagerDataStorage inherited;
+        typedef typename TManagerDataStorage::CGraphVertex CGraphVertex;
         typedef typename CGraphVertex::_dist_type _dist_type;
         typedef typename CGraphVertex::_index_type _index_type;
 

@@ -8,10 +8,9 @@
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION \
-	template<typename _data_storage, typename TCompoundVertex>
+#define TEMPLATE_SPECIALIZATION template<typename TManagerDataStorage>
 
-#define CBinaryHeap				CDataStorageBinaryHeap::CDataStorage<_data_storage,TCompoundVertex>
+#define CBinaryHeap				CDataStorageBinaryHeap::CDataStorage<TManagerDataStorage>
 
 TEMPLATE_SPECIALIZATION
 IC	CBinaryHeap::CDataStorage				(const u32 vertex_count) : 

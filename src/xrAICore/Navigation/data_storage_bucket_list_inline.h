@@ -15,12 +15,9 @@
 		u32			bucket_count,\
 		bool		clear_buckets\
 	>\
-	template <\
-		typename _data_storage,\
-		typename TCompoundVertex\
-	>
+	template<typename TManagerDataStorage>
 
-#define CBucketList CDataStorageBucketList<_path_id_type,_bucket_id_type,bucket_count,clear_buckets>::CDataStorage<_data_storage,TCompoundVertex>
+#define CBucketList CDataStorageBucketList<_path_id_type,_bucket_id_type,bucket_count,clear_buckets>::CDataStorage<TManagerDataStorage>
 
 TEMPLATE_SPECIALIZATION
 IC	CBucketList::CDataStorage			(const u32 vertex_count) :
