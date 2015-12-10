@@ -36,6 +36,10 @@ using namespace GraphEngineSpace;
 class CGraphEngine
 {
 public:
+    template<typename... Components>
+    struct CompoundVertex : Components::template VertexData<CompoundVertex<Components...>>...
+    {};
+
 #ifndef AI_COMPILER
 	using CSolverPriorityQueue = CDataStorageBinaryHeap;
 	using CStringPriorityQueue = CDataStorageBinaryHeap;
@@ -54,19 +58,46 @@ public:
 	using CSolverVertexAllocator = CVertexAllocatorFixed<8*1024>;
 	using CStringVertexAllocator = CVertexAllocatorFixed<1024>;
 #endif
-
-	using CAlgorithm = CAStar<_dist_type, CPriorityQueue, CVertexManager, CVertexAllocator>;
+    using AlgorithmStorage = CVertexPath<true>;
+    using AlgorithmVertexData = AStar::template ByDistType<_dist_type>;
+    using AlgorithmVertex = CompoundVertex<AlgorithmVertexData,
+        CPriorityQueue, CVertexManager, CVertexAllocator, AlgorithmStorage>;
+	using CAlgorithm = CAStar<
+        _dist_type,
+        CPriorityQueue,
+        CVertexManager,
+        CVertexAllocator,
+        AlgorithmVertex,
+        true,
+        AlgorithmStorage>;
 	
 #ifndef AI_COMPILER
+    using SolverAlgorithmStorage = CEdgePath<_solver_edge_type, true>;
+    using SolverAlgorithmVertexData = AStar::template ByDistType<_solver_dist_type>;
+    using SolverAlgorithmVertex = CompoundVertex<SolverAlgorithmVertexData,
+        CSolverPriorityQueue, CSolverVertexManager, CSolverVertexAllocator, SolverAlgorithmStorage>;
 	using CSolverAlgorithm = CAStar<
 		_solver_dist_type,
 		CSolverPriorityQueue,
 		CSolverVertexManager,
 		CSolverVertexAllocator,
+        SolverAlgorithmVertex,
 		true,
-		CEdgePath<_solver_edge_type, true>>;
+        SolverAlgorithmStorage>;
 
-	using CStringAlgorithm = CAStar<float, CStringPriorityQueue, CStringVertexManager, CStringVertexAllocator>;
+    using _string_dist_type = float;
+    using StringAlgorithmStorage = AlgorithmStorage;
+    using StringAlgorithmVertexData = AStar::template ByDistType<_string_dist_type>;
+    using StringAlgorithmVertex = CompoundVertex<StringAlgorithmVertexData,
+        CStringPriorityQueue, CStringVertexManager, CStringVertexAllocator, StringAlgorithmStorage>;
+	using CStringAlgorithm = CAStar<
+        _string_dist_type,
+        CStringPriorityQueue,
+        CStringVertexManager,
+        CStringVertexAllocator,
+        StringAlgorithmVertex,
+        true,
+        AlgorithmStorage>;
 #endif // AI_COMPILER
 
 	CAlgorithm *m_algorithm;

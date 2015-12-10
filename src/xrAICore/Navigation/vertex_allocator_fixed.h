@@ -9,13 +9,19 @@
 #pragma once
 
 template <u32 reserved_vertex_count>
-struct CVertexAllocatorFixed {
-	template <typename _vertex>
-	class CDataStorage {
+struct CVertexAllocatorFixed
+{
+    template<typename TCompoundVertex>
+    struct VertexData
+    {};
+
+	template <typename TCompoundVertex>
+	class CDataStorage
+    {
 	public:
-		typedef _vertex								CGraphVertex;
-		typedef typename CGraphVertex::_index_type	_index_type;
-		typedef xr_vector<CGraphVertex>				VERTICES;
+		typedef TCompoundVertex CGraphVertex;
+		typedef typename CGraphVertex::_index_type _index_type;
+		typedef xr_vector<CGraphVertex> VERTICES;
 
 	protected:
 		u32							m_vertex_count;

@@ -8,24 +8,25 @@
 
 #pragma once
 
-struct CDataStorageBinaryHeap {
+struct CDataStorageBinaryHeap
+{
+    template<typename TCompoundVertex>
+    struct VertexData
+    {};
 
-	template <
-		typename _data_storage,
-		template <typename _T> class _vertex = CEmptyClassTemplate
-	>
-    class CDataStorage : public _data_storage::template CDataStorage<_vertex> {
+	template<typename _data_storage, typename TCompoundVertex>
+    class CDataStorage : public _data_storage::template CDataStorage<TCompoundVertex>
+    {
 	public:
-        typedef typename _data_storage::template CDataStorage<_vertex>	inherited;
-		typedef typename inherited::CGraphVertex				CGraphVertex;
-		typedef typename CGraphVertex::_dist_type				_dist_type;
-		typedef typename CGraphVertex::_index_type				_index_type;
+        typedef typename _data_storage::template CDataStorage<TCompoundVertex> inherited;
+		typedef TCompoundVertex CGraphVertex;
+		typedef typename CGraphVertex::_dist_type _dist_type;
+		typedef typename CGraphVertex::_index_type _index_type;
 
-		struct CGraphNodePredicate {
-			IC			bool	operator()(CGraphVertex *node1, CGraphVertex *node2)
-			{
-				return				(node1->f() > node2->f());
-			};
+		struct CGraphNodePredicate
+        {
+            bool operator()(CGraphVertex *node1, CGraphVertex *node2)
+			{ return node1->f() > node2->f(); }
 		};
 
 	protected:

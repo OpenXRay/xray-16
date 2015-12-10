@@ -13,42 +13,32 @@ template <
 	typename _index_type,
 	u8 mask
 >
-struct CVertexManagerFixed {
+struct CVertexManagerFixed
+{
+    template<typename TCompoundVertex>
+	struct VertexData
+    {
+		typedef _index_type _index_type;
+		_index_type _index : 8*sizeof(_index_type)-mask;
+		_index_type _opened : mask;
 
-	template <template <typename _T> class T1>
-	struct VertexManager {
-		template<typename T2>
-		struct _vertex : public T1<T2> {
-			typedef _index_type _index_type;
-			_index_type	_index  : 8*sizeof(_index_type) - mask;
-			_index_type	_opened : mask;
-
-			IC	_index_type index() const
-			{
-				return	(_index);
-			}
-
-			IC	_index_type opened() const
-			{
-				return	(_opened);
-			}
-		};
+		_index_type index() const { return _index; }
+		_index_type opened() const { return	_opened; }
 	};
 
 	template <
         typename _builder,
         typename _allocator,
-		template <typename _T> class _vertex = CEmptyClassTemplate
+        typename TCompoundVertex
 	> 
     class CDataStorage :
-        public _builder::template CDataStorage<VertexManager<_vertex>::_vertex>,
-        public _allocator::template CDataStorage<typename _builder::template CDataStorage<VertexManager<_vertex>::_vertex>::CGraphVertex>
+        public _builder::template CDataStorage<TCompoundVertex>,
+        public _allocator::template CDataStorage<TCompoundVertex>
     {
 	public:
-        typedef typename _builder::template CDataStorage<VertexManager<_vertex>::_vertex> CDataStorageBase;
-        typedef typename _allocator::template CDataStorage<
-            typename _builder::template CDataStorage<VertexManager<_vertex>::_vertex>::CGraphVertex> CDataStorageAllocator;
-		typedef typename CDataStorageBase::CGraphVertex CGraphVertex;
+        typedef typename _builder::template CDataStorage<TCompoundVertex> CDataStorageBase;
+        typedef typename _allocator::template CDataStorage<TCompoundVertex> CDataStorageAllocator;
+		typedef TCompoundVertex CGraphVertex;
 		typedef typename CGraphVertex::_index_type _index_type;
 
 #pragma pack(push,1)

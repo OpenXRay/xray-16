@@ -10,10 +10,10 @@
 
 #define TEMPLATE_SPECIALIZATION \
 	template<typename _edge_type, bool bEuclidianHeuristics>\
-	template <template <typename _T> class _vertex> 
+	template<typename TCompoundVertex> 
 
 
-#define CEdgePathBuilder		CEdgePath<_edge_type,bEuclidianHeuristics>::CDataStorage<_vertex>
+#define CEdgePathBuilder		CEdgePath<_edge_type,bEuclidianHeuristics>::CDataStorage<TCompoundVertex>
 
 TEMPLATE_SPECIALIZATION
 IC	CEdgePathBuilder::CDataStorage			(const u32 vertex_count) :

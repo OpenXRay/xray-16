@@ -8,22 +8,21 @@
 
 #pragma once
 
-template <bool	 bEuclidianHeuristics = true>
-struct CVertexPath {
-
+template<bool bEuclidianHeuristics = true>
+struct CVertexPath
+{
 #pragma pack(push,1)
-	template <template <typename _T> class T1>
-	struct DataStoragePath {
-		struct _vertex : public T1<_vertex> {
-		};
-	};
+	template<typename TCompoundVertex>
+    struct VertexData
+    {};
 #pragma pack(pop)
 
-	template <template <typename _T> class _vertex> 
-	class CDataStorage {
+	template<typename TCompoundVertex>
+	class CDataStorage
+    {
 	public:
-		typedef typename DataStoragePath<_vertex>::_vertex	CGraphVertex;
-		typedef	typename CGraphVertex::_index_type			_index_type;
+		typedef TCompoundVertex	CGraphVertex;
+		typedef	typename CGraphVertex::_index_type _index_type;
 	
 	public:
 		IC					CDataStorage		(const u32 vertex_count);

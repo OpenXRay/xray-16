@@ -11,52 +11,48 @@
 #include "xrAICore/Navigation/vertex_path.h"
 #include "xrAICore/Navigation/data_storage_constructor.h"
 
+namespace Dijkstra
+{
+    template<typename _dist_type>
+    struct ByDistType
+    {
+        template<typename TCompoundVertex>
+	    struct VertexData
+        {
+		    typedef _dist_type _dist_type;
+
+		    _dist_type _f;
+            TCompoundVertex *_back;
+
+		    _dist_type &f() { return _f; }
+		    const _dist_type &f() const { return _f; }
+            TCompoundVertex *&back() { return _back; }
+	    };
+    };
+}
+
 template <
 	typename _dist_type,
 	typename _priority_queue, 
 	typename _vertex_manager, 
 	typename _vertex_allocator,
+    typename TCompoundVertex = EmptyVertexData,
 	bool	 euclidian_heuristics = true,
 	typename _data_storage_base = CVertexPath<euclidian_heuristics>,
-	template <typename _T> class _vertex = CEmptyClassTemplate,
 	typename _iteration_type = u32
 > class CDijkstra
 {
 public:
-	template <typename T1>
-	struct _Vertex : public _vertex<T1> {
-		typedef _dist_type _dist_type;
-
-		_dist_type	_f;
-		T1			*_back;
-
-		IC	_dist_type &f()
-		{
-			return	(_f);
-		}
-
-		IC	const _dist_type &f() const
-		{
-			return	(_f);
-		}
-
-		IC	T1	*&back()
-		{
-			return	(_back);
-		}
-	};
-
-
 	typedef CDataStorageConstructor<
 		_priority_queue, // algorithm
 		_vertex_manager, // manager
 		_data_storage_base, // builder
 		_vertex_allocator, // allocator
-		_Vertex
+        TCompoundVertex
 	> CDataStorage;
 
 protected:
-	typedef typename CDataStorage::CGraphVertex CGraphVertex;
+	typedef TCompoundVertex CGraphVertex;
 	typedef typename CGraphVertex::_dist_type	_dist_type;
 	typedef typename CGraphVertex::_index_type	_index_type;
 

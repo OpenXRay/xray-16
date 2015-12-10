@@ -14,53 +14,35 @@ template <
 	u32		 hash_size,
 	u32		 fix_size
 >
-struct CVertexManagerHashFixed {
+struct CVertexManagerHashFixed
+{
+	template<typename TCompoundVertex>
+	struct VertexData
+    {
+		typedef _index_type _index_type;
+		_index_type _index;
+		bool _opened;
 
-	template <template <typename _T> class T1>
-	struct VertexManager {
-		template<typename T2>
-		struct _vertex : public T1<T2> {
-			typedef _index_type _index_type;
-			_index_type	_index;
-			bool		_opened;
-
-			IC	const _index_type &index() const
-			{
-				return	(_index);
-			}
-
-			IC	_index_type &index()
-			{
-				return	(_index);
-			}
-
-			IC	bool &opened()
-			{
-				return	(_opened);
-			}
-
-			IC	bool opened() const
-			{
-				return	(_opened);
-			}
-		};
+		const _index_type &index() const { return _index; }
+		_index_type &index() { return _index; }
+		bool &opened() { return _opened; }
+        bool opened() const { return _opened; }
 	};
 
 	template <
         typename _builder,
         typename _allocator,
-		template <typename _T> class _vertex = CEmptyClassTemplate
+		typename TCompoundVertex
 	> 
     class CDataStorage :
-        public _builder::template CDataStorage<VertexManager<_vertex>::_vertex>,
-        public _allocator::template CDataStorage<typename _builder::template CDataStorage<VertexManager<_vertex>::_vertex>::CGraphVertex>
+        public _builder::template CDataStorage<TCompoundVertex>,
+        public _allocator::template CDataStorage<TCompoundVertex>
     {
 	public:
-        typedef typename _builder::template CDataStorage<VertexManager<_vertex>::_vertex> CDataStorageBase;
-        typedef typename _allocator::template CDataStorage<
-            typename _builder::template CDataStorage<VertexManager<_vertex>::_vertex>::CGraphVertex> CDataStorageAllocator;
-		typedef typename CDataStorageBase::CGraphVertex		CGraphVertex;
-		typedef typename CGraphVertex::_index_type		_index_type;
+        typedef typename _builder::template CDataStorage<TCompoundVertex> CDataStorageBase;
+        typedef typename _allocator::template CDataStorage<TCompoundVertex> CDataStorageAllocator;
+		typedef typename TCompoundVertex CGraphVertex;
+		typedef typename CGraphVertex::_index_type _index_type;
 
 #pragma pack(push,1)
 		template <typename _path_id_type>

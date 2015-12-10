@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-
+struct EmptyVertexData {};
 template <typename T>				class CEmptyClassTemplate	{};
 template <typename T1, typename T2> class CEmptyClassTemplate2	{};
 
@@ -16,18 +16,17 @@ template <
 	typename _builder, // CVertexPath
 	typename _allocator
 >
-struct CManagerBuilderAllocatorConstructor {
-	template <
-		template <typename T> class _vertex = CEmptyClassTemplate
-	>
-	class CDataStorage : 
-	    public _manager::template CDataStorage<_builder, _allocator, _vertex>
+struct CManagerBuilderAllocatorConstructor
+{
+	template<typename TCompoundVertex>
+	class CDataStorage :
+	    public _manager::template CDataStorage<_builder, _allocator, TCompoundVertex>
 	{
 	public:
-	    typedef typename _manager::template CDataStorage<_builder, _allocator, _vertex> inherited;
+	    typedef typename _manager::template CDataStorage<_builder, _allocator, TCompoundVertex> inherited;
 		typedef typename inherited::CDataStorageAllocator inherited_allocator;
-		typedef typename inherited::CGraphVertex	CGraphVertex;
-		typedef typename CGraphVertex::_index_type	_index_type;
+		typedef TCompoundVertex CGraphVertex;
+		typedef typename CGraphVertex::_index_type _index_type;
 
 	public:
         CDataStorage(const u32 vertex_count) :
@@ -46,16 +45,16 @@ template <
 	typename _manager, // CVertexManagerFixed|CVertexManagerHashFixed
 	typename _builder, // CEdgePath|CVertexPath
 	typename _allocator, // CVertexAllocatorFixed
-	template <typename _T> class _vertex = CEmptyClassTemplate // _Vertex -- dijkstra vertex
+	typename TCompoundVertex // _Vertex -- dijkstra vertex
 >
 struct CDataStorageConstructor : // CDataStorageBucketList::CDataStorage<CManagerBuilderAllocatorConstructor<manager, path, allocator> >
     public _algorithm::template CDataStorage<
-    CManagerBuilderAllocatorConstructor<_manager, _builder, _allocator>, _vertex>
+    CManagerBuilderAllocatorConstructor<_manager, _builder, _allocator>, TCompoundVertex>
 {
     typedef typename _algorithm::template CDataStorage<
-		CManagerBuilderAllocatorConstructor<_manager, _builder, _allocator>, _vertex> inherited; 
+		CManagerBuilderAllocatorConstructor<_manager, _builder, _allocator>, TCompoundVertex> inherited;
 
-	typedef typename inherited::CGraphVertex	CGraphVertex;
+	typedef TCompoundVertex CGraphVertex;
 	typedef typename CGraphVertex::_index_type	_index_type;
 
 	CDataStorageConstructor (const u32 vertex_count) :

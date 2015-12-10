@@ -14,34 +14,27 @@ template <
 	u32			bucket_count,
 	bool		clear_buckets
 >
-struct CDataStorageBucketList {
-
-	template <template <typename _T> class T1>
-	struct BucketList
+struct CDataStorageBucketList
+{
+	template<typename TCompoundVertex>
+	struct VertexData
     {
-		template<typename T2>
-		struct _vertex : public T1<T2>
-        {
-            T2 *_next;
-			T2 *_prev;
-            _path_id_type m_path_id;
-            _bucket_id_type m_bucket_id;
-            T2 *&next() { return _next; }
-			T2 *&prev() { return _prev; }
-		};
+        TCompoundVertex *_next;
+        TCompoundVertex *_prev;
+        _path_id_type m_path_id;
+        _bucket_id_type m_bucket_id;
+        TCompoundVertex *&next() { return _next; }
+        TCompoundVertex *&prev() { return _prev; }
 	};
 
-	template <
-		typename _data_storage,
-		template <typename _T> class _vertex = CEmptyClassTemplate
-	>
-	class CDataStorage : public _data_storage::template CDataStorage<BucketList<_vertex>::_vertex>
+	template<typename _data_storage, typename TCompoundVertex>
+	class CDataStorage : public _data_storage::template CDataStorage<TCompoundVertex>
     {
 	public:
-        typedef typename _data_storage::template CDataStorage<BucketList<_vertex>::_vertex> inherited;
-        typedef typename inherited::CGraphVertex	CGraphVertex;
-        typedef typename CGraphVertex::_dist_type	_dist_type;
-        typedef typename CGraphVertex::_index_type	_index_type;
+        typedef typename _data_storage::template CDataStorage<TCompoundVertex> inherited;
+        typedef TCompoundVertex CGraphVertex;
+        typedef typename CGraphVertex::_dist_type _dist_type;
+        typedef typename CGraphVertex::_index_type _index_type;
 
 	protected:
         _dist_type m_max_distance;

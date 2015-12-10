@@ -14,9 +14,9 @@
 		typename _priority_queue,\
 		typename _vertex_manager,\
 		typename _vertex_allocator,\
+        typename TCompoundVertex,\
 		bool	 euclidian_heuristics,\
 		typename _data_storage_base,\
-		template<typename _T> class _vertex,\
 		typename _iteration_type\
 	>
 
@@ -25,9 +25,9 @@
 	_priority_queue,\
 	_vertex_manager,\
 	_vertex_allocator,\
+    TCompoundVertex,\
 	euclidian_heuristics,\
 	_data_storage_base,\
-	_vertex,\
 	_iteration_type\
 >
 

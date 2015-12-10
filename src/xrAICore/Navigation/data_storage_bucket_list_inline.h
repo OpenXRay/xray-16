@@ -17,10 +17,10 @@
 	>\
 	template <\
 		typename _data_storage,\
-		template <typename _T> class _vertex\
+		typename TCompoundVertex\
 	>
 
-#define CBucketList CDataStorageBucketList<_path_id_type,_bucket_id_type,bucket_count,clear_buckets>::CDataStorage<_data_storage,_vertex>
+#define CBucketList CDataStorageBucketList<_path_id_type,_bucket_id_type,bucket_count,clear_buckets>::CDataStorage<_data_storage,TCompoundVertex>
 
 TEMPLATE_SPECIALIZATION
 IC	CBucketList::CDataStorage			(const u32 vertex_count) :

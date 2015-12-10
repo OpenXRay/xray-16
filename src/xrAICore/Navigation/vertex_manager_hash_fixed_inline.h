@@ -18,10 +18,10 @@
 	template <\
 		typename _builder,\
         typename _allocator,\
-		template <typename _T> class _vertex\
+		typename TCompoundVertex\
 	>
 
-#define CHashFixedVertexManager	CVertexManagerHashFixed<_path_id_type,_index_type,hash_size,fix_size>::CDataStorage<_builder,_allocator,_vertex>
+#define CHashFixedVertexManager	CVertexManagerHashFixed<_path_id_type,_index_type,hash_size,fix_size>::CDataStorage<_builder,_allocator,TCompoundVertex>
 
 TEMPLATE_SPECIALIZATION
 IC	CHashFixedVertexManager::CDataStorage		(const u32 vertex_count) :

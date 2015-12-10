@@ -17,10 +17,10 @@
 	template <\
 		typename _builder,\
         typename _allocator,\
-		template <typename _T> class _vertex\
+		typename TCompoundVertex\
 	>
 
-#define CFixedVertexManager	CVertexManagerFixed<_path_id_type,_index_type,mask>::CDataStorage<_builder,_allocator,_vertex>
+#define CFixedVertexManager	CVertexManagerFixed<_path_id_type,_index_type,mask>::CDataStorage<_builder,_allocator,TCompoundVertex>
 
 TEMPLATE_SPECIALIZATION
 IC	CFixedVertexManager::CDataStorage		(const u32 vertex_count) :

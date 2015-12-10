@@ -10,10 +10,10 @@
 
 #define TEMPLATE_SPECIALIZATION \
 	template<bool bEuclidianHeuristics>\
-	template <template <typename _T> class _vertex> 
+	template<typename TCompoundVertex> 
 
 
-#define CVertexPathBuilder		CVertexPath<bEuclidianHeuristics>::CDataStorage<_vertex>
+#define CVertexPathBuilder		CVertexPath<bEuclidianHeuristics>::CDataStorage<TCompoundVertex>
 
 TEMPLATE_SPECIALIZATION
 IC	CVertexPathBuilder::CDataStorage			(const u32 vertex_count)
