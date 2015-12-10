@@ -4,10 +4,9 @@ X-Ray Engine 1.6 expansion
 This repository contains X-Ray Engine sources based on version 1.6.02.
 The original engine is used in S.T.A.L.K.E.R. Call of Pripyat game released by GSC Game World.
 
-It is a place to share ideas on what to implement, gather people that want to work on the engine,
-and work on the source code.
+For current progress, see [`dev`](https://github.com/OpenXRay/xray-16/tree/dev) and [`ai_cleanup`](https://github.com/OpenXRay/xray-16/tree/ai_cleanup) branches.
 
-Current task list: [doc/design/task_list.txt](doc/design/task_list.txt)
+Current task list: ~~[doc/design/task_list.txt](doc/design/task_list.txt)~~ (see [Issues](https://github.com/openxray/xray-16/issues))
 
 Task history: [doc/design/task_history.txt](doc/design/task_history.txt)
 
