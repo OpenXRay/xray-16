@@ -69,7 +69,7 @@ protected:
 
 public:
     inline CAStar(const u32 max_vertex_count);
-    virtual ~CAStar();
+    inline virtual ~CAStar();
     template <typename TPathManager>
     inline bool find(TPathManager &path_manager);
 };
