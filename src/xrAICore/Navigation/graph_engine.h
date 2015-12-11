@@ -36,24 +36,15 @@ using namespace GraphEngineSpace;
 class CGraphEngine
 {
 public:
-#ifndef AI_COMPILER
-	using CSolverPriorityQueue = CDataStorageBinaryHeap;
-	using CStringPriorityQueue = CDataStorageBinaryHeap;
-#endif
-	using CPriorityQueue = CDataStorageBucketList<u32, u32, 8*1024, false>;	
-	using CVertexManager = CVertexManagerFixed<u32, u32, 8>;
-
-#ifndef AI_COMPILER
-	using CSolverVertexManager = CVertexManagerHashFixed<u32, _solver_index_type, 256, 8*1024>;
-	using CStringVertexManager = CVertexManagerHashFixed<u32, shared_str, 128, 1024>;
-#endif
+    // common algorithm
+    using CPriorityQueue = CDataStorageBucketList<u32, u32, 8*1024, false>;
+    using CVertexManager = CVertexManagerFixed<u32, u32, 8>;
 #ifdef AI_COMPILER
-	using CVertexAllocator = CVertexAllocatorFixed<2*1024*1024>;
+    static const size_t VertexAllocatorReserve = 2*1024*1024;
 #else
-	using CVertexAllocator = CVertexAllocatorFixed<64*1024>;
-	using CSolverVertexAllocator = CVertexAllocatorFixed<8*1024>;
-	using CStringVertexAllocator = CVertexAllocatorFixed<1024>;
+    static const size_t VertexAllocatorReserve = 64*1024;
 #endif
+    using CVertexAllocator = CVertexAllocatorFixed<VertexAllocatorReserve>;
     using AlgorithmStorage = CVertexPath<true>;
     using CAlgorithm = CAStar<
         _dist_type,
@@ -62,21 +53,28 @@ public:
         CVertexAllocator,
         true,
         AlgorithmStorage>;
-	
-#ifndef AI_COMPILER
-    using SolverAlgorithmStorage = CEdgePath<_solver_edge_type, true>;
-	using CSolverAlgorithm = CAStar<
-		_solver_dist_type,
-		CSolverPriorityQueue,
-		CSolverVertexManager,
-		CSolverVertexAllocator,
-		true,
-        SolverAlgorithmStorage>;
 
-    using _string_dist_type = float;
+#ifndef AI_COMPILER
+    // solver algorithm
+	using CSolverPriorityQueue = CDataStorageBinaryHeap;
+    using CSolverVertexManager = CVertexManagerHashFixed<u32, _solver_index_type, 256, 8*1024>;
+    using CSolverVertexAllocator = CVertexAllocatorFixed<8*1024>;
+    using SolverAlgorithmStorage = CEdgePath<_solver_edge_type, true>;
+    using CSolverAlgorithm = CAStar<
+        _solver_dist_type,
+        CSolverPriorityQueue,
+        CSolverVertexManager,
+        CSolverVertexAllocator,
+        true,
+        SolverAlgorithmStorage>;
+    // string algorithm
+    using CStringPriorityQueue = CDataStorageBinaryHeap;
+    using CStringVertexManager = CVertexManagerHashFixed<u32, shared_str, 128, 1024>;
+    using CStringVertexAllocator = CVertexAllocatorFixed<1024>;
     using StringAlgorithmStorage = AlgorithmStorage;
+    using StringAlgorithmDistance = float;    
 	using CStringAlgorithm = CAStar<
-        _string_dist_type,
+        StringAlgorithmDistance,
         CStringPriorityQueue,
         CStringVertexManager,
         CStringVertexAllocator,
