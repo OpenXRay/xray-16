@@ -182,7 +182,6 @@ public:
 #endif    
     void collect_all_garbage();
     static u32 GetMemoryUsage();
-    void PrintHelp();
 
     void initialize_lua_studio(lua_State *state, cs::lua_studio::world *&world, lua_studio_engine *&engine);
     void finalize_lua_studio(lua_State *state, cs::lua_studio::world *&world, lua_studio_engine *&engine);

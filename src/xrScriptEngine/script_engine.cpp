@@ -1319,16 +1319,6 @@ static void strreplaceall(xr_string &str, LPCSTR what, LPCSTR to)
         str.replace(A-str.c_str(), S_len, to);
 }
 
-void CScriptEngine::PrintHelp()
-{
-    // XXX: implement symbol dumper
-}
-
-#else
-
-void CScriptEngine::PrintHelp()
-{ Msg("! Release build doesn't support lua-help :("); }
-
 #endif
 
 CScriptProcess *CScriptEngine::CreateScriptProcess(shared_str name, shared_str scripts)
