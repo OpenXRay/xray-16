@@ -23,7 +23,7 @@
 #include "enemy_manager.h"
 #include "visual_memory_manager.h"
 #include "sight_manager.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "sound_player.h"
 #include "stalker_planner.h"

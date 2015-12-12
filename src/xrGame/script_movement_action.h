@@ -21,10 +21,8 @@ namespace MonsterSpace {
 	enum EScriptMonsterSpeedParam;
 };
 
-namespace PatrolPathManager {
-	enum EPatrolStartType;
-	enum EPatrolRouteType;
-};
+enum EPatrolStartType;
+enum EPatrolRouteType;
 
 class CPatrolPath;
 class CScriptGameObject;
@@ -63,10 +61,10 @@ public:
 	MonsterSpace::EBodyState					m_tBodyState;
 	MonsterSpace::EMovementType					m_tMovementType;
 	DetailPathManager::EDetailPathType			m_tPathType;
-	CObject										*m_tpObjectToGo;
+	IGameObject										*m_tpObjectToGo;
 	const CPatrolPath							*m_path;
-	PatrolPathManager::EPatrolStartType			m_tPatrolPathStart;
-	PatrolPathManager::EPatrolRouteType			m_tPatrolPathStop;
+	EPatrolStartType m_tPatrolPathStart;
+	EPatrolRouteType m_tPatrolPathStop;
 	Fvector										m_tDestinationPosition;
 	u32											m_tNodeID;
 	EGoalType									m_tGoalType;
@@ -106,8 +104,8 @@ public:
 	IC		void	SetPatrolPath			(const CPatrolPath *path, shared_str path_name);
 	IC		void	SetPosition				(const Fvector &tPosition);
 	IC		void	SetSpeed				(float fSpeed);
-	IC		void	SetPatrolStart			(PatrolPathManager::EPatrolStartType tPatrolPathStart);
-	IC		void	SetPatrolStop			(PatrolPathManager::EPatrolRouteType tPatrolPathStop);
+	IC		void	SetPatrolStart			(EPatrolStartType tPatrolPathStart);
+	IC		void	SetPatrolStop			(EPatrolRouteType tPatrolPathStop);
 	IC		void	SetPatrolRandom			(bool bRandom);
 	IC		void	SetInputKeys			(const EInputKeys tInputKeys);
 	IC		void	initialize				();

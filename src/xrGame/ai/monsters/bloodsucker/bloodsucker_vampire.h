@@ -20,7 +20,7 @@ public:
 	virtual	void		critical_finalize				();
 	virtual bool		check_start_conditions			();
 	virtual bool		check_completion				();
-	virtual void		remove_links					(CObject* object);
+	virtual void		remove_links					(IGameObject* object);
 
 	virtual void		setup_substates					();
 	virtual void		check_force_state				();

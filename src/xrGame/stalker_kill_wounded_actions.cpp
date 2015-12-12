@@ -18,7 +18,7 @@
 #include "enemy_manager.h"
 #include "sight_manager.h"
 #include "memory_space.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "visual_memory_manager.h"
 #include "script_game_object.h"
 #include "restricted_object.h"
@@ -131,7 +131,7 @@ void CStalkerActionReachWounded::execute					()
 		return;
 	}
 
-//	CObject									*processor = Level().Objects.net_Find(processor_id);
+//	IGameObject									*processor = Level().Objects.net_Find(processor_id);
 //	if (processor && processor->Position().distance_to_sqr(object().Position()) < _sqr(3.f)) {
 //		object().movement().set_movement_type	(eMovementTypeStand);
 //		return;

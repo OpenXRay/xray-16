@@ -23,7 +23,6 @@ xr_token rpoint_game_type[]={
 	{ 0,					0	}
 };
 
-
 #ifdef _EDITOR
 bool GameTypeChooser::LoadStream(IReader& F)
 {

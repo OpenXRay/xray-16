@@ -17,6 +17,7 @@
 #include "CopyProtection.h"
 
 #include "xrSASH.h"
+#include "xrServerEntities/smart_cast.h"
 
 //---------------------------------------------------------------------
 
@@ -177,7 +178,8 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
         //-----------------------------------------------------------
         g_pGamePersistent->PreStart(op_server);
         //-----------------------------------------------------------
-        g_pGameLevel = (IGame_Level*)NEW_INSTANCE(CLSID_GAME_LEVEL);
+        g_pGameLevel = dynamic_cast<IGame_Level*>(NEW_INSTANCE(CLSID_GAME_LEVEL));
+        R_ASSERT(g_pGameLevel);
         LoadBegin();
         g_pGamePersistent->Start(op_server);
         g_pGameLevel->net_Start(op_server, op_client);
@@ -224,7 +226,8 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
         Console->Hide();
         Device.Reset(false);
 
-        g_pGameLevel = (IGame_Level*)NEW_INSTANCE(CLSID_GAME_LEVEL);
+        g_pGameLevel = smart_cast<IGame_Level*>(NEW_INSTANCE(CLSID_GAME_LEVEL));
+        VERIFY(g_pGameLevel);
         shared_str server_options = g_pGameLevel->OpenDemoFile(demo_file);
 
         //-----------------------------------------------------------

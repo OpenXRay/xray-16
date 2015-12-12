@@ -2,7 +2,7 @@
 #include "monster_enemy_manager.h"
 #include "BaseMonster/base_monster.h"
 #include "ai/ai_monsters_misc.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "memory_manager.h"
 #include "visual_memory_manager.h"
 #include "actor.h"
@@ -298,7 +298,7 @@ void CMonsterEnemyManager::script_enemy	(const CEntityAlive &enemy)
 	m_script_enemy		= &enemy;
 }
 
-void CMonsterEnemyManager::remove_links (CObject* O)
+void CMonsterEnemyManager::remove_links (IGameObject* O)
 {
 	if ( enemy == O )
 	{

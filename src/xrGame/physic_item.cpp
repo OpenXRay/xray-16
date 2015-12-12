@@ -117,7 +117,7 @@ void CPhysicItem::UpdateCL()
 
 void CPhysicItem::activate_physic_shell()
 {
-	CObject						*object = smart_cast<CObject*>(H_Parent());
+	IGameObject						*object = smart_cast<IGameObject*>(H_Parent());
 	R_ASSERT					(object);
 	XFORM().set					(object->XFORM());
 	inherited::activate_physic_shell();

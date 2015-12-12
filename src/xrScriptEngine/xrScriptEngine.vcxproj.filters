@@ -57,9 +57,6 @@
     <ClInclude Include="script_engine.hpp">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="script_engine_inline.hpp">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="script_space_forward.hpp">
       <Filter>Engine</Filter>
     </ClInclude>
@@ -117,6 +114,12 @@
     <ClInclude Include="LuaStudio\Defines.hpp">
       <Filter>LuaStudio</Filter>
     </ClInclude>
+    <ClInclude Include="Functor.hpp">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="BindingsDumper.hpp">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -157,6 +160,9 @@
     </ClCompile>
     <ClCompile Include="LuaStudio\LuaStudio.cpp">
       <Filter>LuaStudio</Filter>
+    </ClCompile>
+    <ClCompile Include="BindingsDumper.cpp">
+      <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

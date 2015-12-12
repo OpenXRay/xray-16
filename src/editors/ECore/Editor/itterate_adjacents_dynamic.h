@@ -1,7 +1,7 @@
 #ifndef _ITTERATE_ADJACENTS_DYNAMIC_H_
 #define _ITTERATE_ADJACENTS_DYNAMIC_H_
 
-#include "common/face_smoth_flags.h"
+#include "Common/face_smoth_flags.h"
 
 template<typename  typeVertex>
 struct itterate_adjacents_params_dynamic

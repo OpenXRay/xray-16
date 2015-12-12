@@ -4,7 +4,7 @@
 #include "ai/monsters/monster_velocity_space.h"
 
 #include "xrCore/_vector3d_ext.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 
 #define TEMPLATE_SIGNATURE template <typename _Object>
 

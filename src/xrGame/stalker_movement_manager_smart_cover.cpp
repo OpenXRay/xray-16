@@ -565,7 +565,7 @@ bool stalker_movement_manager_smart_cover::in_smart_cover		() const
 	return							(false);
 }
 
-void stalker_movement_manager_smart_cover::remove_links			(CObject *object)
+void stalker_movement_manager_smart_cover::remove_links			(IGameObject *object)
 {
 	inherited::remove_links			( object );
 

@@ -11,10 +11,10 @@ class CAnomalyDetector {
 	bool					m_active;
 
 	struct SAnomalyInfo {
-		CObject		*object;
+		IGameObject		*object;
 		u32			time_registered;
 
-		bool		operator == (CObject *obj) 	{
+		bool		operator == (IGameObject *obj) 	{
 			return (object == obj);
 		}
 	};
@@ -39,7 +39,7 @@ public:
 	void		reinit				();
 
 	void		update_schedule		();
-	void		on_contact			(CObject *obj);
+	void		on_contact			(IGameObject *obj);
 	
 	void		activate			(){m_active = true;}
 	void		deactivate			(){m_active = false;}

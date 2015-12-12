@@ -93,7 +93,7 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>$(SolutionDir);$(xrSdkDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;XRAICORE_EXPORTS;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>XRGAME_EXPORTS;LUABIND_DYNAMIC_LINK;WIN32;NDEBUG;_WINDOWS;_USRDLL;XRAICORE_EXPORTS;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling />
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -104,7 +104,7 @@
       <ForceConformanceInForLoopScope>false</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>PCH.hpp</PrecompiledHeaderFile>
       <BrowseInformation />
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -117,7 +117,7 @@
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);$(SolutionDir)Externals\luajit\bin\$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>NotSet</SubSystem>
       <LargeAddressAware>false</LargeAddressAware>
@@ -128,6 +128,7 @@
       <DataExecutionPrevention />
       <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
       <TargetMachine>NotSet</TargetMachine>
+      <AdditionalDependencies>LuaJIT.lib;luabind.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
@@ -146,7 +147,7 @@
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <AdditionalIncludeDirectories>$(SolutionDir);$(xrSdkDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>MIXED;WIN32;DEBUG;_WINDOWS;_USRDLL;XRAICORE_EXPORTS;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>XRGAME_EXPORTS;LUABIND_DYNAMIC_LINK;MIXED;WIN32;DEBUG;_WINDOWS;_USRDLL;XRAICORE_EXPORTS;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -158,13 +159,14 @@
       <BrowseInformation />
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <PrecompiledHeaderFile>PCH.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);$(SolutionDir)Externals\luajit\bin\$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>false</LargeAddressAware>
@@ -172,6 +174,7 @@
       <DataExecutionPrevention />
       <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
       <TargetMachine>NotSet</TargetMachine>
+      <AdditionalDependencies>LuaJIT.lib;luabind.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -188,7 +191,7 @@
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <AdditionalIncludeDirectories>$(SolutionDir);$(xrSdkDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;DEBUG;_WINDOWS;_USRDLL;XRAICORE_EXPORTS;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>XRGAME_EXPORTS;LUABIND_DYNAMIC_LINK;WIN32;DEBUG;_WINDOWS;_USRDLL;XRAICORE_EXPORTS;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>false</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -200,7 +203,7 @@
       <ForceConformanceInForLoopScope>false</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>PCH.hpp</PrecompiledHeaderFile>
       <BrowseInformation />
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -213,7 +216,7 @@
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);$(SolutionDir)Externals\luajit\bin\$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <MapExports>false</MapExports>
       <LargeAddressAware>false</LargeAddressAware>
@@ -221,6 +224,7 @@
       <DataExecutionPrevention />
       <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
       <TargetMachine>NotSet</TargetMachine>
+      <AdditionalDependencies>LuaJIT.lib;luabind.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -232,17 +236,140 @@
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\Externals\luabind\src\luabind.vcxproj">
+      <Project>{ccd4afae-aa10-42c6-a452-fdee497ccdf1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\xrScriptEngine\xrScriptEngine.vcxproj">
+      <Project>{132c62de-de85-4978-9675-c78ed4da46f0}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pch.hpp" />
+    <ClInclude Include="AISpaceBase.hpp" />
+    <ClInclude Include="Components\condition_state.h" />
+    <ClInclude Include="Components\condition_state_inline.h" />
+    <ClInclude Include="Components\operator_abstract.h" />
+    <ClInclude Include="Components\operator_abstract_inline.h" />
+    <ClInclude Include="Components\operator_condition.h" />
+    <ClInclude Include="Components\operator_condition_inline.h" />
+    <ClInclude Include="Components\problem_solver.h" />
+    <ClInclude Include="Components\problem_solver_inline.h" />
+    <ClInclude Include="Components\script_world_property.h" />
+    <ClInclude Include="Components\script_world_property_inline.h" />
+    <ClInclude Include="Components\script_world_state.h" />
+    <ClInclude Include="Navigation\ai_object_location.h" />
+    <ClInclude Include="Navigation\ai_object_location_impl.h" />
+    <ClInclude Include="Navigation\ai_object_location_inline.h" />
+    <ClInclude Include="Navigation\a_star.h" />
+    <ClInclude Include="Navigation\a_star_inline.h" />
+    <ClInclude Include="Navigation\data_storage_binary_heap.h" />
+    <ClInclude Include="Navigation\data_storage_binary_heap_inline.h" />
+    <ClInclude Include="Navigation\data_storage_bucket_list.h" />
+    <ClInclude Include="Navigation\data_storage_bucket_list_inline.h" />
+    <ClInclude Include="Navigation\data_storage_constructor.h" />
+    <ClInclude Include="Navigation\dijkstra.h" />
+    <ClInclude Include="Navigation\dijkstra_inline.h" />
+    <ClInclude Include="Navigation\edge_path.h" />
+    <ClInclude Include="Navigation\edge_path_inline.h" />
+    <ClInclude Include="Navigation\game_graph.h" />
+    <ClInclude Include="Navigation\game_graph_inline.h" />
+    <ClInclude Include="Navigation\game_graph_space.h" />
+    <ClInclude Include="Navigation\game_level_cross_table.h" />
+    <ClInclude Include="Navigation\game_level_cross_table_inline.h" />
+    <ClInclude Include="Navigation\graph_abstract.h" />
+    <ClInclude Include="Navigation\graph_abstract_inline.h" />
+    <ClInclude Include="Navigation\graph_edge.h" />
+    <ClInclude Include="Navigation\graph_edge_inline.h" />
+    <ClInclude Include="Navigation\graph_engine.h" />
+    <ClInclude Include="Navigation\graph_engine_inline.h" />
+    <ClInclude Include="Navigation\graph_engine_space.h" />
+    <ClInclude Include="Navigation\graph_vertex.h" />
+    <ClInclude Include="Navigation\graph_vertex_inline.h" />
+    <ClInclude Include="Navigation\level_graph.h" />
+    <ClInclude Include="Navigation\level_graph_inline.h" />
+    <ClInclude Include="Navigation\level_graph_space.h" />
+    <ClInclude Include="Navigation\level_graph_vertex_inline.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_game.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_game_inline.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_game_level.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_game_level_inline.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_game_vertex.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_game_vertex_inline.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_generic.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_generic_inline.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_level.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_level_flooder.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_level_flooder_inline.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_level_inline.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_level_nearest_vertex.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_level_nearest_vertex_inline.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_level_straight_line.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_level_straight_line_inline.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_params.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_params_flooder.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_params_game_level.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_params_game_vertex.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_params_nearest_vertex.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_params_straight_line.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_solver.h" />
+    <ClInclude Include="Navigation\PathManagers\path_manager_solver_inline.h" />
+    <ClInclude Include="Navigation\PatrolPath\patrol_path.h" />
+    <ClInclude Include="Navigation\PatrolPath\patrol_path_inline.h" />
+    <ClInclude Include="Navigation\PatrolPath\patrol_path_params.h" />
+    <ClInclude Include="Navigation\PatrolPath\patrol_path_params_inline.h" />
+    <ClInclude Include="Navigation\PatrolPath\patrol_path_storage.h" />
+    <ClInclude Include="Navigation\PatrolPath\patrol_path_storage_inline.h" />
+    <ClInclude Include="Navigation\PatrolPath\patrol_point.h" />
+    <ClInclude Include="Navigation\PatrolPath\patrol_point_inline.h" />
+    <ClInclude Include="Navigation\vertex_allocator_fixed.h" />
+    <ClInclude Include="Navigation\vertex_allocator_fixed_inline.h" />
+    <ClInclude Include="Navigation\vertex_manager_fixed.h" />
+    <ClInclude Include="Navigation\vertex_manager_fixed_inline.h" />
+    <ClInclude Include="Navigation\vertex_manager_hash_fixed.h" />
+    <ClInclude Include="Navigation\vertex_manager_hash_fixed_inline.h" />
+    <ClInclude Include="Navigation\vertex_path.h" />
+    <ClInclude Include="Navigation\vertex_path_inline.h" />
+    <ClInclude Include="PCH.hpp" />
+    <ClInclude Include="ScriptPCH.hpp" />
     <ClInclude Include="xrAICore.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="pch.cpp">
+    <ClCompile Include="AISpaceBase.cpp" />
+    <ClCompile Include="Components\script_world_property_script.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Components\script_world_state_script.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Navigation\game_graph_script.cpp" />
+    <ClCompile Include="Navigation\level_graph.cpp" />
+    <ClCompile Include="Navigation\level_graph_vertex.cpp" />
+    <ClCompile Include="Navigation\PatrolPath\patrol_path.cpp" />
+    <ClCompile Include="Navigation\PatrolPath\patrol_path_params.cpp" />
+    <ClCompile Include="Navigation\PatrolPath\patrol_path_params_script.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Navigation\PatrolPath\patrol_path_storage.cpp" />
+    <ClCompile Include="Navigation\PatrolPath\patrol_point.cpp" />
+    <ClCompile Include="PCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">pch.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">PCH.hpp</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="ScriptPCH.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="xrAICore.cpp" />
   </ItemGroup>

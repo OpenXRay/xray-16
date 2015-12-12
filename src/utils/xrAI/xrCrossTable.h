@@ -10,9 +10,9 @@
 
 #include "Common/LevelStructure.hpp"
 #include "alife_space.h"
-#include "xrGame/game_level_cross_table.h"
-#include "xrGame/game_graph.h"
-#include "xrGame/level_graph.h"
+#include "xrAICore/Navigation/game_level_cross_table.h"
+#include "xrAICore/Navigation/game_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 
 #define CROSS_TABLE_NAME_RAW	"level.gct.raw"
 

@@ -16,7 +16,7 @@
 #include "eatable_item_object.h" 
 #include "Missile.h"
 #include "game_cl_base_weapon_usage_statistic.h"
-#include "LevelGameDef.h"
+#include "Common/LevelGameDef.h"
 #include "clsid_game.h"
 #include "ui\UIBuyWndShared.h"
 #include "UIGameCTA.h"
@@ -184,7 +184,7 @@ void game_sv_CaptureTheArtefact::SM_CheckViewSwitching()
 	CUIGameCTA* gameCTA = smart_cast<CUIGameCTA*>(CurrentGameUI());
 	if (gameCTA)
 	{
-		CObject* pObject				= Level().CurrentViewEntity();
+		IGameObject* pObject				= Level().CurrentViewEntity();
 		if (pObject && smart_cast<CActor*>(pObject))
 		{
 			string1024						Text;
@@ -196,7 +196,7 @@ void game_sv_CaptureTheArtefact::SM_CheckViewSwitching()
 	}
 }
 
-void game_sv_CaptureTheArtefact::SM_SwitchOnPlayer(CObject* pNewObject)
+void game_sv_CaptureTheArtefact::SM_SwitchOnPlayer(IGameObject* pNewObject)
 {
 	if (!pNewObject)					return;
 
@@ -246,7 +246,7 @@ void game_sv_CaptureTheArtefact::SM_SwitchOnNextActivePlayer()
 	m_server->ForEachClientDo(tmp_functor);
 		
 	
-	CObject* pNewObject				= NULL;
+	IGameObject* pNewObject				= NULL;
 	if (!tmp_functor.PPlayersCount)
 	{
 		xrClientData*	C			= (xrClientData*) m_server->GetServerClient();

@@ -14,7 +14,7 @@
 #include "relation_registry.h"
 #include "alife_time_manager.h"
 #include "alife_graph_registry.h"
-#include "game_graph.h"
+#include "xrAICore/Navigation/game_graph.h"
 #include "alife_object_registry.h"
 #include "ef_storage.h"
 #include "ef_pattern.h"

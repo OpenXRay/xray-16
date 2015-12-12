@@ -162,7 +162,7 @@ BOOL CEffect_Thunderbolt::RayPick(const Fvector& s, const Fvector& d, float& dis
     bRes = Tools->RayPick(s, d, dist, 0, 0);
 #else
     collide::rq_result RQ;
-    CObject* E = g_pGameLevel->CurrentViewEntity();
+    IGameObject* E = g_pGameLevel->CurrentViewEntity();
     bRes = g_pGameLevel->ObjectSpace.RayPick(s, d, dist, collide::rqtBoth, RQ, E);
     if (bRes) dist = RQ.range;
     else

@@ -9,7 +9,7 @@
 #pragma once
 
 #include "stalker_combat_action_base.h"
-#include "random32.h"
+#include "Random.hpp"
 
 class CCoverPoint;
 

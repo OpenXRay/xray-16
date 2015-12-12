@@ -19,7 +19,7 @@ public:
 	virtual			~CPsyAura				();
 	
 			void	init_external			(CBaseMonster *obj) {m_object = obj;}
-	virtual bool	feel_touch_contact		(CObject* O){return FALSE;}
+	virtual bool	feel_touch_contact		(IGameObject* O){return FALSE;}
 	virtual	void	schedule_update			();
 	virtual void	process_objects_in_aura	() {}
 

@@ -20,9 +20,7 @@ template <typename _1, typename _2> class intrusive_ptr;
 class CSpaceRestriction;
 
 class CSpaceRestrictionManager : public CSpaceRestrictionHolder {
-#ifdef DEBUG
-	friend class CLevelGraph;
-#endif
+    friend class LevelGraphDebugRender;
 	struct CClientRestriction;
 
 protected:

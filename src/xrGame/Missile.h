@@ -59,7 +59,7 @@ protected:
 	virtual void			OnHiddenItem		();
 
 	//для сети
-	virtual void			net_Relcase			(CObject* O );
+	virtual void			net_Relcase			(IGameObject* O );
 protected:
 
 	//время нахождения в текущем состоянии

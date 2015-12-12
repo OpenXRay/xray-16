@@ -11,7 +11,7 @@
 #include "Common/object_broker.h"
 #include "game_base.h"
 #include "ai_space.h"
-#include "game_graph.h"
+#include "xrAICore/Navigation/game_graph.h"
 
 #pragma warning(push)
 #pragma warning(disable:4995)
@@ -145,7 +145,7 @@ void CALifeSpawnRegistry::load				(IReader &file_stream, xrGUID *save_guid)
 	R_ASSERT2					(m_chunk,"Spawn version mismatch - REBUILD SPAWN!");
 
 	VERIFY						(!m_game_graph);
-	m_game_graph				= xr_new<CGameGraph>(*m_chunk);
+	m_game_graph				= new CGameGraph(*m_chunk);
 	ai().game_graph				(m_game_graph);
 
 	R_ASSERT2					((header().graph_guid() == ai().game_graph().header().guid()) || ignore_save_incompatibility(),"Spawn doesn't correspond to the graph : REBUILD SPAWN!");

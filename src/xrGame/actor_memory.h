@@ -21,7 +21,7 @@ private:
 
 public:
 					CActorMemory			(CActor *actor);
-	virtual	bool	feel_vision_isRelevant	(CObject *object);
+	virtual	bool	feel_vision_isRelevant	(IGameObject *object);
 	virtual	void	camera					(
 						Fvector &position,
 						Fvector &direction,

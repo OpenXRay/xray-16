@@ -154,24 +154,6 @@
     <Filter Include="AI\AComponents\ObjectHandler\planner\properties">
       <UniqueIdentifier>{fcd6c07b-a9f4-4b5a-a733-07a086ac37cb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\AComponents\ProblemSolver">
-      <UniqueIdentifier>{1708bf96-3248-4ab8-8ff4-dfcc9f312dc0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AComponents\ProblemSolver\condition_state">
-      <UniqueIdentifier>{a5d29258-3a35-427f-9b90-9700a31c7313}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AComponents\ProblemSolver\condition_state\ScriptWorldState">
-      <UniqueIdentifier>{f40a0a54-74d0-49ee-8a4d-1df98adb65d1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AComponents\ProblemSolver\operator_abstract">
-      <UniqueIdentifier>{4d7a6542-5e38-4010-a9e3-e32b2856bc39}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AComponents\ProblemSolver\operator_condition">
-      <UniqueIdentifier>{84c4875a-2bc0-4829-a50a-9b0687e724cb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AComponents\ProblemSolver\operator_condition\ScriptWorldProperty">
-      <UniqueIdentifier>{8c698550-4801-42e8-90d0-d9f4bf6de1ae}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AI\AComponents\SetupManager">
       <UniqueIdentifier>{623c74d9-fae0-4845-a9b6-d2933cdc51ed}</UniqueIdentifier>
     </Filter>
@@ -1165,135 +1147,6 @@
     <Filter Include="AI\AMonsters\humans\stalker\Miscellaneous">
       <UniqueIdentifier>{1b70f0e7-f20a-4a9a-af1d-89f1d060214a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\ANavigation">
-      <UniqueIdentifier>{2aecd674-f3e2-4e3e-ba4e-c918516d2bd8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\GameGraph">
-      <UniqueIdentifier>{f2b410ba-d81c-48fa-b862-cfe2c473e724}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\GameLevelCrossTable">
-      <UniqueIdentifier>{ce4e0809-7dca-41d9-8971-495071b25e26}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\GraphAbstract">
-      <UniqueIdentifier>{e95f4619-c8e9-4188-8a58-ef421892ce1b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\GraphAbstract\GraphEdge">
-      <UniqueIdentifier>{33ebbf43-d09e-4a8f-b3aa-85c253c2fa03}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\GraphAbstract\GraphVertex">
-      <UniqueIdentifier>{5ff96cd3-ad86-45ce-9b45-024b73cb7043}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\LevelGraph">
-      <UniqueIdentifier>{2f4464ba-6ad8-4b97-b9c7-a1ca8b8bdc77}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\ObjectLocation">
-      <UniqueIdentifier>{b2b43ff2-c913-428c-accb-30a95093bd65}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding">
-      <UniqueIdentifier>{8d11e01e-8568-4c66-acf8-490b3195cd73}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\Algorithms">
-      <UniqueIdentifier>{0631be18-9508-40b6-9013-5bb4e86ffeaa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\Algorithms\A%2a">
-      <UniqueIdentifier>{2f0f7dd8-d637-467b-9aa7-da90f25c6015}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\Algorithms\Dijkstra">
-      <UniqueIdentifier>{85bbf5f7-6e44-4cf1-9939-85b1a5469e19}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\DataStorages">
-      <UniqueIdentifier>{ee35322f-db75-4601-b910-249cde14cc5a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\DataStorages\constructors">
-      <UniqueIdentifier>{b72cdeca-4829-4407-af66-9615542b9fe8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\DataStorages\constructors\builder_allocator">
-      <UniqueIdentifier>{76067fb4-d431-4250-88c0-9d68272f132d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\DataStorages\constructors\manager_builder_allocator">
-      <UniqueIdentifier>{b0d560f8-67b0-46df-bfaa-99c2178dcd0b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\DataStorages\path_builders">
-      <UniqueIdentifier>{0982b0a6-315c-4da7-b0b3-e6e5f9c11eba}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\DataStorages\path_builders\edge_path">
-      <UniqueIdentifier>{e558f6dd-aa2c-4d95-b297-206a05ed1e86}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\DataStorages\path_builders\vertex_path">
-      <UniqueIdentifier>{6d4bf8c4-fad4-46ef-ad89-3ea3dc2da896}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\DataStorages\priority_queues">
-      <UniqueIdentifier>{f340ab8c-364d-4936-abd0-86288ca3a2e1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\DataStorages\priority_queues\binary_heap">
-      <UniqueIdentifier>{23fdf309-4262-4f54-83d3-25bd645fffb4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\DataStorages\priority_queues\bucket_list">
-      <UniqueIdentifier>{a578572d-704d-4562-b9e0-e83cb371a95f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\DataStorages\vertex_allocators">
-      <UniqueIdentifier>{208d2b83-b05d-436b-a1f6-3a1b71262cc9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\DataStorages\vertex_allocators\fixed">
-      <UniqueIdentifier>{83a869fe-a9a6-470d-97bc-97883664d8fd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\DataStorages\vertex_managers">
-      <UniqueIdentifier>{0884f70a-29b9-4a03-89ff-66f72d0904ac}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\DataStorages\vertex_managers\fixed">
-      <UniqueIdentifier>{45bb38a5-f433-49ec-949c-15331dbe1024}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\DataStorages\vertex_managers\hash_fixed">
-      <UniqueIdentifier>{be249c0a-e8cf-4bf3-82d1-7d6cfd01ad9d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\GraphEngine">
-      <UniqueIdentifier>{712f21a1-c1a6-4066-980d-139cb5ec3d41}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\PathManagers">
-      <UniqueIdentifier>{a217ece8-89d2-4ff6-afd9-2aaa59106f97}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\PathManagers\path_manager_game">
-      <UniqueIdentifier>{02581922-d3d1-4e76-9375-bf7f6ffbb86d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\PathManagers\path_manager_game\level">
-      <UniqueIdentifier>{7ad5cff9-2303-4d9c-ae6a-0b0fdc07acc1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\PathManagers\path_manager_game\vertex">
-      <UniqueIdentifier>{cb171ece-2b1e-4b16-aea9-a0f4d7fc07c9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\PathManagers\path_manager_generic">
-      <UniqueIdentifier>{6727d68d-0e6e-442d-831a-604afa0e9956}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\PathManagers\path_manager_level">
-      <UniqueIdentifier>{117b7602-6b03-47c5-b18d-d9ca4dc39a7b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\PathManagers\path_manager_level\nearest_vertex">
-      <UniqueIdentifier>{6c4fcfbd-e6e5-45d5-9e23-0156e01dcc6f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\PathManagers\path_manager_level\flooder">
-      <UniqueIdentifier>{a54c14f4-3e60-4246-952e-9de400b57335}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\PathManagers\path_manager_level\straight_line">
-      <UniqueIdentifier>{47e7fd18-6830-4278-9b23-35b5fd54ddbf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\PathManagers\path_manager_params">
-      <UniqueIdentifier>{b2bcaf14-586c-4a24-8765-fc6c83b77233}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\Pathfinding\PathManagers\path_manager_solver">
-      <UniqueIdentifier>{bebdaa35-9d2c-48be-90d5-1d8ea031ed10}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\PatrolPaths">
-      <UniqueIdentifier>{e2f41b61-5586-4f27-9025-9ace9d459bb1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\PatrolPaths\PatrolPath">
-      <UniqueIdentifier>{c0ab9432-db9a-43fb-a058-c9b14d31180d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\PatrolPaths\PatrolPathStorage">
-      <UniqueIdentifier>{32a8134a-7ddd-4b95-84cc-f8015312e395}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\ANavigation\PatrolPaths\PatrolPoint">
-      <UniqueIdentifier>{91c62445-f1c7-433c-8357-601bb648a304}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AI\ASound">
       <UniqueIdentifier>{a568c889-96b8-41c7-9bee-0d4f24d1a47e}</UniqueIdentifier>
     </Filter>
@@ -1873,9 +1726,6 @@
     <Filter Include="Core\Common\ObjectFactory\object_item_single">
       <UniqueIdentifier>{ccb87c67-2113-4332-a153-a09f0c652b35}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Common\Profiler">
-      <UniqueIdentifier>{b01e2b34-c3d5-4cea-ba97-2fe725e2ec98}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Common\QuadTree">
       <UniqueIdentifier>{72169ff6-d11e-4053-ae24-dbe64fd9ffcf}</UniqueIdentifier>
     </Filter>
@@ -1884,9 +1734,6 @@
     </Filter>
     <Filter Include="Core\Common\Random\weighted">
       <UniqueIdentifier>{2dac256d-728c-4b18-9aed-459b7c337f03}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Common\Random\32bit">
-      <UniqueIdentifier>{98932cee-d304-479e-9443-fbd7a5a8bb34}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\Common\Shared">
       <UniqueIdentifier>{666d30e9-1e70-4acb-a0af-34763debc983}</UniqueIdentifier>
@@ -2329,9 +2176,6 @@
     <Filter Include="ScriptClasses\ScriptActions\script_movement_action">
       <UniqueIdentifier>{3bfcef06-2951-4770-b8f8-7da939e04774}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ScriptClasses\ScriptActions\script_movement_action\patrol_path_params">
-      <UniqueIdentifier>{e68bd57b-aa85-46ce-bfd2-d782d0a85fd9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ScriptClasses\ScriptActions\script_watch_action">
       <UniqueIdentifier>{48d2be0b-ebb9-4323-9345-3f4a70275b99}</UniqueIdentifier>
     </Filter>
@@ -2694,9 +2538,6 @@
     <ClInclude Include="patrol_path_manager_inline.h">
       <Filter>AI\AComponents\MovementManager\PathManagers\PatrolPathManager</Filter>
     </ClInclude>
-    <ClInclude Include="patrol_path_manager_space.h">
-      <Filter>AI\AComponents\MovementManager\PathManagers\PatrolPathManager</Filter>
-    </ClInclude>
     <ClInclude Include="restricted_object.h">
       <Filter>AI\AComponents\MovementManager\RestrictedObject</Filter>
     </ClInclude>
@@ -2732,39 +2573,6 @@
     </ClInclude>
     <ClInclude Include="object_property_evaluators_inline.h">
       <Filter>AI\AComponents\ObjectHandler\planner\properties</Filter>
-    </ClInclude>
-    <ClInclude Include="problem_solver.h">
-      <Filter>AI\AComponents\ProblemSolver</Filter>
-    </ClInclude>
-    <ClInclude Include="problem_solver_inline.h">
-      <Filter>AI\AComponents\ProblemSolver</Filter>
-    </ClInclude>
-    <ClInclude Include="condition_state.h">
-      <Filter>AI\AComponents\ProblemSolver\condition_state</Filter>
-    </ClInclude>
-    <ClInclude Include="condition_state_inline.h">
-      <Filter>AI\AComponents\ProblemSolver\condition_state</Filter>
-    </ClInclude>
-    <ClInclude Include="script_world_state.h">
-      <Filter>AI\AComponents\ProblemSolver\condition_state\ScriptWorldState</Filter>
-    </ClInclude>
-    <ClInclude Include="operator_abstract.h">
-      <Filter>AI\AComponents\ProblemSolver\operator_abstract</Filter>
-    </ClInclude>
-    <ClInclude Include="operator_abstract_inline.h">
-      <Filter>AI\AComponents\ProblemSolver\operator_abstract</Filter>
-    </ClInclude>
-    <ClInclude Include="operator_condition.h">
-      <Filter>AI\AComponents\ProblemSolver\operator_condition</Filter>
-    </ClInclude>
-    <ClInclude Include="operator_condition_inline.h">
-      <Filter>AI\AComponents\ProblemSolver\operator_condition</Filter>
-    </ClInclude>
-    <ClInclude Include="script_world_property.h">
-      <Filter>AI\AComponents\ProblemSolver\operator_condition\ScriptWorldProperty</Filter>
-    </ClInclude>
-    <ClInclude Include="script_world_property_inline.h">
-      <Filter>AI\AComponents\ProblemSolver\operator_condition\ScriptWorldProperty</Filter>
     </ClInclude>
     <ClInclude Include="setup_manager.h">
       <Filter>AI\AComponents\SetupManager</Filter>
@@ -4692,234 +4500,6 @@
     <ClInclude Include="stalker_sound_data_inline.h">
       <Filter>AI\AMonsters\humans\stalker\SoundUserData</Filter>
     </ClInclude>
-    <ClInclude Include="game_graph.h">
-      <Filter>AI\ANavigation\GameGraph</Filter>
-    </ClInclude>
-    <ClInclude Include="game_graph_inline.h">
-      <Filter>AI\ANavigation\GameGraph</Filter>
-    </ClInclude>
-    <ClInclude Include="game_level_cross_table.h">
-      <Filter>AI\ANavigation\GameLevelCrossTable</Filter>
-    </ClInclude>
-    <ClInclude Include="game_level_cross_table_inline.h">
-      <Filter>AI\ANavigation\GameLevelCrossTable</Filter>
-    </ClInclude>
-    <ClInclude Include="graph_edge.h">
-      <Filter>AI\ANavigation\GraphAbstract\GraphEdge</Filter>
-    </ClInclude>
-    <ClInclude Include="graph_edge_inline.h">
-      <Filter>AI\ANavigation\GraphAbstract\GraphEdge</Filter>
-    </ClInclude>
-    <ClInclude Include="graph_vertex.h">
-      <Filter>AI\ANavigation\GraphAbstract\GraphVertex</Filter>
-    </ClInclude>
-    <ClInclude Include="graph_vertex_inline.h">
-      <Filter>AI\ANavigation\GraphAbstract\GraphVertex</Filter>
-    </ClInclude>
-    <ClInclude Include="level_graph.h">
-      <Filter>AI\ANavigation\LevelGraph</Filter>
-    </ClInclude>
-    <ClInclude Include="level_graph_inline.h">
-      <Filter>AI\ANavigation\LevelGraph</Filter>
-    </ClInclude>
-    <ClInclude Include="level_graph_space.h">
-      <Filter>AI\ANavigation\LevelGraph</Filter>
-    </ClInclude>
-    <ClInclude Include="level_graph_vertex_inline.h">
-      <Filter>AI\ANavigation\LevelGraph</Filter>
-    </ClInclude>
-    <ClInclude Include="ai_object_location.h">
-      <Filter>AI\ANavigation\ObjectLocation</Filter>
-    </ClInclude>
-    <ClInclude Include="ai_object_location_impl.h">
-      <Filter>AI\ANavigation\ObjectLocation</Filter>
-    </ClInclude>
-    <ClInclude Include="ai_object_location_inline.h">
-      <Filter>AI\ANavigation\ObjectLocation</Filter>
-    </ClInclude>
-    <ClInclude Include="a_star.h">
-      <Filter>AI\ANavigation\Pathfinding\Algorithms\A%2a</Filter>
-    </ClInclude>
-    <ClInclude Include="a_star_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\Algorithms\A%2a</Filter>
-    </ClInclude>
-    <ClInclude Include="dijkstra.h">
-      <Filter>AI\ANavigation\Pathfinding\Algorithms\Dijkstra</Filter>
-    </ClInclude>
-    <ClInclude Include="dijkstra_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\Algorithms\Dijkstra</Filter>
-    </ClInclude>
-    <ClInclude Include="data_storage_constructor.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\constructors</Filter>
-    </ClInclude>
-    <ClInclude Include="builder_allocator_constructor.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\constructors\builder_allocator</Filter>
-    </ClInclude>
-    <ClInclude Include="builder_allocator_constructor_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\constructors\builder_allocator</Filter>
-    </ClInclude>
-    <ClInclude Include="manager_builder_allocator_constructor.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\constructors\manager_builder_allocator</Filter>
-    </ClInclude>
-    <ClInclude Include="manager_builder_allocator_constructor_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\constructors\manager_builder_allocator</Filter>
-    </ClInclude>
-    <ClInclude Include="edge_path.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\path_builders\edge_path</Filter>
-    </ClInclude>
-    <ClInclude Include="edge_path_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\path_builders\edge_path</Filter>
-    </ClInclude>
-    <ClInclude Include="vertex_path.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\path_builders\vertex_path</Filter>
-    </ClInclude>
-    <ClInclude Include="vertex_path_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\path_builders\vertex_path</Filter>
-    </ClInclude>
-    <ClInclude Include="data_storage_double_linked_list.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\priority_queues</Filter>
-    </ClInclude>
-    <ClInclude Include="data_storage_double_linked_list_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\priority_queues</Filter>
-    </ClInclude>
-    <ClInclude Include="data_storage_single_linked_list.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\priority_queues</Filter>
-    </ClInclude>
-    <ClInclude Include="data_storage_single_linked_list_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\priority_queues</Filter>
-    </ClInclude>
-    <ClInclude Include="data_storage_binary_heap.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\priority_queues\binary_heap</Filter>
-    </ClInclude>
-    <ClInclude Include="data_storage_binary_heap_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\priority_queues\binary_heap</Filter>
-    </ClInclude>
-    <ClInclude Include="data_storage_bucket_list.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\priority_queues\bucket_list</Filter>
-    </ClInclude>
-    <ClInclude Include="data_storage_bucket_list_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\priority_queues\bucket_list</Filter>
-    </ClInclude>
-    <ClInclude Include="vertex_allocator_fixed.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\vertex_allocators\fixed</Filter>
-    </ClInclude>
-    <ClInclude Include="vertex_allocator_fixed_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\vertex_allocators\fixed</Filter>
-    </ClInclude>
-    <ClInclude Include="vertex_manager_fixed.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\vertex_managers\fixed</Filter>
-    </ClInclude>
-    <ClInclude Include="vertex_manager_fixed_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\vertex_managers\fixed</Filter>
-    </ClInclude>
-    <ClInclude Include="vertex_manager_hash_fixed.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\vertex_managers\hash_fixed</Filter>
-    </ClInclude>
-    <ClInclude Include="vertex_manager_hash_fixed_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\DataStorages\vertex_managers\hash_fixed</Filter>
-    </ClInclude>
-    <ClInclude Include="graph_engine.h">
-      <Filter>AI\ANavigation\Pathfinding\GraphEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="graph_engine_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\GraphEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="graph_engine_space.h">
-      <Filter>AI\ANavigation\Pathfinding\GraphEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_game.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_game</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_game_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_game</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_game_level.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_game\level</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_game_level_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_game\level</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_game_vertex.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_game\vertex</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_game_vertex_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_game\vertex</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_generic.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_generic</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_generic_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_generic</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_level.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_level</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_level_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_level</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_level_nearest_vertex.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_level\nearest_vertex</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_level_nearest_vertex_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_level\nearest_vertex</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_level_flooder.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_level\flooder</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_level_flooder_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_level\flooder</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_level_straight_line.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_level\straight_line</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_level_straight_line_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_level\straight_line</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_params.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_params</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_params_flooder.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_params</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_params_game_level.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_params</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_params_game_vertex.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_params</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_params_nearest_vertex.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_params</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_params_straight_line.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_params</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_solver.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_solver</Filter>
-    </ClInclude>
-    <ClInclude Include="path_manager_solver_inline.h">
-      <Filter>AI\ANavigation\Pathfinding\PathManagers\path_manager_solver</Filter>
-    </ClInclude>
-    <ClInclude Include="patrol_path.h">
-      <Filter>AI\ANavigation\PatrolPaths\PatrolPath</Filter>
-    </ClInclude>
-    <ClInclude Include="patrol_path_inline.h">
-      <Filter>AI\ANavigation\PatrolPaths\PatrolPath</Filter>
-    </ClInclude>
-    <ClInclude Include="patrol_path_storage.h">
-      <Filter>AI\ANavigation\PatrolPaths\PatrolPathStorage</Filter>
-    </ClInclude>
-    <ClInclude Include="patrol_path_storage_inline.h">
-      <Filter>AI\ANavigation\PatrolPaths\PatrolPathStorage</Filter>
-    </ClInclude>
-    <ClInclude Include="patrol_point.h">
-      <Filter>AI\ANavigation\PatrolPaths\PatrolPoint</Filter>
-    </ClInclude>
-    <ClInclude Include="patrol_point_inline.h">
-      <Filter>AI\ANavigation\PatrolPaths\PatrolPoint</Filter>
-    </ClInclude>
     <ClInclude Include="script_bind_macroses.h">
       <Filter>ScriptClasses</Filter>
     </ClInclude>
@@ -4934,12 +4514,6 @@
     </ClInclude>
     <ClInclude Include="script_movement_action_inline.h">
       <Filter>ScriptClasses\ScriptActions\script_movement_action</Filter>
-    </ClInclude>
-    <ClInclude Include="patrol_path_params.h">
-      <Filter>ScriptClasses\ScriptActions\script_movement_action\patrol_path_params</Filter>
-    </ClInclude>
-    <ClInclude Include="patrol_path_params_inline.h">
-      <Filter>ScriptClasses\ScriptActions\script_movement_action\patrol_path_params</Filter>
     </ClInclude>
     <ClInclude Include="script_watch_action.h">
       <Filter>ScriptClasses\ScriptActions\script_watch_action</Filter>
@@ -5058,18 +4632,6 @@
     <ClInclude Include="script_callback_ex.h">
       <Filter>ScriptClasses\ScriptCallbackEx</Filter>
     </ClInclude>
-    <ClInclude Include="script_callback_ex_generators.h">
-      <Filter>ScriptClasses\ScriptCallbackEx</Filter>
-    </ClInclude>
-    <ClInclude Include="script_callback_ex_inline.h">
-      <Filter>ScriptClasses\ScriptCallbackEx</Filter>
-    </ClInclude>
-    <ClInclude Include="script_callback_ex_nonvoid.h">
-      <Filter>ScriptClasses\ScriptCallbackEx</Filter>
-    </ClInclude>
-    <ClInclude Include="script_callback_ex_void.h">
-      <Filter>ScriptClasses\ScriptCallbackEx</Filter>
-    </ClInclude>
     <ClInclude Include="script_particles.h">
       <Filter>ScriptClasses\ScriptParticles</Filter>
     </ClInclude>
@@ -5153,9 +4715,6 @@
     </ClInclude>
     <ClInclude Include="Tracer.h">
       <Filter>Core\Client\Level\Bullet Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrServerEntities\LevelGameDef.h">
-      <Filter>Core\Client\Level\SeniorityHierarchyHolder</Filter>
     </ClInclude>
     <ClInclude Include="seniority_hierarchy_holder.h">
       <Filter>Core\Client\Level\SeniorityHierarchyHolder</Filter>
@@ -5958,12 +5517,6 @@
     <ClInclude Include="..\xrServerEntities\object_item_single_inline.h">
       <Filter>Core\Common\ObjectFactory\object_item_single</Filter>
     </ClInclude>
-    <ClInclude Include="profiler.h">
-      <Filter>Core\Common\Profiler</Filter>
-    </ClInclude>
-    <ClInclude Include="profiler_inline.h">
-      <Filter>Core\Common\Profiler</Filter>
-    </ClInclude>
     <ClInclude Include="quadtree.h">
       <Filter>Core\Common\QuadTree</Filter>
     </ClInclude>
@@ -5972,9 +5525,6 @@
     </ClInclude>
     <ClInclude Include="ai\weighted_random.h">
       <Filter>Core\Common\Random\weighted</Filter>
-    </ClInclude>
-    <ClInclude Include="random32.h">
-      <Filter>Core\Common\Random\32bit</Filter>
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\shared_data.h">
       <Filter>Core\Common\Shared</Filter>
@@ -7137,7 +6687,12 @@
     <ClInclude Include="WeaponHUD.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons</Filter>
     </ClInclude>
-    <ClInclude Include="game_graph_space.h" />
+    <ClInclude Include="Random.hpp">
+      <Filter>Core\Common\Random</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelGraphDebugRender.hpp">
+      <Filter>AI\ADebug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -7253,12 +6808,6 @@
     </ClCompile>
     <ClCompile Include="object_property_evaluators.cpp">
       <Filter>AI\AComponents\ObjectHandler\planner\properties</Filter>
-    </ClCompile>
-    <ClCompile Include="script_world_state_script.cpp">
-      <Filter>AI\AComponents\ProblemSolver\condition_state\ScriptWorldState</Filter>
-    </ClCompile>
-    <ClCompile Include="script_world_property_script.cpp">
-      <Filter>AI\AComponents\ProblemSolver\operator_condition\ScriptWorldProperty</Filter>
     </ClCompile>
     <ClCompile Include="sight_manager.cpp">
       <Filter>AI\AComponents\SightManager</Filter>
@@ -8298,30 +7847,6 @@
     <ClCompile Include="ai\stalker\ai_stalker_script_entity.cpp">
       <Filter>AI\AMonsters\humans\stalker\Miscellaneous</Filter>
     </ClCompile>
-    <ClCompile Include="game_graph_script.cpp">
-      <Filter>AI\ANavigation\GameGraph</Filter>
-    </ClCompile>
-    <ClCompile Include="level_graph.cpp">
-      <Filter>AI\ANavigation\LevelGraph</Filter>
-    </ClCompile>
-    <ClCompile Include="level_graph_debug.cpp">
-      <Filter>AI\ANavigation\LevelGraph</Filter>
-    </ClCompile>
-    <ClCompile Include="level_graph_debug2.cpp">
-      <Filter>AI\ANavigation\LevelGraph</Filter>
-    </ClCompile>
-    <ClCompile Include="level_graph_vertex.cpp">
-      <Filter>AI\ANavigation\LevelGraph</Filter>
-    </ClCompile>
-    <ClCompile Include="patrol_path.cpp">
-      <Filter>AI\ANavigation\PatrolPaths\PatrolPath</Filter>
-    </ClCompile>
-    <ClCompile Include="patrol_path_storage.cpp">
-      <Filter>AI\ANavigation\PatrolPaths\PatrolPathStorage</Filter>
-    </ClCompile>
-    <ClCompile Include="patrol_point.cpp">
-      <Filter>AI\ANavigation\PatrolPaths\PatrolPoint</Filter>
-    </ClCompile>
     <ClCompile Include="script_abstract_action.cpp">
       <Filter>ScriptClasses\ScriptActions\script_abstract_action</Filter>
     </ClCompile>
@@ -8330,12 +7855,6 @@
     </ClCompile>
     <ClCompile Include="script_movement_action_script.cpp">
       <Filter>ScriptClasses\ScriptActions\script_movement_action</Filter>
-    </ClCompile>
-    <ClCompile Include="patrol_path_params.cpp">
-      <Filter>ScriptClasses\ScriptActions\script_movement_action\patrol_path_params</Filter>
-    </ClCompile>
-    <ClCompile Include="patrol_path_params_script.cpp">
-      <Filter>ScriptClasses\ScriptActions\script_movement_action\patrol_path_params</Filter>
     </ClCompile>
     <ClCompile Include="script_watch_action.cpp">
       <Filter>ScriptClasses\ScriptActions\script_watch_action</Filter>
@@ -8651,9 +8170,6 @@
     </ClCompile>
     <ClCompile Include="Tracer.cpp">
       <Filter>Core\Client\Level\Bullet Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\LevelGameDef.cpp">
-      <Filter>Core\Client\Level\SeniorityHierarchyHolder</Filter>
     </ClCompile>
     <ClCompile Include="seniority_hierarchy_holder.cpp">
       <Filter>Core\Client\Level\SeniorityHierarchyHolder</Filter>
@@ -9468,14 +8984,8 @@
     <ClCompile Include="..\xrServerEntities\object_item_script.cpp">
       <Filter>Core\Common\ObjectFactory\object_item_script</Filter>
     </ClCompile>
-    <ClCompile Include="profiler.cpp">
-      <Filter>Core\Common\Profiler</Filter>
-    </ClCompile>
     <ClCompile Include="ai\weighted_random.cpp">
       <Filter>Core\Common\Random\weighted</Filter>
-    </ClCompile>
-    <ClCompile Include="random32.cpp">
-      <Filter>Core\Common\Random\32bit</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\smart_cast.cpp">
       <Filter>Core\Common\SmartCast</Filter>
@@ -10719,6 +10229,12 @@
     <ClCompile Include="ui\ChangeWeatherDialog.cpp">
       <Filter>UI\Multiplayer\Voting</Filter>
     </ClCompile>
+    <ClCompile Include="Random.cpp">
+      <Filter>Core\Common\Random</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelGraphDebugRender.cpp">
+      <Filter>AI\ADebug</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ai\monsters\chimera\chimera_attack_state.h">
@@ -10726,12 +10242,6 @@
     </CustomBuild>
     <CustomBuild Include="ai\monsters\chimera\chimera_attack_state_inline.h">
       <Filter>AI\AMonsters\monsters\Chimera\states</Filter>
-    </CustomBuild>
-    <CustomBuild Include="graph_abstract.h">
-      <Filter>AI\ANavigation\GraphAbstract</Filter>
-    </CustomBuild>
-    <CustomBuild Include="graph_abstract_inline.h">
-      <Filter>AI\ANavigation\GraphAbstract</Filter>
     </CustomBuild>
     <CustomBuild Include="Explosive.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Explosives</Filter>

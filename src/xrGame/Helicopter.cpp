@@ -501,7 +501,7 @@ void CHelicopter::load(IReader &input_packet)
 	load_data		(m_time_between_rocket_attack, input_packet);
 	load_data		(m_syncronize_rocket, input_packet);
 }
-void CHelicopter::net_Relcase(CObject* O )
+void CHelicopter::net_Relcase(IGameObject* O )
 {
 	CExplosive::net_Relcase(O);
 	inherited::net_Relcase(O);

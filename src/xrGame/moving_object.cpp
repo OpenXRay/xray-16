@@ -51,12 +51,12 @@ Fvector moving_object::target_position	() const
 	return				(object().target_position());
 }
 
-void moving_object::ignore				(const CObject *object)
+void moving_object::ignore				(const IGameObject *object)
 {
 	m_ignored_object	= object;
 }
 
-bool moving_object::ignored				(const CObject *object)
+bool moving_object::ignored				(const IGameObject *object)
 {
 	if (object == m_object)
 		return			(true);

@@ -512,5 +512,5 @@ IC	T1	smart_cast(T2& p)
 
 #ifdef XRGAME_EXPORTS
 	template <> extern
-	CGameObject* SmartDynamicCast::smart_cast<CGameObject,CObject>(CObject *p);
+	CGameObject* SmartDynamicCast::smart_cast<CGameObject,IGameObject>(IGameObject *p);
 #endif

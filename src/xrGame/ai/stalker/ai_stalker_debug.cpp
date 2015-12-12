@@ -32,7 +32,7 @@
 #include "game_path_manager.h"
 #include "detail_path_manager.h"
 #include "sight_manager.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "EntityCondition.h"
 #include "ai/ai_monsters_misc.h"
 #include "agent_manager.h"
@@ -303,7 +303,7 @@ void CAI_Stalker::debug_text			()
 		DBG_OutText	("%s%sobjects     : %d",indent,indent,memory().hit().objects().size());
 		ALife::_OBJECT_ID					object_id = memory().hit().last_hit_object_id();
 		DBG_OutText	("%s%slast hit object id   : %d",indent,indent,object_id);
-		CObject								*object = (object_id == ALife::_OBJECT_ID(-1)) ? 0 : Level().Objects.net_Find(object_id);
+		IGameObject								*object = (object_id == ALife::_OBJECT_ID(-1)) ? 0 : Level().Objects.net_Find(object_id);
 		DBG_OutText	("%s%slast hit object name : %s",indent,indent,object ? *object->cName() : "");
 #ifdef USE_SELECTED_HIT
 		if (memory().hit().hit()) {
@@ -1030,7 +1030,7 @@ void fill_points			(CCustomMonster *self, const Fvector &position, const Fvector
 	pick_distance					= params.m_pick_distance;
 }
 
-void draw_visiblity_rays	(CCustomMonster *self, const CObject *object, collide::rq_results& rq_storage)
+void draw_visiblity_rays	(CCustomMonster *self, const IGameObject *object, collide::rq_results& rq_storage)
 {
 	typedef Feel::Vision::feel_visible_Item		feel_visible_Item;
 	typedef xr_vector<feel_visible_Item>		VISIBLE_ITEMS;
@@ -1663,7 +1663,7 @@ void CAI_Stalker::OnRender				()
 		if (!memory().enemy().selected() || !memory().visual().visible_now(memory().enemy().selected()))
 			return;
 
-		xr_vector<CObject*>		objects;
+		xr_vector<IGameObject*>		objects;
 		feel_vision_get			(objects);
 		if (std::find(objects.begin(),objects.end(),memory().enemy().selected()) != objects.end()) {
 			Fvector				position = feel_vision_get_vispoint(const_cast<CEntityAlive*>(memory().enemy().selected()));

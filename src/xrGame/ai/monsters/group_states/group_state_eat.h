@@ -20,7 +20,7 @@ public:
 	virtual void		initialize				();
 	virtual void		finalize				();
 	virtual void		critical_finalize		();
-	virtual void		remove_links			(CObject* object);
+	virtual void		remove_links			(IGameObject* object);
 
 	virtual	void		reselect_state			();
 	virtual	void		setup_substates			();

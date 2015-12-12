@@ -20,12 +20,11 @@
 #include "movement_manager_space.h"
 #include "detail_path_manager.h"
 #include "patrol_path_manager.h"
-#include "patrol_path_manager_space.h"
 #include "level_path_manager.h"
 #include "level_location_selector.h"
 #include "memory_manager.h"
 #include "visual_memory_manager.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "movement_manager.h"
 #include "script_callback_ex.h"
 #include "game_object_space.h"
@@ -637,7 +636,7 @@ const CScriptEntityAction *CScriptEntity::GetActionByIndex	(u32 action_index) co
 	return							(m_tpActionQueue[action_index]);
 }
 
-void CScriptEntity::sound_callback	(const CObject *object, int sound_type, const Fvector &position, float sound_power)
+void CScriptEntity::sound_callback	(const IGameObject *object, int sound_type, const Fvector &position, float sound_power)
 {
 	if (!smart_cast<const CGameObject*>(object))
 		return;

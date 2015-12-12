@@ -52,7 +52,7 @@ void CTAGameClCaptionsManager::ShowInProgressCaptions()
 	if (parent_game_object->HasTimeLimit())
 		parent_game_ui->SetTimeMsgCaption(timelimit_message);
 
-	CObject*	control_entity = Level().CurrentControlEntity();
+	IGameObject*	control_entity = Level().CurrentControlEntity();
 	if (!control_entity)
 		return;
 	

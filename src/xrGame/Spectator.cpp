@@ -84,7 +84,7 @@ void CSpectator::UpdateCL()
 		if (m_pActorToLookAt)
 		{
 #ifdef DEBUG
-			m_pActorToLookAt->dbg_update_cl			= 0;
+			m_pActorToLookAt->SetDbgUpdateFrame(0);
 			m_pActorToLookAt->GetSchedulerData().dbg_update_shedule	= 0;
 			Game().GetSchedulerData().dbg_update_shedule				= 0;
 #endif
@@ -93,7 +93,7 @@ void CSpectator::UpdateCL()
 			m_pActorToLookAt->shedule_Update	(0);
 			Game().shedule_Update				(0);
 #ifdef DEBUG
-			m_pActorToLookAt->dbg_update_cl			= 0;
+			m_pActorToLookAt->SetDbgUpdateFrame(0);
 			m_pActorToLookAt->GetSchedulerData().dbg_update_shedule	= 0;
 			Game().GetSchedulerData().dbg_update_shedule				= 0;
 #endif
@@ -312,9 +312,9 @@ void CSpectator::IR_OnMouseMove(int dx, int dy)
 	}
 }
 
-void CSpectator::FirstEye_ToPlayer(CObject* pObject)
+void CSpectator::FirstEye_ToPlayer(IGameObject* pObject)
 {
-	CObject*	pCurViewEntity = Level().CurrentEntity();
+	IGameObject*	pCurViewEntity = Level().CurrentEntity();
 	CActor*		pOldActor = NULL;
 	if (pCurViewEntity)
 	{
@@ -351,14 +351,14 @@ void CSpectator::FirstEye_ToPlayer(CObject* pObject)
 	if (Device.Paused() && pOldActor)
 	{
 #ifdef DEBUG
-		pOldActor->dbg_update_cl		= 0;
+		pOldActor->SetDbgUpdateFrame(0);
 		pOldActor->GetSchedulerData().dbg_update_shedule	= 0;
 #endif
 		Device.dwTimeDelta				= 0;
 		pOldActor->UpdateCL				();
 		pOldActor->shedule_Update		(0);
 #ifdef DEBUG
-		pOldActor->dbg_update_cl		= 0;
+		pOldActor->SetDbgUpdateFrame(0);
 		pOldActor->GetSchedulerData().dbg_update_shedule	= 0;
 #endif
 	}
@@ -532,7 +532,7 @@ bool			CSpectator::SelectNextPlayerToLook	(bool const search_next)
 			if (ps->team != PS->team && !PS->testFlag(GAME_PLAYER_FLAG_SPECTATOR)) continue;
 		};
 		u16 id = ps->GameID;
-		CObject* pObject = Level().Objects.net_Find(id);
+		IGameObject* pObject = Level().Objects.net_Find(id);
 		if (!pObject) continue;
 		CActor* A = smart_cast<CActor*>(pObject);
 		if (!A) continue;
@@ -566,7 +566,7 @@ bool			CSpectator::SelectNextPlayerToLook	(bool const search_next)
 	return false;
 };
 
-void			CSpectator::net_Relcase				(CObject *O)
+void			CSpectator::net_Relcase				(IGameObject *O)
 {
 	if (O != m_pActorToLookAt)
 		return;

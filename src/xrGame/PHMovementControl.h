@@ -39,7 +39,7 @@ class CPHMovementControl :
 static const int path_few_point=10;
 
 public:
-CObject					*ParentObject		(){ return pObject; }
+IGameObject					*ParentObject		(){ return pObject; }
 IElevatorState			*ElevatorState		();
 void 					in_shedule_Update	( u32 DT );
 void					PHCaptureObject 	( CPhysicsShellHolder* object, CPHCaptureBoneCallback* cb =0 );
@@ -107,7 +107,7 @@ private:
 	float				m_fGroundDelayFactor;
 	BOOL				bIsAffectedByGravity;
 	//------------------------------
-	CObject*			pObject;
+	IGameObject*			pObject;
 	EEnvironment		eOldEnvironment;
 	EEnvironment		eEnvironment;
 	Fbox				aabb;
@@ -279,11 +279,11 @@ public:
 	bool				CharacterExist			() const		;	
 	void				update_last_material	()				;
 	u16					injurious_material_idx	()				;
-	CPHMovementControl(CObject* parent);
+	CPHMovementControl(IGameObject* parent);
 	~CPHMovementControl(void);
 
 	CPHCharacter		*character				()	{		return m_character; };
-	void				NetRelcase				( CObject* O );
+	void				NetRelcase				( IGameObject* O );
 private:
 	void				actor_calculate			(Fvector& vAccel,const Fvector& camDir, float ang_speed, float jump, float dt, bool bLight);
 	void				UpdateCollisionDamage	( );

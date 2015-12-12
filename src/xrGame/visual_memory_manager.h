@@ -23,7 +23,7 @@ public:
 	typedef MemorySpace::CVisibleObject			CVisibleObject;
 	typedef MemorySpace::CNotYetVisibleObject	CNotYetVisibleObject;
 	typedef xr_vector<CVisibleObject>			VISIBLES;
-	typedef xr_vector<CObject*>					RAW_VISIBLES;
+	typedef xr_vector<IGameObject*>					RAW_VISIBLES;
 	typedef xr_vector<CNotYetVisibleObject>		NOT_YET_VISIBLES;
 
 private:
@@ -58,11 +58,11 @@ private:
 	u32					m_last_update_time;
 
 public:
-			void	add_visible_object		(const CObject *object, float time_delta, bool fictitious = false);
+			void	add_visible_object		(const IGameObject *object, float time_delta, bool fictitious = false);
 
 protected:
 	IC		void	fill_object				(CVisibleObject &visible_object, const CGameObject *game_object);
-			bool	should_ignore_object	(CObject const* object) const;
+			bool	should_ignore_object	(IGameObject const* object) const;
 			void	add_visible_object		(const CVisibleObject visible_object);
 			float	object_visible_distance	(const CGameObject *game_object, float &object_distance) const;
 			float	object_luminocity		(const CGameObject *game_object) const;
@@ -71,7 +71,7 @@ protected:
 			u32		get_prev_time			(const CGameObject *game_object) const;
 
 public:
-			u32		visible_object_time_last_seen			(const CObject *object) const;
+			u32		visible_object_time_last_seen			(const IGameObject *object) const;
 
 protected:
 			void	add_not_yet_visible_object				(const CNotYetVisibleObject &not_yet_visible_object);
@@ -88,8 +88,8 @@ public:
 	virtual	void	reinit					();
 	virtual	void	reload					(LPCSTR section);
 	virtual	void	update					(float time_delta);
-	virtual	float	feel_vision_mtl_transp	(CObject* O, u32 element);	
-			void	remove_links			(CObject *object);
+	virtual	float	feel_vision_mtl_transp	(IGameObject* O, u32 element);	
+			void	remove_links			(IGameObject *object);
 
 public:
 			bool	visible					(const CGameObject *game_object, float time_delta);
@@ -113,7 +113,7 @@ public:
 			bool	visible_now				(const CGameObject *game_object) const;
 
 public:
-			void	enable					(const CObject *object, bool enable);
+			void	enable					(const IGameObject *object, bool enable);
 
 public:
 	IC		float	visibility_threshold	() const;
@@ -138,7 +138,7 @@ public:
 public:
 			void					save						(NET_Packet &packet) const;
 			void					load						(IReader &packet);
-			void					on_requested_spawn			(CObject *object);
+			void					on_requested_spawn			(IGameObject *object);
 
 private:
 			void					clear_delayed_objects		();

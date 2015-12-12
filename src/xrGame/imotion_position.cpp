@@ -378,8 +378,8 @@ float imotion_position::advance_animation( float dt, IKinematicsAnimated& KA )
 }
 
 #ifdef	DEBUG
-void DBG_DrawBones( CObject &O );
-void DBG_PhysBones( CObject &O );
+void DBG_DrawBones( IGameObject &O );
+void DBG_PhysBones( IGameObject &O );
 void collide_anim_dbg_draw( CPhysicsShell	*shell, float dt )
 {
 	VERIFY( shell );

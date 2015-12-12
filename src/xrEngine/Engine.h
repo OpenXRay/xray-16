@@ -5,7 +5,6 @@
 // you must define ENGINE_BUILD then building the engine itself
 // and not define it if you are about to build DLL
 
-// XXX: move all *_API macros to XRayConfig.hpp
 #ifndef ENGINE_API
 #ifndef NO_ENGINE_API
 #ifdef ENGINE_BUILD

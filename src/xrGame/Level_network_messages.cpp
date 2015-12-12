@@ -12,7 +12,7 @@
 #include "game_cl_base_weapon_usage_statistic.h"
 #include "ai_space.h"
 #include "saved_game_wrapper.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "file_transfer.h"
 #include "message_filter.h"
 #include "xrPhysics/iphworld.h"
@@ -238,7 +238,7 @@ void CLevel::ClientReceive()
 					break;
 				}*/
 				P->r_u16		(ID);
-				CObject*	O	= Objects.net_Find		(ID);
+				IGameObject*	O	= Objects.net_Find		(ID);
 				if (0 == O)		break;
 				O->net_ImportInput(*P);
 			}break;

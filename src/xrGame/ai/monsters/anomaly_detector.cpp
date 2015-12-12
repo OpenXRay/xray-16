@@ -73,7 +73,7 @@ void CAnomalyDetector::update_schedule()
 	);
 }
 
-void CAnomalyDetector::on_contact(CObject *obj)
+void CAnomalyDetector::on_contact(IGameObject *obj)
 {
 	if (!m_active) return;
 	

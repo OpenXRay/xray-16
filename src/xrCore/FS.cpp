@@ -321,19 +321,19 @@ void IWriter::w_sdir(const Fvector& D)
     w_dir(C);
     w_float(mag);
 }
+// XXX: reimplement to prevent buffer overflows
 void IWriter::w_printf(const char* format, ...)
 {
-    va_list mark;
+    va_list args;
+    va_start(args, format);
+    VPrintf(format, args);
+    va_end(args);
+}
+
+void IWriter::VPrintf(const char *format, va_list args)
+{
     char buf[1024];
-
-    va_start(mark, format);
-#ifndef _EDITOR
-    vsprintf_s(buf, format, mark);
-#else
-    vsprintf(buf, format, mark);
-#endif
-    va_end(mark);
-
+    std::vsnprintf(buf, sizeof(buf), format, args);
     w(buf, xr_strlen(buf));
 }
 

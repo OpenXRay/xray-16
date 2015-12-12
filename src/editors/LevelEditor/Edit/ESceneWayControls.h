@@ -6,17 +6,24 @@
 // refs
 class CWayPoint;
 
-enum{
-	estWayModeWay,
-	estWayModePoint
+enum
+{
+    estWayModeWay,
+    estWayModePoint
 };
+
 //---------------------------------------------------------------------------
-class TUI_ControlWayPointAdd: public TUI_CustomControl{
+class TUI_ControlWayPointAdd: public TUI_CustomControl
+{
 public:
-    TUI_ControlWayPointAdd(int st, int act, ESceneToolBase* parent);
-    virtual ~TUI_ControlWayPointAdd(){;}
-	virtual bool Start  (TShiftState _Shift);
+    TUI_ControlWayPointAdd(int st, int act, ESceneToolBase *parent);
+
+    virtual ~TUI_ControlWayPointAdd() {}
+
+    virtual bool Start(TShiftState _Shift);
     virtual void OnEnter();
 };
 
 #endif //UI_WayPointToolsH
+
+

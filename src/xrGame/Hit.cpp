@@ -6,7 +6,7 @@
 #include "xrMessages.h"
 #include "Level.h"
 #include "xrPhysics/mathutils.h"
-SHit::SHit(float powerA, Fvector &dirA, CObject *whoA, u16 elementA, Fvector p_in_bone_spaceA,\
+SHit::SHit(float powerA, Fvector &dirA, IGameObject *whoA, u16 elementA, Fvector p_in_bone_spaceA,\
 		   float impulseA, ALife::EHitType hit_typeA, float armor_piercingA, bool AimBullet)
 {
 		power					= powerA								;

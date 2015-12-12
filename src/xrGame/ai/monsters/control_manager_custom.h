@@ -17,7 +17,7 @@ class CEntityAlive;
 class CControlManagerCustom : public CControl_ComBase {
 	typedef					CControl_ComBase	inherited;
 
-	xr_vector<CObject*>		m_nearest;
+	xr_vector<IGameObject*>		m_nearest;
 
 	CAnimationSequencer		*m_sequencer;
 	CAnimationTriple		*m_triple_anim;
@@ -68,7 +68,7 @@ public:
 	
 	//-------------------------------------------------------------------------------
 	// Jump
-	void		jump					(CObject *obj, const SControlJumpData &ta);
+	void		jump					(IGameObject *obj, const SControlJumpData &ta);
 	bool		jump					(const SControlJumpData &ta);
 	void		jump					(const Fvector &position);
 	void		load_jump_data			(LPCSTR s1, LPCSTR s2, LPCSTR s3, LPCSTR s4, u32 vel_mask_prepare, u32 vel_mask_ground, u32 flags);
@@ -96,7 +96,7 @@ public:
 
 	void		critical_wound			(LPCSTR anim);
 
-	void		remove_links			(CObject * object);
+	void		remove_links			(IGameObject * object);
 
 	CControlJump*	get_jump_control	() { return m_jump; }
 private:

@@ -27,7 +27,7 @@ public:
 	};
 
 public:
-	CObject						*m_tpObjectToWatch;
+	IGameObject						*m_tpObjectToWatch;
 	SightManager::ESightType	m_tWatchType;
 	EGoalType					m_tGoalType;
 	Fvector						m_tWatchVector;

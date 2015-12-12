@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "ai/Monsters/Pseudodog/psy_dog.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "ai_space.h"
 #include "alife_simulator.h"
 #include "xrServerEntities/xrServer_Object_Base.h"
 #include "xrServer.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "Level.h"
 #include "ai/Monsters/control_movement_base.h"
 #include "ai/Monsters/monster_velocity_space.h"
@@ -160,7 +160,7 @@ void CPsyDog::net_Destroy()
 	inherited::net_Destroy();
 }
 
-void CPsyDog::Die(CObject* who)
+void CPsyDog::Die(IGameObject* who)
 {
 	inherited::Die		(who);
 	m_aura->on_death	();
@@ -276,7 +276,7 @@ void CPsyDogPhantom::Think()
 	Actor()->Cameras().AddPPEffector(xr_new<CMonsterEffector>(m_appear_effector.ppi, m_appear_effector.time, m_appear_effector.time_attack, m_appear_effector.time_release));
 }
 
-//void CPsyDogPhantom::Hit(float P,Fvector &dir,CObject*who,s16 element,Fvector p_in_object_space,float impulse, ALife::EHitType hit_type)
+//void CPsyDogPhantom::Hit(float P,Fvector &dir,IGameObject*who,s16 element,Fvector p_in_object_space,float impulse, ALife::EHitType hit_type)
 void	CPsyDogPhantom::Hit					(SHit* pHDS)
 {
 	if (is_wait_to_destroy_object()) return;
@@ -298,7 +298,7 @@ void CPsyDogPhantom::net_Destroy()
 	inherited::net_Destroy();
 }
 
-void CPsyDogPhantom::Die(CObject* who)
+void CPsyDogPhantom::Die(IGameObject* who)
 {
 	inherited::Die	(who);
 	destroy_me		();
@@ -309,7 +309,7 @@ void CPsyDogPhantom::try_to_register_to_parent()
 	// parent not ready yet
 	if(m_parent) return;
 	
-	CObject	*obj = Level().Objects.net_Find(m_parent_id);
+	IGameObject	*obj = Level().Objects.net_Find(m_parent_id);
 	if (obj) {
 		CPsyDog *dog = smart_cast<CPsyDog *>(obj);
 		VERIFY(dog);

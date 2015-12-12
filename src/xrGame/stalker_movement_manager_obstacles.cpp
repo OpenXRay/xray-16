@@ -13,7 +13,7 @@
 #include "ai/stalker/ai_stalker.h"
 #include "restricted_object_obstacle.h"
 #include "level_path_manager.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "detail_path_manager.h"
 #include "stalker_animation_manager.h"
 #include "doors_actor.h"
@@ -210,7 +210,7 @@ const float &stalker_movement_manager_obstacles::prediction_speed	() const
 	return		(object().animation().target_speed());
 }
 
-void stalker_movement_manager_obstacles::remove_links				(CObject *object)
+void stalker_movement_manager_obstacles::remove_links				(IGameObject *object)
 {
 	inherited::remove_links			(object);
 	m_static_obstacles.remove_links	(object);

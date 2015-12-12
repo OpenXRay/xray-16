@@ -9,18 +9,18 @@
 #include "stdafx.h"
 #include "ai/Monsters/rats/ai_rat.h"
 #include "ai/ai_monsters_misc.h"
-#include "game_graph.h"
+#include "xrAICore/Navigation/game_graph.h"
 #include "magic_box3.h"
 #include "Include/xrRender/RenderVisual.h"
-#include "ai_object_location.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/ai_object_location.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "movement_manager.h"
 #include "location_manager.h"
 #include "Level.h"
-#include "random32.h"
+#include "Random.hpp"
 #include "ai_space.h"
 #include "restricted_object.h"
-#include "patrol_path.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path.h"
 #include "debug_renderer.h"
 #include "ai/Monsters/ai_monster_squad_manager.h"
 #include "ai/Monsters/ai_monster_squad.h"
@@ -422,7 +422,7 @@ void CAI_Rat::select_next_home_position	()
 
 bool CAI_Rat::can_stand_in_position()
 {
-	xr_vector<CObject*>					tpNearestList								; 
+	xr_vector<IGameObject*>					tpNearestList								; 
 	//float m_radius = Radius();
 	Level().ObjectSpace.GetNearest		(tpNearestList, Position(), 0.2f, this)	; 
 	if (tpNearestList.empty())
@@ -435,8 +435,8 @@ bool CAI_Rat::can_stand_in_position()
 	M.c									= C2;
 	MagicBox3							box(M,d);
 
-	xr_vector<CObject*>::iterator		I = tpNearestList.begin();
-	xr_vector<CObject*>::iterator		E = tpNearestList.end();
+	xr_vector<IGameObject*>::iterator		I = tpNearestList.begin();
+	xr_vector<IGameObject*>::iterator		E = tpNearestList.end();
 	for ( ; I != E; ++I) {
 		if (!smart_cast<CAI_Rat*>(*I))
 			continue;
@@ -454,9 +454,9 @@ bool CAI_Rat::can_stand_in_position()
 
 bool CAI_Rat::can_stand_here	()
 {
-	xr_vector<CObject*>					tpNearestList								; 
+	xr_vector<IGameObject*>					tpNearestList								; 
 	Level().ObjectSpace.GetNearest		(tpNearestList, Position(),Radius(),this)	; 
-	//xr_vector<CObject*>				&tpNearestList = Level().ObjectSpace.q_nearest; 
+	//xr_vector<IGameObject*>				&tpNearestList = Level().ObjectSpace.q_nearest; 
 	if (tpNearestList.empty())
 		return							(true);
 
@@ -467,8 +467,8 @@ bool CAI_Rat::can_stand_here	()
 	M.c									= C2;
 	MagicBox3							box(M,d);
 
-	xr_vector<CObject*>::iterator		I = tpNearestList.begin();
-	xr_vector<CObject*>::iterator		E = tpNearestList.end();
+	xr_vector<IGameObject*>::iterator		I = tpNearestList.begin();
+	xr_vector<IGameObject*>::iterator		E = tpNearestList.end();
 	for ( ; I != E; ++I) {
 		if (!smart_cast<CAI_Rat*>(*I))
 			continue;

@@ -12,7 +12,7 @@
 #include "ai/stalker/ai_stalker.h"
 #include "smart_cover.h"
 #include "ai_space.h"
-#include "graph_engine.h"
+#include "xrAICore/Navigation/graph_engine.h"
 #include "smart_cover_transition.hpp"
 #include "smart_cover_transition_animation.hpp"
 #include "sight_manager.h"
@@ -21,7 +21,7 @@
 #include "memory_space.h"
 #include "memory_manager.h"
 #include "enemy_manager.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 
 namespace smart_cover {
 	shared_str	transform_vertex(shared_str const &vertex_id, bool const &in);

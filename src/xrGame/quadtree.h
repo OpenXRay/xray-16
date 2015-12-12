@@ -7,8 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-
-#include "profiler.h"
+#include "xrEngine/profiler.h"
 
 template <typename _object_type>
 class CQuadTree {

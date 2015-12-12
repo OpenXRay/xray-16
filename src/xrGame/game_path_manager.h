@@ -9,7 +9,7 @@
 #pragma once
 
 #include "abstract_path_manager.h"
-#include "game_graph.h"
+#include "xrAICore/Navigation/game_graph.h"
 
 template <
 	typename _VertexEvaluator,

@@ -12,8 +12,8 @@
 #include "space_restriction_bridge.h"
 #include "restriction_space.h"
 #include "ai_space.h"
-#include "level_graph.h"
-#include "graph_engine.h"
+#include "xrAICore/Navigation/level_graph.h"
+#include "xrAICore/Navigation/graph_engine.h"
 
 #pragma warning(push)
 #pragma warning(disable:4995)
@@ -219,7 +219,7 @@ void CSpaceRestrictionComposition::check_restrictor_type()
 	if (!ai().get_alife())
 		return;
 
-	CObject							*object = Level().Objects.FindObjectByName(m_space_restrictors);
+	IGameObject							*object = Level().Objects.FindObjectByName(m_space_restrictors);
 	if (!object)
 		return;
 

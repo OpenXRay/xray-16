@@ -10,11 +10,10 @@
 #include "alife_monster_patrol_path_manager.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "ai_space.h"
-#include "patrol_path_storage.h"
-#include "patrol_path.h"
-#include "patrol_point.h"
-#include "patrol_path_manager_space.h"
-#include "game_graph.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_point.h"
+#include "xrAICore/Navigation/game_graph.h"
 
 CALifeMonsterPatrolPathManager::CALifeMonsterPatrolPathManager	(object_type *object)
 {
@@ -30,8 +29,8 @@ CALifeMonsterPatrolPathManager::CALifeMonsterPatrolPathManager	(object_type *obj
 	m_previous_vertex_index	= u32(-1);
 	m_start_vertex_index	= u32(-1);
 
-	start_type				(PatrolPathManager::ePatrolStartTypeNearest);
-	route_type				(PatrolPathManager::ePatrolRouteTypeContinue);
+	start_type				(ePatrolStartTypeNearest);
+	route_type				(ePatrolRouteTypeContinue);
 	use_randomness			(true);
 }
 
@@ -103,23 +102,23 @@ void CALifeMonsterPatrolPathManager::actualize				()
 	m_completed							= false;
 
 	switch (start_type()) {
-		case PatrolPathManager::ePatrolStartTypeFirst : {
+		case ePatrolStartTypeFirst : {
 			m_current_vertex_index		= 0;
 			break;
 		}
-		case PatrolPathManager::ePatrolStartTypeLast : {
+		case ePatrolStartTypeLast : {
 			m_current_vertex_index		= path().vertices().size() - 1;
 			break;
 		}
-		case PatrolPathManager::ePatrolStartTypeNearest : {
+		case ePatrolStartTypeNearest : {
 			select_nearest				();
 			break;
 		}
-		case PatrolPathManager::ePatrolStartTypePoint : {
+		case ePatrolStartTypePoint : {
 			m_current_vertex_index		= m_start_vertex_index;
 			break;
 		}
-		case PatrolPathManager::ePatrolStartTypeNext :
+		case ePatrolStartTypeNext :
 			// we advisedly do not process this case since it is far-fetched
 		default	: NODEFAULT;
 	};
@@ -156,12 +155,12 @@ void CALifeMonsterPatrolPathManager::navigate					()
 
 	if (!branching_factor) {
 		switch (route_type()) {
-			case PatrolPathManager::ePatrolRouteTypeStop : {
+			case ePatrolRouteTypeStop : {
 				VERIFY					(!m_completed);
 				m_completed				= true;
 				break;
 			};
-			case PatrolPathManager::ePatrolRouteTypeContinue : {
+			case ePatrolRouteTypeContinue : {
 				if (vertex.edges().empty()) {
 					VERIFY				(!m_completed);
 					m_completed			= true;

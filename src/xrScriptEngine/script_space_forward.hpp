@@ -8,8 +8,14 @@
 
 #pragma once
 
-namespace luabind {
-	class object;
-	template<class T> class functor;
-	template<class T> T object_cast(const object& obj);
+namespace luabind
+{
+namespace adl
+{
+class object;
+}
+
+template<class T> class functor;
+template<class T, class ValueWrapper>
+T object_cast(ValueWrapper const& value_wrapper);
 };

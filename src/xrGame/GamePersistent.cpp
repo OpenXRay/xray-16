@@ -4,7 +4,7 @@
 #include "xrEngine/xr_ioconsole.h"
 #include "xrEngine/GameMtlLib.h"
 #include "Include/xrRender/Kinematics.h"
-#include "profiler.h"
+#include "xrEngine/profiler.h"
 #include "MainMenu.h"
 #include "UICursor.h"
 #include "game_base_space.h"
@@ -608,13 +608,13 @@ void CGamePersistent::OnFrame	()
 #ifdef DEBUG
 					if(psActorFlags.test(AF_NO_CLIP))
 					{
-						Actor()->dbg_update_cl			= 0;
+						Actor()->SetDbgUpdateFrame(0);
 						Actor()->GetSchedulerData().dbg_update_shedule		= 0;
 						Device.dwTimeDelta				= 0;
 						Device.fTimeDelta				= 0.01f;			
 						Actor()->UpdateCL				();
 						Actor()->shedule_Update			(0);
-						Actor()->dbg_update_cl			= 0;
+						Actor()->SetDbgUpdateFrame(0);
 						Actor()->GetSchedulerData().dbg_update_shedule		= 0;
 
 						CSE_Abstract* e					= Level().Server->ID_to_entity(Actor()->ID());
@@ -624,15 +624,15 @@ void CGamePersistent::OnFrame	()
 						xr_vector<u16>::iterator it = s_actor->children.begin();
 						for(;it!=s_actor->children.end();it++)
 						{
-							CObject* obj = Level().Objects.net_Find(*it);
+							IGameObject* obj = Level().Objects.net_Find(*it);
 							if(obj && Engine.Sheduler.Registered(obj))
 							{
 								obj->GetSchedulerData().dbg_update_shedule = 0;
-								obj->dbg_update_cl = 0;
+								obj->SetDbgUpdateFrame(0);
 								obj->shedule_Update	(0);
 								obj->UpdateCL();
 								obj->GetSchedulerData().dbg_update_shedule = 0;
-								obj->dbg_update_cl = 0;
+								obj->SetDbgUpdateFrame(0);
 							}
 						}
 					}
@@ -685,8 +685,9 @@ void CGamePersistent::OnFrame	()
 	}
 
 #ifdef DEBUG
-	if ((m_last_stats_frame + 1) < m_frame_counter)
-		profiler().clear		();
+    // XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
+	//if ((m_last_stats_frame + 1) < m_frame_counter)
+	//	profiler().clear		();
 #endif
 	UpdateDof();
 }
@@ -743,7 +744,8 @@ void CGamePersistent::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
 #ifdef DEBUG
 #	ifndef _EDITOR
 		m_last_stats_frame		= m_frame_counter;
-		profiler().show_stats(font,!!psAI_Flags.test(aiStats));
+        // XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
+		//profiler().show_stats(font,!!psAI_Flags.test(aiStats));
 #	endif
 #endif
 }

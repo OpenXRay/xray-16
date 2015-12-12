@@ -44,7 +44,7 @@ void CRender::render_main	(Fmatrix&	m_ViewProjection, bool _fportals)
 				if (lstRenderables.size())		uID_LTRACK	= uLastLTRACK%lstRenderables.size();
 
 				// update light-vis for current entity / actor
-				CObject*	O					= g_pGameLevel->CurrentViewEntity();
+				IGameObject*	O					= g_pGameLevel->CurrentViewEntity();
 				if (O)		{
 					CROS_impl*	R					= (CROS_impl*) O->ROS();
 					if (R)		R->update			(O);

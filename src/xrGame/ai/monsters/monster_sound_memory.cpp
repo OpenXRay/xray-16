@@ -73,7 +73,7 @@ void CMonsterSoundMemory::HearSound(const SoundElem &s)
 
 }
 
-void CMonsterSoundMemory::HearSound(const CObject* who, int eType, const Fvector &Position, float power, TTime time)
+void CMonsterSoundMemory::HearSound(const IGameObject* who, int eType, const Fvector &Position, float power, TTime time)
 {
 	SoundElem s;
 	s.SetConvert(who,eType,Position,power,time);
@@ -164,7 +164,7 @@ bool CMonsterSoundMemory::is_loud_sound(float val)
 	return false;
 }
 
-bool CMonsterSoundMemory::get_sound_from_object(const CObject* obj, SoundElem	&value)
+bool CMonsterSoundMemory::get_sound_from_object(const IGameObject* obj, SoundElem	&value)
 {
 	for (u32 i=0; i<Sounds.size(); i++) 
 		if (Sounds[i].who == obj) {
@@ -176,8 +176,8 @@ bool CMonsterSoundMemory::get_sound_from_object(const CObject* obj, SoundElem	&v
 }
 
 struct pred_remove_relcase {
-	CObject *obj;
-	pred_remove_relcase(CObject *o) {obj = o;}
+	IGameObject *obj;
+	pred_remove_relcase(IGameObject *o) {obj = o;}
 
 	bool operator() (const SoundElem &x) const {
 		if (x.who == obj) return true;
@@ -186,7 +186,7 @@ struct pred_remove_relcase {
 	}
 };
 
-void CMonsterSoundMemory::remove_links(CObject *O)
+void CMonsterSoundMemory::remove_links(IGameObject *O)
 {
 	// удаление устаревших звуков
 	Sounds.erase	(

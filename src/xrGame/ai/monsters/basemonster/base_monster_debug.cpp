@@ -18,7 +18,7 @@
 #include "actor_memory.h"
 #include "inventory.h"
 #include "weapon.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "movement_manager_space.h"
 #include "ai/Monsters/control_animation_base.h"
 #include "ai/Monsters/monster_state_manager.h"

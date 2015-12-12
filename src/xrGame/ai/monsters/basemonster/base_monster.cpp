@@ -4,9 +4,9 @@
 #include "hit.h"
 #include "PHDestroyable.h"
 #include "CharacterPhysicsSupport.h"
-#include "game_level_cross_table.h"
-#include "game_graph.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/game_level_cross_table.h"
+#include "xrAICore/Navigation/game_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "PHMovementControl.h"
 #include "ai/Monsters/ai_monster_squad_manager.h"
 #include "xrServerEntities/xrserver_objects_alife_monsters.h"
@@ -38,7 +38,7 @@
 #include "xrServer.h"
 #include "ai/Monsters/ai_monster_squad.h"
 #include "Actor.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "ai/Monsters/anti_aim_ability.h"
@@ -394,7 +394,7 @@ void CBaseMonster::shedule_Update(u32 dt)
 //////////////////////////////////////////////////////////////////////
 
 
-void CBaseMonster::Die(CObject* who)
+void CBaseMonster::Die(IGameObject* who)
 {
 	if (StateMan) StateMan->critical_finalize();
 
@@ -599,12 +599,12 @@ void CBaseMonster::set_state_sound(u32 type, bool once)
 	m_prev_sound_type	= type;
 }
 
-bool CBaseMonster::feel_touch_on_contact	(CObject *O)
+bool CBaseMonster::feel_touch_on_contact	(IGameObject *O)
 {
 	return		(inherited::feel_touch_on_contact(O));
 }
 
-bool CBaseMonster::feel_touch_contact(CObject *O)
+bool CBaseMonster::feel_touch_contact(IGameObject *O)
 {
 	m_anomaly_detector->on_contact(O);
 	return inherited::feel_touch_contact(O);
@@ -754,7 +754,7 @@ IFactoryObject *CBaseMonster::_construct	()
 	return						(this);
 }
 
-void CBaseMonster::net_Relcase(CObject *O)
+void CBaseMonster::net_Relcase(IGameObject *O)
 {
 	inherited::net_Relcase(O);
 
@@ -884,7 +884,7 @@ void CBaseMonster::OnEvent(NET_Packet& P, u16 type)
 	{
 	case GE_KILL_SOMEONE:
 		P.r_u16		(id);
-		CObject* O	= Level().Objects.net_Find	(id);
+		IGameObject* O	= Level().Objects.net_Find	(id);
 
 		if (O)  {
 			CEntity *pEntity = smart_cast<CEntity*>(O);

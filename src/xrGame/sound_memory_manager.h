@@ -73,7 +73,7 @@ private:
 	IC		void				update_sound_threshold	();
 	IC		u32					priority				(const CSoundObject &sound) const;
 			void				add						(const CSoundObject &sound_object, bool check_for_existance = false);
-			void				add						(const CObject *object, int sound_type, const Fvector &position, float sound_power);
+			void				add						(const IGameObject *object, int sound_type, const Fvector &position, float sound_power);
 
 protected:
 	IC		void				priority				(const ESoundTypes &sound_type, u32 priority);
@@ -84,12 +84,12 @@ public:
 	virtual	void				Load					(LPCSTR section);
 	virtual	void				reinit					();
 	virtual	void				reload					(LPCSTR section);
-	virtual void				feel_sound_new			(CObject* who, int eType, CSound_UserDataPtr user_data, const Fvector &Position, float power);
+	virtual void				feel_sound_new			(IGameObject* who, int eType, CSound_UserDataPtr user_data, const Fvector &Position, float power);
 	virtual	void				update					();
-			void				remove_links			(CObject *object);
+			void				remove_links			(IGameObject *object);
 
 public:
-			void				enable					(const CObject *object, bool enable);
+			void				enable					(const IGameObject *object, bool enable);
 
 public:
 	IC		const SOUNDS		&objects				() const;
@@ -105,7 +105,7 @@ public:
 public:
 			void				save					(NET_Packet &packet) const;
 			void				load					(IReader &packet);
-			void				on_requested_spawn		(CObject *object);
+			void				on_requested_spawn		(IGameObject *object);
 
 private:
 			void				clear_delayed_objects	();

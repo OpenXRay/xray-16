@@ -10,8 +10,8 @@
 #include "agent_memory_manager.h"
 #include "agent_manager.h"
 #include "agent_member_manager.h"
-#include "ai_object_location.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/ai_object_location.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "entity_alive.h"
 #include "memory_space_impl.h"
 
@@ -20,7 +20,7 @@ void CAgentMemoryManager::update		()
 	reset_memory_masks	();
 }
 
-void CAgentMemoryManager::remove_links	(CObject *object)
+void CAgentMemoryManager::remove_links	(IGameObject *object)
 {
 }
 
@@ -68,7 +68,7 @@ void CAgentMemoryManager::update_memory_masks		(const squad_mask_type &mask)
 	}
 }
 
-void CAgentMemoryManager::object_information		(const CObject *object, u32 &level_time, Fvector &position)
+void CAgentMemoryManager::object_information		(const IGameObject *object, u32 &level_time, Fvector &position)
 {
 	{
 		VISIBLES::const_iterator	I = std::find(visibles().begin(),visibles().end(),object_id(object));

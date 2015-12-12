@@ -4,7 +4,7 @@
 #include "xrEngine/xr_object.h"
 
 CSpectrCameraFirstEye::CSpectrCameraFirstEye(float const & fTimeDelta,
-											 CObject* p,
+											 IGameObject* p,
 											 u32 flags) :
 	inherited(p, flags),
 	m_fTimeDelta(fTimeDelta)

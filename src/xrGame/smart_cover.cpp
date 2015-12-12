@@ -9,11 +9,11 @@
 #include "smart_cover.h"
 #include "smart_cover_storage.h"
 #include "smart_cover_object.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "smart_cover_action.h"
 #include "ai_space.h"
-#include "level_graph.h"
-#include "graph_engine.h"
+#include "xrAICore/Navigation/level_graph.h"
+#include "xrAICore/Navigation/graph_engine.h"
 
 namespace hash_fixed_vertex_manager {
 	
@@ -53,9 +53,8 @@ cover::cover					(
 	Loopholes::const_iterator	I = m_description->loopholes().begin();
 	Loopholes::const_iterator	E = m_description->loopholes().end();
 	for ( ; I != E; ++I) {
-		luabind::object::iterator	i = loopholes_availability.begin( );
-		luabind::object::iterator	e = loopholes_availability.end( );
-		for ( ; i != e; ++i ) {
+		for (luabind::iterator i(loopholes_availability), e; i!=e; ++i)
+        {
 			LPCSTR const loophole_id= luabind::object_cast< LPCSTR >( i.key( ) );
 			if ( xr_strcmp( loophole_id, (*I)->id( ) ) )
 				continue;

@@ -29,6 +29,6 @@ public:
 	virtual	float		evaluate		(const CGameObject *object) const;
 	virtual	float		do_evaluate		(const CGameObject *object) const;
 	virtual void		update			();
-			void		remove_links	(CObject *object);
+			void		remove_links	(IGameObject *object);
 	virtual	void		on_restrictions_change	();
 };

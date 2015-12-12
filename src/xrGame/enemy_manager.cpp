@@ -14,12 +14,12 @@
 #include "ef_storage.h"
 #include "ef_pattern.h"
 #include "autosave_manager.h"
-#include "ai_object_location.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/ai_object_location.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "Level.h"
 #include "script_game_object.h"
 #include "ai_space.h"
-#include "profiler.h"
+#include "xrEngine/profiler.h"
 #include "actor.h"
 #include "ai/stalker/ai_stalker.h"
 #include "movement_manager.h"
@@ -186,7 +186,7 @@ void CEnemyManager::set_ready_to_save		()
 	m_ready_to_save				= true;
 }
 
-void CEnemyManager::remove_links			(CObject *object)
+void CEnemyManager::remove_links			(IGameObject *object)
 {
 	// since we use no members in CEntityAlive during search,
 	// we just use the pinter itself, we can just statically cast object
@@ -365,7 +365,7 @@ bool CEnemyManager::need_update				(const bool &only_wounded) const
 	if (last_hit_time && (last_hit_time > m_last_enemy_change) ) {
 		ALife::_OBJECT_ID		enemy_id	= m_object->memory().hit().last_hit_object_id();
 		VERIFY					( enemy_id != ALife::_OBJECT_ID(-1) );
-		CObject const* enemy	= Level().Objects.net_Find(enemy_id);
+        IGameObject const* enemy	= Level().Objects.net_Find(enemy_id);
 		VERIFY					(enemy);
 		CEntityAlive const*		alive_enemy = smart_cast<CEntityAlive const*>(enemy);
 		if (alive_enemy && m_object->is_relation_enemy(alive_enemy))

@@ -13,7 +13,7 @@
 #include "ai/stalker/ai_stalker.h"
 #include "restricted_object_obstacle.h"
 #include "level_path_manager.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "moving_objects.h"
 #include "detail_path_manager.h"
 #include "level_path_builder.h"

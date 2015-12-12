@@ -34,6 +34,7 @@
 #include "artefact.h"
 
 using namespace luabind;
+using namespace luabind::policy;
 
 class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject> &instance)
 {
@@ -61,10 +62,10 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
 		.def("best_cover",					&CScriptGameObject::best_cover)
 		.def("safe_cover",					&CScriptGameObject::safe_cover)
 		.def("spawn_ini",					&CScriptGameObject::spawn_ini)
-		.def("memory_visible_objects",		&CScriptGameObject::memory_visible_objects, return_stl_iterator)
-		.def("memory_sound_objects",		&CScriptGameObject::memory_sound_objects, return_stl_iterator)
-		.def("memory_hit_objects",			&CScriptGameObject::memory_hit_objects, return_stl_iterator)
-		.def("not_yet_visible_objects",		&CScriptGameObject::not_yet_visible_objects, return_stl_iterator)
+		.def("memory_visible_objects",		&CScriptGameObject::memory_visible_objects, return_stl_iterator())
+		.def("memory_sound_objects",		&CScriptGameObject::memory_sound_objects, return_stl_iterator())
+		.def("memory_hit_objects",			&CScriptGameObject::memory_hit_objects, return_stl_iterator())
+		.def("not_yet_visible_objects",		&CScriptGameObject::not_yet_visible_objects, return_stl_iterator())
 		.def("visibility_threshold",		&CScriptGameObject::visibility_threshold)
 		.def("enable_vision",				&CScriptGameObject::enable_vision)
 		.def("vision_enabled",				&CScriptGameObject::vision_enabled)
@@ -104,7 +105,7 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
 		.def("base_out_restrictions",		&CScriptGameObject::base_out_restrictions)
 		.def("accessible",					&CScriptGameObject::accessible_position)
 		.def("accessible",					&CScriptGameObject::accessible_vertex_id)
-		.def("accessible_nearest",			&CScriptGameObject::accessible_nearest, out_value(_3))
+		.def("accessible_nearest",			&CScriptGameObject::accessible_nearest)
 
 		//////////////////////////////////////////////////////////////////////////
 		.def("enable_attachable_item",		&CScriptGameObject::enable_attachable_item)
@@ -141,7 +142,7 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
 
 		.def("get_task_state",				&CScriptGameObject::GetGameTaskState)
 		.def("set_task_state",				&CScriptGameObject::SetGameTaskState)
-		.def("give_task",					&CScriptGameObject::GiveTaskToActor,		adopt(_2))
+		.def("give_task",					&CScriptGameObject::GiveTaskToActor, adopt<2>())
 		.def("set_active_task",				&CScriptGameObject::SetActiveTask)
 		.def("is_active_task",				&CScriptGameObject::IsActiveTask)
 		.def("get_task",					&CScriptGameObject::GetTask)

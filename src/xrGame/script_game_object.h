@@ -13,7 +13,7 @@
 
 #include "xr_time.h"
 #include "character_info_defs.h"
-#include "game_graph_space.h"
+#include "xrAICore/Navigation/game_graph_space.h"
 #include "game_location_selector.h"
 
 enum EPdaMsg;
@@ -31,10 +31,8 @@ namespace doors { class door; }
 class NET_Packet;
 class CGameTask;
 
-namespace PatrolPathManager { 
-	enum EPatrolStartType;
-	enum EPatrolRouteType;
-};
+enum EPatrolStartType;
+enum EPatrolRouteType;
 
 namespace MemorySpace {
 	struct CMemoryInfo;
@@ -127,12 +125,13 @@ struct CSightParams {
 	Fvector						m_vector;
 };
 
-namespace luabind {
-	template <typename return_type>
-	class functor;
-
-	class object;
-} // namespace luabind
+namespace luabind
+{
+namespace adl
+{
+class object;
+}
+}
 
 class CScriptGameObject {
 	mutable CGameObject		*m_game_object;
@@ -142,7 +141,7 @@ public:
 
 							CScriptGameObject		(CGameObject *tpGameObject);
 	virtual					~CScriptGameObject		();
-							operator CObject*		();
+							operator IGameObject*		();
 
 	IC		CGameObject			&object				() const;
 			CScriptGameObject	*Parent				() const;
@@ -337,8 +336,8 @@ public:
 
 
 			void				ActorLookAtPoint	(Fvector point);
-			void				IterateInventory	(luabind::functor<void> functor, luabind::object object);
-			void				IterateInventoryBox	(luabind::functor<void> functor, luabind::object object);
+			void				IterateInventory	(luabind::functor<void> functor, luabind::adl::object object);
+			void				IterateInventoryBox	(luabind::functor<void> functor, luabind::adl::object object);
 			void				MarkItemDropped		(CScriptGameObject *item);
 			bool				MarkedDropped		(CScriptGameObject *item);
 			void				UnloadMagazine		();
@@ -414,15 +413,15 @@ public:
 			
 	// Callbacks			
 			void				SetCallback			(GameObject::ECallbackType type, const luabind::functor<void> &functor);
-			void				SetCallback			(GameObject::ECallbackType type, const luabind::functor<void> &functor, const luabind::object &object);
+			void				SetCallback			(GameObject::ECallbackType type, const luabind::functor<void> &functor, const luabind::adl::object &object);
 			void				SetCallback			(GameObject::ECallbackType type);
 
 			void				set_patrol_extrapolate_callback(const luabind::functor<bool> &functor);
-			void				set_patrol_extrapolate_callback(const luabind::functor<bool> &functor, const luabind::object &object);
+			void				set_patrol_extrapolate_callback(const luabind::functor<bool> &functor, const luabind::adl::object &object);
 			void				set_patrol_extrapolate_callback();
 
 			void				set_enemy_callback	(const luabind::functor<bool> &functor);
-			void				set_enemy_callback	(const luabind::functor<bool> &functor, const luabind::object &object);
+			void				set_enemy_callback	(const luabind::functor<bool> &functor, const luabind::adl::object &object);
 			void				set_enemy_callback	();
 	
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -431,7 +430,7 @@ public:
 			void				SetTipTextDefault	();
 			void				SetNonscriptUsable	(bool nonscript_usable);
 ///////////////////////////////////////////////////////////////////////////////////////////
-			void				set_fastcall		(const luabind::functor<bool> &functor, const luabind::object &object);
+			void				set_fastcall		(const luabind::functor<bool> &functor, const luabind::adl::object &object);
 			void				set_const_force		(const Fvector &dir,float value,u32  time_interval)							;
 //////////////////////////////////////////////////////////////////////////
 
@@ -525,7 +524,7 @@ public:
 			void				set_desired_position	(const Fvector *desired_position);
 			void				set_desired_direction	();
 			void				set_desired_direction	(const Fvector *desired_direction);
-			void				set_patrol_path			(LPCSTR path_name, const PatrolPathManager::EPatrolStartType patrol_start_type, const PatrolPathManager::EPatrolRouteType patrol_route_type, bool random);
+			void				set_patrol_path			(LPCSTR path_name, const EPatrolStartType patrol_start_type, const EPatrolRouteType patrol_route_type, bool random);
 			void				inactualize_patrol_path	();
 			void				set_dest_level_vertex_id(u32 level_vertex_id);
 			void				set_dest_game_vertex_id	(GameGraph::_GRAPH_ID game_vertex_id);
@@ -722,7 +721,7 @@ public:
 
 			void				set_smart_cover_target_selector			();
 			void				set_smart_cover_target_selector			(luabind::functor<void> functor);
-			void				set_smart_cover_target_selector			(luabind::functor<void> functor, luabind::object object);
+			void				set_smart_cover_target_selector			(luabind::functor<void> functor, luabind::adl::object object);
 
 			void				set_smart_cover_target_idle				();
 			void				set_smart_cover_target_lookout			();

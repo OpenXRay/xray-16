@@ -37,7 +37,7 @@
 #include "GameTask.h"
 #include "MainMenu.h"
 #include "saved_game_wrapper.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 
 #include "cameralook.h"
 #include "character_hit_animations_params.h"
@@ -51,7 +51,8 @@
 #ifdef DEBUG
 #	include "PHDebug.h"
 #	include "ui/UIDebugFonts.h" 
-#	include "game_graph.h"
+#	include "xrAICore/Navigation/game_graph.h"
+#include "LevelGraphDebugRender.hpp"
 #	include "CharacterPhysicsSupport.h"
 #endif // DEBUG
 
@@ -783,7 +784,7 @@ public:
 		if (!ai().get_level_graph())
 			return;
 
-		ai().level_graph().setup_current_level	(-1);
+		Level().GetLevelGraphDebugRender()->SetupCurrentLevel(-1);
 	}
 };
 
@@ -799,9 +800,7 @@ public:
 		if (!ai().get_level_graph())
 			return;
 
-		ai().level_graph().setup_current_level	(
-			ai().level_graph().level_id()
-		);
+        Level().GetLevelGraphDebugRender()->SetupCurrentLevel(ai().level_graph().level_id());
 	}
 };
 
@@ -817,7 +816,7 @@ public:
 			return;
 
 		if (!*args) {
-			ai().level_graph().setup_current_level	(-1);
+            Level().GetLevelGraphDebugRender()->SetupCurrentLevel(-1);
 			return;
 		}
 
@@ -827,7 +826,7 @@ public:
 			return;
 		}
 
-		ai().level_graph().setup_current_level	(level->id());
+        Level().GetLevelGraphDebugRender()->SetupCurrentLevel(level->id());
 	}
 };
 
@@ -1007,7 +1006,7 @@ public:
 		_GetItem(args,0,param1,' ');
 		_GetItem(args,1,param2,' ');
 
-		CObject			*obj = Level().Objects.FindObjectByName(param1);
+		IGameObject			*obj = Level().Objects.FindObjectByName(param1);
 		CBaseMonster	*monster = smart_cast<CBaseMonster *>(obj);
 		if (!monster)	return;
 		
@@ -1032,7 +1031,7 @@ public:
 			}
 			ph_dbg_draw_mask1.set(ph_m1_DbgTrackObject,TRUE);
 			PH_DBG_SetTrackObject();
-			//CObject* O= Level().Objects.FindObjectByName(args);
+			//IGameObject* O= Level().Objects.FindObjectByName(args);
 			//if(O)
 			//{
 			//	PH_DBG_SetTrackObject(*(O->cName()));
@@ -1119,12 +1118,6 @@ public:
 
 #ifdef DEBUG
 
-struct CCC_LuaHelp : public IConsole_Command {
-	CCC_LuaHelp(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
-
-	virtual void Execute(LPCSTR args) { GlobalEnv.ScriptEngine->PrintHelp(); }
-};
-
 struct CCC_ShowSmartCastStats : public IConsole_Command {
 	CCC_ShowSmartCastStats(LPCSTR N) : IConsole_Command(N)  { bEmptyArgsHandled = true; };
 
@@ -1162,7 +1155,7 @@ public:
 #endif
 
 #ifndef MASTER_GOLD
-#	include "game_graph.h"
+#	include "xrAICore/Navigation/game_graph.h"
 struct CCC_JumpToLevel : public IConsole_Command {
 	CCC_JumpToLevel(LPCSTR N) : IConsole_Command(N)  {};
 
@@ -1483,7 +1476,7 @@ public		:
 			return;
 		};
 
-		CObject* obj			= Level().CurrentViewEntity();	VERIFY(obj);
+		IGameObject* obj			= Level().CurrentViewEntity();	VERIFY(obj);
 		shared_str ssss			= args;
 
 		CAttachmentOwner* owner = smart_cast<CAttachmentOwner*>(obj);
@@ -1964,7 +1957,6 @@ CMD4(CCC_Integer,			"hit_anims_tune",						&tune_hit_anims,		0, 1);
 	CMD3(CCC_Mask,		"g_important_save",		&psActorFlags,	AF_IMPORTANT_SAVE);
 	
 #ifdef DEBUG
-	CMD1(CCC_LuaHelp,				"lua_help");
 	CMD1(CCC_ShowSmartCastStats,	"show_smart_cast_stats");
 	CMD1(CCC_ClearSmartCastStats,	"clear_smart_cast_stats");
 

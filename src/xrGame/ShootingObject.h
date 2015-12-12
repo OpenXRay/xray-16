@@ -44,7 +44,7 @@ protected:
 //////////////////////////////////////////////////////////////////////////
 protected:
 	virtual void			LoadFireParams		(LPCSTR section); 		//сила выстрела
-	virtual bool			SendHitAllowed		(CObject* pUser);
+	virtual bool			SendHitAllowed		(IGameObject* pUser);
 	virtual void			FireBullet			(const Fvector& pos, 
         										const Fvector& dir, 
 												float fire_disp,

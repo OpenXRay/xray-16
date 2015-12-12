@@ -16,5 +16,5 @@ CScriptMonsterAction::~CScriptMonsterAction	()
 
 void CScriptMonsterAction::SetObject	(CScriptGameObject *tObj)
 {
-	m_tObject	= tObj->operator CObject*();
+	m_tObject	= tObj->operator IGameObject*();
 }

@@ -232,6 +232,12 @@
     <Filter Include="Game API\MaterialSystem">
       <UniqueIdentifier>{59004dc1-5e77-4968-8321-6290b1ab9d3a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game API\Level">
+      <UniqueIdentifier>{6e4e4f2d-02fc-4141-9ae3-ca29550fc16d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="General\Profiler">
+      <UniqueIdentifier>{b310210e-3620-4a9a-a6a8-02077cc6f0f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CopyProtection.h">
@@ -293,9 +299,6 @@
     </ClInclude>
     <ClInclude Include="IPhysicsShell.h">
       <Filter>Interfaces\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="IGame_Level.h">
-      <Filter>Game API</Filter>
     </ClInclude>
     <ClInclude Include="IGame_ObjectPool.h">
       <Filter>Game API\Objects</Filter>
@@ -561,6 +564,15 @@
     <ClInclude Include="IGameFont.hpp">
       <Filter>Render\Font output</Filter>
     </ClInclude>
+    <ClInclude Include="IGame_Level.h">
+      <Filter>Game API\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="profiler.h">
+      <Filter>General\Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="profiler_inline.h">
+      <Filter>General\Profiler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">
@@ -601,15 +613,6 @@
     </ClCompile>
     <ClCompile Include="phdebug.cpp">
       <Filter>Interfaces\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="IGame_Level.cpp">
-      <Filter>Game API</Filter>
-    </ClCompile>
-    <ClCompile Include="IGame_Level_check_textures.cpp">
-      <Filter>Game API</Filter>
-    </ClCompile>
-    <ClCompile Include="IGame_Persistent.cpp">
-      <Filter>Game API</Filter>
     </ClCompile>
     <ClCompile Include="IGame_ObjectPool.cpp">
       <Filter>Game API\Objects</Filter>
@@ -877,6 +880,18 @@
     </ClCompile>
     <ClCompile Include="PerformanceAlert.cpp">
       <Filter>RenderRef\Execution &amp; 3D\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="IGame_Level.cpp">
+      <Filter>Game API\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="IGame_Level_check_textures.cpp">
+      <Filter>Game API\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="IGame_Persistent.cpp">
+      <Filter>Game API\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="profiler.cpp">
+      <Filter>General\Profiler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

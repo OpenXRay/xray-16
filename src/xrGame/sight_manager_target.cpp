@@ -10,7 +10,7 @@
 #include "sight_manager.h"
 #include "ai/stalker/ai_stalker.h"
 #include "stalker_movement_manager_smart_cover.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "ai_space.h"
 #include "ai/stalker/ai_stalker_space.h"
 #include "detail_path_manager.h"
@@ -216,7 +216,7 @@ bool CSightManager::GetDirectionAnglesByPrevPositions(float &yaw, float &pitch)
 	if (i < 2) 
 		return				(false);
 
-	CObject::SavedPosition	tPreviousPosition = m_object->ps_Element(i - 2), tCurrentPosition = m_object->ps_Element(i - 1);
+    GameObjectSavedPosition	tPreviousPosition = m_object->ps_Element(i - 2), tCurrentPosition = m_object->ps_Element(i - 1);
 	VERIFY					(_valid(tPreviousPosition.vPosition));
 	VERIFY					(_valid(tCurrentPosition.vPosition));
 	tDirection.sub			(tCurrentPosition.vPosition,tPreviousPosition.vPosition);

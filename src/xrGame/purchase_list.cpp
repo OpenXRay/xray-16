@@ -10,7 +10,7 @@
 #include "purchase_list.h"
 #include "inventoryowner.h"
 #include "gameobject.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "Level.h"
 
 static float min_deficit_factor = .3f;

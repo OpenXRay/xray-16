@@ -662,7 +662,7 @@ void					CRender::rmNormal			()
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 CRender::CRender()
-:m_bFirstFrameAfterReset(false)
+:m_bFirstFrameAfterReset(false), Sectors_xrc("render")
 {
 	init_cacades();
 }
@@ -690,6 +690,7 @@ void CRender::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
     font.OutNext("- culled:     %u", Stats.ic_culled);
     Stats.FrameStart();
     HOM.DumpStatistics(font, alert);
+    Sectors_xrc.DumpStatistics(font, alert);
 }
 
 /////////

@@ -12,7 +12,7 @@
 #include "enemy_manager.h"
 #include "xrServerEntities/ai_sounds.h"
 
-bool CAI_Rat::feel_vision_isRelevant(CObject* O)
+bool CAI_Rat::feel_vision_isRelevant(IGameObject* O)
 {
 	CEntityAlive* E = smart_cast<CEntityAlive*> (O);
 	if (!E) return false;
@@ -20,7 +20,7 @@ bool CAI_Rat::feel_vision_isRelevant(CObject* O)
 	return true;
 }
 
-void CAI_Rat::feel_sound_new(CObject* who, int eType, CSound_UserDataPtr user_data, const Fvector &Position, float power)
+void CAI_Rat::feel_sound_new(IGameObject* who, int eType, CSound_UserDataPtr user_data, const Fvector &Position, float power)
 {
 	if (!g_Alive())
 		return;
@@ -49,7 +49,7 @@ void CAI_Rat::feel_sound_new(CObject* who, int eType, CSound_UserDataPtr user_da
 	inherited::feel_sound_new	(who,eType,user_data,Position,power);
 }
 
-bool CAI_Rat::feel_touch_on_contact	(CObject *O)
+bool CAI_Rat::feel_touch_on_contact	(IGameObject *O)
 {
 	return		(inherited::feel_touch_on_contact(O));
 }

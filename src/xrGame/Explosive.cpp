@@ -32,7 +32,7 @@
 #include "xrPhysics/iActivationShape.h"
 #include "xrPhysics/iphworld.h"
 #include "game_base_space.h"
-#include "profiler.h"
+#include "xrEngine/profiler.h"
 
 #include "Include/xrRender/Kinematics.h"
 #define EFFECTOR_RADIUS 30.f
@@ -290,7 +290,7 @@ float CExplosive::ExplosionEffect(collide::rq_results& storage, CExplosive*exp_o
 	return effect/TEST_RAYS_PER_OBJECT;
 	
 }
-float CExplosive::TestPassEffect(const	Fvector	&source_p,	const	Fvector	&dir,float range,float ef_radius,collide::rq_results& storage, CObject* blasted_obj)
+float CExplosive::TestPassEffect(const	Fvector	&source_p,	const	Fvector	&dir,float range,float ef_radius,collide::rq_results& storage, IGameObject* blasted_obj)
 {
 	float sq_ef_radius=ef_radius*ef_radius;
 	float dist_factor	=		sq_ef_radius/(range*range*(exp_dist_extinction_factor-1.f)+sq_ef_radius);
@@ -401,9 +401,9 @@ void CExplosive::Explode()
 	for (u32 o_it=0; o_it<ISpatialResult.size(); o_it++)
 	{
 		ISpatial*		spatial	= ISpatialResult[o_it];
-		//		feel_touch_new(spatial->dcast_CObject());
+		//		feel_touch_new(spatial->dcast_GameObject());
 
-		CPhysicsShellHolder	*pGameObject = smart_cast<CPhysicsShellHolder*>(spatial->dcast_CObject());
+		CPhysicsShellHolder	*pGameObject = smart_cast<CPhysicsShellHolder*>(spatial->dcast_GameObject());
 		if(pGameObject && cast_game_object()->ID() != pGameObject->ID()) 
 			m_blasted_objects.push_back(pGameObject);
 	}
@@ -752,7 +752,7 @@ void CExplosive::ActivateExplosionBox(const Fvector &size,Fvector &in_out_pos)
 	ActivateShapeExplosive( self_obj, size, m_vExplodeSize, in_out_pos );
 	if(self_shell&&self_shell->isActive())self_shell->EnableCollision();
 }
-void CExplosive::net_Relcase(CObject* O)
+void CExplosive::net_Relcase(IGameObject* O)
 {
 	if (GameID() == eGameIDSingle)
 	{

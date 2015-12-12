@@ -21,7 +21,7 @@ using namespace	collide;
 //--------------------------------------------------------------------------------
 // RayTest - Occluded/No
 //--------------------------------------------------------------------------------
-BOOL CObjectSpace::RayTest	( const Fvector &start, const Fvector &dir, float range, collide::rq_target tgt, collide::ray_cache* cache, CObject* ignore_object)
+BOOL CObjectSpace::RayTest	( const Fvector &start, const Fvector &dir, float range, collide::rq_target tgt, collide::ray_cache* cache, IGameObject* ignore_object)
 {
 	lock.Enter		();
 	BOOL	_ret	= _RayTest(start,dir,range,tgt,cache,ignore_object);
@@ -29,7 +29,7 @@ BOOL CObjectSpace::RayTest	( const Fvector &start, const Fvector &dir, float ran
     lock.Leave		();
 	return			_ret;
 }
-BOOL CObjectSpace::_RayTest	( const Fvector &start, const Fvector &dir, float range, collide::rq_target tgt, collide::ray_cache* cache, CObject* ignore_object)
+BOOL CObjectSpace::_RayTest	( const Fvector &start, const Fvector &dir, float range, collide::rq_target tgt, collide::ray_cache* cache, IGameObject* ignore_object)
 {
 	VERIFY					(_abs(dir.magnitude()-1)<EPS);
 	r_temp.r_clear			();
@@ -46,7 +46,7 @@ BOOL CObjectSpace::_RayTest	( const Fvector &start, const Fvector &dir, float ra
 		for (u32 o_it=0; o_it<r_spatial.size(); o_it++)
 		{
 			ISpatial*	spatial			= r_spatial[o_it];
-			CObject*	collidable		= spatial->dcast_CObject	();
+            IGameObject*	collidable		= spatial->dcast_GameObject	();
 			if (collidable && (collidable!=ignore_object))	{
 				ECollisionFormType tp	= collidable->GetCForm()->Type();
 				if ((tgt&(rqtObject|rqtObstacle))&&(tp==cftObject)&&collidable->GetCForm()->_RayQuery(Q,r_temp))	return TRUE;
@@ -98,7 +98,7 @@ BOOL CObjectSpace::_RayTest	( const Fvector &start, const Fvector &dir, float ra
 //--------------------------------------------------------------------------------
 // RayPick
 //--------------------------------------------------------------------------------
-BOOL CObjectSpace::RayPick	( const Fvector &start, const Fvector &dir, float range, rq_target tgt, rq_result& R, CObject* ignore_object)
+BOOL CObjectSpace::RayPick	( const Fvector &start, const Fvector &dir, float range, rq_target tgt, rq_result& R, IGameObject* ignore_object)
 {
     lock.Enter		();
 	BOOL	_res	= _RayPick(start,dir,range,tgt,R,ignore_object);
@@ -106,7 +106,7 @@ BOOL CObjectSpace::RayPick	( const Fvector &start, const Fvector &dir, float ran
     lock.Leave		();
 	return	_res;
 }
-BOOL CObjectSpace::_RayPick	( const Fvector &start, const Fvector &dir, float range, rq_target tgt, rq_result& R, CObject* ignore_object)
+BOOL CObjectSpace::_RayPick	( const Fvector &start, const Fvector &dir, float range, rq_target tgt, rq_result& R, IGameObject* ignore_object)
 {
 	r_temp.r_clear			();
 	R.O		= 0; R.range = range; R.element = -1;
@@ -125,7 +125,7 @@ BOOL CObjectSpace::_RayPick	( const Fvector &start, const Fvector &dir, float ra
 		// Determine visibility for dynamic part of scene
 		for (u32 o_it=0; o_it<r_spatial.size(); o_it++){
 			ISpatial*	spatial			= r_spatial[o_it];
-			CObject*	collidable		= spatial->dcast_CObject();
+            IGameObject*	collidable		= spatial->dcast_GameObject();
 			if			(0==collidable)				continue;
 			if			(collidable==ignore_object)	continue;
 			ECollisionFormType tp		= collidable->GetCForm()->Type();
@@ -152,7 +152,7 @@ BOOL CObjectSpace::_RayPick	( const Fvector &start, const Fvector &dir, float ra
 //--------------------------------------------------------------------------------
 // RayQuery
 //--------------------------------------------------------------------------------
-BOOL CObjectSpace::RayQuery		(collide::rq_results& dest, const collide::ray_defs& R, collide::rq_callback* CB, LPVOID user_data, collide::test_callback* tb, CObject* ignore_object)
+BOOL CObjectSpace::RayQuery		(collide::rq_results& dest, const collide::ray_defs& R, collide::rq_callback* CB, LPVOID user_data, collide::test_callback* tb, IGameObject* ignore_object)
 {
     lock.Enter					();
 	BOOL						_res = _RayQuery2(dest,R,CB,user_data,tb,ignore_object);
@@ -160,7 +160,7 @@ BOOL CObjectSpace::RayQuery		(collide::rq_results& dest, const collide::ray_defs
     lock.Leave					();
 	return						(_res);
 }
-BOOL CObjectSpace::_RayQuery2	(collide::rq_results& r_dest, const collide::ray_defs& R, collide::rq_callback* CB, LPVOID user_data, collide::test_callback* tb, CObject* ignore_object)
+BOOL CObjectSpace::_RayQuery2	(collide::rq_results& r_dest, const collide::ray_defs& R, collide::rq_callback* CB, LPVOID user_data, collide::test_callback* tb, IGameObject* ignore_object)
 {
 	// initialize query
 	r_dest.r_clear		();
@@ -188,7 +188,7 @@ BOOL CObjectSpace::_RayQuery2	(collide::rq_results& r_dest, const collide::ray_d
 		// Traverse object database
 		g_SpatialSpace->q_ray	(r_spatial,0,d_flags,R.start,R.dir,R.range);
 		for (u32 o_it=0; o_it<r_spatial.size(); o_it++){
-			CObject*	collidable		= r_spatial[o_it]->dcast_CObject();
+            IGameObject*	collidable		= r_spatial[o_it]->dcast_GameObject();
 			if			(0==collidable)				continue;
 			if			(collidable==ignore_object)	continue;
 			ICollisionForm*	cform		= collidable->GetCForm();
@@ -212,7 +212,7 @@ BOOL CObjectSpace::_RayQuery2	(collide::rq_results& r_dest, const collide::ray_d
 	return r_dest.r_count();
 }
 
-BOOL CObjectSpace::_RayQuery3	(collide::rq_results& r_dest, const collide::ray_defs& R, collide::rq_callback* CB, LPVOID user_data, collide::test_callback* tb, CObject* ignore_object)
+BOOL CObjectSpace::_RayQuery3	(collide::rq_results& r_dest, const collide::ray_defs& R, collide::rq_callback* CB, LPVOID user_data, collide::test_callback* tb, IGameObject* ignore_object)
 {
 	// initialize query
 	r_dest.r_clear			();
@@ -255,7 +255,7 @@ BOOL CObjectSpace::_RayQuery3	(collide::rq_results& r_dest, const collide::ray_d
 			// Traverse object database
 			g_SpatialSpace->q_ray	(r_spatial,0,d_flags,d_rd.start,d_rd.dir,d_rd.range);
 			for (u32 o_it=0; o_it<r_spatial.size(); o_it++){
-				CObject*	collidable		= r_spatial[o_it]->dcast_CObject();
+                IGameObject*	collidable		= r_spatial[o_it]->dcast_GameObject();
 				if			(0==collidable)				continue;
 				if			(collidable==ignore_object)	continue;
 				ICollisionForm*	cform		= collidable->GetCForm();
@@ -289,7 +289,7 @@ BOOL CObjectSpace::_RayQuery3	(collide::rq_results& r_dest, const collide::ray_d
 	return r_dest.r_count()	;
 }
 
-BOOL CObjectSpace::_RayQuery	(collide::rq_results& r_dest, const collide::ray_defs& R, collide::rq_callback* CB, LPVOID user_data, collide::test_callback* tb, CObject* ignore_object)
+BOOL CObjectSpace::_RayQuery	(collide::rq_results& r_dest, const collide::ray_defs& R, collide::rq_callback* CB, LPVOID user_data, collide::test_callback* tb, IGameObject* ignore_object)
 {
 #ifdef DEBUG
 	if (R.range<EPS || !_valid(R.range))
@@ -342,7 +342,7 @@ BOOL CObjectSpace::_RayQuery	(collide::rq_results& r_dest, const collide::ray_de
 				g_SpatialSpace->q_ray		(r_spatial,0,d_flags,d_rd.start,d_rd.dir,d_rd.range);
 				// Determine visibility for dynamic part of scene
 				for (u32 o_it=0; o_it<r_spatial.size(); o_it++){
-					CObject*	collidable		= r_spatial[o_it]->dcast_CObject();
+                    IGameObject*	collidable		= r_spatial[o_it]->dcast_GameObject();
 					if			(0==collidable)				continue;
 					if			(collidable==ignore_object)	continue;
 					ICollisionForm*	cform		= collidable->GetCForm();

@@ -44,7 +44,7 @@ void ScheduledBase::shedule_Update(u32 dt)
     if (shedule.dbg_startframe == shedule.dbg_update_shedule)
     {
         LPCSTR name = "unknown";
-        CObject* O = dynamic_cast<CObject*> (this);
+        IGameObject* O = dynamic_cast<IGameObject*> (this);
         if (O) name = *O->cName();
         Debug.fatal(DEBUG_INFO, "'shedule_Update' called twice per frame for %s", name);
     }

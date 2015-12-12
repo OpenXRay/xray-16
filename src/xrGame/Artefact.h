@@ -3,7 +3,7 @@
 #include "hud_item_object.h"
 #include "hit_immunity.h"
 #include "xrPhysics/PHUpdateObject.h"
-#include "patrol_path.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path.h"
 
 class SArtefactActivation;
 struct SArtefactDetectorsSupport;

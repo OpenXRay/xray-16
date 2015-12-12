@@ -10,8 +10,8 @@
 
 #include "alife_spawn_registry_header.h"
 #include "xrServer_Objects_ALife_Monsters.h"
-#include "game_graph.h"
-#include "graph_abstract.h"
+#include "xrAICore/Navigation/game_graph.h"
+#include "xrAICore/Navigation/graph_abstract.h"
 #include "server_entity_wrapper.h"
 #include "ai_debug.h"
 

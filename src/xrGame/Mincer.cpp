@@ -65,7 +65,7 @@ void CMincer::net_Destroy()
 	inherited::net_Destroy();
 	m_telekinetics.clear_impacts();
 }
-void CMincer::feel_touch_new				(CObject* O)
+void CMincer::feel_touch_new				(IGameObject* O)
 {
 	
 	inherited::feel_touch_new(O);
@@ -75,7 +75,7 @@ void CMincer::feel_touch_new				(CObject* O)
 		Telekinesis().activate(GO, m_fThrowInImpulse, m_fTeleHeight, 100000);
 	}
 }
-bool	CMincer::feel_touch_contact				(CObject* O)
+bool	CMincer::feel_touch_contact				(IGameObject* O)
 {
 	return inherited::feel_touch_contact(O)&&smart_cast<CPhysicsShellHolder *>(O);
 }
@@ -88,7 +88,7 @@ bool CMincer::BlowoutState	()
 {
 	bool ret=inherited::BlowoutState	();
 
-	//xr_set<CObject*>::iterator it=m_inZone.begin(),e=m_inZone.end();
+	//xr_set<IGameObject*>::iterator it=m_inZone.begin(),e=m_inZone.end();
 	//for(;e!=it;++it)
 	//{
 	//	CEntityAlive * EA = smart_cast<CEntityAlive *>(*it);
@@ -122,7 +122,7 @@ void CMincer::NotificateDestroy			(CPHDestroyableNotificate *dn)
 	float impulse;
 	//if(!m_telekinetics.has_impacts()) return;
 
-	//CObject* obj=Level().Objects.net_Find(id);
+	//IGameObject* obj=Level().Objects.net_Find(id);
 	CPhysicsShellHolder* obj=dn->PPhysicsShellHolder();
 	m_telekinetics.draw_out_impact(dir,impulse);
 	CParticlesPlayer* PP = smart_cast<CParticlesPlayer*>(obj);

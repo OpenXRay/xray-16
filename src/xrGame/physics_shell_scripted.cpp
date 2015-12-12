@@ -123,7 +123,7 @@ SCRIPT_EXPORT(CPhysicsJoint, (),
 		.def("set_max_force_and_velocity",			&CPhysicsJoint::SetForceAndVelocity)
 		.def("get_max_force_and_velocity",			&CPhysicsJoint::GetMaxForceAndVelocity)
 		.def("get_axis_angle",						&CPhysicsJoint::GetAxisAngle)
-		.def("get_limits",							&CPhysicsJoint::GetLimits,out_value(_2) + out_value(_3))
+		.def("get_limits",							&CPhysicsJoint::GetLimits, policy_list<out_value<2>, out_value<3>>())
 		.def("get_axis_dir",						&CPhysicsJoint::GetAxisDirDynamic)
 		.def("get_anchor",							&CPhysicsJoint::GetAnchorDynamic)
 		.def("is_breakable",						&CPhysicsJoint::isBreakable)

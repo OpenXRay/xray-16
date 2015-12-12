@@ -539,7 +539,7 @@ void InventoryUtilities::SendInfoToLuaScripts(shared_str info)
 		funct( mode );
 	}
 }
-
+// XXX: interpolate color (enemy..neutral..friend)<->(red..gray..lime)
 u32 InventoryUtilities::GetGoodwillColor(CHARACTER_GOODWILL gw)
 {
 	u32 res = 0xffc0c0c0;

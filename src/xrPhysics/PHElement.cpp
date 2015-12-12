@@ -12,7 +12,7 @@
 
 #include "Include/xrRender/Kinematics.h"
 #include "Include/xrRender/KinematicsAnimated.h"
-#include "ode/src/util.h"
+#include "Externals/ode/ode/src/util.h"
 
 #ifdef DEBUG
 #	include "debug_output.h"
@@ -22,10 +22,7 @@
 ///////////////////////////////////////////////////////////////
 #pragma warning(disable:4995)
 #pragma warning(disable:4267)
-
-#include "ode/src/collision_kernel.h"
-
-
+#include "Externals/ode/ode/src/collision_kernel.h"
 #pragma warning(default:4267)
 #pragma warning(default:4995)
 ///////////////////////////////////////////////////////////////////

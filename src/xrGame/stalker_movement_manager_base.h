@@ -50,7 +50,7 @@ public:
 	virtual void	on_travel_point_change			(const u32 &previous_travel_point_index);
 	virtual	void	on_restrictions_change			();
 	virtual	void	set_level_dest_vertex			(u32 const& level_vertex_id);
-	virtual	void	remove_links					(CObject *object);
+	virtual	void	remove_links					(IGameObject *object);
 			void	initialize						();
 	IC		float	path_direction_angle			();
 	IC		bool	turn_in_place					() const;

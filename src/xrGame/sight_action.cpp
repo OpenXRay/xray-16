@@ -10,7 +10,7 @@
 #include "sight_action.h"
 #include "ai/stalker/ai_stalker.h"
 #include "sight_manager.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "inventory.h"
 
@@ -88,7 +88,7 @@ void CSightAction::execute						()
 	}
 }
 
-void CSightAction::remove_links					(CObject *object)
+void CSightAction::remove_links					(IGameObject *object)
 {
 	if (!m_object_to_look)
 		return;
@@ -329,10 +329,10 @@ void CSightAction::predict_object_position		( bool use_exact_position )
 
 	u32 const count			= m_object_to_look->ps_Size();
 	if ( count > 1 ) {
-		CObject::SavedPosition const current_position = m_object_to_look->ps_Element( count - 1 );
+        GameObjectSavedPosition const current_position = m_object_to_look->ps_Element( count - 1 );
 		VERIFY					( Device.dwTimeGlobal >= current_position.dwTime );
 
-		CObject::SavedPosition previous_position = m_object_to_look->ps_Element( count - 2 );
+        GameObjectSavedPosition previous_position = m_object_to_look->ps_Element( count - 2 );
 		for (int i=3; (current_position.dwTime == previous_position.dwTime) && (i<=(int)count); ++i)
 			previous_position	= m_object_to_look->ps_Element( count - i );
 

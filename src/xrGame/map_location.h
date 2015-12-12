@@ -2,7 +2,7 @@
 #pragma once
 #include "Common/object_interfaces.h"
 #include "alife_space.h"
-#include "game_graph_space.h"
+#include "xrAICore/Navigation/game_graph_space.h"
 
 class CMapSpot;
 class CMiniMapSpot;

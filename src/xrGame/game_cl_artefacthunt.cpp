@@ -4,7 +4,7 @@
 #include "Level.h"
 #include "UIGameAHunt.h"
 #include "map_manager.h"
-#include "LevelGameDef.h"
+#include "Common/LevelGameDef.h"
 #include "hit.h"
 #include "PHDestroyable.h"
 #include "actor.h"
@@ -273,7 +273,7 @@ void game_cl_ArtefactHunt::TranslateGameMessage	(u32 msg, NET_Packet& P)
 				Color_Main, *st.translate("mp_art_destroyed"));
 			u16 ArtefactID = P.r_u16();
 			//-------------------------------------------
-			CObject* pObj = Level().Objects.net_Find(ArtefactID);
+			IGameObject* pObj = Level().Objects.net_Find(ArtefactID);
 			if (pObj && xr_strlen(m_Eff_Af_Disappear))
 				PlayParticleEffect(m_Eff_Af_Disappear.c_str(), pObj->Position());
 			//-------------------------------------------
@@ -318,14 +318,14 @@ void game_cl_ArtefactHunt::GetMapEntities(xr_vector<SZoneMapEntityData>& dst)
 	s16 local_team						=		local_player->team;
 
 
-	CObject* pObject = Level().Objects.net_Find(artefactID);
+	IGameObject* pObject = Level().Objects.net_Find(artefactID);
 	if(!pObject)
 		return;
 
 	CArtefact* pArtefact = smart_cast<CArtefact*>(pObject);
 	VERIFY(pArtefact);
 
-	CObject* pParent = pArtefact->H_Parent();
+	IGameObject* pParent = pArtefact->H_Parent();
 	if(!pParent){// Artefact alone
 		D.color	= color_artefact;
 		D.pos	= pArtefact->Position();
@@ -334,7 +334,7 @@ void game_cl_ArtefactHunt::GetMapEntities(xr_vector<SZoneMapEntityData>& dst)
 	};
 
 	if (pParent && pParent->ID() == artefactBearerID && GetPlayerByGameID(artefactBearerID)){
-		CObject* pBearer = Level().Objects.net_Find(artefactBearerID);
+		IGameObject* pBearer = Level().Objects.net_Find(artefactBearerID);
 		VERIFY(pBearer);
 		D.pos	= pBearer->Position();
 
@@ -698,7 +698,7 @@ bool game_cl_ArtefactHunt::NeedToSendReady_Spectator(int key, game_PlayerState* 
 	return res;
 }
 
-void game_cl_ArtefactHunt::OnSpawn(CObject* pObj)
+void game_cl_ArtefactHunt::OnSpawn(IGameObject* pObj)
 {
 	inherited::OnSpawn(pObj);
 	if (!pObj) return;
@@ -710,7 +710,7 @@ void game_cl_ArtefactHunt::OnSpawn(CObject* pObj)
 	};	
 }
 
-void game_cl_ArtefactHunt::OnDestroy(CObject* pObj)
+void game_cl_ArtefactHunt::OnDestroy(IGameObject* pObj)
 {	
 	inherited::OnDestroy(pObj);
 	if (!pObj) return;
@@ -738,7 +738,7 @@ void game_cl_ArtefactHunt::LoadSndMessages()
 
 void	game_cl_ArtefactHunt::OnBuySpawnMenu_Ok		()
 {
-	CObject* curr = Level().CurrentEntity();
+	IGameObject* curr = Level().CurrentEntity();
 	if (!curr) return;
 	CGameObject* GO = smart_cast<CGameObject*>(curr);
 	NET_Packet			P;

@@ -160,3 +160,4 @@
 #define ID_SPOT  LWID_('S','P','O','T')
 
 #endif
+

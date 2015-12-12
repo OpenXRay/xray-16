@@ -6,15 +6,15 @@
 #include "Level.h"
 #include "xrEngine/xr_object.h"
 #include "ai_space.h"
-#include "game_graph.h"
+#include "xrAICore/Navigation/game_graph.h"
 #include "xrServer.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "ui/UIXmlInit.h"
 #include "ui/UIMap.h"
 #include "alife_simulator.h"
-#include "graph_engine.h"
+#include "xrAICore/Navigation/graph_engine.h"
 #include "actor.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "alife_object_registry.h"
 #include "relation_registry.h"
 #include "InventoryOwner.h"
@@ -237,7 +237,7 @@ void CMapLocation::CalcPosition()
 		return;
 	}
 
-	CObject* pObject =  Level().Objects.net_Find(m_objectID);
+	IGameObject* pObject =  Level().Objects.net_Find(m_objectID);
 	if(!pObject)
 	{
 		if(m_owner_se_object)
@@ -260,7 +260,7 @@ const Fvector2& CMapLocation::CalcDirection()
 		m_cached.m_Direction.set(Device.vCameraDirection.x,Device.vCameraDirection.z);
 	}else
 	{
-		CObject* pObject =  Level().Objects.net_Find(m_objectID);
+		IGameObject* pObject =  Level().Objects.net_Find(m_objectID);
 		if(!pObject)
 			m_cached.m_Direction.set(0.0f, 0.0f);
 		else{
@@ -270,7 +270,7 @@ const Fvector2& CMapLocation::CalcDirection()
 	}
 
 	if(m_flags.test(ePosToActor)){
-		CObject* pObject =  Level().Objects.net_Find(m_objectID);
+		IGameObject* pObject =  Level().Objects.net_Find(m_objectID);
 		if(pObject){
 			Fvector2 dcp,obj_pos;
 			dcp.set(Device.vCameraPosition.x, Device.vCameraPosition.z);
@@ -312,7 +312,7 @@ bool CMapLocation::Update() //returns actual
 		}
 	}
 
-	CObject* pObject					= Level().Objects.net_Find(m_objectID);
+	IGameObject* pObject					= Level().Objects.net_Find(m_objectID);
 	
 	if (m_owner_se_object || (!IsGameTypeSingle() && pObject) )
 	{
@@ -771,7 +771,7 @@ bool CRelationMapLocation::Update()
 	bool vis_res = true;
 	if(m_last_relation==ALife::eRelationTypeEnemy || m_last_relation==ALife::eRelationTypeWorstEnemy)
 	{
-		CObject* _object_ = Level().Objects.net_Find(m_objectID);
+		IGameObject* _object_ = Level().Objects.net_Find(m_objectID);
 		if(_object_)
 		{
 			CEntityAlive* ea = smart_cast<CEntityAlive*>(_object_);
@@ -799,7 +799,7 @@ bool CRelationMapLocation::Update()
 
 	if(bAlive==false)
 	{
-		CObject* _object_ = Level().Objects.net_Find(m_objectID);
+		IGameObject* _object_ = Level().Objects.net_Find(m_objectID);
 		if(_object_)
 		{
 			const CGameObject* pObj = smart_cast<const CGameObject*>(_object_);

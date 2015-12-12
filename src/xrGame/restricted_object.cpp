@@ -12,14 +12,14 @@
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "Level.h"
 #include "ai_space.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "space_restriction.h"
 #include "space_restriction_bridge.h"
 #include "space_restriction_base.h"
-#include "profiler.h"
+#include "xrEngine/profiler.h"
 #include "alife_simulator.h"
 #include "alife_object_registry.h"
-#include "game_graph.h"
+#include "xrAICore/Navigation/game_graph.h"
 #include "custommonster.h"
 
 CRestrictedObject::~CRestrictedObject		()
@@ -269,7 +269,7 @@ IC	void CRestrictedObject::construct_restriction_string(LPSTR temp_restrictions,
 	xr_vector<ALife::_OBJECT_ID>::const_iterator	I = restrictions.begin();
 	xr_vector<ALife::_OBJECT_ID>::const_iterator	E = restrictions.end();
 	for ( ; I != E; ++I) {
-		CObject					*object = Level().Objects.net_Find(*I);
+		IGameObject					*object = Level().Objects.net_Find(*I);
 		if (!object || !!strstr(*current_restrictions,*object->cName()) == value)
 			continue;
 

@@ -53,14 +53,14 @@ public:
 	virtual	void				reinit						();
 	virtual	void				reload						(LPCSTR section);
 	virtual	void				update						(float time_delta);
-			void				remove_links				(CObject *object);
+			void				remove_links				(IGameObject *object);
 	virtual void				on_restrictions_change		();
 
 public:
-			void				enable						(const CObject *object, bool enable);
-			CMemoryInfo			memory						(const CObject *object) const;
-			u32					memory_time					(const CObject *object) const;
-			Fvector				memory_position				(const CObject *object) const;
+			void				enable						(const IGameObject *object, bool enable);
+			CMemoryInfo			memory						(const IGameObject *object) const;
+			u32					memory_time					(const IGameObject *object) const;
+			Fvector				memory_position				(const IGameObject *object) const;
 			void				make_object_visible_somewhen(const CEntityAlive *enemy);
 
 public:
@@ -82,7 +82,7 @@ public:
 public:
 			void				save						(NET_Packet &packet) const;
 			void				load						(IReader &packet);
-			void xr_stdcall		on_requested_spawn			(CObject *object);
+			void xr_stdcall		on_requested_spawn			(IGameObject *object);
 };
 
 #include "memory_manager_inline.h"

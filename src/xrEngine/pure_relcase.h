@@ -7,7 +7,7 @@ private:
     int m_ID;
 public:
     template <typename class_type>
-    pure_relcase(void (xr_stdcall class_type::* function_to_bind)(CObject*))
+    pure_relcase(void (xr_stdcall class_type::* function_to_bind)(IGameObject*))
     {
         R_ASSERT(g_pGameLevel);
         class_type* self = static_cast<class_type*>(this);

@@ -17,6 +17,7 @@ class IUIRender;
 class CGameMtlLibrary;
 class CRender;
 class CScriptEngine;
+class AISpaceBase;
 
 class XRAPI_API EngineGlobalEnvironment
 {
@@ -33,6 +34,8 @@ public:
 #endif
     IRenderFactory* RenderFactory;
     CScriptEngine* ScriptEngine;
+    AISpaceBase *AISpace;
 };
 
-extern XRAPI_API EngineGlobalEnvironment GlobalEnv;
+extern XRAPI_API EngineGlobalEnvironment GlobalEnv; // XXX: rename to GEnv
+extern XRAPI_API bool g_dedicated_server; // XXX: move to EngineGlobalEnvironment

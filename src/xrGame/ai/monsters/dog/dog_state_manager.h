@@ -11,5 +11,5 @@ public:
 					CStateManagerDog	(CAI_Dog *monster); 
 	virtual void	execute				();
 			bool	check_eat			();
-	virtual void	remove_links		(CObject* object) { inherited::remove_links(object);}
+	virtual void	remove_links		(IGameObject* object) { inherited::remove_links(object);}
 };

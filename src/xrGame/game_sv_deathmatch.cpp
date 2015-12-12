@@ -436,7 +436,7 @@ void	game_sv_Deathmatch::Update()
 
 				if(GameDM)
 				{
-					CObject* pObject				= Level().CurrentViewEntity();
+					IGameObject* pObject				= Level().CurrentViewEntity();
 					if (pObject && smart_cast<CActor*>(pObject))
 					{
 						string1024					Text;
@@ -575,7 +575,7 @@ void	game_sv_Deathmatch::SM_SwitchOnNextActivePlayer()
 	m_server->ForEachClientDo(tmp_functor);
 
 	
-	CObject* pNewObject				= NULL;
+	IGameObject* pNewObject				= NULL;
 	if (!tmp_functor.PPlayersCount)
 	{
 		xrClientData*	C			= (xrClientData*) m_server->GetServerClient();
@@ -596,14 +596,14 @@ void	game_sv_Deathmatch::SM_SwitchOnNextActivePlayer()
 
 #include "WeaponHUD.h"
 
-void game_sv_Deathmatch::net_Relcase(CObject* O)
+void game_sv_Deathmatch::net_Relcase(IGameObject* O)
 {
 	if(m_pSM_CurViewEntity==O)
 		m_pSM_CurViewEntity = NULL;
 	
 }
 
-void	game_sv_Deathmatch::SM_SwitchOnPlayer(CObject* pNewObject)
+void	game_sv_Deathmatch::SM_SwitchOnPlayer(IGameObject* pNewObject)
 {
 	if (!pNewObject)					return;
 

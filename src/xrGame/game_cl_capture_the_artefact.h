@@ -101,7 +101,7 @@ public:
 	virtual bool OnKeyboardPress(int key);
 	virtual	bool OnKeyboardRelease(int key);
 	
-	virtual	void OnSpawn(CObject* pObj);
+	virtual	void OnSpawn(IGameObject* pObj);
 	virtual	BOOL CanCallBuyMenu();
 	virtual BOOL CanCallSkinMenu() {return TRUE;};
 	virtual BOOL CanCallTeamSelectMenu();

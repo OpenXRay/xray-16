@@ -9,8 +9,8 @@
 #pragma once
 
 #include "ai_monster_space.h"
-#include "graph_engine_space.h"
-#include "game_graph_space.h"
+#include "xrAICore/Navigation/graph_engine_space.h"
+#include "xrAICore/Navigation/game_graph_space.h"
 #include <boost/noncopyable.hpp>
 
 namespace MovementManager {
@@ -142,7 +142,7 @@ private:
 	};
 
 protected:
-	typedef xr_vector<CObject*>	NEAREST_OBJECTS;
+	typedef xr_vector<IGameObject*>	NEAREST_OBJECTS;
 
 protected:
 	NEAREST_OBJECTS			m_nearest_objects;

@@ -199,7 +199,7 @@ void CAgentLocationManager::update	()
 	remove_old_danger_covers	();
 }
 
-void CAgentLocationManager::remove_links(CObject *object)
+void CAgentLocationManager::remove_links(IGameObject *object)
 {
 	m_danger_locations.erase	(
 		std::remove_if(	

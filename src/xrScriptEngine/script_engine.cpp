@@ -17,6 +17,7 @@
 #endif
 #include "Include/xrAPI/xrAPI.h"
 #include "ScriptExporter.hpp"
+#include "BindingsDumper.hpp"
 #ifdef USE_DEBUGGER
 #include "script_debugger.hpp"
 #endif
@@ -110,8 +111,7 @@ static void *lua_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
 
 #endif // PURE_ALLOC
 
-static void *__cdecl luabind_allocator(luabind::memory_allocation_function_parameter,
-    const void *pointer, size_t const size)
+static void *__cdecl luabind_allocator(void *context, const void *pointer, size_t const size)
 {
     if (!size)
     {
@@ -252,36 +252,6 @@ void CScriptEngine::reinit()
         return;
     }
     RegisterState(m_virtual_machine, this);
-    // initialize lua standard library functions 
-    struct luajit
-    {
-        static void open_lib(lua_State *L, pcstr module_name, lua_CFunction function)
-        {
-            lua_pushcfunction(L, function);
-            lua_pushstring(L, module_name);
-            lua_call(L, 1, 0);
-        }
-    };
-
-    luajit::open_lib(lua(), "", luaopen_base);
-    luajit::open_lib(lua(), LUA_LOADLIBNAME, luaopen_package);
-    luajit::open_lib(lua(), LUA_TABLIBNAME, luaopen_table);
-    luajit::open_lib(lua(), LUA_IOLIBNAME, luaopen_io);
-    luajit::open_lib(lua(), LUA_OSLIBNAME, luaopen_os);
-    luajit::open_lib(lua(), LUA_MATHLIBNAME, luaopen_math);
-    luajit::open_lib(lua(), LUA_STRLIBNAME, luaopen_string);
-#ifdef DEBUG
-    luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
-#endif
-    if (!strstr(Core.Params, "-nojit"))
-    {
-        luajit::open_lib(lua(), LUA_JITLIBNAME, luaopen_jit);
-#ifndef DEBUG
-        put_function(lua(), opt_lua_binary, sizeof(opt_lua_binary), "jit.opt");
-        put_function(lua(), opt_inline_lua_binary, sizeof(opt_lua_binary), "jit.opt_inline");
-        dojitopt(lua(), "2");
-#endif
-    }
     if (strstr(Core.Params, "-_g"))
         file_header = file_header_new;
     else
@@ -643,16 +613,16 @@ luabind::object CScriptEngine::name_space(LPCSTR namespace_name)
     string256 S1;
     xr_strcpy(S1, namespace_name);
     LPSTR S = S1;
-    luabind::object lua_namespace = luabind::get_globals(lua());
+    luabind::object lua_namespace = luabind::globals(lua());
     for (;;)
     {
         if (!xr_strlen(S))
             return lua_namespace;
         LPSTR I = strchr(S, '.');
         if (!I)
-            return lua_namespace[S];
+            return lua_namespace[(const char*)S];
         *I = 0;
-        lua_namespace = lua_namespace[S];
+        lua_namespace = lua_namespace[(const char*)S];
         S = I + 1;
     }
 }
@@ -870,7 +840,7 @@ void CScriptEngine::disconnect_from_debugger()
 CScriptEngine::CScriptEngine()
 {
     luabind::allocator = &luabind_allocator;
-    luabind::allocator_parameter = nullptr;
+    luabind::allocator_context = nullptr;
     m_current_thread = nullptr;
 #ifdef DEBUG
     m_stack_is_ready = false;
@@ -945,12 +915,13 @@ int CScriptEngine::lua_pcall_failed(lua_State *L)
         lua_pop (L, 1);
     return LUA_ERRRUN;
 }
-
+#if !XRAY_EXCEPTIONS
 void CScriptEngine::lua_cast_failed(lua_State *L, LUABIND_TYPE_INFO info)
 {
     print_output(L, "", LUA_ERRRUN);
     Debug.fatal(DEBUG_INFO, "LUA error: cannot cast lua value to %s", info->name());
 }
+#endif
 
 void CScriptEngine::setup_callbacks()
 {
@@ -970,7 +941,10 @@ void CScriptEngine::setup_callbacks()
         luabind::set_error_callback(CScriptEngine::lua_error);
 #endif
 #ifndef MASTER_GOLD
-        luabind::set_pcall_callback(CScriptEngine::lua_pcall_failed);
+        luabind::set_pcall_callback([](lua_State *L)
+        {
+            lua_pushcfunction(L, CScriptEngine::lua_pcall_failed);
+        });
 #endif
     }
 #if !XRAY_EXCEPTIONS 
@@ -1029,6 +1003,57 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
         m_lua_studio_world->remove(lua());
 #endif
     reinit();
+    luabind::open(lua());
+    // XXX: temporary workaround to preserve backwards compatibility with game scripts
+    luabind::disable_super_deprecation();
+    setup_callbacks();
+    if (exporterFunc)
+        exporterFunc(lua());
+    if (std::strstr(Core.Params, "-dump_bindings") && !bindingsDumped)
+    {
+        bindingsDumped = true;
+        static int dumpId = 1;
+        string_path filePath;
+        xr_sprintf(filePath, "ScriptBindings_%d.txt", dumpId++);
+        FS.update_path(filePath, "$app_data_root$", filePath);
+        IWriter *writer = FS.w_open(filePath);
+        BindingsDumper dumper;
+        BindingsDumper::Options options = {};
+        options.ShiftWidth = 4;
+        options.IgnoreDerived = true;
+        options.StripThis = true;
+        dumper.Dump(lua(), writer, options);
+        FS.w_close(writer);
+    }
+    // initialize lua standard library functions 
+    struct luajit
+    {
+        static void open_lib(lua_State *L, pcstr module_name, lua_CFunction function)
+        {
+            lua_pushcfunction(L, function);
+            lua_pushstring(L, module_name);
+            lua_call(L, 1, 0);
+        }
+    };
+    luajit::open_lib(lua(), "", luaopen_base);
+    luajit::open_lib(lua(), LUA_LOADLIBNAME, luaopen_package);
+    luajit::open_lib(lua(), LUA_TABLIBNAME, luaopen_table);
+    luajit::open_lib(lua(), LUA_IOLIBNAME, luaopen_io);
+    luajit::open_lib(lua(), LUA_OSLIBNAME, luaopen_os);
+    luajit::open_lib(lua(), LUA_MATHLIBNAME, luaopen_math);
+    luajit::open_lib(lua(), LUA_STRLIBNAME, luaopen_string);
+#ifdef DEBUG
+    luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
+#endif
+    if (!strstr(Core.Params, "-nojit"))
+    {
+        luajit::open_lib(lua(), LUA_JITLIBNAME, luaopen_jit);
+#ifndef DEBUG
+        put_function(lua(), opt_lua_binary, sizeof(opt_lua_binary), "jit.opt");
+        put_function(lua(), opt_inline_lua_binary, sizeof(opt_lua_binary), "jit.opt_inline");
+        dojitopt(lua(), "2");
+#endif
+    }
 #ifdef USE_LUA_STUDIO
     if (m_lua_studio_world || strstr(Core.Params, "-lua_studio"))
     {
@@ -1042,10 +1067,6 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
         }
     }
 #endif
-    luabind::open(lua());
-    setup_callbacks();
-    if (exporterFunc)
-        exporterFunc(lua());
     setup_auto_load();
 #ifdef DEBUG
     m_stack_is_ready = true;
@@ -1162,6 +1183,37 @@ bool CScriptEngine::function_object(LPCSTR function_to_call, luabind::object &ob
     return true;
 }
 
+void CScriptEngine::add_script_process(const ScriptProcessor &process_id, CScriptProcess *script_process)
+{
+    VERIFY(m_script_processes.find(process_id)==m_script_processes.end());
+    m_script_processes.insert(std::make_pair(process_id, script_process));
+}
+
+CScriptProcess *CScriptEngine::script_process(const ScriptProcessor &process_id) const
+{
+    auto it = m_script_processes.find(process_id);
+    if (it!=m_script_processes.end())
+        return it->second;
+    return nullptr;
+}
+
+void CScriptEngine::parse_script_namespace(const char *name, char *ns, u32 nsSize, char *func, u32 funcSize)
+{
+    auto p = strrchr(name, '.');
+    if (!p)
+    {
+        xr_strcpy(ns, nsSize, GlobalNamespace);
+        p = name-1;
+    }
+    else
+    {
+        VERIFY(p-name+1<=nsSize);
+        strncpy(ns, name, p-name);
+        ns[p-name] = 0;
+    }
+    xr_strcpy(func, funcSize, p+1);
+}
+
 #if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
 void CScriptEngine::stopDebugger()
 {
@@ -1275,22 +1327,6 @@ void CScriptEngine::on_error(lua_State *state)
 
 #ifdef DEBUG
 
-static xr_string to_string(luabind::object const &o)
-{
-    using namespace luabind;
-    if (o.type()==LUA_TSTRING)
-        return object_cast<luabind::internal_string>(o).c_str();
-    lua_State *L = o.lua_state();
-    LUABIND_CHECK_STACK(L);
-    if (o.type()==LUA_TNUMBER)
-    {
-        char buffer[_CVTBUFSIZE ];
-        _gcvt_s(buffer, object_cast<float>(o), 16);
-        return buffer;
-    }
-    return xr_string("<")+lua_typename(L, o.type())+">";
-}
-
 static void strreplaceall(xr_string &str, LPCSTR what, LPCSTR to)
 {
     LPCSTR A;
@@ -1298,242 +1334,6 @@ static void strreplaceall(xr_string &str, LPCSTR what, LPCSTR to)
     while (A = strstr(str.c_str(), what), A)
         str.replace(A-str.c_str(), S_len, to);
 }
-
-static xr_string &process_signature(xr_string &str)
-{
-    strreplaceall(str, "custom [", "");
-    strreplaceall(str, "]", "");
-    strreplaceall(str, "float", "number");
-    strreplaceall(str, "lua_State*, ", "");
-    strreplaceall(str, " ,lua_State*", "");
-    return str;
-}
-
-static xr_string member_to_string(luabind::object const &e, LPCSTR function_signature)
-{
-#ifndef LUABIND_NO_ERROR_CHECKING
-    using namespace luabind::detail;
-    lua_State *L = e.lua_state();
-    LUABIND_CHECK_STACK(L);
-    if (e.type() == LUA_TFUNCTION)
-    {
-        e.pushvalue();
-        stack_pop p(L, 1);
-        {
-            if (!lua_getupvalue(L, -1, 3))
-                return to_string(e);
-            stack_pop p2(L, 1);
-            if (lua_touserdata(L, -1)!=reinterpret_cast<void*>(0x1337))
-                return to_string(e);
-        }
-        // #ifdef BOOST_NO_STRINGSTREAM
-        //      std::strstream s;
-        // #else
-        //      std::stringstream s;
-        // #endif
-        xr_string s = "";
-        {
-            lua_getupvalue(L, -1, 2);
-            stack_pop p2(L, 1);
-        }
-        {
-            lua_getupvalue(L, -1, 1);
-            stack_pop p2(L, 1);
-            method_rep *m = static_cast<method_rep*>(lua_touserdata(L, -1));
-            for (auto i = m->overloads().begin(); i != m->overloads().end(); ++i)
-            {
-                luabind::internal_string str;
-                i->get_signature(L, str);
-                if (i != m->overloads().begin())
-                    s += "\n";
-                xr_string xr_str(str.c_str());
-                s += function_signature + process_signature(xr_str) + ";";
-            }
-        }
-#ifdef BOOST_NO_STRINGSTREAM
-        s += "\n";// std::ends;
-#endif
-        return s;
-    }
-    return to_string(e);
-#else
-    return "";
-#endif
-}
-
-static void print_class(lua_State *L, luabind::detail::class_rep *crep)
-{
-    using namespace luabind::detail;
-    xr_string S;
-    // print class and bases
-    {
-        S = crep->get_class_type()!=class_rep::cpp_class ? "LUA class " : "C++ class ";
-        S.append(crep->name());
-        typedef luabind::internal_vector<class_rep::base_info> BASES;
-        const BASES &bases = crep->bases();
-        BASES::const_iterator I = bases.begin(), B = I;
-        BASES::const_iterator E = bases.end();
-        if (B!=E)
-            S.append(" : ");
-        for (; I!=E; ++I)
-        {
-            if (I!=B)
-                S.append(",");
-            S.append((*I).base->name());
-        }
-        Msg("%s {", S.c_str());
-    }
-    // print class constants
-    {
-        const class_rep::STATIC_CONSTANTS &constants = crep->static_constants();
-        for (auto &c : constants)
-#ifndef USE_NATIVE_LUA_STRINGS
-            Msg("    const %s = %d;", c.first, c.second);
-#else
-            Msg("    const %s = %d;", getstr(c.first.m_object), c.second);
-#endif
-        if (!constants.empty())
-            Msg("    ");
-    }
-    // print class properties
-    {
-#ifndef USE_NATIVE_LUA_STRINGS
-        typedef luabind::internal_map<const char*, class_rep::callback, ltstr> PROPERTIES;
-#else
-        typedef class_rep::callback_map PROPERTIES;
-#endif
-        const PROPERTIES &properties = crep->properties();
-        for (auto &p : properties)
-#ifndef USE_NATIVE_LUA_STRINGS
-            Msg("    property %s;", p.first);
-#else
-            Msg("    property %s;", getstr(p.first.m_object));
-#endif
-        if (!properties.empty())
-            Msg("    ");
-    }
-    // print class constructors
-    {
-        typedef luabind::internal_vector<construct_rep::overload_t> Constructors;
-        const Constructors &constructors = crep->constructors().overloads;
-        for (auto &ctor : constructors)
-        {
-            luabind::internal_string luaStr;
-            ctor.get_signature(L, luaStr);
-            xr_string str(luaStr.c_str());
-            strreplaceall(str, "custom [", "");
-            strreplaceall(str, "]", "");
-            strreplaceall(str, "float", "number");
-            strreplaceall(str, "lua_State*, ", "");
-            strreplaceall(str, " ,lua_State*", "");
-            Msg("    %s %s;", crep->name(), str.c_str());
-        }
-        if (!constructors.empty())
-            Msg("    ");
-    }
-    // print class methods
-    {
-        crep->get_table(L);
-        luabind::object table(L);
-        table.set();
-        for (auto &obj : table) // XXX: conversion from proxy_object to proxy_object &
-        {
-            xr_string str = "    function ";
-            str.append(to_string(obj).c_str());
-            strreplaceall(S, "function __add", "operator +");
-            strreplaceall(S, "function __sub", "operator -");
-            strreplaceall(S, "function __mul", "operator *");
-            strreplaceall(S, "function __div", "operator /");
-            strreplaceall(S, "function __pow", "operator ^");
-            strreplaceall(S, "function __lt", "operator <");
-            strreplaceall(S, "function __le", "operator <=");
-            strreplaceall(S, "function __gt", "operator >");
-            strreplaceall(S, "function __ge", "operator >=");
-            strreplaceall(S, "function __eq", "operator ==");
-            Msg("%s", member_to_string(obj, str.c_str()).c_str());
-        }
-    }
-    Msg("};\n");
-}
-
-static void print_free_functions(lua_State *L, const luabind::object &object, LPCSTR header, const xr_string &indent)
-{
-    using namespace luabind::detail::free_functions;
-    u32 count = 0;
-    for (auto &proxy : object) // XXX: conversion from proxy_object to proxy_object &
-    {
-        if (proxy.type() != LUA_TFUNCTION)
-            continue;
-        proxy.pushvalue();
-        if (lua_iscfunction(L, -1) && lua_getupvalue(L, -1, 2))
-        {
-            // check the magic number that identifies luabind's functions
-            if (lua_touserdata(L, -1)==(void*)0x1337 && lua_getupvalue(L, -2, 1))
-            {
-                if (!count)
-                    Msg("\n%snamespace %s {", indent.c_str(), header);
-                count++;
-                auto rep = static_cast<function_rep*>(lua_touserdata(L, -1));
-                for (auto &overload : rep->overloads())
-                {
-                    luabind::internal_string luaStr;
-                    overload.get_signature(L, luaStr);
-                    xr_string str(luaStr.c_str());
-                    Msg("    %sfunction %s%s;", indent.c_str(), rep->name(), process_signature(str).c_str());
-                }
-                lua_pop(L, 1);
-            }
-            lua_pop(L, 1);
-        }
-        lua_pop(L, 1);
-    }
-    {
-        xr_string _indent = indent;
-        _indent.append("    ");
-        object.pushvalue();
-        lua_pushnil(L);
-        while (lua_next(L, -2))
-        {
-            if (lua_type(L, -1)==LUA_TTABLE)
-            {
-                LPCSTR S = lua_tostring(L, -2);
-                if (xr_strcmp("_G", S) && xr_strcmp("package", S))
-                {
-                    luabind::object obj(L);
-                    obj.set();
-                    if (!xr_strcmp("security", S)) // XXX: why?
-                        S = S;
-                    print_free_functions(L, obj, S, _indent);
-                }
-            }
-#pragma todo("Dima to Dima : Remove this hack if find out why")
-            if (lua_isnumber(L, -2))
-            {
-                lua_pop(L, 1);
-                lua_pop(L, 1);
-                break;
-            }
-            lua_pop(L, 1);
-        }
-    }
-    if (count)
-        Msg("%s};", indent.c_str());
-}
-
-void CScriptEngine::PrintHelp()
-{
-    Msg("\nList of the classes exported to LUA\n");
-    luabind::detail::class_registry::get_registry(lua())->iterate_classes(lua(), &print_class);
-    Msg("End of list of the classes exported to LUA\n");
-    Msg("\nList of the namespaces exported to LUA\n");
-    print_free_functions(lua(), luabind::get_globals(lua()), "", "");
-    Msg("End of list of the namespaces exported to LUA\n");
-}
-
-#else
-
-void CScriptEngine::PrintHelp()
-{ Msg("! Release build doesn't support lua-help :("); }
 
 #endif
 

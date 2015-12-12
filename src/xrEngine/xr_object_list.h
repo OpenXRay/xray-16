@@ -1,8 +1,11 @@
 #ifndef __XR_OBJECT_LIST_H__
 #define __XR_OBJECT_LIST_H__
 
-// refs
-class ENGINE_API CObject;
+#ifdef DEBUG
+extern ENGINE_API BOOL debug_destroy;
+#endif
+
+class IGameObject;
 class NET_Packet;
 
 class ENGINE_API CObjectList
@@ -30,8 +33,8 @@ public:
         { Update.FrameEnd(); }
     };
 private:
-    CObject* map_NETID[0xffff];
-    typedef xr_vector<CObject*> Objects;
+    IGameObject* map_NETID[0xffff];
+    typedef xr_vector<IGameObject*> Objects;
     Objects destroy_queue;
     Objects objects_active;
     Objects objects_sleeping;
@@ -41,7 +44,7 @@ private:
     u32 statsFrame;
 
 public:
-    typedef fastdelegate::FastDelegate1<CObject*> RELCASE_CALLBACK;
+    typedef fastdelegate::FastDelegate1<IGameObject*> RELCASE_CALLBACK;
     struct SRelcasePair
     {
         int* m_ID;
@@ -66,27 +69,27 @@ public:
     CObjectList();
     ~CObjectList();
 
-    CObject* FindObjectByName(shared_str name);
-    CObject* FindObjectByName(LPCSTR name);
-    CObject* FindObjectByCLS_ID(CLASS_ID cls);
+    IGameObject* FindObjectByName(shared_str name);
+    IGameObject* FindObjectByName(LPCSTR name);
+    IGameObject* FindObjectByCLS_ID(CLASS_ID cls);
 
     void Load();
     void Unload();
 
-    CObject* Create(LPCSTR name);
-    void Destroy(CObject* O);
+    IGameObject* Create(LPCSTR name);
+    void Destroy(IGameObject* O);
 private:
-    void SingleUpdate(CObject* O);
+    void SingleUpdate(IGameObject* O);
 public:
     void Update(bool bForce);
 
-    void net_Register(CObject* O);
-    void net_Unregister(CObject* O);
+    void net_Register(IGameObject* O);
+    void net_Unregister(IGameObject* O);
 
     u32 net_Export(NET_Packet* P, u32 _start, u32 _count); // return next start
     void net_Import(NET_Packet* P);
 
-    ICF CObject* net_Find(u16 ID) const
+    ICF IGameObject* net_Find(u16 ID) const
     {
         if (ID == u16(-1))
             return (0);
@@ -94,12 +97,12 @@ public:
         return (map_NETID[ID]);
     }
 
-    void o_crow(CObject* O);
-    void o_remove(Objects& v, CObject* O);
-    void o_activate(CObject* O);
-    void o_sleep(CObject* O);
+    void o_crow(IGameObject* O);
+    void o_remove(Objects& v, IGameObject* O);
+    void o_activate(IGameObject* O);
+    void o_sleep(IGameObject* O);
     IC u32 o_count() { return objects_active.size() + objects_sleeping.size(); };
-    IC CObject* o_get_by_iterator(u32 _it)
+    IC IGameObject* o_get_by_iterator(u32 _it)
     {
         if (_it < objects_active.size()) return objects_active[_it];
         else return objects_sleeping[_it - objects_active.size()];
@@ -107,9 +110,9 @@ public:
     bool dump_all_objects();
 
 public:
-    void register_object_to_destroy(CObject* object_to_destroy);
+    void register_object_to_destroy(IGameObject* object_to_destroy);
 #ifdef DEBUG
-    bool registered_object_to_destroy(const CObject* object_to_destroy) const;
+    bool registered_object_to_destroy(const IGameObject* object_to_destroy) const;
 #endif // #ifdef DEBUG
 
 private:

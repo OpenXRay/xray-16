@@ -202,7 +202,7 @@ void CRenderDevice::on_idle()
     u32 FrameStartTime = TimerGlobal.GetElapsed_ms();
 #endif
     if (psDeviceFlags.test(rsStatistic))
-        g_bEnableStatGather = TRUE;
+        g_bEnableStatGather = TRUE; // XXX: why not use either rsStatistic or g_bEnableStatGather?
     else g_bEnableStatGather = FALSE;
     if (g_loading_events.size())
     {
@@ -486,10 +486,14 @@ u32	script_time_global_async() { return Device.TimerAsync_MMT(); }
 
 SCRIPT_EXPORT(Device, (),
 {
-    luabind::function(luaState, "time_global", script_time_global);
-    luabind::function(luaState, "time_global_async", script_time_global_async);
-    luabind::function(luaState, "device", get_device);
-    luabind::function(luaState, "is_enough_address_space_available", is_enough_address_space_available);
+    using namespace luabind;
+    module(luaState)
+    [
+        def("time_global", &script_time_global),
+        def("time_global_async", &script_time_global_async),
+        def("device", &get_device),
+        def("is_enough_address_space_available", &is_enough_address_space_available)
+    ];
 });
 
 CLoadScreenRenderer::CLoadScreenRenderer()

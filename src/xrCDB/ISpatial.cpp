@@ -260,7 +260,7 @@ void			ISpatial_DB::insert		(ISpatial* S)
 	BOOL		bValid	= _valid(S->GetSpatialData().sphere.R) && _valid(S->GetSpatialData().sphere.P);
 	if (!bValid)	
 	{
-		CObject*	O	= dynamic_cast<CObject*>(S);
+        IGameObject*	O	= dynamic_cast<IGameObject*>(S);
 		if	(O)			Debug.fatal(DEBUG_INFO,"Invalid OBJECT position or radius (%s)",O->cName().c_str());
 		else			{
 			CPS_Instance* P = dynamic_cast<CPS_Instance*>(S);

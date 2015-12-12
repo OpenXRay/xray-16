@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "ai_monster_utils.h"
 #include "Entity.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "ai_space.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "Include/xrRender/Kinematics.h"
 #include "basemonster/base_monster.h"
 // проверить, находится ли объект entity на ноде
@@ -30,7 +30,7 @@ bool object_position_valid(const CEntity *entity)
 		);
 }
 
-Fvector get_bone_position	(CObject *object, LPCSTR bone_name)
+Fvector get_bone_position	(IGameObject *object, LPCSTR bone_name)
 {
 	u16 bone_id			= smart_cast<IKinematics*>(object->Visual())->LL_BoneID				(bone_name);
 	CBoneInstance &bone = smart_cast<IKinematics*>(object->Visual())->LL_GetBoneInstance	(bone_id);
@@ -41,7 +41,7 @@ Fvector get_bone_position	(CObject *object, LPCSTR bone_name)
 	return	(global_transform.c);
 }
 
-Fvector get_head_position(CObject *object) 
+Fvector get_head_position(IGameObject *object) 
 {
 	pcstr bone_name		=	"bip01_head";
 	if ( CBaseMonster* monster = smart_cast<CBaseMonster*>(object) )

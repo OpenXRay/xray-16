@@ -17,7 +17,7 @@
 
 #include "inventory.h"
 #include "Level.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "xrPhysics/iphworld.h"
 #include "restriction_space.h"

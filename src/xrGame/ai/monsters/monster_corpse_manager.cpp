@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "monster_corpse_manager.h"
 #include "BaseMonster/base_monster.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 
 CMonsterCorpseManager::CMonsterCorpseManager()
 {
@@ -69,7 +69,7 @@ void CMonsterCorpseManager::reinit()
 	time_last_seen	= 0;
 }
 
-void   CMonsterCorpseManager::remove_links (CObject* O)
+void   CMonsterCorpseManager::remove_links (IGameObject* O)
 {
 	if ( corpse == O )
 	{

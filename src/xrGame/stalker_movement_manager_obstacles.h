@@ -27,7 +27,7 @@ public:
 						stalker_movement_manager_obstacles	(CAI_Stalker *object);
 	virtual				~stalker_movement_manager_obstacles	();
 	virtual	void				move_along_path				(CPHMovementControl *movement_control, Fvector &dest_position, float time_delta);
-	virtual	void				remove_links				(CObject *object);
+	virtual	void				remove_links				(IGameObject *object);
 	virtual	void				Load						( LPCSTR section );
 			float				is_going_through			( Fmatrix const& matrix, Fvector const& vector, float max_distance ) const;
 			void				on_death					( );

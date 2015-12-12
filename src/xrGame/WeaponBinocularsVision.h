@@ -2,7 +2,7 @@
 #include "ui\uistatic.h"
 #include "HudSound.h"
 
-class CObject;
+class IGameObject;
 
 
 enum{
@@ -11,7 +11,7 @@ enum{
 };
 struct SBinocVisibleObj{
 							SBinocVisibleObj		()					{};
-	CObject*				m_object;
+	IGameObject*				m_object;
 	CUIStatic				m_lt;
 	CUIStatic				m_lb;
 	CUIStatic				m_rt;
@@ -36,7 +36,7 @@ public:
 	~CBinocularsVision			();
 	void	Update				();
 	void	Draw				();
-	void	remove_links		(CObject *object);
+	void	remove_links		(IGameObject *object);
 
 protected :
 	Fcolor						m_frame_color;

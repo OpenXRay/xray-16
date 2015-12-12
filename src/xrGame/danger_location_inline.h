@@ -13,7 +13,7 @@ IC	bool CDangerLocation::operator==	(const Fvector &position) const
 	return		(!!this->position().similar(position));
 }
 
-IC	bool CDangerLocation::operator==	(const CObject *object) const
+IC	bool CDangerLocation::operator==	(const IGameObject *object) const
 {
 	return		(false);
 }

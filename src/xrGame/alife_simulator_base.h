@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "random32.h"
+#include "Random.hpp"
 #include "alife_space.h"
-#include "game_graph_space.h"
+#include "xrAICore/Navigation/game_graph_space.h"
 #include "Common/object_interfaces.h"
 
 class IPureServer;

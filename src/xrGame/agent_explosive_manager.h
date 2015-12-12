@@ -10,7 +10,7 @@
 
 #include "danger_explosive.h"
 
-class CObject;
+class IGameObject;
 class CAgentManager;
 class CMemberOrder;
 
@@ -31,7 +31,7 @@ protected:
 
 public:
 	IC						CAgentExplosiveManager	(CAgentManager *object);
-			void			remove_links			(CObject *object);
+			void			remove_links			(IGameObject *object);
 			void			register_explosive		(const CExplosive *explosive, const CGameObject *game_object);
 			void			react_on_explosives		();
 			void			update					();

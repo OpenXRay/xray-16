@@ -18,7 +18,7 @@ public:
 	virtual void		reselect_state					();
 	virtual void		setup_substates					();
 	virtual void		check_force_state				();
-	virtual void		remove_links					(CObject* object) { inherited::remove_links(object);}
+	virtual void		remove_links					(IGameObject* object) { inherited::remove_links(object);}
 };
 
 #include "monster_state_squad_rest_follow_inline.h"

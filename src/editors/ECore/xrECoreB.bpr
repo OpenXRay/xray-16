@@ -3,168 +3,185 @@
 <PROJECT>
   <MACROS>
     <VERSION value="BCB.06.00"/>
-    <PROJECT value="$(OUTPUT_BINARIES_DIR)\xrECoreB.dll"/>
-    <OBJFILES value="x:\intermediate_ed\ecore\guid.obj x:\intermediate_ed\ecore\bone.obj 
-      x:\intermediate_ed\ecore\defines.obj 
-      x:\intermediate_ed\ecore\cl_collector.obj 
-      x:\intermediate_ed\ecore\Envelope.obj x:\intermediate_ed\ecore\fmesh.obj 
-      x:\intermediate_ed\ecore\GameFont.obj 
-      x:\intermediate_ed\ecore\GameMtlLib.obj 
-      x:\intermediate_ed\ecore\IGame_Persistent.obj 
-      x:\intermediate_ed\ecore\IInputReceiver.obj 
-      x:\intermediate_ed\ecore\interp.obj x:\intermediate_ed\ecore\motion.obj 
-      x:\intermediate_ed\ecore\pure.obj x:\intermediate_ed\ecore\Xr_input.obj 
-      x:\intermediate_ed\ecore\xrImage_Resampler.obj 
-      x:\intermediate_ed\ecore\FBasicVisual.obj 
-      x:\intermediate_ed\ecore\FHierrarhyVisual.obj 
-      x:\intermediate_ed\ecore\SkeletonAnimated.obj 
-      x:\intermediate_ed\ecore\SkeletonCustom.obj 
-      x:\intermediate_ed\ecore\SkeletonRigid.obj 
-      x:\intermediate_ed\ecore\SkeletonX.obj 
-      x:\intermediate_ed\ecore\ResourceManager_Reset.obj 
-      x:\intermediate_ed\ecore\ai_sounds.obj 
-      x:\intermediate_ed\ecore\nv_algebra.obj 
-      x:\intermediate_ed\ecore\SkeletonMotions.obj 
-      x:\intermediate_ed\ecore\tntQAVI.obj 
-      x:\intermediate_ed\ecore\xrCDB_Collector.obj 
-      x:\intermediate_ed\ecore\perlin.obj 
-      x:\intermediate_ed\ecore\xrTheora_Surface.obj 
-      x:\intermediate_ed\ecore\xrTheora_Stream.obj 
-      x:\intermediate_ed\ecore\LightAnimLibrary.obj 
-      x:\intermediate_ed\ecore\xrHemisphere.obj 
-      x:\intermediate_ed\ecore\BlenderDefault.obj 
-      x:\intermediate_ed\ecore\Blender_default_aref.obj 
-      x:\intermediate_ed\ecore\Blender_Vertex.obj 
-      x:\intermediate_ed\ecore\Blender_vertex_aref.obj 
-      x:\intermediate_ed\ecore\Blender_screen_gray.obj 
-      x:\intermediate_ed\ecore\Blender_Editor_Selection.obj 
-      x:\intermediate_ed\ecore\Blender_Screen_SET.obj 
-      x:\intermediate_ed\ecore\blender_light.obj 
-      x:\intermediate_ed\ecore\blender_b.obj 
-      x:\intermediate_ed\ecore\Blender_Lm(EbB).obj 
-      x:\intermediate_ed\ecore\Blender_Blur.obj 
-      x:\intermediate_ed\ecore\Blender_Editor_Wire.obj 
-      x:\intermediate_ed\ecore\Blender_LaEmB.obj 
-      x:\intermediate_ed\ecore\Blender_BmmD.obj 
-      x:\intermediate_ed\ecore\Blender_Shadow_World.obj 
-      x:\intermediate_ed\ecore\Blender_Model.obj 
-      x:\intermediate_ed\ecore\Blender_Model_EbB.obj 
-      x:\intermediate_ed\ecore\Blender_detail_still.obj 
-      x:\intermediate_ed\ecore\Blender_tree.obj 
-      x:\intermediate_ed\ecore\Blender_particle.obj 
-      x:\intermediate_ed\ecore\guid_generator.obj 
-      x:\intermediate_ed\ecore\UI_MainMail.obj 
-      x:\intermediate_ed\ecore\BoneEditor.obj 
-      x:\intermediate_ed\ecore\c_dinput.obj 
-      x:\intermediate_ed\ecore\ColorPicker.obj 
-      x:\intermediate_ed\ecore\D3DUtils.obj x:\intermediate_ed\ecore\device.obj 
-      x:\intermediate_ed\ecore\du_box.obj x:\intermediate_ed\ecore\du_cone.obj 
-      x:\intermediate_ed\ecore\du_cylinder.obj 
-      x:\intermediate_ed\ecore\du_sphere.obj 
-      x:\intermediate_ed\ecore\EDetailModel.obj 
-      x:\intermediate_ed\ecore\EditMesh.obj 
-      x:\intermediate_ed\ecore\EditMeshIO.obj 
-      x:\intermediate_ed\ecore\EditMeshModify.obj 
-      x:\intermediate_ed\ecore\EditMeshPick.obj 
-      x:\intermediate_ed\ecore\EditMeshRender.obj 
-      x:\intermediate_ed\ecore\EditObject.obj 
-      x:\intermediate_ed\ecore\EditObjectEditor.obj 
-      x:\intermediate_ed\ecore\EditObjectImport.obj 
-      x:\intermediate_ed\ecore\EditObjectIO.obj 
-      x:\intermediate_ed\ecore\EditObjectMotions.obj 
-      x:\intermediate_ed\ecore\EditObjectProps.obj 
-      x:\intermediate_ed\ecore\EditObjectSkin.obj 
-      x:\intermediate_ed\ecore\EditorPreferences.obj 
-      x:\intermediate_ed\ecore\ELog.obj x:\intermediate_ed\ecore\Engine.obj 
-      x:\intermediate_ed\ecore\EStats.obj 
-      x:\intermediate_ed\ecore\ExportObjectOGF.obj 
-      x:\intermediate_ed\ecore\ExportSkeleton.obj 
-      x:\intermediate_ed\ecore\ExportSkeletonCalculateTB.obj 
-      x:\intermediate_ed\ecore\ImageEditor.obj 
-      x:\intermediate_ed\ecore\ImageManager.obj 
-      x:\intermediate_ed\ecore\Library.obj x:\intermediate_ed\ecore\LogForm.obj 
-      x:\intermediate_ed\ecore\render.obj 
-      x:\intermediate_ed\ecore\SoundEditor.obj 
-      x:\intermediate_ed\ecore\SoundManager.obj 
-      x:\intermediate_ed\ecore\TLSPRITE.obj 
-      x:\intermediate_ed\ecore\UI_Camera.obj 
-      x:\intermediate_ed\ecore\UI_MainCommand.obj 
-      x:\intermediate_ed\ecore\ui_main.obj x:\intermediate_ed\ecore\stdafx.obj 
-      x:\intermediate_ed\ecore\UI_ToolsCustom.obj 
-      x:\intermediate_ed\ecore\ImageManagerDO.obj 
-      x:\intermediate_ed\ecore\GeometryCollector.obj 
-      x:\intermediate_ed\ecore\ParticleEffectActions.obj 
-      x:\intermediate_ed\ecore\EThumbnailTexture.obj 
-      x:\intermediate_ed\ecore\EThumbnail.obj 
-      x:\intermediate_ed\ecore\EThumbnailObject.obj 
-      x:\intermediate_ed\ecore\EThumbnailSound.obj 
-      x:\intermediate_ed\ecore\du_sphere_part.obj 
-      x:\intermediate_ed\ecore\ImageManagerLOD.obj 
-      x:\intermediate_ed\ecore\DeviceScreenshot.obj 
-      x:\intermediate_ed\ecore\pDomain.obj 
-      x:\intermediate_ed\ecore\EThumbnailGroup.obj 
-      x:\intermediate_ed\ecore\xrLoadSurface.obj 
-      x:\intermediate_ed\ecore\WmlContMinBox3.obj 
-      x:\intermediate_ed\ecore\WmlBox3.obj 
-      x:\intermediate_ed\ecore\WmlMinimizeN.obj 
-      x:\intermediate_ed\ecore\WmlMinimize1.obj 
-      x:\intermediate_ed\ecore\WmlMath.obj 
-      x:\intermediate_ed\ecore\WmlVector3.obj 
-      x:\intermediate_ed\ecore\WmlMatrix3.obj 
-      x:\intermediate_ed\ecore\WmlSystem.obj 
-      x:\intermediate_ed\ecore\WmlWinSystem.obj 
-      x:\intermediate_ed\ecore\WmlContBox3.obj 
-      x:\intermediate_ed\ecore\WmlQuaternion.obj 
-      x:\intermediate_ed\ecore\WmlApprGaussPointsFit3.obj 
-      x:\intermediate_ed\ecore\WmlEigen.obj 
-      x:\intermediate_ed\ecore\RAPIDMinBox.obj 
-      x:\intermediate_ed\ecore\Image.obj x:\intermediate_ed\ecore\MinimapEditor.obj 
-      x:\intermediate_ed\ecore\tga.obj x:\intermediate_ed\ecore\DetailModel.obj 
-      x:\intermediate_ed\ecore\ModelPool.obj 
-      x:\intermediate_ed\ecore\ParticleEffect.obj 
-      x:\intermediate_ed\ecore\ParticleGroup.obj 
-      x:\intermediate_ed\ecore\PSLibrary.obj 
-      x:\intermediate_ed\ecore\Texture.obj x:\intermediate_ed\ecore\xrRender_console.obj 
-      x:\intermediate_ed\ecore\FVisual.obj x:\intermediate_ed\ecore\xrSkin2W.obj 
-      x:\intermediate_ed\ecore\ParticleEffectDef.obj 
-      x:\intermediate_ed\ecore\FProgressive.obj 
-      x:\intermediate_ed\ecore\FSkinned.obj 
-      x:\intermediate_ed\ecore\Animation.obj x:\intermediate_ed\ecore\HW.obj 
-      x:\intermediate_ed\ecore\HWCaps.obj 
-      x:\intermediate_ed\ecore\dxRenderFactory.obj 
-      x:\intermediate_ed\ecore\dxFontRender.obj 
-      x:\intermediate_ed\ecore\R_Backend.obj 
-      x:\intermediate_ed\ecore\R_Backend_xform.obj 
-      x:\intermediate_ed\ecore\R_Backend_DBG.obj 
-      x:\intermediate_ed\ecore\R_Backend_Runtime.obj 
-      x:\intermediate_ed\ecore\dx9r_constants_cache.obj 
-      x:\intermediate_ed\ecore\r_constants.obj 
-      x:\intermediate_ed\ecore\R_DStreams.obj 
-      x:\intermediate_ed\ecore\ResourceManager.obj 
-      x:\intermediate_ed\ecore\ResourceManager_Resources.obj 
-      x:\intermediate_ed\ecore\ResourceManager_Loader.obj 
-      x:\intermediate_ed\ecore\SH_Atomic.obj 
-      x:\intermediate_ed\ecore\SH_Texture.obj 
-      x:\intermediate_ed\ecore\SH_Constant.obj 
-      x:\intermediate_ed\ecore\SH_Matrix.obj x:\intermediate_ed\ecore\SH_RT.obj 
-      x:\intermediate_ed\ecore\Shader.obj x:\intermediate_ed\ecore\tss_def.obj 
-      x:\intermediate_ed\ecore\Blender_Recorder.obj 
-      x:\intermediate_ed\ecore\Blender.obj 
-      x:\intermediate_ed\ecore\Blender_Palette.obj 
-      x:\intermediate_ed\ecore\Blender_Recorder_StandartBinding.obj 
-      x:\intermediate_ed\ecore\TextureDescrManager.obj 
-      x:\intermediate_ed\ecore\ETextureParams.obj 
-      x:\intermediate_ed\ecore\Blender_Recorder_R2.obj 
-      x:\intermediate_ed\ecore\NVMeshMender.obj 
-      x:\intermediate_ed\ecore\ExportObjectOGFCalculateTB.obj 
-      x:\intermediate_ed\ecore\R_Backend_hemi.obj 
-      x:\intermediate_ed\ecore\R_Backend_tree.obj 
-      x:\intermediate_ed\ecore\PhysicsShellHolderEditorBase.obj 
-      x:\intermediate_ed\ecore\MgcCont3DMinSphere.obj 
-      x:\intermediate_ed\ecore\MgcVector2.obj 
-      x:\intermediate_ed\ecore\MgcVector3.obj 
-      x:\intermediate_ed\ecore\MgcMath.obj x:\intermediate_ed\ecore\Frustum.obj 
-      x:\intermediate_ed\ecore\stats_manager.obj"/>
+    <PROJECT value="..\..\..\bin\editors\xrECoreB.dll"/>
+    <OBJFILES value="..\..\..\intermediate\editors\xrECoreB\guid.obj 
+      ..\..\..\intermediate\editors\xrECoreB\bone.obj 
+      ..\..\..\intermediate\editors\xrECoreB\defines.obj 
+      ..\..\..\intermediate\editors\xrECoreB\cl_collector.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Envelope.obj 
+      ..\..\..\intermediate\editors\xrECoreB\fmesh.obj 
+      ..\..\..\intermediate\editors\xrECoreB\GameFont.obj 
+      ..\..\..\intermediate\editors\xrECoreB\GameMtlLib.obj 
+      ..\..\..\intermediate\editors\xrECoreB\IGame_Persistent.obj 
+      ..\..\..\intermediate\editors\xrECoreB\IInputReceiver.obj 
+      ..\..\..\intermediate\editors\xrECoreB\interp.obj 
+      ..\..\..\intermediate\editors\xrECoreB\motion.obj 
+      ..\..\..\intermediate\editors\xrECoreB\pure.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Xr_input.obj 
+      ..\..\..\intermediate\editors\xrECoreB\xrImage_Resampler.obj 
+      ..\..\..\intermediate\editors\xrECoreB\FBasicVisual.obj 
+      ..\..\..\intermediate\editors\xrECoreB\FHierrarhyVisual.obj 
+      ..\..\..\intermediate\editors\xrECoreB\SkeletonAnimated.obj 
+      ..\..\..\intermediate\editors\xrECoreB\SkeletonCustom.obj 
+      ..\..\..\intermediate\editors\xrECoreB\SkeletonRigid.obj 
+      ..\..\..\intermediate\editors\xrECoreB\SkeletonX.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ResourceManager_Reset.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ai_sounds.obj 
+      ..\..\..\intermediate\editors\xrECoreB\nv_algebra.obj 
+      ..\..\..\intermediate\editors\xrECoreB\SkeletonMotions.obj 
+      ..\..\..\intermediate\editors\xrECoreB\tntQAVI.obj 
+      ..\..\..\intermediate\editors\xrECoreB\xrCDB_Collector.obj 
+      ..\..\..\intermediate\editors\xrECoreB\perlin.obj 
+      ..\..\..\intermediate\editors\xrECoreB\xrTheora_Surface.obj 
+      ..\..\..\intermediate\editors\xrECoreB\xrTheora_Stream.obj 
+      ..\..\..\intermediate\editors\xrECoreB\LightAnimLibrary.obj 
+      ..\..\..\intermediate\editors\xrECoreB\xrHemisphere.obj 
+      ..\..\..\intermediate\editors\xrECoreB\BlenderDefault.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_default_aref.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_Vertex.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_vertex_aref.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_screen_gray.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_Editor_Selection.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_Screen_SET.obj 
+      ..\..\..\intermediate\editors\xrECoreB\blender_light.obj 
+      ..\..\..\intermediate\editors\xrECoreB\blender_b.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_Lm(EbB).obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_Blur.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_Editor_Wire.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_LaEmB.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_BmmD.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_Shadow_World.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_Model.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_Model_EbB.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_detail_still.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_tree.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_particle.obj 
+      ..\..\..\intermediate\editors\xrECoreB\guid_generator.obj 
+      ..\..\..\intermediate\editors\xrECoreB\UI_MainMail.obj 
+      ..\..\..\intermediate\editors\xrECoreB\BoneEditor.obj 
+      ..\..\..\intermediate\editors\xrECoreB\c_dinput.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ColorPicker.obj 
+      ..\..\..\intermediate\editors\xrECoreB\D3DUtils.obj 
+      ..\..\..\intermediate\editors\xrECoreB\device.obj 
+      ..\..\..\intermediate\editors\xrECoreB\du_box.obj 
+      ..\..\..\intermediate\editors\xrECoreB\du_cone.obj 
+      ..\..\..\intermediate\editors\xrECoreB\du_cylinder.obj 
+      ..\..\..\intermediate\editors\xrECoreB\du_sphere.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EDetailModel.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EditMesh.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EditMeshIO.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EditMeshModify.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EditMeshPick.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EditMeshRender.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EditObject.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EditObjectEditor.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EditObjectImport.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EditObjectIO.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EditObjectMotions.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EditObjectProps.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EditObjectSkin.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EditorPreferences.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ELog.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Engine.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EStats.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ExportObjectOGF.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ExportSkeleton.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ExportSkeletonCalculateTB.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ImageEditor.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ImageManager.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Library.obj 
+      ..\..\..\intermediate\editors\xrECoreB\LogForm.obj 
+      ..\..\..\intermediate\editors\xrECoreB\render.obj 
+      ..\..\..\intermediate\editors\xrECoreB\SoundEditor.obj 
+      ..\..\..\intermediate\editors\xrECoreB\SoundManager.obj 
+      ..\..\..\intermediate\editors\xrECoreB\TLSPRITE.obj 
+      ..\..\..\intermediate\editors\xrECoreB\UI_Camera.obj 
+      ..\..\..\intermediate\editors\xrECoreB\UI_MainCommand.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ui_main.obj 
+      ..\..\..\intermediate\editors\xrECoreB\stdafx.obj 
+      ..\..\..\intermediate\editors\xrECoreB\UI_ToolsCustom.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ImageManagerDO.obj 
+      ..\..\..\intermediate\editors\xrECoreB\GeometryCollector.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ParticleEffectActions.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EThumbnailTexture.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EThumbnail.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EThumbnailObject.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EThumbnailSound.obj 
+      ..\..\..\intermediate\editors\xrECoreB\du_sphere_part.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ImageManagerLOD.obj 
+      ..\..\..\intermediate\editors\xrECoreB\DeviceScreenshot.obj 
+      ..\..\..\intermediate\editors\xrECoreB\pDomain.obj 
+      ..\..\..\intermediate\editors\xrECoreB\EThumbnailGroup.obj 
+      ..\..\..\intermediate\editors\xrECoreB\xrLoadSurface.obj 
+      ..\..\..\intermediate\editors\xrECoreB\WmlContMinBox3.obj 
+      ..\..\..\intermediate\editors\xrECoreB\WmlBox3.obj 
+      ..\..\..\intermediate\editors\xrECoreB\WmlMinimizeN.obj 
+      ..\..\..\intermediate\editors\xrECoreB\WmlMinimize1.obj 
+      ..\..\..\intermediate\editors\xrECoreB\WmlMath.obj 
+      ..\..\..\intermediate\editors\xrECoreB\WmlVector3.obj 
+      ..\..\..\intermediate\editors\xrECoreB\WmlMatrix3.obj 
+      ..\..\..\intermediate\editors\xrECoreB\WmlSystem.obj 
+      ..\..\..\intermediate\editors\xrECoreB\WmlWinSystem.obj 
+      ..\..\..\intermediate\editors\xrECoreB\WmlContBox3.obj 
+      ..\..\..\intermediate\editors\xrECoreB\WmlQuaternion.obj 
+      ..\..\..\intermediate\editors\xrECoreB\WmlApprGaussPointsFit3.obj 
+      ..\..\..\intermediate\editors\xrECoreB\WmlEigen.obj 
+      ..\..\..\intermediate\editors\xrECoreB\RAPIDMinBox.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Image.obj 
+      ..\..\..\intermediate\editors\xrECoreB\MinimapEditor.obj 
+      ..\..\..\intermediate\editors\xrECoreB\tga.obj 
+      ..\..\..\intermediate\editors\xrECoreB\DetailModel.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ModelPool.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ParticleEffect.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ParticleGroup.obj 
+      ..\..\..\intermediate\editors\xrECoreB\PSLibrary.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Texture.obj 
+      ..\..\..\intermediate\editors\xrECoreB\xrRender_console.obj 
+      ..\..\..\intermediate\editors\xrECoreB\FVisual.obj 
+      ..\..\..\intermediate\editors\xrECoreB\xrSkin2W.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ParticleEffectDef.obj 
+      ..\..\..\intermediate\editors\xrECoreB\FProgressive.obj 
+      ..\..\..\intermediate\editors\xrECoreB\FSkinned.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Animation.obj 
+      ..\..\..\intermediate\editors\xrECoreB\HW.obj 
+      ..\..\..\intermediate\editors\xrECoreB\HWCaps.obj 
+      ..\..\..\intermediate\editors\xrECoreB\dxRenderFactory.obj 
+      ..\..\..\intermediate\editors\xrECoreB\dxFontRender.obj 
+      ..\..\..\intermediate\editors\xrECoreB\R_Backend.obj 
+      ..\..\..\intermediate\editors\xrECoreB\R_Backend_xform.obj 
+      ..\..\..\intermediate\editors\xrECoreB\R_Backend_DBG.obj 
+      ..\..\..\intermediate\editors\xrECoreB\R_Backend_Runtime.obj 
+      ..\..\..\intermediate\editors\xrECoreB\dx9r_constants_cache.obj 
+      ..\..\..\intermediate\editors\xrECoreB\r_constants.obj 
+      ..\..\..\intermediate\editors\xrECoreB\R_DStreams.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ResourceManager.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ResourceManager_Resources.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ResourceManager_Loader.obj 
+      ..\..\..\intermediate\editors\xrECoreB\SH_Atomic.obj 
+      ..\..\..\intermediate\editors\xrECoreB\SH_Texture.obj 
+      ..\..\..\intermediate\editors\xrECoreB\SH_Constant.obj 
+      ..\..\..\intermediate\editors\xrECoreB\SH_Matrix.obj 
+      ..\..\..\intermediate\editors\xrECoreB\SH_RT.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Shader.obj 
+      ..\..\..\intermediate\editors\xrECoreB\tss_def.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_Recorder.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_Palette.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_Recorder_StandartBinding.obj 
+      ..\..\..\intermediate\editors\xrECoreB\TextureDescrManager.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ETextureParams.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Blender_Recorder_R2.obj 
+      ..\..\..\intermediate\editors\xrECoreB\NVMeshMender.obj 
+      ..\..\..\intermediate\editors\xrECoreB\ExportObjectOGFCalculateTB.obj 
+      ..\..\..\intermediate\editors\xrECoreB\R_Backend_hemi.obj 
+      ..\..\..\intermediate\editors\xrECoreB\R_Backend_tree.obj 
+      ..\..\..\intermediate\editors\xrECoreB\PhysicsShellHolderEditorBase.obj 
+      ..\..\..\intermediate\editors\xrECoreB\MgcCont3DMinSphere.obj 
+      ..\..\..\intermediate\editors\xrECoreB\MgcVector2.obj 
+      ..\..\..\intermediate\editors\xrECoreB\MgcVector3.obj 
+      ..\..\..\intermediate\editors\xrECoreB\MgcMath.obj 
+      ..\..\..\intermediate\editors\xrECoreB\Frustum.obj 
+      ..\..\..\intermediate\editors\xrECoreB\stats_manager.obj"/>
     <RESFILES value="resource.res"/>
     <IDLFILES value=""/>
     <IDLGENFILES value=""/>
@@ -175,7 +192,7 @@
     <LIBRARIES value="editor.lib editorB.lib"/>
     <SPARELIBS value="rtl.lib vcl.lib editorB.lib editor.lib elpackB6.lib"/>
     <PACKAGES value="vcl.bpi rtl.bpi elpackB6.bpi bcbsmp.bpi"/>
-    <PATHCPP value=".;Engine;..\..\xrEngine;Engine;..\..\xrEngine;..\..\xrEngine;..\..\xrEngine;..\..\xrEngine;..\..\xrEngine;..\..\xrEngine;..\..\xrEngine;..\..\xrEngine;..\..\xrEngine;..\..\xrEngine;..\..\xrEngine;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;Engine;Engine;..\..\xrEngine;..\..\xrEngine;..\..\xrCDB;..\..\xrEngine;..\..\xrEngine;..\..\xrEngine;..\..\xrEngine;..\..\xrEngine;..\..\Layers\xrRenderPC_R1;..\..\Layers\xrRenderPC_R1;..\..\Layers\xrRenderPC_R1;..\..\Layers\xrRenderPC_R1;..\..\Layers\xrRenderPC_R1;..\..\Layers\xrRender;..\..\Layers\xrRender;Engine\blenders;Engine\blenders;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\Layers\xrRenderPC_R1;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;Engine;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;Editor;WildMagic;WildMagic;WildMagic;WildMagic;WildMagic;WildMagic;WildMagic;WildMagic;WildMagic;WildMagic;WildMagic;WildMagic;WildMagic;WildMagic;Engine;Editor;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\xrCPU_Pipe;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender\blenders;..\..\Layers\xrRender\blenders;..\..\Layers\xrRender\blenders;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\Layers\xrRender;..\..\common\NvMender2003;Editor;..\..\Layers\xrRender;..\..\Layers\xrRender;Editor;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core;..\..\xrCDB;..\..\Layers\xrRender"/>
+    <PATHCPP value=".;Engine;..\..\xrEngine;..\..\Layers\xrRender;..\..\xrCDB;..\..\Layers\xrRenderPC_R1;Engine\blenders;Editor;WildMagic;..\..\xrCPU_Pipe;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;..\..\common\NvMender2003;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
@@ -185,35 +202,36 @@
     <USERDEFINES value="_EDITOR;_ECOREB;XRCDB_EXPORTS;_DEBUG"/>
     <SYSDEFINES value="NO_STRICT;_RTLDLL;USEPACKAGES"/>
     <MAINSOURCE value="xrECoreB.bpf"/>
-    <INCLUDEPATH value="..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment3D;&quot;D:\Program Files\Borland\CBuilder6\Projects&quot;;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)"/>
-    <LIBPATH value="..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment3D;..\..\..\sdk\components\ElPack\Code;..\..\..\SDK\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;&quot;E:\Program Files\Borland\CBuilder6\Projects&quot;;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCPU_Pipe;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk;$(OUT_LIB_DIR)"/>
+    <INCLUDEPATH value="..\..\xrCPU_Pipe;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment3D;&quot;D:\Program Files\Borland\CBuilder6\Projects&quot;;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCDB;Engine\Blenders;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;..\..\..\sdk\components\AlexMX;..\..\..\sdk\components\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)"/>
+    <LIBPATH value="..\..\xrCPU_Pipe;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment3D;..\..\..\sdk\components\ElPack\Code;..\..\..\sdk\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;&quot;E:\Program Files\Borland\CBuilder6\Projects&quot;;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk;$(OUT_LIB_DIR)"/>
     <WARNINGS value="-w8092 -w8090 -w8089 -w8087 -wprc -wucp -wstv -wstu -wsig -wpin -w-par 
       -wnod -wnak -w-8027 -w-8026 -wdef -wcln -wbbf -wasm -wamp -wamb"/>
     <OTHERFILES value=""/>
   </MACROS>
   <OPTIONS>
-    <IDLCFLAGS value="-I..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core 
+    <IDLCFLAGS value="-I..\..\xrCPU_Pipe 
+      -I..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core 
       -I..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D 
       -I..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D 
       -I..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment3D 
       -I&quot;D:\Program Files\Borland\CBuilder6\Projects&quot; 
       -I..\..\common\NvMender2003 -I..\.. -I..\..\Layers\xrRenderDX9 
       -I..\..\Layers\xrRender\blenders -I..\..\Layers\xrRender 
-      -I..\..\Layers\xrRenderPC_R1 -I..\..\xrCDB -I..\..\xrCPU_Pipe 
-      -IEngine\Blenders -I..\..\xrEngine -I$(DXSDK_DIR)\Include -IWildMagic 
-      -IEditor -IEngine -I$(BCB)\include -I$(BCB)\include\vcl 
-      -I$(COMPONENTS)\AlexMX -I$(COMPONENTS)\ElPack\Code\Source 
-      -I$(BCB)\Include\Mfc -I$(CORE_DIR) -I..\xrEProps -I$(XIPH_DIR) 
-      -I$(MAGIC_SW_DIR) -I$(SDK_DIR)\include\freeimage -I$(ETOOLS_DIR) 
-      -src_suffix cpp -D_EDITOR -D_ECOREB -DXRCDB_EXPORTS -D_DEBUG -boa"/>
+      -I..\..\Layers\xrRenderPC_R1 -I..\..\xrCDB -IEngine\Blenders 
+      -I..\..\xrEngine -I$(DXSDK_DIR)\Include -IWildMagic -IEditor -IEngine 
+      -I$(BCB)\include -I$(BCB)\include\vcl -I..\..\..\sdk\components\AlexMX 
+      -I..\..\..\sdk\components\ElPack\Code\Source -I$(BCB)\Include\Mfc 
+      -I$(CORE_DIR) -I..\xrEProps -I$(XIPH_DIR) -I$(MAGIC_SW_DIR) 
+      -I$(SDK_DIR)\include\freeimage -I$(ETOOLS_DIR) -src_suffix cpp -D_EDITOR 
+      -D_ECOREB -DXRCDB_EXPORTS -D_DEBUG -boa"/>
     <CFLAG1 value="-WD -Od -H=pch.csm -Hc -Q -Vms -Vx -Ve -xf -xp -VF -ff -X- -r- -ps -a4 -6 
       -b- -k -y -v -vi- -tWD -tWM -c"/>
-    <PFLAGS value="-N2x:\intermediate_ed\ecore -N0x:\intermediate_ed\ecore -$Y+ -$W -$O- -$A8 
-      -v -JPHNE -M"/>
+    <PFLAGS value="-N2..\..\..\intermediate\editors\xrECoreB 
+      -N0..\..\..\intermediate\editors\xrECoreB -$Y+ -$W -$O- -$A8 -v -JPHNE -M"/>
     <RFLAGS value=""/>
     <AFLAGS value="/mu /w2 /zi"/>
-    <LFLAGS value="-lx:\stalker_addon\libraries -Ix:\intermediate_ed\ecore -D&quot;&quot; -aa -Tpd -x 
-      -Gi -v"/>
+    <LFLAGS value="-l..\..\..\lib\editors -I..\..\..\intermediate\editors\xrECoreB -D&quot;&quot; -aa 
+      -Tpd -x -Gi -v"/>
     <OTHERFILES value=""/>
   </OPTIONS>
   <LINKER>
@@ -448,53 +466,59 @@ ProductVersion=1.0.0.0
 Comments=
 
 [HistoryLists\hlIncludePath]
-Count=17
-Item0=D:\Program Files\Borland\CBuilder6\Projects;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
-Item1=$(VC_INCLUDE);D:\Program Files\Borland\CBuilder6\Projects;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
-Item2=D:\Program Files\Borland\CBuilder6\Projects;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrEngine\xrRender_R1;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
-Item3=D:\Program Files\Borland\CBuilder6\Projects;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrEngine\xrRender_R1;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
-Item4=..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrEngine\xrRender_R1;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
-Item5=..\..\common\NvMender2003;D:\STALKER\sources\engine\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrEngine\xrRender_R1;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
-Item6=..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrEngine\xrRender_R1;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
-Item7=..\..\xrEngine\xrRender_R1;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
-Item8=..\..\xrEngine\xrRender_R1;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage
-Item9=..\..\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage
-Item10=I:\Program Files\Borland\CBuilder6\Projects;blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\freeimage
-Item11=blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\freeimage
-Item12=blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR)
-Item13=..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR)
-Item14=..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR)
-Item15=..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR)\include
-Item16=$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR)\include
+Count=20
+Item0=..\..\xrCPU_Pipe;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment3D;D:\Program Files\Borland\CBuilder6\Projects;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCDB;Engine\Blenders;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;..\..\..\sdk\components\AlexMX;..\..\..\sdk\components\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
+Item1=..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment3D;D:\Program Files\Borland\CBuilder6\Projects;..\..\common\NvMender2003;..\..\;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCDB;Engine\Blenders;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;..\..\..\sdk\components\AlexMX;..\..\..\sdk\components\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps\;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
+Item2=..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment3D;D:\Program Files\Borland\CBuilder6\Projects;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
+Item3=D:\Program Files\Borland\CBuilder6\Projects;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
+Item4=$(VC_INCLUDE);D:\Program Files\Borland\CBuilder6\Projects;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
+Item5=D:\Program Files\Borland\CBuilder6\Projects;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrEngine\xrRender_R1;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
+Item6=D:\Program Files\Borland\CBuilder6\Projects;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrEngine\xrRender_R1;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
+Item7=..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrEngine\xrRender_R1;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
+Item8=..\..\common\NvMender2003;D:\STALKER\sources\engine\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrEngine\xrRender_R1;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
+Item9=..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrEngine\xrRender_R1;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
+Item10=..\..\xrEngine\xrRender_R1;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage;$(ETOOLS_DIR)
+Item11=..\..\xrEngine\xrRender_R1;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage
+Item12=..\..\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrCPU_Pipe;Engine\Blenders;..\..\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\include\freeimage
+Item13=I:\Program Files\Borland\CBuilder6\Projects;blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\freeimage
+Item14=blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR);$(SDK_DIR)\freeimage
+Item15=blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR)
+Item16=..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR);$(MAGIC_SW_DIR)
+Item17=..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR)
+Item18=..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine\xrRender;..\..\xrEngine;$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR)\include
+Item19=$(DXSDK_DIR)\Include;WildMagic;Editor;Engine;$(BCB)\include;$(BCB)\include\vcl;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code\Source;$(BCB)\Include\Mfc;$(CORE_DIR);..\xrEProps;$(XIPH_DIR)\include
 
 [HistoryLists\hlLibraryPath]
-Count=26
-Item0=..\..\..\sdk\components\ElPack\Code;..\..\..\SDK\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCPU_Pipe;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk;$(OUT_LIB_DIR)
-Item1=..\..\..\sdk\components\ElPack\Code;..\..\..\SDK\components\AlexMX;$(COMPONENTS)\ElPack\Code;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCPU_Pipe;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk;$(OUT_LIB_DIR)
-Item2=..\..\..\SDK\components\AlexMX;$(COMPONENTS)\ElPack\Code;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCPU_Pipe;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk;$(OUT_LIB_DIR)
-Item3=..\..\..\SDK\components\AlexMX;$(COMPONENTS)\ElPack\Code;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCPU_Pipe;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk
-Item4=..\..\..\SDK\components\AlexMX;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCPU_Pipe;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk
-Item5=$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCPU_Pipe;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk
-Item6=..\..\..\SDK\components\ElPack\Code;..\..\..\SDK\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk
-Item7=..\..\..\SDK\components\ElPack\Code;..\..\..\SDK\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk;x:\stalker_addon\libraries;x:\libraries
-Item8=..\..\..\SDK\components\ElPack\Code;..\..\..\SDK\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk;x:\stalker_addon\libraries
-Item9=..\..\..\SDK\components\ElPack\Code;..\..\..\SDK\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\stalker_addon\libraries
-Item10=..\..\..\SDK\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\stalker_addon\libraries
-Item11=..\..\..\SDK\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\libraries
-Item12=..\..\..\SDK\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\libraries
-Item13=..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\libraries
-Item14=..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\stalker_addon\libraries
-Item15=..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;$(XRAY_LIBS)
-Item16=D:\Program Files\Borland\CBuilder6\Projects;..\..\common\NvMender2003;D:\STALKER\sources\engine\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;$(XRAY_LIBS)
-Item17=..\..\common\NvMender2003;D:\STALKER\sources\engine\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;$(XRAY_LIBS)
-Item18=..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;$(XRAY_LIBS)
-Item19=..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\stalker_addon\libraries
-Item20=WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\stalker_addon\libraries
-Item21=$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\stalker_addon\libraries
-Item22=I:\Program Files\Borland\CBuilder6\Projects;blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;WildMagic;Editor;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\libraries
-Item23=blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;WildMagic;Editor;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\libraries
-Item24=WildMagic;Editor;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\libraries
-Item25=Editor;WildMagic;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\libraries
+Count=29
+Item0=..\..\xrCPU_Pipe;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment3D;..\..\..\sdk\components\ElPack\Code;..\..\..\sdk\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk;$(OUT_LIB_DIR)
+Item1=..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment3D;..\..\..\sdk\components\ElPack\Code;..\..\..\sdk\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk;$(OUT_LIB_DIR)
+Item2=..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core3D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Core2D;..\..\..\sdk\sources\MagicSoftware\FreeMagic\Source\Containment3D;..\..\..\sdk\components\ElPack\Code;..\..\..\SDK\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCPU_Pipe;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk;$(OUT_LIB_DIR)
+Item3=..\..\..\sdk\components\ElPack\Code;..\..\..\SDK\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCPU_Pipe;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk;$(OUT_LIB_DIR)
+Item4=..\..\..\sdk\components\ElPack\Code;..\..\..\SDK\components\AlexMX;$(COMPONENTS)\ElPack\Code;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCPU_Pipe;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk;$(OUT_LIB_DIR)
+Item5=..\..\..\SDK\components\AlexMX;$(COMPONENTS)\ElPack\Code;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCPU_Pipe;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk;$(OUT_LIB_DIR)
+Item6=..\..\..\SDK\components\AlexMX;$(COMPONENTS)\ElPack\Code;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCPU_Pipe;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk
+Item7=..\..\..\SDK\components\AlexMX;$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCPU_Pipe;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk
+Item8=$(COMPONENTS)\ElPack\Code;$(COMPONENTS)\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrCPU_Pipe;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk
+Item9=..\..\..\SDK\components\ElPack\Code;..\..\..\SDK\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;WildMagic;Editor;Engine\blenders;..\..\xrCDB;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk
+Item10=..\..\..\SDK\components\ElPack\Code;..\..\..\SDK\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk;x:\stalker_addon\libraries;x:\libraries
+Item11=..\..\..\SDK\components\ElPack\Code;..\..\..\SDK\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(BCB)\Lib\Psdk;x:\stalker_addon\libraries
+Item12=..\..\..\SDK\components\ElPack\Code;..\..\..\SDK\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\stalker_addon\libraries
+Item13=..\..\..\SDK\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\stalker_addon\libraries
+Item14=..\..\..\SDK\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\libraries
+Item15=..\..\..\SDK\components\AlexMX;..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\libraries
+Item16=..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\libraries
+Item17=..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\stalker_addon\libraries
+Item18=..\..\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;$(XRAY_LIBS)
+Item19=D:\Program Files\Borland\CBuilder6\Projects;..\..\common\NvMender2003;D:\STALKER\sources\engine\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;$(XRAY_LIBS)
+Item20=..\..\common\NvMender2003;D:\STALKER\sources\engine\common\NvMender2003;..\..;..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;$(XRAY_LIBS)
+Item21=..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;$(XRAY_LIBS)
+Item22=..\..\Layers\xrRenderDX9;..\..\Layers\xrRender\blenders;E:\Program Files\Borland\CBuilder6\Projects;..\..\Layers\xrRender;..\..\Layers\xrRenderPC_R1;..\..\xrRender_R1;..\..\xrCPU_Pipe;..\..\xrRender;WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\stalker_addon\libraries
+Item23=WildMagic;Editor;Engine\blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\stalker_addon\libraries
+Item24=$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\stalker_addon\libraries
+Item25=I:\Program Files\Borland\CBuilder6\Projects;blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;WildMagic;Editor;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\libraries
+Item26=blenders;..\..\xrEngine\xrRender_R1;..\..\xrEngine\blenders;WildMagic;Editor;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\libraries
+Item27=WildMagic;Editor;..\..\xrCDB;..\..\xrEngine\xrCPU_Pipe;Engine\Blenders;..\..\xrEngine\xrRender;..\..\xrEngine;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\libraries
+Item28=Editor;WildMagic;Engine;$(BCB)\lib;$(BCB)\lib\obj;$(BCB)\Projects\Lib;$(COMPONENTS)\AlexMX;$(COMPONENTS)\ElPack\Code;$(BCB)\Lib\Psdk;x:\libraries
 
 [HistoryLists\hlDebugSourcePath]
 Count=1
@@ -508,26 +532,32 @@ Item2=_EDITOR;_ECOREB;_DEBUG;XRCDB_EXPORTS
 Item3=_EDITOR;_ECOREB;_DEBUG
 
 [HistoryLists\hlIntOutputDir]
-Count=5
-Item0=x:\intermediate_ed\ecore
-Item1=$(OUTPUT_INTERMEDIATE_DIR)\ecore
-Item2=Intermediate
-Item3=XRLC_Intermediate
-Item4=xrLC_Options
+Count=7
+Item0=..\..\..\intermediate\editors\xrECoreB
+Item1=..\..\..\intermediate\editors\ECore
+Item2=x:\intermediate_ed\ecore
+Item3=$(OUTPUT_INTERMEDIATE_DIR)\ecore
+Item4=Intermediate
+Item5=XRLC_Intermediate
+Item6=xrLC_Options
 
 [HistoryLists\hlFinalOutputDir]
-Count=3
-Item0=$(OUTPUT_BINARIES_DIR)\
-Item1=x:\stalker_addon\binaries\
-Item2=x:\binaries\
+Count=5
+Item0=..\..\..\bin\editors\
+Item1=..\..\..\bin\editors
+Item2=$(OUTPUT_BINARIES_DIR)\
+Item3=x:\stalker_addon\binaries\
+Item4=x:\binaries\
 
 [HistoryLists\hIBPIOutputDir]
-Count=5
-Item0=x:\stalker_addon\libraries
-Item1=$(OUTPUT_LIBRARIES_DIR)
-Item2=$(OUTPUT_LIBRARIES_DIR)\
-Item3=X:\libraries
-Item4=X:\libraries\
+Count=7
+Item0=..\..\..\lib\editors
+Item1=..\..\..\lib\editors\
+Item2=x:\stalker_addon\libraries
+Item3=$(OUTPUT_LIBRARIES_DIR)
+Item4=$(OUTPUT_LIBRARIES_DIR)\
+Item5=X:\libraries
+Item6=X:\libraries\
 
 [Debugging]
 DebugSourceDirs=$(BCB)\source\vcl

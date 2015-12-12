@@ -25,6 +25,7 @@ To build X-Ray Engine you'll need following libraries:
 * DirectX SDK June 2010: http://www.microsoft.com/en-us/download/details.aspx?id=6812
   - replace dxguid.lib with the one from Windows SDK
     (for DirectPlay GUIDs)
+XXX nitrocaster: add LuaJIT & LuaBind instructions
 
 You can download all these libraries (except Windows/DirectX SDK) with compiled binaries here:
 https://dl.dropboxusercontent.com/u/63973281/dev/xray/xray-16-libraries.zip
@@ -35,31 +36,33 @@ Setup:
 - Install patch 1.6.02 (only for russian locale, worldwide release should have it included):
   http://cop.stalker-game.ru/?page=patches#2
 - Download and unpack archive with libraries
-- Create _bin_dbg, _bin_mix and _bin_rel folders in the game installation directory
-- Copy following files from bin to _bin_dbg, _bin_mix and _bin_rel:
+- Create _bin_dbg_Win32, _bin_mix_Win32 and _bin_rel_Win32 folders in the game installation directory
+  (Debug, Mixed and Release binaries for 32-bit Windows). Hereinafter '_bin_xxx_Win32' is referred to as 'xbin'.
+- Copy following files from bin to xbin:
   - dbghelp.dll
   - eax.dll
   - wrap_oal.dll
-- Copy following files from bin to _bin_dbg\dedicated, _bin_mix\dedicated and _bin_rel\dedicated:
+- Copy following files from bin to xbin\dedicated:
   - eax.dll
   - wrap_oal.dll
-- For _bin_rel and _bin_mix:
-  - Copy BugTrap.dll from src\Externals\BugTrap\Bin
-- For _bin_dbg:
-  - Copy BugTrapD.dll from src\Externals\BugTrap\Bin and rename it to BugTrap.dll
-- Copy following files from src\Externals\OpenSSL\bin to _bin_dbg, _bin_mix and _bin_rel:
+- Copy following files from src\Externals\BugTrap\Bin to xbin:
+  - Debug configuration:
+    - BugTrapD.dll (rename to BugTrap.dll)
+  - Other configurations:
+    - BugTrap.dll
+- Copy following files from src\Externals\OpenSSL\bin to xbin:
   - libeay32.dll
   - ssleay32.dll
 - Create soft link to /gamedata in the game installation directory:
   $ mklink /D <game installation directory>\gamedata <xray-16 repository root>\res\gamedata  
 - After successful build use xrbinup.cmd to update game binaries:
-  $ xrbinup.cmd "E:\Program Files (x86)\GSC World Publishing\STALKER-COP" %src% dbg  
+  $ xrbinup.cmd "E:\Program Files (x86)\GSC World Publishing\STALKER-COP" %src% Win32 Debug  
 - You can create cmd script to update binaries in a single click, for example:
   @echo off
   setlocal
   set src="E:\git\xray-16"
   set dst="E:\Program Files (x86)\GSC World Publishing\STALKER-COP"
-  call xrbinup.cmd %dst% %src% dbg
+  call xrbinup.cmd %dst% %src% Win32 Debug
   endlocal
 
 XXX nitrocaster: add script for copying/renaming/soft linking

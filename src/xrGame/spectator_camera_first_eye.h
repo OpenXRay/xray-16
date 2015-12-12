@@ -10,7 +10,7 @@ private:
 	typedef			CCameraFirstEye inherited;
 	float const &	m_fTimeDelta;
 public:
-					CSpectrCameraFirstEye	(float const & fTimeDelta, CObject* p, u32 flags=0);
+					CSpectrCameraFirstEye	(float const & fTimeDelta, IGameObject* p, u32 flags=0);
 	virtual			~CSpectrCameraFirstEye	();
 	CSpectrCameraFirstEye&	operator=		(CSpectrCameraFirstEye& copy) {};
 	

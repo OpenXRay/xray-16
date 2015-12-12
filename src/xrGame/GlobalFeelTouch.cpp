@@ -19,9 +19,9 @@ struct delete_predicate_by_time : public std::binary_function<Feel::Touch::DenyT
 		return false;
 	};
 };
-struct objects_ptrs_equal : public std::binary_function<Feel::Touch::DenyTouch, CObject const *, bool>
+struct objects_ptrs_equal : public std::binary_function<Feel::Touch::DenyTouch, IGameObject const *, bool>
 {
-	bool operator() (Feel::Touch::DenyTouch const & left, CObject const * const right) const
+	bool operator() (Feel::Touch::DenyTouch const & left, IGameObject const * const right) const
 	{
 		if (left.O == right)
 			return true;
@@ -38,7 +38,7 @@ void GlobalFeelTouch::feel_touch_update(Fvector& P, float R)
 	feel_touch_disable.erase(new_end, feel_touch_disable.end());
 }
 
-bool GlobalFeelTouch::is_object_denied(CObject const * O)
+bool GlobalFeelTouch::is_object_denied(IGameObject const * O)
 {
 	/*Fvector temp_vector;
 	feel_touch_update(temp_vector, 0.f);*/

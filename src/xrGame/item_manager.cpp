@@ -10,12 +10,12 @@
 #include "item_manager.h"
 #include "inventory_item.h"
 #include "custommonster.h"
-#include "ai_object_location.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/ai_object_location.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "restricted_object.h"
 #include "movement_manager.h"
 #include "ai_space.h"
-#include "profiler.h"
+#include "xrEngine/profiler.h"
 #include "ai/stalker/ai_stalker.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "restricted_object.h"
@@ -122,7 +122,7 @@ void CItemManager::update			()
 	STOP_PROFILE
 }
 
-void CItemManager::remove_links		(CObject *object)
+void CItemManager::remove_links		(IGameObject *object)
 {
 	// since we use no members in CGameObject during search,
 	// we just use the pinter itself, we can just statically cast object

@@ -109,7 +109,7 @@ void CPoltergeist::PhysicalImpulse	(const Fvector &position)
 {
 	m_nearest.clear_not_free		();
 	Level().ObjectSpace.GetNearest	(m_nearest,position, IMPULSE_RADIUS, NULL); 
-	//xr_vector<CObject*> &m_nearest = Level().ObjectSpace.q_nearest;
+	//xr_vector<IGameObject*> &m_nearest = Level().ObjectSpace.q_nearest;
 	if (m_nearest.empty())			return;
 	
 	u32 index = Random.randI		(m_nearest.size());

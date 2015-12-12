@@ -5,7 +5,7 @@
 
 bool is_object_valid_on_svclient(u16 id_entity)
 {
-	CObject* tmp_obj		= Level().Objects.net_Find(id_entity);
+	IGameObject* tmp_obj		= Level().Objects.net_Find(id_entity);
 	if (!tmp_obj)
 		return false;
 	

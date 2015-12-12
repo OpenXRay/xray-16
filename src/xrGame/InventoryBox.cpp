@@ -32,7 +32,7 @@ void CInventoryBox::OnEvent(NET_Packet& P, u16 type)
 		{
 			u16 id;
             P.r_u16					(id);
-			CObject* itm			= Level().Objects.net_Find(id);  VERIFY(itm);
+			IGameObject* itm			= Level().Objects.net_Find(id);  VERIFY(itm);
 			m_items.push_back		(id);
 			itm->H_SetParent		(this);
 			itm->setVisible			(FALSE);
@@ -55,7 +55,7 @@ void CInventoryBox::OnEvent(NET_Packet& P, u16 type)
 		{
 			u16 id;
             P.r_u16(id);
-			CObject* itm = Level().Objects.net_Find(id);  VERIFY(itm);
+			IGameObject* itm = Level().Objects.net_Find(id);  VERIFY(itm);
 			xr_vector<u16>::iterator it;
 			it = std::find(m_items.begin(),m_items.end(),id); VERIFY(it!=m_items.end());
 			m_items.erase		(it);
@@ -102,7 +102,7 @@ BOOL CInventoryBox::net_Spawn(CSE_Abstract* DC)
 	return					TRUE;
 }
 
-void CInventoryBox::net_Relcase(CObject* O)
+void CInventoryBox::net_Relcase(IGameObject* O)
 {
 	inherited::net_Relcase(O);
 }

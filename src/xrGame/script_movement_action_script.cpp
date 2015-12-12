@@ -9,11 +9,10 @@
 #include "pch_script.h"
 #include "script_movement_action.h"
 #include "script_game_object.h"
-#include "patrol_path_manager_space.h"
 #include "detail_path_manager_space.h"
 #include "ai_monster_space.h"
-#include "patrol_path_params.h"
-#include "patrol_path.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path_params.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;

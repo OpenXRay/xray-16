@@ -143,7 +143,7 @@ void CHUDTarget::Render()
 
 	VERIFY				(g_bRendering);
 
-	CObject*	O		= Level().CurrentEntity();
+	IGameObject*	O		= Level().CurrentEntity();
 	if (0==O)			return;
 	CEntity*	E		= smart_cast<CEntity*>(O);
 	if (0==E)			return;
@@ -318,7 +318,7 @@ void CHUDTarget::Render()
 	}
 }
 
-void CHUDTarget::net_Relcase(CObject* O)
+void CHUDTarget::net_Relcase(IGameObject* O)
 {
 	if(PP.RQ.O == O)
 		PP.RQ.O = NULL;

@@ -16,6 +16,6 @@ CScriptObjectAction::~CScriptObjectAction	()
 
 void CScriptObjectAction::SetObject			(CScriptGameObject *tpLuaGameObject)
 {
-	m_tpObject			= tpLuaGameObject->operator CObject*();
+	m_tpObject			= tpLuaGameObject->operator IGameObject*();
 	m_bCompleted		= false;
 }

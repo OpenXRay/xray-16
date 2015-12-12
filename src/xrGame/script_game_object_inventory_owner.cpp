@@ -23,7 +23,7 @@
 #include "relation_registry.h"
 #include "custommonster.h"
 #include "actorcondition.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "huditem.h"
 #include "ui/UItalkWnd.h"
 #include "inventory.h"
@@ -770,7 +770,7 @@ void construct_restriction_vector(shared_str restrictions, xr_vector<ALife::_OBJ
 	string64	temp;
 	u32			n = _GetItemCount(*restrictions);
 	for (u32 i=0; i<n; ++i) {
-		CObject	*object = Level().Objects.FindObjectByName(_GetItem(*restrictions,i,temp));
+		IGameObject	*object = Level().Objects.FindObjectByName(_GetItem(*restrictions,i,temp));
 		if (!object)
 			continue;
 		result.push_back(object->ID());

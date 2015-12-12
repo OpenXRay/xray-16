@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "compiler.h"
-#include "levelgamedef.h"
-#include "xrGame/level_graph.h"
+#include "Common/LevelGameDef.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "AIMapExport.h"
 
 IC	const Fvector vertex_position(const CLevelGraph::CPosition &Psrc, const Fbox &bb, const SAIParams &params)

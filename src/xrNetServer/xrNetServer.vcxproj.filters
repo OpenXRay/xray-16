@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="ip_filter.cpp" />
+    <ClCompile Include="NET_AuthCheck.cpp" />
+    <ClCompile Include="NET_Client.cpp" />
+    <ClCompile Include="NET_Common.cpp" />
+    <ClCompile Include="NET_Compressor.cpp" />
+    <ClCompile Include="NET_Log.cpp" />
+    <ClCompile Include="NET_Server.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ip_filter.h" />
+    <ClInclude Include="NET_AuthCheck.h" />
+    <ClInclude Include="NET_Client.h" />
+    <ClInclude Include="NET_Common.h" />
+    <ClInclude Include="NET_Compressor.h" />
+    <ClInclude Include="NET_Log.h" />
+    <ClInclude Include="NET_Messages.h" />
+    <ClInclude Include="NET_PlayersMonitor.h" />
+    <ClInclude Include="NET_Server.h" />
+    <ClInclude Include="NET_Shared.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+</Project>

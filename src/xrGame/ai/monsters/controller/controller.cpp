@@ -24,8 +24,8 @@
 #include "ai/monsters/control_direction_base.h"
 #include "ai/monsters/control_movement_base.h"
 #include "ai/monsters/control_path_builder_base.h"
-#include "level_graph.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/level_graph.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "Inventory.h"
 #include "monster_community.h"
 #include "character_community.h"
@@ -469,7 +469,7 @@ void CController::shedule_Update(u32 dt)
 	test_covers();
 }
 
-void CController::Die(CObject* who)
+void CController::Die(IGameObject* who)
 {
 	inherited::Die(who);
 	FreeFromControl();
@@ -484,7 +484,7 @@ void CController::net_Destroy()
 	FreeFromControl		();
 }
 
-void CController::net_Relcase(CObject *O)
+void CController::net_Relcase(IGameObject *O)
 {
 	inherited::net_Relcase(O);
 }

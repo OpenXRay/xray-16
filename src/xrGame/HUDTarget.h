@@ -37,5 +37,5 @@ public:
 	float					GetRQVis	() {return PP.power;};
 	CHUDCrosshair&			GetHUDCrosshair	() {return HUDCrosshair;}
 	void					ShowCrosshair	(bool b);
-	void					net_Relcase		(CObject* O);
+	void					net_Relcase		(IGameObject* O);
 };

@@ -42,7 +42,7 @@ void CClientSpawnManager::add				(ALife::_OBJECT_ID requesting_id, ALife::_OBJEC
 
 void CClientSpawnManager::add				(ALife::_OBJECT_ID requesting_id, ALife::_OBJECT_ID requested_id, CSpawnCallback &spawn_callback)
 {
-	CObject							*object = Level().Objects.net_Find(requesting_id);
+	IGameObject							*object = Level().Objects.net_Find(requesting_id);
 	if (object) {
 		callback					(spawn_callback,object);
 		return;
@@ -109,7 +109,7 @@ void CClientSpawnManager::clear				(ALife::_OBJECT_ID requested_id)
 	}
 }
 
-void CClientSpawnManager::callback			(CSpawnCallback &spawn_callback, CObject *object)
+void CClientSpawnManager::callback			(CSpawnCallback &spawn_callback, IGameObject *object)
 {
 	if (spawn_callback.m_object_callback)
 		spawn_callback.m_object_callback	(object);
@@ -119,7 +119,7 @@ void CClientSpawnManager::callback			(CSpawnCallback &spawn_callback, CObject *o
 	(spawn_callback.m_callback)	(object->ID(),script_game_object);
 }
 
-void CClientSpawnManager::callback			(CObject *object)
+void CClientSpawnManager::callback			(IGameObject *object)
 {
 	REQUEST_REGISTRY::iterator		I = m_registry.find(object->ID());
 	if (I == m_registry.end())

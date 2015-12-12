@@ -1,6 +1,12 @@
+[submodule "src/Externals/luabind"]
+	path = src/Externals/luabind
+	url = git@github.com:OpenXRay/luabind-deboostified.git
+[submodule "src/Externals/luajit"]
+	path = src/Externals/luajit
+	url = git@github.com:OpenXRay/LuaJIT.git
 [submodule "src/Externals/glbinding"]
 	path = src/Externals/glbinding
-	url = https://github.com/cginternals/glbinding.git
+	url = git@github.com:cginternals/glbinding.git
 [submodule "src/Externals/gli"]
 	path = src/Externals/gli
-	url = https://github.com/g-truc/gli
+	url = git@github.com:g-truc/gli

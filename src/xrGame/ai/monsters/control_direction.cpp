@@ -3,9 +3,9 @@
 #include "BaseMonster/base_monster.h"
 #include "control_manager.h"
 #include "detail_path_manager.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "ai_space.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "detail_path_manager_space.h"
 
 void CControlDirection::reinit()
@@ -150,7 +150,7 @@ bool CControlDirection::is_face_target(const Fvector &position, float eps_angle)
 	return true;
 }
 
-bool CControlDirection::is_face_target(const CObject *obj, float eps_angle) 
+bool CControlDirection::is_face_target(const IGameObject *obj, float eps_angle) 
 {
 	return is_face_target(obj->Position(), eps_angle);
 }

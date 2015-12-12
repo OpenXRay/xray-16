@@ -3,7 +3,7 @@
 #ifdef DEBUG
 #include "ObjectDump.h"
 
-ENGINE_API std::string dbg_object_base_dump_string(const CObject* obj)
+ENGINE_API std::string dbg_object_base_dump_string(const IGameObject* obj)
 {
     if (!obj)
         return make_string("object: NULL ptr");
@@ -13,7 +13,7 @@ ENGINE_API std::string dbg_object_base_dump_string(const CObject* obj)
         obj->Visual() ? obj->cNameVisual().c_str() : "none");
 }
 
-ENGINE_API std::string dbg_object_poses_dump_string(const CObject* obj)
+ENGINE_API std::string dbg_object_poses_dump_string(const IGameObject* obj)
 {
     if (!obj)
         return std::string("");
@@ -22,14 +22,14 @@ ENGINE_API std::string dbg_object_poses_dump_string(const CObject* obj)
     std::string buf("");
     for (u32 i = 0; i < ps_size; ++i)
     {
-        const CObject::SavedPosition& svp = obj->ps_Element(i);
+        const GameObjectSavedPosition& svp = obj->ps_Element(i);
         buf += (make_string(" \n %d, time: %d pos: %s ", i, svp.dwTime, get_string(svp.vPosition).c_str()));
     }
 
     return make_string("\n XFORM: %s \n position stack : %s \n, ", get_string(obj->XFORM()).c_str(), buf.c_str());
 }
 
-ENGINE_API std::string dbg_object_visual_geom_dump_string(const CObject* obj)
+ENGINE_API std::string dbg_object_visual_geom_dump_string(const IGameObject* obj)
 {
     if (!obj || !obj->Visual())
         return std::string("");
@@ -60,23 +60,33 @@ ENGINE_API std::string dbg_object_visual_geom_dump_string(const CObject* obj)
  u32 dwFrame_UpdateCL;
  u32 dwFrame_AsCrow;
  */
-ENGINE_API std::string dbg_object_props_dump_string(const CObject* obj)
+ENGINE_API std::string dbg_object_props_dump_string(const IGameObject* obj)
 {
     if (!obj)
         return std::string("");
-    CObject::ObjectProperties props;
+    GameObjectProperties props;
     obj->DBGGetProps(props);
-
-    return make_string(" net_ID :%d, bActiveCounter :%d, bEnabled :%s, bVisible :%s, bDestroy :%s, \n net_Local %s, net_Ready :%s, net_SV_Update :%s, crow :%s, bPreDestroy : %s ",
-        props.net_ID, props.bActiveCounter, get_string(bool(!!props.bEnabled)).c_str(), get_string(bool(!!props.bVisible)).c_str(),
-        get_string(bool(!!props.bDestroy)).c_str(), get_string(bool(!!props.net_Local)).c_str(), get_string(bool(!!props.net_Ready)).c_str(),
-        get_string(bool(!!props.net_SV_Update)).c_str(), get_string(bool(!!props.crow)).c_str(), get_string(bool(!!props.bPreDestroy)).c_str()
-        )
-        +
-        make_string("\n dbg_update_cl: %d, dwFrame_UpdateCL: %d, dwFrame_AsCrow :%d, Device.dwFrame :%d, Device.dwTimeGlobal: %d \n",
-        obj->dbg_update_cl, obj->dwFrame_UpdateCL, obj->dwFrame_AsCrow, Device.dwFrame, Device.dwTimeGlobal);
+    const char *format = " "
+        "net_ID :%d, bActiveCounter :%d, bEnabled :%s, bVisible :%s, bDestroy :%s, \n "
+        "net_Local %s, net_Ready :%s, net_SV_Update :%s, crow :%s, bPreDestroy : %s \n "
+        "dbg_update_cl: %d, dwFrame_UpdateCL: %d, dwFrame_AsCrow :%d, Device.dwFrame :%d, Device.dwTimeGlobal: %d \n";
+    auto enabled = get_string(bool(!!props.bEnabled)).c_str();
+    auto visible = get_string(bool(!!props.bVisible)).c_str();
+    auto destroy = get_string(bool(!!props.bDestroy)).c_str();
+    auto netLocal = get_string(bool(!!props.net_Local)).c_str();
+    auto netReady = get_string(bool(!!props.net_Ready)).c_str();
+    auto netSvUpdate = get_string(bool(!!props.net_SV_Update)).c_str();
+    auto crow = get_string(bool(!!props.crow)).c_str();
+    auto preDestroy = get_string(bool(!!props.bPreDestroy)).c_str();
+    auto updateFrameDbg = obj->GetDbgUpdateFrame();
+    auto updateFrame = obj->GetUpdateFrame();
+    auto updateFrameCrow = obj->GetCrowUpdateFrame();
+    return make_string(format,
+        props.net_ID, props.bActiveCounter, enabled, visible, destroy,
+        netLocal, netReady, netSvUpdate, crow, preDestroy,
+        updateFrameDbg, updateFrame, updateFrameCrow, Device.dwFrame, Device.dwTimeGlobal);
 }
-ENGINE_API std::string dbg_object_full_dump_string(const CObject* obj)
+ENGINE_API std::string dbg_object_full_dump_string(const IGameObject* obj)
 {
     return dbg_object_base_dump_string(obj) +
         dbg_object_props_dump_string(obj) +
@@ -84,7 +94,7 @@ ENGINE_API std::string dbg_object_full_dump_string(const CObject* obj)
         dbg_object_visual_geom_dump_string(obj);
 
 }
-ENGINE_API std::string dbg_object_full_capped_dump_string(const CObject* obj)
+ENGINE_API std::string dbg_object_full_capped_dump_string(const IGameObject* obj)
 {
     return std::string("\n object dump: \n") +
         dbg_object_full_dump_string(obj);

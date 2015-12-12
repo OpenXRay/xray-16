@@ -11,8 +11,8 @@ public:
 };
 
 inline ICollidable::~ICollidable() {}
-// XXX: merge into CObject
-class ENGINE_API CollidableBase : public ICollidable
+// XXX: merge into IGameObject
+class ENGINE_API CollidableBase : public virtual ICollidable
 {
 public:
     CollidableBase();

@@ -11,6 +11,7 @@
 #include "CameraManager.h"
 #include "xr_object.h"
 #include "Feel_Sound.h"
+#include "xrServerEntities/smart_cast.h"
 
 ENGINE_API IGame_Level* g_pGameLevel = NULL;
 extern BOOL g_bLoaded;
@@ -111,7 +112,7 @@ bool IGame_Level::Load(u32 dwNum)
 
     // HUD + Environment
     if (!g_hud)
-        g_hud = (CCustomHUD*)NEW_INSTANCE(CLSID_HUDMANAGER);
+        g_hud = smart_cast<CCustomHUD*>(NEW_INSTANCE(CLSID_HUDMANAGER));
 
     // Render-level Load
     GlobalEnv.Render->level_Load(LL_Stream);
@@ -229,7 +230,7 @@ void CServerInfo::AddItem(shared_str& name_, LPCSTR value_, u32 color_)
     }
 }
 
-void IGame_Level::SetEntity(CObject* O)
+void IGame_Level::SetEntity(IGameObject* O)
 {
     if (pCurrentEntity)
         pCurrentEntity->On_LostEntity();
@@ -240,7 +241,7 @@ void IGame_Level::SetEntity(CObject* O)
     pCurrentEntity = pCurrentViewEntity = O;
 }
 
-void IGame_Level::SetViewEntity(CObject* O)
+void IGame_Level::SetViewEntity(IGameObject* O)
 {
     if (pCurrentViewEntity)
         pCurrentViewEntity->On_LostEntity();
@@ -284,7 +285,7 @@ void IGame_Level::SoundEvent_Register(ref_sound_data_ptr S, float range)
     {
         Feel::Sound* L = (*it)->dcast_FeelSound();
         if (0 == L) continue;
-        CObject* CO = (*it)->dcast_CObject();
+        IGameObject* CO = (*it)->dcast_GameObject();
         VERIFY(CO);
         if (CO->getDestroy()) continue;
 

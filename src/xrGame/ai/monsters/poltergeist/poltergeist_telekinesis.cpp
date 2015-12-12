@@ -133,7 +133,7 @@ class best_object_predicate2 {
 	Fvector enemy_pos;
 	Fvector monster_pos;
 public:
-	typedef CObject*	CObject_ptr;
+	typedef IGameObject*	CObject_ptr;
 
 	best_object_predicate2(const Fvector &m_pos, const Fvector &pos) {
 		monster_pos = m_pos;
@@ -151,7 +151,7 @@ public:
 
 //////////////////////////////////////////////////////////////////////////
 
-bool CPolterTele::trace_object(CObject *obj, const Fvector &target)
+bool CPolterTele::trace_object(IGameObject *obj, const Fvector &target)
 {
 	Fvector			trace_from;
 	obj->Center		(trace_from);
@@ -174,7 +174,7 @@ bool CPolterTele::trace_object(CObject *obj, const Fvector &target)
 	return false;
 }
 
-void CPolterTele::tele_find_objects(xr_vector<CObject*> &objects, const Fvector &pos) 
+void CPolterTele::tele_find_objects(xr_vector<IGameObject*> &objects, const Fvector &pos) 
 {
 	m_nearest.clear_not_free		();
 	Level().ObjectSpace.GetNearest	(m_nearest, pos, m_pmt_radius, NULL);
@@ -205,7 +205,7 @@ void CPolterTele::tele_find_objects(xr_vector<CObject*> &objects, const Fvector 
 bool CPolterTele::tele_raise_objects()
 {
 	// find objects near actor
-	xr_vector<CObject*>		tele_objects;
+	xr_vector<IGameObject*>		tele_objects;
 	tele_objects.reserve	(20);
 
 	// получить список объектов вокруг врага

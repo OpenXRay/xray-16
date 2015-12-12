@@ -4,7 +4,7 @@
 #include "memory_manager.h"
 #include "visual_memory_manager.h"
 #include "enemy_manager.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "monster_home.h"
 #include "Dog/dog.h"
 #include "ai_monster_squad.h"
@@ -236,7 +236,7 @@ ENEMIES_MAP_IT CMonsterEnemyMemory::find_best_enemy()
 	return it;
 }
 
-void CMonsterEnemyMemory::remove_links(CObject *O)
+void CMonsterEnemyMemory::remove_links(IGameObject *O)
 {
 	if ( monster )
 	{

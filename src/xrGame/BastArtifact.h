@@ -35,9 +35,9 @@ public:
 	virtual bool Useful() const;
 
 
-	virtual void feel_touch_new	(CObject* O);
-	virtual void feel_touch_delete	(CObject* O);
-	virtual bool feel_touch_contact	(CObject* O);
+	virtual void feel_touch_new	(IGameObject* O);
+	virtual void feel_touch_delete	(IGameObject* O);
+	virtual bool feel_touch_contact	(IGameObject* O);
 
 	bool IsAttacking() {return NULL!=m_AttakingEntity;}
 

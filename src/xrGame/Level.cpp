@@ -19,7 +19,7 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "team_base_zone.h"
 #include "infoportion.h"
-#include "patrol_path_storage.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"
 #include "date_time.h"
 #include "space_restriction_manager.h"
 #include "seniority_hierarchy_holder.h"
@@ -27,7 +27,7 @@
 #include "client_spawn_manager.h"
 #include "autosave_manager.h"
 #include "ClimableObject.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "mt_config.h"
 #include "phcommander.h"
 #include "map_manager.h"
@@ -56,6 +56,7 @@
 #include "PhysicObject.h"
 #include "PHDebug.h"
 #include "debug_text_tree.h"
+#include "LevelGraphDebugRender.hpp"
 #endif
 
 ENGINE_API bool g_dedicated_server;
@@ -94,6 +95,7 @@ CLevel::CLevel() :
         m_autosave_manager = xr_new<CAutosaveManager>();
 #ifdef DEBUG
         m_debug_renderer = xr_new<CDebugRenderer>();
+        levelGraphDebugRender = xr_new<LevelGraphDebugRender>();
         m_level_debug = xr_new<CLevelDebug>();
 #endif
     }
@@ -144,6 +146,7 @@ CLevel::~CLevel()
     xr_delete(m_client_spawn_manager);
     xr_delete(m_autosave_manager);
 #ifdef DEBUG
+    xr_delete(levelGraphDebugRender);
     xr_delete(m_debug_renderer);
 #endif
     if (!g_dedicated_server)
@@ -246,7 +249,7 @@ bool g_bDebugEvents = false;
 void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
 {
     // Msg("--- event[%d] for [%d]",type,dest);
-    CObject* O = Objects.net_Find(dest);
+    IGameObject* O = Objects.net_Find(dest);
     if (0 == O)
     {
 #ifdef DEBUG
@@ -277,7 +280,7 @@ void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
         u16 id = P.r_u16();
         P.r_seek(pos);
         bool ok = true;
-        CObject* D = Objects.net_Find(id);
+        IGameObject* D = Objects.net_Find(id);
         if (0 == D)
         {
 #ifndef MASTER_GOLD
@@ -628,7 +631,7 @@ void CLevel::OnRender()
 #endif
 #ifdef DEBUG
     if (ai().get_level_graph())
-        ai().level_graph().render();
+        levelGraphDebugRender->Render(ai().game_graph(), ai().level_graph());
 #ifdef DEBUG_PRECISE_PATH
     test_precise_path();
 #endif
@@ -639,7 +642,7 @@ void CLevel::OnRender()
     {
         for (u32 I = 0; I < Level().Objects.o_count(); I++)
         {
-            CObject* _O = Level().Objects.o_get_by_iterator(I);
+            IGameObject* _O = Level().Objects.o_get_by_iterator(I);
             CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(_O);
             if (stalker)
                 stalker->OnRender();
@@ -708,7 +711,7 @@ void CLevel::OnRender()
     {
         for (u32 I = 0; I < Level().Objects.o_count(); I++)
         {
-            CObject* object = Objects.o_get_by_iterator(I);
+            IGameObject* object = Objects.o_get_by_iterator(I);
             CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(object);
             if (!stalker)
                 continue;
@@ -721,7 +724,7 @@ void CLevel::OnRender()
     {
         for (u32 I = 0; I < Level().Objects.o_count(); I++)
         {
-            CObject* object = Objects.o_get_by_iterator(I);
+            IGameObject* object = Objects.o_get_by_iterator(I);
             CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(object);
             if (!stalker)
                 continue;
@@ -931,7 +934,7 @@ void CLevel::PhisStepsCallback(u32 Time0, u32 Time1)
     //#pragma todo("Oles to all: highly inefficient and slow!!!")
     //fixed (Andy)
     /*
-    for (xr_vector<CObject*>::iterator O=Level().Objects.objects.begin(); O!=Level().Objects.objects.end(); ++O)
+    for (xr_vector<IGameObject*>::iterator O=Level().Objects.objects.begin(); O!=Level().Objects.objects.end(); ++O)
     {
     if( smart_cast<CActor*>((*O)){
     CActor* pActor = smart_cast<CActor*>(*O);
@@ -1064,7 +1067,7 @@ CZoneList* CLevel::create_hud_zones_list()
     return hud_zones_list;
 }
 
-bool CZoneList::feel_touch_contact(CObject* O)
+bool CZoneList::feel_touch_contact(IGameObject* O)
 {
     TypesMapIt it = m_TypesMap.find(O->cNameSect());
     bool res = (it != m_TypesMap.end());

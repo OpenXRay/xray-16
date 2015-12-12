@@ -48,7 +48,7 @@ public:
 	virtual void	on_scanning				() {}
 
 private:
-			float	get_velocity			(CObject *obj);
+			float	get_velocity			(IGameObject *obj);
 
 #ifdef DEBUG
 public:

@@ -39,7 +39,7 @@ bool activating_character_delay::do_position_correct()
 	CPHMovementControl *m = char_support.movement();
 	VERIFY( m );
 	
-	CObject *obj =	m->ParentObject();
+	IGameObject *obj =	m->ParentObject();
 #ifdef	DEBUG 
 	CEntityAlive* e_alife =smart_cast<CEntityAlive*>(obj);
 	VERIFY(e_alife);

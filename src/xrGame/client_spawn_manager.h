@@ -15,7 +15,7 @@ class CGameObject;
 
 class CClientSpawnManager {
 public:
-	typedef fastdelegate::FastDelegate1<CObject*>			CALLBACK_TYPE;
+	typedef fastdelegate::FastDelegate1<IGameObject*>			CALLBACK_TYPE;
 
 public:
 	struct CSpawnCallback {
@@ -44,8 +44,8 @@ public:
 			void		remove					(ALife::_OBJECT_ID	requesting_id, ALife::_OBJECT_ID requested_id);
 			void		clear					(ALife::_OBJECT_ID	requested_id);
 			void		clear					();
-			void		callback				(CObject			*object);
-			void		callback				(CSpawnCallback		&spawn_callback, CObject *object);
+			void		callback				(IGameObject			*object);
+			void		callback				(CSpawnCallback		&spawn_callback, IGameObject *object);
 			const CSpawnCallback *callback		(ALife::_OBJECT_ID	requesting_id, ALife::_OBJECT_ID requested_id) const;
 #ifdef DEBUG
 	IC		const REQUEST_REGISTRY &registry	() const;

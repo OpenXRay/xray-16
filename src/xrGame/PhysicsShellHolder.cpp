@@ -120,7 +120,7 @@ void	CPhysicsShellHolder::PHHit( SHit &H )
 		if(m_pPhysicsShell) m_pPhysicsShell->applyHit(H.bone_space_position(),H.direction(),H.phys_impulse(),H.bone(),H.type());
 }
 
-//void	CPhysicsShellHolder::Hit(float P, Fvector &dir, CObject* who, s16 element,
+//void	CPhysicsShellHolder::Hit(float P, Fvector &dir, IGameObject* who, s16 element,
 //						 Fvector p_in_object_space, float impulse, ALife::EHitType hit_type)
 void	CPhysicsShellHolder::Hit					(SHit* pHDS)
 {

@@ -2,7 +2,7 @@
 #include "corpse_cover.h"
 #include "cover_point.h"
 #include "ai_space.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 
 void CMonsterCorpseCoverEvaluator::evaluate_cover		(const CCoverPoint *cover_point, float weight)
 {

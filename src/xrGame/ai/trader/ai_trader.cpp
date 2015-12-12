@@ -168,7 +168,7 @@ void CAI_Trader::OnEvent		(NET_Packet& P, u16 type)
 	CInventoryOwner::OnEvent	(P,type);
 
 	u16 id;
-	CObject* Obj;
+	IGameObject* Obj;
 
 	switch (type) {
 		case GE_TRADE_BUY:
@@ -204,7 +204,7 @@ void CAI_Trader::OnEvent		(NET_Packet& P, u16 type)
 	}
 }
 
-void CAI_Trader::feel_touch_new				(CObject* O)
+void CAI_Trader::feel_touch_new				(IGameObject* O)
 {
 	if (!g_Alive())		return;
 	if (Remote())		return;
@@ -221,7 +221,7 @@ void CAI_Trader::feel_touch_new				(CObject* O)
 	}
 }
 
-void CAI_Trader::DropItemSendMessage(CObject *O)
+void CAI_Trader::DropItemSendMessage(IGameObject *O)
 {
 	if (!O || !O->H_Parent() || (this != O->H_Parent()))
 		return;
@@ -265,7 +265,7 @@ void CAI_Trader::Think()
 {
 }
 
-void CAI_Trader::Die (CObject* who)
+void CAI_Trader::Die (IGameObject* who)
 {
 	inherited::Die (who);
 }

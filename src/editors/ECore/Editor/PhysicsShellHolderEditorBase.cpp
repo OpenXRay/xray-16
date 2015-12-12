@@ -2,8 +2,9 @@
 #pragma hdrstop
 
 #include "PhysicsShellHolderEditorBase.h"
-#include "../../xrphysics/physicsshell.h"
-#	include "GameMtlLib.h"
+#include "xrPhysics/PhysicsShell.h"
+#include "xrEngine/GameMtlLib.h"
+
 //CObjectList	 Objects;
 static void SetBoneMaterials( IKinematics &K )
 {

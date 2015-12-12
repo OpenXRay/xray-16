@@ -28,7 +28,7 @@ public:
 	virtual void				Load(CInifile const * ini,LPCSTR section);
 
 	virtual void 				net_Destroy		();
-	virtual void				net_Relcase		(CObject* O);
+	virtual void				net_Relcase		(IGameObject* O);
 	virtual void 				UpdateCL();
 	virtual void 				Explode();
 	virtual void 				ExplodeParams	(const Fvector& pos, const Fvector& dir);
@@ -70,7 +70,7 @@ static		void				GetRaySourcePos			(CExplosive	*exp_obj,const Fvector &expl_centr
 
 			void				ExplodeWaveProcessObject(collide::rq_results& storage,CPhysicsShellHolder*sh);
 			void				ExplodeWaveProcess		();
-static		float				TestPassEffect			(const	Fvector	&source_p,	const	Fvector	&dir,float range,float ef_radius,collide::rq_results& storage, CObject* blasted_obj);
+static		float				TestPassEffect			(const	Fvector	&source_p,	const	Fvector	&dir,float range,float ef_radius,collide::rq_results& storage, IGameObject* blasted_obj);
 			void				LightCreate				();
 			void				LightDestroy			();
 protected:
@@ -160,7 +160,7 @@ protected:
 	} effector;
 };
 
-IC void random_point_in_object_box(Fvector &out_pos,CObject* obj)
+IC void random_point_in_object_box(Fvector &out_pos,IGameObject* obj)
 {
 	const Fbox &l_b1 = obj->BoundingBox();
 	Fvector l_c, l_d;l_b1.get_CD(l_c,l_d);

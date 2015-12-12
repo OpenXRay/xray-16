@@ -51,7 +51,11 @@ public:
 	}
 private:
     // not exported
-    virtual	CLASS_ID &GetClassId() override { return call_member<CLASS_ID&>(this, "GetClassId"); }
+    virtual	CLASS_ID &GetClassId() override
+    {
+        static CLASS_ID id = -1;
+        return id;
+    }
 };
 
 typedef FactoryObjectWrapperTpl<IFactoryObject> FactoryObjectWrapper;
@@ -102,14 +106,14 @@ public:
 		return	(self->base::spatial_sector_point());
 	}
 	
-	virtual	CObject*		dcast_CObject				()
+	virtual	IGameObject*		dcast_GameObject				()
 	{
-		return	(call_member<CObject*>(this,"dcast_CObject"));
+		return	(call_member<IGameObject*>(this,"dcast_GameObject"));
 	}
 
-	static	CObject*		dcast_CObject_static		(base *self)
+	static	IGameObject*		dcast_CObject_static		(base *self)
 	{
-		return	(self->base::dcast_CObject());
+		return	(self->base::dcast_GameObject());
 	}
 
 	virtual	Feel::Sound*	dcast_FeelSound				()
@@ -208,9 +212,9 @@ public:
 */
 };
 
-typedef IRenderableWrapper<IRenderable,luabind::wrap_base> CIRenderableWrapper;
+using CIRenderableWrapper = IRenderableWrapper<IRenderable,luabind::wrap_base>;
 
-//typedef FactoryObjectWrapperTpl<CObject,luabind::wrap_base> CObjectDLL_Pure;
+//typedef FactoryObjectWrapperTpl<IGameObject,luabind::wrap_base> CObjectDLL_Pure;
 //typedef ISpatialWrapper<CObjectDLL_Pure>			CObjectISpatial;
 //typedef ISheduledWrapper<CObjectDLL_Pure>			CObjectISheduled;
 //typedef IRenderableWrapper<CObjectISheduled>		CObjectIRenderable;
@@ -221,7 +225,7 @@ typedef IRenderableWrapper<IRenderable,luabind::wrap_base> CIRenderableWrapper;
 //	virtual					~CObjectWrapper		() {};
 ///**
 //	virtual BOOL			Ready				();
-//	virtual CObject*		H_SetParent			(CObject* O);
+//	virtual IGameObject*		H_SetParent			(IGameObject* O);
 //	virtual void			Center				(Fvector& C) const;
 //	virtual float			Radius				() const;
 //	virtual const Fbox&		BoundingBox			() const;
@@ -235,8 +239,8 @@ typedef IRenderableWrapper<IRenderable,luabind::wrap_base> CIRenderableWrapper;
 //	virtual BOOL			net_Relevant		();
 //	virtual void			net_MigrateInactive	(NET_Packet& P);
 //	virtual void			net_MigrateActive	(NET_Packet& P);
-//	virtual void			net_Relcase			(CObject* O);
-//	virtual	SavedPosition	ps_Element			(u32 ID) const;
+//	virtual void			net_Relcase			(IGameObject* O);
+//	virtual	GameObjectSavedPosition	ps_Element			(u32 ID) const;
 //	virtual void			ForceTransform		(const Fmatrix& m);
 //	virtual void			OnHUDDraw			(CCustomHUD* hud);
 //	virtual void			OnH_B_Chield		();
@@ -247,10 +251,11 @@ typedef IRenderableWrapper<IRenderable,luabind::wrap_base> CIRenderableWrapper;
 //};
 
 
-typedef FactoryObjectWrapperTpl<CGameObject> CGameObjectIFactoryObject;
-//typedef ISpatialWrapper<CGameObjectIFactoryObject>				CGameObjectISpatial;
-typedef ISheduledWrapper<CGameObjectIFactoryObject>				CGameObjectISheduled;
-typedef IRenderableWrapper<CGameObjectISheduled>			CGameObjectIRenderable;
+using CGameObjectIFactoryObject = FactoryObjectWrapperTpl<CGameObject>;
+//using CGameObjectISpatial = ISpatialWrapper<CGameObjectIFactoryObject>;
+using CGameObjectISheduled = ISheduledWrapper<CGameObjectIFactoryObject>;
+using CGameObjectIRenderable = IRenderableWrapper<ISheduledWrapper<FactoryObjectWrapperTpl<CGameObject>>>;
+//using CGameObjectIRenderable = IRenderableWrapper<CGameObjectISheduled>; // original
 
 class CGameObjectWrapper : public CGameObjectIRenderable {
 public:
@@ -303,12 +308,12 @@ public:
 	IC						CEntityWrapper		() {}
 	virtual					~CEntityWrapper		() {}
 
-	virtual void			HitSignal			(float P, Fvector &local_dir,	CObject* who, s16 element)
+	virtual void			HitSignal			(float P, Fvector &local_dir,	IGameObject* who, s16 element)
 	{
 		luabind::call_member<void>(this,"HitSignal",P,local_dir,who,element);
 	}
 
-	static	void			HitSignal_static	(CEntity *self, float P, Fvector &local_dir,	CObject* who, s16 element)
+	static	void			HitSignal_static	(CEntity *self, float P, Fvector &local_dir,	IGameObject* who, s16 element)
 	{
 		ai().script_engine().script_log(LuaMessageType::Error,"You are trying to call a pure virtual function CEntity::HitSignal!");
 	}

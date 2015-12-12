@@ -14,13 +14,13 @@
 #include "enemy_manager.h"
 #include "memory_space_impl.h"
 #include "custommonster.h"
-#include "ai_object_location.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/ai_object_location.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "sound_user_data_visitor.h"
 #include "agent_manager.h"
 #include "agent_member_manager.h"
 #include "ai/stalker/ai_stalker.h"
-#include "profiler.h"
+#include "xrEngine/profiler.h"
 #include "client_spawn_manager.h"
 #include "memory_manager.h"
 #include "xrEngine/IGame_Persistent.h"
@@ -112,7 +112,7 @@ IC	u32	 CSoundMemoryManager::priority	(const MemorySpace::CSoundObject &sound) c
 	return				(priority);
 }
 
-void CSoundMemoryManager::enable		(const CObject *object, bool enable)
+void CSoundMemoryManager::enable		(const IGameObject *object, bool enable)
 {
 	xr_vector<CSoundObject>::iterator	J = std::find(m_sounds->begin(),m_sounds->end(),object_id(object));
 	if (J == m_sounds->end())
@@ -125,7 +125,7 @@ IC	bool is_sound_type(int s, const ESoundTypes &t)
 	return	((s & t) == t);
 }
 
-void CSoundMemoryManager::feel_sound_new(CObject *object, int sound_type, CSound_UserDataPtr user_data, const Fvector &position, float sound_power)
+void CSoundMemoryManager::feel_sound_new(IGameObject *object, int sound_type, CSound_UserDataPtr user_data, const Fvector &position, float sound_power)
 {
 #ifndef MASTER_GOLD
 	if (object && smart_cast<CActor*>(object) && psAI_Flags.test(aiIgnoreActor))
@@ -139,7 +139,7 @@ void CSoundMemoryManager::feel_sound_new(CObject *object, int sound_type, CSound
 	if (user_data)
 		user_data->accept	(m_visitor);
 
-	CObject					*self = m_object;
+	IGameObject					*self = m_object;
 	VERIFY					(self);
 #ifndef SILENCE
 	Msg						("%s (%d) - sound type %x from %s at %d in (%.2f,%.2f,%.2f) with power %.2f",*self->cName(),Device.dwTimeGlobal,sound_type,object ? *object->cName() : "world",Device.dwTimeGlobal,position.x,position.y,position.z,sound_power);
@@ -219,7 +219,7 @@ void CSoundMemoryManager::add			(const CSoundObject &sound_object, bool check_fo
 		m_sounds->push_back	(sound_object);
 }
 
-void CSoundMemoryManager::add			(const CObject *object, int sound_type, const Fvector &position, float sound_power)
+void CSoundMemoryManager::add			(const IGameObject *object, int sound_type, const Fvector &position, float sound_power)
 {
 #ifndef SAVE_OWN_SOUNDS
 	// we do not want to save our own sounds
@@ -334,9 +334,9 @@ void CSoundMemoryManager::update()
 }
 
 struct CSoundObjectPredicate {
-	const CObject *m_object;
+	const IGameObject *m_object;
 
-				CSoundObjectPredicate	(const CObject *object) :
+				CSoundObjectPredicate	(const IGameObject *object) :
 					m_object		(object)
 	{
 	}
@@ -353,7 +353,7 @@ struct CSoundObjectPredicate {
 	}
 };
 
-void CSoundMemoryManager::remove_links	(CObject *object)
+void CSoundMemoryManager::remove_links	(IGameObject *object)
 {
 	VERIFY					(m_sounds);
 	SOUNDS::iterator		I = std::find_if(m_sounds->begin(),m_sounds->end(),CSoundObjectPredicate(object));
@@ -505,7 +505,7 @@ void CSoundMemoryManager::clear_delayed_objects()
 	m_delayed_objects.clear					();
 }
 
-void CSoundMemoryManager::on_requested_spawn	(CObject *object)
+void CSoundMemoryManager::on_requested_spawn	(IGameObject *object)
 {
 	DELAYED_SOUND_OBJECTS::iterator		I = m_delayed_objects.begin();
 	DELAYED_SOUND_OBJECTS::iterator		E = m_delayed_objects.end();

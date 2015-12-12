@@ -197,7 +197,7 @@ void CGlowManager::Render			()
 void CGlowManager::render_sw		()
 {
 	// 0. save main view and disable
-	CObject*	o_main		= g_pGameLevel->CurrentViewEntity();
+	IGameObject*	o_main		= g_pGameLevel->CurrentViewEntity();
 
 	// 1. Test some number of glows
 	Fvector start	= Device.vCameraPosition;

@@ -89,7 +89,7 @@ void	character_shell_control::	set_start_shell_params		(CPhysicsShell	* sh) cons
 
 }
 
-void character_shell_control:: apply_start_velocity_factor	( CObject* who, Fvector &velocity ) const
+void character_shell_control:: apply_start_velocity_factor	( IGameObject* who, Fvector &velocity ) const
 {
 	velocity.mul( 1.3f );
 	velocity.mul( 1.25f*m_after_death_velocity_factor );

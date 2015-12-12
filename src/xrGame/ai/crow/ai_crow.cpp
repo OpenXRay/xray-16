@@ -257,7 +257,7 @@ void CAI_Crow::state_DeathFall()
 	VERIFY2( valid_pos( Position() ), dbg_valide_pos_string(Position(),this,"CAI_Crow::state_DeathFall()") );
 }
 
-void CAI_Crow::Die				(CObject* who)
+void CAI_Crow::Die				(IGameObject* who)
 {
 	inherited::Die	(who)	;
 	processing_activate	()	;	// enable UpdateCL for dead crows - especially for physics support
@@ -401,7 +401,7 @@ void CAI_Crow::net_Import	(NET_Packet& P)
 	VERIFY2				( valid_pos( Position() ), dbg_valide_pos_string(Position(),this," CAI_Crow::net_Import	(NET_Packet& P)") );
 }
 //---------------------------------------------------------------------
-void CAI_Crow::HitSignal	(float /**HitAmount/**/, Fvector& /**local_dir/**/, CObject* who, s16 /**element/**/)
+void CAI_Crow::HitSignal	(float /**HitAmount/**/, Fvector& /**local_dir/**/, IGameObject* who, s16 /**element/**/)
 {
 	//bool				first_time = !!g_Alive(); 
 //	bool				first_time = !PPhysicsShell(); 
@@ -425,7 +425,7 @@ void CAI_Crow::CreateSkeleton()
 	m_pPhysicsShell->SetMaterial(smart_cast<IKinematics*>(Visual())->LL_GetData(smart_cast<IKinematics*>(Visual())->LL_GetBoneRoot()).game_mtl_idx);
 }
 
-//void CAI_Crow::Hit	(float P, Fvector &dir, CObject* who, s16 element,Fvector p_in_object_space, float impulse, ALife::EHitType hit_type)
+//void CAI_Crow::Hit	(float P, Fvector &dir, IGameObject* who, s16 element,Fvector p_in_object_space, float impulse, ALife::EHitType hit_type)
 void	CAI_Crow::Hit							(SHit* pHDS)
 {
 //	inherited::Hit	(P,dir,who,element,p_in_object_space,impulse/100.f, hit_type);

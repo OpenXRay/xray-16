@@ -28,7 +28,7 @@ void __stdcall	CHOM::MT_RENDER()
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CHOM::CHOM()
+CHOM::CHOM() : xrc("HOM")
 {
 	bEnabled		= FALSE;
 	m_pModel		= 0;
@@ -341,6 +341,7 @@ void CHOM::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
     font.OutNext("- frustum:    %u", stats.FrustumTriangleCount);
     font.OutNext("- total:      %d", m_pModel ? m_pModel->get_tris_count() : 0);
     stats.FrameStart();
+    xrc.DumpStatistics(font, alert);
 }
 
 #ifdef DEBUG

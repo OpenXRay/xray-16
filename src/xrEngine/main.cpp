@@ -341,7 +341,8 @@ void Startup()
     //#endif
     LALib.OnCreate();
     pApp = xr_new<CApplication>();
-    g_pGamePersistent = (IGame_Persistent*)NEW_INSTANCE(CLSID_GAME_PERSISTANT);
+    g_pGamePersistent = dynamic_cast<IGame_Persistent*>(NEW_INSTANCE(CLSID_GAME_PERSISTANT));
+    R_ASSERT(g_pGamePersistent);
     g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
     g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
 

@@ -11,7 +11,7 @@
 
 #include "xrEngine/feel_vision.h"
 
-class CObject;
+class IGameObject;
 class CEntity;
 class CVisualMemoryManager;
 
@@ -49,10 +49,10 @@ public:
 	virtual bool					shedule_Needed			();
 
 public:
-	virtual	float					feel_vision_mtl_transp	(CObject *object, u32 element);
+	virtual	float					feel_vision_mtl_transp	(IGameObject *object, u32 element);
 
 public:
-	virtual	bool					feel_vision_isRelevant	(CObject *object) = 0;
+	virtual	bool					feel_vision_isRelevant	(IGameObject *object) = 0;
 	virtual	void					camera					(
 										Fvector &position,
 										Fvector &direction,
@@ -67,7 +67,7 @@ public:
 public:
 	virtual	void					reinit					();
 	virtual	void					reload					(LPCSTR section);
-			void					remove_links			(CObject *object);
+			void					remove_links			(IGameObject *object);
 
 public:
 	IC		CVisualMemoryManager	&visual					() const;

@@ -7,7 +7,7 @@
 
 #include "CameraBase.h"
 
-CCameraBase::CCameraBase(CObject* p, u32 flags)
+CCameraBase::CCameraBase(IGameObject* p, u32 flags)
 {
     m_Flags.assign(flags);
     vPosition.set(0, 0, 0);

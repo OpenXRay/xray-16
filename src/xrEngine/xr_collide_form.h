@@ -4,7 +4,7 @@
 #include "xrCDB/xr_collide_defs.h"
 
 // refs
-class ENGINE_API CObject;
+class ENGINE_API IGameObject;
 class ENGINE_API CInifile;
 
 // t-defs
@@ -25,7 +25,7 @@ struct clQueryTri
 
 struct clQueryCollision
 {
-    xr_vector<CObject*> objects; // affected objects
+    xr_vector<IGameObject*> objects; // affected objects
     xr_vector<clQueryTri> tris; // triangles (if queried)
     xr_vector<Fobb> boxes; // boxes/ellipsoids (if queried)
     xr_vector<Fvector4> spheres; // spheres (if queried)
@@ -85,7 +85,7 @@ class ENGINE_API ICollisionForm
 {
     friend class CObjectSpace;
 protected:
-    CObject* owner; // владелец
+    IGameObject* owner; // владелец
     u32 dwQueryID;
 protected:
     Fbox bv_box; // (Local) BBox объекта
@@ -93,13 +93,13 @@ protected:
 private:
     ECollisionFormType m_type;
 public:
-    ICollisionForm(CObject* _owner, ECollisionFormType tp);
+    ICollisionForm(IGameObject* _owner, ECollisionFormType tp);
     virtual ~ICollisionForm();
 
     virtual BOOL _RayQuery(const collide::ray_defs& Q, collide::rq_results& R) = 0;
     //virtual void _BoxQuery ( const Fbox& B, const Fmatrix& M, u32 flags) = 0;
 
-    IC CObject* Owner() const { return owner; }
+    IC IGameObject* Owner() const { return owner; }
     const Fbox& getBBox() const { return bv_box; }
     float getRadius() const { return bv_sphere.R; }
     const Fsphere& getSphere() const { return bv_sphere; }
@@ -146,7 +146,7 @@ private:
     void BuildState();
     void BuildTopLevel();
 public:
-    CCF_Skeleton(CObject* _owner);
+    CCF_Skeleton(IGameObject* _owner);
 
     virtual BOOL _RayQuery(const collide::ray_defs& Q, collide::rq_results& R);
     bool _ElementCenter(u16 elem_id, Fvector& e_center);
@@ -161,12 +161,12 @@ class ENGINE_API CCF_EventBox : public ICollisionForm
 private:
     Fplane Planes[6];
 public:
-    CCF_EventBox(CObject* _owner);
+    CCF_EventBox(IGameObject* _owner);
 
     virtual BOOL _RayQuery(const collide::ray_defs& Q, collide::rq_results& R);
     //virtual void _BoxQuery ( const Fbox& B, const Fmatrix& M, u32 flags);
 
-    BOOL Contact(CObject* O);
+    BOOL Contact(IGameObject* O);
 };
 
 class ENGINE_API CCF_Shape : public ICollisionForm
@@ -188,7 +188,7 @@ public:
     };
     xr_vector<shape_def> shapes;
 public:
-    CCF_Shape(CObject* _owner);
+    CCF_Shape(IGameObject* _owner);
 
     virtual BOOL _RayQuery(const collide::ray_defs& Q, collide::rq_results& R);
     //virtual void _BoxQuery ( const Fbox& B, const Fmatrix& M, u32 flags);
@@ -196,7 +196,7 @@ public:
     void add_sphere(Fsphere& S);
     void add_box(Fmatrix& B);
     void ComputeBounds();
-    BOOL Contact(CObject* O);
+    BOOL Contact(IGameObject* O);
     xr_vector<shape_def>& Shapes() { return shapes; }
 };
 

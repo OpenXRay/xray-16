@@ -65,9 +65,9 @@ protected:
 	u32								m_dwSM_SwitchDelta;
 	u32								m_dwSM_LastSwitchTime;
 	u32								m_dwSM_CurViewEntity;
-	CObject	*						m_pSM_CurViewEntity;
+	IGameObject	*						m_pSM_CurViewEntity;
 	void							SM_SwitchOnNextActivePlayer			();
-	void							SM_SwitchOnPlayer		(CObject* pNewObject);
+	void							SM_SwitchOnPlayer		(IGameObject* pNewObject);
 
 	BOOL							Is_Anomaly_InLists		(CSE_Abstract* E);
 
@@ -97,7 +97,7 @@ protected:
 	u32								m_dwWarmUp_CurTime;
 	bool							m_bInWarmUp;
 	
-				void	__stdcall	net_Relcase				(CObject* O);
+				void	__stdcall	net_Relcase				(IGameObject* O);
 
 public:
 									game_sv_Deathmatch		();

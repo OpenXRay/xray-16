@@ -2,19 +2,9 @@
 
 //UI-controls
 #include "UIScriptWnd.h"
-#include "UIButton.h"
-#include "UIMessageBox.h"
-#include "UIPropertiesBox.h"
-#include "UICheckButton.h"
-#include "UIRadioButton.h"
-#include "UIStatic.h"
-#include "UIEditBox.h"
-#include "UIFrameWindow.h"
-#include "UIFrameLineWnd.h"
-#include "UIProgressBar.h"
-#include "UITabControl.h"
 #include "uiscriptwnd_script.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "xrScriptEngine/Functor.hpp"
 
 using namespace luabind;
 

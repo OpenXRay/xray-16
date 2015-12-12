@@ -218,7 +218,7 @@ LPCSTR CObjectHandlerPlanner::property2string(const _condition_type &id)
 }
 #endif
 
-void CObjectHandlerPlanner::remove_evaluators	(CObject *object)
+void CObjectHandlerPlanner::remove_evaluators	(IGameObject *object)
 {
 #pragma todo("Dima to Dima : safe, but not optimal!")
 	for (;;) {
@@ -229,7 +229,7 @@ void CObjectHandlerPlanner::remove_evaluators	(CObject *object)
 	}
 }
 
-void CObjectHandlerPlanner::remove_operators	(CObject *object)
+void CObjectHandlerPlanner::remove_operators	(IGameObject *object)
 {
 #pragma todo("Dima to Dima : safe, but not optimal!")
 	for (;;) {

@@ -134,7 +134,7 @@ IC		CIKLimbsController				*ik_controller					( )	{ return m_ik_controller; }
 		void 							in_NetSpawn						( CSE_Abstract* e )																									;
 		void 							in_NetDestroy					( )																													;
 		void							destroy_imotion					( );
-		void							in_NetRelcase					( CObject* O )																										;
+		void							in_NetRelcase					( IGameObject* O )																										;
 		void 							in_Init							( )																													;
 		void 							in_Load							( LPCSTR section )																									;
 		void 							in_Hit							( SHit &H, bool is_killing=false );
@@ -167,13 +167,13 @@ virtual									~CCharacterPhysicsSupport		( )																													;
 private:
 		void 							CreateSkeleton					( CPhysicsShell* &pShell )																							;
 
-		void 							ActivateShell					( CObject* who )																									;
-		void							CreateShell						( CObject* who, Fvector& dp, Fvector & velocity  )																	;
+		void 							ActivateShell					( IGameObject* who )																									;
+		void							CreateShell						( IGameObject* who, Fvector& dp, Fvector & velocity  )																	;
 		void							AddActiveWeaponCollision		();
 		void							RemoveActiveWeaponCollision		();
 		void							bone_chain_disable				(u16 bone, u16 r_bone, IKinematics &K);
 		void							bone_fix_clear					();
-		void							EndActivateFreeShell			( CObject* who, const Fvector& inital_entity_position, const Fvector& dp, const Fvector & velocity )				;
+		void							EndActivateFreeShell			( IGameObject* who, const Fvector& inital_entity_position, const Fvector& dp, const Fvector & velocity )				;
 		void							KillHit							( SHit &H )																											;
 static	void							DeathAnimCallback				( CBlend *B )																										;
 		void							CreateIKController				( )																													;

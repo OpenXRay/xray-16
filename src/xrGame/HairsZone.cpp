@@ -19,7 +19,7 @@ void CHairsZone::CheckForAwaking()
 	for(OBJECT_INFO_VEC_IT it = m_ObjectInfoMap.begin(); 
 		m_ObjectInfoMap.end() != it; ++it) 
 	{
-		CObject* pObject = (*it).object;
+		IGameObject* pObject = (*it).object;
 		if (!pObject) continue;
 
 		CEntityAlive* pEnt = smart_cast<CEntityAlive*>(pObject);

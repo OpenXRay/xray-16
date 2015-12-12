@@ -10,7 +10,7 @@
 
 #include "GameObject.h"
 #include "xrEngine/feel_touch.h"
-#include "game_graph_space.h"
+#include "xrAICore/Navigation/game_graph_space.h"
 
 class CLevelChanger : public CGameObject, public Feel::Touch {
 private:
@@ -36,8 +36,8 @@ public:
 	virtual void		Center				(Fvector& C) const;
 	virtual float		Radius				() const;
 	virtual void		shedule_Update		(u32 dt);
-	virtual void		feel_touch_new		(CObject* O);
-	virtual bool		feel_touch_contact	(CObject* O);
+	virtual void		feel_touch_new		(IGameObject* O);
+	virtual bool		feel_touch_contact	(IGameObject* O);
 
 	virtual bool		IsVisibleForZones() { return false;}
 	void				EnableLevelChanger	(bool b)				{m_b_enabled=b;}

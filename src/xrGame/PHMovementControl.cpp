@@ -45,7 +45,7 @@
 
 const u64 after_creation_collision_hit_block_steps_number=100;
 
-CPHMovementControl::CPHMovementControl(CObject* parent)
+CPHMovementControl::CPHMovementControl(IGameObject* parent)
 {
 	pObject=parent;
 
@@ -263,7 +263,7 @@ void CPHMovementControl::UpdateCollisionDamage( )
 }
 
 #include <ai/monsters/basemonster/base_monster.h>
-#include <ai_object_location.h>
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "xrCore/_vector3d_ext.h"
 
 bool CPHMovementControl::MakeJumpPath(xr_vector<DetailPathManager::STravelPathPoint> &	out_path, 
@@ -1354,7 +1354,7 @@ void	CPHMovementControl::TraceBorder(const Fvector &prev_position)
 
 	STraceBorderQParams			p(this,dir);
 	storage.r_clear				();
-	g_pGameLevel->ObjectSpace.RayQuery(storage,RD,BorderTraceCallback,&p,NULL,smart_cast<CObject*>(m_character->PhysicsRefObject()));
+	g_pGameLevel->ObjectSpace.RayQuery(storage,RD,BorderTraceCallback,&p,NULL,smart_cast<IGameObject*>(m_character->PhysicsRefObject()));
 }
 
 void	CPHMovementControl::				UpdateObjectBox(CPHCharacter *ach)
@@ -1774,7 +1774,7 @@ void			CPHMovementControl::BlockDamageSet		( u64 steps_num )
 	UpdateCollisionDamage();//reset all saved values
 }
 
-void	CPHMovementControl::NetRelcase	( CObject* O )
+void	CPHMovementControl::NetRelcase	( IGameObject* O )
 {
 	
 	CPhysicsShellHolder *sh = smart_cast<CPhysicsShellHolder *>(O);

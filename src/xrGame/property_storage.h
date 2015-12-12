@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "graph_engine_space.h"
+#include "xrAICore/Navigation/graph_engine_space.h"
 
 class CPropertyStorage {
 public:

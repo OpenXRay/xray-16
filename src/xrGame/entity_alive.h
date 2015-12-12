@@ -59,7 +59,7 @@ public:
 
 	virtual void			HitImpulse				(float amount, Fvector& vWorldDir, Fvector& vLocalDir);
 	virtual	void			Hit						(SHit* pHDS);
-	virtual void			Die						(CObject* who);
+	virtual void			Die						(IGameObject* who);
 	virtual void			g_WeaponBones			(int &L, int &R1, int &R2)										= 0;
 			void			set_lock_corpse			(bool b_l_corpse);
 			bool			is_locked_corpse		();
@@ -181,7 +181,7 @@ public:
 	virtual void				OnCriticalRadiationHealthLoss() {};	//вызывается если entity умрет от радиации 
 
 	virtual	CVisualMemoryManager*visual_memory				() const {return(0);}
-	virtual	void				net_Relcase					(CObject *O);
+	virtual	void				net_Relcase					(IGameObject *O);
 
 public:
 	virtual	Fvector				predict_position			(const float &time_to_check) const;

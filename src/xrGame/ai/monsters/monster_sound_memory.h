@@ -39,7 +39,7 @@ typedef enum {
 
 typedef struct tagSoundElement
 {
-	const CObject		*who;
+	const IGameObject		*who;
 	TSoundDangerValue	type;
 	Fvector				position;		// позиция звука, не объекта, издавшего звук
 	float				power;
@@ -53,7 +53,7 @@ typedef struct tagSoundElement
 	bool operator < (const tagSoundElement &s) const  { 
 		return (value < s.value);
 	}
-	IC void SetConvert(const CObject* who, int eType, const Fvector &position, float power, TTime time) {
+	IC void SetConvert(const IGameObject* who, int eType, const Fvector &position, float power, TTime time) {
 		this->who = who; type = ConvertSoundType((ESoundTypes)eType); this->position = position; this->power = power; this->time = time;
 	}
 	TSoundDangerValue ConvertSoundType(ESoundTypes stype);
@@ -80,7 +80,7 @@ public:
 	void		init_external			(CBaseMonster *M, TTime mem_time);
 
 	void		HearSound				(const SoundElem &s);
-	void		HearSound				(const CObject* who, int eType, const Fvector &Position, float power, TTime time);
+	void		HearSound				(const IGameObject* who, int eType, const Fvector &Position, float power, TTime time);
 	IC	bool	IsRememberSound			() {return (!Sounds.empty());}		
 	
 	// Lain: added
@@ -89,14 +89,14 @@ public:
 
 	void		GetSound				(SoundElem& s, bool& bDangerous);	// возвращает самый опасный звук
 	SoundElem	&GetSound				();
-	bool		get_sound_from_object	(const CObject* who, SoundElem	&value);	
+	bool		get_sound_from_object	(const IGameObject* who, SoundElem	&value);	
 
 	void		UpdateHearing			();
 
 	bool		is_loud_sound			(float val);
 	
 	void		clear					() {Sounds.clear();}
-	void		remove_links			(CObject *O);
+	void		remove_links			(IGameObject *O);
 
 	// help sounds
 	bool		hear_help_sound			();

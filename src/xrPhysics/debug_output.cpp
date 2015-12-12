@@ -81,9 +81,9 @@ virtual	void _cdecl DBG_OutText( LPCSTR s,... )
 }
 //virtual	void DBG_TextOutSet( float x, float y )									=0;
 //virtual	void DBG_TextSetColor( u32 color )										=0;
-//virtual	void DBG_DrawBind( CObject &O )											=0;
-//virtual	void DBG_PhysBones( CObject &O )										=0;
-//virtual	void DBG_DrawBones( CObject &O )										=0;
+//virtual	void DBG_DrawBind( IGameObject &O )											=0;
+//virtual	void DBG_PhysBones( IGameObject &O )										=0;
+//virtual	void DBG_DrawBones( IGameObject &O )										=0;
 virtual	void DBG_DrawFrameStart( )
 {
 

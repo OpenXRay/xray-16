@@ -16,7 +16,7 @@ class CControl_Com;
 
 class CControl_Manager {
 	CBaseMonster			*m_object;
-	xr_vector<CObject*>		m_nearest;
+	xr_vector<IGameObject*>		m_nearest;
 
 	DEFINE_VECTOR			(CControl_Com *, CONTROLLERS_VECTOR, CONTROLLERS_VECTOR_IT);
 	DEFINE_MAP				(ControlCom::EEventType, CONTROLLERS_VECTOR, LISTENERS_MAP, LISTENERS_MAP_IT);	

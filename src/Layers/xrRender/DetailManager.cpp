@@ -73,8 +73,8 @@ void CDetailManager::SSwingValue::lerp(const SSwingValue& A, const SSwingValue& 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-
-CDetailManager::CDetailManager	()
+// XXX stats: add to statistics
+CDetailManager::CDetailManager	() : xrc("detail manager")
 {
 	dtFS 		= 0;
 	dtSlots		= 0;

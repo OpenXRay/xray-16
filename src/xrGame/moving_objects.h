@@ -13,14 +13,14 @@
 #include "obstacles_query.h"
 
 class moving_object;
-class CObject;
+class IGameObject;
 class MagicBox3;
 struct boxes;
 
 class moving_objects {
 private:
 	typedef CQuadTree<moving_object>					TREE;
-	typedef xr_vector<CObject*>							NEAREST_STATIC;
+	typedef xr_vector<IGameObject*>							NEAREST_STATIC;
 
 public:
 	enum possible_actions {
@@ -65,7 +65,7 @@ private:
 #endif // DEBUG
 
 private:
-	IC		bool				collided				(const CObject *object, const Fvector &position, const float &radius) const;
+	IC		bool				collided				(const IGameObject *object, const Fvector &position, const float &radius) const;
 			bool				collided_static			(const Fvector &position, const float &radius);
 			bool				collided_static			(moving_object *object, const Fvector &dest_position);
 			void				fill_static				(obstacles_query &query, const Fvector &position, const float &radius);

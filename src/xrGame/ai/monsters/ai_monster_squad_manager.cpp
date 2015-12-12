@@ -98,7 +98,7 @@ void CMonsterSquadManager::update(CEntity *entity)
 	}
 }
 
-void CMonsterSquadManager::remove_links(CObject *O)
+void CMonsterSquadManager::remove_links(IGameObject *O)
 {
 	for (u32 team_id=0; team_id<team.size();team_id++) {
 		for (u32 squad_id=0; squad_id<team[team_id].size(); squad_id++) {

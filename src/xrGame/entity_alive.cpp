@@ -305,7 +305,7 @@ void	CEntityAlive::Hit(SHit* pHDS)
 
 }
 
-void CEntityAlive::Die	(CObject* who)
+void CEntityAlive::Die	(IGameObject* who)
 {
 	if(IsGameTypeSingle())
 		RELATION_REGISTRY().Action(smart_cast<CEntityAlive*>(who), this, RELATION_REGISTRY::KILL);
@@ -739,7 +739,7 @@ void					CEntityAlive::	set_collision_hit_callback		(ICollisionHitCallback *cc)
 
 }
 
-void CEntityAlive::net_Relcase	(CObject *object)
+void CEntityAlive::net_Relcase	(IGameObject *object)
 {
 	inherited::net_Relcase		(object);
 	conditions().remove_links	(object);

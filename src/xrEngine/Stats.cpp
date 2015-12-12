@@ -70,8 +70,7 @@ CStats::~CStats()
     xr_delete(statsFont);
 }
 
-
-static void DumpSpatialStatistics(CGameFont &font, IPerformanceAlert *alert, ISpatial_DB &db, float engineTotal)
+static void DumpSpatialStatistics(IGameFont &font, IPerformanceAlert *alert, ISpatial_DB &db, float engineTotal)
 {
 #ifdef DEBUG
     auto &stats = db.Stats;
@@ -85,21 +84,6 @@ static void DumpSpatialStatistics(CGameFont &font, IPerformanceAlert *alert, ISp
 #undef PPP
     stats.FrameStart();
 #endif
-}
-
-static void DumpColliderStatistics(CGameFont &font, IPerformanceAlert *alert)
-{
-    auto &stats = XRC.Stats;
-    stats.FrameEnd();
-    static float rayPs = 0;
-    static float boxPs = 0;
-    rayPs = 0.99f*rayPs + 0.01f*(stats.RayQuery.count/stats.RayQuery.result);
-    boxPs = 0.99f*boxPs + 0.01f*(stats.BoxQuery.count/stats.BoxQuery.result);
-    font.OutNext("XRC:");
-    font.OutNext("- ray:        %2.2fms, %d, %2.0fK", stats.RayQuery.result, stats.RayQuery.count, rayPs);
-    font.OutNext("- box:        %2.2fms, %d, %2.0fK", stats.BoxQuery.result, stats.BoxQuery.count, boxPs);
-    font.OutNext("- frustum:    %2.2fms, %d", stats.FrustumQuery.result, stats.FrustumQuery.count);
-    stats.FrameStart();
 }
 
 void CStats::Show()
@@ -142,7 +126,6 @@ void CStats::Show()
         g_pGamePersistent->DumpStatistics(font, alertPtr);
         DumpSpatialStatistics(font, alertPtr, *g_SpatialSpace, engineTotal);
         DumpSpatialStatistics(font, alertPtr, *g_SpatialSpacePhysic, engineTotal);
-        DumpColliderStatistics(font, alertPtr);
         if (physics_world())
             physics_world()->DumpStatistics(font, alertPtr);
         font.OutSet(200, 0);

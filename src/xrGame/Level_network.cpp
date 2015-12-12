@@ -187,7 +187,7 @@ void CLevel::ClientSend()
 //		if (!(Game().local_player) || Game().local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) return;
 		if (CurrentControlEntity()) 
 		{
-			CObject* pObj = CurrentControlEntity();
+			IGameObject* pObj = CurrentControlEntity();
 			if (!pObj->getDestroy() && pObj->net_Relevant())
 			{				
 				P.w_begin		(M_CL_UPDATE);
@@ -237,7 +237,7 @@ u32	CLevel::Objects_net_Save	(NET_Packet* _Packet, u32 start, u32 max_object_siz
 	NET_Packet& Packet	= *_Packet;
 	u32			position;
 	for (; start<Objects.o_count(); start++)	{
-		CObject		*_P = Objects.o_get_by_iterator(start);
+		IGameObject		*_P = Objects.o_get_by_iterator(start);
 		CGameObject *P = smart_cast<CGameObject*>(_P);
 //		Msg			("save:iterating:%d:%s, size[%d]",P->ID(),*P->cName(), Packet.w_tell() );
 		if (P && !P->getDestroy() && P->net_SaveRelevant())	{
@@ -513,7 +513,7 @@ void			CLevel::ClearAllObjects				()
 		ParentFound = false;
 		for (u32 i=0; i<CLObjNum; i++)
 		{
-			CObject* pObj = Level().Objects.o_get_by_iterator(i);
+			IGameObject* pObj = Level().Objects.o_get_by_iterator(i);
 			if (!pObj->H_Parent()) continue;
 			//-----------------------------------------------------------
 			NET_Packet			GEN;
@@ -539,7 +539,7 @@ void			CLevel::ClearAllObjects				()
 
 	for (u32 i=0; i<CLObjNum; i++)
 	{
-		CObject* pObj = Level().Objects.o_get_by_iterator(i);
+		IGameObject* pObj = Level().Objects.o_get_by_iterator(i);
 		if (pObj->H_Parent() != NULL)
 		{
 			if (IsGameTypeSingle())

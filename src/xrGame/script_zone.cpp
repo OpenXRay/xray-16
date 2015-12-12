@@ -57,7 +57,7 @@ void CScriptZone::shedule_Update(u32 dt)
 	feel_touch_update			(P,s.R);
 }
 
-void CScriptZone::feel_touch_new	(CObject *tpObject)
+void CScriptZone::feel_touch_new	(IGameObject *tpObject)
 {
 	CGameObject					*l_tpGameObject = smart_cast<CGameObject*>(tpObject);
 	if (!l_tpGameObject)
@@ -66,7 +66,7 @@ void CScriptZone::feel_touch_new	(CObject *tpObject)
 	callback(GameObject::eZoneEnter)(lua_game_object(),l_tpGameObject->lua_game_object());
 }
 
-void CScriptZone::feel_touch_delete	(CObject *tpObject)
+void CScriptZone::feel_touch_delete	(IGameObject *tpObject)
 {
 	CGameObject					*l_tpGameObject = smart_cast<CGameObject*>(tpObject);
 	
@@ -76,19 +76,19 @@ void CScriptZone::feel_touch_delete	(CObject *tpObject)
 	callback(GameObject::eZoneExit)(lua_game_object(),l_tpGameObject->lua_game_object());
 }
 
-void CScriptZone::net_Relcase			(CObject *O)
+void CScriptZone::net_Relcase			(IGameObject *O)
 {
 	CGameObject					*l_tpGameObject = smart_cast<CGameObject*>(O);
 	if (!l_tpGameObject)
 		return;
 
-	xr_vector<CObject*>::iterator	I = std::find(feel_touch.begin(),feel_touch.end(),O);
+	xr_vector<IGameObject*>::iterator	I = std::find(feel_touch.begin(),feel_touch.end(),O);
 	if (I != feel_touch.end()) {
 		callback(GameObject::eZoneExit)(lua_game_object(),l_tpGameObject->lua_game_object());
 	}
 }
 
-bool CScriptZone::feel_touch_contact	(CObject* O)
+bool CScriptZone::feel_touch_contact	(IGameObject* O)
 {
 	return						(((CCF_Shape*)GetCForm())->Contact(O));
 }
@@ -130,8 +130,8 @@ void CScriptZone::OnRender()
 
 bool CScriptZone::active_contact(u16 id) const
 {
-	xr_vector<CObject*>::const_iterator	I = feel_touch.begin();
-	xr_vector<CObject*>::const_iterator	E = feel_touch.end();
+	xr_vector<IGameObject*>::const_iterator	I = feel_touch.begin();
+	xr_vector<IGameObject*>::const_iterator	E = feel_touch.end();
 	for ( ; I != E; ++I)
 		if ((*I)->ID() == id)
 			return						(true);

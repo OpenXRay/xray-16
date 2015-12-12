@@ -603,9 +603,9 @@ void CAgentEnemyManager::distribute_enemies		()
 }
 
 struct wounded_predicate {
-	CObject			*m_object;
+	IGameObject			*m_object;
 
-	IC			wounded_predicate	(CObject *object)
+	IC			wounded_predicate	(IGameObject *object)
 	{
 		VERIFY		(object);
 		m_object	= object;
@@ -623,7 +623,7 @@ struct wounded_predicate {
 	}
 };
 
-void CAgentEnemyManager::remove_links			(CObject *object)
+void CAgentEnemyManager::remove_links			(IGameObject *object)
 {
 	m_wounded.erase					(
 		std::remove_if(

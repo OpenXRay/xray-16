@@ -12,18 +12,29 @@
 #include <ExtCtrls.hpp>
 #include <Graphics.hpp>
 #include <jpeg.hpp>
+
 //---------------------------------------------------------------------------
 class TfrmSplash : public TForm
 {
-__published:	// IDE-managed Components
-    TImage *Image1;
-	TMxLabel *lbStatus;
-private:	// User declarations
-public:		// User declarations
-    __fastcall TfrmSplash(TComponent* Owner);
-    void SetStatus(LPSTR log){ if (log){ lbStatus->Caption = log; lbStatus->Repaint(); };}
+    __published: // IDE-managed Components
+    TImage*Image1;
+    TMxLabel *lbStatus;
+private: // User declarations
+public: // User declarations
+    __fastcall TfrmSplash(TComponent *Owner);
+
+    void SetStatus(LPSTR log)
+    {
+        if (log)
+        {
+            lbStatus->Caption = log;
+            lbStatus->Repaint();
+        };
+    }
 };
+
 //---------------------------------------------------------------------------
-extern PACKAGE TfrmSplash *frmSplash;
+extern PACKAGE TfrmSplash * frmSplash;
 //---------------------------------------------------------------------------
 #endif
+

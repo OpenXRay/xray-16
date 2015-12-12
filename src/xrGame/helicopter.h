@@ -8,7 +8,7 @@
 #include "hit_immunity.h"
 #include "memory_manager.h"
 #include "HudSound.h"
-#include "patrol_path.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path.h"
 #include "PHDestroyable.h"
 #include "Explosive.h"
 
@@ -273,7 +273,7 @@ public:
 	virtual void					net_Destroy			();
 	virtual void					net_Export			(NET_Packet &P){};
 	virtual void					net_Import			(NET_Packet &P){};
-	virtual void					net_Relcase			(CObject* O );
+	virtual void					net_Relcase			(IGameObject* O );
 	virtual void					save				(NET_Packet &output_packet);
 	virtual void					load				(IReader &input_packet);
 
@@ -294,7 +294,7 @@ public:
 	virtual	void					Hit					(SHit* pHDS);
 	virtual void					PHHit				(SHit &H);
 	//CEntity
-	virtual void					HitSignal			(float P, Fvector &local_dir,	CObject* who, s16 element){;}
+	virtual void					HitSignal			(float P, Fvector &local_dir,	IGameObject* who, s16 element){;}
 	virtual void					HitImpulse			(float P, Fvector &vWorldDir, 	Fvector& vLocalDir){;}
 	
 	virtual const Fmatrix&			get_ParticlesXFORM			();
@@ -307,7 +307,7 @@ public:
 public:
 	//for scripting
 	bool					isVisible						(CScriptGameObject* O);
-	bool					isObjectVisible					(CObject* O);
+	bool					isObjectVisible					(IGameObject* O);
 	bool			 		isOnAttack						()				{return m_enemy.type!=eEnemyNone;}
 
 	void					goPatrolByPatrolPath			(LPCSTR path_name,int start_idx);

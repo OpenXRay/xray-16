@@ -14,8 +14,8 @@
 #include "PHDestroyable.h"
 #include "CharacterPhysicsSupport.h"
 #include "script_entity_action.h"
-#include "game_level_cross_table.h"
-#include "game_graph.h"
+#include "xrAICore/Navigation/game_level_cross_table.h"
+#include "xrAICore/Navigation/game_graph.h"
 #include "Inventory.h"
 #include "Artefact.h"
 #include "PHMovementControl.h"
@@ -37,7 +37,7 @@
 #include "object_handler_space.h"
 #include "memory_manager.h"
 #include "sight_manager.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "EntityCondition.h"
 #include "xrScriptEngine/script_engine.hpp"
@@ -51,7 +51,7 @@
 #include "visual_memory_manager.h"
 #include "enemy_manager.h"
 #include "xrServerEntities/alife_human_brain.h"
-#include "profiler.h"
+#include "xrEngine/profiler.h"
 #include "BoneProtections.h"
 #include "stalker_animation_names.h"
 #include "stalker_decision_space.h"
@@ -462,7 +462,7 @@ void CAI_Stalker::reload			(LPCSTR section)
 	m_power_fx_factor				= pSettings->r_float(section,"power_fx_factor");
 }
 
-void CAI_Stalker::Die				(CObject* who)
+void CAI_Stalker::Die				(IGameObject* who)
 {
 	movement().on_death				( );
 
@@ -800,7 +800,7 @@ void CAI_Stalker::update_object_handler	()
 		}
 #ifdef DEBUG
 		catch (luabind::cast_failed &message) {
-			Msg						("! Expression \"%s\" from luabind::object to %s",message.what(),message.info()->name());
+			Msg						("! Expression \"%s\" from luabind::object to %s",message.what(),message.info().name());
 			throw;
 		}
 #endif
@@ -1091,7 +1091,7 @@ void CAI_Stalker::Think			()
 //		}
 #ifdef DEBUG
 //		catch (luabind::cast_failed &message) {
-//			Msg						("! Expression \"%s\" from luabind::object to %s",message.what(),message.info()->name());
+//			Msg						("! Expression \"%s\" from luabind::object to %s",message.what(),message.info().name());
 			//throw;
 //		}
 #endif
@@ -1122,7 +1122,7 @@ void CAI_Stalker::Think			()
 //	}
 #if 0//def DEBUG
 	catch (luabind::cast_failed &message) {
-		Msg						("! Expression \"%s\" from luabind::object to %s",message.what(),message.info()->name());
+		Msg						("! Expression \"%s\" from luabind::object to %s",message.what(),message.info().name());
 		movement().initialize	();
 		movement().update		(update_delta);
 		throw;
@@ -1161,7 +1161,7 @@ const MonsterSpace::SBoneRotation &CAI_Stalker::head_orientation	() const
 	return		(movement().head_orientation());
 }
 
-void CAI_Stalker::net_Relcase				(CObject*	 O)
+void CAI_Stalker::net_Relcase				(IGameObject*	 O)
 {
 	inherited::net_Relcase				(O);
 

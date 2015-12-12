@@ -146,7 +146,6 @@ public:
     virtual void DestroyInternal(bool bForce) = 0;
 };
 
-extern ENGINE_API bool g_dedicated_server;
 extern ENGINE_API IGame_Persistent* g_pGamePersistent;
 #endif //IGame_PersistentH
 

@@ -27,6 +27,7 @@
 #include "ai_space.h"
 #include "cover_manager.h"
 #include "stalker_movement_restriction.h"
+#include "Random.hpp"
 
 using namespace StalkerDecisionSpace;
 

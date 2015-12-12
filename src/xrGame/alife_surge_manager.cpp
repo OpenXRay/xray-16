@@ -17,7 +17,7 @@
 #include "ai_space.h"
 #include "ef_storage.h"
 #include "ef_pattern.h"
-#include "graph_engine.h"
+#include "xrAICore/Navigation/graph_engine.h"
 #include "xrserver.h"
 #include "alife_human_brain.h"
 

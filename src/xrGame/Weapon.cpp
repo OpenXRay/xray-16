@@ -11,7 +11,7 @@
 #include "xr_level_controller.h"
 #include "game_cl_base.h"
 #include "Include/xrRender/Kinematics.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "xrPhysics/mathutils.h"
 #include "Common/object_broker.h"
 #include "player_hud.h"
@@ -1807,14 +1807,14 @@ float CWeapon::GetConditionToShow	() const
 
 BOOL CWeapon::ParentMayHaveAimBullet	()
 {
-	CObject* O=H_Parent();
+	IGameObject* O=H_Parent();
 	CEntityAlive* EA=smart_cast<CEntityAlive*>(O);
 	return EA->cast_actor()!=0;
 }
 
 BOOL CWeapon::ParentIsActor	()
 {
-	CObject* O			= H_Parent();
+	IGameObject* O			= H_Parent();
 	if (!O)
 		return FALSE;
 

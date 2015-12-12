@@ -1,8 +1,8 @@
 #ifndef PHJOINT_DESTROY_INFO_H
 #define PHJOINT_DESTROY_INFO_H
 
+#include "Externals/ode/include/ode/common.h"
 
-#include "include/ode/common.h"
 class CPHJointDestroyInfo
 {
 friend class CPHShellSplitterHolder;

@@ -16,11 +16,11 @@
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CStalkerPlanner, (),
+SCRIPT_EXPORT(CStalkerPlanner, (CScriptActionPlanner),
 {
 	module(luaState)
 	[
-		class_<CStalkerPlanner>("stalker_ids")
+		class_<CStalkerPlanner, CScriptActionPlanner>("stalker_ids")
 			.enum_("properties")
 			[
 				luabind::value("property_alive",							StalkerDecisionSpace::eWorldPropertyAlive),

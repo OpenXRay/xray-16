@@ -256,7 +256,7 @@ void CControlManagerCustom::seq_run(MotionID motion)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Jumping
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void CControlManagerCustom::jump(CObject *obj, const SControlJumpData &ta)
+void CControlManagerCustom::jump(IGameObject *obj, const SControlJumpData &ta)
 {
 	if (!m_man->check_start_conditions(ControlCom::eControlJump)) 
 		return;
@@ -665,7 +665,7 @@ void CControlManagerCustom::critical_wound(LPCSTR anim)
 }
 //////////////////////////////////////////////////////////////////////////
 
-void CControlManagerCustom::remove_links (CObject * object)
+void CControlManagerCustom::remove_links (IGameObject * object)
 {
 	if ( m_jump )
 		m_jump->remove_links(object);

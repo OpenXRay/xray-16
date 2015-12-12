@@ -47,7 +47,7 @@ public:
 			squad_mask_type			mask					(const ALife::_OBJECT_ID &id) const;
 	IC		bool					group_behaviour			() const;
 	IC		iterator				member					(squad_mask_type mask);
-			void					remove_links			(CObject *object);
+			void					remove_links			(IGameObject *object);
 			void					register_in_combat		(const CAI_Stalker *object);
 			void					unregister_in_combat	(const CAI_Stalker *object);
 			bool					registered_in_combat	(const CAI_Stalker *object) const;

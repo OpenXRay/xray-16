@@ -50,7 +50,7 @@ public:
 	virtual	void				reinit					();
 	virtual	void				update					(u32 time_delta);
 	virtual	void				on_frame				(CPHMovementControl *movement_control, Fvector &dest_position);
-	virtual	void				remove_links			(CObject *object);
+	virtual	void				remove_links			(IGameObject *object);
 			void		cleanup_after_animation_selector();
 			bool				in_smart_cover			() const;
 	inline	bool				check_can_kill_enemy	() const;

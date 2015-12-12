@@ -23,11 +23,11 @@ public:
 	virtual void	reinit				();
 	virtual BOOL	net_Spawn			(CSE_Abstract* DC);
 	virtual void	net_Destroy			();
-	virtual void	net_Relcase			(CObject* O);
+	virtual void	net_Relcase			(IGameObject* O);
 	virtual void	shedule_Update		(u32 dt);
-	virtual void	feel_touch_new		(CObject* O);
-	virtual void	feel_touch_delete	(CObject* O);
-	virtual bool	feel_touch_contact	(CObject* O);
+	virtual void	feel_touch_new		(IGameObject* O);
+	virtual void	feel_touch_delete	(IGameObject* O);
+	virtual bool	feel_touch_contact	(IGameObject* O);
 			bool	active_contact		(u16 id) const;
 	virtual bool	IsVisibleForZones	()				{return false;}
 	virtual	bool	register_schedule	() const		{return true;}

@@ -15,7 +15,7 @@ using namespace	collide;
 // Purpose	: stores space slots
 //----------------------------------------------------------------------
 CObjectSpace::CObjectSpace	( ):
-	xrc()
+	xrc("object space")
 #ifdef CONFIG_PROFILE_LOCKS
 	,Lock(MUTEX_PROFILE_ID(CObjectSpace::Lock))
 #endif // CONFIG_PROFILE_LOCKS
@@ -46,7 +46,7 @@ CObjectSpace::~CObjectSpace	( )
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-int CObjectSpace::GetNearest		( xr_vector<ISpatial*>& q_spatial, xr_vector<CObject*>&	q_nearest, const Fvector &point, float range, CObject* ignore_object )
+int CObjectSpace::GetNearest		( xr_vector<ISpatial*>& q_spatial, xr_vector<IGameObject*>&	q_nearest, const Fvector &point, float range, IGameObject* ignore_object )
 {
 	q_spatial.clear_not_free		( );
 	// Query objects
@@ -59,7 +59,7 @@ int CObjectSpace::GetNearest		( xr_vector<ISpatial*>& q_spatial, xr_vector<CObje
 	xr_vector<ISpatial*>::iterator	it	= q_spatial.begin	();
 	xr_vector<ISpatial*>::iterator	end	= q_spatial.end		();
 	for (; it!=end; it++)		{
-		CObject* O				= (*it)->dcast_CObject		();
+        IGameObject* O				= (*it)->dcast_GameObject		();
 		if (0==O)				continue;
 		if (O==ignore_object)	continue;
 		Fsphere mS				= { O->GetSpatialData().sphere.P, O->GetSpatialData().sphere.R	};
@@ -70,7 +70,7 @@ int CObjectSpace::GetNearest		( xr_vector<ISpatial*>& q_spatial, xr_vector<CObje
 }
 
 //----------------------------------------------------------------------
-IC int	CObjectSpace::GetNearest	( xr_vector<CObject*>&	q_nearest, const Fvector &point, float range, CObject* ignore_object )
+IC int	CObjectSpace::GetNearest	( xr_vector<IGameObject*>&	q_nearest, const Fvector &point, float range, IGameObject* ignore_object )
 {
 	return							(
 		GetNearest(
@@ -84,9 +84,9 @@ IC int	CObjectSpace::GetNearest	( xr_vector<CObject*>&	q_nearest, const Fvector 
 }
 
 //----------------------------------------------------------------------
-IC int   CObjectSpace::GetNearest( xr_vector<CObject*>&	q_nearest, ICollisionForm* obj, float range)
+IC int   CObjectSpace::GetNearest( xr_vector<IGameObject*>&	q_nearest, ICollisionForm* obj, float range)
 {
-	CObject*	O		= obj->Owner	();
+    IGameObject*	O		= obj->Owner	();
 	return				GetNearest( q_nearest, O->GetSpatialData().sphere.P, range + O->GetSpatialData().sphere.R, O );
 }
 
@@ -166,3 +166,6 @@ void CObjectSpace::dbgRender()
 }
 */
 #endif
+// XXX stats: add to statistics
+void CObjectSpace::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
+{ xrc.DumpStatistics(font, alert); }

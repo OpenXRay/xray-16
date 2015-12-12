@@ -13,7 +13,7 @@
 #include "team_hierarchy_holder.h"
 #include "squad_hierarchy_holder.h"
 #include "group_hierarchy_holder.h"
-#include "game_graph_space.h"
+#include "xrAICore/Navigation/game_graph_space.h"
 
 class CBlend;
 class CPatrolPath;
@@ -366,16 +366,16 @@ public:
 	virtual void				net_Destroy				();
 	virtual void				net_Export				(NET_Packet& P);
 	virtual void				net_Import				(NET_Packet& P);
-	virtual void				HitSignal				(float amount, Fvector& vLocalDir, CObject* who, s16 element);
-	virtual void				Die						(CObject* who);
+	virtual void				HitSignal				(float amount, Fvector& vLocalDir, IGameObject* who, s16 element);
+	virtual void				Die						(IGameObject* who);
 	virtual void				Load					(LPCSTR section);
 	virtual void				Think					();
 	virtual void				SelectAnimation			(const Fvector& _view, const Fvector& _move, float speed );
 	virtual void				Exec_Action				(float dt);
-	virtual	void				feel_sound_new			(CObject* who, int type, CSound_UserDataPtr user_data, const Fvector &Position, float power);
-	virtual void				feel_touch_new			(CObject* O);
-	virtual bool				feel_touch_on_contact	(CObject* O);
-    virtual bool				feel_vision_isRelevant(CObject*);
+	virtual	void				feel_sound_new			(IGameObject* who, int type, CSound_UserDataPtr user_data, const Fvector &Position, float power);
+	virtual void				feel_touch_new			(IGameObject* O);
+	virtual bool				feel_touch_on_contact	(IGameObject* O);
+    virtual bool				feel_vision_isRelevant(IGameObject*);
 	virtual void				shedule_Update			(u32 dt);
 	virtual void				UpdateCL				();
 	virtual	void				Hit						(SHit* pHDS);

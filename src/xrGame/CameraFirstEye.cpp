@@ -9,7 +9,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CCameraFirstEye::CCameraFirstEye(CObject* p, u32 flags ) : CCameraBase(p, flags),lookat_active(false)
+CCameraFirstEye::CCameraFirstEye(IGameObject* p, u32 flags ) : CCameraBase(p, flags),lookat_active(false)
 {
 }
 

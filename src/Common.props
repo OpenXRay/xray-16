@@ -1,42 +1,52 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='Win32'">
+    <xrPlatform>Win32</xrPlatform>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='x86'">
+    <xrPlatform>Win32</xrPlatform>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='x64'">
+    <xrPlatform>Win64</xrPlatform>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(xrPlatform)'==''">
+    <xrPlatform>$(Platform)</xrPlatform>
+  </PropertyGroup>
   <PropertyGroup Label="UserMacros">
     <xrBinRootDir>$(SolutionDir)..\bin\</xrBinRootDir>
-    <xrBinPlugRootDir>$(SolutionDir)..\bin_plugs\</xrBinPlugRootDir>
     <xrLibRootDir>$(SolutionDir)..\lib\</xrLibRootDir>
-    <xrBinDir>$(SolutionDir)..\bin\$(Configuration)\</xrBinDir>
-    <xrBinPlugDir>$(SolutionDir)..\bin_plugs\$(Configuration)\</xrBinPlugDir>
-    <xrLibDir>$(SolutionDir)..\lib\$(Configuration)\</xrLibDir>
-    <xrIntDir>$(SolutionDir)..\intermediate\$(Configuration)\</xrIntDir>
+    <xrBinDir>$(SolutionDir)..\bin\$(xrPlatform)\$(Configuration)\</xrBinDir>
+    <xrPlugBinDir>$(SolutionDir)..\bin\$(xrPlatform)\$(Configuration)\plugins\</xrPlugBinDir>
+    <xrLibDir>$(SolutionDir)..\lib\$(xrPlatform)\$(Configuration)\</xrLibDir>
+    <xrIntDir>$(SolutionDir)..\intermediate\$(xrPlatform)\$(Configuration)\</xrIntDir>
     <xrSdkDir>$(SolutionDir)..\sdk\</xrSdkDir>
   </PropertyGroup>
-  <PropertyGroup />
-  <ItemDefinitionGroup />
-  <ItemGroup>
-      <BuildMacro Include="xrBinRootDir">
-      <Value>$(xrBinRootDir)</Value>
-    </BuildMacro>
-    <BuildMacro Include="xrBinPlugRootDir">
-      <Value>$(xrBinPlugRootDir)</Value>
-    </BuildMacro>
-    <BuildMacro Include="xrLibRootDir">
-      <Value>$(xrLibRootDir)</Value>
-    </BuildMacro>
-    <BuildMacro Include="xrBinDir">
-      <Value>$(xrBinDir)</Value>
-    </BuildMacro>
-    <BuildMacro Include="xrBinPlugDir">
-      <Value>$(xrBinPlugDir)</Value>
-    </BuildMacro>
-    <BuildMacro Include="xrLibDir">
-      <Value>$(xrLibDir)</Value>
-    </BuildMacro>
-    <BuildMacro Include="xrIntDir">
-      <Value>$(xrIntDir)</Value>
-    </BuildMacro>
-    <BuildMacro Include="xrSdkDir">
-      <Value>$(xrSdkDir)</Value>
-    </BuildMacro>
-  </ItemGroup>
+  <PropertyGroup Condition="'$(ConfigurationType)'=='Application'">
+    <OutDir>$(xrBinDir)</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(ConfigurationType)'=='DynamicLibrary'">
+    <OutDir>$(xrBinDir)</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(ConfigurationType)'=='StaticLibrary'">
+    <OutDir>$(xrLibDir)</OutDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(ProjectDir);$(xrSdkDir)include;$(DXSDK_DIR)Include;$(SolutionDir)Externals\luajit\src;$(SolutionDir)Externals\luabind;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4251;4275</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <OutputFile>$(xrLibDir)$(TargetName).lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
 </Project>

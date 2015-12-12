@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "../../xrServerEntities/xrEProps.h"
+#include "xrServerEntities/xrEProps.h"
 
 USEFORM("ChoseForm.cpp", frmChoseItem);
 USEFORM("ItemDialog.cpp", frmItemDialog);

@@ -13,7 +13,7 @@
 #include "ai_space.h"
 #include "cover_manager.h"
 #include "stalker_movement_restriction.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "inventory_item.h"
 #include "agent_member_manager.h"
 #include "memory_manager.h"

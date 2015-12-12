@@ -8,22 +8,20 @@
 
 #pragma once
 
-#include "game_graph_space.h"
+#include "xrAICore/Navigation/game_graph_space.h"
 
 
 class CMovementManagerHolder;
 class CPatrolPath;
 
-namespace PatrolPathManager {
-	enum EPatrolStartType;
-	enum EPatrolRouteType;
-};
+enum EPatrolStartType;
+enum EPatrolRouteType;
 
 class CALifeMonsterPatrolPathManager {
 public:
 	typedef CMovementManagerHolder								object_type;
-	typedef PatrolPathManager::EPatrolStartType					EPatrolStartType;
-	typedef PatrolPathManager::EPatrolRouteType					EPatrolRouteType;
+	typedef EPatrolStartType EPatrolStartType;
+	typedef EPatrolRouteType EPatrolRouteType;
 	typedef GameGraph::_GRAPH_ID								_GRAPH_ID;
 
 private:

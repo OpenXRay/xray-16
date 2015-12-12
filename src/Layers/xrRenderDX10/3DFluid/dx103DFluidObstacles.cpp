@@ -204,7 +204,7 @@ void dx103DFluidObstacles::ProcessDynamicObstacles( const dx103DFluidData &Fluid
 		// renderable
 		//IRenderable*	renderable		= spatial->dcast_Renderable	();
 		//if (0==renderable)				continue;					// unknown, but renderable object (r1_glow???)
-		CObject*		pObject = spatial->dcast_CObject();
+		IGameObject*		pObject = spatial->dcast_GameObject();
 		if (!pObject) continue;
 
 		const IObjectPhysicsCollision* pCollision = pObject->physics_collision();

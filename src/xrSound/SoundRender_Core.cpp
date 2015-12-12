@@ -312,7 +312,7 @@ void	CSoundRender_Core::clone				( ref_sound& S, const ref_sound& from, esound_t
 }
 
 
-void	CSoundRender_Core::play					( ref_sound& S, CObject* O, u32 flags, float delay)
+void	CSoundRender_Core::play					( ref_sound& S, IGameObject* O, u32 flags, float delay)
 {
 	if (!bPresent || 0==S._handle())return;
 	S._p->g_object		= O;
@@ -323,7 +323,7 @@ void	CSoundRender_Core::play					( ref_sound& S, CObject* O, u32 flags, float de
 		S._feedback()->switch_to_2D();
 }
 
-void	CSoundRender_Core::play_no_feedback		( ref_sound& S, CObject* O, u32 flags, float delay, Fvector* pos, float* vol, float* freq, Fvector2* range)
+void	CSoundRender_Core::play_no_feedback		( ref_sound& S, IGameObject* O, u32 flags, float delay, Fvector* pos, float* vol, float* freq, Fvector2* range)
 {
 	if (!bPresent || 0==S._handle())return;
 	ref_sound_data_ptr	orig = S._p;
@@ -348,7 +348,7 @@ void	CSoundRender_Core::play_no_feedback		( ref_sound& S, CObject* O, u32 flags,
 	S._p				= orig;
 }
 
-void	CSoundRender_Core::play_at_pos			( ref_sound& S, CObject* O, const Fvector &pos, u32 flags, float delay)
+void	CSoundRender_Core::play_at_pos			( ref_sound& S, IGameObject* O, const Fvector &pos, u32 flags, float delay)
 {
 	if (!bPresent || 0==S._handle())return;
 	S._p->g_object		= O;
@@ -520,7 +520,7 @@ void CSoundRender_Core::i_eax_commit_setting()
     	i_eax_set(&DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_COMMITDEFERREDSETTINGS,NULL,0);
 }
 
-void CSoundRender_Core::object_relcase( CObject* obj )
+void CSoundRender_Core::object_relcase( IGameObject* obj )
 {
 	if (obj){
 		for (u32 eit=0; eit<s_emitters.size(); eit++){

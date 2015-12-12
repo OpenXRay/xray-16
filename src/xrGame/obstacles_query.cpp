@@ -11,7 +11,7 @@
 #include "GameObject.h"
 #include "ai_obstacle.h"
 #include "ai_space.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 
 #pragma warning(push)
 #pragma warning(disable:4995)
@@ -169,7 +169,7 @@ bool obstacles_query::remove_objects	(const Fvector &position, const float &radi
 	return						(crc_before != crc());
 }
 
-void obstacles_query::remove_links		(CObject *object)
+void obstacles_query::remove_links		(IGameObject *object)
 {
 	OBSTACLES::iterator			I = m_obstacles.find(smart_cast<CGameObject*>(object));
 	if (I == m_obstacles.end())

@@ -5,7 +5,7 @@
 #include "game_location_selector.h"
 #include "level_location_selector.h"
 #include "detail_path_manager.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "ai_space.h"
 #include "movement_manager_space.h"
 #include "level_path_manager.h"

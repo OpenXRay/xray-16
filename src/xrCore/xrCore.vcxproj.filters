@@ -121,6 +121,9 @@
     <Filter Include="Crypto">
       <UniqueIdentifier>{c56e1246-919c-4516-ad31-b9d3b4dadbc4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Math\RNG">
+      <UniqueIdentifier>{ba09a2fb-b14c-4c35-8e0d-957a47930740}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -817,6 +820,9 @@
     </ClInclude>
     <ClInclude Include="Crypto\xr_dsa_verifyer.h">
       <Filter>Crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Random32.hpp">
+      <Filter>Math\RNG</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

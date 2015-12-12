@@ -10,15 +10,15 @@
 #include "hit_memory_manager.h"
 #include "memory_space_impl.h"
 #include "custommonster.h"
-#include "ai_object_location.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/ai_object_location.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "script_callback_ex.h"
 #include "script_game_object.h"
 #include "agent_manager.h"
 #include "agent_member_manager.h"
 #include "ai/stalker/ai_stalker.h"
 #include "game_object_space.h"
-#include "profiler.h"
+#include "xrEngine/profiler.h"
 #include "client_spawn_manager.h"
 #include "memory_manager.h"
 #include "xrEngine/IGame_Persistent.h"
@@ -29,9 +29,9 @@
 #endif // MASTER_GOLD
 
 struct CHitObjectPredicate {
-	const CObject *m_object;
+	const IGameObject *m_object;
 
-				CHitObjectPredicate			(const CObject *object) :
+				CHitObjectPredicate			(const IGameObject *object) :
 					m_object				(object)
 	{
 	}
@@ -91,7 +91,7 @@ void CHitMemoryManager::reload				(LPCSTR section)
 	m_max_hit_count			= READ_IF_EXISTS(pSettings,r_s32,section,"DynamicHitCount",1);
 }
 
-void CHitMemoryManager::add					(float amount, const Fvector &vLocalDir, const CObject *who, s16 element)
+void CHitMemoryManager::add					(float amount, const Fvector &vLocalDir, const IGameObject *who, s16 element)
 {
 #ifndef MASTER_GOLD
 	if (who && smart_cast<CActor const*>(who) && psAI_Flags.test(aiIgnoreActor))
@@ -224,7 +224,7 @@ void CHitMemoryManager::update()
 	STOP_PROFILE
 }
 
-void CHitMemoryManager::enable			(const CObject *object, bool enable)
+void CHitMemoryManager::enable			(const IGameObject *object, bool enable)
 {
 	HITS::iterator				J = std::find(m_hits->begin(),m_hits->end(),object_id(object));
 	if (J == m_hits->end())
@@ -233,7 +233,7 @@ void CHitMemoryManager::enable			(const CObject *object, bool enable)
 	(*J).m_enabled				= enable;
 }
 
-void CHitMemoryManager::remove_links	(CObject *object)
+void CHitMemoryManager::remove_links	(IGameObject *object)
 {
 	if (m_last_hit_object_id == object->ID()) {
 		m_last_hit_object_id	= ALife::_OBJECT_ID(-1);
@@ -389,7 +389,7 @@ void CHitMemoryManager::clear_delayed_objects()
 	m_delayed_objects.clear					();
 }
 
-void CHitMemoryManager::on_requested_spawn	(CObject *object)
+void CHitMemoryManager::on_requested_spawn	(IGameObject *object)
 {
 	DELAYED_HIT_OBJECTS::iterator		I = m_delayed_objects.begin();
 	DELAYED_HIT_OBJECTS::iterator		E = m_delayed_objects.end();

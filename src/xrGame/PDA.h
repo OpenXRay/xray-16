@@ -31,14 +31,14 @@ public:
 
 	virtual void 							shedule_Update			(u32 dt);
 
-	virtual void 							feel_touch_new			(CObject* O);
-	virtual void 							feel_touch_delete		(CObject* O);
-	virtual bool 							feel_touch_contact		(CObject* O);
+	virtual void 							feel_touch_new			(IGameObject* O);
+	virtual void 							feel_touch_delete		(IGameObject* O);
+	virtual bool 							feel_touch_contact		(IGameObject* O);
 
 
 	virtual u16								GetOriginalOwnerID		() {return m_idOriginalOwner;}
 	virtual CInventoryOwner*				GetOriginalOwner		();
-	virtual CObject*						GetOwnerObject			();
+	virtual IGameObject*						GetOwnerObject			();
 
 
 			void							TurnOn					() {m_bTurnedOff = false;}
@@ -50,7 +50,7 @@ public:
 
 
 			void							ActivePDAContacts		(xr_vector<CPda*>& res);
-			CPda*							GetPdaFromOwner			(CObject* owner);
+			CPda*							GetPdaFromOwner			(IGameObject* owner);
 			u32								ActiveContactsNum		()							{return m_active_contacts.size();}
 			void							PlayScriptFunction		();
 			bool							CanPlayScriptFunction	() {if(!xr_strcmp(m_functor_str, "")) return false; return true;};
@@ -65,7 +65,7 @@ protected:
 	void									UpdateActiveContacts	();
 
 
-	xr_vector<CObject*>						m_active_contacts;
+	xr_vector<IGameObject*>						m_active_contacts;
 	float									m_fRadius;
 
 	u16										m_idOriginalOwner;

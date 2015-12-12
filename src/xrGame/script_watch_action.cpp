@@ -26,7 +26,7 @@ CScriptWatchAction::~CScriptWatchAction	()
 
 void CScriptWatchAction::SetWatchObject	(CScriptGameObject *tpObjectToWatch)
 {
-	m_tpObjectToWatch	= tpObjectToWatch->operator CObject*();
+	m_tpObjectToWatch	= tpObjectToWatch->operator IGameObject*();
 	m_tGoalType			= eGoalTypeObject;
 	m_bCompleted		= false;
 }

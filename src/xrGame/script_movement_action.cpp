@@ -10,8 +10,7 @@
 #include "script_movement_action.h"
 #include "script_game_object.h"
 #include "detail_path_manager_space.h"
-#include "patrol_path_manager_space.h"
-#include "patrol_path_params.h"
+#include "xrAICore/Navigation/PatrolPath/patrol_path_params.h"
 #include "ai_monster_space.h"
 
 CScriptMovementAction::CScriptMovementAction		(MonsterSpace::EScriptMonsterMoveAction tAct, CPatrolPathParams *tPatrolPathParams, float dist_to_end, MonsterSpace::EScriptMonsterSpeedParam speed_param)
@@ -45,8 +44,8 @@ CScriptMovementAction::CScriptMovementAction		()
 	SetMovementType		(MonsterSpace::eMovementTypeStand);
 	SetPathType			(DetailPathManager::eDetailPathTypeSmooth);
 	SetPatrolPath		(0,"");
-	SetPatrolStart		(PatrolPathManager::ePatrolStartTypeNearest);
-	SetPatrolStop		(PatrolPathManager::ePatrolRouteTypeContinue);
+	SetPatrolStart		(ePatrolStartTypeNearest);
+	SetPatrolStop		(ePatrolRouteTypeContinue);
 	SetPatrolRandom		(true);
 	SetSpeed			(0);
 	SetObjectToGo		(0);
@@ -124,7 +123,7 @@ CScriptMovementAction::~CScriptMovementAction	()
 void CScriptMovementAction::SetObjectToGo		(CScriptGameObject *tpObjectToGo)
 {
 	if (tpObjectToGo)
-		m_tpObjectToGo	= tpObjectToGo->operator CObject*();
+		m_tpObjectToGo	= tpObjectToGo->operator IGameObject*();
 	else
 		m_tpObjectToGo	= 0;
 	m_tGoalType			= eGoalTypeObject;

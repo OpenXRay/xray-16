@@ -28,12 +28,12 @@ public:
 
 	virtual	void Hit				(SHit* pHDS);
 
-	virtual void feel_touch_new		(CObject* O);
-	virtual void feel_touch_delete	(CObject* O);
-	virtual bool feel_touch_contact	(CObject* O);
+	virtual void feel_touch_new		(IGameObject* O);
+	virtual void feel_touch_delete	(IGameObject* O);
+	virtual bool feel_touch_contact	(IGameObject* O);
 
 protected:
-	virtual void	net_Relcase		(CObject* O );
+	virtual void	net_Relcase		(IGameObject* O );
 	virtual void	UpdateCLChild	();
 
 	//гравитационный удар по всем объектам в зоне дос€гаемости

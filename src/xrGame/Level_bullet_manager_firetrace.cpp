@@ -34,7 +34,7 @@ extern float gCheckHitK;
 //test callback функция 
 //  object - object for testing
 //return TRUE-тестировать объект / FALSE-пропустить объект
-BOOL CBulletManager::test_callback(const collide::ray_defs& rd, CObject* object, LPVOID params)
+BOOL CBulletManager::test_callback(const collide::ray_defs& rd, IGameObject* object, LPVOID params)
 {
 	bullet_test_callback_data* pData	= (bullet_test_callback_data*)params;
 	SBullet* bullet = pData->pBullet;
@@ -62,14 +62,14 @@ BOOL CBulletManager::test_callback(const collide::ray_defs& rd, CObject* object,
 					{
 						// да попали, найдем кто стрелял
 						bool play_whine				= true;
-						CObject* initiator			= Level().Objects.net_Find	(bullet->parent_id);
+						IGameObject* initiator			= Level().Objects.net_Find	(bullet->parent_id);
 						if (actor){
 							// попали в актера
 							float hpf				= 1.f;
 							float ahp				= actor->HitProbability();
 #if 1
 #	if 0
-							CObject					*weapon_object = Level().Objects.net_Find	(bullet->weapon_id);
+							IGameObject					*weapon_object = Level().Objects.net_Find	(bullet->weapon_id);
 							if (weapon_object) {
 								CWeapon				*weapon = smart_cast<CWeapon*>(weapon_object);
 								if (weapon) {
@@ -85,7 +85,7 @@ BOOL CBulletManager::test_callback(const collide::ray_defs& rd, CObject* object,
 								hpf					= stalker->SpecificCharacter().hit_probability_factor();
 
 							float					dist_factor = 1.f;
-							CObject					*weapon_object = Level().Objects.net_Find	(bullet->weapon_id);
+							IGameObject					*weapon_object = Level().Objects.net_Find	(bullet->weapon_id);
 							if (weapon_object) {
 								CWeapon				*weapon = smart_cast<CWeapon*>(weapon_object);
 								if (weapon) {
@@ -143,7 +143,7 @@ BOOL CBulletManager::test_callback(const collide::ray_defs& rd, CObject* object,
 }
 
 //callback функция 
-//	result.O;		// 0-static else CObject*
+//	result.O;		// 0-static else IGameObject*
 //	result.range;	// range from start to element 
 //	result.element;	// if (O) "num tri" else "num bone"
 //	params;			// user defined abstract data
@@ -198,7 +198,7 @@ void CBulletManager::FireShotmark (SBullet* bullet, const Fvector& vDir, const F
 	//проиграть звук
 	if(pSound && ShowMark)
 	{
-		CObject* O			= Level().Objects.net_Find(bullet->parent_id );
+		IGameObject* O			= Level().Objects.net_Find(bullet->parent_id );
 		bullet->m_mtl_snd	= *pSound;
 		bullet->m_mtl_snd.play_at_pos(O, vEnd, 0);
 	}

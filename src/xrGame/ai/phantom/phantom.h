@@ -40,7 +40,7 @@ private:
 	CParticlesObject*	m_fly_particles;
 	static void			animation_end_callback	(CBlend* B);
 private:
-	CObject*			m_enemy;
+	IGameObject*			m_enemy;
 
 	float				fSpeed;	
 	float				fASpeed;
@@ -55,7 +55,7 @@ private:
 
 	void				UpdatePosition				(const Fvector& tgt_pos);
 
-	void				PsyHit						(const CObject *object, float value);
+	void				PsyHit						(const IGameObject *object, float value);
 public:
 						CPhantom					();
 	virtual				~CPhantom					();
@@ -72,7 +72,7 @@ public:
 	virtual void		shedule_Update				(u32 DT); 
 	virtual void		UpdateCL					();
 
-	virtual void		HitSignal					(float	HitAmount,	Fvector& local_dir, CObject* who, s16 element){}
+	virtual void		HitSignal					(float	HitAmount,	Fvector& local_dir, IGameObject* who, s16 element){}
 	virtual void		HitImpulse					(float	amount,		Fvector& vWorldDir, Fvector& vLocalDir){}
 	virtual	void		Hit							(SHit* pHDS);
 

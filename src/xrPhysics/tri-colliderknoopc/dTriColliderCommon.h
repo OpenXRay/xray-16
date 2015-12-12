@@ -1,6 +1,7 @@
 #ifndef D_TRI_COLLIDER_COMMON
 #define D_TRI_COLLIDER_COMMON
-#include "include/ode/common.h"
+
+#include "Externals/ode/include/ode/common.h"
 #include "xrPhysics/ExtendedGeom.h"
 #include "dTriColliderMath.h"
 

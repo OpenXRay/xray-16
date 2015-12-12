@@ -29,7 +29,7 @@ struct CRemoveExplosivesPredicate {
 	}
 };
 
-void CAgentExplosiveManager::remove_links	(CObject *object)
+void CAgentExplosiveManager::remove_links	(IGameObject *object)
 {
 	TO_BE_DESTROYED::iterator		I = std::find(m_explosives_to_remove.begin(),m_explosives_to_remove.end(),object->ID());
 	if (I != m_explosives_to_remove.end())

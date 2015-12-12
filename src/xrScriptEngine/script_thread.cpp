@@ -13,11 +13,6 @@
 
 // #include "xrCore/Platform.h"
 
-extern "C"
-{
-#include "lua/lua.h"
-};
-
 #ifdef USE_DEBUGGER
 #ifndef USE_LUA_STUDIO
 #include "script_debugger.h"

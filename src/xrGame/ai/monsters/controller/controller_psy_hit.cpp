@@ -141,7 +141,7 @@ namespace detail
 
 bool check_actor_visibility (const Fvector trace_from, 
 							 const Fvector trace_to,
-							 CObject* object)
+							 IGameObject* object)
 {
 	const float dist = trace_from.distance_to(trace_to);
 	Fvector trace_dir;

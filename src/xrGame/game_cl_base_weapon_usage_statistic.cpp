@@ -543,9 +543,9 @@ void WeaponUsageStatistic::OnBullet_Fire(SBullet* pBullet, const CCartridge& car
 	if (!CollectData()) return;
 
 	if (!pBullet || !pBullet->flags.allow_sendhit) return;
-	CObject					*object_weapon = Level().Objects.net_Find(pBullet->weapon_id);
+	IGameObject					*object_weapon = Level().Objects.net_Find(pBullet->weapon_id);
 	if (!object_weapon) return;
-	CObject					*object_parent = Level().Objects.net_Find(pBullet->parent_id);
+	IGameObject					*object_parent = Level().Objects.net_Find(pBullet->parent_id);
 	if (!object_parent) return;
 	CActor* pActor = smart_cast<CActor*>(object_parent);
 	if (!pActor) return;
@@ -577,7 +577,7 @@ void WeaponUsageStatistic::OnBullet_Hit(SBullet* pBullet, u16 TargetID, s16 elem
 		WeaponIt->m_dwHitsScored++;
 		WeaponIt->m_dwHitsScored_d++;
 		//---------------------------
-		CObject					*pTarget = Level().Objects.net_Find(TargetID);
+		IGameObject					*pTarget = Level().Objects.net_Find(TargetID);
 		if (!pTarget) return;
 		CActor* pActor = smart_cast<CActor*>(pTarget);
 		if (!pActor) return;
@@ -756,7 +756,7 @@ void WeaponUsageStatistic::On_Check_Respond(NET_Packet* P)
 			HitData& HData				= *HitIt;
 			HData.Deadly				= true;
 			HData.BoneID				= BoneID;
-			CObject* pObj				= Level().Objects.net_Find(HData.TargetID);
+			IGameObject* pObj				= Level().Objects.net_Find(HData.TargetID);
 			
 			if (pObj)
 				HData.BoneName			= smart_cast<IKinematics*>(pObj->Visual())->LL_BoneName_dbg(BoneID);
@@ -825,7 +825,7 @@ void WeaponUsageStatistic::OnExplosionKill(game_PlayerState* ps, const SHit& hit
 	
 	statistic_sync_quard syncg(m_mutex);
 
-	CObject* killer								= hit.who;
+	IGameObject* killer								= hit.who;
 	if(!killer)									return;
 
 	u16 killer_id								= hit.whoID;
@@ -834,7 +834,7 @@ void WeaponUsageStatistic::OnExplosionKill(game_PlayerState* ps, const SHit& hit
 
 	Player_Statistic& PlayerStatKiller			= *(FindPlayer(killerPS->getName()));
 
-	CObject* weapon_object						= Level().Objects.net_Find(hit.weaponID);
+	IGameObject* weapon_object						= Level().Objects.net_Find(hit.weaponID);
 	WEAPON_STATS_it WeaponIt					= PlayerStatKiller.FindPlayersWeapon(weapon_object->cNameSect().c_str());
 	++WeaponIt->m_dwHitsScored;
 	++WeaponIt->m_dwKillsScored;
@@ -862,7 +862,7 @@ void WeaponUsageStatistic::OnBleedKill(game_PlayerState* killer_ps, game_PlayerS
 	if (!killer_ps || !victim_ps)
 		return;
 	Player_Statistic& PlayerStatKiller = *(FindPlayer(killer_ps->getName()));
-	CObject* weapon_object	= Level().Objects.net_Find(weapon_id);
+	IGameObject* weapon_object	= Level().Objects.net_Find(weapon_id);
 	if (!weapon_object)
 		return;
 

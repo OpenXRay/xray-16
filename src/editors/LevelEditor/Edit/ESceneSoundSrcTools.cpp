@@ -7,21 +7,25 @@
 
 void ESceneSoundSrcTool::CreateControls()
 {
-	inherited::CreateDefaultControls(estDefault);
+    inherited::CreateDefaultControls(estDefault);
 }
+
 //----------------------------------------------------
 
 void ESceneSoundSrcTool::RemoveControls()
 {
-	inherited::RemoveControls();
+    inherited::RemoveControls();
 }
+
 //----------------------------------------------------
 
-CCustomObject* ESceneSoundSrcTool::CreateObject(LPVOID data, LPCSTR name)
+CCustomObject *ESceneSoundSrcTool::CreateObject(LPVOID data, LPCSTR name)
 {
-	CCustomObject* O	= xr_new<ESoundSource>(data,name);
-    O->ParentTool		= this;
+    CCustomObject*O = xr_new<ESoundSource>(data, name);
+    O->ParentTool = this;
     return O;
 }
+
 //----------------------------------------------------
+
 

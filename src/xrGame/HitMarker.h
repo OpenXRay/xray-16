@@ -67,7 +67,7 @@ public:
 	void					InitShader( LPCSTR tex_name );
 	void					InitShader_Grenade( LPCSTR tex_name );
 
-	void					net_Relcase( CObject* obj );
+	void					net_Relcase( IGameObject* obj );
 };
 
 #endif // __XR_HITMARKER_H__

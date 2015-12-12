@@ -29,7 +29,7 @@ public:
     void DrawStackTrace();
     static int OutputTop(lua_State *);
     static void hookLua(lua_State *, lua_Debug *);
-    static int hookLuaBind(lua_State *);
+    static void hookLuaBind(lua_State *);
     static int errormessageLua(lua_State *);
     static void errormessageLuaBind(lua_State *);
     static void line_hook(lua_State *, lua_Debug *);

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "random32.h"
+#include "Random.hpp"
 #include "ai_sounds.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
 
@@ -82,7 +82,7 @@ public:
 			xr_delete							(m_sound);
 		}
 
-				void	play_at_pos				(CObject *object, const Fvector &position)
+				void	play_at_pos				(IGameObject *object, const Fvector &position)
 		{
 			m_sound->play_at_pos				(object,position);
 			m_started							= true;
@@ -124,7 +124,7 @@ private:
 	SOUND_COLLECTIONS							m_sounds;
 	xr_vector<CSoundSingle>						m_playing_sounds;
 	u32											m_sound_mask;
-	CObject										*m_object;
+	IGameObject										*m_object;
 	shared_str									m_sound_prefix;
 
 	IC		Fvector		compute_sound_point			(const CSoundSingle &sound);
@@ -133,7 +133,7 @@ private:
 			bool		check_sound_legacy			(u32 internal_type) const;
 
 public:
-						CSoundPlayer				(CObject *object);
+						CSoundPlayer				(IGameObject *object);
 	virtual				~CSoundPlayer				();
 	virtual	void		reinit						();
 	virtual	void		reload						(LPCSTR section);

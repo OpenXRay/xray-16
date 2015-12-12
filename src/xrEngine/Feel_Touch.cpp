@@ -12,12 +12,12 @@ Touch::~Touch()
 {
 }
 
-bool Touch::feel_touch_contact(CObject* O)
+bool Touch::feel_touch_contact(IGameObject* O)
 {
     return true;
 }
 
-void Touch::feel_touch_deny(CObject* O, DWORD T)
+void Touch::feel_touch_deny(IGameObject* O, DWORD T)
 {
     DenyTouch D;
     D.O = O;
@@ -42,14 +42,14 @@ void Touch::feel_touch_update(Fvector& C, float R)
     q_nearest.clear_not_free();
     q_nearest.reserve(feel_touch.size());
     g_pGameLevel->ObjectSpace.GetNearest(q_nearest, C, R, NULL);
-    xr_vector<CObject*>::iterator n_begin = q_nearest.begin();
-    xr_vector<CObject*>::iterator n_end = q_nearest.end();
+    xr_vector<IGameObject*>::iterator n_begin = q_nearest.begin();
+    xr_vector<IGameObject*>::iterator n_end = q_nearest.end();
     if (n_end != n_begin)
     {
         // Process results (NEW)
-        for (xr_vector<CObject*>::iterator it = n_begin; it != n_end; it++)
+        for (xr_vector<IGameObject*>::iterator it = n_begin; it != n_end; it++)
         {
-            CObject* O = *it;
+            IGameObject* O = *it;
             if (O->getDestroy()) continue; // Don't touch candidates for destroy
             if (!feel_touch_contact(O)) continue; // Actual contact
 
@@ -73,7 +73,7 @@ void Touch::feel_touch_update(Fvector& C, float R)
     // Process results (DELETE)
     for (int d = 0; d<int(feel_touch.size()); d++)
     {
-        CObject* O = feel_touch[d];
+        IGameObject* O = feel_touch[d];
         if (O->getDestroy() || !feel_touch_contact(O) || (std::find(n_begin, n_end, O) == n_end)) // Don't touch candidates for destroy
         {
             // _delete_
@@ -86,9 +86,9 @@ void Touch::feel_touch_update(Fvector& C, float R)
     //. Engine.Sheduler.Slice ();
 }
 
-void Touch::feel_touch_relcase(CObject* O)
+void Touch::feel_touch_relcase(IGameObject* O)
 {
-    xr_vector<CObject*>::iterator I = std::find(feel_touch.begin(), feel_touch.end(), O);
+    xr_vector<IGameObject*>::iterator I = std::find(feel_touch.begin(), feel_touch.end(), O);
     if (I != feel_touch.end())
     {
         feel_touch.erase(I);

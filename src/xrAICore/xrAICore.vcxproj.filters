@@ -7,51 +7,417 @@
     <Filter Include="AI">
       <UniqueIdentifier>{ead4ed3c-483a-4897-9a67-86aee65993a3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\Space">
-      <UniqueIdentifier>{eb5bf024-7c70-4fb8-a36f-dab9d4f49934}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\Sound">
-      <UniqueIdentifier>{f2a8f6d9-3cd0-4632-8581-de07014634a5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AI\Navigation">
       <UniqueIdentifier>{d9e337c6-7d29-410e-8e17-5d9846fdb40c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\Monsters">
-      <UniqueIdentifier>{d9b3a029-b867-49ed-9a0a-77a5df273816}</UniqueIdentifier>
+    <Filter Include="AI\Navigation\GameGraph">
+      <UniqueIdentifier>{27e6f00b-b68d-4062-b125-99be7102f517}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\Life">
-      <UniqueIdentifier>{9ae1eb7a-5b47-4a29-9051-7a2b431b76b0}</UniqueIdentifier>
+    <Filter Include="AI\Navigation\GameLevelCrossTable">
+      <UniqueIdentifier>{59d87326-e78f-4b25-8204-cebf01ffa46b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\Group">
-      <UniqueIdentifier>{8202bea5-dd0d-44a0-bde7-71b5d24a890d}</UniqueIdentifier>
+    <Filter Include="AI\Navigation\GraphAbstract">
+      <UniqueIdentifier>{931c5dd8-0ca5-40b3-b5e1-d723a44625a5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\Eval">
-      <UniqueIdentifier>{1adf8660-aa3a-4fa8-8081-3b4e004c6cb2}</UniqueIdentifier>
+    <Filter Include="AI\Navigation\LevelGraph">
+      <UniqueIdentifier>{ee3192b0-1130-4764-a36e-1ccc5d93a49e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\Debug">
-      <UniqueIdentifier>{79c65283-544c-4ba7-bce5-ffb1883aeab7}</UniqueIdentifier>
+    <Filter Include="AI\Navigation\ObjectLocation">
+      <UniqueIdentifier>{27e8643e-b273-4d34-8833-dbe0d3227751}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\Cover">
-      <UniqueIdentifier>{75958997-701a-4933-8d49-37f1b2e39e76}</UniqueIdentifier>
+    <Filter Include="AI\Navigation\Pathfinding">
+      <UniqueIdentifier>{078f1f15-b235-4d04-a045-956d74837de9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\Pathfinding\Algorithms">
+      <UniqueIdentifier>{4eaac001-1aac-418b-84c8-79725f48e648}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\Pathfinding\DataStorages">
+      <UniqueIdentifier>{c3602905-2c85-4d1b-9d39-5e8c45ec1103}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\Pathfinding\GraphEngine">
+      <UniqueIdentifier>{f5413617-f4b1-47e0-b56b-95fe3c830734}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\Pathfinding\PathManagers">
+      <UniqueIdentifier>{2e911171-d05f-4da1-a33a-187dfe5d03eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\Pathfinding\Algorithms\AStar">
+      <UniqueIdentifier>{bf58389f-e744-465f-ae94-c1f784cbf5d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\Pathfinding\Algorithms\Dijkstra">
+      <UniqueIdentifier>{e3038a1b-99ee-45f1-9e90-69d4b9efd1e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\Pathfinding\DataStorages\PathBuilders">
+      <UniqueIdentifier>{139145a6-47d3-4c12-bf95-9b059031b4e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\Pathfinding\DataStorages\Constructors">
+      <UniqueIdentifier>{7d85f0f9-c9cf-4151-af97-809ee58b899e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\Pathfinding\DataStorages\PriorityQueues">
+      <UniqueIdentifier>{dec5fd0f-78d2-4cc6-ab6a-d12ccdb73688}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\Pathfinding\DataStorages\VertexAllocators">
+      <UniqueIdentifier>{085bd13e-d433-4df7-bc25-ba9740100e20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\Pathfinding\DataStorages\VertexManagers">
+      <UniqueIdentifier>{45a320f2-03de-44ad-9c0d-dbc052a44704}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\Pathfinding\PathManagers\Game">
+      <UniqueIdentifier>{3f12bb50-50de-40e5-9300-1c573000080b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\Pathfinding\PathManagers\Generic">
+      <UniqueIdentifier>{eadaf6a3-4262-4df8-bcc5-7956d93b8732}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\Pathfinding\PathManagers\Level">
+      <UniqueIdentifier>{98b0d609-bf16-4a6b-9cae-3c98781dd761}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\Pathfinding\PathManagers\Params">
+      <UniqueIdentifier>{c4ad4bdc-98c3-4f51-aa30-641f77e94936}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\Pathfinding\PathManagers\Solver">
+      <UniqueIdentifier>{1f3126c3-259b-4c92-aee1-ae88dc078e0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\PatrolPath">
+      <UniqueIdentifier>{7b17ad67-6886-45e6-a010-d6b609d3559e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\PatrolPath\PatrolPoint">
+      <UniqueIdentifier>{5301776c-85c8-4fc7-aed9-ea1202a8db37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\PatrolPath\Storage">
+      <UniqueIdentifier>{f7cae56b-25d5-4170-8f85-9415a9b4a6a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Navigation\PatrolPath\Params">
+      <UniqueIdentifier>{8436bb6d-53d2-4169-bda7-74b38481efe8}</UniqueIdentifier>
     </Filter>
     <Filter Include="AI\Components">
-      <UniqueIdentifier>{511278d6-d14c-4c32-8f26-cfebab343732}</UniqueIdentifier>
+      <UniqueIdentifier>{e2963941-68ae-483e-b506-1fd859ba2aee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Components\ProblemSolver">
+      <UniqueIdentifier>{ef10b3bf-8d77-4cb3-ac50-d442bfbb5396}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Components\ProblemSolver\ConditionState">
+      <UniqueIdentifier>{ecfe845c-d31c-4372-ad2c-71799f5eab1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Components\ProblemSolver\OperatorAbstract">
+      <UniqueIdentifier>{907ab193-5232-402e-86e0-161733d5b4bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Components\ProblemSolver\OperatorCondition">
+      <UniqueIdentifier>{eb0815c0-351d-48d1-9366-6dbe396a2c15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Components\ProblemSolver\ConditionState\ScriptWorldState">
+      <UniqueIdentifier>{98b6d83f-fff3-454d-b633-0789aa17f67e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\Components\ProblemSolver\OperatorCondition\ScriptWorldProperty">
+      <UniqueIdentifier>{9f082bbb-9605-4f4b-82b1-8f9561b6121c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="xrAICore.hpp">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="pch.hpp">
+    <ClInclude Include="Navigation\game_graph.h">
+      <Filter>AI\Navigation\GameGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\game_graph_inline.h">
+      <Filter>AI\Navigation\GameGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\game_graph_space.h">
+      <Filter>AI\Navigation\GameGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\game_level_cross_table.h">
+      <Filter>AI\Navigation\GameLevelCrossTable</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\game_level_cross_table_inline.h">
+      <Filter>AI\Navigation\GameLevelCrossTable</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\graph_abstract.h">
+      <Filter>AI\Navigation\GraphAbstract</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\graph_abstract_inline.h">
+      <Filter>AI\Navigation\GraphAbstract</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\graph_edge.h">
+      <Filter>AI\Navigation\GraphAbstract</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\graph_edge_inline.h">
+      <Filter>AI\Navigation\GraphAbstract</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\graph_vertex.h">
+      <Filter>AI\Navigation\GraphAbstract</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\graph_vertex_inline.h">
+      <Filter>AI\Navigation\GraphAbstract</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\level_graph.h">
+      <Filter>AI\Navigation\LevelGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\level_graph_inline.h">
+      <Filter>AI\Navigation\LevelGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\level_graph_space.h">
+      <Filter>AI\Navigation\LevelGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\level_graph_vertex_inline.h">
+      <Filter>AI\Navigation\LevelGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\ai_object_location.h">
+      <Filter>AI\Navigation\ObjectLocation</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\ai_object_location_impl.h">
+      <Filter>AI\Navigation\ObjectLocation</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\ai_object_location_inline.h">
+      <Filter>AI\Navigation\ObjectLocation</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\a_star.h">
+      <Filter>AI\Navigation\Pathfinding\Algorithms\AStar</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\a_star_inline.h">
+      <Filter>AI\Navigation\Pathfinding\Algorithms\AStar</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\dijkstra.h">
+      <Filter>AI\Navigation\Pathfinding\Algorithms\Dijkstra</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\dijkstra_inline.h">
+      <Filter>AI\Navigation\Pathfinding\Algorithms\Dijkstra</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\data_storage_constructor.h">
+      <Filter>AI\Navigation\Pathfinding\DataStorages\Constructors</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\edge_path.h">
+      <Filter>AI\Navigation\Pathfinding\DataStorages\PathBuilders</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\edge_path_inline.h">
+      <Filter>AI\Navigation\Pathfinding\DataStorages\PathBuilders</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\vertex_path.h">
+      <Filter>AI\Navigation\Pathfinding\DataStorages\PathBuilders</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\vertex_path_inline.h">
+      <Filter>AI\Navigation\Pathfinding\DataStorages\PathBuilders</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\data_storage_binary_heap.h">
+      <Filter>AI\Navigation\Pathfinding\DataStorages\PriorityQueues</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\data_storage_binary_heap_inline.h">
+      <Filter>AI\Navigation\Pathfinding\DataStorages\PriorityQueues</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\data_storage_bucket_list.h">
+      <Filter>AI\Navigation\Pathfinding\DataStorages\PriorityQueues</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\data_storage_bucket_list_inline.h">
+      <Filter>AI\Navigation\Pathfinding\DataStorages\PriorityQueues</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\vertex_allocator_fixed.h">
+      <Filter>AI\Navigation\Pathfinding\DataStorages\VertexAllocators</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\vertex_allocator_fixed_inline.h">
+      <Filter>AI\Navigation\Pathfinding\DataStorages\VertexAllocators</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\vertex_manager_fixed.h">
+      <Filter>AI\Navigation\Pathfinding\DataStorages\VertexManagers</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\vertex_manager_fixed_inline.h">
+      <Filter>AI\Navigation\Pathfinding\DataStorages\VertexManagers</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\vertex_manager_hash_fixed.h">
+      <Filter>AI\Navigation\Pathfinding\DataStorages\VertexManagers</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\vertex_manager_hash_fixed_inline.h">
+      <Filter>AI\Navigation\Pathfinding\DataStorages\VertexManagers</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\graph_engine.h">
+      <Filter>AI\Navigation\Pathfinding\GraphEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\graph_engine_inline.h">
+      <Filter>AI\Navigation\Pathfinding\GraphEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\graph_engine_space.h">
+      <Filter>AI\Navigation\Pathfinding\GraphEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_game.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_game_inline.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_game_level.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_game_level_inline.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_game_vertex.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_game_vertex_inline.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_generic.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Generic</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_generic_inline.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Generic</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_level.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_level_flooder.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_level_flooder_inline.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_level_inline.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_level_nearest_vertex.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_level_nearest_vertex_inline.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_level_straight_line.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_level_straight_line_inline.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_params.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Params</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_params_flooder.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Params</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_params_game_level.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Params</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_params_game_vertex.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Params</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_params_nearest_vertex.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Params</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_params_straight_line.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Params</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_solver.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PathManagers\path_manager_solver_inline.h">
+      <Filter>AI\Navigation\Pathfinding\PathManagers\Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PatrolPath\patrol_path_inline.h">
+      <Filter>AI\Navigation\PatrolPath</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PatrolPath\patrol_path.h">
+      <Filter>AI\Navigation\PatrolPath</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PatrolPath\patrol_point.h">
+      <Filter>AI\Navigation\PatrolPath\PatrolPoint</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PatrolPath\patrol_point_inline.h">
+      <Filter>AI\Navigation\PatrolPath\PatrolPoint</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PatrolPath\patrol_path_storage.h">
+      <Filter>AI\Navigation\PatrolPath\Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PatrolPath\patrol_path_storage_inline.h">
+      <Filter>AI\Navigation\PatrolPath\Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PatrolPath\patrol_path_params.h">
+      <Filter>AI\Navigation\PatrolPath\Params</Filter>
+    </ClInclude>
+    <ClInclude Include="Navigation\PatrolPath\patrol_path_params_inline.h">
+      <Filter>AI\Navigation\PatrolPath\Params</Filter>
+    </ClInclude>
+    <ClInclude Include="PCH.hpp">
       <Filter>Kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\problem_solver.h">
+      <Filter>AI\Components\ProblemSolver</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\operator_abstract.h">
+      <Filter>AI\Components\ProblemSolver\OperatorAbstract</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\operator_abstract_inline.h">
+      <Filter>AI\Components\ProblemSolver\OperatorAbstract</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\operator_condition.h">
+      <Filter>AI\Components\ProblemSolver\OperatorCondition</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\operator_condition_inline.h">
+      <Filter>AI\Components\ProblemSolver\OperatorCondition</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\script_world_state.h">
+      <Filter>AI\Components\ProblemSolver\ConditionState\ScriptWorldState</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\script_world_property.h">
+      <Filter>AI\Components\ProblemSolver\OperatorCondition\ScriptWorldProperty</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\script_world_property_inline.h">
+      <Filter>AI\Components\ProblemSolver\OperatorCondition\ScriptWorldProperty</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\condition_state.h">
+      <Filter>AI\Components\ProblemSolver\ConditionState</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\condition_state_inline.h">
+      <Filter>AI\Components\ProblemSolver\ConditionState</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptPCH.hpp">
+      <Filter>Kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\problem_solver_inline.h">
+      <Filter>AI\Components\ProblemSolver</Filter>
+    </ClInclude>
+    <ClInclude Include="AISpaceBase.hpp">
+      <Filter>AI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="pch.cpp">
-      <Filter>Kernel</Filter>
-    </ClCompile>
     <ClCompile Include="xrAICore.cpp">
       <Filter>Kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="Navigation\game_graph_script.cpp">
+      <Filter>AI\Navigation\GameGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="Navigation\level_graph.cpp">
+      <Filter>AI\Navigation\LevelGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="Navigation\level_graph_vertex.cpp">
+      <Filter>AI\Navigation\LevelGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="Navigation\PatrolPath\patrol_path.cpp">
+      <Filter>AI\Navigation\PatrolPath</Filter>
+    </ClCompile>
+    <ClCompile Include="Navigation\PatrolPath\patrol_point.cpp">
+      <Filter>AI\Navigation\PatrolPath\PatrolPoint</Filter>
+    </ClCompile>
+    <ClCompile Include="Navigation\PatrolPath\patrol_path_storage.cpp">
+      <Filter>AI\Navigation\PatrolPath\Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="Navigation\PatrolPath\patrol_path_params.cpp">
+      <Filter>AI\Navigation\PatrolPath\Params</Filter>
+    </ClCompile>
+    <ClCompile Include="Navigation\PatrolPath\patrol_path_params_script.cpp">
+      <Filter>AI\Navigation\PatrolPath\Params</Filter>
+    </ClCompile>
+    <ClCompile Include="PCH.cpp">
+      <Filter>Kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\script_world_state_script.cpp">
+      <Filter>AI\Components\ProblemSolver\ConditionState\ScriptWorldState</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\script_world_property_script.cpp">
+      <Filter>AI\Components\ProblemSolver\OperatorCondition\ScriptWorldProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptPCH.cpp">
+      <Filter>Kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="AISpaceBase.cpp">
+      <Filter>AI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

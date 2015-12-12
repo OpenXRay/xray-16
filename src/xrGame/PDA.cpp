@@ -75,7 +75,7 @@ void CPda::shedule_Update(u32 dt)
 void CPda::UpdateActiveContacts	()
 {
 	m_active_contacts.clear_not_free();
-	xr_vector<CObject*>::iterator it= feel_touch.begin();
+	xr_vector<IGameObject*>::iterator it= feel_touch.begin();
 	for(;it!=feel_touch.end();++it){
 		CEntityAlive* pEA = smart_cast<CEntityAlive*>(*it);
 		if(!!pEA->g_Alive() && !pEA->cast_base_monster())
@@ -85,7 +85,7 @@ void CPda::UpdateActiveContacts	()
 	}
 }
 
-void CPda::feel_touch_new(CObject* O) 
+void CPda::feel_touch_new(IGameObject* O) 
 {
 	if ( CInventoryOwner* pNewContactInvOwner = smart_cast<CInventoryOwner*>(O) )
 	{
@@ -94,7 +94,7 @@ void CPda::feel_touch_new(CObject* O)
 	}
 }
 
-void CPda::feel_touch_delete(CObject* O) 
+void CPda::feel_touch_delete(IGameObject* O) 
 {
 	if(!H_Parent())							return;
 	if ( CInventoryOwner* pLostContactInvOwner = smart_cast<CInventoryOwner*>(O) )
@@ -104,7 +104,7 @@ void CPda::feel_touch_delete(CObject* O)
 	}
 }
 
-bool CPda::feel_touch_contact(CObject* O) 
+bool CPda::feel_touch_contact(IGameObject* O) 
 {
 	CEntityAlive* entity_alive = smart_cast<CEntityAlive*>(O);
 
@@ -153,7 +153,7 @@ void CPda::OnH_B_Independent(bool just_before_destroy)
 
 CInventoryOwner* CPda::GetOriginalOwner()
 {
-	CObject* pObject =  Level().Objects.net_Find(GetOriginalOwnerID());
+	IGameObject* pObject =  Level().Objects.net_Find(GetOriginalOwnerID());
 	CInventoryOwner* pInvOwner = smart_cast<CInventoryOwner*>(pObject);
 
 	return pInvOwner;
@@ -164,8 +164,8 @@ CInventoryOwner* CPda::GetOriginalOwner()
 void CPda::ActivePDAContacts(xr_vector<CPda*>& res)
 {
 	res.clear_not_free						();
-	xr_vector<CObject*>::iterator it		= m_active_contacts.begin();
-	xr_vector<CObject*>::iterator it_e		= m_active_contacts.end();
+	xr_vector<IGameObject*>::iterator it		= m_active_contacts.begin();
+	xr_vector<IGameObject*>::iterator it_e		= m_active_contacts.end();
 
 	for(;it!=it_e;++it)
 	{
@@ -187,7 +187,7 @@ void CPda::load(IReader &input_packet)
 	load_data		(m_sFullName, input_packet);
 }
 
-CObject* CPda::GetOwnerObject()
+IGameObject* CPda::GetOwnerObject()
 {
 	return				Level().Objects.net_Find(GetOriginalOwnerID());
 }
@@ -211,7 +211,7 @@ LPCSTR		CPda::Name				()
 }
 */
 
-CPda* CPda::GetPdaFromOwner(CObject* owner)
+CPda* CPda::GetPdaFromOwner(IGameObject* owner)
 {
 	return smart_cast<CInventoryOwner*>(owner)->GetPDA			();
 }

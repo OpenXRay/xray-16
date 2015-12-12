@@ -12,8 +12,8 @@
 #include "ai/monsters/control_path_builder_base.h"
 #include "monster_velocity_space.h"
 #include "ai_space.h"
-#include "level_graph.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/level_graph.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 #include "CharacterPhysicsSupport.h"
 #ifdef DEBUG
 #include "level_debug.h"
@@ -60,7 +60,7 @@ bool CControlJump::check_start_conditions()
 	return true;
 }
 
-void CControlJump::remove_links	(CObject* object)
+void CControlJump::remove_links	(IGameObject* object)
 {
 	if ( m_data.target_object == object )
 		m_data.target_object	=	NULL;
@@ -394,7 +394,7 @@ void CControlJump::stop()
 
 //////////////////////////////////////////////////////////////////////////
 // Get target point in world space
-Fvector CControlJump::get_target(CObject *obj)
+Fvector CControlJump::get_target(IGameObject *obj)
 {
 	u16 bone_id			= smart_cast<IKinematics*>(obj->Visual())->LL_GetBoneRoot			();
 	CBoneInstance &bone = smart_cast<IKinematics*>(obj->Visual())->LL_GetBoneInstance		(bone_id);
@@ -529,7 +529,7 @@ void CControlJump::hit_test()
 		m_object->HitEntityInJump(smart_cast<CEntity*>(m_data.target_object));
 }
 
-bool CControlJump::can_jump(CObject *target)
+bool CControlJump::can_jump(IGameObject *target)
 {
 	const bool	aggressive_jump	=	m_object->can_use_agressive_jump(target);
 	Fvector		target_position;
@@ -538,7 +538,7 @@ bool CControlJump::can_jump(CObject *target)
 	return							can_jump(target_position, aggressive_jump);
 }
 
-bool CControlJump::jump_intersect_geometry (Fvector const & target, CObject * const ignored_object)
+bool CControlJump::jump_intersect_geometry (Fvector const & target, IGameObject * const ignored_object)
 {
 	calculate_jump_time				(target, false);
 
@@ -677,7 +677,7 @@ bool CControlJump::can_jump(Fvector const& target, bool const aggressive_jump)
 }
 
 
-Fvector CControlJump::predict_position(CObject *obj, const Fvector &pos)
+Fvector CControlJump::predict_position(IGameObject *obj, const Fvector &pos)
 {
 	return pos;
 }

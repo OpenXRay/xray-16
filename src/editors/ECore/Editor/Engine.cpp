@@ -8,8 +8,7 @@
 #include "Engine.h"
 #include "ui_main.h"
 
-xrDispatchTable	PSGP;                
-CEngine	Engine;
+CEngine Engine;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -17,39 +16,37 @@ CEngine	Engine;
 
 CEngine::CEngine()
 {
-	pSettings = 0;
+    pSettings = 0;
 }
 
-CEngine::~CEngine()
-{
-
-}
+CEngine::~CEngine() {}
 
 LPCSTR CEngine::LastWindowsError()
 {
-	static string1024 errmsg_buf;
-    LPCSTR err=0;
+    static string1024 errmsg_buf;
+    LPCSTR err = 0;
 
-    u32 hr=GetLastError();
-	if (hr!=0) {
-		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM,0,hr,0,errmsg_buf,1024,0);
+    u32 hr = GetLastError();
+    if (hr!=0)
+    {
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 0, hr, 0, errmsg_buf, 1024, 0);
         err = errmsg_buf;
-	}
+    }
     return err;
 }
 
-extern void __stdcall xrSkin1W_x86	(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones);
-extern void __stdcall xrSkin2W_x86	(vertRender* D, vertBoned2W* S, u32 vCount, CBoneInstance* Bones);
+extern void __stdcall xrSkin1W_x86(vertRender *D, vertBoned1W *S, u32 vCount, CBoneInstance *Bones);
+extern void __stdcall xrSkin2W_x86(vertRender *D, vertBoned2W *S, u32 vCount, CBoneInstance *Bones);
 
 void CEngine::Initialize(void)
 {
-	// Other stuff
-	string_path              fn;
-    strconcat               (sizeof(fn),fn,UI->EditorName(),".log");
-    FS.update_path			(fn,_local_root_,fn);
+    // Other stuff
+    string_path fn;
+    strconcat(sizeof(fn), fn, UI->EditorName(), ".log");
+    FS.update_path(fn, _local_root_, fn);
 
 #ifdef _EDITOR
-	// Bind PSGP
+    // Bind PSGP
 	ZeroMemory				(&PSGP,sizeof(PSGP));
 	hPSGP		            = LoadLibrary("xrCPU_Pipe");
 	R_ASSERT2	            (hPSGP,"Can't find 'xrCPU_Pipe'");
@@ -61,20 +58,25 @@ void CEngine::Initialize(void)
     PSGP.skin2W				= xrSkin2W_x86;
 #endif
 
-	ReloadSettings			();
+    ReloadSettings();
 }
 
 void CEngine::ReloadSettings()
 {
-	xr_delete				(pSettings);
+    xr_delete(pSettings);
     // game configure
-    string_path 			si_name;
-    FS.update_path			(si_name,"$game_config$","system.ltx");
-	pSettings				= xr_new<CInifile>(si_name,TRUE);// FALSE,TRUE,TRUE);
+    string_path si_name;
+    FS.update_path(si_name, "$game_config$", "system.ltx");
+    pSettings = xr_new<CInifile>(si_name, TRUE);// FALSE,TRUE,TRUE);
 }
 
 void CEngine::Destroy()
 {
-    xr_delete				(pSettings);
-	if (hPSGP)	{ FreeLibrary(hPSGP); hPSGP=0; }
+    xr_delete(pSettings);
+    if (hPSGP)
+    {
+        FreeLibrary(hPSGP);
+        hPSGP = 0;
+    }
 }
+

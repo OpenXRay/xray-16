@@ -23,7 +23,7 @@ public:
 	u32					get_corpse_count		() {return m_objects.size();}
 
 	void				clear					() {m_objects.clear();}
-	void				remove_links			(CObject *O);
+	void				remove_links			(IGameObject *O);
 
 	void				add_corpse				(const CEntityAlive *corpse);
 	bool                is_valid_corpse			(const CEntityAlive *corpse);

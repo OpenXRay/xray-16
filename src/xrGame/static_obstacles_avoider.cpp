@@ -124,7 +124,7 @@ void static_obstacles_avoider::update						()
 	process_query					(true);
 }
 
-void static_obstacles_avoider::remove_links					(CObject *object)
+void static_obstacles_avoider::remove_links					(IGameObject *object)
 {
 	m_current_iteration.remove_links(object);
 	m_inactive_query.remove_links	(object);

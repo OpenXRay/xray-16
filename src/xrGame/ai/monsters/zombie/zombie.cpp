@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "zombie.h"
 #include "zombie_state_manager.h"
-#include "profiler.h"
+#include "xrEngine/profiler.h"
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "EntityCondition.h"
 #include "ai/monsters/monster_velocity_space.h"
@@ -140,7 +140,7 @@ BOOL CZombie::net_Spawn (CSE_Abstract* DC)
 #define TIME_FAKE_DEATH			5000
 #define TIME_RESURRECT_RESTORE	2000
 
-//void CZombie::Hit(float P,Fvector &dir,CObject*who,s16 element,Fvector p_in_object_space,float impulse, ALife::EHitType hit_type)
+//void CZombie::Hit(float P,Fvector &dir,IGameObject*who,s16 element,Fvector p_in_object_space,float impulse, ALife::EHitType hit_type)
 void	CZombie::Hit								(SHit* pHDS)
 {
 //	inherited::Hit(P,dir,who,element,p_in_object_space,impulse,hit_type);

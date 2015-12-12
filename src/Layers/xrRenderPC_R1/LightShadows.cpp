@@ -31,8 +31,8 @@ const	u32			cache_old		= 30*1000;	// 30 secs
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-
-CLightShadows::CLightShadows()
+// XXX: add to statistics
+CLightShadows::CLightShadows() : xrc("LightShadows")
 {
 	current	= 0;
 	RT		= 0;

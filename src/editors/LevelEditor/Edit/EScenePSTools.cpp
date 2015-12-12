@@ -2,35 +2,38 @@
 #pragma hdrstop
 
 #include "EScenePSTools.h"
-#include "ui_leveltools.h"
+#include "UI_LevelTools.h"
 #include "EScenePSControls.h"
 #include "FramePS.h"
 #include "EParticlesObject.h"
 
 void EScenePSTool::CreateControls()
 {
-	inherited::CreateDefaultControls(estDefault);
-    AddControl		(xr_new<TUI_ControlPSAdd>(estDefault,etaAdd,		this));
-	// frame
-    pFrame 			= xr_new<TfraPS>((TComponent*)0);
+    inherited::CreateDefaultControls(estDefault);
+    AddControl(xr_new<TUI_ControlPSAdd>(estDefault, etaAdd, this));
+    // frame
+    pFrame = xr_new<TfraPS>((TComponent*)0);
 }
+
 //----------------------------------------------------
 
 void EScenePSTool::RemoveControls()
 {
-	inherited::RemoveControls();
+    inherited::RemoveControls();
 }
+
 //----------------------------------------------------
 
-CCustomObject* EScenePSTool::CreateObject(LPVOID data, LPCSTR name)
+CCustomObject *EScenePSTool::CreateObject(LPVOID data, LPCSTR name)
 {
-	CCustomObject* O	= xr_new<EParticlesObject>(data,name);
-    O->ParentTool		= this;
+    CCustomObject*O = xr_new<EParticlesObject>(data, name);
+    O->ParentTool = this;
     return O;
 }
+
 //----------------------------------------------------
-bool  EScenePSTool::ExportGame(SExportStreams* F)
+bool EScenePSTool::ExportGame(SExportStreams *F)
 {
-	return inherited::ExportGame	(F);
+    return inherited::ExportGame(F);
 }
 

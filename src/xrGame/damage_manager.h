@@ -12,7 +12,7 @@ class CDamageManager {
 protected:
 	float				m_default_hit_factor;
 	float				m_default_wound_factor;
-	CObject				*m_object;
+    IGameObject				*m_object;
 
 public:
 						CDamageManager	();

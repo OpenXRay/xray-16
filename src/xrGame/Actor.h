@@ -101,7 +101,7 @@ public:
 	// Render
 	virtual void						renderable_Render			();
 	virtual BOOL						renderable_ShadowGenerate	();
-	virtual	void						feel_sound_new				(CObject* who, int type, CSound_UserDataPtr user_data, const Fvector& Position, float power);
+	virtual	void						feel_sound_new				(IGameObject* who, int type, CSound_UserDataPtr user_data, const Fvector& Position, float power);
 	virtual	Feel::Sound*				dcast_FeelSound				()	{ return this;	}
 			float						m_snd_noise;
 #ifdef DEBUG
@@ -166,12 +166,12 @@ public:
 	virtual	void OnPlayHeadShotParticle (NET_Packet P);
 
 
-	virtual void						Die				(CObject* who);
+	virtual void						Die				(IGameObject* who);
 	virtual	void						Hit				(SHit* pHDS);
 	virtual	void						PHHit			(SHit &H);
-	virtual void						HitSignal		(float P, Fvector &vLocalDir,	CObject* who, s16 element);
-			void						HitSector		(CObject* who, CObject* weapon);
-			void						HitMark			(float P, Fvector dir,			CObject* who, s16 element, Fvector position_in_bone_space, float impulse,  ALife::EHitType hit_type);
+	virtual void						HitSignal		(float P, Fvector &vLocalDir,	IGameObject* who, s16 element);
+			void						HitSector		(IGameObject* who, IGameObject* weapon);
+			void						HitMark			(float P, Fvector dir,			IGameObject* who, s16 element, Fvector position_in_bone_space, float impulse,  ALife::EHitType hit_type);
 
 			void						Feel_Grenade_Update( float rad );
 
@@ -333,10 +333,10 @@ protected:
 	CActorCameraManager*	m_pActorEffector;
 	static float			f_Ladder_cam_limit;
 public:
-	virtual void			feel_touch_new				(CObject* O);
-	virtual void			feel_touch_delete			(CObject* O);
-	virtual bool			feel_touch_contact			(CObject* O);
-	virtual bool			feel_touch_on_contact		(CObject* O);
+	virtual void			feel_touch_new				(IGameObject* O);
+	virtual void			feel_touch_delete			(IGameObject* O);
+	virtual bool			feel_touch_contact			(IGameObject* O);
+	virtual bool			feel_touch_on_contact		(IGameObject* O);
 
 	CGameObject*			ObjectWeLookingAt			() {return m_pObjectWeLookingAt;}
 	CInventoryOwner*		PersonWeLookingAt			() {return m_pPersonWeLookingAt;}
@@ -369,7 +369,7 @@ protected:
 	float					m_fPickupInfoRadius;
 
 	void					PickupModeUpdate	();
-	void					PickupInfoDraw		(CObject* object);
+	void					PickupInfoDraw		(IGameObject* object);
 	void					PickupModeUpdate_COD ();
 
 	//////////////////////////////////////////////////////////////////////////
@@ -490,8 +490,8 @@ public:
 	virtual void						net_Import			( NET_Packet& P);				// import from server
 	virtual void						net_Destroy			();
 	virtual BOOL						net_Relevant		();//	{ return getSVU() | getLocal(); };		// relevant for export to server
-	virtual	void						net_Relcase			( CObject* O );					//
-	virtual void xr_stdcall				on_requested_spawn  (CObject *object);
+	virtual	void						net_Relcase			( IGameObject* O );					//
+	virtual void xr_stdcall				on_requested_spawn  (IGameObject *object);
 	//object serialization
 	virtual void						save				(NET_Packet &output_packet);
 	virtual void						load				(IReader &input_packet);
@@ -627,7 +627,7 @@ protected:
 		Fvector							m_AutoPickUp_AABB_Offset;
 
 		void							Check_for_AutoPickUp			();
-		void							SelectBestWeapon				(CObject* O);
+		void							SelectBestWeapon				(IGameObject* O);
 public:
 		void							SetWeaponHideState				(u16 State, bool bSet);
 private://IPhysicsShellHolder
@@ -660,7 +660,7 @@ protected:
 
 	virtual		bool			Check_for_BackStab_Bone			(u16 element);
 public:
-	virtual void				SetHitInfo						(CObject* who, CObject* weapon, s16 element, Fvector Pos, Fvector Dir);
+	virtual void				SetHitInfo						(IGameObject* who, IGameObject* weapon, s16 element, Fvector Pos, Fvector Dir);
 
 	virtual	void				OnHitHealthLoss					(float NewHealth);	
 	virtual	void				OnCriticalHitHealthLoss			();
@@ -706,7 +706,7 @@ public:
 
 private:
 	collide::rq_results			RQR;
-			BOOL				CanPickItem						(const CFrustum& frustum, const Fvector& from, CObject* item);
+			BOOL				CanPickItem						(const CFrustum& frustum, const Fvector& from, IGameObject* item);
 	xr_vector<ISpatial*>		ISpatialResult;
 
 private:

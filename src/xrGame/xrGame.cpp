@@ -10,14 +10,12 @@
 #include "object_factory.h"
 #include "ui/xrUIXmlParser.h"
 #include "xr_level_controller.h"
-#include "profiler.h"
-
-#include "lua/library_linkage.h"
-#include "luabind/library_linkage.h"
+#include "xrEngine/profiler.h"
 
 //#pragma comment(lib,"ode.lib")
 #pragma comment(lib,"xrEngine.lib")
 #pragma comment(lib, "xrScriptEngine.lib")
+#pragma comment(lib, "xrAICore.lib")
 
 extern "C" {
 	DLL_API IFactoryObject*	__cdecl xrFactory_Create		(CLASS_ID clsid)
@@ -49,7 +47,8 @@ BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
 			// keyboard binding
 			CCC_RegisterInput	();
 #ifdef DEBUG
-			g_profiler			= xr_new<CProfiler>();
+            // XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
+			//g_profiler			= xr_new<CProfiler>();
 #endif
 			break;
 		}

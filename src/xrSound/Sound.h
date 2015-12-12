@@ -23,7 +23,7 @@
 #define OGG_COMMENT_VERSION 		0x0003 
 
 // refs
-class	CObject;
+class	IGameObject;
 class	XRSOUND_API					CSound_params;
 class	XRSOUND_API					CSound_source;
 class	XRSOUND_API					CSound_emitter;
@@ -89,7 +89,7 @@ public:
 	CSound_emitter*					feedback;		//!< Pointer to emitter, automaticaly clears on emitter-stop
 	esound_type						s_type;
 	int								g_type;			//!< Sound type, usually for AI
-	CObject*						g_object;		//!< Game object that emitts ref_sound
+	IGameObject*						g_object;		//!< Game object that emitts ref_sound
 	CSound_UserDataPtr				g_userdata;
 	shared_str						fn_attached		[2];
 
@@ -118,7 +118,7 @@ public:
 
 	IC CSound_source*		_handle					()		const			{return _p?_p->handle:NULL;}
 	IC CSound_emitter*		_feedback				()						{return _p?_p->feedback:0;}
-	IC CObject*				_g_object				()						{VERIFY(_p); return _p->g_object;}
+	IC IGameObject*				_g_object				()						{VERIFY(_p); return _p->g_object;}
 	IC int					_g_type					()						{VERIFY(_p); return _p->g_type;}
 	IC esound_type			_sound_type				()						{VERIFY(_p); return _p->s_type;}
 	IC CSound_UserDataPtr	_g_userdata				()						{VERIFY(_p); return _p->g_userdata;}
@@ -130,9 +130,9 @@ public:
 
 	IC void					destroy					( );
 
-	IC void					play					( CObject* O, u32 flags=0, float delay=0.f);
-	IC void					play_at_pos				( CObject* O, const Fvector &pos ,	u32 flags=0, float delay=0.f);
-	IC void					play_no_feedback		( CObject* O, u32 flags=0, float delay=0.f, Fvector* pos=0, float* vol=0, float* freq=0, Fvector2* range=0);
+	IC void					play					( IGameObject* O, u32 flags=0, float delay=0.f);
+	IC void					play_at_pos				( IGameObject* O, const Fvector &pos ,	u32 flags=0, float delay=0.f);
+	IC void					play_no_feedback		( IGameObject* O, u32 flags=0, float delay=0.f, Fvector* pos=0, float* vol=0, float* freq=0, Fvector2* range=0);
 
 	IC void					stop 					( );
 	IC void					stop_deffered			( );
@@ -220,7 +220,7 @@ public:
 		float				volume;
 		esound_type			type;
 		int					game_type;
-		CObject*			game_object;
+		IGameObject*			game_object;
 		struct  {
 			u32				_3D			:1;
 			u32				_rendered	:1;
@@ -267,9 +267,9 @@ public:
 	virtual void					stop_emitters			( )																						= 0;	
 	virtual int						pause_emitters			( bool val )																			= 0;
 
-	virtual void					play					( ref_sound& S, CObject* O,						u32 flags=0, float delay=0.f)			= 0;
-	virtual void					play_at_pos				( ref_sound& S, CObject* O,	const Fvector &pos,	u32 flags=0, float delay=0.f)			= 0;
-	virtual void					play_no_feedback		( ref_sound& S, CObject* O,						u32 flags=0, float delay=0.f, Fvector* pos=0, float* vol=0, float* freq=0, Fvector2* range=0)= 0;
+	virtual void					play					( ref_sound& S, IGameObject* O,						u32 flags=0, float delay=0.f)			= 0;
+	virtual void					play_at_pos				( ref_sound& S, IGameObject* O,	const Fvector &pos,	u32 flags=0, float delay=0.f)			= 0;
+	virtual void					play_no_feedback		( ref_sound& S, IGameObject* O,						u32 flags=0, float delay=0.f, Fvector* pos=0, float* vol=0, float* freq=0, Fvector2* range=0)= 0;
 
 	virtual void					set_master_volume		( float f=1.f )																			= 0;
 	virtual void					set_geometry_env		( IReader* I )																			= 0;
@@ -283,7 +283,7 @@ public:
 
 	virtual float					get_occlusion_to		( const Fvector& hear_pt, const Fvector& snd_pt, float dispersion=0.2f)					= 0;
 
-	virtual void					object_relcase			( CObject* obj )																		= 0;
+	virtual void					object_relcase			( IGameObject* obj )																		= 0;
 	virtual const Fvector&			listener_position		()																						= 0;
 #ifdef __BORLANDC__
 	virtual SoundEnvironment_LIB*	get_env_library			()																						= 0;
@@ -308,9 +308,9 @@ IC void	ref_sound::attach_tail					( LPCSTR name)											{	VERIFY(!::Sound->i
 
 IC void	ref_sound::clone						( const ref_sound& from,esound_type sound_type, int	game_type)	{	VERIFY(!::Sound->i_locked()); 	::Sound->clone		(*this,from,sound_type,game_type);					}
 IC void	ref_sound::destroy						( )														{	VERIFY(!::Sound->i_locked()); 	::Sound->destroy	(*this);													}
-IC void	ref_sound::play							( CObject* O,						u32 flags, float d)	{	VERIFY(!::Sound->i_locked()); 	::Sound->play		(*this,O,flags,d);											}
-IC void	ref_sound::play_at_pos					( CObject* O, const Fvector &pos,	u32 flags, float d)	{	VERIFY(!::Sound->i_locked()); 	::Sound->play_at_pos(*this,O,pos,flags,d);										}
-IC void	ref_sound::play_no_feedback				( CObject* O, u32 flags, float d, Fvector* pos, float* vol, float* freq, Fvector2* range){	VERIFY(!::Sound->i_locked()); ::Sound->play_no_feedback(*this,O,flags,d,pos,vol,freq,range);	}
+IC void	ref_sound::play							( IGameObject* O,						u32 flags, float d)	{	VERIFY(!::Sound->i_locked()); 	::Sound->play		(*this,O,flags,d);											}
+IC void	ref_sound::play_at_pos					( IGameObject* O, const Fvector &pos,	u32 flags, float d)	{	VERIFY(!::Sound->i_locked()); 	::Sound->play_at_pos(*this,O,pos,flags,d);										}
+IC void	ref_sound::play_no_feedback				( IGameObject* O, u32 flags, float d, Fvector* pos, float* vol, float* freq, Fvector2* range){	VERIFY(!::Sound->i_locked()); ::Sound->play_no_feedback(*this,O,flags,d,pos,vol,freq,range);	}
 IC void	ref_sound::set_position					( const Fvector &pos)									{	VERIFY(!::Sound->i_locked()); 	VERIFY(_feedback());_feedback()->set_position(pos);								}
 IC void	ref_sound::set_frequency				( float freq)											{	VERIFY(!::Sound->i_locked()); 	if (_feedback())	_feedback()->set_frequency(freq);							}
 IC void	ref_sound::set_range					( float min, float max )								{	VERIFY(!::Sound->i_locked()); 	if (_feedback())	_feedback()->set_range(min,max);							}

@@ -568,7 +568,7 @@ void CAI_Bloodsucker::shedule_Update(u32 dt)
 	if (m_alien_control.active())	sound().play(eAlien);
 }
 
-void CAI_Bloodsucker::Die(CObject* who)
+void CAI_Bloodsucker::Die(IGameObject* who)
 {
 	inherited::Die(who);
 	stop_invisible_predator();

@@ -5,20 +5,20 @@
 #include "scene.h"
 
 
-#include "../../xrphysics/iphworld.h"
-#include "../../xrcdb/xr_area.h"
+#include "xrphysics/iphworld.h"
+#include "xrcdb/xr_area.h"
 
-//#include "../ECore/Editor/EditObject.h"
+//#include "editors/ECore/Editor/EditObject.h"
 
-#include "sceneobject.h"
-#include "ui_leveltools.h"
+#include "SceneObject.h"
+#include "UI_LevelTools.h"
 #include "mesh_data.h"
-#include "spawnpoint.h"
+#include "SpawnPoint.h"
 
 CScenePhyscs	g_scene_physics;
 
 
-bool	CScenePhyscs ::Simulating			()
+bool	CScenePhyscs ::Simulating		()
 {
 	return !!physics_world();
 }
@@ -79,7 +79,7 @@ BOOL GetStaticCformData   ( ObjectList& lst, mesh_build_data &data, bool b_selec
             CGroupObject* group = (CGroupObject*)(*_F);
 
             ObjectList 			grp_lst;
-            group->GetObjects	(grp_lst);
+            group->GetObjects(grp_lst);
             
             bResult = ParseStaticObjects(grp_lst, group->Name, b_selected_only);
         }break;   */
@@ -109,7 +109,7 @@ void	CScenePhyscs::OnSceneModified()
     	UpdateLevelCollision();
 
 }
-bool CScenePhyscs::CreateObjectSpace	(bool b_selected_only)
+bool CScenePhyscs::CreateObjectSpace(bool b_selected_only)
 {
 
     ObjClassID cls = LTools->CurrentClassID();
@@ -143,7 +143,7 @@ bool CScenePhyscs::CreateObjectSpace	(bool b_selected_only)
 	if(!bResult)
     	 return false;
      
-	build_data.l_faces		= xr_alloc<CDB::TRI>	(build_data.l_face_cnt);
+	build_data.l_faces		= xr_alloc<CDB::TRI>(build_data.l_face_cnt);
 	build_data.l_verts		= xr_alloc<Fvector>(build_data.l_vert_cnt);
    if(b_selected_only)
    {
@@ -179,25 +179,25 @@ bool CScenePhyscs::CreateObjectSpace	(bool b_selected_only)
     return    bResult;
 }
 
-CScenePhyscs::~CScenePhyscs			()
+CScenePhyscs::~CScenePhyscs		()
 {
-   //	DestroyAll			()  ;
-    DestroyObjectSpace	()	;
+   //	DestroyAll		()  ;
+    DestroyObjectSpace()	;
     R_ASSERT( !m_object_space );
  }
 
-void CScenePhyscs::DestroyObjectSpace	()
+void CScenePhyscs::DestroyObjectSpace()
 {
   destroy_object_space( m_object_space );
 }
- void  CScenePhyscs::DestroyWorld			()
+ void  CScenePhyscs::DestroyWorld		()
  {
 	if(physics_world())
     	destroy_physics_world();
 
   }
 
-void  CScenePhyscs::CreateWorld			()
+void  CScenePhyscs::CreateWorld		()
 {
 
 
@@ -221,7 +221,7 @@ void CreatePhysicsShellsSelected()
         }
     }
 }
-void   CScenePhyscs::	UseSimulatePoses	()
+void   CScenePhyscs::	UseSimulatePoses()
 {
    ObjectList lst;
     if (Scene->GetQueryObjects(lst,OBJCLASS_SPAWNPOINT,1,1,0)){
@@ -252,10 +252,10 @@ void DestroyPhysicsShells()
  	if(!m_object_space)
     	CreateObjectSpace(false);
         
-	CreateWorld					();
-    CreatePhysicsShellsSelected	();
+	CreateWorld				();
+    CreatePhysicsShellsSelected();
  }
- void  CScenePhyscs::	DestroyAll			()
+ void  CScenePhyscs::	DestroyAll		()
  {
  	DestroyPhysicsShells();
     DestroyWorld();

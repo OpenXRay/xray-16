@@ -5,7 +5,7 @@
 #include "game_sv_single.h"
 #include "alife_simulator.h"
 #include "alife_simulator_header.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "xrEngine/fdemorecord.h"
 #include "Level.h"
 #include "xr_level_controller.h"
@@ -91,7 +91,6 @@ extern bool g_block_pause;
 extern float g_separate_factor;
 extern float g_separate_radius;
 
-#include <luabind/functor.hpp>
 #include "xrScriptEngine/script_engine.hpp"
 #include "ai_space.h"
 
@@ -331,9 +330,9 @@ void CLevel::IR_OnKeyboardPress	(int key)
 					}
 				}
 			if (bOk) {
-				CObject *tpObject = CurrentEntity();
-				CObject *__I = Objects.o_get_by_iterator(i);
-				CObject **I = &__I;
+				IGameObject *tpObject = CurrentEntity();
+				IGameObject *__I = Objects.o_get_by_iterator(i);
+				IGameObject **I = &__I;
 				
 				SetEntity(*I);
 				if (tpObject != *I)
@@ -439,7 +438,7 @@ void CLevel::IR_OnKeyboardPress	(int key)
 
 
 	#ifdef _DEBUG
-		CObject *obj = Level().Objects.FindObjectByName("monster");
+		IGameObject *obj = Level().Objects.FindObjectByName("monster");
 		if (obj) {
 			CBaseMonster *monster = smart_cast<CBaseMonster *>(obj);
 			if (monster) 

@@ -2,9 +2,10 @@
 #include "phmovestorage.h"
 #pragma warning(disable:4995)
 #pragma warning(disable:4267)
-#include "ode/src/collision_kernel.h"
+#include "Externals/ode/ode/src/collision_kernel.h"
 #pragma warning(default:4995)
 #pragma warning(default:4267)
+
 struct dxGeomTransform : public dxGeom {
 	dxGeom *obj;		// object that is being transformed
 	int cleanup;		// 1 to destroy obj when destroyed

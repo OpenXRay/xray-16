@@ -12,7 +12,7 @@
 #include "smart_cover_detail.h"
 #include "xrScriptEngine/script_space_forward.hpp"
 #include "xrCore/Containers/AssociativeVector.hpp"
-#include "graph_abstract.h"
+#include "xrAICore/Navigation/graph_abstract.h"
 #include "smart_cover_action.h"
 
 namespace smart_cover {
@@ -57,7 +57,7 @@ private:
 	bool					m_exitable;
 
 public:
-							loophole				(luabind::object const &description);
+							loophole				(luabind::adl::object const &description);
 							~loophole				();
 	IC	shared_str	const	&id						()		const;
 	IC	float		const	&range					()		const;
@@ -79,8 +79,8 @@ public:
 		void				exit_position			(Fvector &position) const;
 
 private:
-		void				add_action				(LPCSTR type, luabind::object const &table);
-		void				fill_transitions		(luabind::object const &transitions_table);
+		void				add_action				(LPCSTR type, luabind::adl::object const &table);
+		void				fill_transitions		(luabind::adl::object const &transitions_table);
 };
 
 } // namespace smart_cover

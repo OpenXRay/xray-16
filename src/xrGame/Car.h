@@ -515,7 +515,7 @@ private:
 
 	static void			cb_Steer					(CBoneInstance* B);
 	virtual	void			Hit							(SHit* pHDS);
-	virtual void			Die							(CObject* who);
+	virtual void			Die							(IGameObject* who);
 	virtual void PHHit									(SHit &H);
 			bool WheelHit								(float P,s16 element,ALife::EHitType hit_type);
 			bool DoorHit								(float P,s16 element,ALife::EHitType hit_type);
@@ -556,7 +556,7 @@ public:
 	virtual void			net_Import					(NET_Packet& P);				// import from server
 	virtual BOOL			net_Relevant				()	{ return getLocal(); };		// relevant for export to server
 	virtual BOOL			UsedAI_Locations			();
-	virtual	void			net_Relcase					(CObject* O );
+	virtual	void			net_Relcase					(IGameObject* O );
 	// Input
 	virtual void			OnMouseMove					(int x, int y);
 	virtual void			OnKeyboardPress				(int dik);
@@ -582,7 +582,7 @@ public:
 	virtual float			SetfHealth					(float value)	{return CEntity::SetfHealth(value);};
 
 	// Hits
-	virtual void			HitSignal					(float /**HitAmount/**/,	Fvector& /**local_dir/**/, CObject* /**who/**/, s16 /**element/**/)	{};
+	virtual void			HitSignal					(float /**HitAmount/**/,	Fvector& /**local_dir/**/, IGameObject* /**who/**/, s16 /**element/**/)	{};
 	virtual void			HitImpulse					(float /**amount/**/,		Fvector& /**vWorldDir/**/, Fvector& /**vLocalDir/**/)			{};
 	virtual void			g_fireParams				(const CHudItem* /**pHudItem/**/, Fvector& /**P/**/, Fvector& /**D/**/)											{};
 	virtual u16				Initiator					();

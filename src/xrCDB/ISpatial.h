@@ -58,7 +58,7 @@ enum
 
 //////////////////////////////////////////////////////////////////////////
 // Fast type conversion
-//class 			CObject;
+//class 			IGameObject;
 //class 			IRenderable;
 //class 			IRender_Light;
 //
@@ -68,6 +68,7 @@ enum
 class 				ISpatial_NODE;
 class 				IRender_Sector;
 class 				ISpatial_DB;
+class IGameObject;
 namespace Feel { class Sound; }
 class 				IRenderable;
 class 				IRender_Light;
@@ -95,7 +96,7 @@ public:
     virtual void spatial_move() = 0;
     virtual Fvector spatial_sector_point() = 0;
     virtual void spatial_updatesector() = 0;
-    virtual CObject *dcast_CObject() = 0;
+    virtual IGameObject *dcast_GameObject() = 0;
 	virtual Feel::Sound *dcast_FeelSound() = 0;
 	virtual IRenderable *dcast_Renderable() = 0;
 	virtual IRender_Light *dcast_Light() = 0;
@@ -103,7 +104,7 @@ public:
 
 inline ISpatial::~ISpatial() {}
 
-class XRCDB_API	SpatialBase : public ISpatial
+class XRCDB_API	SpatialBase : public virtual ISpatial
 {
 public:
     SpatialData spatial;
@@ -125,7 +126,7 @@ public:
 		spatial_updatesector_internal				()	;
 	}
 
-	virtual CObject *dcast_CObject() override { return 0; }
+	virtual IGameObject *dcast_GameObject() override { return 0; }
 	virtual Feel::Sound *dcast_FeelSound() override { return 0; }
 	virtual IRenderable *dcast_Renderable()	override { return 0; }
 	virtual IRender_Light *dcast_Light() override { return 0; }

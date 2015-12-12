@@ -16,7 +16,7 @@ public:
 
 	virtual bool			OnWeapon_Fire				(u16 sender, u16 sender_weapon_id) { return false;};
 	virtual	bool			OnBullet_Fire				(u16 sender, u16 sender_weapon_id, const Fvector& position, const Fvector& direction) { return false; };
-	virtual bool			OnBullet_Hit				(CObject const * hitter, CObject const * victim, CObject const * weapon, u16 const bone) { return false; };
+	virtual bool			OnBullet_Hit				(IGameObject const * hitter, IGameObject const * victim, IGameObject const * weapon, u16 const bone) { return false; };
 	virtual bool			OnArtefactSpawned			() { return false; };
 	virtual bool			OnPlayerTakeArtefact		(game_PlayerState const * ps) { return false; };
 	virtual bool			OnPlayerDropArtefact		(game_PlayerState const * ps) { return false; };

@@ -11,14 +11,14 @@
 #include "ai/stalker/ai_stalker.h"
 #include "memory_space_impl.h"
 #include "Include/xrRender/Kinematics.h"
-#include "ai_object_location.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/ai_object_location.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "xrEngine/GameMtlLib.h"
 #include "agent_manager.h"
 #include "agent_member_manager.h"
 #include "ai_space.h"
-#include "profiler.h"
+#include "xrEngine/profiler.h"
 #include "actor.h"
 #include "xrEngine/camerabase.h"
 #include "gamepersistent.h"
@@ -56,7 +56,7 @@ struct CVisibleObjectPredicate {
 	{
 	}
 
-	bool		operator()						(const CObject *object) const
+	bool		operator()						(const IGameObject *object) const
 	{
 		VERIFY	(object);
 		return	(object->ID() == m_id);
@@ -171,7 +171,7 @@ IC	const CVisionParameters &CVisualMemoryManager::current_state() const
 	}
 }
 
-u32	CVisualMemoryManager::visible_object_time_last_seen	(const CObject *object) const
+u32	CVisualMemoryManager::visible_object_time_last_seen	(const IGameObject *object) const
 {
 	VISIBLES::iterator	I = std::find(m_objects->begin(),m_objects->end(),object_id(object));
 	if (I != m_objects->end()) 
@@ -223,7 +223,7 @@ bool CVisualMemoryManager::visible_now	(const CGameObject *game_object) const
 	return							((objects().end() != I) && (*I).visible(mask()));
 }
 
-void CVisualMemoryManager::enable		(const CObject *object, bool enable)
+void CVisualMemoryManager::enable		(const IGameObject *object, bool enable)
 {
 	VISIBLES::iterator	J = std::find(m_objects->begin(),m_objects->end(),object_id(object));
 	if (J == m_objects->end())
@@ -301,8 +301,8 @@ float CVisualMemoryManager::get_object_velocity	(const CGameObject *game_object,
 	if ((game_object->ps_Size() < 2) || (not_yet_visible_object.m_prev_time == game_object->ps_Element(game_object->ps_Size() - 2).dwTime))
 		return							(0.f);
 
-	CObject::SavedPosition	pos0 = game_object->ps_Element	(game_object->ps_Size() - 2);
-	CObject::SavedPosition	pos1 = game_object->ps_Element	(game_object->ps_Size() - 1);
+	GameObjectSavedPosition	pos0 = game_object->ps_Element	(game_object->ps_Size() - 2);
+	GameObjectSavedPosition	pos1 = game_object->ps_Element	(game_object->ps_Size() - 1);
 
 	return					(
 		pos1.vPosition.distance_to(pos0.vPosition)/
@@ -411,7 +411,7 @@ bool CVisualMemoryManager::visible				(const CGameObject *game_object, float tim
 	return						(object->m_value >= current_state().m_visibility_threshold);
 }
 
-bool   CVisualMemoryManager::should_ignore_object (CObject const* object) const
+bool   CVisualMemoryManager::should_ignore_object (IGameObject const* object) const
 {
 	if ( !object )
 	{
@@ -437,7 +437,7 @@ bool   CVisualMemoryManager::should_ignore_object (CObject const* object) const
 	return false;
 }
 
-void CVisualMemoryManager::add_visible_object	(const CObject *object, float time_delta, bool fictitious)
+void CVisualMemoryManager::add_visible_object	(const IGameObject *object, float time_delta, bool fictitious)
 {
 	if ( !fictitious && should_ignore_object(object) )
 	{
@@ -546,7 +546,7 @@ bool CVisualMemoryManager::visible(u32 _level_vertex_id, float yaw, float eye_fo
 		return(false);
 }
 
-float CVisualMemoryManager::feel_vision_mtl_transp(CObject* O, u32 element)
+float CVisualMemoryManager::feel_vision_mtl_transp(IGameObject* O, u32 element)
 {
 	float vis				= 1.f;
 	if (O){
@@ -563,9 +563,9 @@ float CVisualMemoryManager::feel_vision_mtl_transp(CObject* O, u32 element)
 }
 
 struct CVisibleObjectPredicateEx {
-	const CObject *m_object;
+	const IGameObject *m_object;
 
-				CVisibleObjectPredicateEx	(const CObject *object) :
+				CVisibleObjectPredicateEx	(const IGameObject *object) :
 	m_object		(object)
 	{
 	}
@@ -589,7 +589,7 @@ struct CVisibleObjectPredicateEx {
 	}
 };
 
-void CVisualMemoryManager::remove_links	(CObject *object)
+void CVisualMemoryManager::remove_links	(IGameObject *object)
 {
 	{
 		VERIFY						(m_objects);
@@ -656,8 +656,8 @@ void CVisualMemoryManager::update				(float time_delta)
 
 	START_PROFILE("Memory Manager/visuals/update/add_visibles")
 	{
-		xr_vector<CObject*>::const_iterator	I = m_visible_objects.begin();
-		xr_vector<CObject*>::const_iterator	E = m_visible_objects.end();
+		xr_vector<IGameObject*>::const_iterator	I = m_visible_objects.begin();
+		xr_vector<IGameObject*>::const_iterator	E = m_visible_objects.end();
 		for ( ; I != E; ++I)
 			add_visible_object			(*I,time_delta);
 	}
@@ -892,7 +892,7 @@ void CVisualMemoryManager::clear_delayed_objects()
 	m_delayed_objects.clear					();
 }
 
-void CVisualMemoryManager::on_requested_spawn	(CObject *object)
+void CVisualMemoryManager::on_requested_spawn	(IGameObject *object)
 {
 	DELAYED_VISIBLE_OBJECTS::iterator	I = m_delayed_objects.begin();
 	DELAYED_VISIBLE_OBJECTS::iterator	E = m_delayed_objects.end();

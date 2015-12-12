@@ -3,7 +3,7 @@
 #include "Include/xrRender/KinematicsAnimated.h"
 
 struct SControlJumpData : public ControlCom::IComData {
-	CObject					*target_object;
+	IGameObject					*target_object;
  	Fvector					target_position;
 	float					force_factor;
 
@@ -103,10 +103,10 @@ public:
 	virtual void	update_frame			();
 
 	// check for distance and angle difference
-	virtual	bool	can_jump				(CObject *target);
+	virtual	bool	can_jump				(IGameObject *target);
 
 	bool			can_jump				(Fvector const& target, bool const aggressive_jump);
-	bool			jump_intersect_geometry (Fvector const & target, CObject * ignored_object);
+	bool			jump_intersect_geometry (Fvector const & target, IGameObject * ignored_object);
 
 	// stop/break jump and all of jumping states
 	virtual void	stop					();
@@ -116,7 +116,7 @@ public:
 
 SControlJumpData	&setup_data				() {return m_data;}
 
-	void			remove_links			(CObject* object);
+	void			remove_links			(IGameObject* object);
 
 private:	
 			void	calculate_jump_time (Fvector const & target, bool check_force_factor);
@@ -124,7 +124,7 @@ private:
 			// build path after jump 
 			void	grounding			();
 			// get target position according to object center point
-			Fvector get_target			(CObject *obj);
+			Fvector get_target			(IGameObject *obj);
 			// check for hit object
 			void	hit_test			();
 
@@ -132,7 +132,7 @@ private:
 			bool	is_on_the_ground	();
 
 			// position prediction
-			Fvector	predict_position	(CObject *obj, const Fvector &pos);
+			Fvector	predict_position	(IGameObject *obj, const Fvector &pos);
 
 			void	start_jump			(const Fvector &point);
 

@@ -12,7 +12,7 @@ public:
 
 	virtual	void		initialize					();
 	virtual	void		execute						();
-	virtual void		remove_links				(CObject* object) { inherited::remove_links(object); }
+	virtual void		remove_links				(IGameObject* object) { inherited::remove_links(object); }
 
 	virtual void		finalize					();
 	virtual void		critical_finalize			();

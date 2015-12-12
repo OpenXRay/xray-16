@@ -74,8 +74,8 @@ public:
 public:
 	
 	virtual	BOOL			renderable_ShadowReceive		()	{ return TRUE;	}  
-	virtual void			Die								(CObject* who);
-	virtual void			HitSignal						(float amount, Fvector& vLocalDir, CObject* who, s16 element);
+	virtual void			Die								(IGameObject* who);
+	virtual void			HitSignal						(float amount, Fvector& vLocalDir, IGameObject* who, s16 element);
 	virtual	void			Hit								(SHit* pHDS);
 	virtual	void			PHHit							( SHit &H );
 	virtual void			SelectAnimation					(const Fvector& _view, const Fvector& _move, float speed );
@@ -93,7 +93,7 @@ public:
 	virtual	BOOL			net_SaveRelevant				();
 	virtual void			net_Export						(NET_Packet& P);
 	virtual void			net_Import						(NET_Packet& P);
-	virtual void			net_Relcase						(CObject *O);
+	virtual void			net_Relcase						(IGameObject *O);
 
 	//save/load server serialization
 	virtual void			save							(NET_Packet &output_packet) {inherited::save(output_packet);}
@@ -110,10 +110,10 @@ public:
 
 	virtual void			init							() {}
 
-	virtual void			feel_sound_new					(CObject* who, int eType, CSound_UserDataPtr user_data, const Fvector &Position, float power);
-	virtual bool			feel_vision_isRelevant			(CObject* O);
-	virtual bool			feel_touch_on_contact			(CObject* O);
-	virtual bool			feel_touch_contact				(CObject *);
+	virtual void			feel_sound_new					(IGameObject* who, int eType, CSound_UserDataPtr user_data, const Fvector &Position, float power);
+	virtual bool			feel_vision_isRelevant			(IGameObject* O);
+	virtual bool			feel_touch_on_contact			(IGameObject* O);
+	virtual bool			feel_touch_contact				(IGameObject *);
 
 	virtual bool			useful							(const CItemManager *manager, const CGameObject *object) const;
 	virtual float			evaluate						(const CItemManager *manager, const CGameObject *object) const;
@@ -351,8 +351,8 @@ public:
 	// Special Services (refactoring needed)
 		
 	void				on_kill_enemy				(const CEntity *obj);
-	void				Hit_Psy						(CObject *object, float value);
-	void				Hit_Wound					(CObject *object, float value, const Fvector &dir, float impulse);
+	void				Hit_Psy						(IGameObject *object, float value);
+	void				Hit_Wound					(IGameObject *object, float value, const Fvector &dir, float impulse);
 	CParticlesObject	*PlayParticles				(const shared_str& name, const Fvector &position, const Fvector &dir, BOOL auto_remove = TRUE, BOOL xformed = TRUE);
 	void				load_effector				(LPCSTR section, LPCSTR line, SAttackEffector &effector);
 
@@ -503,7 +503,7 @@ public:
 	float get_feel_enemy_who_just_hit_max_distance () { return m_feel_enemy_who_just_hit_max_distance; }
 	float get_feel_enemy_who_made_sound_max_distance () { return m_feel_enemy_who_made_sound_max_distance; }
 	float get_feel_enemy_max_distance			   () { return m_feel_enemy_max_distance; }
-	virtual bool  can_use_agressive_jump (const CObject*) { return false; }
+	virtual bool  can_use_agressive_jump (const IGameObject*) { return false; }
 
 private:
 	steering_behaviour::manager*    m_steer_manager;

@@ -26,7 +26,7 @@ using namespace collide;
 // Class : CXR_CFObject
 // Purpose : stores collision form
 //----------------------------------------------------------------------
-ICollisionForm::ICollisionForm(CObject* _owner, ECollisionFormType tp)
+ICollisionForm::ICollisionForm(IGameObject* _owner, ECollisionFormType tp)
 {
     owner = _owner;
     m_type = tp;
@@ -108,7 +108,7 @@ IC bool RAYvsCYLINDER(const Fcylinder& c_cylinder, const Fvector& S, const Fvect
     return ((rp_res == Fcylinder::rpOriginOutside) || (!bCull && (rp_res == Fcylinder::rpOriginInside)));
 }
 
-CCF_Skeleton::CCF_Skeleton(CObject* O) : ICollisionForm(O, cftObject)
+CCF_Skeleton::CCF_Skeleton(IGameObject* O) : ICollisionForm(O, cftObject)
 {
     //getVisData
     IRenderVisual* pVisual = O->Visual();
@@ -278,7 +278,7 @@ BOOL CCF_Skeleton::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
 }
 
 //----------------------------------------------------------------------------------
-CCF_EventBox::CCF_EventBox(CObject* O) : ICollisionForm(O, cftShape)
+CCF_EventBox::CCF_EventBox(IGameObject* O) : ICollisionForm(O, cftShape)
 {
     Fvector A[8], B[8];
     A[0].set(-1, -1, -1);
@@ -310,7 +310,7 @@ CCF_EventBox::CCF_EventBox(CObject* O) : ICollisionForm(O, cftShape)
     Planes[5].build(B[1], B[0], B[6]);
 }
 
-BOOL CCF_EventBox::Contact(CObject* O)
+BOOL CCF_EventBox::Contact(IGameObject* O)
 {
     IRenderVisual* V = O->Visual();
     vis_data& vis = V->getVisData();
@@ -338,7 +338,7 @@ void CCF_EventBox::_BoxQuery(const Fbox& B, const Fmatrix& M, u32 flags)
 //----------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------
-CCF_Shape::CCF_Shape(CObject* _owner) : ICollisionForm(_owner, cftShape)
+CCF_Shape::CCF_Shape(IGameObject* _owner) : ICollisionForm(_owner, cftShape)
 {
 }
 BOOL CCF_Shape::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
@@ -478,7 +478,7 @@ void CCF_Shape::ComputeBounds()
     if (bCalcSphere) bv_box.getsphere(bv_sphere.P, bv_sphere.R);
 }
 
-BOOL CCF_Shape::Contact(CObject* O)
+BOOL CCF_Shape::Contact(IGameObject* O)
 {
     // Build object-sphere in World-Space
     Fsphere S;

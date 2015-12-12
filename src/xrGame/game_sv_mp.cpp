@@ -237,7 +237,7 @@ struct real_sender
 
 void	game_sv_mp::KillPlayer				(ClientID id_who, u16 GameID)
 {
-	CObject* pObject =  Level().Objects.net_Find(GameID);
+	IGameObject* pObject =  Level().Objects.net_Find(GameID);
 	if (!pObject || !smart_cast<CActor*>(pObject)) return;
 	// Remove everything	
 	xrClientData* xrCData	=	m_server->ID_to_client(id_who);
@@ -610,7 +610,7 @@ void game_sv_mp::AllowDeadBodyRemove(ClientID id, u16 GameID)
 	if (pSObject)
 		pSObject->owner = (xrClientData*)m_server->GetServerClient();
 
-	CObject* pObject =  Level().Objects.net_Find(GameID);
+	IGameObject* pObject =  Level().Objects.net_Find(GameID);
 	
 
 	if (pObject && smart_cast<CActor*>(pObject))
@@ -691,7 +691,7 @@ bool	game_sv_mp::GetPosAngleFromActor				(ClientID id, Fvector& Pos, Fvector &An
 	xrClientData* xrCData	=	m_server->ID_to_client(id);
 	if (!xrCData || !xrCData->owner) return false;
 	
-	CObject* pObject =  Level().Objects.net_Find(xrCData->owner->ID);
+	IGameObject* pObject =  Level().Objects.net_Find(xrCData->owner->ID);
 	///	R_ASSERT2	((pObject && smart_cast<CActor*>(pObject)),"Dead Player is not Actor");
 
 	if (!pObject || !smart_cast<CActor*>(pObject)) return false;

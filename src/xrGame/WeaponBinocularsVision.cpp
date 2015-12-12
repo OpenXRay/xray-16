@@ -22,8 +22,8 @@ extern u32 C_ON_NEUTRAL;
 extern u32 C_ON_FRIEND;
 
 struct FindVisObjByObject{
-	const CObject*			O;
-	FindVisObjByObject(const CObject* o):O(o){}
+	const IGameObject*			O;
+	FindVisObjByObject(const IGameObject* o):O(o){}
 	bool operator () (const SBinocVisibleObj* vis){
 		return (O==vis->m_object);
 	}
@@ -217,11 +217,11 @@ void CBinocularsVision::Update()
 	CVisualMemoryManager::VISIBLES::const_iterator v_it = vVisibles.begin();
 	for (; v_it!=vVisibles.end(); ++v_it)
 	{
-		const CObject*	_object_			= (*v_it).m_object;
+		const IGameObject*	_object_			= (*v_it).m_object;
 		if (!pActor->memory().visual().visible_now(smart_cast<const CGameObject*>(_object_)))
 			continue;
 
-		CObject* object_ = const_cast<CObject*>(_object_);
+		IGameObject* object_ = const_cast<IGameObject*>(_object_);
 		
 
 		CEntityAlive*	EA = smart_cast<CEntityAlive*>(object_);
@@ -282,7 +282,7 @@ void CBinocularsVision::Load(const shared_str& section)
 	m_sounds.LoadSound	(section.c_str(),"catch_snd", "catch_snd", false, SOUND_TYPE_NO_SOUND);
 }
 
-void CBinocularsVision::remove_links(CObject *object)
+void CBinocularsVision::remove_links(IGameObject *object)
 {
 	VIS_OBJECTS::iterator	I = std::find_if(m_active_objects.begin(),m_active_objects.end(),FindVisObjByObject(object));
 	if (I == m_active_objects.end())

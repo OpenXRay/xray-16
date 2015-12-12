@@ -73,7 +73,7 @@ void faster_than_bullets_time::OnPlayerKilled(u16 killer_id, u16 target_id, u16 
 		return;
 	}
 
-	CObject* victim_obj = Level().Objects.net_Find(target_id);
+	IGameObject* victim_obj = Level().Objects.net_Find(target_id);
 	if (!victim_obj)
 		return;
 

@@ -26,7 +26,7 @@ public:
 
 private:
 	const CEntityAlive			*m_object;
-	const CObject				*m_ignored_object;
+	const IGameObject				*m_ignored_object;
 	Fvector						m_position;
 	obstacles_query				m_static_query;
 	obstacles_query				m_dynamic_query;
@@ -48,8 +48,8 @@ public:
 			Fvector				target_position	() const;
 			void				update_position	();
 	IC		const CEntityAlive	&object			() const;
-			void				ignore			(const CObject *object);
-			bool				ignored			(const CObject *object);
+			void				ignore			(const IGameObject *object);
+			bool				ignored			(const IGameObject *object);
 	IC		void				action			(const action_type &action);
 	IC		void				action			(const action_type &action, const Fvector &action_position);
 	IC		const action_type	&action			() const;

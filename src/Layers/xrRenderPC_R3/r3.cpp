@@ -648,7 +648,7 @@ void					CRender::rmNormal			()
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 CRender::CRender()
-:m_bFirstFrameAfterReset(false)
+:m_bFirstFrameAfterReset(false), Sectors_xrc("render")
 {
 	init_cacades();
 }
@@ -676,6 +676,7 @@ void CRender::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
     font.OutNext("- culled:     %u", Stats.ic_culled);
     Stats.FrameStart();
     HOM.DumpStatistics(font, alert);
+    Sectors_xrc.DumpStatistics(font, alert);
 }
 
 static inline bool match_shader_id		( LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result );

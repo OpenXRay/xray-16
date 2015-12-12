@@ -4,7 +4,7 @@
 #include "memory_manager.h"
 #include "visual_memory_manager.h"
 #include "item_manager.h"
-#include "ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location.h"
 
 CMonsterCorpseMemory::CMonsterCorpseMemory()
 {
@@ -127,7 +127,7 @@ CORPSE_MAP_IT CMonsterCorpseMemory::find_best_corpse()
 	return it;
 }
 
-void CMonsterCorpseMemory::remove_links(CObject *O)
+void CMonsterCorpseMemory::remove_links(IGameObject *O)
 {
 	for (CORPSE_MAP_IT	I = m_objects.begin();I!=m_objects.end();++I) {
 		if ((*I).first == O) {

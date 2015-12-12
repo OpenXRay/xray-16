@@ -20,7 +20,7 @@ public:
 inline IFactoryObject::~IFactoryObject() {}
 inline IFactoryObject *IFactoryObject::_construct() { return this; }
 
-class ENGINE_API FactoryObjectBase : public IFactoryObject
+class ENGINE_API FactoryObjectBase : public virtual IFactoryObject
 {
 public:
     CLASS_ID CLS_ID;

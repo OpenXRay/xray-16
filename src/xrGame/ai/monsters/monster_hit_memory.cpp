@@ -25,12 +25,12 @@ void CMonsterHitMemory::update()
 	remove_non_actual();
 }
 
-bool CMonsterHitMemory::is_hit(CObject *pO)
+bool CMonsterHitMemory::is_hit(IGameObject *pO)
 {
 	return (std::find(m_hits.begin(),m_hits.end(),pO) != m_hits.end());
 }
 
-void CMonsterHitMemory::add_hit(CObject *who, EHitSide side)
+void CMonsterHitMemory::add_hit(IGameObject *who, EHitSide side)
 {
 	SMonsterHit			new_hit_info;
 	new_hit_info.object		= who;
@@ -129,7 +129,7 @@ TTime CMonsterHitMemory::get_last_hit_time()
 	return last_hit.time;
 }
 
-CObject	*CMonsterHitMemory::get_last_hit_object()
+IGameObject	*CMonsterHitMemory::get_last_hit_object()
 {
 	SMonsterHit		last_hit;
 	last_hit.object	= 0;
@@ -156,16 +156,16 @@ Fvector CMonsterHitMemory::get_last_hit_position()
 }
 
 struct predicate_old_info {
-	const CObject *object;
+	const IGameObject *object;
 
-	predicate_old_info(const CObject *obj) : object(obj) {}
+	predicate_old_info(const IGameObject *obj) : object(obj) {}
 
 	IC bool	operator() (const SMonsterHit &hit_info) {
 		return (object == hit_info.object);
 	}
 };
 
-void CMonsterHitMemory::remove_hit_info(const CObject *obj)
+void CMonsterHitMemory::remove_hit_info(const IGameObject *obj)
 {
 	m_hits.erase	(
 		std::remove_if(

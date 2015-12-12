@@ -28,7 +28,7 @@ public:
 
 inline ISheduled::~ISheduled() {}
 
-class ENGINE_API ScheduledBase : public ISheduled
+class ENGINE_API ScheduledBase : public virtual ISheduled
 {
 public:
     SchedulerData shedule;

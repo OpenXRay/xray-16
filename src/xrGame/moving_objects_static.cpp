@@ -9,7 +9,7 @@
 #include "stdafx.h"
 #include "moving_objects.h"
 #include "ai_space.h"
-#include "level_graph.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "moving_object.h"
 #include "moving_objects_impl.h"
 
@@ -104,7 +104,7 @@ public:
 	{
 	}
 	
-	IC	bool	operator()		(const CObject *object) const
+	IC	bool	operator()		(const IGameObject *object) const
 	{
 		if (m_object->ignored(object))
 			return			(true);

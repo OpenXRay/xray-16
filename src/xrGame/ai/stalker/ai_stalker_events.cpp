@@ -33,7 +33,7 @@ void CAI_Stalker::OnEvent		(NET_Packet& P, u16 type)
 
 			u16			id;
 			P.r_u16		(id);
-			CObject		*O = Level().Objects.net_Find	(id);
+			IGameObject		*O = Level().Objects.net_Find	(id);
 
 			R_ASSERT	(O);
 
@@ -70,7 +70,7 @@ void CAI_Stalker::OnEvent		(NET_Packet& P, u16 type)
 			u16 id;
 			P.r_u16		(id);
 
-			CObject		*O = Level().Objects.net_Find(id);
+			IGameObject		*O = Level().Objects.net_Find(id);
 
 #pragma todo("Dima to Oles : how can this happen?")
 			if (!O)
@@ -89,7 +89,7 @@ void CAI_Stalker::OnEvent		(NET_Packet& P, u16 type)
 	}
 }
 
-void CAI_Stalker::on_ownership_reject	( CObject*O, bool just_before_destroy )
+void CAI_Stalker::on_ownership_reject	( IGameObject*O, bool just_before_destroy )
 {
 	m_pPhysics_support->in_UpdateCL			();
 	IKinematics* const kinematics			= smart_cast<IKinematics*>(Visual());
@@ -108,7 +108,7 @@ void CAI_Stalker::on_ownership_reject	( CObject*O, bool just_before_destroy )
 	feel_touch_deny							(O,2000);
 }
 
-void CAI_Stalker::generate_take_event			( CObject const* const object ) const
+void CAI_Stalker::generate_take_event			( IGameObject const* const object ) const
 {
 	NET_Packet		packet;
 	u_EventGen		( packet, GE_OWNERSHIP_TAKE, ID() );
@@ -116,7 +116,7 @@ void CAI_Stalker::generate_take_event			( CObject const* const object ) const
 	u_EventSend		( packet );
 }
 
-void CAI_Stalker::DropItemSendMessage	(CObject *O)
+void CAI_Stalker::DropItemSendMessage	(IGameObject *O)
 {
 	if (!O || !O->H_Parent() || (this != O->H_Parent()))
 		return;
@@ -136,12 +136,12 @@ void CAI_Stalker::UpdateAvailableDialogs(CPhraseDialogManager* partner)
 	CAI_PhraseDialogManager::UpdateAvailableDialogs(partner);
 }
 
-void CAI_Stalker::feel_touch_new				(CObject* O)
+void CAI_Stalker::feel_touch_new				(IGameObject* O)
 {
 //	Msg					("FEEL_TOUCH::NEW : %s",*O->cName());
 	if (!g_Alive())		return;
 	if (Remote())		return;
-	if ((O->spatial.type | STYPE_VISIBLEFORAI) != O->spatial.type) return;
+	if ((O->GetSpatialData().type | STYPE_VISIBLEFORAI) != O->GetSpatialData().type) return;
 
 	// Now, test for game specific logical objects to minimize traffic
 	CInventoryItem		*I	= smart_cast<CInventoryItem*>	(O);

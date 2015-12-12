@@ -9,7 +9,7 @@
 #pragma once
 
 #include "alife_space.h"
-#include "game_graph_space.h"
+#include "xrAICore/Navigation/game_graph_space.h"
 
 class CSavedGameWrapper {
 public:

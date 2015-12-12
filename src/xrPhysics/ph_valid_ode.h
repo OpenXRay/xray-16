@@ -1,9 +1,9 @@
 #pragma once
 
+#include "Externals/ode/include/ode/common.h"
+#include "Externals/ode/include/ode/mass.h"
+#include "Externals/ode/include/ode/objects.h"
 
-#include "include/ode/common.h"
-#include "include/ode/mass.h"
-#include "include/ode/objects.h"
 IC BOOL dV_valid			(const dReal * v)
 {
 	return _valid(v[0])&&_valid(v[1])&&_valid(v[2]);

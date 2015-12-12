@@ -17,10 +17,10 @@
 #include "ef_storage.h"
 #include "xrserver.h"
 #include "Level.h"
-#include "graph_engine.h"
+#include "xrAICore/Navigation/graph_engine.h"
 #include "xrEngine/x_ray.h"
 #include "restriction_space.h"
-#include "profiler.h"
+#include "xrEngine/profiler.h"
 #include "mt_config.h"
 
 using namespace ALife;

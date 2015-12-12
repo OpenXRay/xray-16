@@ -630,7 +630,7 @@ void CEntityCondition::SConditionChangeV::load(LPCSTR sect, LPCSTR prefix)
 	m_fV_HealthRestore		= READ_IF_EXISTS(pSettings,r_float,sect, str,0.0f);
 }
 
-void CEntityCondition::remove_links	(const CObject *object)
+void CEntityCondition::remove_links	(const IGameObject *object)
 {
 	if (m_pWho != object)
 		return;

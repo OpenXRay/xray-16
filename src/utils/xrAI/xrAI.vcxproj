@@ -16,6 +16,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EA5932F3-02FE-4AD3-89E8-7072DC465D25}</ProjectGuid>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
@@ -60,18 +61,12 @@
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(xrBinDir)</OutDir>
-    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(xrBinDir)</OutDir>
-    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
-    <OutDir>$(xrBinDir)</OutDir>
-    <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -84,7 +79,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.;$(SolutionDir);$(DXSDK_DIR)Include;$(SolutionDir)xrServerEntities;$(xrSdkDir)include;$(SolutionDir)Externals\MagicSoftware\Sdk\Include;$(SolutionDir)Externals\FreeImage\Dist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(SolutionDir)Externals\MagicSoftware\Sdk\Include;$(SolutionDir)Externals\FreeImage\Dist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;DEBUG;AI_COMPILER;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Sync</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -97,8 +92,6 @@
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <BrowseInformation />
       <WarningLevel>Level4</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <ResourceCompile>
@@ -109,7 +102,6 @@
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrLibDir);$(xrSdkDir)libraries;$(SolutionDir)Externals\FreeImage\Dist;$(SolutionDir)Externals\MagicSoftware\Sdk\Library\DebugDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <MapExports>false</MapExports>
       <SubSystem>Windows</SubSystem>
       <StackReserveSize>0</StackReserveSize>
@@ -117,7 +109,7 @@
       <LargeAddressAware>true</LargeAddressAware>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
-      <TargetMachine>NotSet</TargetMachine>
+      <TargetMachine>MachineX86</TargetMachine>
       <AdditionalDependencies>FreeImaged.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -137,7 +129,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>.;$(SolutionDir);$(DXSDK_DIR)Include;$(SolutionDir)xrServerEntities;$(xrSdkDir)include;$(SolutionDir)Externals\MagicSoftware\Sdk\Include;$(SolutionDir)Externals\FreeImage\Dist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(SolutionDir)Externals\MagicSoftware\Sdk\Include;$(SolutionDir)Externals\FreeImage\Dist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;AI_COMPILER;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling />
@@ -152,8 +144,6 @@
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <BrowseInformation />
       <WarningLevel>Level3</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -163,7 +153,6 @@
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrLibDir);$(xrSdkDir)libraries;$(SolutionDir)Externals\FreeImage\Dist;$(SolutionDir)Externals\MagicSoftware\Sdk\Library\ReleaseDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <StackReserveSize>0</StackReserveSize>
       <StackCommitSize>0</StackCommitSize>
@@ -171,7 +160,7 @@
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
-      <TargetMachine>NotSet</TargetMachine>
+      <TargetMachine>MachineX86</TargetMachine>
       <AdditionalDependencies>FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -190,7 +179,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>.;$(SolutionDir);$(DXSDK_DIR)Include;$(SolutionDir)xrServerEntities;$(xrSdkDir)include;$(SolutionDir)Externals\MagicSoftware\Sdk\Include;$(SolutionDir)Externals\FreeImage\Dist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(SolutionDir)Externals\MagicSoftware\Sdk\Include;$(SolutionDir)Externals\FreeImage\Dist;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;DEBUG;_WINDOWS;AI_COMPILER;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -204,8 +193,6 @@
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <BrowseInformation />
       <WarningLevel>Level3</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -228,7 +215,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\xrEngine\xrLoadSurface.cpp" />
-    <ClCompile Include="..\..\xrGame\random32.cpp" />
     <ClCompile Include="..\..\xrServerEntities\alife_human_brain.cpp" />
     <ClCompile Include="..\..\xrServerEntities\alife_monster_brain.cpp" />
     <ClCompile Include="..\..\xrServerEntities\alife_space.cpp" />
@@ -259,12 +245,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\xrGame\level_graph.cpp" />
-    <ClCompile Include="..\..\xrGame\level_graph_vertex.cpp" />
     <ClCompile Include="level_spawn_constructor.cpp" />
-    <ClCompile Include="..\..\xrGame\patrol_path.cpp" />
-    <ClCompile Include="..\..\xrGame\patrol_path_storage.cpp" />
-    <ClCompile Include="..\..\xrGame\patrol_point.cpp" />
     <ClCompile Include="server_entity_wrapper.cpp" />
     <ClCompile Include="space_restrictor_wrapper.cpp" />
     <ClCompile Include="spawn_patcher.cpp" />
@@ -279,7 +260,6 @@
     <ClCompile Include="xr_graph_merge.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\xrGame\random32.h" />
     <ClInclude Include="..\..\xrServerEntities\alife_human_brain.h" />
     <ClInclude Include="..\..\xrServerEntities\alife_human_brain_inline.h" />
     <ClInclude Include="..\..\xrServerEntities\alife_monster_brain.h" />
@@ -288,7 +268,6 @@
     <ClInclude Include="..\..\xrServerEntities\character_info_defs.h" />
     <ClInclude Include="..\..\xrServerEntities\clsid_game.h" />
     <ClInclude Include="..\..\xrServerEntities\game_base_space.h" />
-    <ClInclude Include="..\..\xrGame\game_graph_space.h" />
     <ClInclude Include="..\..\xrServerEntities\InfoPortionDefs.h" />
     <ClInclude Include="..\..\xrServerEntities\inventory_space.h" />
     <ClInclude Include="..\..\xrServerEntities\ItemListTypes.h" />
@@ -315,83 +294,18 @@
     <ClInclude Include="..\..\xrServerEntities\xrServer_Object_Base.h" />
     <ClInclude Include="..\..\xrServerEntities\xrServer_Space.h" />
     <ClInclude Include="AIMapExport.h" />
-    <ClInclude Include="..\..\xrGame\a_star.h" />
-    <ClInclude Include="..\..\xrGame\a_star_inline.h" />
-    <ClInclude Include="..\..\xrGame\builder_allocator_constructor.h" />
-    <ClInclude Include="..\..\xrGame\builder_allocator_constructor_inline.h" />
     <ClInclude Include="compiler.h" />
     <ClInclude Include="cover_point.h" />
     <ClInclude Include="cover_point_inline.h" />
-    <ClInclude Include="..\..\xrGame\data_storage_binary_heap.h" />
-    <ClInclude Include="..\..\xrGame\data_storage_binary_heap_inline.h" />
-    <ClInclude Include="..\..\xrGame\data_storage_bucket_list.h" />
-    <ClInclude Include="..\..\xrGame\data_storage_bucket_list_inline.h" />
-    <ClInclude Include="..\..\xrGame\data_storage_constructor.h" />
-    <ClInclude Include="..\..\xrGame\data_storage_double_linked_list.h" />
-    <ClInclude Include="..\..\xrGame\data_storage_double_linked_list_inline.h" />
-    <ClInclude Include="..\..\xrGame\data_storage_single_linked_list.h" />
-    <ClInclude Include="..\..\xrGame\data_storage_single_linked_list_inline.h" />
-    <ClInclude Include="..\..\xrGame\dijkstra.h" />
-    <ClInclude Include="..\..\xrGame\dijkstra_inline.h" />
-    <ClInclude Include="..\..\xrGame\edge_path.h" />
-    <ClInclude Include="..\..\xrGame\edge_path_inline.h" />
     <ClInclude Include="ETextureParams.h" />
     <ClInclude Include="factory_api.h" />
-    <ClInclude Include="..\..\xrGame\game_graph.h" />
     <ClInclude Include="game_graph_builder.h" />
     <ClInclude Include="game_graph_builder_inline.h" />
-    <ClInclude Include="..\..\xrGame\game_graph_inline.h" />
-    <ClInclude Include="..\..\xrGame\game_level_cross_table.h" />
-    <ClInclude Include="..\..\xrGame\game_level_cross_table_inline.h" />
     <ClInclude Include="game_spawn_constructor.h" />
     <ClInclude Include="game_spawn_constructor_inline.h" />
-    <ClInclude Include="..\..\xrGame\graph_abstract.h" />
-    <ClInclude Include="..\..\xrGame\graph_abstract_inline.h" />
-    <ClInclude Include="..\..\xrGame\graph_edge.h" />
-    <ClInclude Include="..\..\xrGame\graph_edge_inline.h" />
-    <ClInclude Include="..\..\xrGame\graph_engine.h" />
-    <ClInclude Include="..\..\xrGame\graph_engine_inline.h" />
-    <ClInclude Include="..\..\xrGame\graph_engine_space.h" />
-    <ClInclude Include="..\..\xrGame\graph_vertex.h" />
-    <ClInclude Include="..\..\xrGame\graph_vertex_inline.h" />
     <ClInclude Include="guid_generator.h" />
-    <ClInclude Include="LevelGameDef.h" />
-    <ClInclude Include="..\..\xrGame\level_graph.h" />
-    <ClInclude Include="..\..\xrGame\level_graph_inline.h" />
-    <ClInclude Include="..\..\xrGame\level_graph_space.h" />
-    <ClInclude Include="..\..\xrGame\level_graph_vertex_inline.h" />
     <ClInclude Include="level_spawn_constructor.h" />
     <ClInclude Include="level_spawn_constructor_inline.h" />
-    <ClInclude Include="..\..\xrGame\manager_builder_allocator_constructor.h" />
-    <ClInclude Include="..\..\xrGame\manager_builder_allocator_constructor_inline.h" />
-    <ClInclude Include="..\..\xrGame\path_manager.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_game.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_game_inline.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_game_level.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_game_level_inline.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_game_vertex_type.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_game_vertex_type_inline.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_generic.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_generic_inline.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_level.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_level_evaluator.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_level_evaluator_inline.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_level_flooder.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_level_flooder_inline.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_level_inline.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_level_straight_line.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_level_straight_line_inline.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_params.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_params_flooder.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_params_game_level.h" />
-    <ClInclude Include="..\..\xrGame\path_manager_params_straight_line.h" />
-    <ClInclude Include="..\..\xrGame\patrol_path.h" />
-    <ClInclude Include="..\..\xrGame\patrol_path_inline.h" />
-    <ClInclude Include="..\..\xrGame\patrol_path_storage.h" />
-    <ClInclude Include="..\..\xrGame\patrol_path_storage_inline.h" />
-    <ClInclude Include="..\..\xrGame\patrol_point.h" />
-    <ClInclude Include="..\..\xrGame\patrol_point_inline.h" />
-    <ClInclude Include="profiler.h" />
     <ClInclude Include="PropertiesListHelper.h" />
     <ClInclude Include="quadtree.h" />
     <ClInclude Include="quadtree_inline.h" />
@@ -404,14 +318,6 @@
     <ClInclude Include="spawn_constructor_space.h" />
     <ClInclude Include="spawn_patcher.h" />
     <ClInclude Include="StdAfx.h" />
-    <ClInclude Include="..\..\xrGame\vertex_allocator_fixed.h" />
-    <ClInclude Include="..\..\xrGame\vertex_allocator_fixed_inline.h" />
-    <ClInclude Include="..\..\xrGame\vertex_manager_fixed.h" />
-    <ClInclude Include="..\..\xrGame\vertex_manager_fixed_inline.h" />
-    <ClInclude Include="..\..\xrGame\vertex_manager_hash_fixed.h" />
-    <ClInclude Include="..\..\xrGame\vertex_manager_hash_fixed_inline.h" />
-    <ClInclude Include="..\..\xrGame\vertex_path.h" />
-    <ClInclude Include="..\..\xrGame\vertex_path_inline.h" />
     <ClInclude Include="xrAI.h" />
     <ClInclude Include="xrCrossTable.h" />
     <ClInclude Include="xrShaderTypes.h" />
@@ -419,6 +325,14 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\xrAICore\xrAICore.vcxproj">
+      <Project>{5cb057d8-4464-40a6-af10-c26b826d1d90}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
+      <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

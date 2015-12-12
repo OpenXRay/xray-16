@@ -8,7 +8,7 @@
 
 #include "IGame_Level.h"
 #include "Common/object_broker.h"
-#include "xrServerEntities/LevelGameDef.h"
+#include "Common/LevelGameDef.h"
 
 void CEnvModifier::load(IReader* fs, u32 version)
 {

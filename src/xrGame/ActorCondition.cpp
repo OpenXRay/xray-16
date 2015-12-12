@@ -334,7 +334,7 @@ void CActorCondition::AffectDamage_InjuriousMaterialAndMonstersInfluence()
 
 	if ( pda )
 	{
-		typedef xr_vector<CObject*>				monsters;
+		typedef xr_vector<IGameObject*>				monsters;
 
 		for ( monsters::const_iterator	it	=	pda->feel_touch.begin();
 										it	!=	pda->feel_touch.end();

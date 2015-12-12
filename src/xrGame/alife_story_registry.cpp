@@ -10,7 +10,7 @@
 #include "alife_story_registry.h"
 #include "xrServer_Objects_ALife.h"
 #include "ai_space.h"
-#include "game_graph.h"
+#include "xrAICore/Navigation/game_graph.h"
 
 CALifeStoryRegistry::~CALifeStoryRegistry	()
 {

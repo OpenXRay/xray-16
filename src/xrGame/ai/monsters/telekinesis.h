@@ -7,7 +7,7 @@ class CTelekinesis : public CPHUpdateObject {
 protected:
 	DEFINE_VECTOR(CTelekineticObject*,TELE_OBJECTS,TELE_OBJECTS_IT);
 	TELE_OBJECTS			objects;
-	xr_vector<CObject*>		m_nearest;
+	xr_vector<IGameObject*>		m_nearest;
 	bool					active;
 
 public:
@@ -63,7 +63,7 @@ CTelekineticObject	get_object_by_index (u32 index) {VERIFY(objects.size() > inde
 			void	schedule_update		();
 
 			// объект был удален - удалить все связи на объект
-			void	remove_links		(CObject *O);
+			void	remove_links		(IGameObject *O);
 
 protected:
 	virtual CTelekineticObject*	alloc_tele_object(){return xr_new<CTelekineticObject>();}

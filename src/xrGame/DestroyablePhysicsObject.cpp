@@ -70,7 +70,7 @@ BOOL CDestroyablePhysicsObject::net_Spawn(CSE_Abstract* DC)
 	return res;
 }
 
-//void CDestroyablePhysicsObject::Hit							(float P,Fvector &dir,CObject *who,s16 element,Fvector p_in_object_space, float impulse,  ALife::EHitType hit_type)
+//void CDestroyablePhysicsObject::Hit							(float P,Fvector &dir,IGameObject *who,s16 element,Fvector p_in_object_space, float impulse,  ALife::EHitType hit_type)
 void	CDestroyablePhysicsObject::Hit					(SHit* pHDS)
 {
 	SHit	HDS = *pHDS;

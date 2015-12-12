@@ -303,12 +303,12 @@ void CBurer::UpdateGraviObject()
 
 	collide::rq_result	l_rq;
 	if (Level().ObjectSpace.RayPick(new_pos, dir, trace_dist, collide::rqtBoth, l_rq, NULL)) {
-		const CObject *enemy = smart_cast<const CObject *>(m_gravi_object.enemy);
+		const IGameObject *enemy = smart_cast<const IGameObject *>(m_gravi_object.enemy);
 		if ((l_rq.O == enemy) && (l_rq.range < trace_dist)) {
 			
 			// check for visibility
 			bool b_enemy_visible = false;
-			xr_vector<CObject *> visible_objects;
+			xr_vector<IGameObject *> visible_objects;
 			feel_vision_get(visible_objects);
 
 			// find object
@@ -353,7 +353,7 @@ void CBurer::UpdateGraviObject()
 	// hit objects
 	m_nearest.clear_not_free		();
 	Level().ObjectSpace.GetNearest	(m_nearest,m_gravi_object.cur_pos, m_gravi.radius, NULL); 
-	//xr_vector<CObject*> &m_nearest = Level().ObjectSpace.q_nearest;
+	//xr_vector<IGameObject*> &m_nearest = Level().ObjectSpace.q_nearest;
 
 	for (u32 i=0;i<m_nearest.size();i++) {
 		CPhysicsShellHolder  *obj = smart_cast<CPhysicsShellHolder *>(m_nearest[i]);
@@ -442,7 +442,7 @@ void	CBurer::Hit								(SHit* pHDS)
 	last_hit_frame								=	Device.dwFrame;
 }
 
-void CBurer::Die(CObject* who)
+void CBurer::Die(IGameObject* who)
 {
 	inherited::Die(who);
 
@@ -454,7 +454,7 @@ void CBurer::Die(CObject* who)
 	CTelekinesis::Deactivate();
 }
 
-void CBurer::net_Relcase(CObject *O)
+void CBurer::net_Relcase(IGameObject *O)
 {
 	inherited::net_Relcase		(O);
 

@@ -32,7 +32,7 @@ public:
 	IC		void			clear					();
 			void			react_on_member_death	();
 			void			update					();
-			void			remove_links			(CObject *object);
+			void			remove_links			(IGameObject *object);
 };
 
 #include "agent_corpse_manager_inline.h"

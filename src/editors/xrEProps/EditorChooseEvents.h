@@ -2,11 +2,11 @@
 #define EditorChooseEventsH
 
 #include "ChooseTypes.h"
-#include "../../Layers/xrRender/SkeletonAnimated.h"
-#include "../../Layers/xrRender/ResourceManager.h"
+#include "Layers/xrRender/SkeletonAnimated.h"
+#include "Layers/xrRender/ResourceManager.h"
 
-#include "../../Layers/xrRender/ParticleEffect.h"
-#include "../../Layers/xrRender/ParticleGroup.h"
+#include "Layers/xrRender/ParticleEffect.h"
+#include "Layers/xrRender/ParticleGroup.h"
 
 ref_sound* choose_snd;
 

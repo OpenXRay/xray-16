@@ -3,7 +3,7 @@
 #ifndef PH_JOINT
 #define PH_JOINT
 #include "PhysicsShell.h"
-#include "include/ode/common.h"
+#include "Externals/ode/include/ode/common.h"
 #include "physics_scripted.h"
 class CPHJointDestroyInfo;
 class CPHJoint:

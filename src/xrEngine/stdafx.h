@@ -44,10 +44,7 @@ extern ENGINE_API CInifile* pGameIni;
 #pragma comment( lib, "winmm.lib" )
 #pragma comment( lib, "dinput8.lib" )
 #pragma comment( lib, "dxguid.lib" )
-
-#include "lua/library_linkage.h"
-#include "luabind/library_linkage.h"
-
+// XXX: move to script engine headers
 #ifndef DEBUG
 # define LUABIND_NO_ERROR_CHECKING
 #endif

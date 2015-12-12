@@ -21,12 +21,12 @@
 #include "ai/Monsters/control_animation_base.h"
 #include "UIGameCustom.h"
 #include "UI/UIStatic.h"
-#include "ai_object_location.h"
-#include "profiler.h"
+#include "xrAICore/Navigation/ai_object_location.h"
+#include "xrEngine/profiler.h"
 #include "ActorEffector.h"
 #include "xrEngine/CameraBase.h"
 
-void CBaseMonster::feel_sound_new(CObject* who, int eType, CSound_UserDataPtr user_data, const Fvector &Position, float power)
+void CBaseMonster::feel_sound_new(IGameObject* who, int eType, CSound_UserDataPtr user_data, const Fvector &Position, float power)
 {
 	if (!g_Alive())		return;
 
@@ -195,12 +195,12 @@ void CBaseMonster::HitEntity(const CEntity *pEntity, float fDamage, float impuls
 }
 
 
-bool  CBaseMonster::feel_vision_isRelevant(CObject* O)
+bool  CBaseMonster::feel_vision_isRelevant(IGameObject* O)
 {
 	if (!g_Alive())					return false;
 	if (0==smart_cast<CEntity*>(O))	return false;
 	
-	if ((O->spatial.type & STYPE_VISIBLEFORAI) != STYPE_VISIBLEFORAI) return false;
+	if ((O->GetSpatialData().type & STYPE_VISIBLEFORAI) != STYPE_VISIBLEFORAI) return false;
 	
 	// если спит, то ничего не видит
 	if (m_bSleep) return false;
@@ -219,7 +219,7 @@ bool  CBaseMonster::feel_vision_isRelevant(CObject* O)
 	return true;
 }
 
-void CBaseMonster::HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16 element)
+void CBaseMonster::HitSignal(float amount, Fvector& vLocalDir, IGameObject* who, s16 element)
 {
 	if (!g_Alive()) return;
 	
@@ -267,7 +267,7 @@ void CBaseMonster::SetAttackEffector()
 	}
 }
 
-void CBaseMonster::Hit_Psy(CObject *object, float value) 
+void CBaseMonster::Hit_Psy(IGameObject *object, float value) 
 {
 	NET_Packet		P;
 	SHit			HS;
@@ -284,7 +284,7 @@ void CBaseMonster::Hit_Psy(CObject *object, float value)
 	u_EventSend		(P);
 }
 
-void CBaseMonster::Hit_Wound(CObject *object, float value, const Fvector &dir, float impulse) 
+void CBaseMonster::Hit_Wound(IGameObject *object, float value, const Fvector &dir, float impulse) 
 {
 	NET_Packet	P;
 	SHit		HS;

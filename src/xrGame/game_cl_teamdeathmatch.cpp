@@ -208,7 +208,7 @@ void game_cl_TeamDeathmatch::GetMapEntities(xr_vector<SZoneMapEntityData>& dst)
 	for(;it!=players.end();++it){
 		if(local_team == it->second->team){
 			u16 id = it->second->GameID;
-			CObject* pObject = Level().Objects.net_Find(id);
+			IGameObject* pObject = Level().Objects.net_Find(id);
 			if (!pObject) continue;
 			if (!pObject || !smart_cast<CActor*>(pObject)) continue;
 
@@ -280,7 +280,7 @@ void game_cl_TeamDeathmatch::OnTeamSelect(int Team)
 
 	if (NeedToSendTeamSelect)
 	{
-		CObject *l_pObj = Level().CurrentEntity();
+		IGameObject *l_pObj = Level().CurrentEntity();
 
 		CGameObject *l_pPlayer = smart_cast<CGameObject*>(l_pObj);
 		if(!l_pPlayer) return;
@@ -534,7 +534,7 @@ void	game_cl_TeamDeathmatch::OnRender				()
 			game_PlayerState* ps = it->second;
 			u16 id = ps->GameID;
 			if (ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) continue;
-			CObject* pObject = Level().Objects.net_Find(id);
+			IGameObject* pObject = Level().Objects.net_Find(id);
 			if (!pObject) continue;
 			if (!pObject || !smart_cast<CActor*>(pObject)) continue;
 			if (IsEnemy(ps)) continue;
@@ -663,7 +663,7 @@ void game_cl_TeamDeathmatch::UpdateMapLocations		()
 				continue;
 			};
 			
-			CObject* pObject = Level().Objects.net_Find(id);
+			IGameObject* pObject = Level().Objects.net_Find(id);
 			if (!pObject || !smart_cast<CActor*>(pObject)) continue;
 			if (IsEnemy(ps)) 
 			{

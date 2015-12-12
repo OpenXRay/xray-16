@@ -86,7 +86,7 @@ BOOL CClimableObject::	net_Spawn			( CSE_Abstract* DC)
 	shift.mul(f_min_width);
 	
 	XFORM().transform_dir(shift);
-	CObject::Position().sub(shift);
+    Position().sub(shift);
 	m_box.xform_set(Fidentity);
 	
 	m_pStaticShell = P_BuildLeaderGeomShell(this, ObjectContactCallback, m_box );

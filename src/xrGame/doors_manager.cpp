@@ -29,7 +29,7 @@ manager::~manager					( )
 //
 //void manager::check_bug_door		( ) const
 //{
-//	CObject const* const object = Level().Objects.FindObjectByName("shkaf_work_01_door_0000");
+//	IGameObject const* const object = Level().Objects.FindObjectByName("shkaf_work_01_door_0000");
 //	if ( !object ) {
 //		Msg					( "there is now object[\"shkaf_work_01_door_0000\"] found" );
 //		return;

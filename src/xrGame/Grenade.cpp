@@ -342,7 +342,7 @@ BOOL CGrenade::UsedAI_Locations		()
 	return inherited::UsedAI_Locations( );//m_dwDestroyTime == 0xffffffff;
 }
 
-void CGrenade::net_Relcase(CObject* O )
+void CGrenade::net_Relcase(IGameObject* O )
 {
 	CExplosive::net_Relcase(O);
 	inherited::net_Relcase(O);

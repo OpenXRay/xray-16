@@ -12,6 +12,7 @@
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
+using namespace luabind::policy;
 
 SCRIPT_EXPORT(CSE_ALifeCreatureActor, (CSE_ALifeCreatureAbstract, CSE_ALifeTraderAbstract, CSE_PHSkeleton),
 {
@@ -106,7 +107,7 @@ static void CSE_ALifeOnlineOfflineGroup_Export(lua_State *luaState)
 		.def("register_member",		&CSE_ALifeOnlineOfflineGroup::register_member)
 		.def("unregister_member",	&CSE_ALifeOnlineOfflineGroup::unregister_member)
 		.def("commander_id",		&CSE_ALifeOnlineOfflineGroup::commander_id)
-		.def("squad_members",		&CSE_ALifeOnlineOfflineGroup::squad_members, return_stl_iterator)
+		.def("squad_members",		&CSE_ALifeOnlineOfflineGroup::squad_members, return_stl_iterator())
 		.def("npc_count",			&CSE_ALifeOnlineOfflineGroup::npc_count)
 		.def("add_location_type",	&CSE_ALifeOnlineOfflineGroup::add_location_type)
 		.def("clear_location_types",&CSE_ALifeOnlineOfflineGroup::clear_location_types)

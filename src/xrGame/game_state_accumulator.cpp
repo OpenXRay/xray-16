@@ -85,7 +85,7 @@ void game_state_accumulator::OnBullet_Fire(u16 sender,
 	}
 }
 
-void game_state_accumulator::OnBullet_Hit(CObject const * hitter, CObject const * victim, CObject const * weapon, u16 const bone)
+void game_state_accumulator::OnBullet_Hit(IGameObject const * hitter, IGameObject const * victim, IGameObject const * weapon, u16 const bone)
 {
 	if (!hitter || !victim || !weapon)
 		return;
@@ -156,8 +156,8 @@ void game_state_accumulator::OnPlayerKilled(u16 killer_id, u16 target_id, u16 we
 	if (!is_enemies(killer_id, target_id))
 		return;
 
-	CObject* killer_obj = Level().Objects.net_Find(killer_id);
-	CObject* victim_obj = Level().Objects.net_Find(target_id);
+	IGameObject* killer_obj = Level().Objects.net_Find(killer_id);
+	IGameObject* victim_obj = Level().Objects.net_Find(target_id);
 	if (killer_obj && victim_obj)
 	{
 		m_kills.add_kill(
@@ -208,7 +208,7 @@ void game_state_accumulator::OnRoundStart()
 	}
 }
 
-u16 game_state_accumulator::get_object_id(CObject const * obj)
+u16 game_state_accumulator::get_object_id(IGameObject const * obj)
 {
 	if (!obj)
 		return 0;
@@ -224,7 +224,7 @@ u16 game_state_accumulator::get_object_id(CObject const * obj)
 
 u16 game_state_accumulator::get_object_id(u16 item_object_id)
 {
-	CObject	*tmp_object = Level().Objects.net_Find(item_object_id);
+	IGameObject	*tmp_object = Level().Objects.net_Find(item_object_id);
 	if (!tmp_object )
 		return 0;
 
@@ -467,7 +467,7 @@ CWeapon* game_state_accumulator::get_active_weapon(game_PlayerState* player)
 	if (!player)
 		return NULL;
 
-	CObject* tmp_obj = Level().Objects.net_Find(player->GameID);
+	IGameObject* tmp_obj = Level().Objects.net_Find(player->GameID);
 	if (!tmp_obj)
 		return NULL;
 
@@ -488,7 +488,7 @@ CWeapon* game_state_accumulator::get_active_weapon(game_PlayerState* player)
 
 CActor*	 game_state_accumulator::get_players_actor(u16 game_id)
 {
-	CObject* tmp_obj = Level().Objects.net_Find(game_id);
+	IGameObject* tmp_obj = Level().Objects.net_Find(game_id);
 	if (!tmp_obj)
 		return NULL;
 

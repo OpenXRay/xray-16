@@ -160,7 +160,7 @@ public:
 			Game().local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) 
 										return;
 		
-		CObject *l_pObj					= Level().CurrentControlEntity();
+		IGameObject *l_pObj					= Level().CurrentControlEntity();
 		CActor *l_pPlayer				= smart_cast<CActor*>(l_pObj);
 		if(l_pPlayer) 
 		{
@@ -236,7 +236,7 @@ public:
 			if (CO < CLObjNum && CO < SVObjNum)
 			{
 				CSE_Abstract* pEntity = Level().Server->ID_to_entity(SObjID[CO]);
-				CObject* pObj = Level().Objects.net_Find(CObjID[CO]);
+				IGameObject* pObj = Level().Objects.net_Find(CObjID[CO]);
 				char color = (pObj->ID() == pEntity->ID) ? '-' : '!';
 
 				Msg("%c%4d: Client - %20s[%5d] <===> Server - %s [%d]", color, CO+1, 
@@ -247,7 +247,7 @@ public:
 			{
 				if (CO<CLObjNum)
 				{
-					CObject* pObj = Level().Objects.net_Find(CObjID[CO]);
+					IGameObject* pObj = Level().Objects.net_Find(CObjID[CO]);
 					Msg("! %2d: Client - %s [%d] <===> Server - -----------------", CO+1, 
 						*(pObj->cNameSect()), pObj->ID());
 				}
