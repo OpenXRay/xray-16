@@ -14,7 +14,13 @@ void _VertexStream::Create	()
     RImplementation.Resources->Evict();
 
 	mSize					= rsDVB_Size*1024;
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined (USE_OGL)
+	glGenBuffers(1, &pVB);
+	R_ASSERT(pVB);
+
+	glBindBuffer(GL_ARRAY_BUFFER, pVB);
+	CHK_GL(glBufferData(GL_ARRAY_BUFFER, mSize, nullptr, GL_DYNAMIC_DRAW));
+#elif defined(USE_DX10) || defined(USE_DX11)
 	D3D_BUFFER_DESC bufferDesc;
 	bufferDesc.ByteWidth        = mSize;
 	bufferDesc.Usage            = D3D_USAGE_DYNAMIC;	
@@ -39,8 +45,13 @@ void _VertexStream::Create	()
 
 void _VertexStream::Destroy	()
 {
-	HW.stats_manager.decrement_stats_vb	(pVB);
-	_RELEASE							(pVB);
+#ifdef USE_OGL
+	if (pVB)
+		glDeleteBuffers(1, &pVB);
+#else
+	HW.stats_manager.decrement_stats_vb(pVB);
+	_RELEASE(pVB);
+#endif // USE_OGL
 	_clear								();
 }
 
@@ -66,6 +77,9 @@ void* _VertexStream::Lock	( u32 vl_Count, u32 Stride, u32& vOffset )
 
 	// Check if there is need to flush and perform lock
 	BYTE* pData			= 0;
+#ifdef USE_OGL
+	glBindBuffer(GL_ARRAY_BUFFER, pVB);
+#endif // USE_OGL
 	if ((vl_Count+vl_mPosition) >= vl_mSize)
 	{
 		// FLUSH-LOCK
@@ -73,7 +87,9 @@ void* _VertexStream::Lock	( u32 vl_Count, u32 Stride, u32& vOffset )
 		vOffset				= 0;
 		mDiscardID			++;
 
-#if defined(USE_DX11)
+#if defined (USE_OGL)
+		CHK_GL(pData = (BYTE*)glMapBufferRange(GL_ARRAY_BUFFER, mPosition, bytes_need, LOCKFLAGS_FLUSH));
+#elif defined(USE_DX11)
 		HW.pContext->Map(pVB, 0, D3D_MAP_WRITE_DISCARD, 0, &MappedSubRes);
 		pData=(BYTE*)MappedSubRes.pData;
 		pData += vOffset;
@@ -92,7 +108,9 @@ void* _VertexStream::Lock	( u32 vl_Count, u32 Stride, u32& vOffset )
 		mPosition			= vl_mPosition*Stride;
 		vOffset				= vl_mPosition;
 
-#if defined(USE_DX11)
+#if defined(USE_OGL)
+		CHK_GL(pData = (BYTE*)glMapBufferRange(GL_ARRAY_BUFFER, mPosition, bytes_need, LOCKFLAGS_APPEND));
+#elif defined(USE_DX11)
 		HW.pContext->Map(pVB, 0, D3D_MAP_WRITE_NO_OVERWRITE, 0, &MappedSubRes);
 		pData=(BYTE*)MappedSubRes.pData;
 		pData += vOffset*Stride;
@@ -123,7 +141,9 @@ void	_VertexStream::Unlock		( u32 Count, u32 Stride)
 
 	VERIFY				(pVB);
 
-#if defined(USE_DX11)
+#if defined(USE_OGL)
+	CHK_GL(glUnmapBuffer(GL_ARRAY_BUFFER));
+#elif defined(USE_DX11)
 	HW.pContext->Unmap(pVB, 0);
 #elif defined(USE_DX10)
 	pVB->Unmap();
@@ -167,7 +187,13 @@ void	_IndexStream::Create	()
 
 	mSize					= rsDIB_Size*1024;
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_OGL)
+	glGenBuffers(1, &pIB);
+	R_ASSERT(pIB);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pIB);
+	CHK_GL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, mSize, nullptr, GL_DYNAMIC_DRAW));
+#elif defined(USE_DX10) || defined(USE_DX11)
 	D3D_BUFFER_DESC bufferDesc;
 	bufferDesc.ByteWidth        = mSize;
 	bufferDesc.Usage            = D3D_USAGE_DYNAMIC;	
@@ -191,8 +217,13 @@ void	_IndexStream::Create	()
 
 void	_IndexStream::Destroy()
 {
-	HW.stats_manager.decrement_stats_ib	(pIB);
-	_RELEASE							(pIB);
+#ifdef USE_OGL
+	if (pIB)
+		glDeleteBuffers(1, &pIB);
+#else
+	HW.stats_manager.decrement_stats_ib(pIB);
+	_RELEASE(pIB);
+#endif // USE_OGL
 	_clear								();
 }
 
@@ -211,14 +242,17 @@ u16*	_IndexStream::Lock	( u32 Count, u32& vOffset )
 	// If either user forced us to flush,
 	// or there is not enough space for the index data,
 	// then flush the buffer contents
-	u32 dwFlags = LOCKFLAGS_APPEND;
+	u32 dwFlags = (u32)LOCKFLAGS_APPEND;
 	if ( 2*( Count + mPosition ) >= mSize )
 	{
 		mPosition	= 0;						// clear position
-		dwFlags		= LOCKFLAGS_FLUSH;			// discard it's contens
+		dwFlags		= (u32)LOCKFLAGS_FLUSH;			// discard it's contens
 		mDiscardID	++;
 	}
-#if defined(USE_DX11)
+#if defined(USE_OGL)
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pIB);
+	CHK_GL(pLockedData = (BYTE*)glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, mPosition * 2, Count * 2, (BufferAccessMask)dwFlags));
+#elif defined(USE_DX11)
 	D3D_MAP MapMode = (dwFlags==LOCKFLAGS_APPEND) ? 
 		D3D_MAP_WRITE_NO_OVERWRITE : D3D_MAP_WRITE_DISCARD;
 	HW.pContext->Map(pIB, 0, MapMode, 0, &MappedSubRes);
@@ -245,7 +279,9 @@ void	_IndexStream::Unlock(u32 RealCount)
 	PGO						(Msg("PGO:IB_UNLOCK:%d",RealCount));
 	mPosition				+=	RealCount;
 	VERIFY					(pIB);
-#if defined(USE_DX11)
+#if defined(USE_OGL)
+	CHK_GL(glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER));
+#elif defined(USE_DX11)
 	HW.pContext->Unmap(pIB, 0);
 #elif defined(USE_DX10)
 	pIB->Unmap();

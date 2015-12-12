@@ -3,29 +3,69 @@
 #pragma once
 
 //	Interface
-IC HRESULT CreateQuery( ID3DQuery **ppQuery , D3DQUERYTYPE Type);
-IC HRESULT GetData( ID3DQuery *pQuery, void *pData, UINT DataSize );
-IC HRESULT BeginQuery( ID3DQuery *pQuery);
-IC HRESULT EndQuery( ID3DQuery *pQuery);
+
+#ifdef USE_OGL
+
+IC HRESULT CreateQuery(GLuint* pQuery);
+IC HRESULT GetData(GLuint query, void *pData, UINT DataSize);
+IC HRESULT BeginQuery(GLuint query);
+IC HRESULT EndQuery(GLuint query);
+IC HRESULT ReleaseQuery(GLuint pQuery);
+
+#else
+
+IC HRESULT CreateQuery(ID3DQuery **ppQuery);
+IC HRESULT GetData(ID3DQuery *pQuery, void *pData, UINT DataSize);
+IC HRESULT BeginQuery(ID3DQuery *pQuery);
+IC HRESULT EndQuery(ID3DQuery *pQuery);
+IC HRESULT ReleaseQuery(ID3DQuery *pQuery);
+
+#endif // USE_OGL
 
 //	Implementation
 
-#if defined(USE_DX11)
+#if defined(USE_OGL)
 
-IC HRESULT CreateQuery ( ID3DQuery **ppQuery, D3DQUERYTYPE Type)
+IC HRESULT CreateQuery(GLuint *pQuery)
+{
+	glGenQueries(1, pQuery);
+	return S_OK;
+}
+
+IC HRESULT GetData(GLuint query, void *pData, UINT DataSize)
+{
+	if (DataSize == sizeof(GLint64))
+		CHK_GL(glGetQueryObjecti64v(query, GL_QUERY_RESULT, (GLint64*)pData));
+	else
+		CHK_GL(glGetQueryObjectiv(query, GL_QUERY_RESULT, (GLint*)pData));
+	return S_OK;
+}
+
+IC HRESULT BeginQuery(GLuint query)
+{
+	CHK_GL(glBeginQuery(GL_SAMPLES_PASSED, query));
+	return S_OK;
+}
+
+IC HRESULT EndQuery(GLuint query)
+{
+	CHK_GL(glEndQuery(GL_SAMPLES_PASSED));
+	return S_OK;
+}
+
+IC HRESULT ReleaseQuery(GLuint query)
+{
+	CHK_GL(glDeleteQueries(1, &query));
+	return S_OK;
+}
+
+#elif defined(USE_DX11)
+
+IC HRESULT CreateQuery ( ID3DQuery **ppQuery)
 {
 	D3D_QUERY_DESC	desc;
 	desc.MiscFlags = 0;
-	
-	switch (Type)
-	{
-	case D3DQUERYTYPE_OCCLUSION:
-		desc.Query = D3D_QUERY_OCCLUSION;
-		break;
-	default:
-		VERIFY(!"No default.");
-	}
-
+	desc.Query = D3D_QUERY_OCCLUSION;
 	return HW.pDevice->CreateQuery( &desc, ppQuery);
 }
 
@@ -47,22 +87,19 @@ IC HRESULT EndQuery( ID3DQuery *pQuery)
 	return S_OK;
 }
 
+IC HRESULT ReleaseQuery(ID3DQuery* pQuery)
+{
+	_RELEASE(pQuery);
+	return S_OK;
+}
+
 #elif defined(USE_DX10)
 
-IC HRESULT CreateQuery ( ID3DQuery **ppQuery, D3DQUERYTYPE Type)
+IC HRESULT CreateQuery ( ID3DQuery **ppQuery)
 {
 	D3D_QUERY_DESC	desc;
 	desc.MiscFlags = 0;
-	
-	switch (Type)
-	{
-	case D3DQUERYTYPE_OCCLUSION:
-		desc.Query = D3D_QUERY_OCCLUSION;
-		break;
-	default:
-		VERIFY(!"No default.");
-	}
-
+	desc.Query = D3D_QUERY_OCCLUSION;
 	return HW.pDevice->CreateQuery( &desc, ppQuery);
 }
 
@@ -84,11 +121,17 @@ IC HRESULT EndQuery( ID3DQuery *pQuery)
 	return S_OK;
 }
 
+IC HRESULT ReleaseQuery(ID3DQuery* pQuery)
+{
+	_RELEASE(pQuery);
+	return S_OK;
+}
+
 #else	//	USE_DX10
 
-IC HRESULT CreateQuery ( ID3DQuery **ppQuery, D3DQUERYTYPE Type)
+IC HRESULT CreateQuery ( ID3DQuery **ppQuery)
 {
-	return HW.pDevice->CreateQuery(Type, ppQuery);
+	return HW.pDevice->CreateQuery(D3DQUERYTYPE_OCCLUSION, ppQuery);
 }
 
 IC HRESULT GetData( ID3DQuery *pQuery, void *pData, UINT DataSize )
@@ -104,6 +147,12 @@ IC HRESULT BeginQuery( ID3DQuery *pQuery)
 IC HRESULT EndQuery( ID3DQuery *pQuery)
 {
 	return pQuery->Issue( D3DISSUE_END);
+}
+
+IC HRESULT ReleaseQuery(ID3DQuery* pQuery)
+{
+	_RELEASE(pQuery);
+	return S_OK;
 }
 
 #endif	//	USE_DX10

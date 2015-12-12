@@ -34,11 +34,19 @@ void	resptrcode_shader::create		(IBlender* B, LPCSTR s_shader, LPCSTR s_textures
 }
 
 //////////////////////////////////////////////////////////////////////////
+#ifdef USE_OGL
+void	resptrcode_geom::create			(u32 FVF , GLuint vb, GLuint ib)
+#else
 void	resptrcode_geom::create			(u32 FVF , ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
+#endif // USE_OGL
 {
     _set(RImplementation.Resources->CreateGeom(FVF, vb, ib));
 }
+#ifdef USE_OGL
+void	resptrcode_geom::create			(D3DVERTEXELEMENT9* decl, GLuint vb, GLuint ib)
+#else
 void	resptrcode_geom::create			(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
+#endif // USE_OGL
 {
     _set(RImplementation.Resources->CreateGeom(decl, vb, ib));
 }
@@ -51,7 +59,7 @@ BOOL SPass::equal(const SPass& other)
 	if (state		!= other.state)		return FALSE;
 	if (ps			!= other.ps)			return FALSE;
 	if (vs			!= other.vs)			return FALSE;
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	if (gs			!= other.gs)			return FALSE;
 #	ifdef USE_DX11
 	if (hs			!= other.hs)			return FALSE;

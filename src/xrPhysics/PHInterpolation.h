@@ -3,7 +3,7 @@
 #define PHINTERPOLATON_H
 
 
-#include "3rd party/ode/include/ode/common.h"
+#include "include/ode/common.h"
 
 class CPHInterpolation {
 

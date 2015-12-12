@@ -243,16 +243,16 @@
     <ClInclude Include="..\xrRender\Light_DB.h">
       <Filter>Lights</Filter>
     </ClInclude>
-    <ClInclude Include="light_gi.h">
+    <ClInclude Include="..\xrRender\light_gi.h">
       <Filter>Lights</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\Light_Package.h">
       <Filter>Lights</Filter>
     </ClInclude>
-    <ClInclude Include="Light_Render_Direct.h">
+    <ClInclude Include="..\xrRender\Light_Render_Direct.h">
       <Filter>Lights</Filter>
     </ClInclude>
-    <ClInclude Include="light_smapvis.h">
+    <ClInclude Include="..\xrRender\light_smapvis.h">
       <Filter>Lights</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\LightTrack.h">
@@ -833,22 +833,22 @@
     <ClCompile Include="..\xrRender\Light_DB.cpp">
       <Filter>Lights</Filter>
     </ClCompile>
-    <ClCompile Include="light_GI.cpp">
+    <ClCompile Include="..\xrRender\light_GI.cpp">
       <Filter>Lights</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\Light_Package.cpp">
       <Filter>Lights</Filter>
     </ClCompile>
-    <ClCompile Include="Light_Render_Direct.cpp">
+    <ClCompile Include="..\xrRender\Light_Render_Direct.cpp">
       <Filter>Lights</Filter>
     </ClCompile>
-    <ClCompile Include="Light_Render_Direct_ComputeXFS.cpp">
+    <ClCompile Include="..\xrRender\Light_Render_Direct_ComputeXFS.cpp">
       <Filter>Lights</Filter>
     </ClCompile>
-    <ClCompile Include="light_smapvis.cpp">
+    <ClCompile Include="..\xrRender\light_smapvis.cpp">
       <Filter>Lights</Filter>
     </ClCompile>
-    <ClCompile Include="light_vis.cpp">
+    <ClCompile Include="..\xrRender\light_vis.cpp">
       <Filter>Lights</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\LightTrack.cpp">

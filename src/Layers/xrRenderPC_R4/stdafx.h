@@ -28,6 +28,7 @@
 
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 
+#define		R_GL	0
 #define		R_R1	1
 #define		R_R2	2
 #define		R_R3	3

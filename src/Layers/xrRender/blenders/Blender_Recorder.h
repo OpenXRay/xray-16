@@ -52,7 +52,7 @@ private:
 
 	string128			pass_vs;
 	string128			pass_ps;
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	string128			pass_gs;
 #	ifdef USE_DX11
 	string128			pass_hs;
@@ -125,7 +125,7 @@ public:
 	// R1/R2-compiler	[programmable]		- templates
 	void				r_Pass				(LPCSTR vs,		LPCSTR ps,		bool bFog,	BOOL	bZtest=TRUE,				BOOL	bZwrite=TRUE,			BOOL	bABlend=FALSE,			D3DBLEND	abSRC=D3DBLEND_ONE,		D3DBLEND abDST=D3DBLEND_ZERO,	BOOL aTest=FALSE,	u32 aRef=0);
 	void				r_Constant			(LPCSTR name,	R_constant_setup* s);
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	void				r_Pass				(LPCSTR vs,		LPCSTR gs, LPCSTR ps,		bool bFog,	BOOL	bZtest=TRUE,				BOOL	bZwrite=TRUE,			BOOL	bABlend=FALSE,			D3DBLEND	abSRC=D3DBLEND_ONE,		D3DBLEND abDST=D3DBLEND_ZERO,	BOOL aTest=FALSE,	u32 aRef=0);
 #	ifdef USE_DX11
 	void				r_TessPass			(LPCSTR vs,	LPCSTR hs, LPCSTR ds, LPCSTR gs, LPCSTR ps, bool bFog, BOOL bZtest=TRUE, BOOL bZwrite=TRUE, BOOL bABlend=FALSE,	D3DBLEND abSRC=D3DBLEND_ONE, D3DBLEND abDST=D3DBLEND_ZERO, BOOL aTest=FALSE, u32 aRef=0);
@@ -134,7 +134,9 @@ public:
 	void				r_Stencil(BOOL Enable, u32 Func=D3DCMP_ALWAYS, u32 Mask=0x00, u32 WriteMask=0x00, u32 Fail=D3DSTENCILOP_KEEP, u32 Pass=D3DSTENCILOP_KEEP, u32 ZFail=D3DSTENCILOP_KEEP);
 	void				r_StencilRef(u32 Ref);
 	void				r_CullMode(D3DCULL Mode);
-	
+#endif	//	USE_DX10
+
+#if defined(USE_DX10) || defined(USE_DX11)
 	void				r_dx10Texture(LPCSTR ResourceName,	LPCSTR texture);
 	void				r_dx10Texture(LPCSTR ResourceName,	shared_str texture) { return r_dx10Texture(ResourceName, texture.c_str());};
 	u32					r_dx10Sampler(LPCSTR ResourceName);
@@ -147,6 +149,12 @@ public:
 	void				r_Sampler_clf		(LPCSTR name,	LPCSTR texture,		bool b_ps1x_ProjectiveDivide=false);
 	void				r_Sampler_clw		(LPCSTR name,	LPCSTR texture,		bool b_ps1x_ProjectiveDivide=false);
 #endif	//	USE_DX10
+
+#ifdef USE_OGL
+	void				i_Comparison(u32 s, u32		func);
+	void				r_Sampler_cmp(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide = false);
+#endif // USE_OGL
+	
 	void				r_ColorWriteEnable( bool cR=true, bool cG=true, bool cB=true, bool cA=true);
 	void				r_End				();
 

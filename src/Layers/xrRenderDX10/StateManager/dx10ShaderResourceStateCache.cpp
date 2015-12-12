@@ -99,7 +99,7 @@ void dx10ShaderResourceStateCache::Apply()
 
 void dx10ShaderResourceStateCache::SetPSResource( u32 uiSlot, ID3DShaderResourceView	*pRes )
 {
-	VERIFY(uiSlot<CBackend::mtMaxPixelShaderTextures);
+	VERIFY(uiSlot<CTexture::mtMaxPixelShaderTextures);
 
 	if ( m_PSViews[uiSlot] != pRes)
 	{
@@ -120,7 +120,7 @@ void dx10ShaderResourceStateCache::SetPSResource( u32 uiSlot, ID3DShaderResource
 
 void dx10ShaderResourceStateCache::SetGSResource( u32 uiSlot, ID3DShaderResourceView	*pRes )
 {
-	VERIFY(uiSlot<CBackend::mtMaxGeometryShaderTextures);
+	VERIFY(uiSlot<CTexture::mtMaxGeometryShaderTextures);
 
 	if ( m_GSViews[uiSlot] != pRes)
 	{
@@ -141,7 +141,7 @@ void dx10ShaderResourceStateCache::SetGSResource( u32 uiSlot, ID3DShaderResource
 
 void dx10ShaderResourceStateCache::SetVSResource( u32 uiSlot, ID3DShaderResourceView	*pRes )
 {
-	VERIFY(uiSlot<CBackend::mtMaxVertexShaderTextures);
+	VERIFY(uiSlot<CTexture::mtMaxVertexShaderTextures);
 
 	if ( m_VSViews[uiSlot] != pRes)
 	{
@@ -163,7 +163,7 @@ void dx10ShaderResourceStateCache::SetVSResource( u32 uiSlot, ID3DShaderResource
 #ifdef USE_DX11
 void dx10ShaderResourceStateCache::SetHSResource( u32 uiSlot, ID3DShaderResourceView	*pRes )
 {
-	VERIFY(uiSlot<CBackend::mtMaxHullShaderTextures);
+	VERIFY(uiSlot<CTexture::mtMaxHullShaderTextures);
 
 	if ( m_HSViews[uiSlot] != pRes)
 	{
@@ -184,7 +184,7 @@ void dx10ShaderResourceStateCache::SetHSResource( u32 uiSlot, ID3DShaderResource
 
 void dx10ShaderResourceStateCache::SetDSResource( u32 uiSlot, ID3DShaderResourceView	*pRes )
 {
-	VERIFY(uiSlot<CBackend::mtMaxHullShaderTextures);
+	VERIFY(uiSlot<CTexture::mtMaxHullShaderTextures);
 
 	if ( m_DSViews[uiSlot] != pRes)
 	{
@@ -205,7 +205,7 @@ void dx10ShaderResourceStateCache::SetDSResource( u32 uiSlot, ID3DShaderResource
 
 void dx10ShaderResourceStateCache::SetCSResource( u32 uiSlot, ID3DShaderResourceView	*pRes )
 {
-	VERIFY(uiSlot<CBackend::mtMaxComputeShaderTextures);
+	VERIFY(uiSlot<CTexture::mtMaxComputeShaderTextures);
 
 	if ( m_CSViews[uiSlot] != pRes)
 	{

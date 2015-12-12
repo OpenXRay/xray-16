@@ -18,8 +18,14 @@ public:
 	IC BOOL	valid()	{ return !!pTexture; }
 
 public:
+#ifdef USE_OGL
+	GLuint					pRT;
+	GLuint					pZRT;
+	GLenum					target;
+#else
 	ID3DTexture2D*			pSurface;
 	ID3DRenderTargetView*	pRT;
+#endif // USE_OGL
 #if defined(USE_DX10) || defined(USE_DX11)
 	ID3DDepthStencilView*	pZRT;
 

@@ -58,16 +58,26 @@ typedef	resptr_core<SConstantList,resptr_base<SConstantList> >								ref_consta
 //////////////////////////////////////////////////////////////////////////
 struct	 ECORE_API		SGeometry		: public xr_resource_flagged									{
 	ref_declaration		dcl;
+#ifdef USE_OGL
+	GLuint				vb;
+	GLuint				ib;
+#else
 	ID3DVertexBuffer*	vb;
 	ID3DIndexBuffer*	ib;
+#endif // USE_OGL
 	u32					vb_stride;
 						~SGeometry		();
 };
 
 struct 	ECORE_API	resptrcode_geom	: public resptr_base<SGeometry>
 {
-	void 				create			(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
-	void				create			(u32 FVF				, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
+#ifdef USE_OGL
+	void 				create(D3DVERTEXELEMENT9* decl, GLuint vb, GLuint ib);
+	void				create(u32 FVF, GLuint vb, GLuint ib);
+#else
+	void 				create(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
+	void				create(u32 FVF, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
+#endif // USE_OGL
 	void				destroy			()			{ _set(NULL);		}
 	u32					stride			()	const	{ return _get()->vb_stride;	}
 };
@@ -79,7 +89,7 @@ struct	  ECORE_API		SPass			: public xr_resource_flagged									{
 	ref_state							state;		// Generic state, like Z-Buffering, samplers, etc
 	ref_ps								ps;			// may be NULL = FFP, in that case "state" must contain TSS setup
 	ref_vs								vs;			// may be NULL = FFP, in that case "state" must contain RS setup, *and* FVF-compatible declaration must be used
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	ref_gs								gs;			// may be NULL = don't use geometry shader at all
 #	ifdef USE_DX11
 	ref_hs								hs;			// may be NULL = don't use hull shader at all

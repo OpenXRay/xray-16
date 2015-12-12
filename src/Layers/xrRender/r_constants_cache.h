@@ -4,7 +4,9 @@
 
 #include "r_constants.h"
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_OGL)
+#include "Layers/xrRenderGL/glr_constants_cache.h"
+#elif defined(USE_DX10) || defined(USE_DX11)
 #include "Layers/xrRenderDX10/dx10r_constants_cache.h"
 #else	//	USE_DX10
 #include "Layers/xrRenderDX9/dx9r_constants_cache.h"

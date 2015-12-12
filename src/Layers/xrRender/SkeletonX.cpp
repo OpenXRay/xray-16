@@ -555,7 +555,7 @@ void CSkeletonX::_FillVerticesSoft2W(const Fmatrix& view, CSkeletonWallmark& wm,
 	}
 }
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 void CSkeletonX::_DuplicateIndices(const char* N, IReader *data)
 {
 	//	We will have trouble with container since don't know were to take readable indices

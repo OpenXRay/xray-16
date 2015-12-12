@@ -42,6 +42,7 @@
 # define VERIFY3(expr,e2,e3) do {static bool ignore_always = false; if (!ignore_always && !(expr)) ::Debug.fail(#expr,e2,e3,DEBUG_INFO,ignore_always);} while(0)
 # define VERIFY4(expr,e2,e3,e4)do {static bool ignore_always = false; if (!ignore_always && !(expr)) ::Debug.fail(#expr,e2,e3,e4,DEBUG_INFO,ignore_always);} while(0)
 # define CHK_DX(expr) do {static bool ignore_always = false; HRESULT hr = expr; if (!ignore_always && FAILED(hr)) ::Debug.error(hr,#expr,DEBUG_INFO,ignore_always);} while(0)
+# define CHK_GL(expr) do {static bool ignore_always = false; (expr); GLenum err = glGetError(); if (!ignore_always && err != GL_NO_ERROR) ::Debug.error((int)err,#expr,DEBUG_INFO,ignore_always);} while(0)
 # else // DEBUG
 # ifdef __BORLANDC__
 # define NODEFAULT
@@ -53,6 +54,7 @@
 # define VERIFY3(expr, e2, e3) do {} while (0)
 # define VERIFY4(expr, e2, e3, e4)do {} while (0)
 # define CHK_DX(a) a
+# define CHK_GL(a) a
 # endif // DEBUG
 //---------------------------------------------------------------------------------------------
 // FIXMEs / TODOs / NOTE macros

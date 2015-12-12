@@ -769,7 +769,15 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
             return 0;
         }        
 #ifndef DEDICATED_SERVER
-        if (strstr(Core.Params, "-r2a"))
+        if (strstr(Core.Params, "-gl"))
+            Console->Execute("renderer renderer_gl");
+        else if (strstr(Core.Params, "-r4"))
+            Console->Execute("renderer renderer_r4");
+        else if (strstr(Core.Params, "-r3"))
+            Console->Execute("renderer renderer_r3");
+        else if (strstr(Core.Params, "-r2.5"))
+            Console->Execute("renderer renderer_r2.5");
+        else if (strstr(Core.Params, "-r2a"))
             Console->Execute("renderer renderer_r2a");
         else if (strstr(Core.Params, "-r2"))
             Console->Execute("renderer renderer_r2");

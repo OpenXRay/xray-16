@@ -21,13 +21,13 @@ public:
 #endif
 
 private:
-	ID3DShaderResourceView	*m_PSViews[CBackend::mtMaxPixelShaderTextures];
-	ID3DShaderResourceView	*m_GSViews[CBackend::mtMaxGeometryShaderTextures];
-	ID3DShaderResourceView	*m_VSViews[CBackend::mtMaxVertexShaderTextures];
+	ID3DShaderResourceView	*m_PSViews[CTexture::mtMaxPixelShaderTextures];
+	ID3DShaderResourceView	*m_GSViews[CTexture::mtMaxGeometryShaderTextures];
+	ID3DShaderResourceView	*m_VSViews[CTexture::mtMaxVertexShaderTextures];
 #ifdef USE_DX11
-	ID3DShaderResourceView	*m_HSViews[CBackend::mtMaxHullShaderTextures];
-	ID3DShaderResourceView	*m_DSViews[CBackend::mtMaxDomainShaderTextures];
-	ID3DShaderResourceView	*m_CSViews[CBackend::mtMaxComputeShaderTextures];
+	ID3DShaderResourceView	*m_HSViews[CTexture::mtMaxHullShaderTextures];
+	ID3DShaderResourceView	*m_DSViews[CTexture::mtMaxDomainShaderTextures];
+	ID3DShaderResourceView	*m_CSViews[CTexture::mtMaxComputeShaderTextures];
 #endif
 
 	u32		m_uiMinPSView;

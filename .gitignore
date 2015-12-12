@@ -1,6 +1,6 @@
-# exclude all dot files except .gitignore
+# exclude all dot files except .git files
 .*
-!.gitignore
+!.git*
 
 # exclude binaries and temporary files
 bin/

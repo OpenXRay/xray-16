@@ -2,7 +2,7 @@
 #define	dxPixEventWrapper_included
 #pragma once
 
-#ifdef	DEBUG
+#if defined(DEBUG) && !defined(USE_OGL)
 
 #define PIX_EVENT(Name)	dxPixEventWrapper	pixEvent##Name(L#Name)
 

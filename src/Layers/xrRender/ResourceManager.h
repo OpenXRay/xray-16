@@ -35,7 +35,7 @@ public:
 	DEFINE_MAP_PRED(const char*,CRT*,			map_RT,			map_RTIt,			str_pred);
 	//	DX10 cut DEFINE_MAP_PRED(const char*,CRTC*,			map_RTC,		map_RTCIt,			str_pred);
 	DEFINE_MAP_PRED(const char*,SVS*,			map_VS,			map_VSIt,			str_pred);
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	DEFINE_MAP_PRED(const char*,SGS*,			map_GS,			map_GSIt,			str_pred);
 #endif	//	USE_DX10
 #ifdef USE_DX11
@@ -56,7 +56,7 @@ private:
 	//	DX10 cut map_RTC												m_rtargets_c;
 	map_VS												m_vs;
 	map_PS												m_ps;
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	map_GS												m_gs;
 #endif	//	USE_DX10
 	map_TD												m_td;
@@ -145,7 +145,7 @@ public:
 
 	//	DX10 cut CRTC*							_CreateRTC			(LPCSTR Name, u32 size,	D3DFORMAT f);
 	//	DX10 cut void							_DeleteRTC			(const CRTC*	RT	);
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	SGS*							_CreateGS			(LPCSTR Name);
 	void							_DeleteGS			(const SGS*	GS	);
 #endif	//	USE_DX10
@@ -174,6 +174,9 @@ public:
 	SState*							_CreateState		(SimulatorStates& Code);
 	void							_DeleteState		(const SState* SB);
 
+#ifdef USE_OGL
+	SDeclaration*					_CreateDecl			(u32 FVF);
+#endif // USE_OGL
 	SDeclaration*					_CreateDecl			(D3DVERTEXELEMENT9* dcl);
 	void							_DeleteDecl			(const SDeclaration* dcl);
 
@@ -210,8 +213,13 @@ public:
 	void			Delete					(const Shader*		S	);
 	void			RegisterConstantSetup	(LPCSTR name,		R_constant_setup* s)	{	v_constant_setup.push_back(mk_pair(shared_str(name),s));	}
 
+#ifdef USE_OGL
+	SGeometry*		CreateGeom				(D3DVERTEXELEMENT9* decl, GLuint vb, GLuint ib);
+	SGeometry*		CreateGeom				(u32 FVF				, GLuint vb, GLuint ib);
+#else
 	SGeometry*		CreateGeom				(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
 	SGeometry*		CreateGeom				(u32 FVF				, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib);
+#endif // USE_OGL
 	void			DeleteGeom				(const SGeometry* VS		);
 	void			DeferredLoad			(BOOL E)					{ bDeferredLoad=E;	}
 	void			DeferredUpload			();

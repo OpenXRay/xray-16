@@ -26,7 +26,7 @@ void	CBlender_Compile::r_Pass		(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, 
     SVS* vs = RImplementation.Resources->_CreateVS(_vs);
 	dest.ps					= ps;
 	dest.vs					= vs;
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	SGS* gs					= RImplementation.Resources->_CreateGS			("null");
 	dest.gs					= gs;
 #	ifdef USE_DX11

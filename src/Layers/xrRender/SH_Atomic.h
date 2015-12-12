@@ -3,7 +3,9 @@
 #pragma once
 #include "xrCore/xr_resource.h"
 #include "tss_def.h"
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_OGL)
+#include "Layers/xrRenderGL/glState.h"
+#elif defined(USE_DX10) || defined(USE_DX11)
 #include "Layers/xrRenderDX10/StateManager/dx10State.h"
 #endif	//	USE_DX10
 
@@ -25,7 +27,11 @@ typedef	resptr_core<SInputSignature,resptr_base<SInputSignature> >	ref_input_sig
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SVS : public xr_resource_named							
 {
+#ifdef USE_OGL
+	GLuint								vs;
+#else
 	ID3DVertexShader*					vs;
+#endif // USE_OGL
 	R_constant_table					constants;
 #if defined(USE_DX10) || defined(USE_DX11)
 	ref_input_sign						signature;
@@ -38,17 +44,25 @@ typedef	resptr_core<SVS,resptr_base<SVS> >	ref_vs;
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SPS : public xr_resource_named
 {
+#ifdef USE_OGL
+	GLuint								ps;
+#else
 	ID3DPixelShader*					ps;
+#endif // USE_OGL
 	R_constant_table					constants;
 	~SPS			();
 };
 typedef	resptr_core<SPS,resptr_base<SPS> > ref_ps;
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SGS : public xr_resource_named
 {
+#ifdef USE_OGL
+	GLuint								gs;
+#else
 	ID3DGeometryShader*					gs;
+#endif // USE_OGL
 	R_constant_table					constants;
 	~SGS			();
 };
@@ -86,7 +100,11 @@ typedef	resptr_core< SCS, resptr_base<SCS> >	ref_cs;
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SState : public xr_resource_flagged
 {
+#ifdef	USE_OGL
+	glState								state;
+#else
 	ID3DState*							state;
+#endif // USE_OGL
 	SimulatorStates						state_code;
 	~SState			();
 };
@@ -95,7 +113,10 @@ typedef	resptr_core<SState,resptr_base<SState> >	ref_state;
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SDeclaration : public xr_resource_flagged
 {
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_OGL)
+	u32									FVF;
+	GLuint								dcl;
+#elif defined(USE_DX10) || defined(USE_DX11)
 	//	Maps input signature to input layout
 	xr_map<ID3DBlob*, ID3DInputLayout*>		vs_to_layout;
 	xr_vector<D3D_INPUT_ELEMENT_DESC>		dx10_dcl_code;

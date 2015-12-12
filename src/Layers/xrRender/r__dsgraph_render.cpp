@@ -102,7 +102,7 @@ IC	bool	cmp_ps_mat			(mapMatrixPS::TNode* N1, mapMatrixPS::TNode* N2)
 #endif
 }
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 IC	bool	cmp_gs_nrm			(mapNormalGS::TNode* N1, mapNormalGS::TNode* N2)			{	return (N1->val.ssa > N2->val.ssa);		}
 IC	bool	cmp_gs_mat			(mapMatrixGS::TNode* N1, mapMatrixGS::TNode* N2)			{	return (N1->val.ssa > N2->val.ssa);		}
 #endif	//	USE_DX10
@@ -282,7 +282,7 @@ void D3DXRenderBase::r_dsgraph_render_graph	(u32	_priority, bool _clear)
 				mapNormalVS::TNode*	Nvs			= nrmVS[vs_id];
 				RCache.set_VS					(Nvs->key);
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 				//	GS setup
 				mapNormalGS&		gs			= Nvs->val;		gs.ssa	= 0;
 
@@ -351,7 +351,7 @@ void D3DXRenderBase::r_dsgraph_render_graph	(u32	_priority, bool _clear)
 					}
 					nrmPS.clear				();
 					if(_clear) ps.clear		();
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 				}
 				nrmGS.clear				();
 				if(_clear) gs.clear		();
@@ -376,7 +376,7 @@ void D3DXRenderBase::r_dsgraph_render_graph	(u32	_priority, bool _clear)
 			mapMatrixVS::TNode*	Nvs			= matVS[vs_id];
 			RCache.set_VS					(Nvs->key);	
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 			mapMatrixGS&		gs			= Nvs->val;		gs.ssa	= 0;
 
 			gs.getANY_P						(matGS);
@@ -443,7 +443,7 @@ void D3DXRenderBase::r_dsgraph_render_graph	(u32	_priority, bool _clear)
 				}
 				matPS.clear				();
 				if(_clear) ps.clear		();
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 			}
 			matGS.clear				();
 			if(_clear) gs.clear		();
@@ -542,7 +542,7 @@ void D3DXRenderBase::r_dsgraph_render_hud_ui()
 	const ref_rt	rt_null;
 	RCache.set_RT(0,	1);
 	RCache.set_RT(0,	2);
-#if	(RENDER==R_R3) || (RENDER==R_R4)
+#if	(RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 	if( !RImplementation.o.dx10_msaa )
 	{
 		if (RImplementation.o.albedo_wo)	RImplementation.Target->u_setrt		(RImplementation.Target->rt_Accumulator,	rt_null,	rt_null,	HW.pBaseZB);

@@ -10,8 +10,51 @@ class  CTheoraSurface;
 class  ECORE_API CTexture : public xr_resource_named
 {
 public:
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+	enum	MaxTextures
+	{
+		//	Actually these values are 128
+		mtMaxPixelShaderTextures = 16,
+		mtMaxVertexShaderTextures = 4,
+		mtMaxGeometryShaderTextures = 16,
+#	ifdef USE_DX11
+		mtMaxHullShaderTextures = 16,
+		mtMaxDomainShaderTextures = 16,
+		mtMaxComputeShaderTextures = 16,
+#	endif
+		mtMaxCombinedShaderTextures =
+			  mtMaxPixelShaderTextures
+			+ mtMaxVertexShaderTextures
+			+ mtMaxGeometryShaderTextures
+#	ifdef USE_DX11
+			+ mtMaxHullShaderTextures
+			+ mtMaxDomainShaderTextures
+			+ mtMaxComputeShaderTextures
+#	endif
+	};
+#else	//	USE_DX10
+	enum	MaxTextures
+	{
+		mtMaxPixelShaderTextures = 16,
+		mtMaxVertexShaderTextures = 4,
+		mtMaxCombinedShaderTextures =
+			  mtMaxPixelShaderTextures
+			+ mtMaxVertexShaderTextures
+	};
+#endif	//	USE_DX10
+
+#ifdef USE_OGL
+	//	Since OGL doesn't differentiate between stages,
+	//	distance between enum values should be the max for that stage.
+	enum ResourceShaderType
+	{
+		rstPixel = 0,	//	Default texture offset
+		rstVertex = rstPixel + mtMaxPixelShaderTextures,
+		rstGeometry = rstVertex + mtMaxVertexShaderTextures,
+	};
+#else
 	//	Since DX10 allows up to 128 unique textures, 
-	//	distance between enum values should be at leas 128
+	//	distance between enum values should be at least 128
 	enum ResourceShaderType	//	Don't change this since it's hardware-dependent
 	{
 		rstPixel = 0,	//	Default texture offset
@@ -22,6 +65,7 @@ public:
 		rstCompute = rstDomain+256,
         rstInvalid = rstCompute+256
 	};
+#endif // USE_OGL
 
 public:
 	void	__stdcall					apply_load		(u32	stage);
@@ -36,12 +80,18 @@ public:
 	void								Unload			(void);
 //	void								Apply			(u32 dwStage);
 
-	void								surface_set		(ID3DBaseTexture* surf );
-	ID3DBaseTexture*					surface_get 	();
+#ifdef USE_OGL
+	void								surface_set(GLenum target, GLuint surf);
+	GLuint								surface_get();
+#else
+	void								surface_set(ID3DBaseTexture* surf);
+	ID3DBaseTexture*					surface_get();
+#endif // USE_OGL
+
 
 	IC BOOL								isUser			()		{ return flags.bUser;					}
-	IC u32								get_Width		()		{ desc_enshure(); return desc.Width;	}
-	IC u32								get_Height		()		{ desc_enshure(); return desc.Height;	}
+	IC u32								get_Width		()		{ desc_enshure(); return m_width;	}
+	IC u32								get_Height		()		{ desc_enshure(); return m_height;	}
 
 	void								video_Sync		(u32 _time){m_play_time=_time;}
 	void								video_Play		(BOOL looped, u32 _time=0xFFFFFFFF);
@@ -92,13 +142,26 @@ public:	//	Public class members (must be encapsulated furthur)
 	};
 
 private:
+#ifdef USE_OGL
+	GLuint							pSurface;
+	GLuint							pBuffer;
+	// Sequence data
+	xr_vector<GLuint>				seqDATA;
+	// Description
+	GLint							m_width;
+	GLint							m_height;
+	GLuint							desc_cache;
+	GLenum							desc;
+#else
 	ID3DBaseTexture*					pSurface;
 	// Sequence data
 	xr_vector<ID3DBaseTexture*>			seqDATA;
-
 	// Description
+	u32									m_width;
+	u32									m_height;
 	ID3DBaseTexture*					desc_cache;
 	D3D_TEXTURE2D_DESC					desc;
+#endif // USE_OGL
 
 #if defined(USE_DX10) || defined(USE_DX11)
 	ID3DShaderResourceView*			m_pSRView;
