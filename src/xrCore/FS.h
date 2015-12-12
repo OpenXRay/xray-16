@@ -85,6 +85,7 @@ public:
     IC void w_dir(const Fvector& D) { w_u16(pvCompress(D)); }
     void w_sdir(const Fvector& D);
     void __cdecl w_printf(const char* format, ...);
+    void VPrintf(const char *format, va_list args);
 
     // generalized chunking
     u32 align();
