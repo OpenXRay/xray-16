@@ -81,6 +81,7 @@ private:
     u32 m_last_no_file_length;
     static string4096 g_ca_stdout;
     bool logReenterability = false;
+    bool bindingsDumped = false;
 
 protected:
     CScriptProcessStorage m_script_processes;

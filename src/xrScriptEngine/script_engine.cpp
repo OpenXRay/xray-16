@@ -17,6 +17,7 @@
 #endif
 #include "Include/xrAPI/xrAPI.h"
 #include "ScriptExporter.hpp"
+#include "BindingsDumper.hpp"
 #ifdef USE_DEBUGGER
 #include "script_debugger.hpp"
 #endif
@@ -251,36 +252,6 @@ void CScriptEngine::reinit()
         return;
     }
     RegisterState(m_virtual_machine, this);
-    // initialize lua standard library functions 
-    struct luajit
-    {
-        static void open_lib(lua_State *L, pcstr module_name, lua_CFunction function)
-        {
-            lua_pushcfunction(L, function);
-            lua_pushstring(L, module_name);
-            lua_call(L, 1, 0);
-        }
-    };
-
-    luajit::open_lib(lua(), "", luaopen_base);
-    luajit::open_lib(lua(), LUA_LOADLIBNAME, luaopen_package);
-    luajit::open_lib(lua(), LUA_TABLIBNAME, luaopen_table);
-    luajit::open_lib(lua(), LUA_IOLIBNAME, luaopen_io);
-    luajit::open_lib(lua(), LUA_OSLIBNAME, luaopen_os);
-    luajit::open_lib(lua(), LUA_MATHLIBNAME, luaopen_math);
-    luajit::open_lib(lua(), LUA_STRLIBNAME, luaopen_string);
-#ifdef DEBUG
-    luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
-#endif
-    if (!strstr(Core.Params, "-nojit"))
-    {
-        luajit::open_lib(lua(), LUA_JITLIBNAME, luaopen_jit);
-#ifndef DEBUG
-        put_function(lua(), opt_lua_binary, sizeof(opt_lua_binary), "jit.opt");
-        put_function(lua(), opt_inline_lua_binary, sizeof(opt_lua_binary), "jit.opt_inline");
-        dojitopt(lua(), "2");
-#endif
-    }
     if (strstr(Core.Params, "-_g"))
         file_header = file_header_new;
     else
@@ -1032,6 +1003,57 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
         m_lua_studio_world->remove(lua());
 #endif
     reinit();
+    luabind::open(lua());
+    // XXX: temporary workaround to preserve backwards compatibility with game scripts
+    luabind::disable_super_deprecation();
+    setup_callbacks();
+    if (exporterFunc)
+        exporterFunc(lua());
+    if (std::strstr(Core.Params, "-dump_bindings") && !bindingsDumped)
+    {
+        bindingsDumped = true;
+        static int dumpId = 1;
+        string_path filePath;
+        xr_sprintf(filePath, "ScriptBindings_%d.txt", dumpId++);
+        FS.update_path(filePath, "$app_data_root$", filePath);
+        IWriter *writer = FS.w_open(filePath);
+        BindingsDumper dumper;
+        BindingsDumper::Options options = {};
+        options.ShiftWidth = 4;
+        options.IgnoreDerived = true;
+        options.StripThis = true;
+        dumper.Dump(lua(), writer, options);
+        FS.w_close(writer);
+    }
+    // initialize lua standard library functions 
+    struct luajit
+    {
+        static void open_lib(lua_State *L, pcstr module_name, lua_CFunction function)
+        {
+            lua_pushcfunction(L, function);
+            lua_pushstring(L, module_name);
+            lua_call(L, 1, 0);
+        }
+    };
+    luajit::open_lib(lua(), "", luaopen_base);
+    luajit::open_lib(lua(), LUA_LOADLIBNAME, luaopen_package);
+    luajit::open_lib(lua(), LUA_TABLIBNAME, luaopen_table);
+    luajit::open_lib(lua(), LUA_IOLIBNAME, luaopen_io);
+    luajit::open_lib(lua(), LUA_OSLIBNAME, luaopen_os);
+    luajit::open_lib(lua(), LUA_MATHLIBNAME, luaopen_math);
+    luajit::open_lib(lua(), LUA_STRLIBNAME, luaopen_string);
+#ifdef DEBUG
+    luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
+#endif
+    if (!strstr(Core.Params, "-nojit"))
+    {
+        luajit::open_lib(lua(), LUA_JITLIBNAME, luaopen_jit);
+#ifndef DEBUG
+        put_function(lua(), opt_lua_binary, sizeof(opt_lua_binary), "jit.opt");
+        put_function(lua(), opt_inline_lua_binary, sizeof(opt_lua_binary), "jit.opt_inline");
+        dojitopt(lua(), "2");
+#endif
+    }
 #ifdef USE_LUA_STUDIO
     if (m_lua_studio_world || strstr(Core.Params, "-lua_studio"))
     {
@@ -1045,12 +1067,6 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
         }
     }
 #endif
-    luabind::open(lua());
-    // XXX: temporary workaround to preserve backwards compatibility with game scripts
-    luabind::disable_super_deprecation();
-    setup_callbacks();
-    if (exporterFunc)
-        exporterFunc(lua());
     setup_auto_load();
 #ifdef DEBUG
     m_stack_is_ready = true;

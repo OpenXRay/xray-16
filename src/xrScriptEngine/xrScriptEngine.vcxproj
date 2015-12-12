@@ -217,6 +217,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BindingsDumper.hpp" />
     <ClInclude Include="DebugMacros.hpp" />
     <ClInclude Include="Functor.hpp" />
     <ClInclude Include="LuaStudio\Backend\Backend.hpp" />
@@ -248,6 +249,7 @@
     <ClInclude Include="xrScriptEngine.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BindingsDumper.cpp" />
     <ClCompile Include="LuaStudio\LuaStudio.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

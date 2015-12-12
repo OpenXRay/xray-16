@@ -117,6 +117,9 @@
     <ClInclude Include="Functor.hpp">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="BindingsDumper.hpp">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -157,6 +160,9 @@
     </ClCompile>
     <ClCompile Include="LuaStudio\LuaStudio.cpp">
       <Filter>LuaStudio</Filter>
+    </ClCompile>
+    <ClCompile Include="BindingsDumper.cpp">
+      <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
