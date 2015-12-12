@@ -13,6 +13,7 @@
 #include "ai/stalker/ai_stalker.h"
 #include "stalker_decision_space.h"
 #include "script_game_object.h"
+#include "script_game_object_impl.h"
 #include "stalker_alife_planner.h"
 #include "stalker_anomaly_planner.h"
 #include "stalker_death_planner.h"

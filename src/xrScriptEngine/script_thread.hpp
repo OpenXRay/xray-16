@@ -9,6 +9,7 @@
 #pragma once
 
 #include "xrScriptEngine/xrScriptEngine.hpp"
+#include "xrCore/xrCore.h"
 #ifdef DEBUG
 #include "script_stack_tracker.hpp"
 #endif

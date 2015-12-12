@@ -18,6 +18,7 @@
 #include "object_handler_space.h"
 #include "stalker_animation_manager.h"
 #include "object_handler_planner.h"
+#include "object_handler_planner_impl.h"
 
 //////////////////////////////////////////////////////////////////////////
 // CObjectActionCommand

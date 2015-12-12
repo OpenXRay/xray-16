@@ -13,6 +13,7 @@
 #include "stalker_decision_space.h"
 #include "stalker_property_evaluators.h"
 #include "script_game_object.h"
+#include "script_game_object_impl.h"
 #include "ai/stalker/ai_stalker.h"
 #include "stalker_movement_manager_smart_cover.h"
 #include "memory_manager.h"

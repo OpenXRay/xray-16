@@ -10,6 +10,7 @@
 #include "stalker_combat_actions.h"
 #include "ai/stalker/ai_stalker.h"
 #include "script_game_object.h"
+#include "script_game_object_impl.h"
 #include "stalker_decision_space.h"
 #include "inventory.h"
 #include "cover_evaluators.h"

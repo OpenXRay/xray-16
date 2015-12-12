@@ -21,6 +21,7 @@
 #include "xrAICore/Navigation/level_graph.h"
 #include "visual_memory_manager.h"
 #include "script_game_object.h"
+#include "script_game_object_impl.h"
 #include "restricted_object.h"
 #include "sound_player.h"
 #include "ai/stalker/ai_stalker_space.h"

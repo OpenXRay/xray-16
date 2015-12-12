@@ -39,6 +39,7 @@
 #include "ai/Monsters/ai_monster_squad.h"
 #include "Actor.h"
 #include "xrAICore/Navigation/ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location_impl.h"
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "ai/Monsters/anti_aim_ability.h"

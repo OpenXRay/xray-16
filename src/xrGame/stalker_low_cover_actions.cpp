@@ -20,6 +20,7 @@
 #include "sound_player.h"
 #include "ai/stalker/ai_stalker_space.h"
 #include "script_game_object.h"
+#include "script_game_object_impl.h"
 #include "stalker_combat_planner.h"
 #include "stalker_planner.h"
 

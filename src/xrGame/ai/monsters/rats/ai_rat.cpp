@@ -17,6 +17,7 @@
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "detail_path_manager.h"
 #include "xrAICore/Navigation/ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location_impl.h"
 #include "movement_manager.h"
 #include "location_manager.h"
 #include "xrServerEntities/ai_sounds.h"

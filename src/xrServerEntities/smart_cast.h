@@ -82,9 +82,9 @@
 #		undef cast_type_list
 #		define cast_type_list save_cast_list	(IRender_Light,		ISpatial)
 
-		DECLARE_SPECIALIZATION			(CGameObject,			ISpatial,			dcast_GameObject);
+		DECLARE_SPECIALIZATION			(IGameObject,			ISpatial,			dcast_GameObject);
 #		undef cast_type_list
-#		define cast_type_list save_cast_list	(CGameObject,			ISpatial)
+#		define cast_type_list save_cast_list	(IGameObject,			ISpatial)
 
 #		ifndef DO_NOT_DECLARE_TYPE_LIST
 			class IGameObject;

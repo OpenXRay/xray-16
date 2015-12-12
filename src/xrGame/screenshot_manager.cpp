@@ -13,7 +13,6 @@
 #include "ximage.h"
 #include "xmemfile.h"
 
-#pragma comment(lib,"cximage.lib")
 #pragma comment(lib,"libjpeg.lib")
 
 void*	cxalloc(size_t size)

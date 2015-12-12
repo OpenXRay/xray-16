@@ -10,6 +10,7 @@
 #include "stalker_danger_in_direction_planner.h"
 #include "ai/stalker/ai_stalker.h"
 #include "script_game_object.h"
+#include "script_game_object_impl.h"
 #include "stalker_danger_in_direction_actions.h"
 #include "stalker_decision_space.h"
 #include "stalker_danger_property_evaluators.h"

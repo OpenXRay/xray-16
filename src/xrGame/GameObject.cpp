@@ -607,7 +607,7 @@ BOOL CGameObject::net_Spawn		(CSE_Abstract*	DC)
 	}
 	BOOL ret = scriptBinder.net_Spawn(DC);
 #else
-	return						(CScriptBinder::net_Spawn(DC));
+	return						(scriptBinder.net_Spawn(DC));
 #endif
 
 #ifdef DEBUG

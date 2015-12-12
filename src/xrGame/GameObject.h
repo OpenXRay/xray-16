@@ -102,8 +102,10 @@ public:
 	CGameObject();
 	virtual ~CGameObject();
     // XXX: review
+#ifdef DEBUG
     virtual u32 GetDbgUpdateFrame() const override { return dbg_update_cl; }
     virtual void SetDbgUpdateFrame(u32 value) override { dbg_update_cl = value; }
+#endif
     virtual u32 GetUpdateFrame() const override { return dwFrame_UpdateCL; }
     virtual void SetUpdateFrame(u32 value) override { dwFrame_UpdateCL = value; }
     virtual u32 GetCrowUpdateFrame() const override { return dwFrame_AsCrow; }

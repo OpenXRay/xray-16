@@ -395,7 +395,9 @@ public:
     u8* m_lzo_working_buffer = nullptr;
     void init_compression();
     void deinit_compression();
+#ifdef DEBUG
     LevelGraphDebugRender *GetLevelGraphDebugRender() const { return levelGraphDebugRender; }
+#endif
 };
 
 // XXX nitrocaster: should not cast to inherited

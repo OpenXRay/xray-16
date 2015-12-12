@@ -212,6 +212,7 @@ float CCar::FireDirDiff()
 	return 0.0f;
 }
 #include "script_game_object.h"
+#include "script_game_object_impl.h"
 #include "car_memory.h"
 #include "visual_memory_manager.h"
 

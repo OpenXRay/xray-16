@@ -23,6 +23,7 @@
 #include "item_manager.h"
 #include "danger_manager.h"
 #include "xrAICore/Navigation/ai_object_location.h"
+#include "xrAICore/Navigation/ai_object_location_impl.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "xrAICore/Navigation/game_graph.h"
 #include "movement_manager.h"

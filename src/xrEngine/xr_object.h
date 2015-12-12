@@ -135,9 +135,10 @@ public:
     //virtual void SetCForm(ICollisionForm *cform) override = 0;
     //virtual ICollisionForm *GetCForm() const override = 0;
     // ~ICollidable
-
+#ifdef DEBUG
     virtual u32 GetDbgUpdateFrame() const = 0;
     virtual void SetDbgUpdateFrame(u32 value) = 0;
+#endif
     virtual u32 GetUpdateFrame() const = 0;
     virtual void SetUpdateFrame(u32 value) = 0;
     virtual u32 GetCrowUpdateFrame() const = 0;

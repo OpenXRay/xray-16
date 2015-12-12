@@ -10,6 +10,7 @@
 #include "stalker_combat_action_base.h"
 #include "ai/stalker/ai_stalker.h"
 #include "script_game_object.h"
+#include "script_game_object_impl.h"
 #include "sound_player.h"
 #include "ai/stalker/ai_stalker_space.h"
 #include "memory_manager.h"

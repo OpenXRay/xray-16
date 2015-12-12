@@ -916,10 +916,10 @@ int CScriptEngine::lua_pcall_failed(lua_State *L)
     return LUA_ERRRUN;
 }
 #if !XRAY_EXCEPTIONS
-void CScriptEngine::lua_cast_failed(lua_State *L, LUABIND_TYPE_INFO info)
+void CScriptEngine::lua_cast_failed(lua_State *L, const luabind::type_id &info)
 {
     print_output(L, "", LUA_ERRRUN);
-    Debug.fatal(DEBUG_INFO, "LUA error: cannot cast lua value to %s", info->name());
+    Debug.fatal(DEBUG_INFO, "LUA error: cannot cast lua value to %s", info.name());
 }
 #endif
 

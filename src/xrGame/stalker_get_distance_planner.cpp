@@ -13,6 +13,7 @@
 #include "stalker_property_evaluators.h"
 #include "stalker_get_distance_actions.h"
 #include "script_game_object.h"
+#include "script_game_object_impl.h"
 #include "ai/stalker/ai_stalker.h"
 
 using namespace StalkerSpace;

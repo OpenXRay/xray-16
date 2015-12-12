@@ -11,6 +11,7 @@
 #include "ai/stalker/ai_stalker.h"
 #include "ai/stalker/ai_stalker_space.h"
 #include "script_game_object.h"
+#include "script_game_object_impl.h"
 #include "stalker_danger_property_evaluators.h"
 #include "agent_manager.h"
 #include "agent_member_manager.h"

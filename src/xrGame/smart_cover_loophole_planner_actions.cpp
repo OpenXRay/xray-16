@@ -8,6 +8,7 @@
 #include "pch_script.h"
 #include "smart_cover_loophole_planner_actions.h"
 #include "script_game_object.h"
+#include "script_game_object_impl.h"
 #include "ai/stalker/ai_stalker.h"
 #include "ai/stalker/ai_stalker_impl.h"
 #include "ai/stalker/ai_stalker_space.h"

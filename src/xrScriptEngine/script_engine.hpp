@@ -151,7 +151,7 @@ public:
     static void lua_error(lua_State *L);
     static int lua_pcall_failed(lua_State *L);
 #if !XRAY_EXCEPTIONS
-    static void lua_cast_failed(lua_State *L, LUABIND_TYPE_INFO info);
+    static void lua_cast_failed(lua_State *L, const luabind::type_id &info);
 #endif
 #ifdef DEBUG
     static void lua_hook_call(lua_State *L, lua_Debug *dbg);
@@ -179,13 +179,12 @@ public:
     void try_connect_to_debugger();
     void disconnect_from_debugger();
     cs::lua_studio::world *debugger() const { return m_lua_studio_world; }
-#endif
-#endif    
-    void collect_all_garbage();
-    static u32 GetMemoryUsage();
-
     void initialize_lua_studio(lua_State *state, cs::lua_studio::world *&world, lua_studio_engine *&engine);
     void finalize_lua_studio(lua_State *state, cs::lua_studio::world *&world, lua_studio_engine *&engine);
+#endif
+#endif
+    void collect_all_garbage();
+    static u32 GetMemoryUsage();
 
     CScriptProcess *CreateScriptProcess(shared_str name, shared_str scripts);
     CScriptThread *CreateScriptThread(LPCSTR caNamespaceName, bool do_string = false, bool reload = false);

@@ -20,6 +20,7 @@
 #include "cover_point.h"
 #include "stalker_decision_space.h"
 #include "script_game_object.h"
+#include "script_game_object_impl.h"
 #include "visual_memory_manager.h"
 
 //////////////////////////////////////////////////////////////////////////
