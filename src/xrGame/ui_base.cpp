@@ -288,9 +288,6 @@ shared_str	ui_core::get_xml_name(LPCSTR fn)
 			xr_sprintf(str, "%s", fn);
 			if ( NULL==strext(fn) ) xr_strcat(str, ".xml");
 		}
-#ifdef DEBUG
-		Msg("[16-9] get_xml_name for[%s] returns [%s]", fn, str);
-#endif // #ifdef DEBUG
 	}
 	return str;
 }
