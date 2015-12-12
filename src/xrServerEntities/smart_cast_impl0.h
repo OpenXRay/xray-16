@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "object_type_traits.h"
+#include "Common/object_type_traits.h"
 
 namespace SmartDynamicCast {
 	template <typename T1, typename T2>

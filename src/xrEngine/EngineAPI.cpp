@@ -7,6 +7,8 @@
 #include "xrCDB/xrXRC.h"
 #include "xrScriptEngine/script_engine.hpp"
 
+#include "xrCore/ModuleLookup.hpp"
+
 extern xr_token* vid_quality_token;
 
 //////////////////////////////////////////////////////////////////////
@@ -76,8 +78,7 @@ void CEngineAPI::InitializeNotDedicated()
     if (psDeviceFlags.test(rsR4))
     {
         // try to initialize R4
-        Log("Loading DLL:", r4_name);
-        hRender = LoadLibrary(r4_name);
+        hRender = XRay::LoadLibrary(r4_name);
         if (0 == hRender)
         {
             // try to load R1
@@ -89,8 +90,7 @@ void CEngineAPI::InitializeNotDedicated()
     if (psDeviceFlags.test(rsR3))
     {
         // try to initialize R3
-        Log("Loading DLL:", r3_name);
-        hRender = LoadLibrary(r3_name);
+        hRender = XRay::LoadLibrary(r3_name);
         if (0 == hRender)
         {
             // try to load R1
@@ -106,8 +106,7 @@ void CEngineAPI::InitializeNotDedicated()
         // try to initialize R2
         psDeviceFlags.set(rsR4, FALSE);
         psDeviceFlags.set(rsR3, FALSE);
-        Log("Loading DLL:", r2_name);
-        hRender = LoadLibrary(r2_name);
+        hRender = XRay::LoadLibrary(r2_name);
         if (0 == hRender)
         {
             // try to load R1
@@ -138,8 +137,7 @@ void CEngineAPI::Initialize(void)
         psDeviceFlags.set(rsR2, FALSE);
         renderer_value = 0; //con cmd
 
-        Log("Loading DLL:", r1_name);
-        hRender = LoadLibrary(r1_name);
+        hRender = XRay::LoadLibrary(r1_name);
         if (0 == hRender) R_CHK(GetLastError());
         R_ASSERT(hRender);
         g_current_renderer = 1;
@@ -147,13 +145,12 @@ void CEngineAPI::Initialize(void)
     // game
     {
         LPCSTR g_name = "xrGame";
-        Log("Loading DLL:", g_name);
-        hGame = LoadLibrary(g_name);
+        hGame = XRay::LoadLibrary(g_name);
         if (0 == hGame) R_CHK(GetLastError());
         R_ASSERT2(hGame, "Game DLL raised exception during loading or there is no game DLL at all");
-        pCreate = (Factory_Create*)GetProcAddress(hGame, "xrFactory_Create");
+        pCreate = (Factory_Create*)XRay::GetProcAddress(hGame, "xrFactory_Create");
         R_ASSERT(pCreate);
-        pDestroy = (Factory_Destroy*)GetProcAddress(hGame, "xrFactory_Destroy");
+        pDestroy = (Factory_Destroy*)XRay::GetProcAddress(hGame, "xrFactory_Destroy");
         R_ASSERT(pDestroy);
     }
 
@@ -163,22 +160,21 @@ void CEngineAPI::Initialize(void)
     if (strstr(Core.Params, "-tune"))
     {
         LPCSTR g_name = "vTuneAPI";
-        Log("Loading DLL:", g_name);
-        hTuner = LoadLibrary(g_name);
+        hTuner = XRay::LoadLibrary(g_name);
         if (0 == hTuner) R_CHK(GetLastError());
         R_ASSERT2(hTuner, "Intel vTune is not installed");
         tune_enabled = TRUE;
-        tune_pause = (VTPause*)GetProcAddress(hTuner, "VTPause");
+        tune_pause = (VTPause*)XRay::GetProcAddress(hTuner, "VTPause");
         R_ASSERT(tune_pause);
-        tune_resume = (VTResume*)GetProcAddress(hTuner, "VTResume");
+        tune_resume = (VTResume*)XRay::GetProcAddress(hTuner, "VTResume");
         R_ASSERT(tune_resume);
     }
 }
 
 void CEngineAPI::Destroy(void)
 {
-    if (hGame) { FreeLibrary(hGame); hGame = 0; }
-    if (hRender) { FreeLibrary(hRender); hRender = 0; }    
+    if (hGame) { XRay::UnloadLibrary(hGame); hGame = 0; }
+    if (hRender) { XRay::UnloadLibrary(hRender); hRender = 0; }
     pCreate = 0;
     pDestroy = 0;
     Engine.Event._destroy();
@@ -228,45 +224,44 @@ void CEngineAPI::CreateRendererList()
     else
     {
         // try to initialize R2
-        Log("Loading DLL:", r2_name);
-        hRender = LoadLibrary(r2_name);
+        hRender = XRay::LoadLibrary(r2_name);
         if (hRender)
         {
             bSupports_r2 = true;
-            SupportsAdvancedRendering* test_rendering = (SupportsAdvancedRendering*)GetProcAddress(hRender, "SupportsAdvancedRendering");
+            SupportsAdvancedRendering* test_rendering = (SupportsAdvancedRendering*)XRay::GetProcAddress(hRender, "SupportsAdvancedRendering");
             R_ASSERT(test_rendering);
             bSupports_r2_5 = test_rendering();
-            FreeLibrary(hRender);
+            XRay::UnloadLibrary(hRender);
         }
 
         // try to initialize R3
         Log("Loading DLL:", r3_name);
         // Hide "d3d10.dll not found" message box for XP
         SetErrorMode(SEM_FAILCRITICALERRORS);
-        hRender = LoadLibrary(r3_name);
+        hRender = XRay::LoadLibrary(r3_name);
         // Restore error handling
         SetErrorMode(0);
         if (hRender)
         {
-            SupportsDX10Rendering* test_dx10_rendering = (SupportsDX10Rendering*)GetProcAddress(hRender, "SupportsDX10Rendering");
+            SupportsDX10Rendering* test_dx10_rendering = (SupportsDX10Rendering*)XRay::GetProcAddress(hRender, "SupportsDX10Rendering");
             R_ASSERT(test_dx10_rendering);
             bSupports_r3 = test_dx10_rendering();
-            FreeLibrary(hRender);
+            XRay::UnloadLibrary(hRender);
         }
 
         // try to initialize R4
         Log("Loading DLL:", r4_name);
         // Hide "d3d10.dll not found" message box for XP
         SetErrorMode(SEM_FAILCRITICALERRORS);
-        hRender = LoadLibrary(r4_name);
+        hRender = XRay::LoadLibrary(r4_name);
         // Restore error handling
         SetErrorMode(0);
         if (hRender)
         {
-            SupportsDX11Rendering* test_dx11_rendering = (SupportsDX11Rendering*)GetProcAddress(hRender, "SupportsDX11Rendering");
+            SupportsDX11Rendering* test_dx11_rendering = (SupportsDX11Rendering*)XRay::GetProcAddress(hRender, "SupportsDX11Rendering");
             R_ASSERT(test_dx11_rendering);
             bSupports_r4 = test_dx11_rendering();
-            FreeLibrary(hRender);
+            XRay::UnloadLibrary(hRender);
         }
 
         // try to initialize GL

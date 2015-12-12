@@ -32,6 +32,7 @@ private:
     int load_stage;
 
     u32 ll_dwReference;
+    bool loaded;
 private:
     EVENT eQuit;
     EVENT eStart;
@@ -43,6 +44,8 @@ private:
     void Level_Append(LPCSTR lname);
 public:
     CGameFont* pFontSystem;
+
+    bool IsLoaded() { return loaded; }
 
     // Levels
     xr_vector<sLevelInfo> Levels;

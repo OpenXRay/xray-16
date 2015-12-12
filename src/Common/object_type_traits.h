@@ -9,6 +9,8 @@
 #define object_type_traits_h_included
 #pragma once
 
+#include <type_traits>
+
 //#define USE_BOOST
 
 #ifdef USE_BOOST
@@ -28,32 +30,12 @@
 
 	template <bool expression, typename T1, typename T2>
 	struct _if {
-		template <bool>
-		struct selector {
-			typedef T2 result;
-		};
-
-		template <>
-		struct selector<true> {
-			typedef T1 result;
-		};
-
-		typedef typename selector<expression>::result result;
+		using result = typename std::conditional<expression, T1, T2>::type;
 	};
 
 	template <typename T1, typename T2>
 	struct is_type {
-		template <typename T>
-		struct selector {
-			enum { value = false, };
-		};
-
-		template <>
-		struct selector<T1> {
-			enum { value = true, };
-		};
-
-		enum { value = selector<T2>::value, };
+		enum { value = std::is_same<T1,T2>::value, };
 	};
 
 	template <typename T>
@@ -102,13 +84,7 @@
 
 		template <typename T>
 		struct is_void {
-			template <typename P>
-			struct select		{enum { value = false}; };
-			
-			template <>
-			struct select<void> {enum { value = true}; };
-			
-			enum { value = select<T>::value};
+			enum { value = std::is_same<void,T>::value };
 		};
 
 		template <typename T> struct is_const{

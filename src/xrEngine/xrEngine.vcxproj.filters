@@ -572,6 +572,9 @@
     <ClCompile Include="x_ray.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
     <ClCompile Include="IInputReceiver.cpp">
       <Filter>Interfaces\Input</Filter>
     </ClCompile>
