@@ -130,8 +130,9 @@ void CHW::CreateDevice( HWND hWnd, bool move_window )
 #endif // DEBUG
 
 	// Clip control ensures compatibility with D3D device coordinates.
-	// TODO: Fix these differences in the blenders/shaders.
-	CHK_GL(glClipControl(GL_UPPER_LEFT, GL_ZERO_TO_ONE));
+	// TODO: OGL: Also use GL_UPPER_LEFT to match D3D.
+	// TODO: OGL: Fix these differences in the blenders/shaders.
+	CHK_GL(glClipControl(GL_LOWER_LEFT, GL_ZERO_TO_ONE));
 
 	//	Create render target and depth-stencil views here
 	UpdateViews();
