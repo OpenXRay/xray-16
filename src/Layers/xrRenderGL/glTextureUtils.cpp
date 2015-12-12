@@ -55,7 +55,7 @@ TextureFormatPairs	TextureFormatList[] =
 		//D3DFMT_D16 GL_DEPTH_COMPONENT16
 		//D3DFMT_D32 Not available 
 		//D3DFMT_D15S1 Not available 
-		//D3DFMT_D24S8 Not available 
+    {D3DFMT_D24S8, GL_DEPTH24_STENCIL8},
 	{ D3DFMT_D24X8,			GL_DEPTH24_STENCIL8 },
 		//D3DFMT_D24X4S4 Not available 
 		//D3DFMT_D16 DXGI_FORMAT_D16_UNORM 
