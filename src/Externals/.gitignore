@@ -1,4 +1,4 @@
-# exclude all third-party libraries
+# exclude third-party libraries (except submodules)
 3dsmax
 BugTrap
 FreeImage
@@ -13,5 +13,3 @@ nvapi
 OpenAutomate
 OpenSSL
 zlib
-luabind
-luajit
