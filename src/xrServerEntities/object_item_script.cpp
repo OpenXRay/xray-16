@@ -37,6 +37,7 @@ ObjectFactory::SERVER_BASE_CLASS *CObjectItemScript::server_object	(LPCSTR secti
 	SERVER_SCRIPT_BASE_CLASS	*object;
 
 	try {
+        // XXX nitrocaster: why not call m_server_creator(section) with adopt policy?
 		luabind::object	*instance = 0;
 		try {
 			instance	= xr_new<luabind::object>((luabind::object)(m_server_creator(section)));
