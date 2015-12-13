@@ -8,6 +8,18 @@
 #pragma comment(lib, "xrEngine.lib")
 #pragma comment(lib, "xrScriptEngine.lib")
 
+extern "C" void XR_EXPORT SetupEnv()
+{
+    GlobalEnv.Render = &RImplementation;
+    GlobalEnv.RenderFactory = &RenderFactoryImpl;
+    GlobalEnv.DU = &DUImpl;
+    GlobalEnv.UIRender = &UIRenderImpl;
+#ifdef DEBUG
+    GlobalEnv.DRender = &DebugRenderImpl;
+#endif
+    xrRender_initconsole();
+}
+
 BOOL APIENTRY DllMain( HANDLE hModule, 
                        DWORD  ul_reason_for_call, 
                        LPVOID lpReserved
@@ -16,18 +28,8 @@ BOOL APIENTRY DllMain( HANDLE hModule,
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH	:
-		//	Can't call CreateDXGIFactory from DllMain
-		//if (!xrRender_test_hw())	return FALSE;
-		GlobalEnv.Render					= &RImplementation;
-		GlobalEnv.RenderFactory				= &RenderFactoryImpl;
-		GlobalEnv.DU						= &DUImpl;
-		//GlobalEnv.vid_mode_token			= inited by HW;
-        GlobalEnv.UIRender					= &UIRenderImpl;
-#ifdef DEBUG
-        GlobalEnv.DRender						= &DebugRenderImpl;
-#endif	//	DEBUG
-		xrRender_initconsole		();
-		break	;
+        SetupEnv();
+        break;
 	case DLL_THREAD_ATTACH	:
 	case DLL_THREAD_DETACH	:
 	case DLL_PROCESS_DETACH	:

@@ -142,6 +142,11 @@ void CEngineAPI::Initialize(void)
         R_ASSERT(hRender);
         g_current_renderer = 1;
     }
+    // ask current renderer to setup GlobalEnv
+    using SetupEnvFunc = void(*)();
+    auto setupEnv = (SetupEnvFunc)XRay::GetProcAddress(hRender, "SetupEnv");
+    R_ASSERT(setupEnv);
+    setupEnv();
     // game
     {
         LPCSTR g_name = "xrGame";
