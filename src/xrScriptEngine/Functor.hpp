@@ -6,22 +6,28 @@
 
 namespace luabind
 {
-template<typename TResult>
+template <typename TResult, typename... Policies>
 class functor : public adl::object
 {
 public:
     functor() {}
     functor(const adl::object &obj) : adl::object(obj) {}
 
-    template<typename... Args>
+    template <typename... Args>
     TResult operator()(Args &&...args) const
-    { return call_function<TResult>(*static_cast<const adl::object *>(this), std::forward<Args>(args)...); }
+    {
+        auto self = static_cast<const adl::object *>(this);
+        return call_function<TResult, policy_list<Policies...>>(*self, std::forward<Args>(args)...);
+    }
 };
 
-template<>
-template<typename... Args>
-void functor<void>::operator()(Args &&...args) const
-{ call_function<void>(*static_cast<const adl::object *>(this), std::forward<Args>(args)...); }
+template <>
+template <typename... Args>
+void functor<void, typename...>::operator()(Args &&...args) const
+{
+    auto self = static_cast<const adl::object *>(this);
+    call_function<void, policy_list<Policies...>>(*self, std::forward<Args>(args)...);
+}
 
 namespace detail
 {
