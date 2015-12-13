@@ -1,12 +1,11 @@
 #include "stdafx.h"
+#include "xrCore.h"
 
 #ifdef DEBUG_MEMORY_MANAGER
 # pragma warning(push)
 # pragma warning(disable:4995)
 # include <malloc.h>
 # pragma warning(pop)
-
-# include <boost/crc.hpp>
 
 extern void BuildStackTrace ();
 
@@ -116,10 +115,7 @@ void save_stack_trace ()
         *--J = 0;
     }
 
-    boost::crc_32_type temp;
-    temp.process_block (string,string + accumulator);
-    u32 crc = temp.checksum();
-
+    u32 crc = crc32(string, accumulator);
     STATS::iterator I = stats.find(crc);
     STATS::iterator E = stats.end();
     for ( ; I != E; ++I)

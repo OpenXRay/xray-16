@@ -836,8 +836,6 @@ int stack_overflow_exception_filter(int exception_code)
         return EXCEPTION_CONTINUE_SEARCH;
 }
 
-#include <boost/crc.hpp>
-
 int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
                      char* lpCmdLine,
@@ -852,9 +850,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
     //u32 const& crc = *(u32*)buffer;
 
-    //boost::crc_32_type processor;
-    //processor.process_block ( buffer + 4, buffer + file_size );
-    //u32 const new_crc = processor.checksum( );
+    //u32 const new_crc = crc32( buffer + 4, buffer + file_size );
     //VERIFY ( new_crc == crc );
 
     //free (buffer);

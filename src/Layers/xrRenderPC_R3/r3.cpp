@@ -870,8 +870,6 @@ public:
 	}
 };
 
-#include <boost/crc.hpp>
-
 HRESULT	CRender::shader_compile			(
 	LPCSTR							name,
 	DWORD const*					pSrcData,
@@ -1351,16 +1349,10 @@ HRESULT	CRender::shader_compile			(
 		IReader* file = FS.r_open(file_name);
 		if (file->length()>4)
 		{
-			u32 crc = 0;
-			crc = file->r_u32();
-
-			boost::crc_32_type		processor;
-			processor.process_block	( file->pointer(), ((char*)file->pointer()) + file->elapsed() );
-			u32 const real_crc		= processor.checksum( );
-
-			if ( real_crc == crc ) {
-				_result				= create_shader(pTarget, (DWORD*)file->pointer(), file->elapsed(), file_name, result, o.disasm);
-			}
+            u32 crc = file->r_u32();
+            u32 crcComp = crc32(file->pointer(), file->elapsed());
+            if (crcComp==crc)
+                _result = create_shader(pTarget, (DWORD*)file->pointer(), file->elapsed(), file_name, result, o.disasm);
 		}
 		file->close();
 	}
@@ -1386,11 +1378,7 @@ HRESULT	CRender::shader_compile			(
 		if (SUCCEEDED(_result))
 		{
 			IWriter* file = FS.w_open(file_name);
-
-			boost::crc_32_type		processor;
-			processor.process_block	( pShaderBuf->GetBufferPointer(), ((char*)pShaderBuf->GetBufferPointer()) + pShaderBuf->GetBufferSize() );
-			u32 const crc			= processor.checksum( );
-
+            u32 crc = crc32(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());
 			file->w_u32				(crc);
 			file->w					(pShaderBuf->GetBufferPointer(), (u32)pShaderBuf->GetBufferSize());
 			FS.w_close				(file);
