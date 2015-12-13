@@ -229,8 +229,6 @@
     <ClInclude Include="LuaStudio\Defines.hpp" />
     <ClInclude Include="LuaStudio\LuaStudio.hpp" />
     <ClInclude Include="mslotutils.h" />
-    <ClInclude Include="opt.lua.h" />
-    <ClInclude Include="opt_inline.lua.h" />
     <ClInclude Include="pch.hpp" />
     <ClInclude Include="ScriptEngineConfig.hpp" />
     <ClInclude Include="ScriptEngineScript.hpp" />

@@ -72,12 +72,6 @@
     <ClInclude Include="DebugMacros.hpp">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="opt.lua.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="opt_inline.lua.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="ScriptEngineConfig.hpp">
       <Filter>Kernel</Filter>
     </ClInclude>

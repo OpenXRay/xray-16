@@ -11,10 +11,6 @@
 #include "script_process.hpp"
 #include "script_thread.hpp"
 #include "xrCore/doug_lea_allocator.h"
-#ifndef DEBUG
-#include "opt.lua.h"
-#include "opt_inline.lua.h"
-#endif
 #include "Include/xrAPI/xrAPI.h"
 #include "ScriptExporter.hpp"
 #include "BindingsDumper.hpp"
@@ -135,95 +131,32 @@ static void *__cdecl luabind_allocator(void *context, const void *pointer, size_
 #endif
 }
 
-// ---- start of LuaJIT extensions
-static void l_message(lua_State *state, const char *msg)
-{ Msg("! [LUA_JIT] %s", msg); }
-
-static int report(lua_State *L, int status)
+namespace
 {
-    if (status && !lua_isnil(L, -1))
+void LuaJITLogError(lua_State *ls, const char *msg)
+{
+    const char *info = nullptr;
+    if (!lua_isnil(ls, -1))
     {
-        const char *msg = lua_tostring(L, -1);
-        if (!msg)
-            msg = "(error object is not a string)";
-        l_message(L, msg);
-        lua_pop(L, 1);
+        info = lua_tostring(ls, -1);
+        lua_pop(ls, 1);
     }
-    return status;
+    Msg("! LuaJIT: %s (%s)", msg, info ? info : "no info");
 }
-
-static int loadjitmodule(lua_State *L, const char *notfound)
+// tries to execute 'jit'+command
+bool RunJITCommand(lua_State *ls, const char *command)
 {
-    lua_getglobal(L, "require");
-    lua_pushliteral(L, "jit.");
-    lua_pushvalue(L, -3);
-    lua_concat(L, 2);
-    if (lua_pcall(L, 1, 1, 0))
+    string128 buf;
+    xr_strcpy(buf, "jit.");
+    xr_strcat(buf, command);
+    if (luaL_dostring(ls, buf))
     {
-        const char *msg = lua_tostring(L, -1);
-        if (msg && !strncmp(msg, "module ", 7))
-        {
-            l_message(L, notfound);
-            return 1;
-        }
-        return report(L, 1);
+        LuaJITLogError(ls, "Unrecognized command");
+        return false;
     }
-    lua_getfield(L, -1, "start");
-    lua_remove(L, -2); // drop module table
-    return 0;
+    return true;
 }
-
-// JIT engine control command: try jit library first or load add-on module
-static int dojitcmd(lua_State *L, const char *cmd)
-{
-    const char *val = strchr(cmd, '=');
-    lua_pushlstring(L, cmd, val ? val-cmd : xr_strlen(cmd));
-    lua_getglobal(L, "jit"); // get jit.* table
-    lua_pushvalue(L, -2);
-    lua_gettable(L, -2); // lookup library function
-    if (!lua_isfunction(L, -1))
-    {
-        lua_pop(L, 2); // drop non-function and jit.* table, keep module name
-        if (loadjitmodule(L, "unknown luaJIT command"))
-            return 1;
-    }
-    else
-        lua_remove(L, -2); // drop jit.* table
-    lua_remove(L, -2); // drop module name
-    if (val)
-        lua_pushstring(L, val + 1);
-    return report(L, lua_pcall(L, val ? 1 : 0, 0, 0));
 }
-
-void jit_command(lua_State *state, LPCSTR command)
-{ dojitcmd(state, command); }
-
-#ifndef DEBUG
-// start optimizer
-static int dojitopt(lua_State *L, const char *opt)
-{
-    lua_pushliteral(L, "opt");
-    if (loadjitmodule(L, "LuaJIT optimizer module not installed"))
-        return 1;
-    lua_remove(L, -2); // drop module name
-    if (*opt)
-        lua_pushstring(L, opt);
-    return report(L, lua_pcall(L, *opt ? 1 : 0, 0, 0));
-}
-#endif
-// ---- end of LuaJIT extensions
-
-#ifndef DEBUG
-static void put_function(lua_State* state, const u8 *buffer, u32 buffer_size, LPCSTR package_id)
-{
-    lua_getglobal(state, "package");
-    lua_pushstring(state, "preload");
-    lua_gettable(state, -2);
-    lua_pushstring(state, package_id);
-    luaL_loadbuffer(state, (char*)buffer, buffer_size, package_id);
-    lua_settable(state, -3);
-}
-#endif
 
 const char *const CScriptEngine::GlobalNamespace = SCRIPT_GLOBAL_NAMESPACE;
 Lock CScriptEngine::stateMapLock;
@@ -768,8 +701,6 @@ static LogCallback s_old_log_callback = nullptr;
 #endif
 #endif
 
-void jit_command(lua_State *, LPCSTR);
-
 #if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
 static void log_callback(void *context, const char *message)
 {
@@ -804,8 +735,7 @@ void CScriptEngine::initialize_lua_studio(lua_State *state, cs::lua_studio::worl
     world = s_create_world(*engine, false, false);
     VERIFY(world);
     s_old_log_callback = SetLogCB(LogCallback(log_callback, this));
-    jit_command(state, "debug=2");
-    jit_command(state, "off");
+    RunJITCommand(state, "off()");
     world->add(state);
 }
 
@@ -1045,14 +975,16 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
 #ifdef DEBUG
     luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
 #endif
+    // XXX nitrocaster: with vanilla scripts, '-nojit' option requires script profiler to be disabled. The reason
+    // is that lua hooks somehow make 'super' global unavailable (is's used all over the vanilla scripts).
+    // You can disable script profiler by commenting out the following lines in the beginning of _g.script:
+    // if (jit == nil) then
+    //     profiler.setup_hook()
+    // end
     if (!strstr(Core.Params, "-nojit"))
     {
         luajit::open_lib(lua(), LUA_JITLIBNAME, luaopen_jit);
-#ifndef DEBUG
-        put_function(lua(), opt_lua_binary, sizeof(opt_lua_binary), "jit.opt");
-        put_function(lua(), opt_inline_lua_binary, sizeof(opt_lua_binary), "jit.opt_inline");
-        dojitopt(lua(), "2");
-#endif
+        RunJITCommand(lua(), "opt.start(2)");
     }
 #ifdef USE_LUA_STUDIO
     if (m_lua_studio_world || strstr(Core.Params, "-lua_studio"))
@@ -1061,8 +993,7 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
             try_connect_to_debugger();
         else
         {
-            jit_command(lua(), "debug=2");
-            jit_command(lua(), "off");
+            RunJITCommand(lua(), "off()");
             m_lua_studio_world->add(lua());
         }
     }
