@@ -155,7 +155,8 @@ public:
 	{
 		if (IsGameTypeSingle())		
 										return;
-		
+        if (!g_pGameLevel)
+            return;
 		if (Game().local_player && 
 			Game().local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) 
 										return;
