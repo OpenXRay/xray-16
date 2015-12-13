@@ -106,22 +106,21 @@ IC	int	CObjectFactory::script_clsid	(const CLASS_ID &clsid) const
 }
 
 #ifndef NO_XR_GAME
-IC	CObjectFactory::CLIENT_BASE_CLASS *CObjectFactory::client_object	(const CLASS_ID &clsid) const
+inline CObjectFactory::ClientObjectBaseClass *CObjectFactory::client_object	(const CLASS_ID &clsid) const
 {
 	return				(item(clsid).client_object());
 }
-
-IC	CObjectFactory::SERVER_BASE_CLASS *CObjectFactory::server_object	(const CLASS_ID &clsid, LPCSTR section) const
-{
-	return				(item(clsid).server_object(section));
-}
-#else
-IC	CObjectFactory::SERVER_BASE_CLASS *CObjectFactory::server_object	(const CLASS_ID &clsid, LPCSTR section) const
-{
-	const CObjectItemAbstract	*object = item(clsid,true);
-	return				(object ? object->server_object(section) : 0);
-}
 #endif
+
+inline CObjectFactory::ServerObjectBaseClass *CObjectFactory::server_object	(const CLASS_ID &clsid, LPCSTR section) const
+{
+#ifndef NO_XR_GAME
+	return				(item(clsid).server_object(section));
+#else
+    const CObjectItemAbstract	*object = item(clsid, true);
+    return				(object ? object->server_object(section) : 0);
+#endif
+}
 
 IC	void CObjectFactory::actualize										() const
 {

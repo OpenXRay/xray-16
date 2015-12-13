@@ -22,7 +22,7 @@ IC	CSObjectItemSingle::CObjectItemSingle	(const CLASS_ID &clsid, LPCSTR script_c
 
 #ifndef NO_XR_GAME
 TEMPLATE_SPECIALIZATION
-ObjectFactory::CLIENT_BASE_CLASS *CSObjectItemSingle::client_object	() const
+ObjectFactory::ClientObjectBaseClass *CSObjectItemSingle::client_object	() const
 {
 	FATAL				("Cannot instantiate client object, because client class is not declared!");
 	return				(0);
@@ -30,7 +30,7 @@ ObjectFactory::CLIENT_BASE_CLASS *CSObjectItemSingle::client_object	() const
 #endif
 
 TEMPLATE_SPECIALIZATION
-ObjectFactory::SERVER_BASE_CLASS *CSObjectItemSingle::server_object	(LPCSTR section) const
+ObjectFactory::ServerObjectBaseClass *CSObjectItemSingle::server_object	(LPCSTR section) const
 {
 	return				(xr_new<SERVER_TYPE>(section)->init());
 }
@@ -43,13 +43,13 @@ IC	CObjectItemSingle<_unknown_type,true>::CObjectItemSingle	(const CLASS_ID &cls
 }
 
 template <typename _unknown_type>
-ObjectFactory::CLIENT_BASE_CLASS *CObjectItemSingle<_unknown_type,true>::client_object	() const
+ObjectFactory::ClientObjectBaseClass *CObjectItemSingle<_unknown_type,true>::client_object	() const
 {
 	return				(xr_new<CLIENT_TYPE>()->_construct());
 }
 
 template <typename _unknown_type>
-ObjectFactory::SERVER_BASE_CLASS *CObjectItemSingle<_unknown_type,true>::server_object	(LPCSTR section) const
+ObjectFactory::ServerObjectBaseClass *CObjectItemSingle<_unknown_type,true>::server_object	(LPCSTR section) const
 {
 	FATAL				("Cannot instantiate server object, because server class is not declared!");
 	return				(0);

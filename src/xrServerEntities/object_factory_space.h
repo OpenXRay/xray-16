@@ -6,28 +6,19 @@
 //	Description : Object factory space
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef object_factory_spaceH
-#define object_factory_spaceH
-
 #pragma once
 
 #ifndef XRGAME_EXPORTS
-#	define NO_XR_GAME
+#define NO_XR_GAME
 #endif
 
+class IFactoryObject;
 class CSE_Abstract;
 
-namespace ObjectFactory {
-
+namespace ObjectFactory
+{
 #ifndef NO_XR_GAME
-	typedef IFactoryObject		CLIENT_BASE_CLASS;
+using ClientObjectBaseClass = IFactoryObject;
 #endif
-	typedef CSE_Abstract		SERVER_BASE_CLASS;
-
-#ifndef NO_XR_GAME
-	typedef IFactoryObject		CLIENT_SCRIPT_BASE_CLASS;
-#endif
-	typedef CSE_Abstract		SERVER_SCRIPT_BASE_CLASS;
+using ServerObjectBaseClass = CSE_Abstract;
 };
-
-#endif

@@ -22,16 +22,16 @@ IC	CSObjectItemClientServer::CObjectItemClientServer	(const CLASS_ID &clsid, LPC
 
 #ifndef NO_XR_GAME
 TEMPLATE_SPECIALIZATION
-ObjectFactory::CLIENT_BASE_CLASS *CSObjectItemClientServer::client_object	() const
+ObjectFactory::ClientObjectBaseClass *CSObjectItemClientServer::client_object	() const
 {
 	return				(xr_new<CLIENT_TYPE>()->_construct());
 }
 #endif
 
 TEMPLATE_SPECIALIZATION
-ObjectFactory::SERVER_BASE_CLASS *CSObjectItemClientServer::server_object	(LPCSTR section) const
+ObjectFactory::ServerObjectBaseClass *CSObjectItemClientServer::server_object	(LPCSTR section) const
 {
-	ObjectFactory::SERVER_BASE_CLASS * o = xr_new<SERVER_TYPE>(section)->init();
+	ObjectFactory::ServerObjectBaseClass * o = xr_new<SERVER_TYPE>(section)->init();
 	R_ASSERT			(o);
 	return				(o);
 }
@@ -50,9 +50,9 @@ ObjectFactory::SERVER_BASE_CLASS *CSObjectItemClientServer::server_object	(LPCST
 	}
 
 	TEMPLATE_SPECIALIZATION
-	ObjectFactory::CLIENT_BASE_CLASS *CSObjectItemClientServerSingleMp::client_object	() const
+	ObjectFactory::ClientObjectBaseClass *CSObjectItemClientServerSingleMp::client_object	() const
 	{
-		ObjectFactory::CLIENT_BASE_CLASS	*result = 
+		ObjectFactory::ClientObjectBaseClass	*result =
 			IsGameTypeSingle() ?
 			xr_new<_client_type_single>() :
 			xr_new<_client_type_mp>();
@@ -61,9 +61,9 @@ ObjectFactory::SERVER_BASE_CLASS *CSObjectItemClientServer::server_object	(LPCST
 	}
 
 	TEMPLATE_SPECIALIZATION
-	ObjectFactory::SERVER_BASE_CLASS *CSObjectItemClientServerSingleMp::server_object	(LPCSTR section) const
+	ObjectFactory::ServerObjectBaseClass *CSObjectItemClientServerSingleMp::server_object	(LPCSTR section) const
 	{
-		ObjectFactory::SERVER_BASE_CLASS	*result = 
+		ObjectFactory::ServerObjectBaseClass	*result =
 			IsGameTypeSingle() ?
 			xr_new<_server_type_single>(section) :
 			xr_new<_server_type_mp>(section);

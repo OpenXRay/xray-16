@@ -25,9 +25,9 @@ protected:
 public:
 	IC											CObjectItemClientServer		(const CLASS_ID &clsid, LPCSTR script_clsid);
 #ifndef NO_XR_GAME
-	virtual ObjectFactory::CLIENT_BASE_CLASS	*client_object				() const;
+    virtual ObjectFactory::ClientObjectBaseClass *client_object() const;
 #endif
-	virtual ObjectFactory::SERVER_BASE_CLASS	*server_object				(LPCSTR section) const;
+    virtual ObjectFactory::ServerObjectBaseClass *server_object(LPCSTR section) const;
 };
 
 #ifndef NO_XR_GAME
@@ -36,8 +36,8 @@ public:
 	typedef CObjectItemAbstract	inherited;
 	public:
 		IC											CObjectItemClientServerSingleMp	(const CLASS_ID &clsid, LPCSTR script_clsid);
-		virtual ObjectFactory::CLIENT_BASE_CLASS	*client_object					() const;
-		virtual ObjectFactory::SERVER_BASE_CLASS	*server_object					(LPCSTR section) const;
+        virtual ObjectFactory::ClientObjectBaseClass *client_object() const;
+        virtual ObjectFactory::ServerObjectBaseClass *server_object(LPCSTR section) const;
 	};
 #endif // NO_XR_GAME
 

@@ -14,9 +14,9 @@
 #ifndef NO_XR_GAME
 #	include "attachable_item.h"
 
-ObjectFactory::CLIENT_BASE_CLASS *CObjectItemScript::client_object	() const
+ObjectFactory::ClientObjectBaseClass *CObjectItemScript::client_object	() const
 {
-	ObjectFactory::CLIENT_SCRIPT_BASE_CLASS	*object = nullptr;
+	ObjectFactory::ClientObjectBaseClass *object = nullptr;
 	try {
 		object	= m_client_creator();
 	}
@@ -29,9 +29,9 @@ ObjectFactory::CLIENT_BASE_CLASS *CObjectItemScript::client_object	() const
 
 #endif
 
-ObjectFactory::SERVER_BASE_CLASS *CObjectItemScript::server_object	(LPCSTR section) const
+ObjectFactory::ServerObjectBaseClass *CObjectItemScript::server_object	(LPCSTR section) const
 {
-    ObjectFactory::SERVER_BASE_CLASS *object = nullptr;
+    ObjectFactory::ServerObjectBaseClass *object = nullptr;
 
 	try {
         object = m_server_creator(section);
@@ -46,9 +46,9 @@ ObjectFactory::SERVER_BASE_CLASS *CObjectItemScript::server_object	(LPCSTR secti
 	}
 
 	R_ASSERT			(object);
-    ObjectFactory::SERVER_BASE_CLASS *o = object->init();
-	R_ASSERT			(o);
-	return				(o);
+    object = object->init();
+	R_ASSERT			(object);
+	return				(object);
 }
 
 CObjectItemScript::CObjectItemScript	(

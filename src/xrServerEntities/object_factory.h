@@ -17,14 +17,9 @@
 class CObjectFactory {
 public:
 #ifndef NO_XR_GAME
-	typedef ObjectFactory::CLIENT_BASE_CLASS			CLIENT_BASE_CLASS;
+    using ClientObjectBaseClass = ObjectFactory::ClientObjectBaseClass;
 #endif
-	typedef ObjectFactory::SERVER_BASE_CLASS			SERVER_BASE_CLASS;
-
-#ifndef NO_XR_GAME
-	typedef ObjectFactory::CLIENT_SCRIPT_BASE_CLASS	CLIENT_SCRIPT_BASE_CLASS;
-#endif
-	typedef ObjectFactory::SERVER_SCRIPT_BASE_CLASS	SERVER_SCRIPT_BASE_CLASS;
+    using ServerObjectBaseClass = ObjectFactory::ServerObjectBaseClass;
 
 protected:
 	struct CObjectItemPredicate {
@@ -76,11 +71,9 @@ public:
 	virtual								~CObjectFactory					();
 			void						init							();
 #ifndef NO_XR_GAME
-	IC		CLIENT_BASE_CLASS			*client_object					(const CLASS_ID &clsid) const;
-	IC		SERVER_BASE_CLASS			*server_object					(const CLASS_ID &clsid, LPCSTR section) const;
-#else
-	IC		SERVER_BASE_CLASS			*server_object					(const CLASS_ID &clsid, LPCSTR section) const;
+    inline ClientObjectBaseClass *client_object(const CLASS_ID &clsid) const;
 #endif
+    inline ServerObjectBaseClass *server_object(const CLASS_ID &clsid, LPCSTR section) const;
 
 	IC		int							script_clsid					(const CLASS_ID &clsid) const;
 			void						register_script					() const;
