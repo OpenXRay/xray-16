@@ -41,7 +41,6 @@ struct CDataStorageBucketList
         Vertex m_list_data[2];
         Vertex *m_list_head;
         Vertex *m_list_tail;
-        Distance m_switch_factor;
         Distance m_min_bucket_value;
         Distance m_max_bucket_value;
         Vertex *m_buckets[BucketCount];
@@ -52,7 +51,6 @@ struct CDataStorageBucketList
         virtual ~CDataStorage();
         inline void init();
         inline void add_best_closed();
-        inline void set_switch_factor(const Distance _switch_factor);
         inline bool is_opened_empty();
         inline u32 compute_bucket_id(Vertex &vertex) const;
         inline void verify_buckets() const;

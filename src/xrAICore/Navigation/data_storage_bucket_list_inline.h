@@ -25,7 +25,6 @@ inline CBucketList::CDataStorage(const u32 vertex_count) :
     Inherited(vertex_count)
 {
     m_max_distance = Distance(-1);
-    m_switch_factor = Distance(1);
     m_min_bucket_value = Distance(0);
     m_max_bucket_value = Distance(1000);
     ZeroMemory(m_buckets, BucketCount*sizeof(Vertex*));
@@ -55,14 +54,6 @@ inline void CBucketList::add_best_closed()
 {
     VERIFY(!is_opened_empty());
     Inherited::add_closed(*m_buckets[m_min_bucket_id]);
-}
-
-TEMPLATE_SPECIALIZATION
-inline void CBucketList::set_switch_factor(const Distance _switch_factor)
-{
-    if (!sorted)
-        NODEFAULT;
-    m_switch_factor = _switch_factor;
 }
 
 TEMPLATE_SPECIALIZATION
