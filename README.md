@@ -17,7 +17,7 @@ If you find a bug or have an enhancement request, file an [Issue](https://github
 
 Pull requests appreciated! However, the following things should be taken into consideration:
 * We want to keep the game as close as possible to the vanilla game, so instead of introducing new gameplay features,
-  consider fixing bugs, improving performance and code quality
+  consider adding non-gameplay features, fixing bugs, improving performance and code quality
 * Major changes should be discussed before implementation
 * Follow the [procedures](doc/procedure)
 
