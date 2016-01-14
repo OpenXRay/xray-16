@@ -2,6 +2,8 @@ TITLE: X-Ray 1.6 build and setup instructions
 
 Build:
 ------
+Currently, the only compiler supported is Visual C++ 2015.
+
 By default, all libraries mentioned below (except Windows/DirectX SDK) are assumed to be in
 the src\Externals directory.
 
