@@ -11,7 +11,7 @@ Current task list: [doc/design/task_list.txt](doc/design/task_list.txt)
 
 Task history: [doc/design/task_history.txt](doc/design/task_history.txt)
 
-Build instructions can be found [here](https://github.com/openxray/xray-16/blob/master/doc/howto/build.txt).
+Build instructions: [doc/howto/build.txt](doc/howto/build.txt)
 
 If you find a bug or have an enhancement request, file an [Issue](https://github.com/openxray/xray-16/issues).
 
