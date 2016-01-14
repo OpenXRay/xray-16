@@ -7,7 +7,7 @@
 
 int __cdecl main	(int argc, char* argv[])
 {
-	Debug._initialize	(false);
+	xrDebug::Initialize	(false);
 	Core._initialize	("xrCompress",0,FALSE);
 	printf				("\n\n");
 

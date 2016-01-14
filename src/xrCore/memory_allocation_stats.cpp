@@ -7,11 +7,6 @@
 # include <malloc.h>
 # pragma warning(pop)
 
-extern void BuildStackTrace ();
-
-extern char g_stackTrace[100][4096];
-extern int g_stackTraceCount;
-
 static bool g_mem_alloc_gather_stats = false;
 static float g_mem_alloc_gather_stats_frequency = 0.f;
 
@@ -73,6 +68,11 @@ void mem_alloc_clear_stats ()
     stats.clear ();
 }
 
+namespace
+{
+StackTraceInfo StackTrace;
+}
+
 __declspec(noinline)
 void save_stack_trace ()
 {
@@ -83,32 +83,28 @@ void save_stack_trace ()
         return;
 
     // OutputDebugStackTrace ("----------------------------------------------------");
-
-    BuildStackTrace ();
-
-    if (g_stackTraceCount <= 2)
+    StackTrace.Count = xrDebug::BuildStackTrace(StackTrace.Frames, StackTrace.Capacity, StackTrace.LineCapacity);
+    const int skipFrames = 2;
+    if (StackTrace.Count<=skipFrames)
         return;
-
     u32 accumulator = 0;
-    VERIFY (g_stackTraceCount > 2);
-    int* lengths = (int*)_alloca((g_stackTraceCount - 2)*sizeof(int));
+    int* lengths = (int*)_alloca((StackTrace.Count-skipFrames)*sizeof(int));
     {
         int* I = lengths;
-        for (int i=2; i<g_stackTraceCount; ++i, ++I)
+        for (int i = skipFrames; i<StackTrace.Count; ++i, ++I)
         {
-            *I = xr_strlen(g_stackTrace[i]);
-            accumulator += u32((*I)*sizeof(char) + 1);
+            *I = xr_strlen(StackTrace[i]);
+            accumulator += u32(*I+1);
         }
     }
 
     PSTR string = (PSTR)malloc(accumulator);
     {
         PSTR J = string;
-        VERIFY (g_stackTraceCount > 2);
         int* I = lengths;
-        for (int i=2; i<g_stackTraceCount; ++i, ++I, ++J)
+        for (int i = skipFrames; i<StackTrace.Count; ++i, ++I, ++J)
         {
-            memcpy (J,g_stackTrace[i],*I);
+            memcpy(J, StackTrace[i], *I);
             J += *I;
             *J = '\n';
         }

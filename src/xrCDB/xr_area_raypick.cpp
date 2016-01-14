@@ -293,7 +293,7 @@ BOOL CObjectSpace::_RayQuery	(collide::rq_results& r_dest, const collide::ray_de
 {
 #ifdef DEBUG
 	if (R.range<EPS || !_valid(R.range))
-		Debug.fatal			(DEBUG_INFO,"Invalid RayQuery range passed: %f.",R.range);
+		xrDebug::Fatal			(DEBUG_INFO,"Invalid RayQuery range passed: %f.",R.range);
 #endif
 	// initialize query
 	r_dest.r_clear			();
@@ -327,7 +327,7 @@ BOOL CObjectSpace::_RayQuery	(collide::rq_results& r_dest, const collide::ray_de
 						s_res.range	= R.range-s_rd.range-EPS_L;
 #ifdef DEBUG
 						if (!(fis_zero(s_res.range,EPS) || s_res.range>=0.f))
-							Debug.fatal(DEBUG_INFO,"Invalid RayQuery static range: %f (%f). /#1/",s_res.range,s_rd.range);
+							xrDebug::Fatal(DEBUG_INFO,"Invalid RayQuery static range: %f (%f). /#1/",s_res.range,s_rd.range);
 #endif
 					}
 				}
@@ -353,7 +353,7 @@ BOOL CObjectSpace::_RayQuery	(collide::rq_results& r_dest, const collide::ray_de
 					}
 #ifdef DEBUG
 					if (!((0==r_temp.r_count()) || (r_temp.r_count()&&(fis_zero(r_temp.r_begin()->range, EPS)||(r_temp.r_begin()->range>=0.f)))))
-						Debug.fatal(DEBUG_INFO,"Invalid RayQuery dynamic range: %f (%f). /#2/",r_temp.r_begin()->range,d_rd.range);
+						xrDebug::Fatal(DEBUG_INFO,"Invalid RayQuery dynamic range: %f (%f). /#2/",r_temp.r_begin()->range,d_rd.range);
 #endif
 				}
 			}
@@ -365,7 +365,7 @@ BOOL CObjectSpace::_RayQuery	(collide::rq_results& r_dest, const collide::ray_de
 				d_res.range	= R.range-d_rd.range-EPS_L;
 #ifdef DEBUG
 				if (!(fis_zero(d_res.range,EPS) || d_res.range>=0.f))
-					Debug.fatal(DEBUG_INFO,"Invalid RayQuery dynamic range: %f (%f). /#3/",d_res.range,d_rd.range);
+					xrDebug::Fatal(DEBUG_INFO,"Invalid RayQuery dynamic range: %f (%f). /#3/",d_res.range,d_rd.range);
 #endif
 			}else{
 				sd_test.set(d_mask,FALSE);

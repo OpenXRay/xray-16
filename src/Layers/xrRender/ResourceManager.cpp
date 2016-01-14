@@ -57,7 +57,7 @@ IBlender* CResourceManager::_GetBlender		(LPCSTR Name)
 		return 0;
 	}
 #endif
-	if (I==m_blenders.end())	{ Debug.fatal(DEBUG_INFO,"Shader '%s' not found in library.",Name); return 0; }
+	if (I==m_blenders.end())	{ xrDebug::Fatal(DEBUG_INFO,"Shader '%s' not found in library.",Name); return 0; }
 #endif
 	else					return I->second;
 }

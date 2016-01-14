@@ -187,7 +187,7 @@ int APIENTRY WinMain(HINSTANCE hInst,
 //  g_dummy_stuff       = &trivial_encryptor::encode;
 
     // Initialize debugging
-    Debug._initialize   (false);
+    xrDebug::Initialize   (false);
     Core._initialize    ("xrLC");
     
     if(strstr(Core.Params,"-nosmg"))

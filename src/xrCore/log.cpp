@@ -172,7 +172,7 @@ void Log(const char* msg, const Fmatrix& dop)
 
 void LogWinErr(const char* msg, long err_code)
 {
-    Msg("%s: %s", msg, Debug.error2string(err_code));
+    Msg("%s: %s", msg, xrDebug::ErrorToString(err_code));
 }
 
 LogCallback SetLogCB(const LogCallback &cb)

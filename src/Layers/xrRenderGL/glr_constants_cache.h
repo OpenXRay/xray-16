@@ -31,7 +31,7 @@ private:
 			break;
 		default:
 #ifdef DEBUG
-			Debug.fatal(DEBUG_INFO, "Invalid constant run-time-type for '%s'", *C->name);
+			xrDebug::Fatal(DEBUG_INFO, "Invalid constant run-time-type for '%s'", *C->name);
 #else
 			NODEFAULT;
 #endif
@@ -52,7 +52,7 @@ private:
 			break;
 		default:
 #ifdef DEBUG
-			Debug.fatal(DEBUG_INFO, "Invalid constant run-time-type for '%s'", *C->name);
+			xrDebug::Fatal(DEBUG_INFO, "Invalid constant run-time-type for '%s'", *C->name);
 #else
 			NODEFAULT;
 #endif
@@ -73,7 +73,7 @@ private:
 			break;
 		default:
 #ifdef DEBUG
-			Debug.fatal(DEBUG_INFO, "Invalid constant run-time-type for '%s'", *C->name);
+			xrDebug::Fatal(DEBUG_INFO, "Invalid constant run-time-type for '%s'", *C->name);
 #else
 			NODEFAULT;
 #endif

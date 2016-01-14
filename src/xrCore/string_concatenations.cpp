@@ -35,7 +35,7 @@ void process(u32 const index, u32 const count, LPCSTR* strings)
     }
     *k = 0;
 
-    Debug.fatal(
+    xrDebug::Fatal(
         DEBUG_INFO,
         make_string(
             "buffer overflow: cannot concatenate strings(%d):\r\n%s",

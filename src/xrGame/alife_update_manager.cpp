@@ -448,7 +448,7 @@ void CALifeUpdateManager::add_restriction	(ALife::_OBJECT_ID id, ALife::_OBJECT_
 		case RestrictionSpace::eRestrictorTypeIn : {
 #ifdef DEBUG
 			if (std::find(creature->m_dynamic_in_restrictions.begin(),creature->m_dynamic_in_restrictions.end(),restriction_id) != creature->m_dynamic_in_restrictions.end()) {
-				LogStackTrace				("cannot add in-restriction stack trace");
+				xrDebug::LogStackTrace				("cannot add in-restriction stack trace");
 				Msg							("! cannot add in-restriction with id %d, name %s to the entity with id %d, name %s, because it is already added",restriction_id,restrictor->name_replace(),id,creature->name_replace());
 				Msg							("! Please report this log file to Lain");
 				return;

@@ -117,7 +117,7 @@ void CBuild::Load	(const b_params& Params, const IReader& _in_FS)
 			} catch (...)
 			{
 				err_save	();
-				Debug.fatal	(DEBUG_INFO,"* ERROR: Can't process face #%d",i);
+				xrDebug::Fatal	(DEBUG_INFO,"* ERROR: Can't process face #%d",i);
 			}
 		}
         Logger.Progress(p_total += p_cost);
@@ -147,7 +147,7 @@ void CBuild::Load	(const b_params& Params, const IReader& _in_FS)
 		if (InvalideFaces())	
 		{
 			err_save		();
-			Debug.fatal		(DEBUG_INFO,"* FATAL: %d invalid faces. Compilation aborted",InvalideFaces());
+			xrDebug::Fatal		(DEBUG_INFO,"* FATAL: %d invalid faces. Compilation aborted",InvalideFaces());
 		}
 	}
 

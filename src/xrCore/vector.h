@@ -10,11 +10,6 @@
 #undef PI
 #endif
 
-#ifdef FLT_MAX
-#undef FLT_MAX
-#undef FLT_MIN
-#endif
-
 // Select platform
 #ifdef _MSC_VER
 #define M_VISUAL

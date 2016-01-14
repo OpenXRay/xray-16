@@ -828,7 +828,7 @@ void CScriptEngine::lua_error(lua_State *L)
     print_output(L, "", LUA_ERRRUN);
     on_error(L);
 #if !XRAY_EXCEPTIONS 
-    Debug.fatal(DEBUG_INFO, "LUA error: %s", lua_tostring(L, -1));
+    xrDebug::Fatal(DEBUG_INFO, "LUA error: %s", lua_tostring(L, -1));
 #else
     throw lua_tostring(L,-1);
 #endif
@@ -839,7 +839,7 @@ int CScriptEngine::lua_pcall_failed(lua_State *L)
     print_output(L, "", LUA_ERRRUN);
     on_error(L);
 #if !XRAY_EXCEPTIONS
-    Debug.fatal(DEBUG_INFO, "LUA error: %s", lua_isstring(L, -1) ? lua_tostring(L, -1) : "");
+    xrDebug::Fatal(DEBUG_INFO, "LUA error: %s", lua_isstring(L, -1) ? lua_tostring(L, -1) : "");
 #endif
     if (lua_isstring(L, -1))
         lua_pop (L, 1);
@@ -849,7 +849,7 @@ int CScriptEngine::lua_pcall_failed(lua_State *L)
 void CScriptEngine::lua_cast_failed(lua_State *L, const luabind::type_id &info)
 {
     print_output(L, "", LUA_ERRRUN);
-    Debug.fatal(DEBUG_INFO, "LUA error: cannot cast lua value to %s", info.name());
+    xrDebug::Fatal(DEBUG_INFO, "LUA error: cannot cast lua value to %s", info.name());
 }
 #endif
 

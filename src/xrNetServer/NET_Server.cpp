@@ -397,7 +397,7 @@ if(!psNET_direct_connect)
 			0 );					// dwFlags
 		if (HostSuccess != S_OK)
 		{
-//			xr_string res = Debug.error2string(HostSuccess);
+//			xr_string res = xrDebug::ErrorToString(HostSuccess);
 				if (bPortWasSet) 
 				{
 					Msg("! IPureServer : port %d is BUSY!", psNET_Port);

@@ -26,8 +26,6 @@ extern void Detect();
 
 static u32 init_counter = 0;
 
-extern char g_application_path[256];
-
 //. extern xr_vector<shared_str>* LogFile;
 
 void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, LPCSTR fs_fname, bool plugin)
@@ -48,9 +46,6 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
         GetModuleFileName(GetModuleHandle("xrCore"), fn, sizeof(fn));
         _splitpath(fn, dr, di, 0, 0);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
-#ifndef _EDITOR
-        xr_strcpy(g_application_path, sizeof(g_application_path), ApplicationPath);
-#endif
 
 #ifdef _EDITOR
         // working path
@@ -83,7 +78,7 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
         R_ASSERT(CPU::ID.feature&_CPU_FEATURE_SSE);
         ttapi_Init(CPU::ID);
         XRay::Math::Initialize();
-        // Debug._initialize ();
+        // xrDebug::Initialize ();
 
         rtc_initialize();
 

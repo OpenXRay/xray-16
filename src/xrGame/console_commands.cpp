@@ -137,12 +137,12 @@ enum E_COMMON_FLAGS{
 
 CUIOptConCom g_OptConCom;
 
-typedef void (*full_memory_stats_callback_type) ( );
-XRCORE_API full_memory_stats_callback_type g_full_memory_stats_callback;
-
 static void full_memory_stats	( )
 {
 	Memory.mem_compact		();
+	u32		m_base=0,c_base=0,m_lmaps=0,c_lmaps=0;
+    GlobalEnv.Render->ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
+	log_vminfo	();
 	size_t	_process_heap	= ::Memory.mem_usage();
 #ifndef PURE_ALLOC
 	u32		_game_lua		= CScriptEngine::GetMemoryUsage();
@@ -150,9 +150,6 @@ static void full_memory_stats	( )
 #endif
 	int		_eco_strings	= (int)g_pStringContainer->stat_economy			();
 	int		_eco_smem		= (int)g_pSharedMemoryContainer->stat_economy	();
-	u32		m_base=0,c_base=0,m_lmaps=0,c_lmaps=0;
-    GlobalEnv.Render->ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
-	log_vminfo	();
 	Msg		("* [ D3D ]: textures[%d K]", (m_base+m_lmaps)/1024);
 #ifdef PURE_ALLOC
 	Msg		("* [x-ray]: process heap[%u K]",_process_heap/1024);
@@ -171,7 +168,7 @@ class CCC_MemStats : public IConsole_Command
 public:
 	CCC_MemStats(LPCSTR N) : IConsole_Command(N)  {
 		bEmptyArgsHandled = TRUE;
-		g_full_memory_stats_callback	= &full_memory_stats;
+		xrDebug::SetOutOfMemoryCallback(full_memory_stats);
 	};
 	virtual void Execute(LPCSTR args) {
 		full_memory_stats( );

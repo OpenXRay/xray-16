@@ -542,15 +542,15 @@ CVirtualFileRW::CVirtualFileRW(const char* cFileName)
 {
     // Open the file
     hSrcFile = CreateFile(cFileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
-    R_ASSERT3(hSrcFile != INVALID_HANDLE_VALUE, cFileName, Debug.error2string(GetLastError()));
+    R_ASSERT3(hSrcFile != INVALID_HANDLE_VALUE, cFileName, xrDebug::ErrorToString(GetLastError()));
     Size = (int)GetFileSize(hSrcFile, NULL);
-    R_ASSERT3(Size, cFileName, Debug.error2string(GetLastError()));
+    R_ASSERT3(Size, cFileName, xrDebug::ErrorToString(GetLastError()));
 
     hSrcMap = CreateFileMapping(hSrcFile, 0, PAGE_READWRITE, 0, 0, 0);
-    R_ASSERT3(hSrcMap != INVALID_HANDLE_VALUE, cFileName, Debug.error2string(GetLastError()));
+    R_ASSERT3(hSrcMap != INVALID_HANDLE_VALUE, cFileName, xrDebug::ErrorToString(GetLastError()));
 
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-    R_ASSERT3(data, cFileName, Debug.error2string(GetLastError()));
+    R_ASSERT3(data, cFileName, xrDebug::ErrorToString(GetLastError()));
 
 #ifdef FS_DEBUG
     register_file_mapping(data, Size, cFileName);
@@ -572,15 +572,15 @@ CVirtualFileReader::CVirtualFileReader(const char* cFileName)
 {
     // Open the file
     hSrcFile = CreateFile(cFileName, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
-    R_ASSERT3(hSrcFile != INVALID_HANDLE_VALUE, cFileName, Debug.error2string(GetLastError()));
+    R_ASSERT3(hSrcFile != INVALID_HANDLE_VALUE, cFileName, xrDebug::ErrorToString(GetLastError()));
     Size = (int)GetFileSize(hSrcFile, NULL);
-    R_ASSERT3(Size, cFileName, Debug.error2string(GetLastError()));
+    R_ASSERT3(Size, cFileName, xrDebug::ErrorToString(GetLastError()));
 
     hSrcMap = CreateFileMapping(hSrcFile, 0, PAGE_READONLY, 0, 0, 0);
-    R_ASSERT3(hSrcMap != INVALID_HANDLE_VALUE, cFileName, Debug.error2string(GetLastError()));
+    R_ASSERT3(hSrcMap != INVALID_HANDLE_VALUE, cFileName, xrDebug::ErrorToString(GetLastError()));
 
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_READ, 0, 0, 0);
-    R_ASSERT3(data, cFileName, Debug.error2string(GetLastError()));
+    R_ASSERT3(data, cFileName, xrDebug::ErrorToString(GetLastError()));
 
 #ifdef FS_DEBUG
     register_file_mapping(data, Size, cFileName);

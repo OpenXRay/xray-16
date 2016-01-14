@@ -162,7 +162,7 @@ BOOL motions_value::load(LPCSTR N, IReader* data, vecBones* bones)
     }
     else
     {
-        Debug.fatal(DEBUG_INFO, "Old skinned model version unsupported! (%s)", N);
+        xrDebug::Fatal(DEBUG_INFO, "Old skinned model version unsupported! (%s)", N);
     }
     if (!bRes) return false;
 

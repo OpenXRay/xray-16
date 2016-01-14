@@ -233,7 +233,7 @@ CLASS_ID game_GameState::getCLASS_ID(LPCSTR game_type_name, bool isServer)
 
 		xr_delete			(l_tpIniFile);
 		if(clsid.size()==0)
-			Debug.fatal		(DEBUG_INFO,"Unknown game type: %s",game_type_name);
+			xrDebug::Fatal		(DEBUG_INFO,"Unknown game type: %s",game_type_name);
 
 		return				(TEXT2CLSID(*clsid));
 	}*/

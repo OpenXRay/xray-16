@@ -1375,12 +1375,12 @@ void CGameObject::UpdateCL			()
 #ifdef DEBUG
     VERIFY2(_valid(renderable.xform), *cName());
     if (Device.dwFrame==dbg_update_cl)
-        Debug.fatal(DEBUG_INFO, "'UpdateCL' called twice per frame for %s", *cName());
+        xrDebug::Fatal(DEBUG_INFO, "'UpdateCL' called twice per frame for %s", *cName());
     dbg_update_cl = Device.dwFrame;
     if (Parent && spatial.node_ptr)
-        Debug.fatal(DEBUG_INFO, "Object %s has parent but is still registered inside spatial DB", *cName());
+        xrDebug::Fatal(DEBUG_INFO, "Object %s has parent but is still registered inside spatial DB", *cName());
     if (!CForm && (spatial.type&STYPE_COLLIDEABLE))
-        Debug.fatal(DEBUG_INFO, "Object %s registered as 'collidable' but has no collidable model", *cName());
+        xrDebug::Fatal(DEBUG_INFO, "Object %s registered as 'collidable' but has no collidable model", *cName());
 #endif
     spatial_update(base_spu_epsP*5, base_spu_epsR*5);
     // crow

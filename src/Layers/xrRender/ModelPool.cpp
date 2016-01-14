@@ -114,7 +114,7 @@ dxRender_Visual*	CModelPool::Instance_Load		(const char* N, BOOL allow_register)
 				Msg("!Can't find model file '%s'.",name);
                 return 0;
 #else            
-				Debug.fatal(DEBUG_INFO,"Can't find model file '%s'.",name);
+				xrDebug::Fatal(DEBUG_INFO,"Can't find model file '%s'.",name);
 #endif
 			}
 	} else {

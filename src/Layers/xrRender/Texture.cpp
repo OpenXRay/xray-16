@@ -313,7 +313,7 @@ ID3DBaseTexture*	CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 	R_ASSERT(FS.exist(fn,"$game_textures$",	"ed\\ed_not_existing_texture",".dds"));
 	goto _DDS;
 
-//	Debug.fatal(DEBUG_INFO,"Can't find texture '%s'",fname);
+//	xrDebug::Fatal(DEBUG_INFO,"Can't find texture '%s'",fname);
 
 #endif
 

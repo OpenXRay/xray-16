@@ -528,7 +528,7 @@ void CHW::Reset (HWND hwnd)
 	while	(TRUE)	{
 		HRESULT _hr							= HW.pDevice->Reset	(&DevPP);
 		if (SUCCEEDED(_hr))					break;
-		Msg		("! ERROR: [%dx%d]: %s",DevPP.BackBufferWidth,DevPP.BackBufferHeight,Debug.error2string(_hr));
+		Msg		("! ERROR: [%dx%d]: %s",DevPP.BackBufferWidth,DevPP.BackBufferHeight,xrDebug::ErrorToString(_hr));
 		Sleep	(100);
 	}
 	R_CHK				(pDevice->GetRenderTarget			(0,&pBaseRT));
@@ -567,7 +567,7 @@ void CHW::Reset (HWND hwnd)
 	while	(TRUE)	{
 		HRESULT _hr							= HW.pDevice->Reset	(&DevPP);
 		if (SUCCEEDED(_hr))					break;
-		Msg		("! ERROR: [%dx%d]: %s",DevPP.BackBufferWidth,DevPP.BackBufferHeight,Debug.error2string(_hr));
+		Msg		("! ERROR: [%dx%d]: %s",DevPP.BackBufferWidth,DevPP.BackBufferHeight,xrDebug::ErrorToString(_hr));
 		Sleep	(100);
 	}
 	R_CHK				(pDevice->GetRenderTarget			(0,&pBaseRT));

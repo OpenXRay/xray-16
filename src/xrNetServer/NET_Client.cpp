@@ -543,7 +543,7 @@ if(!psNET_direct_connect)
 				DPNCONNECT_SYNC);		// dwFlags
 			if (res != S_OK)
 			{
-				//			xr_string res = Debug.error2string(HostSuccess);
+				//			xr_string res = xrDebug::ErrorToString(HostSuccess);
 
 				if (bPortWasSet) 
 				{
@@ -623,7 +623,7 @@ if(!psNET_direct_connect)
 				);
 			if (res != S_OK)
 			{
-				//			xr_string res = Debug.error2string(HostSuccess);
+				//			xr_string res = xrDebug::ErrorToString(HostSuccess);
 				switch (res)
 				{
 				case DPNERR_INVALIDHOSTADDRESS:
@@ -857,8 +857,8 @@ HRESULT	IPureClient::net_Handler(u32 dwMessageType, PVOID pMessage)
 			else
 			{
 #ifdef DEBUG
-				OnSessionTerminate( (::Debug.error2string(m_hResultCode)));
-				Msg("- Session terminated : %s", (::Debug.error2string(m_hResultCode)));
+				OnSessionTerminate( (xrDebug::ErrorToString(m_hResultCode)));
+				Msg("- Session terminated : %s", (xrDebug::ErrorToString(m_hResultCode)));
 #endif
 			}
 		};
@@ -971,7 +971,7 @@ void	IPureClient::SendTo_LL(void* data, u32 size, u32 dwFlags, u32 dwTimeout)
 //	Msg("- Client::SendTo_LL [%d]", size);
 	if( FAILED(hr) )	
 	{
-		Msg	("! ERROR: Failed to send net-packet, reason: %s",::Debug.error2string(hr));
+		Msg	("! ERROR: Failed to send net-packet, reason: %s",xrDebug::ErrorToString(hr));
 //		const char* x = DXGetErrorString9(hr);
 		string1024 tmp="";
 		DXTRACE_ERR(tmp, hr);

@@ -85,7 +85,7 @@ bool IGame_Level::Load(u32 dwNum)
     pApp->Level_Set(dwNum);
     string_path temp;
     if (!FS.exist(temp, "$level$", "level.ltx"))
-        Debug.fatal(DEBUG_INFO, "Can't find level configuration file '%s'.", temp);
+        xrDebug::Fatal(DEBUG_INFO, "Can't find level configuration file '%s'.", temp);
     pLevel = xr_new<CInifile>(temp);
 
     // Open

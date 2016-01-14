@@ -625,9 +625,9 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
                           int nCmdShow)
 {
 #ifdef DEDICATED_SERVER
-    Debug._initialize(true);
+    xrDebug::Initialize(true);
 #else // DEDICATED_SERVER
-    Debug._initialize(false);
+    xrDebug::Initialize(false);
 #endif // DEDICATED_SERVER
 
     if (!IsDebuggerPresent())

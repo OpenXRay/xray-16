@@ -152,7 +152,7 @@ bool CALifeStorageManager::load	(LPCSTR save_name_no_check)
 	FS.update_path				(file_name,"$game_saves$",m_save_name);
 
 	xr_strcpy					(g_last_saved_game, save_name);
-	xr_strcpy					(g_bug_report_file, file_name);
+    xrDebug::SetBugReportFile(file_name);
 
 	IReader						*stream;
 	stream						= FS.r_open(file_name);

@@ -49,8 +49,8 @@ void OGF::CalculateTB()
 		)
 	)
 	{
-		Debug.fatal	(DEBUG_INFO, "NVMeshMender failed " );
-		//Debug.fatal	(DEBUG_INFO,"NVMeshMender failed (%s)",mender.GetLastError().c_str());
+		xrDebug::Fatal	(DEBUG_INFO, "NVMeshMender failed " );
+		//xrDebug::Fatal	(DEBUG_INFO,"NVMeshMender failed (%s)",mender.GetLastError().c_str());
 	}
 
 	// ************************************* Bind declarators

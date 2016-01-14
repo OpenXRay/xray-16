@@ -7,7 +7,7 @@ do {\
     if (!(expr))\
     {\
         string4096 assertion_info;\
-        ::Debug.gather_info(_TRE(#expr), nullptr, nullptr, nullptr, DEBUG_INFO, assertion_info);\
+        xrDebug::GatherInfo(_TRE(#expr), nullptr, nullptr, nullptr, DEBUG_INFO, assertion_info);\
         throw assertion_info;\
     }\
 } while(0)
@@ -16,7 +16,7 @@ do {\
     if (!(expr))\
     {\
         string4096 assertion_info;\
-        ::Debug.gather_info(_TRE(#expr), msg0, nullptr, nullptr, DEBUG_INFO, assertion_info);\
+        xrDebug::GatherInfo(_TRE(#expr), msg0, nullptr, nullptr, DEBUG_INFO, assertion_info);\
         throw assertion_info;\
     }\
 } while(0)
@@ -25,7 +25,7 @@ do {\
     if (!(expr))\
     {\
         string4096 assertion_info;\
-        ::Debug.gather_info(_TRE(#expr), msg0, msg1, nullptr, DEBUG_INFO, assertion_info);\
+        xrDebug::GatherInfo(_TRE(#expr), msg0, msg1, nullptr, DEBUG_INFO, assertion_info);\
         throw assertion_info;\
     }\
 } while(0)

@@ -36,7 +36,7 @@ void xrServer::Process_update(NET_Packet& P, ClientID sender)
 			if ((P.r_tell()-_pos) != size)	{
 				string16	tmp;
 				CLSID2TEXT	(E->m_tClassID,tmp);
-				Debug.fatal	(DEBUG_INFO,
+				xrDebug::Fatal	(DEBUG_INFO,
 					"Beer from the creator of '%s'; initiator: 0x%08x, r_tell() = %d, pos = %d, objectID = %d",
 					tmp,
 					CL->ID.value(),

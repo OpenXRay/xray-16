@@ -369,7 +369,7 @@ CBlend*	CKinematicsAnimated::PlayCycle		(LPCSTR  N, BOOL bMixIn, PlayCallback Ca
 {
 	MotionID motion_ID		= ID_Cycle(N);
 	if (motion_ID.valid())	return PlayCycle(motion_ID,bMixIn,Callback,CallbackParam,channel);
-	else					{ Debug.fatal(DEBUG_INFO,"! MODEL: can't find cycle: %s", N); return 0; }
+	else					{ xrDebug::Fatal(DEBUG_INFO,"! MODEL: can't find cycle: %s", N); return 0; }
 }
 CBlend*	CKinematicsAnimated::PlayCycle		(MotionID motion_ID,  BOOL bMixIn, PlayCallback Callback, LPVOID CallbackParam,u8 channel /*= 0*/)
 {	
@@ -702,7 +702,7 @@ void CKinematicsAnimated::Load(const char* N, IReader *data, u32 dwFlags)
                     Msg			("!Can't find motion file '%s'.",nm);
                     return;
 #else
-                    Debug.fatal	(DEBUG_INFO,"Can't find motion file '%s'.",nm);
+                    xrDebug::Fatal	(DEBUG_INFO,"Can't find motion file '%s'.",nm);
 #endif
                 }
             }
@@ -741,7 +741,7 @@ void CKinematicsAnimated::Load(const char* N, IReader *data, u32 dwFlags)
                     Msg			("!Can't find motion file '%s'.",nm);
                     return;
 #else
-                    Debug.fatal	(DEBUG_INFO,"Can't find motion file '%s'.",nm);
+                    xrDebug::Fatal	(DEBUG_INFO,"Can't find motion file '%s'.",nm);
 #endif
                 }
             }

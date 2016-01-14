@@ -62,7 +62,7 @@ void BasicPostProcessAnimator::Load(LPCSTR name, bool internalFs /*= true*/)
         if (!FS.exist(full_path, "$level$", name))
         {
             if (!FS.exist(full_path, "$game_anims$", name))
-                Debug.fatal(DEBUG_INFO, "Can't find motion file '%s'.", name);
+                xrDebug::Fatal(DEBUG_INFO, "Can't find motion file '%s'.", name);
         }
     }
     else

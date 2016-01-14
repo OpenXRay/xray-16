@@ -86,7 +86,7 @@ CInput::CInput(BOOL bExclusive, int deviceForInit)
                    mouse_input_flags,
                    MOUSEBUFFERSIZE));
 
-    Debug.set_on_dialog(&on_error_dialog);
+    xrDebug::SetDialogHandler(on_error_dialog);
 
 #ifdef ENGINE_BUILD
     Device.seqAppActivate.Add(this);

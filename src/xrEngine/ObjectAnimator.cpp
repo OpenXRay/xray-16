@@ -43,7 +43,7 @@ void CObjectAnimator::LoadMotions(LPCSTR fname)
     string_path full_path;
     if (!FS.exist(full_path, "$level$", fname))
         if (!FS.exist(full_path, "$game_anims$", fname))
-            Debug.fatal(DEBUG_INFO, "Can't find motion file '%s'.", fname);
+            xrDebug::Fatal(DEBUG_INFO, "Can't find motion file '%s'.", fname);
 
     LPCSTR ext = strext(full_path);
     if (ext)
@@ -106,7 +106,7 @@ COMotion* CObjectAnimator::Play(bool loop, LPCSTR name)
         }
         else
         {
-            Debug.fatal(DEBUG_INFO, "OBJ ANIM::Cycle '%s' not found.", name);
+            xrDebug::Fatal(DEBUG_INFO, "OBJ ANIM::Cycle '%s' not found.", name);
             return NULL;
         }
     }
@@ -121,7 +121,7 @@ COMotion* CObjectAnimator::Play(bool loop, LPCSTR name)
         }
         else
         {
-            Debug.fatal(DEBUG_INFO, "OBJ ANIM::Cycle '%s' not found.", name);
+            xrDebug::Fatal(DEBUG_INFO, "OBJ ANIM::Cycle '%s' not found.", name);
             return NULL;
         }
     }

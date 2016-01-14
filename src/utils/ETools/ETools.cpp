@@ -11,7 +11,7 @@ BOOL APIENTRY DllMain( HANDLE hModule,
 { 
 	switch(fdwReason) {
 		case DLL_PROCESS_ATTACH:
-			Debug._initialize	(false);
+			xrDebug::Initialize	(false);
 			Core._initialize	("XRayEditorTools",0,FALSE);
 			//FPU::m64r	();
 			break;

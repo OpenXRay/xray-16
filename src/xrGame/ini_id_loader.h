@@ -144,7 +144,7 @@ const typename ITEM_DATA* CSINI_IdToIndex::GetByIndex(T_INDEX index, bool no_ass
 	if((size_t)index>=m_pItemDataVector->size())
 	{
 		if(!no_assert)
-			Debug.fatal(DEBUG_INFO,"item by index not found in section %s, line %s", section_name, line_name);
+			xrDebug::Fatal(DEBUG_INFO,"item by index not found in section %s, line %s", section_name, line_name);
 		return NULL;
 	}
 	return &(m_pItemDataVector->at(index));

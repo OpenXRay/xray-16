@@ -184,7 +184,7 @@ void CSpecificCharacter::load_shared	(LPCSTR)
 	xr_free(buf_str);
 	
 	if(data()->m_Community.index() == NO_COMMUNITY_INDEX)
-		Debug.fatal(DEBUG_INFO,"wrong 'community' '%s' in specific character %s ", team, *m_OwnId);
+		xrDebug::Fatal(DEBUG_INFO,"wrong 'community' '%s' in specific character %s ", team, *m_OwnId);
 
 	data()->m_Rank			= pXML->ReadInt("rank", 0, NO_RANK);
 	R_ASSERT3(data()->m_Rank != NO_RANK, "'rank' field not fulfiled for specific character", *m_OwnId);
