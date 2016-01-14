@@ -9,13 +9,13 @@
 #define SMART_COVER_TRANSITION_ANIMATION_HPP_INCLUDED
 
 #include "ai_monster_space.h"
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 
 namespace smart_cover {
 
 namespace transitions {
 
-class animation_action final : private boost::noncopyable
+class animation_action final : private Noncopyable
 {
 private:
 	Fvector									m_position;

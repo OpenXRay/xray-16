@@ -11,7 +11,7 @@
 
 #ifdef INGAME_EDITOR
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "Include/editor/property_holder.hpp"
 
 namespace editor
@@ -26,7 +26,7 @@ namespace sound_channels
 
 class source :
     public editor::property_holder_holder,
-    private boost::noncopyable
+    private Noncopyable
 {
 public:
     source(shared_str const& source);

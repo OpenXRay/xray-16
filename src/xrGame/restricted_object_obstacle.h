@@ -9,11 +9,11 @@
 #pragma once
 
 #include "restricted_object.h"
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 
 class obstacles_query;
 
-class CRestrictedObjectObstacle : public CRestrictedObject, private boost::noncopyable {
+class CRestrictedObjectObstacle : public CRestrictedObject, private Noncopyable {
 private:
 	typedef CRestrictedObject	inherited;
 

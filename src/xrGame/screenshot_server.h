@@ -1,7 +1,7 @@
 #ifndef SCREENSHOT_SERVER
 #define SCREENSHOT_SERVER
 #include "file_transfer.h"
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 
 enum clientdata_event_t
 {
@@ -13,7 +13,7 @@ enum clientdata_event_t
 	e_configs_error_notif
 };
 
-class clientdata_proxy : boost::noncopyable
+class clientdata_proxy : Noncopyable
 {
 private:
 	ClientID						m_admin_id;		//for file transfer

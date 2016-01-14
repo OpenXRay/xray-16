@@ -2,7 +2,7 @@
 #define LOGIN_MANAGER
 
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "mixed_delegate.h"
 #include "xrGameSpy/GameSpy/GP/gp.h"
 #include "account_manager.h"
@@ -48,7 +48,7 @@ struct profile
 //typedef fastdelegate::FastDelegate<void (profile const *, shared_str const &)>	login_operation_cb;
 typedef mixed_delegate<void (profile const *, char const *), mdut_login_operation_cb_tag>	login_operation_cb;
 
-class login_manager : private boost::noncopyable
+class login_manager : private Noncopyable
 {
 public:
 	explicit			login_manager		(CGameSpy_Full* fullgs_obj);

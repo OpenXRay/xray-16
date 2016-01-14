@@ -18,7 +18,7 @@ namespace steering_behaviour {
 
 class cohesion final :
 	public base,
-	private boost::noncopyable 
+	private Noncopyable 
 {
 public:
 						cohesion	(CAI_Rat const *object);

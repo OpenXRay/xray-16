@@ -11,7 +11,7 @@
 
 #ifdef INGAME_EDITOR
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "Include/editor/property_holder.hpp"
 #include "thunderbolt.h"
 
@@ -30,7 +30,7 @@ namespace thunderbolts
 
 class gradient :
     public SThunderboltDesc::SFlare,
-    private boost::noncopyable
+    private Noncopyable
 {
 public:
     gradient();

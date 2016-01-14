@@ -10,13 +10,13 @@
 #define PROPERTY_COLLECTION_HPP_INCLUDED
 
 #include "Include/editor/property_holder.hpp"
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "Common/object_broker.h"
 
 template <typename container_type, typename holder_type>
 class property_collection :
     public editor::property_holder_collection,
-    private boost::noncopyable
+    private Noncopyable
 {
 public:
     typedef editor::property_holder property_holder;

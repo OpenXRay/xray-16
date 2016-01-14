@@ -1,10 +1,10 @@
 #pragma once
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 
 class CCharacterPhysicsSupport;
 class activating_character_delay:
-	private boost::noncopyable
+	private Noncopyable
 {
 	CCharacterPhysicsSupport &char_support;
 	u32 activate_time;

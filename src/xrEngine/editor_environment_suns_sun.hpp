@@ -11,7 +11,7 @@
 
 #ifdef INGAME_EDITOR
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "Include/editor/property_holder.hpp"
 #include "xr_efflensflare.h"
 
@@ -32,7 +32,7 @@ class manager;
 class sun :
     public CLensFlare,
     public editor::property_holder_holder,
-    private boost::noncopyable
+    private Noncopyable
 {
 public:
     sun(manager const& manager, shared_str const& section);

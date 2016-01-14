@@ -1,13 +1,13 @@
 #ifndef GAME_CL_CTA_CAPTIONS_MANAGER
 #define GAME_CL_CTA_CAPTIONS_MANAGER
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 
 class game_cl_CaptureTheArtefact;
 class CUIGameCTA;
 
 class	CTAGameClCaptionsManager : 
-		private boost::noncopyable
+		private Noncopyable
 {
 private:
 			bool							m_press_fire2spect_showed;

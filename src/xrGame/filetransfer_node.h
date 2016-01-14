@@ -2,12 +2,12 @@
 #define FILETRANSFER_NODE
 
 #include "filetransfer_common.h"
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 
 namespace file_transfer
 {
 
-class file_reader : private boost::noncopyable
+class file_reader : private Noncopyable
 {
 public:
 					file_reader			() {};

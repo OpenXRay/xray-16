@@ -9,7 +9,7 @@
 #define SMART_COVER_PLANNER_ACTIONS_H_INCLUDED
 
 #include "smart_cover_detail.h"
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "stalker_combat_action_base.h"
 
 class CAI_Stalker;
@@ -24,7 +24,7 @@ class animation_planner;
 
 class action_base :
 	public CStalkerActionCombatBase,
-	private boost::noncopyable
+	private Noncopyable
 {
 private:
 	typedef CStalkerActionCombatBase inherited;

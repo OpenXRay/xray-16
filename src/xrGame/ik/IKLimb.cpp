@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "IKLimb.h"
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "Include/xrRender/Kinematics.h"
 #include "GameObject.h"
 #include "game_object_space.h"
@@ -1005,7 +1005,7 @@ float	CIKLimb::get_time_to_step_begin	( const CBlend& B )	const
 }
 
 struct ssaved_callback :
-	private boost::noncopyable
+	private Noncopyable
 {
 	ssaved_callback( CBoneInstance &bi ):
 		_bi					( bi						)		,

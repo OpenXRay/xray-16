@@ -9,7 +9,7 @@
 #ifndef INVENTORY_UPGRADE_BASE_H_INCLUDED
 #define INVENTORY_UPGRADE_BASE_H_INCLUDED
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "Common/object_broker.h"
 
 class CInventoryItem;
@@ -40,7 +40,7 @@ enum UpgradeStateResult
 };
 
 class UpgradeBase :
-	private	boost::noncopyable
+	private	Noncopyable
 {
 public:
 							UpgradeBase();

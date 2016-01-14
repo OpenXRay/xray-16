@@ -15,7 +15,7 @@
 #include "xrCore/xrCore.h"
 #include "xrScriptEngine/xrScriptEngine.hpp"
 #include "xrScriptEngine/LuaStudio/Backend/Interfaces.hpp"
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 
 namespace luabind
 {
@@ -27,7 +27,7 @@ class class_rep;
 
 class XRSCRIPTENGINE_API lua_studio_engine :
     public cs::lua_studio::engine,
-    private boost::noncopyable
+    private Noncopyable
 {
 public:
     using Backend = cs::lua_studio::backend;

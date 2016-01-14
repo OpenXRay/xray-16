@@ -3,7 +3,7 @@
 
 #include "traffic_optimization.h"
 
-class last_updates_cache : private boost::noncopyable
+class last_updates_cache : private Noncopyable
 {
 public:
 	static u32 const cache_entities_size = 32;

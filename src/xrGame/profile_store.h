@@ -1,7 +1,7 @@
 #ifndef GAMESPY_PROFILE_STORE
 #define GAMESPY_PROFILE_STORE
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "xrEngine/ISheduled.h"
 #include "profile_data_types.h"
 
@@ -23,7 +23,7 @@ class best_scores_store;
 
 class profile_store : 
 	public ScheduledBase,
-	private boost::noncopyable
+	private Noncopyable
 {
 public:
 	explicit		profile_store			(CGameSpy_Full* fullgs_obj);

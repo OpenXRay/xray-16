@@ -18,7 +18,7 @@ namespace steering_behaviour {
 
 class separation final :
 	public base,
-	private boost::noncopyable 
+	private Noncopyable 
 {
 public:
 						separation	(CAI_Rat const *object);

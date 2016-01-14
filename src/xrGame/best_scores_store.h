@@ -1,7 +1,7 @@
 #ifndef BEST_SCORES_SYSTEM_INCLUDED
 #define BEST_SCORES_SYSTEM_INCLUDED
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "xrCore/Containers/AssociativeVector.hpp"
 #include "xrGameSpy/GameSpy/sake/sake.h"
 #include "profile_data_types.h"

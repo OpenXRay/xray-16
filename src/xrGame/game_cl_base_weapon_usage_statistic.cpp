@@ -10,9 +10,9 @@
 #include "game_cl_base_weapon_usage_statistic.h"
 #include "Include/xrRender/Kinematics.h"
 #include "game_cl_mp.h"
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 
-class statistic_sync_quard : private boost::noncopyable
+class statistic_sync_quard : private Noncopyable
 {
 	Lock & m_mutex;
 public:

@@ -11,7 +11,7 @@
 
 #ifdef INGAME_EDITOR
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "Include/editor/property_holder.hpp"
 #include "property_collection_forward.hpp"
 #include "Environment.h"
@@ -32,7 +32,7 @@ class manager;
 class channel :
     public CEnvAmbient::SSndChannel,
     public editor::property_holder_holder,
-    private boost::noncopyable
+    private Noncopyable
 {
 private:
     typedef CEnvAmbient::SSndChannel inherited;

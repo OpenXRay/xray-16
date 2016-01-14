@@ -9,13 +9,13 @@
 #ifndef STEERING_BEHAVIOUR_BASE_H_INCLUDED
 #define STEERING_BEHAVIOUR_BASE_H_INCLUDED
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 
 class CAI_Rat;
 
 namespace steering_behaviour {
 
-class base : private boost::noncopyable {
+class base : private Noncopyable {
 public:
 						base		(CAI_Rat const *object);
 	virtual				~base		() {}

@@ -11,7 +11,7 @@
 
 #ifdef INGAME_EDITOR
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "property_collection_forward.hpp"
 
 namespace editor
@@ -26,7 +26,7 @@ namespace sound_channels
 
 class channel;
 
-class manager : private boost::noncopyable
+class manager : private Noncopyable
 {
 public:
     manager();

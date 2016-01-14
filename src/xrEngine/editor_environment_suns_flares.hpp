@@ -11,7 +11,7 @@
 
 #ifdef INGAME_EDITOR
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "property_collection_forward.hpp"
 
 namespace editor
@@ -28,7 +28,7 @@ namespace suns
 class manager;
 class flare;
 
-class flares : private boost::noncopyable
+class flares : private Noncopyable
 {
 public:
     flares();

@@ -2,7 +2,7 @@
 #include "xrPhysics/IPHCapture.h"
 #include "CaptureBoneCallback.h"
 #include "Include/xrRender/Kinematics.h"
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 
 #define TEMPLATE_SPECIALIZATION template <\
 	typename _Object\

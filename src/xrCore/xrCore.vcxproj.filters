@@ -785,6 +785,9 @@
     <ClInclude Include="Debug\SymbolEngine.h">
       <Filter>Debug core</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\Noncopyable.hpp">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">

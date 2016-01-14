@@ -9,11 +9,11 @@
 #ifndef RAT_STATE_BASE_H_INCLUDED
 #define RAT_STATE_BASE_H_INCLUDED
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 
 class CAI_Rat;
 
-class rat_state_base : private boost::noncopyable {
+class rat_state_base : private Noncopyable {
 private:
 	CAI_Rat	*m_object;
 

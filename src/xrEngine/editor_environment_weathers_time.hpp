@@ -11,7 +11,7 @@
 
 #ifdef INGAME_EDITOR
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "Include/editor/property_holder.hpp"
 #include "Environment.h"
 
@@ -30,7 +30,7 @@ class weather;
 class time :
     public CEnvDescriptorMixer,
     public editor::property_holder_holder,
-    private boost::noncopyable
+    private Noncopyable
 {
 private:
     typedef CEnvDescriptorMixer inherited;

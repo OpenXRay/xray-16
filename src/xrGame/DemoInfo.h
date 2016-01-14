@@ -1,7 +1,7 @@
 #ifndef DEMOINFO_H
 #define DEMOINFO_H
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 
 
 class CStreamReader;
@@ -15,7 +15,7 @@ struct game_PlayerState;
 //void stream_read_demostring	(CStreamReader* stream, shared_str & dest_rest, u32 max_size = STREAM_DEMOSTRING_MAX_SIZE);
 //void stream_write_demostring(IWriter* writer, shared_str const & string_to_write, u32 max_size = STREAM_DEMOSTRING_MAX_SIZE);
 
-class demo_player_info : private boost::noncopyable
+class demo_player_info : private Noncopyable
 {
 private:
 	shared_str	m_name;
@@ -44,7 +44,7 @@ public:
 	static	u32	const			demo_info_max_size;
 }; //class demo_player_info
 
-class demo_info : private boost::noncopyable
+class demo_info : private Noncopyable
 {
 private:
 	typedef xr_vector<demo_player_info*>	players_coll_t;

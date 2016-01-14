@@ -11,7 +11,7 @@
 #include "ai_monster_space.h"
 #include "xrAICore/Navigation/graph_engine_space.h"
 #include "xrAICore/Navigation/game_graph_space.h"
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 
 namespace MovementManager {
 	enum EPathType;

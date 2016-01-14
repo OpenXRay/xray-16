@@ -11,7 +11,7 @@
 
 #ifdef INGAME_EDITOR
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "property_collection_forward.hpp"
 
 struct SThunderboltDesc;
@@ -34,7 +34,7 @@ class thunderbolt;
 class thunderbolt_id;
 class collection;
 
-class manager : private boost::noncopyable
+class manager : private Noncopyable
 {
 public:
     manager(::editor::environment::manager* environment);

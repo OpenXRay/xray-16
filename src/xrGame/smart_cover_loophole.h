@@ -8,7 +8,7 @@
 #ifndef SMART_COVER_LOOPHOLE_H_INCLUDED
 #define SMART_COVER_LOOPHOLE_H_INCLUDED
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "smart_cover_detail.h"
 #include "xrScriptEngine/script_space_forward.hpp"
 #include "xrCore/Containers/AssociativeVector.hpp"
@@ -19,7 +19,7 @@ namespace smart_cover {
 
 class object;
 
-class loophole final : private boost::noncopyable 
+class loophole final : private Noncopyable 
 {
 private:
 	class action_predicate {

@@ -11,7 +11,7 @@
 
 #ifdef INGAME_EDITOR
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "Include/editor/property_holder.hpp"
 #include "property_collection_forward.hpp"
 #include "thunderbolt.h"
@@ -32,7 +32,7 @@ class thunderbolt_id;
 class collection :
     public SThunderboltCollection,
     public editor::property_holder_holder,
-    private boost::noncopyable
+    private Noncopyable
 {
 public:
     collection(manager const& manager, shared_str const& id);

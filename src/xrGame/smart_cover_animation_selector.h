@@ -9,7 +9,7 @@
 #define SMART_COVER_ANIMATION_SELECTOR_H_INCLUDED
 
 #include "smart_cover_detail.h"
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "smart_cover_animation_planner.h"
 
@@ -24,7 +24,7 @@ namespace smart_cover {
 class action_base;
 class wait_after_exit;
 
-class animation_selector final : private boost::noncopyable
+class animation_selector final : private Noncopyable
 {
 private:
 	CPropertyStorage		*m_storage;

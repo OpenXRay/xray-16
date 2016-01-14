@@ -11,7 +11,7 @@
 
 #ifdef INGAME_EDITOR
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 
 namespace editor
 {
@@ -26,7 +26,7 @@ namespace suns
 
 class manager;
 
-class gradient : private boost::noncopyable
+class gradient : private Noncopyable
 {
 public:
     gradient();

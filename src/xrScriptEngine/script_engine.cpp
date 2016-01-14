@@ -18,7 +18,7 @@
 #include "script_debugger.hpp"
 #endif
 #include <stdarg.h>
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 
 Flags32 g_LuaDebug;
 
@@ -560,7 +560,7 @@ luabind::object CScriptEngine::name_space(LPCSTR namespace_name)
     }
 }
 
-struct raii_guard : private boost::noncopyable
+struct raii_guard : private Noncopyable
 {
     CScriptEngine *scriptEngine;
     int m_error_code;

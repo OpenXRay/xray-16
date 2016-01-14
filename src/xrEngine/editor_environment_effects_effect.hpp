@@ -11,7 +11,7 @@
 
 #ifdef INGAME_EDITOR
 
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "Include/editor/property_holder.hpp"
 #include "Environment.h"
 
@@ -30,7 +30,7 @@ class manager;
 class effect :
     public CEnvAmbient::SEffect,
     public editor::property_holder_holder,
-    private boost::noncopyable
+    private Noncopyable
 {
 public:
     effect(manager const& manager, shared_str const& id);

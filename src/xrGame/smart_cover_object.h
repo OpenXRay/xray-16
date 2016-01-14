@@ -10,14 +10,14 @@
 #define SMART_COVER_OBJECT_H_INCLUDED
 
 #include "gameobject.h"
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 
 namespace smart_cover {
 	class cover;
 
 class object : 
 	public CGameObject,
-	private boost::noncopyable
+	private Noncopyable
 {
 private:
 	typedef CGameObject	inherited;
