@@ -57,7 +57,7 @@ void CSoundRender_Source::i_decompress_fr(OggVorbis_File* ovf, char* _dest, u32 
 	while (TotalRet < (long)left) 
 	{
 		ret = ov_read(ovf, /*PCM*/ _dest+ TotalRet, left - TotalRet, 0, 2, 1, &current_section);
-
+        // BUG: ov_read can return negative value indicating an error, making this loop infinite
 		// if end of file or read limit exceeded
 		if (ret == 0) break;
 		else if (ret < 0) 		// Error in bitstream
