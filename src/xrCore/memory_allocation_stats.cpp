@@ -1,131 +1,103 @@
 #include "stdafx.h"
-#include "xrCore.h"
 
-#ifdef DEBUG_MEMORY_MANAGER
-# pragma warning(push)
-# pragma warning(disable:4995)
-# include <malloc.h>
-# pragma warning(pop)
-
-static bool g_mem_alloc_gather_stats = false;
-static float g_mem_alloc_gather_stats_frequency = 0.f;
-
-typedef std::pair<PSTR,u32> STATS_PAIR;
-typedef std::multimap<u32,STATS_PAIR> STATS;
-static STATS stats;
-
-void mem_alloc_gather_stats (const bool& value)
-{
-    g_mem_alloc_gather_stats = value;
-}
-
-void mem_alloc_gather_stats_frequency (const float& value)
-{
-    g_mem_alloc_gather_stats_frequency = value;
-}
-
-void mem_alloc_show_stats ()
-{
-    u32 size = (u32)stats.size();
-    STATS_PAIR* strings = (STATS_PAIR*)_alloca(size*sizeof(STATS_PAIR));
-    STATS_PAIR* e = strings + size;
-    STATS_PAIR* i = strings;
-
-    u32 accumulator = 0;
-    STATS::const_iterator I = stats.begin();
-    STATS::const_iterator E = stats.end();
-    for ( ; I != E; ++I, ++i)
-    {
-        *i = (*I).second;
-        accumulator += (*I).second.second;
-    }
-
-    struct predicate
-    {
-        static inline bool compare (const STATS_PAIR& _0, const STATS_PAIR& _1)
-        {
-            return (_0.second < _1.second);
-        }
-    };
-
-    std::sort (strings,e,predicate::compare);
-
-    int j = 0;
-    for (i = strings; i != e; ++i, ++j)
-    {
-        Msg ("%d(%d)-----------------%d[%d]:%5.2f%%------------------",j,size,(*i).second,accumulator,((*i).second*100)/float(accumulator));
-        Log ((*i).first);
-    }
-}
-
-void mem_alloc_clear_stats ()
-{
-    STATS::iterator I = stats.begin();
-    STATS::iterator E = stats.end();
-    for ( ; I != E; ++I)
-        free ((*I).second.first);
-
-    stats.clear ();
-}
+#ifndef DEBUG_MEMORY_MANAGER
+#include <malloc.h> // _alloca
 
 namespace
 {
+bool StatsGatherEnabled = false;
+float StatsGatherFrequency = 0.0f;
 StackTraceInfo StackTrace;
 }
 
-__declspec(noinline)
-void save_stack_trace ()
+struct StatsItem
 {
-    if (!g_mem_alloc_gather_stats)
-        return;
+    char *StackTrace;
+    size_t Calls;
+};
 
-    if (::Random.randF() >= g_mem_alloc_gather_stats_frequency)
-        return;
+static std::multimap<u32, StatsItem> stats;
 
-    // OutputDebugStackTrace ("----------------------------------------------------");
+void mem_alloc_gather_stats(const bool &value)
+{ StatsGatherEnabled = value; }
+
+void mem_alloc_gather_stats_frequency(const float &value)
+{ StatsGatherFrequency = value; }
+
+void mem_alloc_show_stats()
+{
+    size_t statsSize = stats.size();
+    auto strings = (StatsItem *)malloc(statsSize*sizeof(StatsItem));
+    size_t totalCalls = 0, i = 0;
+    for (auto &pair : stats)
+    {
+        strings[i] = pair.second;
+        i++;
+        totalCalls += pair.second.Calls;
+    }
+    struct Comparer
+    {
+        bool operator()(const StatsItem &a, const StatsItem &b)
+        { return a.Calls<b.Calls; }
+    };
+    std::sort(strings, strings+statsSize, Comparer());
+    for (i = 0; i<statsSize; i++)
+    {
+        StatsItem &item = strings[i];
+        Msg("%zu(%zu)-----------------%zu[%zu]:%5.2f%%------------------",
+            i, statsSize, item.Calls, totalCalls, item.Calls*100/float(totalCalls));
+        Log(item.StackTrace);
+    }
+    free(strings);
+}
+
+void mem_alloc_clear_stats()
+{
+    for (auto &item : stats)
+        free(item.second.StackTrace);
+    stats.clear();
+}
+
+__declspec(noinline) void save_stack_trace()
+{
+    if (!StatsGatherEnabled)
+        return;
+    if (::Random.randF()>=StatsGatherFrequency)
+        return;
     StackTrace.Count = xrDebug::BuildStackTrace(StackTrace.Frames, StackTrace.Capacity, StackTrace.LineCapacity);
-    const int skipFrames = 2;
+    const size_t skipFrames = 2;
     if (StackTrace.Count<=skipFrames)
         return;
-    u32 accumulator = 0;
-    int* lengths = (int*)_alloca((StackTrace.Count-skipFrames)*sizeof(int));
+    size_t frameCount = StackTrace.Count-skipFrames;
+    size_t totalSize = 0;
+    auto lengths = (size_t *)_alloca(frameCount*sizeof(size_t));
+    for (int i = 0; i<frameCount; i++)
     {
-        int* I = lengths;
-        for (int i = skipFrames; i<StackTrace.Count; ++i, ++I)
-        {
-            *I = xr_strlen(StackTrace[i]);
-            accumulator += u32(*I+1);
-        }
+        lengths[i] = strlen(StackTrace[i+skipFrames]);
+        totalSize += lengths[i]+1;
     }
-
-    PSTR string = (PSTR)malloc(accumulator);
+    char *stackTrace = (char *)malloc(totalSize);
     {
-        PSTR J = string;
-        int* I = lengths;
-        for (int i = skipFrames; i<StackTrace.Count; ++i, ++I, ++J)
+        char *ptr = stackTrace;
+        for (int i = 0; i<frameCount; i++)
         {
-            memcpy(J, StackTrace[i], *I);
-            J += *I;
-            *J = '\n';
+            memcpy(ptr, StackTrace[i], lengths[i]);
+            ptr += lengths[i];
+            *ptr = '\n';
         }
-        *--J = 0;
+        *ptr = 0;
     }
-
-    u32 crc = crc32(string, accumulator);
-    STATS::iterator I = stats.find(crc);
-    STATS::iterator E = stats.end();
-    for ( ; I != E; ++I)
+    u32 crc = crc32(stackTrace, totalSize);
+    for (auto it = stats.find(crc); it!=stats.end(); it++)
     {
-        if ((*I).first != crc)
+        auto &pair = *it;
+        if (pair.first!=crc)
             break;
-
-        if (xr_strcmp((*I).second.first,string))
+        if (strcmp(pair.second.StackTrace, stackTrace))
             continue;
-
-        ++((*I).second.second);
+        pair.second.Calls++;
         return;
     }
-
-    stats.insert(std::make_pair(crc, std::make_pair(string, 1)));
+    stats.insert({crc, {stackTrace, 1}});
 }
-#endif // DEBUG
+#endif // DEBUG_MEMORY_MANAGER
