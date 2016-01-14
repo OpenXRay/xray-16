@@ -361,7 +361,7 @@
     <ClCompile Include="Threading\Lock.cpp" />
     <ClCompile Include="xrCore.cpp" />
     <ClCompile Include="ModuleLookup.cpp" />
-    <ClCompile Include="xrDebugNew.cpp" />
+    <ClCompile Include="xrDebug.cpp" />
     <ClCompile Include="xrMemory.cpp" />
     <ClCompile Include="xrMemory_align.cpp" />
     <ClCompile Include="xrMemory_debug.cpp" />

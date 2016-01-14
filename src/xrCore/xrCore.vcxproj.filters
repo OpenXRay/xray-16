@@ -240,9 +240,6 @@
     <ClCompile Include="doug_lea_allocator.cpp">
       <Filter>Memory manager\dlmalloc\wrapper</Filter>
     </ClCompile>
-    <ClCompile Include="xrDebugNew.cpp">
-      <Filter>Debug core</Filter>
-    </ClCompile>
     <ClCompile Include="blackbox\BlackBoxUI.cpp">
       <Filter>Debug core\BlackBox</Filter>
     </ClCompile>
@@ -392,6 +389,9 @@
     </ClCompile>
     <ClCompile Include="Crypto\xr_dsa_verifyer.cpp">
       <Filter>Crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="xrDebug.cpp">
+      <Filter>Debug core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
