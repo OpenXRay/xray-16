@@ -108,11 +108,11 @@ void xr_dsa::generate_params()
 	string256		random_string;
 	xr_sprintf					(random_string, "%I64d_%s", CPU::QPC(), rnd_seed);
 	//sprintf_s					(random_string, "%s", rnd_seed);
-	unsigned char*	rnd_seed	= static_cast<unsigned char*>((void*)random_string);
+	unsigned char*	seed	= static_cast<unsigned char*>((void*)random_string);
 	unsigned int	rnd_ssize	= xr_strlen(random_string);
 	DSA* tmp_dsa_params	= DSA_generate_parameters(
 		key_bit_length,
-		rnd_seed,
+        seed,
 		rnd_ssize,
 		&counter,
 		&long_ret,

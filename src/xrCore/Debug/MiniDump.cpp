@@ -4,8 +4,11 @@ Copyright (c) 1997-2001 John Robbins -- All rights reserved.
 ----------------------------------------------------------------------*/
 
 #include "stdafx.h"
+#pragma warning(push)
+#pragma warning(disable:4091) // 'typedef ': ignored on left of '' when no variable is declared
 #include "MiniDump.h"
 #include "StackTrace.h"
+#pragma warning(pop)
 #include <process.h>
 
 // The structure I can package the data necessary to the dump writer thread.

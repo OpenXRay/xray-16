@@ -168,11 +168,11 @@ void* xrMemory::mem_realloc(void* P, size_t size)
         debug_cs.Enter();
 #endif
     u32 p_current = get_header(P);
-    u32 p_new = get_pool(1 + size + (debug_mode ? 4 : 0));
+    u32 newPool = get_pool(1 + size + (debug_mode ? 4 : 0));
     u32 p_mode;
     if (mem_generic==p_current)
     {
-        if (p_new < p_current)
+        if (newPool < p_current)
             p_mode = 2;
         else
             p_mode = 0;

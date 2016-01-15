@@ -112,14 +112,14 @@ int ttapi_Init(const _processor_info &pi)
     // System Info
     ttapi_worker_count = pi.n_cores;
     SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
-    DWORD i, dwNumIter;
+    DWORD dwNumIter;
     volatile DWORD dwDummy = 1;
     LARGE_INTEGER liFrequency, liStart, liEnd;
     QueryPerformanceFrequency(&liFrequency);
     // Get fast spin-loop timings
     dwNumIter = 100000000;
     QueryPerformanceCounter(&liStart);
-    for (i = 0; i < dwNumIter; ++i)
+    for (DWORD i = 0; i < dwNumIter; ++i)
     {
         if (!dwDummy)
             goto process1;
@@ -128,11 +128,11 @@ int ttapi_Init(const _processor_info &pi)
 process1:
     QueryPerformanceCounter(&liEnd);
     // We want 1/25 (40ms) fast spin-loop
-    ttapi_dwFastIter = (dwNumIter * liFrequency.QuadPart) / ((liEnd.QuadPart - liStart.QuadPart) * 25);
+    ttapi_dwFastIter = DWORD((dwNumIter * liFrequency.QuadPart) / ((liEnd.QuadPart - liStart.QuadPart) * 25));
     // Get slow spin-loop timings
     dwNumIter = 10000000;
     QueryPerformanceCounter(&liStart);
-    for (i = 0; i < dwNumIter; ++i)
+    for (DWORD i = 0; i < dwNumIter; ++i)
     {
         if (!dwDummy)
             goto process2;
@@ -141,7 +141,7 @@ process1:
 process2:
     QueryPerformanceCounter(&liEnd);
     // We want 1/2 (500ms) slow spin-loop
-    ttapi_dwSlowIter = (dwNumIter * liFrequency.QuadPart) / ((liEnd.QuadPart - liStart.QuadPart) * 2);
+    ttapi_dwSlowIter = DWORD((dwNumIter * liFrequency.QuadPart) / ((liEnd.QuadPart - liStart.QuadPart) * 2));
     SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
     // Check for override from command line
     char szSearchFor[] = "-max-threads";

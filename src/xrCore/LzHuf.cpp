@@ -32,9 +32,6 @@ char wterr[] = "Can't write.";
 u8 text_buf[N + F];
 int match_position, match_length, lson[N + 1], rson[N + 257], dad[N + 1];
 
-unsigned code, len;
-unsigned tim_size = 0;
-
 unsigned freq[T + 1]; /* frequency table */
 
 int prnt[T + N_CHAR + 1]; /* pointers to parent nodes, except for the */
@@ -531,8 +528,6 @@ void EncodeChar(unsigned c)
         k = prnt[k];
     } while (k != R);
     fs.PutCode(j, i);
-    code = i;
-    len = j;
     update(c);
 }
 
@@ -588,7 +583,7 @@ int DecodePosition(void)
 /* compression */
 void Encode(void) /* compression */
 {
-    int i, c, len, r, s, last_match_length;
+    int i, c, r, s, last_match_length;
 
     textsize = fs.InputSize();
     fs.Init_Output(textsize);
@@ -605,8 +600,12 @@ void Encode(void) /* compression */
     r = N - F;
     for (i = s; i < r; i++)
         text_buf[i] = 0x20;
-    for (len = 0; len < F && (c = fs._getb()) != EOF; len++)
+    int len = 0;
+    while (len < F && (c = fs._getb()) != EOF)
+    {
         text_buf[r + len] = (unsigned char)c;
+        len++;
+    }
     textsize = len;
     for (i = 1; i <= F; i++)
         InsertNode(r - i);
@@ -648,7 +647,6 @@ void Encode(void) /* compression */
         }
     } while (len > 0);
     fs.PutFlush();
-    tim_size = textsize;
 }
 
 void Decode(void) /* recover */
@@ -692,7 +690,6 @@ void Decode(void) /* recover */
             }
         }
     }
-    tim_size = count;
 }
 
 unsigned _writeLZ(int hf, void* d, unsigned size)

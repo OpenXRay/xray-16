@@ -4,9 +4,12 @@ Copyright (c) 1997-2000 John Robbins -- All rights reserved.
 ----------------------------------------------------------------------*/
 
 #include "stdafx.h"
+#pragma warning(push)
+#pragma warning(disable:4091) // 'typedef ': ignored on left of '' when no variable is declared
 #include "StackTrace.h"
 #include "SymbolEngine.h"
 #include "MiniDump.h"
+#pragma warning(pop)
 #include <psapi.h>
 #pragma comment(lib, "psapi.lib")
 

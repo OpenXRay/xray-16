@@ -71,7 +71,7 @@ __declspec(noinline) void save_stack_trace()
     size_t frameCount = StackTrace.Count-skipFrames;
     size_t totalSize = 0;
     auto lengths = (size_t *)_alloca(frameCount*sizeof(size_t));
-    for (int i = 0; i<frameCount; i++)
+    for (size_t i = 0; i<frameCount; i++)
     {
         lengths[i] = strlen(StackTrace[i+skipFrames]);
         totalSize += lengths[i]+1;
@@ -79,7 +79,7 @@ __declspec(noinline) void save_stack_trace()
     char *stackTrace = (char *)malloc(totalSize);
     {
         char *ptr = stackTrace;
-        for (int i = 0; i<frameCount; i++)
+        for (size_t i = 0; i<frameCount; i++)
         {
             memcpy(ptr, StackTrace[i], lengths[i]);
             ptr += lengths[i];

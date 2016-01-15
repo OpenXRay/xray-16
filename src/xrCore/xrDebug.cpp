@@ -443,7 +443,7 @@ void xrDebug::FormatLastError(char *buffer, const size_t &bufferSize)
         0,
         nullptr);
     // XXX nitrocaster: check buffer overflow
-    sprintf(buffer, "[error][%8d]: %s", lastErr, msg);
+    sprintf(buffer, "[error][%8d]: %s", lastErr, (char *)msg);
     LocalFree(msg);
 }
 
