@@ -59,7 +59,9 @@ TEMPLATE_SPECIALIZATION
 inline void CBinaryHeap::decrease_opened(Vertex &vertex, const Distance value)
 {
     VERIFY(!is_opened_empty());
-    for (Vertex **i = m_heap_head; *i!=&vertex; i++);
+    Vertex **i = m_heap_head;
+    while (*i!=&vertex)
+        i++;
     std::push_heap(m_heap_head, i+1, VertexPredicate());
 }
 

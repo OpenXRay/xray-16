@@ -520,8 +520,8 @@ void CPHMovementControl::PathNearestPoint(const xr_vector<DetailPathManager::STr
 
 	Fvector path_point,vtemp;
 	float temp;
-
-	for(int i=0;i<m_path_size-1;++i)
+    int i;
+	for(i=0;i<m_path_size-1;++i)
 	{
 		const Fvector &first=path[i].position, &second=path[i+1].position;
 		from_first.sub(new_position,first);
@@ -612,8 +612,8 @@ void CPHMovementControl::PathNearestPointFindUp(const xr_vector<DetailPathManage
 	Fvector path_point,vtemp;
 	float temp;
 	dir.set		(0,0,1);
-
-	for(int i=m_start_index;i<m_path_size-1;++i)
+    int i;
+	for(i=m_start_index;i<m_path_size-1;++i)
 	{
 		const Fvector &first=path[i].position, &second=path[i+1].position;
 		from_first.sub(new_position,first);
@@ -701,7 +701,8 @@ void CPHMovementControl::PathNearestPointFindDown(const xr_vector<DetailPathMana
 	float temp;
 	//(going down)
 	dir.set(0,0,1);
-	for(int i=m_start_index;i>1;--i)
+    int i;
+	for(i=m_start_index;i>1;--i)
 	{
 		const Fvector &first=path[i-1].position, &second=path[i].position;
 		from_first.sub(new_position,first);

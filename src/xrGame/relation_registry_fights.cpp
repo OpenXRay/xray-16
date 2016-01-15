@@ -27,7 +27,8 @@ void RELATION_REGISTRY::FightRegister (u16 attacker, u16 defender, ALife::ERelat
 	UpdateFightRegister();
 
 	FIGHT_VECTOR& fights = fight_registry();
-	for(FIGHT_VECTOR_IT it = fights.begin(); it != fights.end(); it++)
+    FIGHT_VECTOR_IT it;
+	for(it = fights.begin(); it != fights.end(); it++)
 	{
 		FIGHT_DATA& fight_data = *it;
 		if(attacker == fight_data.attacker && defender == fight_data.defender)

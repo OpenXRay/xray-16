@@ -825,7 +825,7 @@ void CInventory::UpdateDropTasks()
 			UpdateDropItem		(itm);
 	}
 
-	for(i = 0; i < 2; ++i)	
+	for(u16 i = 0; i < 2; ++i)	
 	{
 		TIItemContainer &list			= i?m_ruck:m_belt;
 		TIItemContainer::iterator it	= list.begin();
@@ -1197,8 +1197,8 @@ bool CInventory::CanTakeItem(CInventoryItem *inventory_item) const
 	if (inventory_item->object().getDestroy()) return false;
 
 	if(!inventory_item->CanTake()) return false;
-
-	for(TIItemContainer::const_iterator it = m_all.begin(); it != m_all.end(); it++)
+    TIItemContainer::const_iterator it;
+	for(it = m_all.begin(); it != m_all.end(); it++)
 		if((*it)->object().ID() == inventory_item->object().ID()) break;
 	VERIFY3(it == m_all.end(), "item already exists in inventory",*inventory_item->object().cName());
 

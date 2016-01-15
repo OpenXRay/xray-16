@@ -1562,7 +1562,7 @@ void	CActor::OnRender_Network()
 		};
 
 		//drawing speed vectors
-		for (i=0; i<2; i++)
+		for (int i=0; i<2; i++)
 		{
 			c = float(i);
 			for (u32 k=0; k<3; k++)

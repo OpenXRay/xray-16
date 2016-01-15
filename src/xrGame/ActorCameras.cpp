@@ -254,7 +254,8 @@ void	CActor::cam_Lookout	( const Fmatrix &xform, float camera_height )
 					da			= PI/1000.f;
 					if (!fis_zero(r_torso.roll))
 						da		*= r_torso.roll/_abs(r_torso.roll);
-					for (float angle=0.f; _abs(angle)<_abs(alpha); angle+=da)
+                    float angle;
+					for (angle=0.f; _abs(angle)<_abs(alpha); angle+=da)
 					{
 						Fvector				pt;
 						calc_gl_point( pt, xform, radius, angle );

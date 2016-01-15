@@ -749,7 +749,8 @@ void LevelGraphDebugRender::DrawCovers()
         CLevelGraph::CVertex *v = levelGraph->vertex(coverPoint->level_vertex_id());
         Fvector dir;
         float bestValue = -1;
-        for (u32 i = 0, j = 0; i<36; ++i)
+        u32 j = 0;
+        for (u32 i = 0; i<36; ++i)
         {
             float value = levelGraph->high_cover_in_direction(float(10*i)/180*PI, v);
             dir.setHP(float(10*i)/180*PI, 0);
@@ -785,7 +786,8 @@ void LevelGraphDebugRender::DrawCovers()
         debugRenderer.draw_aabb(pos, halfSize-0.01f, 1.f, halfSize-0.01f, color_xrgb(0, 255, 0));
         v = levelGraph->vertex(coverPoint->level_vertex_id());
         bestValue = -1;
-        for (u32 i = 0, j = 0; i<36; ++i)
+        j = 0;
+        for (u32 i = 0; i<36; ++i)
         {
             float value = levelGraph->low_cover_in_direction(float(10*i)/180*PI, v);
             dir.setHP(float(10*i)/180.f*PI, 0);

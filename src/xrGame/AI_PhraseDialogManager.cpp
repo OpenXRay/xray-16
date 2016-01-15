@@ -59,7 +59,7 @@ void CAI_PhraseDialogManager::AnswerPhrase (DIALOG_SHARED_PTR& phrase_dialog)
 			}
 		}
 
-		for(i=0; i<phrase_dialog->PhraseList().size(); i++)
+		for(u32 i=0; i<phrase_dialog->PhraseList().size(); i++)
 		{
 			if(phrase_goodwill == phrase_dialog->PhraseList()[phrase_num]->GoodwillLevel())
 				phrases.push_back(i);

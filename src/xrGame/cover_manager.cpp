@@ -89,7 +89,8 @@ void CCoverManager::compute_static_cover	()
 	m_temp.resize			(ai().level_graph().header().vertex_count());
 
 	CLevelGraph const		&graph = ai().level_graph();
-	for (u32 i=0, n = ai().level_graph().header().vertex_count(); i<n; ++i) {
+    u32 levelVertexCount = ai().level_graph().header().vertex_count();
+	for (u32 i=0; i<levelVertexCount; ++i) {
 		CLevelGraph::CVertex const &vertex = *graph.vertex(i);
 		if (vertex.high_cover(0) + vertex.high_cover(1) + vertex.high_cover(2) + vertex.high_cover(3)) {
 			m_temp[i]		= edge_vertex(i);
@@ -104,7 +105,7 @@ void CCoverManager::compute_static_cover	()
 		m_temp[i]			= false;
 	}
 
-	for (u32 i=0; i<n; ++i)
+	for (u32 i=0; i<levelVertexCount; ++i)
 		if (m_temp[i] && critical_cover(i))
 			m_covers->insert(xr_new<CCoverPoint>(ai().level_graph().vertex_position(ai().level_graph().vertex(i)),i));
 

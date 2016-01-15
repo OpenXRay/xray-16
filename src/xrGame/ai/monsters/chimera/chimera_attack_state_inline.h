@@ -185,10 +185,8 @@ bool   ChimeraAttackState<Object>::select_target_for_move ()
 
 		float	const	move_scan_points	=	8;
 		float	const	move_scan_angle		=	deg2rad(360.f) / move_scan_points;
-
-		for (			u32	index			=	0; 
-							index			<	move_scan_points; 
-						  ++index	)
+        u32	index = 0;
+        for (; index<move_scan_points; index++)
 		{
 			float	const	angle			=	move_scan_angle * 
 												(index+1) * 
