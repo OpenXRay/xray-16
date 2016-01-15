@@ -1256,18 +1256,6 @@ void CScriptEngine::on_error(lua_State *state)
 #endif
 }
 
-#ifdef DEBUG
-
-static void strreplaceall(xr_string &str, LPCSTR what, LPCSTR to)
-{
-    LPCSTR A;
-    int S_len = xr_strlen(what);
-    while (A = strstr(str.c_str(), what), A)
-        str.replace(A-str.c_str(), S_len, to);
-}
-
-#endif
-
 CScriptProcess *CScriptEngine::CreateScriptProcess(shared_str name, shared_str scripts)
 { return new CScriptProcess(this, name, scripts); }
 
