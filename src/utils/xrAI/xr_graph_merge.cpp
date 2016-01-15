@@ -194,7 +194,9 @@ public:
 			IReader									*F = FS.r_open(fName);
 			u32										id;
 			IReader									*O = F->open_chunk_iterator(id);
-			for (int i=0; O; O = F->open_chunk_iterator(id,O))	{
+            int vertexId = 0;
+            for (; O; O = F->open_chunk_iterator(id, O))
+            {
 				NET_Packet							P;
 				P.B.count							= O->length();
 				O->r								(P.B.data,P.B.count);
@@ -233,9 +235,9 @@ public:
 						S								= xr_strdup(tpGraphPoint->name_replace());
 						T.caConnectName					= xr_strdup(*tpGraphPoint->m_caConnectionPointName);
 						T.dwLevelID						= dwfGetIDByLevelName(Ini,*tpGraphPoint->m_caConnectionLevelName);
-//						T.tGraphID						= (GameGraph::_GRAPH_ID)i;
+//						T.tGraphID						= (GameGraph::_GRAPH_ID)vertexId;
 //						T.tOldGraphID					= tGraphID;
-						T.tOldGraphID					= (GameGraph::_GRAPH_ID)i;
+						T.tOldGraphID					= (GameGraph::_GRAPH_ID)vertexId;
 						T.tGraphID						= tGraphID;
 
 						bool							ok = true;
@@ -250,14 +252,15 @@ public:
 
 						if (ok) {
 							m_tVertexMap.insert			(mk_pair(S,T));
-							i++;
+                            vertexId++;
 						}
 					}
 				}
 				F_entity_Destroy					(E);
 			}
-			if (i != m_tpGraph->header().vertex_count())
-				Msg									("Graph for the level %s doesn't correspond to the graph points from Level Editor! (%d : %d)",*m_tLevel.name(),i,m_tpGraph->header().vertex_count());
+			if (vertexId!=m_tpGraph->header().vertex_count())
+				Msg("Graph for the level %s doesn't correspond to the graph points from Level Editor! (%d : %d)",
+                    *m_tLevel.name(), vertexId, m_tpGraph->header().vertex_count());
 			
 			VERTEX_MAP::const_iterator				I = m_tVertexMap.begin();
 			VERTEX_MAP::const_iterator				E = m_tVertexMap.end();
@@ -265,7 +268,7 @@ public:
 				R_ASSERT3	(!xr_strlen((*I).second.caConnectName) || ((*I).second.tGraphID < m_tpVertices.size()),"Rebuild graph for the level",*m_tLevel.name());
 			}
 
-//			VERIFY3									(i == m_tpGraph->header().vertex_count(), "Rebuild graph for the level ",m_tLevel.name());
+//			VERIFY3(vertexId==m_tpGraph->header().vertex_count(), "Rebuild graph for the level ",m_tLevel.name());
 			O->close								();
 			FS.r_close								(F);
 		}
