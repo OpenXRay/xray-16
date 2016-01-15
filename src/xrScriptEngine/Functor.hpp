@@ -16,8 +16,8 @@ public:
     template <typename... Args>
     TResult operator()(Args &&...args) const
     {
-        auto self = static_cast<const adl::object *>(this);
-        return call_function<TResult, policy_list<Policies...>>(*self, std::forward<Args>(args)...);
+        auto obj = static_cast<const adl::object *>(this);
+        return call_function<TResult, policy_list<Policies...>>(*obj, std::forward<Args>(args)...);
     }
 };
 
@@ -25,8 +25,8 @@ template <>
 template <typename... Args>
 void functor<void, typename...>::operator()(Args &&...args) const
 {
-    auto self = static_cast<const adl::object *>(this);
-    call_function<void, policy_list<Policies...>>(*self, std::forward<Args>(args)...);
+    auto obj = static_cast<const adl::object *>(this);
+    call_function<void, policy_list<Policies...>>(*obj, std::forward<Args>(args)...);
 }
 
 namespace detail

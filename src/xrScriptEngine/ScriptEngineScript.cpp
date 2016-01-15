@@ -14,8 +14,6 @@
 #include "Include/xrAPI/xrAPI.h"
 #include "ScriptExporter.hpp"
 
-using namespace luabind;
-
 void LuaLog(LPCSTR caMessage)
 {
 #ifndef MASTER_GOLD
@@ -151,6 +149,7 @@ std::ostream& operator<<(std::ostream& os, const profile_timer_script& pt)
 
 SCRIPT_EXPORT(CScriptEngine, (),
 {
+    using namespace luabind;
     module(luaState)
     [
         class_<profile_timer_script>("profile_timer")
