@@ -412,7 +412,7 @@ void CLocatorAPI::LoadArchive(archive& A, LPCSTR entrypoint)
         buffer += sizeof(crc);
 
         u32 name_length = buffer_size - 4 * sizeof(u32);
-        Memory.mem_copy(name, buffer, name_length);
+        memcpy(name, buffer, name_length);
         name[name_length] = 0;
         buffer += buffer_size - 4 * sizeof(u32);
 

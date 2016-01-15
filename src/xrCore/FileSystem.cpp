@@ -134,7 +134,7 @@ bool EFS_Utils::GetOpenNameInternal(LPCSTR initial, LPSTR buffer, int sz_buf, bo
     MakeFilter(flt, P.m_FilterCaption ? P.m_FilterCaption : "", P.m_DefExt);
 
     OPENFILENAME ofn;
-    Memory.mem_fill(&ofn, 0, sizeof(ofn));
+    memset(&ofn, 0, sizeof(ofn));
 
     if (xr_strlen(buffer))
     {
@@ -239,7 +239,7 @@ bool EFS_Utils::GetSaveName(LPCSTR initial, string_path& buffer, LPCSTR offset, 
 
     MakeFilter(flt, P.m_FilterCaption ? P.m_FilterCaption : "", def_ext);
     OPENFILENAME ofn;
-    Memory.mem_fill(&ofn, 0, sizeof(ofn));
+    memset(&ofn, 0, sizeof(ofn));
     if (xr_strlen(buffer))
     {
         string_path dr;

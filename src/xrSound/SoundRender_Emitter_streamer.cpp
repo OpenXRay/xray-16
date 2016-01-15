@@ -14,7 +14,7 @@ void	CSoundRender_Emitter::fill_data(u8* _dest, u32 offset, u32 size)
 	return;
 //*/
 /*
-	Memory.mem_fill	(_dest,0,size);	// debug only
+	memset	(_dest,0,size);	// debug only
 	//	Msg			("stream: %10s - %d",*source->fname,size);
 	int				dummy;
 	ov_pcm_seek		(source->ovf,(psSoundFreq==sf_22K)?offset:offset/2);
@@ -88,7 +88,7 @@ void	CSoundRender_Emitter::fill_block	(void* ptr, u32 size)
 				if(get_cursor(true) >= dwBytesTotal)
 				{
 					// ??? We requested the block after remainder - just zero
-					Memory.mem_fill	(dest,0,size);
+					memset	(dest,0,size);
 				}else 
 				{
 					// Calculate remainder
@@ -96,7 +96,7 @@ void	CSoundRender_Emitter::fill_block	(void* ptr, u32 size)
 					u32 sz_zero		= (get_cursor(true)+size) - dwBytesTotal;
 					VERIFY			(size == (sz_data+sz_zero));
 					fill_data		(dest,get_cursor(false),sz_data);
-					Memory.mem_fill	(dest+sz_data,0,sz_zero);
+					memset	(dest+sz_data,0,sz_zero);
 				}
 				move_cursor					(size);
 			}

@@ -246,7 +246,7 @@ bool manager::save_current_blend(char* buffer, u32 const& buffer_size)
 
     writer.w_u8(0);
     writer.seek(0);
-    Memory.mem_copy(buffer, writer.pointer(), writer.size());
+    memcpy(buffer, writer.pointer(), writer.size());
     return (true);
 }
 

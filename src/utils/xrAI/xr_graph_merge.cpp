@@ -141,7 +141,7 @@ public:
 			(*I).tGlobalPoint.add	(m_tpGraph->vertex(int(I - B))->game_point(),m_tLevel.offset());
 			(*I).tLevelID			= dwLevelID;
 			(*I).tNodeID			= m_tpGraph->vertex(int(I - B))->level_vertex_id();
-			Memory.mem_copy			((*I).tVertexTypes,m_tpGraph->vertex(int(I - B))->vertex_type(),GameGraph::LOCATION_TYPE_COUNT*sizeof(GameGraph::_LOCATION_ID));
+			memcpy			((*I).tVertexTypes,m_tpGraph->vertex(int(I - B))->vertex_type(),GameGraph::LOCATION_TYPE_COUNT*sizeof(GameGraph::_LOCATION_ID));
 			(*I).tNeighbourCount	= m_tpGraph->vertex(int(I - B))->edge_count();
 			CGameGraph::const_iterator	b,i,e;
 			m_tpGraph->begin		(int(I - B),i,e);
@@ -302,7 +302,7 @@ public:
 			tVertex.tLocalPoint		= (*I).tLocalPoint;
 			tVertex.tGlobalPoint	= (*I).tGlobalPoint;
 			tVertex.tNodeID			= (*I).tNodeID;
-			Memory.mem_copy			(tVertex.tVertexTypes,(*I).tVertexTypes,GameGraph::LOCATION_TYPE_COUNT*sizeof(GameGraph::_LOCATION_ID));
+			memcpy			(tVertex.tVertexTypes,(*I).tVertexTypes,GameGraph::LOCATION_TYPE_COUNT*sizeof(GameGraph::_LOCATION_ID));
 			tVertex.tLevelID		= (*I).tLevelID;
 			tVertex.dwEdgeOffset	= dwOffset;
 			tVertex.dwPointOffset	= dwPointOffset;

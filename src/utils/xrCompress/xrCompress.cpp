@@ -165,7 +165,7 @@ void xrCompressor::write_file_header(LPCSTR file_name, const u32 &crc, const u32
 	*(u32*)buffer		= crc;
 	buffer				+= sizeof(u32);
 
-	Memory.mem_copy		(buffer,file_name,file_name_size);
+	memcpy		(buffer,file_name,file_name_size);
 	buffer				+= file_name_size;
 
 	*(u32*)buffer		= ptr;

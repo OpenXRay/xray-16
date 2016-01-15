@@ -40,7 +40,7 @@ void recalculation::setup_recalculationflags_file( u32 check_sum )
 	//u32 buff_size = dtH.slot_index( dtH.x_size(), dtH.z_size() ) * sizeof( slots_flags[0] );
 	u32 buff_size = dtH.slot_count( ) * sizeof( slots_flags[0] );
 	void* buff = _alloca( buff_size );
-	Memory.mem_fill( buff, 0, buff_size );
+	memset( buff, 0, buff_size );
 	W->w_chunk( 1, buff, buff_size );
 	FS.w_close( W );
 }

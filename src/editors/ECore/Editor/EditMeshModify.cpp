@@ -299,7 +299,7 @@ void CEditableMesh::OptimizeMesh(BOOL NoOpt)
         m_VertCount = m_NewPoints.size();
         xr_free(m_Vertices);
         m_Vertices = xr_alloc<Fvector>(m_VertCount);
-        Memory.mem_copy(m_Vertices, &*m_NewPoints.begin(), m_NewPoints.size()*sizeof(Fvector));
+        memcpy(m_Vertices, &*m_NewPoints.begin(), m_NewPoints.size()*sizeof(Fvector));
 
         if (i_del_face)
         {

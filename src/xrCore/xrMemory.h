@@ -25,7 +25,6 @@ extern XRCORE_API void dump_phase ();
 # define DUMP_PHASE do {} while (0)
 #endif // DEBUG_MEMORY_MANAGER
 
-#include "xrMemory_pso.h"
 #include "xrMemory_POOL.h"
 #include "xrMemory_pure.h"
 
@@ -74,10 +73,6 @@ public:
     void* mem_realloc (void* p, size_t size );
 #endif // DEBUG_MEMORY_NAME
     void mem_free(void* p);
-
-    pso_MemCopy* mem_copy;
-    pso_MemFill* mem_fill;
-    pso_MemFill32* mem_fill32;
 };
 
 extern XRCORE_API xrMemory Memory;
@@ -85,9 +80,9 @@ extern XRCORE_API xrMemory Memory;
 #undef ZeroMemory
 #undef CopyMemory
 #undef FillMemory
-#define ZeroMemory(a,b) Memory.mem_fill(a,0,b)
+#define ZeroMemory(a,b) memset(a,0,b)
 #define CopyMemory(a,b,c) memcpy(a,b,c) //. CopyMemory(a,b,c)
-#define FillMemory(a,b,c) Memory.mem_fill(a,c,b)
+#define FillMemory(a,b,c) memset(a,c,b)
 
 // delete
 #ifdef __BORLANDC__

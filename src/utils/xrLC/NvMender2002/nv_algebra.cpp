@@ -30,12 +30,12 @@ mat3::mat3()
 
 mat3::mat3(const nv_scalar* array)
 {
-    Memory.mem_copy(mat_array, array, sizeof(nv_scalar) * 9);
+    memcpy(mat_array, array, sizeof(nv_scalar) * 9);
 }
 
 mat3::mat3(const mat3 & M)
 {
-    Memory.mem_copy(mat_array, M.mat_array, sizeof(nv_scalar) * 9);
+    memcpy(mat_array, M.mat_array, sizeof(nv_scalar) * 9);
 }
 
 mat4::mat4()
@@ -44,12 +44,12 @@ mat4::mat4()
 
 mat4::mat4(const nv_scalar* array)
 {
-    Memory.mem_copy(mat_array, array, sizeof(nv_scalar) * 16);
+    memcpy(mat_array, array, sizeof(nv_scalar) * 16);
 }
 
 mat4::mat4(const mat4& M)
 {
-    Memory.mem_copy(mat_array, M.mat_array, sizeof(nv_scalar) * 16);
+    memcpy(mat_array, M.mat_array, sizeof(nv_scalar) * 16);
 }
 
 vec3 & cross(vec3 & u, const vec3 & v, const vec3 & w)

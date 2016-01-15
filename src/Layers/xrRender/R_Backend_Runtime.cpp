@@ -54,7 +54,7 @@ void CBackend::OnFrameBegin	()
 		set_RT				(HW.pBaseRT);
 		set_ZB				(HW.pBaseZB);
 #endif	//	USE_DX10
-		Memory.mem_fill		(&stat,0,sizeof(stat));
+		memset		(&stat,0,sizeof(stat));
 		Vertex.Flush		();
 		Index.Flush			();
 		set_Stencil			(FALSE);

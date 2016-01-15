@@ -4422,7 +4422,7 @@ bool XRayMtl::EvalChannel(ShadeContext& sc, int channelID, Color& outClr)
 
 	// Get raw color\value from the shader
 	IllumParams ip(0, NULL);
-	Memory.mem_fill(static_cast<void*>(&ip), 0, sizeof(IllumParams) );
+	memset(static_cast<void*>(&ip), 0, sizeof(IllumParams) );
 	//	ip.mtlFlags = flags;
 	pShad->GetIllumParams( sc, ip );
 

@@ -23,7 +23,7 @@ public:
 
 	CConstant		()
 	{
-		Memory.mem_fill	(this,0,sizeof(CConstant));
+		memset	(this,0,sizeof(CConstant));
 	}
 	IC void			set_float	(float r, float g, float b, float a)
 	{

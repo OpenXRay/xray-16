@@ -236,7 +236,7 @@ void CSoundRender_Core::set_geometry_env(IReader* I)
 	
 	u8*	_data			= (u8*)xr_malloc(geom_ch->length());
 	
-	Memory.mem_copy		(_data, geom_ch->pointer(), geom_ch->length() );
+	memcpy		(_data, geom_ch->pointer(), geom_ch->length() );
 
 	IReader* geom		= xr_new<IReader>(_data, geom_ch->length(), 0);
 	
