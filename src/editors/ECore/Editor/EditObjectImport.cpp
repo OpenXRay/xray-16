@@ -12,7 +12,8 @@
 
 extern "C"
 {
-#include "utils/LWO/lwo2.h" };
+#include "utils/LWO/lwo2.h"
+};
 
 #ifdef _EDITOR
 #include "Layers/xrRender/ResourceManager.h"

@@ -199,22 +199,22 @@ class CSector;
 #endif
 
 class ECORE_API CEditableMesh{
-    friendclass MeshExpUtility;
-    friendclass CEditableObject;
-    friendclass CSectorItem;
-    friendclass CSector;
-    friendclass CPortalUtils;
-    friendclass SceneBuilder;
-    friendclass CExportSkeleton;
-    friendclass CExportObjectOGF;
-    friendclass TfrmEditLibrary;
-    friendclass CExporter;
-    friendclass CXRayObjectExport;
-    friendclass CXRaySkinExport;
+    friend class MeshExpUtility;
+    friend class CEditableObject;
+    friend class CSectorItem;
+    friend class CSector;
+    friend class CPortalUtils;
+    friend class SceneBuilder;
+    friend class CExportSkeleton;
+    friend class CExportObjectOGF;
+    friend class TfrmEditLibrary;
+    friend class CExporter;
+    friend class CXRayObjectExport;
+    friend class CXRaySkinExport;
 
     shared_str m_Name;
 
-    CEditableObject*m_Parent;
+    CEditableObject *m_Parent;
 
     void GenerateCFModel();
     void GenerateRenderBuffers();

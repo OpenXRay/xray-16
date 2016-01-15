@@ -105,7 +105,7 @@ void CObjectOGFCollectorPacked::CalculateTB()
 		NVMeshMender::DontWeightNormalsByFaceSize	// weigh vertex normals by the triangle's size
 		))
 	{
-		Debug.fatal	(DEBUG_INFO,"NVMeshMender failed (%s)",mender.GetLastError().c_str());
+		xrDebug::Fatal	(DEBUG_INFO,"NVMeshMender failed (%s)",mender.GetLastError().c_str());
 	}
 
 	// Bind declarators
@@ -178,8 +178,8 @@ void CObjectOGFCollectorPacked::CalculateTB()
 		)
 	)
 	{
-		Debug.fatal	( DEBUG_INFO, "NVMeshMender failed " );
-		//Debug.fatal	(DEBUG_INFO,"NVMeshMender failed (%s)",mender.GetLastError().c_str());
+		xrDebug::Fatal	( DEBUG_INFO, "NVMeshMender failed " );
+		//xrDebug::Fatal	(DEBUG_INFO,"NVMeshMender failed (%s)",mender.GetLastError().c_str());
 	}
 	
 	retrive_data_from_mender_otput( m_Verts, m_Faces, mender_in_out_verts, mender_in_out_indices, mender_mapping_out_to_in_vert  );

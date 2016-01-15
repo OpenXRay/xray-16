@@ -451,7 +451,7 @@ MStatus CXRayObjectExport::ExportPart(CEditableObject* O, MDagPath& mdagPath, MO
                 // out face material
                 int iTexture    = texMap[meshPoly.index()];
                 if (iTexture<0)
-                    Debug.fatal(DEBUG_INFO,"Can't find material for polygon: %d",meshPoly.index());
+                    xrDebug::Fatal(DEBUG_INFO,"Can't find material for polygon: %d",meshPoly.index());
                 SXRShaderData& D= xr_data[iTexture];
 
                 int compIdx = meshPoly.index();
@@ -521,9 +521,9 @@ LPCSTR CXRayObjectExport::getMaterialName(MDagPath & mdagPath, int cid, int obje
         lastMaterials = currentMaterials;
 
         int mLength = mArray.length(); 
-        if (mLength==0) Debug.fatal(DEBUG_INFO,"Object '%s' has polygon '%d' without material.",0,cid);
+        if (mLength==0) xrDebug::Fatal(DEBUG_INFO,"Object '%s' has polygon '%d' without material.",0,cid);
         if (mLength>1){
-            Debug.fatal(DEBUG_INFO,"Object '%s' has polygon '%d' with more than one material.",0,cid);
+            xrDebug::Fatal(DEBUG_INFO,"Object '%s' has polygon '%d' with more than one material.",0,cid);
         }
     }else{
         xr_delete(currentMaterials);
