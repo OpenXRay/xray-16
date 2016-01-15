@@ -250,7 +250,7 @@ void BindingsDumper::PrintClass()
     size_t baseCount = bases.size();
     if (baseCount)
         Print(" : ");
-    for (u32 i = 0; i<baseCount; i++)
+    for (size_t i = 0; i<baseCount; i++)
     {
         if (i)
             Print(", ");
