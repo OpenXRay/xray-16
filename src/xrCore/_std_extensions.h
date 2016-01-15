@@ -273,8 +273,6 @@ inline int __cdecl xr_sprintf(char(&destination)[count], LPCSTR format_string, .
 }
 #endif // #ifndef MASTER_GOLD
 
-# pragma deprecated( strcpy, strcpy_s, sprintf, sprintf_s, strcat, strcat_s )
-
 template <int count>
 inline int xr_strcpy(char(&destination)[count], LPCSTR source)
 {
