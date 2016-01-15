@@ -3,8 +3,8 @@
 
 struct StackTraceInfo
 {
-    static const int Capacity = 100;
-    static const int LineCapacity = 256;
+    static const size_t Capacity = 100;
+    static const size_t LineCapacity = 256;
     char Frames[Capacity*LineCapacity];
     size_t Count;
 
