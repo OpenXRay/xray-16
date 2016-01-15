@@ -354,7 +354,7 @@ bool AABBNoLeafTree::Build(AABBTree* tree)
 	mExtentsCoeff.y = 1.0f / EQuantCoeff.y;			\
 	mExtentsCoeff.z = 1.0f / EQuantCoeff.z;
 
-#define PERFORM_QUANTIZATION														\
+#define PERFORM_QUANTIZATION(i)\
 	/* Quantize */																	\
 	((float*)mNodes[i].mAABB.mCenter)[0] = sword(Nodes[i].mAABB.mCenter.x * CQuantCoeff.x);	\
 	((float*)mNodes[i].mAABB.mCenter)[1] = sword(Nodes[i].mAABB.mCenter.y * CQuantCoeff.y);	\
@@ -460,9 +460,9 @@ bool AABBQuantizedTree::Build(AABBTree* tree)
 
 		// Quantize
 		uintptr_t Data;
-		for(i=0;i<mNbNodes;i++)
+		for (udword i = 0; i<mNbNodes; i++)
 		{
-			PERFORM_QUANTIZATION
+			PERFORM_QUANTIZATION(i)
 			REMAP_DATA(mData)
 		}
 
@@ -538,9 +538,9 @@ bool AABBQuantizedNoLeafTree::Build(AABBTree* tree)
 
 		// Quantize
 		uintptr_t Data;
-		for(i=0;i<mNbNodes;i++)
+		for(udword i = 0; i<mNbNodes; i++)
 		{
-			PERFORM_QUANTIZATION
+			PERFORM_QUANTIZATION(i)
 			REMAP_DATA(mData)
 			REMAP_DATA(mData2)
 		}

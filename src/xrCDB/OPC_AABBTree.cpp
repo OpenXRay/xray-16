@@ -180,7 +180,7 @@ bool AABBTreeNode::Subdivide(AABBTreeBuilder* builder)
 
 		// Compute variances
 		Point Vars(0.0f, 0.0f, 0.0f);
-		for(i=0;i<mNbPrimitives;i++)
+		for(udword i=0;i<mNbPrimitives;i++)
 		{
 			udword Index = mNodePrimitives[i];
 			float Cx = builder->GetSplittingValue(Index, 0);
