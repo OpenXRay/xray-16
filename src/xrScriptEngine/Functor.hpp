@@ -31,7 +31,7 @@ void functor<void, typename...>::operator()(Args &&...args) const
 
 namespace detail
 {
-template<typename T>
+template <typename T>
 struct type_to_string<functor<T>>
 {
     static void get(lua_State *L)
@@ -44,7 +44,7 @@ struct type_to_string<functor<T>>
 };
 }
 
-template<typename T>
+template <typename T>
 struct default_converter<functor<T>> : native_converter_base<functor<T>>
 {
     static int compute_score(lua_State *luaState, int index)
@@ -61,11 +61,11 @@ struct default_converter<functor<T>> : native_converter_base<functor<T>>
     { value.push(luaState); }
 };
 
-template<typename T>
+template <typename T>
 struct default_converter<const functor<T>> : default_converter<functor<T>>
 {};
 
-template<typename T>
+template <typename T>
 struct default_converter<const functor<T> &> : default_converter<functor<T>>
 {};
 }
