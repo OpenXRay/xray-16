@@ -4,9 +4,11 @@
 #include "xrDebug.h"
 #include "os_clipboard.h"
 #include "Debug/dxerr.h"
+#pragma warning(push)
+#pragma warning(disable:4091) // 'typedef ': ignored on left of '' when no variable is declared
 #include "Debug/StackTrace.h"
 #include "Debug/MiniDump.h"
-
+#pragma warning(pop)
 #include <malloc.h>
 #include <direct.h>
 
@@ -28,8 +30,6 @@ static BOOL bException = FALSE;
 #ifndef USE_BUG_TRAP
 #include <exception>
 #endif
-
-#include <dbghelp.h> // MiniDump flags
 
 #ifdef USE_BUG_TRAP
 #include <BugTrap/source/Client/BugTrap.h>
