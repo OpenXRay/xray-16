@@ -1138,7 +1138,7 @@ void CScriptEngine::parse_script_namespace(const char *name, char *ns, u32 nsSiz
     }
     else
     {
-        VERIFY(p-name+1<=nsSize);
+        VERIFY(u32(p-name+1)<=nsSize);
         strncpy(ns, name, p-name);
         ns[p-name] = 0;
     }

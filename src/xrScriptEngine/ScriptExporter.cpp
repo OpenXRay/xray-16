@@ -29,7 +29,7 @@ void ScriptExporter::Node::Export(lua_State *luaState)
         return;
     }
     // export dependencies recursively
-    for (int i = 0; i<depCount; i++)
+    for (size_t i = 0; i<depCount; i++)
     {
         // check if 'deps[i]' depends on 'node'
         for (Node *n = GetFirst(); n; n = n->GetNext())
@@ -50,12 +50,12 @@ void ScriptExporter::Node::Export(lua_State *luaState)
 
 bool ScriptExporter::Node::HasDependency(const Node *node) const
 {
-    for (int i = 0; i<depCount; i++)
+    for (size_t i = 0; i<depCount; i++)
     {
         if (!strcmp(deps[i], node->id))
             return true;
     }
-    for (int i = 0; i<depCount; i++)
+    for (size_t i = 0; i<depCount; i++)
     {
         // check if 'deps[i]' depends on 'node'
         for (Node *n = GetFirst(); n; n = n->GetNext())
