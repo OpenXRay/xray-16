@@ -655,7 +655,7 @@ void CKinematicsAnimated::IBlend_Startup	()
 #endif
 	}
 	// cycles+fx clear
-	for (i=0; i<MAX_PARTS; i++)
+	for (u32 i=0; i<MAX_PARTS; i++)
 		blend_cycles[i].clear();
 	blend_fx.clear		();
 	ChannelFactorsStartup();

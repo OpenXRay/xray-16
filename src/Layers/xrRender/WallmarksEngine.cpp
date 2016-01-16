@@ -152,7 +152,7 @@ void CWallmarksEngine::RecurseTri(u32 t, Fmatrix &mView, CWallmarksEngine::stati
 		}
 		
 		// recurse
-		for (i=0; i<3; i++)
+		for (u32 i=0; i<3; i++)
 		{
 			u32 adj					= sml_adjacency[3*t+i];
 			if (0xffffffff==adj)	continue;

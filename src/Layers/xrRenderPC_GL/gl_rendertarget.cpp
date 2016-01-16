@@ -766,10 +766,12 @@ CRenderTarget::CRenderTarget		()
 					}
 				}
 			}
-
-			for (int it3=0; it3<TEX_jitter_count-1; it3++)	{
+            int it3 = 0;
+			while (it3<TEX_jitter_count-1)
+            {
 				CHK_GL						(glBindTexture(GL_TEXTURE_2D, t_noise_surf[it3]));
 				CHK_GL						(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, TEX_jitter, TEX_jitter, GL_RGBA, GL_UNSIGNED_BYTE, tempData[it3]));
+                it3++;
 			}
 
 			float tempDataHBAO[TEX_jitter*TEX_jitter * 4];

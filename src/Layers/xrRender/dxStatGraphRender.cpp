@@ -172,7 +172,7 @@ void dxStatGraphRender::RenderBack(CStatGraph &owner)
 		pv->set				(owner.rb.x,int(base_y+g_y*owner.grid_step.y*elem_factor),owner.grid_color); pv++;
 	};
 
-	for (g_y=1; g_y<=Num_H_LinesUp; g_y++)
+	for (int g_y=1; g_y<=Num_H_LinesUp; g_y++)
 	{									
 		pv->set				(owner.lt.x,int(base_y-g_y*owner.grid_step.y*elem_factor),owner.grid_color); pv++; 	
 		pv->set				(owner.rb.x,int(base_y-g_y*owner.grid_step.y*elem_factor),owner.grid_color); pv++; 	

@@ -607,7 +607,7 @@ void CKinematics::AddWallmark(const Fmatrix* parent_xform, const Fvector3& start
     test_sphere.set			(cp,size); 
 	U16Vec					test_bones;
 	test_bones.reserve		(LL_BoneCount());
-	for (k=0; k<LL_BoneCount(); k++){
+	for (u16 k=0; k<LL_BoneCount(); k++){
 		CBoneData& BD		= LL_GetData(k);  
 		if (LL_GetBoneVisible(k)&&!BD.shape.flags.is(SBoneShape::sfNoPickable)){
 			Fobb& obb		= cache_obb[k];
