@@ -37,7 +37,7 @@ bool CEditableObject::ExportLWO(LPCSTR fname)
 			F->close_chunk	();
 		}
 		// surfaces
-		for (s_it=m_Surfaces.begin(); s_it!=m_Surfaces.end(); s_it++){
+		for (SurfaceIt s_it=m_Surfaces.begin(); s_it!=m_Surfaces.end(); s_it++){
 			CSurface* S=*s_it;
 			int im_idx=FindLPCSTR(images,S->_Texture());
 			R_ASSERT(im_idx>=0);
