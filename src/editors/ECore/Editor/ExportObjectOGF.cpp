@@ -569,7 +569,7 @@ bool CExportObjectOGF::ExportAsWavefrontOBJ(IWriter &F, LPCSTR fn)
     F.w_string(tmp);
 
     u32 v_offs = 0;
-    for (split_it = m_Splits.begin(); split_it!=m_Splits.end(); ++split_it)
+    for (SplitIt split_it = m_Splits.begin(); split_it!=m_Splits.end(); ++split_it)
     {
         _splitpath((*split_it)->m_Surf->_Texture(), 0, 0, tex_name, 0);
         sprintf(tmp, "g %d", split_it-m_Splits.begin());

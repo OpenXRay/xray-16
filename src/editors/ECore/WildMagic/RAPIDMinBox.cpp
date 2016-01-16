@@ -241,7 +241,7 @@ BOOL RAPIDMinBox(Fobb& B, Fvector* vertices, u32 v_count)
     B.m_rotate.MTxV		(c,vertices[0]);
     minval.set			(c);
     maxval.set			(c);
-	for(i=0; i<v_count; i++){
+	for(u32 i=0; i<v_count; i++){
 	    B.m_rotate.MTxV	(c,vertices[i]);
 		minmax			(minval.x, maxval.x, c.x);
 		minmax			(minval.y, maxval.y, c.y);

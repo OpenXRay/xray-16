@@ -284,7 +284,7 @@ bool CEditableObject::Load(IReader& F)
 
 // surfaces xrlc part
 			if(F.find_chunk(EOBJ_CHUNK_SURFACES_XRLC))
-				for (s_it=m_Surfaces.begin(); s_it!=m_Surfaces.end(); s_it++){
+				for (SurfaceIt s_it = m_Surfaces.begin(); s_it!=m_Surfaces.end(); s_it++){
 					F.r_stringZ(buf); (*s_it)->SetShaderXRLC(buf.c_str());
 				}
 		}
