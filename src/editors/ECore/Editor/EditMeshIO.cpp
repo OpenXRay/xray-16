@@ -8,22 +8,22 @@
 #include "EditMesh.h"
 #include "EditObject.h"
 
-#define EMESH_CURRENT_VERSION	      	0x0011
+#define EMESH_CURRENT_VERSION           0x0011
 //----------------------------------------------------
-#define EMESH_CHUNK_VERSION	        	0x1000
-#define EMESH_CHUNK_MESHNAME        	0x1001
-#define EMESH_CHUNK_FLAGS	        	0x1002
-#define EMESH_CHUNK_NOT_USED_0        	0x1003
-#define EMESH_CHUNK_BBOX	        	0x1004
-#define EMESH_CHUNK_VERTS	        	0x1005
-#define EMESH_CHUNK_FACES	        	0x1006
-#define EMESH_CHUNK_VMAPS_0	        	0x1007
-#define EMESH_CHUNK_VMREFS	        	0x1008
-#define EMESH_CHUNK_SFACE				0x1009
-#define EMESH_CHUNK_BOP					0x1010
-#define EMESH_CHUNK_VMAPS_1		       	0x1011
-#define EMESH_CHUNK_VMAPS_2		       	0x1012
-#define EMESH_CHUNK_SG			       	0x1013
+#define EMESH_CHUNK_VERSION             0x1000
+#define EMESH_CHUNK_MESHNAME            0x1001
+#define EMESH_CHUNK_FLAGS               0x1002
+#define EMESH_CHUNK_NOT_USED_0          0x1003
+#define EMESH_CHUNK_BBOX                0x1004
+#define EMESH_CHUNK_VERTS               0x1005
+#define EMESH_CHUNK_FACES               0x1006
+#define EMESH_CHUNK_VMAPS_0             0x1007
+#define EMESH_CHUNK_VMREFS              0x1008
+#define EMESH_CHUNK_SFACE               0x1009
+#define EMESH_CHUNK_BOP                 0x1010
+#define EMESH_CHUNK_VMAPS_1             0x1011
+#define EMESH_CHUNK_VMAPS_2             0x1012
+#define EMESH_CHUNK_SG                  0x1013
 
 void CEditableMesh::SaveMesh(IWriter &F)
 {
@@ -135,7 +135,7 @@ bool CEditableMesh::LoadMesh(IReader &F)
     F.r(m_Faces, m_FaceCount*sizeof(st_Face));
 
     m_SmoothGroups = xr_alloc<u32>(m_FaceCount);
-    memset(m_SmoothGroups, m_Flags.is(flSGMask) ? 0 : u32(-1), m_FaceCount);
+    MemFill32(m_SmoothGroups, m_Flags.is(flSGMask) ? 0 : u32(-1), m_FaceCount);
     u32 sg_chunk_size = F.find_chunk(EMESH_CHUNK_SG);
     if (sg_chunk_size)
     {
@@ -226,17 +226,17 @@ bool CEditableMesh::LoadMesh(IReader &F)
 #ifdef _EDITOR
     if (!EPrefs->object_flags.is(epoDeffLoadRB))
     {
-        GenerateFNormals	();
-        GenerateAdjacency	();
-	    GenerateVNormals	(0);
-		GenerateRenderBuffers();
-        UnloadFNormals		();
-        UnloadAdjacency		();
-	    UnloadVNormals		();
+        GenerateFNormals    ();
+        GenerateAdjacency   ();
+        GenerateVNormals    (0);
+        GenerateRenderBuffers();
+        UnloadFNormals      ();
+        UnloadAdjacency     ();
+        UnloadVNormals      ();
     }
     
     if (!EPrefs->object_flags.is(epoDeffLoadCF)) 
-    	GenerateCFModel();       
+        GenerateCFModel();       
 #endif
     OptimizeMesh(false);
     RebuildVMaps();
