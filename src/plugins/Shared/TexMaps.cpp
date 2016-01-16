@@ -217,7 +217,7 @@ IOResult Texmaps::Save(ISave *isave) {
 	isave->Write(&f,sizeof(f),&nb);			
 	isave->EndChunk();
 
-	for ( i=0; i<STD2_NMAX_TEXMAPS; i++) {
+	for (int i=0; i<STD2_NMAX_TEXMAPS; i++) {
 		if (txmap[i].amount!=1.0f) {
 			isave->BeginChunk(TEX_AMT0+i);
 			isave->Write(&txmap[i].amount,sizeof(float),&nb);			
