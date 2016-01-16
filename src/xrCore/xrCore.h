@@ -27,56 +27,20 @@
 # define BENCH_SEC_SCRAMBLEMEMBER2
 #endif // BENCHMARK_BUILD
 
-#pragma warning(disable:4996)
-
-#if (defined(_DEBUG) || defined(MIXED) || defined(DEBUG)) && !defined(FORCE_NO_EXCEPTIONS)
-// "debug" or "mixed"
 #if !defined(_CPPUNWIND)
 #error Please enable exceptions...
 #endif
-#define _HAS_EXCEPTIONS 1 // STL
-#define XRAY_EXCEPTIONS 1 // XRAY
-#else
-// "release"
-#if defined(_CPPUNWIND) && !defined __BORLANDC__
-#error Please disable exceptions...
-#endif
-#define _HAS_EXCEPTIONS 1 // STL
-#define XRAY_EXCEPTIONS 0 // XRAY
-#define LUABIND_NO_EXCEPTIONS
-#pragma warning(disable:4530)
-#endif
-
-#if !defined(_MT)
-// multithreading disabled
+#ifndef _MT
 #error Please enable multi-threaded library...
 #endif
-
-# include "Platform.h"
-
-/*
-// stl-config
-// *** disable exceptions for both STLport and VC7.1 STL
-// #define _STLP_NO_EXCEPTIONS 1
-// #if XRAY_EXCEPTIONS
-#define _HAS_EXCEPTIONS 1 // force STL again
-// #endif
-*/
-
-// *** try to minimize code bloat of STLport
-// XXX: delete this
-#ifdef __BORLANDC__
+#ifdef NDEBUG
+#define XRAY_EXCEPTIONS 0
+#define LUABIND_NO_EXCEPTIONS
 #else
-#ifdef XRCORE_EXPORTS // no exceptions, export allocator and common stuff
-#define _STLP_DESIGNATED_DLL 1
-#define _STLP_USE_DECLSPEC 1
-#else
-#define _STLP_USE_DECLSPEC 1 // no exceptions, import allocator and common stuff
-#endif
+#define XRAY_EXCEPTIONS 1
 #endif
 
-
-// using std::exception;
+#include "Platform.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -85,13 +49,11 @@
 #include <string.h>
 #include <typeinfo.h>
 
-#ifndef DEBUG
 #ifdef _DEBUG
 #define DEBUG
 #endif
 #ifdef MIXED
 #define DEBUG
-#endif
 #endif
 
 #ifndef DEBUG
