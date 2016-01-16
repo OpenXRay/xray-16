@@ -331,7 +331,7 @@ void CRender::LoadSectors(IReader* fs)
 	{
 		CDB::Collector	CL;
 		fs->find_chunk	(fsL_PORTALS);
-		for (i=0; i<count; i++)
+		for (u32 i=0; i<count; i++)
 		{
 			b_portal	P;
 			fs->r		(&P,sizeof(P));
