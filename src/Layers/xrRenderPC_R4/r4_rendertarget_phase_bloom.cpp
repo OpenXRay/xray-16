@@ -40,8 +40,8 @@ void	CalcGauss_k7(
 	// calculate
 	float mag					=	0;
 	for (int i=-7; i<=0; i++)	W[-i]	=	expf	(-float(i*i)/(2*r*r));	// weight
-	for (i=0; i<8; i++)	mag		+= i?2*W[i]:W[i];							// symmetrical weight
-	for (i=0; i<8; i++)	W[i]	= s_out*W[i]/mag;
+	for (int i=0; i<8; i++)	mag		+= i?2*W[i]:W[i];							// symmetrical weight
+	for (int i=0; i<8; i++)	W[i]	= s_out*W[i]/mag;
 
 	// W[0]=0, W[7]=-7
 	w0.set	(W[1],W[2],W[3],W[4]);		// -1, -2, -3, -4
