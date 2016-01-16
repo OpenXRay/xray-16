@@ -2,60 +2,111 @@
 #define xrDebug_macrosH
 #pragma once
 
-//#define ANONYMOUS_BUILD
+#define DEBUG_INFO {__FILE__, __LINE__, __FUNCTION__}
 
-#ifndef __BORLANDC__
-# ifndef ANONYMOUS_BUILD
-# define DEBUG_INFO __FILE__,__LINE__,__FUNCTION__
-# else // ANONYMOUS_BUILD
-# define DEBUG_INFO "",__LINE__,""
-# endif // ANONYMOUS_BUILD
-#else // __BORLANDC__
-# define DEBUG_INFO __FILE__,__LINE__,__FILE__
-#endif // __BORLANDC__
+#define CHECK_OR_EXIT(expr, message)\
+    do {\
+        if (!(expr))\
+            xrDebug::DoExit(message);\
+    } while (false)
+#define R_ASSERT(expr)\
+    do {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr);\
+    } while (false)
+#define R_ASSERT2(expr, desc)\
+    do {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc);\
+    } while (false)
+#define R_ASSERT3(expr, desc, arg1)\
+    do {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc, arg1);\
+    } while (false)
+#define R_ASSERT4(expr, desc, arg1, arg2)\
+    do {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc, arg1, arg2);\
+    } while (false)
+#define R_CHK(expr)\
+    do {\
+        static bool ignoreAlways = false;\
+        HRESULT hr = expr;\
+        if (!ignoreAlways && FAILED(hr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, hr);\
+    } while (false)
+#define R_CHK2(expr, arg1)\
+    do {\
+        static bool ignoreAlways = false;\
+        HRESULT hr = expr;\
+        if (!ignoreAlways && FAILED(hr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, hr, arg1);\
+    } while (false)
+#define FATAL(desc) xrDebug::Fatal(DEBUG_INFO, "%s", desc)
 
-#ifdef ANONYMOUS_BUILD
- #define _TRE(arg) ""
-#else
- #define _TRE(arg) arg
+#ifdef VERIFY
+#undef VERIFY
 #endif
 
-
-# define CHECK_OR_EXIT(expr,message) do {if (!(expr)) xrDebug::DoExit(message);} while (0)
-
-# define R_ASSERT(expr) do {static bool ignore_always = false; if (!ignore_always && !(expr)) xrDebug::Fail(_TRE(#expr),DEBUG_INFO,ignore_always);} while(0)
-# define R_ASSERT2(expr,e2) do {static bool ignore_always = false; if (!ignore_always && !(expr)) xrDebug::Fail(_TRE(#expr),_TRE(e2),DEBUG_INFO,ignore_always);} while(0)
-# define R_ASSERT3(expr,e2,e3) do {static bool ignore_always = false; if (!ignore_always && !(expr)) xrDebug::Fail(_TRE(#expr),_TRE(e2),_TRE(e3),DEBUG_INFO,ignore_always);} while(0)
-# define R_ASSERT4(expr,e2,e3,e4) do {static bool ignore_always = false; if (!ignore_always && !(expr)) xrDebug::Fail(_TRE(#expr),_TRE(e2),_TRE(e3),_TRE(e4),DEBUG_INFO,ignore_always);} while(0)
-# define R_CHK(expr) do {static bool ignore_always = false; HRESULT hr = expr; if (!ignore_always && FAILED(hr)) xrDebug::Error(hr,_TRE(#expr),DEBUG_INFO,ignore_always);} while(0)
-# define R_CHK2(expr,e2) do {static bool ignore_always = false; HRESULT hr = expr; if (!ignore_always && FAILED(hr)) xrDebug::Error(hr,_TRE(#expr),_TRE(e2),DEBUG_INFO,ignore_always);} while(0)
-# define FATAL(description) xrDebug::Fatal(DEBUG_INFO,description)
-
-# ifdef VERIFY
-# undef VERIFY
-# endif // VERIFY
-
-# ifdef DEBUG
-# define NODEFAULT FATAL("nodefault reached")
-# define VERIFY(expr) do {static bool ignore_always = false; if (!ignore_always && !(expr)) xrDebug::Fail(#expr,DEBUG_INFO,ignore_always);} while(0)
-# define VERIFY2(expr,e2) do {static bool ignore_always = false; if (!ignore_always && !(expr)) xrDebug::Fail(#expr,e2,DEBUG_INFO,ignore_always);} while(0)
-# define VERIFY3(expr,e2,e3) do {static bool ignore_always = false; if (!ignore_always && !(expr)) xrDebug::Fail(#expr,e2,e3,DEBUG_INFO,ignore_always);} while(0)
-# define VERIFY4(expr,e2,e3,e4)do {static bool ignore_always = false; if (!ignore_always && !(expr)) xrDebug::Fail(#expr,e2,e3,e4,DEBUG_INFO,ignore_always);} while(0)
-# define CHK_DX(expr) do {static bool ignore_always = false; HRESULT hr = expr; if (!ignore_always && FAILED(hr)) xrDebug::Error(hr,#expr,DEBUG_INFO,ignore_always);} while(0)
-# define CHK_GL(expr) do {static bool ignore_always = false; (expr); GLenum err = glGetError(); if (!ignore_always && err != GL_NO_ERROR) xrDebug::Error((int)err,#expr,DEBUG_INFO,ignore_always);} while(0)
-# else // DEBUG
-# ifdef __BORLANDC__
-# define NODEFAULT
-# else
-# define NODEFAULT __assume(0)
-# endif
-# define VERIFY(expr) do {} while (0)
-# define VERIFY2(expr, e2) do {} while (0)
-# define VERIFY3(expr, e2, e3) do {} while (0)
-# define VERIFY4(expr, e2, e3, e4)do {} while (0)
-# define CHK_DX(a) a
-# define CHK_GL(a) a
-# endif // DEBUG
+#ifdef DEBUG
+#define NODEFAULT FATAL("nodefault reached")
+#define VERIFY(expr)\
+    do {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr);\
+    } while (false)
+#define VERIFY2(expr, desc)\
+    do {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc);\
+    } while (false)
+#define VERIFY3(expr, desc, arg1)\
+    do {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc, arg1);\
+    } while (false)
+#define VERIFY4(expr, desc, arg1, arg2)\
+    do {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc, arg1, arg2);\
+    } while (false)
+#define CHK_DX(expr)\
+    do {\
+        static bool ignoreAlways = false;\
+        HRESULT hr = expr;\
+        if (!ignoreAlways && FAILED(hr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, hr);\
+    } while (false)
+#define CHK_GL(expr)\
+    do {\
+        static bool ignoreAlways = false;\
+        expr;\
+        GLenum err = glGetError();\
+        if (!ignoreAlways && err!=GL_NO_ERROR)\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, (long)err);\
+    } while (false)
+#else // DEBUG
+#ifdef __BORLANDC__
+#define NODEFAULT
+#else
+#define NODEFAULT __assume(0)
+#endif
+#define VERIFY(expr) do {} while (false)
+#define VERIFY2(expr, desc) do {} while (false)
+#define VERIFY3(expr, desc, arg1) do {} while (false)
+#define VERIFY4(expr, desc, arg1, arg2) do {} while (false)
+#define CHK_DX(expr) expr
+#define CHK_GL(expr) expr
+#endif // DEBUG
 //---------------------------------------------------------------------------------------------
 // FIXMEs / TODOs / NOTE macros
 //---------------------------------------------------------------------------------------------

@@ -11,6 +11,29 @@ struct StackTraceInfo
     char *operator[](size_t i) { return Frames+i*LineCapacity; }
 };
 
+class ErrorLocation
+{
+public:
+    const char *File = nullptr;
+    int Line = -1;
+    const char *Function = nullptr;
+
+    ErrorLocation(const char *file, int line, const char *function)
+    {
+        File = file;
+        Line = line;
+        Function = function;
+    }
+
+    ErrorLocation &operator=(const ErrorLocation &rhs)
+    {
+        File = rhs.File;
+        Line = rhs.Line;
+        Function = rhs.Function;
+        return *this;
+    }
+};
+
 class XRCORE_API xrDebug
 {
 public:
@@ -25,12 +48,12 @@ private:
     static CrashHandler OnCrash;
     static DialogHandler OnDialog;
     static string_path BugReportFile;
-    static bool	ErrorAfterDialog;
+    static bool ErrorAfterDialog;
     static StackTraceInfo StackTrace;
     
 public:
     xrDebug() = delete;
-	static void Initialize(const bool &dedicated);
+    static void Initialize(const bool &dedicated);
     static void Destroy();
     static void OnThreadSpawn();
     static OutOfMemoryCallbackFunc GetOutOfMemoryCallback() { return OutOfMemoryCallback; }
@@ -43,24 +66,15 @@ public:
     static void SetBugReportFile(const char *fileName);
     static void LogStackTrace(const char *header);
     static size_t BuildStackTrace(char *buffer, size_t capacity, size_t lineCapacity);
-    static void GatherInfo(const char *expression, const char *description, const char *arg0, const char *arg1,
-        const char *file, int line, const char *function, char *assertionInfo);
-    static void Fail(const char *e1, const char *file, int line, const char *function, bool &ignoreAlways);
-    static void Fail(const char *e1, const std::string &e2, const char *file, int line, const char *function,
-        bool &ignoreAlways);
-    static void Fail(const char *e1, const char *e2, const char *file, int line, const char *function,
-        bool &ignoreAlways);
-    static void Fail(const char *e1, const char *e2, const char *e3, const char *file, int line, const char *function,
-        bool &ignoreAlways);
-    static void Fail(const char *e1, const char *e2, const char *e3, const char *e4, const char *file, int line,
-        const char *function, bool &ignoreAlways);
-    static void Error(long code, const char *e1, const char *file, int line, const char *function,
-        bool &ignoreAlways);
-    static void Error(long code, const char *e1, const char *e2, const char *file, int line, const char *function,
-        bool &ignoreAlways);
-    static void Fatal(const char *file, int line, const char *function, const char *format, ...);
-    static void Backend(const char *reason, const char *expression, const char *arg0, const char *arg1,
-        const char *file, int line, const char *function, bool &ignoreAlways);
+    static void GatherInfo(char *assertionInfo, const ErrorLocation &loc, const char *expr,
+        const char *desc, const char *arg1 = nullptr, const char *arg2 = nullptr);
+    static void Fatal(const ErrorLocation &loc, const char *format, ...);
+    static void Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *expr,
+        long hresult, const char *arg1 = nullptr, const char *arg2 = nullptr);
+    static void Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *expr,
+        const char *desc = "assertion failed", const char *arg1 = nullptr, const char *arg2 = nullptr);
+    static void Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *expr,
+        const std::string &desc, const char *arg1 = nullptr, const char *arg2 = nullptr);
     static void DoExit(const std::string &message);
 
 private:
@@ -79,7 +93,7 @@ inline std::string make_string(const char *format, ...)
     va_start(args, format);
     string4096 temp;
     vsprintf(temp, format, args);
-    return std::string(temp);
+    return temp;
 }
 
 #include "xrDebug_macros.h"

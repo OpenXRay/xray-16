@@ -116,39 +116,41 @@ size_t xrDebug::BuildStackTrace(EXCEPTION_POINTERS* exPtrs, char *buffer, size_t
     return frameCount;
 }
 
-void xrDebug::GatherInfo(const char *expression, const char *description, const char *arg0, const char *arg1,
-    const char *file, int line, const char *function, char *assertionInfo)
+void xrDebug::GatherInfo(char *assertionInfo, const ErrorLocation &loc, const char *expr,
+    const char *desc, const char *arg1, const char *arg2)
 {
     char *buffer = assertionInfo;
-    bool extendedDesc = description && strchr(description, '\n');
+    if (!expr)
+        expr = "<no expression>";
+    bool extendedDesc = desc && strchr(desc, '\n');
     char *prefix = "[error] ";
     buffer += sprintf(buffer, "\nFATAL ERROR\n\n");
-    buffer += sprintf(buffer, "%sExpression    : %s\n", prefix, expression);
-    buffer += sprintf(buffer, "%sFunction      : %s\n", prefix, function);
-    buffer += sprintf(buffer, "%sFile          : %s\n", prefix, file);
-    buffer += sprintf(buffer, "%sLine          : %d\n", prefix, line);
+    buffer += sprintf(buffer, "%sExpression    : %s\n", prefix, expr);
+    buffer += sprintf(buffer, "%sFunction      : %s\n", prefix, loc.Function);
+    buffer += sprintf(buffer, "%sFile          : %s\n", prefix, loc.File);
+    buffer += sprintf(buffer, "%sLine          : %d\n", prefix, loc.Line);
     if (extendedDesc)
     {
-        buffer += sprintf(buffer, "\n%s\n", description);
-        if (arg0)
+        buffer += sprintf(buffer, "\n%s\n", desc);
+        if (arg1)
         {
-            buffer += sprintf(buffer, "%s\n", arg0);
-            if (arg1)
-                buffer += sprintf(buffer, "%s\n", arg1);
+            buffer += sprintf(buffer, "%s\n", arg1);
+            if (arg2)
+                buffer += sprintf(buffer, "%s\n", arg2);
         }
     }
     else
     {
-        buffer += sprintf(buffer, "%sDescription   : %s\n", prefix, description);
-        if (arg0)
+        buffer += sprintf(buffer, "%sDescription   : %s\n", prefix, desc);
+        if (arg1)
         {
-            if (arg1)
+            if (arg2)
             {
-                buffer += sprintf(buffer, "%sArgument 0    : %s\n", prefix, arg0);
-                buffer += sprintf(buffer, "%sArgument 1    : %s\n", prefix, arg1);
+                buffer += sprintf(buffer, "%sArgument 0    : %s\n", prefix, arg1);
+                buffer += sprintf(buffer, "%sArgument 1    : %s\n", prefix, arg2);
             }
             else
-                buffer += sprintf(buffer, "%sArguments     : %s\n", prefix, arg0);
+                buffer += sprintf(buffer, "%sArguments     : %s\n", prefix, arg1);
         }
     }
     buffer += sprintf(buffer, "\n");
@@ -183,15 +185,23 @@ void xrDebug::GatherInfo(const char *expression, const char *description, const 
     os_clipboard::copy_to_clipboard(assertionInfo);
 }
 
-void xrDebug::DoExit(const std::string &message)
+void xrDebug::Fatal(const ErrorLocation &loc, const char *format, ...)
 {
-    FlushLog();
-    MessageBox(NULL, message.c_str(), "Error", MB_OK|MB_ICONERROR|MB_SYSTEMMODAL);
-    TerminateProcess(GetCurrentProcess(), 1);
+    string1024 desc;
+    va_list args;
+    va_start(args, format);
+    vsnprintf(desc, sizeof(desc), format, args);
+    va_end(args);
+    bool ignoreAlways = true;
+    Fail(ignoreAlways, loc, nullptr, "fatal error", desc);
 }
 
-void xrDebug::Backend(const char *expression, const char *description, const char *arg0, const char *arg1,
-    const char *file, int line, const char *function, bool &ignoreAlways)
+void xrDebug::Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *expr,
+    long hresult, const char *arg1, const char *arg2)
+{ Fail(ignoreAlways, loc, expr, xrDebug::ErrorToString(hresult), arg1, arg2); }
+
+void xrDebug::Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *expr,
+    const char *desc, const char *arg1, const char *arg2)
 {
 #ifdef PROFILE_CRITICAL_SECTIONS
     static Lock lock(MUTEX_PROFILE_ID(xrDebug::Backend));
@@ -201,7 +211,7 @@ void xrDebug::Backend(const char *expression, const char *description, const cha
     lock.Enter();
     ErrorAfterDialog = true;
     string4096 assertionInfo;
-    GatherInfo(expression, description, arg0, arg1, file, line, function, assertionInfo);
+    GatherInfo(assertionInfo, loc, expr, desc, arg1, arg2);
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
     strcat(assertionInfo,
         "\r\n"
@@ -252,6 +262,17 @@ void xrDebug::Backend(const char *expression, const char *description, const cha
     lock.Leave();
 }
 
+void xrDebug::Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *expr,
+    const std::string &desc, const char *arg1, const char *arg2)
+{ Fail(ignoreAlways, loc, expr, desc.c_str(), arg1, arg2); }
+
+void xrDebug::DoExit(const std::string &message)
+{
+    FlushLog();
+    MessageBox(NULL, message.c_str(), "Error", MB_OK|MB_ICONERROR|MB_SYSTEMMODAL);
+    TerminateProcess(GetCurrentProcess(), 1);
+}
+
 LPCSTR xrDebug::ErrorToString(long code)
 {
     const char *result = nullptr;
@@ -263,57 +284,6 @@ LPCSTR xrDebug::ErrorToString(long code)
         result = descStorage;
     }
     return result;
-}
-
-void xrDebug::Error(long hr, const char *expr, const char *file, int line, const char *function, bool &ignoreAlways)
-{
-    Backend(expr, ErrorToString(hr), nullptr, nullptr, file, line, function, ignoreAlways);
-}
-
-void xrDebug::Error(long hr, const char *expr, const char *e2, const char *file, int line, const char *function,
-    bool &ignoreAlways)
-{
-    Backend(expr, ErrorToString(hr), e2, 0, file, line, function, ignoreAlways);
-}
-
-void xrDebug::Fail(const char *e1, const char *file, int line, const char *function, bool &ignoreAlways)
-{
-    Backend(e1, "assertion failed", 0, 0, file, line, function, ignoreAlways);
-}
-
-void xrDebug::Fail(const char *e1, const std::string &e2, const char *file, int line, const char *function,
-    bool &ignoreAlways)
-{
-    Backend(e1, e2.c_str(), 0, 0, file, line, function, ignoreAlways);
-}
-
-void xrDebug::Fail(const char *e1, const char *e2, const char *file, int line, const char *function,
-    bool &ignoreAlways)
-{
-    Backend(e1, e2, 0, 0, file, line, function, ignoreAlways);
-}
-
-void xrDebug::Fail(const char *e1, const char *e2, const char *e3, const char *file, int line, const char *function,
-    bool &ignoreAlways)
-{
-    Backend(e1, e2, e3, 0, file, line, function, ignoreAlways);
-}
-
-void xrDebug::Fail(const char *e1, const char *e2, const char *e3, const char *e4, const char *file, int line,
-    const char *function, bool &ignoreAlways)
-{
-    Backend(e1, e2, e3, e4, file, line, function, ignoreAlways);
-}
-
-void xrDebug::Fatal(const char *file, int line, const char *function, const char *format, ...)
-{
-    string1024 buffer;
-    va_list p;
-    va_start(p, format);
-    vsprintf(buffer, format, p);
-    va_end(p);
-    bool ignoreAlways = true;
-    Backend(nullptr, "fatal error", buffer, 0, file, line, function, ignoreAlways);
 }
 
 int out_of_memory_handler(size_t size)
@@ -513,8 +483,7 @@ void _terminate()
     if (strstr(GetCommandLine(), "-silent_error_mode"))
         exit(-1);
     string4096 assertionInfo;
-    xrDebug::GatherInfo(nullptr, "Unexpected application termination", nullptr, nullptr,
-        DEBUG_INFO, assertionInfo);
+    xrDebug::GatherInfo(assertionInfo, DEBUG_INFO, nullptr, "Unexpected application termination");
     strcat(assertionInfo, "Press OK to abort execution\r\n");
     MessageBox(GetTopWindow(NULL), assertionInfo, "Fatal Error", MB_OK|MB_ICONERROR|MB_SYSTEMMODAL);
     exit(-1);
@@ -524,7 +493,7 @@ void _terminate()
 static void handler_base(const char *reason)
 {
     bool ignoreAlways = false;
-    xrDebug::Backend(nullptr, reason, nullptr, nullptr, DEBUG_INFO, ignoreAlways);
+    xrDebug::Fail(ignoreAlways, DEBUG_INFO, nullptr, reason, nullptr, nullptr);
 }
 
 static void invalid_parameter_handler(const wchar_t *expression, const wchar_t *function,
@@ -550,7 +519,7 @@ static void invalid_parameter_handler(const wchar_t *expression, const wchar_t *
         line = __LINE__;
         xr_strcpy(mbFile, __FILE__);
     }
-    xrDebug::Backend(mbExpression, "invalid parameter", nullptr, nullptr, mbFile, line, mbFunction, ignoreAlways);
+    xrDebug::Fail(ignoreAlways, {mbFile, int(line), mbFunction}, mbExpression, "invalid parameter");
 }
 
 static void pure_call_handler()
