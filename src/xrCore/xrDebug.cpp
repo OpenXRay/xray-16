@@ -183,7 +183,7 @@ void xrDebug::GatherInfo(const char *expression, const char *description, const 
     os_clipboard::copy_to_clipboard(assertionInfo);
 }
 
-void xrDebug::DoExit(const std::string& message)
+void xrDebug::DoExit(const std::string &message)
 {
     FlushLog();
     MessageBox(NULL, message.c_str(), "Error", MB_OK|MB_ICONERROR|MB_SYSTEMMODAL);
@@ -191,7 +191,7 @@ void xrDebug::DoExit(const std::string& message)
 }
 
 void xrDebug::Backend(const char *expression, const char *description, const char *arg0, const char *arg1,
-    const char *file, int line, const char *function, bool& ignoreAlways)
+    const char *file, int line, const char *function, bool &ignoreAlways)
 {
 #ifdef PROFILE_CRITICAL_SECTIONS
     static Lock lock(MUTEX_PROFILE_ID(xrDebug::Backend));
@@ -366,7 +366,7 @@ void WINAPI xrDebug::PreErrorHandler(INT_PTR)
     BT_SaveSnapshot(nullptr);
 }
 
-void xrDebug::SetupExceptionHandler(const bool& dedicated)
+void xrDebug::SetupExceptionHandler(const bool &dedicated)
 {
     BT_InstallSehFilter();
     if (!dedicated && !strstr(GetCommandLine(), "-silent_error_mode"))

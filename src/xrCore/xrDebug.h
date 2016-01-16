@@ -61,7 +61,7 @@ public:
     static void Fatal(const char *file, int line, const char *function, const char *format, ...);
     static void Backend(const char *reason, const char *expression, const char *arg0, const char *arg1,
         const char *file, int line, const char *function, bool &ignoreAlways);
-    static void DoExit(const std::string& message);
+    static void DoExit(const std::string &message);
 
 private:
     static void FormatLastError(char *buffer, const size_t &bufferSize);
