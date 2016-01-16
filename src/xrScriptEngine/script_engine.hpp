@@ -82,6 +82,8 @@ private:
     static string4096 g_ca_stdout;
     bool logReenterability = false;
     bool bindingsDumped = false;
+    char *scriptBuffer = nullptr;
+    size_t scriptBufferSize = 0;
 
 protected:
     CScriptProcessStorage m_script_processes;

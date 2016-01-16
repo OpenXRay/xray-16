@@ -189,6 +189,8 @@ void CScriptEngine::reinit()
         file_header = file_header_new;
     else
         file_header = file_header_old;
+    scriptBufferSize = 1024*1024;
+    scriptBuffer = xr_alloc<char>(scriptBufferSize);
 }
 
 int CScriptEngine::vscript_log(LuaMessageType luaMessageType, LPCSTR caFormat, va_list marker)
@@ -338,38 +340,14 @@ bool CScriptEngine::load_buffer(lua_State *L, LPCSTR caBuffer, size_t tSize, LPC
         xr_sprintf(insert, header, caNameSpaceName, a, b);
         u32 str_len = xr_strlen(insert);
         u32 const total_size = str_len+tSize;
-        LPSTR script = nullptr;
-        bool dynamic_allocation = false;
-        __try
+        if (total_size>=scriptBufferSize)
         {
-            if (total_size < 768 * 1024)
-                script = (LPSTR)_alloca(total_size);
-            else
-            {
-#ifdef DEBUG
-                script = (LPSTR)Memory.mem_alloc(total_size, "lua script file");
-#else
-                script = (LPSTR)Memory.mem_alloc(total_size);
-#endif
-                dynamic_allocation = true;
-            }
+            scriptBufferSize = total_size;
+            scriptBuffer = (char *)xr_realloc(scriptBuffer, scriptBufferSize);
         }
-        __except (GetExceptionCode()==STATUS_STACK_OVERFLOW)
-        {
-            int errcode = _resetstkoflw();
-            R_ASSERT2(errcode, "Could not reset the stack after \"Stack overflow\" exception!");
-#ifdef DEBUG
-            script = (LPSTR)Memory.mem_alloc(total_size, "lua script file (after exception)");
-#else
-            script = (LPSTR)Memory.mem_alloc(total_size);
-#endif
-            dynamic_allocation = true;
-        }
-        xr_strcpy(script, total_size, insert);
-        CopyMemory(script+str_len, caBuffer, u32(tSize));
-        l_iErrorCode = luaL_loadbuffer(L, script, tSize+str_len, caScriptName);
-        if (dynamic_allocation)
-            xr_free(script);
+        xr_strcpy(scriptBuffer, total_size, insert);
+        CopyMemory(scriptBuffer+str_len, caBuffer, u32(tSize));
+        l_iErrorCode = luaL_loadbuffer(L, scriptBuffer, tSize+str_len, caScriptName);
     }
     else
         l_iErrorCode = luaL_loadbuffer(L, caBuffer, tSize, caScriptName);
@@ -808,6 +786,8 @@ CScriptEngine::~CScriptEngine()
     disconnect_from_debugger();
 #endif
 #endif
+    if (scriptBuffer)
+        xr_free(scriptBuffer);
 }
 
 void CScriptEngine::unload()
