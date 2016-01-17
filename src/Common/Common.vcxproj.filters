@@ -39,6 +39,9 @@
     <ClInclude Include="PlatformWindows.inl">
       <Filter>Platform</Filter>
     </ClInclude>
+    <ClInclude Include="Compiler.inl">
+      <Filter>Platform</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="NvMender2003">

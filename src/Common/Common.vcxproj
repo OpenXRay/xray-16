@@ -107,6 +107,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Compiler.inl" />
     <ClInclude Include="Config.hpp" />
     <ClInclude Include="face_smoth_flags.h" />
     <ClInclude Include="FSMacros.hpp" />

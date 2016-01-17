@@ -15,6 +15,8 @@
 #define XR_X86
 #endif
 
+#include "Common/Compiler.inl"
+
 #ifdef __GNUC__
 #define XR_EXPORT __attribute__ ((visibility("default")))
 #define XR_IMPORT __attribute__ ((visibility("default")))
