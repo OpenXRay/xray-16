@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "xrCore/Platform.h"
+#include "xrCore/Platform.hpp"
 
 #include "xrlight_implicit.h"
 #include "xrLight_ImplicitDeflector.h"

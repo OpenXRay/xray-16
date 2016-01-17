@@ -1,6 +1,6 @@
 #pragma once
 
-#include "xrCore/Platform.h"
+#include "xrCore/Platform.hpp"
 
 #ifdef XRAICORE_EXPORTS
 #define XRAICORE_API XR_EXPORT

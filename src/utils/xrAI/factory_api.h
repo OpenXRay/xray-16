@@ -1,6 +1,6 @@
 #pragma once
 
-#include "xrCore/Platform.h"
+#include "xrCore/Platform.hpp"
 
 extern "C" {
     typedef XR_IMPORT  IServerEntity*   __stdcall Factory_Create    (LPCSTR section);

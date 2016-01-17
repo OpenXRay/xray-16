@@ -2,7 +2,7 @@
 #define SoundH
 #pragma once
 
-#include "xrCore/Platform.h"
+#include "xrCore/Platform.hpp"
 
 #ifdef XRSOUND_EXPORTS
 	#define XRSOUND_API XR_EXPORT

@@ -2,7 +2,7 @@
 #define XRENGINE_ISPATIAL_H_INCLUDED
 
 //#pragma once
-#include "xrCore/Platform.h"
+#include "xrCore/Platform.hpp"
 #include "xrCore/xrPool.h"
 #include "xr_collide_defs.h"
 

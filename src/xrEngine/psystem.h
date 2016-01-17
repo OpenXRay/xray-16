@@ -2,7 +2,7 @@
 #define PSystemH
 #pragma once
 
-#include "xrCore/Platform.h"
+#include "xrCore/Platform.hpp"
 
 #ifdef XR_PARTICLES_EXPORTS
 #define PARTICLES_API XR_EXPORT

@@ -377,9 +377,6 @@
     <ClInclude Include="ModuleLookup.hpp">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="Platform.h">
-      <Filter>Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="_bitwise.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -775,6 +772,9 @@
     </ClInclude>
     <ClInclude Include="..\Common\Noncopyable.hpp">
       <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform.hpp">
+      <Filter>Kernel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

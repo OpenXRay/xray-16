@@ -1,7 +1,7 @@
 #ifndef xrEPropsH
 #define xrEPropsH
 
-#include "xrCore/Platform.h"
+#include "xrCore/Platform.hpp"
 
 #ifdef XR_EPROPS_EXPORTS
 #define XR_EPROPS_API XR_EXPORT

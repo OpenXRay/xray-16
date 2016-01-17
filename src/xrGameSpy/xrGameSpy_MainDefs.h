@@ -1,6 +1,6 @@
 #pragma once
 
-#include "xrCore/Platform.h"
+#include "xrCore/Platform.hpp"
 
 #define QRCDKEY_INTEGRATION
 #define SB_ICMP_SUPPORT
