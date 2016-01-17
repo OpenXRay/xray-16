@@ -15,6 +15,7 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Config.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)face_smoth_flags.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FSMacros.hpp" />
     <ClInclude Include="$(MSBuildThisFileDirectory)GUID.hpp" />

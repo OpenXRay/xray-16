@@ -18,6 +18,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)NvMender2003\remove_isolated_verts.h">
       <Filter>NvMender2003</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Config.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)NvMender2003\NVMeshMender.cpp">
