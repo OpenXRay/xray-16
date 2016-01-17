@@ -19,11 +19,9 @@ extern bool shared_str_initialized;
 #include "d3dx9.h"
 #include "D3DX_Wrapper.h"
 #pragma comment(lib, "EToolsB.lib")
-#define DEBUG_INVOKE DebugBreak()
 # define USE_BUG_TRAP
 #else
 #define USE_BUG_TRAP
-#define DEBUG_INVOKE __asm int 3
 static BOOL bException = FALSE;
 #endif
 
@@ -238,7 +236,7 @@ void xrDebug::Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *exp
 #ifdef USE_BUG_TRAP
             BT_SetUserMessage(assertionInfo);
 #endif
-            DEBUG_INVOKE;
+            DEBUG_BREAK;
             break;
         case IDTRYAGAIN:
             ErrorAfterDialog = false;
@@ -248,13 +246,13 @@ void xrDebug::Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *exp
             ignoreAlways = true;
             break;
         default:
-            DEBUG_INVOKE;
+            DEBUG_BREAK;
         }
 #else // !USE_OWN_ERROR_MESSAGE_WINDOW
 #ifdef USE_BUG_TRAP
         BT_SetUserMessage(assertionInfo);
 #endif
-        DEBUG_INVOKE;
+        DEBUG_BREAK;
 #endif
     }
     if (OnDialog)
