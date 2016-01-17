@@ -338,6 +338,9 @@ void WINAPI xrDebug::PreErrorHandler(INT_PTR)
 
 void xrDebug::SetupExceptionHandler(const bool &dedicated)
 {
+    // disable 'appname has stopped working' popup dialog
+    UINT prevMode = SetErrorMode(SEM_NOGPFAULTERRORBOX);
+    SetErrorMode(prevMode|SEM_NOGPFAULTERRORBOX);
     BT_InstallSehFilter();
     if (!dedicated && !strstr(GetCommandLine(), "-silent_error_mode"))
         BT_SetActivityType(BTA_SHOWUI);
