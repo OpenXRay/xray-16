@@ -16,8 +16,13 @@
 # define _WIN32_WINNT 0x0501
 #endif
 
+#ifdef __GNUC__
+#define XR_EXPORT __attribute__ ((visibility("default")))
+#define XR_IMPORT __attribute__ ((visibility("default")))
+#else // _MSC_VER
 #define XR_EXPORT __declspec(dllexport)
 #define XR_IMPORT __declspec(dllimport)
+#endif
 
 // inline control - redefine to use compiler's heuristics ONLY
 // it seems "IC" is misused in many places which cause code-bloat
