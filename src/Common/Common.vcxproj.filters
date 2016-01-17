@@ -30,10 +30,19 @@
     <ClInclude Include="NvMender2003\remove_isolated_verts.h">
       <Filter>NvMender2003</Filter>
     </ClInclude>
+    <ClInclude Include="PlatformWindows.hpp">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="PlatformLinux.hpp">
+      <Filter>Platform</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="NvMender2003">
       <UniqueIdentifier>{4a2b53ad-98a9-4338-99a6-b5ea4123d5bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{05b6dbf9-e387-495f-9d92-e2b8ecc350fa}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

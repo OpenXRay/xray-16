@@ -126,6 +126,8 @@
     <ClInclude Include="object_loader.h" />
     <ClInclude Include="object_saver.h" />
     <ClInclude Include="object_type_traits.h" />
+    <ClInclude Include="PlatformLinux.hpp" />
+    <ClInclude Include="PlatformWindows.hpp" />
     <ClInclude Include="Util.hpp" />
     <ClInclude Include="_d3d_extensions.h" />
   </ItemGroup>
