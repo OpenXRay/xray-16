@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ImportGroup Label="PropertySheets" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(SolutionDir)ConfigurationDefs.props" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='Win32'">
     <xrPlatform>Win32</xrPlatform>
   </PropertyGroup>
@@ -44,6 +46,13 @@
         4458 : declaration of 'x' hides class member
       -->
       <DisableSpecificWarnings>4251;4275;4458</DisableSpecificWarnings>
+      <!--
+        LUABIND_DYNAMIC_LINK : self-explanatory
+        MSVC;dSINGLE;WIN32 : for ODE
+        _SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE : temporary workaround for deprecated API
+      -->
+      <PreprocessorDefinitions>LUABIND_DYNAMIC_LINK;MSVC;dSINGLE;WIN32;_SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
