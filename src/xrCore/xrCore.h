@@ -40,7 +40,7 @@
 #define XRAY_EXCEPTIONS 1
 #endif
 
-#include "Platform.hpp"
+#include "Common/Platform.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>

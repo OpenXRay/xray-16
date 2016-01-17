@@ -36,6 +36,9 @@
     <ClInclude Include="PlatformLinux.hpp">
       <Filter>Platform</Filter>
     </ClInclude>
+    <ClInclude Include="Platform.hpp">
+      <Filter>Platform</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="NvMender2003">

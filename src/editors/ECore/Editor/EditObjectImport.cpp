@@ -18,7 +18,7 @@ extern "C"
 #ifdef _EDITOR
 #include "Layers/xrRender/ResourceManager.h"
 
-#include "xrCore/Platform.hpp"
+#include "Common/Platform.hpp"
 extern "C" XR_IMPORT lwObject* LWOImportObject(char* filename);
 extern "C" XR_IMPORT void LWOCloseFile(lwObject* object);
 #endif

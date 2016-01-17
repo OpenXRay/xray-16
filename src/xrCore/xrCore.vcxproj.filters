@@ -773,9 +773,6 @@
     <ClInclude Include="..\Common\Noncopyable.hpp">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="Platform.hpp">
-      <Filter>Kernel</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">

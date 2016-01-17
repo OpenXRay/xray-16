@@ -1,6 +1,6 @@
 #pragma once
 
-#include "xrCore/Platform.hpp"
+#include "Common/Platform.hpp"
 #include "xrCore/xrCore.h"
 #ifdef XRLC_LIGHT_EXPORTS
 #   define XRLC_LIGHT_API XR_EXPORT

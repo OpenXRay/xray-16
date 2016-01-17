@@ -375,7 +375,6 @@
     <ClInclude Include="vector.h" />
     <ClInclude Include="xrCore.h" />
     <ClInclude Include="ModuleLookup.hpp" />
-    <ClInclude Include="Platform.hpp" />
     <ClInclude Include="xrDebug.h" />
     <ClInclude Include="xrDebug_macros.h" />
     <ClInclude Include="xrMemory.h" />

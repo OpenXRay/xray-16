@@ -1,6 +1,6 @@
 #pragma once
 
-#include "xrCore/Platform.hpp"
+#include "Common/Platform.hpp"
 
 #ifdef XRDXTC_EXPORTS
 #define DXTC_API XR_EXPORT

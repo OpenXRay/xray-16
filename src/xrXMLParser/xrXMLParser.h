@@ -2,7 +2,7 @@
 #define xrXMLParserH
 #pragma once
 
-#include "xrCore/Platform.hpp"
+#include "Common/Platform.hpp"
 
 #ifdef XRXMLPARSER_EXPORTS
 	#define XRXMLPARSER_API XR_EXPORT

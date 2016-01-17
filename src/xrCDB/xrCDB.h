@@ -1,7 +1,7 @@
 #ifndef XRCDB_H
 #define XRCDB_H
 
-#include "xrCore/Platform.hpp"
+#include "Common/Platform.hpp"
 
 //#pragma once
 // The following ifdef block is the standard way of creating macros which make exporting

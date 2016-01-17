@@ -2,7 +2,7 @@
 #define _VECTOR4_H
 #pragma once
 
-#include "Platform.hpp"
+#include "Common/Platform.hpp"
 
 template <class T>
 struct _vector4

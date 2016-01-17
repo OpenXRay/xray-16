@@ -1,6 +1,6 @@
 #pragma once
 
-#include "xrCore/Platform.hpp"
+#include "Common/Platform.hpp"
 
 #ifdef XRAPI_EXPORTS
 #define XRAPI_API XR_EXPORT

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "xrCore/Platform.hpp"
+#include "Common/Platform.hpp"
 
 #include "xrScriptEngine/LuaStudio/Config.hpp"
 

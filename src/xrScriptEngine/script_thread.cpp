@@ -11,7 +11,7 @@
 #include "script_engine.hpp"
 #include "Include/xrAPI/xrAPI.h"
 
-// #include "xrCore/Platform.hpp"
+// #include "Common/Platform.hpp"
 
 #ifdef USE_DEBUGGER
 #ifndef USE_LUA_STUDIO

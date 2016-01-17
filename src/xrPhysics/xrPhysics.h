@@ -1,6 +1,6 @@
 #pragma once
 
-#include "xrCore/Platform.hpp"
+#include "Common/Platform.hpp"
 
 #ifdef XRPHYSICS_EXPORTS
 #define XRPHYSICS_API XR_EXPORT

@@ -1,5 +1,5 @@
 #pragma once
-#include "xrCore/Platform.hpp"
+#include "Common/Platform.hpp"
 #include "xrCore/FS.h"
 #include "utils/Shader_xrLC.h"
 struct STextureParams;
