@@ -30,13 +30,13 @@
     <ClInclude Include="NvMender2003\remove_isolated_verts.h">
       <Filter>NvMender2003</Filter>
     </ClInclude>
-    <ClInclude Include="PlatformWindows.hpp">
-      <Filter>Platform</Filter>
-    </ClInclude>
-    <ClInclude Include="PlatformLinux.hpp">
-      <Filter>Platform</Filter>
-    </ClInclude>
     <ClInclude Include="Platform.hpp">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="PlatformLinux.inl">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="PlatformWindows.inl">
       <Filter>Platform</Filter>
     </ClInclude>
   </ItemGroup>
