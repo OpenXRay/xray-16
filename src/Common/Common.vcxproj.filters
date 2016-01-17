@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="_d3d_extensions.h" />
+    <ClInclude Include="Config.hpp" />
+    <ClInclude Include="face_smoth_flags.h" />
+    <ClInclude Include="FSMacros.hpp" />
+    <ClInclude Include="GUID.hpp" />
+    <ClInclude Include="LevelGameDef.h" />
+    <ClInclude Include="LevelStructure.hpp" />
+    <ClInclude Include="Noncopyable.hpp" />
+    <ClInclude Include="object_broker.h" />
+    <ClInclude Include="object_cloner.h" />
+    <ClInclude Include="object_comparer.h" />
+    <ClInclude Include="object_destroyer.h" />
+    <ClInclude Include="object_interfaces.h" />
+    <ClInclude Include="object_loader.h" />
+    <ClInclude Include="object_saver.h" />
+    <ClInclude Include="object_type_traits.h" />
+    <ClInclude Include="Util.hpp" />
+    <ClInclude Include="NvMender2003\convert.h">
+      <Filter>NvMender2003</Filter>
+    </ClInclude>
+    <ClInclude Include="NvMender2003\mender_input_output.h">
+      <Filter>NvMender2003</Filter>
+    </ClInclude>
+    <ClInclude Include="NvMender2003\NVMeshMender.h">
+      <Filter>NvMender2003</Filter>
+    </ClInclude>
+    <ClInclude Include="NvMender2003\remove_isolated_verts.h">
+      <Filter>NvMender2003</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="NvMender2003">
+      <UniqueIdentifier>{4a2b53ad-98a9-4338-99a6-b5ea4123d5bf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="NvMender2003\NVMeshMender.cpp">
+      <Filter>NvMender2003</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
