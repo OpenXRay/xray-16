@@ -9,6 +9,12 @@
 #error Unsupported platform
 #endif
 
+#if defined(_M_X64) || defined(__amd64__)
+#define XR_X64
+#else
+#define XR_X86
+#endif
+
 #ifdef __GNUC__
 #define XR_EXPORT __attribute__ ((visibility("default")))
 #define XR_IMPORT __attribute__ ((visibility("default")))
