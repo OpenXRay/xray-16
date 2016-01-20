@@ -20,7 +20,10 @@ if not exist %game_root% (
 for /f "delims=" %%a in ('chdir') do set git_root=%%a
 set git_root="%git_root%"
 pushd %game_root%
-set xbin=_bin_dbg_Win32 _bin_mix_Win32 _bin_rel_Win32
+set bin_dbg_win32=_bin_dbg_Win32
+set bin_mix_win32=_bin_mix_Win32
+set bin_rel_win32=_bin_rel_Win32
+set xbin=%bin_dbg_win32% %bin_mix_win32% %bin_rel_win32%
 for %%b in (%xbin%) do (
   if not exist %%b (
     mkdir %%b
@@ -36,9 +39,9 @@ for %%b in (%xbin%) do (
   cp %git_root%\src\Externals\OpenSSL\bin\libeay32.dll %%b\libeay32.dll
   cp %git_root%\src\Externals\OpenSSL\bin\ssleay32.dll %%b\ssleay32.dll
 )
-cp %git_root%\src\Externals\BugTrap\bin\BugTrapD.dll !xbin[0]!\BugTrap.dll
-cp %git_root%\src\Externals\BugTrap\bin\BugTrap.dll !xbin[1]!\BugTrap.dll
-cp %git_root%\src\Externals\BugTrap\bin\BugTrap.dll !xbin[2]!\BugTrap.dll
+cp %git_root%\src\Externals\BugTrap\bin\BugTrapD.dll %bin_dbg_win32%\BugTrap.dll
+cp %git_root%\src\Externals\BugTrap\bin\BugTrap.dll %bin_mix_win32%\BugTrap.dll
+cp %git_root%\src\Externals\BugTrap\bin\BugTrap.dll %bin_rel_win32%\BugTrap.dll
 if exist gamedata (
   echo gamedata already exists. Remove/rename it, then
   echo   create soft link to "%git_root%\res\gamedata"
