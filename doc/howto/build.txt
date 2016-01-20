@@ -41,5 +41,6 @@ Setup:
 - Run xrbinprep.cmd to initialize new game binary directories and link default gamedata to OpenXRay's:
   $ xrbinprep.cmd "C:\Program Files (x86)\GSC World Publishing\S.T.A.L.K.E.R. - Call of Pripyat"
   Note that this script requires admin rights (in order to execute 'mklink'). Also make sure you pass a
-  game installation directory to this script)
+  game installation directory to this script. Once done, you can find .xrbinup_xxx scripts in the reporitory root:
+  use them later to install newly built binaries to the corresponding game binary directory.
 - Now you can build the engine!
