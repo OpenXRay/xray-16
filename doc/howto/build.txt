@@ -38,33 +38,8 @@ Setup:
 - Install patch 1.6.02 (only for russian locale, worldwide release should have it included):
   http://cop.stalker-game.ru/?page=patches#2
 - Download and unpack archive with libraries
-- Create _bin_dbg_Win32, _bin_mix_Win32 and _bin_rel_Win32 folders in the game installation directory
-  (Debug, Mixed and Release binaries for 32-bit Windows). Hereinafter '_bin_xxx_Win32' is referred to as 'xbin'.
-- Copy following files from bin to xbin:
-  - dbghelp.dll
-  - eax.dll
-  - wrap_oal.dll
-- Copy following files from bin to xbin\dedicated:
-  - eax.dll
-  - wrap_oal.dll
-- Copy following files from src\Externals\BugTrap\Bin to xbin:
-  - Debug configuration:
-    - BugTrapD.dll (rename to BugTrap.dll)
-  - Other configurations:
-    - BugTrap.dll
-- Copy following files from src\Externals\OpenSSL\bin to xbin:
-  - libeay32.dll
-  - ssleay32.dll
-- Create soft link to /gamedata in the game installation directory:
-  $ mklink /D <game installation directory>\gamedata <xray-16 repository root>\res\gamedata  
-- After successful build use xrbinup.cmd to update game binaries:
-  $ xrbinup.cmd "E:\Program Files (x86)\GSC World Publishing\STALKER-COP" %src% Win32 Debug  
-- You can create cmd script to update binaries in a single click, for example:
-  @echo off
-  setlocal
-  set src="E:\git\xray-16"
-  set dst="E:\Program Files (x86)\GSC World Publishing\STALKER-COP"
-  call xrbinup.cmd %dst% %src% Win32 Debug
-  endlocal
-
-XXX nitrocaster: add script for copying/renaming/soft linking
+- Run xrbinprep.cmd to initialize new game binary directories and link default gamedata to OpenXRay's:
+  $ xrbinprep.cmd "C:\Program Files (x86)\GSC World Publishing\S.T.A.L.K.E.R. - Call of Pripyat"
+  Note that this script requires admin rights (in order to execute 'mklink'). Also make sure you pass a
+  game installation directory to this script)
+- Now you can build the engine!
