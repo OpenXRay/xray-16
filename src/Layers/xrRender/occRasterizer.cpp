@@ -65,7 +65,7 @@ occRasterizer::~occRasterizer	()
 
 void occRasterizer::clear		()
 {
-	u32 size			= occ_dim*occ_dim*sizeof(float);
+	u32 size			= occ_dim*occ_dim;
 	float f				= 1.f;
     MemFill32(bufFrame,0,size);
     MemFill32(bufDepth,*LPDWORD(&f),size);
