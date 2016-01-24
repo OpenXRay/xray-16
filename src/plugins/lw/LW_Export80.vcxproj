@@ -61,19 +61,19 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(xrPlugBinDir)LightWave</OutDir>
+    <OutDir>$(xrPlugBinDir)LightWave\</OutDir>
     <TargetName>XRayExport</TargetName>
     <TargetExt>.p</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(xrPlugBinDir)LightWave</OutDir>
+    <OutDir>$(xrPlugBinDir)LightWave\</OutDir>
     <TargetName>XRayExport</TargetName>
     <TargetExt>.p</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(xrPlugBinDir)LightWave</OutDir>
+    <OutDir>$(xrPlugBinDir)LightWave\</OutDir>
     <TargetName>XRayExport</TargetName>
     <TargetExt>.p</TargetExt>
   </PropertyGroup>

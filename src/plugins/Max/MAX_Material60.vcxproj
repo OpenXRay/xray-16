@@ -59,19 +59,19 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(xrPlugBinDir)3DSMax6</OutDir>
+    <OutDir>$(xrPlugBinDir)3DSMax6\</OutDir>
     <TargetName>XRayMaterial</TargetName>
     <TargetExt>.dlt</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(xrPlugBinDir)3DSMax6</OutDir>
+    <OutDir>$(xrPlugBinDir)3DSMax6\</OutDir>
     <TargetName>XRayMaterial</TargetName>
     <TargetExt>.dlt</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(xrPlugBinDir)3DSMax6</OutDir>
+    <OutDir>$(xrPlugBinDir)3DSMax6\</OutDir>
     <TargetName>XRayMaterial</TargetName>
     <TargetExt>.dlt</TargetExt>
   </PropertyGroup>
