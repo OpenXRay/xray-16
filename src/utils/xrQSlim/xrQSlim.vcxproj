@@ -18,7 +18,6 @@
     <ProjectGuid>{F1836CE2-59EF-4189-8B9C-D103A511CB27}</ProjectGuid>
     <RootNamespace>xrQSlim</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
