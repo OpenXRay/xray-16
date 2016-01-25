@@ -4,6 +4,7 @@
 #include "ui/UIStatic.h"
 #include "ui/UIBtnHint.h"
 #include "xrEngine/IInputReceiver.h"
+#include "xrEngine/xr_input.h"
 
 #define C_DEFAULT	color_xrgb(0xff,0xff,0xff)
 
@@ -31,34 +32,16 @@ void CUICursor::OnScreenResolutionChanged()
 	InitInternal				();
 }
 
-void CUICursor::Clip(bool clip)
-{
-    HWND hwnd = Device.m_hWnd;
-    if (hwnd)
-    {
-        if (clip)
-        {
-            RECT clientRect;
-            ::GetClientRect(hwnd, &clientRect);
-            ::ClientToScreen(hwnd, (LPPOINT)&clientRect.left);
-            ::ClientToScreen(hwnd, (LPPOINT)&clientRect.right);
-            ::ClipCursor(&clientRect);
-        }
-        else
-            ::ClipCursor(nullptr);
-    }
-}
-
 void CUICursor::Show()
 {
     bVisible = true;
-    Clip(false);
+    pInput->ClipCursor(false);
 }
 
 void CUICursor::Hide()
 {
     bVisible = false;
-    Clip(true);
+    pInput->ClipCursor(true);
 }
 
 void CUICursor::InitInternal()

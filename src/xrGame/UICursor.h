@@ -27,5 +27,4 @@ public:
 	bool			IsVisible					() {return bVisible;}
     void			Show();
     void			Hide();
-    void Clip(bool clip);
 };

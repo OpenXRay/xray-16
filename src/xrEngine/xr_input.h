@@ -90,6 +90,7 @@ public:
     BOOL iGetAsyncKeyState(int dik);
     BOOL iGetAsyncBtnState(int btn);
     void iGetLastMouseDelta(Ivector2& p) { p.set(offs[0], offs[1]); }
+    void ClipCursor(bool clip);
 
     CInput(BOOL bExclusive = true, int deviceForInit = default_key);
     ~CInput();

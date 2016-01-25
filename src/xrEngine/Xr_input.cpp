@@ -352,6 +352,24 @@ BOOL CInput::iGetAsyncBtnState(int btn)
     return !!mouseState[btn];
 }
 
+void CInput::ClipCursor(bool clip)
+{
+    HWND hwnd = Device.m_hWnd;
+    if (hwnd)
+    {
+        if (clip)
+        {
+            RECT clientRect;
+            ::GetClientRect(hwnd, &clientRect);
+            ::ClientToScreen(hwnd, (LPPOINT)&clientRect.left);
+            ::ClientToScreen(hwnd, (LPPOINT)&clientRect.right);
+            ::ClipCursor(&clientRect);
+        }
+        else
+            ::ClipCursor(nullptr);
+    }
+}
+
 void CInput::MouseUpdate()
 {
     HRESULT hr;
