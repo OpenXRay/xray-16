@@ -31,6 +31,36 @@ void CUICursor::OnScreenResolutionChanged()
 	InitInternal				();
 }
 
+void CUICursor::Clip(bool clip)
+{
+    HWND hwnd = Device.m_hWnd;
+    if (hwnd)
+    {
+        if (clip)
+        {
+            RECT clientRect;
+            ::GetClientRect(hwnd, &clientRect);
+            ::ClientToScreen(hwnd, (LPPOINT)&clientRect.left);
+            ::ClientToScreen(hwnd, (LPPOINT)&clientRect.right);
+            ::ClipCursor(&clientRect);
+        }
+        else
+            ::ClipCursor(nullptr);
+    }
+}
+
+void CUICursor::Show()
+{
+    bVisible = true;
+    Clip(false);
+}
+
+void CUICursor::Hide()
+{
+    bVisible = false;
+    Clip(true);
+}
+
 void CUICursor::InitInternal()
 {
 	m_static					= xr_new<CUIStatic>();
