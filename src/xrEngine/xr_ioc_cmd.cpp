@@ -543,21 +543,15 @@ ENGINE_API BOOL r2_sun_static = TRUE;
 ENGINE_API BOOL r2_advanced_pp = FALSE; // advanced post process and effects
 
 u32 renderer_value = 3;
-//void fill_render_mode_list();
-//void free_render_mode_list();
 
 class CCC_r2 : public CCC_Token
 {
     typedef CCC_Token inherited;
 public:
     CCC_r2(LPCSTR N) :inherited(N, &renderer_value, NULL) { renderer_value = 3; };
-    virtual ~CCC_r2()
-    {
-        //free_render_mode_list();
-    }
+    virtual ~CCC_r2() {}
     virtual void Execute(LPCSTR args)
     {
-        //fill_render_mode_list ();
         // vid_quality_token must be already created!
         tokens = vid_quality_token;
 
