@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "xrXMLParser.h"
+#include "XMLDocument.hpp"
 
 
 XMLDocument::XMLDocument()

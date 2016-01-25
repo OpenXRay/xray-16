@@ -366,9 +366,6 @@
     <ClCompile Include="Debug\StackTrace.cpp">
       <Filter>Debug core</Filter>
     </ClCompile>
-    <ClCompile Include="XML\xrXMLParser.cpp">
-      <Filter>XML</Filter>
-    </ClCompile>
     <ClCompile Include="XML\tinystr.cpp">
       <Filter>XML\TinyXML</Filter>
     </ClCompile>
@@ -380,6 +377,9 @@
     </ClCompile>
     <ClCompile Include="XML\tinyxmlparser.cpp">
       <Filter>XML\TinyXML</Filter>
+    </ClCompile>
+    <ClCompile Include="XML\XMLDocument.cpp">
+      <Filter>XML</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -794,14 +794,14 @@
     <ClInclude Include="..\Common\Noncopyable.hpp">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="XML\xrXMLParser.h">
-      <Filter>XML</Filter>
-    </ClInclude>
     <ClInclude Include="XML\tinystr.h">
       <Filter>XML\TinyXML</Filter>
     </ClInclude>
     <ClInclude Include="XML\tinyxml.h">
       <Filter>XML\TinyXML</Filter>
+    </ClInclude>
+    <ClInclude Include="XML\XMLDocument.hpp">
+      <Filter>XML</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

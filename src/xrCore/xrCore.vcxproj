@@ -258,7 +258,7 @@
     <ClCompile Include="XML\tinyxml.cpp" />
     <ClCompile Include="XML\tinyxmlerror.cpp" />
     <ClCompile Include="XML\tinyxmlparser.cpp" />
-    <ClCompile Include="XML\xrXMLParser.cpp" />
+    <ClCompile Include="XML\XMLDocument.cpp" />
     <ClCompile Include="xrCore.cpp" />
     <ClCompile Include="ModuleLookup.cpp" />
     <ClCompile Include="xrDebug.cpp" />
@@ -379,7 +379,7 @@
     <ClInclude Include="vector.h" />
     <ClInclude Include="XML\tinystr.h" />
     <ClInclude Include="XML\tinyxml.h" />
-    <ClInclude Include="XML\xrXMLParser.h" />
+    <ClInclude Include="XML\XMLDocument.hpp" />
     <ClInclude Include="xrCore.h" />
     <ClInclude Include="ModuleLookup.hpp" />
     <ClInclude Include="xrDebug.h" />
