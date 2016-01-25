@@ -121,10 +121,10 @@
     <Filter Include="Math\RNG">
       <UniqueIdentifier>{ba09a2fb-b14c-4c35-8e0d-957a47930740}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Xml">
+    <Filter Include="XML">
       <UniqueIdentifier>{f365c098-99bb-41a7-858d-12ba18a1311e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Xml\TinyXML">
+    <Filter Include="XML\TinyXML">
       <UniqueIdentifier>{eb0bfab5-c514-4df4-a747-d14beb72f57b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -366,20 +366,20 @@
     <ClCompile Include="Debug\StackTrace.cpp">
       <Filter>Debug core</Filter>
     </ClCompile>
-    <ClCompile Include="Xml\tinystr.cpp">
-      <Filter>Xml</Filter>
+    <ClCompile Include="XML\xrXMLParser.cpp">
+      <Filter>XML</Filter>
     </ClCompile>
-    <ClCompile Include="Xml\tinyxml.cpp">
-      <Filter>Xml</Filter>
+    <ClCompile Include="XML\tinystr.cpp">
+      <Filter>XML\TinyXML</Filter>
     </ClCompile>
-    <ClCompile Include="Xml\tinyxmlerror.cpp">
-      <Filter>Xml</Filter>
+    <ClCompile Include="XML\tinyxml.cpp">
+      <Filter>XML\TinyXML</Filter>
     </ClCompile>
-    <ClCompile Include="Xml\tinyxmlparser.cpp">
-      <Filter>Xml</Filter>
+    <ClCompile Include="XML\tinyxmlerror.cpp">
+      <Filter>XML\TinyXML</Filter>
     </ClCompile>
-    <ClCompile Include="Xml\xrXMLParser.cpp">
-      <Filter>Xml</Filter>
+    <ClCompile Include="XML\tinyxmlparser.cpp">
+      <Filter>XML\TinyXML</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -794,14 +794,14 @@
     <ClInclude Include="..\Common\Noncopyable.hpp">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="Xml\tinystr.h">
-      <Filter>Xml</Filter>
+    <ClInclude Include="XML\xrXMLParser.h">
+      <Filter>XML</Filter>
     </ClInclude>
-    <ClInclude Include="Xml\tinyxml.h">
-      <Filter>Xml</Filter>
+    <ClInclude Include="XML\tinystr.h">
+      <Filter>XML\TinyXML</Filter>
     </ClInclude>
-    <ClInclude Include="Xml\xrXMLParser.h">
-      <Filter>Xml</Filter>
+    <ClInclude Include="XML\tinyxml.h">
+      <Filter>XML\TinyXML</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
