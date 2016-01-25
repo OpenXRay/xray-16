@@ -13,13 +13,13 @@ const LPCSTR UI_PATH				= "ui";
 typedef TiXmlNode		XML_NODE;
 typedef TiXmlAttribute	XML_ATTRIBUTE;
 
-class XRCORE_API CXml  
+class XRCORE_API XMLDocument
 {
 	void 				Load					(LPCSTR path_alias, LPCSTR xml_filename);
 public:
 	string_path			m_xml_file_name;
-						CXml					();
-	virtual				~CXml					();
+						XMLDocument					();
+	virtual				~XMLDocument					();
 	void				ClearInternal			();
 
 	void 				Load					(LPCSTR path_alias, LPCSTR path, LPCSTR  xml_filename);
@@ -89,8 +89,8 @@ protected:
 public:
 	virtual shared_str correct_file_name		(LPCSTR path, LPCSTR fn) {return fn;}
 private:
-						CXml					(const CXml& copy);
-	void				operator=				( const CXml& copy );
+						XMLDocument					(const XMLDocument& copy);
+	void				operator=				( const XMLDocument& copy );
 
 	typedef TiXmlElement						XML_ELEM;
 	TiXmlDocument								m_Doc;
