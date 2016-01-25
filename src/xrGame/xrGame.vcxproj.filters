@@ -1831,9 +1831,6 @@
     <Filter Include="Core\Server\GameSpy">
       <UniqueIdentifier>{0e29aa42-d79c-425a-994b-c18169f076de}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Server\GameSpy\CdkeyDecode">
-      <UniqueIdentifier>{1e260ced-c32e-4b46-a3cc-a5fd5d7c6109}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Server\ID_Generator">
       <UniqueIdentifier>{896c2566-b777-4505-acd6-792e19f54026}</UniqueIdentifier>
     </Filter>
@@ -2286,6 +2283,9 @@
     </Filter>
     <Filter Include="ScriptClasses\ScriptSound">
       <UniqueIdentifier>{7461340c-f13a-4ba4-a432-e8aeca7393cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Server\CdkeyDecode">
+      <UniqueIdentifier>{43eeb848-b66f-495c-8120-ea477ba14632}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -5940,12 +5940,6 @@
     <ClInclude Include="gamespy\GameSpy_SAKE.h">
       <Filter>Core\Server\GameSpy</Filter>
     </ClInclude>
-    <ClInclude Include="gamespy\CdkeyDecode\base32.h">
-      <Filter>Core\Server\GameSpy\CdkeyDecode</Filter>
-    </ClInclude>
-    <ClInclude Include="gamespy\CdkeyDecode\cdkeydecode.h">
-      <Filter>Core\Server\GameSpy\CdkeyDecode</Filter>
-    </ClInclude>
     <ClInclude Include="id_generator.h">
       <Filter>Core\Server\ID_Generator</Filter>
     </ClInclude>
@@ -6692,6 +6686,12 @@
     </ClInclude>
     <ClInclude Include="LevelGraphDebugRender.hpp">
       <Filter>AI\ADebug</Filter>
+    </ClInclude>
+    <ClInclude Include="CdkeyDecode\base32.h">
+      <Filter>Core\Server\CdkeyDecode</Filter>
+    </ClInclude>
+    <ClInclude Include="CdkeyDecode\cdkeydecode.h">
+      <Filter>Core\Server\CdkeyDecode</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -9353,12 +9353,6 @@
     <ClCompile Include="gamespy\GameSpy_SAKE.cpp">
       <Filter>Core\Server\GameSpy</Filter>
     </ClCompile>
-    <ClCompile Include="gamespy\CdkeyDecode\base32.c">
-      <Filter>Core\Server\GameSpy\CdkeyDecode</Filter>
-    </ClCompile>
-    <ClCompile Include="gamespy\CdkeyDecode\cdkeydecode.c">
-      <Filter>Core\Server\GameSpy\CdkeyDecode</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrServerEntities\gametype_chooser.cpp">
       <Filter>Core\Server\ServerEntities</Filter>
     </ClCompile>
@@ -10234,6 +10228,12 @@
     </ClCompile>
     <ClCompile Include="LevelGraphDebugRender.cpp">
       <Filter>AI\ADebug</Filter>
+    </ClCompile>
+    <ClCompile Include="CdkeyDecode\base32.c">
+      <Filter>Core\Server\CdkeyDecode</Filter>
+    </ClCompile>
+    <ClCompile Include="CdkeyDecode\cdkeydecode.c">
+      <Filter>Core\Server\CdkeyDecode</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

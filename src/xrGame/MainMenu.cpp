@@ -14,7 +14,7 @@
 #include "gamespy/GameSpy_Full.h"
 #include "gamespy/GameSpy_HTTP.h"
 #include "gamespy/GameSpy_Available.h"
-#include "gamespy/CdkeyDecode/cdkeydecode.h"
+#include "CdkeyDecode/cdkeydecode.h"
 #include "string_table.h"
 #include "xrCore/os_clipboard.h"
 

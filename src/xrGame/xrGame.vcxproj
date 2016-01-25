@@ -778,6 +778,8 @@
     <ClInclude Include="CarLights.h" />
     <ClInclude Include="CarWeapon.h" />
     <ClInclude Include="car_memory.h" />
+    <ClInclude Include="CdkeyDecode\base32.h" />
+    <ClInclude Include="CdkeyDecode\cdkeydecode.h" />
     <ClInclude Include="cdkey_ban_list.h" />
     <ClInclude Include="CharacterPhysicsSupport.h" />
     <ClInclude Include="character_community.h" />
@@ -892,8 +894,6 @@
     <ClInclude Include="GalantineArtifact.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GamePersistent.h" />
-    <ClInclude Include="gamespy\CdkeyDecode\base32.h" />
-    <ClInclude Include="gamespy\CdkeyDecode\cdkeydecode.h" />
     <ClInclude Include="gamespy\GameSpy_ATLAS.h" />
     <ClInclude Include="GameSpy\GameSpy_Available.h" />
     <ClInclude Include="GameSpy\GameSpy_Base_Defs.h" />
@@ -2309,6 +2309,16 @@
     <ClCompile Include="CarWeapon.cpp" />
     <ClCompile Include="CarWheels.cpp" />
     <ClCompile Include="car_memory.cpp" />
+    <ClCompile Include="CdkeyDecode\base32.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="CdkeyDecode\cdkeydecode.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="cdkey_ban_list.cpp" />
     <ClCompile Include="CharacterPhysicsSupport.cpp" />
     <ClCompile Include="character_community.cpp" />
@@ -2456,14 +2466,6 @@
     <ClCompile Include="GamePersistent.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="gamespy\CdkeyDecode\base32.c">
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="gamespy\CdkeyDecode\cdkeydecode.c">
-      <PrecompiledHeader>
-      </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="gamespy\GameSpy_ATLAS.cpp" />
     <ClCompile Include="GameSpy\GameSpy_Available.cpp" />
