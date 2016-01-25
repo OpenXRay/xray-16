@@ -224,6 +224,12 @@ void CEngineAPI::CreateRendererList()
     }
     else
     {
+        // XXX: since we are going to support OpenGL render with its own feature levels,
+        // the reference render availability checking trick doesn't quite work: it's based
+        // on assumption that first unsupported render quality level means all the rest
+        // (greater) levels are not supported too, which is incorrect in case of Linux,
+        // where we have OpenGL only (so the engine would crash on R_ASSERT below).
+        // ...
         // try to initialize R2
         hRender = XRay::LoadLibrary(r2_name);
         if (hRender)
