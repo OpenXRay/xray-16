@@ -31,6 +31,7 @@
 #include "UI/UIGameTutorial.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
+#include "xrEngine/xr_input.h"
 
 #ifndef MASTER_GOLD
 #	include "custommonster.h"
@@ -771,6 +772,7 @@ void CGamePersistent::OnAppActivate		()
 	}
 
 	bEntryFlag = TRUE;
+    pInput->ClipCursor(!GetUICursor().IsVisible());
 }
 
 void CGamePersistent::OnAppDeactivate	()
@@ -780,7 +782,7 @@ void CGamePersistent::OnAppDeactivate	()
 	bool bIsMP = (g_pGameLevel && Level().game && GameID() != eGameIDSingle);
 
 	bRestorePause = FALSE;
-
+    
 	if ( !bIsMP )
 	{
 		bRestorePause			= Device.Paused();
