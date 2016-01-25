@@ -34,10 +34,6 @@ CEngineAPI::~CEngineAPI()
     // destroy quality token here
     if (vid_quality_token)
     {
-        for (int i = 0; vid_quality_token[i].name; i++)
-        {
-            xr_free(vid_quality_token[i].name);
-        }
         xr_free(vid_quality_token);
         vid_quality_token = NULL;
     }
@@ -274,81 +270,37 @@ void CEngineAPI::CreateRendererList()
     }
 
     hRender = 0;
-
-    xr_vector<LPCSTR> _tmp;
-    u32 i = 0;
-    bool bBreakLoop = false;
-    for (; i < 6; ++i)
+    bool proceed = true;
+    xr_vector<LPCSTR> tmp;
+    tmp.push_back("renderer_r1");
+    if (proceed && (proceed = bSupports_r2))
     {
-        switch (i)
-        {
-        case 1:
-            if (!bSupports_r2)
-                bBreakLoop = true;
-            break;
-        case 3: //"renderer_r2.5"
-            if (!bSupports_r2_5)
-                bBreakLoop = true;
-            break;
-        case 5: //"renderer_r_dx10"
-            if (!bSupports_r3)
-                bBreakLoop = true;
-            break;
-        case 6: //"renderer_r_dx11"
-            if (!bSupports_r4)
-                bBreakLoop = true;
-            break;
-        default:
-            ;
-        }
-
-        if (bBreakLoop) break;
-
-        _tmp.push_back(NULL);
-        LPCSTR val = NULL;
-        switch (i)
-        {
-        case 0:
-            val = "renderer_r1";
-            break;
-        case 1:
-            val = "renderer_r2a";
-            break;
-        case 2:
-            val = "renderer_r2";
-            break;
-        case 3:
-            val = "renderer_r2.5";
-            break;
-        case 4:
-            val = "renderer_gl";
-            break;
-        case 5:
-            val = "renderer_r3";
-            break; // -)
-        case 6:
-            val = "renderer_r4";
-            break; // -)
-        }
-        if (bBreakLoop) break;
-        _tmp.back() = xr_strdup(val);
+        tmp.push_back("renderer_r2a");
+        tmp.push_back("renderer_r2");
     }
-
-    u32 _cnt = _tmp.size() + 1;
+    if (proceed && (proceed = bSupports_r2_5))
+        tmp.push_back("renderer_r2.5");
+    if (proceed && (proceed = bSupports_gl))
+        tmp.push_back("renderer_gl");
+    if (proceed && (proceed = bSupports_r3))
+        tmp.push_back("renderer_r3");
+    if (proceed && (proceed = bSupports_r4))
+        tmp.push_back("renderer_r4");
+    u32 _cnt = tmp.size() + 1;
     vid_quality_token = xr_alloc<xr_token>(_cnt);
 
     vid_quality_token[_cnt - 1].id = -1;
     vid_quality_token[_cnt - 1].name = NULL;
 
 #ifdef DEBUG
-    Msg("Available render modes[%d]:", _tmp.size());
+    Msg("Available render modes[%d]:", tmp.size());
 #endif // DEBUG
-    for (u32 i = 0; i < _tmp.size(); ++i)
+    for (u32 i = 0; i < tmp.size(); ++i)
     {
         vid_quality_token[i].id = i;
-        vid_quality_token[i].name = _tmp[i];
+        vid_quality_token[i].name = tmp[i];
 #ifdef DEBUG
-        Msg("[%s]", _tmp[i]);
+        Msg("[%s]", tmp[i]);
 #endif // DEBUG
     }
 
