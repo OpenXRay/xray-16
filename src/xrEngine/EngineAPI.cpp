@@ -279,18 +279,18 @@ void CEngineAPI::CreateRendererList()
     bool proceed = true;
     xr_vector<LPCSTR> tmp;
     tmp.push_back("renderer_r1");
-    if (proceed && (proceed = bSupports_r2))
+    if (proceed &= bSupports_r2, proceed)
     {
         tmp.push_back("renderer_r2a");
         tmp.push_back("renderer_r2");
     }
-    if (proceed && (proceed = bSupports_r2_5))
+    if (proceed &= bSupports_r2_5, proceed)
         tmp.push_back("renderer_r2.5");
-    if (proceed && (proceed = bSupports_gl))
+    if (proceed &= bSupports_gl, proceed)
         tmp.push_back("renderer_gl");
-    if (proceed && (proceed = bSupports_r3))
+    if (proceed &= bSupports_r3, proceed)
         tmp.push_back("renderer_r3");
-    if (proceed && (proceed = bSupports_r4))
+    if (proceed &= bSupports_r4, proceed)
         tmp.push_back("renderer_r4");
     u32 _cnt = tmp.size() + 1;
     vid_quality_token = xr_alloc<xr_token>(_cnt);
