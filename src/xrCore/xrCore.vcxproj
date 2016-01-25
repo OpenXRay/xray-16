@@ -279,19 +279,19 @@
     <ClCompile Include="_std_extensions.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\GUID.hpp" />
-    <ClInclude Include="..\common\LevelStructure.hpp" />
+    <ClInclude Include="..\Common\GUID.hpp" />
+    <ClInclude Include="..\Common\LevelStructure.hpp" />
     <ClInclude Include="..\Common\Noncopyable.hpp" />
-    <ClInclude Include="..\common\object_broker.h" />
-    <ClInclude Include="..\common\object_cloner.h" />
-    <ClInclude Include="..\common\object_comparer.h" />
-    <ClInclude Include="..\common\object_destroyer.h" />
-    <ClInclude Include="..\common\object_interfaces.h" />
-    <ClInclude Include="..\common\object_loader.h" />
-    <ClInclude Include="..\common\object_saver.h" />
-    <ClInclude Include="..\common\object_type_traits.h" />
-    <ClInclude Include="..\common\Util.hpp" />
-    <ClInclude Include="..\common\_d3d_extensions.h" />
+    <ClInclude Include="..\Common\object_broker.h" />
+    <ClInclude Include="..\Common\object_cloner.h" />
+    <ClInclude Include="..\Common\object_comparer.h" />
+    <ClInclude Include="..\Common\object_destroyer.h" />
+    <ClInclude Include="..\Common\object_interfaces.h" />
+    <ClInclude Include="..\Common\object_loader.h" />
+    <ClInclude Include="..\Common\object_saver.h" />
+    <ClInclude Include="..\Common\object_type_traits.h" />
+    <ClInclude Include="..\Common\Util.hpp" />
+    <ClInclude Include="..\Common\_d3d_extensions.h" />
     <ClInclude Include="Animation\Bone.hpp" />
     <ClInclude Include="Animation\Envelope.hpp" />
     <ClInclude Include="Animation\Motion.hpp" />

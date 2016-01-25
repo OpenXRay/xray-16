@@ -686,10 +686,10 @@
     <ClInclude Include="Media\Image.hpp">
       <Filter>Media</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\Util.hpp">
+    <ClInclude Include="..\Common\Util.hpp">
       <Filter>Kernel\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\_d3d_extensions.h">
+    <ClInclude Include="..\Common\_d3d_extensions.h">
       <Filter>Kernel\Common</Filter>
     </ClInclude>
     <ClInclude Include="cdecl_cast.hpp">
@@ -725,28 +725,28 @@
     <ClInclude Include="Threading\Event.hpp">
       <Filter>Threading</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\object_type_traits.h">
+    <ClInclude Include="..\Common\object_type_traits.h">
       <Filter>Common\Object</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\object_broker.h">
+    <ClInclude Include="..\Common\object_broker.h">
       <Filter>Common\Object</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\object_cloner.h">
+    <ClInclude Include="..\Common\object_cloner.h">
       <Filter>Common\Object</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\object_comparer.h">
+    <ClInclude Include="..\Common\object_comparer.h">
       <Filter>Common\Object</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\object_destroyer.h">
+    <ClInclude Include="..\Common\object_destroyer.h">
       <Filter>Common\Object</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\object_interfaces.h">
+    <ClInclude Include="..\Common\object_interfaces.h">
       <Filter>Common\Object</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\object_loader.h">
+    <ClInclude Include="..\Common\object_loader.h">
       <Filter>Common\Object</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\object_saver.h">
+    <ClInclude Include="..\Common\object_saver.h">
       <Filter>Common\Object</Filter>
     </ClInclude>
     <ClInclude Include="Debug\dxerr.h">
@@ -758,10 +758,10 @@
     <ClInclude Include="Debug\DXGetErrorString.inl">
       <Filter>Debug core\DxErr</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\GUID.hpp">
+    <ClInclude Include="..\Common\GUID.hpp">
       <Filter>Kernel\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\LevelStructure.hpp">
+    <ClInclude Include="..\Common\LevelStructure.hpp">
       <Filter>Kernel\Common</Filter>
     </ClInclude>
     <ClInclude Include="Crypto\crypto.h">
