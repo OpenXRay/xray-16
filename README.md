@@ -7,9 +7,7 @@ The original engine is used in S.T.A.L.K.E.R. Call of Pripyat game released by G
 It is a place to share ideas on what to implement, gather people that want to work on the engine,
 and work on the source code.
 
-Current task list: [doc/design/task_list.txt](doc/design/task_list.txt)
-
-Task history: [doc/design/task_history.txt](doc/design/task_history.txt)
+Changelist is available in [wiki](https://github.com/OpenXRay/xray-16/wiki/Changes).
 
 Build instructions: [doc/howto/build.txt](doc/howto/build.txt)
 
