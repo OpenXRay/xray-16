@@ -254,6 +254,11 @@
     <ClCompile Include="Threading\Event.cpp" />
     <ClCompile Include="Threading\ttapi.cpp" />
     <ClCompile Include="Threading\Lock.cpp" />
+    <ClCompile Include="Xml\tinystr.cpp" />
+    <ClCompile Include="Xml\tinyxml.cpp" />
+    <ClCompile Include="Xml\tinyxmlerror.cpp" />
+    <ClCompile Include="Xml\tinyxmlparser.cpp" />
+    <ClCompile Include="Xml\xrXMLParser.cpp" />
     <ClCompile Include="xrCore.cpp" />
     <ClCompile Include="ModuleLookup.cpp" />
     <ClCompile Include="xrDebug.cpp" />
@@ -372,6 +377,9 @@
     <ClInclude Include="Threading\ttapi.h" />
     <ClInclude Include="Threading\Lock.hpp" />
     <ClInclude Include="vector.h" />
+    <ClInclude Include="Xml\tinystr.h" />
+    <ClInclude Include="Xml\tinyxml.h" />
+    <ClInclude Include="Xml\xrXMLParser.h" />
     <ClInclude Include="xrCore.h" />
     <ClInclude Include="ModuleLookup.hpp" />
     <ClInclude Include="xrDebug.h" />

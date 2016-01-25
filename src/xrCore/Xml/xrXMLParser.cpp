@@ -4,12 +4,12 @@
 #include "xrXMLParser.h"
 
 
-XRXMLPARSER_API CXml::CXml()
+CXml::CXml()
 	:	m_root			(NULL),
 		m_pLocalRoot	(NULL)
 {}
 
-XRXMLPARSER_API CXml::~CXml()
+CXml::~CXml()
 {
 	ClearInternal();
 }
@@ -456,19 +456,3 @@ LPCSTR CXml::CheckUniqueAttrib (XML_NODE* start_node, LPCSTR tag_name, LPCSTR at
 	return NULL;
 }
 #endif
-
-BOOL APIENTRY DllMain( HANDLE hModule, 
-                       u32  ul_reason_for_call, 
-                       LPVOID lpReserved
-					 )
-{
-	switch (ul_reason_for_call)
-	{
-	case DLL_PROCESS_ATTACH: {
-		break;
-	}
-	case DLL_PROCESS_DETACH:
-		break;
-	}
-    return TRUE;
-}

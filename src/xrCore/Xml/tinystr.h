@@ -256,7 +256,7 @@ class TiXmlString
 		{
 			// The rep_ is really an array of ints. (see the allocator, above).
 			// Cast it back before delete, so the compiler won't incorrectly call destructors.
-			xr_free( reinterpret_cast<int*>( rep_ ) );
+			xr_free( reinterpret_cast<int *&>( rep_ ) );
 		}
 	}
 

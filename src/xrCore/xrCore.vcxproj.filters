@@ -121,6 +121,12 @@
     <Filter Include="Math\RNG">
       <UniqueIdentifier>{ba09a2fb-b14c-4c35-8e0d-957a47930740}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Xml">
+      <UniqueIdentifier>{f365c098-99bb-41a7-858d-12ba18a1311e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Xml\TinyXML">
+      <UniqueIdentifier>{eb0bfab5-c514-4df4-a747-d14beb72f57b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -359,6 +365,21 @@
     </ClCompile>
     <ClCompile Include="Debug\StackTrace.cpp">
       <Filter>Debug core</Filter>
+    </ClCompile>
+    <ClCompile Include="Xml\tinystr.cpp">
+      <Filter>Xml</Filter>
+    </ClCompile>
+    <ClCompile Include="Xml\tinyxml.cpp">
+      <Filter>Xml</Filter>
+    </ClCompile>
+    <ClCompile Include="Xml\tinyxmlerror.cpp">
+      <Filter>Xml</Filter>
+    </ClCompile>
+    <ClCompile Include="Xml\tinyxmlparser.cpp">
+      <Filter>Xml</Filter>
+    </ClCompile>
+    <ClCompile Include="Xml\xrXMLParser.cpp">
+      <Filter>Xml</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -772,6 +793,15 @@
     </ClInclude>
     <ClInclude Include="..\Common\Noncopyable.hpp">
       <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Xml\tinystr.h">
+      <Filter>Xml</Filter>
+    </ClInclude>
+    <ClInclude Include="Xml\tinyxml.h">
+      <Filter>Xml</Filter>
+    </ClInclude>
+    <ClInclude Include="Xml\xrXMLParser.h">
+      <Filter>Xml</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
