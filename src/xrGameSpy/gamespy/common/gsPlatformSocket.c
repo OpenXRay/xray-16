@@ -235,7 +235,8 @@ int DisableNagle(SOCKET sock)
 		
 		struct timeval aTimeout = { 0, 0 };
 
-		assert(theSocket != INVALID_SOCKET);
+		if (theSocket == INVALID_SOCKET)
+			return -1;
 
 		// Setup the parameters.
 		////////////////////////
