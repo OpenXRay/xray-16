@@ -173,8 +173,7 @@ public:
 	EErrorDlg		GetErrorDialogType				() const { return m_NeedErrDialog; } ;
 	void			CheckForErrorDlg				();
 	void			SwitchToMultiplayerMenu			();
-	void			OnNewPatchFound					(LPCSTR VersionName, LPCSTR URL);
-	void			OnNoNewPatchFound				();
+	void xr_stdcall OnPatchCheck					(bool success, LPCSTR VersionName, LPCSTR URL);
 	void xr_stdcall OnDownloadPatch					(CUIWindow*, void*);
 	void xr_stdcall OnConnectToMasterServerOkClicked(CUIWindow*, void*);
 
@@ -184,9 +183,8 @@ public:
 
 	void			OnSessionTerminate				(LPCSTR reason);
 	void			OnLoadError						(LPCSTR module);
-	void			OnDownloadPatchError			();
-	void			OnDownloadPatchSuccess			();
-	void			OnDownloadPatchProgress			(u64 bytesReceived, u64 totalSize);
+	void xr_stdcall OnDownloadPatchResult(bool success);
+	void xr_stdcall OnDownloadPatchProgress(u64 received, u64 total);
 	void xr_stdcall OnRunDownloadedPatch			(CUIWindow*, void*);
 	void			Show_CTMS_Dialog				();
 	void			Hide_CTMS_Dialog				();

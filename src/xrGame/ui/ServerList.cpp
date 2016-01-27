@@ -9,8 +9,10 @@
 #include "TeamInfo.h"
 #include "MainMenu.h"
 #include "login_manager.h"
+#include "GameSpy/GameSpy_Keys.h"
 #include "GameSpy/GameSpy_Full.h"
 #include "GameSpy/GameSpy_Browser.h"
+#include <xrGame/spectator.h>
 
 LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
 CGameSpy_Browser* g_gs_browser = NULL;
@@ -181,6 +183,86 @@ void CServerList::AfterDisappear()
 	UpdateVisibility		();
 }
 
+void CServerList::AddServerDetail(const GameInfo &info)
+{
+    CUIListBox &listBox = m_list[LST_SRV_PROP];
+    float halfWidth = listBox.GetWidth()/2;
+    CUIListBoxItem *item = listBox.AddItem();
+    item->SetText(info.InfoName.c_str());
+    item->GetTextItem()->SetWidth(halfWidth);
+    item->AddTextField(info.InfoData.c_str(), halfWidth);
+}
+
+void CServerList::AddBoolED(const char *keyName, bool value)
+{
+    CStringTable st;
+    AddServerDetail(GameInfo(*st.translate(keyName), value ?
+        *st.translate("mp_si_enabled") : *st.translate("mp_si_disabled")));
+}
+
+void CServerList::AddBoolYN(const char *keyName, bool value)
+{
+    CStringTable st;
+    AddServerDetail(GameInfo(*st.translate(keyName), value ?
+        *st.translate("mp_si_yes") : *st.translate("mp_si_no")));
+}
+
+void CServerList::AddBoolKeyED(void *s, const char *keyName, int k)
+{
+    AddBoolED(keyName, browser().GetBool(s, k));
+}
+
+void CServerList::AddBoolKeyYN(void *s, const char *keyName, int k)
+{
+    AddBoolYN(keyName, browser().GetBool(s, k));
+}
+
+void CServerList::AddIntKey(void *s, const char *keyName, int k)
+{
+    CStringTable st;
+    string256 tmp;
+    xr_sprintf(tmp, "%d", browser().GetInt(s, k));
+	AddServerDetail(GameInfo(*st.translate(keyName), tmp));
+}
+
+void CServerList::AddIntKeyN(void *s, float m, const char *keyName, const char *suffix, int k)
+{
+    CStringTable st;
+    if (browser().GetInt(s, k))
+    {
+        string256 tmp;
+        xr_sprintf(tmp, "%d%s", int(browser().GetInt(s, k)*m), suffix);
+	    AddServerDetail(GameInfo(*st.translate(keyName), tmp));
+    }
+	else
+        AddServerDetail(GameInfo(*st.translate(keyName), *st.translate("mp_si_no")));
+}
+
+void CServerList::AddTimeKey(void *s, const char *keyName, const char *format, const char *suffix, int k)
+{
+    CStringTable st;
+    if (browser().GetInt(s, k))
+    {
+        string256 tmp;
+        xr_sprintf(tmp, format, browser().GetFloat(s, k), *st.translate(suffix));
+	    AddServerDetail(GameInfo(*st.translate(keyName), tmp));
+    }
+	else
+        AddServerDetail(GameInfo(*st.translate(keyName), *st.translate("mp_si_no")));
+}
+
+void CServerList::AddString(const char *key, const char *value)
+{
+    CStringTable st;
+    AddServerDetail(GameInfo(*st.translate(key), value));
+}
+
+void CServerList::AddStringSt(const char *key, const char *value)
+{
+    CStringTable st;
+    AddServerDetail(GameInfo(*st.translate(key), *st.translate(value)));
+}
+
 void CServerList::FillUpDetailedServerInfo()
 {	
 
@@ -189,158 +271,177 @@ void CServerList::FillUpDetailedServerInfo()
 	bool spect = false;
 		
 	CUIListItemServer* pItem = (CUIListItemServer*)m_list[LST_SERVER].GetSelectedItem();
-	if(pItem)
+    if (!pItem)
+    {
+        ClearDetailedServerInfo();
+        return;
+    }
+	ServerInfo srvInfo;
+    int serverIndex = pItem->GetInfo()->info.Index;
+	browser().GetServerInfoByIndex(&srvInfo, serverIndex);
+	u32 teams = srvInfo.m_aTeams.size();
+
+	if (2==teams)
 	{
-		ServerInfo srvInfo;
-		browser().GetServerInfoByIndex(&srvInfo, pItem->GetInfo()->info.Index);
-		u32 teams = srvInfo.m_aTeams.size();
-
-		if (2 == teams)
+		LPSTR _buff = NULL;
+		CUIListBoxItem* pItemAdv;
+		// TEAM 1
+		xr_vector<PlayerInfo>::iterator it;
+		for (it = srvInfo.m_aPlayers.begin(); it != srvInfo.m_aPlayers.end(); ++it)
 		{
-			LPSTR _buff = NULL;
-
-			CUIListBoxItem* pItemAdv;
-
-			// TEAM 1
-			xr_vector<PlayerInfo>::iterator it;
-			for (it = srvInfo.m_aPlayers.begin(); it != srvInfo.m_aPlayers.end(); ++it)
+			PlayerInfo pf = *it;
+			if (1 != pf.Team)
+				continue;
+			if (pf.Spectator)
+				continue;
+			if (!t1) // add header
 			{
-				PlayerInfo pf = *it;
-				if (1 != pf.Team)
-					continue;
-				if (pf.Spectator)
-					continue;
-
-				if (!t1)		// add header
-				{
-					STRCONCAT(_buff, CStringTable().translate("ui_st_team").c_str(),
-						"\"", CTeamInfo::GetTeam1_name().c_str(), "\"");
-
-					pItemAdv					= m_list[LST_PLAYERS].AddItem();
-					pItemAdv->SetTextColor		(m_list[LST_PLAYERS].GetTextColor());
-					pItemAdv->SetFont			(m_list[LST_PLAYERS].GetFont());
-					pItemAdv->SetText			(_buff);
-					pItemAdv->GetTextItem()->SetWidth(m_list[LST_PLAYERS].GetDesiredChildWidth());
-					t1 = true;
-				}
-
-
- 				pItemAdv						= m_list[LST_PLAYERS].AddItem();
-
-				char buf[16];
-				pItemAdv->SetTextColor			(m_list[LST_PLAYERS].GetTextColor());
-				pItemAdv->SetFont				(m_list[LST_PLAYERS].GetFont());
-				pItemAdv->SetText	(pf.Name);
-				pItemAdv->GetTextItem()->SetWidth(m_header2[1].GetWidth());
-
-				xr_sprintf						(buf,sizeof(buf),"%d",pf.Frags);
-				pItemAdv->AddTextField			(buf, m_header2[2].GetWidth());
-
-				xr_sprintf						(buf,sizeof(buf),"%d",pf.Deaths);
-				pItemAdv->AddTextField			(buf, m_header2[3].GetWidth());
+				STRCONCAT(_buff, CStringTable().translate("ui_st_team").c_str(),
+					"\"", CTeamInfo::GetTeam1_name().c_str(), "\"");
+				pItemAdv					= m_list[LST_PLAYERS].AddItem();
+				pItemAdv->SetTextColor		(m_list[LST_PLAYERS].GetTextColor());
+				pItemAdv->SetFont			(m_list[LST_PLAYERS].GetFont());
+				pItemAdv->SetText			(_buff);
+				pItemAdv->GetTextItem()->SetWidth(m_list[LST_PLAYERS].GetDesiredChildWidth());
+				t1 = true;
 			}
+ 			pItemAdv						= m_list[LST_PLAYERS].AddItem();
+			char buf[16];
+			pItemAdv->SetTextColor			(m_list[LST_PLAYERS].GetTextColor());
+			pItemAdv->SetFont				(m_list[LST_PLAYERS].GetFont());
+			pItemAdv->SetText	(pf.Name);
+			pItemAdv->GetTextItem()->SetWidth(m_header2[1].GetWidth());
+			xr_sprintf						(buf,sizeof(buf),"%d",pf.Frags);
+			pItemAdv->AddTextField			(buf, m_header2[2].GetWidth());
+			xr_sprintf						(buf,sizeof(buf),"%d",pf.Deaths);
+			pItemAdv->AddTextField			(buf, m_header2[3].GetWidth());
+		}
 
 			
-			// TEAM 2
-			for (it = srvInfo.m_aPlayers.begin(); it != srvInfo.m_aPlayers.end(); it++)
-			{
-				PlayerInfo pf = *it;
-				if (2 != pf.Team)
-					continue;
-				if (pf.Spectator)
-					continue;
-
-				if (!t2)
-				{
-					STRCONCAT(_buff, CStringTable().translate("ui_st_team").c_str(),
-						"\"", CTeamInfo::GetTeam2_name().c_str(), "\"");
-
-					m_list[LST_PLAYERS].AddTextItem	(_buff);
-
-					t2 = true;
-				}
-
-				pItemAdv						= m_list[LST_PLAYERS].AddItem();
-
-				char buf[16];
-				pItemAdv->SetTextColor			(m_list[LST_PLAYERS].GetTextColor());
-				pItemAdv->SetFont				(m_list[LST_PLAYERS].GetFont());
-				pItemAdv->SetText				(pf.Name);
-				pItemAdv->GetTextItem()->SetWidth(m_header2[1].GetWidth());
-				
-				xr_sprintf						(buf,sizeof(buf),"%d",pf.Frags);
-				pItemAdv->AddTextField			(buf, m_header2[2].GetWidth());
-
-				xr_sprintf						(buf,sizeof(buf),"%d",pf.Deaths);
-				pItemAdv->AddTextField			(buf, m_header2[3].GetWidth());
-			}
-
-			// SPECTATORS
-			for (it = srvInfo.m_aPlayers.begin(); it != srvInfo.m_aPlayers.end();++it)
-			{
-				PlayerInfo pf = *it;
-				if (!pf.Spectator)
-					continue;
-
-				if (!spect)
-				{
-					pItemAdv					= m_list[LST_PLAYERS].AddTextItem(CStringTable().translate("mp_spectator").c_str());
-					spect = true;
-				}
-
-				pItemAdv						= m_list[LST_PLAYERS].AddItem();
-
-				char buf[16];
-				pItemAdv->SetFont				(m_list[LST_PLAYERS].GetFont());
-				pItemAdv->SetTextColor			(m_list[LST_PLAYERS].GetTextColor());
-				pItemAdv->SetText				(pf.Name);
-				pItemAdv->GetTextItem()->SetWidth(m_header2[1].GetWidth());
-
-				xr_sprintf						(buf,sizeof(buf),"%d",pf.Frags);
-				pItemAdv->AddTextField			(buf, m_header2[2].GetWidth());
-
-				xr_sprintf						(buf,sizeof(buf),"%d",pf.Deaths);
-				pItemAdv->AddTextField			(buf, m_header2[3].GetWidth());
-			}
-
-		}
-		else
+		// TEAM 2
+		for (it = srvInfo.m_aPlayers.begin(); it != srvInfo.m_aPlayers.end(); it++)
 		{
-			xr_vector<PlayerInfo>::iterator it;
-			for (it = srvInfo.m_aPlayers.begin(); it != srvInfo.m_aPlayers.end(); ++it)
+			PlayerInfo pf = *it;
+			if (2 != pf.Team)
+				continue;
+			if (pf.Spectator)
+				continue;
+			if (!t2)
 			{
-				PlayerInfo pf = *it;
-				CUIListBoxItem* pItemAdv		= m_list[LST_PLAYERS].AddItem();
-
-				char buf[16];
-
-				pItemAdv->SetTextColor			(m_list[LST_PLAYERS].GetTextColor());
-				pItemAdv->SetFont				(m_list[LST_PLAYERS].GetFont());
-				pItemAdv->SetText				(pf.Name);
-				pItemAdv->GetTextItem()->SetWidth(m_header2[1].GetWidth());
-
-				xr_sprintf						(buf,sizeof(buf),"%d",pf.Frags);
-				pItemAdv->AddTextField			(buf, m_header2[2].GetWidth());
-
-				xr_sprintf						(buf,sizeof(buf),"%d",pf.Deaths);
-				pItemAdv->AddTextField			(buf, m_header2[3].GetWidth());
+				STRCONCAT(_buff, CStringTable().translate("ui_st_team").c_str(),
+					"\"", CTeamInfo::GetTeam2_name().c_str(), "\"");
+				m_list[LST_PLAYERS].AddTextItem	(_buff);
+				t2 = true;
 			}
+			pItemAdv						= m_list[LST_PLAYERS].AddItem();
+			char buf[16];
+			pItemAdv->SetTextColor			(m_list[LST_PLAYERS].GetTextColor());
+			pItemAdv->SetFont				(m_list[LST_PLAYERS].GetFont());
+			pItemAdv->SetText				(pf.Name);
+			pItemAdv->GetTextItem()->SetWidth(m_header2[1].GetWidth());				
+			xr_sprintf						(buf,sizeof(buf),"%d",pf.Frags);
+			pItemAdv->AddTextField			(buf, m_header2[2].GetWidth());
+			xr_sprintf						(buf,sizeof(buf),"%d",pf.Deaths);
+			pItemAdv->AddTextField			(buf, m_header2[3].GetWidth());
 		}
-
-		xr_vector<GameInfo>::iterator it;
-		for (it = srvInfo.m_aInfos.begin(); it != srvInfo.m_aInfos.end(); ++it)
+		// SPECTATORS
+		for (it = srvInfo.m_aPlayers.begin(); it != srvInfo.m_aPlayers.end();++it)
 		{
-			GameInfo gi							= *it;
-			CUIListBoxItem* pItemAdv			= m_list[LST_SRV_PROP].AddItem();
-
-			pItemAdv->SetText					(gi.InfoName.c_str());
-			pItemAdv->GetTextItem()->SetWidth	(m_list[LST_SRV_PROP].GetWidth()/2);
-
-			pItemAdv->AddTextField				(gi.InfoData.c_str(), m_list[LST_SRV_PROP].GetWidth()/2);
+			PlayerInfo pf = *it;
+			if (!pf.Spectator)
+				continue;
+			if (!spect)
+			{
+				pItemAdv					= m_list[LST_PLAYERS].AddTextItem(CStringTable().translate("mp_spectator").c_str());
+				spect = true;
+			}
+			pItemAdv						= m_list[LST_PLAYERS].AddItem();
+			char buf[16];
+			pItemAdv->SetFont				(m_list[LST_PLAYERS].GetFont());
+			pItemAdv->SetTextColor			(m_list[LST_PLAYERS].GetTextColor());
+			pItemAdv->SetText				(pf.Name);
+			pItemAdv->GetTextItem()->SetWidth(m_header2[1].GetWidth());
+			xr_sprintf						(buf,sizeof(buf),"%d",pf.Frags);
+			pItemAdv->AddTextField			(buf, m_header2[2].GetWidth());
+			xr_sprintf						(buf,sizeof(buf),"%d",pf.Deaths);
+			pItemAdv->AddTextField			(buf, m_header2[3].GetWidth());
 		}
 	}
 	else
-		ClearDetailedServerInfo		();
+	{
+		xr_vector<PlayerInfo>::iterator it;
+		for (it = srvInfo.m_aPlayers.begin(); it != srvInfo.m_aPlayers.end(); ++it)
+		{
+			PlayerInfo pf = *it;
+			CUIListBoxItem* pItemAdv		= m_list[LST_PLAYERS].AddItem();
+			char buf[16];
+			pItemAdv->SetTextColor			(m_list[LST_PLAYERS].GetTextColor());
+			pItemAdv->SetFont				(m_list[LST_PLAYERS].GetFont());
+			pItemAdv->SetText				(pf.Name);
+			pItemAdv->GetTextItem()->SetWidth(m_header2[1].GetWidth());
+			xr_sprintf						(buf,sizeof(buf),"%d",pf.Frags);
+			pItemAdv->AddTextField			(buf, m_header2[2].GetWidth());
+			xr_sprintf						(buf,sizeof(buf),"%d",pf.Deaths);
+			pItemAdv->AddTextField			(buf, m_header2[3].GetWidth());
+		}
+	}
+    CStringTable st;
+    void *sv = browser().GetServerByIndex(serverIndex);
+    AddString("mp_si_servername", srvInfo.m_ServerName);
+    AddString("mp_si_version", srvInfo.m_ServerVersion);
+    AddIntKey(sv, "mp_si_max_ping", G_MAX_PING_KEY);
+    AddBoolKeyYN(sv, "mp_si_maprotation", G_MAP_ROTATION_KEY);
+    AddBoolKeyED(sv, "mp_si_voting", G_VOTING_ENABLED_KEY);
+    AddBoolKeyYN(sv, "mp_si_voting", G_VOTING_ENABLED_KEY);
+    AddString("mp_si_spectatormodes", "");
+    AddBoolYN("mp_si_free_fly", srvInfo.SpectratorModes & (1 << CSpectator::eacFreeFly));
+    AddBoolYN("mp_si_first_eye", srvInfo.SpectratorModes & (1 << CSpectator::eacFirstEye));
+    AddBoolYN("mp_si_look_at", srvInfo.SpectratorModes & (1 << CSpectator::eacLookAt));
+    AddBoolYN("mp_si_free_look", srvInfo.SpectratorModes & (1 << CSpectator::eacFreeLook));
+    if (srvInfo.m_GameType!=eGameIDDeathmatch)
+        AddBoolYN("mp_si_team_only", srvInfo.SpectratorModes & (1 << CSpectator::eacMaxCam));
+    AddIntKey(sv, "mp_si_fraglimit", G_FRAG_LIMIT_KEY);
+    AddTimeKey(sv, "mp_si_time_limit", "%.0f %s", "mp_si_min", G_TIME_LIMIT_KEY);
+    AddString("mp_si_invinsibility", "");
+    AddBoolKeyYN(sv, "mp_si_invinsibility_indicators", G_DAMAGE_BLOCK_INDICATOR_KEY);
+    AddTimeKey(sv, "mp_si_invinsibility_time", "%.f %s", "mp_si_sec", G_DAMAGE_BLOCK_TIME_KEY);
+    AddBoolKeyYN(sv, "mp_si_anomalies", G_ANOMALIES_ENABLED_KEY);
+    if (browser().GetInt(sv, G_ANOMALIES_TIME_KEY))
+    {
+        AddTimeKey(sv, "mp_si_anomalies_period", "%.1f %s", "mp_si_min", G_ANOMALIES_TIME_KEY);
+    }
+    else
+        AddStringSt("mp_si_anomalies_period", "mp_si_infinite");
+    AddTimeKey(sv, "mp_si_forcerespawn", "%.f %s", "mp_si_sec", G_FORCE_RESPAWN_KEY);
+    AddTimeKey(sv, "mp_si_warmuptime", "%.0f %s", "mp_si_sec", G_WARM_UP_TIME_KEY);
+    if (srvInfo.m_GameType==eGameIDTeamDeathmatch ||
+        srvInfo.m_GameType==eGameIDArtefactHunt ||
+        srvInfo.m_GameType==eGameIDCaptureTheArtefact)
+    {
+        AddBoolKeyYN(sv, "mp_si_autoteam_balance", G_AUTO_TEAM_BALANCE_KEY);
+        AddBoolKeyYN(sv, "mp_si_autoteam_swap", G_AUTO_TEAM_SWAP_KEY);
+        AddBoolKeyYN(sv, "mp_si_friendly_indicators", G_FRIENDLY_INDICATORS_KEY);
+        AddBoolKeyYN(sv, "mp_si_friendly_names", G_FRIENDLY_NAMES_KEY);
+        AddIntKeyN(sv, 1/100.0f, "mp_si_friendly_fire", " %", G_FRIENDLY_FIRE_KEY);
+    }
+    if (srvInfo.m_GameType==eGameIDArtefactHunt ||
+        srvInfo.m_GameType==eGameIDCaptureTheArtefact)
+    {
+        AddString("mp_si_artefacts", "");
+        AddIntKey(sv, "mp_si_afcount", G_ARTEFACTS_COUNT_KEY);
+        AddTimeKey(sv, "mp_si_afstaytime", "%.2f %s", "mp_si_min", G_ARTEFACT_STAY_TIME_KEY);
+        AddTimeKey(sv, "mp_si_afrespawntime", "%.0f %s", "mp_si_sec", G_ARTEFACT_RESPAWN_TIME_KEY);
+        if (srvInfo.Reinforcement==-1)
+            AddStringSt("mp_si_players_respawn", "mp_si_artefact_captured");
+        else if (srvInfo.Reinforcement==0)
+            AddString("mp_si_players_respawn", "mp_si_any_time");
+        else
+            AddTimeKey(sv, "mp_si_players_respawn", "%.0f %s", "mp_si_sec", G_REINFORCEMENT_KEY);
+        AddBoolKeyYN(sv, "mp_si_shielded_bases", G_SHIELDED_BASES_KEY);
+        AddBoolKeyYN(sv, "mp_si_return_players", G_RETURN_PLAYERS_KEY);
+        AddBoolKeyYN(sv, "mp_si_afbearer_cant_sprint", G_BEARER_CANT_SPRINT_KEY);
+    }
+    AddString("Uptime", srvInfo.m_ServerUpTime);
 }
 
 void CServerList::ClearDetailedServerInfo()
@@ -563,8 +664,17 @@ void CServerList::RefreshGameSpyList(bool Local)
 {
 	SetSortFunc			("",		false);
 	SetSortFunc			("ping",	false);
-	browser().RefreshList_Full(Local, m_edit_gs_filter.GetText());
-
+	auto result = browser().RefreshList_Full(Local, m_edit_gs_filter.GetText());
+    switch (result)
+    {
+    case GSUpdateStatus::ConnectingToMaster:
+        if (MainMenu())
+            MainMenu()->Show_CTMS_Dialog();
+        break;
+    case GSUpdateStatus::MasterUnreachable:
+        MainMenu()->SetErrorDialog(CMainMenu::ErrMasterServerConnectFailed);
+        break;
+    }
 	ResetCurItem		();
 	RefreshList			();
 }

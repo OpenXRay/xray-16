@@ -1,9 +1,5 @@
 #include "stdafx.h"
 #include "GameSpy_GP.h"
-#include "account_manager.h"
-#include "login_manager.h"
-#include "MainMenu.h"
-//in case of fatal error, deleting profile class instance
 
 shared_str CGameSpy_GP::TryToTranslate(GPResult const & res)
 {
@@ -234,7 +230,6 @@ void __cdecl CGameSpy_GP::OnGameSpyErrorCb(GPConnection * connection,
 		Msg("! GameSpy FATAL GP ERROR: error code: %d, description: %s",
 			earg->errorCode,
 			error_descr);
-		//MainMenu()->GetLoginMngr()->delete_profile_obj();
 		return;
 	}
 	Msg("! GameSpy GP ERROR: error code: %d, description: %s", 

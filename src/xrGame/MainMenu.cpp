@@ -14,6 +14,7 @@
 #include "gamespy/GameSpy_Full.h"
 #include "gamespy/GameSpy_HTTP.h"
 #include "gamespy/GameSpy_Available.h"
+#include "gamespy/GameSpy_Browser.h"
 #include "CdkeyDecode/cdkeydecode.h"
 #include "string_table.h"
 #include "xrCore/os_clipboard.h"
@@ -469,7 +470,19 @@ void CMainMenu::OnFrame()
 
 	if(IsActive() || m_sPDProgress.IsInProgress)
 	{
-		m_pGameSpyFull->Update();
+        GSUpdateStatus status = m_pGameSpyFull->Update();
+        if (status!=GSUpdateStatus::ConnectingToMaster)
+            Hide_CTMS_Dialog();
+        switch (status)
+        {
+        case GSUpdateStatus::MasterUnreachable:
+        case GSUpdateStatus::Unknown:
+            SetErrorDialog(ErrMasterServerConnectFailed);
+            break;
+        case GSUpdateStatus::OutOfService:
+            SetErrorDialog(ErrGSServiceFailed);
+            break;
+        }
 		m_atlas_submit_queue->update();
 	}
 
@@ -549,8 +562,13 @@ void CMainMenu::DestroyInternal(bool bForce)
 		xr_delete		(m_startDialog);
 }
 
-void CMainMenu::OnNewPatchFound(LPCSTR VersionName, LPCSTR URL)
+void CMainMenu::OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL)
 {
+    if (!success)
+    {
+        m_pMB_ErrDlgs[NoNewPatch]->ShowDialog(false);
+        return;
+    }
 	if (m_sPDProgress.IsInProgress) return;
 	
 	if (m_pMB_ErrDlgs[NewPatchFound])	
@@ -572,11 +590,6 @@ void CMainMenu::OnNewPatchFound(LPCSTR VersionName, LPCSTR URL)
 	m_pMB_ErrDlgs[NewPatchFound]->AddCallbackStr	("button_yes", MESSAGE_BOX_YES_CLICKED, CUIWndCallback::void_function(this, &CMainMenu::OnDownloadPatch));
 	m_pMB_ErrDlgs[NewPatchFound]->ShowDialog(false);
 };
-
-void CMainMenu::OnNoNewPatchFound()
-{
-	m_pMB_ErrDlgs[NoNewPatch]->ShowDialog(false);
-}
 
 void CMainMenu::OnDownloadPatch(CUIWindow*, void*)
 {
@@ -608,22 +621,20 @@ void CMainMenu::OnDownloadPatch(CUIWindow*, void*)
 	m_sPDProgress.Progress		= 0;
 	m_sPDProgress.FileName		= m_sPatchFileName;
 	m_sPDProgress.Status		= "";
-
-	m_pGameSpyFull->GetGameSpyHTTP()->DownloadFile(*m_sPatchURL, *m_sPatchFileName);
+    CGameSpy_HTTP::CompletionCallback completionCallback;
+    completionCallback.bind(this, &CMainMenu::OnDownloadPatchResult);
+    CGameSpy_HTTP::ProgressCallback progressCallback;
+    progressCallback.bind(this, &CMainMenu::OnDownloadPatchProgress);
+	m_pGameSpyFull->GetGameSpyHTTP()->DownloadFile(*m_sPatchURL, *m_sPatchFileName,
+        completionCallback, progressCallback);
 }
 
-void	CMainMenu::OnDownloadPatchError()
+void	CMainMenu::OnDownloadPatchResult(bool success)
 {
-	m_sPDProgress.IsInProgress	= false;
-	m_pMB_ErrDlgs[PatchDownloadError]->ShowDialog(false);
+    m_sPDProgress.IsInProgress = false;
+	auto dialogId = success ? PatchDownloadSuccess : PatchDownloadError;
+    m_pMB_ErrDlgs[dialogId]->ShowDialog(false);
 };
-
-void	CMainMenu::OnDownloadPatchSuccess			()
-{
-	m_sPDProgress.IsInProgress	= false;
-	
-	m_pMB_ErrDlgs[PatchDownloadSuccess]->ShowDialog(false);
-}
 
 void	CMainMenu::OnSessionTerminate				(LPCSTR reason)
 {

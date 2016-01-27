@@ -184,7 +184,12 @@ u32				xrGameSpyServer::OnMessage(NET_Packet& P, ClientID sender)			// Non-Zero 
 #ifndef MASTER_GOLD
 				Msg("Server : Respond accepted, Authenticate client.");
 #endif // #ifndef MASTER_GOLD
-				m_GCDServer.AuthUser(int(CL->ID.value()), CL->m_cAddress.m_data.data, CL->m_pChallengeString, ResponseStr, this);
+                CGameSpy_GCD_Server::ClientAuthCallback authCb;
+                authCb.bind(this, &xrGameSpyServer::OnCDKey_Validation);
+                CGameSpy_GCD_Server::ClientReauthCallback reauthCb;
+                reauthCb.bind(this, &xrGameSpyServer::OnCDKey_ReValidation);
+				m_GCDServer.AuthUser(int(CL->ID.value()), CL->m_cAddress.m_data.data, CL->m_pChallengeString,
+                    ResponseStr, authCb, reauthCb);
 				xr_strcpy(CL->m_guid,128,this->GCD_Server()->GetKeyHash(CL->ID.value()));
 			}
 			else

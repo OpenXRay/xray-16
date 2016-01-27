@@ -47,8 +47,31 @@ struct ServerInfo{
 	bool					m_bUserPass;
 	s16						m_Ping;
 	s16						m_Port, m_HPort;
+    int MaxPing;
+    bool MapRotation;
+    bool VotingEnabled;
+    int SpectratorModes;
+    int FragLimit;
+    float TimeLimit;
+    bool DamageBlockTime;
+    bool DamageBlockIndicators;
+    bool AnomaliesEnabled;
+    float AnomaliesTime;
+    float ForceRespawn;
+    float WarmUp;
+    bool AutoTeamBalance;
+    bool AutoTeamSwap;
+    bool FriendlyIndicators;
+    bool FriendlyNames;
+    float FriendlyFire;
+    int ArtefactCount;
+    float ArtefactStayTime;
+    float ArtefactRespawnTime;
+    float Reinforcement;
+    bool ShieldedBases;
+    bool ReturnPlayers;
+    bool BearerCantSprint;
 
-	xr_vector<GameInfo>		m_aInfos;
 	xr_vector<PlayerInfo>	m_aPlayers;
 	xr_vector<TeamInfo>		m_aTeams;
 
@@ -61,6 +84,15 @@ struct ServerInfo{
 	};
 
 	bool			operator	==		(LPCSTR Address){int res = xr_strcmp(m_Address, Address);return	res	 == 0;};
+};
+
+enum class GSUpdateStatus
+{
+    Success,
+    ConnectingToMaster,
+    MasterUnreachable,
+    OutOfService,
+    Unknown
 };
 
 class CGameSpy_Browser
@@ -93,7 +125,7 @@ public:
 	bool			Init(CServerList* pServerList);
 	void			Clear();
 
-	void			RefreshList_Full(bool Local, const char* FilterStr = "");
+    GSUpdateStatus RefreshList_Full(bool Local, const char* FilterStr = "");
 	void			RefreshQuick(int Index);
 	bool			HasAllKeys			(int Index);
 	bool			CheckDirectConnection(int Index);
@@ -102,9 +134,14 @@ public:
 
 	int				GetServersCount();
 	void			GetServerInfoByIndex(ServerInfo* pServerInfo, int idx);
+    void *GetServerByIndex(int id);
+    bool GetBool(void *srv, int keyId, bool defaultValue = false);
+    int GetInt(void *srv, int keyId, int defaultValue = 0);
+    float GetFloat(void *srv, int keyId, float defaultValue = 0.0f);
+    const char *GetString(void *srv, int keyId, const char *defaultValue = nullptr);
 
 	void			OnUpdateFailed		(void* server);
-	void			Update();	
+    GSUpdateStatus Update();
 
 	void			UpdateServerList	();
 	void			SortBrowserByPing	();

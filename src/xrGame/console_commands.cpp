@@ -1689,8 +1689,9 @@ public:
 		}
 		
 //		GameSpyPatching.CheckForPatch(InformOfNoPatch);
-		
-		MainMenu()->GetGS()->GetGameSpyPatching()->CheckForPatch(InformOfNoPatch);
+        CGameSpy_Patching::PatchCheckCallback cb;
+        cb.bind(MainMenu(), &CMainMenu::OnPatchCheck);
+		MainMenu()->GetGS()->GetGameSpyPatching()->CheckForPatch(InformOfNoPatch, cb);
 	}
 };
 

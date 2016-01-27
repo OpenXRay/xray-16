@@ -68,8 +68,8 @@ public:
 	
 
 	int								GetPlayersCount					();
-	void							OnCDKey_Validation				(int LocalID, int res, char* errormsg);
-	void							OnCDKey_ReValidation			(int LocalID, int hint, char* challenge);
+	void xr_stdcall OnCDKey_Validation				(int LocalID, int res, char* errormsg);
+	void xr_stdcall OnCDKey_ReValidation			(int LocalID, int hint, char* challenge);
 	CGameSpy_QR2*					QR2() {return &m_QR2;} ;
 
 	CGameSpy_GCD_Server*		GCD_Server()					{ return &m_GCDServer; }

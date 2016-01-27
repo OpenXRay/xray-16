@@ -1,11 +1,25 @@
 #include "stdafx.h"
 #include "xrGameSpyServer.h"
 #include "xrMessages.h"
+#include "gamespy/GameSpy_QR2_callbacks.h"
+
 /////////////////////// QR2 ///////////////////////////////////////
 //void			xrGameSpyServer::QR2_Init			(u32 PortID)
 void			xrGameSpyServer::QR2_Init			(int PortID)
 {	
-	if (!m_QR2.Init(PortID, m_iReportToMasterServer, this)) return;
+    CGameSpy_QR2::Context ctx;
+    ctx.OnServerKey = callback_serverkey;
+    ctx.OnPlayerKey = callback_playerkey;
+    ctx.OnTeamKey = callback_teamkey;
+    ctx.OnKeyList = callback_keylist;
+    ctx.OnCount = callback_count;
+    ctx.OnError = callback_adderror;
+    ctx.OnNatNeg = callback_nn;
+    ctx.OnClientMessage = callback_cm;
+    ctx.OnDenyIP = callback_deny_ip;
+    ctx.GSServer = this;
+	if (!m_QR2.Init(PortID, m_iReportToMasterServer, ctx))
+        return;
 	m_bQR2_Initialized = TRUE;
 };
 

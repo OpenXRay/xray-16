@@ -3,6 +3,7 @@
 class CGameSpy_Available;
 class CGameSpy_Patching;
 class CGameSpy_HTTP;
+enum class GSUpdateStatus;
 class CGameSpy_Browser;
 class CGameSpy_GP;
 class CGameSpy_SAKE;
@@ -31,7 +32,7 @@ public:
 	CGameSpy_SAKE*		GetGameSpySAKE		() const { return m_pGS_SAKE; };
 	CGameSpy_ATLAS*		GetGameSpyATLAS		() const { return m_pGS_ATLAS; };
 
-	void		Update			();
+    GSUpdateStatus Update();
 	const char*	GetGameVersion	();
 	
 	void		CoreThink		(gsi_time theMs)	{ xrGS_gsCoreThink(theMs);	};

@@ -4,6 +4,9 @@
 
 class CGameSpy_Patching
 {
+public:
+    using PatchCheckCallback = fastdelegate::FastDelegate<void(bool success, const char *ver, const char *url)>;
+
 private:
 	HMODULE	m_hGameSpyDLL;
 
@@ -13,7 +16,7 @@ public:
 	CGameSpy_Patching(HMODULE hGameSpyDLL);
 	~CGameSpy_Patching();
 
-	void CheckForPatch	(bool InformOfNoPatch);
+	void CheckForPatch	(bool InformOfNoPatch, PatchCheckCallback &cb);
 	void PtTrackUsage	(int userID);
 private:
 	//--------------------- GCD_Client -------------------------------------------	

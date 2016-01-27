@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "GameSpy_Patching.h"
 #include "GameSpy_Base_Defs.h"
-#include "MainMenu.h"
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
 
 CGameSpy_Patching::CGameSpy_Patching()
@@ -100,12 +99,14 @@ static char const * ModifyDownloadUrl(char* dest, u32 dest_size, char const * or
 bool g_bInformUserThatNoPatchFound = true;
 void __cdecl GS_ptPatchCallback ( PTBool available, PTBool mandatory, const char * versionName, int fileID, const char * downloadURL,  void * param )
 {
-	if (!MainMenu()) return;
+    if (!param)
+        return;
+    auto &cb = *static_cast<CGameSpy_Patching::PatchCheckCallback*>(param);
 	if (!available)
 	{
 		Msg("No new patches are available.");
-		if (g_bInformUserThatNoPatchFound)
-			MainMenu()->OnNoNewPatchFound();		
+        if (g_bInformUserThatNoPatchFound)
+            cb(false, nullptr, nullptr);
 		return;
 	};
 	Msg("Found NewPatch: %s - %s", versionName, downloadURL);
@@ -113,22 +114,15 @@ void __cdecl GS_ptPatchCallback ( PTBool available, PTBool mandatory, const char
 	char* new_download_url = static_cast<char*>(_alloca(new_url_size));
 	char const * new_url = ModifyDownloadUrl(new_download_url, new_url_size, downloadURL);
 	Msg("NewPatch url after updating: %s", new_url);
-	MainMenu()->OnNewPatchFound(versionName, new_url);
+    cb(true, versionName, new_url);
 };
 
-void	CGameSpy_Patching::CheckForPatch(bool InformOfNoPatch)
+void	CGameSpy_Patching::CheckForPatch(bool InformOfNoPatch, PatchCheckCallback &cb)
 {
 	g_bInformUserThatNoPatchFound = InformOfNoPatch;
-	bool res =  xrGS_ptCheckForPatchA(
-		GS_ptPatchCallback,
-		PTFalse,
-		this
-	);	
+	bool res =  xrGS_ptCheckForPatchA(GS_ptPatchCallback, PTFalse, &cb);
 	if (!res)
-	{
 		Msg("! Unable to send query for patch!");
-
-	}
 };
 
 void CGameSpy_Patching::PtTrackUsage	(int userID)

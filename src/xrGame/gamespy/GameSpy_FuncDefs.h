@@ -15,6 +15,7 @@
 #include "xrGameSpy/GameSpy/sc/sc.h"
 
 #undef max
+#include "xrEngine/Engine.h" // for DLL_API
 
 extern "C" {
 

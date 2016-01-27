@@ -16,6 +16,7 @@ class CGameSpy_Browser;
 class CUIMessageBoxEx;
 class CGameSpy_Browser;
 struct ServerInfo;
+struct GameInfo;
 
 #define LST_SERVER		0 
 #define LST_SRV_PROP	1
@@ -76,6 +77,17 @@ protected:
 			void AfterAppear();
 			void BeforeDisapear();
 			void AfterDisappear();
+    void AddServerDetail(const GameInfo &info);
+    void AddBoolED(const char *keyName, bool value);
+    void AddBoolYN(const char *keyName, bool value);
+    void AddBoolKeyED(void *s, const char *keyName, int k);
+    void AddBoolKeyYN(void *s, const char *keyName, int k);
+    void AddIntKey(void *s, const char *keyName, int k);
+    void AddIntKeyN(void *s, float m, const char *keyName, const char *suffix, int k);
+    void AddTimeKey(void *s, const char *keyName, const char *format, const char *suffix, int k);
+    void AddString(const char *key, const char *value);
+    void AddStringSt(const char *key, const char *value);
+
 			void FillUpDetailedServerInfo();
 			void ClearDetailedServerInfo();
 

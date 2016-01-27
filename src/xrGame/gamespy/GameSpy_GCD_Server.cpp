@@ -2,7 +2,6 @@
 #include "GameSpy_GCD_Server.h"
 #include "GameSpy_FuncDefs.h"
 #include "GameSpy_Base_Defs.h"
-#include "xrGameSpyServer.h"
 
 CGameSpy_GCD_Server::CGameSpy_GCD_Server()
 {
@@ -72,23 +71,40 @@ void	CGameSpy_GCD_Server::CreateRandomChallenge(char* challenge, int nchars)
 	};
 }
 
+class GSAuthContext
+{
+public:
+    using ClientAuthCallback = CGameSpy_GCD_Server::ClientAuthCallback;
+    using ClientReauthCallback = CGameSpy_GCD_Server::ClientReauthCallback;
+
+    CGameSpy_GCD_Server::ClientAuthCallback &Auth;
+    CGameSpy_GCD_Server::ClientReauthCallback &Reauth;
+
+    GSAuthContext(ClientAuthCallback &auth, ClientReauthCallback &reauth) :
+        Auth(auth), Reauth(reauth)
+    {}
+};
+
 //--------------------------- CD Key callbacks -----------------------------------
-void __cdecl ClientAuthorizeCallback(int productid, int localid, int authenticated, char *errmsg, void *instance)
+void __cdecl GSClientAuthCallback(int productid, int localid, int authenticated, char *errmsg, void *instance)
 {
-	xrGameSpyServer* pServer = (xrGameSpyServer*) (instance);
-	if (pServer) pServer->OnCDKey_Validation(localid, authenticated, errmsg);
+    auto ctx = static_cast<GSAuthContext*>(instance);
+    if (ctx)
+        ctx->Auth(localid, authenticated, errmsg);
 };
 
-void __cdecl ClientReAuthorizeCallback(int gameid, int localid, int hint, char *challenge, void *instance)
+void __cdecl GSClientReauthCallback(int gameid, int localid, int hint, char *challenge, void *instance)
 {
-	xrGameSpyServer* pServer = (xrGameSpyServer*) (instance);
-	if (pServer) pServer->OnCDKey_ReValidation(localid, hint, challenge);
+    auto ctx = static_cast<GSAuthContext*>(instance);
+    if (ctx)
+        ctx->Reauth(localid, hint, challenge);
 };
 
-void	CGameSpy_GCD_Server::AuthUser(int localid, unsigned int userip, char *challenge, char *response, 
-									  void *instance)
+void	CGameSpy_GCD_Server::AuthUser(int localid, u32 userip, char *challenge, char *response, 
+    ClientAuthCallback &authCallback, ClientReauthCallback &reauthCallback)
 {
-	xrGS_gcd_authenticate_user(localid, userip, challenge, response, ClientAuthorizeCallback, ClientReAuthorizeCallback, instance);
+    GSAuthContext ctx(authCallback, reauthCallback);
+	xrGS_gcd_authenticate_user(localid, userip, challenge, response, GSClientAuthCallback, GSClientReauthCallback, &ctx);
 };
 
 void	CGameSpy_GCD_Server::ReAuthUser(int localid, int hint,char *response)

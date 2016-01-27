@@ -7,7 +7,6 @@
 #include "GameSpy_GP.h"
 #include "GameSpy_SAKE.h"
 #include "GameSpy_ATLAS.h"
-#include "MainMenu.h"
 #include "Common/object_broker.h"
 
 CGameSpy_Full::CGameSpy_Full()	
@@ -70,18 +69,19 @@ void	CGameSpy_Full::LoadGameSpy()
 	GAMESPY_LOAD_FN			(xrGS_gsCoreShutdown);
 }
 
-void	CGameSpy_Full::Update	()
+GSUpdateStatus CGameSpy_Full::Update()
 {
 	if (!m_bServicesAlreadyChecked)
 	{
 		m_bServicesAlreadyChecked = true;
-		MainMenu()->SetErrorDialog(CMainMenu::ErrGSServiceFailed);
+        return GSUpdateStatus::OutOfService;
 	}
 	m_pGS_HTTP->Think	();
-	m_pGS_SB->Update	();
+    GSUpdateStatus status = m_pGS_SB->Update();
 	m_pGS_GP->Think		();
 	CoreThink			(15);
 	m_pGS_ATLAS->Think	();
+    return status;
 };
 
 const	char*	CGameSpy_Full::GetGameVersion()
