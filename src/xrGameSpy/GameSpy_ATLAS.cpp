@@ -1,7 +1,5 @@
 #include "stdafx.h"
 #include "GameSpy_ATLAS.h"
-#include "xrGameSpy_MainDefs.h"
-#include "GameSpy/GP/gp.h"
 
 CGameSpy_ATLAS::CGameSpy_ATLAS	()
 {

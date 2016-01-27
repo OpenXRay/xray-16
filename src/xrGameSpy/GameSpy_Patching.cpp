@@ -1,7 +1,5 @@
 #include "StdAfx.h"
 #include "GameSpy_Patching.h"
-#include "xrGameSpy_MainDefs.h"
-#include "xrGameSpy.h"
 
 static char const * QueryPatchVersionString(char* dest, u32 dest_size)
 {

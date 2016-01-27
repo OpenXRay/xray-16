@@ -1,7 +1,5 @@
 #include "StdAfx.h"
 #include "GameSpy_GCD_Server.h"
-#include "GameSpy_FuncDefs.h"
-#include "xrGameSpy_MainDefs.h"
 
 bool	CGameSpy_GCD_Server::Init()
 {

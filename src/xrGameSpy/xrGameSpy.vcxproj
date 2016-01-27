@@ -971,7 +971,6 @@
     <ClInclude Include="GameSpy_Available.h" />
     <ClInclude Include="GameSpy_Browser.h" />
     <ClInclude Include="GameSpy_Full.h" />
-    <ClInclude Include="GameSpy_FuncDefs.h" />
     <ClInclude Include="GameSpy_GCD_Client.h" />
     <ClInclude Include="GameSpy_GCD_Server.h" />
     <ClInclude Include="GameSpy_GP.h" />

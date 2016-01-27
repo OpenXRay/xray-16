@@ -8,7 +8,6 @@
 #include "GameSpy_SAKE.h"
 #include "GameSpy_ATLAS.h"
 #include "Common/object_broker.h"
-#include "xrGameSpy_MainDefs.h"
 
 CGameSpy_Full::CGameSpy_Full()	
 {

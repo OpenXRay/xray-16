@@ -2,8 +2,6 @@
 
 #include "xrCore/xrCore.h"
 #include "xrGameSpy/xrGameSpy.h"
-#include "xrGameSpy/GameSpy_FuncDefs.h"
-#include "xrCore/fastdelegate.h"
 
 class XRGAMESPY_API CGameSpy_HTTP
 {

@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "GameSpy_QR2.h"
-#include "xrGameSpy_MainDefs.h"
 #include "GameSpy_Keys.h"
 
 namespace

@@ -3,9 +3,8 @@
 
 #include "Common/Noncopyable.hpp"
 #include "mixed_delegate.h"
-#include "xrGameSpy/GameSpy_FuncDefs.h"
-
 #include "queued_async_method.h"
+#include "xrGameSpy/xrGameSpy.h"
 
 class CGameSpy_GP;
 

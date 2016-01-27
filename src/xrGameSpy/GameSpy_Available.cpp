@@ -1,7 +1,5 @@
 #include "StdAfx.h"
 #include "GameSpy_Available.h"
-#include "GameSpy_FuncDefs.h"
-#include "xrGameSpy_MainDefs.h"
 
 bool	CGameSpy_Available::CheckAvailableServices		(shared_str& resultstr)
 {

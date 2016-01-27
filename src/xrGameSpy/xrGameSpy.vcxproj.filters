@@ -629,9 +629,6 @@
     <ClInclude Include="GameSpy_Full.h">
       <Filter>Wrapper</Filter>
     </ClInclude>
-    <ClInclude Include="GameSpy_FuncDefs.h">
-      <Filter>Wrapper</Filter>
-    </ClInclude>
     <ClInclude Include="GameSpy_GCD_Client.h">
       <Filter>Wrapper</Filter>
     </ClInclude>

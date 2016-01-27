@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "GameSpy_GP.h"
-#include "xrGameSpy_MainDefs.h"
 
 shared_str CGameSpy_GP::TryToTranslate(GPResult const & res)
 {

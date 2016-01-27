@@ -1,11 +1,8 @@
 #include "StdAfx.h"
-#include "xrServerEntities/gametype_chooser.h"
 #include "GameSpy_Browser.h"
-#include "GameSpy_Available.h"
+#include "xrServerEntities/gametype_chooser.h"
 #include "GameSpy_Keys.h"
-#include "GameSpy_QR2.h"
 #include "Common/object_broker.h"
-#include "xrGameSpy_MainDefs.h"
 
 #define GAMETYPE_NAME_KEY						100
 #define	DEDICATED_KEY							101

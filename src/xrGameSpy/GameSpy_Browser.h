@@ -2,7 +2,6 @@
 
 #include "xrCore/xrCore.h"
 #include "xrGameSpy/xrGameSpy.h"
-#include "xrGameSpy/GameSpy_FuncDefs.h"
 
 class CServerList;
 class CGameSpy_QR2;

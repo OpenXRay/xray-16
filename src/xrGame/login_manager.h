@@ -4,10 +4,8 @@
 
 #include "Common/Noncopyable.hpp"
 #include "mixed_delegate.h"
-#include "xrGameSpy/GameSpy/GP/gp.h"
+#include "xrGameSpy/xrGameSpy.h"
 #include "account_manager.h"
-
-#include "login_manager.h"
 #include "queued_async_method.h"
 
 class CGameSpy_Full;

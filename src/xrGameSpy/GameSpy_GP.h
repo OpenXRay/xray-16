@@ -3,8 +3,6 @@
 
 #include "xrCore/xrCore.h"
 #include "xrGameSpy/xrGameSpy.h"
-#include "xrGameSpy/GameSpy_FuncDefs.h"
-#include "xrGameSpy/GameSpy/GP/gp.h"
 
 class XRGAMESPY_API CGameSpy_GP
 {

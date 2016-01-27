@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "GameSpy_GCD_Client.h"
-#include "xrGameSpy_MainDefs.h"
 
 void CGameSpy_GCD_Client::CreateRespond(char *cdkey, char* RespondStr, char* ChallengeStr, u8 Reauth)
 {

@@ -3,7 +3,6 @@
 
 #include "xrCore/xrCore.h"
 #include "xrGameSpy/xrGameSpy.h"
-#include "xrGameSpy/GameSpy_FuncDefs.h"
 
 namespace gamespy_sake
 {

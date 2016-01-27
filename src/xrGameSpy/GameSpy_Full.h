@@ -2,7 +2,6 @@
 
 #include "xrCore/xrCore.h"
 #include "xrGameSpy/xrGameSpy.h"
-#include "xrGameSpy/GameSpy_FuncDefs.h"
 
 class CGameSpy_Available;
 class CGameSpy_Patching;

@@ -1,7 +1,5 @@
 #include "stdafx.h"
-#include "GameSpy_Full.h"
 #include "GameSpy_SAKE.h"
-#include "xrGameSpy_MainDefs.h"
 
 shared_str const CGameSpy_SAKE::TryToTranslate(SAKERequestResult const & request_result)
 {
