@@ -48,15 +48,3 @@
 
 #define GAMESPY_PATCHING_VERSIONUNIQUE_ID	"test_version_1"
 #define GAMESPY_PATCHING_DISTRIBUTION_ID	0
-
- 
-
-#ifndef XRGAMESPY_API
-	#ifdef XRGAMESPY_EXPORTS
-		#define XRGAMESPY_API				XR_EXPORT
-	#endif
-#endif
-
-#define EXPORT_FN_DECL(r, f, p)		XRGAMESPY_API r xrGS_##f p;
-// XXX: remove (see xrGameSpy.h)
-extern void FillSecretKey (char* SecretKey);

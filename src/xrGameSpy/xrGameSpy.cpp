@@ -1,33 +1,15 @@
-// xrGameSpy.cpp : Defines the entry point for the DLL application.
-//
-
 #include "stdafx.h"
 #include "xrGameSpy.h"
-BOOL APIENTRY DllMain( HANDLE hModule, 
-                       DWORD  ul_reason_for_call, 
-                       LPVOID lpReserved
-					 )
-{
-	switch (ul_reason_for_call)
-	{
-	case DLL_PROCESS_ATTACH:
-	case DLL_THREAD_ATTACH:
-	case DLL_THREAD_DETACH:
-	case DLL_PROCESS_DETACH:
-		break;
-	}
-    return TRUE;
-}
 
-void	FillSecretKey(char* SecretKey)
+void	FillSecretKey(char *secretKey)
 {
-	SecretKey[0] = 'L';
-	SecretKey[1] = 'T';
-	SecretKey[2] = 'U';
-	SecretKey[3] = '2';
-	SecretKey[4] = 'z';
-	SecretKey[5] = '2';
-	SecretKey[6] = '\0';
+	secretKey[0] = 'L';
+	secretKey[1] = 'T';
+	secretKey[2] = 'U';
+	secretKey[3] = '2';
+	secretKey[4] = 'z';
+	secretKey[5] = '2';
+	secretKey[6] = '\0';
 }
 
 const char* GetGameVersion() { return GAME_VERSION; }
