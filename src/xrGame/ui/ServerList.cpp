@@ -9,10 +9,10 @@
 #include "TeamInfo.h"
 #include "MainMenu.h"
 #include "login_manager.h"
-#include "GameSpy/GameSpy_Keys.h"
-#include "GameSpy/GameSpy_Full.h"
-#include "GameSpy/GameSpy_Browser.h"
-#include <xrGame/spectator.h>
+#include "xrGameSpy/GameSpy_Keys.h"
+#include "xrGameSpy/GameSpy_Full.h"
+#include "xrGameSpy/GameSpy_Browser.h"
+#include "spectator.h"
 
 LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
 CGameSpy_Browser* g_gs_browser = NULL;
@@ -20,7 +20,11 @@ CGameSpy_Browser* g_gs_browser = NULL;
 CServerList::CServerList()
 {
 	m_GSBrowser	= MainMenu()->GetGS()->GetGameSpyBrowser();
-	browser().Init(this);
+    CGameSpy_Browser::UpdateCallback updateCb;
+    updateCb.bind(this, &CServerList::OnUpdate);
+    CGameSpy_Browser::DestroyCallback destroyCb;
+    destroyCb.bind(this, &CServerList::OnBrowserDestroy);
+	browser().Init(updateCb, destroyCb);
 
 	for (int i = 0; i<LST_COLUMN_COUNT; i++)
 		AttachChild(&m_header_frames[i]);
@@ -70,7 +74,7 @@ inline CGameSpy_Browser& CServerList::browser	() const
 	return				( *m_GSBrowser );
 }
 
-void CServerList::on_game_spy_browser_destroy	(CGameSpy_Browser* browser)
+void CServerList::OnBrowserDestroy(CGameSpy_Browser *browser)
 {
 	VERIFY				(m_GSBrowser);
 	VERIFY				(m_GSBrowser == browser);

@@ -6,7 +6,7 @@
 #include "gametype_chooser.h"
 #include "RegistryFuncs.h"
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
-#include "gamespy/GameSpy_GP.h"
+#include "xrGameSpy/GameSpy_GP.h"
 #include "ui/UICDkey.h"
 
 xr_token g_GameModes	[] = {

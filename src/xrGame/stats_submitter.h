@@ -2,7 +2,7 @@
 #define STATS_SUBMITTER_INCLUDED
 
 #include "Common/Noncopyable.hpp"
-#include "gamespy/GameSpy_ATLAS.h"
+#include "xrGameSpy/GameSpy_ATLAS.h"
 #include "profile_data_types.h"
 #include "gsc_dsigned_ltx.h"
 #include "xrCore/Crypto/crypto.h"

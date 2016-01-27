@@ -219,32 +219,6 @@ LPCSTR GameTypeToString(EGameIDs gt, bool bShort)
 	}
 }
 
-EGameIDs ParseStringToGameType(LPCSTR str)
-{
-	if (!xr_strcmp(str, "single")) 
-		return eGameIDSingle;
-	else
-		if (!xr_strcmp(str, "deathmatch") || !xr_strcmp(str, "dm")) 
-			return eGameIDDeathmatch;
-		else
-			if (!xr_strcmp(str, "teamdeathmatch") || !xr_strcmp(str, "tdm")) 
-				return eGameIDTeamDeathmatch;
-			else
-				if (!xr_strcmp(str, "artefacthunt") || !xr_strcmp(str, "ah")) 
-					return eGameIDArtefactHunt;
-				else
-					if (!xr_strcmp(str, "capturetheartefact") || !xr_strcmp(str, "cta")) 
-						return eGameIDCaptureTheArtefact;
-					else
-						if (!xr_strcmp(str, "dominationzone")) 
-							return eGameIDDominationZone;
-						else
-							if (!xr_strcmp(str, "teamdominationzone")) 
-								return eGameIDTeamDominationZone;
-							else 
-								return eGameIDNoGame; //EGameIDs
-}
-
 void CGamePersistent::UpdateGameType			()
 {
 	__super::UpdateGameType		();

@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "xrGameSpyServer.h"
-#include "GameSpy_Keys.h"
-#include "GameSpy_GCD_Client.h"
-#include "GameSpy_QR2.h"
+#include "xrGameSpy/GameSpy_Keys.h"
+#include "xrGameSpy/GameSpy_GCD_Client.h"
+#include "xrGameSpy/GameSpy_QR2.h"
 #include "Level.h"
 #include "game_sv_artefacthunt.h"
 #include "ui/UIInventoryUtilities.h"
@@ -27,14 +27,11 @@ void __cdecl callback_serverkey(int keyid, qr2_buffer_t outbuf, void *userdata)
 	game_sv_ArtefactHunt* gmAhunt = smart_cast<game_sv_ArtefactHunt*>(gameState);
 
 	LPCSTR time_str = InventoryUtilities::GetTimeAsString( Device.dwTimeGlobal, InventoryUtilities::etpTimeToSecondsAndDay ).c_str();
-
-	string4096		game_version;
-
 	switch (keyid)
 	{
 	case HOSTNAME_KEY:		pQR2->BufferAdd(outbuf, pServer->HostName.c_str()); break;
 	case MAPNAME_KEY:		pQR2->BufferAdd(outbuf, pServer->MapName.c_str()); break;
-	case GAMEVER_KEY:		pQR2->BufferAdd(outbuf, pQR2->GetGameVersion(game_version)); break;
+	case GAMEVER_KEY:		pQR2->BufferAdd(outbuf, pQR2->GetGameVersion()); break;
 	case NUMPLAYERS_KEY:	pQR2->BufferAdd_Int(outbuf, pServer->GetPlayersCount()); break;
 	case MAXPLAYERS_KEY:	pQR2->BufferAdd_Int(outbuf, pServer->m_iMaxPlayers); break;
 	case SERVER_UP_TIME_KEY:pQR2->BufferAdd(outbuf, time_str); break;

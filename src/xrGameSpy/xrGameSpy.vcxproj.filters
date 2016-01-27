@@ -1,18 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
-    </Filter>
     <Filter Include="GameSpy">
       <UniqueIdentifier>{d9143032-4c20-442f-aa89-8fd3afab1374}</UniqueIdentifier>
     </Filter>
@@ -58,47 +46,14 @@
     <Filter Include="GameSpy\webservices">
       <UniqueIdentifier>{f8224574-8bcd-4498-a635-a4a2a9db4269}</UniqueIdentifier>
     </Filter>
-    <Filter Include="xrGameSpy_ServerBrowser">
-      <UniqueIdentifier>{fb6a19de-1d68-4bab-8444-454b329b66ba}</UniqueIdentifier>
+    <Filter Include="Wrapper">
+      <UniqueIdentifier>{10ec51cf-f963-406d-b1e7-310d41620169}</UniqueIdentifier>
     </Filter>
-    <Filter Include="xrGameSpy_Available">
-      <UniqueIdentifier>{e5ae29dd-4440-429f-af55-2ed87d62b215}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="xrGameSpy_QR2">
-      <UniqueIdentifier>{053bb9fa-dc47-4714-925e-e06c54648531}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="xrGameSpy_CDKey">
-      <UniqueIdentifier>{870d6566-8ccb-4860-957b-bd1e58fd6846}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="xrGameSpy_Patching">
-      <UniqueIdentifier>{637c04de-9b6b-4d45-93e8-ddb57383dc8b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="xrGameSpy_HTTP">
-      <UniqueIdentifier>{c6a7f7ac-0059-4608-8de3-e9d93b11c8e0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="xrGameSpy_GP">
-      <UniqueIdentifier>{0f92966a-1a19-4d78-8215-41eca594009e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="xrGameSpy_SAKE">
-      <UniqueIdentifier>{3de3a9ea-d965-4c12-9780-47ca47a2eab3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="xrGameSpy_Core">
-      <UniqueIdentifier>{d80714cc-194a-41ca-ae89-11c04bf8db4c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="xrGameSpy_ATLAS">
-      <UniqueIdentifier>{2bcdfea1-f176-493d-b9e5-36103f0763f4}</UniqueIdentifier>
+    <Filter Include="Kernel">
+      <UniqueIdentifier>{70c3e673-6563-46d7-a104-e0867f6c4f0e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DistributionFunc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="xrGameSpy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="gamespy\darray.c">
       <Filter>GameSpy</Filter>
     </ClCompile>
@@ -354,47 +309,47 @@
     <ClCompile Include="Gamespy\webservices\AuthService.c">
       <Filter>GameSpy\webservices</Filter>
     </ClCompile>
-    <ClCompile Include="xrGameSpy_ServerBrowser.cpp">
-      <Filter>xrGameSpy_ServerBrowser</Filter>
+    <ClCompile Include="xrGameSpy.cpp">
+      <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="xrGameSpy_Available.cpp">
-      <Filter>xrGameSpy_Available</Filter>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="xrGameSpy_QR2.cpp">
-      <Filter>xrGameSpy_QR2</Filter>
+    <ClCompile Include="GameSpy_ATLAS.cpp">
+      <Filter>Wrapper</Filter>
     </ClCompile>
-    <ClCompile Include="xrGameSpy_CDKey.cpp">
-      <Filter>xrGameSpy_CDKey</Filter>
+    <ClCompile Include="GameSpy_Available.cpp">
+      <Filter>Wrapper</Filter>
     </ClCompile>
-    <ClCompile Include="xrGameSpy_Patching.cpp">
-      <Filter>xrGameSpy_Patching</Filter>
+    <ClCompile Include="GameSpy_Browser.cpp">
+      <Filter>Wrapper</Filter>
     </ClCompile>
-    <ClCompile Include="xrGameSpy_HTTP.cpp">
-      <Filter>xrGameSpy_HTTP</Filter>
+    <ClCompile Include="GameSpy_Full.cpp">
+      <Filter>Wrapper</Filter>
     </ClCompile>
-    <ClCompile Include="xrGameSpy_GP.cpp">
-      <Filter>xrGameSpy_GP</Filter>
+    <ClCompile Include="GameSpy_GCD_Client.cpp">
+      <Filter>Wrapper</Filter>
     </ClCompile>
-    <ClCompile Include="xrGameSpy_SAKE.cpp">
-      <Filter>xrGameSpy_SAKE</Filter>
+    <ClCompile Include="GameSpy_GCD_Server.cpp">
+      <Filter>Wrapper</Filter>
     </ClCompile>
-    <ClCompile Include="xrGameSpy_Core.cpp">
-      <Filter>xrGameSpy_Core</Filter>
+    <ClCompile Include="GameSpy_GP.cpp">
+      <Filter>Wrapper</Filter>
     </ClCompile>
-    <ClCompile Include="xrGameSpy_ATLAS.cpp">
-      <Filter>xrGameSpy_ATLAS</Filter>
+    <ClCompile Include="GameSpy_HTTP.cpp">
+      <Filter>Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="GameSpy_Patching.cpp">
+      <Filter>Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="GameSpy_QR2.cpp">
+      <Filter>Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="GameSpy_SAKE.cpp">
+      <Filter>Wrapper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="xrGameSpy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="xrGameSpy_MainDefs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="gamespy\darray.h">
       <Filter>GameSpy</Filter>
     </ClInclude>
@@ -653,35 +608,53 @@
     <ClInclude Include="Gamespy\webservices\AuthService.h">
       <Filter>GameSpy\webservices</Filter>
     </ClInclude>
-    <ClInclude Include="xrGameSpy_ServerBrowser.h">
-      <Filter>xrGameSpy_ServerBrowser</Filter>
+    <ClInclude Include="xrGameSpy.h">
+      <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="xrGameSpy_Available.h">
-      <Filter>xrGameSpy_Available</Filter>
+    <ClInclude Include="xrGameSpy_MainDefs.h">
+      <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="xrGameSpy_QR2.h">
-      <Filter>xrGameSpy_QR2</Filter>
+    <ClInclude Include="stdafx.h">
+      <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="xrGameSpy_CDKey.h">
-      <Filter>xrGameSpy_CDKey</Filter>
+    <ClInclude Include="GameSpy_ATLAS.h">
+      <Filter>Wrapper</Filter>
     </ClInclude>
-    <ClInclude Include="xrGameSpy_Patching.h">
-      <Filter>xrGameSpy_Patching</Filter>
+    <ClInclude Include="GameSpy_Available.h">
+      <Filter>Wrapper</Filter>
     </ClInclude>
-    <ClInclude Include="xrGameSpy_HTTP.h">
-      <Filter>xrGameSpy_HTTP</Filter>
+    <ClInclude Include="GameSpy_Browser.h">
+      <Filter>Wrapper</Filter>
     </ClInclude>
-    <ClInclude Include="xrGameSpy_GP.h">
-      <Filter>xrGameSpy_GP</Filter>
+    <ClInclude Include="GameSpy_Full.h">
+      <Filter>Wrapper</Filter>
     </ClInclude>
-    <ClInclude Include="xrGameSpy_SAKE.h">
-      <Filter>xrGameSpy_SAKE</Filter>
+    <ClInclude Include="GameSpy_FuncDefs.h">
+      <Filter>Wrapper</Filter>
     </ClInclude>
-    <ClInclude Include="xrGameSpy_Core.h">
-      <Filter>xrGameSpy_Core</Filter>
+    <ClInclude Include="GameSpy_GCD_Client.h">
+      <Filter>Wrapper</Filter>
     </ClInclude>
-    <ClInclude Include="xrGameSpy_ATLAS.h">
-      <Filter>xrGameSpy_ATLAS</Filter>
+    <ClInclude Include="GameSpy_GCD_Server.h">
+      <Filter>Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSpy_GP.h">
+      <Filter>Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSpy_HTTP.h">
+      <Filter>Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSpy_Keys.h">
+      <Filter>Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSpy_Patching.h">
+      <Filter>Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSpy_QR2.h">
+      <Filter>Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSpy_SAKE.h">
+      <Filter>Wrapper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

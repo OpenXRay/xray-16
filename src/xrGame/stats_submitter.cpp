@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "stats_submitter.h"
-#include "gamespy/GameSpy_Full.h"
+#include "xrGameSpy/GameSpy_Full.h"
 #include "login_manager.h"
 #include "MainMenu.h"
 #include "profile_store.h"

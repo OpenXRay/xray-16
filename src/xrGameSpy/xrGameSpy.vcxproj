@@ -149,7 +149,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DistributionFunc.cpp" />
     <ClCompile Include="gamespy\common\gsAssert.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -863,22 +862,23 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="GameSpy_ATLAS.cpp" />
+    <ClCompile Include="GameSpy_Available.cpp" />
+    <ClCompile Include="GameSpy_Browser.cpp" />
+    <ClCompile Include="GameSpy_Full.cpp" />
+    <ClCompile Include="GameSpy_GCD_Client.cpp" />
+    <ClCompile Include="GameSpy_GCD_Server.cpp" />
+    <ClCompile Include="GameSpy_GP.cpp" />
+    <ClCompile Include="GameSpy_HTTP.cpp" />
+    <ClCompile Include="GameSpy_Patching.cpp" />
+    <ClCompile Include="GameSpy_QR2.cpp" />
+    <ClCompile Include="GameSpy_SAKE.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="xrGameSpy.cpp" />
-    <ClCompile Include="xrGameSpy_ATLAS.cpp" />
-    <ClCompile Include="xrGameSpy_Available.cpp" />
-    <ClCompile Include="xrGameSpy_CDKey.cpp" />
-    <ClCompile Include="xrGameSpy_Core.cpp" />
-    <ClCompile Include="xrGameSpy_GP.cpp" />
-    <ClCompile Include="xrGameSpy_HTTP.cpp" />
-    <ClCompile Include="xrGameSpy_Patching.cpp" />
-    <ClCompile Include="xrGameSpy_QR2.cpp" />
-    <ClCompile Include="xrGameSpy_SAKE.cpp" />
-    <ClCompile Include="xrGameSpy_ServerBrowser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gamespy\common\gsAssert.h" />
@@ -967,22 +967,30 @@
     <ClInclude Include="gamespy\serverbrowsing\sb_internal.h" />
     <ClInclude Include="gamespy\serverbrowsing\sb_serverbrowsing.h" />
     <ClInclude Include="Gamespy\webservices\AuthService.h" />
+    <ClInclude Include="GameSpy_ATLAS.h" />
+    <ClInclude Include="GameSpy_Available.h" />
+    <ClInclude Include="GameSpy_Browser.h" />
+    <ClInclude Include="GameSpy_Full.h" />
+    <ClInclude Include="GameSpy_FuncDefs.h" />
+    <ClInclude Include="GameSpy_GCD_Client.h" />
+    <ClInclude Include="GameSpy_GCD_Server.h" />
+    <ClInclude Include="GameSpy_GP.h" />
+    <ClInclude Include="GameSpy_HTTP.h" />
+    <ClInclude Include="GameSpy_Keys.h" />
+    <ClInclude Include="GameSpy_Patching.h" />
+    <ClInclude Include="GameSpy_QR2.h" />
+    <ClInclude Include="GameSpy_SAKE.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="xrGameSpy.h" />
-    <ClInclude Include="xrGameSpy_ATLAS.h" />
-    <ClInclude Include="xrGameSpy_Available.h" />
-    <ClInclude Include="xrGameSpy_CDKey.h" />
-    <ClInclude Include="xrGameSpy_Core.h" />
-    <ClInclude Include="xrGameSpy_GP.h" />
-    <ClInclude Include="xrGameSpy_HTTP.h" />
     <ClInclude Include="xrGameSpy_MainDefs.h" />
-    <ClInclude Include="xrGameSpy_Patching.h" />
-    <ClInclude Include="xrGameSpy_QR2.h" />
-    <ClInclude Include="xrGameSpy_SAKE.h" />
-    <ClInclude Include="xrGameSpy_ServerBrowser.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\xrCore\xrCore.vcxproj">
+      <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

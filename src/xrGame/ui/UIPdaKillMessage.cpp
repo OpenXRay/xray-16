@@ -33,7 +33,7 @@ void CUIPdaKillMessage::Init(KillMessageStruct& msg, CGameFont* F)
 	SetColorAnimation			("ui_main_msgs_short", LA_ONLYALPHA|LA_TEXTCOLOR|LA_TEXTURECOLOR, 5000.0f);
 }
 
-float CUIPdaKillMessage::InitText(CUITextWnd& refStatic, float x, PlayerInfo& info)
+float CUIPdaKillMessage::InitText(CUITextWnd& refStatic, float x, ColoredName& info)
 {
 
 	if ( 0 == xr_strlen(info.m_name))

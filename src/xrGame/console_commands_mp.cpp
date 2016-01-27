@@ -20,7 +20,7 @@
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
 #include "DemoPlay_Control.h"
 #include "account_manager_console.h"
-#include "gamespy/GameSpy_GP.h"
+#include "xrGameSpy/GameSpy_GP.h"
 
 EGameIDs	ParseStringToGameType	(LPCSTR str);
 LPCSTR		GameTypeToString		(EGameIDs gt, bool bShort);

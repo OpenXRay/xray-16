@@ -2,9 +2,9 @@
 #include "xrMessages.h"
 #include "xrGameSpyServer.h"
 #include "xrEngine/IGame_Persistent.h"
-
-#include "GameSpy/GameSpy_Base_Defs.h"
-#include "GameSpy/GameSpy_Available.h"
+#include "xrGameSpy/xrGameSpy.h"
+#include "xrGameSpy/GameSpy_Available.h"
+#include "xrGameSpy/GameSpy_GCD_Server.h"
 
 //#define DEMO_BUILD
 
@@ -260,7 +260,7 @@ void xrGameSpyServer::GetServerInfo( CServerInfo* si )
 	si->AddItem( "Players", tmp, RGB(255,128,255) );
 
 	string256 res;
-	si->AddItem( "Game version", QR2()->GetGameVersion( res ), RGB(0,158,255) );
+	si->AddItem( "Game version", GetGameVersion(), RGB(0,158,255) );
 	
 	xr_strcpy( res, "" );
 	if ( HasProtected() || (Password.size() > 0))

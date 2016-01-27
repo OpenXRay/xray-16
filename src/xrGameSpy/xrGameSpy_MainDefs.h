@@ -58,5 +58,5 @@
 #endif
 
 #define EXPORT_FN_DECL(r, f, p)		XRGAMESPY_API r xrGS_##f p;
-
+// XXX: remove (see xrGameSpy.h)
 extern void FillSecretKey (char* SecretKey);

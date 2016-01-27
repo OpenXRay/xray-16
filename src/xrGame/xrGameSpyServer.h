@@ -1,8 +1,8 @@
 #pragma once
 
 #include "xrServer.h"
-#include "GameSpy/GameSpy_GCD_Server.h"
-#include "GameSpy/GameSpy_QR2.h"
+#include "xrGameSpy/GameSpy_GCD_Server.h"
+#include "xrGameSpy/GameSpy_QR2.h"
 
 
 class xrGameSpyClientData	: public xrClientData

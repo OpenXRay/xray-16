@@ -43,8 +43,8 @@
 #include "character_hit_animations_params.h"
 #include "inventory_upgrade_manager.h"
 
-#include "GameSpy/GameSpy_Full.h"
-#include "GameSpy/GameSpy_Patching.h"
+#include "xrGameSpy/GameSpy_Full.h"
+#include "xrGameSpy/GameSpy_Patching.h"
 
 #include "ai_debug_variables.h"
 #include "xrPhysics/console_vars.h"

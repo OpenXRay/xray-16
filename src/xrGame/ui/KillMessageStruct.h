@@ -9,7 +9,8 @@
 
 #include "ui_defs.h"
 
-struct PlayerInfo{
+struct ColoredName
+{
     shared_str	m_name;
 	u32			m_color;
 };
@@ -20,8 +21,8 @@ struct IconInfo{
 };
 
 struct KillMessageStruct{
-	PlayerInfo	m_victim;
+	ColoredName	m_victim;
 	IconInfo	m_initiator;
-	PlayerInfo	m_killer;
+	ColoredName	m_killer;
 	IconInfo	m_ext_info;
 };

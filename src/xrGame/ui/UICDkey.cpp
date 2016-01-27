@@ -7,11 +7,11 @@
 #include "RegistryFuncs.h"
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
 #include "player_name_modifyer.h"
-#include "gamespy/GameSpy_GP.h"
+#include "xrGameSpy/GameSpy_GP.h"
 #include <dinput.h>
 #include "xrCore/os_clipboard.h"
 
-extern string64	gsCDKey;
+string64 gsCDKey = "";
 LPCSTR AddHyphens( LPCSTR c );
 LPCSTR DelHyphens( LPCSTR c );
 

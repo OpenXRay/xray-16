@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "awards_store.h"
-#include "GameSpy/GameSpy_Full.h"
-#include "GameSpy/GAmeSpy_SAKE.h"
+#include "xrGameSpy/GameSpy_Full.h"
+#include "xrGameSpy/GAmeSpy_SAKE.h"
 
 namespace gamespy_profile
 {

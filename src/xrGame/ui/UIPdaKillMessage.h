@@ -11,7 +11,7 @@ public:
 
 			void Init				(KillMessageStruct& msg, CGameFont* F);
 protected:
-			float InitText(CUITextWnd& refStatic, float x, PlayerInfo& info);
+			float InitText(CUITextWnd& refStatic, float x, ColoredName& info);
 			float InitIcon(CUIStatic& refStatic, float x, IconInfo& info);
 
     CUITextWnd	m_victim_name;

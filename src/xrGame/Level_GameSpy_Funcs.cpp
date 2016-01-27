@@ -2,10 +2,10 @@
 #include "Level.h"
 #include "xrMessages.h"
 #include "xrEngine/x_ray.h"
-#include "GameSpy/GameSpy_GCD_Client.h"
-
-
+#include "xrGameSpy/GameSpy_GCD_Client.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "ui/UICDkey.h"
+
 void						CLevel::OnGameSpyChallenge			(NET_Packet* P)
 {
 #ifndef MASTER_GOLD
@@ -19,7 +19,9 @@ void						CLevel::OnGameSpyChallenge			(NET_Packet* P)
 	//--------------------------------------------------------------------
 	string128 ResponseStr="";
 	CGameSpy_GCD_Client GCD;
-	GCD.CreateRespond(ResponseStr, ChallengeStr, Reauth);
+    string512 cdkey = "";
+    GetCDKey_FromRegistry(cdkey);
+	GCD.CreateRespond(cdkey, ResponseStr, ChallengeStr, Reauth);
 	//--------- Send Respond ---------------------------------------------
 	NET_Packet newP;
 

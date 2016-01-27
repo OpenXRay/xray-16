@@ -11,10 +11,11 @@
 #include <dinput.h>
 #include "ui\UIBtnHint.h"
 #include "UICursor.h"
-#include "gamespy/GameSpy_Full.h"
-#include "gamespy/GameSpy_HTTP.h"
-#include "gamespy/GameSpy_Available.h"
-#include "gamespy/GameSpy_Browser.h"
+#include "xrGameSpy/GameSpy_Full.h"
+#include "xrGameSpy/GameSpy_HTTP.h"
+#include "xrGameSpy/GameSpy_Available.h"
+#include "xrGameSpy/GameSpy_Browser.h"
+#include "xrGameSpy/xrGameSpy.h"
 #include "CdkeyDecode/cdkeydecode.h"
 #include "string_table.h"
 #include "xrCore/os_clipboard.h"
@@ -759,7 +760,7 @@ bool CMainMenu::IsCDKeyIsValid()
 	int GameID = 0;
 	for (int i=0; i<4; i++)
 	{
-		m_pGameSpyFull->GetGameSpyHTTP()->xrGS_GetGameID(&GameID, i);
+		GetGameID(&GameID, i);
 		if (VerifyClientCheck(CDKey, unsigned short (GameID)) == 1)
 			return true;
 	};	
@@ -795,14 +796,7 @@ void CMainMenu::OnConnectToMasterServerOkClicked(CUIWindow*, void*)
 LPCSTR CMainMenu::GetGSVer()
 {
 	static string256	buff;
-	if(m_pGameSpyFull)
-	{
-		xr_strcpy(buff, m_pGameSpyFull->GetGameVersion());
-	}else
-	{
-		buff[0]	= 0;
-	}
-
+    xr_strcpy(buff, GetGameVersion());
 	return buff;
 }
 
