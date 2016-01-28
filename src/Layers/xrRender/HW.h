@@ -27,11 +27,11 @@ public:
 	void					CreateD3D				();
 	void					DestroyD3D				();
 #endif // !USE_OGL
-	void					CreateDevice			(HWND hw, bool move_window);
+	void					CreateDevice			(HWND hWnd, bool move_window);
 
 	void					DestroyDevice			();
 
-	void					Reset					(HWND hw);
+	void					Reset					(HWND hWnd);
 
 #ifndef USE_OGL
 	void					selectResolution		(u32 &dwWidth, u32 &dwHeight, BOOL bWindowed);
@@ -65,12 +65,12 @@ public:
 	GLuint					pFB;
 	GLuint					pCFB;
 
-	CHWCaps					Caps;
-
 	HWND					m_hWnd;
 	HDC						m_hDC;
 	HGLRC					m_hRC;
+
 #elif defined(USE_DX11)
+// XXX: Rename m_pAdapter -> pAdapter, m_pSwapChain -> pSwapChain
 public:
 	IDXGIAdapter*			m_pAdapter;	//	pD3D equivalent
 	ID3D11Device*			pDevice;	//	combine with DX9 pDevice via typedef
@@ -79,14 +79,13 @@ public:
 	ID3D11RenderTargetView*	pBaseRT;	//	combine with DX9 pBaseRT via typedef
 	ID3D11DepthStencilView*	pBaseZB;
 
-	CHWCaps					Caps;
-
-	D3D_DRIVER_TYPE		m_DriverType;	//	DevT equivalent
+	D3D_DRIVER_TYPE			m_DriverType;	//	DevT equivalent
 	DXGI_SWAP_CHAIN_DESC	m_ChainDesc;	//	DevPP equivalent
 	bool					m_bUsePerfhud;
 	D3D_FEATURE_LEVEL		FeatureLevel;
 #elif defined(USE_DX10)
 public:
+// XXX: Rename m_pAdapter -> pAdapter, m_pSwapChain -> pSwapChain
 	IDXGIAdapter*			m_pAdapter;	//	pD3D equivalent
 	ID3D10Device1*       	pDevice1;	//	combine with DX9 pDevice via typedef
 	ID3D10Device*        	pDevice;	//	combine with DX9 pDevice via typedef
@@ -95,8 +94,6 @@ public:
 	IDXGISwapChain*         m_pSwapChain;
 	ID3D10RenderTargetView*	pBaseRT;	//	combine with DX9 pBaseRT via typedef
 	ID3D10DepthStencilView*	pBaseZB;
-
-	CHWCaps					Caps;
 
 	D3D10_DRIVER_TYPE		m_DriverType;	//	DevT equivalent
 	DXGI_SWAP_CHAIN_DESC	m_ChainDesc;	//	DevPP equivalent
@@ -114,25 +111,29 @@ public:
 	IDirect3DSurface9*		pBaseRT;
 	IDirect3DSurface9*		pBaseZB;
 
-	CHWCaps					Caps;
-
 	UINT					DevAdapter;
 	D3DDEVTYPE				DevT;
 	D3DPRESENT_PARAMETERS	DevPP;
 #endif
 
+public:
+	CHWCaps					Caps;
+
 #if !defined(_MAYA_EXPORT) && !defined(USE_OGL)
 	stats_manager			stats_manager;
 #endif
+
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	void			UpdateViews();
 #endif
+
 #if defined(USE_DX10) || defined(USE_DX11)
 	DXGI_RATIONAL	selectRefresh(u32 dwWidth, u32 dwHeight, DXGI_FORMAT fmt);
 
 	virtual	void	OnAppActivate();
 	virtual void	OnAppDeactivate();
 #endif
+
 #ifdef USE_OGL
 	// TODO: OGL: Implement this into a compatibility layer?
 	void ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[4]);
