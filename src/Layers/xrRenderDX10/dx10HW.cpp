@@ -109,7 +109,7 @@ void CHW::CreateD3D()
 	if (!m_pAdapter)
 		pFactory->EnumAdapters(0, &m_pAdapter);
 
-	_RELEASE(pFactory);
+	pFactory->Release();
 
 	/*
 	R_ASSERT2	           	 	(hD3D,"Can't find 'd3d10.dll'\nPlease install latest version of DirectX before running this program");
