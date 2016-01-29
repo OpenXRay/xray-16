@@ -8,7 +8,6 @@
 #include "resource.h"
 #include "LightAnimLibrary.h"
 #include "xrCDB/ISpatial.h"
-#include "CopyProtection.h"
 #include "Text_Console.h"
 #include <process.h>
 #include <locale.h>
@@ -78,7 +77,6 @@ void InitEngine()
 {
     Engine.Initialize();
     Device.Initialize();
-    CheckCopyProtection();
 }
 
 static void InitEngineExt()
@@ -246,7 +244,6 @@ void Startup()
     DestroyWindow(logoWindow);
     logoWindow = NULL;
     // Main cycle
-    CheckCopyProtection();
     Memory.mem_usage();
     Device.Run();
     // Destroy APP

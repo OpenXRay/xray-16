@@ -387,7 +387,6 @@
     <ClInclude Include="CameraDefs.h" />
     <ClInclude Include="CameraManager.h" />
     <ClInclude Include="cf_dynamic_mesh.h" />
-    <ClInclude Include="CopyProtection.h" />
     <ClInclude Include="CustomHUD.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="device.h" />

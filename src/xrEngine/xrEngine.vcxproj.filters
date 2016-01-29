@@ -240,9 +240,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CopyProtection.h">
-      <Filter>General</Filter>
-    </ClInclude>
     <ClInclude Include="defines.h">
       <Filter>General</Filter>
     </ClInclude>

@@ -14,8 +14,6 @@
 #include "std_classes.h"
 #include "GameFont.h"
 #include "xrCDB/ISpatial.h"
-#include "CopyProtection.h"
-
 #include "xrSASH.h"
 #include "xrServerEntities/smart_cast.h"
 
@@ -259,8 +257,6 @@ void CApplication::LoadBegin()
 #endif
         phase_timer.Start();
         load_stage = 0;
-
-        CheckCopyProtection();
     }
 }
 
@@ -301,7 +297,6 @@ void CApplication::LoadDraw()
         load_draw_internal();
 
     Device.End();
-    CheckCopyProtection();
 }
 
 void CApplication::LoadTitleInt(LPCSTR str1, LPCSTR str2, LPCSTR str3)
@@ -426,8 +421,6 @@ void CApplication::Level_Set(u32 L)
 
     if (path[0])
         m_pRender->setLevelLogo(path);
-
-    CheckCopyProtection();
 }
 
 int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
