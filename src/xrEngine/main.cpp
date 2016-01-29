@@ -51,7 +51,7 @@ static int start_year = 1999; // 1999
 
 #ifndef DEDICATED_SERVER
 
-#include "xrGameSpy/gamespy/md5c.c"
+#include <GameSpy/md5c.c>
 #include <ctype.h>
 
 #define DEFAULT_MODULE_HASH "3CAABCFCFF6F3A810019C6A72180F166"

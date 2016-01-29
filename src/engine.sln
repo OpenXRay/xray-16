@@ -164,6 +164,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShaderEditor", "editors\Sha
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Common\Common.vcxproj", "{EDB0DFAF-5D6F-4D74-AE66-0DDADE12A7F6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameSpy", "Externals\GameSpy.vcxproj", "{67FF193E-2C20-402A-9026-9F5F6327503C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_Dedicated|Mixed Platforms = Debug_Dedicated|Mixed Platforms
@@ -2081,6 +2083,39 @@ Global
 		{EDB0DFAF-5D6F-4D74-AE66-0DDADE12A7F6}.Release|Win32.ActiveCfg = Release|Win32
 		{EDB0DFAF-5D6F-4D74-AE66-0DDADE12A7F6}.Release|Win32.Build.0 = Release|Win32
 		{EDB0DFAF-5D6F-4D74-AE66-0DDADE12A7F6}.Release|x64.ActiveCfg = Release|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Debug_Dedicated|Mixed Platforms.ActiveCfg = Debug|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Debug_Dedicated|Mixed Platforms.Build.0 = Debug|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Debug_Dedicated|Win32.ActiveCfg = Debug|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Debug_Dedicated|Win32.Build.0 = Debug|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Debug_Dedicated|x64.ActiveCfg = Release|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Debug_Dedicated|x64.Build.0 = Release|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Debug|Win32.Build.0 = Debug|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Debug|x64.ActiveCfg = Debug|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Mixed_Dedicated|Mixed Platforms.ActiveCfg = Mixed|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Mixed_Dedicated|Mixed Platforms.Build.0 = Mixed|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Mixed_Dedicated|Win32.ActiveCfg = Mixed|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Mixed_Dedicated|Win32.Build.0 = Mixed|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Mixed_Dedicated|x64.ActiveCfg = Release|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Mixed_Dedicated|x64.Build.0 = Release|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Mixed|Mixed Platforms.ActiveCfg = Mixed|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Mixed|Mixed Platforms.Build.0 = Mixed|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Mixed|Win32.ActiveCfg = Mixed|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Mixed|Win32.Build.0 = Mixed|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Mixed|x64.ActiveCfg = Mixed|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Release_Dedicated|Mixed Platforms.ActiveCfg = Release|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Release_Dedicated|Mixed Platforms.Build.0 = Release|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Release_Dedicated|Win32.ActiveCfg = Release|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Release_Dedicated|Win32.Build.0 = Release|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Release_Dedicated|x64.ActiveCfg = Release|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Release_Dedicated|x64.Build.0 = Release|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Release|Win32.ActiveCfg = Release|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Release|Win32.Build.0 = Release|Win32
+		{67FF193E-2C20-402A-9026-9F5F6327503C}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2132,6 +2167,7 @@ Global
 		{77BED9F9-EEB1-4ECD-8E4E-E7C673EAAE9C} = {CB0C814D-FB4E-453B-B7A0-716F4A1EACA4}
 		{8E48F5C4-3EBB-4930-86AC-9AE6F26410FC} = {CB0C814D-FB4E-453B-B7A0-716F4A1EACA4}
 		{1D137785-6E1B-4718-B800-F9380B945C9F} = {CB0C814D-FB4E-453B-B7A0-716F4A1EACA4}
+		{67FF193E-2C20-402A-9026-9F5F6327503C} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 	EndGlobalSection
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}
