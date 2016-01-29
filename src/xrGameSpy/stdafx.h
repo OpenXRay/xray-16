@@ -1,16 +1,13 @@
+// stdafx.h : include file for standard system include files,
+// or project specific include files that are used frequently, but
+// are changed infrequently
+//
+
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN
+
+#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
+// Windows Header Files:
 #include <windows.h>
 
-#include "xrGameSpy/GameSpy/Common/gsCommon.h"
-#include "xrGameSpy/GameSpy/Common/gsAvailable.h"
-#include "xrGameSpy/GameSpy/ghttp/ghttp.h"
-#include "xrGameSpy/GameSpy/qr2/qr2.h"
-#include "xrGameSpy/GameSpy/gcdkey/gcdkeyc.h"
-#include "xrGameSpy/GameSpy/gcdkey/gcdkeys.h"
-#include "xrGameSpy/GameSpy/serverbrowsing/sb_serverbrowsing.h"
-#include "xrGameSpy/GameSpy/pt/pt.h"
-#include "xrGameSpy/GameSpy/gp/gp.h"
-#include "xrGameSpy/GameSpy/sake/sake.h"
-#include "xrGameSpy/GameSpy/sc/sc.h"
+// TODO: reference additional headers your program requires here
