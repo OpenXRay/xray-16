@@ -1,0 +1,306 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mixed|Win32">
+      <Configuration>Mixed</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{67FF193E-2C20-402A-9026-9F5F6327503C}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <TargetMachine>MachineX86</TargetMachine>
+      <LargeAddressAware>true</LargeAddressAware>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <TargetMachine>MachineX86</TargetMachine>
+      <LargeAddressAware>true</LargeAddressAware>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <TargetMachine>MachineX86</TargetMachine>
+      <LargeAddressAware>true</LargeAddressAware>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="GameSpy\src\GameSpy\common\gsAssert.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\common\gsAvailable.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\common\gsCore.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\common\gsCrypt.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\common\gsLargeInt.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\common\gsRC4.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\common\gsSHA1.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\common\gsSoap.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\common\gsSSL.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\common\gsStringUtil.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\common\gsUdpEngine.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\common\gsXML.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\darray.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\gcdkey\gcdkeyc.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\gcdkey\gcdkeys.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\ghttp\ghttpBuffer.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\ghttp\ghttpCallbacks.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\ghttp\ghttpCommon.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\ghttp\ghttpConnection.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\ghttp\ghttpEncryption.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\ghttp\ghttpMain.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\ghttp\ghttpPost.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\ghttp\ghttpProcess.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\GP\gp.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\GP\gpi.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\GP\gpiBuddy.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\GP\gpiBuffer.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\GP\gpiCallback.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\GP\gpiConnect.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\GP\gpiInfo.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\GP\gpiKeys.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\GP\gpiOperation.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\GP\gpiPeer.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\GP\gpiProfile.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\GP\gpiPS3.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\GP\gpiSearch.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\GP\gpiTransfer.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\GP\gpiUnique.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\GP\gpiUtility.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\gstats\gbucket.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\gstats\gstats.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\gt2\gt2Auth.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\gt2\gt2Buffer.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\gt2\gt2Callback.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\gt2\gt2Connection.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\gt2\gt2Encode.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\gt2\gt2Filter.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\gt2\gt2Main.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\gt2\gt2Message.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\gt2\gt2Socket.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\gt2\gt2Utility.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\hashtable.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\md5c.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\natneg\NATify.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\natneg\natneg.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\nonport.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\pt\ptMain.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\qr2\qr2.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\qr2\qr2regkeys.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\sake\sakeMain.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\sake\sakeRequest.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\sake\sakeRequestMisc.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\sake\sakeRequestModify.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\sake\sakeRequestRead.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\sc\sciInterface.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\sc\sciMain.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\sc\sciReport.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\sc\sciSerialize.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\sc\sciWebServices.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\serverbrowsing\sb_crypt.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\serverbrowsing\sb_queryengine.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\serverbrowsing\sb_server.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\serverbrowsing\sb_serverbrowsing.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\serverbrowsing\sb_serverlist.c" />
+    <ClCompile Include="GameSpy\src\GameSpy\webservices\AuthService.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsAssert.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsAvailable.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsCommon.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsCore.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsCrypt.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsDebug.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsLargeInt.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsMemory.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsPlatform.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsPlatformSocket.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsPlatformThread.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsPlatformUtil.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsRC4.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsSHA1.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsSoap.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsSSL.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsStringUtil.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsUdpEngine.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\common\gsXML.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\darray.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\gcdkey\gcdkeyc.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\gcdkey\gcdkeys.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\ghttp\ghttp.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\ghttp\ghttpASCII.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\ghttp\ghttpBuffer.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\ghttp\ghttpCallbacks.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\ghttp\ghttpCommon.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\ghttp\ghttpConnection.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\ghttp\ghttpEncryption.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\ghttp\ghttpMain.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\ghttp\ghttpPost.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\ghttp\ghttpProcess.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\GP\gp.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\GP\gpi.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\GP\gpiBuddy.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\GP\gpiBuffer.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\GP\gpiCallback.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\GP\gpiConnect.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\GP\gpiInfo.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\GP\gpiKeys.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\GP\gpiOperation.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\GP\gpiPeer.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\GP\gpiProfile.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\GP\gpiPS3.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\GP\gpiSearch.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\GP\gpiTransfer.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\GP\gpiUnique.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\GP\gpiUtility.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\gstats\gbucket.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\gstats\gpersist.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\gstats\gstats.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\gt2\gt2.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\gt2\gt2Auth.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\gt2\gt2Buffer.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\gt2\gt2Callback.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\gt2\gt2Connection.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\gt2\gt2Encode.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\gt2\gt2Filter.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\gt2\gt2Main.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\gt2\gt2Message.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\gt2\gt2Socket.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\gt2\gt2Utility.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\hashtable.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\md5.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\natneg\NATify.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\natneg\natneg.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\natneg\nninternal.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\nonport.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\pt\pt.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\qr2\qr2.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\qr2\qr2regkeys.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\sake\sake.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\sake\sakeMain.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\sake\sakeRequest.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\sake\sakeRequestInternal.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\sc\sc.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\sc\sci.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\sc\sciInterface.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\sc\sciReport.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\sc\sciSerialize.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\sc\sciWebServices.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\serverbrowsing\sb_ascii.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\serverbrowsing\sb_crypt.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\serverbrowsing\sb_internal.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\serverbrowsing\sb_serverbrowsing.h" />
+    <ClInclude Include="GameSpy\src\GameSpy\webservices\AuthService.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
