@@ -4770,9 +4770,6 @@
     <ClInclude Include="Level_network_map_sync.h">
       <Filter>Core\Client\Level\LevelMapSync</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrGameSpy\gamespy\md5.h">
-      <Filter>Core\Client\Level\ClientDigestComputer</Filter>
-    </ClInclude>
     <ClInclude Include="DemoInfo.h">
       <Filter>Core\Client\Level\LevelNetworkDemo</Filter>
     </ClInclude>
@@ -6651,6 +6648,9 @@
     <ClInclude Include="CdkeyDecode\cdkeydecode.h">
       <Filter>Core\Server\CdkeyDecode</Filter>
     </ClInclude>
+    <ClInclude Include="..\Externals\GameSpy\src\GameSpy\md5.h">
+      <Filter>Core\Client\Level\ClientDigestComputer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -8163,9 +8163,6 @@
       <Filter>Core\Client\Level\LevelMapSync</Filter>
     </ClCompile>
     <ClCompile Include="Level_network_digest_computer.cpp">
-      <Filter>Core\Client\Level\ClientDigestComputer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrGameSpy\gamespy\md5c.c">
       <Filter>Core\Client\Level\ClientDigestComputer</Filter>
     </ClCompile>
     <ClCompile Include="DemoInfo.cpp">
@@ -10159,6 +10156,9 @@
     </ClCompile>
     <ClCompile Include="CdkeyDecode\cdkeydecode.c">
       <Filter>Core\Server\CdkeyDecode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Externals\GameSpy\src\GameSpy\md5c.c">
+      <Filter>Core\Client\Level\ClientDigestComputer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

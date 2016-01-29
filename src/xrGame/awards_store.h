@@ -4,7 +4,7 @@
 #include "xrCore/Containers/AssociativeVector.hpp"
 #include "Common/Noncopyable.hpp"
 #include "profile_data_types.h"
-#include "xrGameSpy/GameSpy/sake/sake.h"
+#include <GameSpy/sake/sake.h>
 #include "gsc_dsigned_ltx.h"
 
 class CGameSpy_Full;

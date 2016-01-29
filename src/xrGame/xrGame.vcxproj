@@ -210,7 +210,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\xrGameSpy\gamespy\md5.h" />
+    <ClInclude Include="..\Externals\GameSpy\src\GameSpy\md5.h" />
     <ClInclude Include="..\xrServerEntities\ai_sounds.h" />
     <ClInclude Include="..\xrServerEntities\alife_human_brain.h" />
     <ClInclude Include="..\xrServerEntities\alife_human_brain_inline.h" />
@@ -1671,7 +1671,7 @@
     <ClInclude Include="ZudaArtifact.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\xrGameSpy\gamespy\md5c.c">
+    <ClCompile Include="..\Externals\GameSpy\src\GameSpy\md5c.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>

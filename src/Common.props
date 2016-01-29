@@ -38,7 +38,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(ProjectDir);$(xrSdkDir)include;$(DXSDK_DIR)Include;$(SolutionDir)Externals\luajit\src;$(SolutionDir)Externals\luabind;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(ProjectDir);$(xrSdkDir)include;$(DXSDK_DIR)Include;$(SolutionDir)Externals\luajit\src;$(SolutionDir)Externals\luabind;$(SolutionDir)Externals\GameSpy\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <!--
         4251 : class 'x' needs to have dll-interface to be used by clients of class 'y'

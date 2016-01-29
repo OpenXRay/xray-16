@@ -3,14 +3,14 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-#include "xrGameSpy/GameSpy/Common/gsCommon.h"
-#include "xrGameSpy/GameSpy/Common/gsAvailable.h"
-#include "xrGameSpy/GameSpy/ghttp/ghttp.h"
-#include "xrGameSpy/GameSpy/qr2/qr2.h"
-#include "xrGameSpy/GameSpy/gcdkey/gcdkeyc.h"
-#include "xrGameSpy/GameSpy/gcdkey/gcdkeys.h"
-#include "xrGameSpy/GameSpy/serverbrowsing/sb_serverbrowsing.h"
-#include "xrGameSpy/GameSpy/pt/pt.h"
-#include "xrGameSpy/GameSpy/gp/gp.h"
-#include "xrGameSpy/GameSpy/sake/sake.h"
-#include "xrGameSpy/GameSpy/sc/sc.h"
+#include <GameSpy/Common/gsCommon.h>
+#include <GameSpy/Common/gsAvailable.h>
+#include <GameSpy/ghttp/ghttp.h>
+#include <GameSpy/qr2/qr2.h>
+#include <GameSpy/gcdkey/gcdkeyc.h>
+#include <GameSpy/gcdkey/gcdkeys.h>
+#include <GameSpy/serverbrowsing/sb_serverbrowsing.h>
+#include <GameSpy/pt/pt.h>
+#include <GameSpy/gp/gp.h>
+#include <GameSpy/sake/sake.h>
+#include <GameSpy/sc/sc.h>

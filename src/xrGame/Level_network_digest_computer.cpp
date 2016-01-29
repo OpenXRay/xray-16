@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Level.h"
-#include "xrGameSpy/gamespy/md5.h"
+#include <GameSpy/md5.h>
 
 extern	void	GetCDKey_FromRegistry(char* CDKeyStr);
 char const * ComputeClientDigest(string128& dest)
