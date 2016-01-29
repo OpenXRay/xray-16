@@ -7,9 +7,6 @@
 #include "utils/xrLC_Light/xrLC_GlobalData.h"
 #include "utils/xrLCUtil/LevelCompilerLoggerWindow.hpp"
 
-//#pragma comment(linker,"/STACK:0x800000,0x400000")
-//#pragma comment(linker,"/HEAP:0x70000000,0x10000000")
-
 #pragma comment(lib,"comctl32.lib")
 #pragma comment(lib,"d3dx9.lib")
 #pragma comment(lib,"IMAGEHLP.LIB")
@@ -19,16 +16,6 @@
 #pragma comment(lib,"xrCore.lib")
 #pragma comment(lib,"xrLC_Light.lib")
 #pragma comment(lib, "xrLCUtil.lib")
-
-#define PROTECTED_BUILD
-
-#ifdef PROTECTED_BUILD
-#   define TRIVIAL_ENCRYPTOR_ENCODER
-#   define TRIVIAL_ENCRYPTOR_DECODER
-#   include "xrEngine/trivial_encryptor.h"
-#   undef TRIVIAL_ENCRYPTOR_ENCODER
-#   undef TRIVIAL_ENCRYPTOR_DECODER
-#endif // PROTECTED_BUILD
 
 CBuild* pBuild      = NULL;
 u32     version     = 0;
@@ -100,16 +87,7 @@ void Startup(LPSTR     lpCmdLine)
     xr_sprintf(temp, "%s - Levels Compiler", name);
     Logger.Initialize(temp);
     // Faster FPU 
-    SetPriorityClass        (GetCurrentProcess(),NORMAL_PRIORITY_CLASS);
-    /*
-    u32 dwMin           = 1800*(1024*1024);
-    u32 dwMax           = 1900*(1024*1024);
-    if (0==SetProcessWorkingSetSize(GetCurrentProcess(),dwMin,dwMax))
-    {
-        clMsg("*** Failed to expand working set");
-    };
-    */
-    
+    SetPriorityClass        (GetCurrentProcess(),NORMAL_PRIORITY_CLASS);    
     // Load project
     string_path             prjName;
     FS.update_path          (prjName,"$game_levels$",strconcat(sizeof(prjName),prjName,name,"\\build.prj"));
@@ -172,20 +150,11 @@ void Startup(LPSTR     lpCmdLine)
     Logger.Destroy();
 }
 
-//typedef void DUMMY_STUFF (const void*,const u32&,void*);
-//XRCORE_API DUMMY_STUFF    *g_temporary_stuff;
-//XRCORE_API DUMMY_STUFF    *g_dummy_stuff;
-
-
-
 int APIENTRY WinMain(HINSTANCE hInst,
                      HINSTANCE hPrevInstance,
                      LPSTR     lpCmdLine,
                      int       nCmdShow)
 {
-//  g_temporary_stuff   = &trivial_encryptor::decode;
-//  g_dummy_stuff       = &trivial_encryptor::encode;
-
     // Initialize debugging
     xrDebug::Initialize   (false);
     Core._initialize    ("xrLC");

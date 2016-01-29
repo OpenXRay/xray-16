@@ -1,16 +1,6 @@
 #include "stdafx.h"
 #include "xrCompress.h"
 
-//typedef void DUMMY_STUFF (const void*,const u32&,void*);
-//XRCORE_API DUMMY_STUFF	*g_temporary_stuff;
-//XRCORE_API DUMMY_STUFF	*g_dummy_stuff;
-
-//#	define TRIVIAL_ENCRYPTOR_ENCODER
-//#	define TRIVIAL_ENCRYPTOR_DECODER
-
-//#	undef TRIVIAL_ENCRYPTOR_ENCODER
-//#	undef TRIVIAL_ENCRYPTOR_DECODER
-
 xrCompressor::xrCompressor()
 :fs_pack_writer(NULL),bFast(false),files_list(NULL),folders_list(NULL),bStoreFiles(false),pPackHeader(NULL),config_ltx(NULL)
 {
@@ -24,9 +14,6 @@ xrCompressor::xrCompressor()
 	dwTimeStart		= 0;
 
 	XRP_MAX_SIZE	= 1024*1024*640; // bytes (640Mb)
-
-//	g_temporary_stuff	= &trivial_encryptor::decode;
-//	g_dummy_stuff		= &trivial_encryptor::encode;
 }
 
 xrCompressor::~xrCompressor()
@@ -338,12 +325,6 @@ void xrCompressor::OpenPack(LPCSTR tgt_folder, int num)
 	filesALIAS		= 0;
 
 	dwTimeStart		= timeGetTime();
-
-	//write pack header without compression
-//	DUMMY_STUFF* _dummy_stuff_subst		= NULL;
-//	_dummy_stuff_subst					= g_dummy_stuff;
-//	g_dummy_stuff						= NULL;
-
 	if(config_ltx && config_ltx->section_exist("header"))
 	{
 		CMemoryWriter			W;

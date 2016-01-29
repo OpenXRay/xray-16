@@ -17,9 +17,6 @@
 
 const u32 BIG_FILE_READER_WINDOW_SIZE = 1024*1024;
 
-//typedef void DUMMY_STUFF (const void*,const u32&,void*);
-//XRCORE_API DUMMY_STUFF *g_temporary_stuff = 0;
-
 # pragma warning(push)
 # pragma warning(disable:4995)
 # include <malloc.h>
@@ -305,8 +302,6 @@ IReader* open_chunk(void* ptr, u32 ID)
             {
                 BYTE* dest;
                 unsigned dest_sz;
-                // if (g_temporary_stuff)
-                // g_temporary_stuff (src_data,dwSize,src_data);
                 _decompressLZ(&dest, &dest_sz, src_data, dwSize);
                 xr_free(src_data);
                 return xr_new<CTempReader>(dest, dest_sz, 0);
@@ -377,16 +372,6 @@ void CLocatorAPI::LoadArchive(archive& A, LPCSTR entrypoint)
     }
     if (entrypoint)
         xr_strcpy(fs_entry_point, sizeof(fs_entry_point), entrypoint);
-
-
-    // DUMMY_STUFF *g_temporary_stuff_subst = NULL;
-    //
-    // if(strstr(A.path.c_str(),".xdb"))
-    // {
-    // g_temporary_stuff_subst = g_temporary_stuff;
-    // g_temporary_stuff = NULL;
-    // }
-
     // Read FileSystem
     A.open();
     IReader* hdr = open_chunk(A.hSrcFile, 1);
@@ -424,9 +409,6 @@ void CLocatorAPI::LoadArchive(archive& A, LPCSTR entrypoint)
         Register(full, A.vfs_idx, crc, ptr, size_real, size_compr, 0);
     }
     hdr->close();
-
-    // if(g_temporary_stuff_subst)
-    // g_temporary_stuff = g_temporary_stuff_subst;
 }
 
 void CLocatorAPI::archive::open()
@@ -469,11 +451,6 @@ void CLocatorAPI::ProcessArchive(LPCSTR _path)
 
     // Read header
     BOOL bProcessArchiveLoading = TRUE;
-
-    // DUMMY_STUFF *g_temporary_stuff_subst = NULL;
-    // g_temporary_stuff_subst = g_temporary_stuff;
-    // g_temporary_stuff = NULL;
-
     IReader* hdr = open_chunk(A.hSrcFile, CFS_HeaderChunkID);
     if (hdr)
     {
@@ -481,8 +458,6 @@ void CLocatorAPI::ProcessArchive(LPCSTR _path)
         hdr->close();
         bProcessArchiveLoading = A.header->r_bool("header", "auto_load");
     }
-    // g_temporary_stuff = g_temporary_stuff_subst;
-
     if (bProcessArchiveLoading || strstr(Core.Params, "-auto_load_arch"))
         LoadArchive(A);
     else

@@ -10,9 +10,6 @@
 #include <sys\stat.h>
 #pragma warning(default:4995)
 
-//typedef void DUMMY_STUFF (const void*,const u32&,void*);
-//XRCORE_API DUMMY_STUFF *g_dummy_stuff = 0;
-
 #ifdef M_BORLAND
 # define O_SEQUENTIAL 0
 #endif // M_BORLAND

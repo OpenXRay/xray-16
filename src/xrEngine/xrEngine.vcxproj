@@ -475,7 +475,6 @@
     <ClInclude Include="Text_Console.h" />
     <ClInclude Include="thunderbolt.h" />
     <ClInclude Include="tntQAVI.h" />
-    <ClInclude Include="trivial_encryptor.h" />
     <ClInclude Include="vis_common.h" />
     <ClInclude Include="WaveForm.h" />
     <ClInclude Include="xrHemisphere.h" />

@@ -252,9 +252,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>General</Filter>
     </ClInclude>
-    <ClInclude Include="trivial_encryptor.h">
-      <Filter>General</Filter>
-    </ClInclude>
     <ClInclude Include="x_ray.h">
       <Filter>General</Filter>
     </ClInclude>
