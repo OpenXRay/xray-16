@@ -200,6 +200,10 @@ public:
 // ********************************************** The Core definition
 class XRCORE_API xrCore
 {
+private:
+    const char *buildDate;
+    u32 buildId;
+
 public:
     string64 ApplicationName;
     string_path ApplicationPath;
@@ -213,6 +217,11 @@ public:
 public:
     void _initialize(LPCSTR ApplicationName, LogCallback cb = 0, BOOL init_fs = TRUE, LPCSTR fs_fname = 0, bool plugin = false);
     void _destroy();
+    const char *GetBuildDate() const { return buildDate; }
+    u32 GetBuildId() const { return buildId; }
+
+private:
+    void CalculateBuildId();
 };
 
 extern XRCORE_API xrCore Core;

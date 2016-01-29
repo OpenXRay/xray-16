@@ -23,8 +23,6 @@
 ENGINE_API bool g_dedicated_server = false;
 ENGINE_API CApplication *pApp = nullptr;
 ENGINE_API CInifile* pGameIni = nullptr;
-XRCORE_API const char *build_date;
-XRCORE_API u32 build_id;
 ENGINE_API bool g_bBenchmark = false;
 string512 g_sBenchmarkName;
 ENGINE_API string512 g_sLaunchOnExit_params;
@@ -36,41 +34,6 @@ namespace
 HWND logoWindow = nullptr;
 
 void RunBenchmark(const char *name);
-
-void CalculateBuildId()
-{
-    const int startDay = 31;
-    const int startMonth = 1;
-    const int startYear = 1999;
-    const char *monthId[12] =
-    {
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    };
-    const int daysInMonth[12] =
-    {
-        31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
-    };
-    build_date = __DATE__;
-    int days;
-    int months = 0;
-    int years;
-    string16 month;
-    string256 buffer;
-    xr_strcpy(buffer, build_date);
-    sscanf(buffer, "%s %d %d", month, &days, &years);
-    for (int i = 0; i<12; i++)
-    {
-        if (_stricmp(monthId[i], month))
-            continue;
-        months = i;
-        break;
-    }
-    build_id = (years- startYear)*365+days-startDay;
-    for (int i = 0; i<months; i++)
-        build_id += daysInMonth[i];
-    for (int i = 0; i<startMonth-1; i++)
-        build_id -= daysInMonth[i];
-}
 }
 
 void InitEngine()
@@ -397,7 +360,6 @@ int RunApplication(const char *commandLine)
         u32 sz = xr_strlen(fsltx);
         sscanf(strstr(commandLine, fsltx)+sz, "%[^ ] ", fsgame);
     }
-    CalculateBuildId();
     Core._initialize("xray", NULL, TRUE, *fsgame ? fsgame : nullptr);
     InitSettings();
     // Adjust player & computer name for Asian
