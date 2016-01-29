@@ -448,27 +448,16 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
 
     if (!IsDebuggerPresent())
     {
-
-        HMODULE const kernel32 = LoadLibrary("kernel32.dll");
-        R_ASSERT(kernel32);
-
-        typedef BOOL(__stdcall*HeapSetInformation_type) (HANDLE, HEAP_INFORMATION_CLASS, PVOID, SIZE_T);
-        HeapSetInformation_type const heap_set_information =
-            (HeapSetInformation_type)GetProcAddress(kernel32, "HeapSetInformation");
-        if (heap_set_information)
-        {
-            ULONG HeapFragValue = 2;
+        ULONG HeapFragValue = 2;
 #ifdef DEBUG
-            BOOL const result =
+        BOOL const result =
 #endif // #ifdef DEBUG
-                heap_set_information(
-                    GetProcessHeap(),
-                    HeapCompatibilityInformation,
-                    &HeapFragValue,
-                    sizeof(HeapFragValue)
-                );
-            VERIFY2(result, "can't set process heap low fragmentation");
-        }
+            HeapSetInformation(
+                GetProcessHeap(),
+                HeapCompatibilityInformation,
+                &HeapFragValue,
+                sizeof(HeapFragValue));
+        VERIFY2(result, "can't set process heap low fragmentation");
     }
 #ifndef DEDICATED_SERVER
     // Check for another instance
