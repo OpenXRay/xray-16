@@ -10,3 +10,6 @@
 [submodule "src/Externals/gli"]
 	path = src/Externals/gli
 	url = git@github.com:g-truc/gli
+[submodule "src/Externals/GameSpy"]
+	path = src/Externals/GameSpy
+	url = git@github.com:nitrocaster/GameSpy.git
