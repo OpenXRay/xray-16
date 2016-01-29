@@ -100,8 +100,7 @@ void CHW::CreateD3D()
 		}
 		else
 		{
-			m_pAdapter->Release();
-			m_pAdapter = 0;
+			_RELEASE(m_pAdapter);
 		}
 		++i;
 	}
@@ -131,7 +130,7 @@ void CHW::DestroyD3D()
 //	FreeLibrary(hD3D);
 }
 
-void CHW::CreateDevice( HWND m_hWnd, bool move_window )
+void CHW::CreateDevice( HWND hWnd, bool move_window )
 {
 	m_move_window			= move_window;
 	CreateD3D();
@@ -291,10 +290,10 @@ void CHW::CreateDevice( HWND m_hWnd, bool move_window )
 
 	// Windoze
 	//P.SwapEffect			= bWindowed?D3DSWAPEFFECT_COPY:D3DSWAPEFFECT_DISCARD;
-	//P.hDeviceWindow			= m_hWnd;
+	//P.hDeviceWindow			= hWnd;
 	//P.Windowed				= bWindowed;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-	sd.OutputWindow = m_hWnd;
+	sd.OutputWindow = hWnd;
 	sd.Windowed = bWindowed;
 
 	// Depth/stencil
@@ -336,18 +335,27 @@ void CHW::CreateDevice( HWND m_hWnd, bool move_window )
 //        D3D_FEATURE_LEVEL_10_0,
     };
 
-   R =  D3D11CreateDeviceAndSwapChain(   0,//m_pAdapter,//What wrong with adapter??? We should use another version of DXGI?????
-                                          m_DriverType,
-                                          NULL,
-                                          createDeviceFlags,
-										  pFeatureLevels,
-										  sizeof(pFeatureLevels)/sizeof(pFeatureLevels[0]),
-										  D3D11_SDK_VERSION,
-                                          &sd,
-                                          &m_pSwapChain,
-		                                  &pDevice,
-										  &FeatureLevel,		
-										  &pContext);
+// MSDN:
+// If you set the pAdapter parameter to a non - NULL value, you must also set
+// the DriverType parameter to the D3D_DRIVER_TYPE_UNKNOWN value. If you set
+// the pAdapter parameter to a non - NULL value and the DriverType parameter
+// to the D3D_DRIVER_TYPE_HARDWARE value, D3D11CreateDeviceAndSwapChain returns
+// an HRESULT of E_INVALIDARG.
+
+	R = D3D11CreateDeviceAndSwapChain(
+		m_pAdapter,
+		D3D_DRIVER_TYPE_UNKNOWN,
+		NULL,
+		createDeviceFlags,
+		pFeatureLevels,
+		ARRAYSIZE(pFeatureLevels),
+		D3D11_SDK_VERSION,
+		&sd,
+		&m_pSwapChain,
+		&pDevice,
+		&FeatureLevel,
+		&pContext
+		);
 #else
    R =  D3DX10CreateDeviceAndSwapChain(   m_pAdapter,
                                           m_DriverType,
@@ -371,7 +379,7 @@ void CHW::CreateDevice( HWND m_hWnd, bool move_window )
 	if (FAILED(R))	{
 		R	= HW.pD3D->CreateDevice(	DevAdapter,
 			DevT,
-			m_hWnd,
+			hWnd,
 			GPU | D3DCREATE_MULTITHREADED,	//. ? locks at present
 			&P,
 			&pDevice );
@@ -423,7 +431,7 @@ void CHW::CreateDevice( HWND m_hWnd, bool move_window )
 	Msg		("*     Texture memory: %d M",		memory/(1024*1024));
 	//Msg		("*          DDI-level: %2.1f",		float(D3DXGetDriverLevel(pDevice))/100.f);
 #ifndef _EDITOR
-	updateWindowProps							(m_hWnd);
+	updateWindowProps							(hWnd);
 	fill_vid_mode_list							(this);
 #endif
 }
@@ -735,7 +743,7 @@ BOOL CHW::support( D3DFORMAT fmt, DWORD type, DWORD usage)
 	return TRUE;
 }
 
-void CHW::updateWindowProps(HWND m_hWnd)
+void CHW::updateWindowProps(HWND hWnd)
 {
 	//	BOOL	bWindowed				= strstr(Core.Params,"-dedicated") ? TRUE : !psDeviceFlags.is	(rsFullscreen);
 	BOOL	bWindowed				= !psDeviceFlags.is	(rsFullscreen);
@@ -747,7 +755,7 @@ void CHW::updateWindowProps(HWND m_hWnd)
             dwWindowStyle = WS_BORDER | WS_VISIBLE;
             if (!strstr(Core.Params, "-no_dialog_header"))
                 dwWindowStyle |= WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX;
-            SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle);
+            SetWindowLong(hWnd, GWL_STYLE, dwWindowStyle);
 			// When moving from fullscreen to windowed mode, it is important to
 			// adjust the window size after recreating the device rather than
 			// beforehand to ensure that you get the window size you want.  For
@@ -768,9 +776,9 @@ void CHW::updateWindowProps(HWND m_hWnd)
 				(DesktopRect.right+m_ChainDesc.BufferDesc.Width)/2, 
 				(DesktopRect.bottom+m_ChainDesc.BufferDesc.Height)/2);
 
-			AdjustWindowRect		(	&m_rcWindowBounds, dwWindowStyle, FALSE );
+			AdjustWindowRect		(&m_rcWindowBounds, dwWindowStyle, FALSE);
 
-			SetWindowPos			(	m_hWnd, 
+			SetWindowPos			(hWnd, 
 				HWND_NOTOPMOST,	
                 m_rcWindowBounds.left,
                 m_rcWindowBounds.top,
@@ -781,11 +789,11 @@ void CHW::updateWindowProps(HWND m_hWnd)
 	}
 	else
 	{
-		SetWindowLong			( m_hWnd, GWL_STYLE, dwWindowStyle=(WS_POPUP|WS_VISIBLE) );
+		SetWindowLong			(hWnd, GWL_STYLE, dwWindowStyle=(WS_POPUP|WS_VISIBLE) );
 	}
 
 	ShowCursor	(FALSE);
-	SetForegroundWindow( m_hWnd );
+	SetForegroundWindow(hWnd);
 }
 
 
