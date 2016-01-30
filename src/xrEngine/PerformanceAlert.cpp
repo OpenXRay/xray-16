@@ -9,7 +9,7 @@ void PerformanceAlert::Print(IGameFont &font, const char *format, ...)
     float refHeight = font.GetHeight();
     font.SetColor(alertColor);
     font.OutSet(alertPos.x, alertPos.y);
-    font.SetHeightI(fontBaseSize*2);
+    font.SetHeight(fontBaseSize*2);
     va_list args;
     va_start(args, format);
     font.OutNextVA(format, args);
