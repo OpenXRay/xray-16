@@ -47,46 +47,17 @@ BOOL CSoundRender_CoreA::EAXTestSupport	(BOOL bDeferred)
 void  CSoundRender_CoreA::_restart()
 {
 	inherited::_restart();
-/*
-	CSoundRender_Target*	T	= 0;
-	for (u32 tit=0; tit<s_targets.size(); tit++)
-	{
-		T						= s_targets[tit];
-		T->_destroy				();
-	}
-
-	// Reset the current context to NULL.
-    alcMakeContextCurrent		(NULL);         
-    // Release the context and the device.
-    alcDestroyContext			(pContext);		
-	pContext					= NULL;
-    alcCloseDevice				(pDevice);		
-	pDevice						= NULL;
-
-	_initialize					(2);
-
-	for (u32 tit=0; tit<s_targets.size(); tit++)
-	{
-		T						= s_targets[tit];
-		T->_initialize				();
-	}
-*/
 }
 
-void CSoundRender_CoreA::_initialize(int stage)
+void CSoundRender_CoreA::_initialize()
 {
-	if(stage==0)
-	{
-		pDeviceList					= xr_new<ALDeviceList>();
+	pDeviceList					= xr_new<ALDeviceList>();
 
-		if (0==pDeviceList->GetNumDevices())
-		{ 
-			CHECK_OR_EXIT			(0,"OpenAL: Can't create sound device.");
-			xr_delete				(pDeviceList);
-		}
-		return;
+	if (0==pDeviceList->GetNumDevices())
+	{
+		CHECK_OR_EXIT			(0,"OpenAL: Can't create sound device.");
+		xr_delete				(pDeviceList);
 	}
-	
 	pDeviceList->SelectBestDevice	();
 	R_ASSERT						(snd_device_id>=0 && snd_device_id<pDeviceList->GetNumDevices());
 	const ALDeviceDesc& deviceDesc	= pDeviceList->GetDeviceDesc(snd_device_id);
@@ -140,25 +111,22 @@ void CSoundRender_CoreA::_initialize(int stage)
         bEAX 					= EAXTestSupport(FALSE);
     }
 
-    inherited::_initialize		(stage);
+    inherited::_initialize		();
 
-	if(stage==1)//first initialize
+	// Pre-create targets
+	CSoundRender_Target*	T	= 0;
+	for (u32 tit=0; tit<u32(psSoundTargets); tit++)
 	{
-		// Pre-create targets
-		CSoundRender_Target*	T	= 0;
-		for (u32 tit=0; tit<u32(psSoundTargets); tit++)
+		T						=	xr_new<CSoundRender_TargetA>();
+		if (T->_initialize())
 		{
-			T						=	xr_new<CSoundRender_TargetA>();
-			if (T->_initialize())
-			{
-				s_targets.push_back	(T);
-			}else
-			{
-        		Log					("! SOUND: OpenAL: Max targets - ",tit);
-				T->_destroy			();
-        		xr_delete			(T);
-        		break;
-			}
+			s_targets.push_back	(T);
+		}else
+		{
+        	Log					("! SOUND: OpenAL: Max targets - ",tit);
+			T->_destroy			();
+        	xr_delete			(T);
+        	break;
 		}
 	}
 }

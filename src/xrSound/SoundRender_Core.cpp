@@ -59,7 +59,7 @@ CSoundRender_Core::~CSoundRender_Core()
 #endif
 }
 
-void CSoundRender_Core::_initialize(int stage)
+void CSoundRender_Core::_initialize()
 {
     Log							("* sound: EAX 2.0 extension:",bEAX?"present":"absent");
     Log							("* sound: EAX 2.0 deferred:",bDeferredEAX?"present":"absent");

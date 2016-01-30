@@ -244,7 +244,7 @@ class MODEL;
 /// definition (Sound Manager Interface)
 class XRSOUND_API	CSound_manager_interface
 {
-	virtual void	  				_initialize				(int stage)																			= 0;
+	virtual void	  				_initialize				()																			= 0;
 	virtual void					_clear					( )																						= 0;
 
 protected:
@@ -254,7 +254,7 @@ protected:
 public:
 	virtual							~CSound_manager_interface(){}
 
-	static void						_create					(int stage);
+	static void						_create					();
 	static void						_destroy				( );
 
 	virtual void					_restart				( )																						= 0;

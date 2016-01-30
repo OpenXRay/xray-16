@@ -118,14 +118,9 @@ void destroyInput()
     xr_delete(pInput);
 }
 
-void InitSound1()
+void InitSound()
 {
-    CSound_manager_interface::_create(0);
-}
-
-void InitSound2()
-{
-    CSound_manager_interface::_create(1);
+    CSound_manager_interface::_create();
 }
 
 void destroySound()
@@ -184,9 +179,8 @@ void CheckPrivilegySlowdown()
 
 void Startup()
 {
-    InitSound1();
     execUserScript();
-    InitSound2();
+    InitSound();
     // ...command line for auto start
     const char *startArgs = strstr(Core.Params, "-start ");
     if (startArgs)

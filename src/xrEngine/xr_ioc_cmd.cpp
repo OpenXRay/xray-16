@@ -469,7 +469,8 @@ public:
     CCC_SND_Restart(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
     virtual void Execute(LPCSTR args)
     {
-        Sound->_restart();
+        if (Sound)
+            Sound->_restart();
     }
 };
 
