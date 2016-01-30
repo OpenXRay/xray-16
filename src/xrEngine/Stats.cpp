@@ -107,7 +107,6 @@ void CStats::Show()
         font.SetColor(0xFFFF0000);
         font.OutSet(Device.dwWidth / 2.0f + (font.SizeOf_("--= tune =--") / 2.0f), Device.dwHeight / 2.0f);
         font.OutNext("--= tune =--");
-        font.OnRender();
         font.SetHeight(sz);
     }
     // Show them
@@ -144,7 +143,6 @@ void CStats::Show()
         font.OutNext("QPC: %u", CPU::qpc_counter);
         CPU::qpc_counter = 0;
 #endif
-        font.OnRender();
     }
     if (psDeviceFlags.test(rsCameraPos))
     {
@@ -153,7 +151,6 @@ void CStats::Show()
         font.SetColor(0xffffffff);
         font.Out(10, 600, "CAMERA POSITION:  [%3.2f,%3.2f,%3.2f]", VPUSH(Device.vCameraPosition));
         font.SetHeight(refHeight);
-        font.OnRender();
     }
 #ifdef DEBUG
     if (!g_bDisableRedText && errors.size())
@@ -162,9 +159,9 @@ void CStats::Show()
         font.OutSet(400, 0);
         for (u32 it = (u32)_max(int(0), (int)errors.size() - g_ErrorLineCount); it < errors.size(); it++)
             font.OutNext("%s", errors[it].c_str());
-        font.OnRender();
     }
 #endif
+    font.OnRender();
 }
 
 void CStats::OnDeviceCreate()
