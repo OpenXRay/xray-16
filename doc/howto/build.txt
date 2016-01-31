@@ -31,7 +31,7 @@ To build X-Ray Engine you'll need following libraries:
 XXX nitrocaster: add LuaJIT & LuaBind instructions
 
 You can download all these libraries (except Windows/DirectX SDK) with compiled binaries here:
-https://dl.dropboxusercontent.com/u/63973281/dev/xray/xray-16-libraries.zip
+https://drive.google.com/file/d/0B2mH6ffKfXjCMjRfRTZsVlBtUVE
 
 Setup:
 ------
