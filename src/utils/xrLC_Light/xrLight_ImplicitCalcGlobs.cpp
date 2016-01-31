@@ -17,7 +17,7 @@ void	ImplicitCalcGlobs::read				( INetReader	&r )
 		R_ASSERT(read_faces);
 		NetClear	( );
 		Allocate( );
-		defl	= xr_new<ImplicitDeflector>();
+		defl	= new ImplicitDeflector();
 		ImplicitHash->read( r, *read_faces );
 		defl->read( r );
 
@@ -39,7 +39,7 @@ void	ImplicitCalcGlobs::read				( INetReader	&r )
 	}
 	void ImplicitCalcGlobs::Allocate()
 	{
-			ImplicitHash	= xr_new<IHASH>	();
+			ImplicitHash	= new IHASH	();
 	}
 	void	ImplicitCalcGlobs::Deallocate()
 	{

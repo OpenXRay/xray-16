@@ -61,7 +61,7 @@ void __fastcall TfrmImageLib::EditLib(AnsiString &title, bool bImport)
 {
     if (!form)
     {
-        form = xr_new<TfrmImageLib>((TComponent*)0);
+        form = new TfrmImageLib((TComponent*)0);
         form->Caption = title;
         form->bImportMode = bImport;
         form->ebRemoveTexture->Enabled = !bImport;
@@ -92,7 +92,7 @@ ETextureThumbnail *TfrmImageLib::FindUsedTHM(const shared_str &name)
     if (it!=m_THM_Used.end())
         return it->second;
 
-    ETextureThumbnail*thm = xr_new<ETextureThumbnail>(name.c_str(),false);
+    ETextureThumbnail*thm = new ETextureThumbnail(name.c_str(),false);
     m_THM_Used[name] = thm;
 
     if (bImportMode)
@@ -397,7 +397,7 @@ void TfrmImageLib::OnItemsFocused(ListItemsVec &items)
                     thm = FindUsedTHM(prop->Key());
                     if (!thm)
                     {
-                        m_THM_Used.push_back    (thm=xr_new<ETextureThumbnail>(prop->Key(),false));
+                        m_THM_Used.push_back    (thm=new ETextureThumbnail(prop->Key(),false));
                         xr_string fn            = prop->Key();
                         ImageLib.UpdateFileName (fn);
 
@@ -411,7 +411,7 @@ void TfrmImageLib::OnItemsFocused(ListItemsVec &items)
                 {
                     thm = FindUsedTHM(prop->Key());
                     if (!thm) 
-                        m_THM_Used.push_back(thm=xr_new<ETextureThumbnail>(prop->Key()));
+                        m_THM_Used.push_back(thm=new ETextureThumbnail(prop->Key()));
                 }
                 */
                 m_THM_Current.push_back(thm);

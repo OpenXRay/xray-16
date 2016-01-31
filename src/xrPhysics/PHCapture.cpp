@@ -20,14 +20,14 @@
 ///////////////////////////////////////////////////////////////////////////////////
 IPHCapture	*phcapture_create(CPHCharacter *ch, IPhysicsShellHolder* object, NearestToPointCallback* cb /*=0*/ )
 {
-//m_capture=xr_new<CPHCapture>(m_character,
+//m_capture=new CPHCapture(m_character,
 //							 object,
 //							 cb
 //							 );
 	VERIFY( ch );
 	//VERIFY( object );
 	//VERIFY( cb );
-	return xr_new<CPHCapture>(ch,
+	return new CPHCapture(ch,
 		   				 object,
 		   				 cb
 		   				 );
@@ -35,7 +35,7 @@ IPHCapture	*phcapture_create(CPHCharacter *ch, IPhysicsShellHolder* object, Near
 IPHCapture	*phcapture_create(CPHCharacter *ch, IPhysicsShellHolder* object,u16 element)
 {
 	VERIFY( ch );
-	return xr_new<CPHCapture>(ch,
+	return new CPHCapture(ch,
 		object,
 		element
 		);

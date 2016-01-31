@@ -9,7 +9,7 @@
 class XRayMtlClassDesc:public ClassDesc2 {
 public:
 	int 			IsPublic		()				{ return 1; }
-	void *			Create			(BOOL loading)	{ return xr_new<XRayMtl>(loading); }
+	void *			Create			(BOOL loading)	{ return new XRayMtl(loading); }
 	const TCHAR *	ClassName		()				{ return GetString(IDS_CLASS_NAME); }
 	SClass_ID		SuperClassID	()				{ return MATERIAL_CLASS_ID; }
 	Class_ID 		ClassID			()				{ return XRAYMTL_CLASS_ID; }
@@ -1158,7 +1158,7 @@ void* XRayMtl::GetInterface(ULONG id)
 
 void XRayMtl::Reset() 
 {
-	ReplaceReference( TEXMAPS_REF, xr_new<Texmaps>((MtlBase*)this));	
+	ReplaceReference( TEXMAPS_REF, new Texmaps((MtlBase*)this));	
 	ivalid.SetEmpty();
 
 	SetShaderIndx( FindShader( Class_ID(DEFAULT_SHADER_CLASS_ID,0) ));
@@ -1274,7 +1274,7 @@ XRayMtl::XRayMtl(BOOL loading) : mReshadeRQ(RR_None), mInRQ(RR_None) // mjm - 06
 RefTargetHandle XRayMtl::Clone(RemapDir &remap) {
 	//DebugPrint(" Cloning NEWSTDMTL %d \n", ++numNewStdMtls);
 	macroRecorder->Disable();
-	XRayMtl *mnew = xr_new<XRayMtl>(TRUE);
+	XRayMtl *mnew = new XRayMtl(TRUE);
 	*((MtlBase*)mnew) = *((MtlBase*)this);  // copy superclass stuff
 	mnew->ReplaceReference(TEXMAPS_REF,		remap.CloneRef(maps));
 	mnew->ReplaceReference(SHADER_REF,		remap.CloneRef(pShader));	
@@ -1620,7 +1620,7 @@ void XRayMtl::SwitchShader(Shader* newShader, BOOL loadDlg )
 		theHold.Resume(); //-----------------------------------------------------
 
 		if (theHold.Holding())
-			theHold.Put(xr_new<SwitchShaderRestore>(this,oldShader,newShader));  // this will make a ref to oldShader
+			theHold.Put(new SwitchShaderRestore(this,oldShader,newShader));  // this will make a ref to oldShader
 
 		theHold.Suspend(); //-----------------------------------------------------
 
@@ -1800,7 +1800,7 @@ void XRayMtl::SwitchSampler( Sampler* newSampler )
 
 		theHold.Resume(); //-----------------------------------------------------
 		if (theHold.Holding())
-			theHold.Put(xr_new<SwitchSamplerRestore>(this, pixelSampler));  // this will make a ref to oldShader
+			theHold.Put(new SwitchSamplerRestore(this, pixelSampler));  // this will make a ref to oldShader
 		theHold.Suspend(); //-----------------------------------------------------
 
 		SetPixelSampler( newSampler );
@@ -3376,10 +3376,10 @@ case NEWSTDMTL_DIM_REFLECT:
 
 	// register version updaters
 	if (version <= FINAL_PARAMBLOCK_v1_VERSION) {
-		iload->RegisterPostLoadCallback(xr_new<ParamBlockPLCB>((ParamVersionDesc*)oldNewStdMtlVersions, NEWSTDMTL_NUMOLDVER, &stdMtlVersion, this, 0));
-		iload->RegisterPostLoadCallback(xr_new<NewStdMtl2UpdateCB>(this, version));
+		iload->RegisterPostLoadCallback(new ParamBlockPLCB((ParamVersionDesc*)oldNewStdMtlVersions, NEWSTDMTL_NUMOLDVER, &stdMtlVersion, this, 0));
+		iload->RegisterPostLoadCallback(new NewStdMtl2UpdateCB(this, version));
 		if (version<12)
-			iload->RegisterPostLoadCallback(xr_new<NewStdMtl2BumpFixCB>(this));
+			iload->RegisterPostLoadCallback(new NewStdMtl2BumpFixCB(this));
 		iload->SetObsolete();
 	}
 
@@ -3390,7 +3390,7 @@ case NEWSTDMTL_DIM_REFLECT:
 	if (gamemtlId==-1) gamemtlId = XRayMtl::FindGameMtl("default");
 
 	// register plcb to finalize setup
-	iload->RegisterPostLoadCallback(xr_new<NewStdMtl2CB>(this));
+	iload->RegisterPostLoadCallback(new NewStdMtl2CB(this));
 
 	return IO_OK;
 }
@@ -3739,7 +3739,7 @@ void XRayMtl::PostShade(ShadeContext& sc, IReshadeFragment* pFrag, int& nextTexI
 // too late for sdk, eco in progress
 IllumParams* CloneIp( IllumParams& ip )
 {
-	IllumParams* pClone = xr_new<IllumParams>( ip.nUserIllumOut, ip.userIllumNames );
+	IllumParams* pClone = new IllumParams( ip.nUserIllumOut, ip.userIllumNames );
 	pClone->finalC = ip.finalC;
 	pClone->finalT = ip.finalT;
 	pClone->finalOpac = ip.finalOpac;

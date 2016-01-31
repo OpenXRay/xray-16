@@ -13,7 +13,7 @@
 
 CStalkerAnimationState::CStalkerAnimationState	()
 {
-	m_in_place			= xr_new<IN_PLACE_ANIMATIONS>();
+	m_in_place			= new IN_PLACE_ANIMATIONS();
 }
 
 CStalkerAnimationState::CStalkerAnimationState	(const CStalkerAnimationState &stalker_animation_state)

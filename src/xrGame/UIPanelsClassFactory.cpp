@@ -15,19 +15,19 @@ UITeamState* UIPanelsClassFactory::CreateTeamPanel(shared_str const & teamName, 
 {
 	if (teamName == "greenteam")
 	{
-		return xr_new<UITeamState>(etGreenTeam, teamPanels);
+		return new UITeamState(etGreenTeam, teamPanels);
 	} else if (teamName == "blueteam")
 	{
-		return xr_new<UITeamState>(etBlueTeam, teamPanels);
+		return new UITeamState(etBlueTeam, teamPanels);
 	} else if (teamName == "spectatorsteam")
 	{
-		return xr_new<UITeamState>(etSpectatorsTeam, teamPanels);
+		return new UITeamState(etSpectatorsTeam, teamPanels);
 	} else if (teamName == "greenteam_pending")
 	{
-		return xr_new<UITeamState>(etGreenTeam, teamPanels);
+		return new UITeamState(etGreenTeam, teamPanels);
 	} else if (teamName == "blueteam_pending")
 	{
-		return xr_new<UITeamState>(etBlueTeam, teamPanels);
+		return new UITeamState(etBlueTeam, teamPanels);
 	}
 	return NULL;
 }

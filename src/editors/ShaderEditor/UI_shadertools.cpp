@@ -259,15 +259,15 @@ void CShaderTool::RegisterTools()
         ISHTools *tools = 0;
         switch (k)
         {
-            case aeEngine: tools = xr_new<CSHEngineTools>(ISHInit(EToolsID(k), m_Items, fraLeftBar->tsEngine, m_ItemProps, m_PreviewProps));
+            case aeEngine: tools = new CSHEngineTools(ISHInit(EToolsID(k), m_Items, fraLeftBar->tsEngine, m_ItemProps, m_PreviewProps));
                 break;
-            case aeCompiler: tools = xr_new<CSHCompilerTools>(ISHInit(EToolsID(k), m_Items, fraLeftBar->tsCompiler, m_ItemProps, m_PreviewProps));
+            case aeCompiler: tools = new CSHCompilerTools(ISHInit(EToolsID(k), m_Items, fraLeftBar->tsCompiler, m_ItemProps, m_PreviewProps));
                 break;
-            case aeMtl: tools = xr_new<CSHGameMtlTools>(ISHInit(EToolsID(k), m_Items, fraLeftBar->tsMaterial, m_ItemProps, m_PreviewProps));
+            case aeMtl: tools = new CSHGameMtlTools(ISHInit(EToolsID(k), m_Items, fraLeftBar->tsMaterial, m_ItemProps, m_PreviewProps));
                 break;
-            case aeMtlPair: tools = xr_new<CSHGameMtlPairTools>(ISHInit(EToolsID(k), m_Items, fraLeftBar->tsMaterialPair, m_ItemProps, m_PreviewProps));
+            case aeMtlPair: tools = new CSHGameMtlPairTools(ISHInit(EToolsID(k), m_Items, fraLeftBar->tsMaterialPair, m_ItemProps, m_PreviewProps));
                 break;
-            //case aeSoundEnv: tools = xr_new<CSHSoundEnvTools>(ISHInit(EToolsID(k), m_Items, fraLeftBar->tsSoundEnv, m_ItemProps, m_PreviewProps));
+            //case aeSoundEnv: tools = new CSHSoundEnvTools(ISHInit(EToolsID(k), m_Items, fraLeftBar->tsSoundEnv, m_ItemProps, m_PreviewProps));
                 break;
         }
         R_ASSERT(tools);

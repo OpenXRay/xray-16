@@ -209,7 +209,7 @@ item_respawn_manager::respawn_section_iter
 	u32 sections_count = _GetItemCount(section_name.c_str());
 	string256				temp_section_name;
 
-	section_items* tmp_sect_items = xr_new<section_items>();
+	section_items* tmp_sect_items = new section_items();
 
 	for (u32 is = 0; is < sections_count; ++is)
 	{

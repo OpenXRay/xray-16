@@ -17,8 +17,8 @@ CALifeMonsterMovementManager::CALifeMonsterMovementManager	(object_type *object)
 {
 	VERIFY			(object);
 	m_object		= object;
-	m_detail		= xr_new<detail_path_type>(object);
-	m_patrol		= xr_new<patrol_path_type>(object);
+	m_detail		= new detail_path_type(object);
+	m_patrol		= new patrol_path_type(object);
 	m_path_type		= MovementManager::ePathTypeNoPath;
 }
 

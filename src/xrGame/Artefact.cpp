@@ -80,7 +80,7 @@ void CArtefact::Load(LPCSTR section)
 BOOL CArtefact::net_Spawn(CSE_Abstract* DC) 
 {
 	if(pSettings->r_bool(cNameSect(),"can_be_controlled") )
-		m_detectorObj				= xr_new<SArtefactDetectorsSupport>(this);
+		m_detectorObj				= new SArtefactDetectorsSupport(this);
 
 	BOOL result						= inherited::net_Spawn(DC);
 	SwitchAfParticles				(true);
@@ -491,7 +491,7 @@ void CArtefact::CreateArtefactActivation()
 	if (m_activationObj) {
 		return;
 	}
-	m_activationObj = xr_new<SArtefactActivation>(this, H_Parent()->ID());
+	m_activationObj = new SArtefactActivation(this, H_Parent()->ID());
 }
 
 SArtefactDetectorsSupport::SArtefactDetectorsSupport(CArtefact* A)

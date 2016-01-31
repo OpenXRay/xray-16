@@ -19,7 +19,7 @@ CActorMain *&AUI = (CActorMain*)UI;
 
 CActorMain::CActorMain()
 {
-    EPrefs = xr_new<CAEPreferences>();
+    EPrefs = new CAEPreferences();
 }
 
 //---------------------------------------------------------------------------

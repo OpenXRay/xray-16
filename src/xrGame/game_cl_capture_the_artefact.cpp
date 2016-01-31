@@ -1340,7 +1340,7 @@ void game_cl_CaptureTheArtefact::OnVoteStart(NET_Packet& P)
 	m_game_ui->SetVoteTimeResultMsg("");
 
 	if (!m_pVoteRespondWindow)
-            m_pVoteRespondWindow = xr_new<CUIVote>();
+            m_pVoteRespondWindow = new CUIVote();
 	m_pVoteRespondWindow->SetVoting(fin_str);
 }
 

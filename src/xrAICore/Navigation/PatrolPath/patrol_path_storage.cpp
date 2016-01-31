@@ -37,9 +37,9 @@ void CPatrolPathStorage::load_raw			(const CLevelGraph *level_graph, const CGame
 		m_registry.insert		(
 			std::make_pair(
 				patrol_name,
-				&xr_new<CPatrolPath>(
+				&(new CPatrolPath(
 					patrol_name
-				)->load_raw(
+				))->load_raw(
 					level_graph,
 					cross,
 					game_graph,

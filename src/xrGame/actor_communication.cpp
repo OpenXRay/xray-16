@@ -174,7 +174,7 @@ void CActor::LostPdaContact		(CInventoryOwner* pInvOwner)
 
 void CActor::AddGameNews_deffered	 (GAME_NEWS_DATA& news_data, u32 delay)
 {
-	GAME_NEWS_DATA * d = xr_new<GAME_NEWS_DATA>(news_data);
+	GAME_NEWS_DATA * d = new GAME_NEWS_DATA(news_data);
 	//*d = news_data;
 	m_defferedMessages.push_back( SDefNewsMsg() );
 	m_defferedMessages.back().news_data = d;

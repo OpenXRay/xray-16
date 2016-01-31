@@ -53,7 +53,7 @@ void __fastcall TfrmChoseItem::FormDestroy(TObject *Sender)
 int __fastcall TfrmChoseItem::SelectItem(u32 choose_ID, LPCSTR& dest, int sel_cnt, LPCSTR init_name, TOnChooseFillItems item_fill, void* fill_param, TOnChooseSelectItem item_select, ChooseItemVec* items, u32 mask)
 {
 	VERIFY(!form);
-	form 							= xr_new<TfrmChoseItem>((TComponent*)0);
+	form 							= new TfrmChoseItem((TComponent*)0);
     form->m_Flags.assign			(mask);
     form->m_Flags.set				(cfMultiSelect,sel_cnt>1);
     form->iMultiSelLimit 			= sel_cnt;

@@ -18,7 +18,7 @@ void	xrLight			()
 	u32	stride			= range/NUM_THREADS;
 	u32	last			= range-stride*	(NUM_THREADS-1);
 	for (u32 thID=0; thID<NUM_THREADS; thID++)	{
-		CThread*	T		= xr_new<LightThread> (thID,thID*stride,thID*stride+((thID==(NUM_THREADS-1))?last:stride));
+		CThread*	T		= new LightThread (thID,thID*stride,thID*stride+((thID==(NUM_THREADS-1))?last:stride));
 		T->thMessages		= FALSE;
 		T->thMonitor		= FALSE;
 		Threads.start		(T);

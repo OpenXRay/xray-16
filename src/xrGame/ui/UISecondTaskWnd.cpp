@@ -54,7 +54,7 @@ void UITaskListWnd::init_from_xml( CUIXml& xml, LPCSTR path )
 	Register( m_bt_close );
 	AddCallback( m_bt_close, BUTTON_DOWN, CUIWndCallback::void_function( this, &UITaskListWnd::OnBtnClose ) );
 
-	m_list = xr_new<CUIScrollView>();
+	m_list = new CUIScrollView();
 	m_list->SetAutoDelete( true );
 	AttachChild( m_list );
 	CUIXmlInit::InitScrollView( xml, "task_list", 0, m_list );
@@ -139,7 +139,7 @@ void UITaskListWnd::UpdateList()
 		CGameTask* task = (*itb).game_task;
 		if ( task && task->GetTaskState() == eTaskStateInProgress )
 		{
-			UITaskListWndItem* item = xr_new<UITaskListWndItem>();
+			UITaskListWndItem* item = new UITaskListWndItem();
 			if ( item->init_task( task, this ) )
 			{
 				m_list->AddWindow( item, true );

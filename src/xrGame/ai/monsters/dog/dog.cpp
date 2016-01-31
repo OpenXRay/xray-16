@@ -22,7 +22,7 @@
 
 CAI_Dog::CAI_Dog()
 {
-	StateMan = xr_new<CStateManagerDog>(this);
+	StateMan = new CStateManagerDog(this);
 	
 	min_move_dist		= u32(5);
 	max_move_dist		= u32(7);

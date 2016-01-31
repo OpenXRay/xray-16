@@ -37,7 +37,7 @@ CWallmarksEngine::wm_slot* CWallmarksEngine::FindSlot	(ref_shader shader)
 }
 CWallmarksEngine::wm_slot* CWallmarksEngine::AppendSlot	(ref_shader shader)
 {
-	marks.push_back				(xr_new<wm_slot>(shader));
+	marks.push_back				(new wm_slot(shader));
 	return marks.back			();
 }
 
@@ -83,7 +83,7 @@ void CWallmarksEngine::clear()
 CWallmarksEngine::static_wallmark*	CWallmarksEngine::static_wm_allocate		()
 {
 	static_wallmark*	W = 0;
-	if (static_pool.empty())  W = xr_new<static_wallmark> ();
+	if (static_pool.empty())  W = new static_wallmark ();
 	else					{ W = static_pool.back(); static_pool.pop_back(); }
 
 	W->ttl				= ps_r__WallmarkTTL;

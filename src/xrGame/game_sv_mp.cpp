@@ -48,7 +48,7 @@ extern xr_token	round_end_result_str[];
 
 game_sv_mp::game_sv_mp() :inherited()
 {
-	m_strWeaponsData		= xr_new<CItemMgr>();
+	m_strWeaponsData		= new CItemMgr();
 	m_bVotingActive = false;	
 	//------------------------------------------------------
 //	g_pGamePersistent->Environment().SetWeather("mp_weather");

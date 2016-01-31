@@ -44,7 +44,7 @@ void UITeamHeader::InitColumnsStatics(CUIXml& uiXml)
 			break;
 		LPCSTR tempColumnName = uiXml.ReadAttrib(tempColumnNode, "name", 
 			"column_not_set_in_name_attribute");
-		CUIStatic* tempColumn = xr_new<CUIStatic>();
+		CUIStatic* tempColumn = new CUIStatic();
 		VERIFY(tempColumn);
 		this->AttachChild(static_cast<CUIWindow*>(tempColumn));
 		tempColumn->SetAutoDelete(true);
@@ -67,7 +67,7 @@ void UITeamHeader::InitFieldsStatics	(CUIXml& uiXml)
 			break;
 		LPCSTR tempFieldName = uiXml.ReadAttrib(tempFieldNode, "name", 
 			"field_not_set_in_name_attribute");
-		CUIStatic* tempField = xr_new<CUIStatic>();
+		CUIStatic* tempField = new CUIStatic();
 		VERIFY(tempField);
 		this->AttachChild(static_cast<CUIWindow*>(tempField));
 		tempField->SetAutoDelete(true);

@@ -45,7 +45,7 @@ bool CEditableObject::LoadBoneData(IReader &F)
     IReader *R;
     while (0!=(R = F.open_chunk(count++)))
     {
-        CBone *nBone = xr_new<CBone>();
+        CBone *nBone = new CBone();
         load_bones.push_back(nBone);
         nBone->LoadData(*R);
         Msg("loaded bone [%s]", nBone->Name().c_str());

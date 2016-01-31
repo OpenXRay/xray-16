@@ -14,7 +14,7 @@ public:
 
 		//for (u32 y=0; y<s_Y; y++)
 		//	for (u32 x=0; x<s_Y; x++)
-		//		table[y][x]	= xr_new<xr_vector<T> > ();
+		//		table[y][x]	= new xr_vector<T>();
 	}
 	~hash2D()
 	{

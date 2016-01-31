@@ -23,7 +23,7 @@ ENGINE_API extern CConsole* Console;
 using editor::property_holder;
 
 engine_impl::engine_impl() :
-    m_input_receiver(xr_new<IInputReceiver>()),
+    m_input_receiver(new IInputReceiver()),
     m_input_captured(false)
 {
 }

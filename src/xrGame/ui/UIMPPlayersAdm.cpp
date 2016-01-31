@@ -30,59 +30,59 @@ xr_token g_ban_times[] = {
 
 CUIMpPlayersAdm::CUIMpPlayersAdm()
 {
-	m_pPlayersList = xr_new<CUIListBox>();
+	m_pPlayersList = new CUIListBox();
 	m_pPlayersList->SetAutoDelete(true);
 	AttachChild(m_pPlayersList);
 
-	m_pRefreshBtn = xr_new<CUI3tButton>();
+	m_pRefreshBtn = new CUI3tButton();
 	m_pRefreshBtn->SetAutoDelete(true);
 	AttachChild(m_pRefreshBtn);
 
-	m_pScreenAllBtn = xr_new<CUI3tButton>();
+	m_pScreenAllBtn = new CUI3tButton();
 	m_pScreenAllBtn->SetAutoDelete(true);
 	AttachChild(m_pScreenAllBtn);
 
-	m_pConfigAllBtn = xr_new<CUI3tButton>();
+	m_pConfigAllBtn = new CUI3tButton();
 	m_pConfigAllBtn->SetAutoDelete(true);
 	AttachChild(m_pConfigAllBtn);
 	
-	m_pPingLimitBtn = xr_new<CUI3tButton>();
+	m_pPingLimitBtn = new CUI3tButton();
 	m_pPingLimitBtn->SetAutoDelete(true);
 	AttachChild(m_pPingLimitBtn);
 
-	m_pPingLimitTrack = xr_new<CUITrackBar>();
+	m_pPingLimitTrack = new CUITrackBar();
 	m_pPingLimitTrack->SetAutoDelete(true);
 	AttachChild(m_pPingLimitTrack);
 
-	m_pPingLimitText = xr_new<CUITextWnd>();
+	m_pPingLimitText = new CUITextWnd();
 	m_pPingLimitText->SetAutoDelete(true);
 	AttachChild(m_pPingLimitText);
 
-	m_pScreenPlayerBtn = xr_new<CUI3tButton>();
+	m_pScreenPlayerBtn = new CUI3tButton();
 	m_pScreenPlayerBtn->SetAutoDelete(true);
 	AttachChild(m_pScreenPlayerBtn);
 
-	m_pConfigPlayerBtn = xr_new<CUI3tButton>();
+	m_pConfigPlayerBtn = new CUI3tButton();
 	m_pConfigPlayerBtn->SetAutoDelete(true);
 	AttachChild(m_pConfigPlayerBtn);
 
-	m_pKickPlayerBtn = xr_new<CUI3tButton>();
+	m_pKickPlayerBtn = new CUI3tButton();
 	m_pKickPlayerBtn->SetAutoDelete(true);
 	AttachChild(m_pKickPlayerBtn);
 
-	m_pBanPlayerBtn = xr_new<CUI3tButton>();
+	m_pBanPlayerBtn = new CUI3tButton();
 	m_pBanPlayerBtn->SetAutoDelete(true);
 	AttachChild(m_pBanPlayerBtn);
 
-	m_pBanPlayerCombo = xr_new<CUIComboBox>();
+	m_pBanPlayerCombo = new CUIComboBox();
 	m_pBanPlayerCombo->SetAutoDelete(true);
 	AttachChild(m_pBanPlayerCombo);
 
-	//m_pBanTimeTrack = xr_new<CUITrackBar>();
+	//m_pBanTimeTrack = new CUITrackBar();
 	//m_pBanTimeTrack->SetAutoDelete(true);
 	//AttachChild(m_pBanTimeTrack);
 
-	//m_pBanTimeText = xr_new<CUITextWnd>();
+	//m_pBanTimeText = new CUITextWnd();
 	//m_pBanTimeText->SetAutoDelete(true);
 	//AttachChild(m_pBanTimeText);
 }

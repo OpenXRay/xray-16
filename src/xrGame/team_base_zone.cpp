@@ -47,7 +47,7 @@ float CTeamBaseZone::Radius			() const
 
 BOOL CTeamBaseZone::net_Spawn	(CSE_Abstract* DC) 
 {
-	CCF_Shape					*l_pShape = xr_new<CCF_Shape>(this);
+	CCF_Shape					*l_pShape = new CCF_Shape(this);
     SetCForm(l_pShape);
 
 	CSE_Abstract				*l_tpAbstract = (CSE_Abstract*)(DC);

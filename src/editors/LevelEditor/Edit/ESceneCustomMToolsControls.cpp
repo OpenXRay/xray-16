@@ -8,7 +8,7 @@
 void ESceneToolBase::CreateDefaultControls(u32 sub_target_id)
 {
     for (int a = 0; a<etaMaxActions; a++)
-        AddControl(xr_new<TUI_CustomControl>(sub_target_id, a, this));
+        AddControl(new TUI_CustomControl(sub_target_id, a, this));
 }
 
 void ESceneToolBase::RemoveControls()

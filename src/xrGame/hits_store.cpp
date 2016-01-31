@@ -31,7 +31,7 @@ void hits_store::add_hit(shared_str const & hitter,
 
 	if (tmp_iter == m_bullet_hits.end())
 	{
-		bullet_hits_t* new_hits_queue	= xr_new<bullet_hits_t>();
+		bullet_hits_t* new_hits_queue	= new bullet_hits_t();
 		tmp_iter						= m_bullet_hits.insert(
 			std::make_pair(search_key, new_hits_queue)).first;
 	}

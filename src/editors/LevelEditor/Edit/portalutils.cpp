@@ -104,7 +104,7 @@ bool CPortalUtils::CreateDefaultSector()
     Fbox box;
     if (Scene->GetBox(box, OBJCLASS_SCENEOBJECT))
     {
-        CSector *sector_def = xr_new<CSector>((LPVOID)0,DEFAULT_SECTOR_NAME);
+        CSector *sector_def = new CSector((LPVOID)0,DEFAULT_SECTOR_NAME);
         sector_def->sector_color.set(1, 0, 0, 0);
         sector_def->m_bDefault = true;
         sector_def->CaptureAllUnusedMeshes();
@@ -187,7 +187,7 @@ bool CPortalUtils::Validate(bool bMsg)
     if (Scene->GetBox(box, OBJCLASS_SCENEOBJECT))
     {
         bResult = true;
-        CSector *sector_def = xr_new<CSector>((LPVOID)0,DEFAULT_SECTOR_NAME);
+        CSector *sector_def = new CSector((LPVOID)0,DEFAULT_SECTOR_NAME);
         sector_def->CaptureAllUnusedMeshes();
         int f_cnt;
         sector_def->GetCounts(0, 0, &f_cnt);
@@ -594,7 +594,7 @@ public:
                 // append portal
                 string256 namebuffer;
                 Scene->GenObjectName(OBJCLASS_PORTAL, namebuffer);
-                CPortal *_O = xr_new<CPortal>((LPVOID)0, namebuffer);
+                CPortal *_O = new CPortal((LPVOID)0, namebuffer);
                 for (u32 i = 0; i<vlist.size(); i++)
                 {
                     _O->Vertices().push_back(verts[vlist[i]]);
@@ -631,7 +631,7 @@ int CPortalUtils::CalculateSelectedPortals(ObjectList &sectors)
     // calculate portals
     Fbox bb;
     Scene->GetBox(bb, OBJCLASS_SCENEOBJECT);
-    sCollector *CL = xr_new<sCollector>(bb);
+    sCollector *CL = new sCollector(bb);
     Fmatrix T;
 
     //1. xform + weld

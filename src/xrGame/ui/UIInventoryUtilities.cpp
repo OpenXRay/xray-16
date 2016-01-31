@@ -59,7 +59,7 @@ CharInfoStrings		*charInfoGoodwillStrings	= NULL;
 
 void InventoryUtilities::CreateShaders()
 {
-	g_tmpWMShader = xr_new<ui_shader>();
+	g_tmpWMShader = new ui_shader();
 	(*g_tmpWMShader)->create("effects\\wallmark",  "wm\\wm_grenade");
 	//g_tmpWMShader.create("effects\\wallmark",  "wm\\wm_grenade");
 }
@@ -188,7 +188,7 @@ const ui_shader& InventoryUtilities::GetBuyMenuShader()
 {	
 	if(!g_BuyMenuShader)
 	{
-		g_BuyMenuShader = xr_new<ui_shader>();
+		g_BuyMenuShader = new ui_shader();
 		(*g_BuyMenuShader)->create("hud\\default", BUY_MENU_TEXTURE);
 	}
 
@@ -199,7 +199,7 @@ const ui_shader& InventoryUtilities::GetEquipmentIconsShader()
 {	
 	if(!g_EquipmentIconsShader)
 	{
-		g_EquipmentIconsShader = xr_new<ui_shader>();
+		g_EquipmentIconsShader = new ui_shader();
 		(*g_EquipmentIconsShader)->create("hud\\default", "ui\\ui_icon_equipment");
 	}
 
@@ -210,7 +210,7 @@ const ui_shader&	InventoryUtilities::GetMPCharIconsShader()
 {
 	if(!g_MPCharIconsShader)
 	{
-		g_MPCharIconsShader = xr_new<ui_shader>();
+		g_MPCharIconsShader = new ui_shader();
 		(*g_MPCharIconsShader)->create("hud\\default",  MP_CHAR_ICONS);
 	}
 
@@ -221,7 +221,7 @@ const ui_shader& InventoryUtilities::GetOutfitUpgradeIconsShader()
 {	
 	if(!g_OutfitUpgradeIconsShader)
 	{
-		g_OutfitUpgradeIconsShader = xr_new<ui_shader>();
+		g_OutfitUpgradeIconsShader = new ui_shader();
 		(*g_OutfitUpgradeIconsShader)->create("hud\\default", "ui\\ui_actor_armor");
 	}
 
@@ -232,7 +232,7 @@ const ui_shader& InventoryUtilities::GetWeaponUpgradeIconsShader()
 {	
 	if(!g_WeaponUpgradeIconsShader)
 	{
-		g_WeaponUpgradeIconsShader = xr_new<ui_shader>();
+		g_WeaponUpgradeIconsShader = new ui_shader();
 		(*g_WeaponUpgradeIconsShader)->create("hud\\default", "ui\\ui_actor_weapons");
 	}
 
@@ -437,7 +437,7 @@ void InitCharacterInfoStrings()
 	if (!charInfoReputationStrings)
 	{
 		// Create string->Id DB
-		charInfoReputationStrings	= xr_new<CharInfoStrings>();
+		charInfoReputationStrings	= new CharInfoStrings();
 		// Reputation
 		LoadStrings(charInfoReputationStrings, relationsLtxSection, reputationgField);
 	}
@@ -445,7 +445,7 @@ void InitCharacterInfoStrings()
 	if (!charInfoRankStrings)
 	{
 		// Create string->Id DB
-		charInfoRankStrings			= xr_new<CharInfoStrings>();
+		charInfoRankStrings			= new CharInfoStrings();
 		// Ranks
 		LoadStrings(charInfoRankStrings, relationsLtxSection, ratingField);
 	}
@@ -453,7 +453,7 @@ void InitCharacterInfoStrings()
 	if (!charInfoGoodwillStrings)
 	{
 		// Create string->Id DB
-		charInfoGoodwillStrings			= xr_new<CharInfoStrings>();
+		charInfoGoodwillStrings			= new CharInfoStrings();
 		// Goodwills
 		LoadStrings(charInfoGoodwillStrings, relationsLtxSection, goodwillField);
 	}

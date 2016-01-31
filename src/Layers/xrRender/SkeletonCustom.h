@@ -130,7 +130,7 @@ protected:
 	CSkeletonX*					LL_GetChild				(u32 idx);
 
 	// internal functions
-	virtual CBoneData*			CreateBoneData			(u16 ID){return xr_new<CBoneData>(ID);}
+	virtual CBoneData*			CreateBoneData			(u16 ID){return new CBoneData(ID);}
 	virtual void				IBoneInstances_Create	();
 	virtual void				IBoneInstances_Destroy	();
 	void						Visibility_Invalidate	()	{ Update_Visibility=TRUE; };

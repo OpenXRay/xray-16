@@ -102,7 +102,7 @@ void CUISequencer::Start(LPCSTR tutor_name)
 	Device.seqFrame.Add			(this, REG_PRIORITY_LOW-10000);
 	
 	
-	m_UIWindow					= xr_new<CUIWindow>();
+	m_UIWindow					= new CUIWindow();
 
 	CUIXml uiXml;
 	uiXml.Load					(CONFIG_PATH, UI_PATH, "game_tutorials.xml");
@@ -151,8 +151,8 @@ void CUISequencer::Start(LPCSTR tutor_name)
 		LPCSTR	_tp				= uiXml.ReadAttrib("item",i,"type","");
 		bool bVideo				= 0==_stricmp(_tp,"video");
 		CUISequenceItem* pItem	= 0;
-		if (bVideo)	pItem		= xr_new<CUISequenceVideoItem>(this);
-		else		pItem		= xr_new<CUISequenceSimpleItem>(this);
+		if (bVideo)	pItem		= new CUISequenceVideoItem(this);
+		else		pItem		= new CUISequenceSimpleItem(this);
 		m_sequencer_items.push_back(pItem);
 		pItem->Load				(&uiXml,i);
 	}

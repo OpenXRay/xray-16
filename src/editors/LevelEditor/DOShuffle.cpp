@@ -32,7 +32,7 @@ SDOData::SDOData()
 bool __fastcall TfrmDOShuffle::Run()
 {
     VERIFY(!form);
-    form = xr_new<TfrmDOShuffle>((TComponent*)0, dynamic_cast<EDetailManager*>(Scene->GetTool(OBJCLASS_DO)));
+    form = new TfrmDOShuffle((TComponent*)0, dynamic_cast<EDetailManager*>(Scene->GetTool(OBJCLASS_DO)));
     // show
     return (form->ShowModal()==mrOk);
 }
@@ -91,7 +91,7 @@ void TfrmDOShuffle::FillData()
     ColorIndexPairIt it = S;
     for (; it!=E; it++)
     {
-        TfrmOneColor *OneColor = xr_new<TfrmOneColor>((TComponent*)0);
+        TfrmOneColor *OneColor = new TfrmOneColor((TComponent*)0);
         color_indices.push_back(OneColor);
         OneColor->Parent = form->sbDO;
         OneColor->ShowIndex(this);
@@ -356,7 +356,7 @@ void __fastcall TfrmDOShuffle::ebDelObjectClick(TObject *Sender)
 void __fastcall TfrmDOShuffle::ebAppendIndexClick(TObject *Sender)
 {
     bColorIndModif = true;
-    color_indices.push_back(xr_new<TfrmOneColor>((TComponent*)0));
+    color_indices.push_back(new TfrmOneColor((TComponent*)0));
     color_indices.back()->Parent = sbDO;
     color_indices.back()->ShowIndex(this);
 }

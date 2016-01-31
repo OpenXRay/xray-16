@@ -8,9 +8,9 @@
 
 void EDetailManager::CreateControls()
 {
-    AddControl(xr_new<TUI_CustomControl>(estDefault, etaSelect, this));
+    AddControl(new TUI_CustomControl(estDefault, etaSelect, this));
     // frame
-    pFrame = xr_new<TfraDetailObject>((TComponent*)0, this);
+    pFrame = new TfraDetailObject((TComponent*)0, this);
 }
 
 //----------------------------------------------------

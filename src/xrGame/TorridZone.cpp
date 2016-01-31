@@ -5,7 +5,7 @@
 
 CTorridZone::CTorridZone()
 {
-	m_animator			= xr_new<CObjectAnimator>();
+	m_animator			= new CObjectAnimator();
 }
 
 CTorridZone::~CTorridZone()

@@ -29,7 +29,7 @@ void property_collection<collection::container_type, collection>::display_name(u
 template <>
 editor::property_holder* property_collection<collection::container_type, collection>::create()
 {
-    thunderbolt_id* object = xr_new<thunderbolt_id>(m_holder.m_manager, "");
+    thunderbolt_id* object = new thunderbolt_id(m_holder.m_manager, "");
     object->fill(this);
     return (object->object());
 }
@@ -40,7 +40,7 @@ collection::collection(manager const& manager, shared_str const& id) :
     m_property_holder(0)
 {
     section = id;
-    m_collection = xr_new<collection_type>(&m_ids, this);
+    m_collection = new collection_type(&m_ids, this);
 }
 
 collection::~collection()
@@ -65,7 +65,7 @@ void collection::load(CInifile& config)
     items_type::const_iterator e = items.Data.end();
     for (; i != e; ++i)
     {
-        thunderbolt_id* object = xr_new<thunderbolt_id>(m_manager, (*i).first);
+        thunderbolt_id* object = new thunderbolt_id(m_manager, (*i).first);
         object->fill(m_collection);
         m_ids.push_back(object);
 

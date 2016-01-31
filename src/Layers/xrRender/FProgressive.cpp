@@ -54,7 +54,7 @@ void FProgressive::Load		(const char* N, IReader *data, u32 dwFlags)
 		destructor<IReader>	geomdef	(data->open_chunk		(OGF_FASTPATH));
 		destructor<IReader>	def		(geomdef().open_chunk	(OGF_SWIDATA));
 
-		xSWI				= xr_new<FSlideWindowItem>();
+		xSWI				= new FSlideWindowItem();
 		xSWI->reserved[0]	= def().r_u32();	// reserved 16 bytes
 		xSWI->reserved[1]	= def().r_u32();
 		xSWI->reserved[2]	= def().r_u32();

@@ -197,17 +197,17 @@ CRenderTarget::CRenderTarget		()
 	RImplementation.Resources->Evict			();
 
 	// Blenders
-	b_occq							= xr_new<CBlender_light_occq>			();
-	b_accum_mask					= xr_new<CBlender_accum_direct_mask>	();
-	b_accum_direct					= xr_new<CBlender_accum_direct>			();
-	b_accum_direct_cascade			= xr_new<CBlender_accum_direct_cascade>	();
-	b_accum_point					= xr_new<CBlender_accum_point>			();
-	b_accum_spot					= xr_new<CBlender_accum_spot>			();
-	b_accum_reflected				= xr_new<CBlender_accum_reflected>		();
-	b_bloom							= xr_new<CBlender_bloom_build>			();
-	b_ssao							= xr_new<CBlender_SSAO>					();
-	b_luminance						= xr_new<CBlender_luminance>			();
-	b_combine						= xr_new<CBlender_combine>				();
+	b_occq							= new CBlender_light_occq			();
+	b_accum_mask					= new CBlender_accum_direct_mask	();
+	b_accum_direct					= new CBlender_accum_direct			();
+	b_accum_direct_cascade			= new CBlender_accum_direct_cascade	();
+	b_accum_point					= new CBlender_accum_point			();
+	b_accum_spot					= new CBlender_accum_spot			();
+	b_accum_reflected				= new CBlender_accum_reflected		();
+	b_bloom							= new CBlender_bloom_build			();
+	b_ssao							= new CBlender_SSAO					();
+	b_luminance						= new CBlender_luminance			();
+	b_combine						= new CBlender_combine				();
 
 	//	NORMAL
 	{

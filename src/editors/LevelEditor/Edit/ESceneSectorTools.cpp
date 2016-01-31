@@ -14,10 +14,10 @@
 void ESceneSectorTool::CreateControls()
 {
     //	inherited::CreateControls();
-    AddControl(xr_new<TUI_ControlSectorSelect>(estDefault, etaSelect, this));
-    AddControl(xr_new<TUI_ControlSectorAdd>(estDefault, etaAdd, this));
+    AddControl(new TUI_ControlSectorSelect(estDefault, etaSelect, this));
+    AddControl(new TUI_ControlSectorAdd(estDefault, etaAdd, this));
     // frame
-    pFrame = xr_new<TfraSector>((TComponent*)0);
+    pFrame = new TfraSector((TComponent*)0);
 }
 
 //----------------------------------------------------
@@ -108,7 +108,7 @@ void ESceneSectorTool::FillProp(LPCSTR pref, PropItemVec &items)
 
 CCustomObject *ESceneSectorTool::CreateObject(LPVOID data, LPCSTR name)
 {
-    CCustomObject*O = xr_new<CSector>(data, name);
+    CCustomObject*O = new CSector(data, name);
     O->ParentTool = this;
     return O;
 }

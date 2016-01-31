@@ -31,7 +31,7 @@ void ESceneGlowTool::FillProp(LPCSTR pref, PropItemVec &items)
 
 CCustomObject *ESceneGlowTool::CreateObject(LPVOID data, LPCSTR name)
 {
-    CCustomObject*O = xr_new<CGlow>(data, name);
+    CCustomObject*O = new CGlow(data, name);
     O->ParentTool = this;
     return O;
 }

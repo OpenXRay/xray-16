@@ -60,7 +60,7 @@ private:
 		for (ExpVertIt vI=m_ExpVertices.begin(); vI!=m_ExpVertices.end(); vI++)
 			if ((*vI)->similar(pTestV)) return vI-m_ExpVertices.begin();
 
-		st_VERT* V	= xr_new<st_VERT>();
+		st_VERT* V	= new st_VERT();
 		*V			= pTestV;
 		m_ExpVertices.push_back(V);
 		return m_ExpVertices.size()-1;
@@ -69,7 +69,7 @@ public:
 	//-----------------------------------------------------------------------------
 	CVertexDef*		AddVertex	()
 	{
-		CVertexDef* V = xr_new<CVertexDef>();
+		CVertexDef* V = new CVertexDef();
 		m_Vertices.push_back(V);
 		return V;
 	}

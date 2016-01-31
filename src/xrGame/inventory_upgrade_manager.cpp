@@ -94,7 +94,7 @@ Root* Manager::add_root( shared_str const& root_id )
 	{
 		VERIFY2( 0, make_string( "Try add the existent upgrade_root for inventory item <%s>!", root_id.c_str() ) );
 	}
-	Root* 	new_root = xr_new<Root>();
+	Root* 	new_root = new Root();
 	m_roots.insert( std::make_pair( root_id, new_root ) );
 	new_root->construct( root_id, *this );
 	return ( new_root );
@@ -107,7 +107,7 @@ Upgrade* Manager::add_upgrade( shared_str const& upgrade_id, Group& parent_group
 		VERIFY2( 0, make_string( "Try add the existent upgrade (%s), in group <%s>. Such upgrade is in group <%s> already!",
 			upgrade_id.c_str(), parent_group.id_str(), get_upgrade( upgrade_id )->parent_group_id().c_str() ) );
 	}
-	Upgrade* new_upgrade = xr_new<Upgrade>();
+	Upgrade* new_upgrade = new Upgrade();
 	m_upgrades.insert( std::make_pair( upgrade_id, new_upgrade ) );
 	new_upgrade->construct( upgrade_id, parent_group, *this );
 	return ( new_upgrade );
@@ -118,7 +118,7 @@ Group* Manager::add_group( shared_str const& group_id, UpgradeBase& parent_upgra
 	Group* new_group = get_group( group_id );
 	if ( !new_group )
 	{
-		new_group = xr_new<Group>();
+		new_group = new Group();
 		m_groups.insert( std::make_pair( group_id, new_group ) );
 		new_group->construct( group_id, parent_upgrade, *this );
 		return ( new_group );
@@ -133,7 +133,7 @@ Property* Manager::add_property( shared_str const& property_id )
 	{
 		VERIFY2( 0, make_string( "Try add the existent upgrade property <%s>!", property_id.c_str() ) );
 	}
-	Property* new_property = xr_new<Property>();
+	Property* new_property = new Property();
 	m_properties.insert( std::make_pair( property_id, new_property ) );
 	new_property->construct( property_id, *this );
 	return ( new_property );

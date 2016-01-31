@@ -73,7 +73,7 @@ void PS::CPGDef::OnEffectsEditClick(ButtonValue *B, bool &bDataModified, bool &b
     switch (B->btn_num)
     {
         case 0:
-            m_Effects.push_back(xr_new<SEffect>());
+            m_Effects.push_back(new SEffect());
             m_Effects.back()->m_Flags.set(CPGDef::SEffect::flEnabled, FALSE);
             ExecCommand(COMMAND_UPDATE_PROPERTIES);
             OnParamsChange(B);

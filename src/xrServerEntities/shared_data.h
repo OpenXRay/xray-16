@@ -23,7 +23,7 @@ public:
 	};
 public:
 	static	T*		Instance	() {
-		if(!_self) _self=xr_new<T>(); 
+		if(!_self) _self=new T(); 
 		++_refcount;
 		return _self;
 	}
@@ -63,7 +63,7 @@ public:
 
 		// if not found - create appropriate shared data object
 		if (_shared_tab.end() == shared_it) {
-			_data		= xr_new<SHARED_TYPE>();
+			_data		= new SHARED_TYPE();
 			_shared_tab.insert(mk_pair(id, _data));
 		} else _data = shared_it->second;
 

@@ -297,7 +297,7 @@ void CPolterTele::tele_fire_objects()
 			CPhysicsShellHolder		*hobj = tele_object.get_object();
 			
 			VERIFY( hobj );
-			hobj->set_collision_hit_callback( xr_new<SCollisionHitCallback>( hobj, m_pmt_object_collision_damage ) );
+			hobj->set_collision_hit_callback( new SCollisionHitCallback( hobj, m_pmt_object_collision_damage ) );
 			m_object->CTelekinesis::fire_t	(tele_object.get_object(),enemy_pos, tele_object.get_object()->Position().distance_to(enemy_pos) / m_pmt_fly_velocity);
 			return;
 		}

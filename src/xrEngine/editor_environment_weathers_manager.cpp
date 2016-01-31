@@ -32,7 +32,7 @@ void property_collection<manager::weather_container_type, manager>::display_name
 template <>
 editor::property_holder* property_collection<manager::weather_container_type, manager>::create()
 {
-    weather* object = xr_new<weather>(&m_holder.m_manager, generate_unique_id("weather_unique_id_").c_str());
+    weather* object = new weather(&m_holder.m_manager, generate_unique_id("weather_unique_id_").c_str());
     object->fill(this);
     return (object->object());
 }
@@ -42,7 +42,7 @@ manager::manager(editor::environment::manager* manager) :
     m_collection(0),
     m_changed(true)
 {
-    m_collection = xr_new<collection_type>(&m_weathers, this, &m_changed);
+    m_collection = new collection_type(&m_weathers, this, &m_changed);
 }
 
 manager::~manager()
@@ -82,7 +82,7 @@ void manager::load()
 
         id = *i;
         id[length - 4] = 0;
-        weather* object = xr_new<weather>(&m_manager, id.c_str());
+        weather* object = new weather(&m_manager, id.c_str());
         object->load();
         object->fill(m_collection);
         m_weathers.push_back(object);

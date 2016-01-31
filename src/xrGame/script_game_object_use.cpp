@@ -188,8 +188,8 @@ void CScriptGameObject::set_fastcall(const luabind::functor<bool> &functor, cons
 	
 
 	
-	CPHScriptGameObjectCondition* c=xr_new<CPHScriptGameObjectCondition>(object,functor,m_game_object);
-	CPHDummiAction*				  a=xr_new<CPHDummiAction>();
+	CPHScriptGameObjectCondition* c=new CPHScriptGameObjectCondition(object,functor,m_game_object);
+	CPHDummiAction*				  a=new CPHDummiAction();
 	CPHSriptReqGObjComparer cmpr(m_game_object);
 	Level().ph_commander_scripts().remove_calls(&cmpr);
 	Level().ph_commander_scripts().add_call(c,a);
@@ -213,8 +213,8 @@ void CScriptGameObject::set_const_force(const Fvector &dir,float value,u32 time_
 //	Msg( "const force added: force: %f,  time: %d ,dir(%f,%f,%f)", value, time_interval, dir.x, dir.y, dir.z );
 //#endif
 	Fvector force;force.set(dir);force.mul(value);
-	CPHConstForceAction *a=	xr_new<CPHConstForceAction>(shell,force);
-	CPHExpireOnStepCondition *cn=xr_new<CPHExpireOnStepCondition>();
+	CPHConstForceAction *a=	new CPHConstForceAction(shell,force);
+	CPHExpireOnStepCondition *cn=new CPHExpireOnStepCondition();
 	cn->set_time_interval(time_interval);
 	//ph_world->AddCall(cn,a);
 	Level().ph_commander_physics_worldstep().add_call_threadsafety(cn,a);

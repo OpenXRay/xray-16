@@ -167,7 +167,7 @@ CMonsterCoverManager::~CMonsterCoverManager()
 
 void CMonsterCoverManager::load()
 {
-	m_ce_best = xr_new<CCoverEvaluator>(&(m_object->control().path_builder().restrictions()));
+	m_ce_best = new CCoverEvaluator(&(m_object->control().path_builder().restrictions()));
 }
 
 const CCoverPoint *CMonsterCoverManager::find_cover(const Fvector &position, float min_pos_distance, float max_pos_distance, float deviation)

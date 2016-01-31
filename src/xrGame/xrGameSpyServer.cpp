@@ -30,7 +30,7 @@ bool	xrGameSpyServer::HasProtected()	{ return !!ServerFlags.test(server_flag_pro
 //----------- xrGameSpyClientData -----------------------
 IClient*		xrGameSpyServer::client_Create		()
 {
-	return xr_new<xrGameSpyClientData> ();
+	return new xrGameSpyClientData ();
 }
 xrGameSpyClientData::xrGameSpyClientData	():xrClientData()
 {

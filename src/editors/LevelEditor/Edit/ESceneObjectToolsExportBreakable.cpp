@@ -105,7 +105,7 @@ bool ESceneObjectTool::ExportBreakableObjects(SExportStreams *F)
     if (!GetBox(bb))
         return false;
 
-    extractor = xr_new<CGeomPartExtractor>();
+    extractor = new CGeomPartExtractor();
     extractor->Initialize(bb, EPS_L, 2);
 
     UI->SetStatus("Export breakable objects...");
@@ -235,7 +235,7 @@ bool ESceneObjectTool::ExportClimableObjects(SExportStreams *F)
     if (!GetBox(bb))
         return false;
 
-    extractor = xr_new<CGeomPartExtractor>();
+    extractor = new CGeomPartExtractor();
     extractor->Initialize(bb, EPS_L, int_max);
 
     UI->SetStatus("Export climable objects...");

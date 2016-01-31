@@ -18,7 +18,7 @@ static Class_ID TexmapsClassID(TEXMAPS_CLASS_ID, 0);
 class OldTexmapsClassDesc:public ClassDesc {
 	public:
 	int 			IsPublic() { return 0; }
-	void *			Create(BOOL loading) { 	return xr_new<Texmaps>((MtlBase*)NULL); }
+	void *			Create(BOOL loading) { 	return new Texmaps((MtlBase*)NULL); }
 	const TCHAR *	ClassName() { return GetString(IDS_DS_CLASSTEXMAPS); }
 	SClass_ID		SuperClassID() { return REF_MAKER_CLASS_ID; }
 	Class_ID 		ClassID() { return TexmapsClassID; }
@@ -29,7 +29,7 @@ class OldTexmapsClassDesc:public ClassDesc {
 class TexmapsClassDesc:public ClassDesc {
 	public:
 	int 			IsPublic() { return 0; }
-	void *			Create(BOOL loading) { 	return xr_new<Texmaps>((MtlBase*)NULL); }
+	void *			Create(BOOL loading) { 	return new Texmaps((MtlBase*)NULL); }
 	const TCHAR *	ClassName() { return GetString(IDS_DS_CLASSTEXMAPS); }
 	SClass_ID		SuperClassID() { return TEXMAP_CONTAINER_CLASS_ID; }
 	Class_ID 		ClassID() { return TexmapsClassID; }
@@ -176,7 +176,7 @@ void Texmaps::RescaleWorldUnits(float f) {
 	}
 
 RefTargetHandle Texmaps::Clone(RemapDir &remap) {
-	Texmaps *tm = xr_new<Texmaps>((MtlBase*)NULL);
+	Texmaps *tm = new Texmaps((MtlBase*)NULL);
 	for (int i = 0; i<STD2_NMAX_TEXMAPS; i++) {
 		tm->txmap[i].amount = txmap[i].amount;
 		tm->txmap[i].mapOn = txmap[i].mapOn;
@@ -243,7 +243,7 @@ IOResult Texmaps::Load(ILoad *iload) {
 		switch(id = iload->CurChunkID())  {
 			case TEX_OLD_ONOFF_CHUNK:
 				iload->SetObsolete();
-				iload->RegisterPostLoadCallback(xr_new<TexmapsPostLoad>(this));
+				iload->RegisterPostLoadCallback(new TexmapsPostLoad(this));
 				loadingOld = TRUE;
 			case TEX_ONOFF_CHUNK:
 				{

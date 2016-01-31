@@ -63,7 +63,7 @@ extern bool b_shniaganeed_pp;
 
 CMainMenu*	MainMenu()	{return (CMainMenu*)g_pGamePersistent->m_pMainMenu; };
 //----------------------------------------------------------------------------------
-#define INIT_MSGBOX(_box, _template)	{ _box = xr_new<CUIMessageBoxEx>(); _box->InitMessageBox(_template);}
+#define INIT_MSGBOX(_box, _template)	{ _box = new CUIMessageBoxEx(); _box->InitMessageBox(_template);}
 //----------------------------------------------------------------------------------
 
 CMainMenu::CMainMenu	()
@@ -101,9 +101,9 @@ CMainMenu::CMainMenu	()
 
 	if(!g_dedicated_server)
 	{
-		g_btnHint						= xr_new<CUIButtonHint>();
-		g_statHint						= xr_new<CUIButtonHint>();
-		m_pGameSpyFull					= xr_new<CGameSpy_Full>();
+		g_btnHint						= new CUIButtonHint();
+		g_statHint						= new CUIButtonHint();
+		m_pGameSpyFull					= new CGameSpy_Full();
 		
 		for (u32 i=0; i<u32(ErrMax); i++)
 		{
@@ -118,11 +118,11 @@ CMainMenu::CMainMenu	()
 		m_pMB_ErrDlgs[DownloadMPMap]->AddCallbackStr("button_copy", MESSAGE_BOX_COPY_CLICKED, CUIWndCallback::void_function(this, &CMainMenu::OnDownloadMPMap_CopyURL));
 		m_pMB_ErrDlgs[DownloadMPMap]->AddCallbackStr("button_yes", MESSAGE_BOX_YES_CLICKED, CUIWndCallback::void_function(this, &CMainMenu::OnDownloadMPMap));
 
-		m_account_mngr			= xr_new<gamespy_gp::account_manager>		(m_pGameSpyFull->GetGameSpyGP());
-		m_login_mngr			= xr_new<gamespy_gp::login_manager>			(m_pGameSpyFull);
-		m_profile_store			= xr_new<gamespy_profile::profile_store>	(m_pGameSpyFull);
-		m_stats_submitter		= xr_new<gamespy_profile::stats_submitter>	(m_pGameSpyFull);
-		m_atlas_submit_queue	= xr_new<atlas_submit_queue>				(m_stats_submitter);
+		m_account_mngr			= new gamespy_gp::account_manager		(m_pGameSpyFull->GetGameSpyGP());
+		m_login_mngr			= new gamespy_gp::login_manager			(m_pGameSpyFull);
+		m_profile_store			= new gamespy_profile::profile_store	(m_pGameSpyFull);
+		m_stats_submitter		= new gamespy_profile::stats_submitter	(m_pGameSpyFull);
+		m_atlas_submit_queue	= new atlas_submit_queue				(m_stats_submitter);
 	}
 	
 	Device.seqFrame.Add		(this,REG_PRIORITY_LOW-1000);
@@ -856,7 +856,7 @@ demo_info const * CMainMenu::GetDemoInfo(LPCSTR file_name)
 {
 	if (!m_demo_info_loader)
 	{
-		m_demo_info_loader = xr_new<demo_info_loader>();
+		m_demo_info_loader = new demo_info_loader();
 	}
 	return m_demo_info_loader->get_demofile_info(file_name);
 }

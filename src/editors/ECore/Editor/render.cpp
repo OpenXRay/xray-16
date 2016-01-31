@@ -43,7 +43,7 @@ void CRender::ShutDown()
 
 void CRender::OnDeviceCreate()
 {
-    Models = xr_new<CModelPool>();
+    Models = new CModelPool();
     Models->Logging(FALSE);
 }
 
@@ -92,7 +92,7 @@ void CRender::Render() {}
 IRender_DetailModel *CRender::model_CreateDM(IReader *F)
 {
     VERIFY(F);
-    CDetail *D = xr_new<CDetail>();
+    CDetail *D = new CDetail();
     D->Load(F);
     return D;
 }
@@ -280,6 +280,6 @@ void CRender::reset_begin()
 
 void CRender::reset_end()
 {
-    Target = xr_new<CRenderTarget>();
+    Target = new CRenderTarget();
 }
 

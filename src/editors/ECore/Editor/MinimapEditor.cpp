@@ -26,7 +26,7 @@ void __fastcall TTMinimapEditor::Show()
 {
     if (!form)
     {
-        form = xr_new<TTMinimapEditor>((TComponent*)0);
+        form = new TTMinimapEditor((TComponent*)0);
         //.        form->Caption 		= title;
     }
 
@@ -133,7 +133,7 @@ void TTMinimapEditor::ApplyPoints(bool to_controls)
 void DrawThumbnail(TCanvas *pCanvas, TRect &r, U32Vec &data, bool bDrawWithAlpha, int _w, int _h)
 {
     pCanvas->CopyMode = cmSrcCopy;
-    Graphics::TBitmap *pBitmap = xr_new<Graphics::TBitmap>();
+    Graphics::TBitmap *pBitmap = new Graphics::TBitmap();
 
     pBitmap->PixelFormat = pf24bit; //pf32bit;
     pBitmap->Height = _h;

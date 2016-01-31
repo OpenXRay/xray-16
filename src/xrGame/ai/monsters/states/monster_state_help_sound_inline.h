@@ -13,8 +13,8 @@
 TEMPLATE_SPECIALIZATION
 CStateMonsterHearHelpSoundAbstract::CStateMonsterHearHelpSound(_Object *obj) : inherited(obj)
 {
-	add_state	(eStateHearHelpSound_MoveToDest,	xr_new<CStateMonsterMoveToPointEx<_Object> >(obj));
-	add_state	(eStateHearHelpSound_LookAround,	xr_new<CStateMonsterCustomActionLook<_Object> >(obj));
+	add_state	(eStateHearHelpSound_MoveToDest,	new CStateMonsterMoveToPointEx<_Object>(obj));
+	add_state	(eStateHearHelpSound_LookAround,	new CStateMonsterCustomActionLook<_Object>(obj));
 }
 
 TEMPLATE_SPECIALIZATION

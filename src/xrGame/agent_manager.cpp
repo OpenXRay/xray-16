@@ -46,13 +46,13 @@ void CAgentManager::init_scheduler		()
 
 void CAgentManager::init_components		()
 {
-	m_corpse					= xr_new<CAgentCorpseManager>	(this);
-	m_enemy						= xr_new<CAgentEnemyManager>	(this);
-	m_explosive					= xr_new<CAgentExplosiveManager>(this);
-	m_location					= xr_new<CAgentLocationManager>	(this);
-	m_member					= xr_new<CAgentMemberManager>	(this);
-	m_memory					= xr_new<CAgentMemoryManager>	(this);
-	m_brain						= xr_new<CAgentManagerPlanner>	();
+	m_corpse					= new CAgentCorpseManager	(this);
+	m_enemy						= new CAgentEnemyManager	(this);
+	m_explosive					= new CAgentExplosiveManager(this);
+	m_location					= new CAgentLocationManager	(this);
+	m_member					= new CAgentMemberManager	(this);
+	m_memory					= new CAgentMemoryManager	(this);
+	m_brain						= new CAgentManagerPlanner	();
 	brain().setup				(this);
 }
 

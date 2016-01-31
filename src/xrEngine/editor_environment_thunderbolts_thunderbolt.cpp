@@ -37,7 +37,7 @@ thunderbolt::~thunderbolt()
 void thunderbolt::create_top_gradient(CInifile& config, shared_str const& section)
 {
     VERIFY(section == m_id);
-    m_top = xr_new<gradient>();
+    m_top = new gradient();
     m_top->load(config, section, "gradient_top");
     m_GradientTop = m_top;
 }
@@ -45,7 +45,7 @@ void thunderbolt::create_top_gradient(CInifile& config, shared_str const& sectio
 void thunderbolt::create_center_gradient(CInifile& config, shared_str const& section)
 {
     VERIFY(section == m_id);
-    m_center = xr_new<gradient>();
+    m_center = new gradient();
     m_center->load(config, section, "gradient_center");
     m_GradientCenter = m_center;
 }

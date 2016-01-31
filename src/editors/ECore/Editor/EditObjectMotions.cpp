@@ -330,7 +330,7 @@ bool CEditableObject::LoadSMotions(const char* fname)
     m_SMotions.resize(F->r_u32());
     SetActiveSMotion(0);
     for (SMotionIt m_it=m_SMotions.begin(); m_it!=m_SMotions.end(); m_it++){
-        *m_it = xr_new<CSMotion>();
+        *m_it = new CSMotion();
         if (!(*m_it)->Load(*F)){
             ELog.DlgMsg(mtError,"Motions has different version. Load failed.");
             xr_delete(*m_it);
@@ -359,7 +359,7 @@ bool CEditableObject::AppendSMotion(LPCSTR fname, SMotionVec *inserted)
     LPCSTR ext = strext(fname);
     if (0==stricmp(ext, ".skl"))
     {
-        CSMotion *M = xr_new<CSMotion>();
+        CSMotion *M = new CSMotion();
         if (!M->LoadMotion(fname))
         {
             ELog.Msg(mtError, "Motion '%s' can't load. Append failed.", fname);
@@ -404,7 +404,7 @@ bool CEditableObject::AppendSMotion(LPCSTR fname, SMotionVec *inserted)
             int cnt = F->r_u32();
             for (int k = 0; k<cnt; k++)
             {
-                CSMotion *M = xr_new<CSMotion>();
+                CSMotion *M = new CSMotion();
                 if (!M->Load(*F))
                 {
                     ELog.Msg(mtError, "Motion '%s' has different version. Load failed.", M->Name());

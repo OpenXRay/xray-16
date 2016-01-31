@@ -40,20 +40,20 @@ void CStalkerAnomalyPlanner::setup				(CAI_Stalker *object, CPropertyStorage *st
 
 void CStalkerAnomalyPlanner::add_evaluators		()
 {
-	add_evaluator			(eWorldPropertyInsideAnomaly	,xr_new<CStalkerPropertyEvaluatorInsideAnomaly>		(m_object,"inside anomaly"));
-	add_evaluator			(eWorldPropertyAnomaly			,xr_new<CStalkerPropertyEvaluatorAnomaly>			(m_object,"undetected anomaly"));
+	add_evaluator			(eWorldPropertyInsideAnomaly	,new CStalkerPropertyEvaluatorInsideAnomaly		(m_object,"inside anomaly"));
+	add_evaluator			(eWorldPropertyAnomaly			,new CStalkerPropertyEvaluatorAnomaly			(m_object,"undetected anomaly"));
 }
 
 void CStalkerAnomalyPlanner::add_actions		()
 {
 	CStalkerActionBase		*action;
 
-	action					= xr_new<CStalkerActionGetOutOfAnomaly>	(m_object,"get_out_of_anomaly");
+	action					= new CStalkerActionGetOutOfAnomaly	(m_object,"get_out_of_anomaly");
 	add_condition			(action,eWorldPropertyInsideAnomaly,true);
 	add_effect				(action,eWorldPropertyInsideAnomaly,false);
 	add_operator			(eWorldOperatorGetOutOfAnomaly,		action);
 
-	action					= xr_new<CStalkerActionDetectAnomaly>	(m_object,"detect_anomaly");
+	action					= new CStalkerActionDetectAnomaly	(m_object,"detect_anomaly");
 	add_condition			(action,eWorldPropertyInsideAnomaly,false);
 	add_condition			(action,eWorldPropertyAnomaly,		true);
 	add_effect				(action,eWorldPropertyAnomaly,		false);

@@ -27,15 +27,15 @@
 
 CStateManagerController::CStateManagerController(CController *obj) : inherited(obj)
 {
-	add_state(eStateRest,					xr_new<CStateMonsterRest<CController> >					(obj));
-	add_state(eStatePanic,					xr_new<CStateMonsterPanic<CController> >				(obj));
-	add_state(eStateHearInterestingSound,	xr_new<CStateMonsterHearInterestingSound<CController> >	(obj));
-	add_state(eStateHearDangerousSound,		xr_new<CStateMonsterHearDangerousSound<CController> >	(obj));
-	add_state(eStateHitted,					xr_new<CStateMonsterHitted<CController> >				(obj));
-	add_state(eStateAttack,					xr_new<CStateControllerAttack<CController> >			(obj));
+	add_state(eStateRest,					new CStateMonsterRest<CController>(obj));
+	add_state(eStatePanic,					new CStateMonsterPanic<CController>(obj));
+	add_state(eStateHearInterestingSound,	new CStateMonsterHearInterestingSound<CController>(obj));
+	add_state(eStateHearDangerousSound,		new CStateMonsterHearDangerousSound<CController>(obj));
+	add_state(eStateHitted,					new CStateMonsterHitted<CController>(obj));
+	add_state(eStateAttack,					new CStateControllerAttack<CController>(obj));
 
-	add_state(eStateEat,		xr_new<CStateMonsterEat<CController> >(obj));
-	add_state(eStateCustom,		xr_new<CStateControlHide<CController> >(obj));
+	add_state(eStateEat,		new CStateMonsterEat<CController>(obj));
+	add_state(eStateCustom,		new CStateControlHide<CController>(obj));
 }
 
 bool   CStateManagerController::check_control_start_conditions	(ControlCom::EControlType type)

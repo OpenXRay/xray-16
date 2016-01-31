@@ -3,7 +3,7 @@
 
 void CControlAnimationBase::AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVelocityParam *vel, EPState p_s, LPCSTR fx_front, LPCSTR fx_back, LPCSTR fx_left, LPCSTR fx_right)
 {
-	SAnimItem *new_item		= xr_new<SAnimItem>();
+	SAnimItem *new_item		= new SAnimItem();
 
 	new_item->target_name	= tn;
 	new_item->spec_id		= s_id;
@@ -22,7 +22,7 @@ void CControlAnimationBase::AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVeloci
 
 void CControlAnimationBase::AddAnim(EMotionAnim ma, LPCSTR tn, int s_id, SVelocityParam *vel, EPState p_s)
 {
-	SAnimItem *new_item		= xr_new<SAnimItem>();
+	SAnimItem *new_item		= new SAnimItem();
 
 	new_item->target_name	= tn;
 	new_item->spec_id		= s_id;

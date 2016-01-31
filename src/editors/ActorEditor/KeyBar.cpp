@@ -25,7 +25,7 @@ __fastcall TfrmKeyBar::TfrmKeyBar(TComponent *Owner)
 //---------------------------------------------------------------------------
 TfrmKeyBar *TfrmKeyBar::CreateKeyBar(TWinControl *parent)
 {
-    TfrmKeyBar *B = xr_new<TfrmKeyBar>(parent);
+    TfrmKeyBar *B = new TfrmKeyBar(parent);
     B->Parent = parent;
     B->Align = alBottom;
     B->Show();

@@ -34,7 +34,7 @@ void property_collection<flares::flares_type, flares>::display_name(
 template <>
 editor::property_holder* property_collection<flares::flares_type, flares>::create()
 {
-    flare* object = xr_new<flare>();
+    flare* object = new flare();
     object->fill(this);
     return (object->object());
 }
@@ -44,7 +44,7 @@ flares::flares() :
     m_shader(""),
     m_collection(0)
 {
-    m_collection = xr_new<collection_type>(&m_flares, this);
+    m_collection = new collection_type(&m_flares, this);
 }
 
 flares::~flares()
@@ -83,7 +83,7 @@ void flares::load(CInifile& config, shared_str const& section)
     LPSTR result = (LPSTR)_alloca(buffer_size);
     for (u32 i = 0; i < min_flare_count; ++i)
     {
-        flare* object = xr_new<flare>();
+        flare* object = new flare();
         object->m_opacity = (float)atof(_GetItem(flare_opacity.c_str(), i, result, buffer_size));
         object->m_position = (float)atof(_GetItem(flare_position.c_str(), i, result, buffer_size));
         object->m_radius = (float)atof(_GetItem(flare_radius.c_str(), i, result, buffer_size));

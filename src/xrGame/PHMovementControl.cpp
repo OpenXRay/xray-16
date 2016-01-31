@@ -1023,8 +1023,8 @@ void	CPHMovementControl::AllocateCharacterObject(CharacterType type)
 	switch(type)
 	{
 		case actor:		m_character = create_actor_character( IsGameTypeSingle() )	;	break;
-		//case actor:	m_character = xr_new<CPHActorCharacter>	()					;	break;
-		//case ai:		m_character = xr_new<CPHAICharacter>	()					;	break;
+		//case actor:	m_character = new CPHActorCharacter	()					;	break;
+		//case ai:		m_character = new CPHAICharacter	()					;	break;
 		case ai:		m_character = create_ai_character()							;	break;
 		default:		NODEFAULT;
 	}
@@ -1052,7 +1052,7 @@ if( !object||
 
 m_capture = phcapture_create( m_character, object,static_cast<NearestToPointCallback*>( cb ) );
 
-//m_capture=xr_new<CPHCapture>(m_character,
+//m_capture=new CPHCapture(m_character,
 //							 object,
 //							 cb
 //							 );
@@ -1069,7 +1069,7 @@ void	CPHMovementControl::PHCaptureObject(CPhysicsShellHolder* object,u16 element
 		)
 		return;
 
-	//m_capture=xr_new<CPHCapture>(m_character,
+	//m_capture=new CPHCapture(m_character,
 	//	object,
 	//	element
 	//	);

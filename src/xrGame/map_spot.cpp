@@ -275,7 +275,7 @@ CComplexMapSpot::~CComplexMapSpot()
 
 CUIStaticOrig* CComplexMapSpot::CreateStaticOrig(CUIXml& xml, LPCSTR ui_path)
 {
-	CUIStaticOrig* ui		= xr_new<CUIStaticOrig>();
+	CUIStaticOrig* ui		= new CUIStaticOrig();
 	AttachChild				(ui);
 	ui->SetAutoDelete		(true);
 	CUIXmlInit::InitStatic	(xml, ui_path, 0, ui);

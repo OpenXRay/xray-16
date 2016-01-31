@@ -40,9 +40,9 @@ __fastcall TfrmMain::TfrmMain(TComponent *Owner)
     : TForm(Owner)
 {
     // forms
-    fraBottomBar = xr_new<TfraBottomBar>((TComponent*)0);
-    fraTopBar = xr_new<TfraTopBar>((TComponent*)0);
-    fraLeftBar = xr_new<TfraLeftBar>((TComponent*)0);
+    fraBottomBar = new TfraBottomBar((TComponent*)0);
+    fraTopBar = new TfraTopBar((TComponent*)0);
+    fraLeftBar = new TfraLeftBar((TComponent*)0);
     //-
 
     fraBottomBar->Parent = paBottomBar;

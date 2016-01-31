@@ -114,11 +114,11 @@ bool CLevel::net_start1				()
 		// Connect
 		if (!xr_strcmp(p.m_game_type,"single"))
 		{
-			Server					= xr_new<xrServer>();
+			Server					= new xrServer();
 		} else
 		{
 			g_allow_heap_min		= false;
-			Server					= xr_new<xrGameSpyServer>();
+			Server					= new xrGameSpyServer();
 		}
 
 		if (xr_strcmp(p.m_alife,"alife"))

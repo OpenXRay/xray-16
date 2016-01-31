@@ -48,7 +48,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
 			CCC_RegisterInput	();
 #ifdef DEBUG
             // XXX nitrocaster PROFILER: temporarily disabled due to linkage issues
-			//g_profiler			= xr_new<CProfiler>();
+			//g_profiler			= new CProfiler();
 #endif
 			break;
 		}

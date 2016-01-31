@@ -1063,7 +1063,7 @@ void FillStateMenu(TMenuItem *root, TNotifyEvent on_click)
     {
         if (b->second.type==PFunction::ftState)
         {
-            TMenuItem *mi = xr_new<TMenuItem>((TComponent*)0);
+            TMenuItem *mi = new TMenuItem((TComponent*)0);
             mi->Caption = b->second.command;
             mi->OnClick = on_click;
             root->Insert(root->Count, mi);
@@ -1081,7 +1081,7 @@ void FillActionMenu(TMenuItem *root, TNotifyEvent on_click)
     {
         if (b->second.type==PFunction::ftAction)
         {
-            TMenuItem *mi = xr_new<TMenuItem>((TComponent*)0);
+            TMenuItem *mi = new TMenuItem((TComponent*)0);
             mi->Caption = b->second.command;
             mi->OnClick = on_click;
             root->Insert(root->Count, mi);

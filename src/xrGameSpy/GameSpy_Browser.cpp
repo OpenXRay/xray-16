@@ -84,7 +84,7 @@ CGameSpy_Browser::CGameSpy_Browser()
 {
 	m_pQR2 = NULL;
 	m_pGSBrowser = NULL;
-    m_pQR2 = xr_new<CGameSpy_QR2>();
+    m_pQR2 = new CGameSpy_QR2();
     m_pQR2->RegisterAdditionalKeys();
     m_bAbleToConnectToMasterServer = true;
     m_bTryingToConnectToMasterServer = false;
@@ -191,7 +191,7 @@ GSUpdateStatus CGameSpy_Browser::RefreshList_Full(bool Local, const char* Filter
         m_refresh_lock.Leave();
 		if (!m_bAbleToConnectToMasterServer)
 		    return GSUpdateStatus::MasterUnreachable;
-        RefreshData*	pRData = xr_new<RefreshData>();
+        RefreshData*	pRData = new RefreshData();
         xr_strcpy(pRData->FilterStr, FilterStr);
         pRData->pGSBrowser = this;
         m_bTryingToConnectToMasterServer = true;

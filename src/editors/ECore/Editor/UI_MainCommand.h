@@ -159,7 +159,7 @@ struct ECORE_API SECommand{
     ~SECommand(){xr_free(name);xr_free(desc);for (ESubCommandVecIt it = sub_commands.begin(); it!=sub_commands.end(); it++) xr_delete(*it);}
     IC LPCSTR Name(){return name&&name[0] ? name : "";}
     IC LPCSTR Desc(){return desc&&desc[0] ? desc : "";}
-    void AppendSubCommand(LPCSTR desc, CCommandVar p0, CCommandVar p1){sub_commands.push_back(xr_new<SESubCommand>(desc,this,p0,p1));}
+    void AppendSubCommand(LPCSTR desc, CCommandVar p0, CCommandVar p1){sub_commands.push_back(new SESubCommand(desc,this,p0,p1));}
 };
 DEFINE_VECTOR(SECommand *, ECommandVec, ECommandVecIt);
 
@@ -180,12 +180,12 @@ ECORE_API BOOL AllowLogCommands();
 #define BIND_CMD_EVENT_S(a) 						fastdelegate::bind<TECommandEvent>(a)
 #define BIND_CMD_EVENT_C(a,b)						fastdelegate::bind<TECommandEvent>(a,&b)
 
-#define REGISTER_CMD_S(id,cmd)  					RegisterCommand(id, xr_new<SECommand>(#id,"",false,false,BIND_CMD_EVENT_S(cmd),id,false));
-#define REGISTER_CMD_C(id,owner,cmd) 				RegisterCommand(id, xr_new<SECommand>(#id,"",false,false,BIND_CMD_EVENT_C(owner,cmd),id,false));
-#define REGISTER_CMD_SE(id,desc,cmd,gs) 			RegisterCommand(id, xr_new<SECommand>(#id,desc,true,false,BIND_CMD_EVENT_S(cmd),id,gs));
-#define REGISTER_CMD_CE(id,desc,owner,cmd,gs)		RegisterCommand(id, xr_new<SECommand>(#id,desc,true,false,BIND_CMD_EVENT_C(owner,cmd),id,gs));
-#define REGISTER_SUB_CMD_SE(id,desc,cmd,gs){  		SECommand* SUB_CMD_HOLDER; RegisterCommand(id, SUB_CMD_HOLDER=xr_new<SECommand>(#id,desc,true,true,BIND_CMD_EVENT_S(cmd),id,gs));
-#define REGISTER_SUB_CMD_CE(id,desc,owner,cmd,gs){ 	SECommand* SUB_CMD_HOLDER; RegisterCommand(id, SUB_CMD_HOLDER=xr_new<SECommand>(#id,desc,true,true,BIND_CMD_EVENT_C(owner,cmd),id,gs));
+#define REGISTER_CMD_S(id,cmd)  					RegisterCommand(id, new SECommand(#id,"",false,false,BIND_CMD_EVENT_S(cmd),id,false));
+#define REGISTER_CMD_C(id,owner,cmd) 				RegisterCommand(id, new SECommand(#id,"",false,false,BIND_CMD_EVENT_C(owner,cmd),id,false));
+#define REGISTER_CMD_SE(id,desc,cmd,gs) 			RegisterCommand(id, new SECommand(#id,desc,true,false,BIND_CMD_EVENT_S(cmd),id,gs));
+#define REGISTER_CMD_CE(id,desc,owner,cmd,gs)		RegisterCommand(id, new SECommand(#id,desc,true,false,BIND_CMD_EVENT_C(owner,cmd),id,gs));
+#define REGISTER_SUB_CMD_SE(id,desc,cmd,gs){  		SECommand* SUB_CMD_HOLDER; RegisterCommand(id, SUB_CMD_HOLDER=new SECommand(#id,desc,true,true,BIND_CMD_EVENT_S(cmd),id,gs));
+#define REGISTER_SUB_CMD_CE(id,desc,owner,cmd,gs){ 	SECommand* SUB_CMD_HOLDER; RegisterCommand(id, SUB_CMD_HOLDER=new SECommand(#id,desc,true,true,BIND_CMD_EVENT_C(owner,cmd),id,gs));
 #define APPEND_SUB_CMD(desc,p0,p1)					RegisterSubCommand(SUB_CMD_HOLDER,desc,p0,p1);
 #define REGISTER_SUB_CMD_END }
 

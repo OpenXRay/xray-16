@@ -366,7 +366,7 @@ void thread_spawn(thread_t* entry, const char* name, unsigned stack, void* argli
 {
     xrDebug::Initialize(false);
 
-    THREAD_STARTUP* startup = xr_new<THREAD_STARTUP>();
+    THREAD_STARTUP* startup = new THREAD_STARTUP();
     startup->entry = entry;
     startup->name = (char*)name;
     startup->args = arglist;

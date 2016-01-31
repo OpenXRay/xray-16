@@ -12,8 +12,8 @@
 TEMPLATE_SPECIALIZATION
 CStateChimeraHuntingAbstract::CStateChimeraHunting(_Object *obj) : inherited(obj)
 {
-	add_state(eStateMoveToCover,	xr_new<CStateChimeraHuntingMoveToCover<_Object> >	(obj));
-	add_state(eStateComeOut,		xr_new<CStateChimeraHuntingComeOut<_Object> >		(obj));
+	add_state(eStateMoveToCover,	new CStateChimeraHuntingMoveToCover<_Object>(obj));
+	add_state(eStateComeOut,		new CStateChimeraHuntingComeOut<_Object>(obj));
 }
 
 

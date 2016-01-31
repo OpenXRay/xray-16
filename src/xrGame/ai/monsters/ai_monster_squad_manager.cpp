@@ -35,7 +35,7 @@ void CMonsterSquadManager::register_member(u8 team_id, u8 squad_id, u8 group_id,
 		for (u32 i=0; i<group_id; i++) 	
 			team[team_id][squad_id][i]		= 0;
 
-		pSquad								= xr_new<CMonsterSquad>();
+		pSquad								= new CMonsterSquad();
 		team[team_id][squad_id][group_id]	= pSquad;
 
 	// есть team, нет squad - создать squad
@@ -47,7 +47,7 @@ void CMonsterSquadManager::register_member(u8 team_id, u8 squad_id, u8 group_id,
 		for (u32 i=0; i<group_id; i++) 	
 			team[team_id][squad_id][i]		= 0;
 
-		pSquad								= xr_new<CMonsterSquad>();
+		pSquad								= new CMonsterSquad();
 		team[team_id][squad_id][group_id]	= pSquad;
 
 	// есть team, squad, нет group 
@@ -59,11 +59,11 @@ void CMonsterSquadManager::register_member(u8 team_id, u8 squad_id, u8 group_id,
 		for (u32 i = prev_size; i < group_id; i++)
 			team[team_id][squad_id][i]		= 0;
 		
-		pSquad								= xr_new<CMonsterSquad>();
+		pSquad								= new CMonsterSquad();
 		team[team_id][squad_id][group_id]	= pSquad;
 	} else {
 		if (team[team_id][squad_id][group_id] == 0) {
-			pSquad								= xr_new<CMonsterSquad>();
+			pSquad								= new CMonsterSquad();
 			team[team_id][squad_id][group_id]	= pSquad;
 		} else {
 			// TODO: Verify IT!

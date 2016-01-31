@@ -33,7 +33,7 @@
 net_updateInvData* CInventoryItem::NetSync()			
 {
 	if(!m_net_updateData) 
-		m_net_updateData = xr_new<net_updateInvData>();
+		m_net_updateData = new net_updateInvData();
 	return m_net_updateData;
 }
 

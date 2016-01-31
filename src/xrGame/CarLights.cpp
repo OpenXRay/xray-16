@@ -142,7 +142,7 @@ void CCarLights::ParseDefinitions()
 	for (int i=0 ;i<count; ++i) 
 	{
 		_GetItem					(S,i,S1);
-		m_lights.push_back(xr_new<SCarLight>());
+		m_lights.push_back(new SCarLight());
 		m_lights.back()->Init(this);
 		m_lights.back()->ParseDefinitions(S1);
 	}

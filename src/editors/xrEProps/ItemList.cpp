@@ -35,7 +35,7 @@ static  ILVec					ILForms;
 //---------------------------------------------------------------------------
 TItemList* TItemList::CreateForm(LPCSTR title, TWinControl* parent, TAlign align, u32 flags)
 {
-	TItemList* props 			= xr_new<TItemList>(parent);
+	TItemList* props 			= new TItemList(parent);
     // on create
 	props->OnCreate				(title,parent, align, flags);
 	ILForms.push_back			(props);

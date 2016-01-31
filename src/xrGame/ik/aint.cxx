@@ -249,7 +249,7 @@ float AngleInt::Range() const
 
 void AngleIntList::add(float l, float h)
 {
-    AngleIntListNode *t = xr_new<AngleIntListNode>(l, h, (AngleIntListNode*)0);
+    AngleIntListNode *t = new AngleIntListNode(l, h, (AngleIntListNode*)0);
 
     if (!head)
 	head = tail = t;

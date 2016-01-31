@@ -31,7 +31,7 @@ void property_collection<manager::container_type, manager>::display_name(u32 con
 template <>
 editor::property_holder* property_collection<manager::container_type, manager>::create()
 {
-    sun* object = xr_new<sun>(m_holder, generate_unique_id("sun_unique_id_").c_str());
+    sun* object = new sun(m_holder, generate_unique_id("sun_unique_id_").c_str());
     object->fill(this);
     return (object->object());
 }
@@ -41,7 +41,7 @@ manager::manager(::editor::environment::manager* environment) :
     m_collection(0),
     m_changed(true)
 {
-    m_collection = xr_new<collection_type>(&m_suns, this, &m_changed);
+    m_collection = new collection_type(&m_suns, this, &m_changed);
 }
 
 manager::~manager()
@@ -56,7 +56,7 @@ void manager::load()
 {
     string_path file_name;
     CInifile* config =
-        xr_new<CInifile>(
+        new CInifile(
             FS.update_path(
                 file_name,
                 "$game_config$",
@@ -82,7 +82,7 @@ void manager::save()
 {
     string_path file_name;
     CInifile* config =
-        xr_new<CInifile>(
+        new CInifile(
             FS.update_path(
                 file_name,
                 "$game_config$",
@@ -127,7 +127,7 @@ void manager::add(CInifile& config, shared_str const& section)
         m_suns.end()
     );
 
-    sun* object = xr_new<sun>(*this, section);
+    sun* object = new sun(*this, section);
     object->load(config);
     object->fill(m_collection);
     m_suns.push_back(object);

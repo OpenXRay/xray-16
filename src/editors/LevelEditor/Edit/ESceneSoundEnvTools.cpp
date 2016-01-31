@@ -30,7 +30,7 @@ void ESceneSoundEnvTool::Clear(bool bSpecific)
 
 CCustomObject *ESceneSoundEnvTool::CreateObject(LPVOID data, LPCSTR name)
 {
-    CCustomObject*O = xr_new<ESoundEnvironment>(data, name);
+    CCustomObject*O = new ESoundEnvironment(data, name);
     O->ParentTool = this;
     return O;
 }

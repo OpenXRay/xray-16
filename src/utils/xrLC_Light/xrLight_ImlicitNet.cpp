@@ -16,7 +16,7 @@ extern ImplicitCalcGlobs cl_globs;
 namespace lc_net{
 	static void AddImpImplicitNetTask( u32 from, u32 to )
 	{
-				//tmanager.start		(xr_new<ImplicitThread> (thID,&defl,thID*stride,thID*stride+stride));
+				//tmanager.start		(new ImplicitThread (thID,&defl,thID*stride,thID*stride+stride));
 				if( from == to )
 					return;
 				R_ASSERT( from < to );

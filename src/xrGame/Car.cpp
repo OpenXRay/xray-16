@@ -41,15 +41,15 @@ CCar::CCar()
 	m_driver_anim_type = 0;
 	m_bone_steer	= BI_NONE;
 	active_camera	= 0;
-	camera[ectFirst]= xr_new<CCameraFirstEye>	(this, CCameraBase::flRelativeLink|CCameraBase::flPositionRigid); 
+	camera[ectFirst]= new CCameraFirstEye	(this, CCameraBase::flRelativeLink|CCameraBase::flPositionRigid); 
 	camera[ectFirst]->tag	= ectFirst;
 	camera[ectFirst]->Load("car_firsteye_cam");
 
-	camera[ectChase]= xr_new<CCameraLook>		(this,	CCameraBase::flRelativeLink); 
+	camera[ectChase]= new CCameraLook		(this,	CCameraBase::flRelativeLink); 
 	camera[ectChase]->tag	= ectChase;
 	camera[ectChase]->Load("car_look_cam");
 
-	camera[ectFree]	= xr_new<CCameraLook>		(this); 
+	camera[ectFree]	= new CCameraLook		(this); 
 	camera[ectFree]->tag	= ectFree;
 	camera[ectFree]->Load("car_free_cam");
 	OnCameraChange(ectFirst);
@@ -69,10 +69,10 @@ CCar::CCar()
 	//////////////////////////////
 	/////////////////////////////
 	m_exhaust_particles	="vehiclefx\\exhaust_1";
-	m_car_sound			=xr_new<SCarSound>	(this);
+	m_car_sound			=new SCarSound	(this);
 
 	//у машины слотов в инвентаре нет
-	inventory			= xr_new<CInventory>();
+	inventory			= new CInventory();
 	inventory->SetSlotsUseful(false);
 	m_doors_torque_factor = 2.f;
 	m_power_increment_factor=0.5f;
@@ -179,11 +179,11 @@ BOOL	CCar::net_Spawn				(CSE_Abstract* DC)
 	if(pUserData->section_exist("destroyed"))
 		CPHDestroyable::Load(pUserData,"destroyed");
 	if(pUserData->section_exist("mounted_weapon_definition"))
-		m_car_weapon = xr_new<CCarWeapon>(this);
+		m_car_weapon = new CCarWeapon(this);
 
 	if(pUserData->section_exist("visual_memory_definition"))
 	{
-		m_memory			= xr_new<car_memory>(this);
+		m_memory			= new car_memory(this);
 		m_memory->reload	(pUserData->r_string("visual_memory_definition", "section"));
 	}
 

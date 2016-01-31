@@ -162,7 +162,7 @@ void CLevel::SaveDemoInfo()
 	m_writer->seek(m_demo_info_file_pos);
 	if (!m_demo_info)
 	{
-		m_demo_info = xr_new<demo_info>();
+		m_demo_info = new demo_info();
 	}
 	m_demo_info->load_from_game();
 	m_demo_info->write_to_file(m_writer);
@@ -185,7 +185,7 @@ bool CLevel::LoadDemoHeader	()
 	u32 demo_info_start_pos	= m_reader->tell();
 	
 	R_ASSERT(m_demo_info == NULL);
-	m_demo_info = xr_new<demo_info>();
+	m_demo_info = new demo_info();
 	m_demo_info->read_from_file(m_reader);
 
 	m_reader->seek			(demo_info_start_pos + demo_info::max_demo_info_size);
@@ -276,14 +276,14 @@ message_filter*	 CLevel::GetMessageFilter()
 {
 	if (m_msg_filter)
 		return m_msg_filter;
-	m_msg_filter = xr_new<message_filter>();
+	m_msg_filter = new message_filter();
 	return m_msg_filter;
 }
 demoplay_control* CLevel::GetDemoPlayControl()
 {
 	if (m_demoplay_control)
 		return m_demoplay_control;
-	m_demoplay_control = xr_new<demoplay_control>();
+	m_demoplay_control = new demoplay_control();
 	return m_demoplay_control;
 }
 /*

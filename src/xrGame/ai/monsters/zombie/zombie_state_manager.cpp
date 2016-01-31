@@ -19,18 +19,18 @@
 
 CStateManagerZombie::CStateManagerZombie(CZombie *obj) : inherited(obj)
 {
-	add_state(eStateRest,				xr_new<CStateMonsterRest<CZombie> >	(obj));
+	add_state(eStateRest,				new CStateMonsterRest<CZombie>(obj));
 	add_state(
 		eStateAttack,				
-		xr_new<CStateMonsterAttack<CZombie> > (obj, 
-			xr_new<CStateZombieAttackRun<CZombie> > (obj), 
-			xr_new<CStateMonsterAttackMelee<CZombie> > (obj)
+		new CStateMonsterAttack<CZombie>(obj, 
+			new CStateZombieAttackRun<CZombie>(obj), 
+			new CStateMonsterAttackMelee<CZombie>(obj)
 		)
 	);
-	add_state(eStateEat,					xr_new<CStateMonsterEat<CZombie> >(obj));
-	add_state(eStateHearInterestingSound,	xr_new<CStateMonsterHearInterestingSound<CZombie> >(obj));
-	add_state(eStateControlled,				xr_new<CStateMonsterControlled<CZombie> >	(obj));
-	add_state(eStateHearHelpSound,			xr_new<CStateMonsterHearHelpSound<CZombie> >(obj));
+	add_state(eStateEat,					new CStateMonsterEat<CZombie>(obj));
+	add_state(eStateHearInterestingSound,	new CStateMonsterHearInterestingSound<CZombie>(obj));
+	add_state(eStateControlled,				new CStateMonsterControlled<CZombie>(obj));
+	add_state(eStateHearHelpSound,			new CStateMonsterHearHelpSound<CZombie>(obj));
 }
 
 CStateManagerZombie::~CStateManagerZombie()

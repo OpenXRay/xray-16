@@ -69,7 +69,7 @@ const u32	g_clWhite					= 0xffffffff;
 CUIMainIngameWnd::CUIMainIngameWnd()
 :/*m_pGrenade(NULL),m_pItem(NULL),*/m_pPickUpItem(NULL),m_pMPChatWnd(NULL),UIArtefactIcon(NULL),m_pMPLogWnd(NULL)
 {
-	UIZoneMap					= xr_new<CUIZoneMap>();
+	UIZoneMap					= new CUIZoneMap();
 }
 
 #include "UIProgressShape.h"
@@ -127,7 +127,7 @@ void CUIMainIngameWnd::Init()
 
 	uiXml.SetLocalRoot			(uiXml.GetRoot());
 
-	m_UIIcons					= xr_new<CUIScrollView>(); m_UIIcons->SetAutoDelete(true);
+	m_UIIcons					= new CUIScrollView(); m_UIIcons->SetAutoDelete(true);
 	xml_init.InitScrollView		(uiXml, "icons_scroll_view", 0, m_UIIcons);
 	AttachChild					(m_UIIcons);
 	
@@ -224,20 +224,20 @@ void CUIMainIngameWnd::Init()
 
 	uiXml.SetLocalRoot						(uiXml.GetRoot());
 	
-	UIMotionIcon							= xr_new<CUIMotionIcon>(); UIMotionIcon->SetAutoDelete(true);
+	UIMotionIcon							= new CUIMotionIcon(); UIMotionIcon->SetAutoDelete(true);
 	UIZoneMap->MapFrame().AttachChild		(UIMotionIcon);
 	UIMotionIcon->Init						(UIZoneMap->MapFrame().GetWndRect());
 
 	UIStaticDiskIO							= UIHelper::CreateStatic(uiXml, "disk_io", this);
 
-	m_ui_hud_states							= xr_new<CUIHudStatesWnd>();
+	m_ui_hud_states							= new CUIHudStatesWnd();
 	m_ui_hud_states->SetAutoDelete			(true);
 	AttachChild								(m_ui_hud_states);
 	m_ui_hud_states->InitFromXml			(uiXml, "hud_states");
 
 	for(int i=0; i<4; i++)
 	{
-		m_quick_slots_icons.push_back	(xr_new<CUIStatic>());
+		m_quick_slots_icons.push_back	(new CUIStatic());
 		m_quick_slots_icons.back()	->SetAutoDelete(true);
 		AttachChild				(m_quick_slots_icons.back());
 		string32 path;
@@ -505,7 +505,7 @@ void CUIMainIngameWnd::InitFlashingIcons(CUIXml* node)
 	// Пробегаемся по всем нодам и инициализируем из них статики
 	for (int i = 0; i < staticsCount; ++i)
 	{
-		pIcon = xr_new<CUIStatic>();
+		pIcon = new CUIStatic();
 		xml_init.InitStatic(*node, flashingIconNodeName, i, pIcon);
 		shared_str iconType = node->ReadAttrib(flashingIconNodeName, i, "type", "none");
 

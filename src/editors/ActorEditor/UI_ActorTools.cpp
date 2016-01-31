@@ -159,7 +159,7 @@ void _SynchronizeTextures()
     for (; it!=_E; it++)
     {
         ETextureThumbnail*THM = 0;
-        THM = xr_new<ETextureThumbnail>(it->name.c_str());
+        THM = new ETextureThumbnail(it->name.c_str());
         STextureParams &fmt = THM->_Format();
         if (fmt.material==STextureParams::tmOrenNayar_Blin)
         {
@@ -643,7 +643,7 @@ bool CActorTools::Import(LPCSTR initial, LPCSTR obj_name)
         strcpy(full_name, obj_name);
 
     VERIFY(m_bReady);
-    CEditableObject *O = xr_new<CEditableObject>(obj_name);
+    CEditableObject *O = new CEditableObject(obj_name);
     if (O->Load(full_name))
     {
         O->m_objectFlags.set(CEditableObject::eoDynamic, TRUE);
@@ -672,7 +672,7 @@ bool CActorTools::Load(LPCSTR obj_name)
     full_name = obj_name;
 
     VERIFY(m_bReady);
-    CEditableObject *O = xr_new<CEditableObject>(obj_name);
+    CEditableObject *O = new CEditableObject(obj_name);
     if (FS.exist(full_name.c_str())&&O->Load(full_name.c_str()))
     {
         xr_delete(m_pEditObject);
@@ -1175,7 +1175,7 @@ bool CActorTools::BatchConvert(LPCSTR fn)
             if (FS.exist(src_name))
             {
                 Msg(".Converting '%s' <-> '%s'", it->first.c_str(), it->second.c_str());
-                CEditableObject *O = xr_new<CEditableObject>("convert");
+                CEditableObject *O = new CEditableObject("convert");
                 BOOL res = O->Load(src_name);
                 if (res)
                     res = O->ExportOGF(tgt_name, 4);
@@ -1206,7 +1206,7 @@ bool CActorTools::BatchConvert(LPCSTR fn)
             if (FS.exist(src_name))
             {
                 Msg(".Converting '%s' <-> '%s'", it->first.c_str(), it->second.c_str());
-                CEditableObject *O = xr_new<CEditableObject>("convert");
+                CEditableObject *O = new CEditableObject("convert");
                 BOOL res = O->Load(src_name);
                 if (res)
                     res = O->ExportOMF(tgt_name);

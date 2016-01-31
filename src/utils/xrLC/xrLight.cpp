@@ -93,7 +93,7 @@ for(u32 dit = 0; dit<lc_global_data()->g_deflectors().size(); dit++)
 		CThreadManager	threads(ProxyStatus, ProxyProgress);
 		const	u32	thNUM	= 6;
 		CTimer	start_time;	start_time.Start();				
-		for				(int L=0; L<thNUM; L++)	threads.start(xr_new<CLMThread> (L));
+		for				(int L=0; L<thNUM; L++)	threads.start(new CLMThread (L));
 		threads.wait	(500);
         Logger.clMsg("%f seconds", start_time.GetElapsed_sec());
 }

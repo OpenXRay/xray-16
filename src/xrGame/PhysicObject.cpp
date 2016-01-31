@@ -99,18 +99,18 @@ void CPhysicObject::create_collision_model			( )
 	CInifile* ini = K->LL_UserData();
 	if( ini && ini->section_exist( "collide" ) && ini->line_exist("collide", "mesh" ) && ini->r_bool("collide", "mesh" ) )
 	{
-        CForm = xr_new<CCF_DynamicMesh>( this );
+        CForm = new CCF_DynamicMesh( this );
 		return;
 	}
 
-    CForm = xr_new<CCF_Skeleton>(this);
+    CForm = new CCF_Skeleton(this);
 
 	/*
 	switch(m_type) {
 		case epotBox:			
 		case epotFixedChain:
 		case epotFreeChain :
-		case epotSkeleton  :	collidable.model = xr_new<CCF_Skeleton>(this);	break;
+		case epotSkeleton  :	collidable.model = new CCF_Skeleton(this);	break;
 
 		default: NODEFAULT; 
 		
@@ -515,7 +515,7 @@ void	CPhysicObject::	set_collision_hit_callback	(ICollisionHitCallback *cc)
 /*
 DEFINE_MAP_PRED	(LPCSTR,	CPhysicsJoint*,	JOINT_P_MAP,	JOINT_P_PAIR_IT,	pred_str);
 
-JOINT_P_MAP			*l_tpJointMap = xr_new<JOINT_P_MAP>();
+JOINT_P_MAP			*l_tpJointMap = new JOINT_P_MAP();
 
 l_tpJointMap->insert(mk_pair(bone_name,joint*));
 JOINT_P_PAIR_IT		I = l_tpJointMap->find(bone_name);
@@ -544,7 +544,7 @@ bool CPhysicObject::is_ai_obstacle		() const
 net_updatePhData* CPhysicObject::NetSync()			
 {
 	if(!m_net_updateData) 
-		m_net_updateData = xr_new<net_updatePhData>();
+		m_net_updateData = new net_updatePhData();
 	return m_net_updateData;
 }
 

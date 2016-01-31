@@ -47,7 +47,7 @@ void UIMapLegend::init_from_xml( CUIXml& xml, LPCSTR path )
 	m_caption    = UIHelper::CreateStatic( xml, "t_caption", this );
 	m_btn_close  = UIHelper::Create3tButton( xml, "btn_close", this );
 
-	m_list = xr_new<CUIScrollView>();
+	m_list = new CUIScrollView();
 	AttachChild( m_list );
 	CUIXmlInit::InitScrollView( xml, "legend_list", 0, m_list );
 
@@ -59,7 +59,7 @@ void UIMapLegend::init_from_xml( CUIXml& xml, LPCSTR path )
 
 	for ( int i = 0; i < cn ; ++i )
 	{
-		list_item = xr_new<UIMapLegendItem>();
+		list_item = new UIMapLegendItem();
 		list_item->init_from_xml( xml, i );
 		m_list->AddWindow( list_item, true );
 

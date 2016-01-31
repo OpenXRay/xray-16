@@ -16,7 +16,7 @@ CUITrackBar::CUITrackBar()
 	m_b_is_float(true),
 	m_b_invert(false)
 {	
-	m_pSlider						= xr_new<CUI3tButton>();			
+	m_pSlider						= new CUI3tButton();			
 	AttachChild						(m_pSlider);		
 	m_pSlider->SetAutoDelete		(true);
 	m_b_mouse_capturer				= false;

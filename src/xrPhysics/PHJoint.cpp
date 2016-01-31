@@ -1513,7 +1513,7 @@ CPhysicsElement* CPHJoint::PSecond_element()
 }
 void CPHJoint::SetBreakable(float force,float torque)
 {
-	if(!m_destroy_info)	m_destroy_info=xr_new<CPHJointDestroyInfo>(force,torque);
+	if(!m_destroy_info)	m_destroy_info=new CPHJointDestroyInfo(force,torque);
 }
 
 void CPHJoint::SetShell(CPHShell* p)

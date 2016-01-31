@@ -123,7 +123,7 @@ void demo_info::read_from_file(CStreamReader* file_to_read)
 	m_players.reserve		(m_players_count);
 	for (u32 i = 0; i < m_players_count; ++i)
 	{
-		demo_player_info* new_player = xr_new<demo_player_info>();
+		demo_player_info* new_player = new demo_player_info();
 		
 		new_player->read_from_file	(file_to_read);
 		m_players.push_back			(new_player);
@@ -174,7 +174,7 @@ void demo_info::load_from_game()
 	{
 		game_PlayerState* tmp_player = tmp_game->GetPlayerByOrderID(i);
 		R_ASSERT2(tmp_player, "player not exist");
-		demo_player_info* new_player = xr_new<demo_player_info>();
+		demo_player_info* new_player = new demo_player_info();
 		new_player->load_from_player(tmp_player);
 		m_players.push_back(new_player);
 	}

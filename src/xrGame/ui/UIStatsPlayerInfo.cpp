@@ -14,7 +14,7 @@ CUIStatsPlayerInfo::CUIStatsPlayerInfo(xr_vector<PI_FIELD_INFO>* info, CGameFont
 	m_pF = pF;
 	m_text_col = text_col;
 
-	m_pBackground = xr_new<CUIStatic>();	
+	m_pBackground = new CUIStatic();	
 	AttachChild(m_pBackground);
 
 	R_ASSERT(!info->empty());
@@ -75,7 +75,7 @@ void CUIStatsPlayerInfo::Update(){
 
 void CUIStatsPlayerInfo::AddField(float len, CGameFont* pF, u32 text_col, bool icon)
 {
-	CUIStatic* wnd = icon ? xr_new<CUIStatsIcon>() : xr_new<CUIStatic>();
+	CUIStatic* wnd = icon ? new CUIStatsIcon() : new CUIStatic();
 	wnd->SetAutoDelete	(true);
 
 	if (m_fields.empty())

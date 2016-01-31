@@ -115,7 +115,7 @@ CSurface* CEditableObject::CreateSurface(Mtl* mtl, u32 mid)
 	if (!mtl){ ELog.Msg(mtError,"Empty material..."); return 0;	}
 	for (SurfaceIt s_it=m_Surfaces.begin(); s_it!=m_Surfaces.end(); s_it++)
 		if (((*s_it)->mid==mid)&&((*s_it)->mtl==mtl)) return *s_it;
-	CSurface* S		= xr_new<CSurface>();
+	CSurface* S		= new CSurface();
 	S->mid			= mid;
 	S->mtl			= mtl;
 	Class_ID cls_id = mtl->ClassID();
@@ -141,14 +141,14 @@ CSurface* CEditableObject::CreateSurface(Mtl* mtl, u32 mid)
 bool CEditableObject::ImportMAXSkeleton(CExporter* E)
 {
 	bool bResult				= true;
-	CEditableMesh* MESH			= xr_new<CEditableMesh>(this);
+	CEditableMesh* MESH			= new CEditableMesh(this);
 	m_Meshes.push_back(MESH);
 	// import mesh
 	if (!MESH->Convert(E))		return FALSE;
 	// BONES
 	m_Bones.reserve(E->m_Bones.size());
 	for (int B=0; B!=E->m_Bones.size(); B++){
-		m_Bones.push_back(xr_new<CBone>());
+		m_Bones.push_back(new CBone());
 		CBone* BONE				= m_Bones.back(); 
 		CBoneDef* bone			= E->m_Bones[B];
 		CBoneDef* parent_bone	= bone->parent;

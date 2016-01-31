@@ -19,13 +19,13 @@ UITeamState::UITeamState()
 UITeamState::UITeamState(ETeam teamId, UITeamPanels *teamPanels)
 {
 	myTeam = teamId;
-	/*myScrollList = xr_new<CUIScrollView>();
+	/*myScrollList = new CUIScrollView();
 	myScrollList->SetAutoDelete(true);
 	
 	myScrollList->m_sort_function = fastdelegate::MakeDelegate
 		(this, &UITeamState::SortingLessFunction);
 	
-	myTeamHeader = xr_new<UITeamHeader>(this);
+	myTeamHeader = new UITeamHeader(this);
 	myTeamHeader->SetAutoDelete(true);
 	
 	AttachChild(myTeamHeader);
@@ -102,10 +102,10 @@ int	UITeamState::InitScrollPanels()
 
 		mainUiXml->SetLocalRoot(panel_root);
 
-		temp_panel.first = xr_new<CUIScrollView>();
+		temp_panel.first = new CUIScrollView();
 		temp_panel.first->m_sort_function = fastdelegate::MakeDelegate
 			(this, &UITeamState::SortingLessFunction);
-		temp_panel.second = xr_new<UITeamHeader>(this);
+		temp_panel.second = new UITeamHeader(this);
 		temp_panel.first->SetAutoDelete(true);
 		temp_panel.second->SetAutoDelete(true);
 		
@@ -183,7 +183,7 @@ void UITeamState::AddPlayer(ClientID const & clientId)
 	Msg("--- UITeamState: adding player (ClientID = 0x%08x) to %d team (0x%08x)", clientId.value(), myTeam, this);
 #endif // #ifdef DEBUG
 
-	UIPlayerItem* tempPlayerItem = xr_new<UIPlayerItem>(static_cast<ETeam>(ps->team), 
+	UIPlayerItem* tempPlayerItem = new UIPlayerItem(static_cast<ETeam>(ps->team), 
 		clientId,
 		this, 
 			m_teamPanels);

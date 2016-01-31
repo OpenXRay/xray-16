@@ -19,12 +19,12 @@
 TEMPLATE_SPECIALIZATION
 CStateGroupRestAbstract::CStateGroupRest(_Object *obj) : inherited(obj)
 {
-	add_state(eStateRest_Sleep,				xr_new<CStateMonsterRestSleep<_Object> >			(obj));
-	add_state(eStateCustomMoveToRestrictor, xr_new<CStateMonsterMoveToRestrictor<_Object> >		(obj));
-	add_state(eStateRest_MoveToHomePoint,	xr_new<CStateMonsterRestMoveToHomePoint<_Object> >	(obj));
-	add_state(eStateSmartTerrainTask,		xr_new<CStateMonsterSmartTerrainTask<_Object> >		(obj));
-	add_state(eStateRest_Idle,				xr_new<CStateGroupRestIdle<_Object> >					(obj));
-	add_state(eStateCustom,					xr_new<CStateCustomGroup<_Object> >					(obj));
+	add_state(eStateRest_Sleep,				new CStateMonsterRestSleep<_Object>(obj));
+	add_state(eStateCustomMoveToRestrictor, new CStateMonsterMoveToRestrictor<_Object>(obj));
+	add_state(eStateRest_MoveToHomePoint,	new CStateMonsterRestMoveToHomePoint<_Object>(obj));
+	add_state(eStateSmartTerrainTask,		new CStateMonsterSmartTerrainTask<_Object>(obj));
+	add_state(eStateRest_Idle,				new CStateGroupRestIdle<_Object>(obj));
+	add_state(eStateCustom,					new CStateCustomGroup<_Object>(obj));
 }
 
 TEMPLATE_SPECIALIZATION

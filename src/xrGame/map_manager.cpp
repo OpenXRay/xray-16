@@ -52,7 +52,7 @@ void SLocationKey::load(IReader &stream)
 	stream.r_stringZ(spot_type);
 	stream.r_u8		();
 
-	location  = xr_new<CMapLocation>(*spot_type, object_id);
+	location  = new CMapLocation(*spot_type, object_id);
 
 	location->load	(stream);
 }
@@ -88,7 +88,7 @@ void CMapLocationRegistry::save(IWriter &stream)
 
 CMapManager::CMapManager()
 {
-	m_locations_wrapper = xr_new<CMapLocationWrapper>();
+	m_locations_wrapper = new CMapLocationWrapper();
 	m_locations_wrapper->registry().init(1);
 	m_locations = NULL;
 }
@@ -101,7 +101,7 @@ CMapManager::~CMapManager()
 
 CMapLocation* CMapManager::AddMapLocation(const shared_str& spot_type, u16 id)
 {
-	CMapLocation* l = xr_new<CMapLocation>(spot_type.c_str(), id);
+	CMapLocation* l = new CMapLocation(spot_type.c_str(), id);
 	Locations().push_back( SLocationKey(spot_type, id) );
 	Locations().back().location = l;
 	if (IsGameTypeSingle()&& g_actor)
@@ -124,7 +124,7 @@ CMapLocation* CMapManager::AddRelationLocation(CInventoryOwner* pInvOwner)
 
 
 	R_ASSERT(!HasMapLocation(sname, pInvOwner->object_id()));
-	CMapLocation* l = xr_new<CRelationMapLocation>(sname, pInvOwner->object_id(), pActor->object_id());
+	CMapLocation* l = new CRelationMapLocation(sname, pInvOwner->object_id(), pActor->object_id());
 	Locations().push_back( SLocationKey(sname, pInvOwner->object_id()) );
 	Locations().back().location = l;
 	return l;

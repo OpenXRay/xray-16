@@ -280,7 +280,7 @@ motions_value* motions_container::dock(shared_str key, IReader* data, vecBones* 
     {
         // loading motions
         VERIFY(data);
-        result = xr_new<motions_value>();
+        result = new motions_value();
         result->m_dwReference = 0;
         BOOL bres = result->load(key.c_str(), data, bones);
         if (bres)

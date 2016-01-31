@@ -49,7 +49,7 @@ IPHWorld * __stdcall physics_world()
 
 void	__stdcall create_physics_world( bool mt, CObjectSpace *os, CObjectList *lo, CRenderDeviceBase *dv ) //IPHWorldUpdateCallbck &commander, 
 {
-		ph_world							= xr_new<CPHWorld>(); //&commander
+		ph_world							= new CPHWorld(); //&commander
 		VERIFY( os );
 //		VERIFY( lo );
 		VERIFY( dv );
@@ -64,20 +64,20 @@ void	__stdcall	destroy_physics_world()
 
 CObjectSpace* __stdcall create_object_space()
 {
-	//CFileReader* fr =	xr_new<CFileReader>("D:/STALKER/resources/gamedata/levels/stohe_selo/level.cform");
-	CFileReader* fr =	xr_new<CFileReader>("ActorEditorLevel.cform");
-	CObjectSpace* os = xr_new<CObjectSpace>();
-    g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
-    g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
+	//CFileReader* fr =	new CFileReader("D:/STALKER/resources/gamedata/levels/stohe_selo/level.cform");
+	CFileReader* fr =	new CFileReader("ActorEditorLevel.cform");
+	CObjectSpace* os = new CObjectSpace();
+    g_SpatialSpace = new ISpatial_DB("Spatial obj");
+    g_SpatialSpacePhysic = new ISpatial_DB("Spatial phys");
 	os->Load( fr, 0 );
 	//xr_delete(fr);
 	return os;
 }
 CObjectSpace*	__stdcall	mesh_create_object_space(Fvector* verts, CDB::TRI* tris, const hdrCFORM &H, CDB::build_callback build_callback)
 {
-	CObjectSpace* os = xr_new<CObjectSpace>();
-    g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
-    g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
+	CObjectSpace* os = new CObjectSpace();
+    g_SpatialSpace = new ISpatial_DB("Spatial obj");
+    g_SpatialSpacePhysic = new ISpatial_DB("Spatial phys");
 	os->Create( verts, tris, H, build_callback );
 	return os;
 }
@@ -184,7 +184,7 @@ void CPHWorld::Create( bool mt, CObjectSpace * os, CObjectList *lo, CRenderDevic
 	m_device = dv;
 	Device().AddSeqFrame( this, mt );
 
-	//m_commander							=xr_new<CPHCommander>();
+	//m_commander							=new CPHCommander();
 	//dVector3 extensions={2048,256,2048};
 	/*
 	Fbox	level_box		=	Level().ObjectSpace.GetBoundingVolume();

@@ -37,7 +37,7 @@ void CUIGameAHunt::Init	(int stage)
 		CUIXmlInit::InitWindow			(uiXml, "global", 0,		Window);
 		CUIXmlInit::InitTextWnd			(uiXml, "fraglimit",0,		m_pFragLimitIndicator);
 
-		m_pReinforcementInidcator		= xr_new<CUITextWnd>();
+		m_pReinforcementInidcator		= new CUITextWnd();
 		m_pReinforcementInidcator->SetAutoDelete(true);
 		CUIXmlInit::InitTextWnd			(uiXml, "reinforcement", 0, m_pReinforcementInidcator);		
 
@@ -73,7 +73,7 @@ void CUIGameAHunt::SetClGame (game_cl_GameState* g)
 	R_ASSERT(m_game);
 	//-----------------------------------------------------------------------
 	delete_data							(m_pBuySpawnMsgBox);
-	m_pBuySpawnMsgBox					= xr_new<CUIMessageBoxEx>();	
+	m_pBuySpawnMsgBox					= new CUIMessageBoxEx();	
 	m_pBuySpawnMsgBox->InitMessageBox	("message_box_buy_spawn");
 	m_pBuySpawnMsgBox->SetText			("");
 

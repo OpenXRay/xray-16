@@ -205,7 +205,7 @@ dxGeom* dCreateTriList(dSpaceID space, dTriCallback* Callback, dTriArrayCallback
 
 	Data->ArrayCallback = ArrayCallback;
 
-	Data->Collider = xr_new<dcTriListCollider>(g);
+	Data->Collider = new dcTriListCollider(g);
 
 
 

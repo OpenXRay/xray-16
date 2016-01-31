@@ -181,7 +181,7 @@ CInifile &CSE_Abstract::spawn_ini			()
 	if (!m_ini_file) 
 #pragma warning(push)
 #pragma warning(disable:4238)
-		m_ini_file			= xr_new<CInifile>(
+		m_ini_file			= new CInifile(
 			&IReader			(
 				(void*)(*(m_ini_string)),
 				m_ini_string.size()

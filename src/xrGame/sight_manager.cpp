@@ -138,7 +138,7 @@ void CSightManager::Exec_Look		(float time_delta)
 
 	//static CStatGraph* s_stats_graph	= 0;
 	//if ( !s_stats_graph ) {
-	//	s_stats_graph					= xr_new<CStatGraph>();
+	//	s_stats_graph					= new CStatGraph();
 	//	s_stats_graph->SetRect			(0, 1024-68, 1280, 68, 0xff000000, 0xff000000);
 	//	s_stats_graph->SetMinMax		(-PI, PI, 1000);
 	//	s_stats_graph->SetStyle			(CStatGraph::stBarLine);
@@ -217,7 +217,7 @@ void CSightManager::setup			(const CSightAction &sight_action)
 		return;
 
 	clear				();
-	add_action			(0,xr_new<CSightControlAction>(1.f,u32(-1),sight_action));
+	add_action			(0,new CSightControlAction(1.f,u32(-1),sight_action));
 }
 
 void CSightManager::update			()

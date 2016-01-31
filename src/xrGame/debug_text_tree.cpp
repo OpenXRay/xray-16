@@ -151,7 +151,7 @@ void   text_tree::toggle_show (int group_id_)
 
 text_tree&   text_tree::add_line ()
 {
-	text_tree* child = xr_new<text_tree>();
+	text_tree* child = new text_tree();
 	children.push_back(child);
 	return *child;
 }

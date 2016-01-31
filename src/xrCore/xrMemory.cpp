@@ -77,10 +77,10 @@ void xrMemory::_initialize(BOOL bDebug)
 #endif // DEBUG_MEMORY_MANAGER
 
     // DUMP_PHASE;
-    g_pStringContainer = xr_new<str_container>();
+    g_pStringContainer = new str_container();
     shared_str_initialized = true;
     // DUMP_PHASE;
-    g_pSharedMemoryContainer = xr_new<smem_container>();
+    g_pSharedMemoryContainer = new smem_container();
     // DUMP_PHASE;
 }
 

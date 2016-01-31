@@ -13,19 +13,19 @@
 CUIVote::CUIVote()
 {
 	m_prev_upd_time		= 0;
-	bkgrnd				= xr_new<CUIStatic>();	bkgrnd->SetAutoDelete(true);	AttachChild(bkgrnd);
-	msg					= xr_new<CUITextWnd>();	msg->SetAutoDelete(true);		AttachChild(msg);
+	bkgrnd				= new CUIStatic();	bkgrnd->SetAutoDelete(true);	AttachChild(bkgrnd);
+	msg					= new CUITextWnd();	msg->SetAutoDelete(true);		AttachChild(msg);
 
 	for (int i = 0; i<3; i++)
 	{
-		cap[i]			= xr_new<CUITextWnd>();		cap[i]->SetAutoDelete(true);	AttachChild(cap[i]);
-//		frame[i]		= xr_new<CUIFrameWindow>();	frame[i]->SetAutoDelete(true);	AttachChild(frame[i]);
-		list[i]			= xr_new<CUIListBox>();		list[i]->SetAutoDelete(true);	AttachChild(list[i]);
+		cap[i]			= new CUITextWnd();		cap[i]->SetAutoDelete(true);	AttachChild(cap[i]);
+//		frame[i]		= new CUIFrameWindow();	frame[i]->SetAutoDelete(true);	AttachChild(frame[i]);
+		list[i]			= new CUIListBox();		list[i]->SetAutoDelete(true);	AttachChild(list[i]);
 	}	
 
-	btn_yes		= xr_new<CUI3tButton>();	btn_yes->SetAutoDelete(true);		AttachChild(btn_yes);
-	btn_no		= xr_new<CUI3tButton>();	btn_no->SetAutoDelete(true);		AttachChild(btn_no);
-	btn_cancel	= xr_new<CUI3tButton>();	btn_cancel->SetAutoDelete(true);	AttachChild(btn_cancel);
+	btn_yes		= new CUI3tButton();	btn_yes->SetAutoDelete(true);		AttachChild(btn_yes);
+	btn_no		= new CUI3tButton();	btn_no->SetAutoDelete(true);		AttachChild(btn_no);
+	btn_cancel	= new CUI3tButton();	btn_cancel->SetAutoDelete(true);	AttachChild(btn_cancel);
 	
 	Init();
 }

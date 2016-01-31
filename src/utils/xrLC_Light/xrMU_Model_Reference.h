@@ -33,7 +33,7 @@ public:
 	void					write				( IWriter	&w ) const ;
 	void					receive_result		( INetReader	&r );
 	void					send_result			( IWriter	&w ) const;
-	static	xrMU_Reference* read_create()		{ return xr_new<xrMU_Reference>(); };
+	static	xrMU_Reference* read_create()		{ return new xrMU_Reference(); };
 
 
 //	void					export_ogf			();

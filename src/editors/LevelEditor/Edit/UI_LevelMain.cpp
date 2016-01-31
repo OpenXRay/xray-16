@@ -33,8 +33,8 @@ CLevelMain *&LUI = (CLevelMain*)UI;
 
 CLevelMain::CLevelMain()
 {
-    m_Cursor = xr_new<C3DCursor>();
-    EPrefs = xr_new<CLevelPreferences>();
+    m_Cursor = new C3DCursor();
+    EPrefs = new CLevelPreferences();
 }
 
 CLevelMain::~CLevelMain()
@@ -1032,7 +1032,7 @@ CCommandVar CommandUpdateCaption(CCommandVar p1, CCommandVar p2)
 //------
 CCommandVar CommandCreateSoundLib(CCommandVar p1, CCommandVar p2)
 {
-    SndLib = xr_new<CLevelSoundManager>();
+    SndLib = new CLevelSoundManager();
     return TRUE;
 }
 

@@ -73,7 +73,7 @@ void Fvisual::Load		(const char* N, IReader *data, u32 dwFlags)
 			destructor<IReader>	def		(geomdef().open_chunk	(OGF_GCONTAINER));
 
 			// we have fast-mesh
-			m_fast						= xr_new<IRender_Mesh>	();
+			m_fast						= new IRender_Mesh	();
 
 			// verts
 			D3DVERTEXELEMENT9*	fmt		= 0;

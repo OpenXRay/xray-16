@@ -19,29 +19,29 @@ CUIMpAdminMenu::CUIMpAdminMenu()
 	m_pActiveDialog = NULL;
 	m_sActiveSection = "";
 
-	m_pBack = xr_new<CUIStatic>();
+	m_pBack = new CUIStatic();
 	m_pBack->SetAutoDelete(true);
 	AttachChild(m_pBack);
 
-	m_pTabControl = xr_new<CUITabControl>();
+	m_pTabControl = new CUITabControl();
 	m_pTabControl->SetAutoDelete(true);
 	AttachChild(m_pTabControl);
 
-	m_pPlayersAdm = xr_new<CUIMpPlayersAdm>();
+	m_pPlayersAdm = new CUIMpPlayersAdm();
 	m_pPlayersAdm->SetAutoDelete(false);
 
-	m_pServerAdm = xr_new<CUIMpServerAdm>();
+	m_pServerAdm = new CUIMpServerAdm();
 	m_pServerAdm->SetAutoDelete(false);
 
-	m_pChangeMapAdm = xr_new<CUIMpChangeMapAdm>();
+	m_pChangeMapAdm = new CUIMpChangeMapAdm();
 	m_pChangeMapAdm->SetAutoDelete(false);
 
-	m_pClose = xr_new<CUI3tButton>();
+	m_pClose = new CUI3tButton();
 	m_pClose->SetAutoDelete(true);
 	AttachChild(m_pClose);
 
-	m_pMessageBoxLogin = xr_new<CUIMessageBoxEx>();
-	m_pMessageBoxOk = xr_new<CUIMessageBoxEx>();
+	m_pMessageBoxLogin = new CUIMessageBoxEx();
+	m_pMessageBoxOk = new CUIMessageBoxEx();
 	Init();
 }
 
@@ -58,7 +58,7 @@ CUIMpAdminMenu::~CUIMpAdminMenu()
 void CUIMpAdminMenu::Init()
 {
 	if (!xml_doc)
-		xml_doc = xr_new<CUIXml>();
+		xml_doc = new CUIXml();
 
 	xml_doc->Load(CONFIG_PATH, UI_PATH, "ui_mp_admin_menu.xml");
 

@@ -28,7 +28,7 @@ CEnvelope* CreateEnvelope(LWChannelID chan, LWChannelID* chan_parent /*= nullptr
     CEnvelope *env;
     st_Key *key, *tail = NULL;
     double val;
-    env = xr_new<CEnvelope>();
+    env = new CEnvelope();
     group = g_chinfo->channelParent(chan);
     lwenv = g_chinfo->channelEnvelope(chan);
     lwkey = NULL;
@@ -52,7 +52,7 @@ CEnvelope* CreateEnvelope(LWChannelID chan, LWChannelID* chan_parent /*= nullptr
     }
     while (lwkey = g_envf->nextKey(lwenv, lwkey))
     {
-        key = xr_new<st_Key>();
+        key = new st_Key();
         env->keys.push_back(key);
         g_envf->keyGet(lwenv, lwkey, LWKEY_SHAPE, &key->shape);
         g_envf->keyGet(lwenv, lwkey, LWKEY_VALUE, &val);		key->value = (float)val + val_parent;

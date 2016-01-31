@@ -46,7 +46,7 @@ int CParticleManager::CreateEffect(u32 max_particles)
         effect_vec.push_back	(0);
     }
 
-    effect_vec[eff_id]	= xr_new<ParticleEffect>(max_particles);
+    effect_vec[eff_id]	= new ParticleEffect(max_particles);
 	
 	return eff_id;
 }
@@ -72,7 +72,7 @@ int	CParticleManager::CreateActionList()
         m_alist_vec.push_back	(0);
     }
 
-    m_alist_vec[list_id]	= xr_new<ParticleActions>();
+    m_alist_vec[list_id]	= new ParticleActions();
 	
 	return list_id;
 }
@@ -213,37 +213,37 @@ ParticleAction* CParticleManager::CreateAction(PActionEnum type)
 {
 	ParticleAction* pa			= 0;
     switch(type){
-    case PAAvoidID:				pa = xr_new<PAAvoid>();				break;
-    case PABounceID:    		pa = xr_new<PABounce>();			break;
-    case PACopyVertexBID:    	pa = xr_new<PACopyVertexB>();		break;
-    case PADampingID:    		pa = xr_new<PADamping>();			break;
-    case PAExplosionID:    		pa = xr_new<PAExplosion>();			break;
-    case PAFollowID:    		pa = xr_new<PAFollow>();			break;
-    case PAGravitateID:    		pa = xr_new<PAGravitate>();			break;
-    case PAGravityID:    		pa = xr_new<PAGravity>();			break;
-    case PAJetID:    			pa = xr_new<PAJet>();				break;
-    case PAKillOldID:    		pa = xr_new<PAKillOld>();			break;
-    case PAMatchVelocityID:    	pa = xr_new<PAMatchVelocity>();		break;
-    case PAMoveID:    			pa = xr_new<PAMove>();				break;
-    case PAOrbitLineID:    		pa = xr_new<PAOrbitLine>();			break;
-    case PAOrbitPointID:    	pa = xr_new<PAOrbitPoint>();		break;
-    case PARandomAccelID:    	pa = xr_new<PARandomAccel>();		break;
-    case PARandomDisplaceID:    pa = xr_new<PARandomDisplace>();	break;
-    case PARandomVelocityID:    pa = xr_new<PARandomVelocity>();	break;
-    case PARestoreID:    		pa = xr_new<PARestore>();			break;
-    case PASinkID:    			pa = xr_new<PASink>();				break;
-    case PASinkVelocityID:    	pa = xr_new<PASinkVelocity>();		break;
-    case PASourceID:    		pa = xr_new<PASource>();			break;
-    case PASpeedLimitID:    	pa = xr_new<PASpeedLimit>();		break;
-    case PATargetColorID:    	pa = xr_new<PATargetColor>();		break;
-    case PATargetSizeID:    	pa = xr_new<PATargetSize>();		break;
-    case PATargetRotateID:    	pa = xr_new<PATargetRotate>();		break;
-    case PATargetRotateDID:    	pa = xr_new<PATargetRotate>();		break;
-    case PATargetVelocityID:    pa = xr_new<PATargetVelocity>(); 	break;
-    case PATargetVelocityDID:   pa = xr_new<PATargetVelocity>();	break;
-    case PAVortexID:    		pa = xr_new<PAVortex>();			break;
-    case PATurbulenceID:		pa = xr_new<PATurbulence>();		break;
-    case PAScatterID:  			pa = xr_new<PAScatter>();			break;
+    case PAAvoidID:				pa = new PAAvoid();				break;
+    case PABounceID:    		pa = new PABounce();			break;
+    case PACopyVertexBID:    	pa = new PACopyVertexB();		break;
+    case PADampingID:    		pa = new PADamping();			break;
+    case PAExplosionID:    		pa = new PAExplosion();			break;
+    case PAFollowID:    		pa = new PAFollow();			break;
+    case PAGravitateID:    		pa = new PAGravitate();			break;
+    case PAGravityID:    		pa = new PAGravity();			break;
+    case PAJetID:    			pa = new PAJet();				break;
+    case PAKillOldID:    		pa = new PAKillOld();			break;
+    case PAMatchVelocityID:    	pa = new PAMatchVelocity();		break;
+    case PAMoveID:    			pa = new PAMove();				break;
+    case PAOrbitLineID:    		pa = new PAOrbitLine();			break;
+    case PAOrbitPointID:    	pa = new PAOrbitPoint();		break;
+    case PARandomAccelID:    	pa = new PARandomAccel();		break;
+    case PARandomDisplaceID:    pa = new PARandomDisplace();	break;
+    case PARandomVelocityID:    pa = new PARandomVelocity();	break;
+    case PARestoreID:    		pa = new PARestore();			break;
+    case PASinkID:    			pa = new PASink();				break;
+    case PASinkVelocityID:    	pa = new PASinkVelocity();		break;
+    case PASourceID:    		pa = new PASource();			break;
+    case PASpeedLimitID:    	pa = new PASpeedLimit();		break;
+    case PATargetColorID:    	pa = new PATargetColor();		break;
+    case PATargetSizeID:    	pa = new PATargetSize();		break;
+    case PATargetRotateID:    	pa = new PATargetRotate();		break;
+    case PATargetRotateDID:    	pa = new PATargetRotate();		break;
+    case PATargetVelocityID:    pa = new PATargetVelocity(); 	break;
+    case PATargetVelocityDID:   pa = new PATargetVelocity();	break;
+    case PAVortexID:    		pa = new PAVortex();			break;
+    case PATurbulenceID:		pa = new PATurbulence();		break;
+    case PAScatterID:  			pa = new PAScatter();			break;
     default: NODEFAULT;
     }
     pa->type					= type;

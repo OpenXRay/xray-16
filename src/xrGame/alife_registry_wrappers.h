@@ -33,7 +33,7 @@ class CALifeRegistryWrapperObject {
 public:
 	IC				CALifeRegistryWrapperObject		()
 	{
-		m_registry	= xr_new<T>();
+		m_registry	= new T();
 	}
 
 	virtual			~CALifeRegistryWrapperObject	()

@@ -234,7 +234,7 @@ XR_EXPORT void ELightAnimLibrary::Load()
             IReader* O = OBJ->open_chunk(0);
             for (int count = 1; O; count++)
             {
-                CLAItem* I = xr_new<CLAItem>();
+                CLAItem* I = new CLAItem();
                 I->Load(*O);
                 if (version == 0)
                 {
@@ -298,7 +298,7 @@ CLAItem* ELightAnimLibrary::FindItem(LPCSTR name)
 CLAItem* ELightAnimLibrary::AppendItem(LPCSTR name, CLAItem* src)
 {
     VERIFY2 (FindItem(name)==0,"Duplicate name found.");
-    CLAItem* I = xr_new<CLAItem>();
+    CLAItem* I = new CLAItem();
     if (src) *I = *src;
     else I->InitDefault();
     I->cName = name;

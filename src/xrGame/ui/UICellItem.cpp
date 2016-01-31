@@ -48,26 +48,26 @@ void CUICellItem::init()
 	CUIXml	uiXml;
 	uiXml.Load( CONFIG_PATH, UI_PATH, "actor_menu_item.xml" );
 	
-	m_text					= xr_new<CUIStatic>();
+	m_text					= new CUIStatic();
 	m_text->SetAutoDelete	( true );
 	AttachChild				( m_text );
 	CUIXmlInit::InitStatic	( uiXml, "cell_item_text", 0, m_text );
 	m_text->Show			( false );
 
-/*	m_mark					= xr_new<CUIStatic>();
+/*	m_mark					= new CUIStatic();
 	m_mark->SetAutoDelete	( true );
 	AttachChild				( m_mark );
 	CUIXmlInit::InitStatic	( uiXml, "cell_item_mark", 0, m_mark );
 	m_mark->Show			( false );*/
 
-	m_upgrade				= xr_new<CUIStatic>();
+	m_upgrade				= new CUIStatic();
 	m_upgrade->SetAutoDelete( true );
 	AttachChild				( m_upgrade );
 	CUIXmlInit::InitStatic	( uiXml, "cell_item_upgrade", 0, m_upgrade );
 	m_upgrade_pos			= m_upgrade->GetWndPos();
 	m_upgrade->Show			( false );
 
-	m_pConditionState = xr_new<CUIProgressBar>();
+	m_pConditionState = new CUIProgressBar();
 	m_pConditionState->SetAutoDelete(true);
 	AttachChild(m_pConditionState);
 	CUIXmlInit::InitProgressBar(uiXml, "condition_progess_bar", 0, m_pConditionState);
@@ -171,7 +171,7 @@ bool CUICellItem::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 CUIDragItem* CUICellItem::CreateDragItem()
 {
 	CUIDragItem* tmp;
-	tmp = xr_new<CUIDragItem>(this);
+	tmp = new CUIDragItem(this);
 	Frect r;
 	GetAbsoluteRect(r);
 

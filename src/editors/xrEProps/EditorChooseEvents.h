@@ -31,7 +31,7 @@ void __stdcall  SelectSoundSource(SChooseItem* item, PropItemVec& info_items)
 /*
 //.
 	ECustomThumbnail*& thm, ref_sound& snd, 
-    thm 		= xr_new<ESoundThumbnail>(item->name.c_str());
+    thm 		= new ESoundThumbnail(item->name.c_str());
 */
 }
 void __stdcall  CloseSoundSource()
@@ -70,13 +70,13 @@ void __stdcall  FillObject(ChooseItemVec& items, void* param)
 }
 void __stdcall  SelectObject(SChooseItem* item, PropItemVec& info_items)
 {
-	EObjectThumbnail* thm			= xr_new<EObjectThumbnail>(*item->name);
+	EObjectThumbnail* thm			= new EObjectThumbnail(*item->name);
     if (thm->Valid()) thm->FillInfo	(info_items);
     xr_delete						(thm);
 }
 void __stdcall  DrawObjectTHM(LPCSTR name, HDC hdc, const Irect& r)
 {
-	EObjectThumbnail* thm			= xr_new<EObjectThumbnail>(name);
+	EObjectThumbnail* thm			= new EObjectThumbnail(name);
     if (thm->Valid()) thm->Draw		(hdc,r);
     xr_delete						(thm);
 }
@@ -92,13 +92,13 @@ void __stdcall  FillGroup(ChooseItemVec& items, void* param)
 }
 void __stdcall  SelectGroup(SChooseItem* item, PropItemVec& info_items)
 {
-	EGroupThumbnail* thm			= xr_new<EGroupThumbnail>(*item->name);
+	EGroupThumbnail* thm			= new EGroupThumbnail(*item->name);
     if (thm->Valid()) thm->FillInfo	(info_items);
     xr_delete						(thm);
 }
 void __stdcall  DrawGroupTHM(LPCSTR name, HDC hdc, const Irect& r)
 {
-	EGroupThumbnail* thm			= xr_new<EGroupThumbnail>(name);
+	EGroupThumbnail* thm			= new EGroupThumbnail(name);
     if (thm->Valid()) thm->Draw		(hdc,r);
     xr_delete						(thm);
 }
@@ -257,7 +257,7 @@ void __stdcall  FillTexture(ChooseItemVec& items, void* param)
 void __stdcall  DrawTextureTHM(LPCSTR name, HDC hdc, const Irect& r)
 {
 	if (name&&name[0]){
-        ETextureThumbnail* thm		= xr_new<ETextureThumbnail>(name);
+        ETextureThumbnail* thm		= new ETextureThumbnail(name);
         if (thm->Valid()) thm->Draw	(hdc,r);
         xr_delete					(thm);
     }
@@ -277,7 +277,7 @@ void __stdcall  FillTextureRaw(ChooseItemVec& items, void* param)
 void __stdcall  DrawTextureTHMRaw(LPCSTR name, HDC hdc, const Irect& r)
 {
 	if (name&&name[0]){
-        ETextureThumbnail* thm		= xr_new<ETextureThumbnail>(name);
+        ETextureThumbnail* thm		= new ETextureThumbnail(name);
         if (thm->Valid()) thm->Draw	(hdc,r);
         xr_delete					(thm);
     }
@@ -286,7 +286,7 @@ void __stdcall  DrawTextureTHMRaw(LPCSTR name, HDC hdc, const Irect& r)
 void __stdcall  SelectTexture(SChooseItem* item, PropItemVec& info_items)
 {
 	if (item->name.size()){
-        ETextureThumbnail* thm			= xr_new<ETextureThumbnail>(*item->name);
+        ETextureThumbnail* thm			= new ETextureThumbnail(*item->name);
         if (thm->Valid()) thm->FillInfo	(info_items);
         xr_delete						(thm);
     }
@@ -294,7 +294,7 @@ void __stdcall  SelectTexture(SChooseItem* item, PropItemVec& info_items)
 void __stdcall  SelectTextureRaw(SChooseItem* item, PropItemVec& info_items)
 {
 	if (item->name.size()){
-        ETextureThumbnail* thm			= xr_new<ETextureThumbnail>(*item->name);
+        ETextureThumbnail* thm			= new ETextureThumbnail(*item->name);
         if (thm->Valid()) thm->FillInfo	(info_items);
         xr_delete						(thm);
     }
@@ -379,7 +379,7 @@ void FillChooseEvents()
 	TfrmChoseItem::AppendEvents	(smGameMaterial,	"Select Game Material",		ChoseEvents::FillGameMaterial,	0,				   0,				0,				0);
 	TfrmChoseItem::AppendEvents	(smGameAnim,		"Select Animation",		ChoseEvents::FillGameAnim,	0,				   0,				0,				0);
 	TfrmChoseItem::AppendEvents	(smGameSMotions,	"Select Game Object Motions",	ChoseEvents::FillGameObjectMots,ChoseEvents::SelectGameObjectMots, 0,				0,				0);
-    choose_snd = xr_new<ref_sound>();
+    choose_snd = new ref_sound();
 }
 void ClearChooseEvents()
 {

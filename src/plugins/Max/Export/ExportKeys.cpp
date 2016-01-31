@@ -141,7 +141,7 @@ int SceneEnumProc::callback(INode *node)
 
 
 void SceneEnumProc::Append(INode *node, Object *obj, int type) {
-	SceneEntry *entry = xr_new<SceneEntry>(node, obj, type);
+	SceneEntry *entry = new SceneEntry(node, obj, type);
 	
 	if(tail)
 		tail->next = entry;
@@ -248,7 +248,7 @@ ObjectEntry *ObjectList::Contains(INode *node) {
 }
 
 void ObjectList::Append(SceneEntry *e) {
-	ObjectEntry *entry = xr_new<ObjectEntry>(e);
+	ObjectEntry *entry = new ObjectEntry(e);
 	if(tail)
 		tail->next = entry;
 	tail = entry;
@@ -303,7 +303,7 @@ int ObjNameList::Contains(TSTR &n) {
 }
 
 void ObjNameList::Append(TSTR &n) {
-	ObjName *entry = xr_new<ObjName>(n);
+	ObjName *entry = new ObjName(n);
 	if(tail)
 		tail->next = entry;
 	tail = entry;

@@ -15,7 +15,7 @@ void __fastcall CPSLibrary::FindByName(LPCSTR new_name, bool &res)
 
 PS::CPEDef *CPSLibrary::AppendPED(PS::CPEDef *src)
 {
-    m_PEDs.push_back(xr_new<PS::CPEDef>());
+    m_PEDs.push_back(new PS::CPEDef());
 #ifdef _PARTICLE_EDITOR
     if (src) m_PEDs.back()->Copy(*src);
 #endif
@@ -26,7 +26,7 @@ PS::CPEDef *CPSLibrary::AppendPED(PS::CPEDef *src)
 
 PS::CPGDef *CPSLibrary::AppendPGD(PS::CPGDef *src)
 {
-    m_PGDs.push_back(xr_new<PS::CPGDef>());
+    m_PGDs.push_back(new PS::CPGDef());
     if (src)
         m_PGDs.back()->Clone(src);
     return m_PGDs.back();

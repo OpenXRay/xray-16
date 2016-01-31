@@ -554,7 +554,7 @@ EDetail *EDetailManager::AppendDO(LPCSTR name, bool bTestUnique)
     if (bTestUnique&&(0!=(D = FindDOByName(name))))
         return D;
 
-    D = xr_new<EDetail>();
+    D = new EDetail();
     if (!D->Update(name))
     {
         xr_delete(D);

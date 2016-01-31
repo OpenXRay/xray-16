@@ -202,7 +202,7 @@ bool	global_data_file_path(LPCSTR name, IAgent* agent, DWORD sessionId, string_p
 		next ni;
 		it( xr_vector<net_global_data*>	&data): ni(data)
 		{
-			data[ et ] = xr_new< tnet_global_data<et> >();
+			data[ et ] = new tnet_global_data<et>();
 		}
 		static	void cleanup( xr_vector<net_global_data*>	&data )
 		{

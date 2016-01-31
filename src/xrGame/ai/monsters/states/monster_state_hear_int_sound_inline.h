@@ -11,8 +11,8 @@
 TEMPLATE_SPECIALIZATION
 CStateMonsterHearInterestingSoundAbstract::CStateMonsterHearInterestingSound(_Object *obj) : inherited(obj)
 {
-	add_state	(eStateHearInterestingSound_MoveToDest,	xr_new<CStateMonsterMoveToPoint<_Object> >(obj));
-	add_state	(eStateHearInterestingSound_LookAround,	xr_new<CStateMonsterCustomActionLook<_Object> >(obj));
+	add_state	(eStateHearInterestingSound_MoveToDest,	new CStateMonsterMoveToPoint<_Object>(obj));
+	add_state	(eStateHearInterestingSound_LookAround,	new CStateMonsterCustomActionLook<_Object>(obj));
 }
 
 TEMPLATE_SPECIALIZATION

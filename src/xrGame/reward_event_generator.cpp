@@ -21,12 +21,12 @@ reward_event_generator::reward_event_generator(u32 const max_rewards_per_game) :
 {
 	m_local_player				= NULL;
 	m_rewarded					= 0;
-	m_state_accum				= xr_new<game_state_accumulator>();
+	m_state_accum				= new game_state_accumulator();
 	event_action_delegate_t		tmp_delegate(this, &reward_event_generator::AddRewardTask);
-	m_state_event_checker		= xr_new<rewarding_state_events>(m_state_accum, tmp_delegate);
+	m_state_event_checker		= new rewarding_state_events(m_state_accum, tmp_delegate);
 	
-	m_event_handlers			= xr_new<rewarding_event_handlers>(m_state_accum, tmp_delegate);
-	m_best_scores_helper		= xr_new<best_scores_helper>(m_state_accum);
+	m_event_handlers			= new rewarding_event_handlers(m_state_accum, tmp_delegate);
+	m_best_scores_helper		= new best_scores_helper(m_state_accum);
 	m_event_handlers->set_null_handler(m_best_scores_helper);
 
 	m_state_event_checker->init	();

@@ -43,7 +43,7 @@ BOOL CSpaceRestrictor::net_Spawn	(CSE_Abstract* data)
 
 	m_space_restrictor_type			= se_shape->m_space_restrictor_type;
 
-	CCF_Shape						*shape = xr_new<CCF_Shape>(this);
+	CCF_Shape						*shape = new CCF_Shape(this);
     SetCForm(shape);
 
 	for (u32 i=0; i < se_shape->shapes.size(); ++i) {

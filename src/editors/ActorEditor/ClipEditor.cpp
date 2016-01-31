@@ -89,7 +89,7 @@ bool clip_pred_float(float x, TClipMaker::CUIClip *y)
 
 TClipMaker *TClipMaker::CreateForm()
 {
-    return xr_new<TClipMaker>((TComponent*)0);
+    return new TClipMaker((TComponent*)0);
 }
 
 void TClipMaker::DestroyForm(TClipMaker *form)
@@ -192,7 +192,7 @@ void __fastcall TClipMaker::FormCloseQuery(TObject *Sender, bool &CanClose)
                 tgt.resize(clips.size());
                 ClipIt t_it=tgt.begin();
                 for (UIClipIt s_it=clips.begin(); s_it!=clips.end(); s_it++,t_it++){
-                    *t_it = xr_new<CClip>();
+                    *t_it = new CClip();
                     **t_it= *(CClip*)*s_it;
                 }
                 Tools.Modified();
@@ -628,7 +628,7 @@ void TClipMaker::InsertClip()
 {
     shared_str nm;
     m_ClipList->GenerateObjectName(nm, 0, "clip", true);
-    CUIClip *clip = xr_new<CUIClip>(*nm, this, sel_clip ? sel_clip->RunTime()-EPS_L : 0);
+    CUIClip *clip = new CUIClip(*nm, this, sel_clip ? sel_clip->RunTime()-EPS_L : 0);
     clips.push_back(clip);
     UpdateClips(true, false);
     SelectClip(clip);
@@ -640,7 +640,7 @@ void TClipMaker::AppendClip()
 {
     shared_str nm;
     m_ClipList->GenerateObjectName(nm, 0, "clip", true);
-    CUIClip *clip = xr_new<CUIClip>(*nm, this, sel_clip ? sel_clip->RunTime()+sel_clip->Length()-EPS_L : 0);
+    CUIClip *clip = new CUIClip(*nm, this, sel_clip ? sel_clip->RunTime()+sel_clip->Length()-EPS_L : 0);
     clips.push_back(clip);
     UpdateClips(true, false);
     SelectClip(clip);
@@ -670,7 +670,7 @@ void TClipMaker::LoadClips()
             IReader *M = C->open_chunk(0);
             for (int count = 1; M; count++)
             {
-                CUIClip *clip = xr_new<CUIClip>(this, count);
+                CUIClip *clip = new CUIClip(this, count);
                 if (!clip->Load(*M))
                 {
                     ELog.Msg(mtError, "Unsupported clip version. Load failed.");

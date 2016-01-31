@@ -15,9 +15,9 @@
 TEMPLATE_SPECIALIZATION
 CStateGroupPanicAbstract::CStateGroupPanic(_Object *obj) : inherited(obj)
 {
-	add_state(eStatePanic_Run,					xr_new<CStateGroupPanicRun<_Object> >(obj));
-	add_state(eStatePanic_FaceUnprotectedArea,	xr_new<CStateMonsterLookToUnprotectedArea<_Object> >(obj));
-	add_state(eStatePanic_MoveToHomePoint,		xr_new<CStateMonsterAttackMoveToHomePoint<_Object> >(obj));	
+	add_state(eStatePanic_Run,					new CStateGroupPanicRun<_Object>(obj));
+	add_state(eStatePanic_FaceUnprotectedArea,	new CStateMonsterLookToUnprotectedArea<_Object>(obj));
+	add_state(eStatePanic_MoveToHomePoint,		new CStateMonsterAttackMoveToHomePoint<_Object>(obj));	
 }
 
 TEMPLATE_SPECIALIZATION

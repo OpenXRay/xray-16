@@ -81,7 +81,7 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
 	}
 	if(uiXml.NavigateToNode("background_frame",0))
 	{
-		UIBackground				= xr_new<CUIFrameWindow>();
+		UIBackground				= new CUIFrameWindow();
 		UIBackground->SetAutoDelete	(true);
 		AttachChild					(UIBackground);
 		xml_init.InitFrameWindow	(uiXml, "background_frame", 0,	UIBackground);
@@ -89,7 +89,7 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
 	m_complex_desc = false;
 	if(uiXml.NavigateToNode("static_name",0))
 	{
-		UIName						= xr_new<CUITextWnd>();	 
+		UIName						= new CUITextWnd();	 
 		AttachChild					(UIName);		
 		UIName->SetAutoDelete		(true);
 		xml_init.InitTextWnd		(uiXml, "static_name", 0,	UIName);
@@ -97,7 +97,7 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
 	}
 	if(uiXml.NavigateToNode("static_weight",0))
 	{
-		UIWeight				= xr_new<CUITextWnd>();	 
+		UIWeight				= new CUITextWnd();	 
 		AttachChild				(UIWeight);		
 		UIWeight->SetAutoDelete(true);
 		xml_init.InitTextWnd		(uiXml, "static_weight", 0,			UIWeight);
@@ -105,7 +105,7 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
 
 	if(uiXml.NavigateToNode("static_cost",0))
 	{
-		UICost					= xr_new<CUITextWnd>();	 
+		UICost					= new CUITextWnd();	 
 		AttachChild				(UICost);
 		UICost->SetAutoDelete	(true);
 		xml_init.InitTextWnd		(uiXml, "static_cost", 0,			UICost);
@@ -113,7 +113,7 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
 
 	if(uiXml.NavigateToNode("static_no_trade",0))
 	{
-		UITradeTip					= xr_new<CUITextWnd>();	 
+		UITradeTip					= new CUITextWnd();	 
 		AttachChild					(UITradeTip);
 		UITradeTip->SetAutoDelete	(true);
 		xml_init.InitTextWnd		(uiXml, "static_no_trade", 0,		UITradeTip);
@@ -121,29 +121,29 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
 
 	if(uiXml.NavigateToNode("descr_list",0))
 	{
-//		UIConditionWnd					= xr_new<CUIConditionParams>();
+//		UIConditionWnd					= new CUIConditionParams();
 //		UIConditionWnd->InitFromXml		(uiXml);
-		UIWpnParams						= xr_new<CUIWpnParams>();
+		UIWpnParams						= new CUIWpnParams();
 		UIWpnParams->InitFromXml		(uiXml);
 
-		UIArtefactParams				= xr_new<CUIArtefactParams>();
+		UIArtefactParams				= new CUIArtefactParams();
 		UIArtefactParams->InitFromXml	(uiXml);
 
-		UIBoosterInfo					= xr_new<CUIBoosterInfo>();
+		UIBoosterInfo					= new CUIBoosterInfo();
 		UIBoosterInfo->InitFromXml		(uiXml);
 
-		//UIDesc_line						= xr_new<CUIStatic>();
+		//UIDesc_line						= new CUIStatic();
 		//AttachChild						(UIDesc_line);	
 		//UIDesc_line->SetAutoDelete		(true);
 		//xml_init.InitStatic				(uiXml, "description_line", 0, UIDesc_line);
 
 		if ( ai().get_alife() ) // (-designer)
 		{
-			UIProperties					= xr_new<UIInvUpgPropertiesWnd>();
+			UIProperties					= new UIInvUpgPropertiesWnd();
 			UIProperties->init_from_xml		("actor_menu_item.xml");
 		}
 
-		UIDesc							= xr_new<CUIScrollView>(); 
+		UIDesc							= new CUIScrollView(); 
 		AttachChild						(UIDesc);		
 		UIDesc->SetAutoDelete			(true);
 		m_desc_info.bShowDescrText		= !!uiXml.ReadAttribInt("descr_list",0,"only_text_info", 1);
@@ -154,7 +154,7 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
 
 	if (uiXml.NavigateToNode("image_static", 0))
 	{	
-		UIItemImage					= xr_new<CUIStatic>();	 
+		UIItemImage					= new CUIStatic();	 
 		AttachChild					(UIItemImage);	
 		UIItemImage->SetAutoDelete	(true);
 		xml_init.InitStatic			(uiXml, "image_static", 0, UIItemImage);
@@ -165,7 +165,7 @@ void CUIItemInfo::InitItemInfo(LPCSTR xml_name)
 	}
 	if ( uiXml.NavigateToNode( "outfit_info", 0 ) )
 	{
-		UIOutfitInfo				= xr_new<CUIOutfitInfo>();
+		UIOutfitInfo				= new CUIOutfitInfo();
 		UIOutfitInfo->InitFromXml	(uiXml);
 	}
 
@@ -286,7 +286,7 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
 		VERIFY					(0==UIDesc->GetSize());
 		if(m_desc_info.bShowDescrText)
 		{
-			CUITextWnd* pItem					= xr_new<CUITextWnd>();
+			CUITextWnd* pItem					= new CUITextWnd();
 			pItem->SetTextColor					(m_desc_info.uDescClr);
 			pItem->SetFont						(m_desc_info.pDescFont);
 			pItem->SetWidth						(UIDesc->GetDesiredChildWidth());

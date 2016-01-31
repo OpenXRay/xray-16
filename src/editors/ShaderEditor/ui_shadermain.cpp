@@ -19,7 +19,7 @@ CShaderMain *&PUI = (CShaderMain*)UI;
 
 CShaderMain::CShaderMain()
 {
-    EPrefs = xr_new<CCustomPreferences>();
+    EPrefs = new CCustomPreferences();
 }
 
 //---------------------------------------------------------------------------

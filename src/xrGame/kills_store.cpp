@@ -28,7 +28,7 @@ void kills_store::add_kill(shared_str const & killer,
 	kills_map_t::iterator tmp_iter = m_kills.find(search_key);
 	if (tmp_iter == m_kills.end())
 	{
-		kills_t* new_kills	= xr_new<kills_t>();
+		kills_t* new_kills	= new kills_t();
 		tmp_iter			= m_kills.insert(
 			std::make_pair(search_key, new_kills)).first;
 	}

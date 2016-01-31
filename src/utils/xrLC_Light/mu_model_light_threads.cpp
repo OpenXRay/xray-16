@@ -110,9 +110,9 @@ public:
 		get_intervals( MU_THREADS, inlc_global_data()->mu_refs().size(), threads, stride, last );
 
 		for (u32 thID=0; thID<threads; thID++)
-			mu_secondary.start	( xr_new<CMULight> (thID,thID*stride,thID*stride + stride ) );
+			mu_secondary.start	( new CMULight (thID,thID*stride,thID*stride + stride ) );
 		if(last > 0)
-			mu_secondary.start	( xr_new<CMULight> (threads,threads*stride,threads*stride + last ) );
+			mu_secondary.start	( new CMULight (threads,threads*stride,threads*stride + last ) );
 	}
 };
 
@@ -120,7 +120,7 @@ public:
 void	run_mu_base( bool net )
 {
 	
-	mu_base.start				(xr_new<CMUThread> (0));
+	mu_base.start				(new CMUThread (0));
 }
 
 void	wait_mu_base_thread		()

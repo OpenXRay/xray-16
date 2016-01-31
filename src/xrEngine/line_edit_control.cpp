@@ -375,7 +375,7 @@ void line_edit_control::create_key_state(u32 const dik, key_state state)
     //{
     // xr_delete( m_actions[dik] );
     //}
-    m_actions[dik] = xr_new<text_editor::key_state_base>(state, prev);
+    m_actions[dik] = new text_editor::key_state_base(state, prev);
 }
 
 void line_edit_control::create_char_pair(u32 const dik, char c, char c_shift, bool translate)
@@ -385,14 +385,14 @@ void line_edit_control::create_char_pair(u32 const dik, char c, char c_shift, bo
         xr_delete(m_actions[dik]);
     }
 
-    m_actions[dik] = xr_new<text_editor::type_pair>(dik, c, c_shift, translate);
+    m_actions[dik] = new text_editor::type_pair(dik, c, c_shift, translate);
 }
 
 void line_edit_control::assign_callback(u32 const dik, key_state state, Callback const& callback)
 {
     VERIFY(dik < DIK_COUNT);
     Base* prev_action = m_actions[dik];
-    m_actions[dik] = xr_new<text_editor::callback_base>(callback, state);
+    m_actions[dik] = new text_editor::callback_base(callback, state);
     m_actions[dik]->on_assign(prev_action);
 }
 

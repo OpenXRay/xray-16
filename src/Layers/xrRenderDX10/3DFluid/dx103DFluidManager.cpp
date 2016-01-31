@@ -140,16 +140,16 @@ void dx103DFluidManager::Initialize( int width, int height, int depth )
 	Reset();
 
 
-	m_pGrid = xr_new<dx103DFluidGrid>();
+	m_pGrid = new dx103DFluidGrid();
 
 	m_pGrid->Initialize( m_iTextureWidth, m_iTextureHeight, m_iTextureDepth);
 
-	m_pRenderer = xr_new<dx103DFluidRenderer>();
+	m_pRenderer = new dx103DFluidRenderer();
 	m_pRenderer->Initialize( m_iTextureWidth, m_iTextureHeight, m_iTextureDepth);
 
-	m_pObstaclesHandler = xr_new<dx103DFluidObstacles>(m_iTextureWidth, m_iTextureHeight, m_iTextureDepth, m_pGrid);
+	m_pObstaclesHandler = new dx103DFluidObstacles(m_iTextureWidth, m_iTextureHeight, m_iTextureDepth, m_pGrid);
 
-	m_pEmittersHandler = xr_new<dx103DFluidEmitters>(m_iTextureWidth, m_iTextureHeight, m_iTextureDepth, m_pGrid);
+	m_pEmittersHandler = new dx103DFluidEmitters(m_iTextureWidth, m_iTextureHeight, m_iTextureDepth, m_pGrid);
 
 	m_bInited = true;
 

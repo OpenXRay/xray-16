@@ -15,10 +15,10 @@
 TEMPLATE_SPECIALIZATION
 CStateGroupRestIdleAbstract::CStateGroupRestIdle(_Object *obj) : inherited(obj)
 {
-	add_state	(eStateRest_WalkToCover,	xr_new<CStateMonsterMoveToPointEx<_Object> >	(obj));
-	add_state	(eStateRest_LookOpenPlace,	xr_new<CStateMonsterLookToPoint<_Object> >		(obj));
-	add_state	(eStateRest_WalkGraphPoint,	xr_new<CStateMonsterMoveToPointEx<_Object> >	(obj));
-	add_state	(eStateCustom,				xr_new<CStateMonsterCustomAction<_Object> >				(obj));
+	add_state	(eStateRest_WalkToCover,	new CStateMonsterMoveToPointEx<_Object>(obj));
+	add_state	(eStateRest_LookOpenPlace,	new CStateMonsterLookToPoint<_Object>(obj));
+	add_state	(eStateRest_WalkGraphPoint,	new CStateMonsterMoveToPointEx<_Object>(obj));
+	add_state	(eStateCustom,				new CStateMonsterCustomAction<_Object>(obj));
 }
 
 TEMPLATE_SPECIALIZATION

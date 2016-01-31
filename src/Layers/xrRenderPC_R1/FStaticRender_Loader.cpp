@@ -46,12 +46,12 @@ void CRender::level_Load(IReader *fs)
 
 	// Components
 
-	L_Shadows					= xr_new<CLightShadows>		();
-	L_Projector					= xr_new<CLightProjector>	();
-	L_DB						= xr_new<CLight_DB>			();
-	L_Glows						= xr_new<CGlowManager>		();
-	Wallmarks					= xr_new<CWallmarksEngine>	();
-	Details						= xr_new<CDetailManager>	();
+	L_Shadows					= new CLightShadows		();
+	L_Projector					= new CLightProjector	();
+	L_DB						= new CLight_DB			();
+	L_Glows						= new CGlowManager		();
+	Wallmarks					= new CWallmarksEngine	();
+	Details						= new CDetailManager	();
 
 	rmFar						();
 	rmNormal					();
@@ -286,7 +286,7 @@ void CRender::LoadSectors(IReader* fs)
 	u32 count = size/sizeof(b_portal);
 	Portals.resize	(count);
 	for (u32 c=0; c<count; c++)
-		Portals[c]	= xr_new<CPortal> ();
+		Portals[c]	= new CPortal ();
 
 	// load sectors
 	IReader* S = fs->open_chunk(fsL_SECTORS);
@@ -295,7 +295,7 @@ void CRender::LoadSectors(IReader* fs)
 		IReader* P = S->open_chunk(i);
 		if (0==P) break;
 
-		CSector* __S		= xr_new<CSector> ();
+		CSector* __S		= new CSector ();
 		__S->load			(*P);
 		Sectors.push_back	(__S);
 
@@ -330,7 +330,7 @@ void CRender::LoadSectors(IReader* fs)
 		}
 
 		// build portal model
-		rmPortals = xr_new	<CDB::MODEL> ();
+		rmPortals = new	CDB::MODEL();
 		rmPortals->build	(CL.getV(),int(CL.getVS()),CL.getT(),int(CL.getTS()));
 	} else {
 		rmPortals = 0;

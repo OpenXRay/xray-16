@@ -33,7 +33,7 @@ void CZoneEffector::Activate()
 {
 	m_pActor = smart_cast<CActor*>(Level().CurrentEntity());
 	if(!m_pActor) return;
-	m_pp_effector						= xr_new<CPostprocessAnimatorLerp>();
+	m_pp_effector						= new CPostprocessAnimatorLerp();
 	m_pp_effector->SetType				(EEffectorPPType( u32(u64(this) & u32(-1)) ));
 	m_pp_effector->SetCyclic			(true);
 	m_pp_effector->SetFactorFunc		(GET_KOEFF_FUNC(this, &CZoneEffector::GetFactor));

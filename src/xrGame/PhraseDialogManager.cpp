@@ -102,7 +102,7 @@ bool CPhraseDialogManager::AddAvailableDialog(shared_str dialog_id, CPhraseDialo
 		return false;
 	m_CheckedDialogs.push_back(dialog_id);
 
-	DIALOG_SHARED_PTR phrase_dialog(xr_new<CPhraseDialog>());
+	DIALOG_SHARED_PTR phrase_dialog(new CPhraseDialog());
 	phrase_dialog->Load(dialog_id);
 
 	//вызвать скриптовую присоединенную функцию 

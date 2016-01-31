@@ -38,7 +38,7 @@ SThunderboltDesc::~SThunderboltDesc()
 
 void SThunderboltDesc::create_top_gradient(CInifile& pIni, shared_str const& sect)
 {
-    m_GradientTop = xr_new<SFlare>();
+    m_GradientTop = new SFlare();
     m_GradientTop->shader = pIni.r_string(sect, "gradient_top_shader");
     m_GradientTop->texture = pIni.r_string(sect, "gradient_top_texture");
     m_GradientTop->fRadius = pIni.r_fvector2(sect, "gradient_top_radius");
@@ -48,7 +48,7 @@ void SThunderboltDesc::create_top_gradient(CInifile& pIni, shared_str const& sec
 
 void SThunderboltDesc::create_center_gradient(CInifile& pIni, shared_str const& sect)
 {
-    m_GradientCenter = xr_new<SFlare>();
+    m_GradientCenter = new SFlare();
     m_GradientCenter->shader = pIni.r_string(sect, "gradient_center_shader");
     m_GradientCenter->texture = pIni.r_string(sect, "gradient_center_texture");
     m_GradientCenter->fRadius = pIni.r_fvector2(sect, "gradient_center_radius");

@@ -354,7 +354,7 @@ void SHeliMovementState::goByRoundPath(Fvector center_, float radius_, bool cloc
 	}
 	need_to_del_path	= true;
 	u32 pt_idx			= 0;
-	CPatrolPath* pp = xr_new<CPatrolPath>("heli_round_path");
+	CPatrolPath* pp = new CPatrolPath("heli_round_path");
 
 	float start_h	= 0.0f;
 	float end_h		= PI_MUL_2-EPS;
@@ -409,7 +409,7 @@ void SHeliMovementState::SetPointFlags(u32 idx, u32 new_flags)
 {
 	CPatrolPath				*p = const_cast<CPatrolPath*>(currPatrolPath);
 	CPatrolPoint* pt_curr	= &p->vertex(idx)->data();
-	CPatrolPoint* pt_new	= xr_new<CPatrolPoint>(	
+	CPatrolPoint* pt_new	= new CPatrolPoint(	
 		(CLevelGraph*)0,
 		(CGameLevelCrossTable*)0,
 		(CGameGraph*)0,

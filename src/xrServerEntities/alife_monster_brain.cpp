@@ -43,7 +43,7 @@ CALifeMonsterBrain::CALifeMonsterBrain		(object_type *object)
 	m_smart_terrain					= 0;
 
 #ifdef XRGAME_EXPORTS
-	m_movement_manager				= xr_new<CALifeMonsterMovementManager>(object);
+	m_movement_manager				= new CALifeMonsterMovementManager(object);
 #endif
 	
 #ifdef XRGAME_EXPORTS

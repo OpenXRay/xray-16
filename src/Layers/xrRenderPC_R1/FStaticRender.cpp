@@ -89,11 +89,11 @@ void					CRender::create					()
 	m_bMakeAsyncSS				= false;
 
 //---------
-	Target						= xr_new<CRenderTarget>		();
+	Target						= new CRenderTarget		();
 //---------
 	//
-	Models						= xr_new<CModelPool>		();
-	L_Dynamic					= xr_new<CLightR_Manager>	();
+	Models						= new CModelPool		();
+	L_Dynamic					= new CLightR_Manager	();
 	PSLibrary.OnCreate			();
 //.	HWOCC.occq_create			(occq_size);
 
@@ -128,7 +128,7 @@ void					CRender::reset_end				()
 {
 	xrRender_apply_tf			();
 //.	HWOCC.occq_create			(occq_size);
-	Target						=	xr_new<CRenderTarget>	();
+	Target						=	new CRenderTarget	();
 	if (L_Projector)			L_Projector->invalidate		();
 
 	// Set this flag true to skip the first render frame,
@@ -142,7 +142,7 @@ void					CRender::OnFrame				()
 }
 
 // Implementation
-IRender_ObjectSpecific*	CRender::ros_create				(IRenderable* parent)					{ return xr_new<CROS_impl>();			}
+IRender_ObjectSpecific*	CRender::ros_create				(IRenderable* parent)					{ return new CROS_impl();			}
 void					CRender::ros_destroy			(IRender_ObjectSpecific* &p)			{ xr_delete(p);							}
 IRenderVisual*			CRender::model_Create			(LPCSTR name, IReader* data)			{ return Models->Create(name,data);		}
 IRenderVisual*			CRender::model_CreateChild		(LPCSTR name, IReader* data)			{ return Models->CreateChild(name,data);}
@@ -155,7 +155,7 @@ void					CRender::model_Delete			(IRenderVisual* &V, BOOL bDiscard)
 }
 IRender_DetailModel*	CRender::model_CreateDM			(IReader*F)
 {
-	CDetail*	D		= xr_new<CDetail> ();
+	CDetail*	D		= new CDetail ();
 	D->Load				(F);
 	return D;
 }
@@ -200,7 +200,7 @@ FSlideWindowItem*		CRender::getSWI					(int id)			{ VERIFY(id<int(SWIs.size()));
 
 IRender_Light*			CRender::light_create			()					{ return L_DB->Create();								}
 
-IRender_Glow*			CRender::glow_create			()					{ return xr_new<CGlow>();								}
+IRender_Glow*			CRender::glow_create			()					{ return new CGlow();								}
 
 void					CRender::flush					()					{ r_dsgraph_render_graph	(0);						}
 

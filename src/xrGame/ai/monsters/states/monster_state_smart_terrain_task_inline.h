@@ -16,9 +16,9 @@
 TEMPLATE_SPECIALIZATION
 CStateMonsterSmartTerrainTaskAbstract::CStateMonsterSmartTerrainTask(_Object *obj) : inherited(obj)
 {
-	add_state(eStateSmartTerrainTaskGamePathWalk,	xr_new<CStateMonsterSmartTerrainTaskGraphWalk<_Object> >(obj));
-	add_state(eStateSmartTerrainTaskLevelPathWalk,	xr_new<CStateMonsterMoveToPointEx<_Object> >			(obj));
-	add_state(eStateSmartTerrainTaskWaitCapture,	xr_new<CStateMonsterCustomAction<_Object> >				(obj));
+	add_state(eStateSmartTerrainTaskGamePathWalk,	new CStateMonsterSmartTerrainTaskGraphWalk<_Object>(obj));
+	add_state(eStateSmartTerrainTaskLevelPathWalk,	new CStateMonsterMoveToPointEx<_Object>(obj));
+	add_state(eStateSmartTerrainTaskWaitCapture,	new CStateMonsterCustomAction<_Object>(obj));
 }
 
 TEMPLATE_SPECIALIZATION

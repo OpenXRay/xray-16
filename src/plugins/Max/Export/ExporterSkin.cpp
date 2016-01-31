@@ -16,7 +16,7 @@ BOOL CExporter::ExportSkin(INode* pNode, LPCSTR fname)
 
 	if (!Capture())		return FALSE;
 	if (m_bHasError)	return FALSE;
-	CEditableObject* OBJECT = xr_new<CEditableObject>("object");
+	CEditableObject* OBJECT = new CEditableObject("object");
 	OBJECT->SetVersionToCurrent(TRUE,TRUE);
 	if (!OBJECT->ImportMAXSkeleton(this)){
 		xr_delete(OBJECT);

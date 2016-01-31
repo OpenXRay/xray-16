@@ -55,7 +55,7 @@ void CLight::OnFuzzyFlagChange(PropValue *value)
 {
     if (m_Flags.is(ELight::flPointFuzzy))
     {
-        m_FuzzyData = xr_new<SFuzzyData>();
+        m_FuzzyData = new SFuzzyData();
         OnFuzzyTypeChange(value);
     }
     else

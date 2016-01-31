@@ -38,28 +38,28 @@ void CStalkerALifePlanner::setup			(CAI_Stalker *object, CPropertyStorage *stora
 
 void CStalkerALifePlanner::add_evaluators	()
 {
-	add_evaluator			(eWorldPropertyPuzzleSolved				,xr_new<CStalkerPropertyEvaluatorConst>						(false,"zone puzzle solved"));
-	add_evaluator			(eWorldPropertySmartTerrainTask			,xr_new<CStalkerPropertyEvaluatorSmartTerrainTask>			(m_object,"under smart terrain"));
-	add_evaluator			(eWorldPropertyALife					,xr_new<CStalkerPropertyEvaluatorALife>						(m_object,"ALife Simulator"));
+	add_evaluator			(eWorldPropertyPuzzleSolved				,new CStalkerPropertyEvaluatorConst						(false,"zone puzzle solved"));
+	add_evaluator			(eWorldPropertySmartTerrainTask			,new CStalkerPropertyEvaluatorSmartTerrainTask			(m_object,"under smart terrain"));
+	add_evaluator			(eWorldPropertyALife					,new CStalkerPropertyEvaluatorALife						(m_object,"ALife Simulator"));
 }
 
 void CStalkerALifePlanner::add_actions		()
 {
 	CStalkerActionBase		*action;
 
-	action					= xr_new<CStalkerActionNoALife>					(m_object,"free_no_alife");
+	action					= new CStalkerActionNoALife					(m_object,"free_no_alife");
 	add_condition			(action,eWorldPropertyALife,					false);
 	add_condition			(action,eWorldPropertyPuzzleSolved,				false);
 	add_effect				(action,eWorldPropertyPuzzleSolved,				true);
 	add_operator			(eWorldOperatorALifeEmulation,					action);
 
-	action					= xr_new<CStalkerActionSmartTerrain>			(m_object,"smart terrain : get task location");
+	action					= new CStalkerActionSmartTerrain			(m_object,"smart terrain : get task location");
 	add_condition			(action,eWorldPropertyALife,					true);
 	add_condition			(action,eWorldPropertySmartTerrainTask,			true);
 	add_effect				(action,eWorldPropertySmartTerrainTask,			false);
 	add_operator			(eWorldOperatorSmartTerrainTask,				action);
 
-	action					= xr_new<CStalkerActionSolveZonePuzzle>			(m_object,"solve_zone_puzzle");
+	action					= new CStalkerActionSolveZonePuzzle			(m_object,"solve_zone_puzzle");
 	add_condition			(action,eWorldPropertyALife,					true);
 	add_condition			(action,eWorldPropertySmartTerrainTask,			false);
 	add_condition			(action,eWorldPropertyPuzzleSolved,				false);

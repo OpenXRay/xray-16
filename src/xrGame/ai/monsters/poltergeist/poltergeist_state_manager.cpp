@@ -19,13 +19,13 @@
 
 CStateManagerPoltergeist::CStateManagerPoltergeist(CPoltergeist *obj) : inherited(obj)
 {
-	add_state(eStateRest,					xr_new<CPoltergeistStateRest<CPoltergeist> > (obj));
-	add_state(eStateEat,					xr_new<CStateMonsterEat<CPoltergeist> >(obj));
-	add_state(eStateAttack_AttackHidden,	xr_new<CStatePoltergeistAttackHidden<CPoltergeist> > (obj));
-	add_state(eStatePanic,					xr_new<CStateMonsterPanic<CPoltergeist> >(obj));
-	add_state(eStateHitted,					xr_new<CStateMonsterHitted<CPoltergeist> >(obj));
-	add_state(eStateHearInterestingSound,	xr_new<CStateMonsterHearInterestingSound<CPoltergeist> >(obj));
-	add_state(eStateHearDangerousSound,		xr_new<CStateMonsterHearDangerousSound<CPoltergeist> >(obj));
+	add_state(eStateRest,					new CPoltergeistStateRest<CPoltergeist>(obj));
+	add_state(eStateEat,					new CStateMonsterEat<CPoltergeist>(obj));
+	add_state(eStateAttack_AttackHidden,	new CStatePoltergeistAttackHidden<CPoltergeist>(obj));
+	add_state(eStatePanic,					new CStateMonsterPanic<CPoltergeist>(obj));
+	add_state(eStateHitted,					new CStateMonsterHitted<CPoltergeist>(obj));
+	add_state(eStateHearInterestingSound,	new CStateMonsterHearInterestingSound<CPoltergeist>(obj));
+	add_state(eStateHearDangerousSound,		new CStateMonsterHearDangerousSound<CPoltergeist>(obj));
 }
 
 CStateManagerPoltergeist::~CStateManagerPoltergeist()

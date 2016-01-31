@@ -14,7 +14,7 @@
 
 CStateManagerPsyDog::CStateManagerPsyDog(CAI_PseudoDog *monster) : inherited(monster)
 {
-//	add_state(eStateAttack_Psy,	 xr_new<CStatePsyDogPsyAttack<CAI_PseudoDog> >	 (monster));
+//	add_state(eStateAttack_Psy,	 new CStatePsyDogPsyAttack<CAI_PseudoDog>(monster));
 }
 
 void CStateManagerPsyDog::execute()

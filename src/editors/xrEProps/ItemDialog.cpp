@@ -36,7 +36,7 @@ void __fastcall TfrmItemDialog::ebClick(TObject *Sender)
 int __fastcall TfrmItemDialog::Run(LPCSTR caption, LPCSTR msg, LPCSTR buttons)
 {
 	R_ASSERT(buttons&&buttons[0]);
-	form = xr_new<TfrmItemDialog>((TComponent*)0);
+	form = new TfrmItemDialog((TComponent*)0);
 	form->Caption 		= caption;
     form->lbMsg->Caption= msg;
     int cnt				= _GetItemCount(buttons); R_ASSERT(cnt<9);

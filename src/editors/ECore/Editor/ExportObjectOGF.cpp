@@ -121,7 +121,7 @@ CExportObjectOGF::SSplit::~SSplit()
 
 void CExportObjectOGF::SSplit::AppendPart(int apx_vertices, int apx_faces)
 {
-    m_Parts.push_back(xr_new<CObjectOGFCollectorPacked>(apx_box, apx_vertices, apx_faces));
+    m_Parts.push_back(new CObjectOGFCollectorPacked(apx_box, apx_vertices, apx_faces));
     m_CurrentPart = m_Parts.back();
 }
 
@@ -319,7 +319,7 @@ bool CExportObjectOGF::PrepareMESH(CEditableMesh *MESH)
                 break; 
             }
 #endif
-            m_Splits.push_back(xr_new<SSplit>(surf,m_Source->GetBox()));
+            m_Splits.push_back(new SSplit(surf,m_Source->GetBox()));
             split = m_Splits.back();
         }
         int elapsed_faces = surf->m_Flags.is(CSurface::sf2Sided) ? face_lst.size()*2 : face_lst.size();

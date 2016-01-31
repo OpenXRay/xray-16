@@ -29,7 +29,7 @@ __fastcall TfraObject::TfraObject(TComponent *Owner, ESceneObjectTool *parent_to
 //---------------------------------------------------------------------------
 void TfraObject::OnDrawObjectThumbnail(LPCSTR name, HDC hdc, const Irect &r)
 {
-    EObjectThumbnail *thm = xr_new<EObjectThumbnail>(name);
+    EObjectThumbnail *thm = new EObjectThumbnail(name);
     thm->Draw(hdc, r);
     xr_delete(thm);
 }
@@ -163,7 +163,7 @@ void __fastcall TfraObject::ebMultiAppendClick(TObject *Sender)
         {
             string256 namebuffer;
             Scene->GenObjectName(OBJCLASS_SCENEOBJECT, namebuffer, it->c_str());
-            CSceneObject *obj = xr_new<CSceneObject>((LPVOID)0, namebuffer);
+            CSceneObject *obj = new CSceneObject((LPVOID)0, namebuffer);
             CEditableObject *ref = obj->SetReference(it->c_str());
             if (!ref)
             {

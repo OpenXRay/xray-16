@@ -16,9 +16,9 @@
 TEMPLATE_SPECIALIZATION
 CStateMonsterAttackCampAbstract::CStateMonsterAttackCamp(_Object *obj) : inherited(obj) 
 {
-	add_state	(eStateAttackCamp_Hide,		xr_new<CStateMonsterMoveToPointEx<_Object> >	(obj));
-	add_state	(eStateAttackCamp_Camp,		xr_new<CStateMonsterLookToPoint<_Object> >		(obj));
-	add_state	(eStateAttackCamp_StealOut,	xr_new<CStateMonsterAttackCampStealOut<_Object> >(obj));
+	add_state	(eStateAttackCamp_Hide,		new CStateMonsterMoveToPointEx<_Object>(obj));
+	add_state	(eStateAttackCamp_Camp,		new CStateMonsterLookToPoint<_Object>(obj));
+	add_state	(eStateAttackCamp_StealOut,	new CStateMonsterAttackCampStealOut<_Object>(obj));
 }
 
 TEMPLATE_SPECIALIZATION

@@ -88,7 +88,7 @@ void reward_manager::load_reward_item	(CInifile & reward_config,
 	VERIFY2(m_rewards_map.find(index) == m_rewards_map.end(),
 		make_string("reward with id=%d already loaded", index).c_str());
 
-	reward_descriptor*	tmp_descriptor	= xr_new<reward_descriptor>();
+	reward_descriptor*	tmp_descriptor	= new reward_descriptor();
 	tmp_descriptor->m_award_name		= reward_config.r_string(section, "name");
 	tmp_descriptor->m_texture_name		= reward_config.r_string(section, "ingame_texture");
 	tmp_descriptor->m_color_animation	= reward_config.r_string(section, "color_animation");

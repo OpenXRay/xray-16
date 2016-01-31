@@ -216,7 +216,7 @@ void CHitMemoryManager::update()
 	for ( ; I != E; ++I) {
 		if ((*I).m_level_time > level_time) {
 			xr_delete			(m_selected_hit);
-			m_selected_hit		= xr_new<CHitObject>(*I);
+			m_selected_hit		= new CHitObject(*I);
 			level_time			= (*I).m_level_time;
 		}
 	}

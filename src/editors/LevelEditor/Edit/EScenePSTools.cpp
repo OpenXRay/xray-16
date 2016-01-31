@@ -10,9 +10,9 @@
 void EScenePSTool::CreateControls()
 {
     inherited::CreateDefaultControls(estDefault);
-    AddControl(xr_new<TUI_ControlPSAdd>(estDefault, etaAdd, this));
+    AddControl(new TUI_ControlPSAdd(estDefault, etaAdd, this));
     // frame
-    pFrame = xr_new<TfraPS>((TComponent*)0);
+    pFrame = new TfraPS((TComponent*)0);
 }
 
 //----------------------------------------------------
@@ -26,7 +26,7 @@ void EScenePSTool::RemoveControls()
 
 CCustomObject *EScenePSTool::CreateObject(LPVOID data, LPCSTR name)
 {
-    CCustomObject*O = xr_new<EParticlesObject>(data, name);
+    CCustomObject*O = new EParticlesObject(data, name);
     O->ParentTool = this;
     return O;
 }

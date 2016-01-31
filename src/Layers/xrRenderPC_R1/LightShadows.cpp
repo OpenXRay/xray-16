@@ -109,7 +109,7 @@ void CLightShadows::set_object	(IRenderable* O)
 
 			// alloc
 			caster*	cs		= NULL;
-			if (casters_pool.empty())	cs	= xr_new<caster> ();
+			if (casters_pool.empty())	cs	= new caster ();
 			else {
 				cs	= casters_pool.back	();
 				casters_pool.pop_back	();

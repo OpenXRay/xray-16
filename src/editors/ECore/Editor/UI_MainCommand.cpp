@@ -314,7 +314,7 @@ CCommandVar CommandInitialize(CCommandVar p1, CCommandVar p2)
         Lib.OnCreate();
         BOOL bWeather = psDeviceFlags.is(rsEnvironment);
         psDeviceFlags.set(rsEnvironment, FALSE);
-        g_pGamePersistent = xr_new<IGame_Persistent>();
+        g_pGamePersistent = new IGame_Persistent();
 
         if (Tools->OnCreate())
         {
@@ -587,7 +587,7 @@ CCommandVar CommandGridSlotSize(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandCreateSoundLib(CCommandVar p1, CCommandVar p2)
 {
-    SndLib = xr_new<CSoundManager>();
+    SndLib = new CSoundManager();
     return TRUE;
 }
 

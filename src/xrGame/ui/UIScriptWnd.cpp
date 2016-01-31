@@ -43,7 +43,7 @@ bool CUIDialogWndEx::Load(LPCSTR xml_name)
 
 SCallbackInfo*	CUIDialogWndEx::NewCallback ()
 {
-	m_callbacks.push_back( xr_new<SCallbackInfo>() );
+	m_callbacks.push_back( new SCallbackInfo() );
 	return m_callbacks.back();
 }
 

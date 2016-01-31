@@ -105,9 +105,9 @@ __fastcall TProperties::TProperties(TComponent* Owner) : TForm(Owner)
 {
 	m_FirstClickItem= 0;
 	bModified 		= false;
-	m_BMCheck 		= xr_new<Graphics::TBitmap>();
-    m_BMDot 		= xr_new<Graphics::TBitmap>();
-    m_BMEllipsis 	= xr_new<Graphics::TBitmap>();
+	m_BMCheck 		= new Graphics::TBitmap();
+    m_BMDot 		= new Graphics::TBitmap();
+    m_BMEllipsis 	= new Graphics::TBitmap();
 	m_BMCheck->LoadFromResourceName		((u32)HInstance,"CHECK");
 	m_BMDot->LoadFromResourceName		((u32)HInstance,"DOT");
 	m_BMEllipsis->LoadFromResourceName	((u32)HInstance,"ELLIPSIS");
@@ -124,7 +124,7 @@ __fastcall TProperties::TProperties(TComponent* Owner) : TForm(Owner)
 
 TProperties* TProperties::CreateForm(const AnsiString& title, TWinControl* parent, TAlign align, TOnModifiedEvent modif, TOnItemFocused focused, TOnCloseEvent on_close, u32 flags)
 {
-	TProperties* props 			= xr_new<TProperties>(parent);
+	TProperties* props 			= new TProperties(parent);
     props->OnModifiedEvent 		= modif;
     props->OnItemFocused    	= focused;
     props->OnCloseEvent			= on_close;
@@ -163,7 +163,7 @@ TProperties* TProperties::CreateForm(const AnsiString& title, TWinControl* paren
 
 TProperties* TProperties::CreateModalForm(const AnsiString& title, bool bShowButtonsBar, TOnModifiedEvent modif, TOnItemFocused focused, TOnCloseEvent on_close, u32 flags)
 {
-	TProperties* props 			= xr_new<TProperties>((TComponent*)0);
+	TProperties* props 			= new TProperties((TComponent*)0);
     props->OnModifiedEvent 		= modif;
     props->OnItemFocused    	= focused;
     props->OnCloseEvent			= on_close;
@@ -769,11 +769,11 @@ void __fastcall TProperties::tvPropertiesMouseDown(TObject *Sender,
                     pmEnum->Items->Clear();
                     TokenValueCustom* T			= dynamic_cast<TokenValueCustom*>(prop->GetFrontValue()); R_ASSERT(T);
                     xr_token* token_list 		= T->token;
-                    TMenuItem* mi 				= xr_new<TMenuItem>((TComponent*)0);
+                    TMenuItem* mi 				= new TMenuItem((TComponent*)0);
                     mi->Caption 				= "-";
                     pmEnum->Items->Add			(mi);
                     for(int i=0; token_list[i].name; i++){
-                        mi 			= xr_new<TMenuItem>((TComponent*)0);
+                        mi 			= new TMenuItem((TComponent*)0);
                         mi->Tag		= i;
                         mi->Caption = token_list[i].name;
                         mi->OnClick = PMItemClick;
@@ -783,12 +783,12 @@ void __fastcall TProperties::tvPropertiesMouseDown(TObject *Sender,
                 case PROP_RTOKEN:{
                     pmEnum->Items->Clear();
                     RTokenValueCustom* T		= dynamic_cast<RTokenValueCustom*>(prop->GetFrontValue()); R_ASSERT(T);
-                    TMenuItem* mi 				= xr_new<TMenuItem>((TComponent*)0);
+                    TMenuItem* mi 				= new TMenuItem((TComponent*)0);
                     mi->Caption 				= "-";
                     pmEnum->Items->Add			(mi);
                     for(u32 k=0; k<T->token_count; k++){
                     	xr_rtoken& t= T->token[k];
-                        mi 			= xr_new<TMenuItem>((TComponent*)0);
+                        mi 			= new TMenuItem((TComponent*)0);
                         mi->Tag		= k;
                         mi->Caption = *t.name;
                         mi->OnClick = PMItemClick;
@@ -798,11 +798,11 @@ void __fastcall TProperties::tvPropertiesMouseDown(TObject *Sender,
                 case PROP_SH_TOKEN:{
                     pmEnum->Items->Clear();
                     TokenValueSH* T	= dynamic_cast<TokenValueSH*>(prop->GetFrontValue()); R_ASSERT(T);
-                    TMenuItem* mi 	= xr_new<TMenuItem>((TComponent*)0);
+                    TMenuItem* mi 	= new TMenuItem((TComponent*)0);
                     mi->Caption 	= "-";
                     pmEnum->Items->Add(mi);
                     for (u32 i=0; i<T->cnt; i++){
-                        mi 			= xr_new<TMenuItem>((TComponent*)0);
+                        mi 			= new TMenuItem((TComponent*)0);
                         mi->Tag		= i;
                         mi->Caption = T->items[i].str;
                         mi->OnClick = PMItemClick;
@@ -812,11 +812,11 @@ void __fastcall TProperties::tvPropertiesMouseDown(TObject *Sender,
                 case PROP_CLIST:{
                     pmEnum->Items->Clear();
                     CListValue* T				= dynamic_cast<CListValue*>(prop->GetFrontValue()); R_ASSERT(T);
-                    TMenuItem* mi	= xr_new<TMenuItem>((TComponent*)0);
+                    TMenuItem* mi	= new TMenuItem((TComponent*)0);
                     mi->Caption 	= "-";
                     pmEnum->Items->Add(mi);
                     for(u32 k=0; k<T->item_count; k++){
-                        mi 			= xr_new<TMenuItem>((TComponent*)0);
+                        mi 			= new TMenuItem((TComponent*)0);
                         mi->Tag		= k;
                         mi->Caption = T->items[k].c_str();
                         mi->OnClick = PMItemClick;
@@ -826,11 +826,11 @@ void __fastcall TProperties::tvPropertiesMouseDown(TObject *Sender,
                 case PROP_RLIST:{
                     pmEnum->Items->Clear();
                     RListValue* T				= dynamic_cast<RListValue*>(prop->GetFrontValue()); R_ASSERT(T);
-                    TMenuItem* mi	= xr_new<TMenuItem>((TComponent*)0);
+                    TMenuItem* mi	= new TMenuItem((TComponent*)0);
                     mi->Caption 	= "-";
                     pmEnum->Items->Add(mi);
                     for(u32 k=0; k<T->item_count; k++){
-                        mi 			= xr_new<TMenuItem>((TComponent*)0);
+                        mi 			= new TMenuItem((TComponent*)0);
                         mi->Tag		= k;
                         mi->Caption = T->items[k].c_str();
                         mi->OnClick = PMItemClick;
@@ -859,11 +859,11 @@ void __fastcall TProperties::tvPropertiesMouseDown(TObject *Sender,
                 break;
                 case PROP_TEXTURE2:{
                     pmEnum->Items->Clear();
-                    TMenuItem* mi	= xr_new<TMenuItem>((TComponent*)0);
+                    TMenuItem* mi	= new TMenuItem((TComponent*)0);
                     mi->Caption 	= "-";
                     pmEnum->Items->Add(mi);
                     for (u32 i=0; i<TSTRING_COUNT; i++){
-                        mi = xr_new<TMenuItem>((TComponent*)0);
+                        mi = new TMenuItem((TComponent*)0);
                         mi->Tag		= i;
                         mi->Caption = TEXTUREString[i];
                         mi->OnClick = PMItemClick;

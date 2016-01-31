@@ -27,7 +27,7 @@ void CStringTable::Init		()
 {
 	if(NULL != pData) return;
     
-	pData				= xr_new<STRING_TABLE_DATA>();
+	pData				= new STRING_TABLE_DATA();
 	
 	//имя языка, если не задано (NULL), то первый <text> в <string> в XML
 	pData->m_sLanguage	= pSettings->r_string("string_table", "language");

@@ -10,19 +10,19 @@
 #include "xrEngine/xr_ioconsole.h"
 
 CUITextVote::CUITextVote(){
-	bkgrnd = xr_new<CUIStatic>(); bkgrnd->SetAutoDelete(true);
+	bkgrnd = new CUIStatic(); bkgrnd->SetAutoDelete(true);
 	AttachChild(bkgrnd);
 
-	header = xr_new<CUIStatic>(); header->SetAutoDelete(true);
+	header = new CUIStatic(); header->SetAutoDelete(true);
 	AttachChild(header);
 
-	edit = xr_new<CUIEditBoxEx>(); edit->SetAutoDelete(true);
+	edit = new CUIEditBoxEx(); edit->SetAutoDelete(true);
 	AttachChild(edit);
 
-	btn_ok = xr_new<CUI3tButtonEx>(); btn_ok->SetAutoDelete(true);
+	btn_ok = new CUI3tButtonEx(); btn_ok->SetAutoDelete(true);
 	AttachChild(btn_ok);
 
-	btn_cancel = xr_new<CUI3tButtonEx>(); btn_cancel->SetAutoDelete(true);
+	btn_cancel = new CUI3tButtonEx(); btn_cancel->SetAutoDelete(true);
 	AttachChild(btn_cancel);
 }
 

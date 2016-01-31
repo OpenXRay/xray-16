@@ -13,15 +13,15 @@ CUICellItem*	create_cell_item(CInventoryItem* itm)
 	CWeapon*     pWeapon = smart_cast<CWeapon*>(itm);
 	if ( pAmmo )
 	{
-		cell_item = xr_new<CUIAmmoCellItem>(pAmmo);
+		cell_item = new CUIAmmoCellItem(pAmmo);
 	}
 	else if ( pWeapon )
 	{
-		cell_item = xr_new<CUIWeaponCellItem>(pWeapon);
+		cell_item = new CUIWeaponCellItem(pWeapon);
 	}
 	else
 	{
-		cell_item = xr_new<CUIInventoryCellItem>(itm);
+		cell_item = new CUIInventoryCellItem(itm);
 	}
 	return cell_item;
 }

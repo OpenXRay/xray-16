@@ -29,7 +29,7 @@ void __fastcall TDB_packer::ActivatePacker()
 {
     if (!m_form)
     {
-        m_form = xr_new<TDB_packer>((TComponent*)0);
+        m_form = new TDB_packer((TComponent*)0);
     }
     m_form->prepare();
     m_form->ShowModal();

@@ -22,7 +22,7 @@ dx10State::~dx10State()
 
 dx10State* dx10State::Create(SimulatorStates& state_code)
 {
-	dx10State	*pState = xr_new<dx10State>();
+	dx10State	*pState = new dx10State();
 
 	state_code.UpdateState(*pState);
 

@@ -127,13 +127,13 @@ void CUIHudStatesWnd::InitFromXml( CUIXml& xml, LPCSTR path )
 
 //	m_ui_armor_bar    = UIHelper::CreateProgressBar( xml, "progress_bar_armor", this );
 
-//	m_progress_self = xr_new<CUIProgressShape>();
+//	m_progress_self = new CUIProgressShape();
 //	m_progress_self->SetAutoDelete(true);
 //	AttachChild( m_progress_self );
 //	CUIXmlInit::InitProgressShape( xml, "progress", 0, m_progress_self );
 
-//	m_arrow				= xr_new<UI_Arrow>();
-//	m_arrow_shadow		= xr_new<UI_Arrow>();
+//	m_arrow				= new UI_Arrow();
+//	m_arrow_shadow		= new UI_Arrow();
 
 //	m_arrow->init_from_xml( xml, "arrow", this );
 //	m_arrow_shadow->init_from_xml( xml, "arrow_shadow", this );

@@ -44,14 +44,14 @@ void UITeamPanels::InitAllFrames(shared_str const & frame_node)
 		LPCSTR frame_class = uiXml.ReadAttrib(tempFrameNode, "class", "class_of_frame_not_defined");
 		if (!xr_strcmp(frame_class, "frame_line"))
 		{
-			CUIFrameLineWnd*				temp_frame_line = xr_new<CUIFrameLineWnd>();
+			CUIFrameLineWnd*				temp_frame_line = new CUIFrameLineWnd();
 			CUIXmlInit::InitFrameLine		(uiXml, frame_node.c_str(), i, temp_frame_line);
 			temp_frame_line->SetAutoDelete	(true);
 			AttachChild						(temp_frame_line);
 		}
 		else if(!xr_strcmp(frame_class, "static"))
 		{
-			CUIStatic*						temp_static = xr_new<CUIStatic>();
+			CUIStatic*						temp_static = new CUIStatic();
 			CUIXmlInit::InitStatic			(uiXml, frame_node.c_str(), i, temp_static);
 			temp_static->SetAutoDelete		(true);
 			AttachChild						(temp_static);

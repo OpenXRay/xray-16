@@ -14,7 +14,7 @@
 //---------------------------------------------------------------------------
 TfrmObjectList *TfrmObjectList::CreateForm(TWinControl *parent)
 {
-    TfrmObjectList *OL = xr_new<TfrmObjectList>(parent);
+    TfrmObjectList *OL = new TfrmObjectList(parent);
     if (parent)
         OL->Parent = parent;
     return OL;

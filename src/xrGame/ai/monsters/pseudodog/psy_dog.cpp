@@ -20,7 +20,7 @@
 
 CPsyDog::CPsyDog()
 {
-	m_aura						=	xr_new<CPsyDogAura>(this);
+	m_aura						=	new CPsyDogAura(this);
 	m_max_phantoms_count		=	NULL;
 	m_phantoms_die_time			=	NULL;
 }
@@ -169,7 +169,7 @@ void CPsyDog::Die(IGameObject* who)
 
 IStateManagerBase *CPsyDog::create_state_manager()
 {
-	return xr_new<CStateManagerPsyDog>(this);
+	return new CStateManagerPsyDog(this);
 }
 
 u8 CPsyDog::get_phantoms_count()
@@ -272,8 +272,8 @@ void CPsyDogPhantom::Think()
 	if (EnemyMan.get_enemy() != Actor()) 
 		return;
 
-	Actor()->Cameras().AddCamEffector(xr_new<CMonsterEffectorHit>(m_appear_effector.ce_time,m_appear_effector.ce_amplitude,m_appear_effector.ce_period_number,m_appear_effector.ce_power));
-	Actor()->Cameras().AddPPEffector(xr_new<CMonsterEffector>(m_appear_effector.ppi, m_appear_effector.time, m_appear_effector.time_attack, m_appear_effector.time_release));
+	Actor()->Cameras().AddCamEffector(new CMonsterEffectorHit(m_appear_effector.ce_time,m_appear_effector.ce_amplitude,m_appear_effector.ce_period_number,m_appear_effector.ce_power));
+	Actor()->Cameras().AddPPEffector(new CMonsterEffector(m_appear_effector.ppi, m_appear_effector.time, m_appear_effector.time_attack, m_appear_effector.time_release));
 }
 
 //void CPsyDogPhantom::Hit(float P,Fvector &dir,IGameObject*who,s16 element,Fvector p_in_object_space,float impulse, ALife::EHitType hit_type)

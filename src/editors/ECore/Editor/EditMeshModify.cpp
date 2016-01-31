@@ -92,7 +92,7 @@ void CEditableMesh::RebuildVMaps()
                             int vm_idx = FindVMapByName(nVMaps, vmap->name.c_str(), vmap->type, false);
                             if (-1==vm_idx)
                             {
-                                nVMaps.push_back(xr_new<st_VMap>(vmap->name.c_str(),vmap->type,false));
+                                nVMaps.push_back(new st_VMap(vmap->name.c_str(),vmap->type,false));
                                 vm_idx = nVMaps.size()-1;
                             }
                             st_VMap*nVMap = nVMaps[vm_idx];
@@ -114,7 +114,7 @@ void CEditableMesh::RebuildVMaps()
                             int vm_idx = FindVMapByName(nVMaps, vmap->name.c_str(), vmap->type, true);
                             if (-1==vm_idx)
                             {
-                                nVMaps.push_back(xr_new<st_VMap>(vmap->name.c_str(),vmap->type,true));
+                                nVMaps.push_back(new st_VMap(vmap->name.c_str(),vmap->type,true));
                                 vm_idx = nVMaps.size()-1;
                             }
                             st_VMap*nVMapPM = nVMaps[vm_idx];
@@ -141,7 +141,7 @@ void CEditableMesh::RebuildVMaps()
                         int vm_idx = FindVMapByName(nVMaps, vmap->name.c_str(), vmap->type, false);
                         if (-1==vm_idx)
                         {
-                            nVMaps.push_back(xr_new<st_VMap>(vmap->name.c_str(),vmap->type,false));
+                            nVMaps.push_back(new st_VMap(vmap->name.c_str(),vmap->type,false));
                             vm_idx = nVMaps.size()-1;
                         }
                         st_VMap*nWMap = nVMaps[vm_idx];

@@ -169,7 +169,7 @@ void CScriptEngine::reinit()
     stateMapLock.Enter();
     if (!stateMap)
     {
-        stateMap = xr_new<xr_hash_map<lua_State*, CScriptEngine*>>();
+        stateMap = new xr_hash_map<lua_State*, CScriptEngine*>();
         stateMap->reserve(32); // 32 lua states should be enough
     }
     stateMapLock.Leave();
@@ -709,7 +709,7 @@ void CScriptEngine::initialize_lua_studio(lua_State *state, cs::lua_studio::worl
     s_destroy_world = (destroy_world_function_type)
         GetProcAddress(s_script_debugger_handle, "_cs_lua_studio_backend_destroy_world@4");
     R_ASSERT2 (s_destroy_world, "can't find function \"cs_lua_studio_backend_destroy_world\" in the library");
-    engine = xr_new<lua_studio_engine>();
+    engine = new lua_studio_engine();
     world = s_create_world(*engine, false, false);
     VERIFY(world);
     s_old_log_callback = SetLogCB(LogCallback(log_callback, this));
@@ -1141,7 +1141,7 @@ void CScriptEngine::restartDebugger()
 {
     if(debugger())
         stopDebugger();
-    m_scriptDebugger = xr_new<CScriptDebugger>(this);
+    m_scriptDebugger = new CScriptDebugger(this);
     debugger()->PrepareLuaBind();
     Msg("Script debugger restarted.");
 }

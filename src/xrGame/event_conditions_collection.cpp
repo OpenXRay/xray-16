@@ -40,7 +40,7 @@ void event_conditions_collection::check_for_events()
 event_condition_t* event_conditions_collection::add_condition(enum_event_operation operation,
 															  buffer_vector<event_argument_type> & arguments)
 {
-	event_condition_t* tmp_condition	= xr_new<event_condition_t>();
+	event_condition_t* tmp_condition	= new event_condition_t();
 	tmp_condition->m_operation			= operation;
 	
 	for (buffer_vector<event_argument_type>::const_iterator i = arguments.begin(),

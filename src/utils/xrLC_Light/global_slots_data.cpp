@@ -27,7 +27,7 @@ void	global_slots_data::	Load			( )
 	// re-open
 	string_path			N;
 	FS.update_path		( N, "$level$", "level.details" );
-	dtFS				= xr_new<CVirtualFileRW> ( N );
+	dtFS				= new CVirtualFileRW ( N );
 
 	R_ASSERT			( dtH.version()==DETAIL_VERSION );
 

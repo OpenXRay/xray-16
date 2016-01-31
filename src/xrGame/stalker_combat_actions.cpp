@@ -134,8 +134,8 @@ void CStalkerActionMakeItemKilling::initialize	()
 	object().sound().remove_active_sounds	(u32(eStalkerSoundMaskNoHumming));
 
 	object().sight().clear	();
-	object().sight().add_action(eSightActionTypeWatchItem,xr_new<CSightControlAction>(1.f,3000,CSightAction(SightManager::eSightTypePathDirection)));
-	object().sight().add_action(eSightActionTypeWatchEnemy,xr_new<CSightControlAction>(1.f,3000,CSightAction(SightManager::eSightTypePosition,object().memory().enemy().selected()->Position(),false)));
+	object().sight().add_action(eSightActionTypeWatchItem,new CSightControlAction(1.f,3000,CSightAction(SightManager::eSightTypePathDirection)));
+	object().sight().add_action(eSightActionTypeWatchEnemy,new CSightControlAction(1.f,3000,CSightAction(SightManager::eSightTypePosition,object().memory().enemy().selected()->Position(),false)));
 
 	object().movement().set_mental_state		(eMentalStateDanger);
 }
@@ -745,7 +745,7 @@ void CStalkerActionDetourEnemy::initialize		()
 #ifdef DISABLE_COVER_BEFORE_DETOUR
 	if (/**(Random.randF(1.f) < .8f) && /**/object().agent_manager().member().member(m_object).cover())	
 		object().agent_manager().location().add	(
-			xr_new<CDangerCoverLocation>(
+			new CDangerCoverLocation(
 				object().agent_manager().member().member(m_object).cover(),
 				Device.dwTimeGlobal,
 				TEMP_DANGER_INTERVAL,

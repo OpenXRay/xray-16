@@ -16,21 +16,21 @@
 
 CUIDemoPlayControl::CUIDemoPlayControl()
 {
-	m_progress_bar			= xr_new<CUIProgressBar>();	AttachChild(m_progress_bar);
-	m_background			= xr_new<CUIStatic>();		AttachChild(m_background);
-	m_restart_btn			= xr_new<CUI3tButton>();	AttachChild(m_restart_btn);
-	m_decrease_speed_btn	= xr_new<CUI3tButton>();	AttachChild(m_decrease_speed_btn);
-	m_play_pause_btn		= xr_new<CUI3tButton>();	AttachChild(m_play_pause_btn);
-	m_increase_speed_btn	= xr_new<CUI3tButton>();	AttachChild(m_increase_speed_btn);
-	m_rewind_until_btn		= xr_new<CUI3tButton>();	AttachChild(m_rewind_until_btn);
-	m_repeat_rewind_btn		= xr_new<CUI3tButton>();	AttachChild(m_repeat_rewind_btn);
-	m_static_demo_status	= xr_new<CUITextWnd>();		AttachChild(m_static_demo_status);
+	m_progress_bar			= new CUIProgressBar();	AttachChild(m_progress_bar);
+	m_background			= new CUIStatic();		AttachChild(m_background);
+	m_restart_btn			= new CUI3tButton();	AttachChild(m_restart_btn);
+	m_decrease_speed_btn	= new CUI3tButton();	AttachChild(m_decrease_speed_btn);
+	m_play_pause_btn		= new CUI3tButton();	AttachChild(m_play_pause_btn);
+	m_increase_speed_btn	= new CUI3tButton();	AttachChild(m_increase_speed_btn);
+	m_rewind_until_btn		= new CUI3tButton();	AttachChild(m_rewind_until_btn);
+	m_repeat_rewind_btn		= new CUI3tButton();	AttachChild(m_repeat_rewind_btn);
+	m_static_demo_status	= new CUITextWnd();		AttachChild(m_static_demo_status);
 	
-	m_all_players				= xr_new<CUIPropertiesBox>();
+	m_all_players				= new CUIPropertiesBox();
 	AttachChild					(m_all_players);
 	m_all_players->SetWindowName("all_players_pbox");
 
-	m_rewind_type				= xr_new<CUIPropertiesBox>(m_all_players); 
+	m_rewind_type				= new CUIPropertiesBox(m_all_players); 
 	AttachChild					(m_rewind_type);
 	m_rewind_type->SetWindowName("rewind_types_pbox");
 
@@ -138,7 +138,7 @@ void CUIDemoPlayControl::InitAllPlayers		()
 	
 	VERIFY(!m_players_store && !m_players);
 	m_players_store				= xr_malloc(players_count * sizeof(shared_str));
-	m_players					= xr_new<players_collection_t>(m_players_store, players_count);
+	m_players					= new players_collection_t(m_players_store, players_count);
 
 	CStringTable st;
 	m_all_players->InitPropertiesBox(Fvector2().set(0,0), Fvector2().set(100,200));

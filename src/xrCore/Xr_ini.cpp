@@ -8,7 +8,7 @@ XRCORE_API CInifile const* pSettingsAuth = NULL;
 
 CInifile* CInifile::Create(const char* szFileName, BOOL ReadOnly)
 {
-    return xr_new<CInifile>(szFileName, ReadOnly);
+    return new CInifile(szFileName, ReadOnly);
 }
 
 void CInifile::Destroy(CInifile* ini)
@@ -279,7 +279,7 @@ void CInifile::Load(IReader* F, LPCSTR path
                     xrDebug::Fatal(DEBUG_INFO, "Duplicate section '%s' found.", *Current->Name);
                 DATA.insert(I, Current);
             }
-            Current = xr_new<Sect>();
+            Current = new Sect();
             Current->Name = 0;
             // start new section
             R_ASSERT3(strchr(str, ']'), "Bad ini section found: ", str);
@@ -731,7 +731,7 @@ void CInifile::w_string(LPCSTR S, LPCSTR L, LPCSTR V, LPCSTR comment)
     if (!section_exist(sect))
     {
         // create _new_ section
-        Sect* NEW = xr_new<Sect>();
+        Sect* NEW = new Sect();
         NEW->Name = sect;
         RootIt I = std::lower_bound(DATA.begin(), DATA.end(), sect, sect_pred);
         DATA.insert(I, NEW);

@@ -279,7 +279,7 @@ bool TUI::ShowHint(const AStringVec &SS)
         m_bHintShowing = true;
         if (!m_pHintWindow)
         {
-            m_pHintWindow = xr_new<THintWindow>((TComponent*)0);
+            m_pHintWindow = new THintWindow((TComponent*)0);
             m_pHintWindow->Brush->Color = (TColor)0x0d9F2FF;
         }
         TRect rect = m_pHintWindow->CalcHintRect(320, S, 0);
@@ -643,7 +643,7 @@ bool TUI::OnCreate(TD3DWindow *w, TPanel *p)
     // Creation
     ETOOLS::ray_options(CDB::OPT_ONLYNEAREST|CDB::OPT_CULL);
 
-    pInput = xr_new<CInput>(FALSE, mouse_device_key);
+    pInput = new CInput(FALSE, mouse_device_key);
     UI->IR_Capture();
 
     m_bReady = true;
@@ -679,7 +679,7 @@ void TUI::OnDestroy()
 SPBItem *TUI::ProgressStart(float max_val, LPCSTR text)
 {
     VERIFY(m_bReady);
-    SPBItem*item = xr_new<SPBItem>(text,"",max_val);
+    SPBItem*item = new SPBItem(text,"",max_val);
     m_ProgressItems.push_back(item);
     ELog.Msg(mtInformation, text);
     ProgressDraw();

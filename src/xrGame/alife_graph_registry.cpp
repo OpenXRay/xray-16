@@ -65,7 +65,7 @@ void CALifeGraphRegistry::update			(CSE_ALifeDynamicObject *object)
 
 void CALifeGraphRegistry::setup_current_level	()
 {
-	m_level						= xr_new<CALifeLevelRegistry>(ai().game_graph().vertex(actor()->m_tGraphID)->level_id());
+	m_level						= new CALifeLevelRegistry(ai().game_graph().vertex(actor()->m_tGraphID)->level_id());
 	level().set_process_time	(m_process_time);
 	for (int i=0, n=ai().game_graph().header().vertex_count(); i<n; ++i)
 		if (ai().game_graph().vertex(i)->level_id() == level().level_id()) {

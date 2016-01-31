@@ -12,8 +12,8 @@
 TEMPLATE_SPECIALIZATION
 CBloodsuckerStateAttackAbstract::CBloodsuckerStateAttack(_Object *obj) : inherited_attack(obj)
 {
-	add_state	(eStateAttack_Hide,	xr_new<CStateMonsterBackstubEnemy<_Object> >(obj));
-	add_state	(eStateVampire_Execute,	xr_new<CStateBloodsuckerVampireExecute<_Object> >(obj));
+	add_state	(eStateAttack_Hide,	new CStateMonsterBackstubEnemy<_Object>(obj));
+	add_state	(eStateVampire_Execute,	new CStateBloodsuckerVampireExecute<_Object>(obj));
 }
 
 TEMPLATE_SPECIALIZATION

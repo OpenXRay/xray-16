@@ -19,7 +19,7 @@ ListItem* CListHelper::FindItem		(ListItemsVec& items,	LPCSTR key)
     
 ListItem* CListHelper::CreateItem	(ListItemsVec& items, LPCSTR key, int type, u32 item_flags, void* object)
 {
-    ListItem* item	= xr_new<ListItem>	(type);
+    ListItem* item	= new ListItem	(type);
     item->SetName	(key);
     item->m_Object	= object;
     item->m_Flags.set(item_flags,TRUE);

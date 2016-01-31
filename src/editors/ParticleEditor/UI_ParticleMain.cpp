@@ -20,7 +20,7 @@ CParticleMain *&PUI = (CParticleMain*)UI;
 
 CParticleMain::CParticleMain()
 {
-    EPrefs = xr_new<CCustomPreferences>();
+    EPrefs = new CCustomPreferences();
 }
 
 //---------------------------------------------------------------------------

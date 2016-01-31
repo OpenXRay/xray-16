@@ -663,7 +663,7 @@ void CPHShell::build_FromKinematics(IKinematics* K,BONE_P_MAP* p_geting_map)
     m_pKinematics           =K;
     spGetingMap             =p_geting_map;
     //CBoneData& bone_data  = m_pKinematics->LL_GetData(0);
-    if(!m_spliter_holder) m_spliter_holder=xr_new<CPHShellSplitterHolder>(this);
+    if(!m_spliter_holder) m_spliter_holder=new CPHShellSplitterHolder(this);
     bool vis_check = false;
     AddElementRecursive(0,m_pKinematics->LL_GetBoneRoot(),Fidentity,0,&vis_check);
     //R_ASSERT2((*elements.begin())->numberOfGeoms(),"No physics shapes was assigned for model or no shapes in main root bone!!!");
@@ -678,7 +678,7 @@ void CPHShell::preBuild_FromKinematics(IKinematics* K,BONE_P_MAP* p_geting_map)
     m_pKinematics           =K;
     spGetingMap             =p_geting_map;
     //CBoneData& bone_data  = m_pKinematics->LL_GetData(0);
-    if(!m_spliter_holder) m_spliter_holder=xr_new<CPHShellSplitterHolder>(this);
+    if(!m_spliter_holder) m_spliter_holder=new CPHShellSplitterHolder(this);
     bool vis_check=false;
     AddElementRecursive(0,m_pKinematics->LL_GetBoneRoot(),Fidentity,0,&vis_check);
     //R_ASSERT2((*elements.begin())->numberOfGeoms(),"No physics shapes was assigned for model or no shapes in main root bone!!!");
@@ -1323,13 +1323,13 @@ void CPHShell::setElementSplitter(u16 element_number,u16 splitter_position)
 }
 void CPHShell::AddSplitter(CPHShellSplitter::EType type,u16 element,u16 joint)
 {
-    if(!m_spliter_holder) m_spliter_holder=xr_new<CPHShellSplitterHolder>(this);
+    if(!m_spliter_holder) m_spliter_holder=new CPHShellSplitterHolder(this);
     m_spliter_holder->AddSplitter(type,element,joint);
 }
 
 void CPHShell::AddSplitter(CPHShellSplitter::EType type,u16 element,u16 joint,u16 position)
 {
-    if(!m_spliter_holder) m_spliter_holder=xr_new<CPHShellSplitterHolder>(this);
+    if(!m_spliter_holder) m_spliter_holder=new CPHShellSplitterHolder(this);
     m_spliter_holder->AddSplitter(type,element,joint,position);
 }
 void CPHShell::setEndJointSplitter()
@@ -1605,7 +1605,7 @@ void CPHShell::CreateShellAnimator( CInifile const * ini, LPCSTR section )
 {   
     //Для фильтра коллизий относим данный объект к классу анимированных
     CPHCollideValidator::SetAnimatedClass(*this);
-    m_pPhysicsShellAnimatorC=xr_new<CPhysicsShellAnimator>( this,  ini, section );
+    m_pPhysicsShellAnimatorC=new CPhysicsShellAnimator( this,  ini, section );
     VERIFY( PhysicsRefObject( ) );
     PhysicsRefObject()->ObjectProcessingActivate();
     //m_pPhysicsShellAnimatorC->ResetCallbacks();

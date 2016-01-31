@@ -23,7 +23,7 @@ vision_client::vision_client					(CEntity *object, const u32 &update_interval) :
 {
 	VERIFY						(m_object);
 
-	m_visual					= xr_new<CVisualMemoryManager>(this);
+	m_visual					= new CVisualMemoryManager(this);
 
 	m_state						= 0;
 

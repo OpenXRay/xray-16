@@ -183,7 +183,7 @@
 #ifndef NO_XR_GAME
 	ENGINE_API					bool g_dedicated_server;
 #	define ADD(a,b,c,d)			add<a,b>(c,d)
-#	define ADD_MP(a,b,c,d,e,f)	add(xr_new<CObjectItemClientServerSingleMp<a,b,c,d> >(e,f))
+#	define ADD_MP(a,b,c,d,e,f)	add(new CObjectItemClientServerSingleMp<a,b,c,d>(e,f))
 #else
 #	define ADD(a,b,c,d)			add<b>(c,d)
 #endif

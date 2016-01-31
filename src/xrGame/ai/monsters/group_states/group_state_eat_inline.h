@@ -23,14 +23,14 @@
 TEMPLATE_SPECIALIZATION
 CStateGroupEatAbstract::CStateGroupEat(_Object *obj) : inherited(obj)
 {
-	add_state	(eStateEat_CorpseApproachRun,	xr_new<CStateMonsterMoveToPoint<_Object> >	(obj));
-	add_state	(eStateEat_CorpseApproachWalk,	xr_new<CStateMonsterMoveToPoint<_Object> >	(obj));
-	add_state	(eStateEat_CheckCorpse,			xr_new<CStateMonsterCustomAction<_Object> >	(obj));
-	add_state	(eStateEat_Eat,					xr_new<CStateGroupEating<_Object> >		(obj));
-	add_state	(eStateEat_WalkAway,			xr_new<CStateMonsterHideFromPoint<_Object> >(obj));
-	add_state	(eStateEat_Rest,				xr_new<CStateMonsterCustomAction<_Object> >	(obj));
-	add_state	(eStateEat_Drag,				xr_new<CStateGroupDrag<_Object> >				(obj));
-	add_state	(eStateCustom,					xr_new<CStateCustomGroup<_Object> >			(obj));
+	add_state	(eStateEat_CorpseApproachRun,	new CStateMonsterMoveToPoint<_Object>(obj));
+	add_state	(eStateEat_CorpseApproachWalk,	new CStateMonsterMoveToPoint<_Object>(obj));
+	add_state	(eStateEat_CheckCorpse,			new CStateMonsterCustomAction<_Object>(obj));
+	add_state	(eStateEat_Eat,					new CStateGroupEating<_Object>(obj));
+	add_state	(eStateEat_WalkAway,			new CStateMonsterHideFromPoint<_Object>(obj));
+	add_state	(eStateEat_Rest,				new CStateMonsterCustomAction<_Object>(obj));
+	add_state	(eStateEat_Drag,				new CStateGroupDrag<_Object>(obj));
+	add_state	(eStateCustom,					new CStateCustomGroup<_Object>(obj));
 }
 
 TEMPLATE_SPECIALIZATION

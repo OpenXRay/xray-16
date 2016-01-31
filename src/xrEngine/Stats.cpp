@@ -168,7 +168,7 @@ void CStats::OnDeviceCreate()
 {
     g_bDisableRedText = !!strstr(Core.Params, "-xclsx");
 #ifndef DEDICATED_SERVER
-    statsFont = xr_new<CGameFont>("stat_font", CGameFont::fsDeviceIndependent);
+    statsFont = new CGameFont("stat_font", CGameFont::fsDeviceIndependent);
 #endif
 #ifdef DEBUG
     if (!g_bDisableRedText)

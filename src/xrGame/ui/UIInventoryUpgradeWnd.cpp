@@ -48,9 +48,9 @@ CUIInventoryUpgradeWnd::Scheme::~Scheme()
 
 CUIInventoryUpgradeWnd::CUIInventoryUpgradeWnd()
 {
-	//m_WeaponIconsShader = xr_new<ui_shader>();
+	//m_WeaponIconsShader = new ui_shader();
 	//(*m_WeaponIconsShader)->create("hud\\default", "ui\\ui_actor_weapons");
-	//m_OutfitIconsShader = xr_new<ui_shader>();
+	//m_OutfitIconsShader = new ui_shader();
 	//(*m_OutfitIconsShader)->create("hud\\default", "ui\\ui_actor_armor");
 	m_inv_item       = NULL;
 	m_cur_upgrade_id = NULL;
@@ -75,17 +75,17 @@ void CUIInventoryUpgradeWnd::Init()
 	CUIXmlInit xml_init;
 	xml_init.InitWindow( uiXml, "main", 0, this );
 
-	m_item = xr_new<CUIStatic>();
+	m_item = new CUIStatic();
 	m_item->SetAutoDelete( true );
 	AttachChild( m_item );
 	xml_init.InitStatic( uiXml, "item_static", 0, m_item );
 	
-	m_back = xr_new<CUIWindow>();
+	m_back = new CUIWindow();
 	m_back->SetAutoDelete( true );
 	xml_init.InitWindow( uiXml, "back", 0, m_back );
 	AttachChild(m_back);
 
-	m_scheme_wnd = xr_new<CUIWindow>();
+	m_scheme_wnd = new CUIWindow();
 	m_scheme_wnd->SetAutoDelete( true );
 	AttachChild( m_scheme_wnd );
 	xml_init.InitWindow( uiXml, "scheme", 0, m_scheme_wnd );

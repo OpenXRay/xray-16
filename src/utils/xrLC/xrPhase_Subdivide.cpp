@@ -150,14 +150,14 @@ resplit:
 				}
 				
 				// Create _new deflectors
-				CDeflector*		D1	= xr_new<CDeflector>(); 
+				CDeflector*		D1	= new CDeflector(); 
 				//Deflector = D1;
 				D1->OA_Place(s1); 
 				D1->OA_Export();
 				lc_global_data()->g_deflectors().push_back(D1);
 
 				
-				CDeflector*		D2	= xr_new<CDeflector>(); 
+				CDeflector*		D2	= new CDeflector(); 
 				//Deflector		= D2;
 				D2->OA_Place(s2); 
 				D2->OA_Export(); 
@@ -167,8 +167,8 @@ resplit:
 			// Delete old SPLIT and push two new
 			xr_delete				(g_XSplit[X]);
 			g_XSplit.erase			(g_XSplit.begin()+X); X--;
-			g_XSplit.push_back		(xr_new<vecFace>(s1));	Detach(&s1);
-			g_XSplit.push_back		(xr_new<vecFace>(s2));	Detach(&s2);
+			g_XSplit.push_back		(new vecFace(s1));	Detach(&s1);
+			g_XSplit.push_back		(new vecFace(s2));	Detach(&s2);
 		}
 		s1.clear	();
 		s2.clear	();

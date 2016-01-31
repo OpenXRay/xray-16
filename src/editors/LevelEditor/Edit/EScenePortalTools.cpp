@@ -14,9 +14,9 @@
 void EScenePortalTool::CreateControls()
 {
     //	inherited::CreateControls();
-    AddControl(xr_new<TUI_ControlPortalSelect>(estDefault, etaSelect, this));
+    AddControl(new TUI_ControlPortalSelect(estDefault, etaSelect, this));
     // frame
-    pFrame = xr_new<TfraPortal>((TComponent*)0);
+    pFrame = new TfraPortal((TComponent*)0);
     ((TfraPortal*)pFrame)->tool = this;
 }
 
@@ -39,7 +39,7 @@ void EScenePortalTool::FillProp(LPCSTR pref, PropItemVec &items)
 
 CCustomObject *EScenePortalTool::CreateObject(LPVOID data, LPCSTR name)
 {
-    CCustomObject*O = xr_new<CPortal>(data, name);
+    CCustomObject*O = new CPortal(data, name);
     O->ParentTool = this;
     return O;
 }

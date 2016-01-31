@@ -34,7 +34,7 @@ void property_collection<manager::thunderbolt_container_type, manager>::display_
 template <>
 editor::property_holder* property_collection<manager::thunderbolt_container_type, manager>::create()
 {
-    thunderbolt* object = xr_new<thunderbolt>(&m_holder, generate_unique_id("thunderbolt_unique_id_").c_str());
+    thunderbolt* object = new thunderbolt(&m_holder, generate_unique_id("thunderbolt_unique_id_").c_str());
     object->fill(m_holder.environment(), this);
     return (object->object());
 }
@@ -48,7 +48,7 @@ void property_collection<manager::collection_container_type, manager>::display_n
 template <>
 editor::property_holder* property_collection<manager::collection_container_type, manager>::create()
 {
-    collection* object = xr_new<collection>(m_holder, generate_unique_id("thunderbolt_collection_unique_id_").c_str());
+    collection* object = new collection(m_holder, generate_unique_id("thunderbolt_collection_unique_id_").c_str());
     object->fill(this);
     return (object->object());
 }
@@ -61,8 +61,8 @@ manager::manager(::editor::environment::manager* environment) :
     m_property_holder(0),
     m_environment(*environment)
 {
-    m_thunderbolt_collection = xr_new<thunderbolt_collection_type>(&m_thunderbolts, this, &m_thunderbolts_changed);
-    m_collections_collection = xr_new<collection_collection_type>(&m_collections, this, &m_collections_changed);
+    m_thunderbolt_collection = new thunderbolt_collection_type(&m_thunderbolts, this, &m_thunderbolts_changed);
+    m_collections_collection = new collection_collection_type(&m_collections, this, &m_collections_changed);
 }
 
 manager::~manager()
@@ -88,7 +88,7 @@ void manager::load_thunderbolts()
 
     string_path file_name;
     CInifile* config =
-        xr_new<CInifile>(
+        new CInifile(
             FS.update_path(
                 file_name,
                 "$game_config$",
@@ -106,7 +106,7 @@ void manager::load_thunderbolts()
     sections_type::const_iterator e = sections.end();
     for (; i != e; ++i)
     {
-        thunderbolt* object = xr_new<thunderbolt>(this, (*i)->Name);
+        thunderbolt* object = new thunderbolt(this, (*i)->Name);
         object->load(*config);
         object->fill(m_environment, m_thunderbolt_collection);
         m_thunderbolts.push_back(object);
@@ -119,7 +119,7 @@ void manager::save_thunderbolts()
 {
     string_path file_name;
     CInifile* config =
-        xr_new<CInifile>(
+        new CInifile(
             FS.update_path(
                 file_name,
                 "$game_config$",
@@ -144,7 +144,7 @@ void manager::load_collections()
 
     string_path file_name;
     CInifile* config =
-        xr_new<CInifile>(
+        new CInifile(
             FS.update_path(
                 file_name,
                 "$game_config$",
@@ -162,7 +162,7 @@ void manager::load_collections()
     sections_type::const_iterator e = sections.end();
     for (; i != e; ++i)
     {
-        collection* object = xr_new<collection>(*this, (*i)->Name);
+        collection* object = new collection(*this, (*i)->Name);
         object->load(*config);
         object->fill(m_thunderbolt_collection);
         m_collections.push_back(object);
@@ -175,7 +175,7 @@ void manager::save_collections()
 {
     string_path file_name;
     CInifile* config =
-        xr_new<CInifile>(
+        new CInifile(
             FS.update_path(
                 file_name,
                 "$game_config$",
@@ -207,7 +207,7 @@ void manager::save()
 
     string_path file_name;
     CInifile* config =
-        xr_new<CInifile>(
+        new CInifile(
             FS.update_path(
                 file_name,
                 "$game_config$",

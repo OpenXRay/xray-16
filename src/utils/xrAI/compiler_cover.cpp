@@ -347,7 +347,7 @@ void compute_cover_nodes	()
 	Fbox					aabb;
 	CalculateHeight			(aabb);
 	VERIFY					(!g_covers);
-	g_covers				= xr_new<CPointQuadTree>(aabb,g_params.fPatchSize*.5f,8*65536,4*65536);
+	g_covers				= new CPointQuadTree(aabb,g_params.fPatchSize*.5f,8*65536,4*65536);
 
 	g_cover_nodes.assign	(g_nodes.size(),false);
 
@@ -359,7 +359,7 @@ void compute_cover_nodes	()
 			continue;
 
 		*J					= true;
-		g_covers->insert	(xr_new<CCoverPoint>((*I).Pos, u32(I - B)));
+		g_covers->insert	(new CCoverPoint((*I).Pos, u32(I - B)));
 	}
 }
 
@@ -428,7 +428,7 @@ void compute_non_covers		()
 		Fbox					aabb;
 		CalculateHeight			(aabb);
 		VERIFY					(!g_covers);
-		g_covers				= xr_new<CPointQuadTree>(aabb,g_params.fPatchSize*.5f,8*65536,4*65536);
+		g_covers				= new CPointQuadTree(aabb,g_params.fPatchSize*.5f,8*65536,4*65536);
 
 		Nodes::iterator			B = g_nodes.begin(), I = B;
 		Nodes::iterator			E = g_nodes.end();
@@ -442,7 +442,7 @@ void compute_non_covers		()
 					continue;
 			}
 
-			g_covers->insert	(xr_new<CCoverPoint>((*I).Pos, u32(I - B)));
+			g_covers->insert	(new CCoverPoint((*I).Pos, u32(I - B)));
 		}
 
 		VERIFY					(g_covers->size());
@@ -548,7 +548,7 @@ void	xrCover	(bool pure_covers)
 	u32	stride			= g_nodes.size()/NUM_THREADS;
 	u32	last			= g_nodes.size()-stride*(NUM_THREADS-1);
 	for (u32 thID=0; thID<NUM_THREADS; thID++)
-		Threads.start(xr_new<CoverThread>(thID,thID*stride,thID*stride+((thID==(NUM_THREADS-1))?last:stride)));
+		Threads.start(new CoverThread(thID,thID*stride,thID*stride+((thID==(NUM_THREADS-1))?last:stride)));
 	Threads.wait			();
 	Msg("%d seconds elapsed.",(timeGetTime()-start_time)/1000);
 

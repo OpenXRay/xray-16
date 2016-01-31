@@ -9,7 +9,7 @@
 
 CAI_Flesh::CAI_Flesh()
 {
-	StateMan = xr_new<CStateManagerFlesh>(this);
+	StateMan = new CStateManagerFlesh(this);
 	
 	m_fEyeShiftYaw		= PI_DIV_6;
 

@@ -322,7 +322,7 @@ void CSHEngineTools::Load()
             while (fs&&!fs->eof())
             {
                 fs->r_stringZ(name, sizeof(name));
-                CConstant *C = xr_new<CConstant>();
+                CConstant *C = new CConstant();
                 C->Load(fs);
                 m_Constants.insert(mk_pair(xr_strdup(name), C));
             }
@@ -335,7 +335,7 @@ void CSHEngineTools::Load()
             while (fs&&!fs->eof())
             {
                 fs->r_stringZ(name, sizeof(name));
-                CMatrix *M = xr_new<CMatrix>();
+                CMatrix *M = new CMatrix();
                 M->Load(fs);
                 m_Matrices.insert(mk_pair(xr_strdup(name), M));
             }
@@ -682,7 +682,7 @@ void CSHEngineTools::AddConstantRef(LPSTR name)
 
 LPCSTR CSHEngineTools::AppendConstant(CConstant *src, CConstant **dest)
 {
-    CConstant *C = xr_new<CConstant>();
+    CConstant *C = new CConstant();
     if (src)
         *C = *src;
     C->dwReference = 1;
@@ -696,7 +696,7 @@ LPCSTR CSHEngineTools::AppendConstant(CConstant *src, CConstant **dest)
 
 LPCSTR CSHEngineTools::AppendMatrix(CMatrix *src, CMatrix **dest)
 {
-    CMatrix *M = xr_new<CMatrix>();
+    CMatrix *M = new CMatrix();
     if (src)
         *M = *src;
     M->dwReference = 1;
@@ -830,7 +830,7 @@ void CSHEngineTools::CollapseMatrix(LPSTR name)
         }
     }
     // append new optimized matrix
-    CMatrix *N = xr_new<CMatrix>(*M);
+    CMatrix *N = new CMatrix(*M);
     N->dwReference = 1;
     m_OptMatrices.insert(mk_pair(xr_strdup(name), N));
 }
@@ -853,7 +853,7 @@ void CSHEngineTools::CollapseConstant(LPSTR name)
         }
     }
     // append opt constant
-    CConstant *N = xr_new<CConstant>(*C);
+    CConstant *N = new CConstant(*C);
     N->dwReference = 1;
     m_OptConstants.insert(mk_pair(xr_strdup(name), N));
 }

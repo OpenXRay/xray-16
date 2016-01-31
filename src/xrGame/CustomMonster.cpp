@@ -772,7 +772,7 @@ BOOL CCustomMonster::net_Spawn	(CSE_Abstract* DC)
 	shedule.t_min				= 100;
 	shedule.t_max				= 250; // This equaltiy is broken by Dima :-( // 30 * NET_Latency / 4;
 
-	m_moving_object				= xr_new<moving_object>(this);
+	m_moving_object				= new moving_object(this);
 
 	return TRUE;
 }
@@ -961,17 +961,17 @@ float CCustomMonster::evaluate		(const CDangerManager *manager, const CDangerObj
 
 CMovementManager *CCustomMonster::create_movement_manager	()
 {
-	return	(xr_new<CMovementManager>(this));
+	return	(new CMovementManager(this));
 }
 
 CSound_UserDataVisitor *CCustomMonster::create_sound_visitor		()
 {
-	return	(m_sound_user_data_visitor	= xr_new<CSound_UserDataVisitor>());
+	return	(m_sound_user_data_visitor	= new CSound_UserDataVisitor());
 }
 
 CMemoryManager *CCustomMonster::create_memory_manager		()
 {
-	return	(xr_new<CMemoryManager>(this,create_sound_visitor()));
+	return	(new CMemoryManager(this,create_sound_visitor()));
 }
 
 const SRotation CCustomMonster::Orientation	() const
@@ -988,7 +988,7 @@ IFactoryObject *CCustomMonster::_construct()
 {
 	m_memory_manager			= create_memory_manager();
 	m_movement_manager			= create_movement_manager();
-	m_sound_player				= xr_new<CSoundPlayer>(this);
+	m_sound_player				= new CSoundPlayer(this);
 
 	inherited::_construct		();
 	CScriptEntity::_construct	();

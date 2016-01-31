@@ -15,13 +15,13 @@ void	game_cl_mp::LoadSndMessage			(LPCSTR caSection, LPCSTR caLine, u32 ID)
 	string4096 Name, Prior;
 	_GetItem(Line, 0, Name);
 	_GetItem(Line, 1, Prior);
-	m_pSndMessages.push_back( xr_new<SND_Message>());
+	m_pSndMessages.push_back( new SND_Message());
 	m_pSndMessages.back()->Load(ID, atol(Prior), Name);
 }
 
 void game_cl_mp::AddSoundMessage(LPCSTR sound_name, u32 const sound_priority, u32 const soundID)
 {
-	m_pSndMessages.push_back(xr_new<SND_Message>());
+	m_pSndMessages.push_back(new SND_Message());
 	m_pSndMessages.back()->Load(soundID, sound_priority, sound_name);
 }
 

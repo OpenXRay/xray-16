@@ -35,7 +35,7 @@ net_task_manager *g_net_task_manager = 0;
 }
  void				  create_net_task_manager()
 {
-	g_net_task_manager = xr_new<net_task_manager>();
+	g_net_task_manager = new net_task_manager();
 }
  void				  destroy_net_task_manager()
 {
@@ -93,7 +93,7 @@ void net_task_manager::create_global_data_write( LPCSTR save_path )
 #endif
 
 #ifndef LOAD_GL_DATA
-	//gl_data_write = xr_new<INetFileBuffWriter>( "tmp_global_data", 1024*1024/2,false);
+	//gl_data_write = new INetFileBuffWriter( "tmp_global_data", 1024*1024/2,false);
 	//inlc_global_data()->write( *gl_data_write );
 	//gl_data_write->w_close();
 
@@ -107,7 +107,7 @@ void net_task_manager::create_global_data_write( LPCSTR save_path )
 	//string_path bin_path;
 	//FS.update_path( bin_path,"$app_root$", gl_data_net_file_name );
 	
-	//g_net_data = xr_new<CVirtualFileRW>(global_data_file_name);
+	//g_net_data = new CVirtualFileRW(global_data_file_name);
 	
 	// dbg_buf = Memory.mem_alloc( 560000000, "dbg_buf" );
 ////////////////
@@ -128,11 +128,11 @@ void net_task_manager::create_global_data_write( LPCSTR save_path )
 ///////////////
 	clMsg( "create_global_data_write:  end" );
 #else
-	//gl_data_write = xr_new<INetFileBuffWriter>( "tmp_global_data", 1024*1024/2,true);
+	//gl_data_write = new INetFileBuffWriter( "tmp_global_data", 1024*1024/2,true);
 	//gl_data_write->w_close();
 	 string_path			 lfile_name;
 	 FS.update_path		( lfile_name, "$level$", "tmp_global_data" );
-	 g_net_data = xr_new<CVirtualFileRW>(lfile_name);
+	 g_net_data = new CVirtualFileRW(lfile_name);
 #endif
 
 	
@@ -272,7 +272,7 @@ void net_task_manager::receive(  INetReader& r )
 	VERIFY(inlc_global_data());
 	//inlc_global_data()->create_read_faces();
 #ifdef NET_CMP
-	CDeflector * netD	=xr_new<CDeflector>();
+	CDeflector * netD	=new CDeflector();
 	CDeflector *D		=inlc_global_data()->g_deflectors()[id];
 	netD->read( r );
 	if(!netD->similar(*D))

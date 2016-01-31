@@ -384,7 +384,7 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
 			strconcat			(sizeof(anm_name),anm_name,"camera_effects\\weapon\\", M.name.c_str(),".anm");
 			if (FS.exist( ce_path, "$game_anims$", anm_name))
 			{
-				CAnimatorCamEffector* e		= xr_new<CAnimatorCamEffector>();
+				CAnimatorCamEffector* e		= new CAnimatorCamEffector();
 				e->SetType					(eCEWeaponAction);
 				e->SetHudAffect				(false);
 				e->SetCyclic				(false);
@@ -663,7 +663,7 @@ attachable_hud_item* player_hud::create_hud_item(const shared_str& sect)
 		if(itm->m_sect_name==sect)
 			return itm;
 	}
-	attachable_hud_item* res	= xr_new<attachable_hud_item>(this);
+	attachable_hud_item* res	= new attachable_hud_item(this);
 	res->load					(sect);
 	res->m_hand_motions.load	(m_model, sect);
 	m_pool.push_back			(res);

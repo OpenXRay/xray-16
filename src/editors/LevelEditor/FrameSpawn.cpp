@@ -81,7 +81,7 @@ void TfraSpawn::OnDrawObjectThumbnail(LPCSTR name, HDC hdc, const Irect &r)
     if (pSettings->line_exist(sect, "visual"))
     {
         const shared_str &visual = pSettings->r_string(sect, "visual");
-        EObjectThumbnail *thm = xr_new<EObjectThumbnail>(visual.c_str());
+        EObjectThumbnail *thm = new EObjectThumbnail(visual.c_str());
         thm->Draw(hdc, r);
         xr_delete(thm);
     }

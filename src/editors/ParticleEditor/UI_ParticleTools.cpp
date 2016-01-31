@@ -55,7 +55,7 @@ CParticleTool::~CParticleTool()
 
 bool CParticleTool::OnCreate()
 {
-    fmItemProp = xr_new<TfmItemProp>((TComponent*)NULL);
+    fmItemProp = new TfmItemProp((TComponent*)NULL);
     fmItemProp->Visible = true;
 
     m_bReady = true;
@@ -86,7 +86,7 @@ bool CParticleTool::OnCreate()
     m_PList->SetOnItemRemoveEvent(fastdelegate::bind<TOnItemRemove>(this, &CParticleTool::OnParticleItemRemove));
     m_PList->SetImages(fraLeftBar->ilModeIcons);
 
-    m_ParentAnimator = xr_new<CObjectAnimator>();
+    m_ParentAnimator = new CObjectAnimator();
 
     return true;
 }
@@ -435,7 +435,7 @@ CCommandVar CParticleTool::CreateGroupFromSelected(CCommandVar p1, CCommandVar p
     pg->m_Name = grp_name.c_str();
 
     pg->m_fTimeLimit = 0.0f;
-    PS::CPGDef::SEffect *eff = xr_new<PS::CPGDef::SEffect>();
+    PS::CPGDef::SEffect *eff = new PS::CPGDef::SEffect();
     pg->m_Effects.push_back(eff);
     eff->m_EffectName = eff_name;
 

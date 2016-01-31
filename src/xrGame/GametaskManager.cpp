@@ -39,7 +39,7 @@ bool task_prio_pred(const SGameTaskKey& k1, const SGameTaskKey& k2)
 
 CGameTaskManager::CGameTaskManager()
 {
-	m_gametasks_wrapper			= xr_new<CGameTaskWrapper>();
+	m_gametasks_wrapper			= new CGameTaskWrapper();
 	m_gametasks_wrapper->registry().init(0);// actor's id
 	m_flags.zero				();
 	m_flags.set					(eChanged, TRUE);

@@ -9,7 +9,7 @@
 
 CCat::CCat()
 {
-	StateMan = xr_new<CStateManagerCat>		(this);
+	StateMan = new CStateManagerCat		(this);
 }
 
 CCat::~CCat()

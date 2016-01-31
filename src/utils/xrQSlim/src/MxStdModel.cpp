@@ -46,7 +46,7 @@ MxVertexID MxStdModel::alloc_vertex(float x, float y, float z)
 	v_data(id).user_tag = 0x0;
 	vertex_mark_valid(id);
 
-	face_links.add(xr_new<MxFaceList>());
+	face_links.add(new MxFaceList());
 	unsigned int l = face_links.last_id();
 	VERIFY( l == id );
 	VERIFY( neighbors(id).length() == 0 );
@@ -86,7 +86,7 @@ void MxStdModel::init_face(MxFaceID id)
 
 MxStdModel *MxStdModel::clone()
 {
-	MxStdModel *m = xr_new<MxStdModel>(vert_count(), face_count());
+	MxStdModel *m = new MxStdModel(vert_count(), face_count());
 	// ??BUG: Current flags/marks won't be copied.  Is this the
 	//        behavior we want?
 	MxBlockModel::clone(m);

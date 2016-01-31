@@ -34,14 +34,14 @@ void CUIGameTDM::Init (int stage)
 {
 	if(stage==0)
 	{ //shared
-		m_pUITeamSelectWnd				= xr_new<CUISpawnWnd>	();
-		m_team1_icon					= xr_new<CUIStatic>();
-		m_team2_icon					= xr_new<CUIStatic>();
-		m_team1_score					= xr_new<CUITextWnd>();
+		m_pUITeamSelectWnd				= new CUISpawnWnd	();
+		m_team1_icon					= new CUIStatic();
+		m_team2_icon					= new CUIStatic();
+		m_team1_score					= new CUITextWnd();
 		m_team1_score->SetAutoDelete	(true);
-		m_team2_score					= xr_new<CUITextWnd>();
+		m_team2_score					= new CUITextWnd();
 		m_team2_score->SetAutoDelete	(true);
-		m_buy_msg_caption				= xr_new<CUITextWnd>();
+		m_buy_msg_caption				= new CUITextWnd();
 		m_buy_msg_caption->SetAutoDelete(true);
 
 		inherited::Init					(stage);

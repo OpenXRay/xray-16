@@ -928,7 +928,7 @@ void D3DXRenderBase::Create(HWND hWnd, u32 &dwWidth, u32 &dwHeight,
 #endif
 	fWidth_2 = float(dwWidth/2);
 	fHeight_2 = float(dwHeight/2);
-	Resources = xr_new<CResourceManager>();
+	Resources = new CResourceManager();
 }
 
 void D3DXRenderBase::SetupGPU(bool bForceGPU_SW, bool bForceGPU_NonPure, bool bForceGPU_REF)

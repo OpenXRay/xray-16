@@ -117,7 +117,7 @@ bool CLight::LoadLTX(CInifile &ini, LPCSTR sect_name)
 
     if (m_Flags.is(ELight::flPointFuzzy))
     {
-        m_FuzzyData = xr_new<SFuzzyData>();
+        m_FuzzyData = new SFuzzyData();
         m_FuzzyData->LoadLTX(ini, sect_name);
     }
 
@@ -230,7 +230,7 @@ bool CLight::LoadStream(IReader &F)
 
     if (F.find_chunk(LIGHT_CHUNK_FUZZY_DATA))
     {
-        m_FuzzyData = xr_new<SFuzzyData>();
+        m_FuzzyData = new SFuzzyData();
         m_FuzzyData->LoadStream(F);
         m_Flags.set(ELight::flPointFuzzy, TRUE);
     }

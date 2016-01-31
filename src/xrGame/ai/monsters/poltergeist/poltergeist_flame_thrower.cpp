@@ -85,7 +85,7 @@ void CPolterFlame::create_flame(const IGameObject *target_object)
 	Fvector position;
 	if (!get_valid_flame_position(target_object, position)) return;
 
-	SFlameElement *element			= xr_new<SFlameElement>();
+	SFlameElement *element			= new SFlameElement();
 	
 	element->position				= position;
 	element->target_object			= target_object;

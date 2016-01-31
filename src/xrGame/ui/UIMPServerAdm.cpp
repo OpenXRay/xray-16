@@ -10,210 +10,210 @@
 
 CUIMpServerAdm::CUIMpServerAdm()
 {
-	m_pBackBtn = xr_new<CUI3tButton>();
+	m_pBackBtn = new CUI3tButton();
 	m_pBackBtn->SetAutoDelete(true);
 	AttachChild(m_pBackBtn);
 	m_pBackBtn->Show(false);
 
-	m_pMainSelectionWnd = xr_new<CUIWindow>();
+	m_pMainSelectionWnd = new CUIWindow();
 	m_pMainSelectionWnd->SetAutoDelete(true);
 	AttachChild(m_pMainSelectionWnd);
 
-	m_pRestartBtn = xr_new<CUI3tButton>();
+	m_pRestartBtn = new CUI3tButton();
 	m_pRestartBtn->SetAutoDelete(true);
 	m_pMainSelectionWnd->AttachChild(m_pRestartBtn);
 	m_pRestartBtn->SetMessageTarget(this);
 
-	m_pFastRestartBtn = xr_new<CUI3tButton>();
+	m_pFastRestartBtn = new CUI3tButton();
 	m_pFastRestartBtn->SetAutoDelete(true);
 	m_pMainSelectionWnd->AttachChild(m_pFastRestartBtn);
 	m_pFastRestartBtn->SetMessageTarget(this);
 
-	m_pChangeWeatherBtn = xr_new<CUI3tButton>();
+	m_pChangeWeatherBtn = new CUI3tButton();
 	m_pChangeWeatherBtn->SetAutoDelete(true);
 	m_pMainSelectionWnd->AttachChild(m_pChangeWeatherBtn);
 	m_pChangeWeatherBtn->SetMessageTarget(this);
 
-	m_pChangeGameTypeBtn = xr_new<CUI3tButton>();
+	m_pChangeGameTypeBtn = new CUI3tButton();
 	m_pChangeGameTypeBtn->SetAutoDelete(true);
 	m_pMainSelectionWnd->AttachChild(m_pChangeGameTypeBtn);
 	m_pChangeGameTypeBtn->SetMessageTarget(this);
 
-	m_pChangeGameLimitsBtn = xr_new<CUI3tButton>();
+	m_pChangeGameLimitsBtn = new CUI3tButton();
 	m_pChangeGameLimitsBtn->SetAutoDelete(true);
 	m_pMainSelectionWnd->AttachChild(m_pChangeGameLimitsBtn);
 	m_pChangeGameLimitsBtn->SetMessageTarget(this);
 	
-	m_pVoteStopBtn = xr_new<CUI3tButton>();
+	m_pVoteStopBtn = new CUI3tButton();
 	m_pVoteStopBtn->SetAutoDelete(true);
 	m_pMainSelectionWnd->AttachChild(m_pVoteStopBtn);
 	m_pVoteStopBtn->SetMessageTarget(this);
 
-	m_pWeatherSelectionWnd = xr_new<CUIWindow>();
+	m_pWeatherSelectionWnd = new CUIWindow();
 	m_pWeatherSelectionWnd->SetAutoDelete(true);
 	AttachChild(m_pWeatherSelectionWnd);
 
-	m_pClearWeatherBtn = xr_new<CUI3tButton>();
+	m_pClearWeatherBtn = new CUI3tButton();
 	m_pClearWeatherBtn->SetAutoDelete(true);
 	m_pWeatherSelectionWnd->AttachChild(m_pClearWeatherBtn);
 	m_pClearWeatherBtn->SetMessageTarget(this);
 
-	m_pCloudyWeatherBtn = xr_new<CUI3tButton>();
+	m_pCloudyWeatherBtn = new CUI3tButton();
 	m_pCloudyWeatherBtn->SetAutoDelete(true);
 	m_pWeatherSelectionWnd->AttachChild(m_pCloudyWeatherBtn);
 	m_pCloudyWeatherBtn->SetMessageTarget(this);
 
-	m_pRainWeatherBtn = xr_new<CUI3tButton>();
+	m_pRainWeatherBtn = new CUI3tButton();
 	m_pRainWeatherBtn->SetAutoDelete(true);
 	m_pWeatherSelectionWnd->AttachChild(m_pRainWeatherBtn);
 	m_pRainWeatherBtn->SetMessageTarget(this);
 
-	m_pNightWeatherBtn = xr_new<CUI3tButton>();
+	m_pNightWeatherBtn = new CUI3tButton();
 	m_pNightWeatherBtn->SetAutoDelete(true);
 	m_pWeatherSelectionWnd->AttachChild(m_pNightWeatherBtn);
 	m_pNightWeatherBtn->SetMessageTarget(this);
 
-	m_pWeatherChangeRateSpin = xr_new<CUISpinNum>();
+	m_pWeatherChangeRateSpin = new CUISpinNum();
 	m_pWeatherChangeRateSpin->SetAutoDelete(true);
 	m_pWeatherSelectionWnd->AttachChild(m_pWeatherChangeRateSpin);
 
-	m_pWeatherChangeRateBtn = xr_new<CUI3tButton>();
+	m_pWeatherChangeRateBtn = new CUI3tButton();
 	m_pWeatherChangeRateBtn->SetAutoDelete(true);
 	m_pWeatherSelectionWnd->AttachChild(m_pWeatherChangeRateBtn);
 	m_pWeatherChangeRateBtn->SetMessageTarget(this);
 	m_pWeatherSelectionWnd->Show(false);
 
-	m_pGameTypeSelectionWnd = xr_new<CUIWindow>();
+	m_pGameTypeSelectionWnd = new CUIWindow();
 	m_pGameTypeSelectionWnd->SetAutoDelete(true);
 	AttachChild(m_pGameTypeSelectionWnd);
 
-	m_pDMBtn = xr_new<CUI3tButton>();
+	m_pDMBtn = new CUI3tButton();
 	m_pDMBtn->SetAutoDelete(true);
 	m_pGameTypeSelectionWnd->AttachChild(m_pDMBtn);
 	m_pDMBtn->SetMessageTarget(this);
 
-	m_pTDMBtn = xr_new<CUI3tButton>();
+	m_pTDMBtn = new CUI3tButton();
 	m_pTDMBtn->SetAutoDelete(true);
 	m_pGameTypeSelectionWnd->AttachChild(m_pTDMBtn);
 	m_pTDMBtn->SetMessageTarget(this);
 
-	m_pCTABtn = xr_new<CUI3tButton>();
+	m_pCTABtn = new CUI3tButton();
 	m_pCTABtn->SetAutoDelete(true);
 	m_pGameTypeSelectionWnd->AttachChild(m_pCTABtn);
 	m_pCTABtn->SetMessageTarget(this);
 
-	m_pAHBtn = xr_new<CUI3tButton>();
+	m_pAHBtn = new CUI3tButton();
 	m_pAHBtn->SetAutoDelete(true);
 	m_pGameTypeSelectionWnd->AttachChild(m_pAHBtn);
 	m_pAHBtn->SetMessageTarget(this);
 	m_pGameTypeSelectionWnd->Show(false);
 
-	m_pGameLimitsSelectionWnd = xr_new<CUIWindow>();
+	m_pGameLimitsSelectionWnd = new CUIWindow();
 	m_pGameLimitsSelectionWnd->SetAutoDelete(true);
 	AttachChild(m_pGameLimitsSelectionWnd);
 
-	m_pSetTimeLimitBtn = xr_new<CUI3tButton>();
+	m_pSetTimeLimitBtn = new CUI3tButton();
 	m_pSetTimeLimitBtn->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pSetTimeLimitBtn);
 	m_pSetTimeLimitBtn->SetMessageTarget(this);
-	m_pTimeLimitEdit = xr_new<CUIEditBox>();
+	m_pTimeLimitEdit = new CUIEditBox();
 	m_pTimeLimitEdit->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pTimeLimitEdit);
 
-	m_pSetFragLimitBtn = xr_new<CUI3tButton>();
+	m_pSetFragLimitBtn = new CUI3tButton();
 	m_pSetFragLimitBtn->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pSetFragLimitBtn);
 	m_pSetFragLimitBtn->SetMessageTarget(this);
-	m_pFragLimitEdit = xr_new<CUIEditBox>();
+	m_pFragLimitEdit = new CUIEditBox();
 	m_pFragLimitEdit->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pFragLimitEdit);
 
-	m_pSetArtLimitBtn = xr_new<CUI3tButton>();
+	m_pSetArtLimitBtn = new CUI3tButton();
 	m_pSetArtLimitBtn->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pSetArtLimitBtn);
 	m_pSetArtLimitBtn->SetMessageTarget(this);
-	m_pArtLimitEdit = xr_new<CUIEditBox>();
+	m_pArtLimitEdit = new CUIEditBox();
 	m_pArtLimitEdit->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pArtLimitEdit);
 
-	m_pSetWarmUpBtn = xr_new<CUI3tButton>();
+	m_pSetWarmUpBtn = new CUI3tButton();
 	m_pSetWarmUpBtn->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pSetWarmUpBtn);
 	m_pSetWarmUpBtn->SetMessageTarget(this);
-	m_pWarmUpEdit = xr_new<CUIEditBox>();
+	m_pWarmUpEdit = new CUIEditBox();
 	m_pWarmUpEdit->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pWarmUpEdit);
 
-	m_pSpectatorFECheck = xr_new<CUICheckButton>();
+	m_pSpectatorFECheck = new CUICheckButton();
 	m_pSpectatorFECheck->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pSpectatorFECheck);
 	m_pSpectatorFECheck->SetMessageTarget(this);
 
-	m_pSpectatorFFCheck = xr_new<CUICheckButton>();
+	m_pSpectatorFFCheck = new CUICheckButton();
 	m_pSpectatorFFCheck->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pSpectatorFFCheck);
 	m_pSpectatorFFCheck->SetMessageTarget(this);
 
-	m_pSpectatorFLCheck = xr_new<CUICheckButton>();
+	m_pSpectatorFLCheck = new CUICheckButton();
 	m_pSpectatorFLCheck->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pSpectatorFLCheck);
 	m_pSpectatorFLCheck->SetMessageTarget(this);
 
-	m_pSpectatorLACheck = xr_new<CUICheckButton>();
+	m_pSpectatorLACheck = new CUICheckButton();
 	m_pSpectatorLACheck->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pSpectatorLACheck);
 	m_pSpectatorLACheck->SetMessageTarget(this);
 
-	m_pSpectatorTCCheck = xr_new<CUICheckButton>();
+	m_pSpectatorTCCheck = new CUICheckButton();
 	m_pSpectatorTCCheck->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pSpectatorTCCheck);
 	m_pSpectatorTCCheck->SetMessageTarget(this);
 
-	m_pInvincibleTimeEdit = xr_new<CUIEditBox>();
+	m_pInvincibleTimeEdit = new CUIEditBox();
 	m_pInvincibleTimeEdit->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pInvincibleTimeEdit);
-	m_pSetInvincibleTimeBtn = xr_new<CUI3tButton>();
+	m_pSetInvincibleTimeBtn = new CUI3tButton();
 	m_pSetInvincibleTimeBtn->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pSetInvincibleTimeBtn);
 	m_pSetInvincibleTimeBtn->SetMessageTarget(this);
 
-	m_pDamageBlockTimeEdit = xr_new<CUIEditBox>();
+	m_pDamageBlockTimeEdit = new CUIEditBox();
 	m_pDamageBlockTimeEdit->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pDamageBlockTimeEdit);
-	m_pSetDamageBlockTimeBtn = xr_new<CUI3tButton>();
+	m_pSetDamageBlockTimeBtn = new CUI3tButton();
 	m_pSetDamageBlockTimeBtn->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pSetDamageBlockTimeBtn);
 	m_pSetDamageBlockTimeBtn->SetMessageTarget(this);
 
-	m_pReinforcementTimeEdit = xr_new<CUIEditBox>();
+	m_pReinforcementTimeEdit = new CUIEditBox();
 	m_pReinforcementTimeEdit->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pReinforcementTimeEdit);
-	m_pSetReinforcementTimeBtn = xr_new<CUI3tButton>();
+	m_pSetReinforcementTimeBtn = new CUI3tButton();
 	m_pSetReinforcementTimeBtn->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pSetReinforcementTimeBtn);
 	m_pSetReinforcementTimeBtn->SetMessageTarget(this);
 
-	m_pVoteEnabledCheck = xr_new<CUICheckButton>();
+	m_pVoteEnabledCheck = new CUICheckButton();
 	m_pVoteEnabledCheck->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pVoteEnabledCheck);
 	m_pVoteEnabledCheck->SetMessageTarget(this);
 
-	m_pDamBlockIndicCheck = xr_new<CUICheckButton>();
+	m_pDamBlockIndicCheck = new CUICheckButton();
 	m_pDamBlockIndicCheck->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pDamBlockIndicCheck);
 	m_pDamBlockIndicCheck->SetMessageTarget(this);
 
-	m_pFriendlyNamesCheck = xr_new<CUICheckButton>();
+	m_pFriendlyNamesCheck = new CUICheckButton();
 	m_pFriendlyNamesCheck->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pFriendlyNamesCheck);
 	m_pFriendlyNamesCheck->SetMessageTarget(this);
 
-	m_pFriendlyIndicCheck = xr_new<CUICheckButton>();
+	m_pFriendlyIndicCheck = new CUICheckButton();
 	m_pFriendlyIndicCheck->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pFriendlyIndicCheck);
 	m_pFriendlyIndicCheck->SetMessageTarget(this);
 
-	m_pBearerCantSprintCheck = xr_new<CUICheckButton>();
+	m_pBearerCantSprintCheck = new CUICheckButton();
 	m_pBearerCantSprintCheck->SetAutoDelete(true);
 	m_pGameLimitsSelectionWnd->AttachChild(m_pBearerCantSprintCheck);
 	m_pBearerCantSprintCheck->SetMessageTarget(this);

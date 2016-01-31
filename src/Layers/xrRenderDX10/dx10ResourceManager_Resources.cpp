@@ -75,7 +75,7 @@ SState*		CResourceManager::_CreateState		(SimulatorStates& state_code)
 	}
 
 	// Create New
-	v_states.push_back				(xr_new<SState>());
+	v_states.push_back				(new SState());
 	v_states.back()->dwFlags		|= xr_resource_flagged::RF_REGISTERED;
 #if defined(USE_DX10) || defined(USE_DX11)
 	v_states.back()->state			= ID3DState::Create(state_code);
@@ -99,7 +99,7 @@ SPass*		CResourceManager::_CreatePass			(const SPass& proto)
 		if (v_passes[it]->equal(proto))
 			return v_passes[it];
 
-	SPass*	P					=	xr_new<SPass>();
+	SPass*	P					=	new SPass();
 	P->dwFlags					|=	xr_resource_flagged::RF_REGISTERED;
 	P->state					=	proto.state;
 	P->ps						=	proto.ps;
@@ -143,7 +143,7 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 	if (I!=m_vs.end())	return I->second;
 	else
 	{
-		SVS*	_vs					= xr_new<SVS>	();
+		SVS*	_vs					= new SVS	();
 		_vs->dwFlags				|= xr_resource_flagged::RF_REGISTERED;
 		m_vs.insert					(mk_pair(_vs->set_name(name),_vs));
 		//_vs->vs				= NULL;
@@ -248,7 +248,7 @@ SPS*	CResourceManager::_CreatePS			(LPCSTR _name)
 	if (I!=m_ps.end())	return		I->second;
 	else
 	{
-		SPS*	_ps					=	xr_new<SPS>	();
+		SPS*	_ps					=	new SPS	();
 		_ps->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
 		m_ps.insert					(mk_pair(_ps->set_name(name),_ps));
 		if (0==stricmp(_name,"null"))	{
@@ -332,7 +332,7 @@ SGS*	CResourceManager::_CreateGS			(LPCSTR name)
 	if (I!=m_gs.end())	return		I->second;
 	else
 	{
-		SGS*	_gs					=	xr_new<SGS>	();
+		SGS*	_gs					=	new SGS	();
 		_gs->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
 		m_gs.insert					(mk_pair(_gs->set_name(name),_gs));
 		if (0==stricmp(name,"null"))	{
@@ -412,7 +412,7 @@ SDeclaration*	CResourceManager::_CreateDecl	(D3DVERTEXELEMENT9* dcl)
 	}
 
 	// Create _new
-	SDeclaration* D			= xr_new<SDeclaration>();
+	SDeclaration* D			= new SDeclaration();
 	u32 dcl_size			= D3DXGetDeclLength(dcl)+1;
 	//	Don't need it for DirectX 10 here
 	//CHK_DX					(HW.pDevice->CreateVertexDeclaration(dcl,&D->dcl));
@@ -437,7 +437,7 @@ R_constant_table*	CResourceManager::_CreateConstantTable	(R_constant_table& C)
 
 	for (u32 it=0; it<v_constant_tables.size(); it++)
 		if (v_constant_tables[it]->equal(C))	return v_constant_tables[it];
-	v_constant_tables.push_back			(xr_new<R_constant_table>(C));
+	v_constant_tables.push_back			(new R_constant_table(C));
 	v_constant_tables.back()->dwFlags	|=	xr_resource_flagged::RF_REGISTERED;
 	return v_constant_tables.back		();
 }
@@ -463,7 +463,7 @@ CRT*	CResourceManager::_CreateRT		(LPCSTR Name, u32 w, u32 h,	D3DFORMAT f, u32 S
 	if (I!=m_rtargets.end())	return		I->second;
 	else
 	{
-		CRT *RT					=	xr_new<CRT>();
+		CRT *RT					=	new CRT();
 		RT->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
 		m_rtargets.insert		(mk_pair(RT->set_name(Name),RT));
 #ifdef USE_DX11
@@ -497,7 +497,7 @@ CRTC*	CResourceManager::_CreateRTC		(LPCSTR Name, u32 size,	D3DFORMAT f)
 	if (I!=m_rtargets_c.end())	return I->second;
 	else
 	{
-		CRTC *RT				=	xr_new<CRTC>();
+		CRTC *RT				=	new CRTC();
 		RT->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
 		m_rtargets_c.insert		(mk_pair(RT->set_name(Name),RT));
 		if (Device.b_is_Ready)	RT->create	(Name,size,f);
@@ -548,7 +548,7 @@ SGeometry*	CResourceManager::CreateGeom	(D3DVERTEXELEMENT9* decl, ID3DVertexBuff
 		if ((G.dcl==dcl) && (G.vb==vb) && (G.ib==ib) && (G.vb_stride==vb_stride))	return v_geoms[it];
 	}
 
-	SGeometry *Geom		=	xr_new<SGeometry>	();
+	SGeometry *Geom		=	new SGeometry	();
 	Geom->dwFlags		|=	xr_resource_flagged::RF_REGISTERED;
 	Geom->dcl			=	dcl;
 	Geom->vb			=	vb;
@@ -587,7 +587,7 @@ CTexture* CResourceManager::_CreateTexture	(LPCSTR _Name)
 	if (I!=m_textures.end())	return	I->second;
 	else
 	{
-		CTexture *	T		=	xr_new<CTexture>();
+		CTexture *	T		=	new CTexture();
 		T->dwFlags			|=	xr_resource_flagged::RF_REGISTERED;
 		m_textures.insert	(mk_pair(T->set_name(Name),T));
 		T->Preload			();
@@ -635,7 +635,7 @@ CMatrix*	CResourceManager::_CreateMatrix	(LPCSTR Name)
 	if (I!=m_matrices.end())	return I->second;
 	else
 	{
-		CMatrix* M			=	xr_new<CMatrix>();
+		CMatrix* M			=	new CMatrix();
 		M->dwFlags			|=	xr_resource_flagged::RF_REGISTERED;
 		M->dwReference		=	1;
 		m_matrices.insert	(mk_pair(M->set_name(Name),M));
@@ -669,7 +669,7 @@ CConstant*	CResourceManager::_CreateConstant	(LPCSTR Name)
 	if (I!=m_constants.end())	return I->second;
 	else
 	{
-		CConstant* C		=	xr_new<CConstant>();
+		CConstant* C		=	new CConstant();
 		C->dwFlags			|=	xr_resource_flagged::RF_REGISTERED;
 		C->dwReference		=	1;
 		m_constants.insert	(mk_pair(C->set_name(Name),C));
@@ -706,7 +706,7 @@ STextureList*	CResourceManager::_CreateTextureList(STextureList& L)
 		STextureList*	base		= lst_textures[it];
 		if (L.equal(*base))			return base;
 	}
-	STextureList*	lst		=	xr_new<STextureList>(L);
+	STextureList*	lst		=	new STextureList(L);
 	lst->dwFlags			|=	xr_resource_flagged::RF_REGISTERED;
 	lst_textures.push_back	(lst);
 	return lst;
@@ -729,7 +729,7 @@ SMatrixList*	CResourceManager::_CreateMatrixList(SMatrixList& L)
 		SMatrixList*	base		= lst_matrices[it];
 		if (L.equal(*base))			return base;
 	}
-	SMatrixList*	lst		=	xr_new<SMatrixList>(L);
+	SMatrixList*	lst		=	new SMatrixList(L);
 	lst->dwFlags			|=	xr_resource_flagged::RF_REGISTERED;
 	lst_matrices.push_back	(lst);
 	return lst;
@@ -752,7 +752,7 @@ SConstantList*	CResourceManager::_CreateConstantList(SConstantList& L)
 		SConstantList*	base		= lst_constants[it];
 		if (L.equal(*base))			return base;
 	}
-	SConstantList*	lst		=	xr_new<SConstantList>(L);
+	SConstantList*	lst		=	new SConstantList(L);
 	lst->dwFlags			|=	xr_resource_flagged::RF_REGISTERED;
 	lst_constants.push_back	(lst);
 	return lst;
@@ -767,7 +767,7 @@ void			CResourceManager::_DeleteConstantList(const SConstantList* L )
 dx10ConstantBuffer* CResourceManager::_CreateConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable)
 {
 	VERIFY(pTable);
-	dx10ConstantBuffer	*pTempBuffer = xr_new<dx10ConstantBuffer>(pTable);
+	dx10ConstantBuffer	*pTempBuffer = new dx10ConstantBuffer(pTable);
 
 	for (u32 it=0; it<v_constant_buffer.size(); it++)
 	{
@@ -806,7 +806,7 @@ SInputSignature* CResourceManager::_CreateInputSignature(ID3DBlob* pBlob)
 		}
 	}
 
-	SInputSignature	*pSign = xr_new<SInputSignature>(pBlob);
+	SInputSignature	*pSign = new SInputSignature(pBlob);
 
 	pSign->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 	v_input_signature.push_back	(pSign);

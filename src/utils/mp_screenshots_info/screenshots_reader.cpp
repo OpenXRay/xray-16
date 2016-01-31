@@ -68,7 +68,7 @@ reader::reader(IReader* freader)
 	m_info_pos					= static_cast<u32>((u8*)tmp_info_begin - m_jpeg_data);
 
 	IReader	tmp_reader			(tmp_info_begin, m_info_size);
-	m_info_section				= xr_new<CInifile>(&tmp_reader);
+	m_info_section				= new CInifile(&tmp_reader);
 }
 
 reader::~reader()

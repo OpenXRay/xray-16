@@ -18,8 +18,8 @@
 TEMPLATE_SPECIALIZATION
 CStateMonsterSquadRestFollowAbstract::CStateMonsterSquadRestFollow(_Object *obj) : inherited(obj)
 {
-	add_state	(eStateSquad_RestFollow_Idle,			xr_new<CStateMonsterCustomAction<_Object> >	(obj));
-	add_state	(eStateSquad_RestFollow_WalkToPoint,	xr_new<CStateMonsterMoveToPointEx<_Object> >	(obj));
+	add_state	(eStateSquad_RestFollow_Idle,			new CStateMonsterCustomAction<_Object>(obj));
+	add_state	(eStateSquad_RestFollow_WalkToPoint,	new CStateMonsterMoveToPointEx<_Object>(obj));
 }
 
 TEMPLATE_SPECIALIZATION

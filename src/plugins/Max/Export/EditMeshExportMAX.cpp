@@ -148,7 +148,7 @@ bool CEditableMesh::Convert( INode *node )
 		int vm_cnt = obj->mesh.getNumTVerts();
 		m_VMaps.resize(1);
 		st_VMap*& VM = m_VMaps.back();
-		VM = xr_new<st_VMap>("Texture",vmtUV,false);
+		VM = new st_VMap("Texture",vmtUV,false);
 		for (int tx_i=0; tx_i<vm_cnt; tx_i++){
 			UVVert* tv = obj->mesh.tVerts + tx_i;
 			VM->appendUV(tv->x,1-tv->y);
@@ -190,11 +190,11 @@ bool CEditableMesh::Convert(CExporter* E)
 	// Weight maps 
 	m_VMaps.resize(E->m_Bones.size()+1);
 	for (DWORD b_i=0; b_i<E->m_Bones.size(); b_i++)
-		m_VMaps[b_i]	= xr_new<st_VMap>(E->m_Bones[b_i]->name.c_str(),vmtWeight,false);;
+		m_VMaps[b_i]	= new st_VMap(E->m_Bones[b_i]->name.c_str(),vmtWeight,false);;
 	// UV map
 	int VM_UV_idx		= m_VMaps.size()-1;
 	st_VMap*& VM_UV		= m_VMaps[VM_UV_idx];
-	VM_UV				= xr_new<st_VMap>("texture",vmtUV,false);
+	VM_UV				= new st_VMap("texture",vmtUV,false);
 
 	// points
 	{

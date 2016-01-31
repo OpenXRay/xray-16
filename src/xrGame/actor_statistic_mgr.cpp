@@ -111,7 +111,7 @@ s32 SStatSectionData::GetTotalPoints() const
 
 CActorStatisticMgr::CActorStatisticMgr		()
 {
-	m_actor_stats_wrapper = xr_new<CActorStatisticsWrapper>();
+	m_actor_stats_wrapper = new CActorStatisticsWrapper();
 	m_actor_stats_wrapper->registry().init(0);
 }
 

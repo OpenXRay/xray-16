@@ -32,7 +32,7 @@ CLightmap::~CLightmap()
 }
 CLightmap*	CLightmap::read_create ( )
 {
-	return xr_new<CLightmap>();
+	return new CLightmap();
 }
 void CLightmap::Capture		(CDeflector *D, int b_u, int b_v, int s_u, int s_v, BOOL bRotated)
 {

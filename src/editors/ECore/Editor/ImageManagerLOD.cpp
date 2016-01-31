@@ -468,7 +468,7 @@ void CImageManager::CreateLODTexture(CEditableObject *OBJECT, LPCSTR tex_name, u
     CreateLODTexture(OBJECT, lod_pixels, nm_pixels, tgt_w, tgt_h, samples, quality);
 
     string_path out_name, src_name;
-    CImage *I = xr_new<CImage>();
+    CImage *I = new CImage();
     // save lod
     strcpy(src_name, tex_name);
 

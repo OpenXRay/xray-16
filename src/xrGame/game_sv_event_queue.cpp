@@ -10,7 +10,7 @@ GameEventQueue::GameEventQueue()
 {
 	unused.reserve	(128);
 	for (int i=0; i<16; i++)
-		unused.push_back	(xr_new<GameEvent>());
+		unused.push_back	(new GameEvent());
 }
 GameEventQueue::~GameEventQueue()
 {
@@ -28,7 +28,7 @@ GameEvent*		GameEventQueue::Create	()
 	cs.Enter		();
 	if (unused.empty())	
 	{
-		ready.push_back		(xr_new<GameEvent> ());
+		ready.push_back		(new GameEvent ());
 		ge					= ready.back	();
 		//---------------------------------------------
 #ifdef _DEBUG
@@ -66,7 +66,7 @@ GameEvent*		GameEventQueue::Create	(NET_Packet& P, u16 type, u32 time, ClientID 
 	cs.Enter		();
 	if (unused.empty())	
 	{
-		ready.push_back		(xr_new<GameEvent> ());
+		ready.push_back		(new GameEvent ());
 		ge					= ready.back	();
 		//---------------------------------------------
 #ifdef _DEBUG

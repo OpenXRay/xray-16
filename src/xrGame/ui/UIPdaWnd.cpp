@@ -68,7 +68,7 @@ void CUIPdaWnd::Init()
 	m_caption_const			= ( m_caption->GetText() );
 	m_clock					= UIHelper::CreateTextWnd	( uiXml, "clock_wnd", this );
 /*
-	m_anim_static			= xr_new<CUIAnimatedStatic>();
+	m_anim_static			= new CUIAnimatedStatic();
 	AttachChild				(m_anim_static);
 	m_anim_static->SetAutoDelete(true);
 	CUIXmlInit::InitAnimatedStatic(uiXml, "anim_static", 0, m_anim_static);
@@ -79,29 +79,29 @@ void CUIPdaWnd::Init()
 
 	if ( IsGameTypeSingle() )
 	{
-		pUITaskWnd					= xr_new<CUITaskWnd>();
+		pUITaskWnd					= new CUITaskWnd();
 		pUITaskWnd->hint_wnd		= m_hint_wnd;
 		pUITaskWnd->Init			();
 
-//-		pUIFactionWarWnd				= xr_new<CUIFactionWarWnd>();
+//-		pUIFactionWarWnd				= new CUIFactionWarWnd();
 //-		pUIFactionWarWnd->hint_wnd		= m_hint_wnd;
 //-		pUIFactionWarWnd->Init			();
 
-		pUIRankingWnd					= xr_new<CUIRankingWnd>();
+		pUIRankingWnd					= new CUIRankingWnd();
 		pUIRankingWnd->Init				();
 
-		pUILogsWnd						= xr_new<CUILogsWnd>();
+		pUILogsWnd						= new CUILogsWnd();
 		pUILogsWnd->Init				();
 
 	}
 
-	UITabControl					= xr_new<CUITabControl>();
+	UITabControl					= new CUITabControl();
 	UITabControl->SetAutoDelete		(true);
 	AttachChild						(UITabControl);
 	CUIXmlInit::InitTabControl		(uiXml, "tab", 0, UITabControl);
 	UITabControl->SetMessageTarget	(this);
 
-	UINoice					= xr_new<CUIStatic>();
+	UINoice					= new CUIStatic();
 	UINoice->SetAutoDelete	( true );
 	CUIXmlInit::InitStatic	( uiXml, "noice_static", 0, UINoice );
 

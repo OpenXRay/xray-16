@@ -98,7 +98,7 @@ typename CSIni_Table::ITEM_TABLE& CSIni_Table::table	()
 	if(m_pTable)
 		return *m_pTable;
 
-	m_pTable = xr_new<ITEM_TABLE>();
+	m_pTable = new ITEM_TABLE();
 
 	VERIFY(table_sect);
 	std::size_t table_size = T_INI_LOADER::GetMaxIndex()+1;

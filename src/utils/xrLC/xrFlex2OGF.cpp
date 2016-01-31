@@ -75,7 +75,7 @@ void CBuild::Flex2OGF()
 		
 		u32 MODEL_ID		= u32(it-g_XSplit.begin());
 		
-		OGF*		pOGF	= xr_new<OGF> ();
+		OGF*		pOGF	= new OGF ();
 		Face*		F		= *((*it)->begin());			// first face
 		b_material*	M		= &(materials()[F->dwMaterial]);	// and it's material
 		R_ASSERT	(F && M);

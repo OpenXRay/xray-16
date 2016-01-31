@@ -92,7 +92,7 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
 {
 	if ( !g_uiSpotXml )
 	{
-		g_uiSpotXml				= xr_new<CUIXml>();
+		g_uiSpotXml				= new CUIXml();
 		g_uiSpotXml->Load		(CONFIG_PATH, UI_PATH, "map_spots.xml");
 	}
 
@@ -137,7 +137,7 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
 		{
 			if ( !bReload )
 			{
-				m_level_spot = xr_new<CMapSpot>(this);
+				m_level_spot = new CMapSpot(this);
 			}
 			m_level_spot->Load(g_uiSpotXml,str);
 		}else{
@@ -152,7 +152,7 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
 		{
 			if ( !bReload )
 			{
-				m_level_spot_pointer = xr_new<CMapSpotPointer>(this);
+				m_level_spot_pointer = new CMapSpotPointer(this);
 			}
 			m_level_spot_pointer->Load(g_uiSpotXml,str);
 		}else{
@@ -169,7 +169,7 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
 		{
 			if ( !bReload )
 			{
-				m_minimap_spot = xr_new<CMiniMapSpot>(this);
+				m_minimap_spot = new CMiniMapSpot(this);
 			}
 			m_minimap_spot->Load(g_uiSpotXml,str);
 		}else{
@@ -183,7 +183,7 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
 		{
 			if ( !bReload )
 			{
-				m_minimap_spot_pointer = xr_new<CMapSpotPointer>(this);
+				m_minimap_spot_pointer = new CMapSpotPointer(this);
 			}
 			m_minimap_spot_pointer->Load(g_uiSpotXml,str);
 		}else{
@@ -200,7 +200,7 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
 		{
 			if ( !bReload )
 			{
-				m_complex_spot = xr_new<CComplexMapSpot>(this);
+				m_complex_spot = new CComplexMapSpot(this);
 			}
 			m_complex_spot->Load(g_uiSpotXml,str);
 		}else{
@@ -214,7 +214,7 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
 		{
 			if ( !bReload )
 			{
-				m_complex_spot_pointer = xr_new<CMapSpotPointer>(this);
+				m_complex_spot_pointer = new CMapSpotPointer(this);
 			}
 			m_complex_spot_pointer->Load(g_uiSpotXml,str);
 		}else{
@@ -646,7 +646,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
 		{
 			if ( NULL == m_level_map_spot_border )
 			{
-				m_level_map_spot_border			= xr_new<CMapSpot>(this);
+				m_level_map_spot_border			= new CMapSpot(this);
 				m_level_map_spot_border->Load	(g_uiSpotXml,m_spot_border_names[0].c_str());
 			}
 			return m_level_map_spot_border;
@@ -655,7 +655,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
 		{
 			if ( NULL == m_mini_map_spot_border )
 			{
-				m_mini_map_spot_border			= xr_new<CMapSpot>(this);
+				m_mini_map_spot_border			= new CMapSpot(this);
 				m_mini_map_spot_border->Load	(g_uiSpotXml,m_spot_border_names[2].c_str());
 			}
 			return m_mini_map_spot_border;
@@ -664,7 +664,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
 		{
 			if ( NULL == m_complex_spot_border )
 			{
-				m_complex_spot_border			= xr_new<CMapSpot>(this);
+				m_complex_spot_border			= new CMapSpot(this);
 				m_complex_spot_border->Load		(g_uiSpotXml,m_spot_border_names[4].c_str());
 			}
 			return m_complex_spot_border;
@@ -676,7 +676,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
 		{
 			if ( NULL == m_level_map_spot_border_na && m_spot_border_names[1].size() )
 			{
-				m_level_map_spot_border_na			= xr_new<CMapSpot>(this);
+				m_level_map_spot_border_na			= new CMapSpot(this);
 				m_level_map_spot_border_na->Load	(g_uiSpotXml,m_spot_border_names[1].c_str());
 			}
 			return m_level_map_spot_border_na;
@@ -685,7 +685,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
 		{
 			if ( NULL == m_mini_map_spot_border_na && m_spot_border_names[3].size() )
 			{
-				m_mini_map_spot_border_na			= xr_new<CMapSpot>(this);
+				m_mini_map_spot_border_na			= new CMapSpot(this);
 				m_mini_map_spot_border_na->Load		(g_uiSpotXml,m_spot_border_names[3].c_str());
 			}
 			return m_mini_map_spot_border_na;
@@ -694,7 +694,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
 		{
 			if ( NULL == m_complex_spot_border_na && m_spot_border_names[5].size() )
 			{
-				m_complex_spot_border_na			= xr_new<CMapSpot>(this);
+				m_complex_spot_border_na			= new CMapSpot(this);
 				m_complex_spot_border_na->Load		(g_uiSpotXml,m_spot_border_names[5].c_str());
 			}
 			return m_complex_spot_border_na;

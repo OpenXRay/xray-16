@@ -24,7 +24,7 @@ void CRenderDevice::initialize_editor()
     VERIFY(m_editor_initialize);
     m_editor_finalize = (finalize_function_ptr)XRay::GetProcAddress(m_editor_module, "finalize");
     VERIFY(m_editor_finalize);
-    m_engine = xr_new<engine_impl>();
+    m_engine = new engine_impl();
     m_editor_initialize(m_editor, m_engine);
     VERIFY(m_editor);
     m_hWnd = m_editor->view_handle();

@@ -28,7 +28,7 @@ xr_token							function_token			[ ]={
 void FillMenuFromToken(TMxPopupMenu* menu, const xr_token *token_list, TClickEvent func ){
 	menu->Items->Clear();
 	for( int i=0; token_list[i].name; i++ ){
-    	TMenuItem* mi = xr_new<TMenuItem>((TComponent*)0);
+    	TMenuItem* mi = new TMenuItem((TComponent*)0);
       	mi->Caption = token_list[i].name;
         mi->OnClick = func;
       	menu->Items->Add(mi);
@@ -133,9 +133,9 @@ void __fastcall TfrmShaderFunction::ebCancelClick(TObject *Sender)
 int __fastcall TfrmShaderFunction::Run(WaveForm* func)
 {
 	VERIFY(func);
-	form = xr_new<TfrmShaderFunction>((TComponent*)0);
+	form = new TfrmShaderFunction((TComponent*)0);
 	form->m_CurFunc 	= func;
-    form->m_SaveFunc	= xr_new<WaveForm>(*func);
+    form->m_SaveFunc	= new WaveForm(*func);
     form->GetFuncData	();
     form->UpdateFuncData();
     int res 	= form->ShowModal();

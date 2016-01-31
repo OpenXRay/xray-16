@@ -56,7 +56,7 @@ public:
 virtual	CTelekineticObject*		activate				(CPhysicsShellHolder *obj, float strength, float height, u32 max_time_keep, bool rot = true);
 virtual void					clear					()										;
 virtual	void					clear_notrelevant		()										;
-virtual CTelekineticObject*		alloc_tele_object		()										{return static_cast<CTelekineticObject*>(xr_new<CTeleWhirlwindObject>());}
+virtual CTelekineticObject*		alloc_tele_object		()										{return static_cast<CTelekineticObject*>(new CTeleWhirlwindObject());}
 		float					keep_radius				()										{return m_keep_radius;}
 		void					set_throw_power			(float throw_pow);
 };

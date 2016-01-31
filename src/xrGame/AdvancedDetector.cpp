@@ -17,7 +17,7 @@ CAdvancedDetector::~CAdvancedDetector()
 void CAdvancedDetector::CreateUI()
 {
 	R_ASSERT			(NULL==m_ui);
-	m_ui				= xr_new<CUIArtefactDetectorAdv>();
+	m_ui				= new CUIArtefactDetectorAdv();
 	ui().construct		(this);
 }
 

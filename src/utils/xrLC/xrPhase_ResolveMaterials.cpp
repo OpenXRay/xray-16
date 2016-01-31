@@ -47,7 +47,7 @@ void	CBuild::xrPhase_ResolveMaterials()
 		g_XSplit.resize	(counts.size());
 		for (u32 I=0; I<counts.size(); I++) 
 		{
-			g_XSplit[I] = xr_new<vecFace> ();
+			g_XSplit[I] = new vecFace ();
 			g_XSplit[I]->reserve	(counts[I].dwCount);
 		}
 		

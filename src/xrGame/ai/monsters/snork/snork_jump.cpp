@@ -8,7 +8,7 @@
 //{
 //	m_object				= monster;
 //	
-//	//m_jumper				= xr_new<CJumpingAbility>();				
+//	//m_jumper				= new CJumpingAbility();				
 //	//m_jumper->init_external	(m_object);
 //	//m_jumper->reinit		(MotionID(),MotionID(),MotionID());
 //}

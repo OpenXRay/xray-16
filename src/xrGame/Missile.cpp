@@ -36,7 +36,7 @@ void create_force_progress()
 
 
 	CUIXmlInit						xml_init;
-	g_MissileForceShape				= xr_new<CUIProgressShape>();
+	g_MissileForceShape				= new CUIProgressShape();
 	xml_init.InitProgressShape		(uiXml, "progress", 0, g_MissileForceShape);
 }
 

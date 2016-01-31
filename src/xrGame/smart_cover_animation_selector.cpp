@@ -33,7 +33,7 @@ animation_selector::animation_selector				(CAI_Stalker *object) :
 {
 	m_skeleton_animated	= smart_cast<IKinematicsAnimated*>(object->Visual());
 	VERIFY				(m_skeleton_animated);
-	m_planner			= xr_new<animation_planner>(object, "animation planner");
+	m_planner			= new animation_planner(object, "animation planner");
 }
 
 animation_selector::~animation_selector				()

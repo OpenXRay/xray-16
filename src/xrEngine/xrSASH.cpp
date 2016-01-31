@@ -475,7 +475,7 @@ void xrSASH::TryInitEngine(bool bNoRun)
         Console->Execute("renderer renderer_r2");
     else
     {
-        CCC_LoadCFG_custom* pTmp = xr_new<CCC_LoadCFG_custom>("renderer ");
+        CCC_LoadCFG_custom* pTmp = new CCC_LoadCFG_custom("renderer ");
         pTmp->Execute(Console->ConfigFile);
         if (m_bOpenAutomate)
             pTmp->Execute("SASH.ltx");

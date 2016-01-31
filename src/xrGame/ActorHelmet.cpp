@@ -14,7 +14,7 @@ CHelmet::CHelmet()
 	for(int i=0; i<ALife::eHitTypeMax; i++)
 		m_HitTypeProtection[i] = 1.0f;
 
-	m_boneProtection = xr_new<SBoneProtections>();
+	m_boneProtection = new SBoneProtections();
 }
 
 CHelmet::~CHelmet()

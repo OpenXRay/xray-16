@@ -142,9 +142,9 @@ void PostProcessParamProxy::GetValue(float time, [Out] float% value, int index)
 float PostProcessParamProxy::GetKeyTime(int index) { return impl->get_key_time(index); }
 void PostProcessParamProxy::Reset() { impl->clear_all_keys(); }
 
-BasicPostProcessAnimator::BasicPostProcessAnimator() : impl(xr_new<::BasicPostProcessAnimator>()) {}
+BasicPostProcessAnimator::BasicPostProcessAnimator() : impl(new ::BasicPostProcessAnimator()) {}
 BasicPostProcessAnimator::BasicPostProcessAnimator(int id, bool cyclic) :
-    impl(xr_new<::BasicPostProcessAnimator>(id, cyclic)) {}
+    impl(new ::BasicPostProcessAnimator(id, cyclic)) {}
 
 BasicPostProcessAnimator::~BasicPostProcessAnimator()
 {

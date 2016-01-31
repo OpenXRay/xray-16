@@ -130,7 +130,7 @@ void Startup(LPSTR     lpCmdLine)
     
     // Conversion
     Logger.Phase("Converting data structures...");
-    pBuild                  = xr_new<CBuild>();
+    pBuild                  = new CBuild();
     pBuild->Load            (Params,*F);
     FS.r_close              (F);
     

@@ -16,32 +16,32 @@ CUIServerInfo::CUIServerInfo()
 {
 	m_dds_file_created				= false;
 
-	m_background					= xr_new<CUIStatic>();
+	m_background					= new CUIStatic();
 	AttachChild						(m_background);
 	m_background->SetAutoDelete		(true);
 	
-	m_caption						= xr_new<CUIStatic>();
+	m_caption						= new CUIStatic();
 	AttachChild						(m_caption);
 	m_caption->SetAutoDelete		(true);
 
-	m_image							= xr_new<CUIStatic>();
+	m_image							= new CUIStatic();
 	AttachChild						(m_image);
 	m_image->SetAutoDelete			(true);
 
-	m_text_desc						= xr_new<CUIScrollView>();
+	m_text_desc						= new CUIScrollView();
 	AttachChild						(m_text_desc);
 	m_text_desc->SetAutoDelete		(true);
 
-	m_text_body						= xr_new<CUITextWnd>();
+	m_text_body						= new CUITextWnd();
 	//m_text_desc->AttachChild		(m_text_body);
 	//m_text_body->SetAutoDelete		(true);
 	
 
-	m_btn_spectator					= xr_new<CUI3tButton>();
+	m_btn_spectator					= new CUI3tButton();
 	AttachChild						(m_btn_spectator);
 	m_btn_spectator->SetAutoDelete	(true);
 
-	m_btn_next						= xr_new<CUI3tButton>();
+	m_btn_next						= new CUI3tButton();
 	AttachChild						(m_btn_next);
 	m_btn_next->SetAutoDelete		(true);
 

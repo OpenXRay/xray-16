@@ -105,7 +105,7 @@ void CUIInventoryUpgradeWnd::LoadSchemes( CUIXml& uiXml )
 		XML_NODE* tmpl_node = uiXml.NavigateToNode( "template", i_tmpl );
 		uiXml.SetLocalRoot( tmpl_node );
 
-		Scheme* scheme = xr_new<Scheme>();
+		Scheme* scheme = new Scheme();
 		scheme->cells.reserve( MAX_UI_UPGRADE_CELLS );
 
 		LPCSTR name = uiXml.ReadAttrib( tmpl_node, "name", "" );
@@ -121,9 +121,9 @@ void CUIInventoryUpgradeWnd::LoadSchemes( CUIXml& uiXml )
 			int cell_cnt = uiXml.GetNodesNum( clm_node, "cell" );
 			for ( int i_cell = 0; i_cell < cell_cnt; ++i_cell )
 			{
-				UIUpgrade* item = xr_new<UIUpgrade>( this );
+				UIUpgrade* item = new UIUpgrade( this );
 				item->load_from_xml( uiXml, i_clm, i_cell, t_cell_item );
-				CUIUpgradePoint* item_point = xr_new<CUIUpgradePoint>( item );
+				CUIUpgradePoint* item_point = new CUIUpgradePoint( item );
 				item_point->load_from_xml(uiXml, i_cell);
 				item->attach_point(item_point);
 

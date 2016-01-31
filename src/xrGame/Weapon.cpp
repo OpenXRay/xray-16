@@ -415,10 +415,10 @@ void CWeapon::Load		(LPCSTR section)
 		m_zoom_params.m_fScopeZoomFactor	= pSettings->r_float( cNameSect(), "scope_zoom_factor");
 		if ( !g_dedicated_server )
 		{
-			m_UIScope				= xr_new<CUIWindow>();
+			m_UIScope				= new CUIWindow();
 			if(!pWpnScopeXml)
 			{
-				pWpnScopeXml			= xr_new<CUIXml>();
+				pWpnScopeXml			= new CUIXml();
 				pWpnScopeXml->Load		(CONFIG_PATH, UI_PATH, "scopes.xml");
 			}
 			CUIXmlInit::InitWindow	(*pWpnScopeXml, scope_tex_name.c_str(), 0, m_UIScope);
@@ -1382,7 +1382,7 @@ void CWeapon::OnZoomIn()
 		GamePersistent().SetPickableEffectorDOF(true);
 
 	if(m_zoom_params.m_sUseBinocularVision.size() && IsScopeAttached() && NULL==m_zoom_params.m_pVision) 
-		m_zoom_params.m_pVision	= xr_new<CBinocularsVision>(m_zoom_params.m_sUseBinocularVision/*"wpn_binoc"*/);
+		m_zoom_params.m_pVision	= new CBinocularsVision(m_zoom_params.m_sUseBinocularVision/*"wpn_binoc"*/);
 
 	if(m_zoom_params.m_sUseZoomPostprocess.size() && IsScopeAttached()) 
 	{
@@ -1391,7 +1391,7 @@ void CWeapon::OnZoomIn()
 		{
 			if(NULL==m_zoom_params.m_pNight_vision)
 			{
-				m_zoom_params.m_pNight_vision	= xr_new<CNightVisionEffector>(m_zoom_params.m_sUseZoomPostprocess/*"device_torch"*/);
+				m_zoom_params.m_pNight_vision	= new CNightVisionEffector(m_zoom_params.m_sUseZoomPostprocess/*"device_torch"*/);
 			}
 		}
 	}
@@ -1863,7 +1863,7 @@ void CWeapon::OnStateSwitch	(u32 S)
 	//	{
 	//		CActor* current_actor	= smart_cast<CActor*>(H_Parent());
 	//		if (current_actor)
-	//			current_actor->Cameras().AddCamEffector(xr_new<CEffectorDOF>(m_zoom_params.m_ReloadDof) );
+	//			current_actor->Cameras().AddCamEffector(new CEffectorDOF(m_zoom_params.m_ReloadDof) );
 	//	}
 	//}
 }

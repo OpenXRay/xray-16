@@ -24,7 +24,7 @@ BOOL CPhysicsSkeletonObject::net_Spawn(CSE_Abstract* DC)
 
 	inherited::net_Spawn	(DC);
 	xr_delete(CForm);
-	CForm = xr_new<CCF_Skeleton>(this);
+	CForm = new CCF_Skeleton(this);
 	CPHSkeleton::Spawn(e);
 	setVisible(TRUE);
 	setEnabled(TRUE);

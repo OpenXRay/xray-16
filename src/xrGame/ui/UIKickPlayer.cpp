@@ -15,37 +15,37 @@
 CUIKickPlayer::CUIKickPlayer()
 {
 	m_prev_upd_time				= 0;
-	bkgrnd						= xr_new<CUIStatic>(); 
+	bkgrnd						= new CUIStatic(); 
 	bkgrnd->SetAutoDelete		(true);
 	AttachChild					(bkgrnd);
 
-	header						= xr_new<CUIStatic>(); 
+	header						= new CUIStatic(); 
 	header->SetAutoDelete		(true);
 	AttachChild					(header);
 
-	lst_back					= xr_new<CUIFrameWindow>(); 
+	lst_back					= new CUIFrameWindow(); 
 	lst_back->SetAutoDelete		(true);
 	AttachChild					(lst_back);
 
-	m_ui_players_list			= xr_new<CUIListBox>(); 
+	m_ui_players_list			= new CUIListBox(); 
 	m_ui_players_list->SetAutoDelete(true);
 	AttachChild					(m_ui_players_list);
 
-	btn_ok						= xr_new<CUI3tButton>(); 
+	btn_ok						= new CUI3tButton(); 
 	btn_ok->SetAutoDelete		(true);
 	AttachChild					(btn_ok);
 
-	btn_cancel					= xr_new<CUI3tButton>(); 
+	btn_cancel					= new CUI3tButton(); 
 	btn_cancel->SetAutoDelete	(true);
 	AttachChild					(btn_cancel);
 
-	m_spin_ban_sec				= xr_new<CUISpinNum>();
+	m_spin_ban_sec				= new CUISpinNum();
 	m_spin_ban_sec->SetAutoDelete(true);
 	m_spin_ban_sec->SetMax		(3000000);
 	m_spin_ban_sec->SetMin		(60);
 	AttachChild					(m_spin_ban_sec);
 
-	m_ban_sec_label				= xr_new<CUIStatic>();
+	m_ban_sec_label				= new CUIStatic();
 	m_ban_sec_label->SetAutoDelete(true);
 	AttachChild					(m_ban_sec_label);
 

@@ -152,7 +152,7 @@ void login_manager::login_offline(char const * nick, login_operation_cb logincb)
 	//verify symbols in new unique nick
 	string256					new_nick;
 	modify_player_name			(nick, new_nick);
-	m_current_profile			= xr_new<profile>(0, new_nick, "", false);
+	m_current_profile			= new profile(0, new_nick, "", false);
 	m_login_operation_cb		(m_current_profile, "mp_login_success");
 	m_login_operation_cb.clear	();
 }
@@ -323,7 +323,7 @@ void __cdecl login_manager::login_cb(GPConnection * connection,
 		tmp_ticket_dest[0] = 0;
 	}
 
-	my_inst->m_current_profile = xr_new<profile>(
+	my_inst->m_current_profile = new profile(
 		tmp_res->profile,
 		tmp_res->uniquenick,
 		tmp_ticket_dest,

@@ -17,9 +17,9 @@
 TEMPLATE_SPECIALIZATION
 CStateGroupHearDangerousSoundAbstract::CStateGroupHearDangerousSound(_Object *obj) : inherited(obj)
 {
-	add_state	(eStateHearDangerousSound_Hide,				xr_new<CStateMonsterMoveToPointEx<_Object> >		(obj));
-	add_state	(eStateSquad,								xr_new<CStateMonsterMoveToPoint<_Object> >			(obj));
-	add_state	(eStateHearDangerousSound_Home,				xr_new<CStateMonsterDangerMoveToHomePoint<_Object> >(obj));
+	add_state	(eStateHearDangerousSound_Hide,				new CStateMonsterMoveToPointEx<_Object>(obj));
+	add_state	(eStateSquad,								new CStateMonsterMoveToPoint<_Object>(obj));
+	add_state	(eStateHearDangerousSound_Home,				new CStateMonsterDangerMoveToHomePoint<_Object>(obj));
 }
 
 TEMPLATE_SPECIALIZATION

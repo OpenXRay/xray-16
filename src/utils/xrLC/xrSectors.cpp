@@ -22,7 +22,7 @@ void CBuild::BuildSectors()
 	for (u32 I=0; I<g_tree.size(); I++)
 	{
 		u32 Sector = g_tree[I]->Sector;
-		if (0==g_sectors[Sector]) g_sectors[Sector] = xr_new<CSector> (Sector);
+		if (0==g_sectors[Sector]) g_sectors[Sector] = new CSector (Sector);
 	}
 
     Logger.Status("Building hierrarhy...");

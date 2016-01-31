@@ -22,7 +22,7 @@ AISpaceBase::~AISpaceBase()
 void AISpaceBase::Load(const char *levelName)
 {
     const CGameGraph::SLevel &currentLevel = game_graph().header().level(levelName);
-    m_level_graph = xr_new<CLevelGraph>();
+    m_level_graph = new CLevelGraph();
     game_graph().set_current_level(currentLevel.id());
     auto &crossHeader = cross_table().header();
     auto &levelHeader = level_graph().header();
@@ -30,7 +30,7 @@ void AISpaceBase::Load(const char *levelName)
     R_ASSERT2(crossHeader.level_guid()==levelHeader.guid(), "cross_table doesn't correspond to the AI-map");
     R_ASSERT2(crossHeader.game_guid()==gameHeader.guid(), "graph doesn't correspond to the cross table");
     u32 vertexCount = _max(gameHeader.vertex_count(), levelHeader.vertex_count());
-    m_graph_engine = xr_new<CGraphEngine>(vertexCount);
+    m_graph_engine = new CGraphEngine(vertexCount);
     R_ASSERT2(currentLevel.guid()==levelHeader.guid(), "graph doesn't correspond to the AI-map");
     if (!xr_strcmp(currentLevel.name(), levelName))
         Validate(currentLevel.id());
@@ -44,7 +44,7 @@ void AISpaceBase::Unload(bool reload)
     xr_delete(m_graph_engine);
     xr_delete(m_level_graph);
     if (!reload && m_game_graph)
-        m_graph_engine = xr_new<CGraphEngine>(game_graph().header().vertex_count());
+        m_graph_engine = new CGraphEngine(game_graph().header().vertex_count());
 }
 
 void AISpaceBase::Initialize()
@@ -52,9 +52,9 @@ void AISpaceBase::Initialize()
     if (g_dedicated_server)
         return;
     VERIFY(!m_graph_engine);
-    m_graph_engine = xr_new<CGraphEngine>(1024);
+    m_graph_engine = new CGraphEngine(1024);
     VERIFY(!m_patrol_path_storage);
-    m_patrol_path_storage = xr_new<CPatrolPathStorage>();
+    m_patrol_path_storage = new CPatrolPathStorage();
 }
 
 void AISpaceBase::Validate(u32 levelId) const
@@ -95,7 +95,7 @@ void AISpaceBase::patrol_path_storage_raw(IReader &stream)
     if (g_dedicated_server)
         return;
     xr_delete(m_patrol_path_storage);
-    m_patrol_path_storage = xr_new<CPatrolPathStorage>();
+    m_patrol_path_storage = new CPatrolPathStorage();
     m_patrol_path_storage->load_raw(get_level_graph(), get_cross_table(), get_game_graph(), stream);
 }
 
@@ -104,7 +104,7 @@ void AISpaceBase::patrol_path_storage(IReader &stream)
     if (g_dedicated_server)
         return;
     xr_delete(m_patrol_path_storage);
-    m_patrol_path_storage = xr_new<CPatrolPathStorage>();
+    m_patrol_path_storage = new CPatrolPathStorage();
     m_patrol_path_storage->load(stream);
 }
 
@@ -115,7 +115,7 @@ void AISpaceBase::SetGameGraph(CGameGraph *gameGraph)
         VERIFY(!m_game_graph);
         m_game_graph = gameGraph;
         xr_delete(m_graph_engine);
-        m_graph_engine = xr_new<CGraphEngine>(game_graph().header().vertex_count());
+        m_graph_engine = new CGraphEngine(game_graph().header().vertex_count());
     }
     else
     {

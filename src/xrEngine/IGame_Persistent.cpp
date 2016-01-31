@@ -37,13 +37,13 @@ IGame_Persistent::IGame_Persistent()
 
 #ifndef INGAME_EDITOR
 #ifndef _EDITOR
-    pEnvironment = xr_new<CEnvironment>();
+    pEnvironment = new CEnvironment();
 #endif
 #else // #ifdef INGAME_EDITOR
     if (RDEVICE.editor())
-        pEnvironment = xr_new<editor::environment::manager>();
+        pEnvironment = new editor::environment::manager();
     else
-        pEnvironment = xr_new<CEnvironment>();
+        pEnvironment = new CEnvironment();
 #endif // #ifdef INGAME_EDITOR
 }
 

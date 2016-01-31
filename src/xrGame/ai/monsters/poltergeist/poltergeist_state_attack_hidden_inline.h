@@ -15,7 +15,7 @@
 TEMPLATE_SPECIALIZATION
 CStatePoltergeistAttackHiddenAbstract::CStatePoltergeistAttackHidden (_Object *obj) : inherited(obj)
 {
-	add_state	(eStateAttack_MoveToHomePoint,	xr_new<CStateMonsterAttackMoveToHomePoint<_Object> >(obj));	
+	add_state	(eStateAttack_MoveToHomePoint,	new CStateMonsterAttackMoveToHomePoint<_Object>(obj));	
 }
 
 TEMPLATE_SPECIALIZATION

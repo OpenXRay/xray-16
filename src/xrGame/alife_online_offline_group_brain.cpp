@@ -42,7 +42,7 @@ CALifeOnlineOfflineGroupBrain::CALifeOnlineOfflineGroupBrain		(object_type *obje
 	m_object						= object;
 
 #ifdef XRGAME_EXPORTS
-	m_movement_manager				= xr_new<CALifeMonsterMovementManager>(object);
+	m_movement_manager				= new CALifeMonsterMovementManager(object);
 #endif
 }
 

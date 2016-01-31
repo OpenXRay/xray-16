@@ -39,10 +39,10 @@ CAI_Rat::CAI_Rat() :
 	m_behaviour_manager		(0)
 {
 	init					();
-//	m_behaviour_manager				= xr_new<steering_behaviour::manager>(this);
-//	m_behaviour_manager->add		(xr_new<steering_behaviour::cohesion>(this),	.5f);
-//	m_behaviour_manager->add		(xr_new<steering_behaviour::separation>(this),	.5f);
-//	m_behaviour_manager->add		(xr_new<steering_behaviour::alignment>(this),	.5f);
+//	m_behaviour_manager				= new steering_behaviour::manager(this);
+//	m_behaviour_manager->add		(new steering_behaviour::cohesion(this),	.5f);
+//	m_behaviour_manager->add		(new steering_behaviour::separation(this),	.5f);
+//	m_behaviour_manager->add		(new steering_behaviour::alignment(this),	.5f);
 }
 
 CAI_Rat::~CAI_Rat()
@@ -86,22 +86,22 @@ void CAI_Rat::init()
 
 void CAI_Rat::init_state_manager		()
 {
-	m_state_manager				= xr_new<rat_state_manager>();
+	m_state_manager				= new rat_state_manager();
 	m_state_manager->construct	(this);
 	fire(false);
 
-	m_state_manager->add_state	(aiRatDeath,		xr_new<rat_state_death>			());
-	m_state_manager->add_state	(aiRatFreeActive,	xr_new<rat_state_free_active>	());
-	m_state_manager->add_state	(aiRatFreePassive,	xr_new<rat_state_free_passive>	());
-	m_state_manager->add_state	(aiRatAttackRange,	xr_new<rat_state_attack_range>	());
-	m_state_manager->add_state	(aiRatAttackMelee,	xr_new<rat_state_attack_melee>	());
-	m_state_manager->add_state	(aiRatUnderFire,	xr_new<rat_state_under_fire>	());
-	m_state_manager->add_state	(aiRatRetreat,		xr_new<rat_state_retreat>		());
-	m_state_manager->add_state	(aiRatPursuit,		xr_new<rat_state_pursuit>		());
-	m_state_manager->add_state	(aiRatFreeRecoil,	xr_new<rat_state_free_recoil>	());
-	m_state_manager->add_state	(aiRatReturnHome,	xr_new<rat_state_return_home>	());
-	m_state_manager->add_state	(aiRatEatCorpse,	xr_new<rat_state_eat_corpse>	());
-	m_state_manager->add_state	(aiRatNoWay,		xr_new<rat_state_no_way>		());
+	m_state_manager->add_state	(aiRatDeath,		new rat_state_death			());
+	m_state_manager->add_state	(aiRatFreeActive,	new rat_state_free_active	());
+	m_state_manager->add_state	(aiRatFreePassive,	new rat_state_free_passive	());
+	m_state_manager->add_state	(aiRatAttackRange,	new rat_state_attack_range	());
+	m_state_manager->add_state	(aiRatAttackMelee,	new rat_state_attack_melee	());
+	m_state_manager->add_state	(aiRatUnderFire,	new rat_state_under_fire	());
+	m_state_manager->add_state	(aiRatRetreat,		new rat_state_retreat		());
+	m_state_manager->add_state	(aiRatPursuit,		new rat_state_pursuit		());
+	m_state_manager->add_state	(aiRatFreeRecoil,	new rat_state_free_recoil	());
+	m_state_manager->add_state	(aiRatReturnHome,	new rat_state_return_home	());
+	m_state_manager->add_state	(aiRatEatCorpse,	new rat_state_eat_corpse	());
+	m_state_manager->add_state	(aiRatNoWay,		new rat_state_no_way		());
 
 	m_state_manager->push_state	(aiRatFreeActive);
 }

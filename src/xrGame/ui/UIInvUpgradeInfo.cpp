@@ -47,32 +47,32 @@ void UIInvUpgradeInfo::init_from_xml( LPCSTR xml_name )
 
 	xml_init.InitWindow( ui_xml, "main_frame", 0, this );
 	
-	m_background = xr_new<CUIFrameWindow>();
+	m_background = new CUIFrameWindow();
 	AttachChild( m_background );
 	m_background->SetAutoDelete( true );
 	xml_init.InitFrameWindow( ui_xml, "background_frame", 0, m_background );
 
-	m_name = xr_new<CUITextWnd>();	 
+	m_name = new CUITextWnd();	 
 	AttachChild( m_name );		
 	m_name->SetAutoDelete( true );
 	xml_init.InitTextWnd( ui_xml, "info_name", 0, m_name );
 
-	m_cost = xr_new<CUITextWnd>();	 
+	m_cost = new CUITextWnd();	 
 	AttachChild( m_cost );		
 	m_cost->SetAutoDelete( true );
 	xml_init.InitTextWnd( ui_xml, "info_cost", 0, m_cost );
 
-	m_desc = xr_new<CUITextWnd>();	 
+	m_desc = new CUITextWnd();	 
 	AttachChild( m_desc );
 	m_desc->SetAutoDelete( true );
 	xml_init.InitTextWnd( ui_xml, "info_desc", 0, m_desc );
 
-	m_prereq = xr_new<CUITextWnd>();	 
+	m_prereq = new CUITextWnd();	 
 	AttachChild( m_prereq );
 	m_prereq->SetAutoDelete( true );
 	xml_init.InitTextWnd( ui_xml, "info_prerequisites", 0, m_prereq );
 
-	m_properties_wnd = xr_new<UIInvUpgPropertiesWnd>();	 
+	m_properties_wnd = new UIInvUpgPropertiesWnd();	 
 	AttachChild( m_properties_wnd );
 	m_properties_wnd->SetAutoDelete( true );
 	m_properties_wnd->init_from_xml( xml_name );

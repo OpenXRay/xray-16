@@ -41,7 +41,7 @@ void CUITalkWnd::InitTalkWnd()
 {
 	inherited::SetWndRect(Frect().set(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT));
 
-	UITalkDialogWnd			= xr_new<CUITalkDialogWnd>();
+	UITalkDialogWnd			= new CUITalkDialogWnd();
 	UITalkDialogWnd->SetAutoDelete(true);
 	AttachChild				(UITalkDialogWnd);
 	UITalkDialogWnd->m_pParent = this;

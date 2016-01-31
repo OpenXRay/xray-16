@@ -5,7 +5,7 @@
 #include <dinput.h>
 
 CUIMessageBoxEx::CUIMessageBoxEx(){
-	m_pMessageBox = xr_new<CUIMessageBox>();
+	m_pMessageBox = new CUIMessageBox();
 	m_pMessageBox->SetWindowName("msg_box");
 //	m_pMessageBox->SetAutoDelete(true);
 	AttachChild(m_pMessageBox);

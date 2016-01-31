@@ -6,7 +6,7 @@
 
 CCustomObject *ESceneWayTool::CreateObject(LPVOID data, LPCSTR name)
 {
-    CCustomObject*O = xr_new<CWayObject>(data, name);
+    CCustomObject*O = new CWayObject(data, name);
     O->ParentTool = this;
     return O;
 }

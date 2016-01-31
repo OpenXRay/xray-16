@@ -59,19 +59,19 @@ CMovementManager::~CMovementManager	()
 void CMovementManager::Load			(LPCSTR section)
 {
 	m_restricted_object				= create_restricted_object();
-	m_location_manager				= xr_new<CLocationManager>		 (m_object);
+	m_location_manager				= new CLocationManager		 (m_object);
 
-	m_base_game_selector			= xr_new<CGameVertexParams>		 (locations().vertex_types());
-	m_base_level_selector			= xr_new<CBaseParameters>		 ();
+	m_base_game_selector			= new CGameVertexParams		 (locations().vertex_types());
+	m_base_level_selector			= new CBaseParameters		 ();
 	
-	m_game_location_selector		= xr_new<CGameLocationSelector	>(m_restricted_object,m_location_manager);
-	m_game_path_manager				= xr_new<CGamePathManager		>(m_restricted_object);
-	m_level_path_manager			= xr_new<CLevelPathManager		>(m_restricted_object);
-	m_detail_path_manager			= xr_new<CDetailPathManager		>(m_restricted_object);
-	m_patrol_path_manager			= xr_new<CPatrolPathManager		>(m_restricted_object,m_object);
+	m_game_location_selector		= new CGameLocationSelector(m_restricted_object,m_location_manager);
+	m_game_path_manager				= new CGamePathManager(m_restricted_object);
+	m_level_path_manager			= new CLevelPathManager(m_restricted_object);
+	m_detail_path_manager			= new CDetailPathManager(m_restricted_object);
+	m_patrol_path_manager			= new CPatrolPathManager(m_restricted_object,m_object);
 
-	m_level_path_builder			= xr_new<CLevelPathBuilder>(this);
-	m_detail_path_builder			= xr_new<CDetailPathBuilder>(this);
+	m_level_path_builder			= new CLevelPathBuilder(this);
+	m_detail_path_builder			= new CDetailPathBuilder(this);
 
 	extrapolate_path				(false);
 
@@ -377,7 +377,7 @@ void CMovementManager::enable_movement			(bool enabled)
 
 CRestrictedObject *CMovementManager::create_restricted_object	()
 {
-	return								(xr_new<CRestrictedObject>(m_object));
+	return								(new CRestrictedObject(m_object));
 }
 
 CMovementManager::CLevelPathManager::PATH &CMovementManager::level_path_path		()

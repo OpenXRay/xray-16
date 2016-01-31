@@ -10,7 +10,7 @@ class dx10State
 {
 //	Public interface
 public:
-	dx10State();	//	These have to be private bu xr_new/xr_delete don't support this
+	dx10State();	//	These have to be private bu new/xr_delete don't support this
 	~dx10State();
 
 	static dx10State* Create( SimulatorStates& state_code );

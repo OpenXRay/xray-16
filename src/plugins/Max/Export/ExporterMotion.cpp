@@ -26,7 +26,7 @@ BOOL CExporter::ExportMotion(INode* pNode, LPCSTR fname)
 	int iEndTick		= U.ip->GetAnimRange().End();
 
 	// build motion
-	CSMotion* MOT		= xr_new<CSMotion>();
+	CSMotion* MOT		= new CSMotion();
 	MOT->SetParam		(iStartTick/iTPF,iEndTick/iTPF,(float)iFPS);
 	string64 nm;		_splitpath(fname,0,0,nm,0);
 	MOT->SetName		(nm);
@@ -44,12 +44,12 @@ BOOL CExporter::ExportMotion(INode* pNode, LPCSTR fname)
 		st_BoneMotion& BM = BMVec.back();
 		BM.SetName(bone->name.c_str());
 
-		BM.envs[ctPositionX] = xr_new<CEnvelope>();
-		BM.envs[ctPositionY] = xr_new<CEnvelope>();
-		BM.envs[ctPositionZ] = xr_new<CEnvelope>();
-		BM.envs[ctRotationH] = xr_new<CEnvelope>();
-		BM.envs[ctRotationP] = xr_new<CEnvelope>();
-		BM.envs[ctRotationB] = xr_new<CEnvelope>();
+		BM.envs[ctPositionX] = new CEnvelope();
+		BM.envs[ctPositionY] = new CEnvelope();
+		BM.envs[ctPositionZ] = new CEnvelope();
+		BM.envs[ctRotationH] = new CEnvelope();
+		BM.envs[ctRotationP] = new CEnvelope();
+		BM.envs[ctRotationB] = new CEnvelope();
 
 		BM.envs[ctPositionX]->behavior[0]=1; BM.envs[ctPositionX]->behavior[1]=1;
 		BM.envs[ctPositionY]->behavior[0]=1; BM.envs[ctPositionY]->behavior[1]=1;
@@ -62,8 +62,8 @@ BOOL CExporter::ExportMotion(INode* pNode, LPCSTR fname)
 		st_Key *X,*Y,*Z,*H,*P,*B;
 		for(tick = iStartTick; tick < iEndTick; tick+=iTPF)
 		{
-			X = xr_new<st_Key>();	Y = xr_new<st_Key>();	Z = xr_new<st_Key>();
-			H = xr_new<st_Key>();	P = xr_new<st_Key>();	B = xr_new<st_Key>();
+			X = new st_Key();	Y = new st_Key();	Z = new st_Key();
+			H = new st_Key();	P = new st_Key();	B = new st_Key();
 			BM.envs[ctPositionX]->keys.push_back(X);	BM.envs[ctPositionY]->keys.push_back(Y);	BM.envs[ctPositionZ]->keys.push_back(Z);
 			BM.envs[ctRotationH]->keys.push_back(H);	BM.envs[ctRotationP]->keys.push_back(P);	BM.envs[ctRotationB]->keys.push_back(B);
 			// get the bone transformation matrix

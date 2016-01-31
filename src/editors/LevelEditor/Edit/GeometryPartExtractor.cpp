@@ -425,7 +425,7 @@ void recurse_tri(SBPart *P, SBFaceVec &faces, SBAdjVec &adjs, SBFace *F)
 //----------------------------------------------------
 void CGeomPartExtractor::AppendFace(CSurface *surf, const Fvector *v, const Fvector *n, const Fvector2 *uvs[3])
 {
-    SBFace *F = xr_new<SBFace>(surf, uvs);
+    SBFace *F = new SBFace(surf, uvs);
     // insert verts
     for (int k = 0; k<3; k++)
     {
@@ -444,7 +444,7 @@ CGeomPartExtractor::CGeomPartExtractor()
 void CGeomPartExtractor::Initialize(const Fbox &bb, float eps, u32 per_bone_face_count_min)
 {
     VERIFY(0==m_Verts);
-    m_Verts = xr_new<VCPacked>(bb, eps);
+    m_Verts = new VCPacked(bb, eps);
     m_PerBoneFaceCountMin = per_bone_face_count_min;
     VERIFY(m_PerBoneFaceCountMin>0);
 }
@@ -479,7 +479,7 @@ BOOL CGeomPartExtractor::Process()
             SBFace *F = *f_it;
             if (!F->marked)
             {
-                SBPart *P = xr_new<SBPart>();
+                SBPart *P = new SBPart();
                 recurse_tri(P, m_Faces, m_Adjs, *f_it);
                 m_Parts.push_back(P);
             }

@@ -30,24 +30,24 @@ void EScene::RegisterSceneTools(ESceneToolBase *mt)
 
 void EScene::CreateSceneTools()
 {
-    RegisterSceneTools(xr_new<ESceneDummyTool>()); //+
-    RegisterSceneTools(xr_new<ESceneObjectTool>()); //+
+    RegisterSceneTools(new ESceneDummyTool()); //+
+    RegisterSceneTools(new ESceneObjectTool()); //+
 
-    RegisterSceneTools(xr_new<ESceneLightTool>()); //+
-    RegisterSceneTools(xr_new<ESceneSoundSrcTool>()); //+
-    RegisterSceneTools(xr_new<ESceneSoundEnvTool>()); //+
-    RegisterSceneTools(xr_new<ESceneGroupTool>()); //+
-    RegisterSceneTools(xr_new<ESceneShapeTool>()); //+
-    RegisterSceneTools(xr_new<ESceneGlowTool>()); //+
-    RegisterSceneTools(xr_new<ESceneSpawnTool>()); //+
-    RegisterSceneTools(xr_new<ESceneWayTool>()); //+
-    RegisterSceneTools(xr_new<ESceneSectorTool>()); //+
-    RegisterSceneTools(xr_new<EScenePortalTool>()); //+
-    RegisterSceneTools(xr_new<EScenePSTool>()); //+
-    RegisterSceneTools(xr_new<EDetailManager>()); //+
-    RegisterSceneTools(xr_new<ESceneAIMapTool>()); //+
-    RegisterSceneTools(xr_new<ESceneWallmarkTool>()); //+
-    RegisterSceneTools(xr_new<ESceneFogVolumeTool>()); //+
+    RegisterSceneTools(new ESceneLightTool()); //+
+    RegisterSceneTools(new ESceneSoundSrcTool()); //+
+    RegisterSceneTools(new ESceneSoundEnvTool()); //+
+    RegisterSceneTools(new ESceneGroupTool()); //+
+    RegisterSceneTools(new ESceneShapeTool()); //+
+    RegisterSceneTools(new ESceneGlowTool()); //+
+    RegisterSceneTools(new ESceneSpawnTool()); //+
+    RegisterSceneTools(new ESceneWayTool()); //+
+    RegisterSceneTools(new ESceneSectorTool()); //+
+    RegisterSceneTools(new EScenePortalTool()); //+
+    RegisterSceneTools(new EScenePSTool()); //+
+    RegisterSceneTools(new EDetailManager()); //+
+    RegisterSceneTools(new ESceneAIMapTool()); //+
+    RegisterSceneTools(new ESceneWallmarkTool()); //+
+    RegisterSceneTools(new ESceneFogVolumeTool()); //+
 }
 
 void EScene::DestroySceneTools()

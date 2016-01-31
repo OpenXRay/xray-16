@@ -505,8 +505,8 @@ void xrCompressor::ProcessLTX(CInifile& ltx)
 	if (ltx.line_exist("options","exclude_exts"))
 		_SequenceToList(exclude_exts, ltx.r_string("options","exclude_exts"));
 
-	files_list				= xr_new< xr_vector<char*> >();
-	folders_list			= xr_new< xr_vector<char*> >();
+	files_list				= new xr_vector<char*>();
+	folders_list			= new xr_vector<char*>();
 
 	if(ltx.section_exist("include_folders"))
 	{

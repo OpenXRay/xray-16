@@ -102,14 +102,14 @@ void CUIArtefactParams::InitFromXml( CUIXml& xml )
 	CUIXmlInit::InitWindow( xml, base, 0, this );
 	xml.SetLocalRoot( base_node );
 	
-	m_Prop_line = xr_new<CUIStatic>();
+	m_Prop_line = new CUIStatic();
 	AttachChild( m_Prop_line );
 	m_Prop_line->SetAutoDelete( false );	
 	CUIXmlInit::InitStatic( xml, "prop_line", 0, m_Prop_line );
 
 	for ( u32 i = 0; i < ALife::infl_max_count; ++i )
 	{
-		m_immunity_item[i] = xr_new<UIArtefactParamItem>();
+		m_immunity_item[i] = new UIArtefactParamItem();
 		m_immunity_item[i]->Init( xml, af_immunity_section_names[i] );
 		m_immunity_item[i]->SetAutoDelete(false);
 
@@ -121,7 +121,7 @@ void CUIArtefactParams::InitFromXml( CUIXml& xml )
 
 	for ( u32 i = 0; i < ALife::eRestoreTypeMax; ++i )
 	{
-		m_restore_item[i] = xr_new<UIArtefactParamItem>();
+		m_restore_item[i] = new UIArtefactParamItem();
 		m_restore_item[i]->Init( xml, af_restore_section_names[i] );
 		m_restore_item[i]->SetAutoDelete(false);
 
@@ -132,7 +132,7 @@ void CUIArtefactParams::InitFromXml( CUIXml& xml )
 	}
 	
 	{
-		m_additional_weight = xr_new<UIArtefactParamItem>();
+		m_additional_weight = new UIArtefactParamItem();
 		m_additional_weight->Init( xml, "additional_weight" );
 		m_additional_weight->SetAutoDelete(false);
 

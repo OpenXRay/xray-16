@@ -200,8 +200,8 @@ ui_core::ui_core()
 {
 	if(!g_dedicated_server)
 	{
-		m_pUICursor					= xr_new<CUICursor>();
-		m_pFontManager				= xr_new<CFontManager>();
+		m_pUICursor					= new CUICursor();
+		m_pFontManager				= new CFontManager();
 	}else
 	{
 		m_pUICursor					= NULL;

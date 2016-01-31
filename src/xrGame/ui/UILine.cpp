@@ -143,14 +143,14 @@ int CUILine::GetSize(){
 
 const CUILine* CUILine::GetEmptyLine(){
 	xr_delete(m_tmpLine);
-	m_tmpLine = xr_new<CUILine>();
+	m_tmpLine = new CUILine();
 
     return m_tmpLine;
 }
 
 const CUILine* CUILine::Cut2Pos(Position& pos, bool to_first){
 	xr_delete(m_tmpLine);
-	m_tmpLine = xr_new<CUILine>();
+	m_tmpLine = new CUILine();
 
 	int last;
 

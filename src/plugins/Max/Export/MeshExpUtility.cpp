@@ -146,12 +146,12 @@ BOOL MeshExpUtility::BuildObject(CEditableObject*& exp_obj, LPCSTR m_ExportName)
 
 	ELog.Msg(mtInformation,"Building object..." );
 	char fname[256]; _splitpath( m_ExportName, 0, 0, fname, 0 );
-	exp_obj = xr_new<CEditableObject>(fname);	
+	exp_obj = new CEditableObject(fname);	
 	exp_obj->SetVersionToCurrent(TRUE,TRUE);
 
 	ExportItemIt it = m_Items.begin();
 	for(;it!=m_Items.end();it++){
-		CEditableMesh *submesh = xr_new<CEditableMesh>(exp_obj);
+		CEditableMesh *submesh = new CEditableMesh(exp_obj);
 		ELog.Msg(mtInformation,"Converting node '%s'...", it->pNode->GetName());
 		if( submesh->Convert(it->pNode) ){
 			// transform

@@ -20,6 +20,6 @@ CTeamHierarchyHolder &CSeniorityHierarchyHolder::team	(u32 team_id)
 {
 	VERIFY3					(team_id < max_team_count,"Team id is invalid : ",*SeniorityHierarchy::to_string(team_id));
 	if (!m_teams[team_id])
-		m_teams[team_id]	= xr_new<CTeamHierarchyHolder>(this);
+		m_teams[team_id]	= new CTeamHierarchyHolder(this);
 	return					(*m_teams[team_id]);
 }

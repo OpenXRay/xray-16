@@ -32,15 +32,15 @@ CMemoryManager::CMemoryManager		(CEntityAlive *entity_alive, CSound_UserDataVisi
 	m_stalker			= smart_cast<CAI_Stalker*>(m_object);
 
 	if (m_stalker)
-		m_visual		= xr_new<CVisualMemoryManager>(m_stalker);
+		m_visual		= new CVisualMemoryManager(m_stalker);
 	else
-		m_visual		= xr_new<CVisualMemoryManager>(m_object);
+		m_visual		= new CVisualMemoryManager(m_object);
 
-	m_sound				= xr_new<CSoundMemoryManager>	(m_object, m_stalker, visitor);
-	m_hit				= xr_new<CHitMemoryManager>		(m_object, m_stalker);
-	m_enemy				= xr_new<CEnemyManager>			(m_object);
-	m_item				= xr_new<CItemManager>			(m_object);
-	m_danger			= xr_new<CDangerManager>		(m_object);
+	m_sound				= new CSoundMemoryManager	(m_object, m_stalker, visitor);
+	m_hit				= new CHitMemoryManager		(m_object, m_stalker);
+	m_enemy				= new CEnemyManager			(m_object);
+	m_item				= new CItemManager			(m_object);
+	m_danger			= new CDangerManager		(m_object);
 }
 
 CMemoryManager::~CMemoryManager		()

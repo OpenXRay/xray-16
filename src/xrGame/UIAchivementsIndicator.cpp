@@ -8,7 +8,7 @@
 
 CUIAchivementIndicator::CUIAchivementIndicator()
 {
-	m_achivement_log			= xr_new<CUIGameLog>();
+	m_achivement_log			= new CUIGameLog();
 	AttachChild					(m_achivement_log);
 	CUIXml						tmp_xml;
 	tmp_xml.Load				(CONFIG_PATH, UI_PATH, "ui_mp_achivements.xml");

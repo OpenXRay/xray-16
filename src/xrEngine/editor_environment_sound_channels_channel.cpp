@@ -28,7 +28,7 @@ void property_collection<channel::sound_container_type, channel>::display_name(u
 template <>
 editor::property_holder* property_collection<channel::sound_container_type, channel>::create()
 {
-    source* object = xr_new<source>("");
+    source* object = new source("");
     object->fill(this);
     return (object->object());
 }
@@ -41,7 +41,7 @@ channel::channel(manager const& manager, shared_str const& id) :
     m_load_section = id;
     m_sound_dist = Fvector2().set(0.f, 0.f);
     m_sound_period = Ivector4().set(0, 0, 0, 0);
-    m_collection = xr_new<collection_type>(&m_sounds, this);
+    m_collection = new collection_type(&m_sounds, this);
 }
 
 channel::~channel()
@@ -64,7 +64,7 @@ void channel::load(CInifile& config)
     string_path sound;
     for (u32 i = 0, n = _GetItemCount(sounds); i < n; ++i)
     {
-        source* object = xr_new<source>(_GetItem(sounds, i, sound));
+        source* object = new source(_GetItem(sounds, i, sound));
         object->fill(m_collection);
         m_sounds.push_back(object);
     }

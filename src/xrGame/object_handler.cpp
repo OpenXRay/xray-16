@@ -29,7 +29,7 @@
 
 CObjectHandler::CObjectHandler		()
 {
-	m_planner					= xr_new<CObjectHandlerPlanner>();
+	m_planner					= new CObjectHandlerPlanner();
 	m_inventory_actual			= false;
 //	m_last_enemy_for_best_weapon= 0;
 }

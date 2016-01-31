@@ -95,7 +95,7 @@ float CUIListBoxItem::FieldsLength() const
 
 CUIStatic* CUIListBoxItem::AddIconField(float width)
 {
-	CUIStatic* st			= xr_new<CUIStatic>();
+	CUIStatic* st			= new CUIStatic();
 	st->SetAutoDelete		(true);
 	st->SetWndPos			(Fvector2().set(FieldsLength(),0.0f));
 	st->SetWndSize			(Fvector2().set(width, GetHeight()));
@@ -105,7 +105,7 @@ CUIStatic* CUIListBoxItem::AddIconField(float width)
 
 CUITextWnd* CUIListBoxItem::AddTextField(LPCSTR txt, float width)
 {
-	CUITextWnd* st			= xr_new<CUITextWnd>();
+	CUITextWnd* st			= new CUITextWnd();
 	st->SetAutoDelete		(true);
 	st->SetWndPos			(Fvector2().set(FieldsLength(),0.0f));
 	st->SetWndSize			(Fvector2().set(width, GetHeight()));

@@ -184,7 +184,7 @@ public:
     virtual void Create(shared_str &options) override {}
 	virtual const char *type_name() const override { return "base game"; }
 	virtual game_PlayerState *createPlayerState(NET_Packet *accountInfo) override
-    { return xr_new<game_PlayerState>(accountInfo); }
+    { return new game_PlayerState(accountInfo); }
     virtual ALife::_TIME_ID GetStartGameTime() override;
 	virtual ALife::_TIME_ID GetGameTime() override;
 	virtual float GetGameTimeFactor() override;				

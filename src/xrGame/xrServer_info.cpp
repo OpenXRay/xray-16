@@ -30,7 +30,7 @@ server_info_uploader& xrServer::GetServerInfoUploader()
 		result = *tmp_iter;
 	} else
 	{
-		result = xr_new<server_info_uploader>(m_file_transfers);
+		result = new server_info_uploader(m_file_transfers);
 		m_info_uploaders.push_back(result);
 	}
 	return *result;

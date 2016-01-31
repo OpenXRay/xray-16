@@ -37,7 +37,7 @@ demo_info* demo_info_loader::load_demofile(LPCSTR demo_file_name)
 	tmp_reader->r				(&tmp_fake_header, sizeof(tmp_fake_header));
 	tmp_reader->r_stringZ		(tmp_fake_string);
 
-	demo_info*	tmp_demoinfo = xr_new<demo_info>();
+	demo_info*	tmp_demoinfo = new demo_info();
 	tmp_demoinfo->read_from_file(tmp_reader);
 	tmp_demoinfo->sort_players(&sort_team_players_by_spots);
 	FS.r_close(tmp_reader);

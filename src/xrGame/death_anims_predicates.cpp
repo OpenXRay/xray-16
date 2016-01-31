@@ -325,14 +325,14 @@ void death_anims::setup		( IKinematicsAnimated* k, LPCSTR section, CInifile cons
 	VERIFY( ini );
 	VERIFY( anims.empty() );
 	anims.resize( types_number );
-	anims[0] =	xr_new<type_motion0>()->setup( k, ini, section, "kill_enertion"			);	//1.	Инерционное движение вперед от попадания в голову 
-	anims[1] =	xr_new<type_motion1>()->setup( k, ini, section, "kill_burst"			);	//2.	Изрешетить пулями
-	anims[2] =	xr_new<type_motion2>()->setup( k, ini, section, "kill_shortgun"			);	//3.	Шотган 
+	anims[0] =	(new type_motion0())->setup( k, ini, section, "kill_enertion"			);	//1.	Инерционное движение вперед от попадания в голову 
+	anims[1] =	(new type_motion1())->setup( k, ini, section, "kill_burst"			);	//2.	Изрешетить пулями
+	anims[2] =	(new type_motion2())->setup( k, ini, section, "kill_shortgun"			);	//3.	Шотган 
 
-	anims[6] =	xr_new<type_motion3>()->setup( k, ini, section, "kill_headshot"			);	//4.	Хедшот (по вероятности), кроме 5 (4) 
-	anims[4] =	xr_new<type_motion4>()->setup( k, ini, section, "kill_sniper_headshot"	);	//5.	Снайперка в голову. 
-	anims[5] =	xr_new<type_motion5>()->setup( k, ini, section, "kill_sniper_body"		);	//6.	Снайперка в тело. 
-	anims[3] =	xr_new<type_motion6>()->setup( k, ini, section, "kill_grenade"			);	//7.	Гранта 
+	anims[6] =	(new type_motion3())->setup( k, ini, section, "kill_headshot"			);	//4.	Хедшот (по вероятности), кроме 5 (4) 
+	anims[4] =	(new type_motion4())->setup( k, ini, section, "kill_sniper_headshot"	);	//5.	Снайперка в голову. 
+	anims[5] =	(new type_motion5())->setup( k, ini, section, "kill_sniper_body"		);	//6.	Снайперка в тело. 
+	anims[3] =	(new type_motion6())->setup( k, ini, section, "kill_grenade"			);	//7.	Гранта 
 	if( ini->line_exist( section , "random_death_animations" )  )
 		rnd_anims.setup( k, ini->r_string( section , "random_death_animations" ) ); 
 }

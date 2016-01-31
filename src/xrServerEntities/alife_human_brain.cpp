@@ -42,7 +42,7 @@ CALifeHumanBrain::CALifeHumanBrain			(object_type *object) : inherited(object)
 	m_object						= object;
 
 #ifdef XRGAME_EXPORTS
-	m_object_handler				= xr_new<CALifeHumanObjectHandler>(object);
+	m_object_handler				= new CALifeHumanObjectHandler(object);
 #endif
 	
 	m_dwTotalMoney					= 0;

@@ -14,10 +14,10 @@
 TEMPLATE_SPECIALIZATION
 CStateMonsterFindEnemyAbstract::CStateMonsterFindEnemy(_Object *obj) : inherited(obj)
 {
-	add_state	(eStateFindEnemy_Run,			xr_new<CStateMonsterFindEnemyRun<_Object> >			(obj));
-	add_state	(eStateFindEnemy_LookAround,	xr_new<CStateMonsterFindEnemyLook<_Object> >		(obj));
-	add_state	(eStateFindEnemy_Angry,			xr_new<CStateMonsterFindEnemyAngry<_Object> >		(obj));
-	add_state	(eStateFindEnemy_WalkAround,	xr_new<CStateMonsterFindEnemyWalkAround<_Object> >	(obj));
+	add_state	(eStateFindEnemy_Run,			new CStateMonsterFindEnemyRun<_Object>(obj));
+	add_state	(eStateFindEnemy_LookAround,	new CStateMonsterFindEnemyLook<_Object>(obj));
+	add_state	(eStateFindEnemy_Angry,			new CStateMonsterFindEnemyAngry<_Object>(obj));
+	add_state	(eStateFindEnemy_WalkAround,	new CStateMonsterFindEnemyWalkAround<_Object>(obj));
 }
 
 TEMPLATE_SPECIALIZATION

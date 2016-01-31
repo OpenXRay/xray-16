@@ -191,14 +191,14 @@ void	CKinematics::Load(const char* N, IReader *data, u32 dwFlags)
 #ifndef _EDITOR    
 	// User data
 	IReader* UD 	= data->open_chunk(OGF_S_USERDATA);
-    pUserData		= UD?xr_new<CInifile>(UD,FS.get_path("$game_config$")->m_Path):0;
+    pUserData		= UD?new CInifile(UD,FS.get_path("$game_config$")->m_Path):0;
     if (UD)			UD->close();
 #endif
 
 	// Globals
-	bone_map_N		= xr_new<accel>		();
-	bone_map_P		= xr_new<accel>		();
-	bones			= xr_new<vecBones>	();
+	bone_map_N		= new accel		();
+	bone_map_P		= new accel		();
+	bones			= new vecBones	();
 	bone_instances	= NULL;
 
 	// Load bones
@@ -628,7 +628,7 @@ void CKinematics::AddWallmark(const Fmatrix* parent_xform, const Fvector3& start
 	}
 
 	// ok. allocate wallmark
-	intrusive_ptr<CSkeletonWallmark>		wm = xr_new<CSkeletonWallmark>(this,parent_xform,shader,cp,RDEVICE.fTimeGlobal);
+	intrusive_ptr<CSkeletonWallmark>		wm = new CSkeletonWallmark(this,parent_xform,shader,cp,RDEVICE.fTimeGlobal);
 	wm->m_LocalBounds.set		(cp,size*2.f);
 	wm->XFORM()->transform_tiny	(wm->m_Bounds.P,cp);
 	wm->m_Bounds.R				= wm->m_Bounds.R; 

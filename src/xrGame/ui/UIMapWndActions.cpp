@@ -129,26 +129,26 @@ void CMapActionPlanner::setup		(CUIMapWnd *object)
 	m_storage.set_property		(2,false);
 	m_storage.set_property		(3,false);
 
-	add_evaluator				(ePropTargetMapShown,	xr_new<CEvaluatorTargetMapShown>("ePropTargetMapShown"));
-	add_evaluator				(ePropMapMinimized,		xr_new<CEvaluatorMapMinimized>	("ePropMapMinimized"));
-	add_evaluator				(ePropMapResized,		xr_new<CEvaluatorMapResized>	("ePropMapResized"));
-	add_evaluator				(ePropMapIdle,			xr_new<CEvaluatorMapConst>		(false,"ePropMapIdle"));
+	add_evaluator				(ePropTargetMapShown,	new CEvaluatorTargetMapShown("ePropTargetMapShown"));
+	add_evaluator				(ePropMapMinimized,		new CEvaluatorMapMinimized	("ePropMapMinimized"));
+	add_evaluator				(ePropMapResized,		new CEvaluatorMapResized	("ePropMapResized"));
+	add_evaluator				(ePropMapIdle,			new CEvaluatorMapConst		(false,"ePropMapIdle"));
 
 	// final world state
-	_world_operator* action		= xr_new<CMapActionIdle>("eOperatorMapIdle");
+	_world_operator* action		= new CMapActionIdle("eOperatorMapIdle");
 	add_condition				(action,ePropMapResized,	true);
 	add_condition				(action,ePropTargetMapShown,true);
 	add_condition				(action,ePropMapIdle,		false);
 	add_effect					(action,ePropMapIdle,		true);
 	add_operator				(eOperatorMapIdle,action);
 
-	action						= xr_new<CMapActionResize>("eOperatorMapResize");
+	action						= new CMapActionResize("eOperatorMapResize");
 	add_condition				(action,ePropTargetMapShown,	true);
 	add_condition				(action,ePropMapResized,		false);
 	add_effect					(action,ePropMapResized,		true);
 	add_operator				(eOperatorMapResize,			action);
 
-	action						= xr_new<CMapActionMinimize>("eOperatorMapMinimize");
+	action						= new CMapActionMinimize("eOperatorMapMinimize");
 	add_condition				(action,ePropTargetMapShown,false);
 	add_effect					(action,ePropTargetMapShown,true);
 	add_operator				(eOperatorMapMinimize,		action);

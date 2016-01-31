@@ -85,7 +85,7 @@ CRelationRegistryWrapper& RELATION_REGISTRY::relation_registry()
 	if(!m_relation_registry){
 		VERIFY(IsGameTypeSingle());
 
-		m_relation_registry = xr_new<CRelationRegistryWrapper>();
+		m_relation_registry = new CRelationRegistryWrapper();
 		load_attack_goodwill();
 	}
 
@@ -96,7 +96,7 @@ CRelationRegistryWrapper& RELATION_REGISTRY::relation_registry()
 RELATION_REGISTRY::FIGHT_VECTOR& RELATION_REGISTRY::fight_registry()
 {
 	if(!m_fight_registry)
-		m_fight_registry = xr_new<FIGHT_VECTOR>();
+		m_fight_registry = new FIGHT_VECTOR();
 
 	return *m_fight_registry;
 }
@@ -111,7 +111,7 @@ void RELATION_REGISTRY::clear_relation_registry()
 const shared_str& RELATION_REGISTRY::GetSpotName(ALife::ERelationType& type)
 {
 	if(!m_spot_names)
-		m_spot_names = xr_new<RELATION_MAP_SPOTS>();
+		m_spot_names = new RELATION_MAP_SPOTS();
 	return m_spot_names->GetSpotName(type);
 }
 

@@ -11,7 +11,7 @@ public:
 public:
     CTCD()
     {
-        cdColor = xr_new<TColorDialog>((TComponent*)0);
+        cdColor = new TColorDialog((TComponent*)0);
         cdColor->Options = TColorDialogOptions()<<cdFullOpen;
     }
 

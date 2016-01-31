@@ -44,7 +44,7 @@ __fastcall TfrmEditLibrary::TfrmEditLibrary(TComponent *Owner)
     : TForm(Owner)
 {
     DEFINE_INI(fsStorage);
-    //	m_pEditObject 	= xr_new<CSceneObject>((LPVOID)0,(LPSTR)0);
+    //	m_pEditObject 	= new CSceneObject((LPVOID)0,(LPSTR)0);
     m_Props = TfrmPropertiesEObject::CreateProperties(0, alNone, TOnModifiedEvent(this, &TfrmEditLibrary::OnModified));
     m_Items = TItemList::CreateForm("Objects", paItems, alClient, TItemList::ilMultiSelect|TItemList::ilEditMenu|TItemList::ilDragAllowed|TItemList::ilFolderStore);
     m_Items->SetOnItemsFocusedEvent(fastdelegate::bind<TOnILItemsFocused>(this, &TfrmEditLibrary::OnItemsFocused));
@@ -59,7 +59,7 @@ void __fastcall TfrmEditLibrary::ShowEditor()
 {
     if (!form)
     {
-        form = xr_new<TfrmEditLibrary>((TComponent*)0);
+        form = new TfrmEditLibrary((TComponent*)0);
         Scene->lock();
     }
     form->Show();
@@ -286,7 +286,7 @@ void __fastcall TfrmEditLibrary::OnItemsFocused(ListItemsVec &items)
 
         FS.update_path(thm_fn,_objects_, ChangeFileExt(nm, ".thm").c_str());
         if (FS.exist(thm_fn))
-            m_Thm = xr_new<EObjectThumbnail>(nm.c_str());
+            m_Thm = new EObjectThumbnail(nm.c_str());
         /*
         if (cbPreview->Checked || m_Props->Visible)
         {
@@ -663,7 +663,7 @@ void TfrmEditLibrary::ChangeReference(const RStringVec &items)
     RStringVec::const_iterator sit_e = items.end();
     for (; sit!=sit_e; ++sit)
     {
-        CSceneObject *SO = xr_new<CSceneObject>((LPVOID)0, (LPSTR)0);
+        CSceneObject *SO = new CSceneObject((LPVOID)0, (LPSTR)0);
         m_pEditObjects.push_back(SO);
         SO->SetReference((*sit).c_str());
 
@@ -831,7 +831,7 @@ void __fastcall TfrmEditLibrary::ebImportClick(TObject *Sender)
         for (AStringIt it = lst.begin(); it!=lst.end(); ++it)
         {
             nm = ChangeFileExt(ExtractFileName(*it), "").c_str();
-            CEditableObject *O = xr_new<CEditableObject>(nm.c_str());
+            CEditableObject *O = new CEditableObject(nm.c_str());
             if (O->Load(it->c_str()))
             {
                 save_nm = xr_string(FS.get_path(_objects_)->m_Path)+folder.c_str()+EFS.ChangeFileExt(nm, ".object");
@@ -936,7 +936,7 @@ void __fastcall TfrmEditLibrary::ebExportOBJClick(TObject *Sender)
         ListItemsIt it_e = sel_items.end();
 
         SPBItem *pb = UI->ProgressStart(form->m_pEditObjects.size(), "Expotring to OBJ");
-        CSceneObject *SO = xr_new<CSceneObject>((LPVOID)0, (LPSTR)0);
+        CSceneObject *SO = new CSceneObject((LPVOID)0, (LPSTR)0);
         for (; it!=it_e; ++it)
         {
             ListItem *item = *it;

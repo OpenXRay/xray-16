@@ -49,7 +49,7 @@ CServerList::CServerList()
 	m_bAnimation					= false;
 
 	m_sort_func						= "none";
-	m_message_box					= xr_new<CUIMessageBoxEx>();
+	m_message_box					= new CUIMessageBoxEx();
 	m_message_box->InitMessageBox	("message_box_password");
 	m_message_box->SetMessageTarget	(this);
 	

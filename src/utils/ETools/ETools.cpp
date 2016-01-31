@@ -130,7 +130,7 @@ namespace ETOOLS{
 
 	ETOOLS_API CDB::Collector*			 __stdcall create_collector		()
 	{
-		return							xr_new<CDB::Collector>	();
+		return							new CDB::Collector	();
 	}
 	ETOOLS_API void						 __stdcall destroy_collector		(CDB::Collector*& M)
 	{
@@ -147,7 +147,7 @@ namespace ETOOLS{
 
 	ETOOLS_API CDB::CollectorPacked*	 __stdcall create_collectorp		(const Fbox &bb, int apx_vertices, int apx_faces)
 	{
-		return							xr_new<CDB::CollectorPacked>	(bb, apx_vertices, apx_faces);
+		return							new CDB::CollectorPacked	(bb, apx_vertices, apx_faces);
 	}
 	ETOOLS_API void						 __stdcall destroy_collectorp		(CDB::CollectorPacked*& M)
 	{
@@ -171,7 +171,7 @@ namespace ETOOLS{
 	}
 	ETOOLS_API CDB::MODEL*	 __stdcall create_model	(Fvector* V, int Vcnt, CDB::TRI* T, int Tcnt)
 	{
-		CDB::MODEL* M		= xr_new<CDB::MODEL> ();
+		CDB::MODEL* M		= new CDB::MODEL ();
 		M->build			(V, Vcnt, T, Tcnt);
 		return M;
 	}

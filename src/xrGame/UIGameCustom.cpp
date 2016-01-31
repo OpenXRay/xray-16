@@ -114,9 +114,9 @@ StaticDrawableWrapper* CUIGameCustom::AddCustomStatic(const char* id, bool singl
             return *it;
     }
     CUIXmlInit xmlInit;
-    CustomStatics.push_back(xr_new<StaticDrawableWrapper>());
+    CustomStatics.push_back(new StaticDrawableWrapper());
     StaticDrawableWrapper* sss = CustomStatics.back();
-    sss->m_static = xr_new<CUIStatic>();
+    sss->m_static = new CUIStatic();
     sss->m_name = id;
     xmlInit.InitStatic(*MsgConfig, id, 0, sss->m_static);
     float ttl = MsgConfig->ReadAttribFlt(id, 0, "ttl", -1.0f);
@@ -223,19 +223,19 @@ void CUIGameCustom::Load()
     if (!g_pGameLevel)
         return;
     R_ASSERT(!MsgConfig);
-    MsgConfig = xr_new<CUIXml>();
+    MsgConfig = new CUIXml();
     MsgConfig->Load(CONFIG_PATH, UI_PATH, "ui_custom_msgs.xml");
     R_ASSERT(!ActorMenu);
-    ActorMenu = xr_new<CUIActorMenu>();
+    ActorMenu = new CUIActorMenu();
     R_ASSERT(!PdaMenu);
-    PdaMenu = xr_new<CUIPdaWnd>();
+    PdaMenu = new CUIPdaWnd();
     R_ASSERT(!Window);
-    Window = xr_new<CUIWindow>();
+    Window = new CUIWindow();
     R_ASSERT(!UIMainIngameWnd);
-    UIMainIngameWnd = xr_new<CUIMainIngameWnd>();
+    UIMainIngameWnd = new CUIMainIngameWnd();
     UIMainIngameWnd->Init();
     R_ASSERT(!m_pMessagesWnd);
-    m_pMessagesWnd = xr_new<CUIMessagesWindow>();
+    m_pMessagesWnd = new CUIMessagesWindow();
     Init(0);
     Init(1);
     Init(2);

@@ -20,15 +20,15 @@
 
 CStateManagerGigant::CStateManagerGigant(CPseudoGigant *monster) : inherited(monster)
 {
-	add_state(eStateRest,					xr_new<CStateMonsterRest<CPseudoGigant> >				(monster));
-	add_state(eStatePanic,					xr_new<CStateMonsterPanic<CPseudoGigant> >				(monster));
-	add_state(eStateAttack,					xr_new<CStateMonsterAttack<CPseudoGigant> >				(monster));
-	add_state(eStateEat,					xr_new<CStateMonsterEat<CPseudoGigant> >				(monster));
-	add_state(eStateHearInterestingSound,	xr_new<CStateMonsterHearInterestingSound<CPseudoGigant> >(monster));
-	add_state(eStateHearDangerousSound,		xr_new<CStateMonsterHearDangerousSound<CPseudoGigant> >	(monster));
-	add_state(eStateHitted,					xr_new<CStateMonsterHitted<CPseudoGigant> >				(monster));
-	add_state(eStateControlled,				xr_new<CStateMonsterControlled<CPseudoGigant> >			(monster));
-	add_state(eStateHearHelpSound,			xr_new<CStateMonsterHearHelpSound<CPseudoGigant> >		(monster));
+	add_state(eStateRest,					new CStateMonsterRest<CPseudoGigant>(monster));
+	add_state(eStatePanic,					new CStateMonsterPanic<CPseudoGigant>(monster));
+	add_state(eStateAttack,					new CStateMonsterAttack<CPseudoGigant>(monster));
+	add_state(eStateEat,					new CStateMonsterEat<CPseudoGigant>(monster));
+	add_state(eStateHearInterestingSound,	new CStateMonsterHearInterestingSound<CPseudoGigant>(monster));
+	add_state(eStateHearDangerousSound,		new CStateMonsterHearDangerousSound<CPseudoGigant>(monster));
+	add_state(eStateHitted,					new CStateMonsterHitted<CPseudoGigant>(monster));
+	add_state(eStateControlled,				new CStateMonsterControlled<CPseudoGigant>(monster));
+	add_state(eStateHearHelpSound,			new CStateMonsterHearHelpSound<CPseudoGigant>(monster));
 }
 
 void CStateManagerGigant::execute()

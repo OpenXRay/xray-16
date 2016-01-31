@@ -17,18 +17,18 @@ CUIVotingCategory::CUIVotingCategory()
 	change_map		= NULL;
 	change_gametype	= NULL;
 
-	bkgrnd			= xr_new<CUIStatic>(); bkgrnd->SetAutoDelete(true); AttachChild(bkgrnd);
-	header			= xr_new<CUIStatic>(); header->SetAutoDelete(true);	AttachChild(header);
-	btn_cancel		= xr_new<CUI3tButton>();btn_cancel->SetAutoDelete(true); AttachChild(btn_cancel);
+	bkgrnd			= new CUIStatic(); bkgrnd->SetAutoDelete(true); AttachChild(bkgrnd);
+	header			= new CUIStatic(); header->SetAutoDelete(true);	AttachChild(header);
+	btn_cancel		= new CUI3tButton();btn_cancel->SetAutoDelete(true); AttachChild(btn_cancel);
 
 	for (int i = 0; i<7; i++)
 	{
-		btn[i] = xr_new<CUI3tButton>();
+		btn[i] = new CUI3tButton();
 		btn[i]->SetAutoDelete(true);
 		AttachChild(btn[i]);
 
 
-		txt[i] = xr_new<CUIStatic>();
+		txt[i] = new CUIStatic();
 		txt[i]->SetAutoDelete(true);
 		AttachChild(txt[i]);
 	}
@@ -48,7 +48,7 @@ CUIVotingCategory::~CUIVotingCategory()
 void CUIVotingCategory::InitVotingCategory()
 {
 	if (!xml_doc)
-		xml_doc = xr_new<CUIXml>();
+		xml_doc = new CUIXml();
 
 	xml_doc->Load(CONFIG_PATH, UI_PATH, "voting_category.xml");
 
@@ -125,35 +125,35 @@ void CUIVotingCategory::OnBtn(int i)
 		case 2:
 			HideDialog();
 			if (!kick)
-				kick = xr_new<CUIKickPlayer>();
+				kick = new CUIKickPlayer();
 			kick->InitKick				(*xml_doc);
 			kick->ShowDialog			(true);
 			break;
 		case 3:
 			HideDialog();
 			if (!kick)
-				kick = xr_new<CUIKickPlayer>();
+				kick = new CUIKickPlayer();
 			kick->InitBan(*xml_doc);
 			kick->ShowDialog			(true);
 			break;
 		case 4:
 			HideDialog();
 			if (!change_map)
-				change_map				= xr_new<CUIChangeMap>();
+				change_map				= new CUIChangeMap();
 			change_map->InitChangeMap	(*xml_doc);
 			change_map->ShowDialog		(true);
 			break;
 		case 5:
 			HideDialog();
 			if (!change_weather)
-				change_weather			= xr_new<ChangeWeatherDialog>();
+				change_weather			= new ChangeWeatherDialog();
 			change_weather->InitChangeWeather(*xml_doc);
 			change_weather->ShowDialog	(true);
 			break;
 		case 6:
 			HideDialog();
 			if (!change_gametype)
-				change_gametype			= xr_new<ChangeGameTypeDialog>();
+				change_gametype			= new ChangeGameTypeDialog();
 			change_gametype->InitChangeGameType(*xml_doc);
 			change_gametype->ShowDialog	(true);
 			break;

@@ -24,15 +24,15 @@
 TEMPLATE_SPECIALIZATION
 CStateMonsterRestAbstract::CStateMonsterRest(_Object *obj) : inherited(obj)
 {
-	add_state(eStateRest_Sleep,			xr_new<CStateMonsterRestSleep<_Object> >	(obj));
-	add_state(eStateRest_WalkGraphPoint,xr_new<CStateMonsterRestWalkGraph<_Object> >(obj));
-	add_state(eStateRest_Idle,			xr_new<CStateMonsterRestIdle<_Object> >		(obj));
-	add_state(eStateRest_Fun,			xr_new<CStateMonsterRestFun<_Object> >		(obj));
-	add_state(eStateSquad_Rest,			xr_new<CStateMonsterSquadRest<_Object> >	(obj));
-	add_state(eStateSquad_RestFollow,	xr_new<CStateMonsterSquadRestFollow<_Object> >(obj));
-	add_state(eStateCustomMoveToRestrictor, xr_new<CStateMonsterMoveToRestrictor<_Object> > (obj));
-	add_state(eStateRest_MoveToHomePoint, xr_new<CStateMonsterRestMoveToHomePoint<_Object> > (obj));
-	add_state(eStateSmartTerrainTask, xr_new<CStateMonsterSmartTerrainTask<_Object> > (obj));
+	add_state(eStateRest_Sleep,			new CStateMonsterRestSleep<_Object>(obj));
+	add_state(eStateRest_WalkGraphPoint,new CStateMonsterRestWalkGraph<_Object>(obj));
+	add_state(eStateRest_Idle,			new CStateMonsterRestIdle<_Object>(obj));
+	add_state(eStateRest_Fun,			new CStateMonsterRestFun<_Object>(obj));
+	add_state(eStateSquad_Rest,			new CStateMonsterSquadRest<_Object>(obj));
+	add_state(eStateSquad_RestFollow,	new CStateMonsterSquadRestFollow<_Object>(obj));
+	add_state(eStateCustomMoveToRestrictor, new CStateMonsterMoveToRestrictor<_Object>(obj));
+	add_state(eStateRest_MoveToHomePoint, new CStateMonsterRestMoveToHomePoint<_Object>(obj));
+	add_state(eStateSmartTerrainTask, new CStateMonsterSmartTerrainTask<_Object>(obj));
 }
 
 TEMPLATE_SPECIALIZATION

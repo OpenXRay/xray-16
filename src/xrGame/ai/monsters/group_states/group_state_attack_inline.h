@@ -22,19 +22,19 @@
 TEMPLATE_SPECIALIZATION
 CStateGroupAttackAbstract::CStateGroupAttack(_Object *obj) : inherited(obj)
 {
-	add_state	(eStateAttack_Run,				xr_new<CStateGroupAttackRun<_Object> >				(obj));
-	add_state	(eStateAttack_Melee,			xr_new<CStateMonsterAttackMelee<_Object> >			(obj));
-	add_state	(eStateAttack_RunAttack,		xr_new<CStateMonsterAttackRunAttack<_Object> >		(obj));
-	add_state	(eStateAttack_Attack_On_Run,	xr_new<CStateMonsterAttackOnRun<_Object> >			(obj));
-	add_state	(eStateAttack_RunAway,			xr_new<CStateMonsterHideFromPoint<_Object> >		(obj));
-	add_state	(eStateAttack_FindEnemy,		xr_new<CStateMonsterFindEnemy<_Object> >			(obj));	
-	add_state	(eStateAttack_MoveToHomePoint,	xr_new<CStateMonsterAttackMoveToHomePoint<_Object> >(obj));	
+	add_state	(eStateAttack_Run,				new CStateGroupAttackRun<_Object>(obj));
+	add_state	(eStateAttack_Melee,			new CStateMonsterAttackMelee<_Object>(obj));
+	add_state	(eStateAttack_RunAttack,		new CStateMonsterAttackRunAttack<_Object>(obj));
+	add_state	(eStateAttack_Attack_On_Run,	new CStateMonsterAttackOnRun<_Object>(obj));
+	add_state	(eStateAttack_RunAway,			new CStateMonsterHideFromPoint<_Object>(obj));
+	add_state	(eStateAttack_FindEnemy,		new CStateMonsterFindEnemy<_Object>(obj));	
+	add_state	(eStateAttack_MoveToHomePoint,	new CStateMonsterAttackMoveToHomePoint<_Object>(obj));	
 	
-	add_state	(eStateCustom,					xr_new<CStateGroupSquadMoveToRadius<_Object> >		(obj));
-	add_state	(eStateAttack_AttackHidden,		xr_new<CStateGroupSquadMoveToRadius<_Object> >		(obj));
-	add_state	(eStateAttackCamp,				xr_new<CStateGroupSquadMoveToRadius<_Object> >		(obj));
-	add_state	(eStateAttack_Steal,			xr_new<CStateGroupSquadMoveToRadiusEx<_Object> >		(obj));
-	add_state	(eStateAttack_ControlFire,		xr_new<CStateCustomGroup<_Object> >					(obj));
+	add_state	(eStateCustom,					new CStateGroupSquadMoveToRadius<_Object>(obj));
+	add_state	(eStateAttack_AttackHidden,		new CStateGroupSquadMoveToRadius<_Object>(obj));
+	add_state	(eStateAttackCamp,				new CStateGroupSquadMoveToRadius<_Object>(obj));
+	add_state	(eStateAttack_Steal,			new CStateGroupSquadMoveToRadiusEx<_Object>(obj));
+	add_state	(eStateAttack_ControlFire,		new CStateCustomGroup<_Object>(obj));
 }
 
 TEMPLATE_SPECIALIZATION

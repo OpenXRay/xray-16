@@ -118,7 +118,7 @@ moving_bones_snd_player* create_moving_bones_snd_player( CInifile* ini, IKinemat
 {
 	if( !ini || !ini->section_exist( "moving_bones_snd_player" ) )
 		return 0;
-	return xr_new<moving_bones_snd_player>( &K, ini, "moving_bones_snd_player", obj );
+	return new moving_bones_snd_player( &K, ini, "moving_bones_snd_player", obj );
 }
 
 moving_bones_snd_player* create_moving_bones_snd_player( CGameObject &O )

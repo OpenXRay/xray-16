@@ -12,9 +12,9 @@
 void ESceneGroupTool::CreateControls()
 {
     inherited::CreateDefaultControls(estDefault);
-    AddControl(xr_new<TUI_ControlGroupAdd>(estDefault, etaAdd, this));
+    AddControl(new TUI_ControlGroupAdd(estDefault, etaAdd, this));
     // frame
-    pFrame = xr_new<TfraGroup>((TComponent*)0, this);
+    pFrame = new TfraGroup((TComponent*)0, this);
 }
 
 //----------------------------------------------------
@@ -73,7 +73,7 @@ void ESceneGroupTool::GroupObjects(bool bUndo)
 {
     string256 namebuffer;
     Scene->GenObjectName(OBJCLASS_GROUP, namebuffer);
-    CGroupObject *group = xr_new<CGroupObject>((LPVOID)0, namebuffer);
+    CGroupObject *group = new CGroupObject((LPVOID)0, namebuffer);
 
     // validate objects
     ObjectList lst;
@@ -146,7 +146,7 @@ void ESceneGroupTool::AlignToObject()
 
 CCustomObject *ESceneGroupTool::CreateObject(LPVOID data, LPCSTR name)
 {
-    CCustomObject*O = xr_new<CGroupObject>(data, name);
+    CCustomObject*O = new CGroupObject(data, name);
     O->ParentTool = this;
     return O;
 }

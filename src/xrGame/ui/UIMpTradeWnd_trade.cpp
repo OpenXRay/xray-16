@@ -54,7 +54,7 @@ bool CUIMpTradeWnd::TryToSellItem(SBuyItemInfo* sell_itm, bool do_destroy, SBuyI
 			int accel_idx						= m_store_hierarchy->CurrentLevel().GetItemIdx(iinfo->m_name_sect);
 			VERIFY								(accel_idx!=-1);
 			iinfo->m_cell_item->SetAccelerator	( (accel_idx>10) ? 0 : DIK_1+accel_idx );
-			iinfo->m_cell_item->SetCustomDraw	(xr_new<CUICellItemTradeMenuDraw>(this, iinfo));
+			iinfo->m_cell_item->SetCustomDraw	(new CUICellItemTradeMenuDraw(this, iinfo));
 
 		}
 	}
@@ -281,7 +281,7 @@ void CUIMpTradeWnd::RenewShopItem(const shared_str& sect_name, bool b_just_bough
 			int accel_idx						= m_store_hierarchy->CurrentLevel().GetItemIdx(sect_name);
 			pitem->m_cell_item->SetAccelerator	( (accel_idx>9) ? 0 : DIK_1+accel_idx );
 
-			pitem->m_cell_item->SetCustomDraw	(xr_new<CUICellItemTradeMenuDraw>(this, pitem));
+			pitem->m_cell_item->SetCustomDraw	(new CUICellItemTradeMenuDraw(this, pitem));
 			pList->SetItem						(pitem->m_cell_item);
 		}
 	}

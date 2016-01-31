@@ -262,8 +262,8 @@ void CBaseMonster::SetAttackEffector()
 {
 	CActor *pA = smart_cast<CActor *>(Level().CurrentEntity());
 	if (pA) {
-		Actor()->Cameras().AddCamEffector(xr_new<CMonsterEffectorHit>(db().m_attack_effector.ce_time,db().m_attack_effector.ce_amplitude,db().m_attack_effector.ce_period_number,db().m_attack_effector.ce_power));
-		Actor()->Cameras().AddPPEffector(xr_new<CMonsterEffector>(db().m_attack_effector.ppi, db().m_attack_effector.time, db().m_attack_effector.time_attack, db().m_attack_effector.time_release));
+		Actor()->Cameras().AddCamEffector(new CMonsterEffectorHit(db().m_attack_effector.ce_time,db().m_attack_effector.ce_amplitude,db().m_attack_effector.ce_period_number,db().m_attack_effector.ce_power));
+		Actor()->Cameras().AddPPEffector(new CMonsterEffector(db().m_attack_effector.ppi, db().m_attack_effector.time, db().m_attack_effector.time_attack, db().m_attack_effector.time_release));
 	}
 }
 

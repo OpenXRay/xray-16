@@ -23,7 +23,7 @@ void CUIDragDropReferenceList::Initialize()
 {
 	for(int i=0; i<m_container->CellsCapacity().x; i++)
 	{
-		m_references.push_back(xr_new<CUIStatic>());
+		m_references.push_back(new CUIStatic());
 		Fvector2 pos = Fvector2().set((m_container->CellSize().x+m_container->CellsSpacing().x)*i,0);
 		m_references.back()->SetAutoDelete(true);
 		m_references.back()->SetWndPos(pos);

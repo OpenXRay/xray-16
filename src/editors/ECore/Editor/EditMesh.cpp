@@ -400,7 +400,7 @@ void CEditableMesh::GenerateAdjacency()
     m_AdjsRefs++;
     if (m_Adjs)
         return;
-    m_Adjs = xr_new<AdjVec>();
+    m_Adjs = new AdjVec();
     VERIFY(m_Faces);
     m_Adjs->resize(m_VertCount);
     //.	Log				(".. Update adjacency");

@@ -39,13 +39,13 @@ manager::manager() :
     m_thunderbolts(0),
     m_weathers(0)
 {
-    m_effects = xr_new<editor::environment::effects::manager>(this);
-    m_sound_channels = xr_new<editor::environment::sound_channels::manager>();
-    m_ambients = xr_new<editor::environment::ambients::manager>(*this);
-    m_weathers = xr_new<editor::environment::weathers::manager>(this);
-    m_suns = xr_new<editor::environment::suns::manager>(this);
-    m_levels = xr_new<editor::environment::levels::manager>(m_weathers);
-    m_thunderbolts = xr_new<editor::environment::thunderbolts::manager>(this);
+    m_effects = new editor::environment::effects::manager(this);
+    m_sound_channels = new editor::environment::sound_channels::manager();
+    m_ambients = new editor::environment::ambients::manager(*this);
+    m_weathers = new editor::environment::weathers::manager(this);
+    m_suns = new editor::environment::suns::manager(this);
+    m_levels = new editor::environment::levels::manager(m_weathers);
+    m_thunderbolts = new editor::environment::thunderbolts::manager(this);
 
     load_internal();
     fill();
@@ -198,7 +198,7 @@ manager::light_animator_ids_type const& manager::light_animator_ids() const
 void manager::create_mixer()
 {
     VERIFY(!CurrentEnv);
-    editor::environment::weathers::time* object = xr_new<editor::environment::weathers::time>(this, (editor::environment::weathers::weather const*)0, "");
+    editor::environment::weathers::time* object = new editor::environment::weathers::time(this, (editor::environment::weathers::weather const*)0, "");
     CurrentEnv = object;
     object->fill(0);
 }

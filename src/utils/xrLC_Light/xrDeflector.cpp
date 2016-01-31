@@ -437,7 +437,7 @@ bool	CDeflector::similar					( const CDeflector &D, float eps/* =EPS */ ) const
 
 CDeflector*		CDeflector::read_create					()
 {
-	return xr_new<CDeflector>();
+	return new CDeflector();
 }
 
 void DumpDeflctor( u32 id )

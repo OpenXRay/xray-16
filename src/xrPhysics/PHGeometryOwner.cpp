@@ -182,18 +182,18 @@ void CPHGeometryOwner::			add_Box		(const Fobb&		V)
 	if(box.m_halfsize.x<0.005f) box.m_halfsize.x=0.005f;
 	if(box.m_halfsize.y<0.005f) box.m_halfsize.y=0.005f;
 	if(box.m_halfsize.z<0.005f) box.m_halfsize.z=0.005f;
-	m_geoms.push_back(smart_cast<CODEGeom*>(xr_new<CBoxGeom>(box)));
+	m_geoms.push_back(smart_cast<CODEGeom*>(new CBoxGeom(box)));
 
 }
 
 void CPHGeometryOwner::			add_Sphere	(const Fsphere&	V)
 {
-	m_geoms.push_back(smart_cast<CODEGeom*>(xr_new<CSphereGeom>(V)));
+	m_geoms.push_back(smart_cast<CODEGeom*>(new CSphereGeom(V)));
 }
 
 void CPHGeometryOwner::add_Cylinder	(const Fcylinder& V)
 {
-	m_geoms.push_back(smart_cast<CODEGeom*>(xr_new<CCylinderGeom>(V)));
+	m_geoms.push_back(smart_cast<CODEGeom*>(new CCylinderGeom(V)));
 }
 
 

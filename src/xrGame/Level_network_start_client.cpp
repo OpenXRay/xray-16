@@ -142,7 +142,7 @@ bool	CLevel::net_start_client4				()
 
 		R_ASSERT							(physics_world());
 
-		m_ph_commander_physics_worldstep	= xr_new<CPHCommander>();
+		m_ph_commander_physics_worldstep	= new CPHCommander();
 		physics_world()->set_update_callback( m_ph_commander_physics_worldstep );
 
 		physics_world()->set_default_contact_shotmark( ContactShotMark );
@@ -247,7 +247,7 @@ bool	CLevel::net_start_client6				()
 			game->OnConnected				();
 			if (game->Type() != eGameIDSingle)
 			{
-				m_file_transfer = xr_new<file_transfer::client_site>();
+				m_file_transfer = new file_transfer::client_site();
 			}
 		}
 

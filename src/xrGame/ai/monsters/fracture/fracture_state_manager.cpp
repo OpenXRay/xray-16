@@ -18,12 +18,12 @@
 
 CStateManagerFracture::CStateManagerFracture(CFracture *obj) : inherited(obj)
 {
-	add_state(eStateRest,					xr_new<CStateMonsterRest<CFracture> >				(obj));
-	add_state(eStateAttack,					xr_new<CStateMonsterAttack<CFracture> >				(obj));
-	add_state(eStateEat,					xr_new<CStateMonsterEat<CFracture> >				(obj));
-	add_state(eStateHearDangerousSound,		xr_new<CStateMonsterHearDangerousSound<CFracture> >	(obj));
-	add_state(eStatePanic,					xr_new<CStateMonsterPanic<CFracture> >				(obj));
-	add_state(eStateHitted,					xr_new<CStateMonsterHitted<CFracture> >				(obj));
+	add_state(eStateRest,					new CStateMonsterRest<CFracture>(obj));
+	add_state(eStateAttack,					new CStateMonsterAttack<CFracture>(obj));
+	add_state(eStateEat,					new CStateMonsterEat<CFracture>(obj));
+	add_state(eStateHearDangerousSound,		new CStateMonsterHearDangerousSound<CFracture>(obj));
+	add_state(eStatePanic,					new CStateMonsterPanic<CFracture>(obj));
+	add_state(eStateHitted,					new CStateMonsterHitted<CFracture>(obj));
 }
 
 CStateManagerFracture::~CStateManagerFracture()

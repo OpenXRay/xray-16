@@ -11,7 +11,7 @@ CUITabButtonMP::CUITabButtonMP()
 
 void CUITabButtonMP::CreateHint()
 {
-	m_hint				= xr_new<CUIStatic>();
+	m_hint				= new CUIStatic();
 	m_hint->SetAutoDelete(true);
 	m_hint->SetCustomDraw(true);
 	AttachChild			(m_hint);

@@ -40,7 +40,7 @@ void CUIZoneMap::Init()
 	
 	m_clock_wnd						= UIHelper::CreateStatic(uiXml, "minimap:clock_wnd", &m_background);
 
-	m_activeMap						= xr_new<CUIMiniMap>();
+	m_activeMap						= new CUIMiniMap();
 	m_clipFrame.AttachChild			(m_activeMap);
 	m_activeMap->SetAutoDelete		(true);
 

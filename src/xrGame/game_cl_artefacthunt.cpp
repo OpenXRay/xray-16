@@ -52,9 +52,9 @@ game_cl_ArtefactHunt::game_cl_ArtefactHunt()
 
 void game_cl_ArtefactHunt::Init ()
 {
-//	pInventoryMenu	= xr_new<CUIInventoryWnd>();	
-//	pPdaMenu = xr_new<CUIPdaWnd>();
-//	pMapDesc = xr_new<CUIMapDesc>();
+//	pInventoryMenu	= new CUIInventoryWnd();	
+//	pPdaMenu = new CUIPdaWnd();
+//	pMapDesc = new CUIMapDesc();
 
 	LoadTeamData(TEAM1_MENU);
 	LoadTeamData(TEAM2_MENU);

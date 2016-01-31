@@ -29,7 +29,7 @@ static BoneVec* m_LWBones=0;
 
 static void AppendBone(LWItemID bone)
 {
-	m_LWBones->push_back(xr_new<CBone>());
+	m_LWBones->push_back(new CBone());
 	CBone& B = *m_LWBones->back();
 	B.SetName(g_iteminfo->name(bone));
     LWBoneParser::Parse(B, bone);
@@ -120,7 +120,7 @@ extern "C" {
 					char name[1024];
 					_splitpath( buf, 0, 0, name, 0 );
 
-					CEditableObject* obj = xr_new<CEditableObject>(name);
+					CEditableObject* obj = new CEditableObject(name);
 					obj->SetVersionToCurrent(TRUE,TRUE);
 
 					// parse bone if exist

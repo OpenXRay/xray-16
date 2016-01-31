@@ -74,7 +74,7 @@ SPass*		CResourceManager::_CreatePass			(const SPass& proto)
 		if (v_passes[it]->equal(proto))
 			return v_passes[it];
 	
-	SPass*	P					=	xr_new<SPass>();
+	SPass*	P					=	new SPass();
 	P->dwFlags					|=	xr_resource_flagged::RF_REGISTERED;
 	P->state					=	proto.state;
 	P->ps						=	proto.ps;
@@ -172,7 +172,7 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 	if (I!=m_vs.end())	return I->second;
 	else
 	{
-		SVS*	_vs					= xr_new<SVS>	();
+		SVS*	_vs					= new SVS	();
 		_vs->dwFlags				|= xr_resource_flagged::RF_REGISTERED;
 		m_vs.insert					(mk_pair(_vs->set_name(name),_vs));
 		//_vs->vs				= NULL;
@@ -263,7 +263,7 @@ SPS*	CResourceManager::_CreatePS			(LPCSTR _name)
 	if (I != m_ps.end())	return		I->second;
 	else
 	{
-		SPS*	_ps					=	xr_new<SPS>	();
+		SPS*	_ps					=	new SPS	();
 		_ps->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
 		m_ps.insert					(mk_pair(_ps->set_name(name),_ps));
 		VERIFY(strcmpi(name, "null") != 0);
@@ -344,7 +344,7 @@ SGS*	CResourceManager::_CreateGS			(LPCSTR name)
 	if (I!=m_gs.end())	return		I->second;
 	else
 	{
-		SGS*	_gs					=	xr_new<SGS>	();
+		SGS*	_gs					=	new SGS	();
 		_gs->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
 		m_gs.insert					(mk_pair(_gs->set_name(name),_gs));
 		if (0==stricmp(name,"null"))	{

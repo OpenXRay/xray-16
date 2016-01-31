@@ -126,12 +126,12 @@ int ProcessDifference()
 		_flags.set(file_comparer::eDontCheckFileSize, TRUE);
 	};
 
-	FS_new = xr_new<CLocatorAPI>	();
+	FS_new = new CLocatorAPI	();
 	FS_new->_initialize(CLocatorAPI::flTargetFolderOnly,new_folder);
 	file_list_new	= FS_new->file_list_open	("$target_folder$",FS_ListFiles);
 	folder_list_new	= FS_new->file_list_open	("$target_folder$",FS_ListFolders);
 
-	FS_old = xr_new<CLocatorAPI>	();
+	FS_old = new CLocatorAPI	();
 	FS_old->_initialize(CLocatorAPI::flTargetFolderOnly,old_folder);
 	file_list_old	= FS_old->file_list_open	("$target_folder$",FS_ListFiles);
 	folder_list_old	= FS_old->file_list_open	("$target_folder$",FS_ListFolders);

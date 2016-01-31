@@ -153,13 +153,13 @@ bool CCustomObject::LoadStream(IReader &F)
     // object motion
     if (F.find_chunk(CUSTOMOBJECT_CHUNK_MOTION))
     {
-        m_Motion = xr_new<COMotion>();
+        m_Motion = new COMotion();
         if (!m_Motion->Load(F))
         {
             ELog.Msg(mtError, "CustomObject: '%s' - motion has different version. Load failed.", Name);
             xr_delete(m_Motion);
         }
-        m_MotionParams = xr_new<SAnimParams>();
+        m_MotionParams = new SAnimParams();
         m_MotionParams->Set(m_Motion);
         AnimationUpdate(m_MotionParams->Frame());
     }

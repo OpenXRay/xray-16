@@ -8,7 +8,7 @@
 
 CFracture::CFracture()
 {
-	StateMan = xr_new<CStateManagerFracture>(this);
+	StateMan = new CStateManagerFracture(this);
 }
 
 CFracture::~CFracture()

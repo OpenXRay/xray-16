@@ -32,7 +32,7 @@ CUITextWnd* CUIGameLog::AddLogMessage(LPCSTR msg)
 
 CUIPdaMsgListItem* CUIGameLog::AddPdaMessage()
 {
-	CUIPdaMsgListItem* pItem				= xr_new<CUIPdaMsgListItem>();
+	CUIPdaMsgListItem* pItem				= new CUIPdaMsgListItem();
 	pItem->InitPdaMsgListItem				(Fvector2().set(GetDesiredChildWidth(),10.0f));
 	pItem->SetColorAnimation				("ui_main_msgs_short", LA_ONLYALPHA|LA_TEXTCOLOR|LA_TEXTURECOLOR);
 	AddWindow								(pItem, true);
@@ -42,7 +42,7 @@ CUIPdaMsgListItem* CUIGameLog::AddPdaMessage()
 
 CUIPdaKillMessage* CUIGameLog::AddLogMessage(KillMessageStruct& msg)
 {
-	CUIPdaKillMessage* pItem	= xr_new<CUIPdaKillMessage>();	
+	CUIPdaKillMessage* pItem	= new CUIPdaKillMessage();	
 	pItem->SetWidth				(GetDesiredChildWidth());
 	pItem->SetHeight			(kill_msg_height);
 	pItem->Init					(msg, m_pFont);
@@ -57,7 +57,7 @@ void CUIGameLog::AddChatMessage(LPCSTR msg, LPCSTR author)
 
 	_TrimRight(fullLine);
     
-	CUITextWnd* pItem			= xr_new<CUITextWnd>();
+	CUITextWnd* pItem			= new CUITextWnd();
 	pItem->SetTextComplexMode	(true);
 	pItem->SetText				(fullLine);
     pItem->SetCutWordsMode		(true);

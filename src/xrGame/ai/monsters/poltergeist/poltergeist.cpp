@@ -24,7 +24,7 @@ void SetActorVisibility(u16 who, float value);
 
 CPoltergeist::CPoltergeist()
 {
-	StateMan					= xr_new<CStateManagerPoltergeist>(this);
+	StateMan					= new CStateManagerPoltergeist(this);
 	
 	invisible_vel.set			(0.1f, 0.1f);
 	
@@ -116,10 +116,10 @@ void CPoltergeist::Load(LPCSTR section)
 	LPCSTR polter_type = pSettings->r_string(section,"type");
 	
 	if (xr_strcmp(polter_type,"flamer") == 0) {
-		m_flame			= xr_new<CPolterFlame>(this);
+		m_flame			= new CPolterFlame(this);
 		m_flame->load	(section);
 	} else {
-		m_tele			= xr_new<CPolterTele>(this);
+		m_tele			= new CPolterTele(this);
 		m_tele->load	(section);
 	}
 
@@ -431,7 +431,7 @@ void CPoltergeist::on_deactivate()
 
 CMovementManager *CPoltergeist::create_movement_manager	()
 {
-	m_movement_manager				= xr_new<CPoltergeisMovementManager>(this);
+	m_movement_manager				= new CPoltergeisMovementManager(this);
 
 	control().add					(m_movement_manager, ControlCom::eControlPath);
 	control().install_path_manager	(m_movement_manager);

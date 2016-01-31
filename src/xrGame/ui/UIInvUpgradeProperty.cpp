@@ -34,8 +34,8 @@ UIProperty::~UIProperty()
 
 void UIProperty::init_from_xml( CUIXml& ui_xml )
 {
-	m_ui_icon = xr_new<CUIStatic>();	 
-	m_ui_text = xr_new<CUITextWnd>();
+	m_ui_icon = new CUIStatic();	 
+	m_ui_text = new CUITextWnd();
 	AttachChild( m_ui_icon );
 	AttachChild( m_ui_text );
 	m_ui_icon->SetAutoDelete( true );
@@ -158,7 +158,7 @@ void UIInvUpgPropertiesWnd::init_from_xml( LPCSTR xml_name )
 
 	CUIXmlInit::InitWindow( ui_xml, "properties", 0, this );
 
-	m_Upgr_line = xr_new<CUIStatic>();	 
+	m_Upgr_line = new CUIStatic();	 
 	AttachChild(m_Upgr_line);
 	m_Upgr_line->SetAutoDelete(true);
 	CUIXmlInit::InitStatic(ui_xml, "properties:upgr_line", 0, m_Upgr_line);
@@ -174,7 +174,7 @@ void UIInvUpgPropertiesWnd::init_from_xml( LPCSTR xml_name )
 	CInifile::SectIt_	ie = inv_section.Data.end();
 	for ( ; ib != ie ; ++ib )
 	{
-		UIProperty* ui_property = xr_new<UIProperty>(); // load one time !!
+		UIProperty* ui_property = new UIProperty(); // load one time !!
 		ui_property->init_from_xml( ui_xml );
 
 		property_id._set( (*ib).first );

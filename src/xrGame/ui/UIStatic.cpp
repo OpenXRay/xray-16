@@ -229,7 +229,7 @@ CUILines* CUIStatic::TextItemControl()
 {
 	if (!m_pTextControl) 
 	{
-		m_pTextControl = xr_new<CUILines>(); 
+		m_pTextControl = new CUILines(); 
 		m_pTextControl->SetTextAlignment(CGameFont::alLeft);
 	}
 	return m_pTextControl;

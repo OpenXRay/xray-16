@@ -30,7 +30,7 @@ void createWpnScopeXML()
 {
 	if(!pWpnScopeXml)
 	{
-		pWpnScopeXml			= xr_new<CUIXml>();
+		pWpnScopeXml			= new CUIXml();
 		pWpnScopeXml->Load		(CONFIG_PATH, UI_PATH, "scopes.xml");
 	}
 }
@@ -989,7 +989,7 @@ void CWeaponMagazined::InitAddons()
 
 			if ( !g_dedicated_server )
 			{
-				m_UIScope				= xr_new<CUIWindow>();
+				m_UIScope				= new CUIWindow();
 				createWpnScopeXML		();
 				CUIXmlInit::InitWindow	(*pWpnScopeXml, scope_tex_name.c_str(), 0, m_UIScope);
 			}
@@ -1116,7 +1116,7 @@ void CWeaponMagazined::OnZoomIn			()
 		CEffectorZoomInertion* S = smart_cast<CEffectorZoomInertion*>	(pActor->Cameras().GetCamEffector(eCEZoom));
 		if (!S)	
 		{
-			S = (CEffectorZoomInertion*)pActor->Cameras().AddCamEffector(xr_new<CEffectorZoomInertion> ());
+			S = (CEffectorZoomInertion*)pActor->Cameras().AddCamEffector(new CEffectorZoomInertion ());
 			S->Init(this);
 		};
 		S->SetRndSeed			(pActor->GetZoomRndSeed());

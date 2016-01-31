@@ -50,8 +50,8 @@ void CRender::level_Load(IReader* fs)
 	}
 
 	// Components
-	Wallmarks					= xr_new<CWallmarksEngine>	();
-	Details						= xr_new<CDetailManager>	();
+	Wallmarks					= new CWallmarksEngine	();
+	Details						= new CDetailManager	();
 
 	if	(!g_dedicated_server)	{
 		// VB,IB,SWI
@@ -326,7 +326,7 @@ void CRender::LoadSectors(IReader* fs)
 	u32 count = size/sizeof(b_portal);
 	Portals.resize	(count);
 	for (u32 c=0; c<count; c++)
-		Portals[c]	= xr_new<CPortal> ();
+		Portals[c]	= new CPortal ();
 
 	// load sectors
 	IReader* S = fs->open_chunk(fsL_SECTORS);
@@ -335,7 +335,7 @@ void CRender::LoadSectors(IReader* fs)
 		IReader* P = S->open_chunk(i);
 		if (0==P) break;
 
-		CSector* __S		= xr_new<CSector> ();
+		CSector* __S		= new CSector ();
 		__S->load			(*P);
 		Sectors.push_back	(__S);
 
@@ -372,7 +372,7 @@ void CRender::LoadSectors(IReader* fs)
 		}
 
 		// build portal model
-		rmPortals = xr_new<CDB::MODEL> ();
+		rmPortals = new CDB::MODEL ();
 		rmPortals->build	(CL.getV(),int(CL.getVS()),CL.getT(),int(CL.getTS()));
 	} else {
 		rmPortals = 0;
@@ -433,7 +433,7 @@ void CRender::Load3DFluid()
 			u32 cnt = F->r_u32();
 			for(u32 i=0; i<cnt; ++i)
 			{
-				dx103DFluidVolume *pVolume = xr_new<dx103DFluidVolume>();
+				dx103DFluidVolume *pVolume = new dx103DFluidVolume();
 				pVolume->Load("", F, 0);
 
 				//	Attach to sector's static geometry

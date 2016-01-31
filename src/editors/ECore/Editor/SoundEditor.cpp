@@ -64,7 +64,7 @@ void __fastcall TfrmSoundLib::EditLib(AnsiString &title)
 {
     if (!form)
     {
-        form = xr_new<TfrmSoundLib>((TComponent*)0);
+        form = new TfrmSoundLib((TComponent*)0);
         form->Caption = title;
         form->modif_map.clear();
         m_Flags.zero();
@@ -433,7 +433,7 @@ void __fastcall TfrmSoundLib::OnItemsFocused(ListItemsVec &items)
             {
                 ESoundThumbnail*thm = FindUsedTHM(prop->Key());
                 if (!thm)
-                    m_THM_Used.push_back(thm = xr_new<ESoundThumbnail>(prop->Key()));
+                    m_THM_Used.push_back(thm = new ESoundThumbnail(prop->Key()));
                 m_THM_Current.push_back(thm);
                 thm->FillProp(props);
             }

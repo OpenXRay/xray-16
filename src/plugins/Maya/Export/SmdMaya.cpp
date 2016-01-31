@@ -296,7 +296,7 @@ CSurface* CEditableObject::CreateSurface(MObject shader)
 	for(SurfaceIt s_it=m_Surfaces.begin(); s_it!=m_Surfaces.end(); s_it++)
 		if ((*s_it)->tag==*((int*)&shader)) return *s_it;
 	if (!S){
-		S				= xr_new<CSurface>();
+		S				= new CSurface();
 		S->tag			= *((int*)&shader);
 		SXRShaderData	d;
 		MStatus status	= parseShader(shader, d);
@@ -359,9 +359,9 @@ MStatus CXRaySkinExport::exportObject(LPCSTR fn, bool b_ogf)
 	if (strext(fname)) 
 		*strext(fname)=0;
 
-	CEditableObject* OBJECT = xr_new<CEditableObject>(fname);
+	CEditableObject* OBJECT = new CEditableObject(fname);
 	OBJECT->SetVersionToCurrent(TRUE,TRUE);
-	CEditableMesh* MESH		= xr_new<CEditableMesh>(OBJECT);
+	CEditableMesh* MESH		= new CEditableMesh(OBJECT);
 	MESH->SetName			("skin");
 	OBJECT->Meshes().push_back(MESH);
 	// IMPORT MESH
@@ -376,11 +376,11 @@ MStatus CXRaySkinExport::exportObject(LPCSTR fn, bool b_ogf)
 	// Weight maps 
 	_vmaps.resize			(m_boneList.size()+1);
 	for (DWORD b_i=0; b_i<m_boneList.size(); b_i++)
-		_vmaps[b_i]			= xr_new<st_VMap>(m_boneList[b_i]->name,vmtWeight,false);
+		_vmaps[b_i]			= new st_VMap(m_boneList[b_i]->name,vmtWeight,false);
 	// UV map
 	int VM_UV_idx			= _vmaps.size()-1;
 	st_VMap*& VM_UV			= _vmaps[VM_UV_idx];
-	VM_UV					= xr_new<st_VMap>("texture",vmtUV,false);
+	VM_UV					= new st_VMap("texture",vmtUV,false);
 	// Write out the vertex table
 	{
 		MESH->m_VertCount	= m_vertList.size();
@@ -456,7 +456,7 @@ MStatus CXRaySkinExport::exportObject(LPCSTR fn, bool b_ogf)
 		Fvector offset,rotate;
 		offset.set			((*boneIt)->trans);
 		rotate.set			((*boneIt)->orient);
-		OBJECT->Bones().push_back(xr_new<CBone>());
+		OBJECT->Bones().push_back(new CBone());
 		CBone* BONE			= OBJECT->Bones().back(); 
 		BONE->SetWMap		((*boneIt)->name);
 		BONE->SetName		((*boneIt)->name);
@@ -532,7 +532,7 @@ MStatus CXRaySkinExport::exportMotion(LPCSTR fn, const MMatrix& locator)
 	float iFPS			= 30.f;
 
 	// build motion
-	CSMotion* MOT		= xr_new<CSMotion>();
+	CSMotion* MOT		= new CSMotion();
 	MOT->SetParam		(frameFirst,frameLast,(float)iFPS);
 	MOT->SetName		(nm);
 
@@ -549,12 +549,12 @@ MStatus CXRaySkinExport::exportMotion(LPCSTR fn, const MMatrix& locator)
 			st_BoneMotion& BM = BMVec.back();
 			BM.SetName		(bone->name);
 
-			BM.envs[ctPositionX] = xr_new<CEnvelope>();
-			BM.envs[ctPositionY] = xr_new<CEnvelope>();
-			BM.envs[ctPositionZ] = xr_new<CEnvelope>();
-			BM.envs[ctRotationH] = xr_new<CEnvelope>();
-			BM.envs[ctRotationP] = xr_new<CEnvelope>();
-			BM.envs[ctRotationB] = xr_new<CEnvelope>();
+			BM.envs[ctPositionX] = new CEnvelope();
+			BM.envs[ctPositionY] = new CEnvelope();
+			BM.envs[ctPositionZ] = new CEnvelope();
+			BM.envs[ctRotationH] = new CEnvelope();
+			BM.envs[ctRotationP] = new CEnvelope();
+			BM.envs[ctRotationB] = new CEnvelope();
 
 			BM.envs[ctPositionX]->behavior[0]=1; BM.envs[ctPositionX]->behavior[1]=1;
 			BM.envs[ctPositionY]->behavior[0]=1; BM.envs[ctPositionY]->behavior[1]=1;
@@ -583,8 +583,8 @@ MStatus CXRaySkinExport::exportMotion(LPCSTR fn, const MMatrix& locator)
 				SmdBone* bone	= *boneIt;
 				st_BoneMotion& BM = BMVec[boneIt-m_boneList.begin()];
 
-				X = xr_new<st_Key>();	Y = xr_new<st_Key>();	Z = xr_new<st_Key>();
-				H = xr_new<st_Key>();	P = xr_new<st_Key>();	B = xr_new<st_Key>();
+				X = new st_Key();	Y = new st_Key();	Z = new st_Key();
+				H = new st_Key();	P = new st_Key();	B = new st_Key();
 				BM.envs[ctPositionX]->keys.push_back(X);	
 				BM.envs[ctPositionY]->keys.push_back(Y);	
 				BM.envs[ctPositionZ]->keys.push_back(Z);
@@ -628,7 +628,7 @@ int CXRaySkinExport::AppendVertex(MPoint pt, float u, float v, const WBVec& wb)
 							return it-m_vertList.begin();
 	}
 	{
-		m_vertList.push_back( xr_new<SmdVertex>( pt, u, v, wb ) );
+		m_vertList.push_back( new SmdVertex( pt, u, v, wb ) );
 		return m_vertList.size()-1;
 	}
 }
@@ -733,7 +733,7 @@ MStatus CXRaySkinExport::parsePolySet(MItMeshPolygon &meshPoly, MObjectArray& rg
 				return status;
 			}
 
-			tri = xr_new<SmdTriangle>();
+			tri = new SmdTriangle();
 			if (tri == NULL) {
 				Msg("!error creating triangle");
 				status = MS::kFailure;
@@ -907,7 +907,7 @@ MStatus CXRaySkinExport::getBones(void)
 							
 			// set up the array for all vertices
 			xr_delete(m_rgWeights);
-			m_rgWeights = xr_new<VWBVec>();
+			m_rgWeights = new VWBVec();
 			m_rgWeights->resize(gIter.count(&stat));
 			if (!stat) {
 				Msg("!Error creating array of vertices");
@@ -1004,7 +1004,7 @@ MStatus CXRaySkinExport::setUpBoneMap(MObject* pSkinObject)
 			{
 				// this is a new bone; need to add it to the list
 	
-				SmdBone *bone		= xr_new<SmdBone>();
+				SmdBone *bone		= new SmdBone();
 				bone->id			= ++lastJointID;
 				bone->name			= xr_strdup(joint.name().asChar());
 				joint.getPath		(jointPath);

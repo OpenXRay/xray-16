@@ -20,7 +20,7 @@ void property_collection<manager::effect_container_type, manager>::display_name(
 template <>
 editor::property_holder* property_collection<manager::effect_container_type, manager>::create()
 {
-    effect* object = xr_new<effect>(m_holder, generate_unique_id("effect_unique_id_").c_str());
+    effect* object = new effect(m_holder, generate_unique_id("effect_unique_id_").c_str());
     object->fill(this);
     return (object->object());
 }
@@ -30,7 +30,7 @@ manager::manager(::editor::environment::manager* environment) :
     m_collection(0),
     m_changed(true)
 {
-    m_collection = xr_new<collection_type>(&m_effects, this, &m_changed);
+    m_collection = new collection_type(&m_effects, this, &m_changed);
 }
 
 manager::~manager()
@@ -43,7 +43,7 @@ void manager::load()
 {
     string_path file_name;
     CInifile* config =
-        xr_new<CInifile>(
+        new CInifile(
             FS.update_path(
                 file_name,
                 "$game_config$",
@@ -63,7 +63,7 @@ void manager::load()
     sections_type::const_iterator e = sections.end();
     for (; i != e; ++i)
     {
-        effect* object = xr_new<effect>(*this, (*i)->Name);
+        effect* object = new effect(*this, (*i)->Name);
         object->load(*config);
         object->fill(m_collection);
         m_effects.push_back(object);
@@ -76,7 +76,7 @@ void manager::save()
 {
     string_path file_name;
     CInifile* config =
-        xr_new<CInifile>(
+        new CInifile(
             FS.update_path(
                 file_name,
                 "$game_config$",

@@ -112,7 +112,7 @@ BOOL CGameMtlLibrary::UpdateMtlPairs()
 
 SGameMtl *CGameMtlLibrary::AppendMaterial(SGameMtl *parent)
 {
-    SGameMtl *M = xr_new<SGameMtl>();
+    SGameMtl *M = new SGameMtl();
     if (parent)
         *M = *parent;//base params
 
@@ -447,7 +447,7 @@ void CGameMtlLibrary::MtlNameToMtlPair(LPCSTR name, int &mtl0, int &mtl1)
 
 SGameMtlPair *CGameMtlLibrary::CreateMaterialPair(int m0, int m1, SGameMtlPair *parent)
 {
-    SGameMtlPair *M = xr_new<SGameMtlPair>(this);
+    SGameMtlPair *M = new SGameMtlPair(this);
     if (parent)
     {
         M->ID_parent = parent->ID;

@@ -103,8 +103,8 @@ SpaceRestrictionHolder::CBaseRestrictionPtr CSpaceRestrictionHolder::restriction
 
 	collect_garbage			();
 
-	CSpaceRestrictionBase	*composition = xr_new<CSpaceRestrictionComposition>(this,space_restrictors);
-	CSpaceRestrictionBridge	*bridge = xr_new<CSpaceRestrictionBridge>(composition);
+	CSpaceRestrictionBase	*composition = new CSpaceRestrictionComposition(this,space_restrictors);
+	CSpaceRestrictionBridge	*bridge = new CSpaceRestrictionBridge(composition);
 	m_restrictions.insert	(std::make_pair(space_restrictors,bridge));
 	return					(bridge);
 }
@@ -135,10 +135,10 @@ void CSpaceRestrictionHolder::register_restrictor				(CSpaceRestrictor *space_re
 			on_default_restrictions_changed	();
 	}
 	
-	CSpaceRestrictionShape	*shape = xr_new<CSpaceRestrictionShape>(space_restrictor,restrictor_type != RestrictionSpace::eDefaultRestrictorTypeNone);
+	CSpaceRestrictionShape	*shape = new CSpaceRestrictionShape(space_restrictor,restrictor_type != RestrictionSpace::eDefaultRestrictorTypeNone);
 	RESTRICTIONS::iterator	I = m_restrictions.find(space_restrictors);
 	if (I == m_restrictions.end()) {
-		CSpaceRestrictionBridge	*bridge = xr_new<CSpaceRestrictionBridge>(shape);
+		CSpaceRestrictionBridge	*bridge = new CSpaceRestrictionBridge(shape);
 		m_restrictions.insert	(std::make_pair(space_restrictors,bridge));
 		return;
 	}
@@ -187,7 +187,7 @@ void CSpaceRestrictionHolder::unregister_restrictor			(CSpaceRestrictor *space_r
 			on_default_restrictions_changed	();
 	}
 
-	CSpaceRestrictionBase	*composition = xr_new<CSpaceRestrictionComposition>(this,restrictor_id);
+	CSpaceRestrictionBase	*composition = new CSpaceRestrictionComposition(this,restrictor_id);
 	bridge->change_implementation	(composition);
 	m_restrictions.insert	(std::make_pair(restrictor_id,bridge));
 

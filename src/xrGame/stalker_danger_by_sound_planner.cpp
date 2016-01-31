@@ -46,15 +46,15 @@ void CStalkerDangerBySoundPlanner::finalize					()
 }
 void CStalkerDangerBySoundPlanner::add_evaluators			()
 {
-	add_evaluator			(eWorldPropertyDanger			,xr_new<CStalkerPropertyEvaluatorDangers>			(m_object,"danger"));
-	add_evaluator			(eWorldPropertyDangerUnknown	,xr_new<CStalkerPropertyEvaluatorConst>				(false,"fake"));
+	add_evaluator			(eWorldPropertyDanger			,new CStalkerPropertyEvaluatorDangers			(m_object,"danger"));
+	add_evaluator			(eWorldPropertyDangerUnknown	,new CStalkerPropertyEvaluatorConst				(false,"fake"));
 }
 
 void CStalkerDangerBySoundPlanner::add_actions				()
 {
 	CStalkerActionBase		*action;
 
-	action					= xr_new<CStalkerActionDangerBySoundTakeCover>(m_object,"fake");
+	action					= new CStalkerActionDangerBySoundTakeCover(m_object,"fake");
 	add_effect				(action,eWorldPropertyDanger,		false);
 	add_operator			(eWorldOperatorDangerUnknownTakeCover,	action);
 }

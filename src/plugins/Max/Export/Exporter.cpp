@@ -132,7 +132,7 @@ int	CExporter::AddBone(INode* pNode, Matrix3 &matMesh, IPhysiqueExport* pExport)
 	for (BoneDefIt it=m_Bones.begin(); it!=m_Bones.end(); it++)
 		if ((*it)->isEqual(pNode)) return it-m_Bones.begin();
 	
-	CBoneDef*	pBone= xr_new<CBoneDef>(pNode);
+	CBoneDef*	pBone= new CBoneDef(pNode);
 	if (pBone->SetInitTM(pExport,matMesh)){
 		AddBone(pBone->pBone->GetParentNode(),matMesh,pExport);
 		m_Bones.push_back	(pBone);
@@ -383,7 +383,7 @@ BOOL CExporter::Capture()
 					m_id %= cSubMaterials;
 				}
 
-				st_FACE* nF		= xr_new<st_FACE>();
+				st_FACE* nF		= new st_FACE();
 				nF->m_id		= m_id;
 				nF->sm_group	= gF->getSmGroup();
 				for (int VVV=0; VVV<3; VVV++){
@@ -422,7 +422,7 @@ BOOL MeshExpUtility::SaveAsSkin(const char* fname)
 	R_ASSERT		(pRootNode);
 
 	// export
-	CExporter *E	= xr_new<CExporter>();
+	CExporter *E	= new CExporter();
 	bRes			= E->ExportSkin(pRootNode,fname);
 	xr_delete		(E);
 
@@ -442,7 +442,7 @@ BOOL MeshExpUtility::SaveSkinKeys(LPCSTR fname){
 	R_ASSERT		(pRootNode);
 
 	// export
-	CExporter *E	= xr_new<CExporter>();
+	CExporter *E	= new CExporter();
 	bRes			= E->ExportMotion(pRootNode,fname);
 	xr_delete(E);
 

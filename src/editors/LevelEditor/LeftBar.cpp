@@ -791,7 +791,7 @@ void TfraLeftBar::RefreshBar()
     u32 idx = 0;
     for (AStringIt it = EPrefs->scene_recent_list.begin(); it!=EPrefs->scene_recent_list.end(); it++)
     {
-        TMenuItem *MI = xr_new<TMenuItem>((TComponent*)0);
+        TMenuItem *MI = new TMenuItem((TComponent*)0);
         MI->Caption = *it;
         MI->OnClick = miRecentFilesClick;
         MI->Tag = 0x1001;
@@ -845,7 +845,7 @@ void __fastcall TfraLeftBar::SyncTHM1Click(TObject *Sender)
 
     for (; I!=E; ++I)
     {
-        ETextureThumbnail*TH = xr_new<ETextureThumbnail>((*I).name.c_str(),false);
+        ETextureThumbnail*TH = new ETextureThumbnail((*I).name.c_str(),false);
         TH->Load((*I).name.c_str(),_textures_);
         TH->Save();
         xr_delete(TH);

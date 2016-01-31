@@ -116,14 +116,14 @@ void __fastcall TfraBottomBar::fsStorageRestorePlacement(TObject *Sender)
     // setup menu
     miWeather->Clear();
 
-    TMenuItem *mi = xr_new<TMenuItem>((TComponent*)0);
+    TMenuItem *mi = new TMenuItem((TComponent*)0);
     mi->Caption = "none";
     mi->OnClick = miWeatherClick;
     mi->Tag = -1;
     mi->Checked = true;
     mi->RadioItem = true;
     miWeather->Add(mi);
-    mi = xr_new<TMenuItem>((TComponent*)0);
+    mi = new TMenuItem((TComponent*)0);
     mi->Caption = "-";
     miWeather->Add(mi);
     /*
@@ -132,26 +132,26 @@ void __fastcall TfraBottomBar::fsStorageRestorePlacement(TObject *Sender)
         CEnvironment::EnvsMapIt _E=g_pGamePersistent->Environment().WeatherCycles.end();
         for (; _I!=_E; _I++)
         {
-            mi				= xr_new<TMenuItem>((TComponent*)0);
+            mi				= new TMenuItem((TComponent*)0);
             mi->Caption 	= *_I->first;
             mi->OnClick 	= miWeatherClick;
             mi->RadioItem	= true;
             miWeather->Add	(mi);
         }
     */
-    mi = xr_new<TMenuItem>((TComponent*)0);
+    mi = new TMenuItem((TComponent*)0);
     mi->Caption = "-";
     miWeather->Add(mi);
-    mi = xr_new<TMenuItem>((TComponent*)0);
+    mi = new TMenuItem((TComponent*)0);
     mi->Caption = "Reload";
     mi->OnClick = miWeatherClick;
     mi->Tag = -2;
     miWeather->Add(mi);
 
-    mi = xr_new<TMenuItem>((TComponent*)0);
+    mi = new TMenuItem((TComponent*)0);
     mi->Caption = "-";
     miWeather->Add(mi);
-    mi = xr_new<TMenuItem>((TComponent*)0);
+    mi = new TMenuItem((TComponent*)0);
     mi->Caption = "Properties...";
     mi->OnClick = miWeatherClick;
     mi->Tag = -3;
@@ -348,19 +348,19 @@ void __fastcall TfraBottomBar::ebMacroMouseDown(TObject *Sender,
     {
         SESubCommand*SUB = CMD->sub_commands[k];
         BOOL bValid = !xr_string(SUB->p0).empty();
-        mi = xr_new<TMenuItem>((TComponent*)0);
+        mi = new TMenuItem((TComponent*)0);
         mi->Caption = AnsiString().sprintf("%d: %s", k+1, bValid ? xr_string(SUB->p0).c_str() : "<empty>");
-        TMenuItem *e = xr_new<TMenuItem>((TComponent*)0);
+        TMenuItem *e = new TMenuItem((TComponent*)0);
         e->Caption = "Execute";
         e->OnClick = MacroExecuteClick;
         e->Enabled = bValid;
         e->Tag = k;
         e->ShortCut = SUB->shortcut.hotkey;
-        TMenuItem *a = xr_new<TMenuItem>((TComponent*)0);
+        TMenuItem *a = new TMenuItem((TComponent*)0);
         a->Caption = "Assign";
         a->OnClick = MacroAssignClick;
         a->Tag = k;
-        TMenuItem *c = xr_new<TMenuItem>((TComponent*)0);
+        TMenuItem *c = new TMenuItem((TComponent*)0);
         c->Caption = "Clear";
         c->OnClick = MacroClearClick;
         c->Tag = k;
@@ -369,14 +369,14 @@ void __fastcall TfraBottomBar::ebMacroMouseDown(TObject *Sender,
         mi->Add(c);
         pmMacro->Items->Add(mi);
     }
-    mi = xr_new<TMenuItem>((TComponent*)0);
+    mi = new TMenuItem((TComponent*)0);
     mi->Caption = "-";
     pmMacro->Items->Add(mi);
-    mi = xr_new<TMenuItem>((TComponent*)0);
+    mi = new TMenuItem((TComponent*)0);
     mi->Caption = "Edit Command List...";
     mi->OnClick = MacroEditCommandListClick;
     pmMacro->Items->Add(mi);
-    mi = xr_new<TMenuItem>((TComponent*)0);
+    mi = new TMenuItem((TComponent*)0);
     mi->Caption = "Log Commands";
     mi->AutoCheck = true;
     mi->Checked = AllowLogCommands();

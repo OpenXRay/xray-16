@@ -75,7 +75,7 @@ void InitSettings()
 #ifdef DEBUG
     Msg("Updated path to system.ltx is %s", fname);
 #endif
-    pSettings = xr_new<CInifile>(fname, TRUE);
+    pSettings = new CInifile(fname, TRUE);
     CHECK_OR_EXIT(pSettings->section_count(),
         make_string("Cannot find file %s.\nReinstalling application may fix this problem.", fname));
     xr_auth_strings_t ignoredPaths, checkedPaths;
@@ -83,9 +83,9 @@ void InitSettings()
     PathIncludePred includePred(&ignoredPaths);
     CInifile::allow_include_func_t includeFilter;
     includeFilter.bind(&includePred, &PathIncludePred::IsIncluded);
-    pSettingsAuth = xr_new<CInifile>(fname, TRUE, TRUE, FALSE, 0, includeFilter);
+    pSettingsAuth = new CInifile(fname, TRUE, TRUE, FALSE, 0, includeFilter);
     FS.update_path(fname, "$game_config$", "game.ltx");
-    pGameIni = xr_new<CInifile>(fname, TRUE);
+    pGameIni = new CInifile(fname, TRUE);
     CHECK_OR_EXIT(pGameIni->section_count(),
         make_string("Cannot find file %s.\nReinstalling application may fix this problem.", fname));
 }
@@ -93,9 +93,9 @@ void InitSettings()
 void InitConsole()
 {
 #ifdef DEDICATED_SERVER
-    Console = xr_new<CTextConsole>();
+    Console = new CTextConsole();
 #else
-    Console = xr_new<CConsole>();
+    Console = new CConsole();
 #endif
     Console->Initialize();
     xr_strcpy(Console->ConfigFile, "user.ltx");
@@ -110,7 +110,7 @@ void InitConsole()
 void InitInput()
 {
     bool captureInput = !strstr(Core.Params, "-i");
-    pInput = xr_new<CInput>(captureInput);
+    pInput = new CInput(captureInput);
 }
 
 void destroyInput()
@@ -192,11 +192,11 @@ void Startup()
     ShowWindow(Device.m_hWnd, SW_SHOWNORMAL);
     Device.Create();
     LALib.OnCreate();
-    pApp = xr_new<CApplication>();
+    pApp = new CApplication();
     g_pGamePersistent = dynamic_cast<IGame_Persistent*>(NEW_INSTANCE(CLSID_GAME_PERSISTANT));
     R_ASSERT(g_pGamePersistent);
-    g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
-    g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
+    g_SpatialSpace = new ISpatial_DB("Spatial obj");
+    g_SpatialSpacePhysic = new ISpatial_DB("Spatial phys");
     // Destroy LOGO
     DestroyWindow(logoWindow);
     logoWindow = NULL;

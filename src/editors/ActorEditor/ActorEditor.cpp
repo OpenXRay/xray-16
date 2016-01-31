@@ -24,7 +24,7 @@ WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int)
         Application->Icon->Handle = LoadIcon(MainInstance, "MAINICON");
         Application->Title = "Loading...";
     }
-    frmSplash = xr_new<TfrmSplash>((TComponent*)0);
+    frmSplash = new TfrmSplash((TComponent*)0);
     frmSplash->Show();
     frmSplash->Repaint();
     frmSplash->SetStatus("Core initializing...");
@@ -36,8 +36,8 @@ WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int)
     frmSplash->SetStatus("Loading...");
 
     // startup create
-    Tools = xr_new<CActorTools>();
-    UI = xr_new<CActorMain>();
+    Tools = new CActorTools();
+    UI = new CActorMain();
     UI->RegisterCommands();
 
     Application->Title = UI->EditorDesc();

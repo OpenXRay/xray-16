@@ -14,10 +14,10 @@
 TEMPLATE_SPECIALIZATION
 CStateMonsterHearDangerousSoundAbstract::CStateMonsterHearDangerousSound(_Object *obj) : inherited(obj)
 {
-	add_state	(eStateHearDangerousSound_Hide,				xr_new<CStateMonsterHideFromPoint<_Object> >(obj));
-	add_state	(eStateHearDangerousSound_FaceOpenPlace,	xr_new<CStateMonsterLookToUnprotectedArea<_Object> >(obj));
-	add_state	(eStateHearDangerousSound_StandScared,		xr_new<CStateMonsterCustomAction<_Object> >(obj));
-	add_state	(eStateHearDangerousSound_Home,				xr_new<CStateMonsterDangerMoveToHomePoint<_Object> >(obj));
+	add_state	(eStateHearDangerousSound_Hide,				new CStateMonsterHideFromPoint<_Object>(obj));
+	add_state	(eStateHearDangerousSound_FaceOpenPlace,	new CStateMonsterLookToUnprotectedArea<_Object>(obj));
+	add_state	(eStateHearDangerousSound_StandScared,		new CStateMonsterCustomAction<_Object>(obj));
+	add_state	(eStateHearDangerousSound_Home,				new CStateMonsterDangerMoveToHomePoint<_Object>(obj));
 }
 
 TEMPLATE_SPECIALIZATION

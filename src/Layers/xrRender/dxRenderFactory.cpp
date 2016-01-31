@@ -28,7 +28,7 @@ dxRenderFactory RenderFactoryImpl;
 #define RENDER_FACTORY_IMPLEMENT(Class) \
 	I##Class* dxRenderFactory::Create##Class() \
 { \
-	return xr_new<dx##Class>(); \
+	return new dx##Class(); \
 } \
 	void dxRenderFactory::Destroy##Class(I##Class *pObject)\
 { \

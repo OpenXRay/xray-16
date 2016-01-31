@@ -19,34 +19,34 @@ CUIChangeMap::CUIChangeMap()
 {
 	m_prev_upd_time = 0;
 
-	bkgrnd = xr_new<CUIStatic>(); bkgrnd->SetAutoDelete(true);
+	bkgrnd = new CUIStatic(); bkgrnd->SetAutoDelete(true);
 	AttachChild(bkgrnd);
 
-	header = xr_new<CUITextWnd>(); header->SetAutoDelete(true);
+	header = new CUITextWnd(); header->SetAutoDelete(true);
 	AttachChild(header);
 
-	map_pic = xr_new<CUIStatic>(); map_pic->SetAutoDelete(true);
+	map_pic = new CUIStatic(); map_pic->SetAutoDelete(true);
 	AttachChild(map_pic);
 
-	map_frame = xr_new<CUIStatic>(); map_frame->SetAutoDelete(true);
+	map_frame = new CUIStatic(); map_frame->SetAutoDelete(true);
 	AttachChild(map_frame);
 	
-	map_version = xr_new<CUITextWnd>(); map_version->SetAutoDelete(true);
+	map_version = new CUITextWnd(); map_version->SetAutoDelete(true);
 	AttachChild(map_version);
 
-	frame = xr_new<CUIFrameWindow>(); frame->SetAutoDelete(true);
+	frame = new CUIFrameWindow(); frame->SetAutoDelete(true);
 	AttachChild(frame);
 
-	lst_back = xr_new<CUIFrameWindow>(); lst_back->SetAutoDelete(true);
+	lst_back = new CUIFrameWindow(); lst_back->SetAutoDelete(true);
 	AttachChild(lst_back);
 
-	lst = xr_new<CUIListBox>(); lst->SetAutoDelete(true);
+	lst = new CUIListBox(); lst->SetAutoDelete(true);
 	AttachChild(lst);
 
-	btn_ok = xr_new<CUI3tButton>(); btn_ok->SetAutoDelete(true);
+	btn_ok = new CUI3tButton(); btn_ok->SetAutoDelete(true);
 	AttachChild(btn_ok);
 
-	btn_cancel = xr_new<CUI3tButton>(); btn_cancel->SetAutoDelete(true);
+	btn_cancel = new CUI3tButton(); btn_cancel->SetAutoDelete(true);
 	AttachChild(btn_cancel);
 }
 

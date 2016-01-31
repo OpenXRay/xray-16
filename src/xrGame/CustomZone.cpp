@@ -168,7 +168,7 @@ void CCustomZone::Load(LPCSTR section)
 
 	if(pSettings->line_exist(section,"postprocess")) 
 	{
-		m_actor_effector				= xr_new<CZoneEffector>();
+		m_actor_effector				= new CZoneEffector();
 		m_actor_effector->Load			(pSettings->r_string(section,"postprocess"));
 	};
 

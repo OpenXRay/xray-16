@@ -49,13 +49,13 @@ void CUIMpTradeWnd::Init(const shared_str& sectionName, const shared_str& sectio
 	CUIXml								xml_doc;
 	xml_doc.Load						(CONFIG_PATH, UI_PATH, "mp_buy_menu.xml");
 
-	m_store_hierarchy					= xr_new<CStoreHierarchy>();
+	m_store_hierarchy					= new CStoreHierarchy();
  	m_store_hierarchy->Init				(xml_doc, "items_hierarchy");
 	m_store_hierarchy->InitItemsInGroup	(m_sectionName);
 
 	CUIXmlInit::InitWindow				(xml_doc, "main",						0, this);
 
-	m_root_tab_control					= xr_new<CUIBuyWeaponTab>(); AttachChild(m_root_tab_control); m_root_tab_control->SetAutoDelete(true);
+	m_root_tab_control					= new CUIBuyWeaponTab(); AttachChild(m_root_tab_control); m_root_tab_control->SetAutoDelete(true);
 	CUIXmlInit::InitTabControl			(xml_doc, "tab_control",				0, m_root_tab_control);
 	Register							(m_root_tab_control);
 	AddCallback							(m_root_tab_control,	TAB_CHANGED,		CUIWndCallback::void_function	(this, &CUIMpTradeWnd::OnRootTabChanged));
@@ -72,12 +72,12 @@ void CUIMpTradeWnd::Init(const shared_str& sectionName, const shared_str& sectio
 	}
 	m_root_tab_control->ResetTab		();
 
-	m_shop_wnd							= xr_new<CUIWindow>();	AttachChild(m_shop_wnd);		m_shop_wnd->SetAutoDelete(true);
+	m_shop_wnd							= new CUIWindow();	AttachChild(m_shop_wnd);		m_shop_wnd->SetAutoDelete(true);
 	CUIXmlInit::InitWindow				(xml_doc, "shop_wnd",	0, m_shop_wnd);
 
 	for(int idx = e_first; idx<e_total_lists; ++idx)
 	{
-		CUIDragDropListEx* lst			= xr_new<CUIDragDropListEx>();
+		CUIDragDropListEx* lst			= new CUIDragDropListEx();
 		m_list[idx]						= lst;
 		if(idx!=e_shop)
 		{
@@ -186,11 +186,11 @@ void CUIMpTradeWnd::Init(const shared_str& sectionName, const shared_str& sectio
 	m_static_information				= UIHelper::CreateTextWnd( xml_doc, "static_info",			this );
 	m_static_money_change				= UIHelper::CreateTextWnd( xml_doc, "static_money_change",	this );
 	
-	m_item_info							= xr_new<CUIItemInfo>();
+	m_item_info							= new CUIItemInfo();
 	AttachChild							(m_item_info); m_item_info->SetAutoDelete(true);
 	m_item_info->InitItemInfo			(Fvector2().set(0,0), Fvector2().set(100,100), "buy_menu_item.xml");
 
-	m_item_mngr							= xr_new<CItemMgr>();
+	m_item_mngr							= new CItemMgr();
 	m_item_mngr->Load					(sectionPrice);
 #ifndef MASTER_GOLD
 	m_item_mngr->Dump					();

@@ -651,7 +651,7 @@ void CUIXmlInit::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index, CU
 		LPCSTR node_name			= node->Value();
 		if(0==stricmp(node_name,"auto_static"))
 		{
-			CUIStatic* pUIStatic		= xr_new<CUIStatic>();
+			CUIStatic* pUIStatic		= new CUIStatic();
 			InitStatic					(xml_doc, "auto_static", cnt_static, pUIStatic);
 			xr_sprintf					(buff,"auto_static_%d", cnt_static);
 			pUIStatic->SetWindowName	(buff);
@@ -662,7 +662,7 @@ void CUIXmlInit::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index, CU
 		}else
 		if(0==stricmp(node_name,"auto_frameline"))
 		{
-			CUIFrameLineWnd* pUIFrameline = xr_new<CUIFrameLineWnd>();
+			CUIFrameLineWnd* pUIFrameline = new CUIFrameLineWnd();
 			InitFrameLine				(xml_doc, "auto_frameline", cnt_frameline, pUIFrameline);
 			xr_sprintf					(buff,"auto_frameline_%d", cnt_frameline);
 			pUIFrameline->SetWindowName	(buff);
@@ -682,7 +682,7 @@ void CUIXmlInit::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index, CU
 	string64							sname;
 	for(int i=0; i<items_num; i++)
 	{
-		pUIStatic						= xr_new<CUIStatic>();
+		pUIStatic						= new CUIStatic();
 		InitStatic						(xml_doc, "auto_static", i, pUIStatic);
 		xr_sprintf						(sname,"auto_static_%d", i);
 		pUIStatic->SetWindowName		(sname);
@@ -708,7 +708,7 @@ void CUIXmlInit::InitAutoFrameLineGroup(CUIXml& xml_doc, LPCSTR path, int index,
 	string64							sname;
 	for(int i=0; i<items_num; ++i)
 	{
-		pUIFL							= xr_new<CUIFrameLineWnd>();
+		pUIFL							= new CUIFrameLineWnd();
 		InitFrameLine					(xml_doc, "auto_frameline", i, pUIFL);
 		xr_sprintf						(sname,"auto_frameline_%d", i);
 		pUIFL->SetWindowName			(sname);
@@ -801,7 +801,7 @@ bool CUIXmlInit::InitTabControl(CUIXml &xml_doc, LPCSTR path, int index, CUITabC
 
 	for (int i = 0; i < tabsCount; ++i)
 	{
-		newButton = radio ? xr_new<CUIRadioButton>() : xr_new<CUITabButton>();
+		newButton = radio ? new CUIRadioButton() : new CUITabButton();
 		status &= Init3tButton(xml_doc, "button", i, newButton);
 		newButton->m_btn_id = xml_doc.ReadAttrib("button",i,"id");
 		R_ASSERT3(newButton->m_btn_id.size(), xml_doc.m_xml_file_name, path);
@@ -1129,7 +1129,7 @@ void CUIXmlInit::InitColorDefs()
 {
 	if (NULL != m_pColorDefs) return;
 
-	m_pColorDefs = xr_new<ColorDefs>();
+	m_pColorDefs = new ColorDefs();
 
 	CUIXml					uiXml;
 	uiXml.Load				(CONFIG_PATH, UI_PATH, COLOR_DEFINITIONS);
@@ -1190,7 +1190,7 @@ bool CUIXmlInit::InitScrollView	(CUIXml& xml_doc, LPCSTR path, int index, CUIScr
 
 	for (int i = 0; i < tabsCount; ++i)
 	{
-		CUITextWnd* newText				= xr_new<CUITextWnd>();
+		CUITextWnd* newText				= new CUITextWnd();
 		InitText						(xml_doc, "text", i, &newText->TextItemControl());
 		newText->SetTextComplexMode		(true);
 		newText->SetWidth				(pWnd->GetDesiredChildWidth());

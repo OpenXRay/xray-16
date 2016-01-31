@@ -65,7 +65,7 @@ void UIPlayerItem::InitTextParams(CUIXml& uiXml)
 			break;
 		LPCSTR param_name = uiXml.ReadAttrib(text_param_node, "name", 
 			"param_name_not_set_in_name_attribute");
-		CUITextWnd* temp_static = xr_new<CUITextWnd>();
+		CUITextWnd* temp_static = new CUITextWnd();
 		VERIFY(temp_static);
 		this->AttachChild(temp_static);
 		temp_static->SetAutoDelete(true);
@@ -86,7 +86,7 @@ void UIPlayerItem::InitIconParams(CUIXml& uiXml)
 			break;
 		LPCSTR param_name = uiXml.ReadAttrib(icon_param_node, "name", 
 			"param_name_not_set_in_name_attribute");
-		CUIStatsIcon* temp_static = xr_new<CUIStatsIcon>();
+		CUIStatsIcon* temp_static = new CUIStatsIcon();
 		VERIFY(temp_static);
 		this->AttachChild(temp_static);
 		temp_static->SetAutoDelete(true);

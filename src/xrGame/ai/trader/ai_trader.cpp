@@ -26,7 +26,7 @@
 
 CAI_Trader::CAI_Trader()
 {
-	AnimMan			= xr_new<CTraderAnimation>(this);
+	AnimMan			= new CTraderAnimation(this);
 } 
 
 CAI_Trader::~CAI_Trader()
@@ -365,7 +365,7 @@ ALife::ERelationType  CAI_Trader::tfGetRelationType	(const CEntityAlive *tpEntit
 
 IFactoryObject *CAI_Trader::_construct	()
 {
-	m_sound_player				= xr_new<CSoundPlayer>(this);
+	m_sound_player				= new CSoundPlayer(this);
 	
 	CEntityAlive::_construct	(); 
 	CInventoryOwner::_construct	();

@@ -13,23 +13,23 @@
 
 CUIMpChangeMapAdm::CUIMpChangeMapAdm()
 {
-	map_pic = xr_new<CUIStatic>(); 
+	map_pic = new CUIStatic(); 
 	map_pic->SetAutoDelete(true);
 	AttachChild(map_pic);
 
-	map_frame = xr_new<CUIStatic>(); 
+	map_frame = new CUIStatic(); 
 	map_frame->SetAutoDelete(true);
 	AttachChild(map_frame);
 	
-	map_version = xr_new<CUITextWnd>(); 
+	map_version = new CUITextWnd(); 
 	map_version->SetAutoDelete(true);
 	AttachChild(map_version);
 
-	lst = xr_new<CUIListBox>(); 
+	lst = new CUIListBox(); 
 	lst->SetAutoDelete(true);
 	AttachChild(lst);
 
-	btn_ok = xr_new<CUI3tButton>(); 
+	btn_ok = new CUI3tButton(); 
 	btn_ok->SetAutoDelete(true);
 	AttachChild(btn_ok);
 }

@@ -172,7 +172,7 @@ void   anti_aim_ability::start_camera_effector ()
 		
 	m_effector_id					=	Actor()->Cameras().RequestCamEffectorId();
 
-	CAnimatorCamEffector* cam_eff	=	xr_new<CAnimatorCamEffector>();
+	CAnimatorCamEffector* cam_eff	=	new CAnimatorCamEffector();
 	cam_eff->SetType					((ECamEffectorType)m_effector_id);
 	cam_eff->SetCyclic					(false);
 

@@ -214,7 +214,7 @@ void CActor::on_weapon_shot_start		(CWeapon *weapon)
 	CCameraShotEffector* effector = smart_cast<CCameraShotEffector*>( Cameras().GetCamEffector(eCEShot) );
 	if ( !effector )
 	{
-		effector = (CCameraShotEffector*)Cameras().AddCamEffector( xr_new<CCameraShotEffector>( camera_recoil ) );
+		effector = (CCameraShotEffector*)Cameras().AddCamEffector( new CCameraShotEffector( camera_recoil ) );
 	}
 	else
 	{

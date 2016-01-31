@@ -20,7 +20,7 @@
 
 CSnork::CSnork() 
 {
-	StateMan		= xr_new<CStateManagerSnork>	(this);
+	StateMan		= new CStateManagerSnork	(this);
 	com_man().add_ability(ControlCom::eControlJump);
 	com_man().add_ability(ControlCom::eControlThreaten);
 }

@@ -12,8 +12,8 @@
 TEMPLATE_SPECIALIZATION
 CStateMonsterControlledAbstract::CStateMonsterControlled(_Object *obj) : inherited(obj)
 {
-	add_state	(eStateControlled_Attack,		xr_new<CStateMonsterControlledAttack<_Object> >	(obj));
-	add_state	(eStateControlled_Follow,		xr_new<CStateMonsterControlledFollow<_Object> >	(obj));	
+	add_state	(eStateControlled_Attack,		new CStateMonsterControlledAttack<_Object>(obj));
+	add_state	(eStateControlled_Follow,		new CStateMonsterControlledFollow<_Object>(obj));	
 }
 
 TEMPLATE_SPECIALIZATION

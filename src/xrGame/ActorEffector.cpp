@@ -10,7 +10,7 @@
 void AddEffector		(CActor* A, int type, const shared_str& sect_name)
 {
 	if(pSettings->line_exist(sect_name,"pp_eff_name")){
-		CPostprocessAnimator* pp_anm		= xr_new<CPostprocessAnimator>();
+		CPostprocessAnimator* pp_anm		= new CPostprocessAnimator();
 
 		bool bCyclic						= !!pSettings->r_bool(sect_name,"pp_eff_cyclic");
 
@@ -25,7 +25,7 @@ void AddEffector		(CActor* A, int type, const shared_str& sect_name)
 	}
 	if(pSettings->line_exist(sect_name,"cam_eff_name")){
 		bool bCyclic						= !!pSettings->r_bool(sect_name,"cam_eff_cyclic");
-		CAnimatorCamEffector* cam_anm		= xr_new<CAnimatorCamEffector>();
+		CAnimatorCamEffector* cam_anm		= new CAnimatorCamEffector();
 		cam_anm->SetType					((ECamEffectorType)type);
 		cam_anm->SetCyclic					(bCyclic);
 
@@ -45,7 +45,7 @@ void AddEffector		(CActor* A, int type, const shared_str& sect_name, CEffectorCo
 {
 	if(pSettings->line_exist(sect_name,"pp_eff_name")){
 		bool bCyclic						= !!pSettings->r_bool(sect_name,"pp_eff_cyclic");
-		CPostprocessAnimatorControlled* pp_anm	= xr_new<CPostprocessAnimatorControlled>(ec);
+		CPostprocessAnimatorControlled* pp_anm	= new CPostprocessAnimatorControlled(ec);
 		pp_anm->SetType						((EEffectorPPType)type);
 		pp_anm->SetCyclic					(bCyclic);
 		pp_anm->bOverlap					= !!pSettings->r_bool(sect_name,"pp_eff_overlap");
@@ -55,7 +55,7 @@ void AddEffector		(CActor* A, int type, const shared_str& sect_name, CEffectorCo
 	}
 	if(pSettings->line_exist(sect_name,"cam_eff_name")){
 		bool bCyclic						= !!pSettings->r_bool(sect_name,"cam_eff_cyclic");
-		CCameraEffectorControlled* cam_anm	= xr_new<CCameraEffectorControlled>(ec);
+		CCameraEffectorControlled* cam_anm	= new CCameraEffectorControlled(ec);
 		cam_anm->SetType					((ECamEffectorType)type);
 		cam_anm->SetCyclic					(bCyclic);
 
@@ -75,7 +75,7 @@ void AddEffector		(CActor* A, int type, const shared_str& sect_name, GET_KOEFF_F
 {
 	if(pSettings->line_exist(sect_name,"pp_eff_name")){
 		bool bCyclic						= !!pSettings->r_bool(sect_name,"pp_eff_cyclic");
-		CPostprocessAnimatorLerp* pp_anm	= xr_new<CPostprocessAnimatorLerp>();
+		CPostprocessAnimatorLerp* pp_anm	= new CPostprocessAnimatorLerp();
 		pp_anm->SetType						((EEffectorPPType)type);
 		pp_anm->SetCyclic					(bCyclic);
 		pp_anm->bOverlap					= !!pSettings->r_bool(sect_name,"pp_eff_overlap");
@@ -86,7 +86,7 @@ void AddEffector		(CActor* A, int type, const shared_str& sect_name, GET_KOEFF_F
 	}
 	if(pSettings->line_exist(sect_name,"cam_eff_name")){
 		bool bCyclic						= !!pSettings->r_bool(sect_name,"cam_eff_cyclic");
-		CAnimatorCamLerpEffector* cam_anm	= xr_new<CAnimatorCamLerpEffector>();
+		CAnimatorCamLerpEffector* cam_anm	= new CAnimatorCamLerpEffector();
 		cam_anm->SetFactorFunc				(k_func);
 		cam_anm->SetType					((ECamEffectorType)type);
 		cam_anm->SetCyclic					(bCyclic);
@@ -108,7 +108,7 @@ void AddEffector(CActor* A, int type, const shared_str& sect_name, float factor)
 	clamp(factor, 0.001f, 1.5f);
 	if(pSettings->line_exist(sect_name,"pp_eff_name")){
 		bool bCyclic						= !!pSettings->r_bool(sect_name,"pp_eff_cyclic");
-		CPostprocessAnimatorLerpConst* pp_anm= xr_new<CPostprocessAnimatorLerpConst>();
+		CPostprocessAnimatorLerpConst* pp_anm= new CPostprocessAnimatorLerpConst();
 		pp_anm->SetType						((EEffectorPPType)type);
 		pp_anm->SetCyclic					(bCyclic);
 		pp_anm->SetPower					(factor);
@@ -119,7 +119,7 @@ void AddEffector(CActor* A, int type, const shared_str& sect_name, float factor)
 	}
 	if(pSettings->line_exist(sect_name,"cam_eff_name")){
 		bool bCyclic						= !!pSettings->r_bool(sect_name,"cam_eff_cyclic");
-		CAnimatorCamLerpEffectorConst* cam_anm	= xr_new<CAnimatorCamLerpEffectorConst>();
+		CAnimatorCamLerpEffectorConst* cam_anm	= new CAnimatorCamLerpEffectorConst();
 		cam_anm->SetFactor					(factor);
 		cam_anm->SetType					((ECamEffectorType)type);
 		cam_anm->SetCyclic					(bCyclic);
@@ -152,7 +152,7 @@ CEffectorController::~CEffectorController()
 CAnimatorCamEffector::CAnimatorCamEffector()
 {
 	m_bCyclic				= true;
-	m_objectAnimator		= xr_new<CObjectAnimator>();
+	m_objectAnimator		= new CObjectAnimator();
 	m_bAbsolutePositioning	= false;
 	m_fov					= -1.0f;
 }

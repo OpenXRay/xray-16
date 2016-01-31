@@ -57,14 +57,14 @@ void CUIBoosterInfo::InitFromXml(CUIXml& xml)
 	CUIXmlInit::InitWindow(xml, base, 0, this);
 	xml.SetLocalRoot(base_node);
 	
-	m_Prop_line = xr_new<CUIStatic>();
+	m_Prop_line = new CUIStatic();
 	AttachChild(m_Prop_line);
 	m_Prop_line->SetAutoDelete(false);	
 	CUIXmlInit::InitStatic(xml, "prop_line", 0, m_Prop_line);
 
 	for(u32 i = 0; i < eBoostExplImmunity; ++i)
 	{
-		m_booster_items[i] = xr_new<UIBoosterInfoItem>();
+		m_booster_items[i] = new UIBoosterInfoItem();
 		m_booster_items[i]->Init(xml, ef_boosters_section_names[i]);
 		m_booster_items[i]->SetAutoDelete(false);
 
@@ -74,21 +74,21 @@ void CUIBoosterInfo::InitFromXml(CUIXml& xml)
 		xml.SetLocalRoot(base_node);
 	}
 
-	m_booster_satiety = xr_new<UIBoosterInfoItem>();
+	m_booster_satiety = new UIBoosterInfoItem();
 	m_booster_satiety->Init(xml, "boost_satiety");
 	m_booster_satiety->SetAutoDelete(false);
 	LPCSTR name = CStringTable().translate("ui_inv_satiety").c_str();
 	m_booster_satiety->SetCaption(name);
 	xml.SetLocalRoot( base_node );
 
-	m_booster_anabiotic = xr_new<UIBoosterInfoItem>();
+	m_booster_anabiotic = new UIBoosterInfoItem();
 	m_booster_anabiotic->Init(xml, "boost_anabiotic");
 	m_booster_anabiotic->SetAutoDelete(false);
 	name = CStringTable().translate("ui_inv_survive_surge").c_str();
 	m_booster_anabiotic->SetCaption(name);
 	xml.SetLocalRoot( base_node );
 
-	m_booster_time = xr_new<UIBoosterInfoItem>();
+	m_booster_time = new UIBoosterInfoItem();
 	m_booster_time->Init(xml, "boost_time");
 	m_booster_time->SetAutoDelete(false);
 	name = CStringTable().translate("ui_inv_effect_time").c_str();

@@ -21,7 +21,7 @@ void ESceneSoundSrcTool::RemoveControls()
 
 CCustomObject *ESceneSoundSrcTool::CreateObject(LPVOID data, LPCSTR name)
 {
-    CCustomObject*O = xr_new<ESoundSource>(data, name);
+    CCustomObject*O = new ESoundSource(data, name);
     O->ParentTool = this;
     return O;
 }

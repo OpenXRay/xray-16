@@ -66,7 +66,7 @@ CTelekineticObject	get_object_by_index (u32 index) {VERIFY(objects.size() > inde
 			void	remove_links		(IGameObject *O);
 
 protected:
-	virtual CTelekineticObject*	alloc_tele_object(){return xr_new<CTelekineticObject>();}
+	virtual CTelekineticObject*	alloc_tele_object(){return new CTelekineticObject();}
 private:
 
 	// обновление на шагах физики

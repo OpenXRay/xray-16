@@ -24,7 +24,7 @@ ECustomThumbnail::~ECustomThumbnail() {}
 void DrawThumbnail(TCanvas* pCanvas, TRect& r, U32Vec& data, bool bDrawWithAlpha, int _w = THUMB_WIDTH, int _h = THUMB_HEIGHT)
 {
     pCanvas->CopyMode		= cmSrcCopy;
-    Graphics::TBitmap *pBitmap = xr_new<Graphics::TBitmap>();
+    Graphics::TBitmap *pBitmap = new Graphics::TBitmap();
 
     pBitmap->PixelFormat 	= pf32bit;
     pBitmap->Height		 	= _h;
@@ -99,9 +99,9 @@ EImageThumbnail *CreateThumbnail(LPCSTR src_name, ECustomThumbnail::THMType type
 {
     switch (type)
     {
-        case ECustomThumbnail::ETObject: return xr_new<EObjectThumbnail>(src_name,bLoad);
-        case ECustomThumbnail::ETTexture: return xr_new<ETextureThumbnail>(src_name,bLoad);
-        case ECustomThumbnail::ETGroup: return xr_new<EGroupThumbnail>(src_name,bLoad);
+        case ECustomThumbnail::ETObject: return new EObjectThumbnail(src_name,bLoad);
+        case ECustomThumbnail::ETTexture: return new ETextureThumbnail(src_name,bLoad);
+        case ECustomThumbnail::ETGroup: return new EGroupThumbnail(src_name,bLoad);
         default: NODEFAULT;
     }
     return 0;

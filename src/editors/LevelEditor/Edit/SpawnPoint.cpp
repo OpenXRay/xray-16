@@ -225,7 +225,7 @@ void __stdcall CSpawnPoint::CLE_Motion::OnChangeMotion()
     xr_delete(animator);
     if (source->motion_name.size())
     {
-        animator = xr_new<CObjectAnimator>();
+        animator = new CObjectAnimator();
         animator->Load(*source->motion_name);
         PlayMotion();
     }
@@ -250,12 +250,12 @@ void CSpawnPoint::SSpawnData::Create(LPCSTR _entity_ref)
         m_Data->set_name(_entity_ref);
         if (m_Data->visual())
         {
-            m_Visual = xr_new<CLE_Visual>(m_Data->visual());
+            m_Visual = new CLE_Visual(m_Data->visual());
             m_Data->set_editor_flag(IServerEntity::flVisualChange|IServerEntity::flVisualAnimationChange);
         }
         if (m_Data->motion())
         {
-            m_Motion = xr_new<CLE_Motion>(m_Data->motion());
+            m_Motion = new CLE_Motion(m_Data->motion());
             m_Data->set_editor_flag(IServerEntity::flMotionChange);
         }
         if (pSettings->line_exist(m_Data->name(), "$player"))
@@ -539,7 +539,7 @@ void CSpawnPoint::SSpawnData::OnFrame()
 
         for (u32 i = 0; i<cnt; ++i,++vc)
         {
-            CLE_Visual *V = xr_new<CLE_Visual>(vc->visual);
+            CLE_Visual *V = new CLE_Visual(vc->visual);
             V->OnChangeVisual();
             m_VisualHelpers.push_back(V);
             V->PlayAnimation();

@@ -89,7 +89,7 @@ void recalculation::load( u32 check_sum )
 	string_path						  N;
 	FS.update_path					( N,	"$level$", "recalculation_data_slots.details" );
 
-	dtFS			= xr_new<CVirtualFileRW> ( N );
+	dtFS			= new CVirtualFileRW ( N );
 	dtFS			->find_chunk	( 1 );
 	slots_flags		= (u8*)dtFS->pointer();
 }

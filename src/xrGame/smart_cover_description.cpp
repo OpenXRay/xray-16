@@ -128,7 +128,7 @@ void description::load_loopholes	(shared_str const &table_id)
 			continue;
 		}
 
-		smart_cover::loophole	*loophole = xr_new<smart_cover::loophole>(table);
+		smart_cover::loophole	*loophole = new smart_cover::loophole(table);
 		VERIFY					(
 			std::find_if(
 				m_loopholes.begin(),
@@ -233,7 +233,7 @@ void description::load_actions	(luabind::object const &table, description::Actio
 	for (luabind::iterator I(actions), E; I!=E; ++I)
     {
 		luabind::object			tmp = *I;
-		transitions::action		*action = xr_new<transitions::action>(tmp);
+		transitions::action		*action = new transitions::action(tmp);
 		result.push_back		(action);
 	}
 }

@@ -127,7 +127,7 @@ INetQueue::INetQueue()
 {
 	unused.reserve	(128);
 	for (int i=0; i<16; i++)
-		unused.push_back	(xr_new<NET_Packet>());
+		unused.push_back	(new NET_Packet());
 }
 
 INetQueue::~INetQueue()
@@ -149,7 +149,7 @@ NET_Packet*		INetQueue::Create	()
 //#endif
 	if (unused.empty())	
 	{
-		ready.push_back		(xr_new<NET_Packet> ());
+		ready.push_back		(new NET_Packet ());
 		P					= ready.back	();
 		//---------------------------------------------
 		LastTimeCreate = GetTickCount();
@@ -171,7 +171,7 @@ NET_Packet*		INetQueue::Create	(const NET_Packet& _other)
 //#endif
 	if (unused.empty())	
 	{
-		ready.push_back		(xr_new<NET_Packet> ());
+		ready.push_back		(new NET_Packet ());
 		P					= ready.back	();
 		//---------------------------------------------
 		LastTimeCreate = GetTickCount();
@@ -328,7 +328,7 @@ IPureClient::_Recieve( const void* data, u32 data_size, u32 /*param*/ )
 		if( psNET_Flags.test( NETFLAG_LOG_CL_PACKETS ) ) 
 		{
 			if( !pClNetLog ) 
-				pClNetLog = xr_new<INetLog>("logs\\net_cl_log.log", timeServer());
+				pClNetLog = new INetLog("logs\\net_cl_log.log", timeServer());
 			    
 			if( pClNetLog ) 
 				pClNetLog->LogData( timeServer(), const_cast<void*>(data), data_size, TRUE );
@@ -354,7 +354,7 @@ IPureClient::IPureClient	(CTimer* timer): net_Statistic(timer)
 	net_TimeDelta			= 0;
 	net_TimeDelta_Calculated = 0;
 
-	pClNetLog = NULL;//xr_new<INetLog>("logs\\net_cl_log.log", timeServer());
+	pClNetLog = NULL;//new INetLog("logs\\net_cl_log.log", timeServer());
 
 }
 
@@ -948,7 +948,7 @@ void	IPureClient::SendTo_LL(void* data, u32 size, u32 dwFlags, u32 dwTimeout)
 	if( psNET_Flags.test(NETFLAG_LOG_CL_PACKETS) ) 
 	{
 		if( !pClNetLog) 
-		    pClNetLog = xr_new<INetLog>( "logs\\net_cl_log.log", timeServer() );
+		    pClNetLog = new INetLog( "logs\\net_cl_log.log", timeServer() );
 		if( pClNetLog ) 
 		    pClNetLog->LogData( timeServer(), data, size );
 	}

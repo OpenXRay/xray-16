@@ -163,7 +163,7 @@ typename void	CSINI_IdToIndex::InitInternal ()
 	VERIFY(!m_pItemDataVector);
 	T_INIT::InitIdToIndex();
 	{
-		m_pItemDataVector = xr_new<T_VECTOR>();
+		m_pItemDataVector = new T_VECTOR();
 
 		VERIFY(section_name);
 		VERIFY(line_name);

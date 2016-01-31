@@ -27,7 +27,7 @@ void CUIEditBox::InitTextureEx(LPCSTR texture, LPCSTR  shader)
 {
 	if(!m_frameLine)
 	{
-		m_frameLine = xr_new<CUIFrameLineWnd>();
+		m_frameLine = new CUIFrameLineWnd();
 		AttachChild(m_frameLine);
 		m_frameLine->SetAutoDelete(true);
 	}

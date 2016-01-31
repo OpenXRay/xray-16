@@ -77,27 +77,27 @@ void stalker_low_cover_planner::finalize				()
 
 void stalker_low_cover_planner::add_evaluators			()
 {
-	add_evaluator			(eWorldPropertyLowCover,	xr_new<CStalkerPropertyEvaluatorConst>		(true,"using low cover"));
-	add_evaluator			(eWorldPropertyReadyToKill,	xr_new<CStalkerPropertyEvaluatorReadyToKill>(m_object,"ready to kill"));
-	add_evaluator			(eWorldPropertySeeEnemy,	xr_new<CStalkerPropertyEvaluatorSeeEnemy>	(m_object,"see enemy"));
+	add_evaluator			(eWorldPropertyLowCover,	new CStalkerPropertyEvaluatorConst		(true,"using low cover"));
+	add_evaluator			(eWorldPropertyReadyToKill,	new CStalkerPropertyEvaluatorReadyToKill(m_object,"ready to kill"));
+	add_evaluator			(eWorldPropertySeeEnemy,	new CStalkerPropertyEvaluatorSeeEnemy	(m_object,"see enemy"));
 }
 
 void stalker_low_cover_planner::add_actions				()
 {
 	CStalkerActionBase		*action;
 
-	action					= xr_new<CStalkerActionGetReadyToKillLowCover>	(m_object,"get_ready_to_kill");
+	action					= new CStalkerActionGetReadyToKillLowCover	(m_object,"get_ready_to_kill");
 	add_condition			(action,eWorldPropertyReadyToKill,		false);
 	add_effect				(action,eWorldPropertyReadyToKill,		true);
 	add_operator			(eWorldOperatorGetReadyToKill,			action);
 
-	action					= xr_new<CStalkerActionKillEnemyLowCover>		(m_object,"kill_enemy");
+	action					= new CStalkerActionKillEnemyLowCover		(m_object,"kill_enemy");
 	add_condition			(action,eWorldPropertyReadyToKill,		true);
 	add_condition			(action,eWorldPropertySeeEnemy,			true);
 	add_effect				(action,eWorldPropertyLowCover,			false);
 	add_operator			(eWorldOperatorKillEnemy,				action);
 
-	action					= xr_new<CStalkerActionHoldPositionLowCover>	(m_object,"hold_position");
+	action					= new CStalkerActionHoldPositionLowCover	(m_object,"hold_position");
 	add_condition			(action,eWorldPropertyReadyToKill,		true);
 	add_condition			(action,eWorldPropertySeeEnemy,			false);
 	add_effect				(action,eWorldPropertyLowCover,			false);

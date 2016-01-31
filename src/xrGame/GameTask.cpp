@@ -330,7 +330,7 @@ void SGameTaskKey::save(IWriter &stream)
 
 void SGameTaskKey::load(IReader &stream)
 {
-	game_task					= xr_new<CGameTask>();
+	game_task					= new CGameTask();
 	load_data					(task_id, stream);
 	game_task->m_ID				= task_id;
 	game_task->load_task		(stream);

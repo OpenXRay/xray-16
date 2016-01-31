@@ -79,7 +79,7 @@ EScene::EScene()
     // 	Build options
     m_SummaryInfo = 0;
     //ClearSnapList	(false);
-    g_frmConflictLoadObject = xr_new<TfrmAppendObjectInfo>((TComponent*)NULL);
+    g_frmConflictLoadObject = new TfrmAppendObjectInfo((TComponent*)NULL);
 }
 
 EScene::~EScene()

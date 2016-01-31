@@ -115,7 +115,7 @@ void CUIWpnParams::SetInfo( CInventoryItem* slot_wpn, CInventoryItem& cur_wpn )
 {
 	if ( !g_lua_wpn_params )
 	{
-		g_lua_wpn_params = xr_new<SLuaWpnParams>();
+		g_lua_wpn_params = new SLuaWpnParams();
 	}
 	
 	LPCSTR cur_section  = cur_wpn.object().cNameSect().c_str();

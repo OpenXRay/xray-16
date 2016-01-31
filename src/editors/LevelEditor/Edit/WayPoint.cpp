@@ -237,7 +237,7 @@ void CWayPoint::Convert2Link(CWayPoint *P)
 void CWayPoint::CreateLink(CWayPoint *P, float pb)
 {
     if (P!=this)
-        m_Links.push_back(xr_new<SWPLink>(P, pb));
+        m_Links.push_back(new SWPLink(P, pb));
 }
 
 bool CWayPoint::AppendLink(CWayPoint *P, float pb)
@@ -501,7 +501,7 @@ CWayPoint *CWayObject::AppendWayPoint()
 {
     for (WPIt it = m_WayPoints.begin(); it!=m_WayPoints.end(); it++)
         (*it)->Select(0);
-    m_WayPoints.push_back(xr_new<CWayPoint>(FHelper.GenerateName("wp", 2, fastdelegate::bind<TFindObjectByName>(this, &CWayObject::FindWPByName), false, false).c_str()));
+    m_WayPoints.push_back(new CWayPoint(FHelper.GenerateName("wp", 2, fastdelegate::bind<TFindObjectByName>(this, &CWayObject::FindWPByName), false, false).c_str()));
     m_WayPoints.back()->m_bSelected = true;
     return m_WayPoints.back();
 }
@@ -682,7 +682,7 @@ bool CWayObject::LoadLTX(CInifile &ini, LPCSTR sect_name)
     u32 wp_idx = 0;
     for (WPIt it = m_WayPoints.begin(); it!=m_WayPoints.end(); ++it,++wp_idx)
     {
-        CWayPoint *W = xr_new<CWayPoint>("");
+        CWayPoint *W = new CWayPoint("");
         *it = W;
 
         sprintf(buff, "wp_%d_pos", wp_idx);
@@ -787,7 +787,7 @@ bool CWayObject::LoadStream(IReader &F)
     m_WayPoints.resize(F.r_u16());
     for (WPIt it = m_WayPoints.begin(); it!=m_WayPoints.end(); it++)
     {
-        CWayPoint *W = xr_new<CWayPoint>("");
+        CWayPoint *W = new CWayPoint("");
         *it = W;
         F.r_fvector3(W->m_vPosition);
         W->m_Flags.assign(F.r_u32());

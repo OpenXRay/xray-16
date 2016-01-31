@@ -76,7 +76,7 @@ IC			bool	NeedShowScrollBar	();		// no comment
 	cmp_function	m_sort_function;
 };
 
-#define ADD_TEXT_TO_VIEW3(txt,st,view)		st = xr_new<CUITextWnd>();						\
+#define ADD_TEXT_TO_VIEW3(txt,st,view)		st = new CUITextWnd();						\
 											st->SetFont(UI().Font().pFontLetterica16Russian); \
 											st->SetText(txt);								\
 											st->SetTextComplexMode(true);					\

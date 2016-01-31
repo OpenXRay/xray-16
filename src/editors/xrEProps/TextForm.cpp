@@ -75,7 +75,7 @@ void __fastcall TfrmText::ebApplyClick(TObject *Sender)
 
 TfrmText* __fastcall TfrmText::CreateForm(AnsiString& txt, LPCSTR caption, u32 flags, int lim, LPCSTR apply_name, TOnApplyClick on_apply, TOnCloseClick on_close, TOnCodeInsight on_insight)
 {
-	TfrmText* form			= xr_new<TfrmText>((TComponent*)0);
+	TfrmText* form			= new TfrmText((TComponent*)0);
     form->Caption			= caption;
     form->m_Text			= &txt;
     form->mmText->ReadOnly	= flags&flReadOnly;
@@ -94,8 +94,8 @@ TfrmText* __fastcall TfrmText::CreateForm(AnsiString& txt, LPCSTR caption, u32 f
 
 bool __fastcall TfrmText::RunEditor(AnsiString& txt, LPCSTR caption, u32 flags, int lim, LPCSTR apply_name, TOnApplyClick on_apply, TOnCloseClick on_close, TOnCodeInsight on_insight)
 {
-	TfrmText* form			= xr_new<TfrmText>((TComponent*)0);
-	form 					= xr_new<TfrmText>((TComponent*)0);
+	TfrmText* form			= new TfrmText((TComponent*)0);
+	form 					= new TfrmText((TComponent*)0);
     form->Caption			= caption;
     form->m_Text			= &txt;
     form->mmText->ReadOnly	= flags&flReadOnly;

@@ -278,7 +278,7 @@ void CSoundManager::SynchronizeSounds(bool sync_thm, bool sync_game, bool bForce
         // check thumbnail
         if (sync_thm&&bThm)
         {
-            THM = xr_new<ESoundThumbnail>(it->name.c_str());
+            THM = new ESoundThumbnail(it->name.c_str());
             THM->Save(m_age);
             bUpdated = TRUE;
         }
@@ -286,7 +286,7 @@ void CSoundManager::SynchronizeSounds(bool sync_thm, bool sync_game, bool bForce
         if (bForceGame||(sync_game&&bGame))
         {
             if (!THM)
-                THM = xr_new<ESoundThumbnail>(it->name.c_str());
+                THM = new ESoundThumbnail(it->name.c_str());
             R_ASSERT(THM);
             string_path src_name;
             strconcat(sizeof(src_name), src_name, base_name.c_str(), ".wav");

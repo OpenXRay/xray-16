@@ -138,7 +138,7 @@ void CImageManager::CreateTextureThumbnail(ETextureThumbnail *THM, const AnsiStr
 void CImageManager::CreateGameTexture(LPCSTR src_name, ETextureThumbnail *thumb)
 {
     R_ASSERT(src_name&&src_name[0]);
-    ETextureThumbnail *THM = thumb ? thumb : xr_new<ETextureThumbnail>(src_name);
+    ETextureThumbnail *THM = thumb ? thumb : new ETextureThumbnail(src_name);
     string_path base_name;
     strcpy(base_name, src_name);
 
@@ -202,7 +202,7 @@ bool CImageManager::MakeGameTexture(ETextureThumbnail *THM, LPCSTR game_name, u3
     {
         bool e_res = true;
         LPCSTR e_name = THM->m_TexParams.ext_normal_map_name.c_str();
-        ETextureThumbnail *NM_THM = xr_new<ETextureThumbnail>(e_name);
+        ETextureThumbnail *NM_THM = new ETextureThumbnail(e_name);
         if (NM_THM->_Format().type==STextureParams::ttNormalMap)
         {
             if (NM_THM->_Format().fmt==STextureParams::tfRGBA)
@@ -307,7 +307,7 @@ void CImageManager::SafeCopyLocalToServer(FS_FileSet &files)
             U32Vec data;
             u32 w, h, a;
             R_ASSERT(Surface_Load(src_name, data, w, h, a));
-            CImage *I = xr_new<CImage>();
+            CImage *I = new CImage();
             I->Create(w, h, data.begin());
             I->Vflip();
             I->SaveTGA(dest_name);
@@ -375,7 +375,7 @@ void CImageManager::SynchronizeTextures(bool sync_thm, bool sync_game, bool bFor
         // check thumbnail
         if (sync_thm&&bThm)
         {
-            THM = xr_new<ETextureThumbnail>(it->name.c_str());
+            THM = new ETextureThumbnail(it->name.c_str());
             bool bRes = Surface_Load(fn, data, w, h, a);
             R_ASSERT(bRes);
             //.             MakeThumbnailImage(THM,data.begin(),w,h,a);
@@ -386,7 +386,7 @@ void CImageManager::SynchronizeTextures(bool sync_thm, bool sync_game, bool bFor
         if (bForceGame||(sync_game&&bGame))
         {
             if (!THM)
-                THM = xr_new<ETextureThumbnail>(it->name.c_str());
+                THM = new ETextureThumbnail(it->name.c_str());
             R_ASSERT(THM);
             if (data.empty())
             {
@@ -746,8 +746,8 @@ EImageThumbnail *CImageManager::CreateThumbnail(LPCSTR src_name, ECustomThumbnai
 {
     switch (type)
     {
-        case ECustomThumbnail::ETObject: return xr_new<EObjectThumbnail>(src_name, bLoad);
-        case ECustomThumbnail::ETTexture: return xr_new<ETextureThumbnail>(src_name, bLoad);
+        case ECustomThumbnail::ETObject: return new EObjectThumbnail(src_name, bLoad);
+        case ECustomThumbnail::ETTexture: return new ETextureThumbnail(src_name, bLoad);
         default: NODEFAULT;
     }
     return 0;

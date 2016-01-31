@@ -61,7 +61,7 @@ void CUITaskWnd::Init()
 	AddCallback						(m_cbQuestNpcs, BUTTON_CLICKED, CUIWndCallback::void_function(this,&CUITaskWnd::OnShowQuestNpcs));
 	m_bQuestNpcsEnabled				= true;
 	
-	m_pMapWnd						= xr_new<CUIMapWnd>(); 
+	m_pMapWnd						= new CUIMapWnd(); 
 	m_pMapWnd->SetAutoDelete		(false);
 	m_pMapWnd->hint_wnd				= hint_wnd;
 	m_pMapWnd->Init					(PDA_TASK_XML,"map_wnd");
@@ -70,7 +70,7 @@ void CUITaskWnd::Init()
 	m_center_background				= UIHelper::CreateStatic( xml, "center_background", this );
 	m_devider						= UIHelper::CreateStatic( xml, "line_devider", this );
 
-	m_pStoryLineTaskItem			= xr_new<CUITaskItem>();
+	m_pStoryLineTaskItem			= new CUITaskItem();
 	m_pStoryLineTaskItem->Init		(xml,"storyline_task_item");
 	AttachChild						(m_pStoryLineTaskItem);
 	m_pStoryLineTaskItem->SetAutoDelete(true);
@@ -83,7 +83,7 @@ void CUITaskWnd::Init()
 	m_BtnTaskListWnd		= UIHelper::Create3tButton( xml, "btn_second_task", this );
 	AddCallback				(m_BtnTaskListWnd, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITaskWnd::OnShowTaskListWnd));
 
-	m_task_wnd					= xr_new<UITaskListWnd>(); 
+	m_task_wnd					= new UITaskListWnd(); 
 	m_task_wnd->SetAutoDelete	(true);
 	m_task_wnd->hint_wnd		= hint_wnd;
 	m_task_wnd->init_from_xml	(xml, "second_task_wnd");
@@ -92,7 +92,7 @@ void CUITaskWnd::Init()
 	m_task_wnd->Show			(false);
 	m_task_wnd_show				= false;
 
-	m_map_legend_wnd					= xr_new<UIMapLegend>(); 
+	m_map_legend_wnd					= new UIMapLegend(); 
 	m_map_legend_wnd->SetAutoDelete		(true);
 	m_map_legend_wnd->init_from_xml		(xml, "map_legend_wnd");
 	m_pMapWnd->AttachChild				(m_map_legend_wnd);

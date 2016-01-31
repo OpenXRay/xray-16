@@ -16,7 +16,7 @@ CSimpleDetector::~CSimpleDetector(void)
 void CSimpleDetector::CreateUI()
 {
 	R_ASSERT(NULL==m_ui);
-	m_ui				= xr_new<CUIArtefactDetectorSimple>();
+	m_ui				= new CUIArtefactDetectorSimple();
 	ui().construct		(this);
 }
 

@@ -52,7 +52,7 @@ bool disk_file_reader::opened() const
 // memory reader
 memory_reader::memory_reader(u8* data_ptr, u32 data_size)
 {
-	m_reader = xr_new<IReader>(static_cast<void*>(data_ptr), static_cast<int>(data_size));
+	m_reader = new IReader(static_cast<void*>(data_ptr), static_cast<int>(data_size));
 }
 memory_reader::~memory_reader()
 {
@@ -263,7 +263,7 @@ filetransfer_node::filetransfer_node(shared_str const & file_name,
 	m_user_param(0),
 	m_process_callback(callback)
 {
-	m_reader = xr_new<disk_file_reader>(file_name);
+	m_reader = new disk_file_reader(file_name);
 }
 
 filetransfer_node::filetransfer_node(u8* data,
@@ -277,7 +277,7 @@ filetransfer_node::filetransfer_node(u8* data,
 	m_user_param(user_param),
 	m_process_callback(callback)
 {
-	m_reader = xr_new<memory_reader>(data, data_size);
+	m_reader = new memory_reader(data, data_size);
 }
 
 filetransfer_node::filetransfer_node(CMemoryWriter* src_writer,
@@ -291,7 +291,7 @@ filetransfer_node::filetransfer_node(CMemoryWriter* src_writer,
 	m_user_param(user_param),
 	m_process_callback(callback)
 {
-	m_reader = xr_new<memory_writer_reader>(src_writer, max_size);
+	m_reader = new memory_writer_reader(src_writer, max_size);
 }
 
 filetransfer_node::filetransfer_node	(buffer_vector<mutable_buffer_t>* vector_of_buffers,
@@ -305,7 +305,7 @@ filetransfer_node::filetransfer_node	(buffer_vector<mutable_buffer_t>* vector_of
 	m_process_callback(callback)
 {
 	VERIFY(vector_of_buffers);
-	m_reader = xr_new<buffers_vector_reader>(vector_of_buffers);
+	m_reader = new buffers_vector_reader(vector_of_buffers);
 }
 
 filetransfer_node::~filetransfer_node()

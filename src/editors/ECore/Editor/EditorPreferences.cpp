@@ -113,7 +113,7 @@ void CCustomPreferences::OnKeyboardCommonFileClick(ButtonValue *B, bool &bModif,
         case 0:
             if (EFS.GetOpenName("$import$", fn, false, NULL, 6))
             {
-                CInifile *I = xr_new<CInifile>(fn.c_str(), TRUE, TRUE, TRUE);
+                CInifile *I = new CInifile(fn.c_str(), TRUE, TRUE, TRUE);
                 LoadShortcuts(I);
                 xr_delete(I);
                 m_ItemProps->RefreshForm();
@@ -122,7 +122,7 @@ void CCustomPreferences::OnKeyboardCommonFileClick(ButtonValue *B, bool &bModif,
         case 1:
             if (EFS.GetSaveName("$import$", fn, NULL, 6))
             {
-                CInifile *I = xr_new<CInifile>(fn.c_str(), FALSE, TRUE, TRUE);
+                CInifile *I = new CInifile(fn.c_str(), FALSE, TRUE, TRUE);
                 SaveShortcuts(I);
                 xr_delete(I);
             }
@@ -329,7 +329,7 @@ void CCustomPreferences::Load()
 {
     string_path fn;
     INI_NAME(fn);
-    CInifile *I = xr_new<CInifile>(fn, TRUE, TRUE, TRUE);
+    CInifile *I = new CInifile(fn, TRUE, TRUE, TRUE);
     Load(I);
     xr_delete(I);
     ApplyValues();
@@ -339,7 +339,7 @@ void CCustomPreferences::Save()
 {
     string_path fn;
     INI_NAME(fn);
-    CInifile *I = xr_new<CInifile>(fn, FALSE, TRUE, TRUE);
+    CInifile *I = new CInifile(fn, FALSE, TRUE, TRUE);
     I->set_override_names(TRUE);
     Save(I);
     xr_delete(I);

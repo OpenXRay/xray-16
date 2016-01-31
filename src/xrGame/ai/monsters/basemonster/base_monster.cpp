@@ -59,13 +59,13 @@ CBaseMonster::CBaseMonster() :	m_psy_aura(this, "psy"),
 								m_radiation_aura(this, "radiation"), 
 								m_base_aura(this, "base")
 {
-	m_pPhysics_support=xr_new<CCharacterPhysicsSupport>(CCharacterPhysicsSupport::etBitting,this);
+	m_pPhysics_support=new CCharacterPhysicsSupport(CCharacterPhysicsSupport::etBitting,this);
 	
 	m_pPhysics_support				->in_Init();
 
 	// Components external init 
 	
-	m_control_manager				= xr_new<CControl_Manager>(this);
+	m_control_manager				= new CControl_Manager(this);
 
 	EnemyMemory.init_external		(this, 20000);
 	SoundMemory.init_external		(this, 20000);
@@ -90,10 +90,10 @@ CBaseMonster::CBaseMonster() :	m_psy_aura(this, "psy"),
 	m_com_manager.add_ability		(ControlCom::eControlTripleAnimation);
 
 
-	m_anomaly_detector				= xr_new<CAnomalyDetector>(this);
-	CoverMan						= xr_new<CMonsterCoverManager>(this);
+	m_anomaly_detector				= new CAnomalyDetector(this);
+	CoverMan						= new CMonsterCoverManager(this);
 
-	Home							= xr_new<CMonsterHome>(this);
+	Home							= new CMonsterHome(this);
 
 	com_man().add_ability				(ControlCom::eComCriticalWound);
 
@@ -728,7 +728,7 @@ void CBaseMonster::on_kill_enemy(const CEntity *obj)
 
 CMovementManager *CBaseMonster::create_movement_manager	()
 {
-	m_movement_manager = xr_new<CControlPathBuilder>(this);
+	m_movement_manager = new CControlPathBuilder(this);
 
 	control().add					(m_movement_manager, ControlCom::eControlPath);
 	control().install_path_manager	(m_movement_manager);
@@ -782,10 +782,10 @@ void CBaseMonster::net_Relcase(IGameObject *O)
 	
 void CBaseMonster::create_base_controls()
 {
-	m_anim_base		= xr_new<CControlAnimationBase>		();
-	m_move_base		= xr_new<CControlMovementBase>		();
-	m_path_base		= xr_new<CControlPathBuilderBase>	();
-	m_dir_base		= xr_new<CControlDirectionBase>		();
+	m_anim_base		= new CControlAnimationBase		();
+	m_move_base		= new CControlMovementBase		();
+	m_path_base		= new CControlPathBuilderBase	();
+	m_dir_base		= new CControlDirectionBase		();
 }
 
 void CBaseMonster::set_action(EAction action)

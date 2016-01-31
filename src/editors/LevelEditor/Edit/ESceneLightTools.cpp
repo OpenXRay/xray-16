@@ -321,7 +321,7 @@ void ESceneLightTool::CreateControls()
 {
     inherited::CreateDefaultControls(estDefault);
     // frame
-    pFrame = xr_new<TfraLight>((TComponent*)0);
+    pFrame = new TfraLight((TComponent*)0);
 }
 
 //----------------------------------------------------
@@ -335,7 +335,7 @@ void ESceneLightTool::RemoveControls()
 
 CCustomObject *ESceneLightTool::CreateObject(LPVOID data, LPCSTR name)
 {
-    CCustomObject*O = xr_new<CLight>(data, name);
+    CCustomObject*O = new CLight(data, name);
     O->ParentTool = this;
     return O;
 }

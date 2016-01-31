@@ -30,7 +30,7 @@ __fastcall TfrmPropertiesEObject::TfrmPropertiesEObject(TComponent *Owner)
 
 TfrmPropertiesEObject *TfrmPropertiesEObject::CreateProperties(TWinControl *parent, TAlign align, TOnModifiedEvent modif)
 {
-    TfrmPropertiesEObject *props = xr_new<TfrmPropertiesEObject>(parent);
+    TfrmPropertiesEObject *props = new TfrmPropertiesEObject(parent);
     props->OnModifiedEvent = modif;
     if (parent)
     {
@@ -169,7 +169,7 @@ void TfrmPropertiesEObject::OnSurfaceFocused(TElTreeItem *item)
                     LPCSTR nm = TProperties::GetItemColumn(item, 0);
                     if (nm&&nm[0])
                     {
-                        m_Thumbnail = xr_new<ETextureThumbnail>(nm);
+                        m_Thumbnail = new ETextureThumbnail(nm);
                         lbWidth->Caption = m_Thumbnail->_Width();
                         lbHeight->Caption = m_Thumbnail->_Height();
                         lbAlpha->Caption = (m_Thumbnail->_Alpha()) ? "present" : "absent";

@@ -52,7 +52,7 @@ void ui_actor_state_wnd::init_from_xml( CUIXml& xml, LPCSTR path )
 
 	for ( int i = 0; i < stt_count; ++i )
 	{
-		m_state[i] = xr_new<ui_actor_state_item>();
+		m_state[i] = new ui_actor_state_item();
 		m_state[i]->SetAutoDelete( true );
 		AttachChild( m_state[i] );
 		m_state[i]->set_hint_wnd( m_hint_wnd );
@@ -320,19 +320,19 @@ void ui_actor_state_item::init_from_xml( CUIXml& xml, LPCSTR path )
 	}
 	if ( xml.NavigateToNode( "progress_shape", 0 ) )	
 	{
-		m_sensor = xr_new<CUIProgressShape>();
+		m_sensor = new CUIProgressShape();
 		AttachChild( m_sensor );
 		m_sensor->SetAutoDelete( true );
 		CUIXmlInit::InitProgressShape( xml, "progress_shape", 0, m_sensor );
 	}
 	if ( xml.NavigateToNode( "arrow", 0 ) )	
 	{
-		m_arrow = xr_new<UI_Arrow>();
+		m_arrow = new UI_Arrow();
 		m_arrow->init_from_xml( xml, "arrow", this );
 	}
 	if ( xml.NavigateToNode( "arrow_shadow", 0 ) )	
 	{
-		m_arrow_shadow = xr_new<UI_Arrow>();
+		m_arrow_shadow = new UI_Arrow();
 		m_arrow_shadow->init_from_xml( xml, "arrow_shadow", this );
 	}
 	if ( xml.NavigateToNode( "icon", 0 ) )	

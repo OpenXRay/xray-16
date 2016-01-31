@@ -68,7 +68,7 @@ u32	CScriptGameObject::add_combat_sound	(LPCSTR prefix, u32 max_count, ESoundTyp
 		return					(0);
 	}
 	else
-		return					( stalker->sound().add(prefix,max_count,type,priority,mask,internal_type,bone_name, xr_new<CStalkerSoundData>(stalker) ) );
+		return					( stalker->sound().add(prefix,max_count,type,priority,mask,internal_type,bone_name, new CStalkerSoundData(stalker) ) );
 }
 
 u32	CScriptGameObject::add_sound		(LPCSTR prefix, u32 max_count, ESoundTypes type, u32 priority, u32 mask, u32 internal_type)

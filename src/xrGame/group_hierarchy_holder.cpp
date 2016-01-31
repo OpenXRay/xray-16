@@ -49,9 +49,9 @@ void CGroupHierarchyHolder::register_in_group			(CEntity *member)
 	VERIFY3						(I == m_members.end(),"Specified group member has already been found",*member->cName());
 
 	if (m_members.empty()) {
-		m_visible_objects		= xr_new<VISIBLE_OBJECTS>();
-		m_sound_objects			= xr_new<SOUND_OBJECTS>();
-		m_hit_objects			= xr_new<HIT_OBJECTS>();
+		m_visible_objects		= new VISIBLE_OBJECTS();
+		m_sound_objects			= new SOUND_OBJECTS();
+		m_hit_objects			= new HIT_OBJECTS();
 
 //		m_visible_objects->reserve	(128);
 //		m_sound_objects->reserve	(128);
@@ -75,7 +75,7 @@ void CGroupHierarchyHolder::register_in_squad			(CEntity *member)
 void CGroupHierarchyHolder::register_in_agent_manager	(CEntity *member)
 {
 	if (!get_agent_manager() && smart_cast<CAI_Stalker*>(member)) {
-		m_agent_manager								= xr_new<CAgentManager>();
+		m_agent_manager								= new CAgentManager();
 		agent_manager().memory().set_squad_objects	(&visible_objects());
 		agent_manager().memory().set_squad_objects	(&sound_objects());
 		agent_manager().memory().set_squad_objects	(&hit_objects());

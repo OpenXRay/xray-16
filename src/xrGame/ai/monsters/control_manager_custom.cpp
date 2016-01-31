@@ -43,36 +43,36 @@ void CControlManagerCustom::add_ability(ControlCom::EControlType type)
 {
 	switch (type) {
 	case ControlCom::eControlSequencer:
-		m_sequencer		= xr_new<CAnimationSequencer>();
+		m_sequencer		= new CAnimationSequencer();
 		m_man->add		(m_sequencer, ControlCom::eControlSequencer);
 		break;
 	case ControlCom::eControlTripleAnimation:
-		m_triple_anim	= xr_new<CAnimationTriple>();
+		m_triple_anim	= new CAnimationTriple();
 		m_man->add		(m_triple_anim, ControlCom::eControlTripleAnimation);
 		break;
 	case ControlCom::eControlRotationJump:
-		m_rotation_jump = xr_new<CControlRotationJump>();
+		m_rotation_jump = new CControlRotationJump();
 		m_man->add		(m_rotation_jump, ControlCom::eControlRotationJump);
 		break;
 	case ControlCom::eControlJump:
-		m_jump			= xr_new<CControlJump>();
+		m_jump			= new CControlJump();
 		m_man->add		(m_jump, ControlCom::eControlJump);
 		break;
 	case ControlCom::eControlRunAttack:
-		m_run_attack	= xr_new<CControlRunAttack>();
+		m_run_attack	= new CControlRunAttack();
 		m_man->add		(m_run_attack, ControlCom::eControlRunAttack);
 		break;
 	case ControlCom::eControlThreaten:
-		m_threaten			= xr_new<CControlThreaten>();
+		m_threaten			= new CControlThreaten();
 		m_man->add			(m_threaten, ControlCom::eControlThreaten);
 		set_threaten_data	(0,0.f);
 		break;
 	case ControlCom::eControlMeleeJump:
-		m_melee_jump	= xr_new<CControlMeleeJump>();
+		m_melee_jump	= new CControlMeleeJump();
 		m_man->add		(m_melee_jump, ControlCom::eControlMeleeJump);
 		break;
 	case ControlCom::eComCriticalWound:
-		m_critical_wound	= xr_new<CControlCriticalWound>();
+		m_critical_wound	= new CControlCriticalWound();
 		m_man->add			(m_critical_wound, ControlCom::eComCriticalWound);
 		break;
 

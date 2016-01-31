@@ -255,7 +255,7 @@ void CAI_Stalker::Hit(SHit* pHDS)
 			if ( !invulnerable() && cover && HDS.initiator() &&
 				( HDS.initiator()->ID() != ID() ) && !fis_zero( HDS.damage() ) && brain().affect_cover() )
 			{
-				agent_manager().location().add( xr_new<CDangerCoverLocation>(cover,Device.dwTimeGlobal,DANGER_INTERVAL,DANGER_DISTANCE) );
+				agent_manager().location().add( new CDangerCoverLocation(cover,Device.dwTimeGlobal,DANGER_INTERVAL,DANGER_DISTANCE) );
 			}
 		}
 

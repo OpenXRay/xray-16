@@ -7,7 +7,7 @@ namespace crypto
 
 xr_sha256::xr_sha256()
 {
-	m_sha_ctx		= xr_new<SHA_CTX>();
+	m_sha_ctx		= new SHA_CTX();
 }
 
 xr_sha256::~xr_sha256()

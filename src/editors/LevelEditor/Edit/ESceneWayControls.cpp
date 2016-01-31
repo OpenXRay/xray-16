@@ -25,9 +25,9 @@ void ESceneWayTool::CreateControls()
 {
     inherited::CreateDefaultControls(estWayModeWay);
     inherited::CreateDefaultControls(estWayModePoint);
-    AddControl(xr_new<TUI_ControlWayPointAdd>(estWayModePoint, etaAdd, this));
+    AddControl(new TUI_ControlWayPointAdd(estWayModePoint, etaAdd, this));
     // frame
-    pFrame = xr_new<TfraWayPoint>((TComponent*)0);
+    pFrame = new TfraWayPoint((TComponent*)0);
 }
 
 //----------------------------------------------------

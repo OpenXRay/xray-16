@@ -55,7 +55,7 @@ void default_behaviour_planner::add_evaluators			()
 {
 	add_evaluator			(
 		eWorldPropertyPlannerHasTarget,
-		xr_new<evaluators::loophole_planner_const_evaluator>(
+		new evaluators::loophole_planner_const_evaluator(
 			&object(),
 			"default behaviour planner has target",
 			false
@@ -63,7 +63,7 @@ void default_behaviour_planner::add_evaluators			()
 	);
 	add_evaluator			(
 		eWorldPropertyLoopholeCanStayIdle,
-		xr_new<evaluators::is_action_available_evaluator>(
+		new evaluators::is_action_available_evaluator(
 			&object(),
 			"can stay idle",
 			"idle"
@@ -71,7 +71,7 @@ void default_behaviour_planner::add_evaluators			()
 	);
 	add_evaluator			(
 		eWorldPropertyLoopholeCanLookout,
-		xr_new<evaluators::is_action_available_evaluator>(
+		new evaluators::is_action_available_evaluator(
 			&object(),
 			"can lookout",
 			"lookout"
@@ -79,7 +79,7 @@ void default_behaviour_planner::add_evaluators			()
 	);
 	add_evaluator			(
 		eWorldPropertyReadyToLookout,
-		xr_new<evaluators::lookout_time_interval_passed_evaluator>(
+		new evaluators::lookout_time_interval_passed_evaluator(
 			&object(),
 			"ready to lookout",
 			object().default_lookout_interval()
@@ -87,7 +87,7 @@ void default_behaviour_planner::add_evaluators			()
 	);
 	add_evaluator			(
 		eWorldPropertyReadyToIdle,
-		xr_new<evaluators::idle_time_interval_passed_evaluator>(
+		new evaluators::idle_time_interval_passed_evaluator(
 			&object(),
 			"stay idle",
 			object().default_idle_interval()
@@ -98,7 +98,7 @@ void default_behaviour_planner::add_evaluators			()
 void default_behaviour_planner::add_actions				()
 {
 	CActionBase<animation_planner> *action;
-	action					= xr_new<target_provider>(&object(), "idle", eWorldPropertyLoopholeIdle, 0);
+	action					= new target_provider(&object(), "idle", eWorldPropertyLoopholeIdle, 0);
 	add_condition			(action, eWorldPropertyLoopholeCanStayIdle,			true);
 	add_condition			(action, eWorldPropertyReadyToIdle,					true);
 	add_condition			(action, eWorldPropertyPlannerHasTarget,			false);
@@ -106,7 +106,7 @@ void default_behaviour_planner::add_actions				()
 	add_operator			(eWorldOperatorLoopholeTargetIdle,					action);
 	action->setup			(&object(), inherited_action::m_storage);
 
-	action					= xr_new<target_provider>(&object(), "lookout", eWorldPropertyLookedOut, 0);
+	action					= new target_provider(&object(), "lookout", eWorldPropertyLookedOut, 0);
 	add_condition			(action, eWorldPropertyLoopholeCanLookout,			true);
 	add_condition			(action, eWorldPropertyReadyToLookout,				true);
 	add_condition			(action, eWorldPropertyPlannerHasTarget,			false);
