@@ -6,6 +6,7 @@
 
 #if !defined(_EDITOR) && !defined(USE_OGL)
 	#include <nvapi.h>
+#include <ags_lib/inc/amd_ags.h>
 #endif
 
 namespace
@@ -70,16 +71,25 @@ u32 GetNVGpuNum()
 
 u32 GetATIGpuNum()
 {
-    // XXX: use AMD AGS
-	//int iGpuNum = AtiMultiGPUAdapters();
-	int iGpuNum = 1;
-
-	if (iGpuNum>1)
-	{
-		Msg	("* ATI MGPU: %d-Way CrossFire detected.", iGpuNum);
-	}
-
-	return iGpuNum;
+    AGSContext *ags = nullptr;
+    AGSGPUInfo gpuInfo = {};
+    AGSReturnCode status = agsInit(&ags, &gpuInfo);
+    if (status!=AGS_SUCCESS)
+    {
+        Msg("! AGS: Initialization failed (%d)", status);
+        return 1;
+    }
+    int crossfireGpuCount = 1;
+    status = agsGetCrossfireGPUCount(ags, &crossfireGpuCount);
+    if (status!=AGS_SUCCESS)
+    {
+        Msg("! AGS: Unable to get CrossFire GPU count (%d)", status);
+        agsDeInit(ags);
+        return 1;
+    }
+    Msg("* AGS: CrossFire GPU count: %d", crossfireGpuCount);
+    agsDeInit(ags);
+	return crossfireGpuCount;
 }
 
 u32 GetGpuNum()

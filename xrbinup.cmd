@@ -71,6 +71,12 @@ set cp_tool=cp
 %cp_tool% %src%\xrRender_R3.dll %dst%\xrRender_R3.dll
 %cp_tool% %src%\xrRender_R4.dll %dst%\xrRender_R4.dll
 %cp_tool% %src%\xrRender_GL.dll %dst%\xrRender_GL.dll
+if %platform%==Win32 (
+  %cp_tool% %src%\amd_ags_x86.dll %dst%\amd_ags_x86.dll
+)
+if %platform%==Win64 (
+  %cp_tool% %src%\amd_ags_x64.dll %dst%\amd_ags_x64.dll
+)
 %cp_tool% %src%\xrXMLParser.dll %dst%\xrXMLParser.dll
 rem CxImage is compiled as DLLs only in debug configuration
 if %cfg%==Debug (
