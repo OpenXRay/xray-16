@@ -150,13 +150,15 @@ public:
     }
 protected:
     bool					m_bTriStateReload;
-    u8						m_sub_state;
+   
     // a misfire happens, you'll need to rearm weapon
     bool					bMisfire;
 
     BOOL					m_bAutoSpawnAmmo;
     virtual bool			AllowBore();
 public:
+	u8						m_sub_state;
+
     bool IsGrenadeLauncherAttached() const;
     bool IsScopeAttached() const;
     bool IsSilencerAttached() const;
@@ -531,7 +533,6 @@ protected:
     CParticlesObject*		m_pFlameParticles2;
 
 protected:
-    int						GetAmmoCount_forType(shared_str const& ammo_type) const;
     int						GetAmmoCount(u8 ammo_type) const;
 
 public:
@@ -635,6 +636,13 @@ protected:
 public:
     virtual u32				ef_main_weapon_type() const;
     virtual u32				ef_weapon_type() const;
+
+	//Alundaio
+	int						GetAmmoCount_forType(shared_str const& ammo_type) const;
+	virtual void			set_ef_main_weapon_type(u32 type){ m_ef_main_weapon_type = type; };
+	virtual void			set_ef_weapon_type(u32 type){ m_ef_weapon_type = type; };
+	virtual void			SetAmmoType(u8 type) { m_ammoType = type; };
+	//-Alundaio
 
 protected:
     // This is because when scope is attached we can't ask scope for these params

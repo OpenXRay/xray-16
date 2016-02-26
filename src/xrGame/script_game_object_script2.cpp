@@ -143,6 +143,16 @@ class_<CScriptGameObject> &script_register_game_object1(class_<CScriptGameObject
 		.def("get_ammo_in_magazine",		&CScriptGameObject::GetAmmoElapsed)
 		.def("get_ammo_total",				&CScriptGameObject::GetSuitableAmmoTotal)
 		.def("set_ammo_elapsed",			&CScriptGameObject::SetAmmoElapsed)
+		//Alundaio
+		.def("set_ammo_type",				&CScriptGameObject::SetAmmoType)
+		.def("get_ammo_count_for_type",     &CScriptGameObject::GetAmmoCount)
+		.def("get_main_weapon_type",		&CScriptGameObject::GetMainWeaponType)
+		.def("get_weapon_type",				&CScriptGameObject::GetWeaponType)
+		.def("set_main_weapon_type",		&CScriptGameObject::SetMainWeaponType)
+		.def("set_weapon_type",				&CScriptGameObject::SetWeaponType)
+		.def("has_ammo_type",				&CScriptGameObject::HasAmmoType)
+		.def("get_weapon_substate",			&CScriptGameObject::GetWeaponSubstate)
+		//-Alundaio
 		.def("set_queue_size",				&CScriptGameObject::SetQueueSize)
 //		.def("best_hit",					&CScriptGameObject::GetBestHit)
 //		.def("best_sound",					&CScriptGameObject::GetBestSound)

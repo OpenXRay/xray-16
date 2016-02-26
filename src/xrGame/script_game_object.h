@@ -818,6 +818,14 @@ public:
 			//Weapon
 			void				Weapon_AddonAttach(CScriptGameObject* item);
 			void				Weapon_AddonDetach(LPCSTR item_section);
+			bool				HasAmmoType(u8 type);
+			int					GetAmmoCount(u8 type);
+			void				SetAmmoType(u8 type);
+			void				SetMainWeaponType(u32 type);
+			void				SetWeaponType(u32 type);
+			u32					GetMainWeaponType();
+			u32					GetWeaponType();
+			u8					GetWeaponSubstate();
 
 			//Weapon & Outfit
 			bool				InstallUpgrade(LPCSTR upgrade);
