@@ -340,12 +340,82 @@ void CScriptGameObject::SetAmmoElapsed(int ammo_elapsed)
     weapon->SetAmmoElapsed(ammo_elapsed);
 }
 
+//Alundaio
+int CScriptGameObject::GetAmmoCount(u8 type)
+{
+    CWeapon* weapon = smart_cast<CWeapon*>(&object());
+    if (!weapon) return 0;
+
+    if (type < weapon->m_ammoTypes.size())
+        return weapon->GetAmmoCount_forType(weapon->m_ammoTypes[type]);
+
+    return 0;
+}
+
+void CScriptGameObject::SetAmmoType(u8 type)
+{
+    CWeapon* weapon = smart_cast<CWeapon*>(&object());
+    if (!weapon) return;
+
+    weapon->SetAmmoType(type);
+}
+
+void CScriptGameObject::SetMainWeaponType(u32 type)
+{
+    CWeapon* weapon = smart_cast<CWeapon*>(&object());
+    if (!weapon) return;
+
+    weapon->set_ef_main_weapon_type(type);
+}
+
+void CScriptGameObject::SetWeaponType(u32 type)
+{
+    CWeapon* weapon = smart_cast<CWeapon*>(&object());
+    if (!weapon) return;
+
+    weapon->set_ef_weapon_type(type);
+}
+
+u32 CScriptGameObject::GetMainWeaponType()
+{
+    CWeapon* weapon = smart_cast<CWeapon*>(&object());
+    if (!weapon) return 0;
+
+    return weapon->ef_main_weapon_type();
+}
+
+u32 CScriptGameObject::GetWeaponType()
+{
+    CWeapon* weapon = smart_cast<CWeapon*>(&object());
+    if (!weapon) return 0;
+
+    return weapon->ef_weapon_type();
+}
+
+bool CScriptGameObject::HasAmmoType(u8 type)
+{
+    CWeapon* weapon = smart_cast<CWeapon*>(&object());
+    if (!weapon) return false;
+
+    return type < weapon->m_ammoTypes.size();
+}
+
+u8 CScriptGameObject::GetWeaponSubstate()
+{
+    CWeapon* weapon = smart_cast<CWeapon*>(&object());
+    if (!weapon) return 0;
+
+    return weapon->m_sub_state;
+}
+
+//-Alundaio
+
 u32 CScriptGameObject::GetSuitableAmmoTotal() const
 {
     const CWeapon* weapon = smart_cast<const CWeapon*>(&object());
     if (!weapon)
-        return (0);
-    return (weapon->GetSuitableAmmoTotal(true));
+        return 0;
+    return weapon->GetSuitableAmmoTotal(true);
 }
 
 //////////////////////////////////////////////////////////////////////////
