@@ -1,18 +1,18 @@
 [submodule "src/Externals/luabind"]
 	path = src/Externals/luabind
-	url = git@github.com:OpenXRay/luabind-deboostified.git
+	url = https://github.com/OpenXRay/luabind-deboostified.git
 [submodule "src/Externals/luajit"]
 	path = src/Externals/luajit
-	url = git@github.com:OpenXRay/LuaJIT.git
+	url = https://github.com/OpenXRay/LuaJIT.git
 [submodule "src/Externals/glbinding"]
 	path = src/Externals/glbinding
-	url = git@github.com:cginternals/glbinding.git
+	url = https://github.com/cginternals/glbinding.git
 [submodule "src/Externals/gli"]
 	path = src/Externals/gli
-	url = git@github.com:g-truc/gli
+	url = https://github.com/g-truc/gli
 [submodule "src/Externals/GameSpy"]
 	path = src/Externals/GameSpy
-	url = git@github.com:nitrocaster/GameSpy.git
+	url = https://github.com/nitrocaster/GameSpy.git
 [submodule "src/Externals/AGS_SDK"]
 	path = src/Externals/AGS_SDK
-	url = git@github.com:GPUOpen-LibrariesAndSDKs/AGS_SDK.git
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/AGS_SDK.git
