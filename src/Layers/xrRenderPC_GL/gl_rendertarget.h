@@ -106,6 +106,8 @@ public:
 	ref_texture					t_noise				[TEX_jitter_count];
 	GLuint			t_noise_surf_mipped;
 	ref_texture					t_noise_mipped;
+
+	ref_texture					t_base;
 private:
 	// OCCq
 
@@ -192,6 +194,8 @@ public:
 	ref_geom					g_postprocess;
 	ref_shader				s_menu;
 	ref_geom					g_menu;
+	ref_shader					s_flip;
+	ref_geom					g_flip;
 private:
 	float						im_noise_time;
 	u32							im_noise_shift_w;
@@ -290,6 +294,7 @@ public:
 	void						phase_combine			();
 	void						phase_combine_volumetric();
 	void						phase_pp				();
+	void						phase_flip				();
 
 	virtual void				set_blur				(float	f)		{ param_blur=f;						}
 	virtual void				set_gray				(float	f)		{ param_gray=f;						}

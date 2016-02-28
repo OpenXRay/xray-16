@@ -1077,9 +1077,7 @@ void D3DXRenderBase::End()
 	RCache.OnFrameEnd();
 	Memory.dbg_check();
 	DoAsyncScreenshot();
-#if defined(USE_OGL)
-	SwapBuffers(HW.m_hDC);
-#elif defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 	HW.m_pSwapChain->Present(0, 0);
 #else
 	CHK_DX(HW.pDevice->EndScene());

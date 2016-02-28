@@ -38,6 +38,7 @@ CHW::CHW() :
 	m_hRC(NULL),
 	pDevice(this),
 	pContext(this),
+	m_pSwapChain(this),
 	m_move_window(true),
 	pBaseRT(0),
 	pBaseZB(0),
@@ -132,7 +133,7 @@ void CHW::CreateDevice( HWND hWnd, bool move_window )
 	// Clip control ensures compatibility with D3D device coordinates.
 	// TODO: OGL: Also use GL_UPPER_LEFT to match D3D.
 	// TODO: OGL: Fix these differences in the blenders/shaders.
-	CHK_GL(glClipControl(GL_LOWER_LEFT, GL_ZERO_TO_ONE));
+	CHK_GL(glClipControl(GL_UPPER_LEFT, GL_ZERO_TO_ONE));
 
 	//	Create render target and depth-stencil views here
 	UpdateViews();
@@ -346,11 +347,12 @@ void CHW::UpdateViews()
 	// Create the clear framebuffer
 	glGenFramebuffers(1, &pCFB);
 
-	// Create a render target view
-	// We reserve a texture name to represent GL_BACK
+	// Create a color render target
 	glGenTextures(1, &HW.pBaseRT);
+	CHK_GL(glBindTexture(GL_TEXTURE_2D, HW.pBaseRT));
+	CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, psCurrentVidMode[0], psCurrentVidMode[1]));
 
-	// Create Depth/stencil buffer
+	// Create depth/stencil buffer
 	glGenTextures(1, &HW.pBaseZB);
 	CHK_GL(glBindTexture(GL_TEXTURE_2D, HW.pBaseZB));
 	CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, psCurrentVidMode[0], psCurrentVidMode[1]));
@@ -372,6 +374,8 @@ void CHW::ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[
 	glClearColor(ColorRGBA[0], ColorRGBA[1], ColorRGBA[2], ColorRGBA[3]);
 	CHK_GL(glClear(GL_COLOR_BUFFER_BIT));
 	glPopAttrib();
+
+	RCache.set_FB(pFB);
 }
 
 void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT Depth, UINT8 Stencil)
@@ -403,5 +407,13 @@ void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT
 	}
 	CHK_GL(glClear((ClearBufferMask)mask));
 	glPopAttrib();
+
+	RCache.set_FB(pFB);
+}
+
+HRESULT CHW::Present(UINT SyncInterval, UINT Flags)
+{
+	RImplementation.Target->phase_flip();
+	return SwapBuffers(m_hDC) ? S_OK : E_FAIL;
 }
 #endif

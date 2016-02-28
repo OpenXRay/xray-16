@@ -21,7 +21,6 @@ void	CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
 	dwHeight = _1->dwHeight;
 	GLuint cnt = 0;
 	GLenum buffers[3] = { GL_NONE };
-	RCache.set_FB(HW.pFB);
 	if (_1)
 	{
 		buffers[cnt++] = GL_COLOR_ATTACHMENT0;
@@ -51,7 +50,6 @@ void	CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, GLuint zb)
 	dwHeight = _1->dwHeight;
 	GLuint cnt = 0;
 	GLenum buffers[2] = { GL_NONE };
-	RCache.set_FB(HW.pFB);
 	if (_1)
 	{
 		buffers[cnt++] = GL_COLOR_ATTACHMENT0;
@@ -75,13 +73,6 @@ void	CRenderTarget::u_setrt(u32 W, u32 H, GLuint _1, GLuint _2, GLuint _3, GLuin
 	dwHeight = H;
 	GLuint cnt = 0;
 	GLenum buffers[3] = { GL_NONE };
-	if (_1 == HW.pBaseRT)
-	{
-		RCache.set_FB();
-		return;
-	}
-
-	RCache.set_FB(HW.pFB);
 	if (_1)
 	{
 		buffers[cnt++] = GL_COLOR_ATTACHMENT0;
@@ -843,6 +834,12 @@ CRenderTarget::CRenderTarget		()
 	// Menu
 	s_menu.create						("distort");
 	g_menu.create						(FVF::F_TL,RCache.Vertex.Buffer(),RCache.QuadIB);
+
+	// Flip
+	t_base								= RImplementation.Resources->_CreateTexture	(r2_base);
+	t_base->surface_set					(GL_TEXTURE_2D, HW.pBaseRT);
+	s_flip.create						("effects\\screen_set",		r2_base);
+	g_flip.create						(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
 
 	// 
 	dwWidth		= Device.dwWidth;

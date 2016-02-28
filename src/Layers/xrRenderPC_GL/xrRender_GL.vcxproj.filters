@@ -681,6 +681,9 @@
     <ClCompile Include="..\xrRenderGL\MSAA\glMSAABlender.cpp">
       <Filter>Interface implementations\MSAARender</Filter>
     </ClCompile>
+    <ClCompile Include="gl_rendertarget_phase_flip.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">

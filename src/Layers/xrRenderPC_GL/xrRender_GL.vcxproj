@@ -268,6 +268,7 @@
     <ClCompile Include="gl_rendertarget_phase_accumulator.cpp" />
     <ClCompile Include="gl_rendertarget_phase_bloom.cpp" />
     <ClCompile Include="gl_rendertarget_phase_combine.cpp" />
+    <ClCompile Include="gl_rendertarget_phase_flip.cpp" />
     <ClCompile Include="gl_rendertarget_phase_luminance.cpp" />
     <ClCompile Include="gl_rendertarget_phase_occq.cpp" />
     <ClCompile Include="gl_rendertarget_phase_PP.cpp" />
