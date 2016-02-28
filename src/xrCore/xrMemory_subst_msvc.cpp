@@ -110,7 +110,7 @@ void xrMemory::mem_free(void *P)
     }
 #ifdef DEBUG_MEMORY_MANAGER
     if (g_globalCheckAddr==P)
-        __asm int 3;
+        DEBUG_BREAK;
     if (mem_initialized)
         debug_cs.Enter();
 #endif
@@ -163,7 +163,7 @@ void* xrMemory::mem_realloc(void* P, size_t size)
     }
 #ifdef DEBUG_MEMORY_MANAGER
     if (g_globalCheckAddr==P)
-        __asm int 3;
+        DEBUG_BREAK;
     if (mem_initialized)
         debug_cs.Enter();
 #endif
@@ -239,7 +239,7 @@ void* xrMemory::mem_realloc(void* P, size_t size)
     if (mem_initialized)
         debug_cs.Leave();
     if (g_globalCheckAddr==_ptr)
-        __asm int 3;
+        DEBUG_BREAK;
 #endif
     return _ptr;
 }

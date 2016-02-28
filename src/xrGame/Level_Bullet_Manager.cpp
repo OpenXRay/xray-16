@@ -1063,7 +1063,7 @@ void CBulletManager::RegisterEvent			(EventType Type, BOOL _dynamic, SBullet* bu
 	if (m_Events.size() > 1000) {
 		static bool breakpoint = true;
 		if (breakpoint)
-			__asm int 3;
+			DEBUG_BREAK;
 	}
 #endif // #ifdef DEBUG
 
