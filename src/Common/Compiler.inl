@@ -2,6 +2,10 @@
 #error Unsupported compiler
 #endif
 
+#ifdef _MSC_VER
+#include <intrin.h> // for __debugbreak
+#endif
+
 #if defined(__GNUC__)
 #define XR_EXPORT __attribute__ ((visibility("default")))
 #define XR_IMPORT __attribute__ ((visibility("default")))
@@ -19,7 +23,7 @@
 #define NO_INLINE __declspec(noinline)
 #define FORCE_INLINE __forceinline
 #define ALIGN(a) __declspec(align(a))
-#define DEBUG_BREAK _asm { int 3 }
+#define DEBUG_BREAK __debugbreak()
 #define __thread __declspec(thread)
 #endif
 
