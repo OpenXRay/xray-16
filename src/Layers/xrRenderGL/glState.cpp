@@ -62,6 +62,11 @@ void glState::Apply()
 
 	CHK_GL(glDepthMask(m_pDepthStencilState.DepthWriteMask ? GL_TRUE : GL_FALSE));
 
+	if (m_pRasterizerState.ScissorEnable)
+		glEnable(GL_SCISSOR_TEST);
+	else
+		glDisable(GL_SCISSOR_TEST);
+
 	if (m_pBlendState.BlendEnable)
 		glEnable(GL_BLEND);
 	else
@@ -97,6 +102,10 @@ void glState::UpdateRenderState(u32 name, u32 value)
 	{
 		case D3DRS_CULLMODE:
 			m_pRasterizerState.CullMode = (D3DCULL)value;
+			break;
+
+		case D3DRS_SCISSORTESTENABLE:
+			m_pRasterizerState.ScissorEnable = value;
 			break;
 
 		case D3DRS_ZENABLE:

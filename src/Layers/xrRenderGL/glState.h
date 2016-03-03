@@ -5,6 +5,7 @@
 typedef struct
 {
 	D3DCULL CullMode;
+	BOOL ScissorEnable;
 } D3D_RASTERIZER_STATE;
 
 typedef struct
