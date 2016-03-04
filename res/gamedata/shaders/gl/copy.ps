@@ -1,0 +1,26 @@
+#include "common.h"
+
+#ifndef ISAMPLE
+#define ISAMPLE 0
+#endif
+
+in int gl_SampleID;
+out vec4 SV_Target;
+
+layout(location = TEXCOORD0) in float2 tc;
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+void main ()
+{
+	//return	tex2D		(s_base,tc);
+#ifndef USE_MSAA
+	SV_Target	=	tex2D		( s_generic, tc );
+#else
+#ifndef MSAA_OPTIMIZATION
+	SV_Target	=	texelFetch	( s_generic, int2( tc * pos_decompression_params2.xy), 0, ISAMPLE );
+#else
+	SV_Target	=	texelFetch	( s_generic, int2( tc * pos_decompression_params2.xy), 0, gl_SampleID );
+#endif
+#endif
+}
