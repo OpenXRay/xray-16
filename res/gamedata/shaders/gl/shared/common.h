@@ -23,6 +23,8 @@
 #define float4x4    mat4
 #define float3x4    mat4x3
 
+vec4	mul(int a,		vec4 b)	{ return a * b; }
+vec4	mul(float a,	vec4 b)	{ return a * b; }
 vec3	mul(mat3 a,		vec3 b)	{ return a * b; }
 vec3	mul(vec3 a,		mat3 b)	{ return a * b; }
 mat3	mul(mat3 a,		mat3 b)	{ return a * b; }
