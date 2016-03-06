@@ -32,8 +32,8 @@ void CBlender_Compile::r_CullMode(D3DCULL Mode)
 
 void	CBlender_Compile::i_Comparison(u32 s, u32 func)
 {
-	RS.SetSAMP(s, (u32)GL_TEXTURE_COMPARE_MODE, (u32)GL_COMPARE_REF_TO_TEXTURE);
-	RS.SetSAMP(s, (u32)GL_TEXTURE_COMPARE_FUNC, func);
+	RS.SetSAMP(s, XRDX10SAMP_COMPARISONFILTER, TRUE);
+	RS.SetSAMP(s, XRDX10SAMP_COMPARISONFUNC, func);
 }
 
 void	CBlender_Compile::r_Sampler_cmp(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide)

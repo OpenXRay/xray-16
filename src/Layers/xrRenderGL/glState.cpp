@@ -254,8 +254,7 @@ void glState::UpdateSamplerState(u32 stage, u32 name, u32 value)
 			CHK_GL(glSamplerParameteri(m_samplerArray[stage], GL_TEXTURE_COMPARE_FUNC, value));
 			break;
 		default:
-			// Assume this is an OpenGL sampler parameter
-			CHK_GL(glSamplerParameteri(m_samplerArray[stage], (GLenum)name, value));
+			VERIFY(!"Sampler state not implemented");
 			break;
 	}
 }

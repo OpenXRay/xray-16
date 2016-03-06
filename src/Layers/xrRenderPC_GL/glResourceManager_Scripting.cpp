@@ -54,7 +54,7 @@ public:
 	adopt_sampler&			_fmag_none		()						{ if (C) C->i_Filter_Mag(stage,D3DTEXF_NONE);										return *this;	}
 	adopt_sampler&			_fmag_point		()						{ if (C) C->i_Filter_Mag(stage,D3DTEXF_POINT);										return *this;	}
 	adopt_sampler&			_fmag_linear	()						{ if (C) C->i_Filter_Mag(stage,D3DTEXF_LINEAR);										return *this;	}
-	adopt_sampler&			_comp_less		()						{ if (C) C->i_Comparison(stage,D3DCMP_LESS);										return *this;	}
+	adopt_sampler&			_comp_less		()						{ if (C) C->i_Comparison(stage,D3D_COMPARISON_LESS_EQUAL);							return *this;	}
 };	
 
 #pragma warning( push )
