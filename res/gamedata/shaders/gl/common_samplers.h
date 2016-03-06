@@ -5,6 +5,7 @@
 #define Texture3D	uniform sampler3D
 #define Texture2DMS uniform sampler2DMS
 #define TextureCube uniform samplerCube​
+#define Texture2DShadow uniform sampler2DShadow
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Geometry phase / deferring               	//
