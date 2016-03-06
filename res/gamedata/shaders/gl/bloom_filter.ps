@@ -1,0 +1,42 @@
+#include "common.h"
+#include "iostructs\p_filter.h"
+
+//////////////////////////////////////////////////////////////////////////////////////////
+uniform float4 		weight[2];
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+// Separable gauss filter: 	2*7 + 1 + 7*2 = 29 samples
+// Samples:			0-central, -1, -2,..., -7, 1, 2,... 7
+// Approximated i-count:	15t + 15a + 7a(d) + 1(out) = 38, HLSL compiled to 38 :)
+float4 _main ( p_filter I )
+{
+	// central
+	float4 accum 	=	weight[1].w * tex2D	(s_bloom, I.Tex0.xy);
+
+	// left (7)
+	// right (7) - no swizles on 'texld', so this is dep-read infact
+	accum		+= 	weight[0].x * tex2D	(s_bloom, I.Tex1.xy);
+	accum		+= 	weight[0].x * tex2D	(s_bloom, I.Tex1.wz);
+
+	accum		+= 	weight[0].y * tex2D	(s_bloom, I.Tex2.xy);
+	accum		+= 	weight[0].y * tex2D	(s_bloom, I.Tex2.wz);
+
+	accum		+= 	weight[0].z * tex2D	(s_bloom, I.Tex3.xy);
+	accum		+= 	weight[0].z * tex2D	(s_bloom, I.Tex3.wz);
+
+	accum		+= 	weight[0].w * tex2D	(s_bloom, I.Tex4.xy);
+	accum		+= 	weight[0].w * tex2D	(s_bloom, I.Tex4.wz);
+
+	accum		+= 	weight[1].x * tex2D	(s_bloom, I.Tex5.xy);
+	accum		+= 	weight[1].x * tex2D	(s_bloom, I.Tex5.wz);
+
+	accum		+= 	weight[1].y * tex2D	(s_bloom, I.Tex6.xy);
+	accum		+= 	weight[1].y * tex2D	(s_bloom, I.Tex6.wz);
+
+	accum		+= 	weight[1].z * tex2D	(s_bloom, I.Tex7.xy);
+	accum		+= 	weight[1].z * tex2D	(s_bloom, I.Tex7.wz);
+
+	// OK
+	return 		accum;
+}
