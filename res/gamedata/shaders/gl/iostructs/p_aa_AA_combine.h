@@ -1,5 +1,6 @@
 
 out vec4 SV_Target;
+in vec4 gl_FragCoord;
 
 layout(location = TEXCOORD0)	in float2 	p_aa_AA_Tex0	; // TEXCOORD0;
 layout(location = TEXCOORD1)	in float2	p_aa_AA_Tex1	; // TEXCOORD1;
@@ -9,11 +10,16 @@ layout(location = TEXCOORD4)	in float2 	p_aa_AA_Tex4	; // TEXCOORD4;
 layout(location = TEXCOORD5)	in float4	p_aa_AA_Tex5	; // TEXCOORD5;
 layout(location = TEXCOORD6)	in float4 	p_aa_AA_Tex6	; // TEXCOORD6;
 
-float4 _main ( p_aa_AA I );
+#ifdef GBUFFER_OPTIMIZATION
+float4 _main ( v_aa_AA I, float4 pos2d );
+#else
+float4 _main ( v_aa_AA I );
+#endif
 
 void main()
 {
-	p_aa_AA	I;
+	v_aa_AA	I;
+	I.P			= gl_FragCoord;
 	I.Tex0		= p_aa_AA_Tex0;
 	I.Tex1		= p_aa_AA_Tex1;
 	I.Tex2		= p_aa_AA_Tex2;
@@ -22,5 +28,9 @@ void main()
 	I.Tex5		= p_aa_AA_Tex5;
 	I.Tex6		= p_aa_AA_Tex6;
 
-	SV_Target	= _main (I);
+#ifdef GBUFFER_OPTIMIZATION
+	SV_Target	= _main ( I, gl_FragCoord );
+#else
+	SV_Target	= _main ( I );
+#endif
 }

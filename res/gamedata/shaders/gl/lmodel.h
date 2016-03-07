@@ -2,7 +2,7 @@
 #define LMODEL_H
 
 #include "common.h"
-
+#line 6 9
 //////////////////////////////////////////////////////////////////////////////////////////
 // Lighting formulas			// 
 float4 plight_infinity( float m, float3 pnt, float3 normal, float3 light_direction )
