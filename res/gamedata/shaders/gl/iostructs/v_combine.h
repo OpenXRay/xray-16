@@ -1,6 +1,6 @@
 
 out gl_PerVertex { vec4 gl_Position; };
-#line 4 1
+
 struct 	_in        	
 {
 	float4	P	; // POSITIONT;	// xy=pos, zw=tc0

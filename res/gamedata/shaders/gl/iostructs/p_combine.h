@@ -5,7 +5,7 @@ in vec4 gl_FragCoord;
 #ifdef MSAA_OPTIMIZATION
 in int gl_SampleID;
 #endif
-#line 9 10
+
 struct	_input
 {
 	float4	tc0	; // TEXCOORD0;	// tc.xy, tc.w = tonemap scale

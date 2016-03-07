@@ -2,7 +2,7 @@
 #define HMODEL_H
 
 #include "common.h"
-#line 6 8
+
 //uniform samplerCUBE         env_s0                ;
 //uniform samplerCUBE         env_s1                ;
 //uniform samplerCUBE         sky_s0                ;
