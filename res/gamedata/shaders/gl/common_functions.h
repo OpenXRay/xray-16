@@ -234,9 +234,9 @@ gbuffer_data gbuffer_load_data( float2 tc, float2 pos2d, int iSample )
 	gbd.N = float3(0,0,0);
 
 #ifndef USE_MSAA
-	float4 P	= s_position.Sample( smp_nofilter, tc );
+	float4 P	= tex2D( s_position, tc );
 #else
-	float4 P	= s_position.Load( int3( pos2d, 0 ), iSample );
+	float4 P	= texelFetch( s_position, int2( pos2d ), 0, iSample );
 #endif
 
 	// 3d view space pos reconstruction math
