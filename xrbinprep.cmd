@@ -31,17 +31,17 @@ for %%b in (%xbin%) do (
   if not exist %%b\dedicated (
     mkdir %%b\dedicated
   )
-  cp bin\dbghelp.dll %%b\dbghelp.dll
-  cp bin\eax.dll %%b\eax.dll
-  cp bin\wrap_oal.dll %%b\wrap_oal.dll
-  cp bin\eax.dll %%b\dedicated\eax.dll
-  cp bin\wrap_oal.dll %%b\dedicated\wrap_oal.dll
-  cp %git_root%\src\Externals\OpenSSL\bin\libeay32.dll %%b\libeay32.dll
-  cp %git_root%\src\Externals\OpenSSL\bin\ssleay32.dll %%b\ssleay32.dll
+  copy bin\dbghelp.dll %%b\dbghelp.dll
+  copy bin\eax.dll %%b\eax.dll
+  copy bin\wrap_oal.dll %%b\wrap_oal.dll
+  copy bin\eax.dll %%b\dedicated\eax.dll
+  copy bin\wrap_oal.dll %%b\dedicated\wrap_oal.dll
+  copy %git_root%\src\Externals\OpenSSL\bin\libeay32.dll %%b\libeay32.dll
+  copy %git_root%\src\Externals\OpenSSL\bin\ssleay32.dll %%b\ssleay32.dll
 )
-cp %git_root%\src\Externals\BugTrap\bin\BugTrapD.dll %bin_dbg_win32%\BugTrap.dll
-cp %git_root%\src\Externals\BugTrap\bin\BugTrap.dll %bin_mix_win32%\BugTrap.dll
-cp %git_root%\src\Externals\BugTrap\bin\BugTrap.dll %bin_rel_win32%\BugTrap.dll
+copy %git_root%\src\Externals\BugTrap\bin\BugTrapD.dll %bin_dbg_win32%\BugTrap.dll
+copy %git_root%\src\Externals\BugTrap\bin\BugTrap.dll %bin_mix_win32%\BugTrap.dll
+copy %git_root%\src\Externals\BugTrap\bin\BugTrap.dll %bin_rel_win32%\BugTrap.dll
 if exist gamedata (
   echo gamedata already exists. Remove/rename it, then
   echo   create soft link to "%git_root%\res\gamedata"
