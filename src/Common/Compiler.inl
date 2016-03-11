@@ -35,3 +35,5 @@
 #define IC inline
 #define ICF FORCE_INLINE
 #define ICN NO_INLINE
+
+#define UNUSED(...) (void)(__VA_ARGS__)
