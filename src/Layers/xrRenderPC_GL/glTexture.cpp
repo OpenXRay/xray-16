@@ -68,7 +68,7 @@ GLuint	CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
 {
 	GLuint					pTexture = 0;
 	string_path				fn;
-	u32						dwWidth, dwHeight;
+	u32						dwWidth, dwHeight, dwDepth;
 	u32						img_size = 0;
 	int						img_loaded_lod = 0;
 	gli::gl::format			fmt;
@@ -82,8 +82,7 @@ GLuint	CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
 	strcpy_s(fname,fRName); //. andy if (strext(fname)) *strext(fname)=0;
 	fix_texture_name		(fname);
 	IReader* S				= NULL;
-	// TODO: OGL: Implement bump mapping.
-	//if (!FS.exist(fn,"$game_textures$",	fname,	".dds")	&& strstr(fname,"_bump"))	goto _BUMP_from_base;
+	if (!FS.exist(fn,"$game_textures$",	fname,	".dds")	&& strstr(fname,"_bump"))	goto _BUMP_from_base;
 	if (FS.exist(fn,"$level$",			fname,	".dds"))							goto _DDS;
 	if (FS.exist(fn,"$game_saves$",		fname,	".dds"))							goto _DDS;
 	if (FS.exist(fn,"$game_textures$",	fname,	".dds"))							goto _DDS;
@@ -114,6 +113,7 @@ _DDS:
 		gli::texture Texture = gli::load((char*)S->pointer(), img_size);
 		R_ASSERT(!Texture.empty());
 		if (gli::is_target_cube(Texture.target()))					goto _DDS_CUBE;
+		if (Texture.target() == gli::TARGET_3D)						goto _DDS_3D;
 		else														goto _DDS_2D;
 
 	_DDS_CUBE:
@@ -122,6 +122,7 @@ _DDS:
 			mip_cnt = Texture.levels();
 			dwWidth = Texture.dimensions().x;
 			dwHeight = Texture.dimensions().y;
+			dwDepth = Texture.dimensions().z;
 			fmt = GL.translate(Texture.format());
 
 			glGenTextures(1, &pTexture);
@@ -150,6 +151,43 @@ _DDS:
 			ret_desc = GL_TEXTURE_CUBE_MAP;
 			return					pTexture;
 		}
+	_DDS_3D:
+		{
+			// Check for LMAP and compress if needed
+			strlwr(fn);
+
+
+			// Load   SYS-MEM-surface, bound to device restrictions
+			gli::gl GL;
+			mip_cnt = Texture.levels();
+			dwWidth = Texture.dimensions().x;
+			dwHeight = Texture.dimensions().y;
+			dwDepth = Texture.dimensions().z;
+			fmt = GL.translate(Texture.format());
+
+			glGenTextures(1, &pTexture);
+			glBindTexture(GL_TEXTURE_3D, pTexture);
+			CHK_GL(glTexStorage3D(GL_TEXTURE_3D, mip_cnt, (GLenum)fmt.Internal, dwWidth, dwHeight, dwDepth));
+			for (size_t i = 0; i < mip_cnt; i++)
+			{
+				if (gli::is_compressed(Texture.format()))
+				{
+					CHK_GL(glCompressedTexSubImage3D(GL_TEXTURE_3D, i, 0, 0, 0, Texture.dimensions(i).x, Texture.dimensions(i).y, Texture.dimensions(i).z,
+						(GLenum)fmt.Internal, Texture.size(i), Texture.data(0, 0, i)));
+				}
+				else {
+					CHK_GL(glTexSubImage3D(GL_TEXTURE_3D, i, 0, 0, 0, Texture.dimensions(i).x, Texture.dimensions(i).y, Texture.dimensions(i).z,
+						(GLenum)fmt.External, (GLenum)fmt.Type, Texture.data(0, 0, i)));
+				}
+			}
+			FS.r_close(S);
+
+			// OK
+			img_loaded_lod = get_texture_load_lod(fn);
+			ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
+			ret_desc = GL_TEXTURE_3D;
+			return					pTexture;
+		}
 	_DDS_2D:
 		{
 			// Check for LMAP and compress if needed
@@ -161,6 +199,7 @@ _DDS:
 			mip_cnt = Texture.levels();
 			dwWidth = Texture.dimensions().x;
 			dwHeight = Texture.dimensions().y;
+			dwDepth = Texture.dimensions().z;
 			fmt = GL.translate(Texture.format());
 
 			glGenTextures(1, &pTexture);
@@ -187,4 +226,32 @@ _DDS:
 			return					pTexture;
 		}
 	}
+
+_BUMP_from_base:
+	{
+		//Msg			("! auto-generated bump map: %s",fname);
+		Msg			("! Fallback to default bump map: %s",fname);
+		//////////////////
+		if (strstr(fname,"_bump#"))			
+		{
+			R_ASSERT2	(FS.exist(fn,"$game_textures$",	"ed\\ed_dummy_bump#",	".dds"), "ed_dummy_bump#");
+			S						= FS.r_open	(fn);
+			R_ASSERT2				(S, fn);
+			img_size				= S->length	();
+			goto		_DDS;
+		}
+		if (strstr(fname,"_bump"))			
+		{
+			R_ASSERT2	(FS.exist(fn,"$game_textures$",	"ed\\ed_dummy_bump",	".dds"),"ed_dummy_bump");
+			S						= FS.r_open	(fn);
+
+			R_ASSERT2	(S, fn);
+
+			img_size				= S->length	();
+			goto		_DDS;
+		}
+		//////////////////
+	}
+
+	return 0;
 }
