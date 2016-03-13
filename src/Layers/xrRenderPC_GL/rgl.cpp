@@ -659,8 +659,6 @@ static inline void load_includes(LPCSTR pSrcData, UINT SrcDataLen, xr_vector<cha
 
 		// Add next source, skip quotation
 		str++;
-		// TODO: OGL: Include string index in line directive
-		source.push_back("#line 2\n");
 		source.push_back(str);
 	}
 }
