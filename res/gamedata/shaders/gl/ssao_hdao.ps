@@ -210,10 +210,10 @@ float HDAOValleyAngle( uint2 u2ScreenCoord )
 		i2MirrorOffsetScreenCoord = int2( u2ScreenCoord ) + i2MirrorPattern;
 		
 		// Clamp our test to screen coordinates
-		i2OffsetScreenCoord = any(greaterThan( i2OffsetScreenCoord, ( g_f2RTSize - float2( 1.0f, 1.0f ) ) )) ? int2( g_f2RTSize - float2( 1.0f, 1.0f ) ) : ( i2OffsetScreenCoord );
-		i2MirrorOffsetScreenCoord = any(greaterThan( i2MirrorOffsetScreenCoord, ( g_f2RTSize - float2( 1.0f, 1.0f ) ) )) ? int2( g_f2RTSize - float2( 1.0f, 1.0f ) ) : ( i2MirrorOffsetScreenCoord );
-		i2OffsetScreenCoord = any(lessThan( i2OffsetScreenCoord, int2( 0 ) )) ? int2( 0 ) : ( i2OffsetScreenCoord );
-		i2MirrorOffsetScreenCoord = any(lessThan( i2MirrorOffsetScreenCoord, int2( 0 ) )) ? int2( 0 ) : ( i2MirrorOffsetScreenCoord );
+		i2OffsetScreenCoord = ivec2(mix( ( i2OffsetScreenCoord ), int2( g_f2RTSize - float2( 1.0f, 1.0f ) ), greaterThan( i2OffsetScreenCoord, ( g_f2RTSize - float2( 1.0f, 1.0f ) ) )));
+		i2MirrorOffsetScreenCoord = ivec2(mix( ( i2MirrorOffsetScreenCoord ), int2( g_f2RTSize - float2( 1.0f, 1.0f ) ), greaterThan( i2MirrorOffsetScreenCoord, ( g_f2RTSize - float2( 1.0f, 1.0f ) ) )));
+		i2OffsetScreenCoord = ivec2(mix( ( i2OffsetScreenCoord ), int2( 0 ), lessThan( i2OffsetScreenCoord, int2( 0 ) )));
+		i2MirrorOffsetScreenCoord = ivec2(mix( ( i2MirrorOffsetScreenCoord ), int2( 0 ), lessThan( i2MirrorOffsetScreenCoord, int2( 0 ) )));
 		
 #ifdef USE_MSAA
 #ifdef GBUFFER_OPTIMIZATION
@@ -324,13 +324,13 @@ float	calc_hdao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
 		
 		f4PosZ		  = GatherZSamples( f2TexCoord );
 		f4Diff		  = float4(ZDisp) - f4PosZ;
-		f4Compare[0]  = any(lessThan( f4Diff, float4(g_fSSAORejectRadius) )) ? float4( 1.0f ) : float4( 0.0f );
-		f4Compare[0] *= any(greaterThan( f4Diff, float4(g_fSSAOAcceptRadius) )) ? float4( 1.0f ) : float4( 0.0f );
+		f4Compare[0]  = mix(float4( 0.0f ), float4( 1.0f ), lessThan( f4Diff, float4(g_fSSAORejectRadius) ));
+		f4Compare[0] *= mix(float4( 0.0f ), float4( 1.0f ), greaterThan( f4Diff, float4(g_fSSAOAcceptRadius) ));
 		
 		f4PosZ		  = GatherZSamples( f2MirrorTexCoord );
 		f4Diff		  = float4(ZDisp) - f4PosZ;
-		f4Compare[1]  = any(lessThan( f4Diff, float4(g_fSSAORejectRadius) )) ? float4( 1.0f ) : float4( 0.0f );
-		f4Compare[1] *= any(greaterThan( f4Diff, float4(g_fSSAOAcceptRadius) )) ? float4( 1.0f ) : float4( 0.0f );
+		f4Compare[1]  = mix(float4( 0.0f ), float4( 1.0f ), lessThan( f4Diff, float4(g_fSSAORejectRadius) ));
+		f4Compare[1] *= mix(float4( 0.0f ), float4( 1.0f ), greaterThan( f4Diff, float4(g_fSSAOAcceptRadius) ));
 
 		f4Occlusion.xyzw += g_f4SSAORingWeight[iGather].xyzw * ( f4Compare[0].xyzw * f4Compare[1].zwxy );
 	}

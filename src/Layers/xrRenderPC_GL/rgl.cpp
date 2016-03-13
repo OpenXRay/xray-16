@@ -921,6 +921,7 @@ HRESULT	CRender::shader_compile(
 		CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
 		CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));
 		CHK_GL(glBindFragDataLocation(program, 1, "SV_Target1"));
+		CHK_GL(glBindFragDataLocation(program, 2, "SV_Target2"));
 		CHK_GL(glLinkProgram(program));
 		CHK_GL(glDetachShader(program, shader));
 		CHK_GL(glGetProgramiv(program, GL_LINK_STATUS, &status));

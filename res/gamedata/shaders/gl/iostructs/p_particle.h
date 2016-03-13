@@ -28,7 +28,9 @@ void main()
 	v2p			I;
 	I.tc0		= p_particle_tc;
 	I.c 		= p_particle_c;
+#ifdef	USE_SOFT_PARTICLES
 	I.tctexgen 	= p_particle_tctexgen;
+#endif
 	I.hpos		= gl_FragCoord;
 
 	SV_Target	= _main (I);
