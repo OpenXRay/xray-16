@@ -385,7 +385,8 @@ CRenderTarget::CRenderTarget		()
 			s_create_minmax_sm.create( &TempBlender, "null" );
 		}
 
-      //rt_smap_surf.create			(r2_RT_smap_surf,			size,size,nullrt		);
+		// TODO: OGL: Don't create a color buffer for the shadow map.
+		rt_smap_surf.create			(r2_RT_smap_surf,			size,size,nullrt		);
 		//rt_smap_ZB					= NULL;
 		s_accum_mask.create			(b_accum_mask,				"r3\\accum_mask");
 		s_accum_direct.create		(b_accum_direct,			"r3\\accum_direct");
