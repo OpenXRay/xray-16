@@ -5,7 +5,7 @@
 
 struct 	v_model_skinned_0
 {
-	int4 	P	; // POSITION;	// (float,float,float,1) - quantized	// short4
+	float4 	P	; // POSITION;	// (float,float,float,1) - quantized	// short4
 	float3	N	; // NORMAL;	// normal				// DWORD
 	float3	T	; // TANGENT;	// tangent				// DWORD
 	float3	B	; // BINORMAL;	// binormal				// DWORD
@@ -13,7 +13,7 @@ struct 	v_model_skinned_0
 };
 struct 	v_model_skinned_1   		// 24 bytes
 {
-	int4 	P	; // POSITION;	// (float,float,float,1) - quantized	// short4
+	float4 	P	; // POSITION;	// (float,float,float,1) - quantized	// short4
 	float4	N	; // NORMAL;	// (nx,ny,nz,index)			// DWORD
 	float3	T	; // TANGENT;	// tangent				// DWORD
 	float3	B	; // BINORMAL;	// binormal				// DWORD
@@ -21,7 +21,7 @@ struct 	v_model_skinned_1   		// 24 bytes
 };
 struct 	v_model_skinned_2		// 28 bytes
 {
-	int4 	P	; // POSITION;	// (float,float,float,1) - quantized	// short4
+	float4 	P	; // POSITION;	// (float,float,float,1) - quantized	// short4
 	float4 	N	; // NORMAL;	// (nx,ny,nz,weight)	// DWORD
 	float3	T	; // TANGENT;	// tangent				// DWORD
 	float3	B	; // BINORMAL;	// binormal				// DWORD
@@ -30,7 +30,7 @@ struct 	v_model_skinned_2		// 28 bytes
 
 struct 	v_model_skinned_3		// 28 bytes
 {
-	int4 	P	; // POSITION;	// (float,float,float,1) - quantized	// short4
+	float4 	P	; // POSITION;	// (float,float,float,1) - quantized	// short4
 	float4 	N	; // NORMAL;	// (nx,ny,nz,weight0)			// DWORD
 	float4	T	; // TANGENT;	// (tx,ty,tz,weight1)				// DWORD
 	float4	B	; // BINORMAL;	// (bx,by,bz,m-index2)				// DWORD
@@ -39,7 +39,7 @@ struct 	v_model_skinned_3		// 28 bytes
 
 struct 	v_model_skinned_4		// 28 bytes
 {
-	int4 	P	; // POSITION;	// (float,float,float,1) - quantized	// short4
+	float4 	P	; // POSITION;	// (float,float,float,1) - quantized	// short4
 	float4 	N	; // NORMAL;	// (nx,ny,nz,weight0)			// DWORD
 	float4	T	; // TANGENT;	// (tx,ty,tz,weight1)				// DWORD
 	float4	B	; // BINORMAL;	// (bx,by,bz,weight2)				// DWORD

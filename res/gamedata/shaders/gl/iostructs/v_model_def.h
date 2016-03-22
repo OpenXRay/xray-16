@@ -9,11 +9,7 @@ struct v2p
 	float4 hpos	; // SV_Position;
 };
 
-#ifdef	SKIN_NONE
 layout(location = POSITION)		in float4	v_model_P		; // POSITION;		// (float,float,float,1)
-#else
-layout(location = POSITION)		in int4		v_model_P		; // POSITION;		// (float,float,float,1) - quantized
-#endif
 #ifdef	SKIN_0
 layout(location = NORMAL)		in float3	v_model_N		; // NORMAL;		// (nx,ny,nz)
 #else
