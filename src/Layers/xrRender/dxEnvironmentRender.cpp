@@ -174,9 +174,9 @@ void dxEnvironmentRender::OnFrame(CEnvironment &env)
 		//. very very ugly hack
 		if (HW.Caps.raster_major >= 3 && HW.Caps.geometry.bVTF){
 			// tonemapping in VS
-			mixRen.sky_r_textures.push_back		(mk_pair(u32(D3DVERTEXTEXTURESAMPLER0),tonemap));	//. hack
-			mixRen.sky_r_textures_env.push_back	(mk_pair(u32(D3DVERTEXTEXTURESAMPLER0),tonemap));	//. hack
-			mixRen.clouds_r_textures.push_back	(mk_pair(u32(D3DVERTEXTEXTURESAMPLER0),tonemap));	//. hack
+			mixRen.sky_r_textures.push_back		(mk_pair(u32(CTexture::rstVertex),tonemap));	//. hack
+			mixRen.sky_r_textures_env.push_back	(mk_pair(u32(CTexture::rstVertex),tonemap));	//. hack
+			mixRen.clouds_r_textures.push_back	(mk_pair(u32(CTexture::rstVertex),tonemap));	//. hack
 		} else {
 			// tonemapping in PS
 			mixRen.sky_r_textures.push_back		(mk_pair(2,tonemap));								//. hack
