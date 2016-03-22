@@ -72,7 +72,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(SolutionDir)Externals\OpenAutomate\inc;$(SolutionDir)Externals\glbinding\source\glbinding\include;$(SolutionDir)Externals\gli;$(SolutionDir)Externals\gli\external\glm;$(SolutionDir)Externals\AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Externals\OpenAutomate\inc;$(SolutionDir)Externals\gl\include;$(SolutionDir)Externals\glew\include;$(SolutionDir)Externals\gli;$(SolutionDir)Externals\gli\external\glm;$(SolutionDir)Externals\AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>USE_OGL;GLBINDING_STATIC;NO_XR_VDECLARATOR;_USRDLL;XRRENDER_GL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -111,7 +111,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)Externals\OpenAutomate\inc;$(SolutionDir)Externals\glbinding\source\glbinding\include;$(SolutionDir)Externals\gli;$(SolutionDir)Externals\gli\external\glm;$(SolutionDir)Externals\AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Externals\OpenAutomate\inc;$(SolutionDir)Externals\gl\include;$(SolutionDir)Externals\glew\include;$(SolutionDir)Externals\gli;$(SolutionDir)Externals\gli\external\glm;$(SolutionDir)Externals\AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>USE_OGL;GLBINDING_STATIC;NO_XR_VDECLARATOR;_USRDLL;XRRENDER_GL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -153,7 +153,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(SolutionDir)Externals\OpenAutomate\inc;$(SolutionDir)Externals\glbinding\source\glbinding\include;$(SolutionDir)Externals\gli;$(SolutionDir)Externals\gli\external\glm;$(SolutionDir)Externals\AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Externals\OpenAutomate\inc;$(SolutionDir)Externals\gl\include;$(SolutionDir)Externals\glew\include;$(SolutionDir)Externals\gli;$(SolutionDir)Externals\gli\external\glm;$(SolutionDir)Externals\AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>USE_OGL;GLBINDING_STATIC;NO_XR_VDECLARATOR;_USRDLL;XRRENDER_GL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -516,8 +516,8 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Externals\glbinding.vcxproj">
-      <Project>{aa714987-a9eb-3322-b3c6-ee1bd242cec6}</Project>
+    <ProjectReference Include="..\..\Externals\glew.vcxproj">
+      <Project>{664e6f0d-6784-4760-9565-d54f8eb1edf4}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\xrEngine\xrEngine.vcxproj">
       <Project>{2578c6d8-660d-48ae-9322-7422f8664f06}</Project>

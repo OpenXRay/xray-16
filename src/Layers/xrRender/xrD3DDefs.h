@@ -7,7 +7,6 @@
 // TODO: Get rid of D3D types.
 #include <d3d9types.h>
 
-using namespace gl;
 class glState;
 
 typedef enum D3D_CLEAR_FLAG {

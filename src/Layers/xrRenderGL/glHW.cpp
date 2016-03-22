@@ -8,8 +8,6 @@
 #include "xrEngine/XR_IOConsole.h"
 #include "Include/xrAPI/xrAPI.h"
 
-#include <glbinding/Binding.h>
-
 #ifndef _EDITOR
 void	fill_vid_mode_list			(CHW* _hw);
 void	free_vid_mode_list			();
@@ -122,8 +120,12 @@ void CHW::CreateDevice( HWND hWnd, bool move_window )
 		return;
 	}
 
-	// Initialize glBinding
-	glbinding::Binding::initialize();
+	// Initialize OpenGL Extension Wrangler
+	if (glewInit() != GLEW_OK)
+	{
+		Msg("Could not initialize glew.");
+		return;
+	}
 
 #ifdef DEBUG
 	CHK_GL(glEnable(GL_DEBUG_OUTPUT));
@@ -393,7 +395,7 @@ void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT
 		mask |= (u32)GL_STENCIL_BUFFER_BIT;
 
 
-	glPushAttrib((AttribMask)mask);
+	glPushAttrib(mask);
 	if (ClearFlags & D3DCLEAR_ZBUFFER)
 	{
 		glDepthMask(GL_TRUE);
@@ -404,7 +406,7 @@ void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT
 		glStencilMask(~0);
 		glClearStencil(Stencil);
 	}
-	CHK_GL(glClear((ClearBufferMask)mask));
+	CHK_GL(glClear(mask));
 	glPopAttrib();
 
 	RCache.set_FB(pFB);

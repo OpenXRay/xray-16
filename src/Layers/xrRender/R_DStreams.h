@@ -3,8 +3,11 @@
 #pragma once
 
 #ifdef USE_OGL
-const BufferAccessMask LOCKFLAGS_FLUSH	= BufferAccessMask::GL_MAP_WRITE_BIT | BufferAccessMask::GL_MAP_INVALIDATE_BUFFER_BIT;
-const BufferAccessMask LOCKFLAGS_APPEND = BufferAccessMask::GL_MAP_WRITE_BIT; // TODO: Implement buffer object appending using glBufferSubData
+enum
+{
+	LOCKFLAGS_FLUSH		= GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT,
+	LOCKFLAGS_APPEND	= GL_MAP_WRITE_BIT // TODO: Implement buffer object appending using glBufferSubData
+};
 #else
 enum
 {

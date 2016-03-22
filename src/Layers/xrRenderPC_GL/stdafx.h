@@ -12,7 +12,12 @@
 #pragma warning( 4 : 4244 )
 #pragma warning(disable:4237)
 
-#include <glbinding/gl/gl.h>
+#define GLEW_STATIC
+#include <gl\glew.h>
+#include <gl\GL.h>
+#include <gl\GLU.h>
+#include <gl\glext.h>
+#include <gl\wglext.h>
 
 #include "Layers/xrRender/xrD3DDefs.h"
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"
