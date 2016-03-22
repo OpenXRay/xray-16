@@ -5,13 +5,13 @@
 
 #ifdef	MSAA_ALPHATEST_DX10_1
 #if MSAA_SAMPLES == 2
-static const float2 MSAAOffsets[2] = { float2(4,4), float2(-4,-4) };
+const float2 MSAAOffsets[2] = { float2(4,4), float2(-4,-4) };
 #endif
 #if MSAA_SAMPLES == 4
-static const float2 MSAAOffsets[4] = { float2(-2,-6), float2(6,-2), float2(-6,2), float2(2,6) };
+const float2 MSAAOffsets[4] = { float2(-2,-6), float2(6,-2), float2(-6,2), float2(2,6) };
 #endif
 #if MSAA_SAMPLES == 8
-static const float2 MSAAOffsets[8] = { float2(1,-3), float2(-1,3), float2(5,1), float2(-3,-5), 
+const float2 MSAAOffsets[8] = { float2(1,-3), float2(-1,3), float2(5,1), float2(-3,-5), 
 								               float2(-5,5), float2(-7,-1), float2(3,7), float2(7,-7) };
 #endif
 #endif	//	MSAA_ALPHATEST_DX10_1
@@ -35,8 +35,8 @@ float4 tbase( float2 tc )
 
 #if defined(ALLOW_STEEPPARALLAX) && defined(USE_STEEPPARALLAX)
 
-static const float fParallaxStartFade = 8.0f;
-static const float fParallaxStopFade = 12.0f;
+const float fParallaxStartFade = 8.0f;
+const float fParallaxStopFade = 12.0f;
 
 void UpdateTC( inout p_bumped I )
 {

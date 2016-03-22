@@ -1,6 +1,6 @@
 #include	"common.h"
-#include	"iostructs\v_static_bumped.h"
-
+#include	"iostructs\v_static_bump.h"
+#line 4 1
 v2p_bumped _main( v_in I )
 {
 //	I.color.rgb 	= I.color.bgr;	//	Swizzle to compensate DX9/DX10 format mismatch
@@ -12,7 +12,11 @@ v2p_bumped _main( v_in I )
 	v2p_bumped 	O;
 	float3	Pe	= mul		(m_WV,  w_pos		);
 	O.hpos 		= mul		(m_WVP,	w_pos		);
+#if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
 	O.tcdh 		= float4	(tc.xyyy			);
+#else
+	O.tcdh 		= float2	(tc.xyyy			);
+#endif
 	O.position	= float4	(Pe, hemi			);
 //	O.position	= float4	(O.hpos.xyz, hemi	);
 

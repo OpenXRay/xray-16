@@ -18,5 +18,5 @@ void main()
 
 	v2p_shadow_direct O = _main (I);
 
-	gl_Position = O.HPos;
+	gl_Position = O.hpos;
 }

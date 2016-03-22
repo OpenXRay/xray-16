@@ -17,4 +17,5 @@ void main()
 #ifdef 	USE_SJITTER
 	v2p_volume_tcJ	= O.tcJ;
 #endif
+	gl_Position		= O.hpos;
 }

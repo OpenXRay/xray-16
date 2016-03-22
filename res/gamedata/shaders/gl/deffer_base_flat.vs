@@ -1,6 +1,6 @@
 #include "common.h"
 #include "iostructs\v_static_flat.h"
-
+#line 4 1
 v2p_flat _main ( v_in I )
 {
 	I.Nh			= unpack_D3DCOLOR(I.Nh);
@@ -15,7 +15,11 @@ v2p_flat _main ( v_in I )
 	float3	Pe	= mul( m_WV, I.P );
 
 	float2	tc 	= unpack_tc_base( I.tc, I.T.w, I.B.w);	// copy tc
-	O.tcdh		= float4( tc.xyyy );
+#if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
+	O.tcdh 		= float4( tc.xyyy );
+#else
+	O.tcdh 		= float2( tc.xyyy );
+#endif
 	O.position	= float4( Pe, I.Nh.w );
 
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)

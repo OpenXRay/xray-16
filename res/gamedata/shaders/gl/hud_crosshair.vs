@@ -1,6 +1,6 @@
 #include "common_iostructs.h"
-//#include "common.h"
-#include "iostructs\v2p_TL0uv.h"
+//include "common.h"
+#include "iostructs\v_TL0uv.h"
 
 uniform float4		screen_res;		// Screen resolution (x-Width,y-Height, zw - 1/resolution)
 

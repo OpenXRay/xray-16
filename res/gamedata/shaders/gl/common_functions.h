@@ -64,8 +64,11 @@ float3 calc_model_lq_lighting( float3 norm_w )
 }
 
 float3 	unpack_normal( float3 v )	{ return 2*v-1; }
+float3 	unpack_normal( float4 v )	{ return 2*v.xyz-1; }
 float3 	unpack_bx2( float3 v )	{ return 2*v-1; }
+float3 	unpack_bx2( float4 v )	{ return 2*v.xyz-1; }
 float3 	unpack_bx4( float3 v )	{ return 4*v-2; } //!reduce the amount of stretching from 4*v-2 and increase precision
+float3 	unpack_bx4( float4 v )	{ return 4*v.xyz-2; }
 float2 	unpack_tc_lmap( float2 tc )	{ return tc*(1.f/32768.f);	} // [-1  .. +1 ] 
 float4	unpack_color( float4 c ) { return c.bgra; }
 float4	unpack_D3DCOLOR( float4 c ) { return c.bgra; }
