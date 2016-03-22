@@ -885,7 +885,11 @@ HRESULT	CRender::shader_compile(
 	string256 name_comment;
 	sprintf_s(name_comment, "// %s\n", name);
 	const char** sources = xr_alloc<const char*>(sources_len);
+#ifdef DEBUG
+	sources[0] = "#version 410\n#pragma optimize (off)\n";
+#else
 	sources[0] = "#version 410\n";
+#endif
 	sources[1] = name_comment;
 	memcpy(sources + 2, defines, def_len * sizeof(char*));
 	memcpy(sources + def_len + 2, source.data(), source.size() * sizeof(char*));
