@@ -14,7 +14,7 @@ v2p_flat 	_main (v_detail v)
 {
 	v2p_flat 		O;
 	// index
-	int 	i 	= v.misc.w;
+	int 	i 	= int(v.misc.w);
 	float4  m0 	= array[i+0];
 	float4  m1 	= array[i+1];
 	float4  m2 	= array[i+2];

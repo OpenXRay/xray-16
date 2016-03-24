@@ -465,7 +465,7 @@ struct	v_tree
 struct        v_detail                    
 {
         float4      pos			; // POSITION;                // (float,float,float,1)
-        int4        misc		; // TEXCOORD0;        // (u(Q),v(Q),frac,matrix-id)
+        float4      misc		; // TEXCOORD0;        // (u(Q),v(Q),frac,matrix-id)
 };
 
 #endif	//	common_iostructs_h_included

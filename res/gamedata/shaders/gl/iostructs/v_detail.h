@@ -2,7 +2,7 @@
 out gl_PerVertex { vec4 gl_Position; };
 
 layout(location = POSITION)		in float4	v_detail_pos	; // POSITION;                // (float,float,float,1)
-layout(location = TEXCOORD0)	in int4		v_detail_misc	; // TEXCOORD0;        // (u(Q),v(Q),frac,matrix-id)
+layout(location = TEXCOORD0)	in float4	v_detail_misc	; // TEXCOORD0;        // (u(Q),v(Q),frac,matrix-id)
 
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
 layout(location = TEXCOORD0) 	out float4	v2p_flat_tcdh	; // TEXCOORD0;	// Texture coordinates,         w=sun_occlusion
