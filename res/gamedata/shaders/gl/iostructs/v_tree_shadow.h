@@ -3,7 +3,7 @@ out gl_PerVertex { vec4 gl_Position; };
 
 layout(location = POSITION)		in float4	v_shadow_P		; // POSITION;		// (float,float,float,1)
 #ifdef	USE_AREF
-layout(location = TEXCOORD0)	in int4		v_shadow_tc		; // TEXCOORD0;	// (u,v,frac,???)
+layout(location = TEXCOORD0)	in float4	v_shadow_tc		; // TEXCOORD0;	// (u,v,frac,???)
 #endif	//	USE_AREF
 
 #ifdef	USE_AREF

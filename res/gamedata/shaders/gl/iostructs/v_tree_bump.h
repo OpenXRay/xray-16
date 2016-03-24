@@ -5,7 +5,7 @@ layout(location = POSITION)		in float4	v_tree_P		; // POSITION;		// (float,float
 layout(location = NORMAL)		in float4	v_tree_Nh		; // NORMAL;		// (nx,ny,nz)
 layout(location = TANGENT)		in float3	v_tree_T		; // TANGENT;		// tangent
 layout(location = BINORMAL)		in float3	v_tree_B		; // BINORMAL;		// binormal
-layout(location = TEXCOORD0)	in int4		v_tree_tc		; // TEXCOORD0;	// (u,v,frac,???)
+layout(location = TEXCOORD0)	in float4	v_tree_tc		; // TEXCOORD0;	// (u,v,frac,???)
 
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
 layout(location = TEXCOORD0) 	out float4	v2p_bumped_tcdh	; // TEXCOORD0;	// Texture coordinates,         w=sun_occlusion

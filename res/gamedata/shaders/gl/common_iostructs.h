@@ -413,7 +413,7 @@ struct	p_flat
 struct	v_shadow_direct_aref
 {
 	float4	P		; // POSITION;		// (float,float,float,1)
-	int4	tc		; // TEXCOORD0;	// (u,v,frac,???)
+	float4	tc		; // TEXCOORD0;	// (u,v,frac,???)
 };
 
 struct	v_shadow_direct
@@ -457,7 +457,7 @@ struct	v_tree
 	float4	Nh		; // NORMAL;		// (nx,ny,nz)
 	float3	T		; // TANGENT;		// tangent
 	float3	B		; // BINORMAL;		// binormal
-	int4	tc		; // TEXCOORD0;	// (u,v,frac,???)
+	float4	tc		; // TEXCOORD0;	// (u,v,frac,???)
 };
 
 ////////////////////////////////////////////////////////////////
