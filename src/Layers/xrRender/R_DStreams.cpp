@@ -142,6 +142,7 @@ void	_VertexStream::Unlock		( u32 Count, u32 Stride)
 	VERIFY				(pVB);
 
 #if defined(USE_OGL)
+	glBindBuffer(GL_ARRAY_BUFFER, pVB);
 	CHK_GL(glUnmapBuffer(GL_ARRAY_BUFFER));
 #elif defined(USE_DX11)
 	HW.pContext->Unmap(pVB, 0);
@@ -280,6 +281,7 @@ void	_IndexStream::Unlock(u32 RealCount)
 	mPosition				+=	RealCount;
 	VERIFY					(pIB);
 #if defined(USE_OGL)
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pIB);
 	CHK_GL(glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER));
 #elif defined(USE_DX11)
 	HW.pContext->Unmap(pIB, 0);
