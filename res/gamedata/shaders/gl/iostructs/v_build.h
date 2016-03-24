@@ -28,6 +28,6 @@ void main()
 	v2p_build_Tex0 = O.Tex0;
 	v2p_build_Tex1 = O.Tex1;
 	v2p_build_Tex2 = O.Tex2;
-	v2p_build_Tex3 = O.Tex2;
+	v2p_build_Tex3 = O.Tex3;
 	gl_Position = O.HPos;
 }
