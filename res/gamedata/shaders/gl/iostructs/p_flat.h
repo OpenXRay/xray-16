@@ -1,9 +1,9 @@
 
 out vec4 SV_Target0;
-#ifndef GBUFFER_OPTIMIZATION
 out vec4 SV_Target1;
-#endif
+#ifndef GBUFFER_OPTIMIZATION
 out vec4 SV_Target2;
+#endif
 #ifdef EXTEND_F_DEFFER
 out int gl_SampleMask[];
 #endif
@@ -51,10 +51,12 @@ void main()
 #endif	//	MSAA_ALPHATEST_DX10_1_ATOC
 
 	SV_Target0 = O.position;
-#ifndef GBUFFER_OPTIMIZATION
+#ifdef GBUFFER_OPTIMIZATION
+	SV_Target1 = O.C;
+#else
 	SV_Target1 = O.Ne;
-#endif
 	SV_Target2 = O.C;
+#endif
 #ifdef EXTEND_F_DEFFER
 	gl_SampleMask[0] = O.mask;
 #endif
