@@ -1,6 +1,6 @@
 #include "common.h"
 #include "iostructs\v_static_flat.h"
-#line 4 1
+
 v2p_flat _main ( v_in I )
 {
 	I.Nh			= unpack_D3DCOLOR(I.Nh);

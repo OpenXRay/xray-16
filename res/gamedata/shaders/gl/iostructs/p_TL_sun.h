@@ -30,7 +30,6 @@ void main()
 	I.Tex0		= p_TL_Tex0;
 	I.Color 	= p_TL_Color;
 
-	SV_Target	= _main (I);
 #ifdef MSAA_OPTIMIZATION
 #ifdef GBUFFER_OPTIMIZATION
 	SV_Target	= _main ( I, gl_FragCoord, gl_SampleID );

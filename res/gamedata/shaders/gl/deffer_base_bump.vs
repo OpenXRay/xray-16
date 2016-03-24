@@ -1,6 +1,6 @@
 #include	"common.h"
 #include	"iostructs\v_static_bump.h"
-#line 4 1
+
 v2p_bumped _main( v_in I )
 {
 //	I.color.rgb 	= I.color.bgr;	//	Swizzle to compensate DX9/DX10 format mismatch

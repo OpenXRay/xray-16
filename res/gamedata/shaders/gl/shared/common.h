@@ -49,6 +49,7 @@ void	sincos(float x, out float s, out float c) { s = sin(x); c = cos(x); }
 #define texCUBE 	texture
 #define asuint		floatBitsToUint
 #define asfloat		uintBitsToFloat
+#define mask(m,a,b)	mix(b,a,m)
 
 // Semantics assignment, maximum 16 slots
 #define COLOR		0

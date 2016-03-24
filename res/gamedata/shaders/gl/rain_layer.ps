@@ -4,10 +4,10 @@
 #include "iostructs\p_rain_layer.h"
 
 
-float3x4 m_sunmask;	// ortho-projection
+uniform float3x4 m_sunmask;	// ortho-projection
 Texture2D	s_water;
 
-
+#line 11 1
 #ifdef GBUFFER_OPTIMIZATION
 float4 _main ( float2 tc, float2 tcJ, float4 pos2d )
 #else

@@ -453,9 +453,9 @@ float dx10_1_hw_hq_7x7( float3 tc )
    // loop over the rows
    for( row = -GS2; row <= GS2; row += 2 )
    {
-       [unroll]for( col = -GS2; col <= GS2; col += 2 )
+       for( col = -GS2; col <= GS2; col += 2 )
        {
-            float4 v = ( tc.zzzz <= textureGatherOffset( s_dmap, tc.xy, int2( col, row ) ) ) ? (1.0).xxxx : (0.0).xxxx; 
+            float4 v = mask( lessThanEqual( tc.zzzz, textureGatherOffset( s_dmap, tc.xy, int2( col, row ) ) ), float4(1.0), float4(0.0)); 
             
             if( row == -GS2 ) // top row
             {
@@ -482,7 +482,7 @@ float dx10_1_hw_hq_7x7( float3 tc )
                 else if( col == GS2 ) // right
                     s += dot( float4( 1.0, fc.x, fc.x, 1.0 ), v ); 
                 else // center
-                    s += dot( (1.0).xxxx, v ); 
+                    s += dot( float4(1.0), v ); 
             }
         }
    }
@@ -821,7 +821,7 @@ float 	shadow_rain 	(float4 tc, float2 tcJ)			// jittered sampling
 
 //////////////////////////////////////////////////////////////////////////////////////////
 #ifdef  USE_SUNMASK	
-float3x4 m_sunmask;	// ortho-projection
+uniform float3x4 m_sunmask;	// ortho-projection
 float sunmask( float4 P )
 {
 	float2 		tc	= mul( m_sunmask, P );		//

@@ -51,10 +51,10 @@ float4 _main ( v_aa_AA I )
   float4 tc6r 		=  I.Tex6.wzyx;
   
 #ifdef GBUFFER_OPTIMIZATION
-  gbuffer_data gbd5 = gbuffer_load_data_offset(I.Tex0,I.Tex5, pos2d); 
-  gbuffer_data gbd6 = gbuffer_load_data_offset(I.Tex0,I.Tex6, pos2d); 
-  gbuffer_data gbd5r = gbuffer_load_data_offset(I.Tex0,tc5r, pos2d); 
-  gbuffer_data gbd6r = gbuffer_load_data_offset(I.Tex0,tc6r, pos2d); 
+  gbuffer_data gbd5 = gbuffer_load_data_offset(I.Tex0,I.Tex5.xy, pos2d); 
+  gbuffer_data gbd6 = gbuffer_load_data_offset(I.Tex0,I.Tex6.xy, pos2d); 
+  gbuffer_data gbd5r = gbuffer_load_data_offset(I.Tex0,tc5r.xy, pos2d); 
+  gbuffer_data gbd6r = gbuffer_load_data_offset(I.Tex0,tc6r.xy, pos2d); 
 #else
   gbuffer_data gbd5 = gbuffer_load_data(I.Tex5.xy); 
   gbuffer_data gbd6 = gbuffer_load_data(I.Tex6.xy); 

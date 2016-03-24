@@ -4,14 +4,14 @@
 #include "iostructs\p_rain_patch.h"
 
 
-float3x4 m_sunmask;	// ortho-projection
+uniform float3x4 m_sunmask;	// ortho-projection
 //Texture2D	s_water;
 Texture3D	s_water;
 Texture3D	s_waterFall;
-float4	RainDensity;
-float4	RainFallof;
-float4	WorldX;	//	Float3	
-float4	WorldZ;	//	Float3	
+uniform float4	RainDensity;
+uniform float4	RainFallof;
+uniform float4	WorldX;	//	Float3	
+uniform float4	WorldZ;	//	Float3	
 
 
 float3	GetNVNMap( Texture3D s_texture, float2 tc, float time)
