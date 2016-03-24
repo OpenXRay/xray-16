@@ -17,14 +17,14 @@ v2p_bumped 	_main 	(v_tree I)
 	float3 	pos		= mul			(m_xform, I.P);
 
 	//
-	float 	base 	= m_xform._24	;		// take base height from matrix
+	float 	base 	= m_xform._42	;		// take base height from matrix
 	float 	dp		= calc_cyclic  	(wave.w+dot(pos,float3(wave)));
 	float 	H 		= pos.y - base	;		// height of vertex (scaled, rotated, etc.)
 	float 	frac 	= I.tc.z*consts.x;		// fractional (or rigidity)
 	float 	inten 	= H * dp;				// intensity
 	float2 	result	= calc_xz_wave	(wind.xz*inten, frac);
 #ifdef		USE_TREEWAVE
-			result	= 0;
+			result	= float2(0);
 #endif
 	float4 	w_pos 	= float4(pos.x+result.x, pos.y, pos.z+result.y, 1);
 	float2 	tc 		= (I.tc * consts).xy;
@@ -34,7 +34,6 @@ v2p_bumped 	_main 	(v_tree I)
 	// Eye-space pos/normal
 	v2p_bumped 		O;
 	float3	Pe		= mul		(m_V,  	w_pos		);
-	O.tcdh 			= float4	(tc.xyyy			);
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
 	O.tcdh			= float4	(tc.xyyy			);
 #else

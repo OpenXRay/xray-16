@@ -25,13 +25,13 @@ v2p_shadow_direct _main ( v_shadow_direct I )
 	float3 	pos	= mul		(m_xform , I.P);
 
 	// 
-	float 	base 	= m_xform._24;			// take base height from matrix
-	float 	dp		= calc_cyclic  (wave.w+dot(pos,(float3)wave));
+	float 	base 	= m_xform._42;			// take base height from matrix
+	float 	dp		= calc_cyclic  (wave.w+dot(pos,float3(wave)));
 	float 	H 		= pos.y - base;			// height of vertex (scaled, rotated, etc.)
 	float 	inten 	= H * dp;			// intensity
 	float2 	result;
 #ifdef	USE_TREEWAVE
-			result	= 0;
+			result	= float2(0);
 #else	//	USE_TREEWAVE
 #ifdef	USE_AREF
 	float 	frac 	= I.tc.z*consts.x;		// fractional (or rigidity)

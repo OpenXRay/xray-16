@@ -48,7 +48,11 @@ v2p_flat 	_main (v_detail v)
 	O.N 		= mul		(m_WV,  normalize(norm)	);
 	float3	Pe	= mul		(m_WV,  pos				);
 //	O.tcdh 		= float4	((v.misc * consts).xy	);
+#if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
 	O.tcdh 		= float4	((v.misc * consts).xyyy );
+#else
+	O.tcdh 		= float2	((v.misc * consts).xyyy	);
+#endif
 
 # if defined(USE_R2_STATIC_SUN)
 	O.tcdh.w	= c0.x;								// (,,,dir-occlusion)
@@ -57,4 +61,3 @@ v2p_flat 	_main (v_detail v)
 
 	return O;
 }
-FXVS;

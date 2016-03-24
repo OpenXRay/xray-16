@@ -6,7 +6,7 @@ struct 	v2p
 	float2	tc0	; // TEXCOORD0;	// base
 };
 
-layout(location = TEXCOORD0)	in float4	p_simple_tc0	; // TEXCOORD0;	// base
+layout(location = TEXCOORD0)	in float2	p_simple_tc0	; // TEXCOORD0;	// base
 
 float4 _main ( v2p I );
 

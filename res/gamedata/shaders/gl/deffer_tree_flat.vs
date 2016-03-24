@@ -19,7 +19,7 @@ v2p_flat _main (v_tree I)
 	float3 	pos		= mul		(m_xform, I.P);
 
 	//
-	float 	base 	= m_xform._24;			// take base height from matrix
+	float 	base 	= m_xform._42;			// take base height from matrix
 	float 	dp		= calc_cyclic  (wave.w+dot(pos,float3(wave)));
 	float 	H 		= pos.y - base;			// height of vertex (scaled, rotated, etc.)
 	float 	frac 	= I.tc.z*consts.x;		// fractional (or rigidity)
@@ -37,7 +37,11 @@ v2p_flat _main (v_tree I)
     //float 	hemi 	= I.Nh.w;
 	o.hpos			= mul		(m_VP, f_pos				);
 	o.N 			= mul		(float3x3(m_xform_v), unpack_bx2(I.Nh)	);
-	o.tcdh 			= float4	((I.tc * consts).xyyy		);
+#if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
+	o.tcdh			= float4	((I.tc * consts).xyyy		);
+#else
+	o.tcdh			= float2	((I.tc * consts).xyyy		);
+#endif
 	o.position		= float4	(Pe, hemi					);
 
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
