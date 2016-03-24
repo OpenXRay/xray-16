@@ -121,7 +121,7 @@ SDeclaration*	CResourceManager::_CreateDecl	(u32 FVF)
 	glGenVertexArrays(1, &D->dcl);
 
 	D->FVF = FVF;
-	glBufferUtils::ConvertVertexDeclaration(FVF, D->dcl);
+	glBufferUtils::ConvertVertexDeclaration(FVF, D);
 	D->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 	v_declarations.push_back(D);
 
@@ -143,7 +143,7 @@ SDeclaration*	CResourceManager::_CreateDecl(D3DVERTEXELEMENT9* dcl)
 	D->FVF = 0;
 	u32 dcl_size = glBufferUtils::GetDeclLength(dcl) + 1;
 	D->dcl_code.assign(dcl, dcl + dcl_size);
-	glBufferUtils::ConvertVertexDeclaration(dcl, D->dcl);
+	glBufferUtils::ConvertVertexDeclaration(dcl, D);
 	D->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 	v_declarations.push_back(D);
 
