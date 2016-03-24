@@ -9,7 +9,7 @@ struct 	v_model_skinned_0
 	float3	N	; // NORMAL;	// normal				// DWORD
 	float3	T	; // TANGENT;	// tangent				// DWORD
 	float3	B	; // BINORMAL;	// binormal				// DWORD
-	int2	tc	; // TEXCOORD0;// (u,v)				// short2
+	float2	tc	; // TEXCOORD0;// (u,v)				// short2
 };
 struct 	v_model_skinned_1   		// 24 bytes
 {
@@ -17,7 +17,7 @@ struct 	v_model_skinned_1   		// 24 bytes
 	float4	N	; // NORMAL;	// (nx,ny,nz,index)			// DWORD
 	float3	T	; // TANGENT;	// tangent				// DWORD
 	float3	B	; // BINORMAL;	// binormal				// DWORD
-	int2	tc	; // TEXCOORD0;// (u,v)				// short2
+	float2	tc	; // TEXCOORD0;// (u,v)				// short2
 };
 struct 	v_model_skinned_2		// 28 bytes
 {
@@ -25,7 +25,7 @@ struct 	v_model_skinned_2		// 28 bytes
 	float4 	N	; // NORMAL;	// (nx,ny,nz,weight)	// DWORD
 	float3	T	; // TANGENT;	// tangent				// DWORD
 	float3	B	; // BINORMAL;	// binormal				// DWORD
-	int4 	tc	; // TEXCOORD0;	// (u,v, w=m-index0, z=m-index1)  	// short4
+	float4 	tc	; // TEXCOORD0;	// (u,v, w=m-index0, z=m-index1)  	// short4
 };
 
 struct 	v_model_skinned_3		// 28 bytes
@@ -34,7 +34,7 @@ struct 	v_model_skinned_3		// 28 bytes
 	float4 	N	; // NORMAL;	// (nx,ny,nz,weight0)			// DWORD
 	float4	T	; // TANGENT;	// (tx,ty,tz,weight1)				// DWORD
 	float4	B	; // BINORMAL;	// (bx,by,bz,m-index2)				// DWORD
-	int4 	tc	; // TEXCOORD0;	// (u,v, w=m-index0, z=m-index1)  	// short4
+	float4 	tc	; // TEXCOORD0;	// (u,v, w=m-index0, z=m-index1)  	// short4
 };
 
 struct 	v_model_skinned_4		// 28 bytes
@@ -43,7 +43,7 @@ struct 	v_model_skinned_4		// 28 bytes
 	float4 	N	; // NORMAL;	// (nx,ny,nz,weight0)			// DWORD
 	float4	T	; // TANGENT;	// (tx,ty,tz,weight1)				// DWORD
 	float4	B	; // BINORMAL;	// (bx,by,bz,weight2)				// DWORD
-	int2 	tc	; // TEXCOORD0;// (u,v)  					// short2
+	float2 	tc	; // TEXCOORD0;// (u,v)  					// short2
 	float4 	ind	; // TEXCOORD1;// (x=m-index0, y=m-index1, z=m-index2, w=m-index3)  	// DWORD
 };
 

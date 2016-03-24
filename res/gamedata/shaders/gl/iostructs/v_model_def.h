@@ -22,12 +22,10 @@ layout(location = BINORMAL)		in float4	v_model_B		; // BINORMAL;		// (nx,ny,nz,w
 layout(location = TANGENT)		in float3	v_model_T		; // TANGENT;		// (nx,ny,nz)
 layout(location = BINORMAL)		in float3	v_model_B		; // BINORMAL;		// (nx,ny,nz)
 #endif
-#ifdef	SKIN_NONE
-layout(location = TEXCOORD0)	in float2	v_model_tc		; // TEXCOORD0;	// (u,v)
-#elif defined(SKIN_2) || defined(SKIN_3)
-layout(location = TEXCOORD0)	in int4		v_model_tc		; // TEXCOORD0;	// (u,v)
+#if defined(SKIN_2) || defined(SKIN_3)
+layout(location = TEXCOORD0)	in float4	v_model_tc		; // TEXCOORD0;	// (u,v)
 #else
-layout(location = TEXCOORD0)	in int2		v_model_tc		; // TEXCOORD0;	// (u,v)
+layout(location = TEXCOORD0)	in float2	v_model_tc		; // TEXCOORD0;	// (u,v)
 #endif
 #ifdef	SKIN_4
 layout(location = TEXCOORD1)	in float4	v_model_ind		; // (x=m-index0, y=m-index1, z=m-index2, w=m-index3)

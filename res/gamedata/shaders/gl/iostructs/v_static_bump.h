@@ -10,9 +10,9 @@ out gl_PerVertex { vec4 gl_Position; };
 layout(location = NORMAL)		in float4	v_static_Nh		; // NORMAL;	// (nx,ny,nz,hemi occlusion)
 layout(location = TANGENT)		in float4	v_static_T		; // TANGENT;	// tangent
 layout(location = BINORMAL)		in float4	v_static_B		; // BINORMAL;	// binormal
-layout(location = TEXCOORD0)	in int2		v_static_tc		; // TEXCOORD0;	// (u,v)
+layout(location = TEXCOORD0)	in float2	v_static_tc		; // TEXCOORD0;	// (u,v)
 #ifdef	USE_LM_HEMI
-layout(location = TEXCOORD1)	in int2		v_static_lmh	; // TEXCOORD1;	// (lmu,lmv)
+layout(location = TEXCOORD1)	in float2	v_static_lmh	; // TEXCOORD1;	// (lmu,lmv)
 #endif
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
 layout(location = COLOR0)		in float4	v_static_color	; // COLOR0;	// (r,g,b,dir-occlusion)	//	Swizzle before use!!!
