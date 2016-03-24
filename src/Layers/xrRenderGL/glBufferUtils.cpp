@@ -261,7 +261,7 @@ void ConvertVertexDeclaration(u32 FVF, SDeclaration* decl)
 		if (FVF & D3DFVF_TEXCOORDSIZE4(i))
 			size = 4;
 
-		CHK_GL(glVertexAttribFormat(attrib, size, GL_FLOAT, GL_TRUE, offset));
+		CHK_GL(glVertexAttribFormat(attrib, size, GL_FLOAT, GL_FALSE, offset));
 		CHK_GL(glVertexAttribBinding(attrib, 0));
 		CHK_GL(glEnableVertexAttribArray(attrib));
 		offset += size * sizeof(float);
