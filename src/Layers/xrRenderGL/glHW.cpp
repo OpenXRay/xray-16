@@ -345,9 +345,6 @@ void CHW::UpdateViews()
 	glGenFramebuffers(1, &pFB);
 	CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, pFB));
 
-	// Create the clear framebuffer
-	glGenFramebuffers(1, &pCFB);
-
 	// Create a color render target
 	glGenTextures(1, &HW.pBaseRT);
 	CHK_GL(glBindTexture(GL_TEXTURE_2D, HW.pBaseRT));
@@ -365,8 +362,7 @@ void CHW::ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[
 	if (pRenderTargetView == 0)
 		return;
 
-	// Bind the clear framebuffer and attach the render target
-	RCache.set_FB(pCFB);
+	// Attach the render target
 	CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pRenderTargetView, 0));
 
 	// Clear the color buffer without affecting the global state
@@ -375,8 +371,6 @@ void CHW::ClearRenderTargetView(GLuint pRenderTargetView, const FLOAT ColorRGBA[
 	glClearColor(ColorRGBA[0], ColorRGBA[1], ColorRGBA[2], ColorRGBA[3]);
 	CHK_GL(glClear(GL_COLOR_BUFFER_BIT));
 	glPopAttrib();
-
-	RCache.set_FB(pFB);
 }
 
 void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT Depth, UINT8 Stencil)
@@ -384,8 +378,7 @@ void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT
 	if (pDepthStencilView == 0)
 		return;
 
-	// Bind the clear framebuffer and attach the render target
-	RCache.set_FB(pCFB);
+	// Attach the depth buffer
 	CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, pDepthStencilView, 0));
 
 	u32 mask = 0;
@@ -408,8 +401,6 @@ void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT
 	}
 	CHK_GL(glClear(mask));
 	glPopAttrib();
-
-	RCache.set_FB(pFB);
 }
 
 HRESULT CHW::Present(UINT SyncInterval, UINT Flags)
