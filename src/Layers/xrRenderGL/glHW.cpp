@@ -396,7 +396,7 @@ void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT
 
 
 	glPushAttrib(mask);
-	if (ClearFlags & D3DCLEAR_ZBUFFER)
+	if (ClearFlags & D3D_CLEAR_DEPTH)
 	{
 		glDepthMask(GL_TRUE);
 		glClearDepthf(Depth);
