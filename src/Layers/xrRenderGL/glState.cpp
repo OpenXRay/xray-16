@@ -48,7 +48,6 @@ void glState::Apply()
 	RCache.set_CullMode(m_pRasterizerState.CullMode);
 	RCache.set_Z(m_pDepthStencilState.DepthEnable);
 	RCache.set_ZFunc(m_pDepthStencilState.DepthFunc);
-	/* TODO: OGL: Cache the stencil state globally.
 	RCache.set_Stencil(
 		m_pDepthStencilState.StencilEnable,
 		m_pDepthStencilState.StencilFunc,
@@ -58,7 +57,7 @@ void glState::Apply()
 		m_pDepthStencilState.StencilFailOp,
 		m_pDepthStencilState.StencilPassOp,
 		m_pDepthStencilState.StencilDepthFailOp
-		);*/
+		);
 
 	CHK_GL(glDepthMask(m_pDepthStencilState.DepthWriteMask ? GL_TRUE : GL_FALSE));
 
@@ -83,8 +82,7 @@ void glState::Apply()
 		glStateUtils::ConvertBlendOp(m_pBlendState.BlendOpAlpha)
 		));
 
-	// TODO: OGL: Cache the color mask globally.
-	//RCache.set_ColorWriteEnable(m_pBlendState.ColorMask);
+	RCache.set_ColorWriteEnable(m_pBlendState.ColorMask);
 }
 
 void glState::Release()
