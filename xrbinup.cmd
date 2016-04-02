@@ -86,7 +86,6 @@ if %platform%==Win32 (
 if %platform%==Win64 (
   %cp_tool% "!src!\amd_ags_x64.dll" "!dst!\amd_ags_x64.dll"
 )
-%cp_tool% "!src!\xrXMLParser.dll" "!dst!\xrXMLParser.dll"
 rem CxImage is compiled as DLLs only in debug configuration
 if %cfg%==Debug (
   %cp_tool% "!src!\CxImage.dll" "!dst!\CxImage.dll"
