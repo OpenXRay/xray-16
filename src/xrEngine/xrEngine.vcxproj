@@ -286,7 +286,7 @@
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>LuaJIT.lib;luabind.lib;vfw32.lib;libogg_static.lib;libtheora_static.lib;oalib.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(SolutionDir)Externals\OpenAutomate\libraries;$(SolutionDir)Externals\libogg-1.1.4\win32\lib\$(Platform)\Debug;$(SolutionDir)Externals\libtheora-1.1.1\win32\lib\$(Platform)\Debug;$(xrLibRootDir)Debug;$(SolutionDir)Externals\luajit\bin\$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(SolutionDir)Externals\OpenAutomate\libraries;$(SolutionDir)Externals\libogg-1.1.4\win32\lib\$(Platform)\Debug;$(SolutionDir)Externals\libtheora-1.1.1\win32\lib\$(Platform)\Debug;$(xrLibRootDir)$(Platform)\Debug;$(SolutionDir)Externals\luajit\bin\$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <MapExports>false</MapExports>
       <SubSystem>Windows</SubSystem>
