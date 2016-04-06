@@ -10,7 +10,7 @@
 #define PROPERTY_HOLDER_INCLUDE_HPP_INCLUDED
 
 #pragma unmanaged
-#include <boost/noncopyable.hpp>
+#include "Common/Noncopyable.hpp"
 #include "xrcore/fastdelegate.h"
 #include <utility>
 #include "include/editor/property_holder.hpp"
@@ -23,7 +23,8 @@ private ref struct Pair {
 };
 
 template <typename T>
-class value_holder : private boost::noncopyable {
+class value_holder : private Noncopyable
+{
 public:
 	inline		value_holder	(T& value) :
 		m_value	(value)
