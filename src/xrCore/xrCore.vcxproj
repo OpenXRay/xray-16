@@ -70,7 +70,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)Externals;$(SolutionDir)Externals\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Externals;$(SolutionDir)Externals\openssl\include;$(SolutionDir)Externals\lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>false</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -86,12 +86,12 @@
     </ClCompile>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(SolutionDir)Externals\BugTrap\Bin;$(SolutionDir)Externals\openssl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(SolutionDir)Externals\BugTrap\Bin;$(SolutionDir)Externals\openssl\lib;$(SolutionDir)Externals\lzo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <MapExports>false</MapExports>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>libeay32.lib;ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libeay32.lib;ssleay32.lib;lzo2.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
@@ -104,7 +104,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)Externals;$(SolutionDir)Externals\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Externals;$(SolutionDir)Externals\openssl\include;$(SolutionDir)Externals\lzo-2.02\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -118,14 +118,14 @@
       <WarningLevel>Level4</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(SolutionDir)Externals\BugTrap\Bin;$(SolutionDir)Externals\openssl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(SolutionDir)Externals\BugTrap\Bin;$(SolutionDir)Externals\openssl\lib;$(SolutionDir)Externals\lzo-2.02;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>libeay32.lib;ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libeay32.lib;ssleay32.lib;lzo2.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
@@ -137,7 +137,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(SolutionDir)Externals;$(SolutionDir)Externals\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Externals;$(SolutionDir)Externals\openssl\include;$(SolutionDir)Externals\lzo-2.02\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -151,13 +151,13 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(SolutionDir)Externals\BugTrap\Bin;$(SolutionDir)Externals\openssl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(SolutionDir)Externals\BugTrap\Bin;$(SolutionDir)Externals\openssl\lib;$(SolutionDir)Externals\lzo-2.02;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>libeay32.lib;ssleay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libeay32.lib;ssleay32.lib;lzo2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -167,6 +167,9 @@
     <ClCompile Include="Animation\Motion.cpp" />
     <ClCompile Include="Animation\SkeletonMotions.cpp" />
     <ClCompile Include="clsid.cpp" />
+    <ClCompile Include="Compression\lzo_compressor.cpp" />
+    <ClCompile Include="Compression\rt_compressor.cpp" />
+    <ClCompile Include="Compression\rt_compressor9.cpp" />
     <ClCompile Include="cpuid.cpp" />
     <ClCompile Include="crc32.cpp" />
     <ClCompile Include="Crypto\crypto.cpp" />
@@ -190,7 +193,6 @@
     <ClCompile Include="LocatorAPI_defs.cpp" />
     <ClCompile Include="log.cpp" />
     <ClCompile Include="LzHuf.cpp" />
-    <ClCompile Include="lzo_compressor.cpp" />
     <ClCompile Include="Math\PLC_SSE.cpp" />
     <ClCompile Include="Math\Skin4W_MT.cpp" />
     <ClCompile Include="Math\SkinXW_SSE.cpp" />
@@ -234,14 +236,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="rt_compressor.cpp" />
-    <ClCompile Include="rt_compressor9.cpp" />
-    <ClCompile Include="rt_lzo1x_1.cpp" />
-    <ClCompile Include="rt_lzo1x_9x.cpp" />
-    <ClCompile Include="rt_lzo1x_d1.cpp" />
-    <ClCompile Include="rt_lzo1x_d2.cpp" />
-    <ClCompile Include="rt_lzo1x_d3.cpp" />
-    <ClCompile Include="rt_lzo_init.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">Create</PrecompiledHeader>
@@ -302,6 +296,8 @@
     <ClInclude Include="cdecl_cast.hpp" />
     <ClInclude Include="clsid.h" />
     <ClInclude Include="Coder.hpp" />
+    <ClInclude Include="Compression\lzo_compressor.h" />
+    <ClInclude Include="Compression\rt_compressor.h" />
     <ClInclude Include="compression_ppmd_stream.h" />
     <ClInclude Include="compression_ppmd_stream_inline.h" />
     <ClInclude Include="Containers\AssociativeVector.hpp" />
@@ -338,7 +334,6 @@
     <ClInclude Include="LocatorAPI_defs.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="lzhuf.h" />
-    <ClInclude Include="lzo_compressor.h" />
     <ClInclude Include="Math\PLC_SSE.hpp" />
     <ClInclude Include="Math\Random32.hpp" />
     <ClInclude Include="Math\Skin4W_MT.hpp" />
@@ -356,16 +351,6 @@
     <ClInclude Include="ppmd_compressor.h" />
     <ClInclude Include="ptmalloc3\malloc-2.8.3.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="rt_compressor.h" />
-    <ClInclude Include="rt_config1x.h" />
-    <ClInclude Include="rt_lzo1x.h" />
-    <ClInclude Include="rt_lzoconf.h" />
-    <ClInclude Include="rt_lzodefs.h" />
-    <ClInclude Include="rt_lzo_conf.h" />
-    <ClInclude Include="rt_lzo_config.h" />
-    <ClInclude Include="rt_lzo_dict.h" />
-    <ClInclude Include="rt_lzo_ptr.h" />
-    <ClInclude Include="rt_miniacc.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="stream_reader.h" />
     <ClInclude Include="stream_reader_inline.h" />

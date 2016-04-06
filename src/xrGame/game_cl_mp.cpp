@@ -33,7 +33,7 @@
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
 #include "screenshot_server.h"
 #include "xrCore/ppmd_compressor.h"
-#include "xrCore/rt_compressor.h"
+#include "xrCore/Compression/rt_compressor.h"
 #include "game_cl_mp_snd_messages.h"
 #include "xrCore/Crypto/crypto.h"
 

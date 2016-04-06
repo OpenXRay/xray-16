@@ -70,14 +70,8 @@
     <Filter Include="Compression\ppmd\stream">
       <UniqueIdentifier>{eb917568-ae1d-4c88-bee2-4507bdf4c7eb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Compression\rt">
-      <UniqueIdentifier>{7965a62e-399b-4c1d-8875-1a1b3ad35c2c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Compression\lz">
       <UniqueIdentifier>{323bcbd1-ae95-4728-a16f-b3a4e4a7cab5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Compression\lzo">
-      <UniqueIdentifier>{8478c94c-87c4-4858-8ff7-9c85273343c0}</UniqueIdentifier>
     </Filter>
     <Filter Include="OS">
       <UniqueIdentifier>{6d6f8325-ad31-4677-b0b9-de5d952c320b}</UniqueIdentifier>
@@ -255,35 +249,8 @@
     <ClCompile Include="Model.cpp">
       <Filter>Compression\ppmd\core</Filter>
     </ClCompile>
-    <ClCompile Include="rt_compressor.cpp">
-      <Filter>Compression\rt</Filter>
-    </ClCompile>
-    <ClCompile Include="rt_compressor9.cpp">
-      <Filter>Compression\rt</Filter>
-    </ClCompile>
     <ClCompile Include="LzHuf.cpp">
       <Filter>Compression\lz</Filter>
-    </ClCompile>
-    <ClCompile Include="lzo_compressor.cpp">
-      <Filter>Compression\lzo</Filter>
-    </ClCompile>
-    <ClCompile Include="rt_lzo1x_1.cpp">
-      <Filter>Compression\lzo</Filter>
-    </ClCompile>
-    <ClCompile Include="rt_lzo1x_9x.cpp">
-      <Filter>Compression\lzo</Filter>
-    </ClCompile>
-    <ClCompile Include="rt_lzo1x_d1.cpp">
-      <Filter>Compression\lzo</Filter>
-    </ClCompile>
-    <ClCompile Include="rt_lzo1x_d2.cpp">
-      <Filter>Compression\lzo</Filter>
-    </ClCompile>
-    <ClCompile Include="rt_lzo1x_d3.cpp">
-      <Filter>Compression\lzo</Filter>
-    </ClCompile>
-    <ClCompile Include="rt_lzo_init.cpp">
-      <Filter>Compression\lzo</Filter>
     </ClCompile>
     <ClCompile Include="os_clipboard.cpp">
       <Filter>OS</Filter>
@@ -380,6 +347,15 @@
     </ClCompile>
     <ClCompile Include="XML\XMLDocument.cpp">
       <Filter>XML</Filter>
+    </ClCompile>
+    <ClCompile Include="Compression\lzo_compressor.cpp">
+      <Filter>Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="Compression\rt_compressor.cpp">
+      <Filter>Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="Compression\rt_compressor9.cpp">
+      <Filter>Compression</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -620,41 +596,8 @@
     <ClInclude Include="compression_ppmd_stream_inline.h">
       <Filter>Compression\ppmd\stream</Filter>
     </ClInclude>
-    <ClInclude Include="rt_compressor.h">
-      <Filter>Compression\rt</Filter>
-    </ClInclude>
     <ClInclude Include="lzhuf.h">
       <Filter>Compression\lz</Filter>
-    </ClInclude>
-    <ClInclude Include="lzo_compressor.h">
-      <Filter>Compression\lzo</Filter>
-    </ClInclude>
-    <ClInclude Include="rt_config1x.h">
-      <Filter>Compression\lzo</Filter>
-    </ClInclude>
-    <ClInclude Include="rt_lzo1x.h">
-      <Filter>Compression\lzo</Filter>
-    </ClInclude>
-    <ClInclude Include="rt_lzo_conf.h">
-      <Filter>Compression\lzo</Filter>
-    </ClInclude>
-    <ClInclude Include="rt_lzo_config.h">
-      <Filter>Compression\lzo</Filter>
-    </ClInclude>
-    <ClInclude Include="rt_lzo_dict.h">
-      <Filter>Compression\lzo</Filter>
-    </ClInclude>
-    <ClInclude Include="rt_lzo_ptr.h">
-      <Filter>Compression\lzo</Filter>
-    </ClInclude>
-    <ClInclude Include="rt_lzoconf.h">
-      <Filter>Compression\lzo</Filter>
-    </ClInclude>
-    <ClInclude Include="rt_lzodefs.h">
-      <Filter>Compression\lzo</Filter>
-    </ClInclude>
-    <ClInclude Include="rt_miniacc.h">
-      <Filter>Compression\lzo</Filter>
     </ClInclude>
     <ClInclude Include="os_clipboard.h">
       <Filter>OS</Filter>
@@ -802,6 +745,12 @@
     </ClInclude>
     <ClInclude Include="XML\XMLDocument.hpp">
       <Filter>XML</Filter>
+    </ClInclude>
+    <ClInclude Include="Compression\lzo_compressor.h">
+      <Filter>Compression</Filter>
+    </ClInclude>
+    <ClInclude Include="Compression\rt_compressor.h">
+      <Filter>Compression</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
