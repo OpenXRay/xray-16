@@ -16,3 +16,6 @@
 [submodule "src/Externals/glew"]
 	path = src/Externals/glew
 	url = https://github.com/Armada651/glew.git
+[submodule "src/Externals/lzo"]
+	path = src/Externals/lzo
+	url = https://github.com/alexgdi/lzo.git
