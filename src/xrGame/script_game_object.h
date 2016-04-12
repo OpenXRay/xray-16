@@ -815,6 +815,10 @@ public:
             void SetHealthEx(float hp); //AVO
 			float				GetLuminocityHemi();
 			float				GetLuminocity();
+			bool				Use(CScriptGameObject* obj);
+			void				StartTrade(CScriptGameObject* obj);
+			void				StartUpgrade(CScriptGameObject* obj);
+			void				SetWeight(float w);
 			//Weapon
 			void				Weapon_AddonAttach(CScriptGameObject* item);
 			void				Weapon_AddonDetach(LPCSTR item_section);
@@ -826,6 +830,7 @@ public:
 			u32					GetMainWeaponType();
 			u32					GetWeaponType();
 			u8					GetWeaponSubstate();
+			u8					GetAmmoType();
 
 			//Weapon & Outfit
 			bool				InstallUpgrade(LPCSTR upgrade);

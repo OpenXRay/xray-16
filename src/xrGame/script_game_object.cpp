@@ -43,6 +43,10 @@
 #include "damage_manager.h" //Alundaio: For set_visual
 #include "ai\phantom\phantom.h"
 
+#include "uigamecustom.h"
+#include "ui/UIActorMenu.h"
+#include "InventoryBox.h"
+
 class CScriptBinderObject;
 
 //////////////////////////////////////////////////////////////////////////
@@ -360,6 +364,14 @@ void CScriptGameObject::SetAmmoType(u8 type)
 	weapon->SetAmmoType(type);
 }
 
+u8 CScriptGameObject::GetAmmoType()
+{
+	CWeapon	*weapon = smart_cast<CWeapon*>(&object());
+	if (!weapon) return 255;
+
+	return weapon->GetAmmoType();
+}
+
 void CScriptGameObject::SetMainWeaponType(u32 type)
 {
 	CWeapon	*weapon = smart_cast<CWeapon*>(&object());
@@ -379,7 +391,7 @@ void CScriptGameObject::SetWeaponType(u32 type)
 u32 CScriptGameObject::GetMainWeaponType()
 {
 	CWeapon	*weapon = smart_cast<CWeapon*>(&object());
-	if (!weapon) return 0;
+	if (!weapon) return 255;
 		
 	return weapon->ef_main_weapon_type();
 }
@@ -387,7 +399,7 @@ u32 CScriptGameObject::GetMainWeaponType()
 u32 CScriptGameObject::GetWeaponType()
 {
 	CWeapon	*weapon = smart_cast<CWeapon*>(&object());
-	if (!weapon) return 0;
+	if (!weapon) return 255;
 
 	return weapon->ef_weapon_type();
 }
@@ -403,7 +415,7 @@ bool CScriptGameObject::HasAmmoType(u8 type)
 u8 CScriptGameObject::GetWeaponSubstate()
 {
 	CWeapon	*weapon = smart_cast<CWeapon*>(&object());
-	if (!weapon) return 0;
+	if (!weapon) return 255;
 
 	return weapon->m_sub_state;
 }
@@ -666,9 +678,102 @@ void CScriptGameObject::PhantomSetEnemy(CScriptGameObject* enemy)
 	if (!phant)
 		return;
 
-	CGameObject* obj = smart_cast<CGameObject*>(enemy);
-	if (!obj)
+	phant->SetEnemy(&enemy->object());
+}
+
+//Allows to force use an object if passed obj is the actor
+bool CScriptGameObject::Use(CScriptGameObject* obj)
+{
+	bool ret = object().use(&obj->object());
+
+	CActor* actor = smart_cast<CActor*>(&obj->object());
+	if (!actor)
+		return ret;
+
+	CInventoryOwner* pActorInv = smart_cast<CInventoryOwner*>(actor);
+	if (!pActorInv)
+		return ret;
+
+	CUIActorMenu& ActorMenu = CurrentGameUI()->GetActorMenu();
+
+	CInventoryBox* pBox = smart_cast<CInventoryBox*>(&object());
+	if (pBox)
+	{
+		ActorMenu.SetActor(pActorInv);
+		ActorMenu.SetInvBox(pBox);
+
+		ActorMenu.SetMenuMode(mmDeadBodySearch);
+		ActorMenu.ShowDialog(true);
+
+		return true;
+	} else {
+		CInventoryOwner* pOtherOwner = smart_cast<CInventoryOwner*>(&object());
+		if (!pOtherOwner)
+			return ret;
+
+		/*
+		CEntityAlive* e = smart_cast<CEntityAlive*>(pOtherOwner);
+		if (e && e->g_Alive())
+		{
+			actor->RunTalkDialog(pOtherOwner, false);
+			return true;
+		}
+		*/
+
+		ActorMenu.SetActor(pActorInv);
+		ActorMenu.SetPartner(pOtherOwner);
+
+		ActorMenu.SetMenuMode(mmDeadBodySearch);
+		ActorMenu.ShowDialog(true);
+
+		return true;
+	}
+
+	return false;
+}
+
+void CScriptGameObject::StartTrade(CScriptGameObject* obj)
+{
+	CActor* actor = smart_cast<CActor*>(&obj->object());
+	if (!actor)
 		return;
 
-	phant->SetEnemy(obj);
+	CInventoryOwner* pActorInv = smart_cast<CInventoryOwner*>(actor);
+	if (!pActorInv)
+		return;
+
+	CInventoryOwner* pOtherOwner = smart_cast<CInventoryOwner*>(&object());
+	if (!pOtherOwner)
+		return;
+
+	CUIActorMenu& ActorMenu = CurrentGameUI()->GetActorMenu();
+
+	ActorMenu.SetActor(pActorInv);
+	ActorMenu.SetPartner(pOtherOwner);
+
+	ActorMenu.SetMenuMode(mmTrade);
+	ActorMenu.ShowDialog(true);
+}
+
+void CScriptGameObject::StartUpgrade(CScriptGameObject* obj)
+{
+	CActor* actor = smart_cast<CActor*>(&obj->object());
+	if (!actor)
+		return;
+
+	CInventoryOwner* pActorInv = smart_cast<CInventoryOwner*>(actor);
+	if (!pActorInv)
+		return;
+
+	CInventoryOwner* pOtherOwner = smart_cast<CInventoryOwner*>(&object());
+	if (!pOtherOwner)
+		return;
+
+	CUIActorMenu& ActorMenu = CurrentGameUI()->GetActorMenu();
+
+	ActorMenu.SetActor(pActorInv);
+	ActorMenu.SetPartner(pOtherOwner);
+
+	ActorMenu.SetMenuMode(mmUpgrade);
+	ActorMenu.ShowDialog(true);
 }

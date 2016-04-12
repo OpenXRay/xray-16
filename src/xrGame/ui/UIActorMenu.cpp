@@ -232,7 +232,7 @@ void CUIActorMenu::Update()
 		}
 	case mmDeadBodySearch:
 		{
-			CheckDistance();
+			//CheckDistance();
 			break;
 		}
 	default: R_ASSERT(0); break;
