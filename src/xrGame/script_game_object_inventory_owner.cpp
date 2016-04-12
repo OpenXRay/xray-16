@@ -1961,6 +1961,18 @@ float CScriptGameObject::Weight() const
     return inventory_item->Weight();
 }
 
+void CScriptGameObject::SetWeight(float w)
+{
+    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
+    if (!inventory_item)
+    {
+        ai().script_engine().script_log(LuaMessageType::Error,
+                                        "CSciptEntity : cannot access class member SetWeight!");
+        return;
+    }
+    inventory_item->SetWeight(w);
+}
+
 float CScriptGameObject::GetActorJumpSpeed() const
 {
     CActor* pActor = smart_cast<CActor*>(&object());

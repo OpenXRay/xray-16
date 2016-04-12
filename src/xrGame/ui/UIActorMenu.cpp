@@ -211,7 +211,8 @@ void CUIActorMenu::Update()
     }
     case mmDeadBodySearch:
     {
-        CheckDistance();
+        // Alundaio: remove distance check when opening inventory boxes
+        //CheckDistance(); 
         break;
     }
     default: R_ASSERT(0); break;

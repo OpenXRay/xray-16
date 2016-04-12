@@ -831,6 +831,10 @@ public:
     //Alundaio
     float GetLuminocityHemi();
     float GetLuminocity();
+    bool Use(CScriptGameObject* obj);
+    void StartTrade(CScriptGameObject* obj);
+    void StartUpgrade(CScriptGameObject* obj);
+    void SetWeight(float w);
 
     //Weapon
     void Weapon_AddonAttach(CScriptGameObject* item);
@@ -843,6 +847,7 @@ public:
     u32 GetMainWeaponType();
     u32 GetWeaponType();
     u8 GetWeaponSubstate();
+    u8 GetAmmoType();
 
     //Weapon & Outfit
     bool InstallUpgrade(pcstr upgrade);
