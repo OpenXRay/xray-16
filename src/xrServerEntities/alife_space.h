@@ -178,7 +178,7 @@ namespace ALife {
 #endif
 	}
 #ifndef	_EDITOR
-xr_token							hit_types_token							[ ];
+        extern xr_token							hit_types_token							[ ];
 
 	IC LPCSTR g_cafHitType2String(EHitType tHitType)
 	{
