@@ -19,7 +19,7 @@
 #ifdef PURE_DYNAMIC_CAST
 #	define smart_cast dynamic_cast
 #else
-#       include <loki/typelist.h>
+#       include <loki/Typelist.h>
 
 #	define PURE_DYNAMIC_CAST_COMPATIBILITY_CHECK
 
