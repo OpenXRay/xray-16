@@ -664,6 +664,7 @@
     <ClInclude Include="alife_time_manager.h" />
     <ClInclude Include="alife_time_manager_inline.h" />
     <ClInclude Include="alife_update_manager.h" />
+    <ClInclude Include="AmebaZone.h" />
     <ClInclude Include="ammunition_groups.h" />
     <ClInclude Include="animation_movement_controller.h" />
     <ClInclude Include="animation_script_callback.h" />
@@ -2177,6 +2178,7 @@
     <ClCompile Include="alife_trader.cpp" />
     <ClCompile Include="alife_trader_abstract.cpp" />
     <ClCompile Include="alife_update_manager.cpp" />
+    <ClCompile Include="AmebaZone.cpp" />
     <ClCompile Include="ammunition_groups.cpp" />
     <ClCompile Include="animation_movement_controller.cpp" />
     <ClCompile Include="animation_script_callback.cpp">

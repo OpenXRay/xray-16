@@ -2290,6 +2290,9 @@
     <Filter Include="PCH">
       <UniqueIdentifier>{c2cce2fe-498b-4192-baf4-c5a1bf9717f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Client\Objects\zones\Ameba">
+      <UniqueIdentifier>{0ca5d322-0181-4fae-9706-95107e18fdc5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6658,6 +6661,9 @@
     <ClInclude Include="raypick.h">
       <Filter>Core\Common</Filter>
     </ClInclude>
+    <ClInclude Include="AmebaZone.h">
+      <Filter>Core\Client\Objects\zones\Ameba</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -10173,6 +10179,9 @@
     </ClCompile>
     <ClCompile Include="raypick.cpp">
       <Filter>Core\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="AmebaZone.cpp">
+      <Filter>Core\Client\Objects\zones\Ameba</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
