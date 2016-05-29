@@ -2491,6 +2491,9 @@
     <Filter Include="AI\AMonsters\common\script\monster states\Controlled">
       <UniqueIdentifier>{71df3723-4ad3-4db1-9eb8-7bf643a66f93}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Client\Objects\zones\Ameba">
+      <UniqueIdentifier>{7111b5cd-588d-46ec-81c2-ccc6c70fa4de}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -7386,6 +7389,9 @@
     <ClInclude Include="WeaponRevolver.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
     </ClInclude>
+    <ClInclude Include="AmebaZone.h">
+      <Filter>Core\Client\Objects\zones\Ameba</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -11041,6 +11047,9 @@
     </ClCompile>
     <ClCompile Include="raypick.cpp">
       <Filter>Core\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="AmebaZone.cpp">
+      <Filter>Core\Client\Objects\zones\Ameba</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
