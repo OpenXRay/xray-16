@@ -2069,5 +2069,17 @@ void CScriptGameObject::SetActorRunBackCoef(float run_back_coef)
     }
     pActor->m_fRunBackFactor = run_back_coef;
 }
+
+void CScriptGameObject::SetCharacterIcon(pcstr iconName)
+{
+    CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
+
+    if (!pInventoryOwner)
+    {
+        ai().script_engine().script_log(LuaMessageType::Error, "SetCharacterIcon available only for InventoryOwner");
+        return;
+    }
+    return pInventoryOwner->SetIcon(iconName);
+}
 #endif
 //-Alundaio
