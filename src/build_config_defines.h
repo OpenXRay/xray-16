@@ -1,7 +1,7 @@
 #pragma once
 
 // CALLBACKS
-	//#define EXTENDED_ITEM_CALLBACKS						// (eItemToBelt, eItemToSlot, eItemToRuck)
+	#define EXTENDED_ITEM_CALLBACKS							// (eItemToBelt, eItemToSlot, eItemToRuck)
 	#define EXTENDED_WEAPON_CALLBACKS						// (eOnWeaponZoomIn, eOnWeaponZoomOut, eOnWeaponJammed)
 	#define INVENTORY_UPGRADE_CALLBACKS						// calls lua function inventory_upgrades.effect_upgrade_item
 	#define ACTOR_BEFORE_DEATH_CALLBACK						// For extending the life of the actor to fake death or do other tasks that need to happen before actor is dead

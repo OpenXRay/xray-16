@@ -371,6 +371,8 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
 		.def("get_max_uses", &CScriptGameObject::GetMaxUses)
 		// Phantom
 		.def("phantom_set_enemy", &CScriptGameObject::PhantomSetEnemy)
+		// Actor
+		.def("set_character_icon", &CScriptGameObject::SetCharacterIcon)
 		//Alundaio: END
 #endif
 #ifdef GAME_OBJECT_TESTING_EXPORTS

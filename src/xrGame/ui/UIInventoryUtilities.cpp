@@ -548,7 +548,7 @@ u32 InventoryUtilities::GetGoodwillColor(CHARACTER_GOODWILL gw)
 {
 	u32 res = 0xffc0c0c0;
 	if(gw==NEUTRAL_GOODWILL){
-		res = 0xffc0c0c0;
+		res = 0xfffce80b; //0xffc0c0c0;
 	}else
 	if(gw>1000){
 		res = 0xff00ff00;
@@ -581,7 +581,7 @@ u32	InventoryUtilities::GetRelationColor(ALife::ERelationType relation)
 		return 0xff00ff00;
 		break;
 	case ALife::eRelationTypeNeutral:
-		return 0xffc0c0c0;
+		return 0xfffce80b; //0xffc0c0c0;
 		break;
 	case ALife::eRelationTypeEnemy:
 		return  0xffff0000;

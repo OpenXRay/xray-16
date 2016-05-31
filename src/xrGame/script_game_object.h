@@ -894,7 +894,9 @@ public:
 		    float       GetActorRunCoef  () const;
 		    void        SetActorRunCoef   (float run_coef);       
 		    float       GetActorRunBackCoef  () const;
-		    void        SetActorRunBackCoef   (float run_back_coef);     
+		    void        SetActorRunBackCoef   (float run_back_coef);
+
+			void		SetCharacterIcon(LPCSTR iconName);
 #endif
 //-Alundaio
 

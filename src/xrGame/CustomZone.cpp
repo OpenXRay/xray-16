@@ -1393,8 +1393,25 @@ void CCustomZone::GoEnabledState()
 
 bool CCustomZone::feel_touch_on_contact	(CObject *O)
 {
+	//Alundaio
+	/*
 	if ((spatial.type | STYPE_VISIBLEFORAI) != spatial.type)
 		return			(false);
+	*/
+
+	if (smart_cast<CCustomZone*>(O))				return false;
+	if (smart_cast<CBreakableObject*>(O))			return false;
+	if (0==smart_cast<CKinematics*>(O->Visual()))	return false;
+	if (O->ID() == ID()) return false;
+
+	CGameObject *object = smart_cast<CGameObject*>(O);
+    if (!object || !object->IsVisibleForZones())
+		return false;
+
+	if (!((CCF_Shape*)CFORM())->Contact(O))
+		return false;
+	
+	//Alundaio - END
 
 	return				(inherited::feel_touch_on_contact(O));
 }

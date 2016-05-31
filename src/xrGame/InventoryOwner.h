@@ -167,6 +167,8 @@ public:
 	virtual void			SetReputation	(CHARACTER_REPUTATION_VALUE);
 	virtual void			ChangeReputation(CHARACTER_REPUTATION_VALUE);
 
+	virtual void			SetIcon(const shared_str& iconName){ CharacterInfo().m_SpecificCharacter.data()->m_icon_name = iconName; };
+
 	//для работы с relation system
 	u16								object_id	() const;
 	CHARACTER_COMMUNITY_INDEX		Community	() const {return CharacterInfo().Community().index();};
