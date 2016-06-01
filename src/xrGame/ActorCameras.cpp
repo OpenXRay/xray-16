@@ -369,13 +369,16 @@ void CActor::cam_Update(float dt, float fFOV)
 	{
 		collide_camera( *cameras[eacFirstEye], _viewport_near, this );
 	}
-	if( psActorFlags.test(AF_PSP) )
-	{
+	
+	//Alundaio -psp always
+	//if( psActorFlags.test(AF_PSP) )
+	//{
 		Cameras().UpdateFromCamera			(C);
-	}else
-	{
-		Cameras().UpdateFromCamera			(cameras[eacFirstEye]);
-	}
+	//}else
+	//{
+	//	Cameras().UpdateFromCamera			(cameras[eacFirstEye]);
+	//}
+	//-Alundaio
 
 	fCurAVelocity			= vPrevCamDir.sub(cameras[eacFirstEye]->vDirection).magnitude()/Device.fTimeDelta;
 	vPrevCamDir				= cameras[eacFirstEye]->vDirection;
