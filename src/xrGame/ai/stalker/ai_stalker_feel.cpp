@@ -15,9 +15,6 @@
 #include "../../stalker_movement_manager_smart_cover.h"
 #include "../../stalker_animation_manager.h"
 
-BOOL g_ai_die_in_anomaly = 0; //Alundaio
-#include "CustomZone.h"
-
 #ifdef DEBUG
 #	include "../../ai_debug.h"
 	extern Flags32 psAI_Flags;
@@ -80,13 +77,6 @@ bool CAI_Stalker::feel_touch_contact	(CObject *O)
 bool CAI_Stalker::feel_touch_on_contact	(CObject *O)
 {
 	VERIFY							(O != this);
-
-	//Alundaio
-	if (g_ai_die_in_anomaly == 1 && smart_cast<CCustomZone*>(O))
-	{
-		return		(inherited::feel_touch_on_contact(O));
-	}
-	//-Alundaio
 
 	if ((O->spatial.type | STYPE_VISIBLEFORAI) != O->spatial.type)
         return	(false);
