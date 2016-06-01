@@ -361,12 +361,15 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("get_attached_vehicle", &CScriptGameObject::GetAttachedVehicle)
 
 #ifdef GAME_OBJECT_EXTENDED_EXPORTS
+        .def("iterate_feel_touch", &CScriptGameObject::IterateFeelTouch)
         .def("get_luminocity_hemi", &CScriptGameObject::GetLuminocityHemi)
         .def("get_luminocity", &CScriptGameObject::GetLuminocity)
         .def("bone_visible", &CScriptGameObject::IsBoneVisible)
         .def("set_bone_visible", &CScriptGameObject::SetBoneVisible)
         .def("set_health_ex", &CScriptGameObject::SetHealthEx) // AVO
         .def("force_set_position", &CScriptGameObject::ForceSetPosition)
+        .def("set_spatial_type", &CScriptGameObject::SetSpatialType)
+        .def("get_spatial_type", &CScriptGameObject::GetSpatialType)
 
         //For Weapons
         .def("weapon_addon_attach", &CScriptGameObject::Weapon_AddonAttach)
