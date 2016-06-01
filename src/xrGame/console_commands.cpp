@@ -101,6 +101,8 @@ int g_keypress_on_start = 1;
 
 ENGINE_API extern float g_console_sensitive;
 
+extern BOOL g_ai_die_in_anomaly; //Alundaio
+
 void register_mp_console_commands();
 //-----------------------------------------------------------
 
@@ -2148,6 +2150,8 @@ void CCC_RegisterCommands()
     CMD4(CCC_Integer, "g_sleep_time", &psActorSleepTime, 1, 24);
 
     CMD4(CCC_Integer, "ai_use_old_vision", &g_ai_use_old_vision, 0, 1);
+
+    CMD4(CCC_Integer, "ai_die_in_anomaly", &g_ai_die_in_anomaly, 0, 1); //Alundaio
 
     CMD4(CCC_Float, "ai_aim_predict_time", &g_aim_predict_time, 0.f, 10.f);
 
