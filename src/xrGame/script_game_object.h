@@ -819,6 +819,10 @@ public:
 			void				StartTrade(CScriptGameObject* obj);
 			void				StartUpgrade(CScriptGameObject* obj);
 			void				SetWeight(float w);
+			void				IterateFeelTouch(luabind::functor<void> functor);
+			u32					GetSpatialType();
+			void				SetSpatialType(u32 sptype);
+
 			//Weapon
 			void				Weapon_AddonAttach(CScriptGameObject* item);
 			void				Weapon_AddonDetach(LPCSTR item_section);

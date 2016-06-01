@@ -46,6 +46,8 @@
 #include "CharacterPhysicsSupport.h"
 #include "player_hud.h"
 #include "eatable_item.h"
+#include "script_callback_ex.h"
+#include "../xrEngine/feel_touch.h"
 #endif
 //-Alundaio
 
@@ -1393,5 +1395,31 @@ u8 CScriptGameObject::GetMaxUses()
 
 	return eItm->GetMaxUses();
 }
+
+void CScriptGameObject::IterateFeelTouch(luabind::functor<void> functor)
+{
+	Feel::Touch* touch = smart_cast<Feel::Touch*>(&object());
+	if (touch)
+	{
+		xr_vector<CObject*>::const_iterator	I = touch->feel_touch.begin();
+		xr_vector<CObject*>::const_iterator	E = touch->feel_touch.end();
+		for (; I != E; ++I) {
+			CObject* o = smart_cast<CObject*>(*I);
+			if (o)
+				functor(o->ID());
+		}
+	}
+}
+
+void CScriptGameObject::SetSpatialType(u32 sptype)
+{
+	object().spatial.type = sptype;
+}
+
+u32 CScriptGameObject::GetSpatialType()
+{
+	return object().spatial.type;
+}
+
 #endif
 //-Alundaio
