@@ -822,6 +822,8 @@ public:
 			void				IterateFeelTouch(luabind::functor<void> functor);
 			u32					GetSpatialType();
 			void				SetSpatialType(u32 sptype);
+			u8					GetRestrictionType();
+			void				SetRestrictionType(u8 typ);
 
 			//Weapon
 			void				Weapon_AddonAttach(CScriptGameObject* item);

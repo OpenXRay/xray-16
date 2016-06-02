@@ -39,7 +39,7 @@ private:
 	mutable Fsphere				m_selfbounds;
 	mutable bool				m_actuality;
 
-private:
+public:
 			u8					m_space_restrictor_type;
 private:
 	IC		void				actual				(bool value) const;

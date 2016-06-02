@@ -235,6 +235,8 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
         ]
 
         //CustomZone
+		.def("set_restrictor_type",			&CScriptGameObject::SetRestrictionType) 
+		.def("get_restrictor_type",			&CScriptGameObject::GetRestrictionType)
         .def("enable_anomaly",              &CScriptGameObject::EnableAnomaly)
         .def("disable_anomaly",             &CScriptGameObject::DisableAnomaly)
         .def("get_anomaly_power",			&CScriptGameObject::GetAnomalyPower)
