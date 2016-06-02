@@ -1534,5 +1534,25 @@ u32 CScriptGameObject::GetSpatialType()
 {
     return object().spatial.type;
 }
+
+u8 CScriptGameObject::GetRestrictionType()
+{
+    CSpaceRestrictor* restr = smart_cast<CSpaceRestrictor*>(&object());
+    if (restr)
+        return restr->m_space_restrictor_type;
+
+    return -1;
+}
+
+void CScriptGameObject::SetRestrictionType(u8 type)
+{
+    CSpaceRestrictor* restr = smart_cast<CSpaceRestrictor*>(&object());
+    if (restr)
+    {
+        restr->m_space_restrictor_type = type;
+        if (type != RestrictionSpace::eRestrictorTypeNone)
+            Level().space_restriction_manager().register_restrictor(restr, RestrictionSpace::ERestrictorTypes(type));
+    }
+}
 #endif
 //-Alundaio
