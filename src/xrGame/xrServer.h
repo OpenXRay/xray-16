@@ -249,7 +249,7 @@ public:
     u32 GetEntitiesNum() { return entities.size(); };
     CSE_Abstract* GetEntity(u32 Num);
     u32 const GetLastUpdatesSize() const { return m_last_updates_size; };
-    xrClientData* ID_to_client(ClientID ID, bool ScanAll = false)
+    xrClientData* ID_to_client(ClientID const& ID, bool ScanAll = false)
     {
         return (xrClientData*)(IPureServer::ID_to_client(ID, ScanAll));
     }

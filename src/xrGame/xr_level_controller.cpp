@@ -30,22 +30,39 @@ _action actions[] = {{"left", kLEFT, _both}, {"right", kRIGHT, _both}, {"up", kU
     {"wpn_firemode_prev", kWPN_FIREMODE_PREV, _both}, {"wpn_firemode_next", kWPN_FIREMODE_NEXT, _both},
 
     {"pause", kPAUSE, _both}, {"drop", kDROP, _both}, {"use", kUSE, _both}, {"scores", kSCORES, _both},
-    {"chat", kCHAT, _mp}, {"chat_team", kCHAT_TEAM, _mp}, {"screenshot", kSCREENSHOT, _both}, {"quit", kQUIT, _both},
-    {"console", kCONSOLE, _both}, {"inventory", kINVENTORY, _both}, {"buy_menu", kBUY, _mp}, {"skin_menu", kSKIN, _mp},
-    {"team_menu", kTEAM, _mp}, {"active_jobs", kACTIVE_JOBS, _sp},
+    {"chat", kCHAT, _both}, {"chat_team", kCHAT_TEAM, _both}, {"screenshot", kSCREENSHOT, _both}, {"quit", kQUIT, _both},
+    {"console", kCONSOLE, _both}, {"inventory", kINVENTORY, _both}, {"buy_menu", kBUY, _both}, {"skin_menu", kSKIN, _both},
+    {"team_menu", kTEAM, _both}, {"active_jobs", kACTIVE_JOBS, _sp},
 
-    {"vote_begin", kVOTE_BEGIN, _mp}, {"show_admin_menu", kSHOW_ADMIN_MENU, _mp}, {"vote", kVOTE, _mp},
-    {"vote_yes", kVOTEYES, _mp}, {"vote_no", kVOTENO, _mp},
+    {"vote_begin", kVOTE_BEGIN, _both}, {"show_admin_menu", kSHOW_ADMIN_MENU, _both}, {"vote", kVOTE, _both},
+    {"vote_yes", kVOTEYES, _both}, {"vote_no", kVOTENO, _both},
 
     {"next_slot", kNEXT_SLOT, _both}, {"prev_slot", kPREV_SLOT, _both},
 
-    {"speech_menu_0", kSPEECH_MENU_0, _mp}, {"speech_menu_1", kSPEECH_MENU_1, _mp},
+    {"speech_menu_0", kSPEECH_MENU_0, _both}, {"speech_menu_1", kSPEECH_MENU_1, _both},
 
     {"quick_use_1", kQUICK_USE_1, _both}, {"quick_use_2", kQUICK_USE_2, _both}, {"quick_use_3", kQUICK_USE_3, _both},
     {"quick_use_4", kQUICK_USE_4, _both},
 
     {"quick_save", kQUICK_SAVE, _sp}, {"quick_load", kQUICK_LOAD, _sp},
-    //	{ "alife_command",		kALIFE_CMD				,_sp},
+    //{ "alife_command", kALIFE_CMD, _sp},
+
+    { "custom1", kCUSTOM1, _sp },
+    { "custom2", kCUSTOM2, _sp },
+    { "custom3", kCUSTOM3, _sp },
+    { "custom4", kCUSTOM4, _sp },
+    { "custom5", kCUSTOM5, _sp },
+    { "custom6", kCUSTOM6, _sp },
+    { "custom7", kCUSTOM7, _sp },
+    { "custom8", kCUSTOM8, _sp },
+    { "custom9", kCUSTOM9, _sp },
+    { "custom10", kCUSTOM10, _sp },
+    { "custom11", kCUSTOM11, _sp },
+    { "custom12", kCUSTOM12, _sp },
+    { "custom13", kCUSTOM13, _sp },
+    { "custom14", kCUSTOM14, _sp },
+    { "custom15", kCUSTOM15, _sp },
+    { "cam_autoaim", kCAM_AUTOAIM, _sp },
 
     {NULL, kLASTACTION, _both}};
 

@@ -82,7 +82,25 @@ enum EGameActions
 
     kQUICK_SAVE,
     kQUICK_LOAD,
-    kALIFE_CMD,
+//    kALIFE_CMD,
+
+    kCUSTOM1,
+    kCUSTOM2,
+    kCUSTOM3,
+    kCUSTOM4,
+    kCUSTOM5,
+    kCUSTOM6,
+    kCUSTOM7,
+    kCUSTOM8,
+    kCUSTOM9,
+    kCUSTOM10,
+    kCUSTOM11,
+    kCUSTOM12,
+    kCUSTOM13,
+    kCUSTOM14,
+    kCUSTOM15,
+
+    kCAM_AUTOAIM,
 
     kLASTACTION,
     kNOTBINDED,

@@ -254,7 +254,7 @@ void CScriptGameObject::ForEachInventoryItems(const luabind::functor<void>& func
 }
 
 // 1
-void CScriptGameObject::IterateInventory(luabind::functor<void> functor, luabind::object object)
+void CScriptGameObject::IterateInventory(luabind::functor<bool> functor, luabind::object object)
 {
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&this->object());
     if (!inventory_owner)
@@ -264,14 +264,12 @@ void CScriptGameObject::IterateInventory(luabind::functor<void> functor, luabind
         return;
     }
 
-    TIItemContainer::iterator I = inventory_owner->inventory().m_all.begin();
-    TIItemContainer::iterator E = inventory_owner->inventory().m_all.end();
-    for (; I != E; ++I)
-        functor(object, (*I)->object().lua_game_object());
+    for (auto& it : inventory_owner->inventory().m_all)
+        functor(object, it->object().lua_game_object());
 }
 
 #include "InventoryBox.h"
-void CScriptGameObject::IterateInventoryBox(luabind::functor<void> functor, luabind::object object)
+void CScriptGameObject::IterateInventoryBox(luabind::functor<bool> functor, luabind::object object)
 {
     CInventoryBox* inventory_box = smart_cast<CInventoryBox*>(&this->object());
     if (!inventory_box)
@@ -281,13 +279,11 @@ void CScriptGameObject::IterateInventoryBox(luabind::functor<void> functor, luab
         return;
     }
 
-    xr_vector<u16>::const_iterator I = inventory_box->m_items.begin();
-    xr_vector<u16>::const_iterator E = inventory_box->m_items.end();
-    for (; I != E; ++I)
+    for (auto& item : inventory_box->m_items)
     {
-        CGameObject* GO = smart_cast<CGameObject*>(Level().Objects.net_Find(*I));
-        if (GO)
-            functor(object, GO->lua_game_object());
+        CGameObject* GO = smart_cast<CGameObject*>(Level().Objects.net_Find(item));
+        if (functor(object, GO->lua_game_object()) == true)
+            return;
     }
 }
 

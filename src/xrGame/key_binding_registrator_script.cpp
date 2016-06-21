@@ -6,16 +6,17 @@
 using namespace luabind;
 
 static int dik_to_bind(int dik) { return get_binded_action(dik); }
-SCRIPT_EXPORT(KeyBindings, (), {
-    class EnumGameActions
-    {
-    };
-    class KeyBindingRegistrator
-    {
-    };
-    module(luaState)[def("dik_to_bind", &dik_to_bind),
+SCRIPT_EXPORT(KeyBindings, (),
+{
+    class EnumGameActions {};
+    class KeyBindingRegistrator {};
+    module(luaState)
+    [
+        def("dik_to_bind", &dik_to_bind),
         class_<EnumGameActions>("key_bindings")
-            .enum_("commands")[value("kFWD", int(kFWD)), value("kBACK", int(kBACK)), value("kL_STRAFE", int(kL_STRAFE)),
+            .enum_("commands")
+            [
+                value("kFWD", int(kFWD)), value("kBACK", int(kBACK)), value("kL_STRAFE", int(kL_STRAFE)),
                 value("kR_STRAFE", int(kR_STRAFE)), value("kL_LOOKOUT", int(kL_LOOKOUT)),
                 value("kR_LOOKOUT", int(kR_LOOKOUT)), value("kLEFT", int(kLEFT)), value("kRIGHT", int(kRIGHT)),
                 value("kUP", int(kUP)), value("kDOWN", int(kDOWN)), value("kJUMP", int(kJUMP)),
@@ -24,14 +25,23 @@ SCRIPT_EXPORT(KeyBindings, (), {
                 value("kCAM_ZOOM_OUT", int(kCAM_ZOOM_OUT)), value("kTORCH", int(kTORCH)),
                 value("kNIGHT_VISION", int(kNIGHT_VISION)), value("kWPN_1", int(kWPN_1)), value("kWPN_2", int(kWPN_2)),
                 value("kWPN_3", int(kWPN_3)), value("kWPN_4", int(kWPN_4)), value("kWPN_5", int(kWPN_5)),
-                value("kWPN_6", int(kWPN_6)), value("kWPN_NEXT", int(kWPN_NEXT)), value("kWPN_FIRE", int(kWPN_FIRE)),
-                value("kWPN_RELOAD", int(kWPN_RELOAD)), value("kWPN_ZOOM", int(kWPN_ZOOM)),
+                value("kWPN_6", int(kWPN_6)), value("kARTEFACT", int(kARTEFACT)), value("kWPN_NEXT", int(kWPN_NEXT)),
+                value("kWPN_FIRE", int(kWPN_FIRE)), value("kWPN_RELOAD", int(kWPN_RELOAD)), value("kWPN_ZOOM", int(kWPN_ZOOM)),
                 value("kWPN_FUNC", int(kWPN_FUNC)), value("kUSE", int(kUSE)), value("kDROP", int(kDROP)),
                 value("kSCORES", int(kSCORES)), value("kCHAT", int(kCHAT)), value("kSCREENSHOT", int(kSCREENSHOT)),
                 value("kQUIT", int(kQUIT)), value("kCONSOLE", int(kCONSOLE)), value("kINVENTORY", int(kINVENTORY)),
-                value("kBUY", int(kBUY)), value("kSKIN", int(kSKIN)), value("kTEAM", int(kTEAM))],
+                value("kBUY", int(kBUY)), value("kSKIN", int(kSKIN)), value("kTEAM", int(kTEAM)),
+                value("kQUICK_SAVE", int(kQUICK_SAVE)), value("kQUICK_LOAD", int(kQUICK_LOAD)), value("kCAM_AUTOAIM", int(kCAM_AUTOAIM)),
+                value("kCUSTOM1", int(kCUSTOM1)), value("kCUSTOM2", int(kCUSTOM2)), value("kCUSTOM3", int(kCUSTOM3)),
+                value("kCUSTOM4", int(kCUSTOM4)), value("kCUSTOM5", int(kCUSTOM5)), value("kCUSTOM6", int(kCUSTOM6)),
+                value("kCUSTOM7", int(kCUSTOM7)), value("kCUSTOM8", int(kCUSTOM8)), value("kCUSTOM9", int(kCUSTOM9)),
+                value("kCUSTOM10", int(kCUSTOM10)), value("kCUSTOM11", int(kCUSTOM11)), value("kCUSTOM12", int(kCUSTOM12)),
+                value("kCUSTOM13", int(kCUSTOM13)), value("kCUSTOM14", int(kCUSTOM14)), value("kCUSTOM15", int(kCUSTOM15))
+            ],
         class_<KeyBindingRegistrator>("DIK_keys")
-            .enum_("dik_keys")[value("DIK_ESCAPE", int(DIK_ESCAPE)), value("DIK_2", int(DIK_2)),
+            .enum_("dik_keys")
+            [
+                value("DIK_ESCAPE", int(DIK_ESCAPE)), value("DIK_2", int(DIK_2)),
                 value("DIK_4", int(DIK_4)), value("DIK_6", int(DIK_6)), value("DIK_8", int(DIK_8)),
                 value("DIK_0", int(DIK_0)), value("DIK_EQUALS", int(DIK_EQUALS)), value("DIK_TAB", int(DIK_TAB)),
                 value("DIK_W", int(DIK_W)), value("DIK_R", int(DIK_R)), value("DIK_Y", int(DIK_Y)),
@@ -81,5 +91,7 @@ SCRIPT_EXPORT(KeyBindings, (), {
                 value("DIK_DOWN", int(DIK_DOWN)), value("DIK_INSERT", int(DIK_INSERT)),
                 value("DIK_LWIN", int(DIK_LWIN)), value("DIK_APPS", int(DIK_APPS)), value("MOUSE_1", int(MOUSE_1)),
                 value("MOUSE_3", int(MOUSE_3)), value("DIK_RETURN", int(DIK_RETURN)),
-                value("DIK_NUMPADENTER", int(DIK_NUMPADENTER))]];
+                value("DIK_NUMPADENTER", int(DIK_NUMPADENTER))
+            ]
+    ];
 });

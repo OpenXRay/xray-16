@@ -488,6 +488,10 @@ bool CUICellContainer::AddSimilar(CUICellItem* itm)
         const PIItem iitem = static_cast<PIItem>(itm->m_pData);
         if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
             return false;
+
+        if (pSettings->line_exist(iitem->m_section_id, "dont_stack") &&
+            pSettings->r_bool(iitem->m_section_id, "dont_stack") == true)
+            return false;
     }
     //-Alundaio
 
@@ -518,6 +522,10 @@ CUICellItem* CUICellContainer::FindSimilar(CUICellItem* itm)
         {
             auto iitem = static_cast<PIItem>(i->m_pData);
             if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
+                continue;
+
+            if (pSettings->line_exist(iitem->m_section_id, "dont_stack") &&
+                pSettings->r_bool(iitem->m_section_id, "dont_stack") == true)
                 continue;
         }
         //-Alundaio

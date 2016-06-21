@@ -307,7 +307,7 @@ public:
     }
     */
 
-    IClient* GetClientByID(ClientID clientId)
+    IClient* GetClientByID(const ClientID& clientId)
     {
         return net_players.GetFoundClient(ClientIdSearchPredicate(clientId));
     }

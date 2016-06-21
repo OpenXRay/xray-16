@@ -5,6 +5,8 @@
 #include "xrServerEntities/inventory_space.h"
 #include "UIHint.h"
 
+#include "script_game_object.h" //Alundaio
+
 class CUICharacterInfo;
 class CUIDragDropListEx;
 class CUIDragDropReferenceList;
@@ -360,6 +362,9 @@ public:
     void UpdateConditionProgressBars();
 
     IC UIHint* get_hint_wnd() { return m_hint_wnd; }
+
+    CScriptGameObject* GetCurrentItemAsGameObject();
+    void HighlightSectionInSlot(pcstr section, u8 type, u16 slot_id = 0);
 
     void RefreshCurrentItemCell();
     void DonateCurrentItem(CUICellItem* cell_item); //Alundaio: Donate item via context menu while in trade menu

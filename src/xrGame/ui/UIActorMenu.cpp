@@ -867,3 +867,66 @@ void CUIActorMenu::UpdateConditionProgressBars()
     else
         m_Helmet_progress->SetProgressPos(0);
 }
+
+CScriptGameObject* CUIActorMenu::GetCurrentItemAsGameObject()
+{
+    CGameObject* GO = smart_cast<CGameObject*>(CurrentIItem());
+    if (GO)
+        return GO->lua_game_object();
+
+    return nullptr;
+}
+
+void CUIActorMenu::HighlightSectionInSlot(pcstr section, u8 type, u16 slot_id /*= 0*/)
+{
+    CUIDragDropListEx* slot_list = m_pInventoryBagList;
+    switch (type)
+    {
+    case iActorBag:
+        slot_list = m_pInventoryBagList;
+        break;
+    case iActorBelt:
+        slot_list = m_pInventoryBeltList;
+        break;
+    case iActorSlot:
+        slot_list = GetSlotList(slot_id);
+        break;
+    case iActorTrade:
+        slot_list = m_pTradeActorBagList;
+        break;
+    case iDeadBodyBag:
+        slot_list = m_pDeadBodyBagList;
+        break;
+    case iPartnerTrade:
+        slot_list = m_pTradePartnerList;
+        break;
+    case iPartnerTradeBag:
+        slot_list = m_pTradePartnerBagList;
+        break;
+    case iQuickSlot:
+        slot_list = m_pQuickSlot;
+        break;
+    case iTrashSlot:
+        slot_list = m_pTrashList;
+        break;
+    }
+
+    if (!slot_list)
+        return;
+
+    u32 const cnt = slot_list->ItemsCount();
+    for (u32 i = 0; i < cnt; ++i)
+    {
+        CUICellItem* ci = slot_list->GetItemIdx(i);
+        const PIItem item = static_cast<PIItem>(ci->m_pData);
+        if (!item)
+            continue;
+
+        if (!strcmp(section, item->m_section_id.c_str()) == 0)
+            continue;
+
+        ci->m_select_armament = true;
+    }
+
+    m_highlight_clear = false;
+}

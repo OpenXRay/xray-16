@@ -81,7 +81,7 @@ CScriptGameObject* CScriptGameObject::best_weapon()
     }
     else
     {
-        CGameObject* game_object = object_handler->best_weapon() ? &object_handler->best_weapon()->object() : 0;
+        CGameObject* game_object = object_handler->best_weapon() ? &object_handler->best_weapon()->object() : nullptr;
         return (game_object ? game_object->lua_game_object() : 0);
     }
 }

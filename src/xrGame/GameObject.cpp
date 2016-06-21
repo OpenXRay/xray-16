@@ -458,9 +458,10 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
     {
         //Alundaio:
         //R_ASSERT(Level().Objects.net_Find(E->ID) == nullptr);
-        if (Level().Objects.net_Find(E->ID) != nullptr)
+        IGameObject* o = Level().Objects.net_Find(E->ID);
+        if (o != nullptr)
         {
-            GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CGameObject:net_Spawn() | Level().Objects.net_Find(E->ID) != nullptr (This mean object already exist on level by this ID) ID=%s s_name=%s", E->ID, E->s_name);
+            GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CGameObject:net_spawn():: Object with ID already exists! ID=%d self=%s other=%s", E->ID, cName().c_str(), o->cName().c_str());
             return false;
         }
     }
