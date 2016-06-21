@@ -3,19 +3,37 @@
 #include "../Weapon.h"
 
 
+struct SIconLayer
+{
+	LPCSTR m_name;
+	CUIStatic* m_icon;
+	Fvector2 offset;
+	u32 m_color;
+	float m_scale;
+};
+
 class CUIInventoryCellItem :public CUICellItem
 {
 	typedef  CUICellItem	inherited;
 public:
-								CUIInventoryCellItem		(CInventoryItem* itm);
-	virtual		bool			EqualTo						(CUICellItem* itm);
-	virtual		void			UpdateItemText				();
-				CUIDragItem*	CreateDragItem				();
-	virtual		bool			IsHelper					();
-	virtual		void			SetIsHelper					(bool is_helper);
-				bool			IsHelperOrHasHelperChild	();
-				void			Update						();
-				CInventoryItem* object						() {return (CInventoryItem*)m_pData;}
+											CUIInventoryCellItem		(CInventoryItem* itm);
+	virtual		bool						EqualTo						(CUICellItem* itm);
+	virtual		void						UpdateItemText				();
+				CUIDragItem*				CreateDragItem				();
+	virtual		bool						IsHelper					();
+	virtual		void						SetIsHelper					(bool is_helper);
+				bool						IsHelperOrHasHelperChild	();
+				void						Update						();
+				CInventoryItem*				object						() {return (CInventoryItem*)m_pData;}
+				//Alundaio
+				virtual		void			OnAfterChild(CUIDragDropListEx* parent_list);
+				virtual		void			SetTextureColor(u32 color);
+
+				xr_vector<SIconLayer*>		m_layers;
+				void						RemoveLayer					(SIconLayer* layer);
+				void						CreateLayer					(LPCSTR name, Fvector2 offset, u32 color, float scale);
+				CUIStatic*					InitLayer					(CUIStatic* s, LPCSTR section, Fvector2 addon_offset, bool b_rotate, u32 color, float scale);
+				//-Alundaio
 };
 
 class CUIAmmoCellItem :public CUIInventoryCellItem

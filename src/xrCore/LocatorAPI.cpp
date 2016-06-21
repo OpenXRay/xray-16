@@ -552,6 +552,10 @@ IC bool pred_str_ff(const _finddata_t& x, const _finddata_t& y)
 
 bool ignore_name(const char* _name)
 {
+	// ignore windows hidden thumbs.db
+	if (0 == strcmp(_name, "Thumbs.db"))
+		return true;
+
     // ignore processing ".svn" folders
     return (_name[0] == '.' && _name[1] == 's' && _name[2] == 'v' && _name[3] == 'n' && _name[4] == 0);
 }

@@ -1,9 +1,13 @@
 #pragma once
 
+#include "script_export_space.h"
+
 #include "UIDialogWnd.h"
 #include "UIWndCallback.h"
 #include "../../xrServerEntities/inventory_space.h"
 #include "UIHint.h"
+
+#include "script_game_object.h" //Alundaio
 
 class CUICharacterInfo;
 class CUIDragDropListEx;
@@ -345,7 +349,14 @@ public:
 	void RefreshCurrentItemCell();
 	void SetCurrentItem(CUICellItem* itm);		//Alundaio: Made public
 	CUICellItem* CurrentItem();					//Alundaio: Made public
+
+	CScriptGameObject* GetCurrentItemAsGameObject();
+	void HighlightSectionInSlot(LPCSTR section, u8 type, u16 slot_id = 0);
+
 	//-AxelDominator && Alundaio consumable use condition
 	void DonateCurrentItem(CUICellItem* cell_item); //Alundaio: Donate item via context menu while in trade menu
-
+	DECLARE_SCRIPT_REGISTER_FUNCTION
 }; // class CUIActorMenu
+add_to_type_list(CUIActorMenu)
+#undef script_type_list
+#define script_type_list save_type_list(CUIActorMenu)

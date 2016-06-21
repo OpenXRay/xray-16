@@ -314,6 +314,19 @@ void teleport_object(CALifeSimulator *alife, ALife::_OBJECT_ID id, GameGraph::_G
 {
 	alife->teleport_object(id, game_vertex_id, level_vertex_id, position);
 }
+
+void IterateInfo(const CALifeSimulator *alife, const ALife::_OBJECT_ID &id, luabind::functor<void> functor)
+{
+	const KNOWN_INFO_VECTOR	*known_info = registry(alife, id);
+	if (!known_info)
+		return;
+
+	xr_vector<shared_str>::const_iterator	I = known_info->begin();
+	xr_vector<shared_str>::const_iterator	E = known_info->end();
+	for (; I != E; ++I)
+		functor(id, (LPCSTR)(*I).c_str());
+}
+
 //-Alundaio
 
 
@@ -353,6 +366,7 @@ void CALifeSimulator::script_register			(lua_State *L)
 			.def("set_switch_distance",			&CALifeSimulator::set_switch_distance) //Alundaio: renamed to set_switch_distance from switch_distance
 			//Alundaio: extend alife simulator exports
 			.def("teleport_object", &teleport_object)
+			.def("iterate_info", &IterateInfo)
 			//Alundaio: END
 	
 		,def("alife",						&alife)

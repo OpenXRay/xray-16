@@ -7,6 +7,13 @@
 
 #include "pch_script.h"
 #include "UIActorMenu.h"
+#include "../UIGameCustom.h"
+
+#include "UIWindow.h"
+#include "UICellItemFactory.h"
+#include "UIDragDropListEx.h"
+#include "UIDragDropReferenceList.h"
+#include "UICellCustomItems.h"
 
 #include "../actor.h"
 #include "../inventory_item.h"
@@ -16,6 +23,25 @@
 #include "eatable_item.h"
 
 using namespace luabind;
+
+CUIActorMenu* GetActorMenu()
+{
+	return &CurrentGameUI()->GetActorMenu();
+}
+
+u8 GrabMenuMode()
+{
+	return (u8)(CurrentGameUI()->GetActorMenu().GetMenuMode());
+}
+
+CScriptGameObject* CUIActorMenu::GetCurrentItemAsGameObject()
+{
+	CGameObject* GO = smart_cast<CGameObject*>(CurrentIItem());
+	if (GO)
+		return GO->lua_game_object();
+
+	return (0);
+}
 
 void CUIActorMenu::TryRepairItem(CUIWindow* w, void* d)
 {
@@ -107,4 +133,95 @@ void CUIActorMenu::CurModeToScript()
 	luabind::functor<void>	funct;
 	R_ASSERT( ai().script_engine().functor( "actor_menu.actor_menu_mode", funct ) );
 	funct( mode );
+}
+
+void CUIActorMenu::HighlightSectionInSlot(LPCSTR section, u8 type, u16 slot_id)
+{
+	CUIDragDropListEx* slot_list = m_pInventoryBagList;
+	switch (type)
+	{
+		case EDDListType::iActorBag:
+			slot_list = m_pInventoryBagList;
+			break;
+		case EDDListType::iActorBelt:
+			slot_list = m_pInventoryBeltList;
+			break;
+		case EDDListType::iActorSlot:
+			slot_list = GetSlotList(slot_id);
+			break;
+		case EDDListType::iActorTrade:
+			slot_list = m_pTradeActorBagList;
+			break;
+		case EDDListType::iDeadBodyBag:
+			slot_list = m_pDeadBodyBagList;
+			break;
+		case EDDListType::iPartnerTrade:
+			slot_list = m_pTradePartnerList;
+			break;
+		case EDDListType::iPartnerTradeBag:
+			slot_list = m_pTradePartnerBagList;
+			break;
+		case EDDListType::iQuickSlot:
+			slot_list = m_pQuickSlot;
+			break;
+		case EDDListType::iTrashSlot:
+			slot_list = m_pTrashList;
+			break;
+	}
+
+	if (!slot_list)
+		return;
+
+	u32 const cnt = slot_list->ItemsCount();
+	for (u32 i = 0; i < cnt; ++i)
+	{
+		CUICellItem* ci = slot_list->GetItemIdx(i);
+		PIItem item = (PIItem)ci->m_pData;
+		if (!item)
+			continue;
+
+		if (!strcmp(section, item->m_section_id.c_str()) == 0)
+			continue;
+
+		ci->m_select_armament = true;
+	}
+
+	m_highlight_clear = false;
+}
+
+#pragma optimize("s",on)
+void CUIActorMenu::script_register(lua_State *L)
+{
+	module(L)
+	[
+		class_< enum_exporter<EDDListType> >("EDDListType")
+			.enum_("EDDListType")
+			[
+				value("iActorBag", int(EDDListType::iActorBag)),
+				value("iActorBelt", int(EDDListType::iActorBelt)),
+				value("iActorSlot", int(EDDListType::iActorSlot)),
+				value("iActorTrade", int(EDDListType::iActorTrade)),
+				value("iDeadBodyBag", int(EDDListType::iDeadBodyBag)),
+				value("iInvalid", int(EDDListType::iInvalid)),
+				value("iPartnerTrade", int(EDDListType::iPartnerTrade)),
+				value("iPartnerTradeBag", int(EDDListType::iPartnerTradeBag)),
+				value("iQuickSlot", int(EDDListType::iQuickSlot)),
+				value("iTrashSlot", int(EDDListType::iTrashSlot))
+			],
+
+			class_< CUIActorMenu, CUIDialogWnd, CUIWndCallback>("CUIActorMenu")
+				.def(constructor<>())
+				.def("get_drag_item", &CUIActorMenu::GetCurrentItemAsGameObject)
+				.def("highlight_section_in_slot", &CUIActorMenu::HighlightSectionInSlot)
+				.def("refresh_current_cell_item", &CUIActorMenu::RefreshCurrentItemCell)
+				.def("IsShown", &CUIActorMenu::IsShown)
+				.def("ShowDialog", &CUIActorMenu::ShowDialog)
+				.def("HideDialog", &CUIActorMenu::HideDialog)
+	];
+
+	module(L, "ActorMenu")
+	[
+		def("get_actor_menu", &GetActorMenu),
+		def("get_menu_mode", &GrabMenuMode)
+	];
 }

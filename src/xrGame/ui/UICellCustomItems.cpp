@@ -39,7 +39,90 @@ CUIInventoryCellItem::CUIInventoryCellItem(CInventoryItem* itm)
 
 	inherited::SetTextureRect						(rect);
 	inherited::SetStretchTexture					(true);
+
+	//Alundaio; Layered icon
+	LPCSTR section = pSettings->line_exist(itm->m_section_id,"1icon_layer") ? pSettings->r_string(itm->m_section_id, "1icon_layer") : NULL;
+	if (section && pSettings->section_exist(section))
+	{
+		Fvector2 offset;
+		offset.x = pSettings->r_float(itm->m_section_id, "1icon_layer_x");
+		offset.y = pSettings->r_float(itm->m_section_id, "1icon_layer_y");
+
+		float scale = pSettings->line_exist(itm->m_section_id, "1icon_layer_scale") ? pSettings->r_float(itm->m_section_id, "1icon_layer_scale") : 1.0f;
+		u32 color;
+		if (pSettings->line_exist(itm->m_section_id, "1icon_layer_color"))
+			color = pSettings->r_color(itm->m_section_id, "1icon_layer_color");
+
+		CreateLayer(section, offset, color, scale);
+	}
+	section = pSettings->line_exist(itm->m_section_id, "2icon_layer") ? pSettings->r_string(itm->m_section_id, "2icon_layer") : NULL;
+	if (section && pSettings->section_exist(section))
+	{
+		Fvector2 offset;
+		offset.x = pSettings->r_float(itm->m_section_id, "2icon_layer_x");
+		offset.y = pSettings->r_float(itm->m_section_id, "2icon_layer_y");
+
+		float scale = pSettings->line_exist(itm->m_section_id, "2icon_layer_scale") ? pSettings->r_float(itm->m_section_id, "2icon_layer_scale") : 1.0f;
+		u32 color;
+		if (pSettings->line_exist(itm->m_section_id, "2icon_layer_color"))
+			color = pSettings->r_color(itm->m_section_id, "2icon_layer_color");
+
+		CreateLayer(section, offset, color, scale);
+	}
+	section = pSettings->line_exist(itm->m_section_id, "3icon_layer") ? pSettings->r_string(itm->m_section_id, "3icon_layer") : NULL;
+	if (section && pSettings->section_exist(section))
+	{
+		Fvector2 offset;
+		offset.x = pSettings->r_float(itm->m_section_id, "3icon_layer_x");
+		offset.y = pSettings->r_float(itm->m_section_id, "3icon_layer_y");
+
+		float scale = pSettings->line_exist(itm->m_section_id, "3icon_layer_scale") ? pSettings->r_float(itm->m_section_id, "3icon_layer_scale") : 1.0f;
+		u32 color;
+		if (pSettings->line_exist(itm->m_section_id, "3icon_layer_color"))
+			color = pSettings->r_color(itm->m_section_id, "3icon_layer_color");
+
+		CreateLayer(section, offset, color, scale);
+	}
+	section = pSettings->line_exist(itm->m_section_id, "4icon_layer") ? pSettings->r_string(itm->m_section_id, "4icon_layer") : NULL;
+	if (section && pSettings->section_exist(section))
+	{
+		Fvector2 offset;
+		offset.x = pSettings->r_float(itm->m_section_id, "4icon_layer_x");
+		offset.y = pSettings->r_float(itm->m_section_id, "4icon_layer_y");
+
+		float scale = pSettings->line_exist(itm->m_section_id, "4icon_layer_scale") ? pSettings->r_float(itm->m_section_id, "4icon_layer_scale") : 1.0f;
+		u32 color;
+		if (pSettings->line_exist(itm->m_section_id, "4icon_layer_color"))
+			color = pSettings->r_color(itm->m_section_id, "4icon_layer_color");
+
+		CreateLayer(section, offset, color, scale);
+	}
+	section = pSettings->line_exist(itm->m_section_id, "5icon_layer") ? pSettings->r_string(itm->m_section_id, "5icon_layer") : NULL;
+	if (section && pSettings->section_exist(section))
+	{
+		Fvector2 offset;
+		offset.x = pSettings->r_float(itm->m_section_id, "5icon_layer_x");
+		offset.y = pSettings->r_float(itm->m_section_id, "5icon_layer_y");
+
+		float scale = pSettings->line_exist(itm->m_section_id, "5icon_layer_scale") ? pSettings->r_float(itm->m_section_id, "5icon_layer_scale") : 1.0f;
+		u32 color;
+		if (pSettings->line_exist(itm->m_section_id, "5icon_layer_color"))
+			color = pSettings->r_color(itm->m_section_id, "5icon_layer_color");
+
+		CreateLayer(section, offset, color, scale);
+	}
+	//-Alundaio
 }
+
+void CUIInventoryCellItem::OnAfterChild(CUIDragDropListEx* parent_list)
+{
+
+	for (xr_vector<SIconLayer*>::iterator it = m_layers.begin(); m_layers.end() != it; ++it)
+	{
+		(*it)->m_icon = InitLayer((*it)->m_icon, (*it)->m_name, (*it)->offset, parent_list->GetVerticalPlacement(), (*it)->m_color, (*it)->m_scale);
+	}
+}
+
 
 bool CUIInventoryCellItem::EqualTo(CUICellItem* itm)
 {
@@ -70,7 +153,32 @@ bool CUIInventoryCellItem::IsHelperOrHasHelperChild()
 
 CUIDragItem* CUIInventoryCellItem::CreateDragItem()
 {
-	return IsHelperOrHasHelperChild() ? NULL : inherited::CreateDragItem();
+	if (IsHelperOrHasHelperChild())
+		return NULL;
+
+	CUIDragItem* i = inherited::CreateDragItem();
+	CUIStatic* s = NULL;
+
+	for (xr_vector<SIconLayer*>::iterator it = m_layers.begin(); m_layers.end() != it; ++it)
+	{
+		s = xr_new<CUIStatic>(); 
+		s->SetAutoDelete(true);
+		s->SetShader(InventoryUtilities::GetEquipmentIconsShader());
+		InitLayer(s, (*it)->m_name, (*it)->offset, false, (*it)->m_color, (*it)->m_scale);
+		s->SetTextureColor(i->wnd()->GetTextureColor());
+		i->wnd()->AttachChild(s);
+	}
+
+	return				i;
+}
+
+void CUIInventoryCellItem::SetTextureColor(u32 color)
+{
+	for (xr_vector<SIconLayer*>::iterator it = m_layers.begin(); m_layers.end() != it; ++it)
+	{
+		if ((*it)->m_icon)
+			(*it)->m_icon->SetTextureColor((*it)->m_color ? (*it)->m_color : color);
+	}
 }
 
 bool CUIInventoryCellItem::IsHelper ()
@@ -83,9 +191,107 @@ void CUIInventoryCellItem::SetIsHelper (bool is_helper)
 	object()->set_is_helper(is_helper);
 }
 
+//Alundaio
+void CUIInventoryCellItem::RemoveLayer(SIconLayer* layer)
+{
+	if (m_layers.empty())
+		return;
+
+	for (xr_vector<SIconLayer*>::iterator it = m_layers.begin(); m_layers.end() != it; ++it)
+	{
+		if ((*it) == layer)
+		{
+			DetachChild((*it)->m_icon);
+			m_layers.erase(it);
+			return;
+		}
+	}
+}
+
+void CUIInventoryCellItem::CreateLayer(LPCSTR section, Fvector2 offset, u32 color, float scale)
+{
+	SIconLayer* layer = xr_new<SIconLayer>();
+	layer->m_name = section;
+	layer->offset = offset;
+	layer->m_color = color;
+	layer->m_scale = scale;
+	m_layers.push_back(layer);
+}
+
+CUIStatic* CUIInventoryCellItem::InitLayer(CUIStatic* s, LPCSTR section, Fvector2 addon_offset, bool b_rotate, u32 color, float scale)
+{
+
+	if (!s)
+	{
+		s = xr_new<CUIStatic>();
+		s->SetAutoDelete(true);
+		AttachChild(s);
+		s->SetShader(InventoryUtilities::GetEquipmentIconsShader());
+		s->SetTextureColor(color ? color : GetTextureColor());
+	}
+
+	Frect					tex_rect;
+	Fvector2				base_scale;
+
+	if (Heading())
+	{
+		base_scale.x = (GetHeight() / (INV_GRID_WIDTHF*m_grid_size.x))*scale;
+		base_scale.y = (GetWidth() / (INV_GRID_HEIGHTF*m_grid_size.y))*scale;
+	}
+	else
+	{
+		base_scale.x = (GetWidth() / (INV_GRID_WIDTHF*m_grid_size.x))*scale;
+		base_scale.y = (GetHeight() / (INV_GRID_HEIGHTF*m_grid_size.y))*scale;
+	}
+	Fvector2				cell_size;
+	cell_size.x = pSettings->r_float(section, "inv_grid_width")*INV_GRID_WIDTHF;
+	cell_size.y = pSettings->r_float(section, "inv_grid_height")*INV_GRID_HEIGHTF;
+
+	tex_rect.x1 = pSettings->r_float(section, "inv_grid_x")*INV_GRID_WIDTHF;
+	tex_rect.y1 = pSettings->r_float(section, "inv_grid_y")*INV_GRID_HEIGHTF;
+
+	tex_rect.rb.add(tex_rect.lt, cell_size);
+
+	cell_size.mul(base_scale);
+
+	if (b_rotate)
+	{
+		s->SetWndSize(Fvector2().set(cell_size.y, cell_size.x));
+		Fvector2 new_offset;
+		new_offset.x = addon_offset.y*base_scale.x;
+		new_offset.y = GetHeight() - addon_offset.x*base_scale.x - cell_size.x;
+		addon_offset = new_offset;
+		addon_offset.x *= UI().get_current_kx();
+	}
+	else
+	{
+		s->SetWndSize(cell_size);
+		addon_offset.mul(base_scale);
+	}
+
+	s->SetWndPos(addon_offset);
+	s->SetTextureRect(tex_rect);
+	s->SetStretchTexture(true);
+
+	s->EnableHeading(b_rotate);
+
+	if (b_rotate)
+	{
+		s->SetHeading(GetHeading());
+		Fvector2 offs;
+		offs.set(0.0f, s->GetWndSize().y);
+		s->SetHeadingPivot(Fvector2().set(0.0f, 0.0f), /*Fvector2().set(0.0f,0.0f)*/offs, true);
+	}
+
+	return s;
+}
+
+//-Alundaio
 void CUIInventoryCellItem::Update()
 {
-	inherited::Update	();
+	bool b = Heading();
+	inherited::Update();
+
 	inherited::UpdateConditionProgressBar(); //Alundaio
 	UpdateItemText();
 
@@ -100,6 +306,11 @@ void CUIInventoryCellItem::Update()
 	}
 
 	SetTextureColor(color);
+
+	for (xr_vector<SIconLayer*>::iterator it = m_layers.begin(); m_layers.end() != it; ++it)
+	{
+		(*it)->m_icon = InitLayer((*it)->m_icon, (*it)->m_name, (*it)->offset, Heading(), (*it)->m_color, (*it)->m_scale);
+	}
 }
 
 void CUIInventoryCellItem::UpdateItemText()

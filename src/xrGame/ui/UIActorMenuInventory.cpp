@@ -1171,35 +1171,67 @@ void CUIActorMenu::PropertiesBoxForUsing( PIItem item, bool& b_show )
 	}
 
 	//1st Custom Use action
-	act_str = READ_IF_EXISTS(pSettings, r_string, section_name, "use1_text", 0);
-	if (act_str)
+	LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use1_functor", 0);
+	if (functor_name)
 	{
-		m_UIPropertiesBox->AddItem(act_str, NULL, INVENTORY_EAT2_ACTION);
-		b_show = true;
+		luabind::functor<LPCSTR> funct1;
+		if (ai().script_engine().functor(functor_name, funct1))
+		{
+			act_str = funct1(GO->lua_game_object());
+			if (act_str)
+			{
+				m_UIPropertiesBox->AddItem(act_str, NULL, INVENTORY_EAT2_ACTION);
+				b_show = true;				
+			}
+		}
 	}
 
 	//2nd Custom Use action
-	act_str = READ_IF_EXISTS(pSettings, r_string, section_name, "use2_text", 0);
-	if (act_str)
+	functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use2_functor", 0);
+	if (functor_name)
 	{
-		m_UIPropertiesBox->AddItem(act_str, NULL, INVENTORY_EAT3_ACTION);
-		b_show = true;
+		luabind::functor<LPCSTR> funct1;
+		if (ai().script_engine().functor(functor_name, funct1))
+		{
+			act_str = funct1(GO->lua_game_object());
+			if (act_str)
+			{
+				m_UIPropertiesBox->AddItem(act_str, NULL, INVENTORY_EAT3_ACTION);
+				b_show = true;				
+			}
+		}
 	}
 
 	//3rd Custom Use action
-	act_str = READ_IF_EXISTS(pSettings, r_string, section_name, "use3_text", 0);
-	if (act_str)
+	functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use3_functor", 0);
+	if (functor_name)
 	{
-		m_UIPropertiesBox->AddItem(act_str, NULL, INVENTORY_EAT4_ACTION);
-		b_show = true;
+		luabind::functor<LPCSTR> funct1;
+		if (ai().script_engine().functor(functor_name, funct1))
+		{
+			act_str = funct1(GO->lua_game_object());
+			if (act_str)
+			{
+				m_UIPropertiesBox->AddItem(act_str, NULL, INVENTORY_EAT4_ACTION);
+				b_show = true;				
+			}
+		}
 	}
 
 	//4th Custom Use action
-	act_str = READ_IF_EXISTS(pSettings, r_string, section_name, "use4_text", 0);
-	if (act_str)
+	functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use4_functor", 0);
+	if (functor_name)
 	{
-		m_UIPropertiesBox->AddItem(act_str, NULL, INVENTORY_EAT5_ACTION);
-		b_show = true;
+		luabind::functor<LPCSTR> funct1;
+		if (ai().script_engine().functor(functor_name, funct1))
+		{
+			act_str = funct1(GO->lua_game_object());
+			if (act_str)
+			{
+				m_UIPropertiesBox->AddItem(act_str, NULL, INVENTORY_EAT5_ACTION);
+				b_show = true;				
+			}
+		}
 	}
 }
 
@@ -1275,7 +1307,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked( CUIWindow* w, void* d )
 	case INVENTORY_EAT2_ACTION:
 		{
 			CGameObject* GO = smart_cast<CGameObject*>(item);
-			LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use1_functor", 0);
+			LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use1_action_functor", 0);
 			if (functor_name)
 			{
 				luabind::functor<bool>	funct1;
@@ -1290,7 +1322,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked( CUIWindow* w, void* d )
 	case INVENTORY_EAT3_ACTION:
 		{
 			CGameObject* GO = smart_cast<CGameObject*>(item);
-			LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use2_functor", 0);
+			LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use2_action_functor", 0);
 			if (functor_name)
 			{
 				luabind::functor<bool>	funct2;
@@ -1305,7 +1337,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked( CUIWindow* w, void* d )
 	case INVENTORY_EAT4_ACTION:
 	{
 		CGameObject* GO = smart_cast<CGameObject*>(item);
-		LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use3_functor", 0);
+		LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use3_action_functor", 0);
 		if (functor_name)
 		{
 			luabind::functor<bool>	funct3;
@@ -1320,7 +1352,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked( CUIWindow* w, void* d )
 	case INVENTORY_EAT5_ACTION:
 	{
 		CGameObject* GO = smart_cast<CGameObject*>(item);
-		LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use4_functor", 0);
+		LPCSTR functor_name = READ_IF_EXISTS(pSettings, r_string, GO->cNameSect(), "use4_action_functor", 0);
 		if (functor_name)
 		{
 			luabind::functor<bool>	funct4;

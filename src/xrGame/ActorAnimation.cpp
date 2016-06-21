@@ -291,7 +291,7 @@ void CActor::g_SetSprintAnimation( u32 mstate_rl,MotionID &head,MotionID &torso,
 	
 	bool jump = (mstate_rl&mcFall)		||
 				(mstate_rl&mcLanding)	||
-				(mstate_rl&mcLanding)	||
+				//(mstate_rl&mcLanding)	||
 				(mstate_rl&mcLanding2)	||
 				(mstate_rl&mcJump)		;
 	

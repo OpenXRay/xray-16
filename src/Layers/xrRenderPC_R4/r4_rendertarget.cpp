@@ -288,7 +288,7 @@ CRenderTarget::CRenderTarget		()
 	param_noise_fps		= 25.f;
 	param_noise_scale	= 1.f;
 
-	im_noise_time		= 1/100;
+	im_noise_time		= 1/100.0f; //Alundaio should be float?
 	im_noise_shift_w	= 0;
 	im_noise_shift_h	= 0;
 

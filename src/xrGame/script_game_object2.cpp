@@ -76,7 +76,7 @@ CScriptGameObject *CScriptGameObject::best_weapon()
 	}
 	else {
 		//Alundaio: extra security
-		CGameObject		*game_object = object_handler->best_weapon() ? &object_handler->best_weapon()->object() : 0;
+		CGameObject		*game_object = object_handler->best_weapon() ? &object_handler->best_weapon()->object() : NULL;
 		if (!game_object)
 			return (0);
 

@@ -445,9 +445,9 @@ void CBaseMonster::settings_read(CInifile const * ini, LPCSTR section, SMonsterS
 
 		if (ini->line_exist(ppi_section,"color_base")) 
 			sscanf(ini->r_string(ppi_section,"color_base"),	"%f,%f,%f", &data.m_attack_effector.ppi.color_base.r, &data.m_attack_effector.ppi.color_base.g, &data.m_attack_effector.ppi.color_base.b);		
-		if (ini->line_exist(ppi_section,"color_base")) 
+		if (ini->line_exist(ppi_section,"color_gray")) 
 			sscanf(ini->r_string(ppi_section,"color_gray"),	"%f,%f,%f", &data.m_attack_effector.ppi.color_gray.r, &data.m_attack_effector.ppi.color_gray.g, &data.m_attack_effector.ppi.color_gray.b);
-		if (ini->line_exist(ppi_section,"color_base")) 
+		if (ini->line_exist(ppi_section,"color_add")) 
 			sscanf(ini->r_string(ppi_section,"color_add"),	"%f,%f,%f", &data.m_attack_effector.ppi.color_add.r,  &data.m_attack_effector.ppi.color_add.g,	&data.m_attack_effector.ppi.color_add.b);
 
 		READ_SETTINGS(data.m_attack_effector.time,					"time",				r_float, ini, ppi_section);

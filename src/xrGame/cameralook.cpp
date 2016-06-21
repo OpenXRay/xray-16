@@ -86,7 +86,7 @@ void CCameraLook::OnActivate( CCameraBase* old_cam )
 #include "visual_memory_manager.h"
 #include "actor_memory.h"
 
-int cam_dik = DIK_LSHIFT;
+//int cam_dik = DIK_LSHIFT;
 
 Fvector CCameraLook2::m_cam_offset;
 void CCameraLook2::OnActivate( CCameraBase* old_cam )
@@ -96,6 +96,7 @@ void CCameraLook2::OnActivate( CCameraBase* old_cam )
 
 void CCameraLook2::Update(Fvector& point, Fvector&)
 {
+	int cam_dik = get_action_dik(kCAM_AUTOAIM, 0);
 	if(!m_locked_enemy)
 	{//autoaim
 		if( pInput->iGetAsyncKeyState(cam_dik) )

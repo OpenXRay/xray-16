@@ -1089,7 +1089,7 @@ public:
 
     size_t width() const
     {
-        return cubeFaces[0].height();
+        return cubeFaces[0].width();
     }
 
     void clear()
