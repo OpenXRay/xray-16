@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="lzo\src\lzo1.c" />
+    <ClCompile Include="lzo\src\lzo1a.c" />
+    <ClCompile Include="lzo\src\lzo1a_99.c" />
+    <ClCompile Include="lzo\src\lzo1b_1.c" />
+    <ClCompile Include="lzo\src\lzo1b_2.c" />
+    <ClCompile Include="lzo\src\lzo1b_3.c" />
+    <ClCompile Include="lzo\src\lzo1b_4.c" />
+    <ClCompile Include="lzo\src\lzo1b_5.c" />
+    <ClCompile Include="lzo\src\lzo1b_6.c" />
+    <ClCompile Include="lzo\src\lzo1b_7.c" />
+    <ClCompile Include="lzo\src\lzo1b_8.c" />
+    <ClCompile Include="lzo\src\lzo1b_9.c" />
+    <ClCompile Include="lzo\src\lzo1b_99.c" />
+    <ClCompile Include="lzo\src\lzo1b_9x.c" />
+    <ClCompile Include="lzo\src\lzo1b_cc.c" />
+    <ClCompile Include="lzo\src\lzo1b_d1.c" />
+    <ClCompile Include="lzo\src\lzo1b_d2.c" />
+    <ClCompile Include="lzo\src\lzo1b_rr.c" />
+    <ClCompile Include="lzo\src\lzo1b_xx.c" />
+    <ClCompile Include="lzo\src\lzo1c_1.c" />
+    <ClCompile Include="lzo\src\lzo1c_2.c" />
+    <ClCompile Include="lzo\src\lzo1c_3.c" />
+    <ClCompile Include="lzo\src\lzo1c_4.c" />
+    <ClCompile Include="lzo\src\lzo1c_5.c" />
+    <ClCompile Include="lzo\src\lzo1c_6.c" />
+    <ClCompile Include="lzo\src\lzo1c_7.c" />
+    <ClCompile Include="lzo\src\lzo1c_8.c" />
+    <ClCompile Include="lzo\src\lzo1c_9.c" />
+    <ClCompile Include="lzo\src\lzo1c_99.c" />
+    <ClCompile Include="lzo\src\lzo1c_9x.c" />
+    <ClCompile Include="lzo\src\lzo1c_cc.c" />
+    <ClCompile Include="lzo\src\lzo1c_d1.c" />
+    <ClCompile Include="lzo\src\lzo1c_d2.c" />
+    <ClCompile Include="lzo\src\lzo1c_rr.c" />
+    <ClCompile Include="lzo\src\lzo1c_xx.c" />
+    <ClCompile Include="lzo\src\lzo1f_1.c" />
+    <ClCompile Include="lzo\src\lzo1f_9x.c" />
+    <ClCompile Include="lzo\src\lzo1f_d1.c" />
+    <ClCompile Include="lzo\src\lzo1f_d2.c" />
+    <ClCompile Include="lzo\src\lzo1x_1.c" />
+    <ClCompile Include="lzo\src\lzo1x_1k.c" />
+    <ClCompile Include="lzo\src\lzo1x_1l.c" />
+    <ClCompile Include="lzo\src\lzo1x_1o.c" />
+    <ClCompile Include="lzo\src\lzo1x_9x.c" />
+    <ClCompile Include="lzo\src\lzo1x_d1.c" />
+    <ClCompile Include="lzo\src\lzo1x_d2.c" />
+    <ClCompile Include="lzo\src\lzo1x_d3.c" />
+    <ClCompile Include="lzo\src\lzo1x_o.c" />
+    <ClCompile Include="lzo\src\lzo1y_1.c" />
+    <ClCompile Include="lzo\src\lzo1y_9x.c" />
+    <ClCompile Include="lzo\src\lzo1y_d1.c" />
+    <ClCompile Include="lzo\src\lzo1y_d2.c" />
+    <ClCompile Include="lzo\src\lzo1y_d3.c" />
+    <ClCompile Include="lzo\src\lzo1y_o.c" />
+    <ClCompile Include="lzo\src\lzo1z_9x.c" />
+    <ClCompile Include="lzo\src\lzo1z_d1.c" />
+    <ClCompile Include="lzo\src\lzo1z_d2.c" />
+    <ClCompile Include="lzo\src\lzo1z_d3.c" />
+    <ClCompile Include="lzo\src\lzo1_99.c" />
+    <ClCompile Include="lzo\src\lzo2a_9x.c" />
+    <ClCompile Include="lzo\src\lzo2a_d1.c" />
+    <ClCompile Include="lzo\src\lzo2a_d2.c" />
+    <ClCompile Include="lzo\src\lzo_crc.c" />
+    <ClCompile Include="lzo\src\lzo_init.c" />
+    <ClCompile Include="lzo\src\lzo_ptr.c" />
+    <ClCompile Include="lzo\src\lzo_str.c" />
+    <ClCompile Include="lzo\src\lzo_util.c" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{614AA57F-58D7-45A8-A5FF-93F04B05FAC6}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>lzo</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>lzo2</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\Common.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\Common.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\Common.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\Common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>lzo\src;lzo\include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>lzo\src;lzo\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>lzo\src;lzo\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>lzo\src;lzo\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
