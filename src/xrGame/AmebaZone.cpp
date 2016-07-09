@@ -55,7 +55,7 @@ void  CAmebaZone::Affect(SZoneObjectInfo* O)
 	Fvector position_in_bone_space;
 
 	float power = Power(distance_to_center(O->object), m_fEffectiveRadius);
-	float power_critical = 0.0f;
+	//float power_critical = 0.0f;
 	float impulse = m_fHitImpulseScale*power*pGameObject->GetMass();
 
 	if(power > 0.01f) 

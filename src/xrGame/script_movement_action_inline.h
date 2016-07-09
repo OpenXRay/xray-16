@@ -70,19 +70,19 @@ IC	void CScriptMovementAction::SetPathType			(const DetailPathManager::EDetailPa
 	m_bCompleted		= false;
 }
 
-IC	void CScriptMovementAction::SetPatrolPath		(const CPatrolPath *path, shared_str path_name)
+IC	void CScriptMovementAction::SetPatrolPath		(const CPatrolPath *path, const shared_str &path_name)
 {
 	m_path				= path;
 	m_path_name			= path_name;
-	m_tGoalType			= eGoalTypePatrolPath;
+	m_tGoalType			= EGoalType::eGoalTypePatrolPath;
 	m_bCompleted		= false;
 }
 
 IC	void CScriptMovementAction::SetPosition			(const Fvector &tPosition)
 {
 	m_tDestinationPosition = tPosition;
-	m_tGoalType			= eGoalTypePathPosition;
-	m_bCompleted		= false;
+	m_tGoalType				= EGoalType::eGoalTypePathPosition;
+	m_bCompleted			= false;
 }
 
 IC	void CScriptMovementAction::SetSpeed			(float fSpeed)
@@ -112,7 +112,7 @@ IC	void CScriptMovementAction::SetPatrolRandom		(bool bRandom)
 IC	void CScriptMovementAction::SetInputKeys		(const EInputKeys tInputKeys)
 {
 	m_tInputKeys		= tInputKeys;
-	m_tGoalType			= eGoalTypeInput;
+	m_tGoalType			= EGoalType::eGoalTypeInput;
 	m_bCompleted		= false;
 }
 

@@ -432,6 +432,7 @@ public:
         R.x = s1*(m[0][0] * V1.x + m[1][0] * V1.y + m[2][0] * V1.z);
         R.y = s1*(m[0][1] * V1.x + m[1][1] * V1.y + m[2][1] * V1.z);
         R.z = s1*(m[0][2] * V1.x + m[1][2] * V1.y + m[2][2] * V1.z);
+		return *this;
     }
     IC SelfRef MxV(Tvector& R, const Tvector& V1) const
     {

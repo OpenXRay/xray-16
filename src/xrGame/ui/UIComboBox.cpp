@@ -270,32 +270,30 @@ void CUIComboBox::OnFocusReceive()
 }
 
 bool CUIComboBox::OnMouseAction(float x, float y, EUIMessages mouse_action){
-	if(CUIWindow::OnMouseAction(x, y, mouse_action)) 
+
+	if (CUIWindow::OnMouseAction(x, y, mouse_action))
 		return true;
 
-	bool bCursorOverScb = false;
-	bCursorOverScb		= m_list_box.ScrollBar()->CursorOverWindow();
-	switch (m_eState){
-		case LIST_EXPANDED:			
-
-			if (  (!bCursorOverScb) &&  mouse_action == WINDOW_LBUTTON_DOWN)
-			{
-                ShowList(false);
-				return true;
-			}
-			break;
-		case LIST_FONDED:
-			if(mouse_action==WINDOW_LBUTTON_DOWN)
-			{
+	if (mouse_action == WINDOW_LBUTTON_DOWN)
+	{
+		switch (m_eState)
+		{
+			case LIST_EXPANDED:
+				if (!m_list_box.ScrollBar()->CursorOverWindow())
+				{
+					ShowList(false);
+					return true;
+				}
+				break;
+			case LIST_FONDED:
 				OnBtnClicked();
-				return true;			
-			}break;
-		default:
-			break;
-	}	
-	 
+				return true;
+			default:
+				break;
+		}
+	}
 
-        return false;
+	return false;
 }
 
 void CUIComboBox::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
@@ -337,4 +335,14 @@ void CUIComboBox::ClearList()
 	m_itoken_id = 0;
 	ShowList(false);
 	m_disabled.clear();
+}
+
+void CUIComboBox::SetSelectedIDX(u32 idx)
+{
+	m_list_box.SetSelectedIDX(idx);
+}
+
+u32 CUIComboBox::GetSelectedIDX()
+{
+	return m_list_box.GetSelectedIDX();
 }

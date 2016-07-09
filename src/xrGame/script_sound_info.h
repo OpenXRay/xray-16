@@ -22,7 +22,7 @@ public:
 		position		= Fvector().set(0.f,0.f,0.f);
 	}
 
-	void set(CScriptGameObject *p_who, bool p_danger, Fvector p_position, float p_power, int p_time) {
+	void set(CScriptGameObject *p_who, bool p_danger,Fvector p_position, float p_power, int p_time) {
 		who			= p_who;
 		position	= p_position;
 		power		= p_power;

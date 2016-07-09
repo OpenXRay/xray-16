@@ -344,7 +344,7 @@ void CActor::g_SetAnimation( u32 mstate_rl )
 	else							
 		ST 		= &m_anims->m_normal;
 
-	STorsoWpn* __TW = &ST->m_torso[4]; //Alundaio: Animation Set knife/grenade running animation without weapon by XEM #100
+	//STorsoWpn* __TW = &ST->m_torso[4]; //Alundaio: Animation Set knife/grenade running animation without weapon by XEM #100
 
 	bool bAccelerated = isActorAccelerated(mstate_rl, IsZoomAimingMode());
 	if ( bAccelerated )

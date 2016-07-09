@@ -565,13 +565,14 @@ IC	u32	CLevelGraph::row_length				() const
 
 IC	bool CLevelGraph::valid_vertex_position	(const Fvector &position) const
 {
-	if ((position.x < header().box().min.x - header().cell_size()*.5f) || (position.x > header().box().max.x + header().cell_size()*.5f) || (position.z < header().box().min.z - header().cell_size()*.5f) || (position.z > header().box().max.z + header().cell_size()*.5f))
+	const Fbox* box = &header().box();
+	if ((position.x < box->min.x - header().cell_size()*.5f) || (position.x > box->max.x + header().cell_size()*.5f) || (position.z < box->min.z - header().cell_size()*.5f) || (position.z > box->max.z + header().cell_size()*.5f))
 		return			(false);
 
-	if (!(iFloor((position.z - header().box().min.z)/header().cell_size() + .5f) < (int)m_row_length))
+	if (!(iFloor((position.z - box->min.z) / header().cell_size() + .5f) < (int)m_row_length))
 		return			(false);
 	
-	if (!(iFloor((position.x - header().box().min.x)/header().cell_size() + .5f) < (int)m_column_length))
+	if (!(iFloor((position.x - box->min.x) / header().cell_size() + .5f) < (int)m_column_length))
 		return			(false);
 
 	return				((vertex_position(position).xz() < (1 << MAX_NODE_BIT_COUNT) - 1));

@@ -125,7 +125,7 @@ IC int xr_strcmp(const shared_str& a, const shared_str& b)
     if (a.equal(b)) return 0;
     else return xr_strcmp(*a, *b);
 }
-IC void xr_strlwr(xr_string& src) { for (xr_string::iterator it = src.begin(); it != src.end(); it++) *it = xr_string::value_type(tolower(*it)); }
+IC void xr_strlwr(xr_string& src) { for (xr_string::iterator it = src.begin(); it != src.end(); ++it) *it = xr_string::value_type(tolower(*it)); }
 IC void xr_strlwr(shared_str& src) { if (*src) { LPSTR lp = xr_strdup(*src); xr_strlwr(lp); src = lp; xr_free(lp); } }
 
 #pragma pack(pop)

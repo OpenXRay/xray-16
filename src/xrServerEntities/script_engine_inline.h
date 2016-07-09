@@ -10,8 +10,8 @@
 
 IC	void CScriptEngine::add_script_process		(const EScriptProcessors &process_id, CScriptProcess *script_process)
 {
-	CScriptProcessStorage::const_iterator	I = m_script_processes.find(process_id);
-	VERIFY									(I == m_script_processes.end());
+//	CScriptProcessStorage::const_iterator	I = m_script_processes.find(process_id);
+//	VERIFY									(I == m_script_processes.end());
 	m_script_processes.insert				(std::make_pair(process_id,script_process));
 }
 

@@ -188,10 +188,10 @@ struct ENGINE_API motions_value
     u32 mem_usage()
     {
         u32 sz = sizeof(*this) + m_motion_map.size() * 6 + m_partition.mem_usage();
-        for (MotionDefVecIt it = m_mdefs.begin(); it != m_mdefs.end(); it++)
+        for (MotionDefVecIt it = m_mdefs.begin(); it != m_mdefs.end(); ++it)
             sz += it->mem_usage();
-        for (BoneMotionMapIt bm_it = m_motions.begin(); bm_it != m_motions.end(); bm_it++)
-            for (MotionVecIt m_it = bm_it->second.begin(); m_it != bm_it->second.end(); m_it++)
+        for (BoneMotionMapIt bm_it = m_motions.begin(); bm_it != m_motions.end(); ++bm_it)
+            for (MotionVecIt m_it = bm_it->second.begin(); m_it != bm_it->second.end(); ++m_it)
                 sz += m_it->mem_usage();
         return sz;
     }
@@ -233,7 +233,7 @@ public:
     bool operator== (shared_motions const& rhs) const { return (p_ == rhs.p_); }
 
     // misc func
-    MotionVec* bone_motions(shared_str bone_name) { VERIFY(p_); return p_->bone_motions(bone_name); }
+    MotionVec* bone_motions(const shared_str &bone_name) { VERIFY(p_); return p_->bone_motions(bone_name); }
     accel_map* motion_map() { VERIFY(p_); return &p_->m_motion_map; }
     accel_map* cycle() { VERIFY(p_); return &p_->m_cycle; }
     accel_map* fx() { VERIFY(p_); return &p_->m_fx; }

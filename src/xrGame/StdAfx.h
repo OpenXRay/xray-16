@@ -1,12 +1,19 @@
 #pragma once
 
+#pragma warning(push)
 #pragma warning(disable:4995)
 #include "../xrEngine/stdafx.h"
 #include "DPlay/dplay8.h"
-#pragma warning(default:4995)
+#pragma warning(pop)
+//#pragma warning(default:4995)
 #pragma warning( 4 : 4018 )
 #pragma warning( 4 : 4244 )
 #pragma warning(disable:4505)
+
+#pragma warning(disable:4251)
+#pragma warning(disable:4127)
+#pragma warning(disable:4100)
+#pragma warning(disable:4201)
 
 //AVO: print, don't fail
 #include "../build_config_defines.h"

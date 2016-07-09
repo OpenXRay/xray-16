@@ -3,6 +3,7 @@
 
 class CZoneCampfire :public CMosquitoBald
 {
+private:
 	typedef CMosquitoBald	inherited;
 protected:
 	CParticlesObject*		m_pEnablingParticles;

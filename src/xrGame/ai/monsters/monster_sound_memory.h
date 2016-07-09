@@ -58,7 +58,7 @@ typedef struct tagSoundElement
 	}
 	TSoundDangerValue ConvertSoundType(ESoundTypes stype);
 
-	void CalcValue(TTime cur_time, Fvector cur_pos) {
+	void CalcValue(TTime cur_time, const Fvector &cur_pos) {
 		value = FACTOR_SOUND_TYPE * u32(NONE_DANGEROUS_SOUND - WEAPON_SHOOTING) - iFloor(FACTOR_DISTANCE * cur_pos.distance_to(position)) - FACTOR_DELTA_TIME * iFloor(float((cur_time - time) / 1000)) + FACTOR_SOUND_POWER * iFloor(power);
 	}
 

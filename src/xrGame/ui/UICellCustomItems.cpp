@@ -41,75 +41,30 @@ CUIInventoryCellItem::CUIInventoryCellItem(CInventoryItem* itm)
 	inherited::SetStretchTexture					(true);
 
 	//Alundaio; Layered icon
-	LPCSTR section = pSettings->line_exist(itm->m_section_id,"1icon_layer") ? pSettings->r_string(itm->m_section_id, "1icon_layer") : NULL;
-	if (section && pSettings->section_exist(section))
+	u8 itrNum = 1;
+	LPCSTR field = "1icon_layer";
+	while (pSettings->line_exist(itm->m_section_id, field))
 	{
-		Fvector2 offset;
-		offset.x = pSettings->r_float(itm->m_section_id, "1icon_layer_x");
-		offset.y = pSettings->r_float(itm->m_section_id, "1icon_layer_y");
+		string32 buf;
 
-		float scale = pSettings->line_exist(itm->m_section_id, "1icon_layer_scale") ? pSettings->r_float(itm->m_section_id, "1icon_layer_scale") : 1.0f;
-		u32 color;
-		if (pSettings->line_exist(itm->m_section_id, "1icon_layer_color"))
-			color = pSettings->r_color(itm->m_section_id, "1icon_layer_color");
+		LPCSTR section = pSettings->r_string(itm->m_section_id, field);
+		if (!section)
+			continue;
+
+		Fvector2 offset;
+		offset.x = pSettings->r_float(itm->m_section_id, strconcat(sizeof(buf),buf,std::to_string(itrNum).c_str(),"icon_layer_x"));
+		offset.x = pSettings->r_float(itm->m_section_id, strconcat(sizeof(buf), buf, std::to_string(itrNum).c_str(), "icon_layer_y"));
+
+		float scale = pSettings->line_exist(itm->m_section_id, field) ? pSettings->r_float(itm->m_section_id, strconcat(sizeof(buf), buf, std::to_string(itrNum).c_str(), "icon_layer_scale")) : 1.0f;
+
+		LPCSTR field_color = strconcat(sizeof(buf), buf, std::to_string(itrNum).c_str(), "icon_layer_color");
+		u32 color = pSettings->line_exist(itm->m_section_id, field_color) ? pSettings->r_color(itm->m_section_id, field_color) : GetTextureColor();
 
 		CreateLayer(section, offset, color, scale);
-	}
-	section = pSettings->line_exist(itm->m_section_id, "2icon_layer") ? pSettings->r_string(itm->m_section_id, "2icon_layer") : NULL;
-	if (section && pSettings->section_exist(section))
-	{
-		Fvector2 offset;
-		offset.x = pSettings->r_float(itm->m_section_id, "2icon_layer_x");
-		offset.y = pSettings->r_float(itm->m_section_id, "2icon_layer_y");
 
-		float scale = pSettings->line_exist(itm->m_section_id, "2icon_layer_scale") ? pSettings->r_float(itm->m_section_id, "2icon_layer_scale") : 1.0f;
-		u32 color;
-		if (pSettings->line_exist(itm->m_section_id, "2icon_layer_color"))
-			color = pSettings->r_color(itm->m_section_id, "2icon_layer_color");
+		itrNum++;
 
-		CreateLayer(section, offset, color, scale);
-	}
-	section = pSettings->line_exist(itm->m_section_id, "3icon_layer") ? pSettings->r_string(itm->m_section_id, "3icon_layer") : NULL;
-	if (section && pSettings->section_exist(section))
-	{
-		Fvector2 offset;
-		offset.x = pSettings->r_float(itm->m_section_id, "3icon_layer_x");
-		offset.y = pSettings->r_float(itm->m_section_id, "3icon_layer_y");
-
-		float scale = pSettings->line_exist(itm->m_section_id, "3icon_layer_scale") ? pSettings->r_float(itm->m_section_id, "3icon_layer_scale") : 1.0f;
-		u32 color;
-		if (pSettings->line_exist(itm->m_section_id, "3icon_layer_color"))
-			color = pSettings->r_color(itm->m_section_id, "3icon_layer_color");
-
-		CreateLayer(section, offset, color, scale);
-	}
-	section = pSettings->line_exist(itm->m_section_id, "4icon_layer") ? pSettings->r_string(itm->m_section_id, "4icon_layer") : NULL;
-	if (section && pSettings->section_exist(section))
-	{
-		Fvector2 offset;
-		offset.x = pSettings->r_float(itm->m_section_id, "4icon_layer_x");
-		offset.y = pSettings->r_float(itm->m_section_id, "4icon_layer_y");
-
-		float scale = pSettings->line_exist(itm->m_section_id, "4icon_layer_scale") ? pSettings->r_float(itm->m_section_id, "4icon_layer_scale") : 1.0f;
-		u32 color;
-		if (pSettings->line_exist(itm->m_section_id, "4icon_layer_color"))
-			color = pSettings->r_color(itm->m_section_id, "4icon_layer_color");
-
-		CreateLayer(section, offset, color, scale);
-	}
-	section = pSettings->line_exist(itm->m_section_id, "5icon_layer") ? pSettings->r_string(itm->m_section_id, "5icon_layer") : NULL;
-	if (section && pSettings->section_exist(section))
-	{
-		Fvector2 offset;
-		offset.x = pSettings->r_float(itm->m_section_id, "5icon_layer_x");
-		offset.y = pSettings->r_float(itm->m_section_id, "5icon_layer_y");
-
-		float scale = pSettings->line_exist(itm->m_section_id, "5icon_layer_scale") ? pSettings->r_float(itm->m_section_id, "5icon_layer_scale") : 1.0f;
-		u32 color;
-		if (pSettings->line_exist(itm->m_section_id, "5icon_layer_color"))
-			color = pSettings->r_color(itm->m_section_id, "5icon_layer_color");
-
-		CreateLayer(section, offset, color, scale);
+		field = strconcat(sizeof(buf), buf, std::to_string(itrNum).c_str(), "icon_layer");
 	}
 	//-Alundaio
 }

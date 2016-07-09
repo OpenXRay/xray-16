@@ -278,7 +278,7 @@ public:
 	bool					IsPlayerIPDenied(u32 ip_address);
 	//WARNING! very bad method :(
 	//IClient*				client_Get		(u32 index)							{return net_players.GetClientByIndex(index);};
-	IClient*				GetClientByID	(ClientID clientId)					{return net_players.GetFoundClient(ClientIdSearchPredicate(clientId));};
+	IClient*				GetClientByID	(const ClientID &clientId)					{return net_players.GetFoundClient(ClientIdSearchPredicate(clientId));};
 	//IClient*				GetDisconnectedClientByID(ClientID clientId)		{return net_players.GetFoundDisconnectedClient(ClientIdSearchPredicate(clientId));}
 
 
