@@ -103,7 +103,11 @@ void MODEL::build(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc, vo
         BTHREAD_params P = {this, V, Vcnt, T, Tcnt, bc, bcp};
         thread_spawn(build_thread, "CDB-construction", 0, &P);
         while (S_INIT == status)
+        {
+            if (S_INIT != status)
+                break;
             Sleep(5);
+        }
     }
 #endif
 }
