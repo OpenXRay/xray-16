@@ -639,8 +639,9 @@ void CRender::Render()
         Details->Render(); // grass / details
     r_dsgraph_render_lods(true, false); // lods - FB
 
-    g_pGamePersistent->Environment().RenderSky(); // sky / sun
-    g_pGamePersistent->Environment().RenderClouds(); // clouds
+    CEnvironment* Env = &g_pGamePersistent->Environment();
+    Env->RenderSky(); // sky / sun
+    Env->RenderClouds(); // clouds
 
     r_pmask(true, false); // disable priority "1"
     o.vis_intersect = TRUE;
@@ -668,8 +669,8 @@ void CRender::Render()
     if (L_Glows)
         L_Glows->Render(); // glows
     BasicStats.Glows.End();
-    g_pGamePersistent->Environment().RenderFlares(); // lens-flares
-    g_pGamePersistent->Environment().RenderLast(); // rain/thunder-bolts
+    Env->RenderFlares(); // lens-flares
+    Env->RenderLast(); // rain/thunder-bolts
 
 #ifdef DEBUG
     for (int _priority = 0; _priority < 2; ++_priority)
@@ -953,7 +954,7 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     FS.file_list(m_file_set, folder_name, FS_ListFiles | FS_RootOnly, "*");
 
     string_path temp_file_name, file_name;
-    if (!match_shader_id(name, sh_name, m_file_set, temp_file_name))
+    if (ps_use_precompiled_shaders == false || !match_shader_id(name, sh_name, m_file_set, temp_file_name))
     {
         string_path file;
         xr_strcpy(file, "shaders_cache\\r1\\");

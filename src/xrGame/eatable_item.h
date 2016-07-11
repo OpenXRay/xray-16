@@ -38,6 +38,6 @@ public:
     bool CanDelete() const { return m_bRemoveAfterUse == true; }
     virtual u8 GetMaxUses() const { return m_iMaxUses; }
     virtual u8 GetRemainingUses() const { return m_iRemainingUses; }
-    void SetRemainingUses(u8 value) { if (value <= m_iMaxUses && value >= 0) m_iRemainingUses = value; };
+    void SetRemainingUses(u8 value) { if (value <= m_iMaxUses) m_iRemainingUses = value; };
     float Weight() const override;
 };

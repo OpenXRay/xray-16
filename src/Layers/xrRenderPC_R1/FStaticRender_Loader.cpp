@@ -172,7 +172,7 @@ void CRender::level_Unload()
     Resources->DBG_VerifyGeoms();
     Resources->DBG_VerifyTextures();
 #endif
-    b_loaded = FALSE;
+    b_loaded = false;
 }
 
 void CRender::LoadBuffers(CStreamReader* base_fs)

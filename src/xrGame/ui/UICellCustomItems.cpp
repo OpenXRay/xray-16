@@ -49,18 +49,12 @@ CUIInventoryCellItem::CUIInventoryCellItem(CInventoryItem* itm)
         offset.y = pSettings->r_float(itm->m_section_id,
                                       strconcat(sizeof buf, buf, std::to_string(itrNum).c_str(), "icon_layer_y"));
 
-        float scale = pSettings->line_exist(itm->m_section_id, field)
-                          ? pSettings->r_float(itm->m_section_id,
-                                               strconcat(sizeof buf, buf, std::to_string(itrNum).c_str(),
-                                                         "icon_layer_scale"))
+        pcstr field_scale = strconcat(sizeof buf, buf, std::to_string(itrNum).c_str(), "icon_layer_scale");
+        const float scale = pSettings->line_exist(itm->m_section_id, field_scale)
+                          ? pSettings->r_float(itm->m_section_id, field_scale)
                           : 1.0f;
 
-        const pcstr field_color = strconcat(sizeof buf, buf, std::to_string(itrNum).c_str(), "icon_layer_color");
-        const u32 color = pSettings->line_exist(itm->m_section_id, field_color)
-                        ? pSettings->r_color(itm->m_section_id, field_color)
-                        : GetTextureColor();
-
-        CreateLayer(section, offset, color, scale);
+        CreateLayer(section, offset, scale);
 
         itrNum++;
 
@@ -73,8 +67,8 @@ void CUIInventoryCellItem::OnAfterChild(CUIDragDropListEx* parent_list)
 {
     for (auto& it : m_layers)
     {
-        it->m_icon = InitLayer(it->m_icon, it->m_name, it->offset, parent_list->GetVerticalPlacement(),
-            it->m_color, it->m_scale);
+        it->m_icon = InitLayer(it->m_icon, it->m_name, it->offset,
+            parent_list->GetVerticalPlacement(), it->m_scale);
     }
 }
 
@@ -115,7 +109,7 @@ CUIDragItem* CUIInventoryCellItem::CreateDragItem()
         s = new CUIStatic();
         s->SetAutoDelete(true);
         s->SetShader(InventoryUtilities::GetEquipmentIconsShader());
-        InitLayer(s, it->m_name, it->offset, false, it->m_color, it->m_scale);
+        InitLayer(s, it->m_name, it->offset, false, it->m_scale);
         s->SetTextureColor(i->wnd()->GetTextureColor());
         i->wnd()->AttachChild(s);
     }
@@ -145,9 +139,7 @@ void CUIInventoryCellItem::Update()
     SetTextureColor(color);
 
     for (auto& it : m_layers)
-    {
-        it->m_icon = InitLayer(it->m_icon, it->m_name, it->offset, Heading(), it->m_color, it->m_scale);
-    }
+        it->m_icon = InitLayer(it->m_icon, it->m_name, it->offset, Heading(), it->m_scale);
 }
 
 
@@ -155,7 +147,7 @@ void CUIInventoryCellItem::SetTextureColor(u32 color)
 {
 	for (auto& it : m_layers)
 		if (it->m_icon)
-			it->m_icon->SetTextureColor(it->m_color ? it->m_color : color);
+			it->m_icon->SetTextureColor(color);
 }
 
 //Alundaio
@@ -172,17 +164,16 @@ void CUIInventoryCellItem::RemoveLayer(SIconLayer* layer)
     }
 }
 
-void CUIInventoryCellItem::CreateLayer(pcstr section, Fvector2 offset, u32 color, float scale)
+void CUIInventoryCellItem::CreateLayer(pcstr name, Fvector2 offset, float scale)
 {
 	SIconLayer* layer = new SIconLayer();
-	layer->m_name = section;
+	layer->m_name = name;
 	layer->offset = offset;
-	layer->m_color = color;
 	layer->m_scale = scale;
 	m_layers.push_back(layer);
 }
 
-CUIStatic* CUIInventoryCellItem::InitLayer(CUIStatic* s, pcstr section, Fvector2 addon_offset, bool b_rotate, u32 color, float scale)
+CUIStatic* CUIInventoryCellItem::InitLayer(CUIStatic* s, pcstr section, Fvector2 addon_offset, bool b_rotate, float scale)
 {
 
 	if (!s)
@@ -191,7 +182,7 @@ CUIStatic* CUIInventoryCellItem::InitLayer(CUIStatic* s, pcstr section, Fvector2
 		s->SetAutoDelete(true);
 		AttachChild(s);
 		s->SetShader(InventoryUtilities::GetEquipmentIconsShader());
-		s->SetTextureColor(color ? color : GetTextureColor());
+		s->SetTextureColor(GetTextureColor());
 	}
 
 	Frect					tex_rect;

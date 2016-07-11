@@ -183,7 +183,17 @@ void CRender::level_Unload()
 
     //*** Shaders
     Shaders.clear();
-    b_loaded = FALSE;
+
+    if (ps_clear_models_on_unload == true)
+    {
+        Models->ClearPool(true);
+        Visuals.clear();
+        RImplementation.Resources->Dump(false);
+        //static int unload_counter = 0;
+        //Msg("The Level Unloaded.======================== %d", ++unload_counter);
+    }
+
+    b_loaded = false;
 }
 
 void CRender::LoadBuffers(CStreamReader* base_fs, BOOL _alternative)
