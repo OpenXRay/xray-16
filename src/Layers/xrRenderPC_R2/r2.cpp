@@ -272,10 +272,11 @@ void					CRender::create					()
 	}
 
 	// constants
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup	("parallax",	&binder_parallax);
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup	("water_intensity",	&binder_water_intensity);
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup	("sun_shafts_intensity",	&binder_sun_shafts_intensity);
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup	("pos_decompression_params",	&binder_pos_decompress_params);
+	CResourceManager* RM = dxRenderDeviceRender::Instance().Resources;
+	RM->RegisterConstantSetup("parallax",	&binder_parallax);
+	RM->RegisterConstantSetup("water_intensity", &binder_water_intensity);
+	RM->RegisterConstantSetup("sun_shafts_intensity", &binder_sun_shafts_intensity);
+	RM->RegisterConstantSetup("pos_decompression_params", &binder_pos_decompress_params);
 
 	c_lmaterial					= "L_material";
 	c_sbase						= "s_base";
@@ -1004,7 +1005,7 @@ HRESULT	CRender::shader_compile			(
 	FS.file_list	( m_file_set, folder_name, FS_ListFiles | FS_RootOnly, "*");
 
 	string_path temp_file_name, file_name;
-	if ( !match_shader_id(name, sh_name, m_file_set, temp_file_name) ) {
+	if (ps_use_precompiled_shaders == 0 || !match_shader_id(name, sh_name, m_file_set, temp_file_name)) {
 //		Msg				( "no library shader found" );
 		string_path file;
 		xr_strcpy		( file, "shaders_cache\\r2\\" );

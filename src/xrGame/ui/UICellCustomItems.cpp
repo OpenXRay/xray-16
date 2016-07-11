@@ -53,14 +53,15 @@ CUIInventoryCellItem::CUIInventoryCellItem(CInventoryItem* itm)
 
 		Fvector2 offset;
 		offset.x = pSettings->r_float(itm->m_section_id, strconcat(sizeof(buf),buf,std::to_string(itrNum).c_str(),"icon_layer_x"));
-		offset.x = pSettings->r_float(itm->m_section_id, strconcat(sizeof(buf), buf, std::to_string(itrNum).c_str(), "icon_layer_y"));
+		offset.y = pSettings->r_float(itm->m_section_id, strconcat(sizeof(buf), buf, std::to_string(itrNum).c_str(), "icon_layer_y"));
 
-		float scale = pSettings->line_exist(itm->m_section_id, field) ? pSettings->r_float(itm->m_section_id, strconcat(sizeof(buf), buf, std::to_string(itrNum).c_str(), "icon_layer_scale")) : 1.0f;
+		LPCSTR field_scale = strconcat(sizeof(buf), buf, std::to_string(itrNum).c_str(), "icon_layer_scale");
+		float scale = pSettings->line_exist(itm->m_section_id, field_scale) ? pSettings->r_float(itm->m_section_id, field_scale) : 1.0f;
 
-		LPCSTR field_color = strconcat(sizeof(buf), buf, std::to_string(itrNum).c_str(), "icon_layer_color");
-		u32 color = pSettings->line_exist(itm->m_section_id, field_color) ? pSettings->r_color(itm->m_section_id, field_color) : GetTextureColor();
+		//LPCSTR field_color = strconcat(sizeof(buf), buf, std::to_string(itrNum).c_str(), "icon_layer_color");
+		//u32 color = pSettings->line_exist(itm->m_section_id, field_color) ? pSettings->r_color(itm->m_section_id, field_color) : 0;
 
-		CreateLayer(section, offset, color, scale);
+		CreateLayer(section, offset, scale);
 
 		itrNum++;
 
@@ -74,7 +75,7 @@ void CUIInventoryCellItem::OnAfterChild(CUIDragDropListEx* parent_list)
 
 	for (xr_vector<SIconLayer*>::iterator it = m_layers.begin(); m_layers.end() != it; ++it)
 	{
-		(*it)->m_icon = InitLayer((*it)->m_icon, (*it)->m_name, (*it)->offset, parent_list->GetVerticalPlacement(), (*it)->m_color, (*it)->m_scale);
+		(*it)->m_icon = InitLayer((*it)->m_icon, (*it)->m_name, (*it)->offset, parent_list->GetVerticalPlacement(), (*it)->m_scale);
 	}
 }
 
@@ -119,7 +120,7 @@ CUIDragItem* CUIInventoryCellItem::CreateDragItem()
 		s = xr_new<CUIStatic>(); 
 		s->SetAutoDelete(true);
 		s->SetShader(InventoryUtilities::GetEquipmentIconsShader());
-		InitLayer(s, (*it)->m_name, (*it)->offset, false, (*it)->m_color, (*it)->m_scale);
+		InitLayer(s, (*it)->m_name, (*it)->offset, false, (*it)->m_scale);
 		s->SetTextureColor(i->wnd()->GetTextureColor());
 		i->wnd()->AttachChild(s);
 	}
@@ -132,7 +133,7 @@ void CUIInventoryCellItem::SetTextureColor(u32 color)
 	for (xr_vector<SIconLayer*>::iterator it = m_layers.begin(); m_layers.end() != it; ++it)
 	{
 		if ((*it)->m_icon)
-			(*it)->m_icon->SetTextureColor((*it)->m_color ? (*it)->m_color : color);
+			(*it)->m_icon->SetTextureColor(color);
 	}
 }
 
@@ -163,17 +164,17 @@ void CUIInventoryCellItem::RemoveLayer(SIconLayer* layer)
 	}
 }
 
-void CUIInventoryCellItem::CreateLayer(LPCSTR section, Fvector2 offset, u32 color, float scale)
+void CUIInventoryCellItem::CreateLayer(LPCSTR section, Fvector2 offset, float scale)
 {
 	SIconLayer* layer = xr_new<SIconLayer>();
 	layer->m_name = section;
 	layer->offset = offset;
-	layer->m_color = color;
+	//layer->m_color = color;
 	layer->m_scale = scale;
 	m_layers.push_back(layer);
 }
 
-CUIStatic* CUIInventoryCellItem::InitLayer(CUIStatic* s, LPCSTR section, Fvector2 addon_offset, bool b_rotate, u32 color, float scale)
+CUIStatic* CUIInventoryCellItem::InitLayer(CUIStatic* s, LPCSTR section, Fvector2 addon_offset, bool b_rotate, float scale)
 {
 
 	if (!s)
@@ -182,7 +183,7 @@ CUIStatic* CUIInventoryCellItem::InitLayer(CUIStatic* s, LPCSTR section, Fvector
 		s->SetAutoDelete(true);
 		AttachChild(s);
 		s->SetShader(InventoryUtilities::GetEquipmentIconsShader());
-		s->SetTextureColor(color ? color : GetTextureColor());
+		s->SetTextureColor(GetTextureColor());
 	}
 
 	Frect					tex_rect;
@@ -264,7 +265,8 @@ void CUIInventoryCellItem::Update()
 
 	for (xr_vector<SIconLayer*>::iterator it = m_layers.begin(); m_layers.end() != it; ++it)
 	{
-		(*it)->m_icon = InitLayer((*it)->m_icon, (*it)->m_name, (*it)->offset, Heading(), (*it)->m_color, (*it)->m_scale);
+		(*it)->m_icon = InitLayer((*it)->m_icon, (*it)->m_name, (*it)->offset, Heading(), (*it)->m_scale);
+		(*it)->m_icon->SetTextureColor(color);
 	}
 }
 

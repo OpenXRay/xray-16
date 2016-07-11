@@ -374,12 +374,13 @@ void					CRender::create					()
 	}
 
 	// constants
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup	("parallax",	&binder_parallax);
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup	("water_intensity",	&binder_water_intensity);
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup	("sun_shafts_intensity",	&binder_sun_shafts_intensity);
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup	("m_AlphaRef",	&binder_alpha_ref);
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup	("pos_decompression_params",	&binder_pos_decompress_params);
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup	("pos_decompression_params2",	&binder_pos_decompress_params2);
+	CResourceManager* RM = dxRenderDeviceRender::Instance().Resources;
+	RM->RegisterConstantSetup("parallax",	&binder_parallax);
+	RM->RegisterConstantSetup("water_intensity", &binder_water_intensity);
+	RM->RegisterConstantSetup("sun_shafts_intensity", &binder_sun_shafts_intensity);
+	RM->RegisterConstantSetup("m_AlphaRef", &binder_alpha_ref);
+	RM->RegisterConstantSetup("pos_decompression_params", &binder_pos_decompress_params);
+	RM->RegisterConstantSetup("pos_decompression_params2", &binder_pos_decompress_params2);
 
 	c_lmaterial					= "L_material";
 	c_sbase						= "s_base";
@@ -1360,7 +1361,7 @@ HRESULT	CRender::shader_compile			(
 	FS.file_list	( m_file_set, folder_name, FS_ListFiles | FS_RootOnly, "*");
 
 	string_path temp_file_name, file_name;
-	if ( !match_shader_id(name, sh_name, m_file_set, temp_file_name) ) {
+	if (ps_use_precompiled_shaders == 0 || !match_shader_id(name, sh_name, m_file_set, temp_file_name)) {
 		string_path file;
 		xr_strcpy		( file, "shaders_cache\\r3\\" );
 		xr_strcat		( file, name );

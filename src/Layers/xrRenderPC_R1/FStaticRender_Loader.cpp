@@ -181,37 +181,40 @@ void CRender::LoadBuffers	(CStreamReader *base_fs)
 		u32 count				= fs->r_u32();
 		DCL.resize				(count);
 		VB.resize				(count);
+
+		u32					buffer_size = (MAXD3DDECLLENGTH + 1)*sizeof(D3DVERTEXELEMENT9);
+		D3DVERTEXELEMENT9	*dcl = (D3DVERTEXELEMENT9*)_alloca(buffer_size); //Alundaio: moved out of loop!
+
 		for (u32 i=0; i<count; i++)
 		{
 			// decl
 
-//			D3DVERTEXELEMENT9	*dcl = (D3DVERTEXELEMENT9*) fs->pointer();
-			u32					buffer_size = (MAXD3DDECLLENGTH+1)*sizeof(D3DVERTEXELEMENT9);
-			D3DVERTEXELEMENT9	*dcl = (D3DVERTEXELEMENT9*)_alloca(buffer_size);
-			fs->r				(dcl,buffer_size);
-			fs->advance			(-(int)buffer_size);
+			//			D3DVERTEXELEMENT9	*dcl = (D3DVERTEXELEMENT9*) fs->pointer();
 
-			u32 dcl_len			= D3DXGetDeclLength		(dcl)+1;
+			fs->r(dcl, buffer_size);
+			fs->advance(-(int)buffer_size);
 
-			DCL[i].resize		(dcl_len);
-			fs->r				(DCL[i].begin(),dcl_len*sizeof(D3DVERTEXELEMENT9));
+			u32 dcl_len = D3DXGetDeclLength(dcl) + 1;
+
+			DCL[i].resize(dcl_len);
+			fs->r(DCL[i].begin(), dcl_len*sizeof(D3DVERTEXELEMENT9));
 			//.????????? remove T&B from DCL[]
 
 			// count, size
-			u32 vCount			= fs->r_u32	();
-			u32 vSize			= D3DXGetDeclVertexSize	(dcl,0);
-			Msg	("* [Loading VB] %d verts, %d Kb",vCount,(vCount*vSize)/1024);
+			u32 vCount = fs->r_u32();
+			u32 vSize = D3DXGetDeclVertexSize(dcl, 0);
+			Msg("* [Loading VB] %d verts, %d Kb", vCount, (vCount*vSize) / 1024);
 
 			// Create and fill
-			BYTE*	pData		= 0;
-			R_CHK				(HW.pDevice->CreateVertexBuffer(vCount*vSize,dwUsage,0,D3DPOOL_MANAGED,&VB[i],0));
-			HW.stats_manager.increment_stats		( vCount*vSize, enum_stats_buffer_type_vertex, D3DPOOL_MANAGED);
-			R_CHK				(VB[i]->Lock(0,0,(void**)&pData,0));
-			fs->r				(pData,vCount*vSize);
-//			CopyMemory			(pData,fs->pointer(),vCount*vSize);	//.???? copy while skip T&B
-			VB[i]->Unlock		();
+			BYTE*	pData = 0;
+			R_CHK(HW.pDevice->CreateVertexBuffer(vCount*vSize, dwUsage, 0, D3DPOOL_MANAGED, &VB[i], 0));
+			HW.stats_manager.increment_stats(vCount*vSize, enum_stats_buffer_type_vertex, D3DPOOL_MANAGED);
+			R_CHK(VB[i]->Lock(0, 0, (void**)&pData, 0));
+			fs->r(pData, vCount*vSize);
+			//			CopyMemory			(pData,fs->pointer(),vCount*vSize);	//.???? copy while skip T&B
+			VB[i]->Unlock();
 
-//			fs->advance			(vCount*vSize);
+			//			fs->advance			(vCount*vSize);
 		}
 		fs->close				();
 	} else {

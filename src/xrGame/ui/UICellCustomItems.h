@@ -8,7 +8,7 @@ struct SIconLayer
 	LPCSTR m_name;
 	CUIStatic* m_icon;
 	Fvector2 offset;
-	u32 m_color;
+	//u32 m_color;
 	float m_scale;
 };
 
@@ -31,8 +31,8 @@ public:
 
 				xr_vector<SIconLayer*>		m_layers;
 				void						RemoveLayer					(SIconLayer* layer);
-				void						CreateLayer					(LPCSTR name, Fvector2 offset, u32 color, float scale);
-				CUIStatic*					InitLayer					(CUIStatic* s, LPCSTR section, Fvector2 addon_offset, bool b_rotate, u32 color, float scale);
+				void						CreateLayer					(LPCSTR name, Fvector2 offset, float scale);
+				CUIStatic*					InitLayer					(CUIStatic* s, LPCSTR section, Fvector2 addon_offset, bool b_rotate, float scale);
 				//-Alundaio
 };
 
