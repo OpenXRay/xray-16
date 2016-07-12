@@ -89,8 +89,12 @@ void CWeaponMagazined::Load(LPCSTR section)
     //Alundaio: LAYERED_SND_SHOOT
 #ifdef LAYERED_SND_SHOOT
     m_layered_sounds.LoadSound(section, "snd_shoot", "sndShot", true, m_eSoundShot);
+    if (WeaponSoundExist(section, "snd_shoot_actor"))
+        m_layered_sounds.LoadSound(section, "snd_shoot_actor", "sndShotActor", false, m_eSoundShot);
 #else
-    m_sounds.LoadSound(section, "snd_shoot", "sndShot", true, m_eSoundShot);  //Alundaio: Set exclusive to true 
+    m_sounds.LoadSound(section, "snd_shoot", "sndShot", true, m_eSoundShot);  //Alundaio: Set exclusive to true
+    if (WeaponSoundExist(section, "snd_shoot_actor"))
+        m_sounds.LoadSound(section, "snd_shoot_actor", "sndShot", false, m_eSoundShot);
 #endif
     //-Alundaio
 
@@ -114,7 +118,17 @@ void CWeaponMagazined::Load(LPCSTR section)
         if (pSettings->line_exist(section, "silencer_smoke_particles"))
             m_sSilencerSmokeParticles = pSettings->r_string(section, "silencer_smoke_particles");
 
+    //Alundaio: LAYERED_SND_SHOOT Silencer
+ #ifdef LAYERED_SND_SHOOT
+        m_layered_sounds.LoadSound(section, "snd_silncer_shot", "sndSilencerShot", false, m_eSoundShot);
+        if (WeaponSoundExist(section, "snd_silncer_shot_actor"))
+            m_layered_sounds.LoadSound(section, "snd_silncer_shot_actor", "sndSilencerShotActor", false, m_eSoundShot);
+ #else
         m_sounds.LoadSound(section, "snd_silncer_shot", "sndSilencerShot", false, m_eSoundShot);
+        if (WeaponSoundExist(section, "snd_silncer_shot_actor"))
+            m_sounds.LoadSound(section, "snd_silncer_shot_actor", "sndSilencerShotActor", false, m_eSoundShot);
+ #endif
+    //-Alundaio
     }
 
     m_iBaseDispersionedBulletsCount = READ_IF_EXISTS(pSettings, r_u8, section, "base_dispersioned_bullets_count", 0);
@@ -183,7 +197,7 @@ void CWeaponMagazined::FireStart()
     { // misfire
         //Alundaio
 #ifdef EXTENDED_WEAPON_CALLBACKS
-        CGameObject	*object = smart_cast<CGameObject*>(H_Parent());
+        IGameObject	*object = smart_cast<IGameObject*>(H_Parent());
         if (object)
             object->callback(GameObject::eOnWeaponJammed)(object->lua_game_object(), this->lua_game_object());
 #endif
@@ -627,8 +641,34 @@ void CWeaponMagazined::OnShot()
     // Sound
     //Alundaio: LAYERED_SND_SHOOT
 #ifdef LAYERED_SND_SHOOT
+    //Alundaio: Actor sounds
+    if (ParentIsActor())
+    {
+        if (strcmp(m_sSndShotCurrent.c_str(), "sndShot") == 0
+            && pSettings->line_exist(m_section_id, "snd_shoot_actor")
+            && m_layered_sounds.FindSoundItem("sndShotActor", false))
+            m_sSndShotCurrent = "sndShotActor";
+        else if (strcmp(m_sSndShotCurrent.c_str(), "sndSilencerShot") == 0
+            && pSettings->line_exist(m_section_id, "snd_silncer_shot_actor")
+            && m_layered_sounds.FindSoundItem("sndSilencerShotActor", false))
+            m_sSndShotCurrent = "sndSilencerShotActor";
+    }
+    //-Alundaio
     m_layered_sounds.PlaySound(m_sSndShotCurrent.c_str(), get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
 #else
+    //Alundaio: Actor sounds
+    if (ParentIsActor())
+    {
+        if (strcmp(m_sSndShotCurrent.c_str(), "sndShot") == 0
+            && pSettings->line_exist(m_section_id, "snd_shoot_actor")
+            && m_sounds.FindSoundItem("sndShotActor", false))
+            m_sSndShotCurrent = "sndShotActor";
+        else if (strcmp(m_sSndShotCurrent.c_str(), "sndSilencerShot") == 0
+            && pSettings->line_exist(m_section_id, "snd_silncer_shot_actor")
+            && m_sounds.FindSoundItem("sndSilencerShotActor", false))
+            m_sSndShotCurrent = "sndSilencerShotActor";
+    }
+    //-Alundaio
     PlaySound(m_sSndShotCurrent.c_str(), get_LastFP(), (u8)(m_iShotNum - 1)); //Alundaio: Play sound at index (ie. snd_shoot, snd_shoot1, snd_shoot2, snd_shoot3)
 #endif
     //-Alundaio
