@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Common/Platform.hpp"
+#include "_types.h"
 
 template <class T>
 struct _vector4

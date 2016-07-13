@@ -1,5 +1,8 @@
 #ifndef __M__
 #define __M__
+#include "_vector2.h"
+#include "_vector3d.h"
+#include "_vector4.h"
 /*
 * DirectX-compliant, ie row-column order, ie m[Row][Col].
 * Same as:
@@ -24,6 +27,8 @@
 // NOTE_2: mul(A,B) means transformation B, followed by A
 // NOTE_3: I,J,K,C equals to R,N,D,T
 // NOTE_4: The rotation sequence is ZXY
+
+template <class T> struct _quaternion;
 
 template <class T>
 struct _matrix
@@ -84,80 +89,16 @@ public:
         _44_ = 1;
         return *this;
     }
-    ICF SelfRef identity(void)
-    {
-        _11 = 1;
-        _12 = 0;
-        _13 = 0;
-        _14 = 0;
-        _21 = 0;
-        _22 = 1;
-        _23 = 0;
-        _24 = 0;
-        _31 = 0;
-        _32 = 0;
-        _33 = 1;
-        _34 = 0;
-        _41 = 0;
-        _42 = 0;
-        _43 = 0;
-        _44 = 1;
-        return *this;
-    }
-    IC SelfRef rotation(const _quaternion<T>& Q);
-    ICF SelfRef mk_xform(const _quaternion<T>& Q, const Tvector& V);
+    SelfRef identity();
+    SelfRef rotation(const _quaternion<T>& Q);
+    SelfRef mk_xform(const _quaternion<T>& Q, const Tvector& V);
 
     // Multiply RES = A[4x4]*B[4x4] (WITH projection)
-    ICF SelfRef mul(const Self& A, const Self& B)
-    {
-        VERIFY((this != &A) && (this != &B));
-        m[0][0] = A.m[0][0] * B.m[0][0] + A.m[1][0] * B.m[0][1] + A.m[2][0] * B.m[0][2] + A.m[3][0] * B.m[0][3];
-        m[0][1] = A.m[0][1] * B.m[0][0] + A.m[1][1] * B.m[0][1] + A.m[2][1] * B.m[0][2] + A.m[3][1] * B.m[0][3];
-        m[0][2] = A.m[0][2] * B.m[0][0] + A.m[1][2] * B.m[0][1] + A.m[2][2] * B.m[0][2] + A.m[3][2] * B.m[0][3];
-        m[0][3] = A.m[0][3] * B.m[0][0] + A.m[1][3] * B.m[0][1] + A.m[2][3] * B.m[0][2] + A.m[3][3] * B.m[0][3];
-
-        m[1][0] = A.m[0][0] * B.m[1][0] + A.m[1][0] * B.m[1][1] + A.m[2][0] * B.m[1][2] + A.m[3][0] * B.m[1][3];
-        m[1][1] = A.m[0][1] * B.m[1][0] + A.m[1][1] * B.m[1][1] + A.m[2][1] * B.m[1][2] + A.m[3][1] * B.m[1][3];
-        m[1][2] = A.m[0][2] * B.m[1][0] + A.m[1][2] * B.m[1][1] + A.m[2][2] * B.m[1][2] + A.m[3][2] * B.m[1][3];
-        m[1][3] = A.m[0][3] * B.m[1][0] + A.m[1][3] * B.m[1][1] + A.m[2][3] * B.m[1][2] + A.m[3][3] * B.m[1][3];
-
-        m[2][0] = A.m[0][0] * B.m[2][0] + A.m[1][0] * B.m[2][1] + A.m[2][0] * B.m[2][2] + A.m[3][0] * B.m[2][3];
-        m[2][1] = A.m[0][1] * B.m[2][0] + A.m[1][1] * B.m[2][1] + A.m[2][1] * B.m[2][2] + A.m[3][1] * B.m[2][3];
-        m[2][2] = A.m[0][2] * B.m[2][0] + A.m[1][2] * B.m[2][1] + A.m[2][2] * B.m[2][2] + A.m[3][2] * B.m[2][3];
-        m[2][3] = A.m[0][3] * B.m[2][0] + A.m[1][3] * B.m[2][1] + A.m[2][3] * B.m[2][2] + A.m[3][3] * B.m[2][3];
-
-        m[3][0] = A.m[0][0] * B.m[3][0] + A.m[1][0] * B.m[3][1] + A.m[2][0] * B.m[3][2] + A.m[3][0] * B.m[3][3];
-        m[3][1] = A.m[0][1] * B.m[3][0] + A.m[1][1] * B.m[3][1] + A.m[2][1] * B.m[3][2] + A.m[3][1] * B.m[3][3];
-        m[3][2] = A.m[0][2] * B.m[3][0] + A.m[1][2] * B.m[3][1] + A.m[2][2] * B.m[3][2] + A.m[3][2] * B.m[3][3];
-        m[3][3] = A.m[0][3] * B.m[3][0] + A.m[1][3] * B.m[3][1] + A.m[2][3] * B.m[3][2] + A.m[3][3] * B.m[3][3];
-        return *this;
-    }
+    SelfRef mul(const Self& A, const Self& B);
 
     // Multiply RES = A[4x3]*B[4x3] (no projection), faster than ordinary multiply
-    ICF SelfRef mul_43(const Self& A, const Self& B)
-    {
-        VERIFY((this != &A) && (this != &B));
-        m[0][0] = A.m[0][0] * B.m[0][0] + A.m[1][0] * B.m[0][1] + A.m[2][0] * B.m[0][2];
-        m[0][1] = A.m[0][1] * B.m[0][0] + A.m[1][1] * B.m[0][1] + A.m[2][1] * B.m[0][2];
-        m[0][2] = A.m[0][2] * B.m[0][0] + A.m[1][2] * B.m[0][1] + A.m[2][2] * B.m[0][2];
-        m[0][3] = 0;
+    SelfRef mul_43(const Self& A, const Self& B);
 
-        m[1][0] = A.m[0][0] * B.m[1][0] + A.m[1][0] * B.m[1][1] + A.m[2][0] * B.m[1][2];
-        m[1][1] = A.m[0][1] * B.m[1][0] + A.m[1][1] * B.m[1][1] + A.m[2][1] * B.m[1][2];
-        m[1][2] = A.m[0][2] * B.m[1][0] + A.m[1][2] * B.m[1][1] + A.m[2][2] * B.m[1][2];
-        m[1][3] = 0;
-
-        m[2][0] = A.m[0][0] * B.m[2][0] + A.m[1][0] * B.m[2][1] + A.m[2][0] * B.m[2][2];
-        m[2][1] = A.m[0][1] * B.m[2][0] + A.m[1][1] * B.m[2][1] + A.m[2][1] * B.m[2][2];
-        m[2][2] = A.m[0][2] * B.m[2][0] + A.m[1][2] * B.m[2][1] + A.m[2][2] * B.m[2][2];
-        m[2][3] = 0;
-
-        m[3][0] = A.m[0][0] * B.m[3][0] + A.m[1][0] * B.m[3][1] + A.m[2][0] * B.m[3][2] + A.m[3][0];
-        m[3][1] = A.m[0][1] * B.m[3][0] + A.m[1][1] * B.m[3][1] + A.m[2][1] * B.m[3][2] + A.m[3][1];
-        m[3][2] = A.m[0][2] * B.m[3][0] + A.m[1][2] * B.m[3][1] + A.m[2][2] * B.m[3][2] + A.m[3][2];
-        m[3][3] = 1;
-        return *this;
-    }
     IC SelfRef mulA_44(const Self& A) // mul after
     {
         Self B;
@@ -186,68 +127,9 @@ public:
         mul_43(A, B);
         return *this;
     };
-    IC SelfRef invert(const Self& a) // important: this is 4x3 invert, not the 4x4 one
-    {
-        // faster than self-invert
-        T fDetInv = (a._11 * (a._22 * a._33 - a._23 * a._32) - a._12 * (a._21 * a._33 - a._23 * a._31) +
-            a._13 * (a._21 * a._32 - a._22 * a._31));
 
-        VERIFY(_abs(fDetInv) > flt_zero);
-        fDetInv = 1.0f / fDetInv;
-
-        _11 = fDetInv * (a._22 * a._33 - a._23 * a._32);
-        _12 = -fDetInv * (a._12 * a._33 - a._13 * a._32);
-        _13 = fDetInv * (a._12 * a._23 - a._13 * a._22);
-        _14 = 0.0f;
-
-        _21 = -fDetInv * (a._21 * a._33 - a._23 * a._31);
-        _22 = fDetInv * (a._11 * a._33 - a._13 * a._31);
-        _23 = -fDetInv * (a._11 * a._23 - a._13 * a._21);
-        _24 = 0.0f;
-
-        _31 = fDetInv * (a._21 * a._32 - a._22 * a._31);
-        _32 = -fDetInv * (a._11 * a._32 - a._12 * a._31);
-        _33 = fDetInv * (a._11 * a._22 - a._12 * a._21);
-        _34 = 0.0f;
-
-        _41 = -(a._41 * _11 + a._42 * _21 + a._43 * _31);
-        _42 = -(a._41 * _12 + a._42 * _22 + a._43 * _32);
-        _43 = -(a._41 * _13 + a._42 * _23 + a._43 * _33);
-        _44 = 1.0f;
-        return *this;
-    }
-
-    IC bool invert_b(const Self& a) // important: this is 4x3 invert, not the 4x4 one
-    {
-        // faster than self-invert
-        T fDetInv = (a._11 * (a._22 * a._33 - a._23 * a._32) - a._12 * (a._21 * a._33 - a._23 * a._31) +
-            a._13 * (a._21 * a._32 - a._22 * a._31));
-
-        if (_abs(fDetInv) <= flt_zero)
-            return false;
-        fDetInv = 1.0f / fDetInv;
-
-        _11 = fDetInv * (a._22 * a._33 - a._23 * a._32);
-        _12 = -fDetInv * (a._12 * a._33 - a._13 * a._32);
-        _13 = fDetInv * (a._12 * a._23 - a._13 * a._22);
-        _14 = 0.0f;
-
-        _21 = -fDetInv * (a._21 * a._33 - a._23 * a._31);
-        _22 = fDetInv * (a._11 * a._33 - a._13 * a._31);
-        _23 = -fDetInv * (a._11 * a._23 - a._13 * a._21);
-        _24 = 0.0f;
-
-        _31 = fDetInv * (a._21 * a._32 - a._22 * a._31);
-        _32 = -fDetInv * (a._11 * a._32 - a._12 * a._31);
-        _33 = fDetInv * (a._11 * a._22 - a._12 * a._21);
-        _34 = 0.0f;
-
-        _41 = -(a._41 * _11 + a._42 * _21 + a._43 * _31);
-        _42 = -(a._41 * _12 + a._42 * _22 + a._43 * _32);
-        _43 = -(a._41 * _13 + a._42 * _23 + a._43 * _33);
-        _44 = 1.0f;
-        return true;
-    }
+    SelfRef invert(const Self& a); // important: this is 4x3 invert, not the 4x4 one
+    bool invert_b(const Self& a); // important: this is 4x3 invert, not the 4x4 one
 
     IC SelfRef invert() // slower than invert other matrix
     {
@@ -256,26 +138,9 @@ public:
         invert(a);
         return *this;
     }
-    IC SelfRef transpose(const Self& matSource) // faster version of transpose
-    {
-        _11 = matSource._11;
-        _12 = matSource._21;
-        _13 = matSource._31;
-        _14 = matSource._41;
-        _21 = matSource._12;
-        _22 = matSource._22;
-        _23 = matSource._32;
-        _24 = matSource._42;
-        _31 = matSource._13;
-        _32 = matSource._23;
-        _33 = matSource._33;
-        _34 = matSource._43;
-        _41 = matSource._14;
-        _42 = matSource._24;
-        _43 = matSource._34;
-        _44 = matSource._44;
-        return *this;
-    }
+
+    SelfRef transpose(const Self& matSource); // faster version of transpose
+
     IC SelfRef transpose() // self transpose - slower
     {
         Self a;
@@ -323,167 +188,20 @@ public:
         return scale(v.x, v.y, v.z);
     }
 
-    IC SelfRef rotateX(T Angle) // rotation about X axis
-    {
-        T cosa = _cos(Angle);
-        T sina = _sin(Angle);
-        i.set(1, 0, 0);
-        _14 = 0;
-        j.set(0, cosa, sina);
-        _24 = 0;
-        k.set(0, -sina, cosa);
-        _34 = 0;
-        c.set(0, 0, 0);
-        _44 = 1;
-        return *this;
-    }
-    IC SelfRef rotateY(T Angle) // rotation about Y axis
-    {
-        T cosa = _cos(Angle);
-        T sina = _sin(Angle);
-        i.set(cosa, 0, -sina);
-        _14 = 0;
-        j.set(0, 1, 0);
-        _24 = 0;
-        k.set(sina, 0, cosa);
-        _34 = 0;
-        c.set(0, 0, 0);
-        _44 = 1;
-        return *this;
-    }
-    IC SelfRef rotateZ(T Angle) // rotation about Z axis
-    {
-        T cosa = _cos(Angle);
-        T sina = _sin(Angle);
-        i.set(cosa, sina, 0);
-        _14 = 0;
-        j.set(-sina, cosa, 0);
-        _24 = 0;
-        k.set(0, 0, 1);
-        _34 = 0;
-        c.set(0, 0, 0);
-        _44 = 1;
-        return *this;
-    }
+    SelfRef rotateX(T Angle); // rotation about X axis
+    SelfRef rotateY(T Angle); // rotation about Y axis
+    SelfRef rotateZ(T Angle); // rotation about Z axis
 
-    IC SelfRef rotation(const Tvector& vdir, const Tvector& vnorm)
-    {
-        Tvector vright;
-        vright.crossproduct(vnorm, vdir).normalize();
-        m[0][0] = vright.x;
-        m[0][1] = vright.y;
-        m[0][2] = vright.z;
-        m[0][3] = 0;
-        m[1][0] = vnorm.x;
-        m[1][1] = vnorm.y;
-        m[1][2] = vnorm.z;
-        m[1][3] = 0;
-        m[2][0] = vdir.x;
-        m[2][1] = vdir.y;
-        m[2][2] = vdir.z;
-        m[2][3] = 0;
-        m[3][0] = 0;
-        m[3][1] = 0;
-        m[3][2] = 0;
-        m[3][3] = 1;
-        return *this;
-    }
+    SelfRef rotation(const Tvector& vdir, const Tvector& vnorm);
 
-    IC SelfRef mapXYZ()
-    {
-        i.set(1, 0, 0);
-        _14 = 0;
-        j.set(0, 1, 0);
-        _24 = 0;
-        k.set(0, 0, 1);
-        _34 = 0;
-        c.set(0, 0, 0);
-        _44 = 1;
-        return *this;
-    }
-    IC SelfRef mapXZY()
-    {
-        i.set(1, 0, 0);
-        _14 = 0;
-        j.set(0, 0, 1);
-        _24 = 0;
-        k.set(0, 1, 0);
-        _34 = 0;
-        c.set(0, 0, 0);
-        _44 = 1;
-        return *this;
-    }
-    IC SelfRef mapYXZ()
-    {
-        i.set(0, 1, 0);
-        _14 = 0;
-        j.set(1, 0, 0);
-        _24 = 0;
-        k.set(0, 0, 1);
-        _34 = 0;
-        c.set(0, 0, 0);
-        _44 = 1;
-        return *this;
-    }
-    IC SelfRef mapYZX()
-    {
-        i.set(0, 1, 0);
-        _14 = 0;
-        j.set(0, 0, 1);
-        _24 = 0;
-        k.set(1, 0, 0);
-        _34 = 0;
-        c.set(0, 0, 0);
-        _44 = 1;
-        return *this;
-    }
-    IC SelfRef mapZXY()
-    {
-        i.set(0, 0, 1);
-        _14 = 0;
-        j.set(1, 0, 0);
-        _24 = 0;
-        k.set(0, 1, 0);
-        _34 = 0;
-        c.set(0, 0, 0);
-        _44 = 1;
-        return *this;
-    }
-    IC SelfRef mapZYX()
-    {
-        i.set(0, 0, 1);
-        _14 = 0;
-        j.set(0, 1, 0);
-        _24 = 0;
-        k.set(1, 0, 0);
-        _34 = 0;
-        c.set(0, 0, 0);
-        _44 = 1;
-        return *this;
-    }
+    SelfRef mapXYZ();
+    SelfRef mapXZY();
+    SelfRef mapYXZ();
+    SelfRef mapYZX();
+    SelfRef mapZXY();
+    SelfRef mapZYX();
 
-    IC SelfRef rotation(const Tvector& axis, T Angle)
-    {
-        T Cosine = _cos(Angle);
-        T Sine = _sin(Angle);
-        m[0][0] = axis.x * axis.x + (1 - axis.x * axis.x) * Cosine;
-        m[0][1] = axis.x * axis.y * (1 - Cosine) + axis.z * Sine;
-        m[0][2] = axis.x * axis.z * (1 - Cosine) - axis.y * Sine;
-        m[0][3] = 0;
-        m[1][0] = axis.x * axis.y * (1 - Cosine) - axis.z * Sine;
-        m[1][1] = axis.y * axis.y + (1 - axis.y * axis.y) * Cosine;
-        m[1][2] = axis.y * axis.z * (1 - Cosine) + axis.x * Sine;
-        m[1][3] = 0;
-        m[2][0] = axis.x * axis.z * (1 - Cosine) + axis.y * Sine;
-        m[2][1] = axis.y * axis.z * (1 - Cosine) - axis.x * Sine;
-        m[2][2] = axis.z * axis.z + (1 - axis.z * axis.z) * Cosine;
-        m[2][3] = 0;
-        m[3][0] = 0;
-        m[3][1] = 0;
-        m[3][2] = 0;
-        m[3][3] = 1;
-        return *this;
-    }
+    SelfRef rotation(const Tvector& axis, T Angle);
 
     // mirror X
     IC SelfRef mirrorX()
@@ -538,56 +256,11 @@ public:
         m[2][2] *= -1;
         return *this;
     }
-    IC SelfRef mul(const Self& A, T v)
-    {
-        m[0][0] = A.m[0][0] * v;
-        m[0][1] = A.m[0][1] * v;
-        m[0][2] = A.m[0][2] * v;
-        m[0][3] = A.m[0][3] * v;
-        m[1][0] = A.m[1][0] * v;
-        m[1][1] = A.m[1][1] * v;
-        m[1][2] = A.m[1][2] * v;
-        m[1][3] = A.m[1][3] * v;
-        m[2][0] = A.m[2][0] * v;
-        m[2][1] = A.m[2][1] * v;
-        m[2][2] = A.m[2][2] * v;
-        m[2][3] = A.m[2][3] * v;
-        m[3][0] = A.m[3][0] * v;
-        m[3][1] = A.m[3][1] * v;
-        m[3][2] = A.m[3][2] * v;
-        m[3][3] = A.m[3][3] * v;
-        return *this;
-    }
-    IC SelfRef mul(T v)
-    {
-        m[0][0] *= v;
-        m[0][1] *= v;
-        m[0][2] *= v;
-        m[0][3] *= v;
-        m[1][0] *= v;
-        m[1][1] *= v;
-        m[1][2] *= v;
-        m[1][3] *= v;
-        m[2][0] *= v;
-        m[2][1] *= v;
-        m[2][2] *= v;
-        m[2][3] *= v;
-        m[3][0] *= v;
-        m[3][1] *= v;
-        m[3][2] *= v;
-        m[3][3] *= v;
-        return *this;
-    }
-    IC SelfRef div(const Self& A, T v)
-    {
-        VERIFY(_abs(v) > 0.000001f);
-        return mul(A, 1.0f / v);
-    }
-    IC SelfRef div(T v)
-    {
-        VERIFY(_abs(v) > 0.000001f);
-        return mul(1.0f / v);
-    }
+
+    SelfRef mul(const Self& A, T v);
+    SelfRef mul(T v);
+    SelfRef div(const Self& A, T v);
+    SelfRef div(T v);
     // fov
     IC SelfRef build_projection(T fFOV, T fAspect, T fNearPlane, T fFarPlane)
     {
@@ -796,52 +469,14 @@ public:
         transform_dir(res, v);
         v.set(res);
     }
-    ICF SelfRef setHPB(T h, T p, T b)
-    {
-        T _ch, _cp, _cb, _sh, _sp, _sb, _cc, _cs, _sc, _ss;
 
-        _sh = _sin(h);
-        _ch = _cos(h);
-        _sp = _sin(p);
-        _cp = _cos(p);
-        _sb = _sin(b);
-        _cb = _cos(b);
-        _cc = _ch * _cb;
-        _cs = _ch * _sb;
-        _sc = _sh * _cb;
-        _ss = _sh * _sb;
-
-        i.set(_cc - _sp * _ss, -_cp * _sb, _sp * _cs + _sc);
-        _14_ = 0;
-        j.set(_sp * _sc + _cs, _cp * _cb, _ss - _sp * _cc);
-        _24_ = 0;
-        k.set(-_cp * _sh, _sp, _cp * _ch);
-        _34_ = 0;
-        c.set(0, 0, 0);
-        _44_ = 1;
-        return *this;
-    }
+    SelfRef setHPB(T h, T p, T b);
     IC SelfRef setXYZ(T x, T y, T z) { return setHPB(y, x, z); }
     IC SelfRef setXYZ(Tvector const& xyz) { return setHPB(xyz.y, xyz.x, xyz.z); }
     IC SelfRef setXYZi(T x, T y, T z) { return setHPB(-y, -x, -z); }
     IC SelfRef setXYZi(Tvector const& xyz) { return setHPB(-xyz.y, -xyz.x, -xyz.z); }
     //
-    IC void getHPB(T& h, T& p, T& b) const
-    {
-        T cy = _sqrt(j.y * j.y + i.y * i.y);
-        if (cy > 16.0f * type_epsilon<T>)
-        {
-            h = (T)-atan2(k.x, k.z);
-            p = (T)-atan2(-k.y, cy);
-            b = (T)-atan2(i.y, j.y);
-        }
-        else
-        {
-            h = (T)-atan2(-i.z, i.x);
-            p = (T)-atan2(-k.y, cy);
-            b = 0;
-        }
-    }
+    void getHPB(T& h, T& p, T& b) const;
     IC void getHPB(Tvector& hpb) const { getHPB(hpb.x, hpb.y, hpb.z); }
     IC void getXYZ(T& x, T& y, T& z) const { getHPB(y, x, z); }
     IC void getXYZ(Tvector& xyz) const { getXYZ(xyz.x, xyz.y, xyz.z); }

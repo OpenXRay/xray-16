@@ -515,11 +515,22 @@ void CLocatorAPI::ProcessOne(LPCSTR path, const _finddata_t& entry)
 IC bool pred_str_ff(const _finddata_t& x, const _finddata_t& y) { return xr_strcmp(x.name, y.name) < 0; }
 bool ignore_name(const char* _name)
 {
-    // ignore windows hidden Thumbs.db
-    if (0 == strcmp(_name, "Thumbs.db"))
+    if (!strcmp(_name, "Thumbs.db"))
+        return true; // ignore windows hidden Thumbs.db
+    if (!strcmp(_name, ".svn"))
+        return true; // ignore ".svn" folders
+    if (!strcmp(_name, ".vs"))
+        return true; // ignore ".vs" folders
+    const size_t len = strlen(_name);
+#define ENDS_WITH(n) (len>sizeof(n) && !strcmp(_name+len-(sizeof(n)-1), n))
+    if (ENDS_WITH(".VC.db"))
         return true;
-    // ignore processing ".svn" folders
-    return (_name[0] == '.' && _name[1] == 's' && _name[2] == 'v' && _name[3] == 'n' && _name[4] == 0);
+    if (ENDS_WITH(".VC.opendb"))
+        return true;
+    if (ENDS_WITH(".sln"))
+        return true;
+#undef ENDS_WITH
+    return false;
 }
 
 // we need to check for file existance

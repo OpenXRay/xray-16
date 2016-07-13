@@ -1,5 +1,6 @@
 #ifndef __V2D__
 #define __V2D__
+#include "Common/inlining_macros.h"
 
 template <class T>
 struct _vector2
@@ -252,9 +253,7 @@ typedef _vector2<double> Dvector2;
 typedef _vector2<int> Ivector2;
 
 template <class T>
-BOOL _valid(const _vector2<T>& v)
-{
-    return _valid((T)v.x) && _valid((T)v.y);
-}
+bool _valid(const _vector2<T>& v)
+{ return _valid((T)v.x) && _valid((T)v.y); }
 
 #endif

@@ -1,6 +1,11 @@
 #ifndef _STD_EXT_internal
 #define _STD_EXT_internal
 
+#include "Common/Platform.hpp"
+#include <math.h>
+#include <float.h>
+#include <stdio.h>
+
 #define BREAK_AT_STRCMP
 #ifndef DEBUG
 #undef BREAK_AT_STRCMP

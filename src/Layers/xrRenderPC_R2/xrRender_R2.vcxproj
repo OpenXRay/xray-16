@@ -511,6 +511,9 @@
       <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\..\utils\xrMiscMath_lib\xrMiscMath_lib.vcxproj">
+      <Project>{cc912a26-e688-49f5-99f4-7a0f9af4e438}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\xrScriptEngine\xrScriptEngine.vcxproj">
       <Project>{132c62de-de85-4978-9675-c78ed4da46f0}</Project>
     </ProjectReference>

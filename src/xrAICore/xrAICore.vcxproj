@@ -234,6 +234,9 @@
     <ProjectReference Include="..\Externals\luabind\src\luabind.vcxproj">
       <Project>{ccd4afae-aa10-42c6-a452-fdee497ccdf1}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\utils\xrMiscMath_lib\xrMiscMath_lib.vcxproj">
+      <Project>{cc912a26-e688-49f5-99f4-7a0f9af4e438}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\xrScriptEngine\xrScriptEngine.vcxproj">
       <Project>{132c62de-de85-4978-9675-c78ed4da46f0}</Project>
     </ProjectReference>

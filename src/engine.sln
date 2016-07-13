@@ -185,6 +185,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oalib", "Externals\OpenAutomate\oalib\oalib.vcxproj", "{61D4856F-FA82-4F02-BB88-909DDFB1FE74}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cryptlib", "Externals\cryptlib.vcxproj", "{C39F4B46-6E89-4074-902E-CA57073044D2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrMiscMath_lib", "utils\xrMiscMath_lib\xrMiscMath_lib.vcxproj", "{CC912A26-E688-49F5-99F4-7A0F9AF4E438}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -913,6 +914,42 @@ Global
 		{C39F4B46-6E89-4074-902E-CA57073044D2}.Release_Dedicated|Win32.Build.0 = Release|Win32
 		{C39F4B46-6E89-4074-902E-CA57073044D2}.Release|Win32.ActiveCfg = Release|Win32
 		{C39F4B46-6E89-4074-902E-CA57073044D2}.Release|Win32.Build.0 = Release|Win32
+		{614AA57F-58D7-45A8-A5FF-93F04B05FAC6}.Release|x64.ActiveCfg = Release|x64
+		{614AA57F-58D7-45A8-A5FF-93F04B05FAC6}.Release|x64.Build.0 = Release|x64
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Debug_Dedicated|Mixed Platforms.ActiveCfg = Debug|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Debug_Dedicated|Mixed Platforms.Build.0 = Debug|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Debug_Dedicated|Win32.ActiveCfg = Debug|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Debug_Dedicated|Win32.Build.0 = Debug|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Debug_Dedicated|x64.ActiveCfg = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Debug_Dedicated|x64.Build.0 = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Debug|Win32.Build.0 = Debug|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Debug|x64.ActiveCfg = Debug|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Mixed_Dedicated|Mixed Platforms.ActiveCfg = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Mixed_Dedicated|Mixed Platforms.Build.0 = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Mixed_Dedicated|Win32.ActiveCfg = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Mixed_Dedicated|Win32.Build.0 = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Mixed_Dedicated|x64.ActiveCfg = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Mixed_Dedicated|x64.Build.0 = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Mixed|Mixed Platforms.ActiveCfg = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Mixed|Mixed Platforms.Build.0 = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Mixed|Win32.ActiveCfg = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Mixed|Win32.Build.0 = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Mixed|x64.ActiveCfg = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Mixed|x64.Build.0 = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Release_Dedicated|Mixed Platforms.ActiveCfg = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Release_Dedicated|Mixed Platforms.Build.0 = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Release_Dedicated|Win32.ActiveCfg = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Release_Dedicated|Win32.Build.0 = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Release_Dedicated|x64.ActiveCfg = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Release_Dedicated|x64.Build.0 = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Release|Win32.ActiveCfg = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Release|Win32.Build.0 = Release|Win32
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -976,6 +1013,7 @@ Global
 		{848E8AB3-9962-4C04-B813-5690399C8A3E} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 		{61D4856F-FA82-4F02-BB88-909DDFB1FE74} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 		{C39F4B46-6E89-4074-902E-CA57073044D2} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
+		{CC912A26-E688-49F5-99F4-7A0F9AF4E438} = {89F6A7EE-3BBE-45D3-A8A8-5D9366CD987B}
 	EndGlobalSection
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}

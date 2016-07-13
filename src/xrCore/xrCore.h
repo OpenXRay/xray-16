@@ -102,11 +102,7 @@
 #pragma warning(disable : 4100) // unreferenced formal parameter
 
 // Our headers
-#ifdef XRCORE_EXPORTS
-#define XRCORE_API XR_EXPORT
-#else
-#define XRCORE_API XR_IMPORT
-#endif
+#include "xrCore_impexp.h"
 
 #include "xrDebug.h"
 #include "vector.h"

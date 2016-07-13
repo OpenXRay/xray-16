@@ -1,5 +1,6 @@
 #pragma once
 #include "xrCore/_types.h"
+#include <string>
 
 struct StackTraceInfo
 {
