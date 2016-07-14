@@ -2287,6 +2287,9 @@
     <Filter Include="Core\Server\QR2 callbacks">
       <UniqueIdentifier>{0e29aa42-d79c-425a-994b-c18169f076de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PCH">
+      <UniqueIdentifier>{c2cce2fe-498b-4192-baf4-c5a1bf9717f0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -4653,12 +4656,6 @@
     <ClInclude Include="ai_space_inline.h">
       <Filter>AI\ASpace</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrServerEntities\pch_script.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="StdAfx.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="CameraFirstEye.h">
       <Filter>Core\Client\Cameras</Filter>
     </ClInclude>
@@ -6651,6 +6648,12 @@
     <ClInclude Include="..\Externals\GameSpy\src\GameSpy\md5.h">
       <Filter>Core\Client\Level\ClientDigestComputer</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrServerEntities\pch_script.h">
+      <Filter>PCH</Filter>
+    </ClInclude>
+    <ClInclude Include="StdAfx.h">
+      <Filter>PCH</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -8014,12 +8017,6 @@
     </ClCompile>
     <ClCompile Include="ai_space.cpp">
       <Filter>AI\ASpace</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrServerEntities\pch_script.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="StdAfx.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="CameraFirstEye.cpp">
       <Filter>Core\Client\Cameras</Filter>
@@ -10159,6 +10156,12 @@
     </ClCompile>
     <ClCompile Include="..\Externals\GameSpy\src\GameSpy\md5c.c">
       <Filter>Core\Client\Level\ClientDigestComputer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrServerEntities\pch_script.cpp">
+      <Filter>PCH</Filter>
+    </ClCompile>
+    <ClCompile Include="StdAfx.cpp">
+      <Filter>PCH</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

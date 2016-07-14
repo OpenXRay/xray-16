@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "xrServerEntities/smart_cast.h" // get_script_wrapper() needs it
 class iphysics_scripted;
 class iphysics_game_scripted
 {
