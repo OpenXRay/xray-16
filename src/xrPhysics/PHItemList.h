@@ -1,7 +1,8 @@
 #ifndef PH_ITEM_LIST_H
 #define PH_ITEM_LIST_H
+#include "xrCore/xrDebug_macros.h" // for pragma todo. Remove once resolved.
 /*
-#define DECLARE_PHLIST_ITEM(class_name)			public:\
+#define DECLARE_PHLIST_ITEM(class_name) public:\
                                                 class CPHListItem\
                                                 {\
                                                     friend class CPHItemList<class_name>;\
@@ -21,7 +22,7 @@
     friend class CPHItemStack<class_name>; \
     u16 stack_pos;
 
-//#define TPI(item)								((T::CPHListItem*)item)
+//#define TPI(item) ((T::CPHListItem*)item)
 
 template <class T>
 class CPHItemList
@@ -33,8 +34,7 @@ protected:
     u16 size;
 
 public:
-    class iterator;
-    typedef class iterator
+    class iterator
     {
         T* my_ptr;
 
@@ -49,24 +49,27 @@ public:
     u16 count() { return size; }
     void push_back(T* item)
     {
+        VERIFY2(size < 65535, "CPHItemList overflow");
         *(last_tome) = item;
         item->tome = last_tome;
         last_tome = &((item)->next);
         item->next = 0;
         size++;
     }
-    void move_items(CPHItemList<T>& sourse_list)
+    void move_items(CPHItemList<T>& source_list)
     {
-        if (!sourse_list.first_next)
+        if (!source_list.first_next)
             return;
-        *(last_tome) = sourse_list.first_next;
-        sourse_list.first_next->tome = last_tome;
-        last_tome = sourse_list.last_tome;
-        size = size + sourse_list.size;
-        sourse_list.empty();
+        VERIFY2(size + source_list.size < 65535, "CPHItemList overflow");
+        *(last_tome) = source_list.first_next;
+        source_list.first_next->tome= last_tome;
+        last_tome = source_list.last_tome;
+        size += source_list.size;
+        source_list.empty();
     }
     void erase(iterator i)
     {
+        VERIFY2(size != 0, "CPHItemList underflow");
         T* item = *i;
         T* next = item->next;
         *(item->tome) = next;
@@ -96,10 +99,11 @@ public:
         CPHItemList<T>::push_back(item);
     }
 };
-#define DEFINE_PHITEM_LIST(T, N, I) \
-    typedef CPHItemList<T> N;       \
+#define DEFINE_PHITEM_LIST(T, N, I)\
+    typedef CPHItemList<T> N;\
     typedef CPHItemList<T>::iterator I;
-#define DEFINE_PHITEM_STACK(T, N, I) \
-    typedef CPHItemStack<T> N;       \
+#define DEFINE_PHITEM_STACK(T, N, I)\
+    typedef CPHItemStack<T> N;\
     typedef CPHItemStack<T>::iterator I;
-#endif
+
+#endif // PH_ITEM_LIST_H
