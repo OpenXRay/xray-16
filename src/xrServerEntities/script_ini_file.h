@@ -55,6 +55,7 @@ public:
     void remove_line(pcstr S, pcstr L);
     void set_override_names(bool b);
     u32 section_count();
+    void set_readonly(bool b);
 };
 
 #include "script_ini_file_inline.h"

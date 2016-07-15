@@ -9,6 +9,7 @@
 #include "pch_script.h"
 #include "script_ini_file.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "xrScriptEngine/Functor.hpp"
 
 using namespace luabind;
 using namespace luabind::policy;
@@ -51,7 +52,19 @@ CScriptIniFile* reload_system_ini()
     pSettings = new CInifile(fname);
     return (CScriptIniFile*)pSettings;
 }
-//Alundaio: END
+
+void section_for_each(CScriptIniFile* self, luabind::functor<bool> functor)
+{
+    using sections_type = CInifile::Root;
+    sections_type& sections = self->sections();
+
+    for (auto& section : sections)
+    {
+        if (functor(section->Name.c_str()) == true)
+            return;
+    }
+}
+//-Alundaio
 
 #ifdef XRGAME_EXPORTS
 CScriptIniFile* get_game_ini() { return (CScriptIniFile*)pGameIni; }
@@ -85,6 +98,8 @@ static void CScriptIniFile_Export(lua_State* luaState)
             .def("remove_line", &CScriptIniFile::remove_line)
             .def("set_override_names", &CScriptIniFile::set_override_names)
             .def("section_count", &CScriptIniFile::section_count)
+            .def("section_for_each", &section_for_each)
+            .def("set_readonly", &CScriptIniFile::set_readonly)
             //Alundaio: END
             .def("section_exist", &CScriptIniFile::section_exist)
             .def("line_exist", (bool (CScriptIniFile::*)(LPCSTR, LPCSTR) const)&CScriptIniFile::line_exist)
@@ -104,7 +119,7 @@ static void CScriptIniFile_Export(lua_State* luaState)
 #endif
             //Alundaio: extend
             def("reload_system_ini", &reload_system_ini),
-            //Alundaio:: END
+            //-Alundaio
             def("system_ini", &get_system_ini), def("create_ini_file", &create_ini_file, adopt<0>())
     ];
 }

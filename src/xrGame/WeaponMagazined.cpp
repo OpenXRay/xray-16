@@ -638,7 +638,7 @@ void CWeaponMagazined::state_MagEmpty(float dt) {}
 void CWeaponMagazined::SetDefaults() { CWeapon::SetDefaults(); }
 void CWeaponMagazined::OnShot()
 {
-    // Sound
+    // SoundWeaponMagazined.cpp
     //Alundaio: LAYERED_SND_SHOOT
 #ifdef LAYERED_SND_SHOOT
     //Alundaio: Actor sounds
@@ -647,13 +647,15 @@ void CWeaponMagazined::OnShot()
         if (strcmp(m_sSndShotCurrent.c_str(), "sndShot") == 0
             && pSettings->line_exist(m_section_id, "snd_shoot_actor")
             && m_layered_sounds.FindSoundItem("sndShotActor", false))
-            m_sSndShotCurrent = "sndShotActor";
+            m_layered_sounds.PlaySound("sndShotActor", get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
         else if (strcmp(m_sSndShotCurrent.c_str(), "sndSilencerShot") == 0
             && pSettings->line_exist(m_section_id, "snd_silncer_shot_actor")
             && m_layered_sounds.FindSoundItem("sndSilencerShotActor", false))
-            m_sSndShotCurrent = "sndSilencerShotActor";
+            m_layered_sounds.PlaySound("sndSilencerShotActor", get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
+        else
+            m_layered_sounds.PlaySound(m_sSndShotCurrent.c_str(), get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
     }
-    //-Alundaio
+    else
     m_layered_sounds.PlaySound(m_sSndShotCurrent.c_str(), get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
 #else
     //Alundaio: Actor sounds
@@ -662,14 +664,14 @@ void CWeaponMagazined::OnShot()
         if (strcmp(m_sSndShotCurrent.c_str(), "sndShot") == 0
             && pSettings->line_exist(m_section_id, "snd_shoot_actor")
             && m_sounds.FindSoundItem("sndShotActor", false))
-            m_sSndShotCurrent = "sndShotActor";
+            PlaySound("sndShotActor", get_LastFP(), (u8)(m_iShotNum - 1));
         else if (strcmp(m_sSndShotCurrent.c_str(), "sndSilencerShot") == 0
             && pSettings->line_exist(m_section_id, "snd_silncer_shot_actor")
             && m_sounds.FindSoundItem("sndSilencerShotActor", false))
-            m_sSndShotCurrent = "sndSilencerShotActor";
+            PlaySound("sndSilencerShotActor", get_LastFP(), (u8)(m_iShotNum - 1));
     }
-    //-Alundaio
-    PlaySound(m_sSndShotCurrent.c_str(), get_LastFP(), (u8)(m_iShotNum - 1)); //Alundaio: Play sound at index (ie. snd_shoot, snd_shoot1, snd_shoot2, snd_shoot3)
+    else //Alundaio: Play sound at index (ie. snd_shoot, snd_shoot1, snd_shoot2, snd_shoot3)
+        PlaySound(m_sSndShotCurrent.c_str(), get_LastFP(), (u8)(m_iShotNum - 1));
 #endif
     //-Alundaio
 

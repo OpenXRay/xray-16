@@ -56,7 +56,6 @@ public:
         return xr_strcmp(str, "on") == 0 || xr_strcmp(str, "yes") == 0 || xr_strcmp(str, "true") == 0 || xr_strcmp(str, "1") == 0;
     }
 
-private:
     enum
     {
         eSaveAtEnd = 1 << 0,
@@ -64,6 +63,8 @@ private:
         eOverrideNames = 1 << 2,
     };
     Flags8 m_flags;
+
+private:
     string_path m_file_name;
     Root DATA;
 

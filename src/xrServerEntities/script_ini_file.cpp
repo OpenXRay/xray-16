@@ -213,7 +213,12 @@ void CScriptIniFile::set_override_names(bool b)
     inherited::set_override_names(b);
 }
 
+void CScriptIniFile::set_readonly(bool b)
+{
+    inherited::m_flags.set(eReadOnly, b);
+}
+
 u32 CScriptIniFile::section_count()
 {
-    return(inherited::section_count());
+    return inherited::section_count();
 }
