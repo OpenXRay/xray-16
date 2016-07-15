@@ -26,6 +26,20 @@ CScriptIniFile *reload_system_ini()
 	pSettings = xr_new<CInifile>(fname);
 	return	((CScriptIniFile*)pSettings);
 }
+
+void section_for_each(CScriptIniFile* self, luabind::functor<bool> functor)
+{
+    typedef CInifile::Root sections_type;
+    sections_type& sections = self->sections();
+
+    sections_type::const_iterator i = sections.begin();
+    sections_type::const_iterator e = sections.end();
+    for (; i != e; ++i)
+    {
+		if (functor((LPCSTR)(*i)->Name.c_str()) == true)
+			return;
+    }
+}
 #endif
 //Alundaio: END
 
@@ -81,7 +95,7 @@ void CScriptIniFile::script_register(lua_State *L)
 			.def(constructor<LPCSTR>())
 			//Alundaio: Extend script ini file
 #ifdef INI_FILE_EXTENDED_EXPORTS
-            .def(constructor<LPCSTR, bool>())
+            //.def(constructor<LPCSTR,BOOL,BOOL,BOOL,BOOL>())
 			.def("w_bool",&CScriptIniFile::w_bool)
 			.def("w_color", &CScriptIniFile::w_color)
 			.def("w_fcolor", &CScriptIniFile::w_fcolor)
@@ -103,6 +117,8 @@ void CScriptIniFile::script_register(lua_State *L)
 			.def("remove_line", &CScriptIniFile::remove_line)
             .def("set_override_names", &CScriptIniFile::set_override_names)
             .def("section_count", &CScriptIniFile::section_count)
+			.def("section_for_each", &::section_for_each)
+			.def("set_readonly", &CScriptIniFile::set_readonly)
 #endif
 			//Alundaio: END
 			.def("section_exist",	&CScriptIniFile::section_exist	)

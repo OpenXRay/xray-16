@@ -103,7 +103,7 @@ Fvector CScriptIniFile::r_fvector3(LPCSTR S, LPCSTR L)
 
 //AVO: additional methods to allow writing to ini files
 #ifdef INI_FILE_EXTENDED_EXPORTS
-void CScriptIniFile::w_bool(LPCSTR S, LPCSTR L, BOOL V, LPCSTR comment)
+void CScriptIniFile::w_bool(LPCSTR S, LPCSTR L, bool V, LPCSTR comment)
 {
     THROW3(inherited::section_exist(S), "Cannot find section", S);
     THROW3(inherited::line_exist(S, L), "Cannot find line", L);
@@ -221,7 +221,7 @@ bool CScriptIniFile::save_as(LPCSTR new_fname)
     return(inherited::save_as(new_fname));
 }
 
-void CScriptIniFile::save_at_end(BOOL b)
+void CScriptIniFile::save_at_end(bool b)
 {
     inherited::save_at_end(b);
 }
@@ -233,13 +233,18 @@ void CScriptIniFile::remove_line(LPCSTR S, LPCSTR L)
     inherited::remove_line(S, L);
 }
 
-void CScriptIniFile::set_override_names(BOOL b)
+void CScriptIniFile::set_override_names(bool b)
 {
     inherited::set_override_names(b);
 }
 
+void CScriptIniFile::set_readonly(bool b)
+{
+	inherited::m_flags.set(eReadOnly, b);
+}
+
 u32 CScriptIniFile::section_count()
 {
-    return(inherited::section_count());
+	return (inherited::section_count());
 }
 #endif

@@ -34,7 +34,7 @@ public:
 			Fvector		r_fvector3			(LPCSTR S, LPCSTR L);
             //AVO: additional methods to allow writing to ini files
 #ifdef INI_FILE_EXTENDED_EXPORTS
-            void w_bool(LPCSTR S, LPCSTR L, BOOL V, LPCSTR comment /* = 0 */);
+            void w_bool(LPCSTR S, LPCSTR L, bool V, LPCSTR comment /* = 0 */);
             void w_color(LPCSTR S, LPCSTR L, u32 V, LPCSTR comment /* = 0 */);
             void w_fcolor(LPCSTR S, LPCSTR L, const Fcolor& V, LPCSTR comment /* = 0 */);
             void w_float(LPCSTR S, LPCSTR L, float V, LPCSTR comment /* = 0 */);
@@ -51,10 +51,11 @@ public:
             void w_u64(LPCSTR S, LPCSTR L, u64 V, LPCSTR comment /* = 0 */);
             void w_u8(LPCSTR S, LPCSTR L, u8 V, LPCSTR comment /* = 0 */);
             bool save_as(LPCSTR new_fname /* = 0 */);
-            void save_at_end(BOOL b);
+            void save_at_end(bool b);
             void remove_line(LPCSTR S, LPCSTR L);
-            void set_override_names(BOOL b);
-            u32 section_count();
+            void set_override_names(bool b);
+			u32 section_count();
+			void set_readonly(bool b);
 #endif
 
 			DECLARE_SCRIPT_REGISTER_FUNCTION
