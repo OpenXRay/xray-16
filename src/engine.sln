@@ -98,9 +98,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrRender_R3", "Layers\xrRenderPC_R3\xrRender_R3.vcxproj", "{3F383D3C-FCD8-4170-990B-EB4833F09248}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrEngine", "xrEngine\xrEngine.vcxproj", "{2578C6D8-660D-48AE-9322-7422F8664F06}"
-	ProjectSection(ProjectDependencies) = postProject
-		{98D24A3D-7666-4C11-9D6E-B10393CE8CBA} = {98D24A3D-7666-4C11-9D6E-B10393CE8CBA}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrLC_Light", "utils\xrLC_Light\xrLC_Light.vcxproj", "{EFB76D6F-0092-439C-A783-C0BE10BD17C9}"
 	ProjectSection(ProjectDependencies) = postProject
