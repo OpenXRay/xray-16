@@ -1,6 +1,6 @@
+#pragma once
 #ifndef xrDebug_macrosH
 #define xrDebug_macrosH
-#pragma once
 
 #define DEBUG_INFO {__FILE__, __LINE__, __FUNCTION__}
 #define CHECK_OR_EXIT(expr, message)\

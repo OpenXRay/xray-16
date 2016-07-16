@@ -1,3 +1,4 @@
+#pragma once
 #ifndef _vector_included
 #define _vector_included
 

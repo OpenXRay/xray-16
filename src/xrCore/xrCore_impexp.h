@@ -1,6 +1,4 @@
-#ifdef _MSC_VER
 #pragma once
-#endif
 #ifndef XRCORE_IMPEXP_H
 #define XRCORE_IMPEXP_H
 #include "Common/xr_impexp_macros.h"
