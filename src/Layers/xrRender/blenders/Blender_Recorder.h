@@ -20,10 +20,10 @@ public:
     LPCSTR detail_texture;
     R_constant_setup* detail_scaler;
 
-    BOOL bEditor;
-    BOOL bDetail;
-    BOOL bDetail_Diffuse;
-    BOOL bDetail_Bump;
+    bool bEditor;
+    bool bDetail;
+    bool bDetail_Diffuse;
+    bool bDetail_Bump;
     BOOL bUseSteepParallax;
     int iElement;
 
