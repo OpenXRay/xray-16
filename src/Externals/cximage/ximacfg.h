@@ -9,12 +9,10 @@ extern "C" void*	cxrealloc(void* ptr, size_t size);
 
 #include "xrCore/xrCore.h"
 
+#ifdef _MSC_VER // TODO: Remove this and instead depend on VS project "References"?
 #pragma comment(lib,"libjpeg.lib")
 #pragma comment(lib,"xrCore.lib")
-
-#ifdef DEBUG
-#include "xrCore/ftimer.h"
-#endif //#ifdef DEBUG
+#endif
 
 #ifdef	CXIMAGE_BUILD
 #	define	CXIMAGE_API	__declspec(dllexport)
