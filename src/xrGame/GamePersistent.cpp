@@ -53,6 +53,9 @@
 //	static	void	ode_free	(void *ptr, size_t size)					{ return xr_free(ptr);				}
 //#endif // DEBUG_MEMORY_MANAGER
 
+// temporary hack to get rid of the Microsoft-specific "__super"
+typedef IGame_Persistent my_super;
+
 CGamePersistent::CGamePersistent(void)
 {
     m_bPickableDOF = false;
@@ -155,7 +158,7 @@ void CGamePersistent::OnAppStart()
     // load game materials
     GMLib.Load();
     init_game_globals();
-    __super ::OnAppStart();
+    my_super::OnAppStart();
     m_pUI_core = new ui_core();
     m_pMainMenu = new CMainMenu();
 }
@@ -168,20 +171,20 @@ void CGamePersistent::OnAppEnd()
     xr_delete(m_pMainMenu);
     xr_delete(m_pUI_core);
 
-    __super ::OnAppEnd();
+    my_super::OnAppEnd();
 
     clean_game_globals();
 
     GMLib.Unload();
 }
 
-void CGamePersistent::Start(LPCSTR op) { __super ::Start(op); }
+void CGamePersistent::Start(LPCSTR op) { my_super::Start(op); }
 void CGamePersistent::Disconnect()
 {
     // destroy ambient particles
     CParticlesObject::Destroy(ambient_particles);
 
-    __super ::Disconnect();
+    my_super::Disconnect();
     // stop all played emitters
     ::Sound->stop_emitters();
     m_game_params.m_e_game_type = eGameIDNoGame;
@@ -191,7 +194,7 @@ void CGamePersistent::Disconnect()
 
 void CGamePersistent::OnGameStart()
 {
-    __super ::OnGameStart();
+    my_super::OnGameStart();
     UpdateGameType();
 }
 
@@ -212,7 +215,7 @@ LPCSTR GameTypeToString(EGameIDs gt, bool bShort)
 
 void CGamePersistent::UpdateGameType()
 {
-    __super ::UpdateGameType();
+    my_super::UpdateGameType();
 
     m_game_params.m_e_game_type = ParseStringToGameType(m_game_params.m_game_type);
 
@@ -224,7 +227,7 @@ void CGamePersistent::UpdateGameType()
 
 void CGamePersistent::OnGameEnd()
 {
-    __super ::OnGameEnd();
+    my_super::OnGameEnd();
 
     xr_delete(g_stalker_animation_data_storage);
     xr_delete(g_stalker_velocity_holder);
@@ -638,7 +641,7 @@ void CGamePersistent::OnFrame()
         }
 #endif // MASTER_GOLD
     }
-    __super ::OnFrame();
+    my_super::OnFrame();
 
     if (!Device.Paused())
         Engine.Sheduler.Update();
