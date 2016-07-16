@@ -674,7 +674,7 @@ void CRender::Render()
     g_pGamePersistent->Environment().RenderFlares(); // lens-flares
     g_pGamePersistent->Environment().RenderLast(); // rain/thunder-bolts
 
-#if DEBUG
+#ifdef DEBUG
     for (int _priority = 0; _priority < 2; ++_priority)
     {
         for (u32 iPass = 0; iPass < SHADER_PASSES_MAX; ++iPass)
