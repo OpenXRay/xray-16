@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: alife_space.h
-//	Created 	: 08.01.2002
-//  Modified 	: 08.01.2003
-//	Author		: Dmitriy Iassenev
-//	Description : ALife space
+//  Module      : alife_space.h
+//  Created     : 08.01.2002
+//  Modified    : 08.01.2003
+//  Author      : Dmitriy Iassenev
+//  Description : ALife space
 ////////////////////////////////////////////////////////////////////////////
 
 #ifndef XRAY_ALIFE_SPACE
@@ -100,7 +100,7 @@ enum EHitType
     eHitTypeStrike,
     eHitTypeExplosion,
     eHitTypeWound_2, // knife's alternative fire
-    //		eHitTypePhysicStrike,
+    //      eHitTypePhysicStrike,
     eHitTypeLightBurn,
     eHitTypeMax,
 };
@@ -157,39 +157,10 @@ enum EWeaponAddonStatus
     eAddonAttachable = 2
 };
 
-IC EHitType g_tfString2HitType(LPCSTR caHitType)
-{
-    if (!stricmp(caHitType, "burn"))
-        return (eHitTypeBurn);
-    else if (!stricmp(caHitType, "light_burn"))
-        return (eHitTypeLightBurn);
-    else if (!stricmp(caHitType, "shock"))
-        return (eHitTypeShock);
-    else if (!stricmp(caHitType, "strike"))
-        return (eHitTypeStrike);
-    else if (!stricmp(caHitType, "wound"))
-        return (eHitTypeWound);
-    else if (!stricmp(caHitType, "radiation"))
-        return (eHitTypeRadiation);
-    else if (!stricmp(caHitType, "telepatic"))
-        return (eHitTypeTelepatic);
-    else if (!stricmp(caHitType, "fire_wound"))
-        return (eHitTypeFireWound);
-    else if (!stricmp(caHitType, "chemical_burn"))
-        return (eHitTypeChemicalBurn);
-    else if (!stricmp(caHitType, "explosion"))
-        return (eHitTypeExplosion);
-    else if (!stricmp(caHitType, "wound_2"))
-        return (eHitTypeWound_2);
-    else
-        FATAL("Unsupported hit type!");
-    NODEFAULT;
-#ifdef DEBUG
-    return (eHitTypeMax);
-#endif
-}
+EHitType g_tfString2HitType(LPCSTR caHitType);
+
 #ifndef _EDITOR
-extern xr_token hit_types_token[];
+extern const xr_token hit_types_token[];
 
 IC LPCSTR g_cafHitType2String(EHitType tHitType) { return get_token_name(hit_types_token, tHitType); }
 #endif
