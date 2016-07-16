@@ -1,5 +1,24 @@
+#pragma once
 #ifndef _STL_EXT_internal
 #define _STL_EXT_internal
+
+#include <string>
+#include <vector>
+#include <deque>
+#include <list>
+#include <set>
+#include <map>
+#include "_types.h"
+#include "_rect.h"
+#include "_plane.h"
+#include "_vector2.h"
+#include "_vector3d.h"
+#include "_color.h"
+#include "_std_extensions.h"
+#include "xrMemory.h"
+#include "xrDebug_macros.h" // only for pragma todo. Remove once handled.
+
+#pragma todo("tamlin: This header includes pretty much every std collection there are. Compiler-hog! FIX!")
 
 using std::swap;
 
@@ -69,7 +88,7 @@ public:
     void clear() { erase(begin(), end()); }
 };
 
-#else
+#else // M_NOSTDCONTAINERS_EXT
 
 template <class T>
 class xalloc
@@ -143,20 +162,6 @@ inline bool operator!=(const xalloc<_Ty>&, const xalloc<_Other>&)
 {
     return (false);
 }
-
-namespace std
-{
-template <class _Tp1, class _Tp2>
-inline xalloc<_Tp2>& __stl_alloc_rebind(xalloc<_Tp1>& __a, const _Tp2*)
-{
-    return (xalloc<_Tp2>&)(__a);
-}
-template <class _Tp1, class _Tp2>
-inline xalloc<_Tp2> __stl_alloc_create(xalloc<_Tp1>&, const _Tp2*)
-{
-    return xalloc<_Tp2>();
-}
-};
 
 // string(char)
 typedef std::basic_string<char, std::char_traits<char>, xalloc<char>> xr_string;
@@ -245,7 +250,7 @@ public:
     typedef typename allocator allocator_type;
     typedef typename allocator_type::value_type value_type;
     typedef typename allocator_type::size_type size_type;
-    u32 size() const { return (u32) __super ::size(); }
+    u32 size() const { return (u32)std::deque<T, allocator>::size(); }
 };
 
 // stack
@@ -275,44 +280,49 @@ protected:
     _C c;
 };
 
+// instantiate the (simplest) member function in the collections, to get xalloc<T> as the default allocator.
 template <typename T, typename allocator = xalloc<T>>
 class xr_list : public std::list<T, allocator>
 {
 public:
-    u32 size() const { return (u32) __super ::size(); }
+    u32 size() const { return (u32)std::list<T, allocator>::size(); }
 };
 template <typename K, class P = std::less<K>, typename allocator = xalloc<K>>
 class xr_set : public std::set<K, P, allocator>
 {
 public:
-    u32 size() const { return (u32) __super ::size(); }
+    u32 size() const { return (u32)std::set<K, P, allocator>::size(); }
 };
 template <typename K, class P = std::less<K>, typename allocator = xalloc<K>>
 class xr_multiset : public std::multiset<K, P, allocator>
 {
 public:
-    u32 size() const { return (u32) __super ::size(); }
+    u32 size() const { return (u32)std::multiset<K, P, allocator>::size(); }
 };
 template <typename K, class V, class P = std::less<K>, typename allocator = xalloc<std::pair<K, V>>>
 class xr_map : public std::map<K, V, P, allocator>
 {
 public:
-    u32 size() const { return (u32) __super ::size(); }
+    u32 size() const { return (u32)std::map<K, V, P, allocator >::size(); }
 };
 template <typename K, class V, class P = std::less<K>, typename allocator = xalloc<std::pair<K, V>>>
 class xr_multimap : public std::multimap<K, V, P, allocator>
 {
 public:
-    u32 size() const { return (u32) __super ::size(); }
+    u32 size() const { return (u32)std::multimap<K, V, P, allocator>::size(); }
 };
 
 #ifdef STLPORT
-template <typename V, class _HashFcn = std::hash<V>, class _EqualKey = std::equal_to<V>, typename allocator = xalloc<V>>
-class xr_hash_set : public std::hash_set<V, _HashFcn, _EqualKey, allocator>
+namespace std
 {
-public:
-    u32 size() const { return (u32) __super ::size(); }
-};
+    template<class _Tp1, class _Tp2>
+    inline xalloc<_Tp2>& __stl_alloc_rebind(xalloc<_Tp1>& __a, const _Tp2*)
+    { return (xalloc<_Tp2>&)(__a); }
+    template<class _Tp1, class _Tp2>
+    inline xalloc<_Tp2> __stl_alloc_create(xalloc<_Tp1>&, const _Tp2*)
+    { return xalloc<_Tp2>(); }
+}
+
 template <typename V, class _HashFcn = std::hash<V>, class _EqualKey = std::equal_to<V>, typename allocator = xalloc<V>>
 class xr_hash_multiset : public std::hash_multiset<V, _HashFcn, _EqualKey, allocator>
 {
@@ -335,6 +345,10 @@ public:
     u32 size() const { return (u32) __super ::size(); }
 };
 #else
+#ifndef _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
+#define _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
+#endif
+#include <hash_map>
 template <typename K, class V, class _Traits = stdext::hash_compare<K, std::less<K>>,
     typename allocator = xalloc<std::pair<K, V>>>
 class xr_hash_map : public stdext::hash_map<K, V, _Traits, allocator>
@@ -344,7 +358,9 @@ public:
 };
 #endif // #ifdef STLPORT
 
-#endif
+#endif // M_NOSTDCONTAINERS_EXT
+
+#pragma todo("tamlin: Why define our own mk_pair? What's wrong with std::make_pair")
 
 struct pred_str : public std::binary_function<char*, char*, bool>
 {
@@ -352,8 +368,10 @@ struct pred_str : public std::binary_function<char*, char*, bool>
 };
 struct pred_stri : public std::binary_function<char*, char*, bool>
 {
-    IC bool operator()(const char* x, const char* y) const { return stricmp(x, y) < 0; }
+    IC bool operator()(const char* x, const char* y) const { return _stricmp(x, y) < 0; }
 };
+
+// tamlin: TODO (low priority, for a rainy day): Rename these macros from DEFINE_* to DECLARE_*
 
 // STL extensions
 #define DEF_VECTOR(N, T)    \
