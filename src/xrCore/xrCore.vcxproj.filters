@@ -121,12 +121,12 @@
     <Filter Include="XML\TinyXML">
       <UniqueIdentifier>{eb0bfab5-c514-4df4-a747-d14beb72f57b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PCH">
+      <UniqueIdentifier>{061cfd8f-ceab-42cf-83c5-bdfb65c5d322}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
-      <Filter>Kernel</Filter>
-    </ClCompile>
-    <ClCompile Include="stdafx.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
     <ClCompile Include="xrCore.cpp">
@@ -354,15 +354,15 @@
     <ClCompile Include="Compression\rt_compressor9.cpp">
       <Filter>Compression</Filter>
     </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>PCH</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
       <Filter>Kernel</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>Kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="stdafx.h">
       <Filter>Kernel</Filter>
     </ClInclude>
     <ClInclude Include="xrCore.h">
@@ -745,6 +745,9 @@
     </ClInclude>
     <ClInclude Include="Compression\rt_compressor.h">
       <Filter>Compression</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>PCH</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
