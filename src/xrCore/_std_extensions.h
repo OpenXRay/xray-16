@@ -72,7 +72,7 @@ struct XRCORE_API xr_token
     int id;
 };
 
-IC LPCSTR get_token_name(xr_token* tokens, int key)
+IC LPCSTR get_token_name(const xr_token* tokens, int key)
 {
     for (int k = 0; tokens[k].name; k++)
         if (key == tokens[k].id)
@@ -80,7 +80,7 @@ IC LPCSTR get_token_name(xr_token* tokens, int key)
     return "";
 }
 
-IC int get_token_id(xr_token* tokens, LPCSTR key)
+IC int get_token_id(const xr_token* tokens, LPCSTR key)
 {
     for (int k = 0; tokens[k].name; k++)
         if (_stricmp(tokens[k].name, key) == 0)
