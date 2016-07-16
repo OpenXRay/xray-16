@@ -1,6 +1,15 @@
+#pragma once
 #ifndef __V2D__
 #define __V2D__
 #include "Common/inlining_macros.h"
+
+#ifdef min
+# undef min
+#endif
+#ifdef max
+# undef max
+#endif
+
 
 template <class T>
 struct _vector2

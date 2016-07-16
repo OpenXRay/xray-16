@@ -1,5 +1,7 @@
-#ifndef __C__
-#define __C__
+#pragma once
+#ifndef XRCORE_COLOR_H
+#define XRCORE_COLOR_H
+#include "vector.h" // clampr
 
 // maps unsigned 8 bits/channel to D3DCOLOR
 ICF u32 color_argb(u32 a, u32 r, u32 g, u32 b)
@@ -256,4 +258,4 @@ BOOL _valid(const _color<T>& c)
     return _valid(c.r) && _valid(c.g) && _valid(c.b) && _valid(c.a);
 }
 
-#endif
+#endif // XRCORE_COLOR_H

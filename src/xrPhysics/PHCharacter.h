@@ -22,10 +22,14 @@ enum EHitType;
 };
 static enum EEnvironment { peOnGround, peAtWall, peInAir };
 
-class CPHCharacter : public CPHObject, public CPHSynchronize, public CPHDisablingTranslational, public IPhysicsElement
+class CPHCharacter :
+    public CPHObject,
+    public CPHSynchronize,
+    public CPHDisablingTranslational,
+    public IPhysicsElement
 #if 0
 #ifdef DEBUG
-	,public pureRender
+    ,public pureRender
 #endif
 #endif
 {

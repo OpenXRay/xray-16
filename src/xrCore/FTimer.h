@@ -1,6 +1,10 @@
 #pragma once
 #ifndef FTimerH
 #define FTimerH
+#include "xrCore_impexp.h"
+#include "_stl_extensions.h"
+#include "_math.h"
+#include "log.h"
 
 class CTimer_paused;
 

@@ -1,6 +1,6 @@
+#pragma once
 #ifndef xrMemoryH
 #define xrMemoryH
-#pragma once
 
 #include "memory_monitor.h"
 

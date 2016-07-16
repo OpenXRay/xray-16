@@ -30,6 +30,7 @@ class CSE_ALifeObject;
 class CALifeSmartTerrainTask;
 #endif //#ifdef XRGAME_EXPORTS
 class CALifeMonsterAbstract;
+class CSE_ALifeInventoryItem;
 
 struct SFillPropData
 {

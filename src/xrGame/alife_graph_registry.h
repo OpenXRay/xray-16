@@ -12,6 +12,7 @@
 #include "alife_level_registry.h"
 
 class CSE_ALifeCreatureActor;
+class CSE_ALifeInventoryItem;
 
 class CALifeGraphRegistry
 {

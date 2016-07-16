@@ -1,6 +1,4 @@
-#ifdef _MSC_VER
 #pragma once
-#endif
 #ifndef XR_IMPEXP_MACROS_H
 #define XR_IMPEXP_MACROS_H
 

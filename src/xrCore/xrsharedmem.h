@@ -1,6 +1,10 @@
+#pragma once
 #ifndef xrsharedmemH
 #define xrsharedmemH
-#pragma once
+
+#include "Threading/Lock.hpp"
+#include "_stl_extensions.h"
+#include "xrCore_impexp.h"
 
 #pragma pack(push, 4)
 //////////////////////////////////////////////////////////////////////////

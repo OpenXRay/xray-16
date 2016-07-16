@@ -1,5 +1,11 @@
+#pragma once
 #ifndef logH
 #define logH
+#include "Common/Platform.hpp"
+#include "xrCore_impexp.h"
+
+class shared_str;
+template <typename T, typename allocator> class xr_vector;
 
 #define VPUSH(a) ((a).x), ((a).y), ((a).z)
 

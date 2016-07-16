@@ -1,5 +1,8 @@
+#pragma once
 #ifndef _PLANE
 #define _PLANE
+#include "_vector3d.h"
+#include "_matrix.h"
 
 template <class T>
 class _plane

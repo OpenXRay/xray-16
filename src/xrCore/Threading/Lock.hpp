@@ -1,5 +1,5 @@
 #pragma once
-#include "xrCore/xrCore.h"
+#include "xrCore/xrCore_impexp.h"
 
 #include <mutex>
 #include <atomic>

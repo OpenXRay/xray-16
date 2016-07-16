@@ -39,7 +39,7 @@ class CInventoryOwner;
 struct SHit;
 
 class CSE_ALifeInventoryItem;
-typedef CSE_ALifeInventoryItem::mask_num_items mask_inv_num_items;
+typedef typename CSE_ALifeInventoryItem::mask_num_items mask_inv_num_items;
 
 struct net_update_IItem
 {

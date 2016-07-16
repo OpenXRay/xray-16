@@ -1,3 +1,4 @@
+#pragma once
 #ifndef __V3D__
 #define __V3D__
 // XXX: review

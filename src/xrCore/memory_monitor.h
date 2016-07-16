@@ -1,3 +1,4 @@
+#pragma once
 #ifndef MEMORY_MONITOR_H
 #define MEMORY_MONITOR_H
 
@@ -8,6 +9,8 @@
 #endif // DEBUG
 
 #ifdef USE_MEMORY_MONITOR
+
+#include "xrCore_impexp.h"
 
 namespace memory_monitor
 {

@@ -1,9 +1,11 @@
+#pragma once
 // FS.h: interface for the CFS class.
 //
 //////////////////////////////////////////////////////////////////////
 
 #ifndef fsH
 #define fsH
+#include "_stl_extensions.h"
 
 #define CFS_CompressMark (1ul << 31ul)
 #define CFS_HeaderChunkID (666)

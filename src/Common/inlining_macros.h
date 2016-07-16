@@ -1,6 +1,4 @@
-#ifdef _MSC_VER
 #pragma once
-#endif
 #ifndef INLINING_MACROS_H
 #define INLINING_MACROS_H
 
