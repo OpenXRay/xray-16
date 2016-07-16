@@ -55,6 +55,9 @@ typedef xr_vector<shared_str> PSVec;
 typedef PSVec::iterator PSIt;
 #endif
 
+#include "xrCore/xrDebug_macros.h"
+#pragma todo("Place at least CGameMtlLibrary in a static lib or something. It currently gets instantiated a huge amount of times.")
+
 struct MTL_EXPORT_API SGameMtl
 {
     friend class CGameMtlLibrary;
@@ -247,7 +250,7 @@ public:
 
     GameMtlIt GetMaterialIt(LPCSTR name)
     {
-        auto pred = [&](const SGameMtl* mtl) { return !strcmpi(mtl->m_Name.c_str(), name); };
+        auto pred = [&](const SGameMtl* mtl) { return !_strcmpi(mtl->m_Name.c_str(), name); };
         return std::find_if(materials.begin(), materials.end(), pred);
     }
     GameMtlIt GetMaterialIt(shared_str& name)
