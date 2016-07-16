@@ -2957,7 +2957,7 @@ static int change_mparam(int param_number, int value) {
   }
 }
 
-#if DEBUG
+#ifdef DEBUG
 /* ------------------------- Debugging Support --------------------------- */
 
 /* Check properties of any chunk, whether free, inuse, mmapped etc  */
@@ -4456,7 +4456,7 @@ static void** ialloc(mstate m,
     }
   }
 
-#if DEBUG
+#ifdef DEBUG
   if (marray != chunks) {
     /* final element must have exactly exhausted chunk */
     if (element_size != 0) {

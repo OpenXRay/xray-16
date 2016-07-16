@@ -8,7 +8,7 @@
 
 #include "stdafx.h"
 #include "LevelGraphDebugRender.hpp"
-#if DEBUG
+#ifdef DEBUG
 #include "xrAICore/Navigation/game_graph.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "xrAICore/Navigation/graph_engine.h"
