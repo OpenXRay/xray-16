@@ -680,7 +680,7 @@ int CInifile::r_token(LPCSTR S, LPCSTR L, const xr_token* token_list) const
 {
     LPCSTR C = r_string(S, L);
     for (int i = 0; token_list[i].name; i++)
-        if (!stricmp(C, token_list[i].name))
+        if (!_stricmp(C, token_list[i].name))
             return token_list[i].id;
     return 0;
 }

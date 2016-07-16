@@ -157,7 +157,7 @@ void FileCompress(const char* fn, const char* sign, void* data, u32 size)
     MARK M;
     mk_mark(M, sign);
 
-    int H = open(fn, O_BINARY | O_CREAT | O_WRONLY | O_TRUNC, S_IREAD | S_IWRITE);
+    int H = _open(fn, O_BINARY | O_CREAT | O_WRONLY | O_TRUNC, S_IREAD | S_IWRITE);
     R_ASSERT2(H > 0, fn);
     _write(H, &M, 8);
     _writeLZ(H, data, size);
@@ -169,7 +169,7 @@ void* FileDecompress(const char* fn, const char* sign, u32* size)
     MARK M, F;
     mk_mark(M, sign);
 
-    int H = open(fn, O_BINARY | O_RDONLY);
+    int H = _open(fn, O_BINARY | O_RDONLY);
     R_ASSERT2(H > 0, fn);
     _read(H, &F, 8);
     if (strncmp(M, F, 8) != 0)
@@ -181,7 +181,7 @@ void* FileDecompress(const char* fn, const char* sign, u32* size)
 
     void* ptr = 0;
     u32 SZ;
-    SZ = _readLZ(H, ptr, filelength(H) - 8);
+    SZ = _readLZ(H, ptr, _filelength(H) - 8);
     _close(H);
     if (size)
         *size = SZ;

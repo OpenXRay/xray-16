@@ -78,7 +78,7 @@ struct str_container_impl
                 u32 crc = crc32(value->value, value->dwLength);
                 string32 crc_str;
                 R_ASSERT3(crc == value->dwCRC, "CorePanic: read-only memory corruption (shared_strings)",
-                    itoa(value->dwCRC, crc_str, 16));
+                    _itoa(value->dwCRC, crc_str, 16));
                 R_ASSERT3(value->dwLength == xr_strlen(value->value),
                     "CorePanic: read-only memory corruption (shared_strings, internal structures)", value->value);
                 value = value->next;
@@ -392,8 +392,8 @@ void str_container::verify()
         str_value* sv = *it;
         u32 crc = crc32(sv->value, sv->dwLength);
         string32 crc_str;
-        R_ASSERT3(
-            crc == sv->dwCRC, "CorePanic: read-only memory corruption (shared_strings)", itoa(sv->dwCRC, crc_str, 16));
+        R_ASSERT3(crc == sv->dwCRC,
+            "CorePanic: read-only memory corruption (shared_strings)", _itoa(sv->dwCRC, crc_str, 16));
         R_ASSERT3(sv->dwLength == xr_strlen(sv->value),
             "CorePanic: read-only memory corruption (shared_strings, internal structures)", sv->value);
     }
