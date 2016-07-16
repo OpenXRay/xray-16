@@ -281,6 +281,12 @@ bool CxImageJPG::Decode(CxFile * hFile)
 #endif //CXIMAGE_SUPPORT_DECODE
 ////////////////////////////////////////////////////////////////////////////////
 #if CXIMAGE_SUPPORT_ENCODE
+
+#ifdef DEBUG
+#include "xrCore/FTimer.h"
+#include "xrCore/log.h"
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 bool CxImageJPG::Encode(CxFile * hFile)
 {
