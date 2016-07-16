@@ -187,7 +187,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>d3dx.lib;mesh.lib;geom.lib;gfx.lib;maxutil.lib;core.lib;paramblk2.lib;comctl32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;R:\MagicFM\Sdk\Library\Release\MagicFM.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>mesh.lib;geom.lib;gfx.lib;maxutil.lib;core.lib;paramblk2.lib;comctl32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(XRAY_15X_LIBS)\bugtrap\bin;$(DXSDK_DIR)Lib\x86;$(SolutionDir)Externals\3dsmax/ver-6.0/lib;$(xrLibDir);$(xrSdkDir)libraries;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>Export\Utility.def</ModuleDefinitionFile>
