@@ -171,7 +171,7 @@ float CTextureDescrMngr::GetMaterial(const shared_str& tex_name) const
     return 1.0f;
 }
 
-void CTextureDescrMngr::GetTextureUsage(const shared_str& tex_name, BOOL& bDiffuse, BOOL& bBump) const
+void CTextureDescrMngr::GetTextureUsage(const shared_str& tex_name, bool& bDiffuse, bool& bBump) const
 {
     map_TD::const_iterator I = m_texture_details.find(tex_name);
     if (I != m_texture_details.end())
