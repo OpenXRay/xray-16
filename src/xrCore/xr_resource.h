@@ -1,6 +1,8 @@
+#pragma once
 #ifndef xr_resourceH
 #define xr_resourceH
-#pragma once
+#include "xrCore_impexp.h"
+#include "xrstring.h"
 
 // resource itself, the base class for all derived resources
 class XRCORE_API xr_resource

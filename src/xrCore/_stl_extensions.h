@@ -369,6 +369,12 @@ struct pred_stri : public std::binary_function<char*, char*, bool>
     IC bool operator()(const char* x, const char* y) const { return _stricmp(x, y) < 0; }
 };
 
+IC void xr_strlwr(xr_string& src)
+{
+    for (xr_string::iterator it = src.begin(); it!=src.end(); it++)
+        *it = xr_string::value_type(tolower(*it));
+}
+
 // tamlin: TODO (low priority, for a rainy day): Rename these macros from DEFINE_* to DECLARE_*
 // Xottab_DUTY: TODO: or maybe use Im-Dex variant (Get rid of this DEFINE macroses)
 
@@ -457,4 +463,4 @@ DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
 DEFINE_VECTOR(AnsiString*, LPAStringVec, LPAStringIt);
 #endif
 
-#endif
+#endif // include guard

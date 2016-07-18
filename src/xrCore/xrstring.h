@@ -3,6 +3,8 @@
 #pragma once
 
 // TODO: tamlin: Get rid of _std_extensions.h as compile-time dependency, if possible.
+#include "xrCore_impexp.h"
+#include "_types.h"
 #include "_std_extensions.h"
 
 #pragma pack(push, 4)
@@ -40,10 +42,6 @@ class IWriter;
 //////////////////////////////////////////////////////////////////////////
 class XRCORE_API str_container
 {
-private:
-    Lock cs;
-    str_container_impl* impl;
-
 public:
     str_container();
     ~str_container();
@@ -54,9 +52,9 @@ public:
     void dump(IWriter* W);
     void verify();
     u32 stat_economy();
-#ifdef CONFIG_PROFILE_LOCKS
-    str_container() : cs(MUTEX_PROFILE_ID(str_container)) {}
-#endif // CONFIG_PROFILE_LOCKS
+
+private:
+    str_container_impl* impl;
 };
 XRCORE_API extern str_container* g_pStringContainer;
 
@@ -123,6 +121,7 @@ public:
         _set(rhs);
         return (shared_str&)*this;
     }
+    // XXX tamlin: Remove operator*(). It may be convenient, but it's dangerous. Use 
     str_c operator*() const { return p_ ? p_->value : 0; }
     bool operator!() const { return p_ == 0; }
     char operator[](size_t id) { return p_->value[id]; }
@@ -142,18 +141,7 @@ public:
         rhs.p_ = tmp;
     }
     bool equal(const shared_str& rhs) const { return (p_ == rhs.p_); }
-    shared_str& __cdecl printf(const char* format, ...)
-    {
-        string4096 buf;
-        va_list p;
-        va_start(p, format);
-        int vs_sz = vsnprintf(buf, sizeof(buf) - 1, format, p);
-        buf[sizeof(buf) - 1] = 0;
-        va_end(p);
-        if (vs_sz)
-            _set(buf);
-        return (shared_str&)*this;
-    }
+    shared_str& __cdecl printf(const char* format, ...);
 };
 
 // res_ptr == res_ptr
@@ -168,7 +156,7 @@ IC bool operator==(shared_str const& a, shared_str const& b) { return a._get() =
 IC bool operator!=(shared_str const& a, shared_str const& b) { return a._get() != b._get(); }
 IC bool operator<(shared_str const& a, shared_str const& b) { return a._get() < b._get(); }
 IC bool operator>(shared_str const& a, shared_str const& b) { return a._get() > b._get(); }
-// externally visible standart functionality
+// externally visible standard functionality
 IC void swap(shared_str& lhs, shared_str& rhs) { lhs.swap(rhs); }
 IC u32 xr_strlen(const shared_str& a) throw() { return a.size(); }
 IC int xr_strcmp(const shared_str& a, const char* b) throw() { return xr_strcmp(*a, b); }
@@ -180,23 +168,9 @@ IC int xr_strcmp(const shared_str& a, const shared_str& b) throw()
     else
         return xr_strcmp(*a, *b);
 }
-IC void xr_strlwr(xr_string& src)
-{
-    for (xr_string::iterator it = src.begin(); it != src.end(); it++)
-        *it = xr_string::value_type(tolower(*it));
-}
-IC void xr_strlwr(shared_str& src)
-{
-    if (*src)
-    {
-        LPSTR lp = xr_strdup(*src);
-        xr_strlwr(lp);
-        src = lp;
-        xr_free(lp);
-    }
-}
 
-#pragma todo("tamlin: Move xr_strlwr into a static lib (f.ex. 'xrMisc_lib')")
+// void xr_strlwr(xr_string& src) // in _stl_extensions.h, since it depends on xr_string defined there.
+void xr_strlwr(shared_str& src);
 
 #pragma pack(pop)
 

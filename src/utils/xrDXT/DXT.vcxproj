@@ -241,7 +241,7 @@
     <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\xrMiscMath_lib\xrMiscMath_lib.vcxproj">
+    <ProjectReference Include="..\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{cc912a26-e688-49f5-99f4-7a0f9af4e438}</Project>
     </ProjectReference>
   </ItemGroup>

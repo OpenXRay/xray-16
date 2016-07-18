@@ -30,7 +30,7 @@ bool exact_normalize(float* a)
 		{
 			goto aa2_largest;
 		}
-		else   // aa1 is largest
+		else // aa1 is largest
 		{
 			a0 /= aa1;
 			a2 /= aa1;
@@ -52,11 +52,11 @@ bool exact_normalize(float* a)
 			a[1] = a1*l;
 			a[2] = (double)_copysign(l, a2);
 		}
-		else   // aa0 is largest
+		else // aa0 is largest
 		{
 			if (aa0 <= 0)
 			{
-				// dDEBUGMSG ("vector has zero size"); ... this messace is annoying
+				// dDEBUGMSG ("vector has zero size"); ... this message is annoying
 				a[0] = 0; // if all a's are zero, this is where we'll end up.
 				a[1] = 1; // return a default unit length vector.
 				a[2] = 0;

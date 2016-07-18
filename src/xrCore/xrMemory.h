@@ -102,14 +102,19 @@ extern XRCORE_API xrMemory Memory;
 // generic "C"-like allocations/deallocations
 #ifdef DEBUG_MEMORY_NAME
 #include "typeinfo.h"
+template <class T>
+IC T* xr_alloc(u32 count)
+{ return (T*)Memory.mem_alloc(count*sizeof(T), typeid(T).name()); }
+
+#else
+template <class T>
+IC T* xr_alloc(u32 count)
+{ return (T*)Memory.mem_alloc(count * sizeof(T)); }
+
+#endif
 
 template <class T>
-IC T* xr_alloc(u32 count)
-{
-    return (T*)Memory.mem_alloc(count * sizeof(T), typeid(T).name());
-}
-template <class T>
-IC void xr_free(T*& P)
+IC void xr_free(T*& P) throw()
 {
     if (P)
     {
@@ -117,45 +122,26 @@ IC void xr_free(T*& P)
         P = NULL;
     };
 }
-IC void* xr_malloc(size_t size) { return Memory.mem_alloc(size, "xr_malloc"); }
-IC void* xr_realloc(void* P, size_t size) { return Memory.mem_realloc(P, size, "xr_realloc"); }
-#else // DEBUG_MEMORY_NAME
-template <class T>
-IC T* xr_alloc(u32 count)
-{
-    return (T*)Memory.mem_alloc(count * sizeof(T));
-}
-template <class T>
-IC void xr_free(T*& P)
-{
-    if (P)
-    {
-        Memory.mem_free((void*)P);
-        P = NULL;
-    };
-}
-IC void* xr_malloc(size_t size) { return Memory.mem_alloc(size); }
-IC void* xr_realloc(void* P, size_t size) { return Memory.mem_realloc(P, size); }
-#endif // DEBUG_MEMORY_NAME
+
+XRCORE_API void* xr_malloc(size_t size);
+XRCORE_API void* xr_realloc(void* P, size_t size);
 
 XRCORE_API char* xr_strdup(const char* string);
 
-#ifdef DEBUG_MEMORY_NAME
 // Global new/delete override
 #if !(defined(__BORLANDC__) || defined(NO_XRNEW))
-IC void* operator new(size_t size) { return Memory.mem_alloc(size ? size : 1, "C++ NEW"); }
-IC void operator delete(void* p) { xr_free(p); }
-IC void* operator new[](size_t size) { return Memory.mem_alloc(size ? size : 1, "C++ NEW"); }
-IC void operator delete[](void* p) { xr_free(p); }
+#if defined(_MSC_VER)
+#ifndef BUILDING_XRMISC_LIB // Attempt to force the TU to include our version.
+#pragma comment(lib, "xrMisc")
 #endif
-#else // DEBUG_MEMORY_NAME
-#if !(defined(__BORLANDC__) || defined(NO_XRNEW))
-IC void* operator new(size_t size) { return Memory.mem_alloc(size ? size : 1); }
-IC void operator delete(void* p) { xr_free(p); }
-IC void* operator new[](size_t size) { return Memory.mem_alloc(size ? size : 1); }
-IC void operator delete[](void* p) { xr_free(p); }
-#endif
-#endif // DEBUG_MEMORY_MANAGER
+#endif // _MSC_VER
+// XXX: Implementations of operator new/delete are in xrMisc/xrMemory.cpp, since they need
+// to be in a static link library.
+void* operator new(size_t size); // XXX: throw(std::bad_alloc) ?
+void operator delete(void* p) throw();
+void* operator new[](size_t size); // XXX: throw(std::bad_alloc) ?
+void operator delete[](void* p) throw();
+#endif // __BORLANDC__ etc
 
 // POOL-ing
 const u32 mem_pools_count = 54;

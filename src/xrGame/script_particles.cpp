@@ -128,7 +128,7 @@ void CScriptParticles::Stop()
     m_particles->Stop(FALSE);
 }
 
-void CScriptParticles::StopDeffered()
+void CScriptParticles::StopDeferred()
 {
     VERIFY(m_particles);
     m_particles->Stop(TRUE);

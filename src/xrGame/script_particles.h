@@ -43,7 +43,7 @@ public:
     void Play();
     void PlayAtPos(const Fvector& pos);
     void Stop();
-    void StopDeffered();
+    void StopDeferred();
 
     bool IsPlaying() const;
     bool IsLooped() const;

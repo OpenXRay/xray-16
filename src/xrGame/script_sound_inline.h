@@ -76,10 +76,10 @@ IC void CScriptSound::Stop()
     m_sound.stop();
 }
 
-IC void CScriptSound::StopDeffered()
+IC void CScriptSound::StopDeferred()
 {
     VERIFY(m_sound._handle());
-    m_sound.stop_deffered();
+    m_sound.stop_deferred();
 }
 
 IC void CScriptSound::SetPosition(const Fvector& position)

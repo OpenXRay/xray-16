@@ -3853,8 +3853,11 @@
     <ProjectReference Include="..\Externals\cximage\cximage.vcxproj">
       <Project>{880cd250-ba77-4daf-a8d4-552f12dd3ae4}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\utils\xrMiscMath_lib\xrMiscMath_lib.vcxproj">
+    <ProjectReference Include="..\utils\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{cc912a26-e688-49f5-99f4-7a0f9af4e438}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\xrMisc\xrMisc.vcxproj">
+      <Project>{c964d17a-05a8-4bfa-b0a8-7af5c6b627ec}</Project>
     </ProjectReference>
     <ProjectReference Include="..\xrScriptEngine\xrScriptEngine.vcxproj">
       <Project>{132c62de-de85-4978-9675-c78ed4da46f0}</Project>

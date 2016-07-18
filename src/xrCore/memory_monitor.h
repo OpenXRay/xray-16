@@ -11,6 +11,7 @@
 #ifdef USE_MEMORY_MONITOR
 
 #include "xrCore_impexp.h"
+#include "_types.h"
 
 namespace memory_monitor
 {

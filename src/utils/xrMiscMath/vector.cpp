@@ -677,8 +677,8 @@ template Dvector& Dvector::reflect(const Dvector& dir, const Dvector& norm);
 template Fvector& Fvector::slide(const Fvector& dir, const Fvector& norm);
 template Dvector& Dvector::slide(const Dvector& dir, const Dvector& norm);
 
-template void _vector3<float>::generate_orthonormal_basis(const _vector3<float>& dir, _vector3<float>& up, _vector3<float>& right);
-template void _vector3<double>::generate_orthonormal_basis(const _vector3<double>& dir, _vector3<double>& up, _vector3<double>& right);
-template void _vector3<float>::generate_orthonormal_basis_normalized(_vector3<float>& dir, _vector3<float>& up, _vector3<float>& right);
-template void _vector3<double>::generate_orthonormal_basis_normalized(_vector3<double>& dir, _vector3<double>& up, _vector3<double>& right);
+template void Fvector::generate_orthonormal_basis(const Fvector& dir, Fvector& up, Fvector& right);
+template void Dvector::generate_orthonormal_basis(const Dvector& dir, Dvector& up, Dvector& right);
+template void Fvector::generate_orthonormal_basis_normalized(Fvector& dir, Fvector& up, Fvector& right);
+template void Dvector::generate_orthonormal_basis_normalized(Dvector& dir, Dvector& up, Dvector& right);
 

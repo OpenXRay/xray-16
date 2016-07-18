@@ -34,6 +34,8 @@ void* xrMemory::mem_alloc(size_t size, const char* _name)
 void* xrMemory::mem_alloc(size_t size)
 #endif
 {
+    if (!size)
+        size = 1; // While allocationg 0 bytes is valid, let's mimic the old code for now.
     stat_calls++;
     static bool g_use_pure_alloc_initialized = false;
     if (!g_use_pure_alloc_initialized)
@@ -44,7 +46,7 @@ void* xrMemory::mem_alloc(size_t size)
     if (g_use_pure_alloc)
     {
         void* result = malloc(size);
-#ifdef USE_MEMORY_MONITOR
+#if defined(USE_MEMORY_MONITOR) && defined(DEBUG_MEMORY_NAME)
         memory_monitor::monitor_alloc(result, size, _name);
 #endif
         return result;
@@ -91,7 +93,7 @@ void* xrMemory::mem_alloc(size_t size)
     if (mem_initialized)
         debug_cs.Leave();
 #endif
-#ifdef USE_MEMORY_MONITOR
+#if defined(USE_MEMORY_MONITOR) && defined(DEBUG_MEMORY_NAME)
     memory_monitor::monitor_alloc(_ptr, size, _name);
 #endif
     return _ptr;
