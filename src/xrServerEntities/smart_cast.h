@@ -15,11 +15,12 @@
 
 #define  TL_FAST_COMPILATION
 #undef   STATIC_CHECK
-#include <loki/typelist.h>
 
 #ifdef PURE_DYNAMIC_CAST
 #	define smart_cast dynamic_cast
 #else
+#       include <loki/Typelist.h>
+
 #	define PURE_DYNAMIC_CAST_COMPATIBILITY_CHECK
 
 #	ifdef DEBUG

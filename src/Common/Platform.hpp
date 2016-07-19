@@ -18,7 +18,6 @@
 #include "Common/Compiler.inl"
 
 #include <ctime>
-#include <sys\utime.h>
 
 #if defined(LINUX)
 #include "Common/PlatformLinux.inl"

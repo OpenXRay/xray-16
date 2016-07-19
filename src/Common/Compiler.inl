@@ -15,6 +15,12 @@
 #endif
 
 #if defined(__GNUC__)
+#define XR_ASSUME(expr)  if (expr){} else __builtin_unreachable()
+#elif defined(_MSC_VER)
+#define XR_ASSUME(expr) __assume(expr)
+#endif
+
+#if defined(__GNUC__)
 #define NO_INLINE __attribute__((noinline))
 #define FORCE_INLINE __attribute__((always_inline)) inline
 #define ALIGN(a) __attribute__((aligned(a)))

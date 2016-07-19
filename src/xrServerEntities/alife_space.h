@@ -139,11 +139,10 @@ namespace ALife {
 		eCombatTypeDummy = u32(-1),
 	};
 
-	//возможность подключения аддонов
-	enum EWeaponAddonStatus{
-		eAddonDisabled				= 0,	//нельзя присоеденить
-		eAddonPermanent				= 1,	//постоянно подключено по умолчанию
-		eAddonAttachable			= 2		//можно присоединять
+        enum EWeaponAddonStatus {
+                eAddonDisabled				= 0,
+                eAddonPermanent				= 1,
+                eAddonAttachable			= 2
 	};
 
 	IC EHitType	g_tfString2HitType(LPCSTR caHitType)
@@ -178,7 +177,7 @@ namespace ALife {
 #endif
 	}
 #ifndef	_EDITOR
-xr_token							hit_types_token							[ ];
+        extern xr_token							hit_types_token							[ ];
 
 	IC LPCSTR g_cafHitType2String(EHitType tHitType)
 	{
