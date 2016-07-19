@@ -99,7 +99,7 @@
 #ifdef __BORLANDC__
 #define NODEFAULT
 #else
-#define NODEFAULT __assume(0)
+#define NODEFAULT XR_ASSUME(0)
 #endif
 #define VERIFY(expr) do {} while (false)
 #define VERIFY2(expr, desc) do {} while (false)

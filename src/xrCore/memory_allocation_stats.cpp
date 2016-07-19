@@ -58,7 +58,7 @@ void mem_alloc_clear_stats()
     stats.clear();
 }
 
-__declspec(noinline) void save_stack_trace()
+NO_INLINE void save_stack_trace()
 {
     if (!StatsGatherEnabled)
         return;
