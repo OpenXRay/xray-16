@@ -5,6 +5,8 @@
 #include "ElevatorState.h"
 #include "IColisiondamageInfo.h"
 #include "xrEngine/GameMtlLib.h"
+#include "xrCDB/xr_collide_defs.h"
+
 namespace ALife
 {
 enum EHitType;

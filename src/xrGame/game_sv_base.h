@@ -214,7 +214,7 @@ public:
     virtual u32 get_alive_count(u32 team);
     virtual xr_vector<u16>* get_children(ClientID id_who);
     void u_EventGen(NET_Packet& P, u16 type, u16 dest);
-    void u_EventSend(NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED);
+    void u_EventSend(NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/);
 
     // Events
     virtual BOOL OnPreCreate(CSE_Abstract* E) { return TRUE; };

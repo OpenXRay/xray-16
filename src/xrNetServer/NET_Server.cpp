@@ -3,6 +3,9 @@
 #include "NET_Common.h"
 #include "net_server.h"
 #include <functional>
+//#include "xrCore/net_utils.h"
+#include <dplay/dplay8.h>
+#include "NET_Messages.h"
 
 #include "NET_Log.h"
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
@@ -92,27 +95,80 @@ IClient::IClient(CTimer* timer) : stats(timer), server(NULL)
 }
 
 IClient::~IClient() {}
+
+struct ClientStatisticImpl
+{
+    DPN_CONNECTION_INFO ci_last;
+    u32 mps_receive, mps_receive_base;
+    u32 mps_send, mps_send_base;
+    u32 dwBaseTime;
+    CTimer* device_timer;
+};
+
+IClientStatistic::IClientStatistic() :
+    m_pimpl(new ClientStatisticImpl)
+{}
+
+IClientStatistic::IClientStatistic(CTimer* timer)
+{
+    ZeroMemory(this, sizeof(*this));
+    m_pimpl = new ClientStatisticImpl;
+    m_pimpl->device_timer = timer;
+    m_pimpl->dwBaseTime = TimeGlobal(m_pimpl->device_timer);
+}
+
+IClientStatistic::IClientStatistic(const IClientStatistic& rhs) :
+    m_pimpl(new ClientStatisticImpl)
+{
+    *m_pimpl = *rhs.m_pimpl;
+}
+
+IClientStatistic::~IClientStatistic()
+{ delete m_pimpl; }
+
 void IClientStatistic::Update(DPN_CONNECTION_INFO& CI)
 {
-    u32 time_global = TimeGlobal(device_timer);
-    if (time_global - dwBaseTime >= 999)
+    const u32 time_global = TimeGlobal(m_pimpl->device_timer);
+    if (time_global - m_pimpl->dwBaseTime >= 999)
     {
-        dwBaseTime = time_global;
+        m_pimpl->dwBaseTime = time_global;
 
-        mps_recive = CI.dwMessagesReceived - mps_receive_base;
-        mps_receive_base = CI.dwMessagesReceived;
+        m_pimpl->mps_receive = CI.dwMessagesReceived - m_pimpl->mps_receive_base;
+        m_pimpl->mps_receive_base= CI.dwMessagesReceived;
 
         u32 cur_msend = CI.dwMessagesTransmittedHighPriority + CI.dwMessagesTransmittedNormalPriority +
             CI.dwMessagesTransmittedLowPriority;
-        mps_send = cur_msend - mps_send_base;
-        mps_send_base = cur_msend;
+        m_pimpl->mps_send = cur_msend - m_pimpl->mps_send_base;
+        m_pimpl->mps_send_base = cur_msend;
 
         dwBytesSendedPerSec = dwBytesSended;
         dwBytesSended = 0;
         dwBytesReceivedPerSec = dwBytesReceived;
         dwBytesReceived = 0;
     }
-    ci_last = CI;
+    m_pimpl->ci_last = CI;
+}
+
+u32 IClientStatistic::getPing() const { return m_pimpl->ci_last.dwRoundTripLatencyMS; }
+u32 IClientStatistic::getBPS() const { return m_pimpl->ci_last.dwThroughputBPS; }
+u32 IClientStatistic::getPeakBPS() const { return m_pimpl->ci_last.dwPeakThroughputBPS; }
+u32 IClientStatistic::getDroppedCount() const { return m_pimpl->ci_last.dwPacketsDropped; }
+u32 IClientStatistic::getRetriedCount() const { return m_pimpl->ci_last.dwPacketsRetried; }
+u32 IClientStatistic::getMPS_Receive() const { return m_pimpl->mps_receive; }
+u32 IClientStatistic::getMPS_Send() const { return m_pimpl->mps_send; }
+u32 IClientStatistic::getReceivedPerSec() const { return dwBytesReceivedPerSec; }
+u32 IClientStatistic::getSendedPerSec() const { return dwBytesSendedPerSec; }
+
+void IClientStatistic::Clear()
+{
+    // XXX: Ugly, ugly hack (just following the lead of original code). FIX!
+    ClientStatisticImpl* const saved_impl = m_pimpl;
+    CTimer* const saved_timer = m_pimpl->device_timer;
+    ZeroMemory(this, sizeof(*this));
+    ZeroMemory(m_pimpl, sizeof(*m_pimpl));
+    m_pimpl = saved_impl;
+    m_pimpl->device_timer = saved_timer;
+    m_pimpl->dwBaseTime = TimeGlobal(m_pimpl->device_timer);
 }
 
 // {0218FA8B-515B-4bf2-9A5F-2F079D1759F3}

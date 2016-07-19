@@ -6,6 +6,7 @@
 //	Description : Stalker movement parameters class
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef STALKER_MOVEMENT_PARAMS_H_INCLUDED
 #define STALKER_MOVEMENT_PARAMS_H_INCLUDED
 

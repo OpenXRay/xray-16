@@ -1,5 +1,7 @@
+#pragma once
 #ifndef XRENGINE_ISHEDULED_H_INCLUDED
 #define XRENGINE_ISHEDULED_H_INCLUDED
+#include "Engine.h"
 
 class SchedulerData
 {

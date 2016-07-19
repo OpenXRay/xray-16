@@ -1,7 +1,10 @@
+#pragma once
 #ifndef XRSHEDULER_H_INCLUDED
 #define XRSHEDULER_H_INCLUDED
 
-#include "ISheduled.h"
+//#include "ISheduled.h"
+#include "Engine_impexp.h"
+class ISheduled;
 
 class ENGINE_API CSheduler
 {

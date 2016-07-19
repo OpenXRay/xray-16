@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "xrPhysics.h"
-#include "Externals/ode/include/ode/memory.h"
+#include "ode/include/ode/memory.h"
 
 #pragma comment(lib, "ode.lib")
 #pragma comment(lib, "xrCDB.lib")

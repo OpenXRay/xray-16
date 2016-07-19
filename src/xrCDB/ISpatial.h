@@ -4,7 +4,10 @@
 //#pragma once
 #include "Common/Platform.hpp"
 #include "xrCore/xrPool.h"
-#include "xr_collide_defs.h"
+//#include "xr_collide_defs.h"
+#include "xrCore/_types.h"
+#include "xrCore/_vector3d.h"
+#include "xrCDB.h"
 
 #pragma pack(push, 4)
 

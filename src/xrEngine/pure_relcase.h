@@ -1,3 +1,4 @@
+#pragma once
 #ifndef pure_relcaseH
 #define pure_relcaseH
 

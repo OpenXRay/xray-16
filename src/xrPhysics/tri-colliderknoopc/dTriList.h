@@ -1,5 +1,5 @@
 
-#include "Externals/ode/include/ode/common.h"
+#include "ode/include/ode/common.h"
 
 /* Class ID */
 

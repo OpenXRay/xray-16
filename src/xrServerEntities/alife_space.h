@@ -6,6 +6,7 @@
 //  Description : ALife space
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef XRAY_ALIFE_SPACE
 #define XRAY_ALIFE_SPACE
 

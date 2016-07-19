@@ -22,6 +22,7 @@
 #include "xrPhysics/iphworld.h"
 #include "restriction_space.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrNetServer/NET_Messages.h"
 
 SArtefactActivation::SArtefactActivation(CArtefact* af, u32 owner_id)
 {

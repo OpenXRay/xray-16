@@ -4,10 +4,10 @@
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #pragma warning(disable : 4267)
-#include "Externals/ode/ode/src/objects.h"
-#include "Externals/ode/ode/src/joint.h"
+#include "ode/ode/src/objects.h"
+#include "ode/ode/src/joint.h"
 #pragma warning(pop)
-#include "Externals/ode/include/ode/objects.h"
+#include "ode/include/ode/objects.h"
 #include "PhysicsCommon.h"
 
 class CPHIslandFlags

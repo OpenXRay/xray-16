@@ -17,6 +17,7 @@
 #include "ai/Monsters/Pseudodog/psy_dog_state_manager.h"
 #include "alife_object_registry.h"
 #include "xrServerEntities/xrserver_objects_alife_monsters.h"
+#include "xrNetServer/NET_Messages.h"
 
 CPsyDog::CPsyDog()
 {

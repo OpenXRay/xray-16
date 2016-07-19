@@ -16,6 +16,7 @@
 #include "xrserver.h"
 #include "ai_space.h"
 #include "xrAICore/Navigation/level_graph.h"
+#include "xrNetServer/NET_Messages.h"
 
 #ifdef DEBUG
 #include "Level.h"

@@ -1,11 +1,11 @@
+#pragma once
 #ifndef igame_level_h_defined
 #define igame_level_h_defined
-
-#pragma once
 
 #include "IInputReceiver.h"
 #include "xr_object_list.h"
 #include "xrCDB/xr_area.h"
+#include "xrSound/Sound.h"
 
 // refs
 class ENGINE_API CCameraManager;

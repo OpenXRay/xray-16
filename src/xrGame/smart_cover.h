@@ -5,6 +5,7 @@
 //	Description : Smart cover class
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef SMART_COVER_H_INCLUDED
 #define SMART_COVER_H_INCLUDED
 

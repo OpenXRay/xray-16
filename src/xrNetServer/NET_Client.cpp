@@ -780,7 +780,7 @@ HRESULT IPureClient::net_Handler(u32 dwMessageType, PVOID pMessage)
         for (u32 I = 0; I < net_Hosts.size(); I++)
         {
             HOST_NODE& N = net_Hosts[I];
-            if (pDesc->guidInstance == N.dpAppDesc.guidInstance)
+            if (pDesc->guidInstance == N.pdpAppDesc->guidInstance)
             {
                 // This host is already in the list
                 bHostRegistered = TRUE;
@@ -796,15 +796,15 @@ HRESULT IPureClient::net_Handler(u32 dwMessageType, PVOID pMessage)
 
             // Copy the Host Address
             R_CHK(pEnumHostsResponseMsg->pAddressSender->Duplicate(&NODE.pHostAddress));
-            CopyMemory(&NODE.dpAppDesc, pDesc, sizeof(DPN_APPLICATION_DESC));
+            CopyMemory(NODE.pdpAppDesc, pDesc, sizeof(DPN_APPLICATION_DESC));
 
             // Null out all the pointers we aren't copying
-            NODE.dpAppDesc.pwszSessionName = NULL;
-            NODE.dpAppDesc.pwszPassword = NULL;
-            NODE.dpAppDesc.pvReservedData = NULL;
-            NODE.dpAppDesc.dwReservedDataSize = 0;
-            NODE.dpAppDesc.pvApplicationReservedData = NULL;
-            NODE.dpAppDesc.dwApplicationReservedDataSize = 0;
+            NODE.pdpAppDesc->pwszSessionName = NULL;
+            NODE.pdpAppDesc->pwszPassword = NULL;
+            NODE.pdpAppDesc->pvReservedData = NULL;
+            NODE.pdpAppDesc->dwReservedDataSize = 0;
+            NODE.pdpAppDesc->pvApplicationReservedData = NULL;
+            NODE.pdpAppDesc->dwApplicationReservedDataSize = 0;
 
             if (pDesc->pwszSessionName)
             {
@@ -1135,6 +1135,32 @@ void IPureClient::net_Syncronize()
 
 void IPureClient::ClearStatistic() { net_Statistic.Clear(); }
 BOOL IPureClient::net_IsSyncronised() { return net_Syncronised; }
+
+IPureClient::HOST_NODE::HOST_NODE() :
+    pdpAppDesc(new DPN_APPLICATION_DESC),
+    pHostAddress(0)
+{}
+
+IPureClient::HOST_NODE::HOST_NODE(const HOST_NODE& rhs) :
+    pdpAppDesc(new DPN_APPLICATION_DESC)
+{
+    *pdpAppDesc = *rhs.pdpAppDesc;
+    pHostAddress = rhs.pHostAddress;
+    dpSessionName = rhs.dpSessionName;
+}
+
+IPureClient::HOST_NODE::HOST_NODE(HOST_NODE&& rhs) throw() :
+    pdpAppDesc(rhs.pdpAppDesc)
+{
+    pHostAddress = rhs.pHostAddress;
+    dpSessionName.swap(rhs.dpSessionName);
+    rhs.pdpAppDesc = 0;
+    rhs.pHostAddress = 0;
+}
+
+IPureClient::HOST_NODE::~HOST_NODE() throw()
+{ delete pdpAppDesc; }
+
 #include <WINSOCK2.H>
 #include <Ws2tcpip.h>
 bool IPureClient::GetServerAddress(ip_address& pAddress, DWORD* pPort)

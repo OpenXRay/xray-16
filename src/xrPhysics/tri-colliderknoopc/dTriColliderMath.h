@@ -1,7 +1,7 @@
 #ifndef D_TRI_COLLIDER_MATH_H
 #define D_TRI_COLLIDER_MATH_H
 #include "__aabb_tri.h"
-#include "Externals/ode/include/ode/common.h"
+#include "ode/include/ode/common.h"
 #include "xrPhysics/MathUtilsOde.h"
 #include "dcTriangle.h"
 

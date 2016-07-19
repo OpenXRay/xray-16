@@ -3,6 +3,7 @@
 #include "game_sv_base.h"
 #include "Level.h"
 #include "xrServer_Objects_Alife_Items.h"
+#include "xrNetServer/NET_Messages.h"
 #include <functional>
 
 item_respawn_manager::spawn_item::spawn_item()

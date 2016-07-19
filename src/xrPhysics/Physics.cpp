@@ -13,10 +13,18 @@
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #pragma warning(disable : 4267)
+<<<<<<< HEAD
 #include "Externals/ode/ode/src/collision_kernel.h"
 #include "Externals/ode/ode/src/joint.h"
 #include "Externals/ode/ode/src/objects.h"
 #pragma warning(pop)
+=======
+#include "ode/ode/src/collision_kernel.h"
+#include "ode/ode/src/joint.h"
+#include "ode/ode/src/objects.h"
+#pragma warning(default : 4267)
+#pragma warning(default : 4995)
+>>>>>>> 1ca44c6e... Move src/Externals to Externals.
 
 extern CPHWorld* ph_world;
 ///////////////////////////////////////////////////////////////////

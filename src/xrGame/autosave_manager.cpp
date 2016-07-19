@@ -15,6 +15,7 @@
 #include "UIGameCustom.h"
 #include "Actor.h"
 #include "MainMenu.h"
+#include "xrNetServer/NET_Messages.h"
 
 extern LPCSTR alife_section;
 

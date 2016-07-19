@@ -6,6 +6,7 @@
 //	Description : stalker movement manager class with smart covers
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef STALKER_MOVEMENT_MANAGER_SMART_COVER_H_INCLUDED
 #define STALKER_MOVEMENT_MANAGER_SMART_COVER_H_INCLUDED
 

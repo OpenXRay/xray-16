@@ -2,9 +2,9 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef IINPUTRECEIVERH
 #define IINPUTRECEIVERH
-#pragma once
 
 class ENGINE_API IInputReceiver
 {

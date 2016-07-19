@@ -319,7 +319,7 @@
     <ClInclude Include="xrPhysics.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)Externals\ode\contrib\msvc7\ode_default\default.vcxproj">
+    <ProjectReference Include="$(xrExternals)ode\contrib\msvc7\ode_default\default.vcxproj">
       <Project>{1bf75feb-87dd-486c-880b-227987d191c2}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

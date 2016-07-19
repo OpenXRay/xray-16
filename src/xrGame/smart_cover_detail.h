@@ -5,6 +5,7 @@
 //	Description : Smart cover auxillary namespace
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef SMART_COVER_DETAIL_H_INCLUDED
 #define SMART_COVER_DETAIL_H_INCLUDED
 

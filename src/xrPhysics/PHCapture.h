@@ -5,7 +5,7 @@
 #include "phupdateobject.h"
 
 #include "phisland.h"
-#include "Externals/ode/include/ode/common.h"
+#include "ode/include/ode/common.h"
 #include "iphcapture.h"
 class IPhysicsShellHolder;
 class CPHCharacter;

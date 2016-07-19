@@ -25,6 +25,14 @@ public:
 
 //==============================================================================
 
+// DPlay
+extern "C"
+{
+typedef struct _DPN_APPLICATION_DESC DPN_APPLICATION_DESC;
+struct IDirectPlay8Address;
+struct IDirectPlay8Client;
+}
+
 class XRNETSERVER_API IPureClient : private MultipacketReciever, private MultipacketSender
 {
     enum ConnectionState
@@ -38,9 +46,16 @@ class XRNETSERVER_API IPureClient : private MultipacketReciever, private Multipa
 protected:
     struct HOST_NODE // deprecated...
     {
-        DPN_APPLICATION_DESC dpAppDesc;
+        HOST_NODE();
+        HOST_NODE(const HOST_NODE& rhs);
+        HOST_NODE(HOST_NODE&& rhs) throw();
+        ~HOST_NODE() throw();
+
+        DPN_APPLICATION_DESC* pdpAppDesc;
         IDirectPlay8Address* pHostAddress;
         shared_str dpSessionName;
+    private:
+        void operator=(const HOST_NODE&) = delete;
     };
     GameDescriptionData m_game_description;
     CTimer* device_timer;
@@ -71,7 +86,7 @@ protected:
     void Sync_Average();
 
     void SetClientID(ClientID const& local_client) { net_ClientID = local_client; };
-    IC virtual void SendTo_LL(void* data, u32 size, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0);
+    IC virtual void SendTo_LL(void* data, u32 size, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/, u32 dwTimeout = 0);
 
 public:
     IPureClient(CTimer* tm);
@@ -94,7 +109,7 @@ public:
     IC void net_msg_Release() { net_Queue.Release(); }; //							|
     IC void EndProcessQueue() { net_Queue.Unlock(); }; //							<-
     // send
-    virtual void Send(NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0);
+    virtual void Send(NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/, u32 dwTimeout = 0);
     virtual void Flush_Send_Buffer();
     virtual void OnMessage(void* data, u32 size);
     virtual void OnInvalidHost(){};

@@ -6,6 +6,7 @@
 //	Description : stalker movement manager class with obstacles avoiding
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef STALKER_MOVEMENT_MANAGER_OBSTACLES_H_INCLUDED
 #define STALKER_MOVEMENT_MANAGER_OBSTACLES_H_INCLUDED
 

@@ -17,6 +17,7 @@
 #include "ai_space.h"
 #include "alife_simulator.h"
 #include "alife_time_manager.h"
+#include "xrNetServer/NET_Messages.h"
 
 #define BODY_REMOVE_TIME 600000
 

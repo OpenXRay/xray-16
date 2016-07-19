@@ -22,6 +22,7 @@
 #include "restriction_space.h"
 #include "xrEngine/profiler.h"
 #include "mt_config.h"
+#include "xrNetServer/NET_Messages.h"
 
 using namespace ALife;
 

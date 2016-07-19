@@ -6,7 +6,7 @@ int dCollideCylRay(dxGeom* o1, dxGeom* o2, int flags, dContactGeom* contact, int
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #pragma warning(disable : 4267)
-#include "Externals/ode/ode/src/collision_std.h"
+#include "ode/ode/src/collision_std.h"
 #pragma warning(pop)
 
 struct dxRayMotions

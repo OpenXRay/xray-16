@@ -1,6 +1,9 @@
+#pragma once
 #ifndef xrPoolH
 #define xrPoolH
-//#pragma once
+#include "_types.h"
+#include "xrDebug_macros.h"
+#include "_stl_extensions.h"
 
 template <class T, int granularity>
 class poolSS

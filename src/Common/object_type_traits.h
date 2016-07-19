@@ -5,9 +5,9 @@
 //  Author      : Dmitriy Iassenev
 //  Description : Object type traits
 ////////////////////////////////////////////////////////////////////////////
+#pragma once
 #ifndef object_type_traits_h_included
 #define object_type_traits_h_included
-#pragma once
 
 #include <type_traits>
 

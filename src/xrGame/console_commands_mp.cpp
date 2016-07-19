@@ -21,6 +21,7 @@
 #include "DemoPlay_Control.h"
 #include "account_manager_console.h"
 #include "xrGameSpy/GameSpy_GP.h"
+#include "xrNetServer/NET_Messages.h"
 
 EGameIDs ParseStringToGameType(LPCSTR str);
 LPCSTR GameTypeToString(EGameIDs gt, bool bShort);

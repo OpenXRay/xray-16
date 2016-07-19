@@ -4,6 +4,7 @@
 #include "Level.h"
 #include "xrServer.h"
 #include "ui_base.h"
+#include "xrNetServer/NET_Messages.h"
 
 #define MAX_FT_WAIT_TIME (2000 * 3) /*3 max pings*/
 #define MAX_START_WAIT_TIME (2000 * 14) /*10 max pings*/

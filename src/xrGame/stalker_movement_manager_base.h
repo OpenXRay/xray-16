@@ -6,6 +6,7 @@
 //	Description : stalker movement manager base class
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef STALKER_MOVEMENT_MANAGER_BASE_H_INCLUDED
 #define STALKER_MOVEMENT_MANAGER_BASE_H_INCLUDED
 

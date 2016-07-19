@@ -1,3 +1,4 @@
+#pragma once
 #ifndef XR_SHA_INCLUDED
 #define XR_SHA_INCLUDED
 

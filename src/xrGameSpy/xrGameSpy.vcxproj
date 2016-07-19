@@ -185,7 +185,7 @@
     <ClInclude Include="xrGameSpy_MainDefs.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Externals\GameSpy.vcxproj">
+    <ProjectReference Include="$(xrExternals)GameSpy.vcxproj">
       <Project>{67ff193e-2c20-402a-9026-9f5f6327503c}</Project>
     </ProjectReference>
     <ProjectReference Include="..\utils\xrMiscMath\xrMiscMath.vcxproj">

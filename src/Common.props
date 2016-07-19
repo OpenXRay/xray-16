@@ -23,6 +23,7 @@
     <xrLibDir>$(SolutionDir)..\lib\$(xrPlatform)\$(Configuration)\</xrLibDir>
     <xrIntDir>$(SolutionDir)..\intermediate\$(xrPlatform)\$(Configuration)\</xrIntDir>
     <xrSdkDir>$(SolutionDir)..\sdk\</xrSdkDir>
+    <xrExternals>$(SolutionDir)..\Externals\</xrExternals>
   </PropertyGroup>
   <PropertyGroup Condition="'$(ConfigurationType)'=='Application'">
     <OutDir>$(xrBinDir)</OutDir>
@@ -41,7 +42,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(ProjectDir);$(xrSdkDir)include;$(SolutionDir)Externals;$(DXSDK_DIR)Include;$(SolutionDir)Externals\luajit\src;$(SolutionDir)Externals\luabind;$(SolutionDir)Externals\GameSpy\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(xrExternals);$(ProjectDir);$(xrSdkDir)include;$(DXSDK_DIR)Include;$(xrExternals)luajit\src;$(xrExternals)luabind;$(xrExternals)GameSpy\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <!--
         4251 : class 'x' needs to have dll-interface to be used by clients of class 'y'

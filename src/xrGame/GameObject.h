@@ -2,9 +2,9 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#pragma once
 #if !defined(AFX_GAMEOBJECT_H__3DA72D03_C759_4688_AEBB_89FA812AA873__INCLUDED_)
 #define AFX_GAMEOBJECT_H__3DA72D03_C759_4688_AEBB_89FA812AA873__INCLUDED_
-#pragma once
 
 #include "xrEngine/xr_object.h"
 #include "xrServer_Space.h"
@@ -215,7 +215,7 @@ public:
     // Utilities
     // XXX: move out
     static void u_EventGen(NET_Packet& P, u32 type, u32 dest);
-    static void u_EventSend(NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED);
+    static void u_EventSend(NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/);
     // Methods
     virtual void Load(LPCSTR section) override;
     virtual void UpdateCL() override; // Called each frame, so no need for dt

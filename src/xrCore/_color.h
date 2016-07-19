@@ -1,7 +1,21 @@
 #pragma once
 #ifndef XRCORE_COLOR_H
 #define XRCORE_COLOR_H
-#include "vector.h" // clampr
+#include "_types.h" // iFloor
+#include "_bitwise.h" // iFloor
+//#include "vector.h" // clampr - refuse to include that hierarchy only to clamp an int to 8-bit value!
+
+namespace
+{
+s32 clamp_to_8bit(const s32 val)
+{
+    if (val<0)
+        return 0;
+    if (val>255)
+        return 255;
+    return val;
+}
+}
 
 // maps unsigned 8 bits/channel to D3DCOLOR
 ICF u32 color_argb(u32 a, u32 r, u32 g, u32 b)
@@ -11,10 +25,17 @@ ICF u32 color_argb(u32 a, u32 r, u32 g, u32 b)
 ICF u32 color_rgba(u32 r, u32 g, u32 b, u32 a) { return color_argb(a, r, g, b); }
 ICF u32 color_argb_f(f32 a, f32 r, f32 g, f32 b)
 {
-    s32 _r = clampr(iFloor(r * 255.f), 0, 255);
-    s32 _g = clampr(iFloor(g * 255.f), 0, 255);
-    s32 _b = clampr(iFloor(b * 255.f), 0, 255);
-    s32 _a = clampr(iFloor(a * 255.f), 0, 255);
+#if 0
+    s32 _r = clampr(iFloor(r*255.f), 0, 255);
+    s32 _g = clampr(iFloor(g*255.f), 0, 255);
+    s32 _b = clampr(iFloor(b*255.f), 0, 255);
+    s32 _a = clampr(iFloor(a*255.f), 0, 255);
+#else
+    s32 _r = clamp_to_8bit(iFloor(r*255.f));
+    s32 _g = clamp_to_8bit(iFloor(g*255.f));
+    s32 _b = clamp_to_8bit(iFloor(b*255.f));
+    s32 _a = clamp_to_8bit(iFloor(a*255.f));
+#endif
     return color_argb(_a, _r, _g, _b);
 }
 ICF u32 color_rgba_f(f32 r, f32 g, f32 b, f32 a) { return color_argb_f(a, r, g, b); }

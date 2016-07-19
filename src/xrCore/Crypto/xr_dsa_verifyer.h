@@ -1,3 +1,4 @@
+#pragma once
 #ifndef XR_DSA_VERIFYER_INCLUDED
 #define XR_DSA_VERIFYER_INCLUDED
 

@@ -6,8 +6,12 @@
 //	Description : Server objects space
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef xrServer_SpaceH
 #define xrServer_SpaceH
+#include "xrCore/_types.h"
+#include "xrCore/_vector3d.h"
+#include "xrCore/_stl_extensions.h"
 
 #ifndef XRGAME_EXPORTS
 #define SERVER_ENTITY_EDITOR_METHODS virtual void FillProps(LPCSTR pref, PropItemVec& values);

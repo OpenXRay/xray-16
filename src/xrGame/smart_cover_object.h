@@ -6,6 +6,7 @@
 //	Description : smart cover object class
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef SMART_COVER_OBJECT_H_INCLUDED
 #define SMART_COVER_OBJECT_H_INCLUDED
 

@@ -1,7 +1,7 @@
-
 #include "stdafx.h"
 
 #include "NET_Common.h"
+#include "NET_Messages.h"
 
 /*#ifdef DEBUG
 void PrintParsedPacket(const char* message, u16 message_type, const void* packet_data, u32 packet_size)

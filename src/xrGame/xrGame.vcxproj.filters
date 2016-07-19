@@ -2916,9 +2916,6 @@
     <ClInclude Include="alife_simulator.h">
       <Filter>AI\ALife</Filter>
     </ClInclude>
-    <ClInclude Include="alife_simulator_inline.h">
-      <Filter>AI\ALife</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrServerEntities\alife_space.h">
       <Filter>AI\ALife</Filter>
     </ClInclude>
@@ -3058,9 +3055,6 @@
       <Filter>AI\ALife\simulator_base\time_manager</Filter>
     </ClInclude>
     <ClInclude Include="alife_update_manager.h">
-      <Filter>AI\ALife\update_manager</Filter>
-    </ClInclude>
-    <ClInclude Include="alife_update_manager_inline.h">
       <Filter>AI\ALife\update_manager</Filter>
     </ClInclude>
     <ClInclude Include="alife_storage_manager.h">
@@ -6645,7 +6639,7 @@
     <ClInclude Include="CdkeyDecode\cdkeydecode.h">
       <Filter>Core\Server\CdkeyDecode</Filter>
     </ClInclude>
-    <ClInclude Include="..\Externals\GameSpy\src\GameSpy\md5.h">
+    <ClInclude Include="..\..\Externals\GameSpy\src\GameSpy\md5.h">
       <Filter>Core\Client\Level\ClientDigestComputer</Filter>
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\pch_script.h">
@@ -10154,7 +10148,7 @@
     <ClCompile Include="CdkeyDecode\cdkeydecode.c">
       <Filter>Core\Server\CdkeyDecode</Filter>
     </ClCompile>
-    <ClCompile Include="..\Externals\GameSpy\src\GameSpy\md5c.c">
+    <ClCompile Include="..\..\Externals\GameSpy\src\GameSpy\md5c.c">
       <Filter>Core\Client\Level\ClientDigestComputer</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\pch_script.cpp">

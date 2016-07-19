@@ -1,6 +1,6 @@
 #ifndef __DXTRILIST_INCLUDED__
 #define __DXTRILIST_INCLUDED__
-#include "Externals/ode/include/ode/common.h"
+#include "ode/include/ode/common.h"
 
 struct dcVector3
 {

@@ -5,6 +5,7 @@
 //	Description : Loophole class for smart cover
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef SMART_COVER_LOOPHOLE_H_INCLUDED
 #define SMART_COVER_LOOPHOLE_H_INCLUDED
 

@@ -18,6 +18,7 @@
 #include "actor.h"
 #include "weapon.h"
 #include "game_cl_base_weapon_usage_statistic.h"
+#include "xrNetServer/NET_Messages.h"
 
 #include "xrEngine/IGame_Persistent.h"
 #include "ui/UIActorMenu.h"

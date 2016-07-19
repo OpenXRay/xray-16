@@ -5,8 +5,8 @@
 
 #include "PHDefs.h"
 #include "PHImpact.h"
-#include "Externals/ode/include/ode/common.h"
-#include "Externals/ode/include/ode/mass.h"
+#include "ode/include/ode/common.h"
+#include "ode/include/ode/mass.h"
 
 class CPHFracture;
 class CPHElement;

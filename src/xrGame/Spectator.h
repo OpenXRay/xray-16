@@ -1,7 +1,6 @@
+#pragma once
 #ifndef __SPECTATOR_H__
 #define __SPECTATOR_H__
-
-#pragma once
 
 #include "xrEngine/feel_touch.h"
 #include "xrEngine/iinputreceiver.h"

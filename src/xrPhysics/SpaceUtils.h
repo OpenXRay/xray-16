@@ -3,7 +3,7 @@
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #pragma warning(disable : 4267)
-#include "Externals/ode/ode/src/collision_kernel.h"
+#include "/ode/ode/src/collision_kernel.h"
 #pragma warning(pop)
 
 IC void spatialParsFromDGeom(dGeomID d_space, Fvector& center, Fvector& AABB, float& radius)
